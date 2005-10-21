@@ -29,3 +29,5 @@ library, but is useful enough to ship with the Factor distribution.
 - contrib/xml.factor -- XML parser and writer (Daniel Ehrenberg)
 
 - contrib/cairo/ -- cairo bindings (Sampo Vuori)
+
+- contrib/math/ -- extended math library (Doug Coleman)

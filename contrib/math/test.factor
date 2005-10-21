@@ -70,3 +70,139 @@ USING: kernel math test sequences ;
 [ t ] [ 11 gammaln 15.1044 - abs .0001 < ] unit-test
 [ t ] [ 9000000000000000000000000000000000000000000 gammaln 8.811521863477754e+44 - abs 5.387515050969975e+30 < ] unit-test
 
+[ 1 ] [ qi norm ] unit-test
+[ 1 ] [ qj norm ] unit-test
+[ 1 ] [ qk norm ] unit-test
+[ 1 ] [ q1 norm ] unit-test
+[ 0 ] [ q0 norm ] unit-test
+[ t ] [ qi qj q* qk = ] unit-test
+[ t ] [ qj qk q* qi = ] unit-test
+[ t ] [ qk qi q* qj = ] unit-test
+[ t ] [ qi qi q* q1 v+ q0 = ] unit-test
+[ t ] [ qj qj q* q1 v+ q0 = ] unit-test
+[ t ] [ qk qk q* q1 v+ q0 = ] unit-test
+[ t ] [ qi qj qk q* q* q1 v+ q0 = ] unit-test
+[ t ] [ i qj n*v qk = ] unit-test
+[ t ] [ qj i q*n qk v+ q0 = ] unit-test
+[ t ] [ qk qj q/ qi = ] unit-test
+[ t ] [ qi qk q/ qj = ] unit-test
+[ t ] [ qj qi q/ qk = ] unit-test
+[ t ] [ qi q>v v>q qi = ] unit-test
+[ t ] [ qj q>v v>q qj = ] unit-test
+[ t ] [ qk q>v v>q qk = ] unit-test
+[ t ] [ 1 c>q q1 = ] unit-test
+[ t ] [ i c>q qi = ] unit-test
+
+[
+    @{ @{ 0 }@ @{ 0 }@ @{ 0 }@ }@
+] [
+    3 1 zero-matrix
+] unit-test
+
+[
+    @{ @{ 1 0 0 }@
+       @{ 0 1 0 }@
+       @{ 0 0 1 }@ }@
+] [
+    3 identity-matrix
+] unit-test
+
+[
+    @{ @{ 1 0 4 }@
+       @{ 0 7 0 }@
+       @{ 6 0 3 }@ }@
+] [
+    @{ @{ 1 0 0 }@
+       @{ 0 2 0 }@
+       @{ 0 0 3 }@ }@
+       
+    @{ @{ 0 0 4 }@
+       @{ 0 5 0 }@
+       @{ 6 0 0 }@ }@
+
+    m+
+] unit-test
+
+[
+    @{ @{ 1 0 4 }@
+       @{ 0 7 0 }@
+       @{ 6 0 3 }@ }@
+] [
+    @{ @{ 1 0 0 }@
+       @{ 0 2 0 }@
+       @{ 0 0 3 }@ }@
+       
+    @{ @{ 0 0 -4 }@
+       @{ 0 -5 0 }@
+       @{ -6 0 0 }@ }@
+
+    m-
+] unit-test
+
+[
+    @{ 10 20 30 }@
+] [
+    10 @{ 1 2 3 }@ n*v
+] unit-test
+
+[
+    @{ 3 4 }@
+] [
+    @{ @{ 1 0 }@
+       @{ 0 1 }@ }@
+
+    @{ 3 4 }@
+
+    m.v
+] unit-test
+
+[
+    @{ 4 3 }@
+] [
+    @{ @{ 0 1 }@
+       @{ 1 0 }@ }@
+
+    @{ 3 4 }@
+
+    m.v
+] unit-test
+
+[ @{ 0 0 1 }@ ] [ @{ 1 0 0 }@ @{ 0 1 0 }@ cross ] unit-test
+[ @{ 1 0 0 }@ ] [ @{ 0 1 0 }@ @{ 0 0 1 }@ cross ] unit-test
+[ @{ 0 1 0 }@ ] [ @{ 0 0 1 }@ @{ 1 0 0 }@ cross ] unit-test
+
+[ @{ @{ 1 2 }@ @{ 3 4 }@ @{ 5 6 }@ }@ ]
+[ @{ @{ 1 2 }@ @{ 3 4 }@ @{ 5 6 }@ }@ flip flip ]
+unit-test
+
+[ @{ @{ 1 3 5 }@ @{ 2 4 6 }@ }@ ]
+[ @{ @{ 1 3 5 }@ @{ 2 4 6 }@ }@ flip flip ]
+unit-test
+
+[ @{ @{ 1 3 5 }@ @{ 2 4 6 }@ }@ ]
+[ @{ @{ 1 2 }@ @{ 3 4 }@ @{ 5 6 }@ }@ flip ]
+unit-test
+
+[
+    @{ @{ 6 }@ }@
+] [
+    @{ @{ 3 }@ }@ @{ @{ 2 }@ }@ m.
+] unit-test
+
+[
+    @{ @{ 11 }@ }@
+] [
+    @{ @{ 1 3 }@ }@ @{ @{ 5 }@ @{ 2 }@ }@ m.
+] unit-test
+
+[
+    @{ @{ 28 }@ }@
+] [
+    @{ @{ 2 4 6 }@ }@
+
+    @{ @{ 1 }@
+       @{ 2 }@
+       @{ 3 }@ }@
+    
+    m.
+] unit-test
