@@ -1,6 +1,7 @@
 IN: dimensions
 USING: parser sequences words compiler ;
 [
+    "contrib/math/utils.factor"
     "contrib/math/combinatorics.factor"
     "contrib/math/analysis.factor"
     "contrib/math/polynomial.factor"

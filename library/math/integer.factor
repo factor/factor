@@ -21,15 +21,6 @@ UNION: integer fixnum bignum ;
     #! such that a*x=d mod y.
     swap 0 1 2swap (gcd) abs ; foldable
 
-: lcm ( a b -- c )
-    #! Smallest integer such that c/a and c/b are both integers.
-    2dup gcd nip >r * r> /i ; foldable
-
-: mod-inv ( x n -- y )
-    #! Compute the multiplicative inverse of x mod n.
-    gcd 1 = [ "Non-trivial divisor found" throw ] unless ;
-    foldable
-
 : (next-power-of-2) ( i n -- n )
     2dup >= [
         drop

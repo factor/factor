@@ -77,14 +77,14 @@ TUPLE: solid ;
 
 : rect>screen ( shape -- x1 y1 x2 y2 )
     >r origin get dup r> rect-dim v+
-    [ first2 ] 2apply [ 1 - ] 2apply ;
+    [ first2 ] 2apply ( [ 1 - ] 2apply ) ;
 
 ! Solid pen
 M: solid draw-interior
     drop dup bg gl-color rect-dim gl-fill-rect ;
 
 M: solid draw-boundary
-    drop dup fg gl-color rect-dim @{ 1 1 0 }@ v- gl-rect ;
+    drop dup fg gl-color rect-dim ( @{ 1 1 0 }@ v- ) gl-rect ;
 
 ! Rollover only
 TUPLE: rollover-only ;

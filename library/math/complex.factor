@@ -28,8 +28,6 @@ M: number = ( n n -- ? ) number= ;
 
 : conjugate ( z -- z* ) >rect neg rect> ; inline
 
-: ** ( u v -- u*v' ) conjugate * ; inline
-
 : arg ( z -- arg )
     #! Compute the complex argument.
     >rect swap fatan2 ; inline

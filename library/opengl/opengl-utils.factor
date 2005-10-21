@@ -86,7 +86,7 @@ USING: alien errors kernel math namespaces opengl sdl sequences ;
     swap glMatrixMode glPushMatrix call glPopMatrix ; inline
 
 : gl-set-clip ( loc dim -- )
-    dup first2 >r >r
+    dup first2 1+ >r >r
     over second swap second + height get swap - >r
     first r> r> r> glScissor ;
 

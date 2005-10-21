@@ -10,3 +10,7 @@ DEFER: fixnum-imm? ( -- ? )
 
 DEFER: vregs ( -- n )
 #! Number of vregs
+
+DEFER: dual-fp/int-regs? ( -- ? )
+#! Should fp parameters to fastcalls be loaded in integer
+#! registers too? Only for PowerPC.

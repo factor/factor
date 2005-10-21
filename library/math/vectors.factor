@@ -25,20 +25,19 @@ USING: arrays generic kernel sequences ;
     2dup v* >r >r drop dup r> v* v- r> v+ ;
 
 : v. ( v v -- x )
-    #! Real inner product.
+    #! Dot product.
     0 [ * + ] 2reduce ;
-
-: c. ( v v -- x )
-    #! Complex inner product.
-    0 [ ** + ] 2reduce ;
 
 : norm-sq ( v -- n ) 0 [ absq + ] reduce ;
 
-: norm ( vec -- n ) norm-sq sqrt ;
+: norm ( vec -- n )
+    #! Length of a vector.
+    norm-sq sqrt ;
 
-: normalize ( vec -- vec ) dup norm v/n ;
+: normalize ( vec -- uvec )
+    #! Unit vector with same direction as vec.
+    dup norm v/n ;
 
 : proj ( u v -- w )
     #! Orthogonal projection of u onto v.
     [ [ v. ] keep norm-sq v/n ] keep n*v ;
-

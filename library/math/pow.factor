@@ -45,16 +45,3 @@ M: integer ^ ( z w -- z^w )
     ] [
         dup 0 < [ neg ^ recip ] [ (integer^) ] if
     ] if ;
-
-: (^mod) ( n z w -- z^w )
-    1 swap [
-        1 number= [ dupd * pick mod ] when >r sq over mod r>
-    ] each-bit 2nip ; inline
-
-: ^mod ( z w n -- z^w )
-    #! Compute z^w mod n.
-    over 0 < [
-        [ >r neg r> ^mod ] keep mod-inv
-    ] [
-        -rot (^mod)
-    ] if ; foldable
