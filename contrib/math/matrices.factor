@@ -1,7 +1,7 @@
 ! Copyright (C) 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
-IN: math
-USING: arrays generic kernel sequences ;
+IN: math-contrib
+USING: arrays generic kernel sequences math ;
 
 ! Matrices
 : zero-matrix ( m n -- matrix )

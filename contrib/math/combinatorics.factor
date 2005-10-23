@@ -1,6 +1,5 @@
-USING: kernel sequences errors namespaces ;
-USING: test ;
-IN: math
+IN: math-contrib
+USING: kernel sequences errors namespaces math ;
 
 : (0..n] ( n -- (0..n] ) 1+ 1 swap <range> ; inline
 : [1..n] ( n -- [1..n] ) (0..n] ; inline

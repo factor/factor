@@ -1,14 +1,6 @@
+IN: polynomial-internals
 USING: kernel sequences vectors math math-internals namespaces ;
 
-USING: prettyprint inspector io test ;
-
-! p+ p- n*p p* p/mod pgcd
-
-IN: math
-: max-length ( seq seq -- n )
-    [ length ] 2apply max ; flushable
-
-IN: math-internals
 : 2length ( seq seq -- ) [ length ] 2apply ;
 
 : zero-vector ( n -- vector ) 0 <repeated> >vector ;
@@ -34,7 +26,7 @@ IN: math-internals
 : pextend ( p p -- p p )
     2dup 2zero-extend ;
 
-IN: math
+IN: math-contrib
 
 : p= ( p p -- )
     pextend = ;
@@ -74,7 +66,7 @@ IN: math
 : p-sq ( p -- p-sq )
     dup p* ;
 
-IN: math-internals
+IN: polynomial-internals
 
 : pop-front ( seq -- seq )
     1 swap tail ;

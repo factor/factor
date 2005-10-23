@@ -7,7 +7,7 @@
 ! Quaternions are represented as pairs of complex numbers,
 ! using the identity: (a+bi)+(c+di)j = a+bi+cj+dk.
 USING: arrays kernel math sequences ;
-IN: math-internals
+IN: quaternions-internals
 
 : 2q [ first2 ] 2apply ; inline
 
@@ -15,7 +15,7 @@ IN: math-internals
 
 : q*b 2q >r ** swap r> * + ; inline
 
-IN: math
+IN: math-contrib
 
 : q* ( u v -- u*v )
     #! Multiply quaternions.

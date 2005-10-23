@@ -7,10 +7,7 @@ USING: parser sequences words compiler ;
     "contrib/math/polynomial.factor"
     "contrib/math/quaternions.factor"
     "contrib/math/matrices.factor"
-
-    ! "contrib/math/dimensional-analysis.factor"
-    ! "contrib/math/units.factor"
-    ! "contrib/math/constants.factor"
 ] [ run-file ] each
 
+"math-contrib" words [ try-compile ] each
 

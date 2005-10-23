@@ -1,7 +1,5 @@
+IN: analysis-internals
 USING: kernel sequences errors namespaces math ;
-USING: test ;
-
-IN: math-internals
 
 : Z:(-inf,0]? ( n -- bool )
     #! nonpositive integer
@@ -37,7 +35,7 @@ IN: math-internals
 : gamma-neg ( gamma[abs[x]] x -- gamma[x] )
     dup pi * sin * * pi neg swap / ; inline
 
-IN: math
+IN: math-contrib
 
 : gamma ( x -- gamma[x] )
     #! gamma(x) = integral 0..inf [ t^(x-1) exp(-t) ] dt

@@ -1,4 +1,4 @@
-IN: math
+IN: math-contrib
 USING: errors kernel sequences ;
 
 : deg>rad pi * 180 / ; inline
