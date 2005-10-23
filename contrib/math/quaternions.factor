@@ -6,7 +6,7 @@
 
 ! Quaternions are represented as pairs of complex numbers,
 ! using the identity: (a+bi)+(c+di)j = a+bi+cj+dk.
-USING: arrays kernel math sequences ;
+USING: arrays kernel math sequences math-contrib ;
 IN: quaternions-internals
 
 : 2q [ first2 ] 2apply ; inline
