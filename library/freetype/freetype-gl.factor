@@ -83,10 +83,10 @@ TUPLE: font ascent descent height handle sprites ;
 
 : dpi 72 ;
 
-: fix>float 64 /f ;
+: fix>int 64 /i ;
 
 : font-units>pixels ( n font -- n )
-    face-size face-size-y-scale FT_MulFix fix>float ;
+    face-size face-size-y-scale FT_MulFix fix>int ;
 
 : init-ascent ( font face -- )
     dup face-y-max swap font-units>pixels swap set-font-ascent ;
@@ -115,8 +115,8 @@ C: font ( handle -- font )
     freetype-error face-glyph ;
 
 : glyph-size ( glyph -- dim )
-    dup glyph-advance-x fix>float
-    swap glyph-height fix>float 0 3array ;
+    dup glyph-advance-x fix>int
+    swap glyph-height fix>int 0 3array ;
 
 : render-glyph ( font char -- bitmap )
     #! Render a character and return a pointer to the bitmap.
@@ -157,7 +157,7 @@ C: font ( handle -- font )
     ] with-locked-block ;
 
 : glyph-texture-loc ( glyph font -- loc )
-    font-ascent swap glyph-hori-bearing-y fix>float -
+    font-ascent swap glyph-hori-bearing-y fix>int -
     0 swap 0 3array ;
 
 : glyph-texture-size ( glyph -- dim )
