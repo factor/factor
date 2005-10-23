@@ -81,12 +81,14 @@ TUPLE: font ascent descent height handle sprites ;
     ttf-name ttf-path >r freetype get r>
     0 f <void*> [ FT_New_Face freetype-error ] keep *void* ;
 
-: dpi 72 ;
+: dpi 72 ; inline
 
-: fix>int 64 /i ;
+: ft-floor -6 shift ; inline
+
+: ft-ceil 63 + -64 bitand -6 shift ; inline
 
 : font-units>pixels ( n font -- n )
-    face-size face-size-y-scale FT_MulFix fix>int ;
+    face-size face-size-y-scale FT_MulFix ;
 
 : init-ascent ( font face -- )
     dup face-y-max swap font-units>pixels swap set-font-ascent ;
@@ -96,7 +98,8 @@ TUPLE: font ascent descent height handle sprites ;
 
 : init-font ( font -- )
     dup font-handle 2dup init-ascent dupd init-descent
-    dup font-ascent over font-descent - swap set-font-height ;
+    dup font-ascent over font-descent - ft-ceil
+    swap set-font-height ;
 
 C: font ( handle -- font )
     [ set-font-handle ] keep dup flush-font dup init-font ;
@@ -115,8 +118,8 @@ C: font ( handle -- font )
     freetype-error face-glyph ;
 
 : glyph-size ( glyph -- dim )
-    dup glyph-advance-x fix>int
-    swap glyph-height fix>int 0 3array ;
+    dup glyph-hori-advance ft-ceil
+    swap glyph-height ft-ceil 0 3array ;
 
 : render-glyph ( font char -- bitmap )
     #! Render a character and return a pointer to the bitmap.
@@ -157,7 +160,7 @@ C: font ( handle -- font )
     ] with-locked-block ;
 
 : glyph-texture-loc ( glyph font -- loc )
-    font-ascent swap glyph-hori-bearing-y fix>int -
+    font-ascent swap glyph-hori-bearing-y - ft-floor
     0 swap 0 3array ;
 
 : glyph-texture-size ( glyph -- dim )
