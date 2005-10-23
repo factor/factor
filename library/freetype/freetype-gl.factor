@@ -160,8 +160,8 @@ C: font ( handle -- font )
     ] with-locked-block ;
 
 : glyph-texture-loc ( glyph font -- loc )
-    font-ascent swap glyph-hori-bearing-y - ft-floor
-    0 swap 0 3array ;
+    over glyph-hori-bearing-x ft-floor -rot
+    font-ascent swap glyph-hori-bearing-y - ft-floor 0 3array ;
 
 : glyph-texture-size ( glyph -- dim )
     dup glyph-bitmap-width next-power-of-2
