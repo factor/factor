@@ -69,6 +69,9 @@ M: object map ( seq quot -- seq )
 : min-length ( seq seq -- n )
     [ length ] 2apply min ; flushable
 
+: max-length ( seq seq -- n )
+    [ length ] 2apply max ; flushable
+
 : 2each ( seq seq quot -- )
     #! Don't use with lists.
     -rot 2dup min-length [ (2each) ] repeat 3drop ; inline
