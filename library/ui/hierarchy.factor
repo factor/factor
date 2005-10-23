@@ -62,6 +62,9 @@ namespaces sequences vectors ;
 
 : relative ( g1 g2 -- g2-g1 ) screen-loc swap screen-loc v- ;
 
+: relative-rect ( g1 g2 -- rect )
+    [ relative ] keep rect-dim <rect> ;
+
 : child? ( parent child -- ? ) parents memq? ;
 
 GENERIC: focusable-child* ( gadget -- gadget/t )

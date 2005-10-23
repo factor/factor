@@ -44,15 +44,22 @@ M: viewport pref-dim gadget-child pref-dim ;
     2dup over scroller-x update-slider
     over scroller-y update-slider ;
 
-: (scroll-to) ( scroller gadget -- point )
-    >r scroller-viewport gadget-child r> relative ;
+: pop-follows ( scroller -- follows )
+    dup scroller-follows f rot set-scroller-follows ;
+
+: (do-scroll) ( gadget viewport -- point )
+    [ [ swap relative-rect ] keep rect-union ] keep
+    [ rect-extent v+ ] 2apply v- ;
+
+: do-scroll ( scroller -- delta )
+    dup pop-follows dup [
+        swap scroller-viewport (do-scroll)
+    ] [
+        2drop @{ 0 0 0 }@
+    ] if ;
 
 : update-scroller ( scroller -- )
-    dup dup scroller-follows dup [
-        f pick set-scroller-follows (scroll-to)
-    ] [
-        drop scroller-origin
-    ] if scroll ;
+    [ dup do-scroll ] keep scroller-origin v+ scroll ;
 
 : position-viewport ( viewport scroller -- )
     scroller-origin vneg swap gadget-child set-rect-loc ;
