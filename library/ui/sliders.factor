@@ -135,10 +135,10 @@ C: slider ( vector -- slider )
     0 over set-slider-page
     0 over set-slider-max
     dup slider-opposite
-    2dup <elevator> pick add-elevator
+    dup <elevator> pick add-elevator
     2dup <up-button> pick add-up
     2dup <down-button> pick add-down
-    dupd <thumb> pick add-thumb ;
+    <thumb> over add-thumb ;
 
 : <x-slider> ( -- slider ) @{ 1 0 0 }@ <slider> ;
 

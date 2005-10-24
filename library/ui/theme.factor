@@ -10,14 +10,12 @@ USING: arrays gadgets kernel sequences styles ;
     << solid >> boundary set-paint-prop ;
 
 : button-theme ( gadget -- )
-    dup << gradient @{
+    << gradient f @{
         @{ 240 240 240 }@
         @{ 192 192 192 }@
         @{ 192 192 192 }@
         @{ 96 96 96 }@
-    }@ >> interior set-paint-prop
-    dup @{ 96 96 96 }@ foreground set-paint-prop
-    << solid >> boundary set-paint-prop ;
+    }@ >> interior set-paint-prop ;
 
 : editor-theme ( editor -- )
     bold font-style set-paint-prop ;
@@ -31,7 +29,7 @@ USING: arrays gadgets kernel sequences styles ;
     red background set-paint-prop ;
 
 : elevator-theme ( elevator -- )
-    dup << gradient @{
+    dup << gradient f @{
         @{ 64 64 64 }@
         @{ 96 96 96 }@
         @{ 128 128 128 }@
