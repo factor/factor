@@ -39,7 +39,7 @@ styles threads ;
 TUPLE: button ;
 
 C: button ( gadget quot -- button )
-    rot <border> dup @{ 0 1 0 }@ button-theme
+    rot <border> dup button-theme
     over set-gadget-delegate
     [ swap button-gestures ] keep ;
 

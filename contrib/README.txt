@@ -5,12 +5,18 @@ library, but is useful enough to ship with the Factor distribution.
 
 - contrib/algebra/ -- infix math syntax (Daniel Ehrenberg)
 
+- contrib/cairo/ -- cairo bindings (Sampo Vuori)
+
 - contrib/concurrency/ -- Erlang/Termite-style concurrency (Chris Double)
 
 - contrib/cont-responder/ -- additional examples and tools for the
   continuation-based web framework (Chris Double)
   
 - contrib/crypto/ -- MD5 and SHA1 cryptographic hashes (Doug Coleman)
+
+- contrib/httpd/ -- HTTP server and client (Slava Pestov, Chris Double)
+
+- contrib/math/ -- extended math library (Doug Coleman)
 
 - contrib/parser-combinators/ -- Lazy lists and Haskell-style parser
   combinators (Chris Double)
@@ -27,7 +33,3 @@ library, but is useful enough to ship with the Factor distribution.
 - contrib/dlists.factor -- double-linked-lists (Mackenzie Straight)
 
 - contrib/xml.factor -- XML parser and writer (Daniel Ehrenberg)
-
-- contrib/cairo/ -- cairo bindings (Sampo Vuori)
-
-- contrib/math/ -- extended math library (Doug Coleman)

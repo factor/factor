@@ -100,10 +100,10 @@ M: rollover-only draw-boundary ( gadget boundary -- )
     [ delegate draw-boundary ] [ 2drop ] if ;
 
 ! Gradient pen
-TUPLE: gradient direction colors ;
+TUPLE: gradient colors ;
 
 M: gradient draw-interior ( gadget gradient -- )
-    dup gradient-direction swap gradient-colors rot rect-dim
+    over gadget-orientation swap gradient-colors rot rect-dim
     gl-gradient ;
 
 M: gadget draw-gadget* ( gadget -- )

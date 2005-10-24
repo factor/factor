@@ -44,7 +44,7 @@ M: array rect-dim drop @{ 0 0 0 }@ ;
 ! actions, and a reference to the gadget's parent.
 TUPLE: gadget
     paint gestures visible? relayout? root?
-    parent children ;
+    parent children orientation ;
 
 : show-gadget t swap set-gadget-visible? ;
 
@@ -55,7 +55,8 @@ M: gadget = eq? ;
 : gadget-child gadget-children first ;
 
 C: gadget ( -- gadget )
-    @{ 0 0 0 }@ dup <rect> over set-delegate dup show-gadget ;
+    @{ 0 0 0 }@ dup <rect> over set-delegate dup show-gadget
+    @{ 0 1 0 }@ over set-gadget-orientation ;
 
 : delegate>gadget ( tuple -- ) <gadget> swap set-delegate ;
 

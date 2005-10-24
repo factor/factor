@@ -1,5 +1,17 @@
+0.79:
+
+- fix remaining cosmetic issues in UI
+- investigate UI on Linux/x86
+- swap @{ and { syntax
+- get stuff in examples dir running in the ui
+- [ ... is annoying
+  perhaps on the last line of output, if a block doesn't fit, print
+  it anyway?
+- apropos: use new smarter completion?
+
 + ui:
 
+- keyboard completion
 - get outliner working with lots of lines of output
 - listener continuations
 - fix up the min thumb size hack
@@ -14,7 +26,6 @@
 - find out why so many small bignums get consed
 - use incremental strategy for all pack layouts where possible
 - multiline editing in listener
-- get stuff in examples dir running in the ui
 - text selection
 - clipboard support
 
@@ -27,15 +38,9 @@
 + misc
 
 - code walker & exceptions
-- load all sources in stage1
 - investigate if rehashing on startup is really necessary
 - remove word transfer hack in bootstrap
-- [ ... is annoying
-  perhaps on the last line of output, if a block doesn't fit, print
-  it anyway?
-- apropos: use new smarter completion?
 - signal handler should not lose stack pointers
-- http keep alive, and range get
 
 + ffi:
 
@@ -78,7 +83,6 @@
 - slice: if sequence or seq start is changed, abstraction violation
 - split: return vectors
 - set-path: iterative
-- swap @{ }@ and { } syntax
 - specialized arrays
 - instances: do not use make-list
 - >c/c>: vector stack

@@ -9,7 +9,7 @@ namespaces sdl sequences strings styles ;
 
 : <underline> ( -- gadget )
     <gadget>
-    dup << gradient f @{ 1 0 0 }@ @{ @{ 64 64 64 }@ @{ 255 255 255 }@ }@ >>
+    dup << gradient f @{ @{ 64 64 64 }@ @{ 255 255 255 }@ }@ >>
     interior set-paint-prop
     @{ 0 10 0 }@ over set-gadget-dim ;
 
@@ -358,7 +358,7 @@ M: general-list tutorial-line
 
 : tutorial-theme
     dup @{ 204 204 255 }@ background set-paint-prop
-    dup << gradient f @{ 0 1 0 }@ @{ @{ 204 204 255 }@ @{ 255 204 255 }@ }@ >>
+    dup << gradient f @{ @{ 204 204 255 }@ @{ 255 204 255 }@ }@ >>
     interior set-paint-prop
     dup "Sans Serif" font set-paint-prop
     16 font-size set-paint-prop ;

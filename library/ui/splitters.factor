@@ -17,7 +17,7 @@ TUPLE: splitter split ;
 
 : divider-motion ( splitter -- )
     dup hand>split
-    over rect-dim @{ 1 1 1 }@ vmax v/ over pack-vector v.
+    over rect-dim @{ 1 1 1 }@ vmax v/ over gadget-orientation v.
     0 max 1 min over set-splitter-split relayout-1 ;
 
 : divider-actions ( thumb -- )

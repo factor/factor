@@ -31,9 +31,9 @@ M: viewport pref-dim gadget-child pref-dim ;
 
 : set-slider ( page max value slider -- )
     #! page/max/value are 3-vectors.
-    [ [ slider-vector v. ] keep set-slider-value ] keep
-    [ [ slider-vector v. ] keep set-slider-max ] keep
-    [ [ slider-vector v. ] keep set-slider-page ] keep
+    [ [ gadget-orientation v. ] keep set-slider-value ] keep
+    [ [ gadget-orientation v. ] keep set-slider-max ] keep
+    [ [ gadget-orientation v. ] keep set-slider-page ] keep
     fix-slider ;
 
 : update-slider ( scroller value slider -- )

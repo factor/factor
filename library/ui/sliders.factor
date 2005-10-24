@@ -11,7 +11,7 @@ TUPLE: elevator ;
 : find-elevator [ elevator? ] find-parent ;
 
 ! A slider scrolls a viewport.
-TUPLE: slider vector elevator thumb value max page ;
+TUPLE: slider elevator thumb value max page ;
 
 : find-slider [ slider? ] find-parent ;
 
@@ -19,7 +19,7 @@ TUPLE: slider vector elevator thumb value max page ;
     #! A scaling factor such that if x is a slider co-ordinate,
     #! x*n is the screen position of the thumb, and conversely
     #! for x/n. The '1 max' calls avoid division by zero.
-    dup slider-elevator rect-dim over slider-vector v. 1 max
+    dup slider-elevator rect-dim over gadget-orientation v. 1 max
     swap slider-max 1 max / ;
 
 : slider>screen slider-scale * ;
@@ -44,7 +44,7 @@ SYMBOL: slider-changed
     [ slider-changed ] swap handle-gesture drop ;
 
 : elevator-drag ( elevator -- )
-    dup drag-loc >r find-slider r> over slider-vector v.
+    dup drag-loc >r find-slider r> over gadget-orientation v.
     over screen>slider
     swap set-slider-value* ;
 
@@ -54,9 +54,8 @@ SYMBOL: slider-changed
     [ find-elevator elevator-drag ] [ drag 1 ] set-action ;
 
 : <thumb> ( vector -- thumb )
-    <gadget> dup rot button-theme
-    t over set-gadget-root?
-    dup thumb-actions ;
+    <gadget> [ set-gadget-orientation ] keep
+    t over set-gadget-root? dup button-theme dup thumb-actions ;
 
 : slide-by ( amount gadget -- )
     #! The gadget can be any child of a slider.
@@ -67,7 +66,7 @@ SYMBOL: slider-changed
 
 : elevator-click ( elevator -- )
     dup hand get relative >r find-slider r>
-    over slider-vector v.
+    over gadget-orientation v.
     over screen>slider over slider-value - sgn
     swap slide-by-page ;
 
@@ -75,12 +74,11 @@ SYMBOL: slider-changed
     [ elevator-click ] [ button-down 1 ] set-action ;
 
 C: elevator ( vector -- elevator )
-    dup delegate>gadget
-    dup rot elevator-theme
-    dup elevator-actions ;
+    dup delegate>gadget [ set-gadget-orientation ] keep
+    dup elevator-theme dup elevator-actions ;
 
 : (layout-thumb) ( slider n -- n )
-    over slider-vector n*v swap slider-thumb ;
+    over gadget-orientation n*v swap slider-thumb ;
 
 : thumb-loc ( slider -- loc )
     dup slider-value swap slider>screen ;
@@ -93,7 +91,7 @@ C: elevator ( vector -- elevator )
 
 : layout-thumb-dim ( slider -- )
     dup dup thumb-dim (layout-thumb)
-    >r >r dup rect-dim r> rot slider-vector set-axis r>
+    >r >r dup rect-dim r> rot gadget-orientation set-axis r>
     set-gadget-dim ;
 
 : layout-thumb ( slider -- )
@@ -104,39 +102,43 @@ M: elevator layout* ( elevator -- )
 
 : slide-by-line ( -1/1 slider -- ) >r 32 * r> slide-by ;
 
-: slider-vertical? slider-vector @{ 0 1 0 }@ = ;
+: slider-vertical? gadget-orientation @{ 0 1 0 }@ = ;
 
-: <slide-button> ( polygon amount -- )
+: <slide-button> ( orientation polygon amount -- )
     >r <polygon-gadget> dup icon-theme r>
-    [ swap slide-by-line ] curry <repeat-button> ;
+    [ swap slide-by-line ] curry <repeat-button>
+    [ set-gadget-orientation ] keep ;
 
-: <up-button> ( slider -- button )
-    slider-vertical? arrow-up arrow-left ? -1 <slide-button> ;
+: <up-button> ( slider orientation -- button )
+    swap slider-vertical? arrow-up arrow-left ? -1
+    <slide-button> ;
 
-: add-up @{ 1 1 1 }@ over slider-vector v- first2 frame-add ;
+: add-up @{ 1 1 1 }@ over gadget-orientation v- first2 frame-add ;
 
-: <down-button> ( slider -- button )
-    slider-vertical? arrow-down arrow-right ? 1 <slide-button> ;
+: <down-button> ( slider orientation -- button )
+    swap slider-vertical? arrow-down arrow-right ? 1
+    <slide-button> ;
 
-: add-down @{ 1 1 1 }@ over slider-vector v+ first2 frame-add ;
+: add-down @{ 1 1 1 }@ over gadget-orientation v+ first2 frame-add ;
 
 : add-elevator 2dup set-slider-elevator @center frame-add ;
 
 : add-thumb 2dup slider-elevator add-gadget set-slider-thumb ;
 
 : slider-opposite ( slider -- vector )
-    slider-vector @{ 1 1 0 }@ swap v- ;
+    gadget-orientation @{ 1 1 0 }@ swap v- ;
 
 C: slider ( vector -- slider )
-    [ set-slider-vector ] keep
     dup delegate>frame
+    [ set-gadget-orientation ] keep
     0 over set-slider-value
     0 over set-slider-page
     0 over set-slider-max
-    dup slider-opposite <elevator> over add-elevator
-    dup <up-button> over add-up
-    dup <down-button> over add-down
-    dup slider-opposite <thumb> over add-thumb ;
+    dup slider-opposite
+    2dup <elevator> pick add-elevator
+    2dup <up-button> pick add-up
+    2dup <down-button> pick add-down
+    dupd <thumb> pick add-thumb ;
 
 : <x-slider> ( -- slider ) @{ 1 0 0 }@ <slider> ;
 

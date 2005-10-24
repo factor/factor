@@ -10,7 +10,7 @@ USING: gadgets generic io kernel math namespaces ;
 ! change size, the incremental strategy does not work.
 
 ! The cursor is the current size of the incremental pack.
-! New gadgets are added at cursor-cursor*pack-vector.
+! New gadgets are added at cursor-cursor*gadget-orientation.
 
 TUPLE: incremental cursor ;
 
@@ -27,13 +27,13 @@ M: incremental pref-dim ( incremental -- dim )
     [
         swap rect-dim swap incremental-cursor
         2dup v+ >r vmax r>
-    ] keep  pack-vector set-axis ;
+    ] keep  gadget-orientation set-axis ;
 
 : update-cursor ( gadget incremental -- )
     [ next-cursor ] keep set-incremental-cursor ;
 
 : incremental-loc ( gadget incremental -- )
-    dup incremental-cursor swap pack-vector v*
+    dup incremental-cursor swap gadget-orientation v*
     swap set-rect-loc ;
 
 : prefer-incremental ( gadget -- )

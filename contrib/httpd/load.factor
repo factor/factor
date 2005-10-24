@@ -11,6 +11,10 @@ USING: kernel parser sequences io ;
     "contrib/httpd/browser-responder.factor"
     "contrib/httpd/default-responders.factor"
     "contrib/httpd/http-client.factor"
+    "contrib/httpd/test/html.factor"
+    "contrib/httpd/test/http-client.factor"
+    "contrib/httpd/test/httpd.factor"
+    "contrib/httpd/test/url-encoding.factor"
 ] [
     dup print run-file
 ] each

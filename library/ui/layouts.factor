@@ -58,13 +58,13 @@ DEFER: layout
         dup layout* dup layout-children
     ] when drop ;
 
-TUPLE: pack align fill gap vector ;
+TUPLE: pack align fill gap ;
 
 : pref-dims ( gadget -- list )
     gadget-children [ pref-dim ] map ;
 
 : orient ( gadget seq1 seq2 -- seq )
-    >r >r pack-vector r> r> [ pick set-axis ] 2map nip ;
+    >r >r gadget-orientation r> r> [ pick set-axis ] 2map nip ;
 
 : packed-dim-2 ( gadget sizes -- list )
     [ over rect-dim over v- rot pack-fill v*n v+ ] map-with ;
@@ -93,8 +93,8 @@ C: pack ( vector -- pack )
     #! gap: between each child.
     #! fill: 0 leaves default width, 1 fills to pack width.
     #! align: 0 left, 1/2 center, 1 right.
-    [ set-pack-vector ] keep
     dup delegate>gadget
+    [ set-gadget-orientation ] keep
     0 over set-pack-align
     0 over set-pack-fill
     @{ 0 0 0 }@ over set-pack-gap ;
@@ -111,7 +111,7 @@ M: pack pref-dim ( pack -- dim )
             pref-dims [ max-dim ] keep
             [ @{ 0 0 0 }@ [ v+ ] reduce ] keep length 1 - 0 max
         ] keep pack-gap n*v v+
-    ] keep pack-vector set-axis ;
+    ] keep gadget-orientation set-axis ;
 
 M: pack layout* ( pack -- ) dup pref-dims packed-layout ;
 
@@ -119,7 +119,7 @@ M: pack layout* ( pack -- ) dup pref-dims packed-layout ;
     swapd [ rect-loc origin get v+ v- over v. ] binsearch nip ;
 
 M: pack children-on ( rect pack -- list )
-    dup pack-vector swap gadget-children [
+    dup gadget-orientation swap gadget-children [
         3dup
         >r >r dup rect-loc swap rect-dim v+ r> r> fast-children-on 1+
         >r

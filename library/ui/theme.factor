@@ -7,15 +7,15 @@ USING: arrays gadgets kernel sequences styles ;
     << solid >> interior set-paint-prop ;
 
 : solid-boundary ( gadget -- )
-    << solid f >> boundary set-paint-prop ;
+    << solid >> boundary set-paint-prop ;
 
-: button-theme ( gadget vector -- )
-    dupd @{
+: button-theme ( gadget -- )
+    dup << gradient @{
         @{ 240 240 240 }@
         @{ 192 192 192 }@
         @{ 192 192 192 }@
         @{ 96 96 96 }@
-    }@ <gradient> interior set-paint-prop
+    }@ >> interior set-paint-prop
     dup @{ 96 96 96 }@ foreground set-paint-prop
     << solid >> boundary set-paint-prop ;
 
@@ -30,13 +30,12 @@ USING: arrays gadgets kernel sequences styles ;
     dup solid-interior
     red background set-paint-prop ;
 
-: elevator-theme ( elevator vector -- )
-    dupd @{
-            @{ 64 64 64 }@
-            @{ 96 96 96 }@
-            @{ 128 128 128 }@
-        }@
-    <gradient> interior set-paint-prop
+: elevator-theme ( elevator -- )
+    dup << gradient @{
+        @{ 64 64 64 }@
+        @{ 96 96 96 }@
+        @{ 128 128 128 }@
+    }@ >> interior set-paint-prop
     light-gray background set-paint-prop ;
 
 : divider-theme ( divider -- )
@@ -48,7 +47,7 @@ USING: arrays gadgets kernel sequences styles ;
 
 : menu-theme ( menu -- )
     dup solid-boundary
-    << gradient f @{ 1 0 0 }@ @{ @{ 216 216 216 }@ @{ 255 255 255 }@ }@ >>
+    << gradient f @{ @{ 216 216 216 }@ @{ 255 255 255 }@ }@ >>
     interior set-paint-prop ;
 
 : icon-theme ( gadget -- )
