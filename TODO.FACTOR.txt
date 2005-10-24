@@ -6,8 +6,6 @@
 - off-by-one error in pick-up?
 - closing ui does not stop timers
 - adding/removing timers automatically for animated gadgets
-- pane should not scroll all the way to the right if long lines are present
-- multi-part gradients
 - tabular output
 - debugger should use outlining
 - support nested incremental layouts more efficiently
@@ -19,7 +17,6 @@
 - get stuff in examples dir running in the ui
 - text selection
 - clipboard support
-- get things working without the [ >fixnum ] map hack
 
 + tutorial:
 
@@ -42,7 +39,6 @@
 
 + ffi:
 
-- powerpc: ffi call a function that calls printf, segfault
 - C structs, enums, unions: use new-style string mode parsing
 - alien/c-types.factor is ugly
 - smarter out parameter handling

@@ -26,7 +26,6 @@ t [
     "/library/alien/malloc.factor"
     "/library/io/buffer.factor"
 
-    "/library/httpd/load.factor"
     "/library/sdl/load.factor"
     "/library/opengl/load.factor"
     "/library/freetype/load.factor"
