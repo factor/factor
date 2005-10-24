@@ -16,7 +16,8 @@ UNIX_OBJS = native/unix/file.o \
 	native/unix/signal.o \
 	native/unix/ffi.o \
 	native/unix/run.o \
-	native/unix/memory.o
+	native/unix/memory.o \
+	native/unix/mach_signal.o
 
 WIN32_OBJS = native/win32/ffi.o \
 	native/win32/file.o \

@@ -23,6 +23,8 @@ C: world ( -- world )
     world get world-content @center frame-add ;
 
 : set-status ( gadget -- )
+    #! Set the status bar gadget to the given gadget. It must
+    #! implement the set-message generic word.
     world get 2dup set-world-status
     world-content @bottom frame-add ;
 
@@ -44,11 +46,11 @@ C: world ( -- world )
     <gadget> dup add-layer dup world get set-world-glass
     dupd add-gadget prefer ;
 
-: world-clip ( -- rect )
-    @{ 0 0 0 }@ width get height get 0 3array <rect> ;
+: world-clip ( -- )
+    @{ 0 0 0 }@ width get height get 0 3array <rect> clip set ;
 
 : draw-world ( -- )
-    world get [ world-clip clip set draw-gadget ] with-gl-surface ;
+    [ world-clip world get draw-gadget ] with-gl-surface ;
 
 ! Status bar protocol
 GENERIC: set-message ( string/f status -- )

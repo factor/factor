@@ -38,13 +38,6 @@
   it anyway?
 - apropos: use new smarter completion?
 - signal handler should not lose stack pointers
-- sigsegv handling on OS X:
-
-  http://developer.apple.com/technotes/tn2004/tn2123.html#SECLIMITATIONS
-  http://www.caddr.com/macho/archives/sbcl-devel/2005-3/4742.html
-  http://www.caddr.com/macho/archives/sbcl-devel/2005-3/4764.html
-  http://clozure.com/cgi-bin/viewcvs.cgi/ccl/lisp-kernel/lisp-exceptions.c?rev=1.9&content-type=text/vnd.viewcvs-markup
-
 - http keep alive, and range get
 
 + ffi:
