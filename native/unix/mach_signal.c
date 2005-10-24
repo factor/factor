@@ -3,7 +3,9 @@ Copyright (C) 1993-1999, 2002-2003  Bruno Haible <clisp.org at bruno>
 Copyright (C) 2003  Paolo Bonzini <gnu.org at bonzini>
 
 Used under BSD license with permission from Paolo Bonzini and Bruno Haible,
-2005-03-10 */
+2005-03-10
+
+see http://www.caddr.com/macho/archives/sbcl-devel/2005-3/4764.html */
 
 #ifdef __APPLE__
 
@@ -26,10 +28,7 @@ static SIGSEGV_THREAD_STATE_TYPE save_thread_state;
 static void
 terminating_handler ()
 {
-  /* Dump core.  */
   raise (SIGSEGV);
-
-  /* Seriously.  */
   abort ();
 }
 

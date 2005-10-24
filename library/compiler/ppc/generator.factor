@@ -7,7 +7,7 @@ kernel-internals lists math memory namespaces words ;
 : compile-c-call ( symbol dll -- )
     2dup dlsym  11 LOAD32  0 1 rel-dlsym  11 MTLR  BLRL ;
 
-: stack-increment \ stack-reserve get stack@ 16 align ;
+: stack-increment \ stack-reserve get 32 max stack@ 16 align ;
 
 M: %prologue generate-node ( vop -- )
     drop
