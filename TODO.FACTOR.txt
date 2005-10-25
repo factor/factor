@@ -1,6 +1,9 @@
 0.79:
 
-- fix remaining cosmetic issues in UI
+- tutorial gradient does not appear
+- sig11 on first startup
+- fix initial font metrics being incorrect
+- fix solid boundary paint
 - investigate UI on Linux/x86
 - swap @{ and { syntax
 - get stuff in examples dir running in the ui
@@ -95,6 +98,7 @@
 
 + kernel:
 
+- better prettyprinting of cond
 - better handling of random arrangements of html words when
   prettyprinting
 - friendlier .factor-rc load error handling

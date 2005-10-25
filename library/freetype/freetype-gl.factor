@@ -129,12 +129,10 @@ C: font ( handle -- font )
 : with-locked-block ( size quot -- | quot: address -- )
     swap 1 calloc [ swap call ] keep free ; inline
 
-: b/b>w 8 shift bitor ;
-
 : copy-pixel ( bit tex -- bit tex )
-    f pick alien-unsigned-1 255 b/b>w
-    f pick set-alien-unsigned-2
-    >r 1+ r> 2 + ;
+    255 f pick set-alien-unsigned-1 1+
+    f pick alien-unsigned-1
+    f pick set-alien-unsigned-1 >r 1+ r> 1+ ;
 
 : (copy-row) ( bit tex bitend texend -- bitend texend )
     >r pick over >= [
