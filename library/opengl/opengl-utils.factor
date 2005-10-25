@@ -44,6 +44,9 @@ USING: alien errors kernel math namespaces opengl sdl sequences ;
 : do-state ( what quot -- )
     swap glBegin call glEnd ; inline
 
+: do-matrix ( mode quot -- )
+    swap glMatrixMode glPushMatrix call glPopMatrix ; inline
+
 : gl-color ( { r g b } -- )
     dup first 255 /f over second 255 /f rot third 255 /f
     glColor3d ;
@@ -84,9 +87,6 @@ USING: alien errors kernel math namespaces opengl sdl sequences ;
 : gl-poly ( points { r g b } -- )
     #! Draw a polygon.
     GL_LINE_LOOP (gl-poly) ;
-
-: do-matrix ( mode quot -- )
-    swap glMatrixMode glPushMatrix call glPopMatrix ; inline
 
 : gl-set-clip ( loc dim -- )
     dup first2 ( 1+ ) >r >r
