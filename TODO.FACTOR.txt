@@ -1,16 +1,14 @@
 0.79:
 
-- tutorial gradient does not appear
 - sig11 on first startup
 - fix initial font metrics being incorrect
-- fix solid boundary paint
-- investigate UI on Linux/x86
 - swap @{ and { syntax
 - get stuff in examples dir running in the ui
 - [ ... is annoying
   perhaps on the last line of output, if a block doesn't fit, print
   it anyway?
 - apropos: use new smarter completion?
+- fix buttons
 
 + ui:
 

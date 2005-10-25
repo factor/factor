@@ -70,7 +70,10 @@ USING: alien errors kernel math namespaces opengl sdl sequences ;
 
 : gl-rect ( dim -- )
     #! Draws a two-dimensional box.
-    GL_LINE_LOOP [ four-sides ] do-state ;
+    GL_MODELVIEW [
+        0.5 0.5 0 glTranslatef @{ 1 1 0 }@ v-
+        GL_LINE_STRIP [ dup four-sides top-left ] do-state
+    ] do-matrix ;
 
 : (gl-poly) [ [ gl-vertex ] each ] do-state ;
 
@@ -79,14 +82,14 @@ USING: alien errors kernel math namespaces opengl sdl sequences ;
     GL_POLYGON (gl-poly) ;
 
 : gl-poly ( points { r g b } -- )
-    #! Draw a filled polygon.
+    #! Draw a polygon.
     GL_LINE_LOOP (gl-poly) ;
 
 : do-matrix ( mode quot -- )
     swap glMatrixMode glPushMatrix call glPopMatrix ; inline
 
 : gl-set-clip ( loc dim -- )
-    dup first2 1+ >r >r
+    dup first2 ( 1+ ) >r >r
     over second swap second + height get swap - >r
     first r> r> r> glScissor ;
 

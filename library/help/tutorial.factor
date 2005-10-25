@@ -11,7 +11,8 @@ namespaces sdl sequences strings styles ;
     <gadget>
     dup << gradient f @{ @{ 64 64 64 }@ @{ 255 255 255 }@ }@ >>
     interior set-paint-prop
-    @{ 0 10 0 }@ over set-gadget-dim ;
+    @{ 0 10 0 }@ over set-gadget-dim
+    @{ 1 0 0 }@ over set-gadget-orientation ;
 
 GENERIC: tutorial-line ( object -- gadget )
 
@@ -28,8 +29,16 @@ M: string tutorial-line
 M: general-list tutorial-line
     car <input-button> dup example-theme ;
 
+: page-theme
+    dup @{ 204 204 255 }@ background set-paint-prop
+    dup << gradient f @{ @{ 204 204 255 }@ @{ 255 204 255 }@ }@ >>
+    interior set-paint-prop
+    dup "Sans Serif" font set-paint-prop
+    16 font-size set-paint-prop ;
+
 : <page> ( list -- gadget )
-    [ tutorial-line ] map make-pile 1 over set-pack-fill <border> ;
+    [ tutorial-line ] map make-pile 1 over set-pack-fill
+    dup page-theme <border> ;
 
 : tutorial-pages
     {
@@ -356,16 +365,8 @@ M: general-list tutorial-line
         }
     } ;
 
-: tutorial-theme
-    dup @{ 204 204 255 }@ background set-paint-prop
-    dup << gradient f @{ @{ 204 204 255 }@ @{ 255 204 255 }@ }@ >>
-    interior set-paint-prop
-    dup "Sans Serif" font set-paint-prop
-    16 font-size set-paint-prop ;
-
 : <tutorial> ( pages -- browser )
-    tutorial-pages [ <page> ] map <book>
-    dup tutorial-theme <book-browser> ;
+    tutorial-pages [ <page> ] map <book> <book-browser> ;
 
 : tutorial ( -- )
     <tutorial> gadget. ;
