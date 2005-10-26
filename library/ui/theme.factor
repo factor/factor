@@ -2,6 +2,7 @@
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: gadgets-buttons
 DEFER: <button-paint>
+DEFER: button-paint
 
 IN: gadgets-theme
 USING: arrays gadgets kernel sequences styles ;
