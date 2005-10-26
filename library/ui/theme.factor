@@ -2,7 +2,6 @@
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: gadgets-buttons
 DEFER: <button-paint>
-DEFER: button-paint
 
 IN: gadgets-theme
 USING: arrays gadgets kernel sequences styles ;
@@ -48,8 +47,8 @@ USING: arrays gadgets kernel sequences styles ;
     bold font-style set-paint-prop ;
 
 : roll-button-theme ( button -- )
-    dup << button-paint f f << solid >> << solid >> >> boundary set-paint-prop
-    dup << button-paint f f f << solid >> >> interior set-paint-prop
+    dup f f << solid >> << solid >> <button-paint> boundary set-paint-prop
+    dup f f f << solid >> <button-paint> interior set-paint-prop
     @{ 236 230 232 }@ background set-paint-prop ;
 
 : caret-theme ( caret -- )

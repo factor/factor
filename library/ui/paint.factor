@@ -5,6 +5,16 @@ io kernel lists math namespaces opengl sdl sequences strings
 styles vectors ;
 IN: gadgets
 
+: paint-prop* ( gadget key -- value ) swap gadget-paint ?hash ;
+
+: paint-prop ( gadget key -- value )
+    over [
+        2dup paint-prop* dup
+        [ 2nip ] [ drop >r gadget-parent r> paint-prop ] if
+    ] [
+        2drop f
+    ] if ;
+
 GENERIC: draw-gadget* ( gadget -- )
 
 M: gadget draw-gadget* ( gadget -- ) drop ;
@@ -43,16 +53,6 @@ DEFER: draw-gadget
             dup do-clip [ dup (draw-gadget) ] with-translation
         ] with-scope
     ] when drop ;
-
-: paint-prop* ( gadget key -- value ) swap gadget-paint ?hash ;
-
-: paint-prop ( gadget key -- value )
-    over [
-        2dup paint-prop* dup
-        [ 2nip ] [ drop >r gadget-parent r> paint-prop ] if
-    ] [
-        2drop f
-    ] if ;
 
 : init-paint ( gadget -- gestures )
     dup gadget-paint
