@@ -55,3 +55,6 @@ IN: math-contrib
             dup abs gammaln-lanczos6 swap dup 0 > [ drop ] [ gamma-neg ] if
     ] if ;
 
+: nth-root ( n x -- )
+    log >r inv r> * e swap ^ ;
+

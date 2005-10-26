@@ -1,4 +1,4 @@
-IN: polynomial-internals
+IN: polynomials-internals
 USING: kernel sequences vectors math math-internals namespaces ;
 
 : 2length ( seq seq -- ) [ length ] 2apply ;
