@@ -92,30 +92,26 @@ M: gradient draw-interior ( gadget gradient -- )
 TUPLE: polygon points ;
 
 M: polygon draw-boundary ( gadget polygon -- )
-    swap foreground paint-prop gl-color polygon-points gl-poly ;
+    swap foreground paint-prop gl-color
+    polygon-points [ gl-poly ] each ;
 
 M: polygon draw-interior ( gadget polygon -- )
-    swap background paint-prop gl-color polygon-points gl-fill-poly ;
+    swap background paint-prop gl-color
+    polygon-points [ gl-fill-poly ] each ;
 
-: arrow-up    @{ @{ 3 0 0 }@ @{ 6 6 0 }@ @{ 0 6 0 }@ }@ ;
-: arrow-right @{ @{ 0 0 0 }@ @{ 6 3 0 }@ @{ 0 6 0 }@ }@ ;
-: arrow-down  @{ @{ 0 0 0 }@ @{ 6 0 0 }@ @{ 3 6 0 }@ }@ ;
-: arrow-left  @{ @{ 0 3 0 }@ @{ 6 0 0 }@ @{ 6 6 0 }@ }@ ;
+: arrow-up    @{ @{ @{ 3 0 0 }@ @{ 6 6 0 }@ @{ 0 6 0 }@ }@ }@ ;
+: arrow-right @{ @{ @{ 0 0 0 }@ @{ 6 3 0 }@ @{ 0 6 0 }@ }@ }@ ;
+: arrow-down  @{ @{ @{ 0 0 0 }@ @{ 6 0 0 }@ @{ 3 6 0 }@ }@ }@ ;
+: arrow-left  @{ @{ @{ 0 3 0 }@ @{ 6 0 0 }@ @{ 6 6 0 }@ }@ }@ ;
 
 : arrow-right|
-    @{
-        @{ 0 0 0 }@ @{ 0 6 0 }@ @{ 6 3 0 }@
-        @{ 6 6 0 }@ @{ 6 0 0 }@ @{ 6 3 0 }@
-    }@ ;
+    @{ @{ @{ 6 0 0 }@ @{ 6 6 0 }@ }@ }@ arrow-right append ;
 
 : arrow-|left
-    @{
-        @{ 6 0 0 }@ @{ 6 6 0 }@ @{ 0 3 0 }@
-        @{ 0 6 0 }@ @{ 0 0 0 }@ @{ 0 3 0 }@
-    }@ ;
+    @{ @{ @{ 1 0 0 }@ @{ 1 6 0 }@ }@ }@ arrow-left append ;
 
 : <polygon-gadget> ( points -- gadget )
-    dup max-dim @{ 1 1 0 }@ v+
+    dup @{ 0 0 0 }@ [ max-dim vmax ] reduce
     >r <polygon> <gadget> r> over set-rect-dim
     dup rot interior set-paint-prop ;
 

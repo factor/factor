@@ -82,7 +82,7 @@ USING: alien errors kernel math namespaces opengl sdl sequences ;
 
 : gl-fill-poly ( points -- )
     #! Draw a filled polygon.
-    GL_POLYGON (gl-poly) ;
+    dup length 2 > GL_POLYGON GL_LINES ? (gl-poly) ;
 
 : gl-poly ( points { r g b } -- )
     #! Draw a polygon.
