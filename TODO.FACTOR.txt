@@ -7,11 +7,13 @@
 - [ ... is annoying
   perhaps on the last line of output, if a block doesn't fit, print
   it anyway?
-- fix first/last arrows
 - deallocate textures and display lists
+- nicer-looking buttons
+- pixelColor replacement
 
 + ui:
 
+- make-pane: if no input, just return pane-output
 - keyboard completion
 - get outliner working with lots of lines of output
 - listener continuations
