@@ -10,6 +10,7 @@
 - deallocate textures and display lists
 - nicer-looking buttons
 - pixelColor replacement
+- opengl stack overflow
 
 + ui:
 
