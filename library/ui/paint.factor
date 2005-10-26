@@ -5,11 +5,27 @@ io kernel lists math namespaces opengl sdl sequences strings
 styles vectors ;
 IN: gadgets
 
+GENERIC: draw-gadget* ( gadget -- )
+
+M: gadget draw-gadget* ( gadget -- ) drop ;
+
+SYMBOL: interior
+SYMBOL: boundary
+
+GENERIC: draw-interior ( gadget interior -- )
+GENERIC: draw-boundary ( gadget boundary -- )
+
 SYMBOL: clip
 
 : visible-children ( gadget -- seq ) clip get swap children-on ;
 
-GENERIC: draw-gadget* ( gadget -- )
+DEFER: draw-gadget
+
+: (draw-gadget) ( gadget -- )
+    dup dup interior paint-prop* draw-interior
+    dup dup boundary paint-prop* draw-boundary
+    dup draw-gadget*
+    visible-children [ draw-gadget ] each ;
 
 : do-clip ( gadget -- )
     >absolute clip [ rect-intersect dup ] change
@@ -24,12 +40,9 @@ GENERIC: draw-gadget* ( gadget -- )
 : draw-gadget ( gadget -- )
     clip get over inside? [
         [
-            dup do-clip [
-                dup draw-gadget*
-                visible-children [ draw-gadget ] each
-            ] with-translation
+            dup do-clip [ dup (draw-gadget) ] with-translation
         ] with-scope
-    ] [ drop ] if ;
+    ] when drop ;
 
 : paint-prop* ( gadget key -- value ) swap gadget-paint ?hash ;
 
@@ -51,24 +64,7 @@ GENERIC: draw-gadget* ( gadget -- )
 : add-paint ( gadget hash -- )
     dup [ >r init-paint r> hash-update ] [ 2drop ] if ;
 
-: fg ( gadget -- color )
-    dup reverse-video paint-prop
-    background foreground ? paint-prop ;
-
-: bg ( gadget -- color )
-    dup reverse-video paint-prop [
-        foreground
-    ] [
-        dup rollover paint-prop rollover-bg background ?
-    ] if paint-prop ;
-
 ! Pen paint properties
-SYMBOL: interior
-SYMBOL: boundary
-
-GENERIC: draw-interior ( gadget interior -- )
-GENERIC: draw-boundary ( gadget boundary -- )
-
 M: f draw-interior 2drop ;
 M: f draw-boundary 2drop ;
 
@@ -76,28 +72,14 @@ M: f draw-boundary 2drop ;
 TUPLE: solid ;
 
 : rect>screen ( shape -- x1 y1 x2 y2 )
-    >r origin get dup r> rect-dim v+
-    [ first2 ] 2apply ( [ 1 - ] 2apply ) ;
+    >r origin get dup r> rect-dim v+ [ first2 ] 2apply ;
 
 ! Solid pen
 M: solid draw-interior
-    drop dup bg gl-color rect-dim gl-fill-rect ;
+    drop dup background paint-prop gl-color rect-dim gl-fill-rect ;
 
 M: solid draw-boundary
-    drop dup fg gl-color rect-dim ( @{ 1 1 0 }@ v- ) gl-rect ;
-
-! Rollover only
-TUPLE: rollover-only ;
-
-C: rollover-only << solid >> over set-delegate ;
-
-M: rollover-only draw-interior ( gadget interior -- )
-    over rollover paint-prop
-    [ delegate draw-interior ] [ 2drop ] if ;
-
-M: rollover-only draw-boundary ( gadget boundary -- )
-    over rollover paint-prop
-    [ delegate draw-boundary ] [ 2drop ] if ;
+    drop dup foreground paint-prop gl-color rect-dim gl-rect ;
 
 ! Gradient pen
 TUPLE: gradient colors ;
@@ -106,19 +88,14 @@ M: gradient draw-interior ( gadget gradient -- )
     over gadget-orientation swap gradient-colors rot rect-dim
     gl-gradient ;
 
-M: gadget draw-gadget* ( gadget -- )
-    dup
-    dup interior paint-prop* draw-interior
-    dup boundary paint-prop* draw-boundary ;
-
 ! Polygon pen
 TUPLE: polygon points ;
 
 M: polygon draw-boundary ( gadget polygon -- )
-    swap fg gl-color polygon-points gl-poly ;
+    swap foreground paint-prop gl-color polygon-points gl-poly ;
 
 M: polygon draw-interior ( gadget polygon -- )
-    swap bg gl-color polygon-points gl-fill-poly ;
+    swap background paint-prop gl-color polygon-points gl-fill-poly ;
 
 : arrow-up    @{ @{ 3 0 0 }@ @{ 6 6 0 }@ @{ 0 6 0 }@ }@ ;
 : arrow-right @{ @{ 0 0 0 }@ @{ 6 3 0 }@ @{ 0 6 0 }@ }@ ;

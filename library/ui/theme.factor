@@ -1,5 +1,8 @@
 ! Copyright (C) 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
+IN: gadgets-buttons
+DEFER: <button-paint>
+
 IN: gadgets-theme
 USING: arrays gadgets kernel sequences styles ;
 
@@ -9,20 +12,44 @@ USING: arrays gadgets kernel sequences styles ;
 : solid-boundary ( gadget -- )
     << solid >> boundary set-paint-prop ;
 
-: button-theme ( gadget -- )
+: plain-gradient
     << gradient f @{
         @{ 240 240 240 }@
         @{ 192 192 192 }@
         @{ 192 192 192 }@
         @{ 96 96 96 }@
-    }@ >> interior set-paint-prop ;
+    }@ >> ;
+
+: rollover-gradient
+    << gradient f @{
+        @{ 255 255 255 }@
+        @{ 216 216 216 }@
+        @{ 216 216 216 }@
+        @{ 112 112 112 }@
+    }@ >> ;
+
+: pressed-gradient
+    << gradient f @{
+        @{ 112 112 112 }@
+        @{ 216 216 216 }@
+        @{ 216 216 216 }@
+        @{ 255 255 255 }@
+    }@ >> ;
+
+: bevel-button-theme ( gadget -- )
+    plain-gradient rollover-gradient pressed-gradient
+    <button-paint> interior set-paint-prop ;
+
+: thumb-theme ( thumb -- )
+    plain-gradient interior set-paint-prop ;
 
 : editor-theme ( editor -- )
     bold font-style set-paint-prop ;
 
 : roll-button-theme ( button -- )
-    dup <rollover-only> interior set-paint-prop
-    <rollover-only> boundary set-paint-prop ;
+    dup << button-paint f f << solid >> << solid >> >> boundary set-paint-prop
+    dup << button-paint f f f << solid >> >> interior set-paint-prop
+    @{ 236 230 232 }@ background set-paint-prop ;
 
 : caret-theme ( caret -- )
     dup solid-interior
@@ -36,8 +63,12 @@ USING: arrays gadgets kernel sequences styles ;
     }@ >> interior set-paint-prop
     light-gray background set-paint-prop ;
 
+: reverse-video-theme ( gadget -- )
+    dup black background set-paint-prop
+    white foreground set-paint-prop ;
+
 : divider-theme ( divider -- )
-    dup solid-interior t reverse-video set-paint-prop ;
+    dup solid-interior reverse-video-theme ;
 
 : display-title-theme
     dup @{ 216 232 255 }@ background set-paint-prop
@@ -50,15 +81,12 @@ USING: arrays gadgets kernel sequences styles ;
 
 : icon-theme ( gadget -- )
     dup gray background set-paint-prop
-    dup light-gray rollover-bg set-paint-prop
     gray foreground set-paint-prop ;
 
 : world-theme
     {{
         [[ background @{ 255 255 255 }@ ]]
-        [[ rollover-bg @{ 236 230 232 }@ ]]
         [[ foreground @{ 0 0 0 }@ ]]
-        [[ reverse-video f ]]
         [[ font "Monospaced" ]]
         [[ font-size 12 ]]
         [[ font-style plain ]]

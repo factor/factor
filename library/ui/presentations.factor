@@ -28,15 +28,15 @@ TUPLE: command-button object ;
     <menu> show-hand-menu ;
 
 C: command-button ( gadget object -- button )
-    [ set-command-button-object ] keep
+    [
+        set-command-button-object
+        [ command-menu ] <roll-button>
+    ] keep
     [ set-gadget-delegate ] keep
-    dup [ command-menu ] button-gestures
-    dup roll-button-theme
     dup menu-button-actions ;
 
 M: command-button gadget-help ( button -- string )
-    command-button-object
-    dup word? [ synopsis ] [ summary ] if ;
+    command-button-object dup word? [ synopsis ] [ summary ] if ;
 
 : init-commands ( gadget -- gadget )
     dup presented paint-prop [ <command-button> ] when* ;

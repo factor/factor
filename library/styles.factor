@@ -14,9 +14,6 @@ IN: styles
 
 SYMBOL: foreground ! Used for text and outline shapes.
 SYMBOL: background ! Used for filled shapes.
-SYMBOL: rollover-bg
-SYMBOL: rollover
-SYMBOL: reverse-video
 
 SYMBOL: font
 SYMBOL: font-size

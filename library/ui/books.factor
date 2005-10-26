@@ -35,7 +35,7 @@ TUPLE: book-browser book ;
 
 : <book-button> ( polygon quot -- button )
     \ find-book swons >r <polygon-gadget> dup icon-theme r>
-    <button> ;
+    <bevel-button> ;
 
 : <book-buttons> ( book -- gadget )
     [

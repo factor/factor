@@ -373,4 +373,4 @@ M: general-list tutorial-line
 
 : <tutorial-button>
     "Tutorial" <label>
-    [ drop [ tutorial ] pane get pane-call ] <button> ;
+    [ drop [ tutorial ] pane get pane-call ] <bevel-button> ;

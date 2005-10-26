@@ -22,10 +22,10 @@ M: label pref-dim ( label -- dim )
     label-size ;
 
 : draw-label ( label -- )
-    dup fg gl-color dup gadget-font swap label-text draw-string ;
+    dup foreground paint-prop gl-color
+    dup gadget-font swap label-text draw-string ;
 
-M: label draw-gadget* ( label -- )
-    dup delegate draw-gadget* draw-label ;
+M: label draw-gadget* ( label -- ) draw-label ;
 
 M: label set-message ( string/f label -- )
     set-label-text* ;

@@ -105,3 +105,12 @@ M: object tail ( index seq -- seq ) [ tail-slice ] keep like ;
 : drop-prefix ( seq1 seq2 -- seq1 seq2 )
     2dup mismatch dup -1 = [ drop 2dup min-length ] when
     tuck swap tail-slice >r swap tail-slice r> ;
+
+IN: strings
+
+: completion? ( partial completion quot -- ? )
+    #! Test if 'partial' is a completion of 'completion', by
+    #! comparing each "-"-delimited chunk using 'quot'. The
+    #! quotation is usually either [ subseq? ] or [ swap head? ].
+    >r [ "-" split ] 2apply 2dup [ length ] 2apply <=
+    [ r> 2map [ ] all? ] [ r> 3drop f ] if ; inline

@@ -144,8 +144,7 @@ M: editor layout* ( editor -- )
 M: editor label-text ( editor -- string )
     editor-text ;
 
-M: editor draw-gadget* ( editor -- )
-    dup delegate draw-gadget* draw-label ;
+M: editor draw-gadget* ( editor -- ) draw-label ;
 
 : set-possibilities ( possibilities editor -- )
     #! Set completion possibilities.

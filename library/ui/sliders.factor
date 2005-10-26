@@ -55,7 +55,9 @@ SYMBOL: slider-changed
 
 : <thumb> ( vector -- thumb )
     <gadget> [ set-gadget-orientation ] keep
-    t over set-gadget-root? dup button-theme dup thumb-actions ;
+    t over set-gadget-root?
+    dup thumb-theme
+    dup thumb-actions ;
 
 : slide-by ( amount gadget -- )
     #! The gadget can be any child of a slider.

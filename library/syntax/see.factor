@@ -2,7 +2,7 @@
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: prettyprint
 USING: generic hashtables io kernel lists math namespaces
-sequences styles words ;
+sequences strings styles words ;
 
 : declaration. ( word prop -- )
     tuck word-name word-prop [ pprint-word ] [ drop ] if ;
@@ -128,7 +128,7 @@ M: word class. drop ;
     ] with-pprint ;
 
 : (apropos) ( substring -- seq )
-    all-words [ word-name subseq? ] subset-with ;
+    all-words [ word-name [ subseq? ] completion? ] subset-with ;
 
 : apropos ( substring -- )
     #! List all words that contain a string.

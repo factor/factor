@@ -63,8 +63,7 @@ C: display ( -- display )
     1/2 <x-splitter> ;
 
 : <status-bar> ( -- gadget )
-    "" <label> dup solid-interior
-    dup t reverse-video set-paint-prop ;
+    "" <label> dup solid-interior dup reverse-video-theme ;
 
 : listener-application ( -- )
     t t <pane> dup pane global set-hash
