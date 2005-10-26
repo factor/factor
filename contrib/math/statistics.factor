@@ -19,7 +19,7 @@ USING: kernel math sequences ;
 
 : range ( seq -- n )
     #! max - min
-    number-sort [ pop ] keep first - ;
+    number-sort [ first ] keep pop swap - ;
 
 : var ( seq -- )
     #! variance, normalize by N-1
