@@ -4,8 +4,12 @@ gadgets-editors gadgets-labels gadgets-layouts gadgets-panes
 gadgets-presentations gadgets-theme generic kernel lists math
 namespaces sdl sequences strings styles ;
 
+: tutorial-font @{ "Serif" plain 14 }@ swap set-label-font ;
+
+: heading-font @{ "Serif" plain 24 }@ swap set-label-font ;
+
 : <slide-title> ( text -- gadget )
-    <label> dup 24 font-size set-paint-prop ;
+    <label> dup heading-font ;
 
 : <underline> ( -- gadget )
     <gadget>
@@ -20,21 +24,18 @@ M: string tutorial-line
     @{
         @{ [ "* " ?head ] [ <slide-title> ] }@
         @{ [ dup "--" = ] [ drop <underline> ] }@
-        @{ [ t ] [ <label> ] }@
+        @{ [ t ] [ <label> dup tutorial-font ] }@
     }@ cond ;
 
 : example-theme
-    dup solid-interior "Monospaced" font set-paint-prop ;
+    << solid f @{ 204 204 255 }@ >> swap set-gadget-interior ;
 
 M: general-list tutorial-line
     car <input-button> dup example-theme ;
 
 : page-theme
-    dup @{ 204 204 255 }@ background set-paint-prop
     << gradient f @{ @{ 204 204 255 }@ @{ 255 204 255 }@ }@ >>
-    over set-gadget-interior
-    dup "Sans Serif" font set-paint-prop
-    16 font-size set-paint-prop ;
+    swap set-gadget-interior ;
 
 : <page> ( list -- gadget )
     [ tutorial-line ] map make-pile 1 over set-pack-fill

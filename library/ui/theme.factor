@@ -21,33 +21,37 @@ USING: arrays gadgets kernel sequences styles ;
 : plain-gradient
     << gradient f @{
         @{ 240 240 240 }@
-        @{ 192 192 192 }@
-        @{ 192 192 192 }@
-        @{ 96 96 96 }@
+        @{ 212 212 212 }@
+        @{ 212 212 212 }@
+        @{ 160 160 160 }@
     }@ >> ;
 
 : rollover-gradient
     << gradient f @{
         @{ 255 255 255 }@
-        @{ 216 216 216 }@
-        @{ 216 216 216 }@
-        @{ 112 112 112 }@
+        @{ 232 232 232 }@
+        @{ 232 232 232 }@
+        @{ 192 192 192 }@
     }@ >> ;
 
 : pressed-gradient
     << gradient f @{
-        @{ 112 112 112 }@
-        @{ 216 216 216 }@
-        @{ 216 216 216 }@
+        @{ 192 192 192 }@
+        @{ 232 232 232 }@
+        @{ 232 232 232 }@
         @{ 255 255 255 }@
     }@ >> ;
 
+: faint-boundary
+    << solid f @{ 160 160 160 }@ >> swap set-gadget-boundary ;
+
 : bevel-button-theme ( gadget -- )
     plain-gradient rollover-gradient pressed-gradient
-    <button-paint> swap set-gadget-interior ;
+    <button-paint> over set-gadget-interior
+    faint-boundary ;
 
 : thumb-theme ( thumb -- )
-    plain-gradient swap set-gadget-interior ;
+    plain-gradient over set-gadget-interior faint-boundary ;
 
 : roll-button-theme ( button -- )
     f solid-black solid-black <button-paint> over set-gadget-boundary
@@ -58,8 +62,8 @@ USING: arrays gadgets kernel sequences styles ;
 
 : elevator-theme ( elevator -- )
     << gradient f @{
-        @{ 64 64 64 }@
         @{ 96 96 96 }@
+        @{ 112 112 112 }@
         @{ 128 128 128 }@
     }@ >> swap set-gadget-interior ;
 
