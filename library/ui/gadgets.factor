@@ -80,13 +80,13 @@ M: gadget children-on ( rect/point gadget -- list )
 : pick-up-list ( rect/point gadget -- gadget/f )
     dupd children-on reverse-slice [ inside? ] find-with nip ;
 
-: translate ( rect/point -- )
-    rect-loc origin [ v+ ] change ;
+: translate ( rect/point -- new-origin )
+    rect-loc origin [ v+ dup ] change ;
 
 : pick-up ( rect/point gadget -- gadget )
     [
         2dup inside? [
-            dup translate 2dup pick-up-list dup
+            dup translate drop 2dup pick-up-list dup
             [ nip pick-up ] [ rot 2drop ] if
         ] [ 2drop f ] if
     ] with-scope ;

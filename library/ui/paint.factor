@@ -34,23 +34,25 @@ DEFER: draw-gadget
 : (draw-gadget) ( gadget -- )
     dup dup interior paint-prop* draw-interior
     dup dup boundary paint-prop* draw-boundary
-    dup draw-gadget*
-    visible-children [ draw-gadget ] each ;
+    dup draw-gadget* ;
 
 : do-clip ( gadget -- )
     >absolute clip [ rect-intersect dup ] change
     dup rect-loc swap rect-dim gl-set-clip ;
 
 : with-translation ( gadget quot -- | quot: gadget -- )
+    #! Note: origin variable is still changed after quot returns
     GL_MODELVIEW [
-        >r dup rect-loc dup translate first3 glTranslated
+        >r dup rect-loc translate first3 glTranslated
         r> call
     ] do-matrix ; inline
 
 : draw-gadget ( gadget -- )
     clip get over inside? [
         [
-            dup do-clip [ dup (draw-gadget) ] with-translation
+            dup do-clip
+            [ dup (draw-gadget) ] with-translation
+            visible-children [ draw-gadget ] each
         ] with-scope
     ] when drop ;
 
