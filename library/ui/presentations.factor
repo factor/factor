@@ -39,10 +39,10 @@ M: command-button gadget-help ( button -- string )
     command-button-object dup word? [ synopsis ] [ summary ] if ;
 
 : init-commands ( gadget -- gadget )
-    dup presented paint-prop [ <command-button> ] when* ;
+    ( dup presented paint-prop [ <command-button> ] when* ) ;
 
 : <styled-label> ( style text -- label )
-    <label> dup rot dup [ alist>hash ] when add-paint ;
+    <label> nip ; ! dup rot dup [ alist>hash ] when add-paint ;
 
 : <presentation> ( style text -- presentation )
     gadget pick assoc dup

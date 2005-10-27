@@ -57,13 +57,12 @@ SYMBOL: structured-input
     pane-input set-editor-text ;
 
 : <input-button> ( string -- button )
-    dup <label> swap [ nip pane get replace-input ] curry
+    dup <label> dup editor-theme
+    swap [ nip pane get replace-input ] curry
     <roll-button> ;
 
 : print-input ( string pane -- )
-    [
-        <input-button> dup bold font-style set-paint-prop gadget.
-    ] with-stream* ;
+    [ <input-button> gadget. ] with-stream* ;
 
 : pane-return ( pane -- )
     dup pane-input dup [
@@ -145,7 +144,7 @@ M: pane stream-close ( pane -- ) drop ;
 
 : make-pane ( quot -- pane )
     #! Execute the quotation with output to an output-only pane.
-    f f <pane> dup world-theme [ swap with-stream ] keep ; inline
+    f f <pane> [ swap with-stream ] keep ; inline
 
 : with-pane ( pane quot -- )
     #! Clear the pane and run the quotation in a scope with

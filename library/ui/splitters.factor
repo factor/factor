@@ -26,7 +26,9 @@ TUPLE: splitter split ;
     [ gadget-parent divider-motion ] [ drag 1 ] set-action ;
 
 C: divider ( -- divider )
-    dup delegate>gadget dup divider-theme dup divider-actions ;
+    dup delegate>gadget
+    dup reverse-video-theme
+    dup divider-actions ;
 
 C: splitter ( first second split vector -- splitter )
     [ delegate>pack ] keep

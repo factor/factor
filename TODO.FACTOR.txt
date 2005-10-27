@@ -24,7 +24,6 @@
 - tabular output
 - debugger should use outlining
 - support nested incremental layouts more efficiently
-- make-pane should not need world-theme
 - only redraw dirty gadgets
 - find out why so many small bignums get consed
 - use incremental strategy for all pack layouts where possible

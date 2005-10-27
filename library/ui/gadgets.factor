@@ -40,11 +40,10 @@ M: array rect-dim drop @{ 0 0 0 }@ ;
 : rect-union ( rect rect -- rect )
     2rect-extent vmax >r vmin r> <extent-rect> ;
 
-! A gadget is a rectangle, a paint, a mapping of gestures to
-! actions, and a reference to the gadget's parent.
 TUPLE: gadget
-    paint gestures visible? relayout? root?
-    parent children orientation ;
+    parent children orientation
+    gestures visible? relayout? root?
+    interior boundary ;
 
 : show-gadget t swap set-gadget-visible? ;
 

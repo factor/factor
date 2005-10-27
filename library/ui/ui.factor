@@ -15,7 +15,6 @@ global [ first-time on ] bind
         first-time get [
             <world> world set
             world get solid-interior
-            world get world-theme
             @{ 800 600 0 }@ world get set-gadget-dim
             <hand> hand set
             listener-application

@@ -3,14 +3,20 @@
 IN: gadgets-buttons
 DEFER: <button-paint>
 
+IN: gadgets-labels
+DEFER: set-label-color
+DEFER: set-label-font
+
 IN: gadgets-theme
 USING: arrays gadgets kernel sequences styles ;
 
-: solid-interior ( gadget -- )
-    << solid >> interior set-paint-prop ;
+: solid-black << solid f @{ 0 0 0 }@ >> ;
 
-: solid-boundary ( gadget -- )
-    << solid >> boundary set-paint-prop ;
+: solid-white << solid f @{ 255 255 255 }@ >> ;
+
+: solid-interior solid-white swap set-gadget-interior ;
+
+: solid-boundary solid-black swap set-gadget-boundary ;
 
 : plain-gradient
     << gradient f @{
@@ -38,56 +44,40 @@ USING: arrays gadgets kernel sequences styles ;
 
 : bevel-button-theme ( gadget -- )
     plain-gradient rollover-gradient pressed-gradient
-    <button-paint> interior set-paint-prop ;
+    <button-paint> swap set-gadget-interior ;
 
 : thumb-theme ( thumb -- )
-    plain-gradient interior set-paint-prop ;
-
-: editor-theme ( editor -- )
-    bold font-style set-paint-prop ;
+    plain-gradient swap set-gadget-interior ;
 
 : roll-button-theme ( button -- )
-    dup f f << solid >> << solid >> <button-paint> boundary set-paint-prop
-    dup f f f << solid >> <button-paint> interior set-paint-prop
-    @{ 236 230 232 }@ background set-paint-prop ;
+    f solid-black solid-black <button-paint> over set-gadget-boundary
+    f f << solid f @{ 236 230 232 }@ >> <button-paint> swap set-gadget-interior ;
 
 : caret-theme ( caret -- )
-    dup solid-interior
-    red background set-paint-prop ;
+    << solid f @{ 255 0 0 }@ >> swap set-gadget-interior ;
 
 : elevator-theme ( elevator -- )
-    dup << gradient f @{
+    << gradient f @{
         @{ 64 64 64 }@
         @{ 96 96 96 }@
         @{ 128 128 128 }@
-    }@ >> interior set-paint-prop
-    light-gray background set-paint-prop ;
+    }@ >> swap set-gadget-interior ;
 
 : reverse-video-theme ( gadget -- )
-    dup black background set-paint-prop
-    white foreground set-paint-prop ;
-
-: divider-theme ( divider -- )
-    dup solid-interior reverse-video-theme ;
+    solid-black swap set-gadget-interior ;
 
 : display-title-theme
-    dup @{ 216 232 255 }@ background set-paint-prop
-    solid-interior ;
+    << solid f @{ 216 232 255 }@ >> swap set-gadget-interior ;
 
 : menu-theme ( menu -- )
     dup solid-boundary
     << gradient f @{ @{ 216 216 216 }@ @{ 255 255 255 }@ }@ >>
-    interior set-paint-prop ;
+    swap set-gadget-interior ;
 
-: icon-theme ( gadget -- )
-    dup gray background set-paint-prop
-    gray foreground set-paint-prop ;
+: label-theme ( label -- )
+    @{ 0 0 0 }@ over set-label-color
+    @{ "Monospaced" plain 12 }@ swap set-label-font ;
 
-: world-theme
-    {{
-        [[ background @{ 255 255 255 }@ ]]
-        [[ foreground @{ 0 0 0 }@ ]]
-        [[ font "Monospaced" ]]
-        [[ font-size 12 ]]
-        [[ font-style plain ]]
-    }} add-paint ;
+: editor-theme ( editor -- )
+    @{ 0 0 0 }@ over set-label-color
+    @{ "Monospaced" bold 12 }@ swap set-label-font ;

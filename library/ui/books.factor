@@ -2,7 +2,8 @@
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: gadgets-books
 USING: gadgets gadgets-buttons gadgets-labels gadgets-layouts
-gadgets-theme generic kernel lists math namespaces sequences ;
+gadgets-theme generic kernel lists math namespaces sequences
+styles ;
 
 TUPLE: book page ;
 
@@ -34,7 +35,7 @@ TUPLE: book-browser book ;
     [ book-browser? ] find-parent book-browser-book ;
 
 : <book-button> ( polygon quot -- button )
-    \ find-book swons >r <polygon-gadget> dup icon-theme r>
+    \ find-book swons >r gray swap <polygon-gadget> r>
     <bevel-button> ;
 
 : <book-buttons> ( book -- gadget )

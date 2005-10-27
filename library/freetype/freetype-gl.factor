@@ -34,6 +34,8 @@ SYMBOL: open-fonts
 ! sprites is a vector.
 TUPLE: font ascent descent height handle sprites ;
 
+M: font = eq? ;
+
 : flush-font ( font -- )
     #! Only do this after re-creating a GL context!
     dup font-sprites [ ] subset free-sprites
@@ -109,9 +111,9 @@ C: font ( handle -- font )
     first3 >r open-face dup 0 r> 6 shift
     dpi dpi FT_Set_Char_Size freetype-error <font> ;
 
-: lookup-font ( font style ptsize -- font )
+: lookup-font ( { font style ptsize } -- font )
     #! Cache open fonts.
-    3array open-fonts get [ open-font ] cache ;
+    open-fonts get [ open-font ] cache ;
 
 : load-glyph ( font char -- glyph )
     >r font-handle r> dupd 0 FT_Load_Char

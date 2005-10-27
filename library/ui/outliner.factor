@@ -3,7 +3,7 @@
 IN: gadgets-outliner
 USING: arrays gadgets gadgets-borders gadgets-buttons
 gadgets-labels gadgets-layouts gadgets-panes gadgets-theme
-generic io kernel lists sequences ;
+generic io kernel lists sequences styles ;
 
 ! Outliner gadget.
 TUPLE: outliner quot ;
@@ -24,8 +24,7 @@ DEFER: <expand-button>
     [ outliner? ] find-parent ;
 
 : <expand-arrow> ( ? -- gadget )
-    arrow-right arrow-down ? <polygon-gadget>
-    dup icon-theme <border> ;
+    arrow-right arrow-down ? gray swap <polygon-gadget> <border> ;
 
 : <expand-button> ( ? -- gadget )
     #! If true, the button expands, otherwise it collapses.

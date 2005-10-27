@@ -29,7 +29,7 @@ USE: line-editor
 ! An editor gadget wraps a line editor object and passes
 ! gestures to the line editor.
 
-TUPLE: editor line caret ;
+TUPLE: editor line caret font color ;
 
 : scroll>caret ( editor -- ) editor-caret scroll-to ;
 
@@ -64,7 +64,7 @@ TUPLE: editor line caret ;
 : set-caret-x ( x editor -- )
     #! Move the caret to a clicked location.
     dup [
-        gadget-font line-text get x>offset set-caret-pos
+        label-font* line-text get x>offset set-caret-pos
     ] with-editor ;
 
 : click-editor ( editor -- )
@@ -122,7 +122,7 @@ C: editor ( text -- )
     dup editor-actions ;
 
 : offset>x ( gadget offset str -- x )
-    head-slice >r gadget-font r> string-width ;
+    head-slice >r label-font* r> string-width ;
 
 : caret-loc ( editor -- x y )
     dup editor-line [ caret-pos line-text get ] bind offset>x
@@ -141,8 +141,17 @@ M: editor layout* ( editor -- )
     dup editor-caret over caret-dim swap set-gadget-dim
     dup editor-caret swap caret-loc swap set-rect-loc ;
 
-M: editor label-text ( editor -- string )
-    editor-text ;
+M: editor label-text editor-text ;
+
+M: editor label-color editor-color ;
+
+M: editor label-font editor-font ;
+
+M: editor set-label-text set-editor-text ;
+
+M: editor set-label-color set-editor-color ;
+
+M: editor set-label-font set-editor-font ;
 
 M: editor draw-gadget* ( editor -- ) draw-label ;
 

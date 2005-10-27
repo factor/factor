@@ -9,8 +9,8 @@ namespaces sdl sequences strings styles ;
 
 : <underline> ( -- gadget )
     <gadget>
-    dup << gradient f @{ @{ 64 64 64 }@ @{ 255 255 255 }@ }@ >>
-    interior set-paint-prop
+    << gradient f @{ @{ 64 64 64 }@ @{ 255 255 255 }@ }@ >>
+    over set-gadget-interior
     @{ 0 10 0 }@ over set-gadget-dim
     @{ 1 0 0 }@ over set-gadget-orientation ;
 
@@ -31,8 +31,8 @@ M: general-list tutorial-line
 
 : page-theme
     dup @{ 204 204 255 }@ background set-paint-prop
-    dup << gradient f @{ @{ 204 204 255 }@ @{ 255 204 255 }@ }@ >>
-    interior set-paint-prop
+    << gradient f @{ @{ 204 204 255 }@ @{ 255 204 255 }@ }@ >>
+    over set-gadget-interior
     dup "Sans Serif" font set-paint-prop
     16 font-size set-paint-prop ;
 
@@ -355,7 +355,7 @@ M: general-list tutorial-line
             "* Learning more"
             "--"
             "Hopefully this tutorial has sparked your interest in Factor."
-            ""
+            ""  
             "You can learn more by reading the Factor developer's handbook:"
             ""
             "http://factor.sourceforge.net/handbook.pdf"

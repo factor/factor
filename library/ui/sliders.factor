@@ -107,7 +107,7 @@ M: elevator layout* ( elevator -- )
 : slider-vertical? gadget-orientation @{ 0 1 0 }@ = ;
 
 : <slide-button> ( orientation polygon amount -- )
-    >r <polygon-gadget> dup icon-theme r>
+    >r gray swap <polygon-gadget> r>
     [ swap slide-by-line ] curry <repeat-button>
     [ set-gadget-orientation ] keep ;
 
