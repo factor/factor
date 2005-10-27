@@ -1,5 +1,5 @@
 USING: kernel math infix parser namespaces sequences strings prettyprint
-    errors lists hashtables vectors html io generic ;
+    errors lists hashtables vectors html io generic words ;
 IN: xml
 
 ! * Simple SAX-ish parser
@@ -301,7 +301,7 @@ M: contained process
     [ contained-name ] keep contained-props 0 <vector> <tag> push-datum ;
 
 M: opener process
-    10 <vector> cons
+    { } clone cons
     xml-stack get push ;
 
 M: closer process
@@ -313,7 +313,7 @@ M: closer process
     ] keep opener-props r> <tag> push-datum ;
 
 : initialize-xml-stack ( -- )
-    f 10 <vector> cons unit >vector xml-stack set ;
+    f { } clone cons unit >vector xml-stack set ;
 
 : xml ( string -- vector )
     #! Produces a tree of XML nodes
@@ -322,7 +322,7 @@ M: closer process
         [ process ] xml-each
         xml-stack get
         dup length 1 = [ <unclosed> throw ] unless
-        first cdr
+        first cdr second
     ] with-scope ;
 
 ! * Printer
@@ -373,12 +373,13 @@ M: comment (xml>string)
     "-->" % ;
 
 : xml>string ( xml -- string )
-    [ [ (xml>string) ] each ] "" make ;
+    [ (xml>string) ] "" make ;
 
 : xml-reprint ( string -- string )
     xml xml>string ;
 
 ! * Easy XML generation for more literal things
+! should this be rewritten?
 
 : text ( string -- )
     chars>entities push-datum ;
@@ -398,5 +399,21 @@ M: comment (xml>string)
         initialize-xml-stack
         call
         xml-stack get
-        first cdr
+        first cdr second
     ] with-scope ; inline
+
+! * System for words specialized on tag names
+
+: PROCESS:
+    CREATE
+    dup {{ }} clone "xtable" set-word-prop
+    dup literalize [
+        "xtable" word-prop
+        >r dup tag-name r> hash call
+    ] cons define-compound ; parsing
+
+: TAG:
+    scan scan-word [
+        swap "xtable" word-prop
+        rot "/" split [ >r 2dup r> swap set-hash ] each 2drop
+    ] f ; parsing
