@@ -8,9 +8,9 @@
   perhaps on the last line of output, if a block doesn't fit, print
   it anyway?
 - deallocate textures and display lists
-- nicer-looking buttons
 - pixelColor replacement
 - fix presentations
+- gadget-children on f error with outliners
 
 + ui:
 
