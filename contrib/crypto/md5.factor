@@ -1,6 +1,6 @@
 IN: crypto-internals
-USING: kernel io strings sequences namespaces math prettyprint
-unparser test parser lists crypto ;
+USING: kernel io strings sequences namespaces math
+       unparser test parser lists crypto ;
 
 SYMBOL: a
 SYMBOL: b
@@ -149,14 +149,7 @@ SYMBOL: old-d
     S41 61 pick 4 nth-int  [ I ] ABCD
     S42 62 pick 11 nth-int [ I ] DABC
     S43 63 pick 2 nth-int  [ I ] CDAB
-
-    "63: " write get-old-md5-debug hex-string print
-    "63change: " write get-md5-debug hex-string print
-
     S44 64 pick 9 nth-int  [ I ] BCDA
-
-    "64: " write get-old-md5-debug hex-string print
-    "64change: " write get-md5-debug hex-string print
 
     update-md
     drop ;
