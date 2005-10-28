@@ -99,7 +99,7 @@ M: motion-event handle-event ( event -- )
 
 : world-step ( -- )
     world get world-invalid >r layout-world r>
-    [ update-hand USE: test [ draw-world ] time ] when ;
+    [ update-hand draw-world ] when ;
 
 : next-event ( -- event ? ) <event> dup SDL_PollEvent ;
 

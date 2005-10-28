@@ -2,7 +2,7 @@ USING: alien io kernel parser sequences ;
 
 "freetype" @{
     @{ [ os "macosx" = ] [ "libfreetype.dylib" ] }@
-    @{ [ os "win32" = ] [ "freetype.dll" ] }@
+    @{ [ os "win32" = ] [ "freetype6.dll" ] }@
     @{ [ t ] [ "libfreetype.so" ] }@
 }@ cond "cdecl" add-library
     
