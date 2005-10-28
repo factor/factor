@@ -20,7 +20,7 @@ presentation sequences strings styles words ;
     ] "" make ;
 
 : hex-color, ( triplet -- )
-    [ >hex 2 CHAR: 0 pad-left % ] each ;
+    [ 255 * >fixnum >hex 2 CHAR: 0 pad-left % ] each ;
 
 : fg-css, ( color -- )
     "color: #" % hex-color, "; " % ;

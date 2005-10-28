@@ -1,7 +1,5 @@
 0.79:
 
-- sig11 on first startup
-- fix initial font metrics being incorrect
 - swap @{ and { syntax
 - get stuff in examples dir running in the ui
 - [ ... is annoying

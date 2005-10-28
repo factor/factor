@@ -17,16 +17,13 @@ global [ first-time on ] bind
             world get solid-interior
             @{ 800 600 0 }@ world get set-gadget-dim
             <hand> hand set
-            listener-application
             first-time off
         ] when
     ] bind ;
 
 : check-running
-    world get [
-        world-running?
-        [ "The UI is already running" throw ] when
-    ] when* ;
+    world get world-running?
+    [ "The UI is already running" throw ] when ;
 
 IN: shells
 
@@ -35,5 +32,6 @@ IN: shells
     #! dimensions.
     [
         init-world check-running
-        world get rect-dim first2 0 gl-flags [ run-world ] with-screen
+        world get rect-dim first2
+        [ listener-application run-world ] with-gl-screen
     ] with-freetype ;

@@ -40,12 +40,6 @@ GENERIC: resize ( n seq -- seq )
 : ?push ( elt seq/f -- seq )
     [ 1 <vector> ] unless* [ push ] keep ;
 
-: first2 ( { x y } -- x y )
-    dup first swap second ; inline
-
-: first3 ( { x y z } -- x y z )
-    dup first over second rot third ; inline
-
 : bounds-check? ( n seq -- ? )
     over 0 >= [ length < ] [ 2drop f ] if ;
 
@@ -73,3 +67,7 @@ M: object set-nth-unsafe set-nth ;
 M: integer length ;
 M: integer nth drop ;
 M: integer nth-unsafe drop ;
+
+: first2-unsafe [ 0 swap nth-unsafe ] keep 1 swap nth-unsafe ; inline
+: first3-unsafe [ first2-unsafe ] keep 2 swap nth-unsafe ; inline
+: first4-unsafe [ first3-unsafe ] keep 3 swap nth-unsafe ; inline

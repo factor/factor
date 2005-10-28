@@ -186,8 +186,9 @@ C: font ( handle -- font )
     0 -rot [ char-width + ] each-with ;
 
 : draw-string ( open-font string -- )
-    GL_MODELVIEW [
-        GL_TEXTURE_BIT [
-            [ char-sprite sprite-dlist glCallList ] each-with
-        ] save-attribs
-    ] do-matrix ;
+    GL_TEXTURE_2D glEnable
+    0 -rot [
+        char-sprite [ sprite-width + ] keep
+        sprite-dlist glCallList
+    ] each-with neg 0 0 glTranslatef
+    GL_TEXTURE_2D glDisable ;

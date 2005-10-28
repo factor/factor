@@ -10,9 +10,9 @@ DEFER: set-label-font
 IN: gadgets-theme
 USING: arrays gadgets kernel sequences styles ;
 
-: solid-black << solid f @{ 0 0 0 }@ >> ;
+: solid-black << solid f @{ 0.0 0.0 0.0 1.0 }@ >> ;
 
-: solid-white << solid f @{ 255 255 255 }@ >> ;
+: solid-white << solid f @{ 1.0 1.0 1.0 1.0 }@ >> ;
 
 : solid-interior solid-white swap set-gadget-interior ;
 
@@ -20,30 +20,30 @@ USING: arrays gadgets kernel sequences styles ;
 
 : plain-gradient
     << gradient f @{
-        @{ 240 240 240 }@
-        @{ 212 212 212 }@
-        @{ 212 212 212 }@
-        @{ 160 160 160 }@
+        @{ 0.94 0.94 0.94 1.0 }@
+        @{ 0.83 0.83 0.83 1.0 }@
+        @{ 0.83 0.83 0.83 1.0 }@
+        @{ 0.62 0.62 0.62 1.0 }@
     }@ >> ;
 
 : rollover-gradient
     << gradient f @{
-        @{ 255 255 255 }@
-        @{ 232 232 232 }@
-        @{ 232 232 232 }@
-        @{ 192 192 192 }@
+        @{ 1.0 1.0 1.0 1.0 }@
+        @{ 0.9 0.9 0.9 1.0 }@
+        @{ 0.9 0.9 0.9 1.0 }@
+        @{ 0.75 0.75 0.75 1.0 }@
     }@ >> ;
 
 : pressed-gradient
     << gradient f @{
-        @{ 192 192 192 }@
-        @{ 232 232 232 }@
-        @{ 232 232 232 }@
-        @{ 255 255 255 }@
+        @{ 0.75 0.75 0.75 1.0 }@
+        @{ 0.9 0.9 0.9 1.0 }@
+        @{ 0.9 0.9 0.9 1.0 }@
+        @{ 1.0 1.0 1.0 1.0 }@
     }@ >> ;
 
 : faint-boundary
-    << solid f @{ 160 160 160 }@ >> swap set-gadget-boundary ;
+    << solid f @{ 0.62 0.62 0.62 1.0 }@ >> swap set-gadget-boundary ;
 
 : bevel-button-theme ( gadget -- )
     plain-gradient rollover-gradient pressed-gradient
@@ -55,33 +55,32 @@ USING: arrays gadgets kernel sequences styles ;
 
 : roll-button-theme ( button -- )
     f solid-black solid-black <button-paint> over set-gadget-boundary
-    f f << solid f @{ 236 230 232 }@ >> <button-paint> swap set-gadget-interior ;
+    f f << solid f @{ 0.92 0.9 0.9 1.0 }@ >> <button-paint> swap set-gadget-interior ;
 
 : caret-theme ( caret -- )
-    << solid f @{ 255 0 0 }@ >> swap set-gadget-interior ;
+    << solid f @{ 1.0 0.0 0.0 1.0 }@ >> swap set-gadget-interior ;
 
 : elevator-theme ( elevator -- )
     << gradient f @{
-        @{ 96 96 96 }@
-        @{ 112 112 112 }@
-        @{ 128 128 128 }@
+        @{ 0.37 0.37 0.37 1.0 }@
+        @{ 0.43 0.43 0.43 1.0 }@
+        @{ 0.5 0.5 0.5 1.0 }@
     }@ >> swap set-gadget-interior ;
 
 : reverse-video-theme ( gadget -- )
     solid-black swap set-gadget-interior ;
 
 : display-title-theme
-    << solid f @{ 216 232 255 }@ >> swap set-gadget-interior ;
+    << solid f @{ 0.84 0.9 1.0 1.0 }@ >> swap set-gadget-interior ;
 
 : menu-theme ( menu -- )
     dup solid-boundary
-    << gradient f @{ @{ 216 216 216 }@ @{ 255 255 255 }@ }@ >>
-    swap set-gadget-interior ;
+    << solid f @{ 0.9 0.9 0.9 0.9 }@ >> swap set-gadget-interior ;
 
 : label-theme ( label -- )
-    @{ 0 0 0 }@ over set-label-color
+    @{ 0.0 0.0 0.0 1.0 }@ over set-label-color
     @{ "Monospaced" plain 12 }@ swap set-label-font ;
 
 : editor-theme ( editor -- )
-    @{ 0 0 0 }@ over set-label-color
+    @{ 0.0 0.0 0.0 1.0 }@ over set-label-color
     @{ "Monospaced" bold 12 }@ swap set-label-font ;

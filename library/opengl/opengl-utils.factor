@@ -3,9 +3,11 @@
 IN: opengl
 USING: alien errors kernel math namespaces opengl sdl sequences ;
 
+: gl-color ( { r g b a } -- ) first4 glColor4d ; inline
+
 : init-gl ( -- )
     0.0 0.0 0.0 0.0 glClearColor 
-    1.0 0.0 0.0 glColor3d
+    @{ 1.0 0.0 0.0 0.0 }@ gl-color
     GL_COLOR_BUFFER_BIT glClear
     GL_PROJECTION glMatrixMode
     glLoadIdentity
@@ -14,10 +16,10 @@ USING: alien errors kernel math namespaces opengl sdl sequences ;
     0 0 width get height get glViewport
     0 width get height get 0 gluOrtho2D
     GL_SMOOTH glShadeModel
-    GL_TEXTURE_2D glEnable
     GL_BLEND glEnable
     GL_SRC_ALPHA GL_ONE_MINUS_SRC_ALPHA glBlendFunc
-    GL_SCISSOR_TEST glEnable ;
+    GL_SCISSOR_TEST glEnable
+    GL_MODELVIEW glMatrixMode ;
 
 : gl-flags
     SDL_OPENGL
@@ -31,7 +33,7 @@ USING: alien errors kernel math namespaces opengl sdl sequences ;
     init-surface ;
 
 : with-gl-screen ( quot -- )
-    >r 0 gl-flags r> with-screen ;
+    >r 0 gl-flags r> with-screen ; inline
 
 : gl-error ( -- )
     glGetError dup 0 = [ drop ] [ gluErrorString throw ] if ;
@@ -47,19 +49,15 @@ USING: alien errors kernel math namespaces opengl sdl sequences ;
 : do-matrix ( mode quot -- )
     swap glMatrixMode glPushMatrix call glPopMatrix ; inline
 
-: gl-color ( { r g b } -- )
-    dup first 255 /f over second 255 /f rot third 255 /f
-    glColor3d ;
+: gl-vertex first3 glVertex3d ; inline
 
-: gl-vertex first3 glVertex3d ;
+: top-left drop 0 0 glTexCoord2d @{ 0 0 0 }@ gl-vertex ; inline
 
-: top-left drop 0 0 glTexCoord2d @{ 0 0 0 }@ gl-vertex ;
+: top-right 1 0 glTexCoord2d @{ 1 0 0 }@ v* gl-vertex ; inline
 
-: top-right 1 0 glTexCoord2d @{ 1 0 0 }@ v* gl-vertex ;
+: bottom-left 0 1 glTexCoord2d @{ 0 1 0 }@ v* gl-vertex ; inline
 
-: bottom-left 0 1 glTexCoord2d @{ 0 1 0 }@ v* gl-vertex ;
-
-: bottom-right 1 1 glTexCoord2d gl-vertex ;
+: bottom-right 1 1 glTexCoord2d gl-vertex ; inline
 
 : four-sides ( dim -- )
     dup top-left dup top-right dup bottom-right bottom-left ;
@@ -151,16 +149,17 @@ C: sprite ( loc dim dim2 -- )
     GL_TEXTURE_2D GL_TEXTURE_WRAP_S GL_CLAMP glTexParameterf
     GL_TEXTURE_2D GL_TEXTURE_WRAP_T GL_CLAMP glTexParameterf ;
 
+: gl-translate ( { x y z } -- ) first3 glTranslatef ;
+
 : make-sprite-dlist ( sprite -- id )
     GL_MODELVIEW [
         GL_COMPILE [
-            GL_MODELVIEW [
-                dup sprite-loc first3 glTranslatef
-                GL_TEXTURE_2D over sprite-texture glBindTexture
-                init-texture
-                dup sprite-dim2 gl-fill-rect
-            ] do-matrix
-            sprite-width 0 0 glTranslatef
+            dup sprite-loc gl-translate
+            GL_TEXTURE_2D over sprite-texture glBindTexture
+            init-texture
+            dup sprite-dim2 gl-fill-rect
+            dup sprite-dim @{ 1 0 0 }@ v*
+            swap sprite-loc v- gl-translate
         ] make-dlist
     ] do-matrix ;
 

@@ -20,26 +20,22 @@ SYMBOL: clip
 DEFER: draw-gadget
 
 : (draw-gadget) ( gadget -- )
-    dup dup gadget-interior draw-interior
-    dup dup gadget-boundary draw-boundary
-    draw-gadget* ;
+    dup rect-loc translate [
+        gl-translate
+        dup dup gadget-interior draw-interior
+        dup dup gadget-boundary draw-boundary
+        draw-gadget*
+    ] keep vneg gl-translate ;
 
 : do-clip ( gadget -- )
     >absolute clip [ rect-intersect dup ] change
     dup rect-loc swap rect-dim gl-set-clip ;
 
-: with-translation ( gadget quot -- | quot: gadget -- )
-    #! Note: origin variable is still changed after quot returns
-    GL_MODELVIEW [
-        >r dup rect-loc translate first3 glTranslated
-        r> call
-    ] do-matrix ; inline
-
 : draw-gadget ( gadget -- )
     clip get over inside? [
         [
             dup do-clip
-            dup [ (draw-gadget) ] with-translation
+            dup (draw-gadget)
             dup visible-children [ draw-gadget ] each
         ] with-scope
     ] when drop ;

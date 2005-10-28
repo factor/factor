@@ -17,6 +17,15 @@ sequences strings vectors words ;
 
 IN: sequences
 
+: first2 ( { x y } -- x y )
+    1 swap bounds-check nip first2-unsafe ; inline
+
+: first3 ( { x y z } -- x y z )
+    2 swap bounds-check nip first3-unsafe ; inline
+
+: first4 ( { x y z w } -- x y z w )
+    3 swap bounds-check nip first4-unsafe ; inline
+
 M: object like drop ;
 
 M: object empty? ( seq -- ? ) length 0 = ;

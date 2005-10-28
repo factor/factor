@@ -13,7 +13,7 @@ namespaces sdl sequences strings styles ;
 
 : <underline> ( -- gadget )
     <gadget>
-    << gradient f @{ @{ 64 64 64 }@ @{ 255 255 255 }@ }@ >>
+    << gradient f @{ @{ 0.25 0.25 0.25 1.0 }@ @{ 1.0 1.0 1.0 1.0 }@ }@ >>
     over set-gadget-interior
     @{ 0 10 0 }@ over set-gadget-dim
     @{ 1 0 0 }@ over set-gadget-orientation ;
@@ -28,13 +28,13 @@ M: string tutorial-line
     }@ cond ;
 
 : example-theme
-    << solid f @{ 204 204 255 }@ >> swap set-gadget-interior ;
+    << solid f @{ 0.8 0.8 1.0 1.0 }@ >> swap set-gadget-interior ;
 
 M: general-list tutorial-line
     car <input-button> dup example-theme ;
 
 : page-theme
-    << gradient f @{ @{ 204 204 255 }@ @{ 255 204 255 }@ }@ >>
+    << gradient f @{ @{ 0.8 0.8 1.0 1.0 }@ @{ 1.0 0.8 1.0 1.0 }@ }@ >>
     swap set-gadget-interior ;
 
 : <page> ( list -- gadget )
