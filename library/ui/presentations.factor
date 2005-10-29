@@ -38,15 +38,21 @@ C: command-button ( gadget object -- button )
 M: command-button gadget-help ( button -- string )
     command-button-object dup word? [ synopsis ] [ summary ] if ;
 
-: init-commands ( gadget -- gadget )
-    ( dup presented paint-prop [ <command-button> ] when* ) ;
+: init-commands ( style gadget -- gadget )
+    presented rot assoc [ <command-button> ] when* ;
+
+: style-font ( style -- font )
+    [ font swap assoc [ "Monospaced" ] unless* ] keep
+    [ font-style swap assoc [ plain ] unless* ] keep
+    font-size swap assoc [ 12 ] unless* 3array ;
 
 : <styled-label> ( style text -- label )
-    <label> nip ; ! dup rot dup [ alist>hash ] when add-paint ;
+    <label> foreground pick assoc over set-label-text
+    swap style-font over set-label-font ;
 
 : <presentation> ( style text -- presentation )
-    gadget pick assoc dup
-    [ nip ] [ drop dupd <styled-label> init-commands ] if
+    gadget pick assoc
+    [ ] [ >r dup dup r> <styled-label> init-commands ] ?if
     outline rot assoc [ <outliner> ] when* ;
 
 : gadget. ( gadget -- )
