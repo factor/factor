@@ -4,28 +4,28 @@ USING: gadgets kernel namespaces test ;
 [
     << rect f @{ 10 10 0 }@ @{ 50 50 0 }@ >>
     << rect f @{ -10 -10 0 }@ @{ 40 40 0 }@ >>
-    intersect-rect
+    rect-intersect
 ] unit-test
 
 [ << rect f @{ 200 200 0 }@ @{ 0 0 0 }@ >> ]
 [
     << rect f @{ 100 100 0 }@ @{ 50 50 0 }@ >>
     << rect f @{ 200 200 0 }@ @{ 40 40 0 }@ >>
-    intersect-rect
+    rect-intersect
 ] unit-test
 
 [ << rect f @{ -10 -10 0 }@ @{ 70 70 0 }@ >> ]
 [
     << rect f @{ 10 10 0 }@ @{ 50 50 0 }@ >>
     << rect f @{ -10 -10 0 }@ @{ 40 40 0 }@ >>
-    union-rect
+    rect-union
 ] unit-test
 
 [ << rect f @{ 100 100 0 }@ @{ 140 140 0 }@ >> ]
 [
     << rect f @{ 100 100 0 }@ @{ 50 50 0 }@ >>
     << rect f @{ 200 200 0 }@ @{ 40 40 0 }@ >>
-    union-rect
+    rect-union
 ] unit-test
 
 [ f ] [

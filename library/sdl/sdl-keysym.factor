@@ -6,12 +6,12 @@ IN: sdl USING: namespaces ;
 ! Later, something better needs to be done.
 
 : modifiers
-    {
+    @{
         [[ "SHIFT" HEX: 0003 ]]
         [[ "CTRL"  HEX: 00c0 ]]
         [[ "ALT"   HEX: 0300 ]]
         [[ "META"  HEX: 0c00 ]]
-    } ;
+    }@ ;
 
 : keysyms
     {{

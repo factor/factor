@@ -50,7 +50,7 @@ SYMBOL: crossref
 : usages ( word -- deps )
     #! List all usages of a word. This is a transitive closure,
     #! so indirect usages are reported.
-    crossref get dup [ closure ] [ 2drop { } ] if ;
+    crossref get dup [ closure ] [ 2drop @{ }@ ] if ;
 
 : usage ( word -- list )
     #! List all direct usages of a word.
@@ -109,13 +109,13 @@ M: compound definer drop \ : ;
     [ f swap set-word-prop ] each-with ;
 
 : reset-word ( word -- )
-    {
+    @{
         "parsing" "inline" "foldable" "flushable" "predicating"
         "documentation" "stack-effect"
-    } reset-props ;
+    }@ reset-props ;
 
 : reset-generic ( word -- )
-    dup reset-word { "methods" "combination" } reset-props ;
+    dup reset-word @{ "methods" "combination" }@ reset-props ;
 
 M: word literalize <wrapper> ;
 

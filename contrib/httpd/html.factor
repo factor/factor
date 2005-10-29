@@ -20,7 +20,7 @@ presentation sequences strings styles words ;
     ] "" make ;
 
 : hex-color, ( triplet -- )
-    [ 255 * >fixnum >hex 2 CHAR: 0 pad-left % ] each ;
+    3 swap head [ 255 * >fixnum >hex 2 CHAR: 0 pad-left % ] each ;
 
 : fg-css, ( color -- )
     "color: #" % hex-color, "; " % ;
@@ -39,6 +39,16 @@ presentation sequences strings styles words ;
 
 : font-css, ( font -- )
     "font-family: " % % "; " % ;
+
+: assoc-apply ( value-alist quot-alist -- )
+    #! Looks up the key of each pair in the first list in the
+    #! second list to produce a quotation. The quotation is
+    #! applied to the value of the pair. If there is no
+    #! corresponding quotation, the value is popped off the
+    #! stack.
+    swap [
+        unswons rot assoc* dup [ cdr call ] [ 2drop ] if
+    ] each-with ;
 
 : css-style ( style -- )
     [

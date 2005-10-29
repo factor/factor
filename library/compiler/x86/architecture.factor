@@ -18,7 +18,7 @@ USING: assembler compiler-backend kernel sequences ;
     #! Number of vregs
     3 ; inline
 
-M: vreg v>operand vreg-n { EAX ECX EDX } nth ;
+M: vreg v>operand vreg-n @{ EAX ECX EDX }@ nth ;
 
 ! On x86, parameters are never passed in registers.
 M: int-regs fastcall-regs drop 0 ;

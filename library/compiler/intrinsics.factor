@@ -119,13 +119,13 @@ namespaces sequences words ;
     over binary-op-imm?
     [ binary-op-imm ] [ binary-op-reg ] if ;
 
-{
-    { fixnum+       %fixnum+       }
-    { fixnum-       %fixnum-       }
-    { fixnum-bitand %fixnum-bitand }
-    { fixnum-bitor  %fixnum-bitor  }
-    { fixnum-bitxor %fixnum-bitxor }
-} [
+@{
+    @{ fixnum+       %fixnum+       }@
+    @{ fixnum-       %fixnum-       }@
+    @{ fixnum-bitand %fixnum-bitand }@
+    @{ fixnum-bitor  %fixnum-bitor  }@
+    @{ fixnum-bitxor %fixnum-bitxor }@
+}@ [
     first2 [ binary-op ] curry "intrinsic" set-word-prop
 ] each
 
@@ -139,13 +139,13 @@ namespaces sequences words ;
     pick binary-op-imm?
     [ binary-jump-imm ] [ binary-jump-reg ] if ;
 
-{
-    { fixnum<= %jump-fixnum<= }
-    { fixnum<  %jump-fixnum<  }
-    { fixnum>= %jump-fixnum>= }
-    { fixnum>  %jump-fixnum>  }
-    { eq?      %jump-eq?      }
-} [
+@{
+    @{ fixnum<= %jump-fixnum<= }@
+    @{ fixnum<  %jump-fixnum<  }@
+    @{ fixnum>= %jump-fixnum>= }@
+    @{ fixnum>  %jump-fixnum>  }@
+    @{ eq?      %jump-eq?      }@
+}@ [
     first2 [ binary-jump ] curry "if-intrinsic" set-word-prop
 ] each
 
@@ -168,8 +168,8 @@ namespaces sequences words ;
     ! See the remark on fixnum-mod for vreg usage
     drop
     in-2
-    { << vreg f 1 >> << vreg f 0 >> }
-    { << vreg f 2 >> << vreg f 0 >> }
+    @{ << vreg f 1 >> << vreg f 0 >> }@
+    @{ << vreg f 2 >> << vreg f 0 >> }@
     %fixnum/mod ,
     << vreg f 2 >> 0 %replace-d ,
     << vreg f 0 >> 1 %replace-d ,

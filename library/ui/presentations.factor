@@ -47,7 +47,7 @@ M: command-button gadget-help ( button -- string )
     font-size swap assoc [ 12 ] unless* 3array ;
 
 : <styled-label> ( style text -- label )
-    <label> foreground pick assoc over set-label-text
+    <label> foreground pick assoc [ over set-label-color ] when*
     swap style-font over set-label-font ;
 
 : <presentation> ( style text -- presentation )

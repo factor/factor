@@ -33,7 +33,7 @@ namespaces parser prettyprint sequences strings vectors words ;
     0 [ [ max ] when* ] reduce ;
 
 : unbalanced-branches ( in out -- )
-    { "Unbalanced branches:" } -rot [
+    @{ "Unbalanced branches:" }@ -rot [
         swap number>string " " rot length number>string
         append3
     ] 2map append "\n" join inference-error ;

@@ -48,10 +48,10 @@ M: node = eq? ;
 : set-node-out-d node-shuffle set-shuffle-out-d ;
 : set-node-out-r node-shuffle set-shuffle-out-r ;
 
-: empty-node f { } { } { } { } ;
-: param-node ( label) { } { } { } { } ;
-: in-node ( inputs) >r f r> { } { } { } ;
-: out-node ( outputs) >r f { } r> { } { } ;
+: empty-node f @{ }@ @{ }@ @{ }@ @{ }@ ;
+: param-node ( label) @{ }@ @{ }@ @{ }@ @{ }@ ;
+: in-node ( inputs) >r f r> @{ }@ @{ }@ @{ }@ ;
+: out-node ( outputs) >r f @{ }@ r> @{ }@ @{ }@ ;
 
 : d-tail ( n -- list ) meta-d get tail* ;
 : r-tail ( n -- list ) meta-r get tail* ;
@@ -146,7 +146,7 @@ SYMBOL: current-node
     [
         dup node-in-d % dup node-out-d %
         dup node-in-r % node-out-r %
-    ] { } make ;
+    ] @{ }@ make ;
 
 : uses-value? ( value node -- ? ) node-values memq? ;
 

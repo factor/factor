@@ -41,12 +41,12 @@ parse-command-line
 compile? [
     "Compiling base..." print
 
-    {
+    @{
         uncons 1+ 1- + <= > >= mod length
         nth-unsafe set-nth-unsafe
         = string>number number>string scan solve-recursion
         kill-set kill-node (generate)
-    } [ compile ] each
+    }@ [ compile ] each
 ] when
 
 compile? [
@@ -80,10 +80,13 @@ compile? [
     0 exit
 ] set-boot
 
-0 [ compiled? [ 1+ ] when ] each-word
-number>string write " words compiled" print
+all-words [ compiled? ] subset length
+number>string write " compiled words" print
 
-0 [ drop 1+ ] each-word
+all-words [ symbol? ] subset length
+number>string write " symbol words" print
+
+all-words length
 number>string write " words total" print 
 
 "Total bootstrap GC time: " write gc-time

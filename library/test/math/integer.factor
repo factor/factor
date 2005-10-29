@@ -60,8 +60,6 @@ USING: kernel math prettyprint test ;
 
 [ t ] [ 123 124 verify-gcd ] unit-test
 [ t ] [ 50 120 verify-gcd ] unit-test
-[ 3 ] [ 5 7 mod-inv ] unit-test
-[ 78572682077 ] [ 234829342 342389423843 mod-inv ] unit-test
 
 [ -1 ] [ -1 >bignum >fixnum ] unit-test
 

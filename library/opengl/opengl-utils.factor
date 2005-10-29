@@ -3,7 +3,7 @@
 IN: opengl
 USING: alien errors kernel math namespaces opengl sdl sequences ;
 
-: gl-color ( { r g b a } -- ) first4 glColor4d ; inline
+: gl-color ( @{ r g b a }@ -- ) first4 glColor4d ; inline
 
 : init-gl ( -- )
     0.0 0.0 0.0 0.0 glClearColor 
@@ -62,7 +62,7 @@ USING: alien errors kernel math namespaces opengl sdl sequences ;
 : four-sides ( dim -- )
     dup top-left dup top-right dup bottom-right bottom-left ;
 
-: gl-line ( from to { r g b } -- )
+: gl-line ( from to color -- )
     gl-color [ gl-vertex ] 2apply ;
 
 : gl-fill-rect ( dim -- )
@@ -82,7 +82,7 @@ USING: alien errors kernel math namespaces opengl sdl sequences ;
     #! Draw a filled polygon.
     dup length 2 > GL_POLYGON GL_LINES ? (gl-poly) ;
 
-: gl-poly ( points { r g b } -- )
+: gl-poly ( points color -- )
     #! Draw a polygon.
     GL_LINE_LOOP (gl-poly) ;
 
@@ -149,7 +149,7 @@ C: sprite ( loc dim dim2 -- )
     GL_TEXTURE_2D GL_TEXTURE_WRAP_S GL_CLAMP glTexParameterf
     GL_TEXTURE_2D GL_TEXTURE_WRAP_T GL_CLAMP glTexParameterf ;
 
-: gl-translate ( { x y z } -- ) first3 glTranslatef ;
+: gl-translate ( @{ x y z }@ -- ) first3 glTranslatef ;
 
 : make-sprite-dlist ( sprite -- id )
     GL_MODELVIEW [

@@ -123,7 +123,7 @@ M: fixnum ' ( n -- tagged ) fixnum-tag immediate ;
 
 : bignum>seq ( n -- seq )
     #! n is positive or zero.
-    [ (bignum>seq) ] { } make ;
+    [ (bignum>seq) ] @{ }@ make ;
 
 : emit-bignum ( n -- )
     [ 0 < 1 0 ? ] keep abs bignum>seq
@@ -285,7 +285,7 @@ M: hashtable ' ( hashtable -- pointer )
 
 : global, ( -- )
     [
-        { vocabularies typemap builtins } [ [ ] change ] each
+        @{ vocabularies typemap builtins }@ [ [ ] change ] each
     ] make-hash '
     global-offset fixup ;
 

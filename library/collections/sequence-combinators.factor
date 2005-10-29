@@ -149,8 +149,8 @@ M: object find ( seq quot -- i elt )
     swap [ with rot ] subset 2nip ; inline
 
 : monotonic? ( seq quot -- ? | quot: elt elt -- ? )
-    #! Eg, { 1 2 3 4 } [ < ] monotonic? ==> t
-    #!     { 1 3 2 4 } [ < ] monotonic? ==> f
+    #! Eg, @{ 1 2 3 4 }@ [ < ] monotonic? ==> t
+    #!     @{ 1 3 2 4 }@ [ < ] monotonic? ==> f
     #! Don't use with lists.
     swap dup length 1- [
         pick pick >r >r (monotonic) r> r> rot

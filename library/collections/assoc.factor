@@ -21,13 +21,3 @@ IN: lists USING: kernel sequences ;
 : set-assoc ( value key alist -- alist )
     #! Adds the key/value pair to the alist.
     dupd remove-assoc acons ;
-
-: assoc-apply ( value-alist quot-alist -- )
-    #! Looks up the key of each pair in the first list in the
-    #! second list to produce a quotation. The quotation is
-    #! applied to the value of the pair. If there is no
-    #! corresponding quotation, the value is popped off the
-    #! stack.
-    swap [
-        unswons rot assoc* dup [ cdr call ] [ 2drop ] if
-    ] each-with ;

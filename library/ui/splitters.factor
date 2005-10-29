@@ -46,12 +46,12 @@ C: splitter ( first second split vector -- splitter )
     dup splitter-split swap rect-dim
     n*v [ >fixnum ] map divider-size 1/2 v*n v- ;
 
-: splitter-layout ( splitter -- { a b c } )
+: splitter-layout ( splitter -- @{ a b c }@ )
     [
         dup splitter-part ,
         divider-size ,
         dup rect-dim divider-size v- swap splitter-part v- ,
-    ] { } make ;
+    ] @{ }@ make ;
 
 M: splitter layout* ( splitter -- )
     dup splitter-layout packed-layout ;

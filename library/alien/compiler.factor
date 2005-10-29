@@ -70,7 +70,7 @@ C: alien-node make-node ;
 : c-aligned c-size cell align ;
 
 : stack-space ( parameters -- n )
-    0 swap [ c-aligned + ] each ;
+    0 [ c-aligned + ] reduce ;
 
 : unbox-parameter ( n parameter -- node )
     c-type [ "unboxer" get "reg-class" get ] bind %unbox ;
@@ -134,7 +134,7 @@ M: alien-node linearize* ( node -- )
 
 : unpair ( seq -- odds evens )
     2 swap group flip dup empty?
-    [ drop { } { } ] [ first2 ] if ;
+    [ drop @{ }@ @{ }@ ] [ first2 ] if ;
 
 : parse-arglist ( lst -- types stack effect )
     unpair [
@@ -169,6 +169,6 @@ M: compound (uncrossref)
     over "infer" word-prop or [
         drop
     ] [
-        dup { "infer-effect" "base-case" "no-effect" "terminates" }
+        dup @{ "infer-effect" "base-case" "no-effect" "terminates" }@
         reset-props update-xt
     ] if ;

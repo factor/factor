@@ -44,7 +44,7 @@ TUPLE: book-browser book ;
         arrow-left   [ prev-page  ] <book-button> ,
         arrow-right  [ next-page  ] <book-button> ,
         arrow-right| [ last-page  ] <book-button> ,
-    ] { } make make-shelf ;
+    ] @{ }@ make make-shelf ;
 
 C: book-browser ( book -- gadget )
     dup delegate>frame

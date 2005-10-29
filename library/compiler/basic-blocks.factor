@@ -13,7 +13,7 @@ USING: arrays hashtables kernel lists math namespaces sequences ;
     ] if ;
 
 : split-blocks ( linear -- blocks )
-    [ 0 swap (split-blocks) ] { } make ;
+    [ 0 swap (split-blocks) ] @{ }@ make ;
 
 SYMBOL: d-height
 SYMBOL: r-height
@@ -145,7 +145,7 @@ M: %indirect trim-dead* ( tail vop -- ) ?dead-literal ;
         dup simplify-stack
         d-height get %inc-d r-height get %inc-r 2array append
         trim-dead
-    ] { } make ;
+    ] @{ }@ make ;
 
 : keep-simplifying ( block -- block )
     dup length >r simplify-block dup length r> =

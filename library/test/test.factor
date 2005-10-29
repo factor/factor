@@ -73,7 +73,7 @@ SYMBOL: failures
     prepare-tests [ test ] subset terpri passed. failed. ;
 
 : tests
-    {
+    @{
         "lists/cons" "lists/lists" "lists/assoc"
         "lists/namespaces"
         "combinators"
@@ -94,24 +94,24 @@ SYMBOL: failures
         "gadgets/frames" "memory"
         "redefine" "annotate" "binary" "inspector"
         "kernel"
-    } run-tests ;
+    }@ run-tests ;
 
 : benchmarks
-    {
+    @{
         "benchmark/empty-loop" "benchmark/fac"
         "benchmark/fib" "benchmark/sort"
         "benchmark/continuations" "benchmark/ack"
         "benchmark/hashtables" "benchmark/strings"
         "benchmark/vectors" "benchmark/prettyprint"
         "benchmark/image"
-    } run-tests ;
+    }@ run-tests ;
 
 : compiler-tests
-    {
+    @{
         "io/buffer" "compiler/optimizer"
         "compiler/simple"
         "compiler/stack" "compiler/ifte"
         "compiler/generic" "compiler/bail-out"
         "compiler/linearizer" "compiler/intrinsics"
         "compiler/identities"
-    } run-tests ;
+    }@ run-tests ;

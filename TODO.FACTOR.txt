@@ -2,14 +2,8 @@
 
 - swap @{ and { syntax
 - get stuff in examples dir running in the ui
-- [ ... is annoying
-  perhaps on the last line of output, if a block doesn't fit, print
-  it anyway?
-- deallocate textures and display lists
 - pixelColor replacement
-- fix presentations
-- gadget-children on f error with outliners
-
+X
 + ui:
 
 - make-pane: if no input, just return pane-output
@@ -46,7 +40,6 @@
 + ffi:
 
 - C structs, enums, unions: use new-style string mode parsing
-- alien/c-types.factor is ugly
 - smarter out parameter handling
 - clarify powerpc passing of value struct parameters
 - ffi unicode strings: null char security hole

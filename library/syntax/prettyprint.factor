@@ -27,7 +27,7 @@ global [
     0 column set
     0 indent set
     0 last-newline set
-    0 line-count set
+    1 line-count set
     string-limit off
 ] bind
 
@@ -43,13 +43,6 @@ C: section ( length -- section )
     [ set-section-start ] keep
     0 over set-section-indent ;
 
-: section-fits? ( section -- ? )
-    margin get dup 0 = [
-        2drop t
-    ] [
-        >r section-end last-newline get - indent get + r> <=
-    ] if ;
-
 : line-limit? ( -- ? )
     line-limit get dup [ line-count get <= ] when ;
 
@@ -61,8 +54,8 @@ C: section ( length -- section )
         drop
     ] [
         last-newline set
-        line-count inc
         line-limit? [ "..." write end-printing get continue ] when
+        line-count inc
         "\n" write do-indent
     ] if ;
 
@@ -108,6 +101,17 @@ C: block ( -- block )
     dup indent>
     dup section-nl-after?
     [ section-end fresh-line ] [ drop ] if ;
+
+: section-fits? ( section -- ? )
+    margin get dup 0 = [
+        2drop t
+    ] [
+        line-limit? pick block? and [
+            2drop t
+        ] [
+            >r section-end last-newline get - indent get + r> <=
+        ] if
+    ] if ;
 
 : pprint-section ( section -- )
     dup section-fits?
@@ -171,13 +175,13 @@ GENERIC: pprint* ( obj -- )
 
 : vocab-style ( vocab -- style )
     {{
-        [[ "syntax" [ [[ foreground [ 128 128 128 ] ]] ] ]]
-        [[ "kernel" [ [[ foreground [ 0 0 128 ] ]] ] ]]
-        [[ "sequences" [ [[ foreground [ 128 0 0 ] ]] ] ]]
-        [[ "math" [ [[ foreground [ 0 128 0 ] ]] ] ]]
-        [[ "math-internals" [ [[ foreground [ 192 0 0 ] ]] ] ]]
-        [[ "kernel-internals" [ [[ foreground [ 192 0 0 ] ]] ] ]]
-        [[ "io-internals" [ [[ foreground [ 192 0 0 ] ]] ] ]]
+        [[ "syntax" [ [[ foreground @{ 0.5 0.5 0.5 1.0 }@ ]] ] ]]
+        [[ "kernel" [ [[ foreground @{ 0.0 0.0 0.5 1.0 }@ ]] ] ]]
+        [[ "sequences" [ [[ foreground @{ 0.5 0.0 0.0 1.0 }@ ]] ] ]]
+        [[ "math" [ [[ foreground @{ 0.0 0.5 0.0 1.0 }@ ]] ] ]]
+        [[ "math-internals" [ [[ foreground @{ 0.75 0.0 0.0 1.0 }@ ]] ] ]]
+        [[ "kernel-internals" [ [[ foreground @{ 0.75 0.0 0.0 1.0 }@ ]] ] ]]
+        [[ "io-internals" [ [[ foreground @{ 0.75 0.0 0.0 1.0 }@ ]] ] ]]
     }} hash ;
 
 : word-style ( word -- style )
@@ -352,11 +356,11 @@ M: wrapper pprint* ( wrapper -- )
     #! Examples are ] } }} ]] >> and so on.
     t "pprint-close" set-word-prop ;
 
-{
-    { POSTPONE: [ POSTPONE: ] }
-    { POSTPONE: { POSTPONE: } }
-    { POSTPONE: @{ POSTPONE: }@ }
-    { POSTPONE: {{ POSTPONE: }} }
-    { POSTPONE: [[ POSTPONE: ]] }
-    { POSTPONE: [[ POSTPONE: ]] }
-} [ first2 define-close define-open ] each
+@{
+    @{ POSTPONE: [ POSTPONE: ] }@
+    @{ POSTPONE: { POSTPONE: } }@
+    @{ POSTPONE: @{ POSTPONE: }@ }@
+    @{ POSTPONE: {{ POSTPONE: }} }@
+    @{ POSTPONE: [[ POSTPONE: ]] }@
+    @{ POSTPONE: [[ POSTPONE: ]] }@
+}@ [ first2 define-close define-open ] each

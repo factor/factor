@@ -13,7 +13,7 @@ math math-internals sequences words ;
     dup optimizer-hooks cond ;
 
 : define-optimizers ( word optimizers -- )
-    { [ t ] [ drop t ] } add "optimizer-hooks" set-word-prop ;
+    @{ [ t ] [ drop t ] }@ add "optimizer-hooks" set-word-prop ;
 
 : partial-eval? ( #call -- ? )
     dup node-param "foldable" word-prop [
@@ -49,18 +49,18 @@ math math-internals sequences words ;
     dup flip-subst node-successor dup
     dup node-children first2 swap 2array swap set-node-children ;
 
-\ not {
-    { [ dup node-successor #if? ] [ flip-branches ] }
-} define-optimizers
+\ not @{
+    @{ [ dup node-successor #if? ] [ flip-branches ] }@
+}@ define-optimizers
 
 : disjoint-eq? ( node -- ? )
     dup node-classes swap node-in-d
     [ swap ?hash ] map-with
     first2 2dup and [ classes-intersect? not ] [ 2drop f ] if ;
 
-\ eq? {
-    { [ dup disjoint-eq? ] [ [ f ] inline-literals ] }
-} define-optimizers
+\ eq? @{
+    @{ [ dup disjoint-eq? ] [ [ f ] inline-literals ] }@
+}@ define-optimizers
 
 ! Arithmetic identities
 SYMBOL: @

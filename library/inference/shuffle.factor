@@ -3,7 +3,7 @@ USING: hashtables kernel math namespaces sequences ;
 
 TUPLE: shuffle in-d in-r out-d out-r ;
 
-: empty-shuffle { } { } { } { } <shuffle> ;
+: empty-shuffle @{ }@ @{ }@ @{ }@ @{ }@ <shuffle> ;
 
 : cut* ( seq1 seq2 -- seq seq ) [ head* ] 2keep tail* ;
 

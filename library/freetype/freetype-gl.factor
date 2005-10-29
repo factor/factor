@@ -19,15 +19,9 @@ SYMBOL: open-fonts
         {{ }} clone open-fonts set
     ] bind ;
 
-: free-dlists ( seq -- )
-    drop ;
-
-: free-textures ( seq -- )
-    drop ;
-
-: free-sprites ( glyphs -- )
-    dup [ sprite-dlist ] map free-dlists
-    [ sprite-texture ] map free-textures ;
+: free-sprite ( sprite -- )
+    dup sprite-dlist 1 glDeleteLists
+    sprite-texture <uint> 1 swap glDeleteTextures ;
 
 ! A font object from FreeType.
 ! the handle is an FT_Face.
@@ -38,7 +32,7 @@ M: font = eq? ;
 
 : flush-font ( font -- )
     #! Only do this after re-creating a GL context!
-    dup font-sprites [ ] subset free-sprites
+    dup font-sprites [ [ free-sprite ] when* ] each
     { } clone swap set-font-sprites ;
 
 : close-font ( font -- )
@@ -106,12 +100,12 @@ M: font = eq? ;
 C: font ( handle -- font )
     [ set-font-handle ] keep dup flush-font dup init-font ;
 
-: open-font ( { font style ptsize } -- font )
+: open-font ( @{ font style ptsize }@ -- font )
     #! Open a font and set the point size of the font.
     first3 >r open-face dup 0 r> 6 shift
     dpi dpi FT_Set_Char_Size freetype-error <font> ;
 
-: lookup-font ( { font style ptsize } -- font )
+: lookup-font ( @{ font style ptsize }@ -- font )
     #! Cache open fonts.
     open-fonts get [ open-font ] cache ;
 

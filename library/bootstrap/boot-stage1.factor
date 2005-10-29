@@ -17,7 +17,7 @@ sequences io vectors words ;
         boot
     ] %
 
-    {
+    @{
         "/version.factor"
 
         "/library/generic/early-generic.factor"
@@ -150,7 +150,7 @@ sequences io vectors words ;
         "/library/cli.factor"
         
         "/library/bootstrap/init.factor"
-    } [ dup print parse-resource % ] each
+    }@ [ dup print parse-resource % ] each
     
     [ "/library/bootstrap/boot-stage2.factor" run-resource ] %
 ] [ ] make

@@ -43,7 +43,7 @@ USING: arrays gadgets kernel sequences styles ;
     }@ >> ;
 
 : faint-boundary
-    << solid f @{ 0.62 0.62 0.62 1.0 }@ >> swap set-gadget-boundary ;
+    << solid f @{ 0.62 0.62 0.62 0.8 }@ >> swap set-gadget-boundary ;
 
 : bevel-button-theme ( gadget -- )
     plain-gradient rollover-gradient pressed-gradient
@@ -55,7 +55,7 @@ USING: arrays gadgets kernel sequences styles ;
 
 : roll-button-theme ( button -- )
     f solid-black solid-black <button-paint> over set-gadget-boundary
-    f f << solid f @{ 0.92 0.9 0.9 1.0 }@ >> <button-paint> swap set-gadget-interior ;
+    f f pressed-gradient <button-paint> swap set-gadget-interior ;
 
 : caret-theme ( caret -- )
     << solid f @{ 1.0 0.0 0.0 1.0 }@ >> swap set-gadget-interior ;

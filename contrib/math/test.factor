@@ -223,3 +223,5 @@ unit-test
 [ 0 ] [ { 1 } var ] unit-test
 [ 0 ] [ { 1 } std ] unit-test
 
+[ 3 ] [ 5 7 mod-inv ] unit-test
+[ 78572682077 ] [ 234829342 342389423843 mod-inv ] unit-test
