@@ -28,6 +28,8 @@ TYPEDEF: XID Colormap
 TYPEDEF: XID GContext
 TYPEDEF: XID KeySym
 
+TYPEDEF: ulong Atom
+
 TYPEDEF: void* Display*
 TYPEDEF: void* Screen*
 TYPEDEF: void* GC
@@ -164,9 +166,9 @@ FUNCTION: Status XSetWindowBackground ( Display* display, Window w, ulong backgr
 FUNCTION: Status XDefineCursor ( Display* display, Window w, Cursor cursor ) ;
 FUNCTION: Status XUndefineCursor ( Display* display, Window w ) ;
 
-!
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 ! 4 - Window Information Functions
-!
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 FUNCTION: Status XQueryTree ( Display* display, Window w, Window* root_return, Window* parent_return, Window** children_return, uint* nchildren_return ) ;
 
@@ -203,6 +205,14 @@ FUNCTION: Status XGetWindowAttributes ( Display* display, Window w, XWindowAttri
 : IsViewable		2 ;
 
 FUNCTION: boolean XQueryPointer ( Display* display, Window w, Window* root_return, Window* child_return, int* root_x_return, int* root_y_return, int* win_x_return, int* win_y_return, uint* mask_return ) ;
+
+! 4.5 Selections
+
+FUNCTION: int XSetSelectionOwner ( Display* display, Atom selection, Window owner, Time time ) ;
+
+FUNCTION: Window XGetSelectionOwner ( Display* display, Atom selection ) ;
+
+FUNCTION: int XConvertSelection ( Display* display, Atom selection, Atom target, Atom property, Window requestor, Time time ) ;
 
 !
 ! 6 - Color Management Functions
