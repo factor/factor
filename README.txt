@@ -41,7 +41,11 @@ parameters to build the Factor runtime:
   linux
   linux-ppc
   macosx
+  macosx-sdl
   windows
+
+Note: If you wish to use the Factor UI on Mac OS X, you must build with the
+macosx-sdl target.
 
 The following options can be given to make:
 
@@ -108,20 +112,15 @@ naming the libraries during bootstrap, as in the next section.
 
 * Setting up SDL libraries for use with Factor
 
-Factor's UI requires recent versions of the following three libraries in
-order to operate:
-
-  libSDL.so
-  libSDL_ttf.so
-  libSDL_gfx.so
+The Windows binary package for Factor includes all prerequisite DLLs. On Unix,
+you need recent versions of SDL and FreeType.
 
 If you have installed these libraries but the UI still fails with an
 error, you will need to find out the exact names that they are installed
 as, and issue a command similar to the following to bootstrap Factor:
 
   ./f boot.image.<foo> -libraries:sdl:name=libSDL-1.2.so
-                       -libraries:sdl-ttf:name=libSDL_ttf.so
-                       -libraries:sdl-gfx:name=libSDL_gfx.so
+                       -libraries:freetype:name=libfreetype.so
 
 * Source organization
 
@@ -133,6 +132,7 @@ as, and issue a command similar to the following to bootstrap Factor:
     collections/ - data types including but not limited to lists,
       vectors, hashtables, and operations on them
     compiler/ - optimizing native compiler
+    freetype/ - FreeType binding, rendering glyphs to OpenGL textures
     generic/ - generic words, for object oriented programming style
     help/ - online help system
     httpd/ - HTTP client, server, and web application framework
@@ -140,7 +140,8 @@ as, and issue a command similar to the following to bootstrap Factor:
       useful development tool of its own
     io/ - input and output streams
     math/ - integers, ratios, floats, complex numbers, vectors, matrices
-    sdl/ - bindings for libSDL, libSDL_ttf and libSDL_gfx
+    opengl/ - OpenGL graphics library binding
+    sdl/ - SDL binding
     syntax/ - parser and object prettyprinter
     test/ - unit test framework and test suite
     tools/ - interactive development tools

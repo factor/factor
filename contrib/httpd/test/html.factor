@@ -23,7 +23,7 @@ USING: html io kernel namespaces styles test ;
 [ "<span style='color: #ff00ff; font-family: Monospaced; '>car</span>" ]
 [
     [
-        [ [ foreground 255 0 255 ] [[ font "Monospaced" ]] ]
+        [ [ foreground 1 0 1 ] [[ font "Monospaced" ]] ]
         [ drop "car" write ]
         span-tag
     ] string-out
@@ -41,7 +41,7 @@ USING: html io kernel namespaces styles test ;
 [
     [
         "car"
-        [ [ foreground 255 0 255 ] [[ font "Monospaced" ]] ]
+        [ [ foreground 1 0 1 ] [[ font "Monospaced" ]] ]
         html-format
     ] string-out
 ] unit-test

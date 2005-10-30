@@ -1,9 +1,8 @@
 0.79:
 
-- fix prettyprinter
-- syntax updates and testing for contrib/
-- get stuff in examples dir running in the ui
-- pixelColor replacement
+- test everything in contrib
+- update handbook
+- fix remaining GL issues
 
 + ui:
 

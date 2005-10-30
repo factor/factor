@@ -14,22 +14,15 @@
 ! "examples/mandel.factor" run-file
 
 IN: mandel
-USE: compiler
-USE: alien
-USE: errors
-USE: kernel
-USE: lists
-USE: math
-USE: namespaces
-USE: sdl
-USE: sdl-event
-USE: sdl-gfx
-USE: sdl-video
-USE: vectors
-USE: prettyprint
-USE: sequences
-USE: io
-USE: test
+USING: arrays compiler io kernel math namespaces sequences
+strings test ;
+
+: max-color 360 ; inline
+: zoom-fact 0.8 ; inline
+: width 640 ; inline
+: height 480 ; inline
+: nb-iter 40 ; inline
+: center -0.65 ; inline
 
 : f_ ( h s v i -- f ) >r swap rot >r 2dup r> 6 * r> - ;
 : p ( v s x -- v p x ) >r dupd neg 1 + * r> ;
@@ -75,81 +68,65 @@ USE: test
 [ 1 0 0 ] [ 1 1 1 hsv>rgb ] unit-test
 [ 1/6 1/9 1/9 ] [ 1 1/3 1/6 hsv>rgb ] unit-test
 
-: scale 255 * >fixnum ;
+: scale 255 * >fixnum ; inline
 
-: scale-rgb ( r g b a -- n )
-    scale
-    swap scale 8 shift bitor
-    swap scale 16 shift bitor
-    swap scale 24 shift bitor ;
+: scale-rgb ( r g b -- n )
+    rot scale rot scale rot scale 3array ;
 
-: sat 0.85 ;
-: val 0.85 ;
+: sat 0.85 ; inline
+: val 0.85 ; inline
 
 : <color-map> ( nb-cols -- map )
     dup [
-        360 * swap 1 + / 360 / sat val
-        hsv>rgb 1.0 scale-rgb
+        360 * swap 1+ / 360 / sat val
+        hsv>rgb scale-rgb
     ] map-with ;
 
 : iter ( c z nb-iter -- x )
     over absq 4.0 >= over 0 = or
-    [ 2nip ] [ 1- >r sq dupd + r> iter ] if ;
+    [ 2nip ] [ 1- >r sq dupd + r> iter ] if ; inline
 
-: max-color 360 ;
-
-SYMBOL: zoom-fact
-SYMBOL: x-inc
-SYMBOL: y-inc
-SYMBOL: nb-iter
 SYMBOL: cols
-SYMBOL: center
 
-: init-mandel ( -- )
-    width get 200000 zoom-fact get * / x-inc set
-    height get 150000 zoom-fact get * / y-inc set
-    nb-iter get max-color min <color-map> cols set ;
+: x-inc width 200000 zoom-fact * / ; inline
+: y-inc height 150000 zoom-fact * / ; inline
 
 : c ( i j -- c )
     >r
-    x-inc get * center get real x-inc get width get 2 / * - + >float
+    x-inc * center real x-inc width 2 / * - + >float
     r>
-    y-inc get * center get imaginary y-inc get height get 2 / * - + >float
-    rect> ;
+    y-inc * center imaginary y-inc height 2 / * - + >float
+    rect> ; inline
 
 : render ( -- )
+    height [
+        width [
+            2dup swap c 0 nb-iter iter dup 0 = [
+                drop "\0\0\0"
+            ] [
+                cols get [ length mod ] keep nth
+            ] if %
+        ] repeat
+    ] repeat ;
+
+: ppm-header ( w h -- )
+    "P6\n" % swap # " " % # "\n255\n" % ;
+
+: sbuf-size width height * 3 * 100 + ;
+
+: run ( -- string )
     [
-        c 0 nb-iter get iter dup 0 = [
-            drop 0
-        ] [
-            cols get [ length mod ] keep nth
-        ] if
-    ] with-pixels ; compiled
+        sbuf-size <sbuf> building set
+        width height ppm-header
+        nb-iter max-color min <color-map> cols set
+        render
+        building get >string
+    ] with-scope ;
 
-: event-loop ( event -- )
-    dup SDL_WaitEvent [
-        dup event-type SDL_QUIT = [
-            drop
-        ] [
-            event-loop
-        ] if
-    ] [
-        drop
-    ] if ; compiled
+: run>file ( file -- )
+    "Generating " write dup write "..." print
+    <file-writer> [ run write ] with-stream ;
 
-: mandel ( -- )
-    1280 1024 0 SDL_HWSURFACE  [
-        [
-            3.7 zoom-fact set
-            -0.45 center set
-            100 nb-iter set
-            init-mandel
-            [ render ] time
-            "Done." print flush
-        ] with-surface
+\ render compile
 
-        <event> event-loop
-        SDL_Quit
-    ] with-screen ;
-
-mandel
+[ "mandel.pnm" run>file ] time

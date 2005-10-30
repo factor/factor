@@ -16,6 +16,7 @@ Nice to have:
   - square root of a matrix, e^matrix
   - finding roots of polynomials
 - Algebra:
+  - polynomial derivative
   - ^mod for polynomials
   - mod-inv for polynomials
   - arithmetic modulo a+sqrt(b)
@@ -28,6 +29,10 @@ Nice to have:
   - interval arithmetic
   - combinatorics: stirling numbers
   - factoring polynomials over finite fields
+  - minimal and characteristic polynomials of algebraic numbers
+  - norm and trace of algebraic numbers
+  - minimal and characteristic polynomials of matrices
+  - eigenvalues of matrices
 - Graphs:
   - minimum spanning trees
 - Logic:

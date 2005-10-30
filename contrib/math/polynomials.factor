@@ -5,16 +5,16 @@ USING: kernel sequences vectors math math-internals namespaces ;
 
 : zero-vector ( n -- vector ) 0 <repeated> >vector ;
 
-: nzero-pad ( n seq -- seq )
-    #! extend seq by n zeros
-    >r zero-vector r> swap nappend ;
-
 : zero-pad ( n seq -- seq )
     #! extend seq by n zeros
     >r zero-vector r> swap append ;
 
 : zero-pad-front ( n seq -- seq )
     >r zero-vector r> append ;
+
+: nzero-pad ( n seq -- )
+    #! extend seq by n zeros
+    >r zero-vector r> swap nappend ;
 
 : zero-extend ( n seq -- )
     #! extend seq to max(n,length) with 0s
@@ -56,17 +56,14 @@ IN: math-contrib
 : conv*b ( seq -- seq )
     rot dup pop drop 1 zero-vector swap append -rot ;
 
-: conv ( p p -- p )
-    conv*a [ 3dup -rot v* sum >r pick r> -rot set-nth conv*b ] repeat nip ;
-
-! polynomial multiply
 : p* ( p p -- p )
-    conv ;
+    #! Multiply two polynomials.
+    conv*a [ 3dup -rot v* sum >r pick r> -rot set-nth conv*b ] repeat nip ;
 
 : p-sq ( p -- p-sq )
     dup p* ;
 
-IN: polynomial-internals
+IN: polynomials-internals
 
 : pop-front ( seq -- seq )
     1 swap tail ;
@@ -82,18 +79,22 @@ IN: polynomial-internals
 : (p/mod)
     2dup /-last 2dup , n*p swapd p- dup pop drop swap pop-front ;
 
-IN: math
+IN: math-contrib
 
 : p/mod
-    p/mod-setup [ [ (p/mod) ] times ] { } make reverse nip swap 2ptrim pextend ;
+    p/mod-setup [ [ (p/mod) ] times ] V{ } make
+    reverse nip swap 2ptrim pextend ;
 
 : (pgcd) ( b a y x -- a d )
-    dup { 0 } clone p= [
+    dup V{ 0 } clone p= [
         drop nip
     ] [
         tuck p/mod >r pick p* swap >r swapd p- r> r> (pgcd)
     ] if ;
     
 : pgcd ( p p -- p )
-    swap { 0 } clone { 1 } clone 2swap (pgcd) ;
+    swap V{ 0 } clone V{ 1 } clone 2swap (pgcd) ;
 
+: pdiff ( p -- p' )
+    #! Polynomial derivative.
+    [ length reverse-slice ] keep [ 1+ * ] 2map 1 swap head* ;

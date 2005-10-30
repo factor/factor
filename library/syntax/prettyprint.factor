@@ -346,19 +346,12 @@ M: wrapper pprint* ( wrapper -- )
 : .o >oct print ;
 : .h >hex print ;
 
-: define-open
-    #! The word will be pretty-printed as a block opener.
-    t "pprint-open" set-word-prop ;
-
-: define-close ( word -- )
-    #! The word will be pretty-printed as a block closer.
-    t "pprint-close" set-word-prop ;
-
 { 
     POSTPONE: [ POSTPONE: [[
     POSTPONE: { POSTPONE: V{ POSTPONE: H{
     POSTPONE: T{ POSTPONE: W{
-} [ define-open ] each
+} [ t "pprint-open" set-word-prop ] each
 
-{ POSTPONE: [ POSTPONE: } POSTPONE: ]] }
-[ define-close ] each
+{
+    POSTPONE: ] POSTPONE: } POSTPONE: ]]
+} [ t "pprint-close" set-word-prop ] each

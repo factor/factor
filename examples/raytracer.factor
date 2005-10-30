@@ -1,7 +1,8 @@
 ! Factor port of the raytracer benchmark from
 ! http://www.ffconsultancy.com/free/ray_tracer/languages.html
 
-USING: arrays generic io kernel lists math namespaces sequences ;
+USING: arrays compiler generic io kernel lists math namespaces
+sequences test ;
 IN: ray
 
 ! parameters
@@ -142,18 +143,24 @@ DEFER: create ( level c r -- scene )
         ] map-with
     ] map ;
 
-: pnm-header ( w h -- )
+: pgm-header ( w h -- )
     "P5\n" % swap # " " % # "\n255\n" % ;
 
-: pnm-pixel ( n -- ) 255 * 0.5 + >fixnum , ;
+: pgm-pixel ( n -- ) 255 * 0.5 + >fixnum , ;
 
 : ray-trace ( scene -- pixels )
     pixel-grid [ [ ray-pixel ] map-with ] map-with ;
 
 : run ( -- string )
     levels { 0.0 -1.0 0.0 } 1.0 create ray-trace [
-        size size pnm-header
-        [ [ oversampling sq / pnm-pixel ] each ] each
+        size size pgm-header
+        [ [ oversampling sq / pgm-pixel ] each ] each
     ] "" make ;
 
-: run>file ( file -- ) <file-writer> [ run write ] with-stream ;
+: run>file ( file -- )
+    "Generating " write dup write "..." print
+    <file-writer> [ run write ] with-stream ;
+
+\ run compile
+
+[ "raytracer.pnm" run>file ] time
