@@ -29,7 +29,7 @@ parser sequences strings words ;
 : define-slot ( class slot reader writer -- )
     >r >r 2dup r> define-reader r> define-writer ;
 
-: ?create ( @{ name vocab }@ -- word )
+: ?create ( { name vocab } -- word )
     dup [ first2 create ] when ;
 
 : intern-slots ( spec -- spec )

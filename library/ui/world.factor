@@ -47,7 +47,7 @@ C: world ( -- world )
     dupd add-gadget prefer ;
 
 : world-clip ( -- )
-    @{ 0 0 0 }@ width get height get 0 3array <rect> clip set ;
+    { 0 0 0 } width get height get 0 3array <rect> clip set ;
 
 : draw-world ( -- )
     [ world-clip world get draw-gadget ] with-gl-surface ;

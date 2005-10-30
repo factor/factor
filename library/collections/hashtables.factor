@@ -163,12 +163,12 @@ M: hashtable clone ( hash -- hash ) clone-growable ;
     2dup hash-contained? >r swap hash-contained? r> and ;
 
 M: hashtable = ( obj hash -- ? )
-    @{
-        @{ [ 2dup eq? ] [ 2drop t ] }@
-        @{ [ over hashtable? not ] [ 2drop f ] }@
-        @{ [ 2dup [ hash-size ] 2apply number= not ] [ 2drop f ] }@
-        @{ [ t ] [ hashtable= ] }@
-    }@ cond ;
+    {
+        { [ 2dup eq? ] [ 2drop t ] }
+        { [ over hashtable? not ] [ 2drop f ] }
+        { [ 2dup [ hash-size ] 2apply number= not ] [ 2drop f ] }
+        { [ t ] [ hashtable= ] }
+    } cond ;
 
 M: hashtable hashcode ( hash -- n )
     #! Poor.

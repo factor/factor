@@ -27,7 +27,7 @@ SYMBOL: d
 : next-x ( x y -- x ) a get * sin swap b get * cos - ;
 : next-y ( x y -- y ) swap c get * sin swap d get * cos - ;
 
-: pixel ( #{ x y }# color -- )
+: pixel ( C{ x y } color -- )
     >r >r surface get r> >rect r> pixelColor ;
 
 : iterate-dejong ( x y -- x y )

@@ -129,7 +129,7 @@ M: for-arguments-sake empty-method-test drop "Hi" ;
 TUPLE: another-one ;
 
 [ "Hi" ] [ <for-arguments-sake> empty-method-test empty-method-test ] unit-test
-[ << another-one f >> ] [ <another-one> empty-method-test ] unit-test
+[ T{ another-one f } ] [ <another-one> empty-method-test ] unit-test
 
 ! Test generic see and parsing
 [ "IN: temporary SYMBOL: bah\nUNION: bah fixnum alien ;\n" ]
@@ -168,7 +168,7 @@ M: object complex-combination nip ;
 TUPLE: shit ;
 
 M: shit complex-combination cons ;
-[ [[ << shit f >> 5 ]] ] [ << shit f >> 5 complex-combination ] unit-test
+[ [[ T{ shit f } 5 ]] ] [ T{ shit f } 5 complex-combination ] unit-test
 
 [ t ] [ \ complex-combination generic? >boolean ] unit-test
 
@@ -176,7 +176,7 @@ M: shit complex-combination cons ;
 ! G: small-delegation [ over ] [ type ] ;
 ! M: shit small-delegation cons ;
 ! 
-! [ [[ << shit f >> 5 ]] ] [ << delegating-small-generic << shit f >> >> 5 small-delegation ] unit-test
+! [ [[ T{ shit f } 5 ]] ] [ T{ delegating-small-generic T{ shit f } } 5 small-delegation ] unit-test
 
 GENERIC: big-generic-test
 M: fixnum big-generic-test "fixnum" ;
@@ -187,8 +187,8 @@ M: shit big-generic-test "shit" ;
 
 TUPLE: delegating ;
 
-[ << shit f >> "shit" ] [ << shit f >> big-generic-test ] unit-test
-[ << shit f >> "shit" ] [ << delegating << shit f >> >> big-generic-test ] unit-test
+[ T{ shit f } "shit" ] [ T{ shit f } big-generic-test ] unit-test
+[ T{ shit f } "shit" ] [ T{ delegating T{ shit f } } big-generic-test ] unit-test
 
 [ t ] [ \ = simple-generic? ] unit-test
 [ f ] [ \ each simple-generic? ] unit-test

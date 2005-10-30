@@ -86,7 +86,7 @@ UNION: value number string ;
 
 : semicolon ( -- semicolon )
     #! The semicolon token
-    << tok f CHAR: ; >> ;
+    T{ tok f CHAR: ; } ;
 
 : nest-apply ( [ ast ] -- apply )
     unswons unit swap [
@@ -214,7 +214,7 @@ M: vector compile-ast ! literal vectors
 : functions
     #! Regular functions
     #! Gives quotation applicable to stack
-    {{
+    H{
         [ [[ "+" 2 ]] + ]
         [ [[ "-" 2 ]] - ]
         [ [[ ">" 2 ]] [ > ] infix-relation ]
@@ -248,7 +248,7 @@ M: vector compile-ast ! literal vectors
         [ [[ "sn" 3 ]] -rot set-nth ]
         [ [[ "prod" 1 ]] product ]
         [ [[ "vec" 1 ]] >vector ]
-    }} ;
+    } ;
 
 : drc ( list -- list )
     #! all of list except last element (backwards cdr)
@@ -264,7 +264,7 @@ M: vector compile-ast ! literal vectors
 : high-functions
     #! Higher-order functions
     #! Gives quotation applicable to quotation and rest of stack
-    {{
+    H{
         [ [[ "!" 2 ]] 2map ]
         [ [[ "!" 1 ]] map ]
         [ [[ ">" 2 ]] map-with ]
@@ -274,7 +274,7 @@ M: vector compile-ast ! literal vectors
         [ [[ "~" 2 ]] call not ]
         [ [[ "/" 2 ]] swapd reduce ]
         [ [[ "\\" 2 ]] swapd accumulate ]
-    }} ;
+    } ;
 
 : get-hash ( key table -- value )
     #! like hash but throws exception if f

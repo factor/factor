@@ -42,6 +42,6 @@ SYMBOL: interned-literals
     compiled-offset 0 compile-cell ;
 
 : init-assembler ( -- )
-    {{ }} clone interned-literals global set-hash ;
+    H{ } clone interned-literals global set-hash ;
 
 : w>h/h dup -16 shift HEX: ffff bitand >r HEX: ffff bitand r> ;

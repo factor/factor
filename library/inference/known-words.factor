@@ -35,7 +35,7 @@ prettyprint ;
     dup "infer-effect" word-prop consume/produce
     [ [ t ] [ f ] if ] infer-quot ;
 
-@{ fixnum<= fixnum< fixnum>= fixnum> eq? }@ [
+{ fixnum<= fixnum< fixnum>= fixnum> eq? } [
     dup dup literalize [ manual-branch ] cons
     "infer" set-word-prop
 ] each

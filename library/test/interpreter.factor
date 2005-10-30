@@ -12,8 +12,8 @@ IN: temporary
 : run ( -- ) [ do ] interpret ;
 
 : init-interpreter ( -- )
-    { } clone meta-r set
-    { } clone meta-d set
+    V{ } clone meta-r set
+    V{ } clone meta-d set
     namestack meta-n set
     catchstack meta-c set
     meta-cf off
@@ -22,58 +22,58 @@ IN: temporary
 : test-interpreter
     init-interpreter meta-cf set run meta-d get ;
 
-[ { 1 2 3 } ] [
+[ V{ 1 2 3 } ] [
     [ 1 2 3 ] test-interpreter
 ] unit-test
 
-[ { "Yo" 2 } ] [
+[ V{ "Yo" 2 } ] [
     [ 2 >r "Yo" r> ] test-interpreter
 ] unit-test
 
-[ { 2 } ] [
+[ V{ 2 } ] [
     [ t [ 2 ] [ "hi" ] if ] test-interpreter
 ] unit-test
 
-[ { "hi" } ] [
+[ V{ "hi" } ] [
     [ f [ 2 ] [ "hi" ] if ] test-interpreter
 ] unit-test
 
-[ { 4 } ] [
+[ V{ 4 } ] [
     [ 2 2 fixnum+ ] test-interpreter
 ] unit-test
 
-[ { "Hey" "there" } ] [
+[ V{ "Hey" "there" } ] [
     [ [[ "Hey" "there" ]] uncons ] test-interpreter
 ] unit-test
 
-[ { t } ] [
+[ V{ t } ] [
     [ "XYZ" "XYZ" = ] test-interpreter
 ] unit-test
 
-[ { f } ] [
+[ V{ f } ] [
     [ "XYZ" "XuZ" = ] test-interpreter
 ] unit-test
 
-[ { #{ 1 1.5 }# { } #{ 1 1.5 }# { } } ] [
-    [ #{ 1 1.5 }# { } 2dup ] test-interpreter
+[ V{ C{ 1 1.5 } { } C{ 1 1.5 } { } } ] [
+    [ C{ 1 1.5 } { } 2dup ] test-interpreter
 ] unit-test
 
-[ { 4 } ] [
+[ V{ 4 } ] [
     [ 2 2 + ] test-interpreter
 ] unit-test
 
-[ { } ] [
+[ V{ } ] [
     [ 3 "x" set ] test-interpreter
 ] unit-test
 
-[ { 3 } ] [
+[ V{ 3 } ] [
     [ 3 "x" set "x" get ] test-interpreter
 ] unit-test
 
-[ { "hi\n" } ] [
+[ V{ "hi\n" } ] [
     [ [ "hi" print ] string-out ] test-interpreter
 ] unit-test
 
-[ { "4\n" } ] [
+[ V{ "4\n" } ] [
     [ [ 2 2 + . ] string-out ] test-interpreter
 ] unit-test

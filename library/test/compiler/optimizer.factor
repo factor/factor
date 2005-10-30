@@ -43,7 +43,7 @@ optimizer prettyprint sequences strings test vectors words ;
 
 : foo 1 2 3 ;
 
-[ {{ }} ] [ \ foo word-def dataflow kill-set ] unit-test
+[ H{ } ] [ \ foo word-def dataflow kill-set ] unit-test
 
 [ t ] [ [ [ 1 ] [ 2 ] ] [ [ 1 ] [ 2 ] if ] kill-set= ] unit-test
 
@@ -165,7 +165,7 @@ TUPLE: pred-test ;
         "not a tuple"
     ] if ; compiled
 
-[ << pred-test >> "pred-test" ] [ << pred-test >> pred-test-3 ] unit-test
+[ T{ pred-test } "pred-test" ] [ T{ pred-test } pred-test-3 ] unit-test
 
 : pred-test-4
     dup pred-test? [
@@ -174,7 +174,7 @@ TUPLE: pred-test ;
         "not a tuple"
     ] if ; compiled
 
-[ << pred-test >> "pred-test" ] [ << pred-test >> pred-test-4 ] unit-test
+[ T{ pred-test } "pred-test" ] [ T{ pred-test } pred-test-4 ] unit-test
 
 ! : inline-test
 !     "nom" = ; compiled

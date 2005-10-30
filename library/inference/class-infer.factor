@@ -152,8 +152,8 @@ DEFER: (infer-classes)
 
 : infer-classes ( node -- )
     [
-        {{ }} clone value-classes set
-        {{ }} clone value-literals set
-        {{ }} clone ties set
+        H{ } clone value-classes set
+        H{ } clone value-literals set
+        H{ } clone ties set
         (infer-classes)
     ] with-scope ;

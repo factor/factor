@@ -18,7 +18,7 @@ M: real summary
 
 M: complex summary
     "a complex number in the "
-    swap quadrant @{ "first" "second" "fourth" "third" }@ nth
+    swap quadrant { "first" "second" "fourth" "third" } nth
     " quadrant" append3 ;
 
 GENERIC: sheet ( obj -- sheet )

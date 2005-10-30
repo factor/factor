@@ -134,7 +134,7 @@ M: absolute-16/16 fixup ( absolute -- ) >absolute fixup-16/16 ;
     [
         deferred-xts off
         compiled-xts off
-        { } clone compile-words set
+        V{ } clone compile-words set
         call
         fixup-xts
         commit-xts

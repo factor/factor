@@ -9,7 +9,7 @@ words ;
 
 SYMBOL: commands
 
-{ } clone commands global set-hash
+V{ } clone commands global set-hash
 
 : define-command ( class name quot -- )
     3array commands get push ;

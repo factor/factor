@@ -115,7 +115,7 @@ USE: sequences
   #! Return an html fragment dispaying the source
   #! of the given word.
   dup dup
-  {{ }} clone [
+  [
     "browser" "responder" set
     <table "1" =border table> 
       <tr> <th "2" =colspan th> "Source" write </th> </tr>
@@ -125,7 +125,7 @@ USE: sequences
            <td "top" =valign td> [ [ parse ] catch [ "No such word" write ] [ car usages. ] if ] with-simple-html-output </td>
       </tr>
     </table>
-  ] bind ;
+  ] make-hash ;
 
 : display-word-see-form ( url -- )
   #! Write out the html for code that accepts

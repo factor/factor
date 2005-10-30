@@ -41,11 +41,11 @@ unit-test
 
 16 <hashtable> "testhash" set
 
-t #{ 2 3 }# "testhash" get set-hash
+t C{ 2 3 } "testhash" get set-hash
 f 100000000000000000000000000 "testhash" get set-hash
 { } { [ { } ] } "testhash" get set-hash
 
-[ t ] [ #{ 2 3 }# "testhash" get hash ] unit-test
+[ t ] [ C{ 2 3 } "testhash" get hash ] unit-test
 [ f ] [ 100000000000000000000000000 "testhash" get hash* cdr ] unit-test
 [ { } ] [ { [ { } ] } clone "testhash" get hash* cdr ] unit-test
 
@@ -63,13 +63,13 @@ f 100000000000000000000000000 "testhash" get set-hash
 
 [ 4 ] [
     "hey"
-    {{ [[ "hey" 4 ]] [[ "whey" 5 ]] }} 2dup (hashcode)
+    H{ [[ "hey" 4 ]] [[ "whey" 5 ]] } 2dup (hashcode)
     swap underlying nth assoc
 ] unit-test
 
 ! Testing the hash element counting
 
-{{ }} clone "counting" set
+H{ } clone "counting" set
 "value" "key" "counting" get set-hash
 [ 1 ] [ "counting" get hash-size ] unit-test
 "value" "key" "counting" get set-hash
@@ -79,21 +79,21 @@ f 100000000000000000000000000 "testhash" get set-hash
 "key" "counting" get remove-hash
 [ 0 ] [ "counting" get hash-size ] unit-test
 
-[ t ] [ {{ }} dup hash-contained? ] unit-test
-[ f ] [ {{ [[ 1 3 ]] }} {{ }} hash-contained? ] unit-test
-[ t ] [ {{ }} {{ [[ 1 3 ]] }} hash-contained? ] unit-test
-[ t ] [ {{ [[ 1 3 ]] }} {{ [[ 1 3 ]] }} hash-contained? ] unit-test
-[ f ] [ {{ [[ 1 3 ]] }} {{ [[ 1 "hey" ]] }} hash-contained? ] unit-test
-[ f ] [ {{ [[ 1 f ]] }} {{ }} hash-contained? ] unit-test
-[ t ] [ {{ [[ 1 f ]] }} {{ [[ 1 f ]] }} hash-contained? ] unit-test
+[ t ] [ H{ } dup hash-contained? ] unit-test
+[ f ] [ H{ [[ 1 3 ]] } H{ } hash-contained? ] unit-test
+[ t ] [ H{ } H{ [[ 1 3 ]] } hash-contained? ] unit-test
+[ t ] [ H{ [[ 1 3 ]] } H{ [[ 1 3 ]] } hash-contained? ] unit-test
+[ f ] [ H{ [[ 1 3 ]] } H{ [[ 1 "hey" ]] } hash-contained? ] unit-test
+[ f ] [ H{ [[ 1 f ]] } H{ } hash-contained? ] unit-test
+[ t ] [ H{ [[ 1 f ]] } H{ [[ 1 f ]] } hash-contained? ] unit-test
 
-[ t ] [ {{ }} dup = ] unit-test
-[ f ] [ "xyz" {{ }} = ] unit-test
-[ t ] [ {{ }} {{ }} = ] unit-test
-[ f ] [ {{ [[ 1 3 ]] }} {{ }} = ] unit-test
-[ f ] [ {{ }} {{ [[ 1 3 ]] }} = ] unit-test
-[ t ] [ {{ [[ 1 3 ]] }} {{ [[ 1 3 ]] }} = ] unit-test
-[ f ] [ {{ [[ 1 3 ]] }} {{ [[ 1 "hey" ]] }} = ] unit-test
+[ t ] [ H{ } dup = ] unit-test
+[ f ] [ "xyz" H{ } = ] unit-test
+[ t ] [ H{ } H{ } = ] unit-test
+[ f ] [ H{ [[ 1 3 ]] } H{ } = ] unit-test
+[ f ] [ H{ } H{ [[ 1 3 ]] } = ] unit-test
+[ t ] [ H{ [[ 1 3 ]] } H{ [[ 1 3 ]] } = ] unit-test
+[ f ] [ H{ [[ 1 3 ]] } H{ [[ 1 "hey" ]] } = ] unit-test
 
 ! Test rehashing
 
@@ -117,10 +117,10 @@ f 100000000000000000000000000 "testhash" get set-hash
 [
     3
 ] [
-    2 {{
+    2 H{
             [[ 1 2 ]] 
             [[ 2 3 ]]
-    }} clone hash
+    } clone hash
 ] unit-test
 
 ! There was an assoc in place of assoc* somewhere
@@ -131,16 +131,16 @@ f 100000000000000000000000000 "testhash" get set-hash
 [ 1 ] [ "f-hash-test" get hash-size ] unit-test
 
 [ 21 ] [
-    0 {{
+    0 H{
         [[ 1 2 ]]
         [[ 3 4 ]]
         [[ 5 6 ]]
-    }} [
+    } [
         uncons + +
     ] hash-each
 ] unit-test
 
-{{ }} clone "cache-test" set
+H{ } clone "cache-test" set
 
 [ 4 ] [ 1 "cache-test" get [ 3 + ] cache ] unit-test
 [ 5 ] [ 2 "cache-test" get [ 3 + ] cache ] unit-test
@@ -148,42 +148,42 @@ f 100000000000000000000000000 "testhash" get set-hash
 [ 5 ] [ 2 "cache-test" get [ 3 + ] cache ] unit-test
 
 [
-    {{ [[ "factor" "rocks" ]] [[ 3 4 ]] }}
+    H{ [[ "factor" "rocks" ]] [[ 3 4 ]] }
 ] [
-    {{ [[ "factor" "rocks" ]] [[ "dup" "sq" ]] [[ 3 4 ]] }}
-    {{ [[ "factor" "rocks" ]] [[ 1 2 ]] [[ 2 3 ]] [[ 3 4 ]] }}
+    H{ [[ "factor" "rocks" ]] [[ "dup" "sq" ]] [[ 3 4 ]] }
+    H{ [[ "factor" "rocks" ]] [[ 1 2 ]] [[ 2 3 ]] [[ 3 4 ]] }
     hash-intersect
 ] unit-test
 
 [
-    {{ [[ 1 2 ]] [[ 2 3 ]] }}
+    H{ [[ 1 2 ]] [[ 2 3 ]] }
 ] [
-    {{ [[ "factor" "rocks" ]] [[ "dup" "sq" ]] [[ 3 4 ]] }}
-    {{ [[ "factor" "rocks" ]] [[ 1 2 ]] [[ 2 3 ]] [[ 3 4 ]] }}
+    H{ [[ "factor" "rocks" ]] [[ "dup" "sq" ]] [[ 3 4 ]] }
+    H{ [[ "factor" "rocks" ]] [[ 1 2 ]] [[ 2 3 ]] [[ 3 4 ]] }
     hash-diff
 ] unit-test
 
 [
     2
 ] [
-    {{ [[ "factor" "rocks" ]] [[ "dup" "sq" ]] [[ 3 4 ]] }}
-    {{ [[ "factor" "rocks" ]] [[ 1 2 ]] [[ 2 3 ]] [[ 3 4 ]] }}
+    H{ [[ "factor" "rocks" ]] [[ "dup" "sq" ]] [[ 3 4 ]] }
+    H{ [[ "factor" "rocks" ]] [[ 1 2 ]] [[ 2 3 ]] [[ 3 4 ]] }
     hash-diff hash-size
 ] unit-test
 
 [
     t
 ] [
-    {{ [[ "hello" "world" ]] }}
+    H{ [[ "hello" "world" ]] }
     clone
     100 [ 1+ over set-bucket-count hashcode ] map-with all-equal?
 ] unit-test
 
 [
-    {{ [[ 1 2 ]] [[ 2 3 ]] [[ 6 5 ]] }}
+    H{ [[ 1 2 ]] [[ 2 3 ]] [[ 6 5 ]] }
 ] [
-    {{ [[ 2 4 ]] [[ 6 5 ]] }} {{ [[ 1 2 ]] [[ 2 3 ]] }}
+    H{ [[ 2 4 ]] [[ 6 5 ]] } H{ [[ 1 2 ]] [[ 2 3 ]] }
     hash-union
 ] unit-test
 
-[ [ 1 3 ] ] [ {{ [[ 2 2 ]] }} [ 1 2 3 ] remove-all ] unit-test
+[ [ 1 3 ] ] [ H{ [[ 2 2 ]] } [ 1 2 3 ] remove-all ] unit-test

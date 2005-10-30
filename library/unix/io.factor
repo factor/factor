@@ -321,9 +321,9 @@ USE: io
     #! Should only be called on startup. Calling this at any
     #! other time can have unintended consequences.
     global [
-        {{ }} clone read-tasks set
+        H{ } clone read-tasks set
         FD_SETSIZE <bit-array> read-fdset set
-        {{ }} clone write-tasks set
+        H{ } clone write-tasks set
         FD_SETSIZE <bit-array> write-fdset set
         0 1 t <fd-stream> stdio set
     ] bind ;

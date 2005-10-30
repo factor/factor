@@ -8,7 +8,7 @@ test-responder ;
 #! Remove all existing responders, and create a blank
 #! responder table.
 global [
-    {{ }} clone responders set
+    H{ } clone responders set
 
     ! 404 error message pages are served by this guy
     [
@@ -33,5 +33,5 @@ global [
     ! The root directory is served by...
     "file" set-default-responder
 
-    vhosts nest [ {{ }} clone "default" set ] bind
+    vhosts nest [ H{ } clone "default" set ] bind
 ] bind

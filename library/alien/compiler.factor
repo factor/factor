@@ -84,7 +84,7 @@ C: alien-node make-node ;
 
 : spill-param ( reg-class -- n reg-class )
     reg-class-size stack-params [ tuck + ] change
-    << stack-params >> ;
+    T{ stack-params } ;
 
 : inc-reg-class ( reg-class -- )
     #! On Mac OS X, float parameters 'shadow' integer registers.
@@ -134,7 +134,7 @@ M: alien-node linearize* ( node -- )
 
 : unpair ( seq -- odds evens )
     2 swap group flip dup empty?
-    [ drop @{ }@ @{ }@ ] [ first2 ] if ;
+    [ drop { } { } ] [ first2 ] if ;
 
 : parse-arglist ( lst -- types stack effect )
     unpair [
@@ -161,7 +161,7 @@ M: alien-node linearize* ( node -- )
 ] "infer" set-word-prop
 
 global [
-    "libraries" get [ {{ }} clone "libraries" set ] unless
+    "libraries" get [ H{ } clone "libraries" set ] unless
 ] bind
 
 M: compound (uncrossref)
@@ -169,6 +169,6 @@ M: compound (uncrossref)
     over "infer" word-prop or [
         drop
     ] [
-        dup @{ "infer-effect" "base-case" "no-effect" "terminates" }@
+        dup { "infer-effect" "base-case" "no-effect" "terminates" }
         reset-props update-xt
     ] if ;

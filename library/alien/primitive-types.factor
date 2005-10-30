@@ -117,7 +117,7 @@ USING: alien compiler-backend kernel math namespaces ;
     cell "align" set
     "box_float" "boxer" set
     "unbox_float" "unboxer" set
-    << float-regs f 4 >> "reg-class" set
+    T{ float-regs f 4 } "reg-class" set
 ] "float" define-primitive-type
 
 [
@@ -127,7 +127,7 @@ USING: alien compiler-backend kernel math namespaces ;
     cell 2 * "align" set
     "box_double" "boxer" set
     "unbox_double" "unboxer" set
-    << float-regs f 8 >> "reg-class" set
+    T{ float-regs f 8 } "reg-class" set
 ] "double" define-primitive-type
 
 ! FIXME for 64-bit platforms

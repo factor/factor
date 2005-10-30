@@ -14,7 +14,7 @@ M: #call-label collect-recursion* ( label node -- )
     #! Collect the input stacks of all #call-label nodes that
     #! call given label.
     dup node-param swap
-    [ [ collect-recursion* ] each-node-with ] @{ }@ make ;
+    [ [ collect-recursion* ] each-node-with ] { } make ;
 
 GENERIC: solve-recursion*
 

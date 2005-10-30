@@ -6,7 +6,7 @@ kernel lists math namespaces sequences styles ;
 
 TUPLE: divider splitter ;
 
-: divider-size @{ 8 8 0 }@ ;
+: divider-size { 8 8 0 } ;
 
 M: divider pref-dim drop divider-size ;
 
@@ -17,7 +17,7 @@ TUPLE: splitter split ;
 
 : divider-motion ( splitter -- )
     dup hand>split
-    over rect-dim @{ 1 1 1 }@ vmax v/ over gadget-orientation v.
+    over rect-dim { 1 1 1 } vmax v/ over gadget-orientation v.
     0 max 1 min over set-splitter-split relayout-1 ;
 
 : divider-actions ( thumb -- )
@@ -37,21 +37,21 @@ C: splitter ( first second split vector -- splitter )
     1 over set-pack-fill ;
 
 : <x-splitter> ( first second split -- splitter )
-    @{ 0 1 0 }@ <splitter> ;
+    { 0 1 0 } <splitter> ;
 
 : <y-splitter> ( first second split -- splitter )
-    @{ 1 0 0 }@ <splitter> ;
+    { 1 0 0 } <splitter> ;
 
 : splitter-part ( splitter -- vec )
     dup splitter-split swap rect-dim
     n*v [ >fixnum ] map divider-size 1/2 v*n v- ;
 
-: splitter-layout ( splitter -- @{ a b c }@ )
+: splitter-layout ( splitter -- { a b c } )
     [
         dup splitter-part ,
         divider-size ,
         dup rect-dim divider-size v- swap splitter-part v- ,
-    ] @{ }@ make ;
+    ] { } make ;
 
 M: splitter layout* ( splitter -- )
     dup splitter-layout packed-layout ;

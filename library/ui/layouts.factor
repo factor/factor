@@ -73,7 +73,7 @@ TUPLE: pack align fill gap ;
     2dup packed-dim-2 swap orient ;
 
 : packed-loc-1 ( gadget sizes -- seq )
-    @{ 0 0 0 }@ [ v+ over pack-gap v+ ] accumulate nip ;
+    { 0 0 0 } [ v+ over pack-gap v+ ] accumulate nip ;
 
 : packed-loc-2 ( gadget sizes -- seq )
     [
@@ -97,19 +97,19 @@ C: pack ( vector -- pack )
     [ set-gadget-orientation ] keep
     0 over set-pack-align
     0 over set-pack-fill
-    @{ 0 0 0 }@ over set-pack-gap ;
+    { 0 0 0 } over set-pack-gap ;
 
 : delegate>pack ( vector tuple -- ) >r <pack> r> set-delegate ;
 
-: <pile> ( -- pack ) @{ 0 1 0 }@ <pack> ;
+: <pile> ( -- pack ) { 0 1 0 } <pack> ;
 
-: <shelf> ( -- pack ) @{ 1 0 0 }@ <pack> ;
+: <shelf> ( -- pack ) { 1 0 0 } <pack> ;
 
 M: pack pref-dim ( pack -- dim )
     [
         [
             pref-dims [ max-dim ] keep
-            [ @{ 0 0 0 }@ [ v+ ] reduce ] keep length 1 - 0 max
+            [ { 0 0 0 } [ v+ ] reduce ] keep length 1 - 0 max
         ] keep pack-gap n*v v+
     ] keep gadget-orientation set-axis ;
 
@@ -131,7 +131,7 @@ TUPLE: stack ;
 
 C: stack ( -- gadget )
     #! A stack lays out all its children on top of each other.
-    @{ 0 0 1 }@ over delegate>pack 1 over set-pack-fill ;
+    { 0 0 1 } over delegate>pack 1 over set-pack-fill ;
 
 M: stack children-on ( point stack -- gadget )
     nip gadget-children ;

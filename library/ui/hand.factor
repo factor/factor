@@ -14,7 +14,7 @@ prettyprint sequences vectors ;
 TUPLE: hand click-loc click-rel clicked buttons gadget focus ;
 
 C: hand ( -- hand )
-    dup delegate>gadget { } clone over set-hand-buttons ;
+    dup delegate>gadget V{ } clone over set-hand-buttons ;
 
 : button/ ( n hand -- )
     dup hand-gadget over set-hand-clicked

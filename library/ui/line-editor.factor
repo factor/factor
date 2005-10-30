@@ -117,7 +117,7 @@ M: document-elt prev-elt* 3drop 0 ;
     [
         "" line-text set
         0 <point> caret set
-        { } clone history set
+        V{ } clone history set
         0 history-index set
         possibilities off
     ] make-hash ;
@@ -141,7 +141,7 @@ M: document-elt prev-elt* 3drop 0 ;
     [ drop ] [ 1+ goto-history ] if ;
 
 : completions ( -- seq )
-    << word-elt >> prev-elt@ 2dup = [
+    T{ word-elt } prev-elt@ 2dup = [
         2drop f
     ] [
         line-text get subseq possibilities get
@@ -149,4 +149,4 @@ M: document-elt prev-elt* 3drop 0 ;
     ] if ;
 
 : complete ( completion -- )
-    << word-elt >> prev-elt@ line-replace ;
+    T{ word-elt } prev-elt@ line-replace ;

@@ -64,7 +64,7 @@ strings vectors words ;
 : nest ( variable -- hash )
     #! If the variable is set in the current namespace, return
     #! its value, otherwise set its value to a new namespace.
-    dup namespace hash [ ] [ >r {{ }} clone dup r> set ] ?if ;
+    dup namespace hash [ ] [ >r H{ } clone dup r> set ] ?if ;
 
 : change ( var quot -- )
     #! Execute the quotation with the variable value on the
@@ -84,7 +84,7 @@ strings vectors words ;
     #! Execute a quotation with a namespace on the namestack.
     swap >n call n> drop ; inline
 
-: make-hash ( quot -- hash ) {{ }} clone >n call n> ; inline
+: make-hash ( quot -- hash ) H{ } clone >n call n> ; inline
 
 : with-scope ( quot -- ) make-hash drop ; inline
 
@@ -129,7 +129,7 @@ SYMBOL: hash-buffer
 
 : closure ( key hash -- list )
     [
-        {{ }} clone hash-buffer set
+        H{ } clone hash-buffer set
         (closure)
         hash-buffer get hash-keys
     ] with-scope ;

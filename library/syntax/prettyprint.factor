@@ -73,7 +73,7 @@ TUPLE: block sections ;
 
 C: block ( -- block )
     0 <section> over set-delegate
-    { } clone over set-block-sections
+    V{ } clone over set-block-sections
     t over set-section-nl-after?
     tab-size get over set-section-indent ;
 
@@ -174,15 +174,15 @@ C: pprinter ( -- stream )
 GENERIC: pprint* ( obj -- )
 
 : vocab-style ( vocab -- style )
-    {{
-        [[ "syntax" [ [[ foreground @{ 0.5 0.5 0.5 1.0 }@ ]] ] ]]
-        [[ "kernel" [ [[ foreground @{ 0.0 0.0 0.5 1.0 }@ ]] ] ]]
-        [[ "sequences" [ [[ foreground @{ 0.5 0.0 0.0 1.0 }@ ]] ] ]]
-        [[ "math" [ [[ foreground @{ 0.0 0.5 0.0 1.0 }@ ]] ] ]]
-        [[ "math-internals" [ [[ foreground @{ 0.75 0.0 0.0 1.0 }@ ]] ] ]]
-        [[ "kernel-internals" [ [[ foreground @{ 0.75 0.0 0.0 1.0 }@ ]] ] ]]
-        [[ "io-internals" [ [[ foreground @{ 0.75 0.0 0.0 1.0 }@ ]] ] ]]
-    }} hash ;
+    H{
+        [[ "syntax" [ [[ foreground { 0.5 0.5 0.5 1.0 } ]] ] ]]
+        [[ "kernel" [ [[ foreground { 0.0 0.0 0.5 1.0 } ]] ] ]]
+        [[ "sequences" [ [[ foreground { 0.5 0.0 0.0 1.0 } ]] ] ]]
+        [[ "math" [ [[ foreground { 0.0 0.5 0.0 1.0 } ]] ] ]]
+        [[ "math-internals" [ [[ foreground { 0.75 0.0 0.0 1.0 } ]] ] ]]
+        [[ "kernel-internals" [ [[ foreground { 0.75 0.0 0.0 1.0 } ]] ] ]]
+        [[ "io-internals" [ [[ foreground { 0.75 0.0 0.0 1.0 } ]] ] ]]
+    } hash ;
 
 : word-style ( word -- style )
     dup word-vocabulary vocab-style swap presented swons add ;
@@ -198,7 +198,7 @@ M: object pprint* ( obj -- )
 M: real pprint* ( obj -- ) number>string f text ;
 
 : ch>ascii-escape ( ch -- esc )
-    {{
+    H{
         [[ CHAR: \e "\\e"  ]]
         [[ CHAR: \n "\\n"  ]]
         [[ CHAR: \r "\\r"  ]]
@@ -206,7 +206,7 @@ M: real pprint* ( obj -- ) number>string f text ;
         [[ CHAR: \0 "\\0"  ]]
         [[ CHAR: \\ "\\\\" ]]
         [[ CHAR: \" "\\\"" ]]
-    }} hash ;
+    } hash ;
 
 : ch>unicode-escape ( ch -- esc )
     >hex 4 CHAR: 0 pad-left "\\u" swap append ;
@@ -277,7 +277,7 @@ M: dll pprint* ( obj -- str ) dll-path "DLL\" " pprint-string ;
     swap pprint* swap pprint-elements pprint* ;
 
 M: complex pprint* ( num -- )
-    >rect 2array \ #{ \ }# pprint-sequence ;
+    >rect 2array \ C{ \ } pprint-sequence ;
 
 M: cons pprint* ( list -- )
    [
@@ -286,20 +286,20 @@ M: cons pprint* ( list -- )
    ] check-recursion ;
 
 M: array pprint* ( vector -- )
-    [ \ @{ \ }@ pprint-sequence ] check-recursion ;
-
-M: vector pprint* ( vector -- )
     [ \ { \ } pprint-sequence ] check-recursion ;
 
+M: vector pprint* ( vector -- )
+    [ \ V{ \ } pprint-sequence ] check-recursion ;
+
 M: hashtable pprint* ( hashtable -- )
-    [ hash>alist \ {{ \ }} pprint-sequence ] check-recursion ;
+    [ hash>alist \ H{ \ } pprint-sequence ] check-recursion ;
 
 M: tuple pprint* ( tuple -- )
     [
-        \ << pprint*
+        \ T{ pprint*
         tuple>array dup first pprint*
         <block 1 swap tail-slice pprint-elements block>
-        \ >> pprint*
+        \ } pprint*
     ] check-recursion ;
 
 M: alien pprint* ( alien -- )
@@ -313,7 +313,7 @@ M: wrapper pprint* ( wrapper -- )
     dup wrapped word? [
         \ \ pprint-word wrapped pprint-word
     ] [
-        wrapped 1array \ W[ \ ]W pprint-sequence
+        wrapped 1array \ W{ \ } pprint-sequence
     ] if ;
 
 : with-pprint ( quot -- )
@@ -348,19 +348,17 @@ M: wrapper pprint* ( wrapper -- )
 
 : define-open
     #! The word will be pretty-printed as a block opener.
-    #! Examples are [ { {{ [[ << and so on.
     t "pprint-open" set-word-prop ;
 
 : define-close ( word -- )
     #! The word will be pretty-printed as a block closer.
-    #! Examples are ] } }} ]] >> and so on.
     t "pprint-close" set-word-prop ;
 
-@{
-    @{ POSTPONE: [ POSTPONE: ] }@
-    @{ POSTPONE: { POSTPONE: } }@
-    @{ POSTPONE: @{ POSTPONE: }@ }@
-    @{ POSTPONE: {{ POSTPONE: }} }@
-    @{ POSTPONE: [[ POSTPONE: ]] }@
-    @{ POSTPONE: [[ POSTPONE: ]] }@
-}@ [ first2 define-close define-open ] each
+{ 
+    POSTPONE: [ POSTPONE: [[
+    POSTPONE: { POSTPONE: V{ POSTPONE: H{
+    POSTPONE: T{ POSTPONE: W{
+} [ define-open ] each
+
+{ POSTPONE: [ POSTPONE: } POSTPONE: ]] }
+[ define-close ] each

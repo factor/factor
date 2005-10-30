@@ -9,7 +9,7 @@ USING: generic kernel-internals math-internals vectors ;
     #! Clear the datastack. For interactive use only; invoking
     #! this from a word definition will clobber any values left
     #! on the data stack by the caller.
-    { } set-datastack ;
+    V{ } set-datastack ;
 
 GENERIC: hashcode ( obj -- n ) flushable
 M: object hashcode drop 0 ;

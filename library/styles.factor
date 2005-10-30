@@ -3,14 +3,14 @@
 IN: styles
 
 ! Colors are RGBA quadruples
-: black      @{ 0.0 0.0 0.0 1.0 }@ ;
-: dark-gray  @{ 0.25 0.25 0.25 1.0 }@ ;
-: gray       @{ 0.5 0.5 0.5 1.0 }@ ;
-: light-gray @{ 0.75 0.75 0.75 1.0 }@ ;
-: white      @{ 1.0 1.0 1.0 1.0 }@ ;
-: red        @{ 1.0 0.0 0.0 1.0 }@ ;
-: green      @{ 0.0 1.0 0.0 1.0 }@ ;
-: blue       @{ 0.0 0.0 1.0 1.0 }@ ;
+: black      { 0.0 0.0 0.0 1.0 } ;
+: dark-gray  { 0.25 0.25 0.25 1.0 } ;
+: gray       { 0.5 0.5 0.5 1.0 } ;
+: light-gray { 0.75 0.75 0.75 1.0 } ;
+: white      { 1.0 1.0 1.0 1.0 } ;
+: red        { 1.0 0.0 0.0 1.0 } ;
+: green      { 0.0 1.0 0.0 1.0 } ;
+: blue       { 0.0 0.0 1.0 1.0 } ;
 
 SYMBOL: foreground ! Used for text and outline shapes.
 SYMBOL: background ! Used for filled shapes.

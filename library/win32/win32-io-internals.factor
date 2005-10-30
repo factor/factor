@@ -80,7 +80,7 @@ END-STRUCT
     "overlapped-ext" c-size malloc <alien> ;
 
 C: io-queue ( -- queue )
-    { } clone over set-io-queue-callbacks ;
+    V{ } clone over set-io-queue-callbacks ;
 
 C: io-callback ( -- callback )
     io-queue get io-queue-callbacks [ push ] 2keep

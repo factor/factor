@@ -3,11 +3,11 @@
 IN: opengl
 USING: alien errors kernel math namespaces opengl sdl sequences ;
 
-: gl-color ( @{ r g b a }@ -- ) first4 glColor4d ; inline
+: gl-color ( { r g b a } -- ) first4 glColor4d ; inline
 
 : init-gl ( -- )
     0.0 0.0 0.0 0.0 glClearColor 
-    @{ 1.0 0.0 0.0 0.0 }@ gl-color
+    { 1.0 0.0 0.0 0.0 } gl-color
     GL_COLOR_BUFFER_BIT glClear
     GL_PROJECTION glMatrixMode
     glLoadIdentity
@@ -51,11 +51,11 @@ USING: alien errors kernel math namespaces opengl sdl sequences ;
 
 : gl-vertex first3 glVertex3d ; inline
 
-: top-left drop 0 0 glTexCoord2d @{ 0 0 0 }@ gl-vertex ; inline
+: top-left drop 0 0 glTexCoord2d { 0 0 0 } gl-vertex ; inline
 
-: top-right 1 0 glTexCoord2d @{ 1 0 0 }@ v* gl-vertex ; inline
+: top-right 1 0 glTexCoord2d { 1 0 0 } v* gl-vertex ; inline
 
-: bottom-left 0 1 glTexCoord2d @{ 0 1 0 }@ v* gl-vertex ; inline
+: bottom-left 0 1 glTexCoord2d { 0 1 0 } v* gl-vertex ; inline
 
 : bottom-right 1 1 glTexCoord2d gl-vertex ; inline
 
@@ -72,7 +72,7 @@ USING: alien errors kernel math namespaces opengl sdl sequences ;
 : gl-rect ( dim -- )
     #! Draws a two-dimensional box.
     GL_MODELVIEW [
-        0.5 0.5 0 glTranslatef @{ 1 1 0 }@ v-
+        0.5 0.5 0 glTranslatef { 1 1 0 } v-
         GL_LINE_STRIP [ dup four-sides top-left ] do-state
     ] do-matrix ;
 
@@ -149,7 +149,7 @@ C: sprite ( loc dim dim2 -- )
     GL_TEXTURE_2D GL_TEXTURE_WRAP_S GL_CLAMP glTexParameterf
     GL_TEXTURE_2D GL_TEXTURE_WRAP_T GL_CLAMP glTexParameterf ;
 
-: gl-translate ( @{ x y z }@ -- ) first3 glTranslatef ;
+: gl-translate ( { x y z } -- ) first3 glTranslatef ;
 
 : make-sprite-dlist ( sprite -- id )
     GL_MODELVIEW [
@@ -158,7 +158,7 @@ C: sprite ( loc dim dim2 -- )
             GL_TEXTURE_2D over sprite-texture glBindTexture
             init-texture
             dup sprite-dim2 gl-fill-rect
-            dup sprite-dim @{ 1 0 0 }@ v*
+            dup sprite-dim { 1 0 0 } v*
             swap sprite-loc v- gl-translate
         ] make-dlist
     ] do-matrix ;

@@ -70,7 +70,7 @@ M: silly-pred area dup rect-w swap rect-h * ;
 TUPLE: circle radius ;
 M: circle area circle-radius sq pi * ;
 
-[ 200 ] [ << rect f 0 0 10 20 >> area ] unit-test
+[ 200 ] [ T{ rect f 0 0 10 20 } area ] unit-test
 
 [ ] [ "IN: temporary  SYMBOL: #x  TUPLE: #x ;" eval ] unit-test
 
@@ -80,8 +80,8 @@ TUPLE: empty ;
 
 TUPLE: delegate-clone ;
 
-[ << delegate-clone << empty f >> >> ]
-[ << delegate-clone << empty f >> >> clone ] unit-test
+[ T{ delegate-clone T{ empty f } } ]
+[ T{ delegate-clone T{ empty f } } clone ] unit-test
 
 [ t ] [ \ null \ delegate-clone class< ] unit-test
 [ f ] [ \ object \ delegate-clone class< ] unit-test
@@ -107,6 +107,6 @@ TUPLE: delegate-clone ;
 TUPLE: size-test a b c d ;
 
 [ t ] [
-    << size-test >> array-capacity
+    T{ size-test } array-capacity
     size-test "tuple-size" word-prop =
 ] unit-test

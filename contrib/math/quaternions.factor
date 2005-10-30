@@ -59,13 +59,13 @@ IN: math-contrib
     [ v>q ] 2apply q* q>v ;
 
 ! Zero
-: q0 @{ 0 0 }@ ;
+: q0 { 0 0 } ;
 
 ! Units
-: q1 @{ 1 0 }@ ;
-: qi @{ #{ 0 1 }# 0 }@ ;
-: qj @{ 0 1 }@ ;
-: qk @{ 0 #{ 0 1 }# }@ ;
+: q1 { 1 0 } ;
+: qi { C{ 0 1 } 0 } ;
+: qj { 0 1 } ;
+: qk { 0 C{ 0 1 } } ;
 
 ! Euler angles -- see
 ! http://www.mathworks.com/access/helpdesk/help/toolbox/aeroblks/euleranglestoquaternions.html

@@ -42,7 +42,7 @@ namespaces sequences vectors ;
 : parents ( gadget -- vector )
     #! A list of all parents of the gadget, the first element
     #! is the gadget itself.
-    { } clone [ (parents) ] keep ;
+    V{ } clone [ (parents) ] keep ;
 
 : each-parent ( gadget quot -- ? )
     >r parents r> all? ; inline
@@ -52,12 +52,12 @@ namespaces sequences vectors ;
 
 : screen-loc ( gadget -- point )
     #! The position of the gadget on the screen.
-    parents @{ 0 0 0 }@ [ rect-loc v+ ] reduce ;
+    parents { 0 0 0 } [ rect-loc v+ ] reduce ;
 
 : gadget-point ( gadget vector -- point )
-    #! @{ 0 0 0 }@ - top left corner
-    #! @{ 1/2 1/2 0 }@ - middle
-    #! @{ 1 1 0 }@ - bottom right corner
+    #! { 0 0 0 } - top left corner
+    #! { 1/2 1/2 0 } - middle
+    #! { 1 1 0 } - bottom right corner
     >r dup screen-loc swap rect-dim r> v* v+ ;
 
 : relative ( g1 g2 -- g2-g1 ) screen-loc swap screen-loc v- ;

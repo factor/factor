@@ -25,7 +25,7 @@ GENERIC: returns* ( node -- )
 : returns ( node -- seq )
     #! Trace all control flow paths, build a hash of
     #! final #return nodes.
-    [ returns* ] @{ }@ make ;
+    [ returns* ] { } make ;
 
 M: f returns* drop ;
 
@@ -44,7 +44,7 @@ M: f returns* drop ;
     [ [ remove-values ] each-node-with ] [ 2drop ] if ;
 
 ! Generic nodes
-M: node literals* ( node -- ) drop @{ }@ ;
+M: node literals* ( node -- ) drop { } ;
 
 M: node live-values* ( node -- ) node-values ;
 
@@ -60,12 +60,12 @@ M: #return returns* , ;
 
 M: #return live-values* ( node -- seq )
     #! Values returned by local labels can be killed.
-    dup node-param [ drop @{ }@ ] [ delegate live-values* ] if ;
+    dup node-param [ drop { } ] [ delegate live-values* ] if ;
 
 ! nodes that don't use their input values directly
 UNION: #killable #shuffle #call-label #merge #values ;
 
-M: #killable live-values* ( node -- seq ) drop @{ }@ ;
+M: #killable live-values* ( node -- seq ) drop { } ;
 
 ! #entry
 M: #entry live-values* ( node -- seq )

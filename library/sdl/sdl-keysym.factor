@@ -6,15 +6,15 @@ IN: sdl USING: namespaces ;
 ! Later, something better needs to be done.
 
 : modifiers
-    @{
+    {
         [[ "SHIFT" HEX: 0003 ]]
         [[ "CTRL"  HEX: 00c0 ]]
         [[ "ALT"   HEX: 0300 ]]
         [[ "META"  HEX: 0c00 ]]
-    }@ ;
+    } ;
 
 : keysyms
-    {{
+    H{
         ! The keyboard syms have been cleverly chosen to map to ASCII
         [[ 0  "UNKNOWN"    ]]
         [[ 8  "BACKSPACE"  ]]
@@ -257,4 +257,4 @@ IN: sdl USING: namespaces ;
         [[ 321 "EURO" ]]           ! Some european keyboards
         [[ 322 "UNDO" ]]           ! Atari keyboard has Undo
         ! Add any other keys here
-    }} ;
+    } ;

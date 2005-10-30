@@ -73,18 +73,18 @@ M: polygon draw-boundary ( gadget polygon -- )
 M: polygon draw-interior ( gadget polygon -- )
     [ gl-fill-poly ] draw-polygon drop ;
 
-: arrow-up    @{ @{ @{ 3 0 0 }@ @{ 6 6 0 }@ @{ 0 6 0 }@ }@ }@ ;
-: arrow-right @{ @{ @{ 0 0 0 }@ @{ 6 3 0 }@ @{ 0 6 0 }@ }@ }@ ;
-: arrow-down  @{ @{ @{ 0 0 0 }@ @{ 6 0 0 }@ @{ 3 6 0 }@ }@ }@ ;
-: arrow-left  @{ @{ @{ 0 3 0 }@ @{ 6 0 0 }@ @{ 6 6 0 }@ }@ }@ ;
+: arrow-up    { { { 3 0 0 } { 6 6 0 } { 0 6 0 } } } ;
+: arrow-right { { { 0 0 0 } { 6 3 0 } { 0 6 0 } } } ;
+: arrow-down  { { { 0 0 0 } { 6 0 0 } { 3 6 0 } } } ;
+: arrow-left  { { { 0 3 0 } { 6 0 0 } { 6 6 0 } } } ;
 
 : arrow-right|
-    @{ @{ @{ 6 0 0 }@ @{ 6 6 0 }@ }@ }@ arrow-right append ;
+    { { { 6 0 0 } { 6 6 0 } } } arrow-right append ;
 
 : arrow-|left
-    @{ @{ @{ 1 0 0 }@ @{ 1 6 0 }@ }@ }@ arrow-left append ;
+    { { { 1 0 0 } { 1 6 0 } } } arrow-left append ;
 
 : <polygon-gadget> ( color points -- gadget )
-    dup @{ 0 0 0 }@ [ max-dim vmax ] reduce
+    dup { 0 0 0 } [ max-dim vmax ] reduce
     >r <polygon> <gadget> r> over set-rect-dim
     [ set-gadget-interior ] keep ;

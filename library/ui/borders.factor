@@ -8,7 +8,7 @@ TUPLE: border size ;
 
 C: border ( child -- border )
     dup delegate>gadget
-    @{ 5 5 0 }@ over set-border-size
+    { 5 5 0 } over set-border-size
     [ add-gadget ] keep ;
 
 : layout-border-loc ( border -- )

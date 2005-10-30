@@ -124,13 +124,13 @@ M: xml-string-error error.
     ] if ;
 
 : entities
-    {{
+    H{
         [[ "lt" CHAR: < ]]
         [[ "gt" CHAR: > ]]
         [[ "amp" CHAR: & ]]
         [[ "apos" CHAR: ' ]]
         [[ "quot" CHAR: " ]]
-    }} ;
+    } ;
 
 : parse-entity ( -- ch )
     incr-spot [ CHAR: ; = ] take-until incr-spot
@@ -301,7 +301,7 @@ M: contained process
     [ contained-name ] keep contained-props 0 <vector> <tag> push-datum ;
 
 M: opener process
-    { } clone cons
+    V{ } clone cons
     xml-stack get push ;
 
 M: closer process
@@ -313,7 +313,7 @@ M: closer process
     ] keep opener-props r> <tag> push-datum ;
 
 : initialize-xml-stack ( -- )
-    f { } clone cons unit >vector xml-stack set ;
+    f V{ } clone cons unit >vector xml-stack set ;
 
 : xml ( string -- vector )
     #! Produces a tree of XML nodes
@@ -335,11 +335,11 @@ M: closer process
 GENERIC: (xml>string) ( object -- )
 
 : reverse-entities ! not as many as entities needed for printing
-    {{
+    H{
         [[ CHAR: & "amp" ]]
         [[ CHAR: < "lt" ]]
         [[ CHAR: " "quot" ]]
-    }} ;
+    } ;
 
 M: string (xml>string)
     [
@@ -406,7 +406,7 @@ M: comment (xml>string)
 
 : PROCESS:
     CREATE
-    dup {{ }} clone "xtable" set-word-prop
+    dup H{ } clone "xtable" set-word-prop
     dup literalize [
         "xtable" word-prop
         >r dup tag-name r> hash call

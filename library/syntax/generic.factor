@@ -48,7 +48,3 @@ syntax words ;
     #! stack.
     scan-word [ tuple-constructor ] keep
     [ define-constructor ] [ ] ; parsing
-
-! Tuples.
-: << f ; parsing
-: >> reverse array>tuple swons ; parsing

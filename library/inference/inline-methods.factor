@@ -8,7 +8,7 @@ namespaces sequences words ;
 
 GENERIC: dispatching-values ( node word -- seq )
 
-M: object dispatching-values 2drop @{ }@ ;
+M: object dispatching-values 2drop { } ;
 
 M: simple-generic dispatching-values drop node-in-d peek 1array ;
 

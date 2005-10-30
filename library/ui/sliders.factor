@@ -104,7 +104,7 @@ M: elevator layout* ( elevator -- )
 
 : slide-by-line ( -1/1 slider -- ) >r 32 * r> slide-by ;
 
-: slider-vertical? gadget-orientation @{ 0 1 0 }@ = ;
+: slider-vertical? gadget-orientation { 0 1 0 } = ;
 
 : <slide-button> ( orientation polygon amount -- )
     >r gray swap <polygon-gadget> r>
@@ -115,20 +115,20 @@ M: elevator layout* ( elevator -- )
     swap slider-vertical? arrow-up arrow-left ? -1
     <slide-button> ;
 
-: add-up @{ 1 1 1 }@ over gadget-orientation v- first2 frame-add ;
+: add-up { 1 1 1 } over gadget-orientation v- first2 frame-add ;
 
 : <down-button> ( slider orientation -- button )
     swap slider-vertical? arrow-down arrow-right ? 1
     <slide-button> ;
 
-: add-down @{ 1 1 1 }@ over gadget-orientation v+ first2 frame-add ;
+: add-down { 1 1 1 } over gadget-orientation v+ first2 frame-add ;
 
 : add-elevator 2dup set-slider-elevator @center frame-add ;
 
 : add-thumb 2dup slider-elevator add-gadget set-slider-thumb ;
 
 : slider-opposite ( slider -- vector )
-    gadget-orientation @{ 1 1 0 }@ swap v- ;
+    gadget-orientation { 1 1 0 } swap v- ;
 
 C: slider ( vector -- slider )
     dup delegate>frame
@@ -142,6 +142,6 @@ C: slider ( vector -- slider )
     2dup <down-button> pick add-down
     <thumb> over add-thumb ;
 
-: <x-slider> ( -- slider ) @{ 1 0 0 }@ <slider> ;
+: <x-slider> ( -- slider ) { 1 0 0 } <slider> ;
 
-: <y-slider> ( -- slider ) @{ 0 1 0 }@ <slider> ;
+: <y-slider> ( -- slider ) { 0 1 0 } <slider> ;

@@ -105,11 +105,11 @@ M: symbol apply-object ( word -- )
     [ inferring-base-case off ] cleanup ;
 
 : no-base-case ( word -- )
-    @{
+    {
         "The base case of a recursive word could not be inferred.\n"
         "This means the word calls itself in every control flow path.\n"
         "See the handbook for details."
-    }@ concat inference-error ;
+    } concat inference-error ;
 
 : notify-base-case ( -- )
     base-case-continuation get

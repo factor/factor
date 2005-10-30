@@ -1,14 +1,14 @@
 IN: temporary
-USING: kernel lists math namespaces sequences
+USING: arrays kernel lists math namespaces sequences
 sequences-internals strings test vectors ;
 
-[ { 1 2 3 4 } ] [ 1 5 <range> >vector ] unit-test
+[ V{ 1 2 3 4 } ] [ 1 5 <range> >vector ] unit-test
 [ 3 ] [ 1 4 <range> length ] unit-test
 [ 2 ] [ 1 3 { 1 2 3 4 } <slice> length ] unit-test
-[ { 2 3 } ] [ 1 3 { 1 2 3 4 } <slice> >vector ] unit-test
-[ { 4 5 } ] [ 2 { 1 2 3 4 5 } tail-slice* >vector ] unit-test
-[ { 3 4 } ] [ 2 4 1 10 <range> subseq >vector ] unit-test
-[ { 3 4 } ] [ 0 2 2 4 1 10 <range> <slice> subseq >vector ] unit-test
+[ V{ 2 3 } ] [ 1 3 { 1 2 3 4 } <slice> >vector ] unit-test
+[ V{ 4 5 } ] [ 2 { 1 2 3 4 5 } tail-slice* >vector ] unit-test
+[ V{ 3 4 } ] [ 2 4 1 10 <range> subseq >vector ] unit-test
+[ V{ 3 4 } ] [ 0 2 2 4 1 10 <range> <slice> subseq >vector ] unit-test
 [ "cba" ] [ 3 "abcdef" head-slice reverse ] unit-test
 
 [ 5040 ] [ [ 1 2 3 4 5 6 7 ] 1 [ * ] reduce ] unit-test
@@ -59,10 +59,10 @@ unit-test
 
 [ { } ] [ { } flip ] unit-test
 
-[ @{ "b" "e" }@ ] [ 1 @{ @{ "a" "b" "c" }@ @{ "d" "e" "f" }@ }@ flip nth ] unit-test
+[ { "b" "e" } ] [ 1 { { "a" "b" "c" } { "d" "e" "f" } } flip nth ] unit-test
 
-[ @{ @{ 1 4 }@ @{ 2 5 }@ @{ 3 6 }@ }@ ]
-[ @{ @{ 1 2 3 }@ @{ 4 5 6 }@ }@ flip ] unit-test
+[ { { 1 4 } { 2 5 } { 3 6 } } ]
+[ { { 1 2 3 } { 4 5 6 } } flip ] unit-test
 
 [ f ] [ [ { } { } "Hello" ] all-equal? ] unit-test
 [ f ] [ [ { 2 } { } { } ] all-equal? ] unit-test
@@ -126,12 +126,12 @@ unit-test
 
 [ { 1 2 3 4 5 6 7 8 9 } ] [
     [ - ] { 9 8 7 6 5 4 3 2 1 } clone seq-sorter sort-step
-    sorter-seq >vector nip
+    sorter-seq >array nip
 ] unit-test
 
 [ { 1 2 3 4 5 6 7 8 9 } ] [
     [ - ] { 1 2 3 4 5 6 7 8 9 } clone seq-sorter sort-step
-    sorter-seq >vector nip
+    sorter-seq >array nip
 ] unit-test
 
 [ [ ] ] [ [ ] number-sort ] unit-test
@@ -143,15 +143,15 @@ unit-test
     ] all?
 ] unit-test
 
-[ @{ "" "a" "aa" "aaa" }@ ]
+[ { "" "a" "aa" "aaa" } ]
 [ 4 [ CHAR: a fill ] map ]
 unit-test
 
-[ { } ] [ "f" { } clone [ delete ] keep ] unit-test
-[ { } ] [ "f" { "f" } clone [ delete ] keep ] unit-test
-[ { } ] [ "f" { "f" "f" } clone [ delete ] keep ] unit-test
-[ { "x" } ] [ "f" { "f" "x" "f" } clone [ delete ] keep ] unit-test
-[ { "y" "x" } ] [ "f" { "y" "f" "x" "f" } clone [ delete ] keep ] unit-test
+[ V{ } ] [ "f" V{ } clone [ delete ] keep ] unit-test
+[ V{ } ] [ "f" V{ "f" } clone [ delete ] keep ] unit-test
+[ V{ } ] [ "f" V{ "f" "f" } clone [ delete ] keep ] unit-test
+[ V{ "x" } ] [ "f" V{ "f" "x" "f" } clone [ delete ] keep ] unit-test
+[ V{ "y" "x" } ] [ "f" V{ "y" "f" "x" "f" } clone [ delete ] keep ] unit-test
 
 [ { 1 4 9 } ] [ { 1 2 3 } clone dup [ sq ] inject ] unit-test
 
@@ -166,7 +166,7 @@ unit-test
 [ ] [ { 1 2 } [ 2drop 1 ] sort drop ] unit-test
 
 [ 5 ] [ 1 >bignum { 1 5 7 } nth-unsafe ] unit-test
-[ 5 ] [ 1 >bignum @{ 1 5 7 }@ nth-unsafe ] unit-test
+[ 5 ] [ 1 >bignum { 1 5 7 } nth-unsafe ] unit-test
 [ 5 ] [ 1 >bignum "\u0001\u0005\u0007" nth-unsafe ] unit-test
 
 [ "before&after" ] [ "&" 6 11 "before and after" replace-slice ] unit-test
@@ -183,19 +183,19 @@ unit-test
 
 [ -1 ] [ { "a" "b" "c" } { "a" "b" "c" } mismatch ] unit-test
 
-[ { } { } ] [ { "a" "b" } { "a" "b" } drop-prefix [ >vector ] 2apply ] unit-test
+[ V{ } V{ } ] [ { "a" "b" } { "a" "b" } drop-prefix [ >vector ] 2apply ] unit-test
 
-[ { "C" } { "c" } ] [ { "a" "b" "C" } { "a" "b" "c" } drop-prefix [ >vector ] 2apply ] unit-test
+[ V{ "C" } V{ "c" } ] [ { "a" "b" "C" } { "a" "b" "c" } drop-prefix [ >vector ] 2apply ] unit-test
 
 [ -1 1 "abc" <slice> ] unit-test-fails
 
-[ { "a" "b" } { } ] [ { "X" "a" "b" } { "X" } drop-prefix [ >vector ] 2apply ] unit-test
+[ V{ "a" "b" } V{ } ] [ { "X" "a" "b" } { "X" } drop-prefix [ >vector ] 2apply ] unit-test
 
 [ -1 ] [ "ab" "abc" lexi ] unit-test
 [ 1 ] [ "abc" "ab" lexi ] unit-test
 
-[ 1 4 9 16 16 { f 1 4 9 16 } ] [
-    { } clone "cache-test" set
+[ 1 4 9 16 16 V{ f 1 4 9 16 } ] [
+    V{ } clone "cache-test" set
     1 "cache-test" get [ sq ] cache-nth
     2 "cache-test" get [ sq ] cache-nth
     3 "cache-test" get [ sq ] cache-nth

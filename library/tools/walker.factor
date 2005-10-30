@@ -15,7 +15,7 @@ prettyprint sequences io strings vectors words ;
 : meta-r*
     #! Stepper call stack, as well as the currently
     #! executing quotation.
-    [ meta-r get % meta-executing get , meta-cf get , ] @{ }@ make ;
+    [ meta-r get % meta-executing get , meta-cf get , ] { } make ;
 
 : &r
     #! Print stepper call stack, as well as the currently

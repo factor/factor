@@ -391,7 +391,7 @@ M: cpu write-port ( value port cpu -- )
 : instruction-cycles ( -- vector )
   #! Return a 256 element vector containing the cycles for
   #! each opcode in the 8080 instruction set.
-  @{ 
+  { 
     f f f f f f f f f f f f f f f f f f f f f f f f f f f f f f f f 
     f f f f f f f f f f f f f f f f f f f f f f f f f f f f f f f f 
     f f f f f f f f f f f f f f f f f f f f f f f f f f f f f f f f 
@@ -399,12 +399,12 @@ M: cpu write-port ( value port cpu -- )
     f f f f f f f f f f f f f f f f f f f f f f f f f f f f f f f f 
     f f f f f f f f f f f f f f f f f f f f f f f f f f f f f f f f 
     f f f f f f f f f f f f f f f f f f f f f f f f f f f f f f f f 
-    f f f f f f f f f f f f f f f f f f f f f f f f f f f f f f f f }@ ;
+    f f f f f f f f f f f f f f f f f f f f f f f f f f f f f f f f } ;
 
 : instructions ( -- vector )
   #! Return a 256 element vector containing the emulation words for
   #! each opcode in the 8080 instruction set.
-  @{ 
+  { 
     f f f f f f f f f f f f f f f f f f f f f f f f f f f f f f f f 
     f f f f f f f f f f f f f f f f f f f f f f f f f f f f f f f f 
     f f f f f f f f f f f f f f f f f f f f f f f f f f f f f f f f 
@@ -412,7 +412,7 @@ M: cpu write-port ( value port cpu -- )
     f f f f f f f f f f f f f f f f f f f f f f f f f f f f f f f f 
     f f f f f f f f f f f f f f f f f f f f f f f f f f f f f f f f 
     f f f f f f f f f f f f f f f f f f f f f f f f f f f f f f f f 
-    f f f f f f f f f f f f f f f f f f f f f f f f f f f f f f f f }@ ; inline
+    f f f f f f f f f f f f f f f f f f f f f f f f f f f f f f f f } ; inline
 
 : not-implemented ( <cpu> -- )
   drop ;
@@ -557,7 +557,7 @@ C: cpu ( cpu -- cpu )
   #! Given a string containing a register name, return a vector
   #! where the 1st item is the getter and the 2nd is the setter
   #! for that register.
-  {{
+  H{
     [[ "A"  { cpu-a  set-cpu-a  } ]]
     [[ "B"  { cpu-b  set-cpu-b  } ]]
     [[ "C"  { cpu-c  set-cpu-c  } ]]
@@ -570,13 +570,13 @@ C: cpu ( cpu -- cpu )
     [[ "DE" { cpu-de set-cpu-de } ]]
     [[ "HL" { cpu-hl set-cpu-hl } ]]
     [[ "SP" { cpu-sp set-cpu-sp } ]]
-  }} hash ;
+  } hash ;
 
 
 : flag-lookup ( string -- vector )
   #! Given a string containing a flag name, return a vector
   #! where the 1st item is a word that tests that flag.
-  {{
+  H{
     [[ "NZ"  { flag-nz?  } ]]
     [[ "NC"  { flag-nc?  } ]]
     [[ "PO"  { flag-po?  } ]]
@@ -585,7 +585,7 @@ C: cpu ( cpu -- cpu )
     [[ "C"  { flag-c? } ]]
     [[ "P"  { flag-p?  } ]]
     [[ "M" { flag-m?  } ]]
-  }} hash ;
+  } hash ;
 
 SYMBOL: $1
 SYMBOL: $2
@@ -698,7 +698,7 @@ SYMBOL: $4
   
 : patterns ( -- hashtable )
   #! table of code quotation patterns for each type of instruction.
-  {{
+  H{
     [[ "NOP"          [ drop ]               ]]
     [[ "RET-NN"          [ ret-from-sub  ]               ]]
     [[ "RST-0"      [ 0 swap (emulate-RST) ] ]]
@@ -774,7 +774,7 @@ SYMBOL: $4
     [[ "IN-R,(N)"    [ [ next-byte ] keep [ read-port ] keep set-cpu-a ] ]]
     [[ "EX-(RR),RR"  [  [ $1 ] keep [ read-word ] keep [ $3 ] keep [ $1 ] keep [ write-word ] keep $4 ] ]]
     [[ "EX-RR,RR"    [ [ $1 ] keep [ $3 ] keep [ $2 ] keep $4 ] ]]
-  }} ;
+  } ;
 
 : 8-bit-registers ( -- parser )
   #! A parser for 8-bit registers. On a successfull parse the

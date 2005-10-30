@@ -57,7 +57,7 @@ M: object tail ( index seq -- seq ) [ tail-slice ] keep like ;
         2dup head , dupd tail-slice (group)
     ] if ;
 
-: group ( n seq -- seq ) [ (group) ] @{ }@ make ; flushable
+: group ( n seq -- seq ) [ (group) ] { } make ; flushable
 
 : start-step ( subseq seq n -- subseq slice )
     pick length dupd + rot <slice> ;

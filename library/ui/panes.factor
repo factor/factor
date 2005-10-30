@@ -73,13 +73,13 @@ SYMBOL: structured-input
     dup pane-output clear-incremental pane-current clear-gadget ;
  
 : pane-actions ( line -- )
-    {{
+    H{
         [[ [ button-down 1 ] [ pane-input [ click-editor ] when* ] ]]
         [[ [ "RETURN" ] [ pane-return ] ]]
         [[ [ "UP" ] [ pane-input [ [ history-prev ] with-editor ] when* ] ]]
         [[ [ "DOWN" ] [ pane-input [ [ history-next ] with-editor ] when* ] ]]
         [[ [ "CTRL" "l" ] [ pane get pane-clear ] ]]
-    }} add-actions ;
+    } add-actions ;
 
 C: pane ( input? scrolls? -- pane )
     #! You can create output-only panes. If the scrolls flag is
@@ -105,11 +105,11 @@ M: pane focusable-child* ( pane -- editor )
 
 : prepare-print ( current -- gadget )
     #! Optimization: if line has 1 child, add the child.
-    dup gadget-children @{
-        @{ [ dup empty? ] [ 2drop "" <label> ] }@
-        @{ [ dup length 1 = ] [ nip first ] }@
-        @{ [ t ] [ drop ] }@
-    }@ cond ;
+    dup gadget-children {
+        { [ dup empty? ] [ 2drop "" <label> ] }
+        { [ dup length 1 = ] [ nip first ] }
+        { [ t ] [ drop ] }
+    } cond ;
 
 : pane-print-1 ( current pane -- )
     >r prepare-print r> pane-output add-incremental ;

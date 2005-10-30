@@ -9,7 +9,7 @@ sequences ;
 TUPLE: frame grid ;
 
 : <frame-grid>
-    @{ @{ f f f }@ @{ f f f }@ @{ f f f }@ }@ [ clone ] map ;
+    { { f f f } { f f f } { f f f } } [ clone ] map ;
 
 : @center 1 1 ;
 : @left 0 1 ;
@@ -44,10 +44,10 @@ C: frame ( -- frame )
     [ max-dim ] map ;
 
 : frame-pref-dim ( grid -- dim )
-    reduce-grid @{ 0 0 0 }@ [ v+ ] reduce ;
+    reduce-grid { 0 0 0 } [ v+ ] reduce ;
 
 : pref-dim-grid ( grid -- grid )
-    [ [ [ pref-dim ] [ @{ 0 0 0 }@ ] if* ] map ] map ;
+    [ [ [ pref-dim ] [ { 0 0 0 } ] if* ] map ] map ;
 
 M: frame pref-dim ( frame -- dim )
     frame-grid pref-dim-grid

@@ -66,12 +66,12 @@ TUPLE: buddy name id gid capabilities buddy-icon online ;
 
 ! Family names from ethereal
 : family-names
-{{
+H{
     [[ 1 "Generic" ]] [[ 2 "Location" ]] [[ 3 "Buddylist" ]]
     [[ 4 "Messaging" ]] [[ 6 "Invitation" ]] [[ 8 "Popup" ]]
     [[ 9 "BOS" ]] [[ 10 "User Lookup" ]] [[ 11 "Stats" ]]
     [[ 12 "Translate" ]] [[ 19 "SSI" ]] [[ 21 "ICQ" ]]
-    [[ 34 "Unknown Family" ]] }} ;
+    [[ 34 "Unknown Family" ]] } ;
 
 : ch>lower ( int -- int ) dup LETTER? [ HEX: 20 + ] when ;
 : ch>upper ( int -- int ) dup letter? [ HEX: 20 - ] when ;
@@ -84,10 +84,10 @@ TUPLE: buddy name id gid capabilities buddy-icon online ;
     [ [ unswons cons , ] hash-each ] { } make alist>hash ;
 
 : 2list>hash ( keys values -- hash )
-    {{ }} clone -rot [ swap pick set-hash ] 2each ;
+    H{ } clone -rot [ swap pick set-hash ] 2each ;
 
 : capability-names
-{{
+H{
     [[ "Unknown1" HEX: 094601054c7f11d18222444553540000 ]]
     [[ "Games" HEX: 0946134a4c7f11d18222444553540000 ]]
     [[ "Send Buddy List" HEX: 0946134b4c7f11d18222444553540000 ]]
@@ -102,14 +102,14 @@ TUPLE: buddy name id gid capabilities buddy-icon online ;
     [[ "Unknown3" HEX: 094601034c7f11d18222444553540000 ]]
     [[ "Buddy Icon" HEX: 094613464c7f11d18222444553540000 ]]
     [[ "Add-Ins" HEX: 094613474c7f11d18222444553540000 ]]
-}} ;
+} ;
 
 
 : capability-values
     capability-names hash-swap ;
 
 : capability-abbrevs
-{{
+H{
     [[ CHAR: A "Voice" ]]
     [[ CHAR: C "Send File" ]]
     [[ CHAR: E "AIM Direct IM" ]]
@@ -117,11 +117,11 @@ TUPLE: buddy name id gid capabilities buddy-icon online ;
     [[ CHAR: G "Add-Ins" ]]
     [[ CHAR: H "Get File" ]]
     [[ CHAR: K "Send Buddy List" ]]
-}} ;
+} ;
 
 ! AIM errors
 : aim-errors
-{{
+H{
     [[ 1 "Invalid SNAC header." ]]
     [[ 2 "Server rate limit exceeded." ]]
     [[ 3 "Client rate limit exceeded." ]]
@@ -146,17 +146,17 @@ TUPLE: buddy name id gid capabilities buddy-icon online ;
     [[ 23 "Request ambiguous." ]]
     [[ 24 "Server queue full." ]]
     [[ 25 "Not while on AOL." ]]
-}} ;
+} ;
 
 
 : initialize-aim ( username password -- )
     password set username set
-    {{ }} clone buddy-hash-name set
-    {{ }} clone buddy-hash-id set
-    {{ }} clone group-hash-name set
-    {{ }} clone group-hash-id set
-    {{ }} clone banned-hash-name set
-    {{ }} clone banned-hash-id set
+    H{ } clone buddy-hash-name set
+    H{ } clone buddy-hash-id set
+    H{ } clone group-hash-name set
+    H{ } clone group-hash-id set
+    H{ } clone banned-hash-name set
+    H{ } clone banned-hash-id set
     <queue> modify-queue set
     HEX: 7fff random-int seq-num set
     1 stage-num set ;
@@ -265,13 +265,13 @@ M: object get-banned ( name -- <buddy> )
     ;
 
 : family-table ( -- hash )
-    {{ }} ;
+    H{ } ;
 
 : FAMILY: ( -- fam# )
     scan hex> swons dup car family-table hash dup [
         drop
     ] [
-        drop {{ }} clone over car family-table set-hash
+        drop H{ } clone over car family-table set-hash
     ] if ; parsing
 
 : OPCODE: ( fam# -- )

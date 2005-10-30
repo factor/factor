@@ -14,7 +14,7 @@ styles ;
 
 : directory ( dir -- list )
     (directory)
-    {{ [[ "." "." ]] [[ ".." ".." ]] }}
+    H{ [[ "." "." ]] [[ ".." ".." ]] }
     swap remove-all string-sort ;
 
 : file-length ( file -- length ) stat third ;

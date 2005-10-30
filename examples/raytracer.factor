@@ -7,7 +7,7 @@ IN: ray
 ! parameters
 : light
     #! Normalized { -1 -3 2 }.
-    @{ -0.2672612419124244 -0.8017837257372732 0.5345224838248488 }@ ; inline
+    { -0.2672612419124244 -0.8017837257372732 0.5345224838248488 } ; inline
 
 : oversampling 4 ; inline
 
@@ -71,7 +71,7 @@ M: group intersect-scene ( hit ray group -- hit )
         drop
     ] if-ray-sphere ;
 
-: initial-hit << hit f @{ 0.0 0.0 0.0 }@ INF >> ;
+: initial-hit T{ hit f { 0.0 0.0 0.0 } INF } ;
 
 : initial-intersect ( ray scene -- hit )
     initial-hit -rot intersect-scene ;
@@ -102,12 +102,12 @@ DEFER: create ( level c r -- scene )
     over >r create-center r> 2.0 / >r >r 1 - r> r> create ;
 
 : create-offsets ( quot -- )
-    @{
-        @{ -1.0 1.0 -1.0 }@
-        @{ 1.0 1.0 -1.0 }@
-        @{ -1.0 1.0 1.0 }@
-        @{ 1.0 1.0 1.0 }@
-    }@ swap each ; inline
+    {
+        { -1.0 1.0 -1.0 }
+        { 1.0 1.0 -1.0 }
+        { -1.0 1.0 1.0 }
+        { 1.0 1.0 1.0 }
+    } swap each ; inline
 
 : create-bound ( c r -- sphere ) 3.0 * <sphere> ;
 
@@ -128,7 +128,7 @@ DEFER: create ( level c r -- scene )
 
 : ray-grid ( point ss-grid -- ray-grid )
     [
-        [ v+ normalize @{ 0.0 0.0 -4.0 }@ swap <ray> ] map-with
+        [ v+ normalize { 0.0 0.0 -4.0 } swap <ray> ] map-with
     ] map-with ;
 
 : ray-pixel ( scene point -- n )
@@ -151,7 +151,7 @@ DEFER: create ( level c r -- scene )
     pixel-grid [ [ ray-pixel ] map-with ] map-with ;
 
 : run ( -- string )
-    levels @{ 0.0 -1.0 0.0 }@ 1.0 create ray-trace [
+    levels { 0.0 -1.0 0.0 } 1.0 create ray-trace [
         size size pnm-header
         [ [ oversampling sq / pnm-pixel ] each ] each
     ] "" make ;

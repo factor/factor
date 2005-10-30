@@ -50,17 +50,15 @@ SYMBOL: t
 : [[ f ; parsing
 : ]] first2 swons swons ; parsing
 
-! Arrays
-: @{ f ; parsing
-: }@ reverse >array swons ; parsing
+! Arrays, vectors, etc
+: } reverse swap call swons ; parsing
 
-! Vectors
-: { f ; parsing
-: } reverse >vector swons ; parsing
-
-! Hashtables
-: {{ f ; parsing
-: }} alist>hash swons ; parsing
+: { ( array ) [ >array ] [ ] ; parsing
+: V{ ( vector ) [ >vector ] [ ] ; parsing
+: H{ ( hashtable ) [ alist>hash ] [ ] ; parsing
+: C{ ( complex ) [ first2 rect> ] [ ] ; parsing
+: T{ ( tuple ) [ array>tuple ] [ ] ; parsing
+: W{ ( wrapper ) [ first <wrapper> ] [ ] ; parsing
 
 ! Do not execute parsing word
 : POSTPONE: ( -- ) scan-word swons ; parsing
@@ -83,11 +81,6 @@ SYMBOL: t
 : \
     #! Word literals: \ foo
     scan-word literalize swons ; parsing
-
-! Long wrapper syntax. Only used in the rare case that another
-! wrapper is being wrapped.
-: W[ [ ] ; parsing
-: ]W first <wrapper> swons ; parsing
 
 ! Vocabularies
 : PRIMITIVE:
@@ -139,10 +132,6 @@ SYMBOL: t
 : #!
     #! Documentation comment.
     until-eol parsed-documentation ; parsing
-
-! Complex numbers
-: #{ f ; parsing
-: }# dup second swap first rect> swons ; parsing
 
 ! Reading integers in other bases
 : (BASE) ( base -- )

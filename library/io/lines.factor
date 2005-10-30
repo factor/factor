@@ -46,4 +46,4 @@ M: line-reader stream-read ( count line -- string )
 
 : lines ( stream -- seq )
     #! Read all lines from the stream into a sequence.
-    [ { } clone (lines) ] with-stream ;
+    [ V{ } clone (lines) ] with-stream ;

@@ -1,9 +1,10 @@
 0.79:
 
-- swap @{ and { syntax
+- fix prettyprinter
+- syntax updates and testing for contrib/
 - get stuff in examples dir running in the ui
 - pixelColor replacement
-X
+
 + ui:
 
 - make-pane: if no input, just return pane-output

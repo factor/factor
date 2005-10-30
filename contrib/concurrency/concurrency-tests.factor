@@ -151,9 +151,9 @@ USING: kernel concurrency concurrency-examples threads vectors
 
 [ t 60 120 ] [
   fragile-rpc-server
-  << rpc-command f "product" [ 4 5 6 ] >> over send-synchronous >r
-  << rpc-command f "add" [ 10 20 30  ] >> over send-synchronous >r
-  << rpc-command f "shutdown" [      ] >> swap send-synchronous 
+  T{ rpc-command f "product" [ 4 5 6 ] } over send-synchronous >r
+  T{ rpc-command f "add" [ 10 20 30  ] } over send-synchronous >r
+  T{ rpc-command f "shutdown" [      ] } swap send-synchronous 
   r> r>    
 ] unit-test
  

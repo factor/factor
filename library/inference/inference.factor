@@ -25,12 +25,12 @@ M: inference-error error. ( error -- )
     inference-error-rstate describe ;
 
 M: value literal-value ( value -- )
-    @{
+    {
         "A literal value was expected where a computed value was found.\n"
         "This means the word you are inferring applies 'call' or 'execute'\n"
         "to a value that is not known at compile time.\n"
         "See the handbook for details."
-    }@ concat inference-error ;
+    } concat inference-error ;
 
 ! Word properties that affect inference:
 ! - infer-effect -- must be set. controls number of inputs
@@ -57,7 +57,7 @@ SYMBOL: d-in
     dup meta-d get required-inputs d-in [ + ] change
     meta-d [ add-inputs ] change ;
 
-: effect ( -- @{ in# out# }@ )
+: effect ( -- { in# out# } )
     #! After inference is finished, collect information.
     d-in get meta-d get length 2array ;
 
@@ -65,8 +65,8 @@ SYMBOL: terminated?
 
 : init-inference ( recursive-state -- )
     terminated? off
-    { } clone meta-r set
-    { } clone meta-d set
+    V{ } clone meta-r set
+    V{ } clone meta-d set
     0 d-in set
     recursive-state set
     dataflow-graph off

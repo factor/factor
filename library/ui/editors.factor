@@ -86,32 +86,32 @@ TUPLE: editor line caret font color ;
     swap [ first complete ] with-editor ;
 
 : do-completion ( editor -- )
-    dup [ completions ] with-editor @{
-        @{ [ dup empty? ] [ 2drop ] }@
-        @{ [ dup length 1 = ] [ do-completion-1 ] }@
-        @{ [ t ] [ completion-menu ] }@
-    }@ cond ;
+    dup [ completions ] with-editor {
+        { [ dup empty? ] [ 2drop ] }
+        { [ dup length 1 = ] [ do-completion-1 ] }
+        { [ t ] [ completion-menu ] }
+    } cond ;
 
 : editor-actions ( editor -- )
-    {{
+    H{
         [[ [ gain-focus ] [ focus-editor ] ]]
         [[ [ lose-focus ] [ unfocus-editor ] ]]
         [[ [ button-down 1 ] [ click-editor ] ]]
-        [[ [ "BACKSPACE" ] [ [ << char-elt >> delete-prev-elt ] with-editor ] ]]
-        [[ [ "DELETE" ] [ [ << char-elt >> delete-next-elt ] with-editor ] ]]
-        [[ [ "CTRL" "BACKSPACE" ] [ [ << word-elt >> delete-prev-elt ] with-editor ] ]]
-        [[ [ "CTRL" "DELETE" ] [ [ << word-elt >> delete-next-elt ] with-editor ] ]]
-        [[ [ "ALT" "BACKSPACE" ] [ [ << document-elt >> delete-prev-elt ] with-editor ] ]]
-        [[ [ "ALT" "DELETE" ] [ [ << document-elt >> delete-next-elt ] with-editor ] ]]
-        [[ [ "LEFT" ] [ [ << char-elt >> prev-elt ] with-editor ] ]]
-        [[ [ "RIGHT" ] [ [ << char-elt >> next-elt ] with-editor ] ]]
-        [[ [ "CTRL" "LEFT" ] [ [ << word-elt >> prev-elt ] with-editor ] ]]
-        [[ [ "CTRL" "RIGHT" ] [ [ << word-elt >> next-elt ] with-editor ] ]]
-        [[ [ "HOME" ] [ [ << document-elt >> prev-elt ] with-editor ] ]]
-        [[ [ "END" ] [ [ << document-elt >> next-elt ] with-editor ] ]]
+        [[ [ "BACKSPACE" ] [ [ T{ char-elt } delete-prev-elt ] with-editor ] ]]
+        [[ [ "DELETE" ] [ [ T{ char-elt } delete-next-elt ] with-editor ] ]]
+        [[ [ "CTRL" "BACKSPACE" ] [ [ T{ word-elt } delete-prev-elt ] with-editor ] ]]
+        [[ [ "CTRL" "DELETE" ] [ [ T{ word-elt } delete-next-elt ] with-editor ] ]]
+        [[ [ "ALT" "BACKSPACE" ] [ [ T{ document-elt } delete-prev-elt ] with-editor ] ]]
+        [[ [ "ALT" "DELETE" ] [ [ T{ document-elt } delete-next-elt ] with-editor ] ]]
+        [[ [ "LEFT" ] [ [ T{ char-elt } prev-elt ] with-editor ] ]]
+        [[ [ "RIGHT" ] [ [ T{ char-elt } next-elt ] with-editor ] ]]
+        [[ [ "CTRL" "LEFT" ] [ [ T{ word-elt } prev-elt ] with-editor ] ]]
+        [[ [ "CTRL" "RIGHT" ] [ [ T{ word-elt } next-elt ] with-editor ] ]]
+        [[ [ "HOME" ] [ [ T{ document-elt } prev-elt ] with-editor ] ]]
+        [[ [ "END" ] [ [ T{ document-elt } next-elt ] with-editor ] ]]
         [[ [ "CTRL" "k" ] [ [ line-clear ] with-editor ] ]]
         [[ [ "TAB" ] [ do-completion ] ]]
-    }} add-actions ;
+    } add-actions ;
 
 C: editor ( text -- )
     dup delegate>gadget
@@ -129,13 +129,13 @@ C: editor ( text -- )
     0 0 3array ;
 
 : caret-dim ( editor -- w h )
-    rect-dim @{ 0 1 1 }@ v* @{ 1 0 0 }@ v+ ;
+    rect-dim { 0 1 1 } v* { 1 0 0 } v+ ;
 
 M: editor user-input* ( ch editor -- ? )
     [ insert-char ] with-editor f ;
 
 M: editor pref-dim ( editor -- dim )
-    label-size @{ 1 0 0 }@ v+ ;
+    label-size { 1 0 0 } v+ ;
 
 M: editor layout* ( editor -- )
     dup editor-caret over caret-dim swap set-gadget-dim

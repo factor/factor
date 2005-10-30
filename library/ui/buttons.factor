@@ -40,7 +40,7 @@ C: button ( gadget quot -- button )
     [ swap button-gestures ] keep ;
 
 : <highlight-button> ( gadget quot -- button )
-    <button> @{ 0 0 0 }@ over set-border-size ;
+    <button> { 0 0 0 } over set-border-size ;
 
 : <roll-button> ( gadget quot -- button )
     <highlight-button> dup roll-button-theme ;
@@ -68,11 +68,11 @@ M: button tick ( ms object -- ) nip button-clicked ;
 TUPLE: button-paint plain rollover pressed ;
 
 : button-paint ( button paint -- button paint )
-    @{
-        @{ [ over button-pressed? ] [ button-paint-pressed ] }@
-        @{ [ over button-rollover? ] [ button-paint-rollover ] }@
-        @{ [ t ] [ button-paint-plain ] }@
-    }@ cond ;
+    {
+        { [ over button-pressed? ] [ button-paint-pressed ] }
+        { [ over button-rollover? ] [ button-paint-rollover ] }
+        { [ t ] [ button-paint-plain ] }
+    } cond ;
 
 M: button-paint draw-interior ( button paint -- )
     button-paint draw-interior ;

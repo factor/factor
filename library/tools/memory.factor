@@ -54,7 +54,7 @@ sequences strings unparser vectors words ;
 : instances ( quot -- seq )
     #! Return a list of all object that return true when the
     #! quotation is applied to them.
-    [ [ [ swap call ] 2keep rot ?, ] each-object drop ] { } make ;
+    [ [ [ swap call ] 2keep rot ?, ] each-object drop ] V{ } make ;
     inline
 
 G: each-slot ( obj quot -- )
@@ -88,7 +88,7 @@ M: object each-slot ( obj quot -- )
     num-types zero-array num-types zero-array
     [ >r 2dup r> heap-stat-step ] each-object ;
 
-: heap-stat. ( @{ instances bytes type }@ -- )
+: heap-stat. ( { instances bytes type } -- )
     dup first 0 = [
         dup third type>class pprint ": " write
         dup second pprint " bytes, " write

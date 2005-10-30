@@ -17,13 +17,13 @@ sequences strings vectors words ;
 
 IN: sequences
 
-: first2 ( @{ x y }@ -- x y )
+: first2 ( { x y } -- x y )
     1 swap bounds-check nip first2-unsafe ; inline
 
-: first3 ( @{ x y z }@ -- x y z )
+: first3 ( { x y z } -- x y z )
     2 swap bounds-check nip first3-unsafe ; inline
 
-: first4 ( @{ x y z w }@ -- x y z w )
+: first4 ( { x y z w } -- x y z w )
     3 swap bounds-check nip first4-unsafe ; inline
 
 M: object like drop ;
@@ -161,7 +161,7 @@ M: object reverse ( seq -- seq ) [ <reversed> ] keep like ;
 
 : flip ( seq -- seq )
     #! An example illustrates this word best:
-    #! @{ @{ 1 2 3 }@ @{ 4 5 6 }@ }@ ==> @{ @{ 1 4 }@ @{ 2 5 }@ @{ 3 6 }@ }@
+    #! { { 1 2 3 } { 4 5 6 } } ==> { { 1 4 } { 2 5 } { 3 6 } }
     dup empty? [
         dup first [ length ] keep like
         [ swap [ nth ] map-with ] map-with
@@ -177,7 +177,7 @@ IN: kernel
 
 : cond ( conditions -- )
     #! Conditions is a sequence of quotation pairs.
-    #! @{ @{ [ X ] [ Y ] }@ @{ [ Z ] [ T ] }@ }@
+    #! { { [ X ] [ Y ] } { [ Z ] [ T ] } }
     #! => X [ Y ] [ Z [ T ] [ ] if ] if
     #! The last condition should be a catch-all 't'.
     [ first call ] find nip dup

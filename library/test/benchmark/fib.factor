@@ -39,7 +39,7 @@ TUPLE: box i ;
         swap box-i swap box-i + <box>
     ] if ; compiled
 
-[ << box f 9227465 >> ] [ << box f 34 >> tuple-fib ] unit-test
+[ T{ box f 9227465 } ] [ T{ box f 34 } tuple-fib ] unit-test
 
 SYMBOL: n
 : namespace-fib ( n -- n )

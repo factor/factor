@@ -119,13 +119,13 @@ namespaces sequences words ;
     over binary-op-imm?
     [ binary-op-imm ] [ binary-op-reg ] if ;
 
-@{
-    @{ fixnum+       %fixnum+       }@
-    @{ fixnum-       %fixnum-       }@
-    @{ fixnum-bitand %fixnum-bitand }@
-    @{ fixnum-bitor  %fixnum-bitor  }@
-    @{ fixnum-bitxor %fixnum-bitxor }@
-}@ [
+{
+    { fixnum+       %fixnum+       }
+    { fixnum-       %fixnum-       }
+    { fixnum-bitand %fixnum-bitand }
+    { fixnum-bitor  %fixnum-bitor  }
+    { fixnum-bitxor %fixnum-bitxor }
+} [
     first2 [ binary-op ] curry "intrinsic" set-word-prop
 ] each
 
@@ -139,13 +139,13 @@ namespaces sequences words ;
     pick binary-op-imm?
     [ binary-jump-imm ] [ binary-jump-reg ] if ;
 
-@{
-    @{ fixnum<= %jump-fixnum<= }@
-    @{ fixnum<  %jump-fixnum<  }@
-    @{ fixnum>= %jump-fixnum>= }@
-    @{ fixnum>  %jump-fixnum>  }@
-    @{ eq?      %jump-eq?      }@
-}@ [
+{
+    { fixnum<= %jump-fixnum<= }
+    { fixnum<  %jump-fixnum<  }
+    { fixnum>= %jump-fixnum>= }
+    { fixnum>  %jump-fixnum>  }
+    { eq?      %jump-eq?      }
+} [
     first2 [ binary-jump ] curry "if-intrinsic" set-word-prop
 ] each
 
@@ -161,18 +161,18 @@ namespaces sequences words ;
     in-2
     -1 %inc-d ,
     1 <vreg> 0 <vreg> 2 <vreg> %fixnum-mod ,
-    << vreg f 2 >> 0 %replace-d ,
+    T{ vreg f 2 } 0 %replace-d ,
 ] "intrinsic" set-word-prop
 
 \ fixnum/mod [
     ! See the remark on fixnum-mod for vreg usage
     drop
     in-2
-    @{ << vreg f 1 >> << vreg f 0 >> }@
-    @{ << vreg f 2 >> << vreg f 0 >> }@
+    { T{ vreg f 1 } T{ vreg f 0 } }
+    { T{ vreg f 2 } T{ vreg f 0 } }
     %fixnum/mod ,
-    << vreg f 2 >> 0 %replace-d ,
-    << vreg f 0 >> 1 %replace-d ,
+    T{ vreg f 2 } 0 %replace-d ,
+    T{ vreg f 0 } 1 %replace-d ,
 ] "intrinsic" set-word-prop
 
 \ fixnum-bitnot [
@@ -210,7 +210,7 @@ namespaces sequences words ;
     in-1
     dup cell -8 * <= [
         drop 0 <vreg> 2 <vreg> %fixnum-sgn ,
-        << vreg f 2 >> 0 %replace-d ,
+        T{ vreg f 2 } 0 %replace-d ,
     ] [
         neg 0 <vreg> 0 <vreg> %fixnum>> ,
         out-1

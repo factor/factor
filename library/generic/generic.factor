@@ -60,14 +60,14 @@ DEFER: class<
 
 : class< ( cls1 cls2 -- ? )
     #! Test if class1 is a subclass of class2.
-    @{
-        @{ [ 2dup eq? ] [ 2drop t ] }@
-        @{ [ over flatten hash-size 0 = ] [ 2drop t ] }@
-        @{ [ over superclass ] [ >r superclass r> class< ] }@
-        @{ [ dup superclass ] [ superclass< ] }@
-        @{ [ 2dup [ members ] 2apply or not ] [ 2drop f ] }@
-        @{ [ t ] [ (class<) ] }@
-    }@ cond ;
+    {
+        { [ 2dup eq? ] [ 2drop t ] }
+        { [ over flatten hash-size 0 = ] [ 2drop t ] }
+        { [ over superclass ] [ >r superclass r> class< ] }
+        { [ dup superclass ] [ superclass< ] }
+        { [ 2dup [ members ] 2apply or not ] [ 2drop f ] }
+        { [ t ] [ (class<) ] }
+    } cond ;
 
 : class-compare ( cls1 cls2 -- -1/0/1 )
     2dup eq? [ 2drop 0 ] [ class< 1 -1 ? ] if ;
@@ -105,7 +105,7 @@ M: generic definer drop \ G: ;
 
 : init-methods ( word -- )
      dup "methods" word-prop
-     [ drop ] [ {{ }} clone "methods" set-word-prop ] if ;
+     [ drop ] [ H{ } clone "methods" set-word-prop ] if ;
 
 ! Defining generic words
 
@@ -151,11 +151,11 @@ M: generic definer drop \ G: ;
 : class-and ( class class -- class )
     #! Return a class that is a subclass of both, or null in
     #! the degenerate case.
-    @{
-        @{ [ 2dup class< ] [ drop ] }@
-        @{ [ 2dup swap class< ] [ nip ] }@
-        @{ [ t ] [ (class-and) ] }@
-    }@ cond ;
+    {
+        { [ 2dup class< ] [ drop ] }
+        { [ 2dup swap class< ] [ nip ] }
+        { [ t ] [ (class-and) ] }
+    } cond ;
 
 : classes-intersect? ( class class -- ? )
     class-and flatten hash-size 0 > ;

@@ -11,7 +11,7 @@ TUPLE: viewport ;
 ! The follows slot is set by scroll-to.
 TUPLE: scroller viewport x y follows ;
 
-: scroller-origin ( scroller -- @{ x y 0 }@ )
+: scroller-origin ( scroller -- { x y 0 } )
     dup scroller-x slider-value
     swap scroller-y slider-value
     0 3array ;
@@ -55,7 +55,7 @@ M: viewport pref-dim gadget-child pref-dim ;
     dup pop-follows dup [
         swap scroller-viewport (do-scroll)
     ] [
-        2drop @{ 0 0 0 }@
+        2drop { 0 0 0 }
     ] if ;
 
 : update-scroller ( scroller -- )

@@ -16,7 +16,7 @@ SYMBOL: open-fonts
     global [
         f <void*> dup FT_Init_FreeType freetype-error
         *void* freetype set
-        {{ }} clone open-fonts set
+        H{ } clone open-fonts set
     ] bind ;
 
 : free-sprite ( sprite -- )
@@ -33,7 +33,7 @@ M: font = eq? ;
 : flush-font ( font -- )
     #! Only do this after re-creating a GL context!
     dup font-sprites [ [ free-sprite ] when* ] each
-    { } clone swap set-font-sprites ;
+    V{ } clone swap set-font-sprites ;
 
 : close-font ( font -- )
     dup flush-font font-handle FT_Done_Face ;
@@ -53,7 +53,7 @@ M: font = eq? ;
     init-freetype [ close-freetype ] cleanup ; inline
 
 : ttf-name ( font style -- name )
-    cons {{
+    cons H{
         [[ [[ "Monospaced" plain       ]] "VeraMono" ]]
         [[ [[ "Monospaced" bold        ]] "VeraMoBd" ]]
         [[ [[ "Monospaced" bold-italic ]] "VeraMoBI" ]]
@@ -66,7 +66,7 @@ M: font = eq? ;
         [[ [[ "Serif" bold             ]] "VeraSeBd" ]]
         [[ [[ "Serif" bold-italic      ]] "VeraBI"   ]]
         [[ [[ "Serif" italic           ]] "VeraIt"   ]]
-    }} hash ;
+    } hash ;
 
 : ttf-path ( name -- string )
     [ "/fonts/" % % ".ttf" % ] "" make resource-path ;
@@ -100,12 +100,12 @@ M: font = eq? ;
 C: font ( handle -- font )
     [ set-font-handle ] keep dup flush-font dup init-font ;
 
-: open-font ( @{ font style ptsize }@ -- font )
+: open-font ( { font style ptsize } -- font )
     #! Open a font and set the point size of the font.
     first3 >r open-face dup 0 r> 6 shift
     dpi dpi FT_Set_Char_Size freetype-error <font> ;
 
-: lookup-font ( @{ font style ptsize }@ -- font )
+: lookup-font ( { font style ptsize } -- font )
     #! Cache open fonts.
     open-fonts get [ open-font ] cache ;
 

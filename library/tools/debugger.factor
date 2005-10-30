@@ -53,7 +53,7 @@ PREDICATE: cons kernel-error ( obj -- ? )
 
 M: kernel-error error. ( error -- )
     #! Kernel errors are indexed by integers.
-    cdr uncons car swap @{
+    cdr uncons car swap {
         [ expired-error. ]
         [ io-error. ]
         [ undefined-word-error. ]
@@ -66,7 +66,7 @@ M: kernel-error error. ( error -- )
         [ heap-scan-error. ]
         [ undefined-symbol-error. ]
         [ user-interrupt. ]
-    }@ dispatch ;
+    } dispatch ;
 
 M: no-method error. ( error -- )
     "No suitable method." print

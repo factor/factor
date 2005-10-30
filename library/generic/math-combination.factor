@@ -52,7 +52,7 @@ TUPLE: no-math-method left right generic ;
 : math-vtable ( picker quot -- )
     [
         swap , \ tag ,
-        [ num-tags swap map % ] @{ }@ make ,
+        [ num-tags swap map % ] { } make ,
         \ dispatch ,
     ] [ ] make ; inline
 

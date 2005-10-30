@@ -53,7 +53,7 @@ SYMBOL: table
   #! Create the initial global table
   continuation-table hash-clear ;
 
-{{ }} clone table global set-hash
+H{ } clone table global set-hash
 
 #! Tuple for holding data related to a continuation.
 TUPLE: item expire? quot id time-added ;

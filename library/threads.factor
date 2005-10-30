@@ -39,7 +39,7 @@ DEFER: next-thread
 : in-thread ( quot -- )
     [
         schedule-thread
-        [ ] set-catchstack { } set-callstack
+        [ ] set-catchstack V{ } set-callstack
         try stop
     ] callcc0 drop ;
 
@@ -85,6 +85,6 @@ GENERIC: tick ( ms object -- )
 : init-threads ( -- )
     global [
         <queue> \ run-queue set
-        { } clone \ sleep-queue set
-        {{ }} clone \ timers set
+        V{ } clone \ sleep-queue set
+        H{ } clone \ timers set
     ] bind ;

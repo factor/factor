@@ -33,7 +33,7 @@ SYMBOL: inspector-stack
         terpri
         "inspector " listener-prompt set
         [ inspector-stack get "Inspector history:" ] callstack-hook set
-        { } clone inspector-stack set
+        V{ } clone inspector-stack set
         (inspect)
         listener
     ] with-scope ;

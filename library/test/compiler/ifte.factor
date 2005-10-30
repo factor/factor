@@ -38,12 +38,12 @@ USE: math-internals
 
 : dead-code-rec
     t [
-        #{ 3 2 }#
+        C{ 3 2 }
     ] [
         dead-code-rec
     ] if ; compiled
 
-[ #{ 3 2 }# ] [ dead-code-rec ] unit-test
+[ C{ 3 2 } ] [ dead-code-rec ] unit-test
 
 : one-rec [ f one-rec ] [ "hi" ] if ; compiled
 
@@ -98,30 +98,30 @@ DEFER: countdown-b
 
 [ "even" ] [
     [
-        2 @{
-            @{ [ dup 2 mod 0 = ] [ drop "even" ] }@
-            @{ [ dup 2 mod 1 = ] [ drop "odd" ] }@
-        }@ cond
+        2 {
+            { [ dup 2 mod 0 = ] [ drop "even" ] }
+            { [ dup 2 mod 1 = ] [ drop "odd" ] }
+        } cond
     ] compile-1
 ] unit-test
 
 [ "odd" ] [
     [
-        3 @{
-            { [ dup 2 mod 0 = ] [ drop "even" ] }@
-            { [ dup 2 mod 1 = ] [ drop "odd" ] }@
-        }@ cond
+        3 {
+            { [ dup 2 mod 0 = ] [ drop "even" ] }
+            { [ dup 2 mod 1 = ] [ drop "odd" ] }
+        } cond
     ] compile-1
 ] unit-test
 
 [ "neither" ] [
     [
-        3 @{
-            @{ [ dup string? ] [ drop "string" ] }@
-            @{ [ dup float? ] [ drop "float" ] }@
-            @{ [ dup alien? ] [ drop "alien" ] }@
-            @{ [ t ] [ drop "neither" ] }@
-        }@ cond
+        3 {
+            { [ dup string? ] [ drop "string" ] }
+            { [ dup float? ] [ drop "float" ] }
+            { [ dup alien? ] [ drop "alien" ] }
+            { [ t ] [ drop "neither" ] }
+        } cond
     ] compile-1
 ] unit-test
 

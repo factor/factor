@@ -57,11 +57,11 @@ SYMBOL: live-r
 : computed>stack >r get <vreg> swap r> execute , ;
 
 : vreg>stack ( stack-pos value storer -- )
-    @{
-        @{ [ over not ] [ 3drop ] }@
-        @{ [ over literal? ] [ literal>stack ] }@
-        @{ [ t ] [ computed>stack ] }@
-    }@ cond ; inline
+    {
+        { [ over not ] [ 3drop ] }
+        { [ over literal? ] [ literal>stack ] }
+        { [ t ] [ computed>stack ] }
+    } cond ; inline
 
 : (vregs>stack) ( stack storer -- )
     swap reverse-slice [ length ] keep

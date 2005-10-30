@@ -8,7 +8,7 @@ USING: alien generic hashtables kernel lists math sequences ;
 
 : init-gestures ( gadget -- gestures )
     dup gadget-gestures
-    [ ] [ {{ }} clone dup rot set-gadget-gestures ] ?if ;
+    [ ] [ H{ } clone dup rot set-gadget-gestures ] ?if ;
 
 : set-action ( gadget quot gesture -- )
     rot init-gestures set-hash ;

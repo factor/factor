@@ -41,12 +41,12 @@ parse-command-line
 compile? [
     "Compiling base..." print
 
-    @{
+    {
         uncons 1+ 1- + <= > >= mod length
         nth-unsafe set-nth-unsafe
         = string>number number>string scan solve-recursion
         kill-set kill-node (generate)
-    }@ [ compile ] each
+    } [ compile ] each
 ] when
 
 compile? [

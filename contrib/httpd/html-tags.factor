@@ -99,7 +99,7 @@ USE: sequences
 
 : <foo "<" swap append ;
 
-: do-<foo write {{ }} clone >n { } clone "attrs" set ;
+: do-<foo write H{ } clone >n V{ } clone "attrs" set ;
 
 : def-for-html-word-<foo ( name -- )
     #! Return the name and code for the <foo patterned

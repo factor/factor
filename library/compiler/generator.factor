@@ -29,7 +29,7 @@ GENERIC: generate-node ( vop -- )
 
 : (generate) ( word linear -- )
     #! Compile a word definition from linear IR.
-    { } clone relocation-table set
+    V{ } clone relocation-table set
     dup set-stack-reserve
     begin-assembly swap >r >r
         generate-code

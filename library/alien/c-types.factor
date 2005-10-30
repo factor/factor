@@ -6,14 +6,14 @@ hashtables kernel kernel-internals lists math namespaces parser
 sequences sequences-internals strings words ;
 
 : <c-type> ( -- type )
-    {{
+    H{
         [[ "setter" [ "No setter" throw ] ]]
         [[ "getter" [ "No getter" throw ] ]]
         [[ "boxer" "no boxer" ]]
         [[ "unboxer" "no unboxer" ]]
-        [[ "reg-class" << int-regs f >> ]]
+        [[ "reg-class" T{ int-regs f } ]]
         [[ "width" 0 ]]
-    }} clone ;
+    } clone ;
 
 SYMBOL: c-types
 
