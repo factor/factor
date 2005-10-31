@@ -56,5 +56,56 @@ IN: math-contrib
     ] if ;
 
 : nth-root ( n x -- )
-    log >r inv r> * e swap ^ ;
+    log >r recip r> * e swap ^ ;
 
+! Forth Scientific Library Algorithm #1
+!
+! Evaluates the Real Exponential Integral,
+!     E1(x) = - Ei(-x) =   int_x^\infty exp^{-u}/u du      for x > 0
+! using a rational approximation
+!
+! Collected Algorithms from ACM, Volume 1 Algorithms 1-220,
+! 1980; Association for Computing Machinery Inc., New York,
+! ISBN 0-89791-017-6
+!
+! (c) Copyright 1994 Everett F. Carter.  Permission is granted by the
+! author to use this software for any application provided the
+! copyright notice is preserved.
+
+: exp-int ( x -- y )
+    #! For real values of x only. Accurate to 7 decimals.
+    dup 1.0 < [
+        dup 0.00107857 * 0.00976004 -
+        over *
+        0.05519968 +
+        over *
+        0.24991055 -
+        over *
+        0.99999193 +
+        over *
+        0.57721566 -
+        swap log -
+    ] [
+        dup 8.5733287401 +
+        over *
+        18.059016973 +
+        over *
+        8.6347608925 +
+        over *
+        0.2677737343 +
+
+        over
+        dup 9.5733223454 +
+        over *
+        25.6329561486 +
+        over *
+        21.0996530827 +
+        over *
+        3.9584969228 +
+
+        nip
+        /
+        over /
+        swap -1.0 * exp
+        *
+    ] if ;

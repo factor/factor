@@ -9,7 +9,7 @@ Nice to have:
   - elliptic functions
   - numerical integration
   - numerical differentiation
-  - infinite limits, sums, products
+  - infinite limits, sums, products (all done using a limit combinator)
   - finding roots with Newton's method
   - solving ODEs with Runge-Kutta
   - matrices: singular value decomposition, eigenvalues, LU decomposition,
@@ -17,10 +17,9 @@ Nice to have:
   - square root of a matrix, e^matrix
   - finding roots of polynomials
 - Algebra:
-  - polynomial derivative
-  - ^mod for polynomials
-  - mod-inv for polynomials
-  - arithmetic modulo a+sqrt(b)
+  - p^
+  - p^mod for polynomials
+  - pmod-inv for polynomials
   - matrices: row reduction, integer row reduction, matrix inverse,
     determinant
   - probablistic primality tests
@@ -33,15 +32,11 @@ Nice to have:
   - minimal and characteristic polynomials of algebraic numbers
   - norm and trace of algebraic numbers
   - minimal and characteristic polynomials of matrices
-- Graphs:
-  - minimum spanning trees
 - Logic:
   - tautology checker
   - CNF, DNF
   - natural deduction proof checker
-  - symbolic rewriting of expression trees
 - Statistics:
-  - mean, median, range, standard deviation
   - linear regression
 - Geometry:
   - regions
@@ -56,6 +51,7 @@ Nice to have:
   - symbolic differentiation
   - differential forms
   - wedge product
+  - power series
 - Graphics:
   - 2D, 3D plots
   - y=f(x), implicit, parametric

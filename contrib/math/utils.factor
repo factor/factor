@@ -31,7 +31,3 @@ USING: errors kernel sequences math ;
 : c. ( v v -- x )
     #! Complex inner product.
     0 [ ** + ] 2reduce ;
-
-: inv
-    #! inverse
-    1 swap / ; inline
