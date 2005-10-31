@@ -5,9 +5,13 @@ USING: kernel math sequences ;
     #! arithmetic mean, sum divided by length
     [ sum ] keep length / ;
 
-: geo-mean ( seq -- n )
+: geometric-mean ( seq -- n )
     #! geometric mean, nth root of product
     [ product ] keep length swap nth-root ;
+
+: harmonic-mean ( seq -- n )
+    #! harmonic mean, reciprocal of sum of reciprocals.
+    [ recip ] map sum recip ;
 
 : median ( seq -- n )
     #! middle number if odd, avg of two middle numbers if even
@@ -19,7 +23,7 @@ USING: kernel math sequences ;
 
 : range ( seq -- n )
     #! max - min
-    number-sort [ first ] keep pop swap - ;
+    dup first 2dup [ min ] reduce >r [ max ] reduce r> - ;
 
 : var ( seq -- )
     #! variance, normalize by N-1

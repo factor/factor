@@ -12,7 +12,8 @@ Nice to have:
   - infinite limits, sums, products
   - finding roots with Newton's method
   - solving ODEs with Runge-Kutta
-  - matrices: singular value decomposition, eigenvalues, LU decomposition
+  - matrices: singular value decomposition, eigenvalues, LU decomposition,
+    polar decomposition
   - square root of a matrix, e^matrix
   - finding roots of polynomials
 - Algebra:
@@ -32,7 +33,6 @@ Nice to have:
   - minimal and characteristic polynomials of algebraic numbers
   - norm and trace of algebraic numbers
   - minimal and characteristic polynomials of matrices
-  - eigenvalues of matrices
 - Graphs:
   - minimum spanning trees
 - Logic:
