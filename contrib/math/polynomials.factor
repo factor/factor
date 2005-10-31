@@ -1,5 +1,5 @@
 IN: polynomials-internals
-USING: kernel sequences vectors math math-internals namespaces ;
+USING: kernel sequences vectors math math-internals namespaces arrays ;
 
 : 2length ( seq seq -- ) [ length ] 2apply ;
 
@@ -24,7 +24,7 @@ USING: kernel sequences vectors math math-internals namespaces ;
     2dup max-length [ swap zero-extend ] keep swap zero-extend ;
 
 : pextend ( p p -- p p )
-    2dup 2zero-extend ;
+    [ >vector ] 2apply 2dup 2zero-extend ;
 
 IN: math-contrib
 
@@ -32,6 +32,7 @@ IN: math-contrib
     pextend = ;
 
 : ptrim ( p -- p )
+    >vector
     dup length 1 > [ dup peek 0 = [ dup pop drop ptrim ] when ] when ;
 
 : 2ptrim ( p -- p )
