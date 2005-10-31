@@ -18,7 +18,7 @@ USING: kernel math sequences ;
     number-sort dup length dup even? [
         1+ 2 /i dup 1- rot [ nth ] keep swapd nth + 2 /
     ] [
-        2 / swap nth
+        2 /i swap nth
     ] if ;
 
 : range ( seq -- n )
@@ -36,4 +36,3 @@ USING: kernel math sequences ;
 : std
     #! standard deviation, sqrt of variance
     var sqrt ;
-
