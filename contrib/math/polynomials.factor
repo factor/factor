@@ -3,6 +3,7 @@ USING: kernel sequences vectors math math-internals namespaces arrays ;
 
 ! Polynomials are vectors with the highest powers on the right:
 ! { 1 1 0 1 } -> 1 + x + x^3
+! { } -> 0
 
 : 2length ( seq seq -- ) [ length ] 2apply ;
 
@@ -30,8 +31,12 @@ USING: kernel sequences vectors math math-internals namespaces arrays ;
     #! make two polynomials the same length, if empty, make length 1
     [ >vector ] 2apply 2dup 2zero-extend  ;
 
-: 2empty? ( seq seq -- )
-    [ empty? ] 2apply and ;
+: unempty ( seq seq -- )
+    #! turn { } into { 0 }
+    dup empty? [ 1 swap zero-pad ] when ;
+    
+: 2unempty ( seq seq -- )
+    [ unempty ] 2apply ;
 
 IN: math-contrib
 
@@ -66,11 +71,7 @@ IN: math-contrib
 
 : p* ( p p -- p )
     #! Multiply two polynomials.
-    2dup 2empty? [
-            2drop { 0 } clone
-        ] [
-            conv*a [ 3dup -rot v* sum >r pick r> -rot set-nth conv*b ] repeat nip 
-    ] if ;
+    2unempty conv*a [ 3dup -rot v* sum >r pick r> -rot set-nth conv*b ] repeat nip ;
 
 : p-sq ( p -- p-sq )
     dup p* ;
