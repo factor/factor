@@ -9,6 +9,9 @@ USING: kernel math test sequences math-contrib ;
 [ V{ 3 10 8 } ] [ { 3 4 } { 1 2 } p* ] unit-test
 [ V{ 0 0 0 0 0 0 0 0 0 0 } ] [ { 0 0 0 } { 0 0 0 0 0 0 0 0 } p* ] unit-test
 [ V{ 0 1 } ] [ { 0 1 } { 1 } p* ] unit-test
+[ V{ 0 } ] [ { } { } p* ] unit-test
+[ V{ 0 } ] [ { 0 } { } p* ] unit-test
+[ V{ 0 } ] [ { } { 0 } p* ] unit-test
 [ V{ 0 0 0 } ] [ { 0 0 0 } { 0 0 0 } p+ ] unit-test
 [ V{ 0 0 0 } ] [ { 0 0 0 } { 0 0 0 } p- ] unit-test
 [ { 0 0 0 } ] [ 4 { 0 0 0 } n*p ] unit-test
