@@ -1,6 +1,5 @@
 0.79:
 
-- test everything in contrib
 - update handbook
 - fix remaining GL issues
 

@@ -78,7 +78,7 @@ USING: kernel concurrency concurrency-examples threads vectors
   [ string? ] swap dlist-pred?
 ] unit-test
 
-[ { 1 2 3 } ] [
+[ V{ 1 2 3 } ] [
   0 <vector>
   make-mailbox
   2dup [ mailbox-get swap push ] cons cons in-thread
@@ -89,7 +89,7 @@ USING: kernel concurrency concurrency-examples threads vectors
   3 swap mailbox-put
 ] unit-test
 
-[ { 1 2 3 } ] [
+[ V{ 1 2 3 } ] [
   0 <vector>
   make-mailbox
   2dup [ [ integer? ] swap mailbox-get? swap push ] cons cons in-thread
@@ -100,7 +100,7 @@ USING: kernel concurrency concurrency-examples threads vectors
   3 swap mailbox-put
 ] unit-test
 
-[ { 1 "junk" 3 "junk2" } [ 456 ] ] [
+[ V{ 1 "junk" 3 "junk2" } [ 456 ] ] [
   0 <vector>
   make-mailbox
   2dup [ [ integer? ] swap mailbox-get? swap push ] cons cons in-thread
@@ -171,7 +171,7 @@ USING: kernel concurrency concurrency-examples threads vectors
   [ 50 ] future ?future
 ] unit-test
 
-[ { 50 50 50 } ] [
+[ V{ 50 50 50 } ] [
   0 <vector>
   <promise>
   2dup [ ?promise swap push ] cons cons spawn drop

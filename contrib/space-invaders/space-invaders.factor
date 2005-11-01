@@ -1,5 +1,7 @@
+USING: alien cpu-8080 errors generic io kernel kernel-internals
+lists math namespaces sdl sdl-event sdl-gfx sdl-video sequences
+styles threads ;
 IN: space-invaders
-USING: cpu-8080 kernel lists sdl sdl-event sdl-gfx sdl-video math styles sequences io namespaces generic kernel-internals threads errors ;
 
 TUPLE: space-invaders port1 port2i port2o port3o port4lo port4hi port5o ;
 
@@ -129,21 +131,32 @@ M: key-up-event handle-si-event ( cpu event -- quit? )
   #! n >= a and n <= b
   rot tuck swap <= >r swap >= r> and ;
 
-: color ( x y -- color )
-  #! Return the color to use for the given x/y position.
-  {
-    { [ dup 184 238 within pick 0 223 within and ] [ 2drop green ] }
-    { [ dup 240 247 within pick 16 133 within and ] [ 2drop green ] }
-    { [ dup 247 215 - 247 184 - within pick 0 223 within and ] [ 2drop red ] }
-    { [ t ] [ 2drop white ] }
-  } cond ;
+! : color ( x y -- color )
+!   #! Return the color to use for the given x/y position.
+!   {
+!     { [ dup 184 238 within pick 0 223 within and ] [ 2drop green ] }
+!     { [ dup 240 247 within pick 16 133 within and ] [ 2drop green ] }
+!     { [ dup 247 215 - 247 184 - within pick 0 223 within and ] [ 2drop red ] }
+!     { [ t ] [ 2drop white ] }
+!   } cond ;
+
+: black HEX: 0000 ;
+: white HEX: ffff ;
+
+: plot-pixel ( x y color -- )
+  -rot surface get [ surface-pitch * ] keep
+  [ surface-format sdl-format-BytesPerPixel rot * + ] keep
+  surface-pixels swap set-alien-unsigned-2 ;
 
 : plot-bits ( x y byte bit -- )
-  dup swapd -1 * shift 1 bitand 0 = [ ( x y bit -- )
-    - surface get -rot black rgb pixelColor
-  ] [
-    - surface get -rot 2dup color rgb pixelColor
-  ] if ;
+  dup swapd -1 * shift 1 bitand 0 =
+  [ ( x y bit -- ) - black ] [ - white ] if
+  plot-pixel ;
+
+! : plot-bits ( x y byte bit -- )
+!   dup swapd -1 * shift 1 bitand 0 =
+!   [ ( x y bit -- ) - black ] [ - 2dup color ] if
+!   rgb plot-pixel ;
 
 : do-video-update ( value addr cpu -- )
   drop addr>xy rot ( x y value )
@@ -164,7 +177,7 @@ M: space-invaders update-video ( value addr cpu -- )
   ] if ;
 
 : run ( -- )
-  224 256 0 SDL_HWSURFACE [ 
+  224 256 16 SDL_HWSURFACE [ 
    <space-invaders> "invaders.rom" over load-rom
    <event> event-loop
     SDL_Quit
