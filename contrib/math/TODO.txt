@@ -3,7 +3,7 @@ Nice to have:
 - Permutations -- composition and inverse (trivial; use sort and map-with)
 - Analysis:
   - error function, cosine integral, sine integral, fresnel functions
-  - exponential integral, logarithm integral, zeta function
+  - logarithm integral, zeta function
   - airy wave function
   - hypergeometric functions
   - elliptic functions

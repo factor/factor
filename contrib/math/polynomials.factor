@@ -98,4 +98,4 @@ IN: math-contrib
 
 : pdiff ( p -- p' )
     #! Polynomial derivative.
-    [ length reverse-slice ] keep [ 1+ * ] 2map 1 swap head* ;
+    dup empty? [ [ length ] keep v* 1 swap tail ] unless ;
