@@ -1,6 +1,9 @@
 IN: polynomials-internals
 USING: kernel sequences vectors math math-internals namespaces arrays ;
 
+! Polynomials are vectors with the highest powers on the right:
+! { 1 1 0 1 } -> 1 + x + x^3
+
 : 2length ( seq seq -- ) [ length ] 2apply ;
 
 : zero-vector ( n -- vector ) 0 <repeated> >vector ;
@@ -24,7 +27,11 @@ USING: kernel sequences vectors math math-internals namespaces arrays ;
     2dup max-length [ swap zero-extend ] keep swap zero-extend ;
 
 : pextend ( p p -- p p )
-    [ >vector ] 2apply 2dup 2zero-extend ;
+    #! make two polynomials the same length, if empty, make length 1
+    [ >vector ] 2apply 2dup 2zero-extend  ;
+
+: 2empty? ( seq seq -- )
+    [ empty? ] 2apply and ;
 
 IN: math-contrib
 
@@ -59,7 +66,11 @@ IN: math-contrib
 
 : p* ( p p -- p )
     #! Multiply two polynomials.
-    conv*a [ 3dup -rot v* sum >r pick r> -rot set-nth conv*b ] repeat nip ;
+    2dup 2empty? [
+            2drop { 0 } clone
+        ] [
+            conv*a [ 3dup -rot v* sum >r pick r> -rot set-nth conv*b ] repeat nip 
+    ] if ;
 
 : p-sq ( p -- p-sq )
     dup p* ;
@@ -99,3 +110,8 @@ IN: math-contrib
 : pdiff ( p -- p' )
     #! Polynomial derivative.
     dup empty? [ [ length ] keep v* 1 swap tail ] unless ;
+
+: polyval ( x p -- n )
+    #! evaluate polynomial in a straightforward way
+    ptrim dup length 1 swap <range> [ pick swap ^ ] map 1 rot cut swapd v. swap pop + nip ;
+
