@@ -76,7 +76,7 @@
 
 \chapter*{Foreword}
 
-This handbook documents release 0.77 of the Factor programming language.
+This handbook documents release 0.79 of the Factor programming language.
 
 Note that this handbook is not a tutorial or introductory guide, nor does it cover some background material that you are expected to understand, such as object-oriented programming, higher-order functions, continuations, or general algorithm and program design.
 
@@ -135,6 +135,7 @@ list of inputs and outputs, so \texttt{( x y -- x-y )} indicates that the top st
 The following abbreviations have conventional meaning in stack effect comments:
 
 \begin{description}
+\item[\texttt{\tto x y z \ttc}] an array with elements whose types are hinted at by \texttt{x}, \texttt{y}, \texttt{z}
 \item[\texttt{[ x y z ]}] a list with elements whose types are hinted at by \texttt{x}, \texttt{y}, \texttt{z}
 \item[\texttt{[[ x y ]]}] a cons cell where the type of the car is hinted at by \texttt{x}, and the type of the cdr is hinted at by \texttt{y}
 \item[\texttt{ch}] an integer representing a Unicode character
@@ -151,9 +152,9 @@ The following abbreviations have conventional meaning in stack effect comments:
 \item[\texttt{foo/bar}] either \texttt{foo} or \texttt{bar}. For example, \texttt{str/f} means either a string, or \texttt{f}
 \end{description}
 
-If the stack effect identifies quotations, the stack effect of each quotation may be given after suffixing \texttt{|} to the whole string. For example, the following denotes a word that takes a list and a quotation and produces a new list, calling the quotation with elements of the list.
+If the stack effect identifies quotations, the stack effect of each quotation may be given after suffixing \texttt{|} to the whole string. For example, the following denotes a word that takes a sequence and a quotation and produces a new sequence, calling the quotation with elements of the sequence.
 \begin{verbatim}
-( list quot -- list | quot: elt -- elt )
+( seq quot --seqlist | quot: elt -- elt )
 \end{verbatim}
 
 \section{Naming conventions}
@@ -444,14 +445,14 @@ description={an instance of the \texttt{complex} class, representing a complex n
 \complexglos
 \wordtable{
 \vocabulary{syntax}
-\parsingword{\pound\tto}{\#\tto{} \emph{real} \emph{imaginary} \ttc\#}
+\parsingword{\pound\tto}{C\tto{} \emph{real} \emph{imaginary} \ttc}
 }
 A complex number
 is given by two components, a ``real'' part and ''imaginary'' part. The components
 must either be integers, ratios or floats.
 \begin{verbatim}
-#{ 1/2 1/3 }#   ! the complex number 1/2+1/3i
-#{ 0 1 }#       ! the imaginary unit
+C{ 1/2 1/3 }   ! the complex number 1/2+1/3i
+C{ 0 1 }       ! the imaginary unit
 \end{verbatim}
 
 More information on complex numbers can be found in \ref{complex-numbers}.
@@ -467,13 +468,13 @@ If a quotation contains a literal object, the same literal object instance is us
 \newcommand{\boolglos}{
 \glossary{
 name=boolean,
-description={an instance of the \texttt{boolean} class, either \texttt{f} or \texttt{t}. See generalized boolean}}
+description={either the \texttt{f} or the \texttt{t} object. See generalized boolean}}
 \glossary{
 name=generalized boolean,
 description={an object used as a truth value. The \texttt{f} object is false and anything else is true. See boolean}}
 \glossary{
 name=t,
-description={the canonical truth value. The \texttt{t} class, whose sole instance is the \texttt{t} object. Note that the \texttt{t} class is not equal to the \texttt{t} object}}
+description={the canonical truth value, an instance of the \texttt{word} type which is also a symbol, so it pushes itself on the stack when evaluated}}
 \glossary{
 name=f,
 description={the canonical false value; anything else is true. The \texttt{f} class, whose sole instance is the \texttt{f} object. Note that the \texttt{f} class is not equal to the \texttt{f} object}}
@@ -672,6 +673,23 @@ As with strings, the escape codes described in \ref{syntax:char} are permitted.
 
 String buffers are documented in \ref{string-buffers}.
 
+\subsection{Arrays}\label{array-literals}
+\newcommand{\arrayglos}{\glossary{
+name=array,
+description={an instance of the \texttt{array} class, storing a fixed-size mutable sequence of elements in a contiguous range of memory}}}
+\arrayglos
+\wordtable{
+\vocabulary{syntax}
+\parsingword{\tto}{\tto}
+\parsingword{\ttc}{\ttc}
+}
+Parses an array, whose elements are read between \texttt{\tto} and \texttt{\ttc}.
+\begin{verbatim}
+{ SBUF" macaroni and cheese" 3/2 }
+\end{verbatim}
+
+Arrays are documented in \ref{arrays}.
+
 \subsection{Vectors}\label{vector-literals}
 \newcommand{\vectorglos}{\glossary{
 name=vector,
@@ -679,12 +697,12 @@ description={an instance of the \texttt{vector} class, storing a mutable and gro
 \vectorglos
 \wordtable{
 \vocabulary{syntax}
-\parsingword{\tto}{\tto}
+\parsingword{V\tto}{V\tto}
 \parsingword{\ttc}{\ttc}
 }
-Parses a vector, whose elements are read between \texttt{\tto} and \texttt{\ttc}.
+Parses a vector, whose elements are read between \texttt{V\tto} and \texttt{\ttc}.
 \begin{verbatim}
-{ 3 "blind" "mice" }
+V{ 3 "blind" "mice" }
 \end{verbatim}
 
 Vectors are documented in \ref{vectors}.
@@ -696,16 +714,16 @@ description={an instance of the \texttt{hashtable} class, providing a mutable ma
 \hashglos
 \wordtable{
 \vocabulary{syntax}
-\parsingword{\tto\tto}{\tto\tto}
-\parsingword{\ttc\ttc}{\ttc\ttc}
+\parsingword{H\tto}{\tto}
+\parsingword{\ttc}{\ttc}
 }
-Parses a hashtable. Elements between \texttt{\tto\tto} and \texttt{\ttc\ttc} must be cons cells, where the car is the key and the cdr is a value.
+Parses a hashtable. Elements between \texttt{H\tto} and \texttt{\ttc} must be cons cells, where the car is the key and the cdr is a value.
 \begin{verbatim}
-{{
+H{
     [[ "red" [ 255 0 0 ] ]]
     [[ "green" [ 0 255 0 ] ]]
     [[ "blue" [ 0 0 255 ] ]]
-}}
+}
 \end{verbatim}
 
 Hashtables are documented in \ref{hashtables}.
@@ -717,12 +735,12 @@ description={an instance of a user-defined class whose metaclass is the \texttt{
 \tupleglos
 \wordtable{
 \vocabulary{syntax}
-\parsingword{<<}{<<}
-\parsingword{>>}{>>}
+\parsingword{T\tto}{T\tto}
+\parsingword{\ttc}{\ttc}
 }
-Parses a tuple. The tuple's class must follow \texttt{<<}. The element after that is always the tuple's delegate. Further elements until \texttt{>>} are specified according to the tuple's slot definition. If an insufficient number of elements is given, the remaining slots of the tuple are set to \verb|f|. Listing too many elements raises a parse error.
+Parses a tuple. The tuple's class must follow \texttt{T\tto}. The element after that is always the tuple's delegate. Further elements until \texttt{\ttc} are specified according to the tuple's slot definition. If an insufficient number of elements is given, the remaining slots of the tuple are set to \verb|f|. Listing too many elements raises a parse error.
 \begin{verbatim}
-<< color f 255 0 0 >>
+T{ color f 255 0 0 }
 \end{verbatim}
 
 Tuples are documented in \ref{tuples}.
@@ -2735,6 +2753,44 @@ Creates an immutable sequence consisting of \verb|object| repeated $n$ times. No
 \glossary{name=repeated sequence,
 description={an instance of the \texttt{repeated} class, which is a virtual, immutable sequence consisting of a fixed element repeated a certain number of times}}
 
+\section{Arrays}\label{arrays}
+
+\wordtable{
+\vocabulary{arrays}
+\classword{array}
+}
+\vectorglos
+An array is a fixed-size mutable sequence whose elements are stored in a contiguous range of memory. The literal syntax is covered in \ref{array-literals}. Sometimes you need a growable array -- this is called a vector, and vectors are documented in \ref{vectors}.
+
+\wordtable{
+\vocabulary{arrays}
+\ordinaryword{array?}{array?~( object -- ?~)}
+
+}
+Tests if the object at the top of the stack is an array.
+\wordtable{
+\vocabulary{arrays}
+\ordinaryword{>array}{>array~( sequence -- array )}
+}
+Turns any type of sequence into an array. Given an array, this makes a fresh copy.
+\wordtable{
+\vocabulary{arrays}
+\ordinaryword{<array>}{<array>~( capacity -- array )}
+}
+Creates a new array with a specific size and all elements set to \verb|f|. This size can never change.
+\wordtable{
+\vocabulary{arrays}
+\ordinaryword{zero-array}{zero-array~( length -- vector )}
+}
+Creates a new vector with a specified size and all elements set to 0.
+\wordtable{
+\vocabulary{arrays}
+\ordinaryword{1array}{1array~( element -- array )}
+\ordinaryword{2array}{2array~( element element -- array )}
+\ordinaryword{3array}{3array~( element element element -- array )}
+}
+Creates an array of one, two or three elements from the stack.
+
 \section{Vectors}\label{vectors}
 
 \wordtable{
@@ -2742,7 +2798,7 @@ description={an instance of the \texttt{repeated} class, which is a virtual, imm
 \classword{vector}
 }
 \vectorglos
-A vector is a growable, mutable sequence whose elements are stored in a contiguous range of memory. The literal syntax is covered in \ref{vector-literals}. Very few words operate specifically on vectors; most operations on vectors are done with generic sequence words.
+A vector is a growable, mutable sequence whose elements are stored in a contiguous range of memory. The literal syntax is covered in \ref{vector-literals}.
 
 \wordtable{
 \vocabulary{vectors}
@@ -2763,11 +2819,6 @@ Creates a new vector with an initial capacity that determines how many elements 
 \wordtable{
 \vocabulary{vectors}
 \ordinaryword{empty-vector}{empty-vector~( length -- vector )}
-}
-Creates a new vector of the requested length, where all elements are initially \texttt{f}.
-\wordtable{
-\vocabulary{vectors}
-\ordinaryword{zero-vector}{zero-vector~( length -- vector )}
 }
 Creates a new vector of the requested length, where all elements are initially \texttt{f}.
 
@@ -3907,13 +3958,9 @@ Word&Value\\
 
 \section{Linear algebra}
 
-\subsection{Vectors}
-
 Any Factor sequence can be used to represent a mathematical vector, not just instances of the \verb|vector| class. Anywhere a vector is mentioned in this section, keep in mind it is a mathematical term, not a Factor data type.
 
-The usual mathematical operations on vectors are supported.
-
-\subsubsection{Scaling operations}
+\subsection{Scaling operations}
 
 \wordtable{
 \vocabulary{math}
@@ -3933,7 +3980,7 @@ Multiplies each element of the vector by a scalar. The two words only differ in 
 }
 Divides each element of the vector by a scalar, or alternatively, divides the scalar by each element of a vector. The two words yield different results; the elements of the two resulting vector are reciprocals of each other.
 
-\subsubsection{Pairwise operations}\label{pairwise}
+\subsection{Pairwise operations}\label{pairwise}
 
 These words all expect a pair of vectors of equal length. They apply a binary operation to each pair of elements, producing a new vector. They are all implemented using the \verb|2map| combinator (\ref{iteration}).
 
@@ -3960,7 +4007,7 @@ Note that \verb|v*| is not the inner product. The inner product is the \verb|v.|
 \textbf{\tto 5 8 7/2 9 \ttc}
 \end{alltt}
 
-\subsubsection{Reducing operations}\label{reductions}
+\subsection{Reducing operations}\label{reductions}
 
 These words take a vector as input and produce a single number (or boolean).
 
@@ -3976,7 +4023,7 @@ Adds or multiplies all numbers in the vector. These are implemented using the \v
 : product 1 [ * ] reduce ;
 \end{verbatim}
 
-\subsubsection{Inner and cross products}\label{inner-product}
+\subsection{Inner and cross products}\label{inner-product}
 
 \wordtable{
 \vocabulary{math}
@@ -4018,98 +4065,6 @@ Computes the cross product $v_1\times v_2$. The following example illustrates th
   \tto 156/7 -54/5 57/35 \ttc \tto 8/5 3 -2 \ttc v. .
 \textbf{0}
 \end{alltt}
-
-\subsection{Matrices}\label{matrices}
-
-Matrices are represented as sequences of sequences of equal length. For example, consider
-the following object:
-\begin{verbatim}
-{ { 1 0 -1 }
-  { 2 1/3 6 }
-  { 4 -2 0 }
-  { 0 0 8 } }
-\end{verbatim}
-It corresponds to the following mathematical matrix:
-$$\left( \begin{array}{c c c}
-1 & 0 & -1 \\
-2 & 1/3 & 6 \\
-4 & -2 & 0 \\
-0 & 0 & 8 \end{array}
-\right)$$
-
-The transpose of a matrix may be computed with the \verb|flip| word (\ref{reshaping}).
-\wordtable{
-\vocabulary{math}
-\ordinaryword{<zero-matrix>}{<zero-matrix> ( rows cols -- matrix )}
-}
-Creates a new matrix with the given dimensions and all elements set to zero.
-
-\wordtable{
-\vocabulary{math}
-\ordinaryword{<identity-matrix>}{<identity-matrix> ( n -- matrix )}
-}
-Creates a new $n\times n$ matrix where all elements on the main diagonal are 1, and all other elements are zero; for example:
-
-\begin{alltt}
-  3 <identity-matrix> .
-\textbf{\tto \tto 1 0 0 \ttc \tto 0 1 0 \ttc \tto 0 0 1 \ttc \ttc}
-\end{alltt}
-
-The following are the usual algebraic operations on matrices.
-
-\wordtable{
-\vocabulary{math}
-\ordinaryword{n*m}{n*m ( n matrix -- matrix )}
-}
-Multiplies each element of a matrix by a scalar.
-\begin{alltt}
-  5 2 <identity-matrix> n*m prettyprint
-\textbf{\tto \tto 5 0 \ttc
-   \tto 0 5 \ttc \ttc}
-\end{alltt}
-
-\wordtable{
-\vocabulary{math}
-\ordinaryword{m+}{m+~( matrix matrix -- matrix )}
-}
-Adds two matrices. They must have the same dimensions.
-
-\wordtable{
-\vocabulary{math}
-\ordinaryword{m-}{m-~( matrix matrix -- matrix )}
-}
-Subtracts two matrices. They must have the same dimensions.
-
-\wordtable{
-\vocabulary{math}
-\ordinaryword{m*}{m*~( matrix matrix -- matrix )}
-}
-Multiplies two matrices element-wise. They must have the same dimensions. This is \emph{not} matrix multiplication in the usual mathematical sense.
-
-\wordtable{
-\vocabulary{math}
-\ordinaryword{m.}{m.~( matrix matrix -- matrix )}
-}
-Composes two matrices as linear operators. This is the usual mathematical matrix multiplication, and the first matrix must have the same number of columns as the second matrix has rows.
-
-\wordtable{
-\vocabulary{math}
-\ordinaryword{m.v}{m.v~( matrix vector -- vector )}
-}
-Applies a matrix to a vector on the right, as a linear transformation. The vector is
-treated as a matrix with one column.
-
-\begin{alltt}
-  \tto 5 -3 \ttc \tto \tto 0 1 \ttc \tto 1 0 \ttc \ttc v.m .
-\textbf{\tto -3 5 \ttc}
-\end{alltt}
-
-\wordtable{
-\vocabulary{matrices}
-\ordinaryword{v.m}{v.m~( vector matrix -- vector )}
-}
-Applies a matrix to a vector on the left, as a linear transformation. The vector is
-treated as a matrix with one row.
 
 \section{Converting between numbers and strings}\label{parsing-numbers}
 
@@ -4380,7 +4335,7 @@ Like \verb|with-stream| extend the stream is only closed in the case of an error
 
 \section{Styled output}\label{styles}
 
-HTML streams (\ref{html}) and pane streams (\ref{panes}) support styled text output using the \verb|stream-format| word. The style association list given to this word can contain any of the following keys:
+UI pane streams (\ref{panes}) support styled text output using the \verb|stream-format| word. The style association list given to this word can contain any of the following keys:
 
 \begin{tabular}{l|l}
 Key&Description\\
@@ -5308,204 +5263,6 @@ This word is used to implement end-of-line comments:
 \item <book-browser>
 
 \end{itemize}
-
-\chapter{Web framework}
-
-Factor includes facilities for interoperating with web-based services. This includes an HTTP client, and an HTTP server with a continuation-based web application framework.
-
-\section{HTTP client}
-
-\wordtable{
-\vocabulary{http-client}
-\ordinaryword{http-get}{http-get ( url -- code headers stream )}
-}
-Connects to the server specified in the URL, and makes a \verb|GET| request to retreive that resource.
-
-\wordtable{
-\vocabulary{http-client}
-\ordinaryword{http-post}{http-post ( type content url -- code headers stream )}
-}
-Attempts to connect to the server specified in the URL, and makes a \verb|POST| request with the specified content type and content. The content is automatically URL-encoded for you.
-
-With both words, the output values are as follows:
-\begin{description}
-\item[\texttt{code}] an integer with the HTTP response code; for example, 404 denotes ``file not found'' whereas 200 means ``success''.
-\item[\texttt{headers}] an association list of returned headers.
-\item[\texttt{stream}] a stream for reading the resource.
-\end{description}
-
-The following pair of words convert a string to and from its URL-encoded form.
-
-\wordtable{
-\vocabulary{http}
-\ordinaryword{url-encode}{url-encode ( string -- string )}
-\ordinaryword{url-decode}{url-decode ( string -- string )}
-}
-These words are called automatically by much of the web framework, however they are sometimes useful to call directly.
-
-\section{HTTP server}\label{httpd}
-
-The HTTP server listens for requests on a port and hands them off to responders. A responder takes action based on the type of request.
-
-\wordtable{
-\vocabulary{httpd}
-\ordinaryword{httpd}{httpd ( port -- )}
-}
-Starts listening for HTTP requests on \verb|port|.
-
-The HTTP server is usually started with a phrase like the following:
-\begin{alltt}
-  USING: httpd threads ;
-  [ 8888 httpd ] in-thread
-\end{alltt}
-
-\wordtable{
-\vocabulary{httpd}
-\ordinaryword{stop-httpd}{stop-httpd ( -- )}
-}
-Stops the HTTP server.
-
-A useful application of the HTTP server is the built-in vocabulary browser. You can use it simply by starting the HTTP server then visiting the following location:
-
-\begin{verbatim}
-http://localhost:8888/responder/browser/
-\end{verbatim}
-
-\subsection{Serving static content}
-
-Static content may be served by setting the \verb|"doc-root"| variable to a directory holding the content. This variable may be set in the global namespace, or indeed, individually on each virtual host.
-\begin{verbatim}
-"/var/www/" "doc-root" set
-\end{verbatim}
-
-If a directory holds an \verb|index.html| file, the file is served when the directory is requested, otherwise a directory listing is produced.
-
-A facility for ad-hoc server-side scripting exists. If a file with the \verb|.factsp| filename extension is requested, the file is run with \verb|run-file| and any output it sends to the default stream is sent to the client (\ref{stdio}). These ``Factor server pages'' are slower and less powerful than responders, so it is recommended that responders be used instead.
-
-A different static site can be associated with each virtual host by setting the \verb|"doc-root"| variable in each virtual host (\ref{vhosts}).
-
-\subsection{Responders}
-
-\glossary{name=responder,
-description={A named handler for HTTP requests, installed in the \texttt{responders} variable}}
-\glossary{name=HTTP responder,
-description={See responder}}
-
-The HTTP server listens on a port number for HTTP requests and issues requests to \emph{responders}. The following form of request is understood specially by the HTTP server:
-\begin{verbatim}
-http://myhost/responder/foo/bar
-\end{verbatim}
-Such a request results in the \verb|foo| responder being invoked with the \verb|bar| argument. Requesting a path that does not begin with \verb|/responder| simply invokes the file responder with that path, as documented in the previous section.
-
-\subsubsection{Managing responders}
-
-\wordtable{
-\vocabulary{httpd}
-\symbolword{responders}
-}
-Responders are located in a hashtable stored in the \verb|responders| variable. This variable must be in scope when the \verb|httpd| word is invoked. This is usually the case, as the global namespace includes a default value filled out with all responders that are included as part of the library.
-
-The following words manage the set of installed responders:
-
-\wordtable{
-\vocabulary{httpd}
-\ordinaryword{set-default-responder}{set-default-responder ( name -- )}
-}
-Sets the default responder, that is, the one handling requests not prefixed by \verb|/responder|, to the responder \verb|name|. The initial value for the default responder is \verb|"file"|, identifying the file responder.
-\wordtable{
-\vocabulary{httpd}
-\ordinaryword{add-responder}{add-responder ( responder -- )}
-}
-Adds a responder to the hashtable stored in the \verb|responders| variable that is in scope.
-
-\subsubsection{Developing a responder}
-
-A responder is a hashtable where the following keys must be set:
-
-\begin{description}
-\item[\texttt{"responder"}] The name of the responder
-\item[\texttt{"get"}] A quotation with stack effect \verb|( resource -- )|, invoked when a client requests the path \texttt{/responder/\emph{name}/\emph{resource}} using the \texttt{GET} method
-\item[\texttt{"post"}] A quotation with stack effect \verb|( resource -- )|, invoked when a client requests the path using the \texttt{POST} method
-\item[\texttt{"head"}] A quotation with stack effect \verb|( resource -- )|, invoked when a client requests the path using the \texttt{HEAD} method
-\end{description}
-
-The quotations are called by the HTTP server in the dynamic scope of the responder, with the following additional variables set:
-
-\begin{description}
-\item[\texttt{"method"}] The HTTP method requested by the client; one of \texttt{"get"}, \texttt{"post"} or \texttt{"head"}
-\item[\texttt{"request"}] The full URL requested by the client, sans any query parameters trailing a \verb|?| character
-\item[\texttt{"query"}] An association list of URL-decoded string pairs, obtained by splitting the query string, if any
-\item[\texttt{"raw-query"}] The raw query string. Usually not used
-\item[\texttt{"header"}] An association list of URL-decoded string pairs, obtained from the headers sent by the client
-\item[\texttt{"response"}] Only set in the \verb|POST| method, an association list of string pairs, obtained from the response sent by the client
-\end{description}
-
-\subsection{Virtual hosts}\label{vhosts}
-
-\glossary{name=virtual hosting,
-description={A technique where a server is given several host name aliases via DNS; then the server serves different web sites, depending on the particular host name alias requested by the client}}
-
-Factor's HTTP server supports virtual hosting. This is done with an additional layer of indirection, where each virtual host has its own set of responders. Virtual hosting is optional; by default, all virtual hosts share the same set of responders.
-
-\wordtable{
-\vocabulary{httpd}
-\symbolword{vhosts}
-}
-
-Virtual hosts are defined in a hashtable mapping virtual host names to hashtables of responders. An initial value for this variable is defined in the global namespace; it provides an empty default virtual host. The default virtual host is the value associated with the \verb|"default"| key.
-
-When a client makes a request, the HTTP server first searches for a responder in the requested virtual host; if no responder is found there, the default virtual host is checked. If this also fails, the global \verb|responders| variable is tested.
-
-As an example, suppose the machine running the HTTP server has two DNS aliases, \verb|porky.ham.net| and \verb|spam.ham.net|. The following setup will serve two different static web sites from each virtual host, whereas all other responders are taken from the global table, and are shared between the two hosts:
-
-\begin{verbatim}
-vhosts get [
-    "porky.ham.net" {{
-        [[ "doc-root" "/var/www/porky/" ]]
-    }} set
-    "spam.ham.net" {{
-        [[ "doc-root" "/var/www/spam/" ]]
-    }} set
-] bind
-\end{verbatim}
-
-\section{HTML streams}\label{html}
-
-An HTML stream wraps an existing stream. Strings written to the HTML stream have their special characters converted to HTML entities via the \verb|chars>entities| word documented below. In addition, the \texttt{attrs} parameter to the \texttt{stream-format} word is inspected for style attributes that direct the stream to wrap the output in various HTML tags; see \ref{styles}.
-
-\wordtable{
-\vocabulary{html}
-\ordinaryword{with-html-stream}{with-html-stream ( quot -- )}
-}
-Calls the quotation in a new dynamic scope. The \texttt{stdio} variable is set to an HTML stream wrapping the previous value of \texttt{stdio}, so calls to \texttt{write}, \texttt{format} and \texttt{print} go through the HTML stream.
-
-\wordtable{
-\vocabulary{html}
-\ordinaryword{html-document}{html-document ( title quot -- )}
-}
-Builds on \texttt{with-html-stream} to emit the basic structure of an HTML document, consisting of \texttt{<html>}, \texttt{<head>} and \texttt{<body>} tags. The title is output in two places; a \texttt{<title>} tag  and \texttt{<h1>} tag.
-
-\wordtable{
-\vocabulary{html}
-\ordinaryword{simple-html-document}{simple-html-document ( title quot -- )}
-}
-Like \texttt{html-document}, except the output is wrapped inside a \texttt{<pre>} tag.
-
-\wordtable{
-\vocabulary{html}
-\ordinaryword{chars>entities}{chars>entities ( string -- string )}
-}
-Converts various special characters in the input string (or any sequence of characters) into corresponding HTML entities. The following characters are converted:
-
-\begin{tabular}{l|l}
-Character&Entity\\
-\hline
-\verb|<|   &\verb|&lt;|\\
-\verb|>|   &\verb|&gt;|\\
-\verb|&|   &\verb|&amp;|\\
-\verb|'|   &\verb|&apos;|\\
-\verb|"|   &\verb|&quot;|
-\end{tabular}
 
 \part{The implementation}
 

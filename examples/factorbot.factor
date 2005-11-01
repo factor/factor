@@ -1,5 +1,8 @@
 ! Simple IRC bot written in Factor.
 
+! Load the HTTP server first (contrib/httpd/load.factor).
+! This file uses the url-encode and url-decode words.
+
 USING: errors generic hashtables http io kernel math namespaces
 parser prettyprint sequences strings unparser words ;
 IN: factorbot

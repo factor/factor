@@ -1,17 +1,4 @@
-! Graphical mandelbrot fractal renderer.
-!
-! To run this code, bootstrap Factor like so:
-!
-! ./f boot.image.le32
-!     -libraries:sdl:name=libSDL.so
-!     -libraries:sdl-gfx:name=libSDL_gfx.
-!
-! (But all on one line)
-!
-! Then, start Factor as usual (./f factor.image) and enter this
-! at the listener:
-!
-! "examples/mandel.factor" run-file
+! Run this file to write a Mandelbrot fractal to "mandel.ppm".
 
 IN: mandel
 USING: arrays compiler io kernel math namespaces sequences
