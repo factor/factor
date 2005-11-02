@@ -22,14 +22,12 @@ SYMBOL: unscoped-stack
     HEX: 000000ff bitand unparse % ] "" make ;
 
 
-
-
 ! doesn't compile
 ! : >nvector ( elems n -- )
     ! { } clone swap [ drop swap add ] each reverse ;
 
 : 4vector ( elems -- )
-    { } clone 4 [ drop swap add ] each reverse ;
+    V{ } clone 4 [ drop swap add ] each reverse ;
 
 ! TODO: make this work for types other than ""
 : papply ( seq seq -- seq )
@@ -38,7 +36,6 @@ SYMBOL: unscoped-stack
 : writeln ( string -- )
     write terpri ;
 
-! wrote this months and months ago..
 ! NEEDS REFACTORING, GOSH!
 ! Hexdump
 : (print-offset) ( lineno -- )
@@ -82,21 +79,15 @@ SYMBOL: unscoped-stack
     ] "" make write ;
 
 : hexdump ( str -- )
-! drop ;
     dup length (print-length) (print-bytes) ;
 
 
 
 : save-current-scope
-    unscoped-stack get [ { } clone unscoped-stack set ] unless
+    unscoped-stack get [ V{ } clone unscoped-stack set ] unless
     swap dup unscoped-stream set unscoped-stack get push ;
 
 : set-previous-scope
-    ! unscoped-stream get contents .
-    ! [
-        ! "UNREAD BYTES" writeln
-        ! hexdump
-    ! ] when
     unscoped-stack get dup length 1 > [ 
         [ pop ] keep nip peek unscoped-stream set ] [
         pop drop
@@ -167,16 +158,19 @@ SYMBOL: unscoped-stack
 : (head-u128) ( str -- u128 )
     16 swap head endian> ;
 
-
+! 8 bits
 : head-byte ( -- byte )
     1 unscoped-stream get stream-read first ;
 
+! 16 bits
 : head-short ( -- short )
     2 unscoped-stream get stream-read (head-short) ;
 
+! 32 bits
 : head-int ( -- int )
     4 unscoped-stream get stream-read (head-int) ;
 
+! 64 bits
 : head-longlong ( -- longlong )
     8 unscoped-stream get stream-read (head-longlong) ;
 

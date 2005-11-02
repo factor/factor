@@ -73,11 +73,6 @@ H{
     [[ 12 "Translate" ]] [[ 19 "SSI" ]] [[ 21 "ICQ" ]]
     [[ 34 "Unknown Family" ]] } ;
 
-: ch>lower ( int -- int ) dup LETTER? [ HEX: 20 + ] when ;
-: ch>upper ( int -- int ) dup letter? [ HEX: 20 - ] when ;
-: >lower ( seq -- seq ) [ ch>lower ] map ;
-: >upper ( seq -- seq ) [ ch>upper ] map ;
-
 : sanitize-name ( name -- name ) HEX: 20 swap remove >lower ;
 
 : hash-swap ( hash -- hash )
@@ -182,12 +177,14 @@ H{
     conn get swap with-unscoped-stream ;
 
 : read-aim ( -- bc )
-    [ [
-        head-byte drop
-        head-byte drop
-        head-short drop
-        head-short head-string
-    ] with-aim ] catch [ "Socket error" print throw ] when
+    [
+        [
+            head-byte drop
+            head-byte drop
+            head-short drop
+            head-short head-string
+        ] with-aim
+    ] catch [ "Socket error" print throw ] when
     "Received: " write dup hexdump ;
 
 : make-snac ( fam subtype flags req-id -- )
@@ -729,11 +726,11 @@ SYMBOL: type
 
         type get
         {
-            { [ dup 0 = ] [ drop name get bid get gid get { } clone f f <buddy> 
+            { [ dup 0 = ] [ drop name get bid get gid get V{ } clone f f <buddy> 
             dup name get sanitize-name buddy-hash-name get set-hash bid get buddy-hash-id get set-hash ] }
             { [ dup 1 = ] [ drop name get dup length 0 = [ drop ] [ gid get <group> 
             dup name get sanitize-name group-hash-name get set-hash gid get group-hash-id get set-hash ] if ] }
-            { [ dup 3 = ] [ drop name get bid get gid get { } clone f f <buddy>
+            { [ dup 3 = ] [ drop name get bid get gid get V{ } clone f f <buddy>
             dup name get sanitize-name banned-hash-name get set-hash bid get banned-hash-id get set-hash ] }
             { [ t ] [ drop "Unknown 19-6 type" print ] }
         } cond
