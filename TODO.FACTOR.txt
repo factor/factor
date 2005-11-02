@@ -2,6 +2,8 @@
 
 - update handbook
 - fix remaining GL issues
+- 3/2 { 1 2 3 } nth -> fep
+- 1.0 1+ -> 1.0   1.0 1- -> 1.0
 
 + ui:
 
@@ -22,6 +24,11 @@
 - multiline editing in listener
 - text selection
 - clipboard support
+- bug: slider bars go to 0 pixel width/height
+- bug: left click to bring up context menu, click splitter bar
+  and pane grows to 100%
+- bug: click tutorial, full screen, the right-most arrow icon
+  loses the vertical bar
 
 + tutorial:
 
