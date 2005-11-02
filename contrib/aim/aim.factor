@@ -60,8 +60,6 @@ TUPLE: buddy name id gid capabilities buddy-icon online ;
 : client-ssi-flag 1 ; inline
 : client-charset "text/aolrtf; charset=\"us-ascii\"" ; inline
 : file-transfer-url "http://dynamic.aol.com/cgi/redir?http://www.aol.com/aim/filetransfer/antivirus.html" ; inline
-! : akadns-aol.com "http://www.aol.com.websys.akadns.net" ;
-! 205.188.210.203
 : aim-file-server-port 5190 ; inline
 
 ! Family names from ethereal
@@ -99,9 +97,7 @@ H{
     [[ "Add-Ins" HEX: 094613474c7f11d18222444553540000 ]]
 } ;
 
-
-: capability-values
-    capability-names hash-swap ;
+: capability-values capability-names hash-swap ;
 
 : capability-abbrevs
 H{
@@ -114,7 +110,6 @@ H{
     [[ CHAR: K "Send Buddy List" ]]
 } ;
 
-! AIM errors
 : aim-errors
 H{
     [[ 1 "Invalid SNAC header." ]]
@@ -261,8 +256,7 @@ M: object get-banned ( name -- <buddy> )
     ! [ buddylist get hash-keys string-sort [ , ] each ] { } make [ drop ] simple-outliner ;
     ;
 
-: family-table ( -- hash )
-    H{ } ;
+: family-table ( -- hash ) H{ } ;
 
 : FAMILY: ( -- fam# )
     scan hex> swons dup car family-table hash dup [
@@ -357,6 +351,48 @@ M: object get-banned ( name -- <buddy> )
         writeln handle-capabilities
     ] unless ;
 
+
+
+SYMBOL: saved-cond
+: (process-tlv) ( -- )
+    head-short dup warning set
+    head-short head-string <string-reader> [
+        saved-cond get cond
+    ] with-unscoped-stream ;
+
+: process-tlv ( cond -- )
+    saved-cond set
+    unscoped-stream get empty? [
+            drop
+        ] [
+            head-short drop
+            head-short [ (process-tlv) ] repeat
+    ] if ;
+
+: process-tlv-loop ( cond -- )
+    saved-cond set
+    unscoped-stream get empty? [
+        (process-tlv)
+        saved-cond get process-tlv-loop
+    ] unless ;
+
+
+! for inside a loop
+: (process-tlv-loop2) ( cond -- )
+    head-byte
+    head-byte drop
+    head-short head-string <string-reader> [
+        saved-cond get cond
+    ] with-unscoped-stream ;
+
+! useful inside a tlv handler
+: process-tlv-loop2 ( cond -- )
+    saved-cond set
+    unscoped-stream get empty? [
+        (process-tlv-loop2)
+        saved-cond get process-tlv-loop2
+    ] unless ;
+
 : (handle-online-info)
     unscoped-stream get empty? [
         head-byte head-string name set
@@ -378,7 +414,7 @@ M: object get-banned ( name -- <buddy> )
                     { [ dup 30 = ] [ drop head-int "Unknown30: " write unparse writeln ] }
                     { [ dup 34 = ] [ drop head-short "Unknown32: " write unparse writeln ] }
                     { [ t ] [ "  Unhandled tlv 1h-fh: " write unparse writeln head-contents hexdump ] }
-            } cond
+                } cond
             ] with-unscoped-stream
         ] repeat (handle-online-info)
     ] unless ;
@@ -395,8 +431,7 @@ M: object get-banned ( name -- <buddy> )
 
 ! capabilities ack
 : handle-1-18
-    "Unhandled ack: " write head-contents writeln
-	; FAMILY: 1 OPCODE: 18
+    "Unhandled ack: " write head-contents writeln ; FAMILY: 1 OPCODE: 18
 
 : handle-1-21
     ! AIM Email
@@ -423,18 +458,6 @@ M: object get-banned ( name -- <buddy> )
 	; FAMILY: 2 OPCODE: 1
 
 
-! : handle-2-3
-	! ; FAMILY: 2 OPCODE: 3
-
-! : handle-away-message
-    ! head-byte head-string name set
-    ! name get write "'s away message: " write
-    ! ; FAMILY: 2 OPCODE: 6
-
-! : handle-3-3
-	! ; FAMILY: 3 OPCODE: 3
-
-
 : handle-29
     unscoped-stream get empty? [
         "(29)" print
@@ -452,45 +475,31 @@ M: object get-banned ( name -- <buddy> )
 
 : handle-buddy-status
     head-byte head-string name set
-    head-short drop
-    head-short
-    [
-        head-short
-        head-short head-string <string-reader> [
-            {
-                { [ dup 1 = ] [ drop name get write head-short HEX: 20 bitand 1 > [ " is away." ] [ " is online." ] if writeln ] }
-                { [ dup 2 = ] [ drop "Member since: " write head-short unparse writeln ] }
-                { [ dup 3 = ] [ drop name get write " went online at " write head-int unparse writeln name get buddy-signon ] }
-                { [ dup 4 = ] [ drop name get write " has been idle for " write head-short unparse write " minutes." writeln ] }
-                { [ dup 6 = ] [ drop name get write ": (6): " write head-short unparse write " " write head-short unparse writeln ] }
-                { [ dup 13 = ] [ drop "Capabilities3:" print handle-capabilities  ] }
-                { [ dup 14 = ] [ drop "Capabilities4:" print handle-capabilities  ] }
-                { [ dup 15 = ] [ drop name get write " has been online for " write head-int unparse write " seconds." writeln ] }
-                { [ dup 25 = ] [ drop "Abbreviated capabilities: " write handle-abbrev-capabilities ] }
-                { [ dup 27 = ] [ drop "(27): " write 4 [ head-int unparse write " " write ] repeat terpri ] }
-                { [ dup 29 = ] [ drop handle-29 ] }
-                { [ t ] [ "  Unhandled tlv 3h-bh: " write unparse writeln head-contents hexdump ] }
-            } cond
-        ] with-unscoped-stream
-    ] repeat ; FAMILY: 3 OPCODE: b
+    {
+        { [ dup 1 = ] [ drop name get write head-short HEX: 20 bitand 1 > [ " is away." ] [ " is online." ] if writeln ] }
+        { [ dup 2 = ] [ drop "Member since: " write head-short unparse writeln ] }
+        { [ dup 3 = ] [ drop name get write " went online at " write head-int unparse writeln name get buddy-signon ] }
+        { [ dup 4 = ] [ drop name get write " has been idle for " write head-short unparse write " minutes." writeln ] }
+        { [ dup 6 = ] [ drop name get write ": (6): " write head-short unparse write " " write head-short unparse writeln ] }
+        { [ dup 13 = ] [ drop "Capabilities3:" print handle-capabilities  ] }
+        { [ dup 14 = ] [ drop "Capabilities4:" print handle-capabilities  ] }
+        { [ dup 15 = ] [ drop name get write " has been online for " write head-int unparse write " seconds." writeln ] }
+        { [ dup 25 = ] [ drop "Abbreviated capabilities: " write handle-abbrev-capabilities ] }
+        { [ dup 27 = ] [ drop "(27): " write 4 [ head-int unparse write " " write ] repeat terpri ] }
+        { [ dup 29 = ] [ drop handle-29 ] }
+        { [ t ] [ "  Unhandled tlv 3h-bh: " write unparse writeln head-contents hexdump ] }
+    } process-tlv ; FAMILY: 3 OPCODE: b
 
 ! : handle-4-5
 	! ; FAMILY: 4 OPCODE: 5
 
 : handle-buddy-signoff ( -- )
     head-byte head-string name set
-    head-short drop
-    head-short
-    [
-        head-short
-        head-short head-string <string-reader> [
-            {
-                { [ dup 1 = ] [ drop name get write " signed off." writeln name get buddy-signoff ] }
-                { [ dup HEX: 1d = ] [ drop ] }
-                { [ t ] [ "Unhandled tlv 3h-ch: " write unparse writeln head-contents hexdump ] }
-            } cond
-        ] with-unscoped-stream
-    ] repeat ; FAMILY: 3 OPCODE: c
+    {
+        { [ dup 1 = ] [ drop name get write " signed off." writeln name get buddy-signoff ] }
+        { [ dup HEX: 1d = ] [ drop ] }
+        { [ t ] [ "Unhandled tlv 3h-ch: " write unparse writeln head-contents hexdump ] }
+    } process-tlv ; FAMILY: 3 OPCODE: c
 
 : parse-family-4h-header
     extra-data get <string-reader> [
@@ -499,29 +508,12 @@ M: object get-banned ( name -- <buddy> )
         head-short drop
     ] with-unscoped-stream ;
     
-: parse-message-text ( -- str )
-    head-short drop head-short drop head-contents ;
 
-: parse-message-tlv2
-    unscoped-stream get empty? [
-        head-byte
-        head-byte drop ! fragVer
-        head-short head-string <string-reader>
-        [ 
-            {
-                { [ dup 1 = ] [ drop parse-message-text message set ] }
-                { [ dup 5 = ] [ drop ] }
-                { [ t ] [ "Unknown frag: " write unparse writeln unscoped-stream get contents hexdump ] }
-            } cond
-        ] with-unscoped-stream
-        parse-message-tlv2
-    ] unless ;
 
 : handle-file-transfer-start-tlvs
     unscoped-stream get empty? [
         head-short
         head-short head-string <string-reader> [
-            file-transfer-cancelled off
             dup unparse write ": " write
             {
                 { [ dup 2 = ] [ drop head-int int>ip dup my-ip set "my ip: " write write ] }
@@ -529,7 +521,7 @@ M: object get-banned ( name -- <buddy> )
                 { [ dup 4 = ] [ drop head-int unparse write ] }
                 { [ dup 5 = ] [ drop head-short unparse write ] }
                 { [ dup 10 = ] [ drop head-short unparse write ] }
-                { [ dup 11 = ] [ drop head-short unparse . "Transfer canclled" print file-transfer-cancelled on ] }
+                { [ dup 11 = ] [ drop head-short unparse . "Transfer cancelled" print file-transfer-cancelled on ] }
                 { [ dup 12 = ] [ drop head-contents message set "Message: " write message get writeln ] }
                 { [ dup 13 = ] [ drop head-contents encoding set ] }
                 { [ dup 14 = ] [ drop head-short unparse write ] }
@@ -623,7 +615,8 @@ M: object get-banned ( name -- <buddy> )
     head-u128 capability-values hash 
     {
         { [ dup "Send File" = ]
-            [ . handle-file-transfer-start-tlvs 
+            [ . file-transfer-cancelled off
+                handle-file-transfer-start-tlvs 
                 file-transfer-cancelled get [ send-file-transfer-start ] unless
             ] }
         { [ dup "Chat" = ] [ . handle-chat-start-tlvs 
@@ -634,45 +627,33 @@ M: object get-banned ( name -- <buddy> )
         { [ t ] [ "Unsupported capability in channel 2: " write writeln head-contents hexdump ] }
     } cond ;
 
-: parse-message-chunks
-    unscoped-stream get empty? [
-        head-short
-        head-short head-string <string-reader> [
-            {
-                { [ dup 2 = ] [ drop parse-message-tlv2 ] }
-                { [ dup 5 = ] [ drop handle-file-transfer-start ] }
-                { [ dup 11 = ] [ drop ] }
-                ! { [ dup 13 = ] [ drop ] }
-                { [ t ] [ "Unhandled chunk: " write unparse writeln head-contents hexdump ] }
-            } cond
-        ] with-unscoped-stream
-        parse-message-chunks
-    ] unless ;
-
-: parse-message-tlv ( n -- )
-    [
-        head-short
-        head-short head-string <string-reader>
-        [
-            {
-                { [ dup 1 = ] [ drop head-short drop ] }
-                { [ dup 2 = ] [ drop 15 head-string drop ] }
-                { [ dup 3 = ] [ drop ] }
-                { [ dup 15 = ] [ drop ] }
-                { [ dup 29 = ] [ drop ] }
-                { [ t ] [ "Unknown tlv: " write unparse writeln head-contents hexdump ] }
-            } cond
-        ] with-unscoped-stream
-    ] repeat ;
+: parse-message-text ( -- str )
+    head-short drop head-short drop head-contents ;
 
 : handle-incoming-message ( -- )
     parse-family-4h-header
     head-longlong drop
     head-short channel set 
     head-byte head-string name set
-    head-short warning set
-    head-short parse-message-tlv
-    parse-message-chunks
+    {
+        { [ dup 1 = ] [ drop head-short drop ] }
+        { [ dup 2 = ] [ drop 15 head-string drop ] }
+        { [ dup 3 = ] [ drop ] }
+        { [ dup 15 = ] [ drop ] }
+        { [ dup 29 = ] [ drop ] }
+        { [ t ] [ "Unknown tlv: " write unparse writeln head-contents hexdump ] }
+    } process-tlv
+    {
+        { [ dup 2 = ] [ drop 
+                            {
+                                { [ dup 1 = ] [ drop parse-message-text message set ] }
+                                { [ dup 5 = ] [ drop ] }
+                                { [ t ] [ "Unknown frag: " write unparse writeln unscoped-stream get contents hexdump ] }
+                            } process-tlv-loop2 ] }
+        { [ dup 5 = ] [ drop handle-file-transfer-start ] }
+        { [ dup 11 = ] [ drop ] }
+        { [ t ] [ "Unhandled chunk: " write unparse writeln head-contents hexdump ] }
+    } process-tlv-loop
 
     channel get 1 = [
         "Incoming msg from " write name get write ": " write
@@ -787,21 +768,16 @@ SYMBOL: type
 : parse-server ( ip:port -- )
     ":" split [ first ] keep second string>number aim-chat-port set aim-chat-ip set ;
 
-: process-login-chunks ( stream -- )
+: handle-login-packet ( -- )
     unscoped-stream get empty?  [
-        head-short
-        head-short
-        swap
+        head-short head-short swap
         {
             { [ dup 5 = ] [ drop head-string parse-server ] }
             { [ dup 6 = ] [ drop head-string auth-code set ] }
             { [ t ] [ drop head-string drop ] }
         } cond
-        process-login-chunks
-    ] unless ;
-
-: handle-login-packet ( -- )
-    process-login-chunks ; FAMILY: 17 OPCODE: 3
+        handle-login-packet
+    ] unless ; FAMILY: 17 OPCODE: 3
 
 : password-md5 ( password -- md5 )
     login-key get
