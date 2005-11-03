@@ -20,8 +20,8 @@ SYMBOL: white-pixel
 ! arguments.
 
 : create-window ( -- win )
-dpy get root get 0 0 100 100 10 black-pixel get white-pixel get
-XCreateSimpleWindow ;
+  dpy get root get 0 0 100 100 10 black-pixel get white-pixel get
+  XCreateSimpleWindow ;
 
 : destroy-window ( -- ) dpy get win get XDestroyWindow drop ;
 
@@ -34,7 +34,7 @@ XCreateSimpleWindow ;
 : move-window ( { x y } -- ) >r dpy get win get r> [ ] each XMoveWindow drop ;
 
 : resize-window ( { width height } -- )
->r dpy get win get r> [ ] each XResizeWindow drop ;
+  >r dpy get win get r> [ ] each XResizeWindow drop ;
 
 ! 3.8 Changing Window Stacking Order
 
@@ -48,15 +48,15 @@ XCreateSimpleWindow ;
 : clear-window ( -- ) dpy get win get XClearWindow drop ;
 
 : draw-point ( { x y } -- )
->r dpy get win get gcontext get r> [ ] each XDrawPoint drop ;
+  >r dpy get win get gcontext get r> [ ] each XDrawPoint drop ;
 
 : draw-line ( { x1 y1 } { x2 y2 } -- )
->r >r dpy get win get gcontext get r> [ ] each r> [ ] each XDrawLine drop ;
+  >r >r dpy get win get gcontext get r> [ ] each r> [ ] each XDrawLine drop ;
 
 ! 8.6 - Drawing Text
 
 : draw-string ( { x y } string -- )
->r >r dpy get win get gcontext get r> [ ] each r> dup length XDrawString drop ;
+  >r >r dpy get win get gcontext get r> [ ] each r> dup length XDrawString drop ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 ! 9 - Window and Session Manager Functions
