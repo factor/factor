@@ -376,9 +376,9 @@ FUNCTION: Status XGrabServer ( Display* display ) ;
 FUNCTION: Status XUngrabServer ( Display* display ) ;
 FUNCTION: Status XKillClient ( Display* display, XID resource ) ;
 
-!
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 ! 10 - Events
-!
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 ! 10.3 - Event Masks
 
@@ -454,6 +454,8 @@ BEGIN-STRUCT: XAnyEvent
 	FIELD: Window window
 END-STRUCT
 
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
 BEGIN-STRUCT: XButtonEvent
 	FIELD: int type
 	FIELD: ulong serial
@@ -474,6 +476,430 @@ END-STRUCT
 
 TYPEDEF: XButtonEvent XButtonPressedEvent
 TYPEDEF: XButtonEvent XButtonReleasedEvent
+
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+BEGIN-STRUCT: XKeyEvent
+	FIELD: int type
+	FIELD: ulong serial
+	FIELD: Bool send_event
+	FIELD: Display* display
+	FIELD: Window window
+	FIELD: Window root
+	FIELD: Window subwindow
+	FIELD: Time time
+	FIELD: int x
+	FIELD: int y
+	FIELD: int x_root
+	FIELD: int y_root
+	FIELD: uint state
+	FIELD: uint keycode
+	FIELD: Bool same_screen
+END-STRUCT
+
+TYPEDEF: XKeyEvent XKeyPressedEvent
+TYPEDEF: XKeyEvent XKeyReleasedEvent
+
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+BEGIN-STRUCT: XMotionEvent
+	FIELD: int type
+	FIELD: ulong serial
+	FIELD: Bool send_event
+	FIELD: Display* display
+	FIELD: Window window
+	FIELD: Window root
+	FIELD: Window subwindow
+	FIELD: Time time
+	FIELD: int x
+	FIELD: int y
+	FIELD: int x_root
+	FIELD: int y_root
+	FIELD: uint state
+	FIELD: char is_hint
+	FIELD: Bool same_screen
+END-STRUCT
+
+TYPEDEF: XMotionEvent XPointerMovedEvent
+
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+BEGIN-STRUCT: XCrossingEvent
+	FIELD: int type
+	FIELD: ulong serial
+	FIELD: Bool send_event
+	FIELD: Display* display
+	FIELD: Window window
+	FIELD: Window root
+	FIELD: Window subwindow
+	FIELD: Time time
+	FIELD: int x
+	FIELD: int y
+	FIELD: int x_root
+	FIELD: int y_root
+	FIELD: int mode
+	FIELD: int detail
+	FIELD: Bool same_screen
+	FIELD: Bool focus
+	FIELD: uint state
+END-STRUCT
+
+TYPEDEF: XCrossingEvent XEnterWindowEvent
+TYPEDEF: XCrossingEvent XLeaveWindowEvent
+
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+BEGIN-STRUCT: XFocusChangeEvent
+	FIELD: int type
+	FIELD: ulong serial
+	FIELD: Bool send_event
+	FIELD: Display* display
+	FIELD: Window window
+	FIELD: int mode
+	FIELD: int detail
+END-STRUCT
+
+TYPEDEF: XFocusChangeEvent XFocusInEvent
+TYPEDEF: XFocusChangeEvent XFocusOutEvent
+
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+BEGIN-STRUCT: XExposeEvent
+	FIELD: int type
+	FIELD: ulong serial
+	FIELD: Bool send_event
+	FIELD: Display* display
+	FIELD: Window window
+	FIELD: int x
+	FIELD: int y
+	FIELD: int width
+	FIELD: int height
+	FIELD: int count
+END-STRUCT
+
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+BEGIN-STRUCT: XGraphicsExposeEvent
+	FIELD: int type
+	FIELD: ulong serial
+	FIELD: Bool send_event
+	FIELD: Display* display
+	FIELD: Drawable drawable
+	FIELD: int x
+	FIELD: int y
+	FIELD: int width
+	FIELD: int height
+	FIELD: int count
+	FIELD: int major_code
+	FIELD: int minor_code
+END-STRUCT
+
+BEGIN-STRUCT: XNoExposeEvent
+	FIELD: int type
+	FIELD: ulong serial
+	FIELD: Bool send_event
+	FIELD: Display* display
+	FIELD: Drawable drawable
+	FIELD: int major_code
+	FIELD: int minor_code
+END-STRUCT
+
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+BEGIN-STRUCT: XVisibilityEvent
+	FIELD: int type
+	FIELD: ulong serial
+	FIELD: Bool send_event
+	FIELD: Display* display
+	FIELD: Window window
+	FIELD: int state
+END-STRUCT
+
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+BEGIN-STRUCT: XCreateWindowEvent
+	FIELD: int type
+	FIELD: ulong serial
+	FIELD: Bool send_event
+	FIELD: Display* display
+	FIELD: Window parent
+	FIELD: Window window
+	FIELD: int x
+	FIELD: int y
+	FIELD: int width
+	FIELD: int height
+	FIELD: int border_width
+	FIELD: Bool override_redirect
+END-STRUCT
+
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+BEGIN-STRUCT: XDestroyWindowEvent
+	FIELD: int type
+	FIELD: ulong serial
+	FIELD: Bool send_event
+	FIELD: Display* display
+	FIELD: Window event
+	FIELD: Window window
+END-STRUCT
+
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+BEGIN-STRUCT: XUnmapEvent
+	FIELD: int type
+	FIELD: ulong serial
+	FIELD: Bool send_event
+	FIELD: Display* display
+	FIELD: Window event
+	FIELD: Window window
+	FIELD: Bool from_configure
+END-STRUCT
+
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+BEGIN-STRUCT: XMapEvent
+	FIELD: int type
+	FIELD: ulong serial
+	FIELD: Bool send_event
+	FIELD: Display* display
+	FIELD: Window event
+	FIELD: Window window
+	FIELD: Bool override_redirect
+END-STRUCT
+
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+BEGIN-STRUCT: XMapRequestEvent
+	FIELD: int type
+	FIELD: ulong serial
+	FIELD: Bool send_event
+	FIELD: Display* display
+	FIELD: Window parent
+	FIELD: Window window
+END-STRUCT
+
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+BEGIN-STRUCT: XReparentEvent
+	FIELD: int type
+	FIELD: ulong serial
+	FIELD: Bool send_event
+	FIELD: Display* display
+	FIELD: Window event
+	FIELD: Window window
+	FIELD: Window parent
+	FIELD: int x
+	FIELD: int y
+	FIELD: Bool override_redirect
+END-STRUCT
+
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+BEGIN-STRUCT: XConfigureEvent
+	FIELD: int type
+	FIELD: ulong serial
+	FIELD: Bool send_event
+	FIELD: Display* display
+	FIELD: Window event
+	FIELD: Window window
+	FIELD: int x
+	FIELD: int y
+	FIELD: int width
+	FIELD: int height
+	FIELD: int border_width
+	FIELD: Window above
+	FIELD: Bool override_redirect
+END-STRUCT
+
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+BEGIN-STRUCT: XGravityEvent
+	FIELD: int type
+	FIELD: ulong serial
+	FIELD: Bool send_event
+	FIELD: Display* display
+	FIELD: Window event
+	FIELD: Window window
+	FIELD: int x
+	FIELD: int y
+END-STRUCT
+
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+BEGIN-STRUCT: XResizeRequestEvent
+	FIELD: int type
+	FIELD: ulong serial
+	FIELD: Bool send_event
+	FIELD: Display* display
+	FIELD: Window window
+	FIELD: int width
+	FIELD: int height
+END-STRUCT
+
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+BEGIN-STRUCT: XConfigureRequestEvent
+	FIELD: int type
+	FIELD: ulong serial
+	FIELD: Bool send_event
+	FIELD: Display* display
+	FIELD: Window parent
+	FIELD: Window window
+	FIELD: int x
+	FIELD: int y
+	FIELD: int width
+	FIELD: int height
+	FIELD: int border_width
+	FIELD: Window above
+	FIELD: int detail
+	FIELD: ulong value_mask
+END-STRUCT
+
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+BEGIN-STRUCT: XCirculateEvent
+	FIELD: int type
+	FIELD: ulong serial
+	FIELD: Bool send_event
+	FIELD: Display* display
+	FIELD: Window event
+	FIELD: Window window
+	FIELD: int place
+END-STRUCT
+
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+BEGIN-STRUCT: XCirculateRequestEvent
+	FIELD: int type
+	FIELD: ulong serial
+	FIELD: Bool send_event
+	FIELD: Display* display
+	FIELD: Window parent
+	FIELD: Window window
+	FIELD: int place
+END-STRUCT
+
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+BEGIN-STRUCT: XPropertyEvent
+	FIELD: int type
+	FIELD: ulong serial
+	FIELD: Bool send_event
+	FIELD: Display* display
+	FIELD: Window window
+	FIELD: Atom atom
+	FIELD: Time time
+	FIELD: int state
+END-STRUCT
+
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+BEGIN-STRUCT: XSelectionClearEvent
+	FIELD: int type
+	FIELD: ulong serial
+	FIELD: Bool send_event
+	FIELD: Display* display
+	FIELD: Window window
+	FIELD: Atom selection
+	FIELD: Time time
+END-STRUCT
+
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+BEGIN-STRUCT: XSelectionRequestEvent
+	FIELD: int type
+	FIELD: ulong serial
+	FIELD: Bool send_event
+	FIELD: Display* display
+	FIELD: Window owner
+	FIELD: Window requestor
+	FIELD: Atom selection
+	FIELD: Atom target
+	FIELD: Atom property
+	FIELD: Time time
+END-STRUCT
+
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+BEGIN-STRUCT: XSelectionEvent
+	FIELD: int type
+	FIELD: ulong serial
+	FIELD: Bool send_event
+	FIELD: Display* display
+	FIELD: Window requestor
+	FIELD: Atom selection
+	FIELD: Atom target
+	FIELD: Atom property
+	FIELD: Time time
+END-STRUCT
+
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+BEGIN-STRUCT: XColormapEvent
+	FIELD: int type
+	FIELD: ulong serial
+	FIELD: Bool send_event
+	FIELD: Display* display
+	FIELD: Window window
+	FIELD: Colormap colormap
+	FIELD: Bool new
+	FIELD: int state
+END-STRUCT
+
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+BEGIN-STRUCT: XClientMessageEvent
+	FIELD: int type
+	FIELD: ulong serial
+	FIELD: Bool send_event
+	FIELD: Display* display
+	FIELD: Window window
+	FIELD: Atom message_type
+	FIELD: int format
+!       union {
+! 		char  b[20];
+! 		short s[10];
+! 		long  l[5];
+! 	} data;
+END-STRUCT
+
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+BEGIN-STRUCT: XMappingEvent
+	FIELD: int type
+	FIELD: ulong serial
+	FIELD: Bool send_event
+	FIELD: Display* display
+	FIELD: Window window
+	FIELD: int request
+	FIELD: int first_keycode
+	FIELD: int count
+END-STRUCT
+
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+BEGIN-STRUCT: XErrorEvent
+	FIELD: int type
+	FIELD: Display* display
+	FIELD: ulong serial
+	FIELD: uchar error_code
+	FIELD: uchar request_code
+	FIELD: uchar minor_code
+	FIELD: XID resourceid
+END-STRUCT
+
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+BEGIN-STRUCT: XKeymapEvent
+	FIELD: int type
+	FIELD: ulong serial
+	FIELD: Bool send_event
+	FIELD: Display* display
+	FIELD: Window window
+	! char key_vector[32];
+END-STRUCT
+
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 ! BEGIN-UNION: XEvent
 !            int type;
