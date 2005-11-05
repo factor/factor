@@ -203,3 +203,5 @@ unit-test
     4 "cache-test" get [ "wrong" ] cache-nth
     "cache-test" get
 ] unit-test
+
+[ 1 ] [ 1/2 { 1 2 3 } nth ] unit-test

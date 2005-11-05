@@ -1,11 +1,7 @@
-0.79:
++ ui:
 
 - fix remaining GL issues
 - UI issue: try resizing slider while menu is open
-- 3/2 { 1 2 3 } nth -> fep
-
-+ ui:
-
 - make-pane: if no input, just return pane-output
 - keyboard completion
 - get outliner working with lots of lines of output
@@ -60,6 +56,8 @@
 
 + compiler:
 
+- inference: try changing nth and set-nth array methods to call -unsafe,
+  unbalanced branches error
 - compile interruption checks
 - check that set-datastack and set-callstack compile correctly in the
   face of optimization

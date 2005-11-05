@@ -18,8 +18,8 @@ IN: arrays
 
 M: array clone (clone) ;
 M: array length array-capacity ;
-M: array nth bounds-check array-nth ;
-M: array set-nth bounds-check set-array-nth ;
+M: array nth bounds-check >r >fixnum r> array-nth ;
+M: array set-nth bounds-check >r >fixnum r> set-array-nth ;
 M: array nth-unsafe >r >fixnum r> array-nth ;
 M: array set-nth-unsafe >r >fixnum r> set-array-nth ;
 M: array resize resize-array ;
