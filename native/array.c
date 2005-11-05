@@ -2,7 +2,7 @@
 
 /* the array is full of undefined data, and must be correctly filled before the
 next GC. */
-F_ARRAY* allot_array(CELL type, CELL capacity)
+F_ARRAY* allot_array(CELL type, F_FIXNUM capacity)
 {
 	F_ARRAY *array;
 
@@ -20,7 +20,7 @@ either be F or a fixnum.
 if you want to use pass a pointer, you _must_ hit
 the write barrier manually with a write_barrier()
 call with the returned object. */
-F_ARRAY* array(CELL type, CELL capacity, CELL fill)
+F_ARRAY* array(CELL type, F_FIXNUM capacity, CELL fill)
 {
 	int i; F_ARRAY* array = allot_array(type, capacity);
 	for(i = 0; i < capacity; i++)
@@ -30,27 +30,27 @@ F_ARRAY* array(CELL type, CELL capacity, CELL fill)
 
 void primitive_array(void)
 {
-	CELL size = to_fixnum(dpop());
+	F_FIXNUM size = to_fixnum(dpop());
 	maybe_gc(array_size(size));
 	dpush(tag_object(array(ARRAY_TYPE,size,F)));
 }
 
 void primitive_tuple(void)
 {
-	CELL size = to_fixnum(dpop());
+	F_FIXNUM size = to_fixnum(dpop());
 	maybe_gc(array_size(size));
 	dpush(tag_object(array(TUPLE_TYPE,size,F)));
 }
 
 void primitive_byte_array(void)
 {
-	CELL size = to_fixnum(dpop());
+	F_FIXNUM size = to_fixnum(dpop());
 	maybe_gc(array_size(size));
 	dpush(tag_object(array(BYTE_ARRAY_TYPE,size,0)));
 }
 
 /* see note about fill in array() */
-F_ARRAY* resize_array(F_ARRAY* array, CELL capacity, CELL fill)
+F_ARRAY* resize_array(F_ARRAY* array, F_FIXNUM capacity, CELL fill)
 {
 	int i;
 	F_ARRAY* new_array;
@@ -72,7 +72,7 @@ F_ARRAY* resize_array(F_ARRAY* array, CELL capacity, CELL fill)
 void primitive_resize_array(void)
 {
 	F_ARRAY* array;
-	CELL capacity = to_fixnum(dpeek2());
+	F_FIXNUM capacity = to_fixnum(dpeek2());
 	maybe_gc(array_size(capacity));
 	array = untag_array(dpop());
 	drepl(tag_object(resize_array(array,capacity,F)));

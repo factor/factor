@@ -14,4 +14,4 @@ parser threads words ;
     init-error-handler
     default-cli-args
     parse-command-line
-    "null-stdio" get [ T{ null-stream f } stdio set ] when ;
+    "null-stdio" get [ T{ null-stream } stdio set ] when ;

@@ -25,14 +25,14 @@ INLINE CELL array_size(CELL size)
 	return align8(sizeof(F_ARRAY) + size * CELLS);
 }
 
-F_ARRAY* allot_array(CELL type, CELL capacity);
-F_ARRAY* array(CELL type, CELL capacity, CELL fill);
+F_ARRAY* allot_array(CELL type, F_FIXNUM capacity);
+F_ARRAY* array(CELL type, F_FIXNUM capacity, CELL fill);
 
 void primitive_array(void);
 void primitive_tuple(void);
 void primitive_byte_array(void);
 
-F_ARRAY* resize_array(F_ARRAY* array, CELL capacity, CELL fill);
+F_ARRAY* resize_array(F_ARRAY* array, F_FIXNUM capacity, CELL fill);
 void primitive_resize_array(void);
 void primitive_array_to_tuple(void);
 void primitive_tuple_to_array(void);
