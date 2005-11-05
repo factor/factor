@@ -1,10 +1,8 @@
 ! Copyright (C) 2004, 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: assembler
-USING: alien compiler-backend math memory kernel hashtables
-namespaces ;
-
-SYMBOL: interned-literals
+USING: alien compiler-backend generic hashtables kernel lists
+math memory namespaces ;
 
 : compiled-header HEX: 01c3babe ; inline
 
@@ -25,9 +23,6 @@ SYMBOL: interned-literals
     literal-top set-compiled-cell
     literal-top dup cell + set-literal-top ;
 
-: intern-literal ( obj -- lit# )
-    interned-literals get [ add-literal ] cache ;
-
 : compile-byte ( n -- )
     compiled-offset set-compiled-byte
     compiled-offset 1+ set-compiled-offset ; inline
@@ -40,8 +35,5 @@ SYMBOL: interned-literals
     compiled-header compile-cell
     compiled-offset 0 compile-cell
     compiled-offset 0 compile-cell ;
-
-: init-assembler ( -- )
-    H{ } clone interned-literals global set-hash ;
 
 : w>h/h dup -16 shift HEX: ffff bitand >r HEX: ffff bitand r> ;

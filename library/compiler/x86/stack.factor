@@ -27,7 +27,7 @@ M: %immediate generate-node ( vop -- )
     dup 0 vop-out v>operand swap 0 vop-in address MOV ;
 
 : load-indirect ( dest literal -- )
-    intern-literal unit MOV 0 0 rel-address ;
+    add-literal unit MOV 0 0 rel-address ;
 
 M: %indirect generate-node ( vop -- )
     #! indirect load of a literal through a table

@@ -19,7 +19,7 @@ SYMBOL: relocation-table
     0 rel-type, relocating word-primitive rel, ;
 
 : rel-dlsym ( name dll rel/abs 16/16 -- )
-    1 rel-type, relocating cons intern-literal rel, ;
+    1 rel-type, relocating cons add-literal rel, ;
 
 : rel-address ( rel/abs 16/16 -- )
     #! Relocate address just compiled.

@@ -1,9 +1,8 @@
 0.79:
 
-- update handbook
 - fix remaining GL issues
+- UI issue: try resizing slider while menu is open
 - 3/2 { 1 2 3 } nth -> fep
-- 1.0 1+ -> 1.0   1.0 1- -> 1.0
 
 + ui:
 

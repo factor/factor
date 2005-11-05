@@ -8,7 +8,21 @@
 
 <ul>
 
-<li>The <code>ifte</code> combinator has been renamed to <code>if</code>!</li>
+<li>Incompatible changes:
+
+<ul>
+<li>The <code>ifte</code> combinator has been renamed to <code>if</code>.</li>
+<li>Syntax changes:
+<pre>
+{ 1 2 3 }                ! arrays
+V{ 1 2 3 }               ! vectors
+H{ [[ key value ]] ... } ! hashtables
+C{ 1.02 -7.44 }          ! complex numbers
+T{ class slots ... }     ! tuple
+</pre>
+
+</li>
+</ul>
 
 <li>Compiler:
 
@@ -29,7 +43,9 @@
 <li>Added expandable outliners. Used by the inspector, <code>.s</code>, <code>usage.</code>, <code>uses.</code>, <code>vocabs.</code>, and various other words.</li>
 <li>Added word completion to the listener pane; press <code>TAB</code>.</li>
 <li>Added word navigation shortcuts to the listener pane; press <code>C+LEFT</code> and <code>C+RIGHT</code> to move a word at a time, and <code>C+BACKSPACE</code> and <code>C+DELETE</code> to delete the previous and next word, respectively.</li>
-<lI>Added mouse-over help for presentations</lI>
+<lI>Added mouse-over help for presentations.</lI>
+<li>Previously-entered output is now clickable in the listener.</li>
+<li>New, better-looking widget theme.</li>
 </ul>
 
 </li>
@@ -48,6 +64,8 @@ differ, or -1 if they have equal elements.</li>
 sequences which have the same elements as the two input sequences, with the common
 prefix removed.</li>
 </li>
+
+</ul>
 
 <li>Everything else:
 
@@ -88,8 +106,9 @@ However, most uses of <code>catch</code> can be replaced by <code>cleanup</code>
 <li>Intel 8080 CPU and Space Invaders emulator in <code>contrib/space-invaders</code> (Chris Double)</li>
 <li>AOL Instant Messenger chat client library in <code>contrib/aim</code> (Doug Coleman)</li>
 <li>Cairo graphics library binding in <code>contrib/cairo</code>. (Sampo Vuori)</li>
-<li>New <code>contrib/math/</code> library with quaternions, matrices, polynomials, and various
-advanced mathematical functions. (Doug Coleman)</li>
+<li>Advanced math library with quaternions, matrices, polynomials, statistics and various
+functions in <code>contrib/math/</code>. (Doug Coleman)</li>
+<li>Dimensioned units in <code>contrib/units/</code>. (Doug Coleman)</li>
 </ul>
 
 </li>
