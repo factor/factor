@@ -54,9 +54,8 @@ SYMBOL: height
     ] keep
     ExposureMask KeyPressMask bitor ButtonPressMask bitor StructureNotifyMask bitor
     over set-XSetWindowAttributes-event_mask
-!    dup 1 <int> swap set-XSetWindowAttributes-border_pixel
-    CWColormap CWEventMask bitor swap ;
-!    CWBorderPixel CWColormap bitor CWEventMask bitor swap ;
+    dup 1 swap set-XSetWindowAttributes-border_pixel
+    CWBorderPixel CWColormap bitor CWEventMask bitor swap ;
 
 : make-display ( display-num -- display )
     XOpenDisplay dup dpy set ;
@@ -139,7 +138,6 @@ M: x-button-press-event (handle-event)
     2drop f ;
 
 PREDICATE: x-key-press-event quit-key-event
-!    0 XLookupKeysym XK_Escape = ;
     0 XLookupKeysym dup CHAR: q = swap XK_Escape = or ;
 
 M: quit-key-event (handle-event)
@@ -153,18 +151,17 @@ M: object (handle-event)
     #! unknown event, ignore and continue
     2drop t ;
 
-: handle-event ( glwin -- continue? )
-    ! TODO: don't create a new XEvent object each time (but don't use a global)
-    dup gl-window-dpy <XEvent> tuck XNextEvent drop (handle-event) ;
+: handle-event ( glwin xevent -- continue? )
+    over gl-window-dpy over XNextEvent drop (handle-event) ;
 
-: (loop) ( glwin -- continue? )
-    dup gl-window-dpy XPending 0 > [
-	dup handle-event [ (loop) ] [ drop f ] if
-    ] [ drop t ] if ;
+: (loop) ( glwin xevent -- continue? )
+    over gl-window-dpy XPending 0 > [
+	2dup handle-event [ (loop) ] [ 2drop f ] if
+    ] [ 2drop t ] if ;
 
-: loop ( glwin -- )
-    dup (loop) [ draw-gl-scene loop ] [ drop ] if ;
+: loop ( glwin xevent -- )
+    2dup (loop) [ draw-gl-scene loop ] [ 2drop ] if ;
 
 : main ( -- )
     ":0.0" 10 10 640 480 16 "NeHe Lesson 2" make-gl-window
-    dup loop kill-gl-window ;
+    dup <XEvent> loop kill-gl-window ;
