@@ -1,4 +1,3 @@
-IN: dimensions
 USING: parser sequences words compiler ;
 [
     "contrib/math/utils.factor"
