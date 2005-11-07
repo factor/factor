@@ -24,7 +24,7 @@
 ! ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 IN: html
-USING: prettyprint ;
+USE: prettyprint
 USE: strings
 USE: lists
 USE: kernel

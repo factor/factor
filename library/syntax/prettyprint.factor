@@ -346,12 +346,15 @@ M: wrapper pprint* ( wrapper -- )
 : .o >oct print ;
 : .h >hex print ;
 
+: define-open t "pprint-open" set-word-prop ;
+: define-close t "pprint-close" set-word-prop ;
+
 { 
     POSTPONE: [ POSTPONE: [[
     POSTPONE: { POSTPONE: V{ POSTPONE: H{
     POSTPONE: T{ POSTPONE: W{
-} [ t "pprint-open" set-word-prop ] each
+} [ define-open ] each
 
 {
     POSTPONE: ] POSTPONE: } POSTPONE: ]]
-} [ t "pprint-close" set-word-prop ] each
+} [ define-close ] each
