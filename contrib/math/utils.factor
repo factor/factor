@@ -1,5 +1,5 @@
 IN: math-contrib
-USING: errors kernel sequences math ;
+USING: errors kernel sequences math sequences-internals ;
 
 : deg>rad pi * 180 / ; inline
 : rad>deg 180 * pi / ; inline
@@ -31,3 +31,26 @@ USING: errors kernel sequences math ;
 : c. ( v v -- x )
     #! Complex inner product.
     0 [ ** + ] 2reduce ;
+
+TUPLE: frange from step length ;
+
+C: frange ( from step to -- seq )
+    #! example: 0 .01 10 <frange> >array
+    >r pick - swap [ / ] keep -rot swapd >fixnum 1+ r> 
+    [ set-frange-length ] keep
+    [ set-frange-step ] keep
+    [ set-frange-from ] keep ;
+
+M: frange length ( frange -- n )
+    frange-length ;
+
+: decrement-length ( frange -- )
+    [ frange-length 1- ] keep set-frange-length ;
+
+: increment-start ( frange -- )
+    [ [ frange-from ] keep frange-step + ] keep set-frange-from ;
+
+M: frange nth ( n frange -- obj ) [ frange-step * ] keep frange-from + ;
+M: frange nth-unsafe ( n frange -- obj ) nth ;
+
+
