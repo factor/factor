@@ -7,6 +7,7 @@ USING: parser sequences words compiler ;
     "contrib/math/quaternions.factor"
     "contrib/math/matrices.factor"
     "contrib/math/statistics.factor"
+    "contrib/math/numerical-integration.factor"
 ] [ run-file ] each
 
 "math-contrib" words [ try-compile ] each
