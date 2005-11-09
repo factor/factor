@@ -50,6 +50,9 @@ M: frange length ( frange -- n )
 : increment-start ( frange -- )
     [ [ frange-from ] keep frange-step + ] keep set-frange-from ;
 
+: frange-range ( frange -- range )
+    [ frange-step ] keep frange-length 1- * ;
+
 M: frange nth ( n frange -- obj ) [ frange-step * ] keep frange-from + ;
 M: frange nth-unsafe ( n frange -- obj ) nth ;
 
