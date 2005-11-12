@@ -4,13 +4,12 @@ IN: kernel
 USING: errors hashtables io kernel-internals lists namespaces
 parser sequences strings ;
 
-: ?run-file ( file -- )
-    dup exists? [ [ dup run-file ] try ] when drop ;
-
 : run-user-init ( -- )
     #! Run user init file if it exists
-    "user-init" get
-    [ "~" get "/.factor-rc" append ?run-file ] when ;
+    "user-init" get [
+        "~" get "/.factor-rc" append dup exists?
+        [ try-run-file ] [ drop ] if
+    ] when ;
 
 : set-path ( value seq -- )
     unswons over [ nest [ set-path ] bind ] [ nip set ] if ;
@@ -48,4 +47,4 @@ parser sequences strings ;
     os "win32" = "ui" "tty" ? "shell" set ;
 
 : parse-command-line ( -- )
-    cli-args [ cli-arg ] subset [ run-file ] each  ;
+    cli-args [ cli-arg ] subset [ try-run-file ] each  ;

@@ -1,7 +1,7 @@
 ! Copyright (C) 2004, 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: parser
-USING: io kernel lists math namespaces sequences words ;
+USING: errors io kernel lists math namespaces sequences words ;
 
 : file-vocabs ( -- )
     "scratchpad" "in" set
@@ -22,6 +22,10 @@ USING: io kernel lists math namespaces sequences words ;
 
 : run-file ( file -- )
     parse-file call ;
+
+: try-run-file ( file -- )
+    #! Run a file and trap errors, printing them to stdio.
+    [ [ run-file ] keep ] try drop ;
 
 : parse-resource ( path -- quot )
     #! Resources are loaded from the resource-path variable, or

@@ -1,5 +1,4 @@
 - make-pane: if no input, just return pane-output
-- friendlier .factor-rc load error handling
 - intrinsic char-slot set-char-slot
 
 - default library names are not useful
