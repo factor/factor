@@ -43,6 +43,8 @@ TYPEDEF: int Bool
 
 TYPEDEF: ulong Time
 
+TYPEDEF: void* Window**
+
 !
 ! 2 - Display Functions
 !
@@ -170,6 +172,8 @@ FUNCTION: Status XUndefineCursor ( Display* display, Window w ) ;
 ! 4 - Window Information Functions
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
+! 4.1 - Obtaining Window Information
+
 FUNCTION: Status XQueryTree ( Display* display, Window w, Window* root_return, Window* parent_return, Window** children_return, uint* nchildren_return ) ;
 
 BEGIN-STRUCT: XWindowAttributes
@@ -204,7 +208,32 @@ FUNCTION: Status XGetWindowAttributes ( Display* display, Window w, XWindowAttri
 : IsUnviewable		1 ;
 : IsViewable		2 ;
 
+FUNCTION: Status XGetGeometry (
+  Display* display,
+  Drawable d,
+  Window* root_return,
+  int* x_return,
+  int* y_return,
+  uint* width_return,
+  uint* height_return,
+  uint* border_width_return,
+  uint* depth_return ) ;
+
+! 4.2 - Translating Screen Coordinates
+
 FUNCTION: boolean XQueryPointer ( Display* display, Window w, Window* root_return, Window* child_return, int* root_x_return, int* root_y_return, int* win_x_return, int* win_y_return, uint* mask_return ) ;
+
+! 4.3 - Properties and Atoms
+
+FUNCTION: Atom XInternAtom ( Display* display, char* atom_name, Bool only_if_exists ) ;
+
+FUNCTION: char* XGetAtomName ( Display* display, Atom atom ) ;
+
+! 4.4 - Obtaining and Changing Window Properties
+
+FUNCTION: int XGetWindowProperty ( Display* display, Window w, Atom property, long long_offset, long long_length, Bool delete, Atom req_type, Atom* actual_type_return, int* actual_format_return, ulong* nitems_return, ulong* bytes_after_return, char** prop_return ) ;
+
+FUNCTION: int XChangeProperty ( Display* display, Window w, Atom property, Atom type, int format, int mode, char* data, int nelements ) ;
 
 ! 4.5 Selections
 
@@ -973,9 +1002,9 @@ BEGIN-UNION: XEvent
 !            long pad[24];
 END-UNION
 
-!
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 ! 11 - Event Handling Functions
-!
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 FUNCTION: Status XSelectInput ( Display* display, Window w, long event_mask ) ;
 FUNCTION: Status XFlush ( Display* display ) ;
@@ -984,9 +1013,22 @@ FUNCTION: int XPending ( Display* display ) ;
 FUNCTION: Status XNextEvent ( Display* display, XEvent* event ) ;
 FUNCTION: Status XMaskEvent ( Display* display, long event_mask, XEvent* event_return ) ;
 
-!
+! 11.3 - Event Queue Management
+
+: QueuedAlready 0 ;
+: QueuedAfterReading 1 ;
+: QueuedAfterFlush 2 ;
+
+FUNCTION: int XEventsQueued ( Display* display, int mode ) ;
+FUNCTION: int XPending ( Display* display ) ;
+
+! 11.6 - Sending Events to Other Applications
+
+FUNCTION: Status XSendEvent ( Display* display, Window w, Bool propagate, long event_mask, XEvent* event_send ) ;
+
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 ! 12 - Input Device Functions
-!
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 FUNCTION: int XGrabPointer ( Display* display, Window grab_window, Bool owner_events, uint event_mask, int pointer_mode, int keyboard_mode, Window confine_to, Cursor cursor, Time time ) ;
 FUNCTION: Status XUngrabPointer ( Display* display, Time time ) ;
@@ -994,15 +1036,95 @@ FUNCTION: Status XChangeActivePointerGrab ( Display* display, uint event_mask, C
 FUNCTION: Status XGrabKey ( Display* display, int keycode, uint modifiers, Window grab_window, Bool owner_events, int pointer_mode, int keyboard_mode ) ;
 FUNCTION: Status XSetInputFocus ( Display* display, Window focus, int revert_to, Time time ) ;
 FUNCTION: Status XWarpPointer ( Display* display, Window src_w, Window dest_w, int src_x, int src_y, uint src_width, uint src_height, int dest_x, int dest_y ) ;
-!
+
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 ! 14 - Inter-Client Communication Functions
-!
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 FUNCTION: Status XFetchName ( Display* display, Window w, char** window_name_return ) ;
 FUNCTION: Status XGetTransientForHint ( Display* display, Window w, Window* prop_window_return ) ;
 
-!
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 ! 16 - Application Utility Functions
-!
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 FUNCTION: int XLookupString ( XKeyEvent* event_struct, char* buffer_return, int bytes_buffer, KeySym* keysym_return, XComposeStatus* status_in_out ) ;
+
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+: CurrentTime 0 ;
+
+: XA_PRIMARY  1 ;
+: XA_SECONDARY 2 ;
+: XA_ARC 3 ;
+: XA_ATOM 4 ;
+: XA_BITMAP 5 ;
+: XA_CARDINAL 6 ;
+: XA_COLORMAP 7 ;
+: XA_CURSOR 8 ;
+: XA_CUT_BUFFER0 9 ;
+: XA_CUT_BUFFER1 10 ;
+: XA_CUT_BUFFER2 11 ;
+: XA_CUT_BUFFER3 12 ;
+: XA_CUT_BUFFER4 13 ;
+: XA_CUT_BUFFER5 14 ;
+: XA_CUT_BUFFER6 15 ;
+: XA_CUT_BUFFER7 16 ;
+: XA_DRAWABLE 17 ;
+: XA_FONT 18 ;
+: XA_INTEGER 19 ;
+: XA_PIXMAP 20 ;
+: XA_POINT 21 ;
+: XA_RECTANGLE 22 ;
+: XA_RESOURCE_MANAGER 23 ;
+: XA_RGB_COLOR_MAP 24 ;
+: XA_RGB_BEST_MAP 25 ;
+: XA_RGB_BLUE_MAP 26 ;
+: XA_RGB_DEFAULT_MAP 27 ;
+: XA_RGB_GRAY_MAP 28 ;
+: XA_RGB_GREEN_MAP 29 ;
+: XA_RGB_RED_MAP 30 ;
+: XA_STRING 31 ;
+: XA_VISUALID 32 ;
+: XA_WINDOW 33 ;
+: XA_WM_COMMAND 34 ;
+: XA_WM_HINTS 35 ;
+: XA_WM_CLIENT_MACHINE 36 ;
+: XA_WM_ICON_NAME 37 ;
+: XA_WM_ICON_SIZE 38 ;
+: XA_WM_NAME 39 ;
+: XA_WM_NORMAL_HINTS 40 ;
+: XA_WM_SIZE_HINTS 41 ;
+: XA_WM_ZOOM_HINTS 42 ;
+: XA_MIN_SPACE 43 ;
+: XA_NORM_SPACE 44 ;
+: XA_MAX_SPACE 45 ;
+: XA_END_SPACE 46 ;
+: XA_SUPERSCRIPT_X 47 ;
+: XA_SUPERSCRIPT_Y 48 ;
+: XA_SUBSCRIPT_X 49 ;
+: XA_SUBSCRIPT_Y 50 ;
+: XA_UNDERLINE_POSITION 51 ;
+: XA_UNDERLINE_THICKNESS 52 ;
+: XA_STRIKEOUT_ASCENT 53 ;
+: XA_STRIKEOUT_DESCENT 54 ;
+: XA_ITALIC_ANGLE 55 ;
+: XA_X_HEIGHT 56 ;
+: XA_QUAD_WIDTH 57 ;
+: XA_WEIGHT 58 ;
+: XA_POINT_SIZE 59 ;
+: XA_RESOLUTION 60 ;
+: XA_COPYRIGHT 61 ;
+: XA_NOTICE 62 ;
+: XA_FONT_NAME 63 ;
+: XA_FAMILY_NAME 64 ;
+: XA_FULL_NAME 65 ;
+: XA_CAP_HEIGHT 66 ;
+: XA_WM_CLASS 67 ;
+: XA_WM_TRANSIENT_FOR 68 ;
+
+: XA_LAST_PREDEFINED 68 ;
+
+: PropModeReplace         0 ;
+: PropModePrepend         1 ;
+: PropModeAppend          2 ;

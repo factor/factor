@@ -1,5 +1,5 @@
 
-IN: x USING: namespaces kernel sequences xlib ;
+IN: x USING: namespaces kernel math vectors alien sequences xlib ;
 
 SYMBOL: dpy
 SYMBOL: scr
@@ -8,6 +8,14 @@ SYMBOL: gcontext
 SYMBOL: win
 SYMBOL: black-pixel
 SYMBOL: white-pixel
+SYMBOL: colormap
+
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+: <ulong> <uint> ;
+: <XID> <ulong> ;
+: <Window> <XID> ;
+: <Drawable> <XID> ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 ! 3.3 - Creating Windows
@@ -20,7 +28,7 @@ SYMBOL: white-pixel
 ! arguments.
 
 : create-window ( -- win )
-  dpy get root get 0 0 100 100 10 black-pixel get white-pixel get
+  dpy get root get 0 0 100 100 0 black-pixel get white-pixel get
   XCreateSimpleWindow ;
 
 : destroy-window ( -- ) dpy get win get XDestroyWindow drop ;
@@ -33,6 +41,10 @@ SYMBOL: white-pixel
 
 : move-window ( { x y } -- ) >r dpy get win get r> [ ] each XMoveWindow drop ;
 
+: set-window-x ( x -- ) 0 window-position dup >r set-nth r> move-window ;
+
+: set-window-y ( y -- ) 1 window-position dup >r set-nth r> move-window ;
+
 : resize-window ( { width height } -- )
   >r dpy get win get r> [ ] each XResizeWindow drop ;
 
@@ -40,6 +52,29 @@ SYMBOL: white-pixel
 
 : raise-window ( -- ) dpy get win get XRaiseWindow drop ;
 : lower-window ( -- ) dpy get win get XLowerWindow drop ;
+
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+! 4 - Window Information Functions
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+: window-size ( -- { width height } )
+  dpy get win get 0 <Window> 0 <int> 0 <int>
+  0 <uint> 0 <uint> 2dup 2vector >r
+  0 <uint> 0 <uint>
+  XGetGeometry drop r> [ *uint ] map ;
+
+: window-width 0 window-size nth ;
+
+: window-height 1 window-size nth ;
+
+: window-position ( -- { x y } )
+  dpy get win get 0 <Window>
+  0 <int> 0 <int> 2dup 2vector >r
+  0 <uint> 0 <uint> 0 <uint> 0 <uint>
+  XGetGeometry drop r> [ *int ] map ;
+
+: window-x 0 window-position nth ;
+: window-y 1 window-position nth ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 ! 8 - Graphics Functions
@@ -62,7 +97,7 @@ SYMBOL: white-pixel
 ! 9 - Window and Session Manager Functions
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-: reparent-window ( parent -- ) >r dpy get win get r> 0 0 XReparentWindow ;
+: reparent-window ( parent -- ) >r dpy get win get r> 0 0 XReparentWindow drop ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 ! 11 - Event Handling Functions
@@ -72,7 +107,9 @@ SYMBOL: white-pixel
 
 : flush-dpy ( -- ) dpy get XFlush drop ;
 
-: next-event ( -- event ) dpy get <XEvent> dup XNextEvent drop ;
+: next-event ( -- event ) dpy get <XEvent> dup >r XNextEvent drop r> ;
+
+: events-queued ( mode -- n ) >r dpy get r> XEventsQueued ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 ! Not Categorized Yet
@@ -87,4 +124,40 @@ SYMBOL: white-pixel
   dpy get scr get XRootWindow root set
   dpy get scr get XBlackPixel black-pixel set
   dpy get scr get XWhitePixel white-pixel set
-  dpy get scr get XDefaultGC gcontext set ;
+  dpy get scr get XDefaultGC gcontext set
+  dpy get scr get XDefaultColormap colormap set ;
+
+: set-window-background ( pixel -- )
+  >r dpy get win get r> XSetWindowBackground drop ;
+
+: lookup-color ( name -- pixel )
+  >r dpy get colormap get r> <XColor> dup >r <XColor> XLookupColor drop
+  dpy get colormap get r> dup >r XAllocColor drop
+  r> XColor-pixel ;
+
+: window-children ( -- [ child child ... child ] )
+  dpy get win get 0 <uint> 0 <uint>
+  0 <uint> <void*>   0 <uint>   2dup >r >r
+  XQueryTree drop
+  r> r>					! children-return nchildren-return
+  swap *void* swap *uint		! children nchildren
+  [ over uint-nth ] map
+  swap drop ;
+
+: stack-children ( -- )
+  window-children
+  [ [ { 0 0 } move-window ] with-win ]
+  each ;
+
+: arrange-children-horizontally ( -- )
+  0
+  window-children
+  [ [ dup set-window-x window-width + ] with-win ]
+  each ;
+
+: arrange-children-vertically ( -- )
+  0
+  window-children
+  [ [ dup set-window-y window-height + ] with-win ]
+  each ;
+
