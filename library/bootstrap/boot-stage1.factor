@@ -155,7 +155,10 @@ vectors words ;
         "/library/bootstrap/init.factor"
     } [ dup print parse-resource % ] each
     
-    [ "/library/bootstrap/boot-stage2.factor" run-resource ] %
+    [
+        [ "/library/bootstrap/boot-stage2.factor" run-resource ]
+        [ print-error die ] recover
+    ] %
 ] [ ] make
 
 vocabularies get [
