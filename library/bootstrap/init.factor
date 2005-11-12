@@ -6,7 +6,7 @@ parser threads words ;
 
 : boot ( -- )
     #! Initialize an interpreter with the basic services.
-    global >n
+    init-namespaces
     millis init-random
     init-threads
     init-io

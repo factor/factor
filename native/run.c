@@ -43,7 +43,6 @@ void run(void)
 			if(interrupt)
 			{
 				factorbug();
-				interrupt = false;
 			}
 
 			callframe = cpop();

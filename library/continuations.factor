@@ -1,10 +1,11 @@
 ! Copyright (C) 2003, 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: errors
-USING: kernel-internals ;
+USING: kernel kernel-internals ;
 
-: catchstack ( -- cs ) 6 getenv ; inline
-: set-catchstack ( cs -- ) 6 setenv ; inline
+: catchstack* ( -- cs ) 6 getenv ; inline
+: catchstack ( -- cs ) catchstack* clone ; inline
+: set-catchstack ( cs -- ) clone 6 setenv ; inline
 
 IN: kernel
 USING: namespaces sequences ;

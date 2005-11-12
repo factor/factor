@@ -1,8 +1,8 @@
 ! Copyright (C) 2003, 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: namespaces
-USING: hashtables kernel kernel-internals lists math sequences
-strings vectors words ;
+USING: arrays hashtables kernel kernel-internals lists math
+sequences strings vectors words ;
 
 ! Variables in Factor:
 !
@@ -24,57 +24,28 @@ strings vectors words ;
 ! bind ( namespace quot -- ) executes a quotation with a
 ! namespace pushed on the namespace stack.
 
-: namestack ( -- ns ) 3 getenv ; inline
-
-: set-namestack ( ns -- ) 3 setenv ; inline
-
-: namespace ( -- namespace )
-    #! Push the current namespace.
-    namestack car ; inline
-
-: >n ( namespace -- n:namespace )
-    #! Push a namespace on the name stack.
-    namestack cons set-namestack ; inline
-
-: n> ( n:namespace -- namespace )
-    #! Pop the top of the name stack.
-    namestack uncons set-namestack ; inline
-
-: global ( -- g ) 4 getenv ;
-
-: (get) ( var ns -- value )
-    #! Internal word for searching the namestack.
-    dup [
-        2dup car hash* [
-            nip cdr ( found )
-        ] [
-            cdr (get) ( keep looking )
-        ] ?if
-    ] [
-        2drop f
-    ] if ; flushable
-
-: get ( variable -- value )
-    #! Push the value of a variable by searching the namestack
-    #! from the top down.
-    namestack (get) ; flushable
-
+: namestack* ( -- ns ) 3 getenv ; inline
+: namestack ( -- ns ) namestack* clone ; inline
+: set-namestack ( ns -- ) clone 3 setenv ; inline
+: namespace ( -- namespace ) namestack* peek ; inline
+: >n ( namespace -- n:namespace ) namestack* push ; inline
+: n> ( n:namespace -- namespace ) namestack* pop ; inline
+: global ( -- g ) 4 getenv ; inline
+: get ( variable -- value ) namestack* hash-stack ; flushable
 : set ( value variable -- ) namespace set-hash ;
+: on ( var -- ) t swap set ; inline
+: off ( var -- ) f swap set ; inline
 
 : nest ( variable -- hash )
     #! If the variable is set in the current namespace, return
     #! its value, otherwise set its value to a new namespace.
     dup namespace hash [ ] [ >r H{ } clone dup r> set ] ?if ;
 
-: change ( var quot -- )
+: change ( var quot -- quot: old -- new )
     #! Execute the quotation with the variable value on the
     #! stack. The set the variable to the return value of the
     #! quotation.
     >r dup get r> rot slip set ; inline
-
-: on ( var -- ) t swap set ; inline
-
-: off ( var -- ) f swap set ; inline
 
 : inc ( var -- ) [ 1+ ] change ; inline
 
@@ -138,3 +109,7 @@ IN: lists
 
 : alist>quot ( default alist -- quot )
     [ unswons [ % , , \ if , ] [ ] make ] each ;
+
+IN: kernel-internals
+
+: init-namespaces ( -- ) global 1array >vector set-namestack ;

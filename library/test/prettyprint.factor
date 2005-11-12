@@ -58,3 +58,13 @@ unit-test
 [ ] [ \ pprinter see ] unit-test
 
 [ "ALIEN: 1234" ] [ 1234 <alien> unparse ] unit-test
+
+TUPLE: cat gender declawed? castrated? ;
+
+[ "T{ cat \n     f \"m\" \n    t f\n}" ]
+[
+    [
+        10 margin set
+        T{ cat f "m" t f } unparse
+    ] with-scope
+] unit-test

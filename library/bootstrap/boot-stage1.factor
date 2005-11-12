@@ -1,9 +1,9 @@
 ! Copyright (C) 2004, 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: image
-USING: generic hashtables kernel kernel-internals
-lists math memory namespaces parser prettyprint
-sequences io vectors words ;
+USING: errors generic hashtables io kernel kernel-internals
+lists math memory namespaces parser prettyprint sequences
+vectors words ;
 
 "Bootstrap stage 1..." print
 
@@ -12,6 +12,9 @@ sequences io vectors words ;
 ! The [ ] make form creates a boot quotation
 [
     [
+        ! initialize it twice so that we get a catchstack
+        ! early on for each-object.
+        init-error-handler
         [ hashtable? ] instances
         [ dup hash-size 1 max swap set-bucket-count ] each
         boot

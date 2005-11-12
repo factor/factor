@@ -4,7 +4,7 @@ F_HASHTABLE* hashtable(F_FIXNUM capacity)
 {
 	F_HASHTABLE* hash;
 	if(capacity < 0)
-		general_error(ERROR_NEGATIVE_ARRAY_SIZE,tag_fixnum(capacity));
+		general_error(ERROR_NEGATIVE_ARRAY_SIZE,tag_integer(capacity));
 	hash = allot_object(HASHTABLE_TYPE,sizeof(F_VECTOR));
 	hash->count = tag_fixnum(0);
 	hash->array = tag_object(array(ARRAY_TYPE,capacity,F));

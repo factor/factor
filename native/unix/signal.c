@@ -17,13 +17,6 @@ void dump_stack_signal(int signal, siginfo_t* siginfo, void* uap)
 	interrupt = true;
 }
 
-#ifdef __APPLE__
-int sigsegv_handler(void *fault_address, int serious)
-{
-	return 0;
-}
-#endif
-
 void init_signals(void)
 {
 	struct sigaction custom_sigaction;

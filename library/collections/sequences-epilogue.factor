@@ -120,7 +120,9 @@ M: object peek ( sequence -- element )
 
 : pop* ( sequence -- )
     #! Shorten the sequence by one element.
-    dup length 1- swap set-length ;
+    [ length 1- ] keep
+    [ f -rot set-nth ] 2keep
+    set-length ;
 
 : pop ( sequence -- element )
     #! Get value at end of sequence and remove it.

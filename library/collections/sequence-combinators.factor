@@ -119,6 +119,9 @@ M: object find ( seq quot -- i elt )
 : find-last ( seq quot -- i elt )
     >r [ length 1- ] keep r> find-last* ; inline
 
+: find-last-with ( obj seq quot -- i elt | quot: elt -- ? )
+    swap [ with rot ] find-last 2swap 2drop ; inline
+
 : contains? ( seq quot -- ? )
     find drop -1 > ; inline
 

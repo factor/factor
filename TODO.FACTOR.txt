@@ -1,15 +1,36 @@
+- make-pane: if no input, just return pane-output
+- friendlier .factor-rc load error handling
+- intrinsic char-slot set-char-slot
+
+- default library names are not useful
+- fix remaining GL issues
+- fix up the min thumb size hack
+- closing ui does not stop timers
+- adding/removing timers automatically for animated gadgets
+- saving image with UI open
+- bug: left click to bring up context menu, click splitter bar
+  and pane grows to 100%
+- bug: click tutorial, full screen, the right-most arrow icon
+  loses the vertical bar
+- signal handler should not lose stack pointers
+- callbacks
+- FIELD: char key_vector[32];
+- FIELD: union { char b[20]; short s[10]; long l[5]; } data;
+- MEMBER: long pad[24];
+- inference: try changing nth and set-nth array methods to call -unsafe,
+  unbalanced branches error
+- floating point intrinsics
+- new basic block optimizer
+- declare slot types for built-ins
+- split: return vectors
+- set-path: iterative
+- better prettyprinting of cond
+
 + ui:
 
-- fix remaining GL issues
-- UI issue: try resizing slider while menu is open
-- make-pane: if no input, just return pane-output
 - keyboard completion
 - get outliner working with lots of lines of output
 - listener continuations
-- fix up the min thumb size hack
-- off-by-one error in pick-up?
-- closing ui does not stop timers
-- adding/removing timers automatically for animated gadgets
 - tabular output
 - debugger should use outlining
 - support nested incremental layouts more efficiently
@@ -19,11 +40,6 @@
 - multiline editing in listener
 - text selection
 - clipboard support
-- bug: slider bars go to 0 pixel width/height
-- bug: left click to bring up context menu, click splitter bar
-  and pane grows to 100%
-- bug: click tutorial, full screen, the right-most arrow icon
-  loses the vertical bar
 
 + tutorial:
 
@@ -36,7 +52,6 @@
 - code walker & exceptions
 - investigate if rehashing on startup is really necessary
 - remove word transfer hack in bootstrap
-- signal handler should not lose stack pointers
 
 + ffi:
 
@@ -48,25 +63,13 @@
 - value type structs
 - bitfields in C structs
 - setting struct members that are not *
-- callbacks
-- FIELD: char key_vector[32];
-- FIELD: union { char b[20]; short s[10]; long l[5]; } data;
-- MEMBER: long pad[24];
 - convert factor sequences to c arrays, and vice versa
 
 + compiler:
 
-- inference: try changing nth and set-nth array methods to call -unsafe,
-  unbalanced branches error
-- compile interruption checks
 - check that set-datastack and set-callstack compile correctly in the
   face of optimization
-- floating point intrinsics
-- new basic block optimizer
-- fix fixnum/mod overflow on PowerPC
-- intrinsic char-slot set-char-slot
 - [ ] [ throw ] ifte ==> should raise 'unbalanced branches' error
-- declare slot types for built-ins
 - remove dead code after a 'throw'
 - flushing optimization
 - [ [ dup call ] dup call ] infer hangs
@@ -78,13 +81,8 @@
 + sequences:
 
 - slice: if sequence or seq start is changed, abstraction violation
-- split: return vectors
-- set-path: iterative
 - specialized arrays
-- instances: do not use make-list
-- >c/c>: vector stack
 - search: slow
-- vectorize >n, n>, (get)
 - mutable strings simplifying string operarations
 - real Unicode support (strings are already 16 bits and can be extended
   to 21 if the need arises, but we need full character classification
@@ -92,10 +90,8 @@
 
 + kernel:
 
-- better prettyprinting of cond
 - better handling of random arrangements of html words when
   prettyprinting
-- friendlier .factor-rc load error handling
 - reader syntax for byte arrays, displaced aliens
 - out of memory error when printing global namespace
 - merge timers with sleeping tasks

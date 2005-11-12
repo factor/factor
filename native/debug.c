@@ -160,6 +160,8 @@ void dump_generations(void)
 
 void factorbug(void)
 {
+	interrupt = false;
+
 #ifndef WIN32
 	fcntl(0,F_SETFL,0);
 	fcntl(1,F_SETFL,0);

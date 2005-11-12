@@ -7,8 +7,10 @@ kernel-internals lists math memory namespaces sequences words ;
 ! Not used on x86
 M: %prologue generate-node drop ;
 
-: compile-c-call ( symbol dll -- )
-    2dup dlsym CALL 1 0 rel-dlsym ;
+: compile-dlsym ( symbol dll quot -- )
+    >r 2dup dlsym r> call 1 0 rel-dlsym ; inline
+
+: compile-c-call ( symbol dll -- ) [ CALL ] compile-dlsym ;
 
 M: %call generate-node ( vop -- )
     vop-label dup postpone-word CALL ;
@@ -86,3 +88,11 @@ M: %tag generate-node ( vop -- )
 
 M: %untag generate-node ( vop -- )
     0 vop-out v>operand tag-mask bitnot AND ;
+
+M: %irq generate-node ( vop -- )
+    "end" <label> set
+    drop
+    "interrupt" f [ 0 CMP ] compile-dlsym
+    "end" get JE
+    "factorbug" f compile-c-call
+    "end" get save-xt ;

@@ -65,38 +65,50 @@ M: %fixnum* generate-node ( vop -- )
 : most-negative-fixnum ( -- n )
     first-bignum neg >fixnum ; inline
 
-M: %fixnum/i generate-node ( vop -- )
-    #! This has specific vreg requirements.
+: generate-fixnum/i
+    6 3 4 DIVW  ! divide in2 by in1, store result in out1
+    ! if the result is greater than the most positive fixnum,
+    ! which can only ever happen if we do
+    ! most-negative-fixnum -1 /i, then the result is a bignum.
     <label> "end" set
-    drop
-    5 3 4 DIVW
-    most-positive-fixnum 4 LOAD
-    5 3 tag-fixnum
-    5 0 4 CMP
-    "end" get BLE
+    <label> "no-overflow" set
+    most-positive-fixnum 7 LOAD
+    6 0 7 CMP
+    "no-overflow" get BLE
     most-negative-fixnum neg 3 LOAD
     "s48_long_to_bignum" f compile-c-call
-    3 3 bignum-tag ORI
+    3 3 bignum-tag ORI ;
+
+M: %fixnum/i generate-node ( vop -- )
+    #! This has specific vreg requirements.
+    drop
+    generate-fixnum/i
+    "end" get B
+    "no-overflow" get save-xt
+    6 3 tag-fixnum
     "end" get save-xt ;
 
-: generate-fixnum/mod ( -- )
-    #! The same code is used for %fixnum/i and %fixnum/mod.
-    #! mdest is vreg where to put the modulus. Note this has
-    #! precise vreg requirements.
-    6 3 4 DIVW  ! divide in2 by in1, store result in out1
+: generate-fixnum-mod
     7 6 4 MULLW ! multiply out1 by in1, store result in in1
     5 7 3 SUBF  ! subtract in2 from in1, store result in out1.
     ;
 
 M: %fixnum-mod generate-node ( vop -- )
     #! This has specific vreg requirements.
-    drop generate-fixnum/mod ;
+    drop
+    6 3 4 DIVW  ! divide in2 by in1, store result in out1
+    generate-fixnum-mod ;
 
 M: %fixnum/mod generate-node ( vop -- )
     #! This has specific vreg requirements.
-    drop generate-fixnum/mod
-    3 6 MR
-    3 3 tag-fixnum ;
+    drop
+    generate-fixnum/i
+    0 5 LI
+    "end" get B
+    "no-overflow" get save-xt
+    generate-fixnum-mod
+    6 3 tag-fixnum
+    "end" get save-xt ;
 
 M: %fixnum-bitand generate-node ( vop -- )
     >3-vop< AND ;

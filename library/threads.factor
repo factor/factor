@@ -39,7 +39,7 @@ DEFER: next-thread
 : in-thread ( quot -- )
     [
         schedule-thread
-        [ ] set-catchstack V{ } set-callstack
+        V{ } set-catchstack V{ } set-callstack
         try stop
     ] callcc0 drop ;
 

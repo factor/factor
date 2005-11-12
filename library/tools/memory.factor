@@ -51,11 +51,15 @@ sequences strings unparser vectors words ;
     [ begin-scan [ (each-object) ] keep ]
     [ end-scan ] cleanup drop ; inline
 
+: (instances) ( obj quot seq -- )
+    >r over >r call [ r> r> push ] [ r> r> 2drop ] if ; inline
+
 : instances ( quot -- seq )
-    #! Return a list of all object that return true when the
+    #! Return a vector of all objects that return true when the
     #! quotation is applied to them.
-    [ [ [ swap call ] 2keep rot ?, ] each-object drop ] V{ } make ;
-    inline
+    10000 <vector> [
+        -rot [ (instances) ] 2keep
+    ] each-object nip ; inline
 
 G: each-slot ( obj quot -- )
     [ over ] standard-combination ; inline

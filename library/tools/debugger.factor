@@ -1,9 +1,9 @@
 ! Copyright (C) 2004, 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: errors
-USING: generic inspector kernel kernel-internals lists math
-namespaces parser prettyprint sequences io sequences-internals
-strings vectors words ;
+USING: generic hashtables inspector io kernel kernel-internals
+lists math namespaces parser prettyprint sequences
+sequences-internals strings vectors words ;
 
 SYMBOL: error
 SYMBOL: error-continuation
@@ -110,7 +110,7 @@ M: object error. ( error -- ) . ;
 : :r ( -- ) error-continuation get continuation-call stack. ;
 
 : :get ( var -- value )
-    error-continuation get continuation-name (get) ;
+    error-continuation get continuation-name hash-stack ;
 
 : debug-help ( -- )
     ":s :r show stacks at time of error." print
@@ -136,6 +136,7 @@ M: object error. ( error -- ) . ;
     dup continuation save-error rethrow ;
 
 : init-error-handler ( -- )
+    V{ } clone set-catchstack
     ( kernel calls on error )
     [ error-handler ] 5 setenv
     kernel-error 12 setenv ;

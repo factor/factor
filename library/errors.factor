@@ -9,8 +9,8 @@ TUPLE: no-method object generic ;
 
 : no-method ( object generic -- ) <no-method> throw ;
 
-: >c ( catch -- ) catchstack cons set-catchstack ;
-: c> ( catch -- ) catchstack uncons set-catchstack ;
+: >c ( continuation -- ) catchstack* push ;
+: c> ( -- continuation ) catchstack* pop ;
 
 : catch ( try -- exception/f | try: -- )
     #! Call the try quotation. If an exception is thrown in the

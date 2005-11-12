@@ -352,7 +352,7 @@ M: wrapper pprint* ( wrapper -- )
 { 
     POSTPONE: [ POSTPONE: [[
     POSTPONE: { POSTPONE: V{ POSTPONE: H{
-    POSTPONE: T{ POSTPONE: W{
+    POSTPONE: W{
 } [ define-open ] each
 
 {

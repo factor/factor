@@ -215,3 +215,9 @@ M: hashtable hashcode ( hash -- n )
     #! Remove all elements from the sequence that are keys
     #! in the hashtable.
     [ swap hash* not ] subset-with ; flushable
+
+: hash-stack ( key seq -- value )
+    #! Searches for a key in a sequence of hashtables,
+    #! where the most recently pushed hashtable is searched
+    #! first.
+    [ dupd hash* ] find-last nip ?hash ; flushable
