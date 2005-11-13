@@ -1,6 +1,8 @@
 IN: math-contrib
 USING: kernel math sequences ;
 
+
+
 : mean ( seq -- n )
     #! arithmetic mean, sum divided by length
     [ sum ] keep length / ;
@@ -21,9 +23,13 @@ USING: kernel math sequences ;
         2 /i swap nth
     ] if ;
 
+: minmax ( seq -- min max )
+    #! find the min and max of a seq in one pass
+    inf -inf rot [ dup pick max -rot nip pick min -rot nip ] each ;
+
 : range ( seq -- n )
     #! max - min
-    dup first 2dup [ min ] reduce >r [ max ] reduce r> - ;
+    minmax swap - ;
 
 : var ( seq -- )
     #! variance, normalize by N-1
