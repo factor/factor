@@ -7,8 +7,6 @@
 - default library names are not useful
 - fix remaining GL issues
 - fix up the min thumb size hack
-- bug: left click to bring up context menu, click splitter bar
-  and pane grows to 100%
 - bug: click tutorial, full screen, the right-most arrow icon
   loses the vertical bar
 - signal handler should not lose stack pointers

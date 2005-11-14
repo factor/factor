@@ -72,13 +72,22 @@ M: f set-message 2drop ;
     #! the current gadget, with all parents in between.
     hand get hand-gadget parents reverse-slice ;
 
+: update-hand-gadget ( -- )
+    hand-grab hand get set-hand-gadget ;
+
 : hand-grab ( -- gadget )
     hand get rect-loc world get pick-up ;
 
 : move-hand ( loc -- )
     under-hand >r hand get set-rect-loc
-    hand-grab hand get set-hand-gadget
+    update-hand-gadget
     under-hand r> hand-gestures update-help ;
+
+: update-clicked ( -- )
+    hand get
+    dup hand-gadget over set-hand-clicked
+    dup screen-loc over set-hand-click-loc
+    dup hand-gadget over relative swap set-hand-click-rel ;
 
 M: motion-event handle-event ( event -- )
     motion-event-loc move-hand ;

@@ -9,16 +9,11 @@ GENERIC: handle-event ( event -- )
 M: object handle-event ( event -- )
     drop ;
 
-: button-gesture ( button gesture -- )
-    swap add hand get hand-clicked handle-gesture drop ;
-
 M: button-down-event handle-event ( event -- )
-    button-event-button dup hand get button/
-    [ button-down ] button-gesture ;
+    button-event-button button/ ;
 
 M: button-up-event handle-event ( event -- )
-    button-event-button dup hand get button\
-    [ button-up ] button-gesture ;
+    button-event-button button\ ;
 
 : motion-event-loc ( event -- loc )
     dup motion-event-x swap motion-event-y 0 3array ;

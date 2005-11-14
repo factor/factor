@@ -16,14 +16,17 @@ TUPLE: hand click-loc click-rel clicked buttons gadget focus ;
 C: hand ( -- hand )
     dup delegate>gadget V{ } clone over set-hand-buttons ;
 
-: button/ ( n hand -- )
-    dup hand-gadget over set-hand-clicked
-    dup screen-loc over set-hand-click-loc
-    dup hand-gadget over relative over set-hand-click-rel
-    hand-buttons push ;
+: button-gesture ( button gesture -- )
+    swap add hand get hand-clicked handle-gesture drop ;
 
-: button\ ( n hand -- )
-    hand-buttons delete ;
+: button/ ( n -- )
+    update-clicked
+    dup hand get hand-buttons push
+    [ button-down ] button-gesture ;
+
+: button\ ( n -- )
+    dup hand get hand-buttons delete
+    [ button-up ] button-gesture ;
 
 : drag-gesture ( hand gadget gesture -- )
     #! Send a gesture like [ drag 2 ].

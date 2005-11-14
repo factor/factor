@@ -9,9 +9,12 @@ namespaces sequences ;
     hand get [ hand-gadget ] keep 2dup hand-clicked eq?
     [ 2dup set-hand-clicked update-hand ] unless 2drop ;
 
+: retarget-click ( -- )
+    update-hand-gadget update-clicked ;
+
 : menu-actions ( glass -- )
     dup [ drop retarget-drag ] [ drag 1 ] set-action
-    [ drop hide-glass ] [ button-down 1 ] set-action ;
+    [ drop hide-glass retarget-click ] [ button-down 1 ] set-action ;
 
 : fit-bounds ( loc dim max -- loc )
     #! Adjust loc to fit inside max.
