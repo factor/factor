@@ -62,7 +62,8 @@ namespaces parser prettyprint sequences strings vectors words ;
     unify-effect meta-r set drop ;
 
 : unify-effects ( seq -- )
-    dup datastack-effect callstack-effect ;
+    dup datastack-effect dup callstack-effect
+    [ terminated? swap hash ] all? terminated? set ;
 
 : unify-dataflow ( effects -- nodes )
     [ [ dataflow-graph get ] bind ] map ;

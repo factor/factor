@@ -4,6 +4,10 @@ IN: kernel
 USING: errors hashtables io kernel-internals lists namespaces
 parser sequences strings ;
 
+: try-run-file ( file -- )
+    #! Run a file and trap errors, printing them to stdio.
+    [ [ run-file ] keep ] try drop ;
+
 : run-user-init ( -- )
     #! Run user init file if it exists
     "user-init" get [

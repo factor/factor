@@ -1,6 +1,6 @@
 IN: temporary
 USING: arrays compiler kernel kernel-internals lists math
-math-internals sequences test words ;
+math-internals sequences strings test words ;
 
 ! Oops!
 [ 5000 ] [ [ 5000 ] compile-1 ] unit-test
@@ -17,6 +17,14 @@ math-internals sequences test words ;
 
 ! Write barrier hits on the wrong value were causing segfaults
 [ -3 ] [ -3 1 2 [ cons [ 1 set-slot ] keep ] compile-1 cdr ] unit-test
+
+[ CHAR: b ] [ 1 "abc" [ char-slot ] compile-1 ] unit-test
+[ CHAR: b ] [ 1 [ "abc" char-slot ] compile-1 ] unit-test
+[ CHAR: b ] [ [ 1 "abc" char-slot ] compile-1 ] unit-test
+
+[ "axc" ] [ CHAR: x 1 "abc" [ [ set-char-slot ] keep dup rehash-string ] compile-1 ] unit-test
+[ "axc" ] [ CHAR: x 1 [ "abc" [ set-char-slot ] keep dup rehash-string ] compile-1 ] unit-test
+[ "axc" ] [ CHAR: x [ 1 "abc" [ set-char-slot ] keep dup rehash-string ] compile-1 ] unit-test
 
 [ ] [ 1 [ drop ] compile-1 ] unit-test
 [ ] [ [ 1 drop ] compile-1 ] unit-test

@@ -25,14 +25,16 @@ hashtables parser prettyprint ;
     " was already attempted, and failed" append3
     inference-error ;
 
-: with-recursive-state ( word label quot -- )
-    >r over word-def cons cons
+TUPLE: rstate label quot base-case? ;
+
+: with-recursive-state ( word label base-case quot -- )
+    >r >r over word-def r> <rstate> cons
     recursive-state [ cons ] change r>
     call
     recursive-state [ cdr ] change ; inline
 
-: inline-block ( word -- node-block )
-    gensym 2dup [
+: inline-block ( word base-case -- node-block )
+    >r gensym 2dup r> [
         [
             dup #label >r
             #entry node,
@@ -47,9 +49,8 @@ hashtables parser prettyprint ;
     #! control flow by throwing an exception or restoring a
     #! continuation.
     [
-        inferring-base-case set
         recursive-state get init-inference
-        [ inline-block drop terminated? get effect ] keep
+        over >r inline-block drop terminated? get effect r>
     ] with-scope over consume/produce over [ terminate ] when ;
 
 GENERIC: apply-word
@@ -90,19 +91,19 @@ M: word apply-object ( word -- )
 M: symbol apply-object ( word -- )
     apply-literal ;
 
-: (base-case) ( word label -- )
-    over "inline" word-prop [
-        meta-d get clone >r
-        over inline-block drop
-        [ #call-label ] [ #call ] ?if
-        r> over set-node-in-d node,
-    ] [
-        drop dup t infer-compound nip "base-case" set-word-prop
-    ] if ;
+: inline-base-case ( word label -- )
+    meta-d get clone >r
+    over t inline-block drop
+    [ #call-label ] [ #call ] ?if
+    r> over set-node-in-d node, ;
 
 : base-case ( word label -- )
-    [ inferring-base-case on (base-case) ]
-    [ inferring-base-case off ] cleanup ;
+    over "inline" word-prop [
+        inline-base-case
+    ] [
+        drop dup t infer-compound swap
+        [ 2drop ] [ "base-case" set-word-prop ] if
+    ] if ;
 
 : no-base-case ( word -- )
     {
@@ -115,7 +116,7 @@ M: symbol apply-object ( word -- )
     base-case-continuation get
     [ t swap continue-with ] [ no-base-case ] if* ;
 
-: recursive-word ( word [[ label quot ]] -- )
+: recursive-word ( word rstate -- )
     #! Handle a recursive call, by either applying a previously
     #! inferred base case, or raising an error. If the recursive
     #! call is to a local block, emit a label call node.
@@ -125,10 +126,10 @@ M: symbol apply-object ( word -- )
         over "base-case" word-prop [
             nip consume/produce
         ] [
-            inferring-base-case get [
+            dup rstate-base-case? [
                 notify-base-case
             ] [
-                car base-case
+                rstate-label base-case
             ] if
         ] if*
     ] if* ;
@@ -154,5 +155,5 @@ M: compound apply-object ( word -- )
         recursive-word
     ] [
         dup "inline" word-prop
-        [ inline-block block, ] [ apply-default ] if
+        [ f inline-block block, ] [ apply-default ] if
     ] if* ;

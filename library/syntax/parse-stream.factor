@@ -23,10 +23,6 @@ USING: errors io kernel lists math namespaces sequences words ;
 : run-file ( file -- )
     parse-file call ;
 
-: try-run-file ( file -- )
-    #! Run a file and trap errors, printing them to stdio.
-    [ [ run-file ] keep ] try drop ;
-
 : parse-resource ( path -- quot )
     #! Resources are loaded from the resource-path variable, or
     #! the current directory if it is not set. Words defined in

@@ -466,9 +466,9 @@ prettyprint ;
 \ char-slot [ [ fixnum object ] [ fixnum ] ] "infer-effect" set-word-prop
 \ char-slot t "flushable" set-word-prop
 
-\ set-char-slot [ [ integer fixnum object ] [ ] ] "infer-effect" set-word-prop
-\ resize-array [ [ integer array ] [ array ] ] "infer-effect" set-word-prop
-\ resize-string [ [ integer string ] [ string ] ] "infer-effect" set-word-prop
+\ set-char-slot [ [ fixnum fixnum object ] [ ] ] "infer-effect" set-word-prop
+\ resize-array [ [ fixnum array ] [ array ] ] "infer-effect" set-word-prop
+\ resize-string [ [ fixnum string ] [ string ] ] "infer-effect" set-word-prop
 
 \ <hashtable> [ [ number ] [ hashtable ] ] "infer-effect" set-word-prop
 \ <hashtable> t "flushable" set-word-prop

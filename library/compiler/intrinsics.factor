@@ -22,7 +22,7 @@ namespaces sequences words ;
 
 : slot@ ( node -- n/f )
     #! Compute slot offset.
-    dup node-in-d reverse dup first dup literal? [
+    dup node-in-d reverse-slice dup first dup literal? [
         literal-value cell * swap second
         rot value-tag dup [ - ] [ 2drop f ] if
     ] [
@@ -58,6 +58,21 @@ namespaces sequences words ;
     ] if
     1 %write-barrier ,
 ] "intrinsic" set-word-prop
+
+! \ char-slot [
+!     drop
+!     in-2
+!     -1 %inc-d ,
+!     0 1 %char-slot ,
+!     1 <vreg> 0 %replace-d ,
+! ] "intrinsic" set-word-prop
+! 
+! \ set-char-slot [
+!     drop
+!     in-3
+!     -3 %inc-d ,
+!     0 2 1 %set-char-slot ,
+! ] "intrinsic" set-word-prop
 
 \ type [
     drop

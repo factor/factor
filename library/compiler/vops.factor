@@ -202,18 +202,22 @@ C: %untag make-vop ;
 : %untag <vreg> dest-vop <%untag> ;
 M: %untag basic-block? drop t ;
 
+: slot-vop [ <vreg> ] 2apply 2-vop ;
+
 TUPLE: %slot ;
 C: %slot make-vop ;
-: %slot ( n vreg ) >r <vreg> r> <vreg> 2-vop <%slot> ;
+: %slot ( n vreg ) slot-vop <%slot> ;
 M: %slot basic-block? drop t ;
+
+: set-slot-vop
+    rot <vreg> rot <vreg> rot <vreg> over >r 3array r> 1array f ;
 
 TUPLE: %set-slot ;
 C: %set-slot make-vop ;
 
 : %set-slot ( value obj n )
     #! %set-slot writes to vreg obj.
-    rot <vreg> rot <vreg> rot <vreg> over >r 3array r> 1array
-    f <%set-slot> ;
+    set-slot-vop <%set-slot> ;
 
 M: %set-slot basic-block? drop t ;
 
@@ -232,6 +236,21 @@ C: %fast-set-slot make-vop ;
     >r >r <vreg> r> <vreg> r> over >r 3array r> 1array f
     <%fast-set-slot> ;
 M: %fast-set-slot basic-block? drop t ;
+
+! Char readers and writers
+TUPLE: %char-slot ;
+C: %char-slot make-vop ;
+: %char-slot ( n vreg ) slot-vop <%char-slot> ;
+M: %char-slot basic-block? drop t ;
+
+TUPLE: %set-char-slot ;
+C: %set-char-slot make-vop ;
+
+: %set-char-slot ( value ch n )
+    #! %set-char-slot writes to vreg obj.
+    set-slot-vop <%set-char-slot> ;
+
+M: %set-char-slot basic-block? drop t ;
 
 TUPLE: %write-barrier ;
 C: %write-barrier make-vop ;

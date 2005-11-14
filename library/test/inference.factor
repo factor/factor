@@ -181,6 +181,29 @@ DEFER: agent
 : no-base-case-2 no-base-case-2 ;
 [ [ no-base-case-2 ] infer ] unit-test-fails
 
+! Regression
+: cat dup [ throw ] [ throw ] if ;
+: dog dup [ cat ] [ 3drop ] if ;
+[ { 3 0 } ] [ [ dog ] infer ] unit-test
+
+! Regression
+DEFER: monkey
+: friend dup [ friend ] [ monkey ] if ;
+: monkey dup [ 3drop ] [ friend ] if ;
+[ { 3 0 } ] [ [ friend ] infer ] unit-test
+
+! Regression -- same as above but we infer the second word first
+DEFER: blah2
+: blah dup [ blah ] [ blah2 ] if ;
+: blah2 dup [ blah ] [ 3drop ] if ;
+[ { 3 0 } ] [ [ blah2 ] infer ] unit-test
+
+! Regression
+DEFER: blah4
+: blah3 dup [ blah3 ] [ dup [ blah4 ] [ blah3 ] if ] if ;
+: blah4 dup [ blah4 ] [ dup [ 3drop ] [ blah3 ] if ] if ;
+[ { 3 0 } ] [ [ blah4 ] infer ] unit-test
+
 [ { 2 1 } ] [ [ swons ] infer ] unit-test
 [ { 1 2 } ] [ [ uncons ] infer ] unit-test
 [ { 1 1 } ] [ [ unit ] infer ] unit-test

@@ -1,12 +1,12 @@
 - make-pane: if no input, just return pane-output
-- intrinsic char-slot set-char-slot
+- intrinsic char-slot set-char-slot for x86
+- closing ui does not stop timers
+- adding/removing timers automatically for animated gadgets
+- saving image with UI open
 
 - default library names are not useful
 - fix remaining GL issues
 - fix up the min thumb size hack
-- closing ui does not stop timers
-- adding/removing timers automatically for animated gadgets
-- saving image with UI open
 - bug: left click to bring up context menu, click splitter bar
   and pane grows to 100%
 - bug: click tutorial, full screen, the right-most arrow icon
@@ -16,8 +16,6 @@
 - FIELD: char key_vector[32];
 - FIELD: union { char b[20]; short s[10]; long l[5]; } data;
 - MEMBER: long pad[24];
-- inference: try changing nth and set-nth array methods to call -unsafe,
-  unbalanced branches error
 - floating point intrinsics
 - new basic block optimizer
 - declare slot types for built-ins

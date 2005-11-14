@@ -75,6 +75,8 @@ M: %untag generate-node ( vop -- )
 
 : tag-fixnum ( src dest -- ) tag-bits SLWI ;
 
+: untag-fixnum ( src dest -- ) tag-bits SRAWI ;
+
 M: %dispatch generate-node ( vop -- )
     0 <vreg> check-src
     3 3 1 SRAWI

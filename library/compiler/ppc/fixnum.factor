@@ -18,8 +18,8 @@ namespaces words ;
     "end" get BNO
     dup >3-vop< 3dup r> execute
     2dup
-    dup tag-bits SRAWI
-    dup tag-bits SRAWI
+    dup untag-fixnum
+    dup untag-fixnum
     3 -rot r> execute
     drop
     "s48_long_to_bignum" f compile-c-call
@@ -39,7 +39,7 @@ M: %fixnum- generate-node ( vop -- )
 
 M: %fixnum* generate-node ( vop -- )
     #! Note that this assumes the output will be in r3.
-    >3-vop< dup dup tag-bits SRAWI
+    >3-vop< dup dup untag-fixnum
     0 MTXER
     [ >r >r drop 6 r> r> MULLWO. 3 ] 2keep
     <label> "end" set
@@ -135,7 +135,7 @@ M: %fixnum<< generate-node ( vop -- )
     ! is there going to be an overflow?
     "no-overflow" get BGE
     ! there is going to be an overflow, make a bignum
-    3 3 tag-bits SRAWI
+    3 3 untag-fixnum
     "s48_long_to_bignum" f compile-c-call
     dup 4 LI
     "s48_bignum_arithmetic_shift" f compile-c-call
