@@ -20,9 +20,6 @@
 /* TAGGED user environment data; see getenv/setenv prims */
 DLLEXPORT CELL userenv[USER_ENV];
 
-/* boolean: if true, next interruption check raises exception to user code */
-DLLEXPORT bool interrupt;
-
 /* Error handlers restore this */
 JMP_BUF toplevel;
 

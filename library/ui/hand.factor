@@ -19,15 +19,6 @@ C: hand ( -- hand )
 : button-gesture ( button gesture -- )
     swap add hand get hand-clicked handle-gesture drop ;
 
-: button/ ( n -- )
-    update-clicked
-    dup hand get hand-buttons push
-    [ button-down ] button-gesture ;
-
-: button\ ( n -- )
-    dup hand get hand-buttons delete
-    [ button-up ] button-gesture ;
-
 : drag-gesture ( hand gadget gesture -- )
     #! Send a gesture like [ drag 2 ].
     rot hand-buttons first add swap handle-gesture drop ;

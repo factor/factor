@@ -10,7 +10,7 @@ GENERIC: linearize* ( node -- )
     #! Transform dataflow IR into linear IR. This strips out
     #! stack flow information, and flattens conditionals into
     #! jumps and labels.
-    [ %prologue , %irq , linearize* ] { } make ;
+    [ %prologue , linearize* ] { } make ;
 
 : linearize-next node-successor linearize* ;
 
@@ -20,7 +20,6 @@ M: node linearize* ( node -- ) linearize-next ;
 
 M: #label linearize* ( node -- )
     <label> [
-        %irq ,
         %return-to ,
         dup node-param %label ,
         dup node-child linearize*

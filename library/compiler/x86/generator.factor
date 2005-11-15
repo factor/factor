@@ -88,11 +88,3 @@ M: %tag generate-node ( vop -- )
 
 M: %untag generate-node ( vop -- )
     0 vop-out v>operand tag-mask bitnot AND ;
-
-M: %irq generate-node ( vop -- )
-    "end" <label> set
-    drop
-    "interrupt" f [ 0 CMP ] compile-dlsym
-    "end" get JE
-    "factorbug" f compile-c-call
-    "end" get save-xt ;

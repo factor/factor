@@ -117,17 +117,3 @@ M: %type generate-node ( vop -- )
 M: %tag generate-node ( vop -- )
     dup 0 vop-in v>operand swap 0 vop-out v>operand
     [ tag-mask ANDI ] keep dup tag-fixnum ;
-
-M: %irq generate-node ( vop -- )
-    #! Interrupt check.
-    drop
-    <label> "end" set
-    ! Load interruption flag
-    "interrupt" f 3 compile-dlsym
-    3 3 0 LWZ
-    ! Is it set?
-    0 3 0 CMPI
-    "end" get BEQ
-    ! Call the FEP.
-    "factorbug" f compile-c-call
-    "end" get save-xt ;

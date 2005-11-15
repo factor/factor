@@ -14,8 +14,6 @@ void run(void)
 
 	if(throwing)
 	{
-		interrupt = false;
-
 		if(thrown_keep_stacks)
 		{
 			ds = thrown_ds;
@@ -40,11 +38,6 @@ void run(void)
 	{
 		if(callframe == F)
 		{
-			if(interrupt)
-			{
-				factorbug();
-			}
-
 			callframe = cpop();
 			executing = cpop();
 			continue;

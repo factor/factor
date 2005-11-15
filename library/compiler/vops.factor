@@ -77,11 +77,6 @@ M: vop stack-reserve drop 0 ;
 : 2-vop ( in dest) [ 2array ] keep 1array f ;
 : 3-vop ( in1 in2 dest) >r 2array r> 1array f ;
 
-! interruption check
-TUPLE: %irq ;
-C: %irq make-vop ;
-: %irq empty-vop <%irq> ;
-
 ! miscellanea
 TUPLE: %prologue ;
 C: %prologue make-vop ;

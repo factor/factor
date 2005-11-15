@@ -72,11 +72,11 @@ M: f set-message 2drop ;
     #! the current gadget, with all parents in between.
     hand get hand-gadget parents reverse-slice ;
 
-: update-hand-gadget ( -- )
-    hand-grab hand get set-hand-gadget ;
-
 : hand-grab ( -- gadget )
     hand get rect-loc world get pick-up ;
+
+: update-hand-gadget ( -- )
+    hand-grab hand get set-hand-gadget ;
 
 : move-hand ( loc -- )
     under-hand >r hand get set-rect-loc
@@ -88,9 +88,6 @@ M: f set-message 2drop ;
     dup hand-gadget over set-hand-clicked
     dup screen-loc over set-hand-click-loc
     dup hand-gadget over relative swap set-hand-click-rel ;
-
-M: motion-event handle-event ( event -- )
-    motion-event-loc move-hand ;
 
 : update-hand ( -- )
     #! Called when a gadget is removed or added.
@@ -112,6 +109,8 @@ M: motion-event handle-event ( event -- )
 
 : next-event ( -- event ? ) <event> dup SDL_PollEvent ;
 
+GENERIC: handle-event ( event -- )
+
 : world-loop ( -- )
     #! Keep polling for events until there are no more events in
     #! the queue; then block for the next event.
@@ -124,11 +123,3 @@ M: motion-event handle-event ( event -- )
 
 : run-world ( -- )
     [ start-world world-loop ] [ stop-world ] cleanup ;
-
-M: quit-event handle-event ( event -- )
-    drop stop-world ;
-
-M: resize-event handle-event ( event -- )
-    flush-fonts
-    gl-resize
-    width get height get 0 3array world get set-gadget-dim ;
