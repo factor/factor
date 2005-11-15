@@ -32,7 +32,7 @@ USING: alien errors kernel math namespaces opengl sdl sequences ;
     dup resize-event-w swap resize-event-h 0 gl-flags
     init-surface ;
 
-: with-gl-screen ( quot -- )
+: with-gl-screen ( width height quot -- )
     >r 0 gl-flags r> with-screen ; inline
 
 : gl-error ( -- )
@@ -42,12 +42,14 @@ USING: alien errors kernel math namespaces opengl sdl sequences ;
     #! Execute a quotation, locking the current surface if it
     #! is required (eg, hardware surface).
     [ init-gl call gl-error ] [ SDL_GL_SwapBuffers ] cleanup ;
+    inline
 
 : do-state ( what quot -- )
     swap glBegin call glEnd ; inline
 
 : do-matrix ( mode quot -- )
-    swap glMatrixMode glPushMatrix call glPopMatrix ; inline
+    swap [ glMatrixMode glPushMatrix call ] keep
+    glMatrixMode glPopMatrix ; inline
 
 : gl-vertex first3 glVertex3d ; inline
 
@@ -82,7 +84,7 @@ USING: alien errors kernel math namespaces opengl sdl sequences ;
     #! Draw a filled polygon.
     dup length 2 > GL_POLYGON GL_LINES ? (gl-poly) ;
 
-: gl-poly ( points color -- )
+: gl-poly ( points -- )
     #! Draw a polygon.
     GL_LINE_LOOP (gl-poly) ;
 
