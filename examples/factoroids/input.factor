@@ -2,9 +2,11 @@ IN: factoroids
 USING: generic hashtables io kernel math namespaces sdl
 sequences ;
 
-: fire (  -- )
-    player get dup body-position over body-direction 3 v*n v+
-    swap body-angle spawn-rocket ;
+: fire ( -- )
+    player get [
+        dup body-position over body-direction 3 v*n v+
+        swap body-angle
+    ] keep spawn-rocket ;
 
 : turn-left ( ? actor -- )
     swap [ 1 ] [ dup body-angle-delta 0 < -1 0 ? ] if 30 /f

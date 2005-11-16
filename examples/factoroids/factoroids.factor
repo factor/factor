@@ -22,14 +22,13 @@ IN: factoroids
 
 : (grid-square) ( -- )
     GL_POINTS [
-        3 [ { 1 0 0 } n*v gl-vertex ] each
-        3 [ { 0 0 1 } n*v gl-vertex ] each
+        5 [ { 1 0 0 } n*v gl-vertex ] each
+        5 [ { 0 0 1 } n*v gl-vertex ] each
     ] do-state ;
 
 : grid-square ( w h -- )
     GL_MODELVIEW [
-        0 swap glTranslated
-        1/3 1/3 1/3 glScaled
+        [ 5 * ] 2apply 0 swap glTranslated
         (grid-square)
     ] do-matrix ;
 
@@ -64,6 +63,7 @@ SYMBOL: last-frame
 : run-game ( -- )
     advance-clock tick-actors
     draw-factoroids
+    2 sleep
     check-event [ run-game ] unless ;
 
 : factoroids

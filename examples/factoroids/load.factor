@@ -2,6 +2,7 @@ USING: io parser ;
 
 "examples/factoroids/utils.factor" run-file
 "examples/factoroids/models.factor" run-file
+"examples/factoroids/bodies.factor" run-file
 "examples/factoroids/actors.factor" run-file
 "examples/factoroids/input.factor" run-file
 "examples/factoroids/factoroids.factor" run-file
