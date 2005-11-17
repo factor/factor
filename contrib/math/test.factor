@@ -45,32 +45,32 @@ USING: kernel math test sequences math-contrib ;
 [ 1 ] [ 2 0 nCk ] unit-test
 [ 1 ] [ 2 0 nPk ] unit-test
 [ t ] [ -9000000000000000000000000000000000000000000 gamma inf = ] unit-test
-[ t ] [ -1.5 gamma 2.36327 - abs .0001 < ] unit-test
+[ t ] [ -1.5 gamma 2.36327 almost= ] unit-test
 [ t ] [ -1 gamma inf = ] unit-test
-[ t ] [ -0.5 gamma -3.5449 - abs .0001 < ] unit-test
+[ t ] [ -0.5 gamma -3.5449 almost= ] unit-test
 [ t ] [ 0 gamma inf = ] unit-test
-[ t ] [ .5 gamma 1.7725 - abs .0001 < ] unit-test
-[ t ] [ 1 gamma 1 - abs .0001 < ] unit-test
-[ t ] [ 2 gamma 1 - abs .0001 < ] unit-test
-[ t ] [ 3 gamma 2 - abs .0001 < ] unit-test
-[ t ] [ 11 gamma 3628800 - abs .0001 < ] unit-test
+[ t ] [ .5 gamma 1.7724538 almost= ] unit-test
+[ t ] [ 1 gamma 1 almost= ] unit-test
+[ t ] [ 2 gamma 1 almost= ] unit-test
+[ t ] [ 3 gamma 2 almost= ] unit-test
+[ t ] [ 11 gamma 3628800 almost= ] unit-test
 [ t ] [ 90000000000000000000000000000000000000000000 gamma inf = ] unit-test
 ! some fun identities
-[ t ] [ 2/3 gamma 2 pi * 3 sqrt 1/3 gamma * / - abs .00001 < ] unit-test
-[ t ] [ 3/4 gamma 2 sqrt pi * 1/4 gamma / - abs .0001 < ] unit-test
-[ t ] [ 4/5 gamma 2 5 sqrt / 2 + sqrt pi * 1/5 gamma / - abs .0001 < ] unit-test
-[ t ] [ 3/5 gamma 2 2 5 sqrt / - sqrt pi * 2/5 gamma / - abs .0001 < ] unit-test
+[ t ] [ 2/3 gamma 2 pi * 3 sqrt 1/3 gamma * / almost= ] unit-test
+[ t ] [ 3/4 gamma 2 sqrt pi * 1/4 gamma / almost= ] unit-test
+[ t ] [ 4/5 gamma 2 5 sqrt / 2 + sqrt pi * 1/5 gamma / almost= ] unit-test
+[ t ] [ 3/5 gamma 2 2 5 sqrt / - sqrt pi * 2/5 gamma / almost= ] unit-test
 [ t ] [ -90000000000000000000000000000000000000000000 gammaln inf = ] unit-test
 [ t ] [ -1.5 gammaln inf = ] unit-test
 [ t ] [ -1 gammaln inf = ] unit-test
 [ t ] [ -0.5 gammaln inf = ] unit-test
 [ t ] [ 0 gammaln inf = ] unit-test
-[ t ] [ .5 gammaln .5724 - abs .0001 < ] unit-test
-[ t ] [ 1 gammaln 0 - abs .0001 < ] unit-test
-[ t ] [ 2 gammaln 0 - abs .0001 < ] unit-test
-[ t ] [ 3 gammaln 0.6931 - abs .0001 < ] unit-test
-[ t ] [ 11 gammaln 15.1044 - abs .0001 < ] unit-test
-[ t ] [ 9000000000000000000000000000000000000000000 gammaln 8.811521863477754e+44 - abs 5.387515050969975e+30 < ] unit-test
+[ t ] [ .5 gammaln 0.57236494 almost= ] unit-test
+[ t ] [ 1 gammaln 0 almost= ] unit-test
+[ t ] [ 2 gammaln 0 almost= ] unit-test
+[ t ] [ 3 gammaln 0.693147180 almost= ] unit-test
+[ t ] [ 11 gammaln 15.1044 almost= ] unit-test
+[ t ] [ 9000000000000000000000000000000000000000000 gammaln 8.811521863477754e+44 almost= ] unit-test
 
 [ 1 ] [ qi norm ] unit-test
 [ 1 ] [ qj norm ] unit-test
@@ -211,6 +211,10 @@ unit-test
 
 [ 1 ] [ { 1 } mean ] unit-test
 [ 3/2 ] [ { 1 2 } mean ] unit-test
+[ 0 ] [ { 0 0 0 } geometric-mean ] unit-test
+[ t ] [ { 2 2 2 2 } geometric-mean 2.0 almost= ] unit-test
+[ 1 ] [ { 1 1 1 } geometric-mean ] unit-test
+[ 1/3 ] [ { 1 1 1 } harmonic-mean ] unit-test
 
 [ 0 ] [ { 1 } range ] unit-test
 [ 89 ] [ { 1 2 30 90 } range ] unit-test
