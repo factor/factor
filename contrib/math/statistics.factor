@@ -1,8 +1,6 @@
 IN: math-contrib
 USING: kernel math sequences ;
 
-
-
 : mean ( seq -- n )
     #! arithmetic mean, sum divided by length
     [ sum ] keep length / ;
@@ -13,7 +11,8 @@ USING: kernel math sequences ;
 
 : harmonic-mean ( seq -- n )
     #! harmonic mean, reciprocal of sum of reciprocals.
-    [ recip ] map sum recip ;
+    #! positive reals only
+    0 [ recip + ] reduce recip ;
 
 : median ( seq -- n )
     #! middle number if odd, avg of two middle numbers if even
@@ -22,10 +21,6 @@ USING: kernel math sequences ;
     ] [
         2 /i swap nth
     ] if ;
-
-: minmax ( seq -- min max )
-    #! find the min and max of a seq in one pass
-    inf -inf rot [ dup pick max -rot nip pick min -rot nip ] each ;
 
 : range ( seq -- n )
     #! max - min
@@ -36,7 +31,7 @@ USING: kernel math sequences ;
     dup length 1- dup 0 = [
         0 2nip
     ] [
-        swap [ mean ] keep [ over - sq ] map sum nip swap /
+        swap [ mean ] keep 0 [ pick - sq + ] reduce nip swap /
     ] if ;
 
 : std
