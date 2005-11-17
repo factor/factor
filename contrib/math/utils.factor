@@ -37,9 +37,8 @@ USING: errors kernel sequences math sequences-internals namespaces arrays ;
     inf -inf rot [ dup pick max -rot nip pick min -rot nip ] each ;
 
 : absminmax ( seq -- min max )
-    #! find the min and max of a seq in one pass
-    inf -inf rot [ dup pick max -rot nip pick min -rot nip ] each
-    2dup [ abs ] 2apply > [ swap ] when ;
+    #! find the absolute values of the min and max of a seq in one pass
+    minmax 2dup [ abs ] 2apply > [ swap ] when ;
 
 SYMBOL: almost=-precision .000001 almost=-precision set
 : almost= ( a b -- bool )
@@ -70,9 +69,6 @@ M: frange length ( frange -- n )
 
 : increment-start ( frange -- )
     [ [ frange-from ] keep frange-step + ] keep set-frange-from ;
-
-: exclude-last ( frange -- )
-    ;
 
 : frange-range ( frange -- range )
     [ frange-step ] keep frange-length 1- * ;
