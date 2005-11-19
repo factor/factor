@@ -16,19 +16,19 @@ In many ways, Factor is just like Forth, but with a few additional features: gar
 
 \subsection{Data}
 
-Dealing with strings is a bit easier in Factor than Forth because of garbage collection. Forth uses parsing words that Factor doesn't is when using words that take strings as arguments. Factor doesn't need a parsing word here because it has garbage collection. Unlike Forth, Factor makes a special exception for strings in its syntax, making " recognized as a seperate word, even if it's not followed by a space, as long as it is preceded with a space. Where Forth would write \verb|s" string"| (or sometimes \verb|" string"|) for the syntax of a string, Factor would write \verb|"string"|, a much more conventional notation. Strings, rather than being untyped pointers, are considered string objects. For characters, Factor says \verb|CHAR: c| for Forth's \verb|char c|. As in Forth, Factor characters are integers.
+Dealing with strings is a bit easier in Factor than Forth because of garbage collection. Forth uses parsing words that Factor doesn't when using words that take strings as arguments. Factor doesn't need a parsing word here because it has garbage collection. Unlike Forth, Factor makes a special exception for strings in its syntax, making " recognized as a seperate word, even if it's not followed by a space, as long as it is preceded with a space. Where Forth would write \verb|s" string"| (or sometimes \verb|" string"|) for the syntax of a string, Factor would write \verb|"string"|, a much more conventional notation. Strings, rather than being untyped pointers, are considered string objects. For characters, Factor says \verb|CHAR: c| for Forth's \verb|char c|. As in Forth, Factor characters are integers.
 
 For many of the obvious math words, such as \texttt{+}, \texttt{-}, \texttt{*}, and \texttt{/}, Factor and Forth just share the same name. But in Factor, these work not only on small integers but also on arbitrarily large integers, floating point numbers, fractions, and complex numbers. Factor has a rich math library in the \verb|math| vocabulary.
 
-Unlike Forth, Factor has a large number of datastructures in its standard library, most of which are bounds-checked. These include linked lists, vectors, hashtables, and sometimes-unsafe arrays. But even arrays have their length stored, since it is needed for garbage collection. This is a major change from Forth's anarchy and flexibility when it comes to datastructures.
+Unlike Forth, Factor has a large number of data structures in its standard library, most of which are bounds-checked. These include linked lists, vectors, hashtables, and sometimes-unsafe arrays. But even arrays have their length stored, since it is needed for garbage collection. This is a major change from Forth's anarchy and flexibility when it comes to datastructures.
 
 \subsection{Controlling Flow and Stack}
 
 You can put any code as these lists, and you can move it to the return stack for execution using the word call. This technique is used very often for higher-order functions, largely the same way \texttt{[']} or \texttt{'} is used. \texttt{[ word ]} is the Factor equivalent of \texttt{['] word} for most purposes, but for other operations, prefix it with a backslash (\texttt{\char'134 word}). For executing  a plain word (prefixed with a backslash in Factor), you can use \texttt{execute} just like Forth. But this is not used very often. Normally, you want to use a whole quotation (surrounded by square brackets) since it can be longer than a word, and to execute that, use \texttt{call}.
 
-One of the most visible differences between Factor and Forth is the tendency to use these code quotations where one would use immediate words in Forth. For example, instead of Forth's \verb|if true stuff else false action then|, in Factor you would write \verb|[ true stuff ] [ false action ] ifte|. In order to do \verb|if true stuff then| in Factor, you can't just do \verb|[ true stuff ] ifte|; you have to use a different word instead of ifte, specifically \texttt{when}, in this case: \verb|[ true stuff ] when|. While Factor doesn't have words like \texttt{<>if}, it has a whole range of other if-related words, including \texttt{unless}, \texttt{when*}, \texttt{unless*}, \texttt{?ifte}, and \texttt{?}. Similarly, for a Forth construct like \verb|for blah next|, the Factor code is \verb|[ blah ] repeat|, and the Factor code \verb|[ test ] [ action ] while| is for the Forth construct \verb|begin test while action repeat|.
+One of the most visible differences between Factor and Forth is the tendency to use these code quotations where one would use immediate words in Forth. For example, instead of Forth's \verb|if true stuff else false action then|, in Factor you would write \verb|[ true stuff ] [ false action ] if|. In order to do \verb|if true stuff then| in Factor, you can't just do \verb|[ true stuff ] if|; you have to use a different word instead of if, specifically \texttt{when}, in this case: \verb|[ true stuff ] when|. While Factor doesn't have words like \texttt{<>if}, it has a whole range of other if-related words, including \texttt{unless}, \texttt{when*}, \texttt{unless*}, \texttt{?if}, and \texttt{?}. Similarly, for a Forth construct like \verb|for blah next|, the Factor code is \verb|[ blah ] repeat|, and the Factor code \verb|[ test ] [ action ] while| is for the Forth construct \verb|begin test while action repeat|.
 
-For obvious reasons, Factor shares many of Forth's stack manipulation words. These include \texttt{dup}, \texttt{drop}, \texttt{swap}, \texttt{rot}, \texttt{-rot}, \texttt{2dup}, \texttt{2drop}, \texttt{>r} and \texttt{r>}. Factor doesn't have \texttt{r@}, but somehow, the need never seems to come up in Factor code. Factor adds some new stack shuffling words, such as \texttt{swapd} ( a b c -- b a c ) and \texttt{dupd} ( a b -- a a b )
+For obvious reasons, Factor shares many of Forth's stack manipulation words. These include \texttt{dup}, \texttt{drop}, \texttt{swap}, \texttt{rot}, \texttt{-rot}, \texttt{2dup}, \texttt{2drop}, \texttt{>r} and \texttt{r>}. Factor doesn't have \texttt{r@}, but somehow, the need never seems to come up in Factor code. Factor adds some new stack shuffling words, such as \texttt{swapd} ( a b c -- b a c ) and \texttt{dupd} ( a b -- a a b ).
 
 \subsection{Words, Variables and Parsing}
 
@@ -99,7 +99,7 @@ but in Factor, you dip like
 \end{verbatim}
 This is not new syntax; you are just pushing the top of the stack onto the return stack. But if you do this wrong, taking more than you leave or leaving more than you take, the results are unpredictable and sometimes result in a crash. \texttt{dip} could be implemented very easily in Factor (\verb|: dip swap slip ;|) but that would just be redundant and less flexible.
 
-A big difference between Factor and Joy is the way that Factor encourages you to factor your program into tiny pieces, like Forth. So some words that may have been considered good style in Joy can be considered horrible in Factor. The optimal Factor word contains 7 words. This stylistic difference makes Factor's library very different in order to encourage factoring. For most of Joy's recursive combinators, Factor just uses recursion. Factor does away with some of Joy's words like cond, which usually just lead to words that are too big. Factor does port certain combinators, such as \texttt{times}, \texttt{while} and \texttt{ifte} (but \texttt{ifte} takes a boolean to make the decision, not a quotation).
+A big difference between Factor and Joy is the way that Factor encourages you to factor your program into tiny pieces, like Forth. So some words that may have been considered good style in Joy can be considered horrible in Factor. The optimal Factor word contains 7 words. This stylistic difference makes Factor's library very different in order to encourage factoring. For most of Joy's recursive combinators, Factor just uses recursion. Factor does away with some of Joy's words like cond, which usually just lead to words that are too big. Factor does port certain combinators, such as \texttt{times}, \texttt{while} and \texttt{ifte}, remamed \texttt{if} (but \texttt{if} takes a boolean to make the decision, not a quotation).
 
 \subsection{Words and Variables}
 
@@ -142,7 +142,7 @@ In Factor, code is represented as lists, just like in Scheme and Lisp. But when 
 \end{verbatim}
 is
 \begin{verbatim}
-x [ y ] [ z ] ifte
+x [ y ] [ z ] if
 \end{verbatim}
 
 Factor's \texttt{callcc0} and \texttt{callcc1} is \texttt{call-with-current-continuation} (aka \texttt{call/cc}) in Scheme, basically. The two versions in Factor exist because you need to explicitly specify the arity of your continuation, since factor has no variable argument mechanism. But usually in Factor, you would wrap up continuations in a library rather than use them directly. There is no equivalent of \texttt{dynamic-wind}, and instead, \texttt{catch} (the error handler) is used for most of those resource-handing places.
@@ -200,9 +200,9 @@ if(x, lambda: y, lambda: z)
 \end{verbatim}
 This is essentially what Factor does, in the syntax
 \begin{verbatim}
-x [ y ] [ z ] ifte
+x [ y ] [ z ] if
 \end{verbatim}
-Words like ifte are used for everything from the equivalents of \verb|[x+1 for x in list]| to
+Words like if are used for everything from the equivalents of \verb|[x+1 for x in list]| to
 \begin{verbatim}
 while x==y:
     do(something)
