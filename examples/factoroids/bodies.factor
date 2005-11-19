@@ -7,10 +7,6 @@ angle-delta direction ;
 
 GENERIC: tick ( time obj -- )
 
-: update-direction ( body -- )
-    dup body-angle deg>rad dup sin swap cos 0 swap 3array
-    swap set-body-direction ;
-
 C: body ( position angle size -- )
     [ set-body-size ] keep
     [ set-body-angle ] keep
@@ -43,6 +39,10 @@ C: body ( position angle size -- )
     [ [ scaled-velocity ] keep body-position v+ ] keep
     set-body-position ;
 
+: update-direction ( body -- )
+    dup body-angle deg>rad dup sin swap cos 0 swap 3array
+    swap set-body-direction ;
+
 : body-tick ( time body -- )
     [ update-angle ] 2keep
     [ update-velocity ] 2keep
@@ -63,3 +63,8 @@ C: body ( position angle size -- )
     rot body-up
     >r >r first3 r> first3 r> first3
     gluLookAt ;
+
+: body-perp ( v -- v )
+    #! Return a vector perpendicular to the direction vector
+    #! and also perpendicular to the y axis.
+    body-direction first3 swap >r neg swap r> swap 3array ;

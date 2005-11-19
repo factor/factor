@@ -64,9 +64,6 @@ USING: alien errors kernel math namespaces opengl sdl sequences ;
 : four-sides ( dim -- )
     dup top-left dup top-right dup bottom-right bottom-left ;
 
-: gl-line ( from to color -- )
-    gl-color [ gl-vertex ] 2apply ;
-
 : gl-fill-rect ( dim -- )
     #! Draws a two-dimensional box.
     GL_QUADS [ four-sides ] do-state ;

@@ -61,7 +61,7 @@ unit-test
 
 TUPLE: cat gender declawed? castrated? ;
 
-[ "T{ cat \n     f \"m\" \n    t f\n}" ]
+[ "T{ cat \n    f \"m\" \n    t f\n}" ]
 [
     [
         10 margin set

@@ -23,7 +23,7 @@ M: array rect-dim drop { 0 0 0 } ;
 
 : |v-| ( vec vec -- vec ) v- [ 0 max ] map ;
 
-: <extent-rect> ( loc ext ) dupd swap |v-| <rect> ;
+: <extent-rect> ( loc ext -- rect ) dupd swap |v-| <rect> ;
 
 : >absolute ( rect -- rect )
     rect-bounds >r origin get v+ r> <rect> ;

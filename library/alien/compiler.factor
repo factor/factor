@@ -132,12 +132,8 @@ M: alien-node linearize* ( node -- )
     [ dup parameters stack-space %cleanup , ] unless
     dup linearize-return linearize-next ;
 
-: unpair ( seq -- odds evens )
-    2 swap group flip dup empty?
-    [ drop { } { } ] [ first2 ] if ;
-
 : parse-arglist ( lst -- types stack effect )
-    unpair [
+    2 swap group unpair [
         " " % [ "," ?tail drop % " " % ] each "-- " %
     ] "" make ;
 

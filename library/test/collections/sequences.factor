@@ -205,3 +205,5 @@ unit-test
 ] unit-test
 
 [ 1 ] [ 1/2 { 1 2 3 } nth ] unit-test
+
+[ { } ] [ 0 { } group ] unit-test

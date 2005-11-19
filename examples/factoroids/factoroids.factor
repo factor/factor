@@ -66,6 +66,15 @@ SYMBOL: last-frame
     2 sleep
     check-event [ run-game ] unless ;
 
+: init-actors
+    V{ } clone actors set
+    { 25 1/2 25 } <player> player set
+    { 30 1/2 30 } <player> player get <follower> over set-actor-ai add-actor
+    { 15 1/2 30 } <player> player get <follower> over set-actor-ai add-actor
+    { 10 1/2 30 } <player> <dumbass> over set-actor-ai add-actor
+    { 5 1/2 30 } <player> <dumbass> over set-actor-ai add-actor
+    player get add-actor ;
+
 : factoroids
     init-actors
     800 600 [

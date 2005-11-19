@@ -52,7 +52,7 @@ M: object tail ( index seq -- seq ) [ tail-slice ] keep like ;
 
 : (group) ( n seq -- )
     2dup length >= [
-        dup like , drop
+        dup empty? [ 2drop ] [ dup like , drop ] if
     ] [
         2dup head , dupd tail-slice (group)
     ] if ;
@@ -105,6 +105,9 @@ M: object tail ( index seq -- seq ) [ tail-slice ] keep like ;
 : drop-prefix ( seq1 seq2 -- seq1 seq2 )
     2dup mismatch dup -1 = [ drop 2dup min-length ] when
     tuck swap tail-slice >r swap tail-slice r> ;
+
+: unpair ( seq -- firsts seconds )
+    flip dup empty? [ drop { } { } ] [ first2 ] if ;
 
 IN: strings
 

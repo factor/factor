@@ -211,7 +211,7 @@ M: real pprint* ( obj -- ) number>string f text ;
 : ch>unicode-escape ( ch -- esc )
     >hex 4 CHAR: 0 pad-left "\\u" swap append ;
 
-: unparse-ch ( ch -- ch/str )
+: unparse-ch ( ch -- )
     dup quotable? [
         ,
     ] [

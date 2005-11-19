@@ -1,7 +1,7 @@
-IN: temporary
 USING: arrays assembler compiler compiler-backend generic
 hashtables inference kernel kernel-internals lists math
 optimizer prettyprint sequences strings test vectors words ;
+IN: temporary
 
 : kill-1
     [ 1 2 3 ] [ + ] over drop drop ; compiled
@@ -205,3 +205,9 @@ TUPLE: pred-test ;
 : blah over cons? [ bleh >r 2cdr r> ] [ 2drop f f f ] if ; compiled
 
 [ f ] [ [ 1 2 3 ] [ 1 3 2 ] blah drop 2car = ] unit-test
+
+! regression
+: (the-test) dup 0 > [ 1- (the-test) ] when ; inline
+: the-test 2 dup (the-test) ; compiled
+
+[ 2 0 ] [ the-test ] unit-test

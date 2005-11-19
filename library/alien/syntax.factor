@@ -13,7 +13,6 @@ sequences words ;
 !
 !     : glTranslatef ( x y z -- )
 !         "void" "gl" "glTranslatef" [ "GLfloat" "GLfloat" "GLfloat" ] alien-invoke ;
-!     \ glTranslatef compile
 !
 ! other forms:
 !

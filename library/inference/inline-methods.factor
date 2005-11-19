@@ -19,7 +19,11 @@ M: 2generic dispatching-values drop node-in-d 2 swap tail* ;
     [ swap ?hash [ object ] unless* ] map-with ;
 
 : dispatching-classes ( node -- seq )
-    dup dup node-param dispatching-values node-classes* ;
+    dup node-in-d empty? [
+        drop { }
+    ] [
+        dup dup node-param dispatching-values node-classes*
+    ] if ;
 
 : already-inlined? ( node -- ? )
     #! Was this node inlined from definition of 'word'?

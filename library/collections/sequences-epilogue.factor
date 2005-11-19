@@ -121,7 +121,7 @@ M: object peek ( sequence -- element )
 : pop* ( sequence -- )
     #! Shorten the sequence by one element.
     [ length 1- ] keep
-    [ f -rot set-nth ] 2keep
+    [ 0 -rot set-nth ] 2keep
     set-length ;
 
 : pop ( sequence -- element )
