@@ -25,11 +25,11 @@ UNION: integer fixnum bignum ;
     2dup >= [
         drop
     ] [
-        >r 1 shift 1 max r> (next-power-of-2)
+        >r 1 shift r> (next-power-of-2)
     ] if ;
 
 : next-power-of-2 ( n -- n )
-    0 swap (next-power-of-2) ;
+    1 swap (next-power-of-2) ;
 
 IN: math-internals
 
