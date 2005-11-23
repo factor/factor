@@ -7,6 +7,10 @@ angle-delta direction ;
 
 GENERIC: tick ( time obj -- )
 
+: update-direction ( body -- )
+    dup body-angle deg>rad dup sin swap cos 0 swap 3array
+    swap set-body-direction ;
+
 C: body ( position angle size -- )
     [ set-body-size ] keep
     [ set-body-angle ] keep
@@ -38,10 +42,6 @@ C: body ( position angle size -- )
 : update-position ( time body -- )
     [ [ scaled-velocity ] keep body-position v+ ] keep
     set-body-position ;
-
-: update-direction ( body -- )
-    dup body-angle deg>rad dup sin swap cos 0 swap 3array
-    swap set-body-direction ;
 
 : body-tick ( time body -- )
     [ update-angle ] 2keep

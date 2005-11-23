@@ -12,25 +12,18 @@
 - adding/removing timers automatically for animated gadgets
 - saving image with UI open
 - fix up the min thumb size hack
-
-- make-pane: if no input, just return pane-output
-
-- bug: click tutorial, full screen, the right-most arrow icon
-  loses the vertical bar
-- signal handler should not lose stack pointers
 - callbacks
-- FIELD: char key_vector[32];
-- FIELD: union { char b[20]; short s[10]; long l[5]; } data;
-- MEMBER: long pad[24];
-- floating point intrinsics
-- new basic block optimizer
-- declare slot types for built-ins
-- split: return vectors
-- set-path: iterative
 - better prettyprinting of cond
+- investigate if rehashing on startup is really necessary
+- remove word transfer hack in bootstrap
+- the invalid recursion form case needs to be fixed, for inlines too
+- what about tasks and timers between image restarts
 
 + ui:
 
+- bug: click tutorial, full screen, the right-most arrow icon
+  loses the vertical bar
+- make-pane: if no input, just return pane-output
 - keyboard completion
 - get outliner working with lots of lines of output
 - listener continuations
@@ -53,11 +46,13 @@
 + misc
 
 - code walker & exceptions
-- investigate if rehashing on startup is really necessary
-- remove word transfer hack in bootstrap
+- signal handler should not lose stack pointers
 
 + ffi:
 
+- FIELD: char key_vector[32];
+- FIELD: union { char b[20]; short s[10]; long l[5]; } data;
+- MEMBER: long pad[24];
 - C structs, enums, unions: use new-style string mode parsing
 - smarter out parameter handling
 - clarify powerpc passing of value struct parameters
@@ -70,17 +65,21 @@
 
 + compiler:
 
+- floating point intrinsics
+- new basic block optimizer
+- declare slot types for built-ins
 - check that set-datastack and set-callstack compile correctly in the
   face of optimization
 - [ ] [ throw ] ifte ==> should raise 'unbalanced branches' error
 - remove dead code after a 'throw'
 - flushing optimization
 - [ [ dup call ] dup call ] infer hangs
-- the invalid recursion form case needs to be fixed, for inlines too
 - compile continuations
 
 + sequences:
 
+- split: return vectors
+- set-path: iterative
 - slice: if sequence or seq start is changed, abstraction violation
 - specialized arrays
 - search: slow
@@ -100,8 +99,6 @@
 - reader syntax for byte arrays, displaced aliens
 - out of memory error when printing global namespace
 - merge timers with sleeping tasks
-- what about tasks and timers between image restarts
-- there is a problem with hashcodes of words and bootstrapping
 - delegating generic words with a non-standard picker
 - code gc
 
