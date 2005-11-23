@@ -123,7 +123,6 @@ vectors words ;
         "/library/inference/inference.factor"
         "/library/inference/branches.factor"
         "/library/inference/words.factor"
-        "/library/inference/recursive-values.factor"
         "/library/inference/class-infer.factor"
         "/library/inference/kill-literals.factor"
         "/library/inference/split-nodes.factor"

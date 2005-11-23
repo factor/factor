@@ -39,9 +39,7 @@ DEFER: optimize-node
     optimize-1 [ optimize-loop ] when ;
 
 : optimize ( dataflow -- dataflow )
-    [
-        dup solve-recursion dup split-node optimize-loop
-    ] with-scope ;
+    [ dup split-node optimize-loop ] with-scope ;
 
 : prune-if ( node quot -- successor/t )
     over >r call [ r> node-successor ] [ r> drop t ] if ;

@@ -63,16 +63,19 @@ M: #return live-values* ( node -- seq )
     dup node-param [ drop { } ] [ delegate live-values* ] if ;
 
 ! nodes that don't use their input values directly
-UNION: #killable #shuffle #call-label #merge #values ;
+UNION: #killable #shuffle #call-label #merge #values #entry ;
 
 M: #killable live-values* ( node -- seq ) drop { } ;
 
-! #entry
-M: #entry live-values* ( node -- seq )
-    #! The live values are those which appear in the in-d but
-    #! not in the out-d. These are literals which are replaced
-    #! by computed values in the solve-recursion step.
-    node-out-d ;
+: purge-invariants ( stacks -- seq )
+    #! Output a sequence of values which are not present in the
+    #! same position in each sequence of the stacks sequence.
+    unify-lengths flip [ all-eq? not ] subset concat ;
+
+! #label
+M: #label live-values* ( node -- seq )
+    dup node-child node-in-d
+    >r collect-recursion r> add purge-invariants ;
 
 ! branching
 UNION: #branch #if #dispatch ;
@@ -82,5 +85,5 @@ M: #branch returns* ( node -- ) node-children [ returns* ] each ;
 M: #branch live-values* ( node -- )
     #! This assumes that the last element of each branch is a
     #! #return node.
-    dup delegate live-values* >r returns [ node-in-d ] map
-    unify-lengths purge-invariants r> append ;
+    dup delegate live-values*
+    >r returns [ node-in-d ] map purge-invariants r> append ;

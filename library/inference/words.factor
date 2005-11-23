@@ -30,18 +30,71 @@ TUPLE: rstate label quot base-case? ;
 : with-recursive-state ( word label base-case quot -- )
     >r >r over word-def r> <rstate> cons
     recursive-state [ cons ] change r>
-    call
-    recursive-state [ cdr ] change ; inline
+    call ; inline
 
-: inline-block ( word base-case -- node-block )
-    >r gensym 2dup r> [
-        [
-            dup #label >r
-            #entry node,
-            swap word-def infer-quot
-            #return node, r>
-        ] with-nesting
-    ] with-recursive-state ;
+: inline-block ( word base-case -- node-block variables )
+    [
+        copy-inference
+        >r gensym 2dup r> [
+            [
+                dup #label >r
+                #entry node,
+                swap word-def infer-quot
+                #return node, r>
+            ] with-nesting
+        ] with-recursive-state
+    ] make-hash ;
+
+: apply-infer ( hash -- )
+    { meta-d meta-r d-in }
+    [ [ swap hash ] keep set ] each-with ;
+
+GENERIC: collect-recursion* ( label node -- )
+
+M: node collect-recursion* ( label node -- ) 2drop ;
+
+M: #call-label collect-recursion* ( label node -- )
+    tuck node-param = [ node-in-d , ] [ drop ] if ;
+
+: collect-recursion ( #label -- seq )
+    #! Collect the input stacks of all #call-label nodes that
+    #! call given label.
+    dup node-param swap
+    [ [ collect-recursion* ] each-node-with ] { } make ;
+
+: amend-d-in ( new old -- )
+    [ length ] 2apply - d-in [ + ] change ;
+
+: join-values ( node -- )
+    #! We have to infer recursive labels twice to determine
+    #! which literals survive the recursion (eg, quotations)
+    #! and which don't (loop indices, etc). The latter cannot
+    #! be folded.
+    meta-d get [
+        >r collect-recursion r> add unify-lengths
+        flip [ unify-values ] map dup meta-d set
+    ] keep amend-d-in ;
+
+: splice-node ( node -- )
+    #! Labels which do not call themselves are just spliced into
+    #! the IR, and no #label node is added.
+    dup node-successor [
+        dup node, penultimate-node f over set-node-successor
+        dup current-node set
+    ] when drop ;
+
+: inline-closure ( word -- )
+    #! This is not a closure in the lexical scope sense, but a
+    #! closure under recursive value substitution.
+    #! If the block does not call itself, there is no point in
+    #! having the block node in the IR. Just add its contents.
+    dup f inline-block over recursive-label? [
+        meta-d get >r
+        drop join-values f inline-block apply-infer
+        r> over node-child set-node-in-d node,
+    ] [
+        apply-infer node-child node-successor splice-node drop
+    ] if ;
 
 : infer-compound ( word base-case -- terminates? effect )
     #! Infer a word's stack effect in a separate inferencer
@@ -49,8 +102,8 @@ TUPLE: rstate label quot base-case? ;
     #! control flow by throwing an exception or restoring a
     #! continuation.
     [
-        recursive-state get init-inference
-        over >r inline-block drop terminated? get effect r>
+        recursive-state get init-inference over >r inline-block
+        nip [ terminated? get effect ] bind r>
     ] with-scope over consume/produce over [ terminate ] when ;
 
 GENERIC: apply-word
@@ -92,10 +145,8 @@ M: symbol apply-object ( word -- )
     apply-literal ;
 
 : inline-base-case ( word label -- )
-    meta-d get clone >r
-    over t inline-block drop
-    [ #call-label ] [ #call ] ?if
-    r> over set-node-in-d node, ;
+    meta-d get clone >r over t inline-block apply-infer drop
+    [ #call-label ] [ #call ] ?if r> over set-node-in-d node, ;
 
 : base-case ( word label -- )
     over "inline" word-prop [
@@ -134,26 +185,11 @@ M: symbol apply-object ( word -- )
         ] if*
     ] if* ;
 
-: splice-node ( node -- )
-    dup node-successor [
-        dup node, penultimate-node f over set-node-successor
-        dup current-node set
-    ] when drop ;
-
-: block, ( block -- )
-    #! If the block does not call itself, there is no point in
-    #! having the block node in the IR. Just add its contents.
-    dup recursive-label? [
-        node,
-    ] [
-        node-child node-successor splice-node
-    ] if ;
-
 M: compound apply-object ( word -- )
     #! Apply the word's stack effect to the inferencer state.
     dup recursive-state get assoc [
         recursive-word
     ] [
         dup "inline" word-prop
-        [ f inline-block block, ] [ apply-default ] if
+        [ inline-closure ] [ apply-default ] if
     ] if* ;

@@ -204,6 +204,16 @@ DEFER: blah4
 : blah4 dup [ blah4 ] [ dup [ 3drop ] [ blah3 ] if ] if ;
 [ { 3 0 } ] [ [ blah4 ] infer ] unit-test
 
+! Regression
+: bad-combinator ( obj quot -- )
+    over [
+        2drop
+    ] [
+        [ swap slip ] keep swap bad-combinator
+    ] if ; inline
+
+[ [ [ 1 ] [ ] bad-combinator ] infer ] unit-test-fails
+
 [ { 2 1 } ] [ [ swons ] infer ] unit-test
 [ { 1 2 } ] [ [ uncons ] infer ] unit-test
 [ { 1 1 } ] [ [ unit ] infer ] unit-test

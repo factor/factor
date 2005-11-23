@@ -47,9 +47,9 @@ C: slice ( from to seq -- seq )
     >r 3dup check-slice r>
     [ set-slice-seq ] keep
     [ set-slice-to ] keep
-    [ set-slice-from ] keep ;
+    [ set-slice-from ] keep ; inline
 
-: <range> ( from to -- seq ) dup <slice> ;
+: <range> ( from to -- seq ) dup <slice> ; inline
 
 M: slice length ( range -- n )
     dup slice-to swap slice-from - ;

@@ -1,3 +1,11 @@
+- flip-branches optimizer not working
+
+- prettyprint:
+
+{ V{ T{ literal T{ value f f G:110886 } f } T{ value 
+    f f G:110887
+} } }
+
 - make-pane: if no input, just return pane-output
 - intrinsic char-slot set-char-slot for x86
 - closing ui does not stop timers
@@ -69,8 +77,6 @@
 - flushing optimization
 - [ [ dup call ] dup call ] infer hangs
 - the invalid recursion form case needs to be fixed, for inlines too
-- recursion is iffy; if the stack at the recursive call doesn't match
-  up, throw an error
 - compile continuations
 
 + sequences:
@@ -85,6 +91,10 @@
 
 + kernel:
 
+- first-class methods:
+  - methods outliner
+  - annotations for methods
+  - docstrings, and originating source file for methods
 - better handling of random arrangements of html words when
   prettyprinting
 - reader syntax for byte arrays, displaced aliens

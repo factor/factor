@@ -44,8 +44,6 @@ C: sorter ( seq start end -- sorter )
         ] when
     ] when ; inline
 
-DEFER: (nsort)
-
 : (nsort) ( quot seq start end -- )
     2dup < [
         <sorter> sort-step

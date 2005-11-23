@@ -1,6 +1,7 @@
 USING: arrays assembler compiler compiler-backend generic
 hashtables inference kernel kernel-internals lists math
-optimizer prettyprint sequences strings test vectors words ;
+optimizer prettyprint sequences strings test vectors words
+sequences-internals ;
 IN: temporary
 
 : kill-1
@@ -38,7 +39,7 @@ IN: temporary
 : set= 2dup subset? >r swap subset? r> and ;
 
 : kill-set=
-    dataflow dup solve-recursion dup split-node
+    dataflow dup split-node
     kill-set hash-keys [ literal-value ] map set= ;
 
 : foo 1 2 3 ;
@@ -99,6 +100,14 @@ IN: temporary
     [ 1 2 3 ] >r + r> drop ; compiled
 
 [ 4 ] [ 2 2 literal-kill-test-7 ] unit-test
+
+: literal-kill-test-8
+    dup [ >r dup slip r> literal-kill-test-8 ] [ 2drop ] if ; inline
+
+[ t ] [
+    [ [ ] swap literal-kill-test-8 ] dataflow
+    dup split-node live-values hash-values [ literal? ] subset empty?
+] unit-test
 
 ! Test method inlining
 [ string ] [
@@ -211,3 +220,21 @@ TUPLE: pred-test ;
 : the-test 2 dup (the-test) ; compiled
 
 [ 2 0 ] [ the-test ] unit-test
+
+! regression
+: (double-recursion) ( start end -- )
+    < [
+        6 1 (double-recursion)
+        3 2 (double-recursion)
+    ] when ; inline
+
+: double-recursion 0 2 (double-recursion) ; compiled
+
+[ ] [ double-recursion ] unit-test
+
+: double-label-1
+    [ f double-label-1 ] [ swap nth-unsafe ] if ; inline
+: double-label-2
+    dup general-list? [ ] [ ] if 0 t double-label-1 ; compiled
+
+[ 0 ] [ 10 double-label-2 ] unit-test

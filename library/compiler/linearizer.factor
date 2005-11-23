@@ -19,18 +19,21 @@ M: f linearize* ( f -- ) drop ;
 M: node linearize* ( node -- ) linearize-next ;
 
 M: #label linearize* ( node -- )
+    #! We remap the IR node's label to a new label object here,
+    #! to avoid problems with two IR #label nodes having the
+    #! same label in different lexical scopes.
     <label> [
         %return-to ,
-        dup node-param %label ,
+        <label> dup pick node-param set %label ,
         dup node-child linearize*
     ] keep %label ,
     linearize-next ;
 
-: ?tail-call ( node caller jumper -- next )
-    >r >r dup node-successor #return? [
-        node-param r> drop r> execute ,
+: ?tail-call ( node label caller jumper -- next )
+    >r >r over node-successor #return? [
+        r> drop r> execute , drop
     ] [
-        dup node-param r> execute , r> drop linearize-next
+        r> execute , r> drop linearize-next
     ] if ; inline
 
 : intrinsic ( #call -- quot ) node-param "intrinsic" word-prop ;
@@ -53,12 +56,12 @@ M: #call linearize* ( node -- )
         dup intrinsic [
             dupd call linearize-next
         ] [
-            \ %call \ %jump ?tail-call
+            dup node-param \ %call \ %jump ?tail-call
         ] if*
     ] if* ;
 
 M: #call-label linearize* ( node -- )
-    \ %call-label \ %jump-label ?tail-call ;
+    dup node-param get \ %call-label \ %jump-label ?tail-call ;
 
 M: #if linearize* ( node -- )
     <label> dup in-1  -1 %inc-d , 0 %jump-t , linearize-if ;
@@ -81,6 +84,4 @@ M: #dispatch linearize* ( vtable -- )
     node-children dispatch-head dispatch-body ;
 
 M: #return linearize* ( node -- )
-    #! Simple label returns do not count, since simple labels do
-    #! not push a stack frame on the C stack.
     drop %return , ;

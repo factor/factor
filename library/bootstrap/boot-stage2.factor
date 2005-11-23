@@ -44,7 +44,7 @@ compile? [
     {
         uncons 1+ 1- + <= > >= mod length
         nth-unsafe set-nth-unsafe
-        = string>number number>string scan solve-recursion
+        = string>number number>string scan
         kill-set kill-node (generate)
     } [ compile ] each
 ] when

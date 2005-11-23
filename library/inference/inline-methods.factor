@@ -50,8 +50,7 @@ M: 2generic dispatching-values drop node-in-d 2 swap tail* ;
     dup inlining-class swap node-param "methods" word-prop hash ;
 
 : method-dataflow ( node -- dataflow )
-    dup will-inline swap node-in-d dataflow-with
-    dup solve-recursion ;
+    dup will-inline swap node-in-d dataflow-with ;
 
 : inline-method ( node -- node )
     #! We set the #call node's param to f so that it gets killed

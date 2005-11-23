@@ -79,12 +79,13 @@ M: object >list ( seq -- list ) dup length 0 rot (>list) ;
     #! consecutive indices numbered from 'start'.
     3dup copy-into-check
     dup length [ >r pick r> + pick set-nth-unsafe ] 2each 2drop ;
+    inline
 
 : nappend ( to from -- )
     #! Add all elements of 'from' at the end of 'to'.
     >r dup length swap r>
     over length over length + pick set-length
-    copy-into ;
+    copy-into ; inline
 
 : append ( s1 s2 -- s1+s2 )
     #! Outputs a new sequence of the same type as s1.
@@ -122,11 +123,11 @@ M: object peek ( sequence -- element )
     #! Shorten the sequence by one element.
     [ length 1- ] keep
     [ 0 -rot set-nth ] 2keep
-    set-length ;
+    set-length ; inline
 
 : pop ( sequence -- element )
     #! Get value at end of sequence and remove it.
-    dup peek swap pop* ;
+    dup peek swap pop* ; inline
 
 : join ( seq glue -- seq )
     #! The new sequence is of the same type as glue.
