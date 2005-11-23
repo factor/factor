@@ -7,8 +7,8 @@ USING: alien io kernel parser sequences ;
             "glu" "glu32.dll" "stdcall" add-library
     ] }
     { [ t ] [
-            "gl" "libGL.so" "cdecl" add-library
-            "glu" "libGLU.so" "cdecl" add-library
+            "gl" "libGL.so.1" "cdecl" add-library
+            "glu" "libGLU.so.1" "cdecl" add-library
     ] }
 } cond
 

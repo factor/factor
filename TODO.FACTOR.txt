@@ -1,20 +1,20 @@
-- flip-branches optimizer not working
++ 0.80:
 
+- flip-branches optimizer not working
 - prettyprint:
 
-{ V{ T{ literal T{ value f f G:110886 } f } T{ value 
-    f f G:110887
-} } }
-
-- make-pane: if no input, just return pane-output
+  { V{ T{ literal T{ value f f G:110886 } f } T{ value 
+      f f G:110887
+  } } }
 - intrinsic char-slot set-char-slot for x86
+- fix remaining GL issues
 - closing ui does not stop timers
 - adding/removing timers automatically for animated gadgets
 - saving image with UI open
-
-- default library names are not useful
-- fix remaining GL issues
 - fix up the min thumb size hack
+
+- make-pane: if no input, just return pane-output
+
 - bug: click tutorial, full screen, the right-most arrow icon
   loses the vertical bar
 - signal handler should not lose stack pointers
