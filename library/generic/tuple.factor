@@ -72,7 +72,7 @@ PREDICATE: word tuple-class "tuple-size" word-prop ;
     >r create-in
     dup intern-symbol
     dup tuple-predicate
-    dup \ tuple reintern "superclass" set-word-prop
+    dup \ tuple bootstrap-word "superclass" set-word-prop
     dup define-class
     dup r> tuple-slots
     default-constructor ;

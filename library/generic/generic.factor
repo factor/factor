@@ -96,12 +96,18 @@ M: generic definer drop \ G: ;
         over word-name " is not a class" append throw
     ] unless 2drop ;
 
+: with-methods ( word quot -- | quot: methods -- )
+    #! Applies a quotation to the method hash and regenerates
+    #! the generic.
+    swap [ "methods" word-prop swap call ] keep make-generic ;
+    inline
+
 : define-method ( definition class generic -- )
-    >r reintern r> 2dup check-method
-    [ "methods" word-prop set-hash ] keep make-generic ;
+    >r bootstrap-word r> 2dup check-method
+    [ set-hash ] with-methods ;
 
 : forget-method ( class generic -- )
-    [ "methods" word-prop remove-hash ] keep make-generic ;
+    [ remove-hash ] with-methods ;
 
 : init-methods ( word -- )
      dup "methods" word-prop
@@ -111,13 +117,7 @@ M: generic definer drop \ G: ;
 
 : bootstrap-combination ( quot -- quot )
     #! Bootstrap hack.
-    global [
-        [
-            dup word? [
-                dup word-name swap word-vocabulary lookup
-            ] when
-        ] map
-    ] bind ;
+    global [ [ dup word? [ target-word ] when ] map ] bind ;
 
 : define-generic* ( word combination -- )
     bootstrap-combination
@@ -196,10 +196,9 @@ PREDICATE: word predicate "definition" word-prop ;
     ] map [ drop f ] swap alist>quot ;
 
 : set-members ( class members -- )
-    [ reintern ] map "members" set-word-prop ;
+    [ bootstrap-word ] map "members" set-word-prop ;
 
 : define-union ( class predicate members -- )
-    #! We have to turn the f object into the f word, same for t.
     3dup nip set-members pick define-class
     union-predicate define-predicate ;
 

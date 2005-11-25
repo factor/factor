@@ -42,7 +42,7 @@ int main(int argc, char** argv)
 	CELL generations = 2;
 	CELL young_size = 8;
 	CELL aging_size = 16;
-	CELL code_size = 2;
+	CELL code_size = 4;
 	CELL literal_size = 128;
 	CELL args;
 	CELL i;

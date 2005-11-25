@@ -20,7 +20,7 @@ namespaces sequences vectors words ;
 : sort-methods ( assoc n -- vtable )
     #! Input is a predicate -> method association.
     [
-        type>class [ object reintern ] unless*
+        type>class [ object bootstrap-word ] unless*
         swap [ car classes-intersect? ] subset-with
     ] map-with ;
 
@@ -43,7 +43,7 @@ namespaces sequences vectors words ;
 
 : <vtable> ( picker word n -- vtable )
     #! n is vtable size; either num-types or num-tags.
-    >r 2dup empty-method \ object reintern
+    >r 2dup empty-method \ object bootstrap-word
     swons >r methods r> swons r> sort-methods vtable-methods ;
 
 : small-generic ( picker word -- def )

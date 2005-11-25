@@ -38,7 +38,7 @@ TUPLE: no-math-method left right generic ;
     [ ] [ [ no-math-method ] curry ] ?if ;
 
 : object-method ( generic -- quot )
-    object reintern applicable-method ;
+    object bootstrap-word applicable-method ;
 
 : math-method ( word left right -- quot )
     [ type>class ] 2apply 2dup and [

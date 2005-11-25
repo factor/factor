@@ -188,8 +188,7 @@ M: f ' ( obj -- ptr )
 
 : transfer-word ( word -- word )
     #! This is a hack. See doc/bootstrap.txt.
-    dup dup word-name swap word-vocabulary lookup
-    [ ] [ dup "Missing DEFER: " word-error ] ?if ;
+    dup target-word [ ] [ dup "Missing DEFER: " word-error ] ?if ;
 
 : pooled-object ( object -- ptr ) objects get hash ;
 

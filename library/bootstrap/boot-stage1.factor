@@ -11,14 +11,7 @@ vectors words ;
 
 ! The [ ] make form creates a boot quotation
 [
-    [
-        ! initialize it twice so that we get a catchstack
-        ! early on for each-object.
-        init-error-handler
-        [ hashtable? ] instances
-        [ dup hash-size 1 max swap set-bucket-count ] each
-        boot
-    ] %
+    \ boot ,
 
     {
         "/version.factor"

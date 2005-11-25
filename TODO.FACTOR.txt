@@ -7,7 +7,6 @@
       f f G:110887
   } } }
 - intrinsic char-slot set-char-slot for x86
-- fix remaining GL issues
 - closing ui does not stop timers
 - adding/removing timers automatically for animated gadgets
 - saving image with UI open
@@ -18,6 +17,9 @@
 - remove word transfer hack in bootstrap
 - the invalid recursion form case needs to be fixed, for inlines too
 - what about tasks and timers between image restarts
+- new hashtable
+  - bootstrap it in
+  - double hash
 
 + ui:
 

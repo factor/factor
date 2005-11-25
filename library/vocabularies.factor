@@ -79,11 +79,14 @@ SYMBOL: vocabularies
     #! Test if the word is a member of its vocabulary.
     dup word-name over word-vocabulary lookup eq? ;
 
-: reintern ( word -- word )
+: bootstrap-word ( word -- word )
     dup word-name swap word-vocabulary
     bootstrapping? get [
         dup "syntax" = [ drop "!syntax" ] when
     ] when lookup ;
+
+: target-word ( word -- word )
+    dup word-name swap word-vocabulary lookup ;
 
 "scratchpad" "in" set
 [

@@ -1,15 +1,17 @@
-USING: compiler hashtables kernel math namespaces sequences test ;
+IN: temporary
+USING: compiler hashtables kernel math memory namespaces
+sequences strings test ;
 
-: store-hash ( hashtable n -- )
+: store-hash ( hashtable seq -- )
     [ dup pick set-hash ] each drop ;
 
-: lookup-hash ( hashtable n -- )
+: lookup-hash ( hashtable seq -- )
     [ over hash drop ] each drop ;
 
-: hashtable-benchmark ( -- )
+: hashtable-benchmark ( seq -- )
     100 [
         drop
-        80000 100000 <hashtable> swap 2dup store-hash lookup-hash
-    ] each ; compiled
+        100000 <hashtable> swap 2dup store-hash lookup-hash
+    ] each-with ; compiled
 
-[ ] [ hashtable-benchmark ] unit-test
+[ ] [ [ string? ] instances hashtable-benchmark ] unit-test
