@@ -16,7 +16,7 @@ namespaces prettyprint sequences strings vectors words ;
 SYMBOL: compiled-xts
 
 : save-xt ( word -- )
-    compiled-offset swap compiled-xts set-hash ;
+    compiled-offset swap compiled-xts get set-hash ;
 
 : commit-xts ( -- )
     #! We must flush the instruction cache on PowerPC.
