@@ -1,8 +1,8 @@
 IN: inference
 USING: arrays alien assembler errors generic hashtables
-interpreter io io-internals kernel kernel-internals lists math
-math-internals memory parser sequences strings vectors words
-prettyprint ;
+hashtables-internals interpreter io io-internals kernel
+kernel-internals lists math math-internals memory parser
+sequences strings vectors words prettyprint ;
 
 ! We transform calls to these words into 'branched' forms;
 ! eg, there is no VOP for fixnum<=, only fixnum<= followed
@@ -35,17 +35,13 @@ prettyprint ;
     dup "infer-effect" word-prop consume/produce
     [ [ t ] [ f ] if ] infer-quot ;
 
-{ fixnum<= fixnum< fixnum>= fixnum> eq? } [
-    dup dup literalize [ manual-branch ] cons
-    "infer" set-word-prop
-] each
+{ fixnum<= fixnum< fixnum>= fixnum> eq? }
+[ dup [ manual-branch ] curry "infer" set-word-prop ] each
 
 ! Primitive combinators
 \ call [ [ general-list ] [ ] ] "infer-effect" set-word-prop
 
-\ call [
-    pop-literal infer-quot-value
-] "infer" set-word-prop
+\ call [ pop-literal infer-quot-value ] "infer" set-word-prop
 
 \ execute [ [ word ] [ ] ] "infer-effect" set-word-prop
 
@@ -63,7 +59,7 @@ prettyprint ;
 \ cond [ [ object ] [ ] ] "infer-effect" set-word-prop
 
 \ cond [
-    pop-literal [ first2 cons ] map reverse-slice
+    pop-literal reverse-slice
     [ no-cond ] swap alist>quot infer-quot-value
 ] "infer" set-word-prop
 
@@ -470,8 +466,8 @@ prettyprint ;
 \ resize-array [ [ fixnum array ] [ array ] ] "infer-effect" set-word-prop
 \ resize-string [ [ fixnum string ] [ string ] ] "infer-effect" set-word-prop
 
-\ <hashtable> [ [ number ] [ hashtable ] ] "infer-effect" set-word-prop
-\ <hashtable> t "flushable" set-word-prop
+\ (hashtable) [ [ ] [ hashtable ] ] "infer-effect" set-word-prop
+\ (hashtable) t "flushable" set-word-prop
 
 \ <array> [ [ number ] [ array ] ] "infer-effect" set-word-prop
 \ <array> t "flushable" set-word-prop

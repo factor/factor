@@ -113,7 +113,7 @@ M: %peek trim-dead* ( tail vop -- )
 
 : forget-stack-loc ( loc -- )
     #! Forget that any vregs hold this stack location.
-    vreg-contents [ [ cdr swap = not ] hash-subset-with ] change ;
+    vreg-contents [ [ nip swap = not ] hash-subset-with ] change ;
 
 : remember-replace ( vop -- )
     #! If a vreg claims to hold the stack location we are

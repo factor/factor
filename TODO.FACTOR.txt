@@ -13,13 +13,13 @@
 - fix up the min thumb size hack
 - callbacks
 - better prettyprinting of cond
-- investigate if rehashing on startup is really necessary
 - remove word transfer hack in bootstrap
 - the invalid recursion form case needs to be fixed, for inlines too
 - what about tasks and timers between image restarts
-- new hashtable
-  - bootstrap it in
-  - double hash
+
+- double hash
+- empty key change
+- if hash is full and we change existing key, it should not grow
 
 + ui:
 

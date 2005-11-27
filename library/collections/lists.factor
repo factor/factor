@@ -78,5 +78,6 @@ M: cons = ( obj cons -- ? )
 
 M: f = ( obj f -- ? ) eq? ;
 
-: curry ( obj quot -- quot )
-    >r literalize r> cons ;
+: curry ( obj quot -- quot ) >r literalize r> cons ;
+
+: assoc ( key alist -- value ) [ car = ] find-with nip cdr ;

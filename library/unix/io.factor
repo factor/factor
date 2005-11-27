@@ -135,7 +135,7 @@ GENERIC: task-container ( task -- vector )
 
 : handle-fdset ( fdset tasks -- )
     [
-        cdr dup io-task-port timeout? [
+        nip dup io-task-port timeout? [
             dup io-task-port "Timeout" swap report-error
             nip pop-callback continue
         ] [
@@ -146,7 +146,7 @@ GENERIC: task-container ( task -- vector )
 
 : init-fdset ( fdset tasks -- )
     >r dup FD_SETSIZE clear-bits r>
-    [ car t swap rot set-bit-nth ] hash-each-with ;
+    [ drop t swap rot set-bit-nth ] hash-each-with ;
 
 : init-fdsets ( -- read write except )
     read-fdset get [ read-tasks get init-fdset ] keep

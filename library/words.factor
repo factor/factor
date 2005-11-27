@@ -4,6 +4,9 @@ IN: words
 USING: generic hashtables kernel kernel-internals lists math
 namespaces sequences strings vectors ;
 
+: init-word ( word -- )
+    H{ } clone swap set-word-props ;
+
 ! The basic word type. Words can be named and compared using
 ! identity. They hold a property map.
 
@@ -124,6 +127,6 @@ M: word literalize <wrapper> ;
     #! is not contained in any vocabulary.
     "G:"
     global [ \ gensym dup inc get ] bind
-    number>string append f <word> ;
+    number>string append f <word> dup init-word ;
 
 0 \ gensym global set-hash

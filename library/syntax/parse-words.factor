@@ -1,8 +1,8 @@
 ! Copyright (C) 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: parser
-USING: errors kernel lists math namespaces sequences io
-strings words ;
+USING: errors hashtables kernel lists math namespaces sequences
+io strings words ;
 
 ! The parser uses a number of variables:
 ! line - the line being parsed
@@ -84,17 +84,17 @@ global [ string-mode off ] bind
     (until-eol) (until) ;
 
 : escape ( ch -- esc )
-    [
-        [[ CHAR: e  CHAR: \e ]]
-        [[ CHAR: n  CHAR: \n ]]
-        [[ CHAR: r  CHAR: \r ]]
-        [[ CHAR: t  CHAR: \t ]]
-        [[ CHAR: s  CHAR: \s ]]
-        [[ CHAR: \s CHAR: \s ]]
-        [[ CHAR: 0  CHAR: \0 ]]
-        [[ CHAR: \\ CHAR: \\ ]]
-        [[ CHAR: \" CHAR: \" ]]
-    ] assoc dup [ "Bad escape" throw ] unless ;
+    H{
+        { CHAR: e  CHAR: \e }
+        { CHAR: n  CHAR: \n }
+        { CHAR: r  CHAR: \r }
+        { CHAR: t  CHAR: \t }
+        { CHAR: s  CHAR: \s }
+        { CHAR: \s CHAR: \s }
+        { CHAR: 0  CHAR: \0 }
+        { CHAR: \\ CHAR: \\ }
+        { CHAR: \" CHAR: \" }
+    } hash dup [ "Bad escape" throw ] unless ;
 
 : next-escape ( n str -- ch n )
     2dup nth CHAR: u = [

@@ -35,7 +35,6 @@ vectors words ;
         "/library/collections/arrays.factor"
         "/library/collections/strings.factor"
         "/library/collections/sbuf.factor"
-        "/library/collections/assoc.factor"
         "/library/collections/lists.factor"
         "/library/collections/vectors.factor"
         "/library/collections/hashtables.factor"
@@ -148,7 +147,7 @@ vectors words ;
     } [ dup print parse-resource % ] each
     
     [
-        [ "/library/bootstrap/boot-stage2.factor" run-resource ]
+        "/library/bootstrap/boot-stage2.factor" run-resource
         [ print-error die ] recover
     ] %
 ] [ ] make

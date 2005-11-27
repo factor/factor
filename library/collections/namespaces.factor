@@ -91,9 +91,10 @@ SYMBOL: hash-buffer
 
 : (closure) ( key hash -- )
     tuck hash dup [
-        hash-keys [
-            dup dup closure, [ 2drop ] [ swap (closure) ] if
-        ] each-with
+        [
+            drop dup dup closure,
+            [ 2drop ] [ swap (closure) ] if
+        ] hash-each-with
     ] [
         2drop
     ] if ;
@@ -108,7 +109,7 @@ SYMBOL: hash-buffer
 IN: lists
 
 : alist>quot ( default alist -- quot )
-    [ unswons [ % , , \ if , ] [ ] make ] each ;
+    [ [ first2 swap % , , \ if , ] [ ] make ] each ;
 
 IN: kernel-internals
 

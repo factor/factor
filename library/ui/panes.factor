@@ -74,11 +74,11 @@ SYMBOL: structured-input
  
 : pane-actions ( line -- )
     H{
-        [[ [ button-down 1 ] [ pane-input [ click-editor ] when* ] ]]
-        [[ [ "RETURN" ] [ pane-return ] ]]
-        [[ [ "UP" ] [ pane-input [ [ history-prev ] with-editor ] when* ] ]]
-        [[ [ "DOWN" ] [ pane-input [ [ history-next ] with-editor ] when* ] ]]
-        [[ [ "CTRL" "l" ] [ pane get pane-clear ] ]]
+        { [ button-down 1 ] [ pane-input [ click-editor ] when* ] }
+        { [ "RETURN" ] [ pane-return ] }
+        { [ "UP" ] [ pane-input [ [ history-prev ] with-editor ] when* ] }
+        { [ "DOWN" ] [ pane-input [ [ history-next ] with-editor ] when* ] }
+        { [ "CTRL" "l" ] [ pane get pane-clear ] }
     } add-actions ;
 
 C: pane ( input? scrolls? -- pane )

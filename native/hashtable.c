@@ -1,20 +1,14 @@
 #include "factor.h"
 
-F_HASHTABLE* hashtable(F_FIXNUM capacity)
-{
-	F_HASHTABLE* hash;
-	if(capacity < 0)
-		general_error(ERROR_NEGATIVE_ARRAY_SIZE,tag_integer(capacity));
-	hash = allot_object(HASHTABLE_TYPE,sizeof(F_VECTOR));
-	hash->count = tag_fixnum(0);
-	hash->array = tag_object(array(ARRAY_TYPE,capacity,F));
-	return hash;
-}
-
 void primitive_hashtable(void)
 {
+	F_HASHTABLE* hash;
 	maybe_gc(0);
-	drepl(tag_object(hashtable(to_fixnum(dpeek()))));
+	hash = allot_object(HASHTABLE_TYPE,sizeof(F_VECTOR));
+	hash->count = F;
+	hash->deleted = F;
+	hash->array = F;
+	dpush(tag_object(hash));
 }
 
 void fixup_hashtable(F_HASHTABLE* hashtable)

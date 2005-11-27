@@ -175,13 +175,13 @@ GENERIC: pprint* ( obj -- )
 
 : vocab-style ( vocab -- style )
     H{
-        [[ "syntax" [ [[ foreground { 0.5 0.5 0.5 1.0 } ]] ] ]]
-        [[ "kernel" [ [[ foreground { 0.0 0.0 0.5 1.0 } ]] ] ]]
-        [[ "sequences" [ [[ foreground { 0.5 0.0 0.0 1.0 } ]] ] ]]
-        [[ "math" [ [[ foreground { 0.0 0.5 0.0 1.0 } ]] ] ]]
-        [[ "math-internals" [ [[ foreground { 0.75 0.0 0.0 1.0 } ]] ] ]]
-        [[ "kernel-internals" [ [[ foreground { 0.75 0.0 0.0 1.0 } ]] ] ]]
-        [[ "io-internals" [ [[ foreground { 0.75 0.0 0.0 1.0 } ]] ] ]]
+        { "syntax" [ [[ foreground { 0.5 0.5 0.5 1.0 } ]] ] }
+        { "kernel" [ [[ foreground { 0.0 0.0 0.5 1.0 } ]] ] }
+        { "sequences" [ [[ foreground { 0.5 0.0 0.0 1.0 } ]] ] }
+        { "math" [ [[ foreground { 0.0 0.5 0.0 1.0 } ]] ] }
+        { "math-internals" [ [[ foreground { 0.75 0.0 0.0 1.0 } ]] ] }
+        { "kernel-internals" [ [[ foreground { 0.75 0.0 0.0 1.0 } ]] ] }
+        { "io-internals" [ [[ foreground { 0.75 0.0 0.0 1.0 } ]] ] }
     } hash ;
 
 : word-style ( word -- style )

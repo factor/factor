@@ -70,16 +70,14 @@ M: word (see) drop ;
 M: compound (see)
     dup word-def swap see-body ;
 
-: method. ( word [[ class method ]] -- )
+: method. ( word class method -- )
     \ M: pprint-word
-    unswons pprint-word
-    swap pprint-word
-    <block pprint-elements pprint-;
-    block; ;
+    >r pprint-word pprint-word r>
+    <block pprint-elements pprint-; block; ;
 
 M: generic (see)
     dup dup "combination" word-prop swap see-body
-    dup methods [ newline method. ] each-with ;
+    dup methods [ newline first2 method. ] each-with ;
 
 GENERIC: class. ( word -- )
 
@@ -88,7 +86,7 @@ GENERIC: class. ( word -- )
     dup class? [
         dup implementors [
             newline
-            dup in. tuck "methods" word-prop hash* method.
+            dup in. tuck dupd "methods" word-prop hash method.
         ] each-with
     ] [
         drop

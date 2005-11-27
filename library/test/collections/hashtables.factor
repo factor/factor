@@ -1,5 +1,4 @@
 IN: temporary
-USE: hashtables
 USE: kernel
 USE: lists
 USE: math
@@ -8,15 +7,16 @@ USE: test
 USE: vectors
 USE: sequences
 USE: sequences-internals
+USE: hashtables
+USE: io
+USE: prettyprint
 
-16 <hashtable> "testhash" set
+[ H{ } ] [ { } [ ] map>hash ] unit-test
 
-: silly-key/value dup dup * swap ;
+1000 [ sq ] map>hash "testhash" set
 
-1000 [ silly-key/value "testhash" get set-hash ] each
-
-[ f ]
-[ 1000 >list [ silly-key/value "testhash" get hash = not ] subset ]
+[ V{ } ]
+[ 1000 [ dup sq swap "testhash" get hash = not ] subset ]
 unit-test
 
 [ t ]
@@ -46,25 +46,60 @@ f 100000000000000000000000000 "testhash" get set-hash
 { } { [ { } ] } "testhash" get set-hash
 
 [ t ] [ C{ 2 3 } "testhash" get hash ] unit-test
-[ f ] [ 100000000000000000000000000 "testhash" get hash* cdr ] unit-test
-[ { } ] [ { [ { } ] } clone "testhash" get hash* cdr ] unit-test
+[ f ] [ 100000000000000000000000000 "testhash" get hash* drop ] unit-test
+[ { } ] [ { [ { } ] } clone "testhash" get hash* drop ] unit-test
 
-[
-    [[ "salmon" "fish" ]]
-    [[ "crocodile" "reptile" ]]
-    [[ "cow" "mammal" ]]
-    [[ "visual basic" "language" ]]
-] alist>hash "testhash" set
+{
+    { "salmon" "fish" }
+    { "crocodile" "reptile" }
+    { "cow" "mammal" }
+    { "visual basic" "language" }
+} alist>hash "testhash" set
 
-[ f ] [
+[ f f ] [
     "visual basic" "testhash" get remove-hash
     "visual basic" "testhash" get hash*
 ] unit-test
 
-[ 4 ] [
-    "hey"
-    H{ [[ "hey" 4 ]] [[ "whey" 5 ]] } 2dup (hashcode)
-    swap underlying nth assoc
+[ t ] [ H{ } dup subhash? ] unit-test
+[ f ] [ H{ { 1 3 } } H{ } subhash? ] unit-test
+[ t ] [ H{ } H{ { 1 3 } } subhash? ] unit-test
+[ t ] [ H{ { 1 3 } } H{ { 1 3 } } subhash? ] unit-test
+[ f ] [ H{ { 1 3 } } H{ { 1 "hey" } } subhash? ] unit-test
+[ f ] [ H{ { 1 f } } H{ } subhash? ] unit-test
+[ t ] [ H{ { 1 f } } H{ { 1 f } } subhash? ] unit-test
+
+[ t ] [ H{ } dup = ] unit-test
+[ f ] [ "xyz" H{ } = ] unit-test
+[ t ] [ H{ } H{ } = ] unit-test
+[ f ] [ H{ { 1 3 } } H{ } = ] unit-test
+[ f ] [ H{ } H{ { 1 3 } } = ] unit-test
+[ t ] [ H{ { 1 3 } } H{ { 1 3 } } = ] unit-test
+[ f ] [ H{ { 1 3 } } H{ { 1 "hey" } } = ] unit-test
+
+! Test some combinators
+[
+    { 4 14 32 }
+] [
+    [
+        2 H{
+            { 1 2 }
+            { 3 4 }
+            { 5 6 }
+        } [ * + , ] hash-each-with
+    ] { } make
+] unit-test
+
+[ t ] [ H{ } [ 2drop f ] hash-all? ] unit-test
+[ t ] [ H{ { 1 1 } } [ = ] hash-all? ] unit-test
+[ f ] [ H{ { 1 2 } } [ = ] hash-all? ] unit-test
+[ t ] [ H{ { 1 1 } { 2 2 } } [ = ] hash-all? ] unit-test
+[ f ] [ H{ { 1 2 } { 2 2 } } [ = ] hash-all? ] unit-test
+
+[ H{ } ] [ H{ { t f } { f t } } [ 2drop f ] hash-subset ] unit-test
+[ H{ { 3 4 } { 4 5 } { 6 7 } } ] [
+    3 H{ { 1 2 } { 2 3 } { 3 4 } { 4 5 } { 6 7 } }
+    [ drop <= ] hash-subset-with
 ] unit-test
 
 ! Testing the hash element counting
@@ -78,22 +113,6 @@ H{ } clone "counting" set
 [ 0 ] [ "counting" get hash-size ] unit-test
 "key" "counting" get remove-hash
 [ 0 ] [ "counting" get hash-size ] unit-test
-
-[ t ] [ H{ } dup hash-contained? ] unit-test
-[ f ] [ H{ [[ 1 3 ]] } H{ } hash-contained? ] unit-test
-[ t ] [ H{ } H{ [[ 1 3 ]] } hash-contained? ] unit-test
-[ t ] [ H{ [[ 1 3 ]] } H{ [[ 1 3 ]] } hash-contained? ] unit-test
-[ f ] [ H{ [[ 1 3 ]] } H{ [[ 1 "hey" ]] } hash-contained? ] unit-test
-[ f ] [ H{ [[ 1 f ]] } H{ } hash-contained? ] unit-test
-[ t ] [ H{ [[ 1 f ]] } H{ [[ 1 f ]] } hash-contained? ] unit-test
-
-[ t ] [ H{ } dup = ] unit-test
-[ f ] [ "xyz" H{ } = ] unit-test
-[ t ] [ H{ } H{ } = ] unit-test
-[ f ] [ H{ [[ 1 3 ]] } H{ } = ] unit-test
-[ f ] [ H{ } H{ [[ 1 3 ]] } = ] unit-test
-[ t ] [ H{ [[ 1 3 ]] } H{ [[ 1 3 ]] } = ] unit-test
-[ f ] [ H{ [[ 1 3 ]] } H{ [[ 1 "hey" ]] } = ] unit-test
 
 ! Test rehashing
 
@@ -110,7 +129,7 @@ H{ } clone "counting" set
 
 [ 6 ] [ "rehash" get clone hash-size ] unit-test
 
-"rehash" get hash-clear
+"rehash" get clear-hash
 
 [ 0 ] [ "rehash" get hash-size ] unit-test
 
@@ -118,8 +137,8 @@ H{ } clone "counting" set
     3
 ] [
     2 H{
-            [[ 1 2 ]] 
-            [[ 2 3 ]]
+        { 1 2 }
+        { 2 3 }
     } clone hash
 ] unit-test
 
@@ -132,11 +151,11 @@ H{ } clone "counting" set
 
 [ 21 ] [
     0 H{
-        [[ 1 2 ]]
-        [[ 3 4 ]]
-        [[ 5 6 ]]
+        { 1 2 }
+        { 3 4 }
+        { 5 6 }
     } [
-        uncons + +
+        + +
     ] hash-each
 ] unit-test
 
@@ -148,42 +167,26 @@ H{ } clone "cache-test" set
 [ 5 ] [ 2 "cache-test" get [ 3 + ] cache ] unit-test
 
 [
-    H{ [[ "factor" "rocks" ]] [[ 3 4 ]] }
+    H{ { "factor" "rocks" } { 3 4 } }
 ] [
-    H{ [[ "factor" "rocks" ]] [[ "dup" "sq" ]] [[ 3 4 ]] }
-    H{ [[ "factor" "rocks" ]] [[ 1 2 ]] [[ 2 3 ]] [[ 3 4 ]] }
+    H{ { "factor" "rocks" } { "dup" "sq" } { 3 4 } }
+    H{ { "factor" "rocks" } { 1 2 } { 2 3 } { 3 4 } }
     hash-intersect
 ] unit-test
 
 [
-    H{ [[ 1 2 ]] [[ 2 3 ]] }
+    H{ { 1 2 } { 2 3 } }
 ] [
-    H{ [[ "factor" "rocks" ]] [[ "dup" "sq" ]] [[ 3 4 ]] }
-    H{ [[ "factor" "rocks" ]] [[ 1 2 ]] [[ 2 3 ]] [[ 3 4 ]] }
+    H{ { "factor" "rocks" } { "dup" "sq" } { 3 4 } }
+    H{ { "factor" "rocks" } { 1 2 } { 2 3 } { 3 4 } }
     hash-diff
 ] unit-test
 
 [
-    2
+    H{ { 1 2 } { 2 3 } { 6 5 } }
 ] [
-    H{ [[ "factor" "rocks" ]] [[ "dup" "sq" ]] [[ 3 4 ]] }
-    H{ [[ "factor" "rocks" ]] [[ 1 2 ]] [[ 2 3 ]] [[ 3 4 ]] }
-    hash-diff hash-size
-] unit-test
-
-[
-    t
-] [
-    H{ [[ "hello" "world" ]] }
-    clone
-    100 [ 1+ over set-bucket-count hashcode ] map-with all-equal?
-] unit-test
-
-[
-    H{ [[ 1 2 ]] [[ 2 3 ]] [[ 6 5 ]] }
-] [
-    H{ [[ 2 4 ]] [[ 6 5 ]] } H{ [[ 1 2 ]] [[ 2 3 ]] }
+    H{ { 2 4 } { 6 5 } } H{ { 1 2 } { 2 3 } }
     hash-union
 ] unit-test
 
-[ [ 1 3 ] ] [ H{ [[ 2 2 ]] } [ 1 2 3 ] remove-all ] unit-test
+[ { 1 3 } ] [ H{ { 2 2 } } { 1 2 3 } remove-all ] unit-test

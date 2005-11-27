@@ -7,12 +7,12 @@ sequences sequences-internals strings words ;
 
 : <c-type> ( -- type )
     H{
-        [[ "setter" [ "No setter" throw ] ]]
-        [[ "getter" [ "No getter" throw ] ]]
-        [[ "boxer" "no boxer" ]]
-        [[ "unboxer" "no unboxer" ]]
-        [[ "reg-class" T{ int-regs f } ]]
-        [[ "width" 0 ]]
+        { "setter" [ "No setter" throw ] }
+        { "getter" [ "No getter" throw ] }
+        { "boxer" "no boxer" }
+        { "unboxer" "no unboxer" }
+        { "reg-class" T{ int-regs f } }
+        { "width" 0 }
     } clone ;
 
 SYMBOL: c-types

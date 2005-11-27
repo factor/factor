@@ -110,35 +110,37 @@ IN: temporary
 ] unit-test
 
 ! Test method inlining
+[ f ] [ fixnum { } min-class ] unit-test
+
 [ string ] [
     \ string
     [ repeated integer string array reversed sbuf
     slice vector general-list ]
-    min-class
+    [ class-compare ] sort min-class
 ] unit-test
 
 [ f ] [
     \ fixnum
     [ fixnum integer letter ]
-    min-class
+    [ class-compare ] sort min-class
 ] unit-test
 
 [ fixnum ] [
     \ fixnum
     [ fixnum integer object ]
-    min-class
+    [ class-compare ] sort min-class
 ] unit-test
 
 [ integer ] [
     \ fixnum
     [ integer float object ]
-    min-class
+    [ class-compare ] sort min-class
 ] unit-test
 
 [ object ] [
     \ word
     [ integer float object ]
-    min-class
+    [ class-compare ] sort min-class
 ] unit-test
 
 GENERIC: xyz
@@ -232,9 +234,16 @@ TUPLE: pred-test ;
 
 [ ] [ double-recursion ] unit-test
 
+! regression
 : double-label-1
     [ f double-label-1 ] [ swap nth-unsafe ] if ; inline
 : double-label-2
     dup general-list? [ ] [ ] if 0 t double-label-1 ; compiled
 
 [ 0 ] [ 10 double-label-2 ] unit-test
+
+! regression
+GENERIC: void-generic
+: breakage "hi" void-generic ;
+[ ] [ \ breakage compile ] unit-test
+[ breakage ] unit-test-fails

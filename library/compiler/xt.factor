@@ -1,8 +1,8 @@
 ! Copyright (C) 2004, 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: compiler
-USING: assembler errors generic kernel lists math namespaces
-prettyprint sequences strings vectors words ;
+USING: assembler errors generic hashtables kernel lists math
+namespaces prettyprint sequences strings vectors words ;
 
 ! We use a hashtable "compiled-xts" that maps words to
 ! xt's that are currently being compiled. The commit-xt's word
@@ -16,16 +16,16 @@ prettyprint sequences strings vectors words ;
 SYMBOL: compiled-xts
 
 : save-xt ( word -- )
-    compiled-offset swap compiled-xts [ acons ] change ;
+    compiled-offset swap compiled-xts set-hash ;
 
 : commit-xts ( -- )
     #! We must flush the instruction cache on PowerPC.
     flush-icache
-    compiled-xts get [ unswons set-word-xt ] each
+    compiled-xts get [ swap set-word-xt ] hash-each
     compiled-xts off ;
 
 : compiled-xt ( word -- xt )
-    dup compiled-xts get assoc [ ] [ word-xt ] ?if ;
+    dup compiled-xts get hash [ ] [ word-xt ] ?if ;
 
 ! When a word is encountered that has not been previously
 ! compiled, it is pushed onto this vector. Compilation stops
@@ -123,7 +123,7 @@ M: absolute-16/16 fixup ( absolute -- ) >absolute fixup-16/16 ;
         dup compile-words get member? [
             drop t
         ] [
-            compiled-xts get assoc
+            compiled-xts get hash
         ] if
     ] if ;
 
@@ -133,7 +133,7 @@ M: absolute-16/16 fixup ( absolute -- ) >absolute fixup-16/16 ;
 : with-compiler ( quot -- )
     [
         deferred-xts off
-        compiled-xts off
+        H{ } clone compiled-xts set
         V{ } clone compile-words set
         call
         fixup-xts

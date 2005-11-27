@@ -74,7 +74,7 @@ SYMBOL: failures
 
 : tests
     {
-        "lists/cons" "lists/lists" "lists/assoc"
+        "lists/cons" "lists/lists"
         "lists/namespaces"
         "combinators"
         "continuations" "errors"

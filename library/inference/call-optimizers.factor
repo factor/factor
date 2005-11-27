@@ -19,7 +19,7 @@ math math-internals sequences words ;
     dup node-param "foldable" word-prop [
         dup node-in-d [
             dup literal?
-            [ 2drop t ] [ swap node-literals ?hash* ] if
+            [ 2drop t ] [ swap node-literals ?hash* nip ] if
         ] all-with?
     ] [
         drop f

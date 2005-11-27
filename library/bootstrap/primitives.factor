@@ -190,7 +190,7 @@ vocabularies get [ "syntax" set [ reveal ] each ] bind
     { "set-char-slot" "kernel-internals"    }
     { "resize-array" "arrays"               }
     { "resize-string" "strings"             }
-    { "<hashtable>" "hashtables"            }
+    { "(hashtable)" "hashtables-internals"  }
     { "<array>" "arrays"                    }
     { "<tuple>" "kernel-internals"          }
     { "begin-scan" "memory"                 }
@@ -315,8 +315,9 @@ num-types <array> builtins set
 "hashtable?" "hashtables" create t "inline" set-word-prop
 "hashtable" "hashtables" create 10 "hashtable?" "hashtables" create
 {
-    { 1 { "hash-size" "hashtables" } { "set-hash-size" "kernel-internals" } }
-    { 2 { "underlying" "sequences-internals" } { "set-underlying" "sequences-internals" } }
+    { 1 { "hash-count" "hashtables" } { "set-hash-count" "hashtables-internals" } }
+    { 2 { "hash-deleted" "hashtables" } { "set-hash-deleted" "hashtables-internals" } }
+    { 3 { "underlying" "sequences-internals" } { "set-underlying" "sequences-internals" } }
 } define-builtin
 
 "vector?" "vectors" create t "inline" set-word-prop

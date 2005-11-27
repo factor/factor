@@ -252,14 +252,20 @@ M: string ' ( string -- pointer )
     ( elements -- ) emit-seq
     align-here r> ;
 
+: transfer-tuple ( tuple -- tuple )
+    tuple>array
+    dup first transfer-word 0 pick set-nth
+    array>tuple ;
+
 M: tuple ' ( tuple -- pointer )
-    tuple>array tuple-type emit-array ;
+    transfer-tuple
+    objects get [ tuple>array tuple-type emit-array ] cache ;
 
 M: array ' ( array -- pointer )
     array-type emit-array ;
 
 M: vector ' ( vector -- pointer )
-    dup array-type emit-array swap length
+    dup underlying ' swap length
     object-tag here-as >r
     vector-type >header emit
     emit-fixnum ( length )
@@ -269,11 +275,11 @@ M: vector ' ( vector -- pointer )
 ( Hashes )
 
 M: hashtable ' ( hashtable -- pointer )
-    dup underlying array-type emit-array
-    swap hash-size
+    [ underlying ' ] keep
     object-tag here-as >r
     hashtable-type >header emit
-    emit-fixnum ( length )
+    dup hash-count emit-fixnum
+    hash-deleted emit-fixnum
     emit ( array ptr )
     align-here r> ;
 

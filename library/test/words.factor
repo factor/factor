@@ -1,6 +1,6 @@
 IN: temporary
-USING: generic hashtables kernel lists math namespaces sequences
-test words ;
+USING: arrays generic hashtables kernel lists math namespaces
+sequences test words ;
 
 [ 4 ] [
     "poo" "scratchpad" create [ 2 2 + ] define-compound
@@ -38,7 +38,7 @@ DEFER: plist-test
     "test-scope" [ "scratchpad" ] search word-name
 ] unit-test
 
-[ t ] [ vocabs list? ] unit-test
+[ t ] [ vocabs array? ] unit-test
 [ t ] [ vocabs [ words [ word? ] all? ] all? ] unit-test
 
 [ f ] [ gensym gensym = ] unit-test

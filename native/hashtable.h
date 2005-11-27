@@ -3,11 +3,11 @@ typedef struct {
 	CELL header;
 	/* tagged */
 	CELL count;
+        /* tagged */
+        CELL deleted;
 	/* tagged */
 	CELL array;
 } F_HASHTABLE;
-
-F_HASHTABLE* hashtable(F_FIXNUM capacity);
 
 void primitive_hashtable(void);
 void fixup_hashtable(F_HASHTABLE* hashtable);

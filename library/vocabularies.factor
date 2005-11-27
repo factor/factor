@@ -64,7 +64,7 @@ SYMBOL: vocabularies
     #! already contains the word, the existing instance is
     #! returned.
     2dup check-create 2dup lookup dup
-    [ 2nip ] [ drop <word> dup reveal ] if ;
+    [ 2nip ] [ drop <word> dup init-word dup reveal ] if ;
 
 : constructor-word ( string vocab -- word )
     >r "<" swap ">" append3 r> create ;
@@ -75,18 +75,18 @@ SYMBOL: vocabularies
     crossref get [ dupd remove-hash ] when*
     dup word-name swap word-vocabulary vocab remove-hash ;
 
+: target-word ( word -- word )
+    dup word-name swap word-vocabulary lookup ;
+
 : interned? ( word -- ? )
     #! Test if the word is a member of its vocabulary.
-    dup word-name over word-vocabulary lookup eq? ;
+    dup target-word eq? ;
 
 : bootstrap-word ( word -- word )
     dup word-name swap word-vocabulary
     bootstrapping? get [
         dup "syntax" = [ drop "!syntax" ] when
     ] when lookup ;
-
-: target-word ( word -- word )
-    dup word-name swap word-vocabulary lookup ;
 
 "scratchpad" "in" set
 [

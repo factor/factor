@@ -42,7 +42,7 @@ SYMBOL: builtins
 : (types) ( class -- )
     #! Only valid for a flattened class.
     flatten [
-        car dup superclass
+        drop dup superclass
         [ (types) ] [ "type" word-prop dup set ] ?if
     ] hash-each ;
 
@@ -73,10 +73,11 @@ DEFER: class<
     2dup eq? [ 2drop 0 ] [ class< 1 -1 ? ] if ;
 
 : methods ( generic -- alist )
-    "methods" word-prop hash>alist [ 2car class-compare ] sort ;
+    "methods" word-prop hash>alist
+    [ [ first ] 2apply class-compare ] sort ;
 
 : order ( generic -- list )
-    methods [ car ] map ;
+    "methods" word-prop hash-keys [ class-compare ] sort ;
 
 PREDICATE: compound generic ( word -- ? )
     "combination" word-prop ;
@@ -162,9 +163,9 @@ M: generic definer drop \ G: ;
 
 : min-class ( class seq -- class/f )
     #! Is this class the smallest class in the sequence?
-    [ dupd classes-intersect? ] subset
-    [ class-compare neg ] sort
-    tuck [ class< ] all-with? [ first ] [ drop f ] if ;
+    [ dupd classes-intersect? ] subset reverse-slice
+    tuck [ class< ] all-with? over empty? not and
+    [ first ] [ drop f ] if ;
 
 : define-class ( class -- )
     dup t "class" set-word-prop
@@ -173,7 +174,7 @@ M: generic definer drop \ G: ;
 : implementors ( class -- list )
     #! Find a list of generics that implement a method
     #! specializing on this class.
-    [ "methods" word-prop ?hash ] word-subset-with ;
+    [ "methods" word-prop ?hash* nip ] word-subset-with ;
 
 : classes ( -- list )
     #! Output a list of all defined classes.
@@ -192,7 +193,7 @@ PREDICATE: word predicate "definition" word-prop ;
 ! Union classes for dispatch on multiple classes.
 : union-predicate ( members -- list )
     [
-        "predicate" word-prop \ dup swons [ drop t ] cons
+        "predicate" word-prop \ dup swons [ drop t ] 2array
     ] map [ drop f ] swap alist>quot ;
 
 : set-members ( class members -- )

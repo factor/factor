@@ -1,6 +1,6 @@
 IN: generic
-USING: errors hashtables kernel kernel-internals lists math
-namespaces sequences vectors words ;
+USING: arrays errors hashtables kernel kernel-internals lists
+math namespaces sequences vectors words ;
 
 : error-method ( picker word -- method )
     [ no-method ] curry append ;
@@ -15,36 +15,39 @@ namespaces sequences vectors words ;
     ] if ;
 
 : class-predicates ( picker assoc -- assoc )
-    [ uncons >r "predicate" word-prop append r> cons ] map-with ;
+    [
+        first2 >r "predicate" word-prop append r> 2array
+    ] map-with ;
 
 : sort-methods ( assoc n -- vtable )
     #! Input is a predicate -> method association.
+    #! n is vtable size (either num-types or num-tags).
     [
         type>class [ object bootstrap-word ] unless*
-        swap [ car classes-intersect? ] subset-with
+        swap [ first classes-intersect? ] subset-with
     ] map-with ;
 
-: simplify-alist ( class alist -- default alist )
+: simplify-alist ( class assoc -- default assoc )
     dup cdr [
-        2dup cdr car car class< [
+        2dup cdr car first class< [
             cdr simplify-alist
         ] [
-            uncons >r cdr nip r>
+            uncons >r second nip r>
         ] if
     ] [
-        nip car cdr [ ]
+        nip car second [ ]
     ] if ;
 
 : vtable-methods ( picker alist-seq -- alist-seq )
     dup length [
-        type>class [ swap simplify-alist ] [ car cdr [ ] ] if*
+        type>class [ swap simplify-alist ] [ car second [ ] ] if*
         >r over r> class-predicates alist>quot
     ] 2map nip ;
 
 : <vtable> ( picker word n -- vtable )
     #! n is vtable size; either num-types or num-tags.
-    >r 2dup empty-method \ object bootstrap-word
-    swons >r methods r> swons r> sort-methods vtable-methods ;
+    >r 2dup empty-method \ object bootstrap-word swap 2array
+    >r methods >list r> swons r> sort-methods vtable-methods ;
 
 : small-generic ( picker word -- def )
     2dup methods class-predicates >r empty-method r> alist>quot ;

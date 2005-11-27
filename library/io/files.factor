@@ -13,9 +13,7 @@ styles ;
 : directory? ( file -- ? ) stat car ;
 
 : directory ( dir -- list )
-    (directory)
-    H{ [[ "." "." ]] [[ ".." ".." ]] }
-    swap remove-all string-sort ;
+    (directory) [ { "." ".." } member? not ] subset string-sort ;
 
 : file-length ( file -- length ) stat third ;
 
