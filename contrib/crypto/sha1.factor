@@ -55,10 +55,10 @@ SYMBOL: K
 ! use this syntax eventually
 ! JUMP-TABLE: f 4 ( maximum )
 ! H{
-    ! [[ 0 [ >r over bitnot r> bitand >r bitand r> bitor ] ]]
-    ! [[ 1 [ bitxor bitxor ] ]]
-    ! [[ 2 [ 2dup bitand >r pick bitand >r bitand r> r> bitor bitor ] ]]
-    ! [[ 3 [ bitxor bitxor ] ]]
+    ! { 0 [ >r over bitnot r> bitand >r bitand r> bitor ] }
+    ! { 1 [ bitxor bitxor ] }
+    ! { 2 [ 2dup bitand >r pick bitand >r bitand r> r> bitor bitor ] }
+    ! { 3 [ bitxor bitxor ] }
 ! } f-table set
 
 ! J: 0 f >r over bitnot r> bitand >r bitand r> bitor ;
