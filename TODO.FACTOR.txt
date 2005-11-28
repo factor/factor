@@ -10,7 +10,6 @@
 - remove word transfer hack in bootstrap
 - the invalid recursion form case needs to be fixed, for inlines too
 - what about tasks and timers between image restarts
-
 - double hash
 
 + ui:

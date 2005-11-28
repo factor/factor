@@ -199,13 +199,13 @@ M: real pprint* ( obj -- ) number>string f text ;
 
 : ch>ascii-escape ( ch -- esc )
     H{
-        [[ CHAR: \e "\\e"  ]]
-        [[ CHAR: \n "\\n"  ]]
-        [[ CHAR: \r "\\r"  ]]
-        [[ CHAR: \t "\\t"  ]]
-        [[ CHAR: \0 "\\0"  ]]
-        [[ CHAR: \\ "\\\\" ]]
-        [[ CHAR: \" "\\\"" ]]
+        { CHAR: \e "\\e"  }
+        { CHAR: \n "\\n"  }
+        { CHAR: \r "\\r"  }
+        { CHAR: \t "\\t"  }
+        { CHAR: \0 "\\0"  }
+        { CHAR: \\ "\\\\" }
+        { CHAR: \" "\\\"" }
     } hash ;
 
 : ch>unicode-escape ( ch -- esc )
