@@ -97,7 +97,8 @@ H{
     { "Add-Ins" HEX: 094613474c7f11d18222444553540000 }
 } ;
 
-: capability-values capability-names hash-swap ;
+SYMBOL: capability-names-hash-swapped
+: capability-values capability-names-hash-swapped get ;
 
 : capability-abbrevs
 H{
@@ -149,6 +150,7 @@ H{
     H{ } clone banned-hash-id set
     <queue> modify-queue set
     HEX: 7fff random-int seq-num set
+    capability-names hash-swap capability-names-hash-swapped set 
     1 stage-num set ;
 
 : prepend-aim-protocol ( data -- )
