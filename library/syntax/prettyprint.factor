@@ -298,7 +298,7 @@ M: tuple pprint* ( tuple -- )
     [
         \ T{ pprint*
         tuple>array dup first pprint*
-        <block 1 swap tail-slice pprint-elements block>
+        <block 1 swap tail-slice pprint-elements
         \ } pprint*
     ] check-recursion ;
 

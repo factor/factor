@@ -41,7 +41,7 @@ TUPLE: tombstone ;
     >r >r [ key@ ] 2keep pick -1 > r> r> if ; inline
 
 : <hash-array> ( n -- array )
-    1+ 4 * ((empty)) <repeated> >array ;
+    4 * ((empty)) <repeated> >array ;
 
 : reset-hash ( n hash -- )
     swap <hash-array> over set-underlying
@@ -154,15 +154,16 @@ IN: hashtables
 : hash-size ( hash -- n ) dup hash-count swap hash-deleted - ;
 
 : grow-hash ( hash -- )
-    [ underlying ] keep
-    [ >r length r> reset-hash ] 2keep
-    swap [ swap pick (set-hash) ] each-pair drop ;
+    [ dup underlying swap hash-size 1+ ] keep
+    [ reset-hash ] keep swap [ swap pick (set-hash) ] each-pair
+    drop ;
 
 : ?grow-hash ( hash -- )
-    dup hash-count 1+ 4 * over underlying length >
+    dup hash-count 2 + 2 * over underlying length >
     [ dup grow-hash ] when drop ;
 
-: set-hash ( value key hash -- ) dup ?grow-hash (set-hash) ;
+: set-hash ( value key hash -- )
+    [ (set-hash) ] keep ?grow-hash ;
 
 : hash-keys ( hash -- keys ) 0 swap hash>seq ;
 

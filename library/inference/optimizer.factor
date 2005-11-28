@@ -65,8 +65,8 @@ M: #shuffle optimize-node*  ( node -- node/t )
         compose-shuffle-nodes
     ] [
         drop [
-            dup node-in-d over node-out-d =
-            [ dup node-in-r swap node-out-r = ] [ drop f ] if
+            dup node-in-d over node-out-d sequence=
+            >r dup node-in-r swap node-out-r sequence= r> and
         ] prune-if
     ] if ;
 

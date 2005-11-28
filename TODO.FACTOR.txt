@@ -1,11 +1,5 @@
 + 0.80:
 
-- flip-branches optimizer not working
-- prettyprint:
-
-  { V{ T{ literal T{ value f f G:110886 } f } T{ value 
-      f f G:110887
-  } } }
 - intrinsic char-slot set-char-slot for x86
 - closing ui does not stop timers
 - adding/removing timers automatically for animated gadgets
@@ -18,8 +12,6 @@
 - what about tasks and timers between image restarts
 
 - double hash
-- empty key change
-- if hash is full and we change existing key, it should not grow
 
 + ui:
 
