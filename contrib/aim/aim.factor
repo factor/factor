@@ -1,7 +1,7 @@
 ! All Talk
 
 IN: aim-internals
-USING: kernel sequences lists stdio prettyprint strings namespaces math unparser threads vectors errors parser interpreter test io crypto words hashtables inspector aim-internals generic queues ;
+USING: kernel sequences lists stdio prettyprint strings namespaces math unparser threads vectors errors parser interpreter test io crypto words hashtables inspector aim-internals generic queues arrays ;
 
 SYMBOL: username
 SYMBOL: password
@@ -65,77 +65,77 @@ TUPLE: buddy name id gid capabilities buddy-icon online ;
 ! Family names from ethereal
 : family-names
 H{
-    [[ 1 "Generic" ]] [[ 2 "Location" ]] [[ 3 "Buddylist" ]]
-    [[ 4 "Messaging" ]] [[ 6 "Invitation" ]] [[ 8 "Popup" ]]
-    [[ 9 "BOS" ]] [[ 10 "User Lookup" ]] [[ 11 "Stats" ]]
-    [[ 12 "Translate" ]] [[ 19 "SSI" ]] [[ 21 "ICQ" ]]
-    [[ 34 "Unknown Family" ]] } ;
+    { 1 "Generic" } { 2 "Location" } { 3 "Buddylist" }
+    { 4 "Messaging" } { 6 "Invitation" } { 8 "Popup" }
+    { 9 "BOS" } { 10 "User Lookup" } { 11 "Stats" }
+    { 12 "Translate" } { 19 "SSI" } { 21 "ICQ" }
+    { 34 "Unknown Family" } } ;
 
 : sanitize-name ( name -- name ) HEX: 20 swap remove >lower ;
 
 : hash-swap ( hash -- hash )
-    [ [ unswons cons , ] hash-each ] { } make alist>hash ;
+    [ [ swap 2array , ] hash-each ] { } make alist>hash ;
 
 : 2list>hash ( keys values -- hash )
     H{ } clone -rot [ swap pick set-hash ] 2each ;
 
 : capability-names
 H{
-    [[ "Unknown1" HEX: 094601054c7f11d18222444553540000 ]]
-    [[ "Games" HEX: 0946134a4c7f11d18222444553540000 ]]
-    [[ "Send Buddy List" HEX: 0946134b4c7f11d18222444553540000 ]]
-    [[ "Chat" HEX: 748f2420628711d18222444553540000 ]]
-    [[ "AIM/ICQ Interoperability" HEX: 0946134d4c7f11d18222444553540000 ]]
-    [[ "Voice Chat" HEX: 094613414c7f11d18222444553540000 ]]
-    [[ "iChat" HEX: 094600004c7f11d18222444553540000 ]]
-    [[ "Send File" HEX: 094613434c7f11d18222444553540000 ]]
-    [[ "Unknown2" HEX: 094601ff4c7f11d18222444553540000 ]]
-    [[ "Live Video" HEX: 094601014c7f11d18222444553540000 ]]
-    [[ "Direct Instant Messaging" HEX: 094613454c7f11d18222444553540000 ]]
-    [[ "Unknown3" HEX: 094601034c7f11d18222444553540000 ]]
-    [[ "Buddy Icon" HEX: 094613464c7f11d18222444553540000 ]]
-    [[ "Add-Ins" HEX: 094613474c7f11d18222444553540000 ]]
+    { "Unknown1" HEX: 094601054c7f11d18222444553540000 }
+    { "Games" HEX: 0946134a4c7f11d18222444553540000 }
+    { "Send Buddy List" HEX: 0946134b4c7f11d18222444553540000 }
+    { "Chat" HEX: 748f2420628711d18222444553540000 }
+    { "AIM/ICQ Interoperability" HEX: 0946134d4c7f11d18222444553540000 }
+    { "Voice Chat" HEX: 094613414c7f11d18222444553540000 }
+    { "iChat" HEX: 094600004c7f11d18222444553540000 }
+    { "Send File" HEX: 094613434c7f11d18222444553540000 }
+    { "Unknown2" HEX: 094601ff4c7f11d18222444553540000 }
+    { "Live Video" HEX: 094601014c7f11d18222444553540000 }
+    { "Direct Instant Messaging" HEX: 094613454c7f11d18222444553540000 }
+    { "Unknown3" HEX: 094601034c7f11d18222444553540000 }
+    { "Buddy Icon" HEX: 094613464c7f11d18222444553540000 }
+    { "Add-Ins" HEX: 094613474c7f11d18222444553540000 }
 } ;
 
 : capability-values capability-names hash-swap ;
 
 : capability-abbrevs
 H{
-    [[ CHAR: A "Voice" ]]
-    [[ CHAR: C "Send File" ]]
-    [[ CHAR: E "AIM Direct IM" ]]
-    [[ CHAR: F "Buddy Icon" ]]
-    [[ CHAR: G "Add-Ins" ]]
-    [[ CHAR: H "Get File" ]]
-    [[ CHAR: K "Send Buddy List" ]]
+    { CHAR: A "Voice" }
+    { CHAR: C "Send File" }
+    { CHAR: E "AIM Direct IM" }
+    { CHAR: F "Buddy Icon" }
+    { CHAR: G "Add-Ins" }
+    { CHAR: H "Get File" }
+    { CHAR: K "Send Buddy List" }
 } ;
 
 : aim-errors
 H{
-    [[ 1 "Invalid SNAC header." ]]
-    [[ 2 "Server rate limit exceeded." ]]
-    [[ 3 "Client rate limit exceeded." ]]
-    [[ 4 "Recipient is not logged in." ]]
-    [[ 5 "Requested service unavailable." ]]
-    [[ 6 "Requested service not defined." ]]
-    [[ 7 "You sent obsolete SNAC." ]]
-    [[ 8 "Not supported by server." ]]
-    [[ 9 "Not supported by client." ]]
-    [[ 10 "Refused by client." ]]
-    [[ 11 "Reply too big." ]]
-    [[ 12 "Responses lost." ]]
-    [[ 13 "Request denied." ]]
-    [[ 14 "Incorrect SNAC format." ]]
-    [[ 15 "Insufficient rights." ]]
-    [[ 16 "In local permit/deny. (recipient blocked)" ]]
-    [[ 17 "Sender too evil." ]]
-    [[ 18 "Receiver too evil." ]]
-    [[ 19 "User temporarily unavailable." ]]
-    [[ 20 "No match." ]]
-    [[ 22 "List overflow." ]]
-    [[ 23 "Request ambiguous." ]]
-    [[ 24 "Server queue full." ]]
-    [[ 25 "Not while on AOL." ]]
+    { 1 "Invalid SNAC header." }
+    { 2 "Server rate limit exceeded." }
+    { 3 "Client rate limit exceeded." }
+    { 4 "Recipient is not logged in." }
+    { 5 "Requested service unavailable." }
+    { 6 "Requested service not defined." }
+    { 7 "You sent obsolete SNAC." }
+    { 8 "Not supported by server." }
+    { 9 "Not supported by client." }
+    { 10 "Refused by client." }
+    { 11 "Reply too big." }
+    { 12 "Responses lost." }
+    { 13 "Request denied." }
+    { 14 "Incorrect SNAC format." }
+    { 15 "Insufficient rights." }
+    { 16 "In local permit/deny. (recipient blocked)" }
+    { 17 "Sender too evil." }
+    { 18 "Receiver too evil." }
+    { 19 "User temporarily unavailable." }
+    { 20 "No match." }
+    { 22 "List overflow." }
+    { 23 "Request ambiguous." }
+    { 24 "Server queue full." }
+    { 25 "Not while on AOL." }
 } ;
 
 
