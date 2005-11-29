@@ -6,17 +6,6 @@ TYPEDEF: void* MSGBOXPARAMSA
 TYPEDEF: void* MSGBOXPARAMSW
 
 
-SYMBOL: unicode
-f unicode set
-
-: unicode-exec ( unicode-func ascii-func -- func )
-	unicode get [
-		drop execute
-	] [
-		nip execute
-	] if ; inline
-
-
 ! HKL for ActivateKeyboardLayout
 : HKL_PREV 0 ;
 : HKL_NEXT 1 ;
@@ -503,8 +492,7 @@ FUNCTION: UINT EnumClipboardFormats ( UINT format ) ;
 ! FUNCTION: GetClassNameA
 ! FUNCTION: GetClassNameW
 ! FUNCTION: GetClassWord
-! FUNCTION: GetClientRect
-
+! FUNCTION: BOOL GetClientRect ( HWND hWnd, LPRECT lpRect ) ;
 
 FUNCTION: HANDLE GetClipboardData ( UINT uFormat ) ;
 
@@ -529,7 +517,7 @@ FUNCTION: DWORD GetClipboardSequenceNumber ( ) ;
 ! FUNCTION: GetDlgItemTextA
 ! FUNCTION: GetDlgItemTextW
 ! FUNCTION: GetDoubleClickTime
-! FUNCTION: GetFocus
+FUNCTION: HWND GetFocus ( ) ;
 ! FUNCTION: GetForegroundWindow
 ! FUNCTION: GetGuiResources
 ! FUNCTION: GetGUIThreadInfo
@@ -576,8 +564,8 @@ FUNCTION: DWORD GetClipboardSequenceNumber ( ) ;
 ! FUNCTION: GetNextDlgGroupItem
 ! FUNCTION: GetNextDlgTabItem
 ! FUNCTION: GetOpenClipboardWindow
-! FUNCTION: GetParent
-! FUNCTION: GetPriorityClipboardFormat
+FUNCTION: HWND GetParent ( HWND hWnd ) ;
+FUNCTION: int GetPriorityClipboardFormat ( UINT* paFormatPriorityList, int cFormats ) ;
 ! FUNCTION: GetProcessDefaultLayout
 ! FUNCTION: GetProcessWindowStation
 ! FUNCTION: GetProgmanWindow
@@ -616,7 +604,7 @@ FUNCTION: int GetUpdateRgn ( HWND hWnd, HRGN hRgn, BOOL bErase ) ;
 ! FUNCTION: GetUserObjectInformationA
 ! FUNCTION: GetUserObjectInformationW
 ! FUNCTION: GetUserObjectSecurity
-! FUNCTION: GetWindow
+FUNCTION: HWND GetWindow ( HWND hWnd, UINT uCmd ) ;
 ! FUNCTION: GetWindowContextHelpId
 ! FUNCTION: GetWindowDC
 ! FUNCTION: GetWindowInfo
@@ -669,25 +657,25 @@ FUNCTION: int GetUpdateRgn ( HWND hWnd, HRGN hRgn, BOOL bErase ) ;
 ! FUNCTION: IsCharLowerW
 ! FUNCTION: IsCharUpperA
 ! FUNCTION: IsCharUpperW
-! FUNCTION: IsChild
-! FUNCTION: IsClipboardFormatAvailable
+FUNCTION: BOOL IsChild ( HWND hWndParent, HWND hWnd ) ;
+FUNCTION: BOOL IsClipboardFormatAvailable ( UINT format ) ;
 ! FUNCTION: IsDialogMessage
 ! FUNCTION: IsDialogMessageA
 ! FUNCTION: IsDialogMessageW
 ! FUNCTION: IsDlgButtonChecked
-! FUNCTION: IsGUIThread
-! FUNCTION: IsHungAppWindow
-! FUNCTION: IsIconic
-! FUNCTION: IsMenu
-! FUNCTION: IsRectEmpty
-! FUNCTION: IsServerSideWindow
-! FUNCTION: IsWindow
-! FUNCTION: IsWindowEnabled
-! FUNCTION: IsWindowInDestroy
-! FUNCTION: IsWindowUnicode
-! FUNCTION: IsWindowVisible
-! FUNCTION: IsWinEventHookInstalled
-! FUNCTION: IsZoomed
+FUNCTION: BOOL IsGUIThread ( BOOL bConvert ) ;
+FUNCTION: BOOL IsHungAppWindow ( HWND hWnd ) ;
+FUNCTION: BOOL IsIconic ( HWND hWnd ) ;
+FUNCTION: BOOL IsMenu ( HMENU hMenu ) ;
+! FUNCTION: BOOL IsRectEmpty
+! FUNCTION: BOOL IsServerSideWindow
+FUNCTION: BOOL IsWindow ( HWND hWnd ) ;
+! FUNCTION: BOOL IsWindowEnabled
+! FUNCTION: BOOL IsWindowInDestroy
+FUNCTION: BOOL IsWindowUnicode ( HWND hWnd ) ;
+FUNCTION: BOOL IsWindowVisible ( HWND hWnd ) ;
+! FUNCTION: BOOL IsWinEventHookInstalled
+FUNCTION: BOOL IsZoomed ( HWND hWnd ) ;
 ! FUNCTION: keybd_event
 ! FUNCTION: KillSystemTimer
 ! FUNCTION: KillTimer
@@ -895,7 +883,7 @@ FUNCTION: ATOM RegisterClassExW ( WNDCLASSEX* lpwcx ) ;
 ! FUNCTION: SendDlgItemMessageW
 ! FUNCTION: SendIMEMessageExA
 ! FUNCTION: SendIMEMessageExW
-! FUNCTION: SendInput
+FUNCTION: UINT SendInput ( UINT nInputs, LPINPUT pInputs, int cbSize ) ;
 ! FUNCTION: SendMessageA
 ! FUNCTION: SendMessageCallbackA
 ! FUNCTION: SendMessageCallbackW

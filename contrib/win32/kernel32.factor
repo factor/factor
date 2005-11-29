@@ -35,4 +35,8 @@ FUNCTION: DWORD GetLastError ( ) ;
     GetLastError dup 0 = [ (win32-error) throw ] unless drop ;
 
 
+FUNCTION: LPVOID GlobalLock ( HGLOBAL hMem ) ;
+
+FUNCTION: BOOL GlobalUnlock ( HGLOBAL hMem ) ;
+
 
