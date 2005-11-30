@@ -14,6 +14,8 @@ library, but is useful enough to ship with the Factor distribution.
   
 - contrib/crypto/ -- MD5 and SHA1 cryptographic hashes (Doug Coleman)
 
+- contrib/factory/ -- X11 window manager
+
 - contrib/httpd/ -- HTTP server and client (Slava Pestov, Chris Double)
 
 - contrib/math/ -- extended math library (Doug Coleman)
