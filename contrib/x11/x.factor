@@ -231,6 +231,7 @@ DEFER: with-win
 : set-window-height+		[ set-window-height ] with-win ;
 : center-window-horizontally+ 	[ center-window-horizontally ] with-win ;
 : window-children+		[ window-children ] with-win ;
+: window-map-state+		[ window-map-state ] with-win ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
