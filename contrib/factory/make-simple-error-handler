@@ -1,0 +1,3 @@
+gcc -c simple-error-handler.c
+gcc -L /usr/X11R6/lib -shared -o simple-error-handler.so \
+  simple-error-handler.o -lX11
