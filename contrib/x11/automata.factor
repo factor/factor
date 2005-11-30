@@ -3,7 +3,7 @@
 IN: automata
 
 USING: parser kernel hashtables namespaces sequences lists math io
-       threads strings vectors prettyprint xlib xobj ;
+       threads strings vectors prettyprint xlib x ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 ! set-rule
@@ -57,9 +57,9 @@ SYMBOL: char-0
 
 : setup-window
   ":0.0" initialize-x
-  create-window* win set
-  400 400 resize-window*
-  map-window*
+  create-window win set
+  { 400 400 } resize-window
+  map-window
   flush-dpy ;
 
 : random-line ( -- line )
@@ -72,7 +72,7 @@ SYMBOL: char-0
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 : show-point ( { x y } p -- )
-1 = [ draw-point* ] [ drop ] ifte ;
+1 = [ draw-point ] [ drop ] ifte ;
 
 : (show-line) ( { x y } line -- )
   [ >r dup r> show-point { 1 0 } v+ ] each drop ;
@@ -85,7 +85,7 @@ SYMBOL: char-0
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 : run-rule
-  clear-window*
+  clear-window
   0 random-line
   400
   [ drop

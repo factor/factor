@@ -9,12 +9,9 @@
 ! and are wondering what part of the file to modify, just find the
 ! function or data structure in the manual and note the section.
 
-IN: xlib
-USE: alien
-USE: math
-LIBRARY: xlib
+IN: xlib USING: kernel vectors alien math ;
 
-! "X11" "libX11.so" "cdecl" add-library
+LIBRARY: xlib
 
 "xlib" "libX11.so" "cdecl" add-library
 
@@ -44,6 +41,9 @@ TYPEDEF: int Bool
 TYPEDEF: ulong Time
 
 TYPEDEF: void* Window**
+
+: False 0 ;
+: True 1 ;
 
 !
 ! 2 - Display Functions
@@ -174,7 +174,12 @@ FUNCTION: Status XUndefineCursor ( Display* display, Window w ) ;
 
 ! 4.1 - Obtaining Window Information
 
-FUNCTION: Status XQueryTree ( Display* display, Window w, Window* root_return, Window* parent_return, Window** children_return, uint* nchildren_return ) ;
+FUNCTION: Status XQueryTree (
+  Display* display,
+  Window w,
+  Window* root_return,
+  Window* parent_return,
+  Window** children_return, uint* nchildren_return ) ;
 
 BEGIN-STRUCT: XWindowAttributes
 	FIELD: int x
@@ -221,7 +226,7 @@ FUNCTION: Status XGetGeometry (
 
 ! 4.2 - Translating Screen Coordinates
 
-FUNCTION: boolean XQueryPointer ( Display* display, Window w, Window* root_return, Window* child_return, int* root_x_return, int* root_y_return, int* win_x_return, int* win_y_return, uint* mask_return ) ;
+FUNCTION: Bool XQueryPointer ( Display* display, Window w, Window* root_return, Window* child_return, int* root_x_return, int* root_y_return, int* win_x_return, int* win_y_return, uint* mask_return ) ;
 
 ! 4.3 - Properties and Atoms
 
@@ -243,9 +248,9 @@ FUNCTION: Window XGetSelectionOwner ( Display* display, Atom selection ) ;
 
 FUNCTION: int XConvertSelection ( Display* display, Atom selection, Atom target, Atom property, Window requestor, Time time ) ;
 
-!
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 ! 6 - Color Management Functions
-!
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 BEGIN-STRUCT: XColor
 	FIELD: ulong pixel
@@ -260,9 +265,9 @@ FUNCTION: Status XLookupColor ( Display* display, Colormap colormap, char* color
 FUNCTION: Status XAllocColor ( Display* display, Colormap colormap, XColor* screen_in_out ) ;
 FUNCTION: Status XQueryColor ( Display* display, Colormap colormap, XColor* def_in_out ) ;
 
-!
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 ! 7 - Graphics Context Functions
-!
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 : GCFunction            1 0 shift ;
 : GCPlaneMask           1 1 shift ;
@@ -344,16 +349,15 @@ FUNCTION: Status XSetSubwindowMode ( Display* display, GC gc, int subwindow_mode
 
 FUNCTION: Status XSetFont ( Display* display, GC gc, Font font ) ;
 
-!
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 ! 8 - Graphics Functions
-!
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 FUNCTION: Status XClearWindow ( Display* display, Window w ) ;
 FUNCTION: Status XDrawPoint ( Display* display, Drawable d, GC gc, int x, int y ) ;
 FUNCTION: Status XDrawLine ( Display* display, Drawable d, GC gc, int x1, int y1, int x2, int y2 ) ;
 FUNCTION: Status XDrawArc ( Display* display, Drawable d, GC gc, int x, int y, uint width, uint height, int angle1, int angle2 ) ;
 FUNCTION: Status XFillArc ( Display* display, Drawable d, GC gc, int x, int y, uint width, uint height, int angle1, int angle2 ) ;
-
 
 ! 8.5 - Font Metrics
 
@@ -367,6 +371,7 @@ BEGIN-STRUCT: XCharStruct
 END-STRUCT
 
 FUNCTION: Font XLoadFont ( Display* display, char* name ) ;
+FUNCTION: XFontStruct* XQueryFont ( Display* display, XID font_ID ) ;
 FUNCTION: XFontStruct* XLoadQueryFont ( Display* display, char* name ) ;
 
 BEGIN-STRUCT: XFontStruct
@@ -392,7 +397,14 @@ FUNCTION: int XTextWidth ( XFontStruct* font_struct, char* string, int count ) ;
 
 ! 8.6 - Drawing Text
 
-FUNCTION: Status XDrawString ( Display* display, Drawable d, GC gc, int x, int y, char* string, int length ) ;
+FUNCTION: Status XDrawString (
+	Display* display,
+	Drawable d,
+	GC gc,
+	int x,
+	int y,
+	char* string,
+	int length ) ;
 
 !
 ! 9 - Window and Session Manager Functions
@@ -485,6 +497,12 @@ END-STRUCT
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
+: Button1 1 ;
+: Button2 2 ;
+: Button3 3 ;
+: Button4 4 ;
+: Button5 5 ;
+
 BEGIN-STRUCT: XButtonEvent
 	FIELD: int type
 	FIELD: ulong serial
@@ -505,6 +523,13 @@ END-STRUCT
 
 TYPEDEF: XButtonEvent XButtonPressedEvent
 TYPEDEF: XButtonEvent XButtonReleasedEvent
+
+: XButtonEvent-position ( event -- { x y } )
+  dup XButtonEvent-x swap XButtonEvent-y 2vector ;
+
+: XButtonEvent-root-position ( event -- { x y } )
+  dup XButtonEvent-x swap XButtonEvent-y 2vector ;
+
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
@@ -1030,7 +1055,28 @@ FUNCTION: Status XSendEvent ( Display* display, Window w, Bool propagate, long e
 ! 12 - Input Device Functions
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-FUNCTION: int XGrabPointer ( Display* display, Window grab_window, Bool owner_events, uint event_mask, int pointer_mode, int keyboard_mode, Window confine_to, Cursor cursor, Time time ) ;
+: None 0 ;
+: PointerRoot 1 ;
+
+: RevertToNone		None ;
+: RevertToPointerRoot	PointerRoot ;
+: RevertToParent	2 ;
+
+: GrabModeSync		0 ;
+: GrabModeAsync		1 ;
+
+
+FUNCTION: int XGrabPointer (
+  Display* display,
+  Window grab_window,
+  Bool owner_events,
+  uint event_mask,
+  int pointer_mode,
+  int keyboard_mode,
+  Window confine_to,
+  Cursor cursor,
+  Time time ) ;
+
 FUNCTION: Status XUngrabPointer ( Display* display, Time time ) ;
 FUNCTION: Status XChangeActivePointerGrab ( Display* display, uint event_mask, Cursor cursor, Time time ) ;
 FUNCTION: Status XGrabKey ( Display* display, int keycode, uint modifiers, Window grab_window, Bool owner_events, int pointer_mode, int keyboard_mode ) ;
