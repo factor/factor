@@ -25,7 +25,7 @@
 ! cont-responder facilities.
 !
 IN: browser-responder
-USING: html cont-responder kernel io namespaces words lists prettyprint 
+USING: html cont-responder hashtables kernel io namespaces words lists prettyprint 
        memory sequences ;
 
 : option ( current text -- )
@@ -111,9 +111,5 @@ USING: html cont-responder kernel io namespaces words lists prettyprint
 
 : browser-responder ( -- )
   #! Start the Smalltalk-like browser.
-  "query" get [     
-     [ "vocab" swap assoc ] keep
-     "word" swap assoc
-  ] [
-    "browser-responder" "browse" 
-  ] if* browse ;
+  "vocab" "query" get hash [ "browser-responder" ] unless*
+  "word" "query" get hash [ "browse" ] unless* browse ;

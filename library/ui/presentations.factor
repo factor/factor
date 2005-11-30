@@ -11,8 +11,11 @@ SYMBOL: commands
 
 V{ } clone commands global set-hash
 
+: forget-command ( name -- )
+    commands [ [ second = not ] subset-with ] change ;
+
 : define-command ( class name quot -- )
-    3array commands get push ;
+    over forget-command 3array commands get push ;
 
 : applicable ( object -- seq )
     commands get [ first call ] subset-with ;
@@ -39,24 +42,24 @@ M: command-button gadget-help ( button -- string )
     command-button-object dup word? [ synopsis ] [ summary ] if ;
 
 : init-commands ( style gadget -- gadget )
-    presented rot assoc [ <command-button> ] when* ;
+    presented rot hash [ <command-button> ] when* ;
 
 : style-font ( style -- font )
-    [ font swap assoc [ "Monospaced" ] unless* ] keep
-    [ font-style swap assoc [ plain ] unless* ] keep
-    font-size swap assoc [ 12 ] unless* 3array ;
+    [ font swap hash [ "Monospaced" ] unless* ] keep
+    [ font-style swap hash [ plain ] unless* ] keep
+    font-size swap hash [ 12 ] unless* 3array ;
 
 : <styled-label> ( style text -- label )
-    <label> foreground pick assoc [ over set-label-color ] when*
+    <label> foreground pick hash [ over set-label-color ] when*
     swap style-font over set-label-font ;
 
 : <presentation> ( style text -- presentation )
-    gadget pick assoc
+    gadget pick hash
     [ ] [ >r dup dup r> <styled-label> init-commands ] ?if
-    outline rot assoc [ <outliner> ] when* ;
+    outline rot hash [ <outliner> ] when* ;
 
 : gadget. ( gadget -- )
-    gadget swons unit
+    gadget associate
     "This stream does not support live gadgets"
     swap format terpri ;
 

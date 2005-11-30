@@ -437,7 +437,7 @@ M: cpu reset ( cpu -- )
   [ 0 swap set-cpu-f  ] keep
   [ 0 swap set-cpu-pc  ] keep
   [ HEX: F000 swap set-cpu-sp  ] keep 
-  [ HEX: FFFF 0 <repeated> >vector swap set-cpu-ram ] keep
+  [ HEX: FFFF zero-array swap set-cpu-ram ] keep
   [ f swap set-cpu-halted? ] keep
   [ HEX: 10 swap set-cpu-last-interrupt ] keep
   0 swap set-cpu-cycles ;

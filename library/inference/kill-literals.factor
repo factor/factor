@@ -40,8 +40,8 @@ M: f returns* drop ;
     [ node-out-r remove-all ] keep set-node-out-r ;
 
 : kill-node ( values node -- )
-    over hash-size 0 >
-    [ [ remove-values ] each-node-with ] [ 2drop ] if ;
+    over hash-empty?
+    [ 2drop ] [ [ remove-values ] each-node-with ] if ;
 
 ! Generic nodes
 M: node literals* ( node -- ) drop { } ;

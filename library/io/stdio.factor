@@ -1,7 +1,8 @@
 ! Copyright (C) 2003, 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: io
-USING: errors generic kernel lists namespaces strings styles ;
+USING: errors hashtables generic kernel namespaces strings
+styles ;
 
 : flush  ( -- )              stdio get stream-flush ;
 : readln ( -- string/f )     stdio get stream-readln ;
@@ -15,10 +16,10 @@ USING: errors generic kernel lists namespaces strings styles ;
 : close  ( -- )              stdio get stream-close ;
 
 : write-object ( string object -- )
-    presented swons unit format ;
+    presented associate format ;
 
 : write-outliner ( string object quot -- )
-    outline swons >r presented swons r> 2list format terpri ;
+    [ outline set presented set ] make-hash format terpri ;
 
 : with-stream ( stream quot -- )
     #! Close the stream no matter what happens.

@@ -16,16 +16,7 @@ USING: html io kernel namespaces styles test ;
 [ "" ]
 [
     [
-        [ ] [ drop ] span-tag
-    ] string-out
-] unit-test
-
-[ "<span style='color: #ff00ff; font-family: Monospaced; '>car</span>" ]
-[
-    [
-        [ [ foreground 1 0 1 ] [[ font "Monospaced" ]] ]
-        [ drop "car" write ]
-        span-tag
+        H{ } [ drop ] span-tag
     ] string-out
 ] unit-test
 
@@ -34,14 +25,23 @@ USING: html io kernel namespaces styles test ;
 
 [ "hello world" ]
 [
-    [ "hello world" [ ] html-format ] string-out
+    [ "hello world" H{ } html-format ] string-out
 ] unit-test
 
-[ "<span style='color: #ff00ff; font-family: Monospaced; '>car</span>" ]
+[ "<span style='font-family: Monospaced; '>car</span>" ]
 [
     [
         "car"
-        [ [ foreground 1 0 1 ] [[ font "Monospaced" ]] ]
+        H{ { font "Monospaced" } }
+        html-format
+    ] string-out
+] unit-test
+
+[ "<span style='color: #ff00ff; '>car</span>" ]
+[
+    [
+        "car"
+        H{ { foreground { 1 0 1 1 } } }
         html-format
     ] string-out
 ] unit-test

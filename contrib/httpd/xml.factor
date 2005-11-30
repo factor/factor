@@ -329,16 +329,16 @@ M: closer process
 
 : print-props ( hash -- )
     [
-        " " % unswons % "=\"" % % "\"" %
+        " " % swap % "=\"" % % "\"" %
     ] hash-each ;
 
 GENERIC: (xml>string) ( object -- )
 
 : reverse-entities ! not as many as entities needed for printing
     H{
-        [[ CHAR: & "amp" ]]
-        [[ CHAR: < "lt" ]]
-        [[ CHAR: " "quot" ]]
+        { CHAR: & "amp" }
+        { CHAR: < "lt" }
+        { CHAR: " "quot" }
     } ;
 
 M: string (xml>string)

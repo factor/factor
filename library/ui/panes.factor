@@ -97,7 +97,7 @@ M: pane focusable-child* ( pane -- editor )
     pane-input [ t ] unless* ;
 
 : pane-write-1 ( style text pane -- )
-    pick not pick empty? and [
+    pick hash-empty? pick empty? and [
         3drop
     ] [
         >r <presentation> r> pane-current add-gadget

@@ -153,6 +153,8 @@ IN: hashtables
 
 : hash-size ( hash -- n ) dup hash-count swap hash-deleted - ;
 
+: hash-empty? ( hash -- ? ) hash-size 0 = ;
+
 : grow-hash ( hash -- )
     [ dup underlying swap hash-size 1+ ] keep
     [ reset-hash ] keep swap [ swap pick (set-hash) ] each-pair
@@ -164,6 +166,9 @@ IN: hashtables
 
 : set-hash ( value key hash -- )
     [ (set-hash) ] keep ?grow-hash ;
+
+: associate ( value key -- hashtable )
+    2 <hashtable> [ set-hash ] keep ;
 
 : hash-keys ( hash -- keys ) 0 swap hash>seq ;
 

@@ -8,15 +8,15 @@ sequences strings styles words ;
     tuck word-name word-prop [ pprint-word ] [ drop ] if ;
 
 : declarations. ( word -- )
-    [
+    {
         POSTPONE: parsing
         POSTPONE: inline
         POSTPONE: foldable
         POSTPONE: flushable
-    ] [ declaration. ] each-with ;
+    } [ declaration. ] each-with ;
 
 : comment. ( comment -- )
-    [ [[ font-style italic ]] ] text ;
+    H{ { font-style italic } } text ;
 
 : stack-picture% ( seq -- string )
     dup integer? [ object <repeated> ] when
@@ -40,7 +40,7 @@ sequences strings styles words ;
     [ "(" swap ")" append3 comment. ] when* ;
 
 : in. ( word -- )
-    <block \ IN: pprint-word word-vocabulary f text block; ;
+    <block \ IN: pprint-word word-vocabulary plain-text block; ;
 
 : (synopsis) ( word -- )
     dup in.
@@ -111,7 +111,7 @@ M: tuple-class class.
     newline
     \ TUPLE: pprint-word
     dup pprint-word
-    "slot-names" word-prop [ f text ] each
+    "slot-names" word-prop [ plain-text ] each
     pprint-; ;
 
 M: word class. drop ;

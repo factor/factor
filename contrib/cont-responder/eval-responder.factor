@@ -73,7 +73,7 @@ USE: sequences
   #! Replace occurrences of single quotes with
   #! backslash quote.
   [
-    [ dup [ [[ CHAR: ' "\\'" ]] [[ CHAR: " "\\\"" ]] ] assoc [ % ] [ % ] ?if ] each
+      [ dup H{ { CHAR: ' "\\'" } { CHAR: " "\\\"" } } hash [ % ] [ % ] ?if ] each
   ] "" make ;
  
 : make-eval-javascript ( string -- string )

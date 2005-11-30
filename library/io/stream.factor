@@ -1,8 +1,8 @@
 ! Copyright (C) 2003, 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: io
-USING: errors generic kernel lists math namespaces sequences
-strings ;
+USING: errors hashtables generic kernel math namespaces
+sequences strings ;
 
 SYMBOL: stdio
 
@@ -18,7 +18,7 @@ GENERIC: stream-close  ( stream -- )
 GENERIC: set-timeout   ( timeout stream -- )
 
 : stream-write ( string stream -- )
-    f swap stream-format ;
+    H{ } swap stream-format ;
 
 : stream-terpri ( stream -- )
     "\n" over stream-write stream-finish ;
@@ -50,7 +50,7 @@ TUPLE: wrapper-stream scope ;
 
 C: wrapper-stream ( stream -- stream )
     2dup set-delegate [
-        >r [ stdio set ] make-hash r> set-wrapper-stream-scope
+        >r stdio associate r> set-wrapper-stream-scope
     ] keep ;
 
 : with-wrapper ( stream quot -- )

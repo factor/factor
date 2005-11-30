@@ -62,7 +62,7 @@ DEFER: class<
     #! Test if class1 is a subclass of class2.
     {
         { [ 2dup eq? ] [ 2drop t ] }
-        { [ over flatten hash-size 0 = ] [ 2drop t ] }
+        { [ over flatten hash-empty? ] [ 2drop t ] }
         { [ over superclass ] [ >r superclass r> class< ] }
         { [ dup superclass ] [ superclass< ] }
         { [ 2dup [ members ] 2apply or not ] [ 2drop f ] }
@@ -159,7 +159,7 @@ M: generic definer drop \ G: ;
     } cond ;
 
 : classes-intersect? ( class class -- ? )
-    class-and flatten hash-size 0 > ;
+    class-and flatten hash-empty? not ;
 
 : min-class ( class seq -- class/f )
     #! Is this class the smallest class in the sequence?

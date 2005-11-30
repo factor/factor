@@ -30,12 +30,12 @@ styles ;
 DEFER: directory.
 
 : file-style ( text path -- text style )
-    dup directory? [
-        >r "/" append r>
-        dup [ directory. ] curry outline swons unit
-    ] [
-        f
-    ] if swap file swons swons ;
+    [
+        dup directory? [
+            >r "/" append r>
+            dup [ directory. ] curry outline set
+        ] when swap file set
+    ] make-hash ;
 
 : file. ( dir name -- )
     tuck path+ file-style format ;

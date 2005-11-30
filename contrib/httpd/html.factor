@@ -1,22 +1,22 @@
 ! Copyright (C) 2004, 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: html
-USING: generic http io kernel lists math namespaces
+USING: generic hashtables http io kernel lists math namespaces
 presentation sequences strings styles words ;
 
 : html-entities ( -- alist )
-    [
-        [[ CHAR: < "&lt;"   ]]
-        [[ CHAR: > "&gt;"   ]]
-        [[ CHAR: & "&amp;"  ]]
-        [[ CHAR: ' "&apos;" ]]
-        [[ CHAR: " "&quot;" ]]
-    ] ;
+    H{
+        { CHAR: < "&lt;"   }
+        { CHAR: > "&gt;"   }
+        { CHAR: & "&amp;"  }
+        { CHAR: ' "&apos;" }
+        { CHAR: " "&quot;" }
+    } ;
 
 : chars>entities ( str -- str )
     #! Convert <, >, &, ' and " to HTML entities.
     [
-        [ dup html-entities assoc [ % ] [ , ] ?if ] each
+        [ dup html-entities hash [ % ] [ , ] ?if ] each
     ] "" make ;
 
 : hex-color, ( triplet -- )
@@ -40,25 +40,25 @@ presentation sequences strings styles words ;
 : font-css, ( font -- )
     "font-family: " % % "; " % ;
 
-: assoc-apply ( value-alist quot-alist -- )
+: hash-apply ( value-hash quot-hash -- )
     #! Looks up the key of each pair in the first list in the
     #! second list to produce a quotation. The quotation is
     #! applied to the value of the pair. If there is no
     #! corresponding quotation, the value is popped off the
     #! stack.
     swap [
-        unswons rot assoc* dup [ cdr call ] [ 2drop ] if
-    ] each-with ;
+        swap rot hash dup [ call ] [ 2drop ] if
+    ] hash-each-with ;
 
 : css-style ( style -- )
     [
-        [
-            [ foreground  fg-css, ]
-            [ font        font-css, ]
-            [ font-style  style-css, ]
-            [ font-size   size-css, ]
-            [ underline   underline-css, ]
-        ] assoc-apply
+        H{
+            { foreground  [ fg-css,        ] }
+            { font        [ font-css,      ] }
+            { font-style  [ style-css,     ] }
+            { font-size   [ size-css,      ] }
+            { underline   [ underline-css, ] }
+        } hash-apply
     ] "" make ;
 
 : span-tag ( style quot -- )
@@ -79,7 +79,7 @@ presentation sequences strings styles words ;
     [ "/" % resolve-file-link url-encode % ] "" make ;
 
 : file-link-tag ( style quot -- )
-    over file swap assoc [
+    over file swap hash [
         <a file-link-href =href a> call </a>
     ] [
         call
@@ -95,7 +95,7 @@ presentation sequences strings styles words ;
     ] "" make ;
 
 : browser-link-tag ( style quot -- style )
-    over presented swap assoc dup word? [
+    over presented swap hash dup word? [
         <a browser-link-href =href a> call </a>
     ] [
         drop call
@@ -105,7 +105,7 @@ TUPLE: html-stream ;
 
 M: html-stream stream-write1 ( char stream -- )
     [
-        dup html-entities assoc [ write ] [ write1 ] ?if
+        dup html-entities hash [ write ] [ write1 ] ?if
     ] with-wrapper ;
 
 M: html-stream stream-format ( str style stream -- )

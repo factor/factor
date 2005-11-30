@@ -51,7 +51,7 @@ SYMBOL: table
     
 : reset-continuation-table ( -- ) 
   #! Create the initial global table
-  continuation-table hash-clear ;
+  continuation-table clear-hash ;
 
 H{ } clone table global set-hash
 
@@ -81,7 +81,7 @@ TUPLE: item expire? quot id time-added ;
   #! if they are 'timeout-seconds' old (ie. were added
   #! more than 'timeout-seconds' ago.
   continuation-table clone [ ( timeout-seconds [[ id item ]] -- )
-    uncons swapd expired? [
+    swapd expired? [
       continuation-table remove-hash
     ] [
       drop
@@ -274,7 +274,7 @@ SYMBOL: root-continuation
 : id-or-root ( -- id )
   #! Return the continuation id for the current requested continuation
   #! or the root continuation if no id is supplied.
-  "id" "query" get assoc [ root-continuation get ] unless* ;
+  "id" "query" get hash [ root-continuation get ] unless* ;
 
 : cont-get/post-responder ( id-or-f -- ) 
   #! httpd responder that retrieves a continuation and calls it.
@@ -283,7 +283,7 @@ SYMBOL: root-continuation
   #! no root continuation exists the expired continuation handler
   #! should be called.
   drop [
-    "response" get alist>hash 
+    "response" get 
      id-or-root [
       resume-continuation
     ] [

@@ -25,10 +25,10 @@ M: general-t bool>str drop "true" ;
 M: f bool>str drop "false" ;
 
 : str>bool
-    [
-        [[ "true" t ]]
-        [[ "false" f ]]
-    ] assoc ;
+    H{
+        { "true" t }
+        { "false" f }
+    } hash ;
 
 [ t ] [ t bool>str str>bool ] unit-test
 [ f ] [ f bool>str str>bool ] unit-test

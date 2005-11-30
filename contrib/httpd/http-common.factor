@@ -3,15 +3,15 @@ IN: http
 USING: errors kernel lists math namespaces parser sequences
 io strings ;
 
-: header-line ( alist line -- alist )
-    ": " split1 dup [ cons swons ] [ 2drop ] if ;
+: header-line ( line -- )
+    ": " split1 dup [ swap set ] [ 2drop ] if ;
 
-: (read-header) ( alist -- alist )
+: (read-header) ( hash -- hash )
     readln dup
     empty? [ drop ] [ header-line (read-header) ] if ;
 
-: read-header ( -- alist )
-    [ ] (read-header) ;
+: read-header ( -- hash )
+    [ (read-header) ] make-hash ;
 
 : url-encode ( str -- str )
     [

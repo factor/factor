@@ -91,6 +91,8 @@ C: block ( -- block )
 
 : text ( string style -- ) <text> pprinter get add-section ;
 
+: plain-text ( string -- ) H{ } text ;
+
 : <indent ( section -- ) section-indent indent [ + ] change ;
 
 : indent> ( section -- ) section-indent indent [ swap - ] change ;
@@ -173,19 +175,20 @@ C: pprinter ( -- stream )
 
 GENERIC: pprint* ( obj -- )
 
-: vocab-style ( vocab -- style )
+: vocab-color ( vocab -- style )
     H{
-        { "syntax" [ [[ foreground { 0.5 0.5 0.5 1.0 } ]] ] }
-        { "kernel" [ [[ foreground { 0.0 0.0 0.5 1.0 } ]] ] }
-        { "sequences" [ [[ foreground { 0.5 0.0 0.0 1.0 } ]] ] }
-        { "math" [ [[ foreground { 0.0 0.5 0.0 1.0 } ]] ] }
-        { "math-internals" [ [[ foreground { 0.75 0.0 0.0 1.0 } ]] ] }
-        { "kernel-internals" [ [[ foreground { 0.75 0.0 0.0 1.0 } ]] ] }
-        { "io-internals" [ [[ foreground { 0.75 0.0 0.0 1.0 } ]] ] }
+        { "syntax" { 0.5 0.5 0.5 1.0 } }
+        { "kernel" { 0.0 0.0 0.5 1.0 } }
+        { "sequences" { 0.5 0.0 0.0 1.0 } }
+        { "math" { 0.0 0.5 0.0 1.0 } }
+        { "math-internals" { 0.75 0.0 0.0 1.0 } }
+        { "kernel-internals" { 0.75 0.0 0.0 1.0 } }
+        { "io-internals" { 0.75 0.0 0.0 1.0 } }
     } hash ;
 
 : word-style ( word -- style )
-    dup word-vocabulary vocab-style swap presented swons add ;
+    dup word-vocabulary vocab-color
+    [ [ foreground set ] when* presented set ] make-hash ;
 
 : pprint-word ( obj -- )
     dup word-name [ "( unnamed )" ] unless*
@@ -193,9 +196,9 @@ GENERIC: pprint* ( obj -- )
 
 M: object pprint* ( obj -- )
     "( unprintable object: " swap class word-name " )" append3
-    f text ;
+    plain-text ;
 
-M: real pprint* ( obj -- ) number>string f text ;
+M: real pprint* ( obj -- ) number>string plain-text ;
 
 : ch>ascii-escape ( ch -- esc )
     H{
@@ -227,7 +230,7 @@ M: real pprint* ( obj -- ) number>string f text ;
 
 : pprint-string ( string prefix -- )
     [ % [ unparse-ch ] each CHAR: " , ] "" make
-    do-string-limit f text ;
+    do-string-limit plain-text ;
 
 M: string pprint* ( str -- str ) "\"" pprint-string ;
 
@@ -238,7 +241,7 @@ M: word pprint* ( word -- )
     dup pprint-word
     "pprint-open" word-prop [ <block ] when ;
 
-M: f pprint* drop "f" f text ;
+M: f pprint* drop "f" plain-text ;
 
 M: dll pprint* ( obj -- str ) dll-path "DLL\" " pprint-string ;
 
@@ -249,10 +252,10 @@ M: dll pprint* ( obj -- str ) dll-path "DLL\" " pprint-string ;
 : check-recursion ( obj quot -- indent )
     #! We detect circular structure.
     nesting-limit? [
-        2drop "#" f text
+        2drop "#" plain-text
     ] [
         over recursion-check get memq? [
-            2drop "&" f text
+            2drop "&" plain-text
         ] [
             over recursion-check [ cons ] change
             call
@@ -271,7 +274,7 @@ M: dll pprint* ( obj -- str ) dll-path "DLL\" " pprint-string ;
 : pprint-elements ( seq -- )
     length-limit? >r
     [ pprint-element ] each
-    r> [ "..." f text ] when ;
+    r> [ "..." plain-text ] when ;
 
 : pprint-sequence ( seq start end -- )
     swap pprint* swap pprint-elements pprint* ;
@@ -307,7 +310,7 @@ M: alien pprint* ( alien -- )
         drop "( alien expired )"
     ] [
         \ ALIEN: pprint-word alien-address number>string
-    ] if f text ;
+    ] if plain-text ;
 
 M: wrapper pprint* ( wrapper -- )
     dup wrapped word? [
