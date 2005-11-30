@@ -462,6 +462,17 @@ M: wm-frame handle-property-event ( event frame )
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
+: window-is-mapped? ( window -- ? ) window-map-state+ IsUnmapped = not ;
+
+: mapped-windows ( -- [ a b c d ... ] )
+  root get window-children+ [ window-is-mapped? ] subset ;
+
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+: manage-existing-windows ( -- ) mapped-windows [ manage-window ] each ;
+
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
 ! f initialize-x set-simple-error-handler manage-existing-windows
 ! concurrent-event-loop
 
@@ -477,5 +488,7 @@ M: wm-frame handle-property-event ( event frame )
   "xclock" [ "launch program..." print ] root-menu get add-popup-menu-item
   "xload"  [ "launch program..." print ] root-menu get add-popup-menu-item
   "emacs"  [ "launch program..." print ] root-menu get add-popup-menu-item
+
+  manage-existing-windows
 
   [ concurrent-event-loop ] spawn ;
