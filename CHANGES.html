@@ -8,6 +8,40 @@
 
 <ul>
 
+<li>Incompatible changes:
+
+<ul>
+<li>Some hashtable words changed.
+<ul>
+<li><code>hash* ( key hash -- [[ key value ]] )</code> is now <code>hash* ( key hash -- value ? )</code></li>
+<li><code>hash-clear</code> is now <code>clear-hash</code></li>
+<li><code>hash-each</code>, <code>hash-each-with</code>, <code>hash-all?</code>, <code>hash-all-with?</code>, <code>hash-subset</code>, <code>hash-subset-with</code> now pass the key and value separately on the stack to the given quotation, instead of passing a cons cell</li>
+<li>Literal syntax change: <code>H{ [[ key value ]] ... }</code> is now <code>H{ { key value } }</code></li>
+</ul>
+<li>Association list words <code>assoc*</code>, <code>set-assoc</code>, <code>acons</code> and <code>remove-assoc</code> are gone.</li>
+</li>
+
+<li><code>stream-format ( string style stream -- )</code> now takes a hashtable
+rather than an association list for specifying style information.</li>
+</li>
+
+<li>Compiler changes:
+
+<ul>
+<li>Fixed some problems with compilation of inlined recursive words.</li>
+</ul>
+
+</li>
+
+<li>UI changes:
+
+<ul>
+<li>Fixed invalid OpenGL calls which caused problems on Windows machines with ATI
+drivers, and Linux machines with the MesaGL implementation.</li>
+</ul>
+
+</li>
+
 </ul>
 
 <h1>Factor 0.79:</h1>

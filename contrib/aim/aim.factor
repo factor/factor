@@ -74,7 +74,7 @@ H{
 : sanitize-name ( name -- name ) HEX: 20 swap remove >lower ;
 
 : hash-swap ( hash -- hash )
-    [ [ swap 2array , ] hash-each ] { } make alist>hash ;
+    hash>alist [ first2 swap 2array ] map alist>hash ;
 
 : 2list>hash ( keys values -- hash )
     H{ } clone -rot [ swap pick set-hash ] 2each ;

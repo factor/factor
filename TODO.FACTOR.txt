@@ -1,5 +1,7 @@
 + 0.80:
 
+- check 'see'
+- check interpreter unit test
 - intrinsic char-slot set-char-slot for x86
 - closing ui does not stop timers
 - adding/removing timers automatically for animated gadgets
@@ -7,7 +9,6 @@
 - fix up the min thumb size hack
 - callbacks
 - better prettyprinting of cond
-- remove word transfer hack in bootstrap
 - the invalid recursion form case needs to be fixed, for inlines too
 - what about tasks and timers between image restarts
 - double hash
@@ -29,12 +30,6 @@
 - multiline editing in listener
 - text selection
 - clipboard support
-
-+ tutorial:
-
-- multiline code snippets
-- s-expression text styling language
-- word wrap
 
 + misc
 
@@ -58,8 +53,6 @@
 
 + compiler:
 
-- floating point intrinsics
-- new basic block optimizer
 - declare slot types for built-ins
 - check that set-datastack and set-callstack compile correctly in the
   face of optimization
@@ -74,12 +67,7 @@
 - split: return vectors
 - set-path: iterative
 - slice: if sequence or seq start is changed, abstraction violation
-- specialized arrays
-- search: slow
 - mutable strings simplifying string operarations
-- real Unicode support (strings are already 16 bits and can be extended
-  to 21 if the need arises, but we need full character classification
-  predicates, comparison, case conversion, sorting...)
 
 + kernel:
 
@@ -87,8 +75,6 @@
   - methods outliner
   - annotations for methods
   - docstrings, and originating source file for methods
-- better handling of random arrangements of html words when
-  prettyprinting
 - reader syntax for byte arrays, displaced aliens
 - out of memory error when printing global namespace
 - merge timers with sleeping tasks
@@ -102,5 +88,4 @@
 - reading and writing byte arrays
 - stream server can hang because of exception handler limitations
 - better i/o scheduler
-- utf16, utf8 encoding
 - if two tasks write to a unix stream, the buffer can overflow

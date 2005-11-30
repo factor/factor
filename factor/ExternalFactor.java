@@ -276,7 +276,7 @@ public class ExternalFactor extends VocabularyLookup
 			+ " "
 			+ predicate
 			+ " "
-			+ " completions .");
+			+ " completions >list .");
 
 		Cons moreCompletions = (Cons)parseObject(result).car;
 
