@@ -6,17 +6,20 @@ USING: kernel win32 math namespaces io prettyprint ;
 : enum-clipboard ( -- seq )
     [ 0 (enum-clipboard) ] { } make nip ;
 
-0 OpenClipboard win32-error
-! GetClipboardOwner drop win32-error
-! GetClipboardSequenceNumber drop win32-error
-! enum-clipboard
+: paste ( -- str )
+    0 OpenClipboard drop
+    CF_TEXT IsClipboardFormatAvailable 0 = [
+            "no text in clipboard" print
+        ] [
+            "text found" print
+            CF_TEXT GetClipboardData
+            dup GlobalLock swap
+            GlobalUnlock drop
+    ] if
+    CloseClipboard drop ;
 
-CF_TEXT IsClipboardFormatAvailable win32-error 0 > [
-    CF_TEXT GetClipboardData win32-error
-    ! dup GlobalLock win32-error
-    ! GlobalUnlock win32-error
-] when
+: copy ( str -- )
+    0 OpenClipboard drop
+    CF_TEXT 0 SetClipboardData win32-error
+    CloseClipboard drop ;
 
-
-! EmptyClipboard
-CloseClipboard drop win32-error

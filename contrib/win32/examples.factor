@@ -6,7 +6,7 @@ SYMBOL: wc
 SYMBOL: className "SimpleWindowClass" className set 
 
 : hello-world
-    0 "Hello, world!" "First Application" MB_OK MessageBox ;
+    0 "Hello, world!" "First Application" MB_OK MessageBox win32-error drop ;
 
 
 ! : message-loop ( -- )

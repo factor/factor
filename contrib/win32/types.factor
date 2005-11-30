@@ -26,7 +26,7 @@ TYPEDEF: long*               PLONG_PTR
 TYPEDEF: ulong*              PULONG_PTR
 TYPEDEF: DWORD*              PDWORD
 TYPEDEF: DWORD*              LPDWORD
-TYPEDEF: void*               LPVOID
+TYPEDEF: char*               LPVOID
 TYPEDEF: void*               LPCVOID
 TYPEDEF: char*               LPCSTR
 TYPEDEF: char*               LPCTSTR

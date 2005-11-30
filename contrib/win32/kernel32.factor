@@ -12,6 +12,17 @@ LIBRARY: kernel
 ! #define MAKEINTRESOURCEW(i) (LPWSTR)((ULONG_PTR)((WORD)(i)))
 
 
+! FUNCTION: DWORD FormatMessage(
+    ! DWORD dwFlags,
+    ! LPCVOID lpSource,
+    ! DWORD dwMessageId,
+    ! DWORD dwLanguageId,
+    ! LPTSTR lpBuffer,
+    ! DWORD nSize,
+    ! va_list* Arguments
+! ) ;
+
+
 
 FUNCTION: HMODULE GetModuleHandleA ( char* lpModulename ) ;
 FUNCTION: HMODULE GetModuleHandleW ( char* lpModulename ) ;
