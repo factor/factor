@@ -1,5 +1,19 @@
 + 0.80:
 
+word help sections:
+- synopsis
+- inputs and outputs
+- exceptions
+- see also
+- examples
+- side effects
+- affected by (dynamic variables)
+
+parsing word sections:
+- syntax
+
+- sort out types on 64-bit platforms
+- malloc, free, realloc, memcpy: aliens
 - check 'see'
 - check interpreter unit test
 - intrinsic char-slot set-char-slot for x86

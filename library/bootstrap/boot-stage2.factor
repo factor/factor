@@ -30,7 +30,7 @@ t [
     "/library/opengl/load.factor"
     "/library/freetype/load.factor"
     "/library/ui/load.factor"
-    "/library/help/tutorial.factor"
+    "/library/help/load.factor"
 ] pull-in
 
 ! Handle -libraries:... overrides
