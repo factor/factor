@@ -210,7 +210,7 @@ FUNCTION: BOOL AnyPopup ( ) ;
 ! FUNCTION: BeginDeferWindowPos
 
 
-FUNCTION: HDC BeginPaint (   HWND hwnd,  LPPAINTSTRUCT lpPaint ) ;
+! FUNCTION: HDC BeginPaint (   HWND hwnd,  LPPAINTSTRUCT lpPaint ) ;
 
 ! FUNCTION: BlockInput
 ! FUNCTION: BringWindowToTop
@@ -408,7 +408,7 @@ FUNCTION: HWND CreateWindowExW (
 
 
 FUNCTION: BOOL DrawAnimatedRects ( HWND hWnd, int idAni, RECT* lprcFrom, RECT* lprcTo ) ;
-FUNCTION: BOOL DrawCaption ( HWND hWnd, HDC hdc, LPRECT lprc, UINT uFlags ) ;
+! FUNCTION: BOOL DrawCaption ( HWND hWnd, HDC hdc, LPRECT lprc, UINT uFlags ) ;
 
 ! FUNCTION: DrawEdge
 ! FUNCTION: DrawFocusRect
@@ -597,7 +597,7 @@ FUNCTION: int GetPriorityClipboardFormat ( UINT* paFormatPriorityList, int cForm
 
 
 FUNCTION: HWND GetTopWindow ( HWND hWnd ) ;
-FUNCTION: BOOL GetUpdateRect ( HWND hWnd, LPRECT lpRect, BOOL bErase ) ;
+! FUNCTION: BOOL GetUpdateRect ( HWND hWnd, LPRECT lpRect, BOOL bErase ) ;
 FUNCTION: int GetUpdateRgn ( HWND hWnd, HRGN hRgn, BOOL bErase ) ;
 
 
@@ -688,7 +688,7 @@ FUNCTION: BOOL IsZoomed ( HWND hWnd ) ;
 
 
 FUNCTION: HCURSOR LoadCursorA ( HINSTANCE hInstance, LPCTSTR lpCursorName ) ;
-FUNCTION: HCURSOR LoadCursorW ( HINSTANCE hInstance, LPWCTSTR lpCursorName ) ;
+FUNCTION: HCURSOR LoadCursorW ( HINSTANCE hInstance, LPCWSTR lpCursorName ) ;
 : LoadCursor \ LoadCursorW \ LoadCursorA unicode-exec ;
 
 FUNCTION: HICON LoadIconA ( HINSTANCE hInstance, LPCTSTR lpIconName ) ;
@@ -883,7 +883,7 @@ FUNCTION: ATOM RegisterClassExW ( WNDCLASSEX* lpwcx ) ;
 ! FUNCTION: SendDlgItemMessageW
 ! FUNCTION: SendIMEMessageExA
 ! FUNCTION: SendIMEMessageExW
-FUNCTION: UINT SendInput ( UINT nInputs, LPINPUT pInputs, int cbSize ) ;
+! FUNCTION: UINT SendInput ( UINT nInputs, LPINPUT pInputs, int cbSize ) ;
 ! FUNCTION: SendMessageA
 ! FUNCTION: SendMessageCallbackA
 ! FUNCTION: SendMessageCallbackW

@@ -45,9 +45,15 @@ FUNCTION: DWORD GetLastError ( ) ;
 : win32-error ( -- )
     GetLastError dup 0 = [ (win32-error) throw ] unless drop ;
 
+: GHND HEX: 40 ; inline
+: GMEM_FIXED 0 ; inline
+: GMEM_MOVEABLE 2 ; inline
+: GMEM_ZEROINIT HEX: 40 ; inline
+: GPTR HEX: 40 ; inline
 
-FUNCTION: LPVOID GlobalLock ( HGLOBAL hMem ) ;
-
+FUNCTION: HGLOBAL GlobalAlloc ( UINT uFlags, SIZE_T dwBytes ) ;
+! FUNCTION: LPVOID GlobalLock ( HGLOBAL hMem ) ;
+FUNCTION: char* GlobalLock ( HGLOBAL hMem ) ;
 FUNCTION: BOOL GlobalUnlock ( HGLOBAL hMem ) ;
 
 

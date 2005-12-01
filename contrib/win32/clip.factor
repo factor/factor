@@ -1,4 +1,4 @@
-USING: kernel win32 math namespaces io prettyprint ;
+USING: kernel win32 math namespaces io prettyprint errors ;
 
 : (enum-clipboard) ( n -- )
     EnumClipboardFormats win32-error dup 0 > [ dup , (enum-clipboard) ] when ;
@@ -20,6 +20,12 @@ USING: kernel win32 math namespaces io prettyprint ;
 
 : copy ( str -- )
     0 OpenClipboard drop
+    EmptyClipboard drop
+    GMEM_MOVEABLE 513 GlobalAlloc 0 = [
+        "unable to allocate memory" throw
+    ] when
+
+
     CF_TEXT 0 SetClipboardData win32-error
     CloseClipboard drop ;
 
