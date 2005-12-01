@@ -62,4 +62,13 @@ TUPLE: term entry ;
 
 M: term article-title term-entry ;
 
-M: term article-content terms get hash ;
+M: term article-content
+    term-entry terms get hash
+    [ "No such glossary entry" ] unless* ;
+
+: add-term ( term element -- ) swap terms get set-hash ;
+
+! Missing topics
+M: f article-title drop "No such topic" ;
+
+M: f article-content drop "No such topic" ;
