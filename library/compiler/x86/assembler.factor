@@ -144,22 +144,9 @@ UNION: operand register indirect displaced disp-only ;
     #! 'reg' field of the mod-r/m byte.
     >r compile-byte swap r> 1-operand compile-byte ;
 
-: rex-prefix ( dst src -- )
-    #! Compute a prefix for two 64-bit register operands.
-    over register-64? over register-64? and [
-        BIN: 01001000
-        swap extended? [ BIN: 00000100 bitor ] when
-        swap extended? [ BIN: 00000001 bitor ] when
-        compile-byte
-      
-    ] [
-        2drop
-    ] if ;
-
 : 2-operand ( dst src op -- )
     #! Sets the opcode's direction bit. It is set if the
     #! destination is a direct register operand.
-    >r 2dup rex-prefix r>
     pick register? [ BIN: 10 bitor swapd ] when
     compile-byte register 1-operand ;
 

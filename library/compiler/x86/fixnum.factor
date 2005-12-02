@@ -1,8 +1,8 @@
 ! Copyright (C) 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: compiler-backend
-USING: assembler compiler errors kernel math math-internals
-memory namespaces words ;
+USING: assembler compiler errors kernel kernel-internals math
+math-internals memory namespaces words ;
 
 : literal-overflow
     #! If the src operand is a literal.
