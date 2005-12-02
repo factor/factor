@@ -117,6 +117,16 @@ M: disp-only displacement
 ( Utilities                                                    )
 UNION: operand register indirect displaced disp-only ;
 
+: rex.w? ( reg mod-r/m rex.w -- ? )
+    [ register-64? ] 2apply and and ;
+
+: rex-prefix ( reg mod-r/m rex.w -- n )
+    #! Compile an AMD64 REX prefix.
+    pick pick rex.w? HEX: 01001000 HEX: 01000000 ?
+    swap extended? [ HEX: 00000001 bitor ] when
+    swap extended? [ HEX: 00000100 bitor ] when
+    dup HEX: 01000000 = [ drop ] [ compile-byte ] if ;
+
 : 1-operand-short ( reg n -- )
     #! Some instructions encode their single operand as part of
     #! the opcode.
@@ -148,7 +158,7 @@ UNION: operand register indirect displaced disp-only ;
     #! Sets the opcode's direction bit. It is set if the
     #! destination is a direct register operand.
     pick register? [ BIN: 10 bitor swapd ] when
-    compile-byte register 1-operand ;
+    >r 2dup t rex-prefix r> compile-byte register 1-operand ;
 
 : from ( addr -- addr )
     #! Relative to after next 32-bit immediate.
