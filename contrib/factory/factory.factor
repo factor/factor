@@ -2,12 +2,21 @@
 IN: factory
 
 USING: kernel namespaces generic math sequences hashtables io vectors words
-       prettyprint
-       concurrency xlib x concurrent-widgets simple-error-handler ;
+       prettyprint lists concurrency
+       xlib x concurrent-widgets simple-error-handler ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 SYMBOL: root-menu
+
+: setup-root-menu ( -- )
+  create-menu root-menu set
+  "black" lookup-color root-menu get set-window-background%
+  "xterm"  [ "launch program..." print ] root-menu get add-popup-menu-item
+  "xlogo"  [ "launch program..." print ] root-menu get add-popup-menu-item
+  "xclock" [ "launch program..." print ] root-menu get add-popup-menu-item
+  "xload"  [ "launch program..." print ] root-menu get add-popup-menu-item
+  "emacs"  [ "launch program..." print ] root-menu get add-popup-menu-item ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
@@ -16,70 +25,35 @@ SYMBOL: root-menu
     ButtonReleaseMask
     PointerMotionMask ] 0 [ execute bitor ] reduce ;
 
-: drag-window-loop ( mouse-position-1 window )
-  MouseMask mask-event XAnyEvent-type			! position window type
-  { { [ dup MotionNotify = ]	[ drop drag-window-loop ] }
+: drag-mouse-loop ( position -- )
+  MouseMask mask-event XAnyEvent-type			! position type
+  { { [ dup MotionNotify = ]
+      [ drop drag-mouse-loop ] }
     { [ dup ButtonRelease = ]
-      [ drop						! position window
-        dup mouse-sensor%				! pos-1 window pos-2
-        rot						! window pos-2 pos-1
-        v-						! window pos-diff
-        over window-position%				! window pos-diff win-pos
-        v+						! window new-pos
-        over						! window new-pos window
-        move-window%					! window
-        dup raise-window%
+      [ drop						! position
+        mouse-sensor					! push release
         ungrab-server
         CurrentTime ungrab-pointer
         flush-dpy ] }
-    { [ t ] [ "drag-window-loop ignoring event" print drop drop drop ] } }
-
+    { [ t ] [ drop "drag-mouse-loop ignoring event" print drag-mouse-loop ] } }
   cond ;
 
-: drag-window ( window -- )
-  MouseMask over grab-pointer%		! window
-  grab-server
-  dup mouse-sensor%			! window mouse-position-1
-  swap					! mouse-position-1 window
-  drag-window-loop ;
+: drag-mouse ( -- )
+  MouseMask grab-pointer grab-server mouse-sensor drag-mouse-loop ;
+
+: drag-mouse% [ drag-mouse ] with-window-object ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-DEFER: wm-frame-child
+: drag-move-window ( -- ) drag-mouse swap v- window-position v+ move-window ;
 
-: drag-resize-window-loop ( window )
-  MouseMask mask-event XAnyEvent-type		! frame type
-  { { [ dup MotionNotify = ]
-      [ drop drag-resize-window-loop ] }
-    { [ dup ButtonRelease = ]
-      [ drop					! window
-        dup mouse-sensor%			! window pos-2
-        over					! win pos-2 win
-        window-position%			! win pos-2 win-pos
-        v-					! win new-size
-        swap					! size win
-        tuck					! win size win
-        resize-window%				! win
-        dup wm-frame-child			! win child
-        over					! win child win
-        window-size%				! win child size
-        { 20 20 } v-				! win child size
-        swap					! win size child
-	resize-window%				! win
-        drop
-        ungrab-server
-        CurrentTime ungrab-pointer
-        flush-dpy ] }
-    { [ t ]
-      [ drop drop
-        "drag-resize-window-loop ignoring event" print ] } }
+: drag-move-window% [ drag-move-window ] with-window-object ;
 
-  cond ;
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-: drag-resize-window ( window -- )
-  MouseMask over grab-pointer%
-  grab-server
-  drag-resize-window-loop ;
+: drag-resize-window ( -- ) drag-mouse nip window-position v- resize-window ;
+
+: drag-resize-window% [ drag-resize-window ] with-window-object ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
@@ -229,6 +203,9 @@ M: wm-root handle-configure-request-event ( event wm-root -- )
 ! M: wm-root handle-button-press-event
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
+DEFER: window-list
+DEFER: refresh-window-list
+
 M: wm-root handle-button-press-event ( event wm-root -- )
   drop						! event
 
@@ -241,7 +218,13 @@ M: wm-root handle-button-press-event ( event wm-root -- )
         ifte ] }
 
     { [ dup XButtonEvent-button Button2 = ]
-      [ "Button 2 pressed on root window." print drop ] } }
+      [ window-list get window-map-state% IsUnmapped =
+        [ XButtonEvent-root-position window-list get move-window%
+          window-list get raise-window%
+          window-list get refresh-window-list
+          window-list get map-window% ]
+        [ window-list get unmap-window% ]
+        ifte ] } }
 
   cond ;
 
@@ -434,16 +417,17 @@ M: wm-frame handle-unmap-event ( event frame )
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-! M: wm-frame handle-button-press-event ( event frame )
-!   swap							! frame event
-!   dup XButtonEvent-button Button1 = [ "Button 1 pressed on frame" print ] when
-!   dup XButtonEvent-button Button2 = [ "Button 2 pressed on frame" print ] when
-!   dup XButtonEvent-button Button3 = [ "Button 3 pressed on frame" print ] when ;
+DEFER: layout-frame
+
+: drag-move-frame ( frame -- ) drag-move-window% ;
+
+: drag-resize-frame ( frame -- ) dup drag-resize-window% layout-frame ;
 
 M: wm-frame handle-button-press-event ( event frame )
   over XButtonEvent-button				! event frame button
-  { { [ dup Button1 = ] [ drop nip drag-window ] }
-    { [ dup Button2 = ] [ drop nip drag-resize-window ] }
+  { { [ dup Button1 = ] [ drop nip drag-move-frame ] }
+    { [ dup Button2 = ] [ drop nip drag-resize-frame ] }
+    { [ dup Button3 = ] [ drop nip unmap-window% ] }
     { [ t ] [ drop drop drop ] } }
   cond ;
 
@@ -462,6 +446,48 @@ M: wm-frame handle-property-event ( event frame )
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
+: layout-frame ( frame -- )
+  dup wm-frame-child { 10 10 } swap move-window%
+  dup wm-frame-child				! frame child
+  over window-size%				! frame child size
+  { 20 20 } v-					! frame child child-size
+  swap resize-window%				! frame
+  drop ;
+
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+! window-list
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+SYMBOL: window-list
+
+: setup-window-list ( -- )
+  create-menu window-list set
+  "black" lookup-color window-list get set-window-background% ;
+
+: not-transient? ( frame -- ? ) wm-frame-child get-transient-for-hint% not ;
+
+: add-window-to-list ( window-list frame -- window-list )
+  dup					! window-list frame frame
+  wm-frame-child			! window-list frame child
+  fetch-name%				! window-list frame name-or-f
+  dup					! window-list frame name-or-f name-or-f
+  [ ] [ drop "*untitled*" ] ifte	! window-list frame name
+  swap					! window-list name frame
+  [ map-window% ]			! window-list name frame [ map-window% ]
+  cons					! window-list name action
+  pick					! window-list name action window-list
+  add-popup-menu-item ;
+
+: refresh-window-list ( window-list -- )
+  dup window-children% [ destroy-window+ ] each
+  ! clean-window-table
+  window-table get hash-values [ wm-frame? ] subset
+  [ not-transient? ] subset
+  [ add-window-to-list ] each
+  drop ;
+
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
 : window-is-mapped? ( window -- ? ) window-map-state+ IsUnmapped = not ;
 
 : mapped-windows ( -- [ a b c d ... ] )
@@ -473,22 +499,11 @@ M: wm-frame handle-property-event ( event frame )
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-! f initialize-x set-simple-error-handler manage-existing-windows
-! concurrent-event-loop
-
 : start-factory ( dpy-string -- )
   initialize-x
   SetSimpleErrorHandler
   root get create-wm-root
-
-  create-menu root-menu set
-  "black" lookup-color root-menu get set-window-background%
-  "xterm"  [ "launch program..." print ] root-menu get add-popup-menu-item
-  "xlogo"  [ "launch program..." print ] root-menu get add-popup-menu-item
-  "xclock" [ "launch program..." print ] root-menu get add-popup-menu-item
-  "xload"  [ "launch program..." print ] root-menu get add-popup-menu-item
-  "emacs"  [ "launch program..." print ] root-menu get add-popup-menu-item
-
+  setup-root-menu
+  setup-window-list
   manage-existing-windows
-
   [ concurrent-event-loop ] spawn ;
