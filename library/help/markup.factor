@@ -35,10 +35,18 @@ kernel lists namespaces prettyprint sequences styles ;
     ($block) ;
 
 ! Some links
+TUPLE: link name ;
+
+M: link article-title link-name article-title ;
+
+M: link article-content link-name article-content ;
+
+DEFER: help
+
 : $subsection ( object -- )
     first [
         dup <link> presented set
-        dup [ help ] curry outline set
+        dup [ link-name help ] curry outline set
     ] make-hash [ article-title $subheading ] with-style terpri ;
 
 : $link ( name -- )
