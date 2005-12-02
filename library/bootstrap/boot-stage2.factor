@@ -12,17 +12,16 @@ sequences sequences-internals words ;
 
 cpu "x86" = [
     "/library/compiler/x86/load.factor"
-    "/library/alien/primitive-types.factor"
 ] pull-in
 
 cpu "ppc" = [
     "/library/compiler/ppc/load.factor"
-    "/library/alien/primitive-types.factor"
 ] pull-in
 
 "Loading more library code..." print
 
 t [
+    "/library/alien/primitive-types.factor"
     "/library/alien/malloc.factor"
     "/library/io/buffer.factor"
 
@@ -36,9 +35,15 @@ t [
 ! Handle -libraries:... overrides
 parse-command-line
 
-: compile? "compile" get supported-cpu? and ;
+"compile" get supported-cpu? and [
+    unix? [
+        "/library/unix/load.factor"
+    ] pull-in
+    
+    os "win32" = [
+        "/library/win32/load.factor"
+    ] pull-in
 
-compile? [
     "Compiling base..." print
 
     {
@@ -47,28 +52,15 @@ compile? [
         = string>number number>string scan
         kill-set kill-node (generate)
     } [ compile ] each
-] when
 
-compile? [
-    unix? [
-        "/library/unix/load.factor"
-    ] pull-in
-    
-    os "win32" = [
-        "/library/win32/load.factor"
-    ] pull-in
-] when
-
-"Building cross-reference database..." print
-recrossref
-
-compile? [
     "Compiling system..." print
     compile-all
+    
     terpri
     "Unless you're working on the compiler, ignore the errors above." print
     "Not every word compiles, by design." print
     terpri
+    
     "Initializing native I/O..." print
     init-io
 ] when
@@ -79,6 +71,9 @@ compile? [
     "shell" get [ "shells" ] search execute
     0 exit
 ] set-boot
+
+"Building cross-reference database..." print
+recrossref
 
 all-words [ compiled? ] subset length
 number>string write " compiled words" print
@@ -99,4 +94,3 @@ number>string write " ms" print
 0 exit
 
 FORGET: pull-in
-FORGET: compile?

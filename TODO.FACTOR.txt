@@ -1,5 +1,7 @@
 + 0.80:
 
+- need something like uncons but for arbitrary sequences
+
 word help sections:
 - synopsis
 - inputs and outputs
@@ -88,7 +90,7 @@ parsing word sections:
 - first-class methods:
   - methods outliner
   - annotations for methods
-  - docstrings, and originating source file for methods
+  - originating source file for methods
 - reader syntax for byte arrays, displaced aliens
 - out of memory error when printing global namespace
 - merge timers with sleeping tasks
