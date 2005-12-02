@@ -1,20 +1,20 @@
 
 IN: x
 
-USING: kernel math vectors namespaces sequences xlib x rectangle ;
+USING: kernel math arrays namespaces sequences xlib x rectangle ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 : text-width ( string -- width ) font get swap dup length XTextWidth ;
 
-: string-size ( string -- size ) text-width font get font-height 2vector ;
+: string-size ( string -- size ) text-width font get font-height 2array ;
 
 : string-rect ( string -- rect ) string-size { 0 0 } swap <rect> ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 : base-point ( rect -- )
-  top-left font get XFontStruct-ascent 0 swap 2vector v+ ;
+  top-left font get XFontStruct-ascent 0 swap 2array v+ ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 

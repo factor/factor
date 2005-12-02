@@ -1,9 +1,25 @@
 
 IN: factory
 
-USING: kernel namespaces generic math sequences hashtables io vectors words
+USING: kernel namespaces generic math sequences hashtables io arrays words
        prettyprint lists concurrency
        xlib x concurrent-widgets simple-error-handler ;
+
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+DEFER: workspace-menu
+DEFER: wm-frame?
+DEFER: manage-window
+DEFER: window-list
+DEFER: refresh-window-list
+DEFER: layout-frame
+DEFER: mapped-windows
+
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+: popup-window ( -- ) mouse-sensor move-window raise-window map-window ;
+
+: popup-window% [ popup-window ] with-window-object ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
@@ -16,7 +32,9 @@ SYMBOL: root-menu
   "xlogo"  [ "launch program..." print ] root-menu get add-popup-menu-item
   "xclock" [ "launch program..." print ] root-menu get add-popup-menu-item
   "xload"  [ "launch program..." print ] root-menu get add-popup-menu-item
-  "emacs"  [ "launch program..." print ] root-menu get add-popup-menu-item ;
+  "emacs"  [ "launch program..." print ] root-menu get add-popup-menu-item
+  "Workspaces"
+    [ workspace-menu get popup-window% ] root-menu get add-popup-menu-item ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
@@ -97,12 +115,9 @@ TUPLE: wm-root ;
   dup
   [ swap drop ]
   [ drop >r dpy get r> <window> ]
-  ifte ;
+  if ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-
-DEFER: wm-frame?
-DEFER: manage-window
 
 M: wm-root handle-map-request-event ( event <wm-root> -- )
   drop XMapRequestEvent-window id>obj				! obj
@@ -155,17 +170,17 @@ M: wm-root move-request-x ( event wm-root -- x )
   dup move-request-x?
   [ XConfigureRequestEvent-x ]
   [ XConfigureRequestEvent-window [ window-x ] with-win ]
-  ifte ;
+  if ;
 
 M: wm-root move-request-y ( event wm-root -- y )
   drop
   dup move-request-y?
   [ XConfigureRequestEvent-y ]
   [ XConfigureRequestEvent-window [ window-y ] with-win ]
-  ifte ;
+  if ;
 
 M: wm-root move-request-position ( event wm-root -- { x y } )
-  2dup move-request-x -rot move-request-y 2vector ;
+  2dup move-request-x -rot move-request-y 2array ;
 
 M: wm-root execute-move-request ( event wm-root -- )
   dupd move-request-position swap XConfigureRequestEvent-window move-window+ ;
@@ -177,17 +192,17 @@ M: wm-root size-request-width ( event wm-root -- width )
   dup size-request-width?
   [ XConfigureRequestEvent-width ]
   [ XConfigureRequestEvent-window [ window-width ] with-win ]
-  ifte ;
+  if ;
 
 M: wm-root size-request-height ( event wm-root -- height )
   drop 
   dup size-request-height?
   [ XConfigureRequestEvent-height ]
   [ XConfigureRequestEvent-window [ window-height ] with-win ]
-  ifte ;
+  if ;
 
 M: wm-root size-request-size ( event wm-root -- { width height } )
-  2dup size-request-width -rot size-request-height 2vector ;
+  2dup size-request-width -rot size-request-height 2array ;
 
 M: wm-root execute-size-request ( event wm-root -- )
   dupd size-request-size swap XConfigureRequestEvent-window resize-window+ ;
@@ -203,9 +218,6 @@ M: wm-root handle-configure-request-event ( event wm-root -- )
 ! M: wm-root handle-button-press-event
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-DEFER: window-list
-DEFER: refresh-window-list
-
 M: wm-root handle-button-press-event ( event wm-root -- )
   drop						! event
 
@@ -215,7 +227,7 @@ M: wm-root handle-button-press-event ( event wm-root -- )
           root-menu get raise-window%
           root-menu get map-window% ]
         [ root-menu get unmap-window% ]
-        ifte ] }
+        if ] }
 
     { [ dup XButtonEvent-button Button2 = ]
       [ window-list get window-map-state% IsUnmapped =
@@ -224,7 +236,7 @@ M: wm-root handle-button-press-event ( event wm-root -- )
           window-list get refresh-window-list
           window-list get map-window% ]
         [ window-list get unmap-window% ]
-        ifte ] } }
+        if ] } }
 
   cond ;
 
@@ -332,7 +344,7 @@ TUPLE: wm-frame child ;
 
 M: wm-frame handle-destroy-window-event ( event <wm-frame> -- )
   2dup destroy-window-event-match?
-  [ destroy-window% drop ] [ drop drop ] ifte ;
+  [ destroy-window% drop ] [ drop drop ] if ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
@@ -341,7 +353,7 @@ M: wm-frame handle-destroy-window-event ( event <wm-frame> -- )
 
 M: wm-frame handle-map-request-event ( event <wm-frame> -- )
   2dup map-request-event-match?				! event frame ?
-  [ dup wm-frame-child map-window% map-window% drop ] [ drop drop ] ifte ;
+  [ dup wm-frame-child map-window% map-window% drop ] [ drop drop ] if ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
@@ -350,7 +362,7 @@ M: wm-frame handle-map-request-event ( event <wm-frame> -- )
 
 M: wm-frame handle-map-event ( event <wm-frame> -- )
   2dup map-event-match?
-  [ dup map-window% raise-window% drop ] [ drop drop ] ifte ;
+  [ dup map-window% raise-window% drop ] [ drop drop ] if ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 ! M: wm-frame handle-configure-request-event ( event frame )
@@ -360,16 +372,16 @@ M: wm-frame move-request-x ( event frame -- x )
   over move-request-x?
   [ drop XConfigureRequestEvent-x ]
   [ nip window-x% ]
-  ifte ;
+  if ;
 
 M: wm-frame move-request-y ( event frame -- y )
   over move-request-y?
   [ drop XConfigureRequestEvent-y ]
   [ nip window-y% ]
-  ifte ;
+  if ;
 
 M: wm-frame move-request-position ( event frame -- { x y } )
-  2dup move-request-x -rot move-request-y 2vector ;
+  2dup move-request-x -rot move-request-y 2array ;
 
 M: wm-frame execute-move-request ( event frame )
   dup -rot move-request-position swap move-window% ;
@@ -380,16 +392,16 @@ M: wm-frame size-request-width ( event frame -- width )
   over size-request-width?
   [ drop XConfigureRequestEvent-width ]
   [ nip wm-frame-child window-width% ]
-  ifte ;
+  if ;
 
 M: wm-frame size-request-height ( event frame -- height )
   over size-request-height?
   [ drop XConfigureRequestEvent-height ]
   [ nip wm-frame-child window-height% ]
-  ifte ;
+  if ;
 
 M: wm-frame size-request-size ( event frame -- size )
-  2dup size-request-width -rot size-request-height 2vector ;
+  2dup size-request-width -rot size-request-height 2array ;
 
 : execute-size-request/child ( event frame )
   dup wm-frame-child -rot size-request-size swap resize-window% ;
@@ -413,11 +425,9 @@ M: wm-frame handle-configure-request-event ( event frame )
   wm-frame-child window-id swap XUnmapEvent-window = ;
 
 M: wm-frame handle-unmap-event ( event frame )
-  2dup unmap-event-match? [ unmap-window% drop ] [ drop drop ] ifte ;
+  2dup unmap-event-match? [ unmap-window% drop ] [ drop drop ] if ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-
-DEFER: layout-frame
 
 : drag-move-frame ( frame -- ) drag-move-window% ;
 
@@ -437,7 +447,7 @@ M: wm-frame handle-enter-window-event ( event frame )
   nip dup wm-frame-child valid-window?%
   [ wm-frame-child >r RevertToPointerRoot CurrentTime r> set-input-focus% ]
   [ destroy-window% ]
-  ifte ;
+  if ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
@@ -453,6 +463,52 @@ M: wm-frame handle-property-event ( event frame )
   { 20 20 } v-					! frame child child-size
   swap resize-window%				! frame
   drop ;
+
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+! Workspaces
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+GENERIC: switch-to
+
+SYMBOL: current-workspace
+
+TUPLE: workspace windows ;
+
+: create-workspace [ ] <workspace> ;
+
+M: workspace switch-to ( workspace -- )
+  mapped-windows dup current-workspace get set-workspace-windows
+  [ unmap-window+ ] each
+  dup workspace-windows [ map-window+ ] each
+  current-workspace set ;
+
+SYMBOL: workspace-1
+SYMBOL: workspace-2
+SYMBOL: workspace-3
+SYMBOL: workspace-4
+
+create-workspace workspace-1 set
+create-workspace workspace-2 set
+create-workspace workspace-3 set
+create-workspace workspace-4 set
+
+workspace-1 get current-workspace set
+
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+SYMBOL: workspace-menu
+
+: setup-workspace-menu ( -- )
+  create-menu workspace-menu set
+  "black" lookup-color workspace-menu get set-window-background%
+  "Workspace 1"
+    [ workspace-1 get switch-to ] workspace-menu get add-popup-menu-item
+  "Workspace 2"
+    [ workspace-2 get switch-to ] workspace-menu get add-popup-menu-item
+  "Workspace 3"
+    [ workspace-3 get switch-to ] workspace-menu get add-popup-menu-item
+  "Workspace 4"
+    [ workspace-4 get switch-to ] workspace-menu get add-popup-menu-item ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 ! window-list
@@ -471,7 +527,7 @@ SYMBOL: window-list
   wm-frame-child			! window-list frame child
   fetch-name%				! window-list frame name-or-f
   dup					! window-list frame name-or-f name-or-f
-  [ ] [ drop "*untitled*" ] ifte	! window-list frame name
+  [ ] [ drop "*untitled*" ] if	! window-list frame name
   swap					! window-list name frame
   [ map-window% ]			! window-list name frame [ map-window% ]
   cons					! window-list name action
@@ -505,5 +561,6 @@ SYMBOL: window-list
   root get create-wm-root
   setup-root-menu
   setup-window-list
+  setup-workspace-menu
   manage-existing-windows
   [ concurrent-event-loop ] spawn ;

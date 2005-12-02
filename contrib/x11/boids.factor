@@ -2,7 +2,7 @@
 
 IN: boids
 
-USING: namespaces math kernel sequences vectors xlib x ;
+USING: namespaces math kernel sequences arrays xlib x ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
@@ -38,18 +38,22 @@ SYMBOL: time-slice   0.5 time-slice set
 ! random-boid and random-boids
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-: random-n ( n -- random-0-to-n-1 )
-  1 - 0 swap random-int ;
+! : random-range dupd swap - random-int + ;
+
+: random-range ( a b -- n ) 1 + dupd swap - random-int + ;
+
+! : random-n ( n -- random-0-to-n-1 )
+!   1 - 0 swap random-int ;
 
 : random-pos ( -- pos )
-  world-size get [ random-n ] map ;
+  world-size get [ random-int ] map ;
 
 : random-vel ( -- vel )
-  2 >vector [ drop -10 10 random-int ] map ;
+  2 >array [ drop -10 10 random-range ] map ;
 
 : random-boid ( -- boid ) random-pos random-vel <boid> ;
 
-: random-boids ( n -- boids ) >vector [ drop random-boid ] map ;
+: random-boids ( n -- boids ) >array [ drop random-boid ] map ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
@@ -179,7 +183,7 @@ SYMBOL: boids
     normalize
     separation-weight get
     v*n ]
-  ifte ;
+  if ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
@@ -192,7 +196,7 @@ SYMBOL: boids
     normalize
     alignment-weight get
     v*n ]
-  ifte ;
+  if ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
@@ -207,7 +211,7 @@ SYMBOL: boids
     normalize
     cohesion-weight get
     v*n ]
-  ifte ;
+  if ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
@@ -248,7 +252,7 @@ SYMBOL: boids
 
 : wrap-pos ( pos -- pos )
   [ ] each
-  wrap-y swap wrap-x swap 2vector ;
+  wrap-y swap wrap-x swap 2array ;
 
 : iterate-boid ( self -- self )
   dup >r new-pos wrap-pos r> new-vel <boid> ;

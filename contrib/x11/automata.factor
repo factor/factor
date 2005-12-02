@@ -3,13 +3,15 @@
 IN: automata
 
 USING: parser kernel hashtables namespaces sequences lists math io
-       threads strings vectors prettyprint xlib x ;
+       threads strings arrays prettyprint xlib x ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 ! set-rule
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 SYMBOL: rule
+
+8 <hashtable> rule set
 
 SYMBOL: char-0
 
@@ -27,7 +29,7 @@ SYMBOL: char-0
 
 : rule-values ( n -- { ... } )
   >bin 8 char-0 get pad-left
-  >vector
+  >array
   [ 48 - ] map ;
 
 : set-rule ( n -- )
@@ -40,14 +42,14 @@ SYMBOL: char-0
 : 3nth ( n seq -- slice ) >r dup 3 + r> <slice> ;
 
 : next-chunk ( << slice: a b c >>  - value )
-  >vector rule get hash ;
+  >array rule get hash ;
+
+: (step) ( line -- new-line )
+  dup length 2 - [ swap 3nth next-chunk ] map-with ;
 
 : step-line ( line -- new-line )
   >r { 0 } r> { 0 } append append
   (step) ;
-
-: (step) ( line -- new-line )
-  dup length 2 - [ swap 3nth next-chunk ] map-with ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 ! Display the rule
@@ -64,7 +66,7 @@ SYMBOL: char-0
 
 : random-line ( -- line )
   0 400 <range>
-  [ drop 0 1 random-int ]
+  [ drop 2 random-int ]
   map ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
@@ -72,13 +74,13 @@ SYMBOL: char-0
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 : show-point ( { x y } p -- )
-1 = [ draw-point ] [ drop ] ifte ;
+1 = [ draw-point ] [ drop ] if ;
 
 : (show-line) ( { x y } line -- )
   [ >r dup r> show-point { 1 0 } v+ ] each drop ;
 
 : show-line ( y line -- )
-  >r >r 0 r> 2vector r> (show-line) ;
+  >r >r 0 r> 2array r> (show-line) ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 ! Go
@@ -95,7 +97,7 @@ SYMBOL: char-0
   flush-dpy ;
 
 : random-gallery
-  1 255 random-int
+  255 random-int 1 +
   dup unparse print
   set-rule
   run-rule

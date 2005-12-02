@@ -1,5 +1,5 @@
 
-IN: x USING: namespaces kernel math vectors alien sequences xlib ;
+IN: x USING: namespaces kernel math arrays alien sequences xlib ;
 
 SYMBOL: dpy
 SYMBOL: scr
@@ -72,10 +72,10 @@ DEFER: with-win
   >r dpy get win get r> [ ] each XResizeWindow drop ;
 
 : set-window-width ( width -- )
-  window-height 2vector resize-window ;
+  window-height 2array resize-window ;
 
 : set-window-height ( height -- )
-  window-width swap 2vector resize-window ;
+  window-width swap 2array resize-window ;
 
 : set-window-border-width ( width -- )
   >r dpy get win get r> XSetWindowBorderWidth drop ;
@@ -112,7 +112,7 @@ DEFER: with-win
 
 : window-size ( -- { width height } )
   dpy get win get 0 <Window> 0 <int> 0 <int>
-  0 <uint> 0 <uint> 2dup 2vector >r
+  0 <uint> 0 <uint> 2dup 2array >r
   0 <uint> 0 <uint>
   XGetGeometry drop r> [ *uint ] map ;
 
@@ -122,7 +122,7 @@ DEFER: with-win
 
 : window-position ( -- { x y } )
   dpy get win get 0 <Window>
-  0 <int> 0 <int> 2dup 2vector >r
+  0 <int> 0 <int> 2dup 2array >r
   0 <uint> 0 <uint> 0 <uint> 0 <uint>
   XGetGeometry drop r> [ *int ] map ;
 
@@ -219,6 +219,18 @@ DEFER: with-win
   >r dpy get r> XUngrabPointer drop ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+! 14 - Inter-Client Communication Functions
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+: fetch-name ( -- name-or-f )
+  dpy get win get 0 <int> <void*> dup >r XFetchName drop r>
+  dup *void* alien-address 0 = [ drop f ] [ *char* ] if ;
+
+: get-transient-for-hint ( -- win-or-f )
+  dpy get win get 0 <Window> dup >r XGetTransientForHint r>
+  swap 0 = [ drop f ] [ *Window ] if ;
+
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 ! Not Categorized Yet
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
@@ -232,6 +244,9 @@ DEFER: with-win
 : center-window-horizontally+ 	[ center-window-horizontally ] with-win ;
 : window-children+		[ window-children ] with-win ;
 : window-map-state+		[ window-map-state ] with-win ;
+: destroy-window+		[ destroy-window ] with-win ;
+: map-window+			[ map-window ] with-win ;
+: unmap-window+			[ unmap-window ] with-win ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
@@ -284,7 +299,7 @@ DEFER: with-win
 
 : mouse-sensor ( -- { root-x root-y } )
   dpy get win get 0 <Window> 0 <Window> 0 <int> 0 <int> 2dup >r >r
-  0 <int> 0 <int> 0 <uint> XQueryPointer drop r> *int r> *int 2vector ;
+  0 <int> 0 <int> 0 <uint> XQueryPointer drop r> *int r> *int 2array ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 ! Windows and their children

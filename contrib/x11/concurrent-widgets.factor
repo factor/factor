@@ -229,7 +229,7 @@ TUPLE: menu item-width item-height space ;
 ! dup			! event obj-or-f obj-or-f
 ! [ handle-event ]	
 ! [ drop drop ]		! event obj-or-f obj-or-f [ handle-event ] [ drop drop ]
-! ifte
+! if
 ! event-loop ;
 
 ! It's possible to have multiple displays open simultaneously.
@@ -241,7 +241,7 @@ TUPLE: menu item-width item-height space ;
   QueuedAfterFlush events-queued 0 >
   [ next-event ]
   [ 100 sleep concurrent-next-event ]
-  ifte ;
+  if ;
 
 : concurrent-event-loop ( -- )
   concurrent-next-event	! event
@@ -252,7 +252,7 @@ TUPLE: menu item-width item-height space ;
   dup			! event obj-or-f obj-or-f
   [ handle-event ]	
   [ drop drop ]		! event obj-or-f obj-or-f [ handle-event ] [ drop drop ]
-  ifte
+  if
   concurrent-event-loop ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
@@ -294,3 +294,7 @@ TUPLE: menu item-width item-height space ;
 : vertical-layout%		[ vertical-layout ] with-window-object ;
 
 : draw-string%			[ draw-string ] with-window-object ;
+
+: get-transient-for-hint% [ get-transient-for-hint ] with-window-object ;
+
+: fetch-name%			[ fetch-name ] with-window-object ;
