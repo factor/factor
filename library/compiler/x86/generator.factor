@@ -43,7 +43,7 @@ M: %dispatch generate-node ( vop -- )
     ! Add to jump table base
     dup HEX: ffff ADD  just-compiled >r 0 0 rel-address
     ! Jump to jump table entry
-    unit JMP
+    1array JMP
     ! Align for better performance
     compile-aligned
     ! Fix up jump table pointer
