@@ -17,12 +17,12 @@ F_STRING* allot_string(CELL capacity)
 /* call this after constructing a string */
 void rehash_string(F_STRING* str)
 {
-	F_FIXNUM hash = 0;
+	s32 hash = 0;
 	CELL i;
 	CELL capacity = string_capacity(str);
 	for(i = 0; i < capacity; i++)
-		hash = 31*hash + string_nth(str,i);
-	str->hashcode = tag_fixnum(hash);
+		hash = (31*hash + string_nth(str,i));
+	str->hashcode = (s32)tag_fixnum(hash);
 }
 
 void primitive_rehash_string(void)

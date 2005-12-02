@@ -20,6 +20,10 @@ void init_factor(char* image, CELL ds_size, CELL cs_size,
 	userenv[OS_ENV] = tag_object(from_c_string(FACTOR_OS_STRING));
 	userenv[GEN_ENV] = tag_fixnum(gen_count);
 	userenv[CARD_OFF_ENV] = tag_cell(cards_offset);
+	userenv[IMAGE_ENV] = tag_object(from_c_string(image));
+	userenv[CELL_SIZE_ENV] = tag_fixnum(sizeof(CELL));
+	userenv[INT_SIZE_ENV] = tag_fixnum(sizeof(int));
+	userenv[LONG_SIZE_ENV] = tag_fixnum(sizeof(long));
 }
 
 INLINE bool factor_arg(const char* str, const char* arg, CELL* value)
@@ -98,7 +102,6 @@ int main(int argc, char** argv)
 		args = cons(tag_object(from_c_string(argv[argc])),args);
 	}
 
-	userenv[IMAGE_ENV] = tag_object(from_c_string(image));
 	userenv[ARGS_ENV] = args;
 
 	platform_run();

@@ -16,6 +16,9 @@
 #define OUT_ENV        14
 #define GEN_ENV        15 /* set to gen_count */
 #define IMAGE_ENV      16 /* image name */
+#define CELL_SIZE_ENV  17 /* sizeof(CELL) */
+#define INT_SIZE_ENV   18 /* sizeof(int) */
+#define LONG_SIZE_ENV  19 /* sizeof(long) */
 
 /* TAGGED user environment data; see getenv/setenv prims */
 DLLEXPORT CELL userenv[USER_ENV];

@@ -25,11 +25,11 @@ t [
     "/library/alien/malloc.factor"
     "/library/io/buffer.factor"
 
-    "/library/sdl/load.factor"
-    "/library/opengl/load.factor"
-    "/library/freetype/load.factor"
-    "/library/ui/load.factor"
-    "/library/help/load.factor"
+ !   "/library/sdl/load.factor"
+ !   "/library/opengl/load.factor"
+ !   "/library/freetype/load.factor"
+ !   "/library/ui/load.factor"
+ !   "/library/help/load.factor"
 ] pull-in
 
 ! Handle -libraries:... overrides
