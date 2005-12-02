@@ -289,7 +289,7 @@ M: general-list tutorial-line
             ""
             "Try the following:"
             ""
-            [ ": factorial ( n -- n! ) 0 <range> product ;" ]
+            [ ": factorial ( n -- n! ) 1 swap <range> product ;" ]
             [ "100 factorial ." ]
             ""
             [ "1 3 / 1 2 / + ." ]
