@@ -38,6 +38,8 @@ CELL ds_bot;
 	register CELL ds asm("esi");
 #elif defined(FACTOR_PPC)
 	register CELL ds asm("r14");
+#elif defined(FACTOR_AMD64)
+        register CELL ds asm("r12");
 #else
 	CELL ds;
 #endif
@@ -50,6 +52,8 @@ CELL cs_bot;
 	register CELL cs asm("ebx");
 #elif defined(FACTOR_PPC)
 	register CELL cs asm("r15");
+#elif defined(FACTOR_AMD64)
+        register CELL cs asm("r13");
 #else
 	CELL cs;
 #endif

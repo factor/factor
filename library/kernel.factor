@@ -44,18 +44,6 @@ M: object clone ;
     os "linux" = or
     os "macosx" = or ;
 
-: tag-mask BIN: 111 ; inline
-: num-tags 8 ; inline
-: tag-bits 3 ; inline
-
-: fixnum-tag  BIN: 000 ; inline
-: bignum-tag  BIN: 001 ; inline
-: cons-tag    BIN: 010 ; inline
-: object-tag  BIN: 011 ; inline
-: ratio-tag   BIN: 100 ; inline
-: float-tag   BIN: 101 ; inline
-: complex-tag BIN: 110 ; inline
-
 : slip ( quot x -- x | quot: -- )
     >r call r> ; inline
 
@@ -137,3 +125,18 @@ IN: kernel-internals
     #! specifying an incorrect size. Note that this word is also
     #! handled specially by the compiler's type inferencer.
     <tuple> [ 2 set-slot ] keep ; flushable
+
+! Some runtime implementation details
+: tag-mask BIN: 111 ; inline
+: num-tags 8 ; inline
+: tag-bits 3 ; inline
+
+: fixnum-tag  BIN: 000 ; inline
+: bignum-tag  BIN: 001 ; inline
+: cons-tag    BIN: 010 ; inline
+: object-tag  BIN: 011 ; inline
+: ratio-tag   BIN: 100 ; inline
+: float-tag   BIN: 101 ; inline
+: complex-tag BIN: 110 ; inline
+
+: cell 17 getenv ; inline

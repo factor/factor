@@ -18,6 +18,10 @@ cpu "ppc" = [
     "/library/compiler/ppc/load.factor"
 ] pull-in
 
+cpu "amd64" = [
+    "/library/compiler/amd64/load.factor"
+] pull-in
+
 "Loading more library code..." print
 
 t [
@@ -25,11 +29,11 @@ t [
     "/library/alien/malloc.factor"
     "/library/io/buffer.factor"
 
- !   "/library/sdl/load.factor"
- !   "/library/opengl/load.factor"
- !   "/library/freetype/load.factor"
- !   "/library/ui/load.factor"
- !   "/library/help/load.factor"
+    "/library/sdl/load.factor"
+    "/library/opengl/load.factor"
+    "/library/freetype/load.factor"
+    "/library/ui/load.factor"
+    "/library/help/load.factor"
 ] pull-in
 
 ! Handle -libraries:... overrides

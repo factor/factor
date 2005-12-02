@@ -6,10 +6,6 @@ USING: assembler compiler-backend kernel math ;
 ! r14 data stack
 ! r15 call stack
 
-: cell
-    #! Word size.
-    4 ; inline
-
 : fixnum-imm? ( -- ? )
     #! Can fixnum operations take immediate operands?
     f ; inline

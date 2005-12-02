@@ -20,7 +20,7 @@ M: int-regs push-reg drop EAX PUSH ;
 
 M: float-regs reg-size float-regs-size ;
 M: float-regs push-reg
-    ESP swap reg-size [ SUB  [ ESP ] ] keep
+    ESP swap reg-size [ SUB  { ESP } ] keep
     4 = [ FSTPS ] [ FSTPL ] if ;
 
 M: %unbox generate-node

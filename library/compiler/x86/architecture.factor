@@ -6,10 +6,6 @@ USING: assembler compiler-backend kernel sequences ;
 ! ESI datastack
 ! EBX callstack
 
-: cell
-    #! Word size.
-    4 ; inline
-
 : fixnum-imm? ( -- ? )
     #! Can fixnum operations take immediate operands?
     t ; inline

@@ -1,7 +1,7 @@
 ! Copyright (C) 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: compiler-backend
-USING: alien assembler compiler inference kernel
+USING: alien arrays assembler compiler inference kernel
 kernel-internals lists math memory namespaces sequences words ;
 
 ! Not used on x86
@@ -72,7 +72,7 @@ M: %type generate-node ( vop -- )
     ECX object-tag CMP
     "f" get JE
     ! The pointer is not equal to 3. Load the object header.
-    dup ECX object-tag neg 2list MOV
+    dup ECX object-tag neg 2array MOV
     ! Mask off header tag, making a fixnum.
     dup object-tag XOR
     "end" get JMP

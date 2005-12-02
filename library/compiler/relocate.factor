@@ -1,8 +1,8 @@
 ! Copyright (C) 2004, 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: compiler
-USING: assembler compiler-backend kernel lists math namespaces
-sequences words ;
+USING: assembler compiler-backend kernel kernel-internals lists
+math namespaces sequences words ;
 
 ! To support saving compiled code to disk, generator words
 ! append relocation instructions to this vector.

@@ -9,10 +9,10 @@
 ! strings etc to the image file in the CFactor object memory
 ! format.
 
-IN: image
-USING: arrays errors generic hashtables kernel lists
-math namespaces parser prettyprint sequences
+USING: arrays errors generic hashtables kernel kernel-internals
+lists math namespaces parser prettyprint sequences
 sequences-internals io strings vectors words ;
+IN: image
 
 ! The image being constructed; a vector of word-size integers
 SYMBOL: image

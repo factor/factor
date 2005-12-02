@@ -1,8 +1,9 @@
 ! Copyright (C) 2004, 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: compiler-backend
-USING: assembler compiler errors inference kernel lists math
-memory namespaces sequences strings vectors words ;
+USING: assembler compiler errors inference kernel
+kernel-internals lists math memory namespaces sequences strings
+vectors words ;
 
 ! Compile a VOP.
 GENERIC: generate-node ( vop -- )

@@ -1,7 +1,7 @@
 ! Copyright (C) 2004, 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: assembler
-USING: alien compiler-backend generic hashtables kernel lists
+USING: alien generic hashtables kernel kernel-internals lists
 math memory namespaces ;
 
 : compiled-header HEX: 01c3babe ; inline
@@ -16,7 +16,7 @@ math memory namespaces ;
     f swap set-alien-signed-cell ; inline
 
 : compile-aligned ( n -- )
-    compiled-offset cell 2 * align set-compiled-offset ; inline
+    compiled-offset 8 align set-compiled-offset ; inline
 
 : add-literal ( obj -- lit# )
     address

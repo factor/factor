@@ -30,7 +30,6 @@ PREDICATE: general-list list ( list -- ? )
 
 : swons ( cdr car -- [[ car cdr ]] ) swap cons ; inline
 : unit ( a -- [ a ] ) f cons ; inline
-: 2list ( a b -- [ a b ] ) unit cons ; inline
 
 : 2car ( cons cons -- car car ) [ car ] 2apply ; inline
 : 2cdr ( cons cons -- car car ) [ cdr ] 2apply ; inline

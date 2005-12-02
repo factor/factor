@@ -1,51 +1,10 @@
 ! Copyright (C) 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: assembler
-USING: compiler errors generic kernel lists math parser
-sequences words ;
+USING: arrays compiler errors generic kernel kernel-internals
+lists math parser sequences words ;
 
-! A postfix assembler.
-!
-! x86 is a convoluted mess, so this code will be hard to
-! understand unless you already know the instruction set.
-!
-! Syntax is: destination source opcode. For example, to add
-! 3 to EAX:
-!
-! EAX 3 ADD
-!
-! The general format of an x86 instruction is:
-!
-! - 1-4 bytes: prefix. not supported.
-! - 1-2 bytes: opcode. if the first byte is 0x0f, then opcode is
-! 2 bytes.
-! - 1 byte (optional): mod-r/m byte, specifying operands
-! - 1/4 bytes (optional): displacement
-! - 1 byte (optional): scale/index/displacement byte. not
-! supported.
-! - 1/4 bytes (optional): immediate operand
-!
-! mod-r/m has three bit fields:
-! - 0-2: r/m
-! - 3-5: reg
-! - 6-7: mod
-!
-! If the direction bit (bin mask 10) in the opcode is set, then
-! the source is reg, the destination is r/m. Otherwise, it is
-! the opposite. x86 does this because reg can only encode a
-! direct register operand, while r/m can encode other addressing
-! modes in conjunction with the mod field.
-!
-! The mod field has this encoding:
-! - BIN: 00 indirect
-! - BIN: 01 1-byte displacement is present after mod-r/m field
-! - BIN: 10 4-byte displacement is present after mod-r/m field
-! - BIN: 11 direct register operand
-!
-! To encode displacement only (eg, [ 1234 ] EAX MOV), the
-! r/m field stores the code for the EBP register, mod is 00, and
-! a 4-byte displacement field is given. Usually if mod is 00, no
-! displacement field is present.
+! A postfix assembler for x86 and AMD64.
 
 : byte? -128 127 between? ;
 
@@ -54,59 +13,106 @@ GENERIC: register ( op -- reg )
 GENERIC: displacement ( op -- )
 GENERIC: canonicalize ( op -- op )
 
+#! Extended AMD64 registers return true.
+GENERIC: extended? ( op -- ? )
+#! 64-bit registers return true.
+GENERIC: operand-64? ( op -- ? )
+
 M: object canonicalize ;
+M: object extended? drop f ;
+M: object operand-64? drop cell 8 = ;
 
 ( Register operands -- eg, ECX                                 )
 : REGISTER:
     CREATE dup define-symbol
-    scan-word "register" set-word-prop ; parsing
+    dup scan-word "register" set-word-prop
+    scan-word "register-size" set-word-prop ; parsing
 
-REGISTER: EAX 0
-REGISTER: ECX 1
-REGISTER: EDX 2
-REGISTER: EBX 3
-REGISTER: ESP 4
-REGISTER: EBP 5
-REGISTER: ESI 6
-REGISTER: EDI 7
+! x86 registers
+REGISTER: AX 0 16
+REGISTER: CX 1 16
+REGISTER: DX 2 16
+REGISTER: BX 3 16
+REGISTER: SP 4 16
+REGISTER: BP 5 16
+REGISTER: SI 6 16
+REGISTER: DI 7 16
+
+REGISTER: EAX 0 32
+REGISTER: ECX 1 32
+REGISTER: EDX 2 32
+REGISTER: EBX 3 32
+REGISTER: ESP 4 32
+REGISTER: EBP 5 32
+REGISTER: ESI 6 32
+REGISTER: EDI 7 32
+
+! AMD64 registers
+REGISTER: RAX 0 64
+REGISTER: RCX 1 64
+REGISTER: RDX 2 64
+REGISTER: RBX 3 64
+REGISTER: RSP 4 64
+REGISTER: RBP 5 64
+REGISTER: RSI 6 64
+REGISTER: RDI 7 64
+
+REGISTER: R8 8 64
+REGISTER: R9 9 64
+REGISTER: R10 10 64
+REGISTER: R11 11 64
+REGISTER: R12 12 64
+REGISTER: R13 13 64
+REGISTER: R14 14 64
+REGISTER: R15 15 64
 
 PREDICATE: word register "register" word-prop ;
 
-M: register modifier drop BIN: 11 ;
-M: register register "register" word-prop ;
-M: register displacement drop ;
+PREDICATE: register register-32 "register-size" word-prop 32 = ;
+PREDICATE: register register-64 "register-size" word-prop 64 = ;
 
-( Indirect register operands -- eg, [ ECX ]                    )
-PREDICATE: cons indirect
-    dup cdr [ drop f ] [ car register? ] if ;
+M: register modifier drop BIN: 11 ;
+M: register register "register" word-prop 7 bitand ;
+M: register displacement drop ;
+M: register extended? "register" word-prop 7 > ;
+M: register operand-64? register-64? ;
+
+( Indirect register operands -- eg, { ECX }                    )
+PREDICATE: array indirect
+    dup length 1 = [ first register? ] [ drop f ] if ;
 
 M: indirect modifier drop BIN: 00 ;
-M: indirect register car register ;
+M: indirect register first register ;
 M: indirect displacement drop ;
-M: indirect canonicalize dup car EBP = [ drop [ EBP 0 ] ] when ;
+M: indirect canonicalize dup first EBP = [ drop { EBP 0 } ] when ;
+M: indirect extended? register extended? ;
+M: indirect operand-64? register register-64? ;
 
-( Displaced indirect register operands -- eg, [ EAX 4 ]        )
-PREDICATE: cons displaced
+( Displaced indirect register operands -- eg, { EAX 4 }        )
+PREDICATE: array displaced
     dup length 2 =
     [ first2 integer? swap register? and ] [ drop f ] if ;
 
 M: displaced modifier second byte? BIN: 01 BIN: 10 ? ;
-M: displaced register car register ;
+M: displaced register first register ;
 M: displaced displacement
     second dup byte? [ compile-byte ] [ compile-cell ] if ;
 M: displaced canonicalize
-    dup first EBP = not over second 0 = and [ first unit ] when ;
+    dup first EBP = not over second 0 = and
+    [ first 1array ] when ;
+M: displaced extended? register extended? ;
+M: displaced operand-64? register register-64? ;
 
-( Displacement-only operands -- eg, [ 1234 ]                   )
-PREDICATE: cons disp-only
-    dup length 1 = [ car integer? ] [ drop f ] if ;
+( Displacement-only operands -- eg, { 1234 }                   )
+PREDICATE: array disp-only
+    dup length 1 = [ first integer? ] [ drop f ] if ;
 
 M: disp-only modifier drop BIN: 00 ;
 M: disp-only register
-    #! x86 encodes displacement-only as [ EBP ].
+    #! x86 encodes displacement-only as { EBP }.
     drop BIN: 101 ;
 M: disp-only displacement
-    car compile-cell ;
+    first compile-cell ;
 
 ( Utilities                                                    )
 UNION: operand register indirect displaced disp-only ;
@@ -138,9 +144,22 @@ UNION: operand register indirect displaced disp-only ;
     #! 'reg' field of the mod-r/m byte.
     >r compile-byte swap r> 1-operand compile-byte ;
 
+: rex-prefix ( dst src -- )
+    #! Compute a prefix for two 64-bit register operands.
+    over register-64? over register-64? and [
+        BIN: 01001000
+        swap extended? [ BIN: 00000100 bitor ] when
+        swap extended? [ BIN: 00000001 bitor ] when
+        compile-byte
+      
+    ] [
+        2drop
+    ] if ;
+
 : 2-operand ( dst src op -- )
     #! Sets the opcode's direction bit. It is set if the
     #! destination is a direct register operand.
+    >r 2dup rex-prefix r>
     pick register? [ BIN: 10 bitor swapd ] when
     compile-byte register 1-operand ;
 

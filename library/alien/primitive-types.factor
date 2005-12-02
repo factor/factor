@@ -1,4 +1,5 @@
-USING: alien compiler-backend kernel math namespaces ;
+USING: alien compiler-backend kernel kernel-internals
+math namespaces ;
 
 [
     [ alien-unsigned-cell <alien> ] "getter" set
@@ -28,6 +29,24 @@ USING: alien compiler-backend kernel math namespaces ;
     "box_unsinged_8" "boxer" set
     "unbox_unsigned_8" "unboxer" set
 ] "ulonglong" define-primitive-type
+
+[
+    [ alien-signed-cell ] "getter" set
+    [ set-alien-signed-cell ] "setter" set
+    cell "width" set
+    cell "align" set
+    "box_signed_cell" "boxer" set
+    "unbox_signed_cell" "unboxer" set
+] "long" define-primitive-type
+
+[
+    [ alien-unsigned-cell ] "getter" set
+    [ set-alien-unsigned-cell ] "setter" set
+    cell "width" set
+    cell "align" set
+    "box_unsigned_cell" "boxer" set
+    "unbox_unsigned_cell" "unboxer" set
+] "ulong" define-primitive-type
 
 [
     [ alien-signed-4 ] "getter" set
@@ -129,7 +148,3 @@ USING: alien compiler-backend kernel math namespaces ;
     "unbox_double" "unboxer" set
     T{ float-regs f 8 } "reg-class" set
 ] "double" define-primitive-type
-
-! FIXME for 64-bit platforms
-"int" "long" typedef
-"uint" "ulong" typedef

@@ -1,10 +1,10 @@
 ! Copyright (C) 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: compiler-backend
-USING: alien assembler compiler inference kernel lists math
-memory sequences words ;
+USING: alien arrays assembler compiler inference kernel lists
+math memory sequences words ;
 
-: reg-stack ( n reg -- op ) swap cell * neg 2list ;
+: reg-stack ( n reg -- op ) swap cell * neg 2array ;
 
 GENERIC: loc>operand
 
