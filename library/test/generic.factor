@@ -196,3 +196,10 @@ TUPLE: delegating ;
 [ t ] [ \ + 2generic? ] unit-test
 
 [ "SYMBOL: not-a-class C: not-a-class ;" parse ] unit-test-fails
+
+PREDICATE: word no-docs "documentation" word-prop not ;
+
+UNION: no-docs-union no-docs integer ;
+
+[ t ] [ no-docs no-docs-union class< ] unit-test
+[ f ] [ no-docs-union no-docs class< ] unit-test
