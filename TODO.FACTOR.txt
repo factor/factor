@@ -18,7 +18,6 @@ parsing word sections:
   on linux, 8
 - malloc, free, realloc, memcpy: aliens
 - check 'see'
-- check interpreter unit test
 - intrinsic char-slot set-char-slot for x86
 - closing ui does not stop timers
 - adding/removing timers automatically for animated gadgets

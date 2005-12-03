@@ -52,9 +52,9 @@ SYMBOL: builtins
 DEFER: class<
 
 : superclass< ( cls1 cls2 -- ? )
-    >r superclass r> over [ class< ] [ 2drop f ] if ;
+    >r superclass r> 2dup and [ class< ] [ 2drop f ] if ;
 
-: (class<) ( cls1 cls2 -- ? )
+: union-class< ( cls1 cls2 -- ? )
     [ flatten hash-keys ] 2apply
     swap [ swap [ class< ] contains-with? ] all-with? ;
 
@@ -63,10 +63,9 @@ DEFER: class<
     {
         { [ 2dup eq? ] [ 2drop t ] }
         { [ over flatten hash-empty? ] [ 2drop t ] }
-        { [ over superclass ] [ >r superclass r> class< ] }
-        { [ dup superclass ] [ superclass< ] }
+        { [ 2dup superclass< ] [ 2drop t ] }
         { [ 2dup [ members ] 2apply or not ] [ 2drop f ] }
-        { [ t ] [ (class<) ] }
+        { [ t ] [ union-class< ] }
     } cond ;
 
 : class-compare ( cls1 cls2 -- -1/0/1 )

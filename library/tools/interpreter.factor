@@ -74,6 +74,14 @@ M: word do ( word -- )
 
 M: object do ( object -- ) do-1 ;
 
+! The interpreter loses object identity of the name and catch
+! stacks -- they are copied after each step -- so we execute
+! them atomically and don't allow stepping into these words
+\ >n [ \ >n host-word ] "meta-word" set-word-prop
+\ n> [ \ n> host-word ] "meta-word" set-word-prop
+\ >c [ \ >c host-word ] "meta-word" set-word-prop
+\ c> [ \ c> host-word ] "meta-word" set-word-prop
+
 \ call [ pop-d meta-call ] "meta-word" set-word-prop
 \ execute [ pop-d do ] "meta-word" set-word-prop
 \ if [ pop-d pop-d pop-d [ nip ] [ drop ] if meta-call ] "meta-word" set-word-prop
