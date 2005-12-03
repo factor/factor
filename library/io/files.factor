@@ -34,7 +34,7 @@ DEFER: directory.
         dup directory? [
             >r "/" append r>
             dup [ directory. ] curry outline set
-        ] when swap file set
+        ] when file set
     ] make-hash ;
 
 : file. ( dir name -- )

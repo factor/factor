@@ -1,8 +1,8 @@
 ! Copyright (C) 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: compiler-backend
-USING: assembler compiler kernel math math-internals memory
-namespaces words ;
+USING: assembler compiler kernel kernel-internals math
+math-internals memory namespaces words ;
 
 : >3-imm< ( vop -- out1 in2 in1 )
     [ 0 vop-out v>operand ] keep
