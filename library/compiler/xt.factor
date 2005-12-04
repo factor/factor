@@ -5,6 +5,24 @@ USING: assembler errors generic hashtables kernel
 kernel-internals lists math namespaces prettyprint sequences
 strings vectors words ;
 
+! We use a hashtable "compiled-xts" that maps words to
+! xt's that are currently being compiled. The commit-xt's word
+! sets the xt of each word in the hashtable to the value in the
+! hastable.
+SYMBOL: compiled-xts
+
+: save-xt ( word -- )
+    compiled-offset swap compiled-xts get set-hash ;
+
+: commit-xts ( -- )
+    #! We must flush the instruction cache on PowerPC.
+    flush-icache
+    compiled-xts get [ swap set-word-xt ] hash-each
+    compiled-xts off ;
+
+: compiled-xt ( word -- xt )
+    dup compiled-xts get hash [ ] [ word-xt ] ?if ;
+
 ! To support saving compiled code to disk, generator words
 ! append relocation instructions to this vector.
 SYMBOL: relocation-table
@@ -103,24 +121,6 @@ M: fixup-2/2 fixup ( addr fixup -- )
 : absolute-cell ( word -- )
     dup 0 0 rel-word
     <absolute> compiled-offset cell - <fixup-cell> deferred-xt ;
-
-! We use a hashtable "compiled-xts" that maps words to
-! xt's that are currently being compiled. The commit-xt's word
-! sets the xt of each word in the hashtable to the value in the
-! hastable.
-SYMBOL: compiled-xts
-
-: save-xt ( word -- )
-    compiled-offset swap compiled-xts get set-hash ;
-
-: commit-xts ( -- )
-    #! We must flush the instruction cache on PowerPC.
-    flush-icache
-    compiled-xts get [ swap set-word-xt ] hash-each
-    compiled-xts off ;
-
-: compiled-xt ( word -- xt )
-    dup compiled-xts get hash [ ] [ word-xt ] ?if ;
 
 ! When a word is encountered that has not been previously
 ! compiled, it is pushed onto this vector. Compilation stops
