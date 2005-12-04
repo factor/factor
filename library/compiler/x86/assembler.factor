@@ -170,7 +170,7 @@ UNION: operand register indirect displaced disp-only ;
 ( Moving stuff                                                 )
 GENERIC: PUSH ( op -- )
 M: register PUSH f HEX: 50 short-operand ;
-M: integer PUSH HEX: 68 assemble-1 assemble-cell ;
+M: integer PUSH HEX: 68 assemble-1 assemble-4 ;
 M: operand PUSH BIN: 110 f HEX: ff 1-operand ;
 
 GENERIC: POP ( op -- )
@@ -179,8 +179,8 @@ M: operand POP BIN: 000 f HEX: 8f 1-operand ;
 
 ! MOV where the src is immediate.
 GENERIC: (MOV-I) ( src dst -- )
-M: register (MOV-I) t HEX: b8 short-operand  assemble-cell ;
-M: operand (MOV-I) BIN: 000 t HEX: c7 1-operand assemble-cell ;
+M: register (MOV-I) t HEX: b8 short-operand assemble-cell ;
+M: operand (MOV-I) BIN: 000 t HEX: c7 1-operand assemble-4 ;
 
 GENERIC: MOV ( dst src -- )
 M: integer MOV swap (MOV-I) ;
@@ -188,18 +188,18 @@ M: operand MOV HEX: 89 2-operand ;
 
 ( Control flow                                                 )
 GENERIC: JMP ( op -- )
-M: integer JMP HEX: e9 assemble-1 from assemble-cell ;
+M: integer JMP HEX: e9 assemble-1 from assemble-4 ;
 M: operand JMP BIN: 100 t HEX: ff 1-operand ;
 M: word JMP 0 JMP relative ;
 
 GENERIC: CALL ( op -- )
-M: integer CALL HEX: e8 assemble-1 from assemble-cell ;
+M: integer CALL HEX: e8 assemble-1 from assemble-4 ;
 M: operand CALL BIN: 010 t HEX: ff 1-operand ;
 M: word CALL 0 CALL relative ;
 
 GENERIC: JUMPcc ( opcode addr -- )
 M: integer JUMPcc ( opcode addr -- )
-    HEX: 0f assemble-1  swap assemble-1  from assemble-cell ;
+    HEX: 0f assemble-1  swap assemble-1  from assemble-4 ;
 M: word JUMPcc ( opcode addr -- )
     >r 0 JUMPcc r> relative ;
 
