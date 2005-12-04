@@ -57,7 +57,7 @@ M: %label generate-node ( vop -- )
 
 M: %end-dispatch generate-node ( vop -- ) drop ;
 
-: compile-target ( word -- ) 0 assemble-cell absolute ;
+: compile-target ( word -- ) 0 assemble-cell absolute-cell ;
 
 M: %target-label generate-node vop-label compile-target ;
 

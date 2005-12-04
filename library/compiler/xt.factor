@@ -1,18 +1,113 @@
 ! Copyright (C) 2004, 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: compiler
-USING: assembler errors generic hashtables kernel lists math
-namespaces prettyprint sequences strings vectors words ;
+USING: assembler errors generic hashtables kernel
+kernel-internals lists math namespaces prettyprint sequences
+strings vectors words ;
+
+! To support saving compiled code to disk, generator words
+! append relocation instructions to this vector.
+SYMBOL: relocation-table
+
+: rel, ( n -- ) relocation-table get push ;
+
+: relocating compiled-offset cell - rel, ;
+
+: rel-type, ( rel/abs 16/16 type -- )
+    swap 8 shift bitor swap 16 shift bitor rel, ;
+
+: rel-primitive ( word relative 16/16 -- )
+    0 rel-type, relocating word-primitive rel, ;
+
+: rel-dlsym ( name dll rel/abs 16/16 -- )
+    1 rel-type, relocating cons add-literal rel, ;
+
+: rel-address ( rel/abs 16/16 -- )
+    #! Relocate address just compiled.
+    over 1 = [ 2drop ] [ 2 rel-type, relocating 0 rel, ] if ;
+
+: rel-word ( word rel/abs 16/16 -- )
+    pick primitive? [ rel-primitive ] [ rel-address drop ] if ;
+
+: rel-userenv ( n 16/16 -- )
+    0 swap 3 rel-type, relocating rel, ;
+
+: rel-cards ( 16/16 -- )
+    0 swap 4 rel-type, compiled-offset cell 2 * - rel, 0 rel, ;
+
+! This is for fixing up forward references
+GENERIC: resolve ( fixup -- addr )
+
+TUPLE: absolute word ;
+
+M: absolute resolve absolute-word compiled-xt ;
+
+TUPLE: relative word to ;
+
+M: relative resolve
+    [ relative-word compiled-xt ] keep relative-to - ;
+
+GENERIC: fixup ( addr fixup -- )
+
+TUPLE: fixup-cell at ;
+
+C: fixup-cell ( resolver at -- fixup )
+    [ set-fixup-cell-at ] keep [ set-delegate ] keep ;
+
+M: fixup-cell fixup ( addr fixup -- )
+    fixup-cell-at set-compiled-cell ;
+
+TUPLE: fixup-4 at ;
+
+C: fixup-4 ( resolver at -- fixup )
+    [ set-fixup-4-at ] keep [ set-delegate ] keep ;
+
+M: fixup-4 fixup ( addr fixup -- )
+    fixup-4-at set-compiled-4 ;
+
+TUPLE: fixup-bitfield at mask ;
+
+C: fixup-bitfield ( resolver at mask -- fixup )
+    [ set-fixup-bitfield-mask ] keep
+    [ set-fixup-bitfield-at ] keep
+    [ set-delegate ] keep ;
+
+: <fixup-3> ( resolver at -- )
+    #! Only for PowerPC branch instructions.
+    BIN: 11111111111111111111111100 <fixup-bitfield> ;
+
+: <fixup-2> ( resolver at -- )
+    #! Only for PowerPC conditional branch instructions.
+    BIN: 1111111111111100 <fixup-bitfield> ;
+
+: or-compiled ( n off -- )
+    [ compiled-cell bitor ] keep set-compiled-cell ;
+
+M: fixup-bitfield fixup ( addr fixup -- )
+    [ fixup-bitfield-mask bitand ] keep
+    fixup-bitfield-at or-compiled ;
+
+TUPLE: fixup-2/2 at ;
+
+C: fixup-2/2 ( resolver at -- fixup )
+    [ set-fixup-2/2-at ] keep [ set-delegate ] keep ;
+
+M: fixup-2/2 fixup ( addr fixup -- )
+    fixup-2/2-at >r w>h/h r> tuck 4 - or-compiled or-compiled ;
+
+: relative-4 ( word -- )
+    dup 1 0 rel-word
+    compiled-offset <relative>
+    compiled-offset 4 - <fixup-4> deferred-xt ;
+
+: absolute-cell ( word -- )
+    dup 0 0 rel-word
+    <absolute> compiled-offset cell - <fixup-cell> deferred-xt ;
 
 ! We use a hashtable "compiled-xts" that maps words to
 ! xt's that are currently being compiled. The commit-xt's word
 ! sets the xt of each word in the hashtable to the value in the
 ! hastable.
-!
-! This has the advantage that we can compile a word before the
-! words it depends on and perform a fixup later; among other
-! things this enables mutually recursive words.
-
 SYMBOL: compiled-xts
 
 : save-xt ( word -- )
@@ -30,89 +125,13 @@ SYMBOL: compiled-xts
 ! When a word is encountered that has not been previously
 ! compiled, it is pushed onto this vector. Compilation stops
 ! when the vector is empty.
-
 SYMBOL: compile-words
 
-! deferred-xts is a list of objects responding to the fixup
+! deferred-xts is a vector of objects responding to the fixup
 ! generic.
 SYMBOL: deferred-xts
 
-! Some machinery to allow forward references
-GENERIC: fixup ( object -- )
-
-TUPLE: relative word where to ;
-
-: just-compiled compiled-offset 4 - ;
-
-C: relative ( word -- )
-    over 1 0 rel-word
-    [ set-relative-word ] keep
-    [ just-compiled swap set-relative-where ] keep
-    [ compiled-offset swap set-relative-to ] keep ;
-
-: deferred-xt deferred-xts [ cons ] change ;
-
-: relative ( word -- ) <relative> deferred-xt ;
-
-: relative-fixup ( relative -- addr )
-    dup relative-word compiled-xt swap relative-to - ;
-
-M: relative fixup ( relative -- )
-    dup relative-fixup swap relative-where set-compiled-cell ;
-
-TUPLE: absolute word where ;
-
-C: absolute ( word -- )
-    [ set-absolute-word ] keep
-    [ just-compiled swap set-absolute-where ] keep ;
-
-: absolute ( word -- )
-    dup 0 0 rel-word <absolute> deferred-xt ;
-
-: >absolute dup absolute-word compiled-xt swap absolute-where ;
-
-M: absolute fixup ( absolute -- )
-    >absolute set-compiled-cell ;
-
-! Fixups where the address is inside a bitfield in the
-! instruction.
-TUPLE: relative-bitfld mask ;
-
-C: relative-bitfld ( word mask -- )
-    [ set-relative-bitfld-mask ] keep
-    [ >r <relative> r> set-delegate ] keep
-    [ just-compiled swap set-relative-to ] keep ;
-
-: relative-24 ( word -- )
-    BIN: 11111111111111111111111100 <relative-bitfld>
-    deferred-xt ;
-
-: relative-14 ( word -- )
-    BIN: 1111111111111100 <relative-bitfld>
-    deferred-xt ;
-
-: or-compiled ( n off -- )
-    [ compiled-cell bitor ] keep set-compiled-cell ;
-
-M: relative-bitfld fixup
-    dup relative-fixup over relative-bitfld-mask bitand
-    swap relative-where
-    or-compiled ;
-
-! Fixup where the address is split between two PowerPC D-form
-! instructions (low 16 bits of each instruction is the literal).
-TUPLE: absolute-16/16 ;
-
-C: absolute-16/16 ( word -- )
-    [ >r <absolute> r> set-delegate ] keep ;
-
-: fixup-16/16 ( xt where -- )
-    >r w>h/h r> tuck 4 - or-compiled or-compiled ;
-
-M: absolute-16/16 fixup ( absolute -- ) >absolute fixup-16/16 ;
-
-: absolute-16/16 ( word -- )
-    <absolute-16/16> deferred-xt 0 1 rel-address ;
+: deferred-xt deferred-xts get push ;
 
 : compiling? ( word -- ? )
     #! A word that is compiling or already compiled will not be
@@ -132,7 +151,7 @@ M: absolute-16/16 fixup ( absolute -- ) >absolute fixup-16/16 ;
 
 : with-compiler ( quot -- )
     [
-        deferred-xts off
+        V{ } deferred-xts set
         H{ } clone compiled-xts set
         V{ } clone compile-words set
         call

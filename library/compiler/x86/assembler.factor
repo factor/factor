@@ -190,18 +190,18 @@ M: operand MOV HEX: 89 2-operand ;
 GENERIC: JMP ( op -- )
 M: integer JMP HEX: e9 assemble-1 from assemble-4 ;
 M: operand JMP BIN: 100 t HEX: ff 1-operand ;
-M: word JMP 0 JMP relative ;
+M: word JMP 0 JMP relative-4 ;
 
 GENERIC: CALL ( op -- )
 M: integer CALL HEX: e8 assemble-1 from assemble-4 ;
 M: operand CALL BIN: 010 t HEX: ff 1-operand ;
-M: word CALL 0 CALL relative ;
+M: word CALL 0 CALL relative-4 ;
 
 GENERIC: JUMPcc ( opcode addr -- )
 M: integer JUMPcc ( opcode addr -- )
     HEX: 0f assemble-1  swap assemble-1  from assemble-4 ;
 M: word JUMPcc ( opcode addr -- )
-    >r 0 JUMPcc r> relative ;
+    >r 0 JUMPcc r> relative-4 ;
 
 : JO  HEX: 80 swap JUMPcc ;
 : JNO HEX: 81 swap JUMPcc ;

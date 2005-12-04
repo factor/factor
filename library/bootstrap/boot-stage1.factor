@@ -126,7 +126,6 @@ vectors words ;
         "/library/inference/print-dataflow.factor"
 
         "/library/compiler/assembler.factor"
-        "/library/compiler/relocate.factor"
         "/library/compiler/xt.factor"
         "/library/compiler/vops.factor"
         "/library/compiler/linearizer.factor"
