@@ -8,8 +8,9 @@ kernel-internals lists math memory sequences words ;
 
 GENERIC: loc>operand
 
-M: ds-loc loc>operand ds-loc-n ESI reg-stack ;
-M: cs-loc loc>operand cs-loc-n EBX reg-stack ;
+M: ds-loc loc>operand ds-loc-n ds-reg reg-stack ;
+
+M: cs-loc loc>operand cs-loc-n cs-reg reg-stack ;
 
 M: %peek generate-node ( vop -- )
     dup 0 vop-out v>operand swap 0 vop-in loc>operand MOV ;
@@ -19,9 +20,9 @@ M: %replace generate-node ( vop -- )
 
 : (%inc) swap 0 vop-in cell * dup 0 > [ ADD ] [ neg SUB ] if ;
 
-M: %inc-d generate-node ( vop -- ) ESI (%inc) ;
+M: %inc-d generate-node ( vop -- ) ds-reg (%inc) ;
 
-M: %inc-r generate-node ( vop -- ) EBX (%inc) ;
+M: %inc-r generate-node ( vop -- ) cs-reg (%inc) ;
 
 M: %immediate generate-node ( vop -- )
     dup 0 vop-out v>operand swap 0 vop-in address MOV ;

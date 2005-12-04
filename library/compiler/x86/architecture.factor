@@ -6,6 +6,9 @@ USING: assembler compiler-backend kernel sequences ;
 ! ESI datastack
 ! EBX callstack
 
+: ds-reg ESI ; inline
+: cs-reg EBX ; inline
+
 : fixnum-imm? ( -- ? )
     #! Can fixnum operations take immediate operands?
     t ; inline

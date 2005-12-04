@@ -25,7 +25,7 @@ GENERIC: generate-node ( vop -- )
 
 : generate-reloc ( -- length )
     relocation-table get
-    dup [ compile-cell ] each
+    dup [ assemble-cell ] each
     length cell * ;
 
 : (generate) ( word linear -- )
@@ -57,7 +57,7 @@ M: %label generate-node ( vop -- )
 
 M: %end-dispatch generate-node ( vop -- ) drop ;
 
-: compile-target ( word -- ) 0 compile-cell absolute ;
+: compile-target ( word -- ) 0 assemble-cell absolute ;
 
 M: %target-label generate-node vop-label compile-target ;
 

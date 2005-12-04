@@ -14,7 +14,7 @@ USING: compiler errors generic kernel math memory words ;
 !
 ! 14 15 10 STW
 
-: insn ( operand opcode -- ) 26 shift bitor compile-cell ;
+: insn ( operand opcode -- ) 26 shift bitor assemble-cell ;
 
 : b-form ( bo bi bd aa lk -- n )
     >r 1 shift >r 2 shift >r 16 shift >r 21 shift
