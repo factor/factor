@@ -315,7 +315,7 @@ M: closer process
 : initialize-xml-stack ( -- )
     f V{ } clone cons unit >vector xml-stack set ;
 
-: xml ( string -- vector )
+: xml ( string -- tag )
     #! Produces a tree of XML nodes
     [
 	initialize-xml-stack
@@ -404,13 +404,23 @@ M: comment (xml>string)
 
 ! * System for words specialized on tag names
 
+TUPLE: process-missing process tag ;
+M: process-missing error.
+    "Tag <" write
+    process-missing-tag tag-name write
+    "> not implemented on process process " write
+    dup process-missing-process word-name print ;
+
+: run-process ( tag word -- )
+    2dup "xtable" word-prop
+    >r dup tag-name r> hash* [ 2nip call ] [
+        drop <process-missing> throw
+    ] if ;
+
 : PROCESS:
     CREATE
     dup H{ } clone "xtable" set-word-prop
-    dup literalize [
-        "xtable" word-prop
-        >r dup tag-name r> hash call
-    ] cons define-compound ; parsing
+    dup literalize [ run-process ] cons define-compound ; parsing
 
 : TAG:
     scan scan-word [
