@@ -23,6 +23,12 @@ SYMBOL: compiled-xts
 : compiled-xt ( word -- xt )
     dup compiled-xts get hash [ ] [ word-xt ] ?if ;
 
+! deferred-xts is a vector of objects responding to the fixup
+! generic.
+SYMBOL: deferred-xts
+
+: deferred-xt deferred-xts get push ;
+
 ! To support saving compiled code to disk, generator words
 ! append relocation instructions to this vector.
 SYMBOL: relocation-table
@@ -127,24 +133,11 @@ M: fixup-2/2 fixup ( addr fixup -- )
 ! when the vector is empty.
 SYMBOL: compile-words
 
-! deferred-xts is a vector of objects responding to the fixup
-! generic.
-SYMBOL: deferred-xts
-
-: deferred-xt deferred-xts get push ;
-
 : compiling? ( word -- ? )
     #! A word that is compiling or already compiled will not be
     #! added to the list of words to be compiled.
-    dup compiled? [
-        drop t
-    ] [
-        dup compile-words get member? [
-            drop t
-        ] [
-            compiled-xts get hash
-        ] if
-    ] if ;
+    dup compiled? over compile-words get member? or
+    [ drop t ] [ compiled-xts get hash ] if ;
 
 : fixup-xts ( -- )
     deferred-xts get [ fixup ] each  deferred-xts off ;
