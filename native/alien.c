@@ -117,7 +117,7 @@ void primitive_set_alien_##name (void) \
 	*ptr = value; \
 }
 
-DEF_ALIEN_SLOT(signed_cell,int,signed_cell)
+DEF_ALIEN_SLOT(signed_cell,F_FIXNUM,signed_cell)
 DEF_ALIEN_SLOT(unsigned_cell,CELL,unsigned_cell)
 DEF_ALIEN_SLOT(signed_8,s64,signed_8)
 DEF_ALIEN_SLOT(unsigned_8,u64,unsigned_8)

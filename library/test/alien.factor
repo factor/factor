@@ -32,3 +32,17 @@ USING: arrays alien kernel kernel-internals namespaces test ;
     -1 "dump" get 0 set-alien-signed-8
     "dump" get 0 alien-signed-8
 ] unit-test
+
+cell 8 = [
+    [ HEX: 123412341234 ] [
+      8 <byte-array>
+      HEX: 123412341234 over 0 set-alien-signed-8
+      0 alien-signed-8
+    ] unit-test
+    
+    [ HEX: 123412341234 ] [
+      8 <byte-array>
+      HEX: 123412341234 over 0 set-alien-signed-cell
+      0 alien-signed-cell
+    ] unit-test
+] when

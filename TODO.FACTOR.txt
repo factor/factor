@@ -1,6 +1,8 @@
 + 0.80:
 
 - need something like uncons but for arbitrary sequences
+- on win64: to_cell will break
+- .h .b .o for ratios and floats is broken
 
 word help sections:
 - synopsis
