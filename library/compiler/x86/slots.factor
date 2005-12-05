@@ -28,12 +28,12 @@ M: %write-barrier generate-node ( vop -- )
 
 M: %set-slot generate-node ( vop -- )
     drop
-    ! turn tagged fixnum slot # into an offset, multiple of 4
-    2 input-operand 1 SHR
-    ! compute slot address in 1 vop-in
+    ! turn tagged fixnum slot # into an offset
+    2 input-operand fixnum>slot@
+    ! compute slot address in 2 vop-in
     2 input-operand 1 input-operand ADD
     ! store new slot value
-    0 output-operand 1 input-operand 1array MOV ;
+    0 input-operand 1array 2 input-operand MOV ;
 
 M: %fast-set-slot generate-node ( vop -- )
     drop

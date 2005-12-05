@@ -32,7 +32,7 @@ M: %jump-t generate-node ( vop -- )
     label JNE ;
 
 M: %return-to generate-node ( vop -- )
-    drop 0 PUSH label absolute-4 ;
+    drop 0 address>operand PUSH label absolute-cell ;
 
 M: %return generate-node ( vop -- )
     drop RET ;
@@ -43,8 +43,8 @@ M: %dispatch generate-node ( vop -- )
     #! The jump table must immediately follow this macro.
     <label> "end" set
     drop
-    ! Untag and multiply by 4 to get a jump table offset
-    0 input-operand tag-bits 2 - SHR
+    ! Untag and multiply to get a jump table offset
+    0 input-operand fixnum>slot@
     ! Add to jump table base
     0 input-operand HEX: ffff ADD "end" get absolute-4
     ! Jump to jump table entry

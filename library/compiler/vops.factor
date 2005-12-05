@@ -233,7 +233,7 @@ C: %slot make-vop ;
 M: %slot basic-block? drop t ;
 
 : set-slot-vop
-    rot <vreg> rot <vreg> rot <vreg> over >r 3array r> 1array f ;
+    rot <vreg> rot <vreg> rot <vreg> dup >r 3array r> 1array f ;
 
 TUPLE: %set-slot ;
 C: %set-slot make-vop ;

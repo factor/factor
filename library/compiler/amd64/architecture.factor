@@ -21,3 +21,10 @@ M: int-regs reg-class-size drop 4 ;
 M: float-regs fastcall-regs drop 0 ;
 
 : dual-fp/int-regs? f ;
+
+: address-operand ( address -- operand )
+    #! On AMD64, we have to load 64-bit addresses into a
+    #! scratch register first.
+    0 scratch [ swap MOV ] keep ; inline
+
+: fixnum>slot@ drop ; inline

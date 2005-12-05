@@ -21,3 +21,10 @@ M: int-regs reg-class-size drop 4 ;
 M: float-regs fastcall-regs drop 0 ;
 
 : dual-fp/int-regs? f ;
+
+: address-operand ( address -- operand )
+    #! On x86, we can always use an address as an operand
+    #! directly.
+    ; inline
+
+: fixnum>slot@ 1 SHR ; inline

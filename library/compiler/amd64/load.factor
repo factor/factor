@@ -7,7 +7,6 @@ USING: io kernel parser sequences ;
     "/library/compiler/x86/generator.factor"
     "/library/compiler/x86/slots.factor"
     "/library/compiler/x86/stack.factor"
-    "/library/compiler/amd64/stack.factor"
 ] [
     dup print run-resource
 ] each

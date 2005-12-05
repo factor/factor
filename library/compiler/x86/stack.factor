@@ -26,8 +26,7 @@ M: %immediate generate-node ( vop -- )
     drop 0 output-operand 0 input address MOV ;
 
 : load-indirect ( dest literal -- )
-    #! This is not valid for AMD64. It is redefined there.
-    add-literal 1array MOV 0 0 rel-address ;
+    add-literal address-operand 1array MOV 0 0 rel-address ;
 
 M: %indirect generate-node ( vop -- )
     #! indirect load of a literal through a table
