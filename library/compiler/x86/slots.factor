@@ -5,48 +5,48 @@ USING: alien arrays assembler compiler inference kernel
 kernel-internals lists math memory namespaces sequences words ;
 
 M: %slot generate-node ( vop -- )
-    dest/src
+    drop
     ! turn tagged fixnum slot # into an offset, multiple of 4
-    dup 1 SHR
+    0 input-operand 1 SHR
     ! compute slot address in 0 vop-out
-    dupd ADD
+    0 output-operand 0 input-operand ADD
     ! load slot value in 0 vop-out
-    dup 1array MOV ;
+    0 output-operand dup 1array MOV ;
 
 M: %fast-slot generate-node ( vop -- )
-    dup 0 vop-in swap 0 vop-out v>operand tuck >r 2array r>
-    swap MOV ;
+    drop
+    0 output-operand 1 input-operand 0 input 2array MOV ;
 
 : card-offset 1 getenv ;
 
 M: %write-barrier generate-node ( vop -- )
     #! Mark the card pointed to by vreg.
-    0 vop-in v>operand
-    dup card-bits SHR
+    drop
+    0 input-operand dup card-bits SHR
     card-offset 2array card-mark OR
     0 rel-cards ;
 
 M: %set-slot generate-node ( vop -- )
-    dup 2 vop-in v>operand over 1 vop-in v>operand
+    drop
     ! turn tagged fixnum slot # into an offset, multiple of 4
-    over 1 SHR
+    2 input-operand 1 SHR
     ! compute slot address in 1 vop-in
-    dupd ADD
+    2 input-operand 1 input-operand ADD
     ! store new slot value
-    >r 0 vop-in v>operand r> 1array swap MOV ;
+    0 output-operand 1 input-operand 1array MOV ;
 
 M: %fast-set-slot generate-node ( vop -- )
-    dup 2 vop-in over 1 vop-in v>operand
-    swap 2array swap 0 vop-in v>operand MOV ;
+    drop
+    1 input-operand 2 input 2array 0 output-operand MOV ;
 
-: userenv@ ( n -- addr )
-    cell * "userenv" f dlsym + ;
+: userenv@ ( n -- addr ) cell * "userenv" f dlsym + ;
 
 M: %getenv generate-node ( vop -- )
-    dup 0 vop-out v>operand swap 0 vop-in
-    [ userenv@ 1array MOV ] keep 0 rel-userenv ;
+    drop
+    0 output-operand 0 input userenv@ 1array MOV
+    0 input 0 rel-userenv ;
 
 M: %setenv generate-node ( vop -- )
-    dup 1 vop-in
-    [ userenv@ 1array swap 0 vop-in v>operand MOV ] keep
-    0 rel-userenv ;
+    drop
+    1 input userenv@ 1array 0 input-operand MOV
+    1 input rel-userenv ;

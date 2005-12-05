@@ -61,7 +61,7 @@ M: %type generate-node ( vop -- )
     <label> "f" set
     <label> "end" set
     ! Make a copy
-    ECX 0 output-operand MOV
+    0 scratch 0 output-operand MOV
     ! Get the tag
     0 output-operand tag-mask AND
     ! Compare with object tag number (3).
@@ -74,7 +74,7 @@ M: %type generate-node ( vop -- )
     "header" get save-xt
     ! It does store type info in its header
     ! Is the pointer itself equal to 3? Then its F_TYPE (9).
-    ECX object-tag CMP
+    0 scratch object-tag CMP
     "f" get JE
     ! The pointer is not equal to 3. Load the object header.
     0 output-operand ECX object-tag neg 2array MOV

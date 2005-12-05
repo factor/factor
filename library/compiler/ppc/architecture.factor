@@ -10,11 +10,7 @@ USING: assembler compiler-backend kernel math ;
     #! Can fixnum operations take immediate operands?
     f ; inline
 
-: vregs ( -- n )
-    #! Number of vregs
-    8 ; inline
-
-M: vreg v>operand vreg-n 3 + ;
+: vregs { 3 4 5 6 7 8 9 10 } ; inline
 
 M: int-regs fastcall-regs drop 8 ;
 M: int-regs reg-class-size drop 4 ;

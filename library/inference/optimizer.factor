@@ -52,13 +52,14 @@ M: node optimize-node* ( node -- t )
     drop t ;
 
 ! #shuffle
+: can-compose? ( shuffle -- ? )
+    dup shuffle-in-d length swap shuffle-in-r length +
+    vregs length <= ;
+
 : compose-shuffle-nodes ( #shuffle #shuffle -- #shuffle/t )
     [ [ node-shuffle ] 2apply compose-shuffle ] keep
-    over shuffle-in-d length pick shuffle-in-r length + vregs > [
-        2drop t
-    ] [
-        [ set-node-shuffle ] keep
-    ] if ;
+    over can-compose?
+    [ [ set-node-shuffle ] keep ] [ 2drop t ] if ;
 
 M: #shuffle optimize-node*  ( node -- node/t )
     dup node-successor dup #shuffle? [

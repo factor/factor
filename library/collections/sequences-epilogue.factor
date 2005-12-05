@@ -103,6 +103,9 @@ M: object >list ( seq -- list ) dup length 0 rot (>list) ;
     #! Remove duplicates.
     dup dup length <vector> swap [ over adjoin ] each swap like ;
 
+: diff ( seq1 seq2 -- seq2-seq1 )
+    [ swap member? not ] subset-with ; flushable
+
 : append3 ( s1 s2 s3 -- s1+s2+s3 )
     #! Return a new sequence of the same type as s1.
     rot [ [ rot nappend ] keep swap nappend ] immutable ; flushable

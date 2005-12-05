@@ -123,6 +123,10 @@ M: fixup-2/2 fixup ( addr fixup -- )
     compiled-offset <relative>
     compiled-offset 4 - <fixup-4> deferred-xt ;
 
+: absolute-4 ( word -- )
+    dup 0 0 rel-word ( FIXME)
+    <absolute> compiled-offset 4 - <fixup-4> deferred-xt ;
+
 : absolute-cell ( word -- )
     dup 0 0 rel-word
     <absolute> compiled-offset cell - <fixup-cell> deferred-xt ;

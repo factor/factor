@@ -5,8 +5,7 @@ IN: compiler-backend
 DEFER: fixnum-imm? ( -- ? )
 #! Can fixnum operations take immediate operands?
 
-DEFER: vregs ( -- n )
-#! Number of vregs
+DEFER: vregs ( -- regs )
 
 DEFER: dual-fp/int-regs? ( -- ? )
 #! Should fp parameters to fastcalls be loaded in integer

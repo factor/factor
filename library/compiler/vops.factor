@@ -1,8 +1,8 @@
 ! Copyright (C) 2004, 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: compiler-backend
-USING: arrays errors generic hashtables kernel lists math
-namespaces parser sequences words ;
+USING: arrays errors generic hashtables kernel kernel-internals
+lists math memory namespaces parser sequences words ;
 
 ! The linear IR is the second of the two intermediate
 ! representations used by Factor. It is basically a high-level
@@ -47,6 +47,8 @@ GENERIC: v>operand
 
 M: integer v>operand tag-bits shift ;
 
+M: vreg v>operand vreg-n vregs nth ;
+
 M: f v>operand address ;
 
 ! A virtual operation
@@ -56,7 +58,20 @@ TUPLE: vop inputs outputs label ;
 : set-vop-in ( input vop n -- ) swap vop-inputs set-nth ;
 : vop-out ( vop n -- input ) swap vop-outputs nth ;
 
-: with-vop ( vop quot -- ) [ vop set call ] with-scope ; inline
+: (scratch)
+    vop get dup vop-inputs swap vop-outputs append
+    [ vreg? ] subset [ v>operand ] map vregs diff ;
+
+: scratch ( n -- reg )
+    #! Output a scratch register that is not used by the
+    #! current VOP.
+    \ scratch get nth ;
+
+: with-vop ( vop quot -- )
+    [
+        swap vop set (scratch) \ scratch set call
+    ] with-scope ; inline
+
 : input ( n -- obj ) vop get vop-inputs nth ;
 : input-operand ( n -- n ) input v>operand ;
 : output ( n -- obj ) vop get vop-outputs nth ;

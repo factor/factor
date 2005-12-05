@@ -13,11 +13,7 @@ USING: assembler compiler-backend kernel sequences ;
     #! Can fixnum operations take immediate operands?
     t ; inline
 
-: vregs ( -- n )
-    #! Number of vregs
-    3 ; inline
-
-M: vreg v>operand vreg-n { EAX ECX EDX } nth ;
+: vregs { EAX ECX EDX } ; inline
 
 ! On x86, parameters are never passed in registers.
 M: int-regs fastcall-regs drop 0 ;

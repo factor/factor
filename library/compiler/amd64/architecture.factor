@@ -13,12 +13,7 @@ USING: assembler compiler-backend kernel sequences ;
     #! Can fixnum operations take immediate operands?
     f ; inline
 
-: vregs ( -- n )
-    #! Number of vregs
-    3 ; inline
-
-M: vreg v>operand ( vreg -- reg )
-    vreg-n { RAX RCX RDX RSI RDI R8 R9 R10 R11 } nth ;
+: vregs { RAX RCX RDX RSI RDI R8 R9 R10 R11 } ; inline
 
 ! FIXME
 M: int-regs fastcall-regs drop 0 ;
