@@ -32,7 +32,7 @@ M: %jump-t generate-node ( vop -- )
     label JNE ;
 
 M: %return-to generate-node ( vop -- )
-    drop 0 address>operand PUSH label absolute-cell ;
+    drop 0 PUSH label absolute-cell ;
 
 M: %return generate-node ( vop -- )
     drop RET ;
