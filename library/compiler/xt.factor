@@ -17,8 +17,7 @@ SYMBOL: compiled-xts
 : commit-xts ( -- )
     #! We must flush the instruction cache on PowerPC.
     flush-icache
-    compiled-xts get [ swap set-word-xt ] hash-each
-    compiled-xts off ;
+    compiled-xts get [ swap set-word-xt ] hash-each ;
 
 : compiled-xt ( word -- xt )
     dup compiled-xts get hash [ ] [ word-xt ] ?if ;
@@ -140,11 +139,11 @@ SYMBOL: compile-words
     [ drop t ] [ compiled-xts get hash ] if ;
 
 : fixup-xts ( -- )
-    deferred-xts get [ fixup ] each  deferred-xts off ;
+    deferred-xts get [ dup resolve swap fixup ] each ;
 
 : with-compiler ( quot -- )
     [
-        V{ } deferred-xts set
+        V{ } clone deferred-xts set
         H{ } clone compiled-xts set
         V{ } clone compile-words set
         call

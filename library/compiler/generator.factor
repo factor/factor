@@ -19,7 +19,7 @@ GENERIC: generate-node ( vop -- )
     compiled-offset >r
     compile-aligned
     swap save-xt
-    [ [ generate-node ] each ] each
+    [ [ dup [ generate-node ] with-vop ] each ] each
     compile-aligned
     compiled-offset r> - ;
 
@@ -65,12 +65,6 @@ M: %target generate-node
     vop-label dup postpone-word  compile-target ;
 
 M: %parameters generate-node ( vop -- ) drop ;
-
-GENERIC: v>operand
-
-M: integer v>operand tag-bits shift ;
-
-M: f v>operand address ;
 
 : dest/src ( vop -- dest src )
     dup 0 vop-out v>operand swap 0 vop-in v>operand ;

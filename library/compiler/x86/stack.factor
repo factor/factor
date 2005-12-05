@@ -6,30 +6,28 @@ kernel-internals lists math memory sequences words ;
 
 : reg-stack ( n reg -- op ) swap cell * neg 2array ;
 
-GENERIC: loc>operand
+M: ds-loc v>operand ds-loc-n ds-reg reg-stack ;
 
-M: ds-loc loc>operand ds-loc-n ds-reg reg-stack ;
-
-M: cs-loc loc>operand cs-loc-n cs-reg reg-stack ;
+M: cs-loc v>operand cs-loc-n cs-reg reg-stack ;
 
 M: %peek generate-node ( vop -- )
-    dup 0 vop-out v>operand swap 0 vop-in loc>operand MOV ;
+    drop 0 output-operand 0 input-operand MOV ;
 
 M: %replace generate-node ( vop -- )
-    dup 0 vop-out loc>operand swap 0 vop-in v>operand MOV ;
+    drop 0 output-operand 0 input-operand MOV ;
 
-: (%inc) swap 0 vop-in cell * dup 0 > [ ADD ] [ neg SUB ] if ;
+: (%inc) 0 input cell * dup 0 > [ ADD ] [ neg SUB ] if ;
 
-M: %inc-d generate-node ( vop -- ) ds-reg (%inc) ;
+M: %inc-d generate-node ( vop -- ) drop ds-reg (%inc) ;
 
-M: %inc-r generate-node ( vop -- ) cs-reg (%inc) ;
+M: %inc-r generate-node ( vop -- ) drop cs-reg (%inc) ;
 
 M: %immediate generate-node ( vop -- )
-    dup 0 vop-out v>operand swap 0 vop-in address MOV ;
+    drop 0 output-operand 0 input address MOV ;
 
 : load-indirect ( dest literal -- )
     add-literal 1array MOV 0 0 rel-address ;
 
 M: %indirect generate-node ( vop -- )
     #! indirect load of a literal through a table
-    dup 0 vop-out v>operand swap 0 vop-in load-indirect ;
+    drop 0 output-operand 0 input load-indirect ;

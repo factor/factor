@@ -4,6 +4,11 @@ IN: compiler-frontend
 USING: arrays compiler-backend errors generic inference kernel
 lists math namespaces prettyprint sequences strings words ;
 
+: in-1 0 0 %peek-d , ;
+: in-2 0 1 %peek-d ,  1 0 %peek-d , ;
+: in-3 0 2 %peek-d ,  1 1 %peek-d ,  2 0 %peek-d , ;
+: out-1 T{ vreg f 0 } 0 %replace-d , ;
+
 GENERIC: linearize* ( node -- )
 
 : linearize ( dataflow -- linear )

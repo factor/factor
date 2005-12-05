@@ -43,13 +43,25 @@ TUPLE: cs-loc n ;
 ! A pseudo-register class for parameters spilled on the stack
 TUPLE: stack-params ;
 
+GENERIC: v>operand
+
+M: integer v>operand tag-bits shift ;
+
+M: f v>operand address ;
+
 ! A virtual operation
 TUPLE: vop inputs outputs label ;
 
 : vop-in ( vop n -- input ) swap vop-inputs nth ;
 : set-vop-in ( input vop n -- ) swap vop-inputs set-nth ;
 : vop-out ( vop n -- input ) swap vop-outputs nth ;
-: set-vop-out ( input vop n -- ) swap vop-outputs set-nth ;
+
+: with-vop ( vop quot -- ) [ vop set call ] with-scope ; inline
+: input ( n -- obj ) vop get vop-inputs nth ;
+: input-operand ( n -- n ) input v>operand ;
+: output ( n -- obj ) vop get vop-outputs nth ;
+: output-operand ( n -- n ) output v>operand ;
+: label ( -- label ) vop get vop-label ;
 
 GENERIC: basic-block? ( vop -- ? )
 M: vop basic-block? drop f ;
@@ -76,6 +88,12 @@ M: vop stack-reserve drop 0 ;
 : 2-in/label-vop ( in1 in2 label) >r 2array f r> ;
 : 2-vop ( in dest) [ 2array ] keep 1array f ;
 : 3-vop ( in1 in2 dest) >r 2array r> 1array f ;
+
+: check-dest ( vop reg -- )
+    swap 0 vop-out = [ "bad VOP destination" throw ] unless ;
+
+: check-src ( vop reg -- )
+    swap 0 vop-in = [ "bad VOP source" throw ] unless ;
 
 ! miscellanea
 TUPLE: %prologue ;
@@ -178,11 +196,6 @@ C: %immediate make-vop ;
     swap <vreg> src/dest-vop <%immediate> ;
 
 M: %immediate basic-block? drop t ;
-
-: in-1 0 0 %peek-d , ;
-: in-2 0 1 %peek-d ,  1 0 %peek-d , ;
-: in-3 0 2 %peek-d ,  1 1 %peek-d ,  2 0 %peek-d , ;
-: out-1 T{ vreg f 0 } 0 %replace-d , ;
 
 ! indirect load of a literal through a table
 TUPLE: %indirect ;
@@ -333,12 +346,6 @@ TUPLE: %tag ;
 C: %tag make-vop ;
 : %tag ( vreg ) <vreg> dest-vop <%tag> ;
 M: %tag basic-block? drop t ;
-
-: check-dest ( vop reg -- )
-    swap 0 vop-out = [ "bad VOP destination" throw ] unless ;
-
-: check-src ( vop reg -- )
-    swap 0 vop-in = [ "bad VOP source" throw ] unless ;
 
 TUPLE: %getenv ;
 C: %getenv make-vop ;
