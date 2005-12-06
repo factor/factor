@@ -2,7 +2,7 @@ IN: compiler-backend
 USING: assembler compiler-backend kernel sequences ;
 
 ! x86 register assignments
-! EAX, ECX, EDX, EBP vregs
+! EAX, ECX, EDX vregs
 ! ESI datastack
 ! EBX callstack
 

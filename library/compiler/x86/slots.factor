@@ -14,10 +14,9 @@ M: %slot generate-node ( vop -- )
     0 output-operand dup 1array MOV ;
 
 M: %fast-slot generate-node ( vop -- )
-    drop
-    0 output-operand 1 input-operand 0 input 2array MOV ;
+    drop 0 output-operand 1 input-operand 0 input 2array MOV ;
 
-: card-offset 1 getenv ;
+: card-offset 1 getenv ; inline
 
 M: %write-barrier generate-node ( vop -- )
     #! Mark the card pointed to by vreg.
@@ -33,11 +32,10 @@ M: %set-slot generate-node ( vop -- )
     ! compute slot address in 2 vop-in
     2 input-operand 1 input-operand ADD
     ! store new slot value
-    0 input-operand 1array 2 input-operand MOV ;
+    2 input-operand 1array 0 input-operand MOV ;
 
 M: %fast-set-slot generate-node ( vop -- )
-    drop
-    1 input-operand 2 input 2array 0 output-operand MOV ;
+    drop 1 input-operand 2 input 2array 0 output-operand MOV ;
 
 : userenv@ ( n -- addr ) cell * "userenv" f dlsym + ;
 
