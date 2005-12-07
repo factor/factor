@@ -108,10 +108,10 @@ SYMBOL: failures
 
 : compiler-tests
     {
-        "io/buffer" "compiler/optimizer"
+        "io/buffer"
         "compiler/simple"
         "compiler/stack" "compiler/ifte"
         "compiler/generic" "compiler/bail-out"
         "compiler/linearizer" "compiler/intrinsics"
-        "compiler/identities"
+        "compiler/identities" "compiler/optimizer"
     } run-tests ;

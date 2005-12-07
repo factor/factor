@@ -6,12 +6,14 @@ USING: assembler compiler-backend kernel sequences ;
 ! R14 datastack
 ! R15 callstack
 
-: ds-reg R14 ; inline
-: cs-reg R15 ; inline
-
 : fixnum-imm? ( -- ? )
     #! Can fixnum operations take immediate operands?
     f ; inline
+
+: ds-reg R14 ; inline
+: cs-reg R15 ; inline
+: return-reg RAX ; inline
+: remainder-reg RDX ; inline
 
 : vregs { RAX RCX RDX RSI RDI R8 R9 R10 R11 } ; inline
 
@@ -28,7 +30,3 @@ M: float-regs fastcall-regs drop 0 ;
     0 scratch [ swap MOV ] keep ; inline
 
 : fixnum>slot@ drop ; inline
-
-: return-register RAX ; inline
-
-: remainder-reg RDX ; inline

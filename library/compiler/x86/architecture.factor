@@ -6,12 +6,14 @@ USING: assembler compiler-backend kernel sequences ;
 ! ESI datastack
 ! EBX callstack
 
-: ds-reg ESI ; inline
-: cs-reg EBX ; inline
-
 : fixnum-imm? ( -- ? )
     #! Can fixnum operations take immediate operands?
     t ; inline
+
+: ds-reg ESI ; inline
+: cs-reg EBX ; inline
+: return-register EAX ; inline
+: remainder-reg EDX ; inline
 
 : vregs { EAX ECX EDX } ; inline
 
@@ -28,7 +30,3 @@ M: float-regs fastcall-regs drop 0 ;
     ; inline
 
 : fixnum>slot@ 1 SHR ; inline
-
-: return-register EAX ; inline
-
-: remainder-reg EDX ; inline

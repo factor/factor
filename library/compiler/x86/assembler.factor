@@ -148,11 +148,13 @@ UNION: operand register indirect displaced disp-only ;
     #! Relative to after next 32-bit immediate.
     compiled-offset - 4 - ;
 
+PREDICATE: word callable register? not ;
+
 ( Moving stuff                                                 )
 GENERIC: PUSH ( op -- )
 M: register PUSH f HEX: 50 short-operand ;
 M: integer PUSH HEX: 68 assemble-1 assemble-4 ;
-M: word PUSH 0 PUSH absolute-4 ;
+M: callable PUSH 0 PUSH absolute-4 ;
 M: operand PUSH BIN: 110 f HEX: ff 1-operand ;
 
 GENERIC: POP ( op -- )
@@ -166,24 +168,24 @@ M: operand (MOV-I) BIN: 000 t HEX: c7 1-operand assemble-4 ;
 
 GENERIC: MOV ( dst src -- )
 M: integer MOV swap (MOV-I) ;
-M: word MOV 0 rot (MOV-I) absolute-cell ;
+M: callable MOV 0 rot (MOV-I) absolute-cell ;
 M: operand MOV HEX: 89 2-operand ;
 
 ( Control flow                                                 )
 GENERIC: JMP ( op -- )
 M: integer JMP HEX: e9 assemble-1 from assemble-4 ;
+M: callable JMP 0 JMP relative-4 ;
 M: operand JMP BIN: 100 t HEX: ff 1-operand ;
-M: word JMP 0 JMP relative-4 ;
 
 GENERIC: CALL ( op -- )
 M: integer CALL HEX: e8 assemble-1 from assemble-4 ;
+M: callable CALL 0 CALL relative-4 ;
 M: operand CALL BIN: 010 t HEX: ff 1-operand ;
-M: word CALL 0 CALL relative-4 ;
 
 GENERIC: JUMPcc ( opcode addr -- )
 M: integer JUMPcc ( opcode addr -- )
     HEX: 0f assemble-1  swap assemble-1  from assemble-4 ;
-M: word JUMPcc ( opcode addr -- )
+M: callable JUMPcc ( opcode addr -- )
     >r 0 JUMPcc r> relative-4 ;
 
 : JO  HEX: 80 swap JUMPcc ;

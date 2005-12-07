@@ -16,8 +16,6 @@ word help sections:
 parsing word sections:
 - syntax
 
-- sort out types on 64-bit platforms -- on win64, long is 4 bytes,
-  on linux, 8
 - malloc, free, realloc, memcpy: aliens
 - check 'see'
 - intrinsic char-slot set-char-slot for x86
