@@ -28,7 +28,7 @@ math-internals memory namespaces words ;
     0 output-operand PUSH
     "s48_long_to_bignum" f compile-c-call
     ! An untagged pointer to the bignum is now in EAX; tag it
-    EAX bignum-tag OR
+    return-reg bignum-tag OR
     0 scratch POP
     "end" get save-xt ; inline
 
@@ -42,22 +42,24 @@ M: %fixnum* generate-node ( vop -- )
     drop
     ! both inputs are tagged, so one of them needs to have its
     ! tag removed.
-    EAX tag-bits SAR
-    ECX IMUL
+    0 input-operand tag-bits SAR
+    1 input-operand IMUL
     <label> "end" set
     "end" get JNO
-    EDX PUSH
-    EAX PUSH
+    remainder-reg PUSH
+    0 input-operand PUSH
     "s48_long_long_to_bignum" f compile-c-call
-    ESP 8 ADD
+    0 scratch POP
+    1 scratch POP
     ! now we have to shift it by three bits to remove the second
     ! tag
     tag-bits neg PUSH
-    EAX PUSH
+    0 input-operand PUSH
     "s48_bignum_arithmetic_shift" f compile-c-call
     ! an untagged pointer to the bignum is now in EAX; tag it
-    EAX bignum-tag OR
-    ESP 8 ADD
+    return-reg bignum-tag OR
+    0 scratch POP
+    1 scratch POP
     "end" get save-xt ;
 
 M: %fixnum-mod generate-node ( vop -- )
@@ -65,7 +67,7 @@ M: %fixnum-mod generate-node ( vop -- )
     #! EAX and ECX, and the result is in EDX.
     drop
     CDQ
-    ECX IDIV ;
+    1 input-operand IDIV ;
 
 : generate-fixnum/mod
     #! The same code is used for %fixnum/i and %fixnum/mod.
@@ -73,24 +75,24 @@ M: %fixnum-mod generate-node ( vop -- )
     #! EAX and ECX, and the result is in EDX.
     <label> "end" set
     CDQ
-    ECX IDIV
+    1 input-operand IDIV
     ! Make a copy since following shift is destructive
-    ECX EAX MOV
+    1 input-operand 0 input-operand MOV
     ! Tag the value, since division cancelled tags from both
     ! inputs
-    EAX tag-bits SHL
+    0 input-operand tag-bits SHL
     ! Did it overflow?
     "end" get JNO
     ! There was an overflow, so make ECX into a bignum. we must
     ! save EDX since its volatile.
-    EDX PUSH
-    ECX PUSH
+    remainder-reg PUSH
+    1 input-operand PUSH
     "s48_long_to_bignum" f compile-c-call
     ! An untagged pointer to the bignum is now in EAX; tag it
-    EAX bignum-tag OR
-    ESP cell ADD
+    return-reg bignum-tag OR
+    0 scratch POP
     ! the remainder is now in EDX
-    EDX POP
+    remainder-reg POP
     "end" get save-xt ;
 
 M: %fixnum/i generate-node drop generate-fixnum/mod ;

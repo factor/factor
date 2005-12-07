@@ -13,13 +13,15 @@ M: %prologue generate-node drop ;
 : compile-c-call ( symbol dll -- ) [ CALL ] compile-dlsym ;
 
 M: %call generate-node ( vop -- )
-    drop label dup postpone-word CALL ;
+    drop label dup postpone-word
+    dup primitive? [ address-operand ] when CALL ;
 
 M: %call-label generate-node ( vop -- )
     drop label CALL ;
 
 M: %jump generate-node ( vop -- )
-    drop label dup postpone-word JMP ;
+    drop label dup postpone-word
+    dup primitive? [ address-operand ] when JMP ;
 
 M: %jump-label generate-node ( vop -- )
     drop label JMP ;
@@ -32,7 +34,7 @@ M: %jump-t generate-node ( vop -- )
     label JNE ;
 
 M: %return-to generate-node ( vop -- )
-    drop 0 PUSH label absolute-cell ;
+    drop label address-operand PUSH ;
 
 M: %return generate-node ( vop -- )
     drop RET ;

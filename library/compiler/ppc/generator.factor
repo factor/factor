@@ -42,17 +42,19 @@ M: %call-label generate-node ( vop -- )
 
 : compile-call ( label -- )
     #! Far C call for primitives, near C call for compiled defs.
+    dup postpone-word
     dup primitive? [ word-addr  3 MTLR  BLRL ] [ BL ] if ;
 
 M: %call generate-node ( vop -- )
-    vop-label dup postpone-word compile-call ;
+    vop-label compile-call ;
 
 : compile-jump ( label -- )
     #! For tail calls. IP not saved on C stack.
+    dup postpone-word
     dup primitive? [ word-addr  3 MTCTR  BCTR ] [ B ] if ;
 
 M: %jump generate-node ( vop -- )
-    vop-label dup postpone-word  compile-epilogue compile-jump ;
+    vop-label  compile-epilogue compile-jump ;
 
 M: %jump-label generate-node ( vop -- )
     vop-label B ;

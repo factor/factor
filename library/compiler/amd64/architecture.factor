@@ -30,3 +30,5 @@ M: float-regs fastcall-regs drop 0 ;
 : fixnum>slot@ drop ; inline
 
 : return-register RAX ; inline
+
+: remainder-reg RDX ; inline
