@@ -29,7 +29,7 @@ math-internals memory namespaces words ;
     "s48_long_to_bignum" f compile-c-call
     ! An untagged pointer to the bignum is now in EAX; tag it
     EAX bignum-tag OR
-    ESP 4 ADD
+    0 scratch POP
     "end" get save-xt ; inline
 
 M: %fixnum+ generate-node ( vop -- )
@@ -111,32 +111,33 @@ M: %fixnum-bitnot generate-node ( vop -- )
     0 output-operand tag-mask XOR ;
 
 M: %fixnum<< generate-node
+    #! This has specific register requirements.
     drop
-    ! This has specific register requirements.
     <label> "no-overflow" set
     <label> "end" set
     ! make a copy
-    ECX EAX MOV
+    0 scratch 1 input-operand MOV
     ! check for potential overflow
-    ECX 0 input shift-add ADD
-    ECX 0 input shift-add 2 * 1- CMP
+    0 scratch 0 input shift-add ADD
+    0 scratch 0 input shift-add 2 * 1- CMP
     ! is there going to be an overflow?
     "no-overflow" get JBE
     ! there is going to be an overflow, make a bignum
-    EAX tag-bits SAR
+    1 input-operand tag-bits SAR
     0 input PUSH
-    EAX PUSH
+    1 input-operand PUSH
     "s48_long_to_bignum" f compile-c-call
-    EDX POP
-    EAX PUSH
+    0 scratch POP
+    1 input-operand PUSH
     "s48_bignum_arithmetic_shift" f compile-c-call
     ! tag the result
-    EAX bignum-tag OR
-    ESP cell 2 * ADD
+    1 input-operand bignum-tag OR
+    0 scratch POP
+    1 scratch POP
     "end" get JMP
     ! there is not going to be an overflow
     "no-overflow" get save-xt
-    EAX 0 input SHL
+    1 input-operand 0 input SHL
     "end" get save-xt ;
 
 M: %fixnum>> generate-node
@@ -147,6 +148,7 @@ M: %fixnum>> generate-node
     0 output-operand tag-mask bitnot AND ;
 
 M: %fixnum-sgn generate-node
+    #! This has specific register requirements.
     drop
     ! store 0 in EDX if EAX is >=0, otherwise store -1.
     CDQ

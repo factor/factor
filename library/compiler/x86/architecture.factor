@@ -28,3 +28,5 @@ M: float-regs fastcall-regs drop 0 ;
     ; inline
 
 : fixnum>slot@ 1 SHR ; inline
+
+: return-register EAX ; inline

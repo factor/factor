@@ -28,3 +28,5 @@ M: float-regs fastcall-regs drop 0 ;
     0 scratch [ swap MOV ] keep ; inline
 
 : fixnum>slot@ drop ; inline
+
+: return-register RAX ; inline

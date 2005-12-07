@@ -136,6 +136,7 @@ vectors words ;
         "/library/compiler/compiler.factor"
 
         "/library/alien/c-types.factor"
+        "/library/alien/primitive-types.factor"
         "/library/alien/structs.factor"
         "/library/alien/compiler.factor"
         "/library/alien/syntax.factor"

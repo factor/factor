@@ -5,27 +5,23 @@ errors generic hashtables io io-internals kernel
 kernel-internals lists math memory namespaces optimizer parser
 sequences sequences-internals words ;
 
-: pull-in ( ? list -- )
-    swap [ [ dup print run-resource ] each ] [ drop ] if ;
-
 "Loading compiler backend..." print
 
 cpu "x86" = [
-    "/library/compiler/x86/load.factor"
-] pull-in
+    "/library/compiler/x86/load.factor" run-resource
+] when
 
 cpu "ppc" = [
-    "/library/compiler/ppc/load.factor"
-] pull-in
+    "/library/compiler/ppc/load.factor" run-resource
+] when
 
 cpu "amd64" = [
-    "/library/compiler/amd64/load.factor"
-] pull-in
+    "/library/compiler/amd64/load.factor" run-resource
+] when
 
 "Loading more library code..." print
 
-t [
-    "/library/alien/primitive-types.factor"
+[
     "/library/alien/malloc.factor"
     "/library/io/buffer.factor"
 
@@ -34,19 +30,21 @@ t [
     "/library/freetype/load.factor"
     "/library/ui/load.factor"
     "/library/help/load.factor"
-] pull-in
+] [
+    dup print run-resource
+] each
 
 ! Handle -libraries:... overrides
 parse-command-line
 
 "compile" get supported-cpu? and [
     unix? [
-        "/library/unix/load.factor"
-    ] pull-in
+        "/library/unix/load.factor" run-resource
+    ] when
     
     os "win32" = [
-        "/library/win32/load.factor"
-    ] pull-in
+        "/library/win32/load.factor" run-resource
+    ] when
 
     "Compiling base..." print
 
@@ -96,5 +94,3 @@ number>string write " ms" print
 
 "factor.image" save-image
 0 exit
-
-FORGET: pull-in
