@@ -43,12 +43,15 @@ M: %dispatch generate-node ( vop -- )
     #! Compile a piece of code that jumps to an offset in a
     #! jump table indexed by the fixnum at the top of the stack.
     #! The jump table must immediately follow this macro.
-    <label> "end" set
     drop
+    <label> "end" set
     ! Untag and multiply to get a jump table offset
     0 input-operand fixnum>slot@
-    ! Add to jump table base
-    0 input-operand HEX: ffff ADD "end" get absolute-4
+    ! Add to jump table base. We use a temporary register since
+    ! on AMD4 we have to load a 64-bit immediate. On x86, this
+    ! is redundant.
+    0 scratch HEX: ffffffff MOV "end" get absolute-cell
+    0 input-operand 0 scratch ADD
     ! Jump to jump table entry
     0 input-operand 1array JMP
     ! Align for better performance

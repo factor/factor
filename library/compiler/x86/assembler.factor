@@ -249,6 +249,7 @@ M: operand CMP OCT: 071 2-operand ;
 : IDIV ( src -- ) BIN: 111 t HEX: f7 1-operand ;
 
 : CDQ HEX: 99 assemble-1 ;
+: CQO HEX: 48 assemble-1 CDQ ;
 
 : ROL ( dst n -- ) swap BIN: 000 t HEX: c1 immediate-1 ;
 : ROR ( dst n -- ) swap BIN: 001 t HEX: c1 immediate-1 ;

@@ -12,7 +12,7 @@ USING: assembler compiler-backend kernel sequences ;
 
 : ds-reg ESI ; inline
 : cs-reg EBX ; inline
-: return-register EAX ; inline
+: return-reg EAX ; inline
 : remainder-reg EDX ; inline
 
 : vregs { EAX ECX EDX } ; inline
@@ -30,3 +30,5 @@ M: float-regs fastcall-regs drop 0 ;
     ; inline
 
 : fixnum>slot@ 1 SHR ; inline
+
+: prepare-division CDQ ; inline

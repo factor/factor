@@ -1,8 +1,14 @@
 + 0.80:
 
+- load-indirect cannot use a scratch register since its vop is basic-blockish
+- benchmark/fib out of memory on powerpc
 - need something like uncons but for arbitrary sequences
 - on win64: to_cell will break
 - .h .b .o for ratios and floats is broken
+- amd64 to do:
+  - overflow checks
+  - alien calls
+  - relocation info
 
 word help sections:
 - synopsis

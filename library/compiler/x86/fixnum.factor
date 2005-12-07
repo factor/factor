@@ -42,55 +42,55 @@ M: %fixnum* generate-node ( vop -- )
     drop
     ! both inputs are tagged, so one of them needs to have its
     ! tag removed.
-    0 input-operand tag-bits SAR
-    1 input-operand IMUL
+    1 input-operand tag-bits SAR
+    0 input-operand IMUL
     <label> "end" set
     "end" get JNO
     remainder-reg PUSH
-    0 input-operand PUSH
+    1 input-operand PUSH
     "s48_long_long_to_bignum" f compile-c-call
     0 scratch POP
-    1 scratch POP
+    0 scratch POP
     ! now we have to shift it by three bits to remove the second
     ! tag
     tag-bits neg PUSH
-    0 input-operand PUSH
+    1 input-operand PUSH
     "s48_bignum_arithmetic_shift" f compile-c-call
     ! an untagged pointer to the bignum is now in EAX; tag it
     return-reg bignum-tag OR
     0 scratch POP
-    1 scratch POP
+    0 scratch POP
     "end" get save-xt ;
 
 M: %fixnum-mod generate-node ( vop -- )
     #! This has specific register requirements. Inputs are in
-    #! EAX and ECX, and the result is in EDX.
+    #! ECX and EAX, and the result is in EDX.
     drop
-    CDQ
-    1 input-operand IDIV ;
+    prepare-division
+    0 input-operand IDIV ;
 
 : generate-fixnum/mod
     #! The same code is used for %fixnum/i and %fixnum/mod.
     #! This has specific register requirements. Inputs are in
-    #! EAX and ECX, and the result is in EDX.
+    #! ECX and EAX, and the result is in EDX.
     <label> "end" set
-    CDQ
-    1 input-operand IDIV
+    prepare-division
+    0 input-operand IDIV
     ! Make a copy since following shift is destructive
-    1 input-operand 0 input-operand MOV
+    0 input-operand 1 input-operand MOV
     ! Tag the value, since division cancelled tags from both
     ! inputs
-    0 input-operand tag-bits SHL
+    1 input-operand tag-bits SHL
     ! Did it overflow?
     "end" get JNO
     ! There was an overflow, so make ECX into a bignum. we must
     ! save EDX since its volatile.
     remainder-reg PUSH
-    1 input-operand PUSH
+    0 input-operand PUSH
     "s48_long_to_bignum" f compile-c-call
     ! An untagged pointer to the bignum is now in EAX; tag it
     return-reg bignum-tag OR
-    0 scratch POP
+    0 input-operand POP
     ! the remainder is now in EDX
     remainder-reg POP
     "end" get save-xt ;
@@ -153,7 +153,7 @@ M: %fixnum-sgn generate-node
     #! This has specific register requirements.
     drop
     ! store 0 in EDX if EAX is >=0, otherwise store -1.
-    CDQ
+    prepare-division
     ! give it a fixnum tag.
     0 output-operand tag-bits SHL ;
 

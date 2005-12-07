@@ -26,7 +26,11 @@ M: float-regs fastcall-regs drop 0 ;
 
 : address-operand ( address -- operand )
     #! On AMD64, we have to load 64-bit addresses into a
-    #! scratch register first.
-    0 scratch [ swap MOV ] keep ; inline
+    #! scratch register first. The usage of R11 here is a hack.
+    #! We cannot write '0 scratch' since scratch registers are
+    #! not permitted inside basic-block VOPs.
+    R11 [ swap MOV ] keep ; inline
 
 : fixnum>slot@ drop ; inline
+
+: prepare-division CQO ; inline

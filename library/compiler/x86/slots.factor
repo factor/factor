@@ -7,7 +7,7 @@ kernel-internals lists math memory namespaces sequences words ;
 M: %slot generate-node ( vop -- )
     drop
     ! turn tagged fixnum slot # into an offset, multiple of 4
-    0 input-operand 1 SHR
+    0 input-operand fixnum>slot@
     ! compute slot address in 0 vop-out
     dest/src ADD
     ! load slot value in 0 vop-out
