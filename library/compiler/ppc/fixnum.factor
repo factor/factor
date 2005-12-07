@@ -56,15 +56,6 @@ M: %fixnum* generate-node ( vop -- )
     "end" get save-xt
     3 6 MR ;
 
-: first-bignum ( -- n )
-    1 cell 8 * tag-bits - 1- shift ; inline
-
-: most-positive-fixnum ( -- n )
-    first-bignum 1- >fixnum ; inline
-
-: most-negative-fixnum ( -- n )
-    first-bignum neg >fixnum ; inline
-
 : generate-fixnum/i
     6 3 4 DIVW  ! divide in2 by in1, store result in out1
     ! if the result is greater than the most positive fixnum,

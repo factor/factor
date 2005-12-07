@@ -37,7 +37,7 @@ cpu "amd64" = [
 ! Handle -libraries:... overrides
 parse-command-line
 
-"compile" get supported-cpu? and [
+"compile" get "native-io" get and supported-cpu? and [
     unix? [
         "/library/unix/load.factor" run-resource
     ] when

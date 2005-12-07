@@ -1,7 +1,8 @@
 ! Copyright (C) 2004, 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: math
-USING: errors generic kernel math sequences sequences-internals ;
+USING: errors generic kernel kernel-internals math sequences
+sequences-internals ;
 
 UNION: integer fixnum bignum ;
 
@@ -30,6 +31,15 @@ UNION: integer fixnum bignum ;
 
 : next-power-of-2 ( n -- n )
     1 swap (next-power-of-2) ;
+
+: first-bignum ( -- n )
+    1 cell 8 * tag-bits - 1- shift ; inline
+
+: most-positive-fixnum ( -- n )
+    first-bignum 1- >fixnum ; inline
+
+: most-negative-fixnum ( -- n )
+    first-bignum neg >fixnum ; inline
 
 IN: math-internals
 

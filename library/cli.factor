@@ -47,6 +47,7 @@ parser sequences strings ;
     #! -no-<flag> CLI switch
     "user-init" on
     "compile" on
+    "native-io" on
     "null-stdio" off
     os "win32" = "ui" "tty" ? "shell" set ;
 

@@ -187,3 +187,24 @@ math-internals sequences strings test words ;
     100001 <array> 3 100000 pick set-nth
     [ 100000 swap array-nth ] compile-1
 ] unit-test
+
+! 64-bit overflow
+cell 8 = [
+    [ t ] [ 1 59 fixnum-shift dup [ fixnum+ ] compile-1 1 60 fixnum-shift = ] unit-test
+    [ -1152921504606846977 ] [ 1 60 shift neg >fixnum [ -1 fixnum+ ] compile-1 ] unit-test
+    
+    [ 18446744073709551616 ] [ 1 64 [ fixnum-shift ] compile-1 ] unit-test
+    [ 18446744073709551616 ] [ 1 [ 64 fixnum-shift ] compile-1 ] unit-test
+    [ 18446744073709551616 ] [ 1 [ 32 fixnum-shift 32 fixnum-shift ] compile-1 ] unit-test
+    [ -18446744073709551616 ] [ -1 64 [ fixnum-shift ] compile-1 ] unit-test
+    [ -18446744073709551616 ] [ -1 [ 64 fixnum-shift ] compile-1 ] unit-test
+    [ -18446744073709551616 ] [ -1 [ 32 fixnum-shift 32 fixnum-shift ] compile-1 ] unit-test
+    
+    [ t ] [ 1 40 shift 1 40 shift [ fixnum* ] compile-1 1 80 shift = ] unit-test
+    [ t ] [ 1 40 shift neg 1 40 shift [ fixnum* ] compile-1 1 80 shift neg = ] unit-test
+    [ t ] [ 1 40 shift neg 1 40 shift neg [ fixnum* ] compile-1 1 80 shift = ] unit-test
+    
+    [ 1152921504606846976 ] [ -1152921504606846976 >fixnum -1 [ fixnum/i ] compile-1 ] unit-test
+
+    [ 1152921504606846976 0 ] [ -1152921504606846976 >fixnum -1 [ fixnum/mod ] compile-1 ] unit-test
+] when
