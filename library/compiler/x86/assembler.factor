@@ -257,7 +257,5 @@ M: operand CMP OCT: 071 2-operand ;
 ( x87 Floating Point Unit )
 
 : (FSTP) BIN: 100 f HEX: 1c 1-operand ;
-
 : FSTPS ( operand -- ) HEX: d9 (FSTP) ;
-
 : FSTPL ( operand -- ) HEX: dd (FSTP) ;

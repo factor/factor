@@ -66,8 +66,7 @@ M: %target generate-node
 
 M: %parameters generate-node ( vop -- ) drop ;
 
-: dest/src ( vop -- dest src )
-    dup 0 vop-out v>operand swap 0 vop-in v>operand ;
+: dest/src ( -- dest src ) 0 output-operand 0 input-operand ;
 
 ! These constants must match native/card.h
 : card-bits 7 ;
