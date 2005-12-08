@@ -28,7 +28,9 @@ words ;
 : try-compile ( word -- )
     [ compile ] [ error. drop ] recover ;
 
-: compile-all ( -- ) [ try-compile ] each-word ;
+: compile-all ( -- )
+    [ f "no-effect" set-word-prop ] each-word
+    [ try-compile ] each-word ;
 
 : recompile ( word -- ) dup update-xt compile ;
 

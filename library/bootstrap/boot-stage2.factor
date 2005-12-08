@@ -37,13 +37,15 @@ cpu "amd64" = [
 ! Handle -libraries:... overrides
 parse-command-line
 
-"compile" get "native-io" get and supported-cpu? and [
-    unix? [
-        "/library/unix/load.factor" run-resource
-    ] when
-    
-    os "win32" = [
-        "/library/win32/load.factor" run-resource
+"compile" get supported-cpu? and [
+    "native-io" get [
+        unix? [
+            "/library/unix/load.factor" run-resource
+        ] when
+
+        os "win32" = [
+            "/library/win32/load.factor" run-resource
+        ] when
     ] when
 
     "Compiling base..." print
@@ -64,7 +66,7 @@ parse-command-line
     terpri
     
     "Initializing native I/O..." print
-    init-io
+    "native-io" get [ init-io ] when
 ] when
 
 [
