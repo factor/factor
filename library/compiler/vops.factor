@@ -18,9 +18,6 @@ lists math memory namespaces parser sequences words ;
 : label? ( obj -- ? )
     dup word? [ "label" word-prop ] [ drop f ] if ;
 
-! A location is a virtual register or a stack slot. We can
-! ask a VOP if it reads or writes a location.
-
 ! A virtual register
 TUPLE: vreg n ;
 

@@ -1,5 +1,12 @@
+! Copyright (C) 2005 Slava Pestov.
+! See http://factor.sf.net/license.txt for BSD license.
 IN: compiler-backend
 USING: arrays hashtables kernel lists math namespaces sequences ;
+
+! Optimizations performed here:
+! - combining %inc-d/%inc-r within a single basic block
+! - removing dead loads of stack locations into vregs
+! - removing dead stores of vregs into stack locations
 
 : vop-in ( vop n -- input ) swap vop-inputs nth ;
 : set-vop-in ( input vop n -- ) swap vop-inputs set-nth ;
