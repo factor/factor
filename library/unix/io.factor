@@ -1,8 +1,8 @@
 ! Copyright (C) 2004, 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: io-internals
-USING: alien arrays compiler-backend errors generic hashtables
-io kernel kernel-internals lists math parser sequences strings
+USING: alien arrays errors generic hashtables io kernel
+kernel-internals lists math parser sequences strings
 threads unix-internals vectors words ;
 
 ! We want namespaces::bind to shadow the bind system call from

@@ -362,7 +362,7 @@ C: %setenv make-vop ;
 ! alien operations
 TUPLE: %parameters ;
 C: %parameters make-vop ;
-M: %parameters stack-reserve 0 vop-in ;
+M: %parameters stack-reserve vop-inputs first ;
 : %parameters ( n -- vop ) src-vop <%parameters> ;
 
 TUPLE: %parameter ;
