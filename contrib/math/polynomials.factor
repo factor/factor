@@ -112,7 +112,6 @@ IN: math-contrib
     #! Polynomial derivative.
     dup empty? [ [ length ] keep v* 1 swap tail ] unless ;
 
-: polyval ( x p -- n )
-    #! evaluate polynomial in a straightforward way
-    ptrim dup length 1 swap <range> [ pick swap ^ ] map 1 rot cut swapd v. swap pop + nip ;
-
+: polyval ( x p -- p[x] )
+    #! Evaluate a polynomial.
+    [ powers ] keep v. ;
