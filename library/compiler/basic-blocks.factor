@@ -1,6 +1,10 @@
 IN: compiler-backend
 USING: arrays hashtables kernel lists math namespaces sequences ;
 
+: vop-in ( vop n -- input ) swap vop-inputs nth ;
+: set-vop-in ( input vop n -- ) swap vop-inputs set-nth ;
+: vop-out ( vop n -- input ) swap vop-outputs nth ;
+
 : (split-blocks) ( n linear -- )
     2dup length = [
         dup like , drop

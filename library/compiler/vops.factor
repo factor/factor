@@ -54,10 +54,6 @@ M: f v>operand address ;
 ! A virtual operation
 TUPLE: vop inputs outputs label ;
 
-: vop-in ( vop n -- input ) swap vop-inputs nth ;
-: set-vop-in ( input vop n -- ) swap vop-inputs set-nth ;
-: vop-out ( vop n -- input ) swap vop-outputs nth ;
-
 : (scratch)
     vop get dup vop-inputs swap vop-outputs append
     [ vreg? ] subset [ v>operand ] map vregs diff ;
@@ -80,6 +76,7 @@ TUPLE: vop inputs outputs label ;
 
 GENERIC: basic-block? ( vop -- ? )
 M: vop basic-block? drop f ;
+
 ! simplifies some code
 M: f basic-block? drop f ;
 
@@ -103,12 +100,6 @@ M: vop stack-reserve drop 0 ;
 : 2-in/label-vop ( in1 in2 label) >r 2array f r> ;
 : 2-vop ( in dest) [ 2array ] keep 1array f ;
 : 3-vop ( in1 in2 dest) >r 2array r> 1array f ;
-
-: check-dest ( vop reg -- )
-    swap 0 vop-out = [ "bad VOP destination" throw ] unless ;
-
-: check-src ( vop reg -- )
-    swap 0 vop-in = [ "bad VOP source" throw ] unless ;
 
 ! miscellanea
 TUPLE: %prologue ;
@@ -370,7 +361,6 @@ M: %getenv basic-block? drop t ;
 TUPLE: %setenv ;
 C: %setenv make-vop ;
 : %setenv 2-in-vop <%setenv> ;
-M: %setenv basic-block? drop t ;
 
 ! alien operations
 TUPLE: %parameters ;

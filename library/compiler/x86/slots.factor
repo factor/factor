@@ -8,9 +8,9 @@ M: %slot generate-node ( vop -- )
     drop
     ! turn tagged fixnum slot # into an offset, multiple of 4
     0 input-operand fixnum>slot@
-    ! compute slot address in 0 vop-out
+    ! compute slot address
     dest/src ADD
-    ! load slot value in 0 vop-out
+    ! load slot value
     0 output-operand dup 1array MOV ;
 
 M: %fast-slot generate-node ( vop -- )
@@ -34,7 +34,7 @@ M: %set-slot generate-node ( vop -- )
     drop
     ! turn tagged fixnum slot # into an offset
     2 input-operand fixnum>slot@
-    ! compute slot address in 2 vop-in
+    ! compute slot address
     2 input-operand 1 input-operand ADD
     ! store new slot value
     2 input-operand 1array 0 input-operand MOV ;
