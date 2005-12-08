@@ -52,4 +52,4 @@ M: %getenv generate-node ( vop -- )
 M: %setenv generate-node ( vop -- )
     drop
     1 input userenv@ 1array 0 input-operand MOV
-    1 input rel-userenv ;
+    1 input 0 rel-userenv ;
