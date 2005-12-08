@@ -56,7 +56,7 @@ SYMBOL: relocation-table
     0 swap 3 rel-type, relocating rel, ;
 
 : rel-cards ( 16/16 -- )
-    0 swap 4 rel-type, compiled-offset cell 2 * - rel, 0 rel, ;
+    0 swap 4 rel-type, relocating 0 rel, ;
 
 ! This is for fixing up forward references
 GENERIC: resolve ( fixup -- addr )
@@ -119,7 +119,7 @@ M: fixup-2/2 fixup ( addr fixup -- )
     fixup-2/2-at >r w>h/h r> tuck 4 - or-compiled or-compiled ;
 
 : relative-4 ( word -- )
-    dup 1 0 rel-word
+    dup 1 0 rel-word ( FIXME)
     compiled-offset <relative>
     compiled-offset 4 - <fixup-4> deferred-xt ;
 

@@ -1,5 +1,8 @@
 + 0.80:
 
+- <array> ( length initial )
+- <string> ( length initial )
+- remove repetitions
 - load-indirect cannot use a scratch register since its vop is basic-blockish
 - benchmark/fib out of memory on powerpc
 - need something like uncons but for arbitrary sequences
