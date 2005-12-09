@@ -34,7 +34,11 @@ SYMBOL: relocation-table
 
 : rel, ( n -- ) relocation-table get push ;
 
-: relocating compiled-offset cell - rel, ;
+: cell-just-compiled compiled-offset cell - ;
+
+: 4-just-compiled compiled-offset 4 - ;
+
+: relocating cell-just-compiled rel, ;
 
 : rel-type, ( rel/abs 16/16 type -- )
     swap 8 shift bitor swap 16 shift bitor rel, ;
@@ -121,15 +125,31 @@ M: fixup-2/2 fixup ( addr fixup -- )
 : relative-4 ( word -- )
     dup 1 0 rel-word ( FIXME)
     compiled-offset <relative>
-    compiled-offset 4 - <fixup-4> deferred-xt ;
+    4-just-compiled <fixup-4> deferred-xt ;
+
+: relative-3 ( word -- )
+    4-just-compiled <relative>
+    4-just-compiled <fixup-3> deferred-xt ;
+
+: relative-2 ( word -- )
+    4-just-compiled <relative>
+    4-just-compiled <fixup-2> deferred-xt ;
+
+: relative-2/2 ( word -- )
+    compiled-offset <relative>
+    4-just-compiled <fixup-2/2> deferred-xt ;
 
 : absolute-4 ( word -- )
     dup 0 0 rel-word ( FIXME)
-    <absolute> compiled-offset 4 - <fixup-4> deferred-xt ;
+    <absolute> 4-just-compiled <fixup-4> deferred-xt ;
+
+: absolute-2/2 ( word -- )
+    dup 0 1 rel-word
+    <absolute> cell-just-compiled <fixup-2/2> deferred-xt ;
 
 : absolute-cell ( word -- )
     dup 0 0 rel-word
-    <absolute> compiled-offset cell - <fixup-cell> deferred-xt ;
+    <absolute> cell-just-compiled <fixup-cell> deferred-xt ;
 
 ! When a word is encountered that has not been previously
 ! compiled, it is pushed onto this vector. Compilation stops

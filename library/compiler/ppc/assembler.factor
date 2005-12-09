@@ -160,13 +160,13 @@ USING: compiler errors generic kernel math memory words ;
 
 G: (B) ( dest aa lk -- ) [ pick ] standard-combination ;
 M: integer (B) i-form 18 insn ;
-M: word (B) 0 -rot (B) relative-24 ;
+M: word (B) 0 -rot (B) relative-3 ;
 
 : B 0 0 (B) ; : BL 0 1 (B) ;
 
 GENERIC: BC
 M: integer BC 0 0 b-form 16 insn ;
-M: word BC >r 0 BC r> relative-14 ;
+M: word BC >r 0 BC r> relative-2 ;
 
 : BLT 12 0 rot BC ;  : BGE 4 0 rot BC ;
 : BGT 12 1 rot BC ;  : BLE 4 1 rot BC ;

@@ -5,7 +5,7 @@ USING: alien assembler compiler inference kernel
 kernel-internals lists math memory namespaces sequences words ;
 
 : generate-slot ( size quot -- )
-    >r >r dest/src
+    >r >r
     ! turn tagged fixnum slot # into an offset, multiple of 4
     0 input-operand dup tag-bits r> - SRAWI
     ! compute slot address
@@ -14,7 +14,7 @@ kernel-internals lists math memory namespaces sequences words ;
     0 output-operand dup r> call ; inline
 
 M: %slot generate-node ( vop -- )
-    cell log2 [ 0 LWZ ] generate-slot ;
+    drop cell log2 [ 0 LWZ ] generate-slot ;
 
 M: %fast-slot generate-node ( vop -- )
     drop 0 output-operand dup 0 input LWZ ;
@@ -26,7 +26,7 @@ M: %fast-slot generate-node ( vop -- )
     ! compute slot address in 1st input
     2 input-operand dup 1 input-operand ADD
     ! store new slot value
-    >r 0 input-operand r> r> call ; inline
+    0 input-operand 2 input-operand r> call ; inline
 
 M: %set-slot generate-node ( vop -- )
     drop cell log2 [ 0 STW ] generate-set-slot ;
@@ -37,7 +37,7 @@ M: %fast-set-slot generate-node ( vop -- )
 M: %write-barrier generate-node ( vop -- )
     #! Mark the card pointed to by vreg.
     drop
-    0 input-operand card-bits SRAWI
+    0 input-operand dup card-bits SRAWI
     0 input-operand dup 16 ADD
     0 scratch 0 input-operand 0 LBZ
     0 scratch dup card-mark ORI

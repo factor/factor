@@ -63,7 +63,7 @@ M: %jump-t generate-node ( vop -- )
     drop 0 input-operand 0 swap f address CMPI vop-label BNE ;
 
 M: %return-to generate-node ( vop -- )
-    drop label 0 3 LOAD32  absolute-16/16
+    drop label 0 3 LOAD32  absolute-2/2
     1 1 stack-increment neg STWU
     3 1 stack-increment lr@ STW ;
 
