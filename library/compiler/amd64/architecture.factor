@@ -18,7 +18,7 @@ sequences ;
 
 : vregs { RAX RCX RDX RSI RDI R8 R9 R10 R11 } ; inline
 
-: param-regs { R9 R8 RCX RDX RSI RDI } ;
+: param-regs { RDI RSI RDX RCX R8 R9 } ; inline
 
 : compile-c-call ( symbol dll -- )
     2dup dlsym 0 scratch swap MOV 0 0 rel-dlsym 0 scratch CALL ;

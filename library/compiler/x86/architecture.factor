@@ -22,6 +22,7 @@ sequences ;
     2dup dlsym CALL 1 0 rel-dlsym ;
 
 : compile-c-call* ( symbol dll args -- operands )
+    reverse-slice
     [ [ PUSH ] each compile-c-call ] keep
     [ drop 0 scratch POP ] each ;
 
