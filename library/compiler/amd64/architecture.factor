@@ -1,5 +1,6 @@
 IN: compiler-backend
-USING: assembler compiler-backend kernel sequences ;
+USING: alien assembler compiler compiler-backend kernel
+sequences ;
 
 ! AMD64 register assignments
 ! RAX RCX RDX RSI RDI R8 R9 R10 R11 vregs
@@ -19,7 +20,8 @@ USING: assembler compiler-backend kernel sequences ;
 
 : param-regs { R9 R8 RCX RDX RSI RDI } ;
 
-DEFER: compile-c-call
+: compile-c-call ( symbol dll -- )
+    2dup dlsym 0 scratch swap MOV 0 0 rel-dlsym 0 scratch CALL ;
 
 : compile-c-call* ( symbol dll -- operands )
     param-regs swap [ MOV ] 2each compile-c-call ;

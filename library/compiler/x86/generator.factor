@@ -7,9 +7,6 @@ kernel-internals lists math memory namespaces sequences words ;
 ! Not used on x86
 M: %prologue generate-node drop ;
 
-: compile-c-call ( symbol dll -- )
-    2dup dlsym CALL 1 0 rel-dlsym ;
-
 : (call-label)
     label dup postpone-word
     dup primitive? [ address-operand ] when ;

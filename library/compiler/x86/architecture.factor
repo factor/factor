@@ -1,5 +1,6 @@
 IN: compiler-backend
-USING: assembler compiler-backend kernel sequences ;
+USING: alien assembler compiler compiler-backend kernel
+sequences ;
 
 ! x86 register assignments
 ! EAX, ECX, EDX vregs
@@ -17,7 +18,8 @@ USING: assembler compiler-backend kernel sequences ;
 
 : vregs { EAX ECX EDX } ; inline
 
-DEFER: compile-c-call
+: compile-c-call ( symbol dll -- )
+    2dup dlsym CALL 1 0 rel-dlsym ;
 
 : compile-c-call* ( symbol dll args -- operands )
     [ [ PUSH ] each compile-c-call ] keep
