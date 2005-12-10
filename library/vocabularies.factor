@@ -47,7 +47,7 @@ SYMBOL: vocabularies
 : lookup ( name vocab -- word ) vocab ?hash ;
 
 : search ( name vocabs -- word )
-    dupd [ lookup ] find nip ?hash ;
+    [ lookup ] map-with [ ] find nip ;
 
 : reveal ( word -- )
     #! Add a new word to its vocabulary.
