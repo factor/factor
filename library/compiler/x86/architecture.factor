@@ -17,6 +17,12 @@ USING: assembler compiler-backend kernel sequences ;
 
 : vregs { EAX ECX EDX } ; inline
 
+DEFER: compile-c-call
+
+: compile-c-call* ( symbol dll args -- operands )
+    [ [ PUSH ] each compile-c-call ] keep
+    [ drop 0 scratch POP ] each ;
+
 ! On x86, parameters are never passed in registers.
 M: int-regs fastcall-regs drop 0 ;
 M: int-regs reg-class-size drop 4 ;

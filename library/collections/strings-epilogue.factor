@@ -11,8 +11,7 @@ sequences strings ;
     <repeated> >string ; inline
 
 : padding ( string count char -- string )
-    >r swap length - dup 0 <= [ r> 2drop "" ] [ r> fill ] if ;
-    flushable
+    >r swap length - 0 max r> fill ; flushable
 
 : pad-left ( string count char -- string )
     pick >r padding r> append ; flushable
@@ -21,7 +20,7 @@ sequences strings ;
     pick >r padding r> swap append ; flushable
 
 : ch>string ( ch -- str )
-    1 <sbuf> [ push ] keep (sbuf>string) ; flushable
+    1 swap fill ; flushable
 
 : >sbuf ( seq -- sbuf )
     dup length <sbuf> [ swap nappend ] keep ; inline

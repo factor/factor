@@ -1,5 +1,5 @@
 IN: optimizer
-USING: inference kernel lists sequences words ;
+USING: arrays inference kernel lists sequences words ;
 
 ! #if --> X
 !   |
@@ -24,8 +24,10 @@ M: node split-node* ( node -- ) drop ;
 
 : post-inline ( #return/#values #call/#merge -- )
     dup [
-        [ >r node-in-d r> node-out-d unify-length ] keep
-        node-successor subst-values
+        [
+            >r node-in-d r> node-out-d
+            2array unify-lengths first2
+        ] keep node-successor subst-values
     ] [
         2drop
     ] if ;

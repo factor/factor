@@ -1,5 +1,15 @@
 + 0.80:
 
+- -with combinators are ackward
+
+- cleanups:
+  alien/compiler
+  inference/shuffle
+  inference-words inline-block
+  io/buffer - use aliens not integers
+  alien/malloc - use aliens not integers
+  ui/line-editor - don't use variables
+- fix powerpc backend
 - <array> ( length initial )
 - <string> ( length initial )
 - remove repetitions
@@ -25,7 +35,6 @@ word help sections:
 parsing word sections:
 - syntax
 
-- malloc, free, realloc, memcpy: aliens
 - check 'see'
 - intrinsic char-slot set-char-slot for x86
 - closing ui does not stop timers

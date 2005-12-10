@@ -8,3 +8,4 @@ IN: math
 : -inf -1.0 0.0 / ; inline
 : e 2.7182818284590452354 ; inline
 : pi 3.14159265358979323846 ; inline
+: epsilon 2.2204460492503131e-16 ; inline

@@ -36,6 +36,10 @@ USING: errors kernel sequences math sequences-internals namespaces arrays ;
     #! Complex inner product.
     0 [ ** + ] 2reduce ;
 
+: proj ( u v -- w )
+    #! Orthogonal projection of u onto v.
+    [ [ v. ] keep norm-sq v/n ] keep n*v ;
+
 : minmax ( seq -- min max )
     #! find the min and max of a seq in one pass
     inf -inf rot [ dup pick max -rot nip pick min -rot nip ] each ;

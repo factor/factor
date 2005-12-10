@@ -118,14 +118,6 @@ SYMBOL: @
     { { @ 1 }  [ 2drop 0 ] }
 } define-identities
 
-! [ ^ ] {
-!     { { 1 @ }  [ 2drop 1 ]             }
-!     { { @ 1 }  [ drop ]                }
-!     { { @ 2 }  [ drop dup * ]          }
-!     { { @ -1 } [ drop 1 swap / ]       }
-!     { { @ -2 } [ drop dup * 1 swap / ] }
-! } define-identities
-
 [ bitand fixnum-bitand bignum-bitand ] {
     { { @ -1 } [ drop ] }
     { { -1 @ } [ nip  ] }

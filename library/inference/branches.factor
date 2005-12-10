@@ -9,9 +9,6 @@ namespaces parser prettyprint sequences strings vectors words ;
     #! shorter, pad it with unknown results at the bottom.
     dup 0 [ length max ] reduce swap [ add-inputs ] map-with ;
 
-: unify-length ( seq seq -- seq )
-    2array unify-lengths first2 ;
-
 : unify-values ( seq -- value )
     #! If all values in list are equal, return the value.
     #! Otherwise, unify.

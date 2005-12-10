@@ -1,8 +1,8 @@
 ! Copyright (C) 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: compiler-backend
-USING: assembler compiler errors kernel kernel-internals math
-math-internals memory namespaces words ;
+USING: arrays assembler compiler errors kernel kernel-internals
+math math-internals memory namespaces words ;
 
 : literal-overflow ( -- dest src )
     #! Called if the src operand is a literal.
@@ -25,11 +25,9 @@ math-internals memory namespaces words ;
     ! Compute a result, this time it will fit.
     r> execute
     ! Create a bignum.
-    0 output-operand PUSH
-    "s48_long_to_bignum" f compile-c-call
+    "s48_long_to_bignum" f 0 output-operand 1array compile-c-call*
     ! An untagged pointer to the bignum is now in EAX; tag it
     return-reg bignum-tag OR
-    0 scratch POP
     "end" get save-xt ; inline
 
 M: %fixnum+ generate-node ( vop -- )
@@ -46,20 +44,14 @@ M: %fixnum* generate-node ( vop -- )
     0 input-operand IMUL
     <label> "end" set
     "end" get JNO
-    remainder-reg PUSH
-    1 input-operand PUSH
-    "s48_long_long_to_bignum" f compile-c-call
-    0 scratch POP
-    0 scratch POP
+    "s48_long_long_to_bignum" f
+    remainder-reg 1 input-operand 2array compile-c-call*
     ! now we have to shift it by three bits to remove the second
     ! tag
-    tag-bits neg PUSH
-    1 input-operand PUSH
-    "s48_bignum_arithmetic_shift" f compile-c-call
+    "s48_bignum_arithmetic_shift" f
+    tag-bits neg 1 input-operand 2array compile-c-call*
     ! an untagged pointer to the bignum is now in EAX; tag it
     return-reg bignum-tag OR
-    0 scratch POP
-    0 scratch POP
     "end" get save-xt ;
 
 M: %fixnum-mod generate-node ( vop -- )
@@ -85,12 +77,10 @@ M: %fixnum-mod generate-node ( vop -- )
     "end" get JNO
     ! There was an overflow, so make ECX into a bignum. we must
     ! save EDX since its volatile.
-    remainder-reg PUSH
-    0 input-operand PUSH
-    "s48_long_to_bignum" f compile-c-call
+    "s48_long_to_bignum" f
+    remainder-reg 0 input-operand 2array compile-c-call*
     ! An untagged pointer to the bignum is now in EAX; tag it
     return-reg bignum-tag OR
-    0 input-operand POP
     ! the remainder is now in EDX
     remainder-reg POP
     "end" get save-xt ;
@@ -126,16 +116,12 @@ M: %fixnum<< generate-node
     "no-overflow" get JBE
     ! there is going to be an overflow, make a bignum
     1 input-operand tag-bits SAR
-    0 input PUSH
-    1 input-operand PUSH
-    "s48_long_to_bignum" f compile-c-call
-    0 scratch POP
-    1 input-operand PUSH
-    "s48_bignum_arithmetic_shift" f compile-c-call
+    "s48_long_to_bignum" f
+    0 input 1 input-operand 2array compile-c-call*
+    "s48_bignum_arithmetic_shift" f
+    1 input-operand 1array compile-c-call*
     ! tag the result
     1 input-operand bignum-tag OR
-    0 scratch POP
-    1 scratch POP
     "end" get JMP
     ! there is not going to be an overflow
     "no-overflow" get save-xt

@@ -13,11 +13,6 @@ USING: namespaces ;
 : byte-bit ( n alien -- byte bit )
     over -5 shift alien-unsigned-4 swap 31 bitand ;
 
-: bit-length ( n -- n ) cell / ceiling ;
-
-: <bit-array> ( n -- array )
-    bit-length <byte-array> ;
-
 : bit-nth ( n alien -- ? )
     byte-bit 1 swap shift bitand 0 > ;
 
@@ -29,7 +24,7 @@ USING: namespaces ;
     swap -5 shift set-alien-unsigned-4 ;
 
 : clear-bits ( alien len -- )
-    bit-length [ 0 -rot set-alien-unsigned-cell ] each-with ;
+    bytes>cells [ 0 -rot set-alien-unsigned-cell ] each-with ;
 
 ! Global variables
 SYMBOL: read-fdset
@@ -322,8 +317,8 @@ USE: io
     #! other time can have unintended consequences.
     global [
         H{ } clone read-tasks set
-        FD_SETSIZE <bit-array> read-fdset set
+        FD_SETSIZE <c-object> read-fdset set
         H{ } clone write-tasks set
-        FD_SETSIZE <bit-array> write-fdset set
+        FD_SETSIZE <c-object> write-fdset set
         0 1 t <fd-stream> stdio set
     ] bind ;

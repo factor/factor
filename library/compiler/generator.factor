@@ -55,14 +55,8 @@ SYMBOL: previous-offset
 M: %label generate-node ( vop -- )
     vop-label save-xt ;
 
-M: %end-dispatch generate-node ( vop -- ) drop ;
-
-: compile-target ( word -- ) 0 assemble-cell absolute-cell ;
-
-M: %target-label generate-node vop-label compile-target ;
-
-M: %target generate-node
-    vop-label dup postpone-word  compile-target ;
+M: %target-label generate-node ( vop -- )
+    drop label 0 assemble-cell absolute-cell ;
 
 M: %parameters generate-node ( vop -- ) drop ;
 

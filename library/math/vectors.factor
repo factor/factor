@@ -37,7 +37,3 @@ USING: arrays generic kernel sequences ;
 : normalize ( vec -- uvec )
     #! Unit vector with same direction as vec.
     dup norm v/n ;
-
-: proj ( u v -- w )
-    #! Orthogonal projection of u onto v.
-    [ [ v. ] keep norm-sq v/n ] keep n*v ;

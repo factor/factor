@@ -6,10 +6,7 @@ USING: errors generic kernel math math-internals strings vectors ;
 ! This file is needed very early in bootstrap.
 
 ! Sequences support the following protocol. Concrete examples
-! are strings, string buffers, vectors, and arrays. Arrays are
-! low level and no | quot: elt -- ? t bounds-checked; they are in the
-! kernel-internals vocabulary, so don't use them unless you have
-! a good reason.
+! are strings, string buffers, vectors, and arrays.
 
 GENERIC: empty? ( sequence -- ? ) flushable
 GENERIC: length ( sequence -- n ) flushable

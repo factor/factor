@@ -147,14 +147,6 @@ TUPLE: %target-label ;
 C: %target-label make-vop ;
 : %target-label label-vop <%target-label> ;
 
-TUPLE: %target ;
-C: %target make-vop ;
-: %target label-vop <%target> ;
-
-TUPLE: %end-dispatch ;
-C: %end-dispatch make-vop ;
-: %end-dispatch empty-vop <%end-dispatch> ;
-
 ! stack operations
 TUPLE: %peek ;
 C: %peek make-vop ;

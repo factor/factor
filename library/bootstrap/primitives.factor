@@ -18,7 +18,7 @@ words ;
 "syntax" vocab
 
 H{ } clone vocabularies set
-f crossref set
+crossref off
 
 vocabularies get [ "syntax" set [ reveal ] each ] bind
 

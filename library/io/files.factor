@@ -17,9 +17,6 @@ styles ;
 
 : file-length ( file -- length ) stat third ;
 
-: file-extension ( filename -- extension )
-    "." split dup length 1 <= [ drop f ] [ peek ] if ;
-
 : resource-path ( path -- path )
     "resource-path" get [ "." ] unless* swap path+ ;
 

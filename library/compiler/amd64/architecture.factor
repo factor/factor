@@ -17,6 +17,13 @@ USING: assembler compiler-backend kernel sequences ;
 
 : vregs { RAX RCX RDX RSI RDI R8 R9 R10 R11 } ; inline
 
+: param-regs { R9 R8 RCX RDX RSI RDI } ;
+
+DEFER: compile-c-call
+
+: compile-c-call* ( symbol dll -- operands )
+    param-regs swap [ MOV ] 2each compile-c-call ;
+
 ! FIXME
 M: int-regs fastcall-regs drop 0 ;
 M: int-regs reg-class-size drop 4 ;

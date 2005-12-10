@@ -15,7 +15,7 @@ UNION: sequence array string sbuf vector ;
         dup length [ >r 2dup r> 2nth-unsafe = ] all? 2nip
     ] [
         2drop f
-    ] if ; flushable
+    ] if ; inline
 
 M: sequence = ( obj seq -- ? )
     2dup eq? [

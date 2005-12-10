@@ -29,11 +29,8 @@ parser sequences strings words ;
 : define-slot ( class slot reader writer -- )
     >r >r 2dup r> define-reader r> define-writer ;
 
-: ?create ( { name vocab } -- word )
-    dup [ first2 create ] when ;
-
 : intern-slots ( spec -- spec )
-    [ first3 [ ?create ] 2apply 3array ] map ;
+    [ first3 [ dup [ first2 create ] when ] 2apply 3array ] map ;
 
 : define-slots ( class spec -- )
     #! Define a collection of slot readers and writers for the

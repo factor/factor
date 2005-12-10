@@ -3,6 +3,9 @@
 IN: httpd
 USING: io hashtables kernel lists namespaces ;
 
+: file-extension ( filename -- extension )
+    "." split dup length 1 <= [ drop f ] [ peek ] if ;
+
 : mime-type ( filename -- mime-type )
     file-extension "mime-types" get
     hash [ "text/plain" ] unless* ;

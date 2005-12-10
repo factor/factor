@@ -77,8 +77,7 @@ M: #if linearize* ( node -- )
     in-1
     -1 %inc-d ,
     0 %dispatch ,
-    [ <label> dup %target-label ,  cons ] map
-    %end-dispatch , ;
+    [ <label> dup %target-label ,  cons ] map ;
 
 : dispatch-body ( label/param -- )
     [ uncons %label , linearize* ] each ;

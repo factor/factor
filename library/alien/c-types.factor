@@ -18,24 +18,22 @@ sequences sequences-internals strings words ;
 SYMBOL: c-types
 
 : c-type ( name -- type )
-    dup c-types get hash [ ] [
-        "No such C type: " swap append throw f
-    ] ?if ;
+    dup c-types get hash
+    [ ] [ "No such C type: " swap append throw ] ?if ;
 
-: c-size ( name -- size )
-    "width" swap c-type hash ;
+: c-size ( name -- size ) "width" swap c-type hash ;
 
-: c-getter ( name -- quot )
-    "getter" swap c-type hash ;
+: c-getter ( name -- quot ) "getter" swap c-type hash ;
 
-: c-setter ( name -- quot )
-    "setter" swap c-type hash ;
+: c-setter ( name -- quot ) "setter" swap c-type hash ;
 
 : define-c-type ( quot name -- )
     >r <c-type> [ swap bind ] keep r> c-types get set-hash ;
     inline
 
-: <c-object> ( size -- c-ptr ) cell / ceiling <byte-array> ;
+: bytes>cells cell / ceiling ;
+
+: <c-object> ( size -- c-ptr ) bytes>cells <byte-array> ;
 
 : define-pointer ( type -- )
     "void*" c-type swap "*" append c-types get set-hash ;

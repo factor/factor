@@ -7,21 +7,21 @@ kernel-internals lists math memory namespaces sequences words ;
 ! Not used on x86
 M: %prologue generate-node drop ;
 
-: compile-dlsym ( symbol dll quot -- )
-    >r 2dup dlsym r> call 1 0 rel-dlsym ; inline
+: compile-c-call ( symbol dll -- )
+    2dup dlsym CALL 1 0 rel-dlsym ;
 
-: compile-c-call ( symbol dll -- ) [ CALL ] compile-dlsym ;
+: (call-label)
+    label dup postpone-word
+    dup primitive? [ address-operand ] when ;
 
 M: %call generate-node ( vop -- )
-    drop label dup postpone-word
-    dup primitive? [ address-operand ] when CALL ;
+    drop (call-label) CALL ;
 
 M: %call-label generate-node ( vop -- )
     drop label CALL ;
 
 M: %jump generate-node ( vop -- )
-    drop label dup postpone-word
-    dup primitive? [ address-operand ] when JMP ;
+    drop (call-label) JMP ;
 
 M: %jump-label generate-node ( vop -- )
     drop label JMP ;

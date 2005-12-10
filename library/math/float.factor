@@ -24,5 +24,3 @@ M: float /f float/f ;
 
 M: float 1+ 1.0 float+ ;
 M: float 1- 1.0 float- ;
-
-: epsilon 2.2204460492503131e-16 ; inline
