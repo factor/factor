@@ -118,9 +118,9 @@ M: %fixnum<< generate-node
     ! there is going to be an overflow, make a bignum
     1 input-operand tag-bits SAR
     "s48_long_to_bignum" f
-    1 input-operand 0 input 2array compile-c-call*
-    "s48_bignum_arithmetic_shift" f
     1 input-operand 1array compile-c-call*
+    "s48_bignum_arithmetic_shift" f
+    1 input-operand 0 input 2array compile-c-call*
     ! tag the result
     1 input-operand bignum-tag OR
     "end" get JMP

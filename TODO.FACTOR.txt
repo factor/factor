@@ -1,7 +1,7 @@
 + 0.80:
 
-- -with combinators are ackward
-
+- does parsing cons excessive amounts of bignums with c-streams
+- -with combinators are awkward
 - cleanups:
   alien/compiler
   inference/shuffle

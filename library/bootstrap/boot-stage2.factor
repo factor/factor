@@ -79,10 +79,10 @@ parse-command-line
 "Building cross-reference database..." print
 recrossref
 
-all-words [ compiled? ] subset length
+[ compiled? ] word-subset length
 number>string write " compiled words" print
 
-all-words [ symbol? ] subset length
+[ symbol? ] word-subset length
 number>string write " symbol words" print
 
 all-words length
