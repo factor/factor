@@ -17,7 +17,10 @@ USING: errors io kernel lists math namespaces sequences words ;
 : parse-stream ( stream name -- quot )
     [ file set file-vocabs lines parse-lines ] with-scope ;
 
+: parsing-file ( file -- ) "! " write dup print ;
+
 : parse-file ( file -- quot )
+    parsing-file
     [ <file-reader> ] keep parse-stream ;
 
 : run-file ( file -- )
@@ -30,6 +33,7 @@ USING: errors io kernel lists math namespaces sequences words ;
     #! resource:. This allows words that operate on source
     #! files, like "jedit", to use a different resource path
     #! at run time than was used at parse time.
+    parsing-file
     [ <resource-stream> "resource:" ] keep append parse-stream ;
 
 : run-resource ( file -- )

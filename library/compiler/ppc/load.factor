@@ -9,5 +9,5 @@ USING: io kernel parser sequences ;
     "/library/compiler/ppc/fixnum.factor"
     "/library/compiler/ppc/alien.factor"
 ] [
-    dup print run-resource
+    run-resource
 ] each

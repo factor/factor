@@ -31,7 +31,7 @@ cpu "amd64" = [
     "/library/ui/load.factor"
     "/library/help/load.factor"
 ] [
-    dup print run-resource
+    run-resource
 ] each
 
 ! Handle -libraries:... overrides

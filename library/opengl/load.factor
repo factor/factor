@@ -17,5 +17,5 @@ USING: alien io kernel parser sequences ;
     "/library/opengl/glu.factor"
     "/library/opengl/opengl-utils.factor"
 ] [
-    dup print run-resource
+    run-resource
 ] each

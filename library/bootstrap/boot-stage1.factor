@@ -144,7 +144,7 @@ vectors words ;
         "/library/cli.factor"
         
         "/library/bootstrap/init.factor"
-    } [ dup print parse-resource % ] each
+    } [ parse-resource % ] each
     
     [
         "/library/bootstrap/boot-stage2.factor" run-resource

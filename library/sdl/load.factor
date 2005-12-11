@@ -14,5 +14,5 @@ USING: alien io kernel parser sequences ;
     "/library/sdl/sdl-keyboard.factor"
     "/library/sdl/sdl-utils.factor"
 ] [
-    dup print run-resource
+    run-resource
 ] each

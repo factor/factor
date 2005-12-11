@@ -27,5 +27,5 @@ USING: kernel parser sequences io ;
     "/library/ui/listener.factor"
     "/library/ui/ui.factor"
 ] [
-    dup print run-resource
+    run-resource
 ] each

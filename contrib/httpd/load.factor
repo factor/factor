@@ -16,5 +16,5 @@ USING: kernel parser sequences io ;
     "contrib/httpd/test/httpd.factor"
     "contrib/httpd/test/url-encoding.factor"
 ] [
-    dup print run-file
+    run-file
 ] each
