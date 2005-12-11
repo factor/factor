@@ -24,7 +24,7 @@ sequences ;
 : compile-c-call* ( symbol dll args -- operands )
     reverse-slice
     [ [ PUSH ] each compile-c-call ] keep
-    [ drop 0 scratch POP ] each ;
+    [ drop EDX POP ] each ;
 
 ! On x86, parameters are never passed in registers.
 M: int-regs fastcall-regs drop 0 ;
