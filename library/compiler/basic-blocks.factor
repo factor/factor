@@ -5,6 +5,14 @@ USING: arrays hashtables kernel lists math namespaces sequences ;
 
 ! Optimizations performed here:
 ! - combining %inc-d/%inc-r within a single basic block
+! - if a literal is loaded into a vreg but the vreg is
+!   overwritten before being read, the literal load is deleted
+! - if a %replace is writing a vreg to a stack location already
+!   holding that vreg, or a stack location that is not read
+!   before being popped, the %replace is deleted
+! - if a %peek is reading a stack location into a vreg that
+!   already holds that vreg, or if the vreg is overwritten
+!   before being read, the %peek is deleted
 ! - removing dead loads of stack locations into vregs
 ! - removing dead stores of vregs into stack locations
 

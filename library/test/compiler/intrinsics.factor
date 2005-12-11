@@ -194,16 +194,18 @@ cell 8 = [
     [ t ] [ 1 59 fixnum-shift dup [ fixnum+ ] compile-1 1 60 fixnum-shift = ] unit-test
     [ -1152921504606846977 ] [ 1 60 shift neg >fixnum [ -1 fixnum+ ] compile-1 ] unit-test
     
+    [ t ] [ 1 40 shift 1 40 shift [ fixnum* ] compile-1 1 80 shift = ] unit-test
+    [ t ] [ 1 40 shift neg 1 40 shift [ fixnum* ] compile-1 1 80 shift neg = ] unit-test
+    [ t ] [ 1 40 shift neg 1 40 shift neg [ fixnum* ] compile-1 1 80 shift = ] unit-test
+    [ t ] [ 1 30 shift neg 1 50 shift neg [ fixnum* ] compile-1 1 80 shift = ] unit-test
+    [ t ] [ 1 50 shift neg 1 30 shift neg [ fixnum* ] compile-1 1 80 shift = ] unit-test
+    
     [ 18446744073709551616 ] [ 1 64 [ fixnum-shift ] compile-1 ] unit-test
     [ 18446744073709551616 ] [ 1 [ 64 fixnum-shift ] compile-1 ] unit-test
     [ 18446744073709551616 ] [ 1 [ 32 fixnum-shift 32 fixnum-shift ] compile-1 ] unit-test
     [ -18446744073709551616 ] [ -1 64 [ fixnum-shift ] compile-1 ] unit-test
     [ -18446744073709551616 ] [ -1 [ 64 fixnum-shift ] compile-1 ] unit-test
     [ -18446744073709551616 ] [ -1 [ 32 fixnum-shift 32 fixnum-shift ] compile-1 ] unit-test
-    
-    [ t ] [ 1 40 shift 1 40 shift [ fixnum* ] compile-1 1 80 shift = ] unit-test
-    [ t ] [ 1 40 shift neg 1 40 shift [ fixnum* ] compile-1 1 80 shift neg = ] unit-test
-    [ t ] [ 1 40 shift neg 1 40 shift neg [ fixnum* ] compile-1 1 80 shift = ] unit-test
     
     [ 1152921504606846976 ] [ -1152921504606846976 >fixnum -1 [ fixnum/i ] compile-1 ] unit-test
 

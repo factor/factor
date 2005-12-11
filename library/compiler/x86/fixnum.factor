@@ -44,7 +44,7 @@ M: %fixnum* generate-node ( vop -- )
     0 input-operand IMUL
     <label> "end" set
     "end" get JNO
-    "s48_long_long_to_bignum" f
+    "s48_long_pair_to_bignum" f
     1 input-operand remainder-reg 2array compile-c-call*
     ! now we have to shift it by three bits to remove the second
     ! tag

@@ -36,7 +36,7 @@ M: %fixnum* generate-node ( vop -- )
     "end" get BNO
     >3-vop< MULHW
     4 0 scratch MR
-    "s48_long_long_to_bignum" f compile-c-call
+    "s48_long_pair_to_bignum" f compile-c-call
     ! now we have to shift it by three bits to remove the second
     ! tag
     tag-bits neg 4 LI
