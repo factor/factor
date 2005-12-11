@@ -10,5 +10,5 @@ USING: io kernel parser sequences ;
     "/library/compiler/x86/fixnum.factor"
     "/library/compiler/amd64/alien.factor"
 ] [
-    dup print run-resource
+    run-resource
 ] each

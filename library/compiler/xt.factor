@@ -46,15 +46,15 @@ SYMBOL: relocation-table
 : rel-type, ( arg class type -- )
     #! Write a relocation instruction for the runtime image
     #! loader.
-    >r >r 16 shift r> 8 shift bitor r> bitor rel,
-    cell-just-compiled rel, ;
+    over >r >r >r 16 shift r> 8 shift bitor r> bitor rel,
+    compiled-offset r> rel-absolute-cell = cell 4 ? - rel, ;
 
 : rel-dlsym ( name dll class -- )
     >r cons add-literal compiled-base - cell / r> 1 rel-type, ;
 
 : rel-address ( class -- )
     #! Relocate address just compiled.
-    dup rel-relative = [ 2drop ] [ 0 -rot 2 rel-type, ] if ;
+    dup rel-relative = [ drop ] [ 0 swap 2 rel-type, ] if ;
 
 : rel-word ( word class -- )
     over primitive? [
@@ -65,7 +65,7 @@ SYMBOL: relocation-table
 
 : rel-userenv ( n class -- ) 3 rel-type, ;
 
-: rel-cards ( class -- ) 4 rel-type, ;
+: rel-cards ( class -- ) 0 swap 4 rel-type, ;
 
 ! This is for fixing up forward references
 GENERIC: resolve ( fixup -- addr )

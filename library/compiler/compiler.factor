@@ -12,7 +12,7 @@ words ;
 
 : (compile) ( word -- )
     #! Should be called inside the with-compiler scope.
-    "! Compiling " write dup . dup word-def precompile generate ;
+    "Compiling " write dup . dup word-def precompile generate ;
 
 : compile-postponed ( -- )
     compile-words get dup empty?
