@@ -93,7 +93,7 @@ void undefined_symbol(void)
 CELL get_rel_symbol(F_REL* rel)
 {
 	CELL arg = REL_ARGUMENT(rel);
-	F_CONS* cons = untag_cons(compiling.base + arg * sizeof(CELL));
+	F_CONS* cons = untag_cons(get(compiling.base + arg * sizeof(CELL)));
 	F_STRING* symbol = untag_string(cons->car);
 	DLL* dll = (cons->cdr == F ? NULL : untag_dll(cons->cdr));
 	CELL sym;
