@@ -26,7 +26,7 @@ M: %write-barrier generate-node ( vop -- )
     #! sacrificing a few bytes of generated code size.
     drop
     0 input-operand card-bits SHR
-    0 scratch card-offset MOV 0 rel-cards
+    0 scratch card-offset MOV rel-absolute-cell rel-cards
     0 scratch 0 input-operand ADD
     0 scratch 1array card-mark OR ;
 
@@ -47,11 +47,11 @@ M: %fast-set-slot generate-node ( vop -- )
 M: %getenv generate-node ( vop -- )
     drop
     0 output-operand 0 input userenv@ MOV
-    0 input 0 rel-userenv
+    0 input rel-absolute-cell rel-userenv
     0 output-operand dup 1array MOV ;
 
 M: %setenv generate-node ( vop -- )
     drop
     0 scratch 1 input userenv@ MOV
-    1 input 0 rel-userenv
+    1 input rel-absolute-cell rel-userenv
     0 scratch 1array 0 input-operand MOV ;

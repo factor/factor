@@ -21,7 +21,8 @@ sequences ;
 : param-regs { RDI RSI RDX RCX R8 R9 } ; inline
 
 : compile-c-call ( symbol dll -- )
-    2dup dlsym 0 scratch swap MOV 0 0 rel-dlsym 0 scratch CALL ;
+    2dup dlsym 0 scratch swap MOV
+    rel-absolute-cell rel-dlsym 0 scratch CALL ;
 
 : compile-c-call* ( symbol dll -- operands )
     param-regs swap [ MOV ] 2each compile-c-call ;

@@ -19,7 +19,7 @@ sequences ;
 : vregs { EAX ECX EDX } ; inline
 
 : compile-c-call ( symbol dll -- )
-    2dup dlsym CALL 1 0 rel-dlsym ;
+    2dup dlsym CALL rel-relative rel-dlsym ;
 
 : compile-c-call* ( symbol dll args -- operands )
     reverse-slice

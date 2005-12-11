@@ -1,22 +1,23 @@
 #define USER_ENV 32
 
-#define CARD_OFF_ENV   1 /* for compiling set-slot */
-/* 2 is unused */
-#define NAMESTACK_ENV  3 /* used by library only */
-#define GLOBAL_ENV     4
-#define BREAK_ENV      5
-#define CATCHSTACK_ENV 6 /* used by library only */
-#define CPU_ENV        7
-#define BOOT_ENV       8
-#define CALLCC_1_ENV   9 /* used by library only */
-#define ARGS_ENV       10
-#define OS_ENV         11
-#define ERROR_ENV      12 /* a marker consed onto kernel errors */
-#define IN_ENV         13
-#define OUT_ENV        14
-#define GEN_ENV        15 /* set to gen_count */
-#define IMAGE_ENV      16 /* image name */
-#define CELL_SIZE_ENV  17 /* sizeof(CELL) */
+#define CARD_OFF_ENV      1 /* for compiling set-slot */
+/* 2 is unused */         
+#define NAMESTACK_ENV     3 /* used by library only */
+#define GLOBAL_ENV        4
+#define BREAK_ENV         5
+#define CATCHSTACK_ENV    6 /* used by library only */
+#define CPU_ENV           7
+#define BOOT_ENV          8
+#define CALLCC_1_ENV      9 /* used by library only */
+#define ARGS_ENV          10
+#define OS_ENV            11
+#define ERROR_ENV         12 /* a marker consed onto kernel errors */
+#define IN_ENV            13
+#define OUT_ENV           14
+#define GEN_ENV           15 /* set to gen_count */
+#define IMAGE_ENV         16 /* image name */
+#define CELL_SIZE_ENV     17 /* sizeof(CELL) */
+#define COMPILED_BASE_ENV 18 /* base of code heap */
 
 /* TAGGED user environment data; see getenv/setenv prims */
 DLLEXPORT CELL userenv[USER_ENV];

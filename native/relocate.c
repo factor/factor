@@ -92,7 +92,8 @@ void undefined_symbol(void)
 
 CELL get_rel_symbol(F_REL* rel)
 {
-	F_CONS* cons = untag_cons(get(rel->argument));
+	CELL arg = REL_ARGUMENT(rel);
+	F_CONS* cons = untag_cons(compiling.base + arg * sizeof(CELL));
 	F_STRING* symbol = untag_string(cons->car);
 	DLL* dll = (cons->cdr == F ? NULL : untag_dll(cons->cdr));
 	CELL sym;
@@ -113,18 +114,17 @@ INLINE CELL compute_code_rel(F_REL *rel, CELL original)
 	switch(REL_TYPE(rel))
 	{
 	case F_PRIMITIVE:
-		return primitive_to_xt(rel->argument);
+		return primitive_to_xt(REL_ARGUMENT(rel));
 	case F_DLSYM:
-		code_fixup(&rel->argument);
 		return get_rel_symbol(rel);
 	case F_ABSOLUTE:
 		return original + (compiling.base - code_relocation_base);
 	case F_USERENV:
-		return (CELL)&userenv[rel->argument];
+		return (CELL)&userenv[REL_ARGUMENT(rel)];
 	case F_CARDS:
 		return cards_offset;
 	default:
-		critical_error("Unsupported rel",rel->type);
+		critical_error("Unsupported rel type",rel->type);
 		return -1;
 	}
 }
@@ -152,22 +152,47 @@ INLINE CELL relocate_code_next(CELL relocating)
 
 		code_fixup(&rel->offset);
 		
-		if(REL_16_16(rel))
-			original = reloc_get_16_16(rel->offset);
-		else
+		switch(REL_CLASS(rel))
+		{
+		case REL_ABSOLUTE_CELL:
 			original = get(rel->offset);
+			break;
+		case REL_ABSOLUTE:
+			original = *(u32*)rel->offset;
+			break;
+		case REL_RELATIVE:
+			original = *(u32*)rel->offset - (rel->offset + sizeof(u32));
+			break;
+		case REL_2_2:
+			original = reloc_get_2_2(rel->offset);
+			break;
+		default:
+			critical_error("Unsupported rel class",REL_CLASS(rel));
+			return -1;
+		}
 
 		/* to_c_string can fill up the heap */
 		maybe_gc(0);
 		new_value = compute_code_rel(rel,original);
 
-		if(REL_RELATIVE(rel))
-			new_value -= (rel->offset + CELLS);
-
-		if(REL_16_16(rel))
-			reloc_set_16_16(rel->offset,new_value);
-		else
+		switch(REL_CLASS(rel))
+		{
+		case REL_ABSOLUTE_CELL:
 			put(rel->offset,new_value);
+			break;
+		case REL_ABSOLUTE:
+			*(u32*)rel->offset = new_value;
+			break;
+		case REL_RELATIVE:
+			*(u32*)rel->offset = new_value - (rel->offset + CELLS);
+			break;
+		case REL_2_2:
+			reloc_set_2_2(rel->offset,new_value);
+			break;
+		default:
+			critical_error("Unsupported rel class",REL_CLASS(rel));
+			return -1;
+		}
 
 		rel++;
 	}

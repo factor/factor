@@ -5,7 +5,7 @@ USING: alien assembler compiler inference kernel
 kernel-internals lists math memory namespaces words ;
 
 : compile-dlsym ( symbol dll register -- )
-    >r 2dup dlsym  r> LOAD32 0 1 rel-dlsym ;
+    >r 2dup dlsym  r> LOAD32 rel-2-2 rel-dlsym ;
 
 : compile-c-call ( symbol dll -- )
     11 [ compile-dlsym ] keep MTLR  BLRL ;
@@ -31,14 +31,14 @@ M: %call-label generate-node ( vop -- )
     #! Near calling convention for inlined recursive combinators
     #! Note: length of instruction sequence is hard-coded.
     vop-label
-    compiled-offset 20 + 18 LOAD32  0 1 rel-address
+    compiled-offset 20 + 18 LOAD32  rel-2/2 rel-address
     1 1 stack-increment neg STWU
     18 1 stack-increment lr@ STW
     B ;
 
 : word-addr ( word -- )
     #! Load a word address into r3.
-    dup word-xt 3 LOAD32  0 1 rel-word ;
+    dup word-xt 3 LOAD32  rel-2/2 rel-word ;
 
 : compile-call ( label -- )
     #! Far C call for primitives, near C call for compiled defs.
@@ -84,7 +84,7 @@ M: %dispatch generate-node ( vop -- )
     0 input-operand dup 1 SRAWI
     ! The value 24 is a magic number. It is the length of the
     ! instruction sequence that follows to be generated.
-    compiled-offset 24 + 0 scratch LOAD32  0 1 rel-address
+    compiled-offset 24 + 0 scratch LOAD32  rel-2/2 rel-address
     0 input-operand dup 0 scratch ADD
     0 input-operand dup 0 LWZ
     0 input-operand MTLR

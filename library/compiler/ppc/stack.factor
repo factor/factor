@@ -13,7 +13,7 @@ M: %immediate generate-node ( vop -- )
     drop 0 input address 0 output-operand LOAD ;
 
 : load-indirect ( dest literal -- )
-    add-literal over LOAD32 0 1 rel-address dup 0 LWZ ;
+    add-literal over LOAD32 rel-2/2 rel-address dup 0 LWZ ;
 
 M: %indirect generate-node ( vop -- )
     drop 0 output-operand 0 input load-indirect ;

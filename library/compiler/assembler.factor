@@ -4,6 +4,8 @@ IN: assembler
 USING: alien generic hashtables kernel kernel-internals lists
 math memory namespaces ;
 
+: compiled-base 18 getenv ; inline
+
 : compiled-header HEX: 01c3babe ; inline
 
 : set-compiled-1 ( n a -- ) f swap set-alien-signed-1 ; inline

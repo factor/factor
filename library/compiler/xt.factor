@@ -38,29 +38,34 @@ SYMBOL: relocation-table
 
 : 4-just-compiled compiled-offset 4 - ;
 
-: relocating cell-just-compiled rel, ;
+: rel-absolute-cell 0 ;
+: rel-absolute 1 ;
+: rel-relative 2 ;
+: rel-2/2 3 ;
 
-: rel-type, ( rel/abs 16/16 type -- )
-    swap 8 shift bitor swap 16 shift bitor rel, ;
+: rel-type, ( arg class type -- )
+    #! Write a relocation instruction for the runtime image
+    #! loader.
+    >r >r 16 shift r> 8 shift bitor r> bitor rel,
+    cell-just-compiled rel, ;
 
-: rel-primitive ( word relative 16/16 -- )
-    0 rel-type, relocating word-primitive rel, ;
+: rel-dlsym ( name dll class -- )
+    >r cons add-literal compiled-base - cell / r> 1 rel-type, ;
 
-: rel-dlsym ( name dll rel/abs 16/16 -- )
-    1 rel-type, relocating cons add-literal rel, ;
-
-: rel-address ( rel/abs 16/16 -- )
+: rel-address ( class -- )
     #! Relocate address just compiled.
-    over 1 = [ 2drop ] [ 2 rel-type, relocating 0 rel, ] if ;
+    dup rel-relative = [ 2drop ] [ 0 -rot 2 rel-type, ] if ;
 
-: rel-word ( word rel/abs 16/16 -- )
-    pick primitive? [ rel-primitive ] [ rel-address drop ] if ;
+: rel-word ( word class -- )
+    over primitive? [
+        >r word-primitive r> 0 rel-type,
+    ] [
+        rel-address drop
+    ] if ;
 
-: rel-userenv ( n 16/16 -- )
-    0 swap 3 rel-type, relocating rel, ;
+: rel-userenv ( n class -- ) 3 rel-type, ;
 
-: rel-cards ( 16/16 -- )
-    0 swap 4 rel-type, relocating 0 rel, ;
+: rel-cards ( class -- ) 4 rel-type, ;
 
 ! This is for fixing up forward references
 GENERIC: resolve ( fixup -- addr )
@@ -123,32 +128,35 @@ M: fixup-2/2 fixup ( addr fixup -- )
     fixup-2/2-at >r w>h/h r> tuck 4 - or-compiled or-compiled ;
 
 : relative-4 ( word -- )
-    dup 1 0 rel-word ( FIXME)
+    dup rel-relative rel-word
     compiled-offset <relative>
     4-just-compiled <fixup-4> deferred-xt ;
 
 : relative-3 ( word -- )
+    #! Labels only -- no image relocation information saved
     4-just-compiled <relative>
     4-just-compiled <fixup-3> deferred-xt ;
 
 : relative-2 ( word -- )
+    #! Labels only -- no image relocation information saved
     4-just-compiled <relative>
     4-just-compiled <fixup-2> deferred-xt ;
 
 : relative-2/2 ( word -- )
+    #! Labels only -- no image relocation information saved
     compiled-offset <relative>
     4-just-compiled <fixup-2/2> deferred-xt ;
 
 : absolute-4 ( word -- )
-    dup 0 0 rel-word ( FIXME)
+    dup rel-absolute rel-word
     <absolute> 4-just-compiled <fixup-4> deferred-xt ;
 
 : absolute-2/2 ( word -- )
-    dup 0 1 rel-word
+    dup rel-2/2 rel-word
     <absolute> cell-just-compiled <fixup-2/2> deferred-xt ;
 
 : absolute-cell ( word -- )
-    dup 0 0 rel-word
+    dup rel-absolute-cell rel-word
     <absolute> cell-just-compiled <fixup-cell> deferred-xt ;
 
 ! When a word is encountered that has not been previously
