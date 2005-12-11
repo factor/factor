@@ -111,8 +111,7 @@ M: %fixnum<< generate-node
     ! make a copy
     0 scratch 1 input-operand MOV
     ! check for potential overflow
-    0 scratch 0 input shift-add ADD
-    0 scratch 0 input shift-add 2 * 1- CMP
+    0 scratch 0 input shift-add 2dup ADD 2 * 1- CMP
     ! is there going to be an overflow?
     "no-overflow" get JBE
     ! there is going to be an overflow, make a bignum
