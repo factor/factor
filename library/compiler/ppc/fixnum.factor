@@ -11,7 +11,7 @@ math-internals memory namespaces words ;
     >r >r
     <label> "end" set
     "end" get BNO
-    r> execute
+    >3-vop< r> execute
     0 input-operand dup untag-fixnum
     1 input-operand dup untag-fixnum
     >3-vop< r> execute
@@ -34,8 +34,9 @@ M: %fixnum* generate-node ( vop -- )
     0 MTXER
     0 scratch 0 input-operand 1 input-operand MULLWO.
     "end" get BNO
-    >3-vop< MULHW
-    4 0 scratch MR
+    1 scratch 0 input-operand 1 input-operand MULHW
+    4 1 scratch MR
+    3 0 scratch MR
     "s48_long_pair_to_bignum" f compile-c-call
     ! now we have to shift it by three bits to remove the second
     ! tag
@@ -47,8 +48,11 @@ M: %fixnum* generate-node ( vop -- )
     0 output-operand 0 scratch MR ;
 
 : generate-fixnum/i
-    ! divide in2 by in1, store result in out1
-    0 scratch 0 input-operand 1 input-operand DIVW
+    #! This VOP is funny. If there is an overflow, it falls
+    #! through to the end, and the result is in 0 output-operand.
+    #! Otherwise it jumps to the "no-overflow" label and the
+    #! result is in 0 scratch.
+    0 scratch 1 input-operand 0 input-operand DIVW
     ! if the result is greater than the most positive fixnum,
     ! which can only ever happen if we do
     ! most-negative-fixnum -1 /i, then the result is a bignum.
@@ -57,9 +61,9 @@ M: %fixnum* generate-node ( vop -- )
     most-positive-fixnum 1 scratch LOAD
     0 scratch 0 1 scratch CMP
     "no-overflow" get BLE
-    most-negative-fixnum neg 0 output-operand LOAD
+    most-negative-fixnum neg 3 LOAD
     "s48_long_to_bignum" f compile-c-call
-    0 output-operand dup bignum-tag ORI ;
+    3 dup bignum-tag ORI ;
 
 M: %fixnum/i generate-node ( vop -- )
     #! This has specific vreg requirements.
@@ -72,26 +76,29 @@ M: %fixnum/i generate-node ( vop -- )
 
 : generate-fixnum-mod
     #! PowerPC doesn't have a MOD instruction; so we compute
-    #! x-(x/y)*y.
-    0 scratch 0 output-operand 0 input-operand MULLW
-    1 scratch 0 scratch 1 input-operand SUBF ;
+    #! x-(x/y)*y. Puts the result in 1 scratch.
+    1 scratch 0 scratch 0 input-operand MULLW
+    1 scratch 1 scratch 1 input-operand SUBF ;
 
 M: %fixnum-mod generate-node ( vop -- )
-    #! This has specific vreg requirements.
     drop
     ! divide in2 by in1, store result in out1
-    >3-vop< DIVW
-    generate-fixnum-mod ;
+    0 scratch 1 input-operand 0 input-operand DIVW
+    generate-fixnum-mod
+    0 output-operand 1 scratch MR ;
 
 M: %fixnum/mod generate-node ( vop -- )
-    #! This has specific vreg requirements.
+    #! This has specific vreg requirements. Note: if there's an
+    #! overflow, (most-negative-fixnum 1 /mod) the modulus is
+    #! always zero.
     drop
     generate-fixnum/i
-    0 1 scratch LI
+    0 0 output-operand LI
     "end" get B
     "no-overflow" get save-xt
     generate-fixnum-mod
-    0 output-operand 1 output-operand tag-fixnum
+    0 scratch 1 output-operand tag-fixnum
+    0 output-operand 1 scratch MR
     "end" get save-xt ;
 
 M: %fixnum-bitand generate-node ( vop -- ) drop >3-vop< AND ;
@@ -130,7 +137,8 @@ M: %fixnum<< generate-node ( vop -- )
     "end" get save-xt ;
 
 M: %fixnum>> generate-node ( vop -- )
-    0 output-operand 1 input-operand 0 output-operand SRAWI
+    drop
+    1 input-operand 0 output-operand 0 input SRAWI
     0 output-operand dup untag ;
 
 M: %fixnum-sgn generate-node ( vop -- )

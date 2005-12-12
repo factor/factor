@@ -440,13 +440,15 @@ sequences strings vectors words prettyprint ;
 \ alien-double [ [ c-ptr integer ] [ float ] ] "infer-effect" set-word-prop
 \ alien-double t "flushable" set-word-prop
 
-\ set-alien-double [ [ float c-ptr integer ] [ ] ] "infer-effect" set-word-prop
-\ alien-c-string [ [ c-ptr integer ] [ string ] ] "infer-effect" set-word-prop
-\ alien-c-string t "flushable" set-word-prop
+\ alien>string [ [ c-ptr ] [ string ] ] "infer-effect" set-word-prop
+\ alien>string t "flushable" set-word-prop
 
-\ set-alien-c-string [ [ string c-ptr integer ] [ ] ] "infer-effect" set-word-prop
+\ string>alien [ [ string ] [ byte-array ] ] "infer-effect" set-word-prop
+\ string>alien t "flushable" set-word-prop
+
 \ string>memory [ [ string integer ] [ ] ] "infer-effect" set-word-prop
 \ memory>string [ [ integer integer ] [ string ] ] "infer-effect" set-word-prop
+
 \ alien-address [ [ alien ] [ integer ] ] "infer-effect" set-word-prop
 
 \ slot [ [ object fixnum ] [ object ] ] "infer-effect" set-word-prop

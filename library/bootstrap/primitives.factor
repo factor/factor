@@ -176,8 +176,8 @@ vocabularies get [ "syntax" set [ reveal ] each ] bind
     { "set-alien-float" "alien"             }
     { "alien-double" "alien"                }
     { "set-alien-double" "alien"            }
-    { "alien-c-string" "alien"              }
-    { "set-alien-c-string" "alien"          }
+    { "alien>string" "alien"                }
+    { "string>alien" "alien"                }
     { "throw" "errors"                      }
     { "string>memory" "kernel-internals"    }
     { "memory>string" "kernel-internals"    }

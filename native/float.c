@@ -40,7 +40,7 @@ void primitive_str_to_float(void)
 	maybe_gc(sizeof(F_FLOAT));
 
 	str = untag_string(dpeek());
-	c_str = to_c_string(str);
+	c_str = to_c_string(str,true);
 	end = c_str;
 	f = strtod(c_str,&end);
 	if(end != c_str + string_capacity(str))

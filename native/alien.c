@@ -90,6 +90,18 @@ void primitive_alien_address(void)
 	box_unsigned_cell((CELL)alien_offset(dpop()));
 }
 
+void primitive_alien_to_string(void)
+{
+	maybe_gc(0);
+	drepl(tag_object(from_c_string(alien_offset(dpeek()))));
+}
+
+void primitive_string_to_alien(void)
+{
+	maybe_gc(0);
+	drepl(tag_object(string_to_alien(untag_string(dpeek()),true)));
+}
+
 void fixup_alien(ALIEN* alien)
 {
 	alien->expired = true;
@@ -129,4 +141,3 @@ DEF_ALIEN_SLOT(signed_1,BYTE,signed_1)
 DEF_ALIEN_SLOT(unsigned_1,BYTE,unsigned_1)
 DEF_ALIEN_SLOT(float,float,float)
 DEF_ALIEN_SLOT(double,double,double)
-DEF_ALIEN_SLOT(c_string,char*,c_string)

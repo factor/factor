@@ -108,19 +108,33 @@ void box_c_string(const char *c_string)
 	dpush(c_string ? tag_object(from_c_string(c_string)) : F);
 }
 
-/* untagged */
-char *to_c_string(F_STRING *s)
+F_ARRAY *string_to_alien(F_STRING *s, bool check)
 {
-	CELL i;
 	CELL capacity = string_capacity(s);
-	for(i = 0; i < capacity; i++)
+	F_ARRAY *_c_str;
+	
+	if(check)
 	{
-		u16 ch = string_nth(s,i);
-		if(ch == '\0' || ch > 255)
-			general_error(ERROR_C_STRING,tag_object(s));
+		CELL i;
+		for(i = 0; i < capacity; i++)
+		{
+			u16 ch = string_nth(s,i);
+			if(ch == '\0' || ch > 255)
+				general_error(ERROR_C_STRING,tag_object(s));
+		}
 	}
 
-	return to_c_string_unchecked(s);
+	_c_str = allot_array(BYTE_ARRAY_TYPE,capacity / CELLS + 1);
+	BYTE *c_str = (BYTE*)(_c_str + 1);
+	string_to_memory(s,c_str);
+	c_str[capacity] = '\0';
+	return _c_str;
+}
+
+/* untagged */
+char *to_c_string(F_STRING *s, bool check)
+{
+	return (char*)(string_to_alien(s,check) + 1);
 }
 
 void string_to_memory(F_STRING *s, BYTE *string)
@@ -138,23 +152,12 @@ void primitive_string_to_memory(void)
 	string_to_memory(str,address);
 }
 
-/* untagged */
-char *to_c_string_unchecked(F_STRING *s)
-{
-	CELL capacity = string_capacity(s);
-	F_STRING *_c_str = allot_string(capacity / CHARS + 1);
-	BYTE *c_str = (BYTE*)(_c_str + 1);
-	string_to_memory(s,c_str);
-	c_str[capacity] = '\0';
-	return (char*)c_str;
-}
-
 /* FFI calls this */
 char* unbox_c_string(void)
 {
 	CELL str = dpop();
 	if(type_of(str) == STRING_TYPE)
-		return to_c_string(untag_string(str));
+		return to_c_string(untag_string(str),true);
 	else
 		return (char*)alien_offset(str);
 }

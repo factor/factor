@@ -7,7 +7,7 @@ void init_ffi (void)
 void ffi_dlopen (DLL *dll, bool error)
 {
 	HMODULE module;
-	char *path = to_c_string(untag_string(dll->path));
+	char *path = to_c_string(untag_string(dll->path,true));
 
 	module = LoadLibrary(path);
 
@@ -26,7 +26,7 @@ void ffi_dlopen (DLL *dll, bool error)
 void *ffi_dlsym (DLL *dll, F_STRING *symbol, bool error)
 {
 	void *sym = GetProcAddress(dll ? (HMODULE)dll->dll : GetModuleHandle(NULL),
-		to_c_string(symbol));
+		to_c_string(symbol,true));
 
 	if (!sym)
 	{

@@ -8,7 +8,7 @@ void primitive_stat(void)
 	maybe_gc(0);
 
 	path = untag_string(dpop());
-	if(stat(to_c_string(path),&sb) < 0)
+	if(stat(to_c_string(path,true),&sb) < 0)
 		dpush(F);
 	else
 	{
@@ -36,7 +36,7 @@ void primitive_read_dir(void)
 	maybe_gc(0);
 
 	path = untag_string(dpop());
-	dir = opendir(to_c_string(path));
+	dir = opendir(to_c_string(path,true));
 	if(dir != NULL)
 	{
 		struct dirent* file;

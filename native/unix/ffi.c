@@ -9,7 +9,7 @@ void init_ffi(void)
 
 void ffi_dlopen(DLL *dll, bool error)
 {
-	void *dllptr = dlopen(to_c_string(untag_string(dll->path)), RTLD_LAZY);
+	void *dllptr = dlopen(to_c_string(untag_string(dll->path),true), RTLD_LAZY);
 
 	if(dllptr == NULL)
 	{
@@ -30,7 +30,7 @@ void ffi_dlopen(DLL *dll, bool error)
 void *ffi_dlsym(DLL *dll, F_STRING *symbol, bool error)
 {
 	void *handle = (dll == NULL ? null_dll : dll->dll);
-	void *sym = dlsym(handle,to_c_string(symbol));
+	void *sym = dlsym(handle,to_c_string(symbol,true));
 	if(sym == NULL)
 	{
 		if(error)

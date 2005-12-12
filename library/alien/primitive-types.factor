@@ -103,8 +103,11 @@ math namespaces ;
 ] "uchar" define-primitive-type
 
 [
-    [ alien-c-string ] "getter" set
-    [ set-alien-c-string ] "setter" set
+    [ alien-unsigned-cell <alien> alien>string ] "getter" set
+    [
+        >r >r string>alien alien-address r> r>
+        set-alien-unsigned-cell
+    ] "setter" set
     cell "width" set
     cell "align" set
     "box_c_string" "boxer" set

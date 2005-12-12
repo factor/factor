@@ -56,7 +56,7 @@ M: %set-char-slot generate-node ( vop -- )
 
 : userenv ( reg -- )
     #! Load the userenv pointer in a virtual register.
-    "userenv" f dlsym swap LOAD32 rel-2/2 rel-userenv ;
+    "userenv" f dlsym swap LOAD32 0 rel-2/2 rel-userenv ;
 
 M: %getenv generate-node ( vop -- )
     drop 0 output-operand dup dup userenv 0 input cell * LWZ ;

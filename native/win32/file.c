@@ -8,7 +8,7 @@ void primitive_stat(void)
 	maybe_gc(0);
 	path = untag_string(dpop());
 
-	if(!GetFileAttributesEx(to_c_string(path), GetFileExInfoStandard, &st)) 
+	if(!GetFileAttributesEx(to_c_string(path,true), GetFileExInfoStandard, &st)) 
 	{
 		dpush(F);
 	} 

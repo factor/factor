@@ -24,7 +24,7 @@ void print_cons(CELL cons)
 void print_word(F_WORD* word)
 {
 	if(type_of(word->name) == STRING_TYPE)
-		fprintf(stderr,"%s",to_c_string(untag_string(word->name)));
+		fprintf(stderr,"%s",to_c_string(untag_string(word->name),true));
 	else
 	{
 		fprintf(stderr,"#<not a string: ");
@@ -38,7 +38,7 @@ void print_word(F_WORD* word)
 void print_string(F_STRING* str)
 {
 	fprintf(stderr,"\"");
-	fprintf(stderr,"%s",to_c_string(str));
+	fprintf(stderr,"%s",to_c_string(str,true));
 	fprintf(stderr,"\"");
 }
 
