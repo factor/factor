@@ -31,10 +31,10 @@ rather than an association list for specifying style information.</li>
 <li>Added a pair of words for between Factor strings and C strings, <code>alien&gt;string</code> and <code>string&gt;alien</code>.
 </li>
 
-
 <li>Compiler changes:
 
 <ul>
+<li>AMD64 compiler backend.</li>
 <li>Fixed some problems with compilation of inlined recursive words.</li>
 </ul>
 
@@ -45,6 +45,23 @@ rather than an association list for specifying style information.</li>
 <ul>
 <li>Fixed invalid OpenGL calls which caused problems on Windows machines with ATI
 drivers, and Linux machines with the MesaGL implementation.</li>
+</ul>
+
+</li>
+
+<li>Bootstrap changes:
+
+<ul>
+<li>Source files are no longer loaded in the stage-2 bootstrap. Since stage-2 bootstrap
+runs in the interpreter, this reduces bootstrap time by a few minutes. Instead, all
+source files, including the compiler backend, are loaded in stage-1 bootstrap, and thus
+boot images are now CPU-specific. Boot images can be created as follows:
+<pre>
+USE: image
+"x86" make-image
+"ppc" make-image
+"amd64" make-image
+</pre></li>
 </ul>
 
 </li>

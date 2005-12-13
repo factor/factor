@@ -9,9 +9,9 @@
 ! strings etc to the image file in the CFactor object memory
 ! format.
 
-USING: arrays errors generic hashtables kernel kernel-internals
-lists math namespaces parser prettyprint sequences
-sequences-internals io strings vectors words ;
+USING: alien arrays errors generic hashtables io kernel
+kernel-internals lists math namespaces parser prettyprint
+sequences sequences-internals strings vectors words ;
 IN: image
 
 ! The image being constructed; a vector of word-size integers
@@ -291,7 +291,8 @@ M: hashtable ' ( hashtable -- pointer )
 
 : global, ( -- )
     [
-        { vocabularies typemap builtins } [ [ ] change ] each
+        { vocabularies typemap builtins c-types crossref }
+        [ [ ] change ] each
     ] make-hash '
     global-offset fixup ;
 

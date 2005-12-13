@@ -68,4 +68,4 @@ M: %parameters generate-node ( vop -- ) drop ;
 
 : shift-add ( by -- n )
     #! Used in fixnum-shift overflow check.
-    1 swap cell-bits * swap 1- - shift ;
+    >r 1 cell-bits r> 1- - shift ;
