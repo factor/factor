@@ -22,7 +22,9 @@ SYMBOL: objects
 
 ! Image output format
 SYMBOL: big-endian
-SYMBOL: 64-bits
+
+! Bootstrap architecture name
+SYMBOL: architecture
 
 : emit ( cell -- ) image get push ;
 
@@ -30,7 +32,7 @@ SYMBOL: 64-bits
     dup HEX: ffffffff bitand swap -32 shift HEX: ffffffff bitand ;
 
 : emit-64 ( cell -- )
-    64-bits get [
+    cell get 8 = [
         emit
     ] [
         d>w/w big-endian get [ swap ] unless emit emit
@@ -45,8 +47,7 @@ SYMBOL: 64-bits
 : image-magic HEX: 0f0e0d0c ;
 : image-version 0 ;
 
-: cell 64-bits get 8 4 ? ;
-: char 64-bits get 4 2 ? ;
+: char cell get 2 /i ;
 
 : untag ( cell tag -- ) tag-mask bitnot bitand ;
 : tag ( cell -- tag ) tag-mask bitand ;
@@ -93,7 +94,7 @@ GENERIC: ' ( obj -- ptr )
 ( Allocator )
 
 : here ( -- size ) 
-    image get length header-size - cell * base + ;
+    image get length header-size - cells base + ;
 
 : here-as ( tag -- pointer )
     here swap bitor ;
@@ -109,7 +110,7 @@ M: fixnum ' ( n -- tagged ) fixnum-tag immediate ;
 
 ( Bignums )
 
-: bignum-bits cell 8 * 2 - ;
+: bignum-bits cell-bits 2 - ;
 
 : bignum-radix bignum-bits 1 swap shift 1- ;
 
@@ -163,7 +164,7 @@ M: f ' ( obj -- ptr )
 ! The image begins with the header, then T,
 ! and the bignums 0, 1, and -1.
 
-: begin ( -- ) header t, 0, 1, -1, ;
+: begin-image ( -- ) header t, 0, 1, -1, ;
 
 ( Words )
 
@@ -296,9 +297,9 @@ M: hashtable ' ( hashtable -- pointer )
 
 : boot, ( quot -- ) ' boot-quot-offset fixup ;
 
-: heap-size image get length header-size - cell * ;
+: heap-size image get length header-size - cells ;
 
-: end ( quot -- )
+: end-image ( quot -- )
     "Generating words..." print
     words,
     "Generating global namespace..." print
@@ -307,12 +308,15 @@ M: hashtable ' ( hashtable -- pointer )
     boot,
     "Performing some word fixups..." print
     fixup-words
-    heap-size heap-size-offset fixup ;
+    heap-size heap-size-offset fixup
+    "Image length: " write image get length .
+    "Object cache size: " write objects get hash-size .
+    \ word global remove-hash ;
 
 ( Image output )
 
 : (write-image) ( image -- )
-    64-bits get 8 4 ? swap big-endian get [
+    cell swap big-endian get [
         [ swap >be write ] each-with
     ] [
         [ swap >le write ] each-with
@@ -322,33 +326,27 @@ M: hashtable ' ( hashtable -- pointer )
     "Writing image to " write dup write "..." print
     <file-writer> [ (write-image) ] with-stream ;
 
-: with-image ( quot -- image )
+: prepare-profile ( arch -- )
+    "/library/bootstrap/profile-" swap ".factor" append3
+    run-resource ;
+
+: prepare-image ( arch -- )
+    bootstrapping? on dup architecture set prepare-profile
+    800000 <vector> image set 20000 <hashtable> objects set ;
+
+: <image> ( architecture -- image )
     [
-        bootstrapping? on
-        800000 <vector> image set
-        20000 <hashtable> objects set
-        call
-        "Image length: " write image get length .
-        "Object cache size: " write objects get hash-size .
+        prepare-image
+        begin-image
+        "/library/bootstrap/boot-stage1.factor" run-resource
+        end-image
         image get
-        \ word global remove-hash
     ] with-scope ;
 
-: make-image ( name -- )
-    #! Make a bootstrap image.
-    [
-        begin
-        "/library/bootstrap/boot-stage1.factor" run-resource
-        end
-    ] with-image
-
-    swap write-image ;
+: make-image ( architecture -- )
+    #! Make a bootstrap image for the given architecture
+    #! (x86, ppc, or amd64).
+    dup <image> "boot.image." rot append write-image ;
 
 : make-images ( -- )
-    64-bits off
-    big-endian off "boot.image.le32" make-image
-    big-endian on  "boot.image.be32" make-image
-    64-bits on
-    big-endian off "boot.image.le64" make-image
-    big-endian on  "boot.image.be64" make-image
-    64-bits off ;
+    "x86" make-image "ppc" make-image "amd64" make-image ;

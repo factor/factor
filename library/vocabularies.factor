@@ -41,8 +41,7 @@ SYMBOL: vocabularies
 
 : recrossref ( -- )
     #! Update word cross referencing information.
-    H{ } clone crossref global set-hash
-    [ add-crossref ] each-word ;
+    crossref get clear-hash [ add-crossref ] each-word ;
 
 : lookup ( name vocab -- word ) vocab ?hash ;
 

@@ -26,7 +26,7 @@ GENERIC: generate-node ( vop -- )
 : generate-reloc ( -- length )
     relocation-table get
     dup [ assemble-cell ] each
-    length cell * ;
+    length cells ;
 
 : (generate) ( word linear -- )
     #! Compile a word definition from linear IR.
@@ -68,4 +68,4 @@ M: %parameters generate-node ( vop -- ) drop ;
 
 : shift-add ( by -- n )
     #! Used in fixnum-shift overflow check.
-    1 swap cell 8 * swap 1- - shift ;
+    1 swap cell-bits * swap 1- - shift ;

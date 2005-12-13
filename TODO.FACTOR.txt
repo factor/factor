@@ -12,8 +12,6 @@
 - <array> ( length initial )
 - <string> ( length initial )
 - remove repetitions
-- load-indirect cannot use a scratch register since its vop is basic-blockish
-- benchmark/fib out of memory on powerpc
 - need something like uncons but for arbitrary sequences
 - on win64: to_cell will break
 - .h .b .o for ratios and floats is broken
@@ -87,38 +85,22 @@ parsing word sections:
 + compiler:
 
 - declare slot types for built-ins
-- check that set-datastack and set-callstack compile correctly in the
-  face of optimization
-- [ ] [ throw ] ifte ==> should raise 'unbalanced branches' error
 - remove dead code after a 'throw'
 - flushing optimization
 - [ [ dup call ] dup call ] infer hangs
-- compile continuations
-
-+ sequences:
-
-- split: return vectors
-- set-path: iterative
-- slice: if sequence or seq start is changed, abstraction violation
-- mutable strings simplifying string operarations
 
 + kernel:
 
-- first-class methods:
-  - methods outliner
-  - annotations for methods
-  - originating source file for methods
-- reader syntax for byte arrays, displaced aliens
+- slice: if sequence or seq start is changed, abstraction violation
+- annotations for methods
+- originating source file for methods
 - out of memory error when printing global namespace
-- merge timers with sleeping tasks
 - delegating generic words with a non-standard picker
 - code gc
 
 + i/o:
 
 - i/o tasks hanging around
-- faster stream-copy
-- reading and writing byte arrays
 - stream server can hang because of exception handler limitations
 - better i/o scheduler
 - if two tasks write to a unix stream, the buffer can overflow

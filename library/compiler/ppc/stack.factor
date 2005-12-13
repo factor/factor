@@ -2,12 +2,12 @@
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: compiler-backend
 USING: assembler compiler errors kernel kernel-internals math
-memory words ;
+memory namespaces words ;
 
 GENERIC: loc>operand
 
-M: ds-loc loc>operand ds-loc-n cell * neg 14 swap ;
-M: cs-loc loc>operand cs-loc-n cell * neg 15 swap ;
+M: ds-loc loc>operand ds-loc-n cells neg 14 swap ;
+M: cs-loc loc>operand cs-loc-n cells neg 15 swap ;
 
 M: %immediate generate-node ( vop -- )
     drop 0 input address 0 output-operand LOAD ;

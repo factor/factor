@@ -101,6 +101,16 @@ presentation sequences strings styles words ;
         drop call
     ] if ;
 
+TUPLE: wrapper-stream scope ;
+
+C: wrapper-stream ( stream -- stream )
+    2dup set-delegate [
+        >r stdio associate r> set-wrapper-stream-scope
+    ] keep ;
+
+: with-wrapper ( stream quot -- )
+    >r wrapper-stream-scope r> bind ; inline
+
 TUPLE: html-stream ;
 
 M: html-stream stream-write1 ( char stream -- )

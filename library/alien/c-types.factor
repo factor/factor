@@ -31,7 +31,7 @@ SYMBOL: c-types
     >r <c-type> [ swap bind ] keep r> c-types get set-hash ;
     inline
 
-: bytes>cells cell / ceiling ;
+: bytes>cells cell get / ceiling ;
 
 : <c-object> ( size -- c-ptr ) bytes>cells <byte-array> ;
 
@@ -91,5 +91,3 @@ SYMBOL: c-types
 
 : typedef ( old new -- )
     over "*" append over "*" append (typedef) (typedef) ;
-
-global [ c-types nest drop ] bind

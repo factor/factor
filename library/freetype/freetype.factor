@@ -1,9 +1,15 @@
 ! Copyright (C) 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
-USING: alien ;
+USING: alien kernel ;
 IN: freetype
 
 ! Some code to render TrueType fonts with OpenGL.
+
+"freetype" {
+    { [ os "macosx" = ] [ "libfreetype.dylib" ] }
+    { [ os "win32" = ] [ "freetype6.dll" ] }
+    { [ t ] [ "libfreetype.so.6" ] }
+} cond "cdecl" add-library
 
 LIBRARY: freetype
 

@@ -14,7 +14,7 @@ kernel-internals lists math memory namespaces sequences words ;
     0 output-operand dup r> call ; inline
 
 M: %slot generate-node ( vop -- )
-    drop cell log2 [ 0 LWZ ] generate-slot ;
+    drop cell get log2 [ 0 LWZ ] generate-slot ;
 
 M: %fast-slot generate-node ( vop -- )
     drop 0 output-operand dup 0 input LWZ ;
@@ -29,7 +29,7 @@ M: %fast-slot generate-node ( vop -- )
     0 input-operand 2 input-operand r> call ; inline
 
 M: %set-slot generate-node ( vop -- )
-    drop cell log2 [ 0 STW ] generate-set-slot ;
+    drop cell get log2 [ 0 STW ] generate-set-slot ;
 
 M: %fast-set-slot generate-node ( vop -- )
     drop 0 input-operand 1 input-operand 2 input STW ;
@@ -43,7 +43,7 @@ M: %write-barrier generate-node ( vop -- )
     0 scratch dup card-mark ORI
     0 scratch 0 input-operand 0 STB ;
 
-: string-offset cell 3 * object-tag - ;
+: string-offset 3 cells object-tag - ;
 
 M: %char-slot generate-node ( vop -- )
     drop 1 [ string-offset LHZ ] generate-slot
@@ -59,8 +59,8 @@ M: %set-char-slot generate-node ( vop -- )
     "userenv" f dlsym swap LOAD32 0 rel-2/2 rel-userenv ;
 
 M: %getenv generate-node ( vop -- )
-    drop 0 output-operand dup dup userenv 0 input cell * LWZ ;
+    drop 0 output-operand dup dup userenv 0 input cells LWZ ;
 
 M: %setenv generate-node ( vop -- )
     drop 0 scratch userenv
-    0 input-operand 0 scratch 1 input cell * STW ;
+    0 input-operand 0 scratch 1 input cells STW ;

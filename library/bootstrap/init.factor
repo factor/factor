@@ -11,7 +11,8 @@ parser threads words ;
     init-threads
     init-io
     "HOME" os-env [ "." ] unless* "~" set
+    17 getenv cell set
     init-error-handler
     default-cli-args
     parse-command-line
-    "null-stdio" get [ T{ null-stream } stdio set ] when ;
+    "null-stdio" get [ stdio off ] when ;

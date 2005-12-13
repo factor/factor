@@ -79,9 +79,6 @@ vectors words ;
         "/library/generic/slots.factor"
         "/library/generic/math-combination.factor"
         "/library/generic/tuple.factor"
-
-        "/library/syntax/generic.factor"
-        "/library/syntax/parse-syntax.factor"
         
         "/library/alien/aliens.factor"
         
@@ -136,15 +133,110 @@ vectors words ;
         "/library/compiler/compiler.factor"
 
         "/library/alien/c-types.factor"
-        "/library/alien/primitive-types.factor"
         "/library/alien/structs.factor"
         "/library/alien/compiler.factor"
         "/library/alien/syntax.factor"
+        "/library/alien/malloc.factor"
+        
+        "/library/io/buffer.factor"
+
+        "/library/syntax/generic.factor"
 
         "/library/cli.factor"
         
         "/library/bootstrap/init.factor"
+        
+        "/library/sdl/sdl.factor"
+        "/library/sdl/sdl-video.factor"
+        "/library/sdl/sdl-event.factor"
+        "/library/sdl/sdl-keysym.factor"
+        "/library/sdl/sdl-keyboard.factor"
+        "/library/sdl/sdl-utils.factor"
+
+        "/library/opengl/gl.factor"
+        "/library/opengl/glu.factor"
+        "/library/opengl/opengl-utils.factor"
+
+        "/library/freetype/freetype.factor"
+        "/library/freetype/freetype-gl.factor"
+
+        "/library/ui/gadgets.factor"
+        "/library/ui/layouts.factor"
+        "/library/ui/hierarchy.factor"
+        "/library/ui/paint.factor"
+        "/library/ui/gestures.factor"
+        "/library/ui/theme.factor"
+        "/library/ui/hand.factor"
+        "/library/ui/frames.factor"
+        "/library/ui/world.factor"
+        "/library/ui/events.factor"
+        "/library/ui/borders.factor"
+        "/library/ui/labels.factor"
+        "/library/ui/buttons.factor"
+        "/library/ui/line-editor.factor"
+        "/library/ui/sliders.factor"
+        "/library/ui/scrolling.factor"
+        "/library/ui/menus.factor"
+        "/library/ui/editors.factor"
+        "/library/ui/splitters.factor"
+        "/library/ui/incremental.factor"
+        "/library/ui/panes.factor"
+        "/library/ui/books.factor"
+        "/library/ui/outliner.factor"
+        "/library/ui/presentations.factor"
+        "/library/ui/listener.factor"
+        "/library/ui/ui.factor"
+
+        "/library/help/database.factor"
+        "/library/help/markup.factor"
+        "/library/help/help.factor"
+        "/library/help/tutorial.factor"
+        "/library/help/syntax.factor"
+
+        "/library/syntax/parse-syntax.factor"
     } [ parse-resource % ] each
+    
+    architecture get {
+        {
+            [ dup "x86" = ] [
+                {
+                    "/library/compiler/x86/assembler.factor"
+                    "/library/compiler/amd64/assembler.factor"
+                    "/library/compiler/amd64/architecture.factor"
+                    "/library/compiler/x86/generator.factor"
+                    "/library/compiler/x86/slots.factor"
+                    "/library/compiler/x86/stack.factor"
+                    "/library/compiler/x86/fixnum.factor"
+                    "/library/compiler/amd64/alien.factor"
+                }
+            ]
+        } {
+            [ dup "ppc" = ] [
+                {
+                    "/library/compiler/ppc/assembler.factor"
+                    "/library/compiler/ppc/architecture.factor"
+                    "/library/compiler/ppc/generator.factor"
+                    "/library/compiler/ppc/slots.factor"
+                    "/library/compiler/ppc/stack.factor"
+                    "/library/compiler/ppc/fixnum.factor"
+                    "/library/compiler/ppc/alien.factor"
+                }
+            ]
+        } {
+            [ dup "amd64" = ] [
+                {
+                    "/library/compiler/x86/assembler.factor"
+                    "/library/compiler/amd64/assembler.factor"
+                    "/library/compiler/amd64/architecture.factor"
+                    "/library/compiler/x86/generator.factor"
+                    "/library/compiler/x86/slots.factor"
+                    "/library/compiler/x86/stack.factor"
+                    "/library/compiler/x86/fixnum.factor"
+                    "/library/compiler/amd64/alien.factor"
+                }
+            ]
+        }
+    } cond [ parse-resource % ] each
     
     [
         "/library/bootstrap/boot-stage2.factor" run-resource
@@ -160,3 +252,6 @@ vocabularies get [
 ] bind
 
 "!syntax" vocabularies get remove-hash
+
+H{ } clone crossref set
+recrossref

@@ -20,7 +20,7 @@ GENERIC: operand-64? ( op -- ? )
 
 M: object canonicalize ;
 M: object extended? drop f ;
-M: object operand-64? drop cell 8 = ;
+M: object operand-64? drop cell get 8 = ;
 
 ( Register operands -- eg, ECX                                 )
 : REGISTER:

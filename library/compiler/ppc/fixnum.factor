@@ -142,7 +142,7 @@ M: %fixnum>> generate-node ( vop -- )
     0 output-operand dup untag ;
 
 M: %fixnum-sgn generate-node ( vop -- )
-    drop dest/src cell 8 * 1- SRAWI 0 output-operand dup untag ;
+    drop dest/src cell-bits 1- SRAWI 0 output-operand dup untag ;
 
 : fixnum-jump ( -- label )
     1 input-operand 0 0 input-operand CMP label ;

@@ -1,8 +1,8 @@
 ! Copyright (C) 2005 Alex Chapman.
 ! See http://factor.sf.net/license.txt for BSD license.
-IN: alien
-USING: compiler kernel lists math namespaces parser
-sequences words ;
+IN: !syntax
+USING: alien compiler kernel lists math namespaces parser
+sequences syntax words ;
 
 ! usage of 'LIBRARY:' and 'FUNCTION:' :
 !

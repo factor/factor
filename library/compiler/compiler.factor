@@ -4,9 +4,6 @@ USING: compiler-backend compiler-frontend errors inference io
 kernel lists math namespaces optimizer prettyprint sequences
 words ;
 
-: supported-cpu? ( -- ? )
-    cpu "unknown" = not ;
-
 : precompile ( quotation -- basic-blocks )
     dataflow optimize linearize split-blocks simplify ;
 

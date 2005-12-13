@@ -6,8 +6,8 @@ math namespaces ;
     [
         >r >r alien-address r> r> set-alien-unsigned-cell
     ] "setter" set
-    cell "width" set
-    cell "align" set
+    cell get "width" set
+    cell get "align" set
     "box_alien" "boxer" set
     "unbox_alien" "unboxer" set
 ] "void*" define-primitive-type
@@ -33,8 +33,8 @@ math namespaces ;
 [
     [ alien-signed-cell ] "getter" set
     [ set-alien-signed-cell ] "setter" set
-    cell "width" set
-    cell "align" set
+    cell get "width" set
+    cell get "align" set
     "box_signed_cell" "boxer" set
     "unbox_signed_cell" "unboxer" set
 ] "long" define-primitive-type
@@ -42,8 +42,8 @@ math namespaces ;
 [
     [ alien-unsigned-cell ] "getter" set
     [ set-alien-unsigned-cell ] "setter" set
-    cell "width" set
-    cell "align" set
+    cell get "width" set
+    cell get "align" set
     "box_unsigned_cell" "boxer" set
     "unbox_unsigned_cell" "unboxer" set
 ] "ulong" define-primitive-type
@@ -108,8 +108,8 @@ math namespaces ;
         >r >r string>alien alien-address r> r>
         set-alien-unsigned-cell
     ] "setter" set
-    cell "width" set
-    cell "align" set
+    cell get "width" set
+    cell get "align" set
     "box_c_string" "boxer" set
     "unbox_c_string" "unboxer" set
 ] "char*" define-primitive-type
@@ -117,8 +117,8 @@ math namespaces ;
 [
     [ alien-unsigned-4 ] "getter" set
     [ set-alien-unsigned-4 ] "setter" set
-    cell "width" set
-    cell "align" set
+    cell get "width" set
+    cell get "align" set
     "box_utf16_string" "boxer" set
     "unbox_utf16_string" "unboxer" set
 ] "ushort*" define-primitive-type
@@ -126,8 +126,8 @@ math namespaces ;
 [
     [ alien-unsigned-4 0 = not ] "getter" set
     [ 1 0 ? set-alien-unsigned-4 ] "setter" set
-    cell "width" set
-    cell "align" set
+    cell get "width" set
+    cell get "align" set
     "box_boolean" "boxer" set
     "unbox_boolean" "unboxer" set
 ] "bool" define-primitive-type
@@ -135,8 +135,8 @@ math namespaces ;
 [
     [ alien-float ] "getter" set
     [ set-alien-float ] "setter" set
-    cell "width" set
-    cell "align" set
+    cell get "width" set
+    cell get "align" set
     "box_float" "boxer" set
     "unbox_float" "unboxer" set
     T{ float-regs f 4 } "reg-class" set
@@ -145,8 +145,8 @@ math namespaces ;
 [
     [ alien-double ] "getter" set
     [ set-alien-double ] "setter" set
-    cell 2 * "width" set
-    cell 2 * "align" set
+    cell get 2 * "width" set
+    cell get 2 * "align" set
     "box_double" "boxer" set
     "unbox_double" "unboxer" set
     T{ float-regs f 8 } "reg-class" set

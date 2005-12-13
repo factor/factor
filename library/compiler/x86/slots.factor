@@ -42,7 +42,7 @@ M: %set-slot generate-node ( vop -- )
 M: %fast-set-slot generate-node ( vop -- )
     drop 1 input-operand 2 input 2array 0 input-operand MOV ;
 
-: userenv@ ( n -- addr ) cell * "userenv" f dlsym + ;
+: userenv@ ( n -- addr ) cells "userenv" f dlsym + ;
 
 M: %getenv generate-node ( vop -- )
     drop

@@ -1,6 +1,13 @@
 ! Copyright (C) 2004, 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
-IN: sdl USING: alien ;
+IN: sdl
+USING: alien kernel ;
+
+{
+    { [ os "macosx" = ] [ ] }
+    { [ os "win32" = ] [ "sdl" "sdl.dll" "cdecl" add-library ] }
+    { [ t ] [ "sdl" "libSDL.so" "cdecl" add-library ] }
+} cond
 
 : SDL_INIT_TIMER        HEX: 00000001 ;
 : SDL_INIT_AUDIO        HEX: 00000010 ;

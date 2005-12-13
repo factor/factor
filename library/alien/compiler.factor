@@ -67,7 +67,7 @@ C: alien-node make-node ;
 
 : parameters alien-node-parameters reverse ;
 
-: c-aligned c-size cell align ;
+: c-aligned c-size cell get align ;
 
 : stack-space ( parameters -- n )
     0 [ c-aligned + ] reduce ;

@@ -1,18 +1,21 @@
 ! Copyright (C) 2004, 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: image
-USING: arrays alien generic hashtables io kernel
-kernel-internals lists math namespaces sequences strings vectors
-words ;
+USING: alien arrays generic hashtables io kernel
+kernel-internals lists math namespaces parser sequences strings
+vectors words ;
 
 ! Some very tricky code creating a bootstrap embryo in the
 ! host image.
 
 "Creating primitives and basic runtime structures..." print
 
+H{ } clone c-types set
+"/library/alien/primitive-types.factor" parse-resource
+
 ! These symbols need the same hashcode in the target as in the
 ! host.
-{ vocabularies typemap builtins }
+{ vocabularies typemap builtins c-types cell }
 
 ! Bring up a bare cross-compiling vocabulary.
 "syntax" vocab
@@ -21,6 +24,9 @@ H{ } clone vocabularies set
 crossref off
 
 vocabularies get [ "syntax" set [ reveal ] each ] bind
+
+! Call the quotation parsed from primitive-types.factor
+call
 
 : make-primitive ( { vocab word } n -- )
     >r first2 create r> f define ;

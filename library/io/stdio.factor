@@ -15,9 +15,6 @@ styles ;
 : terpri ( -- )              stdio get stream-terpri ;
 : close  ( -- )              stdio get stream-close ;
 
-: write-object ( string object -- )
-    presented associate format ;
-
 : write-outliner ( string object quot -- )
     [ outline set presented set ] make-hash format terpri ;
 

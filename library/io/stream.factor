@@ -34,24 +34,11 @@ GENERIC: set-timeout   ( timeout stream -- )
     [ 2dup (stream-copy) ] [ stream-close stream-close ] cleanup ;
 
 ! Think '/dev/null'.
-TUPLE: null-stream ;
-M: null-stream stream-flush drop ;
-M: null-stream stream-finish drop ;
-M: null-stream stream-readln drop f ;
-M: null-stream stream-read 2drop f ;
-M: null-stream stream-read1 drop f ;
-M: null-stream stream-write1 2drop ;
-M: null-stream stream-format 3drop ;
-M: null-stream stream-close drop ;
-
-! Sometimes, we want to have a delegating stream that uses stdio
-! words.
-TUPLE: wrapper-stream scope ;
-
-C: wrapper-stream ( stream -- stream )
-    2dup set-delegate [
-        >r stdio associate r> set-wrapper-stream-scope
-    ] keep ;
-
-: with-wrapper ( stream quot -- )
-    >r wrapper-stream-scope r> bind ; inline
+M: f stream-flush drop ;
+M: f stream-finish drop ;
+M: f stream-readln drop f ;
+M: f stream-read 2drop f ;
+M: f stream-read1 drop f ;
+M: f stream-write1 2drop ;
+M: f stream-format 3drop ;
+M: f stream-close drop ;

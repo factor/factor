@@ -15,7 +15,7 @@ M: %parameter generate-node
 GENERIC: reg-size ( reg-class -- n )
 GENERIC: push-reg ( reg-class -- )
 
-M: int-regs reg-size drop cell ;
+M: int-regs reg-size drop cell get ;
 M: int-regs push-reg drop EAX PUSH ;
 
 M: float-regs reg-size float-regs-size ;

@@ -1,43 +1,10 @@
 ! Copyright (C) 2004, 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
-USING: alien assembler compiler compiler-backend
-errors generic hashtables io io-internals kernel
+USING: compiler compiler-backend io io-internals kernel
 kernel-internals lists math memory namespaces optimizer parser
 sequences sequences-internals words ;
 
-"Loading compiler backend..." print
-
-cpu "x86" = [
-    "/library/compiler/x86/load.factor" run-resource
-] when
-
-cpu "ppc" = [
-    "/library/compiler/ppc/load.factor" run-resource
-] when
-
-cpu "amd64" = [
-    "/library/compiler/amd64/load.factor" run-resource
-] when
-
-"Loading more library code..." print
-
-[
-    "/library/alien/malloc.factor"
-    "/library/io/buffer.factor"
-
-    "/library/sdl/load.factor"
-    "/library/opengl/load.factor"
-    "/library/freetype/load.factor"
-    "/library/ui/load.factor"
-    "/library/help/load.factor"
-] [
-    run-resource
-] each
-
-! Handle -libraries:... overrides
-parse-command-line
-
-"compile" get supported-cpu? and [
+"compile" get [
     "native-io" get [
         unix? [
             "/library/unix/load.factor" run-resource
@@ -72,12 +39,9 @@ parse-command-line
 [
     boot
     run-user-init
-    "shell" get [ "shells" ] search execute
+    "shell" get "shells" lookup execute
     0 exit
 ] set-boot
-
-"Building cross-reference database..." print
-recrossref
 
 [ compiled? ] word-subset length
 number>string write " compiled words" print

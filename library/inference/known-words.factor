@@ -508,18 +508,4 @@ sequences strings vectors words prettyprint ;
 \ array>vector [ [ array ] [ vector ] ] "infer-effect" set-word-prop
 \ array>vector t "flushable" set-word-prop
 
-\ datastack [ [ ] [ vector ] ] "infer-effect" set-word-prop
-\ set-datastack [ [ vector ] [ ] ] "infer-effect" set-word-prop
-
-\ callstack [ [ ] [ vector ] ] "infer-effect" set-word-prop
-\ set-callstack [ [ vector ] [ ] ] "infer-effect" set-word-prop
-
-\ c-stack [
-    "c-stack cannot be compiled (yet)" throw
-] "infer" set-word-prop
-
-\ set-c-stack [
-    "set-c-stack cannot be compiled (yet)" throw
-] "infer" set-word-prop
-
 \ flush-icache [ [ ] [ ] ] "infer-effect" set-word-prop

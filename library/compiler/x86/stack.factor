@@ -4,7 +4,7 @@ IN: compiler-backend
 USING: alien arrays assembler compiler inference kernel
 kernel-internals lists math memory sequences words ;
 
-: reg-stack ( n reg -- op ) swap cell * neg 2array ;
+: reg-stack ( n reg -- op ) swap cells neg 2array ;
 
 M: ds-loc v>operand ds-loc-n ds-reg reg-stack ;
 
@@ -16,7 +16,7 @@ M: %peek generate-node ( vop -- )
 M: %replace generate-node ( vop -- )
     drop 0 output-operand 0 input-operand MOV ;
 
-: (%inc) 0 input cell * dup 0 > [ ADD ] [ neg SUB ] if ;
+: (%inc) 0 input cells dup 0 > [ ADD ] [ neg SUB ] if ;
 
 M: %inc-d generate-node ( vop -- ) drop ds-reg (%inc) ;
 
