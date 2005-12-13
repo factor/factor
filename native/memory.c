@@ -151,6 +151,7 @@ CELL clone(CELL obj)
 
 void primitive_clone(void)
 {
+	maybe_gc(0);
 	drepl(clone(dpeek()));
 }
 

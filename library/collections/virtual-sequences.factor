@@ -47,7 +47,7 @@ C: slice ( from to seq -- seq )
     >r 3dup check-slice r>
     [ set-slice-seq ] keep
     [ set-slice-to ] keep
-    [ set-slice-from ] keep ; inline
+    [ set-slice-from ] keep ;
 
 : <range> ( from to -- seq ) dup <slice> ; inline
 

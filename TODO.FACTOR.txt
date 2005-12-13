@@ -9,7 +9,6 @@
   io/buffer - use aliens not integers
   alien/malloc - use aliens not integers
   ui/line-editor - don't use variables
-- fix powerpc backend
 - <array> ( length initial )
 - <string> ( length initial )
 - remove repetitions
