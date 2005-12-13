@@ -7,7 +7,7 @@ void init_ffi (void)
 void ffi_dlopen (DLL *dll, bool error)
 {
 	HMODULE module;
-	char *path = to_c_string(untag_string(dll->path,true));
+	char *path = to_c_string(untag_string(dll->path),true);
 
 	module = LoadLibrary(path);
 

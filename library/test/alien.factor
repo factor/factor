@@ -46,3 +46,6 @@ cell 8 = [
       0 alien-signed-cell
     ] unit-test
 ] when
+
+[ "hello world" ]
+[ "hello world" string>alien alien>string ] unit-test
