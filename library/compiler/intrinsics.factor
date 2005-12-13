@@ -223,7 +223,7 @@ namespaces sequences words ;
 : negative-shift ( n -- )
     -1 %inc-d ,
     in-1
-    dup cell-bits neg * <= [
+    dup cell-bits neg <= [
         drop 0 <vreg> 2 <vreg> %fixnum-sgn ,
         T{ vreg f 2 } 0 %replace-d ,
     ] [
@@ -232,7 +232,7 @@ namespaces sequences words ;
     ] if ;
 
 : positive-shift ( n -- )
-    dup cell-bits * tag-bits - <= [
+    dup cell-bits tag-bits - <= [
         -1 %inc-d ,
         in-1
         0 <vreg> 0 <vreg> %fixnum<< ,
