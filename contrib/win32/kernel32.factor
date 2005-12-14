@@ -52,8 +52,8 @@ FUNCTION: DWORD GetLastError ( ) ;
 : GPTR HEX: 40 ; inline
 
 FUNCTION: HGLOBAL GlobalAlloc ( UINT uFlags, SIZE_T dwBytes ) ;
-! FUNCTION: LPVOID GlobalLock ( HGLOBAL hMem ) ;
-FUNCTION: char* GlobalLock ( HGLOBAL hMem ) ;
+FUNCTION: LPVOID GlobalLock ( HGLOBAL hMem ) ;
+! FUNCTION: char* GlobalLock ( HGLOBAL hMem ) ;
 FUNCTION: BOOL GlobalUnlock ( HGLOBAL hMem ) ;
 
 

@@ -123,8 +123,8 @@ TYPEDEF: BYTE                BOOLEAN
 TYPEDEF: DWORD               COLORREF
 TYPEDEF: ULONGLONG           DWORDLONG
 TYPEDEF: ULONG_PTR           DWORD_PTR
-TYPEDEF: uint                HANDLE
-! TYPEDEF: PVOID               HANDLE
+! TYPEDEF: uint                HANDLE
+TYPEDEF: PVOID               HANDLE
 TYPEDEF: HANDLE              HACCEL
 TYPEDEF: HANDLE              HBITMAP
 TYPEDEF: HANDLE              HBRUSH
