@@ -201,13 +201,12 @@ vectors words ;
             [ dup "x86" = ] [
                 {
                     "/library/compiler/x86/assembler.factor"
-                    "/library/compiler/amd64/assembler.factor"
-                    "/library/compiler/amd64/architecture.factor"
+                    "/library/compiler/x86/architecture.factor"
                     "/library/compiler/x86/generator.factor"
                     "/library/compiler/x86/slots.factor"
                     "/library/compiler/x86/stack.factor"
                     "/library/compiler/x86/fixnum.factor"
-                    "/library/compiler/amd64/alien.factor"
+                    "/library/compiler/x86/alien.factor"
                 }
             ]
         } {
@@ -236,7 +235,7 @@ vectors words ;
                 }
             ]
         }
-    } cond [ parse-resource % ] each
+    } cond [ parse-resource % ] each drop
     
     [
         "/library/bootstrap/boot-stage2.factor" run-resource

@@ -2,7 +2,7 @@
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: assembler
 USING: arrays compiler errors generic kernel kernel-internals
-lists math parser sequences words ;
+lists math namespaces parser sequences words ;
 
 ! A postfix assembler for x86 and AMD64.
 
@@ -23,29 +23,28 @@ M: object extended? drop f ;
 M: object operand-64? drop cell get 8 = ;
 
 ( Register operands -- eg, ECX                                 )
-: REGISTER:
-    CREATE dup define-symbol
-    dup scan-word "register" set-word-prop
-    scan-word "register-size" set-word-prop ; parsing
+: define-register ( symbol num size -- )
+    >r dupd "register" set-word-prop r>
+    "register-size" set-word-prop ;
 
 ! x86 registers
-REGISTER: AX 0 16
-REGISTER: CX 1 16
-REGISTER: DX 2 16
-REGISTER: BX 3 16
-REGISTER: SP 4 16
-REGISTER: BP 5 16
-REGISTER: SI 6 16
-REGISTER: DI 7 16
+SYMBOL: AX \ AX 0 16 define-register
+SYMBOL: CX \ CX 1 16 define-register
+SYMBOL: DX \ DX 2 16 define-register
+SYMBOL: BX \ BX 3 16 define-register
+SYMBOL: SP \ SP 4 16 define-register
+SYMBOL: BP \ BP 5 16 define-register
+SYMBOL: SI \ SI 6 16 define-register
+SYMBOL: DI \ DI 7 16 define-register
 
-REGISTER: EAX 0 32
-REGISTER: ECX 1 32
-REGISTER: EDX 2 32
-REGISTER: EBX 3 32
-REGISTER: ESP 4 32
-REGISTER: EBP 5 32
-REGISTER: ESI 6 32
-REGISTER: EDI 7 32
+SYMBOL: EAX \ EAX 0 32 define-register
+SYMBOL: ECX \ ECX 1 32 define-register
+SYMBOL: EDX \ EDX 2 32 define-register
+SYMBOL: EBX \ EBX 3 32 define-register
+SYMBOL: ESP \ ESP 4 32 define-register
+SYMBOL: EBP \ EBP 5 32 define-register
+SYMBOL: ESI \ ESI 6 32 define-register
+SYMBOL: EDI \ EDI 7 32 define-register
 
 PREDICATE: word register "register" word-prop ;
 

@@ -25,7 +25,7 @@ M: %replace generate-node ( vop -- )
     drop 0 input-operand 0 output loc>operand STW ;
 
 M: %inc-d generate-node ( vop -- )
-    drop 14 14 0 input cell * ADDI ;
+    drop 14 14 0 input cells ADDI ;
 
 M: %inc-r generate-node ( vop -- )
-    drop 15 15 0 input cell * ADDI ;
+    drop 15 15 0 input cells ADDI ;

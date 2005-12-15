@@ -139,4 +139,4 @@ IN: kernel-internals
 : float-tag   BIN: 101 ; inline
 : complex-tag BIN: 110 ; inline
 
-: cell 17 getenv ; inline
+SYMBOL: cell

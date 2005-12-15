@@ -3,20 +3,19 @@
 IN: assembler
 
 ! AMD64 registers
-REGISTER: RAX 0 64
-REGISTER: RCX 1 64
-REGISTER: RDX 2 64
-REGISTER: RBX 3 64
-REGISTER: RSP 4 64
-REGISTER: RBP 5 64
-REGISTER: RSI 6 64
-REGISTER: RDI 7 64
-
-REGISTER: R8 8 64
-REGISTER: R9 9 64
-REGISTER: R10 10 64
-REGISTER: R11 11 64
-REGISTER: R12 12 64
-REGISTER: R13 13 64
-REGISTER: R14 14 64
-REGISTER: R15 15 64
+SYMBOL: RAX \ RAX 0  64 define-register
+SYMBOL: RCX \ RCX 1  64 define-register
+SYMBOL: RDX \ RDX 2  64 define-register
+SYMBOL: RBX \ RBX 3  64 define-register
+SYMBOL: RSP \ RSP 4  64 define-register
+SYMBOL: RBP \ RBP 5  64 define-register
+SYMBOL: RSI \ RSI 6  64 define-register
+SYMBOL: RDI \ RDI 7  64 define-register
+SYMBOL: R8  \ R8  8  64 define-register
+SYMBOL: R9  \ R9  9  64 define-register
+SYMBOL: R10 \ R10 10 64 define-register
+SYMBOL: R11 \ R11 11 64 define-register
+SYMBOL: R12 \ R12 12 64 define-register
+SYMBOL: R13 \ R13 13 64 define-register
+SYMBOL: R14 \ R14 14 64 define-register
+SYMBOL: R15 \ R15 15 64 define-register

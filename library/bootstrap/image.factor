@@ -317,13 +317,16 @@ M: hashtable ' ( hashtable -- pointer )
 ( Image output )
 
 : (write-image) ( image -- )
-    cell swap big-endian get [
+    cell get swap big-endian get [
         [ swap >be write ] each-with
     ] [
         [ swap >le write ] each-with
     ] if ;
 
-: write-image ( image file -- )
+: image-name
+    "boot.image." architecture get append ;
+
+: write-image ( image -- )
     "Writing image to " write dup write "..." print
     <file-writer> [ (write-image) ] with-stream ;
 
@@ -335,19 +338,16 @@ M: hashtable ' ( hashtable -- pointer )
     bootstrapping? on dup architecture set prepare-profile
     800000 <vector> image set 20000 <hashtable> objects set ;
 
-: <image> ( architecture -- image )
+: make-image ( architecture -- )
+    #! Make a bootstrap image for the given architecture
+    #! (x86, ppc, or amd64).
     [
         prepare-image
         begin-image
         "/library/bootstrap/boot-stage1.factor" run-resource
         end-image
-        image get
+        image get image-name write-image
     ] with-scope ;
-
-: make-image ( architecture -- )
-    #! Make a bootstrap image for the given architecture
-    #! (x86, ppc, or amd64).
-    dup <image> "boot.image." rot append write-image ;
 
 : make-images ( -- )
     "x86" make-image "ppc" make-image "amd64" make-image ;
