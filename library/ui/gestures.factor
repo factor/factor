@@ -34,6 +34,8 @@ SYMBOL: motion
 SYMBOL: drag
 SYMBOL: button-up
 SYMBOL: button-down
+SYMBOL: wheel-up
+SYMBOL: wheel-down
 SYMBOL: mouse-enter
 SYMBOL: mouse-leave
 

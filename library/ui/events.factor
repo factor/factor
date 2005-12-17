@@ -4,19 +4,24 @@ IN: gadgets
 USING: arrays alien gadgets-layouts generic kernel lists math
 namespaces sdl sequences strings freetype opengl ;
 
-M: object handle-event ( event -- )
-    drop ;
+M: object handle-event ( event -- ) drop ;
+
+: scroll-wheel? ( button -- ? ) { 4 5 } member? ;
 
 M: button-down-event handle-event ( event -- )
-    update-clicked
-    button-event-button dup
-    hand get hand-buttons push
-    [ button-down ] button-gesture ;
+    update-clicked button-event-button dup scroll-wheel? [
+        dup 4 = [ wheel-up ] [ wheel-down ] ?
+        hand get hand-clicked handle-gesture drop
+    ] [
+        dup hand get hand-buttons push
+        [ button-down ] button-gesture
+    ] if ;
 
 M: button-up-event handle-event ( event -- )
-    button-event-button dup
-    hand get hand-buttons delete
-    [ button-up ] button-gesture ;
+    button-event-button dup scroll-wheel? [
+        dup hand get hand-buttons delete
+        dup [ button-up ] button-gesture
+    ] unless drop ;
 
 : motion-event-loc ( event -- loc )
     dup motion-event-x swap motion-event-y 0 3array ;

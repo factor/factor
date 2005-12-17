@@ -10,11 +10,11 @@ namespaces sequences ;
     [ 2dup set-hand-clicked update-hand ] unless 2drop ;
 
 : retarget-click ( -- )
-    update-hand-gadget update-clicked ;
+    hide-glass update-hand-gadget update-clicked ;
 
 : menu-actions ( glass -- )
-    dup [ drop retarget-drag ] [ drag 1 ] set-action
-    [ drop hide-glass retarget-click ] [ button-down 1 ] set-action ;
+    dup [ drop retarget-drag ] [ drag ] set-action
+    [ drop retarget-click ] [ button-down ] set-action ;
 
 : fit-bounds ( loc dim max -- loc )
     #! Adjust loc to fit inside max.
@@ -40,7 +40,3 @@ namespaces sequences ;
 : <menu> ( assoc -- gadget )
     #! Given an association list mapping labels to quotations.
     menu-items <border> dup menu-theme ;
-
-: menu-button-actions ( gadget -- )
-    dup [ button-clicked ] [ button-down 1 ] set-action
-    [ button-update ] [ button-up 1 ] set-action ;

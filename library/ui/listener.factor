@@ -24,7 +24,7 @@ TUPLE: display title pane ;
 C: display ( -- display )
     dup delegate>frame
     "" <display-title> over add-display-title
-    f f <pane> 2dup swap set-display-pane
+    <pane> 2dup swap set-display-pane
     <scroller> over @center frame-add ;
 
 : present-stack ( seq title display -- )
@@ -66,7 +66,7 @@ C: display ( -- display )
     "" <label> dup status-theme ;
 
 : listener-application ( -- )
-    t t <pane> dup pane global set-hash
+    <input-pane> dup pane global set-hash
     <scroller> <stack-display>
     2/3 <y-splitter> set-application
     <status-bar> set-status

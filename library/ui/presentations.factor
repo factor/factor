@@ -22,11 +22,6 @@ kernel sequences strings styles ;
     [ ] [ >r dup dup r> <styled-label> init-commands ] ?if
     outline rot hash [ <outliner> ] when* ;
 
-: gadget. ( gadget -- )
-    gadget associate
-    "This stream does not support live gadgets"
-    swap format terpri ;
-
 UNION: gadget-stream pack paragraph ;
 
 M: gadget-stream stream-write ( string stream -- )

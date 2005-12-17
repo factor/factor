@@ -88,8 +88,8 @@ M: viewport focusable-child* ( viewport -- gadget )
 : scroll-down-line scroller-y 1 swap slide-by-line ;
 
 : scroller-actions ( scroller -- )
-    dup [ scroll-up-line ] [ button-down 4 ] set-action
-    dup [ scroll-down-line ] [ button-down 5 ] set-action
+    dup [ scroll-up-line ] [ wheel-up ] set-action
+    dup [ scroll-down-line ] [ wheel-down ] set-action
     [ scroller-viewport relayout-1 ] [ slider-changed ] set-action ;
 
 C: scroller ( gadget -- scroller )

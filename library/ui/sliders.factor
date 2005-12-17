@@ -49,9 +49,9 @@ SYMBOL: slider-changed
     swap set-slider-value* ;
 
 : thumb-actions ( thumb -- )
-    dup [ drop ] [ button-up 1 ] set-action
-    dup [ drop ] [ button-down 1 ] set-action
-    [ find-elevator elevator-drag ] [ drag 1 ] set-action ;
+    dup [ drop ] [ button-up ] set-action
+    dup [ drop ] [ button-down ] set-action
+    [ find-elevator elevator-drag ] [ drag ] set-action ;
 
 : <thumb> ( vector -- thumb )
     <gadget> [ set-gadget-orientation ] keep

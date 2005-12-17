@@ -96,7 +96,7 @@ TUPLE: editor line caret font color ;
     H{
         { [ gain-focus ] [ focus-editor ] }
         { [ lose-focus ] [ unfocus-editor ] }
-        { [ button-down 1 ] [ click-editor ] }
+        { [ button-down ] [ click-editor ] }
         { [ "BACKSPACE" ] [ [ T{ char-elt } delete-prev-elt ] with-editor ] }
         { [ "DELETE" ] [ [ T{ char-elt } delete-next-elt ] with-editor ] }
         { [ "CTRL" "BACKSPACE" ] [ [ T{ word-elt } delete-prev-elt ] with-editor ] }

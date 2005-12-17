@@ -16,20 +16,26 @@ TUPLE: hand click-loc click-rel clicked buttons gadget focus ;
 C: hand ( -- hand )
     dup delegate>gadget V{ } clone over set-hand-buttons ;
 
-: button-gesture ( button gesture -- )
-    swap add hand get hand-clicked handle-gesture drop ;
+: (button-gesture) ( buttons gesture -- )
+    swap hand get hand-clicked 3dup >r append r> handle-gesture
+    [ 3drop ] [ nip handle-gesture drop ] if ;
 
-: drag-gesture ( hand gadget gesture -- )
-    #! Send a gesture like [ drag 2 ].
-    rot hand-buttons first add swap handle-gesture drop ;
+: button-gesture ( button gesture -- )
+    #! Send a gesture like [ button-down 2 ]; if nobody
+    #! handles it, send [ button-down ].
+    >r unit r> (button-gesture) ;
+
+: drag-gesture ( -- )
+    #! Send a gesture like [ drag 2 ]; if nobody handles it,
+    #! send [ drag ].
+    hand get hand-buttons [ drag ] (button-gesture) ;
 
 : fire-motion ( hand -- )
     #! Fire a motion gesture to the gadget underneath the hand,
     #! and if a mouse button is down, fire a drag gesture to the
     #! gadget that was clicked.
     [ motion ] over hand-gadget handle-gesture drop
-    dup hand-buttons empty?
-    [ dup dup hand-clicked [ drag ] drag-gesture ] unless drop ;
+    hand-buttons empty? [ drag-gesture ] unless ;
 
 : each-gesture ( gesture seq -- )
     [ handle-gesture* drop ] each-with ;

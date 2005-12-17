@@ -30,8 +30,8 @@ M: string tutorial-line
 : example-theme
     T{ solid f { 0.8 0.8 1.0 1.0 } } swap set-gadget-interior ;
 
-M: general-list tutorial-line
-    car <input-button> dup example-theme ;
+! M: general-list tutorial-line
+!     car <input-button> dup example-theme ;
 
 : page-theme
     T{ gradient f { { 0.8 0.8 1.0 1.0 } { 1.0 0.8 1.0 1.0 } } }

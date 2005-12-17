@@ -30,8 +30,8 @@ TUPLE: button rollover? pressed? ;
 
 : button-gestures ( button quot -- )
     dupd [ action ] set-action
-    dup [ button-clicked ] [ button-up 1 ] set-action
-    dup [ button-update ] [ button-down 1 ] set-action
+    dup [ button-clicked ] [ button-up ] set-action
+    dup [ button-update ] [ button-down ] set-action
     dup [ button-update ] [ mouse-leave ] set-action
     [ button-update ] [ mouse-enter ] set-action ;
 
@@ -55,8 +55,8 @@ C: button ( gadget quot -- button )
     dup button-update remove-timer ;
 
 : repeat-actions ( button -- )
-    dup [ repeat-button-down ] [ button-down 1 ] set-action
-    [ repeat-button-up ] [ button-up 1 ] set-action ;
+    dup [ repeat-button-down ] [ button-down ] set-action
+    [ repeat-button-up ] [ button-up ] set-action ;
 
 : <repeat-button> ( gadget quot -- button )
     #! Button that calls the quotation every 100ms as long as
