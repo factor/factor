@@ -33,20 +33,3 @@ GENERIC: with-nested-stream ( style stream quot -- )
 
 : stream-copy ( in out -- )
     [ 2dup (stream-copy) ] [ stream-close stream-close ] cleanup ;
-
-! Think '/dev/null'.
-M: f stream-close drop ;
-M: f set-timeout drop ;
-
-M: f stream-readln drop f ;
-M: f stream-read1 drop f ;
-M: f stream-read 2drop f ;
-
-M: f stream-write1 2drop ;
-M: f stream-write 2drop ;
-M: f stream-terpri drop ;
-M: f stream-flush drop ;
-
-M: f stream-format 3drop ;
-M: f stream-break drop ;
-M: f with-nested-stream rot drop with-stream* ;
