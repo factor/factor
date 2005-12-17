@@ -1,9 +1,9 @@
 ! Copyright (C) 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: gadgets-presentations
-USING: arrays gadgets gadgets-labels gadgets-layouts
-gadgets-outliner gadgets-panes hashtables io kernel sequences
-strings styles ;
+USING: arrays gadgets gadgets-borders gadgets-labels
+gadgets-layouts gadgets-outliner gadgets-panes hashtables io
+kernel sequences strings styles ;
 
 : init-commands ( style gadget -- gadget )
     presented rot hash [ <command-button> ] when* ;
