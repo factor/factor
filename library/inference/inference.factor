@@ -19,9 +19,9 @@ TUPLE: inference-error message rstate data-stack call-stack ;
     <inference-error> throw ;
 
 M: inference-error error. ( error -- )
-    "! Inference error:" print
+    "Inference error:" print
     dup inference-error-message print
-    "! Recursive state:" print
+    "Recursive state:" print
     inference-error-rstate describe ;
 
 M: value literal-value ( value -- )

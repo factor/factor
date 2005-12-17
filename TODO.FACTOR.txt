@@ -1,5 +1,6 @@
 + 0.80:
 
+- zero-height gadgets mess up hit testing
 - make-image leaks memory
 - does parsing cons excessive amounts of bignums with c-streams
 - -with combinators are awkward

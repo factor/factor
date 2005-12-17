@@ -8,7 +8,7 @@ vectors words ;
 ! Some very tricky code creating a bootstrap embryo in the
 ! host image.
 
-"Creating primitives and basic runtime structures..." print
+"Creating primitives and basic runtime structures..." print flush
 
 H{ } clone c-types set
 "/library/alien/primitive-types.factor" parse-resource

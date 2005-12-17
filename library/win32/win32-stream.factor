@@ -119,8 +119,8 @@ M: string do-write ( str -- )
 : peek-input ( -- str )
     1 in-buffer get buffer-first-n ;
 
-M: win32-stream stream-format ( str style stream -- )
-    win32-stream-this nip [ do-write ] bind ;
+M: win32-stream stream-write ( str stream -- )
+    win32-stream-this [ do-write ] bind ;
 
 M: win32-stream stream-read ( count stream -- str )
     win32-stream-this [ dup <sbuf> swap do-read-count ] bind ;
@@ -132,9 +132,6 @@ M: win32-stream stream-read1 ( stream -- str )
 
 M: win32-stream stream-flush ( stream -- )
     win32-stream-this [ maybe-flush-output ] bind ;
-
-M: win32-stream stream-finish ( stream -- )
-    drop ;
 
 M: win32-stream stream-close ( stream -- )
     win32-stream-this [

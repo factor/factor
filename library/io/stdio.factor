@@ -4,16 +4,24 @@ IN: io
 USING: errors hashtables generic kernel namespaces strings
 styles ;
 
-: flush  ( -- )              stdio get stream-flush ;
+SYMBOL: stdio
+
+: close ( -- ) stdio get stream-close ;
+
 : readln ( -- string/f )     stdio get stream-readln ;
-: read1  ( -- char/f )       stdio get stream-read1 ;
-: read   ( count -- string ) stdio get stream-read ;
-: write  ( string -- )       stdio get stream-write ;
-: write1 ( char -- )         stdio get stream-write1 ;
+: read1 ( -- char/f )       stdio get stream-read1 ;
+: read ( count -- string ) stdio get stream-read ;
+
+: write1 ( char -- ) stdio get stream-write1 ;
+: write ( string -- ) stdio get stream-write ;
+: flush ( -- ) stdio get stream-flush ;
+
+: break ( -- ) stdio get stream-break ;
+: terpri ( -- ) stdio get stream-terpri ;
 : format ( string style -- ) stdio get stream-format ;
-: print  ( string -- )       stdio get stream-print ;
-: terpri ( -- )              stdio get stream-terpri ;
-: close  ( -- )              stdio get stream-close ;
+: with-nesting ( style quot -- ) stdio get with-nested-stream ;
+
+: print ( string -- ) stdio get stream-print ;
 
 : write-outliner ( string object quot -- )
     [ outline set presented set ] make-hash format terpri ;
@@ -26,7 +34,3 @@ styles ;
     #! Close the stream if there is an error.
     [ swap stdio set [ close rethrow ] recover ] with-scope ;
     inline
-
-: contents ( stream -- string )
-    #! Read the entire stream into a string.
-    4096 <sbuf> [ stream-copy ] keep >string ;

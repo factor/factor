@@ -234,7 +234,7 @@ M: port stream-read1 ( stream -- char/f )
     dup io-error ;
 
 : <writer> ( fd -- writer )
-    buffered-port output over set-port-type ;
+    buffered-port output over set-port-type <plain-writer> ;
 
 : write-step ( port -- )
     dup >port< dup buffer@ swap buffer-length write dup 0 >= [
@@ -283,8 +283,6 @@ M: port stream-flush ( stream -- )
     dup output check-port
     [ swap <write-task> add-write-io-task stop ] callcc0 drop ;
 
-M: port stream-finish ( stream -- ) output check-port ;
-
 : wait-to-write ( len port -- )
     tuck can-write? [ dup stream-flush ] unless pending-error ;
 
@@ -292,9 +290,9 @@ M: port stream-write1 ( char writer -- )
     dup output check-port
     1 over wait-to-write ch>buffer ;
 
-M: port stream-format ( string style writer -- )
+M: port stream-write ( string writer -- )
     dup output check-port
-    nip over length over wait-to-write >buffer ;
+    over length over wait-to-write >buffer ;
 
 M: port stream-close ( stream -- )
     dup port-type closed eq? [
@@ -307,8 +305,8 @@ M: port stream-close ( stream -- )
 
 ! Make a duplex stream for reading/writing a pair of fds
 
-: <fd-stream> ( infd outfd flush? -- stream )
-    >r >r <reader> r> <writer> r> <duplex-stream> ;
+: <fd-stream> ( infd outfd -- stream )
+    >r <reader> r> <writer> <duplex-stream> ;
 
 USE: io
 
@@ -320,5 +318,5 @@ USE: io
         FD_SETSIZE <c-object> read-fdset set
         H{ } clone write-tasks set
         FD_SETSIZE <c-object> write-fdset set
-        0 1 t <fd-stream> stdio set
+        0 1 <fd-stream> stdio set
     ] bind ;

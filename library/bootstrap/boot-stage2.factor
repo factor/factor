@@ -15,7 +15,7 @@ sequences sequences-internals words ;
         ] when
     ] when
 
-    "Compiling base..." print
+    "Compiling base..." print flush
 
     {
         uncons 1+ 1- + <= > >= mod length
@@ -24,15 +24,15 @@ sequences sequences-internals words ;
         kill-set kill-node (generate)
     } [ compile ] each
 
-    "Compiling system..." print
+    "Compiling system..." print flush
     compile-all
     
     terpri
     "Unless you're working on the compiler, ignore the errors above." print
     "Not every word compiles, by design." print
-    terpri
+    terpri flush
     
-    "Initializing native I/O..." print
+    "Initializing native I/O..." print flush
     "native-io" get [ init-io ] when
 ] when
 
@@ -56,7 +56,7 @@ number>string write " words total" print
 number>string write " ms" print
 
 "Bootstrapping is complete." print
-"Now, you can run ./f factor.image" print
+"Now, you can run ./f factor.image" print flush
 
 "factor.image" save-image
 0 exit

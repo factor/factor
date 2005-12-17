@@ -301,13 +301,13 @@ M: hashtable ' ( hashtable -- pointer )
 : heap-size image get length header-size - cells ;
 
 : end-image ( quot -- )
-    "Generating words..." print
+    "Generating words..." print flush
     words,
-    "Generating global namespace..." print
+    "Generating global namespace..." print flush
     global,
-    "Generating boot quotation..." print
+    "Generating boot quotation..." print flush
     boot,
-    "Performing some word fixups..." print
+    "Performing some word fixups..." print flush
     fixup-words
     heap-size heap-size-offset fixup
     "Image length: " write image get length .
@@ -327,7 +327,7 @@ M: hashtable ' ( hashtable -- pointer )
     "boot.image." architecture get append ;
 
 : write-image ( image -- )
-    "Writing image to " write dup write "..." print
+    "Writing image to " write dup write "..." print flush
     <file-writer> [ (write-image) ] with-stream ;
 
 : prepare-profile ( arch -- )

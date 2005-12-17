@@ -2,14 +2,10 @@
 ! stream more often.
 USING: io kernel ;
 
-TUPLE: duplex-stream in out flush? ;
+TUPLE: duplex-stream in out ;
 
 M: duplex-stream stream-flush
     duplex-stream-out stream-flush ;
-
-M: duplex-stream stream-finish
-    dup duplex-stream-flush?
-    [ duplex-stream-out stream-flush ] [ drop ] if ;
 
 M: duplex-stream stream-readln
     duplex-stream-in stream-readln ;
@@ -23,8 +19,20 @@ M: duplex-stream stream-read
 M: duplex-stream stream-write1
     duplex-stream-out stream-write1 ;
 
+M: duplex-stream stream-write
+    duplex-stream-out stream-write ;
+
+M: duplex-stream stream-break
+    duplex-stream-out stream-break ;
+
+M: duplex-stream stream-terpri
+    duplex-stream-out stream-terpri ;
+
 M: duplex-stream stream-format
     duplex-stream-out stream-format ;
+
+M: duplex-stream with-nested-stream
+    duplex-stream-out with-nested-stream ;
 
 M: duplex-stream stream-close
     #! The output stream is closed first, in case both streams

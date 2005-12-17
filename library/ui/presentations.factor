@@ -2,10 +2,10 @@
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: gadgets-presentations
 USING: arrays compiler gadgets gadgets-buttons gadgets-labels
-gadgets-menus gadgets-outliner gadgets-panes gadgets-theme
-generic hashtables inference inspector io jedit kernel lists
-memory namespaces parser prettyprint sequences strings styles
-words ;
+gadgets-layouts gadgets-menus gadgets-outliner gadgets-panes
+gadgets-theme generic hashtables inference inspector io jedit
+kernel lists memory namespaces parser prettyprint sequences
+strings styles words ;
 
 SYMBOL: commands
 
@@ -62,6 +62,26 @@ M: command-button gadget-help ( button -- string )
     gadget associate
     "This stream does not support live gadgets"
     swap format terpri ;
+
+UNION: gadget-stream pack paragraph ;
+
+M: gadget-stream stream-write ( string stream -- )
+    over empty? [ 2drop ] [ >r <label> r> add-gadget ] if ;
+
+M: gadget-stream stream-write1 ( char stream -- )
+    >r ch>string r> stream-write ;
+
+M: gadget-stream stream-format ( string style stream -- )
+    pick empty? pick hash-empty? and [
+        3drop
+    ] [
+        >r swap <presentation> r> add-gadget
+    ] if ;
+
+M: gadget-stream stream-break ( stream -- )
+    <break> swap add-gadget ;
+
+M: gadget-stream stream-close ( stream -- ) drop ;
 
 [ drop t ] "Prettyprint" [ . ] define-command
 [ drop t ] "Describe" [ describe ] define-command

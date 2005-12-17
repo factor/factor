@@ -17,7 +17,7 @@ USING: errors io kernel lists math namespaces sequences words ;
 : parse-stream ( stream name -- quot )
     [ file set file-vocabs lines parse-lines ] with-scope ;
 
-: parsing-file ( file -- ) "Loading " write print ;
+: parsing-file ( file -- ) "Loading " write print flush ;
 
 : parse-file ( file -- quot )
     dup parsing-file

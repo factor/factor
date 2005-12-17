@@ -114,7 +114,8 @@ M: object error. ( error -- ) . ;
 
 : debug-help ( -- )
     ":s :r show stacks at time of error." print
-    ":get ( var -- value ) inspects the error namestack." print ;
+    ":get ( var -- value ) inspects the error namestack." print
+    flush ;
 
 : flush-error-handler ( -- )
     #! Last resort.

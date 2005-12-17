@@ -5,7 +5,7 @@ USING: errors generic hashtables io kernel kernel-internals
 lists math memory namespaces parser prettyprint sequences
 vectors words ;
 
-"Bootstrap stage 1..." print
+"Bootstrap stage 1..." print flush
 
 "/library/bootstrap/primitives.factor" run-resource
 
@@ -63,6 +63,7 @@ vectors words ;
         "/library/io/stream.factor"
         "/library/io/duplex-stream.factor"
         "/library/io/stdio.factor"
+        "/library/io/plain-stream.factor"
         "/library/io/lines.factor"
         "/library/io/string-streams.factor"
         "/library/io/c-streams.factor"

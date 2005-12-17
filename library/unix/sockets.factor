@@ -7,9 +7,6 @@ IN: io-internals
 USING: alien errors generic io kernel math namespaces parser
 threads unix-internals ;
 
-: <socket-stream> ( fd -- stream )
-    dup f <fd-stream> ;
-
 : init-sockaddr ( port -- sockaddr )
     <sockaddr-in>
     [ AF_INET swap set-sockaddr-in-family ] keep
@@ -55,13 +52,13 @@ threads unix-internals ;
 IN: io
 
 C: client-stream ( host port fd -- stream )
-    [ >r <socket-stream> r> set-delegate ] keep
+    [ >r dup <fd-stream> r> set-delegate ] keep
     [ set-client-stream-port ] keep
     [ set-client-stream-host ] keep ;
 
 : <client> ( host port -- stream )
     #! Connect to a port number on a TCP/IP host.
-    client-socket <socket-stream> ;
+    client-socket dup <fd-stream> ;
 
 TUPLE: server client ;
 

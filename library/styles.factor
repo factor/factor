@@ -12,6 +12,8 @@ IN: styles
 : green      { 0.0 1.0 0.0 1.0 } ;
 : blue       { 0.0 0.0 1.0 1.0 } ;
 
+! Character styles
+
 SYMBOL: foreground ! Used for text and outline shapes.
 SYMBOL: background ! Used for filled shapes.
 
@@ -31,3 +33,9 @@ SYMBOL: file
 
 ! A quotation that writes an outline expansion to stdio
 SYMBOL: outline
+
+! Paragraph styles
+SYMBOL: border-color
+SYMBOL: border-width
+SYMBOL: padding
+SYMBOL: word-wrap

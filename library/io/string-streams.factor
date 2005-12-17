@@ -5,14 +5,17 @@ USING: io kernel math namespaces sequences strings ;
 
 ! String buffers support the stream output protocol.
 M: sbuf stream-write1 push ;
-M: sbuf stream-format rot nappend drop ;
+M: sbuf stream-write swap nappend ;
 M: sbuf stream-close drop ;
 M: sbuf stream-flush drop ;
-M: sbuf stream-finish drop ;
+
+: <string-writer> ( -- stream )
+    512 <sbuf> <plain-writer> ;
 
 : string-out ( quot -- str )
-    [ 512 <sbuf> stdio set call stdio get >string ] with-scope ;
-    inline
+    [
+        <string-writer> stdio set call stdio get >string
+    ] with-scope ; inline
 
 ! Reversed string buffers support the stream input protocol.
 M: sbuf stream-read1 ( sbuf -- char/f )
@@ -30,4 +33,8 @@ M: sbuf stream-read ( count sbuf -- string )
     <reversed> >sbuf <line-reader> ;
 
 : string-in ( str quot -- )
-    [ swap <string-reader> stdio set call ] with-scope ; inline
+    >r <string-reader> r> with-stream ; inline
+
+: contents ( stream -- string )
+    #! Read the entire stream into a string.
+    <string-writer> [ stream-copy ] keep >string ;

@@ -21,7 +21,7 @@ M: assert error.
     #! Evaluates the given code and prints the time taken to
     #! execute it.
     millis >r gc-time >r call gc-time r> - millis r> -
-    [ # " ms run / " % # " ms GC time" % ] "" make print ;
+    [ # " ms run / " % # " ms GC time" % ] "" make print flush ;
 
 : unit-test ( output input -- )
     [
@@ -52,7 +52,7 @@ SYMBOL: failures
 
 : test ( name -- ? )
     [
-        "=====> " write dup write "..." print
+        "=====> " write dup write "..." print flush
         test-path [
             [ [ run-resource ] with-scope ] keep
         ] assert-depth drop
