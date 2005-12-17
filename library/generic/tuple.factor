@@ -32,7 +32,7 @@ vectors words ;
 : check-shape ( word slots -- )
     #! If the new list of slots is different from the previous,
     #! forget the old definition.
-    >r "in" get lookup dup [
+    >r in get lookup dup [
         dup "tuple-size" word-prop r> length 2 + =
         [ drop ] [ forget-tuple ] if
     ] [
@@ -49,7 +49,7 @@ vectors words ;
     define-slots ;
 
 : tuple-constructor ( class -- word )
-    word-name "in" get constructor-word dup save-location ;
+    word-name in get constructor-word dup save-location ;
 
 PREDICATE: word tuple-class "tuple-size" word-prop ;
 

@@ -262,6 +262,10 @@ M: hashtable = ( obj hash -- ? )
     #! Add all key/value pairs from hash2 to hash1.
     [ swap rot set-hash ] hash-each-with ;
 
+: hash-concat ( seq -- hash )
+    #! Combine a sequence of hashtables into one hashtable.
+    H{ } clone swap [ dupd hash-update ] each ;
+
 : hash-union ( hash1 hash2 -- hash1\/hash2 )
     #! Make a new hashtable with all key/value pairs from
     #! hash1 and hash2. Values in hash2 take precedence.

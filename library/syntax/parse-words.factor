@@ -1,8 +1,8 @@
 ! Copyright (C) 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: parser
-USING: errors hashtables kernel lists math namespaces sequences
-io strings words ;
+USING: errors hashtables io kernel lists math namespaces
+sequences strings vectors words ;
 
 ! The parser uses a number of variables:
 ! line - the line being parsed
@@ -14,14 +14,28 @@ io strings words ;
 ! of vocabularies. If it is a parsing word, it is executed
 ! immediately. Otherwise it is appended to the parse tree.
 
-SYMBOL: line-number
+SYMBOL: use
+SYMBOL: in
 
-: use+ ( string -- ) "use" [ cons ] change ;
+: check-vocab ( name -- vocab )
+    dup vocab
+    [ ] [ " is not a vocabulary name" append throw ] ?if ;
+
+: use+ ( string -- )
+    #! Add a vocabulary to the search path.
+    check-vocab use get push ;
+
+: set-use ( seq -- )
+    [ check-vocab ] map >vector use set ;
+
+: set-in ( name -- )
+    dup ensure-vocab dup in set use+ ;
 
 : parsing? ( word -- ? )
     dup word? [ "parsing" word-prop ] [ drop f ] if ;
 
 SYMBOL: file
+SYMBOL: line-number
 
 : skip ( i seq quot -- n | quot: elt -- ? )
     over >r find* drop dup -1 =
@@ -48,7 +62,7 @@ SYMBOL: file
     dup "col" get "col"  set-word-prop
     file get "file" set-word-prop ;
 
-: create-in "in" get create dup save-location ;
+: create-in in get create dup save-location ;
 
 : CREATE ( -- word ) scan create-in ;
 
@@ -60,7 +74,7 @@ global [ string-mode off ] bind
 : scan-word ( -- obj )
     scan dup [
         dup ";" = not string-mode get and [
-            dup "use" get search [ ] [ string>number ] ?if
+            dup use get hash-stack [ ] [ string>number ] ?if
         ] unless
     ] when ;
 
@@ -150,3 +164,16 @@ global [ string-mode off ] bind
     "col" [
         [ "line" get (parse-string) ] "" make swap
     ] change ;
+
+global [
+    {
+        "scratchpad"
+        "syntax" "arrays" "compiler" "errors" "generic" "hashtables"
+        "help" "inference" "inspector" "interpreter" "io"
+        "jedit" "kernel" "listener" "lists" "math"
+        "memory" "namespaces" "parser" "prettyprint" "queues"
+        "sequences" "shells" "strings" "styles"
+        "test" "threads" "vectors" "words"
+    } set-use
+    "scratchpad" set-in
+] bind

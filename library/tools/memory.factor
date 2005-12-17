@@ -3,7 +3,7 @@
 IN: memory
 USING: arrays errors generic hashtables io kernel
 kernel-internals lists math namespaces parser prettyprint
-sequences strings unparser vectors words ;
+sequences strings vectors words ;
 
 : generations ( -- n ) 15 getenv ;
 

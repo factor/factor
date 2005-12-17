@@ -2,7 +2,7 @@
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: jedit
 USING: arrays errors io kernel listener lists math namespaces
-parser prettyprint sequences strings unparser words ;
+parser prettyprint sequences strings words ;
 
 ! Some words to send requests to a running jEdit instance to
 ! edit files and position the cursor on a specific line number.
@@ -83,6 +83,9 @@ parser prettyprint sequences strings unparser words ;
 ! The telnet server is for the jEdit plugin.
 : telnetd ( port -- )
     \ telnetd [ print-banner listener ] with-server ;
+
+: search ( name vocabs -- word )
+    dupd [ lookup ] find-with nip lookup ;
 
 IN: shells
 

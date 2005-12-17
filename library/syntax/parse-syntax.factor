@@ -96,7 +96,7 @@ SYMBOL: t
     #! Followed by a word name. The word is removed from its
     #! vocabulary. Note that specifying an undefined word is a
     #! no-op.
-    scan "use" get search [ forget ] when* ; parsing
+    scan use get hash-stack [ forget ] when* ; parsing
 
 : USE:
     #! Add vocabulary to search path.
@@ -110,7 +110,7 @@ SYMBOL: t
 
 : IN:
     #! Set vocabulary for new definitions.
-    scan dup use+ "in" set ; parsing
+    scan set-in ; parsing
 
 ! Char literal
 : CHAR: ( -- ) 0 scan next-char drop swons ; parsing

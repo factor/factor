@@ -2,7 +2,7 @@
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: words
 USING: interpreter inspector io kernel lists math namespaces
-prettyprint sequences strings test ;
+prettyprint sequences strings ;
 
 ! The annotation words let you flag a word for either tracing
 ! or single-stepping. Note that currently, words referring to

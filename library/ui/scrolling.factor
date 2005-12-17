@@ -1,8 +1,8 @@
 ! Copyright (C) 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: gadgets-scrolling
-USING: arrays gadgets gadgets-books gadgets-layouts generic kernel
-lists math namespaces sequences styles threads ;
+USING: arrays gadgets gadgets-layouts kernel math namespaces
+sequences ;
 
 ! A viewport can be scrolled.
 TUPLE: viewport ;

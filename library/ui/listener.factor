@@ -7,8 +7,8 @@ IN: gadgets-listener
 USING: gadgets gadgets-editors gadgets-labels gadgets-layouts
 gadgets-panes gadgets-presentations gadgets-scrolling
 gadgets-splitters gadgets-theme generic hashtables help
-inspector io kernel listener lists math namespaces prettyprint
-sdl sequences shells styles threads words ;
+inspector io kernel listener lists math namespaces parser
+prettyprint sdl sequences shells styles threads words ;
 
 SYMBOL: datastack-display
 SYMBOL: callstack-display
@@ -39,7 +39,7 @@ C: display ( -- display )
     callstack-hook get call callstack-display get present-stack ;
 
 : usable-words ( -- words )
-    "use" get prune [ words ] map concat ;
+    use get hash-concat hash-keys ;
 
 : word-completion ( -- )
     usable-words [ word-name ] map

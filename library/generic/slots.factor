@@ -40,11 +40,10 @@ parser sequences strings words ;
     [ first3 define-slot ] each-with ;
 
 : reader-word ( class name -- word )
-    >r word-name "-" r> append3 "in" get 2array ;
+    >r word-name "-" r> append3 in get 2array ;
 
 : writer-word ( class name -- word )
-    [ swap "set-" % word-name % "-" % % ] "" make
-    "in" get 2array ;
+    [ swap "set-" % word-name % "-" % % ] "" make in get 2array ;
 
 : simple-slot ( class name -- reader writer )
     [ reader-word ] 2keep writer-word ;

@@ -38,4 +38,4 @@ sequences strings words ;
         cell get "align" set
         [ swap <displaced-alien> ] "getter" set
     ] "struct-name" get define-c-type
-    "struct-name" get "in" get init-c-type ;
+    "struct-name" get in get init-c-type ;

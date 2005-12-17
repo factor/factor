@@ -1,8 +1,7 @@
 ! Copyright (C) 2004, 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: io-internals
-USING: errors kernel kernel-internals namespaces io
-strings threads ;
+USING: errors kernel kernel-internals namespaces io strings ;
 
 ! Simple wrappers for ANSI C I/O functions, used for
 ! bootstrapping only.

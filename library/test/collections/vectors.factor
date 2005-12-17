@@ -1,6 +1,6 @@
 IN: temporary
 USING: errors kernel kernel-internals lists math namespaces
-random sequences sequences-internals strings test vectors ;
+sequences sequences-internals strings test vectors ;
 
 [ ] [ 10 [ [ -1000000 <vector> ] catch drop ] times ] unit-test
 

@@ -4,8 +4,7 @@ IN: parser
 USING: errors io kernel lists math namespaces sequences words ;
 
 : file-vocabs ( -- )
-    "scratchpad" "in" set
-    [ "syntax" "scratchpad" ] "use" set ;
+    "scratchpad" set-in { "syntax" "scratchpad" } set-use ;
 
 : parse-lines ( lines -- quot )
     [

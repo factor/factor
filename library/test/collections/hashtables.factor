@@ -190,3 +190,8 @@ H{ } clone "cache-test" set
 ] unit-test
 
 [ { 1 3 } ] [ H{ { 2 2 } } { 1 2 3 } remove-all ] unit-test
+
+[ H{ } ] [ { } hash-concat ] unit-test
+[ H{ } ] [ { H{ } } hash-concat ] unit-test
+[ H{ { 1 2 } } ] [ { H{ { 1 2 } } } hash-concat ] unit-test
+[ H{ { 1 2 } { 3 4 } } ] [ { H{ { 1 2 } } H{ { 3 4 } } } hash-concat ] unit-test

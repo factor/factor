@@ -175,9 +175,6 @@ DEFER: agent
 [ { 0 2 } ]
 [ [ [ drop ] 0 agent ] infer ] unit-test
 
-! : no-base-case-1 dup [ no-base-case-1 ] [ no-base-case-1 ] if ;
-! [ [ no-base-case-1 ] infer ] unit-test-fails
-
 : no-base-case-2 no-base-case-2 ;
 [ [ no-base-case-2 ] infer ] unit-test-fails
 
@@ -213,6 +210,12 @@ DEFER: blah4
     ] if ; inline
 
 [ [ [ 1 ] [ ] bad-combinator ] infer ] unit-test-fails
+
+! Regression
+DEFER: do-crap
+: more-crap dup [ drop ] [ dup do-crap call ] if ;
+: do-crap dup [ do-crap ] [ more-crap ] if ;
+[ [ do-crap ] infer ] unit-test-fails
 
 [ { 2 1 } ] [ [ swons ] infer ] unit-test
 [ { 1 2 } ] [ [ uncons ] infer ] unit-test
@@ -275,3 +278,6 @@ DEFER: blah4
 ! This hangs
 
 ! [ ] [ [ [ dup call ] dup call ] infer ] unit-test-fails
+
+! : no-base-case-1 dup [ no-base-case-1 ] [ no-base-case-1 ] if ;
+! [ [ no-base-case-1 ] infer ] unit-test-fails

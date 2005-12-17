@@ -1,8 +1,8 @@
 ! Copyright (C) 2004, 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: words
-USING: hashtables errors kernel lists namespaces strings
-sequences ;
+USING: errors hashtables kernel lists namespaces sequences
+strings ;
 
 ! If true in current namespace, we are bootstrapping.
 SYMBOL: bootstrapping?
@@ -19,6 +19,10 @@ SYMBOL: vocabularies
 : vocab ( name -- vocab )
     #! Get a vocabulary.
     vocabularies get hash ;
+
+: ensure-vocab ( name -- )
+    #! Create the vocabulary if it does not exist.
+    vocabularies get [ nest drop ] bind ;
 
 : words ( vocab -- list )
     #! Push a list of all words in a vocabulary.
@@ -44,9 +48,6 @@ SYMBOL: vocabularies
     crossref get clear-hash [ add-crossref ] each-word ;
 
 : lookup ( name vocab -- word ) vocab ?hash ;
-
-: search ( name vocabs -- word )
-    dupd [ lookup ] find-with nip lookup ;
 
 : reveal ( word -- )
     #! Add a new word to its vocabulary.
@@ -86,14 +87,3 @@ SYMBOL: vocabularies
     bootstrapping? get [
         dup "syntax" = [ drop "!syntax" ] when
     ] when lookup ;
-
-"scratchpad" "in" set
-[
-    "scratchpad"
-    "syntax" "arrays" "compiler" "errors" "generic" "hashtables"
-    "help" "inference" "inspector" "interpreter" "io"
-    "jedit" "kernel" "listener" "lists" "math"
-    "memory" "namespaces" "parser" "prettyprint" "queues"
-    "sequences" "shells" "strings" "styles"
-    "test" "threads" "vectors" "words"
-] "use" set

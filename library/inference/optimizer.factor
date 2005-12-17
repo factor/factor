@@ -2,7 +2,7 @@
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: optimizer
 USING: compiler-backend generic hashtables inference kernel
-lists math matrices namespaces sequences vectors ;
+lists math namespaces sequences vectors ;
 
 ! We use the recursive-state variable here, to track nested
 ! label scopes, to prevent infinite loops when inlining

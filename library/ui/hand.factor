@@ -1,8 +1,7 @@
 ! Copyright (C) 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: gadgets
-USING: alien generic io kernel lists math matrices namespaces
-prettyprint sequences vectors ;
+USING: kernel math namespaces sequences ;
 
 ! The hand is a special gadget that holds mouse position and
 ! mouse button click state.
@@ -16,19 +15,16 @@ TUPLE: hand click-loc click-rel clicked buttons gadget focus ;
 C: hand ( -- hand )
     dup delegate>gadget V{ } clone over set-hand-buttons ;
 
-: (button-gesture) ( buttons gesture -- )
-    swap hand get hand-clicked 3dup >r append r> handle-gesture
-    [ nip handle-gesture drop ] [ 3drop ] if ;
-
-: button-gesture ( button gesture -- )
+: button-gesture ( buttons gesture -- )
     #! Send a gesture like [ button-down 2 ]; if nobody
     #! handles it, send [ button-down ].
-    >r unit r> (button-gesture) ;
+    swap hand get hand-clicked 3dup >r add r> handle-gesture
+    [ nip handle-gesture drop ] [ 3drop ] if ;
 
 : drag-gesture ( -- )
     #! Send a gesture like [ drag 2 ]; if nobody handles it,
     #! send [ drag ].
-    hand get hand-buttons [ drag ] (button-gesture) ;
+    hand get hand-buttons first [ drag ] button-gesture ;
 
 : fire-motion ( hand -- )
     #! Fire a motion gesture to the gadget underneath the hand,

@@ -46,7 +46,7 @@ SYMBOL: margin
     [
         swap dup init-wrap
         gadget-children [ wrap-step ] each-with wrap-dim
-    ] with-scope ;
+    ] with-scope ; inline
 
 M: paragraph pref-dim ( paragraph -- dim )
     [ 2drop ] do-wrap ;
