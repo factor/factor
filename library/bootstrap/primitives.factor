@@ -283,12 +283,12 @@ num-types <array> builtins set
 "fixnum?" "math" create t "inline" set-word-prop
 "fixnum" "math" create 0 "fixnum?" "math" create { } define-builtin
 "fixnum" "math" create 0 "math-priority" set-word-prop
-"fixnum" "math" create ">fixnum" [ "math" ] search unit "coercer" set-word-prop
+"fixnum" "math" create ">fixnum" "math" lookup unit "coercer" set-word-prop
 
 "bignum?" "math" create t "inline" set-word-prop
 "bignum" "math" create 1 "bignum?" "math" create { } define-builtin
 "bignum" "math" create 1 "math-priority" set-word-prop
-"bignum" "math" create ">bignum" [ "math" ] search unit "coercer" set-word-prop
+"bignum" "math" create ">bignum" "math" lookup unit "coercer" set-word-prop
 
 "cons?" "lists" create t "inline" set-word-prop
 "cons" "lists" create 2 "cons?" "lists" create
@@ -302,7 +302,7 @@ num-types <array> builtins set
 "float?" "math" create t "inline" set-word-prop
 "float" "math" create 5 "float?" "math" create { } define-builtin
 "float" "math" create 3 "math-priority" set-word-prop
-"float" "math" create ">float" [ "math" ] search unit "coercer" set-word-prop
+"float" "math" create ">float" "math" lookup unit "coercer" set-word-prop
 
 "complex?" "math" create t "inline" set-word-prop
 "complex" "math" create 6 "complex?" "math" create

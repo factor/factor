@@ -26,6 +26,7 @@ SYMBOL: in
     check-vocab use get push ;
 
 : set-use ( seq -- )
+    #! Convert to a later so we can push later.
     [ check-vocab ] map >vector use set ;
 
 : set-in ( name -- )
@@ -37,12 +38,15 @@ SYMBOL: in
 SYMBOL: file
 SYMBOL: line-number
 
+SYMBOL: line-text
+SYMBOL: column
+
 : skip ( i seq quot -- n | quot: elt -- ? )
     over >r find* drop dup -1 =
     [ drop r> length ] [ r> drop ] if ; inline
 
 : skip-blank ( -- )
-    "col" [ "line" get [ blank? not ] skip ] change ;
+    column [ line-text get [ blank? not ] skip ] change ;
 
 : skip-word ( n line -- n )
     2dup nth CHAR: " = [ drop 1+ ] [ [ blank? ] skip ] if ;
@@ -52,14 +56,13 @@ SYMBOL: line-number
 
 : scan ( -- token )
     skip-blank
-    "col" [ "line" get (scan) dup ] change
-    2dup = [ 2drop f ] [ "line" get subseq ] if ;
+    column [ line-text get (scan) dup ] change
+    2dup = [ 2drop f ] [ line-text get subseq ] if ;
 
 : save-location ( word -- )
     #! Remember where this word was defined.
     dup set-word
     dup line-number get "line" set-word-prop
-    dup "col" get "col"  set-word-prop
     file get "file" set-word-prop ;
 
 : create-in in get create dup save-location ;
@@ -80,16 +83,17 @@ global [ string-mode off ] bind
 
 ! Used by parsing words
 : ch-search ( ch -- index )
-    "col" get "line" get index* ;
+    column get line-text get index* ;
 
 : (until) ( index -- str )
-    "col" get swap dup 1+ "col" set "line" get subseq ;
+    column [ swap dup 1+ ] change line-text get subseq ;
 
 : until ( ch -- str )
     ch-search (until) ;
 
 : (until-eol) ( -- index ) 
-    CHAR: \n ch-search dup -1 = [ drop "line" get length ] when ;
+    CHAR: \n ch-search dup -1 =
+    [ drop line-text get length ] when ;
 
 : until-eol ( -- str )
     #! This is just a hack to get "eval" to work with multiline
@@ -161,8 +165,8 @@ global [ string-mode off ] bind
 : parse-string ( -- str )
     #! Read a string from the input stream, until it is
     #! terminated by a ".
-    "col" [
-        [ "line" get (parse-string) ] "" make swap
+    column [
+        [ line-text get (parse-string) ] "" make swap
     ] change ;
 
 global [

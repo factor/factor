@@ -5,7 +5,7 @@ USING: alien arrays generic hashtables io kernel lists math
 namespaces parser sequences strings styles vectors words ;
 
 ! State
-SYMBOL: column
+SYMBOL: position
 SYMBOL: indent
 SYMBOL: last-newline
 SYMBOL: recursion-check
@@ -24,7 +24,7 @@ global [
     4 tab-size set
     64 margin set
     recursion-check off
-    0 column set
+    0 position set
     0 indent set
     0 last-newline set
     1 line-count set
@@ -38,7 +38,7 @@ GENERIC: pprint-section*
 TUPLE: section start end nl-after? indent ;
 
 C: section ( length -- section )
-    >r column [ dup rot + dup ] change r>
+    >r position [ dup rot + dup ] change r>
     [ set-section-end ] keep
     [ set-section-start ] keep
     0 over set-section-indent ;
@@ -143,7 +143,7 @@ M: block pprint-section* ( block -- )
 
 : newline ( -- ) <newline> pprinter get add-section ;
 
-: end-block ( block -- ) column get swap set-section-end ;
+: end-block ( block -- ) position get swap set-section-end ;
 
 : pop-block ( pprinter -- ) pprinter-stack pop drop ;
 

@@ -6,7 +6,7 @@ USING: errors generic kernel namespaces io ;
 TUPLE: parse-error file line col text ;
 
 : parse-error ( msg -- )
-    file get line-number get "col" get "line" get
+    file get line-number get column get line-text get
     <parse-error> [ set-delegate ] keep throw ;
 
 : with-parser ( quot -- ) [ parse-error ] recover ;

@@ -9,9 +9,9 @@ USING: kernel lists namespaces sequences words ;
     ] when* ;
 
 : (parse) ( str -- )
-    "line" set 0 "col" set
+    line-text set 0 column set
     parse-loop
-    "line" off "col" off ;
+    line-text off column off ;
 
 : parse ( str -- code )
     #! Parse the string into a parse tree that can be executed.
