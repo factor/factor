@@ -130,18 +130,6 @@ SYMBOL: current-node
         dup dataflow-graph set  current-node set
     ] if ;
 
-: nest-node ( -- dataflow current )
-    dataflow-graph get  dataflow-graph off
-    current-node get    current-node off ;
-
-: unnest-node ( new-node dataflow current -- new-node )
-    >r >r dataflow-graph get 1array over set-node-children
-    r> dataflow-graph set
-    r> current-node set ;
-
-: with-nesting ( quot -- new-node | quot: -- new-node )
-    nest-node 2slip unnest-node ; inline
-
 : node-values ( node -- values )
     [
         dup node-in-d % dup node-out-d %

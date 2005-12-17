@@ -131,8 +131,8 @@ M: pane stream-readln ( pane -- line )
 M: pane stream-write1 ( char pane -- )
     [ pane-current stream-write1 ] keep scroll-pane ;
 
-M: pane stream-write ( string style pane -- )
-    [ rot "\n" split pane-write ] keep scroll-pane ;
+M: pane stream-write ( string pane -- )
+    [ swap "\n" split pane-write ] keep scroll-pane ;
 
 M: pane stream-format ( string style pane -- )
     [ rot "\n" split pane-format ] keep scroll-pane ;
@@ -154,6 +154,3 @@ M: pane stream-close ( pane -- ) drop ;
     #! Clear the pane and run the quotation in a scope with
     #! stdio set to the pane.
     >r dup pane-clear r> with-stream* ; inline
-
-M: pane with-nested-stream ( style stream quot -- )
-    -rot >r >r make-pane r> drop r> pane-current add-gadget ;

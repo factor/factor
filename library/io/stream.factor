@@ -22,7 +22,7 @@ GENERIC: stream-flush  ( stream -- )
 GENERIC: stream-break  ( stream -- )
 GENERIC: stream-terpri ( stream -- )
 GENERIC: stream-format ( string style stream -- )
-GENERIC: with-nested-stream ( style stream quot -- )
+GENERIC: with-nested-stream ( quot style stream -- )
 
 : stream-print ( string stream -- )
     [ stream-write ] keep stream-terpri ;

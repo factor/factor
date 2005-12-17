@@ -19,7 +19,9 @@ SYMBOL: stdio
 : break ( -- ) stdio get stream-break ;
 : terpri ( -- ) stdio get stream-terpri ;
 : format ( string style -- ) stdio get stream-format ;
-: with-nesting ( style quot -- ) stdio get with-nested-stream ;
+
+: with-nesting ( style quot -- )
+    swap stdio get with-nested-stream ;
 
 : print ( string -- ) stdio get stream-print ;
 

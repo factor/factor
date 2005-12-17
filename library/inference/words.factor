@@ -1,9 +1,9 @@
 ! Copyright (C) 2004, 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: inference
-USING: errors generic interpreter kernel lists math
-math-internals namespaces sequences strings vectors words
-hashtables parser prettyprint ;
+USING: arrays errors generic hashtables interpreter kernel lists
+math math-internals namespaces parser prettyprint sequences
+strings vectors words ;
 
 : consume-values ( n node -- )
     over ensure-values
@@ -27,21 +27,28 @@ hashtables parser prettyprint ;
 
 TUPLE: rstate label quot base-case? ;
 
+: nest-node ( -- dataflow current )
+    dataflow-graph get  dataflow-graph off
+    current-node get    current-node off ;
+
+: unnest-node ( new-node dataflow current -- new-node )
+    >r >r dataflow-graph get 1array over set-node-children
+    r> dataflow-graph set
+    r> current-node set ;
+
 : with-recursive-state ( word label base-case quot -- )
     >r >r over word-def r> <rstate> cons
     recursive-state [ cons ] change r>
-    call ; inline
+    nest-node 2slip unnest-node ; inline
 
 : inline-block ( word base-case -- node-block variables )
     [
         copy-inference
         >r gensym 2dup r> [
-            [
-                dup #label >r
-                #entry node,
-                swap word-def infer-quot
-                #return node, r>
-            ] with-nesting
+            dup #label >r
+            #entry node,
+            swap word-def infer-quot
+            #return node, r>
         ] with-recursive-state
     ] make-hash ;
 

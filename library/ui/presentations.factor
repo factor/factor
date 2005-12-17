@@ -1,11 +1,11 @@
 ! Copyright (C) 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: gadgets-presentations
-USING: arrays compiler gadgets gadgets-buttons gadgets-labels
-gadgets-layouts gadgets-menus gadgets-outliner gadgets-panes
-gadgets-theme generic hashtables inference inspector io jedit
-kernel lists memory namespaces parser prettyprint sequences
-strings styles words ;
+USING: arrays compiler gadgets gadgets-borders gadgets-buttons
+gadgets-labels gadgets-layouts gadgets-menus gadgets-outliner
+gadgets-panes gadgets-theme generic hashtables inference
+inspector io jedit kernel lists memory namespaces parser
+prettyprint sequences strings styles words ;
 
 SYMBOL: commands
 
@@ -82,6 +82,15 @@ M: gadget-stream stream-break ( stream -- )
     <break> swap add-gadget ;
 
 M: gadget-stream stream-close ( stream -- ) drop ;
+
+: paragraph-style ( pane style -- pane )
+    border-width over hash [ >r <border> r> ] when
+    border-color swap hash
+    [ <solid> over set-gadget-boundary ] when* ;
+
+M: pane with-nested-stream ( quot style stream -- )
+    >r >r make-pane r> paragraph-style
+    r> pane-current add-gadget ;
 
 [ drop t ] "Prettyprint" [ . ] define-command
 [ drop t ] "Describe" [ describe ] define-command

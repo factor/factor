@@ -37,5 +37,4 @@ SYMBOL: outline
 ! Paragraph styles
 SYMBOL: border-color
 SYMBOL: border-width
-SYMBOL: padding
 SYMBOL: word-wrap
