@@ -7,7 +7,7 @@ styles threads ;
 
 TUPLE: button rollover? pressed? ;
 
-: button-down? ( n -- ? ) hand get hand-buttons member? ;
+: button-down? ( -- ? ) hand get hand-buttons empty? not ;
 
 : mouse-over? ( gadget -- ? ) hand get hand-gadget child? ;
 
@@ -15,7 +15,7 @@ TUPLE: button rollover? pressed? ;
 
 : button-update ( button -- )
     dup mouse-over? over set-button-rollover?
-    dup button-rollover? 1 button-down? and
+    dup button-rollover? button-down? and
     over mouse-clicked? and over set-button-pressed?
     relayout-1 ;
 

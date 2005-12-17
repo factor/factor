@@ -18,7 +18,7 @@ C: hand ( -- hand )
 
 : (button-gesture) ( buttons gesture -- )
     swap hand get hand-clicked 3dup >r append r> handle-gesture
-    [ 3drop ] [ nip handle-gesture drop ] if ;
+    [ nip handle-gesture drop ] [ 3drop ] if ;
 
 : button-gesture ( button gesture -- )
     #! Send a gesture like [ button-down 2 ]; if nobody

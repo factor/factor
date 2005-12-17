@@ -39,11 +39,13 @@ TUPLE: command-button object ;
     command-name swons ;
 
 : <command-menu> ( presented -- menu )
-    command-button-object dup applicable
+    dup applicable
     [ <command-menu-item> ] map-with <menu> ;
 
 : command-menu ( command-button -- )
-    dup button-update <command-menu> show-hand-menu ;
+    dup button-update
+    command-button-object <command-menu>
+    show-hand-menu ;
 
 : command-button-actions ( gadget -- )
     dup
