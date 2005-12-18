@@ -39,7 +39,7 @@ M: string tutorial-line
 
 : <page> ( list -- gadget )
     [ tutorial-line ] map make-pile 1 over set-pack-fill
-    dup page-theme <border> ;
+    dup page-theme <default-border> ;
 
 : tutorial-pages
     {

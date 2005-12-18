@@ -80,9 +80,4 @@ M: command-button gadget-help ( button -- string )
 "Compile" [ word? ] [ recompile ] define-command
 "Infer stack effect" [ word? ] [ unit infer . ] define-command
 
-: gadget. ( gadget -- )
-    gadget associate
-    "This stream does not support live gadgets"
-    swap format terpri ;
-
 "Display gadget" [ [ gadget? ] is? ] [ gadget. ] define-command

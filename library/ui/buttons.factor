@@ -36,7 +36,7 @@ TUPLE: button rollover? pressed? ;
     [ button-update ] [ mouse-enter ] set-action ;
 
 C: button ( gadget quot -- button )
-    rot <border> over set-gadget-delegate
+    rot <default-border> over set-gadget-delegate
     [ swap button-gestures ] keep ;
 
 : <highlight-button> ( gadget quot -- button )

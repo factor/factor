@@ -39,4 +39,4 @@ namespaces sequences ;
 
 : <menu> ( assoc -- gadget )
     #! Given an association list mapping labels to quotations.
-    menu-items <border> dup menu-theme ;
+    menu-items <default-border> dup menu-theme ;

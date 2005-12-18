@@ -1,15 +1,18 @@
 ! Copyright (C) 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: gadgets-borders
-USING: errors gadgets gadgets-layouts gadgets-theme generic
-hashtables kernel math namespaces vectors ;
+USING: arrays errors gadgets gadgets-layouts gadgets-theme
+generic hashtables kernel math namespaces vectors ;
 
 TUPLE: border size ;
 
-C: border ( child -- border )
+C: border ( child gap -- border )
     dup delegate>gadget
-    { 5 5 0 } over set-border-size
+    [ >r dup 0 3array r> set-border-size ] keep
     [ add-gadget ] keep ;
+
+: <default-border> ( child -- border )
+    5 <border> ;
 
 : layout-border-loc ( border -- )
     dup border-size swap gadget-child set-rect-loc ;

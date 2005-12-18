@@ -112,6 +112,14 @@ M: pane stream-terpri ( pane -- )
     3dup car -rot pane-current stream-format cdr dup
     [ over stream-terpri pane-format ] [ 3drop ] if ;
 
+: write-gadget ( gadget pane -- )
+    #! Print a gadget to the given pane.
+    pane-current add-gadget ;
+
+: gadget. ( gadget -- )
+    #! Print a gadget to the current pane.
+    stdio get write-gadget terpri ;
+
 ! Panes are streams.
 M: pane stream-flush ( pane -- ) drop ;
 
@@ -138,12 +146,12 @@ M: pane stream-close ( pane -- ) drop ;
     dup pane-current gadget-children empty?
     [ dup stream-terpri ] unless drop ;
 
-: make-pane ( quot -- pane )
-    #! Execute the quotation with output to an output-only pane.
-    <pane> [ swap with-stream ] keep
-    dup ?pane-terpri pane-output ; inline
-
 : with-pane ( pane quot -- )
     #! Clear the pane and run the quotation in a scope with
     #! stdio set to the pane.
-    >r dup pane-clear r> with-stream* ; inline
+    over pane-clear over >r with-stream*
+    r> ?pane-terpri ; inline
+
+: make-pane ( quot -- pane )
+    #! Execute the quotation with output to an output-only pane.
+    <pane> [ with-pane ] keep ; inline
