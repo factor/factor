@@ -39,7 +39,7 @@ C: display ( -- display )
     callstack-hook get call callstack-display get present-stack ;
 
 : usable-words ( -- words )
-    use get hash-concat hash-keys ;
+    use get hash-concat hash-values ;
 
 : word-completion ( -- )
     usable-words [ word-name ] map

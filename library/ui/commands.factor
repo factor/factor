@@ -25,7 +25,7 @@ V{ } clone commands global set-hash
     commands get [ command-pred call ] subset-with ;
 
 : command>quot ( presented command -- quot )
-    command-quot curry [ pane get pane-call ] cons ;
+    command-quot curry [ pane get pane-call ] curry ;
 
 TUPLE: command-button object ;
 

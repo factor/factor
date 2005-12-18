@@ -4,7 +4,7 @@ sequences test words ;
 
 [ 4 ] [
     "poo" "scratchpad" create [ 2 2 + ] define-compound
-    "poo" [ "scratchpad" ] search execute
+    "poo" "scratchpad" lookup execute
 ] unit-test
 
 [ t ] [ t vocabs [ words [ word? and ] each ] each ] unit-test
@@ -25,17 +25,17 @@ DEFER: plist-test
 
 "create-test" "scratchpad" create { 1 2 } "testing" set-word-prop
 [ { 1 2 } ] [
-    "create-test" [ "scratchpad" ] search "testing" word-prop
+    "create-test" "scratchpad" lookup "testing" word-prop
 ] unit-test
 
 [
-    [ t ] [ \ car "car" [ "lists" ] search = ] unit-test
+    [ t ] [ \ car "car" "lists" lookup = ] unit-test
 
     "test-scope" "scratchpad" create drop
 ] with-scope
 
 [ "test-scope" ] [
-    "test-scope" [ "scratchpad" ] search word-name
+    "test-scope" "scratchpad" lookup word-name
 ] unit-test
 
 [ t ] [ vocabs array? ] unit-test

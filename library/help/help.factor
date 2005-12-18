@@ -10,9 +10,9 @@ namespaces parser sequences words ;
 
 : glossary ( name -- ) <term> help ;
 
-[ word? ] "Show word documentation" [ help ] define-command
-[ term? ] "Show term definition" [ help ] define-command
-[ link? ] "Show article" [ help ] define-command
+"Show word documentation" [ word? ] [ help ] define-command
+"Show term definition" [ term? ] [ help ] define-command
+"Show article" [ link? ] [ help ] define-command
 
 H{ } clone articles global set-hash
 H{ } clone terms global set-hash
