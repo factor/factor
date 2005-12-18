@@ -61,7 +61,7 @@ M: gadget-stream stream-format ( string style stream -- )
 
 : apply-wrap-style ( style pane -- style pane )
     wrap-margin [
-        <paragraph> over set-pane-prototype
+        <paragraph> over 2dup set-pane-prototype set-pane-current
     ] apply-style ;
 
 : apply-border-width-style ( style gadget -- style gadget )
