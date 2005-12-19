@@ -1,5 +1,5 @@
 IN: nehe
-USING: opengl x11 syntax kernel sequences alien namespaces math threads generic io prettyprint ;
+USING: opengl x11 xlib syntax kernel sequences alien namespaces math threads generic io prettyprint ;
 
 TUPLE: gl-window dpy screen win ctx x y width height depth ;
 SYMBOL: current-window
@@ -82,7 +82,7 @@ SYMBOL: height
         title set depth set height set width set y set x set
         make-display dup dup make-screen make-vi make-ctx
         make-colormap normal-XSetWindowAttributes make-win
-        dpy get swap 2dup over "WM_DELETE_WINDOW" t XInternAtom <int> 1 XSetWMProtocols drop
+        dpy get swap 2dup over "WM_DELETE_WINDOW" 1 XInternAtom <int> 1 XSetWMProtocols drop
         2dup title get dup None 0 <alien> 0 over XSetStandardProperties drop
         2dup XMapRaised drop
         2dup ctx get glXMakeCurrent 2drop

@@ -9,7 +9,7 @@
 ! and are wondering what part of the file to modify, just find the
 ! function or data structure in the manual and note the section.
 
-IN: xlib USING: kernel vectors alien math ;
+IN: xlib USING: kernel arrays alien math ;
 
 LIBRARY: xlib
 
@@ -27,6 +27,7 @@ TYPEDEF: XID KeySym
 
 TYPEDEF: ulong Atom
 
+TYPEDEF: char* XPointer
 TYPEDEF: void* Display*
 TYPEDEF: void* Screen*
 TYPEDEF: void* GC
@@ -66,6 +67,9 @@ FUNCTION: int XProtocolRevision ( Display* display ) ;
 FUNCTION: int XQLength ( Display* display ) ;
 FUNCTION: int XScreenCount ( Display* display ) ;
 FUNCTION: int XConnectionNumber ( Display* display ) ;
+
+! 2.5 Closing the Display
+FUNCTION: int XCloseDisplay ( Display* display ) ;
 
 !
 ! 3 - Window Functions
@@ -123,12 +127,17 @@ END-STRUCT
 
 ! 3.3 - Creating Windows
 
+FUNCTION: Window XCreateWindow ( Display* display, Window parent, int x, int y, uint width, uint height, uint border_width, int depth, uint class, Visual* visual, ulong valuemask, XSetWindowAttributes* attributes ) ;
 FUNCTION: Window XCreateSimpleWindow ( Display* display, Window parent, int x, int y, uint width, uint height, uint border_width, ulong border, ulong background ) ;
 FUNCTION: Status XDestroyWindow ( Display* display, Window w ) ;
 FUNCTION: Status XMapWindow ( Display* display, Window window ) ;
 FUNCTION: Status XMapSubwindows ( Display* display, Window window ) ;
 FUNCTION: Status XUnmapWindow ( Display* display, Window w ) ;
 FUNCTION: Status XUnmapSubwindows ( Display* display, Window w ) ;
+
+! 3.5 Mapping Windows
+
+FUNCTION: int XMapRaised ( Display* display, Window w ) ;
 
 ! 3.7 - Configuring Windows
 
@@ -264,6 +273,10 @@ END-STRUCT
 FUNCTION: Status XLookupColor ( Display* display, Colormap colormap, char* color_name, XColor* exact_def_return, XColor* screen_def_return ) ;
 FUNCTION: Status XAllocColor ( Display* display, Colormap colormap, XColor* screen_in_out ) ;
 FUNCTION: Status XQueryColor ( Display* display, Colormap colormap, XColor* def_in_out ) ;
+
+! 6.4 Creating, Copying, and Destroying Colormaps
+
+FUNCTION: Colormap XCreateColormap ( Display* display, Window w, Visual* visual, int alloc ) ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 ! 7 - Graphics Context Functions
@@ -525,10 +538,10 @@ TYPEDEF: XButtonEvent XButtonPressedEvent
 TYPEDEF: XButtonEvent XButtonReleasedEvent
 
 : XButtonEvent-position ( event -- { x y } )
-  dup XButtonEvent-x swap XButtonEvent-y 2vector ;
+  dup XButtonEvent-x swap XButtonEvent-y 2array ;
 
 : XButtonEvent-root-position ( event -- { x y } )
-  dup XButtonEvent-x swap XButtonEvent-y 2vector ;
+  dup XButtonEvent-x swap XButtonEvent-y 2array ;
 
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
@@ -1087,6 +1100,10 @@ FUNCTION: Status XWarpPointer ( Display* display, Window src_w, Window dest_w, i
 ! 14 - Inter-Client Communication Functions
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
+! 14.1 Client to Window Manager Communication
+
+FUNCTION: Status XSetWMProtocols ( Display* display, Window w, Atom* protocols, int count ) ;
+
 FUNCTION: Status XFetchName ( Display* display, Window w, char** window_name_return ) ;
 FUNCTION: Status XGetTransientForHint ( Display* display, Window w, Window* prop_window_return ) ;
 
@@ -1094,7 +1111,13 @@ FUNCTION: Status XGetTransientForHint ( Display* display, Window w, Window* prop
 ! 16 - Application Utility Functions
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
+! 16.1 Keyboard Utility Functions
+
+FUNCTION: KeySym XLookupKeysym ( XKeyEvent* key_event, int index ) ;
+
+
 FUNCTION: int XLookupString ( XKeyEvent* event_struct, char* buffer_return, int bytes_buffer, KeySym* keysym_return, XComposeStatus* status_in_out ) ;
+
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
