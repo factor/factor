@@ -35,6 +35,7 @@ SYMBOL: file
 SYMBOL: outline
 
 ! Paragraph styles
+SYMBOL: page-color
 SYMBOL: border-color
 SYMBOL: border-width
 SYMBOL: wrap-margin

@@ -77,32 +77,32 @@ DEFER: describe
 
 : sheet. ( sheet -- )
     dup format-sheet swap peek
-    [ dup [ describe ] curry write-outliner ] 2each ;
+    [ dup [ describe ] curry simple-outliner ] 2each ;
 
 : describe ( object -- ) dup summary print sheet sheet. ;
 
 : word. ( word -- )
-    dup word-name swap dup [ see ] curry write-outliner ;
+    dup word-name swap dup [ see ] curry simple-outliner ;
 
-: simple-outliner ( seq quot -- | quot: obj -- )
+: sequence-outliner ( seq quot -- | quot: obj -- )
     swap [
-        [ unparse-short ] keep rot dupd curry write-outliner
+        [ unparse-short ] keep rot dupd curry simple-outliner
     ] each-with ;
 
 : words. ( vocab -- )
-    words word-sort [ see ] simple-outliner ;
+    words word-sort [ see ] sequence-outliner ;
 
 : vocabs. ( -- )
     #! Outlining word browser.
-    vocabs [ f over [ words. ] curry write-outliner ] each ;
+    vocabs [ words. ] sequence-outliner ;
 
 : usage. ( word -- )
     #! Outlining usages browser.
-    usage [ usage. ] simple-outliner ;
+    usage [ usage. ] sequence-outliner ;
 
 : uses. ( word -- )
     #! Outlining call hierarchy browser.
-    uses [ uses. ] simple-outliner ;
+    uses [ uses. ] sequence-outliner ;
 
 : stack. ( seq -- seq )
     reverse-slice >array describe ;

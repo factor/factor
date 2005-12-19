@@ -138,7 +138,7 @@ M: pane stream-write ( string pane -- )
 M: pane stream-format ( string style pane -- )
     [ rot "\n" split pane-format ] keep scroll-pane ;
 
-M: pane stream-break ( pane -- ) pane-current stream-break ;
+M: pane stream-bl ( pane -- ) pane-current stream-bl ;
 
 M: pane stream-close ( pane -- ) drop ;
 
@@ -154,4 +154,4 @@ M: pane stream-close ( pane -- ) drop ;
 
 : make-pane ( quot -- pane )
     #! Execute the quotation with output to an output-only pane.
-    <pane> [ with-pane ] keep ; inline
+    <pane> [ swap with-pane ] keep ; inline

@@ -15,5 +15,5 @@ M: f stream-terpri drop ;
 M: f stream-flush drop ;
 
 M: f stream-format 3drop ;
-M: f stream-break drop ;
+M: f stream-bl drop ;
 M: f with-nested-stream rot drop with-stream* ;

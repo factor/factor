@@ -24,18 +24,18 @@ styles ;
     #! Open a file path relative to the Factor source code root.
     resource-path <file-reader> ;
 
+: (file.) ( name path -- )
+    file associate [ format* ] with-style ;
+
 DEFER: directory.
 
-: file-style ( text path -- text style )
-    [
-        dup directory? [
-            >r "/" append r>
-            dup [ directory. ] curry outline set
-        ] when file set
-    ] make-hash ;
+: (directory.) ( name path -- )
+    dup [ directory. ] curry
+    [ "/" append (file.) ] write-outliner ;
 
 : file. ( dir name -- )
-    tuck path+ file-style format ;
+    tuck path+
+    dup directory? [ (directory.) ] [ (file.) terpri ] if ;
 
 : directory. ( dir -- )
-    dup directory [ file. terpri ] each-with ;
+    dup directory [ file. ] each-with ;

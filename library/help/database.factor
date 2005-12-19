@@ -5,33 +5,7 @@ USING: arrays hashtables io kernel namespaces parser sequences
 strings styles words ;
 
 ! Markup
-SYMBOL: style-stack
-
 GENERIC: print-element
-
-: with-style ( style quot -- )
-    swap style-stack get push call style-stack get pop* ; inline
-
-: current-style ( -- style )
-    H{ } clone style-stack get [ dupd hash-update ] each ;
-
-PREDICATE: array simple-element
-    dup empty? [ drop t ] [ first word? not ] if ;
-
-M: string print-element current-style format ;
-
-M: simple-element print-element [ print-element ] each ;
-
-M: array print-element
-    dup first >r 1 swap tail r> execute ;
-
-: default-style H{ { font "Sans Serif" } { font-size 14 } } ;
-
-: with-markup ( quot -- )
-    [
-        default-style V{ } clone [ push ] keep style-stack set
-        call
-    ] with-scope ; inline
 
 ! Help articles
 SYMBOL: articles

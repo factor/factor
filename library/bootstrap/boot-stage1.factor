@@ -192,6 +192,7 @@ vectors words ;
         "/library/ui/ui.factor"
 
         "/library/help/database.factor"
+        "/library/help/stylesheet.factor"
         "/library/help/markup.factor"
         "/library/help/help.factor"
         "/library/help/tutorial.factor"

@@ -22,8 +22,8 @@ M: duplex-stream stream-write1
 M: duplex-stream stream-write
     duplex-stream-out stream-write ;
 
-M: duplex-stream stream-break
-    duplex-stream-out stream-break ;
+M: duplex-stream stream-bl
+    duplex-stream-out stream-bl ;
 
 M: duplex-stream stream-terpri
     duplex-stream-out stream-terpri ;

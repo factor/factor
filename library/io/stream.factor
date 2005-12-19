@@ -19,7 +19,7 @@ GENERIC: stream-write  ( string stream -- )
 GENERIC: stream-flush  ( stream -- )
 
 ! Extended output protocol.
-GENERIC: stream-break  ( stream -- )
+GENERIC: stream-bl  ( stream -- )
 GENERIC: stream-terpri ( stream -- )
 GENERIC: stream-format ( string style stream -- )
 GENERIC: with-nested-stream ( quot style stream -- )

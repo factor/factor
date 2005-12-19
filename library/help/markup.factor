@@ -1,8 +1,9 @@
 ! Copyright (C) 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: help
-USING: gadgets gadgets-panes gadgets-presentations hashtables io
-kernel lists namespaces prettyprint sequences styles ;
+USING: arrays gadgets gadgets-panes gadgets-presentations
+hashtables words io kernel lists namespaces prettyprint
+sequences strings styles ;
 
 ! Simple markup language.
 
@@ -12,27 +13,51 @@ kernel lists namespaces prettyprint sequences styles ;
 
 ! Element types are words whose name begins with $.
 
-: ($span) ( content style -- )
-    [ print-element ] with-style ; inline
+PREDICATE: array simple-element
+    dup empty? [ drop t ] [ first word? not ] if ;
 
-: ($block) ( content style quot -- )
-    >r [ [ print-element ] make-pane ] with-style
-    dup r> call gadget. ; inline
+M: string print-element format* ;
+
+M: array print-element
+    dup first >r 1 swap tail r> execute ;
+
+: ($span) ( content style -- )
+    [ print-element ] with-style ;
+
+: ($block) ( content style -- )
+    terpri dup [
+        [ print-element terpri ] with-style
+    ] with-nesting terpri ;
 
 : $see ( content -- ) first see ;
 
 ! Some spans
-: $heading H{ { font "Serif" } { font-size 24 } } ($span) ;
 
-: $subheading H{ { font "Serif" } { font-size 18 } } ($span) ;
+: $heading heading-style ($block) ;
 
-: $parameter H{ { font "Monospaced" } { font-size 12 } } ($span) ;
+: $subheading subheading-style ($block) ;
+
+: $parameter parameter-style ($span) ;
 
 ! Some blocks
-: $code
-    H{ { font "Monospaced" } { font-size 12 } }
-    [ T{ solid f { 0.9 0.9 0.9 1 } } swap set-gadget-interior ]
-    ($block) ;
+: wrap-string ( string -- )
+    " " split [
+        dup empty? [ dup format* bl ] unless drop
+    ] each ;
+
+: ($paragraph) ( element style -- )
+    dup [
+        [
+            [
+                dup string?
+                [ wrap-string ] [ print-element bl ] if
+            ] each
+        ] with-style
+    ] with-nesting terpri ;
+
+M: simple-element print-element paragraph-style ($paragraph) ;
+
+: $code code-style ($block) ;
 
 ! Some links
 TUPLE: link name ;
@@ -43,16 +68,14 @@ M: link article-content link-name article-content ;
 
 DEFER: help
 
+: ($link) dup article-title swap ;
+
 : $subsection ( object -- )
-    first [
-        dup <link> presented set
-        dup [ link-name help ] curry outline set
-    ] make-hash [ article-title $subheading ] with-style terpri ;
+    subheading-style [
+        first <link> ($link) dup [ link-name help ] curry
+        simple-outliner
+    ] with-style ;
 
-: $link ( name -- )
-    first dup <link> presented associate
-    [ article-title print-element ] with-style ;
+: $link ( article -- ) first <link> ($link) simple-object ;
 
-: $glossary ( element -- )
-    first dup <term> presented associate
-    [ print-element ] with-style ;
+: $glossary ( element -- ) first <term> ($link) simple-object ;

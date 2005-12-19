@@ -17,8 +17,8 @@ M: gadget-stream stream-write ( string stream -- )
 M: gadget-stream stream-write1 ( char stream -- )
     >r ch>string r> stream-write ;
 
-M: gadget-stream stream-break ( stream -- )
-    <break> swap add-gadget ;
+M: gadget-stream stream-bl ( stream -- )
+    <word-break> swap add-gadget ;
 
 ! Character styles
 
@@ -42,9 +42,6 @@ M: gadget-stream stream-break ( stream -- )
 : apply-command-style ( style gadget -- style gadget )
     presented [ <command-button> ] apply-style ;
 
-: apply-outliner-style ( style gadget -- style gadget )
-    outline [ <outliner> ] apply-style ;
-
 : <presentation> ( style text -- gadget )
     <label>
     apply-foreground-style
@@ -61,7 +58,8 @@ M: gadget-stream stream-format ( string style stream -- )
 
 : apply-wrap-style ( style pane -- style pane )
     wrap-margin [
-        <paragraph> over 2dup set-pane-prototype set-pane-current
+        2dup <paragraph> swap set-pane-prototype
+        <paragraph> over set-pane-current
     ] apply-style ;
 
 : apply-border-width-style ( style gadget -- style gadget )
@@ -72,16 +70,26 @@ M: gadget-stream stream-format ( string style stream -- )
         <solid> over set-gadget-boundary
     ] apply-style ;
 
-: paragraph-style ( style pane -- gadget )
+: apply-page-color-style ( style gadget -- style gadget )
+    page-color [
+        <solid> over set-gadget-interior
+    ] apply-style ;
+
+: apply-outliner-style ( style gadget -- style gadget )
+    outline [ <outliner> ] apply-style ;
+
+: <styled-paragraph> ( style pane -- gadget )
     apply-wrap-style
     apply-border-width-style
     apply-border-color-style
+    apply-page-color-style
+    apply-outliner-style
     nip ;
 
 : <nested-pane> ( quot style -- gadget )
     #! Create a pane, call the quotation to fill it out.
-    >r <pane> dup r> swap paragraph-style >r swap with-pane r> ;
-    inline
+    >r <pane> dup r> swap <styled-paragraph>
+    >r swap with-pane r> ; inline
 
 M: pane with-nested-stream ( quot style stream -- )
     >r <nested-pane> r> write-gadget ;

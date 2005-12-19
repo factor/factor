@@ -10,7 +10,9 @@ TUPLE: command name pred quot default? ;
 V{ } clone commands global set-hash
 
 : forget-command ( name -- )
-    commands [ [ command-name = not ] subset-with ] change ;
+    global [
+        commands [ [ command-name = not ] subset-with ] change
+    ] bind ;
 
 : (define-command) ( name pred quot default? -- )
     <command> dup command-name forget-command commands get push ;
@@ -32,7 +34,7 @@ TUPLE: command-button object ;
 : command-action ( command-button -- )
     #! Invoke the default action.
     command-button-object dup applicable
-    [ command-default? ] find nip command>quot call ;
+    [ command-default? ] find-last nip command>quot call ;
 
 : <command-menu-item> ( presented command -- item )
     [ command>quot [ drop ] swap append ] keep
@@ -63,8 +65,6 @@ C: command-button ( gadget object -- button )
 M: command-button gadget-help ( button -- string )
     command-button-object dup word? [ synopsis ] [ summary ] if ;
 
-"Use as input" [ input? ] [ input-string pane get replace-input ] define-default-command
-
 "Describe" [ drop t ] [ describe ] define-default-command
 "Prettyprint" [ drop t ] [ . ] define-command
 "Push on data stack" [ drop t ] [ ] define-command
@@ -81,3 +81,5 @@ M: command-button gadget-help ( button -- string )
 "Infer stack effect" [ word? ] [ unit infer . ] define-command
 
 "Display gadget" [ [ gadget? ] is? ] [ gadget. ] define-command
+
+"Use as input" [ input? ] [ input-string pane get replace-input ] define-default-command
