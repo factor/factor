@@ -1,6 +1,6 @@
 IN: crypto-internals
 USING: kernel io strings sequences namespaces math prettyprint
-unparser test parser lists ;
+test parser lists ;
 
 
 : w+ ( int -- int )
