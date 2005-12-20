@@ -1,7 +1,7 @@
 ! All Talk
 
 IN: aim-internals
-USING: kernel sequences lists stdio prettyprint strings namespaces math unparser threads vectors errors parser interpreter test io crypto words hashtables inspector aim-internals generic queues arrays ;
+USING: kernel sequences lists prettyprint strings namespaces math threads vectors errors parser interpreter test io crypto words hashtables inspector aim-internals generic queues arrays ;
 
 SYMBOL: username
 SYMBOL: password

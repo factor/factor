@@ -1,5 +1,5 @@
 IN: network-util
-USING: parser sequences ;
+USING: parser sequences words compiler ;
 
 [
     "contrib/crypto/load.factor"
@@ -7,3 +7,5 @@ USING: parser sequences ;
     "contrib/aim/aim.factor"
 ] [ run-file ] each
 
+"aim-internals" words [ try-compile ] each
+"aim" words [ try-compile ] each
