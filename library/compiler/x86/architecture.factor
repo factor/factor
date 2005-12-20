@@ -41,3 +41,7 @@ M: float-regs fastcall-regs drop 0 ;
 : fixnum>slot@ 1 SHR ; inline
 
 : prepare-division CDQ ; inline
+
+: compile-prologue ; inline
+
+: compile-epilogue ; inline

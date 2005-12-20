@@ -5,7 +5,8 @@ USING: alien arrays assembler compiler inference kernel
 kernel-internals lists math memory namespaces sequences words ;
 
 ! Not used on x86
-M: %prologue generate-node drop ;
+M: %prologue generate-node ( vop -- ) 
+    drop compile-prologue ;
 
 : (call-label)
     label dup postpone-word
@@ -18,10 +19,10 @@ M: %call-label generate-node ( vop -- )
     drop label CALL ;
 
 M: %jump generate-node ( vop -- )
-    drop (call-label) JMP ;
+    drop compile-epilogue (call-label) JMP ;
 
 M: %jump-label generate-node ( vop -- )
-    drop label JMP ;
+    drop compile-epilogue label JMP ;
 
 M: %jump-t generate-node ( vop -- )
     drop
@@ -31,10 +32,10 @@ M: %jump-t generate-node ( vop -- )
     label JNE ;
 
 M: %return-to generate-node ( vop -- )
-    drop label address-operand PUSH ;
+    drop label address-operand PUSH compile-prologue ;
 
 M: %return generate-node ( vop -- )
-    drop RET ;
+    drop compile-epilogue RET ;
 
 M: %dispatch generate-node ( vop -- )
     #! Compile a piece of code that jumps to an offset in a

@@ -54,7 +54,7 @@ M: %call generate-node ( vop -- )
     dup primitive? [ word-addr  3 MTCTR  BCTR ] [ B ] if ;
 
 M: %jump generate-node ( vop -- )
-    drop label  compile-epilogue compile-jump ;
+    drop compile-epilogue label compile-jump ;
 
 M: %jump-label generate-node ( vop -- )
     drop label B ;

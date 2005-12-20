@@ -44,3 +44,7 @@ M: float-regs fastcall-regs drop 0 ;
 : fixnum>slot@ drop ; inline
 
 : prepare-division CQO ; inline
+
+: compile-prologue RSP 8 SUB ; inline
+
+: compile-epilogue RSP 8 ADD ; inline
