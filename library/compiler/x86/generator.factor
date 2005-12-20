@@ -22,7 +22,7 @@ M: %jump generate-node ( vop -- )
     drop compile-epilogue (call-label) JMP ;
 
 M: %jump-label generate-node ( vop -- )
-    drop compile-epilogue label JMP ;
+    drop label JMP ;
 
 M: %jump-t generate-node ( vop -- )
     drop
