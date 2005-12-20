@@ -104,6 +104,10 @@ M: pane stream-terpri ( pane -- )
     over pane-output add-incremental
     prepare-line ;
 
+M: pane stream-terpri* ( pane -- )
+    dup pane-current gadget-children empty?
+    [ dup stream-terpri ] unless drop ;
+
 : pane-write ( pane list -- )
     2dup car swap pane-current stream-write cdr dup
     [ over stream-terpri pane-write ] [ 2drop ] if ;
@@ -142,15 +146,11 @@ M: pane stream-bl ( pane -- ) pane-current stream-bl ;
 
 M: pane stream-close ( pane -- ) drop ;
 
-: ?pane-terpri ( pane -- )
-    dup pane-current gadget-children empty?
-    [ dup stream-terpri ] unless drop ;
-
 : with-pane ( pane quot -- )
     #! Clear the pane and run the quotation in a scope with
     #! stdio set to the pane.
     over pane-clear over >r with-stream*
-    r> ?pane-terpri ; inline
+    r> stream-terpri* ; inline
 
 : make-pane ( quot -- pane )
     #! Execute the quotation with output to an output-only pane.

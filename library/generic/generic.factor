@@ -96,10 +96,19 @@ M: generic definer drop \ G: ;
         over word-name " is not a class" append throw
     ] unless 2drop ;
 
+: ?make-generic ( word -- )
+    #! Unless we're bootstrapping, in which case generic words
+    #! are built as the last stage of bootstrap.
+    bootstrapping? get [
+        [ ] define-compound
+    ] [
+        make-generic
+    ] if ;
+
 : with-methods ( word quot -- | quot: methods -- )
     #! Applies a quotation to the method hash and regenerates
     #! the generic.
-    swap [ "methods" word-prop swap call ] keep make-generic ;
+    swap [ "methods" word-prop swap call ] keep ?make-generic ;
     inline
 
 : define-method ( definition class generic -- )
@@ -122,7 +131,7 @@ M: generic definer drop \ G: ;
 : define-generic* ( word combination -- )
     bootstrap-combination
     dupd "combination" set-word-prop
-    dup init-methods make-generic ;
+    dup init-methods ?make-generic ;
 
 : lookup-union ( class-set -- class )
     #! The class set is a hashtable with equal keys/values.
@@ -132,11 +141,7 @@ M: generic definer drop \ G: ;
     dup members [
         [ (builtin-supertypes) ] each
     ] [
-        dup superclass [
-            (builtin-supertypes)
-        ] [
-            dup set
-        ] ?if
+        dup superclass [ (builtin-supertypes) ] [ dup set ] ?if
     ] ?if ;
 
 : builtin-supertypes ( class -- classes )

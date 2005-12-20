@@ -6,6 +6,7 @@ namespaces parser sequences words ;
     default-style [
         dup article-title $heading
         article-content print-element
+        terpri*
     ] with-style ;
 
 : glossary ( name -- ) <term> help ;

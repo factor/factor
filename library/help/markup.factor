@@ -16,7 +16,8 @@ sequences strings styles ;
 PREDICATE: array simple-element
     dup empty? [ drop t ] [ first word? not ] if ;
 
-M: string print-element format* ;
+M: string print-element
+    " " split [ format* bl ] each ;
 
 M: array print-element
     dup first >r 1 swap tail r> execute ;
@@ -25,11 +26,12 @@ M: array print-element
     [ print-element ] with-style ;
 
 : ($block) ( content style -- )
-    terpri dup [
-        [ print-element terpri ] with-style
-    ] with-nesting terpri ;
+    terpri*
+    [ [ print-element ] with-nesting* ] with-style
+    terpri* ;
 
-: $see ( content -- ) first see ;
+: $see ( content -- )
+    code-style [ [ first see ] with-nesting* ] with-style ;
 
 ! Some spans
 
@@ -39,25 +41,18 @@ M: array print-element
 
 : $parameter parameter-style ($span) ;
 
+: $emphasis emphasis-style ($span) ;
+
+: $terpri terpri drop ;
+
 ! Some blocks
-: wrap-string ( string -- )
-    " " split [
-        dup empty? [ dup format* bl ] unless drop
-    ] each ;
+M: simple-element print-element
+    current-style [ [ print-element ] each ] with-nesting ;
 
-: ($paragraph) ( element style -- )
-    dup [
-        [
-            [
-                dup string?
-                [ wrap-string ] [ print-element bl ] if
-            ] each
-        ] with-style
-    ] with-nesting terpri ;
-
-M: simple-element print-element paragraph-style ($paragraph) ;
-
-: $code code-style ($block) ;
+: $code
+    terpri*
+    first code-style [ [ format* ] with-nesting* ] with-style
+    terpri* ;
 
 ! Some links
 TUPLE: link name ;

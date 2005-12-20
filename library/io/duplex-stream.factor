@@ -28,6 +28,9 @@ M: duplex-stream stream-bl
 M: duplex-stream stream-terpri
     duplex-stream-out stream-terpri ;
 
+M: duplex-stream stream-terpri*
+    duplex-stream-out stream-terpri* ;
+
 M: duplex-stream stream-format
     duplex-stream-out stream-format ;
 

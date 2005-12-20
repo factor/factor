@@ -259,3 +259,7 @@ vocabularies get [
 
 H{ } clone crossref set
 recrossref
+
+"Building generic words..." print flush
+
+all-words [ generic? ] subset [ make-generic ] each

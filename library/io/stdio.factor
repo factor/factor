@@ -19,6 +19,7 @@ SYMBOL: stdio
 
 : bl ( -- ) stdio get stream-bl ;
 : terpri ( -- ) stdio get stream-terpri ;
+: terpri* ( -- ) stdio get stream-terpri* ;
 : format ( string style -- ) stdio get stream-format ;
 
 : with-nesting ( style quot -- )
@@ -37,14 +38,23 @@ SYMBOL: stdio
 
 SYMBOL: style-stack
 
-V{ } clone style-stack global set-hash
+: >style ( style -- )
+    #! Push a style on the style stack.
+    dup hashtable? [ "Style must be a hashtable" throw ] unless
+    style-stack [ ?push ] change ;
+
+: style> ( -- style )
+    style-stack get pop ;
 
 : with-style ( style quot -- )
-    swap style-stack get push call style-stack get pop* ; inline
+    [ >r >style r> call style> drop ] with-scope ; inline
 
 : current-style ( -- style ) style-stack get hash-concat ;
 
 : format* ( string -- ) current-style format ;
+
+: with-nesting* ( quot -- )
+    current-style swap with-nesting ; inline
 
 : write-object ( object quot -- )
     >r presented associate r> with-style ;
