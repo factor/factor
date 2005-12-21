@@ -37,7 +37,7 @@ M: %fixnum* generate-node ( vop -- )
     1 scratch 0 input-operand 1 input-operand MULHW
     4 1 scratch MR
     3 0 scratch MR
-    "s48_long_pair_to_bignum" f compile-c-call
+    "s48_fixnum_pair_to_bignum" f compile-c-call
     ! now we have to shift it by three bits to remove the second
     ! tag
     tag-bits neg 4 LI

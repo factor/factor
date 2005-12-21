@@ -36,7 +36,7 @@ void primitive_bignum_not(void);
 INLINE CELL tag_integer(F_FIXNUM x)
 {
 	if(x < FIXNUM_MIN || x > FIXNUM_MAX)
-		return tag_bignum(s48_long_to_bignum(x));
+		return tag_bignum(s48_fixnum_to_bignum(x));
 	else
 		return tag_fixnum(x);
 }
@@ -44,7 +44,7 @@ INLINE CELL tag_integer(F_FIXNUM x)
 INLINE CELL tag_cell(CELL x)
 {
 	if(x > FIXNUM_MAX)
-		return tag_bignum(s48_ulong_to_bignum(x));
+		return tag_bignum(s48_cell_to_bignum(x));
 	else
 		return tag_fixnum(x);
 }

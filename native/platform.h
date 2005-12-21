@@ -37,14 +37,14 @@
 
 #if defined(WIN32)
 	#define DLLEXPORT __declspec(dllexport)
-    #define SETJMP setjmp
-    #define LONGJMP longjmp
-    #define JMP_BUF jmp_buf
+        #define SETJMP setjmp
+        #define LONGJMP longjmp
+        #define JMP_BUF jmp_buf
 #else
 	#define DLLEXPORT
-    #define SETJMP(jmpbuf) sigsetjmp(jmpbuf,1)
-    #define LONGJMP siglongjmp
-    #define JMP_BUF sigjmp_buf
+        #define SETJMP(jmpbuf) sigsetjmp(jmpbuf,1)
+        #define LONGJMP siglongjmp
+        #define JMP_BUF sigjmp_buf
 #endif
 
 #define INLINE inline static

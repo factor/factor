@@ -69,9 +69,7 @@ INLINE void cpush(CELL top)
 INLINE void call(CELL quot)
 {
 	/* tail call optimization */
-	if(callframe == F)
-		/* put(cs - CELLS,executing) */;
-	else
+	if(callframe != F)
 	{
 		cpush(executing);
 		cpush(callframe);

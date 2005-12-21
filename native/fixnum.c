@@ -12,7 +12,7 @@ F_FIXNUM to_fixnum(CELL tagged)
 	case FIXNUM_TYPE:
 		return untag_fixnum_fast(tagged);
 	case BIGNUM_TYPE:
-		return (F_FIXNUM)s48_bignum_to_long((F_ARRAY*)UNTAG(tagged));
+		return (F_FIXNUM)s48_bignum_to_fixnum((F_ARRAY*)UNTAG(tagged));
 	case RATIO_TYPE:
 		r = (F_RATIO*)UNTAG(tagged);
 		x = to_bignum(r->numerator);
@@ -70,8 +70,8 @@ void primitive_fixnum_multiply(void)
 		{
 			dpush(tag_bignum(
 				s48_bignum_multiply(
-					s48_long_to_bignum(x),
-					s48_long_to_bignum(y))));
+					s48_fixnum_to_bignum(x),
+					s48_fixnum_to_bignum(y))));
 		}
 	}
 }
@@ -163,7 +163,7 @@ void primitive_fixnum_shift(void)
 	}
 
 	dpush(tag_bignum(s48_bignum_arithmetic_shift(
-		s48_long_to_bignum(x),y)));
+		s48_fixnum_to_bignum(x),y)));
 }
 
 void primitive_fixnum_less(void)

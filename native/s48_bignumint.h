@@ -42,8 +42,8 @@ MIT in each case. */
    definition is `CHAR_BIT', which is defined in the Ansi C header
    file "limits.h". */
 
-typedef long bignum_digit_type;
-typedef long bignum_length_type;
+typedef F_FIXNUM bignum_digit_type;
+typedef F_FIXNUM bignum_length_type;
 
 /* BIGNUM_ALLOCATE allocates a (length + 1)-element array of
    `bignum_digit_type'; deallocation is the responsibility of the
@@ -74,8 +74,8 @@ typedef long bignum_length_type;
 
 #define BIGNUM_DIGIT_LENGTH (((sizeof (bignum_digit_type)) * CHAR_BIT) - 2)
 #define BIGNUM_HALF_DIGIT_LENGTH (BIGNUM_DIGIT_LENGTH / 2)
-#define BIGNUM_RADIX (((unsigned long) 1) << BIGNUM_DIGIT_LENGTH)
-#define BIGNUM_RADIX_ROOT (((unsigned long) 1) << BIGNUM_HALF_DIGIT_LENGTH)
+#define BIGNUM_RADIX (((CELL) 1) << BIGNUM_DIGIT_LENGTH)
+#define BIGNUM_RADIX_ROOT (((CELL) 1) << BIGNUM_HALF_DIGIT_LENGTH)
 #define BIGNUM_DIGIT_MASK	 (BIGNUM_RADIX - 1)
 #define BIGNUM_HALF_DIGIT_MASK	 (BIGNUM_RADIX_ROOT - 1)
 

@@ -376,6 +376,8 @@ s48_bignum_remainder(bignum_type numerator, bignum_type denominator)
     }                                                                  \
   }
 
+FOO_TO_BIGNUM(cell,CELL,CELL)
+FOO_TO_BIGNUM(fixnum,F_FIXNUM,CELL)
 FOO_TO_BIGNUM(long,long,unsigned long)
 FOO_TO_BIGNUM(ulong,unsigned long,unsigned long)
 FOO_TO_BIGNUM(long_long,s64,u64)
@@ -383,13 +385,13 @@ FOO_TO_BIGNUM(ulong_long,u64,u64)
 
 /* this is inefficient; its only used for fixnum multiplication overflow so
 it probaly does not matter */
-bignum_type s48_long_pair_to_bignum(unsigned long x, long y)
+bignum_type s48_fixnum_pair_to_bignum(CELL x, F_FIXNUM y)
 {
   return s48_bignum_add(
     s48_bignum_arithmetic_shift(
-      s48_long_to_bignum(y),
+      s48_fixnum_to_bignum(y),
       sizeof(unsigned long) * 8),
-    s48_ulong_to_bignum(x));
+    s48_cell_to_bignum(x));
 }
 
 #define BIGNUM_TO_FOO(name,type,utype) \
@@ -407,6 +409,8 @@ bignum_type s48_long_pair_to_bignum(unsigned long x, long y)
     }                                                                               \
   }
 
+BIGNUM_TO_FOO(cell,CELL,CELL);
+BIGNUM_TO_FOO(fixnum,F_FIXNUM,CELL);
 BIGNUM_TO_FOO(long,long,unsigned long)
 BIGNUM_TO_FOO(ulong,unsigned long,unsigned long)
 BIGNUM_TO_FOO(long_long,s64,u64)

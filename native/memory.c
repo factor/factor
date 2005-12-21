@@ -133,7 +133,7 @@ void primitive_set_integer_slot(void)
 
 void primitive_address(void)
 {
-	drepl(tag_bignum(s48_ulong_to_bignum(dpeek())));
+	drepl(tag_bignum(s48_cell_to_bignum(dpeek())));
 }
 
 void primitive_size(void)
