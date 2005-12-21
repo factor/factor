@@ -170,7 +170,7 @@ SYMBOL: compile-words
     #! added to the list of words to be compiled.
     dup compiled?
     over label? or
-    over linearized get hash or
+    over linearized get ?hash or
     over compile-words get member? or
     swap compiled-xts get hash or ;
 
