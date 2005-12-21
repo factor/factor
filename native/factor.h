@@ -17,8 +17,8 @@
 #define HALF_WORD_SIZE (CELLS*4)
 #define HALF_WORD_MASK (((unsigned long)1<<HALF_WORD_SIZE)-1)
 
-#define FIXNUM_MAX ((1 << (WORD_SIZE - TAG_BITS - 1)) - 1)
-#define FIXNUM_MIN (-(1 << (WORD_SIZE - TAG_BITS - 1)))
+#define FIXNUM_MAX (((F_FIXNUM)1 << (WORD_SIZE - TAG_BITS - 1)) - 1)
+#define FIXNUM_MIN (-((F_FIXNUM)1 << (WORD_SIZE - TAG_BITS - 1)))
 
 /* must always be 16 bits */
 #define CHARS ((signed)sizeof(u16))
