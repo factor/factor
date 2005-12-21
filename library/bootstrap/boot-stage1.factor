@@ -125,9 +125,9 @@ vectors words ;
         "/library/inference/print-dataflow.factor"
 
         "/library/compiler/assembler.factor"
-        "/library/compiler/xt.factor"
         "/library/compiler/vops.factor"
         "/library/compiler/linearizer.factor"
+        "/library/compiler/xt.factor"
         "/library/compiler/stack.factor"
         "/library/compiler/intrinsics.factor"
         "/library/compiler/basic-blocks.factor"
