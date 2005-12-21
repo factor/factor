@@ -18,7 +18,6 @@
 - on win64: to_cell will break
 - .h .b .o for ratios and floats is broken
 - amd64 to do:
-  - fixnum<< overflow check
   - alien calls
   - relocation problem
   - compiling sheet runs out of memory

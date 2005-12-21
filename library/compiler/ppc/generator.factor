@@ -27,15 +27,6 @@ M: %prologue generate-node ( vop -- )
     1 1 stack-increment ADDI
     0 MTLR ;
 
-M: %call-label generate-node ( vop -- )
-    #! Near calling convention for inlined recursive combinators
-    #! Note: length of instruction sequence is hard-coded.
-    vop-label
-    compiled-offset 20 + 18 LOAD32  rel-2/2 rel-address
-    1 1 stack-increment neg STWU
-    18 1 stack-increment lr@ STW
-    B ;
-
 : word-addr ( word -- )
     #! Load a word address into r3.
     dup word-xt 3 LOAD32  rel-2/2 rel-word ;
@@ -56,17 +47,8 @@ M: %call generate-node ( vop -- )
 M: %jump generate-node ( vop -- )
     drop compile-epilogue label compile-jump ;
 
-M: %jump-label generate-node ( vop -- )
-    drop label B ;
-
 M: %jump-t generate-node ( vop -- )
     drop 0 input-operand 0 swap f address CMPI label BNE ;
-
-M: %return-to generate-node ( vop -- )
-    drop
-    label 0 3 LOAD32  absolute-2/2
-    1 1 stack-increment neg STWU
-    3 1 stack-increment lr@ STW ;
 
 M: %return generate-node ( vop -- )
     drop compile-epilogue BLR ;

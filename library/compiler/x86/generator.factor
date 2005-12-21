@@ -8,21 +8,15 @@ kernel-internals lists math memory namespaces sequences words ;
 M: %prologue generate-node ( vop -- ) 
     drop compile-prologue ;
 
-: (call-label)
+: (%call)
     label dup postpone-word
     dup primitive? [ address-operand ] when ;
 
 M: %call generate-node ( vop -- )
-    drop (call-label) CALL ;
-
-M: %call-label generate-node ( vop -- )
-    drop label CALL ;
+    drop (%call) CALL ;
 
 M: %jump generate-node ( vop -- )
-    drop compile-epilogue (call-label) JMP ;
-
-M: %jump-label generate-node ( vop -- )
-    drop label JMP ;
+    drop compile-epilogue (%call) JMP ;
 
 M: %jump-t generate-node ( vop -- )
     drop
@@ -30,9 +24,6 @@ M: %jump-t generate-node ( vop -- )
     0 input-operand f address CMP
     ! If not equal, jump
     label JNE ;
-
-M: %return-to generate-node ( vop -- )
-    drop label address-operand PUSH compile-prologue ;
 
 M: %return generate-node ( vop -- )
     drop compile-epilogue RET ;

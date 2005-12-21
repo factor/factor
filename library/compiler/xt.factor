@@ -1,9 +1,9 @@
 ! Copyright (C) 2004, 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: compiler
-USING: assembler errors generic hashtables kernel
-kernel-internals lists math namespaces prettyprint sequences
-strings vectors words ;
+USING: assembler compiler-backend compiler-frontend errors
+generic hashtables kernel kernel-internals lists math namespaces
+prettyprint sequences strings vectors words ;
 
 ! We use a hashtable "compiled-xts" that maps words to
 ! xt's that are currently being compiled. The commit-xt's word
@@ -168,8 +168,11 @@ SYMBOL: compile-words
 : compiling? ( word -- ? )
     #! A word that is compiling or already compiled will not be
     #! added to the list of words to be compiled.
-    dup compiled? over compile-words get member? or
-    [ drop t ] [ compiled-xts get hash ] if ;
+    dup compiled?
+    over label? or
+    over linearized get hash or
+    over compile-words get member? or
+    swap compiled-xts get hash or ;
 
 : fixup-xts ( -- )
     deferred-xts get [ dup resolve swap fixup ] each ;

@@ -114,25 +114,13 @@ TUPLE: %return ;
 C: %return make-vop ;
 : %return empty-vop <%return> ;
 
-TUPLE: %return-to ;
-C: %return-to make-vop ;
-: %return-to label-vop <%return-to> ;
-
 TUPLE: %jump ;
 C: %jump make-vop ;
 : %jump label-vop <%jump> ;
 
-TUPLE: %jump-label ;
-C: %jump-label make-vop ;
-: %jump-label label-vop <%jump-label> ;
-
 TUPLE: %call ;
 C: %call make-vop ;
 : %call label-vop <%call> ;
-
-TUPLE: %call-label ;
-C: %call-label make-vop ;
-: %call-label label-vop <%call-label> ;
 
 TUPLE: %jump-t ;
 C: %jump-t make-vop ;
