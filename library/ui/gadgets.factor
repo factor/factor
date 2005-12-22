@@ -6,7 +6,7 @@ namespaces sequences styles ;
 
 SYMBOL: origin
 
-{ 0 0 0 } origin global set-hash
+{ 0 0 0 } origin set-global
 
 TUPLE: rect loc dim ;
 

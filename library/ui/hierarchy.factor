@@ -47,7 +47,7 @@ namespaces sequences vectors ;
 : each-parent ( gadget quot -- ? )
     >r parents r> all? ; inline
 
-: find-parent ( gadget quot -- ? )
+: find-parent ( gadget quot -- gadget )
     >r parents r> find nip ; inline
 
 : screen-loc ( gadget -- point )

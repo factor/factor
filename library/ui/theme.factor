@@ -70,9 +70,6 @@ USING: arrays gadgets kernel sequences styles ;
 : reverse-video-theme ( gadget -- )
     solid-black swap set-gadget-interior ;
 
-: display-title-theme
-    T{ solid f { 0.84 0.9 1.0 1.0 } } swap set-gadget-interior ;
-
 : menu-theme ( menu -- )
     dup solid-boundary
     T{ solid f { 0.9 0.9 0.9 0.9 } } swap set-gadget-interior ;

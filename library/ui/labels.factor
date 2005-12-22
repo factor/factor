@@ -32,6 +32,3 @@ M: label pref-dim ( label -- dim )
     dup label-font* swap label-text draw-string ;
 
 M: label draw-gadget* ( label -- ) draw-label ;
-
-M: label set-message ( string/f label -- )
-    set-label-text* ;

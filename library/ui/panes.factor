@@ -42,7 +42,7 @@ SYMBOL: structured-input
 
 : pane-call ( quot pane -- )
     "<< command >>" over stream-print
-    >r structured-input global set-hash
+    >r structured-input set-global
     "\"structured-input\" \"gadgets-panes\" lookup global hash call"
     r> pane-eval ;
 

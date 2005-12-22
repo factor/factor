@@ -10,7 +10,7 @@ M: object handle-event ( event -- ) drop ;
 
 M: button-down-event handle-event ( event -- )
     update-clicked button-event-button dup scroll-wheel? [
-        dup 4 = [ wheel-up ] [ wheel-down ] ?
+        4 = [ wheel-up ] [ wheel-down ] ?
         hand get hand-clicked handle-gesture drop
     ] [
         dup hand get hand-buttons push

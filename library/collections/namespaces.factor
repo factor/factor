@@ -35,6 +35,7 @@ sequences strings vectors words ;
 : set ( value variable -- ) namespace set-hash ;
 : on ( var -- ) t swap set ; inline
 : off ( var -- ) f swap set ; inline
+: set-global ( value var -- ) global set-hash ; inline
 
 : nest ( variable -- hash )
     #! If the variable is set in the current namespace, return

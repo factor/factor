@@ -10,7 +10,7 @@ SYMBOL: bootstrapping?
 SYMBOL: vocabularies
 
 : word ( -- word ) \ word global hash ;
-: set-word ( word -- ) \ word global set-hash ;
+: set-word ( word -- ) \ word set-global ;
 
 : vocabs ( -- list )
     #! Push a list of vocabularies.

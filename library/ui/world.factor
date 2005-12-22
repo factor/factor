@@ -9,24 +9,13 @@ sequences sequences strings styles threads ;
 ! gadgets are contained in. The current world is stored in the
 ! world variable. The invalid slot is a list of gadgets that
 ! need to be layout.
-TUPLE: world running? glass status content invalid ;
+TUPLE: world running? glass status invalid ;
 
 : add-layer ( gadget -- )
     world get add-gadget ;
 
 C: world ( -- world )
-    <stack> over set-delegate
-    <frame> over 2dup set-world-content add-gadget
-    t over set-gadget-root? ;
-
-: set-application ( gadget -- )
-    world get world-content @center frame-add ;
-
-: set-status ( gadget -- )
-    #! Set the status bar gadget to the given gadget. It must
-    #! implement the set-message generic word.
-    world get 2dup set-world-status
-    world-content @bottom frame-add ;
+    <stack> over set-delegate t over set-gadget-root? ;
 
 : add-invalid ( gadget -- )
     world get [ world-invalid cons ] keep set-world-invalid ;
@@ -61,11 +50,13 @@ M: f set-message 2drop ;
     #! Show a message in the status bar.
     world get world-status set-message ;
 
+: relevant-help ( -- string )
+    hand get hand-gadget
+    parents [ gadget-help ] map [ ] find nip ;
+
 : update-help ( -- )
     #! Update mouse-over help message.
-    hand get hand-gadget
-    parents [ gadget-help ] map [ ] find nip
-    show-message ;
+    relevant-help show-message ;
 
 : under-hand ( -- seq )
     #! A sequence whose first element is the world and last is

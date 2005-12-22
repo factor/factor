@@ -186,9 +186,9 @@ vectors words ;
         "/library/ui/panes.factor"
         "/library/ui/books.factor"
         "/library/ui/outliner.factor"
+        "/library/ui/listener.factor"
         "/library/ui/commands.factor"
         "/library/ui/presentations.factor"
-        "/library/ui/listener.factor"
         "/library/ui/ui.factor"
 
         "/library/help/database.factor"

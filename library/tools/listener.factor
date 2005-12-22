@@ -9,9 +9,8 @@ SYMBOL: quit-flag
 
 SYMBOL: listener-hook
 SYMBOL: datastack-hook
-SYMBOL: callstack-hook
 
-"  " listener-prompt global set-hash
+"  " listener-prompt set-global
 
 : bye ( -- )
     #! Exit the current listener.
@@ -49,17 +48,9 @@ SYMBOL: callstack-hook
     #! search path.
     [ use [ clone ] change (listener) ] with-scope ;
 
-: credits ( -- )
-    "Slava Pestov:       dup drop swap >r r>" print
-    "Alex Chapman:       OpenGL binding" print
-    "Doug Coleman:       Mersenne Twister random number generator" print
-    "Chris Double:       continuation-based web framework" print
-    "Mackenzie Straight: Windows port" print ;
-
 : print-banner ( -- )
     "Factor " write version write
-    " on " write os write "/" write cpu write
-    ". For credits, type ``credits''." print ;
+    " on " write os write "/" write cpu print ;
 
 IN: shells
 

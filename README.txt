@@ -9,22 +9,16 @@ implementation. It is not an introduction to the language itself.
 Factor is fully supported on the following platforms:
 
   Linux/x86
-  FreeBSD/x86
+  Linux/AMD64
   Microsoft Windows 2000 or later
   Mac OS X/PowerPC
+
+The following platforms should work, but are not tested on a
+regular basis:
+
+  FreeBSD/x86
+  FreeBSD/AMD64
   Linux/PowerPC
-
-While Factor may run on other Unix platforms (Solaris/Sparc,
-Linux/Alpha, and so on), the native compiler will not be available, and
-thus much functionality will be missing. In particular, the following
-features require the native compiler and only work on supported
-platforms:
-
-  C library interface
-  Non-blocking I/O
-  Networking
-
-Factor _will not_ run, at all, on Windows NT or Windows 9x.
 
 * Compiling Factor
 
@@ -44,8 +38,8 @@ parameters to build the Factor runtime:
   macosx-sdl
   windows
 
-Note: If you wish to use the Factor UI on Mac OS X, you must build with the
-macosx-sdl target.
+Note: If you wish to use the Factor UI on Mac OS X, you must build with
+the macosx-sdl target.
 
 The following options can be given to make:
 
@@ -69,12 +63,11 @@ Compilation will yield an executable named 'f'.
 
 * Building Factor
 
-The Factor source distribution ships with four boot image files:
+The Factor source distribution ships with three boot image files:
 
-  boot.image.le32 - for x86
-  boot.image.be32 - for PowerPC, SPARC
-  boot.image.le64 - for x86-64, Alpha
-  boot.image.be64 - for PowerPC/64, UltraSparc
+  boot.image.x86
+  boot.image.ppc
+  boot.image.amd64
 
 Once you have compiled the Factor runtime, you must bootstrap the Factor
 system using the image that corresponds to your CPU architecture.
@@ -112,8 +105,8 @@ naming the libraries during bootstrap, as in the next section.
 
 * Setting up SDL libraries for use with Factor
 
-The Windows binary package for Factor includes all prerequisite DLLs. On Unix,
-you need recent versions of SDL and FreeType.
+The Windows binary package for Factor includes all prerequisite DLLs.
+On Unix, you need recent versions of SDL and FreeType.
 
 If you have installed these libraries but the UI still fails with an
 error, you will need to find out the exact names that they are installed
@@ -158,7 +151,7 @@ as, and issue a command similar to the following to bootstrap Factor:
 The UI has a simple tutorial that will show you the most basic concepts.
 
 There is a detailed language and library reference available at
-http://factor.sourceforge.net/handbook.pdf.
+http://factorcode.org/handbook.pdf.
 
 You can browse the source code; it is organized into small,
 well-commented files and should be easy to follow once you have a good
@@ -166,11 +159,23 @@ grasp of the language.
 
 * Community
 
-The Factor homepage is located at http://factor.sourceforge.net/.
+The Factor homepage is located at http://factorcode.org/.
 
 Factor developers meet in the #concatenative channel on the
 irc.freenode.net server. Drop by if you want to discuss anything related
 to Factor or language design in general.
+
+* Credits
+
+The following people have contributed code to the Factor core:
+
+Slava Pestov:       Lead developer
+Alex Chapman:       OpenGL binding
+Doug Coleman:       Mersenne Twister random number generator
+Mackenzie Straight: Windows port
+
+A number of contributed libraries not part of the core can be found in
+contrib/. See contrib/README.txt for details.
 
 Have fun!
 

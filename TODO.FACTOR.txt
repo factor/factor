@@ -1,5 +1,6 @@
 + 0.80:
 
+- runtime primitives like fopen: check for null input
 - make = for sequences more efficient
 - zero-height gadgets mess up hit testing
 - does parsing cons excessive amounts of bignums with c-streams
@@ -15,12 +16,12 @@
 - <string> ( length initial )
 - remove repetitions
 - need something like uncons but for arbitrary sequences
-- on win64: to_cell will break
 - .h .b .o for ratios and floats is broken
 - amd64 to do:
   - alien calls
   - relocation problem
   - compiling sheet runs out of memory
+  - port ffi to win64
 
 word help sections:
 - synopsis

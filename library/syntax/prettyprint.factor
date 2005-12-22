@@ -334,7 +334,7 @@ M: wrapper pprint* ( wrapper -- )
 : pprint-short ( object -- string )
     [
         1 line-limit set
-        20 length-limit set
+        15 length-limit set
         2 nesting-limit set
         string-limit on
         pprint

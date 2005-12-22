@@ -55,3 +55,6 @@ C: splitter ( first second split vector -- splitter )
 
 M: splitter layout* ( splitter -- )
     dup splitter-layout packed-layout ;
+
+: find-splitter ( gadget -- splitter )
+    [ splitter? ] find-parent ;

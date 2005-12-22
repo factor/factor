@@ -50,8 +50,7 @@ namespaces prettyprint sequences strings vectors words ;
     report ;
 
 : set-walk-hooks ( -- )
-    [ meta-d get "Stepper data stack:" ] datastack-hook set
-    [ meta-r* "Stepper return stack:" ] callstack-hook set
+    [ meta-d get ] datastack-hook set
     "walk " listener-prompt set ;
 
 : walk ( quot -- )

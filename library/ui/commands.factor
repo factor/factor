@@ -5,29 +5,29 @@ kernel lists namespaces parser prettyprint sequences words ;
 
 SYMBOL: commands
 
-TUPLE: command name pred quot default? ;
+TUPLE: command name pred quot context default? ;
 
-V{ } clone commands global set-hash
+V{ } clone commands set-global
 
 : forget-command ( name -- )
     global [
         commands [ [ command-name = not ] subset-with ] change
     ] bind ;
 
-: (define-command) ( name pred quot default? -- )
+: (define-command) ( name pred quot context default? -- )
     <command> dup command-name forget-command commands get push ;
 
-: define-command ( name pred quot -- )
+: define-command ( name pred quot context -- )
     f (define-command) ;
 
-: define-default-command ( name pred quot -- )
+: define-default-command ( name pred quot context -- )
     t (define-command) ;
 
 : applicable ( object -- seq )
     commands get [ command-pred call ] subset-with ;
 
 : command>quot ( presented command -- quot )
-    command-quot curry [ pane get pane-call ] curry ;
+    [ command-quot curry ] keep command-context unit curry ;
 
 TUPLE: command-button object ;
 
@@ -64,22 +64,3 @@ C: command-button ( gadget object -- button )
 
 M: command-button gadget-help ( button -- string )
     command-button-object dup word? [ synopsis ] [ summary ] if ;
-
-"Describe" [ drop t ] [ describe ] define-default-command
-"Prettyprint" [ drop t ] [ . ] define-command
-"Push on data stack" [ drop t ] [ ] define-command
-
-"See word" [ word? ] [ see ] define-default-command
-"Word call hierarchy" [ word? ] [ uses. ] define-command
-"Word caller hierarchy" [ word? ] [ usage. ] define-command
-"Open in jEdit" [ word? ] [ jedit ] define-command
-"Reload original source" [ word? ] [ reload ] define-command
-"Annotate with watchpoint" [ compound? ] [ watch ] define-command
-"Annotate with breakpoint" [ compound? ] [ break ] define-command
-"Annotate with profiling" [ compound? ] [ profile ] define-command
-"Compile" [ word? ] [ recompile ] define-command
-"Infer stack effect" [ word? ] [ unit infer . ] define-command
-
-"Display gadget" [ [ gadget? ] is? ] [ gadget. ] define-command
-
-"Use as input" [ input? ] [ input-string pane get replace-input ] define-default-command

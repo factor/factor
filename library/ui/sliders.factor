@@ -44,9 +44,8 @@ SYMBOL: slider-changed
     [ slider-changed ] swap handle-gesture drop ;
 
 : elevator-drag ( elevator -- )
-    dup drag-loc >r find-slider r> over gadget-orientation v.
-    over screen>slider
-    swap set-slider-value* ;
+    [ find-slider ] keep drag-loc over gadget-orientation v.
+    over screen>slider swap set-slider-value* ;
 
 : thumb-actions ( thumb -- )
     dup [ drop ] [ button-up ] set-action
@@ -73,7 +72,7 @@ SYMBOL: slider-changed
     swap slide-by-page ;
 
 : elevator-actions ( elevator -- )
-    [ elevator-click ] [ button-down 1 ] set-action ;
+    [ elevator-click ] [ button-down ] set-action ;
 
 C: elevator ( vector -- elevator )
     dup delegate>gadget [ set-gadget-orientation ] keep

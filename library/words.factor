@@ -129,4 +129,4 @@ M: word literalize <wrapper> ;
     global [ \ gensym dup inc get ] bind
     number>string append f <word> dup init-word ;
 
-0 \ gensym global set-hash
+0 \ gensym set-global

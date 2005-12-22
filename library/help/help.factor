@@ -1,6 +1,6 @@
 IN: help
-USING: arrays gadgets-presentations hashtables io kernel
-namespaces parser sequences words ;
+USING: arrays gadgets-listener gadgets-presentations hashtables
+io kernel namespaces parser sequences words ;
 
 : help ( topic -- )
     default-style [
@@ -11,9 +11,9 @@ namespaces parser sequences words ;
 
 : glossary ( name -- ) <term> help ;
 
-"Show word documentation" [ word? ] [ help ] define-command
-"Show term definition" [ term? ] [ help ] define-default-command
-"Show article" [ link? ] [ help ] define-default-command
+"Show word documentation" [ word? ] [ help ] \ in-browser define-command
+"Show term definition" [ term? ] [ help ] \ in-browser define-default-command
+"Show article" [ link? ] [ help ] \ in-browser define-default-command
 
-H{ } clone articles global set-hash
-H{ } clone terms global set-hash
+H{ } clone articles set-global
+H{ } clone terms set-global
