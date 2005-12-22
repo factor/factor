@@ -24,7 +24,7 @@
 ! ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 IN: win32-stream
-USING: alien continuations generic io-internals kernel
+USING: alien generic io-internals kernel
 kernel-internals lists math namespaces prettyprint sequences
 io strings threads win32-api win32-io-internals ;
 
