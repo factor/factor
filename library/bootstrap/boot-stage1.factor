@@ -184,7 +184,6 @@ vectors words ;
         "/library/ui/incremental.factor"
         "/library/ui/paragraphs.factor"
         "/library/ui/panes.factor"
-        "/library/ui/books.factor"
         "/library/ui/outliner.factor"
         "/library/ui/listener.factor"
         "/library/ui/commands.factor"
