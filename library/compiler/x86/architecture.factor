@@ -1,5 +1,5 @@
 IN: compiler-backend
-USING: alien assembler compiler compiler-backend kernel
+USING: alien arrays assembler compiler compiler-backend kernel
 sequences ;
 
 ! x86 register assignments
@@ -45,3 +45,6 @@ M: float-regs fastcall-regs drop 0 ;
 : compile-prologue ; inline
 
 : compile-epilogue ; inline
+
+: load-indirect ( dest literal -- )
+    add-literal 1array MOV rel-absolute-cell rel-address ; inline

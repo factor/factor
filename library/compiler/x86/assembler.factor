@@ -6,6 +6,10 @@ lists math namespaces parser sequences words ;
 
 ! A postfix assembler for x86 and AMD64.
 
+! In 32-bit mode, { 1234 } is absolute indirect addressing.
+! In 64-bit mode, { 1234 } is RIP-relative.
+! Beware!
+
 : byte? -128 127 between? ;
 
 GENERIC: modifier ( op -- mod )
@@ -76,7 +80,7 @@ PREDICATE: array displaced
 M: displaced modifier second byte? BIN: 01 BIN: 10 ? ;
 M: displaced register first register ;
 M: displaced displacement
-    second dup byte? [ assemble-1 ] [ assemble-cell ] if ;
+    second dup byte? [ assemble-1 ] [ assemble-4 ] if ;
 M: displaced canonicalize
     dup first EBP = not over second 0 = and
     [ first 1array ] when ;
@@ -92,7 +96,7 @@ M: disp-only register
     #! x86 encodes displacement-only as { EBP }.
     drop BIN: 101 ;
 M: disp-only displacement
-    first assemble-cell ;
+    first assemble-4 ;
 
 ( Utilities                                                    )
 UNION: operand register indirect displaced disp-only ;

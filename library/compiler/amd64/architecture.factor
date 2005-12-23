@@ -1,6 +1,6 @@
 IN: compiler-backend
-USING: alien assembler compiler compiler-backend kernel
-sequences ;
+USING: alien arrays assembler compiler compiler-backend kernel
+math sequences ;
 
 ! AMD64 register assignments
 ! RAX RCX RDX RSI RDI R8 R9 R10 R11 vregs
@@ -48,3 +48,8 @@ M: float-regs fastcall-regs drop 0 ;
 : compile-prologue RSP 8 SUB ; inline
 
 : compile-epilogue RSP 8 ADD ; inline
+
+: load-indirect ( dest literal -- )
+    #! We use RIP-relative addressing. The '3' is a hardcoded
+    #! instruction length.
+    add-literal from 3 - 1array MOV ; inline
