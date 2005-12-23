@@ -1,67 +1,27 @@
 IN: help
 USING: gadgets gadgets-books gadgets-borders gadgets-buttons
-gadgets-editors gadgets-labels gadgets-layouts gadgets-panes
-gadgets-presentations gadgets-theme generic kernel lists math
-namespaces sdl sequences strings styles ;
-
-: tutorial-font { "Serif" plain 14 } swap set-label-font ;
-
-: heading-font { "Serif" plain 24 } swap set-label-font ;
-
-: <slide-title> ( text -- gadget )
-    <label> dup heading-font ;
-
-: <underline> ( -- gadget )
-    <gadget>
-    T{ gradient f { { 0.25 0.25 0.25 1.0 } { 1.0 1.0 1.0 1.0 } } }
-    over set-gadget-interior
-    { 0 10 0 } over set-gadget-dim
-    { 1 0 0 } over set-gadget-orientation ;
-
-GENERIC: tutorial-line ( object -- gadget )
-
-M: string tutorial-line
-    {
-        { [ "* " ?head ] [ <slide-title> ] }
-        { [ dup "--" = ] [ drop <underline> ] }
-        { [ t ] [ <label> dup tutorial-font ] }
-    } cond ;
-
-: example-theme
-    T{ solid f { 0.8 0.8 1.0 1.0 } } swap set-gadget-interior ;
-
-! M: general-list tutorial-line
-!     car <input-button> dup example-theme ;
+gadgets-labels gadgets-panes io kernel namespaces sequences ;
 
 : page-theme
     T{ gradient f { { 0.8 0.8 1.0 1.0 } { 1.0 0.8 1.0 1.0 } } }
     swap set-gadget-interior ;
 
-: <page> ( list -- gadget )
-    [ tutorial-line ] map make-pile 1 over set-pack-fill
+: <page> ( markup -- gadget )
+    [ default-style [ print-element ] with-style ] make-pane
     dup page-theme <default-border> ;
 
 : tutorial-pages
     {
         {
-            "* Factor: a dynamic language"
-            "--"
+            { $heading "Factor: a dynamic language" }
             "This series of slides presents a quick overview of Factor."
-            ""
-            "Factor is interactive, which means you can test out the code"
-            "in this tutorial immediately."
-            ""
-            "Code examples will insert themselves in the listener's input"
-            "area when clicked:"
-            ""
-            [ "\"hello world\" print" ]
-            ""
+            "Factor is interactive, which means you can test out the code in this tutorial immediately."
+            "Code examples will insert themselves in the listener's input area when clicked:"
+            { $code "\"hello world\" print" }
             "You can then press ENTER to execute the code, or edit it first."
-            ""
-            "http://factor.sourceforge.net"
+            { $url "http://factorcode.org" }
         } {
-            "* The view from 10,000 feet"
-            "--"
+            { $heading "The view from 10,000 feet" }
             "- Everything is an object"
             "- A word is a basic unit of code"
             "- Words are identified by names, and organized in vocabularies"
@@ -69,266 +29,131 @@ M: string tutorial-line
             "- Code blocks can be passed as parameters to words"
             "- Word definitions are very short with very high code reuse"
         } {
-            "* Basic syntax"
-            "--"
-            "Factor code is made up of whitespace-speparated tokens."
-            "Recall the example from the first slide:"
-            ""
-            [ "\"hello world\" print" ]
-            ""
+            { $heading "Basic syntax" }
+            "Factor code is made up of whitespace-speparated tokens. Recall the example from the first slide:"
+            { $code "\"hello world\" print" }
             "The first token (\"hello world\") is a string."
             "The second token (print) is a word."
             "The string is pushed on the stack, and the print word prints it."
         } {
-            "* The stack"
-            "--"
+            { $heading "The stack" }
             "- The stack is like a pile of papers."
             "- You can ``push'' papers on the top of the pile,"
             "  and ``pop'' papers from the top of the pile."
-            ""
             "Here is another code example:"
-            ""
-            [ "2 3 + ." ]
-            ""
+            { $code "2 3 + ." }
             "Try running it in the listener now."
         } {
-            "* Postfix arithmetic"
-            "--"
-            "What happened when you ran it?"
-            ""
-            "The two numbers (2 3) are pushed on the stack."
-            "Then, the + word pops them and pushes the result (5)."
-            "Then, the . word prints this result."
-            ""
+            { $heading "Postfix arithmetic" }
+            "What happened when you ran it? The two numbers (2 3) are pushed on the stack. Then, the + word pops them and pushes the result (5). Then, the . word prints this result."
             "This is called postfix arithmetic."
             "Traditional arithmetic is called infix: 3 + (6 * 2)"
             "Lets translate this into postfix: 3 6 2 * + ."
         } {
-            "* Colon definitions"
-            "--"
+            { $heading "Colon definitions" }
             "We can define new words in terms of existing words."
-            ""
-            [ ": twice  2 * ;" ]
-            ""
-            "This defines a new word named ``twice'' that calls ``2 *''."
-            "Try the following in the listener:"
-            ""
-            [ "3 twice twice ." ]
-            ""
+            { $code ": twice  2 * ;" }
+            "This defines a new word named ``twice'' that calls ``2 *''. Try the following in the listener:"
+            { $code "3 twice twice ." }
             "The result is the same as if you wrote:"
-            ""
-            [ "3 2 * 2 * ." ]
+            { $code "3 2 * 2 * ." }
         } {
-            "* Stack effects"
-            "--"
-            "When we look at the definition of the ``twice'' word,"
-            "it is intuitively obvious that it takes one value from the stack,"
-            "and leaves one value behind. However, with more complex"
-            "definitions, it is better to document this so-called"
-            "``stack effect''."
-            ""
-            "A stack effect comment is written between ( and )."
-            "Factor ignores stack effect comments. Don't you!"
-            ""
+            { $heading "Stack effects" }
+            "When we look at the definition of the ``twice'' word, it is intuitively obvious that it takes one value from the stack, and leaves one value behind. However, with more complex definitions, it is better to document this so-called ``stack effect''."
+            "A stack effect comment is written between ( and ). Factor ignores stack effect comments. Don't you!"
             "The stack effect of twice is ( x -- 2*x )."
             "The stack effect of + is ( x y -- x+y )."
             "The stack effect of . is ( object -- )."
         } {
-            "* Reading user input"
-            "--"
-            "User input is read using the readln ( -- string ) word."
-            "Note its stack effect; it puts a string on the stack."
-            ""
+            { $heading "Reading user input" }
+            "User input is read using the readln ( -- string ) word. Note its stack effect; it puts a string on the stack."
             "This program will ask your name, then greet you:"
-            ""
-            [ "\"What is your name?\" print" ]
-            [ "readln \"Hello, \" write print" ]
+            { $code "\"What is your name?\" print\nreadln \"Hello, \" write print" }
         } {
-            "* Shuffle words"
-            "--"
-            "The word ``twice'' we defined is useless."
-            "Let's try something more useful: squaring a number."
-            ""
-            "We want a word with stack effect ( n -- n*n )."
-            "However, we cannot use * by itself, since its stack effect"
-            "is ( x y -- x*y ); it expects two inputs."
-            ""
-            "However, we can use the word ``dup''. It has stack effect"
-            "( object -- object object ), and it does exactly what we"
-            "need. The ``dup'' word is known as a shuffle word."
+            { $heading "Shuffle words" }
+            "The word ``twice'' we defined is useless. Let's try something more useful: squaring a number."
+            "We want a word with stack effect ( n -- n*n ). We cannot use * by itself, since its stack effect is ( x y -- x*y ); it expects two inputs."
+            "However, we can use the word ``dup''. It has stack effect ( object -- object object ), and it does exactly what we need. The ``dup'' word is known as a shuffle word."
         } {
-            "* The squared word"
-            "--"
+            { $heading "The squared word" }
             "Try entering the following word definition:"
-            ""
-            [ ": square ( n -- n*n ) dup * ;" ]
-            ""
-            "Shuffle words solve the problem where we need to compose"
-            "two words, but their stack effects do not ``fit''."
-            ""
+            { $code ": square ( n -- n*n ) dup * ;" }
+            "Shuffle words solve the problem where we need to compose two words, but their stack effects do not ``fit''."
             "Some of the most commonly-used shuffle words:"
-            ""
-            "drop ( object -- )"
-            "swap ( obj1 obj2 -- obj2 obj1 )"
-            "over ( obj1 obj2 -- obj1 obj2 obj1 )"
+            { $code "drop ( object -- )\nswap ( obj1 obj2 -- obj2 obj1 )\nover ( obj1 obj2 -- obj1 obj2 obj1 )" }
         } {
-            "* Another shuffle example"
-            "--"
+            { $heading "Another shuffle example" }
             "Now let us write a word that negates a number."
             "Start by entering the following in the listener"
-            ""
-            [ "0 10 - ." ]
-            ""
+            { $code "0 10 - ." }
             "It will print -10, as expected. Now notice that this the same as:"
-            ""
-            [ "10 0 swap - ." ]
-            ""
+            { $code "10 0 swap - ." }
             "So indeed, we can factor out the definition ``0 swap -'':"
-            ""
-            [ ": negate ( n -- -n ) 0 swap - ;" ]
+            { $code ": negate ( n -- -n ) 0 swap - ;" }
         } {
-            "* Seeing words"
-            "--"
-            "If you have entered every definition in this tutorial,"
-            "you will now have several new colon definitions:"
-            ""
-            "  twice"
-            "  square"
-            "  negate"
-            ""
-            "You can look at previously-entered word definitions using 'see'."
-            "Try the following:"
-            ""
-            [ "\\ negate see" ]
-            ""
-            "Prefixing a word with \\ pushes it on the stack, instead of"
-            "executing it. So the see word has stack effect ( word -- )."
+            { $heading "Seeing words" }
+            "If you have entered every definition in this tutorial, you will now have several new colon definitions:"
+            { $code "twice\nsquare\nnegate" }
+            "You can look at previously-entered word definitions using 'see'. Try the following:"
+            { $code "\\ negate see" }
+            "Prefixing a word with \\ pushes it on the stack, instead of executing it. So the see word has stack effect ( word -- )."
         } {
-            "* Branches"
-            "--"
-            "Now suppose we want to write a word that computes the"
-            "absolute value of a number; that is, if it is less than 0,"
-            "the number will be negated to yield a positive result."
-            ""
-            [ ": absolute ( x -- |x| ) dup 0 < [ negate ] when ;" ]
-            ""
-            "If the top of the stack is negative, the word negates it"
-            "again, making it positive."
-            ""
-            "The < ( x y -- x<y ) word outputs a boolean."
-            "In Factor, any object can be used as a truth value."
+            { $heading "Branches" }
+            "Now suppose we want to write a word that computes the absolute value of a number; that is, if it is less than 0, the number will be negated to yield a positive result."
+            { $code ": absolute ( x -- |x| ) dup 0 < [ negate ] when ;" }
+            "If the top of the stack is negative, the word negates it again, making it positive. The < ( x y -- x<y ) word outputs a boolean. In Factor, any object can be used as a truth value."
             "- The f object is false."
             "- Anything else is true."
         } {
-            "* More branches"
-            "--"
+            { $heading "More branches" }
             "On the previous slide, you saw the 'when' conditional:"
-            ""
-            [ "  ... condition ... [ ... true case ... ] when" ]
-            ""
+            { $code "  ... condition ... [ ... true case ... ] when" }
             "Another commonly-used form is 'unless':"
-            ""
-            [ "  ... condition ... [ ... false case ... ] unless" ]
-            ""
+            { $code "  ... condition ... [ ... false case ... ] unless" }
             "The 'if' conditional takes action on both branches:"
-            ""
-            [ "  ... condition ... [ ... ] [ ... ] if" ]
+            { $code "  ... condition ... [ ... ] [ ... ] if" }
         } {
-            "* Combinators"
-            "--"
+            { $heading "Combinators" }
             "if, when, unless are words that take lists of code as input."
-            ""
-            "Lists of code are called ``quotations''."
-            "Words that take quotations are called ``combinators''."
-            ""
-            "Another combinator is times ( n quot -- )."
-            "It calls a quotation n times."
-            ""
+            "Lists of code are called ``quotations''. Words that take quotations are called ``combinators''."
+            "Another combinator is times ( n quot -- ). It calls a quotation n times."
             "Try this:"
-            ""
-            [ "10 [ \"Hello combinators\" print ] times" ]
+            { $code "10 [ \"Hello combinators\" print ] times" }
         } {
-            "* Sequences"
-            "--"
+            { $heading "Sequences" }
             "You have already seen strings, very briefly:"
-            ""
             "  \"Hello world\""
-            ""
-            "Strings are part of a class of objects called sequences."
-            "Two other types of sequences you will use a lot are:"
-            ""
-            "  Lists: [ 1 3 \"hi\" 10 2 ]"
-            "  Arrays: { \"the\" { \"quick\" \"brown\" } \"fox\" }"
-            ""
-            "As you can see in the second example, lists and arrays"
-            "can contain any type of object, including other lists"
-            "and arrays."
+            "Strings are part of a class of objects called sequences. Two other types of sequences you will use a lot are:"
+            "Lists: [ 1 3 \"hi\" 10 2 ]"
+            "Arrays: { \"the\" { \"quick\" \"brown\" } \"fox\" }"
+            "As you can see in the second example, lists and arrays can contain any type of object, including other lists and arrays."
         } {
-            "* Sequences and combinators"
-            "--"
-            "A very useful combinator is each ( seq quot -- )."
-            "It calls a quotation with each element of the sequence in turn."
-            ""
+            { $heading "Sequences and combinators" }
+            "A very useful combinator is each ( seq quot -- ). It calls a quotation with each element of the sequence in turn."
             "Try this:"
-            ""
-            [ "{ 10 20 30 } [ . ] each" ]
-            ""
-            "A closely-related combinator is map ( seq quot -- seq )."
-            "It also calls a quotation with each element."
-            "However, it then collects the outputs of the quotation"
-            "into a new sequence."
-            ""
+            { $code "{ 10 20 30 } [ . ] each" }
+            "A closely-related combinator is map ( seq quot -- seq ). It also calls a quotation with each element."
+            "However, it then collects the outputs of the quotation into a new sequence."
             "Try this:"
-            ""
-            [ "{ 10 20 30 } [ 3 + ] map ." ]
-            "==> { 13 23 33 }"
+            { $code "{ 10 20 30 } [ 3 + ] map ." }
         } {
-            "* Numbers - integers and ratios"
-            "--"
-            "Factor's supports arbitrary-precision integers and ratios."
-            ""
+            { $heading "Numbers - integers and ratios" }
+            "Factor supports arbitrary-precision integers and ratios."
             "Try the following:"
-            ""
-            [ ": factorial ( n -- n! ) 1 swap <range> product ;" ]
-            [ "100 factorial ." ]
-            ""
-            [ "1 3 / 1 2 / + ." ]
-            ""
-            "Rational numbers are added, multiplied and reduced to"
-            "lowest terms in the same way you learned in grade school."
+            { $code ": factorial ( n -- n! ) 1 swap <range> product ;\n100 factorial .\n1 3 / 1 2 / + ." }
+            "Rational numbers are added, multiplied and reduced to lowest terms in the same way you learned in grade school."
         } {
-            "* Object oriented programming"
-            "--"
-            "Each object belongs to a class."
-            "Generic words act differently based on an object's class."
-            ""
-            [ "GENERIC: describe ( object -- )" ]
-            [ "M: integer describe \"The integer \" write . ;" ]
-            [ "M: string describe \"The string \" write . ;" ]
-            [ "M: object describe drop \"Unknown object\" print ;" ]
-            ""
-            "Each M: line defines a ``method.''"
-            "Method definitions may appear in independent source files."
-            ""
-            "integer, string, object are built-in classes."
+            { $heading "Object oriented programming" }
+            "Each object belongs to a class. Generic words act differently based on an object's class."
+            { $code "GENERIC: describe ( object -- )\nM: integer describe \"The integer \" write . ;\nM: string describe \"The string \" write . ;\nM: object describe drop \"Unknown object\" print ;" }
+            "Each M: line defines a ``method.'' Method definitions may appear in independent source files. Examples of built-in classes are integer, string, and object."
         } {
-            "* Defining new classes"
-            "--"
+            { $heading "Defining new classes" }
             "New classes can be defined:"
-            ""
-            [ "TUPLE: point x y ;" ]
-            [ "M: point describe" ]
-            [ "  \"x =\" write dup point-x ." ]
-            [ "  \"y =\" write point-y . ;" ]
-            [ "100 200 <point> describe" ]
-            ""
-            "A tuple is a collection of named slots."
-            ""
-            "Tuples support custom constructors, delegation..."
-            "see the developer's handbook for details."
+            { $code "TUPLE: point x y ;\nM: point describe\n  \"x =\" write dup point-x .\n  \"y =\" write point-y . ;\n100 200 <point> describe" }
+            "A tuple is a collection of named slots. Tuples support custom constructors, delegation... see the developer's handbook for details."
         } {
-            "* The library"
-            "--"
+            { $heading "The library" }
             "Offers a good selection of highly-reusable words:"
             "- Operations on sequences"
             "- Variety of mathematical functions"
@@ -336,22 +161,17 @@ M: string tutorial-line
             "- Graphical user interface framework"
             "Browsing the library:"
             "- To list all vocabularies:"
-            [ "vocabs ." ]
+            { $code "vocabs." }
             "- To list all words in a vocabulary:"
-            [ "\"sequences\" words ." ]
+            { $code "\"sequences\" words." }
             "- To show a word definition:"
-            [ "\\ reverse see" ]
+            { $code "\\ reverse see" }
         } {
-            "* Learning more"
-            "--"
+            { $heading "Learning more" }
             "Hopefully this tutorial has sparked your interest in Factor."
-            ""  
             "You can learn more by reading the Factor developer's handbook:"
-            ""
-            "http://factor.sourceforge.net/handbook.pdf"
-            ""
-            "Also, point your IRC client to irc.freenode.net and hop in the"
-            "#concatenative channel to chat with other Factor geeks."
+            { $url "http://factorcode.org/handbook.pdf" }
+            "Also, point your IRC client to irc.freenode.net and hop in the #concatenative channel to chat with other Factor geeks."
         }
     } ;
 

@@ -18,16 +18,20 @@ USING: styles ;
 : parameter-style
     H{
         { font "Monospaced" }
-        { font-size 12 }
         { font-style italic }
     } ;
 
 : code-style
     H{
         { font "Monospaced" }
-        { font-size 12 }
         { page-color { 0.9 0.9 0.9 1 } }
         { border-color { 0.95 0.95 0.95 1 } }
         { border-width 5 }
         { wrap-margin f }
+    } ;
+
+: url-style
+    H{
+        { font "Monospaced" }
+        { foreground { 0.0 0.0 1.0 1.0 } }
     } ;

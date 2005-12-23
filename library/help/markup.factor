@@ -43,6 +43,8 @@ M: array print-element
 
 : $emphasis emphasis-style ($span) ;
 
+: $url url-style ($span) ;
+
 : $terpri terpri drop ;
 
 ! Some blocks
