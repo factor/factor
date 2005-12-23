@@ -1,7 +1,8 @@
 IN: gadgets-presentations
-USING: compiler gadgets gadgets-buttons gadgets-menus
-gadgets-panes generic hashtables inference inspector io jedit
-kernel lists namespaces parser prettyprint sequences words ;
+USING: compiler gadgets gadgets-buttons gadgets-listener
+gadgets-menus gadgets-panes generic hashtables inference
+inspector io jedit kernel lists namespaces parser prettyprint
+sequences words ;
 
 SYMBOL: commands
 
@@ -64,3 +65,22 @@ C: command-button ( gadget object -- button )
 
 M: command-button gadget-help ( button -- string )
     command-button-object dup word? [ synopsis ] [ summary ] if ;
+
+"Describe" [ drop t ] [ describe ] \ in-browser define-default-command
+"Prettyprint" [ drop t ] [ . ] \ in-listener define-command
+"Push on data stack" [ drop t ] [ ] \ in-listener define-command
+
+"See word" [ word? ] [ see ] \ in-browser define-default-command
+"Word call hierarchy" [ word? ] [ uses. ] \ in-browser define-command
+"Word caller hierarchy" [ word? ] [ usage. ] \ in-browser define-command
+"Open in jEdit" [ word? ] [ jedit ] \ call define-command
+"Reload original source" [ word? ] [ reload ] \ in-listener define-command
+"Annotate with watchpoint" [ compound? ] [ watch ] \ in-listener define-command
+"Annotate with breakpoint" [ compound? ] [ break ] \ in-listener define-command
+"Annotate with profiling" [ compound? ] [ profile ] \ in-listener define-command
+"Compile" [ word? ] [ recompile ] \ in-listener define-command
+"Infer stack effect" [ word? ] [ unit infer . ] \ in-listener define-command
+
+"Display gadget" [ [ gadget? ] is? ] [ gadget. ] \ in-listener define-command
+
+"Use as input" [ input? ] [ input-string pane get replace-input ] \ call define-default-command

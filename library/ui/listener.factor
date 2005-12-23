@@ -5,11 +5,10 @@ DEFER: <tutorial-button>
 
 IN: gadgets-listener
 USING: arrays compiler gadgets gadgets-editors gadgets-labels
-gadgets-layouts gadgets-panes gadgets-presentations
-gadgets-scrolling gadgets-splitters gadgets-theme generic
-hashtables inference inspector io jedit kernel listener lists
-math namespaces parser prettyprint sequences shells threads
-words ;
+gadgets-layouts gadgets-panes gadgets-scrolling
+gadgets-splitters gadgets-theme generic hashtables inference
+inspector io jedit kernel listener lists math namespaces parser
+prettyprint sequences shells threads words ;
 
 SYMBOL: stack-bar
 SYMBOL: browser-pane
@@ -81,22 +80,3 @@ M: label set-message ( string/f status -- )
     <listener> set-application
     [ clear listener-thread ] in-thread
     pane get request-focus ;
-
-"Describe" [ drop t ] [ describe ] \ in-browser define-default-command
-"Prettyprint" [ drop t ] [ . ] \ in-listener define-command
-"Push on data stack" [ drop t ] [ ] \ in-listener define-command
-
-"See word" [ word? ] [ see ] \ in-browser define-default-command
-"Word call hierarchy" [ word? ] [ uses. ] \ in-browser define-command
-"Word caller hierarchy" [ word? ] [ usage. ] \ in-browser define-command
-"Open in jEdit" [ word? ] [ jedit ] \ call define-command
-"Reload original source" [ word? ] [ reload ] \ in-listener define-command
-"Annotate with watchpoint" [ compound? ] [ watch ] \ in-listener define-command
-"Annotate with breakpoint" [ compound? ] [ break ] \ in-listener define-command
-"Annotate with profiling" [ compound? ] [ profile ] \ in-listener define-command
-"Compile" [ word? ] [ recompile ] \ in-listener define-command
-"Infer stack effect" [ word? ] [ unit infer . ] \ in-listener define-command
-
-"Display gadget" [ [ gadget? ] is? ] [ gadget. ] \ in-listener define-command
-
-"Use as input" [ input? ] [ input-string pane get replace-input ] \ call define-default-command
