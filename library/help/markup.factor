@@ -2,8 +2,8 @@
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: help
 USING: arrays gadgets gadgets-panes gadgets-presentations
-hashtables words io kernel lists namespaces prettyprint
-sequences strings styles ;
+hashtables inspector io kernel lists namespaces prettyprint
+sequences strings styles words ;
 
 ! Simple markup language.
 
@@ -63,11 +63,15 @@ M: link article-title link-name article-title ;
 
 M: link article-content link-name article-content ;
 
+M: link summary ( term -- string )
+    "An article named \"" swap article-title "\"" append3 ;
+
 DEFER: help
 
 : ($link) dup article-title swap ;
 
 : $subsection ( object -- )
+    terpri*
     subheading-style [
         first <link> ($link) dup [ link-name help ] curry
         simple-outliner

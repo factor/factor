@@ -46,7 +46,11 @@ SYMBOL: datastack-hook
     #! Run a listener loop that executes user input. We start
     #! the listener in a new scope and copy the vocabulary
     #! search path.
-    [ use [ clone ] change (listener) ] with-scope ;
+    [
+        use [ clone ] change
+        [ datastack ] datastack-hook set
+        (listener)
+    ] with-scope ;
 
 : print-banner ( -- )
     "Factor " write version write

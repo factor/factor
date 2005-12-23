@@ -48,7 +48,7 @@ SYMBOL: browser-pane
 : listener-thread
     pane get [
         [ ui-listener-hook ] listener-hook set
-        <tutorial-button> gadget.
+        <tutorial-button>
         tty
     ] with-stream* ;
 

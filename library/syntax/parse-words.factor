@@ -171,13 +171,12 @@ global [ string-mode off ] bind
 
 global [
     {
-        "scratchpad"
-        "syntax" "arrays" "compiler" "errors" "generic" "hashtables"
-        "help" "inference" "inspector" "interpreter" "io"
-        "jedit" "kernel" "listener" "lists" "math"
-        "memory" "namespaces" "parser" "prettyprint" "queues"
-        "sequences" "shells" "strings" "styles"
-        "test" "threads" "vectors" "words"
+        "scratchpad" "syntax" "arrays" "compiler" "errors"
+        "generic" "hashtables" "inference" "inspector"
+        "interpreter" "io" "jedit" "kernel" "listener" "lists"
+        "math" "memory" "namespaces" "parser" "prettyprint"
+        "queues" "sequences" "shells" "strings" "styles" "test"
+        "threads" "vectors" "words"
     } set-use
     "scratchpad" set-in
 ] bind
