@@ -20,7 +20,6 @@
 - .h .b .o for ratios and floats is broken
 - amd64 to do:
   - alien calls
-  - relocation problem
   - compiling sheet runs out of memory
   - port ffi to win64
 
