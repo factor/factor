@@ -1,6 +1,6 @@
 IN: compiler-backend
 USING: alien arrays assembler compiler compiler-backend kernel
-sequences ;
+kernel-internals sequences ;
 
 ! x86 register assignments
 ! EAX, ECX, EDX vregs
@@ -27,8 +27,9 @@ sequences ;
     [ drop EDX POP ] each ;
 
 ! On x86, parameters are never passed in registers.
+M: int-regs return-reg drop EAX ;
 M: int-regs fastcall-regs drop 0 ;
-M: int-regs reg-class-size drop 4 ;
+
 M: float-regs fastcall-regs drop 0 ;
 
 : dual-fp/int-regs? f ;

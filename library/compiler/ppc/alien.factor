@@ -3,26 +3,17 @@
 IN: compiler-backend
 USING: alien assembler kernel math ;
 
-M: %alien-invoke generate-node ( vop -- )
-    drop 0 input 1 input load-library compile-c-call ;
-
 GENERIC: store-insn ( from to offset reg-class -- )
 
 GENERIC: load-insn ( elt parameter reg-class -- )
 
-GENERIC: return-reg ( reg-class -- reg )
-
 M: int-regs store-insn drop 1 swap stack@ STW ;
-
-M: int-regs return-reg drop 3 ;
 
 M: int-regs load-insn drop 3 + 1 rot stack@ LWZ ;
 
 M: float-regs store-insn
     >r 1 swap stack@ r>
     float-regs-size 4 = [ STFS ] [ STFD ] if ;
-
-M: float-regs return-reg drop 1 ;
 
 M: float-regs load-insn
     >r 1+ 1 rot stack@ r> 
@@ -33,10 +24,13 @@ M: stack-params load-insn
 
 M: %unbox generate-node ( vop -- )
     drop
+    ! Call the unboxer
     1 input f compile-c-call
+    ! Store the return value on the C stack
     2 input return-reg 0 input 2 input store-insn ;
 
 M: %parameter generate-node ( vop -- )
+    ! Move a value from the C stack into the fastcall register
     drop 0 input 1 input 2 input load-insn ;
 
 M: %box generate-node ( vop -- ) drop 0 input f compile-c-call ;

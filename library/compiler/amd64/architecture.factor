@@ -1,6 +1,6 @@
 IN: compiler-backend
 USING: alien arrays assembler compiler compiler-backend kernel
-math sequences ;
+kernel-internals math sequences ;
 
 ! AMD64 register assignments
 ! RAX RCX RDX RSI RDI R8 R9 R10 R11 vregs
@@ -13,10 +13,11 @@ math sequences ;
 
 : ds-reg R14 ; inline
 : cs-reg R15 ; inline
-: return-reg RAX ; inline
 : remainder-reg RDX ; inline
 
 : vregs { RAX RCX RDX RSI RDI R8 R9 R10 R11 } ; inline
+
+: alien-regs { RDI RSI RDX RCX R8 R9 } ; inline
 
 : param-regs { RDI RSI RDX RCX R8 R9 } ; inline
 
@@ -27,9 +28,9 @@ math sequences ;
 : compile-c-call* ( symbol dll -- operands )
     param-regs swap [ MOV ] 2each compile-c-call ;
 
-! FIXME
-M: int-regs fastcall-regs drop 0 ;
-M: int-regs reg-class-size drop 4 ;
+M: int-regs return-reg drop RAX ;
+M: int-regs fastcall-regs drop alien-regs length ;
+
 M: float-regs fastcall-regs drop 0 ;
 
 : dual-fp/int-regs? f ;

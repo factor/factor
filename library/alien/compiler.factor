@@ -5,12 +5,6 @@ USING: assembler compiler compiler-backend compiler-frontend
 errors generic hashtables inference io kernel kernel-internals
 lists math namespaces prettyprint sequences strings words parser ;
 
-! ! ! WARNING ! ! !
-! Reloading this file into a running Factor instance on Win32
-! or Unix with FFI I/O will bomb the runtime, since I/O words
-! would become uncompiled, and FFI calls can only be made from
-! compiled code.
-
 ! USAGE:
 ! 
 ! Command line parameters given to the runtime specify libraries
@@ -72,7 +66,7 @@ C: alien-node make-node ;
 : stack-space ( parameters -- n )
     0 [ c-aligned + ] reduce ;
 
-: unbox-parameter ( n parameter -- node )
+: unbox-parameter ( stack# type -- node )
     c-type [ "unboxer" get "reg-class" get ] bind %unbox ;
 
 : unbox-parameters ( params -- )

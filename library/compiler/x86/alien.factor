@@ -4,14 +4,6 @@ IN: compiler-backend
 USING: alien assembler compiler inference kernel
 kernel-internals lists math memory namespaces words ;
 
-M: %alien-invoke generate-node
-    #! call a C function.
-    drop 0 input 1 input load-library compile-c-call ;
-
-M: %parameter generate-node
-    #! x86 does not pass parameters in registers
-    drop ;
-
 GENERIC: reg-size ( reg-class -- n )
 GENERIC: push-reg ( reg-class -- )
 

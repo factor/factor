@@ -27,7 +27,7 @@ math math-internals memory namespaces words ;
     ! Create a bignum.
     "s48_long_to_bignum" f 0 output-operand 1array compile-c-call*
     ! An untagged pointer to the bignum is now in EAX; tag it
-    return-reg bignum-tag OR
+    T{ int-regs } return-reg bignum-tag OR
     "end" get save-xt ; inline
 
 M: %fixnum+ generate-node ( vop -- )
@@ -51,7 +51,7 @@ M: %fixnum* generate-node ( vop -- )
     "s48_bignum_arithmetic_shift" f
     1 input-operand tag-bits neg 2array compile-c-call*
     ! an untagged pointer to the bignum is now in EAX; tag it
-    return-reg bignum-tag OR
+    T{ int-regs } return-reg bignum-tag OR
     "end" get save-xt ;
 
 M: %fixnum-mod generate-node ( vop -- )
@@ -81,7 +81,7 @@ M: %fixnum-mod generate-node ( vop -- )
     "s48_long_to_bignum" f
     0 input-operand 1array compile-c-call*
     ! An untagged pointer to the bignum is now in EAX; tag it
-    return-reg bignum-tag OR
+    T{ int-regs } return-reg bignum-tag OR
     ! the remainder is now in EDX
     remainder-reg POP
     "end" get save-xt ;

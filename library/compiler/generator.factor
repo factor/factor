@@ -1,7 +1,7 @@
 ! Copyright (C) 2004, 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: compiler-backend
-USING: assembler compiler errors inference kernel
+USING: alien assembler compiler errors inference kernel
 kernel-internals lists math memory namespaces sequences strings
 vectors words ;
 
@@ -59,6 +59,12 @@ M: %target-label generate-node ( vop -- )
     drop label 0 assemble-cell absolute-cell ;
 
 M: %parameters generate-node ( vop -- ) drop ;
+
+M: %parameter generate-node ( vop -- ) drop ;
+
+M: %alien-invoke generate-node
+    #! call a C function.
+    drop 0 input 1 input load-library compile-c-call ;
 
 : dest/src ( -- dest src ) 0 output-operand 0 input-operand ;
 
