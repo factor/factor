@@ -26,6 +26,8 @@ H{
     { "tgz"    "application/octet-stream"         }
     { "tar.gz" "application/octet-stream"         }
     { "gz"     "application/octet-stream"         }
+
+    { "pdf"    "application/pdf"                  }
                                                     
     { "factor" "application/x-factor"             }
     { "factsp" "application/x-factor-server-page" }

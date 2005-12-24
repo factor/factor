@@ -89,7 +89,8 @@ M: no-math-method error. ( error -- )
     
     dup parse-error-text dup string? [ print ] [ drop ] if
     
-    parse-error-col [ 0 ] unless* CHAR: \s fill write "^" print ;
+    parse-error-col [ 0 ] unless*
+    CHAR: \s <string> write "^" print ;
 
 M: parse-error error. ( error -- )
     dup parse-dump  delegate error. ;

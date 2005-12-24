@@ -144,7 +144,7 @@ unit-test
 ] unit-test
 
 [ { "" "a" "aa" "aaa" } ]
-[ 4 [ CHAR: a fill ] map ]
+[ 4 [ CHAR: a <string> ] map ]
 unit-test
 
 [ V{ } ] [ "f" V{ } clone [ delete ] keep ] unit-test

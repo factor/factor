@@ -216,6 +216,7 @@ call
     { "(array>tuple)" "kernel-internals"    }
     { "tuple>array" "generic"               }
     { "array>vector" "vectors"              }
+    { "<string>" "strings"                  }
 } dup length 3 swap [ + ] map-with [ make-primitive ] 2each
 
 : set-stack-effect ( { vocab word effect } -- )
@@ -274,7 +275,7 @@ FORGET: set-stack-effect
     register-builtin ;
 
 H{ } clone typemap set
-num-types <array> builtins set
+num-types f <array> builtins set
 
 ! These symbols are needed by the code that executes below
 "object" "generic" create drop

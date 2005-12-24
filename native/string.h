@@ -29,8 +29,9 @@ INLINE CELL string_size(CELL size)
 	return align8(sizeof(F_STRING) + (size + 1) * CHARS);
 }
 
-F_STRING* allot_string(CELL capacity);
-F_STRING* string(CELL capacity, CELL fill);
+F_STRING* allot_string(F_FIXNUM capacity);
+F_STRING* string(F_FIXNUM capacity, CELL fill);
+void primitive_string(void);
 void rehash_string(F_STRING* str);
 void primitive_rehash_string(void);
 F_STRING* resize_string(F_STRING* string, F_FIXNUM capacity, u16 fill);

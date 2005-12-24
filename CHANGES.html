@@ -19,6 +19,11 @@
 <li>Literal syntax change: <code>H{ [[ key value ]] ... }</code> is now <code>H{ { key value } }</code></li>
 </ul>
 <li>Association list words <code>assoc*</code>, <code>set-assoc</code>, <code>acons</code> and <code>remove-assoc</code> are gone.</li>
+<li>The <code>repeated</code> virtual sequence type is gone. Instead, the
+<code>&lt;array&gt;</code> word takes an initial element in addition to an
+initial size.</li>
+<li>The <code>fill</code> word to create a new string with an initial character
+repeated a certain number of times has been renamed to <code>&lt;string&gt;</code>.</li>
 </li>
 
 <li><code>stream-format ( string style stream -- )</code> now takes a hashtable
@@ -45,6 +50,8 @@ rather than an association list for specifying style information.</li>
 <ul>
 <li>A left click on a presentation now invokes the default command. A right click
 shows a menu of possibilities.</li>
+<li>The UI is layed out differently now. The window is split into a browser and
+listener, with certain commands displaying output in the browser.</li>
 <li>Fixed invalid OpenGL calls which caused problems on Windows machines with ATI
 drivers, and Linux machines with the MesaGL implementation.</li>
 </ul>

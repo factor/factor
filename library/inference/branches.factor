@@ -54,7 +54,7 @@ namespaces parser prettyprint sequences strings vectors words ;
     unify-effect meta-d set d-in set ;
 
 : callstack-effect ( seq -- )
-    dup length 0 <repeated>
+    dup length zero-array
     swap meta-r active-variable
     unify-effect meta-r set drop ;
 

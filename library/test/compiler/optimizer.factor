@@ -114,7 +114,7 @@ IN: temporary
 
 [ string ] [
     \ string
-    [ repeated integer string array reversed sbuf
+    [ integer string array reversed sbuf
     slice vector general-list ]
     [ class-compare ] sort min-class
 ] unit-test

@@ -471,10 +471,10 @@ sequences strings vectors words prettyprint ;
 \ (hashtable) [ [ ] [ hashtable ] ] "infer-effect" set-word-prop
 \ (hashtable) t "flushable" set-word-prop
 
-\ <array> [ [ number ] [ array ] ] "infer-effect" set-word-prop
+\ <array> [ [ integer object ] [ array ] ] "infer-effect" set-word-prop
 \ <array> t "flushable" set-word-prop
 
-\ <tuple> [ [ number ] [ tuple ] ] "infer-effect" set-word-prop
+\ <tuple> [ [ integer ] [ tuple ] ] "infer-effect" set-word-prop
 \ <tuple> t "flushable" set-word-prop
 
 \ begin-scan [ [ ] [ ] ] "infer-effect" set-word-prop
@@ -509,3 +509,6 @@ sequences strings vectors words prettyprint ;
 \ array>vector t "flushable" set-word-prop
 
 \ flush-icache [ [ ] [ ] ] "infer-effect" set-word-prop
+
+\ <string> [ [ integer integer ] [ array ] ] "infer-effect" set-word-prop
+\ <string> t "flushable" set-word-prop

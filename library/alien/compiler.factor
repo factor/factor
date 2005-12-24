@@ -23,11 +23,10 @@ lists math namespaces prettyprint sequences strings words parser ;
 TUPLE: alien-error library symbol ;
 
 M: alien-error error. ( error -- )
-    "C library interface words cannot be interpreted. " write
-    "Either the compiler is disabled, " write
-    "or the " write dup alien-error-library pprint
-    " library does not define the " write
-    alien-error-symbol pprint " symbol." print ;
+    "Words calling ``alien-invoke'' cannot run in the interpreter." print
+    "Compile this word and try again." print
+    "Library: " write dup alien-error-library .
+    "Symbol:  " write alien-error-symbol . ;
 
 : alien-invoke ( ... return library function parameters -- ... )
     #! Call a C library function.

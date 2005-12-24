@@ -14,15 +14,10 @@ F_ARRAY* allot_array(CELL type, F_FIXNUM capacity)
 	return array;
 }
 
-/* WARNING: fill must be an immediate type:
-either be F or a fixnum.
-
-if you want to use pass a pointer, you _must_ hit
-the write barrier manually with a write_barrier()
-call with the returned object. */
 F_ARRAY* array(CELL type, F_FIXNUM capacity, CELL fill)
 {
-	int i; F_ARRAY* array = allot_array(type, capacity);
+	int i;
+	F_ARRAY* array = allot_array(type, capacity);
 	for(i = 0; i < capacity; i++)
 		put(AREF(array,i),fill);
 	return array;
@@ -30,9 +25,10 @@ F_ARRAY* array(CELL type, F_FIXNUM capacity, CELL fill)
 
 void primitive_array(void)
 {
+	CELL initial = dpop();
 	F_FIXNUM size = to_fixnum(dpop());
 	maybe_gc(array_size(size));
-	dpush(tag_object(array(ARRAY_TYPE,size,F)));
+	dpush(tag_object(array(ARRAY_TYPE,size,initial)));
 }
 
 void primitive_tuple(void)

@@ -50,7 +50,7 @@ M: node infer-classes* ( node -- ) drop ;
 GENERIC: child-ties ( node -- seq )
 
 M: node child-ties ( node -- seq )
-    node-children length f <repeated> ;
+    node-children length f <array> ;
 
 : value-class ( value -- class )
     value-classes get hash [ object ] unless* ;

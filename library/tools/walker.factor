@@ -1,8 +1,9 @@
 ! Copyright (C) 2004, 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
-IN: interpreter
-USING: errors hashtables inspector io kernel listener lists math
-namespaces prettyprint sequences strings vectors words ;
+IN: walker
+USING: errors hashtables inspector interpreter io kernel
+listener lists math namespaces prettyprint sequences strings
+vectors words ;
 
 ! The single-stepper simulates Factor in Factor to allow
 ! single-stepping through the execution of a quotation. It can

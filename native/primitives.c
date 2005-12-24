@@ -187,7 +187,8 @@ void* primitives[] = {
 	primitive_clone,
 	primitive_array_to_tuple,
 	primitive_tuple_to_array,
-	primitive_array_to_vector
+	primitive_array_to_vector,
+	primitive_string
 };
 
 CELL primitive_to_xt(CELL primitive)

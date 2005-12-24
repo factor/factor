@@ -1,6 +1,6 @@
 IN: turing
-USING: hashtables kernel lists namespaces sequences vectors math
-prettyprint io strings words ;
+USING: arrays hashtables io kernel lists math namespaces
+prettyprint sequences strings vectors words ;
 
 ! A turing machine simulator.
 
@@ -38,7 +38,7 @@ SYMBOL: position
 SYMBOL: tape
 
 ! Initial tape
-20 0 <repeated> >vector tape set
+20 zero-array >vector tape set
 
 : sym ( -- sym )
     #! Symbol at head position.

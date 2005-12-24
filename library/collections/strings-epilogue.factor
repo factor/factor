@@ -7,11 +7,8 @@ sequences strings ;
 : empty-sbuf ( len -- sbuf )
     dup <sbuf> [ set-length ] keep ; inline
 
-: fill ( count char -- string )
-    <repeated> >string ; inline
-
 : padding ( string count char -- string )
-    >r swap length - 0 max r> fill ; flushable
+    >r swap length - 0 max r> <string> ; flushable
 
 : pad-left ( string count char -- string )
     pick >r padding r> append ; flushable
@@ -19,8 +16,7 @@ sequences strings ;
 : pad-right ( string count char -- string )
     pick >r padding r> swap append ; flushable
 
-: ch>string ( ch -- str )
-    1 swap fill ; flushable
+: ch>string ( ch -- str ) 1 swap <string> ; flushable
 
 : >sbuf ( seq -- sbuf )
     dup length <sbuf> [ swap nappend ] keep ; inline

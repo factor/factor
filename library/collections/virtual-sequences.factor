@@ -3,15 +3,6 @@
 IN: sequences
 USING: errors generic kernel math sequences-internals vectors ;
 
-! A repeated sequence is the same element n times.
-TUPLE: repeated length object ;
-
-M: repeated length repeated-length ;
-
-M: repeated nth nip repeated-object ;
-
-M: repeated nth-unsafe nip repeated-object ;
-
 ! A reversal of an underlying sequence.
 TUPLE: reversed ;
 

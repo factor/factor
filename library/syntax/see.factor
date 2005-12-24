@@ -1,7 +1,7 @@
 ! Copyright (C) 2003, 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: prettyprint
-USING: generic hashtables io kernel lists math namespaces
+USING: arrays generic hashtables io kernel lists math namespaces
 sequences strings styles words ;
 
 : declaration. ( word prop -- )
@@ -19,7 +19,7 @@ sequences strings styles words ;
     H{ { font-style italic } } text ;
 
 : stack-picture% ( seq -- string )
-    dup integer? [ object <repeated> ] when
+    dup integer? [ object <array> ] when
     [ word-name % " " % ] each ;
 
 : effect>string ( effect -- string )

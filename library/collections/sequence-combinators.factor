@@ -43,7 +43,7 @@ G: find ( seq quot -- i elt | quot: elt -- ? )
     #! Primitive mapping out of an integer sequence into an
     #! array. Used by map and 2map. Don't call, use map
     #! instead.
-    >r [ <array> ] keep r> swap [
+    >r [ f <array> ] keep r> swap [
         [ rot >r [ swap call ] keep r> set-array-nth ] 3keep
     ] repeat drop ; inline
 

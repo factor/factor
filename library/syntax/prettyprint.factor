@@ -46,7 +46,7 @@ C: section ( length -- section )
 : line-limit? ( -- ? )
     line-limit get dup [ line-count get <= ] when ;
 
-: do-indent indent get CHAR: \s fill write ;
+: do-indent indent get CHAR: \s <string> write ;
 
 : fresh-line ( n -- )
     #! n is current column position.

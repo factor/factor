@@ -1,9 +1,14 @@
 #include "factor.h"
 
 /* untagged */
-F_STRING* allot_string(CELL capacity)
+F_STRING* allot_string(F_FIXNUM capacity)
 {
-	F_STRING* string = allot_object(STRING_TYPE,
+	F_STRING* string;
+
+	if(capacity < 0)
+		general_error(ERROR_NEGATIVE_ARRAY_SIZE,tag_integer(capacity));
+
+	string = allot_object(STRING_TYPE,
 		sizeof(F_STRING) + (capacity + 1) * CHARS);
 	/* strings are null-terminated in memory, even though they also
 	have a length field. The null termination allows us to add
@@ -31,7 +36,7 @@ void primitive_rehash_string(void)
 }
 
 /* untagged */
-F_STRING *string(CELL capacity, CELL fill)
+F_STRING *string(F_FIXNUM capacity, CELL fill)
 {
 	CELL i;
 
@@ -43,6 +48,14 @@ F_STRING *string(CELL capacity, CELL fill)
 	rehash_string(string);
 
 	return string;
+}
+
+void primitive_string(void)
+{
+	CELL initial = to_cell(dpop());
+	F_FIXNUM length = to_fixnum(dpop());
+	maybe_gc(string_size(length));
+	dpush(tag_object(string(length,initial)));
 }
 
 F_STRING* resize_string(F_STRING* string, F_FIXNUM capacity, u16 fill)

@@ -185,7 +185,7 @@ math-internals sequences strings test words ;
 
 ! regression
 [ 3 ] [
-    100001 <array> 3 100000 pick set-nth
+    100001 f <array> 3 100000 pick set-nth
     [ 100000 swap array-nth ] compile-1
 ] unit-test
 

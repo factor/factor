@@ -173,10 +173,10 @@ global [
     {
         "scratchpad" "syntax" "arrays" "compiler" "errors"
         "generic" "hashtables" "inference" "inspector"
-        "interpreter" "io" "jedit" "kernel" "listener" "lists"
-        "math" "memory" "namespaces" "parser" "prettyprint"
-        "queues" "sequences" "shells" "strings" "styles" "test"
-        "threads" "vectors" "words"
+        "io" "jedit" "kernel" "listener" "lists" "math" "memory"
+        "namespaces" "parser" "prettyprint" "queues" "sequences"
+        "shells" "strings" "styles" "test" "threads" "vectors"
+        "walker" "words"
     } set-use
     "scratchpad" set-in
 ] bind

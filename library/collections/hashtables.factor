@@ -40,8 +40,7 @@ TUPLE: tombstone ;
 : if-key ( key hash true false -- | true: index key hash -- )
     >r >r [ key@ ] 2keep pick -1 > r> r> if ; inline
 
-: <hash-array> ( n -- array )
-    1+ 4 * ((empty)) <repeated> >array ;
+: <hash-array> ( n -- array ) 1+ 4 * ((empty)) <array> ;
 
 : reset-hash ( n hash -- )
     swap <hash-array> over set-underlying
