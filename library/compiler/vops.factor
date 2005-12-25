@@ -29,11 +29,11 @@ GENERIC: return-reg ( register-class -- reg )
 
 GENERIC: fastcall-regs ( register-class -- n )
 
-GENERIC: reg-class-size ( register-class -- n )
+GENERIC: reg-size ( register-class -- n )
 
-M: int-regs reg-class-size drop cell get ;
+M: int-regs reg-size drop cell get ;
 
-M: float-regs reg-class-size float-regs-size ;
+M: float-regs reg-size float-regs-size ;
 
 ! A data stack location.
 TUPLE: ds-loc n ;

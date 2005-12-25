@@ -1,5 +1,5 @@
 IN: temporary
-USING: compiler new-hash kernel math memory namespaces
+USING: compiler hashtables kernel math memory namespaces
 sequences strings test ;
 
 : hash-bench-step ( hash elt -- )
