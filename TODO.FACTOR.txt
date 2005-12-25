@@ -1,3 +1,4 @@
+- remove <ushort*-array>, <char*-array>, <void*-array>
 - if cell is rebound, and we allocate c objects, bang
 - make-image leaks memory if there is an error while parsing files
 - runtime primitives like fopen: check for null input

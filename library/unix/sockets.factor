@@ -8,7 +8,7 @@ USING: alien errors generic io kernel math namespaces parser
 threads unix-internals ;
 
 : init-sockaddr ( port -- sockaddr )
-    <sockaddr-in>
+    "sockaddr-in" <c-object>
     [ AF_INET swap set-sockaddr-in-family ] keep
     [ >r htons r> set-sockaddr-in-port ] keep ;
 
@@ -93,7 +93,7 @@ C: accept-task ( port -- task )
     ] keep <client-stream> swap set-server-client ;
 
 M: accept-task do-io-task ( task -- ? )
-    io-task-port <sockaddr-in>
+    io-task-port "sockaddr-in" <c-object>
     over port-handle over "sockaddr-in" c-size <int> accept
     dup 0 >= [
         do-accept t

@@ -96,7 +96,7 @@ USING: cairo cairo-sdl compiler errors kernel namespaces sdl sdl-event sdl-gfx s
 
     320 240 32 SDL_HWSURFACE  [
 		set-up-cairo
-        	<event> event-loop
+        	"event" <c-object> event-loop
 	SDL_Quit
     ] with-screen ;
 

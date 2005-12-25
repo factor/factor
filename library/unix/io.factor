@@ -24,7 +24,7 @@ USING: namespaces ;
     swap -5 shift set-alien-unsigned-4 ;
 
 : clear-bits ( alien len -- )
-    bytes>cells [ 0 -rot set-alien-unsigned-cell ] each-with ;
+    [ 0 -rot set-alien-unsigned-1 ] each-with ;
 
 ! Global variables
 SYMBOL: read-fdset
@@ -315,8 +315,8 @@ USE: io
     #! other time can have unintended consequences.
     global [
         H{ } clone read-tasks set
-        FD_SETSIZE <c-object> read-fdset set
+        FD_SETSIZE <byte-array> read-fdset set
         H{ } clone write-tasks set
-        FD_SETSIZE <c-object> write-fdset set
+        FD_SETSIZE <byte-array> write-fdset set
         0 1 <fd-stream> stdio set
     ] bind ;

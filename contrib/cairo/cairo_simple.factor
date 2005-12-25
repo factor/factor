@@ -52,7 +52,7 @@ USE: sdl-video
 : cairo-sdl-test ( -- )
     320 240 32 SDL_HWSURFACE  [
 		set-up-cairo
-        	<event> event-loop
+        	"event" <c-object> event-loop
 		cr get cairo_destroy
 	SDL_Quit
     ] with-screen ;

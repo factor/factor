@@ -1,5 +1,5 @@
 IN: factoroids
-USING: generic hashtables io kernel math namespaces sdl
+USING: alien generic hashtables io kernel math namespaces sdl
 sequences ;
 
 : fire ( -- )
@@ -48,4 +48,5 @@ M: key-up-event handle-event ( event -- quit? )
     binding second call f ;
 
 : check-event ( -- ? )
-    <event> dup SDL_PollEvent [ handle-event ] [ drop f ] if ;
+    "event" <c-object> dup SDL_PollEvent
+    [ handle-event ] [ drop f ] if ;

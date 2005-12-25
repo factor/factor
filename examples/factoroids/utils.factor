@@ -16,7 +16,7 @@ USING: alien kernel math namespaces opengl sdl sequences ;
     ;
 
 : >float-array ( seq -- float-array )
-    dup length dup <float-array> -rot
+    dup length dup "float" <c-array> -rot
     [ pick set-float-nth ] 2each ;
 
 : light-source

@@ -44,7 +44,8 @@ void primitive_byte_array(void)
 {
 	F_FIXNUM size = to_fixnum(dpop());
 	maybe_gc(array_size(size));
-	dpush(tag_object(array(BYTE_ARRAY_TYPE,size,0)));
+	F_FIXNUM byte_size = (size + sizeof(CELL) - 1) / sizeof(CELL);
+	dpush(tag_object(array(BYTE_ARRAY_TYPE,byte_size,0)));
 }
 
 /* see note about fill in array() */

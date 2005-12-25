@@ -26,7 +26,7 @@ END-STRUCT
         drop f
     ] [
         1000 /mod 1000 *
-        <timeval>
+        "timeval" <c-object>
         [ set-timeval-usec ] keep
         [ set-timeval-sec ] keep
     ] if ;

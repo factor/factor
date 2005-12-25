@@ -179,7 +179,7 @@ M: space-invaders update-video ( value addr cpu -- )
 : run ( -- )
   224 256 16 SDL_HWSURFACE [ 
    <space-invaders> "invaders.rom" over load-rom
-   <event> event-loop
+   "event" <c-object> event-loop
     SDL_Quit
   ] with-screen ;
 

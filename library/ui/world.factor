@@ -98,7 +98,7 @@ M: f set-message 2drop ;
     world get world-invalid >r layout-world r>
     [ update-hand draw-world ] when ;
 
-: next-event ( -- event ? ) <event> dup SDL_PollEvent ;
+: next-event ( -- event ? ) "event" <c-object> dup SDL_PollEvent ;
 
 GENERIC: handle-event ( event -- )
 

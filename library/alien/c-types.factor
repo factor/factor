@@ -31,9 +31,9 @@ SYMBOL: c-types
     >r <c-type> [ swap bind ] keep r> c-types get set-hash ;
     inline
 
-: bytes>cells cell get / ceiling ;
+: <c-object> ( type -- c-ptr ) c-size <byte-array> ;
 
-: <c-object> ( size -- c-ptr ) bytes>cells <byte-array> ;
+: <c-array> ( size type -- c-ptr ) c-size * <byte-array> ;
 
 : define-pointer ( type -- )
     "void*" c-type swap "*" append c-types get set-hash ;
@@ -41,20 +41,6 @@ SYMBOL: c-types
 : define-deref ( name vocab -- )
     >r dup "*" swap append r> create
     swap c-getter 0 swons define-compound ;
-
-: (c-constructor) ( name vocab type quot -- )
-    >r >r constructor-word r> c-size r> cons define-compound ;
-
-: c-constructor ( name vocab -- )
-    #! Make a word <foo> where foo is the structure name that
-    #! allocates a Factor heap-local instance of this structure.
-    #! Used for C functions that expect you to pass in a struct.
-    over [ <c-object> ] (c-constructor) ;
-
-: array-constructor ( name vocab -- )
-    #! Make a word <foo-array> ( n -- byte-array ).
-    over >r >r "-array" append r> r>
-    [ * <c-object> ] (c-constructor) ;
 
 : (define-nth) ( word type quot -- )
     >r c-size [ rot * ] cons r> append define-compound ;
@@ -65,20 +51,17 @@ SYMBOL: c-types
     swap dup c-getter (define-nth) ;
 
 : define-set-nth ( name vocab -- )
-    #! Make a word foo-nth ( n alien -- displaced-alien ).
+    #! Make a word set-foo-nth ( value n alien -- ).
     >r "set-" over "-nth" append3 r> create
     swap dup c-setter (define-nth) ;
 
 : define-out ( name vocab -- )
     #! Out parameter constructor for integral types.
     over [ <c-object> tuck 0 ] over c-setter append
-    (c-constructor) ;
+    >r >r constructor-word r> r> cons define-compound ;
 
 : init-c-type ( name vocab -- )
-    over define-pointer
-    2dup c-constructor
-    2dup array-constructor
-    define-nth ;
+    over define-pointer define-nth ;
 
 : define-primitive-type ( quot name -- )
     [ define-c-type ] keep "alien"

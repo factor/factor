@@ -17,7 +17,7 @@ SYMBOL: width
 SYMBOL: height
 
 : >int-array ( seq -- int-array )
-    dup length dup <int-array> -rot [
+    dup length dup "int" <c-array> -rot [
 	pick set-int-nth
     ] 2each ;
 
