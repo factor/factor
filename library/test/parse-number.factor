@@ -93,7 +93,7 @@ unit-test
 [ "-10/-2" parse-number ]
 unit-test
 
-[ f ]
+[ 5.0 ]
 [ "10.0/2" parse-number ]
 unit-test
 

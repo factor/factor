@@ -2,7 +2,6 @@
 - make-image leaks memory if there is an error while parsing files
 - runtime primitives like fopen: check for null input
 - make = for sequences more efficient
-- zero-height gadgets mess up hit testing
 - does parsing cons excessive amounts of bignums with c-streams
 - -with combinators are awkward
 - cleanups:
@@ -13,7 +12,6 @@
   alien/malloc - use aliens not integers
   ui/line-editor - don't use variables
 - need something like uncons but for arbitrary sequences
-- .h .b .o for ratios and floats is broken
 - amd64 to do:
   - alien calls
   - compiling sheet runs out of memory

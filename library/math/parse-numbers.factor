@@ -8,6 +8,11 @@ strings ;
 
 : not-a-number "Not a number" throw ;
 
+DEFER: base>
+
+: string>ratio ( "a/b" radix -- a/b )
+    >r "/" split1 r> tuck base> >r base> r> / ;
+
 GENERIC: digit> ( ch -- n )
 M: digit  digit> CHAR: 0 - ;
 M: letter digit> CHAR: a - 10 + ;
@@ -17,31 +22,27 @@ M: object digit> not-a-number ;
 : digit+ ( num digit base -- num )
     2dup < [ rot * + ] [ not-a-number ] if ;
 
-: (base>) ( base str -- num )
+: (string>integer) ( base str -- num )
     dup empty? [
         not-a-number
     ] [
         0 [ digit> pick digit+ ] reduce nip
     ] if ;
 
-: base> ( str base -- num )
-    #! Convert a string to an integer. Throw an error if
-    #! conversion fails.
-    swap "-" ?head >r (base>) r> [ neg ] when ;
+: string>integer ( string -- n )
+    swap "-" ?head >r (string>integer) r> [ neg ] when ;
 
-: string>ratio ( "a/b" -- a/b )
-    "/" split1 [ 10 base> ] 2apply / ;
-
-: string>number ( string -- n )
+: base> ( string radix -- n )
     {
-        { [ CHAR: / over member? ] [ string>ratio ] }
-        { [ CHAR: . over member? ] [ string>float ] }
-        { [ t ] [ 10 base> ] }
+        { [ CHAR: / pick member? ] [ string>ratio ] }
+        { [ CHAR: . pick member? ] [ drop string>float ] }
+        { [ t ] [ string>integer ] }
     } cond ;
 
-: bin> 2 base> ;
-: oct> 8 base> ;
-: hex> 16 base> ;
+: string>number ( string -- num ) 10 base> ;
+: bin> ( string -- num ) 2 base> ;
+: oct> ( string -- num ) 8 base> ;
+: hex> ( string -- num ) 16 base> ;
 
 : >digit ( n -- ch )
     dup 10 < [ CHAR: 0 + ] [ 10 - CHAR: a + ] if ;
@@ -50,7 +51,9 @@ M: object digit> not-a-number ;
     dup >r /mod >digit , dup 0 >
     [ r> integer, ] [ r> 2drop ] if ;
 
-: >base ( num radix -- string )
+G: >base ( num radix -- string ) [ over ] standard-combination ;
+
+M: integer >base ( num radix -- string )
     #! Convert a number to a string in a certain base.
     [
         over 0 < [
@@ -60,16 +63,20 @@ M: object digit> not-a-number ;
         ] if
     ] "" make reverse ;
 
+M: ratio >base ( num radix -- string )
+    [
+        over numerator over >base %
+        CHAR: / ,
+        swap denominator swap >base %
+    ] "" make ;
+
+M: float >base ( num radix -- string )
+    #! This is terrible. Will go away when we do our own float
+    #! output.
+    drop float>string
+    CHAR: . over member? [ ".0" append ] unless ;
+
+: number>string ( num -- string ) 10 >base ;
 : >bin ( num -- string ) 2 >base ;
 : >oct ( num -- string ) 8 >base ;
 : >hex ( num -- string ) 16 >base ;
-
-M: integer number>string ( obj -- str ) 10 >base ;
-
-M: ratio number>string ( num -- str )
-    [ dup numerator # CHAR: / , denominator # ] "" make ;
-
-M: float number>string ( float -- str )
-    #! This is terrible. Will go away when we do our own float
-    #! output.
-    float>string CHAR: . over member? [ ".0" append ] unless ;

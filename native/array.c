@@ -25,9 +25,11 @@ F_ARRAY* array(CELL type, F_FIXNUM capacity, CELL fill)
 
 void primitive_array(void)
 {
-	CELL initial = dpop();
-	F_FIXNUM size = to_fixnum(dpop());
-	maybe_gc(array_size(size));
+	CELL initial;
+	F_FIXNUM size;
+	maybe_gc(0);
+	initial = dpop();
+	size = to_fixnum(dpop());
 	dpush(tag_object(array(ARRAY_TYPE,size,initial)));
 }
 

@@ -5,7 +5,12 @@ void signal_handler(int signal, siginfo_t* siginfo, void* uap)
 {
 	if(nursery.here > nursery.limit)
 	{
-		fprintf(stderr,"Out of memory!\n");
+		fprintf(stderr,"Nursery space exhausted\n");
+		factorbug();
+	}
+	else if(compiling.here + sizeof(CELL) > compiling.limit)
+	{
+		fprintf(stderr,"Code space exhausted\n");
 		factorbug();
 	}
 	else
