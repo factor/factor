@@ -13,7 +13,6 @@ kernel-internals sequences ;
 
 : ds-reg ESI ; inline
 : cs-reg EBX ; inline
-: return-reg EAX ; inline
 : remainder-reg EDX ; inline
 
 : vregs { EAX ECX EDX } ; inline

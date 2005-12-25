@@ -4,7 +4,7 @@ void primitive_hashtable(void)
 {
 	F_HASHTABLE* hash;
 	maybe_gc(0);
-	hash = allot_object(HASHTABLE_TYPE,sizeof(F_VECTOR));
+	hash = allot_object(HASHTABLE_TYPE,sizeof(F_HASHTABLE));
 	hash->count = F;
 	hash->deleted = F;
 	hash->array = F;
