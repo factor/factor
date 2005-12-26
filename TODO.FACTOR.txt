@@ -39,3 +39,4 @@
 - stream server can hang because of exception handler limitations
 - better i/o scheduler
 - if two tasks write to a unix stream, the buffer can overflow
+- inference bug

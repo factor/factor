@@ -179,6 +179,3 @@ ARTICLE: "tutorial" "Factor tutorial"
 { $subsection "tutorial-more" } ;
 
 : tutorial "tutorial" help ;
-
-: <tutorial-button>
-    "Factor tutorial" "tutorial" <link> simple-object terpri ;

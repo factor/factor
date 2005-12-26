@@ -105,8 +105,6 @@ vectors words ;
         "/library/io/server.factor"
         "/library/tools/jedit.factor"
 
-        "/library/bootstrap/image.factor"
-
         "/library/compiler/architecture.factor"
 
         "/library/inference/shuffle.factor"
@@ -198,6 +196,8 @@ vectors words ;
         "/library/help/syntax.factor"
 
         "/library/syntax/parse-syntax.factor"
+
+        "/library/bootstrap/image.factor"
     } [ parse-resource % ] each
     
     architecture get {

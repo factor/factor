@@ -507,5 +507,5 @@ sequences strings vectors words prettyprint ;
 
 \ flush-icache [ [ ] [ ] ] "infer-effect" set-word-prop
 
-\ <string> [ [ integer integer ] [ array ] ] "infer-effect" set-word-prop
+\ <string> [ [ integer integer ] [ string ] ] "infer-effect" set-word-prop
 \ <string> t "flushable" set-word-prop

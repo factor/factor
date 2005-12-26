@@ -1,7 +1,7 @@
 ! Copyright (C) 2004, 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: image
-USING: alien arrays generic hashtables io kernel
+USING: alien arrays generic hashtables help io kernel
 kernel-internals lists math namespaces parser sequences strings
 vectors words ;
 
@@ -15,12 +15,18 @@ H{ } clone c-types set
 
 ! These symbols need the same hashcode in the target as in the
 ! host.
-{ vocabularies typemap builtins c-types cell }
+{
+    vocabularies typemap builtins c-types
+    cell crossref articles terms
+}
 
 ! Bring up a bare cross-compiling vocabulary.
 "syntax" vocab
 
 H{ } clone vocabularies set
+H{ } clone articles set
+H{ } clone terms set
+
 crossref off
 
 vocabularies get [ "syntax" set [ reveal ] each ] bind

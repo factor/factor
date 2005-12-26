@@ -9,7 +9,7 @@
 ! strings etc to the image file in the CFactor object memory
 ! format.
 
-USING: alien arrays errors generic hashtables io kernel
+USING: alien arrays errors generic hashtables help io kernel
 kernel-internals lists math namespaces parser prettyprint
 sequences sequences-internals strings vectors words ;
 IN: image
@@ -291,7 +291,10 @@ M: hashtable ' ( hashtable -- pointer )
 
 : global, ( -- )
     [
-        { vocabularies typemap builtins c-types crossref }
+        {
+            vocabularies typemap builtins c-types crossref
+            articles terms
+        }
         [ [ ] change ] each
     ] make-hash '
     global-offset fixup ;

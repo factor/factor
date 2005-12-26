@@ -83,6 +83,7 @@ M: gadget-stream stream-format ( string style stream -- )
     apply-border-width-style
     apply-border-color-style
     apply-page-color-style
+    apply-command-style
     apply-outliner-style
     nip ;
 
