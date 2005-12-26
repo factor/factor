@@ -55,14 +55,17 @@ DEFER: class<
     >r superclass r> 2dup and [ class< ] [ 2drop f ] if ;
 
 : union-class< ( cls1 cls2 -- ? )
-    [ flatten hash-keys ] 2apply
-    swap [ swap [ class< ] contains-with? ] all-with? ;
+    >r flatten r> flatten hash-keys swap
+    [ drop swap [ class< ] contains-with? ] hash-all-with? ;
+
+: class-empty? ( class -- ? )
+    members dup [ empty? ] when ;
 
 : class< ( cls1 cls2 -- ? )
     #! Test if class1 is a subclass of class2.
     {
         { [ 2dup eq? ] [ 2drop t ] }
-        { [ over flatten hash-empty? ] [ 2drop t ] }
+        { [ over class-empty? ] [ 2drop t ] }
         { [ 2dup superclass< ] [ 2drop t ] }
         { [ 2dup [ members ] 2apply or not ] [ 2drop f ] }
         { [ t ] [ union-class< ] }
@@ -163,13 +166,16 @@ M: generic definer drop \ G: ;
     } cond ;
 
 : classes-intersect? ( class class -- ? )
-    class-and flatten hash-empty? not ;
+    class-and class-empty? not ;
 
 : min-class ( class seq -- class/f )
     #! Is this class the smallest class in the sequence?
-    [ dupd classes-intersect? ] subset reverse-slice
-    tuck [ class< ] all-with? over empty? not and
-    [ first ] [ drop f ] if ;
+    #! The input sequence should be sorted.
+    [ dupd classes-intersect? ] subset dup empty? [
+        2drop f
+    ] [
+        tuck [ class< ] all-with? [ peek ] [ drop f ] if
+    ] if ;
 
 : define-class ( class -- )
     dup t "class" set-word-prop

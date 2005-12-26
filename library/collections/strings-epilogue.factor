@@ -4,9 +4,6 @@ IN: strings
 USING: generic kernel kernel-internals lists math namespaces
 sequences strings ;
 
-: empty-sbuf ( len -- sbuf )
-    dup <sbuf> [ set-length ] keep ; inline
-
 : padding ( string count char -- string )
     >r swap length - 0 max r> <string> ; flushable
 
@@ -21,11 +18,13 @@ sequences strings ;
 : >sbuf ( seq -- sbuf )
     dup length <sbuf> [ swap nappend ] keep ; inline
 
-M: object >string >sbuf (sbuf>string) ;
+: >string ( seq -- array )
+    [ length 0 <string> 0 over ] keep copy-into ; inline
 
 M: string thaw >sbuf ;
 
-M: string like ( seq sbuf -- string ) drop >string ;
+M: string like ( seq sbuf -- string )
+    drop dup string? [ >string ] unless ;
 
 M: sbuf like ( seq sbuf -- sbuf )
     drop dup sbuf? [ >sbuf ] unless ;

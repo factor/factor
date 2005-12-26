@@ -25,7 +25,7 @@ M: sbuf stream-read ( count sbuf -- string )
     dup empty? [
         2drop f
     ] [
-        swap over length min empty-sbuf
+        swap over length min 0 <string>
         [ [ drop dup pop ] inject drop ] keep
     ] if ;
 

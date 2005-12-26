@@ -127,7 +127,7 @@ IN: hashtables
         3drop f f
     ] if-key ;
 
-: hash-contains? ( key hash -- ? )
+: hash-member? ( key hash -- ? )
     [ 3drop t ] [ 3drop f ] if-key ;
 
 : ?hash* ( key hash -- value/f ? )
@@ -247,7 +247,7 @@ M: hashtable = ( obj hash -- ? )
     #! Searches for a key in a sequence of hashtables,
     #! where the most recently pushed hashtable is searched
     #! first.
-    [ dupd hash-contains? ] find-last nip ?hash ; flushable
+    [ dupd hash-member? ] find-last nip ?hash ; flushable
 
 : hash-intersect ( hash1 hash2 -- hash1/\hash2 )
     #! Remove all keys from hash2 not in hash1.
@@ -273,7 +273,7 @@ M: hashtable = ( obj hash -- ? )
 : remove-all ( hash seq -- seq )
     #! Remove all elements from the sequence that are keys
     #! in the hashtable.
-    [ swap hash-contains? not ] subset-with ; flushable
+    [ swap hash-member? not ] subset-with ; flushable
 
 : cache ( key hash quot -- value | quot: key -- value )
     pick pick hash [

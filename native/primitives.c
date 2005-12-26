@@ -12,7 +12,6 @@ void* primitives[] = {
 	primitive_vector,
 	primitive_rehash_string,
 	primitive_sbuf,
-	primitive_sbuf_to_string,
 	primitive_to_fixnum,
 	primitive_to_bignum,
 	primitive_to_float,

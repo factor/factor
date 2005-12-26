@@ -4,13 +4,25 @@ IN: strings
 USING: generic kernel kernel-internals lists math sequences
 sequences-internals ;
 
+M: string hashcode ( string -- n )
+    #! Recompute cached hashcode if necessary.
+    dup string-hashcode [ ] [
+        dup rehash-string string-hashcode
+    ] ?if ;
+
 M: string nth ( n str -- ch ) bounds-check char-slot ;
 
 M: string nth-unsafe ( n str -- ch ) >r >fixnum r> char-slot ;
 
-GENERIC: >string ( seq -- string ) flushable
+M: string set-nth ( ch n str -- )
+    bounds-check set-nth-unsafe ;
 
-M: string >string ;
+M: string set-nth-unsafe ( ch n str -- )
+    #! Reset cached hashcode.
+    f over set-string-hashcode
+    >r >fixnum >r >fixnum r> r> set-char-slot ;
+
+M: string clone ( string -- string ) (clone) ;
 
 ! Characters
 PREDICATE: integer blank     " \t\n\r" member? ;

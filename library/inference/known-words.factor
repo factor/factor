@@ -91,9 +91,6 @@ sequences strings vectors words prettyprint ;
 \ <sbuf> [ [ integer ] [ sbuf ] ] "infer-effect" set-word-prop
 \ <sbuf> t "flushable" set-word-prop
 
-\ sbuf>string [ [ sbuf ] [ string ] ] "infer-effect" set-word-prop
-\ sbuf>string t "flushable" set-word-prop
-
 \ >fixnum [ [ number ] [ fixnum ] ] "infer-effect" set-word-prop
 \ >fixnum t "flushable" set-word-prop
 \ >fixnum t "foldable" set-word-prop

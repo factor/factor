@@ -40,7 +40,6 @@ call
     { "<vector>" "vectors"                  }
     { "rehash-string" "strings"             }
     { "<sbuf>" "strings"                    }
-    { "sbuf>string" "strings"               }
     { ">fixnum" "math"                      }
     { ">bignum" "math"                      }
     { ">float" "math"                       }
@@ -338,7 +337,7 @@ num-types f <array> builtins set
 "string" "strings" create 12 "string?" "strings" create
 {
     { 1 { "length" "sequences" } f }
-    { 2 { "hashcode" "kernel" } f }
+    { 2 { "string-hashcode" "kernel-internals" } { "set-string-hashcode" "kernel-internals" } }
 } define-builtin
 
 "sbuf?" "strings" create t "inline" set-word-prop 

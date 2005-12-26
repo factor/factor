@@ -18,22 +18,6 @@ void primitive_sbuf(void)
 	drepl(tag_object(sbuf(size)));
 }
 
-void primitive_sbuf_to_string(void)
-{
-	F_STRING* result;
-	F_SBUF* sbuf = untag_sbuf(dpeek());
-	F_STRING* string = untag_string(sbuf->string);
-	CELL length = untag_fixnum_fast(sbuf->top);
-
-	result = allot_string(length);
-	memcpy(result + 1,
-		(void*)((CELL)(string + 1)),
-		CHARS * length);
-	rehash_string(result);
-
-	drepl(tag_object(result));
-}
-
 void fixup_sbuf(F_SBUF* sbuf)
 {
 	data_fixup(&sbuf->string);
