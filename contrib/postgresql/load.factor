@@ -8,7 +8,12 @@ win32? [
     "postgresql" "libpq.so" "cdecl" add-library
 ] if
 
-[ "postgresql.factor" ]
-[ "contrib/postgresql/" swap append run-file ] each
+[
+    "contrib/postgresql/libpq.factor"
+    "contrib/postgresql/postgresql.factor"
+    "contrib/postgresql/postgresql-test.factor"
+    ! "contrib/postgresql/private.factor" ! put your password in this file
+] [ run-file ] each
 
 "postgresql" words [ try-compile ] each
+
