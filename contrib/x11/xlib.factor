@@ -34,6 +34,7 @@ TYPEDEF: void* GC
 TYPEDEF: void* Visual*
 TYPEDEF: void* XExtData*
 TYPEDEF: void* XFontProp*
+TYPEDEF: void* XComposeStatus*
 
 TYPEDEF: int Status
 
@@ -1154,8 +1155,12 @@ END-STRUCT
 
 FUNCTION: KeySym XLookupKeysym ( XKeyEvent* key_event, int index ) ;
 
-
-FUNCTION: int XLookupString ( XKeyEvent* event_struct, char* buffer_return, int bytes_buffer, KeySym* keysym_return, XComposeStatus* status_in_out ) ;
+FUNCTION: int XLookupString (
+	XKeyEvent* event_struct,
+	char* buffer_return,
+	int bytes_buffer,
+	KeySym* keysym_return,
+	XComposeStatus* status_in_out ) ;
 
 ! 16.7 Determining the Appropriate Visual Type
 
