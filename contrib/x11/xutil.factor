@@ -29,8 +29,6 @@ BEGIN-STRUCT: XSizeHints
     FIELD: int win_gravity;	! added by ICCCM version 1
 END-STRUCT
 
-FUNCTION: int XSetStandardProperties ( Display* display, Window w, char* window_name, char* icon_name, Pixmap icon_pixmap, char** argv, int argc, XSizeHints* hints ) ;
-
 BEGIN-STRUCT: XComposeStatus
     FIELD: XPointer compose_ptr ! state table pointer
     FIELD: int chars_matched    ! match state
