@@ -1118,6 +1118,32 @@ FUNCTION: KeySym XLookupKeysym ( XKeyEvent* key_event, int index ) ;
 
 FUNCTION: int XLookupString ( XKeyEvent* event_struct, char* buffer_return, int bytes_buffer, KeySym* keysym_return, XComposeStatus* status_in_out ) ;
 
+! 16.7 Determining the Appropriate Visual Type
+
+: VisualNoMask			HEX: 0x0 ;
+: VisualIDMask 			HEX: 0x1 ;
+: VisualScreenMask		HEX: 0x2 ;
+: VisualDepthMask		HEX: 0x4 ;
+: VisualClassMask		HEX: 0x8 ;
+: VisualRedMaskMask		HEX: 0x10 ;
+: VisualGreenMaskMask		HEX: 0x20 ;
+: VisualBlueMaskMask		HEX: 0x40 ;
+: VisualColormapSizeMask	HEX: 0x80 ;
+: VisualBitsPerRGBMask		HEX: 0x100 ;
+: VisualAllMask			HEX: 0x1FF ;
+
+BEGIN-STRUCT: XVisualInfo
+	FIELD: Visual* visual
+	FIELD: VisualID visualid
+	FIELD: int screen
+	FIELD: uint depth
+	FIELD: int class
+	FIELD: ulong red_mask
+	FIELD: ulong green_mask
+	FIELD: ulong blue_mask
+	FIELD: int colormap_size
+	FIELD: int bits_per_rgb
+END-STRUCT
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
