@@ -29,14 +29,14 @@ test parser lists ;
 : pad-string-md5 ( string  -- padded-string )
     [
         dup % HEX: 80 ,
-        dup length HEX: 3f bitand zero-pad-length 0 fill %
+        dup length HEX: 3f bitand zero-pad-length 0 <string> %
         dup length 3 shift 8 >le %
     ] "" make nip ;
 
 : pad-string-sha1 ( string  -- padded-string )
     [
         dup % HEX: 80 ,
-        dup length HEX: 3f bitand zero-pad-length 0 fill %
+        dup length HEX: 3f bitand zero-pad-length 0 <string> %
         dup length 3 shift 8 >be %
     ] "" make nip ;
 
