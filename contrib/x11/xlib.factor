@@ -1147,6 +1147,20 @@ BEGIN-STRUCT: XVisualInfo
 END-STRUCT
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+! Appendix D - Compatibility Functions
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+FUNCTION: Status XSetStandardProperties (
+	Display* display,
+	Window w,
+	char* window_name,
+	char* icon_name,
+	Pixmap icon_pixmap,
+	char** argv,
+	int argc,
+	XSizeHints* hints ) ;
+
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 : CurrentTime 0 ;
 
