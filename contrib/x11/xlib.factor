@@ -39,6 +39,7 @@ TYPEDEF: int Status
 
 TYPEDEF: int Bool
 
+TYPEDEF: ulong VisualID
 TYPEDEF: ulong Time
 
 TYPEDEF: void* Window**
@@ -1120,17 +1121,17 @@ FUNCTION: int XLookupString ( XKeyEvent* event_struct, char* buffer_return, int 
 
 ! 16.7 Determining the Appropriate Visual Type
 
-: VisualNoMask			HEX: 0x0 ;
-: VisualIDMask 			HEX: 0x1 ;
-: VisualScreenMask		HEX: 0x2 ;
-: VisualDepthMask		HEX: 0x4 ;
-: VisualClassMask		HEX: 0x8 ;
-: VisualRedMaskMask		HEX: 0x10 ;
-: VisualGreenMaskMask		HEX: 0x20 ;
-: VisualBlueMaskMask		HEX: 0x40 ;
-: VisualColormapSizeMask	HEX: 0x80 ;
-: VisualBitsPerRGBMask		HEX: 0x100 ;
-: VisualAllMask			HEX: 0x1FF ;
+: VisualNoMask			HEX: 0 ;
+: VisualIDMask 			HEX: 1 ;
+: VisualScreenMask		HEX: 2 ;
+: VisualDepthMask		HEX: 4 ;
+: VisualClassMask		HEX: 8 ;
+: VisualRedMaskMask		HEX: 10 ;
+: VisualGreenMaskMask		HEX: 20 ;
+: VisualBlueMaskMask		HEX: 40 ;
+: VisualColormapSizeMask	HEX: 80 ;
+: VisualBitsPerRGBMask		HEX: 100 ;
+: VisualAllMask			HEX: 1FF ;
 
 BEGIN-STRUCT: XVisualInfo
 	FIELD: Visual* visual
