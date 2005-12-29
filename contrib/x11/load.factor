@@ -15,3 +15,5 @@ clear
 "glx.factor" run-file
 "x11" words [ try-compile ] each
 clear
+
+"gl.factor" run-file
