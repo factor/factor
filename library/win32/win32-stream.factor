@@ -122,6 +122,9 @@ M: string do-write ( str -- )
 M: win32-stream stream-write ( str stream -- )
     win32-stream-this [ do-write ] bind ;
 
+M: win32-stream stream-write1 ( char stream -- )
+    win32-stream-this [ >fixnum do-write ] bind ;
+
 M: win32-stream stream-read ( count stream -- str )
     win32-stream-this [ dup <sbuf> swap do-read-count ] bind ;
 
@@ -129,6 +132,15 @@ M: win32-stream stream-read1 ( stream -- str )
     win32-stream-this [
         1 consume-input dup length 0 = [ drop f ] when first 
     ] bind ;
+
+M: win32-stream stream-readln ( stream -- str )
+    win32-stream-this [ readln ] bind ;
+
+M: win32-stream stream-terpri
+    win32-stream-this [ CHAR: \n do-write ] bind ;
+
+M: win32-stream stream-terpri*
+    win32-stream-this stream-terpri ;
 
 M: win32-stream stream-flush ( stream -- )
     win32-stream-this [ maybe-flush-output ] bind ;
@@ -141,6 +153,9 @@ M: win32-stream stream-close ( stream -- )
         out-buffer get buffer-free
     ] bind ;
 
+M: win32-stream stream-format ( string style stream -- )
+    win32-stream-this [ drop do-write ] bind ;
+
 M: win32-stream win32-stream-handle ( stream -- handle )
     win32-stream-this [ handle get ] bind ;
 
@@ -151,6 +166,10 @@ M: win32-stream expire ( stream -- )
     win32-stream-this [
         timeout get [ millis cutoff get > [ handle get CancelIo ] when ] when
     ] bind ;
+
+USE: inspector
+M: win32-stream with-nested-stream ( quot style stream -- )
+    win32-stream-this [ drop stream get swap with-stream* ] bind ;
 
 C: win32-stream ( handle -- stream )
     swap [
@@ -169,5 +188,4 @@ C: win32-stream ( handle -- stream )
 
 : <win32-file-writer> ( path -- stream )
     f t win32-open-file <win32-stream> ;
-
 

@@ -49,7 +49,7 @@ SYMBOL: socket
     AF_INET SOCK_STREAM 0 f f WSA_FLAG_OVERLAPPED WSASocket ;
 
 : setup-sockaddr ( port -- sockaddr )
-    <sockaddr-in> swap
+    "sockaddr-in" <c-object> swap
     htons over set-sockaddr-in-port
     INADDR_ANY over set-sockaddr-in-addr 
     AF_INET over set-sockaddr-in-family ;
@@ -66,8 +66,10 @@ SYMBOL: socket
     dup sockaddr-in-port ntohs swap sockaddr-in-addr inet-ntoa ;
 
 : extract-remote-host ( buffer -- port host )
-    buffer-ptr <alien> 0 32 32 <indirect-pointer> <indirect-pointer> 
-                               <indirect-pointer> dup >r <indirect-pointer> 
+    buffer-ptr <alien> 0 32 32 "indirect-pointer" <c-object> 
+                               "indirect-pointer" <c-object>
+                               "indirect-pointer" <c-object> 
+                        dup >r "indirect-pointer" <c-object>
     GetAcceptExSockaddrs r> indirect-pointer-value <alien> sockaddr> ;
 
 C: win32-client-stream ( buf stream -- stream )
