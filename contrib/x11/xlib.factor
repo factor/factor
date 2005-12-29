@@ -9,7 +9,7 @@
 ! and are wondering what part of the file to modify, just find the
 ! function or data structure in the manual and note the section.
 
-IN: xlib USING: kernel arrays alien math ;
+IN: xlib USING: kernel arrays alien math words sequences ;
 
 LIBRARY: xlib
 
@@ -1107,6 +1107,44 @@ FUNCTION: Status XSetWMProtocols ( Display* display, Window w, Atom* protocols, 
 
 FUNCTION: Status XFetchName ( Display* display, Window w, char** window_name_return ) ;
 FUNCTION: Status XGetTransientForHint ( Display* display, Window w, Window* prop_window_return ) ;
+
+! 14.1.6 - Setting and Reading the WM_HINTS Property
+
+! 17.1.7 - Setting and Reading the WM_NORMAL_HINTS Property
+
+: USPosition	1 0 shift ;
+: USSize	1 1 shift ;
+: PPosition	1 2 shift ;
+: PSize		1 3 shift ;
+: PMinSize	1 4 shift ;
+: PMaxSize	1 5 shift ;
+: PResizeInc	1 6 shift ;
+: PAspect	1 7 shift ;
+: PBaseSize	1 8 shift ;
+: PWinGravity	1 9 shift ;
+: PAllHints [ PPosition PSize PMinSize PMaxSize PResizeInc PAspect ]
+0 [ execute bitor ] reduce ;
+
+BEGIN-STRUCT: XSizeHints
+    FIELD: long flags
+    FIELD: int x
+    FIELD: int y
+    FIELD: int width
+    FIELD: int height
+    FIELD: int min_width
+    FIELD: int min_height
+    FIELD: int max_width
+    FIELD: int max_height
+    FIELD: int width_inc
+    FIELD: int height_inc
+    FIELD: int min_aspect_x
+    FIELD: int min_aspect_y
+    FIELD: int max_aspect_x
+    FIELD: int max_aspect_y
+    FIELD: int base_width
+    FIELD: int base_height
+    FIELD: int win_gravity;
+END-STRUCT
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 ! 16 - Application Utility Functions
