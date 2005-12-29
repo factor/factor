@@ -1,8 +1,6 @@
 - if cell is rebound, and we allocate c objects, bang
 - make-image leaks memory if there is an error while parsing files
 - runtime primitives like fopen: check for null input
-- make = for sequences more efficient
-- does parsing cons excessive amounts of bignums with c-streams
 - -with combinators are awkward
 - cleanups:
   alien/compiler

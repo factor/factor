@@ -3,6 +3,14 @@
 IN: sequences-internals
 USING: arrays generic kernel kernel-internals math vectors ;
 
+: collect ( n generator -- vector | quot: n -- value )
+    #! Primitive mapping out of an integer sequence into an
+    #! array. Used by map and 2map. Don't call, use map
+    #! instead.
+    >r [ f <array> ] keep r> swap [
+        [ rot >r [ swap call ] keep r> set-array-nth ] 3keep
+    ] repeat drop ; inline
+
 : (map) ( quot seq i -- quot seq value )
     pick pick >r >r swap nth-unsafe swap call r> r> rot ; inline
 
@@ -16,6 +24,13 @@ USING: arrays generic kernel kernel-internals math vectors ;
 : (monotonic) ( quot seq i -- ? )
     2dup 1+ swap nth-unsafe >r swap nth-unsafe r> rot call ;
     inline
+
+: (interleave) ( n -- array )
+    dup 0 = [
+        drop { }
+    ] [
+        t <array> f 0 pick set-nth-unsafe
+    ] if ;
 
 IN: sequences
 
@@ -38,14 +53,6 @@ G: find ( seq quot -- i elt | quot: elt -- ? )
 
 : find-with ( obj seq quot -- i elt | quot: elt -- ? )
     swap [ with rot ] find 2swap 2drop ; inline
-
-: collect ( n generator -- vector | quot: n -- value )
-    #! Primitive mapping out of an integer sequence into an
-    #! array. Used by map and 2map. Don't call, use map
-    #! instead.
-    >r [ f <array> ] keep r> swap [
-        [ rot >r [ swap call ] keep r> set-array-nth ] 3keep
-    ] repeat drop ; inline
 
 G: map [ over ] standard-combination ; inline
 
@@ -158,6 +165,13 @@ M: object find ( seq quot -- i elt )
     swap dup length 1- [
         pick pick >r >r (monotonic) r> r> rot
     ] all? 2nip ; inline
+
+: interleave ( seq quot between -- )
+    rot dup length (interleave) [
+        [ -rot [ -rot 2slip call ] 2keep ]
+        [ -rot [ drop call ] 2keep ]
+        if
+    ] 2each 2drop ; inline
 
 : cache-nth ( i seq quot -- elt | quot: i -- elt )
     pick pick ?nth dup [

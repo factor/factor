@@ -5,6 +5,10 @@ USING: arrays gadgets gadgets-panes gadgets-presentations
 hashtables inspector io kernel lists namespaces prettyprint
 sequences strings styles words ;
 
+: uncons* dup first swap 1 swap tail ;
+
+: unswons* uncons* swap ;
+
 ! Simple markup language.
 
 ! <element> ::== <string> | <simple-element> | <fancy-element>
@@ -16,11 +20,18 @@ sequences strings styles words ;
 PREDICATE: array simple-element
     dup empty? [ drop t ] [ first word? not ] if ;
 
+: write-term ( string -- )
+    dup terms get hash [
+        dup <term> presented associate [ format* ] with-style
+    ] [
+        format*
+    ] if ;
+
 M: string print-element
-    " " split [ format* bl ] each ;
+    " " split [ write-term ] [ bl ] interleave ;
 
 M: array print-element
-    dup first >r 1 swap tail r> execute ;
+    unswons* execute ;
 
 : ($span) ( content style -- )
     [ print-element ] with-style ;
@@ -30,16 +41,13 @@ M: array print-element
     [ [ print-element ] with-nesting* ] with-style
     terpri* ;
 
-: $see ( content -- )
-    code-style [ [ first see ] with-nesting* ] with-style ;
-
 ! Some spans
 
 : $heading heading-style ($block) ;
 
 : $subheading subheading-style ($block) ;
 
-: $parameter parameter-style ($span) ;
+: $snippet snippet-style ($span) ;
 
 : $emphasis emphasis-style ($span) ;
 
@@ -51,10 +59,55 @@ M: array print-element
 M: simple-element print-element
     current-style [ [ print-element ] each ] with-nesting ;
 
-: $code
+: ($code) ( text presentation -- )
     terpri*
-    first code-style [ [ format* ] with-nesting* ] with-style
+    code-style [
+        current-style swap presented pick set-hash
+        [ format* ] with-nesting
+    ] with-style
     terpri* ;
+
+: $code ( content -- )
+    first dup <input> ($code) ;
+
+: $example ( content -- )
+    terpri*
+    code-style [
+        current-style over <input> presented pick set-hash
+        [ . ] with-nesting
+    ] with-style
+    terpri* ;
+
+: $synopsis ( content -- )
+    "Synopsis" $subheading  first [ synopsis ] keep ($code) ;
+
+: $values ( content -- )
+    "Arguments and values" $subheading [
+        unswons* $emphasis " -- " format* print-element terpri*
+    ] each ;
+
+: $description ( content -- )
+    "Description" $subheading print-element ;
+
+: $examples ( content -- )
+    "Examples" $subheading [ $example ] each ;
+
+: $see-also ( content -- )
+    "See also" $subheading [ pprint bl ] each ;
+
+: $see ( content -- )
+    code-style [ [ first see ] with-nesting* ] with-style ;
+
+: $definition ( content -- )
+    "Definition" $heading $see ;
+
+: $predicate ( content -- )
+    { { "object" "an object" } } $values
+    "Tests if the top of the stack is a " swap first "." append3
+    1array $description ;
+
+: $list ( content -- )
+    terpri* [ "- " format* print-element terpri* ] each ;
 
 ! Some links
 TUPLE: link name ;
@@ -73,7 +126,7 @@ DEFER: help
 : $subsection ( object -- )
     terpri*
     subheading-style [
-        first <link> ($link) dup [ link-name help ] curry
+        first <link> ($link) dup [ link-name (help) ] curry
         simple-outliner
     ] with-style ;
 

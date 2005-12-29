@@ -17,9 +17,6 @@ M: gadget-stream stream-write ( string stream -- )
 M: gadget-stream stream-write1 ( char stream -- )
     >r ch>string r> stream-write ;
 
-M: gadget-stream stream-bl ( stream -- )
-    <word-break> swap add-gadget ;
-
 ! Character styles
 
 : apply-style ( style gadget key quot -- style gadget )
@@ -41,6 +38,9 @@ M: gadget-stream stream-bl ( stream -- )
 
 : apply-command-style ( style gadget -- style gadget )
     presented [ <command-button> ] apply-style ;
+
+: apply-break-style ( style gadget -- style gadget )
+    word-break [ <word-break-gadget> ] apply-style ;
 
 : <presentation> ( style text -- gadget )
     <label>

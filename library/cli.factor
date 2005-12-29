@@ -18,7 +18,8 @@ parser sequences strings ;
 : set-path ( value seq -- )
     unswons over [ nest [ set-path ] bind ] [ nip set ] if ;
 
-: cli-var-param ( name value -- ) swap ":" split set-path ;
+: cli-var-param ( name value -- )
+    swap ":" split >list set-path ;
 
 : cli-bool-param ( name -- ) "no-" ?head not cli-var-param ;
 

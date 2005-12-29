@@ -114,7 +114,6 @@ M: compound definer drop \ : ;
 : reset-word ( word -- )
     {
         "parsing" "inline" "foldable" "flushable" "predicating"
-        "documentation" "stack-effect"
     } reset-props ;
 
 : reset-generic ( word -- )

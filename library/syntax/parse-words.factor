@@ -82,24 +82,16 @@ global [ string-mode off ] bind
     ] when ;
 
 ! Used by parsing words
-: ch-search ( ch -- index )
-    column get line-text get index* ;
+: ch-search ( ch -- index ) column get line-text get index* ;
 
-: (until) ( index -- str )
-    column [ swap dup 1+ ] change line-text get subseq ;
+: until ( index -- str ) 1+ column set ;
 
-: until ( ch -- str )
-    ch-search (until) ;
-
-: (until-eol) ( -- index ) 
-    CHAR: \n ch-search dup -1 =
-    [ drop line-text get length ] when ;
-
-: until-eol ( -- str )
+: until-eol ( -- )
     #! This is just a hack to get "eval" to work with multiline
     #! strings from jEdit with EOL comments. Normally, input to
     #! the parser is already line-tokenized.
-    (until-eol) (until) ;
+    CHAR: \n ch-search dup -1 =
+    [ drop line-text get length ] when until ;
 
 : escape ( ch -- esc )
     H{
@@ -128,33 +120,6 @@ global [ string-mode off ] bind
         over 1+ >r nth r>
     ] if ;
 
-: doc-comment-here? ( parsed -- ? )
-    not "in-definition" get and ;
-
-: parsed-stack-effect ( parsed str -- parsed )
-    over doc-comment-here? [
-        word "stack-effect" word-prop [
-            drop
-        ] [
-            word swap "stack-effect" set-word-prop
-        ] if
-    ] [
-        drop
-    ] if ;
-
-: documentation+ ( word str -- )
-    over "documentation" word-prop [
-        swap "\n" swap append3
-    ] when*
-    "documentation" set-word-prop ;
-
-: parsed-documentation ( parsed str -- parsed )
-    over doc-comment-here? [
-        word swap documentation+
-    ] [
-        drop
-    ] if ;
-
 : (parse-string) ( n str -- n )
     2dup nth CHAR: " = [
         drop 1+
@@ -172,7 +137,7 @@ global [ string-mode off ] bind
 global [
     {
         "scratchpad" "syntax" "arrays" "compiler" "errors"
-        "generic" "hashtables" "inference" "inspector"
+        "generic" "hashtables" "help" "inference" "inspector"
         "io" "jedit" "kernel" "listener" "lists" "math" "memory"
         "namespaces" "parser" "prettyprint" "queues" "sequences"
         "shells" "strings" "styles" "test" "threads" "vectors"

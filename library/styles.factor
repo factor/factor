@@ -34,6 +34,9 @@ SYMBOL: file
 ! A quotation that writes an outline expansion to stdio
 SYMBOL: outline
 
+! A word break inside a pragraph with wrap-margin set
+SYMBOL: word-break
+
 ! Paragraph styles
 SYMBOL: page-color
 SYMBOL: border-color

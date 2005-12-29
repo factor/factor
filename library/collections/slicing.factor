@@ -94,7 +94,7 @@ M: object tail ( index seq -- seq ) [ tail-slice ] keep like ;
 : (split) ( seq subseq -- )
     tuck (split1) >r , r> dup [ swap (split) ] [ 2drop ] if ;
 
-: split ( seq subseq -- seq ) [ (split) ] [ ] make ; flushable
+: split ( seq subseq -- seq ) [ (split) ] { } make ; flushable
 
 : (cut) ( n seq -- before after )
     [ head ] 2keep tail-slice ; flushable

@@ -3,7 +3,7 @@
 IN: gadgets-panes
 USING: arrays gadgets gadgets-buttons gadgets-editors
 gadgets-labels gadgets-layouts gadgets-scrolling gadgets-theme
-generic hashtables io kernel line-editor lists math namespaces
+generic hashtables io kernel line-editor math namespaces
 sequences strings styles threads ;
 
 ! Input history
@@ -69,24 +69,22 @@ SYMBOL: structured-input
  
 : pane-actions ( line -- )
     H{
-        { [ button-down ] [ pane-input [ click-editor ] when* ] }
-        { [ "UP" ] [ pane-input [ [ history-prev ] with-editor ] when* ] }
-        { [ "DOWN" ] [ pane-input [ [ history-next ] with-editor ] when* ] }
-        { [ "CTRL" "l" ] [ pane get pane-clear ] }
+        { [ button-down ] [ pane-input click-editor ] }
+        { [ "RETURN" ] [ pane-commit ] }
+        { [ "UP" ] [ pane-input [ history-prev ] with-editor ] }
+        { [ "DOWN" ] [ pane-input [ history-next ] with-editor ] }
+        { [ "CTRL" "l" ] [ pane-clear ] }
     } add-actions ;
-
-: input-pane-actions ( line -- )
-    [ pane-commit ] [ "RETURN" ] set-action ;
 
 C: pane ( -- pane )
     <pile> over set-delegate
     <shelf> over set-pane-prototype
     <pile> <incremental> over add-output
-    dup prepare-line dup pane-actions ;
+    dup prepare-line ;
 
 : <input-pane> ( -- pane )
     <pane> t over set-pane-scrolls?
-    "" <editor> over set-pane-input dup input-pane-actions ;
+    "" <editor> over set-pane-input dup pane-actions ;
 
 M: pane focusable-child* ( pane -- editor )
     pane-input [ t ] unless* ;
@@ -108,13 +106,13 @@ M: pane stream-terpri* ( pane -- )
     dup pane-current gadget-children empty?
     [ dup stream-terpri ] unless drop ;
 
-: pane-write ( pane list -- )
-    2dup car swap pane-current stream-write cdr dup
-    [ over stream-terpri pane-write ] [ 2drop ] if ;
+: pane-write ( pane seq -- )
+    [ over pane-current stream-write ]
+    [ dup stream-terpri ] interleave drop ;
 
-: pane-format ( style pane list -- )
-    3dup car -rot pane-current stream-format cdr dup
-    [ over stream-terpri pane-format ] [ 3drop ] if ;
+: pane-format ( style pane seq -- )
+    [ pick pick pane-current stream-format ]
+    [ dup stream-terpri ] interleave 2drop ;
 
 : write-gadget ( gadget pane -- )
     #! Print a gadget to the given pane.
@@ -141,8 +139,6 @@ M: pane stream-write ( string pane -- )
 
 M: pane stream-format ( string style pane -- )
     [ rot "\n" split pane-format ] keep scroll-pane ;
-
-M: pane stream-bl ( pane -- ) pane-current stream-bl ;
 
 M: pane stream-close ( pane -- ) drop ;
 

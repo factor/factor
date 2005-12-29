@@ -17,7 +17,6 @@ SYMBOL: stdio
 : write ( string -- ) stdio get stream-write ;
 : flush ( -- ) stdio get stream-flush ;
 
-: bl ( -- ) stdio get stream-bl ;
 : terpri ( -- ) stdio get stream-terpri ;
 : terpri* ( -- ) stdio get stream-terpri* ;
 : format ( string style -- ) stdio get stream-format ;
@@ -49,9 +48,13 @@ SYMBOL: style-stack
 : with-style ( style quot -- )
     [ >r >style r> call style> drop ] with-scope ; inline
 
-: current-style ( -- style ) style-stack get hash-concat ;
+: current-style ( -- style )
+    #! Always returns a fresh hashtable.
+    style-stack get hash-concat ;
 
 : format* ( string -- ) current-style format ;
+
+: bl ( -- ) " " current-style t word-break pick set-hash format ;
 
 : with-nesting* ( quot -- )
     current-style swap with-nesting ; inline

@@ -71,15 +71,10 @@ M: command-button gadget-help ( button -- string )
 "Prettyprint" [ drop t ] [ . ] \ in-listener define-command
 "Push on data stack" [ drop t ] [ ] \ in-listener define-command
 
-"See word" [ word? ] [ see ] \ in-browser define-default-command
 "Word call hierarchy" [ word? ] [ uses. ] \ in-browser define-command
 "Word caller hierarchy" [ word? ] [ usage. ] \ in-browser define-command
 "Open in jEdit" [ word? ] [ jedit ] \ call define-command
 "Reload original source" [ word? ] [ reload ] \ in-listener define-command
-"Annotate with watchpoint" [ compound? ] [ watch ] \ in-listener define-command
-"Annotate with breakpoint" [ compound? ] [ break ] \ in-listener define-command
-"Annotate with profiling" [ compound? ] [ profile ] \ in-listener define-command
-"Compile" [ word? ] [ recompile ] \ in-listener define-command
 "Infer stack effect" [ word? ] [ unit infer . ] \ in-listener define-command
 
 "Display gadget" [ [ gadget? ] is? ] [ gadget. ] \ in-listener define-command

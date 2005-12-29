@@ -30,10 +30,6 @@ words ;
     dup t "foldable" set-word-prop
     t "flushable" set-word-prop ; parsing
 
-! The variable "in-definition" is set inside a : ... ;.
-! ( and #! then add "stack-effect" and "documentation"
-! properties to the current word if it is set.
-
 ! Booleans
 
 ! the canonical truth value is just a symbol.
@@ -66,12 +62,11 @@ SYMBOL: t
 ! Word definitions
 : :
     #! Begin a word definition. Word name follows.
-    CREATE dup reset-generic [ define-compound ]
-    [ ] "in-definition" on ; parsing
+    CREATE dup reset-generic [ define-compound ] [ ] ; parsing
 
 : ;
     #! End a word definition.
-    "in-definition" off reverse swap call ; parsing
+    reverse swap call ; parsing
 
 ! Symbols
 : SYMBOL:
@@ -123,15 +118,15 @@ SYMBOL: t
 ! Comments
 : (
     #! Stack comment.
-    CHAR: ) until parsed-stack-effect ; parsing
+    CHAR: ) ch-search until ; parsing
 
 : !
     #! EOL comment.
-    until-eol drop ; parsing
+    until-eol ; parsing
 
 : #!
-    #! Documentation comment.
-    until-eol parsed-documentation ; parsing
+    #! EOL comment.
+    until-eol ; parsing
 
 ! Reading integers in other bases
 : (BASE) ( base -- )

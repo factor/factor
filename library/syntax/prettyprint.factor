@@ -131,7 +131,7 @@ M: newline pprint-section* ( newline -- )
     dup newline? [
         drop
     ] [
-        section-start last-newline get = [ " " write ] unless
+        section-start last-newline get = [ bl ] unless
     ] if ;
 
 M: block pprint-section* ( block -- )

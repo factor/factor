@@ -22,12 +22,24 @@ M: string article-title article article-title ;
 M: string article-content article article-content ;
 
 ! Word help
-M: word article-title "The " swap word-name " word" append3 ;
+M: word article-title word-name ;
+
+DEFER: $synopsis
 
 M: word article-content
-    dup "help" word-prop [ ] [
-        "No documentation found for " swap word-name append
-    ] ?if ;
+    [
+        dup "help" word-prop [
+            \ $synopsis pick 2array , %
+        ] [
+            "Undocumented." ,
+        ] if*
+        \ $definition swap 2array ,
+    ] { } make ;
+
+! Special case: f help
+M: f article-title drop \ f word-name ;
+
+M: f article-content drop \ f article-content ;
 
 ! Glossary of terms
 SYMBOL: terms
@@ -41,8 +53,3 @@ M: term article-content
     [ "No such glossary entry" ] unless* ;
 
 : add-term ( term element -- ) swap terms get set-hash ;
-
-! Missing topics
-M: f article-title drop "No such topic" ;
-
-M: f article-content drop "No such topic" ;

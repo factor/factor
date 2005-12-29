@@ -3,9 +3,9 @@ USING: arrays gadgets gadgets-labels generic kernel math
 namespaces sequences ;
 
 ! A word break gadget
-TUPLE: word-break ;
+TUPLE: word-break-gadget ;
 
-C: word-break ( -- gadget ) " " <label> over set-delegate ;
+C: word-break-gadget ( gadget -- gadget ) [ set-delegate ] keep ;
 
 ! A gadget that arranges its children in a word-wrap style.
 TUPLE: paragraph margin ;
@@ -31,7 +31,7 @@ SYMBOL: margin
 
 : wrap-step ( quot child -- | quot: pos child -- )
     dup pref-dim [
-        over word-break? [
+        over word-break-gadget? [
             dup first overrun? [ dup second wrap-line ] when
         ] unless drop wrap-pos rot call
     ] keep first2 advance-y advance-x ; inline

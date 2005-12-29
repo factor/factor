@@ -190,11 +190,13 @@ vectors words ;
 
         "/library/help/database.factor"
         "/library/help/stylesheet.factor"
-        "/library/help/markup.factor"
         "/library/help/help.factor"
-        "/library/help/tutorial.factor"
+        "/library/help/markup.factor"
+        "/library/help/commands.factor"
         "/library/help/syntax.factor"
 
+        "/library/help/tutorial.factor"
+        
         "/library/syntax/parse-syntax.factor"
 
         "/library/bootstrap/image.factor"

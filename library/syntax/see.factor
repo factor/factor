@@ -15,8 +15,14 @@ sequences strings styles words ;
         POSTPONE: flushable
     } [ declaration. ] each-with ;
 
+: in. ( word -- )
+    <block \ IN: pprint-word word-vocabulary plain-text block; ;
+
+: (synopsis) ( word -- )
+    dup in. dup definer pprint-word pprint-word ;
+
 : comment. ( comment -- )
-    H{ { font-style italic } } text ;
+    [ H{ { font-style italic } } text ] when* ;
 
 : stack-picture% ( seq -- string )
     dup integer? [ object <array> ] when
@@ -24,10 +30,11 @@ sequences strings styles words ;
 
 : effect>string ( effect -- string )
     [
-        " " %
+        "( " %
         dup first stack-picture%
         "-- " %
         second stack-picture%
+        ")" %
     ] "" make ;
 
 : stack-effect ( word -- string )
@@ -36,36 +43,22 @@ sequences strings styles words ;
         dup [ effect>string ] when
     ] ?if ;
 
-: stack-effect. ( string -- )
-    [ "(" swap ")" append3 comment. ] when* ;
-
-: in. ( word -- )
-    <block \ IN: pprint-word word-vocabulary plain-text block; ;
-
-: (synopsis) ( word -- )
-    dup in.
-    dup definer pprint-word
-    dup pprint-word
-    stack-effect stack-effect. ;
-
 : synopsis ( word -- string )
     #! Output a brief description of the word in question.
-    [ 0 margin set [ (synopsis) ] with-pprint ] string-out ;
+    [
+        0 margin set [
+            dup (synopsis) stack-effect comment.
+        ] with-pprint
+    ] string-out ;
 
 GENERIC: (see) ( word -- )
 
 M: word (see) drop ;
 
-: documentation. ( word -- )
-    "documentation" word-prop [
-        "\n" split [ "#!" swap append comment. newline ] each
-    ] when* ;
-
 : pprint-; \ ; pprint-word ;
 
 : see-body ( quot word -- )
-    <block dup documentation. swap pprint-elements
-    pprint-; declarations. block; ;
+    <block swap pprint-elements pprint-; declarations. block; ;
 
 M: compound (see)
     dup word-def swap see-body ;
@@ -130,6 +123,5 @@ M: word class. drop ;
 
 : apropos ( substring -- )
     #! List all words that contain a string.
-    (apropos) [
-        "IN: " write dup word-vocabulary write " " write .
-    ] each ;
+    (apropos) word-sort
+    [ [ synopsis ] keep simple-object terpri ] each ;
