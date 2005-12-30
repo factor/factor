@@ -335,3 +335,11 @@ DEFER: with-win
 
 : tallest-child ( window -- child ) window-children+ sort-by-height seq-last ;
 
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+: char-array>string ( n <char-array> -- string )
+swap >array [ swap char-nth ] map-with >string ;
+
+: lookup-string ( event -- string )
+10 <char-array> dup >r 10 0 <alien> 0 <alien> XLookupString r>
+char-array>string ;
