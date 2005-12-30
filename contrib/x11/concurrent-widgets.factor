@@ -142,7 +142,7 @@ dup >r [ select-input ] with-window-object
 r> ;
 
 M: button handle-button-press-event ( event <button> -- )
-  swap drop button-action call ;
+nip button-action call ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 ! <menu>
