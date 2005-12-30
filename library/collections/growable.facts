@@ -1,0 +1,63 @@
+IN: sequences-internals
+USING: help kernel sequences ;
+
+ARTICLE: "sequences-internals" "Growable sequence implementation details"
+"Growable sequences are implementing by having a wrapper object hold a reference to an underlying sequence, together with a fill pointer indicating how many elements of the underlying sequence are occupied. When the fill pointer exceeds the underlying sequence capacity, the underlying sequence grows."
+$terpri
+"There is a growable sequence protocol:"
+{ $subsection underlying }
+{ $subsection set-underlying }
+{ $subsection set-fill }
+"Any instance of a class implementing the above generics can make use of several utility words:"
+{ $subsection capacity }
+{ $subsection ensure }
+{ $subsection grow-length }
+{ $subsection clone-growable }
+"This protocol and the above words are unsafe; they do not perform bounds checks for performance reasons, and thus a mistake can lead to memory corruption due to an underlying sequence being shorter than the fill pointer."
+$terpri
+"Vectors and string buffers are implemented using the growable sequence facility (and they perform full bounds-checks and thus are safe)." ;
+
+HELP: set-fill "( n seq -- )"
+{ $values { "n" "a new fill pointer" } { "seq" "a growable sequence" } }
+{ $contract "Sets the fill pointer (number of occupied elements in the underlying storage) of a growable sequence." }
+{ $safety "This word is in the sequences-internals vocabulary because it is not safe. Changing the fill pointer to a negative value, or a value higher than the underlying sequence length can lead to memory corruption. Client code should use " { $link set-length } " instead." } ;
+
+HELP: underlying "( seq -- underlying )"
+{ $values { "seq" "a growable sequence" } { "underlying" "the underlying sequence" } }
+{ $contract "Outputs the underlying storage of a growable sequence." } ;
+
+HELP: set-underlying "( underlying seq -- )"
+{ $values { "underlying" "a growable sequence" } { "seq" "a vector, string buffer or hashtable" } }
+{ $contract "Modifies the underlying storage of a growable sequence." }
+{ $safety "This word is in the sequences-internals vocabulary because it is not safe. Setting an underlying sequence shorter than the fill pointer can lead to memory corruption." } ;
+
+HELP: capacity "( seq -- n )"
+{ $values { "seq" "a vector or string buffer" } { "n" "the capacity of the sequence" } }
+{ $description "Pushes the number of elements the sequence can hold without growing." } ;
+
+HELP: new-size "( old -- new )"
+{ $values { "old" "a positive integer" } { "new" "a positive integer" } }
+{ $description "Computes the new size of a growable sequence." } ;
+
+HELP: ensure "( n seq -- )"
+{ $values { "n" "a positive integer" } { "seq" "a growable sequence" } }
+{ $description "If " { $snippet "n" } " is less than the length of the sequence, does nothing. Otherwise, if " { $snippet "n" } " also exceeds the capacity of the underlying storage, the underlying storage is grown, and the fill pointer is reset. Finally, if " { $snippet "n" } " is greater than or equal to the length but less than the capacity of the underlying storage, the fill pointer is moved and nothing else is done."
+$terpri
+"This word is used in the implementation of the " { $link set-nth } " generic for sequences supporting the growable sequence protocol (see " { $link "sequences-internals" } ")."
+} ;
+
+HELP: bounds-error "( n seq -- )"
+{ $values { "n" "a positive integer" } { "seq" "a sequence" } }
+{ $description "Throws an error signalling an out-of-bounds access, where " { $snippet "n" } " is the index and " { $snippet "seq" } " is the sequence." } ;
+
+HELP: bounds-check "( n seq -- n seq )"
+{ $values { "n" "a positive integer" } { "seq" "a sequence" } }
+{ $description "Throws an error if " { $snippet "n" } " is negative or if it is greater than or equal to the length of " { $snippet "seq" } ". Otherwise the two inputs remain on the stack." } ;
+
+HELP: grow-length "( n seq -- )"
+{ $values { "n" "a positive integer" } { "seq" "a sequence" } }
+{ $description "An implementation of the " { $link set-length } " generic for sequences supporting the growable sequence protocol (see " { $link "sequences-internals" } ")." } ;
+
+HELP: clone-growable "( seq -- seq )"
+{ $values { "seq" "a sequence" } { "seq" "a fresh sequence" } }
+{ $description "An implementation of the " { $link clone } " generic for sequences supporting the growable sequence protocol (see " { $link "sequences-internals" } ")." } ;

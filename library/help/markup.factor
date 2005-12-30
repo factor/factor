@@ -33,6 +33,9 @@ M: string print-element
 M: array print-element
     unswons* execute ;
 
+M: word print-element
+    { } swap execute ;
+
 : ($span) ( content style -- )
     [ print-element ] with-style ;
 
@@ -89,6 +92,9 @@ M: simple-element print-element
 : $description ( content -- )
     "Description" $subheading print-element ;
 
+: $contract ( content -- )
+    "Contract" $subheading print-element ;
+
 : $examples ( content -- )
     "Examples" $subheading [ $example ] each ;
 
@@ -99,7 +105,7 @@ M: simple-element print-element
     code-style [ [ first see ] with-nesting* ] with-style ;
 
 : $definition ( content -- )
-    "Definition" $heading $see ;
+    "Definition" $subheading $see ;
 
 : $predicate ( content -- )
     { { "object" "an object" } } $values
@@ -108,6 +114,9 @@ M: simple-element print-element
 
 : $list ( content -- )
     terpri* [ "- " format* print-element terpri* ] each ;
+
+: $safety ( content -- )
+    "Memory safety" $subheading print-element ;
 
 ! Some links
 TUPLE: link name ;

@@ -43,11 +43,11 @@ ARTICLE: "tutorial-colon-def" "Colon definitions"
 
 ARTICLE: "tutorial-stack-effects" "Stack effects"
 "When we look at the definition of the " { $snippet "twice" } " word, it is intuitively obvious that it takes one value from the stack, and leaves one value behind. However, with more complex definitions, it is better to document this so-called " { $emphasis "stack effect" } ". A stack effect comment is written between ( and ). Factor ignores stack effect comments. Don't you!"
-{ $terpri }
+$terpri
 "The stack effect of " { $snippet "twice" } " is " { $snippet "( x -- 2*x )" } "."
-{ $terpri }
+$terpri
 "The stack effect of " { $snippet "+" } " is " { $snippet "( x y -- x+y )" } "."
-{ $terpri }
+$terpri
 "The stack effect of " { $snippet "." } " is " { $snippet "( object -- )" } "." ;
 
 ARTICLE: "tutorial-input" "Reading user input"
@@ -57,16 +57,16 @@ ARTICLE: "tutorial-input" "Reading user input"
 
 ARTICLE: "tutorial-shuffle" "Shuffle words"
 "The word " { $snippet "twice" } " we defined is useless. Let's try something more useful: squaring a number."
-{ $terpri }
+$terpri
 "We want a word with stack effect " { $snippet "( n -- n*n )" } ". We cannot use " { $snippet "*" } " by itself, since its stack effect is " { $snippet "( x y -- x*y )" } "; it expects two inputs."
-{ $terpri }
+$terpri
 "However, we can use the word " { $snippet "dup ( object -- object object )" } ". The " { $snippet "dup" } " word is known as a shuffle word." ;
 
 ARTICLE: "tutorial-squared" "The squared word"
 "Try entering the following word definition:"
 { $code ": square ( n -- n*n ) dup * ;" }
 "Shuffle words solve the problem where we need to compose two words, but their stack effects do not ``fit''."
-{ $terpri }
+$terpri
 "Some of the most commonly-used shuffle words:"
 { $code "drop ( object -- )\nswap ( obj1 obj2 -- obj2 obj1 )\nover ( obj1 obj2 -- obj1 obj2 obj1 )" } ;
 
@@ -162,16 +162,16 @@ ARTICLE: "tutorial-library" "The library"
 ARTICLE: "tutorial-more" "Learning more"
 "Hopefully this tutorial has sparked your interest in Factor."
 "You can learn more by reading the Factor developer's handbook:"
-{ $terpri }
+$terpri
 { $url "http://factorcode.org/handbook.pdf" }
-{ $terpri }
+$terpri
 "Also, point your IRC client to irc.freenode.net and hop in the #concatenative channel to chat with other Factor geeks." ;
 
 ARTICLE: "tutorial" "Factor tutorial"
 "Welcome to the Factor tutorial!"
-{ $terpri }
+$terpri
 "Factor is interactive, which means you can test out the code in this tutorial immediately."
-{ $terpri }
+$terpri
 "Code examples will insert themselves in the listener's input area when clicked:"
 { $code "\"hello world\" print" }
 "You can then press ENTER to execute the code, or edit it first."

@@ -45,7 +45,7 @@ USE: lists
 [ "Beginning and end" f ] [ "Beginning and end" "Beginning x" ?tail ] unit-test
 [ "Beginning and end" f ] [ "Beginning and end" "eginning " ?tail ] unit-test
 
-[ [ "This" "is" "a" "split" "sentence" ] ]
+[ { "This" "is" "a" "split" "sentence" } ]
 [ "This is a split sentence" " " split ]
 unit-test
 

@@ -1,9 +1,20 @@
 ! Copyright (C) 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
+IN: kernel-internals
+USING: arrays errors hashtables kernel lists math namespaces parser sequences sequences-internals strings vectors words ;
+
+: tuple= ( seq seq -- ? )
+    over array-capacity over array-capacity number= [
+        dup array-capacity [
+            >r 2dup r> tuck swap array-nth
+            >r swap array-nth r>
+            =
+        ] all? 2nip
+    ] [
+        2drop f
+    ] if ; inline
+
 IN: generic
-USING: arrays errors hashtables kernel kernel-internals lists
-math namespaces parser sequences sequences-internals strings
-vectors words ;
 
 ! Tuples are really arrays in the runtime, but with a different
 ! type number. The layout is as follows:

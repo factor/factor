@@ -25,6 +25,7 @@ M: string article-content article article-content ;
 M: word article-title word-name ;
 
 DEFER: $synopsis
+DEFER: $definition
 
 M: word article-content
     [
