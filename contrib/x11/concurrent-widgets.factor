@@ -15,7 +15,7 @@ TUPLE: window display id ;
   dpy get create-window <window> ;
 
 : with-window-object ( <window> quot -- )
-  [ swap dup window-display dpy set window-id win set call ] with-scope ; inline
+[ swap dup window-display dpy set window-id win set call ] with-scope ; inline
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 ! window-table add-to-window-table
