@@ -2,7 +2,7 @@
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: strings
 USING: generic kernel kernel-internals lists math namespaces
-sequences strings ;
+sequences strings vectors ;
 
 : padding ( string count char -- string )
     >r swap length - 0 max r> <string> ; flushable
@@ -15,8 +15,7 @@ sequences strings ;
 
 : ch>string ( ch -- str ) 1 swap <string> ; flushable
 
-: >sbuf ( seq -- sbuf )
-    dup length <sbuf> [ swap nappend ] keep ; inline
+: >sbuf dup length <sbuf> [ swap nappend ] keep ; inline
 
 : >string ( seq -- array )
     [ length 0 <string> 0 over ] keep copy-into ; inline
@@ -28,3 +27,5 @@ M: string like ( seq sbuf -- string )
 
 M: sbuf like ( seq sbuf -- sbuf )
     drop dup sbuf? [ >sbuf ] unless ;
+
+: a/an ( string -- ) first ch>lower "aeiou" member? "an " "a " ? ;

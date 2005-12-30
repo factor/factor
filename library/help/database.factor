@@ -21,22 +21,6 @@ M: string article-title article article-title ;
 
 M: string article-content article article-content ;
 
-! Word help
-M: word article-title word-name ;
-
-DEFER: $synopsis
-DEFER: $definition
-
-M: word article-content
-    [
-        dup "help" word-prop [
-            \ $synopsis pick 2array , %
-        ] [
-            "Undocumented." ,
-        ] if*
-        \ $definition swap 2array ,
-    ] { } make ;
-
 ! Special case: f help
 M: f article-title drop \ f word-name ;
 

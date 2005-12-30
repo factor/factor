@@ -1,18 +1,33 @@
 IN: arrays
-USING: help lists prettyprint strings vectors ;
+USING: help kernel-internals lists prettyprint strings vectors ;
 
 GLOSSARY: "array"
-"An instance of the" { $link array } "class, implementing a fixed-length mutable sequence of objects" ;
+"an instance of the" { $link array } "class, implementing a fixed-length mutable sequence of objects" ;
+
+ARTICLE: "arrays" "Arrays"
+"An array is a fixed-size mutable sequence whose elements are stored in a contiguous range of memory. The literal syntax is covered in " { $link "array-literals" } ". Sometimes you need a growable array -- this is called a vector, and vectors are documented in " { $link "vectors" } "."
+$terpri
+"Array words are in the " { $snippet "arrays" } " vocabulary. Unsafe implementation words are in the " { $snippet "kernel-internals" } " vocabulary."
+$terpri
+"Arrays form a class of objects."
+{ $subsection array }
+{ $subsection array? }
+"There are several ways to construct arrays."
+{ $subsection >array }
+{ $subsection <array> }
+{ $subsection zero-array }
+{ $subsection 1array }
+{ $subsection 2array }
+{ $subsection 3array }
+"Arrays can be accessed without bounds checks in a pointer unsafe way."
+{ $subsection array-nth }
+{ $subsection set-array-nth } ;
 
 HELP: <array> "( n elt -- array )"
 { $values { "n" "a positive integer specifying array length" } { "elt" "an initial element" } }
-{ $description "Create a new array with the given length and all elements initially set to " { $parameter "elt" } "." }
+{ $description "Create a new array with the given length and all elements initially set to " { $snippet "elt" } "." }
 { $examples { 3 f <array> . } }
 { $see-also <string> <sbuf> <vector> } ;
-
-HELP: array? "( object -- ? )"
-{ $predicate "array" }
-{ $see-also string? sbuf? vector? } ;
 
 HELP: >array "( seq -- array )"
 { $values { "seq" "a sequence" } { "array" "an array" } }

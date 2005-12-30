@@ -1,15 +1,81 @@
 IN: hashtables
-USING: hashtables-internals help inspector prettyprint ;
+USING: hashtables-internals help inspector kernel prettyprint ;
 
 GLOSSARY: "hashtable"
 "An instance of the " { $link hashtable } " class, implementing a mutable mapping from keys to values with expected constant lookup time" ;
+
+GLOSSARY: "hashcode"
+"an integer chosen so that equal objects have equal hashcodes, and unequal objects' hashcodes are distributed as evently as possible" ;
+
+ARTICLE: "hashtables" "Hashtables"
+"A hashtable provides efficient (expected constant time) lookup and storage of key/value pairs. Keys are compared for equality, and a hashing function is used to reduce the number of comparisons made."
+$terpri
+"Hashtable words are in the " { $snippet "hashtables" } " vocabulary. Unsafe implementation words are in the " { $snippet "hashtables-internals" } " vocabulary."
+$terpri
+"Hashtables form a class of objects."
+{ $subsection hashcode }
+{ $subsection hashtable? }
+{ $subsection <hashtable> }
+"There are some primitive operations on hashes, and many utilities."
+{ $subsection "hashtables-lookup" }
+{ $subsection "hashtables-mutation" }
+{ $subsection "hashtables-combinators" }
+{ $subsection "hashtables-utilities" }
+{ $subsection "hashtables-internals" } ;
+
+ARTICLE: "hashtables-lookup" "Looking up keys in hashtables"
+{ $subsection hash }
+{ $subsection hash* }
+{ $subsection ?hash }
+{ $subsection ?hash* }
+{ $subsection hash-member? } ;
+
+ARTICLE: "hashtables-mutation" "Storing keys in hashtables"
+{ $subsection set-hash }
+{ $subsection ?set-hash }
+{ $subsection remove-hash }
+{ $subsection clear-hash } ;
+
+ARTICLE: "hashtables-combinators" "Hashtable combinators"
+"We have the standard functional programming idioms."
+{ $subsection hash-each }
+{ $subsection hash-all? }
+{ $subsection hash-subset }
+"There are curried forms of the above."
+{ $subsection hash-each-with }
+{ $subsection hash-all-with? }
+{ $subsection hash-subset-with }
+"Two oddball combinators."
+{ $subsection cache }
+{ $subsection map>hash } ;
+
+ARTICLE: "hashtables-utilities" "Hashtable utilities"
+"Set-theoretic operations exploit the expected constant lookup time of a hashtable."
+{ $subsection hash-intersect }
+{ $subsection hash-diff }
+{ $subsection hash-union }
+{ $subsection hash-concat }
+{ $subsection hash-update }
+{ $subsection remove-all }
+"A combinator used to implement notions of nested scope. This includes various fundamental abstractions like variables, vocabulary search and cascading styles."
+{ $subsection hash-stack } ;
+
+HELP: hashcode "( object -- n )"
+{ $values { "object" "an object" } { "n" "an integer" } }
+{ $contract "Outputs the hashcode of the object. The fundamental invariant that must never be violated is that if two objects are equal under " { $link = } ", they must have the same hashcode." }
+{ $notes "If mutable objects are used as hashtable keys, they must not be mutated in such a way that their hashcode changes. Doing so will violate bucket sorting invariants and result in undefined behavior." } ;
 
 ARTICLE: "hashtables-internals" "Hashtable implementation details"
 "This hashtable implementation uses only one auxilliary array in addition to the hashtable tuple itself. The array stores keys in even slots and values in odd slots. Values are looked up with a hashing strategy that uses linear probing to resolve collisions."
 { $terpri }
 "There are two special objects: the " { $link ((tombstone)) } " marker and the " { $link ((empty)) } " marker. Neither of these markers can be used as hashtable keys."
 { $terpri }
-"The " { $link hash-count } " slot is the number of entries including deleted entries, and " { $link hash-deleted } " is the number of deleted entries." ;
+"The " { $link hash-count } " slot is the number of entries including deleted entries, and " { $link hash-deleted } " is the number of deleted entries."
+{ $subsection <hash-array> }
+{ $subsection nth-pair }
+{ $subsection set-nth-pair }
+{ $subsection each-pair }
+{ $subsection all-pairs? } ;
 
 HELP: hash@ "( key array -- i )"
 { $values { "key" "a key" } { "array" "the underlying array of a hashtable" } { "i" "the index to begin hashtable search" } }
@@ -100,7 +166,7 @@ HELP: hash>seq "( i hash -- seq )"
 
 HELP: <hashtable> "( n -- hash )"
 { $values { "n" "a positive integer specifying hashtable capacity" } { "hash" "a new hashtable" } }
-{ $description "Create a new hashtable capable of storing " { $parameter "n" } " key/value pairs before growing." }
+{ $description "Create a new hashtable capable of storing " { $snippet "n" } " key/value pairs before growing." }
 { $see-also clear-hash hash-size hash-empty? } ;
 
 HELP: associate "( value key -- hash )"
@@ -122,7 +188,7 @@ HELP: hash-empty? "( hash -- ? )"
 
 HELP: hash* "( key hash -- value ? )"
 { $values { "key" "an object to look up in the hashtable" } { "hash" "a hashtable" } { "value" "the value associated to the key, or " { $link f } " if the key is not present in the hashtable" } { "?" "a boolean indicating if the key was present" } }
-{ $description "Looks up the value associated with a key. Keys are tested for equality. The boolean flag can decide between the case of a missing value, and a value of " { $link f } "." }
+{ $description "Looks up the value associated with a key. The boolean flag can decide between the case of a missing value, and a value of " { $link f } "." }
 { $see-also hash-member? hash ?hash ?hash* } ;
 
 HELP: hash-member? "( key hashtable -- ? )"
@@ -137,7 +203,7 @@ HELP: ?hash* "( key hashtable/f -- ? )"
 
 HELP: hash "( key hash -- value )"
 { $values { "key" "an object to look up in the hashtable" } { "hash" "a hashtable" } { "value" "the value associated to the key, or " { $link f } " if the key is not present in the hashtable" } }
-{ $description "Looks up the value associated with a key. Keys are tested for equality. No distinction is made between a missing value and a value set to " { $link f } "." }
+{ $description "Looks up the value associated with a key. No distinction is made between a missing value and a value set to " { $link f } "." }
 { $see-also hash-member? hash* ?hash ?hash* } ;
 
 HELP: ?hash "( key hash/f -- ? )"
@@ -153,6 +219,11 @@ HELP: remove-hash "( key hash -- )"
 HELP: set-hash "( key hash -- )"
 { $values { "key" "a key" } { "hash" "a hashtable" } }
 { $description "Stores an entry into the hashtable." }
+{ $see-also hash remove-hash } ;
+
+HELP: ?set-hash "( value key hash/f -- hash )"
+{ $values { "value" "a value" } { "key" "a key" } { "hash/f" "a hashtable or " { $link f } } }
+{ $description "If the mapping is " { $link f } ", constructs a new hashtable storing the given key/value pair. Otherwise, stores the key/value pair into the hashtable." }
 { $see-also hash remove-hash } ;
 
 HELP: hash-keys "( hash -- keys )"
@@ -189,3 +260,47 @@ HELP: hash-subset "( hash quot -- subhash )"
 { $values { "hash" "a hashtable" } { "quot" "a quotation with stack effect " { $snippet "( key value -- ? )" } } { "subhash" "a new hashtable" } }
 { $description "Constructs a hashtable consisting of all key/value pairs for which the predicate quotation yields true." }
 { $see-also hash-each hash-each-with hash-all? hash-all-with? hash-subset-with } ;
+
+HELP: subhash? "( hash1 hash2 -- ? )"
+{ $values { "hash1" "a hashtable" } { "hash2" "a hashtable" } { "?" "a new hashtable" } }
+{ $description "Tests if " { $snippet "hash2" } " contains all key/value pairs of " { $snippet "hash1" } "." } ;
+
+HELP: hash-stack "( key seq -- value )"
+{ $values { "key" "a key" } { "seq" "a sequence of hashtables" } { "value" "a value or " { $link f } } }
+{ $description "Looks up the key in every hashtable in the sequence, search from back to front. If the key could not be found, outputs " { $link f } ". This word is used to implement abstractions such as nested scopes; if the sequence is a stack represented by a vector, then the most recently pushed hashtable -- the innermost scope -- will be searched first." } ;
+
+HELP: hash-intersect "( hash1 hash2 -- intersection )"
+{ $values { "hash1" "a hashtable" } { "hash2" "a hashtable" } { "intersection" "a new hashtable" } }
+{ $description "Constructs a hashstable consisting of all key/value pairs from " { $snippet "hash2" } " such that the key is also present in " { $snippet "hash1" } "." }
+{ $notes "The values of the keys in " { $snippet "hash1" } " are disregarded, so this word is usually used for set-theoretic calculations where the hashtable in question either has dummy sentinels as values, or the values equal the keys." } ;
+
+HELP: hash-diff "( hash1 hash2 -- difference )"
+{ $values { "hash1" "a hashtable" } { "hash2" "a hashtable" } { "difference" "a new hashtable" } }
+{ $description "Constructs a hashstable consisting of all key/value pairs from " { $snippet "hash2" } " such that the key is not present in " { $snippet "hash1" } "" }
+{ $notes "The values of the keys in " { $snippet "hash1" } " are disregarded, so this word is usually used for set-theoretic calculations where the hashtable in question either has dummy sentinels as values, or the values equal the keys." } ;
+
+HELP: hash-update "( hash1 hash2 -- )"
+{ $values { "hash1" "a hashtable" } { "hash2" "a hashtable" } }
+{ $description "Adds all key/value pairs from " { $snippet "hash2" } " to " { $snippet "hash1" } "." } ;
+
+HELP: hash-concat "( seq -- hash )"
+{ $values { "seq" "a sequence of hashtables" } { "hash" "a new hashtable" } }
+{ $description "Constructs a hashtable by merging every element of the sequence, with key/value pairs in subsequent hashtables taking precedence." } ;
+
+HELP: hash-union "( hash1 hash2 -- union )"
+{ $values { "hash1" "a hashtable" } { "hash2" "a hashtable" } { "union" "a new hashtable" } }
+{ $description "Constructs a hashstable consisting of all key/value pairs from " { $snippet "hash1" } " and " { $snippet "hash2" } ", with entries from " { $snippet "hash2" } " taking precedence." }
+{ $notes "The values of the keys in " { $snippet "hash1" } " are disregarded, so this word is usually used for set-theoretic calculations where the hashtable in question either has dummy sentinels as values, or the values equal the keys." } ;
+
+HELP: remove-all "( hash seq -- subseq )"
+{ $values { "hash" "a hashtable" } { "seq" "a sequence" } { "subseq" "a new sequence" } }
+{ $description "Constructs a sequence consisting of all elements from the sequence that appear as keys in the hashtable." }
+{ $notes "The values of the keys in the hashtable are disregarded, so this word is usually used for set-theoretic calculations where the hashtable in question either has dummy sentinels as values, or the values equal the keys." } ;
+
+HELP: cache "( key hash quot -- value )"
+{ $values { "key" "a key" } { "hash" "a hashtable" } { "quot" "a quotation with stack effect " { $snippet "( key -- value )" } } { "value" "a previously-retained or freshly-computed value" } }
+{ $description "If the key is present in the hashtable, outputs the associated value, otherwise calls the quotation to produce a value and stores the key/value pair into the hashtable." } ;
+
+HELP: map>hash "( seq quot -- hash )"
+{ $values { "seq" "a sequence" } { "quot" "a quotation with stack effect " { $snippet "( key -- value )" } } { "hash" "a hashtable" } { "value" "a previously-retained or freshly-computed value" } }
+{ $description "Applies the quotation to each element of the sequence to produce a value corresponding to each key, and constructs a new hashtable from these key/value pairs." } ;

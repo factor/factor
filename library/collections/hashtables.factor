@@ -1,3 +1,5 @@
+! Copyright (C) 2004, 2005 Slava Pestov.
+! See http://factor.sf.net/license.txt for BSD license.
 IN: hashtables-internals
 USING: arrays hashtables kernel math sequences
 sequences-internals ;
@@ -67,13 +69,6 @@ TUPLE: tombstone ;
     2dup new-key@ swap [ underlying 2dup nth-unsafe ] keep
     ( value key n underlying old hash )
     swap change-size set-nth-pair ;
-: grow-hash
-    [ dup underlying swap hash-size 1+ ] keep
-    [ reset-hash ] keep swap [ swap pick (set-hash) ] each-pair
-    drop ;
-: ?grow-hash
-    dup hash-count 3 * over underlying length >
-    [ dup grow-hash ] when drop ;
 
 : hash>seq
     underlying dup length 2 /i
@@ -83,7 +78,6 @@ TUPLE: tombstone ;
 IN: hashtables
 
 : <hashtable> (hashtable) [ reset-hash ] keep ;
-: associate 2 <hashtable> [ set-hash ] keep ;
 : clear-hash [ underlying length ] keep reset-hash ;
 : hash-size dup hash-count swap hash-deleted - ;
 : hash-empty? hash-size 0 = ;
@@ -105,7 +99,16 @@ IN: hashtables
     ] [
         3drop
     ] if-key ;
+: grow-hash
+    [ dup underlying swap hash-size 1+ ] keep
+    [ reset-hash ] keep swap [ swap pick (set-hash) ] each-pair
+    drop ;
+: ?grow-hash
+    dup hash-count 3 * over underlying length >
+    [ dup grow-hash ] when drop ;
 : set-hash [ (set-hash) ] keep ?grow-hash ;
+: associate 2 <hashtable> [ set-hash ] keep ;
+: ?set-hash [ [ set-hash ] keep ] [ associate ] if ;
 
 : hash-keys 0 swap hash>seq ; : hash-values 1 swap hash>seq ;
 : hash>alist dup hash-keys swap hash-values 2array flip ;
@@ -139,13 +142,10 @@ IN: hashtables
     inline
 
 M: hashtable clone clone-growable ;
-
-: subhash? ( h1 h2 -- ? )
-    #! Test if h2 contains all the key/value pairs of h1.
-    swap [
-        >r swap hash* [ r> = ] [ r> 2drop f ] if
-    ] hash-all-with? ; flushable
-
+: subhash?
+    swap
+    [ >r swap hash* [ r> = ] [ r> 2drop f ] if ]
+    hash-all-with? ; flushable
 M: hashtable = ( obj hash -- ? )
     {
         { [ 2dup eq? ] [ 2drop t ] }
@@ -154,57 +154,18 @@ M: hashtable = ( obj hash -- ? )
         { [ t ] [ 2dup subhash? >r swap subhash? r> and ] }
     } cond ;
 
-: ?hash ( key hash/f -- value/f )
-    dup [ hash ] [ 2drop f ] if ; flushable
-
-: ?hash* ( key hash/f -- value/f )
-    dup [ hash* ] [ 2drop f f ] if ; flushable
-
-: ?set-hash ( value key hash/f -- hash )
-    [ 2 <hashtable> ] unless* [ set-hash ] keep ;
-
-: hash-stack ( key seq -- value )
-    #! Searches for a key in a sequence of hashtables,
-    #! where the most recently pushed hashtable is searched
-    #! first.
-    [ dupd hash-member? ] find-last nip ?hash ; flushable
-
-: hash-intersect ( hash1 hash2 -- hash1/\hash2 )
-    #! Remove all keys from hash2 not in hash1.
-    [ drop swap hash ] hash-subset-with ;
-
-: hash-diff ( hash1 hash2 -- hash2-hash1 )
-    #! Remove all keys from hash2 in hash1.
-    [ drop swap hash not ] hash-subset-with ;
-
-: hash-update ( hash1 hash2 -- )
-    #! Add all key/value pairs from hash2 to hash1.
-    [ swap rot set-hash ] hash-each-with ;
-
-: hash-concat ( seq -- hash )
-    #! Combine a sequence of hashtables into one hashtable.
-    H{ } clone swap [ dupd hash-update ] each ;
-
-: hash-union ( hash1 hash2 -- hash1\/hash2 )
-    #! Make a new hashtable with all key/value pairs from
-    #! hash1 and hash2. Values in hash2 take precedence.
-    >r clone dup r> hash-update ;
-
-: remove-all ( hash seq -- seq )
-    #! Remove all elements from the sequence that are keys
-    #! in the hashtable.
-    [ swap hash-member? not ] subset-with ; flushable
-
-: cache ( key hash quot -- value | quot: key -- value )
-    pick pick hash [
-        >r 3drop r>
-    ] [
-        pick rot >r >r call dup r> r> set-hash
-    ] if* ; inline
-
-: map>hash ( seq quot -- hash | quot: key -- value )
-    #! Construct a hashtable with keys from the sequence, and
-    #! values obtained by applying the quotation to each key.
+: hash-stack [ dupd hash-member? ] find-last nip ?hash ; flushable
+: hash-intersect [ drop swap hash ] hash-subset-with ; flushable
+: hash-diff [ drop swap hash not ] hash-subset-with ; flushable
+: hash-update [ swap rot set-hash ] hash-each-with ;
+: hash-concat H{ } clone [ dupd hash-update ] reduce ; flushable
+: hash-union >r clone dup r> hash-update ; flushable
+: remove-all [ swap hash-member? not ] subset-with ; flushable
+: cache
+    pick pick hash
+    [ >r 3drop r> ]
+    [ pick rot >r >r call dup r> r> set-hash ] if* ; inline
+: map>hash
     swap [ length <hashtable> ] keep
     [ -rot [ >r over >r call r> r> set-hash ] 2keep ] each nip ;
     inline

@@ -1,0 +1,25 @@
+IN: queues
+USING: help ;
+
+ARTICLE: "queues" "Queues"
+"Last-in-first-out queues can be found in the " { $snippet "queues" } " vocabulary."
+{ $subsection <queue> }
+{ $subsection queue-empty? }
+{ $subsection deque }
+{ $subsection enque } ;
+
+HELP: <queue> "( -- queue )"
+{ $values { "queue" "a new queue" } }
+{ $description "Makes a new queue with no elements." } ;
+
+HELP: queue-empty? "( queue -- ? )"
+{ $values { "queue" "a queue" } { "?" "a boolean" } }
+{ $description "Tests if a queue contains no elements." } ;
+
+HELP: deque "( queue -- elt )"
+{ $values { "queue" "a queue" } { "elt" "an object" } }
+{ $description "Removes an element from the front of the queue." } ;
+
+HELP: enque "( elt queue -- )"
+{ $values { "elt" "an object" } { "queue" "a queue" } }
+{ $description "Adds an element to the back of the queue." } ;

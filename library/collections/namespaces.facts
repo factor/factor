@@ -1,0 +1,160 @@
+IN: namespaces
+USING: help ;
+
+GLOSSARY: "namestack" "a stack holding namespaces. Entering a dynamic scope pushes the name stack, leaving a scope pops it" ;
+
+GLOSSARY: "namespace" "a hashtable pushed on the name stack and used as a set of variable bindings" ;
+
+GLOSSARY: "dynamic scope" "a variable binding policy where bindings established in a scope are visible to all code executed while the scope is active" ;
+
+ARTICLE: "namespaces" "Variables and namespaces"
+"A variable is an entry in a hashtable of bindings, with the hashtable being implicit rather than passed on the stack. These hashtables are termed " { $emphasis "namespaces" } ". Nesting of scopes is implemented with a search order on namespaces, defined by a " { $emphasis "namestack" } ". Since namespaces are just hashtables, any object can be used as a variable, however by convention, variables are keyed by symbols (see " { $link "symbols" } ")."
+$terpri
+"The " { $snippet "get" } " and " { $snippet "set" } " words read and write variable values. The " { $snippet "get" } " word searches up the chain of nested namespaces, while " { $snippet "set" } " always sets variable values in the current namespace only. Namespaces are dynamically scoped; when a quotation is called from a nested scope, any words called by the quotation also execute in that scope."
+{ $subsection get }
+{ $subsection set }
+{ $subsection "namespaces-change" }
+{ $subsection "namespaces-combinators" }
+{ $subsection "namespaces-utilities" }
+{ $subsection "namespaces-internals" } ;
+
+ARTICLE: "namespaces-combinators" "Namespace combinators"
+{ $subsection make-hash }
+{ $subsection with-scope }
+{ $subsection bind } ;
+
+ARTICLE: "namespaces-change" "Ways to change variable values"
+{ $subsection on }
+{ $subsection off }
+{ $subsection inc }
+{ $subsection dec }
+{ $subsection change } ;
+
+ARTICLE: "namespaces-utilities" "Namespace utilities"
+{ $subsection namespace }
+{ $subsection nest }
+{ $subsection global }
+{ $subsection set-global } ;
+
+ARTICLE: "namespaces-internals" "Namespace implementation details"
+"The namestack holds namespaces."
+{ $subsection namestack* }
+{ $subsection namestack }
+{ $subsection set-namestack }
+"A pair of words push and pop namespaces on the namestack."
+{ $subsection >n }
+{ $subsection n> } ;
+
+HELP: get "( variable -- value )"
+{ $values { "variable" "a variable, by convention a symbol" } { "value" "the value, or " { $link f } } }
+{ $description "Searches the namestack for a namespace containing the variable, and outputs the associated value. If no such namespace is found, outputs " { $link f } "." } ;
+
+HELP: set "( value variable -- )"
+{ $values { "value" "the new value" } { "variable" "a variable, by convention a symbol" } }
+{ $description "Assigns a value to the variable in the namespace at the top of the namestack." }
+{ $side-effects "variable" } ;
+
+HELP: off "( variable -- )"
+{ $values { "variable" "a variable, by convention a symbol" } }
+{ $description "Assigns a value of " { $link f } " to the variable." }
+{ $side-effects "variable" } ;
+
+HELP: on "( variable -- ) "
+{ $values { "variable" "a variable, by convention a symbol" } }
+{ $description "Assigns a value of " { $link t } " to the variable." }
+{ $side-effects "variable" } ;
+
+HELP: change "( variable quot -- )"
+{ $values { "variable" "a variable, by convention a symbol" } { "quot" "a quotation with stack effect " { $snippet "( old -- new )" } } }
+{ $description "Applies the quotation to the old value of the variable, and assigns the resulting value to the variable." }
+{ $side-effects "variable" } ;
+
+HELP: inc "( variable -- ) "
+{ $values { "variable" "a variable, by convention a symbol" } }
+{ $description "Increments the value of the variable by 1." }
+{ $errors "An error is thrown if the variable does not hold a number." }
+{ $side-effects "variable" } ;
+
+HELP: dec "( variable -- ) "
+{ $values { "variable" "a variable, by convention a symbol" } }
+{ $description "Decrements the value of the variable by 1." }
+{ $errors "An error is thrown if the variable does not hold a number." }
+{ $side-effects "variable" } ;
+
+HELP: with-scope "( quot -- )"
+{ $values { "quot" "a quotation" } }
+{ $description "Calls the quotation in a new namespace. Any variables set by the quotation are discarded when it returns." } ;
+
+HELP: make-hash "( quot -- hash )"
+{ $values { "quot" "a quotation" } { "hash" "a new hashtable" } }
+{ $description "Calls the quotation in a new namespace, and outputs this namespace when the quotation returns. Useful for quickly building hashtables." } ;
+
+HELP: bind "( ns quot -- )"
+{ $values { "ns" "a hashtable" } { "quot" "a quotation" } }
+{ $description "Calls the quotation in the dynamic scope of " { $snippet "ns" } ". When variables are looked up by the quotation, " { $snippet "ns" } " is checked first, and setting variables in the quotation stores them in " { $snippet "ns" } "." } ;
+
+HELP: namespace "( -- ns )"
+{ $values { "ns" "a hashtable" } }
+{ $description "Outputs the current namespace. Calls to " { $link set } " modify this namespace." } ;
+
+HELP: global "( -- ns )"
+{ $values { "ns" "a hashtable" } }
+{ $description "Outputs the global namespace. The global namespace is always checked last when looking up variable values." } ;
+
+HELP: set-global "( value variable -- )"
+{ $values { "value" "the new value" } { "variable" "a variable, by convention a symbol" } }
+{ $description "Assigns a value to the variable in the global namespace." }
+{ $side-effects "variable" } ;
+
+HELP: nest "( variable -- namespace )"
+{ $values { "variable" "a variable, by convention a symbol" } { "namespace" "a hashtable" } }
+{ $description "If the variable is not set in the current namespace, sets it to a new hashtable, and outputs this hashtable. Otherwise, outputs the existing value (which should probably be a hashtable)." }
+{ $side-effects "variable" } ;
+
+HELP: namestack* "( -- namestack )"
+{ $values { "namestack" "a vector" } }
+{ $description "Outputs the current namestack." } ;
+
+HELP: namestack "( -- namestack )"
+{ $values { "namestack" "a vector" } }
+{ $description "Outputs a copy of the current namestack." } ;
+
+HELP: set-namestack "( namestack -- )"
+{ $values { "namestack" "a vector" } }
+{ $description "Replaces the namestack with a copy of the given vector." } ;
+
+HELP: >n "( ns -- )"
+{ $values { "ns" "a hashtable" } }
+{ $description "Pushes a namespace on the namestack." } ;
+
+HELP: n> "( -- ns )"
+{ $values { "ns" "a hashtable" } }
+{ $description "Pops a namespace from the namestack." } ;
+
+ARTICLE: "sequences-make" "Constructing sequences using an accumulator"
+"The library supports an idiom where sequences can be constructed without passing the partial sequence being built on the stack. This reduces stack noise, and thus simplifies code and makes it easier to understand."
+{ $subsection make }
+{ $subsection , }
+{ $subsection ?, }
+{ $subsection % }
+{ $subsection # } ;
+
+HELP: make "( quot exemplar -- seq )"
+{ $values { "quot" "a quotation" } { "exemplar" "a sequence" } }
+{ $description "Calls the quotation in a new " { $emphasis "dynamic scope" } ". The quotation and any words it calls can execute the " { $link , } " and " { $link % } " words to accumulate elements. When the quotation returns, all accumulated elements are collected into a sequence with the same type as " { $snippet "exemplar" } "." ;
+
+HELP: , "( elt -- )"
+{ $values { "elt" "an object" } }
+{ $description "Adds an element to the end of the sequence being constructed by " { $link make } "." } ;
+
+HELP: ?, "( elt ? -- )"
+{ $values { "elt" "an object" } { ">" "a boolean indicating of the element should be added or not" } }
+{ $description "Conditionally adds an element to the end of the sequence being constructed by " { $link make } "." } ;
+
+HELP: % "( seq -- )"
+{ $values { "seq" "a sequence" } }
+{ $description "Appends a sequence to the end of the sequence being constructed by " { $link make } "." } ;
+
+HELP: # "( n -- )"
+{ $values { "n" "a real number" } }
+{ $description "Appends the string representation of a real number to the end of the sequence being constructed by " { $link make } "." } ;

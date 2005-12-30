@@ -100,7 +100,7 @@ M: tuple = ( obj tuple -- ? )
     2dup eq? [
         2drop t
     ] [
-        over tuple? [ array= ] [ 2drop f ] if
+        over tuple? [ tuple= ] [ 2drop f ] if
     ] if ;
 
 : is? ( obj pred -- ? | pred: obj -- ? )

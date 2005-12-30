@@ -20,6 +20,7 @@ $terpri
 HELP: set-fill "( n seq -- )"
 { $values { "n" "a new fill pointer" } { "seq" "a growable sequence" } }
 { $contract "Sets the fill pointer (number of occupied elements in the underlying storage) of a growable sequence." }
+{ $side-effects "Modifies " { $snippet "seq" } "." }
 { $safety "This word is in the sequences-internals vocabulary because it is not safe. Changing the fill pointer to a negative value, or a value higher than the underlying sequence length can lead to memory corruption. Client code should use " { $link set-length } " instead." } ;
 
 HELP: underlying "( seq -- underlying )"

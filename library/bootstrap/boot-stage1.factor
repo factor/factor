@@ -192,10 +192,17 @@ vectors words ;
         "/library/help/stylesheet.factor"
         "/library/help/help.factor"
         "/library/help/markup.factor"
+        "/library/help/word-help.factor"
         "/library/help/commands.factor"
         "/library/help/syntax.factor"
 
         "/library/help/tutorial.factor"
+        
+        "/library/collections/growable.facts"
+        "/library/collections/arrays.facts"
+        "/library/collections/hashtables.facts"
+        "/library/collections/namespaces.facts"
+        "/library/collections/queues.facts"
         
         "/library/syntax/parse-syntax.factor"
 

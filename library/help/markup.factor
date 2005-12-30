@@ -3,7 +3,7 @@
 IN: help
 USING: arrays gadgets gadgets-panes gadgets-presentations
 hashtables inspector io kernel lists namespaces prettyprint
-sequences strings styles words ;
+sequences strings styles vectors words ;
 
 : uncons* dup first swap 1 swap tail ;
 
@@ -104,20 +104,6 @@ M: simple-element print-element
 : $see ( content -- )
     code-style [ [ first see ] with-nesting* ] with-style ;
 
-: $definition ( content -- )
-    "Definition" $subheading $see ;
-
-: $predicate ( content -- )
-    { { "object" "an object" } } $values
-    "Tests if the top of the stack is a " swap first "." append3
-    1array $description ;
-
-: $list ( content -- )
-    terpri* [ "- " format* print-element terpri* ] each ;
-
-: $safety ( content -- )
-    "Memory safety" $subheading print-element ;
-
 ! Some links
 TUPLE: link name ;
 
@@ -142,3 +128,28 @@ DEFER: help
 : $link ( article -- ) first <link> ($link) simple-object ;
 
 : $glossary ( element -- ) first <term> ($link) simple-object ;
+
+: $definition ( content -- )
+    "Definition" $subheading $see ;
+
+: $predicate ( content -- )
+    { { "object" "an object" } } $values
+    "Tests if the top of the stack is " $description
+    dup first word-name a/an print-element $link
+    "." print-element ;
+
+: $list ( content -- )
+    terpri* [ "- " format* print-element terpri* ] each ;
+
+: $safety ( content -- )
+    "Memory safety" $subheading print-element ;
+
+: $errors ( content -- )
+    "Errors" $subheading print-element ;
+
+: $side-effects ( content -- )
+    "Side effects" $subheading "Modifies " print-element
+    [ $snippet ] [ "," format* bl ] interleave ;
+
+: $notes ( content -- )
+    "Notes" $subheading print-element ;
