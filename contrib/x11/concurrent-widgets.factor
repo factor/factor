@@ -216,7 +216,73 @@ TUPLE: menu item-width item-height space ;
   tuck modify-action-to-unmap
   swap add-menu-item ;
 
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+! <pwindow>
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
+! window with parameterizable responses to events
+
+TUPLE: pwindow resize-action last-size move-action last-position
+key-action button-action motion-action expose-action ;
+
+! resize-action ( { width height } <pwindow> -- )
+! move-action ( { x y } <pwindow> -- )
+
+: create-pwindow ( -- <pwindow> )
+create-window-object f f f f f f f f <pwindow> dup >r set-delegate r>
+dup add-to-window-table ;
+
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+: XConfigureEvent-size ( event -- { width height } )
+dup XConfigureEvent-width swap XConfigureEvent-height 2array ;
+
+: XConfigureEvent-position ( event -- { x y } )
+dup XConfigureEvent-x swap XConfigureEvent-y 2array ;
+
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+: size-changed? ( event obj -- ? )
+pwindow-last-size swap XConfigureEvent-size = not ;
+
+: update-last-size ( event obj -- )
+swap XConfigureEvent-size swap set-pwindow-last-size ;
+
+: call-resize-action ( event obj -- ? )
+swap XConfigureEvent-size swap dup pwindow-resize-action call ;
+
+: maybe-handle-resize ( event obj -- )
+2dup size-changed? [ 2dup update-last-size call-resize-action ] [ 2drop ] if ;
+
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+: position-changed? ( event obj -- ? )
+pwindow-last-position swap XConfigureEvent-position = not ;
+
+: update-last-position ( event obj -- )
+swap XConfigureEvent-position swap set-pwindow-last-position ;
+
+: call-move-action ( event obj -- ? )
+swap XConfigureEvent-position swap dup pwindow-move-action call ;
+
+: maybe-handle-move ( event obj )
+2dup position-changed?
+[ 2dup update-last-position call-move-action ] [ 2drop ] if ;
+
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+M: pwindow handle-configure-event ( event obj -- )
+2dup maybe-handle-resize maybe-handle-move ;
+
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+M: pwindow handle-key-press-event ( event obj -- )
+dup pwindow-key-action call ;
+
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+M: pwindow handle-button-press-event ( event obj -- )
+dup pwindow-button-action call ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 ! event-loop
