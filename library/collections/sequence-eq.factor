@@ -9,8 +9,6 @@ vectors ;
 UNION: sequence array string sbuf vector ;
 
 : sequence= ( seq seq -- ? )
-    #! Check if two sequences have the same length and elements,
-    #! but not necessarily the same class.
     2dup [ length ] 2apply = [
         dup length [ >r 2dup r> 2nth-unsafe = ] all? 2nip
     ] [

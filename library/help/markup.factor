@@ -62,27 +62,19 @@ M: word print-element
 M: simple-element print-element
     current-style [ [ print-element ] each ] with-nesting ;
 
-: ($code) ( text presentation -- )
-    terpri*
+: ($code) ( presentation quot -- )
+    terpri* 
     code-style [
-        current-style swap presented pick set-hash
-        [ format* ] with-nesting
+        >r current-style swap presented pick set-hash r>
+        with-nesting
     ] with-style
-    terpri* ;
+    terpri* ; inline
 
 : $code ( content -- )
-    first dup <input> ($code) ;
-
-: $example ( content -- )
-    terpri*
-    code-style [
-        current-style over <input> presented pick set-hash
-        [ . ] with-nesting
-    ] with-style
-    terpri* ;
+    first dup <input> [ format* ] ($code) ;
 
 : $synopsis ( content -- )
-    "Synopsis" $subheading  first [ synopsis ] keep ($code) ;
+    "Synopsis" $subheading  [ synopsis ] map $code ;
 
 : $values ( content -- )
     "Arguments and values" $subheading [
@@ -96,13 +88,19 @@ M: simple-element print-element
     "Contract" $subheading print-element ;
 
 : $examples ( content -- )
-    "Examples" $subheading [ $example ] each ;
+    "Examples" $subheading print-element ;
 
 : $see-also ( content -- )
     "See also" $subheading [ pprint bl ] each ;
 
 : $see ( content -- )
-    code-style [ [ first see ] with-nesting* ] with-style ;
+    terpri*
+    code-style [ [ first see ] with-nesting* ] with-style
+    terpri* ;
+
+: $example ( content -- )
+    first2 swap dup <input>
+    [ format* "\n==> " format* format* ] ($code) ;
 
 ! Some links
 TUPLE: link name ;

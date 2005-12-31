@@ -203,6 +203,11 @@ vectors words ;
         "/library/collections/hashtables.facts"
         "/library/collections/namespaces.facts"
         "/library/collections/queues.facts"
+        "/library/collections/sbuf.facts"
+        "/library/collections/sequence-combinators.facts"
+        "/library/collections/sequence-eq.facts"
+        "/library/collections/sequence-sort.facts"
+        "/library/collections/sequences-epilogue.facts"
         
         "/library/syntax/parse-syntax.factor"
 

@@ -26,29 +26,24 @@ $terpri
 HELP: <array> "( n elt -- array )"
 { $values { "n" "a positive integer specifying array length" } { "elt" "an initial element" } }
 { $description "Create a new array with the given length and all elements initially set to " { $snippet "elt" } "." }
-{ $examples { 3 f <array> . } }
 { $see-also <string> <sbuf> <vector> } ;
 
 HELP: >array "( seq -- array )"
 { $values { "seq" "a sequence" } { "array" "an array" } }
 { $description "Outputs a freshly-allocated array with the same elements as a given sequence." }
-{ $examples { "abc" >array . } }
 { $see-also >string >sbuf >vector >list } ;
 
 HELP: 1array "( x -- array )"
 { $values { "x" "an object" } { "array" "an array" } }
 { $description "Create a new array with one element." }
-{ $examples { "fred" 1array . } }
 { $see-also 2array 3array ch>string } ;
 
 HELP: 2array "( x y -- array )"
 { $values { "x" "an object" } { "y" "an object" } { "array" "an array" } }
 { $description "Create a new array with two elements." }
-{ $examples { "fred" "jane" 2array . } }
 { $see-also 1array 3array ch>string } ;
 
 HELP: 3array "( x y z -- array )"
 { $values { "x" "an object" } { "y" "an object" } { "z" "an object" } { "array" "an array" } }
 { $description "Create a new array with three elements." }
-{ $examples { "fred" "likes" "jane" 3array . } }
 { $see-also 1array 2array ch>string } ;

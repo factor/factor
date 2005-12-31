@@ -4,9 +4,6 @@ IN: sequences-internals
 USING: arrays generic kernel kernel-internals math vectors ;
 
 : collect ( n generator -- vector | quot: n -- value )
-    #! Primitive mapping out of an integer sequence into an
-    #! array. Used by map and 2map. Don't call, use map
-    #! instead.
     >r [ f <array> ] keep r> swap [
         [ rot >r [ swap call ] keep r> set-array-nth ] 3keep
     ] repeat drop ; inline
@@ -84,11 +81,9 @@ M: object map ( seq quot -- seq )
     -rot 2dup min-length [ (2each) ] repeat 3drop ; inline
 
 : 2reduce ( seq seq identity quot -- value | quot: e x y -- z )
-    #! Don't use with lists.
     >r -rot r> 2each ; inline
 
 : 2map ( seq seq quot -- seq )
-    #! Don't use with lists.
     -rot
     [ 2dup min-length [ (2map) ] collect ] keep like
     >r 3drop r> ; inline
@@ -136,15 +131,12 @@ M: object find ( seq quot -- i elt )
     find-with drop -1 > ; inline
 
 : all? ( seq quot -- ? )
-    #! ForAll(P in X) <==> !Exists(!P in X)
     swap [ swap call not ] contains-with? not ; inline
 
 : all-with? ( obj seq quot -- ? | quot: elt -- ? )
     swap [ with rot ] all? 2nip ; inline
 
 : subset ( seq quot -- seq | quot: elt -- ? )
-    #! all elements for which the quotation returned a value
-    #! other than f are collected in a new list.
     swap [
         dup length <vector> -rot [
             rot >r 2dup >r >r swap call [
@@ -159,9 +151,6 @@ M: object find ( seq quot -- i elt )
     swap [ with rot ] subset 2nip ; inline
 
 : monotonic? ( seq quot -- ? | quot: elt elt -- ? )
-    #! Eg, { 1 2 3 4 } [ < ] monotonic? ==> t
-    #!     { 1 3 2 4 } [ < ] monotonic? ==> f
-    #! Don't use with lists.
     swap dup length 1- [
         pick pick >r >r (monotonic) r> r> rot
     ] all? 2nip ; inline

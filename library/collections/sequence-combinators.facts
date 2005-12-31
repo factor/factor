@@ -1,0 +1,109 @@
+IN: sequences
+USING: help math sequences-internals ;
+
+HELP: collect "( n quot -- array )"
+{ $values { "n" "a non-negative integer" } { "quot" "a quotation with stack effect " { $snippet "( n -- value )" } } { "array" "an array with " { $snippet "n" } " elements" } }
+{ $description "A primitive mapping operation that applies a quotation to all integers from 0 up to but not including " { $snippet "n" } ", and collects the results in a new array. Client code should use " { $snippet map } " instead." } ;
+
+HELP: each "( seq quot -- )"
+{ $values { "seq" "a sequence" } { "quot" "a quotation with stack effect " { $snippet "( elt -- )" } } }
+{ $description "Applies the quotation to each element of the sequence in turn." } ;
+
+HELP: reduce "( seq identity quot -- result )"
+{ $values { "seq" "a sequence" } { "quot" "a quotation with stack effect " { $snippet "( prev elt -- next )" } } }
+{ $description "Combines successive elements of the sequence using a binary operation, and outputs the final result. On the first iteration, the two inputs to the quotation are " { $snippet "identity" } ", and the first element of the sequence. On successive iterations, the first input is the result of the previous iteration, and the second input is the corresponding element of the sequence." }
+{ $examples
+    { $example "{ 1 5 3 } 0 [ + ] reduce ." "9" }
+}
+{ $see-also sum product } ;
+
+HELP: accumulate "( seq identity quot -- newseq )"
+{ $values { "seq" "a sequence" } { "quot" "a quotation with stack effect " { $snippet "( prev elt -- next )" } } }
+{ $description "Combines successive elements of the sequence using a binary operation, and outputs a sequence of intermediate results. On the first iteration, the two inputs to the quotation are " { $snippet "identity" } ", and the first element of the sequence. On successive iterations, the first input is the result of the previous iteration, and the second input is the corresponding element of the sequence." }
+{ $examples
+    { $example "{ 2 2 2 2 2 } 0 [ + ] accumulate ." "{ 0 2 4 6 8 }" }
+} ;
+
+HELP: map "( seq quot -- newseq )"
+{ $values { "seq" "a sequence" } { "quot" "a quotation with stack effect " { $snippet "( old -- new )" } } { "newseq" "a new sequence" } }
+{ $description "Applies the quotation to each element yielding a new element. The new elements are collected into a sequence of the same class as the input sequence." } ;
+
+HELP: inject "( seq quot -- )"
+{ $values { "seq" "a mutable sequence" } { "quot" "a quotation with stack effect " { $snippet "( old -- new )" } } }
+{ $description "Applies the quotation to each element yielding a new element, storing the new elements back in the original sequence." }
+{ $side-effects "seq" } ;
+
+HELP: 2each "( seq1 seq2 quot -- )"
+{ $values { "seq1" "a sequence" } { "seq2" "a sequence" } { "quot" "a quotation with stack effect " { $snippet "( elt1 elt2 -- )" } } }
+{ $description "Applies the quotation to pairs of elements from " { $snippet "sea1" } " and " { $snippet "seq2" } "." }
+{ $notes "If one sequence is shorter than the other, than only the prefix having the length of the minimum of the two is examined." } ;
+
+HELP: 2reduce "( seq1 seq2 quot -- )"
+{ $values { "seq1" "a sequence" } { "seq2" "a sequence" } { "quot" "a quotation with stack effect " { $snippet "( prev elt1 elt2 -- next )" } } }
+{ $description "Combines successive pairs of elements from the two sequences using a ternary operation. The first input value at each iteration except the first one is the result of the previous iteration. The first input value at the first iteration is " { $snippet "identity" } "." }
+{ $examples "The " { $link v. } " word provides a particularly elegant implementation of the dot product." }
+{ $notes "If one sequence is shorter than the other, than only the prefix having the length of the minimum of the two is examined." } ;
+
+HELP: 2map "( seq1 seq2 quot -- seq )"
+{ $values { "seq1" "a sequence" } { "seq2" "a sequence" } { "quot" "a quotation with stack effect " { $snippet "( elt1 elt2 -- new )" } } }
+{ $description "Applies the quotation to each pair of elements in turn, yielding new elements which are collected into a new sequence having the same class as " { $snippet "seq1" } "." }
+{ $see-also v+ v- v* v/ }
+{ $notes "If one sequence is shorter than the other, than only the prefix having the length of the minimum of the two is examined." } ;
+
+HELP: find "( seq quot -- i elt )"
+{ $values { "seq" "a sequence" } { "quot" "a quotation with stack effect " { $snippet "( elt -- ? )" } } }
+{ $description "A simpler variant of " { $link find* } " where the starting index is 0." }
+{ $see-also find* find-last find-last* contains? all? index index* member? } ;
+
+HELP: find* "( n seq quot -- i elt )"
+{ $values { "n" "a starting index" } { "seq" "a sequence" } { "quot" "a quotation with stack effect " { $snippet "( elt -- ? )" } } }
+{ $description "Applies the quotation to each element of the sequence in turn, until it outputs a true value or the end of the sequence is reached. If the quotation yields a true value for some sequence element, the word outputs the element index and the element itself. Otherwise, the word outputs an index of -1 and " { $link f } " as the element." }
+{ $see-also find find-last find-last* contains? all? index index* member? } ;
+
+HELP: find-last "( seq quot -- i elt )"
+{ $values { "seq" "a sequence" } { "quot" "a quotation with stack effect " { $snippet "( elt -- ? )" } } }
+{ $description "A simpler variant of " { $link find-last* } " where the starting index is one less than the length of the sequence." }
+{ $see-also find find* find-last find-last* contains? all? index index* member? } ;
+
+HELP: find-last* "( n seq quot -- i elt )"
+{ $values { "n" "a starting index" } { "seq" "a sequence" } { "quot" "a quotation with stack effect " { $snippet "( elt -- ? )" } } }
+{ $description "Applies the quotation to each element of the sequence in reverse order, until it outputs a true value or the start of the sequence is reached. If the quotation yields a true value for some sequence element, the word outputs the element index and the element itself. Otherwise, the word outputs an index of -1 and " { $link f } " as the element." }
+{ $see-also find find* find-last contains? all? index index* member? } ;
+
+HELP: contains? "( seq quot -- ? )"
+{ $values { "seq" "a sequence" } { "quot" "a quotation with stack effect " { $snippet "( elt -- ? )" } } { "?" "a boolean" } }
+{ $description "Tests if the sequence contains an element satisfying the predicate, by applying the predicate to each element in turn until a true value is found. If the sequence is empty or if the end of the sequence is reached, outputs " { $link f } "." } ;
+
+HELP: all? "( seq quot -- ? )"
+{ $values { "seq" "a sequence" } { "quot" "a quotation with stack effect " { $snippet "( elt -- ? )" } } { "?" "a boolean" } }
+{ $description "Tests if all elements in the sequence satisfy the predicate by checking each element in turn. Given an empty sequence, vacuously outputs " { $link t } "." }
+{ $notes
+    "The implementation makes use of a well-known logical identity:" 
+    $terpri
+    { $snippet "P[x] for all x <==> not ((not P[x]) for some x)" }
+} ;
+
+HELP: subset "( seq quot -- subseq )"
+{ $values { "seq" "a sequence" } { "quot" "a quotation with stack effect " { $snippet "( elt -- ? )" } } { "newseq" "a new sequence" } }
+{ $description "Applies the quotation to each element in turn, and outputs a new sequence containing the elements of the original sequence for which the quotation output a true value." } ;
+
+HELP: monotonic? "( seq quot -- ? )"
+{ $values { "seq" "a sequence" } { "quot" "a quotation with stack effect " { $snippet "( elt elt -- ? )" } } { "?" "a boolean" } }
+{ $description "Applies the relation to successive pairs of elements in the sequence, testing for a truth value. The relation should be a transitive relation, such as a total order or an equality relation." }
+{ $examples
+    "Testing if a sequence is non-decreasing:"
+    { $example "{ 1 1 2 } [ >= ] monotonic?" "t" }
+    "Testing if a sequence is decreasing:"
+    { $example "{ 9 8 6 7 } [ < ] monotonic?" "f" }
+}
+{ $see-also all-eq? all-equal? } ;
+
+HELP: interleave "( seq quot between -- )"
+{ $values { "seq" "a sequence" } { "quot" "a quotation with stack effect " { $snippet "( elt -- )" } } { "between" "a quotation" } }
+{ $description "Applies " { $snippet "quot" } " to each element in turn, also invoking " { $snippet "between" } " in-between each pair of elements." }
+{ $example "{ \"a\" \"b\" \"c\" } [ write ] [ \"X\" write ] interleave" "aXbXc" } ;
+
+HELP: cache-nth "( i seq quot -- elt )"
+{ $values { "i" "a non-negative integer" } { "seq" "a mutable sequence" } { "quot" "a quotation with stack effect " { $snippet "( i -- elt )" } } }
+{ $description "If the sequence does not contain at least " { $snippet "i" } " elements or if the " { $snippet "i" } "th element of the sequence is " { $link f } ", calls the quotation to produce a new value, and stores it back into the sequence. Otherwise, this word outputs the " { $snippet "i" } "th element of the sequence." }
+{ $side-effects "seq" } ;
