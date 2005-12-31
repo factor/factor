@@ -1,11 +1,9 @@
 USING: kernel sequences namespaces math threads io opengl concurrency
 x xlib x11 gl concurrent-widgets ;
 
-SYMBOL: loop-action
-[ ] loop-action set
+SYMBOL: loop-action [ ] loop-action set
 
-SYMBOL: spin
-0.0 spin set
+SYMBOL: spin 0.0 spin set
 
 : init ( -- ) 0.0 0.0 0.0 0.0 glClearColor GL_FLAT glShadeModel ;
 
@@ -20,8 +18,7 @@ swap-buffers ;
 
 : spin-display ( -- )
 spin get 2.0 + spin set
-spin get 360.0 > [ spin get 360.0 - spin set ] when
-display ;
+spin get 360.0 > [ spin get 360.0 - spin set ] when display ;
 
 : reshape ( { width height } -- )
 >r 0 0 r> [ ] each glViewport
@@ -49,9 +46,4 @@ StructureNotifyMask ButtonPressMask bitor select-input
 
 [ GLX_RGBA GLX_DOUBLEBUFFER ] choose-visual create-context make-current
 
-init
-
-{ 250 250 } reshape
-
-[ concurrent-event-loop ] spawn
-[ loop ] spawn
+init [ concurrent-event-loop ] spawn [ loop ] spawn
