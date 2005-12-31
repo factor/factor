@@ -13,3 +13,5 @@ dup length <int-array> swap dup length >array [ pick set-int-nth ] 2each ;
 >r dpy get r> 0 <alien> True glXCreateContext ;
 
 : make-current ( GLXContext -- Bool ) >r dpy get win get r> glXMakeCurrent ;
+
+: swap-buffers ( -- ) dpy get win get glXSwapBuffers ;
