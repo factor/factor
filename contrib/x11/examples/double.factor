@@ -1,4 +1,4 @@
-USING: kernel sequences namespaces math io opengl concurrency
+USING: kernel sequences namespaces math threads io opengl concurrency
 x xlib x11 gl concurrent-widgets ;
 
 SYMBOL: loop-action
@@ -31,12 +31,12 @@ GL_MODELVIEW glMatrixMode glLoadIdentity ;
 
 : mouse ( event -- )
 { { [ dup XButtonEvent-button Button1 = ]
-    [ [ spin-display ] loop-action set drop "Button1 pressed" print ] }
+    [ global [ [ spin-display ] loop-action set ] bind drop ] }
   { [ dup XButtonEvent-button Button2 = ]
-    [ [ ] loop-action set drop ] }
+    [ global [ [ ] loop-action set ] bind drop ] }
   { [ t ] [ drop ] } } cond ;
 
-: loop ( -- ) loop-action get call loop ;
+: loop ( -- ) loop-action get call 10 sleep loop ;
 
 f initialize-x
 
@@ -53,5 +53,5 @@ init
 
 { 250 250 } reshape
 
-! [ concurrent-event-loop ] spawn
-! [ loop ] spawn
+[ concurrent-event-loop ] spawn
+[ loop ] spawn
