@@ -1,5 +1,5 @@
 
-IN: x USING: namespaces kernel math arrays alien sequences xlib ;
+IN: x USING: namespaces kernel math arrays strings alien sequences xlib ;
 
 SYMBOL: dpy
 SYMBOL: scr
