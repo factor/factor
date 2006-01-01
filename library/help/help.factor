@@ -4,7 +4,7 @@ io kernel namespaces parser sequences words ;
 
 : (help) ( topic -- )
     default-style [
-        article-content print-element terpri*
+        [ article-content print-element ] with-nesting* terpri*
     ] with-style ;
 
 DEFER: $heading

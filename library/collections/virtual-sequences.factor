@@ -19,7 +19,7 @@ M: reversed set-nth ( elt n seq -- ) reversed@ set-nth ;
 M: reversed set-nth-unsafe ( elt n seq -- )
     reversed@ set-nth-unsafe ;
 
-M: reversed thaw ( seq -- seq ) delegate reverse ;
+M: reversed thaw ( seq -- seq ) delegate thaw ;
 
 ! A slice of another sequence.
 TUPLE: slice seq from to ;
@@ -57,3 +57,5 @@ M: slice set-nth ( obj n slice -- ) slice@ set-nth ;
 M: slice set-nth-unsafe ( n slice -- obj ) slice@ set-nth-unsafe ;
 
 M: slice like ( seq slice -- seq ) slice-seq like ;
+
+M: slice thaw ( seq -- seq ) delegate thaw ;

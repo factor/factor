@@ -1,24 +1,6 @@
 IN: sequences
 USING: help words ;
 
-GLOSSARY: "comparator"
-"a quotation with stack effect " { $snippet "( elt1 elt2 -- n )" } " that orders the two given elements and outputs a value whose sign denotes the result. See " { $link "sequence-sorting" } ;
-
-ARTICLE: "sequence-sorting" "Sorting and binary search"
-"Sorting and binary search combinators all take comparator quotations with stack effect " { $snippet "( elt1 elt2 -- n )" } " that order the two given elements and output a value whose sign denotes the result:"
-{ $list
-    { "positive - indicates that " { $snippet "elt1" } " follows " { $snippet "elt2" } }
-    { "zero - indicates that " { $snippet "elt1" } " is ordered equivalently to " { $snippet "elt2" } }
-    { "negative - indicates that " { $snippet "elt1" } " precedes " { $snippet "elt2" } }
-}
-"There are two sorting words, one outputs a new sequence and another one is in-place."
-{ $subsection sort }
-{ $subsection nsort }
-"There are three utility words."
-{ $subsection number-sort }
-{ $subsection string-sort }
-{ $subsection word-sort } ;
-
 HELP: sort "( seq quot -- sortedseq )"
 { $values { "seq" "a sequence" } { "quot" "a comparator quotation" } { "sortedseq" "a new sorted sequence" } }
 { $description "Sorts the elements into a new sequence of the same class as " { $snippet "seq" } "." } ;

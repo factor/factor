@@ -1,0 +1,70 @@
+USING: help sequences ;
+
+HELP: head-slice "( n seq -- slice )"
+{ $values { "n" "a non-negative integer" } { "seq" "a sequence" } { "slice" "a slice" } }
+{ $description "Outputs a virtual sequence sharing storage with the first " { $snippet "n" } " elements of the input sequence." }
+{ $errors "Throws an error if the index is out of bounds." } ;
+
+HELP: tail-slice "( n seq -- slice )"
+{ $values { "n" "a non-negative integer" } { "seq" "a sequence" } { "slice" "a slice" } }
+{ $description "Outputs a virtual sequence sharing storage with all elements up to the " { $snippet "n" } "th index of the input sequence." }
+{ $errors "Throws an error if the index is out of bounds." } ;
+
+HELP: head-slice* "( n seq -- slice )"
+{ $values { "n" "a non-negative integer" } { "seq" "a sequence" } { "slice" "a slice" } }
+{ $description "Outputs a virtual sequence sharing storage with all elements of " { $snippet "seq" } " until the " { $snippet "n" } "th element from the end. In other words, it outputs a sequence of the first " { $snippet "l-n" } " elements of the input sequence, where " { $snippet "l" } " is its length." }
+{ $errors "Throws an error if the index is out of bounds." } ;
+
+HELP: tail-slice* "( n seq -- slice )"
+{ $values { "n" "a non-negative integer" } { "seq" "a sequence" } { "slice" "a slice" } }
+{ $description "Outputs a virtual sequence sharing storage with the last " { $snippet "n" } " elements of the input sequence." }
+{ $errors "Throws an error if the index is out of bounds." } ;
+
+HELP: subseq "( m n seq -- subseq )"
+{ $values { "m" "a non-negative integer" } { "n" "a non-negative integer" } { "seq" "a sequence" } { "subseq" "a new sequence" } }
+{ $description "Outputs a new sequence consisting of all elements starting from and including " { $snippet "m" } ", and up to but not including " { $snippet "n" } "." }
+{ $errors "Throws an error if " { $snippet "m" } " or " { $snippet "n" } " is out of bounds." } ;
+
+HELP: head* "( n seq -- headseq )"
+{ $values { "n" "a non-negative integer" } { "seq" "a sequence" } { "headseq" "a new sequence" } }
+{ $description "Outputs a new sequence consisting of all elements of " { $snippet "seq" } " until the " { $snippet "n" } "th element from the end. In other words, it outputs a sequence of the first " { $snippet "l-n" } " elements of the input sequence, where " { $snippet "l" } " is its length." }
+{ $errors "Throws an error if the index is out of bounds." } ;
+
+HELP: tail* "( n seq -- tailseq )"
+{ $values { "n" "a non-negative integer" } { "seq" "a sequence" } { "tailseq" "a new sequence" } }
+{ $description "Outputs a new sequence consisting of the last " { $snippet "n" } " elements of the input sequence." }
+{ $errors "Throws an error if the index is out of bounds." } ;
+
+HELP: head? "( seq begin -- ? )"
+{ $values { "seq" "a sequence" } { "begin" "a sequence" } { "?" "a boolean" } }
+{ $description "Tests if " { $snippet "seq" } " starts with " { $snippet "begin" } ". If " { $snippet "begin" } " is longer than " { $snippet "seq" } ", this word outputs " { $link f } "." } ;
+
+HELP: tail? "( seq end -- ? )"
+{ $values { "seq" "a sequence" } { "begin" "a sequence" } { "?" "a boolean" } }
+{ $description "Tests if " { $snippet "seq" } " ends with " { $snippet "end" } ". If " { $snippet "end" } " is longer than " { $snippet "seq" } ", this word outputs " { $link f } "." } ;
+
+HELP: ?head "( seq begin -- newseq ? )"
+{ $values { "seq" "a sequence" } { "begin" "a sequence" } { "newseq" "a new sequence" } { "?" "a boolean" } }
+{ $description "Tests if " { $snippet "seq" } " starts with " { $snippet "begin" } ". If there is a match, outputs the subrange of " { $snippet "seq" } " excluding " { $snippet "begin" } ", and " { $link t } ". If there is no match, outputs " { $snippet "seq" } " and " { $link f } "." ;
+
+HELP: ?tail "( seq end -- newseq ? )"
+{ $values { "seq" "a sequence" } { "end" "a sequence" } { "newseq" "a new sequence" } { "?" "a boolean" } }
+{ $description "Tests if " { $snippet "seq" } " ends with " { $snippet "end" } ". If there is a match, outputs the subrange of " { $snippet "seq" } " excluding " { $snippet "begin" } ", and " { $link t } ". If there is no match, outputs " { $snippet "seq" } " and " { $link f } "." ;
+
+HELP: replace-slice "( new m n seq -- replaced )"
+{ $values { "new" "a sequence" } { "seq" "a sequence" } { "m" "a non-negative integer" } { "n" "a non-negative integer" } { "reokaced" "a new sequence" } }
+{ $description "Outputs a new sequence consisting of the elements of " { $snippet "seq" } ", with the range from " { $snippet "m" } " to " { $snippet "n" } " replaced by " { $snippet "new" } "." }
+{ $errors "Throws an error if " { $snippet "new" } " contains elements whose types are not permissible in sequences of the same class as " { $snippet "seq" } "." } ;
+
+HELP: group "( n seq -- groups )"
+{ $values { "n" "a non-negative integer" } { "seq" "a sequence" } { "groups" "a sequence of sequences" } }
+{ $description "Splits the sequence into groups of " { $snippet "n" } " elements and collects the groups into a new array." }
+{ $notes "If the sequence length is not a multiple of " { $snippet "n" } ", the final subsequence in the list will be shorter than " { $snippet "n" } " elements." } ;
+
+HELP: start* "( subseq seq i -- n )"
+{ $values { "subseq" "a sequence" } { "seq" "a sequence" } { "i" "a start index" } }
+{ $description "Outputs the start index of a subsequence, starting the search from the " { $snippet "i" } "th element. If no matching subsequence is found, outputs -1." } ;
+
+HELP: start "( subseq seq i -- n )"
+{ $values { "subseq" "a sequence" } { "seq" "a sequence" } { "i" "a start index" } }
+{ $description "Outputs the start index of a subsequence, or -1 if no matching subsequence is found." } ;

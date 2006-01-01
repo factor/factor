@@ -20,7 +20,7 @@ sequences strings vectors ;
 : >string ( seq -- array )
     [ length 0 <string> 0 over ] keep copy-into ; inline
 
-M: string thaw >sbuf ;
+M: string thaw drop SBUF" " clone ;
 
 M: string like ( seq sbuf -- string )
     drop dup string? [ >string ] unless ;

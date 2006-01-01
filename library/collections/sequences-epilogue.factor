@@ -1,5 +1,5 @@
 ! Copyright (C) 2005 Slava Pestov.
-! See http://factor.sf.net/license.txt for BSD license.
+! See http://factorcode.org/license.txt for BSD license.
 IN: sequences-internals
 USING: errors generic kernel kernel-internals lists math
 sequences strings vectors words ;
@@ -80,6 +80,9 @@ M: object >list ( seq -- list ) dup length 0 rot (>list) ;
     over length over length + pick set-length
     copy-into ; inline
 
+: immutable ( seq quot -- seq | quot: seq -- )
+    >r dup thaw dup pick nappend r> rot slip like ; inline
+
 : append ( s1 s2 -- s1+s2 )
     swap [ swap nappend ] immutable ; flushable
 
@@ -98,12 +101,6 @@ M: object >list ( seq -- list ) dup length 0 rot (>list) ;
 : append3 ( s1 s2 s3 -- s1+s2+s3 )
     rot [ [ rot nappend ] keep swap nappend ] immutable ; flushable
 
-: concat ( seq -- seq )
-    dup empty? [
-        [ 1024 <vector> swap [ dupd nappend ] each ] keep
-        first like
-    ] unless ; flushable
-
 M: object peek ( sequence -- element )
     dup length 1- swap nth ;
 
@@ -114,15 +111,6 @@ M: object peek ( sequence -- element )
 
 : pop ( sequence -- element )
     dup peek swap pop* ; inline
-
-: join ( seq glue -- seq )
-    swap dup empty? [
-        swap like
-    ] [
-        dup length <vector> swap
-        [ over push 2dup push ] each nip dup pop*
-        concat
-    ] if ; flushable
 
 M: object reverse-slice ( seq -- seq ) <reversed> ;
 
@@ -150,9 +138,7 @@ M: object reverse ( seq -- seq ) [ <reversed> ] keep like ;
 
 IN: kernel
 
-: depth ( -- n )
-    #! Push the number of elements on the datastack.
-    datastack length ;
+: depth ( -- n ) datastack length ;
 
 : no-cond "cond fall-through" throw ;
 

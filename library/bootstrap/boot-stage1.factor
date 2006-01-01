@@ -208,6 +208,7 @@ vectors words ;
         "/library/collections/sequence-eq.facts"
         "/library/collections/sequence-sort.facts"
         "/library/collections/sequences-epilogue.facts"
+        "/library/collections/sequences.facts"
         
         "/library/syntax/parse-syntax.factor"
 

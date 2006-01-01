@@ -15,6 +15,9 @@ USING: styles ;
 
 : subheading-style H{ { font "Serif" } { font-style bold } } ;
 
+: subsection-style
+    H{ { font "Serif" } { font-size 14 } { font-style bold } } ;
+
 : snippet-style
     H{
         { font "Monospaced" }

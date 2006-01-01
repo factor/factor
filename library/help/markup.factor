@@ -59,8 +59,7 @@ M: word print-element
 : $terpri terpri drop ;
 
 ! Some blocks
-M: simple-element print-element
-    current-style [ [ print-element ] each ] with-nesting ;
+M: simple-element print-element [ print-element ] each ;
 
 : ($code) ( presentation quot -- )
     terpri* 
@@ -74,7 +73,10 @@ M: simple-element print-element
     first dup <input> [ format* ] ($code) ;
 
 : $synopsis ( content -- )
-    "Synopsis" $subheading  [ synopsis ] map $code ;
+    first dup
+    word-vocabulary [ "Vocabulary" $subheading $snippet ] when*
+    stack-effect [ "Stack effect" $subheading $snippet ] when*
+    terpri* ;
 
 : $values ( content -- )
     "Arguments and values" $subheading [
@@ -118,7 +120,7 @@ DEFER: help
 
 : $subsection ( object -- )
     terpri*
-    subheading-style [
+    subsection-style [
         first <link> ($link) dup [ link-name (help) ] curry
         simple-outliner
     ] with-style ;

@@ -20,7 +20,7 @@ M: vector set-nth ( obj n vec -- )
 : >vector ( list -- vector )
     dup length <vector> [ swap nappend ] keep ; inline
 
-M: object thaw >vector ;
+M: object thaw drop V{ } clone ;
 
 M: vector clone ( vector -- vector ) clone-growable ;
 

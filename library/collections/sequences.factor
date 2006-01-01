@@ -1,12 +1,7 @@
 ! Copyright (C) 2005 Slava Pestov.
-! See http://factor.sf.net/license.txt for BSD license.
+! See http://factorcode.org/license.txt for BSD license.
 IN: sequences
 USING: errors generic kernel math math-internals strings vectors ;
-
-! This file is needed very early in bootstrap.
-
-! Sequences support the following protocol. Concrete examples
-! are strings, string buffers, vectors, and arrays.
 
 GENERIC: empty? ( sequence -- ? ) flushable
 GENERIC: length ( sequence -- n ) flushable
@@ -20,10 +15,6 @@ GENERIC: reverse-slice ( seq -- seq ) flushable
 GENERIC: peek ( seq -- elt ) flushable
 GENERIC: head ( n seq -- seq ) flushable
 GENERIC: tail ( n seq -- seq ) flushable
-GENERIC: resize ( n seq -- seq )
-
-: immutable ( seq quot -- seq | quot: seq -- )
-    swap [ thaw ] keep >r dup >r swap call r> r> like ; inline
 
 : first 0 swap nth ; inline
 : second 1 swap nth ; inline
@@ -31,7 +22,6 @@ GENERIC: resize ( n seq -- seq )
 : fourth 3 swap nth ; inline
 
 : push ( element sequence -- )
-    #! Push a value on the end of a sequence.
     dup length swap set-nth ; inline
 
 : ?push ( elt seq/f -- seq )
@@ -41,10 +31,11 @@ GENERIC: resize ( n seq -- seq )
     over 0 >= [ length < ] [ 2drop f ] if ;
 
 : ?nth ( n seq/f -- elt/f )
-    #! seq can even be f, since f answers with zero length.
     2dup length >= [ 2drop f ] [ nth ] if ;
 
 IN: sequences-internals
+
+GENERIC: resize ( n seq -- seq )
 
 ! Unsafe sequence protocol for inner loops
 GENERIC: nth-unsafe

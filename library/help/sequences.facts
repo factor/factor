@@ -1,0 +1,64 @@
+IN: sequences
+USING: arrays help kernel-internals sequences-internals words ;
+
+GLOSSARY: "resizable sequence"
+"a sequence implementing the " { $link set-length } " generic word. For example, vectors and string buffers" ;
+
+GLOSSARY: "mutable sequence"
+"a sequence implementing the " { $link set-nth } " generic word. For example, arrays and strings" ;
+
+GLOSSARY: "array"
+"an instance of the" { $link array } "class, implementing a fixed-length mutable sequence of objects" ;
+
+ARTICLE: "arrays" "Arrays"
+"An array is a fixed-size mutable sequence whose elements are stored in a contiguous range of memory. The literal syntax is covered in " { $link "array-literals" } ". Sometimes you need a growable array -- this is called a vector, and vectors are documented in " { $link "vectors" } "."
+$terpri
+"Array words are in the " { $snippet "arrays" } " vocabulary. Unsafe implementation words are in the " { $snippet "kernel-internals" } " vocabulary."
+$terpri
+"Arrays form a class of objects."
+{ $subsection array }
+{ $subsection array? }
+"There are several ways to construct arrays."
+{ $subsection >array }
+{ $subsection <array> }
+{ $subsection zero-array }
+{ $subsection 1array }
+{ $subsection 2array }
+{ $subsection 3array }
+"Arrays can be accessed without bounds checks in a pointer unsafe way."
+{ $subsection array-nth }
+{ $subsection set-array-nth } ;
+
+GLOSSARY: "comparator"
+"a quotation with stack effect " { $snippet "( elt1 elt2 -- n )" } " that orders the two given elements and outputs a value whose sign denotes the result. See " { $link "sequence-sorting" } ;
+
+ARTICLE: "sequence-sorting" "Sorting and binary search"
+"Sorting and binary search combinators all take comparator quotations with stack effect " { $snippet "( elt1 elt2 -- n )" } " that order the two given elements and output a value whose sign denotes the result:"
+{ $list
+    { "positive - indicates that " { $snippet "elt1" } " follows " { $snippet "elt2" } }
+    { "zero - indicates that " { $snippet "elt1" } " is ordered equivalently to " { $snippet "elt2" } }
+    { "negative - indicates that " { $snippet "elt1" } " precedes " { $snippet "elt2" } }
+}
+"There are two sorting words, one outputs a new sequence and another one is in-place."
+{ $subsection sort }
+{ $subsection nsort }
+"There are three utility words."
+{ $subsection number-sort }
+{ $subsection string-sort }
+{ $subsection word-sort } ;
+
+ARTICLE: "sequences-internals" "Growable sequence implementation details"
+"Growable sequences are implementing by having a wrapper object hold a reference to an underlying sequence, together with a fill pointer indicating how many elements of the underlying sequence are occupied. When the fill pointer exceeds the underlying sequence capacity, the underlying sequence grows."
+$terpri
+"There is a growable sequence protocol:"
+{ $subsection underlying }
+{ $subsection set-underlying }
+{ $subsection set-fill }
+"Any instance of a class implementing the above generics can make use of several utility words:"
+{ $subsection capacity }
+{ $subsection ensure }
+{ $subsection grow-length }
+{ $subsection clone-growable }
+"This protocol and the above words are unsafe; they do not perform bounds checks for performance reasons, and thus a mistake can lead to memory corruption due to an underlying sequence being shorter than the fill pointer."
+$terpri
+"Vectors and string buffers are implemented using the growable sequence facility (and they perform full bounds-checks and thus are safe)." ;

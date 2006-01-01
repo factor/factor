@@ -15,6 +15,6 @@ $terpri
 { $subsection >sbuf }
 { $subsection <sbuf> } ;
 
-HELP: ">sbuf" "( seq -- sbuf )"
+HELP: >sbuf "( seq -- sbuf )"
 { $values { "seq" "a sequence of non-negative integers" } { "sbuf" "a string buffer" } }
 { $description "Turns a character sequence into a string buffer. Given a string buffer, this makes a fresh copy." } ;

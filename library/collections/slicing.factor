@@ -31,7 +31,7 @@ M: object tail ( index seq -- seq ) [ tail-slice ] keep like ;
         dup length rot head-slice sequence=
     ] if ; flushable
 
-: ?head ( seq begin -- str ? )
+: ?head ( seq begin -- seq ? )
     2dup head? [ length swap tail t ] [ drop f ] if ; flushable
 
 : tail? ( seq end -- ? )
@@ -45,16 +45,20 @@ M: object tail ( index seq -- seq ) [ tail-slice ] keep like ;
     2dup tail? [ length swap head* t ] [ drop f ] if ; flushable
 
 : replace-slice ( new from to seq -- seq )
-    #! Replace the range between 'from' and 'to' in 'seq' with
-    #! 'new'. The new sequence has the same type as 'seq'.
     tuck >r >r head-slice r> r> tail-slice swapd append3 ;
     flushable
+
+: (cut) ( n seq -- before after )
+    [ head ] 2keep tail-slice ; flushable
+
+: cut ( n seq -- before after )
+    [ (cut) ] keep like ; flushable
 
 : (group) ( n seq -- )
     2dup length >= [
         dup empty? [ 2drop ] [ dup like , drop ] if
     ] [
-        2dup head , dupd tail-slice (group)
+        dupd (cut) >r , r> (group)
     ] if ;
 
 : group ( n seq -- seq ) [ (group) ] { } make ; flushable
@@ -73,9 +77,7 @@ M: object tail ( index seq -- seq ) [ tail-slice ] keep like ;
         ] if
     ] if ; flushable
 
-: start ( subseq seq -- n )
-    #! The index of a subsequence in a sequence.
-    0 start* ; flushable
+: start ( subseq seq -- n ) 0 start* ; flushable
 
 : subseq? ( subseq seq -- ? ) start -1 > ; flushable
 
@@ -96,18 +98,20 @@ M: object tail ( index seq -- seq ) [ tail-slice ] keep like ;
 
 : split ( seq subseq -- seq ) [ (split) ] { } make ; flushable
 
-: (cut) ( n seq -- before after )
-    [ head ] 2keep tail-slice ; flushable
-
-: cut ( n seq -- before after )
-    [ (cut) ] keep like ; flushable
-
 : drop-prefix ( seq1 seq2 -- seq1 seq2 )
     2dup mismatch dup -1 = [ drop 2dup min-length ] when
     tuck swap tail-slice >r swap tail-slice r> ;
 
 : unpair ( seq -- firsts seconds )
     flip dup empty? [ drop { } { } ] [ first2 ] if ;
+
+: concat ( seq -- seq )
+    dup empty? [ [ [ % ] each ] over first make ] unless ;
+    flushable
+
+: join ( seq glue -- seq )
+    [ swap [ % ] [ dup % ] interleave drop ] over make ;
+    flushable
 
 IN: strings
 

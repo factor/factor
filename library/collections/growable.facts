@@ -1,22 +1,6 @@
 IN: sequences-internals
 USING: help kernel sequences ;
 
-ARTICLE: "sequences-internals" "Growable sequence implementation details"
-"Growable sequences are implementing by having a wrapper object hold a reference to an underlying sequence, together with a fill pointer indicating how many elements of the underlying sequence are occupied. When the fill pointer exceeds the underlying sequence capacity, the underlying sequence grows."
-$terpri
-"There is a growable sequence protocol:"
-{ $subsection underlying }
-{ $subsection set-underlying }
-{ $subsection set-fill }
-"Any instance of a class implementing the above generics can make use of several utility words:"
-{ $subsection capacity }
-{ $subsection ensure }
-{ $subsection grow-length }
-{ $subsection clone-growable }
-"This protocol and the above words are unsafe; they do not perform bounds checks for performance reasons, and thus a mistake can lead to memory corruption due to an underlying sequence being shorter than the fill pointer."
-$terpri
-"Vectors and string buffers are implemented using the growable sequence facility (and they perform full bounds-checks and thus are safe)." ;
-
 HELP: set-fill "( n seq -- )"
 { $values { "n" "a new fill pointer" } { "seq" "a growable sequence" } }
 { $contract "Sets the fill pointer (number of occupied elements in the underlying storage) of a growable sequence." }

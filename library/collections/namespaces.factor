@@ -38,7 +38,8 @@ SYMBOL: building
 
 : make ( quot proto -- )
     [
-        dup thaw building set >r call building get r> like
+        dup thaw building set
+        >r call building get r> like
     ] with-scope ; inline
 
 : , ( obj -- ) building get push ;

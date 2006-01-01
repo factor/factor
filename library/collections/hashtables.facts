@@ -1,81 +1,10 @@
 IN: hashtables
 USING: hashtables-internals help inspector kernel prettyprint ;
 
-GLOSSARY: "hashtable"
-"An instance of the " { $link hashtable } " class, implementing a mutable mapping from keys to values with expected constant lookup time" ;
-
-GLOSSARY: "hashcode"
-"an integer chosen so that equal objects have equal hashcodes, and unequal objects' hashcodes are distributed as evently as possible" ;
-
-ARTICLE: "hashtables" "Hashtables"
-"A hashtable provides efficient (expected constant time) lookup and storage of key/value pairs. Keys are compared for equality, and a hashing function is used to reduce the number of comparisons made."
-$terpri
-"Hashtable words are in the " { $snippet "hashtables" } " vocabulary. Unsafe implementation words are in the " { $snippet "hashtables-internals" } " vocabulary."
-$terpri
-"Hashtables form a class of objects."
-{ $subsection hashcode }
-{ $subsection hashtable? }
-{ $subsection <hashtable> }
-"There are some primitive operations on hashes, and many utilities."
-{ $subsection "hashtables-lookup" }
-{ $subsection "hashtables-mutation" }
-{ $subsection "hashtables-combinators" }
-{ $subsection "hashtables-utilities" }
-{ $subsection "hashtables-internals" } ;
-
-ARTICLE: "hashtables-lookup" "Looking up keys in hashtables"
-{ $subsection hash }
-{ $subsection hash* }
-{ $subsection ?hash }
-{ $subsection ?hash* }
-{ $subsection hash-member? } ;
-
-ARTICLE: "hashtables-mutation" "Storing keys in hashtables"
-{ $subsection set-hash }
-{ $subsection ?set-hash }
-{ $subsection remove-hash }
-{ $subsection clear-hash } ;
-
-ARTICLE: "hashtables-combinators" "Hashtable combinators"
-"We have the standard functional programming idioms."
-{ $subsection hash-each }
-{ $subsection hash-all? }
-{ $subsection hash-subset }
-"There are curried forms of the above."
-{ $subsection hash-each-with }
-{ $subsection hash-all-with? }
-{ $subsection hash-subset-with }
-"Two oddball combinators."
-{ $subsection cache }
-{ $subsection map>hash } ;
-
-ARTICLE: "hashtables-utilities" "Hashtable utilities"
-"Set-theoretic operations exploit the expected constant lookup time of a hashtable."
-{ $subsection hash-intersect }
-{ $subsection hash-diff }
-{ $subsection hash-union }
-{ $subsection hash-concat }
-{ $subsection hash-update }
-{ $subsection remove-all }
-"A combinator used to implement notions of nested scope. This includes various fundamental abstractions like variables, vocabulary search and cascading styles."
-{ $subsection hash-stack } ;
-
 HELP: hashcode "( object -- n )"
 { $values { "object" "an object" } { "n" "an integer" } }
 { $contract "Outputs the hashcode of the object. The fundamental invariant that must never be violated is that if two objects are equal under " { $link = } ", they must have the same hashcode." }
 { $notes "If mutable objects are used as hashtable keys, they must not be mutated in such a way that their hashcode changes. Doing so will violate bucket sorting invariants and result in undefined behavior." } ;
-
-ARTICLE: "hashtables-internals" "Hashtable implementation details"
-"This hashtable implementation uses only one auxilliary array in addition to the hashtable tuple itself. The array stores keys in even slots and values in odd slots. Values are looked up with a hashing strategy that uses linear probing to resolve collisions."
-{ $terpri }
-"There are two special objects: the " { $link ((tombstone)) } " marker and the " { $link ((empty)) } " marker. Neither of these markers can be used as hashtable keys."
-{ $terpri }
-"The " { $link hash-count } " slot is the number of entries including deleted entries, and " { $link hash-deleted } " is the number of deleted entries."
-{ $subsection <hash-array> }
-{ $subsection nth-pair }
-{ $subsection set-nth-pair }
-{ $subsection each-pair }
-{ $subsection all-pairs? } ;
 
 HELP: hash@ "( key array -- i )"
 { $values { "key" "a key" } { "array" "the underlying array of a hashtable" } { "i" "the index to begin hashtable search" } }

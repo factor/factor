@@ -207,3 +207,6 @@ unit-test
 [ 1 ] [ 1/2 { 1 2 3 } nth ] unit-test
 
 [ { } ] [ 0 { } group ] unit-test
+
+! Pathological case
+[ "ihbye" ] [ "hi" reverse-slice "bye" append ] unit-test
