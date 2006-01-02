@@ -2,20 +2,8 @@
 IN: x11
 USING: alien math ;
 
-TYPEDEF: ulong XID
 TYPEDEF: ulong Mask
 TYPEDEF: ulong Atom
-TYPEDEF: ulong VisualID
-TYPEDEF: ulong Time
-TYPEDEF: ulong VisualID
-TYPEDEF: XID Window
-TYPEDEF: XID Drawable
-TYPEDEF: XID Font
-TYPEDEF: XID Pixmap
-TYPEDEF: XID Cursor
-TYPEDEF: XID Colormap
-TYPEDEF: XID GContext
-TYPEDEF: XID KeySym
 TYPEDEF: uchar KeyCode
 
 ! Reserved Resource and Constant Definitions
