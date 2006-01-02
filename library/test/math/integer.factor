@@ -1,5 +1,5 @@
 IN: temporary
-USING: kernel math prettyprint test ;
+USING: kernel math namespaces prettyprint test ;
 
 [ "-8" ] [ -8 unparse ] unit-test
 
@@ -97,3 +97,5 @@ unit-test
 [ 0 ] [ -1 -268435456 >fixnum /i ] unit-test
 [ 0 -1 ] [ -1 -268435456 >fixnum /mod ] unit-test
 [ 14355 ] [ 1591517158873146351817850880000000 32769 mod ] unit-test
+
+[ { 0 1 1 0 } ] [ [ -10 [ , ] each-bit ] { } make ] unit-test

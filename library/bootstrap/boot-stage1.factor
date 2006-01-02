@@ -215,7 +215,7 @@ vectors words ;
         "/library/collections/strings.facts"
         "/library/collections/tree-each.facts"
         "/library/collections/vectors.facts"
-        "/library/collections/virtual-sequence.facts"
+        "/library/collections/virtual-sequences.facts"
         
         "/library/syntax/parse-syntax.factor"
 

@@ -95,9 +95,6 @@ M: simple-element print-element [ print-element ] each ;
 : textual-list ( seq quot -- )
     [ "," format* bl ] interleave ; inline
 
-: $see-also ( content -- )
-    "See also" $subheading [ 1array $link ] textual-list ;
-
 : $see ( content -- )
     terpri*
     code-style [ [ first see ] with-nesting* ] with-style
@@ -141,6 +138,9 @@ DEFER: help
 
 : $definition ( content -- )
     "Definition" $subheading $see ;
+
+: $see-also ( content -- )
+    "See also" $subheading [ 1array $link ] textual-list ;
 
 : $predicate ( content -- )
     { { "object" "an object" } } $values

@@ -29,7 +29,7 @@ M: number ^ ( z w -- z^w )
 : each-bit ( n quot -- | quot: 0/1 -- )
     #! Apply the quotation to each bit of the number. The number
     #! must be positive.
-    over 0 number= [
+    over 0 number= pick -1 number= or [
         2drop
     ] [
         2dup >r >r >r 1 bitand r> call r> -1 shift r> each-bit
