@@ -32,72 +32,6 @@ TYPEDEF: uchar KeyCode
 : CurrentTime 0 ;
 : NoSymbol 0 ;
 
-! Event Definitions
-: NoEventMask			0 ;
-: KeyPressMask			1 0  shift ;
-: KeyReleaseMask		1 1  shift ;
-: ButtonPressMask		1 2  shift ;
-: ButtonReleaseMask		1 3  shift ;
-: EnterWindowMask		1 4  shift ;
-: LeaveWindowMask		1 5  shift ;
-: PointerMotionMask		1 6  shift ;
-: PointerMotionHintMask		1 7  shift ;
-: Button1MotionMask		1 8  shift ;
-: Button2MotionMask		1 9  shift ;
-: Button3MotionMask		1 10 shift ;
-: Button4MotionMask		1 11 shift ;
-: Button5MotionMask		1 12 shift ;
-: ButtonMotionMask		1 13 shift ;
-: KeymapStateMask		1 14 shift ;
-: ExposureMask			1 15 shift ;
-: VisibilityChangeMask		1 16 shift ;
-: StructureNotifyMask		1 17 shift ;
-: ResizeRedirectMask		1 18 shift ;
-: SubstructureNotifyMask	1 19 shift ;
-: SubstructureRedirectMask	1 20 shift ;
-: FocusChangeMask		1 21 shift ;
-: PropertyChangeMask		1 22 shift ;
-: ColormapChangeMask		1 23 shift ;
-: OwnerGrabButtonMask		1 24 shift ;
-
-! Event names.  Used in "type" field in XEvent structures.  Not to be
-! confused with event masks above.  They start from 2 because 0 and 1
-! are reserved in the protocol for errors and replies.
-: KeyPress	   2 ;
-: KeyRelease	   3 ;
-: ButtonPress	   4 ;
-: ButtonRelease	   5 ;
-: MotionNotify	   6 ;
-: EnterNotify	   7 ;
-: LeaveNotify	   8 ;
-: FocusIn	   9 ;
-: FocusOut	   10 ;
-: KeymapNotify	   11 ;
-: Expose	   12 ;
-: GraphicsExpose   13 ;
-: NoExpose	   14 ;
-: VisibilityNotify 15 ;
-: CreateNotify	   16 ;
-: DestroyNotify	   17 ;
-: UnmapNotify	   18 ;
-: MapNotify	   19 ;
-: MapRequest	   20 ;
-: ReparentNotify   21 ;
-: ConfigureNotify  22 ;
-: ConfigureRequest 23 ;
-: GravityNotify	   24 ;
-: ResizeRequest	   25 ;
-: CirculateNotify  26 ;
-: CirculateRequest 27 ;
-: PropertyNotify   28 ;
-: SelectionClear   29 ;
-: SelectionRequest 30 ;
-: SelectionNotify  31 ;
-: ColormapNotify   32 ;
-: ClientMessage	   33 ;
-: MappingNotify	   34 ;
-: LASTEvent	   35 ;	! must be bigger than any event #
-
 ! Key masks. Used as modifiers to GrabButton and GrabKey, results of QueryPointer,
 !   state in various key-, mouse-, and button-related events.
 
@@ -268,64 +202,11 @@ TYPEDEF: uchar KeyCode
 : InputOutput		1 ;
 : InputOnly		2 ;
 
-! Window attributes for CreateWindow and ChangeWindowAttributes
-
-: CWBackPixmap		1 0 shift ;
-: CWBackPixel		1 1 shift ;
-: CWBorderPixmap	1 2 shift ;
-: CWBorderPixel         1 3 shift ;
-: CWBitGravity		1 4 shift ;
-: CWWinGravity		1 5 shift ;
-: CWBackingStore        1 6 shift ;
-: CWBackingPlanes       1 7 shift ;
-: CWBackingPixel        1 8 shift ;
-: CWOverrideRedirect	1 9 shift ;
-: CWSaveUnder		1 10 shift ;
-: CWEventMask		1 11 shift ;
-: CWDontPropagate       1 12 shift ;
-: CWColormap		1 13 shift ;
-: CWCursor	        1 14 shift ;
-
-! ConfigureWindow structure
-
-: CWX			1 0 shift ;
-: CWY			1 1 shift ;
-: CWWidth		1 2 shift ;
-: CWHeight		1 3 shift ;
-: CWBorderWidth		1 4 shift ;
-: CWSibling		1 5 shift ;
-: CWStackMode		1 6 shift ;
-
-
-! Bit Gravity
-
-: ForgetGravity		0 ;
-: NorthWestGravity	1 ;
-: NorthGravity		2 ;
-: NorthEastGravity	3 ;
-: WestGravity		4 ;
-: CenterGravity		5 ;
-: EastGravity		6 ;
-: SouthWestGravity	7 ;
-: SouthGravity		8 ;
-: SouthEastGravity	9 ;
-: StaticGravity		10 ;
-
-! Window gravity + bit gravity above
-
-: UnmapGravity		0 ;
-
 ! Used in CreateWindow for backing-store hint
 
 : NotUseful               0 ;
 : WhenMapped              1 ;
 : Always                  2 ;
-
-! Used in GetWindowAttributes reply
-
-: IsUnmapped		0 ;
-: IsUnviewable		1 ;
-: IsViewable		2 ;
 
 ! Used in ChangeSaveSet
 
@@ -360,25 +241,6 @@ TYPEDEF: uchar KeyCode
 ! *****************************************************************
 ! * GRAPHICS DEFINITIONS
 ! *****************************************************************
-
-! graphics functions, as in GC.alu
-
-: GXclear		HEX: 0 ; ! 0
-: GXand			HEX: 1 ; ! src AND dst
-: GXandReverse		HEX: 2 ; ! src AND NOT dst
-: GXcopy		HEX: 3 ; ! src
-: GXandInverted		HEX: 4 ; ! NOT src AND dst
-: GXnoop		HEX: 5 ; ! dst
-: GXxor			HEX: 6 ; ! src XOR dst
-: GXor			HEX: 7 ; ! src OR dst
-: GXnor			HEX: 8 ; ! NOT src AND NOT dst
-: GXequiv		HEX: 9 ; ! NOT src XOR dst
-: GXinvert		HEX: a ; ! NOT dst
-: GXorReverse		HEX: b ; ! src OR NOT dst
-: GXcopyInverted	HEX: c ; ! NOT src
-: GXorInverted		HEX: d ; ! NOT src OR dst
-: GXnand		HEX: e ; ! NOT src OR NOT dst
-: GXset			HEX: f ; ! 1
 
 ! LineStyle
 
@@ -438,34 +300,6 @@ TYPEDEF: uchar KeyCode
 
 : ArcChord    0 ; ! join endpoints of arc
 : ArcPieSlice 1 ; ! join endpoints to center of arc
-
-! GC components: masks used in CreateGC, CopyGC, ChangeGC, OR'ed into
-! GC.stateChanges
-
-: GCFunction          1 0 shift ;
-: GCPlaneMask         1 1 shift ;
-: GCForeground        1 2 shift ;
-: GCBackground        1 3 shift ;
-: GCLineWidth         1 4 shift ;
-: GCLineStyle         1 5 shift ;
-: GCCapStyle          1 6 shift ;
-: GCJoinStyle	      1 7 shift ;
-: GCFillStyle	      1 8 shift ;
-: GCFillRule	      1 9 shift  ;
-: GCTile	      1 10 shift ;
-: GCStipple	      1 11 shift ;
-: GCTileStipXOrigin   1 12 shift ;
-: GCTileStipYOrigin   1 13 shift ;
-: GCFont 	      1 14 shift ;
-: GCSubwindowMode     1 15 shift ;
-: GCGraphicsExposures 1 16 shift ;
-: GCClipXOrigin	      1 17 shift ;
-: GCClipYOrigin	      1 18 shift ;
-: GCClipMask	      1 19 shift ;
-: GCDashOffset	      1 20 shift ;
-: GCDashList	      1 21 shift ;
-: GCArcMode	      1 22 shift ;
-: GCLastBit	      22 ;
 
 ! *****************************************************************
 ! * FONTS 
