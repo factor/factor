@@ -196,7 +196,9 @@ vectors words ;
         "/library/help/commands.factor"
         "/library/help/syntax.factor"
 
-        "/library/help/tutorial.factor"
+        "/library/help/collections.facts"
+        "/library/help/sequences.facts"
+        "/library/help/tutorial.facts"
         
         "/library/collections/growable.facts"
         "/library/collections/arrays.facts"

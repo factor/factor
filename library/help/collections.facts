@@ -100,9 +100,13 @@ $terpri
 "The " { $snippet "get" } " and " { $snippet "set" } " words read and write variable values. The " { $snippet "get" } " word searches up the chain of nested namespaces, while " { $snippet "set" } " always sets variable values in the current namespace only. Namespaces are dynamically scoped; when a quotation is called from a nested scope, any words called by the quotation also execute in that scope."
 { $subsection get }
 { $subsection set }
+"Various utility words abstract away common variable access patterns:"
 { $subsection "namespaces-change" }
 { $subsection "namespaces-combinators" }
 { $subsection "namespaces-utilities" }
+"A useful facility for constructing sequences by holding an accumulator sequence in a variable:"
+{ $subsection "namespaces-make" }
+"Implementation details your code probably does not care about:"
 { $subsection "namespaces-internals" } ;
 
 ARTICLE: "namespaces-combinators" "Namespace combinators"
@@ -122,6 +126,13 @@ ARTICLE: "namespaces-utilities" "Namespace utilities"
 { $subsection nest }
 { $subsection global }
 { $subsection set-global } ;
+
+ARTICLE: "namespaces-make" "Constructing sequences"
+"There is a lexicon of words for constructing sequences without passing the partial sequence being built on the stack. This reduces stack noise."
+{ $subsection make }
+{ $subsection , }
+{ $subsection % }
+{ $subsection # } ;
 
 ARTICLE: "namespaces-internals" "Namespace implementation details"
 "The namestack holds namespaces."

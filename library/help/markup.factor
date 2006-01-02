@@ -92,8 +92,11 @@ M: simple-element print-element [ print-element ] each ;
 : $examples ( content -- )
     "Examples" $subheading print-element ;
 
+: textual-list ( seq quot -- )
+    [ "," format* bl ] interleave ; inline
+
 : $see-also ( content -- )
-    "See also" $subheading [ pprint bl ] each ;
+    "See also" $subheading [ 1array $link ] textual-list ;
 
 : $see ( content -- )
     terpri*
@@ -102,7 +105,9 @@ M: simple-element print-element [ print-element ] each ;
 
 : $example ( content -- )
     first2 swap dup <input>
-    [ "  " format* format* format* ] ($code) ;
+    [
+        input-style [ format* ] with-style terpri format*
+    ] ($code) ;
 
 ! Some links
 TUPLE: link name ;
@@ -154,7 +159,7 @@ DEFER: help
 
 : $side-effects ( content -- )
     "Side effects" $subheading "Modifies " print-element
-    [ $snippet ] [ "," format* bl ] interleave ;
+    [ $snippet ] textual-list ;
 
 : $notes ( content -- )
     "Notes" $subheading print-element ;

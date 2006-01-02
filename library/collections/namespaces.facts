@@ -87,17 +87,10 @@ HELP: n> "( -- ns )"
 { $values { "ns" "a hashtable" } }
 { $description "Pops a namespace from the namestack." } ;
 
-ARTICLE: "sequences-make" "Constructing sequences using an accumulator"
-"The library supports an idiom where sequences can be constructed without passing the partial sequence being built on the stack. This reduces stack noise, and thus simplifies code and makes it easier to understand."
-{ $subsection make }
-{ $subsection , }
-{ $subsection ?, }
-{ $subsection % }
-{ $subsection # } ;
-
 HELP: make "( quot exemplar -- seq )"
 { $values { "quot" "a quotation" } { "exemplar" "a sequence" } }
-{ $description "Calls the quotation in a new " { $emphasis "dynamic scope" } ". The quotation and any words it calls can execute the " { $link , } " and " { $link % } " words to accumulate elements. When the quotation returns, all accumulated elements are collected into a sequence with the same type as " { $snippet "exemplar" } "." } ;
+{ $description "Calls the quotation in a new " { $emphasis "dynamic scope" } ". The quotation and any words it calls can execute the " { $link , } " and " { $link % } " words to accumulate elements. When the quotation returns, all accumulated elements are collected into a sequence with the same type as " { $snippet "exemplar" } "." }
+{ $examples { $example "[ 1 , 2 , 3 , ] { } make ." "{ 1 2 3 }" } } ;
 
 HELP: , "( elt -- )"
 { $values { "elt" "an object" } }

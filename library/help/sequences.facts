@@ -25,7 +25,8 @@ $terpri
 { $subsection "sequences-comparing" }
 "Some implementation details which your code should probably not care about:"
 { $subsection "sequences-unsafe" }
-{ $subsection "sequences-growable" } ;
+{ $subsection "sequences-growable" }
+{ $see-also "namespaces-make" } ;
 
 ARTICLE: "sequence-implementations" "Sequence implementations"
 "There are two main categories of sequences. Concrete sequences are backed by actual storage:"

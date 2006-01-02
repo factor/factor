@@ -32,6 +32,9 @@ USING: styles ;
         { wrap-margin f }
     } ;
 
+: input-style
+    H{ { font-style bold } } ;
+
 : url-style
     H{
         { font "Monospaced" }
