@@ -38,8 +38,8 @@ GL_MODELVIEW glMatrixMode glLoadIdentity ;
 f initialize-x
 
 create-pwindow
-[ drop reshape "window resized" print ] over set-pwindow-resize-action
-[ drop mouse "button pressed" print ] over set-pwindow-button-action 
+[ drop reshape ] over set-pwindow-resize-action
+[ drop mouse ] over set-pwindow-button-action 
 window-id win set
 StructureNotifyMask ButtonPressMask bitor select-input
 { 250 250 } resize-window { 100 100 } move-window map-window
