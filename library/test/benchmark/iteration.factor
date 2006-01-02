@@ -2,6 +2,8 @@ IN: temporary
 USING: arrays compiler kernel kernel-internals lists math
 sequences strings test vectors sequences-internals ;
 
+: <range> ( from to -- seq ) dup <slice> ; inline
+
 : list-iter 100 [ 0 100000 <range> >list [ ] map drop ] times ; compiled
 : vector-iter 100 [ 0 100000 <range> >vector [ ] map drop ] times ; compiled
 : array-iter 100 [ 0 100000 <range> >array [ ] map drop ] times ; compiled

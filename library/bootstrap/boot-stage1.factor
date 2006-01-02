@@ -42,7 +42,6 @@ vectors words ;
         "/library/collections/sequence-eq.factor"
         "/library/collections/slicing.factor"
         "/library/collections/sequence-sort.factor"
-        "/library/collections/strings-epilogue.factor"
         "/library/collections/tree-each.factor"
         "/library/collections/queues.factor"
 
@@ -74,7 +73,6 @@ vectors words ;
         "/library/syntax/parse-words.factor"
         "/library/syntax/parse-errors.factor"
         "/library/syntax/parser.factor"
-        "/library/syntax/parse-stream.factor"
 
         "/library/generic/generic.factor"
         "/library/generic/standard-combination.factor"
@@ -98,6 +96,8 @@ vectors words ;
         "/library/tools/annotations.factor"
         "/library/tools/inspector.factor"
 
+        "/library/syntax/parse-stream.factor"
+        
         "/library/test/test.factor"
 
         "/library/threads.factor"
@@ -209,6 +209,11 @@ vectors words ;
         "/library/collections/sequence-sort.facts"
         "/library/collections/sequences-epilogue.facts"
         "/library/collections/sequences.facts"
+        "/library/collections/slicing.facts"
+        "/library/collections/strings.facts"
+        "/library/collections/tree-each.facts"
+        "/library/collections/vectors.facts"
+        "/library/collections/virtual-sequence.facts"
         
         "/library/syntax/parse-syntax.factor"
 

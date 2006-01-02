@@ -1,0 +1,6 @@
+USING: help sequences ;
+
+HELP: <slice> "( m n seq -- slice )"
+{ $values { "m" "a non-negative integer" } { "n" "a non-negative integer" } { "seq" "a sequence" } { "slice" "a slice" } }
+{ $description "Outputs a new virtual sequence sharing storage with the subrange of elements in " { $snippet "seq" } " with indices starting from and including " { $snippet "m" } ", and up to but not including " { $snippet "n" } "." }
+{ $errors "Throws an error if " { $snippet "m" } " or " { $snippet "n" } " is out of bounds." } ;

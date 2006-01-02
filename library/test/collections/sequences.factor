@@ -2,13 +2,13 @@ IN: temporary
 USING: arrays kernel lists math namespaces sequences
 sequences-internals strings test vectors ;
 
-[ V{ 1 2 3 4 } ] [ 1 5 <range> >vector ] unit-test
-[ 3 ] [ 1 4 <range> length ] unit-test
+[ V{ 1 2 3 4 } ] [ 1 5 dup <slice> >vector ] unit-test
+[ 3 ] [ 1 4 dup <slice> length ] unit-test
 [ 2 ] [ 1 3 { 1 2 3 4 } <slice> length ] unit-test
 [ V{ 2 3 } ] [ 1 3 { 1 2 3 4 } <slice> >vector ] unit-test
 [ V{ 4 5 } ] [ 2 { 1 2 3 4 5 } tail-slice* >vector ] unit-test
-[ V{ 3 4 } ] [ 2 4 1 10 <range> subseq >vector ] unit-test
-[ V{ 3 4 } ] [ 0 2 2 4 1 10 <range> <slice> subseq >vector ] unit-test
+[ V{ 3 4 } ] [ 2 4 1 10 dup <slice> subseq >vector ] unit-test
+[ V{ 3 4 } ] [ 0 2 2 4 1 10 dup <slice> <slice> subseq >vector ] unit-test
 [ "cba" ] [ 3 "abcdef" head-slice reverse ] unit-test
 
 [ 5040 ] [ [ 1 2 3 4 5 6 7 ] 1 [ * ] reduce ] unit-test
@@ -210,3 +210,5 @@ unit-test
 
 ! Pathological case
 [ "ihbye" ] [ "hi" reverse-slice "bye" append ] unit-test
+
+[ 10 "hi" "bye" copy-into ] unit-test-fails

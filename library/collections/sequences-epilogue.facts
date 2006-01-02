@@ -61,8 +61,8 @@ HELP: delete "( elt seq -- )"
 
 HELP: copy-into "( n dest src -- )"
 { $values { "n" "an index in " { $snippet "dest" } } { "dest" "a mutable sequence" } { "src" "a sequence" } }
-{ $description "Copies all elements of " { $snippet "src" } " to " { $snippet "dest" } ", with destination indices starting from " { $snippet "n" } "." }
-{ $errors "An error is thrown if " { $snippet "to" } " is not large enough to hold the copied elements." } ;
+{ $description "Copies all elements of " { $snippet "src" } " to " { $snippet "dest" } ", with destination indices starting from " { $snippet "n" } ". Grows " { $snippet "to" } " first if necessary." }
+{ $errors "An error is thrown if " { $snippet "to" } " is not resizable, and not large enough to hold the copied elements." } ;
 
 HELP: nappend "( dest src -- )"
 { $values { "n" "an index in " { $snippet "dest" } } { "dest" "a resizable mutable sequence" } { "src" "a sequence" } }
@@ -99,12 +99,6 @@ HELP: append3 "( seq1 seq2 seq3 -- newseq )"
 { $description "Outputs a new sequence consisting of the elements of " { $snippet "seq1" } ", " { $snippet "seq2" } " and " { $snippet "seq3" } " in turn." }
 { $errors "Throws an error if " { $snippet "seq2" } " or " { $snippet "seq3" } " contain elements not permitted in sequences of the same class as " { $snippet "seq1" } "." } ;
 
-HELP: concat "( seq -- newseq )"
-{ $values { "seq" "a sequence" } { "newseq" "a sequence" } }
-{ $description "Concatenates a sequence of sequences together into one sequence. The resulting sequence is of the same class as the first element of " { $snippet "seq" } "." }
-{ $errors "Throws an error if one of the sequences in " { $snippet "seq" } " contains elements not permitted in sequences of the same class as the first element of " { $snippet "seq" } "." }
-{ $see-also join } ;
-
 HELP: peek "( seq -- elt )"
 { $values { "seq" "a sequence" } { "elt" "an object" } }
 { $description "Outputs the last element of a sequence." }
@@ -124,12 +118,6 @@ HELP: pop "( seq -- )"
 { $side-effects "seq" }
 { $errors "Throws an error if the sequence is empty." }
 { $see-also peek pop* } ;
-
-HELP: join "( seq glue -- newseq )"
-{ $values { "seq" "a sequence" } { "glue" "a sequence" } { "newseq" "a sequence" } }
-{ $description "Concatenates a sequence of sequences together into one sequence, placing a copy of " { $snippet "glue" } " between each pair of sequences. The resulting sequence is of the same class as " { $snippet "glue" } "." }
-{ $errors "Throws an error if one of the sequences in " { $snippet "seq" } " contains elements not permitted in sequences of the same class as " { $snippet "glue" } "." }
-{ $see-also concat } ;
 
 HELP: all-equal? "( seq -- ? )"
 { $values { "seq" "a sequence" } { "?" "a boolean" } }

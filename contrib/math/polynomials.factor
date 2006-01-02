@@ -7,7 +7,7 @@ USING: kernel sequences vectors math math-internals namespaces arrays ;
 
 : 2length ( seq seq -- ) [ length ] 2apply ;
 
-: zero-vector ( n -- vector ) zero-array >vector ;
+: zero-vector ( n -- vector ) 0 <array> >vector ;
 
 : zero-pad ( n seq -- seq )
     #! extend seq by n zeros

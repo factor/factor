@@ -31,7 +31,7 @@ GENERIC: tail ( n seq -- seq ) flushable
     over 0 >= [ length < ] [ 2drop f ] if ;
 
 : ?nth ( n seq/f -- elt/f )
-    2dup length >= [ 2drop f ] [ nth ] if ;
+    2dup bounds-check? [ nth ] [ 2drop f ] if ;
 
 IN: sequences-internals
 

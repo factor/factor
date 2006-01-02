@@ -49,7 +49,7 @@ USE: lists
 [ "This is a split sentence" " " split ]
 unit-test
 
-[ [ "OneWord" ] ]
+[ { "OneWord" } ]
 [ "OneWord" " " split ]
 unit-test
 

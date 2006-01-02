@@ -89,7 +89,7 @@ M: object each-slot ( obj quot -- )
 
 : heap-stats ( -- counts sizes )
     #! Return a list of instance count/total size pairs.
-    num-types zero-array num-types zero-array
+    num-types 0 <array> num-types 0 <array>
     [ >r 2dup r> heap-stat-step ] each-object ;
 
 : heap-stat. ( { instances bytes type } -- )

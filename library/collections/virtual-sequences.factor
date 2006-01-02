@@ -19,6 +19,8 @@ M: reversed set-nth ( elt n seq -- ) reversed@ set-nth ;
 M: reversed set-nth-unsafe ( elt n seq -- )
     reversed@ set-nth-unsafe ;
 
+M: reversed like ( seq reversed -- seq ) delegate like ;
+
 M: reversed thaw ( seq -- seq ) delegate thaw ;
 
 ! A slice of another sequence.
@@ -40,8 +42,6 @@ C: slice ( from to seq -- seq )
     [ set-slice-to ] keep
     [ set-slice-from ] keep ;
 
-: <range> ( from to -- seq ) dup <slice> ; inline
-
 M: slice length ( range -- n )
     dup slice-to swap slice-from - ;
 
@@ -58,4 +58,4 @@ M: slice set-nth-unsafe ( n slice -- obj ) slice@ set-nth-unsafe ;
 
 M: slice like ( seq slice -- seq ) slice-seq like ;
 
-M: slice thaw ( seq -- seq ) delegate thaw ;
+M: slice thaw ( seq -- seq ) slice-seq thaw ;

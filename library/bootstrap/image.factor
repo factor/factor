@@ -44,18 +44,19 @@ SYMBOL: architecture
 
 ( Object memory )
 
-: image-magic HEX: 0f0e0d0c ;
-: image-version 0 ;
+: image-magic HEX: 0f0e0d0c ; inline
+: image-version 0 ; inline
 
-: char cell get 2 /i ;
+: char cell get 2 /i ; inline
 
-: untag ( cell tag -- ) tag-mask bitnot bitand ;
-: tag ( cell -- tag ) tag-mask bitand ;
+: untag ( cell tag -- ) tag-mask bitnot bitand ; inline
+: tag ( cell -- tag ) tag-mask bitand ; inline
 
 : array-type     8  ; inline
 : hashtable-type 10 ; inline
 : vector-type    11 ; inline
 : string-type    12 ; inline
+: sbuf-type      13 ; inline
 : wrapper-type   14 ; inline
 : word-type      17 ; inline
 : tuple-type     18 ; inline
@@ -269,6 +270,14 @@ M: vector ' ( vector -- pointer )
     dup underlying ' swap length
     object-tag here-as >r
     vector-type >header emit
+    emit-fixnum ( length )
+    emit ( array ptr )
+    align-here r> ;
+
+M: sbuf ' ( sbuf -- pointer )
+    dup underlying ' swap length
+    object-tag here-as >r
+    sbuf-type >header emit
     emit-fixnum ( length )
     emit ( array ptr )
     align-here r> ;

@@ -1,4 +1,21 @@
-USING: hashtables help kernel namespaces ;
+USING: hashtables hashtables-internals help kernel namespaces
+queues ;
+
+GLOSSARY: "collection" "an object whose primary purpose is to aggregate other objects; examples include sequences, queues and hashtables" ;
+
+ARTICLE: "collections" "Collections"
+{ $subsection "sequences" }
+{ $subsection "queues" }
+{ $subsection "hashtables" }
+{ $subsection "namespaces" } ;
+
+ARTICLE: "queues" "Queues"
+"A simple last-in-first-out queue data structure."
+{ $subsection queue? }
+{ $subsection <queue> }
+{ $subsection queue-empty? }
+{ $subsection enque }
+{ $subsection deque } ;
 
 GLOSSARY: "hashtable"
 "An instance of the " { $link hashtable } " class, implementing a mutable mapping from keys to values with expected constant lookup time" ;

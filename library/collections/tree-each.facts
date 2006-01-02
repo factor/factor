@@ -1,0 +1,6 @@
+USING: help sequences ;
+
+HELP: tree-each "( seq quot -- )"
+{ $values { "obj" "an object" } { "quot" "a quotation with stack effect" { $snippet "( elt -- )" } } }
+{ $description "Recursively descends nested arrays, vectors and lists, applying the quotation to leaf elements." }
+{ $notes "This word does not descend into virtual sequences, or user-defined sequences." } ;

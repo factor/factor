@@ -3,7 +3,7 @@ USING: help kernel-internals lists prettyprint strings vectors ;
 
 HELP: <array> "( n elt -- array )"
 { $values { "n" "a positive integer specifying array length" } { "elt" "an initial element" } }
-{ $description "Create a new array with the given length and all elements initially set to " { $snippet "elt" } "." }
+{ $description "Creates a new array with the given length and all elements initially set to " { $snippet "elt" } "." }
 { $see-also <string> <sbuf> <vector> } ;
 
 HELP: >array "( seq -- array )"

@@ -13,6 +13,14 @@ io strings ;
 : read-header ( -- hash )
     [ (read-header) ] make-hash ;
 
+: url-quotable? ( ch -- ? )
+    #! In a URL, can this character be used without
+    #! URL-encoding?
+    dup letter?
+    over LETTER? or
+    over digit? or
+    swap "/_?." member? or ; foldable
+
 : url-encode ( str -- str )
     [
         [

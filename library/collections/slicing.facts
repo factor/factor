@@ -45,11 +45,11 @@ HELP: tail? "( seq end -- ? )"
 
 HELP: ?head "( seq begin -- newseq ? )"
 { $values { "seq" "a sequence" } { "begin" "a sequence" } { "newseq" "a new sequence" } { "?" "a boolean" } }
-{ $description "Tests if " { $snippet "seq" } " starts with " { $snippet "begin" } ". If there is a match, outputs the subrange of " { $snippet "seq" } " excluding " { $snippet "begin" } ", and " { $link t } ". If there is no match, outputs " { $snippet "seq" } " and " { $link f } "." ;
+{ $description "Tests if " { $snippet "seq" } " starts with " { $snippet "begin" } ". If there is a match, outputs the subrange of " { $snippet "seq" } " excluding " { $snippet "begin" } ", and " { $link t } ". If there is no match, outputs " { $snippet "seq" } " and " { $link f } "." } ;
 
 HELP: ?tail "( seq end -- newseq ? )"
 { $values { "seq" "a sequence" } { "end" "a sequence" } { "newseq" "a new sequence" } { "?" "a boolean" } }
-{ $description "Tests if " { $snippet "seq" } " ends with " { $snippet "end" } ". If there is a match, outputs the subrange of " { $snippet "seq" } " excluding " { $snippet "begin" } ", and " { $link t } ". If there is no match, outputs " { $snippet "seq" } " and " { $link f } "." ;
+{ $description "Tests if " { $snippet "seq" } " ends with " { $snippet "end" } ". If there is a match, outputs the subrange of " { $snippet "seq" } " excluding " { $snippet "begin" } ", and " { $link t } ". If there is no match, outputs " { $snippet "seq" } " and " { $link f } "." } ;
 
 HELP: replace-slice "( new m n seq -- replaced )"
 { $values { "new" "a sequence" } { "seq" "a sequence" } { "m" "a non-negative integer" } { "n" "a non-negative integer" } { "reokaced" "a new sequence" } }
@@ -62,9 +62,46 @@ HELP: group "( n seq -- groups )"
 { $notes "If the sequence length is not a multiple of " { $snippet "n" } ", the final subsequence in the list will be shorter than " { $snippet "n" } " elements." } ;
 
 HELP: start* "( subseq seq i -- n )"
-{ $values { "subseq" "a sequence" } { "seq" "a sequence" } { "i" "a start index" } }
-{ $description "Outputs the start index of a subsequence, starting the search from the " { $snippet "i" } "th element. If no matching subsequence is found, outputs -1." } ;
+{ $values { "subseq" "a sequence" } { "seq" "a sequence" } { "i" "a start index" } { "n" "a start index" } }
+{ $description "Outputs the start index of the first contiguous subsequence equal to " { $snippet "subseq" } ", starting the search from the " { $snippet "i" } "th element. If no matching subsequence is found, outputs -1." } ;
 
-HELP: start "( subseq seq i -- n )"
-{ $values { "subseq" "a sequence" } { "seq" "a sequence" } { "i" "a start index" } }
-{ $description "Outputs the start index of a subsequence, or -1 if no matching subsequence is found." } ;
+HELP: start "( subseq seq -- n )"
+{ $values { "subseq" "a sequence" } { "seq" "a sequence" } { "n" "a start index" } }
+{ $description "Outputs the start index of the first contiguous subsequence equal to " { $snippet "subseq" } ", or -1 if no matching subsequence is found." } ;
+
+HELP: subseq? "( subseq seq -- ? )"
+{ $values { "subseq" "a sequence" } { "seq" "a sequence" } { "?" "a boolean" } }
+{ $description "Tests if " { $snippet "seq" } " contains the elements of " { $snippet "subseq" } " as a contiguous subsequence." } ;
+
+HELP: (split1) "( seq subseq -- before after )"
+{ $values { "seq" "a sequence" } { "subseq" "a sequence" } { "before" "a new sequence" } { "after" "a slice" } }
+{ $description "Splits " { $snippet "seq" } " at the first occurrence of " { $snippet "subseq" } ", and outputs the pieces before and after the split. If " { $snippet "subseq" } " does not occur in " { $snippet "seq" } ", then " { $snippet "before" } " is just " { $snippet "seq" } " and " { $snippet "after" } " is " { $link f } "." } ;
+
+HELP: split1 "( seq subseq -- before after )"
+{ $values { "seq" "a sequence" } { "subseq" "a sequence" } { "before" "a new sequence" } { "after" "a sequence" } }
+{ $description "A variant of " { $link (split1) } " where " { $snippet "after" } " is converted to a sequence of the same class as " { $snippet "seq" } "." } ;
+
+HELP: split "( seq subseq -- pieces )"
+{ $values { "seq" "a sequence" } { "subseq" "a sequence" } { "pieces" "a new array" } }
+{ $description "Splits " { $snippet "seq" } " at each occurrence of " { $snippet "subseq" } ", and outputs an array of pieces." }
+{ $examples { $example "\"hello world how are you?\" \" \" split ." "{ \"hello\" \"world\" \"how\" \"are\" \"you?\" }" } } ;
+
+HELP: drop-prefix "( seq1 seq2 -- slice1 slice2 )"
+{ $values { "seq1" "a sequence" } { "seq2" "a sequence" } { "slice1" "a slice" } { "slice2" "a slice" } }
+{ $description "Outputs a pair of virtual sequences with the common prefix of " { $snippet "seq1" } " and " { $snippet "seq2" } " removed." } ;
+
+HELP: unpair "( assoc -- keys values )"
+{ $values { "assoc" "a sequence of pairs" } { "keys" "a new sequence" } { "values" "a new sequence" } }
+{ $description "Given a sequence of two-element sequences, outputs a new sequence with the first element of each pair, and a new sequence with the second element of each pair." } ;
+
+HELP: concat "( seq -- newseq )"
+{ $values { "seq" "a sequence" } { "newseq" "a sequence" } }
+{ $description "Concatenates a sequence of sequences together into one sequence. The resulting sequence is of the same class as the first element of " { $snippet "seq" } "." }
+{ $errors "Throws an error if one of the sequences in " { $snippet "seq" } " contains elements not permitted in sequences of the same class as the first element of " { $snippet "seq" } "." }
+{ $see-also join } ;
+
+HELP: join "( seq glue -- newseq )"
+{ $values { "seq" "a sequence" } { "glue" "a sequence" } { "newseq" "a sequence" } }
+{ $description "Concatenates a sequence of sequences together into one sequence, placing a copy of " { $snippet "glue" } " between each pair of sequences. The resulting sequence is of the same class as " { $snippet "glue" } "." }
+{ $errors "Throws an error if one of the sequences in " { $snippet "seq" } " contains elements not permitted in sequences of the same class as " { $snippet "glue" } "." }
+{ $see-also concat } ;

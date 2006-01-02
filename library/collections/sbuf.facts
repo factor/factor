@@ -1,20 +1,12 @@
 IN: strings
-USING: help ;
+USING: arrays help vectors ;
 
-GLOSSARY: "string buffer" "an instance of the " { $link "sbuf" } " class, representing a mutable and growable sequence of characters" ;
-
-GLOSSARY: "sbuf" "see string buffer" ;
-
-ARTICLE: "sbufs" "String buffers"
-"A string buffer is a mutable and growable sequence of characters. String buffers can be used to construct new strings by accumilating substrings and characters, however usually they are only used indirectly, since the sequence construction words (see " { $link "sequences-make" } " are more convenient to use in most cases."
-$terpri
-"String buffer words are found in the " { $snippet "strings" } " vocabulary."
-$terpri
-"String buffers form a class of objects."
-{ $subsection sbuf? }
-{ $subsection >sbuf }
-{ $subsection <sbuf> } ;
+HELP: <sbuf> "( n -- sbuf )"
+{ $values { "n" "a positive integer specifying initial capacity" } { "sbuf" "a new string buffer" } }
+{ $description "Creates a new string buffer that can hold " { $snippet "n" } " characters before resizing." }
+{ $see-also <array> <string> <vector> } ;
 
 HELP: >sbuf "( seq -- sbuf )"
 { $values { "seq" "a sequence of non-negative integers" } { "sbuf" "a string buffer" } }
-{ $description "Turns a character sequence into a string buffer. Given a string buffer, this makes a fresh copy." } ;
+{ $description "Outputs a freshly-allocated string buffer with the same elements as a given sequence." }
+{ $errors "Throws an error if the sequence contains elements other than real numbers." } ;

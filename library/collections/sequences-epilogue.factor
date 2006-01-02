@@ -65,23 +65,25 @@ M: object >list ( seq -- list ) dup length 0 rot (>list) ;
 
 : delete ( elt seq -- ) 0 0 rot (delete) nip set-length drop ;
 
-: copy-into-check ( start to from -- )
-    rot rot length + swap length < [
-        "Cannot copy beyond end of sequence" throw
-    ] when ;
+: copy-into-check ( start to from -- start to from )
+    pick over length + pick 2dup length >
+    [ set-length ] [ 2drop ] if ;
 
 : copy-into ( start to from -- )
-    3dup copy-into-check dup length
+    copy-into-check dup length
     [ >r pick r> + pick set-nth-unsafe ] 2each 2drop ;
     inline
 
+: >sequence ( seq quot -- )
+    over >r >r length r> call dup 0 swap r> copy-into ; inline
+
 : nappend ( to from -- )
-    >r dup length swap r>
-    over length over length + pick set-length
-    copy-into ; inline
+    >r [ length ] keep r> copy-into ; inline
+
+: >resizable ( seq -- seq ) [ thaw dup ] keep nappend ;
 
 : immutable ( seq quot -- seq | quot: seq -- )
-    >r dup thaw dup pick nappend r> rot slip like ; inline
+    swap [ >resizable [ swap call ] keep ] keep like ; inline
 
 : append ( s1 s2 -- s1+s2 )
     swap [ swap nappend ] immutable ; flushable

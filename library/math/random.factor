@@ -50,7 +50,7 @@ IN: math
 : init-random ( seed -- )
     #! Initialize the random number generator with a new seed.
     global [
-        mt-n zero-array swap
+        mt-n 0 <array> swap
         HEX: ffffffff bitand 0 pick set-nth
         mt-n 1- [ 2dup mt-formula 1+ pick pick 1+ swap set-nth ] repeat
         mt set 0 mti set

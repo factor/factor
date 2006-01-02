@@ -1,11 +1,187 @@
 IN: sequences
-USING: arrays help kernel-internals sequences-internals words ;
+USING: arrays help kernel-internals sequences-internals strings
+vectors words ;
+
+GLOSSARY: "sequence"
+"a linearly-ordered finite collection of elements responding to the " { $link "sequence-protocol" "sequence protocol" } "." ;
+
+ARTICLE: "sequences" "Sequences"
+"A sequence is a linearly-ordered finite collection of elements."
+$terpri
+"Sequence utility words can operate on any object whose class implements the sequence protocol."
+{ $subsection "sequence-protocol" }
+"There are a number of implementations of sequences in the core library, and you can write new implementations yourself."
+{ $subsection "sequence-implementations" }
+"Much of the power of sequences lies in the polymorphic utility words that allow computations to be expressed as bulk operations without loops, recursion or micro-management of elements."
+{ $subsection "sequences-utilities" }
+{ $subsection "sequences-iteration" }
+{ $subsection "sequences-tests" }
+{ $subsection "sequences-adding" }
+{ $subsection "sequences-indices" }
+{ $subsection "sequences-sets" }
+{ $subsection "sequences-slicing" }
+{ $subsection "sequences-sorting" }
+{ $subsection "sequences-stacks" }
+{ $subsection "sequences-comparing" }
+"Some implementation details which your code should probably not care about:"
+{ $subsection "sequences-unsafe" }
+{ $subsection "sequences-growable" } ;
+
+ARTICLE: "sequence-implementations" "Sequence implementations"
+"There are two main categories of sequences. Concrete sequences are backed by actual storage:"
+{ $subsection "arrays" }
+{ $subsection "vectors" }
+{ $subsection "strings" }
+{ $subsection "sbufs" }
+"Virtual sequences wrap an underlying sequence to present an alternative view of its elements:"
+{ $subsection <slice> }
+{ $subsection reverse-slice }
+"Integers support the sequence protocol:"
+{ $subsection "sequences-integers" } ;
+
+ARTICLE: "sequences-integers" "Integer sequences and counted loops"
+"Integers support the sequence protocol in a trivial fashion; a non-negative integer presents its non-negative predecessors as elements. For example, the integer 3, when viewed as a sequence, contains the elements 0, 1, and 2. This is very useful for performing counted loops."
+$terpri
+"For example, the " { $link each } " combinator, given an integer, simply calls a quotation that number of times, pushing a counter on each iteration that ranges from 0 up to that integer:"
+{ $example "3 [ . ] each" "0\n1\n2" }
+"A common idiom is to iterate over a sequence, while also maintaining a loop counter. This can be done using " { $link 2each } ":"
+{ $example "{ \"a\" \"b\" \"c\" } dup length [\n    \"Index: \" write . \"Element: \" write .\n] 2each" "Index: 0\nElement: \"a\"\nIndex: 1\nElement: \"b\"\nIndex: 2\nElement: \"c\"" }
+"Combinators that produce new sequences, such as " { $snippet map } ", will output an array if the input is an integer." ;
+
+GLOSSARY: "slice" "an instance of the " { $link slice } " class, which is a virtual sequence sharing structure with a subrange of some underlying sequence" ;
+
+ARTICLE: "sequences-utilities" "Basic utilities"
+"Some utilities for accessing various common indices:"
+{ $subsection first }
+{ $subsection second }
+{ $subsection third }
+{ $subsection fourth }
+{ $subsection first2 }
+{ $subsection first3 }
+{ $subsection first4 }
+"A forgiving wrapper for " { $link nth } ":"
+{ $subsection ?nth }
+{ $subsection bounds-check? } ;
+
+ARTICLE: "sequences-iteration" "Iteration and collection"
+"Iteration combinators:"
+{ $subsection each }
+{ $subsection reduce }
+{ $subsection interleave }
+{ $subsection 2each }
+{ $subsection 2reduce }
+"Collection combinators:"
+{ $subsection map }
+{ $subsection 2map }
+"A combinator that modifies elements in-place:"
+{ $subsection inject } ;
+
+ARTICLE: "sequences-tests" "Testing sequences"
+{ $subsection empty? }
+{ $subsection member? }
+{ $subsection memq? }
+{ $subsection head? }
+{ $subsection tail? }
+{ $subsection subseq? }
+{ $subsection contains? }
+{ $subsection all? }
+{ $subsection monotonic? }
+{ $subsection all-eq? }
+{ $subsection all-equal? } ;
+
+ARTICLE: "sequences-slicing" "Slicing and splitting"
+"The first set of words are concerned with taking subsequences of a sequence. Each of the below words comes in dual pairs; the first of the pair outputs a new copied sequence, the second outputs a virtual sequence sharing structure with the underlying sequence."
+{ $subsection subseq }
+{ $subsection <slice> }
+{ $subsection head }
+{ $subsection head-slice }
+{ $subsection tail }
+{ $subsection tail-slice }
+{ $subsection head* }
+{ $subsection head-slice* }
+{ $subsection tail* }
+{ $subsection tail-slice* }
+"Finally, some words for splitting sequences."
+{ $subsection ?head }
+{ $subsection ?tail }
+{ $subsection group }
+{ $subsection (split1) }
+{ $subsection split1 }
+{ $subsection split }
+{ $subsection unpair } ;
+
+ARTICLE: "sequences-indices" "Order-sensitive operations"
+"Searching for the index of an element and or beginning of a subsequence:"
+{ $subsection index }
+{ $subsection index* }
+{ $subsection start }
+{ $subsection start* }
+"Two combinators the above are based on:"
+{ $subsection find }
+{ $subsection find* }
+"Memoization:"
+{ $subsection cache-nth } ;
+
+ARTICLE: "sequences-adding" "Adding and appending"
+"New sequences can be constructed by adding elements to existing sequences."
+{ $subsection add }
+{ $subsection append }
+{ $subsection append3 }
+{ $subsection concat }
+{ $subsection join }
+"Mutable sequences can have elements added in-place."
+{ $subsection push }
+{ $subsection adjoin }
+{ $subsection nappend }
+"Subsequences can be replaced:"
+{ $subsection replace-slice }
+{ $subsection copy-into } ;
+
+ARTICLE: "sequences-sets" "Order-insensitive operations"
+"New sequences can be constructed by removing elements from an existing sequence:"
+{ $subsection remove }
+{ $subsection prune }
+{ $subsection diff }
+"Mutable sequences can have elements removed in-place:"
+{ $subsection delete }
+"A combinator for filtering on arbitrary predicates:"
+{ $subsection subset } ;
+
+ARTICLE: "sequences-stacks" "Stack operations"
+"The classical stack operations, modifying a sequence in place:"
+{ $subsection empty? }
+{ $subsection peek }
+{ $subsection push }
+{ $subsection pop }
+{ $subsection pop* }
+"Lazy instantiation of stacks:"
+{ $subsection ?push } ;
+
+ARTICLE: "sequences-comparing" "Comparing sequences"
+"Element equality:"
+{ $subsection sequence= }
+{ $subsection mismatch }
+"Lexicographic order:"
+{ $subsection lexi } ;
 
 GLOSSARY: "resizable sequence"
 "a sequence implementing the " { $link set-length } " generic word. For example, vectors and string buffers" ;
 
 GLOSSARY: "mutable sequence"
 "a sequence implementing the " { $link set-nth } " generic word. For example, arrays and strings" ;
+
+ARTICLE: "sequence-protocol" "Sequence protocol"
+"All sequences must know their length, and provide a way to access elements:"
+{ $subsection length }
+{ $subsection nth }
+"Mutable sequences:"
+{ $subsection set-nth }
+"Resizable sequences:"
+{ $subsection set-length }
+"An optional generic word for creating sequences of the same class as a given sequence:"
+{ $subsection like }
+"Another optional generic word for optimization purposes:"
+{ $subsection thaw } ;
 
 GLOSSARY: "array"
 "an instance of the" { $link array } "class, implementing a fixed-length mutable sequence of objects" ;
@@ -21,7 +197,6 @@ $terpri
 "There are several ways to construct arrays."
 { $subsection >array }
 { $subsection <array> }
-{ $subsection zero-array }
 { $subsection 1array }
 { $subsection 2array }
 { $subsection 3array }
@@ -29,10 +204,55 @@ $terpri
 { $subsection array-nth }
 { $subsection set-array-nth } ;
 
+GLOSSARY: "string" "an instance of the " { $link "string" } " class, representing a fixed-size mutable sequence of characters" ;
+
+GLOSSARY: "character" "an integer between 0 and 63335, inclusive" ;
+
+ARTICLE: "strings" "Strings"
+"A string is a fixed-size mutable sequence of characters."
+$terpri
+"String words are found in the " { $snippet "strings" } " vocabulary."
+{ $subsection string? }
+{ $subsection >string }
+{ $subsection <string> }
+"A pair of words are used to nicely format columns of text."
+{ $subsection pad-left }
+{ $subsection pad-right }
+"Characters are not a first-class type; they are simply represented as integers between 0 and 65535. A few words operate on characters:"
+{ $subsection blank? }
+{ $subsection letter? }
+{ $subsection LETTER? }
+{ $subsection digit? }
+{ $subsection printable? }
+{ $subsection control? }
+{ $subsection quotable? }
+{ $subsection ch>lower }
+{ $subsection ch>upper } ;
+
+GLOSSARY: "string buffer" "an instance of the " { $link "sbuf" } " class, representing a mutable and growable sequence of characters" ;
+
+GLOSSARY: "sbuf" "see string buffer" ;
+
+ARTICLE: "sbufs" "String buffers"
+"A string buffer is a resizable mutable sequence of characters. String buffers can be used to construct new strings by accumilating substrings and characters, however usually they are only used indirectly, since the sequence construction words are more convenient to use in most cases (see " { $link "sequences-make" } ")."
+$terpri
+"String buffer words are found in the " { $snippet "strings" } " vocabulary."
+{ $subsection sbuf? }
+{ $subsection >sbuf }
+{ $subsection <sbuf> } ;
+
+GLOSSARY: "vector" "an instance of the " { $link "vector" } " class, representing a resizable mutable sequence of objects" ;
+
+ARTICLE: "vectors" "Vectors"
+"A vector is a resizable mutable sequence of objects. Vector words are found in the " { $snippet "vectors" } " vocabulary."
+{ $subsection vector? }
+{ $subsection >vector }
+{ $subsection <vector> } ;
+
 GLOSSARY: "comparator"
 "a quotation with stack effect " { $snippet "( elt1 elt2 -- n )" } " that orders the two given elements and outputs a value whose sign denotes the result. See " { $link "sequence-sorting" } ;
 
-ARTICLE: "sequence-sorting" "Sorting and binary search"
+ARTICLE: "sequences-sorting" "Sorting and binary search"
 "Sorting and binary search combinators all take comparator quotations with stack effect " { $snippet "( elt1 elt2 -- n )" } " that order the two given elements and output a value whose sign denotes the result:"
 { $list
     { "positive - indicates that " { $snippet "elt1" } " follows " { $snippet "elt2" } }
@@ -47,7 +267,19 @@ ARTICLE: "sequence-sorting" "Sorting and binary search"
 { $subsection string-sort }
 { $subsection word-sort } ;
 
-ARTICLE: "sequences-internals" "Growable sequence implementation details"
+ARTICLE: "sequences-unsafe" "Unsafe sequence operations"
+"The unsafe sequence protocol bypasses bounds checks for increased performance:"
+{ $subsection nth-unsafe }
+{ $subsection set-nth-unsafe }
+"These words assume the sequence index given is within bounds; if it is not, memory corruption can occur. Please think twice before using them; first, make sure the code in question is actually a bottleneck; next, try improving the algorithm first. If all else fails, then use these words and test your code very carefully."
+$terpri
+"There is a very important invariant these word must preserve: if at some point in time, the length of a sequence was " { $snippet "n" } ", then any future lookups of elements with indices below " { $snippet "n" } " must not crash the runtime, even if the sequence length is now less than " { $snippet "n" } ". For example, vectors preserve this invariant by never shrinking the underlying storage, only growing it as necessary."
+$terpri
+"The justification for this is that the runtime should not crash if a resizable sequence is resized during the execution of an iteration combinator."
+$terpri
+"Indeed, iteration combinators are the primary use-case for these words; if the iteration index is already guarded by a loop test which ensures it is within bounds, then additional bounds checks are redundant. For example, see the implementation of " { $link each } "." ;
+
+ARTICLE: "sequences-growable" "Growable sequence protocol"
 "Growable sequences are implementing by having a wrapper object hold a reference to an underlying sequence, together with a fill pointer indicating how many elements of the underlying sequence are occupied. When the fill pointer exceeds the underlying sequence capacity, the underlying sequence grows."
 $terpri
 "There is a growable sequence protocol:"

@@ -102,7 +102,7 @@ M: simple-element print-element [ print-element ] each ;
 
 : $example ( content -- )
     first2 swap dup <input>
-    [ format* "\n==> " format* format* ] ($code) ;
+    [ "  " format* format* format* ] ($code) ;
 
 ! Some links
 TUPLE: link name ;
@@ -116,18 +116,23 @@ M: link summary ( term -- string )
 
 DEFER: help
 
-: ($link) dup article-title swap ;
+: ($link) ( element quot -- )
+    over length 1 = [
+        >r first dup article-title swap r> call
+    ] [
+        >r first2 r> swapd call
+    ] if ;
 
 : $subsection ( object -- )
     terpri*
     subsection-style [
-        first <link> ($link) dup [ link-name (help) ] curry
+        [ <link> ] ($link) dup [ link-name (help) ] curry
         simple-outliner
     ] with-style ;
 
-: $link ( article -- ) first <link> ($link) simple-object ;
+: $link ( article -- ) [ <link> ] ($link) simple-object ;
 
-: $glossary ( element -- ) first <term> ($link) simple-object ;
+: $glossary ( element -- ) [ <term> ] ($link) simple-object ;
 
 : $definition ( content -- )
     "Definition" $subheading $see ;

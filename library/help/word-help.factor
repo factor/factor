@@ -8,11 +8,9 @@ M: word article-title word-name ;
     dup "help" word-prop [
         % drop
     ] [
-        dup "predicating" word-prop [
+        "predicating" word-prop [
             \ $predicate swap 2array ,
-        ] [
-            "No documentation found for " , word-name , "." ,
-        ] ?if
+        ] when*
     ] if* ;
 
 M: word article-content

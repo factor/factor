@@ -82,7 +82,6 @@ M: object tail ( index seq -- seq ) [ tail-slice ] keep like ;
 : subseq? ( subseq seq -- ? ) start -1 > ; flushable
 
 : (split1) ( seq subseq -- before after )
-    #! After is a slice.
     dup pick start dup -1 = [
         2drop dup like f
     ] [
@@ -90,7 +89,6 @@ M: object tail ( index seq -- seq ) [ tail-slice ] keep like ;
     ] if ; flushable
 
 : split1 ( seq subseq -- before after )
-    #! After is of the same type as seq.
     (split1) dup like ; flushable
 
 : (split) ( seq subseq -- )

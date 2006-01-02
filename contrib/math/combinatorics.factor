@@ -1,6 +1,7 @@
 IN: math-contrib
 USING: kernel sequences errors namespaces math ;
 
+: <range> ( from to -- seq ) dup <slice> ; inline
 : (0..n] ( n -- (0..n] ) 1+ 1 swap <range> ; inline
 : [1..n] ( n -- [1..n] ) (0..n] ; inline
 : [k..n] ( k n -- [k..n] ) 1+ <range> ; inline

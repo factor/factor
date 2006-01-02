@@ -21,7 +21,7 @@ USING: styles ;
 : snippet-style
     H{
         { font "Monospaced" }
-        { foreground { 0.1 0.1 0.1 1 } }
+        { foreground { 0.3 0.3 0.3 1 } }
     } ;
 
 : code-style
