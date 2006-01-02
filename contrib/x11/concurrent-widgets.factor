@@ -67,7 +67,7 @@ GENERIC: handle-property-event
     { [ dup ConfigureRequest = ]	[ drop handle-configure-request-event ] }
     { [ dup UnmapNotify = ]		[ drop handle-unmap-event ] }
     { [ dup PropertyNotify = ]		[ drop handle-property-event ] }
-    { [ t ]                     	[ "handle-event ignoring event" print drop drop drop ] } }
+    { [ t ]                     	[ "handle-event ignoring event" print 3drop ] } }
   cond ;
 
 M: window handle-configure-event ( event obj -- )
