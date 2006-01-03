@@ -49,6 +49,6 @@ public class EndVector extends FactorParsingDefinition
 		throws FactorParseException
 	{
 		reader.append(new FactorArray(
-			reader.popState(start,word).first));
+			reader.popState(null,word).first));
 	}
 }
