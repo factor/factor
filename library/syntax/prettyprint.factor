@@ -154,9 +154,7 @@ M: block pprint-section* ( block -- )
 : last-block? ( -- ? )
     pprinter get pprinter-stack length 1 = ;
 
-: block> ( -- )
-    #! Protect against malformed <block ... block> forms.
-    last-block? [ (block>) ] unless ;
+: block> ( -- ) last-block? [ (block>) ] unless ;
 
 : block; ( -- )
     pprinter get pprinter-block f swap set-section-nl-after?

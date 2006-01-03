@@ -1,4 +1,4 @@
-! Copyright (C) 2004, 2005 Slava Pestov.
+! Copyright (C) 2004, 2006 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
 
 ! Bootstrapping trick; see doc/bootstrap.txt.
@@ -7,133 +7,63 @@ USING: alien arrays errors generic hashtables kernel lists math
 namespaces parser sequences strings syntax vectors
 words ;
 
-: parsing ( -- )
-    #! Mark the most recently defined word to execute at parse
-    #! time, rather than run time. The word can use 'scan' to
-    #! read ahead in the input stream.
-    word t "parsing" set-word-prop ; parsing
-
-: inline ( -- )
-    #! Mark the last word to be inlined.
-    word  t "inline" set-word-prop ; parsing
-
-: flushable ( -- )
-    #! Declare that a word may be removed if the value it
-    #! computes is unused.
-    word  t "flushable" set-word-prop ; parsing
-
-: foldable ( -- )
-    #! Declare a word as safe for compile-time evaluation.
-    #! Foldable implies flushable, since we can first fold to
-    #! a constant then flush the constant.
-    word
-    dup t "foldable" set-word-prop
-    t "flushable" set-word-prop ; parsing
-
-! Booleans
-
-! the canonical truth value is just a symbol.
-SYMBOL: t
-
-! the canonical falsity is a special runtime object.
-: f f swons ; parsing
-
-! Lists
-: [ f ; parsing
-: ] reverse swons ; parsing
-
-! Conses (whose cdr might not be a list)
-: [[ f ; parsing
-: ]] first2 swons swons ; parsing
-
-! Arrays, vectors, etc
-: } reverse swap call swons ; parsing
-
-: { ( array ) [ >array ] [ ] ; parsing
-: V{ ( vector ) [ >vector ] [ ] ; parsing
-: H{ ( hashtable ) [ alist>hash ] [ ] ; parsing
-: C{ ( complex ) [ first2 rect> ] [ ] ; parsing
-: T{ ( tuple ) [ array>tuple ] [ ] ; parsing
-: W{ ( wrapper ) [ first <wrapper> ] [ ] ; parsing
-
-! Do not execute parsing word
-: POSTPONE: ( -- ) scan-word swons ; parsing
-
-! Word definitions
-: :
-    #! Begin a word definition. Word name follows.
-    CREATE dup reset-generic [ define-compound ] [ ] ; parsing
-
-: ;
-    #! End a word definition.
-    reverse swap call ; parsing
-
-! Symbols
-: SYMBOL:
-    #! A symbol is a word that pushes itself when executed.
-    CREATE dup reset-generic define-symbol ; parsing
-
-: \
-    #! Word literals: \ foo
-    scan-word literalize swons ; parsing
-
-! Vocabularies
-: PRIMITIVE:
-    #! This is just for show. All flash no substance.
-    "You cannot define primitives in Factor" throw ; parsing
-
-: DEFER:
-    #! Create a word with no definition. Used for mutually
-    #! recursive words.
-    CREATE dup reset-generic drop ; parsing
-
-: FORGET:
-    #! Followed by a word name. The word is removed from its
-    #! vocabulary. Note that specifying an undefined word is a
-    #! no-op.
-    scan use get hash-stack [ forget ] when* ; parsing
-
-: USE:
-    #! Add vocabulary to search path.
-    scan use+ ; parsing
-
-: USING:
-    #! A list of vocabularies terminated with ;
-    string-mode on
-    [ string-mode off [ use+ ] each ]
-    f ; parsing
-
-: IN:
-    #! Set vocabulary for new definitions.
-    scan set-in ; parsing
-
-! Char literal
-: CHAR: ( -- ) 0 scan next-char drop swons ; parsing
-
-! String literal
-: " parse-string swons ; parsing
-
-: SBUF" skip-blank parse-string >sbuf swons ; parsing
-
-! Comments
-: (
-    #! Stack comment.
-    CHAR: ) ch-search until ; parsing
-
-: !
-    #! EOL comment.
-    until-eol ; parsing
-
-: #!
-    #! EOL comment.
-    until-eol ; parsing
-
-! Reading integers in other bases
-: (BASE) ( base -- )
-    #! Reads an integer in a specific base.
-    scan swap base> swons ;
-
+: ( CHAR: ) ch-search until ; parsing
+: ! until-eol ; parsing
+: #! until-eol ; parsing
+: IN: scan set-in ; parsing
+: USE: scan use+ ; parsing
+: USING: string-mode on [ string-mode off add-use ] f ; parsing
+: (BASE) scan swap base> swons ;
 : HEX: 16 (BASE) ; parsing
-: DEC: 10 (BASE) ; parsing
 : OCT: 8 (BASE) ; parsing
 : BIN: 2 (BASE) ; parsing
+SYMBOL: t
+: f f swons ; parsing
+: CHAR: 0 scan next-char drop swons ; parsing
+: " parse-string swons ; parsing
+: SBUF" skip-blank parse-string >sbuf swons ; parsing
+: [ f ; parsing
+: ] reverse swons ; parsing
+: [[ f ; parsing
+: ]] first2 swons swons ; parsing
+: ; reverse swap call ; parsing
+: } POSTPONE: ; swons ; parsing
+: { [ >array ] [ ] ; parsing
+: V{ [ >vector ] [ ] ; parsing
+: H{ [ alist>hash ] [ ] ; parsing
+: C{ [ first2 rect> ] [ ] ; parsing
+: T{ [ array>tuple ] [ ] ; parsing
+: W{ [ first <wrapper> ] [ ] ; parsing
+: POSTPONE: scan-word swons ; parsing
+: \ scan-word literalize swons ; parsing
+: parsing word t "parsing" set-word-prop ; parsing
+: inline word  t "inline" set-word-prop ; parsing
+: flushable ( not implemented ) ; parsing
+: foldable word t "foldable" set-word-prop ; parsing
+: SYMBOL: CREATE dup reset-generic define-symbol ; parsing
+DEFER: PRIMITIVE: parsing
+: DEFER: CREATE dup reset-generic drop ; parsing
+: : CREATE dup reset-generic [ define-compound ] [ ] ; parsing
+: GENERIC: CREATE dup reset-word define-generic ; parsing
+: G: CREATE dup reset-word [ define-generic* ] [ ] ; parsing
+: M: scan-word scan-word [ -rot define-method ] [ ] ; parsing
+
+: UNION: ( -- class predicate definition )
+    CREATE dup intern-symbol dup predicate-word
+    [ dupd unit "predicate" set-word-prop ] keep
+    [ define-union ] [ ] ; parsing
+
+: PREDICATE: ( -- class predicate definition )
+    scan-word CREATE dup intern-symbol
+    dup rot "superclass" set-word-prop dup predicate-word
+    [ define-predicate-class ] [ ] ; parsing
+
+: TUPLE:
+    scan string-mode on [ string-mode off define-tuple ] f ;
+    parsing
+
+: C:
+    scan-word [ tuple-constructor ] keep
+    [ define-constructor ] [ ] ; parsing
+
+: FORGET: scan use get hash-stack [ forget ] when* ; parsing

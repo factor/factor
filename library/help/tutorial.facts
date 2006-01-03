@@ -122,7 +122,7 @@ ARTICLE: "tutorial-seq-combinators" "Sequences and combinators"
 
 ARTICLE: "tutorial-rationals" "Numbers - integers and ratios"
 "Factor supports arbitrary-precision integers and ratios. Try the following:"
-{ $code ": factorial ( n -- n! ) 1 swap <range> product ;\n100 factorial .\n1 3 / 1 2 / + ." }
+{ $code ": factorial ( n -- n! ) [ 1+ ] map product ;\n100 factorial .\n1 3 / 1 2 / + ." }
 "Rational numbers are added, multiplied and reduced to lowest terms in the same way you learned in grade school." ;
 
 ARTICLE: "tutorial-oop" "Object oriented programming"

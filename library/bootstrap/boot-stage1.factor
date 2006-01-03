@@ -70,8 +70,6 @@ vectors words ;
         "/library/io/files.factor"
         "/library/io/binary.factor"
 
-        "/library/syntax/parse-words.factor"
-        "/library/syntax/parse-errors.factor"
         "/library/syntax/parser.factor"
 
         "/library/generic/generic.factor"
@@ -89,14 +87,15 @@ vectors words ;
         
         "/library/tools/describe.factor"
         "/library/tools/debugger.factor"
+
+        "/library/syntax/parse-stream.factor"
+        
         "/library/tools/memory.factor"
         "/library/tools/listener.factor"
         "/library/tools/walker.factor"
 
         "/library/tools/annotations.factor"
         "/library/tools/inspector.factor"
-
-        "/library/syntax/parse-stream.factor"
         
         "/library/test/test.factor"
 
@@ -139,8 +138,6 @@ vectors words ;
         "/library/alien/malloc.factor"
         
         "/library/io/buffer.factor"
-
-        "/library/syntax/generic.factor"
 
         "/library/cli.factor"
         
@@ -216,6 +213,9 @@ vectors words ;
         "/library/collections/tree-each.facts"
         "/library/collections/vectors.facts"
         "/library/collections/virtual-sequences.facts"
+        "/library/syntax/parse-stream.facts"
+        "/library/syntax/parser.facts"
+        "/library/syntax/parse-syntax.facts"
         
         "/library/syntax/parse-syntax.factor"
 

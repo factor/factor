@@ -1,0 +1,135 @@
+USING: help parser sequences ;
+
+HELP: use f
+{ $description "A variable holding the current vocabulary search path as a sequence of hashtables." }
+{ $see-also in use+ set-use POSTPONE: USING: POSTPONE: USE: } ;
+
+HELP: in f
+{ $description "A variable holding the current vocabulary for new definitions." }
+{ $see-also use set-in POSTPONE: IN: } ;
+
+HELP: check-vocab "( name -- vocab )"
+{ $values { "name" "a string" } { "vocab" "a hashtable" } }
+{ $description "Outputs a named vocabulary." }
+{ $errors "Throws an error if the vocabulary does not exist." } ;
+
+HELP: use+ "( vocab -- )"
+{ $values { "vocab" "a string" } }
+{ $description "Adds a new vocabulary at the front of the search path. Subsequent word lookups by the parser will search this vocabulary first." }
+$parsing-note
+{ $errors "Throws an error if the vocabulary does not exist." }
+{ $see-also in use add-use set-use POSTPONE: USE: } ;
+
+HELP: set-use "( seq -- )"
+{ $values { "seq" "a sequence of strings" } }
+{ $description "Sets the vocabulary search path. Later vocabularies take precedence." }
+{ $errors "Throws an error if one of the vocabularies does not exist." }
+$parsing-note
+{ $see-also in use use+ add-use file-vocabs } ;
+
+HELP: add-use "( seq -- )"
+{ $values { "seq" "a sequence of strings" } }
+{ $description "Adds multiple vocabularies to the search path, with later vocabularies taking precedence." }
+{ $errors "Throws an error if one of the vocabularies does not exist." }
+$parsing-note
+{ $see-also in use use+ set-use POSTPONE: USING: } ;
+
+HELP: set-in "( name -- )"
+{ $values { "name" "a string" } }
+{ $description "Sets the current vocabulary where new words will be defined, creating the vocabulary first if it does not exist." }
+$parsing-note
+{ $see-also in use POSTPONE: IN: } ;
+
+HELP: parsing? "( obj -- ? )"
+{ $values { "obj" "an object" } { "?" "a boolean" } }
+{ $description "Tests if an object is a parsing word." }
+{ $notes "Outputs " { $link f } " if the object is not a word." } ;
+
+HELP: file f
+{ $description "Variable stores the file name being parsed. This is the input parameter to " { $link parse-stream } "." } ;
+
+HELP: line-number f
+{ $description "Variable holds the line number being parsed." } ;
+
+HELP: line-text f
+{ $description "Variable holds the text of the line being parsed." } ;
+
+HELP: column f
+{ $description "Variable holds the column number being parsed." } ;
+
+HELP: skip "( i seq quot -- n )"
+{ $values { "n" "a starting index" } { "seq" "a sequence" } { "quot" "a quotation with stack effect " { $snippet "( elt -- ? )" } } }
+{ $description "Variant of " { $link find* } " that outputs the length of the sequence instead of -1 if no elements satisfy the predicate." } ;
+
+HELP: skip-blank "( -- )"
+{ $description "Skips whitespace characters in the line currently being parsed." }
+$parsing-note ;
+
+HELP: skip-word "( n line -- n )"
+{ $values { "n" "a non-negative integer" } { "line" "a string" } }
+{ $description "Searches forward in the line for the end of a word starting at index " { $snippet "n" } ". This is a word in the Factor sense; that is, any character other than whitespace is a constituent of the word, and a quote (\") is a word by itself." }
+{ $errors "Throws an error if " { $snippet "n" } " is out of bounds." } ;
+
+HELP: (scan) "( n line -- start end )"
+{ $values { "n" "a non-negative integer" } { "line" "a string" } { "start" "start offset of next word" } { "end" "end offset of next word" } }
+{ $description "Scans forward for the next word in the line. If the end of the line is reached, both outputs equal the length of the line." } ;
+
+HELP: scan "( -- token )"
+{ $values { "token" "a string" } }
+{ $description "Reads the next token from the line currently being parsed. This is the key word that the Factor parser is built on." }
+$parsing-note ;
+
+HELP: save-location "( word -- )"
+{ $values { "word" "a word" } }
+{ $description "Sets the " { $snippet "\"file\"" } " and " {  $snippet "\"line\"" } " word properties to the current parser location." }
+$parsing-note ;
+
+HELP: create-in "( word -- )"
+{ $values { "word" "a word name" } }
+{ $description "Creates a word in the current vocabulary. Until re-defined, the word throws an error when invoked." }
+$parsing-note ;
+
+HELP: CREATE "( -- word )"
+{ $values { "word" "a word" } }
+{ $description "Reads the next token from the line currently being parsed, and creates a word with that name in the current vocabulary." }
+{ $errors "Throws an error if the end of the line is reached." }
+$parsing-note ;
+
+HELP: string-mode f
+{ $description
+    "Variable toggling strong mode. In string mode, the parser does not look up words, and instead just appends strings to the parse tree as they are read."
+    $terpri
+    "Since no parsing words are invoked in string mode, there is a special case that ends it; if the token " { $snippet ";" } " is read, string mode is switched off and the " { $link POSTPONE: ; } " parsing word is called."
+} ;
+
+HELP: scan-word "( -- obj )"
+{ $values { "obj" "a word or a number" } }
+{ $description "Reads the next token from the line currently being parsed. First tries to look up the word in the dictionary, and if the lookup fails, attempts to convert the token to a number." }
+{ $errors "Throws an error if the token does not name a word, and does not parse as a number." }
+$parsing-note ;
+
+HELP: ch-search "( ch -- index )"
+{ $values { "ch" "a character" } { "index" "an index in the current line" } }
+{ $description "Searches the current line, starting from the parser column, for an occurrence of " { $snippet "ch" } ". If the character does not occur in the line, outputs -1." }
+$parsing-note
+{ $see-also POSTPONE: ( } ;
+
+HELP: until "( index -- )"
+{ $values { "index" "an index in the current line" } }
+{ $description "Advances the parser column to immediately after the index." }
+$parsing-note
+{ $see-also POSTPONE: ( } ;
+
+HELP: until-eol "( -- )"
+{ $description "Discards all input until the end of the line." }
+$parsing-note
+{ $see-also POSTPONE: ! POSTPONE: #! } ;
+
+HELP: escape "( escape -- ch )"
+{ $values { "escape" "a single-character escape" } { "ch" "a character" } }
+{ $description "Converts from a single-character escape code and the corresponding character." }
+{ $examples { $example "CHAR: n escape CHAR: \n = ." "t" } } ;
+
+HELP: parse-string "( -- str )"
+{ $values { "str" "a new string" } }
+{ $description "Parses the line until a quote (\"), interpreting escape codes along the way." } ;

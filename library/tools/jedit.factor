@@ -56,7 +56,9 @@ parser prettyprint sequences strings words ;
 : read-packet ( -- string ) 4 read be> read ;
 
 : eval>string ( str -- )
-    [ [ [ eval ] keep ] try drop ] string-out ;
+    [
+        [ [ <string-reader> "Input" parse-stream call ] keep ] try drop
+    ] string-out ;
 
 : wire-server ( -- )
     #! Repeatedly read jEdit requests and execute them. Return

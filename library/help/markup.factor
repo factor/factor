@@ -2,8 +2,8 @@
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: help
 USING: arrays gadgets gadgets-panes gadgets-presentations
-hashtables inspector io kernel lists namespaces prettyprint
-sequences strings styles vectors words ;
+generic hashtables inspector io kernel lists namespaces parser
+prettyprint sequences strings styles vectors words ;
 
 : uncons* dup first swap 1 swap tail ;
 
@@ -72,10 +72,21 @@ M: simple-element print-element [ print-element ] each ;
 : $code ( content -- )
     first dup <input> [ format* ] ($code) ;
 
+: $syntax ( word -- )
+    dup stack-effect [
+        "Syntax" $subheading
+        >r word-name $snippet " " $snippet r> $snippet
+    ] [
+        drop
+    ] if* ;
+
+: $stack-effect ( word -- )
+    stack-effect [ "Stack effect" $subheading $snippet ] when* ;
+
 : $synopsis ( content -- )
     first dup
     word-vocabulary [ "Vocabulary" $subheading $snippet ] when*
-    stack-effect [ "Stack effect" $subheading $snippet ] when*
+    dup parsing? [ $syntax ] [ $stack-effect ] if
     terpri* ;
 
 : $values ( content -- )
@@ -95,10 +106,29 @@ M: simple-element print-element [ print-element ] each ;
 : textual-list ( seq quot -- )
     [ "," format* bl ] interleave ; inline
 
-: $see ( content -- )
+: $see-methods
+    "Methods defined in the generic word:" format* terpri
+    [ order word-sort ] keep
+    [ "methods" word-prop hash . ] curry
+    sequence-outliner ;
+
+: $see-implementors
+    "Generic words defined for this class:" format* terpri
+    [ implementors word-sort ] keep
+    [ swap "methods" word-prop hash . ] curry
+    sequence-outliner ;
+
+: ($see)
     terpri*
-    code-style [ [ first see ] with-nesting* ] with-style
+    code-style [ with-nesting* ] with-style
     terpri* ;
+
+: $see ( content -- )
+    first {
+        { [ dup class? ] [ $see-implementors ] }
+        { [ dup generic? ] [ $see-methods ] }
+        { [ t ] [ [ see ] ($see) ] }
+    } cond ;
 
 : $example ( content -- )
     first2 swap dup <input>
@@ -163,3 +193,6 @@ DEFER: help
 
 : $notes ( content -- )
     "Notes" $subheading print-element ;
+
+: $parsing-note
+    "This word should only be called from parsing words." $notes ;
