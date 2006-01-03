@@ -82,23 +82,25 @@ public class VocabularyLookup
 		FactorWord ket = define("syntax","]");
 		ket.parsing = new Ket(bra,ket);
 
-		/* tuples */
-		FactorWord beginTuple = define("syntax","<<");
-		beginTuple.parsing = new Bra(beginTuple);
-		FactorWord endTuple = define("syntax",">>");
-		endTuple.parsing = new Ket(beginTuple,endTuple);
+		/* arrays, vectors */
+		FactorWord beginVector = define("syntax","V{");
+		beginVector.parsing = new BeginVector(beginVector);
+		FactorWord beginArray = define("syntax","{");
+		beginArray.parsing = new BeginVector(beginArray);
+		FactorWord beginTuple = define("syntax","T{");
+		beginTuple.parsing = new BeginVector(beginTuple);
+		FactorWord beginHash = define("syntax","H{");
+		beginHash.parsing = new BeginVector(beginHash);
+		FactorWord beginWrapper = define("syntax","W{");
+		beginWrapper.parsing = new BeginVector(beginWrapper);
+		FactorWord endVector = define("syntax","}");
+		endVector.parsing = new EndVector(beginVector,endVector);
 
 		/* conses */
 		FactorWord beginCons = define("syntax","[[");
 		beginCons.parsing = new BeginCons(beginCons);
 		FactorWord endCons = define("syntax","]]");
 		endCons.parsing = new EndCons(beginCons,endCons);
-
-		/* vectors */
-		FactorWord beginVector = define("syntax","{");
-		beginVector.parsing = new BeginVector(beginVector);
-		FactorWord endVector = define("syntax","}");
-		endVector.parsing = new EndVector(beginVector,endVector);
 
 		/* word defs */
 		FactorWord def = define("syntax",":");

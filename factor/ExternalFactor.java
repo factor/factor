@@ -175,7 +175,7 @@ public class ExternalFactor extends VocabularyLookup
 		{
 			if(!closed)
 			{
-				Cons moreVocabs = (Cons)parseObject(eval("vocabs .")).car;
+				Cons moreVocabs = (Cons)parseObject(eval("vocabs >list .")).car;
 				while(moreVocabs != null)
 				{
 					String vocab = (String)moreVocabs.car;
@@ -229,7 +229,7 @@ public class ExternalFactor extends VocabularyLookup
 			Cons result = parseObject(eval(FactorReader.unparseObject(name)
 				+ " "
 				+ FactorReader.unparseObject(vocabulary)
-				+ " search jedit-lookup ."));
+				+ " search jedit-lookup >list ."));
 			if(result.car == null)
 				return null;
 
