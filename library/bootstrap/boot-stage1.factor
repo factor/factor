@@ -216,6 +216,7 @@ vectors words ;
         "/library/syntax/parse-stream.facts"
         "/library/syntax/parser.facts"
         "/library/syntax/parse-syntax.facts"
+        "/library/syntax/prettyprint.facts"
         
         "/library/syntax/parse-syntax.factor"
 

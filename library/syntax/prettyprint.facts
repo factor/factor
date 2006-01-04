@@ -1,1 +1,238 @@
+USING: help prettyprint words ;
 
+HELP: position f
+{ $description "Variable. The prettyprinter's current character position." } ;
+
+HELP: last-newline f
+{ $description "Variable. The character position of the last newline output by the prettyprinter." } ;
+
+HELP: recursion-check f
+{ $description "Variable. The current nesting of collections being output by the prettyprinter, used to detect circularity and prevent infinite recursion." } ;
+
+HELP: line-count f
+{ $description "Variable. The number of lines output by the prettyprinter so far, used for line limiting (see " { $link line-limit } ")." } ;
+
+HELP: end-printing f
+{ $description "Variable. A continuation captured by " { $link do-pprint } " that breaks out of the printer." } ;
+
+HELP: indent f
+{ $description "Variable. The prettyprinter's current indent level." } ;
+
+HELP: pprinter-stack f
+{ $description "Variable. A stack of " { $link block } " objects currently being constructed by the prettyprinter." } ;
+
+HELP: tab-size f
+{ $description "Variable. Prettyprinter tab size. Indent nesting is always a multiple of the tab size. The default is 4." } ;
+
+HELP: margin f
+{ $description "Variable. The maximum line length, in characters. Lines longer than the margin are wrapped. The default is 64." } ;
+
+HELP: nesting-limit f
+{ $description "Variable. The maximum nesting level. Structures that nest further than this will simply print as a pound sign (#). The default is " { $link f } ", denoting unlimited nesting depth." } ;
+
+HELP: length-limit f
+{ $description "Variable. The maximum printed sequence length. Sequences longer than this are truncated, and \"...\" is output in place of remaining elements. The default is " { $link f } ", denoting unlimited sequence length." } ;
+
+HELP: line-limit f
+{ $description "Variable. The maximum number of lines output by the prettyprinter before output is truncated with \"...\". The default is " { $link f } ", denoting unlimited line count." } ;
+
+HELP: string-limit f
+{ $description "Variable. Toggles whenever printed strings are truncated to the margin." } ;
+
+HELP: pprint-section* "( section -- )"
+{ $values { "section" "a section" } }
+{ $contract "Prettyprints an object delegating to an instance of " { $link section } ", performing wrapping and indentation using the formatting information in the section." } ;
+
+HELP: section f
+{ $description "A section represents a run of text with a known length and indentation level." } ;
+
+HELP: line-limit? "( -- ? )"
+{ $values { "?" "a boolean" } }
+{ $description "Tests if the line number limit has been reached, and thus if prettyprinting should stop." } ;
+
+HELP: do-indent "( -- )"
+{ $description "Outputs the current indent nesting to the default stream." } ;
+
+HELP: fresh-line "( n -- )"
+{ $values { "n" "the current column position" } }
+{ $description "Advances the prettyprinter by one line unless the current line is empty. If the line limit is exceeded, escapes the prettyprinter by restoring a continuation captured in " { $link do-pprint } "." } ;
+
+HELP: <text> "( string style -- text )"
+{ $values { "string" "a string" } { "style" "a hashtable" } { "text" "a new text section" } }
+{ $description "Creates a text section." } ;
+
+HELP: block f
+{ $description "A block is a section consisting of whitespace-separated child sections." } ;
+
+HELP: pprinter-block "( -- block )"
+{ $values { "block" "a block section" } }
+{ $description "Outputs the block currently being constructed." } ;
+
+HELP: block-empty? "( section -- ? )"
+{ $values { "section" "a section" } { "?" "a boolean" } }
+{ $description "Tests if a section is empty. A section is empty if it is a block with no children." } ;
+
+HELP: add-section "( section -- )"
+{ $values { "section" "a section" } }
+{ $description "Adds a section to the current block." } ;
+
+HELP: text "( text style -- )"
+{ $description "Adds a section consisting of a single string with style information to the current block." } ;
+
+HELP: plain-text "( text -- )"
+{ $description "Adds a section consisting of a single string to the current block." } ;
+
+HELP: <indent "( section -- )"
+{ $values { "section" "a section" } }
+{ $description "Increases indent level by the indent level of the section." }
+
+HELP: indent> "( section -- )"
+{ $values { "section" "a section" } }
+{ $description "Decreases indent level by the indent level of the section." }
+
+HELP: inset-section "( section -- )"
+{ $values { "section" "a section" } }
+{ $description "Prints a section surrounded by line breaks and with increased indent." } ;
+
+HELP: section-fits? "( section -- ? )"
+{ $values { "section" "a section" } { "?" "a boolean" } }
+{ $description "Tests if a section should be printed on the current line." } ;
+
+HELP: pprint-section "( section -- )"
+{ $values { "section" "a section" } }
+{ $description "Prints a section, with a line break and increase in indent level if necessary." } ;
+
+HELP: newline "( -- )"
+{ $description "Adds a section introducing an unconditional line break to the current block." } ;
+
+HELP: advance "( section -- )"
+{ $values { "section" "a section" } }
+{ $description "Emits a space unless the section is the first section on the line." } ;
+
+HELP: <block "( -- )"
+{ $description "Begins a nested block." } ;
+
+HELP: end-block "( section -- )"
+{ $values { "section" "a section" } }
+{ $description "Save the current position as the end position of the section." } ;
+
+HELP: (block>) "( -- )"
+{ $description "Adds the current block to its containing block." } ;
+
+HELP: last-block? "( -- ? )"
+{ $values { "?" "a boolean" } }
+{ $description "Tests if the current block is the top-level block." } ;
+
+HELP: block> "( -- )"
+{ $description "Adds the current block to its containing block, unless the current block is the top-level block in which case it does nothing." }
+{ $notes "This word is used to end blocks in order for the prettyprinter to be forgiving in the case of mismatched begin/end pairs (this can happen when printing parsing words)." } ;
+
+HELP: block; "( -- )"
+{ $description "Adds the current block to its containing block. The current block will be terminated by an unconditional newline." } ;
+
+HELP: end-blocks "( -- )"
+{ $description "Unwind all prettyprinter state to the top level block." } ;
+
+HELP: do-pprint "( -- )"
+{ $description "Recursively output all children of the top-level block. The continuation is restored and output terminates if the line length is exceeded; this test is performed in " { $link fresh-line } "." } ;
+
+HELP: pprint* "( obj -- )"
+{ $values { "obj" "an object" } }
+{ $contract "Adds sections to the current block corresponding to the prettyprinted representation of the object." }
+{ $see-also text newline <block block> block; } ;
+
+HELP: pprint-word "( word -- )"
+{ $values { "word" "a word" } }
+{ $description "Adds a text section for the word. Unlike the " { $link word } " method of " { $link pprint* } ", this does not add a " { $link POSTPONE: POSTPONE: } " prefix to parsing words." } ;
+
+HELP: ch>ascii-escape "( ch -- str )"
+{ $values { "ch" "a character" } { "str" "a string" } }
+{ $description "Converts a character to an escape code." } ;
+
+HELP: ch>unicode-escape "( ch -- str )"
+{ $values { "ch" "a character" } { "str" "a string" } }
+{ $description "Converts a character to a Unicode escape code (" { $snippet "\\u1234"} ")." } ;
+
+HELP: unparse-ch "( ch -- )"
+{ $values { "ch" "a character" } }
+{ $description "Adds the character to the sequence being constructed (see " { $link "namespaces-make" } "). If the character can appear in a string literal, it is added directly, otherwise an escape code is added." } ;
+
+HELP: do-string-limit "( str -- trimmed )"
+{ $values { "str" "a string" } { "trimmed" "a possibly trimmed string" } }
+{ $description "If " { $link string-limit } " is on, trims the string such that it does not exceed the margin, appending \"...\" if trimming took place." } ;
+
+HELP: pprint-string "( str prefix -- )"
+{ $values { "str" "a string" } { "prefix" "a prefix string" } }
+{ $description "Outputs a text section consisting of the prefix, the string, and a final quote (\")." } ;
+
+HELP: nesting-limit? "( -- ? )"
+{ $values { "?" "a boolean" } }
+{ $description "Tests if the " { $link nesting-limit } " has been reached." } ;
+
+HELP: check-recursion "( obj quot -- )"
+{ $values { "obj" "an object" } { "quot" "a quotation with stack effect " { $snippet "( obj -- )" } } }
+{ $description "If the object is already being printed, that is, if the prettyprinter has encountered a cycle in the object graph, or if the maximum nesting depth has been reached, outputs a dummy string. Otherwise applies the quotation to the object." } ;
+
+HELP: length-limit? "( seq -- trimmed ? )"
+{ $values { "seq" "a sequence" } { "trimmed" "a trimmed sequence" } { "?" "a boolean indicating if trimming took place" } }
+{ $description "If the " { $link length-limit } " is set, trims the sequence if necessary, and outputs a boolean indicating if \"...\" should be output." } ;
+
+HELP: pprint-element "( obj -- )"
+{ $values { "obj" "an object" } }
+{ $description "Prettyprints a sequence element." } ;
+
+HELP: pprint-elements "( seq -- )"
+{ $values { "seq" "a sequence" } }
+{ $description "Prettyprints the elements of a sequence, trimming the sequence to " { $link length-limit } " if necessary." } ;
+
+HELP: pprint-sequence "( seq start end -- )"
+{ $values { "seq" "a sequence" } { "start" "a word" } { "end" "a word" } }
+{ $description "Prettyprints a sequence." } ;
+
+HELP: with-pprint "( quot -- )"
+{ $values { "quot" "a quotation" } }
+{ $description "Sets up the prettyprinter and calls the quotation in a new scope. The quotation should add sections to the top-level block. When the quotation returns, the top-level block is printed to the default stream." } ;
+
+HELP: pprint "( obj -- )"
+{ $values { "obj" "an object" } }
+{ $description "Prettyprints an object to the default stream. Output is influenced by many variables; see " { $link "prettyprint-variables" } "." } ;
+
+HELP: . "( obj -- )"
+{ $values { "obj" "an object" } }
+{ $description "Prettyprints an object to the default stream with a trailing line break. Output is influenced by many variables; see " { $link "prettyprint-variables" } "." } ;
+
+HELP: unparse "( obj -- str )"
+{ $values { "obj" "an object" } { "str" "Factor source string" } }
+{ $description "Outputs a prettyprinted string representation of an object." } ;
+
+HELP: pprint-short "( obj -- )"
+{ $values { "obj" "an object" } }
+{ $description "Prettyprints an object to the default stream. This word rebinds printer control variables to enforce ``shorter'' output." } ;
+
+HELP: short. "( obj -- )"
+{ $values { "obj" "an object" } }
+{ $description "Prettyprints an object to the default stream with a trailing line break. This word rebinds printer control variables to enforce ``shorter'' output." } ;
+
+HELP: unparse-short "( obj -- str )"
+{ $values { "obj" "an object" } { "str" "Factor source string" } }
+{ $description "Outputs a prettyprinted string representation of an object. This word rebinds printer control variables to enforce ``shorter'' output." } ;
+
+HELP: .b "( n -- )"
+{ $values { "n" "an integer" } }
+{ $description "Outputs an integer in binary." } ;
+
+HELP: .o "( n -- )"
+{ $values { "n" "an integer" } }
+{ $description "Outputs an integer in octal." } ;
+
+HELP: .h "( n -- )"
+{ $values { "n" "an integer" } }
+{ $description "Outputs an integer in hexadecimal." } ;
+
+HELP: define-open "( word -- )"
+{ $values { "word" "a word" } }
+{ $description "Marks up the word so that it begins a nested block when prettyprinted. Usually only used for parsing words." } ;
+
+HELP: define-close "( word -- )"
+{ $values { "word" "a word" } }
+{ $description "Marks up the word so that it ends a nested block when prettyprinted. Usually only used for parsing words." } ;
