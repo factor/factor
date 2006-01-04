@@ -19,7 +19,7 @@ words ;
 : BIN: 2 (BASE) ; parsing
 SYMBOL: t
 : f f swons ; parsing
-: CHAR: 0 scan next-char drop swons ; parsing
+: CHAR: 0 scan next-char nip swons ; parsing
 : " parse-string swons ; parsing
 : SBUF" skip-blank parse-string >sbuf swons ; parsing
 : [ f ; parsing
