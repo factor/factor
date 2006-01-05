@@ -70,7 +70,7 @@ M: simple-element print-element [ print-element ] each ;
     terpri* ; inline
 
 : $code ( content -- )
-    first dup <input> [ format* ] ($code) ;
+    "\n" join dup <input> [ format* ] ($code) ;
 
 : $syntax ( word -- )
     dup stack-effect [

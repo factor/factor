@@ -90,7 +90,7 @@ HELP: T{ "class delegate slots... }"
 HELP: POSTPONE: "word"
 { $values { "word" "a word" } }
 { $description "Reads the next word from the input string and appends the word to the parse tree, even if it is a parsing word." }
-{ $examples "For an ordinary word " { $snippet "foo" } ", " { $snippet "foo" } " and " { $snippet "POSTPONE: foo" } " are equivalent; however, if " { $snippet "foo" } "\texttt{foo} is a parsing word, the former will execute it at parse time, while the latter will execute it at runtime." }
+{ $examples "For an ordinary word " { $snippet "foo" } ", " { $snippet "foo" } " and " { $snippet "POSTPONE: foo" } " are equivalent; however, if " { $snippet "foo" } " is a parsing word, the former will execute it at parse time, while the latter will execute it at runtime." }
 { $notes "This word is used inside parsing words to delegate further action to another parsing word, and to refer to parsing words literally from literal arrays and such." } ;
 
 HELP: : "word definition... ;"
@@ -119,7 +119,7 @@ HELP: \ "word"
 
 HELP: DEFER: "word"
 { $values { "word" "a new word to define" } }
-{ $description "Create a word \texttt{name} in the current vocabulary that simply raises an error when executed. Usually, the word will be replaced with a real definition later." }
+{ $description "Create a word in the current vocabulary that simply raises an error when executed. Usually, the word will be replaced with a real definition later." }
 { $notes "Due to the way the parser works, words cannot be referenced before they are defined; that is, source files must order definitions in a strictly bottom-up fashion. Mutually-recursive pairs of words can be implemented by " { $emphasis "deferring" } " one of the words in the pair allowing the second word in the pair to parse, then by defining the first word." }
 { $examples { $code "DEFER: foe\n: fie ... foe ... ;\n: foe ... fie ... ;" } } ;
 

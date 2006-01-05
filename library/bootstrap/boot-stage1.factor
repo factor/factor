@@ -218,6 +218,7 @@ vectors words ;
 
         "/doc/handbook/collections.facts"
         "/doc/handbook/sequences.facts"
+        "/doc/handbook/syntax.facts"
         "/doc/handbook/tutorial.facts"
         
         "/library/syntax/parse-syntax.factor"
