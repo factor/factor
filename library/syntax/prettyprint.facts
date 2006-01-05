@@ -1,5 +1,13 @@
 USING: help prettyprint words ;
 
+IN: help
+
+: $prettyprinting-note
+    {
+        "This word should only be called from inside the "
+        { $link with-pprint } " combinator."
+    } $notes ;
+
 HELP: position f
 { $description "Variable. The prettyprinter's current character position." } ;
 
@@ -66,7 +74,8 @@ HELP: block f
 
 HELP: pprinter-block "( -- block )"
 { $values { "block" "a block section" } }
-{ $description "Outputs the block currently being constructed." } ;
+{ $description "Outputs the block currently being constructed." }
+$prettyprinting-note ;
 
 HELP: block-empty? "( section -- ? )"
 { $values { "section" "a section" } { "?" "a boolean" } }
@@ -74,21 +83,26 @@ HELP: block-empty? "( section -- ? )"
 
 HELP: add-section "( section -- )"
 { $values { "section" "a section" } }
-{ $description "Adds a section to the current block." } ;
+{ $description "Adds a section to the current block." }
+$prettyprinting-note ;
 
 HELP: text "( text style -- )"
-{ $description "Adds a section consisting of a single string with style information to the current block." } ;
+{ $description "Adds a section consisting of a single string with style information to the current block." }
+$prettyprinting-note ;
 
 HELP: plain-text "( text -- )"
-{ $description "Adds a section consisting of a single string to the current block." } ;
+{ $description "Adds a section consisting of a single string to the current block." }
+$prettyprinting-note ;
 
 HELP: <indent "( section -- )"
 { $values { "section" "a section" } }
 { $description "Increases indent level by the indent level of the section." }
+$prettyprinting-note ;
 
 HELP: indent> "( section -- )"
 { $values { "section" "a section" } }
 { $description "Decreases indent level by the indent level of the section." }
+$prettyprinting-note ;
 
 HELP: inset-section "( section -- )"
 { $values { "section" "a section" } }
@@ -103,35 +117,42 @@ HELP: pprint-section "( section -- )"
 { $description "Prints a section, with a line break and increase in indent level if necessary." } ;
 
 HELP: newline "( -- )"
-{ $description "Adds a section introducing an unconditional line break to the current block." } ;
+{ $description "Adds a section introducing an unconditional line break to the current block." }
+$prettyprinting-note ;
 
 HELP: advance "( section -- )"
 { $values { "section" "a section" } }
 { $description "Emits a space unless the section is the first section on the line." } ;
 
 HELP: <block "( -- )"
-{ $description "Begins a nested block." } ;
+{ $description "Begins a nested block." }
+$prettyprinting-note ;
 
 HELP: end-block "( section -- )"
 { $values { "section" "a section" } }
 { $description "Save the current position as the end position of the section." } ;
 
 HELP: (block>) "( -- )"
-{ $description "Adds the current block to its containing block." } ;
+{ $description "Adds the current block to its containing block." }
+$prettyprinting-note ;
 
 HELP: last-block? "( -- ? )"
 { $values { "?" "a boolean" } }
-{ $description "Tests if the current block is the top-level block." } ;
+{ $description "Tests if the current block is the top-level block." }
+$prettyprinting-note ;
 
 HELP: block> "( -- )"
 { $description "Adds the current block to its containing block, unless the current block is the top-level block in which case it does nothing." }
-{ $notes "This word is used to end blocks in order for the prettyprinter to be forgiving in the case of mismatched begin/end pairs (this can happen when printing parsing words)." } ;
+{ $notes "This word is used to end blocks in order for the prettyprinter to be forgiving in the case of mismatched begin/end pairs (this can happen when printing parsing words)." }
+$prettyprinting-note ;
 
 HELP: block; "( -- )"
-{ $description "Adds the current block to its containing block. The current block will be terminated by an unconditional newline." } ;
+{ $description "Adds the current block to its containing block. The current block will be terminated by an unconditional newline." }
+$prettyprinting-note ;
 
 HELP: end-blocks "( -- )"
-{ $description "Unwind all prettyprinter state to the top level block." } ;
+{ $description "Unwind all prettyprinter state to the top level block." }
+$prettyprinting-note ;
 
 HELP: do-pprint "( -- )"
 { $description "Recursively output all children of the top-level block. The continuation is restored and output terminates if the line length is exceeded; this test is performed in " { $link fresh-line } "." } ;
@@ -139,11 +160,13 @@ HELP: do-pprint "( -- )"
 HELP: pprint* "( obj -- )"
 { $values { "obj" "an object" } }
 { $contract "Adds sections to the current block corresponding to the prettyprinted representation of the object." }
+$prettyprinting-note
 { $see-also text newline <block block> block; } ;
 
 HELP: pprint-word "( word -- )"
 { $values { "word" "a word" } }
-{ $description "Adds a text section for the word. Unlike the " { $link word } " method of " { $link pprint* } ", this does not add a " { $link POSTPONE: POSTPONE: } " prefix to parsing words." } ;
+{ $description "Adds a text section for the word. Unlike the " { $link word } " method of " { $link pprint* } ", this does not add a " { $link POSTPONE: POSTPONE: } " prefix to parsing words." }
+$prettyprinting-note ;
 
 HELP: ch>ascii-escape "( ch -- str )"
 { $values { "ch" "a character" } { "str" "a string" } }
@@ -163,31 +186,38 @@ HELP: do-string-limit "( str -- trimmed )"
 
 HELP: pprint-string "( str prefix -- )"
 { $values { "str" "a string" } { "prefix" "a prefix string" } }
-{ $description "Outputs a text section consisting of the prefix, the string, and a final quote (\")." } ;
+{ $description "Outputs a text section consisting of the prefix, the string, and a final quote (\")." }
+$prettyprinting-note ;
 
 HELP: nesting-limit? "( -- ? )"
 { $values { "?" "a boolean" } }
-{ $description "Tests if the " { $link nesting-limit } " has been reached." } ;
+{ $description "Tests if the " { $link nesting-limit } " has been reached." }
+$prettyprinting-note ;
 
 HELP: check-recursion "( obj quot -- )"
 { $values { "obj" "an object" } { "quot" "a quotation with stack effect " { $snippet "( obj -- )" } } }
-{ $description "If the object is already being printed, that is, if the prettyprinter has encountered a cycle in the object graph, or if the maximum nesting depth has been reached, outputs a dummy string. Otherwise applies the quotation to the object." } ;
+{ $description "If the object is already being printed, that is, if the prettyprinter has encountered a cycle in the object graph, or if the maximum nesting depth has been reached, outputs a dummy string. Otherwise applies the quotation to the object." }
+$prettyprinting-note ;
 
 HELP: length-limit? "( seq -- trimmed ? )"
 { $values { "seq" "a sequence" } { "trimmed" "a trimmed sequence" } { "?" "a boolean indicating if trimming took place" } }
-{ $description "If the " { $link length-limit } " is set, trims the sequence if necessary, and outputs a boolean indicating if \"...\" should be output." } ;
+{ $description "If the " { $link length-limit } " is set, trims the sequence if necessary, and outputs a boolean indicating if \"...\" should be output." }
+$prettyprinting-note ;
 
 HELP: pprint-element "( obj -- )"
 { $values { "obj" "an object" } }
-{ $description "Prettyprints a sequence element." } ;
+{ $description "Prettyprints a sequence element." }
+$prettyprinting-note ;
 
 HELP: pprint-elements "( seq -- )"
 { $values { "seq" "a sequence" } }
-{ $description "Prettyprints the elements of a sequence, trimming the sequence to " { $link length-limit } " if necessary." } ;
+{ $description "Prettyprints the elements of a sequence, trimming the sequence to " { $link length-limit } " if necessary." }
+$prettyprinting-note ;
 
 HELP: pprint-sequence "( seq start end -- )"
 { $values { "seq" "a sequence" } { "start" "a word" } { "end" "a word" } }
-{ $description "Prettyprints a sequence." } ;
+{ $description "Prettyprints a sequence." }
+$prettyprinting-note ;
 
 HELP: with-pprint "( quot -- )"
 { $values { "quot" "a quotation" } }

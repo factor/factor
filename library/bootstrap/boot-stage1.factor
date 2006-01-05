@@ -143,6 +143,13 @@ vectors words ;
         
         "/library/bootstrap/init.factor"
         
+        "/library/help/database.factor"
+        "/library/help/stylesheet.factor"
+        "/library/help/help.factor"
+        "/library/help/markup.factor"
+        "/library/help/word-help.factor"
+        "/library/help/syntax.factor"
+        
         "/library/sdl/sdl.factor"
         "/library/sdl/sdl-video.factor"
         "/library/sdl/sdl-event.factor"
@@ -185,17 +192,7 @@ vectors words ;
         "/library/ui/presentations.factor"
         "/library/ui/ui.factor"
 
-        "/library/help/database.factor"
-        "/library/help/stylesheet.factor"
-        "/library/help/help.factor"
-        "/library/help/markup.factor"
-        "/library/help/word-help.factor"
         "/library/help/commands.factor"
-        "/library/help/syntax.factor"
-
-        "/library/help/collections.facts"
-        "/library/help/sequences.facts"
-        "/library/help/tutorial.facts"
         
         "/library/collections/growable.facts"
         "/library/collections/arrays.facts"
@@ -217,6 +214,11 @@ vectors words ;
         "/library/syntax/parser.facts"
         "/library/syntax/parse-syntax.facts"
         "/library/syntax/prettyprint.facts"
+        "/library/syntax/see.facts"
+
+        "/doc/handbook/collections.facts"
+        "/doc/handbook/sequences.facts"
+        "/doc/handbook/tutorial.facts"
         
         "/library/syntax/parse-syntax.factor"
 

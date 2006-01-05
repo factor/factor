@@ -55,7 +55,7 @@ unit-test
 
 [ ] [ \ compound see ] unit-test
 
-[ ] [ \ pprinter see ] unit-test
+[ ] [ \ duplex-stream see ] unit-test
 
 [ "ALIEN: 1234" ] [ 1234 <alien> unparse ] unit-test
 

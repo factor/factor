@@ -193,6 +193,3 @@ DEFER: help
 
 : $notes ( content -- )
     "Notes" $subheading print-element ;
-
-: $parsing-note
-    "This word should only be called from parsing words." $notes ;

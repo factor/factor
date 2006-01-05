@@ -1,5 +1,4 @@
 IN: temporary
-USING: vectors ;
 USE: errors
 USE: kernel
 USE: math
@@ -8,6 +7,7 @@ USE: strings
 USE: test
 USE: sequences
 USE: lists
+USE: vectors
 
 [ ] [ 10 [ [ -1000000 <sbuf> ] catch drop ] times ] unit-test
 
@@ -53,7 +53,7 @@ unit-test
 [ "OneWord" " " split ]
 unit-test
 
-[ [ "a" "b" "c" "d" "e" "f" ] ]
+[ { "a" "b" "c" "d" "e" "f" } ]
 [ "aXXbXXcXXdXXeXXf" "XX" split ] unit-test
 
 [ "Hello world" t ] [ "Hello world\n" "\n" ?tail ] unit-test

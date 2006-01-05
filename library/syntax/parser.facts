@@ -1,5 +1,8 @@
 USING: help parser sequences ;
 
+IN: help : $parsing-note
+    "This word should only be called from parsing words." $notes ;
+
 HELP: use f
 { $description "A variable holding the current vocabulary search path as a sequence of hashtables." }
 { $see-also in use+ set-use POSTPONE: USING: POSTPONE: USE: } ;

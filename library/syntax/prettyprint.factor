@@ -296,13 +296,12 @@ M: wrapper pprint* ( wrapper -- )
 : unparse ( object -- str ) [ pprint ] string-out ;
 
 : pprint-short ( object -- string )
-    [
-        1 line-limit set
-        15 length-limit set
-        2 nesting-limit set
-        string-limit on
-        pprint
-    ] with-scope ;
+    H{
+       { line-limit 1 }
+       { length-limit 15 }
+       { nesting-limit 2 }
+       { string-limit t }
+    } clone [ pprint ] bind ;
 
 : short. ( object -- ) pprint-short terpri ;
 

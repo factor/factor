@@ -24,16 +24,16 @@ sequences strings styles words ;
 : comment. ( comment -- )
     [ H{ { font-style italic } } text ] when* ;
 
-: stack-picture% ( seq -- string )
+: stack-picture ( seq -- string )
     dup integer? [ object <array> ] when
-    [ word-name % " " % ] each ;
+    [ word-name ] map " " join ;
 
 : effect>string ( effect -- string )
     [
-        "( " %
-        dup first stack-picture%
-        "-- " %
-        second stack-picture%
+        "(" %
+        dup first stack-picture %
+        " -- " %
+        second stack-picture %
         ")" %
     ] "" make ;
 
