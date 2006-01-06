@@ -30,10 +30,12 @@ library, but is useful enough to ship with the Factor distribution.
 
 - contrib/sqlite/ -- SQLite binding (Chris Double)
 
+- contrib/x11 -- X Window System client library (Eduardo Cavazos)
+
 - contrib/coroutines.factor -- coroutines (Chris Double)
 
 - contrib/dlists.factor -- double-linked-lists (Mackenzie Straight)
 
-- contrib/xml.factor -- XML parser and writer (Daniel Ehrenberg)
+- contrib/splay-trees.factor -- Splay trees (Mackenzie Straight)
 
-- contrib/x11 -- X Window System client library (Eduardo Cavazos)
+- contrib/xml.factor -- XML parser and writer (Daniel Ehrenberg)
