@@ -6,9 +6,6 @@ gadgets-labels gadgets-layouts gadgets-scrolling gadgets-theme
 generic hashtables io kernel line-editor math namespaces
 sequences strings styles threads ;
 
-! Input history
-TUPLE: input string ;
-
 ! A pane is an area that can display text.
 
 ! output: pile

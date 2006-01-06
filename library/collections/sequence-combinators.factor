@@ -1,9 +1,10 @@
 ! Copyright (C) 2005 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 IN: sequences-internals
-USING: arrays generic kernel kernel-internals math vectors ;
+USING: arrays generic kernel kernel-internals math sequences
+vectors ;
 
-: collect ( n generator -- vector | quot: n -- value )
+: collect ( n generator -- array | quot: n -- value )
     >r [ f <array> ] keep r> swap [
         [ rot >r [ swap call ] keep r> set-array-nth ] 3keep
     ] repeat drop ; inline
@@ -28,6 +29,11 @@ USING: arrays generic kernel kernel-internals math vectors ;
     ] [
         t <array> f 0 pick set-nth-unsafe
     ] if ;
+
+: (subset) ( quot accum elt -- quot accum )
+    -rot [
+        >r over >r call [ r> r> push ] [ r> r> 2drop ] if
+    ] 2keep ; inline
 
 IN: sequences
 
@@ -137,15 +143,8 @@ M: object find ( seq quot -- i elt )
     swap [ with rot ] all? 2nip ; inline
 
 : subset ( seq quot -- seq | quot: elt -- ? )
-    swap [
-        dup length <vector> -rot [
-            rot >r 2dup >r >r swap call [
-                r> r> r> [ push ] keep swap
-            ] [
-                r> r> drop r> swap
-            ] if
-        ] each drop
-    ] keep like ; inline
+    over >r V{ } clone rot [ (subset) ] each r> like nip ;
+    inline
 
 : subset-with ( obj seq quot -- seq | quot: obj elt -- ? )
     swap [ with rot ] subset 2nip ; inline

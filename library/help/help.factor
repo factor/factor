@@ -1,6 +1,5 @@
 IN: help
-USING: arrays gadgets-listener gadgets-presentations hashtables
-io kernel namespaces parser sequences words ;
+USING: arrays hashtables io kernel ;
 
 : (help) ( topic -- )
     default-style [

@@ -150,6 +150,9 @@ vectors words ;
         "/library/help/word-help.factor"
         "/library/help/syntax.factor"
         
+        ! This must be the last file of parsing words loaded
+        "/library/syntax/parse-syntax.factor"
+
         "/library/sdl/sdl.factor"
         "/library/sdl/sdl-video.factor"
         "/library/sdl/sdl-event.factor"
@@ -193,7 +196,9 @@ vectors words ;
         "/library/ui/ui.factor"
 
         "/library/help/commands.factor"
-        
+
+        "/library/vocabularies.facts"
+        "/library/words.facts"
         "/library/collections/growable.facts"
         "/library/collections/arrays.facts"
         "/library/collections/hashtables.facts"
@@ -220,8 +225,7 @@ vectors words ;
         "/doc/handbook/sequences.facts"
         "/doc/handbook/syntax.facts"
         "/doc/handbook/tutorial.facts"
-        
-        "/library/syntax/parse-syntax.factor"
+        "/doc/handbook/words.facts"
 
         "/library/bootstrap/image.factor"
     } [ parse-resource % ] each

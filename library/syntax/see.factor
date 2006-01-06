@@ -44,7 +44,6 @@ sequences strings styles words ;
     ] ?if ;
 
 : synopsis ( word -- string )
-    #! Output a brief description of the word in question.
     [
         0 margin set [
             dup (synopsis) stack-effect comment.
@@ -122,6 +121,5 @@ M: word class. drop ;
     all-words [ word-name [ subseq? ] completion? ] subset-with ;
 
 : apropos ( substring -- )
-    #! List all words that contain a string.
     (apropos) word-sort
     [ [ synopsis ] keep simple-object terpri ] each ;

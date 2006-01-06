@@ -11,7 +11,6 @@
   ui/line-editor - don't use variables
 - amd64 to do:
   - alien calls
-  - compiling sheet runs out of memory
   - port ffi to win64
 - intrinsic char-slot set-char-slot for x86
 - closing ui does not stop timers

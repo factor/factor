@@ -1,0 +1,138 @@
+USING: help kernel words ;
+
+IN: help
+
+: $defining-note
+    drop
+    "Calling this word directly is not necessary in most cases. High-level defining words call it automatically." print-element ;
+
+HELP: word-props "( word -- props )"
+{ $values { "word" "a word" } { "props" "a hashtable" } }
+{ $description "Outputs a word's property hashtable." } ;
+
+HELP: set-word-props "( props word -- )"
+{ $values { "props" "a hashtable" } { "word" "a word" } }
+{ $description "Sets a word's property hashtable." }
+{ $notes "The given hashtable must not be a literal, since it will get mutated by future calls to " { $link set-word-prop } "." } ;
+
+HELP: word-primitive "( word -- n )"
+{ $values { "word" "a word" } { "n" "a non-negative integer" } }
+{ $description "Outputs a word's primitive number." } ;
+
+HELP: set-word-primitive "( n word -- )"
+{ $values { "n" "a non-negative integer" } { "word" "a word" } }
+{ $description "Sets a word's primitive number." }
+{ $notes "Changing the primitive number does not update the execution token, and the word will still call its old definition until a subsequent call to " { $link update-xt } "." } ;
+
+HELP: word-def "( word -- obj )"
+{ $values { "word" "a word" } { "obj" "an object" } }
+{ $description "Outputs a word's primitive parameter. This parameter is only used if the primitive number is 1 (compound definitions) or 2 (symbols)." } ;
+
+HELP: set-word-def "( obj word -- )"
+{ $values { "obj" "an object" } { "word" "a word" } }
+{ $description "Sets a word's primitive parameter." }
+$defining-note ;
+
+HELP: init-word "( word -- )"
+{ $values { "word" "a word" } }
+{ $description "Initializes a word output from the " { $link <word> } " primitive." } ;
+
+HELP: word-prop "( word name -- value )"
+{ $values { "word" "a word" } { "name" "a property name" } { "value" "a property value" } }
+{ $description "Retrieves a word property. Word property names are conventionally strings." } ;
+
+HELP: set-word-prop "( word value name -- )"
+{ $values { "word" "a word" } { "value" "a property value" } { "name" "a property name" } }
+{ $description "Stores a word property. Word property names are conventionally strings." } ;
+
+HELP: remove-word-prop "( word name -- )"
+{ $values { "word" "a word" } { "name" "a property name" } }
+{ $description "Removes a word property, so future lookups will output " { $link f } " until it is set again. Word property names are conventionally strings." } ;
+
+HELP: word-xt "( word -- xt )"
+{ $values { "word" "a word" } { "xt" "an execution token integer" } }
+{ $description "Outputs the machine code address of the word's definition." } ;
+
+HELP: set-word-xt "( xt word -- )"
+{ $values { "xt" "an execution token integer" } { "word" "a word" } }
+{ $description "Sets the machine code address of the word's definition." }
+{ $safety "This word is unsafe. Specifying an invalid address can corrupt memory and crash the runtime." }
+{ $notes "This word is used by the compiler." } ;
+
+HELP: word-sort "( seq -- sorted )"
+{ $values { "seq" "a sequence of words" } { "sorted" "a sorted sequence" } }
+{ $description "Sorts a sequence of words by word name." } ;
+
+HELP: uses "( word -- seq )"
+{ $values { "word" "a word" } { "seq" "a sequence of words" } }
+{ $description "Outputs a sequence of words directory called by the given word." }
+{ $notes "The sequence will include the word itself if it is recursive." }
+{ $see-also uses } ;
+
+HELP: crossref f
+{ $description "Variable. A hashtable mapping words to usages, where usages are a set represented by a hashtable with words as keys and dummy sentinels as values." }
+{ $see-also usages recrossref } ;
+
+HELP: add-crossref "( word -- )"
+{ $values { "word" "a word" } }
+{ $description "Adds dependencies from every word called by this word to this word." }
+$defining-note ;
+
+HELP: usage "( word -- seq )"
+{ $values { "word" "a word" } { "seq" "a sequence of words" } }
+{ $description "Outputs a sequence of words that directly call the given word." }
+{ $notes "The sequence will include the word itself if it is recursive." }
+{ $see-also usage } ;
+
+HELP: usages "( word -- seq )"
+{ $values { "word" "a word" } { "seq" "a sequence of words" } }
+{ $description "Outputs a sequence of words that call the given word through some chain of callers." }
+{ $notes "This word computes the transitive closure of the result of " { $link usage } ". The sequence will include the word itself if it is recursive." } ;
+
+HELP: (uncrossref) "( word -- )"
+{ $values { "word" "a word" } }
+{ $contract "Updates the word to cope with a callee being redefined." }
+$defining-note ;
+
+HELP: remove-crossref "( callee caller -- )"
+{ $values { "callee" "a word" } { "caller" "a word" } }
+{ $description "Remove the fact that " { $snippet "caller" } " calls " { $snippet "callee" } " from the cross-referencing database." }
+$defining-note ;
+
+HELP: define "( word def primitive -- )"
+{ $values { "word" "a word" } { "def" "an object" } { "primitive" "a non-negative integer" } }
+{ $description "Defines a word and updates cross-referencing." }
+$defining-note
+{ $see-also define-symbol define-compound } ;
+
+HELP: define-symbol "( word -- )"
+{ $values { "word" "a word" } }
+{ $description "Defines the word to push itself on the stack when executed." } ;
+
+HELP: define-compound "( word def -- )"
+{ $values { "word" "a word" } { "def" "a quotation" } }
+{ $description "Defines the word to call a quotation when executed." } ;
+
+HELP: reset-word "( word -- )"
+{ $values { "word" "a word" } }
+{ $description "Reset word declarations." }
+$defining-note ;
+
+HELP: reset-generic "( word -- )"
+{ $values { "word" "a word" } }
+{ $description "Reset word declarations and generic word properties." }
+$defining-note ;
+
+HELP: gensym "( -- word )"
+{ $values { "word" "a word" } }
+{ $description "Creates an uninterned word that is not equal to any other word in the system. Gensyms have an automatically-generated name based on a prefix and an incrementing counter." }
+{ $examples { $example "gensym ." "G:260561" } }
+{ $notes "Gensyms are often used as placeholder values that have no meaning of their own but must be unique. For example, the compiler uses gensyms to label sections of assembly code." } ;
+
+HELP: definer "( word -- definer )"
+{ $values { "word" "a word" } { "definer" "a word" } }
+{ $description "Outputs the parsing word that defines the given word." }
+{ $examples
+    { $example ": foo ; \ foo definer ." "POSTPONE: :" }
+    { $example "SYMBOL: foo \ foo definer ." "POSTPONE: SYMBOL:" }
+} ;

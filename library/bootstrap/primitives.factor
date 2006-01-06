@@ -35,7 +35,7 @@ vocabularies get [ "syntax" set [ reveal ] each ] bind
 call
 
 : make-primitive ( { vocab word } n -- )
-    >r first2 create r> f define ;
+    >r first2 create f r> define ;
 
 {
     { "execute" "words"                     }

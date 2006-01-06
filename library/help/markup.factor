@@ -1,7 +1,7 @@
-! Copyright (C) 2005 Slava Pestov.
+! Copyright (C) 2005, 2006 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: help
-USING: arrays gadgets gadgets-panes gadgets-presentations
+USING: arrays
 generic hashtables inspector io kernel lists namespaces parser
 prettyprint sequences strings styles vectors words ;
 
@@ -89,11 +89,6 @@ M: simple-element print-element [ print-element ] each ;
     dup parsing? [ $syntax ] [ $stack-effect ] if
     terpri* ;
 
-: $values ( content -- )
-    "Arguments and values" $subheading [
-        unswons* $emphasis " -- " format* print-element terpri*
-    ] each ;
-
 : $description ( content -- )
     "Description" $subheading print-element ;
 
@@ -102,6 +97,13 @@ M: simple-element print-element [ print-element ] each ;
 
 : $examples ( content -- )
     "Examples" $subheading print-element ;
+
+: $warning ( content -- )
+    terpri*
+    current-style warning-style hash-union [
+        "Warning" $subheading print-element
+    ] with-nesting
+    terpri* ;
 
 : textual-list ( seq quot -- )
     [ "," format* bl ] interleave ; inline
@@ -141,6 +143,8 @@ TUPLE: link name ;
 
 M: link article-title link-name article-title ;
 
+M: link article-name link-name article-name ;
+
 M: link article-content link-name article-content ;
 
 M: link summary ( term -- string )
@@ -148,23 +152,19 @@ M: link summary ( term -- string )
 
 DEFER: help
 
-: ($link) ( element quot -- )
-    over length 1 = [
-        >r first dup article-title swap r> call
-    ] [
-        >r first2 r> swapd call
-    ] if ;
-
 : $subsection ( object -- )
     terpri*
     subsection-style [
-        [ <link> ] ($link) dup [ link-name (help) ] curry
+        first dup article-title swap <link>
+        dup [ link-name (help) ] curry
         simple-outliner
     ] with-style ;
 
-: $link ( article -- ) [ <link> ] ($link) simple-object ;
+: $link ( article -- )
+    first dup article-name swap <link> simple-object ;
 
-: $glossary ( element -- ) [ <term> ] ($link) simple-object ;
+: $glossary ( element -- )
+    first dup <term> simple-object ;
 
 : $definition ( content -- )
     "Definition" $subheading $see ;
@@ -172,11 +172,17 @@ DEFER: help
 : $see-also ( content -- )
     "See also" $subheading [ 1array $link ] textual-list ;
 
-: $predicate ( content -- )
-    { { "object" "an object" } } $values
+: $values ( content -- )
+    "Arguments and values" $subheading [
+        unswons* $snippet " -- " format* print-element
+    ] [
+        terpri
+    ] interleave ;
+
+: $predicate ( content -- :r)
+    { { "object" object } } $values
     "Tests if the top of the stack is " $description
-    dup first word-name a/an print-element $link
-    "." print-element ;
+    dup word-name a/an print-element $link "." print-element ;
 
 : $list ( content -- )
     terpri* [ "- " format* print-element terpri* ] each ;

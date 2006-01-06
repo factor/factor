@@ -7,6 +7,8 @@ strings styles words ;
 ! Markup
 GENERIC: print-element
 
+GENERIC: article-name
+
 ! Help articles
 SYMBOL: articles
 
@@ -19,11 +21,15 @@ TUPLE: article title content ;
 
 M: string article-title article article-title ;
 
+M: string article-name article article-name ;
+
 M: string article-content article article-content ;
 
-! Special case: f help
-M: f article-title drop \ f word-name ;
+M: article article-name article-title ;
 
+! Special case: f help
+M: f article-title drop \ f article-title ;
+M: f article-name drop \ f article-name ;
 M: f article-content drop \ f article-content ;
 
 ! Glossary of terms
@@ -32,6 +38,8 @@ SYMBOL: terms
 TUPLE: term entry ;
 
 M: term article-title term-entry ;
+
+M: term article-name term-entry ;
 
 M: term article-content
     term-entry terms get hash

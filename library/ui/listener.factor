@@ -1,14 +1,12 @@
 ! Copyright (C) 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
-IN: help
-DEFER: <link>
-
 IN: gadgets-listener
 USING: arrays compiler gadgets gadgets-editors gadgets-labels
 gadgets-layouts gadgets-panes gadgets-scrolling
 gadgets-splitters gadgets-theme generic hashtables
 inference inspector io jedit kernel listener lists math
-namespaces parser prettyprint sequences shells threads words ;
+namespaces parser prettyprint sequences shells threads words
+help ;
 
 SYMBOL: stack-bar
 SYMBOL: browser-pane
@@ -45,7 +43,7 @@ SYMBOL: browser-pane
     word-completion ;
 
 : tutorial-button
-    "Factor tutorial" "tutorial" <link> simple-object terpri ;
+    { "tutorial" } $link terpri ;
 
 : listener-thread
     pane get [

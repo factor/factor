@@ -11,7 +11,7 @@ USING: styles ;
 : emphasis-style
     H{ { font-style italic } } ;
 
-: heading-style H{ { font "Serif" } { font-size 18 } } ;
+: heading-style H{ { font "Serif" } { font-size 16 } } ;
 
 : subheading-style H{ { font "Serif" } { font-style bold } } ;
 
@@ -39,4 +39,11 @@ USING: styles ;
     H{
         { font "Monospaced" }
         { foreground { 0.0 0.0 1.0 1.0 } }
+    } ;
+
+: warning-style
+    H{
+        { page-color { 0.95 0.95 0.95 1 } }
+        { border-color { 1 0 0 1 } }
+        { border-width 5 }
     } ;

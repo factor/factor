@@ -1,4 +1,4 @@
-! Copyright (C) 2005 Slava Pestov.
+! Copyright (C) 2005, 2006 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: styles
 
@@ -42,3 +42,6 @@ SYMBOL: page-color
 SYMBOL: border-color
 SYMBOL: border-width
 SYMBOL: wrap-margin
+
+! Input history
+TUPLE: input string ;

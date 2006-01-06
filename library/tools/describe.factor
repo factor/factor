@@ -26,11 +26,13 @@ GENERIC: sheet ( obj -- sheet )
 M: object summary
     "an instance of the " swap class word-name " class" append3 ;
 
-M: object sheet ( obj -- sheet )
+: slot-sheet ( obj -- sheet )
     dup class "slots" word-prop
     dup [ second ] map -rot
     [ first slot ] map-with
     2array ;
+
+M: object sheet ( obj -- sheet ) slot-sheet ;
 
 M: sequence summary
     dup length 1 = [

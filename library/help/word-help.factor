@@ -1,8 +1,9 @@
 IN: help
-USING: arrays kernel namespaces words ;
+USING: arrays kernel namespaces prettyprint sequences words ;
 
-! Word help
-M: word article-title word-name ;
+M: word article-title "The " swap word-name " word" append3 ;
+
+M: word article-name word-name ;
 
 : word-help ( word -- )
     dup "help" word-prop [

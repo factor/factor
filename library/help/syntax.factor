@@ -2,7 +2,7 @@ IN: !syntax
 USING: arrays help kernel parser sequences syntax words ;
 
 : HELP:
-    scan-word dup [
+    scan-word bootstrap-word dup [
         >array uncons* >r "stack-effect" set-word-prop r>
         "help" set-word-prop
     ] [ ] ; parsing

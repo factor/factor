@@ -2,7 +2,7 @@ IN: gadgets-presentations
 USING: compiler gadgets gadgets-buttons gadgets-listener
 gadgets-menus gadgets-panes generic hashtables inference
 inspector io jedit kernel lists namespaces parser prettyprint
-sequences words ;
+sequences words styles ;
 
 SYMBOL: commands
 
