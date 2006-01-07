@@ -27,7 +27,7 @@ USING: styles ;
 : code-style
     H{
         { font "Monospaced" }
-        { page-color { 0.9 0.9 0.9 0.5 } }
+        { page-color { 0.9 0.9 1 0.5 } }
         { border-width 5 }
         { wrap-margin f }
     } ;

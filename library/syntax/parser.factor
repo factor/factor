@@ -30,9 +30,9 @@ SYMBOL: column
 
 TUPLE: parse-error file line col text ;
 
-: parse-error ( msg -- )
+C: parse-error ( error -- error )
     file get line-number get column get line-text get
-    <parse-error> [ set-delegate ] keep throw ;
+    <parse-error> [ set-delegate ] keep ;
 
 : skip ( i seq quot -- n | quot: elt -- ? )
     over >r find* drop dup -1 =

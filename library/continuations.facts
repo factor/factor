@@ -21,18 +21,18 @@ HELP: >continuation< "( continuation -- data call name catch )"
 { $description "Takes a continuation apart into its four constituents." } ;
 
 HELP: ifcc "( terminator balance -- )"
-{ $values { "terminator" "a quotation with stack effect " { $snippet "( continuation -- )" } { "balance" "a quotation" } }
-{ $description "Reifies a continuation and passes it to " { $snippet "terminator" } ". When the continuation is restored, execution resumes; " { $snippet "terminator" } " is still on the stack and "{ $snippet "balance" } " is called." }
+{ $values { "terminator" "a quotation with stack effect " { $snippet "( continuation -- )" } } { "balance" "a quotation" } }
+{ $description "Reifies a continuation from the point immediately after which the caller returns, and passes it to " { $snippet "terminator" } ". When the continuation is restored, execution resumes; " { $snippet "terminator" } " is still on the stack and "{ $snippet "balance" } " is called." }
 { $see-also callcc0 callcc1 } ;
 
 HELP: callcc0 "( quot -- )"
 { $values { "quot" "a quotation with stack effect " { $snippet "( continuation -- )" } } }
-{ $description "Applies the quotation to the current continuation. The " { $link continue } " word resumes the continuation." }
+{ $description "Applies the quotation to the current continuation, which is reified from the point immediately after which the caller returns. The " { $link continue } " word resumes the continuation." }
 { $see-also ifcc callcc1 continue } ;
 
 HELP: callcc1 "( quot -- obj )"
 { $values { "quot" "a quotation with stack effect " { $snippet "( continuation -- )" } } { "obj" "an object provided when resuming the continuation" } }
-{ $description "Applies the quotation to the current continuation. The " { $link continue-with } " word resumes the continuation, passing a value back to the original execution context." }
+{ $description "Applies the quotation to the current continuation, which is reified from the point immediately after which the caller returns. The " { $link continue-with } " word resumes the continuation, passing a value back to the original execution context." }
 { $see-also ifcc callcc0 continue-with } ;
 
 HELP: continue "( continuation -- )"

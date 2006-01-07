@@ -108,29 +108,10 @@ M: simple-element print-element [ print-element ] each ;
 : textual-list ( seq quot -- )
     [ "," format* bl ] interleave ; inline
 
-: $see-methods
-    "Methods defined in the generic word:" format* terpri
-    [ order word-sort ] keep
-    [ "methods" word-prop hash . ] curry
-    sequence-outliner ;
-
-: $see-implementors
-    "Generic words defined for this class:" format* terpri
-    [ implementors word-sort ] keep
-    [ swap "methods" word-prop hash . ] curry
-    sequence-outliner ;
-
-: ($see)
-    terpri*
-    code-style [ with-nesting* ] with-style
-    terpri* ;
-
 : $see ( content -- )
-    first {
-        { [ dup class? ] [ $see-implementors ] }
-        { [ dup generic? ] [ $see-methods ] }
-        { [ t ] [ [ see ] ($see) ] }
-    } cond ;
+    terpri*
+    code-style [ [ first see ] with-nesting* ] with-style
+    terpri* ;
 
 : $example ( content -- )
     first2 swap dup <input>

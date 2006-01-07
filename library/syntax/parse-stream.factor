@@ -7,7 +7,7 @@ words ;
 : file-vocabs ( -- )
     "scratchpad" set-in { "syntax" "scratchpad" } set-use ;
 
-: with-parser ( quot -- ) [ parse-error ] recover ;
+: with-parser ( quot -- ) [ <parse-error> rethrow ] recover ;
 
 : parse-lines ( lines -- quot )
     [
