@@ -224,39 +224,7 @@ call
     { "<string>" "strings"                  }
 } dup length 3 swap [ + ] map-with [ make-primitive ] 2each
 
-: set-stack-effect ( { vocab word effect } -- )
-    first3 >r lookup r> "stack-effect" set-word-prop ;
-
-{
-    { "drop" "kernel" " x -- " }
-    { "2drop" "kernel" " x y -- " }
-    { "3drop" "kernel" " x y z -- " }
-    { "dup" "kernel"  " x -- x x " }
-    { "2dup" "kernel"  " x y -- x y x y " }
-    { "3dup" "kernel"  " x y z -- x y z x y z " }
-    { "rot" "kernel"  " x y z -- y z x " }
-    { "-rot" "kernel"  " x y z -- z x y " }
-    { "dupd" "kernel"  " x y -- x x y " }
-    { "swapd" "kernel"  " x y z -- y x z " }
-    { "nip" "kernel"  " x y -- y " }
-    { "2nip" "kernel"  " x y z -- z " }
-    { "tuck" "kernel"  " x y -- y x y " }
-    { "over" "kernel" " x y -- x y x " }
-    { "pick" "kernel" " x y z -- x y z x " }
-    { "swap" "kernel" " x y -- y x " }
-    { ">r" "kernel"   " x -- r: x " }
-    { "r>" "kernel"   " r: x -- x " }
-    { "datastack" "kernel" " -- ds " }
-    { "callstack" "kernel" " -- cs " }
-    { "set-datastack" "kernel" " ds -- " }
-    { "set-callstack" "kernel" " cs -- " }
-    { "flush-icache" "assembler" " -- " }
-} [
-    set-stack-effect
-] each
-
 FORGET: make-primitive
-FORGET: set-stack-effect
 
 ! Okay, now we have primitives fleshed out. Bring up the generic
 ! word system.

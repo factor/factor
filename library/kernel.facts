@@ -1,0 +1,220 @@
+USING: help kernel kernel-internals ;
+
+HELP: eq? "( obj1 obj2 -- ? )"
+{ $values { "obj1" "an object" } { "obj2" "an object" } }
+{ $description "Tests if two references point at the same object." } ;
+
+HELP: drop  "( x -- )"                 $shuffle ;
+HELP: 2drop "( x y -- )"               $shuffle ;
+HELP: 3drop "( x y z -- )"             $shuffle ;
+HELP: dup   "( x -- x x )"             $shuffle ;
+HELP: 2dup  "( x y -- x y x y )"       $shuffle ;
+HELP: 3dup  "( x y z -- x y z x y z )" $shuffle ;
+HELP: rot   "( x y z -- y z x )"       $shuffle ;
+HELP: -rot  "( x y z -- z x y )"       $shuffle ;
+HELP: dupd  "( x y -- x x y )"         $shuffle ;
+HELP: swapd "( x y z -- y x z )"       $shuffle ;
+HELP: nip   "( x y -- y )"             $shuffle ;
+HELP: 2nip  "( x y z -- z )"           $shuffle ;
+HELP: tuck  "( x y -- y x y )"         $shuffle ;
+HELP: over  "( x y -- x y x )"         $shuffle ;
+HELP: pick  "( x y z -- x y z x )"     $shuffle ;
+HELP: swap  "( x y -- y x )"           $shuffle ;
+HELP: 2swap "( x y z t -- z t x y )"   $shuffle ;
+
+HELP: >r "( x -- r: x )" $shuffle ;
+HELP: r> "( r: x -- x )" $shuffle ;
+
+HELP: datastack "( -- ds )"
+{ $values { "ds" "a vector" } }
+{ $description "Outputs the a vector containing a copy of the datastack contents right before the call to this word, with the top of the stack at the end of the vector." } ;
+
+HELP: set-datastack "( ds -- )"
+{ $values { "ds" "a vector" } }
+{ $description "Replaces the datastack contents with a copy of a vector. The end of the vector becomes the top of the stack." } ;
+
+HELP: callstack "( -- cs )"
+{ $values { "cs" "a vector" } }
+{ $description "Outputs the a vector containing a copy of the callstack contents right before the call to this word, with the top of the stack at the end of the vector. The call frame of the caller word is " { $emphasis "not" } " included." } ;
+
+HELP: set-callstack "( cs -- )"
+{ $values { "cs" "a vector" } }
+{ $description "Replaces the callstack contents with a copy of a vector. The end of the vector becomes the top of the stack. The current quotation continues executing. The new callstack takes effect when the current quotation returns, resulting in a callframe being popped." } ;
+
+HELP: clear "( -- )"
+{ $description "Clears the datastack." } ;
+
+HELP: hashcode "( obj -- n )"
+{ $values { "obj" "an object" } { "n" "a fixnum" } }
+{ $contract "Outputs the hashcode of the object. The hashcode operation must satisfy the following properties:"
+{ $list
+    "the hashcode must be a fixnum. Returning a bignum will not cause any problems other than potential performance degradation. Returning other types will result in type errors."
+    { "if two objects are equal under " { $link = } ", they must have equal hashcodes" }
+    "the hashcode is only permitted to change if the object is mutated in some way"
+    { "the word must satisfy the " { $link POSTPONE: flushable } " contract" }
+}
+"If mutable objects are used as hashtable keys, they must not be mutated in such a way that their hashcode changes. Doing so will violate bucket sorting invariants and result in undefined behavior." } ;
+
+HELP: = "( obj1 obj2 -- ? )"
+{ $values { "obj1" "an object" } { "obj2" "an object" } }
+{ $contract
+    "Tests if two objects are equal. If two objects are equal, they should the same printed representation, although the converse is not always true."
+    $terpri
+    "Two objects being " { $link = } " is an equivalence relation, which means,"
+    { $list
+        { $snippet "a = a" }
+        { { $snippet "a = b" } " implies " { $snippet "b = a" } }
+        { { $snippet "a = b" } " and " { $snippet "b = c" } " implies " { $snippet "a = c" } }
+    }
+    "The precise contract is as follows:"
+    { $list
+        { "methods must satisfy the " { $link POSTPONE: flushable } " contract" }
+        { "if no more specific method is defined, " { $link = } "  calls " { $link eq? } }
+        { "two numbers are equal if they have the same numerical value after being upgraded to the highest type of the two (see " { $link "number-protocol" } ")" }
+        "two sequences are equal if they have the same type and elements"
+        "two tuples are equal if their classes and slot values are equal"
+    }
+} ;
+
+HELP: clone "( obj -- cloned )"
+{ $values { "obj" "an object" } { "cloned" "a new object" } }
+{ $contract "Outputs a new object equal to the given object. This is not guaranteed to actually copy the object; it does nothing with immutable objects, and does not copy words either. However, sequences and tuples can be cloned to obtain a shallow copy of the original."
+$terpri
+"Methods must satisfy the " { $link POSTPONE: flushable } " contract." } ;
+
+HELP: set-boot "( quot -- )"
+{ $values { "quot" "a quotation" } }
+{ $description "Sets the initial quotation called by the runtime as the last stage of startup. The image must be saved for changes to the boot quotation to take effect. Usually the boot quotation should not be changed." } ;
+
+HELP: num-types "( -- n )"
+{ $values { "n" "a postiive integer" } }
+{ $description "Outputs one more than the maximum value from the " { $link type } " primitive." } ;
+
+HELP: ? "( cond true false -- true/false )"
+{ $values { "cond" "a generalized boolean" } { "true" "an object" } { "false" "an object" } { "true/false" "one two input objects" } }
+{ $description "Chooses between two values depending on the boolean value of " { $snippet "cond" } "." } ;
+
+HELP: >boolean "( obj -- ? )"
+{ $values { "obj" "a generalized boolean" } { "?" "a boolean" } }
+{ $description "Convert a generalized boolean into a boolean. That is, " { $link f } " retains its value, whereas anything else becomes " { $link t } "." } ;
+
+HELP: not "( obj -- ? )"
+{ $values { "obj" "a generalized boolean" } { "?" "a boolean" } }
+{ $description "For " { $link f } " outputs " { $link t } " and for anything else outputs " { $link f } "." } ;
+
+HELP: and "( obj1 obj2 -- ? )"
+{ $values { "obj1" "a generalized boolean" } { "obj2" "a generalized boolean" } { "obj" "a generalized boolean" } }
+{ $description "Tests if neither object is " { $link f } "." } ;
+
+HELP: or "( obj1 obj2 -- ? )"
+{ $values { "obj1" "a generalized boolean" } { "obj2" "a generalized boolean" } { "obj" "a generalized boolean" } }
+{ $description "Tests if at least one object is not " { $link f } "." } ;
+
+HELP: cpu "( -- cpu )"
+{ $values { "cpu" "a string" } }
+{ $description
+    "Outputs a string descriptor of the current CPU architecture. Currently, this set of descriptors is:"
+    { $code "amd64" "ppc" "x86" }
+} ;
+
+HELP: os "( -- os )"
+{ $values { "os" "a string" } }
+{ $description
+    "Outputs a string descriptor of the current operating system family. Currently, this set of descriptors is:"
+    { $code "freebsd" "linux" "macosx" "win32" "unix" }
+} ;
+
+HELP: slip "( quot x -- x )"
+{ $values { "quot" "a quotation" } { "x" "an object" } }
+{ $description "Calls a quotation while hiding the top of the stack." } ;
+
+HELP: 2slip "( quot x y -- x y )"
+{ $values { "quot" "a quotation" } { "x" "an object" } { "y" "an object" } }
+{ $description "Calls a quotation while hiding the top two stack elements." } ;
+
+HELP: keep "( x quot -- x )"
+{ $values { "quot" "a quotation with stack effect " { $snippet "( x -- )" } } { "x" "an object" } }
+{ $description "Call a quotation with a value on the stack, restoring the value when the quotation returns." } ;
+
+HELP: 2keep "( x y quot -- x y )"
+{ $values { "quot" "a quotation with stack effect " { $snippet "( x y -- )" } } { "x" "an object" } { "y" "an object" } }
+{ $description "Call a quotation with two values on the stack, restoring the values when the quotation returns." } ;
+
+HELP: 3keep "( x y z quot -- x y z )"
+{ $values { "quot" "a quotation with stack effect " { $snippet "( x y -- )" } } { "x" "an object" } { "y" "an object" } { "z" "an object" } }
+{ $description "Call a quotation with three values on the stack, restoring the values when the quotation returns." } ;
+
+HELP: 2apply "( x y quot -- )"
+{ $values { "quot" "a quotation with stack effect " { $snippet "( obj -- )" } } { "x" "an object" } { "y" "an object" } }
+{ $description "Applies the quotation to " { $snippet "x" } ", then to " { $snippet "y" } "." } ;
+
+HELP: if "( cond true false -- )"
+{ $values { "cond" "a generalized boolean" } { "true" "a quotation" } { "false" "a quotation" } }
+{ $description "If " { $snippet "cond" } " is " { $link f } ", calls the " { $snippet "false" } " quotation. Otherwise calls the " { $snippet "true" } " quotation."
+$terpri
+"The " { $snippet "cond" } " value is removed from the stack before either quotation is called." } ;
+
+HELP: when "( cond true false -- )"
+{ $values { "cond" "a generalized boolean" } { "true" "a quotation" } }
+{ $description "If " { $snippet "cond" } " is not " { $link f } ", calls the " { $snippet "true" } " quotation."
+$terpri
+"The " { $snippet "cond" } " value is removed from the stack before the quotation is called." } ;
+
+HELP: unless "( cond true false -- )"
+{ $values { "cond" "a generalized boolean" } { "false" "a quotation" } }
+{ $description "If " { $snippet "cond" } " is " { $link f } ", calls the " { $snippet "false" } " quotation."
+$terpri
+"The " { $snippet "cond" } " value is removed from the stack before the quotation is called." } ;
+
+HELP: if* "( cond true false -- )"
+{ $values { "cond" "a generalized boolean" } { "true" "a quotation with stack effect " { $snippet "( cond -- )" } } { "false" "a quotation" } }
+{ $description "Alternative conditional form that preserves the " { $snippet "cond" } " value if it is true."
+$terpri
+"If the condition is true, it is retained on the stack before the " { $snippet "true" } " quotation is called. Otherwise, the condition is removed from the stack and the " { $snippet "false" } " quotation is called."
+$terpri
+"The following two lines are equivalent:"
+{ $code "X [ Y ] [ Z ] if*" "X dup [ Y ] [ drop Z ] if" } } ;
+
+HELP: when* "( cond true false -- )"
+{ $values { "cond" "a generalized boolean" } { "true" "a quotation with stack effect " { $snippet "( cond -- )" } } }
+{ $description "Variant of " { $link if* } " with no false quotation."
+$terpri
+"The following two lines are equivalent:"
+{ $code "X [ Y ] when*" "X dup [ Y ] [ drop ] if" } } ;
+
+HELP: unless* "( cond true false -- )"
+{ $values { "cond" "a generalized boolean" } { "false" "a quotation " } }
+{ $description "Variant of " { $link if* } " with no true quotation."
+$terpri
+"The following two lines are equivalent:"
+{ $code "X [ Y ] unless*" "X dup [ ] [ drop Y ] if" } } ;
+
+HELP: ?if "( default cond true false -- )"
+{ $values { "cond" "a generalized boolean" } { "true" "a quotation with stack effect " { $snippet "( cond -- )" } } { "false" "a quotation with stack effect " { $snippet "( default -- )" } } }
+{ $description "If the condition is " { $link f } ", the " { $snippet "false" } " quotation is called with the " { $snippet "default" } " value on the stack. Otherwise, the " { $snippet "true" } " quotation is called with the condition on the stack."
+$terpri
+"The following two lines are equivalent:"
+{ $code "X [ Y ] [ Z ] ?if" "X dup [ nip Y ] [ drop Z ] if" } } ;
+
+HELP: keep-datastack "( quot -- )"
+{ $values { "quot" "a quotation" } }
+{ $description "Calls a quotation, saving the datastack before calling it and restoring it after it returns." } ;
+
+HELP: literalize "( obj -- wrapper )"
+{ $values { "obj" "an object" } { "wrapper" "a wrapper or the original object" } }
+{ $description "Turns non-self-evaluating objects (words and wrappers) into wrappers that push those objects, and is a no-op on everything else." } ;
+
+HELP: array-capacity "( array -- n )"
+{ $values { "array" "an array" } { "n" "a non-negative fixnum" } }
+{ $description "Low-level array length accessor." }
+{ $safety "This word is in the " { $snippet "kernel-internals" } " vocabulary because it is unsafe. It does not check types, so improper use can corrupt memory." } ;
+
+HELP: array-nth "( n array -- elt )"
+{ $values { "n" "a non-negative fixnum" } { "array" "an array" }  { "elt" "an object" } }
+{ $description "Low-level array element accessor." }
+{ $safety "This word is in the " { $snippet "kernel-internals" } " vocabulary because it is unsafe. It does not check types or array bounds, and improper use can corrupt memory." } ;
+
+HELP: set-array-nth "( elt n array --)"
+{ $values { "elt" "an object" } { "n" "a non-negative fixnum" } { "array" "an array" }  }
+{ $description "Low-level array element mutator." }
+{ $safety "This word is in the " { $snippet "kernel-internals" } " vocabulary because it is unsafe. It does not check types or array bounds, and improper use can corrupt memory." } ;

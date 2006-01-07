@@ -115,7 +115,7 @@ HELP: SYMBOL: "word"
 HELP: \ "word"
 { $values { "word" "a word" } }
 { $description "Reads the next word from the input and appends a wrapper holding the word to the parse tree. When the evaluator encounters a wrapper, it pushes the wrapped word literally on the data stack." }
-{ $examples { $example "\\ + ." "+" } } ;
+{ $examples "The following two lines are equivalent:" { $code "0 \\ <vector> execute\n<vector>" } } ;
 
 HELP: DEFER: "word"
 { $values { "word" "a new word to define" } }

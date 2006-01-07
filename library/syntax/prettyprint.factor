@@ -156,9 +156,18 @@ M: block pprint-section* ( block -- )
 
 GENERIC: pprint* ( obj -- )
 
+: word-style ( word -- style )
+    [
+        dup presented set
+        parsing? [
+            bold font-style
+        ] [
+            { 0 0 0.3 1 } foreground
+        ] if set
+    ] make-hash ;
+
 : pprint-word ( obj -- )
-    dup word-name [ "( unnamed )" ] unless*
-    swap presented associate text ;
+    dup word-name [ "( ? )" ] unless* swap word-style text ;
 
 M: object pprint* ( obj -- )
     "( unprintable object: " swap class word-name " )" append3

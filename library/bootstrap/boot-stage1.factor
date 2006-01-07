@@ -197,6 +197,7 @@ vectors words ;
 
         "/library/help/commands.factor"
 
+        "/library/kernel.facts"
         "/library/vocabularies.facts"
         "/library/words.facts"
         "/library/collections/growable.facts"
@@ -222,6 +223,7 @@ vectors words ;
         "/library/syntax/see.facts"
 
         "/doc/handbook/collections.facts"
+        "/doc/handbook/parser.facts"
         "/doc/handbook/sequences.facts"
         "/doc/handbook/syntax.facts"
         "/doc/handbook/tutorial.facts"

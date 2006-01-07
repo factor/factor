@@ -199,3 +199,7 @@ DEFER: help
 
 : $notes ( content -- )
     "Notes" $subheading print-element ;
+
+: $shuffle ( content -- )
+    drop
+    "Shuffle word. Re-arranges the stack according to the stack effect pattern." $description ;
