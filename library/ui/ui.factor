@@ -22,16 +22,17 @@ global [ first-time on ] bind
     ] bind ;
 
 : check-running
-    world get world-running?
-    [ "The UI is already running" throw ] when ;
+    world get [
+        world-running?
+        [ "The UI is already running" throw ] when
+    ] when* ;
 
 IN: shells
 
 : ui ( -- )
     #! Start the Factor graphics subsystem with the given screen
     #! dimensions.
-    [
-        init-world check-running
-        world get rect-dim first2
+    check-running [
+        init-world world get rect-dim first2
         [ listener-application run-world ] with-gl-screen
     ] with-freetype ;

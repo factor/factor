@@ -9,7 +9,7 @@ namespaces queues sequences vectors ;
 
 : run-queue ( -- queue ) \ run-queue global hash ;
 
-: schedule-thread ( quot -- ) run-queue enque ;
+: schedule-thread ( continuation -- ) run-queue enque ;
 
 : sleep-queue ( -- vec ) \ sleep-queue global hash ;
 
@@ -21,11 +21,11 @@ namespaces queues sequences vectors ;
 
 DEFER: next-thread
 
-: do-sleep ( -- quot )
+: do-sleep ( -- continuation )
     sleep-queue* dup sleep-time dup 0 =
     [ drop pop cdr ] [ nip io-multiplex next-thread ] if ;
 
-: next-thread ( -- quot )
+: next-thread ( -- continuation )
     run-queue dup queue-empty? [ drop do-sleep ] [ deque ] if ;
 
 : stop ( -- ) next-thread continue ;
@@ -33,8 +33,7 @@ DEFER: next-thread
 : yield ( -- ) [ schedule-thread stop ] callcc0 ;
 
 : sleep ( ms -- )
-    millis +
-    [ cons sleep-queue push stop ] callcc0 drop ;
+    millis + [ cons sleep-queue push stop ] callcc0 drop ;
 
 : in-thread ( quot -- )
     [
