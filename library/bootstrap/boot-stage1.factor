@@ -97,6 +97,13 @@ vectors words ;
         "/library/tools/annotations.factor"
         "/library/tools/inspector.factor"
         
+        "/library/help/database.factor"
+        "/library/help/stylesheet.factor"
+        "/library/help/help.factor"
+        "/library/help/markup.factor"
+        "/library/help/word-help.factor"
+        "/library/help/syntax.factor"
+        
         "/library/test/test.factor"
 
         "/library/threads.factor"
@@ -142,13 +149,6 @@ vectors words ;
         "/library/cli.factor"
         
         "/library/bootstrap/init.factor"
-        
-        "/library/help/database.factor"
-        "/library/help/stylesheet.factor"
-        "/library/help/help.factor"
-        "/library/help/markup.factor"
-        "/library/help/word-help.factor"
-        "/library/help/syntax.factor"
         
         ! This must be the last file of parsing words loaded
         "/library/syntax/parse-syntax.factor"
@@ -197,6 +197,7 @@ vectors words ;
 
         "/library/help/commands.factor"
 
+        "/library/continuations.facts"
         "/library/kernel.facts"
         "/library/vocabularies.facts"
         "/library/words.facts"

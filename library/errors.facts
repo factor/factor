@@ -1,0 +1,7 @@
+USING: errors help ;
+
+HELP: throw "( error -- )"
+{ $values { "error" "an object" } }
+{ $description "Throws an error. Execution does not continue at the point after the " { $link throw } " call. Rather, the innermost catch block is invoked, and execution continues at that point." } ;
+
+

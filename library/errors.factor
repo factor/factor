@@ -3,8 +3,6 @@
 IN: errors
 USING: kernel kernel-internals lists sequences ;
 
-! This is a very lightweight exception handling system.
-
 TUPLE: no-method object generic ;
 
 : no-method ( object generic -- ) <no-method> throw ;

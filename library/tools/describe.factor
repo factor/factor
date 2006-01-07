@@ -1,7 +1,7 @@
 ! Copyright (C) 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: inspector
-USING: arrays generic hashtables io kernel kernel-internals
+USING: arrays generic hashtables help io kernel kernel-internals
 lists math prettyprint sequences strings vectors words ;
 
 GENERIC: summary ( object -- string )
@@ -83,16 +83,13 @@ DEFER: describe
 
 : describe ( object -- ) dup summary print sheet sheet. ;
 
-: word. ( word -- )
-    dup word-name swap dup [ see ] curry simple-outliner ;
-
 : sequence-outliner ( seq quot -- | quot: obj -- )
     swap [
         [ unparse-short ] keep rot dupd curry simple-outliner
     ] each-with ;
 
 : words. ( vocab -- )
-    words word-sort [ see ] sequence-outliner ;
+    words word-sort [ (help) ] sequence-outliner ;
 
 : vocabs. ( -- )
     #! Outlining word browser.

@@ -179,10 +179,10 @@ DEFER: help
         terpri
     ] interleave ;
 
-: $predicate ( content -- :r)
-    { { "object" object } } $values
+: $predicate ( content -- )
+    { { "object" "an object" } } $values
     "Tests if the top of the stack is " $description
-    dup word-name a/an print-element $link "." print-element ;
+    dup first word-name a/an format* $link "." format* ;
 
 : $list ( content -- )
     terpri* [ "- " format* print-element terpri* ] each ;
