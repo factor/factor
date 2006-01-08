@@ -124,6 +124,14 @@ HELP: os "( -- os )"
     { $code "freebsd" "linux" "macosx" "win32" "unix" }
 } ;
 
+HELP: call "( quot -- )"
+{ $values { "quot" "a quotation" } }
+{ $description "Push the current callframe on the callstack, and set the callframe to the given quotation. Conceptually, calls the quotation, as if its definition was substituted at the location of the call." }
+{ $examples
+    "The following two lines are equivalent:"
+    { $code "2 [ 2 + 3 * ] call" "2 2 + 3 *" }
+} ;
+
 HELP: slip "( quot x -- x )"
 { $values { "quot" "a quotation" } { "x" "an object" } }
 { $description "Calls a quotation while hiding the top of the stack." } ;

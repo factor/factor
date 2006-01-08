@@ -2,7 +2,7 @@
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: help
 USING: arrays
-generic hashtables inspector io kernel lists namespaces parser
+generic hashtables io kernel lists namespaces parser
 prettyprint sequences strings styles vectors words ;
 
 : uncons* dup first swap 1 swap tail ;
@@ -127,9 +127,6 @@ M: link article-title link-name article-title ;
 M: link article-name link-name article-name ;
 
 M: link article-content link-name article-content ;
-
-M: link summary ( term -- string )
-    "An article named \"" swap article-title "\"" append3 ;
 
 DEFER: help
 

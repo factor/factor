@@ -6,6 +6,13 @@ IN: help
     drop
     "Calling this word directly is not necessary in most cases. High-level defining words call it automatically." print-element ;
 
+HELP: execute "( word -- )"
+{ $values { "word" "a word" } }
+{ $description "Executes a word." }
+{ $examples
+    { $example ": twice dup execute execute ;\n: hello \"Hello\" print ;\n\\ hello twice" "Hello\nHello" }
+} ;
+
 HELP: word-props "( word -- props )"
 { $values { "word" "a word" } { "props" "a hashtable" } }
 { $description "Outputs a word's property hashtable." } ;

@@ -85,6 +85,13 @@ vectors words ;
 
         "/library/tools/interpreter.factor"
         
+        "/library/help/database.factor"
+        "/library/help/stylesheet.factor"
+        "/library/help/help.factor"
+        "/library/help/markup.factor"
+        "/library/help/word-help.factor"
+        "/library/help/syntax.factor"
+        
         "/library/tools/describe.factor"
         "/library/tools/debugger.factor"
 
@@ -96,13 +103,6 @@ vectors words ;
 
         "/library/tools/annotations.factor"
         "/library/tools/inspector.factor"
-        
-        "/library/help/database.factor"
-        "/library/help/stylesheet.factor"
-        "/library/help/help.factor"
-        "/library/help/markup.factor"
-        "/library/help/word-help.factor"
-        "/library/help/syntax.factor"
         
         "/library/test/test.factor"
 
@@ -198,7 +198,9 @@ vectors words ;
         "/library/help/commands.factor"
 
         "/library/continuations.facts"
+        "/library/errors.facts"
         "/library/kernel.facts"
+        "/library/threads.facts"
         "/library/vocabularies.facts"
         "/library/words.facts"
         "/library/collections/growable.facts"
@@ -224,6 +226,7 @@ vectors words ;
         "/library/syntax/see.facts"
 
         "/doc/handbook/collections.facts"
+        "/doc/handbook/dataflow.facts"
         "/doc/handbook/parser.facts"
         "/doc/handbook/sequences.facts"
         "/doc/handbook/syntax.facts"

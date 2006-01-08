@@ -1,0 +1,189 @@
+USING: errors help kernel lists namespaces threads words ;
+
+GLOSSARY: "stack" "see datastack" ;
+
+GLOSSARY: "datastack" "the primary means of passing values between words" ;
+
+ARTICLE: "dataflow" "Data and control flow"
+{ $subsection "shuffle-words" }
+{ $subsection "quotations" }
+{ $subsection "conditionals" }
+{ $subsection "continuations" } ;
+
+ARTICLE: "shuffle-words" "Shuffle words"
+"Shuffle words rearrange items at the top of the stack. They control the flow of data between words that perform actions."
+$terpri
+"Removing stack elements:"
+{ $subsection drop }
+{ $subsection 2drop }
+{ $subsection 3drop }
+{ $subsection nip }
+{ $subsection 2nip }
+"Duplicating stack elements:"
+{ $subsection dup }
+{ $subsection 2dup }
+{ $subsection 3dup }
+{ $subsection dupd }
+{ $subsection over }
+{ $subsection pick }
+{ $subsection tuck }
+"Permuting stack elements:"
+{ $subsection swap }
+{ $subsection rot }
+{ $subsection -rot }
+{ $subsection 2swap }
+{ $subsection swapd } ;
+
+GLOSSARY: "return stack" "see callstack" ;
+
+GLOSSARY: "callstack" "holds quotations waiting to be called. When a quotation is called with \texttt{call}, or when a compound word is executed, the previous call frame is pushed on the call stack, and the new quotation becomes the current call frame" ;
+
+GLOSSARY: "callframe" "the currently executing quotation" ;
+
+GLOSSARY: "evaluation" "the abstract process by which quotations are executed. There are multiple possible ways to implement an evaluator; namely, interpretation, and compilation" ;
+
+GLOSSARY: "interpreter" "executes quotations by iterating them and recursing into nested definitions. See compiler" ;
+
+GLOSSARY: "quotation" "a list containing Factor code intended for evaluation" ;
+
+GLOSSARY: "combinator" "a word taking quotations or other words as input" ;
+
+ARTICLE: "quotations" "Quotations and combinators"
+"An evaluator executes quotations. Quotations are lists, and since lists can contain any Factor object, they can contain words. It is words that give quotations their operational behavior, as you can see in the following description of the evaluator algorithm."
+{ $list
+    { "If the callframe is " { $link f } ", the callstack is popped and becomes the new call frame." }
+    { "If the " { $link car } " of the callframe is a word, the word is executed:"
+        { $list
+            { "If the word is a symbol, it is pushed on the datastack. See " { $link "symbols" } }
+            { "If the word is a compound definition, the current callframe is pushed on the callstack, and the new callframe becomes the word definition. See " { $link "colon-definition" } }
+            { "If the word is compiled or primitive, the interpreter jumps to a machine code definition. See " { $link "primitives" } }
+            { "If the word is undefined, an error is raised. See " { $link "deferred" } }
+        }
+    }
+    { "If the " { $link car } " of the callframe is a wrapper, the wrapped object is pushed on the datastack. Wrappers arise from the " { $link POSTPONE: \ } " parsing word." }
+    { "Otherwise, the " { $link car } " of the call frame is pushed on the datastack." }
+    { "The callframe is set to the " { $link cdr } ", and the loop continues." }
+}
+"The interpreter performs the above steps literally. The compiler generates machine code which perform the steps in a more efficient manner than the interpreter."
+$terpri
+"The following pair of words are central. They invoke the evaluator reflectively, allowing higher-order programming and meta-programming techniques that lie at the heart of Factor's expressive power."
+{ $subsection call }
+{ $subsection execute }
+"These words are used to implement " { $emphasis "combinators" } ", which are words that take code from the stack. Combinator definitions must be followed by the " { $link POSTPONE: inline } " declaration in order to compile; for example:"
+{ $code
+    ": keep ( x quot -- x | quot: x -- )"
+    "    over >r call r> ; inline"
+}
+"Word inlining is documented in " { $link "declarations" } "."
+{ $subsection "tail-call-optimization" }
+{ $subsection "callstack-manipulation" }
+{ $subsection "quotation-variants" } ;
+
+GLOSSARY: "tail call" "the last call in a quotation" ;
+
+GLOSSARY: "tail call optimization" "the elimination of call stack pushes when making a tail call" ;
+
+ARTICLE: "tail-call-optimization" "Tail call optimization"
+"When a call is made to a quotation from the last word in the call frame, there is no purpose in pushing the empty call frame on the call stack. Therefore the last call in a quotation does not grow the call stack, and tail recursion executes in bounded space." ;
+
+ARTICLE: "callstack-manipulation" "Callstack manipulation"
+"The top of the callstack is not accessed during the execution of a quotation; the callstack is only popped when the end of the quotation is reached. In effect, the callstack can be used as a temporary storage area, as long as pushes and pops are balanced out within a single quotation."
+{ $subsection >r }
+{ $subsection r> }
+"The top of the datastack is ``hidden'' between " { $link >r } " and " { $link r> } ":"
+{ $example "1 2 3 >r .s r>" "2\n1" }
+"It is crucial that usages of " { $link >r } " and " { $link r> } " are balanced within a single quotation or word definition."
+{ $code
+    ": the-good >r 2 + r> * ; ! Okay"
+    ": the-bad  >r 2 + ;      ! Runtime error"
+    ": the-ugly r> ;          ! Runtime error"
+}
+"Basically, the rule is you must leave the callstack in the same state as you found it, so that when the current quotation finishes executing, the interpreter can return to the caller."
+$terpri
+"One exception is that when " { $link if } " occurs as the last word in a definition, values may be pushed on the callstack before the condition value is computed, as long as both branches of the " { $link if } " pop the values off the call stack before returning:"
+{ $code
+    ": foo ( m ? n -- m+n/n )"
+    "    >r [ r> + ] [ drop r> ] if ; ! Okay"
+} ;
+
+ARTICLE: "quotation-variants" "Quotation variants"
+"There are some words that combine shuffle words with " { $link call } ". They are useful for implementing combinators."
+{ $subsection slip }
+{ $subsection 2slip }
+{ $subsection keep }
+{ $subsection 2keep }
+{ $subsection 3keep }
+{ $subsection 2apply } ;
+
+ARTICLE: "conditionals" "Conditionals and boolean logic"
+"In Factor, any object that is not " { $link f } " has a true boolean value, and " { $link f } " has a false boolean value."
+$terpri
+"The basic conditionals:"
+{ $subsection if }
+{ $subsection when }
+{ $subsection unless }
+"A form encapsulating a common stack shuffle pattern:"
+{ $subsection if* }
+{ $subsection when* }
+{ $subsection unless* }
+"Another form encapsulating a common stack shuffle pattern:"
+{ $subsection ?if }
+"Sometimes instead of executing one of two quotations, you just need to pick one of two values:"
+{ $subsection ? }
+"There are some logical operations on booleans:"
+{ $subsection >boolean }
+{ $subsection and }
+{ $subsection or } ;
+
+GLOSSARY: "continuation" "an object representing the future of the computation. Continuations are reified by " { $link callcc0 } " and " { $link callcc1 } ", and resumed with " { $link continue } ;
+
+ARTICLE: "continuations" "Continuations"
+"At any point in the execution of a program, the " { $emphasis "current continuation" } " represents the future of the computation. This object can be reified with the following two words:"
+{ $subsection callcc0 }
+{ $subsection callcc1 }
+"Another two words resume continuations:"
+{ $subsection continue }
+{ $subsection continue-with }
+"Continuations serve as the building block for a number of higher-level abstractions."
+{ $subsection "errors" }
+{ $subsection "threads" }
+{ $subsection "continuations-internals" } ;
+
+ARTICLE: "errors" "Handling errors"
+"Support for handling exceptional situations such as bad user input, implementation bugs, and input/output errors is provided by a set of words built using continuations."
+$terpri
+"Two words raise an error in the innermost error handler for the current dynamic extent:"
+{ $subsection throw }
+{ $subsection rethrow }
+"A set of words establish an error handler:"
+{ $subsection cleanup }
+{ $subsection recover }
+{ $subsection catch }
+"Caught errors can be logged in human-readable form:"
+{ $subsection error. }
+{ $subsection try } ;
+
+ARTICLE: "threads" "Multitasking"
+"Continuations are used to implements co-operative multitasking, where the runtime switches between threads during I/O calls, and explicit yields."
+{ $subsection in-thread }
+{ $subsection yield }
+{ $subsection sleep }
+{ $subsection stop }
+"Multitasking relies on a very simple round-robin scheduler:"
+{ $subsection run-queue }
+{ $subsection sleep-queue }
+{ $subsection schedule-thread }
+{ $subsection next-thread } ;
+
+ARTICLE: "continuations-internals" "Continuation implementation details"
+"A continuation is simply a tuple holding the contents of the four stacks:"
+{ $subsection continuation }
+"The four stacks can be read and written:"
+{ $subsection datastack }
+{ $subsection set-datastack }
+{ $subsection callstack }
+{ $subsection set-callstack }
+{ $subsection namestack }
+{ $subsection set-namestack }
+{ $subsection catchstack }
+{ $subsection set-catchstack } ;
