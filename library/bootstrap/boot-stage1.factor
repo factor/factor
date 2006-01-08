@@ -224,6 +224,7 @@ vectors words ;
         "/library/syntax/parse-syntax.facts"
         "/library/syntax/prettyprint.facts"
         "/library/syntax/see.facts"
+        "/library/tools/debugger.facts"
 
         "/doc/handbook/collections.facts"
         "/doc/handbook/dataflow.facts"

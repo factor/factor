@@ -119,11 +119,9 @@ M: object error. ( error -- ) . ;
     flush ;
 
 : flush-error-handler ( -- )
-    #! Last resort.
     [ "Error in default error handler!" print ] when ;
 
 : print-error ( error -- )
-    #! Print the error.
     [ dup error. ] catch nip flush-error-handler ;
 
 : try ( quot -- )

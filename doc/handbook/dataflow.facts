@@ -161,7 +161,14 @@ $terpri
 { $subsection catch }
 "Caught errors can be logged in human-readable form:"
 { $subsection error. }
-{ $subsection try } ;
+{ $subsection try }
+"Information relating to the most recently thrown error is stored in a pair of global variables:"
+{ $subsection error }
+{ $subsection error-continuation }
+"When an error is thrown and caught by the listener, a number of words facilitate interactive debugging of the error:"
+{ $subsection :s }
+{ $subsection :r }
+{ $subsection :get } ;
 
 ARTICLE: "threads" "Multitasking"
 "Continuations are used to implements co-operative multitasking, where the runtime switches between threads during I/O calls, and explicit yields."
