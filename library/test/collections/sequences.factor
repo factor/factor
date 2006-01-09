@@ -191,8 +191,8 @@ unit-test
 
 [ V{ "a" "b" } V{ } ] [ { "X" "a" "b" } { "X" } drop-prefix [ >vector ] 2apply ] unit-test
 
-[ -1 ] [ "ab" "abc" lexi ] unit-test
-[ 1 ] [ "abc" "ab" lexi ] unit-test
+[ -1 ] [ "ab" "abc" <=> ] unit-test
+[ 1 ] [ "abc" "ab" <=> ] unit-test
 
 [ 1 4 9 16 16 V{ f 1 4 9 16 } ] [
     V{ } clone "cache-test" set

@@ -45,3 +45,18 @@ M: integer ^ ( z w -- z^w )
     ] [
         dup 0 < [ neg ^ recip ] [ (integer^) ] if
     ] if ;
+
+: power-of-2? ( n -- ? )
+    dup 0 > [
+        dup dup neg bitand =
+    ] [
+        drop f
+    ] if ; foldable
+
+: log2 ( n -- b )
+    #! Log base two for integers.
+    {
+        { [ dup 0 <= ] [ "Input must be positive" throw ] }
+        { [ dup 1 = ] [ drop 0 ] }
+        { [ t ] [ -1 shift log2 1+ ] }
+    } cond ; foldable

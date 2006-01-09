@@ -131,17 +131,6 @@ HELP: mismatch "( seq1 seq2 -- i )"
 { $values { "seq1" "a sequence" } { "seq2" "a sequence" } { "i" "an index" } }
 { $description "Compares pairs of elements up to the minimum of the sequences' lengths, outputting the first index where the two sequences have non-equal elements, or -1 if all tested elements were equal." } ;
 
-HELP: lexi "( str1 str2 -- n )"
-{ $values { "str1" "a string" } { "str2" "a string" } { "n" "an integer" } }
-{ $description
-    "Compares two sequences of integers lexicographically (dictionary order). The output value is one of the following:"
-    { $list
-        { "positive - indicating that " { $snippet "str1" } " follows " { $snippet "str2" } }
-        { "zero - indicating that " { $snippet "str1" } " is equal to " { $snippet "str2" } }
-        { "negative - indicating that " { $snippet "str1" } " precedes " { $snippet "str2" } }
-    }
-} ;
-
 HELP: flip "( matrix -- newmatrix )"
 { $values { "matrix" "a sequence of equal-length sequences" } { "newmatrix" "a sequence of equal-length sequences" } }
 { $description "Transposes the matrix; that is, rows become columns and columns become rows." }

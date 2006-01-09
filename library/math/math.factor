@@ -76,19 +76,6 @@ GENERIC: absq ( n -- |n|^2 ) foldable
 : times ( n quot -- | quot: -- )
     swap [ >r dup slip r> ] repeat drop ; inline
 
-: power-of-2? ( n -- ? )
-    dup 0 > [
-        dup dup neg bitand =
-    ] [
-        drop f
-    ] if ; foldable
-
-: log2 ( n -- b )
-    #! Log base two for integers.
-    {
-        { [ dup 0 <= ] [ "Input must be positive" throw ] }
-        { [ dup 1 = ] [ drop 0 ] }
-        { [ t ] [ -1 shift log2 1+ ] }
-    } cond ; foldable
-
 GENERIC: number>string ( str -- num ) foldable
+
+M: real <=> - ;

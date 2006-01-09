@@ -1,5 +1,5 @@
 IN: sequences-internals
-USING: arrays kernel math sequences ;
+USING: arrays generic kernel math sequences ;
 
 : midpoint@ length 2 /i ; inline
 
@@ -84,9 +84,7 @@ IN: sequences
 : sort ( seq quot -- seq | quot: elt elt -- -1/0/1 )
     swap [ swap nsort ] immutable ; inline
 
-: number-sort ( seq -- seq ) [ - ] sort ;
-
-: string-sort ( seq -- seq ) [ lexi ] sort ;
+: natural-sort ( seq -- seq ) [ <=> ] sort ;
 
 : binsearch ( elt seq quot -- i | quot: elt elt -- -1/0/1 )
     swap dup empty?

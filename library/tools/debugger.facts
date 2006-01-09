@@ -2,11 +2,11 @@ USING: errors help ;
 
 HELP: error f
 { $description "Global variable holding most-recently thrown error." }
-{ $notes "Only updated by " { $link throw } ", not " { $link rethrow } "." ;
+{ $notes "Only updated by " { $link throw } ", not " { $link rethrow } "." } ;
 
 HELP: error-continuation f
 { $description "Global variable holding current continuation of most-recently thrown error." }
-{ $notes "Only updated by " { $link throw } ", not " { $link rethrow } "." ;
+{ $notes "Only updated by " { $link throw } ", not " { $link rethrow } "." } ;
 
 HELP: :s "( -- )"
 { $description "Prints the datastack at the time of the most recent error. Used for interactive debugging." } ;

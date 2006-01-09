@@ -36,6 +36,11 @@ rather than an association list for specifying style information.</li>
 <li>Add a new <code>interleave ( seq quot between -- )</code> combinator that applies
 a quotation to each element of a sequence, calling another quotation in between each
 pair.</li>
+<li>Add a new <code>&lt;=&gt; ( obj1 obj2 -- n )</code> word for comparing two
+objects using an intrinsic order. For numbers this is the standard order, for strings
+this is lexicographic order, and for words, this compares word names.</li>
+<li>The <code>natural-sort ( seq -- seq )</code> word replaces <code>number-sort</code>,
+<code>string-sort</code> and <code>word-sort</code>.</li>
 </ul>
 
 </li>

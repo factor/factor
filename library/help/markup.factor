@@ -1,9 +1,8 @@
 ! Copyright (C) 2005, 2006 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: help
-USING: arrays
-generic hashtables io kernel lists namespaces parser
-prettyprint sequences strings styles vectors words ;
+USING: arrays generic hashtables io kernel lists namespaces
+parser prettyprint sequences strings styles vectors words ;
 
 : uncons* dup first swap 1 swap tail ;
 
@@ -160,7 +159,7 @@ DEFER: help
 : $predicate ( content -- )
     { { "object" "an object" } } $values
     "Tests if the object is an instance of the " $description
-    format* $link " class." format* ;
+    $link " class." format* ;
 
 : $list ( content -- )
     terpri* [ "- " format* print-element terpri* ] each ;

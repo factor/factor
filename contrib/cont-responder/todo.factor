@@ -151,7 +151,7 @@ USE: unparser
 : priority-comparator ( item1 item2 -- number )
   #! Return 0 if item equals item2, -1 if item1 < item2 and
   #! 1 if item1 > item2.
-  >r item-priority r> item-priority lexi ;
+  >r item-priority r> item-priority <=> ;
   
 : todo-items ( <todo> -- alist )
   #! Return a list of items for the given todo list.

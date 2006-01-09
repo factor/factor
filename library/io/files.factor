@@ -13,7 +13,8 @@ styles ;
 : directory? ( file -- ? ) stat car ;
 
 : directory ( dir -- list )
-    (directory) [ { "." ".." } member? not ] subset string-sort ;
+    (directory)
+    [ { "." ".." } member? not ] subset natural-sort ;
 
 : file-length ( file -- length ) stat third ;
 

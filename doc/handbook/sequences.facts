@@ -1,6 +1,6 @@
 IN: sequences
-USING: arrays help kernel-internals sequences-internals strings
-vectors words ;
+USING: arrays help kernel kernel-internals sequences-internals
+strings vectors words ;
 
 GLOSSARY: "sequence"
 "a linearly-ordered finite collection of elements responding to the " { $link "sequence-protocol" "sequence protocol" } "." ;
@@ -163,7 +163,7 @@ ARTICLE: "sequences-comparing" "Comparing sequences"
 { $subsection sequence= }
 { $subsection mismatch }
 "Lexicographic order:"
-{ $subsection lexi } ;
+{ $subsection <=> } ;
 
 GLOSSARY: "resizable sequence"
 "a sequence implementing the " { $link set-length } " generic word. For example, vectors and string buffers" ;
@@ -260,13 +260,12 @@ ARTICLE: "sequences-sorting" "Sorting and binary search"
     { "zero - indicates that " { $snippet "elt1" } " is ordered equivalently to " { $snippet "elt2" } }
     { "negative - indicates that " { $snippet "elt1" } " precedes " { $snippet "elt2" } }
 }
-"There are two sorting words, one outputs a new sequence and another one is in-place."
-{ $subsection sort }
+"In-place sorting:"
 { $subsection nsort }
-"There are three utility words."
-{ $subsection number-sort }
-{ $subsection string-sort }
-{ $subsection word-sort } ;
+"Sorting elements in a new sequence:"
+{ $subsection sort }
+"Using the default comparator:"
+{ $subsection natural-sort } ;
 
 ARTICLE: "sequences-unsafe" "Unsafe sequence operations"
 "The unsafe sequence protocol bypasses bounds checks for increased performance:"

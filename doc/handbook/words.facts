@@ -17,7 +17,6 @@ ARTICLE: "words" "Words"
 { $subsection word? }
 { $subsection word-name }
 { $subsection word-vocabulary }
-{ $subsection word-sort }
 { $subsection "vocabularies" }
 { $subsection "word-definition" }
 { $subsection "word-crossref" }

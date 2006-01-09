@@ -89,7 +89,7 @@ DEFER: describe
     ] each-with ;
 
 : words. ( vocab -- )
-    words word-sort [ (help) ] sequence-outliner ;
+    words natural-sort [ (help) ] sequence-outliner ;
 
 : vocabs. ( -- )
     #! Outlining word browser.

@@ -1,4 +1,4 @@
-USING: help kernel kernel-internals ;
+USING: help kernel kernel-internals sequences ;
 
 HELP: eq? "( obj1 obj2 -- ? )"
 { $values { "obj1" "an object" } { "obj2" "an object" } }
@@ -75,6 +75,21 @@ HELP: = "( obj1 obj2 -- ? )"
         "two tuples are equal if their classes and slot values are equal"
     }
 } ;
+
+HELP: <=> "( obj1 obj2 -- n )"
+{ $values { "obj1" "an object" } { "obj2" "an object" } { "n" "an integer" } }
+{ $contract
+    "Compares two objects using an intrinsic partial order, for example, the natural order for real numbers and lexicographic order for strings."
+    $terpri
+    "The output value is one of the following:"
+    { $list
+        { "positive - indicating that " { $snippet "str1" } " follows " { $snippet "str2" } }
+        { "zero - indicating that " { $snippet "str1" } " is equal to " { $snippet "str2" } }
+        { "negative - indicating that " { $snippet "str1" } " precedes " { $snippet "str2" } }
+    }
+    "The default implementation treats the two objects as sequences, and recursively compares their elements. So no extra work is required to compare sequences lexicographically."
+}
+{ $see-also natural-sort } ;
 
 HELP: clone "( obj -- cloned )"
 { $values { "obj" "an object" } { "cloned" "a new object" } }
@@ -220,9 +235,9 @@ HELP: array-capacity "( array -- n )"
 HELP: array-nth "( n array -- elt )"
 { $values { "n" "a non-negative fixnum" } { "array" "an array" }  { "elt" "an object" } }
 { $description "Low-level array element accessor." }
-{ $safety "This word is in the " { $snippet "kernel-internals" } " vocabulary because it is unsafe. It does not check types or array bounds, and improper use can corrupt memory." } ;
+{ $warning "This word is in the " { $snippet "kernel-internals" } " vocabulary because it is unsafe. It does not check types or array bounds, and improper use can corrupt memory." } ;
 
 HELP: set-array-nth "( elt n array --)"
 { $values { "elt" "an object" } { "n" "a non-negative fixnum" } { "array" "an array" }  }
 { $description "Low-level array element mutator." }
-{ $safety "This word is in the " { $snippet "kernel-internals" } " vocabulary because it is unsafe. It does not check types or array bounds, and improper use can corrupt memory." } ;
+{ $warning "This word is in the " { $snippet "kernel-internals" } " vocabulary because it is unsafe. It does not check types or array bounds, and improper use can corrupt memory." } ;

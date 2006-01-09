@@ -1,5 +1,5 @@
 IN: sequences
-USING: help words ;
+USING: help kernel words ;
 
 HELP: sort "( seq quot -- sortedseq )"
 { $values { "seq" "a sequence" } { "quot" "a comparator quotation" } { "sortedseq" "a new sorted sequence" } }
@@ -10,10 +10,6 @@ HELP: nsort "( seq quot -- sortedseq )"
 { $description "Sorts the sequence in-place." }
 { $side-effects "seq" } ;
 
-HELP: number-sort "( seq -- sortedseq )"
+HELP: natural-sort "( seq -- sortedseq )"
 { $values { "seq" "a sequence of real numbers" } { "sortedseq" "a new sorted sequence" } }
-{ $description "Sorts a sequence of real numbers in increasing order." } ;
-
-HELP: string-sort "( seq -- sortedseq )"
-{ $values { "seq" "a sequence of strings" } { "sortedseq" "a new sorted sequence" } }
-{ $description "Sorts a sequence of strings in increasing order." } ;
+{ $description "Sorts a sequence of objects in natural order using the " { $link <=> } " word." } ;

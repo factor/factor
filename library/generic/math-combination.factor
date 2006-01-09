@@ -7,7 +7,6 @@ math namespaces sequences words ;
 ! Math combination for generic dyadic upgrading arithmetic.
 
 : math-priority ( class -- n )
-    #! Non-number classes have the highest priority.
     "math-priority" word-prop [ 100 ] unless* ;
 
 : math-class< ( class class -- ? )
@@ -41,7 +40,7 @@ TUPLE: no-math-method left right generic ;
     object bootstrap-word applicable-method ;
 
 : math-method ( word left right -- quot )
-    [ type>class ] 2apply 2dup and [
+    2dup and [
         2dup math-upgrade >r
         math-class-max over order min-class applicable-method
         r> swap append
@@ -52,7 +51,7 @@ TUPLE: no-math-method left right generic ;
 : math-vtable ( picker quot -- )
     [
         swap , \ tag ,
-        [ num-tags swap map % ] { } make ,
+        [ num-tags [ type>class ] map swap map % ] { } make ,
         \ dispatch ,
     ] [ ] make ; inline
 
@@ -61,7 +60,7 @@ TUPLE: no-math-method left right generic ;
 
 : math-combination ( word -- vtable )
     \ over [
-        dup type>class math-class? [
+        dup math-class? [
             \ dup [ >r 2dup r> math-method ] math-vtable
         ] [
             over object-method

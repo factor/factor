@@ -121,5 +121,5 @@ M: word class. drop ;
     all-words [ word-name [ subseq? ] completion? ] subset-with ;
 
 : apropos ( substring -- )
-    (apropos) word-sort
+    (apropos) natural-sort
     [ [ synopsis ] keep simple-object terpri ] each ;

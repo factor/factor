@@ -1,0 +1,38 @@
+USING: generic help math ;
+
+HELP: math-priority "( class -- n )"
+{ $values { "class" "a class word" } { "n" "a non-negative integer" } }
+{ $description "Outputs the priority of a built-in number class. If class A has a lower priority than class B, then applying a binary math operation to an instance of A and B will upgrade the instance of A to B's type." }
+{ $notes "To simplify implementation of the math method combination, this word outputs 100 for non-numeric classes. Priorities of numeric classes must always be less than 100." } ;
+
+HELP: math-class< "( class1 class2 -- ? )"
+{ $values { "class1" "a class word" } { "class2" "a class word" } { "?" "a boolean" } }
+{ $description "Defines a total ordering on built-in number classes." } ;
+
+HELP: math-upgrade "( class1 class2 -- quot )"
+{ $values { "class1" "a class word" } { "class2" "a class word" } { "quot" "a quotation with stack effect " { $snippet "( n n -- n n )" } } }
+{ $description "Outputs a quotation for upgrading numberical types. It takes two numbers on the stack, an instance of " { $snippet "class1" } ", and an instance of " { $snippet "class2" } ", and converts the one with the lower priority to the higher priority type." }
+{ $examples { $example "fixnum bignum math-upgrade ." "[ >r >bignum r> ]" } } ;
+
+HELP: no-math-method "( left right generic -- )"
+{ $values { "left" "an object" } { "right" "an object" } { "generic" "a generic word" } }
+{ $description } ;
+
+HELP: math-method "( word class1 class2 -- quot )"
+{ $values { "word" "a generic word" } { "class1" "a class word" } { "class2" "a class word" } { "quot" "a quotation" } }
+{ $description "Generates a definition for " { $snippet "word" } " when the two inputs are instances of " { $snippet "class1" } " and " { $snippet "class2" } ", respectively." }
+{ $examples { $example "\\ + fixnum float math-method ." "[ >r >float r> float+ ]" } } ;
+
+HELP: math-class? "( object -- ? )"
+{ $values { "object" "an object" } { "?" "a boolean" } }
+{ $description
+    "Tests if the object is a numerical class word. The numerical classes are precisely the following:"
+    { $list { $link fixnum } { $link bignum } { $link ratio } { $link float } { $link complex } }
+} ;
+
+HELP: math-combination "( word -- quot )"
+{ $values { "word" "a generic word" } { "quot" "a quotation" } }
+{ $description "Generates a double-dispatching word definition. Only methods defined on numerical classes and " { $link object } " take effect in the math combination. Methods defined on numerical classes are guaranteed to have their two inputs upgraded to the highest priority type of the two." } ;
+
+HELP: 2generic f
+{ $description "The class of generic words with the math combination." } ;

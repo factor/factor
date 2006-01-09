@@ -68,8 +68,8 @@ unit-test
 [ t ] [ CHAR: 0 digit? ] unit-test
 [ f ] [ CHAR: x digit? ] unit-test
 
-[ t ] [ "abc" "abd" lexi 0 < ] unit-test
-[ t ] [ "z" "abd" lexi 0 > ] unit-test
+[ t ] [ "abc" "abd" <=> 0 < ] unit-test
+[ t ] [ "z" "abd" <=> 0 > ] unit-test
 
 [ f ] [ [ 0 10 "hello" subseq ] catch not ] unit-test
 

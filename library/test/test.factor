@@ -1,15 +1,12 @@
 ! Factor test suite.
 
 IN: test
-USING: arrays errors kernel lists math memory namespaces parser
-prettyprint sequences io strings words ;
+USING: arrays errors inspector io kernel lists math memory
+namespaces parser prettyprint sequences strings words ;
 
 TUPLE: assert got expect ;
 
-M: assert error.
-    "Assertion failed" print
-    "Expected: " write dup assert-expect .
-    "Got: " write assert-got . ;
+M: assert summary drop "Assertion failed" ;
 
 : assert= ( a b -- )
     2dup = [ 2drop ] [ <assert> throw ] if ;

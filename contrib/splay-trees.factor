@@ -3,11 +3,6 @@
 IN: splay-trees
 USING: kernel math sequences ;
 
-GENERIC: <=> ( x y -- x <=> y )
-
-M: number <=> - ;
-M: sequence <=> lexi ;
-
 TUPLE: splay-tree r ;
 TUPLE: splay-node v k l r ;
 

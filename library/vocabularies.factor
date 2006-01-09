@@ -12,7 +12,7 @@ SYMBOL: vocabularies
 
 : set-word ( word -- ) \ word set-global ;
 
-: vocabs ( -- seq ) vocabularies get hash-keys string-sort ;
+: vocabs ( -- seq ) vocabularies get hash-keys natural-sort ;
 
 : vocab ( name -- vocab ) vocabularies get hash ;
 

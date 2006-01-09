@@ -75,10 +75,6 @@ HELP: set-word-xt "( xt word -- )"
 { $warning "This word is unsafe. Specifying an invalid address can corrupt memory and crash the runtime." }
 { $notes "This word is used by the compiler." } ;
 
-HELP: word-sort "( seq -- sorted )"
-{ $values { "seq" "a sequence of words" } { "sorted" "a sorted sequence" } }
-{ $description "Sorts a sequence of words by word name." } ;
-
 HELP: uses "( word -- seq )"
 { $values { "word" "a word" } { "seq" "a sequence of words" } }
 { $description "Outputs a sequence of words directory called by the given word." }

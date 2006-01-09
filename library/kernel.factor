@@ -1,4 +1,4 @@
-! Copyright (C) 2004, 2005 Slava Pestov.
+! Copyright (C) 2004, 2006 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: kernel
 USING: generic kernel-internals math-internals ;
@@ -12,6 +12,8 @@ M: object hashcode drop 0 ;
 
 GENERIC: = ( obj obj -- ? ) flushable
 M: object = eq? ;
+
+GENERIC: <=> ( obj1 obj2 -- n ) flushable
 
 GENERIC: clone ( obj -- obj ) flushable
 M: object clone ;

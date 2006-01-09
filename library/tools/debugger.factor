@@ -1,4 +1,4 @@
-! Copyright (C) 2004, 2005 Slava Pestov.
+! Copyright (C) 2004, 2006 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: errors
 USING: generic hashtables inspector io kernel kernel-internals
@@ -68,18 +68,9 @@ M: kernel-error error. ( error -- )
         [ user-interrupt. ]
     } dispatch ;
 
-M: no-method error. ( error -- )
-    "No suitable method." print
-    "Generic word: " write dup no-method-generic .
-    "Methods: " write dup no-method-generic order .
-    "Object: " write dup no-method-object short.
-    "Object class: " write no-method-object class short. ;
+M: no-method summary drop "No suitable method" ;
 
-M: no-math-method error. ( error -- )
-    "No suitable arithmetic method." print
-    "Generic word: " write dup no-math-method-generic .
-    "Left operand: " write dup no-math-method-left short.
-    "Right operand: " write no-math-method-right short. ;
+M: no-math-method summary drop "No suitable arithmetic method" ;
 
 : parse-dump ( error -- )
     "Parsing " write
@@ -95,14 +86,9 @@ M: no-math-method error. ( error -- )
 M: parse-error error. ( error -- )
     dup parse-dump  delegate error. ;
 
-M: bounds-error error. ( error -- )
-    "Sequence index out of bounds" print
-    "Sequence: " write dup bounds-error-seq short.
-    "Minimum: 0" print
-    "Maximum: " write dup bounds-error-seq length .
-    "Requested: " write bounds-error-index . ;
+M: bounds-error summary drop "Sequence index out of bounds" ;
 
-M: string error. ( error -- ) print ;
+M: tuple error. ( error -- ) describe ;
 
 M: object error. ( error -- ) . ;
 
@@ -122,15 +108,13 @@ M: object error. ( error -- ) . ;
     [ "Error in default error handler!" print ] when ;
 
 : print-error ( error -- )
+    "An unhandled error was caught:" print terpri
     [ dup error. ] catch nip flush-error-handler ;
 
-: try ( quot -- )
-    #! Execute a quotation, and if it throws an error, print it
-    #! and return to the caller.
-    [ print-error debug-help ] recover ;
+: try ( quot -- ) [ print-error terpri debug-help ] recover ;
 
 : save-error ( error continuation -- )
-    global [ error-continuation set error set ] bind ;
+    error-continuation set-global error set-global ;
 
 : error-handler ( error -- )
     dup continuation save-error rethrow ;

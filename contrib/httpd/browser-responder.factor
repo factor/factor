@@ -50,7 +50,8 @@ USING: html cont-responder hashtables kernel io namespaces words lists prettypri
   #! Write out the HTML for the list of words in a vocabulary. Make the 'word' item
   #! the currently selected option.
   <select "word" =name "width: 200" =style "20" =size "document.forms.main.submit()" =onchange select> 
-    swap words word-sort [ word-name over swap option ] each drop
+    swap words natural-sort
+    [ word-name over swap option ] each drop
   </select> ;
 
 : word-source ( vocab word -- )

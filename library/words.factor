@@ -4,6 +4,8 @@ IN: words
 USING: generic hashtables kernel kernel-internals lists math
 namespaces sequences strings vectors ;
 
+M: word <=> [ word-name ] 2apply <=> ;
+
 GENERIC: definer ( word -- word )
 
 PREDICATE: word undefined ( obj -- ? ) word-primitive 0 = ;
@@ -35,8 +37,6 @@ M: word word-xt ( w -- xt ) 7 integer-slot ;
 
 GENERIC: set-word-xt
 M: word set-word-xt ( xt w -- ) 7 set-integer-slot ;
-
-: word-sort ( seq -- seq ) [ [ word-name ] 2apply lexi ] sort ;
 
 : uses ( word -- uses )
     [

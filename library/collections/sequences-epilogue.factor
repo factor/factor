@@ -1,21 +1,8 @@
-! Copyright (C) 2005 Slava Pestov.
+! Copyright (C) 2005, 2006 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-IN: sequences-internals
-USING: errors generic kernel kernel-internals lists math
-sequences strings vectors words ;
-
-: (lexi) ( seq seq i limit -- n )
-    2dup >= [
-        2drop [ length ] 2apply -
-    ] [
-        >r 3dup 2nth-unsafe 2dup = [
-            2drop 1+ r> (lexi)
-        ] [
-            r> drop - >r 3drop r>
-        ] if
-    ] if ; flushable
-
 IN: sequences
+USING: errors generic kernel kernel-internals lists math
+sequences-internals strings vectors words ;
 
 : first2 ( { x y } -- x y )
     1 swap bounds-check nip first2-unsafe ; inline
@@ -127,11 +114,6 @@ M: object reverse ( seq -- seq ) [ <reversed> ] keep like ;
     [ >r 2dup r> 2nth-unsafe = not ] find
     swap >r 3drop r> ; flushable
 
-: lexi ( s1 s2 -- n )
-    2dup mismatch dup -1 =
-    [ drop [ length ] 2apply - ] [ 2nth-unsafe - ] if ;
-    flushable
-
 : flip ( seq -- seq )
     dup empty? [
         dup first [ length ] keep like
@@ -139,6 +121,10 @@ M: object reverse ( seq -- seq ) [ <reversed> ] keep like ;
     ] unless ; flushable
 
 IN: kernel
+
+M: object <=>
+    2dup mismatch dup -1 =
+    [ drop [ length ] 2apply - ] [ 2nth-unsafe <=> ] if ;
 
 : depth ( -- n ) datastack length ;
 
