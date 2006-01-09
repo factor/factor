@@ -63,15 +63,11 @@ math namespaces sequences vectors words ;
     "methods" word-prop hash-size 3 <= ;
 
 : standard-combination ( word picker -- quot )
-    swap dup tag-generic? [
-        num-tags \ tag big-generic
-    ] [
-        dup small-generic? [
-            small-generic
-        ] [
-            num-types \ type big-generic
-        ] if
-    ] if ;
+    swap {
+        { [ dup tag-generic? ] [ num-tags \ tag big-generic ] }
+        { [ dup small-generic? ] [ small-generic ] }
+        { [ t ] [ num-types \ type big-generic ] }
+    } cond ;
 
 : simple-combination ( word -- quot )
     [ dup ] standard-combination ;

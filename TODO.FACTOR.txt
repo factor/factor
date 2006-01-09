@@ -1,5 +1,10 @@
+- UI word wrap: sometimes a space appears at the front
+- need line and paragraph spacing
+- update HTML stream
+- help cross-referencing
+- UI browser pane needs 'back' button
+- tty help
 - if cell is rebound, and we allocate c objects, bang
-- make-image leaks memory if there is an error while parsing files
 - runtime primitives like fopen: check for null input
 - -with combinators are awkward
 - cleanups:
