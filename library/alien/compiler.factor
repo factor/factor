@@ -2,8 +2,9 @@
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: alien
 USING: assembler compiler compiler-backend compiler-frontend
-errors generic hashtables inference io kernel kernel-internals
-lists math namespaces prettyprint sequences strings words parser ;
+errors generic hashtables inference inspector io kernel
+kernel-internals lists math namespaces parser prettyprint
+sequences strings words ;
 
 ! USAGE:
 ! 
@@ -22,11 +23,8 @@ lists math namespaces prettyprint sequences strings words parser ;
 
 TUPLE: alien-error library symbol ;
 
-M: alien-error error. ( error -- )
-    "Words calling ``alien-invoke'' cannot run in the interpreter." print
-    "Compile this word and try again." print
-    "Library: " write dup alien-error-library .
-    "Symbol:  " write alien-error-symbol . ;
+M: alien-error summary ( error -- )
+    drop "Words calling ``alien-invoke'' cannot run in the interpreter. Compile the caller word and try again." ;
 
 : alien-invoke ( ... return library function parameters -- ... )
     #! Call a C library function.
