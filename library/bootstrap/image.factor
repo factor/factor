@@ -257,7 +257,7 @@ M: string ' ( string -- pointer )
 : transfer-tuple ( tuple -- tuple )
     tuple>array
     dup first transfer-word 0 pick set-nth
-    array>tuple ;
+    >tuple ;
 
 M: tuple ' ( tuple -- pointer )
     transfer-tuple

@@ -97,7 +97,7 @@ HELP: : "word definition... ;"
 { $values { "word" "a new word to define" } { "definition" "a word definition" } }
 { $description "Defines a compound word in the current vocabulary." }
 { $examples { $code ": ask-name ( -- name )\n    \"What is your name? \" write readln ;\n: greet ( name -- )    \"Greetings, \" write print ;\n: friend ( -- )    ask-name greet ;" } }
-{ $see-also POSTPONE: ; } ;
+{ $see-also POSTPONE: ; define-compound } ;
 
 HELP: ; ""
 { $description
@@ -198,21 +198,25 @@ HELP: GENERIC: "word"
     $terpri
     "This parsing word is equivalent to the following usage of the more general " { $link POSTPONE: G: } " word:"
     { $code "G: word simple-combination ;" }
-} ;
+}
+{ $see-also define-generic } ;
 
 HELP: G: "word combination... ;"
 { $values { "word" "a new word to define" } { "combination" "a method combination definition with stack effect " { $snippet "( word -- quot )" } } }
 { $description "Defines a generic word using the long-form. A method combination is a quotation that is given the generic word on the stack, and outputs a quotation " { $emphasis "that becomes the definition of the word" } "." }
-{ $contract "The method combination quotation is called each time the generic word has to be updated (for example, when a method is added), and thus must be side-effect free." } ;
+{ $contract "The method combination quotation is called each time the generic word has to be updated (for example, when a method is added), and thus must be side-effect free." }
+{ $see-also define-generic* } ;
 
 HELP: M: "class generic definition... ;"
 { $values { "class" "a class word" } { "generic" "a generic word" } { "definition" "a method definition" } }
-{ $description "Defines a method, that is, a behavior for the generic word specialized on instances of the class." } ;
+{ $description "Defines a method, that is, a behavior for the generic word specialized on instances of the class." }
+{ $see-also define-method } ;
 
 HELP: UNION: "class members... ;"
 { $values { "class" "a new class word to define" } { "members" "a list of class words separated by whitespace" } }
 { $description "Defines a union class. An object is an instance of a union class if it is an instance of one of its members." }
-{ $notes "Union classes are used to associate the same method with several different classes, as well as to conveniently define predicates." } ;
+{ $notes "Union classes are used to associate the same method with several different classes, as well as to conveniently define predicates." }
+{ $see-also define-union } ;
 
 HELP: PREDICATE: "superclass class predicate... ;"
 { $values { "superclass" "an existing class word" } { "class" "a new class word to define" } { "predicate" "membership test with stack effect " { $snippet "( superclass -- ? )" } } }
@@ -225,13 +229,15 @@ HELP: PREDICATE: "superclass class predicate... ;"
         "it satisfies the predicate"
     }
     "Each predicate must be defined as a subclass of some other class. This ensures that predicates inheriting from disjoint classes do not need to be exhaustively tested during method dispatch."
-} ;
+}
+{ $see-also define-predicate-class } ;
 
 HELP: TUPLE: "class slots... ;"
 { $values { "class" "a new class word to define" } { "slots" "a list of slot names" } }
 { $description "Defines a new tuple class with membership predicate " { $snippet "name?" } " and constructor " { $snippet "<name>" } "."
 $terpri
-"Tuples are user-defined classes with instances composed of named slots. All tuple classes are subtypes of the built-in " { $link tuple } " type." } ;
+"Tuples are user-defined classes with instances composed of named slots. All tuple classes are subtypes of the built-in " { $link tuple } " type." }
+{ $see-also define-tuple } ;
 
 HELP: C: "class definition... ;"
 { $values { "class" "a class word" } { "generic" "a generic word" } { "definition" "a constructor definition" } }
@@ -239,4 +245,5 @@ HELP: C: "class definition... ;"
 $terpri
 "Constructors are named after the tuple class surrounded in angle brackets: " { $snippet "<" } " and " { $snippet ">" } "."  }
 { $contract "The definition must only have one output, the new tuple itself." }
-{ $notes "Each tuple class defines a default constructor that reads slot values from the stack. This parsing word redefines the default constructor." } ;
+{ $notes "Each tuple class defines a default constructor that reads slot values from the stack. This parsing word redefines the default constructor." }
+{ $see-also define-constructor } ;

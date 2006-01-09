@@ -218,7 +218,7 @@ call
     { "expired?" "alien"                    }
     { "<wrapper>" "kernel"                  }
     { "(clone)" "kernel-internals"          }
-    { "(array>tuple)" "kernel-internals"    }
+    { "array>tuple" "kernel-internals"      }
     { "tuple>array" "generic"               }
     { "array>vector" "vectors"              }
     { "<string>" "strings"                  }

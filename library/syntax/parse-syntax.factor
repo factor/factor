@@ -32,7 +32,7 @@ SYMBOL: t
 : V{ [ >vector ] [ ] ; parsing
 : H{ [ alist>hash ] [ ] ; parsing
 : C{ [ first2 rect> ] [ ] ; parsing
-: T{ [ array>tuple ] [ ] ; parsing
+: T{ [ >tuple ] [ ] ; parsing
 : W{ [ first <wrapper> ] [ ] ; parsing
 : POSTPONE: scan-word swons ; parsing
 : \ scan-word literalize swons ; parsing

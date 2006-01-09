@@ -224,6 +224,7 @@ vectors words ;
         "/library/generic/math-combination.facts"
         "/library/generic/slots.facts"
         "/library/generic/standard-combination.facts"
+        "/library/generic/tuple.facts"
         "/library/syntax/parse-stream.facts"
         "/library/syntax/parser.facts"
         "/library/syntax/parse-syntax.facts"

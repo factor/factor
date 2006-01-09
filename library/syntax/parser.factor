@@ -62,6 +62,9 @@ C: parse-error ( error -- error )
 
 : create-in in get create dup save-location ;
 
+: create-constructor ( class -- word )
+    word-name in get constructor-word dup save-location ;
+
 : CREATE ( -- word ) scan create-in ;
 
 SYMBOL: string-mode

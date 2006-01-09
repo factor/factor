@@ -13,14 +13,6 @@ USING: arrays errors hashtables kernel lists math namespaces parser sequences se
 
 IN: generic
 
-! Tuples are really arrays in the runtime, but with a different
-! type number. The layout is as follows:
-
-! slot 0 - object header with type number (as usual)
-! slot 1 - length, including class/delegate slots
-! slot 2 - the class, a word
-! slot 3 - the delegate tuple, or f
-
 : class ( object -- class )
     dup tuple? [ 2 slot ] [ type type>class ] if ; inline
 
@@ -28,8 +20,6 @@ IN: generic
     dup tuple? [ 2 slot ] [ drop f ] if ; inline
 
 : tuple-predicate ( word -- )
-    #! Make a foo? word for testing the tuple class at the top
-    #! of the stack.
     dup predicate-word
     [ \ class-tuple , over literalize , \ eq? , ] [ ] make
     define-predicate ;
@@ -38,8 +28,6 @@ IN: generic
     dup forget "predicate" word-prop car [ forget ] when* ;
 
 : check-shape ( word slots -- )
-    #! If the new list of slots is different from the previous,
-    #! forget the old definition.
     >r in get lookup dup [
         dup "tuple-size" word-prop r> length 2 + =
         [ drop ] [ forget-tuple ] if
@@ -56,9 +44,6 @@ IN: generic
     2dup delegate-slots swap append "slots" set-word-prop
     define-slots ;
 
-: tuple-constructor ( class -- word )
-    word-name in get constructor-word dup save-location ;
-
 PREDICATE: word tuple-class "tuple-size" word-prop ;
 
 : check-tuple-class ( class -- )
@@ -70,7 +55,7 @@ PREDICATE: word tuple-class "tuple-size" word-prop ;
     ] [ ] make r> append define-compound ;
 
 : default-constructor ( tuple -- )
-    [ tuple-constructor ] keep dup [
+    [ create-constructor ] keep dup [
         "slots" word-prop 1 swap tail-slice reverse-slice
         [ peek unit , \ keep , ] each
     ] [ ] make define-constructor ;
@@ -86,29 +71,22 @@ PREDICATE: word tuple-class "tuple-size" word-prop ;
     default-constructor ;
 
 M: tuple clone ( tuple -- tuple )
-    #! Clone a tuple and its delegate.
     (clone) dup delegate clone over set-delegate ;
 
-M: tuple hashcode ( vec -- n )
-    #! Poor.
-    array-capacity ;
+M: tuple hashcode ( vec -- n ) array-capacity ;
 
 M: tuple = ( obj tuple -- ? )
-    2dup eq? [
-        2drop t
-    ] [
-        over tuple? [ tuple= ] [ 2drop f ] if
-    ] if ;
+    2dup eq?
+    [ 2drop t ] [ over tuple? [ tuple= ] [ 2drop f ] if ] if ;
 
 : is? ( obj pred -- ? | pred: obj -- ? )
-    #! Tests if the object satisfies the predicate, or if
-    #! it delegates to an object satisfying it.
-    [ call ] 2keep rot [
-        2drop t
+    over [
+        2dup >r >r call
+        [ r> r> 2drop t ] [ r> delegate r> is? ] if
     ] [
-        over [ >r delegate r> is? ] [ 2drop f ] if
+        2drop f 
     ] if ; inline
 
-: array>tuple ( seq -- tuple )
+: >tuple ( seq -- tuple )
     >vector dup first "tuple-size" word-prop over set-length
-    >array (array>tuple) ;
+    >array array>tuple ;

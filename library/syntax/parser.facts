@@ -92,6 +92,10 @@ HELP: create-in "( word -- )"
 { $description "Creates a word in the current vocabulary. Until re-defined, the word throws an error when invoked." }
 $parsing-note ;
 
+HELP: create-constructor "( word -- constructor )"
+{ $values { "class" "a word" } { "constructor" "a new word" } }
+{ $description "Creates a new word in the current vocabulary, named by surrounding " { $link "word" } " with angle brackets." } ;
+
 HELP: CREATE "( -- word )"
 { $values { "word" "a word" } }
 { $description "Reads the next token from the line currently being parsed, and creates a word with that name in the current vocabulary." }

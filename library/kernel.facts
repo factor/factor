@@ -1,4 +1,4 @@
-USING: help kernel kernel-internals sequences ;
+USING: generic help kernel kernel-internals sequences ;
 
 HELP: eq? "( obj1 obj2 -- ? )"
 { $values { "obj1" "an object" } { "obj2" "an object" } }
@@ -104,6 +104,11 @@ HELP: set-boot "( quot -- )"
 HELP: num-types "( -- n )"
 { $values { "n" "a postiive integer" } }
 { $description "Outputs one more than the maximum value from the " { $link type } " primitive." } ;
+
+HELP: type "( object -- n )"
+{ $values { "object" "an object" } { "n" "a type number" } }
+{ $description "Outputs an object's type number. Often, the " { $link class } " word is more useful." }
+{ $see-also type>class } ;
 
 HELP: ? "( cond true false -- true/false )"
 { $values { "cond" "a generalized boolean" } { "true" "an object" } { "false" "an object" } { "true/false" "one two input objects" } }
