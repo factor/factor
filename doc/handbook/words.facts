@@ -121,9 +121,11 @@ $terpri
 "The following properties are set by the library:"
 { $list
     { { $snippet "\"parsing\"" } ", " { $snippet "\"inline\"" } ", " { $snippet "\"flushable\"" } ", " { $snippet "\"fondable\"" } " - declarations (see " { $link "declarations" } ")" }
-    { { $snippet "\"methods\"" } ", " { $snippet "\"combination\"" } " - only defined on generic words (see " { $link "generic" } ")" }
     { { $snippet "\"file\"" } " - the source file storing the word definition" }
     { { $snippet "\"line\"" } " - the line number in the source file storing the word definition" }
+    { { $snippet "\"methods\"" } ", " { $snippet "\"combination\"" } " - only defined on generic words (see " { $link "generic" } ")" }
+    { { $snippet "\"predicate\"" } " - only defined on class words, stores a quotation that tests if the top of the stack is an instance of that class" }
+    { { $snippet "\"predicating\"" } " - only defined on class predicate words, stores the corresponding class word" }
 } ;
 
 ARTICLE: "word-crossref" "Cross-referencing"

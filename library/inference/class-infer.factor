@@ -62,7 +62,7 @@ M: node child-ties ( node -- seq )
     #! Annotate the node with the currently-inferred set of
     #! value classes.
     dup node-values
-    [ value-class ] map>hash swap set-node-classes ;
+    [ dup value-class ] map>hash swap set-node-classes ;
 
 : intersect-classes ( classes values -- )
     [ [ value-class class-and ] keep set-value-class ] 2each ;

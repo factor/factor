@@ -85,10 +85,10 @@ GENERIC: absq ( n -- |n|^2 ) foldable
 
 : log2 ( n -- b )
     #! Log base two for integers.
-    dup 0 <= [
-        "Input must be positive" throw
-    ] [
-        dup 1 = [ drop 0 ] [ 2 /i log2 1+ ] if
-    ] if ; foldable
+    {
+        { [ dup 0 <= ] [ "Input must be positive" throw ] }
+        { [ dup 1 = ] [ drop 0 ] }
+        { [ t ] [ -1 shift log2 1+ ] }
+    } cond ; foldable
 
 GENERIC: number>string ( str -- num ) foldable

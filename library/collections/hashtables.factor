@@ -251,7 +251,7 @@ M: hashtable = ( obj hash -- ? )
         pick rot >r >r call dup r> r> set-hash
     ] if* ; inline
 
-: map>hash ( seq quot -- hash | quot: key -- value )
+: map>hash ( seq quot -- hash | quot: key -- key value )
     swap [ length <hashtable> ] keep
-    [ -rot [ >r over >r call r> r> set-hash ] 2keep ] each nip ;
+    [ -rot [ >r call swap r> set-hash ] 2keep ] each nip ;
     inline

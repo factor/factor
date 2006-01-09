@@ -31,8 +31,11 @@ SYMBOL: column
 TUPLE: parse-error file line col text ;
 
 C: parse-error ( error -- error )
-    file get line-number get column get line-text get
-    <parse-error> [ set-delegate ] keep ;
+    file get over set-parse-error-file
+    line-number get over set-parse-error-line
+    column get over set-parse-error-col
+    line-text get over set-parse-error-text
+    [ set-delegate ] keep ;
 
 : skip ( i seq quot -- n | quot: elt -- ? )
     over >r find* drop dup -1 =

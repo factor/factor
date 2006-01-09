@@ -56,5 +56,3 @@ M: string thaw drop SBUF" " clone ;
 
 M: string like ( seq sbuf -- string )
     drop dup string? [ >string ] unless ;
-
-: a/an ( string -- ) first ch>lower "aeiou" member? "an " "a " ? ;

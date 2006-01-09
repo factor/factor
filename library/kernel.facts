@@ -215,7 +215,7 @@ HELP: literalize "( obj -- wrapper )"
 HELP: array-capacity "( array -- n )"
 { $values { "array" "an array" } { "n" "a non-negative fixnum" } }
 { $description "Low-level array length accessor." }
-{ $safety "This word is in the " { $snippet "kernel-internals" } " vocabulary because it is unsafe. It does not check types, so improper use can corrupt memory." } ;
+{ $warning "This word is in the " { $snippet "kernel-internals" } " vocabulary because it is unsafe. It does not check types, so improper use can corrupt memory." } ;
 
 HELP: array-nth "( n array -- elt )"
 { $values { "n" "a non-negative fixnum" } { "array" "an array" }  { "elt" "an object" } }

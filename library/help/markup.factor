@@ -159,14 +159,11 @@ DEFER: help
 
 : $predicate ( content -- )
     { { "object" "an object" } } $values
-    "Tests if the top of the stack is " $description
-    dup first word-name a/an format* $link "." format* ;
+    "Tests if the object is an instance of the " $description
+    format* $link " class." format* ;
 
 : $list ( content -- )
     terpri* [ "- " format* print-element terpri* ] each ;
-
-: $safety ( content -- )
-    "Memory safety" $subheading print-element ;
 
 : $errors ( content -- )
     "Errors" $subheading print-element ;
@@ -181,3 +178,7 @@ DEFER: help
 : $shuffle ( content -- )
     drop
     "Shuffle word. Re-arranges the stack according to the stack effect pattern." $description ;
+
+: $low-level-note
+    drop
+    "Calling this word directly is not necessary in most cases. Higher-level words call it automatically." print-element ;

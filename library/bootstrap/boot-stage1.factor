@@ -219,6 +219,7 @@ vectors words ;
         "/library/collections/tree-each.facts"
         "/library/collections/vectors.facts"
         "/library/collections/virtual-sequences.facts"
+        "/library/generic/early-generic.facts"
         "/library/syntax/parse-stream.facts"
         "/library/syntax/parser.facts"
         "/library/syntax/parse-syntax.facts"

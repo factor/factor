@@ -3,13 +3,10 @@
 IN: kernel-internals
 USING: arrays errors hashtables kernel lists math namespaces parser sequences sequences-internals strings vectors words ;
 
-: tuple= ( seq seq -- ? )
-    over array-capacity over array-capacity number= [
-        dup array-capacity [
-            >r 2dup r> tuck swap array-nth
-            >r swap array-nth r>
-            =
-        ] all? 2nip
+: tuple= ( tuple tuple -- ? )
+    2dup [ array-capacity ] 2apply number= [
+        dup array-capacity
+        [ 2dup swap array-nth >r pick array-nth r> = ] all? 2nip
     ] [
         2drop f
     ] if ; inline

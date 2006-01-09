@@ -72,7 +72,3 @@ HELP: >string "( seq -- str )"
 { $description "Outputs a freshly-allocated string with the same elements as a given sequence." }
 { $errors "Throws an error if the sequence contains elements other than real numbers." }
 { $see-also >array >sbuf >vector >list } ;
-
-HELP: a/an "( str -- particle )"
-{ $values { "str" "a string" } { "particle" "an indefinite particle" } }
-{ $description "Outputs the suitable indefinite particle (``a'' or ``an'') for " { $snippet "str" } " by examining the first character." } ;

@@ -31,24 +31,24 @@ HELP: if-key "( key hash true false -- )"
 HELP: nth-pair "( n seq -- key value )"
 { $values { "n" "an index in the sequence" } { "seq" "a sequence" } { "key" "the first element of the pair" } { "value" "the second element of the pair" } }
 { $description "Fetches the elements with index " { $snippet "n" } " and " { $snippet "n+1" } ", respectively." }
-{ $safety "This word is in the hashtables-internals vocabulary because it does not perform bounds checks." }
+{ $warning "This word is in the " { $snippet "hashtables-internals" } " vocabulary because it does not perform bounds checks." }
 { $see-also set-nth-pair } ;
 
 HELP: set-nth-pair "( key value n seq -- )"
 { $values { "key" "the first element of the pair" } { "value" "the second element of the pair" } { "n" "an index in the sequence" } { "seq" "a sequence" } }
 { $description "Stores a pair of values into the elements with index " { $snippet "n" } " and " { $snippet "n+1" } ", respectively." }
-{ $safety "This word is in the hashtables-internals vocabulary because it does not perform bounds checks." }
+{ $warning "This word is in the " { $snippet "hashtables-internals" } " vocabulary because it does not perform bounds checks." }
 { $see-also nth-pair } ;
 
 HELP: each-pair "( array quot -- )"
 { $values { "array" "an array of pairs" } { "quot" "a quotation with stack effect " { $snippet "( key value -- )" } } }
 { $description "Applies a quotation to successive pairs in the array." }
-{ $safety "This word is in the hashtables-internals vocabulary because passing an array of odd length can lead to memory corruption." } ;
+{ $warning "This word is in the " { $snippet "hashtables-internals" } " vocabulary because passing an array of odd length can lead to memory corruption." } ;
 
 HELP: all-pairs? "( array quot -- ? )"
 { $values { "array" "an array of pairs" } { "quot" "a quotation with stack effect " { $snippet "( key value -- ? )" } } { "?" "conjunction of quotation outputs" } }
 { $description "Applies a predicate quotation to successive pairs in the array, and outputs true if the array is empty or if the quotation yields true for each pair." }
-{ $safety "This word is in the hashtables-internals vocabulary because passing an array of odd length can lead to memory corruption." } ;
+{ $warning "This word is in the " { $snippet "hashtables-internals" } " vocabulary because passing an array of odd length can lead to memory corruption." } ;
 
 HELP: reset-hash "( n hash -- )"
 { $values { "n" "a positive integer specifying hashtable capacity" } { "hash" "a hashtable" } }
@@ -91,7 +91,7 @@ HELP: ?grow-hash "( hash -- )"
 HELP: hash>seq "( i hash -- seq )"
 { $values { "i" "0 or 1" } { "hash" "a hashtable" } { "seq" "a sequence of keys or values" } }
 { $description "Client code should not call this word. It is unsafe and only used in the implementation of " { $link hash-keys } " and " { $link hash-values } ", both of which are safe." }
-{ $safety "This word is in the hashtables-internals vocabulary because passing an invalid value for " { $snippet "i" } " can lead to memory corruption." } ;
+{ $warning "This word is in the " { $snippet "hashtables-internals" } " vocabulary because passing an invalid value for " { $snippet "i" } " can lead to memory corruption." } ;
 
 HELP: <hashtable> "( n -- hash )"
 { $values { "n" "a positive integer specifying hashtable capacity" } { "hash" "a new hashtable" } }

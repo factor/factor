@@ -36,3 +36,7 @@ IN: shells
         init-world world get rect-dim first2
         [ listener-application run-world ] with-gl-screen
     ] with-freetype ;
+
+IN: gadgets
+
+: ui* [ ui ] in-thread ;
