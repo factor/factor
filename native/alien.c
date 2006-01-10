@@ -59,9 +59,12 @@ ALIEN* alien(void* ptr)
 	return alien;
 }
 
-void box_alien(void* ptr)
+void box_alien(void *ptr)
 {
-	dpush(tag_object(alien(ptr)));
+	if(ptr == NULL)
+		dpush(F);
+	else
+		dpush(tag_object(alien(ptr)));
 }
 
 void primitive_alien(void)
