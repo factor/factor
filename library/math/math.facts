@@ -1,0 +1,143 @@
+USING: help kernel math ;
+
+HELP: number= "( x y -- ? )"
+{ $values { "x" "a number" } { "y" "a number" } { "?" "a boolean" } }
+{ $description "Tests if two numbers have the same numerical value." }
+{ $notes "Do not call this word directly. Calling " { $link = } " has the same effect and is more concise." } ;
+
+HELP: < "( x y -- ? )"
+{ $values { "x" "a real number" } { "y" "a real number" } { "?" "a boolean" } }
+{ $description "Tests if " { $snippet "x" } " is less than " { $snippet "y" } "." } ;
+
+HELP: <= "( x y -- ? )"
+{ $values { "x" "a real number" } { "y" "a real number" } { "?" "a boolean" } }
+{ $description "Tests if " { $snippet "x" } " is less than or equal to " { $snippet "y" } "." } ;
+
+HELP: > "( x y -- ? )"
+{ $values { "x" "a real number" } { "y" "a real number" } { "?" "a boolean" } }
+{ $description "Tests if " { $snippet "x" } " is greater than " { $snippet "y" } "." } ;
+
+HELP: >= "( x y -- ? )"
+{ $values { "x" "a real number" } { "y" "a real number" } { "?" "a boolean" } }
+{ $description "Tests if " { $snippet "x" } " is greater than or equal to " { $snippet "y" } "." } ;
+
+HELP: + "( x y -- z )"
+{ $values { "x" "a number" } { "y" "a number" } { "z" "a number" } }
+{ $description
+    "Adds two numbers."
+    { $list
+        "Addition of fixnums may overflow and convert the result to a bignum."
+        "Addition of bignums always yields a bignum."
+        "Addition of floats always yields a float."
+        "Addition of ratios and complex numbers proceeds using the relevant mathematical rules."
+    }
+} ;
+
+HELP: - "( x y -- z )"
+{ $values { "x" "a number" } { "y" "a number" } { "z" "a number" } }
+{ $description
+    "Subtracts " { $link "y" } " from " { $snippet "x" } "."
+    { $list
+        "Subtraction of fixnums may overflow and convert the result to a bignum."
+        "Subtraction of bignums always yields a bignum."
+        "Subtraction of floats always yields a float."
+        "Subtraction of ratios and complex numbers proceeds using the relevant mathematical rules."
+    }
+} ;
+
+HELP: * "( x y -- z )"
+{ $values { "x" "a number" } { "y" "a number" } { "z" "a number" } }
+{ $description
+    "Multiplies two numbers."
+    { $list
+        "Multiplication of fixnums may overflow and convert the result to a bignum."
+        "Multiplication of bignums always yields a bignum."
+        "Multiplication of floats always yields a float."
+        "Multiplication of ratios and complex numbers proceeds using the relevant mathematical rules."
+    }
+} ;
+
+HELP: / "( x y -- z )"
+{ $values { "x" "a number" } { "y" "a number" } { "z" "a number" } }
+{ $description
+    "Divides " { $snippet "x" } " by " { $snippet "y" } ", retaining as much precision as possible."
+    { $list
+        "Division of fixnums may yield a ratio, or overflow and yield a bignum."
+        "Division of bignums may yield a ratio."
+        "Division of floats always yields a float."
+        "Division of ratios and complex numbers proceeds using the relevant mathematical rules."
+    }
+} ;
+
+HELP: /i "( x y -- z )"
+{ $values { "x" "a real number" } { "y" "a real number" } { "z" "a real number" } }
+{ $description
+    "Divides " { $snippet "x" } " by " { $snippet "y" } ", truncating the result to an integer."
+    { $list
+        "Integer division of fixnums may overflow and yield a bignum."
+        "Integer division of bignums always yields a bignum."
+        "Integer division of floats always yields a float."
+        "Integer division of ratios and complex numbers proceeds using the relevant mathematical rules."
+    }
+} ;
+
+HELP: /f "( x y -- z )"
+{ $values { "x" "a real number" } { "y" "a real number" } { "z" "a real number" } }
+{ $description
+    "Divides " { $snippet "x" } " by " { $snippet "y" } ", representing the result as a floating point number."
+    { $list 
+        "Integer division of fixnums may overflow and yield a bignum."
+        "Integer division of bignums always yields a bignum."            
+        "Integer division of floats always yields a float."
+        "Integer division of ratios and complex numbers proceeds using the relevant mathematical rules."
+    }
+} ;
+
+HELP: mod "( x y -- z )"
+{ $values { "x" "an integer" } { "y" "an integer" } { "z" "an integer" } }
+{ $description
+    "Computes the remainder of dividing " { $snippet "x" } " by " { $snippet "y" } ", with the remainder being negative if " { $snippet "x" } " is negative."
+    { $list 
+        "Modulus of fixnums always yields a fixnum."
+        "Modulus of bignums always yields a bignum."            
+    }
+} ;
+
+HELP: /mod "( x y -- z w )"
+{ $values { "x" "an integer" } { "y" "an integer" } { "z" "an integer" } { "w" "an integer" } }
+{ $description
+    "Computes the quotient " { $snippet "z" } " and remainder " { $snippet "w" } " of dividing " { $snippet "x" } " by " { $snippet "y" } ", with the remainder being negative if " { $snippet "x" } " is negative."
+    { $list 
+        "The quotient of two fixnums may overflow and yield a bignum; the remainder is always a fixnum"
+        "The quotient and remainder of two bignums is always a bignum."            
+    }
+} ;
+
+HELP: bitand "( x y -- z )"
+{ $values { "x" "an integer" } { "y" "an integer" } { "z" "an integer" } }
+{ $description "Outputs a new integer where each bit is set if and only if the corresponding bit is set in both inputs." }
+{ $examples
+    { $example "BIN: 101 BIN: 10 bitand .b" "0" }
+    { $example "BIN: 110 BIN: 10 bitand .b" "10" }
+} ;
+
+HELP: bitor "( x y -- z )"
+{ $values { "x" "an integer" } { "y" "an integer" } { "z" "an integer" } }
+{ $description "Outputs a new integer where each bit is set if and only if the corresponding bit is set in at least one of the inputs." }
+{ $examples
+    { $example "BIN: 101 BIN: 10 bitor .b" "111" }
+    { $example "BIN: 110 BIN: 10 bitor .b" "110" }
+} ;
+
+HELP: bitxor "( x y -- z )"
+{ $values { "x" "an integer" } { "y" "an integer" } { "z" "an integer" } }
+{ $description "Outputs a new integer where each bit is set if and only if the corresponding bit is set in exactly one of the inputs." }
+{ $examples
+    { $example "BIN: 101 BIN: 10 bitxor .b" "111" }
+    { $example "BIN: 110 BIN: 10 bitxor .b" "100" }
+} ;
+
+HELP: shift "( x n -- y )"
+{ $values { "x" "an integer" } { "n" "an integer" } { "y" "an integer" } }
+{ $description "Shifts " { $snippet "x" } " to the left by " { $snippet "y" } " bits if " { $snippet "y" } " is positive, or " { $snippet "-y" } " bits to the right if " { $snippet "y" } " is negative. Bits ``falling off'' the right hand side are discarded." }
+{ $examples { $example "BIN: 101 5 shift .b" "10100000" } { $example "BIN: 11111 -2 shift .b" "111" } } ;

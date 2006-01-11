@@ -4,8 +4,6 @@ IN: math-internals
 USING: errors generic kernel kernel-internals math ;
 
 : (rect>) ( xr xi -- x )
-    #! Does not perform a check that the arguments are reals.
-    #! Do not use in your own code.
     dup 0 number= [ drop ] [ <complex> ] if ; inline
 
 IN: math

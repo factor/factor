@@ -17,10 +17,7 @@ UNION: integer fixnum bignum ;
         tuck /mod >r pick * swap >r swapd - r> r> (gcd)
     ] if ; inline
 
-: gcd ( x y -- a d )
-    #! Compute the greatest common divisor d and multiplier a
-    #! such that a*x=d mod y.
-    swap 0 1 2swap (gcd) abs ; foldable
+: gcd ( x y -- a d ) swap 0 1 2swap (gcd) abs ; foldable
 
 : (next-power-of-2) ( i n -- n )
     2dup >= [
@@ -29,8 +26,7 @@ UNION: integer fixnum bignum ;
         >r 1 shift r> (next-power-of-2)
     ] if ;
 
-: next-power-of-2 ( n -- n )
-    1 swap (next-power-of-2) ;
+: next-power-of-2 ( n -- n ) 1 swap (next-power-of-2) ;
 
 IN: math-internals
 
@@ -47,10 +43,7 @@ M: integer / ( x y -- x/y )
         2dup gcd nip tuck /i >r /i r> fraction>
     ] if ;
 
-M: fixnum number=
-    #! Fixnums are immediate values, so equality testing is
-    #! trivial.
-    eq? ;
+M: fixnum number= eq? ;
 
 M: fixnum < fixnum< ;
 M: fixnum <= fixnum<= ;

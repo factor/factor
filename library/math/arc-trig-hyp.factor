@@ -3,12 +3,6 @@
 IN: math
 USING: kernel math math-internals ;
 
-! Inverse trigonometric functions:
-!    acos asec asin acosec atan acot
-
-! Inverse hyperbolic functions:
-!    acosh asech asinh acosech atanh acoth
-
 : acosh dup sq 1- sqrt + log ; inline
 : asech recip acosh ; inline
 : asinh dup sq 1+ sqrt + log ; inline

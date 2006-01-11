@@ -3,9 +3,6 @@
 IN: math
 USING: errors kernel math math-internals ;
 
-! Power-related functions:
-!     exp log sqrt pow ^mod
-
 : exp >rect swap fexp swap polar> ; inline
 : log >polar swap flog swap rect> ; inline
 

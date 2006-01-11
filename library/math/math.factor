@@ -1,5 +1,5 @@
-! Copyright (C) 2003, 2005 Slava Pestov.
-! See http://factor.sf.net/license.txt for BSD license.
+! Copyright (C) 2003, 2006 Slava Pestov.
+! See http://factorcode.org/license.txt for BSD license.
 IN: math
 USING: errors generic kernel math-internals ;
 
@@ -27,10 +27,10 @@ G: bitor  ( x y -- z ) math-combination ; foldable
 G: bitxor ( x y -- z ) math-combination ; foldable
 G: shift  ( x n -- y ) math-combination ; foldable
 
+GENERIC: bitnot ( n -- n ) foldable
+
 GENERIC: 1+ ( x -- x+1 ) foldable
 GENERIC: 1- ( x -- x-1 ) foldable
-
-GENERIC: bitnot ( n -- n ) foldable
 
 GENERIC: truncate ( n -- n ) foldable
 GENERIC: floor    ( n -- n ) foldable
@@ -39,10 +39,7 @@ GENERIC: ceiling  ( n -- n ) foldable
 : max ( x y -- z ) [ > ] 2keep ? ; inline
 : min ( x y -- z ) [ < ] 2keep ? ; inline
 
-: between? ( x min max -- ? )
-    #! Push if min <= x <= max. Handles case where min > max
-    #! by swapping them.
-    pick rot >= [ <= ] [ 2drop f ] if ; inline
+: between? ( x min max -- ? ) pick >= >r >= r> and ; inline
 
 : sq dup * ; inline
 
@@ -51,17 +48,17 @@ GENERIC: ceiling  ( n -- n ) foldable
 
 : rem ( x y -- x%y )
     #! Like modulus, but always gives a positive result.
-    [ mod ] keep  over 0 < [ + ] [ drop ] if ; inline
+    [ [ mod ] keep + ] keep mod ; inline
 
 : sgn ( n -- -1/0/1 )
     #! Push the sign of a real number.
-    dup 0 = [ drop 0 ] [ 1 < -1 1 ? ] if ; foldable
+    dup 0 < -1 0 ? swap 0 > 1 0 ? bitor ; foldable
 
 GENERIC: abs ( z -- |z| ) foldable
 GENERIC: absq ( n -- |n|^2 ) foldable
 
 : align ( offset width -- offset )
-    2dup mod dup 0 number= [ 2drop ] [ - + ] if ; inline
+    1- [ + ] keep bitnot bitand ; inline
 
 : (repeat) ( i n quot -- )
     pick pick >=
