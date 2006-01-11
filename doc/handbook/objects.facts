@@ -107,7 +107,7 @@ GLOSSARY: "type" "an object invariant that describes its shape. An object's type
 GLOSSARY: "built-in class" "see type" ;
 
 ARTICLE: "builtin-classes" "Built-in classes"
-"Every object is an instance of to exactly one type, and the type is constant for the lifetime of the object. There is only a fixed number of types built-in to the run-time, and corresponding to each type is a \emph{built-in class}:"
+"Every object is an instance of to exactly one type, and the type is constant for the lifetime of the object. There is only a fixed number of types built-in to the run-time, and corresponding to each type is a " { $emphasis "built-in class" } ":"
 { $code
     "alien"
     "array"
@@ -160,7 +160,7 @@ $terpri
 "A parsing word defines tuple classes."
 { $subsection POSTPONE: TUPLE: }
 { $subsection "tuple-constructors" }
-;
+{ $subsection "tuple-delegation" } ;
 
 GLOSSARY: "constructor" "a word whose primary role is to create new instances of a class" ;
 
