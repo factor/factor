@@ -1,5 +1,5 @@
-! Copyright (C) 2004, 2005 Slava Pestov.
-! See http://factor.sf.net/license.txt for BSD license.
+! Copyright (C) 2004, 2006 Slava Pestov.
+! See http://factorcode.org/license.txt for BSD license.
 IN: image
 USING: errors generic hashtables io kernel kernel-internals
 lists math memory namespaces parser prettyprint sequences
@@ -143,6 +143,10 @@ vectors words ;
         "/library/alien/compiler.factor"
         "/library/alien/syntax.factor"
         "/library/alien/malloc.factor"
+        
+        "/library/alien/objective-c/runtime.factor"
+        "/library/alien/objective-c/utils.factor"
+        "/library/alien/objective-c/syntax.factor"
         
         "/library/io/buffer.factor"
 
