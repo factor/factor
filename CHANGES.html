@@ -48,6 +48,15 @@ this is lexicographic order, and for words, this compares word names.</li>
 <li>C library interface:
 
 <ul>
+<li>Support for binding to Objective C libraries is now included.
+<ul>
+<li>Normal usage of Objective C classes and methods is done using the <code>OBJC-CLASS:</code>
+and <code>OBJC-MESSAGE:</code> parsing words. See the example in
+<code>examples/cocoa-speech.factor</code>.</li>
+<li>Objective C runtime introspection functions and structures are defined in the
+<code>objective-c</code> vocabulary.</li>
+</ul>
+</li>
 <li>Added a pair of words for between Factor strings and C strings, <code>alien&gt;string</code> and <code>string&gt;alien</code>.
 </li>
 
