@@ -7,7 +7,7 @@ G: tree-each* ( obj quot -- | quot: elt -- )
     [ over ] standard-combination ; inline
 
 : tree-each ( obj quot -- | quot: elt -- )
-    [ call ] 2keep tree-each* ;
+    [ call ] 2keep tree-each* ; inline
 
 : tree-each-with ( obj vector quot -- )
     swap [ with ] tree-each 2drop ; inline

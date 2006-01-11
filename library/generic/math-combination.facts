@@ -32,7 +32,20 @@ HELP: math-class? "( object -- ? )"
 
 HELP: math-combination "( word -- quot )"
 { $values { "word" "a generic word" } { "quot" "a quotation" } }
-{ $description "Generates a double-dispatching word definition. Only methods defined on numerical classes and " { $link object } " take effect in the math combination. Methods defined on numerical classes are guaranteed to have their two inputs upgraded to the highest priority type of the two." } ;
+{ $description "Generates a double-dispatching word definition. Only methods defined on numerical classes and " { $link object } " take effect in the math combination. Methods defined on numerical classes are guaranteed to have their two inputs upgraded to the highest priority type of the two."
+$terpri
+"The math method combination is used for binary operators such as " { $link + } " and " { $link * } "."
+$terpri
+"A method can only be added to a generic word using the math combination if the method specializes on one of the below classes, or a union defined over one or more of the below classes:"
+{ $code
+    "fixnum"
+    "bignum"
+    "ratio"
+    "float"
+    "complex"
+    "object"
+}
+"The math combination performs numerical upgrading as described in " { $link "number-protocol" } "." } ;
 
 HELP: 2generic f
 { $description "The class of generic words with the math combination." } ;

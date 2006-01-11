@@ -13,7 +13,7 @@ USE: prettyprint
 
 [ H{ } ] [ { } [ ] map>hash ] unit-test
 
-1000 [ sq ] map>hash "testhash" set
+[ ] [ 1000 [ dup sq ] map>hash "testhash" set ] unit-test
 
 [ V{ } ]
 [ 1000 [ dup sq swap "testhash" get hash = not ] subset ]

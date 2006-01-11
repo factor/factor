@@ -101,7 +101,8 @@ M: object tail ( index seq -- seq ) [ tail-slice ] keep like ;
     tuck swap tail-slice >r swap tail-slice r> ;
 
 : unpair ( seq -- firsts seconds )
-    flip dup empty? [ drop { } { } ] [ first2 ] if ;
+    2 swap group flip
+    dup empty? [ drop { } { } ] [ first2 ] if ;
 
 : concat ( seq -- seq )
     dup empty? [ [ [ % ] each ] over first make ] unless ;

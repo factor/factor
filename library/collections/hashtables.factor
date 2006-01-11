@@ -252,6 +252,6 @@ M: hashtable = ( obj hash -- ? )
     ] if* ; inline
 
 : map>hash ( seq quot -- hash | quot: key -- key value )
-    swap [ length <hashtable> ] keep
+    over length <hashtable> rot
     [ -rot [ >r call swap r> set-hash ] 2keep ] each nip ;
     inline

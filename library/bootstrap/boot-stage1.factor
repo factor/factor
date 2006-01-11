@@ -234,6 +234,7 @@ vectors words ;
 
         "/doc/handbook/collections.facts"
         "/doc/handbook/dataflow.facts"
+        "/doc/handbook/objects.facts"
         "/doc/handbook/parser.facts"
         "/doc/handbook/sequences.facts"
         "/doc/handbook/syntax.facts"

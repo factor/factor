@@ -9,6 +9,7 @@ M: real abs dup 0 < [ neg ] when ;
 M: real absq sq ;
 
 M: real hashcode ( n -- n ) >fixnum ;
+M: real <=> - ;
 
 M: float number= float= ;
 M: float < float< ;

@@ -74,13 +74,13 @@ C: alien-node make-node ;
     dup class get swap fastcall-regs >= ;
 
 : spill-param ( reg-class -- n reg-class )
-    reg-size stack-params [ tuck + ] change
+    reg-class-size stack-params [ tuck + ] change
     T{ stack-params } ;
 
 : inc-reg-class ( reg-class -- )
     #! On Mac OS X, float parameters 'shadow' integer registers.
     dup class inc dup float-regs? dual-fp/int-regs? and [
-        int-regs [ over reg-size 4 / + ] change
+        int-regs [ over reg-class-size 4 / + ] change
     ] when drop ;
 
 : fastcall-param ( reg-class -- n reg-class )
@@ -124,7 +124,7 @@ M: alien-node linearize* ( node -- )
     dup linearize-return linearize-next ;
 
 : parse-arglist ( lst -- types stack effect )
-    2 swap group unpair [
+    unpair [
         " " % [ "," ?tail drop % " " % ] each "-- " %
     ] "" make ;
 

@@ -63,7 +63,7 @@ DEFER: PRIMITIVE: parsing
     parsing
 
 : C:
-    scan-word [ tuple-constructor ] keep
+    scan-word [ create-constructor ] keep
     [ define-constructor ] [ ] ; parsing
 
 : FORGET: scan use get hash-stack [ forget ] when* ; parsing

@@ -77,5 +77,3 @@ GENERIC: absq ( n -- |n|^2 ) foldable
     swap [ >r dup slip r> ] repeat drop ; inline
 
 GENERIC: number>string ( str -- num ) foldable
-
-M: real <=> - ;
