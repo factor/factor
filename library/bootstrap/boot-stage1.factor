@@ -236,6 +236,7 @@ vectors words ;
         "/library/math/integer.facts"
         "/library/math/math.facts"
         "/library/math/parse-numbers.facts"
+        "/library/math/pow.facts"
         "/library/math/random.facts"
         "/library/math/ratio.facts"
         "/library/math/trig-hyp.facts"
