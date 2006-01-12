@@ -26,21 +26,16 @@ M: number = ( n n -- ? ) number= ;
 
 : conjugate ( z -- z* ) >rect neg rect> ; inline
 
-: arg ( z -- arg )
-    #! Compute the complex argument.
-    >rect swap fatan2 ; inline
+: arg ( z -- arg ) >rect swap fatan2 ; inline
 
 : >polar ( z -- abs arg )
     dup abs swap >rect swap fatan2 ; inline
 
-: cis ( theta -- cis )
-    dup fcos swap fsin rect> ; inline
+: cis ( theta -- cis ) dup fcos swap fsin rect> ; inline
 
-: polar> ( abs arg -- z )
-    cis * ; inline
+: polar> ( abs arg -- z ) cis * ; inline
 
-: quadrant ( z -- n )
-    >rect >r 0 >= 0 1 ? r> 0 >= 0 3 ? bitxor ;
+: quadrant ( z -- n ) >rect >r 0 >= 0 1 ? r> 0 >= 0 3 ? bitxor ;
 
 M: complex absq >rect [ sq ] 2apply + ;
 

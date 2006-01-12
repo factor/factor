@@ -182,13 +182,13 @@ HELP: if "( cond true false -- )"
 $terpri
 "The " { $snippet "cond" } " value is removed from the stack before either quotation is called." } ;
 
-HELP: when "( cond true false -- )"
+HELP: when "( cond true -- )"
 { $values { "cond" "a generalized boolean" } { "true" "a quotation" } }
 { $description "If " { $snippet "cond" } " is not " { $link f } ", calls the " { $snippet "true" } " quotation."
 $terpri
 "The " { $snippet "cond" } " value is removed from the stack before the quotation is called." } ;
 
-HELP: unless "( cond true false -- )"
+HELP: unless "( cond false -- )"
 { $values { "cond" "a generalized boolean" } { "false" "a quotation" } }
 { $description "If " { $snippet "cond" } " is " { $link f } ", calls the " { $snippet "false" } " quotation."
 $terpri
