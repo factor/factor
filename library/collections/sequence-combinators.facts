@@ -14,8 +14,7 @@ HELP: reduce "( seq identity quot -- result )"
 { $description "Combines successive elements of the sequence using a binary operation, and outputs the final result. On the first iteration, the two inputs to the quotation are " { $snippet "identity" } ", and the first element of the sequence. On successive iterations, the first input is the result of the previous iteration, and the second input is the corresponding element of the sequence." }
 { $examples
     { $example "{ 1 5 3 } 0 [ + ] reduce ." "9" }
-}
-{ $see-also sum product } ;
+} ;
 
 HELP: accumulate "( seq identity quot -- newseq )"
 { $values { "seq" "a sequence" } { "quot" "a quotation with stack effect " { $snippet "( prev elt -- next )" } } }
