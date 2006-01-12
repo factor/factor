@@ -1,0 +1,55 @@
+USING: help math prettyprint ;
+
+HELP: base> "( str radix -- n )"
+{ $values { "str" "a string" } { "radix" "an integer between 2 and 36" } { "n" "a real number" } }
+{ $description "Creates a real number from a string representation with the given radix. The radix is ignored for floating point literals; they are always taken to be in base 10." }
+{ $errors "Throws an error if the string cannot be interpreted as a number in the given base." }
+{ $see-also >base } ;
+
+HELP: string>number "( str -- n )"
+{ $values { "str" "a string" } { "n" "a real number" } }
+{ $description "Creates a real number from a string representation of a number in base 10." }
+{ $errors "Throws an error if the string cannot be interpreted as a number in base 10." }
+{ $see-also number>string } ;
+
+HELP: bin> "( str -- n )"
+{ $values { "str" "a string" } { "n" "a real number" } }
+{ $description "Creates a real number from a string representation of a number in base 2." }
+{ $errors "Throws an error if the string cannot be interpreted as a number in base 2." }
+{ $see-also POSTPONE: BIN: } ;
+
+HELP: oct> "( str -- n )"
+{ $values { "str" "a string" } { "n" "a real number" } }
+{ $description "Creates a real number from a string representation of a number in base 8." }
+{ $errors "Throws an error if the string cannot be interpreted as a number in base 8." }
+{ $see-also POSTPONE: OCT: } ;
+
+HELP: hex> "( str -- n )"
+{ $values { "str" "a string" } { "n" "a real number" } }
+{ $description "Creates a real number from a string representation of a number in base 16." }
+{ $errors "Throws an error if the string cannot be interpreted as a number in base 16." }
+{ $see-also POSTPONE: HEX: } ;
+
+HELP: >base "( n radix -- str )"
+{ $values { "n" "a real number" } { "radix" "an integer between 2 and 36" } { "str" "a string" } }
+{ $description "Converts a real number into a string representation using the given radix. If the number is a float, the radix is ignored and the output is always in base 10." }
+{ $see-also base> } ;
+
+HELP: number>string "( n -- str )"
+{ $values { "n" "a real number" } { "str" "a string" } }
+{ $description "Outputs a string representation of a number using base 10." } ;
+
+HELP: >bin "( n -- str )"
+{ $values { "n" "a real number" } { "str" "a string" } }
+{ $description "Outputs a string representation of a number using base 2." }
+{ $see-also .b } ;
+
+HELP: >oct "( n -- str )"
+{ $values { "n" "a real number" } { "str" "a string" } }
+{ $description "Outputs a string representation of a number using base 8." } 
+{ $see-also .o } ;
+
+HELP: >hex "( n -- str )"
+{ $values { "n" "a real number" } { "str" "a string" } }
+{ $description "Outputs a string representation of a number using base 16." } 
+{ $see-also .h } ;

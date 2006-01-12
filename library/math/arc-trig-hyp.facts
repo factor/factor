@@ -1,7 +1,4 @@
-IN: help
-USING: math ;
-
-: $values-x/y { { "x" "a complex number" } { "y" "a complex number" } } $values ;
+USING: help math ;
 
 HELP: acosh "( x -- y )"
 $values-x/y

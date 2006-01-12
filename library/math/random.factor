@@ -1,5 +1,5 @@
 ! Copyright (C) 2005 Doug Coleman.
-! See http://factor.sf.net/license.txt for BSD license.
+! See http://factorcode.org/license.txt for BSD license.
 
 ! mersenne twister based on 
 ! http://www.math.sci.hiroshima-u.ac.jp/~m-mat/MT/MT2002/CODES/mt19937ar.c

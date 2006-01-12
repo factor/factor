@@ -27,8 +27,8 @@ HELP: odd? "( n -- ? )"
 
 HELP: gcd "( x y -- a d )"
 { $values { "x" "an integer" } { "y" "an integer" } { "a" "an integer" } { "d" "an integer" } }
-{ $description "Computes the positive greatest common divisor " { $snippet "d" } " of " { $snippet "x" } " and " { $snippet "y" } ", and another value " { $snippet "a" } " satisfying:" { $code "a*x = d mod y" } }
-{ $notes "If " { $snippet "d" } " is 1, then " { $snippet "a" } " is the inverse of " { $snippet "x" } " modulo " { $snippet "y" } "." } ;
+{ $description "Computes the positive greatest common divisor " { $snippet "d" } " of " { $snippet "x" } " and " { $snippet "y" } ", and another value " { $snippet "a" } " satisfying:" { $code "a*y = d mod x" } }
+{ $notes "If " { $snippet "d" } " is 1, then " { $snippet "a" } " is the inverse of " { $snippet "y" } " modulo " { $snippet "x" } "." } ;
 
 HELP: next-power-of-2 "( m -- n )"
 { $values { "m" "a non-negative integer" } { "n" "an integer" } }

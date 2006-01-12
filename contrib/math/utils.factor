@@ -36,6 +36,9 @@ USING: errors kernel sequences math sequences-internals namespaces arrays ;
     #! Complex inner product.
     0 [ ** + ] 2reduce ;
 
+: sum ( v -- n ) 0 [ + ] reduce ;
+: product ( v -- n ) 1 [ * ] reduce ;
+
 : proj ( u v -- w )
     #! Orthogonal projection of u onto v.
     [ [ v. ] keep norm-sq v/n ] keep n*v ;

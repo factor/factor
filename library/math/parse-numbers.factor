@@ -1,10 +1,8 @@
 ! Copyright (C) 2004, 2005 Slava Pestov.
-! See http://factor.sf.net/license.txt for BSD license.
+! See http://factorcode.org/license.txt for BSD license.
 IN: math
 USING: errors generic kernel math-internals namespaces sequences
 strings ;
-
-! Number parsing
 
 : not-a-number "Not a number" throw ;
 
@@ -54,7 +52,6 @@ M: object digit> not-a-number ;
 G: >base ( num radix -- string ) [ over ] standard-combination ;
 
 M: integer >base ( num radix -- string )
-    #! Convert a number to a string in a certain base.
     [
         over 0 < [
             swap neg swap integer, CHAR: - ,
@@ -71,8 +68,6 @@ M: ratio >base ( num radix -- string )
     ] "" make ;
 
 M: float >base ( num radix -- string )
-    #! This is terrible. Will go away when we do our own float
-    #! output.
     drop float>string
     CHAR: . over member? [ ".0" append ] unless ;
 

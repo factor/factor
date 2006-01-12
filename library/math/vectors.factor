@@ -22,8 +22,5 @@ USING: arrays generic kernel sequences ;
 : norm ( vec -- n ) norm-sq sqrt ;
 : normalize ( vec -- uvec ) dup norm v/n ;
 
-: sum ( v -- n ) 0 [ + ] reduce ;
-: product ( v -- n ) 1 [ * ] reduce ;
-
 : set-axis ( x y axis -- v )
     dup length [ >r 0 = pick pick ? r> swap nth ] 2map 2nip ;

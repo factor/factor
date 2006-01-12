@@ -3,7 +3,6 @@
 IN: math
 USING: errors generic kernel math-internals ;
 
-! Math operations
 G: number= ( x y -- ? ) math-combination ; foldable
 M: object number= 2drop f ;
 
@@ -35,42 +34,27 @@ GENERIC: 1- ( x -- x-1 ) foldable
 GENERIC: truncate ( n -- n ) foldable
 GENERIC: floor    ( n -- n ) foldable
 GENERIC: ceiling  ( n -- n ) foldable
-
-: max ( x y -- z ) [ > ] 2keep ? ; inline
-: min ( x y -- z ) [ < ] 2keep ? ; inline
-
-: between? ( x min max -- ? ) pick >= >r >= r> and ; inline
+GENERIC: abs      ( z -- |z| ) foldable
+GENERIC: absq     ( n -- |n|^2 ) foldable
 
 : sq dup * ; inline
-
 : neg 0 swap - ; inline
 : recip 1 swap / ; inline
-
-: rem ( x y -- x%y )
-    #! Like modulus, but always gives a positive result.
-    [ [ mod ] keep + ] keep mod ; inline
-
-: sgn ( n -- -1/0/1 )
-    #! Push the sign of a real number.
-    dup 0 < -1 0 ? swap 0 > 1 0 ? bitor ; foldable
-
-GENERIC: abs ( z -- |z| ) foldable
-GENERIC: absq ( n -- |n|^2 ) foldable
-
-: align ( offset width -- offset )
-    1- [ + ] keep bitnot bitand ; inline
+: max ( x y -- z ) [ > ] 2keep ? ; inline
+: min ( x y -- z ) [ < ] 2keep ? ; inline
+: between? ( x min max -- ? ) pick >= >r >= r> and ; inline
+: rem ( x y -- z ) tuck mod over + swap mod ; inline
+: sgn ( m -- n ) dup 0 < -1 0 ? swap 0 > 1 0 ? bitor ; foldable
+: align ( m w -- n ) 1- [ + ] keep bitnot bitand ; inline
 
 : (repeat) ( i n quot -- )
     pick pick >=
     [ 3drop ] [ [ swap >r call 1+ r> ] keep (repeat) ] if ;
     inline
 
-: repeat ( n quot -- | quot: n -- n )
-    #! The loop counter is kept on the stack, and ranges from
-    #! 0 to n-1.
-    0 -rot (repeat) ; inline
+: repeat ( n quot -- | quot: n -- n ) 0 -rot (repeat) ; inline
 
 : times ( n quot -- | quot: -- )
     swap [ >r dup slip r> ] repeat drop ; inline
 
-GENERIC: number>string ( str -- num ) foldable
+GENERIC: number>string ( n -- str ) foldable

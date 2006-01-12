@@ -17,7 +17,7 @@ UNION: integer fixnum bignum ;
         tuck /mod >r pick * swap >r swapd - r> r> (gcd)
     ] if ; inline
 
-: gcd ( x y -- a d ) swap 0 1 2swap (gcd) abs ; foldable
+: gcd ( x y -- a d ) 0 1 2swap (gcd) abs ; foldable
 
 : (next-power-of-2) ( i n -- n )
     2dup >= [

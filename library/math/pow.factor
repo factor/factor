@@ -1,5 +1,5 @@
 ! Copyright (C) 2004, 2005 Slava Pestov.
-! See http://factor.sf.net/license.txt for BSD license.
+! See http://factorcode.org/license.txt for BSD license.
 IN: math
 USING: errors kernel math math-internals ;
 
@@ -9,7 +9,6 @@ USING: errors kernel math math-internals ;
 GENERIC: sqrt ( n -- n ) foldable
 
 M: complex sqrt >polar swap fsqrt swap 2 / polar> ;
-
 M: real sqrt dup 0 < [ neg fsqrt 0 swap rect> ] [ fsqrt ] if ;
 
 GENERIC: ^ ( z w -- z^w ) foldable
@@ -24,8 +23,6 @@ M: number ^ ( z w -- z^w )
     swap >polar 3dup ^theta >r ^mag r> polar> ;
 
 : each-bit ( n quot -- | quot: 0/1 -- )
-    #! Apply the quotation to each bit of the number. The number
-    #! must be positive.
     over 0 number= pick -1 number= or [
         2drop
     ] [
@@ -51,7 +48,6 @@ M: integer ^ ( z w -- z^w )
     ] if ; foldable
 
 : log2 ( n -- b )
-    #! Log base two for integers.
     {
         { [ dup 0 <= ] [ "Input must be positive" throw ] }
         { [ dup 1 = ] [ drop 0 ] }

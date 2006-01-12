@@ -1,0 +1,10 @@
+USING: help math ;
+
+HELP: (random-int) "( -- rand )"
+{ $values { "rand" "an integer between 0 and 2^32-1" } }
+{ $description "Generates a random 32-bit unsigned integer." } ;
+
+HELP: random-int "( n -- rand )"
+{ $values { "rand" "an integer between 0 and n" } }
+{ $description "Outputs a pseudo-random integer in the interval " { $snippet "[0,n]" } "." }
+{ $notes "As per the closed interval notation, the end-points are included in the interval." } ;
