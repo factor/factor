@@ -28,30 +28,30 @@ HELP: acoth "( x -- y )"
 $values-x/y
 { $description "Inverse hyperbolic cotangent." } ;
 
-HELP: acosh "( x -- y )"
+HELP: acos "( x -- y )"
 $values-x/y
 { $description "Inverse trigonometric cosine." } ;
 
-HELP: asech "( x -- y )"
+HELP: asec "( x -- y )"
 $values-x/y
 { $description "Inverse trigonometric secant." } ;
 
-HELP: asinh "( x -- y )"
+HELP: asin "( x -- y )"
 $values-x/y
 { $description "Inverse trigonometric sine." } ;
 
-HELP: asinh "( x -- y )"
+HELP: asin "( x -- y )"
 $values-x/y
 { $description "Inverse trigonometric sine." } ;
 
-HELP: acosech "( x -- y )"
+HELP: acosec "( x -- y )"
 $values-x/y
 { $description "Inverse trigonometric cosecant." } ;
 
-HELP: atanh "( x -- y )"
+HELP: atan "( x -- y )"
 $values-x/y
 { $description "Inverse trigonometric tangent." } ;
 
-HELP: acoth "( x -- y )"
+HELP: acot "( x -- y )"
 $values-x/y
 { $description "Inverse trigonometric cotangent." } ;

@@ -183,4 +183,5 @@ DEFER: help
     "Calling this word directly is not necessary in most cases. Higher-level words call it automatically." print-element ;
 
 : $values-x/y
+    drop
     { { "x" "a complex number" } { "y" "a complex number" } } $values ;
