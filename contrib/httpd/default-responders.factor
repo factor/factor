@@ -2,8 +2,7 @@
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: httpd
 USING: browser-responder cont-responder file-responder kernel
-namespaces prettyprint quit-responder resource-responder
-test-responder ;
+namespaces prettyprint ;
 
 #! Remove all existing responders, and create a blank
 #! responder table.

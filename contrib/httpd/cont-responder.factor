@@ -21,7 +21,7 @@
 ! OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
 ! ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 IN: cont-responder
-USING: http httpd math random namespaces io
+USING: http httpd math namespaces io
        lists strings kernel html hashtables
        parser generic sequences ;
 

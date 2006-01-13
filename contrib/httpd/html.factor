@@ -2,7 +2,7 @@
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: html
 USING: generic hashtables http io kernel lists math namespaces
-presentation sequences strings styles words ;
+sequences strings styles words ;
 
 : html-entities ( -- alist )
     H{

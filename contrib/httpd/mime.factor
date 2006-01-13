@@ -1,7 +1,7 @@
 ! Copyright (C) 2004, 2005 Slava Pestov.
-! See http://factor.sf.net/license.txt for BSD license.
+! See http://factorcode.org/license.txt for BSD license.
 IN: httpd
-USING: io hashtables kernel lists namespaces ;
+USING: io hashtables kernel sequences math namespaces ;
 
 : file-extension ( filename -- extension )
     "." split dup length 1 <= [ drop f ] [ peek ] if ;
