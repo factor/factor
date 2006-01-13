@@ -1,6 +1,5 @@
 USING: alien cpu-8080 errors generic io kernel kernel-internals
-lists math namespaces sdl sdl-event sdl-gfx sdl-video sequences
-styles threads ;
+lists math namespaces sdl sequences styles threads ;
 IN: space-invaders
 
 TUPLE: space-invaders port1 port2i port2o port3o port4lo port4hi port5o ;
