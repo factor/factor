@@ -48,7 +48,6 @@ SYMBOL: mti
 IN: math
 
 : init-random ( seed -- )
-    #! Initialize the random number generator with a new seed.
     global [
         mt-n 0 <array> swap
         HEX: ffffffff bitand 0 pick set-nth
@@ -58,12 +57,9 @@ IN: math
     ] bind ;
 
 : (random-int) ( -- rand )
-    #! Generate a random integer between 0 and 2^32-1 inclusive.
     global [
         mti get dup mt-n < [ drop generate-mt 0 ] unless
         mt-nth mt-temper mti inc
     ] bind ;
 
-: random-int ( n -- rand )
-    #! Generate a random integer between 0 and n-1 inclusive.
-    (random-int) * -32 shift ;
+: random-int ( n -- rand ) (random-int) * -32 shift ;

@@ -74,10 +74,6 @@ HELP: (set-hash) "( value key hash -- )"
 { $values { "value" "a value" } { "key" "a key to add" } { "hash" "a hashtable" } }
 { $description "Stores the key/value pair into the hashtable. This word does not grow the hashtable if it exceeds capacity, therefore a hang can result. Client code should use " { $link set-hash } " instead, which grows the hashtable if necessary." } ;
 
-HELP: (set-hash) "( value key hash -- )"
-{ $values { "value" "a value" } { "key" "a key to add" } { "hash" "a hashtable" } }
-{ $description "Stores the key/value pair into the hashtable. This word does not grow the hashtable if it exceeds capacity, therefore a hang can result. Client code should use " { $link set-hash } " instead, which grows the hashtable if necessary." } ;
-
 HELP: grow-hash "( hash -- )"
 { $values { "hash" "a hashtable" } }
 { $description "Enlarges the capacity of a hashtable. Client code does not need to call this word directly." }
@@ -145,8 +141,8 @@ HELP: remove-hash "( key hash -- )"
 { $description "Removes an entry from the hashtable." }
 { $see-also clear-hash } ;
 
-HELP: set-hash "( key hash -- )"
-{ $values { "key" "a key" } { "hash" "a hashtable" } }
+HELP: set-hash "( value key hash -- )"
+{ $values { "value" "a value" } { "key" "a key" } { "hash" "a hashtable" } }
 { $description "Stores an entry into the hashtable." }
 { $see-also hash remove-hash } ;
 
