@@ -21,7 +21,7 @@
 ! OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
 ! ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 IN: scratchpad
-USING: kernel lazy parser-combinators test errors strings parser lists math sequences unparser ;
+USING: kernel lazy parser-combinators test errors strings parser lists math sequences ;
 
 ! Testing <&>
 [ [ [[ "cd" [[ "a" "b" ]] ]] ] ] [

@@ -228,7 +228,7 @@ DEFER: list>llist
 : lappend ( llist1 llist2 -- llist )
   #! Concatenate two lazy lists such that they appear to be one big
   #! lazy list.
-  2list list>llist lappend* ;
+  [ ] cons cons list>llist lappend* ;
 
 : leach ( llist quot -- )
   #! Call the quotation on each item in the lazy list. 
@@ -262,36 +262,4 @@ DEFER: list>llist
   ] [ 
     drop lnil
   ] if ;
-
-! M: lcons nth lnth ;
-
-: test1 
-  [ 1 ] list>llist
-  [ 2 ] list>llist
-  2list
-  list>llist
-  lappend* ;
-
-: test2 
-  [ 1 2 ] list>llist
-  [ 3 4 ] list>llist
-  2list
-  list>llist
-  lappend* ;
-
-: test3
-  [ 1 2 3 ] list>llist
-  [ 4 5 6 ] list>llist
-  [ 7 8 9 ] list>llist
-  2list cons
-  list>llist
-  lappend* ;
-
-: test4
-  [ 1 2 3 4 5 ] list>llist
-  [ 2 mod 1 = ] lsubset ;
-
-: test5 lnil unit delay lunit [ lnil? not ] lsubset ;
-
-: test6 lnil unit delay lunit lappend* ;
 
