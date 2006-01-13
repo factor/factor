@@ -24,7 +24,7 @@
 ! Concurrency library for Factor based on Erlang/Termite style
 ! concurrency.
 USING: kernel lists generic threads io namespaces errors words 
-       math sequences hashtables unparser strings vectors dlists ;
+       math sequences hashtables strings vectors dlists ;
 IN: concurrency
 
 #! Debug
