@@ -1,6 +1,6 @@
 IN: crypto-internals
 USING: kernel io strings sequences namespaces math prettyprint
-test parser lists vectors hashtables kernel-internals crypto ;
+test parser lists vectors hashtables kernel-internals math-contrib crypto ;
 
 ! Implemented according to RFC 3174.
 
