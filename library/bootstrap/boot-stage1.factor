@@ -250,6 +250,7 @@ vectors words ;
 
         "/doc/handbook/collections.facts"
         "/doc/handbook/dataflow.facts"
+        "/doc/handbook/handbook.facts"
         "/doc/handbook/math.facts"
         "/doc/handbook/objects.facts"
         "/doc/handbook/parser.facts"

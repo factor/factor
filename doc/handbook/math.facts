@@ -56,7 +56,7 @@ $terpri
 "Some mathematical operations are only supported on integers."
 { $subsection "modular-arithmetic" }
 { $subsection "bitwise-arithmetic" }
-{ $subsection "rational numbers" } ;
+{ $subsection "random-numbers" } ;
 
 ARTICLE: "modular-arithmetic" "Modular arithmetic"
 { $subsection mod }

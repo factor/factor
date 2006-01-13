@@ -30,8 +30,6 @@ global [ first-time on ] bind
 IN: shells
 
 : ui ( -- )
-    #! Start the Factor graphics subsystem with the given screen
-    #! dimensions.
     check-running [
         init-world world get rect-dim first2
         [ listener-application run-world ] with-gl-screen

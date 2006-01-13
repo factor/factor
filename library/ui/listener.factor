@@ -42,14 +42,14 @@ SYMBOL: browser-pane
     datastack-hook get call stack-bar get show-stack
     word-completion ;
 
-: tutorial-button
-    { "tutorial" } $link terpri ;
+: help-button
+    "Please read the " write { "handbook" } $link "." print ;
 
 : listener-thread
     pane get [
         [ ui-listener-hook ] listener-hook set
-        tutorial-button
-        tty
+        help-button
+        listener
     ] with-stream* ;
 
 M: label set-message ( string/f status -- )

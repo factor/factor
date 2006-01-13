@@ -1,0 +1,34 @@
+USING: help parser prettyprint ;
+
+ARTICLE: "handbook" "Factor documentation"
+"Welcome to Factor! Factor documentation is takes the form of an outline, with cross-referencing hyperlinks between topics. You can click the triangle next to a topic heading to expand the topic:"
+{ $subsection "presentation-intro" }
+"There is a short language tutorial:"
+{ $subsection "tutorial" }
+"Some words for performing common operations at the listener:"
+{ $list
+    {
+        "You can read the documentation for a word with " { $link help } ":"
+        { $code "\\ reverse help" }
+    }
+    { "You can print the top of the stack with " { $link . } }
+    {
+        "Source files are loaded with " { $link run-file } ":"
+        { $code "\"tetris.factor\" run-file" }
+    }
+}
+"Detailed documentation:"
+{ $subsection "syntax" }
+{ $subsection "dataflow" }
+{ $subsection "words" }
+{ $subsection "objects" }
+{ $subsection "math" }
+{ $subsection "collections" }
+{ $subsection "parser" } ;
+
+ARTICLE: "presentation-intro" "The presentation-based UI"
+"Factor provides a " { $emphasis "presentation-based" } " user interface. A " { $emphasis "presentation" } " is a graphical representation of a live object. You can see presentations everywhere; help links, words, and code examples are all presentations."
+$terpri
+"When you place the mouse over a presentation, it is highlighted with a surrounding border."
+$terpri
+"Clicking a presentation with the left mouse button invokes a default command. Clicking the right mouse button displays a menu of applicable commands." ;

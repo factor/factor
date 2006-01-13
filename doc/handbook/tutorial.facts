@@ -196,5 +196,3 @@ $terpri
 { $subsection "tutorial-classes" }
 { $subsection "tutorial-library" }
 { $subsection "tutorial-more" } ;
-
-: tutorial "tutorial" help ;
