@@ -14,9 +14,10 @@ USING: kernel math sequences ;
     #! positive reals only
     0 [ recip + ] reduce recip ;
 
+! : number-sort [ - ] sort ;
 : median ( seq -- n )
     #! middle number if odd, avg of two middle numbers if even
-    number-sort dup length dup even? [
+    [ - ] sort dup length dup even? [
         1+ 2 /i dup 1- rot [ nth ] keep swapd nth + 2 /
     ] [
         2 /i swap nth
