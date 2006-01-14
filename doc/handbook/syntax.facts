@@ -119,7 +119,7 @@ $terpri
 
 GLOSSARY: "number" "an instance of the " { $link number } " class" ;
 
-ARTICLE: "syntax-numbers" "Numbers"
+ARTICLE: "syntax-numbers" "Number syntax"
 "If a vocabulary lookup of a token fails, the parser attempts to parse it as a number."
 { $subsection "syntax-integers" }
 { $subsection "syntax-ratios" }
@@ -132,7 +132,7 @@ GLOSSARY: "fixnum" "an instance of the " { $link fixnum } " class, representing 
 
 GLOSSARY: "bignum" "an instance of the " { $link bignum } " class, representing an arbitrary-precision integer whose value is bounded by available object memory" ;
 
-ARTICLE: "syntax-integers" "Integers"
+ARTICLE: "syntax-integers" "Integer syntax"
 "The printed representation of an integer consists of a sequence of digits, optionally prefixed by a sign."
 { $code
     "123456"
@@ -147,18 +147,18 @@ ARTICLE: "syntax-integers" "Integers"
 
 GLOSSARY: "ratio" "an instance of the " { $link ratio } " class, representing an exact ratio of two integers" ;
 
-ARTICLE: "syntax-ratios" "Ratios"
+ARTICLE: "syntax-ratios" "Ratio syntax"
 "The printed representation of a ratio is a pair of integers separated by a slash (/). No intermediate whitespace is permitted. Either integer may be signed, however the ratio will be normalized into a form where the denominator is positive and the greatest common divisor of the two terms is 1."
 { $code
     "75/33"
     "1/10"
     "-5/-6"
 }
-"More information on ratios can be found in " { $link "ratios" } ;
+"More information on ratios can be found in " { $link "rationals" } ;
 
 GLOSSARY: "float" "an instance of the " { $link float } " class, representing an IEEE 754 double-precision floating point number" ;
 
-ARTICLE: "syntax-floats" "Floats"
+ARTICLE: "syntax-floats" "Float syntax"
 "Floating point numbers contain an optional decimal part, an optional exponent, with an optional sign prefix on either the mantissa or exponent."
 { $code
     "10.5"
@@ -170,7 +170,7 @@ ARTICLE: "syntax-floats" "Floats"
 
 GLOSSARY: "complex" "an instance of the " { $link complex } " class, representing a complex number with real and imaginary components, where both components are real numbers" ;
 
-ARTICLE: "syntax-complex-numbers" "Complex numbers"
+ARTICLE: "syntax-complex-numbers" "Complex number syntax"
 "A complex number is given by two components, a ``real'' part and ''imaginary'' part. The components must either be integers, ratios or floats."
 { $code
     "C{ 1/2 1/3 }   ! the complex number 1/2+1/3i"
@@ -180,7 +180,7 @@ ARTICLE: "syntax-complex-numbers" "Complex numbers"
 
 GLOSSARY: "wrapper" "an instance of the " { $link wrapper } " class, holding a reference to a single object. When the evaluator encounters a wrapper, it pushes the wrapped object on the data stack. Wrappers are used to push words literally on the data stack" ;
 
-ARTICLE: "syntax-words" "Words"
+ARTICLE: "syntax-words" "Word syntax"
 "A word occurring inside a quotation is executed when the quotation is called. Sometimes a word needs to be pushed on the data stack instead. The canonical use-case for this is passing the word to the " { $link execute } " combinator, or alternatively, reflectively accessing word properties (" { $link "word-props" } ")."
 { $subsection POSTPONE: \ }
 { $subsection POSTPONE: POSTPONE: }
@@ -201,7 +201,7 @@ ARTICLE: "syntax-booleans" "Booleans"
 
 GLOSSARY: "escape" "a sequence allowing a non-literal character to be inserted in a string. For a list of escapes, see " { $link "escape" } ;
 
-ARTICLE: "syntax-strings" "Characters and strings"
+ARTICLE: "syntax-strings" "Character and string syntax"
 "Factor has no distinct character type, however Unicode character value integers can be read by specifying a literal character, or an escaped representation thereof."
 { $subsection POSTPONE: CHAR: }
 { $subsection POSTPONE: " }
@@ -227,31 +227,31 @@ ARTICLE: "escape" "Character escape codes"
 }
 "While not useful for single characters, this syntax is also permitted inside strings." ;
 
-ARTICLE: "syntax-sbufs" "String buffers"
+ARTICLE: "syntax-sbufs" "String buffer syntax"
 { $subsection POSTPONE: SBUF" }
-"String buffers are documented in " { $link "string-buffers" } "." ;
+"String buffers are documented in " { $link "sbufs" } "." ;
 
-ARTICLE: "syntax-arrays" "Arrays"
+ARTICLE: "syntax-arrays" "Array syntax"
 { $subsection POSTPONE: { }
 { $subsection POSTPONE: } }
 "Arrays are documented in " { $link "arrays" } "." ;
 
-ARTICLE: "syntax-vectors" "Vectors"
+ARTICLE: "syntax-vectors" "Vector syntax"
 { $subsection POSTPONE: V{ }
 { $subsection POSTPONE: } }
 "Vectors are documented in " { $link "vectors" } "." ;
 
-ARTICLE: "syntax-hashtables" "Hashtables"
+ARTICLE: "syntax-hashtables" "Hashtable syntax"
 { $subsection POSTPONE: H{ }
 { $subsection POSTPONE: } }
-"Hashtables are documented in " { $link "vectors" } "." ;
+"Hashtables are documented in " { $link "hashtables" } "." ;
 
-ARTICLE: "syntax-tuples" "Tuples"
+ARTICLE: "syntax-tuples" "Tuple syntax"
 { $subsection POSTPONE: T{ }
 { $subsection POSTPONE: } }
 "Tuples are documented in " { $link "tuples" } "."  ;
 
-ARTICLE: "syntax-lists" "Lists"
+ARTICLE: "syntax-lists" "Quotation syntax"
 { $subsection POSTPONE: [ }
 { $subsection POSTPONE: ] }
-"Lists are documented in " { $link "lists" } "." ;
+"Quotations are documented in " { $link "quotations" } "." ;

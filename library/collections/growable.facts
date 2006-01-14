@@ -28,7 +28,7 @@ HELP: ensure "( n seq -- )"
 { $values { "n" "a positive integer" } { "seq" "a growable sequence" } }
 { $description "If " { $snippet "n" } " is less than the length of the sequence, does nothing. Otherwise, if " { $snippet "n" } " also exceeds the capacity of the underlying storage, the underlying storage is grown, and the fill pointer is reset. Finally, if " { $snippet "n" } " is greater than or equal to the length but less than the capacity of the underlying storage, the fill pointer is moved and nothing else is done."
 $terpri
-"This word is used in the implementation of the " { $link set-nth } " generic for sequences supporting the growable sequence protocol (see " { $link "sequences-internals" } ")."
+"This word is used in the implementation of the " { $link set-nth } " generic for sequences supporting the growable sequence protocol (see " { $link "sequences-growable" } ")."
 } ;
 
 HELP: bounds-error "( n seq -- )"
@@ -41,8 +41,8 @@ HELP: bounds-check "( n seq -- n seq )"
 
 HELP: grow-length "( n seq -- )"
 { $values { "n" "a positive integer" } { "seq" "a sequence" } }
-{ $description "An implementation of the " { $link set-length } " generic for sequences supporting the growable sequence protocol (see " { $link "sequences-internals" } ")." } ;
+{ $description "An implementation of the " { $link set-length } " generic for sequences supporting the growable sequence protocol (see " { $link "sequences-growable" } ")." } ;
 
 HELP: clone-growable "( seq -- seq )"
 { $values { "seq" "a sequence" } { "seq" "a fresh sequence" } }
-{ $description "An implementation of the " { $link clone } " generic for sequences supporting the growable sequence protocol (see " { $link "sequences-internals" } ")." } ;
+{ $description "An implementation of the " { $link clone } " generic for sequences supporting the growable sequence protocol (see " { $link "sequences-growable" } ")." } ;

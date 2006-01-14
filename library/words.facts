@@ -145,6 +145,6 @@ HELP: definer "( word -- definer )"
 { $values { "word" "a word" } { "definer" "a word" } }
 { $description "Outputs the parsing word that defines the given word." }
 { $examples
-    { $example ": foo ; \ foo definer ." "POSTPONE: :" }
-    { $example "SYMBOL: foo \ foo definer ." "POSTPONE: SYMBOL:" }
+    { $example ": foo ; \\ foo definer ." "POSTPONE: :" }
+    { $example "SYMBOL: foo \\ foo definer ." "POSTPONE: SYMBOL:" }
 } ;

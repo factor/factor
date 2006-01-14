@@ -42,7 +42,7 @@ ARTICLE: "integers" "Integers"
 { $example "128 class ." "fixnum" }
 { $example "134217728 128 * ." "17179869184" }
 { $example "134217728 128 * class ." "bignum" }
-"Integers can be entered using a different base; see " { $link "integer-literals" } "."
+"Integers can be entered using a different base; see " { $link "syntax-numbers" } "."
 $terpri
 "Integers can be tested for, and real numbers can be converted to integers:"
 { $subsection fixnum? }
@@ -116,7 +116,7 @@ $terpri
 
 ARTICLE: "complex-numbers" "Complex numbers"
 { $subsection complex }
-"Complex numbers arise as solutions to quadratic equations whose graph does not intersect the " { $emphasis "x" } " axis. Their literal syntax is covered in " { $link "complex-literals" } "."
+"Complex numbers arise as solutions to quadratic equations whose graph does not intersect the " { $emphasis "x" } " axis. Their literal syntax is covered in " { $link "syntax-complex-numbers" } "."
 $terpri
 "Unlike math, where all real numbers are also complex numbers, Factor only considers a number to be a complex number if its imaginary part is non-zero. However, complex number operations are fully supported for real numbers; they are treated as having an imaginary part of zero."
 $terpri

@@ -1,6 +1,7 @@
 ! Combine an input and output stream into one, and flush the
 ! stream more often.
-USING: io kernel ;
+IN: io
+USING: kernel ;
 
 TUPLE: duplex-stream in out ;
 

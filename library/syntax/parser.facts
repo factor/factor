@@ -94,7 +94,7 @@ $parsing-note ;
 
 HELP: create-constructor "( word -- constructor )"
 { $values { "class" "a word" } { "constructor" "a new word" } }
-{ $description "Creates a new word in the current vocabulary, named by surrounding " { $link "word" } " with angle brackets." } ;
+{ $description "Creates a new word in the current vocabulary, named by surrounding " { $snippet "word" } " with angle brackets." } ;
 
 HELP: CREATE "( -- word )"
 { $values { "word" "a word" } }

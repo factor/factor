@@ -77,7 +77,7 @@ HELP: V{ "elements... }"
 HELP: H{ "{ key value }... }"
 { $values { "key" "an object" } { "value" "an object" } }
 { $description "Marks the beginning of a literal hashtable, given as a list of two-element arrays holding key/value pairs." }
-{ $examples { $code "H{ { \"tuna\" \"fish\" } { \"jalapeno\" \"vegatable\" } }" } } ;
+{ $examples { $code "H{ { \"tuna\" \"fish\" } { \"jalapeno\" \"vegetable\" } }" } } ;
 
 HELP: C{ "real imaginary }"
 { $values { "real" "a real number" } { "imaginary" "a real number" } }
@@ -115,7 +115,7 @@ HELP: SYMBOL: "word"
 HELP: \ "word"
 { $values { "word" "a word" } }
 { $description "Reads the next word from the input and appends a wrapper holding the word to the parse tree. When the evaluator encounters a wrapper, it pushes the wrapped word literally on the data stack." }
-{ $examples "The following two lines are equivalent:" { $code "0 \\ <vector> execute\n<vector>" } } ;
+{ $examples "The following two lines are equivalent:" { $code "0 \\ <vector> execute\n0 <vector>" } } ;
 
 HELP: DEFER: "word"
 { $values { "word" "a new word to define" } }
@@ -194,7 +194,7 @@ HELP: GENERIC: "word"
 { $values { "word" "a new word to define" } }
 { $description "Defines a new generic word in the current vocabulary. Initially, it contains no methods, and thus will throw an error when called." }
 { $notes
-    "A " { $link "method-combinations" "method combination" } " facility exists for customizing method dispatch behavior."
+    "A " { $link "method-combination" } " facility exists for customizing method dispatch behavior."
     $terpri
     "This parsing word is equivalent to the following usage of the more general " { $link POSTPONE: G: } " word:"
     { $code "G: word simple-combination ;" }

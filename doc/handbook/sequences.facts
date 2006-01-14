@@ -188,7 +188,7 @@ GLOSSARY: "array"
 "an instance of the" { $link array } "class, implementing a fixed-length mutable sequence of objects" ;
 
 ARTICLE: "arrays" "Arrays"
-"An array is a fixed-size mutable sequence whose elements are stored in a contiguous range of memory. The literal syntax is covered in " { $link "array-literals" } ". Sometimes you need a growable array -- this is called a vector, and vectors are documented in " { $link "vectors" } "."
+"An array is a fixed-size mutable sequence whose elements are stored in a contiguous range of memory. The literal syntax is covered in " { $link "syntax-arrays" } ". Sometimes you need a growable array -- this is called a vector, and vectors are documented in " { $link "vectors" } "."
 $terpri
 "Array words are in the " { $snippet "arrays" } " vocabulary. Unsafe implementation words are in the " { $snippet "kernel-internals" } " vocabulary."
 $terpri

@@ -36,7 +36,7 @@ HELP: + "( x y -- z )"
 HELP: - "( x y -- z )"
 { $values { "x" "a number" } { "y" "a number" } { "z" "a number" } }
 { $description
-    "Subtracts " { $link "y" } " from " { $snippet "x" } "."
+    "Subtracts " { $snippet "y" } " from " { $snippet "x" } "."
     { $list
         "Subtraction of fixnums may overflow and convert the result to a bignum."
         "Subtraction of bignums always yields a bignum."

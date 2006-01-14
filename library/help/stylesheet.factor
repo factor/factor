@@ -8,6 +8,9 @@ USING: styles ;
         { wrap-margin 500 }
     } ;
 
+: link-style
+    H{ { foreground { 0.3 0 0 1 } } { font-style bold } } ;
+
 : emphasis-style
     H{ { font-style italic } } ;
 

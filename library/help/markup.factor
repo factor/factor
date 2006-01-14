@@ -55,7 +55,7 @@ M: word print-element
 
 : $url url-style ($span) ;
 
-: $terpri terpri drop ;
+: $terpri terpri terpri drop ;
 
 ! Some blocks
 M: simple-element print-element [ print-element ] each ;
@@ -138,7 +138,13 @@ DEFER: help
     ] with-style ;
 
 : $link ( article -- )
-    first dup article-name swap <link> simple-object ;
+    first dup word? [
+        pprint
+    ] [
+        link-style [
+            dup article-name swap <link> simple-object
+        ] with-style
+    ] if ;
 
 : $glossary ( element -- )
     first dup <term> simple-object ;
