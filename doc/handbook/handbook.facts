@@ -1,23 +1,13 @@
 USING: help parser prettyprint ;
 
 ARTICLE: "handbook" "Factor documentation"
-"Welcome to Factor! Factor documentation is takes the form of an outline, with cross-referencing hyperlinks between topics. You can click the triangle next to a topic heading to expand the topic:"
+"Welcome to Factor! Factor documentation is takes the form of an outline, with cross-referencing hyperlinks between topics. You can click the triangle next to a topic heading to expand the topic."
+$terpri
+"There is some introductory material you will find useful when starting out:"
 { $subsection "presentation-intro" }
-"There is a short language tutorial:"
 { $subsection "tutorial" }
-"Some words for performing common operations at the listener:"
-{ $list
-    {
-        "You can read the documentation for a word with " { $link help } ":"
-        { $code "\\ reverse help" }
-    }
-    { "You can print the top of the stack with " { $link . } }
-    {
-        "Source files are loaded with " { $link run-file } ":"
-        { $code "\"tetris.factor\" run-file" }
-    }
-}
-"Detailed documentation:"
+{ $subsection "quickref" }
+"More detailed reference documentation:"
 { $subsection "syntax" }
 { $subsection "dataflow" }
 { $subsection "words" }
@@ -32,3 +22,24 @@ $terpri
 "When you place the mouse over a presentation, it is highlighted with a surrounding border."
 $terpri
 "Clicking a presentation with the left mouse button invokes a default command. Clicking the right mouse button displays a menu of applicable commands." ;
+
+ARTICLE: "quickref" "Quick reference"
+"Some words for performing common operations at the listener:"
+{ $list
+    {
+        "You can read the documentation for a word with " { $link help } ":"
+        { $code "\\ reverse help" }
+    }
+    { "You can print the top of the stack with " { $link . } }
+    {
+        "Source files are loaded with " { $link run-file } ":"
+        { $code "\"tetris.factor\" run-file" }
+    }
+}
+"If you enter an invalid word name, you will get a \"not a number\" error:"
+{ $example
+    "fdafasfa"
+    "An unhandled error was caught:\n\nParsing <interactive>:1\nfdafasfa\n        ^\n\"Not a number\"\n\n:s :r show stacks at time of error.\n:get ( var -- value ) inspects the error namestack."
+}
+"Sometimes, the word " { $emphasis "does" } " exist, but you might need to " { $link POSTPONE: USE: } " its vocabulary first. The " { $link apropos } " word can help locate the correct vocabulary:"
+{ $example "\"<label>\" apropos" "IN: gadgets-labels : <label>\nIN: compiler-backend : <label>" } ;

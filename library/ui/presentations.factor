@@ -40,13 +40,14 @@ M: gadget-stream stream-write1 ( char stream -- )
     presented [ <command-button> ] apply-style ;
 
 : apply-break-style ( style gadget -- style gadget )
-    word-break [ <word-break-gadget> ] apply-style ;
+    word-break [ drop <word-break-gadget> ] apply-style ;
 
 : <presentation> ( style text -- gadget )
     <label>
     apply-foreground-style
     apply-background-style
     apply-font-style
+    apply-break-style
     apply-command-style
     nip ;
 

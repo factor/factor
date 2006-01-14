@@ -27,7 +27,9 @@ PREDICATE: array simple-element
     ] if ;
 
 M: string print-element
-    " " split [ write-term ] [ bl ] interleave ;
+    " " split
+    [ dup empty? [ drop ] [ write-term ] if ]
+    [ bl ] interleave ;
 
 M: array print-element
     unswons* execute ;

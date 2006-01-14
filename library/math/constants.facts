@@ -1,0 +1,39 @@
+USING: help kernel-internals math ;
+
+HELP: cells "( m -- n )"
+{ $values { "m" "an integer" } { "n" "an integer" } }
+{ $description "Computes the number of bytes corresponding to " { $snippet "m" } " CPU operand-sized cells." } ;
+
+HELP: cell-bits "( m -- n )"
+{ $values { "m" "an integer" } { "n" "an integer" } }
+{ $description "Computes the number of bits corresponding to " { $snippet "m" } " CPU operand-sized cells." } ;
+
+HELP: i "( -- i )"
+{ $values { "i" "the imaginary unit" } } ;
+
+HELP: -i "( -- -i )"
+{ $values { "i" "the negated imaginary unit" } } ;
+
+HELP: inf "( -- inf )"
+{ $values { "inf" "floating point positive infinity" } } ;
+
+HELP: -inf "( -- -inf )"
+{ $values { "-inf" "floating point negative infinity" } } ;
+
+HELP: e "( -- e )"
+{ $values { "e" "base of natural logarithm" } } ;
+
+HELP: pi "( -- pi )"
+{ $values { "pi" "circumference of circle with diameter 1" } } ;
+
+HELP: epsilon "( -- epsilon )"
+{ $values { "epsilon" "smallest floating point value you can add to 1 without underflow" } } ;
+
+HELP: first-bignum "( -- n )"
+{ $values { "n" "smallest positive integer not representable by a fixnum" } } ;
+
+HELP: most-positive-fixnum "( -- n )"
+{ $values { "n" "largest positive integer representable by a fixnum" } } ;
+
+HELP: most-negative-fixnum "( -- n )"
+{ $values { "n" "smallest negative integer representable by a fixnum" } } ;
