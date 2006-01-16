@@ -1,5 +1,5 @@
-! Combine an input and output stream into one, and flush the
-! stream more often.
+! Copyright (C) 2005 Slava Pestov.
+! See http://factorcode.org/license.txt for BSD license.
 IN: io
 USING: kernel ;
 

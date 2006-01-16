@@ -1,0 +1,65 @@
+HELP: stdio f
+{ $description "Variable. Holds a stream, used for various implicit stream operations. Rebound using " { $link with-stream } " and " { $link with-stream* } "." } ;
+
+HELP: close "( -- )"
+{ $contract "Closes the " { $link stdio } " stream." } 
+$io-error ;
+
+HELP: readln "( -- str/f )"
+{ $values { "str/f" "a string or " { $link f } } }
+{ $contract "Reads a line of input from the " { $link stdio } " stream. Outputs " { $link f } " on stream exhaustion." }
+$io-error ;
+
+HELP: read1 "( -- ch/f )"
+{ $values { "ch/f" "a character or " { $link f } } }
+{ $contract "Reads a character of input from the " { $link stdio } " stream. Outputs " { $link f } " on stream exhaustion." }
+$io-error ;
+
+HELP: read "( n -- str/f )"
+{ $values { "str/f" "a string or " { $link f } } }
+{ $contract "Reads " { $snippet "n" } " characters of input from the " { $link stdio } " stream. Outputs a truncated string or " { $link f } " on stream exhaustion." }
+$io-error ;
+
+HELP: write1 "( ch -- )"
+{ $values { "ch" "a character" } }
+{ $contract "Writes a character of output to the " { $link stdio } " stream." }
+$io-error ;
+
+HELP: write1 "( ch -- )"
+{ $values { "ch" "a character" } }
+{ $contract "Writes a character of output to the " { $link stdio } " stream. If the stream does buffering, output may not be performed immediately; use " { $link flush } " to force output." }
+$io-error ;
+
+HELP: write "( str -- )"
+{ $values { "str" "a string" } }
+{ $contract "Writes a string of output to the " { $link stdio } " stream. If the stream does buffering, output may not be performed immediately; use " { $link flush } " to force output." }
+$io-error ;
+
+HELP: flush "(  -- )"
+{ $contract "Waits for any pending output to the " { $link stdio } " stream to complete." }
+$io-error ;
+
+HELP: terpri "( -- )"
+{ $contract "Writes a line terminator to the " { $link stdio } " stream. If the stream does buffering, output may not be performed immediately; use " { $link flush } " to force output." }
+$io-error ;
+
+HELP: terpri* "( -- )"
+{ $contract "Writes a line terminator to the " { $link stdio } " stream, unless the stream is already positioned at the start of a line, in which case this word does nothing. If the stream does buffering, output may not be performed immediately; use " { $link flush } " to force output." }
+$io-error ;
+
+HELP: format "( str style -- )"
+{ $values { "str" "a string" } { "style" "a hashtable" } }
+{ $contract "Writes formatted text to the " { $link stdio } " stream." }
+{ $notes "Details are in the documentation for " { $link stream-format } "." }
+$io-error ;
+
+HELP: with-nesting "( style quot -- )"
+{ $values { "style" "a hashtable" } { "quot" "a quotation" } }
+{ $contract "Calls the quotation in a new dynamic scope, where the " { $link stdio } " stream is rebound to a nested stream of the current " { $link stdio } " stream, with formatting information applied." }
+{ $notes "Details are in the documentation for " { $link stream-format } "." }
+$io-error ;
+
+HELP: print "( style quot -- )"
+{ $values { "style" "a hashtable" } { "quot" "a quotation" } }
+{ $description "Outputs a newline-terminated string to the " { $link stdio } " stream." }
+$io-error ;

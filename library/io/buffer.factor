@@ -13,24 +13,20 @@ C: buffer ( size -- buffer )
     0 over set-buffer-pos ;
 
 : buffer-free ( buffer -- )
-    #! Frees the C memory associated with the buffer.
     dup buffer-ptr free  0 swap set-buffer-ptr ;
 
 : buffer-contents ( buffer -- string )
-    #! Returns the current contents of the buffer.
     dup buffer-ptr over buffer-pos +
     over buffer-fill rot buffer-pos - memory>string ;
 
 : buffer-reset ( count buffer -- )
-    #! Reset the position to 0 and the fill pointer to count.
     [ set-buffer-fill ] keep 0 swap set-buffer-pos ;
 
 : buffer-consume ( count buffer -- )
-    #! Consume count characters from the beginning of the buffer.
     [ buffer-pos + ] keep
     [ buffer-fill min ] keep
     [ set-buffer-pos ] keep
-    dup buffer-pos over buffer-fill = [
+    dup buffer-pos over buffer-fill >= [
         0 over set-buffer-pos
         0 over set-buffer-fill
     ] when drop ;
@@ -50,7 +46,6 @@ C: buffer ( size -- buffer )
     [ buffer-contents ] keep 0 swap buffer-reset ;
 
 : buffer-length ( buffer -- length )
-    #! Returns the amount of unconsumed input in the buffer.
     dup buffer-fill swap buffer-pos - ;
 
 : buffer-capacity ( buffer -- int )
@@ -64,13 +59,12 @@ C: buffer ( size -- buffer )
     2dup buffer-ptr swap realloc check-ptr
     over set-buffer-ptr set-buffer-size ;
 
+: buffer-overflow ( ? quot -- )
+    [ "Buffer overflow" throw ] if ; inline
+
 : check-overflow ( length buffer -- )
     2dup buffer-capacity > [
-        dup buffer-empty? [
-            buffer-extend
-        ] [
-            "Buffer overflow" throw
-        ] if
+        dup buffer-empty? [ buffer-extend ] buffer-overflow
     ] [
         2drop
     ] if ;
@@ -85,9 +79,13 @@ C: buffer ( size -- buffer )
     [ buffer-end f swap set-alien-unsigned-1 ] keep
     [ buffer-fill 1+ ] keep set-buffer-fill ;
 
+: buffer-bound ( buffer -- n )
+    dup buffer-ptr swap buffer-size + ;
+
 : n>buffer ( count buffer -- )
-    #! Increases the fill pointer by count.
-    [ buffer-fill + ] keep set-buffer-fill ;
+    [ buffer-fill + ] keep 
+    [ buffer-bound <= [ ] buffer-overflow ] keep
+    set-buffer-fill ;
 
 : buffer-peek ( buffer -- char )
     buffer@ f swap alien-unsigned-1 ;

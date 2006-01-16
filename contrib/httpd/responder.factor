@@ -19,7 +19,7 @@ SYMBOL: responders
 
 : error-head ( error -- )
     dup log-error
-    [ [[ "Content-Type" "text/html" ]] ] over response ;
+    H{ { "Content-Type" "text/html" } } over response ;
 
 : httpd-error ( error -- )
     #! This must be run from handle-request

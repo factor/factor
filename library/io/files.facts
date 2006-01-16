@@ -1,0 +1,33 @@
+USING: help io ;
+
+HELP: path+ "( str1 str2 -- str )"
+{ $values { "str1" "a string" } { "str2" "a string" } { "str" "a string" } }
+{ $description "Concatenates two path names." } ;
+
+HELP: exists? "( path -- ? )"
+{ $values { "path" "a string" } { "?" "a boolean" } }
+{ $description "Tests if the file named by " { $snippet "path" } " exists." } ;
+
+HELP: directory? "( path -- ? )"
+{ $values { "path" "a string" } { "?" "a boolean" } }
+{ $description "Tests if " { $snippet "path" } " names a directory." } ;
+
+HELP: directory "( path -- seq )"
+{ $values { "path" "a string" } { "seq" "a sequence of file name strings" } }
+{ $description "Outputs a sorted sequence of file names stored in the directory named by " { $snippet "path" } "." } ;
+
+HELP: file-length "( path -- n )"
+{ $values { "path" "a string" } { "n" "a non-negative integer or " { $link f } } }
+{ $description "Outputs the length of the file in bytes, or " { $link f } " if it does not exist." } ;
+
+HELP: resource-path "( resource -- path )"
+{ $values { "resource" "a string" } { "path" "a string" } }
+{ $description "Resolve a path relative to the Factor source code location." } ;
+
+HELP: <resource-stream> "( resource -- stream )"
+{ $values { "resource" "a string" } { "stream" "an input stream" } }
+{ $description "Opens a file relative to the Factor source code location." } ;
+
+HELP: directory. "( path -- )"
+{ $values { "path" "a string" } }
+{ $description "Prints a directory listing to the " { $link stdio } " stream. If the stream supports it, subdirectories are shown as expandable outliners." } ;

@@ -54,7 +54,7 @@ SYMBOL: style-stack
 
 : format* ( string -- ) current-style format ;
 
-: bl ( -- ) " " current-style t word-break pick set-hash format ;
+: bl ( -- ) H{ { word-break t } } [ " " format* ] with-style ;
 
 : with-nesting* ( quot -- )
     current-style swap with-nesting ; inline

@@ -193,3 +193,6 @@ DEFER: help
 : $values-x/y
     drop
     { { "x" "a complex number" } { "y" "a complex number" } } $values ;
+
+: $io-error
+    "Throws an error if the I/O operation fails." $errors ;
