@@ -1,5 +1,6 @@
 ! Copyright (C) 2004, 2005 Mackenzie Straight.
-! See http://factor.sf.net/license.txt for BSD license.
+! Copyright (C) 2006 Slava Pestov.
+! See http://factorcode.org/license.txt for BSD license.
 IN: io-internals
 USING: alien errors kernel kernel-internals math sequences
 strings ;
@@ -49,13 +50,11 @@ C: buffer ( size -- buffer )
     dup buffer-fill swap buffer-pos - ;
 
 : buffer-capacity ( buffer -- int )
-    #! Returns the amount of data that may be added to the buffer.
     dup buffer-size swap buffer-fill - ;
 
 : buffer-empty? ( buffer -- ? ) buffer-fill 0 = ;
 
 : buffer-extend ( length buffer -- )
-    #! Increases the size of the buffer by length.
     2dup buffer-ptr swap realloc check-ptr
     over set-buffer-ptr set-buffer-size ;
 
@@ -84,7 +83,7 @@ C: buffer ( size -- buffer )
 
 : n>buffer ( count buffer -- )
     [ buffer-fill + ] keep 
-    [ buffer-bound <= [ ] buffer-overflow ] keep
+    [ buffer-bound <= [ ] buffer-overflow ] 2keep
     set-buffer-fill ;
 
 : buffer-peek ( buffer -- char )
