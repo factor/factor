@@ -19,7 +19,7 @@ sequences io strings ;
     " " split1 drop string>number ;
 
 : read-response ( -- code header )
-    #! After sending a GET oR POST we read a response line and
+    #! After sending a GET or POST we read a response line and
     #! header.
     flush readln parse-response read-header ;
 

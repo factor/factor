@@ -9,9 +9,9 @@ io strings ;
 
 : file-response ( mime-type length -- )
     [
-        number>string "Content-Length" swons ,
-        "Content-Type" swons ,
-    ] [ ] make "200 OK" response terpri ;
+        number>string "Content-Length" set
+        "Content-Type" set
+    ] make-hash "200 OK" response terpri ;
 
 : serve-static ( filename mime-type -- )
     over file-length file-response  "method" get "head" = [

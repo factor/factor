@@ -9,7 +9,7 @@ SYMBOL: vhosts
 SYMBOL: responders
 
 : print-header ( alist -- )
-    [ unswons write ": " write url-encode print ] each ;
+    [ swap write ": " write url-encode print ] hash-each ;
 
 : response ( header msg -- )
     "HTTP/1.0 " write print print-header ;
@@ -34,7 +34,7 @@ SYMBOL: responders
     ] with-scope ;
 
 : serving-content ( mime -- )
-    "Content-Type" swons unit
+    "Content-Type" associate
     "200 Document follows" response terpri ;
 
 : serving-html "text/html" serving-content ;
@@ -42,7 +42,7 @@ SYMBOL: responders
 : serving-text "text/plain" serving-content ;
 
 : redirect ( to -- )
-    "Location" swons unit
+    "Location" associate
     "301 Moved Permanently" response terpri ;
 
 : directory-no/ ( -- )
