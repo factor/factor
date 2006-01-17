@@ -238,6 +238,8 @@ vectors words ;
         "/library/io/plain-stream.facts"
         "/library/io/server.facts"
         "/library/io/stdio.facts"
+        "/library/io/stream.facts"
+        "/library/io/string-streams.facts"
         "/library/math/arc-trig-hyp.facts"
         "/library/math/complex.facts"
         "/library/math/constants.facts"

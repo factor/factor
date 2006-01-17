@@ -61,7 +61,6 @@ SYMBOL: style-stack
     [ format* ] write-object ;
 
 : write-outliner ( content caption -- )
-    #! Takes a pair of quotations.
     >r outline associate r> with-nesting terpri ;
 
 : simple-outliner ( string object content -- )

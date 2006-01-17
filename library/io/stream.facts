@@ -1,0 +1,73 @@
+USING: help io ;
+
+HELP: stream-close "( stream -- )"
+{ $values { "stream" "a stream" } }
+{ $contract "Closes the stream. This releases any external resources associated with the stream, such as file handles and network connections. No further operations can be performed on the stream after this call." }
+{ $notes "You must close streams after you are finished working with them. A convenient way to automate this is by using the " { $link with-stream } " word." }
+$io-error ;
+
+HELP: set-timeout "( n stream -- )"
+{ $values { "n" "an integer" } { "stream" "a stream" } }
+{ $contract "" } 
+$io-error ;
+
+HELP: stream-readln "( stream -- str )"
+{ $values { "stream" "an input stream" } { "str" "a string" } }
+{ $contract "Reads a line of input from the stream. Outputs " { $link f } " on stream exhaustion." }
+$io-error ;
+
+HELP: stream-read1 "( stream -- ch/f )"
+{ $values { "stream" "an input stream" } }
+{ $contract "Reads a character of input from the stream. Outputs " { $link f } " on stream exhaustion." }
+$io-error ;
+
+HELP: stream-read "( n stream -- str )"
+{ $values { "n" "a non-negative integer" } { "stream" "an input stream" } { "str" "a string" } }
+{ $contract "Reads " { $snippet "n" } " characters of input from the stream. Outputs a truncated string or " { $link f } " on stream exhaustion." }
+$io-error ;
+
+HELP: stream-write1 "( ch stream -- )"
+{ $values { "ch" "a character" } { "stream" "an output stream" } }
+{ $contract "Writes a character of output to the stream. If the stream does buffering, output may not be performed immediately; use " { $link stream-flush } " to force output." }
+$io-error ;
+
+HELP: stream-write "( str stream -- )"
+{ $values { "str" "a string" } { "stream" "an output stream" } }
+{ $contract "Writes a character of output to the stream. If the stream does buffering, output may not be performed immediately; use " { $link stream-flush } " to force output." }
+$io-error ;
+
+HELP: stream-flush "( stream -- )"
+{ $values { "stream" "an output stream" } }
+{ $contract "Waits for any pending output to complete." }
+{ $notes "With many output streams, written output is buffered and not sent to the underlying resource until either the buffer is full, or this word is called." }
+$io-error ;
+
+HELP: stream-terpri "( stream -- )"
+{ $values { "stream" "an output stream" } }
+{ $contract "Writes a line terminator. If the stream does buffering, output may not be performed immediately; use " { $link stream-flush } " to force output." }
+$io-error ;
+
+HELP: stream-terpri* "( stream -- )"
+{ $values { "stream" "an output stream" } }
+{ $contract "Writes a line terminator unless the stream is already positioned at the start of a line, in which case this word does nothing. If the stream does buffering, output may not be performed immediately; use " { $link stream-flush } " to force output." }
+$io-error ;
+
+HELP: stream-format "( str style stream -- )"
+{ $values { "str" "a string" } { "style" "a hashtable" } { "stream" "an output stream" } }
+{ $contract "Writes formatted text to the stream. If the stream does buffering, output may not be performed immediately; use " { $link stream-flush } " to force output." }
+$io-error ;
+
+HELP: with-nested-stream "( quot style stream -- )"
+{ $values { "quot" "a quotation" } { "style" "a hashtable" } { "stream" "an output stream" } }
+{ $contract "Calls the quotation in a new dynamic scope with the " { $link stdio } " stream rebound to a nested paragraph stream, with formatting information applied." }
+$io-error ;
+
+HELP: stream-print "( str stream -- )"
+{ $values { "str" "a string" } { "stream" "an output stream" } }
+{ $description "Writes a newline-terminated string." }
+$io-error ;
+
+HELP: stream-copy "( in out -- )"
+{ $values { "in" "an input stream" } { "out" "an output stream" } }
+{ $description "" } 
+$io-error ;

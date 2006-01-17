@@ -1,0 +1,22 @@
+USING: help io ;
+
+HELP: <string-writer> "( -- stream )"
+{ $values { "stream" "an output stream" } }
+{ $description "" } ;
+
+HELP: string-out "( quot -- str )"
+{ $values { "quot" "a quotation" } { "str" "a string" } }
+{ $description "" } ;
+
+HELP: <string-reader> "( str -- stream )"
+{ $values { "str" "a string" } { "stream" "an input stream" } }
+{ $description "" } ;
+
+HELP: string-in "( str quot -- )"
+{ $values { "str" "a string" } { "quot" "a quotation" } }
+{ $description "" } ;
+
+HELP: contents "( stream -- str )"
+{ $values { "stream" "an input stream" } { "str" "a string" } }
+{ $description "" }
+$io-error ;

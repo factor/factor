@@ -24,7 +24,7 @@ $io-error ;
 
 HELP: write1 "( ch -- )"
 { $values { "ch" "a character" } }
-{ $contract "Writes a character of output to the " { $link stdio } " stream." }
+{ $contract "Writes a character of output to the " { $link stdio } " stream. If the stream does buffering, output may not be performed immediately; use " { $link flush } " to force output." }
 $io-error ;
 
 HELP: write1 "( ch -- )"
@@ -51,7 +51,7 @@ $io-error ;
 
 HELP: format "( str style -- )"
 { $values { "str" "a string" } { "style" "a hashtable" } }
-{ $contract "Writes formatted text to the " { $link stdio } " stream." }
+{ $contract "Writes formatted text to the " { $link stdio } " stream. If the stream does buffering, output may not be performed immediately; use " { $link flush } " to force output." }
 { $notes "Details are in the documentation for " { $link stream-format } "." }
 $io-error ;
 
@@ -63,7 +63,7 @@ $io-error ;
 
 HELP: print "( style quot -- )"
 { $values { "style" "a hashtable" } { "quot" "a quotation" } }
-{ $description "Outputs a newline-terminated string to the " { $link stdio } " stream." }
+{ $description "Writes a newline-terminated string to the " { $link stdio } " stream." }
 $io-error ;
 
 HELP: with-stream "( stream quot -- )"
