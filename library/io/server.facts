@@ -1,3 +1,5 @@
+USING: help io ;
+
 HELP: log-stream f
 { $description "Variable. Holds an output stream for logging messages." }
 { $see-also log-error log-client with-log-file with-logging } ;

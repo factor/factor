@@ -27,29 +27,24 @@ SYMBOL: stdio
 : print ( string -- ) stdio get stream-print ;
 
 : with-stream ( stream quot -- )
-    #! Close the stream no matter what happens.
     [ swap stdio set [ close ] cleanup ] with-scope ; inline
 
 : with-stream* ( stream quot -- )
-    #! Close the stream if there is an error.
     [ swap stdio set [ close rethrow ] recover ] with-scope ;
     inline
 
 SYMBOL: style-stack
 
 : >style ( style -- )
-    #! Push a style on the style stack.
     dup hashtable? [ "Style must be a hashtable" throw ] unless
     style-stack [ ?push ] change ;
 
-: style> ( -- style )
-    style-stack get pop ;
+: style> ( -- style ) style-stack get pop ;
 
 : with-style ( style quot -- )
     [ >r >style r> call style> drop ] with-scope ; inline
 
 : current-style ( -- style )
-    #! Always returns a fresh hashtable.
     style-stack get hash-concat ;
 
 : format* ( string -- ) current-style format ;
@@ -63,7 +58,6 @@ SYMBOL: style-stack
     >r presented associate r> with-style ;
 
 : simple-object ( string object -- )
-    #! Writes a clickable presentation with the specified string.
     [ format* ] write-object ;
 
 : write-outliner ( content caption -- )
