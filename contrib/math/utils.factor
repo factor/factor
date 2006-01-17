@@ -26,9 +26,9 @@ USING: errors kernel sequences math sequences-internals namespaces arrays ;
         -rot (^mod)
     ] if ; foldable
 
-: powers ( x n -- { 1 x x^2 x^3 ... } )
+: powers ( n x -- { 1 x x^2 x^3 ... } )
     #! Output sequence has n elements.
-    1 swap [ drop [ dupd * ] keep ] map 2nip ;
+    <array> 1 [ * ] accumulate ;
 
 : ** ( u v -- u*v' ) conjugate * ; inline
 

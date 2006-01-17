@@ -110,8 +110,8 @@ IN: math-contrib
 
 : pdiff ( p -- p' )
     #! Polynomial derivative.
-    dup empty? [ [ length ] keep v* 1 swap tail ] unless ;
+    dup length v* { 0 } ?head drop ;
 
-: polyval ( x p -- p[x] )
+: polyval ( p x -- p[x] )
     #! Evaluate a polynomial.
-    [ powers ] keep v. ;
+    >r dup length r> powers v. ;
