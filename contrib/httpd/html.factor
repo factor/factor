@@ -31,9 +31,6 @@ sequences strings styles words ;
     [ bold bold-italic ] member?
     [ "font-weight: bold; " % ] when ;
 
-: underline-css, ( flag -- )
-    [ "text-decoration: underline; " % ] when ;
-
 : size-css, ( size -- )
     "font-size: " % # "; " % ;
 
@@ -57,7 +54,6 @@ sequences strings styles words ;
             { font        [ font-css,      ] }
             { font-style  [ style-css,     ] }
             { font-size   [ size-css,      ] }
-            { underline   [ underline-css, ] }
         } hash-apply
     ] "" make ;
 
@@ -138,7 +134,6 @@ C: html-stream ( stream -- stream )
     #! font
     #! font-style
     #! font-size
-    #! underline
     #! file
     #! word
     #! vocab

@@ -203,14 +203,14 @@ $terpri
 "The following two lines are equivalent:"
 { $code "X [ Y ] [ Z ] if*" "X dup [ Y ] [ drop Z ] if" } } ;
 
-HELP: when* "( cond true false -- )"
+HELP: when* "( cond true -- )"
 { $values { "cond" "a generalized boolean" } { "true" "a quotation with stack effect " { $snippet "( cond -- )" } } }
 { $description "Variant of " { $link if* } " with no false quotation."
 $terpri
 "The following two lines are equivalent:"
 { $code "X [ Y ] when*" "X dup [ Y ] [ drop ] if" } } ;
 
-HELP: unless* "( cond true false -- )"
+HELP: unless* "( cond false -- )"
 { $values { "cond" "a generalized boolean" } { "false" "a quotation " } }
 { $description "Variant of " { $link if* } " with no true quotation."
 $terpri

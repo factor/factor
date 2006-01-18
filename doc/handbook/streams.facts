@@ -1,0 +1,70 @@
+USING: help io ;
+
+GLOSSARY: "stream" "an endpoint for input/output operations, supporting the " { $link "stream-protocol" } ;
+
+ARTICLE: "streams" "Streams"
+"Input and output centers on the concept of a " { $emphasis "stream" } ", which is a source or sink of characters. Streams also support formatted output, which may be used to present styled text in a manner independent of output medium."
+{ $subsection "stream-protocol" }
+{ $subsection "stream-utilities" }
+{ $subsection "stdio" }
+;
+
+GLOSSARY: "input stream" "an object responding to the input words of the " { $link "stream-protocol" } ;
+
+GLOSSARY: "output stream" "an object responding to the output words of the " { $link "stream-protocol" } ;
+
+GLOSSARY: "bidirectional stream" "an object that is both an input and output stream" } ;
+
+ARTICLE: "stream-protocol" "Stream protocol"
+"The stream protocol consits of a large number of generic words, many of which are optional."
+$terpri
+"A word required to be implemented for all streams:"
+{ $subsection stream-close }
+"Three words are required for input streams:"
+{ $subsection stream-read1 }
+{ $subsection stream-read }
+{ $subsection stream-readln }
+"If your stream supports the first two but not the last one, wrap it in a " { $link <line-reader> } " to get a default implementation."
+$terpri
+"Seven words are required for output streams:"
+{ $subsection stream-flush }
+{ $subsection stream-write1 }
+{ $subsection stream-write }
+{ $subsection stream-terpri }
+{ $subsection stream-terpri* }
+{ $subsection stream-format }
+{ $subsection with-nested-stream }
+"If your stream supports the first three but not the rest, wrap it in a " { $link <plain-writer> } ", which provides plain text implementations of the stream formatting words (the so called " { $emphasis "extended stream output protocol" } ")." ;
+
+ARTICLE: "stream-utils" "Stream utilities"
+"There are a few useful stream-related words which are not generic, but merely built up from the stream protocol."
+$terpri
+"First, a simple composition of " { $link stream-write } " and " { $link stream-terpri } ":"
+{ $subsection stream-print }
+"Next up, a pair of words for reading the entire contents of a stream as an array of lines, or a single string:"
+{ $subsection lines }
+{ $subsection contents }
+"Finally, a word to copy the contents of one stream to another:"
+{ $subsection stream-copy } ;
+
+GLOSSARY: "default stream" "see " { $link stdio } ;
+
+ARTICLE: "stdio" "The default stream"
+"Various words take an implicit stream parameter from the " { $link stdio } " variable to reduce stack shuffling. Unless rebound in a child namespace, this variable will be set to a console stream for interacting with the user."
+{ $link close }
+{ $subsection read1 }
+{ $subsection read }
+{ $subsection readln }
+{ $subsection flush }
+{ $subsection write1 }
+{ $subsection write }
+{ $subsection print }
+{ $subsection terpri }
+{ $subsection terpri* }
+{ $subsection format }
+{ $subsection with-nesting }
+"A pair of combinators support rebinding the " { $link stdio } " variable:"
+{ $subsection with-stream }
+{ $subsection with-stream* } ;
+
+

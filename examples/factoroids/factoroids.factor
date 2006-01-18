@@ -11,7 +11,7 @@ IN: factoroids
 
 : draw-ground
     GL_DEPTH_TEST glDisable
-    black gl-color
+    { 0.0 0.0 0.0 1.0 } gl-color
     GL_QUADS [
         { -1000 0 -1000 } gl-vertex
         { -1000 0 1000 } gl-vertex
@@ -33,7 +33,7 @@ IN: factoroids
     ] do-matrix ;
 
 : draw-grid ( w h -- )
-    white gl-color [ swap [ grid-square ] each-with ] each-with ;
+    { 1.0 1.0 1.0 1.0 } gl-color [ swap [ grid-square ] each-with ] each-with ;
 
 : make-ground-list ( -- id )
     GL_COMPILE [ draw-ground 50 50 draw-grid ] make-dlist ;

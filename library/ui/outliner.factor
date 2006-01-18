@@ -24,7 +24,7 @@ DEFER: <expand-button>
     [ outliner? ] find-parent ;
 
 : <expand-arrow> ( ? -- gadget )
-    arrow-right arrow-down ? gray swap
+    arrow-right arrow-down ? { 0.5 0.5 0.5 1.0 } swap
     <polygon-gadget> <default-border> ;
 
 : <expand-button> ( ? -- gadget )
