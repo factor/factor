@@ -345,27 +345,48 @@ H{ [[ "P" "[A]>>>>>>>>>[cB]>>>>>>>>>[ccC]>>>>>>>>>[cccD]" ]]
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-: tree-5 ( -- ) lparser-dialect   5 angle set
+! : tree-5 ( -- ) lparser-dialect   5 angle set
 
-[ 4 set-color-index ] "1" command-table get set-hash
-[ 60 neg rotate-z ]   "2" command-table get set-hash
-[ 1.25 scale-length ] "3" command-table get set-hash
-[ 0.8 scale-length ]  "4" command-table get set-hash
-[ 30 neg rotate-z ]   "5" command-table get set-hash
+! [ 4 set-color-index ] "1" command-table get set-hash
+! [ 60 neg rotate-z ]   "2" command-table get set-hash
+! [ 1.25 scale-length ] "3" command-table get set-hash
+! [ 0.8 scale-length ]  "4" command-table get set-hash
+! [ 30 neg rotate-z ]   "5" command-table get set-hash
 
-H{ [[ "S" "FFR2R2R2R2R2R5S" ]]
+! H{ [[ "S" "FFR2R2R2R2R2R5S" ]]
+!    [[ "R" "[Ba]" ]]
+!    [[ "a" "$tF[Cx]Fb" ]]
+!    [[ "b" "$tF[Dy]Fa" ]]
+!    [[ "B" "&B" ]]
+!    [[ "C" "+C" ]]
+!    [[ "D" "-D" ]]
+!    [[ "x" "a" ]]
+!    [[ "y" "b" ]]
+!    [[ "F" "3F4" ]]
+! } rules set
+
+! "1FFS" result set ;
+
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+: tree-5 ( -- ) lparser-dialect   5 angle set   1 thickness set
+
+"c(4)FFS" axiom set
+
+H{ [[ "S" "FFR>(60)R>(60)R>(60)R>(60)R>(60)R>(30)S" ]]
    [[ "R" "[Ba]" ]]
    [[ "a" "$tF[Cx]Fb" ]]
    [[ "b" "$tF[Dy]Fa" ]]
    [[ "B" "&B" ]]
    [[ "C" "+C" ]]
    [[ "D" "-D" ]]
+
    [[ "x" "a" ]]
    [[ "y" "b" ]]
-   [[ "F" "3F4" ]]
-} rules set
 
-"1FFS" result set ;
+   [[ "F" "'(1.25)F'(.8)" ]]
+} rules set ;
+
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
