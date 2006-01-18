@@ -20,8 +20,8 @@
 ! WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
 ! OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
 ! ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+USING: kernel lazy test errors strings parser lists math sequences parser-combinators ;
 IN: scratchpad
-USING: kernel lazy parser-combinators test errors strings parser lists math sequences ;
 
 ! Testing <&>
 [ [ [[ "cd" [[ "a" "b" ]] ]] ] ] [
