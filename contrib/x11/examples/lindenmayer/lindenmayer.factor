@@ -237,16 +237,26 @@ first3 glColor3f first3 material-color ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
+: -rotate-y neg rotate-y ;
+: -rotate-x neg rotate-x ;
+: -rotate-z neg rotate-z ;
+
+
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
 : lparser-dialect ( -- )
 
 1 length set   45 angle set   1 thickness set   2 set-color-index
 
 H{ [[ "+" [ angle get     rotate-y ] ]]
-   [[ "-" [ angle get neg rotate-y ] ]]
+!  [[ "-" [ angle get neg rotate-y ] ]]
+   [[ "-" [ angle get    -rotate-y ] ]]
    [[ "&" [ angle get     rotate-x ] ]]
-   [[ "^" [ angle get neg rotate-x ] ]]
+!  [[ "^" [ angle get neg rotate-x ] ]]
+   [[ "^" [ angle get    -rotate-x ] ]]
    [[ "<" [ angle get     rotate-z ] ]]
-   [[ ">" [ angle get neg rotate-z ] ]]
+!  [[ ">" [ angle get neg rotate-z ] ]]
+   [[ ">" [ angle get    -rotate-z ] ]]
    [[ "|" [ 180.0         rotate-y ] ]]
    [[ "%" [ 180.0         rotate-z ] ]]
 
