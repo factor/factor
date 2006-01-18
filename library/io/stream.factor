@@ -4,21 +4,14 @@ IN: io
 USING: errors hashtables generic kernel math namespaces
 sequences strings ;
 
-! Stream protocol.
 GENERIC: stream-close  ( stream -- )
 GENERIC: set-timeout   ( timeout stream -- )
-
-! Input stream protocol.
 GENERIC: stream-readln ( stream -- string )
 GENERIC: stream-read1  ( stream -- char/f )
 GENERIC: stream-read   ( count stream -- string )
-
-! Output stream protocol.
 GENERIC: stream-write1 ( char stream -- )
 GENERIC: stream-write  ( string stream -- )
 GENERIC: stream-flush  ( stream -- )
-
-! Extended output protocol.
 GENERIC: stream-terpri ( stream -- )
 GENERIC: stream-terpri* ( stream -- )
 GENERIC: stream-format ( string style stream -- )

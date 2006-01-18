@@ -8,7 +8,7 @@ $io-error ;
 
 HELP: set-timeout "( n stream -- )"
 { $values { "n" "an integer" } { "stream" "a stream" } }
-{ $contract "" } 
+{ $contract "Sets a timeout, in milliseconds, for closing the stream if there is no activity. Not all streams support timeouts." } 
 $io-error ;
 
 HELP: stream-readln "( stream -- str )"
@@ -54,12 +54,16 @@ $io-error ;
 
 HELP: stream-format "( str style stream -- )"
 { $values { "str" "a string" } { "style" "a hashtable" } { "stream" "an output stream" } }
-{ $contract "Writes formatted text to the stream. If the stream does buffering, output may not be performed immediately; use " { $link stream-flush } " to force output." }
+{ $contract "Writes formatted text to the stream. If the stream does buffering, output may not be performed immediately; use " { $link stream-flush } " to force output."
+$terpri
+"The " { $snippet "style" } " hashtable holds character style information. See " { $link "character-styles" } "." }
 $io-error ;
 
 HELP: with-nested-stream "( quot style stream -- )"
 { $values { "quot" "a quotation" } { "style" "a hashtable" } { "stream" "an output stream" } }
-{ $contract "Calls the quotation in a new dynamic scope with the " { $link stdio } " stream rebound to a nested paragraph stream, with formatting information applied." }
+{ $contract "Calls the quotation in a new dynamic scope with the " { $link stdio } " stream rebound to a nested paragraph stream, with formatting information applied."
+$terpri
+"The " { $snippet "style" } " hashtable holds paragraph style information. See " { $link "paragraph-styles" } "." }
 $io-error ;
 
 HELP: stream-print "( str stream -- )"
@@ -69,5 +73,5 @@ $io-error ;
 
 HELP: stream-copy "( in out -- )"
 { $values { "in" "an input stream" } { "out" "an output stream" } }
-{ $description "" } 
+{ $description "Copies the contents of one stream into another, closing both streams when done." } 
 $io-error ;
