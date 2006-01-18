@@ -32,10 +32,9 @@
 !
 ! The result is not that pretty but it shows the basic idea.
 IN: numbers-game
-USE: combinators
+USE: parser-combinators
 USE: kernel
 USE: math
-USE: random
 USE: parser
 USE: html
 USE: cont-responder
@@ -98,4 +97,4 @@ USE: namespaces
 
 : numbers-game number-to-guess numbers-game-loop ;
 
-"numbers-game" [ numbers-game ] install-cont-responder
+! "numbers-game" [ numbers-game ] install-cont-responder

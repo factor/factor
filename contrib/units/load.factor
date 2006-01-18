@@ -1,10 +1,8 @@
-USING: parser sequences words compiler ;
+IN: scratchpad
+USING: kernel parser sequences words compiler ;
+{ "dimensioned" "si-units" "constants" }
+[ "contrib/units/" swap ".factor" append3 run-file ] each
 
-[
-    "contrib/units/dimensioned.factor"
-    "contrib/units/si-units.factor"
-    "contrib/units/constants.factor"
-] [ run-file ] each
-
-! "" words [ try-compile ] each
+{ "units-internal" "units" "si-units" }
+[ words [ try-compile ] each ] each
 

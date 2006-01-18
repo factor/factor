@@ -22,12 +22,10 @@
 ! ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 IN: lazy-examples
 USE: lazy
-USE: stack
 USE: math
 USE: lists
-USE: combinators
+USE: parser-combinators
 USE: kernel
-USE: logic
 USE: sequences
 USE: namespaces
 

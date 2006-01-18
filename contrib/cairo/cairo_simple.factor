@@ -24,9 +24,7 @@ USE: errors
 USE: kernel
 USE: namespaces
 USE: sdl
-USE: sdl-event
-USE: sdl-gfx
-USE: sdl-video
+USE: alien
 
 : redraw ( -- )
 	cr get

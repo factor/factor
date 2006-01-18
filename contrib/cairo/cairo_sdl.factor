@@ -20,12 +20,9 @@ USE: lists
 USE: math
 USE: namespaces
 USE: sdl
-USE: sdl-event
-USE: sdl-gfx
-USE: sdl-video
 USE: vectors
 USE: prettyprint
-USE: stdio
+USE: io
 USE: test
 USE: syntax
 USE: sequences

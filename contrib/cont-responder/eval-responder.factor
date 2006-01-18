@@ -33,14 +33,12 @@ USE: parser
 USE: lists
 USE: errors
 USE: strings
-USE: logic
 USE: live-updater
 USE: prettyprint
-USE: unparser
 USE: words
 USE: vectors
-USE: logging
 USE: sequences
+USE: hashtables
 
 : <evaluator> ( stack msg history -- )
   #! Create an 'evaluator' object that holds
@@ -233,5 +231,5 @@ USE: sequences
     dup [ show-message-page ] [ drop ] if
   ] forever ;
 
-"eval" [ [ ] "None" [ ] <evaluator> eval-responder ] install-cont-responder
+! "eval" [ [ ] "None" [ ] <evaluator> eval-responder ] install-cont-responder
 

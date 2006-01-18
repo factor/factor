@@ -35,7 +35,6 @@ USE: namespaces
 USE: inspector
 USE: lists
 USE: cont-examples
-USE: regexp
 USE: prettyprint
 USE: todo
 USE: math
@@ -491,4 +490,4 @@ USE: sequences
   get-todo-list "todo" set
   show-todo-list ;
 
-"todo" [ drop "todo/" todo-example ] install-cont-responder
+! "todo" [ drop "todo/" todo-example ] install-cont-responder

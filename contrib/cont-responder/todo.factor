@@ -25,7 +25,6 @@
 ! 'password' and list of items. Each item has a priority, description, 
 ! and indication if it is complete. 
 IN: todo
-USE: parser
 USE: strings
 USE: io
 USE: namespaces
@@ -36,7 +35,6 @@ USE: prettyprint
 USE: hashtables
 USE: sequences
 USE: http
-USE: unparser
 
 : <todo> ( user password -- <todo> )
   #! Create an empty todo list

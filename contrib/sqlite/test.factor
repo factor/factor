@@ -25,11 +25,7 @@
 !
 ! Create a test database like follows:
 !
-!   sqlite3 test.db
-!   > create table test (name varchar(30), address varchar(30));
-!   > insert into test values('John', 'America');
-!   > insert into test values('Jane', 'New Zealand');
-!   > [eof]
+!   sqlite3 test.db < test.txt
 !
 !  Then run this file.
 USE: sqlite
@@ -38,18 +34,20 @@ USE: io
 USE: prettyprint
 USE: lists
 
+: test.db "contrib/sqlite/test.db" ;
+
 : show-people ( statement -- )
   dup 0 column-text write " from " write 1 column-text . ;
 
 : run-test ( -- )
-  "test.db" sqlite-open
+  test.db sqlite-open
   dup "select * from test" sqlite-prepare
   dup [ show-people ] sqlite-each 
   sqlite-finalize
   sqlite-close ;
 
 : find-person ( name -- )
-  "test.db" sqlite-open  ( name db )
+  test.db sqlite-open  ( name db )
   dup "select * from test where name=?" sqlite-prepare ( name db stmt )
   [ rot 1 swap sqlite-bind-text ] keep ( db stmt )
   [ [ 1 column-text . ] sqlite-each ] keep
@@ -57,14 +55,14 @@ USE: lists
   sqlite-close ;  
 
 : find-all ( -- )
-  "test.db" sqlite-open  ( db )
+  test.db sqlite-open  ( db )
   dup "select * from test" sqlite-prepare ( db stmt )
   [ [ [ 0 column-text ] keep 1 column-text cons ] sqlite-map ] keep
   sqlite-finalize
   swap sqlite-close ;  
 
 : run-test2 ( -- )
-  "test.db" sqlite-open
+  test.db sqlite-open
   dup "select * from test" sqlite-prepare
   dup [ show-people ] ;
 

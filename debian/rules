@@ -1,0 +1,70 @@
+#!/usr/bin/make -f
+# -*- makefile -*-
+
+# SITE_CFLAGS=-fPIC -ffast-math -funsigned-char -mpowerpc -mpowerpc-gpopt -mpowerpc-gfxopt -maltivec -mabi=altivec -mtune=G4 -mcpu=G4 -pipe
+# SITE_CFLAGS=-march=pentium4
+
+configure: configure-stamp
+
+configure-stamp:
+	dh_testdir
+	touch configure-stamp
+
+build: build-stamp
+
+build-stamp: configure-stamp
+	dh_testdir
+	$(MAKE) linux-`sh debian/architecture.sh`
+####### Build the bootstrap image
+	echo "USE: image \"`sh debian/architecture.sh`\" make-image 0 exit" | factor-vm debian/make-bootstrap-images.factor
+#	wget http://factorcode.org/boot.image.`sh debian/architecture.sh`
+####### Build the factor image
+	./f boot.image.`sh debian/architecture.sh` -libraries:sdl:name=libSDL.so -libraries:freetype:name=libfreetype.so
+#	cp /usr/share/factor/f /usr/share/factor/factor.image .
+####### Build the extended image
+	sqlite3 contrib/sqlite/test.db < contrib/sqlite/test.txt
+#	$(CC) $(CFLAGS) -L /usr/X11R6/lib -shared -o contrib/factory/simple-error-handler.so contrib/factory/simple-error-handler.c -lX11
+	echo 'USING: image kernel ; "extended.image" save-image 0 exit' | ./f factor.image contrib/load.factor
+####### Build the documentation
+	cd doc && for i in *.eps; do epstopdf $$i; done
+	cd doc && rubber --pdf theory
+	cd doc && sh makedoc
+	touch build-stamp
+
+clean:
+	dh_testdir
+	dh_testroot
+	rm -f build-stamp configure-stamp
+	-$(MAKE) clean
+	-rm -f f factor.image extended.image
+	dh_clean
+
+install: build
+	dh_testdir
+	dh_testroot
+	dh_clean -k 
+	dh_installdirs
+	install f factor.image extended.image $(CURDIR)/debian/factor/usr/share/factor
+	install -m 755 debian/factor-vm $(CURDIR)/debian/factor/usr/bin
+
+binary-indep: build install
+
+binary-arch: build install
+	dh_testdir
+	dh_testroot
+	dh_installchangelogs CHANGES.html
+	dh_installdocs
+	dh_installexamples
+	dh_installman
+	dh_link
+	dh_strip
+	dh_compress
+	dh_fixperms
+	dh_installdeb
+	dh_shlibdeps
+	dh_gencontrol
+	dh_md5sums
+	dh_builddeb
+
+binary: binary-indep binary-arch
+.PHONY: build clean binary-indep binary-arch binary install configure

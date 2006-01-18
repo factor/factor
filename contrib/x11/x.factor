@@ -130,7 +130,7 @@ DEFER: with-win
 : window-y 1 window-position nth ;
 
 : get-window-attributes ( -- <XWindowAttributes> )
-  dpy get win get <XWindowAttributes> dup >r XGetWindowAttributes drop r> ;
+  dpy get win get "XWindowAttributes" <c-object> dup >r XGetWindowAttributes drop r> ;
 
 : window-map-state
   get-window-attributes XWindowAttributes-map_state ;
@@ -143,7 +143,7 @@ DEFER: with-win
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 : lookup-color ( name -- pixel )
-  >r dpy get colormap get r> <XColor> dup >r <XColor> XLookupColor drop
+  >r dpy get colormap get r> "XColor" <c-object> dup >r "XColor" <c-object> XLookupColor drop
   dpy get colormap get r> dup >r XAllocColor drop
   r> XColor-pixel ;
 
@@ -197,10 +197,10 @@ DEFER: with-win
 
 : sync-dpy ( discard -- ) >r dpy get r> XSync ;
 
-: next-event ( -- event ) dpy get <XEvent> dup >r XNextEvent drop r> ;
+: next-event ( -- event ) dpy get "XEvent" <c-object> dup >r XNextEvent drop r> ;
 
 : mask-event ( mask -- event )
-  >r dpy get r> <XEvent> dup >r XMaskEvent drop r> ;
+  >r dpy get r> "XEvent" <c-object> dup >r XMaskEvent drop r> ;
 
 : events-queued ( mode -- n ) >r dpy get r> XEventsQueued ;
 
@@ -295,7 +295,7 @@ DEFER: with-win
   drop drop ;
 
 : valid-window? ( -- ? )
-  dpy get win get <XWindowAttributes> XGetWindowAttributes 0 = not ;
+  dpy get win get "XWindowAttributes" <c-object> XGetWindowAttributes 0 = not ;
 
 : mouse-sensor ( -- { root-x root-y } )
   dpy get win get 0 <Window> 0 <Window> 0 <int> 0 <int> 2dup >r >r
@@ -341,5 +341,5 @@ DEFER: with-win
 swap >array [ swap char-nth ] map-with >string ;
 
 : lookup-string ( event -- string )
-10 <char-array> dup >r 10 0 <alien> 0 <alien> XLookupString r>
+10 "char" <c-array> dup >r 10 0 <alien> 0 <alien> XLookupString r>
 char-array>string ;

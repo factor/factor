@@ -19,7 +19,7 @@
 IN: cairo-text
 SYMBOL: angle
 
-USING: cairo cairo-sdl compiler errors kernel namespaces sdl sdl-event sdl-gfx sdl-video lists math sequences ;
+USING: cairo cairo-sdl compiler errors kernel namespaces sdl lists math sequences alien ;
 
 : draw-rect ( angle -- )
 	cr get

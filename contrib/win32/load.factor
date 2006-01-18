@@ -1,15 +1,11 @@
-IN: win32
+IN: scratchpad
 USING: alien compiler kernel parser sequences words ;
 
-win32? [
-    "user" "user32.dll" "stdcall" add-library
-    "kernel" "kernel32.dll" "stdcall" add-library
-] [
-    ! something with wine here?
-] if
+{ { "user" "user32" }
+  { "kernel" "kernel32" } }
+[ first2 add-simple-library ] each
 
-[ "utils.factor" "types.factor" "kernel32.factor" "user32.factor" ]
-
-[ "contrib/win32/" swap append run-file ] each
+{ "utils" "types" "kernel32" "user32" }
+[ "contrib/win32/" swap ".factor" append3 run-file ] each
 
 "win32" words [ try-compile ] each

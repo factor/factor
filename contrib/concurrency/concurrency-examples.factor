@@ -24,7 +24,7 @@
 ! Examples of using the concurrency library.
 IN: concurrency-examples
 USING: concurrency dlists errors gadgets-theme gadgets-panes io kernel lists
-math namespaces opengl prettyprint sequences threads ;
+math math-contrib namespaces opengl prettyprint sequences threads ;
 
 : (logger) ( mailbox -- )
   #! Using the given mailbox, start a thread which

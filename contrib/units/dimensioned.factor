@@ -1,10 +1,10 @@
-USING: physical-constants conversions ;
 USING: kernel prettyprint io sequences words lists vectors inspector math errors namespaces ;
-
 
 IN: units-internal
 : seq-intersect ( seq1 seq2 -- seq1/\seq2 )
     [ swap member? ] subset-with ; flushable
+
+: 2list ( x y -- [ x y ] ) f cons cons ;
 
 IN: units
 

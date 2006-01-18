@@ -87,7 +87,7 @@
 IN: cont-responder
 USE: namespaces
 USE: kernel
-USE: combinators
+USE: parser-combinators
 USE: io
 
 : <cont-test-state> ( -- <state> )

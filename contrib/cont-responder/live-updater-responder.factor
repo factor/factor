@@ -76,4 +76,4 @@ USE: prettyprint
     </html>
   ] show ;
 
-"live-updater" [ live-updater-responder ] install-cont-responder
+! "live-updater" [ live-updater-responder ] install-cont-responder

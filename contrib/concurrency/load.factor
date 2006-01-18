@@ -1,14 +1,10 @@
-USE: kernel
-USE: threads
-USE: prettyprint
-USE: errors
-USE: io
+IN: scratchpad
+USING: kernel parser compiler words sequences ;
 
-USE: parser
+"contrib/dlists.factor" run-file
+"contrib/math/load.factor" run-file
 
-: a "../dlists.factor" run-file 
-    "concurrency.factor" run-file ;
-: b "concurrency-examples.factor" run-file ;
-: c "concurrency-tests.factor" run-file ;
-a
-b
+{ "concurrency" "concurrency-examples" }
+dup
+[ "contrib/concurrency/" swap ".factor" append3 run-file ] each
+[ words [ try-compile ] each ] each

@@ -1,20 +1,8 @@
-USING: kernel parser sequences io ;
-[
-    "contrib/httpd/http-common.factor"
-    "contrib/httpd/mime.factor"
-    "contrib/httpd/html-tags.factor"
-    "contrib/httpd/html.factor"
-    "contrib/httpd/responder.factor"
-    "contrib/httpd/httpd.factor"
-    "contrib/httpd/file-responder.factor"
-    "contrib/httpd/cont-responder.factor"
-    "contrib/httpd/browser-responder.factor"
-    "contrib/httpd/default-responders.factor"
-    "contrib/httpd/http-client.factor"
-    "contrib/httpd/test/html.factor"
-    "contrib/httpd/test/http-client.factor"
-    "contrib/httpd/test/httpd.factor"
-    "contrib/httpd/test/url-encoding.factor"
-] [
-    run-file
-] each
+IN: scratchpad
+USING: words kernel parser sequences io compiler ;
+{ "http-common" "mime" "html-tags" "html" "responder" "httpd" "file-responder" "cont-responder" "browser-responder" "default-responders" "http-client" 
+  "test/html" "test/http-client" "test/httpd" "test/url-encoding" }
+[ "contrib/httpd/" swap ".factor" append3 run-file ] each
+
+{ "browser-responder" "cont-responder" "httpd" "file-responder" "html" "http-client" "http" "xml" }
+[ words [ try-compile ] each ] each

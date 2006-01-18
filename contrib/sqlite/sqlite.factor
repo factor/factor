@@ -37,6 +37,7 @@ USE: strings
 USE: namespaces
 USE: sequences
 USE: lists
+USE: compiler
 
 BEGIN-STRUCT: sqlite3
 END-STRUCT
@@ -170,7 +171,7 @@ END-STRUCT
   #! Open the database referenced by the filename and return
   #! a handle to that database. An error is thrown if the database
   #! failed to open.
-  <sqlite3-indirect> tuck sqlite3_open sqlite-check-result sqlite3-indirect-pointer ;
+  "sqlite3-indirect" <c-object> tuck sqlite3_open sqlite-check-result sqlite3-indirect-pointer ;
 
 : sqlite-close ( db -- )
   #! Close the given database
@@ -184,8 +185,8 @@ END-STRUCT
   #! Prepare a SQL statement. Returns the statement which
   #! can have values bound to parameters or simply executed.
   #! TODO: Support multiple statements in the SQL string.
-  dup length <sqlite3-stmt-indirect> dup >r 
-  <char*-indirect> sqlite3_prepare sqlite-check-result
+  dup length "sqlite3-stmt-indirect" <c-object> dup >r 
+  "char*-indirect" <c-object> sqlite3_prepare sqlite-check-result
   r> sqlite3-stmt-indirect-pointer ;
 
 : sqlite-bind-text ( statement col text -- )

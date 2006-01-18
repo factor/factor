@@ -1,0 +1,18 @@
+factor (0.79+cvs20060119-1) unstable; urgency=low
+
+  * Make an extended.image.
+
+ -- Trent Buck <trentbuck@gmail.com>  Wed, 18 Jan 2006 00:14:02 +1100
+
+factor (0.79+cvs20060117-1) unstable; urgency=low
+
+  * Bootstrap from an already-installed binary.
+
+ -- Trent Buck <trentbuck@gmail.com>  Tue, 17 Jan 2006 10:24:10 +1100
+
+factor (0.79+cvs20060114-1) unstable; urgency=low
+
+  * Initial release Closes: #nnnn  (nnnn is the bug number of your ITP)
+
+ -- Trent Buck <trentbuck@gmail.com>  Sat, 14 Jan 2006 10:17:28 +1100
+
