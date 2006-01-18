@@ -86,18 +86,6 @@ V{ } vertices set
 : polygon-vertex ( -- ) position get vertices get push ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-! Lindenmayer string rewriting and interpretation
-! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-
-! SYMBOL: rules
-! SYMBOL: command-table
-
-! : lookup ( str -- str ) dup rules get hash dup [ nip ] [ drop ] if ;
-
-! : rewrite ( str -- str ) "" swap [ ch>string lookup append ] each ;
-
-! : interpret ( str -- )
-! [ ch>string command-table get hash dup [ call ] [ drop ] if ] each ;
 
 USE: sequences : length* length ; USE: lindenmayer
 
