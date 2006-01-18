@@ -292,3 +292,21 @@ H{ [[ "S" "FFR2R2R2R2R2R5S" ]]
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
+: abop-1 ( -- ) lparser-dialect   45 angle set
+
+[ 0.8 scale-length ] "1" command-table get set-hash
+[ 137 neg rotate-z ] "2" command-table get set-hash
+[ 0.9 scale-thickness ] "3" command-table get set-hash
+[ 12 set-color-index ] "4" command-table get set-hash
+[ 8 set-color-index ] "5" command-table get set-hash
+[ 30 rotate-y ] "6" command-table get set-hash
+[ 120 neg rotate-y ] "7" command-table get set-hash
+
+H{ [[ "A" "F[&1!BL]2'3A" ]]
+   [[ "B" "F[-13$CL]'3C" ]]
+   [[ "C" "F[+13$BL]'3B" ]]
+   [[ "L" "~5{6f7f7f}" ]]
+} rules set
+
+"4FFAL" result set ;
+
