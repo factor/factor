@@ -1,5 +1,5 @@
 USING: kernel alien namespaces arrays vectors math opengl math-contrib
-sequences hashtables strings ;
+lists parser sequences hashtables strings ;
 
 IN: lindenmayer 
 
@@ -89,15 +89,63 @@ V{ } vertices set
 ! Lindenmayer string rewriting and interpretation
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
+! SYMBOL: rules
+! SYMBOL: command-table
+
+! : lookup ( str -- str ) dup rules get hash dup [ nip ] [ drop ] if ;
+
+! : rewrite ( str -- str ) "" swap [ ch>string lookup append ] each ;
+
+! : interpret ( str -- )
+! [ ch>string command-table get hash dup [ call ] [ drop ] if ] each ;
+
+USE: sequences : length* length ; USE: lindenmayer
+
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+! Lindenmayer string rewriting
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
 SYMBOL: rules
+
+: segment ( str -- seq )
+{ { [ dup "" = ] [ drop [ ] ] }
+  { [ dup length* 1 = ] [ f cons ] }
+  { [ dup 1 swap nth CHAR: ( = ]
+    [ dup CHAR: ) swap index 1 +	! str i
+      swap				! i str
+      2dup head				! i str head
+      -rot tail				! head tail
+      segment cons ] }
+  { [ t ] [ 1 over head swap 1 swap tail segment cons ] } }
+cond ;
+
+: lookup ( str -- str ) 1 over head rules get hash dup [ nip ] [ drop ] if ;
+
+: rewrite ( str -- str ) segment [ lookup ] map concat ;
+
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+! Lindenmayer string interpretation
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
 SYMBOL: command-table
 
-: lookup ( str -- str ) dup rules get hash dup [ nip ] [ drop ] if ;
+: segment-command ( seg -- command ) 1 swap head ;
 
-: rewrite ( str -- str ) "" swap [ ch>string lookup append ] each ;
+: segment-parameter ( seg -- parameter )
+dup length* 1 - 2 swap rot subseq parse call ;
 
-: interpret ( str -- )
-[ ch>string command-table get hash dup [ call ] [ drop ] if ] each ;
+: segment-parts ( seg -- param command )
+dup segment-parameter swap segment-command ;
+
+: exec-command ( str -- ) command-table get hash dup [ call ] [ drop ] if ;
+
+: exec-command-with-param ( param command -- )
+command-table get hash dup [ last call ] [ 2drop ] if ;
+
+: (interpret) ( seg -- )
+dup length* 1 = [ exec-command ] [ segment-parts exec-command-with-param ] if ;
+
+: interpret ( str -- ) segment [ (interpret) ] each ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 ! Lparser dialect
@@ -234,28 +282,43 @@ H{ [[ "+" [ angle get     rotate-y ] ]]
 
 SYMBOL: result
 
+! : koch ( -- ) lparser-dialect   90 angle set
+
+! [ 0.41     scale-length ] "1" command-table get set-hash
+! [ 2.439    scale-length ] "2" command-table get set-hash
+! [ 0.5      scale-length ] "3" command-table get set-hash
+! [ 0.2887   scale-length ] "4" command-table get set-hash
+! [ 3.4758   scale-length ] "5" command-table get set-hash
+! [ 60       rotate-z ]     "6" command-table get set-hash
+! [ 120      rotate-z ]     "7" command-table get set-hash
+! [ 180      rotate-x ]     "8" command-table get set-hash
+! [ 109.5111 rotate-x ]     "9" command-table get set-hash
+! [ -120     rotate-y ]     "0" command-table get set-hash
+
+! H{ [[ "K" "[[a|b] 1f2 |6 [a|b]]" ]]
+!    [[ "k" "[ c3 K]" ]]
+!    [[ "a" "[d 7 d 7 d ]" ]]
+!    [[ "b" "e" ]]
+!    [[ "e" "[^ 4f5 8 +z{.0f0f}]" ]]
+!    [[ "d" "[^ 4f5 9 +zk{.0f0f}]" ]]
+! } rules set
+
+! "K" 5 [ rewrite ] times dup result set ;
+
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
 : koch ( -- ) lparser-dialect   90 angle set
 
-[ 0.41     scale-length ] "1" command-table get set-hash
-[ 2.439    scale-length ] "2" command-table get set-hash
-[ 0.5      scale-length ] "3" command-table get set-hash
-[ 0.2887   scale-length ] "4" command-table get set-hash
-[ 3.4758   scale-length ] "5" command-table get set-hash
-[ 60       rotate-z ]     "6" command-table get set-hash
-[ 120      rotate-z ]     "7" command-table get set-hash
-[ 180      rotate-x ]     "8" command-table get set-hash
-[ 109.5111 rotate-x ]     "9" command-table get set-hash
-[ -120     rotate-y ]     "0" command-table get set-hash
-
-H{ [[ "K" "[[a|b] 1f2 |6 [a|b]]" ]]
-   [[ "k" "[ c3 K]" ]]
-   [[ "a" "[d 7 d 7 d ]" ]]
+H{ [[ "K" "[[a|b] '(0.41)f'(2.439) |<(60) [a|b]]" ]]
+   [[ "k" "[ c'(0.5) K]" ]]
+   [[ "a" "[d <(120) d <(120) d ]" ]]
    [[ "b" "e" ]]
-   [[ "e" "[^ 4f5 8 +z{.0f0f}]" ]]
-   [[ "d" "[^ 4f5 9 +zk{.0f0f}]" ]]
+   [[ "e" "[^ '(.2887)f'(3.4758) &(180)      +z{.-(120)f-(120)f}]" ]]
+   [[ "d" "[^ '(.2887)f'(3.4758) &(109.5111) +zk{.-(120)f-(120)f}]" ]]
 } rules set
 
-"K" 5 [ rewrite ] times dup result set ;
+"K" result set ;
+
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
