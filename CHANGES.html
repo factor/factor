@@ -26,6 +26,9 @@ initial size.</li>
 repeated a certain number of times has been renamed to <code>&lt;string&gt;</code>.</li>
 <li>The <code>sum</code> and <code>product</code> words have been moved to
 <code>contrib/math/</code>.</li>
+<li>Some alien word changes:
+<pre>&lt;foo&gt; ==&gt; "foo" &lt;c-object&gt;
+&lt;foo-array&gt; ==&gt; "foo" &lt;c-array&gt;</pre>
 </li>
 
 <li><code>stream-format ( string style stream -- )</code> now takes a hashtable
@@ -104,6 +107,8 @@ USE: image
 <li>Contributed libraries:
 
 <ul>
+<li>All libraries in <code>contrib/</code> have been tested and updated for recent language
+changes, and you can run <code>contrib/load.factor</code> to load all of them at once (Trent Buck)</li>
 <li>Updated <code>contrib/x11/</code> with many more examples (Eduardo Cavazos)</li>
 <li>Added splay tree library in <code>contrib/splay-trees.factor</code> (Mackenzie Straight)</li>
 </ul>

@@ -20,6 +20,8 @@ regular basis:
   FreeBSD/AMD64
   Linux/PowerPC
 
+Other platforms are not supported.
+
 * Compiling Factor
 
 The Factor runtime is written in C, and is built with GNU make and gcc.
@@ -51,7 +53,7 @@ The former allows optimization flags to be specified, for example
 difference in Factor's performance, so willing hackers should
 experiment.
 
-The latter flag disables optimization and builds an executable with
+The DEBUG flag disables optimization and builds an executable with
 debug symbols. This is probably only of interest to people intending to
 hack on the runtime sources.
 
@@ -128,7 +130,6 @@ as, and issue a command similar to the following to bootstrap Factor:
     freetype/ - FreeType binding, rendering glyphs to OpenGL textures
     generic/ - generic words, for object oriented programming style
     help/ - online help system
-    httpd/ - HTTP client, server, and web application framework
     inference/ - stack effect inference, used by compiler, as well as a
       useful development tool of its own
     io/ - input and output streams
@@ -143,7 +144,6 @@ as, and issue a command similar to the following to bootstrap Factor:
     win32/ - Windows-specific I/O code
   contrib/ - various handy libraries not part of the core
   examples/ - small examples illustrating various language features
-  factor/ - Java code for the Factor jEdit plugin
   fonts/ - TrueType fonts used by UI
 
 * Learning Factor
@@ -173,6 +173,7 @@ Slava Pestov:       Lead developer
 Alex Chapman:       OpenGL binding
 Doug Coleman:       Mersenne Twister random number generator
 Mackenzie Straight: Windows port
+Trent Buck:         Debian package
 
 A number of contributed libraries not part of the core can be found in
 contrib/. See contrib/README.txt for details.

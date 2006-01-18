@@ -242,7 +242,7 @@ HELP: array-nth "( n array -- elt )"
 { $description "Low-level array element accessor." }
 { $warning "This word is in the " { $snippet "kernel-internals" } " vocabulary because it is unsafe. It does not check types or array bounds, and improper use can corrupt memory." } ;
 
-HELP: set-array-nth "( elt n array --)"
+HELP: set-array-nth "( elt n array -- )"
 { $values { "elt" "an object" } { "n" "a non-negative fixnum" } { "array" "an array" }  }
 { $description "Low-level array element mutator." }
 { $warning "This word is in the " { $snippet "kernel-internals" } " vocabulary because it is unsafe. It does not check types or array bounds, and improper use can corrupt memory." } ;
