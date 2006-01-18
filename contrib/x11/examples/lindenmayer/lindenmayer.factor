@@ -293,29 +293,6 @@ H{ [[ "+" [ angle get     rotate-y ] ]]
 SYMBOL: axiom
 SYMBOL: result
 
-! : koch ( -- ) lparser-dialect   90 angle set
-
-! [ 0.41     scale-length ] "1" command-table get set-hash
-! [ 2.439    scale-length ] "2" command-table get set-hash
-! [ 0.5      scale-length ] "3" command-table get set-hash
-! [ 0.2887   scale-length ] "4" command-table get set-hash
-! [ 3.4758   scale-length ] "5" command-table get set-hash
-! [ 60       rotate-z ]     "6" command-table get set-hash
-! [ 120      rotate-z ]     "7" command-table get set-hash
-! [ 180      rotate-x ]     "8" command-table get set-hash
-! [ 109.5111 rotate-x ]     "9" command-table get set-hash
-! [ -120     rotate-y ]     "0" command-table get set-hash
-
-! H{ [[ "K" "[[a|b] 1f2 |6 [a|b]]" ]]
-!    [[ "k" "[ c3 K]" ]]
-!    [[ "a" "[d 7 d 7 d ]" ]]
-!    [[ "b" "e" ]]
-!    [[ "e" "[^ 4f5 8 +z{.0f0f}]" ]]
-!    [[ "d" "[^ 4f5 9 +zk{.0f0f}]" ]]
-! } rules set
-
-! "K" 5 [ rewrite ] times dup result set ;
-
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 : koch ( -- ) lparser-dialect   90 angle set
@@ -345,30 +322,6 @@ H{ [[ "P" "[A]>>>>>>>>>[cB]>>>>>>>>>[ccC]>>>>>>>>>[cccD]" ]]
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-! : tree-5 ( -- ) lparser-dialect   5 angle set
-
-! [ 4 set-color-index ] "1" command-table get set-hash
-! [ 60 neg rotate-z ]   "2" command-table get set-hash
-! [ 1.25 scale-length ] "3" command-table get set-hash
-! [ 0.8 scale-length ]  "4" command-table get set-hash
-! [ 30 neg rotate-z ]   "5" command-table get set-hash
-
-! H{ [[ "S" "FFR2R2R2R2R2R5S" ]]
-!    [[ "R" "[Ba]" ]]
-!    [[ "a" "$tF[Cx]Fb" ]]
-!    [[ "b" "$tF[Dy]Fa" ]]
-!    [[ "B" "&B" ]]
-!    [[ "C" "+C" ]]
-!    [[ "D" "-D" ]]
-!    [[ "x" "a" ]]
-!    [[ "y" "b" ]]
-!    [[ "F" "3F4" ]]
-! } rules set
-
-! "1FFS" result set ;
-
-! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-
 : tree-5 ( -- ) lparser-dialect   5 angle set   1 thickness set
 
 "c(4)FFS" axiom set
@@ -386,27 +339,6 @@ H{ [[ "S" "FFR>(60)R>(60)R>(60)R>(60)R>(60)R>(30)S" ]]
 
    [[ "F" "'(1.25)F'(.8)" ]]
 } rules set ;
-
-
-! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-
-! : abop-1 ( -- ) lparser-dialect   45 angle set
-
-! [ 0.8 scale-length ] "1" command-table get set-hash
-! [ 137 neg rotate-z ] "2" command-table get set-hash
-! [ 0.9 scale-thickness ] "3" command-table get set-hash
-! [ 12 set-color-index ] "4" command-table get set-hash
-! [ 8 set-color-index ] "5" command-table get set-hash
-! [ 30 rotate-y ] "6" command-table get set-hash
-! [ 120 neg rotate-y ] "7" command-table get set-hash
-
-! H{ [[ "A" "F[&1!BL]2'3A" ]]
-!    [[ "B" "F[-13$CL]'3C" ]]
-!    [[ "C" "F[+13$BL]'3B" ]]
-!    [[ "L" "~5{6f7f7f}" ]]
-! } rules set
-
-! "4FFAL" result set ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
