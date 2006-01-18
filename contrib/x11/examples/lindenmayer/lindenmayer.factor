@@ -218,8 +218,10 @@ H{ [[ "+" [ angle get     rotate-y ] ]]
    [[ "'" [ 0.9 scale-length ] ]]
    [[ ";" [ 1.1 scale-angle ] ]]
    [[ ":" [ 0.9 scale-angle ] ]]
-   [[ "?" [ thickness get 1.4 * thickness set ] ]]
-   [[ "!" [ thickness get 0.7 * thickness set ] ]]
+!   [[ "?" [ thickness get 1.4 * thickness set ] ]]
+!   [[ "!" [ thickness get 0.7 * thickness set ] ]]
+   [[ "?" [ 1.4 scale-thickness ] ]]
+   [[ "!" [ 0.7 scale-thickness ] ]]
 
    [[ "c" [ inc-color-index ] ]]
 } command-table set ;
