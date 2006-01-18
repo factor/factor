@@ -223,7 +223,9 @@ H{ [[ "+" [ angle get     rotate-y ] ]]
    [[ "?" [ 1.4 scale-thickness ] ]]
    [[ "!" [ 0.7 scale-thickness ] ]]
 
-   [[ "c" [ inc-color-index ] ]]
+!   [[ "c" [ inc-color-index ] ]]
+   [[ "c" [ color-index get 1 + set-color-index ] ]]
+
 } command-table set ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
