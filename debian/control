@@ -9,6 +9,7 @@ Package: factor
 Architecture: any
 Depends: ${shlibs:Depends}, ${misc:Depends}
 Recommends: libsdl1.2-dev, libfreetype6-dev, libcairo2-dev, libsqlite3-dev, libx11-dev, libpq-dev
+Suggests: rlwrap
 Description: compiler for the concatenative language Factor
  Factor is a dynamic programming language. The end goal is to have a high
  performance, robust language for general-purpose client-side and server-side
