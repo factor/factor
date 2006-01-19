@@ -42,6 +42,12 @@
 - if two tasks write to a unix stream, the buffer can overflow
 - inference bug
 - test cases:
+
+
+- fix stack effect comment spacing in help for words without docs,
+	eg (object -- object object) -> ( object -- object object )
+
+ALL TESTS BELOW FAIL ON x86 linux 32bit
 - float not commutative bug
   : a 237241607 1516.925984289192 3036109462846 913470293/554864
     max min * 994.5872660892654 306803761/112249 -216866846 + -
@@ -61,5 +67,8 @@
     -113698191 1404.610575779506 51191522 * * -
     1977.861343144055 -50892488 947579163/437404 * min * ;
 
-- fix stack effect comment spacing in help for words without docs,
-	eg (object -- object object) -> ( object -- object object )
+- compiled vs interpreted output differs!
+	: math-dummy 692476975489 >fixnum ;
+
+: math-dummy -248461184 float>bits ;   FAILS
+
