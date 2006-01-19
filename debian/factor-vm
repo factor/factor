@@ -1,3 +1,0 @@
-#!/bin/sh
-# This script invokes factor with the default image.
-exec /usr/share/factor/f /usr/share/factor/factor.image "$@"
