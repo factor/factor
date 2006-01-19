@@ -1,9 +1,9 @@
-USING: help prettyprint words ;
+USING: help kernel prettyprint words ;
 
 IN: help
 
 : $prettyprinting-note
-    {
+    drop {
         "This word should only be called from inside the "
         { $link with-pprint } " combinator."
     } $notes ;
@@ -233,11 +233,11 @@ HELP: . "( obj -- )"
 
 HELP: unparse "( obj -- str )"
 { $values { "obj" "an object" } { "str" "Factor source string" } }
-{ $description "Outputs a prettyprinted string representation of an object." } ;
+{ $description "Outputs a prettyprinted string representation of an object. Output is influenced by many variables; see " { $link "prettyprint-variables" } "." } ;
 
 HELP: pprint-short "( obj -- )"
 { $values { "obj" "an object" } }
-{ $description "Prettyprints an object to the default stream. This word rebinds printer control variables to enforce ``shorter'' output." } ;
+{ $description "Prettyprints an object to the default stream. This word rebinds printer control variables to enforce ``shorter'' output. See " { $link "prettyprint-variables" } "." } ;
 
 HELP: short. "( obj -- )"
 { $values { "obj" "an object" } }
@@ -245,7 +245,7 @@ HELP: short. "( obj -- )"
 
 HELP: unparse-short "( obj -- str )"
 { $values { "obj" "an object" } { "str" "Factor source string" } }
-{ $description "Outputs a prettyprinted string representation of an object. This word rebinds printer control variables to enforce ``shorter'' output." } ;
+{ $description "Outputs a prettyprinted string representation of an object. This word rebinds printer control variables to enforce ``shorter'' output. See " { $link "prettyprint-variables" } "." } ;
 
 HELP: .b "( n -- )"
 { $values { "n" "an integer" } }

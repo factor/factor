@@ -266,6 +266,7 @@ vectors words ;
         "/doc/handbook/math.facts"
         "/doc/handbook/objects.facts"
         "/doc/handbook/parser.facts"
+        "/doc/handbook/prettyprinter.facts"
         "/doc/handbook/sequences.facts"
         "/doc/handbook/streams.facts"
         "/doc/handbook/syntax.facts"

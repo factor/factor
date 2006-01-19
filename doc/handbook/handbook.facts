@@ -7,7 +7,7 @@ $terpri
 { $subsection "presentation-intro" }
 { $subsection "tutorial" }
 { $subsection "quickref" }
-"More detailed reference documentation:"
+"Detailed reference documentation:"
 { $subsection "syntax" }
 { $subsection "dataflow" }
 { $subsection "words" }
@@ -15,7 +15,9 @@ $terpri
 { $subsection "math" }
 { $subsection "collections" }
 { $subsection "streams" }
-{ $subsection "parser" } ;
+{ $subsection "parser" }
+{ $subsection "prettyprint" }
+;
 
 ARTICLE: "presentation-intro" "The presentation-based UI"
 "Factor provides a " { $emphasis "presentation-based" } " user interface. A " { $emphasis "presentation" } " is a graphical representation of a live object. You can see presentations everywhere; help links, words, and code examples are all presentations."

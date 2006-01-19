@@ -1,13 +1,17 @@
-USING: hashtables hashtables-internals help kernel namespaces
-queues ;
+USING: hashtables hashtables-internals help io-internals kernel
+namespaces queues ;
 
 GLOSSARY: "collection" "an object whose primary purpose is to aggregate other objects; examples include sequences, queues and hashtables" ;
 
 ARTICLE: "collections" "Collections"
+"Classical data structures:"
 { $subsection "sequences" }
 { $subsection "queues" }
 { $subsection "hashtables" }
-{ $subsection "namespaces" } ;
+"An abstraction on hashtables:"
+{ $subsection "namespaces" }
+"A low-level facility:"
+{ $subsection "buffers" } ;
 
 ARTICLE: "queues" "Queues"
 "A simple last-in-first-out queue data structure."
@@ -142,3 +146,27 @@ ARTICLE: "namespaces-internals" "Namespace implementation details"
 "A pair of words push and pop namespaces on the namestack."
 { $subsection >n }
 { $subsection n> } ;
+
+ARTICLE: "buffers" "Locked I/O buffers"
+"I/O buffers are a circular ring structure, a fixed-size queue of characters. Their key feature is that they are backed by manually allocated storage that does not get moved by the garbage collector. They are typically used for asynchronous I/O in conjunction with the C library interface in Factor's implementation."
+$terpri
+"Buffer words are in the " { $snippet "io-internals" } " vocabulary."
+{ $subsection buffer }
+{ $subsection <buffer> }
+"Buffers must be manually deallocated:"
+{ $subsection buffer-free }
+"Buffer operations:"
+{ $subsection buffer-reset }
+{ $subsection buffer-length }
+{ $subsection buffer-empty? }
+{ $subsection buffer-capacity }
+"Reading from the buffer:"
+{ $subsection buffer-peek }
+{ $subsection buffer-pop }
+{ $subsection buffer> }
+{ $subsection buffer>> }
+{ $subsection buffer-contents }
+"Writing to the buffer:"
+{ $subsection buffer-extend }
+{ $subsection ch>buffer }
+{ $subsection >buffer } ;
