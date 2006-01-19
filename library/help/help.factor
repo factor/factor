@@ -12,3 +12,5 @@ DEFER: $heading
     dup article-title $heading (help) ;
 
 : glossary ( name -- ) <term> help ;
+
+: handbook ( -- ) "handbook" help ;
