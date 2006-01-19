@@ -44,7 +44,7 @@
 
 - font problem: http://iarc1.ece.utexas.edu/~erg/font-bug.JPG
 
-- implement 3.3 floor  4.7 ceiling
+- implement 3.3 floor  4.7 ceiling  4.5 truncate
 
 ALL TESTS BELOW FAIL ON x86 linux 32bit
 - float not commutative bug
@@ -93,3 +93,5 @@ Compile fails:
 : math-dummy
     2.522378181825594 tan 7.825249292551574 - cos
     0.2875868408644093 + sin >bignum cos >float sin ;
+
+
