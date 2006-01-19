@@ -33,4 +33,4 @@ input/output ports.
 
 For more information, contact the author, Chris Double, at
 chris.double@double.co.nz or from my weblog
-http://radio.weblogs.com/0102385
+http://www.bluishcoder.co.nz
