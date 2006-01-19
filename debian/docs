@@ -6,6 +6,3 @@ doc/handbook.pdf
 doc/internals.txt
 doc/theory.pdf
 doc/handbook
-examples
-library
-version.factor

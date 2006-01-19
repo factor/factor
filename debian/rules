@@ -4,6 +4,9 @@
 # SITE_CFLAGS=-fPIC -ffast-math -funsigned-char -mpowerpc -mpowerpc-gpopt -mpowerpc-gfxopt -maltivec -mabi=altivec -mtune=G4 -mcpu=G4 -pipe
 # SITE_CFLAGS=-march=pentium4
 
+VERSION=0.80
+FARCH=$(shell sh debian/architecture.sh)
+
 configure: configure-stamp
 
 configure-stamp:
@@ -14,18 +17,19 @@ build: build-stamp
 
 build-stamp: configure-stamp
 	dh_testdir
-	$(MAKE) linux-`sh debian/architecture.sh`
-####### Build the bootstrap image
-	echo "USE: image \"`sh debian/architecture.sh`\" make-image 0 exit" | factor-vm debian/make-bootstrap-images.factor
-#	wget http://factorcode.org/boot.image.`sh debian/architecture.sh`
-####### Build the factor image
-	./f boot.image.`sh debian/architecture.sh` -libraries:sdl:name=libSDL.so -libraries:freetype:name=libfreetype.so
-#	cp /usr/share/factor/f /usr/share/factor/factor.image .
-####### Build the extended image
+	$(MAKE) linux-$(FARCH)
+	mv f runtime
+	# Build the bootstrap image
+	echo "USE: image \"$(FARCH)\" make-image" | factor-run --basic debian/make-bootstrap-images.factor # || wget http://factorcode.org/boot.image.$(FARCH)
+	mv boot.image.$(FARCH) boot.image
+	# Build the factor image
+	./runtime boot.image -libraries:sdl:name=libSDL.so -libraries:freetype:name=libfreetype.so
+	mv factor.image basic.image
+	# Build the extended image
 	sqlite3 contrib/sqlite/test.db < contrib/sqlite/test.txt
-#	$(CC) $(CFLAGS) -L /usr/X11R6/lib -shared -o contrib/factory/simple-error-handler.so contrib/factory/simple-error-handler.c -lX11
-	echo 'USING: image kernel ; "extended.image" save-image 0 exit' | ./f factor.image contrib/load.factor
-####### Build the documentation
+	$(CC) $(CFLAGS) -L /usr/X11R6/lib -shared -o contrib/factory/simple-error-handler.so contrib/factory/simple-error-handler.c -lX11
+	echo 'USING: image kernel ; "extended.image" save-image 0 exit' | ./runtime basic.image contrib/load.factor
+	# Build the documentation
 	cd doc && for i in *.eps; do epstopdf $$i; done
 	cd doc && rubber --pdf theory
 	cd doc && sh makedoc
@@ -36,7 +40,7 @@ clean:
 	dh_testroot
 	rm -f build-stamp configure-stamp
 	-$(MAKE) clean
-	-rm -f f factor.image extended.image
+	-rm -f f runtime factor.image boot.image boot.image.$(FARCH) basic.image extended.image
 	dh_clean
 
 install: build
@@ -44,8 +48,12 @@ install: build
 	dh_testroot
 	dh_clean -k 
 	dh_installdirs
-	install f factor.image extended.image $(CURDIR)/debian/factor/usr/share/factor
-	install -m 755 debian/factor-vm $(CURDIR)/debian/factor/usr/bin
+	# Install binary files
+	install runtime boot.image basic.image extended.image $(CURDIR)/debian/factor/usr/lib/factor
+	# Install source files
+	install contrib examples fonts library version.factor $(CURDIR)/debian/factor/usr/share/factor
+	# Install wrapper scripts
+	install -m 755 debian/scripts/factor-* $(CURDIR)/debian/factor/usr/bin
 
 binary-indep: build install
 
