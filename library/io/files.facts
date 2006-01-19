@@ -1,5 +1,17 @@
 USING: help io ;
 
+HELP: stat "( path -- list )"
+{ $values { "path" "a pathname string" } { "list" "a new list" } }
+{ $description
+    "Outputs a list of file system attributes, or " { $link f } " if the file does not exist. The elements of the list are precisely the following:"
+    { $list
+        "boolean indicating if the file is a directory"
+        "the length in bytes as an integer"
+        "a Unix permission bitmap, or 0 if not supported"
+        "the last modification time, as milliseconds since midnight, January 1st 1970 GMT"
+    }
+} ;
+
 HELP: path+ "( str1 str2 -- str )"
 { $values { "str1" "a string" } { "str2" "a string" } { "str" "a string" } }
 { $description "Concatenates two path names." } ;

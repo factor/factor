@@ -57,8 +57,8 @@ vectors words ;
         "/library/vocabularies.factor"
         "/library/continuations.factor"
         "/library/errors.factor"
-        "/library/styles.factor"
-
+        
+        "/library/io/styles.factor"
         "/library/io/stream.factor"
         "/library/io/duplex-stream.factor"
         "/library/io/stdio.factor"
@@ -240,6 +240,7 @@ vectors words ;
         "/library/io/stdio.facts"
         "/library/io/stream.facts"
         "/library/io/string-streams.facts"
+        "/library/io/styles.facts"
         "/library/math/arc-trig-hyp.facts"
         "/library/math/complex.facts"
         "/library/math/constants.facts"
@@ -266,6 +267,7 @@ vectors words ;
         "/doc/handbook/objects.facts"
         "/doc/handbook/parser.facts"
         "/doc/handbook/sequences.facts"
+        "/doc/handbook/streams.facts"
         "/doc/handbook/syntax.facts"
         "/doc/handbook/tutorial.facts"
         "/doc/handbook/words.facts"
