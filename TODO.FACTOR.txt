@@ -72,3 +72,26 @@ ALL TESTS BELOW FAIL ON x86 linux 32bit
 
 : math-dummy -248461184 float>bits ;   FAILS
 
+---RATIO---
+Compiles VERY SLOWLY
+: math-dummy
+    292025505/568715131 587196182/778552531 cos neg
+    133163510/474434699 >bignum 57689734/429093367 tan cos
+    585585439/262485063 neg ;
+
+Compile fails
+: math-dummy 41614997/15884070 392881821/294492125 + sin sin sin tan sin 830428019/886540270 * neg ;
+
+---FLOAT---
+Compile fails:
+: math-dummy
+    2.522378181825594 tan 7.825249292551574 - cos
+    0.2875868408644093 + sin >bignum cos >float sin ;
+Compile fails:
+: math-dummy
+    0.5589927916549555 tan 2.261878253481278 + tan sin ;
+
+SLOW compile
+: math-dummy
+    1.550108042325469 3.888423982091886 - tan tan ;
+
