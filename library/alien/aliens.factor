@@ -32,6 +32,10 @@ M: alien = ( obj obj -- ? )
         [ "abi" set "name" set ] make-hash swap set
     ] bind ;
 
+: add-simple-library ( name file -- ) 
+    win32? ".dll" ".so" ? append
+    win32? "stdcall" "cdecl" ? add-library ;
+
 : library-abi ( library -- abi )
     library "abi" swap ?hash [ "cdecl" ] unless* ;
 

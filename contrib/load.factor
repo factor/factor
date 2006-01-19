@@ -14,17 +14,12 @@ USING: alien kernel words sequences parser compiler memory ;
 !   cont-responder -> parser-combinators
 ! }
 
-: add-simple-library ( name file -- ) 
-    win32? ".dll" ".so" ? append
-    win32? "stdcall" "cdecl" ? add-library ;
-
 { "coroutines" "dlists" "splay-trees" }
 [ dup
   "contrib/" swap ".factor" append3 run-file
    words [ try-compile ] each ] each
 
-{ "cairo" "math" "concurrency" "crypto" "aim" "httpd" "units" "sqlite" "win32"
-  "x11" ! "factory" has a C component, ick.
+{ "cairo" "math" "concurrency" "crypto" "aim" "httpd" "units" "sqlite" "win32" "x11" ! "factory" has a C component, ick.
   "postgresql" "parser-combinators" "cont-responder" "space-invaders"
 } [ "contrib/" swap "/load.factor" append3 run-file ] each
 
