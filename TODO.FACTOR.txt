@@ -41,8 +41,10 @@
 - better i/o scheduler
 - if two tasks write to a unix stream, the buffer can overflow
 - inference bug
-- test cases:
 
+- font problem: http://iarc1.ece.utexas.edu/~erg/font-bug.JPG
+
+- implement 3.3 floor  4.7 ceiling
 
 - fix stack effect comment spacing in help for words without docs,
 	eg (object -- object object) -> ( object -- object object )
@@ -69,8 +71,7 @@ ALL TESTS BELOW FAIL ON x86 linux 32bit
 
 - compiled vs interpreted output differs!
 	: math-dummy 692476975489 >fixnum ;
-
-: math-dummy -248461184 float>bits ;   FAILS
+	: math-dummy -248461184 float>bits ;   FAILS
 
 ---RATIO---
 Compiles VERY SLOWLY
@@ -85,13 +86,13 @@ Compile fails
 ---FLOAT---
 Compile fails:
 : math-dummy
-    2.522378181825594 tan 7.825249292551574 - cos
-    0.2875868408644093 + sin >bignum cos >float sin ;
-Compile fails:
-: math-dummy
     0.5589927916549555 tan 2.261878253481278 + tan sin ;
 
 SLOW compile
 : math-dummy
     1.550108042325469 3.888423982091886 - tan tan ;
 
+Compile fails:
+: math-dummy
+    2.522378181825594 tan 7.825249292551574 - cos
+    0.2875868408644093 + sin >bignum cos >float sin ;
