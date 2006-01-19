@@ -30,11 +30,11 @@ sequences strings styles words ;
 
 : effect>string ( effect -- string )
     [
-        "(" %
+        "( " %
         dup first stack-picture %
         " -- " %
         second stack-picture %
-        ")" %
+        " )" %
     ] "" make ;
 
 : stack-effect ( word -- string )

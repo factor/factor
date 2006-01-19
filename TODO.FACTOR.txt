@@ -46,9 +46,6 @@
 
 - implement 3.3 floor  4.7 ceiling
 
-- fix stack effect comment spacing in help for words without docs,
-	eg (object -- object object) -> ( object -- object object )
-
 ALL TESTS BELOW FAIL ON x86 linux 32bit
 - float not commutative bug
   : a 237241607 1516.925984289192 3036109462846 913470293/554864
