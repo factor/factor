@@ -20,7 +20,7 @@ build-stamp: configure-stamp
 	$(MAKE) linux-$(FARCH)
 	mv f runtime
 	# Build the bootstrap image
-	echo "USE: image \"$(FARCH)\" make-image" | factor-run --basic debian/make-bootstrap-images.factor # || wget http://factorcode.org/boot.image.$(FARCH)
+	echo 'USE: image "$(FARCH)" make-image' | factor-run --basic -resource-path=. # || wget http://factorcode.org/boot.image.$(FARCH)
 	mv boot.image.$(FARCH) boot.image
 	# Build the factor image
 	./runtime boot.image -libraries:sdl:name=libSDL.so -libraries:freetype:name=libfreetype.so
