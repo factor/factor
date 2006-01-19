@@ -60,3 +60,6 @@
     357331489/880112 1760057/587415 7297976710833 - * max
     -113698191 1404.610575779506 51191522 * * -
     1977.861343144055 -50892488 947579163/437404 * min * ;
+
+- fix stack effect comment spacing in help for words without docs,
+	eg (object -- object object) -> ( object -- object object )
