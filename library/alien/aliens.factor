@@ -1,7 +1,7 @@
 ! Copyright (C) 2004, 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: alien
-USING: arrays hashtables io kernel lists math namespaces parser ;
+USING: arrays hashtables io kernel lists math namespaces parser sequences ;
 
 UNION: c-ptr byte-array alien displaced-alien ;
 
