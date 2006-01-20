@@ -1,5 +1,5 @@
 IN: temporary
-USING: html io kernel namespaces styles test ;
+USING: html io kernel namespaces styles test xml ;
 
 [
     "&lt;html&gt;&amp;&apos;sgml&apos;"
@@ -32,7 +32,7 @@ USING: html io kernel namespaces styles test ;
 [
     [
         "car"
-        H{ { font "Monospaced" } }
+        H{ { font "monospace" } }
         html-format
     ] string-out
 ] unit-test

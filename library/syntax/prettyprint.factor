@@ -54,7 +54,7 @@ C: section ( length -- section )
         last-newline set
         line-limit? [ "..." write end-printing get continue ] when
         line-count inc
-        "\n" write do-indent
+        terpri do-indent
     ] if ;
 
 TUPLE: text string style ;

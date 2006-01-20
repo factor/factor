@@ -29,7 +29,7 @@ M: gadget-stream stream-write1 ( char stream -- )
     background [ <solid> over set-gadget-interior ] apply-style ;
 
 : specified-font ( style -- font )
-    [ font swap hash [ "Monospaced" ] unless* ] keep
+    [ font swap hash [ "monospace" ] unless* ] keep
     [ font-style swap hash [ plain ] unless* ] keep
     font-size swap hash [ 12 ] unless* 3array ;
 

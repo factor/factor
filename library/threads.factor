@@ -42,48 +42,8 @@ DEFER: next-thread
         try stop
     ] callcc0 drop ;
 
-TUPLE: timer object delay last ;
-
-: timer-now millis swap set-timer-last ;
-
-C: timer ( object delay -- timer )
-    [ set-timer-delay ] keep
-    [ set-timer-object ] keep
-    dup timer-now ;
-
-GENERIC: tick ( ms object -- )
-
-: timers ( -- hash ) \ timers global hash ;
-
-: add-timer ( object delay -- )
-    over >r <timer> r> timers set-hash ;
-
-: remove-timer ( object -- ) timers remove-hash ;
-
-: restart-timer ( object -- )
-    timers hash [ timer-now ] when* ;
-
-: next-time ( timer -- ms ) dup timer-delay swap timer-last + ;
-
-: advance-timer ( ms timer -- delay )
-    #! Outputs the time since the last firing.
-    [ timer-last - 0 max ] 2keep set-timer-last ;
-
-: do-timer ( ms timer -- )
-    #! Takes current time, and a timer. If the timer is set to
-    #! fire, calls its callback.
-    dup next-time pick <= [
-        [ advance-timer ] keep timer-object tick
-    ] [
-        2drop
-    ] if ;
-
-: do-timers ( -- )
-    millis timers hash-values [ do-timer ] each-with ;
-
 : init-threads ( -- )
     global [
         <queue> \ run-queue set
         V{ } clone \ sleep-queue set
-        H{ } clone \ timers set
     ] bind ;

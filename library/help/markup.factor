@@ -87,8 +87,7 @@ M: simple-element print-element [ print-element ] each ;
 : $synopsis ( content -- )
     first dup
     word-vocabulary [ "Vocabulary" $subheading $snippet ] when*
-    dup parsing? [ $syntax ] [ $stack-effect ] if
-    terpri* ;
+    dup parsing? [ $syntax ] [ $stack-effect ] if ;
 
 : $description ( content -- )
     "Description" $subheading print-element ;
@@ -110,9 +109,7 @@ M: simple-element print-element [ print-element ] each ;
     [ "," format* bl ] interleave ; inline
 
 : $see ( content -- )
-    terpri*
-    code-style [ [ first see ] with-nesting* ] with-style
-    terpri* ;
+    code-style [ [ first see ] with-nesting* ] with-style ;
 
 : $example ( content -- )
     first2 swap dup <input>

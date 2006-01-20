@@ -76,13 +76,13 @@ USING: arrays gadgets kernel sequences styles ;
 
 : label-theme ( label -- )
     { 0.0 0.0 0.0 1.0 } over set-label-color
-    { "Monospaced" plain 12 } swap set-label-font ;
+    { "monospace" plain 12 } swap set-label-font ;
 
 : editor-theme ( label -- )
     { 0.0 0.0 0.0 1.0 } over set-label-color
-    { "Monospaced" bold 12 } swap set-label-font ;
+    { "monospace" bold 12 } swap set-label-font ;
 
 : status-theme ( label -- )
     dup reverse-video-theme
     { 1.0 1.0 1.0 1.0 } over set-label-color
-    { "Monospaced" plain 12 } swap set-label-font ;
+    { "monospace" plain 12 } swap set-label-font ;

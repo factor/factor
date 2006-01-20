@@ -21,16 +21,10 @@ global [ first-time on ] bind
         ] when
     ] bind ;
 
-: check-running
-    world get [
-        world-running?
-        [ "The UI is already running" throw ] when
-    ] when* ;
-
 IN: shells
 
 : ui ( -- )
-    check-running [
+    [
         init-world world get rect-dim first2
         [ listener-application run-world ] with-gl-screen
     ] with-freetype ;

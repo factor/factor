@@ -9,13 +9,17 @@ sequences sequences strings styles threads ;
 ! gadgets are contained in. The current world is stored in the
 ! world variable. The invalid slot is a list of gadgets that
 ! need to be layout.
-TUPLE: world running? glass status invalid ;
+TUPLE: world running? glass status invalid timers ;
+
+: timers ( -- hash ) world get world-timers ;
 
 : add-layer ( gadget -- )
     world get add-gadget ;
 
 C: world ( -- world )
-    <stack> over set-delegate t over set-gadget-root? ;
+    <stack> over set-delegate
+    t over set-gadget-root?
+    H{ } clone over set-world-timers ;
 
 : add-invalid ( gadget -- )
     world get [ world-invalid cons ] keep set-world-invalid ;

@@ -1,4 +1,3 @@
-- FUNCTION: not updating crossref correctly
 - need line and paragraph spacing
 - update HTML stream
 - help cross-referencing
@@ -10,12 +9,8 @@
   - alien calls
   - port ffi to win64
 - intrinsic char-slot set-char-slot for x86
-- closing ui does not stop timers
-- adding/removing timers automatically for animated gadgets
-- saving image with UI open
 - fix up the min thumb size hack
 - the invalid recursion form case needs to be fixed, for inlines too
-- what about tasks and timers between image restarts
 - code walker & exceptions
 - signal handler should not lose stack pointers
 - FIELD: char key_vector[32];

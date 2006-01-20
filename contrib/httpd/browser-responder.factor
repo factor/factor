@@ -25,8 +25,8 @@
 ! cont-responder facilities.
 !
 IN: browser-responder
-USING: html cont-responder hashtables kernel io namespaces words lists prettyprint 
-       memory sequences ;
+USING: cont-responder hashtables help html io kernel lists
+memory namespaces prettyprint sequences words xml ;
 
 : option ( current text -- )
   #! Output the HTML option tag for the given text. If
@@ -56,13 +56,7 @@ USING: html cont-responder hashtables kernel io namespaces words lists prettypri
 
 : word-source ( vocab word -- )
   #! Write the source for the given word from the vocab as HTML.
-  swap lookup [
-    [ see ] with-simple-html-output
-  ] when* ;
-
-: vm-statistics ( -- )
-  #! Display statistics about the vm.
-  <pre> room. </pre> ;
+  swap lookup [ [ help ] with-html-stream ] when* ;
 
 : browser-body ( vocab word -- )
   #! Write out the HTML for the body of the main browser page.
@@ -70,15 +64,14 @@ USING: html cont-responder hashtables kernel io namespaces words lists prettypri
     <tr>  
       <td> <b> "Vocabularies" write </b> </td>
       <td> <b> "Words" write </b> </td>
-      <td> <b> "Source" write </b> </td>
+      <td> <b> "Documentation" write </b> </td>
     </tr>
     <tr>  
       <td "top" =valign "width: 200" =style td> over vocab-list </td> 
       <td "top" =valign "width: 200" =style td> 2dup word-list </td> 
       <td "top" =valign td> word-source </td> 
     </tr>
-  </table>
-  vm-statistics ;
+  </table> ;
 
 : browser-title ( vocab word -- )
   #! Output the HTML title for the browser.

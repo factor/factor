@@ -3,7 +3,7 @@ USING: styles ;
 
 : default-style
     H{
-        { font "Sans Serif" }
+        { font "sans-serif" }
         { font-size 12 }
         { wrap-margin 500 }
     } ;
@@ -14,22 +14,22 @@ USING: styles ;
 : emphasis-style
     H{ { font-style italic } } ;
 
-: heading-style H{ { font "Serif" } { font-size 16 } } ;
+: heading-style H{ { font "serif" } { font-size 16 } } ;
 
-: subheading-style H{ { font "Serif" } { font-style bold } } ;
+: subheading-style H{ { font "serif" } { font-style bold } } ;
 
 : subsection-style
-    H{ { font "Serif" } { font-size 14 } { font-style bold } } ;
+    H{ { font "serif" } { font-size 14 } { font-style bold } } ;
 
 : snippet-style
     H{
-        { font "Monospaced" }
+        { font "monospace" }
         { foreground { 0.3 0.3 0.3 1 } }
     } ;
 
 : code-style
     H{
-        { font "Monospaced" }
+        { font "monospace" }
         { page-color { 0.9 0.9 1 0.5 } }
         { border-width 5 }
         { wrap-margin f }
@@ -40,7 +40,7 @@ USING: styles ;
 
 : url-style
     H{
-        { font "Monospaced" }
+        { font "monospace" }
         { foreground { 0.0 0.0 1.0 1.0 } }
     } ;
 

@@ -1,8 +1,8 @@
 ! Copyright (C) 2004, 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: httpd
-USING: browser-responder cont-responder file-responder kernel
-namespaces prettyprint ;
+USING: browser-responder cont-responder file-responder
+help-responder kernel namespaces prettyprint ;
 
 #! Remove all existing responders, and create a blank
 #! responder table.
@@ -13,6 +13,12 @@ global [
     [
         "404" "responder" set
         [ drop no-such-responder ] "get" set
+    ] make-responder
+
+    ! Online help browsing
+    [
+        "help" "responder" set
+        [ help-responder ] "get" set
     ] make-responder
     
     ! Servers Factor word definitions from the image.

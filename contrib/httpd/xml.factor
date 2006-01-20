@@ -1,5 +1,6 @@
-USING: kernel math infix parser namespaces sequences strings prettyprint
-    errors lists hashtables vectors html io generic words ;
+USING: kernel math parser namespaces sequences strings
+prettyprint errors lists hashtables vectors io generic
+words ;
 IN: xml
 
 ! * Simple SAX-ish parser
@@ -124,12 +125,18 @@ M: xml-string-error error.
     ] if ;
 
 : entities
+    #! We have both directions here as a shortcut.
     H{
-        [[ "lt" CHAR: < ]]
-        [[ "gt" CHAR: > ]]
-        [[ "amp" CHAR: & ]]
-        [[ "apos" CHAR: ' ]]
-        [[ "quot" CHAR: " ]]
+        { "lt" CHAR: < }
+        { "gt" CHAR: > }
+        { "amp" CHAR: & }
+        { "apos" CHAR: ' }
+        { "quot" CHAR: " }
+        { CHAR: < "&lt;"   }
+        { CHAR: > "&gt;"   }
+        { CHAR: & "&amp;"  }
+        { CHAR: ' "&apos;" }
+        { CHAR: " "&quot;" }
     } ;
 
 : parse-entity ( -- ch )
@@ -334,21 +341,13 @@ M: closer process
 
 GENERIC: (xml>string) ( object -- )
 
-: reverse-entities ! not as many as entities needed for printing
-    H{
-        { CHAR: & "amp" }
-        { CHAR: < "lt" }
-        { CHAR: " "quot" }
-    } ;
-
-M: string (xml>string)
+: chars>entities ( str -- str )
+    #! Convert <, >, &, ' and " to HTML entities.
     [
-        dup reverse-entities hash [
-            CHAR: & , % CHAR: ; ,
-        ] [
-            ,
-        ] ?if
-    ] each ;
+        [ dup entities hash [ % ] [ , ] ?if ] each
+    ] "" make ;
+
+M: string (xml>string) chars>entities % ;
 
 : print-open/close ( tag -- )
     CHAR: > ,

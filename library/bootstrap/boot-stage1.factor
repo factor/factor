@@ -171,6 +171,7 @@ vectors words ;
         "/library/freetype/freetype.factor"
         "/library/freetype/freetype-gl.factor"
 
+        "/library/ui/timers.factor"
         "/library/ui/gadgets.factor"
         "/library/ui/layouts.factor"
         "/library/ui/hierarchy.factor"
@@ -331,9 +332,6 @@ vocabularies get [
 ] bind
 
 "!syntax" vocabularies get remove-hash
-
-H{ } clone crossref set
-recrossref
 
 "Building generic words..." print flush
 

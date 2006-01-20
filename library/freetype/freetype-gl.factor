@@ -54,18 +54,18 @@ M: font = eq? ;
 
 : ttf-name ( font style -- name )
     cons H{
-        { [[ "Monospaced" plain       ]] "VeraMono" }
-        { [[ "Monospaced" bold        ]] "VeraMoBd" }
-        { [[ "Monospaced" bold-italic ]] "VeraMoBI" }
-        { [[ "Monospaced" italic      ]] "VeraMoIt" }
-        { [[ "Sans Serif" plain       ]] "Vera"     }
-        { [[ "Sans Serif" bold        ]] "VeraBd"   }
-        { [[ "Sans Serif" bold-italic ]] "VeraBI"   }
-        { [[ "Sans Serif" italic      ]] "VeraIt"   }
-        { [[ "Serif" plain            ]] "VeraSe"   }
-        { [[ "Serif" bold             ]] "VeraSeBd" }
-        { [[ "Serif" bold-italic      ]] "VeraBI"   }
-        { [[ "Serif" italic           ]] "VeraIt"   }
+        { [[ "monospace" plain        ]] "VeraMono" }
+        { [[ "monospace" bold         ]] "VeraMoBd" }
+        { [[ "monospace" bold-italic  ]] "VeraMoBI" }
+        { [[ "monospace" italic       ]] "VeraMoIt" }
+        { [[ "sans-serif" plain       ]] "Vera"     }
+        { [[ "sans-serif" bold        ]] "VeraBd"   }
+        { [[ "sans-serif" bold-italic ]] "VeraBI"   }
+        { [[ "sans-serif" italic      ]] "VeraIt"   }
+        { [[ "serif" plain            ]] "VeraSe"   }
+        { [[ "serif" bold             ]] "VeraSeBd" }
+        { [[ "serif" bold-italic      ]] "VeraBI"   }
+        { [[ "serif" italic           ]] "VeraIt"   }
     } hash ;
 
 : ttf-path ( name -- string )

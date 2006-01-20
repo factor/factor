@@ -1,38 +1,25 @@
 ! Copyright (C) 2004, 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: html
-USING: generic hashtables http io kernel lists math namespaces
-sequences strings styles words ;
-
-: html-entities ( -- alist )
-    H{
-        { CHAR: < "&lt;"   }
-        { CHAR: > "&gt;"   }
-        { CHAR: & "&amp;"  }
-        { CHAR: ' "&apos;" }
-        { CHAR: " "&quot;" }
-    } ;
-
-: chars>entities ( str -- str )
-    #! Convert <, >, &, ' and " to HTML entities.
-    [
-        [ dup html-entities hash [ % ] [ , ] ?if ] each
-    ] "" make ;
+USING: generic hashtables help http io kernel lists math
+namespaces sequences strings styles words xml ;
 
 : hex-color, ( triplet -- )
     3 swap head [ 255 * >fixnum >hex 2 CHAR: 0 pad-left % ] each ;
 
-: fg-css, ( color -- )
-    "color: #" % hex-color, "; " % ;
+: fg-css, ( color -- ) "color: #" % hex-color, "; " % ;
+
+: bg-css, ( color -- ) "background-color: #" % hex-color, "; " % ;
 
 : style-css, ( flag -- )
-    dup [ italic bold-italic ] member?
+    dup
+    { italic bold-italic } member?
     [ "font-style: italic; " % ] when
-    [ bold bold-italic ] member?
+    { bold bold-italic } member?
     [ "font-weight: bold; " % ] when ;
 
 : size-css, ( size -- )
-    "font-size: " % # "; " % ;
+    "font-size: " % # "pt; " % ;
 
 : font-css, ( font -- )
     "font-family: " % % "; " % ;
@@ -47,10 +34,11 @@ sequences strings styles words ;
         swap rot hash dup [ call ] [ 2drop ] if
     ] hash-each-with ;
 
-: css-style ( style -- )
+: span-css-style ( style -- str )
     [
         H{
             { foreground  [ fg-css,        ] }
+            { background  [ bg-css,        ] }
             { font        [ font-css,      ] }
             { font-style  [ style-css,     ] }
             { font-size   [ size-css,      ] }
@@ -58,10 +46,28 @@ sequences strings styles words ;
     ] "" make ;
 
 : span-tag ( style quot -- )
-    over css-style dup "" = [
+    over span-css-style dup empty? [
         drop call
     ] [
         <span =style span> call </span>
+    ] if ;
+
+: div-css-style ( style -- str )
+    drop "" ;
+    ! [
+    !     H{
+    !         { foreground  [ fg-css,        ] }
+    !         { font        [ font-css,      ] }
+    !         { font-style  [ style-css,     ] }
+    !         { font-size   [ size-css,      ] }
+    !     } hash-apply
+    ! ] "" make ;
+
+: div-tag ( style quot -- )
+    over div-css-style dup empty? [
+        drop call
+    ] [
+        <div =style div> call </div>
     ] if ;
 
 : resolve-file-link ( path -- link )
@@ -81,21 +87,29 @@ sequences strings styles words ;
         call
     ] if* ;
 
-: browser-link-href ( word -- href )
-    dup word-name swap word-vocabulary
-    [
+GENERIC: browser-link-href ( presented -- href )
+
+M: word browser-link-href
+    dup word-name swap word-vocabulary [
         "/responder/browser/?vocab=" %
         url-encode %
         "&word=" %
         url-encode %
     ] "" make ;
 
-: browser-link-tag ( style quot -- style )
-    over presented swap hash dup word? [
-        <a browser-link-href =href a> call </a>
+M: link browser-link-href
+    link-name [ \ f ] unless* dup word? [
+        browser-link-href
     ] [
-        drop call
+        [ "/responder/help/" % url-encode % ] "" make
     ] if ;
+
+M: object browser-link-href
+    drop f ;
+
+: browser-link-tag ( style quot -- style )
+    presented pick hash browser-link-href
+    [ <a =href a> call </a> ] [ call ] if* ;
 
 TUPLE: wrapper-stream scope ;
 
@@ -107,12 +121,19 @@ C: wrapper-stream ( stream -- stream )
 : with-wrapper ( stream quot -- )
     >r wrapper-stream-scope r> bind ; inline
 
+TUPLE: nested-stream ;
+
+C: nested-stream [ set-delegate ] keep ;
+
+M: nested-stream stream-close drop ;
+
 TUPLE: html-stream ;
 
 M: html-stream stream-write1 ( char stream -- )
-    [
-        dup html-entities hash [ write ] [ write1 ] ?if
-    ] with-wrapper ;
+    >r ch>string r> stream-write ;
+
+M: html-stream stream-write ( char stream -- )
+    [ chars>entities write ] with-wrapper ;
 
 M: html-stream stream-format ( str style stream -- )
     [
@@ -122,6 +143,23 @@ M: html-stream stream-format ( str style stream -- )
             ] file-link-tag
         ] browser-link-tag
     ] with-wrapper ;
+
+: pre-tag ( stream style quot -- )
+    wrap-margin rot hash [
+        call
+    ] [
+        over [ [ <pre> ] with-wrapper call ] keep
+        [ </pre> ] with-wrapper
+    ] if ;
+
+M: html-stream with-nested-stream ( quot style stream -- )
+    swap [
+        [ <nested-stream> swap with-stream ] pre-tag
+    ] div-tag ;
+
+M: html-stream stream-terpri [ <br/> ] with-wrapper ;
+
+M: html-stream stream-terpri* [ <br/> ] with-wrapper ;
 
 C: html-stream ( stream -- stream )
     #! Wraps the given stream in an HTML stream. An HTML stream

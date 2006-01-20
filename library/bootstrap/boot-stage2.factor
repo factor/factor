@@ -43,6 +43,10 @@ sequences sequences-internals words ;
     0 exit
 ] set-boot
 
+"Building cross-referencing database..." print
+H{ } clone crossref set
+recrossref
+
 [ compiled? ] word-subset length
 number>string write " compiled words" print
 
