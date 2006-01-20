@@ -25,7 +25,7 @@ strings vectors words ;
     " was already attempted, and failed" append3
     inference-error ;
 
-TUPLE: rstate label quot base-case? ;
+TUPLE: rstate label base-case? ;
 
 : nest-node ( -- dataflow current )
     dataflow-graph get  dataflow-graph off
@@ -37,8 +37,7 @@ TUPLE: rstate label quot base-case? ;
     r> current-node set ;
 
 : with-recursive-state ( word label base-case quot -- )
-    >r >r over word-def r> <rstate> cons
-    recursive-state [ cons ] change r>
+    >r <rstate> cons recursive-state [ cons ] change r>
     nest-node 2slip unnest-node ; inline
 
 : inline-block ( word base-case -- node-block variables )
@@ -109,8 +108,10 @@ M: #call-label collect-recursion* ( label node -- )
     #! control flow by throwing an exception or restoring a
     #! continuation.
     [
-        recursive-state get init-inference over >r inline-block
-        nip [ terminated? get effect ] bind r>
+        dup inferring-base-case set
+        recursive-state get init-inference
+        over >r inline-block nip
+        [ terminated? get effect ] bind r>
     ] with-scope over consume/produce over [ terminate ] when ;
 
 GENERIC: apply-word
@@ -119,12 +120,18 @@ M: object apply-word ( word -- )
     #! A primitive with an unknown stack effect.
     no-effect ;
 
+: save-effect ( word terminates effect -- )
+    inferring-base-case get [
+        3drop
+    ] [
+        >r dupd "terminates" set-word-prop r>
+        "infer-effect" set-word-prop
+    ] if ;
+
 M: compound apply-word ( word -- )
     #! Infer a compound word's stack effect.
     [
-        dup dup f infer-compound
-        >r "terminates" set-word-prop r>
-        "infer-effect" set-word-prop
+        dup f infer-compound save-effect
     ] [
         swap t "no-effect" set-word-prop rethrow
     ] recover ;

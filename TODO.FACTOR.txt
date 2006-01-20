@@ -1,5 +1,4 @@
 - FUNCTION: not updating crossref correctly
-- UI word wrap: sometimes a space appears at the front
 - need line and paragraph spacing
 - update HTML stream
 - help cross-referencing
@@ -7,13 +6,6 @@
 - if cell is rebound, and we allocate c objects, bang
 - runtime primitives like fopen: check for null input
 - -with combinators are awkward
-- cleanups:
-  alien/compiler
-  inference/shuffle
-  inference-words inline-block
-  io/buffer - use aliens not integers
-  alien/malloc - use aliens not integers
-  ui/line-editor - don't use variables
 - amd64 to do:
   - alien calls
   - port ffi to win64
@@ -40,10 +32,7 @@
 - stream server can hang because of exception handler limitations
 - better i/o scheduler
 - if two tasks write to a unix stream, the buffer can overflow
-- inference bug
-
 - font problem: http://iarc1.ece.utexas.edu/~erg/font-bug.JPG
-
 - implement 3.3 floor  4.7 ceiling  4.5 truncate
 
 ALL TESTS BELOW FAIL ON x86 linux 32bit

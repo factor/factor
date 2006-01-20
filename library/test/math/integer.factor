@@ -55,7 +55,7 @@ USING: kernel math namespaces prettyprint test ;
 ] unit-test
 
 : verify-gcd ( x y )
-    2dup gcd ( a d )
+    2dup swap gcd ( a d )
     >r rot * swap rem r> = ; 
 
 [ t ] [ 123 124 verify-gcd ] unit-test

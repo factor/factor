@@ -134,12 +134,12 @@ unit-test
     sorter-seq >array nip
 ] unit-test
 
-[ [ ] ] [ [ ] number-sort ] unit-test
+[ [ ] ] [ [ ] natural-sort ] unit-test
 
 [ t ] [
     100 [
         drop
-        1000 [ drop 1000 random-int ] map number-sort [ <= ] monotonic?
+        100 [ drop 20 random-int [ drop 1000 random-int ] map ] map natural-sort [ <=> 0 <= ] monotonic?
     ] all?
 ] unit-test
 
