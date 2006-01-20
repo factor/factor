@@ -28,30 +28,30 @@ HELP: coth "( x -- y )"
 $values-x/y
 { $description "Hyperbolic cotangent." } ;
 
-HELP: cosh "( x -- y )"
+HELP: cos "( x -- y )"
 $values-x/y
 { $description "Trigonometric cosine." } ;
 
-HELP: sech "( x -- y )"
+HELP: sec "( x -- y )"
 $values-x/y
 { $description "Trigonometric secant." } ;
 
-HELP: sinh "( x -- y )"
+HELP: sin "( x -- y )"
 $values-x/y
 { $description "Trigonometric sine." } ;
 
-HELP: sinh "( x -- y )"
+HELP: sin "( x -- y )"
 $values-x/y
 { $description "Trigonometric sine." } ;
 
-HELP: cosech "( x -- y )"
+HELP: cosec "( x -- y )"
 $values-x/y
 { $description "Trigonometric cosecant." } ;
 
-HELP: tanh "( x -- y )"
+HELP: tan "( x -- y )"
 $values-x/y
 { $description "Trigonometric tangent." } ;
 
-HELP: coth "( x -- y )"
+HELP: cot "( x -- y )"
 $values-x/y
 { $description "Trigonometric cotangent." } ;

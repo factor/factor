@@ -14,7 +14,7 @@ HELP: sqrt "( x -- y )"
 
 HELP: ^ "( x y -- z )"
 { $values { "x" "a complex number" } { "y" "a complex number" } { "z" "a complex number" } }
-{ $description "Raises " { $snippet "x" } " to the power of " { $snippet "y" } ". If \texttt{y}" { $snippet "y" } " is an integer the answer is computed exactly, otherwise a floating point approximation is used." }
+{ $description "Raises " { $snippet "x" } " to the power of " { $snippet "y" } ". If " { $snippet "y" } " is an integer the answer is computed exactly, otherwise a floating point approximation is used." }
 { $errors "Throws an error if " { $snippet "x" } " and " { $snippet "y" } " are both integer 0." } ;
 
 HELP: each-bit "( n quot -- )"

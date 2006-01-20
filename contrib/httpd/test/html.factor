@@ -28,7 +28,7 @@ USING: html io kernel namespaces styles test xml ;
     [ "hello world" H{ } html-format ] string-out
 ] unit-test
 
-[ "<span style='font-family: Monospaced; '>car</span>" ]
+[ "<span style='font-family: monospace; '>car</span>" ]
 [
     [
         "car"
