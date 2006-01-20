@@ -356,7 +356,7 @@ SYMBOL: quit-cc
     r> drop 3drop
   ] if ;
 
-: server-cc ( -- cc | process)
+: server-cc ( -- cc | process )
   #! Captures the current continuation and returns the value.
   #! If that CC is called with a process on the stack it will
   #! set 'self' for the current process to it. Otherwise it will
