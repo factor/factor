@@ -1,5 +1,5 @@
 IN: scratchpad
-USING: kernel parser words compiler sequences ;
+USING: alien compiler kernel parser sequences words ;
 
 "X11" "libX11" add-simple-library
 
@@ -13,4 +13,4 @@ USING: kernel parser words compiler sequences ;
     "gl"    
 } [ "contrib/x11/" swap ".factor" append3 run-file ] each
 
-{ "xlib" "x11" } [ words [ try-compile ] each ] each
+! { "xlib" "x11" } [ words [ try-compile ] each ] each

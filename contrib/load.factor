@@ -1,26 +1,26 @@
 ! Load all contrib libs, compile them, and save a new image.
 IN: scratchpad
-USING: alien kernel words sequences parser compiler memory ;
+USING: alien compiler kernel memory parser sequences words ;
 
-! digraph dependencies {
-!   // run-file libs in the correct order to avoid repeated run-filing
-!   aim -> crypto
-!   concurrency -> dlists
-!   concurrency -> math
-!   cont-responder -> httpd
-!   crypto -> math
-!   factor -> x11
-!   space-invaders -> parser-combinators
-!   cont-responder -> parser-combinators
-! }
+{ 
+    "coroutines"
+    "dlists"
+    "splay-trees"
+} [ "contrib/" swap ".factor" append3 run-file clear ] each
 
-{ "coroutines" "dlists" "splay-trees" }
-[ dup
-  "contrib/" swap ".factor" append3 run-file
-   words [ try-compile ] each ] each
-
-{ "cairo" "math" "concurrency" "crypto" "aim" "httpd" "units" "sqlite" "win32" "x11" ! "factory" has a C component, ick.
-  "postgresql" "parser-combinators" "cont-responder" "space-invaders"
-} [ "contrib/" swap "/load.factor" append3 run-file ] each
-
-compile-all
+{ "cairo"
+  "math"
+  "concurrency"
+  "crypto"
+  "aim"
+  "httpd"
+  "units"
+  "sqlite"
+  "win32"
+  "x11"
+  ! "factory" has a C component, ick.
+  "postgresql"
+  "parser-combinators"
+  "cont-responder"
+  "space-invaders"
+} [ "contrib/" swap "/load.factor" append3 run-file clear ] each
