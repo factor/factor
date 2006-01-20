@@ -97,4 +97,4 @@ USE: namespaces
 
 : numbers-game number-to-guess numbers-game-loop ;
 
-! "numbers-game" [ numbers-game ] install-cont-responder
+"numbers-game" [ numbers-game ] install-cont-responder

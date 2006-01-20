@@ -231,5 +231,4 @@ USE: hashtables
     dup [ show-message-page ] [ drop ] if
   ] forever ;
 
-! "eval" [ [ ] "None" [ ] <evaluator> eval-responder ] install-cont-responder
-
+"eval" [ [ ] "None" [ ] <evaluator> eval-responder ] install-cont-responder
