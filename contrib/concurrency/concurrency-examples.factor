@@ -43,7 +43,7 @@ math math-contrib namespaces opengl prettyprint sequences threads ;
     "Pong server shutting down" swap send
   ] if ;
   
-: pong-server0 ( -- process)
+: pong-server0 ( -- process )
   [ (pong-server0) ] spawn ;
 
 TUPLE: ping-message from ;
