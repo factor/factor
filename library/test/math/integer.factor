@@ -99,3 +99,5 @@ unit-test
 [ 14355 ] [ 1591517158873146351817850880000000 32769 mod ] unit-test
 
 [ { 0 1 1 0 } ] [ [ -10 [ , ] each-bit ] { } make ] unit-test
+
+[ -351382792 ] [ -43922849 3 shift ] unit-test

@@ -62,9 +62,9 @@ memory namespaces prettyprint sequences words xml ;
     #! Write out the HTML for the body of the main browser page.
     <table "100%" =width table> 
         <tr>
-            <td> <b> "Vocabularies" write </b> </td>
-            <td> <b> "Words" write </b> </td>
-            <td> <b> "Documentation" write </b> </td>
+            <th> "Vocabularies" write </th>
+            <th> "Words" write </th>
+            <th> "Documentation" write </th>
         </tr>
         <tr>    
             <td "top" =valign "width: 200" =style td> over vocab-list </td> 

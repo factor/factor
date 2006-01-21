@@ -173,6 +173,7 @@ math-internals sequences strings test words ;
 [ t ] [ 1 20 shift 1 20 shift [ fixnum* ] compile-1 1 40 shift = ] unit-test
 [ t ] [ 1 20 shift neg 1 20 shift [ fixnum* ] compile-1 1 40 shift neg = ] unit-test
 [ t ] [ 1 20 shift neg 1 20 shift neg [ fixnum* ] compile-1 1 40 shift = ] unit-test
+[ -351382792 ] [ -43922849 [ 3 fixnum-shift ] compile-1 ] unit-test
 
 [ 268435456 ] [ -268435456 >fixnum -1 [ fixnum/i ] compile-1 ] unit-test
 
@@ -199,7 +200,7 @@ cell 8 = [
     [ t ] [ 1 40 shift neg 1 40 shift neg [ fixnum* ] compile-1 1 80 shift = ] unit-test
     [ t ] [ 1 30 shift neg 1 50 shift neg [ fixnum* ] compile-1 1 80 shift = ] unit-test
     [ t ] [ 1 50 shift neg 1 30 shift neg [ fixnum* ] compile-1 1 80 shift = ] unit-test
-    
+
     [ 18446744073709551616 ] [ 1 64 [ fixnum-shift ] compile-1 ] unit-test
     [ 18446744073709551616 ] [ 1 [ 64 fixnum-shift ] compile-1 ] unit-test
     [ 18446744073709551616 ] [ 1 [ 32 fixnum-shift 32 fixnum-shift ] compile-1 ] unit-test

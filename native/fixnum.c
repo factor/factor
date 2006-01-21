@@ -136,7 +136,12 @@ void primitive_fixnum_shift(void)
 	F_FIXNUM y = untag_fixnum_fast(dpop());
 	F_FIXNUM x = untag_fixnum_fast(dpop());
 
-	if(y < 0)
+	if(x == 0 || y == 0)
+	{
+		dpush(tag_fixnum(x));
+		return;
+	}
+	else if(y < 0)
 	{
 		if(y <= -WORD_SIZE)
 			dpush(x < 0 ? tag_fixnum(-1) : tag_fixnum(0));
@@ -144,18 +149,10 @@ void primitive_fixnum_shift(void)
 			dpush(tag_fixnum(x >> -y));
 		return;
 	}
-	else if(y == 0)
-	{
-		dpush(tag_fixnum(x));
-		return;
-	}
 	else if(y < WORD_SIZE - TAG_BITS)
 	{
-		F_FIXNUM mask = (1 << (WORD_SIZE - 1 - TAG_BITS - y));
-		if(x > 0)
-			mask = -mask;
-
-		if((x & mask) == 0)
+		F_FIXNUM mask = -(1 << (WORD_SIZE - 1 - TAG_BITS - y));
+		if((x > 0 && (x & mask) == 0) || (x & mask) == mask)
 		{
 			dpush(tag_fixnum(x << y));
 			return;
