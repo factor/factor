@@ -107,13 +107,10 @@ IN: random-tester
 : 2complex>x ( c c -- x ) ( -- word ) { * + - /f } ;
 
 : 2integer>integer ( n n -- n ) ( -- word )
-    { * + - /f max min polar> bitand bitor bitxor align } ;
-: 2ratio>ratio ( r r -- r ) ( -- word ) { * + - /f max min } ;
-: 2float>float ( f f -- f ) ( -- word ) { * + - /f max min polar> } ;
+    { * + - max min bitand bitor bitxor align } ;
+: 2ratio>ratio ( r r -- r ) ( -- word ) { * + - max min } ;
+: 2float>float ( f f -- f ) ( -- word ) { * + - /f max min } ;
 : 2complex>complex ( c c -- c ) ( -- word ) { * + - /f } ;
-
-
-
 
 : random-integer-quotation ( -- quot )
     [
@@ -127,8 +124,7 @@ IN: random-tester
         ] times
     ] [ ] make ;
 
-: random-ratio-quotation ( -- quot )
-    [
+: (random-ratio-quotation) ( -- quot )
         random-ratio ,
         max-length random-int
         [
@@ -136,7 +132,16 @@ IN: random-tester
                 [ ratio>ratio nth-rand , ]
                 [ random-ratio , 2ratio>ratio nth-rand , ]
             ] do-one
-        ] times
+        ] times ;
+
+: random-ratio-quotation ( -- quot )
+    [
+        (random-ratio-quotation)
+    ] [ ] make ;
+
+: random-ratio-quotation-1 ( -- quot )
+    [
+        (random-ratio-quotation) 2ratio>ratio nth-rand ,
     ] [ ] make ;
 
 : random-float-quotation ( -- quot )
@@ -164,10 +169,19 @@ IN: random-tester
     ] [ ] make ;
 
 
+SYMBOL: last
 : interp-compile-check ( quot -- )
-    dup . [ call ] keep compile-1
+    ! dup . 
+    [ last set ] keep
+    [ call ] keep compile-1
     2dup swap unparse write " " write unparse print
     = [ "problem in math" throw ] unless ;
+
+: interp-compile-check* ( quot -- )
+    dup .
+    >r 100 200 300 400 r> [ call 4array ] keep
+    >r 100 200 300 400 r> compile-1 4array
+    = [ "problem found! (compile-check*)" throw ] unless ;
 
 ! 1-arg tests
 : test-integer>x ( -- )
@@ -214,13 +228,12 @@ IN: random-tester
         [ test-complex ]
     } do-one ;
 
-: if-quot ( -- )
-    max-length [
-    ] times ;
 
+: compare-2
+    {
+        < > <= >= number= =
+    } ;
 
-! : test-if
-    ! nested-if-quot compile-check-output ;
 
 
 : stack-identity-0
@@ -279,36 +292,44 @@ IN: random-tester
     ] [ ] make ;
 
 
-: stack-identity ; ! dummy
-
-: define-random-stack-identity ( n -- )
-    random-stack-identity \ stack-identity dup reset-generic swap
-    define-compound \ stack-identity compile ;
-
 : test-random-stack-identity ( -- )
-    4 define-random-stack-identity
-    1 2 3 4 stack-identity 4array { 1 2 3 4 } =
-    [ \ stack-identity see "bad stack-identity!" throw ] unless ;
-
-: (test-random-seq-iterate) ( seq -- )
-    [ [ 2 3 4 stack-identity 3drop ] keep = [ "not equal" throw ] unless ] each ;
-
-: test-random-seq-iterate ( -- )
-    4 define-random-stack-identity
-        ! \ stack-identity see
-    random-seq
-        ! dup .
-    (test-random-seq-iterate) ;
+    4 random-stack-identity interp-compile-check* ;
 
 
-: random-test
-    { test-random-stack-identity test-random-seq-iterate test-math }
+! change the % to make longer quotations
+: if-quot ( -- )
+    [
+        random-ratio , random-ratio , compare-2 nth-rand ,
+        2 [ 30% [ if-quot ] [ random-ratio-quotation-1 ] if unit % ] times
+        \ if ,
+    ] [ ] make ;
+
+: when-quot
+    [
+        random-ratio , random-ratio , compare-2 nth-rand ,
+        90% [ when-quot ] [ random-ratio-quotation-1 ] if unit %
+        coin-flip \ when \ unless ? ,
+    ] [ ] make ;
+
+: nested-ifs ( -- quot )
+    [
+        random-ratio ,
+        if-quot %
+        ! when-quot %
+    ] [ ] make ;
+
+: test-if ( -- ) nested-ifs interp-compile-check ;
+
+: random-test ( -- )
+    {
+        test-if
+        test-random-stack-identity
+        test-math
+    }
     nth-rand execute ;
 
-: random-test-loop ( n -- )
-    [ random-test ] times ;
 
-: watch-simplifier
+: watch-simplifier ( -- )
     [
         dup word-def dataflow optimize
         linearize [ split-blocks simplify . ] hash-each

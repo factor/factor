@@ -8,6 +8,16 @@ IN: random-tester
 : max-length 5 ; inline
 : max-value 1000000000 ; inline
 
+: 10% ( -- bool ) 10 random-int 8 > ;
+: 20% ( -- bool ) 10 random-int 7 > ;
+: 30% ( -- bool ) 10 random-int 6 > ;
+: 40% ( -- bool ) 10 random-int 5 > ;
+: 50% ( -- bool ) 10 random-int 4 > ;
+: 60% ( -- bool ) 10 random-int 3 > ;
+: 70% ( -- bool ) 10 random-int 2 > ;
+: 80% ( -- bool ) 10 random-int 1 > ;
+: 90% ( -- bool ) 10 random-int 0 > ;
+
 ! varying bit-length random number
 : random-bits ( n -- int )
     random-int 2 swap ^ random-int ;
