@@ -139,9 +139,6 @@ M: win32-stream stream-readln ( stream -- str )
 M: win32-stream stream-terpri
     win32-stream-this [ CHAR: \n do-write ] bind ;
 
-M: win32-stream stream-terpri*
-    win32-stream-this stream-terpri ;
-
 M: win32-stream stream-flush ( stream -- )
     win32-stream-this [ maybe-flush-output ] bind ;
 
@@ -167,7 +164,6 @@ M: win32-stream expire ( stream -- )
         timeout get [ millis cutoff get > [ handle get CancelIo ] when ] when
     ] bind ;
 
-USE: inspector
 M: win32-stream with-nested-stream ( quot style stream -- )
     win32-stream-this [ drop stream get swap with-stream* ] bind ;
 

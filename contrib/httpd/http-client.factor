@@ -34,18 +34,18 @@ sequences io strings ;
 
 DEFER: http-get
 
-: do-redirect ( code headers stream -- code headers stream )
+: do-redirect ( code headers string -- code headers string )
     #! Should this support Location: headers that are
     #! relative URLs?
     pick 302 = [
-        stream-close "Location" swap hash nip http-get
+        drop "Location" swap hash nip http-get
     ] when ;
 
 : http-get ( url -- code headers stream )
     #! Opens a stream for reading from an HTTP URL.
     parse-url over parse-host <client> [
-        [ get-request read-response ] with-stream*
-    ] keep do-redirect ;
+        get-request read-response stdio get contents
+    ] with-stream do-redirect ;
 
 : download ( url file -- )
     #! Downloads the contents of a URL to a file.
@@ -60,8 +60,10 @@ DEFER: http-get
         crlf
     ] keep write ;
 
-: http-post ( content-type content url -- code headers stream )
+: http-post ( content-type content url -- code headers string )
     #! Make a POST request. The content is URL encoded for you.
     parse-url over parse-host <client> [
-        [ post-request flush read-response ] with-stream*
+        [
+            post-request flush read-response stdio get contents
+        ] with-stream
     ] keep ;

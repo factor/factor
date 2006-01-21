@@ -293,11 +293,8 @@ M: unclosed error.
     "Tags: " print
     unclosed-tags [ "  <" write write ">" print ] each ;
 
-: seq-last ( seq -- last )
-    [ length 1 - ] keep nth ;
-
 : push-datum ( object -- )
-    xml-stack get seq-last cdr push ;
+    xml-stack get peek cdr push ;
 
 GENERIC: process ( object -- )
 
@@ -315,8 +312,8 @@ M: closer process
     closer-name xml-stack get pop uncons
     >r [ 
         opener-name [
-	    2dup = [ 2drop ] [ swap <mismatched> throw ] if
-	] keep
+            2dup = [ 2drop ] [ swap <mismatched> throw ] if
+        ] keep
     ] keep opener-props r> <tag> push-datum ;
 
 : initialize-xml-stack ( -- )
@@ -325,7 +322,7 @@ M: closer process
 : xml ( string -- tag )
     #! Produces a tree of XML nodes
     [
-	initialize-xml-stack
+        initialize-xml-stack
         [ process ] xml-each
         xml-stack get
         dup length 1 = [ <unclosed> throw ] unless
@@ -407,7 +404,7 @@ TUPLE: process-missing process tag ;
 M: process-missing error.
     "Tag <" write
     process-missing-tag tag-name write
-    "> not implemented on process process " write
+    "> not implemented on process " write
     dup process-missing-process word-name print ;
 
 : run-process ( tag word -- )

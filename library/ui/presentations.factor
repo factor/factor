@@ -5,18 +5,6 @@ USING: arrays gadgets gadgets-borders gadgets-labels
 gadgets-layouts gadgets-outliner gadgets-panes hashtables io
 kernel sequences strings styles ;
 
-! Utility pseudo-stream for implementation of panes
-
-UNION: gadget-stream pack paragraph ;
-
-M: gadget-stream stream-close ( stream -- ) drop ;
-
-M: gadget-stream stream-write ( string stream -- )
-    over empty? [ 2drop ] [ >r <label> r> add-gadget ] if ;
-
-M: gadget-stream stream-write1 ( char stream -- )
-    >r ch>string r> stream-write ;
-
 ! Character styles
 
 : apply-style ( style gadget key quot -- style gadget )
@@ -39,21 +27,13 @@ M: gadget-stream stream-write1 ( char stream -- )
 : apply-command-style ( style gadget -- style gadget )
     presented [ <command-button> ] apply-style ;
 
-: apply-break-style ( style gadget -- style gadget )
-    word-break [ drop <word-break-gadget> ] apply-style ;
-
 : <presentation> ( style text -- gadget )
     <label>
     apply-foreground-style
     apply-background-style
     apply-font-style
-    apply-break-style
     apply-command-style
     nip ;
-
-M: gadget-stream stream-format ( string style stream -- )
-    pick empty? pick hash-empty? and
-    [ 3drop ] [ >r swap <presentation> r> add-gadget ] if ;
 
 ! Paragraph styles
 
@@ -95,3 +75,47 @@ M: gadget-stream stream-format ( string style stream -- )
 
 M: pane with-nested-stream ( quot style stream -- )
     >r <nested-pane> r> write-gadget ;
+
+! Stream utilities
+M: pack stream-close ( stream -- ) drop ;
+
+M: paragraph stream-close ( stream -- ) drop ;
+
+: gadget-write ( string gadget -- )
+    over empty? [ 2drop ] [ >r <label> r> add-gadget ] if ;
+
+M: pack stream-write ( string stream -- ) gadget-write ;
+
+: gadget-bl ( style stream -- )
+    >r " " <presentation> <word-break-gadget> r> add-gadget ;
+
+M: paragraph stream-write ( string stream -- )
+    swap " " split
+    [ over gadget-write ] [ H{ } over gadget-bl ] interleave
+    drop ;
+
+: gadget-write1 ( char gadget -- )
+    >r ch>string r> stream-write ;
+
+M: pack stream-write1 ( char stream -- ) gadget-write1 ;
+
+M: paragraph stream-write1 ( char stream -- )
+    over CHAR: \s =
+    [ H{ } swap gadget-bl drop ] [ gadget-write1 ] if ;
+
+: gadget-format ( string style stream -- )
+    pick empty? pick hash-empty? and
+    [ 3drop ] [ >r swap <presentation> r> add-gadget ] if ;
+
+M: pack stream-format ( string style stream -- )
+    gadget-format ;
+
+M: paragraph stream-format ( string style stream -- )
+    presented pick hash [
+        gadget-format
+    ] [
+        rot " " split
+        [ pick pick gadget-format ]
+        [ 2dup gadget-bl ] interleave
+        2drop
+    ] if ;

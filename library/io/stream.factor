@@ -13,7 +13,6 @@ GENERIC: stream-write1 ( char stream -- )
 GENERIC: stream-write  ( string stream -- )
 GENERIC: stream-flush  ( stream -- )
 GENERIC: stream-terpri ( stream -- )
-GENERIC: stream-terpri* ( stream -- )
 GENERIC: stream-format ( string style stream -- )
 GENERIC: with-nested-stream ( quot style stream -- )
 

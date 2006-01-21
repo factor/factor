@@ -50,3 +50,6 @@ USING: styles ;
         { border-color { 1 0 0 1 } }
         { border-width 5 }
     } ;
+
+: list-element-style
+    H{ { border-color { 0.8 0.8 0.8 1 } } { border-width 5 } } ;

@@ -39,7 +39,6 @@ $terpri
 { $subsection stream-write1 }
 { $subsection stream-write }
 { $subsection stream-terpri }
-{ $subsection stream-terpri* }
 { $subsection stream-format }
 { $subsection with-nested-stream }
 "If your stream supports the first three but not the rest, wrap it in a " { $link <plain-writer> } ", which provides plain text implementations of the stream formatting words (the so called " { $emphasis "extended stream output protocol" } ")." ;
@@ -68,7 +67,6 @@ ARTICLE: "stdio" "The default stream"
 { $subsection write }
 { $subsection print }
 { $subsection terpri }
-{ $subsection terpri* }
 { $subsection format }
 { $subsection with-nesting }
 "A pair of combinators support rebinding the " { $link stdio } " variable:"
@@ -94,8 +92,7 @@ ARTICLE: "character-styles" "Character styles"
 { $subsection font-size }
 { $subsection font-style }
 { $subsection presented }
-{ $subsection file }
-{ $subsection word-break } ;
+{ $subsection file } ;
 
 ARTICLE: "paragraph-styles" "Paragraph styles"
 "Paragraph styles for " { $link with-nested-stream } ":"

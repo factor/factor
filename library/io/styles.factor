@@ -15,7 +15,6 @@ SYMBOL: font-size
 SYMBOL: font-style
 SYMBOL: presented
 SYMBOL: file
-SYMBOL: word-break
 
 ! Paragraph styles
 SYMBOL: page-color

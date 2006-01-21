@@ -72,6 +72,10 @@ USE: sequences
 !
 ! <input "text" =type "name" =name "20" =size input/>
 
+SYMBOL: html
+
+: write-html H{ { html t } } format ;
+
 : attrs>string ( alist -- string )
     #! Convert the attrs alist to a string
     #! suitable for embedding in an html tag.
@@ -81,7 +85,7 @@ USE: sequences
     #! With the attribute namespace on the stack, get the attributes
     #! and write them to standard output. If no attributes exist, write
     #! nothing.
-    "attrs" get attrs>string write ;
+    "attrs" get attrs>string write-html ;
 
 : html-word ( name def -- )
     #! Define 'word creating' word to allow
@@ -90,7 +94,7 @@ USE: sequences
  
 : <foo> "<" swap ">" append3 ;
 
-: do-<foo> <foo> write ;
+: do-<foo> <foo> write-html ;
 
 : def-for-html-word-<foo> ( name -- )
     #! Return the name and code for the <foo> patterned
@@ -99,7 +103,7 @@ USE: sequences
 
 : <foo "<" swap append ;
 
-: do-<foo write H{ } clone >n V{ } clone "attrs" set ;
+: do-<foo write-html H{ } clone >n V{ } clone "attrs" set ;
 
 : def-for-html-word-<foo ( name -- )
     #! Return the name and code for the <foo patterned
@@ -108,7 +112,7 @@ USE: sequences
 
 : foo> ">" append ;
 
-: do-foo> write-attributes n> drop ">" write ;
+: do-foo> write-attributes n> drop ">" write-html ;
 
 : def-for-html-word-foo> ( name -- )
     #! Return the name and code for the foo> patterned
@@ -120,7 +124,7 @@ USE: sequences
 : def-for-html-word-</foo> ( name -- )
     #! Return the name and code for the </foo> patterned
     #! word.    
-    </foo> dup [ write ] cons html-word define-close ;
+    </foo> dup [ write-html ] cons html-word define-close ;
 
 : <foo/> [ "<" % % "/>" % ] "" make ;
 

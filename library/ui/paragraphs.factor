@@ -5,7 +5,8 @@ namespaces sequences ;
 ! A word break gadget
 TUPLE: word-break-gadget ;
 
-C: word-break-gadget ( gadget -- gadget ) [ set-delegate ] keep ;
+C: word-break-gadget ( gadget -- gadget )
+    [ set-delegate ] keep ;
 
 ! A gadget that arranges its children in a word-wrap style.
 TUPLE: paragraph margin ;

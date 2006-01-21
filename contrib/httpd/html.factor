@@ -1,15 +1,18 @@
-! Copyright (C) 2004, 2005 Slava Pestov.
-! See http://factor.sf.net/license.txt for BSD license.
+! Copyright (C) 2004, 2006 Slava Pestov.
+! See http://factorcode.org/license.txt for BSD license.
 IN: html
 USING: generic hashtables help http io kernel lists math
 namespaces sequences strings styles words xml ;
 
 : hex-color, ( triplet -- )
-    3 swap head [ 255 * >fixnum >hex 2 CHAR: 0 pad-left % ] each ;
+    3 swap head
+    [ 255 * >fixnum >hex 2 CHAR: 0 pad-left % ] each ;
 
-: fg-css, ( color -- ) "color: #" % hex-color, "; " % ;
+: fg-css, ( color -- )
+    "color: #" % hex-color, "; " % ;
 
-: bg-css, ( color -- ) "background-color: #" % hex-color, "; " % ;
+: bg-css, ( color -- )
+    "background-color: #" % hex-color, "; " % ;
 
 : style-css, ( flag -- )
     dup
@@ -53,15 +56,12 @@ namespaces sequences strings styles words xml ;
     ] if ;
 
 : div-css-style ( style -- str )
-    drop "" ;
-    ! [
-    !     H{
-    !         { foreground  [ fg-css,        ] }
-    !         { font        [ font-css,      ] }
-    !         { font-style  [ style-css,     ] }
-    !         { font-size   [ size-css,      ] }
-    !     } hash-apply
-    ! ] "" make ;
+    [
+        H{
+            { page-color   [ bg-css,        ] }
+            ! { border-color [ font-css,      ] }
+        } hash-apply
+    ] "" make ;
 
 : div-tag ( style quot -- )
     over div-css-style dup empty? [
@@ -87,6 +87,9 @@ namespaces sequences strings styles words xml ;
         call
     ] if* ;
 
+: do-escaping ( string style -- string )
+    html swap hash [ chars>entities ] unless ;
+
 GENERIC: browser-link-href ( presented -- href )
 
 M: word browser-link-href
@@ -111,16 +114,6 @@ M: object browser-link-href
     presented pick hash browser-link-href
     [ <a =href a> call </a> ] [ call ] if* ;
 
-TUPLE: wrapper-stream scope ;
-
-C: wrapper-stream ( stream -- stream )
-    2dup set-delegate [
-        >r stdio associate r> set-wrapper-stream-scope
-    ] keep ;
-
-: with-wrapper ( stream quot -- )
-    >r wrapper-stream-scope r> bind ; inline
-
 TUPLE: nested-stream ;
 
 C: nested-stream [ set-delegate ] keep ;
@@ -129,62 +122,62 @@ M: nested-stream stream-close drop ;
 
 TUPLE: html-stream ;
 
+C: html-stream ( stream -- stream ) [ set-delegate ] keep ;
+
 M: html-stream stream-write1 ( char stream -- )
     >r ch>string r> stream-write ;
 
-M: html-stream stream-write ( char stream -- )
-    [ chars>entities write ] with-wrapper ;
+: delegate-write delegate stream-write ;
+
+M: html-stream stream-write ( str stream -- )
+    >r chars>entities r> delegate-write ;
 
 M: html-stream stream-format ( str style stream -- )
     [
         [
             [
-                [ drop chars>entities write ] span-tag
+                [
+                    do-escaping stdio get delegate-write
+                ] span-tag
             ] file-link-tag
         ] browser-link-tag
-    ] with-wrapper ;
+    ] with-stream* ;
 
-: pre-tag ( stream style quot -- )
+: pre-tag ( style quot -- )
     wrap-margin rot hash [
         call
     ] [
-        over [ [ <pre> ] with-wrapper call ] keep
-        [ </pre> ] with-wrapper
+        <pre> call </pre>
     ] if ;
 
 M: html-stream with-nested-stream ( quot style stream -- )
-    swap [
-        [ <nested-stream> swap with-stream ] pre-tag
-    ] div-tag ;
+    [
+        [
+            [
+                stdio get <nested-stream> swap with-stream*
+            ] pre-tag
+        ] div-tag
+    ] with-stream* ;
 
-M: html-stream stream-terpri [ <br/> ] with-wrapper ;
-
-M: html-stream stream-terpri* [ <br/> ] with-wrapper ;
-
-C: html-stream ( stream -- stream )
-    #! Wraps the given stream in an HTML stream. An HTML stream
-    #! converts special characters to entities when being
-    #! written, and supports writing attributed strings with
-    #! the following attributes:
-    #!
-    #! foreground - an rgb triplet in a list
-    #! background - an rgb triplet in a list
-    #! font
-    #! font-style
-    #! font-size
-    #! file
-    #! word
-    #! vocab
-    [ >r <wrapper-stream> r> set-delegate ] keep ;
+M: html-stream stream-terpri [ <br/> ] with-stream* ;
 
 : with-html-stream ( quot -- )
-    [ stdio [ <html-stream> ] change  call ] with-scope ;
+    stdio get <html-stream> swap with-stream* ;
+
+: default-css ( -- )
+  <style>
+    "A:link { text-decoration:none}" print
+    "A:visited { text-decoration:none}" print
+    "A:active { text-decoration:none}" print
+    "A:hover, A.nav:hover { border: 1px solid black; text-decoration: none; margin: -1px }" print
+  </style> ;
 
 : html-document ( title quot -- )
     swap chars>entities dup
     <html>
         <head>
             <title> write </title>
+            default-css
         </head>
         <body>
             <h1> write </h1>

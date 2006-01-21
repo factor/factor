@@ -45,10 +45,6 @@ HELP: terpri "( -- )"
 { $contract "Writes a line terminator to the " { $link stdio } " stream. If the stream does buffering, output may not be performed immediately; use " { $link flush } " to force output." }
 $io-error ;
 
-HELP: terpri* "( -- )"
-{ $contract "Writes a line terminator to the " { $link stdio } " stream, unless the stream is already positioned at the start of a line, in which case this word does nothing. If the stream does buffering, output may not be performed immediately; use " { $link flush } " to force output." }
-$io-error ;
-
 HELP: format "( str style -- )"
 { $values { "str" "a string" } { "style" "a hashtable" } }
 { $contract "Writes formatted text to the " { $link stdio } " stream. If the stream does buffering, output may not be performed immediately; use " { $link flush } " to force output." }
@@ -73,7 +69,8 @@ HELP: with-stream "( stream quot -- )"
 
 HELP: with-stream* "( stream quot -- )"
 { $values { "stream" "an input or output stream" } { "quot" "a quotation" } }
-{ $description "Calls the quotation in a new dynamic scope, with the " { $link stdio } " variable rebound to  " { $snippet "stream" } ". The stream is closed if the quotation throws an error, however it is " { $emphasis "not" } " closed if the quotation returns without incident." }
+{ $description "Calls the quotation in a new dynamic scope, with the " { $link stdio } " variable rebound to  " { $snippet "stream" } "." }
+{ $notes "This word differs from " { $link with-stream } " in that if an error is thrown while the quotation is executing, the stream is " { $emphasis "not" } " closed." }
 { $see-also with-stream } ;
 
 HELP: style-stack f

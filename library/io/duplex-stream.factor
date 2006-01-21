@@ -26,9 +26,6 @@ M: duplex-stream stream-write
 M: duplex-stream stream-terpri
     duplex-stream-out stream-terpri ;
 
-M: duplex-stream stream-terpri*
-    duplex-stream-out stream-terpri* ;
-
 M: duplex-stream stream-format
     duplex-stream-out stream-format ;
 

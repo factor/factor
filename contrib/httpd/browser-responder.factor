@@ -4,11 +4,11 @@
 ! modification, are permitted provided that the following conditions are met:
 ! 
 ! 1. Redistributions of source code must retain the above copyright notice,
-!    this list of conditions and the following disclaimer.
+!        this list of conditions and the following disclaimer.
 ! 
 ! 2. Redistributions in binary form must reproduce the above copyright notice,
-!    this list of conditions and the following disclaimer in the documentation
-!    and/or other materials provided with the distribution.
+!        this list of conditions and the following disclaimer in the documentation
+!        and/or other materials provided with the distribution.
 ! 
 ! THIS SOFTWARE IS PROVIDED ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES,
 ! INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND
@@ -29,81 +29,63 @@ USING: cont-responder hashtables help html io kernel lists
 memory namespaces prettyprint sequences words xml ;
 
 : option ( current text -- )
-  #! Output the HTML option tag for the given text. If
-  #! it is equal to the current string, make the option selected.
-  2dup = [
-    "<option selected>" write
-  ] [
-    "<option>" write
-  ] if      
-  chars>entities write 
-  "</option>\n" write drop ;
+    #! Output the HTML option tag for the given text. If
+    #! it is equal to the current string, make the option selected.
+    2dup = [
+        "<option selected>" write
+    ] [
+        "<option>" write
+    ] if            
+    chars>entities write 
+    "</option>\n" write drop ;
 
 : vocab-list ( vocab -- )
-  #! Write out the HTML for the list of vocabularies. Make the currently 
-  #! selected vocab be 'vocab'.
-  <select "vocab" =name "width: 200" =style "20" =size "document.forms.main.submit()" =onchange select> 
-    vocabs [ over swap option ] each drop
-  </select> ;
+    #! Write out the HTML for the list of vocabularies. Make the currently 
+    #! selected vocab be 'vocab'.
+    <select "vocab" =name "width: 200" =style "20" =size "document.forms.main.submit()" =onchange select> 
+        vocabs [ over swap option ] each drop
+    </select> ;
 
 : word-list ( vocab word -- )
-  #! Write out the HTML for the list of words in a vocabulary. Make the 'word' item
-  #! the currently selected option.
-  <select "word" =name "width: 200" =style "20" =size "document.forms.main.submit()" =onchange select> 
-    swap words natural-sort
-    [ word-name over swap option ] each drop
-  </select> ;
+    #! Write out the HTML for the list of words in a vocabulary. Make the 'word' item
+    #! the currently selected option.
+    <select "word" =name "width: 200" =style "20" =size "document.forms.main.submit()" =onchange select> 
+        swap words natural-sort
+        [ word-name over swap option ] each drop
+    </select> ;
 
 : word-source ( vocab word -- )
-  #! Write the source for the given word from the vocab as HTML.
-  swap lookup [ [ help ] with-html-stream ] when* ;
+    #! Write the source for the given word from the vocab as HTML.
+    swap lookup [ [ (help) ] with-html-stream ] when* ;
 
 : browser-body ( vocab word -- )
-  #! Write out the HTML for the body of the main browser page.
-  <table "100%" =width table> 
-    <tr>  
-      <td> <b> "Vocabularies" write </b> </td>
-      <td> <b> "Words" write </b> </td>
-      <td> <b> "Documentation" write </b> </td>
-    </tr>
-    <tr>  
-      <td "top" =valign "width: 200" =style td> over vocab-list </td> 
-      <td "top" =valign "width: 200" =style td> 2dup word-list </td> 
-      <td "top" =valign td> word-source </td> 
-    </tr>
-  </table> ;
+    #! Write out the HTML for the body of the main browser page.
+    <table "100%" =width table> 
+        <tr>
+            <td> <b> "Vocabularies" write </b> </td>
+            <td> <b> "Words" write </b> </td>
+            <td> <b> "Documentation" write </b> </td>
+        </tr>
+        <tr>    
+            <td "top" =valign "width: 200" =style td> over vocab-list </td> 
+            <td "top" =valign "width: 200" =style td> 2dup word-list </td> 
+            <td "top" =valign td> word-source </td> 
+        </tr>
+    </table> ;
 
 : browser-title ( vocab word -- )
-  #! Output the HTML title for the browser.
-  <title> 
-    "Factor Browser - " write 
-    swap write
-    " - " write
-    write
-  </title> ;
-
-: browser-style ( -- )
-  #! Stylesheet for browser pages
-  <style>
-    "A:link { text-decoration:none}\n" write
-    "A:visited { text-decoration:none}\n" write
-    "A:active { text-decoration:none}\n" write
-    "A:hover, A.nav:hover { border: 1px solid black; text-decoration: none; margin: 0px }\n" write
-    "A { margin: 1px }" write
-  </style> ;
+    #! Output the HTML title for the browser.
+    [ "Factor Browser - " % swap % " - " % % ] "" make ;
 
 : browse ( vocab word -- )
-  #! Display a Smalltalk like browser for exploring words.
-  [
-    <html> 
-      <head> 2dup browser-title browser-style </head>
-      <body> 
-        <form "main" =name "" =action "get" =method form> browser-body </form>
-      </body>
-    </html> 
-  ] show-final ;
+    #! Display a Smalltalk like browser for exploring words.
+    [
+        2dup browser-title [
+            <form "main" =name "" =action "get" =method form> browser-body </form>
+        ] html-document
+    ] show-final ;
 
 : browser-responder ( -- )
-  #! Start the Smalltalk-like browser.
-  "vocab" "query" get hash [ "browser-responder" ] unless*
-  "word" "query" get hash [ "browse" ] unless* browse ;
+    #! Start the Smalltalk-like browser.
+    "vocab" "query" get hash [ "browser-responder" ] unless*
+    "word" "query" get hash [ "browse" ] unless* browse ;

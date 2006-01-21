@@ -47,11 +47,6 @@ HELP: stream-terpri "( stream -- )"
 { $contract "Writes a line terminator. If the stream does buffering, output may not be performed immediately; use " { $link stream-flush } " to force output." }
 $io-error ;
 
-HELP: stream-terpri* "( stream -- )"
-{ $values { "stream" "an output stream" } }
-{ $contract "Writes a line terminator unless the stream is already positioned at the start of a line, in which case this word does nothing. If the stream does buffering, output may not be performed immediately; use " { $link stream-flush } " to force output." }
-$io-error ;
-
 HELP: stream-format "( str style stream -- )"
 { $values { "str" "a string" } { "style" "a hashtable" } { "stream" "an output stream" } }
 { $contract "Writes formatted text to the stream. If the stream does buffering, output may not be performed immediately; use " { $link stream-flush } " to force output."

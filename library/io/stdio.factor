@@ -18,7 +18,6 @@ SYMBOL: stdio
 : flush ( -- ) stdio get stream-flush ;
 
 : terpri ( -- ) stdio get stream-terpri ;
-: terpri* ( -- ) stdio get stream-terpri* ;
 : format ( string style -- ) stdio get stream-format ;
 
 : with-nesting ( style quot -- )
@@ -26,12 +25,11 @@ SYMBOL: stdio
 
 : print ( string -- ) stdio get stream-print ;
 
-: with-stream ( stream quot -- )
-    [ swap stdio set [ close ] cleanup ] with-scope ; inline
-
 : with-stream* ( stream quot -- )
-    [ swap stdio set [ close rethrow ] recover ] with-scope ;
-    inline
+    [ swap stdio set call ] with-scope ; inline
+
+: with-stream ( stream quot -- )
+    swap [ [ close ] cleanup ] with-stream* ; inline
 
 SYMBOL: style-stack
 
@@ -49,10 +47,10 @@ SYMBOL: style-stack
 
 : format* ( string -- ) current-style format ;
 
-: bl ( -- ) H{ { word-break t } } [ " " format* ] with-style ;
+: bl ( -- ) " " format* ;
 
-: with-nesting* ( quot -- )
-    current-style swap with-nesting ; inline
+: with-nesting* ( style quot -- )
+    swap [ current-style swap with-nesting ] with-style ; inline
 
 : write-object ( object quot -- )
     >r presented associate r> with-style ;
@@ -61,7 +59,7 @@ SYMBOL: style-stack
     [ format* ] write-object ;
 
 : write-outliner ( content caption -- )
-    >r outline associate r> with-nesting terpri ;
+    >r outline associate r> with-nesting* ;
 
 : simple-outliner ( string object content -- )
     [ simple-object ] write-outliner ;

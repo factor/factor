@@ -1,15 +1,18 @@
 IN: help
-USING: arrays hashtables io kernel ;
+USING: arrays hashtables io kernel namespaces ;
+
+SYMBOL: last-block
 
 : (help) ( topic -- )
     default-style [
-        [ article-content print-element ] with-nesting* terpri*
-    ] with-style ;
+        last-block on article-content print-element
+    ] with-nesting* terpri ;
 
 DEFER: $heading
 
 : help ( topic -- )
-    dup article-title $heading (help) ;
+    default-style [ dup article-title $heading ] with-style
+    (help) ;
 
 : glossary ( name -- ) <term> help ;
 

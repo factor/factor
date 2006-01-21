@@ -13,9 +13,8 @@ M: sbuf stream-flush drop ;
     512 <sbuf> <plain-writer> ;
 
 : string-out ( quot -- str )
-    [
-        <string-writer> stdio set call stdio get >string
-    ] with-scope ; inline
+    <string-writer> [ call stdio get >string ] with-stream* ;
+    inline
 
 ! Reversed string buffers support the stream input protocol.
 M: sbuf stream-read1 ( sbuf -- char/f )

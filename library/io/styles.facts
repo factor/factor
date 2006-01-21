@@ -62,10 +62,6 @@ HELP: presented f
 HELP: file f
 { $description "Character style. A pathname associated with the text. In the Factor HTTP server, this is rendered as a link to this path on the server." } ;
 
-HELP: word-break f
-{ $description "Character style. Denotes that this text is a point in the text where the line can be wrapped." }
-{ $see-also bl } ;
-
 HELP: page-color f
 { $description "Paragraph style. Background color of the paragraph block, denoted by a sequence of four numbers between 0 and 1 (red, green, blue and alpha)." } 
 { $examples

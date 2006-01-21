@@ -19,37 +19,26 @@ parser prettyprint sequences strings styles vectors words ;
 PREDICATE: array simple-element
     dup empty? [ drop t ] [ first word? not ] if ;
 
-: write-term ( string -- )
-    dup terms get hash [
-        dup <term> presented associate [ format* ] with-style
-    ] [
-        format*
-    ] if ;
+M: string print-element last-block off format* ;
 
-M: string print-element
-    " " split
-    [ dup empty? [ drop ] [ write-term ] if ]
-    [ bl ] interleave ;
+M: array print-element unswons* execute ;
 
-M: array print-element
-    unswons* execute ;
-
-M: word print-element
-    { } swap execute ;
+M: word print-element { } swap execute ;
 
 : ($span) ( content style -- )
-    [ print-element ] with-style ;
+    last-block off [ print-element ] with-style ;
 
-: ($block) ( content style -- )
-    terpri*
-    [ [ print-element ] with-nesting* ] with-style
-    terpri* ;
+: ($block) ( quot -- )
+    last-block [ [ terpri ] unless f ] change
+    call
+    terpri
+    last-block on ; inline
 
 ! Some spans
 
-: $heading heading-style ($block) ;
+: $heading [ heading-style ($span) ] ($block) ;
 
-: $subheading subheading-style ($block) ;
+: $subheading [ subheading-style ($span) ] ($block) ;
 
 : $snippet snippet-style ($span) ;
 
@@ -57,18 +46,19 @@ M: word print-element
 
 : $url url-style ($span) ;
 
-: $terpri terpri terpri drop ;
+: $terpri last-block off terpri terpri drop ;
 
 ! Some blocks
-M: simple-element print-element [ print-element ] each ;
+M: simple-element print-element
+    [ print-element ] each ;
 
 : ($code) ( presentation quot -- )
-    terpri* 
-    code-style [
-        >r current-style swap presented pick set-hash r>
-        with-nesting
-    ] with-style
-    terpri* ; inline
+    [
+        code-style [
+            >r current-style swap presented pick set-hash r>
+            with-nesting
+        ] with-style
+    ] ($block) ; inline
 
 : $code ( content -- )
     "\n" join dup <input> [ format* ] ($code) ;
@@ -82,11 +72,16 @@ M: simple-element print-element [ print-element ] each ;
     ] if* ;
 
 : $stack-effect ( word -- )
-    stack-effect [ "Stack effect" $subheading $snippet ] when* ;
+    stack-effect [
+        "Stack effect" $subheading $snippet
+    ] when* ;
+
+: $vocabulary ( content -- )
+    "Vocabulary" $subheading $snippet ;
 
 : $synopsis ( content -- )
     first dup
-    word-vocabulary [ "Vocabulary" $subheading $snippet ] when*
+    word-vocabulary [ $vocabulary ] when*
     dup parsing? [ $syntax ] [ $stack-effect ] if ;
 
 : $description ( content -- )
@@ -99,21 +94,20 @@ M: simple-element print-element [ print-element ] each ;
     "Examples" $subheading print-element ;
 
 : $warning ( content -- )
-    terpri*
-    current-style warning-style hash-union [
-        "Warning" $subheading print-element
-    ] with-nesting
-    terpri* ;
+    [
+        current-style warning-style hash-union [
+            "Warning" $subheading print-element
+        ] with-nesting
+    ] ($block) ;
 
 : textual-list ( seq quot -- )
-    [ "," format* bl ] interleave ; inline
+    [ ", " print-element ] interleave ; inline
 
 : $see ( content -- )
-    code-style [ [ first see ] with-nesting* ] with-style ;
+    code-style [ first see ] with-nesting* ;
 
 : $example ( content -- )
-    first2 swap dup <input>
-    [
+    first2 swap dup <input> [
         input-style [ format* ] with-style terpri format*
     ] ($code) ;
 
@@ -129,24 +123,22 @@ M: link article-content link-name article-content ;
 DEFER: help
 
 : $subsection ( object -- )
-    terpri*
-    subsection-style [
-        first dup article-title swap <link>
-        dup [ link-name (help) ] curry
-        simple-outliner
-    ] with-style ;
+    [
+        subsection-style [
+            first dup article-title swap <link>
+            dup [ link-name (help) ] curry
+            simple-outliner
+        ] with-style
+    ] ($block) ;
 
 : $link ( article -- )
-    first dup word? [
+    last-block off first dup word? [
         pprint
     ] [
         link-style [
             dup article-name swap <link> simple-object
         ] with-style
     ] if ;
-
-: $glossary ( element -- )
-    first dup <term> simple-object ;
 
 : $definition ( content -- )
     "Definition" $subheading $see ;
@@ -155,19 +147,24 @@ DEFER: help
     "See also" $subheading [ 1array $link ] textual-list ;
 
 : $values ( content -- )
-    "Arguments and values" $subheading [
-        unswons* $snippet " -- " format* print-element
-    ] [
-        terpri
-    ] interleave ;
+    "Arguments and values" $subheading
+    [ unswons* $snippet " -- " format* print-element ]
+    [ terpri ] interleave ;
 
 : $predicate ( content -- )
     { { "object" "an object" } } $values
-    "Tests if the object is an instance of the " $description
-    $link " class." format* ;
+    [
+        "Tests if the object is an instance of the " ,
+        { $link } swap append ,
+        " class." ,
+    ] { } make $description ;
 
 : $list ( content -- )
-    terpri* [ "- " format* print-element terpri* ] each ;
+    [
+        [
+            list-element-style [ print-element ] with-nesting*
+        ] ($block)
+    ] each ;
 
 : $errors ( content -- )
     "Errors" $subheading print-element ;
@@ -192,4 +189,5 @@ DEFER: help
     { { "x" "a complex number" } { "y" "a complex number" } } $values ;
 
 : $io-error
+    drop
     "Throws an error if the I/O operation fails." $errors ;

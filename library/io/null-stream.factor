@@ -12,7 +12,6 @@ M: f stream-read 2drop f ;
 M: f stream-write1 2drop ;
 M: f stream-write 2drop ;
 M: f stream-terpri drop ;
-M: f stream-terpri* drop ;
 M: f stream-flush drop ;
 
 M: f stream-format 3drop ;
