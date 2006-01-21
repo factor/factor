@@ -3,5 +3,6 @@ IN: scratchpad
 
 {
     "utils"
+    "random"
     "random-tester"
 } [ "/contrib/random-tester/" swap ".factor" append3 run-resource ] each
