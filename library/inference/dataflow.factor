@@ -10,12 +10,12 @@ SYMBOL: recursive-state
 TUPLE: value recursion uid ;
 
 C: value ( -- value )
-    gensym over set-value-uid
+    \ value counter over set-value-uid
     recursive-state get over set-value-recursion ;
 
 M: value = eq? ;
 
-M: value hashcode value-uid hashcode ;
+M: value hashcode value-uid ;
 
 TUPLE: literal value ;
 

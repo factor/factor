@@ -25,6 +25,9 @@ sequences strings vectors words ;
 
 : inc ( var -- ) [ 1+ ] change ; inline
 
+: counter ( var -- n )
+    global [ [ [ 0 ] unless* dup 1+ >fixnum ] change ] bind ;
+
 : dec ( var -- ) [ 1- ] change ; inline
 
 : bind ( namespace quot -- ) swap >n call n> drop ; inline

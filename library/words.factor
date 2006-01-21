@@ -98,8 +98,7 @@ M: word (uncrossref) drop ;
 M: word literalize <wrapper> ;
 
 : gensym ( -- word )
-    "G:"
-    global [ \ gensym dup inc get ] bind
-    number>string append f <word> dup init-word ;
+    [ "G:" % \ gensym counter # ] "" make
+    f <word> dup init-word ;
 
 0 \ gensym set-global

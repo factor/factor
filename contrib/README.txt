@@ -25,6 +25,8 @@ library, but is useful enough to ship with the Factor distribution.
 
 - contrib/postgresql/ -- PostgreSQL binding (Doug Coleman)
 
+- contrib/random-tester/ -- Random compiler tester (Doug Coleman)
+
 - contrib/space-invaders/ -- Intel 8080-based Space Invaders arcade
   machine emulator (Chris Double)
 
