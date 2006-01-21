@@ -29,6 +29,7 @@
 - if two tasks write to a unix stream, the buffer can overflow
 - font problem: http://iarc1.ece.utexas.edu/~erg/font-bug.JPG
 - implement 3.3 floor  4.7 ceiling  4.5 truncate
+- make 3.4 bits>double an error
 
 ALL TESTS BELOW FAIL ON x86 linux 32bit
 - float not commutative bug
@@ -78,4 +79,61 @@ Compile fails:
     2.522378181825594 tan 7.825249292551574 - cos
     0.2875868408644093 + sin >bignum cos >float sin ;
 
+
+x86 fixnum problem?
+100 [ test-integer>x ] times
+
+IN: compiler-test : math-dummy -63545870 ceiling ;
+Compiling math-dummy
+-63545870 3562994
+
+IN: compiler-test : math-dummy -172512992 double>bits ;
+Compiling math-dummy
+4800873998879566904 4780613886529085440
+
+IN: compiler-test : math-dummy 268435455 float>bits ;
+Compiling math-dummy
+1102377402 4
+
+IN: compiler-test : math-dummy 268435455 neg ;
+Compiling math-dummy
+-268435455 1
+
+IN: compiler-test : math-dummy 48191798 neg ;
+Compiling math-dummy
+-48191798 18917066
+
+IN: compiler-test : math-dummy -176408007 next-power-of-2 ;
+Compiling math-dummy
+1 33554432
+
+IN: compiler-test : math-dummy -63194602 bits>float ;
+Compiling math-dummy
+80.08636474609375 110.8125
+
+IN: compiler-test : math-dummy
+    116813922808736214071768419862654566798144280646827276619588644136147298073359475589294679233724596355072
+    bits>double ;
+Compiling math-dummy
+5.083189076777759e-270 5.097526873523571e-270
+
+IN: compiler-test : math-dummy -43922848 1- ;
+Compiling math-dummy
+-43922849 23186015
+
+IN: compiler-test : math-dummy -186662979 quadrant ;
+Compiling math-dummy
+1 0
+
+IN: compiler-test : math-dummy -51219578 floor ;
+Compiling math-dummy
+-51219578 15889286
+
+IN: compiler-test : math-dummy -56213080 numerator ;
+Compiling math-dummy
+-56213080 10895784
+
+IN: compiler-test : math-dummy -268435456 truncate ;
+Compiling math-dummy
+-268435456 0
 
