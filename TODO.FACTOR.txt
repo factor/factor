@@ -81,6 +81,16 @@ Compile fails:
 
 
 x86 problems below
+Compile failes:
+[ 0.0 cos coth cot neg ]
+[ C{ -740108126/802208755 246440723/614809409 } coth sin cot -22338167 - ]
+
+
+
+
+[ 101637844 ]
+Compiling G:374994
+101637844 -32579884
 
 [ -235345183 ]
 Compiling G:359656
