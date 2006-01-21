@@ -10,4 +10,4 @@ USING: kernel parser sequences words compiler ;
     "matrices"
     "statistics"
     "numerical-integration"
-} [ "contrib/math/" swap ".factor" append3 run-file ] each
+} [ "/contrib/math/" swap ".factor" append3 run-resource ] each

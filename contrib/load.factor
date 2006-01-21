@@ -6,7 +6,7 @@ USING: alien compiler kernel memory parser sequences words ;
     "coroutines"
     "dlists"
     "splay-trees"
-} [ "contrib/" swap ".factor" append3 run-file clear ] each
+} [ "/contrib/" swap ".factor" append3 run-resource clear ] each
 
 { "cairo"
   "math"
@@ -23,4 +23,4 @@ USING: alien compiler kernel memory parser sequences words ;
   "parser-combinators"
   "cont-responder"
   "space-invaders"
-} [ "contrib/" swap "/load.factor" append3 run-file clear ] each
+} [ "/contrib/" swap "/load.factor" append3 run-resource clear ] each

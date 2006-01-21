@@ -51,19 +51,16 @@ following command:</p>
 <pre class="code">
 ./f boot.image.le32 -libraries:sqlite:name=libsqlite3.so
 </pre>
-<p>The quickest way to get up and running with this library is to
-change to the 'sqlite' directory and run Factor. Then execute the
-following commands:</p>
+<p>The quickest way to get up and running with this library is to type the following into the listener:</p>
 <pre class="code">
-"sqlite.factor" run-file
-"tuple-db.factor" run-file
+"/contrib/sqlite/load.factor" run-resource
 USE: sqlite
 USE: tuple-db
 </pre>
 <p>Some simple tests can be run to check that everything is working
 ok:</p>
 <pre class="code">
-"tuple-db-tests.factor" run-file
+"/contrib/sqlite/tuple-db-tests.factor" run-resource
 </pre>
 <h1>Basic Usage</h1>
 <p>This library can be used for storing simple Factor tuples in a

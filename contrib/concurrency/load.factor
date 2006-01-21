@@ -1,10 +1,10 @@
 IN: scratchpad
 USING: kernel parser compiler words sequences ;
 
-"contrib/dlists.factor" run-file
-"contrib/math/load.factor" run-file
+"/contrib/dlists.factor" run-resource
+"/contrib/math/load.factor" run-resource
 
 { 
     "concurrency"
     "concurrency-examples"
-} [ "contrib/concurrency/" swap ".factor" append3 run-file ] each
+} [ "/contrib/concurrency/" swap ".factor" append3 run-resource ] each

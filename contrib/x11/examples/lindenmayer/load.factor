@@ -1,5 +1,5 @@
 USING: kernel parser words compiler sequences ;
 
-"lindenmayer.factor" run-file
+"/contrib/x11/examples/lindenmayer/lindenmayer.factor" run-resource
 
 "lindenmayer" words [ try-compile ] each clear

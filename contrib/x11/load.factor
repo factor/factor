@@ -11,6 +11,6 @@ USING: alien compiler kernel parser sequences words ;
     "concurrent-widgets"
     "glx"
     "gl"    
-} [ "contrib/x11/" swap ".factor" append3 run-file ] each
+} [ "/contrib/x11/" swap ".factor" append3 run-resource ] each
 
 ! { "xlib" "x11" } [ words [ try-compile ] each ] each

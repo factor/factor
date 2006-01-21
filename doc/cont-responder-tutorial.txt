@@ -582,7 +582,7 @@ The 'cont-testing.factor' file (in the contrib/cont-responder
 directory) contains some simple words that maintains this state for
 you in such a way that you can test the words from the console:
 
-  "cont-testing.factor" run-file
+  "/contrib/cont-testing/load.factor" run-resource
 
 For this example we'll call the 'subroutine-example1' responder from
 above. First we need to put a 'testing state' object on the stack. All

@@ -11,4 +11,4 @@ USING: alien compiler kernel parser sequences words ;
     "types"
     "kernel32"
     "user32"
-} [ "contrib/win32/" swap ".factor" append3 run-file ] each
+} [ "/contrib/win32/" swap ".factor" append3 run-resource ] each

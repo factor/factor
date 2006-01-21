@@ -1,8 +1,8 @@
 IN: scratchpad
 USING: words kernel parser sequences io compiler ;
 
-"contrib/httpd/load.factor" run-file
-"contrib/parser-combinators/load.factor" run-file
+"/contrib/httpd/load.factor" run-resource
+"/contrib/parser-combinators/load.factor" run-resource
 
 { 
     "cont-examples"
@@ -13,4 +13,4 @@ USING: words kernel parser sequences io compiler ;
     "eval-responder"
     "live-updater-responder"
     "cont-testing"
-} [ "contrib/cont-responder/" swap ".factor" append3 run-file ] each
+} [ "/contrib/cont-responder/" swap ".factor" append3 run-resource ] each

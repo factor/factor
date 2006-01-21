@@ -1,13 +1,15 @@
 USING: io parser ;
 
-"examples/factoroids/utils.factor" run-file
-"examples/factoroids/models.factor" run-file
-"examples/factoroids/bodies.factor" run-file
-"examples/factoroids/actors.factor" run-file
-"examples/factoroids/projectiles.factor" run-file
-"examples/factoroids/ai.factor" run-file
-"examples/factoroids/input.factor" run-file
-"examples/factoroids/factoroids.factor" run-file
+{
+    "utils"
+    "models"
+    "bodies"
+    "actors"
+    "projectiles"
+    "ai"
+    "input"
+    "factoroids"
+} [ "/examples/factoroids/" swap ".factor" append3 run-resource ] each
 
 "To play Factoroids, enter the following in the listener:" print
 terpri

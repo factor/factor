@@ -6,4 +6,4 @@ USING: kernel parser sequences words compiler ;
     "parser-combinators"
     "lazy-examples"
     "tests"
-} [ "contrib/parser-combinators/" swap ".factor" append3 run-file ] each
+} [ "/contrib/parser-combinators/" swap ".factor" append3 run-resource ] each

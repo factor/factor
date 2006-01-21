@@ -12,8 +12,7 @@
 ! Then, start Factor as usual (./f factor.image) and enter these
 ! at the listener:
 !
-! "cairo.factor" run-file
-! "cairo_sdl.factor" run-file
+! "/contrib/cairo/load.factor" run-resource
 ! "cairo_text.factor" run-file
 
 IN: cairo-text

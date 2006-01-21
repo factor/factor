@@ -8,4 +8,4 @@ USING: kernel alien parser compiler words sequences ;
     "tuple-db"
     "test"
     "tuple-db-tests"
-} [ "contrib/sqlite/" swap ".factor" append3 run-file ] each
+} [ "/contrib/sqlite/" swap ".factor" append3 run-resource ] each

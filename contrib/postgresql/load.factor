@@ -8,4 +8,4 @@ USING: alien compiler kernel parser sequences words ;
     "postgresql"
     "postgresql-test"
     ! "private" ! Put your password in this file
-} [ "contrib/postgresql/" swap ".factor" append3 run-file ] each
+} [ "/contrib/postgresql/" swap ".factor" append3 run-resource ] each

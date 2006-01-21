@@ -10,4 +10,4 @@ USING: alien kernel parser compiler words sequences ;
 { 
     "cairo"
     "cairo_sdl"
-} [ "contrib/cairo/" swap ".factor" append3 run-file ] each
+} [ "/contrib/cairo/" swap ".factor" append3 run-resource ] each

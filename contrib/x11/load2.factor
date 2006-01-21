@@ -8,7 +8,7 @@ USING: kernel alien parser sequences words compiler ;
     "keysymdef.factor"
     "x-events.factor"
     "glx.factor"
-] [ "contrib/x11/" swap append run-file ] each
+] [ "/contrib/x11/" swap append run-resource ] each
 
 "x11" words [ try-compile ] each
 "xlib" words [ try-compile ] each
