@@ -100,5 +100,3 @@ M: word literalize <wrapper> ;
 : gensym ( -- word )
     [ "G:" % \ gensym counter # ] "" make
     f <word> dup init-word ;
-
-0 \ gensym set-global
