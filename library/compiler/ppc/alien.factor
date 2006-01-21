@@ -3,7 +3,7 @@
 IN: compiler-backend
 USING: alien assembler kernel math ;
 
-GENERIC: store-insn ( to offset reg-class -- )
+GENERIC: store-insn ( offset reg-class -- )
 
 GENERIC: load-insn ( elt parameter reg-class -- )
 

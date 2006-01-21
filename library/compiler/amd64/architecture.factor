@@ -17,8 +17,6 @@ kernel-internals math sequences ;
 
 : vregs { RAX RCX RDX RSI RDI R8 R9 R10 R11 } ; inline
 
-: alien-regs { RDI RSI RDX RCX R8 R9 } ; inline
-
 : param-regs { RDI RSI RDX RCX R8 R9 } ; inline
 
 : compile-c-call ( symbol dll -- )
@@ -29,7 +27,7 @@ kernel-internals math sequences ;
     param-regs swap [ MOV ] 2each compile-c-call ;
 
 M: int-regs return-reg drop RAX ;
-M: int-regs fastcall-regs drop alien-regs length ;
+M: int-regs fastcall-regs drop param-regs length ;
 
 M: float-regs fastcall-regs drop 0 ;
 
