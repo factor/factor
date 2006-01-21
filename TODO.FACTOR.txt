@@ -80,60 +80,80 @@ Compile fails:
     0.2875868408644093 + sin >bignum cos >float sin ;
 
 
-x86 fixnum problem?
-100 [ test-integer>x ] times
+x86 problems below
 
-IN: compiler-test : math-dummy -63545870 ceiling ;
-Compiling math-dummy
--63545870 3562994
+[ 0 bits>float ]
+Compiling G:455019
+4.203895392974451e-45 110.8125
 
-IN: compiler-test : math-dummy -172512992 double>bits ;
-Compiling math-dummy
-4800873998879566904 4780613886529085440
+[ -1 float>bits ]
+Compiling G:455338
+1099286058 4
 
-IN: compiler-test : math-dummy 268435455 float>bits ;
-Compiling math-dummy
-1102377402 4
+[ -15766735 double>bits ]
+Compiling G:455023
+4702233936300867587 4777205847159578624
 
-IN: compiler-test : math-dummy 268435455 neg ;
-Compiling math-dummy
--268435455 1
+[ -23841331 bits>double ]
+Compiling G:455027
+5.127236739868035e-270 5.097526873523571e-270
 
-IN: compiler-test : math-dummy 48191798 neg ;
-Compiling math-dummy
--48191798 18917066
+[ -251924354 1+ ]
+Compiling G:455128
+-251924353 16511103
 
-IN: compiler-test : math-dummy -176408007 next-power-of-2 ;
-Compiling math-dummy
-1 33554432
+[ -258114108 1- ]
+Compiling G:455920
+-258114109 10321347
 
-IN: compiler-test : math-dummy -63194602 bits>float ;
-Compiling math-dummy
-80.08636474609375 110.8125
+[ 259957324 bitnot ]
+Compiling G:455227
+-259957325 8478131
 
-IN: compiler-test : math-dummy
-    116813922808736214071768419862654566798144280646827276619588644136147298073359475589294679233724596355072
-    bits>double ;
-Compiling math-dummy
-5.083189076777759e-270 5.097526873523571e-270
-
-IN: compiler-test : math-dummy -43922848 1- ;
-Compiling math-dummy
--43922849 23186015
-
-IN: compiler-test : math-dummy -186662979 quadrant ;
-Compiling math-dummy
+[ -268435456 quadrant ]
+Compiling G:455335
 1 0
 
-IN: compiler-test : math-dummy -51219578 floor ;
-Compiling math-dummy
--51219578 15889286
-
-IN: compiler-test : math-dummy -56213080 numerator ;
-Compiling math-dummy
--56213080 10895784
-
-IN: compiler-test : math-dummy -268435456 truncate ;
-Compiling math-dummy
+[ 620858855246776348355165240843829248 >fixnum ]
+Compiling G:457023
 -268435456 0
+
+[ 268435455 neg ]
+Compiling G:457031
+-268435455 1
+
+[ -60976708 next-power-of-2 ]
+Compiling G:457308
+1 8388608
+
+[ -132458581 real ]
+Compiling G:459251
+-132458581 1759147
+
+[ -200388566 floor ]
+Compiling G:461226
+-200388566 938026
+
+
+2 ARGUEMENT INTEGER WORDS
+[ 252475730 -1 * ]
+Compiling G:452424
+-252475730 15959726
+
+[ -268435456 209630756 min ]
+Compiling G:452492
+-268435456 0
+
+[ -258355397 -181752298 max ]
+Compiling G:452699
+-181752298 19574294
+
+[ -14282409 -22156592 + ]
+Compiling G:452838
+-36439001 30669863
+
+[ -48101335 0 - ]
+Compiling G:454874
+-48101335 19007529
+
 
