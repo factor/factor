@@ -175,8 +175,6 @@ unit-test
 
 [ -1 f ] [ -1 { 1 2 3 } [ 1 = ] find* ] unit-test
 
-[ { 1 2 3 } ] [ { 1 1 2 2 3 3 } prune ] unit-test
-
 [ 0 ] [ { "a" "b" "c" } { "A" "B" "C" } mismatch ] unit-test
 
 [ 1 ] [ { "a" "b" "c" } { "a" "B" "C" } mismatch ] unit-test

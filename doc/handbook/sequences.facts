@@ -132,7 +132,6 @@ ARTICLE: "sequences-adding" "Adding and appending"
 { $subsection join }
 "Mutable sequences can have elements added in-place."
 { $subsection push }
-{ $subsection adjoin }
 { $subsection nappend }
 "Subsequences can be replaced:"
 { $subsection replace-slice }
@@ -141,7 +140,6 @@ ARTICLE: "sequences-adding" "Adding and appending"
 ARTICLE: "sequences-sets" "Order-insensitive operations"
 "New sequences can be constructed by removing elements from an existing sequence:"
 { $subsection remove }
-{ $subsection prune }
 { $subsection diff }
 "Mutable sequences can have elements removed in-place:"
 { $subsection delete }

@@ -78,12 +78,6 @@ M: object >list ( seq -- list ) dup length 0 rot (>list) ;
 : add ( seq elt -- seq )
     swap [ push ] immutable ; flushable
 
-: adjoin ( elt seq -- )
-    2dup member? [ 2drop ] [ push ] if ;
-
-: prune ( seq -- seq )
-    dup dup length <vector> swap [ over adjoin ] each swap like ;
-
 : diff ( seq1 seq2 -- seq2-seq1 )
     [ swap member? not ] subset-with ; flushable
 

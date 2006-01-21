@@ -86,10 +86,6 @@ HELP: adjoin "( elt seq -- )"
 { $side-effects "seq" }
 { $errors "Throws an error if the type of " { $snippet "elt" } " is not permitted in sequences of the same class as " { $snippet "seq1" } "." } ;
 
-HELP: prune "( seq -- newseq )"
-{ $values { "seq" "a sequence" } { "newseq" "a sequence" } }
-{ $description "Outputs a new sequence of the same class as " { $snippet "seq" } " with each element appearing only once." } ;
-
 HELP: diff "( seq1 seq2 -- newseq )"
 { $values { "seq1" "a sequence" } { "seq2" "a sequence" } { "newseq" "a sequence" } }
 { $description "Outputs a sequence consisting of elements present in " { $snippet "seq2" } " but not " { $snippet "seq1" } ", comparing elements for equality." } ;
