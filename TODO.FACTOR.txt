@@ -82,6 +82,10 @@ Compile fails:
 
 x86 problems below
 
+[ -235345183 ]
+Compiling G:359656
+-235345183 33090273
+
 [ 0 bits>float ]
 Compiling G:455019
 4.203895392974451e-45 110.8125
