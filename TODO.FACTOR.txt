@@ -1,4 +1,3 @@
-- fix fixnum<< vop on x86 and ppc
 - need line and paragraph spacing
 - update HTML stream
 - help cross-referencing
