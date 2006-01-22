@@ -102,7 +102,7 @@ M: node child-ties ( node -- seq )
     ] if ;
 
 \ make-tuple [
-    dup node-in-d first value-literal* 1array
+    dup node-in-d first value-literal 1array
 ] "output-classes" set-word-prop
 
 : output-classes ( node -- seq )
@@ -122,7 +122,7 @@ M: #call infer-classes* ( node -- )
 
 M: #shuffle infer-classes* ( node -- )
     node-out-d [ value? ] subset
-    [ [ value-literal* ] keep set-value-literal* ] each ;
+    [ [ value-literal ] keep set-value-literal* ] each ;
 
 M: #if child-ties ( node -- seq )
     node-in-d first dup general-t <class-tie>
