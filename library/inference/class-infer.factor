@@ -29,7 +29,7 @@ TUPLE: class-tie value class ;
 
 M: class-tie apply-tie ( tie -- )
     dup class-tie-class swap class-tie-value
-    annotate-value-class ;
+    set-value-class* ;
 
 TUPLE: literal-tie value literal ;
 
