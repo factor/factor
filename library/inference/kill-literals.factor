@@ -53,7 +53,7 @@ M: node returns* ( node -- seq ) node-successor returns* ;
 ! #shuffle
 M: #shuffle literals* ( node -- seq )
     dup node-out-d swap node-out-r
-    [ [ literal? ] subset ] 2apply append ;
+    [ [ value? ] subset ] 2apply append ;
 
 ! #return
 M: #return returns* , ;

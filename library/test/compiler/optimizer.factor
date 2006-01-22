@@ -40,7 +40,7 @@ IN: temporary
 
 : kill-set=
     dataflow dup split-node
-    kill-set hash-keys [ literal-value ] map set= ;
+    kill-set hash-keys [ value-literal ] map set= ;
 
 : foo 1 2 3 ;
 
@@ -106,7 +106,7 @@ IN: temporary
 
 [ t ] [
     [ [ ] swap literal-kill-test-8 ] dataflow
-    dup split-node live-values hash-values [ literal? ] subset empty?
+    dup split-node live-values hash-values [ value? ] subset empty?
 ] unit-test
 
 ! Test method inlining

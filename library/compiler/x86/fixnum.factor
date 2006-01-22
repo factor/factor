@@ -103,31 +103,6 @@ M: %fixnum-bitnot generate-node ( vop -- )
     ! Mask off the low 3 bits to give a fixnum tag
     0 output-operand tag-mask XOR ;
 
-M: %fixnum<< generate-node
-    #! This has specific register requirements.
-    drop
-    <label> "no-overflow" set
-    <label> "end" set
-    ! make a copy
-    0 scratch 1 input-operand MOV
-    ! check for potential overflow
-    0 scratch 0 input shift-add 2dup ADD 2 * 1- CMP
-    ! is there going to be an overflow?
-    "no-overflow" get JBE
-    ! there is going to be an overflow, make a bignum
-    1 input-operand tag-bits SAR
-    "s48_long_to_bignum" f
-    1 input-operand 1array compile-c-call*
-    "s48_bignum_arithmetic_shift" f
-    1 input-operand 0 input 2array compile-c-call*
-    ! tag the result
-    1 input-operand bignum-tag OR
-    "end" get JMP
-    ! there is not going to be an overflow
-    "no-overflow" get save-xt
-    1 input-operand 0 input SHL
-    "end" get save-xt ;
-
 M: %fixnum>> generate-node
     drop
     ! shift register

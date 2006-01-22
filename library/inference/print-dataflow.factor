@@ -19,10 +19,10 @@ M: comment pprint* ( ann -- )
 : values% ( prefix values -- )
     [
         swap %
-        dup literal? [
-            literal-value unparse %
+        dup value? [
+            value-literal unparse %
         ] [
-            "@" % value-uid #
+            "@" % #
         ] if
     ] each-with ;
 

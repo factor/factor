@@ -12,7 +12,7 @@ namespaces parser prettyprint sequences strings vectors words ;
 : unify-values ( seq -- value )
     #! If all values in list are equal, return the value.
     #! Otherwise, unify.
-    dup all-eq? [ first ] [ drop <value> ] if ;
+    dup all-eq? [ first ] [ drop <computed> ] if ;
 
 : unify-stacks ( seq -- stack )
     #! Replace differing literals in stacks with unknown
@@ -81,7 +81,7 @@ namespaces parser prettyprint sequences strings vectors words ;
             base-case-continuation set
             copy-inference
             dup value-recursion recursive-state set
-            dup literal-value infer-quot
+            dup value-literal infer-quot
             terminated? get [ #values node, ] unless
             f
         ] callcc1 [ terminate ] when drop

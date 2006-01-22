@@ -30,8 +30,6 @@ sequences strings walker ;
     #! Cause the word to start the code walker when executed.
     [ nip [ walk ] cons ] annotate ;
 
-: +@ ( n var -- ) dup get [ swap >r + r> ] when* set ;
-
 : with-profile ( quot word -- )
     millis >r >r call r> millis r> - swap global [ +@ ] bind ;
     inline

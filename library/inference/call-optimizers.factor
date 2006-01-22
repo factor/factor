@@ -18,7 +18,7 @@ math math-internals sequences words ;
 : partial-eval? ( #call -- ? )
     dup node-param "foldable" word-prop [
         dup node-in-d [
-            dup literal?
+            dup value?
             [ 2drop t ] [ swap node-literals ?hash* nip ] if
         ] all-with?
     ] [
@@ -27,8 +27,8 @@ math math-internals sequences words ;
 
 : literal-in-d ( #call -- inputs )
     dup node-in-d [
-        dup literal?
-        [ nip literal-value ] [ swap node-literals ?hash ] if
+        dup value?
+        [ nip value-literal ] [ swap node-literals ?hash ] if
     ] map-with ;
 
 : partial-eval ( #call -- node )
@@ -70,7 +70,7 @@ SYMBOL: @
 
 : literals-match? ( values template -- ? )
     [
-        over literal? [ >r literal-value r> ] [ nip @ ] if =
+        over value? [ >r value-literal r> ] [ nip @ ] if =
     ] 2map [ ] all? ;
 
 : values-match? ( values template -- ? )

@@ -73,7 +73,7 @@ M: #shuffle optimize-node*  ( node -- node/t )
 
 ! #if
 : static-branch? ( node -- lit ? )
-    node-in-d first dup literal? ;
+    node-in-d first dup value? ;
 
 : static-branch ( conditional n -- node )
     over drop-inputs
@@ -81,7 +81,7 @@ M: #shuffle optimize-node*  ( node -- node/t )
 
 M: #if optimize-node* ( node -- node )
     dup static-branch?
-    [ literal-value 0 1 ? static-branch ] [ 2drop t ] if ;
+    [ value-literal 0 1 ? static-branch ] [ 2drop t ] if ;
 
 ! #values
 : optimize-fold ( node -- node/t )

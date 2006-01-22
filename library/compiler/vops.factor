@@ -281,17 +281,13 @@ TUPLE: %fixnum-bitnot ;
 C: %fixnum-bitnot make-vop ; : %fixnum-bitnot 2-vop <%fixnum-bitnot> ;
 M: %fixnum-bitnot basic-block? drop t ;
 
-! At the VOP level, the 'shift' operation is split into five
+! At the VOP level, the 'shift' operation is split into four
 ! distinct operations:
-! - shifts with a large positive count: calls runtime to make
+! - shifts with a positive count: calls runtime to make
 !   a bignum
-! - shifts with a small positive count: %fixnum<<
 ! - shifts with a small negative count: %fixnum>>
 ! - shifts with a small negative count: %fixnum>>
 ! - shifts with a large negative count: %fixnum-sgn
-TUPLE: %fixnum<< ;
-C: %fixnum<< make-vop ;   : %fixnum<<   3-vop <%fixnum<<> ;
-
 TUPLE: %fixnum>> ;
 C: %fixnum>> make-vop ;   : %fixnum>>   3-vop <%fixnum>>> ;
 M: %fixnum>> basic-block? drop t ;

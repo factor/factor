@@ -111,31 +111,6 @@ M: %fixnum-bitnot generate-node ( vop -- )
     drop dest/src NOT
     0 output-operand dup untag ;
 
-M: %fixnum<< generate-node ( vop -- )
-    ! This has specific register requirements.
-    drop
-    <label> "no-overflow" set
-    <label> "end" set
-    ! check for potential overflow
-    0 input shift-add dup 1 scratch LOAD
-    0 scratch 1 input-operand 1 scratch ADD
-    2 * 1- 1 scratch LOAD
-    1 scratch 0 0 scratch CMPL
-    ! is there going to be an overflow?
-    "no-overflow" get BGE
-    ! there is going to be an overflow, make a bignum
-    1 input-operand dup untag-fixnum
-    "s48_long_to_bignum" f compile-c-call
-    0 input 0 scratch LI
-    "s48_bignum_arithmetic_shift" f compile-c-call
-    ! tag the result
-    1 input-operand dup bignum-tag ORI
-    "end" get B
-    ! there is not going to be an overflow
-    "no-overflow" get save-xt
-    1 input-operand dup 0 input SLWI.
-    "end" get save-xt ;
-
 M: %fixnum>> generate-node ( vop -- )
     drop
     1 input-operand 0 output-operand 0 input SRAWI

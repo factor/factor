@@ -24,7 +24,7 @@ M: inference-error error. ( error -- )
     "Recursive state:" print
     inference-error-rstate describe ;
 
-M: value literal-value ( value -- )
+M: integer value-literal ( value -- )
     {
         "A literal value was expected where a computed value was found.\n"
         "This means the word you are inferring applies 'call' or 'execute'\n"
@@ -43,9 +43,10 @@ M: value literal-value ( value -- )
 SYMBOL: d-in
 
 : pop-literal ( -- rstate obj )
-    1 #drop node, pop-d dup value-recursion swap literal-value ;
+    1 #drop node,
+    pop-d dup value-recursion swap value-literal ;
 
-: value-vector ( n -- vector ) [ drop <value> ] map >vector ;
+: value-vector ( n -- vector ) [ drop <computed> ] map >vector ;
 
 : required-inputs ( n stack -- n ) length - 0 max ;
 
@@ -77,7 +78,7 @@ GENERIC: apply-object
 : apply-literal ( obj -- )
     #! Literals are annotated with the current recursive
     #! state.
-    <literal> push-d  1 #push node, ;
+    <value> push-d  1 #push node, ;
 
 M: object apply-object apply-literal ;
 

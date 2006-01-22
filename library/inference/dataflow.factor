@@ -7,23 +7,22 @@ namespaces parser sequences words ;
 ! Recursive state. An alist, mapping words to labels.
 SYMBOL: recursive-state
 
-TUPLE: value recursion uid ;
+: <computed> \ <computed> counter ;
 
-C: value ( -- value )
-    \ value counter over set-value-uid
-    recursive-state get over set-value-recursion ;
+TUPLE: value uid literal recursion ;
 
-M: value = eq? ;
+C: value ( obj -- value )
+    <computed> over set-value-uid
+    recursive-state get over set-value-recursion
+    [ set-value-literal ] keep ;
 
 M: value hashcode value-uid ;
 
-TUPLE: literal value ;
+M: value = eq? ;
 
-C: literal ( obj -- value )
-    <value> over set-delegate
-    [ set-literal-value ] keep ;
+M: integer value-uid ;
 
-M: literal hashcode delegate hashcode ;
+M: integer value-recursion drop f ;
 
 ! The dataflow IR is the first of the two intermediate
 ! representations used by Factor. It annotates concatenative

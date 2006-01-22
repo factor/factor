@@ -23,14 +23,15 @@ sequences strings vectors words ;
 : change ( var quot -- quot: old -- new )
     >r dup get r> rot slip set ; inline
 
-: inc ( var -- ) [ 1+ ] change ; inline
+: +@ ( n var -- ) [ [ 0 ] unless* + ] change ;
 
-: counter ( var -- n )
-    global [ [ [ 0 ] unless* dup 1+ >fixnum ] change ] bind ;
+: inc ( var -- ) 1 swap +@ ; inline
 
-: dec ( var -- ) [ 1- ] change ; inline
+: dec ( var -- ) -1 swap +@ ; inline
 
 : bind ( namespace quot -- ) swap >n call n> drop ; inline
+
+: counter ( var -- n ) global [ dup inc get ] bind ;
 
 : make-hash ( quot -- hash ) H{ } clone >n call n> ; inline
 

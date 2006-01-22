@@ -66,7 +66,7 @@ sequences strings vectors words prettyprint ;
 \ dispatch [ [ fixnum array ] [ ] ] "infer-effect" set-word-prop
 
 \ dispatch [
-    pop-literal nip [ <literal> ] map
+    pop-literal nip [ <value> ] map
     #dispatch pop-d drop infer-branches
 ] "infer" set-word-prop
 
