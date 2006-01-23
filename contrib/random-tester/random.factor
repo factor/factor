@@ -5,7 +5,7 @@ USING: optimizer compiler-frontend compiler-backend inference ;
 IN: random-tester
 
 ! Tweak me
-: max-length 5 ; inline
+: max-length 7 ; inline
 : max-value 1000000000 ; inline
 
 : 10% ( -- bool ) 10 random-int 8 > ;

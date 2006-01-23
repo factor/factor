@@ -112,16 +112,23 @@ IN: random-tester
 : 2float>float ( f f -- f ) ( -- word ) { * + - /f max min } ;
 : 2complex>complex ( c c -- c ) ( -- word ) { * + - /f } ;
 
+: (random-integer-quotation) ( -- quot )
+    random-integer ,
+    max-length random-int
+    [
+        [
+            [ integer>integer nth-rand , ]
+            [ random-integer , 2integer>integer nth-rand , ]
+        ] do-one
+    ] times ;
 : random-integer-quotation ( -- quot )
     [
-        random-integer ,
-        max-length random-int
-        [
-            [
-                [ integer>integer nth-rand , ]
-                [ random-integer , 2integer>integer nth-rand , ]
-            ] do-one
-        ] times
+        (random-integer-quotation)
+    ] [ ] make ;
+
+: random-integer-quotation-1 ( -- quot )
+    [
+        (random-integer-quotation) 2integer>integer nth-rand ,
     ] [ ] make ;
 
 : (random-ratio-quotation) ( -- quot )
@@ -171,9 +178,16 @@ IN: random-tester
 
 SYMBOL: last
 : interp-compile-check ( quot -- )
-    ! dup . 
+    dup . 
     [ last set ] keep
     [ call ] keep compile-1
+    2dup swap unparse write " " write unparse print
+    = [ "problem in math" throw ] unless ;
+
+: interp-compile-check-1 ( quot -- )
+    dup . 
+    [ last set ] keep
+    [ call ] 2keep compile-1
     2dup swap unparse write " " write unparse print
     = [ "problem in math" throw ] unless ;
 
