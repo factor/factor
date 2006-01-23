@@ -122,3 +122,5 @@ SYMBOL: step-size .01 step-size set  ! base on arguments
     1 <= [ "seq must be 2n or longer" throw ] when 
     over [ [ dup >r >r pick pick r> rot swapd nths over call , r> ] repeat ] { } make 2nip nip ;
 
+: nth-rand ( seq -- elem ) [ length random-int ] keep nth ;
+
