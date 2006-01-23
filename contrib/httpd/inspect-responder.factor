@@ -14,4 +14,5 @@ M: general-t browser-link-href
     [ [ http-inspect ] show-final ] curry quot-url
     append ;
 
-: inspect-responder ( url -- ) drop global http-inspect ;
+: inspect-responder ( url -- )
+    drop [ global http-inspect ] show-final ;
