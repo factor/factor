@@ -20,6 +20,9 @@ global [
         "help" "responder" set
         [ help-responder ] "get" set
     ] make-responder
+
+    ! Global variables
+    "inspector" [ inspect-responder ] install-cont-responder
     
     ! Servers Factor word definitions from the image.
     "browser" [ browser-responder ] install-cont-responder

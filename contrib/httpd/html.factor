@@ -1,8 +1,8 @@
 ! Copyright (C) 2004, 2006 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 IN: html
-USING: generic hashtables help http io kernel lists math
-namespaces sequences strings styles words xml ;
+USING: generic hashtables help http inspector io
+kernel lists math namespaces sequences strings styles words xml ;
 
 : hex-color, ( triplet -- )
     3 swap head
@@ -55,16 +55,25 @@ namespaces sequences strings styles words xml ;
         <span =style span> call </span>
     ] if ;
 
+: border-css, ( border -- )
+    "border: 1px solid #" % hex-color, "; " % ;
+
+: padding-css, ( padding -- ) "padding: " % # "px; " % ;
+
+: pre-css, ( -- ) "white-space: pre; " % ;
+
 : div-css-style ( style -- str )
     [
         H{
-            { page-color   [ bg-css,        ] }
-            ! { border-color [ font-css,      ] }
+            { page-color [ bg-css, ] }
+            { border-color [ border-css, ] }
+            { border-width [ padding-css, ] }
+            { wrap-margin [ [ pre-css, ] unless ] }
         } hash-apply
     ] "" make ;
 
 : div-tag ( style quot -- )
-    over div-css-style dup empty? [
+    swap div-css-style dup empty? [
         drop call
     ] [
         <div =style div> call </div>
@@ -92,13 +101,12 @@ namespaces sequences strings styles words xml ;
 
 GENERIC: browser-link-href ( presented -- href )
 
+M: object browser-link-href drop f ;
+
 M: word browser-link-href
-    dup word-name swap word-vocabulary [
-        "/responder/browser/?vocab=" %
-        url-encode %
-        "&word=" %
-        url-encode %
-    ] "" make ;
+    "/responder/browser" swap [
+        dup word-vocabulary "vocab" set word-name "word" set
+    ] make-hash build-url ;
 
 M: link browser-link-href
     link-name [ \ f ] unless* dup word? [
@@ -107,10 +115,7 @@ M: link browser-link-href
         [ "/responder/help/" % url-encode % ] "" make
     ] if ;
 
-M: object browser-link-href
-    drop f ;
-
-: browser-link-tag ( style quot -- style )
+: object-link-tag ( style quot -- )
     presented pick hash browser-link-href
     [ <a =href a> call </a> ] [ call ] if* ;
 
@@ -140,23 +145,16 @@ M: html-stream stream-format ( str style stream -- )
                     do-escaping stdio get delegate-write
                 ] span-tag
             ] file-link-tag
-        ] browser-link-tag
+        ] object-link-tag
     ] with-stream* ;
-
-: pre-tag ( style quot -- )
-    wrap-margin rot hash [
-        call
-    ] [
-        <pre> call </pre>
-    ] if ;
 
 M: html-stream with-nested-stream ( quot style stream -- )
     [
         [
             [
                 stdio get <nested-stream> swap with-stream*
-            ] pre-tag
-        ] div-tag
+            ] div-tag
+        ] object-link-tag
     ] with-stream* ;
 
 M: html-stream stream-terpri [ <br/> ] with-stream* ;
@@ -166,10 +164,10 @@ M: html-stream stream-terpri [ <br/> ] with-stream* ;
 
 : default-css ( -- )
   <style>
-    "A:link { text-decoration:none}" print
-    "A:visited { text-decoration:none}" print
-    "A:active { text-decoration:none}" print
-    "A:hover, A.nav:hover { border: 1px solid black; text-decoration: none; margin: -1px }" print
+    "A:link { text-decoration: none; color: black; }" print
+    "A:visited { text-decoration: none; color: black; }" print
+    "A:active { text-decoration: none; color: black; }" print
+    "A:hover, A:hover { text-decoration: none; color: black; }" print
   </style> ;
 
 : html-document ( title quot -- )

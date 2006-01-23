@@ -1,5 +1,11 @@
 IN: temporary
-USING: html io kernel namespaces styles test xml ;
+USING: html http io kernel namespaces styles test xml ;
+
+[
+    "/responder/foo/?z=%20"
+] [
+    "/responder/foo" H{ { "z" " " } } build-url
+]
 
 [
     "&lt;html&gt;&amp;&apos;sgml&apos;"
@@ -43,21 +49,5 @@ USING: html io kernel namespaces styles test xml ;
         "car"
         H{ { foreground { 1 0 1 1 } } }
         html-format
-    ] string-out
-] unit-test
-
-[
-    "<html><head><title>Foo</title></head><body><h1>Foo</h1></body></html>"
-] [
-    [
-        "Foo" [ ] html-document
-    ] string-out
-] unit-test
-
-[
-    "<html><head><title>Foo</title></head><body><h1>Foo</h1><pre>Hi</pre></body></html>"
-] [
-    [
-        "Foo" [ "Hi" write ] simple-html-document
     ] string-out
 ] unit-test

@@ -2,16 +2,17 @@ IN: scratchpad
 USING: words kernel parser sequences io compiler ;
 
 { 
+    "mime"
     "xml"
     "http-common"
-    "mime"
     "html-tags"
     "html"
     "responder"
     "httpd"
+    "cont-responder"
     "file-responder"
     "help-responder"
-    "cont-responder"
+    "inspect-responder"
     "browser-responder"
     "default-responders"
     "http-client"

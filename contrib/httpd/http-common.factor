@@ -1,7 +1,7 @@
 ! Copyright (C) 2003, 2005 Slava Pestov
 IN: http
-USING: errors kernel lists math namespaces parser sequences
-io strings ;
+USING: errors hashtables io kernel lists math namespaces parser
+sequences strings ;
 
 : header-line ( line -- )
     ": " split1 dup [ swap set ] [ 2drop ] if ;
@@ -62,3 +62,12 @@ io strings ;
 
 : url-decode ( str -- str )
     [ 0 swap url-decode-iter ] "" make ;
+
+: build-url ( path query-params -- str )
+    [
+        swap % dup hash-empty? [
+            "?" %
+            hash>alist
+            [ [ url-encode ] map "=" join ] map "&" join %
+        ] unless drop
+    ] "" make ;

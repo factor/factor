@@ -296,14 +296,17 @@ SYMBOL: root-continuation
   #! by returning a quotation that will pass the original 
   #! quotation to the callback continuation.
   [ , callback-cc get , \ continue-with , ] [ ] make ;
-  
+
+: quot-url ( quot -- url )
+  callback-quot expirable register-continuation id>url ;
+
 : quot-href ( text quot -- )
   #! Write to standard output an HTML HREF where the href,
   #! when referenced, will call the quotation and then return
   #! back to the most recent 'show' call (via the callback-cc).
   #! The text of the link will be the 'text' argument on the 
   #! stack.
-  <a callback-quot expirable register-continuation id>url =href a> write </a> ;
+  <a quot-url =href a> write </a> ;
 
 : init-session-namespace ( -- )
   #! Setup the initial session namespace. Currently this only
@@ -376,13 +379,3 @@ SYMBOL: root-continuation
 : button ( label -- )
   #! Output an HTML submit button with the given label.
   <input "submit" =type =value input/> ;
-
-: with-simple-html-output ( quot -- )
-  #! Run the quotation inside an HTML stream wrapped
-  #! around stdio.
-  <pre> 
-    stdio get <html-stream> [
-      call
-    ] with-stream
-  </pre> ;
-
