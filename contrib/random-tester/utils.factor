@@ -1,11 +1,9 @@
 USING: kernel math sequences namespaces errors hashtables words arrays parser
-       compiler syntax lists io ;
+       compiler syntax lists io math-contrib ;
 USING: optimizer compiler-frontend compiler-backend inference
        inspector prettyprint ;
 IN: random-tester
 
-! SEQUENCES
-: nth-rand ( seq -- elem ) [ length random-int ] keep nth ;
 
 ! HASHTABLES
 : random-hash-entry ( hash -- key value ) hash>alist nth-rand first2 ;

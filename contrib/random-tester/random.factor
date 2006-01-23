@@ -1,5 +1,5 @@
 USING: kernel math sequences namespaces errors hashtables words arrays parser
-       compiler syntax lists io ;
+       compiler syntax lists io math-contrib ;
 USING: inspector prettyprint ;
 USING: optimizer compiler-frontend compiler-backend inference ;
 IN: random-tester
@@ -29,7 +29,6 @@ IN: random-tester
 : random-string
     [ max-length random-int [ max-value random-int , ] times ] "" make ;
 
-
 SYMBOL: special-integers
 [ { -1 0 1 } % most-negative-fixnum , most-positive-fixnum , first-bignum , ] 
 { } make \ special-integers set
@@ -41,11 +40,11 @@ SYMBOL: special-floats
 SYMBOL: special-complexes
 [ 
     { -1 0 1 i -i } %
-    e , pi , 0 pi rect> , 0 pi neg rect> , pi neg 0 rect> , pi pi rect> ,
+    e , e neg , pi , pi neg ,
+    0 pi rect> , 0 pi neg rect> , pi neg 0 rect> , pi pi rect> ,
     pi pi neg rect> , pi neg pi rect> , pi neg pi neg rect> ,
     e neg e neg rect> , e e rect> ,
 ] { } make \ special-complexes set
-
 : special-complexes ( -- seq ) \ special-complexes get ;
 
 : random-fixnum ( -- fixnum )
