@@ -26,6 +26,10 @@ IN: random-tester
     { [ ] { } V{ } "" } nth-rand
     [ max-length random-int [ max-value random-int , ] times ] swap make ;
 
+: random-string
+    [ max-length random-int [ max-value random-int , ] times ] "" make ;
+
+
 SYMBOL: special-integers
 [ { -1 0 1 } % most-negative-fixnum , most-positive-fixnum , first-bignum , ] 
 { } make \ special-integers set

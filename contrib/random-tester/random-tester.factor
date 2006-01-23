@@ -211,6 +211,10 @@ SYMBOL: last
     random-complex complex>x nth-rand f cons cons interp-compile-check ;
 
 
+: test-integer>x-1 ( -- )
+    random-integer integer>x nth-rand unit interp-compile-check-1 ;
+
+
 ! 2-arg tests
 : test-2integer>x ( -- )
     random-integer random-integer 2integer>x nth-rand f cons cons cons interp-compile-check ;
@@ -228,9 +232,82 @@ SYMBOL: last
 : test-2random>x ( -- )
     random-number random-number math-2 nth-rand f cons cons cons interp-compile-check ;
 
+: test-2integer>x-1 ( -- )
+    random-integer random-integer-quotation-1 interp-compile-check-1 ;
 
+: logic-0 ( -- seq )
+    { unix? win32? bootstrapping? f t } ;
+
+: logic-1 ( -- seq )
+    {
+        not tuple? float? integer? complex? ratio? continuation? wrapper?
+        number?  rational? bignum? fixnum? float? primitive? symbol?
+        compound? real?
+    } ;
+!  odd? even? power-of-2?
+
+: logic-2 ( -- seq )
+    {
+        < > <= >= number= = eq?  and or 
+    } ;
+
+: logic-3 ( -- seq )
+    { between? } ;
+
+: complex-logic-2 ( -- seq )
+    {
+        number= = eq? and or
+    } ;
+
+: logic-0-test ( -- )
+    [
+        logic-0 nth-rand ,
+    ] [ ] make interp-compile-check ;
+
+: integer-logic-1-test ( -- )
+    [
+        random-integer , logic-1 nth-rand ,
+    ] [ ] make interp-compile-check ;
+
+: ratio-logic-1-test ( -- )
+    [
+        random-ratio , logic-1 nth-rand ,
+    ] [ ] make interp-compile-check ;
+
+: float-logic-1-test ( -- )
+    [
+        random-float , logic-1 nth-rand ,
+    ] [ ] make interp-compile-check ;
+
+: complex-logic-1-test ( -- )
+    [
+        random-complex , logic-1 nth-rand ,
+    ] [ ] make interp-compile-check ;
+
+
+: integer-logic-2-test ( -- )
+    [
+        random-integer , random-integer , logic-2 nth-rand , 
+    ] [ ] make interp-compile-check ;
+
+: ratio-logic-2-test ( -- )
+    [
+        random-ratio , random-ratio , logic-2 nth-rand , 
+    ] [ ] make interp-compile-check ;
+
+: float-logic-2-test ( -- )
+    [
+        random-float , random-float , logic-2 nth-rand , 
+    ] [ ] make interp-compile-check ;
+
+: complex-logic-2-test ( -- )
+    [
+        random-complex , random-complex , complex-logic-2 nth-rand , 
+    ] [ ] make interp-compile-check ;
+
+: test-integer { test-2integer>x test-integer>x test-2integer>x-1 } nth-rand execute ;
 ! quotation tests
-: test-integer random-integer-quotation interp-compile-check ;
+! : test-integer random-integer-quotation interp-compile-check ;
 : test-ratio random-ratio-quotation interp-compile-check ;
 : test-float random-float-quotation interp-compile-check ;
 : test-complex random-complex-quotation interp-compile-check ;
@@ -243,10 +320,14 @@ SYMBOL: last
     } do-one ;
 
 
-: compare-2
-    {
-        < > <= >= number= =
-    } ;
+: string-to-math-test ( -- )
+    [
+        {
+        [ random-integer , \ number>string , ]
+        [ random-integer , \ number>string , \ string>number , ]
+        } do-one
+    ] [ ] make interp-compile-check ;
+
 
 
 
@@ -313,14 +394,14 @@ SYMBOL: last
 ! change the % to make longer quotations
 : if-quot ( -- )
     [
-        random-ratio , random-ratio , compare-2 nth-rand ,
+        random-ratio , random-ratio , logic-2 nth-rand ,
         2 [ 30% [ if-quot ] [ random-ratio-quotation-1 ] if unit % ] times
         \ if ,
     ] [ ] make ;
 
 : when-quot
     [
-        random-ratio , random-ratio , compare-2 nth-rand ,
+        random-ratio , random-ratio , logic-2 nth-rand ,
         90% [ when-quot ] [ random-ratio-quotation-1 ] if unit %
         coin-flip \ when \ unless ? ,
     ] [ ] make ;
