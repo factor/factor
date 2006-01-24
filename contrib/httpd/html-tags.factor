@@ -73,6 +73,7 @@ USE: sequences
 ! <input "text" =type "name" =name "20" =size input/>
 
 SYMBOL: html
+SYMBOL: attrs
 
 : write-html H{ { html t } } format ;
 
@@ -85,7 +86,7 @@ SYMBOL: html
     #! With the attribute namespace on the stack, get the attributes
     #! and write them to standard output. If no attributes exist, write
     #! nothing.
-    "attrs" get attrs>string write-html ;
+    attrs get attrs>string write-html ;
 
 : html-word ( name def -- )
     #! Define 'word creating' word to allow
@@ -103,7 +104,7 @@ SYMBOL: html
 
 : <foo "<" swap append ;
 
-: do-<foo write-html H{ } clone >n V{ } clone "attrs" set ;
+: do-<foo write-html H{ } clone >n V{ } clone attrs set ;
 
 : def-for-html-word-<foo ( name -- )
     #! Return the name and code for the <foo patterned
@@ -161,7 +162,7 @@ SYMBOL: html
 
 : define-attribute-word ( name -- )
     dup "=" swap append swap [
-        , [ swons "attrs" get push ] %
+        , [ swons attrs get push ] %
     ] [ ] make html-word drop ;
 
 ! Define some closed HTML tags

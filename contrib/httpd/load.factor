@@ -10,6 +10,7 @@ USING: words kernel parser sequences io compiler ;
     "httpd"
     "cont-responder"
     "live-updater"
+    "prototype-js"
     "html"
     "file-responder"
     "help-responder"

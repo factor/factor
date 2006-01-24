@@ -1,7 +1,7 @@
 ! Copyright (C) 2004, 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: httpd
-USING: browser-responder cont-responder file-responder
+USING: io browser-responder cont-responder file-responder
 help-responder inspect-responder kernel namespaces prettyprint ;
 
 #! Remove all existing responders, and create a blank
@@ -17,6 +17,15 @@ global [
 
     ! Online help browsing
     "help" [ help-responder ] install-cont-responder
+
+    ! Javascript source used by ajax libraries
+    [ 
+      "contrib/httpd/javascript/" resource-path "doc-root" set
+      "javascript" "responder" set
+      [ file-responder ] "get" set
+      [ file-responder ] "post" set
+      [ file-responder ] "head" set
+    ] make-responder
 
     ! Global variables
     "inspector" [ inspect-responder ] install-cont-responder

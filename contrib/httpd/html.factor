@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 IN: html
 USING: cont-responder generic hashtables help http inspector io
-kernel lists live-updater math namespaces sequences strings
+kernel lists prototype-js math namespaces sequences strings
 styles words xml ;
 
 : hex-color, ( triplet -- )
@@ -156,9 +156,9 @@ M: html-stream stream-format ( str style stream -- )
     <table "display: inline; " =style table>
         <tr>
             <td>
-                get-random-id dup >r swap [
+                "+" get-random-id dup >r rot [
                     with-html-stream
-                ] curry "+" live-anchor
+                ] curry [ , \ show-final , ] [ ] make updating-anchor
             </td>
             <td>
                 call
@@ -166,7 +166,7 @@ M: html-stream stream-format ( str style stream -- )
         </tr>
         <tr>
             <td> </td>
-            <td r> =id td> </td>
+            <td> <div r> =id div> </td>
         </tr>
     </table> ;
 
@@ -205,7 +205,7 @@ M: html-stream stream-terpri [ <br/> ] with-stream* ;
         <head>
             <title> write </title>
             default-css
-            include-live-updater-js
+            include-prototype-js
         </head>
         <body>
             <h1> write </h1>
