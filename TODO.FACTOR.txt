@@ -29,15 +29,18 @@
 - if two tasks write to a unix stream, the buffer can overflow
 - font problem: http://iarc1.ece.utexas.edu/~erg/font-bug.JPG
 - implement 3.3 floor  4.7 ceiling  4.5 truncate
-- make 3.4 bits>double an error
+- make 3.4 bits>double cause an error like 3.4 bits>float does
 - float>bits bits>double etc fail in gcc 4.0.3 with -fschedule-insns
 - C{ 0/0. 0/0. } C{ 0/0. 0/0. } = .  -> f when -ffast-math is not used on x86
 - can't type C{ nan.0 nan.0 } or C{ nan nan } at the repl
-- add some tests below to tests
+- "contrib/math/prime.factor" run-file is too slow (~100 seconds)
+- test-2integer>x-throws causes an infinite loop in bignum_multiply_unsigned()
+- add some tests below to the unit tests
 
 ALL TESTS BELOW FAIL ON x86 linux 32bit
+- 10 [ tan tan tan ] compile-1 ! runs out of memory
 
-- float not commutative bug
+- float not commutative bug (?)
   : a 237241607 1516.925984289192 3036109462846 913470293/554864
     max min * 994.5872660892654 306803761/112249 -216866846 + -
     max 6073750751093 364.7737275664338 3629914314951 + max max
