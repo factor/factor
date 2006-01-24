@@ -15,4 +15,4 @@ M: general-t browser-link-href
     append ;
 
 : inspect-responder ( url -- )
-    drop [ global http-inspect ] show-final ;
+    [ global http-inspect ] show-final ;

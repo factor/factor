@@ -67,7 +67,7 @@ sequences strings ;
     [
         swap % dup hash-empty? [
             "?" %
-            hash>alist
+            dup hash>alist
             [ [ url-encode ] map "=" join ] map "&" join %
         ] unless drop
     ] "" make ;

@@ -2,7 +2,7 @@
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: httpd
 USING: browser-responder cont-responder file-responder
-help-responder kernel namespaces prettyprint ;
+help-responder inspect-responder kernel namespaces prettyprint ;
 
 #! Remove all existing responders, and create a blank
 #! responder table.
@@ -16,10 +16,7 @@ global [
     ] make-responder
 
     ! Online help browsing
-    [
-        "help" "responder" set
-        [ help-responder ] "get" set
-    ] make-responder
+    "help" [ help-responder ] install-cont-responder
 
     ! Global variables
     "inspector" [ inspect-responder ] install-cont-responder

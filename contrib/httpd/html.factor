@@ -1,8 +1,9 @@
 ! Copyright (C) 2004, 2006 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 IN: html
-USING: generic hashtables help http inspector io
-kernel lists math namespaces sequences strings styles words xml ;
+USING: cont-responder generic hashtables help http inspector io
+kernel lists live-updater math namespaces sequences strings
+styles words xml ;
 
 : hex-color, ( triplet -- )
     3 swap head
@@ -60,7 +61,7 @@ kernel lists math namespaces sequences strings styles words xml ;
 
 : padding-css, ( padding -- ) "padding: " % # "px; " % ;
 
-: pre-css, ( -- ) "white-space: pre; " % ;
+: pre-css, ( -- ) "white-space: pre; font-family:monospace; " % ;
 
 : div-css-style ( style -- str )
     [
@@ -104,7 +105,7 @@ GENERIC: browser-link-href ( presented -- href )
 M: object browser-link-href drop f ;
 
 M: word browser-link-href
-    "/responder/browser" swap [
+    "/responder/browser/" swap [
         dup word-vocabulary "vocab" set word-name "word" set
     ] make-hash build-url ;
 
@@ -112,7 +113,7 @@ M: link browser-link-href
     link-name [ \ f ] unless* dup word? [
         browser-link-href
     ] [
-        [ "/responder/help/" % url-encode % ] "" make
+        "/responder/help/" swap "topic" associate build-url
     ] if ;
 
 : object-link-tag ( style quot -- )
@@ -148,13 +149,36 @@ M: html-stream stream-format ( str style stream -- )
         ] object-link-tag
     ] with-stream* ;
 
+: html-outliner ( caption contents -- )
+    <table>
+        <tr>
+            <td>
+                "replaceme" swap [
+                    [ with-html-stream ] show-final
+                ] curry "+" live-anchor
+            </td>
+            <td>
+                call
+            </td>
+        </tr>
+        <tr>
+            <td> </td>
+            <td> <div "replaceme" =id div> </div>
+        </tr>
+    </table> ;
+
+: outliner-tag ( style quot -- )
+    outline pick hash [ html-outliner ] [ call ] if* ;
+
 M: html-stream with-nested-stream ( quot style stream -- )
     [
         [
             [
-                stdio get <nested-stream> swap with-stream*
-            ] div-tag
-        ] object-link-tag
+                [
+                    stdio get <nested-stream> swap with-stream*
+                ] div-tag
+            ] object-link-tag
+        ] outliner-tag
     ] with-stream* ;
 
 M: html-stream stream-terpri [ <br/> ] with-stream* ;
@@ -176,6 +200,7 @@ M: html-stream stream-terpri [ <br/> ] with-stream* ;
         <head>
             <title> write </title>
             default-css
+            include-live-updater-js
         </head>
         <body>
             <h1> write </h1>
