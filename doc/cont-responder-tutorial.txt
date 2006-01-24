@@ -22,13 +22,12 @@ vocabulary:
 The responders that you will be writing will require an instance of
 the httpd server to be running. It will be run in a background thread
 to enable the interactive development of the applications. The
-following is a simple function to start the server on port 8888 and
-restart it if an error occurs:
+following is a simple function to start the server on port 8888:
 
   USE: httpd
   USE: threads
-  : start-httpd [ 8888 httpd ] [ dup . flush [ start-httpd ] when* ] catch ;
-  [ start-httpd ] in-thread
+  : start-httpd [ 8888 httpd ] in-thread  ;
+  start-httpd
 
 Responders
 ==========
