@@ -20,6 +20,27 @@ IN: random-tester
 ! TODO: take this out eventually
 : math-throw-1
     {
+        recip log2
+        asec asech acot acoth acosec acosech acos acosh asin asinh atan atanh
+    } ;
+
+: integer>x-throw
+    {
+        recip log2
+        asec asech acot acoth acosec acosech acos acosh asin asinh atan atanh
+    } ;
+: ratio>x-throw
+    {
+        recip
+        asec asech acot acoth acosec acosech acos acosh asin asinh atan atanh
+    } ;
+: float>x-throw
+    {
+        recip
+        asec asech acot acoth acosec acosech acos acosh asin asinh atan atanh
+    } ;
+: complex>x-throw
+    {
         recip
         asec asech acot acoth acosec acosech acos acosh asin asinh atan atanh
     } ;
@@ -91,8 +112,6 @@ IN: random-tester
         log neg quadrant 
         sech sin sinh sq sqrt tanh 
     } ;
-
-
 
 
 : math-2 ( -- seq )
@@ -196,6 +215,37 @@ SYMBOL: last
     >r 100 200 300 400 r> [ call 4array ] keep
     >r 100 200 300 400 r> compile-1 4array
     = [ "problem found! (compile-check*)" throw ] unless ;
+
+: interp-compile-check-catch ( quot -- )
+    dup .
+    [ last set ] keep
+    [ catch [ "caught: " write dup print-error ] when* ] keep 
+    [ compile-1 ] catch [ nip "caught: " write dup print-error ] when*
+    = [ "problem in math" throw ] unless ;
+
+
+
+: test-integer>x-throws ( -- )
+    [
+        random-integer , integer>x-throw nth-rand ,
+    ] [ ] make interp-compile-check-catch ;
+: test-ratio>x-throws ( -- )
+    [
+        random-ratio , ratio>x-throw nth-rand ,
+    ] [ ] make interp-compile-check-catch ;
+: test-float>x-throws ( -- )
+    [
+        random-float , float>x-throw nth-rand ,
+    ] [ ] make interp-compile-check-catch ;
+: test-complex>x-throws ( -- )
+    [
+        random-complex , complex>x-throw nth-rand ,
+    ] [ ] make interp-compile-check-catch ;
+
+: test-2integer>x-throws ( -- )
+    [
+        random-integer , random-integer , math-throw-2 nth-rand ,
+    ] [ ] make interp-compile-check-catch ;
 
 ! 1-arg tests
 : test-integer>x ( -- )
