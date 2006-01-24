@@ -149,6 +149,9 @@ M: html-stream stream-format ( str style stream -- )
         ] object-link-tag
     ] with-stream* ;
 
+: with-html-stream ( quot -- )
+    stdio get <html-stream> swap with-stream* ;
+
 : html-outliner ( caption contents -- )
     <table "display: inline; " =style table>
         <tr>
@@ -182,9 +185,6 @@ M: html-stream with-nested-stream ( quot style stream -- )
     ] with-stream* ;
 
 M: html-stream stream-terpri [ <br/> ] with-stream* ;
-
-: with-html-stream ( quot -- )
-    stdio get <html-stream> swap with-stream* ;
 
 : default-css ( -- )
   <style>
