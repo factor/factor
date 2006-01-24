@@ -150,7 +150,7 @@ M: html-stream stream-format ( str style stream -- )
     ] with-stream* ;
 
 : html-outliner ( caption contents -- )
-    <table>
+    <table "display: inline; " =style table>
         <tr>
             <td>
                 get-random-id dup >r swap [
