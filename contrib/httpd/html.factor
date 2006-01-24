@@ -153,8 +153,8 @@ M: html-stream stream-format ( str style stream -- )
     <table>
         <tr>
             <td>
-                "replaceme" swap [
-                    [ with-html-stream ] show-final
+                get-random-id dup >r swap [
+                    with-html-stream
                 ] curry "+" live-anchor
             </td>
             <td>
@@ -163,7 +163,7 @@ M: html-stream stream-format ( str style stream -- )
         </tr>
         <tr>
             <td> </td>
-            <td> <div "replaceme" =id div> </div>
+            <td r> =id td> </td>
         </tr>
     </table> ;
 
@@ -194,7 +194,12 @@ M: html-stream stream-terpri [ <br/> ] with-stream* ;
     "A:hover, A:hover { text-decoration: none; color: black; }" print
   </style> ;
 
+: xhtml-preamble
+    "<?xml version=\"1.0\" encoding=\"iso-8859-1\"?>" print
+    "<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Strict//EN\" \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd\">" print ;
+
 : html-document ( title quot -- )
+    xhtml-preamble
     swap chars>entities dup
     <html>
         <head>

@@ -434,6 +434,10 @@ sequences strings vectors words prettyprint ;
 \ alien-float t "flushable" set-word-prop
 
 \ set-alien-float [ [ float c-ptr integer ] [ ] ] "infer-effect" set-word-prop
+\ alien-float [ [ c-ptr integer ] [ float ] ] "infer-effect" set-word-prop
+\ alien-float t "flushable" set-word-prop
+
+\ set-alien-double [ [ float c-ptr integer ] [ ] ] "infer-effect" set-word-prop
 \ alien-double [ [ c-ptr integer ] [ float ] ] "infer-effect" set-word-prop
 \ alien-double t "flushable" set-word-prop
 

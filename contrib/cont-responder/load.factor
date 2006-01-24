@@ -9,7 +9,6 @@ USING: words kernel parser sequences io compiler ;
     "cont-numbers-game"
     "todo"
     "todo-example"
-    "live-updater"
     "eval-responder"
     "live-updater-responder"
     "cont-testing"

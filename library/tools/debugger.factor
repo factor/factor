@@ -100,8 +100,10 @@ M: object error. ( error -- ) . ;
     error-continuation get continuation-name hash-stack ;
 
 : debug-help ( -- )
-    ":s :r show stacks at time of error." print
-    ":get ( var -- value ) inspects the error namestack." print
+    ":s :r show stacks at time of error" print
+    ":get ( var -- value ) accesses variables at time of error" print
+    ":error starts the inspector with the error" print
+    ":cc starts the inspector with the error continuation" print
     flush ;
 
 : flush-error-handler ( -- )

@@ -44,3 +44,9 @@ SYMBOL: inspector-stack
 : go ( n -- ) inspector-slots get nth (inspect) ;
 
 : up ( -- ) inspector-stack get dup pop* pop (inspect) ;
+
+! Another feature.
+IN: errors
+
+: :error ( -- ) error get inspect ;
+: :cc ( -- ) error-continuation get inspect ;

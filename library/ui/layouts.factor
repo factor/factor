@@ -60,8 +60,7 @@ DEFER: layout
 
 TUPLE: pack align fill gap ;
 
-: pref-dims ( gadget -- list )
-    gadget-children [ pref-dim ] map ;
+: pref-dims ( gadget -- list ) [ pref-dim ] map ;
 
 : orient ( gadget seq1 seq2 -- seq )
     >r >r gadget-orientation r> r> [ pick set-axis ] 2map nip ;
@@ -105,15 +104,18 @@ C: pack ( vector -- pack )
 
 : <shelf> ( -- pack ) { 1 0 0 } <pack> ;
 
-M: pack pref-dim ( pack -- dim )
+: pack-pref-dim ( children gadget -- dim )
     [
-        [
-            pref-dims [ max-dim ] keep
-            [ { 0 0 0 } [ v+ ] reduce ] keep length 1 - 0 max
-        ] keep pack-gap n*v v+
+        >r [ max-dim ] keep
+        [ { 0 0 0 } [ v+ ] reduce ] keep length 1 - 0 max
+        r> pack-gap n*v v+
     ] keep gadget-orientation set-axis ;
 
-M: pack layout* ( pack -- ) dup pref-dims packed-layout ;
+M: pack pref-dim ( pack -- dim )
+    [ gadget-children pref-dims ] keep pack-pref-dim ;
+
+M: pack layout* ( pack -- )
+    dup gadget-children pref-dims packed-layout ;
 
 : fast-children-on ( dim axis gadgets -- i )
     swapd [ rect-loc origin get v+ v- over v. ] binsearch nip ;

@@ -42,14 +42,14 @@ memory namespaces prettyprint sequences words xml ;
 : vocab-list ( vocab -- )
     #! Write out the HTML for the list of vocabularies. Make the currently 
     #! selected vocab be 'vocab'.
-    <select "vocab" =name "width: 200" =style "20" =size "document.forms.main.submit()" =onchange select> 
+    <select "vocab" =name "width: 200px; " =style "20" =size "document.forms.main.submit()" =onchange select> 
         vocabs [ over swap option ] each drop
     </select> ;
 
 : word-list ( vocab word -- )
     #! Write out the HTML for the list of words in a vocabulary. Make the 'word' item
     #! the currently selected option.
-    <select "word" =name "width: 200" =style "20" =size "document.forms.main.submit()" =onchange select> 
+    <select "word" =name "width: 200px; " =style "20" =size "document.forms.main.submit()" =onchange select> 
         swap words natural-sort
         [ word-name over swap option ] each drop
     </select> ;
@@ -67,8 +67,8 @@ memory namespaces prettyprint sequences words xml ;
             <th> "Documentation" write </th>
         </tr>
         <tr>    
-            <td "top" =valign "width: 200" =style td> over vocab-list </td> 
-            <td "top" =valign "width: 200" =style td> 2dup word-list </td> 
+            <td "top" =valign "width: 200px;" =style td> over vocab-list </td> 
+            <td "top" =valign "width: 200px;" =style td> 2dup word-list </td> 
             <td "top" =valign td> word-source </td> 
         </tr>
     </table> ;

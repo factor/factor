@@ -114,6 +114,8 @@ SYMBOL: html
 
 : do-foo> write-attributes n> drop ">" write-html ;
 
+: do-foo/> write-attributes n> drop "/>" write-html ;
+
 : def-for-html-word-foo> ( name -- )
     #! Return the name and code for the foo> patterned
     #! word.
@@ -128,17 +130,19 @@ SYMBOL: html
 
 : <foo/> [ "<" % % "/>" % ] "" make ;
 
+: do-<foo/> <foo/> write-html ;
+
 : def-for-html-word-<foo/> ( name -- )
     #! Return the name and code for the <foo/> patterned
     #! word.
-    dup <foo/> swap [ do-<foo> ] cons html-word drop ;
+    dup <foo/> swap [ do-<foo/> ] cons html-word drop ;
 
 : foo/> "/>" append ;
 
 : def-for-html-word-foo/> ( name -- )
     #! Return the name and code for the foo/> patterned
     #! word.    
-    foo/> [ do-foo> ] html-word define-close ;
+    foo/> [ do-foo/> ] html-word define-close ;
 
 : define-closed-html-word ( name -- ) 
     #! Given an HTML tag name, define the words for

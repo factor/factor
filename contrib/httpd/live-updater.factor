@@ -1,50 +1,21 @@
 ! Copyright (C) 2004 Chris Double.
-! 
-! Redistribution and use in source and binary forms, with or without
-! modification, are permitted provided that the following conditions are met:
-! 
-! 1. Redistributions of source code must retain the above copyright notice,
-!    this list of conditions and the following disclaimer.
-! 
-! 2. Redistributions in binary form must reproduce the above copyright notice,
-!    this list of conditions and the following disclaimer in the documentation
-!    and/or other materials provided with the distribution.
-! 
-! THIS SOFTWARE IS PROVIDED ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES,
-! INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND
-! FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
-! DEVELOPERS AND CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
-! SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
-! PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS;
-! OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
-! WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
-! OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
-! ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+! See http://factorcode.org/license.txt for BSD license.
 !
-! cont-responder code for display forms and anchors that use XMLHttpRequest
-! and the 'liveUpdater.js' code.
+! cont-responder code for display forms and anchors that use
+! XMLHttpRequest and the 'liveUpdater.js' code.
 IN: live-updater
-USING: kernel io strings html cont-responder namespaces lists ;
-
-: get-live-updater-js* ( stream -- string )
-  #! Read all lines from the stream, creating a string of the result.
-  dup stream-readln dup [ % "\n" % get-live-updater-js* ] [ drop stream-close ] if ;
+USING: cont-responder html io kernel lists namespaces strings
+xml ;
 
 : get-live-updater-js ( filename -- string )
   #! Return the liveUpdater javascript code as a string.
   "/contrib/httpd/liveUpdater.js" <resource-stream> contents ;
 
-: live-updater-url ( -- url )
-  #! Generate an URL to the liveUpdater.js code.
-  t [
-    [ get-live-updater-js write ] show        
-  ] register-continuation id>url ;
-
 : include-live-updater-js ( -- )
   #! Write out the HTML script to include the live updater
   #! javascript code.
-  <script "JavaScript" =language live-updater-url =src script> 
-    "" write
+  <script "JavaScript" =language script>
+    get-live-updater-js write-html
   </script> ;
 
 : write-live-anchor-tag ( text -- id )
@@ -53,9 +24,7 @@ USING: kernel io strings html cont-responder namespaces lists ;
   #! an onclick is set via DHTML later to make it run a
   #! quotation on the server. The randomly generated id
   #! for the anchor is returned.
-  <a get-random-id dup =id "#" =href a>  
-    swap write
-  </a> ;  
+  <a get-random-id dup =id "#" =href a> swap write </a> ;  
 
 : register-live-anchor-quot ( div-id div-quot -- kid )
   #! Register the 'quot' with the cont-responder so
@@ -68,7 +37,7 @@ USING: kernel io strings html cont-responder namespaces lists ;
     "div-id" set
   ] make-hash [ 
     [
-      t "disable-initial-redirect?" set
+      "disable-initial-redirect?" on
       [ 
         <div "div-id" get =id div> "div-quot" get call </div>    
       ] show 
@@ -84,11 +53,11 @@ USING: kernel io strings html cont-responder namespaces lists ;
   #! replace whatever HTML DOM object currently has that same
   #! id.
   <script "JavaScript" =language script> 
-    "document.getElementById('" write
-    write
-    "').onclick=liveUpdaterUri('" write
-    register-live-anchor-quot id>url write
-    "');" write
+    "document.getElementById('" write-html
+    write-html
+    "').onclick=liveUpdaterUri('" write-html
+    register-live-anchor-quot id>url write-html
+    "');" write-html
   </script> ;
   
 : live-anchor ( id quot text -- )
@@ -120,7 +89,7 @@ USING: kernel io strings html cont-responder namespaces lists ;
     "div-id" set
   ] make-hash [ 
     [
-      t "disable-initial-redirect?" set
+      "disable-initial-redirect?" on
       #! Retrieve the search query value from the POST parameters.
       [ "s" get ] bind
       [ 

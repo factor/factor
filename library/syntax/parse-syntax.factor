@@ -66,4 +66,4 @@ DEFER: PRIMITIVE: parsing
     scan-word [ create-constructor ] keep
     [ define-constructor ] [ ] ; parsing
 
-: FORGET: scan use get hash-stack [ forget ] when* ; parsing
+: FORGET: scan use get hash [ forget ] when* ; parsing

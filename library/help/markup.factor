@@ -29,7 +29,7 @@ M: word print-element { } swap execute ;
     last-block off [ print-element ] with-style ;
 
 : ($block) ( quot -- )
-    last-block [ [ terpri ] unless f ] change
+    last-block [ [ terpri ] unless t ] change
     call
     terpri
     last-block on ; inline

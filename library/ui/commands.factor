@@ -67,6 +67,7 @@ M: command-button gadget-help ( button -- string )
     command-button-object dup word? [ synopsis ] [ summary ] if ;
 
 "Describe object" [ drop t ] [ describe ] \ in-browser define-default-command
+"Inspect object" [ drop t ] [ inspect ] \ in-listener define-command
 "Describe commands" [ drop t ] [ applicable describe ] \ in-browser define-command
 "Prettyprint" [ drop t ] [ . ] \ in-listener define-command
 "Push on data stack" [ drop t ] [ ] \ in-listener define-command

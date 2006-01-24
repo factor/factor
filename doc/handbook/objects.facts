@@ -61,7 +61,7 @@ ARTICLE: "method-combination" "Method combination"
     "which stack item(s) the generic word dispatches upon,"
     "which methods out of the set of applicable methods are called"
 }
-"The " { $link POSTPONE: GENERIC: } " parsing word creates a generic word using the " { $emphasis "simple method combination." } ". Most generic words that come up in practice use this method combination:"
+"The " { $link POSTPONE: GENERIC: } " parsing word creates a generic word using the " { $emphasis "simple method combination" } ". Most generic words that come up in practice use this method combination:"
 { $subsection simple-combination }
 "The " { $link POSTPONE: G: } " parsing word allows a different method combination to be specified:"
 { $subsection POSTPONE: G: }
