@@ -203,7 +203,7 @@ SYMBOL: last
     2dup swap unparse write " " write unparse print
     = [ "problem in math" throw ] unless ;
 
-: interp-compile-check-1 ( quot -- )
+: interp-compile-check-1 ( x quot -- )
     dup . 
     [ last set ] keep
     [ call ] 2keep compile-1
