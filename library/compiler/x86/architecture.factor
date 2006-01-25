@@ -27,9 +27,9 @@ kernel-internals sequences ;
 
 ! On x86, parameters are never passed in registers.
 M: int-regs return-reg drop EAX ;
-M: int-regs fastcall-regs drop 0 ;
+M: int-regs fastcall-regs drop { } ;
 
-M: float-regs fastcall-regs drop 0 ;
+M: float-regs fastcall-regs drop { } ;
 
 : dual-fp/int-regs? f ;
 

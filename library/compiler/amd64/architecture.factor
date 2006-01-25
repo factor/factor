@@ -19,19 +19,22 @@ kernel-internals math sequences ;
 
 : vregs { RAX RCX RDX RSI RDI R8 R9 R10 R11 } ; inline
 
-: param-regs { RDI RSI RDX RCX R8 R9 } ; inline
+M: int-regs return-reg drop RAX ;
+
+M: int-regs fastcall-regs drop { RDI RSI RDX RCX R8 R9 } ;
 
 : compile-c-call ( symbol dll -- )
     2dup dlsym 0 scratch swap MOV
     rel-absolute-cell rel-dlsym 0 scratch CALL ;
 
-: compile-c-call* ( symbol dll -- operands )
-    param-regs swap [ MOV ] 2each compile-c-call ;
+: compile-c-call* ( symbol dll args -- )
+    T{ int-regs } fastcall-regs
+    swap [ MOV ] 2each compile-c-call ;
 
-M: int-regs return-reg drop RAX ;
-M: int-regs fastcall-regs drop param-regs length ;
+M: float-regs return-reg drop XMM0 ;
 
-M: float-regs fastcall-regs drop 0 ;
+M: float-regs fastcall-regs
+    drop { XMM0 XMM1 XMM2 XMM3 XMM4 XMM5 XMM6 XMM7 } ;
 
 : dual-fp/int-regs? f ;
 

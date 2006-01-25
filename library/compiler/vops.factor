@@ -27,7 +27,7 @@ TUPLE: float-regs size ;
 
 GENERIC: return-reg ( register-class -- reg )
 
-GENERIC: fastcall-regs ( register-class -- n )
+GENERIC: fastcall-regs ( register-class -- regs )
 
 GENERIC: reg-size ( register-class -- n )
 

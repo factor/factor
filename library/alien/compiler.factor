@@ -71,7 +71,7 @@ C: alien-node make-node ;
     [ [ c-aligned - dup ] keep unbox-parameter , ] each drop ;
 
 : reg-class-full? ( class -- ? )
-    dup class get swap fastcall-regs >= ;
+    dup class get swap fastcall-regs length >= ;
 
 : spill-param ( reg-class -- n reg-class )
     reg-size stack-params [ tuck + ] change

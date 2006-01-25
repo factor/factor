@@ -50,6 +50,15 @@ SYMBOL: EBP \ EBP 5 32 define-register
 SYMBOL: ESI \ ESI 6 32 define-register
 SYMBOL: EDI \ EDI 7 32 define-register
 
+SYMBOL: XMM0
+SYMBOL: XMM1
+SYMBOL: XMM2
+SYMBOL: XMM3
+SYMBOL: XMM4
+SYMBOL: XMM5
+SYMBOL: XMM6
+SYMBOL: XMM7
+
 PREDICATE: word register "register" word-prop ;
 
 PREDICATE: register register-32 "register-size" word-prop 32 = ;
@@ -267,3 +276,8 @@ M: operand CMP OCT: 071 2-operand ;
 : (FSTP) BIN: 100 f HEX: 1c 1-operand ;
 : FSTPS ( operand -- ) HEX: d9 assemble-1 (FSTP) ;
 : FSTPL ( operand -- ) HEX: dd assemble-1 (FSTP) ;
+
+( SSE multimedia instructions )
+
+: MOVLPD ( dest src -- ) 2drop ;
+: MOVSS ( dest src -- ) 2drop ;

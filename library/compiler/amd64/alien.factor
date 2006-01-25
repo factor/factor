@@ -14,7 +14,15 @@ M: int-regs store-insn
     drop stack@ RAX MOV ;
 
 M: int-regs load-insn
-    drop param-regs nth swap stack@ MOV ;
+    fastcall-regs nth swap stack@ MOV ;
+
+: MOVSS/LPD float-regs-size 4 = [ MOVSS ] [ MOVLPD ] if ;
+
+M: float-regs store-insn
+    >r stack@ XMM0 r> MOVSS/LPD ;
+
+M: float-regs load-insn
+    [ fastcall-regs nth swap stack@ ] keep MOVSS/LPD ;
 
 M: %unbox generate-node ( vop -- )
     drop
@@ -27,10 +35,11 @@ M: %parameter generate-node ( vop -- )
     ! Move a value from the C stack into the fastcall register
     drop 0 input 1 input 2 input load-insn ;
 
+: load-return-value ( reg-class -- )
+    dup fastcall-regs first swap return-reg
+    2dup eq? [ 2drop ] [ MOV ] if ;
+
 M: %box generate-node ( vop -- )
-    drop
-    ! Move return value of C function into input register
-    param-regs first RAX MOV
-    0 input f compile-c-call ;
+    drop 1 input load-return-value 0 input f compile-c-call ;
 
 M: %cleanup generate-node ( vop -- ) drop ;
