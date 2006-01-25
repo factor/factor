@@ -24,6 +24,8 @@ M: float-regs store-insn
 M: float-regs load-insn
     [ fastcall-regs nth swap stack@ ] keep MOVSS/LPD ;
 
+M: stack-params load-insn 3drop ;
+
 M: %unbox generate-node ( vop -- )
     drop
     ! Call the unboxer

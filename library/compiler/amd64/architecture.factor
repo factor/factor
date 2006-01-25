@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 IN: compiler-backend
 USING: alien arrays assembler compiler compiler-backend kernel
-kernel-internals math sequences ;
+kernel-internals math namespaces sequences ;
 
 ! AMD64 register assignments
 ! RAX RCX RDX RSI RDI R8 R9 R10 R11 vregs
@@ -53,3 +53,8 @@ M: float-regs fastcall-regs
     #! We use RIP-relative addressing. The '3' is a hardcoded
     #! instruction length.
     add-literal from 3 - 1array MOV ; inline
+
+: stack-increment \ stack-reserve get 16 align 8 + ;
+
+: compile-epilogue ( -- )
+    RSP stack-increment ADD ; inline

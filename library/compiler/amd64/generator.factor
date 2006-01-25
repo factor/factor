@@ -3,10 +3,5 @@
 IN: compiler-backend
 USING: assembler kernel math namespaces ;
 
-: stack-increment \ stack-reserve get 16 align 8 + ;
-
 M: %prologue generate-node ( vop -- )
     drop RSP stack-increment SUB ;
-
-: compile-epilogue ( -- )
-    RSP stack-increment ADD ; inline

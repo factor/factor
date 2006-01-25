@@ -21,3 +21,9 @@ FUNCTION: double ffi_test_5 ; compiled
 FUNCTION: double ffi_test_6 float x float y ; compiled
 [ 6.0 ] [ 3.0 2.0 ffi_test_6 ] unit-test
 
+FUNCTION: double ffi_test_7 double x double y ; compiled
+[ 6.0 ] [ 3.0 2.0 ffi_test_7 ] unit-test
+
+FUNCTION: double ffi_test_8 double x float y double z float t int w ; compiled
+[ 19.0 ] [ 3.0 2.0 1.0 6.0 7 ffi_test_8 ] unit-test
+

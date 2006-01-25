@@ -19,3 +19,12 @@ SYMBOL: R12 \ R12 12 64 define-register
 SYMBOL: R13 \ R13 13 64 define-register
 SYMBOL: R14 \ R14 14 64 define-register
 SYMBOL: R15 \ R15 15 64 define-register
+
+SYMBOL: XMM8 \ XMM8 8 128 define-register
+SYMBOL: XMM9 \ XMM9 9 128 define-register
+SYMBOL: XMM10 \ XMM10 10 128 define-register
+SYMBOL: XMM11 \ XMM11 11 128 define-register
+SYMBOL: XMM12 \ XMM12 12 128 define-register
+SYMBOL: XMM13 \ XMM13 13 128 define-register
+SYMBOL: XMM14 \ XMM14 14 128 define-register
+SYMBOL: XMM15 \ XMM15 15 128 define-register

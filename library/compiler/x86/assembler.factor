@@ -50,19 +50,20 @@ SYMBOL: EBP \ EBP 5 32 define-register
 SYMBOL: ESI \ ESI 6 32 define-register
 SYMBOL: EDI \ EDI 7 32 define-register
 
-SYMBOL: XMM0
-SYMBOL: XMM1
-SYMBOL: XMM2
-SYMBOL: XMM3
-SYMBOL: XMM4
-SYMBOL: XMM5
-SYMBOL: XMM6
-SYMBOL: XMM7
+SYMBOL: XMM0 \ XMM0 0 128 define-register
+SYMBOL: XMM1 \ XMM1 1 128 define-register
+SYMBOL: XMM2 \ XMM2 2 128 define-register
+SYMBOL: XMM3 \ XMM3 3 128 define-register
+SYMBOL: XMM4 \ XMM4 4 128 define-register
+SYMBOL: XMM5 \ XMM5 5 128 define-register
+SYMBOL: XMM6 \ XMM6 6 128 define-register
+SYMBOL: XMM7 \ XMM7 7 128 define-register
 
 PREDICATE: word register "register" word-prop ;
 
 PREDICATE: register register-32 "register-size" word-prop 32 = ;
 PREDICATE: register register-64 "register-size" word-prop 64 = ;
+PREDICATE: register register-128 "register-size" word-prop 128 = ;
 
 M: register modifier drop BIN: 11 ;
 M: register register "register" word-prop 7 bitand ;
@@ -279,5 +280,13 @@ M: operand CMP OCT: 071 2-operand ;
 
 ( SSE multimedia instructions )
 
-: MOVLPD ( dest src -- ) 2drop ;
-: MOVSS ( dest src -- ) 2drop ;
+: 2-operand-sse ( dst src op1 op2 -- )
+    pick register-128? [ nip ] [ drop swapd ] if
+    >r 2dup t rex-prefix HEX: 0f assemble-1 r>
+    assemble-1 register mod-r/m ;
+
+: MOVLPD ( dest src -- )
+    HEX: 66 assemble-1 HEX: 12 HEX: 13 2-operand-sse ;
+
+: MOVSS ( dest src -- )
+    HEX: f3 assemble-1 HEX: 10 HEX: 11 2-operand-sse ;

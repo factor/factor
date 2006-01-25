@@ -43,7 +43,14 @@ double ffi_test_6(float x, float y)
 	return x * y;
 }
 
-double ffi_test_7(void)
+double ffi_test_7(double x, double y)
 {
-	return 1.5;
+	printf("ffi_test_7(%f,%f)\n",x,y);
+	return x * y;
+}
+
+double ffi_test_8(double x, float y, double z, float t, int w)
+{
+	printf("ffi_test_8(%f,%f,%f,%f,%d)\n",x,y,z,t,w);
+	return x * y + z * t + w;
 }
