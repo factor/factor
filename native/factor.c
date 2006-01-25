@@ -40,12 +40,12 @@ INLINE bool factor_arg(const char* str, const char* arg, CELL* value)
 int main(int argc, char** argv)
 {
 	char *image;
-	CELL ds_size = 2048;
-	CELL cs_size = 2048;
+	CELL ds_size = 512;
+	CELL cs_size = 512;
 	CELL generations = 2;
-	CELL young_size = 8;
-	CELL aging_size = 16;
-	CELL code_size = 4;
+	CELL young_size = 2 * CELLS;
+	CELL aging_size = 4 * CELLS;
+	CELL code_size = CELLS;
 	CELL literal_size = 128;
 	CELL args;
 	CELL i;
