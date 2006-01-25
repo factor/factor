@@ -17,3 +17,9 @@ int ffi_test_2(int x, int y)
 	printf("ffi_test_2(%d,%d)\n",x,y);
 	return x + y;
 }
+
+int ffi_test_3(int x, int y, int z, int t)
+{
+	printf("ffi_test_3(%d,%d,%d,%d)\n",x,y,z,t);
+	return x + y + z * t;
+}

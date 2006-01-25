@@ -1,3 +1,5 @@
+! Copyright (C) 2005, 2006 Slava Pestov.
+! See http://factorcode.org/license.txt for BSD license.
 IN: compiler-backend
 USING: alien arrays assembler compiler compiler-backend kernel
 kernel-internals math sequences ;
@@ -43,10 +45,6 @@ M: float-regs fastcall-regs drop 0 ;
 : fixnum>slot@ drop ; inline
 
 : prepare-division CQO ; inline
-
-: compile-prologue RSP 8 SUB ; inline
-
-: compile-epilogue RSP 8 ADD ; inline
 
 : load-indirect ( dest literal -- )
     #! We use RIP-relative addressing. The '3' is a hardcoded

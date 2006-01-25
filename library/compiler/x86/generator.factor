@@ -5,8 +5,7 @@ USING: alien arrays assembler compiler inference kernel
 kernel-internals lists math memory namespaces sequences words ;
 
 ! Not used on x86
-M: %prologue generate-node ( vop -- ) 
-    drop compile-prologue ;
+M: %prologue generate-node ( vop -- )  drop ;
 
 : (%call)
     label dup postpone-word
