@@ -1,6 +1,7 @@
 IN: infix
-USING: sequences kernel io math strings combinators namespaces prettyprint
-       errors parser generic lists kernel-internals hashtables words vectors ;
+USING: arrays errors generic hashtables io kernel kernel-internals lists math math-contrib namespaces parser parser-combinators prettyprint sequences strings vectors words ;
+
+: 2list ( x y -- [ x y ] ) f cons cons ;
 
 ! Tokenizer
 
@@ -135,10 +136,10 @@ M: tok parse-token
             binary-op
         ] [
             unary-op
-        ] ifte
+        ] if
     ] [
         null-op
-    ] ifte f ;
+    ] if f ;
 
 ( ast tokens token -- ast tokens )
 
@@ -151,7 +152,7 @@ M: symbol parse-token ! apostrophe
         unswons parse-token (parse-tokens)
     ] [
         drop
-    ] ifte ;
+    ] if ;
 
 : parse-tokens ( tokens -- ast )
     #! Convert a list of tokens into an AST
@@ -171,7 +172,7 @@ M: string compile-ast ! variables
         "Variable not found" throw
     ] [
         [ swap array-nth ] cons
-    ] ifte ;
+    ] if ;
 
 : replace-with ( data -- [ drop data ] )
     \ drop swap 2list ;
@@ -195,7 +196,7 @@ M: vector compile-ast ! literal vectors
         replace-with nip
     ] [
         [ , ] accumulator [ { } make nip ] cons
-    ] ifte ;
+    ] if ;
 
 : infix-relation
     #! Wraps operators like = and > so that if they're given
@@ -209,7 +210,7 @@ M: vector compile-ast ! literal vectors
         dupd r> call [
             drop f
         ] unless
-    ] ifte ;
+    ] if ;
 
 : functions
     #! Regular functions
@@ -256,7 +257,7 @@ M: vector compile-ast ! literal vectors
         uncons drc cons
     ] [
         drop f
-    ] ifte ;
+    ] if ;
 
 : map-with-left ( seq object quot -- seq )
     [ swapd call ] cons swapd map-with ; inline
@@ -280,7 +281,7 @@ M: vector compile-ast ! literal vectors
     #! like hash but throws exception if f
     dupd hash [ nip ] [
         [ "Key not found " write . ] string-out throw
-    ] ifte* ;
+    ] if* ;
 
 : >apply< ( apply -- func args )
     dup apply-func swap apply-args ;
@@ -291,7 +292,7 @@ M: vector compile-ast ! literal vectors
     ] [
         >apply< car >r over r> make-apply
         -rot swons high-functions get-hash cons
-    ] ifte ;
+    ] if ;
 
 : get-function ( apply -- quot )
     >apply< length swap make-apply ;
