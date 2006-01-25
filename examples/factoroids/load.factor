@@ -1,4 +1,4 @@
-USING: io parser ;
+USING: kernel io parser sequences ;
 
 {
     "utils"
