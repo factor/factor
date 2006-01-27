@@ -45,7 +45,7 @@ USING: errors kernel sequences math sequences-internals namespaces arrays ;
 
 : minmax ( seq -- min max )
     #! find the min and max of a seq in one pass
-    inf -inf rot [ dup pick max -rot nip pick min -rot nip ] each ;
+    1./0. -1./0. rot [ dup pick max -rot nip pick min -rot nip ] each ;
 
 : absminmax ( seq -- min max )
     #! find the absolute values of the min and max of a seq in one pass

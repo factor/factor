@@ -41,7 +41,7 @@ IN: math-contrib
     #! gamma(x) = integral 0..inf [ t^(x-1) exp(-t) ] dt
     #! gamma(n+1) = n! for n > 0
     dup Z:(-inf,0]? [
-            drop inf
+            drop 1./0.
         ] [
             dup abs gamma-lanczos6 swap dup 0 > [ drop ] [ gamma-neg ] if
     ] if ;
@@ -50,7 +50,7 @@ IN: math-contrib
     #! gammaln(x) is an alternative when gamma(x)'s range
     #! varies too widely
     dup 0 < [
-            drop inf
+            drop 1./0.
         ] [
             dup abs gammaln-lanczos6 swap dup 0 > [ drop ] [ gamma-neg ] if
     ] if ;
