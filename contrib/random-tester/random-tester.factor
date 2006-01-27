@@ -244,7 +244,7 @@ SYMBOL: last
 
 : test-2integer>x-throws ( -- )
     [
-        random-integer , random-integer , math-throw-2 nth-rand ,
+        random-integer dup . , random-integer dup . , math-throw-2 nth-rand dup . ,
     ] [ ] make interp-compile-check-catch ;
 
 ! 1-arg tests

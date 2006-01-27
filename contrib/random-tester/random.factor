@@ -34,7 +34,7 @@ SYMBOL: special-integers
 { } make \ special-integers set
 : special-integers ( -- seq ) \ special-integers get ;
 SYMBOL: special-floats
-[ { 0.0 } % e , pi , inf , -inf , 0/0. , epsilon , epsilon neg , ]
+[ { 0.0 } % e , pi , 1./0. , -1./0. , 0./0. , epsilon , epsilon neg , ]
 { } make \ special-floats set
 : special-floats ( -- seq ) \ special-floats get ;
 SYMBOL: special-complexes
