@@ -48,7 +48,6 @@ M: incremental pref-dim* ( incremental -- dim )
     prefer-incremental ;
 
 : clear-incremental ( incremental -- )
-    dup (clear-gadget)
+    dup (clear-gadget) dup forget-pref-dim
     { 0 0 0 } over set-incremental-cursor
-    dup forget-pref-dim
     gadget-parent [ relayout ] when* ;
