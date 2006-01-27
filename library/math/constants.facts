@@ -14,12 +14,6 @@ HELP: i "( -- i )"
 HELP: -i "( -- -i )"
 { $values { "i" "the negated imaginary unit" } } ;
 
-HELP: inf "( -- inf )"
-{ $values { "inf" "floating point positive infinity" } } ;
-
-HELP: -inf "( -- -inf )"
-{ $values { "-inf" "floating point negative infinity" } } ;
-
 HELP: e "( -- e )"
 { $values { "e" "base of natural logarithm" } } ;
 

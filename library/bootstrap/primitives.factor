@@ -1,5 +1,5 @@
-! Copyright (C) 2004, 2005 Slava Pestov.
-! See http://factor.sf.net/license.txt for BSD license.
+! Copyright (C) 2004, 2006 Slava Pestov.
+! See http://factorcode.org/license.txt for BSD license.
 IN: image
 USING: alien arrays generic hashtables help io kernel
 kernel-internals lists math namespaces parser sequences strings
@@ -90,11 +90,11 @@ call
     { "bignum<=" "math-internals"           }
     { "bignum>" "math-internals"            }
     { "bignum>=" "math-internals"           }
-    { "float=" "math-internals"             }
     { "float+" "math-internals"             }
     { "float-" "math-internals"             }
     { "float*" "math-internals"             }
     { "float/f" "math-internals"            }
+    { "float-mod" "math-internals"          }
     { "float<" "math-internals"             }
     { "float<=" "math-internals"            }
     { "float>" "math-internals"             }
@@ -297,7 +297,7 @@ num-types f <array> builtins set
 {
     { 1 { "hash-count" "hashtables" } { "set-hash-count" "hashtables-internals" } }
     { 2 { "hash-deleted" "hashtables" } { "set-hash-deleted" "hashtables-internals" } }
-    { 3 { "underlying" "sequences-internals" } { "set-underlying" "sequences-internals" } }
+    { 3 { "hash-array" "hashtables-internals" } { "set-hash-array" "hashtables-internals" } }
 } define-builtin
 
 "vector?" "vectors" create t "inline" set-word-prop

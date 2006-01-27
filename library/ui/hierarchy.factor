@@ -1,5 +1,5 @@
-! Copyright (C) 2005 Slava Pestov.
-! See http://factor.sf.net/license.txt for BSD license.
+! Copyright (C) 2005, 2006 Slava Pestov.
+! See http://factorcode.org/license.txt for BSD license.
 IN: gadgets
 USING: gadgets-layouts generic hashtables kernel lists math
 namespaces sequences vectors ;
@@ -11,6 +11,7 @@ namespaces sequences vectors ;
 
 : unparent ( gadget -- )
     [
+        dup forget-pref-dim
         dup gadget-parent dup
         [ 2dup remove-gadget ] when 2drop
     ] when* ;

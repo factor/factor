@@ -1,7 +1,7 @@
 ! Copyright (C) 2005 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 IN: hashtables-internals
-USING: arrays hashtables kernel math sequences
+USING: arrays hashtables kernel kernel-internals math sequences
 sequences-internals ;
 
 TUPLE: tombstone ;
@@ -21,7 +21,7 @@ TUPLE: tombstone ;
         { [ t ] [ probe (key@) ] }
     } cond ;
 
-: key@ ( key hash -- n ) underlying 2dup hash@ (key@) ;
+: key@ ( key hash -- n ) hash-array 2dup hash@ (key@) ;
 
 : if-key ( key hash true false -- | true: index key hash -- )
     >r >r [ key@ ] 2keep pick -1 > r> r> if ; inline
@@ -29,7 +29,7 @@ TUPLE: tombstone ;
 : <hash-array> ( n -- array ) 1+ 4 * ((empty)) <array> ;
 
 : reset-hash ( n hash -- )
-    swap <hash-array> over set-underlying
+    swap <hash-array> over set-hash-array
     0 over set-hash-count 0 swap set-hash-deleted ;
 
 : (new-key@) ( key keys i -- n )
@@ -40,7 +40,7 @@ TUPLE: tombstone ;
     ] if ;
 
 : new-key@ ( key hash -- n )
-    underlying 2dup hash@ (new-key@) ;
+    hash-array 2dup hash@ (new-key@) ;
 
 : nth-pair ( n seq -- key value )
     [ nth-unsafe ] 2keep >r 1+ r> nth-unsafe ;
@@ -63,8 +63,8 @@ TUPLE: tombstone ;
 
 : (set-hash) ( value key hash -- )
     2dup new-key@ swap
-    [ underlying 2dup nth-unsafe ] keep
-    ( value key n underlying old hash )
+    [ hash-array 2dup nth-unsafe ] keep
+    ( value key n hash-array old hash )
     swap change-size set-nth-pair ;
 
 : (each-pair) ( quot array i -- | quot: k v -- )
@@ -96,7 +96,7 @@ TUPLE: tombstone ;
     swap 0 (all-pairs?) ; inline
 
 : hash>seq ( i hash -- seq )
-    underlying dup length 2 /i
+    hash-array dup length 2 /i
     [ 2 * pick + over nth-unsafe ] map
     [ tombstone? not ] subset 2nip ;
 
@@ -107,7 +107,7 @@ IN: hashtables
 
 : hash* ( key hash -- value ? )
     [
-        nip >r 1+ r> underlying nth-unsafe t
+        nip >r 1+ r> hash-array nth-unsafe t
     ] [
         3drop f f
     ] if-key ;
@@ -124,13 +124,13 @@ IN: hashtables
     dup [ hash ] [ 2drop f ] if ;
 
 : clear-hash ( hash -- )
-    [ underlying length ] keep reset-hash ;
+    [ hash-array length ] keep reset-hash ;
 
 : remove-hash ( key hash -- )
     [
         nip
         dup hash-deleted+
-        underlying >r >r ((tombstone)) dup r> r> set-nth-pair
+        hash-array >r >r ((tombstone)) dup r> r> set-nth-pair
     ] [
         3drop
     ] if-key ;
@@ -140,12 +140,12 @@ IN: hashtables
 : hash-empty? ( hash -- ? ) hash-size 0 = ;
 
 : grow-hash ( hash -- )
-    [ dup underlying swap hash-size 1+ ] keep
+    [ dup hash-array swap hash-size 1+ ] keep
     [ reset-hash ] keep swap [ swap pick (set-hash) ] each-pair
     drop ;
 
 : ?grow-hash ( hash -- )
-    dup hash-count 3 * over underlying length >
+    dup hash-count 3 * over hash-array length >
     [ dup grow-hash ] when drop ;
 
 : set-hash ( value key hash -- )
@@ -166,14 +166,14 @@ IN: hashtables
     [ first2 swap pick (set-hash) ] each ;
 
 : hash-each ( hash quot -- | quot: k v -- )
-    >r underlying r> each-pair ; inline
+    >r hash-array r> each-pair ; inline
 
 : hash-each-with ( obj hash quot -- | quot: obj k v -- )
     swap [ 2swap [ >r -rot r> call ] 2keep ] hash-each 2drop ;
     inline
 
 : hash-all? ( hash quot -- | quot: k v -- ? )
-    >r underlying r> all-pairs? ; inline
+    >r hash-array r> all-pairs? ; inline
 
 : hash-all-with? ( obj hash quot -- | quot: obj k v -- ? )
     swap
@@ -201,7 +201,8 @@ IN: hashtables
     [ 2swap [ >r -rot r> call ] 2keep rot ] hash-subset 2nip ;
     inline
 
-M: hashtable clone ( hash -- hash ) clone-growable ;
+M: hashtable clone ( hash -- hash )
+    (clone) dup hash-array clone over set-hash-array ;
 
 : hashtable= ( hash hash -- ? )
     2dup subhash? >r swap subhash? r> and ;

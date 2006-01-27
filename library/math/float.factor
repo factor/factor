@@ -11,7 +11,7 @@ M: real absq sq ;
 M: real hashcode ( n -- n ) >fixnum ;
 M: real <=> - ;
 
-M: float number= float= ;
+M: float number= [ double>bits ] 2apply = ;
 M: float < float< ;
 M: float <= float<= ;
 M: float > float> ;
@@ -22,6 +22,7 @@ M: float - float- ;
 M: float * float* ;
 M: float / float/f ;
 M: float /f float/f ;
+M: float mod float-mod ;
 
 M: float 1+ 1.0 float+ ;
 M: float 1- 1.0 float- ;

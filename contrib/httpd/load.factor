@@ -24,3 +24,8 @@ USING: words kernel parser sequences io compiler ;
     "test/httpd"
     "test/url-encoding"
 } [ "/contrib/httpd/" swap ".factor" append3 run-resource ] each
+
+"To start the HTTP server, issue the following command in the listener:" print
+"  USE: httpd" print
+"  [ 8888 httpd ] in-thread" print
+"Replacing '8888' with whatever port number you desire." print

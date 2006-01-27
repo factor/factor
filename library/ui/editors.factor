@@ -134,7 +134,7 @@ C: editor ( text -- )
 M: editor user-input* ( ch editor -- ? )
     [ insert-char ] with-editor f ;
 
-M: editor pref-dim ( editor -- dim )
+M: editor pref-dim* ( editor -- dim )
     label-size { 1 0 0 } v+ ;
 
 M: editor layout* ( editor -- )

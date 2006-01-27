@@ -65,12 +65,6 @@ void primitive_float_to_str(void)
 	y = untag_float_fast(dpop()); \
 	x = untag_float_fast(dpop());
 
-void primitive_float_eq(void)
-{
-	GC_AND_POP_FLOATS(x,y);
-	box_boolean(x == y);
-}
-
 void primitive_float_add(void)
 {
 	GC_AND_POP_FLOATS(x,y);
@@ -93,6 +87,12 @@ void primitive_float_divfloat(void)
 {
 	GC_AND_POP_FLOATS(x,y);
 	dpush(tag_float(x / y));
+}
+
+void primitive_float_mod(void)
+{
+	GC_AND_POP_FLOATS(x,y);
+	dpush(tag_float(fmod(x,y)));
 }
 
 void primitive_float_less(void)
@@ -199,31 +199,30 @@ void primitive_fsqrt(void)
 
 void primitive_float_bits(void)
 {
-	double x = to_float(dpeek());
-	float x_ = (float)x;
-	CELL x_bits = *(CELL*)(&x_);
-	drepl(tag_cell(x_bits));
+	FLOAT_BITS b;
+	b.x = (float)to_float(dpeek());
+	drepl(tag_cell(b.y));
 }
 
 void primitive_bits_float(void)
 {
-	CELL x_ = unbox_unsigned_4();
-	float x = *(float*)(&x_);
-	dpush(tag_float(x));
+	FLOAT_BITS b;
+	b.y = unbox_unsigned_4();
+	dpush(tag_float(b.x));
 }
 
 void primitive_double_bits(void)
 {
-	double x = to_float(dpop());
-	u64 x_bits = *(u64*)(&x);
-	box_unsigned_8(x_bits);
+	DOUBLE_BITS b;
+	b.x = to_float(dpop());
+	box_unsigned_8(b.y);
 }
 
 void primitive_bits_double(void)
 {
-	u64 x_ = unbox_unsigned_8();
-	double x = *(double*)(&x_);
-	dpush(tag_float(x));
+	DOUBLE_BITS b;
+	b.y = unbox_unsigned_8();
+	dpush(tag_float(b.x));
 }
 
 #define DEFBOX(name,type)                                                      \

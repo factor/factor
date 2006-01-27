@@ -14,7 +14,7 @@ kernel-internals lists math memory namespaces sequences words ;
     0 output-operand dup r> call ; inline
 
 M: %slot generate-node ( vop -- )
-    drop cell get log2 [ 0 LWZ ] generate-slot ;
+    drop cell log2 [ 0 LWZ ] generate-slot ;
 
 M: %fast-slot generate-node ( vop -- )
     drop 0 output-operand dup 0 input LWZ ;
@@ -29,7 +29,7 @@ M: %fast-slot generate-node ( vop -- )
     0 input-operand 2 input-operand r> call ; inline
 
 M: %set-slot generate-node ( vop -- )
-    drop cell get log2 [ 0 STW ] generate-set-slot ;
+    drop cell log2 [ 0 STW ] generate-set-slot ;
 
 M: %fast-set-slot generate-node ( vop -- )
     drop 0 input-operand 1 input-operand 2 input STW ;

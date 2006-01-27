@@ -11,6 +11,8 @@ USE: hashtables
 USE: io
 USE: prettyprint
 
+[ "hi" V{ 1 2 3 } hash ] unit-test-fails
+
 [ H{ } ] [ { } [ ] map>hash ] unit-test
 
 [ ] [ 1000 [ dup sq ] map>hash "testhash" set ] unit-test

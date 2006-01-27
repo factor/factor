@@ -31,7 +31,7 @@ GENERIC: fastcall-regs ( register-class -- regs )
 
 GENERIC: reg-size ( register-class -- n )
 
-M: int-regs reg-size drop cell get ;
+M: int-regs reg-size drop cell ;
 
 M: float-regs reg-size float-regs-size ;
 

@@ -114,7 +114,7 @@ SYMBOL: @
     { { @ -1 } [ drop 0 swap - ] }
 } define-identities
 
-[ rem mod fixnum-mod bignum-mod ] {
+[ fixnum-mod bignum-mod ] {
     { { @ 1 }  [ 2drop 0 ] }
 } define-identities
 

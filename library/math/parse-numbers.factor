@@ -67,9 +67,19 @@ M: ratio >base ( num radix -- string )
         swap denominator swap >base %
     ] "" make ;
 
-M: float >base ( num radix -- string )
-    drop float>string
+: fix-float
     CHAR: . over member? [ ".0" append ] unless ;
+
+: nan? ( float -- ? )
+    double>bits -51 shift BIN: 111111111111 [ bitand ] keep = ;
+
+M: float >base ( num radix -- string )
+    drop {
+        { [ dup 1.0/0.0 = ] [ drop "1.0/0.0" ] }
+        { [ dup -1.0/0.0 = ] [ drop "-1.0/0.0" ] }
+        { [ dup nan? ] [ drop "0.0/0.0" ] }
+        { [ t ] [ float>string fix-float ] }
+    } cond ;
 
 : number>string ( num -- string ) 10 >base ;
 : >bin ( num -- string ) 2 >base ;

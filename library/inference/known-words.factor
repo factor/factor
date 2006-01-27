@@ -251,10 +251,6 @@ sequences strings vectors words prettyprint ;
 \ bignum>= t "flushable" set-word-prop
 \ bignum>= t "foldable" set-word-prop
 
-\ float= [ [ bignum bignum ] [ object ] ] "infer-effect" set-word-prop
-\ float= t "flushable" set-word-prop
-\ float= t "foldable" set-word-prop
-
 \ float+ [ [ float float ] [ float ] ] "infer-effect" set-word-prop
 \ float+ t "flushable" set-word-prop
 \ float+ t "foldable" set-word-prop
@@ -274,6 +270,10 @@ sequences strings vectors words prettyprint ;
 \ float< [ [ float float ] [ object ] ] "infer-effect" set-word-prop
 \ float< t "flushable" set-word-prop
 \ float< t "foldable" set-word-prop
+
+\ float-mod [ [ float float ] [ float ] ] "infer-effect" set-word-prop
+\ float-mod t "flushable" set-word-prop
+\ float-mod t "foldable" set-word-prop
 
 \ float<= [ [ float float ] [ object ] ] "infer-effect" set-word-prop
 \ float<= t "flushable" set-word-prop

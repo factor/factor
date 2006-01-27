@@ -35,13 +35,8 @@ M: ratio - ( x y -- x-y ) 2dup scale - -rot ratio+d / ;
 M: ratio * ( x y -- x*y ) 2>fraction * >r * r> / ;
 M: ratio / scale / ;
 M: ratio /i scale /i ;
-M: ratio /mod 2dup >r >r /i dup r> * r> swap - ;
-M: ratio mod /mod nip ;
+M: ratio mod 2dup >r >r /i r> r> rot * - ;
 M: ratio /f scale /f ;
-
-M: ratio truncate >fraction /i ;
-M: ratio floor [ truncate ] keep 0 < [ 1- ] when ;
-M: ratio ceiling [ truncate ] keep 0 > [ 1+ ] when ;
 
 M: ratio 1+ >fraction [ + ] keep fraction> ;
 M: ratio 1- >fraction [ - ] keep fraction> ;

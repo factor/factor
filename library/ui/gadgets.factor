@@ -41,7 +41,7 @@ M: array rect-dim drop { 0 0 0 } ;
     2rect-extent vmax >r vmin r> <extent-rect> ;
 
 TUPLE: gadget
-    parent children orientation
+    pref-dim parent children orientation
     gestures visible? relayout? root?
     interior boundary ;
 
@@ -62,8 +62,6 @@ C: gadget ( -- gadget )
 GENERIC: user-input* ( ch gadget -- ? )
 
 M: gadget user-input* 2drop t ;
-
-: invalidate ( gadget -- ) t swap set-gadget-relayout? ;
 
 DEFER: add-invalid
 

@@ -24,7 +24,7 @@ C: label ( text -- label )
     dup label-font* dup font-height >r
     swap label-text string-width r> 0 3array ;
 
-M: label pref-dim ( label -- dim )
+M: label pref-dim* ( label -- dim )
     label-size ;
 
 : draw-label ( label -- )

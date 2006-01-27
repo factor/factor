@@ -30,22 +30,25 @@ GENERIC: bitnot ( n -- n ) foldable
 
 GENERIC: 1+ ( x -- x+1 ) foldable
 GENERIC: 1- ( x -- x-1 ) foldable
-
-GENERIC: truncate ( n -- n ) foldable
-GENERIC: floor    ( n -- n ) foldable
-GENERIC: ceiling  ( n -- n ) foldable
-GENERIC: abs      ( z -- |z| ) foldable
-GENERIC: absq     ( n -- |n|^2 ) foldable
+GENERIC: abs ( z -- |z| ) foldable
+GENERIC: absq ( n -- |n|^2 ) foldable
 
 : sq dup * ; inline
 : neg 0 swap - ; inline
 : recip 1 swap / ; inline
-: max ( x y -- z ) [ > ] 2keep ? ; inline
-: min ( x y -- z ) [ < ] 2keep ? ; inline
-: between? ( x min max -- ? ) pick >= >r >= r> and ; inline
-: rem ( x y -- z ) tuck mod over + swap mod ; inline
+: max ( x y -- z ) [ > ] 2keep ? ; foldable
+: min ( x y -- z ) [ < ] 2keep ? ; foldable
+: between? ( x min max -- ? ) pick >= >r >= r> and ; foldable
+: rem ( x y -- z ) tuck mod over + swap mod ; foldable
 : sgn ( m -- n ) dup 0 < -1 0 ? swap 0 > 1 0 ? bitor ; foldable
 : align ( m w -- n ) 1- [ + ] keep bitnot bitand ; inline
+: truncate ( x -- y ) dup 1 mod - ; foldable
+
+: floor ( x -- y )
+    dup 1 mod dup 0 =
+    [ drop ] [ dup 0 < [ - 1- ] [ - ] if ] if ; foldable
+
+: ceiling ( x -- y ) neg floor neg ; foldable
 
 : (repeat) ( i n quot -- )
     pick pick >=

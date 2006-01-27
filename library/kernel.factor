@@ -94,4 +94,4 @@ IN: kernel-internals
 : float-tag   BIN: 101 ; inline
 : complex-tag BIN: 110 ; inline
 
-SYMBOL: cell
+: cell 17 getenv ; foldable

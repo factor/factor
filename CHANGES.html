@@ -8,36 +8,17 @@
 
 <ul>
 
-<li>Incompatible changes:
+<li>New help system, browsable in the UI and via the HTTP server (<code>/responder/help</code>). In the UI listener, invoke <code>handbook</code> to read the documentation root, and invoke <code>\ foo help</code> to look at documentation for the word <code>foo</code>.</li>
+
+<li>Sequences:
 
 <ul>
-<li>Some hashtable words changed.
-<ul>
-<li><code>hash* ( key hash -- [[ key value ]] )</code> is now <code>hash* ( key hash -- value ? )</code></li>
-<li><code>hash-clear</code> is now <code>clear-hash</code></li>
-<li><code>hash-each</code>, <code>hash-each-with</code>, <code>hash-all?</code>, <code>hash-all-with?</code>, <code>hash-subset</code>, <code>hash-subset-with</code> now pass the key and value separately on the stack to the given quotation, instead of passing a cons cell</li>
-<li>Literal syntax change: <code>H{ [[ key value ]] ... }</code> is now <code>H{ { key value } }</code></li>
-</ul>
 <li>Association list words <code>assoc*</code>, <code>set-assoc</code>, <code>acons</code> and <code>remove-assoc</code> are gone.</li>
 <li>The <code>repeated</code> virtual sequence type is gone. Instead, the
 <code>&lt;array&gt;</code> word takes an initial element in addition to an
 initial size.</li>
 <li>The <code>fill</code> word to create a new string with an initial character
 repeated a certain number of times has been renamed to <code>&lt;string&gt;</code>.</li>
-<li>The <code>sum</code> and <code>product</code> words have been moved to
-<code>contrib/math/</code>.</li>
-<li>Some alien word changes:
-<pre>&lt;foo&gt; ==&gt; "foo" &lt;c-object&gt;
-&lt;foo-array&gt; ==&gt; "foo" &lt;c-array&gt;</pre>
-</li>
-
-<li><code>stream-format ( string style stream -- )</code> now takes a hashtable
-rather than an association list for specifying style information.</li>
-</li>
-
-<li>Sequences:
-
-<ul>
 <li>Add a new <code>interleave ( seq quot between -- )</code> combinator that applies
 a quotation to each element of a sequence, calling another quotation in between each
 pair.</li>
@@ -50,9 +31,43 @@ this is lexicographic order, and for words, this compares word names.</li>
 
 </li>
 
+<li>Hashtables:
+<ul>
+<li><code>hash* ( key hash -- [[ key value ]] )</code> is now <code>hash* ( key hash -- value ? )</code></li>
+<li><code>hash-clear</code> is now <code>clear-hash</code></li>
+<li><code>hash-each</code>, <code>hash-each-with</code>, <code>hash-all?</code>, <code>hash-all-with?</code>, <code>hash-subset</code>, <code>hash-subset-with</code> now pass the key and value separately on the stack to the given quotation, instead of passing a cons cell</li>
+<li>Literal syntax change: <code>H{ [[ key value ]] ... }</code> is now <code>H{ { key value } }</code></li>
+</ul>
+</li>
+
+<li>Math:
+
+<ul>
+
+<li>The <code>sum</code> and <code>product</code> words have been moved to
+<code>contrib/math/</code>.</li>
+<li>The <code>mod</code> word is now supported for ratios and floating point numbers.</li>
+<li>The <code>truncate</code>, <code>floor</code> and <code>ceiling</code> words are now supported for floating point numbers.</li>
+</ul>
+
+</li>
+
+<li>Streams:
+
+<ul>
+<li><code>stream-format ( string style stream -- )</code> now takes a hashtable
+rather than an association list for specifying style information.</li>
+<li><code>stream-write</code> and <code>stream-terpri</code> are now generic words, and there is a new <code>with-nested-stream</code> generic word. You can wrap your output streams in a <code>&lt;plain-writer&gt;</code> to avoid implementing these.</li>
+</ul>
+</li>
+
+
 <li>C library interface:
 
 <ul>
+<li>Some alien word changes:
+<pre>&lt;foo&gt; ==&gt; "foo" &lt;c-object&gt;
+&lt;foo-array&gt; ==&gt; "foo" &lt;c-array&gt;</pre>
 <li>Support for binding to Objective C libraries is now included.
 <ul>
 <li>Normal usage of Objective C classes and methods is done using the <code>OBJC-CLASS:</code>
@@ -77,12 +92,11 @@ and <code>OBJC-MESSAGE:</code> parsing words. See the example in
 <li>UI changes:
 
 <ul>
-<li>A left click on a presentation now invokes the default command. A right click
-shows a menu of possibilities.</li>
-<li>The UI is layed out differently now. The window is split into a browser and
-listener, with certain commands displaying output in the browser.</li>
 <li>Fixed invalid OpenGL calls which caused problems on Windows machines with ATI
 drivers, and Linux machines with the MesaGL implementation.</li>
+<li>The listener looks different now. An expandable top area is used for browsing objects, words and help, and the stack display has been shrunk to a single status line at the bottom of the window.</li>
+<li>A left click on a presentation now invokes the default command. A right click
+shows a menu of possibilities.</li>
 </ul>
 
 </li>
@@ -111,6 +125,7 @@ USE: image
 changes, and you can run <code>contrib/load.factor</code> to load all of them at once (Trent Buck)</li>
 <li>Updated <code>contrib/x11/</code> with many more examples (Eduardo Cavazos)</li>
 <li>Added splay tree library in <code>contrib/splay-trees.factor</code> (Mackenzie Straight)</li>
+<li>Improved AJAX support in <code>contrib/httpd/</code>. The "prototype" JavaScript library is now included (Chris Double)</li>
 </ul>
 
 </li>

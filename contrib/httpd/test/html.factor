@@ -5,7 +5,7 @@ USING: html http io kernel namespaces styles test xml ;
     "/responder/foo/?z=%20"
 ] [
     "/responder/foo" H{ { "z" " " } } build-url
-]
+] unit-test
 
 [
     "&lt;html&gt;&amp;&apos;sgml&apos;"

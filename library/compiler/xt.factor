@@ -34,7 +34,7 @@ SYMBOL: relocation-table
 
 : rel, ( n -- ) relocation-table get push ;
 
-: cell-just-compiled compiled-offset cell get - ;
+: cell-just-compiled compiled-offset cell - ;
 
 : 4-just-compiled compiled-offset 4 - ;
 
@@ -47,10 +47,10 @@ SYMBOL: relocation-table
     #! Write a relocation instruction for the runtime image
     #! loader.
     over >r >r >r 16 shift r> 8 shift bitor r> bitor rel,
-    compiled-offset r> rel-absolute-cell = cell get 4 ? - rel, ;
+    compiled-offset r> rel-absolute-cell = cell 4 ? - rel, ;
 
 : rel-dlsym ( name dll class -- )
-    >r cons add-literal compiled-base - cell get / r>
+    >r cons add-literal compiled-base - cell / r>
     1 rel-type, ;
 
 : rel-address ( class -- )

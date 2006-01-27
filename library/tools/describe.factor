@@ -52,7 +52,7 @@ M: hashtable summary
     "a hashtable storing " swap hash-size number>string
     " keys" append3 ;
 
-M: hashtable sheet dup hash-keys swap hash-values 2array ;
+M: hashtable sheet hash>alist flip ;
 
 M: word summary ( word -- )
     dup word-vocabulary [

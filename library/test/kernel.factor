@@ -8,5 +8,5 @@ test ;
 ! (clone) primitive was missing GC check
 [ ] [ 1000000 [ drop H{ } clone >n n> drop ] each ] unit-test
 
-[ cell ] [ cell ] unit-test
-[ t ] [ cell get integer? ] unit-test
+[ t ] [ cell integer? ] unit-test
+[ t ] [ bootstrap-cell integer? ] unit-test

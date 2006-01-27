@@ -21,7 +21,7 @@ C: border ( child gap -- border )
     dup rect-dim over border-size 2 v*n v-
     swap gadget-child set-gadget-dim ;
 
-M: border pref-dim ( border -- dim )
+M: border pref-dim* ( border -- dim )
     [ border-size 2 v*n ] keep
     gadget-child pref-dim v+ ;
 

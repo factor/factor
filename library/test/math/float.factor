@@ -30,8 +30,21 @@ USE: test
 [ t ] [ pi 3 > ] unit-test
 [ f ] [ e 2 <= ] unit-test
 
+[ t ] [ 1.0 dup float>bits bits>float = ] unit-test
 [ t ] [ pi double>bits bits>double pi = ] unit-test
 [ t ] [ e double>bits bits>double e = ] unit-test
 
 [ 2.0 ] [ 1.0 1+ ] unit-test
 [ 0.0 ] [ 1.0 1- ] unit-test
+
+[ 4.0 ] [ 4.5 truncate ] unit-test
+[ 4.0 ] [ 4.5 floor ] unit-test
+[ 5.0 ] [ 4.5 ceiling ] unit-test
+
+[ -4.0 ] [ -4.5 truncate ] unit-test
+[ -5.0 ] [ -4.5 floor ] unit-test
+[ -4.0 ] [ -4.5 ceiling ] unit-test
+
+[ -4.0 ] [ -4.0 truncate ] unit-test
+[ -4.0 ] [ -4.0 floor ] unit-test
+[ -4.0 ] [ -4.0 ceiling ] unit-test

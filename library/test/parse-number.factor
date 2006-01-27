@@ -1,5 +1,5 @@
 IN: temporary
-USING: errors kernel math parser test ;
+USING: errors kernel math parser sequences test ;
 
 : parse-number ( str -- num )
     #! Convert a string to a number; return f on error.
@@ -112,3 +112,13 @@ unit-test
 [ "12" bin> ] unit-test-fails
 [ "fdsf" bin> ] unit-test-fails
 [ 3 ] [ "11" bin> ] unit-test
+
+[ t ] [
+    { "1.0/0.0" "-1.0/0.0" "0.0/0.0" }
+    [ dup string>number number>string = ] all?
+] unit-test
+
+[ t ] [
+    { 1.0/0.0 -1.0/0.0 0.0/0.0 }
+    [ dup number>string string>number = ] all?
+] unit-test

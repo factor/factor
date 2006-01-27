@@ -1,8 +1,14 @@
-! Copyright (C) 2005 Slava Pestov.
-! See http://factor.sf.net/license.txt for BSD license.
+! Copyright (C) 2005, 2006 Slava Pestov.
+! See http://factorcode.org/license.txt for BSD license.
 IN: gadgets-layouts
 USING: errors gadgets generic hashtables kernel lists math
 namespaces sequences ;
+
+: invalidate ( gadget -- ) t swap set-gadget-relayout? ;
+
+: forget-pref-dim ( gadget -- ) f swap set-gadget-pref-dim ;
+
+: invalidate* ( gadget -- ) dup invalidate forget-pref-dim ;
 
 : relayout ( gadget -- )
     #! Relayout and redraw a gadget and its parent before the
@@ -11,7 +17,7 @@ namespaces sequences ;
     dup gadget-relayout? [
         drop
     ] [
-        dup invalidate
+        dup invalidate*
         dup gadget-root?
         [ add-invalid ]
         [ gadget-parent [ relayout ] when* ] if
@@ -35,9 +41,15 @@ namespaces sequences ;
         [ set-rect-dim ] keep dup add-invalid invalidate
     ] if ;
 
-GENERIC: pref-dim ( gadget -- dim )
+GENERIC: pref-dim* ( gadget -- dim )
 
-M: gadget pref-dim rect-dim ;
+: pref-dim ( gadget -- dim )
+    pref-dim* ;
+    ! dup gadget-pref-dim [ ] [
+    !     dup pref-dim* dup rot set-gadget-pref-dim
+    ! ] ?if ;
+
+M: gadget pref-dim* rect-dim ;
 
 GENERIC: layout* ( gadget -- )
 
@@ -111,7 +123,7 @@ C: pack ( vector -- pack )
         r> pack-gap n*v v+
     ] keep gadget-orientation set-axis ;
 
-M: pack pref-dim ( pack -- dim )
+M: pack pref-dim* ( pack -- dim )
     [ gadget-children pref-dims ] keep pack-pref-dim ;
 
 M: pack layout* ( pack -- )

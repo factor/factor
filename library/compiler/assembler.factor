@@ -18,7 +18,7 @@ math memory namespaces ;
 
 : add-literal ( obj -- lit# )
     address literal-top [ set-compiled-cell ] keep
-    dup cell get + set-literal-top ;
+    dup cell + set-literal-top ;
 
 : assemble-1 ( n -- )
     compiled-offset set-compiled-1
@@ -30,7 +30,7 @@ math memory namespaces ;
 
 : assemble-cell ( n -- )
     compiled-offset set-compiled-cell
-    compiled-offset cell get + set-compiled-offset ; inline
+    compiled-offset cell + set-compiled-offset ; inline
 
 : begin-assembly ( -- code-len-fixup reloc-len-fixup )
     compiled-header assemble-cell

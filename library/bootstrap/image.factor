@@ -1,5 +1,5 @@
-! Copyright (C) 2004, 2005 Slava Pestov.
-! See http://factor.sf.net/license.txt for BSD license.
+! Copyright (C) 2004, 2006 Slava Pestov.
+! See http://factorcode.org/license.txt for BSD license.
 
 ! This library allows one to generate a new set of bootstrap
 ! images (boot.image.{le32,le64,be32,be64}.
@@ -9,9 +9,10 @@
 ! strings etc to the image file in the CFactor object memory
 ! format.
 
-USING: alien arrays errors generic hashtables help io kernel
-kernel-internals lists math namespaces parser prettyprint
-sequences sequences-internals strings vectors words ;
+USING: alien arrays errors generic hashtables
+hashtables-internals help io kernel kernel-internals lists math
+namespaces parser prettyprint sequences sequences-internals
+strings vectors words ;
 IN: image
 
 ! The image being constructed; a vector of word-size integers
@@ -32,7 +33,7 @@ SYMBOL: architecture
     dup HEX: ffffffff bitand swap -32 shift HEX: ffffffff bitand ;
 
 : emit-64 ( cell -- )
-    cell get 8 = [
+    bootstrap-cell 8 = [
         emit
     ] [
         d>w/w big-endian get [ swap ] unless emit emit
@@ -47,7 +48,7 @@ SYMBOL: architecture
 : image-magic HEX: 0f0e0d0c ; inline
 : image-version 0 ; inline
 
-: char cell get 2 /i ; inline
+: char bootstrap-cell 2 /i ; inline
 
 : untag ( cell tag -- ) tag-mask bitnot bitand ; inline
 : tag ( cell -- tag ) tag-mask bitand ; inline
@@ -95,7 +96,7 @@ GENERIC: ' ( obj -- ptr )
 ( Allocator )
 
 : here ( -- size ) 
-    image get length header-size - cells base + ;
+    image get length header-size - bootstrap-cells base + ;
 
 : here-as ( tag -- pointer )
     here swap bitor ;
@@ -285,7 +286,7 @@ M: sbuf ' ( sbuf -- pointer )
 ( Hashes )
 
 M: hashtable ' ( hashtable -- pointer )
-    [ underlying ' ] keep
+    [ hash-array ' ] keep
     object-tag here-as >r
     hashtable-type >header emit
     dup hash-count emit-fixnum
@@ -310,7 +311,7 @@ M: hashtable ' ( hashtable -- pointer )
 
 : boot, ( quot -- ) ' boot-quot-offset fixup ;
 
-: heap-size image get length header-size - cells ;
+: heap-size image get length header-size - bootstrap-cells ;
 
 : end-image ( quot -- )
     "Generating words..." print flush
@@ -329,7 +330,7 @@ M: hashtable ' ( hashtable -- pointer )
 ( Image output )
 
 : (write-image) ( image -- )
-    cell get swap big-endian get [
+    bootstrap-cell swap big-endian get [
         [ swap >be write ] each-with
     ] [
         [ swap >le write ] each-with

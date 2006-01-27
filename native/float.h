@@ -7,6 +7,17 @@ typedef struct {
 	double n;
 } F_FLOAT;
 
+/* for punning */
+typedef union {
+    double x;
+    u64 y;
+} DOUBLE_BITS;
+
+typedef union {
+    float x;
+    u32 y;
+} FLOAT_BITS;
+
 INLINE F_FLOAT* make_float(double n)
 {
 	F_FLOAT* flo = allot_object(FLOAT_TYPE,sizeof(F_FLOAT));
@@ -30,11 +41,11 @@ void primitive_str_to_float(void);
 void primitive_float_to_str(void);
 void primitive_float_to_bits(void);
 
-void primitive_float_eq(void);
 void primitive_float_add(void);
 void primitive_float_subtract(void);
 void primitive_float_multiply(void);
 void primitive_float_divfloat(void);
+void primitive_float_mod(void);
 void primitive_float_less(void);
 void primitive_float_lesseq(void);
 void primitive_float_greater(void);

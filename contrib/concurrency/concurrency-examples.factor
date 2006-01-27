@@ -176,7 +176,7 @@ C: promised-label ( promise -- promised-label )
     drop "Unfulfilled Promise" 
   ] if ;
 
-M: promised-label pref-dim ( promised-label - dim )
+M: promised-label pref-dim* ( promised-label - dim )
   label-size ;
 
 M: promised-label draw-gadget* ( promised-label -- )

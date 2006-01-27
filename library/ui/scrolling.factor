@@ -27,7 +27,7 @@ C: viewport ( content -- viewport )
     t over set-gadget-root?
     [ add-gadget ] keep ;
 
-M: viewport pref-dim gadget-child pref-dim ;
+M: viewport pref-dim* gadget-child pref-dim ;
 
 : set-slider ( page max value slider -- )
     #! page/max/value are 3-vectors.

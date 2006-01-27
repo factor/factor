@@ -49,7 +49,7 @@ SYMBOL: margin
         gadget-children [ wrap-step ] each-with wrap-dim
     ] with-scope ; inline
 
-M: paragraph pref-dim ( paragraph -- dim )
+M: paragraph pref-dim* ( paragraph -- dim )
     [ 2drop ] do-wrap ;
 
 M: paragraph layout* ( paragraph -- )

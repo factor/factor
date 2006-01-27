@@ -8,7 +8,7 @@ TUPLE: divider splitter ;
 
 : divider-size { 8 8 0 } ;
 
-M: divider pref-dim drop divider-size ;
+M: divider pref-dim* drop divider-size ;
 
 TUPLE: splitter split ;
 

@@ -197,8 +197,6 @@ ARTICLE: "trig-hyp-functions" "Trigonometric and hyperbolic functions"
 ARTICLE: "math-constants" "Constants"
 { $subsection i }
 { $subsection -i }
-{ $subsection inf }
-{ $subsection -inf }
 { $subsection e }
 { $subsection pi }
 { $subsection most-positive-fixnum }

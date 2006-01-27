@@ -1,5 +1,5 @@
 ! Copyright (C) 2005, 2006 Slava Pestov.
-! See http://factor.sf.net/license.txt for BSD license.
+! See http://factorcode.org/license.txt for BSD license.
 IN: help
 USING: arrays generic hashtables io kernel lists namespaces
 parser prettyprint sequences strings styles vectors words ;
@@ -36,7 +36,7 @@ M: word print-element { } swap execute ;
 
 ! Some spans
 
-: $heading [ heading-style ($span) ] ($block) ;
+: $heading heading-style ($span) terpri terpri ;
 
 : $subheading [ subheading-style ($span) ] ($block) ;
 
