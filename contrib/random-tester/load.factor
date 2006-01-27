@@ -1,8 +1,6 @@
 USING: kernel parser sequences words compiler ;
 IN: scratchpad
 
-"contrib/math/utils.factor" run-resource
-
 {
     "utils"
     "random"

@@ -1,5 +1,5 @@
 USING: kernel math sequences namespaces errors hashtables words arrays parser
-       compiler syntax lists io math-contrib ;
+       compiler syntax lists io ;
 USING: inspector prettyprint ;
 USING: optimizer compiler-frontend compiler-backend inference ;
 IN: random-tester
@@ -67,10 +67,10 @@ IN: random-tester
 : float>x ( float -- x )
     {
         1+ 1- >bignum >digit >fixnum abs absq arg 
-        cis conjugate cos cosec cosech
-        cosh cot coth double>bits exp float>bits imaginary
+        ceiling cis conjugate cos cosec cosech
+        cosh cot coth double>bits exp float>bits floor imaginary
         log neg next-power-of-2 quadrant real sec
-        sech sgn sin sinh sq sqrt tan tanh 
+        sech sgn sin sinh sq sqrt tan tanh truncate
     } ;
 
 : complex>x
