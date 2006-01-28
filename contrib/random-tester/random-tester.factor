@@ -182,8 +182,24 @@ IN: random-tester
 
 
 SYMBOL: last-quot
-: interp-compile-check ( quot -- )
+SYMBOL: first-arg
+: runtime-check
+    [ last-quot set ] keep
+    [ call ] keep
+    call
+    ! 2dup swap unparse write " " write unparse print
+    = [ last-quot get . "problem in runtime" throw ] unless ;
+
+: runtime-check-1
+    [ last-quot set first-arg set ] 2keep
+    [ call ] 2keep
+    call
+    2dup swap unparse write " " write unparse print
+    = [ "problem in runtime" throw ] unless ;
+
+: interp-runtime-check ( quot -- )
     dup . 
+    ! 0 [ tan tan ] compile-1 drop
     [ last-quot set ] keep
     [ call ] keep compile-1
     2dup swap unparse write " " write unparse print
@@ -191,9 +207,15 @@ SYMBOL: last-quot
 
 : interp-compile-check-1 ( x quot -- )
     .s flush
-    ! dup . flush
     [ last-quot set ] keep
     [ call ] 2keep compile-1
+    2dup swap unparse write " " write unparse print
+    = [ "problem in math" throw ] unless ;
+
+: interp-compile-check-2 ( x quot -- )
+    .s flush
+    [ last-quot set ] keep
+    [ call ] 3keep compile-1
     2dup swap unparse write " " write unparse print
     = [ "problem in math" throw ] unless ;
 
@@ -235,11 +257,13 @@ SYMBOL: last-quot
 : random-float>x-quot ( -- ) random-float float>x nth-rand unit cons ;
 : random-complex>x-quot ( -- ) random-complex complex>x nth-rand unit cons ;
 
-: test-integer>x ( -- ) random-integer>x-quot interp-compile-check ;
-: test-ratio>x ( -- ) random-ratio>x-quot interp-compile-check ;
-: test-float>x ( -- ) random-float>x-quot interp-compile-check ;
-: test-complex>x ( -- ) random-complex>x-quot interp-compile-check ;
+: test-integer>x ( -- ) random-integer>x-quot interp-runtime-check ;
+: test-ratio>x ( -- ) random-ratio>x-quot interp-runtime-check ;
+: test-float>x ( -- ) random-float>x-quot interp-runtime-check ;
+: test-complex>x ( -- ) random-complex>x-quot interp-runtime-check ;
 
+: test-integer>x-runtime ( -- ) random-integer>x-quot runtime-check ;
+: test-integer>x-1-runtime ( -- ) random-integer>x-quot runtime-check ;
 
 : test-integer>x-1 ( -- )
     random-integer integer>x nth-rand unit interp-compile-check-1 ;
@@ -256,27 +280,43 @@ SYMBOL: last-quot
     random-ratio ratio>x-throw nth-rand unit cons interp-compile-check-catch ;
 
 : test-update-xt ( -- )
-    random-integer random-integer 2integer>x nth-rand f cons cons cons update-xt-check ;
+    random-integer random-integer 2integer>x nth-rand unit swons swons update-xt-check ;
 
 ! 2-arg tests
 : test-2integer>x ( -- )
-    random-integer random-integer 2integer>x nth-rand f cons cons cons interp-compile-check ;
+    random-integer random-integer 2integer>x nth-rand unit swons swons interp-runtime-check ;
 
 : test-2ratio>x ( -- )
-    random-ratio random-ratio 2ratio>x nth-rand f cons cons cons interp-compile-check ;
+    random-ratio random-ratio 2ratio>x nth-rand unit swons swons interp-runtime-check ;
 
 : test-2float>x ( -- )
-    random-float random-float 2float>x nth-rand f cons cons cons interp-compile-check ;
+    random-float random-float 2float>x nth-rand unit swons swons interp-runtime-check ;
 
 : test-2complex>x ( -- )
-    random-complex random-complex 2complex>x nth-rand f cons cons cons interp-compile-check ;
+    random-complex random-complex 2complex>x nth-rand unit swons swons interp-runtime-check ;
 
 
 : test-2random>x ( -- )
-    random-number random-number math-2 nth-rand f cons cons cons interp-compile-check ;
+    random-number random-number math-2 nth-rand unit swons swons interp-runtime-check ;
 
-: test-2integer>x-1 ( -- )
-    random-integer random-integer-quotation-1 interp-compile-check-1 ;
+
+
+: test-2integer>x-2 ( -- )
+    random-integer random-integer 2integer>x nth-rand unit interp-compile-check-2 ;
+
+: test-2ratio>x-2 ( -- )
+    random-ratio random-ratio 2ratio>x nth-rand unit interp-compile-check-2 ;
+
+: test-2float>x-2 ( -- )
+    random-float random-float 2float>x nth-rand unit interp-compile-check-2 ;
+
+: test-2complex>x-2 ( -- )
+    random-complex random-complex 2complex>x nth-rand unit interp-compile-check-2 ;
+
+
+! : test-2integer>x-1 ( -- )
+    ! random-integer random-integer-quotation-1 interp-compile-check-1 ;
+
 
 : test-2integer>x-throws ( -- )
     [
@@ -301,10 +341,12 @@ SYMBOL: last-quot
         ! test-ratio>x 
         ! test-float>x 
         ! test-complex>x 
-        test-integer>x-1
-        test-ratio>x-1
-        test-float>x-1
-        test-complex>x-1
+
+        ! test-integer>x-1
+        ! test-ratio>x-1
+        ! test-float>x-1
+        ! test-complex>x-1
+
         ! test-integer>x-throws
         ! test-ratio>x-throws
 
@@ -313,7 +355,11 @@ SYMBOL: last-quot
         ! test-2ratio>x
         ! test-2float>x
         ! test-2complex>x
-        test-2integer>x-1
+        test-2integer>x-2
+        test-2ratio>x-2
+        test-2float>x-2
+        test-2complex>x-2
+        ! ! test-2integer>x-1
         ! test-2integer>x-throws
         ! test-^-shift
         ! test-^-ratio
@@ -335,48 +381,48 @@ SYMBOL: last-quot
 : logic-3 ( -- seq ) { between? } ;
 : complex-logic-2 ( -- seq ) { number= = eq? and or } ;
 
-: logic-0-test ( -- ) logic-0 nth-rand unit interp-compile-check ;
+: logic-0-test ( -- ) logic-0 nth-rand unit interp-runtime-check ;
 
 : integer-logic-1-test ( -- )
     [
         random-integer , logic-1 nth-rand ,
-    ] [ ] make interp-compile-check ;
+    ] [ ] make interp-runtime-check ;
 
 : ratio-logic-1-test ( -- )
     [
         random-ratio , logic-1 nth-rand ,
-    ] [ ] make interp-compile-check ;
+    ] [ ] make interp-runtime-check ;
 
 : float-logic-1-test ( -- )
     [
         random-float , logic-1 nth-rand ,
-    ] [ ] make interp-compile-check ;
+    ] [ ] make interp-runtime-check ;
 
 : complex-logic-1-test ( -- )
     [
         random-complex , logic-1 nth-rand ,
-    ] [ ] make interp-compile-check ;
+    ] [ ] make interp-runtime-check ;
 
 
 : integer-logic-2-test ( -- )
     [
         random-integer , random-integer , logic-2 nth-rand , 
-    ] [ ] make interp-compile-check ;
+    ] [ ] make interp-runtime-check ;
 
 : ratio-logic-2-test ( -- )
     [
         random-ratio , random-ratio , logic-2 nth-rand , 
-    ] [ ] make interp-compile-check ;
+    ] [ ] make interp-runtime-check ;
 
 : float-logic-2-test ( -- )
     [
         random-float , random-float , logic-2 nth-rand , 
-    ] [ ] make interp-compile-check ;
+    ] [ ] make interp-runtime-check ;
 
 : complex-logic-2-test ( -- )
     [
         random-complex , random-complex , complex-logic-2 nth-rand , 
-    ] [ ] make interp-compile-check ;
+    ] [ ] make interp-runtime-check ;
 
 
 : string-to-math-test ( -- )
@@ -385,19 +431,33 @@ SYMBOL: last-quot
         [ random-integer , \ number>string , ]
         [ random-integer , \ number>string , \ string>number , ]
         } do-one
-    ] [ ] make interp-compile-check ;
+    ] [ ] make interp-runtime-check ;
 
 
 : test-float?-when
     [
         random-number , \ dup , \ float? , float>x nth-rand unit , \ when ,
-    ] [ ] make interp-compile-check ;
+    ] [ ] make interp-runtime-check ;
+
+: test-integer?-when-1
+    random-float [
+        \ dup , \ float? , float>x nth-rand unit , \ when ,
+    ] [ ] make interp-compile-check-1 ;
+
+: test-ratio?-when-1
+    random-ratio [
+        \ dup , \ ratio? , ratio>x nth-rand unit , \ when ,
+    ] [ ] make interp-compile-check-1 ;
 
 : test-float?-when-1
     random-float [
         \ dup , \ float? , float>x nth-rand unit , \ when ,
     ] [ ] make interp-compile-check-1 ;
 
+: test-complex?-when-1
+    random-complex [
+        \ dup , \ complex? , complex>x nth-rand unit , \ when ,
+    ] [ ] make interp-compile-check-1 ;
 
 : stack-identity-0
     H{
@@ -481,7 +541,7 @@ SYMBOL: last-quot
         ! when-quot %
     ] [ ] make ;
 
-: test-if ( -- ) nested-ifs interp-compile-check ;
+: test-if ( -- ) nested-ifs interp-runtime-check ;
 
 : random-test ( -- )
     {
