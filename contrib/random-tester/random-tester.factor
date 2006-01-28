@@ -377,17 +377,6 @@ SYMBOL: last-quot
         random-complex , random-complex , complex-logic-2 nth-rand , 
     ] [ ] make interp-compile-check ;
 
-: test-integer
-    {
-        
-        test-2integer>x test-integer>x test-2integer>x-1 } nth-rand execute ;
-! quotation tests
-! : test-integer random-integer-quotation interp-compile-check ;
-: test-ratio random-ratio-quotation interp-compile-check ;
-: test-float random-float-quotation interp-compile-check ;
-: test-complex random-complex-quotation interp-compile-check ;
-
-
 
 : string-to-math-test ( -- )
     [
@@ -397,6 +386,11 @@ SYMBOL: last-quot
         } do-one
     ] [ ] make interp-compile-check ;
 
+
+: test-float?-when
+    [
+        random-number , \ dup , \ float? , float>x nth-rand unit , \ when ,
+    ] [ ] make interp-compile-check ;
 
 
 
