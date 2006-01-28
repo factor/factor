@@ -56,7 +56,7 @@ IN: math-contrib
     ] if ;
 
 : nth-root ( n x -- )
-    log >r recip r> * e swap ^ ;
+    over 0 = [ "0th root is undefined" throw ] when >r recip r> swap ^ ;
 
 ! Forth Scientific Library Algorithm #1
 !
