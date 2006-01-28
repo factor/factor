@@ -4,9 +4,10 @@ USING: inspector prettyprint ;
 USING: optimizer compiler-frontend compiler-backend inference ;
 IN: random-tester
 
-
-
-
+! Math words are listed in arrays according to the number of arguments,
+! if they can throw exceptions or not, and what they output.
+! integer>x -> takes an integer, outputs anything
+! integer>integer -> always outputs an integer
 
 ! Math vocabulary words
 : math-1 ( -- seq )
@@ -17,31 +18,9 @@ IN: random-tester
         log neg next-power-of-2 numerator quadrant real sec
         sech sgn sin sinh sq sqrt tan tanh truncate 
     } ;
-! TODO: take this out eventually
 : math-throw-1
     {
         recip log2
-        asec asech acot acoth acosec acosech acos acosh asin asinh atan atanh
-    } ;
-
-: integer>x-throw
-    {
-        recip log2
-        asec asech acot acoth acosec acosech acos acosh asin asinh atan atanh
-    } ;
-: ratio>x-throw
-    {
-        recip
-        asec asech acot acoth acosec acosech acos acosh asin asinh atan atanh
-    } ;
-: float>x-throw
-    {
-        recip
-        asec asech acot acoth acosec acosech acos acosh asin asinh atan atanh
-    } ;
-: complex>x-throw
-    {
-        recip
         asec asech acot acoth acosec acosech acos acosh asin asinh atan atanh
     } ;
 
@@ -78,8 +57,19 @@ IN: random-tester
         1+ 1- abs absq arg 
         conjugate cos cosec cosech
         cosh cot coth exp imaginary
-        log neg quadrant real sec
-        sech sin sinh sq sqrt tan tanh 
+        log neg quadrant real
+        sec sech sin sinh sq sqrt tan tanh 
+    } ;
+
+: integer>x-throw
+    {
+        recip log2
+        asec asech acot acoth acosec acosech acos acosh asin asinh atan atanh
+    } ;
+: ratio>x-throw
+    {
+        recip
+        asec asech acot acoth acosec acosech acos acosh asin asinh atan atanh
     } ;
 
 : integer>integer
@@ -91,17 +81,14 @@ IN: random-tester
         real sgn sq truncate 
     } ;
 
-: ratio>ratio
-    {
-        1+ 1- >digit abs absq conjugate neg real sq
-    } ;
+: ratio>ratio { 1+ 1- >digit abs absq conjugate neg real sq } ;
 
 : float>float
     {
-        1+ 1- >digit abs absq arg 
+        1+ 1- >digit abs absq arg ceiling
         conjugate cos cosec cosech
-        cosh cot coth exp neg real sec
-        sech sin sinh sq tan tanh 
+        cosh cot coth exp floor neg real sec
+        sech sin sinh sq tan tanh truncate
     } ;
 
 : complex>complex
@@ -115,10 +102,9 @@ IN: random-tester
 
 
 : math-2 ( -- seq )
-    { * + - /f max min polar> bitand bitor bitxor align shift } ;
-: math-throw-2 ( -- seq ) { / /i ^ mod rem } ;
+    { * + - /f max min polar> bitand bitor bitxor align } ;
+: math-throw-2 ( -- seq ) { / /i mod rem } ;
 
-! shift too but can't test with bignums..
 : 2integer>x ( n n -- x ) ( -- word )
     { * + - /f max min polar> bitand bitor bitxor align } ;
 : 2ratio>x ( r r -- x ) ( -- word ) { * + - /f max min polar> } ;
@@ -195,17 +181,17 @@ IN: random-tester
     ] [ ] make ;
 
 
-SYMBOL: last
+SYMBOL: last-quot
 : interp-compile-check ( quot -- )
     dup . 
-    [ last set ] keep
+    [ last-quot set ] keep
     [ call ] keep compile-1
     2dup swap unparse write " " write unparse print
     = [ "problem in math" throw ] unless ;
 
 : interp-compile-check-1 ( x quot -- )
-    dup . 
-    [ last set ] keep
+    dup . flush
+    [ last-quot set ] keep
     [ call ] 2keep compile-1
     2dup swap unparse write " " write unparse print
     = [ "problem in math" throw ] unless ;
@@ -218,52 +204,58 @@ SYMBOL: last
 
 : interp-compile-check-catch ( quot -- )
     dup .
-    [ last set ] keep
+    [ last-quot set ] keep
     [ catch [ "caught: " write dup print-error ] when* ] keep 
     [ compile-1 ] catch [ nip "caught: " write dup print-error ] when*
     = [ "problem in math" throw ] unless ;
 
+: update-math-xt ( -- )
+    math-1 [ update-xt ] each
+    math-throw-1 [ update-xt ] each
+    math-2 [ update-xt ] each
+    math-throw-2 [ update-xt ] each ;
+
+: update-xt-check ( quot -- )
+    update-math-xt
+    dup .
+    [ last-quot set ] keep
+    [ call ] keep
+    [ last car update-xt ] keep call
+    2dup swap unparse write " " write unparse print
+    = [ "update-xt problem" throw ] unless ;
 
 
-: test-integer>x-throws ( -- )
-    [
-        random-integer , integer>x-throw nth-rand ,
-    ] [ ] make interp-compile-check-catch ;
-: test-ratio>x-throws ( -- )
-    [
-        random-ratio , ratio>x-throw nth-rand ,
-    ] [ ] make interp-compile-check-catch ;
-: test-float>x-throws ( -- )
-    [
-        random-float , float>x-throw nth-rand ,
-    ] [ ] make interp-compile-check-catch ;
-: test-complex>x-throws ( -- )
-    [
-        random-complex , complex>x-throw nth-rand ,
-    ] [ ] make interp-compile-check-catch ;
 
-: test-2integer>x-throws ( -- )
-    [
-        random-integer dup . , random-integer dup . , math-throw-2 nth-rand dup . ,
-    ] [ ] make interp-compile-check-catch ;
 
 ! 1-arg tests
-: test-integer>x ( -- )
-    random-integer integer>x nth-rand f cons cons interp-compile-check ;
+    
+: random-integer>x-quot random-integer integer>x nth-rand unit cons ;
+: random-ratio>x-quot ( -- ) random-ratio ratio>x nth-rand unit cons ;
+: random-float>x-quot ( -- ) random-float float>x nth-rand unit cons ;
+: random-complex>x-quot ( -- ) random-complex complex>x nth-rand unit cons ;
 
-: test-ratio>x ( -- )
-    random-ratio ratio>x nth-rand f cons cons interp-compile-check ;
-
-: test-float>x ( -- )
-    random-float float>x nth-rand f cons cons interp-compile-check ;
-
-: test-complex>x ( -- )
-    random-complex complex>x nth-rand f cons cons interp-compile-check ;
+: test-integer>x ( -- ) random-integer>x-quot interp-compile-check ;
+: test-ratio>x ( -- ) random-ratio>x-quot interp-compile-check ;
+: test-float>x ( -- ) random-float>x-quot interp-compile-check ;
+: test-complex>x ( -- ) random-complex>x-quot interp-compile-check ;
 
 
 : test-integer>x-1 ( -- )
     random-integer integer>x nth-rand unit interp-compile-check-1 ;
+: test-ratio>x-1 ( -- )
+    random-ratio ratio>x nth-rand unit interp-compile-check-1 ;
+: test-float>x-1 ( -- )
+    random-float float>x nth-rand unit interp-compile-check-1 ;
+: test-complex>x-1 ( -- )
+    random-complex complex>x nth-rand unit interp-compile-check-1 ;
 
+: test-integer>x-throws ( -- )
+    random-integer integer>x-throw nth-rand unit cons interp-compile-check-catch ;
+: test-ratio>x-throws ( -- )
+    random-ratio ratio>x-throw nth-rand unit cons interp-compile-check-catch ;
+
+: test-update-xt ( -- )
+    random-integer random-integer 2integer>x nth-rand f cons cons cons update-xt-check ;
 
 ! 2-arg tests
 : test-2integer>x ( -- )
@@ -285,6 +277,49 @@ SYMBOL: last
 : test-2integer>x-1 ( -- )
     random-integer random-integer-quotation-1 interp-compile-check-1 ;
 
+: test-2integer>x-throws ( -- )
+    [
+        random-integer , random-integer ,
+        math-throw-2 nth-rand ,
+    ] [ ] make interp-compile-check-catch ;
+
+: test-^-shift ( -- )
+    [
+        100 random-int 50 - ,
+        100 random-int 50 - ,
+        { ^ shift } nth-rand ,
+    ] [ ] make interp-compile-check-catch ;
+
+: test-^-ratio ( -- )
+    [
+        random-ratio , random-ratio , \ ^ ,
+    ] [ ] make interp-compile-check-catch ;
+
+: test-math {
+        ! test-integer>x 
+        ! test-ratio>x 
+        ! test-float>x 
+        ! test-complex>x 
+        test-integer>x-1
+        test-ratio>x-1
+        test-float>x-1
+        test-complex>x-1
+        ! test-integer>x-throws
+        ! test-ratio>x-throws
+
+        ! ! test-update-xt
+        ! test-2integer>x
+        ! test-2ratio>x
+        ! test-2float>x
+        ! test-2complex>x
+        test-2integer>x-1
+        ! test-2integer>x-throws
+        ! test-^-shift
+        ! test-^-ratio
+    } nth-rand unit call ;
+
+
+! Boolean logic tests
 : logic-0 ( -- seq )
     { unix? win32? bootstrapping? f t } ;
 
@@ -295,24 +330,11 @@ SYMBOL: last
         compound? real?
     } ;
 !  odd? even? power-of-2?
+: logic-2 ( -- seq ) { < > <= >= number= = eq?  and or } ;
+: logic-3 ( -- seq ) { between? } ;
+: complex-logic-2 ( -- seq ) { number= = eq? and or } ;
 
-: logic-2 ( -- seq )
-    {
-        < > <= >= number= = eq?  and or 
-    } ;
-
-: logic-3 ( -- seq )
-    { between? } ;
-
-: complex-logic-2 ( -- seq )
-    {
-        number= = eq? and or
-    } ;
-
-: logic-0-test ( -- )
-    [
-        logic-0 nth-rand ,
-    ] [ ] make interp-compile-check ;
+: logic-0-test ( -- ) logic-0 nth-rand unit interp-compile-check ;
 
 : integer-logic-1-test ( -- )
     [
@@ -355,19 +377,16 @@ SYMBOL: last
         random-complex , random-complex , complex-logic-2 nth-rand , 
     ] [ ] make interp-compile-check ;
 
-: test-integer { test-2integer>x test-integer>x test-2integer>x-1 } nth-rand execute ;
+: test-integer
+    {
+        
+        test-2integer>x test-integer>x test-2integer>x-1 } nth-rand execute ;
 ! quotation tests
 ! : test-integer random-integer-quotation interp-compile-check ;
 : test-ratio random-ratio-quotation interp-compile-check ;
 : test-float random-float-quotation interp-compile-check ;
 : test-complex random-complex-quotation interp-compile-check ;
 
-: test-math {
-        [ test-integer ]
-        [ test-ratio ]
-        [ test-float ]
-        [ test-complex ]
-    } do-one ;
 
 
 : string-to-math-test ( -- )

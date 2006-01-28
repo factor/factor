@@ -68,7 +68,7 @@ SYMBOL: special-complexes
     ] if ;
 
 : random-ratio ( -- ratio )
-    1000000000 dup [ random-int ] 2apply 1+ / coin-flip [ neg ] when dup [ drop random-ratio ] unless ;
+    1000000000 dup [ random-int ] 2apply 1+ / coin-flip [ neg ] when dup [ drop random-ratio ] unless 10% [ drop 0 ] when ;
 
 : random-float ( -- float )
     coin-flip [ random-ratio ] [ special-floats nth-rand ] if
