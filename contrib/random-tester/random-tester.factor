@@ -190,7 +190,8 @@ SYMBOL: last-quot
     = [ "problem in math" throw ] unless ;
 
 : interp-compile-check-1 ( x quot -- )
-    dup . flush
+    .s flush
+    ! dup . flush
     [ last-quot set ] keep
     [ call ] 2keep compile-1
     2dup swap unparse write " " write unparse print
@@ -392,6 +393,10 @@ SYMBOL: last-quot
         random-number , \ dup , \ float? , float>x nth-rand unit , \ when ,
     ] [ ] make interp-compile-check ;
 
+: test-float?-when-1
+    random-float [
+        \ dup , \ float? , float>x nth-rand unit , \ when ,
+    ] [ ] make interp-compile-check-1 ;
 
 
 : stack-identity-0
