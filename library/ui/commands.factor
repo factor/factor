@@ -2,7 +2,7 @@ IN: gadgets-presentations
 USING: compiler gadgets gadgets-buttons gadgets-listener
 gadgets-menus gadgets-panes generic hashtables inference
 inspector io jedit kernel lists namespaces parser prettyprint
-sequences words styles ;
+sequences strings styles words ;
 
 SYMBOL: commands
 
@@ -77,6 +77,8 @@ M: command-button gadget-help ( button -- string )
 "Open in jEdit" [ word? ] [ jedit ] \ call define-command
 "Reload original source" [ word? ] [ reload ] \ in-listener define-command
 "Infer stack effect" [ word? ] [ unit infer . ] \ in-listener define-command
+
+"Use word vocabulary" [ word? ] [ word-vocabulary use+ ] \ in-listener define-command
 
 "Display gadget" [ [ gadget? ] is? ] [ gadget. ] \ in-listener define-command
 

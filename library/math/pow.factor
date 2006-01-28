@@ -19,8 +19,18 @@ GENERIC: ^ ( z w -- z^w ) foldable
 : ^theta ( w abs arg -- theta )
     >r >r >rect r> flog * swap r> * + ; inline
 
+: 0^0 "0^0 is not defined" throw ;
+
+: 0^ ( z w -- )
+    dup 0 number= [
+        2drop 0.0/0.0
+    ] [
+        0 < [ drop 1.0/0.0 ] when
+    ] if ;
+
 M: number ^ ( z w -- z^w )
-    swap >polar 3dup ^theta >r ^mag r> polar> ;
+    over 0 number=
+    [ 0^ ] [ swap >polar 3dup ^theta >r ^mag r> polar> ] if ;
 
 : each-bit ( n quot -- | quot: 0/1 -- )
     over 0 number= pick -1 number= or [
@@ -34,11 +44,8 @@ M: number ^ ( z w -- z^w )
     inline
 
 M: integer ^ ( z w -- z^w )
-    over 0 number= over 0 number= and [
-        "0^0 is not defined" throw
-    ] [
-        dup 0 < [ neg ^ recip ] [ (integer^) ] if
-    ] if ;
+    over 0 number=
+    [ 0^ ] [ dup 0 < [ neg ^ recip ] [ (integer^) ] if ] if ;
 
 : power-of-2? ( n -- ? )
     dup 0 > [

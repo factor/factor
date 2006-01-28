@@ -25,4 +25,3 @@
 - if two tasks write to a unix stream, the buffer can overflow
 - font problem: http://iarc1.ece.utexas.edu/~erg/font-bug.JPG
 - make 3.4 bits>double an error
-- float>bits bits>double etc fail in gcc 4.0.3 with -fschedule-insns
