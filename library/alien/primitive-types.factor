@@ -124,7 +124,7 @@ math namespaces ;
 ] "ushort*" define-primitive-type
 
 [
-    [ alien-unsigned-4 0 = not ] "getter" set
+    [ alien-unsigned-4 zero? not ] "getter" set
     [ 1 0 ? set-alien-unsigned-4 ] "setter" set
     bootstrap-cell "width" set
     bootstrap-cell "align" set

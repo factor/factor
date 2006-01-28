@@ -24,7 +24,7 @@ vectors ;
     inline
 
 : (interleave) ( n -- array )
-    dup 0 = [
+    dup zero? [
         drop { }
     ] [
         t <array> f 0 pick set-nth-unsafe

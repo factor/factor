@@ -100,7 +100,7 @@ C: block ( -- block )
     [ section-end fresh-line ] [ drop ] if ;
 
 : section-fits? ( section -- ? )
-    margin get dup 0 = [
+    margin get dup zero? [
         2drop t
     ] [
         line-limit? pick block? and [

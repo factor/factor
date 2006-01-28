@@ -48,3 +48,10 @@ USE: test
 [ -4.0 ] [ -4.0 truncate ] unit-test
 [ -4.0 ] [ -4.0 floor ] unit-test
 [ -4.0 ] [ -4.0 ceiling ] unit-test
+
+[ t ] [ 0.0/0.0 0.0/0.0 = ] unit-test
+[ t ] [ -0.0 -0.0 = ] unit-test
+[ f ] [ 0.0 -0.0 = ] unit-test
+
+[ t ] [ 0.0 zero? ] unit-test
+[ t ] [ -0.0 zero? ] unit-test

@@ -23,4 +23,4 @@ USING: arrays generic kernel sequences ;
 : normalize ( vec -- uvec ) dup norm v/n ;
 
 : set-axis ( x y axis -- v )
-    dup length [ >r 0 = pick pick ? r> swap nth ] 2map 2nip ;
+    dup length [ >r zero? pick pick ? r> swap nth ] 2map 2nip ;

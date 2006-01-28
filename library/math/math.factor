@@ -33,6 +33,9 @@ GENERIC: 1- ( x -- x-1 ) foldable
 GENERIC: abs ( z -- |z| ) foldable
 GENERIC: absq ( n -- |n|^2 ) foldable
 
+GENERIC: zero? ( x -- ? ) foldable
+M: object zero? drop f ;
+
 : sq dup * ; inline
 : neg 0 swap - ; inline
 : recip 1 swap / ; inline

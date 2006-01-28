@@ -110,7 +110,7 @@ C: io-callback ( -- callback )
     pick over r> -rot >r >r GetQueuedCompletionStatus r> r> ;
 
 : overlapped>callback ( overlapped -- callback )
-    indirect-pointer-value dup 0 = [
+    indirect-pointer-value dup zero? [
         drop f
     ] [
         <alien> overlapped-ext-user-data get-io-callback

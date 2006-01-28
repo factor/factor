@@ -1,5 +1,5 @@
-! Copyright (C) 2004, 2005 Slava Pestov.
-! See http://factor.sf.net/license.txt for BSD license.
+! Copyright (C) 2004, 2006 Slava Pestov.
+! See http://factorcode.org/license.txt for BSD license.
 IN: math
 USING: generic kernel math-internals ;
 
@@ -11,7 +11,14 @@ M: real absq sq ;
 M: real hashcode ( n -- n ) >fixnum ;
 M: real <=> - ;
 
-M: float number= [ double>bits ] 2apply = ;
+: fp-nan? ( float -- ? )
+    double>bits -51 shift BIN: 111111111111 [ bitand ] keep = ;
+
+M: float zero?
+    double>bits HEX: 8000000000000000 [ bitor ] keep number= ;
+
+M: float number= [ double>bits ] 2apply number= ;
+
 M: float < float< ;
 M: float <= float<= ;
 M: float > float> ;

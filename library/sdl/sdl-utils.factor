@@ -10,7 +10,7 @@ SYMBOL: height
 SYMBOL: bpp
 
 : sdl-error ( 0/-1 -- )
-    0 = [ SDL_GetError throw ] unless ;
+    zero? [ SDL_GetError throw ] unless ;
 
 : init-keyboard ( -- )
     1 SDL_EnableUNICODE drop
@@ -32,10 +32,10 @@ SYMBOL: bpp
 
 : must-lock-surface? ( -- ? )
     #! This is a macro in SDL_video.h.
-    surface get dup surface-offset 0 = [
+    surface get dup surface-offset zero? [
         surface-flags
         SDL_HWSURFACE SDL_ASYNCBLIT bitor SDL_RLEACCEL bitor
-        bitand 0 = not
+        bitand zero? not
     ] [
         drop t
     ] if ;

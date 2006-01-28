@@ -215,7 +215,7 @@ namespaces sequences words ;
     ] if ;
 
 : fast-shift ( n -- )
-    dup 0 = [
+    dup zero? [
         -1 %inc-d ,
         drop
     ] [

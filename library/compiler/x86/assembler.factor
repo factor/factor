@@ -92,7 +92,7 @@ M: displaced register first register ;
 M: displaced displacement
     second dup byte? [ assemble-1 ] [ assemble-4 ] if ;
 M: displaced canonicalize
-    dup first EBP = not over second 0 = and
+    dup first EBP = not over second zero? and
     [ first 1array ] when ;
 M: displaced extended? first extended? ;
 M: displaced operand-64? first register-64? ;

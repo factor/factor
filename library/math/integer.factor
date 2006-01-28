@@ -11,7 +11,7 @@ UNION: integer fixnum bignum ;
 : odd? ( n -- ? ) 1 bitand 1 = ;
 
 : (gcd) ( b a y x -- a d )
-    dup 0 number= [
+    dup zero? [
         drop nip
     ] [
         tuck /mod >r pick * swap >r swapd - r> r> (gcd)
@@ -36,7 +36,7 @@ IN: math-internals
 : division-by-zero ( x y -- ) "Division by zero" throw ;
 
 M: integer / ( x y -- x/y )
-    dup 0 number= [
+    dup zero? [
         division-by-zero
     ] [
         dup 0 < [ [ neg ] 2apply ] when
@@ -69,6 +69,8 @@ M: fixnum shift fixnum-shift ;
 
 M: fixnum bitnot fixnum-bitnot ;
 
+M: fixnum zero? 0 eq? ;
+
 M: bignum number= bignum= ;
 M: bignum < bignum< ;
 M: bignum <= bignum<= ;
@@ -93,3 +95,5 @@ M: bignum bitxor bignum-bitxor ;
 M: bignum shift bignum-shift ;
 
 M: bignum bitnot bignum-bitnot ;
+
+M: bignum zero? 0 >bignum bignum= ;

@@ -72,7 +72,7 @@ SYMBOL: cutoff
     out-buffer get buffer-length 0 > [ flush-output ] when ;
 
 M: integer do-write ( int -- )
-    out-buffer get [ buffer-capacity 0 = [ flush-output ] when ] keep
+    out-buffer get [ buffer-capacity zero? [ flush-output ] when ] keep
     >r ch>string r> >buffer ;
 
 M: string do-write ( str -- )
@@ -96,7 +96,7 @@ M: string do-write ( str -- )
     dup in-buffer get n>buffer update-file-pointer ;
 
 : consume-input ( count -- str ) 
-    in-buffer get buffer-length 0 = [ fill-input ] when
+    in-buffer get buffer-length zero? [ fill-input ] when
     in-buffer get buffer-size min
     dup in-buffer get buffer-first-n
     swap in-buffer get buffer-consume ;
@@ -105,11 +105,11 @@ M: string do-write ( str -- )
     dup length 0 > [ >string ] [ drop f ] if ;
 
 : do-read-count ( sbuf count -- str )
-    dup 0 = [ 
+    dup zero? [ 
         drop >string 
     ] [
         dup consume-input
-        dup length dup 0 = [
+        dup length dup zero? [
             3drop >string-or-f
         ] [
             >r swap r> - >r swap [ swap nappend ] keep r> do-read-count
@@ -130,7 +130,7 @@ M: win32-stream stream-read ( count stream -- str )
 
 M: win32-stream stream-read1 ( stream -- str )
     win32-stream-this [
-        1 consume-input dup length 0 = [ drop f ] when first 
+        1 consume-input dup length zero? [ drop f ] when first 
     ] bind ;
 
 M: win32-stream stream-readln ( stream -- str )

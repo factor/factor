@@ -137,7 +137,7 @@ IN: hashtables
 
 : hash-size ( hash -- n ) dup hash-count swap hash-deleted - ;
 
-: hash-empty? ( hash -- ? ) hash-size 0 = ;
+: hash-empty? ( hash -- ? ) hash-size zero? ;
 
 : grow-hash ( hash -- )
     [ dup hash-array swap hash-size 1+ ] keep

@@ -37,7 +37,7 @@ SYMBOL: write-tasks
 
 : (io-error) err_no strerror throw ;
 
-: check-null ( n -- ) 0 = [ (io-error) ] when ;
+: check-null ( n -- ) zero? [ (io-error) ] when ;
 
 : io-error ( n -- ) 0 < [ (io-error) ] when ;
 
@@ -126,7 +126,7 @@ GENERIC: task-container ( task -- vector )
     ] if ;
 
 : timeout? ( port -- ? )
-    port-cutoff dup 0 = not swap millis < and ;
+    port-cutoff dup zero? not swap millis < and ;
 
 : handle-fdset ( fdset tasks -- )
     [
@@ -169,7 +169,7 @@ GENERIC: task-container ( task -- vector )
 
 : refill ( port -- ? )
     #! Return f if there is a recoverable error
-    dup buffer-length 0 = [
+    dup buffer-length zero? [
         dup (refill)  dup 0 >= [
             swap n>buffer t
         ] [
@@ -259,7 +259,7 @@ C: write-task ( port -- task )
     [ >r <io-task> r> set-delegate ] keep ;
 
 M: write-task do-io-task
-    io-task-port dup buffer-length 0 = over port-error or [
+    io-task-port dup buffer-length zero? over port-error or [
         0 swap buffer-reset t
     ] [
         write-step f

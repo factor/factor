@@ -106,7 +106,7 @@ GENERIC: trim-dead* ( tail vop -- )
 
 M: tuple trim-dead* ( tail vop -- ) dup forget-vregs , drop ;
 
-: simplify-inc ( vop -- ) dup 0 vop-in 0 = not ?, ;
+: simplify-inc ( vop -- ) dup 0 vop-in zero? not ?, ;
 
 M: %inc-d trim-dead* ( tail vop -- ) simplify-inc drop ;
 

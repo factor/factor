@@ -10,7 +10,8 @@ IN: freetype
 SYMBOL: freetype
 SYMBOL: open-fonts
 
-: freetype-error ( n -- ) 0 = [ "FreeType error" throw ] unless ;
+: freetype-error ( n -- )
+    zero? [ "FreeType error" throw ] unless ;
 
 : init-freetype ( -- )
     global [

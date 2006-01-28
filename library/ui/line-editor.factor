@@ -128,7 +128,7 @@ M: document-elt prev-elt* 3drop 0 ;
 
 : history-prev ( -- )
     #! Call this in the line editor scope.
-    history-index get dup 0 = [
+    history-index get dup zero? [
         drop
     ] [
         dup history-length = [ commit-history ] when

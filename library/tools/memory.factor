@@ -93,7 +93,7 @@ M: object each-slot ( obj quot -- )
     [ >r 2dup r> heap-stat-step ] each-object ;
 
 : heap-stat. ( { instances bytes type } -- )
-    dup first 0 = [
+    dup first zero? [
         dup third type>class pprint ": " write
         dup second pprint " bytes, " write
         dup first pprint " instances" print

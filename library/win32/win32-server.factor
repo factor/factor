@@ -55,12 +55,12 @@ SYMBOL: socket
     AF_INET over set-sockaddr-in-family ;
 
 : bind-socket ( port socket -- )
-    swap setup-sockaddr "sockaddr-in" c-size wsa-bind 0 = [
+    swap setup-sockaddr "sockaddr-in" c-size wsa-bind zero? [
         handle-socket-error
     ] unless ;
 
 : listen-socket ( socket -- )
-    20 wsa-listen 0 = [ handle-socket-error ] unless ;
+    20 wsa-listen zero? [ handle-socket-error ] unless ;
 
 : sockaddr> ( sockaddr -- port host )
     dup sockaddr-in-port ntohs swap sockaddr-in-addr inet-ntoa ;

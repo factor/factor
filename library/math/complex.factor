@@ -4,7 +4,7 @@ IN: math-internals
 USING: errors generic kernel kernel-internals math ;
 
 : (rect>) ( xr xi -- x )
-    dup 0 number= [ drop ] [ <complex> ] if ; inline
+    dup zero? [ drop ] [ <complex> ] if ; inline
 
 IN: math
 

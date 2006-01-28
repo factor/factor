@@ -101,3 +101,7 @@ unit-test
 [ { 0 1 1 0 } ] [ [ -10 [ , ] each-bit ] { } make ] unit-test
 
 [ -351382792 ] [ -43922849 3 shift ] unit-test
+
+[ t ] [ 0 zero? ] unit-test
+[ f ] [ 30 zero? ] unit-test
+[ t ] [ 0 >bignum zero? ] unit-test

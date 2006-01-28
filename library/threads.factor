@@ -22,7 +22,7 @@ namespaces queues sequences vectors ;
 DEFER: next-thread
 
 : do-sleep ( -- continuation )
-    sleep-queue* dup sleep-time dup 0 =
+    sleep-queue* dup sleep-time dup zero?
     [ drop pop cdr ] [ nip io-multiplex next-thread ] if ;
 
 : next-thread ( -- continuation )

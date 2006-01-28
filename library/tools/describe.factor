@@ -10,7 +10,7 @@ GENERIC: summary ( object -- string )
     0 > "a positive " "a negative " ? ;
 
 M: integer summary
-    dup sign-string over 2 mod 0 = "even " "odd " ?
+    dup sign-string over 2 mod zero? "even " "odd " ?
     rot class word-name append3 ;
 
 M: real summary
@@ -72,7 +72,7 @@ M: word summary ( word -- )
 : format-sheet ( sheet -- list )
     #! We use an idiom to notify format-column if it is
     #! formatting the last column.
-    dup length reverse-slice [ 0 = format-column ] 2map
+    dup length reverse-slice [ zero? format-column ] 2map
     flip [ " " join ] map ;
 
 DEFER: describe

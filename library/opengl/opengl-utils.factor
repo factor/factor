@@ -36,7 +36,7 @@ USING: alien errors kernel math namespaces opengl sdl sequences ;
     >r 0 gl-flags r> with-screen ; inline
 
 : gl-error ( -- )
-    glGetError dup 0 = [ drop ] [ gluErrorString throw ] if ;
+    glGetError dup zero? [ drop ] [ gluErrorString throw ] if ;
 
 : with-gl-surface ( quot -- )
     #! Execute a quotation, locking the current surface if it

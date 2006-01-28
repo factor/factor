@@ -67,7 +67,7 @@ M: general-list tail ( n list -- tail )
     swap [ cdr ] times ;
 
 M: general-list nth ( n list -- element )
-    over 0 number= [ nip car ] [ >r 1- r> cdr nth ] if ;
+    over zero? [ nip car ] [ >r 1- r> cdr nth ] if ;
 
 M: cons = ( obj cons -- ? )
     {

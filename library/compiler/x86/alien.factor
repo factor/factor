@@ -22,4 +22,4 @@ M: %box generate-node
     ESP 1 input reg-size ADD ;
 
 M: %cleanup generate-node
-    drop 0 input dup 0 = [ drop ] [ ESP swap ADD ] if ;
+    drop 0 input dup zero? [ drop ] [ ESP swap ADD ] if ;

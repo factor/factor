@@ -15,7 +15,7 @@ sequences-internals strings vectors words ;
 
 M: object like drop ;
 
-M: object empty? ( seq -- ? ) length 0 = ;
+M: object empty? ( seq -- ? ) length zero? ;
 
 : (>list) ( n i seq -- list )
     pick pick <= [

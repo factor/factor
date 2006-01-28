@@ -52,7 +52,7 @@ C: buffer ( size -- buffer )
 : buffer-capacity ( buffer -- int )
     dup buffer-size swap buffer-fill - ;
 
-: buffer-empty? ( buffer -- ? ) buffer-fill 0 = ;
+: buffer-empty? ( buffer -- ? ) buffer-fill zero? ;
 
 : buffer-extend ( length buffer -- )
     2dup buffer-ptr swap realloc check-ptr

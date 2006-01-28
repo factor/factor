@@ -22,18 +22,18 @@ GENERIC: ^ ( z w -- z^w ) foldable
 : 0^0 "0^0 is not defined" throw ;
 
 : 0^ ( z w -- )
-    dup 0 number= [
+    dup zero? [
         2drop 0.0/0.0
     ] [
         0 < [ drop 1.0/0.0 ] when
     ] if ;
 
 M: number ^ ( z w -- z^w )
-    over 0 number=
+    over zero?
     [ 0^ ] [ swap >polar 3dup ^theta >r ^mag r> polar> ] if ;
 
 : each-bit ( n quot -- | quot: 0/1 -- )
-    over 0 number= pick -1 number= or [
+    over zero? pick -1 number= or [
         2drop
     ] [
         2dup >r >r >r 1 bitand r> call r> -1 shift r> each-bit
@@ -44,7 +44,7 @@ M: number ^ ( z w -- z^w )
     inline
 
 M: integer ^ ( z w -- z^w )
-    over 0 number=
+    over zero?
     [ 0^ ] [ dup 0 < [ neg ^ recip ] [ (integer^) ] if ] if ;
 
 : power-of-2? ( n -- ? )

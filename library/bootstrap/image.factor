@@ -117,7 +117,7 @@ M: fixnum ' ( n -- tagged ) fixnum-tag immediate ;
 : bignum-radix bignum-bits 1 swap shift 1- ;
 
 : (bignum>seq) ( n -- )
-    dup 0 = [
+    dup zero? [
         drop
     ] [
         dup bignum-radix bitand ,
