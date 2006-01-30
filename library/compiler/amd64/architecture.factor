@@ -23,12 +23,9 @@ M: int-regs return-reg drop RAX ;
 
 M: int-regs fastcall-regs drop { RDI RSI RDX RCX R8 R9 } ;
 
-: reset-sse RAX RAX XOR ;
-
 : compile-c-call ( symbol dll -- )
-    reset-sse
-    2dup dlsym 1 scratch swap MOV
-    rel-absolute-cell rel-dlsym 1 scratch CALL ;
+    2dup dlsym R10 swap MOV
+    rel-absolute-cell rel-dlsym R10 CALL ;
 
 : compile-c-call* ( symbol dll args -- )
     T{ int-regs } fastcall-regs

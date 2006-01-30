@@ -8,7 +8,7 @@ GENERIC: store-insn ( offset reg-class -- )
 
 GENERIC: load-insn ( elt parameter reg-class -- )
 
-: stack@ RCX RSP MOV  RCX swap 2array ;
+: stack@ R10 RSP MOV  R10 swap 2array ;
 
 M: int-regs store-insn
     drop stack@ RAX MOV ;
@@ -36,6 +36,12 @@ M: %unbox generate-node ( vop -- )
 M: %parameter generate-node ( vop -- )
     ! Move a value from the C stack into the fastcall register
     drop 0 input 1 input 2 input load-insn ;
+
+: reset-sse RAX RAX XOR ;
+
+M: %alien-invoke generate-node
+    reset-sse
+    drop 0 input 1 input load-library compile-c-call ;
 
 : load-return-value ( reg-class -- )
     dup fastcall-regs first swap return-reg
