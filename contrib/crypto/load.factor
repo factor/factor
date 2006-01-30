@@ -10,4 +10,5 @@ USING: kernel parser sequences words compiler ;
     "md5"
     "sha1"
     "rsa"
+    "rc4"
 } [ "/contrib/crypto/" swap ".factor" append3 run-resource ] each
