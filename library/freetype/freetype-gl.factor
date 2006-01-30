@@ -159,8 +159,8 @@ C: font ( handle -- font )
     font-ascent swap glyph-hori-bearing-y - ft-floor 0 3array ;
 
 : glyph-texture-size ( glyph -- dim )
-    dup glyph-bitmap-width 
-    swap glyph-bitmap-rows 0 3array ;
+    dup glyph-bitmap-width next-power-of-2
+    swap glyph-bitmap-rows next-power-of-2 0 3array ;
 
 : <char-sprite> ( font char -- sprite )
     #! Create a new display list of a rendered glyph. This
