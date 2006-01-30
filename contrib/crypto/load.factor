@@ -5,6 +5,9 @@ USING: kernel parser sequences words compiler ;
 
 {
     "common"
+    "random"
+    "miller-rabin"
     "md5"
     "sha1"
+    "rsa"
 } [ "/contrib/crypto/" swap ".factor" append3 run-resource ] each
