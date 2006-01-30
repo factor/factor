@@ -1,5 +1,5 @@
-! Copyright (C) 2005 Slava Pestov.
-! See http://factor.sf.net/license.txt for BSD license.
+! Copyright (C) 2005, 2006 Slava Pestov.
+! See http://factorcode.org/license.txt for BSD license.
 IN: opengl
 USING: alien errors kernel math namespaces opengl sdl sequences ;
 
@@ -51,13 +51,13 @@ USING: alien errors kernel math namespaces opengl sdl sequences ;
     swap [ glMatrixMode glPushMatrix call ] keep
     glMatrixMode glPopMatrix ; inline
 
+: top-left drop 0 0 glTexCoord2d 0 0 0 glVertex3d ; inline
+
+: top-right 1 0 glTexCoord2d first 0 0 glVertex3d ; inline
+
+: bottom-left 0 1 glTexCoord2d second 0 swap 0 glVertex3d ; inline
+
 : gl-vertex first3 glVertex3d ; inline
-
-: top-left drop 0 0 glTexCoord2d { 0 0 0 } gl-vertex ; inline
-
-: top-right 1 0 glTexCoord2d { 1 0 0 } v* gl-vertex ; inline
-
-: bottom-left 0 1 glTexCoord2d { 0 1 0 } v* gl-vertex ; inline
 
 : bottom-right 1 1 glTexCoord2d gl-vertex ; inline
 

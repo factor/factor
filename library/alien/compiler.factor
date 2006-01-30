@@ -1,5 +1,5 @@
-! Copyright (C) 2004, 2005 Slava Pestov.
-! See http://factor.sf.net/license.txt for BSD license.
+! Copyright (C) 2004, 2006 Slava Pestov.
+! See http://factorcode.org/license.txt for BSD license.
 IN: alien
 USING: assembler compiler compiler-backend compiler-frontend
 errors generic hashtables inference inspector io kernel
@@ -116,12 +116,16 @@ C: alien-node make-node ;
         c-type [ "boxer" get "reg-class" get ] bind %box ,
     ] if ;
 
+: linearize-cleanup ( node -- )
+    node-param cdr library-abi "stdcall" =
+    [ dup parameters stack-space %cleanup , ] unless ;
+
 M: alien-node linearize* ( node -- )
     dup parameters linearize-parameters
-    dup node-param dup uncons %alien-invoke ,
-    cdr library-abi "stdcall" =
-    [ dup parameters stack-space %cleanup , ] unless
-    dup linearize-return linearize-next ;
+    dup node-param uncons %alien-invoke ,
+    dup linearize-cleanup
+    dup linearize-return
+    linearize-next ;
 
 : parse-arglist ( lst -- types stack effect )
     unpair [

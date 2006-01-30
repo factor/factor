@@ -1,7 +1,7 @@
-! Copyright (C) 2005 Slava Pestov.
-! See http://factor.sf.net/license.txt for BSD license.
+! Copyright (C) 2005, 2006 Slava Pestov.
+! See http://factorcode.org/license.txt for BSD license.
 USING: alien arrays errors hashtables io kernel
-kernel-internals lists math namespaces opengl prettyprint
+kernel-internals math namespaces opengl prettyprint
 sequences styles ;
 IN: freetype
 
@@ -54,19 +54,19 @@ M: font = eq? ;
     init-freetype [ close-freetype ] cleanup ; inline
 
 : ttf-name ( font style -- name )
-    cons H{
-        { [[ "monospace" plain        ]] "VeraMono" }
-        { [[ "monospace" bold         ]] "VeraMoBd" }
-        { [[ "monospace" bold-italic  ]] "VeraMoBI" }
-        { [[ "monospace" italic       ]] "VeraMoIt" }
-        { [[ "sans-serif" plain       ]] "Vera"     }
-        { [[ "sans-serif" bold        ]] "VeraBd"   }
-        { [[ "sans-serif" bold-italic ]] "VeraBI"   }
-        { [[ "sans-serif" italic      ]] "VeraIt"   }
-        { [[ "serif" plain            ]] "VeraSe"   }
-        { [[ "serif" bold             ]] "VeraSeBd" }
-        { [[ "serif" bold-italic      ]] "VeraBI"   }
-        { [[ "serif" italic           ]] "VeraIt"   }
+    2array H{
+        { { "monospace" plain        } "VeraMono" }
+        { { "monospace" bold         } "VeraMoBd" }
+        { { "monospace" bold-italic  } "VeraMoBI" }
+        { { "monospace" italic       } "VeraMoIt" }
+        { { "sans-serif" plain       } "Vera"     }
+        { { "sans-serif" bold        } "VeraBd"   }
+        { { "sans-serif" bold-italic } "VeraBI"   }
+        { { "sans-serif" italic      } "VeraIt"   }
+        { { "serif" plain            } "VeraSe"   }
+        { { "serif" bold             } "VeraSeBd" }
+        { { "serif" bold-italic      } "VeraBI"   }
+        { { "serif" italic           } "VeraIt"   }
     } hash ;
 
 : ttf-path ( name -- string )
@@ -159,8 +159,8 @@ C: font ( handle -- font )
     font-ascent swap glyph-hori-bearing-y - ft-floor 0 3array ;
 
 : glyph-texture-size ( glyph -- dim )
-    dup glyph-bitmap-width next-power-of-2
-    swap glyph-bitmap-rows next-power-of-2 0 3array ;
+    dup glyph-bitmap-width 
+    swap glyph-bitmap-rows 0 3array ;
 
 : <char-sprite> ( font char -- sprite )
     #! Create a new display list of a rendered glyph. This

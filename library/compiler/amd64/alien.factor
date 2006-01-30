@@ -24,7 +24,8 @@ M: float-regs store-insn
 M: float-regs load-insn
     [ fastcall-regs nth swap stack@ ] keep MOVSS/LPD ;
 
-M: stack-params load-insn 3drop ;
+M: stack-params load-insn
+    drop >r R11 swap stack@ MOV r> stack@ R11 MOV ;
 
 M: %unbox generate-node ( vop -- )
     drop

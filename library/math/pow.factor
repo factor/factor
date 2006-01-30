@@ -19,8 +19,6 @@ GENERIC: ^ ( z w -- z^w ) foldable
 : ^theta ( w abs arg -- theta )
     >r >r >rect r> flog * swap r> * + ; inline
 
-: 0^0 "0^0 is not defined" throw ;
-
 : 0^ ( z w -- )
     dup zero? [
         2drop 0.0/0.0

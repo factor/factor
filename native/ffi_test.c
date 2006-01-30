@@ -54,3 +54,15 @@ double ffi_test_8(double x, float y, double z, float t, int w)
 	printf("ffi_test_8(%f,%f,%f,%f,%d)\n",x,y,z,t,w);
 	return x * y + z * t + w;
 }
+
+int ffi_test_9(int a, int b, int c, int d, int e, int f, int g)
+{
+	printf("ffi_test_9(%d,%d,%d,%d,%d,%d,%d)\n",a,b,c,d,e,f,g);
+	return a + b + c + d + e + f + g;
+}
+
+int ffi_test_10(int a, int b, double c, int d, float e, int f, int g, int h)
+{
+	printf("ffi_test_10(%d,%d,%f,%d,%f,%d,%d,%d)\n",a,b,c,d,e,f,g,h);
+	return a - b - c - d - e - f - g - h;
+}

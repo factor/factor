@@ -27,3 +27,9 @@ FUNCTION: double ffi_test_7 double x double y ; compiled
 FUNCTION: double ffi_test_8 double x float y double z float t int w ; compiled
 [ 19.0 ] [ 3.0 2.0 1.0 6.0 7 ffi_test_8 ] unit-test
 
+FUNCTION: int ffi_test_9 int a int b int c int d int e int f int g ; compiled
+[ 28 ] [ 1 2 3 4 5 6 7 ffi_test_9 ] unit-test
+
+FUNCTION: int ffi_test_10 int a int b double c int d float e int f int g int h ; compiled
+[ -34 ] [ 1 2 3 4 5 6 7 8 ffi_test_10 ] unit-test
+

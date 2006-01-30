@@ -48,6 +48,9 @@ this is lexicographic order, and for words, this compares word names.</li>
 <code>contrib/math/</code>.</li>
 <li>The <code>mod</code> word is now supported for ratios and floating point numbers.</li>
 <li>The <code>truncate</code>, <code>floor</code> and <code>ceiling</code> words are now supported for floating point numbers.</li>
+<li>The NaN, positive infinity and negative infinity floating point numbers now parse and unparse as <code>0.0/0.0</code>, <code>1.0/0.0</code>, and <code>-1.0/0.0</code> respectively.</li>
+<li>The NaN value is now equal to itself under <code>=</code>.</li>
+<li>Negative and postive zero are no longer equal under <code>=</code>. However, the new <code>zero?</code> word tests if the top of the stack is a zero, and it tests for both positive and negative zero.</li>
 </ul>
 
 </li>

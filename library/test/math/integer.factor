@@ -67,7 +67,7 @@ USING: kernel math namespaces prettyprint test ;
 [ 134217728 dup + dup + dup + dup + dup + dup + unparse ]
 unit-test
 
-[ 0 0 ^ ] unit-test-fails
+[ 0.0/0.0 ] [ 0 0 ^ ] unit-test
 [ 1 ] [ 10 0 ^ ] unit-test
 [ 1/8 ] [ 1/2 3 ^ ] unit-test
 [ 1/8 ] [ 2 -3 ^ ] unit-test
