@@ -141,7 +141,7 @@ HELP: os "( -- os )"
 { $values { "os" "a string" } }
 { $description
     "Outputs a string descriptor of the current operating system family. Currently, this set of descriptors is:"
-    { $code "freebsd" "linux" "macosx" "win32" "unix" }
+    { $code "freebsd" "linux" "macosx" "solaris" "win32" "unix" }
 } ;
 
 HELP: call "( quot -- )"

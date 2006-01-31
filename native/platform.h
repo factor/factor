@@ -31,6 +31,8 @@
 	#define FACTOR_OS_STRING "linux"
 #elif defined(__APPLE__)
 	#define FACTOR_OS_STRING "macosx"
+#elif defined(__sun)
+	#define FACTOR_OS_STRING "solaris"
 #else
 	#define FACTOR_OS_STRING "unix"
 #endif

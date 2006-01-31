@@ -368,7 +368,7 @@ SYMBOL: first-arg
 
 ! Boolean logic tests
 : logic-0 ( -- seq )
-    { unix? win32? bootstrapping? f t } ;
+    { bootstrapping? f t } ;
 
 : logic-1 ( -- seq )
     {

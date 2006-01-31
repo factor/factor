@@ -61,6 +61,7 @@ default:
 	@echo "linux-ppc"
 	@echo "macosx"
 	@echo "macosx-sdl -- if you wish to use the Factor GUI on Mac OS X"
+	@echo "solaris"
 	@echo "windows"
 	@echo ""
 	@echo "Also, you might want to set the SITE_CFLAGS environment"

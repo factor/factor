@@ -1,12 +1,12 @@
-! Copyright (C) 2004, 2005 Slava Pestov.
-! See http://factor.sf.net/license.txt for BSD license.
+! Copyright (C) 2004, 2006 Slava Pestov.
+! See http://factorcode.org/license.txt for BSD license.
 USING: compiler compiler-backend io io-internals kernel
 kernel-internals lists math memory namespaces optimizer parser
 sequences sequences-internals words ;
 
 "compile" get [
     "native-io" get [
-        unix? [
+        os { "freebsd" "linux" "macosx" "solaris" } member? [
             "/library/unix/load.factor" run-resource
         ] when
 
