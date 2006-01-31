@@ -17,6 +17,15 @@ void signal_handler(int signal, siginfo_t* siginfo, void* uap)
 		signal_error(signal);
 }
 
+static void sigaction_safe(int signum, const struct sigaction *act, struct sigaction *oldact)
+{
+	int ret;
+	do
+	{
+		ret = sigaction(signum, act, oldact);
+	} while(ret == -1 && errno == EINTR);
+}
+
 void init_signals(void)
 {
 	struct sigaction custom_sigaction;
@@ -25,15 +34,15 @@ void init_signals(void)
 	sigemptyset(&custom_sigaction.sa_mask);
 	custom_sigaction.sa_sigaction = signal_handler;
 	custom_sigaction.sa_flags = SA_SIGINFO;
-	sigaction(SIGABRT,&custom_sigaction,NULL);
-	sigaction(SIGFPE,&custom_sigaction,NULL);
-	sigaction(SIGBUS,&custom_sigaction,NULL);
-	sigaction(SIGQUIT,&custom_sigaction,NULL);
-	sigaction(SIGSEGV,&custom_sigaction,NULL);
+	sigaction_safe(SIGABRT,&custom_sigaction,NULL);
+	sigaction_safe(SIGFPE,&custom_sigaction,NULL);
+	sigaction_safe(SIGBUS,&custom_sigaction,NULL);
+	sigaction_safe(SIGQUIT,&custom_sigaction,NULL);
+	sigaction_safe(SIGSEGV,&custom_sigaction,NULL);
 	
 	sigemptyset(&ign_sigaction.sa_mask);
 	ign_sigaction.sa_handler = SIG_IGN;
-	sigaction(SIGPIPE,&ign_sigaction,NULL);
+	sigaction_safe(SIGPIPE,&ign_sigaction,NULL);
 
 #ifdef __APPLE__
 	mach_initialize();
