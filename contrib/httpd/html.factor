@@ -187,7 +187,7 @@ M: html-stream with-nested-stream ( quot style stream -- )
 M: html-stream stream-terpri [ <br/> ] with-stream* ;
 
 : default-css ( -- )
-  <style>
+  <style "text/css" =type>
     "A:link { text-decoration: none; color: black; }" print
     "A:visited { text-decoration: none; color: black; }" print
     "A:active { text-decoration: none; color: black; }" print
