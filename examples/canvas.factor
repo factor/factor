@@ -46,7 +46,7 @@ C: canvas ( quot -- )
     dup delegate>gadget [ set-canvas-quot ] keep ;
 
 M: canvas add-notify* ( gadget -- )
-    canvas-quot GL_COMPILE [ with-scope ] make-dlist
+    dup canvas-quot GL_COMPILE [ with-scope ] make-dlist
     swap set-canvas-id ;
 
 M: canvas draw-gadget* ( gadget -- )
@@ -68,10 +68,10 @@ M: canvas draw-gadget* ( gadget -- )
     4 [ drop 255 random-int 255 /f ] map gl-color ;
 
 : turtle-test
-    { 800 800 0 } [
+    { 400 400 0 } [
         36 [
-            random-color
+            ! random-color
             10 line-to
-            10 turn-by [ 60 17 regular-polygon ] new-pen
+            10 turn-by [ 60 10 regular-polygon ] new-pen
         ] times
     ] with-canvas ;

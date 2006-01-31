@@ -66,7 +66,7 @@ BEGIN-STRUCT: glyph
     FIELD: FT_Pos   advance-x
     FIELD: FT_Pos   advance-y
                     
-    FIELD: int      format
+    FIELD: long     format
                     
     FIELD: int      bitmap-rows
     FIELD: int      bitmap-width
