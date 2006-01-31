@@ -1,9 +1,9 @@
 ! Copyright (C) 2004, 2006 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-IN: html
 USING: cont-responder generic hashtables help http inspector io
 kernel lists prototype-js math namespaces sequences strings
 styles words xml ;
+IN: html
 
 : hex-color, ( triplet -- )
     3 swap head
@@ -61,7 +61,8 @@ styles words xml ;
 
 : padding-css, ( padding -- ) "padding: " % # "px; " % ;
 
-: pre-css, ( -- ) "white-space: pre; font-family:monospace; " % ;
+: pre-css, ( -- )
+    "white-space: pre; font-family:monospace; " % ;
 
 : div-css-style ( style -- str )
     [
