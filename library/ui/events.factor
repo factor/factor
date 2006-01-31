@@ -47,4 +47,6 @@ M: quit-event handle-event ( event -- )
 M: resize-event handle-event ( event -- )
     flush-fonts
     gl-resize
-    width get height get 0 3array world get set-gadget-dim ;
+    world get remove-notify
+    width get height get 0 3array world get set-gadget-dim
+    world get add-notify ;

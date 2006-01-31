@@ -90,9 +90,14 @@ M: gadget children-on ( rect/point gadget -- list )
 
 : max-dim ( dims -- dim ) { 0 0 0 } [ vmax ] reduce ;
 
+: each-child ( gadget quot -- )
+    >r gadget-children r> each ; inline
+
+: each-child-with ( obj gadget quot -- )
+    >r gadget-children r> each-with ; inline
+
 : set-gadget-delegate ( delegate gadget -- )
-    dup pick gadget-children [ set-gadget-parent ] each-with
-    set-delegate ;
+    dup pick [ set-gadget-parent ] each-child-with set-delegate ;
 
 ! Pointer help protocol
 GENERIC: gadget-help

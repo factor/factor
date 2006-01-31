@@ -46,7 +46,7 @@ SYMBOL: margin
 : do-wrap ( paragraph quot -- dim | quot: pos child -- )
     [
         swap dup init-wrap
-        gadget-children [ wrap-step ] each-with wrap-dim
+        [ wrap-step ] each-child-with wrap-dim
     ] with-scope ; inline
 
 M: paragraph pref-dim* ( paragraph -- dim )

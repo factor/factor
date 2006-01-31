@@ -1,7 +1,8 @@
 ! Copyright (C) 2005, 2006 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 IN: opengl
-USING: alien errors kernel math namespaces opengl sdl sequences ;
+USING: alien errors io kernel math namespaces opengl sdl
+sequences ;
 
 : gl-color ( { r g b a } -- ) first4 glColor4d ; inline
 
@@ -36,7 +37,8 @@ USING: alien errors kernel math namespaces opengl sdl sequences ;
     >r 0 gl-flags r> with-screen ; inline
 
 : gl-error ( -- )
-    glGetError dup zero? [ drop ] [ gluErrorString throw ] if ;
+    glGetError dup zero?
+    [ drop ] [ "GL error: " write gluErrorString print ] if ;
 
 : with-gl-surface ( quot -- )
     #! Execute a quotation, locking the current surface if it

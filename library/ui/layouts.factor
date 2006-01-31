@@ -59,7 +59,7 @@ M: gadget layout* drop ;
 
 DEFER: layout
 
-: layout-children ( gadget -- ) gadget-children [ layout ] each ;
+: layout-children ( gadget -- ) [ layout ] each-child ;
 
 : layout ( gadget -- )
     #! Position the children of the gadget inside the gadget.
