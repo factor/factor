@@ -98,6 +98,12 @@ linux-ppc:
 		LIBS="-ldl $(DEFAULT_LIBS)"
 	$(STRIP) $(BINARY)
 
+solaris solaris-x86:
+	$(MAKE) $(BINARY) \
+		CFLAGS="$(DEFAULT_CFLAGS) -D_STDC_C99 -Drestrict=\"\" " \
+		LIBS="-ldl -lsocket -lnsl $(DEFAULT_LIBS) -R/opt/PM/lib -R/opt/csw/lib -R/usr/local/lib -R/usr/sfw/lib -R/usr/X11R6/lib -R/opt/sfw/lib"
+	$(STRIP) $(BINARY)
+
 windows:
 	$(MAKE) $(BINARY) \
 		CFLAGS="$(DEFAULT_CFLAGS) -DFFI -DWIN32" \

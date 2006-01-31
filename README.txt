@@ -10,8 +10,9 @@ Factor is fully supported on the following platforms:
 
   Linux/x86
   Linux/AMD64
-  Microsoft Windows 2000 or later
   Mac OS X/PowerPC
+  Solaris/x86
+  Microsoft Windows 2000 or later
 
 The following platforms should work, but are not tested on a
 regular basis:
@@ -19,6 +20,7 @@ regular basis:
   FreeBSD/x86
   FreeBSD/AMD64
   Linux/PowerPC
+  Solaris/AMD64
 
 Other platforms are not supported.
 
@@ -38,6 +40,7 @@ parameters to build the Factor runtime:
   linux-ppc
   macosx
   macosx-sdl
+  solaris
   windows
 
 Note: If you wish to use the Factor UI on Mac OS X, you must build with
