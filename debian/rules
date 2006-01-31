@@ -17,22 +17,17 @@ build: build-stamp
 
 build-stamp: configure-stamp
 	dh_testdir
+	# Build the bootstrap image
 	$(MAKE) linux-$(FARCH)
 	mv f runtime
-	# Build the bootstrap image
-	echo 'USE: image "$(FARCH)" make-image' | factor-run --basic -resource-path=. # || wget http://factorcode.org/boot.image.$(FARCH)
+	echo 'USE: image "$(FARCH)" make-image' | ./runtime /usr/lib/factor/basic.image # || wget http://factorcode.org/boot.image.$(FARCH)
 	mv boot.image.$(FARCH) boot.image
 	# Build the factor image
 	./runtime boot.image -libraries:sdl:name=libSDL.so -libraries:freetype:name=libfreetype.so
 	mv factor.image basic.image
 	# Build the extended image
 	sqlite3 contrib/sqlite/test.db < contrib/sqlite/test.txt
-	$(CC) $(CFLAGS) -L /usr/X11R6/lib -shared -o contrib/factory/simple-error-handler.so contrib/factory/simple-error-handler.c -lX11
 	echo 'USING: image kernel ; "contrib/load.factor" run-file compile-all "extended.image" save-image 0 exit' | ./runtime basic.image +X8
-	# Build the documentation
-	cd doc && for i in *.eps; do epstopdf $$i; done
-	cd doc && rubber --pdf theory
-	cd doc && sh makedoc
 	touch build-stamp
 
 clean:
