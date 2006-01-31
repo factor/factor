@@ -24,4 +24,4 @@ USING: io httpd cont-responder html kernel lists namespaces strings ;
   #! call the given quotation on the server. The output generated
   #! from that quotation will replace the DOM element on the page with
   #! the given id. The 'text' is the anchor text.
-  <a "#" =href updating-javascript =onclick a> write </a> ;
+  <a updating-javascript =onclick a> write </a> ;

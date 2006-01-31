@@ -152,23 +152,17 @@ M: html-stream stream-format ( str style stream -- )
 : with-html-stream ( quot -- )
     stdio get <html-stream> swap with-stream* ;
 
+: make-outliner-quot
+    [
+        <div "padding-left:10px;" =style div>
+            with-html-stream
+        </div>
+    ] curry [ , \ show-final , ] [ ] make ;
+            
 : html-outliner ( caption contents -- )
-    <table "display: inline; " =style table>
-        <tr>
-            <td>
-                "+" get-random-id dup >r rot [
-                    with-html-stream
-                ] curry [ , \ show-final , ] [ ] make updating-anchor
-            </td>
-            <td>
-                call
-            </td>
-        </tr>
-        <tr>
-            <td> </td>
-            <td> <div r> =id div> </td>
-        </tr>
-    </table> ;
+    "+ " get-random-id dup >r
+    rot make-outliner-quot updating-anchor call
+    <span r> =id span> </span> ;
 
 : outliner-tag ( style quot -- )
     outline pick hash [ html-outliner ] [ call ] if* ;
