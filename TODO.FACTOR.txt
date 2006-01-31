@@ -1,8 +1,8 @@
+- examples/canvas: free display lists
 - fix remaining HTML stream issues
 - help cross-referencing
 - UI browser pane needs 'back' button
 - runtime primitives like fopen: check for null input
-- amd64 alien calls
 - port ffi to win64
 - intrinsic char-slot set-char-slot for x86
 - fix up the min thumb size hack
