@@ -25,6 +25,7 @@
 - if two tasks write to a unix stream, the buffer can overflow
 - font problem: http://iarc1.ece.utexas.edu/~erg/font-bug.JPG
 - make 3.4 bits>double an error
+- 0./0. 0 0 ^ = . -> f  floating point nan has different bit representations
 
 - 2220.446049250313 [ dup float? [ tanh ] when ] 
   - call and compile-1 give  C{ 0.0/0.0 0.0/0.0 }  0.0/0.0
