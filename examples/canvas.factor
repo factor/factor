@@ -49,6 +49,9 @@ M: canvas add-notify* ( gadget -- )
     dup canvas-quot GL_COMPILE [ with-scope ] make-dlist
     swap set-canvas-id ;
 
+M: canvas remove-notify* ( gadget -- )
+    canvas-id 1 glDeleteLists ;
+
 M: canvas draw-gadget* ( gadget -- )
     GL_MODELVIEW [
         dup rect-dim 2 v/n gl-translate

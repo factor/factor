@@ -1,4 +1,3 @@
-- examples/canvas: free display lists
 - fix remaining HTML stream issues
 - help cross-referencing
 - UI browser pane needs 'back' button
