@@ -15,13 +15,6 @@ USE: lists
 
 [ ] [ "404 not found" httpd-error ] unit-test
 
-[ "arg" ] [
-    [
-        "arg" "default-argument" set
-        "" responder-argument
-    ] with-scope
-] unit-test
-
 [ "inspect/global" ] [ "/inspect/global" trim-/ ] unit-test
 
 [ ] [

@@ -10,22 +10,19 @@ global [
     H{ } clone responders set
 
     ! 404 error message pages are served by this guy
-    [
-        "404" "responder" set
-        [ drop no-such-responder ] "get" set
-    ] make-responder
+    "404" [ no-such-responder ] install-cont-responder
 
     ! Online help browsing
     "help" [ help-responder ] install-cont-responder
 
     ! Javascript source used by ajax libraries
-    [ 
-      "contrib/httpd/javascript/" resource-path "doc-root" set
-      "javascript" "responder" set
-      [ file-responder ] "get" set
-      [ file-responder ] "post" set
-      [ file-responder ] "head" set
-    ] make-responder
+    "javascript" [ 
+        [
+            "contrib/httpd/javascript/" resource-path
+            "doc-root" set
+            file-responder
+        ] with-scope
+    ] install-cont-responder
 
     ! Global variables
     "inspector" [ inspect-responder ] install-cont-responder
@@ -36,13 +33,7 @@ global [
     ! Serves files from a directory stored in the "doc-root"
     ! variable. You can set the variable in the global namespace,
     ! or inside the responder.
-    [
-        ! "/var/www/" "doc-root" set
-        "file" "responder" set
-        [ file-responder ] "get" set
-        [ file-responder ] "post" set
-        [ file-responder ] "head" set
-    ] make-responder
+    "file" [ file-responder ] install-cont-responder
     
     ! The root directory is served by...
     "file" set-default-responder

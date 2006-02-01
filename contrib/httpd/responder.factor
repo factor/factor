@@ -126,11 +126,8 @@ SYMBOL: responders
 : set-default-responder ( name -- )
     responder "default" responders get set-hash ;
 
-: responder-argument ( argument -- argument )
-    dup empty? [ drop "default-argument" get ] when ;
-
 : call-responder ( method argument responder -- )
-    [ responder-argument swap get call ] bind ;
+    over "argument" set [ swap get call ] bind ;
 
 : serve-default-responder ( method url -- )
     "default" responder call-responder ;

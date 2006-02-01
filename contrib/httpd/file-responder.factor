@@ -1,8 +1,8 @@
 ! Copyright (C) 2004,2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: file-responder
-USING: html httpd kernel lists math namespaces parser sequences
-io strings ;
+USING: cont-responder html httpd io kernel lists math namespaces
+parser sequences strings ;
 
 : serving-path ( filename -- filename )
     [ "" ] unless* "doc-root" get swap append ;
@@ -49,13 +49,15 @@ io strings ;
 : serve-object ( filename -- )
     dup directory? [ serve-directory ] [ serve-file ] if ;
 
-: file-responder ( filename -- )
-    "doc-root" get [
-        serving-path dup exists? [
-            serve-object
+: file-responder ( -- )
+    [
+        "doc-root" get [
+            "argument" get serving-path dup exists? [
+                serve-object
+            ] [
+                drop "404 not found" httpd-error
+            ] if
         ] [
-            drop "404 not found" httpd-error
+            "404 doc-root not set" httpd-error
         ] if
-    ] [
-        drop "404 doc-root not set" httpd-error
-    ] if ;
+    ] (show-final) ;

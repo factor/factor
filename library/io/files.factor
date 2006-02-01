@@ -32,7 +32,7 @@ DEFER: directory.
 
 : (directory.) ( name path -- )
     dup [ directory. ] curry
-    [ "/" append (file.) ] write-outliner ;
+    [ "/" append (file.) ] write-outliner terpri ;
 
 : file. ( dir name -- )
     tuck path+
