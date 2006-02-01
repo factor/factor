@@ -44,10 +44,9 @@ namespaces sequences ;
 GENERIC: pref-dim* ( gadget -- dim )
 
 : pref-dim ( gadget -- dim )
-    pref-dim* ;
-    ! dup gadget-pref-dim [ ] [
-    !     dup pref-dim* dup rot set-gadget-pref-dim
-    ! ] ?if ;
+    dup gadget-pref-dim [ ] [
+        dup pref-dim* dup rot set-gadget-pref-dim
+    ] ?if ;
 
 M: gadget pref-dim* rect-dim ;
 
