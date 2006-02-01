@@ -4,7 +4,6 @@
 - UI browser pane needs 'back' button
 - runtime primitives like fopen: check for null input
 - port ffi to win64
-- intrinsic char-slot set-char-slot for x86
 - fix up the min thumb size hack
 - the invalid recursion form case needs to be fixed, for inlines too
 - code walker & exceptions
@@ -23,9 +22,7 @@
 - stream server can hang because of exception handler limitations
 - better i/o scheduler
 - if two tasks write to a unix stream, the buffer can overflow
-- font problem: http://iarc1.ece.utexas.edu/~erg/font-bug.JPG
 - make 3.4 bits>double an error
-- 0./0. 0 0 ^ = . -> f  floating point nan has different bit representations
 
 - 2220.446049250313 [ dup float? [ tanh ] when ] 
   - call and compile-1 give  C{ 0.0/0.0 0.0/0.0 }  0.0/0.0

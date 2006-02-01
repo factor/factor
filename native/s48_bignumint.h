@@ -1,6 +1,6 @@
 /* -*-C-*-
 
-$Id$
+$Id: s48_bignumint.h,v 1.14 2005/12/21 02:36:52 spestov Exp $
 
 Copyright (c) 1989-1992 Massachusetts Institute of Technology
 

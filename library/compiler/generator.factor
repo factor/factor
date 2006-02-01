@@ -72,6 +72,4 @@ M: %alien-invoke generate-node
 : card-bits 7 ;
 : card-mark HEX: 80 ;
 
-: shift-add ( by -- n )
-    #! Used in fixnum-shift overflow check.
-    >r 1 cell-bits r> 1- - shift ;
+: string-offset 3 cells object-tag - ;

@@ -59,20 +59,20 @@ namespaces sequences words ;
     1 %write-barrier ,
 ] "intrinsic" set-word-prop
 
-! \ char-slot [
-!     drop
-!     in-2
-!     -1 %inc-d ,
-!     0 1 %char-slot ,
-!     1 <vreg> 0 %replace-d ,
-! ] "intrinsic" set-word-prop
-! 
-! \ set-char-slot [
-!     drop
-!     in-3
-!     -3 %inc-d ,
-!     0 2 1 %set-char-slot ,
-! ] "intrinsic" set-word-prop
+\ char-slot [
+    drop
+    in-2
+    -1 %inc-d ,
+    0 1 %char-slot ,
+    1 <vreg> 0 %replace-d ,
+] "intrinsic" set-word-prop
+
+\ set-char-slot [
+    drop
+    in-3
+    -3 %inc-d ,
+    0 2 1 %set-char-slot ,
+] "intrinsic" set-word-prop
 
 \ type [
     drop

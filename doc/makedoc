@@ -1,7 +1,0 @@
-#!/bin/sh
-echo X | pdflatex handbook
-makeindex handbook
-sh makeglos handbook
-pdflatex handbook
-pdflatex handbook
-pdflatex handbook

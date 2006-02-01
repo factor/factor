@@ -43,8 +43,6 @@ M: %write-barrier generate-node ( vop -- )
     0 scratch dup card-mark ORI
     0 scratch 0 input-operand 0 STB ;
 
-: string-offset 3 cells object-tag - ;
-
 M: %char-slot generate-node ( vop -- )
     drop 1 [ string-offset LHZ ] generate-slot
     0 output-operand dup tag-fixnum ;

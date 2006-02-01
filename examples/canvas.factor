@@ -70,7 +70,7 @@ M: canvas draw-gadget* ( gadget -- )
 : turtle-test
     { 400 400 0 } [
         36 [
-            ! random-color
+            random-color
             10 line-to
             10 turn-by [ 60 10 regular-polygon ] new-pen
         ] times

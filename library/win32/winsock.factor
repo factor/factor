@@ -1,6 +1,6 @@
 ! :folding=indent:collapseFolds=1:
 
-! $Id$
+! $Id: winsock.factor,v 1.8 2005/09/12 15:10:33 erg Exp $
 !
 ! Copyright (C) 2004 Mackenzie Straight.
 ! 

@@ -42,6 +42,28 @@ M: %set-slot generate-node ( vop -- )
 M: %fast-set-slot generate-node ( vop -- )
     drop 1 input-operand 2 input 2array 0 input-operand MOV ;
 
+: >register-16 ( reg -- reg )
+    "register" word-prop { AX CX DX } nth ;
+
+: scratch-16 ( n -- reg ) scratch >register-16 ;
+
+M: %char-slot generate-node ( vop -- )
+    drop
+    0 input-operand 2 SHR
+    0 scratch dup XOR
+    dest/src ADD
+    0 scratch-16 0 output-operand string-offset 2array MOV
+    0 scratch tag-bits SHL
+    0 output-operand 0 scratch MOV ;
+
+M: %set-char-slot generate-node ( vop -- )
+    drop
+    0 input-operand tag-bits SHR
+    2 input-operand 2 SHR
+    2 input-operand 1 input-operand ADD
+    2 input-operand string-offset
+    2array 0 input-operand >register-16 MOV ;
+
 : userenv@ ( n -- addr ) cells "userenv" f dlsym + ;
 
 M: %getenv generate-node ( vop -- )

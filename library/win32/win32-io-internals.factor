@@ -1,4 +1,4 @@
-! $Id$
+! $Id: win32-io-internals.factor,v 1.15 2006/01/28 20:49:31 spestov Exp $
 !
 ! Copyright (C) 2004, 2005 Mackenzie Straight.
 ! 

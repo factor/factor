@@ -26,7 +26,7 @@ UNION: integer fixnum bignum ;
         >r 1 shift r> (next-power-of-2)
     ] if ;
 
-: next-power-of-2 ( n -- n ) 1 swap (next-power-of-2) ;
+: next-power-of-2 ( n -- n ) 2 swap (next-power-of-2) ;
 
 IN: math-internals
 

@@ -1,6 +1,6 @@
 ! :folding=indent:collapseFolds=1:
 
-! $Id$
+! $Id: win32-io.factor,v 1.4 2005/07/23 06:11:07 eiz Exp $
 !
 ! Copyright (C) 2004 Mackenzie Straight.
 ! 

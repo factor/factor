@@ -1,6 +1,6 @@
 ! :folding=indent:collapseFolds=1:
 
-! $Id$
+! $Id: win32-errors.factor,v 1.11 2005/12/22 02:30:00 erg Exp $
 !
 ! Copyright (C) 2004 Mackenzie Straight.
 ! 

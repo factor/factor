@@ -1,6 +1,6 @@
 /* :tabSize=2:indentSize=2:noTabs=true:
 
-$Id$
+$Id: s48_bignum.c,v 1.12 2005/12/21 02:36:52 spestov Exp $
 
 Copyright (c) 1989-94 Massachusetts Institute of Technology
 

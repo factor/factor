@@ -19,12 +19,9 @@ GENERIC: canonicalize ( op -- op )
 
 #! Extended AMD64 registers return true.
 GENERIC: extended? ( op -- ? )
-#! 64-bit registers return true.
-GENERIC: operand-64? ( op -- ? )
 
 M: object canonicalize ;
 M: object extended? drop f ;
-M: object operand-64? drop cell 8 = ;
 
 ( Register operands -- eg, ECX                                 )
 : define-register ( symbol num size -- )
@@ -61,6 +58,7 @@ SYMBOL: XMM7 \ XMM7 7 128 define-register
 
 PREDICATE: word register "register" word-prop ;
 
+PREDICATE: register register-16 "register-size" word-prop 16 = ;
 PREDICATE: register register-32 "register-size" word-prop 32 = ;
 PREDICATE: register register-64 "register-size" word-prop 64 = ;
 PREDICATE: register register-128 "register-size" word-prop 128 = ;
@@ -69,7 +67,6 @@ M: register modifier drop BIN: 11 ;
 M: register register "register" word-prop 7 bitand ;
 M: register displacement drop ;
 M: register extended? "register" word-prop 7 > ;
-M: register operand-64? register-64? ;
 
 ( Indirect register operands -- eg, { ECX }                    )
 PREDICATE: array indirect
@@ -80,7 +77,6 @@ M: indirect register first register ;
 M: indirect displacement drop ;
 M: indirect canonicalize dup first EBP = [ drop { EBP 0 } ] when ;
 M: indirect extended? first extended? ;
-M: indirect operand-64? first register-64? ;
 
 ( Displaced indirect register operands -- eg, { EAX 4 }        )
 PREDICATE: array displaced
@@ -95,7 +91,6 @@ M: displaced canonicalize
     dup first EBP = not over second zero? and
     [ first 1array ] when ;
 M: displaced extended? first extended? ;
-M: displaced operand-64? first register-64? ;
 
 ( Displacement-only operands -- eg, { 1234 }                   )
 PREDICATE: array disp-only
@@ -121,19 +116,24 @@ UNION: operand register indirect displaced disp-only ;
     swap extended? [ BIN: 00000001 bitor ] when
     dup BIN: 01000000 = [ drop ] [ assemble-1 ] if ;
 
-: rex-prefix-1 ( reg rex.w -- ) f swap rex-prefix ;
+: 16-prefix ( reg r/m -- )
+    [ register-16? ] 2apply or [ HEX: 66 assemble-1 ] when ;
+
+: prefix ( reg r/m rex.w -- ) pick pick 16-prefix rex-prefix ;
+
+: prefix-1 ( reg rex.w -- ) f swap prefix ;
 
 : short-operand ( reg rex.w n -- )
     #! Some instructions encode their single operand as part of
     #! the opcode.
-    >r dupd rex-prefix-1 register r> + assemble-1 ;
+    >r dupd prefix-1 register r> + assemble-1 ;
 
 : mod-r/m ( op reg -- )
     >r canonicalize dup modifier 6 shift over register bitor r>
     3 shift bitor assemble-1 displacement ;
 
 : 1-operand ( op reg rex.w opcode -- )
-    >r >r over r> rex-prefix-1 r> assemble-1 mod-r/m ;
+    >r >r over r> prefix-1 r> assemble-1 mod-r/m ;
 
 : immediate-1 ( imm dst reg rex.w opcode -- )
     #! The 'reg' is not really a register, but a value for the
@@ -155,7 +155,7 @@ UNION: operand register indirect displaced disp-only ;
     #! Sets the opcode's direction bit. It is set if the
     #! destination is a direct register operand.
     pick register? [ BIN: 10 bitor swapd ] when
-    >r 2dup t rex-prefix r> assemble-1 register mod-r/m ;
+    >r 2dup t prefix r> assemble-1 register mod-r/m ;
 
 : from ( addr -- addr )
     #! Relative to after next 32-bit immediate.
@@ -282,7 +282,7 @@ M: operand CMP OCT: 071 2-operand ;
 
 : 2-operand-sse ( dst src op1 op2 -- )
     pick register-128? [ nip ] [ drop swapd ] if
-    >r 2dup t rex-prefix HEX: 0f assemble-1 r>
+    >r 2dup t prefix HEX: 0f assemble-1 r>
     assemble-1 register mod-r/m ;
 
 : MOVLPD ( dest src -- )

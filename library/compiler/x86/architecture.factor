@@ -1,6 +1,6 @@
 IN: compiler-backend
-USING: alien arrays assembler compiler compiler-backend kernel
-kernel-internals sequences ;
+USING: alien arrays assembler compiler compiler-backend generic
+kernel kernel-internals sequences words ;
 
 ! x86 register assignments
 ! EAX, ECX, EDX vregs
