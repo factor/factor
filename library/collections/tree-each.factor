@@ -9,7 +9,7 @@ G: tree-each* ( obj quot -- | quot: elt -- )
 : tree-each ( obj quot -- | quot: elt -- )
     [ call ] 2keep tree-each* ; inline
 
-: tree-each-with ( obj vector quot -- )
+: tree-each-with ( obj obj quot -- )
     swap [ with ] tree-each 2drop ; inline
 
 M: object tree-each* 2drop ;
@@ -23,3 +23,9 @@ M: cons tree-each* ( cons quot -- )
 
 M: wrapper tree-each* ( wrapper quot -- )
     >r wrapped r> tree-each ;
+
+: tree-subset ( obj quot -- seq )
+    [ tree-each ] select ; inline
+
+: tree-subset-with ( obj seq quot -- seq | quot: obj elt -- ? )
+    swap [ with rot ] tree-subset 2nip ; inline

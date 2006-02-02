@@ -30,10 +30,12 @@ vectors ;
         t <array> f 0 pick set-nth-unsafe
     ] if ;
 
-: (subset) ( quot accum elt -- quot accum )
-    -rot [
-        >r over >r call [ r> r> push ] [ r> r> 2drop ] if
-    ] 2keep ; inline
+: select ( seq quot quot -- seq )
+    pick >r >r V{ } clone rot [
+        -rot [
+            >r over >r call [ r> r> push ] [ r> r> 2drop ] if
+        ] 2keep
+    ] r> call r> like nip ; inline
 
 IN: sequences
 
@@ -143,8 +145,7 @@ M: object find ( seq quot -- i elt )
     swap [ with rot ] all? 2nip ; inline
 
 : subset ( seq quot -- seq | quot: elt -- ? )
-    over >r V{ } clone rot [ (subset) ] each r> like nip ;
-    inline
+    [ each ] select ; inline
 
 : subset-with ( obj seq quot -- seq | quot: obj elt -- ? )
     swap [ with rot ] subset 2nip ; inline

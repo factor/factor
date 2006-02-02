@@ -38,11 +38,7 @@ M: word word-xt ( w -- xt ) 7 integer-slot ;
 GENERIC: set-word-xt
 M: word set-word-xt ( xt w -- ) 7 set-integer-slot ;
 
-: uses ( word -- uses )
-    [
-        word-def
-        [ dup word? [ dup dup set ] when drop ] tree-each
-    ] make-hash hash-keys ;
+: uses ( word -- uses ) word-def [ word? ] tree-subset prune ;
 
 SYMBOL: crossref
 

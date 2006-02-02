@@ -80,6 +80,11 @@ IN: lists
 : alist>quot ( default alist -- quot )
     [ [ first2 swap % , , \ if , ] [ ] make ] each ;
 
+IN: sequences
+
+: prune ( seq -- seq )
+    [ [ dup set ] each ] make-hash hash-keys ;
+
 IN: kernel-internals
 
 : init-namespaces ( -- ) global 1array >vector set-namestack ;
