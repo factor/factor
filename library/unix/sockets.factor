@@ -26,9 +26,7 @@ threads unix-internals ;
 
 : with-socket-fd ( quot -- fd | quot: socket -- n )
     socket-fd [ swap call ] keep  swap 0 < [
-        err_no EINPROGRESS = [
-            dup close -1 io-error
-        ] unless
+        err_no EINPROGRESS = [ dup close (io-error) ] unless
     ] when ; inline
 
 : client-socket ( host port -- fd )

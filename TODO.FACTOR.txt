@@ -30,3 +30,4 @@
 - 0.0/0.0 next-power-of-2 never terminates -- comparison always returns false
 - 0.0/0.0 >fixnum .  -> 0    0.0/0.0 >bignum .  -> 0
 
+- httpd crash
