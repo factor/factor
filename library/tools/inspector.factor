@@ -18,7 +18,7 @@ SYMBOL: inspector-stack
 : (inspect) ( obj -- )
     dup inspector-stack get push
     dup summary print
-    sheet sheet-numbers sheet. ;
+    sheet dup empty? [ drop ] [ sheet-numbers sheet. ] if ;
 
 : inspector-help ( -- )
     "Object inspector." print
