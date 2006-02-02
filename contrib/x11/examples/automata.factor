@@ -3,7 +3,7 @@
 IN: automata
 
 USING: parser kernel hashtables namespaces sequences lists math io
-       threads strings arrays prettyprint xlib x ;
+math-contrib threads strings arrays prettyprint xlib x ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 ! set-rule
@@ -11,11 +11,13 @@ USING: parser kernel hashtables namespaces sequences lists math io
 
 SYMBOL: rule
 
-8 <hashtable> rule set
+! 8 <hashtable> rule set
+8 <hashtable> rule set-global
 
 SYMBOL: char-0
 
-48 char-0 set
+! 48 char-0 set
+48 char-0 set-global
 
 : rule-keys ( -- { ... } )
   { { 0 0 0 }
