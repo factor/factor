@@ -10,9 +10,7 @@ kernel lists namespaces sequences ;
     [ describe ] simple-html-document ;
 
 M: general-t browser-link-href
-    "/responder/inspector/" swap
-    [ [ http-inspect ] show-final ] curry quot-url
-    append ;
+    [ [ http-inspect ] show-final ] curry quot-url ;
 
 : inspect-responder ( url -- )
     [ global http-inspect ] show-final ;
