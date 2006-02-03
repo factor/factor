@@ -1,7 +1,11 @@
 IN: gl USING: kernel words sequences alien arrays namespaces x xlib x11 ;
 
+! : >int-array ( seq -- <int-array> )
+! dup length "int-array" <c-object> swap dup length >array
+! [ pick set-int-nth ] 2each ;
+
 : >int-array ( seq -- <int-array> )
-dup length "int-array" <c-object> swap dup length >array [ pick set-int-nth ] 2each ;
+dup length "int" <c-array> swap dup length >array [ pick set-int-nth ] 2each ;
 
 : >attributes ( seq -- attributes )
 0 add [ dup word? [ execute ] [ ] if ] map ;
