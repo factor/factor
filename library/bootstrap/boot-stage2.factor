@@ -47,6 +47,9 @@ sequences sequences-internals words ;
 H{ } clone crossref set
 recrossref
 
+"Setting the resource path..." print
+cwd global [ "resource-path" set ] bind
+
 [ compiled? ] word-subset length
 number>string write " compiled words" print
 
