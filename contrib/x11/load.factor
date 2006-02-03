@@ -1,16 +1,19 @@
-IN: scratchpad
-USING: alien compiler kernel parser sequences words ;
+USING: kernel parser words compiler sequences ;
 
-"X11" "libX11" add-simple-library
+"xlib.factor" run-file
+"xlib" words [ try-compile ] each
+clear
 
-{ 
-    "xlib"
-    "x"
-    "rectangle"
-    "draw-string"
-    "concurrent-widgets"
-    "glx"
-    "gl"    
-} [ "/contrib/x11/" swap ".factor" append3 run-resource ] each
+"x.factor" run-file
 
-! { "xlib" "x11" } [ words [ try-compile ] each ] each
+"rectangle.factor" run-file
+
+"draw-string.factor" run-file
+
+"concurrent-widgets.factor" run-file
+
+"glx.factor" run-file
+"x11" words [ try-compile ] each
+clear
+
+"gl.factor" run-file
