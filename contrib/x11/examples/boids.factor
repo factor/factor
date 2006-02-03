@@ -6,25 +6,38 @@ USING: namespaces math kernel sequences arrays xlib x ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-SYMBOL: separation-radius   100 separation-radius set
-SYMBOL: alignment-radius    100 alignment-radius set
-SYMBOL: cohesion-radius     100 cohesion-radius set
+! SYMBOL: separation-radius   100 separation-radius set
+! SYMBOL: alignment-radius    100 alignment-radius set
+! SYMBOL: cohesion-radius     100 cohesion-radius set
+
+SYMBOL: separation-radius   100 separation-radius set-global
+SYMBOL: alignment-radius    100 alignment-radius set-global
+SYMBOL: cohesion-radius     100 cohesion-radius set-global
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-SYMBOL: separation-view-angle   90 separation-view-angle set
-SYMBOL: alignment-view-angle    90 alignment-view-angle set
-SYMBOL: cohesion-view-angle     90 cohesion-view-angle set
+! SYMBOL: separation-view-angle   90 separation-view-angle set
+! SYMBOL: alignment-view-angle    90 alignment-view-angle set
+! SYMBOL: cohesion-view-angle     90 cohesion-view-angle set
+
+SYMBOL: separation-view-angle   90 separation-view-angle set-global
+SYMBOL: alignment-view-angle    90 alignment-view-angle set-global
+SYMBOL: cohesion-view-angle     90 cohesion-view-angle set-global
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-SYMBOL: separation-weight   1.0 separation-weight set
-SYMBOL: alignment-weight    0.5 alignment-weight set
-SYMBOL: cohesion-weight     1.0 cohesion-weight set
+! SYMBOL: separation-weight   1.0 separation-weight set
+! SYMBOL: alignment-weight    0.5 alignment-weight set
+! SYMBOL: cohesion-weight     1.0 cohesion-weight set
+
+SYMBOL: separation-weight   1.0 separation-weight set-global
+SYMBOL: alignment-weight    0.5 alignment-weight set-global
+SYMBOL: cohesion-weight     1.0 cohesion-weight set-global
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-SYMBOL: world-size   { 400 400 } world-size set
+! SYMBOL: world-size   { 400 400 } world-size set
+SYMBOL: world-size   { 400 400 } world-size set-global
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
@@ -32,7 +45,8 @@ TUPLE: boid pos vel ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-SYMBOL: time-slice   0.5 time-slice set
+! SYMBOL: time-slice   0.5 time-slice set
+SYMBOL: time-slice   0.5 time-slice set-global
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 ! random-boid and random-boids
