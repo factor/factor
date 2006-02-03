@@ -23,8 +23,6 @@ TUPLE: window display id ;
 
 SYMBOL: window-table
 
-! 10 <hashtable> window-table set
-
 10 <hashtable> window-table set-global
 
 : add-to-window-table ( <window> -- )
