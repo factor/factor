@@ -983,6 +983,14 @@ BEGIN-STRUCT: XKeymapEvent
 	FIELD: Display* display
 	FIELD: Window window
 	! char key_vector[32];
+	FIELD: int pad
+	FIELD: int pad
+	FIELD: int pad
+	FIELD: int pad
+	FIELD: int pad
+	FIELD: int pad
+	FIELD: int pad
+	FIELD: int pad
 END-STRUCT
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
