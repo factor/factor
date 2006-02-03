@@ -9,7 +9,7 @@
 ! and are wondering what part of the file to modify, just find the
 ! function or data structure in the manual and note the section.
 
-IN: xlib USING: kernel arrays alien math words sequences ;
+USING: kernel arrays alien math words sequences ; IN: xlib
 
 LIBRARY: xlib
 
@@ -512,11 +512,28 @@ END-STRUCT
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
+! 10.5 Keyboard and Pointer Events
+
 : Button1 1 ;
 : Button2 2 ;
 : Button3 3 ;
 : Button4 4 ;
 : Button5 5 ;
+
+: Button1Mask		1 8  shift ;
+: Button2Mask		1 9  shift ;
+: Button3Mask		1 10 shift ;
+: Button4Mask		1 11 shift ;
+: Button5Mask		1 12 shift ;
+
+: ShiftMask	1 0 shift ;
+: LockMask	1 1 shift ;
+: ControlMask	1 2 shift ;
+: Mod1Mask	1 3 shift ;
+: Mod2Mask	1 4 shift ;
+: Mod3Mask	1 5 shift ;
+: Mod4Mask	1 6 shift ;
+: Mod5Mask	1 7 shift ;
 
 BEGIN-STRUCT: XButtonEvent
 	FIELD: int type

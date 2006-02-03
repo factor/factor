@@ -1,13 +1,13 @@
 ! Based on X.h
-IN: x11
-USING: alien math ;
+
+USING: alien math ; IN: xlib
 
 TYPEDEF: ulong Mask
-TYPEDEF: ulong Atom
+
 TYPEDEF: uchar KeyCode
 
 ! Reserved Resource and Constant Definitions
-: None 0 ;
+
 : ParentRelative 1 ;
 : CopyFromParent 0 ;
 : PointerWindow 0 ;
@@ -23,14 +23,6 @@ TYPEDEF: uchar KeyCode
 ! Key masks. Used as modifiers to GrabButton and GrabKey, results of QueryPointer,
 !   state in various key-, mouse-, and button-related events.
 
-: ShiftMask	1 0 shift ;
-: LockMask	1 1 shift ;
-: ControlMask	1 2 shift ;
-: Mod1Mask	1 3 shift ;
-: Mod2Mask	1 4 shift ;
-: Mod3Mask	1 5 shift ;
-: Mod4Mask	1 6 shift ;
-: Mod5Mask	1 7 shift ;
 
 ! modifier names.  Used to build a SetModifierMapping request or
 ! to read a GetModifierMapping request.  These correspond to the
@@ -48,23 +40,12 @@ TYPEDEF: uchar KeyCode
 ! button masks.  Used in same manner as Key masks above. Not to be confused
 ! with button names below.
 
-: Button1Mask		1 8  shift ;
-: Button2Mask		1 9  shift ;
-: Button3Mask		1 10 shift ;
-: Button4Mask		1 11 shift ;
-: Button5Mask		1 12 shift ;
 
 : AnyModifier		1 15 shift ; ! used in GrabButton, GrabKey
 
 ! button names. Used as arguments to GrabButton and as detail in ButtonPress
 ! and ButtonRelease events.  Not to be confused with button masks above.
 ! Note that 0 is already defined above as "AnyButton".
-
-: Button1	1 ;
-: Button2	2 ;
-: Button3	3 ;
-: Button4	4 ;
-: Button5	5 ;
 
 ! Notify modes
 
