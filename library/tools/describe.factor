@@ -78,8 +78,12 @@ M: word summary ( word -- )
 DEFER: describe
 
 : sheet. ( sheet -- )
-    dup format-sheet swap peek
-    [ dup [ describe ] curry simple-outliner terpri ] 2each ;
+    dup empty? [
+        drop
+    ] [
+        dup format-sheet swap peek
+        [ dup [ describe ] curry simple-outliner terpri ] 2each
+    ] if ;
 
 : describe ( object -- ) dup summary print sheet sheet. ;
 

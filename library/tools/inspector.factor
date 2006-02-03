@@ -8,8 +8,10 @@ prettyprint sequences words ;
 SYMBOL: inspector-slots
 
 : sheet-numbers ( sheet -- sheet )
-    dup first length >array 1array swap append
-    dup peek inspector-slots set ;
+    dup empty? [
+        dup first length >array 1array swap append
+        dup peek inspector-slots set
+    ] unless ;
 
 SYMBOL: inspector-stack
 
@@ -18,7 +20,7 @@ SYMBOL: inspector-stack
 : (inspect) ( obj -- )
     dup inspector-stack get push
     dup summary print
-    sheet dup empty? [ drop ] [ sheet-numbers sheet. ] if ;
+    sheet sheet-numbers sheet. ;
 
 : inspector-help ( -- )
     "Object inspector." print

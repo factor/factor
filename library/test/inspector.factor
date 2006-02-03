@@ -13,3 +13,4 @@ V{ } clone inspector-stack set
 f (inspect)
 \ + (inspect)
 H{ } (inspect)
+H{ } describe
