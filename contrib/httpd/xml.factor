@@ -1,6 +1,5 @@
-USING: kernel math parser namespaces sequences strings
-prettyprint errors lists hashtables vectors io generic
-words ;
+USING: arrays errors generic hashtables io kernel lists math
+namespaces parser prettyprint sequences strings vectors words ;
 IN: xml
 
 ! * Simple SAX-ish parser
@@ -195,9 +194,9 @@ M: xml-string-error error.
         "Attribute lacks quote" <xml-string-error> throw
     ] if ;
 
-: parse-prop ( -- [[ name value ]] )
+: parse-prop ( -- { name value } )
     parse-name pass-blank CHAR: = expect pass-blank
-    parse-prop-value cons pass-blank ;
+    parse-prop-value 2array pass-blank ;
 
 TUPLE: opener name props ;
 TUPLE: closer name ;

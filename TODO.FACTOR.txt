@@ -31,3 +31,7 @@
 - 0.0/0.0 >fixnum .  -> 0    0.0/0.0 >bignum .  -> 0
 
 - httpd crash
+- "localhost" 50 <client> won't fail
+- major GC while downloading files
+- out of memory from ffi calls
+- out of memory from overflow check
