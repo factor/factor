@@ -385,6 +385,8 @@ M: comment (xml>string)
     slip
     <closer> process ; inline
 
+: text-tag ( content name attr-quot -- ) [ text ] tag ; inline
+
 : comment ( string -- )
     <comment> push-datum ;
 
