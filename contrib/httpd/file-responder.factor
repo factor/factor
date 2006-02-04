@@ -32,12 +32,12 @@ parser sequences strings ;
      "method" get "head" = [
         drop
     ] [
-        "request" get [ directory. ] simple-html-document
+        "request" get [ dup log-message directory. ] simple-html-document
     ] if ;
 
 : serve-directory ( filename -- )
-    "/" ?tail [
-        dup "/index.html" append dup exists? [
+    "/" over tail? [
+        dup "index.html" append dup exists? [
             nip serve-file
         ] [
             drop list-directory
