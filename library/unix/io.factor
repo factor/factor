@@ -2,7 +2,7 @@
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: io-internals
 USING: alien arrays errors generic hashtables io kernel
-kernel-internals lists math parser sequences strings
+kernel-internals lists math parser queues sequences strings
 threads unix-internals vectors words ;
 
 ! We want namespaces::bind to shadow the bind system call from
@@ -94,7 +94,9 @@ M: port set-timeout ( timeout port -- )
 ! Associates a port with a list of continuations waiting on the
 ! port to finish I/O
 TUPLE: io-task port callbacks ;
-C: io-task ( port -- ) [ set-io-task-port ] keep ;
+C: io-task ( port -- )
+    [ set-io-task-port ] keep
+    <queue> over set-io-task-callbacks ;
 
 ! Multiplexer
 GENERIC: do-io-task ( task -- ? )
@@ -103,7 +105,7 @@ GENERIC: task-container ( task -- vector )
 : io-task-fd io-task-port port-handle ;
 
 : add-io-task ( callback task -- )
-    [ >r unit r> set-io-task-callbacks ] keep
+    [ >r <queue> [ enque ] keep r> set-io-task-callbacks ] keep
     dup io-task-fd over task-container 2dup hash [
         "Cannot perform multiple I/O ops on the same port" throw
     ] when set-hash ;
@@ -112,11 +114,8 @@ GENERIC: task-container ( task -- vector )
     dup io-task-fd swap task-container remove-hash ;
 
 : pop-callback ( task -- callback )
-    dup io-task-callbacks uncons dup [
-        rot set-io-task-callbacks
-    ] [
-        drop swap remove-io-task
-    ] if ;
+    dup io-task-callbacks dup deque >r
+    queue-empty? [ remove-io-task ] [ drop ] if r> ;
 
 : handle-fd ( task -- )
     dup do-io-task [
@@ -270,8 +269,7 @@ M: write-task task-container drop write-tasks get ;
 : add-write-io-task ( callback task -- )
     dup io-task-fd write-tasks get hash [
         dup write-task? [
-            [ nip io-task-callbacks cons ] keep
-            set-io-task-callbacks
+            nip io-task-callbacks enque
         ] [
             drop add-io-task
         ] if
@@ -279,16 +277,17 @@ M: write-task task-container drop write-tasks get ;
         add-io-task
     ] if* ;
 
-M: port stream-flush ( stream -- )
-    dup output check-port
+: port-flush ( port -- )
     [ swap <write-task> add-write-io-task stop ] callcc0 drop ;
+
+M: port stream-flush ( stream -- )
+    dup output check-port port-flush ;
 
 : wait-to-write ( len port -- )
     tuck can-write? [ dup stream-flush ] unless pending-error ;
 
 M: port stream-write1 ( char writer -- )
-    dup output check-port
-    1 over wait-to-write ch>buffer ;
+    dup output check-port 1 over wait-to-write ch>buffer ;
 
 M: port stream-write ( string writer -- )
     dup output check-port
@@ -296,11 +295,9 @@ M: port stream-write ( string writer -- )
 
 M: port stream-close ( stream -- )
     dup port-type closed eq? [
-        dup port-type output eq? [ dup stream-flush ] when
-        dup port-handle close
-        dup delegate [ buffer-free ] when*
-        f over set-delegate
-        closed over set-port-type
+        dup port-type output eq? >r closed over set-port-type r>
+        [ dup port-flush ] when dup port-handle close
+        dup delegate [ buffer-free ] when* f over set-delegate
     ] unless drop ;
 
 ! Make a duplex stream for reading/writing a pair of fds
