@@ -367,8 +367,11 @@ M: comment (xml>string)
     comment-text %
     "-->" % ;
 
+: xml-preamble
+    "<?xml version=\"1.0\" encoding=\"iso-8859-1\"?>" ;
+
 : xml>string ( xml -- string )
-    [ (xml>string) ] "" make ;
+    [ xml-preamble % (xml>string) ] "" make ;
 
 : xml-reprint ( string -- string )
     xml xml>string ;
