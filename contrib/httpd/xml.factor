@@ -396,7 +396,7 @@ M: comment (xml>string)
         initialize-xml-stack
         call
         xml-stack get
-        first cdr second
+        first cdr first
     ] with-scope ; inline
 
 ! * System for words specialized on tag names
