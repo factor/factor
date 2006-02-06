@@ -31,8 +31,6 @@ M: int-regs fastcall-regs drop { } ;
 
 M: float-regs fastcall-regs drop { } ;
 
-: dual-fp/int-regs? f ;
-
 : address-operand ( address -- operand )
     #! On x86, we can always use an address as an operand
     #! directly.

@@ -66,3 +66,19 @@ int ffi_test_10(int a, int b, double c, int d, float e, int f, int g, int h)
 	printf("ffi_test_10(%d,%d,%f,%d,%f,%d,%d,%d)\n",a,b,c,d,e,f,g,h);
 	return a - b - c - d - e - f - g - h;
 }
+
+struct foo { int x, y; };
+
+int ffi_test_11(int a, struct foo b, int c)
+{
+	printf("ffi_test_11(%d,{%d,%d},%d)\n",a,b.x,b.y,c);
+	return a * b.x + c * b.y;
+}
+
+struct rect { float x, y, w, h; };
+
+int ffi_test_12(int a, int b, struct rect c, int d, int e, int f)
+{
+	printf("ffi_test_12(%d,%d,{%f,%f,%f,%f},%d,%d,%d)\n",a,b,c.x,c.y,c.w,c.h,d,e,f);
+	return a + b + c.x + c.y + c.w + c.h + d + e + f;
+}

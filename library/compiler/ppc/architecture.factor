@@ -21,4 +21,3 @@ M: float-regs fastcall-regs drop 8 ;
 ! Mach-O -vs- Linux/PPC
 : stack@ os "macosx" = 24 8 ? + ;
 : lr@ os "macosx" = 8 4 ? + ;
-: dual-fp/int-regs? os "macosx" = ;

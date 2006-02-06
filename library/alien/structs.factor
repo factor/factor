@@ -18,8 +18,6 @@ sequences strings words ;
     "set-" swap append create-in >r c-setter cons r>
     swap define-compound ;
 
-: c-align c-type [ "align" get ] bind ;
-
 : define-field ( offset type name -- offset )
     >r dup >r c-align align r> r>
     "struct-name" get swap "-" swap append3
@@ -37,5 +35,9 @@ sequences strings words ;
         "width" set
         bootstrap-cell "align" set
         [ swap <displaced-alien> ] "getter" set
+        "width" get [ %unbox-struct ] curry "unboxer" set
+        "struct" on
     ] "struct-name" get define-c-type
     "struct-name" get in get init-c-type ;
+
+: c-struct? ( type -- ? ) "struct" swap c-type hash ;

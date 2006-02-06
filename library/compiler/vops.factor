@@ -31,9 +31,17 @@ GENERIC: fastcall-regs ( register-class -- regs )
 
 GENERIC: reg-size ( register-class -- n )
 
+GENERIC: inc-reg-class ( register-class -- )
+
 M: int-regs reg-size drop cell ;
 
+M: int-regs inc-reg-class class inc ;
+
 M: float-regs reg-size float-regs-size ;
+
+M: float-regs inc-reg-class
+    dup class inc
+    os "macosx" = [ reg-size 4 / int-regs +@ ] [ drop ] if ;
 
 ! A data stack location.
 TUPLE: ds-loc n ;
@@ -355,11 +363,16 @@ C: %cleanup make-vop ;
 
 TUPLE: %unbox ;
 C: %unbox make-vop ;
-: %unbox ( n func reg-class -- vop ) 3-in-vop <%unbox> ;
+: %unbox ( n reg-class func -- vop ) 3-in-vop <%unbox> ;
+
+TUPLE: %unbox-struct ;
+C: %unbox-struct make-vop ;
+: %unbox-struct ( n reg-class size -- vop )
+    3-in-vop <%unbox-struct> ;
 
 TUPLE: %box ;
 C: %box make-vop ;
-: %box ( func reg-class -- vop ) 2-in-vop <%box> ;
+: %box ( reg-class func -- vop ) 2-in-vop <%box> ;
 
 TUPLE: %alien-invoke ;
 C: %alien-invoke make-vop ;

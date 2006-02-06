@@ -13,13 +13,13 @@ M: float-regs push-reg
     4 = [ FSTPS ] [ FSTPL ] if ;
 
 M: %unbox generate-node
-    drop 1 input f compile-c-call  2 input push-reg ;
+    drop 2 input f compile-c-call  1 input push-reg ;
 
 M: %box generate-node
     drop
-    1 input push-reg
-    0 input f compile-c-call
-    ESP 1 input reg-size ADD ;
+    0 input push-reg
+    1 input f compile-c-call
+    ESP 0 input reg-size ADD ;
 
 M: %cleanup generate-node
     drop 0 input dup zero? [ drop ] [ ESP swap ADD ] if ;

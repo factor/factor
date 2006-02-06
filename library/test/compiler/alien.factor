@@ -1,4 +1,4 @@
-USING: compiler test ;
+USING: alien compiler kernel test ;
 
 FUNCTION: void ffi_test_0 ; compiled
 [ ] [ ffi_test_0 ] unit-test
@@ -33,3 +33,32 @@ FUNCTION: int ffi_test_9 int a int b int c int d int e int f int g ; compiled
 FUNCTION: int ffi_test_10 int a int b double c int d float e int f int g int h ; compiled
 [ -34 ] [ 1 2 3 4 5 6 7 8 ffi_test_10 ] unit-test
 
+BEGIN-STRUCT: foo
+    FIELD: int x
+    FIELD: int y
+END-STRUCT
+
+: make-foo ( x y -- foo )
+    "foo" <c-object> [ set-foo-y ] keep [ set-foo-x ] keep ;
+
+FUNCTION: int ffi_test_11 int a foo b int c ; compiled
+
+[ 14 ] [ 1 2 3 make-foo 4 ffi_test_11 ] unit-test
+
+BEGIN-STRUCT: rect
+    FIELD: float x
+    FIELD: float y
+    FIELD: float w
+    FIELD: float h
+END-STRUCT
+
+: <rect>
+    "rect" <c-object>
+    [ set-rect-h ] keep
+    [ set-rect-w ] keep
+    [ set-rect-y ] keep
+    [ set-rect-x ] keep ;
+
+FUNCTION: int ffi_test_12 int a int b rect c int d int e int f ; compiled
+
+[ 45 ] [ 1 2 3 4 5 6 <rect> 7 8 9 ffi_test_12 ] unit-test

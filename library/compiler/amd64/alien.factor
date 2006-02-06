@@ -30,9 +30,9 @@ M: stack-params load-insn
 M: %unbox generate-node ( vop -- )
     drop
     ! Call the unboxer
-    1 input f compile-c-call
+    2 input f compile-c-call
     ! Store the return value on the C stack
-    0 input 2 input store-insn ;
+    0 input 1 input store-insn ;
 
 M: %parameter generate-node ( vop -- )
     ! Move a value from the C stack into the fastcall register
@@ -49,6 +49,6 @@ M: %alien-invoke generate-node
     2dup eq? [ 2drop ] [ MOV ] if ;
 
 M: %box generate-node ( vop -- )
-    drop 1 input load-return-value 0 input f compile-c-call ;
+    drop 0 input load-return-value 1 input f compile-c-call ;
 
 M: %cleanup generate-node ( vop -- ) drop ;

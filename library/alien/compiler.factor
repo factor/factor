@@ -1,10 +1,10 @@
 ! Copyright (C) 2004, 2006 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 IN: alien
-USING: assembler compiler compiler-backend compiler-frontend
-errors generic hashtables inference inspector io kernel
-kernel-internals lists math namespaces parser prettyprint
-sequences strings words ;
+USING: arrays assembler compiler compiler-backend
+compiler-frontend errors generic hashtables inference inspector
+io kernel kernel-internals lists math namespaces parser
+prettyprint sequences strings words ;
 
 ! USAGE:
 ! 
@@ -56,32 +56,25 @@ C: alien-node make-node ;
     [ set-alien-return ] keep
     node, ;
 
-: parameters alien-node-parameters reverse ;
-
-: c-aligned c-size cell align ;
+: parameter-size c-size cell align ;
 
 : stack-space ( parameters -- n )
-    0 [ c-aligned + ] reduce ;
+    0 [ parameter-size + ] reduce ;
 
 : unbox-parameter ( stack# type -- node )
-    c-type [ "unboxer" get "reg-class" get ] bind %unbox ;
+    c-type [ "reg-class" get "unboxer" get ] bind call ;
 
 : unbox-parameters ( params -- )
+    reverse
     [ stack-space ] keep
-    [ [ c-aligned - dup ] keep unbox-parameter , ] each drop ;
+    [ [ parameter-size - dup ] keep unbox-parameter , ] each
+    drop ;
 
 : reg-class-full? ( class -- ? )
     dup class get swap fastcall-regs length >= ;
 
 : spill-param ( reg-class -- n reg-class )
-    reg-size stack-params [ tuck + ] change
-    T{ stack-params } ;
-
-: inc-reg-class ( reg-class -- )
-    #! On Mac OS X, float parameters 'shadow' integer registers.
-    dup class inc dup float-regs? dual-fp/int-regs? and [
-        int-regs [ over reg-size 4 / + ] change
-    ] when drop ;
+    reg-size stack-params dup get -rot +@ T{ stack-params } ;
 
 : fastcall-param ( reg-class -- n reg-class )
     [ dup class get swap inc-reg-class ] keep ;
@@ -92,13 +85,18 @@ C: alien-node make-node ;
     c-type "reg-class" swap hash dup reg-class-full?
     [ spill-param ] [ fastcall-param ] if %parameter ;
 
+: flatten-value-types ( params -- params )
+    #! Convert value type structs to consecutive void*s.
+    [
+        dup c-struct?
+        [ c-size cell / "void*" <array> ] [ 1array ] if
+    ] map concat ;
+
 : load-parameters ( params -- )
     [
-        reverse
-        0 int-regs set
-        0 float-regs set
-        0 stack-params set
-        0 [ 2dup load-parameter , c-aligned + ] reduce drop
+        flatten-value-types
+        0 { int-regs float-regs stack-params } [ set ] each-with
+        0 [ 2dup load-parameter , parameter-size + ] reduce drop
     ] with-scope ;
 
 : linearize-parameters ( parameters -- )
@@ -113,15 +111,16 @@ C: alien-node make-node ;
     alien-node-return dup "void" = [
         drop
     ] [
-        c-type [ "boxer" get "reg-class" get ] bind %box ,
+        c-type [ "reg-class" get "boxer" get ] bind call ,
     ] if ;
 
 : linearize-cleanup ( node -- )
-    node-param cdr library-abi "stdcall" =
-    [ dup parameters stack-space %cleanup , ] unless ;
+    node-param cdr library-abi "stdcall" = [
+        dup alien-node-parameters stack-space %cleanup ,
+    ] unless ;
 
 M: alien-node linearize* ( node -- )
-    dup parameters linearize-parameters
+    dup alien-node-parameters linearize-parameters
     dup node-param uncons %alien-invoke ,
     dup linearize-cleanup
     dup linearize-return
@@ -140,7 +139,7 @@ M: alien-node linearize* ( node -- )
 : define-c-word ( type lib func function-args -- )
     [ "()" subseq? not ] subset parse-arglist (define-c-word) ;
 
-\ alien-invoke [ [ string object string general-list ] [ ] ]
+\ alien-invoke [ [ string object string object ] [ ] ]
 "infer-effect" set-word-prop
 
 \ alien-invoke [
@@ -151,9 +150,7 @@ M: alien-node linearize* ( node -- )
     r> swap alien-node
 ] "infer" set-word-prop
 
-global [
-    "libraries" get [ H{ } clone "libraries" set ] unless
-] bind
+global [ "libraries" nest drop ] bind
 
 M: compound (uncrossref)
     dup word-def \ alien-invoke swap member?

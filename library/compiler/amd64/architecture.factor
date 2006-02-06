@@ -36,8 +36,6 @@ M: float-regs return-reg drop XMM0 ;
 M: float-regs fastcall-regs
     drop { XMM0 XMM1 XMM2 XMM3 XMM4 XMM5 XMM6 XMM7 } ;
 
-: dual-fp/int-regs? f ;
-
 : address-operand ( address -- operand )
     #! On AMD64, we have to load 64-bit addresses into a
     #! scratch register first. The usage of R11 here is a hack.

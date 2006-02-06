@@ -13,7 +13,7 @@ void primitive_expired(void)
 		drepl(F);
 }
 
-void* alien_offset(CELL object)
+void *alien_offset(CELL object)
 {
 	ALIEN *alien;
 	F_ARRAY *array;
@@ -40,18 +40,18 @@ void* alien_offset(CELL object)
 	}
 }
 
-INLINE void* alien_pointer(void)
+INLINE void *alien_pointer(void)
 {
 	F_FIXNUM offset = unbox_signed_cell();
 	return alien_offset(dpop()) + offset;
 }
 
-void* unbox_alien(void)
+void *unbox_alien(void)
 {
 	return alien_offset(dpop());
 }
 
-ALIEN* alien(void* ptr)
+ALIEN *alien(void* ptr)
 {
 	ALIEN* alien = allot_object(ALIEN_TYPE,sizeof(ALIEN));
 	alien->ptr = ptr;
@@ -105,17 +105,17 @@ void primitive_string_to_alien(void)
 	drepl(tag_object(string_to_alien(untag_string(dpeek()),true)));
 }
 
-void fixup_alien(ALIEN* alien)
+void fixup_alien(ALIEN *alien)
 {
 	alien->expired = true;
 }
 
-void fixup_displaced_alien(DISPLACED_ALIEN* d)
+void fixup_displaced_alien(DISPLACED_ALIEN *d)
 {
 	data_fixup(&d->alien);
 }
 
-void collect_displaced_alien(DISPLACED_ALIEN* d)
+void collect_displaced_alien(DISPLACED_ALIEN *d)
 {
 	copy_handle(&d->alien);
 }
@@ -128,7 +128,7 @@ void primitive_alien_##name (void) \
 void primitive_set_alien_##name (void) \
 { \
 	type* ptr = alien_pointer(); \
-	type value = unbox_##boxer (); \
+	type value = unbox_##boxer(); \
 	*ptr = value; \
 }
 
@@ -144,3 +144,9 @@ DEF_ALIEN_SLOT(signed_1,BYTE,signed_1)
 DEF_ALIEN_SLOT(unsigned_1,BYTE,unsigned_1)
 DEF_ALIEN_SLOT(float,float,float)
 DEF_ALIEN_SLOT(double,double,double)
+
+/* for FFI calls passing structs by value */
+void unbox_value_struct(void *dest, CELL size)
+{
+	memcpy(dest,unbox_alien(),size);
+}

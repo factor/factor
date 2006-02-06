@@ -7,10 +7,10 @@ sequences sequences-internals strings words ;
 
 : <c-type> ( -- type )
     H{
-        { "setter" [ "No setter" throw ] }
-        { "getter" [ "No getter" throw ] }
-        { "boxer" "no boxer" }
-        { "unboxer" "no unboxer" }
+        { "setter" [ "Cannot read struct fields with type" throw ] }
+        { "getter" [ "Cannot write struct fields with type" throw ] }
+        { "boxer" [ "Cannot use type as a return value" throw ] }
+        { "unboxer" [ "Cannot use type as a parameter" throw ] }
         { "reg-class" T{ int-regs f } }
         { "width" 0 }
     } clone ;
@@ -22,6 +22,8 @@ SYMBOL: c-types
     [ ] [ "No such C type: " swap append throw ] ?if ;
 
 : c-size ( name -- size ) "width" swap c-type hash ;
+
+: c-align ( name -- align ) "align" swap c-type hash ;
 
 : c-getter ( name -- quot ) "getter" swap c-type hash ;
 
