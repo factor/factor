@@ -1,7 +1,7 @@
+USING: io namespaces kernel hashtables math generic threads concurrency
+lists sequences arrays xlib x ;
 
 IN: concurrent-widgets
-USING: io namespaces kernel hashtables math generic threads concurrency
-       lists sequences arrays xlib x ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 

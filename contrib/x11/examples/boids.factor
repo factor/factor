@@ -1,8 +1,6 @@
 ! Eduardo Cavazos - wayo.cavazos@gmail.com
 
-IN: boids
-
-USING: namespaces math kernel sequences arrays xlib x ;
+USING: namespaces math kernel sequences arrays xlib x ; IN: boids
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 

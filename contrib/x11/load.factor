@@ -1,8 +1,6 @@
 USING: kernel parser words compiler sequences ;
 
-"xlib.factor" run-file
-"xlib" words [ try-compile ] each
-clear
+"xlib.factor" run-file "xlib" words [ try-compile ] each
 
 "x.factor" run-file
 
@@ -12,8 +10,6 @@ clear
 
 "concurrent-widgets.factor" run-file
 
-"glx.factor" run-file
-"x11" words [ try-compile ] each
-clear
+"glx.factor" run-file "x11" words [ try-compile ] each
 
 "gl.factor" run-file

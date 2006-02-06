@@ -1,9 +1,9 @@
 ! Ed Cavazos - wayo.cavazos@gmail.com
 
-IN: automata
-
 USING: parser kernel hashtables namespaces sequences lists math io
 math-contrib threads strings arrays prettyprint xlib x ;
+
+IN: automata
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 ! set-rule
