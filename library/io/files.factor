@@ -6,7 +6,8 @@ styles ;
 
 ! Words for accessing filesystem meta-data.
 
-: path+ ( path path -- path ) "/" swap append3 ;
+: path+ ( path path -- path )
+    over "/" tail? [ append ] [ "/" swap append3 ] if ;
 
 : exists? ( file -- ? ) stat >boolean ;
 

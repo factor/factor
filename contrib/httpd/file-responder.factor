@@ -36,7 +36,7 @@ parser sequences strings ;
     ] if ;
 
 : serve-directory ( filename -- )
-    "/" over tail? [
+    dup "/" tail? [
         dup "index.html" append dup exists? [
             nip serve-file
         ] [
