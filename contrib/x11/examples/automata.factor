@@ -11,12 +11,10 @@ math-contrib threads strings arrays prettyprint xlib x ;
 
 SYMBOL: rule
 
-! 8 <hashtable> rule set
 8 <hashtable> rule set-global
 
 SYMBOL: char-0
 
-! 48 char-0 set
 48 char-0 set-global
 
 : rule-keys ( -- { ... } )
