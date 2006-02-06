@@ -291,7 +291,7 @@ SYMBOL: root-continuation
     ] [
       expired-page-handler 
     ] if* 
-  ] with-exit-continuation [ drop flush ] when* ;
+  ] with-exit-continuation drop ;
 
 : callback-quot ( quot -- quot )
   #! Convert the given quotation so it works as a callback
