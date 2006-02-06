@@ -15,16 +15,20 @@ FUNCTION: bool sel_isMapped ( SEL aSelector ) ;
 FUNCTION: SEL sel_registerName ( char* str ) ;
 
 BEGIN-STRUCT: objc-class
-   FIELD: void* isa
-   FIELD: void* super-class
-   FIELD: char* name
-   FIELD: long version
-   FIELD: long info
-   FIELD: long instance-size
-   FIELD: void* ivars
-   FIELD: void* methodLists
-   FIELD: void* cache
-   FIELD: void* protocols
+    FIELD: void* isa
+    FIELD: void* super-class
+    FIELD: char* name
+    FIELD: long version
+    FIELD: long info
+    FIELD: long instance-size
+    FIELD: void* ivars
+    FIELD: void* methodLists
+    FIELD: void* cache
+    FIELD: void* protocols
+END-STRUCT
+
+BEGIN-STRUCT: objc-object
+    FIELD: objc-class* isa
 END-STRUCT
 
 FUNCTION: int objc_getClassList ( void* buffer, int bufferLen ) ;
