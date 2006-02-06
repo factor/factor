@@ -1,9 +1,8 @@
-
-IN: factory
-
 USING: kernel namespaces generic math sequences hashtables io arrays words
        prettyprint lists concurrency
        xlib x concurrent-widgets simple-error-handler ;
+
+IN: factory
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
@@ -480,19 +479,19 @@ M: workspace switch-to ( workspace -- )
   mapped-windows dup current-workspace get set-workspace-windows
   [ unmap-window+ ] each
   dup workspace-windows [ map-window+ ] each
-  current-workspace set ;
+  current-workspace set-global ;
 
 SYMBOL: workspace-1
 SYMBOL: workspace-2
 SYMBOL: workspace-3
 SYMBOL: workspace-4
 
-create-workspace workspace-1 set
-create-workspace workspace-2 set
-create-workspace workspace-3 set
-create-workspace workspace-4 set
+create-workspace workspace-1 set-global
+create-workspace workspace-2 set-global
+create-workspace workspace-3 set-global
+create-workspace workspace-4 set-global
 
-workspace-1 get current-workspace set
+workspace-1 get current-workspace set-global
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
