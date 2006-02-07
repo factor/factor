@@ -7,30 +7,36 @@
 ! in the Makefile.
 
 IN: cocoa-speech
-USING: alien compiler kernel objective-c sequences words ;
+USING: alien compiler kernel objc sequences words ;
 
 ! Define classes and messages
-OBJC-MESSAGE: id alloc ;
-OBJC-CLASS: NSString
+: init-cocoa
+    "NSObject" define-objc-class
+    "NSString" define-objc-class
+    "NSSpeechSynthesizer" define-objc-class ; parsing
+
+init-cocoa
+
+USING: objc-NSString objc-NSObject objc-NSSpeechSynthesizer ;
+
 : NSASCIIStringEncoding 1 ; inline
-OBJC-MESSAGE: id initWithCString: char* encoding: uint ;
-OBJC-CLASS: NSSpeechSynthesizer
-OBJC-MESSAGE: id initWithVoice: id ;
-OBJC-MESSAGE: bool startSpeakingString: id ;
 
 ! A utility
 : <NSString> ( string -- alien )
     NSString [alloc]
     swap NSASCIIStringEncoding [initWithCString:encoding:] ;
 
-! As usual, alien invoke words need to be compiled
-"cocoa-speech" words [ try-compile ] each
-
 ! A utility
 : <NSSpeechSynthesizer> ( voice -- synth )
     NSSpeechSynthesizer [alloc] swap [initWithVoice:] ;
 
 ! Call the TTS API
-f <NSSpeechSynthesizer>
-"Hello from Factor" <NSString>
-[startSpeakingString:]
+: speech-test
+    f <NSSpeechSynthesizer>
+    "Hello from Factor" <NSString>
+    [startSpeakingString:] ;
+
+! As usual, alien invoke words need to be compiled
+"cocoa-speech" words [ try-compile ] each
+
+speech-test
