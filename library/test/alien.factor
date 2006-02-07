@@ -1,5 +1,6 @@
 IN: temporary
-USING: arrays alien kernel kernel-internals namespaces test ;
+USING: alien arrays kernel kernel-internals namespaces
+objective-c test ;
 
 [ t ] [ 0 <alien> 0 <alien> = ] unit-test
 [ f ] [ 0 <alien> 1024 <alien> = ] unit-test
@@ -49,3 +50,7 @@ cell 8 = [
 
 [ "hello world" ]
 [ "hello world" string>alien alien>string ] unit-test
+
+[ "example" ] [ "{example=@*i}" parse-objc-type ] unit-test
+[ "void*" ] [ "[12^f]" parse-objc-type ] unit-test
+[ "float*" ] [ "^f" parse-objc-type ] unit-test

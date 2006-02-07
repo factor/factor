@@ -146,7 +146,6 @@ vectors words ;
         
         "/library/alien/objective-c/runtime.factor"
         "/library/alien/objective-c/utils.factor"
-        "/library/alien/objective-c/syntax.factor"
         
         "/library/io/buffer.factor"
 

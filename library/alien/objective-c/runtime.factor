@@ -1,6 +1,6 @@
 ! Copyright (C) 2006 Slava Pestov
 ! See http://factorcode.org/license.txt for BSD license.
-IN: objective-c
+IN: objc
 
 LIBRARY: objc
 
@@ -66,3 +66,5 @@ FUNCTION: void class_removeMethods ( objc-class* class, objc-method-list* method
 FUNCTION: uint method_getNumberOfArguments ( objc-method* method ) ;
 
 FUNCTION: uint method_getSizeOfArguments ( objc-method* method ) ;
+
+FUNCTION: uint method_getArgumentInfo ( objc-method* method, int argIndex, char** type, int* offset ) ;
