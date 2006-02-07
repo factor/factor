@@ -53,6 +53,7 @@ C: selector ( name -- sel ) [ set-selector-name ] keep ;
 
 : (parse-objc-type) ( i string -- ctype )
     2dup nth >r >r 1+ r> r> {
+        { [ dup "rnNoORV" member? ] [ drop (parse-objc-type) ] }
         { [ dup CHAR: ^ = ] [ 3drop "void*" ] }
         { [ dup CHAR: { = ] [ drop objc-struct-type ] }
         { [ dup CHAR: [ = ] [ 3drop "void*" ] }
