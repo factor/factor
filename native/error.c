@@ -70,6 +70,18 @@ void signal_error(int signal)
 			cons(tag_fixnum(signal),F))),false);
 }
 
+/* called from signal.c when a sigv tells us that we under/overflowed a page.
+ * The first bool is true if it was the return stack (otherwise it's the data
+ * stack) and the second bool is true if we overflowed it (otherwise we
+ * underflowed it) */
+void signal_stack_error(bool is_return_stack, bool is_overflow)
+{
+	CELL errors[] = { ERROR_STACK_UNDERFLOW, ERROR_STACK_OVERFLOW,
+			  ERROR_RETSTACK_UNDERFLOW, ERROR_RETSTACK_OVERFLOW };
+	const CELL error = errors[is_return_stack * 2 + is_overflow];
+	throw_error(cons(userenv[ERROR_ENV], cons(error, F)), false);
+}
+
 void type_error(CELL type, CELL tagged)
 {
 	CELL c = cons(tag_fixnum(type),cons(tagged,F));

@@ -48,6 +48,18 @@ SYMBOL: error-continuation
 : user-interrupt. ( obj -- )
     "User interrupt" print drop ;
 
+: stack-underflow. ( obj -- )
+    "Stack underflow" print drop ;
+
+: stack-overflow. ( obj -- )
+    "Stack overflow" print drop ;
+
+: return-stack-underflow. ( obj -- )
+    "Return stack underflow" print drop ;
+
+: return-stack-overflow. ( obj -- )
+    "Return stack overflow" print drop ;
+
 PREDICATE: cons kernel-error ( obj -- ? )
     dup first kernel-error = swap second 0 11 between? and ;
 
@@ -66,6 +78,10 @@ M: kernel-error error. ( error -- )
         [ heap-scan-error. ]
         [ undefined-symbol-error. ]
         [ user-interrupt. ]
+	[ stack-underflow. ]
+	[ stack-overflow. ]
+	[ return-stack-underflow. ]
+	[ return-stack-overflow . ]
     } dispatch ;
 
 M: no-method summary drop "No suitable method" ;

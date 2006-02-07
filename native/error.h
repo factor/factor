@@ -10,6 +10,10 @@
 #define ERROR_HEAP_SCAN (9<<3)
 #define ERROR_UNDEFINED_SYMBOL (10<<3)
 #define ERROR_USER_INTERRUPT (11<<3)
+#define ERROR_STACK_UNDERFLOW (12<<3)
+#define ERROR_STACK_OVERFLOW (13<<3)
+#define ERROR_RETSTACK_UNDERFLOW (14<<3)
+#define ERROR_RETSTACK_OVERFLOW (15<<3)
 
 /* Are we throwing an error? */
 bool throwing;
