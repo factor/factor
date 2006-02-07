@@ -6,7 +6,8 @@ xlib x x11 gl concurrent-widgets lindenmayer ;
 USE: sequences
 
 : >float-array ( seq -- )
-dup length <float-array> swap dup length >array [ pick set-float-nth ] 2each ;
+dup length "float" <c-array> swap dup length >array
+[ pick set-float-nth ] 2each ;
 
 USE: lindenmayer
 
@@ -16,10 +17,18 @@ SYMBOL: camera-position { 5 5 5 } camera-position set
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
+! "" result set
+
+! : display ( -- )
+! GL_COLOR_BUFFER_BIT GL_DEPTH_BUFFER_BIT bitor glClear
+! camera-position get glLoadIdentity [ ] each 0.0 0.0 0.0 0.0 1.0 0.0 gluLookAt
+! reset result get interpret glFlush ;
+
 : display ( -- )
 GL_COLOR_BUFFER_BIT GL_DEPTH_BUFFER_BIT bitor glClear
 camera-position get glLoadIdentity [ ] each 0.0 0.0 0.0 0.0 1.0 0.0 gluLookAt
-reset result get interpret glFlush ;
+reset result get dup [ save-state interpret restore-state ] [ drop ] if
+glFlush ;
 
 : reshape ( { width height } -- )
 >r 0 0 r> [ ] each glViewport

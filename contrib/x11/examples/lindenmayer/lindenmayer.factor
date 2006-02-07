@@ -29,12 +29,12 @@ IN: lindenmayer
 SYMBOL: position
 SYMBOL: orientation
 
-: rotate-U ( angle -- ) RU orientation get swap m. orientation set ;
-: rotate-L ( angle -- ) RL orientation get swap m. orientation set ;
-: rotate-H ( angle -- ) RH orientation get swap m. orientation set ;
+: rotate-U ( angle -- ) RU orientation get swap m. orientation set-global ;
+: rotate-L ( angle -- ) RL orientation get swap m. orientation set-global ;
+: rotate-H ( angle -- ) RH orientation get swap m. orientation set-global ;
 
 : step ( length -- )
->r position get orientation get 0 0 r> 3array m.v v+ position set ;
+>r position get orientation get 0 0 r> 3array m.v v+ position set-global ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
@@ -48,7 +48,8 @@ SYMBOL: orientation
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-: reset ( -- ) { 0 0 0 } position set 3 identity-matrix orientation set ;
+: reset ( -- )
+{ 0 0 0 } position set-global 3 identity-matrix orientation set-global ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
@@ -77,9 +78,9 @@ GL_POLYGON glBegin dup polygon-normal first3 glNormal3f
 
 SYMBOL: vertices
 
-V{ } vertices set
+V{ } vertices set-global
 
-: start-polygon ( -- ) 0 <vector> vertices set ;
+: start-polygon ( -- ) 0 <vector> vertices set-global ;
 
 : finish-polygon ( -- ) vertices get polygon ;
 
@@ -131,7 +132,8 @@ dup segment-parameter swap segment-command ;
 command-table get hash dup [ last call ] [ 2drop ] if ;
 
 : (interpret) ( seg -- )
-dup length* 1 = [ exec-command ] [ segment-parts exec-command-with-param ] if ;
+dup length* 1 =
+[ exec-command ] [ segment-parts exec-command-with-param ] if ;
 
 : interpret ( str -- ) segment [ (interpret) ] each ;
 
@@ -151,7 +153,7 @@ DEFER: set-color-index
 
 TUPLE: state position orientation angle length thickness color-index ;
 
-SYMBOL: states V{ } states set
+SYMBOL: states V{ } states set-global
 
 : save-state ( -- )
 position get orientation get angle get length get thickness get
@@ -160,19 +162,19 @@ states get push ;
 
 : restore-state ( -- )
 states get pop
-dup state-position    position set
-dup state-orientation orientation set
-dup state-length      length set
-dup state-angle       angle set
+dup state-position    position set-global
+dup state-orientation orientation set-global
+dup state-length      length set-global
+dup state-angle       angle set-global
 dup state-color-index set-color-index
 dup state-thickness   set-thickness
 drop ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-: scale-length ( m -- ) length get * length set ;
+: scale-length ( m -- ) length get * length set-global ;
 
-: scale-angle ( m -- ) angle get * angle set ;
+: scale-angle ( m -- ) angle get * angle set-global ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
@@ -194,14 +196,15 @@ SYMBOL: color-table
   { 0.25 0.25 0.25 } ! dark grey
   { 0.75 0.75 0.75 } ! medium grey
   { 1 1 1 } ! white
-} color-table set
+} color-table set-global
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 USE: sequences
 
 : >float-array ( seq -- )
-dup length <float-array> swap dup length >array [ pick set-float-nth ] 2each ;
+dup length "float" <c-array> swap dup length >array
+[ pick set-float-nth ] 2each ;
 
 USE: lindenmayer
 
@@ -212,14 +215,14 @@ USE: lindenmayer
 GL_FRONT_AND_BACK GL_AMBIENT_AND_DIFFUSE rot glMaterialfv ;
 
 : set-color-index ( i -- )
-dup color-index set color-table get nth dup
+dup color-index set-global color-table get nth dup
 first3 glColor3f first3 material-color ;
 
 : inc-color-index ( -- ) color-index get 1 + set-color-index ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-: set-thickness ( i -- ) dup thickness set glLineWidth ;
+: set-thickness ( i -- ) dup thickness set-global glLineWidth ;
 
 : scale-thickness ( m -- ) thickness get * 0.5 max set-thickness ;
 
@@ -229,50 +232,50 @@ first3 glColor3f first3 material-color ;
 : -rotate-x neg rotate-x ;
 : -rotate-z neg rotate-z ;
 
-
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 : lparser-dialect ( -- )
 
-1 length set   45 angle set   1 thickness set   2 set-color-index
+1 length set-global   45 angle set-global   1 thickness set-global
+2 set-color-index
 
-H{ [[ "+" [ angle get     rotate-y ] ]]
-!  [[ "-" [ angle get neg rotate-y ] ]]
-   [[ "-" [ angle get    -rotate-y ] ]]
-   [[ "&" [ angle get     rotate-x ] ]]
-!  [[ "^" [ angle get neg rotate-x ] ]]
-   [[ "^" [ angle get    -rotate-x ] ]]
-   [[ "<" [ angle get     rotate-z ] ]]
-!  [[ ">" [ angle get neg rotate-z ] ]]
-   [[ ">" [ angle get    -rotate-z ] ]]
-   [[ "|" [ 180.0         rotate-y ] ]]
-   [[ "%" [ 180.0         rotate-z ] ]]
+H{ { "+" [ angle get     rotate-y ] }
+!  { "-" [ angle get neg rotate-y ] }
+   { "-" [ angle get    -rotate-y ] }
+   { "&" [ angle get     rotate-x ] }
+!  { "^" [ angle get neg rotate-x ] }
+   { "^" [ angle get    -rotate-x ] }
+   { "<" [ angle get     rotate-z ] }
+!  { ">" [ angle get neg rotate-z ] }
+   { ">" [ angle get    -rotate-z ] }
+   { "|" [ 180.0         rotate-y ] }
+   { "%" [ 180.0         rotate-z ] }
 
-   [[ "F" [ length get     draw-forward ] ]]
-   [[ "Z" [ length get 2 / draw-forward ] ]]
-   [[ "f" [ length get     move-forward ] ]]
-   [[ "z" [ length get 2 / move-forward ] ]]
-   [[ "g" [ length get     sneak-forward ] ]]
+   { "F" [ length get     draw-forward ] }
+   { "Z" [ length get 2 / draw-forward ] }
+   { "f" [ length get     move-forward ] }
+   { "z" [ length get 2 / move-forward ] }
+   { "g" [ length get     sneak-forward ] }
 
-   [[ "." [ polygon-vertex ] ]]
-   [[ "[" [ save-state ] ]]
-   [[ "]" [ restore-state ] ]]
-   [[ "{" [ start-polygon ] ]]
-   [[ "}" [ finish-polygon ] ]]
+   { "." [ polygon-vertex ] }
+   { "[" [ save-state ] }
+   { "]" [ restore-state ] }
+   { "{" [ start-polygon ] }
+   { "}" [ finish-polygon ] }
 
-   [[ "/" [ 1.1 scale-length ] ]]
-   [[ "'" [ 0.9 scale-length ] ]]
-   [[ ";" [ 1.1 scale-angle ] ]]
-   [[ ":" [ 0.9 scale-angle ] ]]
-!   [[ "?" [ thickness get 1.4 * thickness set ] ]]
-!   [[ "!" [ thickness get 0.7 * thickness set ] ]]
-   [[ "?" [ 1.4 scale-thickness ] ]]
-   [[ "!" [ 0.7 scale-thickness ] ]]
+   { "/" [ 1.1 scale-length ] }
+   { "'" [ 0.9 scale-length ] }
+   { ";" [ 1.1 scale-angle ] }
+   { ":" [ 0.9 scale-angle ] }
+!   { "?" [ thickness get 1.4 * thickness set ] }
+!   { "!" [ thickness get 0.7 * thickness set ] }
+   { "?" [ 1.4 scale-thickness ] }
+   { "!" [ 0.7 scale-thickness ] }
 
-!   [[ "c" [ inc-color-index ] ]]
-   [[ "c" [ color-index get 1 + set-color-index ] ]]
+!   { "c" [ inc-color-index ] }
+   { "c" [ color-index get 1 + set-color-index ] }
 
-} command-table set ;
+} command-table set-global ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 ! Examples
@@ -283,60 +286,60 @@ SYMBOL: result
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-: koch ( -- ) lparser-dialect   90 angle set
+: koch ( -- ) lparser-dialect   90 angle set-global
 
-H{ [[ "K" "[[a|b] '(0.41)f'(2.439) |<(60) [a|b]]" ]]
-   [[ "k" "[ c'(0.5) K]" ]]
-   [[ "a" "[d <(120) d <(120) d ]" ]]
-   [[ "b" "e" ]]
-   [[ "e" "[^ '(.2887)f'(3.4758) &(180)      +z{.-(120)f-(120)f}]" ]]
-   [[ "d" "[^ '(.2887)f'(3.4758) &(109.5111) +zk{.-(120)f-(120)f}]" ]]
-} rules set
+H{ { "K" "[[a|b] '(0.41)f'(2.439) |<(60) [a|b]]" }
+   { "k" "[ c'(0.5) K]" }
+   { "a" "[d <(120) d <(120) d ]" }
+   { "b" "e" }
+   { "e" "[^ '(.2887)f'(3.4758) &(180)      +z{.-(120)f-(120)f}]" }
+   { "d" "[^ '(.2887)f'(3.4758) &(109.5111) +zk{.-(120)f-(120)f}]" }
+} rules set-global
 
-"K" axiom set ;
-
-! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-
-: spiral-0 ( -- ) lparser-dialect   10 angle set   5 thickness set
-
-"[P]|[P]" axiom set
-
-H{ [[ "P" "[A]>>>>>>>>>[cB]>>>>>>>>>[ccC]>>>>>>>>>[cccD]" ]]
-   [[ "A" "F+;'A" ]]
-   [[ "B" "F!+F+;'B" ]]
-   [[ "C" "F!^+F^+;'C" ]]
-   [[ "D" "F!>^+F>^+;'D" ]]
-} rules set ;
+"K" axiom set-global ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-: tree-5 ( -- ) lparser-dialect   5 angle set   1 thickness set
+: spiral-0 ( -- ) lparser-dialect  10 angle set-global  5 thickness set-global
 
-"c(4)FFS" axiom set
+"[P]|[P]" axiom set-global
 
-H{ [[ "S" "FFR>(60)R>(60)R>(60)R>(60)R>(60)R>(30)S" ]]
-   [[ "R" "[Ba]" ]]
-   [[ "a" "$tF[Cx]Fb" ]]
-   [[ "b" "$tF[Dy]Fa" ]]
-   [[ "B" "&B" ]]
-   [[ "C" "+C" ]]
-   [[ "D" "-D" ]]
-
-   [[ "x" "a" ]]
-   [[ "y" "b" ]]
-
-   [[ "F" "'(1.25)F'(.8)" ]]
-} rules set ;
+H{ { "P" "[A]>>>>>>>>>[cB]>>>>>>>>>[ccC]>>>>>>>>>[cccD]" }
+   { "A" "F+;'A" }
+   { "B" "F!+F+;'B" }
+   { "C" "F!^+F^+;'C" }
+   { "D" "F!>^+F>^+;'D" }
+} rules set-global ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-: abop-1 ( -- ) lparser-dialect   45 angle set   5 thickness set
+: tree-5 ( -- ) lparser-dialect   5 angle set-global   1 thickness set-global
 
-H{ [[ "A" "F[&'(.8)!BL]>(137)'!(.9)A" ]]
-   [[ "B" "F[-'(.8)!(.9)$CL]'!(.9)C" ]]
-   [[ "C" "F[+'(.8)!(.9)$BL]'!(.9)B" ]]
+"c(4)FFS" axiom set-global
 
-   [[ "L" "~c(8){+(30)f-(120)f-(120)f}" ]]
-} rules set
+H{ { "S" "FFR>(60)R>(60)R>(60)R>(60)R>(60)R>(30)S" }
+   { "R" "[Ba]" }
+   { "a" "$tF[Cx]Fb" }
+   { "b" "$tF[Dy]Fa" }
+   { "B" "&B" }
+   { "C" "+C" }
+   { "D" "-D" }
 
-"c(12)FFAL" axiom set ;
+   { "x" "a" }
+   { "y" "b" }
+
+   { "F" "'(1.25)F'(.8)" }
+} rules set-global ;
+
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+: abop-1 ( -- ) lparser-dialect   45 angle set-global   5 thickness set-global
+
+H{ { "A" "F[&'(.8)!BL]>(137)'!(.9)A" }
+   { "B" "F[-'(.8)!(.9)$CL]'!(.9)C" }
+   { "C" "F[+'(.8)!(.9)$BL]'!(.9)B" }
+
+   { "L" "~c(8){+(30)f-(120)f-(120)f}" }
+} rules set-global
+
+"c(12)FFAL" axiom set-global ;
