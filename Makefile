@@ -17,7 +17,8 @@ UNIX_OBJS = native/unix/file.o \
 	native/unix/ffi.o \
 	native/unix/run.o \
 	native/unix/memory.o \
-	native/unix/mach_signal.o
+	native/unix/mach_signal.o \
+	native/unix/icache.o
 
 WIN32_OBJS = native/win32/ffi.o \
 	native/win32/file.o \
@@ -48,7 +49,6 @@ OBJS = $(PLAF_OBJS) native/array.o native/bignum.o \
 	native/boolean.o \
 	native/debug.o \
 	native/hashtable.o \
-	native/icache.o \
 	native/io.o \
 	native/wrapper.o \
 	native/ffi_test.o

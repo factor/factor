@@ -1,4 +1,3 @@
-- fix the windows build
 - if select() returns an error, fep
 - FILE* leaked in process.factor
 - fix remaining HTML stream issues
