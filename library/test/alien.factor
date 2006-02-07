@@ -1,6 +1,5 @@
 IN: temporary
-USING: alien arrays kernel kernel-internals namespaces
-objective-c test ;
+USING: alien arrays kernel kernel-internals namespaces objc test ;
 
 [ t ] [ 0 <alien> 0 <alien> = ] unit-test
 [ f ] [ 0 <alien> 1024 <alien> = ] unit-test
