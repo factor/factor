@@ -5,6 +5,7 @@ USING: kernel parser sequences words compiler ;
 
 {
     "common"
+    "base64"
     "random"
     "miller-rabin"
     "md5"
