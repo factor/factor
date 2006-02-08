@@ -1,0 +1,53 @@
+USING: kernel math sequences namespaces io strings hashtables ;
+IN: crypto-internals
+
+: (count-end) ( elt count seq -- elt count seq )
+    2dup length < [
+        3dup [ length swap - 1- ] keep nth = [ >r 1+ r> (count-end) ] when
+    ] when ;
+
+: count-end ( elt seq -- n )
+    #! count the number of elem at the end of the seq
+    0 swap (count-end) drop nip ;
+
+
+: ch>base64 ( ch -- ch )
+    "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/" nth ;
+
+: base64>ch ( ch -- ch )
+    #! extra f is to adjust index
+    {
+        f f f f f f f f f f f f f f f f f f f f f f f f f f f f f f f f f
+        f f f f f f f f f f 62 f f f 63 52 53 54 55 56 57 58 59 60 61 f f
+        f 0 f f f 0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21
+        22 23 24 25 f f f f f f 26 27 28 29 30 31 32 33 34 35 36 37 38 39
+        40 41 42 43 44 45 46 47 48 49 50 51
+    } nth ;
+
+: encode4 ( seq -- seq )
+    be> 4 [ 3 swap - -6 * shift HEX: 3f bitand ch>base64 ] map-with ;
+
+: decode4 ( str -- str )
+    [ base64>ch ] map 0 4 [ pick nth swap 6 shift bitor ] each nip 3 >be ;
+
+: >base64-rest ( str -- str )
+    [ 3 0 pad-right encode4 ] keep length 1+ swap head 4 CHAR: = pad-right ;
+
+IN: crypto
+: >base64 ( str -- str )
+    #! cut string into two pieces, convert 3 bytes at a time
+    #! pad string with = when not enough bits
+    dup length dup 3 mod - swap cut swap
+    [
+        dup length 3 / [ 3 * dup 3 + rot <slice> encode4 % ] each-with
+        dup empty? [ drop ] [ >base64-rest % ] if
+    ] "" make ;
+
+: base64> ( str -- str )
+    #! input length must be a mulitple of 4
+    [
+        [
+            dup length 4 / [ 4 * dup 4 + rot <slice> decode4 % ] each-with
+        ] keep CHAR: = swap count-end
+    ] SBUF" " make swap [ dup pop* ] times >string ;
+
