@@ -32,7 +32,7 @@ void primitive_dlsym(void)
 	{
 		d = untag_dll(dll);
 		if(d->dll == NULL)
-			general_error(ERROR_EXPIRED,dll);
+			general_error(ERROR_EXPIRED,dll,true);
 	}
 
 	dpush(tag_cell((CELL)ffi_dlsym(d,sym,true)));

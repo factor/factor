@@ -4,7 +4,7 @@ F_SBUF* sbuf(F_FIXNUM capacity)
 {
 	F_SBUF* sbuf;
 	if(capacity < 0)
-		general_error(ERROR_NEGATIVE_ARRAY_SIZE,tag_integer(capacity));
+		general_error(ERROR_NEGATIVE_ARRAY_SIZE,tag_integer(capacity),true);
 	sbuf = allot_object(SBUF_TYPE,sizeof(F_SBUF));
 	sbuf->top = tag_fixnum(0);
 	sbuf->string = tag_object(string(capacity,'\0'));

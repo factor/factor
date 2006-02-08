@@ -24,7 +24,7 @@ void *alien_offset(CELL object)
 	case ALIEN_TYPE:
 		alien = untag_alien_fast(object);
 		if(alien->expired)
-			general_error(ERROR_EXPIRED,object);
+			general_error(ERROR_EXPIRED,object,true);
 		return alien->ptr;
 	case BYTE_ARRAY_TYPE:
 		array = untag_byte_array_fast(object);

@@ -65,7 +65,7 @@ void run(void)
 /* XT of deferred words */
 void undefined(F_WORD* word)
 {
-	general_error(ERROR_UNDEFINED_WORD,tag_object(word));
+	general_error(ERROR_UNDEFINED_WORD,tag_object(word),true);
 }
 
 /* XT of compound definitions */

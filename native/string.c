@@ -6,7 +6,7 @@ F_STRING* allot_string(F_FIXNUM capacity)
 	F_STRING* string;
 
 	if(capacity < 0)
-		general_error(ERROR_NEGATIVE_ARRAY_SIZE,tag_integer(capacity));
+		general_error(ERROR_NEGATIVE_ARRAY_SIZE,tag_integer(capacity),true);
 
 	string = allot_object(STRING_TYPE,
 		sizeof(F_STRING) + (capacity + 1) * CHARS);
@@ -133,7 +133,7 @@ F_ARRAY *string_to_alien(F_STRING *s, bool check)
 		{
 			u16 ch = string_nth(s,i);
 			if(ch == '\0' || ch > 255)
-				general_error(ERROR_C_STRING,tag_object(s));
+				general_error(ERROR_C_STRING,tag_object(s),true);
 		}
 	}
 

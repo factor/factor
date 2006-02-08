@@ -4,15 +4,16 @@
 // this function tests if a given faulting location is in a poison page. The
 // page address is taken from area + round_up_to_page_size(area_size) + 
 // pagesize*offset
-static bool in_page(void *fault, void *i_area, CELL area_size, int offset) {
-  const int pagesize = getpagesize();
-  intptr_t area = (intptr_t) i_area;
-  area += pagesize * ((area_size + (pagesize - 1)) / pagesize);
-  area += offset * pagesize;
+static bool in_page(void *fault, void *i_area, CELL area_size, int offset)
+{
+	const int pagesize = getpagesize();
+	intptr_t area = (intptr_t) i_area;
+	area += pagesize * ((area_size + (pagesize - 1)) / pagesize);
+	area += offset * pagesize;
 
-  const int page = area / pagesize;
-  const int fault_page = (intptr_t)fault / pagesize;
-  return page == fault_page;
+	const int page = area / pagesize;
+	const int fault_page = (intptr_t)fault / pagesize;
+	return page == fault_page;
 }
 
 void signal_handler(int signal, siginfo_t* siginfo, void* uap)
@@ -27,27 +28,14 @@ void signal_handler(int signal, siginfo_t* siginfo, void* uap)
 		fprintf(stderr,"Code space exhausted\n");
 		factorbug();
 	}
-	/* we wish to catch the case where we underflow/overflow the data or
-	// return stacks. These stacks have poison pages above and below the
-	// memory so we just need to test if the faulting addresss is in one of
-	// these pages */
-
-	/* first, underflowing the data stack */
 	else if(in_page(siginfo->si_addr, (void *) ds_bot, 0, -1))
-	{
 		signal_stack_error(false, false);
-	}
-	else if(in_page(siginfo->si_addr, (void *) ds_bot, ds_size, 0)) {
+	else if(in_page(siginfo->si_addr, (void *) ds_bot, ds_size, 0))
 		signal_stack_error(false, true);
-	}
 	else if(in_page(siginfo->si_addr, (void *) cs_bot, 0, -1))
-	{
 		signal_stack_error(true, false);
-	}
-	else if(in_page(siginfo->si_addr, (void *) cs_bot, cs_size, 0)) {
+	else if(in_page(siginfo->si_addr, (void *) cs_bot, cs_size, 0))
 		signal_stack_error(true, true);
-	}
-		
 	else
 		signal_error(signal);
 }

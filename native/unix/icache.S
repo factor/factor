@@ -1,4 +1,4 @@
-#include "platform.h"
+#include "../platform.h"
 
 /* Thanks to Joshua Grams for this code.
 

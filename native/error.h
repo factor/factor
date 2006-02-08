@@ -10,10 +10,10 @@
 #define ERROR_HEAP_SCAN (9<<3)
 #define ERROR_UNDEFINED_SYMBOL (10<<3)
 #define ERROR_USER_INTERRUPT (11<<3)
-#define ERROR_STACK_UNDERFLOW (12<<3)
-#define ERROR_STACK_OVERFLOW (13<<3)
-#define ERROR_RETSTACK_UNDERFLOW (14<<3)
-#define ERROR_RETSTACK_OVERFLOW (15<<3)
+#define ERROR_DS_UNDERFLOW (12<<3)
+#define ERROR_DS_OVERFLOW (13<<3)
+#define ERROR_CS_UNDERFLOW (14<<3)
+#define ERROR_CS_OVERFLOW (15<<3)
 
 /* Are we throwing an error? */
 bool throwing;
@@ -33,8 +33,9 @@ void fatal_error(char* msg, CELL tagged);
 void critical_error(char* msg, CELL tagged);
 void throw_error(CELL error, bool keep_stacks);
 void early_error(CELL error);
-void general_error(CELL error, CELL tagged);
+void general_error(CELL error, CELL tagged, bool keep_stacks);
 void signal_error(int signal);
+void signal_stack_error(bool is_return_stack, bool is_overflow);
 void type_error(CELL type, CELL tagged);
 void primitive_throw(void);
 void primitive_die(void);

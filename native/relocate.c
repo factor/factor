@@ -87,7 +87,7 @@ void relocate_data()
 
 void undefined_symbol(void)
 {
-	general_error(ERROR_UNDEFINED_SYMBOL,F);
+	general_error(ERROR_UNDEFINED_SYMBOL,F,true);
 }
 
 CELL get_rel_symbol(F_REL* rel)

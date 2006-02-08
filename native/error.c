@@ -55,19 +55,17 @@ void primitive_die(void)
 	factorbug();
 }
 
-void general_error(CELL error, CELL tagged)
+void general_error(CELL error, CELL tagged, bool keep_stacks)
 {
 	CELL thrown = cons(userenv[ERROR_ENV],cons(error,cons(tagged,F)));
-	throw_error(thrown,true);
+	throw_error(thrown,keep_stacks);
 }
 
 /* It is not safe to access 'ds' from a signal handler, so we just not
 touch it */
 void signal_error(int signal)
 {
-	throw_error(cons(userenv[ERROR_ENV],
-		cons(ERROR_SIGNAL,
-			cons(tag_fixnum(signal),F))),false);
+	general_error(ERROR_SIGNAL,tag_fixnum(signal),false);
 }
 
 /* called from signal.c when a sigv tells us that we under/overflowed a page.
@@ -76,14 +74,13 @@ void signal_error(int signal)
  * underflowed it) */
 void signal_stack_error(bool is_return_stack, bool is_overflow)
 {
-	CELL errors[] = { ERROR_STACK_UNDERFLOW, ERROR_STACK_OVERFLOW,
-			  ERROR_RETSTACK_UNDERFLOW, ERROR_RETSTACK_OVERFLOW };
-	const CELL error = errors[is_return_stack * 2 + is_overflow];
-	throw_error(cons(userenv[ERROR_ENV], cons(error, F)), false);
+	CELL errors[] = { ERROR_DS_UNDERFLOW, ERROR_DS_OVERFLOW,
+			  ERROR_CS_UNDERFLOW, ERROR_CS_OVERFLOW };
+	general_error(errors[is_return_stack * 2 + is_overflow],F,false);
 }
 
 void type_error(CELL type, CELL tagged)
 {
 	CELL c = cons(tag_fixnum(type),cons(tagged,F));
-	general_error(ERROR_TYPE,c);
+	general_error(ERROR_TYPE,c,true);
 }

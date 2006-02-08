@@ -7,7 +7,7 @@ F_ARRAY* allot_array(CELL type, F_FIXNUM capacity)
 	F_ARRAY *array;
 
 	if(capacity < 0)
-		general_error(ERROR_NEGATIVE_ARRAY_SIZE,tag_integer(capacity));
+		general_error(ERROR_NEGATIVE_ARRAY_SIZE,tag_integer(capacity),true);
 
 	array = allot_object(type,array_size(capacity));
 	array->capacity = tag_fixnum(capacity);
