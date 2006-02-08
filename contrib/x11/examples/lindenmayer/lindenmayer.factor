@@ -36,6 +36,9 @@ SYMBOL: orientation
 : step ( length -- )
 >r position get orientation get 0 0 r> 3array m.v v+ position set-global ;
 
+! : step ( length -- )
+! >r position get orientation get r> 0 0 3array m.v v+ position set-global ;
+
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 : record-vertex ( -- ) position get first3 glVertex3f ;
@@ -89,6 +92,28 @@ V{ } vertices set-global
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 USE: sequences : length* length ; USE: lindenmayer
+
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+! How $ works:
+
+!      V x H
+! L = -------
+!     |V x H|
+
+! V : direction opposite to gravity
+
+: V ( -- ) { 0 1 0 } ;
+
+: H ( -- ) orientation get [ first  ] map ;
+: L ( -- ) orientation get [ second ] map ;
+: U ( -- ) orientation get [ third  ] map ;
+
+: set-H ( { a b c } -- ) orientation get [ 0 swap set-nth ] 2each ;
+: set-L ( { a b c } -- ) orientation get [ 1 swap set-nth ] 2each ;
+: set-U ( { a b c } -- ) orientation get [ 2 swap set-nth ] 2each ;
+
+: roll-until-horizontal ( -- ) V H cross dup norm v/n set-L ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 ! Lindenmayer string rewriting
@@ -240,39 +265,35 @@ first3 glColor3f first3 material-color ;
 2 set-color-index
 
 H{ { "+" [ angle get     rotate-y ] }
-!  { "-" [ angle get neg rotate-y ] }
    { "-" [ angle get    -rotate-y ] }
    { "&" [ angle get     rotate-x ] }
-!  { "^" [ angle get neg rotate-x ] }
    { "^" [ angle get    -rotate-x ] }
    { "<" [ angle get     rotate-z ] }
-!  { ">" [ angle get neg rotate-z ] }
    { ">" [ angle get    -rotate-z ] }
+
    { "|" [ 180.0         rotate-y ] }
    { "%" [ 180.0         rotate-z ] }
+   { "$" [ roll-until-horizontal ]  }
 
    { "F" [ length get     draw-forward ] }
    { "Z" [ length get 2 / draw-forward ] }
    { "f" [ length get     move-forward ] }
    { "z" [ length get 2 / move-forward ] }
    { "g" [ length get     sneak-forward ] }
-
    { "." [ polygon-vertex ] }
+
    { "[" [ save-state ] }
    { "]" [ restore-state ] }
    { "{" [ start-polygon ] }
    { "}" [ finish-polygon ] }
 
-   { "/" [ 1.1 scale-length ] }
+   { "/" [ 1.1 scale-length ] } ! " command in lparser
    { "'" [ 0.9 scale-length ] }
    { ";" [ 1.1 scale-angle ] }
    { ":" [ 0.9 scale-angle ] }
-!   { "?" [ thickness get 1.4 * thickness set ] }
-!   { "!" [ thickness get 0.7 * thickness set ] }
    { "?" [ 1.4 scale-thickness ] }
    { "!" [ 0.7 scale-thickness ] }
 
-!   { "c" [ inc-color-index ] }
    { "c" [ color-index get 1 + set-color-index ] }
 
 } command-table set-global ;
@@ -343,3 +364,17 @@ H{ { "A" "F[&'(.8)!BL]>(137)'!(.9)A" }
 } rules set-global
 
 "c(12)FFAL" axiom set-global ;
+
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+: abop-2 ( -- ) lparser-dialect   30 angle set-global   5 thickness set-global
+
+H{ { "A" "F[&'(.7)!BL]>(137)[&'(.6)!BL]>(137)'(.9)!(.9)A" }
+   { "B" "F[-'(.7)!(.9)$CL]'(.9)!(.9)C" }
+   { "C" "F[+'(.7)!(.9)$BL]'(.9)!(.9)B" }
+
+   { "L" "~c(8){+(45)f(.1)-(45)f(.1)-(45)f(.1)+(45)|+(45)f(.1)-(45)f(.1)-(45)f(.1)}" }
+
+} rules set-global
+
+"c(12)FAL" axiom set-global ;

@@ -37,6 +37,10 @@ glLoadIdentity -1.0 1.0 -1.0 1.0 1.5 200.0 glFrustum
 GL_MODELVIEW glMatrixMode
 display ;
 
+: init ( -- ) axiom get result set ;
+
+: iterate ( -- ) result [ rewrite ] change display ;
+
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 f initialize-x
