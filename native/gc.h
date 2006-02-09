@@ -92,6 +92,12 @@ INLINE void *allot_zone(ZONE *z, CELL a)
 {
 	CELL h = z->here;
 	z->here = h + align8(a);
+	if(z->here > z->limit)
+	{
+		fprintf(stderr,"Nursery space exhausted\n");
+		factorbug();
+	}
+
 	allot_barrier(h);
 	return (void*)h;
 }

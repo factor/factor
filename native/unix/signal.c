@@ -18,17 +18,7 @@ static bool in_page(void *fault, void *i_area, CELL area_size, int offset)
 
 void signal_handler(int signal, siginfo_t* siginfo, void* uap)
 {
-	if(nursery.here > nursery.limit)
-	{
-		fprintf(stderr,"Nursery space exhausted\n");
-		factorbug();
-	}
-	else if(compiling.here + sizeof(CELL) > compiling.limit)
-	{
-		fprintf(stderr,"Code space exhausted\n");
-		factorbug();
-	}
-	else if(in_page(siginfo->si_addr, (void *) ds_bot, 0, -1))
+	if(in_page(siginfo->si_addr, (void *) ds_bot, 0, -1))
 		signal_stack_error(false, false);
 	else if(in_page(siginfo->si_addr, (void *) ds_bot, ds_size, 0))
 		signal_stack_error(false, true);
