@@ -103,6 +103,7 @@ CELL executing;
     #include <dlfcn.h>
 #endif
 
+#include "debug.h"
 #include "error.h"
 #include "cards.h"
 #include "memory.h"
@@ -135,6 +136,5 @@ CELL executing;
 #include "alien.h"
 #include "dll.h"
 #include "wrapper.h"
-#include "debug.h"
 
 #endif /* __FACTOR_H__ */
