@@ -25,7 +25,6 @@ objc-NSAutoreleasePool objc-NSObject threads ;
 
 : event-loop ( -- )
     \ NSApplication get expired? [
-        drop
         NSApplication [sharedApplication]
         \ NSApplication set-global
         [ (event-loop) ] in-thread
