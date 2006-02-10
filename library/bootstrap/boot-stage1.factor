@@ -144,9 +144,6 @@ vectors words ;
         "/library/alien/syntax.factor"
         "/library/alien/malloc.factor"
         
-        "/library/alien/objective-c/runtime.factor"
-        "/library/alien/objective-c/utils.factor"
-        
         "/library/io/buffer.factor"
 
         "/library/cli.factor"

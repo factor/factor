@@ -26,7 +26,7 @@ math namespaces ;
     [ set-alien-unsigned-8 ] "setter" set
     8 "width" set
     8 "align" set
-    [ "box_unsinged_8" %box ] "boxer" set
+    [ "box_unsigned_8" %box ] "boxer" set
     [ "unbox_unsigned_8" %unbox ] "unboxer" set
 ] "ulonglong" define-primitive-type
 

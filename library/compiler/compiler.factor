@@ -29,9 +29,12 @@ sequences words ;
 : try-compile ( word -- )
     [ compile ] [ error. drop ] recover ;
 
-: compile-all ( -- )
-    [ f "no-effect" set-word-prop ] each-word
-    [ try-compile ] each-word ;
+: compile-vocabs ( vocabs -- )
+    [ words ] map concat
+    dup [ f "no-effect" set-word-prop ] each
+    [ try-compile ] each ;
+
+: compile-all ( -- ) vocabs compile-vocabs ;
 
 : recompile ( word -- ) dup update-xt compile ;
 

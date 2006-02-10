@@ -1,8 +1,8 @@
 ! Copyright (C) 2006 Slava Pestov
 ! See http://factorcode.org/license.txt for BSD license.
 IN: objc
-USING: alien arrays hashtables kernel lists math namespaces
-parser sequences words ;
+USING: alien arrays errors hashtables kernel lists math
+namespaces parser sequences words ;
 
 TUPLE: selector name object ;
 
@@ -85,6 +85,7 @@ C: selector ( name -- sel ) [ set-selector-name ] keep ;
     [ method-list>seq % (objc-methods) ] [ 2drop ] if* ;
 
 : objc-methods ( class -- seq )
+    [ "Null pointer passed to objc-methods" throw ] unless*
     [ f <void*> (objc-methods) ] { } make ;
 
 : instance-methods ( classname -- seq )

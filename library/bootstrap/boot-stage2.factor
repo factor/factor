@@ -14,7 +14,7 @@ sequences sequences-internals words ;
             "/library/win32/load.factor" run-resource
         ] when
     ] when
-
+    
     "Compiling base..." print flush
 
     {
@@ -34,6 +34,10 @@ sequences sequences-internals words ;
     
     "Initializing native I/O..." print flush
     "native-io" get [ init-io ] when
+    
+    os "macosx" = [
+        "/library/cocoa/load.factor" run-resource
+    ] when
 ] when
 
 [
@@ -48,7 +52,7 @@ H{ } clone crossref set
 recrossref
 
 "Setting the resource path..." print
-cwd global [ "resource-path" set ] bind
+cwd global "resource-path" set-global
 
 [ compiled? ] word-subset length
 number>string write " compiled words" print

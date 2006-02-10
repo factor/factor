@@ -21,8 +21,6 @@ FUNCTION: void* CFStringCreateWithCString ( void* allocator, char* cStr, int enc
 
 FUNCTION: void* CFBundleCreate ( void* allocator, void* bundleURL ) ; compiled
 
-FUNCTION: void* CFBundleGetFunctionPointerForName ( void* bundle, void* functionName ) ; compiled
-
 FUNCTION: bool CFBundleLoadExecutable ( void* bundle ) ; compiled
 
 FUNCTION: void CFRelease ( void* cf ) ; compiled
@@ -51,7 +49,7 @@ FUNCTION: void CFRelease ( void* cf ) ; compiled
     CFBundleLoadExecutable drop
     {
         "NSObject" "NSWindow"
-        "NSURLRequest" "NSApplication" "%NSURL"
+        "NSURLRequest" "NSApplication"
         "WebView" "WebFrame"
     } [ dup define-objc-class "objc-" swap append use+ ] each ;
     parsing

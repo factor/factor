@@ -12,19 +12,11 @@ USING: alien compiler kernel objc sequences words ;
 ! Define classes and messages
 : init-cocoa
     "NSObject" define-objc-class
-    "NSString" define-objc-class
     "NSSpeechSynthesizer" define-objc-class ; parsing
 
 init-cocoa
 
 USING: objc-NSString objc-NSObject objc-NSSpeechSynthesizer ;
-
-: NSASCIIStringEncoding 1 ; inline
-
-! A utility
-: <NSString> ( string -- alien )
-    NSString [alloc]
-    swap NSASCIIStringEncoding [initWithCString:encoding:] ;
 
 ! A utility
 : <NSSpeechSynthesizer> ( voice -- synth )
@@ -33,7 +25,7 @@ USING: objc-NSString objc-NSObject objc-NSSpeechSynthesizer ;
 ! Call the TTS API
 : speech-test
     f <NSSpeechSynthesizer>
-    "Hello from Factor" <NSString>
+    "Hello from Factor" <CFString>
     [startSpeakingString:] ;
 
 ! As usual, alien invoke words need to be compiled
