@@ -9,11 +9,11 @@ TUPLE: selector name object ;
 C: selector ( name -- sel ) [ set-selector-name ] keep ;
 
 : selector ( selector -- alien )
-    dup selector-object dup expired? not and [
-        selector-object
-    ] [
+    dup selector-object expired? [
         dup selector-name sel_registerName
         dup rot set-selector-object
+    ] [
+        selector-object
     ] if ;
 
 : objc-classes ( -- seq )

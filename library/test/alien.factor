@@ -53,3 +53,5 @@ cell 8 = [
 [ "example" ] [ "{example=@*i}" parse-objc-type ] unit-test
 [ "void*" ] [ "[12^f]" parse-objc-type ] unit-test
 [ "void*" ] [ "^f" parse-objc-type ] unit-test
+
+[ t ] [ f expired? ] unit-test

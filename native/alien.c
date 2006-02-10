@@ -9,6 +9,8 @@ void primitive_expired(void)
 		ALIEN *alien = untag_alien_fast(object);
 		drepl(tag_boolean(alien->expired));
 	}
+	else if(object == F)
+		drepl(T);
 	else
 		drepl(F);
 }

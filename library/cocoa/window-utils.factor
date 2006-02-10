@@ -19,7 +19,8 @@ USING: kernel math objc-NSObject objc-NSWindow ;
     NSMiniaturizableWindowMask bitor
     NSResizableWindowMask bitor ; inline
 
-: <NSWindow> ( title rect type -- window )
-    NSWindow [alloc] -rot NSBackingStoreBuffered 1
+: <NSWindow> ( title rect -- window )
+    NSWindow [alloc] swap
+    standard-window-type NSBackingStoreBuffered 1
     [initWithContentRect:styleMask:backing:defer:]
     [ swap <NSString> [setTitle:] ] keep ;
