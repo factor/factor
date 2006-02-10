@@ -19,21 +19,28 @@
 - slice: if sequence or seq start is changed, abstraction violation
 - out of memory error when printing global namespace
 - delegating generic words with a non-standard picker
+  - pass an integer stack pos instead of a quotation
 - code gc
 - stream server can hang because of exception handler limitations
 - better i/o scheduler
 - if two tasks write to a unix stream, the buffer can overflow
 - make 3.4 bits>double an error
-
 - 2220.446049250313 [ dup float? [ tanh ] when ] 
   - call and compile-1 give  C{ 0.0/0.0 0.0/0.0 }  0.0/0.0
 - 2.718281828459045e+19 [ dup float? [ sech ] when ]
   - call/compile-1:  C{ 0.0/0.0 0.0/0.0 }  0.0
 - 0.0/0.0 next-power-of-2 never terminates -- comparison always returns false
 - 0.0/0.0 >fixnum .  -> 0    0.0/0.0 >bignum .  -> 0
-
-- httpd crash
 - "localhost" 50 <client> won't fail
-- major GC while downloading files
 - out of memory from ffi calls
 - out of memory from overflow check
+- x86 %unbox-struct
+- amd64 %unbox-struct
+- remove literal table
+- callbacks
+- CFBundle error handling
+- autoload frameworks in cocoa class words
+- document FFI
+- document tools
+- document conventions
+- new turtle graphics tutorial
