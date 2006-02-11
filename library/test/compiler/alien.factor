@@ -1,4 +1,5 @@
-USING: alien compiler kernel test ;
+IN: temporary
+USING: alien compiler kernel namespaces namespaces test ;
 
 FUNCTION: void ffi_test_0 ; compiled
 [ ] [ ffi_test_0 ] unit-test

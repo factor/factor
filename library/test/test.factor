@@ -109,5 +109,5 @@ SYMBOL: failures
         "compiler/generic" "compiler/bail-out"
         "compiler/linearizer" "compiler/intrinsics"
         "compiler/identities" "compiler/optimizer"
-        "compiler/alien"
+        "compiler/alien" "compiler/callbacks"
     } run-tests ;

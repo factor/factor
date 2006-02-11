@@ -44,3 +44,9 @@
 - document tools
 - document conventions
 - new turtle graphics tutorial
+- better line spacing in ui
+- use vertex arrays and display lists to speed up ui
+- tabular formatting
+- float intrinsics
+- complex float type
+- complex float intrinsics

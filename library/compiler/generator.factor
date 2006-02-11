@@ -64,7 +64,7 @@ M: %parameter generate-node ( vop -- ) drop ;
 
 M: %alien-invoke generate-node
     #! call a C function.
-    drop 0 input 1 input load-library compile-c-call ;
+    drop 0 input 1 input compile-c-call ;
 
 : dest/src ( -- dest src ) 0 output-operand 0 input-operand ;
 

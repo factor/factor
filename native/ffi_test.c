@@ -82,3 +82,10 @@ int ffi_test_12(int a, int b, struct rect c, int d, int e, int f)
 	printf("ffi_test_12(%d,%d,{%f,%f,%f,%f},%d,%d,%d)\n",a,b,c.x,c.y,c.w,c.h,d,e,f);
 	return a + b + c.x + c.y + c.w + c.h + d + e + f;
 }
+
+void callback_test_1(void (*callback)())
+{
+	printf("callback_test_1 entry");
+	callback();
+	printf("callback_test_1 leaving");
+}

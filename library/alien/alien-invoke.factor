@@ -6,24 +6,20 @@ compiler-frontend errors generic hashtables inference inspector
 io kernel kernel-internals lists math namespaces parser
 prettyprint sequences strings words ;
 
-! USAGE:
-! 
-! Command line parameters given to the runtime specify libraries
-! to load.
-!
-! -libraries:<foo>:name=<soname> -- define a library <foo>, to be
-! loaded from the <soname> DLL.
-!
-! -libraries:<foo>:abi=stdcall -- define a library using the
-! stdcall ABI. This ABI is usually used on Win32. Any other abi
-! parameter, or a missing abi parameter indicates the cdecl ABI
-! should be used, which is common on Unix.
+TUPLE: alien-invoke library function return parameters ;
+C: alien-invoke make-node ;
 
-! FFI code does not run in the interpreter.
+: alien-invoke-stack ( node -- )
+    dup alien-invoke-parameters length over consume-values
+    dup alien-invoke-return "void" = 0 1 ? swap produce-values ;
 
-TUPLE: alien-error library symbol ;
+: alien-invoke-dlsym ( node -- symbol dll )
+    dup alien-invoke-function swap alien-invoke-library
+    load-library ;
 
-M: alien-error summary ( error -- )
+TUPLE: alien-invoke-error library symbol ;
+
+M: alien-invoke-error summary ( error -- )
     drop "Words calling ``alien-invoke'' cannot run in the interpreter. Compile the caller word and try again." ;
 
 : alien-invoke ( ... return library function parameters -- ... )
@@ -31,30 +27,21 @@ M: alien-error summary ( error -- )
     #! 'return' is a type spec, and 'parameters' is a list of
     #! type specs. 'library' is an entry in the "libraries"
     #! namespace.
-    drop <alien-error> throw ;
+    pick pick <alien-invoke-error> throw ;
 
-TUPLE: alien-node return parameters ;
-C: alien-node make-node ;
+\ alien-invoke [ [ string object string object ] [ ] ]
+"infer-effect" set-word-prop
 
-: set-alien-return ( return node -- )
-    2dup set-alien-node-return
-    swap "void" = [ 1 over produce-values ] unless drop ;
-
-: set-alien-parameters ( parameters node -- )
-    2dup set-alien-node-parameters
-    >r length r> consume-values ;
-
-: ensure-dlsym ( symbol library -- ) load-library dlsym drop ;
-
-: alien-node ( return params function library -- )
-    #! We should fail if the library does not exist, so that
-    #! compilation does not keep trying to compile FFI words
-    #! over and over again if the library is not loaded.
-    2dup ensure-dlsym
-    cons param-node <alien-node>
-    [ set-alien-parameters ] keep
-    [ set-alien-return ] keep
-    node, ;
+\ alien-invoke [
+    empty-node <alien-invoke>
+    pop-literal nip over set-alien-invoke-parameters
+    pop-literal nip over set-alien-invoke-function
+    pop-literal nip over set-alien-invoke-library
+    pop-literal nip over set-alien-invoke-return
+    dup alien-invoke-dlsym dlsym drop
+    dup alien-invoke-stack
+    node,
+] "infer" set-word-prop
 
 : parameter-size c-size cell align ;
 
@@ -108,20 +95,22 @@ C: alien-node make-node ;
     dup unbox-parameters load-parameters ;
 
 : linearize-return ( node -- )
-    alien-node-return dup "void" = [
+    alien-invoke-return dup "void" = [
         drop
     ] [
         c-type [ "reg-class" get "boxer" get ] bind call ,
     ] if ;
 
 : linearize-cleanup ( node -- )
-    node-param cdr library-abi "stdcall" = [
-        dup alien-node-parameters stack-space %cleanup ,
-    ] unless ;
+    dup alien-invoke-library library-abi "stdcall" = [
+        drop
+    ] [
+        alien-invoke-parameters stack-space %cleanup ,
+    ] if ;
 
-M: alien-node linearize* ( node -- )
-    dup alien-node-parameters linearize-parameters
-    dup node-param uncons %alien-invoke ,
+M: alien-invoke linearize* ( node -- )
+    dup alien-invoke-parameters linearize-parameters
+    dup alien-invoke-dlsym %alien-invoke ,
     dup linearize-cleanup
     dup linearize-return
     linearize-next ;
@@ -139,24 +128,12 @@ M: alien-node linearize* ( node -- )
 : define-c-word ( type lib func function-args -- )
     [ "()" subseq? not ] subset parse-arglist (define-c-word) ;
 
-\ alien-invoke [ [ string object string object ] [ ] ]
-"infer-effect" set-word-prop
-
-\ alien-invoke [
-    pop-literal nip
-    pop-literal nip >r
-    pop-literal nip
-    pop-literal nip -rot
-    r> swap alien-node
-] "infer" set-word-prop
-
-global [ "libraries" nest drop ] bind
-
 M: compound (uncrossref)
     dup word-def \ alien-invoke swap member?
     over "infer" word-prop or [
         drop
     ] [
-        dup { "infer-effect" "base-case" "no-effect" "terminates" }
+        dup
+        { "infer-effect" "base-case" "no-effect" "terminates" }
         reset-props update-xt
     ] if ;

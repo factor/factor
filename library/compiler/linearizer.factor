@@ -25,12 +25,12 @@ SYMBOL: renamed-labels
 
 GENERIC: linearize* ( node -- )
 
+: make-linear ( word quot -- )
+    swap >r [ %prologue , call ] { } make r>
+    linearized get set-hash ; inline
+
 : linearize-1 ( word dataflow -- )
-    #! Transform dataflow IR into linear IR. This strips out
-    #! stack flow information, and flattens conditionals into
-    #! jumps and labels.
-    [ %prologue , linearize* ] { } make
-    swap linearized get set-hash ;
+    swap [ linearize* ] make-linear ;
 
 : init-linearizer ( -- )
     H{ } clone linearized set
