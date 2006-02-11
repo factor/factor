@@ -1,6 +1,8 @@
 USING: kernel alien math arrays sequences opengl namespaces concurrency
 xlib x x11 gl concurrent-widgets lindenmayer ;
 
+IN: lindenmayer
+
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 USE: sequences
@@ -13,22 +15,21 @@ USE: lindenmayer
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-SYMBOL: camera-position { 5 5 5 } camera-position set
+SYMBOL: camera-position { 5 5 5 } camera-position set-global
+SYMBOL: camera-focus    { 0 0 0 } camera-focus set-global
+SYMBOL: camera-up       { 0 1 0 } camera-up set-global
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-! "" result set
+lparser-dialect "" result set-global
 
-! : display ( -- )
-! GL_COLOR_BUFFER_BIT GL_DEPTH_BUFFER_BIT bitor glClear
-! camera-position get glLoadIdentity [ ] each 0.0 0.0 0.0 0.0 1.0 0.0 gluLookAt
-! reset result get interpret glFlush ;
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 : display ( -- )
 GL_COLOR_BUFFER_BIT GL_DEPTH_BUFFER_BIT bitor glClear
-camera-position get glLoadIdentity [ ] each 0.0 0.0 0.0 0.0 1.0 0.0 gluLookAt
-reset result get dup [ save-state interpret restore-state ] [ drop ] if
-glFlush ;
+glLoadIdentity
+camera-position get first3 camera-focus get first3 camera-up get first3 gluLookAt
+reset result get save-state interpret restore-state glFlush ;
 
 : reshape ( { width height } -- )
 >r 0 0 r> [ ] each glViewport
@@ -37,11 +38,15 @@ glLoadIdentity -1.0 1.0 -1.0 1.0 1.5 200.0 glFrustum
 GL_MODELVIEW glMatrixMode
 display ;
 
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
 : init ( -- ) axiom get result set ;
 
 : iterate ( -- ) result [ rewrite ] change display ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+: setup-window ( -- )
 
 f initialize-x
 
@@ -65,4 +70,4 @@ GL_LIGHTING glEnable
 GL_LIGHT0 glEnable
 GL_DEPTH_TEST glEnable
 
-[ concurrent-event-loop ] spawn
+[ concurrent-event-loop ] spawn ;

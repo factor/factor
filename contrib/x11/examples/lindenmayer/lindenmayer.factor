@@ -56,6 +56,10 @@ SYMBOL: orientation
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
+USE: sequences : length* length ; USE: lindenmayer
+
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
 DEFER: polygon-vertex
 
 : draw-forward ( length -- )
@@ -73,9 +77,16 @@ GL_LINES glBegin record-vertex step record-vertex glEnd ;
 0 over nth over 1 swap nth v- swap
 1 over nth swap 2 swap nth v- cross ;
 
+! : polygon ( vertices -- )
+! GL_POLYGON glBegin dup polygon-normal first3 glNormal3f
+! [ first3 glVertex3f ] each glEnd ;
+
 : polygon ( vertices -- )
-GL_POLYGON glBegin dup polygon-normal first3 glNormal3f
-[ first3 glVertex3f ] each glEnd ;
+dup length* 3 >=
+[ GL_POLYGON glBegin dup polygon-normal first3 glNormal3f
+  [ first3 glVertex3f ] each glEnd ]
+[ drop ]
+if ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
@@ -88,10 +99,6 @@ V{ } vertices set-global
 : finish-polygon ( -- ) vertices get polygon ;
 
 : polygon-vertex ( -- ) position get vertices get push ;
-
-! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-
-USE: sequences : length* length ; USE: lindenmayer
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
@@ -213,11 +220,11 @@ SYMBOL: color-table
   { 0.250 0.878 0.815 } ! turquoise
   { 0 0 1 } ! blue
   { 0.627 0.125 0.941 } ! purple
-  { 0 0.392 0 } ! dark green
-  { 0.0 0.807 0.819 } ! dark turquoise
-  { 0.0 0.0 0.545 } ! dark blue
-  { 0.580 0.0 0.827 } ! dark purple
-  { 0.545 0.0 0.0 } ! dark red
+  { 0.00 0.50 0.00 } ! dark green
+  { 0.00 0.82 0.82 } ! dark turquoise
+  { 0.00 0.00 0.50 } ! dark blue
+  { 0.58 0.00 0.82 } ! dark purple
+  { 0.50 0.00 0.00 } ! dark red
   { 0.25 0.25 0.25 } ! dark grey
   { 0.75 0.75 0.75 } ! medium grey
   { 1 1 1 } ! white
@@ -294,7 +301,7 @@ H{ { "+" [ angle get     rotate-y ] }
    { "?" [ 1.4 scale-thickness ] }
    { "!" [ 0.7 scale-thickness ] }
 
-   { "c" [ color-index get 1 + set-color-index ] }
+   { "c" [ color-index get 1 + color-table get length* mod set-color-index ] }
 
 } command-table set-global ;
 
@@ -354,7 +361,7 @@ H{ { "S" "FFR>(60)R>(60)R>(60)R>(60)R>(60)R>(30)S" }
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-: abop-1 ( -- ) lparser-dialect   45 angle set-global   5 thickness set-global
+: abop-1 ( -- ) lparser-dialect   45 angle set-global   5 set-thickness
 
 H{ { "A" "F[&'(.8)!BL]>(137)'!(.9)A" }
    { "B" "F[-'(.8)!(.9)$CL]'!(.9)C" }
@@ -378,3 +385,85 @@ H{ { "A" "F[&'(.7)!BL]>(137)[&'(.6)!BL]>(137)'(.9)!(.9)A" }
 } rules set-global
 
 "c(12)FAL" axiom set-global ;
+
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+: abop-3 ( -- ) lparser-dialect   30 angle set-global   5 thickness set-global
+
+H{ { "A" "!(.9)t(.4)FB>(94)B>(132)B" }
+   { "B" "[&t(.4)F$A]" }
+   { "F" "'(1.25)F'(.8)" }
+} rules set-global
+
+"c(12)FA" axiom set-global ;
+
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+: abop-4 ( -- ) lparser-dialect   18 angle set-global 5 thickness set-global
+
+H{ { "N" "FII[&(60)rY]>(90)[&(45)'(0.8)rA]>(90)[&(60)rY]>(90)[&(45)'(0.8)rD]!FIK" }
+   { "Y" "[c(4){++l.--l.--l.++|++l.--l.--l.}]" }
+   { "l" "g(.2)l" }
+   { "K" "[!c(2)FF>w>(72)w>(72)w>(72)w>(72)w]" }
+   { "w" "[c(2)^!F][c(5)&(72){-(54)f(3)+(54)f(3)|-(54)f(3)+(54)f(3)}]" }
+   { "f" "_" }
+
+   { "A" "B" }
+   { "B" "C" }
+   { "C" "D" }
+   { "D" "E" }
+   { "E" "G" }
+   { "G" "H" }
+   { "H" "N" }
+
+   { "I" "FoO" }
+   { "O" "FoP" }
+   { "P" "FoQ" }
+   { "Q" "FoR" }
+   { "R" "FoS" }
+   { "S" "FoT" }
+   { "T" "FoU" }
+   { "U" "FoV" }
+   { "V" "FoW" }
+   { "W" "FoX" }
+   { "X" "_" }
+
+   { "o" "$t(-0.03)" }
+   { "r" "~(30)" }
+} rules set-global
+
+"c(12)&(20)N" axiom set-global ;
+
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+: abop-5 ( -- ) lparser-dialect   5 angle set-global   5 thickness set-global
+
+H{ { "a" "F[+(45)l][-(45)l]^;ca" }
+
+   { "l" "j" }
+   { "j" "h" }
+   { "h" "s" }
+   { "s" "d" }
+   { "d" "x" }
+   { "x" "a" }
+
+   { "F" "'(1.17)F'(.855)" }
+} rules set-global
+
+"&(90)+(90)a" axiom set-global ;
+
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+: abop-6 ( -- ) lparser-dialect   5 angle set-global   5 thickness set-global
+
+"&(90)+(90)FFF[-(120)'(.6)x][-(60)'(.8)x][+(120)'(.6)x][+(60)'(.8)x]x"
+axiom set-global
+
+H{ { "a" "F[cdx][cex]F!(.9)a" }
+   { "x" "a" }
+
+   { "d" "+d" }
+   { "e" "-e" }
+
+   { "F" "'(1.25)F'(.8)" }
+} rules set-global ;
