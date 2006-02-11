@@ -1,5 +1,10 @@
 ! Eduardo Cavazos - wayo.cavazos@gmail.com
 
+! Load, compile and then save your image:
+!   "load.factor" run-file save
+! To run the program:
+!   USE: boids setup-window run-boids
+
 USING: namespaces math kernel sequences arrays xlib x ; IN: boids
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!

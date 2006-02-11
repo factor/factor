@@ -1,5 +1,10 @@
 ! Ed Cavazos - wayo.cavazos@gmail.com
 
+! Load, compile and then save your image:
+!   "load.factor" run-file save
+! To run the program:
+!   USE: automata setup-window random-gallery
+
 USING: parser kernel hashtables namespaces sequences lists math io
 math-contrib threads strings arrays prettyprint xlib x ;
 
