@@ -44,9 +44,10 @@ M: alien-callback-error summary ( error -- )
     callback-bottom
 ] "infer" set-word-prop
 
-: linearize-callback ( node -- linear )
-    [ %prologue , alien-callback-word %jump , ] { } make ;
+: linearize-callback ( node -- )
+    dup alien-callback-xt [
+        alien-callback-word %jump ,
+    ] make-linear ;
 
 M: alien-callback linearize* ( node -- )
-    dup linearize-callback over alien-callback-xt
-    linearized get set-hash linearize-next ;
+    dup linearize-callback linearize-next ;
