@@ -36,9 +36,6 @@ SYMBOL: orientation
 : step ( length -- )
 >r position get orientation get 0 0 r> 3array m.v v+ position set-global ;
 
-! : step ( length -- )
-! >r position get orientation get r> 0 0 3array m.v v+ position set-global ;
-
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 : record-vertex ( -- ) position get first3 glVertex3f ;

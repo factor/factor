@@ -28,7 +28,8 @@ lparser-dialect "" result set-global
 : display ( -- )
 GL_COLOR_BUFFER_BIT GL_DEPTH_BUFFER_BIT bitor glClear
 glLoadIdentity
-camera-position get first3 camera-focus get first3 camera-up get first3 gluLookAt
+camera-position get first3 camera-focus get first3 camera-up get first3
+gluLookAt
 reset result get save-state interpret restore-state glFlush ;
 
 : reshape ( { width height } -- )
@@ -40,7 +41,7 @@ display ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-: init ( -- ) axiom get result set ;
+: init ( -- ) axiom get result set display ;
 
 : iterate ( -- ) result [ rewrite ] change display ;
 

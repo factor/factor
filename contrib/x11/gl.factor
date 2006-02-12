@@ -1,9 +1,5 @@
 IN: gl USING: kernel words sequences alien arrays namespaces x xlib x11 ;
 
-! : >int-array ( seq -- <int-array> )
-! dup length "int-array" <c-object> swap dup length >array
-! [ pick set-int-nth ] 2each ;
-
 : >int-array ( seq -- <int-array> )
 dup length "int" <c-array> swap dup length >array [ pick set-int-nth ] 2each ;
 
@@ -16,6 +12,6 @@ dup length "int" <c-array> swap dup length >array [ pick set-int-nth ] 2each ;
 : create-context ( XVisualInfo* -- GLXContext )
 >r dpy get r> 0 <alien> True glXCreateContext ;
 
-: make-current ( GLXContext -- Bool ) >r dpy get win get r> glXMakeCurrent ;
+: make-current ( GLXContext -- ) >r dpy get win get r> glXMakeCurrent drop ;
 
 : swap-buffers ( -- ) dpy get win get glXSwapBuffers ;
