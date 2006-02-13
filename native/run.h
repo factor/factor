@@ -78,7 +78,8 @@ INLINE void call(CELL quot)
 	callframe = quot;
 }
 
-void run(void);
+void run(bool handle_errors);
+void run_toplevel(void);
 void run_nullary_callback(CELL quot);
 CELL run_unary_callback(CELL quot);
 void platform_run(void);

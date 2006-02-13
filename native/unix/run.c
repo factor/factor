@@ -2,6 +2,6 @@
 
 void platform_run()
 {
-	run();
+	run_toplevel();
 }
 

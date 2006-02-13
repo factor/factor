@@ -18,7 +18,7 @@ void primitive_set_compiled_offset(void)
 {
 	CELL offset = unbox_unsigned_cell();
 	compiling.here = offset;
-	if(compiling.here > compiling.limit)
+	if(compiling.here >= compiling.limit)
 	{
 		fprintf(stderr,"Code space exhausted\n");
 		factorbug();

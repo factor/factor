@@ -26,5 +26,5 @@ static long exception_handler(void *rec, void *frame, void *ctx, void *dispatch)
 
 void platform_run ()
 {
-	seh_call(run, exception_handler);
+	seh_call(run_toplevel, exception_handler);
 }

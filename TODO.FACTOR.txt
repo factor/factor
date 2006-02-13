@@ -37,6 +37,7 @@
 - better line spacing in ui
 - use vertex arrays and display lists to speed up ui
 - tabular formatting
+- don't multiplex in the event loop if there is no pending i/o
 
 + compiler/ffi:
 

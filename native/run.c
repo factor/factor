@@ -6,12 +6,8 @@ INLINE void execute(F_WORD* word)
 }
 
 /* Called from platform_run() */
-void init_errors(void)
+void handle_error(void)
 {
-	thrown_error = F;
-	
-	SETJMP(toplevel);
-	
 	if(throwing)
 	{
 		if(thrown_keep_stacks)
@@ -35,15 +31,23 @@ void init_errors(void)
 	}
 }
 
-void run_once(void)
+void run(bool handle_errors)
 {
 	CELL next;
 
+	if(handle_errors)
+	{
+		thrown_error = F;
+		SETJMP(toplevel);
+	}
+	
+	handle_error();
+	
 	for(;;)
 	{
 		if(callframe == F)
 		{
-			if(cs == cs_bot)
+			if(cs_bot - cs == CELLS)
 				return;
 
 			callframe = cpop();
@@ -70,17 +74,16 @@ void run_once(void)
 	}
 }
 
-void run(void)
+void run_toplevel(void)
 {
-	init_errors();
-	run_once();
+	run(true);
 }
 
 /* Called by compiled callbacks after nest_stacks() and boxing registers */
 void run_nullary_callback(CELL quot)
 {
 	call(quot);
-	run_once();
+	run(false);
 	unnest_stacks();
 }
 
@@ -91,7 +94,7 @@ CELL run_unary_callback(CELL quot)
 	
 	nest_stacks();
 	call(quot);
-	run_once();
+	run(false);
 	retval = dpeek();
 	unnest_stacks();
 	return retval;
