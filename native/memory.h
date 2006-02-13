@@ -1,3 +1,13 @@
+typedef struct {
+    CELL start;
+    CELL size;
+} BOUNDED_BLOCK;
+
+/* set up guard pages to check for under/overflow.
+size must be a multiple of the page size */
+BOUNDED_BLOCK *alloc_bounded_block(CELL size);
+void dealloc_bounded_block(BOUNDED_BLOCK *block);
+
 /* macros for reading/writing memory, useful when working around
 C's type system */
 INLINE CELL get(CELL where)
@@ -151,7 +161,3 @@ void primitive_clone(void);
 void primitive_begin_scan(void);
 void primitive_next_object(void);
 void primitive_end_scan(void);
-
-/* set up guard pages to check for under/overflow.
-size must be a multiple of the page size */
-void* alloc_guarded(CELL size);

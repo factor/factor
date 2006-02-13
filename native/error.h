@@ -28,7 +28,6 @@ CELL thrown_cs;
 CELL thrown_callframe;
 CELL thrown_executing;
 
-void init_errors(void);
 void fatal_error(char* msg, CELL tagged);
 void critical_error(char* msg, CELL tagged);
 void throw_error(CELL error, bool keep_stacks);

@@ -1,11 +1,29 @@
+typedef struct _STACKS {
+    CELL ds;
+    CELL ds_save;
+    BOUNDED_BLOCK *ds_region;
+    CELL cs;
+    CELL cs_save;
+    BOUNDED_BLOCK *cs_region;
+    struct _STACKS *next;
+} STACKS;
+
+STACKS *stack_chain;
+
 CELL ds_size, cs_size;
 
-#define STACK_UNDERFLOW(stack,bot) ((stack) + CELLS < UNTAG(bot))
-#define STACK_OVERFLOW(stack,bot,top) ((stack) + CELLS >= UNTAG(bot) + top)
+#define ds_bot ((CELL)(stack_chain->ds_region->start))
+#define cs_bot ((CELL)(stack_chain->cs_region->start))
+
+#define STACK_UNDERFLOW(stack,region) ((stack) + CELLS < (region)->start)
+#define STACK_OVERFLOW(stack,region) ((stack) + CELLS >= (region)->start + (region)->size)
 
 void reset_datastack(void);
 void reset_callstack(void);
 void fix_stacks(void);
+void save_stacks(void);
+void nest_stacks(void);
+void unnest_stacks(void);
 void init_stacks(CELL ds_size, CELL cs_size);
 
 void primitive_drop(void);

@@ -2,7 +2,7 @@
 
 void init_compiler(CELL size)
 {
-	compiling.base = compiling.here = (CELL)alloc_guarded(size);
+	compiling.base = compiling.here = (CELL)(alloc_bounded_block(size)->start);
 	if(compiling.base == 0)
 		fatal_error("Cannot allocate code heap",size);
 	compiling.limit = compiling.base + size;

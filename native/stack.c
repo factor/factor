@@ -12,24 +12,53 @@ void reset_callstack(void)
 
 void fix_stacks(void)
 {
-	if(STACK_UNDERFLOW(ds,ds_bot))
+	if(STACK_UNDERFLOW(ds,stack_chain->ds_region))
 		reset_datastack();
-	else if(STACK_OVERFLOW(ds,ds_bot,ds_size))
+	else if(STACK_OVERFLOW(ds,stack_chain->ds_region))
 		reset_datastack();
-	else if(STACK_UNDERFLOW(cs,cs_bot))
+	else if(STACK_UNDERFLOW(cs,stack_chain->cs_region))
 		reset_callstack();
-	else if(STACK_OVERFLOW(cs,cs_bot,cs_size))
+	else if(STACK_OVERFLOW(cs,stack_chain->cs_region))
 		reset_callstack();
+}
+
+/* called before entry into foreign C code */
+void save_stacks(void)
+{
+	stack_chain->ds = ds;
+	stack_chain->cs = cs;
+}
+
+/* called on entry into a compiled callback */
+void nest_stacks(void)
+{
+	STACKS *new_stacks = malloc(sizeof(STACKS));
+	new_stacks->ds_save = ds;
+	new_stacks->cs_save = cs;
+	new_stacks->ds_region = alloc_bounded_block(ds_size);
+	new_stacks->cs_region = alloc_bounded_block(cs_size);
+	new_stacks->next = stack_chain;
+	stack_chain = new_stacks;
+	reset_datastack();
+	reset_callstack();
+}
+
+/* called when leaving a compiled callback */
+void unnest_stacks(void)
+{
+	dealloc_bounded_block(stack_chain->ds_region);
+	dealloc_bounded_block(stack_chain->cs_region);
+	ds = stack_chain->ds_save;
+	ds = stack_chain->cs_save;
+	stack_chain = stack_chain->next;
 }
 
 void init_stacks(CELL ds_size_, CELL cs_size_)
 {
 	ds_size = ds_size_;
 	cs_size = cs_size_;
-	ds_bot = (CELL)alloc_guarded(ds_size);
-	reset_datastack();
-	cs_bot = (CELL)alloc_guarded(cs_size);
-	reset_callstack();
+	stack_chain = NULL;
+	nest_stacks();
 }
 
 void primitive_drop(void)

@@ -14,6 +14,7 @@ F_ARRAY* allot_array(CELL type, F_FIXNUM capacity)
 	return array;
 }
 
+/* make a new array with an initial element */
 F_ARRAY* array(CELL type, F_FIXNUM capacity, CELL fill)
 {
 	int i;
@@ -23,6 +24,7 @@ F_ARRAY* array(CELL type, F_FIXNUM capacity, CELL fill)
 	return array;
 }
 
+/* push a new array on the stack */
 void primitive_array(void)
 {
 	CELL initial;
@@ -33,6 +35,7 @@ void primitive_array(void)
 	dpush(tag_object(array(ARRAY_TYPE,size,initial)));
 }
 
+/* push a new tuple on the stack */
 void primitive_tuple(void)
 {
 	F_FIXNUM size = to_fixnum(dpop());
@@ -40,6 +43,7 @@ void primitive_tuple(void)
 	dpush(tag_object(array(TUPLE_TYPE,size,F)));
 }
 
+/* push a new byte on the stack */
 void primitive_byte_array(void)
 {
 	F_FIXNUM size = to_fixnum(dpop());
@@ -48,7 +52,6 @@ void primitive_byte_array(void)
 	dpush(tag_object(array(BYTE_ARRAY_TYPE,byte_size,0)));
 }
 
-/* see note about fill in array() */
 F_ARRAY* resize_array(F_ARRAY* array, F_FIXNUM capacity, CELL fill)
 {
 	int i;
@@ -95,6 +98,7 @@ void primitive_tuple_to_array(void)
 	drepl(tuple);
 }
 
+/* image loading */
 void fixup_array(F_ARRAY* array)
 {
 	int i = 0; CELL capacity = array_capacity(array);
@@ -102,6 +106,7 @@ void fixup_array(F_ARRAY* array)
 		data_fixup((void*)AREF(array,i));
 }
 
+/* GC */
 void collect_array(F_ARRAY* array)
 {
 	int i = 0; CELL capacity = array_capacity(array);

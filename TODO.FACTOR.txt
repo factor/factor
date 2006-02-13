@@ -1,45 +1,35 @@
++ portability:
+
+- port ffi to win64
+- x86 %unbox-struct
+- amd64 %unbox-struct
+- get factor running on mac intel
+
++ io:
+
 - if select() returns an error, fep
 - FILE* leaked in process.factor
-- fix remaining HTML stream issues
-- help cross-referencing
-- UI browser pane needs 'back' button
 - runtime primitives like fopen: check for null input
-- port ffi to win64
-- fix up the min thumb size hack
-- the invalid recursion form case needs to be fixed, for inlines too
-- code walker & exceptions
-- signal handler should not lose stack pointers
-- FIELD: char key_vector[32];
-- FIELD: union { char b[20]; short s[10]; long l[5]; } data;
-- MEMBER: long pad[24];
-- C structs, enums, unions: use new-style string mode parsing
-- ffi unicode strings: null char security hole
-- utf16 string boxing
-- [ [ dup call ] dup call ] infer hangs
-- slice: if sequence or seq start is changed, abstraction violation
-- out of memory error when printing global namespace
-- delegating generic words with a non-standard picker
-  - pass an integer stack pos instead of a quotation
-- code gc
 - stream server can hang because of exception handler limitations
 - better i/o scheduler
 - if two tasks write to a unix stream, the buffer can overflow
-- make 3.4 bits>double an error
-- 2220.446049250313 [ dup float? [ tanh ] when ] 
-  - call and compile-1 give  C{ 0.0/0.0 0.0/0.0 }  0.0/0.0
-- 2.718281828459045e+19 [ dup float? [ sech ] when ]
-  - call/compile-1:  C{ 0.0/0.0 0.0/0.0 }  0.0
-- 0.0/0.0 next-power-of-2 never terminates -- comparison always returns false
-- 0.0/0.0 >fixnum .  -> 0    0.0/0.0 >bignum .  -> 0
+- out of memory error when printing global namespace
 - "localhost" 50 <client> won't fail
-- out of memory from ffi calls
-- out of memory from overflow check
-- x86 %unbox-struct
-- amd64 %unbox-struct
-- remove literal table
-- callbacks
+
++ objective C/cocoa:
+
 - CFBundle error handling
 - autoload frameworks in cocoa class words
+- exceptions
+- subclassing
+- messages returning structs by value
+
++ ui/help:
+
+- fix remaining HTML stream issues
+- UI browser pane needs 'back' button
+- fix up the min thumb size hack
+- help cross-referencing
 - document FFI
 - document tools
 - document conventions
@@ -47,6 +37,41 @@
 - better line spacing in ui
 - use vertex arrays and display lists to speed up ui
 - tabular formatting
+
++ compiler/ffi:
+
 - float intrinsics
 - complex float type
 - complex float intrinsics
+- out of memory from ffi calls
+- out of memory from overflow check
+- remove literal table
+- callbacks
+  - zero-arity
+  - return-only
+  - input values
+  - value type struct inputs
+- ffi unicode strings: null char security hole
+- utf16 string boxing
+- signal handler should not lose stack pointers
+- FIELD: char key_vector[32];
+- FIELD: union { char b[20]; short s[10]; long l[5]; } data;
+- MEMBER: long pad[24];
+- C structs, enums, unions: use new-style string mode parsing
+- [ [ dup call ] dup call ] infer hangs
+- the invalid recursion form case needs to be fixed, for inlines too
+- code gc
+
++ misc:
+
+- code walker & exceptions
+- slice: if sequence or seq start is changed, abstraction violation
+- delegating generic words with a non-standard picker
+  - pass an integer stack pos instead of a quotation
+- make 3.4 bits>double an error
+- 2220.446049250313 [ dup float? [ tanh ] when ] 
+  - call and compile-1 give  C{ 0.0/0.0 0.0/0.0 }  0.0/0.0
+- 2.718281828459045e+19 [ dup float? [ sech ] when ]
+  - call/compile-1:  C{ 0.0/0.0 0.0/0.0 }  0.0
+- 0.0/0.0 next-power-of-2 never terminates -- comparison always returns false
+- 0.0/0.0 >fixnum .  -> 0    0.0/0.0 >bignum .  -> 0

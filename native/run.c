@@ -5,13 +5,13 @@ INLINE void execute(F_WORD* word)
 	((XT)(word->xt))(word);
 }
 
-void run(void)
+/* Called from platform_run() */
+void init_errors(void)
 {
-	CELL next;
-
-	/* Error handling. */
+	thrown_error = F;
+	
 	SETJMP(toplevel);
-
+	
 	if(throwing)
 	{
 		if(thrown_keep_stacks)
@@ -33,11 +33,19 @@ void run(void)
 		call(userenv[BREAK_ENV]);
 		throwing = false;
 	}
+}
+
+void run_once(void)
+{
+	CELL next;
 
 	for(;;)
 	{
 		if(callframe == F)
 		{
+			if(cs == cs_bot)
+				return;
+
 			callframe = cpop();
 			executing = cpop();
 			continue;
@@ -60,6 +68,33 @@ void run(void)
 			break;
 		}
 	}
+}
+
+void run(void)
+{
+	init_errors();
+	run_once();
+}
+
+/* Called by compiled callbacks after nest_stacks() and boxing registers */
+void run_nullary_callback(CELL quot)
+{
+	call(quot);
+	run_once();
+	unnest_stacks();
+}
+
+/* Called by compiled callbacks after nest_stacks() and boxing registers */
+CELL run_unary_callback(CELL quot)
+{
+	CELL retval;
+	
+	nest_stacks();
+	call(quot);
+	run_once();
+	retval = dpeek();
+	unnest_stacks();
+	return retval;
 }
 
 /* XT of deferred words */

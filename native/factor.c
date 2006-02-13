@@ -15,7 +15,6 @@ void init_factor(char* image, CELL ds_size, CELL cs_size,
 	callframe = userenv[BOOT_ENV];
 	init_c_io();
 	init_signals();
-	init_errors();
 	userenv[CPU_ENV] = tag_object(from_c_string(FACTOR_CPU_STRING));
 	userenv[OS_ENV] = tag_object(from_c_string(FACTOR_OS_STRING));
 	userenv[GEN_ENV] = tag_fixnum(gen_count);

@@ -1,5 +1,6 @@
 #include "factor.h"
 
+/* test if alien is no longer valid (it survived an image save/load) */
 void primitive_expired(void)
 {
 	CELL object = dpeek();
@@ -15,6 +16,7 @@ void primitive_expired(void)
 		drepl(F);
 }
 
+/* gets the address of an object representing a C pointer */
 void *alien_offset(CELL object)
 {
 	ALIEN *alien;
@@ -42,17 +44,20 @@ void *alien_offset(CELL object)
 	}
 }
 
+/* pop ( alien n ) from datastack, return alien's address plus n */
 INLINE void *alien_pointer(void)
 {
 	F_FIXNUM offset = unbox_signed_cell();
 	return alien_offset(dpop()) + offset;
 }
 
+/* pop an object representing a C pointer */
 void *unbox_alien(void)
 {
 	return alien_offset(dpop());
 }
 
+/* make an alien */
 ALIEN *alien(void* ptr)
 {
 	ALIEN* alien = allot_object(ALIEN_TYPE,sizeof(ALIEN));
@@ -61,6 +66,7 @@ ALIEN *alien(void* ptr)
 	return alien;
 }
 
+/* make an alien and push */
 void box_alien(void *ptr)
 {
 	if(ptr == NULL)
@@ -69,6 +75,7 @@ void box_alien(void *ptr)
 		dpush(tag_object(alien(ptr)));
 }
 
+/* make an alien form an address on the stack */
 void primitive_alien(void)
 {
 	void* ptr = (void*)unbox_signed_cell();
@@ -76,6 +83,7 @@ void primitive_alien(void)
 	box_alien(ptr);
 }
 
+/* make an alien pointing at an offset of another alien */
 void primitive_displaced_alien(void)
 {
 	CELL alien;
@@ -90,38 +98,45 @@ void primitive_displaced_alien(void)
 	dpush(tag_object(d));
 }
 
+/* address of an object representing a C pointer */
 void primitive_alien_address(void)
 {
 	box_unsigned_cell((CELL)alien_offset(dpop()));
 }
 
+/* convert C string at address to Factor string */
 void primitive_alien_to_string(void)
 {
 	maybe_gc(0);
 	drepl(tag_object(from_c_string(alien_offset(dpeek()))));
 }
 
+/* convert Factor string to C string allocated in the Factor heap */
 void primitive_string_to_alien(void)
 {
 	maybe_gc(0);
 	drepl(tag_object(string_to_alien(untag_string(dpeek()),true)));
 }
 
+/* expire aliens when loading the image */
 void fixup_alien(ALIEN *alien)
 {
 	alien->expired = true;
 }
 
+/* image loading */
 void fixup_displaced_alien(DISPLACED_ALIEN *d)
 {
 	data_fixup(&d->alien);
 }
 
+/* GC */
 void collect_displaced_alien(DISPLACED_ALIEN *d)
 {
 	copy_handle(&d->alien);
 }
 
+/* define words to read/write numericals values at an alien address */
 #define DEF_ALIEN_SLOT(name,type,boxer) \
 void primitive_alien_##name (void) \
 { \

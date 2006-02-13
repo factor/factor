@@ -1,10 +1,5 @@
 #include "factor.h"
 
-void init_errors(void)
-{
-	thrown_error = F;
-}
-
 void fatal_error(char* msg, CELL tagged)
 {
 	fprintf(stderr,"Fatal error: %s %ld\n",msg,tagged);

@@ -33,10 +33,10 @@ void init_arena(CELL gens, CELL young_size, CELL aging_size)
 	if(generations == 0)
 		fatal_error("Cannot allocate zone head array",0);
 
-	heap_start = (CELL)alloc_guarded(total_size);
+	heap_start = (CELL)(alloc_bounded_block(total_size)->start);
 	heap_end = heap_start + total_size;
 
-	cards = alloc_guarded(cards_size);
+	cards = malloc(cards_size);
 	cards_end = cards + cards_size;
 	cards_offset = (CELL)cards - (heap_start >> CARD_BITS);
 
@@ -66,21 +66,34 @@ void collect_roots(void)
 {
 	int i;
 	CELL ptr;
+	STACKS *stacks;
 
 	copy_handle(&T);
 	copy_handle(&bignum_zero);
 	copy_handle(&bignum_pos_one);
 	copy_handle(&bignum_neg_one);
-	/* we can't use & here since these two are in
-	registers on PowerPC */
-	COPY_OBJECT(callframe);
-	COPY_OBJECT(executing);
+	copy_handle(&callframe);
+	copy_handle(&executing);
 
-	for(ptr = ds_bot; ptr <= ds; ptr += CELLS)
-		copy_handle((CELL*)ptr);
+	save_stacks();
+	stacks = stack_chain;
 
-	for(ptr = cs_bot; ptr <= cs; ptr += CELLS)
-		copy_handle((CELL*)ptr);
+	while(stacks)
+	{
+		CELL bottom = stacks->ds_region->start;
+		CELL top = stacks->ds;
+		
+		for(ptr = bottom; ptr <= top; ptr += CELLS)
+			copy_handle((CELL*)ptr);
+	
+		bottom = stacks->cs_region->start;
+		top = stacks->cs;
+		
+		for(ptr = bottom; ptr <= top; ptr += CELLS)
+			copy_handle((CELL*)ptr);
+		
+		stacks = stacks->next;
+	}
 
 	for(i = 0; i < USER_ENV; i++)
 		copy_handle(&userenv[i]);

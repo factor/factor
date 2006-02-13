@@ -79,6 +79,8 @@ INLINE void call(CELL quot)
 }
 
 void run(void);
+void run_nullary_callback(CELL quot);
+CELL run_unary_callback(CELL quot);
 void platform_run(void);
 void undefined(F_WORD *word);
 void docol(F_WORD *word);
