@@ -110,6 +110,7 @@ M: alien-invoke-error summary ( error -- )
 
 M: alien-invoke linearize* ( node -- )
     dup alien-invoke-parameters linearize-parameters
+    "save_stacks" f %alien-invoke ,
     dup alien-invoke-dlsym %alien-invoke ,
     dup linearize-cleanup
     dup linearize-return

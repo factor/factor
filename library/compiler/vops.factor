@@ -377,3 +377,7 @@ C: %box make-vop ;
 TUPLE: %alien-invoke ;
 C: %alien-invoke make-vop ;
 : %alien-invoke ( func lib -- vop ) 2-in-vop <%alien-invoke> ;
+
+TUPLE: %nullary-callback ;
+C: %nullary-callback make-vop ;
+: %nullary-callback ( quot -- vop ) src-vop <%nullary-callback> ;

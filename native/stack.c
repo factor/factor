@@ -22,9 +22,13 @@ void fix_stacks(void)
 		reset_callstack();
 }
 
-/* called before entry into foreign C code */
+/* called before entry into foreign C code. Note that ds and cs are stored
+in registers, so callbacks must save and restore the correct values */
 void save_stacks(void)
 {
+	/* we want to save the current callframe along with the call stack */
+	call(F);
+
 	stack_chain->ds = ds;
 	stack_chain->cs = cs;
 }
@@ -33,6 +37,9 @@ void save_stacks(void)
 void nest_stacks(void)
 {
 	STACKS *new_stacks = malloc(sizeof(STACKS));
+	if(new_stacks == NULL)
+		fatal_error("Cannot allocate saved stacks struct",0);
+	
 	new_stacks->ds_save = ds;
 	new_stacks->cs_save = cs;
 	new_stacks->ds_region = alloc_bounded_block(ds_size);
@@ -49,7 +56,7 @@ void unnest_stacks(void)
 	dealloc_bounded_block(stack_chain->ds_region);
 	dealloc_bounded_block(stack_chain->cs_region);
 	ds = stack_chain->ds_save;
-	ds = stack_chain->cs_save;
+	cs = stack_chain->cs_save;
 	stack_chain = stack_chain->next;
 }
 

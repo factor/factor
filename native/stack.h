@@ -21,9 +21,9 @@ CELL ds_size, cs_size;
 void reset_datastack(void);
 void reset_callstack(void);
 void fix_stacks(void);
-void save_stacks(void);
-void nest_stacks(void);
-void unnest_stacks(void);
+DLLEXPORT void save_stacks(void);
+DLLEXPORT void nest_stacks(void);
+DLLEXPORT void unnest_stacks(void);
 void init_stacks(CELL ds_size, CELL cs_size);
 
 void primitive_drop(void);

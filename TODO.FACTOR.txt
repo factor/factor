@@ -65,14 +65,10 @@
 
 + misc:
 
+- aliens are just a special case of displaced aliens -- so we can remove
+  one built in type
 - code walker & exceptions
 - slice: if sequence or seq start is changed, abstraction violation
 - delegating generic words with a non-standard picker
   - pass an integer stack pos instead of a quotation
 - make 3.4 bits>double an error
-- 2220.446049250313 [ dup float? [ tanh ] when ] 
-  - call and compile-1 give  C{ 0.0/0.0 0.0/0.0 }  0.0/0.0
-- 2.718281828459045e+19 [ dup float? [ sech ] when ]
-  - call/compile-1:  C{ 0.0/0.0 0.0/0.0 }  0.0
-- 0.0/0.0 next-power-of-2 never terminates -- comparison always returns false
-- 0.0/0.0 >fixnum .  -> 0    0.0/0.0 >bignum .  -> 0

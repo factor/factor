@@ -45,3 +45,8 @@ M: %parameter generate-node ( vop -- )
 M: %box generate-node ( vop -- ) drop 1 input f compile-c-call ;
 
 M: %cleanup generate-node ( vop -- ) drop ;
+
+M: %nullary-callback generate-node ( vop -- )
+    drop
+    3 0 input load-indirect
+    "run_nullary_callback" f compile-c-call ;

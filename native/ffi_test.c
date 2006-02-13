@@ -85,7 +85,9 @@ int ffi_test_12(int a, int b, struct rect c, int d, int e, int f)
 
 void callback_test_1(void (*callback)())
 {
-	printf("callback_test_1 entry");
+	printf("callback_test_1 entry\n");
+	fflush(stdout);
 	callback();
-	printf("callback_test_1 leaving");
+	printf("callback_test_1 leaving\n");
+	fflush(stdout);
 }
