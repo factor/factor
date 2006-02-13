@@ -52,7 +52,7 @@ H{ } clone crossref set
 recrossref
 
 "Setting the resource path..." print
-cwd global "resource-path" set-global
+cwd "resource-path" set-global
 
 [ compiled? ] word-subset length
 number>string write " compiled words" print
