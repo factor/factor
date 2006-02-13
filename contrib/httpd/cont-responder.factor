@@ -129,13 +129,11 @@ DEFER: show
   #! TODO: Need to handle this better to enable
   #!       returning back to root continuation.
   drop
-  [ 
     <html>                
       <body> 
        <p> "This page has expired." write  </p> 
       </body>
-    </html> 
-  ] show-final ;
+    </html> flush ;
 
 : >callable ( quot|interp|f -- interp )
   dup continuation? [
