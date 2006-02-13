@@ -92,7 +92,9 @@ M: alien-invoke-error summary ( error -- )
     #! architectures where parameters are passed in registers
     #! (PowerPC).
     dup stack-space %parameters ,
-    dup unbox-parameters load-parameters ;
+    dup unbox-parameters
+    "save_stacks" f %alien-invoke ,
+    load-parameters ;
 
 : linearize-return ( node -- )
     alien-invoke-return dup "void" = [
@@ -110,7 +112,6 @@ M: alien-invoke-error summary ( error -- )
 
 M: alien-invoke linearize* ( node -- )
     dup alien-invoke-parameters linearize-parameters
-    "save_stacks" f %alien-invoke ,
     dup alien-invoke-dlsym %alien-invoke ,
     dup linearize-cleanup
     dup linearize-return

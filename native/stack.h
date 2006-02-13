@@ -5,6 +5,7 @@ typedef struct _STACKS {
     CELL cs;
     CELL cs_save;
     BOUNDED_BLOCK *cs_region;
+    CELL callframe;
     struct _STACKS *next;
 } STACKS;
 

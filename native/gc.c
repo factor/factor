@@ -72,14 +72,16 @@ void collect_roots(void)
 	copy_handle(&bignum_zero);
 	copy_handle(&bignum_pos_one);
 	copy_handle(&bignum_neg_one);
-	copy_handle(&callframe);
 	copy_handle(&executing);
+	copy_handle(&callframe);
 
 	save_stacks();
 	stacks = stack_chain;
 
 	while(stacks)
 	{
+		copy_handle(&stacks->callframe);
+		
 		CELL bottom = stacks->ds_region->start;
 		CELL top = stacks->ds;
 		

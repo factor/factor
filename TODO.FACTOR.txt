@@ -41,6 +41,7 @@
 
 + compiler/ffi:
 
+- stack effect comment for FUNCTION: doesn't show return value
 - float intrinsics
 - complex float type
 - complex float intrinsics

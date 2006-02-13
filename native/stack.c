@@ -26,11 +26,9 @@ void fix_stacks(void)
 in registers, so callbacks must save and restore the correct values */
 void save_stacks(void)
 {
-	/* we want to save the current callframe along with the call stack */
-	call(F);
-
 	stack_chain->ds = ds;
 	stack_chain->cs = cs;
+	stack_chain->callframe = F;
 }
 
 /* called on entry into a compiled callback */
@@ -42,10 +40,12 @@ void nest_stacks(void)
 	
 	new_stacks->ds_save = ds;
 	new_stacks->cs_save = cs;
+	new_stacks->callframe = callframe;
 	new_stacks->ds_region = alloc_bounded_block(ds_size);
 	new_stacks->cs_region = alloc_bounded_block(cs_size);
 	new_stacks->next = stack_chain;
 	stack_chain = new_stacks;
+	callframe = F;
 	reset_datastack();
 	reset_callstack();
 }
@@ -57,6 +57,7 @@ void unnest_stacks(void)
 	dealloc_bounded_block(stack_chain->cs_region);
 	ds = stack_chain->ds_save;
 	cs = stack_chain->cs_save;
+	callframe = stack_chain->callframe;
 	stack_chain = stack_chain->next;
 }
 
