@@ -1,5 +1,5 @@
 IN: temporary
-USING: alien compiler errors inference io kernel memory
+USING: alien compiler errors inference io kernel math memory
 namespaces test threads ;
 
 : callback-1 "void" { } [ ] alien-callback ; compiled
@@ -52,3 +52,16 @@ FUNCTION: void callback_test_1 void* callback ; compiled
     "void" { } [ yield "hi" print flush yield ] alien-callback ; compiled
 
 [ ] [ callback-7 callback_test_1 ] unit-test
+
+: callback-8
+    "void" { "int" "int" } [ / "x" set ] alien-callback ;
+    compiled
+
+! FUNCTION: void callback_test_2 void* callback int x int y ;
+! compiled
+! 
+! [ 3/4 ] [
+!     [
+!         "x" off callback-8 3 4 callback_test_2 "x" get
+!     ] with-scope
+! ] unit-test

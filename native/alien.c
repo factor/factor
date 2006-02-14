@@ -44,21 +44,21 @@ void *alien_offset(CELL object)
 	}
 }
 
-/* pop ( alien n ) from datastack, return alien's address plus n */
-INLINE void *alien_pointer(void)
-{
-	F_FIXNUM offset = unbox_signed_cell();
-	return alien_offset(dpop()) + offset;
-}
-
 /* pop an object representing a C pointer */
 void *unbox_alien(void)
 {
 	return alien_offset(dpop());
 }
 
+/* pop ( alien n ) from datastack, return alien's address plus n */
+INLINE void *alien_pointer(void)
+{
+	F_FIXNUM offset = unbox_signed_cell();
+	return unbox_alien() + offset;
+}
+
 /* make an alien */
-ALIEN *alien(void* ptr)
+ALIEN *alien(void *ptr)
 {
 	ALIEN* alien = allot_object(ALIEN_TYPE,sizeof(ALIEN));
 	alien->ptr = ptr;

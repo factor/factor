@@ -61,7 +61,7 @@ int main(int argc, char** argv)
 		printf(" +Xn   Code heap size, megabytes\n");
 		printf("Other options are handled by the Factor library.\n");
 		printf("See the documentation for details.\n");
-		printf("Send bug reports to Slava Pestov <slava@jedit.org>.\n");
+		printf("Send bug reports to Slava Pestov <slava@factorcode.org>.\n");
 		return 1;
 	}
 

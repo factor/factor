@@ -43,14 +43,16 @@ M: float-regs inc-reg-class
     dup class inc
     os "macosx" = [ reg-size 4 / int-regs +@ ] [ drop ] if ;
 
+! A pseudo-register class for parameters spilled on the stack
+TUPLE: stack-params ;
+
+M: stack-params fastcall-regs drop 0 ;
+
 ! A data stack location.
 TUPLE: ds-loc n ;
 
 ! A call stack location.
 TUPLE: cs-loc n ;
-
-! A pseudo-register class for parameters spilled on the stack
-TUPLE: stack-params ;
 
 GENERIC: v>operand
 
@@ -353,9 +355,13 @@ C: %parameters make-vop ;
 M: %parameters stack-reserve vop-inputs first ;
 : %parameters ( n -- vop ) src-vop <%parameters> ;
 
-TUPLE: %parameter ;
-C: %parameter make-vop ;
-: %parameter ( n reg reg-class -- vop ) 3-in-vop <%parameter> ;
+TUPLE: %stack>freg ;
+C: %stack>freg make-vop ;
+: %stack>freg ( n reg reg-class -- vop ) 3-in-vop <%stack>freg> ;
+
+TUPLE: %freg>stack ;
+C: %freg>stack make-vop ;
+: %freg>stack ( n reg reg-class -- vop ) 3-in-vop <%freg>stack> ;
 
 TUPLE: %cleanup ;
 C: %cleanup make-vop ;
@@ -372,7 +378,7 @@ C: %unbox-struct make-vop ;
 
 TUPLE: %box ;
 C: %box make-vop ;
-: %box ( reg-class func -- vop ) 2-in-vop <%box> ;
+: %box ( n reg-class func -- vop ) 3-in-vop <%box> ;
 
 TUPLE: %alien-invoke ;
 C: %alien-invoke make-vop ;

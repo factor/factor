@@ -91,3 +91,12 @@ void callback_test_1(void (*callback)())
 	printf("callback_test_1 leaving\n");
 	fflush(stdout);
 }
+
+void callback_test_2(void (*callback)(int x, int y), int x, int y)
+{
+	printf("callback_test_2 entry\n");
+	fflush(stdout);
+	callback(x,y);
+	printf("callback_test_2 leaving\n");
+	fflush(stdout);
+}

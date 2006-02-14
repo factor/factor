@@ -84,7 +84,6 @@ void run_nullary_callback(CELL quot)
 {
 	call(quot);
 	run(false);
-	unnest_stacks();
 }
 
 /* Called by compiled callbacks after nest_stacks() and boxing registers */
@@ -92,7 +91,6 @@ CELL run_unary_callback(CELL quot)
 {
 	CELL retval;
 	
-	nest_stacks();
 	call(quot);
 	run(false);
 	retval = dpeek();

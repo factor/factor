@@ -1,25 +1,25 @@
-! Copyright (C) 2005 Slava Pestov.
-! See http://factor.sf.net/license.txt for BSD license.
+! Copyright (C) 2005, 2006 Slava Pestov.
+! See http://factorcode.org/license.txt for BSD license.
 IN: compiler-backend
-USING: alien assembler kernel math ;
+USING: alien assembler kernel math sequences ;
 
-GENERIC: store-insn ( offset reg-class -- )
+GENERIC: freg>stack ( stack reg reg-class -- )
 
-GENERIC: load-insn ( elt parameter reg-class -- )
+GENERIC: stack>freg ( stack reg reg-class -- )
 
-M: int-regs store-insn drop >r 3 1 r> stack@ STW ;
+M: int-regs freg>stack drop 1 rot stack@ STW ;
 
-M: int-regs load-insn drop 3 + 1 rot stack@ LWZ ;
+M: int-regs stack>freg drop 1 rot stack@ LWZ ;
 
-M: float-regs store-insn
-    >r >r 1 1 r> stack@ r>
-    float-regs-size 4 = [ STFS ] [ STFD ] if ;
+: STF float-regs-size 4 = [ STFS ] [ STFD ] if ;
 
-M: float-regs load-insn
-    >r 1+ 1 rot stack@ r> 
-    float-regs-size 4 = [ LFS ] [ LFD ] if ;
+M: float-regs freg>stack >r 1 rot stack@ r> STF ;
 
-M: stack-params load-insn
+: LF float-regs-size 4 = [ LFS ] [ LFD ] if ;
+
+M: float-regs stack>freg >r 1 rot stack@ r> LF ;
+
+M: stack-params stack>freg
     drop >r 0 1 rot stack@ LWZ 0 1 r> stack@ STW ;
 
 M: %unbox generate-node ( vop -- )
@@ -27,7 +27,7 @@ M: %unbox generate-node ( vop -- )
     ! Call the unboxer
     2 input f compile-c-call
     ! Store the return value on the C stack
-    0 input 1 input store-insn ;
+    0 input 1 input [ return-reg ] keep freg>stack ;
 
 M: %unbox-struct generate-node ( vop -- )
     drop
@@ -38,11 +38,23 @@ M: %unbox-struct generate-node ( vop -- )
     ! Copy the struct to the stack
     "unbox_value_struct" f compile-c-call ;
 
-M: %parameter generate-node ( vop -- )
-    ! Move a value from the C stack into the fastcall register
-    drop 0 input 1 input 2 input load-insn ;
+: (%move) 0 input 1 input 2 input [ fastcall-regs nth ] keep ;
 
-M: %box generate-node ( vop -- ) drop 1 input f compile-c-call ;
+M: %stack>freg generate-node ( vop -- )
+    ! Move a value from the C stack into the fastcall register
+    drop (%move) stack>freg ;
+
+M: %freg>stack generate-node ( vop -- )
+    ! Move a value from a fastcall register to the C stack
+    drop (%move) freg>stack ;
+
+M: %box generate-node ( vop -- )
+    drop
+    ! If the source is a stack location, load it into freg #0.
+    ! If the source is f, then we assume the value is already in
+    ! freg #0.
+    0 input [ 0 1 input stack>freg ] when*
+    2 input f compile-c-call ;
 
 M: %cleanup generate-node ( vop -- ) drop ;
 

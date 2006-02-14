@@ -43,65 +43,25 @@ M: alien-invoke-error summary ( error -- )
     node,
 ] "infer" set-word-prop
 
-: parameter-size c-size cell align ;
-
-: stack-space ( parameters -- n )
-    0 [ parameter-size + ] reduce ;
-
 : unbox-parameter ( stack# type -- node )
     c-type [ "reg-class" get "unboxer" get ] bind call ;
 
-: unbox-parameters ( params -- )
-    reverse
-    [ stack-space ] keep
-    [ [ parameter-size - dup ] keep unbox-parameter , ] each
-    drop ;
+: unbox-parameters ( parameters -- )
+    [ unbox-parameter , ] reverse-each-parameter ;
 
-: reg-class-full? ( class -- ? )
-    dup class get swap fastcall-regs length >= ;
-
-: spill-param ( reg-class -- n reg-class )
-    reg-size stack-params dup get -rot +@ T{ stack-params } ;
-
-: fastcall-param ( reg-class -- n reg-class )
-    [ dup class get swap inc-reg-class ] keep ;
-
-: load-parameter ( n parameter -- node )
-    #! n is a stack location, and the value of the class
-    #! variable is a register number.
-    c-type "reg-class" swap hash dup reg-class-full?
-    [ spill-param ] [ fastcall-param ] if %parameter ;
-
-: flatten-value-types ( params -- params )
-    #! Convert value type structs to consecutive void*s.
-    [
-        dup c-struct?
-        [ c-size cell / "void*" <array> ] [ 1array ] if
-    ] map concat ;
-
-: load-parameters ( params -- )
-    [
-        flatten-value-types
-        0 { int-regs float-regs stack-params } [ set ] each-with
-        0 [ 2dup load-parameter , parameter-size + ] reduce drop
-    ] with-scope ;
-
-: linearize-parameters ( parameters -- )
+: objects>registers ( parameters -- )
     #! Generate code for boxing a list of C types, then generate
     #! code for moving these parameters to register on
     #! architectures where parameters are passed in registers
-    #! (PowerPC).
+    #! (PowerPC, AMD64).
     dup stack-space %parameters ,
     dup unbox-parameters
     "save_stacks" f %alien-invoke ,
-    load-parameters ;
+    \ %stack>freg move-parameters ;
 
-: linearize-return ( node -- )
-    alien-invoke-return dup "void" = [
-        drop
-    ] [
-        c-type [ "reg-class" get "boxer" get ] bind call ,
-    ] if ;
+: box-return ( node -- )
+    alien-invoke-return dup "void" =
+    [ drop ] [ f swap box-parameter , ] if ;
 
 : linearize-cleanup ( node -- )
     dup alien-invoke-library library-abi "stdcall" = [
@@ -111,10 +71,10 @@ M: alien-invoke-error summary ( error -- )
     ] if ;
 
 M: alien-invoke linearize* ( node -- )
-    dup alien-invoke-parameters linearize-parameters
+    dup alien-invoke-parameters objects>registers
     dup alien-invoke-dlsym %alien-invoke ,
     dup linearize-cleanup
-    dup linearize-return
+    dup box-return
     linearize-next ;
 
 : parse-arglist ( lst -- types stack effect )

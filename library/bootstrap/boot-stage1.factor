@@ -140,6 +140,7 @@ vectors words ;
 
         "/library/alien/c-types.factor"
         "/library/alien/structs.factor"
+        "/library/alien/compiler.factor"
         "/library/alien/alien-invoke.factor"
         "/library/alien/alien-callback.factor"
         "/library/alien/syntax.factor"

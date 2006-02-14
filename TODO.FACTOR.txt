@@ -67,6 +67,8 @@
 - [ [ dup call ] dup call ] infer hangs
 - the invalid recursion form case needs to be fixed, for inlines too
 - code gc
+- clean up C stack frame assembly code to avoid moving spilled arguments
+  twice
 
 + misc:
 
@@ -77,3 +79,4 @@
 - delegating generic words with a non-standard picker
   - pass an integer stack pos instead of a quotation
 - make 3.4 bits>double an error
+- colorcoded prettyprinting for vocabularies
