@@ -23,6 +23,8 @@
 - exceptions
 - subclassing
 - messages returning structs by value
+- fix bootstrap compile errors
+- super message sends
 
 + ui/help:
 

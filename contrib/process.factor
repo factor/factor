@@ -1,3 +1,4 @@
+IN: process
 USING: compiler io io-internals kernel parser ;
 
 FUNCTION: int system ( char* command ) ; compiled
