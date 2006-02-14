@@ -53,8 +53,7 @@
 - out of memory from overflow check
 - remove literal table
 - callbacks
-  - zero-arity
-  - return-only
+  - return values
   - input values
   - value type struct inputs
 - ffi unicode strings: null char security hole

@@ -53,7 +53,9 @@ M: %box generate-node ( vop -- )
     ! If the source is a stack location, load it into freg #0.
     ! If the source is f, then we assume the value is already in
     ! freg #0.
-    0 input [ 0 1 input stack>freg ] when*
+    0 input [
+        1 input [ fastcall-regs first ] keep stack>freg
+    ] when*
     2 input f compile-c-call ;
 
 M: %cleanup generate-node ( vop -- ) drop ;

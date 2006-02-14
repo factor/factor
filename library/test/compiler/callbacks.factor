@@ -57,11 +57,24 @@ FUNCTION: void callback_test_1 void* callback ; compiled
     "void" { "int" "int" } [ / "x" set ] alien-callback ;
     compiled
 
-! FUNCTION: void callback_test_2 void* callback int x int y ;
-! compiled
-! 
-! [ 3/4 ] [
-!     [
-!         "x" off callback-8 3 4 callback_test_2 "x" get
-!     ] with-scope
-! ] unit-test
+FUNCTION: void callback_test_2 void* callback int x int y ;
+compiled
+
+[ 3/4 ] [
+    [
+        "x" off callback-8 3 4 callback_test_2 "x" get
+    ] with-scope
+] unit-test
+
+: callback-9
+    "void" { "int" "double" "int" }
+    [ + * "x" set ] alien-callback ; compiled
+
+FUNCTION: void callback_test_3 void* callback int x double y int z ;
+compiled
+
+[ 27.0 ] [
+    [
+        "x" off callback-9 3 4 5 callback_test_3 "x" get
+    ] with-scope
+] unit-test

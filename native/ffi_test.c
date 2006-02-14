@@ -100,3 +100,13 @@ void callback_test_2(void (*callback)(int x, int y), int x, int y)
 	printf("callback_test_2 leaving\n");
 	fflush(stdout);
 }
+
+void callback_test_3(void (*callback)(int x, double y, int z),
+	int x, double y, int z)
+{
+	printf("callback_test_3 entry\n");
+	fflush(stdout);
+	callback(x,y,z);
+	printf("callback_test_3 leaving\n");
+	fflush(stdout);
+}

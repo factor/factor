@@ -33,7 +33,7 @@ M: alien-callback-error summary ( error -- )
 ] "infer" set-word-prop
 
 : box-parameters ( parameters -- )
-    [ box-parameter , ] reverse-each-parameter ;
+    [ box-parameter , ] each-parameter ;
 
 : registers>objects ( parameters -- )
     #! The corresponding unnest_stacks() call is made by the
