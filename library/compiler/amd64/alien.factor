@@ -50,5 +50,3 @@ M: %alien-invoke generate-node
 
 M: %box generate-node ( vop -- )
     drop 0 input load-return-value 1 input f compile-c-call ;
-
-M: %cleanup generate-node ( vop -- ) drop ;

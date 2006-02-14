@@ -1,8 +1,8 @@
 + portability:
 
 - port ffi to win64
-- x86 %unbox-struct
-- amd64 %unbox-struct
+- update x86 for %unbox-struct and callbacks
+- update amd64 for %unbox-struct and callbacks
 - get factor running on mac intel
 
 + io:
@@ -54,7 +54,7 @@
 - remove literal table
 - callbacks
   - return values
-  - input values
+  - input values which get spilled
   - value type struct inputs
 - ffi unicode strings: null char security hole
 - utf16 string boxing

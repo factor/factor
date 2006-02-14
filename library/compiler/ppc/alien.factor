@@ -58,8 +58,6 @@ M: %box generate-node ( vop -- )
     ] when*
     2 input f compile-c-call ;
 
-M: %cleanup generate-node ( vop -- ) drop ;
-
 M: %nullary-callback generate-node ( vop -- )
     drop
     3 0 input load-indirect

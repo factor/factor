@@ -60,7 +60,11 @@ M: %target-label generate-node ( vop -- )
 
 M: %parameters generate-node ( vop -- ) drop ;
 
-M: %parameter generate-node ( vop -- ) drop ;
+M: %cleanup generate-node ( vop -- ) drop ;
+
+M: %freg>stack generate-node ( vop -- ) drop ;
+
+M: %stack>freg generate-node ( vop -- ) drop ;
 
 M: %alien-invoke generate-node
     #! call a C function.
