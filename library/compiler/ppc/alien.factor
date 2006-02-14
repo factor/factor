@@ -22,6 +22,8 @@ M: float-regs stack>freg >r 1 rot stack@ r> LF ;
 M: stack-params stack>freg
     drop >r 0 1 rot stack@ LWZ 0 1 r> stack@ STW ;
 
+M: stack-params freg>stack swapd stack>freg ;
+
 M: %unbox generate-node ( vop -- )
     drop
     ! Call the unboxer
