@@ -278,6 +278,10 @@ M: operand CMP OCT: 071 2-operand ;
 : FSTPS ( operand -- ) HEX: d9 assemble-1 (FSTP) ;
 : FSTPL ( operand -- ) HEX: dd assemble-1 (FSTP) ;
 
+: (FLD) BIN: 100 f HEX: 04 1-operand ;
+: FLDS ( operand -- ) HEX: d9 assemble-1 (FLD) ;
+: FLDL ( operand -- ) HEX: dd assemble-1 (FLD) ;
+
 ( SSE multimedia instructions )
 
 : 2-operand-sse ( dst src op1 op2 -- )

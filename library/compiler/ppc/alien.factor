@@ -65,12 +65,6 @@ M: %alien-callback generate-node ( vop -- )
     3 0 input load-indirect
     "run_callback" f compile-c-call ;
 
-: do-returns ( quot -- )
-    { T{ int-regs } T{ float-regs f 8 } }
-    dup length [
-        rot [ >r [ cell * ] keep rot r> call ] keep
-    ] 2each ;
-
 : save-return 0 swap [ return-reg ] keep freg>stack ;
 : load-return 0 swap [ return-reg ] keep stack>freg ;
 
