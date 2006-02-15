@@ -1,7 +1,7 @@
 + portability:
 
 - port ffi to win64
-- update x86 for %unbox-struct and callbacks
+- update x86 for callbacks
 - update amd64 for %unbox-struct and callbacks
 - get factor running on mac intel
 

@@ -34,7 +34,7 @@ M: %unbox generate-node ( vop -- )
     ! Store the return value on the C stack
     0 input 1 input store-insn ;
 
-M: %parameter generate-node ( vop -- )
+M: %stack>freg generate-node ( vop -- )
     ! Move a value from the C stack into the fastcall register
     drop 0 input 1 input 2 input load-insn ;
 
