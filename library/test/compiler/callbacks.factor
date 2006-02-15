@@ -85,9 +85,21 @@ FUNCTION: void callback_test_3 void* callback int x double y int z ; compiled
 
 FUNCTION: void callback_test_4 void* callback int a1 int a2 int a3 int a4 int a5 int a6 int a7 int a8 int a9 int a10 ; compiled
 
-[ V{ 1 2 3 4 5 6 7 8 9 10 } ] [
-    [
-        callback-10 1 2 3 4 5 6 7 8 9 10 callback_test_4
-        "stack" get
-    ] with-scope
-] unit-test
+! [ V{ 1 2 3 4 5 6 7 8 9 10 } ] [
+!     [
+!         callback-10 1 2 3 4 5 6 7 8 9 10 callback_test_4
+!         "stack" get
+!     ] with-scope
+! ] unit-test
+
+: callback-11 "int" { } [ 1234 ] alien-callback ; compiled
+
+FUNCTION: int callback_test_5 void* callback ; compiled
+
+[ 1234 ] [ callback-11 callback_test_5 ] unit-test
+
+: callback-12 "double" { } [ pi ] alien-callback ; compiled
+
+FUNCTION: double callback_test_6 void* callback ; compiled
+
+[ t ] [ callback-12 callback_test_6 pi = ] unit-test

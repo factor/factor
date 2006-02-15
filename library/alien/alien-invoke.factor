@@ -44,7 +44,7 @@ M: alien-invoke-error summary ( error -- )
 ] "infer" set-word-prop
 
 : unbox-parameter ( stack# type -- node )
-    c-type [ "reg-class" get "unboxer" get ] bind call ;
+    c-type [ "reg-class" get "unboxer" get call ] bind ;
 
 : unbox-parameters ( parameters -- )
     [ unbox-parameter , ] reverse-each-parameter ;
@@ -60,8 +60,7 @@ M: alien-invoke-error summary ( error -- )
     \ %stack>freg move-parameters ;
 
 : box-return ( node -- )
-    alien-invoke-return dup "void" =
-    [ drop ] [ f swap box-parameter , ] if ;
+    alien-invoke-return [ ] [ f swap box-parameter , ] if-void ;
 
 : linearize-cleanup ( node -- )
     dup alien-invoke-library library-abi "stdcall" = [

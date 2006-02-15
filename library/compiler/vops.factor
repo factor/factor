@@ -384,6 +384,11 @@ TUPLE: %alien-invoke ;
 C: %alien-invoke make-vop ;
 : %alien-invoke ( func lib -- vop ) 2-in-vop <%alien-invoke> ;
 
-TUPLE: %nullary-callback ;
-C: %nullary-callback make-vop ;
-: %nullary-callback ( quot -- vop ) src-vop <%nullary-callback> ;
+TUPLE: %alien-callback ;
+C: %alien-callback make-vop ;
+: %alien-callback ( quot -- vop ) src-vop <%alien-callback> ;
+
+TUPLE: %callback-value ;
+C: %callback-value make-vop ;
+: %callback-value ( reg-class func -- vop )
+    2-in-vop <%callback-value> ;

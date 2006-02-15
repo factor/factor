@@ -80,23 +80,10 @@ void run_toplevel(void)
 }
 
 /* Called by compiled callbacks after nest_stacks() and boxing registers */
-void run_nullary_callback(CELL quot)
+void run_callback(CELL quot)
 {
 	call(quot);
 	run(false);
-	unnest_stacks();
-}
-
-/* Called by compiled callbacks after nest_stacks() and boxing registers */
-void run_unary_callback(CELL quot)
-{
-	CELL retval;
-	
-	call(quot);
-	run(false);
-	retval = dpeek();
-	unnest_stacks();
-	dpush(retval);
 }
 
 /* XT of deferred words */

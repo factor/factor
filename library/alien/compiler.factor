@@ -55,4 +55,7 @@ kernel-internals math namespaces sequences words ;
     ] with-scope ; inline
 
 : box-parameter ( stack# type -- node )
-    c-type [ "reg-class" get "boxer" get ] bind call ;
+    c-type [ "reg-class" get "boxer" get call ] bind ;
+
+: if-void ( type true false -- | false: type -- )
+    pick "void" = [ drop nip call ] [ nip call ] if ; inline

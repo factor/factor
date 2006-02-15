@@ -38,8 +38,19 @@ void nest_stacks(void)
 	if(new_stacks == NULL)
 		fatal_error("Cannot allocate saved stacks struct",0);
 	
+	/* note that these register values are not necessarily valid stack
+	pointers. they are merely saved non-volatile registers, and are
+	restored in unnest_stacks(). consider this scenario:
+	- factor code calls C function
+	- C function saves ds/cs registers (since they're non-volatile)
+	- C function clobbers them
+	- C function calls Factor callback
+	- Factor callback returns
+	- C function restores registers
+	- C function returns to Factor code */
 	new_stacks->ds_save = ds;
 	new_stacks->cs_save = cs;
+
 	new_stacks->callframe = callframe;
 	new_stacks->ds_region = alloc_bounded_block(ds_size);
 	new_stacks->cs_region = alloc_bounded_block(cs_size);
@@ -55,12 +66,15 @@ void unnest_stacks(void)
 {
 	dealloc_bounded_block(stack_chain->ds_region);
 	dealloc_bounded_block(stack_chain->cs_region);
+
 	ds = stack_chain->ds_save;
 	cs = stack_chain->cs_save;
+
 	callframe = stack_chain->callframe;
 	stack_chain = stack_chain->next;
 }
 
+/* called on startup */
 void init_stacks(CELL ds_size_, CELL cs_size_)
 {
 	ds_size = ds_size_;
@@ -218,7 +232,7 @@ void primitive_callstack(void)
 	dpush(tag_object(stack_to_vector(cs_bot,cs)));
 }
 
-/* Returns top of stack */
+/* returns pointer to top of stack */
 CELL vector_to_stack(F_VECTOR* vector, CELL bottom)
 {
 	CELL start = bottom;

@@ -1,7 +1,7 @@
 ! Copyright (C) 2005, 2006 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 IN: compiler-backend
-USING: alien assembler kernel math sequences ;
+USING: alien assembler kernel kernel-internals math sequences ;
 
 GENERIC: freg>stack ( stack reg reg-class -- )
 
@@ -60,7 +60,27 @@ M: %box generate-node ( vop -- )
     ] when*
     2 input f compile-c-call ;
 
-M: %nullary-callback generate-node ( vop -- )
+M: %alien-callback generate-node ( vop -- )
     drop
     3 0 input load-indirect
-    "run_nullary_callback" f compile-c-call ;
+    "run_callback" f compile-c-call ;
+
+: do-returns ( quot -- )
+    { T{ int-regs } T{ float-regs f 8 } }
+    dup length [
+        rot [ >r [ cell * ] keep rot r> call ] keep
+    ] 2each ;
+
+: save-return 0 swap [ return-reg ] keep freg>stack ;
+: load-return 0 swap [ return-reg ] keep stack>freg ;
+
+M: %callback-value generate-node ( vop -- )
+    drop
+    ! Call the unboxer
+    1 input f compile-c-call
+    ! Save return register
+    0 input save-return
+    ! Restore data/callstacks
+    "unnest_stacks" f compile-c-call
+    ! Restore return register
+    0 input load-return ;

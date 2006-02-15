@@ -9,8 +9,8 @@ sequences sequences-internals strings words ;
     H{
         { "setter" [ "Cannot read struct fields with type" throw ] }
         { "getter" [ "Cannot write struct fields with type" throw ] }
-        { "boxer" [ "Cannot use type as a return value" throw ] }
-        { "unboxer" [ "Cannot use type as a parameter" throw ] }
+        { "boxer" [ "boxer-function" get %box ] }
+        { "unboxer" [ "unboxer-function" get %unbox ] }
         { "reg-class" T{ int-regs f } }
         { "width" 0 }
     } clone ;

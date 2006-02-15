@@ -44,10 +44,22 @@ M: alien-callback-error summary ( error -- )
     "nest_stacks" f %alien-invoke ,
     box-parameters ;
 
+: unbox-return ( node -- )
+    alien-callback-return [
+        "unnest_stacks" f %alien-invoke ,
+    ] [
+        c-type [
+            "reg-class" get
+            "unboxer-function" get
+            %callback-value ,
+        ] bind
+    ] if-void ;
+
 : linearize-callback ( node -- )
     dup alien-callback-xt [
         dup alien-callback-parameters registers>objects
-        alien-callback-quot %nullary-callback ,
+        dup alien-callback-quot %alien-callback ,
+        unbox-return
         %return ,
     ] make-linear ;
 

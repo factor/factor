@@ -80,8 +80,7 @@ INLINE void call(CELL quot)
 
 void run(bool handle_errors);
 void run_toplevel(void);
-DLLEXPORT void run_nullary_callback(CELL quot);
-DLLEXPORT CELL run_unary_callback(CELL quot);
+DLLEXPORT void run_callback(CELL quot);
 void platform_run(void);
 void undefined(F_WORD *word);
 void docol(F_WORD *word);

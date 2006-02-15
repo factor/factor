@@ -83,7 +83,7 @@ int ffi_test_12(int a, int b, struct rect c, int d, int e, int f)
 	return a + b + c.x + c.y + c.w + c.h + d + e + f;
 }
 
-void callback_test_1(void (*callback)())
+void callback_test_1(void (*callback)(void))
 {
 	printf("callback_test_1 entry\n");
 	fflush(stdout);
@@ -118,4 +118,22 @@ void callback_test_4(void (*callback)(int a1, int a2, int a3, int a4, int a5, in
 	callback(a1,a2,a3,a4,a5,a6,a7,a8,a9,a10);
 	printf("callback_test_4 leaving\n");
 	fflush(stdout);
+}
+
+int callback_test_5(int (*callback)(void))
+{
+	int x;
+	printf("callback_test_5 entry\n");
+	x = callback();
+	printf("callback_test_5 exit\n");
+	return x;
+}
+
+int callback_test_6(double (*callback)(void))
+{
+	double x;
+	printf("callback_test_6 entry\n");
+	x = callback();
+	printf("callback_test_6 exit\n");
+	return x;
 }
