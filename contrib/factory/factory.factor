@@ -275,31 +275,24 @@ M: wm-root handle-button-press-event ( event wm-root -- )
 ! M: wm-root handle-key-press-event
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-! M: wm-root handle-key-press-event ( event wm-root -- )
-!   drop
-!   { { [ dup XKeyEvent-keycode 67 = ]
-!       [ workspace-1 get switch-to-workspace ] }
-!     { [ dup XKeyEvent-keycode 68 = ]
-!       [ workspace-2 get switch-to-workspace ] }
-!     { [ dup XKeyEvent-keycode 69 = ]
-!       [ workspace-3 get switch-to-workspace ] }
-!     { [ dup XKeyEvent-keycode 70 = ]
-!       [ workspace-4 get switch-to-workspace ] } }
-!   cond ;
+SYMBOL: f1-keycode   67 f1-keycode set-global
+SYMBOL: f2-keycode   68 f2-keycode set-global
+SYMBOL: f3-keycode   69 f3-keycode set-global
+SYMBOL: f4-keycode   70 f4-keycode set-global
+
+: grab-keys ( -- )
+f1-keycode get Mod1Mask False GrabModeAsync GrabModeAsync grab-key
+f2-keycode get Mod1Mask False GrabModeAsync GrabModeAsync grab-key
+f3-keycode get Mod1Mask False GrabModeAsync GrabModeAsync grab-key
+f4-keycode get Mod1Mask False GrabModeAsync GrabModeAsync grab-key ;
 
 M: wm-root handle-key-press-event ( event wm-root -- )
-  drop
-  { { [ dup XKeyEvent-keycode 67 = ]
-      [ "Switch to workspace 1" print drop ] }
-    { [ dup XKeyEvent-keycode 68 = ]
-      [ "Switch to workspace 2" print drop ] }
-    { [ dup XKeyEvent-keycode 69 = ]
-      [ "Switch to workspace 3" print drop ] }
-    { [ dup XKeyEvent-keycode 70 = ]
-      [ "Switch to workspace 4" print drop ] }
-    { [ t ]
-      [ "wm-root ignoring key press" print drop ] } }
-  cond ;
+drop
+{ { [ dup XKeyEvent-keycode f1-keycode get = ] [ workspace-1 get switch-to ] }
+  { [ dup XKeyEvent-keycode f2-keycode get = ] [ workspace-2 get switch-to ] }
+  { [ dup XKeyEvent-keycode f3-keycode get = ] [ workspace-3 get switch-to ] }
+  { [ dup XKeyEvent-keycode f4-keycode get = ] [ workspace-4 get switch-to ] }
+  { [ t ] [ "wm-root ignoring key press" print drop ] } } cond ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
@@ -592,6 +585,7 @@ SYMBOL: window-list
   root get [ make-drag-gc ] with-win drag-gc set
   root get [ black-pixel get set-window-background clear-window ] with-win
   root get create-wm-root
+  root get [ grab-keys ] with-win
   setup-root-menu
   setup-window-list
   setup-workspace-menu

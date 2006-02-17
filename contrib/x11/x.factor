@@ -251,6 +251,9 @@ dup length 1 - [ swap 2nth draw-line ] each-with ;
 : ungrab-pointer ( time -- )
   >r dpy get r> XUngrabPointer drop ;
 
+: grab-key ( keycode modifiers owner-events pointer-mode keyboard-mode -- )
+>r >r >r >r >r dpy get r> r> win get r> r> r> XGrabKey drop ;
+
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 ! 14 - Inter-Client Communication Functions
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
