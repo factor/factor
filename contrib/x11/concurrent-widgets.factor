@@ -67,32 +67,32 @@ GENERIC: handle-property-event
     { [ dup ConfigureRequest = ]	[ drop handle-configure-request-event ] }
     { [ dup UnmapNotify = ]		[ drop handle-unmap-event ] }
     { [ dup PropertyNotify = ]		[ drop handle-property-event ] }
-    { [ t ]                     	[ "handle-event ignoring event" print 3drop ] } }
+    { [ t ]                [ "handle-event ignoring event" print flush 3drop ] } }
   cond ;
 
 M: window handle-configure-event ( event obj -- )
-  "Basic handle-configure-event called" print drop drop ;
+  "Basic handle-configure-event called" print flush drop drop ;
 
 M: window handle-destroy-window-event ( event obj -- )
-  "Basic handle-destroy-window-event called" print drop drop ;
+  "Basic handle-destroy-window-event called" print flush drop drop ;
 
 M: window handle-map-event ( event obj -- )
-  "Basic handle-map-event called" print drop drop ;
+  "Basic handle-map-event called" print flush drop drop ;
 
 M: window handle-expose-event ( event obj -- )
-  "Basic handle-expose-event called" print drop drop ;
+  "Basic handle-expose-event called" print flush drop drop ;
 
 M: window handle-button-release-event ( event obj -- )
-  "Basic handle-button-release-event called" print drop drop ;
+  "Basic handle-button-release-event called" print flush drop drop ;
 
 M: window handle-unmap-event ( event obj -- )
-  "Basic handle-unmap-event called" print drop drop ;
+  "Basic handle-unmap-event called" print flush drop drop ;
 
 M: window handle-key-press-event ( event obj -- )
-  "Basic handle-key-press-event called" print drop drop ;
+  "Basic handle-key-press-event called" print flush drop drop ;
 
 M: window handle-key-release-event ( event obj -- )
-  "Basic handle-key-release-event called" print drop drop ;
+  "Basic handle-key-release-event called" print flush drop drop ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 ! <label>
