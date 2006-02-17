@@ -63,7 +63,7 @@ SYMBOL: char-0
 ! SYMBOL: win
 
 : setup-window
-  ":0.0" initialize-x
+  f initialize-x
   create-window win set
   { 400 400 } resize-window
   map-window
@@ -103,7 +103,7 @@ SYMBOL: char-0
 
 : random-gallery
   255 random-int 1 +
-  dup unparse print
+  dup unparse print flush
   set-rule
   run-rule
   5000 sleep
