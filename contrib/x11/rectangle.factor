@@ -1,6 +1,4 @@
-
-IN: rectangle
-USING: kernel math ;
+USING: kernel math sequences arrays ; IN: rectangle
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
@@ -9,6 +7,9 @@ TUPLE: rect corner size ;
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 GENERIC: top-left
+GENERIC: top-right
+GENERIC: bottom-left
+GENERIC: bottom-right
 
 GENERIC: move-top-left
 GENERIC: move-top-right
@@ -19,7 +20,22 @@ GENERIC: move-middle-center
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
+: rect-width ( rect -- width ) rect-size 0 swap nth ;
+
+: rect-height ( rect -- height ) rect-size 1 swap nth ;
+
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
 M: rect top-left ( rect -- point ) rect-corner ;
+
+M: rect top-right ( rect -- point )
+dup rect-corner swap rect-width 1 - 0 2array v+ ;
+
+M: rect bottom-left ( rect -- point )
+dup rect-corner swap rect-height 1 - 0 swap 2array v+ ;
+
+M: rect bottom-right ( rect -- point )
+dup rect-corner swap rect-size { -1 -1 } v+ v+ ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
