@@ -1,5 +1,5 @@
 USING: kernel namespaces generic math sequences hashtables io arrays words
-       prettyprint lists concurrency
+       prettyprint lists concurrency rectangle
        xlib x concurrent-widgets simple-error-handler ;
 
 IN: factory
@@ -37,38 +37,70 @@ SYMBOL: root-menu
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
+SYMBOL: drag-gc
+
+: make-drag-gc ( -- GC )
+create-gc dup
+[ IncludeInferiors set-subwindow-mode
+  GXxor set-function
+  white-pixel get set-foreground ] with-gcontext ;
+
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
 : MouseMask
   [ ButtonPressMask
     ButtonReleaseMask
     PointerMotionMask ] 0 [ execute bitor ] reduce ;
 
-: drag-mouse-loop ( position -- )
-  MouseMask mask-event XAnyEvent-type			! position type
-  { { [ dup MotionNotify = ]
-      [ drop drag-mouse-loop ] }
-    { [ dup ButtonRelease = ]
-      [ drop						! position
-        mouse-sensor					! push release
-        ungrab-server
-        CurrentTime ungrab-pointer
-        flush-dpy ] }
-    { [ t ] [ drop "drag-mouse-loop ignoring event" print drag-mouse-loop ] } }
-  cond ;
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-: drag-mouse ( -- )
-  MouseMask grab-pointer grab-server mouse-sensor drag-mouse-loop ;
+: drag-mouse-loop ( push last quot -- push release )
+MouseMask mask-event XAnyEvent-type		! push last quot type
+{ { [ dup MotionNotify = ]
+    [ drop 3dup call nip mouse-sensor swap drag-mouse-loop ] }
+{ [ dup ButtonRelease = ]
+  [ drop 3dup nip f swap call 2drop
+    mouse-sensor ungrab-server CurrentTime ungrab-pointer flush-dpy ] }
+{ [ t ]
+  [ drop "drag-mouse-loop ignoring event" print flush drag-mouse-loop ] }
+} cond ;
+
+: drag-mouse ( quot -- push release )
+MouseMask grab-pointer grab-server mouse-sensor f rot drag-mouse-loop ;
 
 : drag-mouse% [ drag-mouse ] with-window-object ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-: drag-move-window ( -- ) drag-mouse swap v- window-position v+ move-window ;
+: ((draw-move-outline)) ( a b - )
+swap v- window-position v+ window-size <rect> root get draw-rect+ ;
+
+: (draw-move-outline) ( push last -- )
+dupd dup [ ((draw-move-outline)) ] [ 2drop ] if
+mouse-sensor ((draw-move-outline)) flush-dpy ;
+
+: draw-move-outline ( push last -- )
+drag-gc get [ (draw-move-outline) ] with-gcontext ;
+
+: drag-move-window ( -- )
+[ draw-move-outline ] drag-mouse swap v- window-position v+ move-window ;
 
 : drag-move-window% [ drag-move-window ] with-window-object ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-: drag-resize-window ( -- ) drag-mouse nip window-position v- resize-window ;
+: ((draw-resize-outline)) ( bottom-right -- )
+window-position v- window-position swap <rect> root get draw-rect+ ;
+
+: (draw-resize-outline) ( push last -- )
+nip dup [ ((draw-resize-outline)) ] [ drop ] if
+mouse-sensor ((draw-resize-outline)) flush-dpy ;
+
+: draw-resize-outline ( push last -- )
+drag-gc get [ (draw-resize-outline) ] with-gcontext ;
+
+: drag-resize-window ( -- )
+[ draw-resize-outline ] drag-mouse nip window-position v- resize-window ;
 
 : drag-resize-window% [ drag-resize-window ] with-window-object ;
 
@@ -125,11 +157,11 @@ M: wm-root handle-map-request-event ( event <wm-root> -- )
       [ map-window% ] }
 
     { [ dup valid-window?% not ]
-      [ "Not a valid window." print drop ] }
+      [ "Not a valid window." print flush drop ] }
 
     { [ dup window-override-redirect% 1 = ]
-      [ "Not reparenting: " print
-        "new window has override_redirect attribute set." print
+      [ "Not reparenting: " print 
+        "new window has override_redirect attribute set." print flush
         drop ] }
 
     { [ t ] [ window-id manage-window ] } }
@@ -235,7 +267,9 @@ M: wm-root handle-button-press-event ( event wm-root -- )
           window-list get refresh-window-list
           window-list get map-window% ]
         [ window-list get unmap-window% ]
-        if ] } }
+        if ] }
+
+    { [ t ] [ "Button has no function on root window." print flush drop ] } }
 
   cond ;
 
@@ -279,7 +313,7 @@ TUPLE: wm-child ;
   [ add-to-window-table ] keep ;
 
 M: wm-child handle-property-event ( child event -- )
-  "A <wm-child> received a property event" print drop drop ;
+  "A <wm-child> received a property event" print flush drop drop ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
@@ -451,7 +485,7 @@ M: wm-frame handle-enter-window-event ( event frame )
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 M: wm-frame handle-property-event ( event frame )
-  "Inside handle-property-event" print drop drop ;
+  "Inside handle-property-event" print flush drop drop ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
@@ -557,6 +591,8 @@ SYMBOL: window-list
 : start-factory ( dpy-string -- )
   initialize-x
   SetSimpleErrorHandler
+  root get [ make-drag-gc ] with-win drag-gc set
+  root get [ black-pixel get set-window-background clear-window ] with-win
   root get create-wm-root
   setup-root-menu
   setup-window-list
