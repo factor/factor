@@ -27,11 +27,9 @@ SYMBOL: root-menu
 : setup-root-menu ( -- )
   create-menu root-menu set
   "black" lookup-color root-menu get set-window-background%
-  "xterm"  [ "launch program..." print ] root-menu get add-popup-menu-item
-  "xlogo"  [ "launch program..." print ] root-menu get add-popup-menu-item
-  "xclock" [ "launch program..." print ] root-menu get add-popup-menu-item
-  "xload"  [ "launch program..." print ] root-menu get add-popup-menu-item
-  "emacs"  [ "launch program..." print ] root-menu get add-popup-menu-item
+  "Terminal" [ "gnome-terminal &" system ] root-menu get add-popup-menu-item
+  "Emacs"    [ "emacs &" system ]          root-menu get add-popup-menu-item
+  "Firefox"  [ "firefox &" system ]        root-menu get add-popup-menu-item
   "Workspaces"
     [ workspace-menu get popup-window% ] root-menu get add-popup-menu-item ;
 
