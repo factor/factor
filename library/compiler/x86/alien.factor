@@ -1,14 +1,16 @@
 ! Copyright (C) 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: compiler-backend
-USING: alien assembler compiler inference kernel
+USING: alien arrays assembler compiler inference kernel
 kernel-internals lists math memory namespaces words ;
 
 GENERIC: push-return-reg ( reg-class -- )
 GENERIC: pop-return-reg ( reg-class -- )
+GENERIC: load-return-reg ( stack@ reg-class -- )
 
 M: int-regs push-return-reg drop EAX PUSH ;
 M: int-regs pop-return-reg drop EAX POP ;
+M: int-regs load-return-reg drop EAX ESP rot 2array MOV ;
 
 : FSTP 4 = [ FSTPS ] [ FSTPL ] if ;
 
@@ -17,8 +19,11 @@ M: float-regs push-return-reg
 
 : FLD 4 = [ FLDS ] [ FLDL ] if ;
 
+M: float-regs load-return-reg
+    reg-size { ESP } swap FLD ;
+
 M: float-regs pop-return-reg
-	reg-size { ESP } over FLD ESP swap ADD ;
+    2dup load-return-reg reg-size ESP swap ADD ;
 
 M: %unbox generate-node
     drop 2 input f compile-c-call  1 input push-return-reg ;
@@ -41,9 +46,10 @@ M: %unbox-struct generate-node ( vop -- )
 
 M: %box generate-node
     drop
+    0 input [ 1 input load-return-reg ] when*
     1 input push-return-reg
     2 input f compile-c-call
-    ESP 1 input reg-size ADD ;
+    1 input pop-return-reg ;
 
 M: %alien-callback generate-node ( vop -- )
     drop

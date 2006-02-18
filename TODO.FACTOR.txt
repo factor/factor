@@ -67,6 +67,9 @@
 - code gc
 - clean up C stack frame assembly code to avoid moving spilled arguments
   twice
+- exceptions inside callbacks are broken:
+  - we need to unwind the stacks to the level where the exception handler
+    was set
 
 + misc:
 
