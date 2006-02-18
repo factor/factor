@@ -274,13 +274,11 @@ M: operand CMP OCT: 071 2-operand ;
 
 ( x87 Floating Point Unit )
 
-: (FSTP) BIN: 100 f HEX: 1c 1-operand ;
-: FSTPS ( operand -- ) HEX: d9 assemble-1 (FSTP) ;
-: FSTPL ( operand -- ) HEX: dd assemble-1 (FSTP) ;
+: FSTPS ( operand -- ) BIN: 011 f HEX: d9 1-operand ;
+: FSTPL ( operand -- ) BIN: 011 f HEX: dd 1-operand ;
 
-: (FLD) BIN: 100 f HEX: 04 1-operand ;
-: FLDS ( operand -- ) HEX: d9 assemble-1 (FLD) ;
-: FLDL ( operand -- ) HEX: dd assemble-1 (FLD) ;
+: FLDS ( operand -- ) BIN: 000 f HEX: d9 1-operand ;
+: FLDL ( operand -- ) BIN: 000 f HEX: dd 1-operand ;
 
 ( SSE multimedia instructions )
 
