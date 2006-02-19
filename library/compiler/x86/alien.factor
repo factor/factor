@@ -8,6 +8,8 @@ GENERIC: push-return-reg ( reg-class -- )
 GENERIC: pop-return-reg ( reg-class -- )
 GENERIC: load-return-reg ( stack@ reg-class -- )
 
+: drop-return-reg ESP swap reg-size ADD ;
+
 M: int-regs push-return-reg drop EAX PUSH ;
 M: int-regs pop-return-reg drop EAX POP ;
 M: int-regs load-return-reg
@@ -21,7 +23,9 @@ M: float-regs push-return-reg
 : FLD 4 = [ FLDS ] [ FLDL ] if ;
 
 M: float-regs pop-return-reg
-    ECX ESP MOV  reg-size { ECX } over FLD ESP swap ADD ;
+    ECX ESP MOV
+    { ECX } over reg-size FLD
+    drop-return-reg ;
 
 M: float-regs load-return-reg
     reg-size >r ECX ESP MOV  ECX swap 2array r> FLD ;
@@ -50,7 +54,7 @@ M: %box generate-node
     0 input [ 4 + 1 input load-return-reg ] when*
     1 input push-return-reg
     2 input f compile-c-call
-    1 input pop-return-reg ;
+    1 input drop-return-reg ;
 
 M: %alien-callback generate-node ( vop -- )
     drop
