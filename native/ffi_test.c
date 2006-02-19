@@ -138,7 +138,7 @@ float callback_test_6(float (*callback)(void))
 	return x;
 }
 
-int callback_test_7(double (*callback)(void))
+double callback_test_7(double (*callback)(void))
 {
 	double x;
 	printf("callback_test_7 entry\n");
