@@ -33,9 +33,11 @@ SYMBOL: c-types
     >r <c-type> [ swap bind ] keep r> c-types get set-hash ;
     inline
 
-: <c-object> ( type -- c-ptr ) c-size <byte-array> ;
+: <c-object> ( type -- c-ptr )
+    global [ c-size <byte-array> ] bind ;
 
-: <c-array> ( size type -- c-ptr ) c-size * <byte-array> ;
+: <c-array> ( size type -- c-ptr )
+    global [ c-size * <byte-array> ] bind ;
 
 : define-pointer ( type -- )
     "void*" c-type swap "*" append c-types get set-hash ;

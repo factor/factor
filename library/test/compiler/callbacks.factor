@@ -85,12 +85,12 @@ FUNCTION: void callback_test_3 void* callback int x double y int z ; compiled
 
 FUNCTION: void callback_test_4 void* callback int a1 int a2 int a3 int a4 int a5 int a6 int a7 int a8 int a9 int a10 ; compiled
 
-! [ V{ 1 2 3 4 5 6 7 8 9 10 } ] [
-!     [
-!         callback-10 1 2 3 4 5 6 7 8 9 10 callback_test_4
-!         "stack" get
-!     ] with-scope
-! ] unit-test
+[ V{ 1 2 3 4 5 6 7 8 9 10 } ] [
+    [
+        callback-10 1 2 3 4 5 6 7 8 9 10 callback_test_4
+        "stack" get
+    ] with-scope
+] unit-test
 
 : callback-11 "int" { } [ 1234 ] alien-callback ; compiled
 
