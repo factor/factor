@@ -129,11 +129,20 @@ int callback_test_5(int (*callback)(void))
 	return x;
 }
 
-int callback_test_6(double (*callback)(void))
+float callback_test_6(float (*callback)(void))
 {
-	double x;
+	float x;
 	printf("callback_test_6 entry\n");
 	x = callback();
 	printf("callback_test_6 exit\n");
+	return x;
+}
+
+int callback_test_7(double (*callback)(void))
+{
+	double x;
+	printf("callback_test_7 entry\n");
+	x = callback();
+	printf("callback_test_7 exit\n");
 	return x;
 }

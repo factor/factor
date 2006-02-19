@@ -103,3 +103,9 @@ FUNCTION: int callback_test_5 void* callback ; compiled
 FUNCTION: double callback_test_6 void* callback ; compiled
 
 [ t ] [ callback-12 callback_test_6 pi = ] unit-test
+
+: callback-13 "float" { } [ pi ] alien-callback ; compiled
+
+FUNCTION: float callback_test_7 void* callback ; compiled
+
+[ t ] [ callback-13 callback_test_7 pi - 0.00001 <= ] unit-test
