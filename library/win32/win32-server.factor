@@ -66,11 +66,11 @@ SYMBOL: socket
     dup sockaddr-in-port ntohs swap sockaddr-in-addr inet-ntoa ;
 
 : extract-remote-host ( buffer -- port host )
-    buffer-ptr <alien> 0 32 32 "indirect-pointer" <c-object> 
-                               "indirect-pointer" <c-object>
-                               "indirect-pointer" <c-object> 
-                        dup >r "indirect-pointer" <c-object>
-    GetAcceptExSockaddrs r> indirect-pointer-value <alien> sockaddr> ;
+    buffer-ptr <alien> 0 32 32 0 <int> 
+                               0 <int>
+                               0 <int> 
+                        dup >r 0 <int>
+    GetAcceptExSockaddrs r> *int <alien> sockaddr> ;
 
 C: win32-client-stream ( buf stream -- stream )
     [ set-delegate extract-remote-host ] keep

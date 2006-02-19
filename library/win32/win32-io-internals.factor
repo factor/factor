@@ -72,10 +72,6 @@ GENERIC: expire
         dup add-completion
     ] with-scope ;
 
-BEGIN-STRUCT: indirect-pointer
-    FIELD: int value
-END-STRUCT
-
 : <overlapped> ( -- overlapped )
     "overlapped-ext" c-size malloc <alien> ;
 
@@ -103,14 +99,11 @@ C: io-callback ( -- callback )
     io-callback-quotation ;
 
 : (wait-for-io) ( timeout -- error overlapped len )
-    >r completion-port get 
-    "indirect-pointer" <c-object> [ 0 swap set-indirect-pointer-value ] keep 
-    "indirect-pointer" <c-object>
-    "indirect-pointer" <c-object>
+    >r completion-port get <int>  0 <int> 0 <int>
     pick over r> -rot >r >r GetQueuedCompletionStatus r> r> ;
 
 : overlapped>callback ( overlapped -- callback )
-    indirect-pointer-value dup zero? [
+    *int dup zero? [
         drop f
     ] [
         <alien> overlapped-ext-user-data get-io-callback
@@ -121,7 +114,7 @@ C: io-callback ( -- callback )
     io-queue-callbacks [ io-callback-stream [ expire ] when* ] each ;
 
 : wait-for-io ( timeout -- callback len )
-    (wait-for-io) overlapped>callback swap indirect-pointer-value 
+    (wait-for-io) overlapped>callback swap *int 
     rot [ queue-error ] unless ;
 
 : win32-init-stdio ( -- )
