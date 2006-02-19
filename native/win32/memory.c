@@ -8,6 +8,8 @@ BOUNDED_BLOCK *alloc_bounded_block(CELL size)
 	
 	GetSystemInfo(&si);
 	mem = (char *)VirtualAlloc(NULL, si.dwPageSize*2 + size, MEM_COMMIT, PAGE_EXECUTE_READWRITE);
+	if(!mem)
+		fatal_error("VirtualAlloc() failed in alloc_bounded_block()",0);
 	
 	if (!VirtualProtect(mem, si.dwPageSize, PAGE_NOACCESS, &ignore))
 		fatal_error("Cannot allocate low guard page", (CELL)mem);
@@ -15,9 +17,7 @@ BOUNDED_BLOCK *alloc_bounded_block(CELL size)
 	if (!VirtualProtect(mem+size+si.dwPageSize, si.dwPageSize, PAGE_NOACCESS, &ignore))
 		fatal_error("Cannot allocate high guard page", (CELL)mem);
 	
-	BOUNDED_BLOCK *retval = malloc(sizeof(BOUNDED_BLOCK));
-	if(retval == NULL)
-		fatal_error("Cannot allocate BOUNDED_BLOCK struct",0);
+	BOUNDED_BLOCK *retval = safe_malloc(sizeof(BOUNDED_BLOCK));
 	
 	retval->start = mem + si.dwPageSize;
 	retval->size = size;

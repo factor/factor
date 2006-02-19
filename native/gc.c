@@ -28,22 +28,16 @@ void init_arena(CELL gens, CELL young_size, CELL aging_size)
 	CELL cards_size = total_size / CARD_SIZE;
 
 	gen_count = gens;
-	generations = malloc(sizeof(ZONE) * gen_count);
-
-	if(generations == 0)
-		fatal_error("Cannot allocate zone head array",0);
+	generations = safe_malloc(sizeof(ZONE) * gen_count);
 
 	heap_start = (CELL)(alloc_bounded_block(total_size)->start);
 	heap_end = heap_start + total_size;
 
-	cards = malloc(cards_size);
+	cards = safe_malloc(cards_size);
 	cards_end = cards + cards_size;
 	cards_offset = (CELL)cards - (heap_start >> CARD_BITS);
 
 	alloter = heap_start;
-
-	if(heap_start == 0)
-		fatal_error("Cannot allocate data heap",0);
 
 	alloter = init_zone(&tenured,aging_size,alloter);
 	alloter = init_zone(&prior,aging_size,alloter);

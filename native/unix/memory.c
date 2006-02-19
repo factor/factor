@@ -17,9 +17,7 @@ BOUNDED_BLOCK *alloc_bounded_block(CELL size)
 	if(mprotect(array + pagesize + size,pagesize,PROT_NONE) == -1)
 		fatal_error("Cannot protect high guard page",(CELL)array);
 
-	BOUNDED_BLOCK *retval = malloc(sizeof(BOUNDED_BLOCK));
-	if(retval == NULL)
-		fatal_error("Cannot allocate BOUNDED_BLOCK struct",0);
+	BOUNDED_BLOCK *retval = safe_malloc(sizeof(BOUNDED_BLOCK));
 	
 	retval->start = (CELL)(array + pagesize);
 	retval->size = size;

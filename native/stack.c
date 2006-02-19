@@ -34,9 +34,7 @@ void save_stacks(void)
 /* called on entry into a compiled callback */
 void nest_stacks(void)
 {
-	STACKS *new_stacks = malloc(sizeof(STACKS));
-	if(new_stacks == NULL)
-		fatal_error("Cannot allocate saved stacks struct",0);
+	STACKS *new_stacks = safe_malloc(sizeof(STACKS));
 	
 	/* note that these register values are not necessarily valid stack
 	pointers. they are merely saved non-volatile registers, and are
