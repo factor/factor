@@ -98,14 +98,14 @@ FUNCTION: int callback_test_5 void* callback ; compiled
 
 [ 1234 ] [ callback-11 callback_test_5 ] unit-test
 
-: callback-12 "double" { } [ pi ] alien-callback ; compiled
+: callback-12 "float" { } [ pi ] alien-callback ; compiled
 
-FUNCTION: double callback_test_6 void* callback ; compiled
+FUNCTION: float callback_test_6 void* callback ; compiled
 
-[ t ] [ callback-12 callback_test_6 pi = ] unit-test
+[ t ] [ callback-12 callback_test_6 pi - 0.00001 <= ] unit-test
 
-: callback-13 "float" { } [ pi ] alien-callback ; compiled
+: callback-13 "double" { } [ pi ] alien-callback ; compiled
 
-FUNCTION: float callback_test_7 void* callback ; compiled
+FUNCTION: double callback_test_7 void* callback ; compiled
 
-[ t ] [ callback-13 callback_test_7 pi - 0.00001 <= ] unit-test
+[ t ] [ callback-13 callback_test_7 pi = ] unit-test
