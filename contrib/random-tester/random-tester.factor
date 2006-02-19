@@ -35,14 +35,13 @@ IN: random-tester
 
 : ratio>x
     {
-        1+ 1- >bignum >digit >fixnum abs absq arg 
+        1+ 1- >bignum >digit >fixnum abs absq arg ceiling
         cis conjugate cos cosec cosech
         cosh cot coth double>bits exp float>bits floor imaginary
         log neg next-power-of-2 quadrant real sec
         sech sgn sin sinh sq sqrt tan tanh truncate 
     } ;
 
-! ceiling, truncate, floor eventually
 : float>x ( float -- x )
     {
         1+ 1- >bignum >digit >fixnum abs absq arg 
@@ -198,11 +197,10 @@ SYMBOL: first-arg
     = [ "problem in runtime" throw ] unless ;
 
 : interp-runtime-check ( quot -- )
-    dup . 
-    ! 0 [ tan tan ] compile-1 drop
+    ! dup . 
     [ last-quot set ] keep
-    [ call ] keep compile-1
-    2dup swap unparse write " " write unparse print
+    [ call ] keep call ! compile-1
+    ! 2dup swap unparse write " " write unparse print
     = [ "problem in math" throw ] unless ;
 
 : interp-compile-check-1 ( x quot -- )
@@ -280,24 +278,24 @@ SYMBOL: first-arg
     random-ratio ratio>x-throw nth-rand unit cons interp-compile-check-catch ;
 
 : test-update-xt ( -- )
-    random-integer random-integer 2integer>x nth-rand unit swons swons update-xt-check ;
+    random-integer random-integer 2integer>x nth-rand unit cons cons update-xt-check ;
 
 ! 2-arg tests
 : test-2integer>x ( -- )
-    random-integer random-integer 2integer>x nth-rand unit swons swons interp-runtime-check ;
+    random-integer random-integer 2integer>x nth-rand unit cons cons interp-runtime-check ;
 
 : test-2ratio>x ( -- )
-    random-ratio random-ratio 2ratio>x nth-rand unit swons swons interp-runtime-check ;
+    random-ratio random-ratio 2ratio>x nth-rand unit cons cons interp-runtime-check ;
 
 : test-2float>x ( -- )
-    random-float random-float 2float>x nth-rand unit swons swons interp-runtime-check ;
+    random-float random-float 2float>x nth-rand unit cons cons interp-runtime-check ;
 
 : test-2complex>x ( -- )
-    random-complex random-complex 2complex>x nth-rand unit swons swons interp-runtime-check ;
+    random-complex random-complex 2complex>x nth-rand unit cons cons interp-runtime-check ;
 
 
 : test-2random>x ( -- )
-    random-number random-number math-2 nth-rand unit swons swons interp-runtime-check ;
+    random-number random-number math-2 nth-rand unit cons cons interp-runtime-check ;
 
 
 

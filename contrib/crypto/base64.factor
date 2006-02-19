@@ -15,7 +15,6 @@ IN: crypto-internals
     "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/" nth ;
 
 : base64>ch ( ch -- ch )
-    #! extra f is to adjust index
     {
         f f f f f f f f f f f f f f f f f f f f f f f f f f f f f f f f f
         f f f f f f f f f f 62 f f f 63 52 53 54 55 56 57 58 59 60 61 f f
