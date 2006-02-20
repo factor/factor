@@ -4,39 +4,53 @@ IN: compiler-backend
 USING: alien arrays assembler kernel kernel-internals math
 sequences ;
 
-GENERIC: store-insn ( offset reg-class -- )
+GENERIC: freg>stack ( stack reg reg-class -- )
 
-GENERIC: load-insn ( elt parameter reg-class -- )
+GENERIC: stack>freg ( stack reg reg-class -- )
 
 : stack@ R10 RSP MOV  R10 swap 2array ;
 
-M: int-regs store-insn
-    drop stack@ RAX MOV ;
+M: int-regs freg>stack drop >r stack@ r> MOV ;
 
-M: int-regs load-insn
-    fastcall-regs nth swap stack@ MOV ;
+M: int-regs stack>freg drop swap stack@ MOV ;
 
 : MOVSS/LPD float-regs-size 4 = [ MOVSS ] [ MOVLPD ] if ;
 
-M: float-regs store-insn
-    >r stack@ XMM0 r> MOVSS/LPD ;
+M: float-regs freg>stack >r >r stack@ r> r> MOVSS/LPD ;
 
-M: float-regs load-insn
-    [ fastcall-regs nth swap stack@ ] keep MOVSS/LPD ;
+M: float-regs stack>freg >r swap stack@ r> MOVSS/LPD ;
 
-M: stack-params load-insn
+M: stack-params stack>freg
     drop >r R11 swap stack@ MOV r> stack@ R11 MOV ;
+
+M: stack-params freg>stack swapd stack>freg ;
+
+M: %unbox-struct generate-node ( vop -- )
+    drop
+    ! Load destination address
+    RDI RSP MOV
+    RDI 0 input ADD
+    ! Load struct size
+    RSI 2 input MOV
+    ! Copy the struct to the stack
+    "unbox_value_struct" f compile-c-call ;
 
 M: %unbox generate-node ( vop -- )
     drop
     ! Call the unboxer
     2 input f compile-c-call
     ! Store the return value on the C stack
-    0 input 1 input store-insn ;
+    0 input 1 input [ return-reg ] keep freg>stack ;
+
+: (%move) 0 input 1 input 2 input [ fastcall-regs nth ] keep ;
 
 M: %stack>freg generate-node ( vop -- )
     ! Move a value from the C stack into the fastcall register
-    drop 0 input 1 input 2 input load-insn ;
+    drop (%move) stack>freg ;
+
+M: %freg>stack generate-node ( vop -- )
+    ! Move a value from a fastcall register to the C stack
+    drop (%move) freg>stack ;
 
 : reset-sse RAX RAX XOR ;
 
@@ -49,4 +63,29 @@ M: %alien-invoke generate-node
     2dup eq? [ 2drop ] [ MOV ] if ;
 
 M: %box generate-node ( vop -- )
-    drop 0 input load-return-value 1 input f compile-c-call ;
+    drop
+    0 input [
+        1 input [ fastcall-regs first ] keep stack>freg
+    ] [
+        1 input load-return-value
+    ] if*
+    2 input f compile-c-call ;
+
+M: %alien-callback generate-node ( vop -- )
+    drop
+    RDI 0 input load-indirect
+    "run_callback" f compile-c-call ;
+
+: save-return 0 swap [ return-reg ] keep freg>stack ;
+: load-return 0 swap [ return-reg ] keep stack>freg ;
+
+M: %callback-value generate-node ( vop -- )
+    drop
+    ! Call the unboxer
+    1 input f compile-c-call
+    ! Save return register
+    0 input save-return
+    ! Restore data/callstacks
+    "unnest_stacks" f compile-c-call
+    ! Restore return register
+    0 input load-return ;
