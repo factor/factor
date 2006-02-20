@@ -52,4 +52,4 @@ void primitive_set_alien_float(void);
 void primitive_alien_double(void);
 void primitive_set_alien_double(void);
 
-void unbox_value_struct(void *dest, CELL size);
+DLLEXPORT void unbox_value_struct(void *dest, CELL size);
