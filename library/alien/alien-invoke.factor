@@ -57,7 +57,7 @@ M: alien-invoke-error summary ( error -- )
     dup stack-space %parameters ,
     dup unbox-parameters
     "save_stacks" f %alien-invoke ,
-    \ %stack>freg move-parameters ;
+    \ %stack>freg move-parameters % ;
 
 : box-return ( node -- )
     alien-invoke-return [ ] [ f swap box-parameter , ] if-void ;

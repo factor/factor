@@ -63,3 +63,7 @@ END-STRUCT
 FUNCTION: int ffi_test_12 int a int b rect c int d int e int f ; compiled
 
 [ 45 ] [ 1 2 3 4 5 6 <rect> 7 8 9 ffi_test_12 ] unit-test
+
+FUNCTION: int ffi_test_13 int a int b int c int d int e int f int g int h int i int j int k ; compiled
+
+[ 66 ] [ 1 2 3 4 5 6 7 8 9 10 11 ffi_test_13 ] unit-test

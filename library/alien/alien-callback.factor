@@ -33,14 +33,11 @@ M: alien-callback-error summary ( error -- )
 ] "infer" set-word-prop
 
 : box-parameters ( parameters -- )
-    [ box-parameter , ] each-parameter ;
+    [ box-parameter ] map-parameters % ;
 
 : registers>objects ( parameters -- )
-    #! The corresponding unnest_stacks() call is made by the
-    #! run_nullary_callback() and run_unary_callback() runtime
-    #! functions.
     dup stack-space %parameters ,
-    dup \ %freg>stack move-parameters
+    dup \ %freg>stack move-parameters %
     "nest_stacks" f %alien-invoke ,
     box-parameters ;
 

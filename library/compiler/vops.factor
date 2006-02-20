@@ -35,12 +35,17 @@ GENERIC: inc-reg-class ( register-class -- )
 
 M: int-regs reg-size drop cell ;
 
-M: int-regs inc-reg-class class inc ;
+: (inc-reg-class)
+    dup class inc
+    os "macosx" = [ reg-size stack-params +@ ] [ drop ] if ;
+
+M: int-regs inc-reg-class
+    (inc-reg-class) ;
 
 M: float-regs reg-size float-regs-size ;
 
 M: float-regs inc-reg-class
-    dup class inc
+    dup (inc-reg-class)
     os "macosx" = [ reg-size 4 / int-regs +@ ] [ drop ] if ;
 
 ! A pseudo-register class for parameters spilled on the stack

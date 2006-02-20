@@ -40,6 +40,7 @@
 
 + compiler/ffi:
 
+- x86 SIB addressing modes
 - amd64 %unbox-struct
 - float intrinsics
 - complex float type

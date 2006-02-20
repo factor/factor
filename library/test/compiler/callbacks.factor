@@ -78,11 +78,6 @@ FUNCTION: void callback_test_3 void* callback int x double y int z ; compiled
     ] with-scope
 ] unit-test
 
-: callback-10
-    "void"
-    { "int" "int" "int" "int" "int" "int" "int" "int" "int" "int" }
-    [ datastack "stack" set ] alien-callback ; compiled
-
 : callback-11 "int" { } [ 1234 ] alien-callback ; compiled
 
 FUNCTION: int callback_test_5 void* callback ; compiled
@@ -100,6 +95,11 @@ FUNCTION: float callback_test_6 void* callback ; compiled
 FUNCTION: double callback_test_7 void* callback ; compiled
 
 [ t ] [ callback-13 callback_test_7 pi = ] unit-test
+
+: callback-10
+    "void"
+    { "int" "int" "int" "int" "int" "int" "int" "int" "int" "int" }
+    [ datastack "stack" set ] alien-callback ; compiled
 
 FUNCTION: void callback_test_4 void* callback int a1 int a2 int a3 int a4 int a5 int a6 int a7 int a8 int a9 int a10 ; compiled
 
