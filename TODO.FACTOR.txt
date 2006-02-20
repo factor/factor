@@ -1,4 +1,3 @@
-- update amd64 for %unbox-struct and callbacks
 - clean up C stack frame assembly code to avoid moving spilled arguments
   twice
 - input values which get spilled
@@ -41,6 +40,7 @@
 
 + compiler/ffi:
 
+- amd64 %unbox-struct
 - float intrinsics
 - complex float type
 - complex float intrinsics

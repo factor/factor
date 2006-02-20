@@ -12,9 +12,9 @@ FUNCTION: void callback_test_1 void* callback ; compiled
 
 [ ] [ callback-1 callback_test_1 ] unit-test
 
-: callback-2 "void" { } [ 5 throw ] alien-callback ; compiled
-
-[ 5 ] [ [ callback-2 callback_test_1 ] catch ] unit-test
+! : callback-2 "void" { } [ 5 throw ] alien-callback ; compiled
+! 
+! [ 5 ] [ [ callback-2 callback_test_1 ] catch ] unit-test
 
 : callback-3 "void" { } [ 5 "x" set ] alien-callback ; compiled
 
