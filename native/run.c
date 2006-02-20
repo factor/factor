@@ -37,11 +37,9 @@ void run(bool handle_errors)
 
 	if(handle_errors)
 	{
-		thrown_error = F;
 		SETJMP(toplevel);
+		handle_error();
 	}
-	
-	handle_error();
 	
 	for(;;)
 	{

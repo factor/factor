@@ -12,25 +12,34 @@ endif
 
 DEFAULT_LIBS = -lm
 
-UNIX_OBJS = native/unix/file.o \
-	native/unix/signal.o \
-	native/unix/ffi.o \
-	native/unix/run.o \
-	native/unix/memory.o \
-	native/unix/mach_signal.o \
-	native/unix/icache.o
-
 WIN32_OBJS = native/win32/ffi.o \
 	native/win32/file.o \
 	native/win32/misc.o \
 	native/win32/run.o \
 	native/win32/memory.o
 
+UNIX_OBJS = native/unix/file.o \
+	native/unix/signal.o \
+	native/unix/ffi.o \
+	native/unix/memory.o \
+	native/unix/icache.o
+
+MACOSX_OBJS = $(UNIX_OBJS) \
+	native/macosx/run.o \
+	native/macosx/mach_signal.o
+
+GENERIC_UNIX_OBJS = $(UNIX_OBJS) \
+	native/unix/run.o
+
 ifdef WIN32
-	PLAF_OBJS = $(WIN32_OBJS)
-	PLAF_SUFFIX = .exe
+ 	PLAF_OBJS = $(WIN32_OBJS)
+ 	PLAF_SUFFIX = .exe
 else
-	PLAF_OBJS = $(UNIX_OBJS)
+	ifdef MACOSX
+		PLAF_OBJS = $(MACOSX_OBJS)
+	else
+		PLAF_OBJS = $(GENERIC_UNIX_OBJS)
+	endif
 endif
 
 OBJS = $(PLAF_OBJS) native/array.o native/bignum.o \
@@ -79,12 +88,14 @@ bsd:
 macosx:
 	$(MAKE) $(BINARY) \
 		CFLAGS="$(DEFAULT_CFLAGS)" \
-		LIBS="$(DEFAULT_LIBS)" 
+		LIBS="$(DEFAULT_LIBS)" \
+		MACOSX=y
 
 macosx-sdl:
 	$(MAKE) $(BINARY) \
 		CFLAGS="$(DEFAULT_CFLAGS) -DFACTOR_SDL" \
-		LIBS="$(DEFAULT_LIBS) -lSDL -lSDLmain -framework Cocoa -framework OpenGL" 
+		LIBS="$(DEFAULT_LIBS) -lSDL -lSDLmain -framework Cocoa -framework OpenGL" \
+		MACOSX=y
 
 linux linux-x86 linux-amd64:
 	$(MAKE) $(BINARY) \
@@ -119,4 +130,7 @@ clean:
 	$(CC) -c $(CFLAGS) -o $@ $<
 
 .S.o:
+	$(CC) -c $(CFLAGS) -o $@ $<
+
+.m.o:
 	$(CC) -c $(CFLAGS) -o $@ $<

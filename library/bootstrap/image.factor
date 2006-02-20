@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 
 ! This library allows one to generate a new set of bootstrap
-! images (boot.image.{le32,le64,be32,be64}.
+! images.
 !
 ! It does this by parsing the set of source files needed to
 ! generate the minimal image, and writing the cons cells, words,
@@ -59,8 +59,8 @@ SYMBOL: architecture
 : string-type    12 ; inline
 : sbuf-type      13 ; inline
 : wrapper-type   14 ; inline
-: word-type      17 ; inline
-: tuple-type     18 ; inline
+: word-type      16 ; inline
+: tuple-type     17 ; inline
 
 : immediate ( x tag -- tagged ) swap tag-bits shift bitor ;
 : >header ( id -- tagged ) object-tag immediate ;

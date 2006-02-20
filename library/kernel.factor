@@ -20,7 +20,7 @@ M: object clone ;
 
 : set-boot ( quot -- ) 8 setenv ;
 
-: num-types ( -- n ) 20 ; inline
+: num-types ( -- n ) 19 ; inline
 
 : ? ( cond t f -- t/f ) rot [ drop ] [ nip ] if ; inline
 

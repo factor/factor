@@ -78,6 +78,7 @@ INLINE void call(CELL quot)
 	callframe = quot;
 }
 
+void handle_error();
 void run(bool handle_errors);
 void run_toplevel(void);
 DLLEXPORT void run_callback(CELL quot);

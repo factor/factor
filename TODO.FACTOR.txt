@@ -1,12 +1,19 @@
+- CFBundle error handling
+- messages returning structs by value
+- fix bootstrap compile errors
+- out of memory from ffi calls
+- update amd64 for %unbox-struct and callbacks
+- clean up C stack frame assembly code to avoid moving spilled arguments
+  twice
+- input values which get spilled
+
 + portability:
 
-- port ffi to win64
-- update amd64 for %unbox-struct and callbacks
+- win64 port
 - get factor running on mac intel
 
 + io:
 
-- if select() returns an error, fep
 - stream server can hang because of exception handler limitations
 - better i/o scheduler
 - if two tasks write to a unix stream, the buffer can overflow
@@ -15,12 +22,8 @@
 
 + objective C/cocoa:
 
-- CFBundle error handling
 - autoload frameworks in cocoa class words
-- exceptions
 - subclassing
-- messages returning structs by value
-- fix bootstrap compile errors
 - super message sends
 
 + ui/help:
@@ -45,12 +48,10 @@
 - float intrinsics
 - complex float type
 - complex float intrinsics
-- out of memory from ffi calls
 - out of memory from overflow check
 - remove literal table
-- callbacks
-  - input values which get spilled
-  - value type struct inputs
+- value type struct inputs to callbacks
+- C functions returning structs by value
 - exceptions inside callbacks are broken:
   - we need to unwind the stacks to the level where the exception handler
     was set
@@ -64,8 +65,6 @@
 - [ [ dup call ] dup call ] infer hangs
 - the invalid recursion form case needs to be fixed, for inlines too
 - code gc
-- clean up C stack frame assembly code to avoid moving spilled arguments
-  twice
 
 + misc:
 

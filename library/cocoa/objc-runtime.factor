@@ -2,8 +2,6 @@
 ! See http://factorcode.org/license.txt for BSD license.
 IN: objc
 
-LIBRARY: objc
-
 TYPEDEF: void* SEL
 
 TYPEDEF: void* id

@@ -11,6 +11,7 @@ void init_factor(char* image, CELL ds_size, CELL cs_size,
 	init_stacks(ds_size,cs_size);
 	/* callframe must be valid in case load_image() does GC */
 	callframe = F;
+	thrown_error = F;
 	load_image(image,literal_size);
 	callframe = userenv[BOOT_ENV];
 	init_c_io();

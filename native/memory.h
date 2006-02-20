@@ -77,11 +77,11 @@ INLINE CELL align8(CELL a)
 #define SBUF_TYPE 13
 #define WRAPPER_TYPE 14
 #define DLL_TYPE 15
-#define WORD_TYPE 17
-#define TUPLE_TYPE 18
-#define BYTE_ARRAY_TYPE 19
+#define WORD_TYPE 16
+#define TUPLE_TYPE 17
+#define BYTE_ARRAY_TYPE 18
 
-#define TYPE_COUNT 20
+#define TYPE_COUNT 19
 
 /* Canonical T object. It's just a word */
 CELL T;

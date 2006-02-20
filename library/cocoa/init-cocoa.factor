@@ -22,6 +22,7 @@ USING: cocoa compiler io kernel objc sequences words ;
     "NSDate"
     "NSError"
     "NSEvent"
+    "NSException"
     "NSInvocation"
     "NSMethodSignature"
     "NSObject"

@@ -330,7 +330,7 @@ num-types f <array> builtins set
 { { 1 { "dll-path" "alien" } f } } define-builtin
 
 "word?" "words" create t "inline" set-word-prop
-"word" "words" create 17 "word?" "words" create
+"word" "words" create 16 "word?" "words" create
 {
     { 1 { "hashcode" "kernel" } f }
     { 2 { "word-name" "words" } f }
@@ -341,11 +341,11 @@ num-types f <array> builtins set
 } define-builtin
 
 "tuple?" "kernel" create t "inline" set-word-prop
-"tuple" "kernel" create 18 "tuple?" "kernel" create
+"tuple" "kernel" create 17 "tuple?" "kernel" create
 { } define-builtin
 
 "byte-array?" "arrays" create t "inline" set-word-prop
-"byte-array" "arrays" create 19
+"byte-array" "arrays" create 18
 "byte-array?" "arrays" create
 { } define-builtin
 

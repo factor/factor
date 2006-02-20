@@ -60,8 +60,11 @@ SYMBOL: error-continuation
 : callstack-overflow. ( obj -- )
     "Return stack overflow" print drop ;
 
+! Hook for library/cocoa/
+DEFER: objc-error. ( alien -- )
+
 PREDICATE: cons kernel-error ( obj -- ? )
-    dup first kernel-error = swap second 0 15 between? and ;
+    dup first kernel-error = swap second 0 16 between? and ;
 
 M: kernel-error error. ( error -- )
     #! Kernel errors are indexed by integers.
@@ -82,6 +85,7 @@ M: kernel-error error. ( error -- )
         [ datastack-overflow. ]
         [ callstack-underflow. ]
         [ callstack-overflow. ]
+        [ objc-error. ]
     } dispatch ;
 
 M: no-method summary drop "No suitable method" ;

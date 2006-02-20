@@ -14,6 +14,7 @@
 #define ERROR_DS_OVERFLOW (13<<3)
 #define ERROR_CS_UNDERFLOW (14<<3)
 #define ERROR_CS_OVERFLOW (15<<3)
+#define ERROR_OBJECTIVE_C (16<<3)
 
 /* Are we throwing an error? */
 bool throwing;
