@@ -59,3 +59,5 @@ kernel-internals math namespaces sequences words ;
 
 : if-void ( type true false -- | false: type -- )
     pick "void" = [ drop nip call ] [ nip call ] if ; inline
+
+: compile-gc "maybe_gc" f %alien-invoke , ;
