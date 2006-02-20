@@ -126,7 +126,6 @@ void* primitives[] = {
 	primitive_dlopen,
 	primitive_dlsym,
 	primitive_dlclose,
-	primitive_alien,
 	primitive_byte_array,
 	primitive_displaced_alien,
 	primitive_alien_signed_cell,

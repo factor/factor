@@ -185,8 +185,8 @@ INLINE void collect_object(CELL scan)
 	case DLL_TYPE:
 		collect_dll((DLL*)scan);
 		break;
-	case DISPLACED_ALIEN_TYPE:
-		collect_displaced_alien((DISPLACED_ALIEN*)scan);
+	case ALIEN_TYPE:
+		collect_alien((ALIEN*)scan);
 		break;
 	case WRAPPER_TYPE:
 		collect_wrapper((F_WRAPPER*)scan);

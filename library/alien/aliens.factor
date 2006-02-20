@@ -17,9 +17,9 @@ sequences ;
 ! parameter, or a missing abi parameter indicates the cdecl ABI
 ! should be used, which is common on Unix.
 
-UNION: c-ptr byte-array alien displaced-alien ;
+: <alien> ( address -- alien ) f <displaced-alien> ; inline
 
-M: alien hashcode ( obj -- n ) alien-address >fixnum ;
+UNION: c-ptr byte-array alien ;
 
 M: alien = ( obj obj -- ? )
     over alien? [ [ alien-address ] 2apply = ] [ 2drop f ] if ;

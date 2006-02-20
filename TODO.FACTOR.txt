@@ -7,8 +7,6 @@
 + io:
 
 - if select() returns an error, fep
-- FILE* leaked in process.factor
-- runtime primitives like fopen: check for null input
 - stream server can hang because of exception handler limitations
 - better i/o scheduler
 - if two tasks write to a unix stream, the buffer can overflow
@@ -44,7 +42,6 @@
 
 + compiler/ffi:
 
-- stack effect comment for FUNCTION: doesn't show return value
 - float intrinsics
 - complex float type
 - complex float intrinsics
@@ -72,8 +69,6 @@
 
 + misc:
 
-- aliens are just a special case of displaced aliens -- so we can remove
-  one built in type
 - code walker & exceptions
 - slice: if sequence or seq start is changed, abstraction violation
 - delegating generic words with a non-standard picker

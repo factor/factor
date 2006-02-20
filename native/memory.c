@@ -75,9 +75,6 @@ CELL untagged_object_size(CELL pointer)
 	case ALIEN_TYPE:
 		size = sizeof(ALIEN);
 		break;
-	case DISPLACED_ALIEN_TYPE:
-		size = sizeof(DISPLACED_ALIEN);
-		break;
 	case WRAPPER_TYPE:
 		size = sizeof(F_WRAPPER);
 		break;

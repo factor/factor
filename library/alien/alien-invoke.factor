@@ -76,9 +76,9 @@ M: alien-invoke linearize* ( node -- )
     dup box-return
     linearize-next ;
 
-: parse-arglist ( lst -- types stack effect )
+: parse-arglist ( return seq -- types stack-effect )
     unpair [
-        " " % [ "," ?tail drop % " " % ] each "-- " %
+        " " % [ "," ?tail drop ] map " " join % " -- " % swap %
     ] "" make ;
 
 : (define-c-word) ( type lib func types stack-effect -- )
@@ -87,7 +87,8 @@ M: alien-invoke linearize* ( node -- )
     word r> "stack-effect" set-word-prop ;
 
 : define-c-word ( type lib func function-args -- )
-    [ "()" subseq? not ] subset parse-arglist (define-c-word) ;
+    [ "()" subseq? not ] subset >r pick r> parse-arglist
+    (define-c-word) ;
 
 M: compound (uncrossref)
     dup word-def \ alien-invoke swap member?

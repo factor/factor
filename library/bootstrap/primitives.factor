@@ -160,7 +160,6 @@ call
     { "dlopen" "alien"                      }
     { "dlsym" "alien"                       }
     { "dlclose" "alien"                     }
-    { "<alien>" "alien"                     }
     { "<byte-array>" "arrays"               }
     { "<displaced-alien>" "alien"           }
     { "alien-signed-cell" "alien"           }
@@ -283,7 +282,8 @@ num-types f <array> builtins set
 { { 0 { "real" "math" } f } { 1 { "imaginary" "math" } f } } define-builtin
 "complex" "math" create 4 "math-priority" set-word-prop
 
-"displaced-alien" "alien" create 7 "displaced-alien?" "alien" create { } define-builtin
+"alien" "alien" create 7 "alien?" "alien" create
+{ { 1 { "underlying-alien" "alien" } f } } define-builtin
 
 "array?" "arrays" create t "inline" set-word-prop
 "array" "arrays" create 8 "array?" "arrays" create
@@ -328,9 +328,6 @@ num-types f <array> builtins set
 "dll?" "alien" create t "inline" set-word-prop
 "dll" "alien" create 15 "dll?" "alien" create
 { { 1 { "dll-path" "alien" } f } } define-builtin
-
-"alien?" "alien" create t "inline" set-word-prop
-"alien" "alien" create 16 "alien?" "alien" create { } define-builtin
 
 "word?" "words" create t "inline" set-word-prop
 "word" "words" create 17 "word?" "words" create

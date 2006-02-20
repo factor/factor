@@ -166,13 +166,21 @@ void primitive_string_to_memory(void)
 }
 
 /* FFI calls this */
-char* unbox_c_string(void)
+char *unbox_c_string(void)
 {
 	CELL str = dpop();
 	if(type_of(str) == STRING_TYPE)
 		return to_c_string(untag_string(str),true);
 	else
 		return (char*)alien_offset(str);
+}
+
+/* this function is used when we really want only Factor strings as input, not
+aliens. In particular, certian primitives crash if given a null pointer (f), so
+we protect against this by using this function instead of unbox_c_string() */
+char *pop_c_string(void)
+{
+	return to_c_string(untag_string(dpop()),true);
 }
 
 /* FFI calls this */

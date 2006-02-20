@@ -65,5 +65,5 @@ void primitive_cwd(void)
 void primitive_cd(void)
 {
 	maybe_gc(0);
-	SetCurrentDirectory(unbox_c_string());
+	SetCurrentDirectory(pop_c_string());
 }

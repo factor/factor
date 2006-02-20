@@ -1,6 +1,7 @@
 typedef struct {
 	CELL header;
-	void* ptr;
+	CELL alien;
+	CELL displacement;
 	bool expired;
 } ALIEN;
 
@@ -9,19 +10,9 @@ INLINE ALIEN* untag_alien_fast(CELL tagged)
 	return (ALIEN*)UNTAG(tagged);
 }
 
-typedef struct {
-	CELL header;
-	CELL alien;
-	CELL displacement;
-} DISPLACED_ALIEN;
-
-INLINE DISPLACED_ALIEN* untag_displaced_alien_fast(CELL tagged)
-{
-	return (DISPLACED_ALIEN*)UNTAG(tagged);
-}
+ALIEN *make_alien(CELL delegate, CELL displacement);
 
 void primitive_expired(void);
-void primitive_alien(void);
 void primitive_displaced_alien(void);
 void primitive_alien_address(void);
 
@@ -30,13 +21,11 @@ void* alien_offset(CELL object);
 void primitive_alien_to_string(void);
 void primitive_string_to_alien(void);
 
-void fixup_alien(ALIEN* alien);
-void fixup_displaced_alien(DISPLACED_ALIEN* d);
-void collect_displaced_alien(DISPLACED_ALIEN* d);
+void fixup_alien(ALIEN* d);
+void collect_alien(ALIEN* d);
 
-DLLEXPORT void* unbox_alien(void);
-ALIEN* alien(void* ptr);
-DLLEXPORT void box_alien(void* ptr);
+DLLEXPORT void *unbox_alien(void);
+DLLEXPORT void box_alien(CELL ptr);
 
 void primitive_alien_signed_cell(void);
 void primitive_set_alien_signed_cell(void);

@@ -50,7 +50,7 @@ SYMBOL: c-types
     >r c-size [ rot * ] cons r> append define-compound ;
 
 : define-nth ( name vocab -- )
-    #! Make a word foo-nth ( n alien -- displaced-alien ).
+    #! Make a word foo-nth ( n alien -- alien ).
     >r dup "-nth" append r> create
     swap dup c-getter (define-nth) ;
 

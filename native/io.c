@@ -20,8 +20,8 @@ The native FFI streams in the library don't have this limitation. */
 
 void init_c_io(void)
 {
-	userenv[IN_ENV] = tag_object(alien(stdin));
-	userenv[OUT_ENV] = tag_object(alien(stdout));
+	userenv[IN_ENV] = tag_object(make_alien(F,(CELL)stdin));
+	userenv[OUT_ENV] = tag_object(make_alien(F,(CELL)stdout));
 }
 
 void io_error(void)
@@ -35,12 +35,12 @@ void primitive_fopen(void)
 	char *path, *mode;
 	FILE* file;
 	maybe_gc(0);
-	mode = unbox_c_string();
-	path = unbox_c_string();
+	mode = pop_c_string();
+	path = pop_c_string();
 	file = fopen(path,mode);
 	if(file == NULL)
 		io_error();
-	box_alien(file);
+	box_alien((CELL)file);
 }
 
 void primitive_fgetc(void)

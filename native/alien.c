@@ -21,21 +21,17 @@ void *alien_offset(CELL object)
 {
 	ALIEN *alien;
 	F_ARRAY *array;
-	DISPLACED_ALIEN *d;
 
 	switch(type_of(object))
 	{
+	case BYTE_ARRAY_TYPE:
+		array = untag_byte_array_fast(object);
+		return array + 1;
 	case ALIEN_TYPE:
 		alien = untag_alien_fast(object);
 		if(alien->expired)
 			general_error(ERROR_EXPIRED,object,true);
-		return alien->ptr;
-	case BYTE_ARRAY_TYPE:
-		array = untag_byte_array_fast(object);
-		return array + 1;
-	case DISPLACED_ALIEN_TYPE:
-		d = untag_displaced_alien_fast(object);
-		return alien_offset(d->alien) + d->displacement;
+		return alien_offset(alien->alien) + alien->displacement;
 	case F_TYPE:
 		return NULL;
 	default:
@@ -58,29 +54,22 @@ INLINE void *alien_pointer(void)
 }
 
 /* make an alien */
-ALIEN *alien(void *ptr)
+ALIEN *make_alien(CELL delegate, CELL displacement)
 {
-	ALIEN* alien = allot_object(ALIEN_TYPE,sizeof(ALIEN));
-	alien->ptr = ptr;
+	ALIEN *alien = allot_object(ALIEN_TYPE,sizeof(ALIEN));
+	alien->alien = delegate;
+	alien->displacement = displacement;
 	alien->expired = false;
 	return alien;
 }
 
 /* make an alien and push */
-void box_alien(void *ptr)
+void box_alien(CELL ptr)
 {
-	if(ptr == NULL)
+	if(ptr == 0)
 		dpush(F);
 	else
-		dpush(tag_object(alien(ptr)));
-}
-
-/* make an alien form an address on the stack */
-void primitive_alien(void)
-{
-	void* ptr = (void*)unbox_signed_cell();
-	maybe_gc(sizeof(ALIEN));
-	box_alien(ptr);
+		dpush(tag_object(make_alien(F,ptr)));
 }
 
 /* make an alien pointing at an offset of another alien */
@@ -88,14 +77,10 @@ void primitive_displaced_alien(void)
 {
 	CELL alien;
 	CELL displacement;
-	DISPLACED_ALIEN* d;
-	maybe_gc(sizeof(DISPLACED_ALIEN));
+	maybe_gc(sizeof(ALIEN));
 	alien = dpop();
 	displacement = unbox_unsigned_cell();
-	d = allot_object(DISPLACED_ALIEN_TYPE,sizeof(DISPLACED_ALIEN));
-	d->alien = alien;
-	d->displacement = displacement;
-	dpush(tag_object(d));
+	dpush(tag_object(make_alien(alien,displacement)));
 }
 
 /* address of an object representing a C pointer */
@@ -118,20 +103,15 @@ void primitive_string_to_alien(void)
 	drepl(tag_object(string_to_alien(untag_string(dpeek()),true)));
 }
 
-/* expire aliens when loading the image */
-void fixup_alien(ALIEN *alien)
-{
-	alien->expired = true;
-}
-
 /* image loading */
-void fixup_displaced_alien(DISPLACED_ALIEN *d)
+void fixup_alien(ALIEN *d)
 {
 	data_fixup(&d->alien);
+	d->expired = true;
 }
 
 /* GC */
-void collect_displaced_alien(DISPLACED_ALIEN *d)
+void collect_alien(ALIEN *d)
 {
 	copy_handle(&d->alien);
 }
