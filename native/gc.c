@@ -353,8 +353,13 @@ void maybe_gc(CELL size)
 	}
 }
 
-void primitive_gc_time(void)
+void simple_gc(void)
 {
 	maybe_gc(0);
+}
+
+void primitive_gc_time(void)
+{
+	simple_gc();
 	dpush(tag_bignum(s48_long_long_to_bignum(gc_time)));
 }
