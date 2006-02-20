@@ -27,5 +27,10 @@ BOUNDED_BLOCK *alloc_bounded_block(CELL size)
 
 void dealloc_bounded_block(BOUNDED_BLOCK *block)
 {
-	fatal_error("dealloc_bounded_block() not implemented on windows FIXME",0);
+	
+	SYSTEM_INFO si;
+	GetSystemInfo(&si);
+	if(!VirtualFree(block->start - si.dwPageSize, si.dwPageSize*2 + block->size, MEM_DECOMMIT))
+		fatal_error("VirtualFree() failed",0);
+	free(block);
 }
