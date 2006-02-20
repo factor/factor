@@ -99,7 +99,7 @@ C: io-callback ( -- callback )
     io-callback-quotation ;
 
 : (wait-for-io) ( timeout -- error overlapped len )
-    >r completion-port get <int>  0 <int> 0 <int>
+    >r completion-port get  0 <int>  0 <int> 0 <int>
     pick over r> -rot >r >r GetQueuedCompletionStatus r> r> ;
 
 : overlapped>callback ( overlapped -- callback )
