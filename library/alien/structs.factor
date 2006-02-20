@@ -40,4 +40,5 @@ sequences strings words ;
     ] "struct-name" get define-c-type
     "struct-name" get in get init-c-type ;
 
-: c-struct? ( type -- ? ) "struct" swap c-type hash ;
+: c-struct? ( type -- ? )
+    c-types get hash [ "struct" swap hash ] [ f ] if* ;

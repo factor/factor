@@ -11,6 +11,7 @@ BEGIN-STRUCT: NSRect
 END-STRUCT
 
 TYPEDEF: NSRect _NSRect
+TYPEDEF: NSRect CGRect
 
 : <NSRect>
     "NSRect" <c-object>
@@ -25,6 +26,7 @@ BEGIN-STRUCT: NSPoint
 END-STRUCT
 
 TYPEDEF: NSPoint _NSPoint
+TYPEDEF: NSPoint CGPoint
 
 : <NSPoint>
     "NSPoint" <c-object>
@@ -37,6 +39,7 @@ BEGIN-STRUCT: NSSize
 END-STRUCT
 
 TYPEDEF: NSSize _NSSize
+TYPEDEF: NSPoint CGPoint
 
 : <NSSize>
     "NSSize" <c-object>

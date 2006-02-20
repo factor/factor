@@ -1,6 +1,4 @@
 - CFBundle error handling
-- messages returning structs by value
-- fix bootstrap compile errors
 - out of memory from ffi calls
 - update amd64 for %unbox-struct and callbacks
 - clean up C stack frame assembly code to avoid moving spilled arguments

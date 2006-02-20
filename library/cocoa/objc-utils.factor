@@ -97,13 +97,28 @@ C: selector ( name -- sel ) [ set-selector-name ] keep ;
 : make-dip ( quot n -- quot )
     dup \ >r <array> -rot \ r> <array> append3 ;
 
-: make-objc-method ( returns args selector -- )
-    <selector> [ selector ] curry over length 2 - make-dip [
-        %
-        swap ,
-        [ f "objc_msgSend" ] % ,
-        \ alien-invoke ,
+: selector-quot ( string -- ) <selector> [ selector ] curry ;
+
+: make-objc-invoke
+    [
+        >r over length 2 - make-dip % r> call \ alien-invoke ,
     ] [ ] make ;
+
+: make-objc-send ( returns args selector -- )
+    selector-quot
+    [ swap , [ f "objc_msgSend" ] % , ] make-objc-invoke ;
+
+: make-objc-send-stret ( returns args selector -- )
+    >r swap [ <c-object> dup ] curry 1 make-dip r>
+    selector-quot append [
+        "void" ,
+        [ f "objc_msgSend_stret" ] %
+        { "void*" } swap append ,
+    ] make-objc-invoke ;
+
+: make-objc-method ( returns args selector -- )
+    pick c-struct?
+    [ make-objc-send-stret ] [ make-objc-send ] if ;
 
 : define-objc-method ( returns types selector -- )
     [ make-objc-method "[" ] keep "]" append3 create-in
