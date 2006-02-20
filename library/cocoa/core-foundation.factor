@@ -1,7 +1,8 @@
 ! Copyright (C) 2006 Slava Pestov
 ! See http://factorcode.org/license.txt for BSD license.
 IN: cocoa
-USING: alien arrays hashtables kernel namespaces ;
+USING: alien arrays errors hashtables kernel namespaces
+sequences ;
 
 TYPEDEF: int CFIndex
 
@@ -47,4 +48,8 @@ FUNCTION: void CFRelease ( void* cf ) ;
     t <CFFileSystemURL> f over CFBundleCreate swap CFRelease ;
 
 : load-framework ( name -- )
-    <CFBundle> CFBundleLoadExecutable drop ;
+    dup <CFBundle> [
+        CFBundleLoadExecutable drop
+    ] [
+        "Cannot load bundled named " swap append throw
+    ] ?if ;
