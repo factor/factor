@@ -184,14 +184,44 @@ char *pop_c_string(void)
 }
 
 /* FFI calls this */
-u16* unbox_utf16_string(void)
+u16 *unbox_utf16_string(void)
 {
 	/* Return pointer to first character */
-	CELL str = dpop();
-	if(type_of(str) == STRING_TYPE)
-		return (u16*)(untag_string(str) + 1);
+	CELL obj = dpop();
+
+	if(type_of(obj) == STRING_TYPE)
+	{
+		F_STRING* str = untag_string(obj);
+		u16 *unboxed = (u16*)(str + 1);
+
+		CELL length = string_capacity(str);
+		CELL i;
+
+		for(i = 0; i < length; i++)
+		{
+			if(unboxed[i] == 0)
+				general_error(ERROR_C_STRING,obj,true);
+		}
+
+		return unboxed;
+	}
 	else
-		return (u16*)alien_offset(str);
+		return (u16*)alien_offset(obj);
+}
+
+/* FFI calls this */
+void box_utf16_string(u16 *unboxed)
+{
+	CELL length = 0;
+	u16 *scan = unboxed;
+	F_STRING *str;
+
+	while(*scan++) length++;
+
+	str = allot_string(length);
+	memcpy((u16*)(str + 1),unboxed,length * sizeof(u16));
+	rehash_string(str);
+	dpush(tag_object(str));
 }
 
 void primitive_char_slot(void)

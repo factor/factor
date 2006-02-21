@@ -1,6 +1,10 @@
-- clean up C stack frame assembly code to avoid moving spilled arguments
-  twice
-- input values which get spilled
+- input values which get spilled on amd64
+- if two tasks write to a unix stream, the buffer can overflow
+- x86 SIB addressing modes
+- exceptions inside callbacks are broken:
+  - we need to unwind the stacks to the level where the exception handler
+    was set
+- "localhost" 50 <client> won't fail
 
 + portability:
 
@@ -11,9 +15,8 @@
 
 - stream server can hang because of exception handler limitations
 - better i/o scheduler
-- if two tasks write to a unix stream, the buffer can overflow
 - out of memory error when printing global namespace
-- "localhost" 50 <client> won't fail
+- yield in a loop starves i/o
 
 + objective C/cocoa:
 
@@ -40,7 +43,6 @@
 
 + compiler/ffi:
 
-- x86 SIB addressing modes
 - amd64 %unbox-struct
 - float intrinsics
 - complex float type
@@ -49,11 +51,6 @@
 - remove literal table
 - value type struct inputs to callbacks
 - C functions returning structs by value
-- exceptions inside callbacks are broken:
-  - we need to unwind the stacks to the level where the exception handler
-    was set
-- ffi unicode strings: null char security hole
-- utf16 string boxing
 - signal handler should not lose stack pointers
 - FIELD: char key_vector[32];
 - FIELD: union { char b[20]; short s[10]; long l[5]; } data;
