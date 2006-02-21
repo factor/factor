@@ -115,23 +115,6 @@ HELP: scan-word "( -- obj )"
 { $errors "Throws an error if the token does not name a word, and does not parse as a number." }
 $parsing-note ;
 
-HELP: ch-search "( ch -- index )"
-{ $values { "ch" "a character" } { "index" "an index in the current line" } }
-{ $description "Searches the current line, starting from the parser column, for an occurrence of " { $snippet "ch" } ". If the character does not occur in the line, outputs -1." }
-$parsing-note
-{ $see-also POSTPONE: ( } ;
-
-HELP: until "( index -- )"
-{ $values { "index" "an index in the current line" } }
-{ $description "Advances the parser column to immediately after the index." }
-$parsing-note
-{ $see-also POSTPONE: ( } ;
-
-HELP: until-eol "( -- )"
-{ $description "Discards all input until the end of the line." }
-$parsing-note
-{ $see-also POSTPONE: ! POSTPONE: #! } ;
-
 HELP: escape "( escape -- ch )"
 { $values { "escape" "a single-character escape" } { "ch" "a character" } }
 { $description "Converts from a single-character escape code and the corresponding character." }

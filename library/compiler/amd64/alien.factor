@@ -24,7 +24,7 @@ M: stack-params stack>freg
     drop >r R11 swap stack@ MOV r> stack@ R11 MOV ;
 
 M: stack-params freg>stack
-    >r stack-increment + swap r> stack>freg ;
+    >r stack-increment + cell + swap r> stack>freg ;
 
 M: %unbox-struct generate-node ( vop -- )
     drop

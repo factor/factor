@@ -1,4 +1,3 @@
-- input values which get spilled on amd64
 - if two tasks write to a unix stream, the buffer can overflow
 - x86 SIB addressing modes
 - exceptions inside callbacks are broken:
