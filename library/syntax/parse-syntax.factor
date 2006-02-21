@@ -7,9 +7,14 @@ USING: alien arrays errors generic hashtables kernel lists math
 namespaces parser sequences strings syntax vectors
 words ;
 
-: ( CHAR: ) ch-search until ; parsing
-: ! until-eol ; parsing
-: #! until-eol ; parsing
+: (
+    CHAR: ) column [
+        line-text get index* dup -1 =
+        [ "Unterminated (" throw ] when 1+
+    ] change ; parsing
+
+: ! line-text get length column set ; parsing
+: #! POSTPONE: ! ; parsing
 : IN: scan set-in ; parsing
 : USE: scan use+ ; parsing
 : USING: string-mode on [ string-mode off add-use ] f ; parsing
