@@ -25,9 +25,14 @@ TUPLE: vreg n ;
 TUPLE: int-regs ;
 TUPLE: float-regs size ;
 
+! A pseudo-register class for parameters spilled on the stack
+TUPLE: stack-params ;
+
 GENERIC: return-reg ( register-class -- reg )
 
 GENERIC: fastcall-regs ( register-class -- regs )
+
+M: stack-params fastcall-regs drop 0 ;
 
 GENERIC: reg-size ( register-class -- n )
 
@@ -47,11 +52,6 @@ M: float-regs reg-size float-regs-size ;
 M: float-regs inc-reg-class
     dup (inc-reg-class)
     os "macosx" = [ reg-size 4 / int-regs +@ ] [ drop ] if ;
-
-! A pseudo-register class for parameters spilled on the stack
-TUPLE: stack-params ;
-
-M: stack-params fastcall-regs drop 0 ;
 
 ! A data stack location.
 TUPLE: ds-loc n ;

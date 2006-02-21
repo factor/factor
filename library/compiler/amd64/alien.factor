@@ -23,7 +23,8 @@ M: float-regs stack>freg >r swap stack@ r> MOVSS/LPD ;
 M: stack-params stack>freg
     drop >r R11 swap stack@ MOV r> stack@ R11 MOV ;
 
-M: stack-params freg>stack swapd stack>freg ;
+M: stack-params freg>stack
+    >r stack-increment + swap r> stack>freg ;
 
 M: %unbox-struct generate-node ( vop -- )
     drop
