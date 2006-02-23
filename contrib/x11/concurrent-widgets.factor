@@ -28,6 +28,11 @@ SYMBOL: window-table
 : add-to-window-table ( <window> -- )
 dup window-id window-table get set-hash ;
 
+: clean-window-table ( -- )
+window-table get
+[ drop dup valid-window?+ [ drop ] [ window-table get remove-hash ] if ]
+hash-each ;
+
 ! The window-table is keyed on window ids. If support is added for
 ! multiple displays, then perhaps there should be a window table for
 ! each open display.
