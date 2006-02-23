@@ -535,6 +535,15 @@ SYMBOL: workspace-menu
     [ workspace-4 get switch-to ] workspace-menu get add-popup-menu-item ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+: invalid-frame? ( <wm-frame> -- ? )
+wm-frame-child window-id valid-window?+ not ;
+
+: remove-invalid-frames ( -- )
+window-table get hash-values [ wm-frame? ] subset [ invalid-frame? ] subset
+[ window-id window-table get remove-hash ] each ;
+
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 ! window-list
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
@@ -560,7 +569,8 @@ SYMBOL: window-list
 
 : refresh-window-list ( window-list -- )
   dup window-children% [ destroy-window+ ] each
-  ! clean-window-table
+  clean-window-table
+  remove-invalid-frames
   window-table get hash-values [ wm-frame? ] subset
   [ not-transient? ] subset
   [ add-window-to-list ] each
