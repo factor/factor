@@ -1,15 +1,16 @@
 
 ----------------------------------------------------------------------
-simple-error-handler
+Load requirements
 ----------------------------------------------------------------------
 
-Before compiling and using factory, setup the error handler:
+Factory depends upon some things in contrib. Load them like so:
 
-  $ make-simple-error-handler
-
-Then startup factor, load the error handler word, and save the image:
-
-  "simple-error-handler.factor" run-file save
+  { "contrib/process.factor"
+    "contrib/concurrency/load.factor"
+    "contrib/x11/load.factor" }
+  [ run-resource ]
+  each
+  save
 
 ----------------------------------------------------------------------
 Loading factory
@@ -17,7 +18,7 @@ Loading factory
 
 Putting factory into your image is as simple as this:
 
-  "factory.factor" run-file save
+  "contrib/factory/load.factor" run-resource save
 
 ----------------------------------------------------------------------
 Running factory in Xnest
