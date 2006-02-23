@@ -230,7 +230,8 @@ dup length 1 - [ swap 2nth draw-line ] each-with ;
 
 : sync-dpy ( discard -- ) >r dpy get r> XSync ;
 
-: next-event ( -- event ) dpy get "XEvent" <c-object> dup >r XNextEvent drop r> ;
+: next-event ( -- event )
+dpy get "XEvent" <c-object> dup >r XNextEvent drop r> ;
 
 : mask-event ( mask -- event )
   >r dpy get r> "XEvent" <c-object> dup >r XMaskEvent drop r> ;
@@ -283,7 +284,6 @@ dup length 1 - [ swap 2nth draw-line ] each-with ;
 : destroy-window+		[ destroy-window ] with-win ;
 : map-window+			[ map-window ] with-win ;
 : unmap-window+			[ unmap-window ] with-win ;
-: valid-window?+		[ valid-window? ] with-win ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
@@ -335,7 +335,9 @@ dup length 1 - [ swap 2nth draw-line ] each-with ;
   drop drop ;
 
 : valid-window? ( -- ? )
-  dpy get win get "XWindowAttributes" <c-object> XGetWindowAttributes 0 = not ;
+dpy get win get "XWindowAttributes" <c-object> XGetWindowAttributes 0 = not ;
+
+: valid-window?+		[ valid-window? ] with-win ;
 
 : mouse-sensor ( -- { root-x root-y } )
   dpy get win get 0 <Window> 0 <Window> 0 <int> 0 <int> 2dup >r >r

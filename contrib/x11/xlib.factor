@@ -967,11 +967,11 @@ END-STRUCT
 BEGIN-STRUCT: XErrorEvent
 	FIELD: int type
 	FIELD: Display* display
+	FIELD: XID resourceid
 	FIELD: ulong serial
 	FIELD: uchar error_code
 	FIELD: uchar request_code
 	FIELD: uchar minor_code
-	FIELD: XID resourceid
 END-STRUCT
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
@@ -1090,6 +1090,10 @@ FUNCTION: int XPending ( Display* display ) ;
 ! 11.6 - Sending Events to Other Applications
 
 FUNCTION: Status XSendEvent ( Display* display, Window w, Bool propagate, long event_mask, XEvent* event_send ) ;
+
+! 11.8 - Handling Protocol Errors
+
+FUNCTION: int XSetErrorHandler ( void* handler ) ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 ! 12 - Input Device Functions
