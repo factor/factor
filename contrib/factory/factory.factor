@@ -13,6 +13,8 @@ DEFER: window-list
 DEFER: refresh-window-list
 DEFER: layout-frame
 DEFER: mapped-windows
+DEFER: workspace-1 DEFER: workspace-2 DEFER: workspace-3 DEFER: workspace-4
+DEFER: switch-to
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
@@ -550,7 +552,7 @@ window-table get hash-values [ wm-frame? ] subset [ invalid-frame? ] subset
 SYMBOL: window-list
 
 : setup-window-list ( -- )
-  create-menu window-list set
+  create-menu window-list set-global
   "black" lookup-color window-list get set-window-background% ;
 
 : not-transient? ( frame -- ? ) wm-frame-child get-transient-for-hint% not ;
