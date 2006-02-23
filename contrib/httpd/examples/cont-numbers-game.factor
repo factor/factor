@@ -32,7 +32,6 @@
 !
 ! The result is not that pretty but it shows the basic idea.
 IN: numbers-game
-USE: parser-combinators
 USE: kernel
 USE: math
 USE: parser

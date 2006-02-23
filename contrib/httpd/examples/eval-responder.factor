@@ -33,7 +33,6 @@ USE: parser
 USE: lists
 USE: errors
 USE: strings
-USE: live-updater
 USE: prettyprint
 USE: words
 USE: vectors
@@ -125,20 +124,6 @@ USE: hashtables
     </table>
   ] make-hash ;
 
-: display-word-see-form ( url -- )
-  #! Write out the html for code that accepts
-  #! the name of a word, and displays the source
-  #! code of that word.
-  [
-    [ 
-      "Enter the name of a word: " write
-      "see" [ html-for-word-source ] live-search
-    ]
-    [
-      <div "see" =id div> "" write </div>
-    ]
-  ] vertical-layout ;
-
 : display-last-output ( string -- )
   #! Write out html to display the last output.
   <table "1" =border table> 
@@ -155,7 +140,6 @@ USE: hashtables
     <html> 
       <head> 
         <title> "Factor Evaluator" write </title>
-        include-live-updater-js
       </head>        
       <body> 
         "Use Alt+E to evaluate, or press 'Evaluate'" paragraph
@@ -164,7 +148,6 @@ USE: hashtables
           [ "stack" get display-stack ]
           [ "history" get display-history ]
         ] horizontal-layout
-	display-word-see-form
         "output" get display-last-output
       </body>
     </html>
