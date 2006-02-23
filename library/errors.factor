@@ -14,8 +14,7 @@ TUPLE: no-method object generic ;
     [ >c call f c> drop f ] callcc1 nip ; inline
 
 : rethrow ( error -- )
-    catchstack* empty?
-    [ die "Can't happen" throw ] [ c> continue-with ] if ;
+    catchstack* empty? [ die ] [ c> continue-with ] if ;
 
 : cleanup ( try cleanup -- | try: -- | cleanup: -- )
     [ >c >r call c> drop r> call ]

@@ -37,7 +37,7 @@ void throw_error(CELL error, bool keep_stacks)
 	thrown_executing = executing;
 
 	/* Return to run() method */
-	LONGJMP(toplevel,1);
+	LONGJMP(stack_chain->toplevel,1);
 }
 
 void primitive_throw(void)

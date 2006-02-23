@@ -55,7 +55,8 @@ M: alien-callback-error summary ( error -- )
 : linearize-callback ( node -- )
     dup alien-callback-xt [
         dup alien-callback-parameters registers>objects
-        dup alien-callback-quot %alien-callback ,
+        dup alien-callback-quot \ init-error-handler swons
+        %alien-callback ,
         unbox-return
         %return ,
     ] make-linear ;

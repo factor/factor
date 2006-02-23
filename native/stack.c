@@ -12,13 +12,13 @@ void reset_callstack(void)
 
 void fix_stacks(void)
 {
-	if(STACK_UNDERFLOW(ds,stack_chain->ds_region))
+	if(STACK_UNDERFLOW(ds,stack_chain->data_region))
 		reset_datastack();
-	else if(STACK_OVERFLOW(ds,stack_chain->ds_region))
+	else if(STACK_OVERFLOW(ds,stack_chain->data_region))
 		reset_datastack();
-	else if(STACK_UNDERFLOW(cs,stack_chain->cs_region))
+	else if(STACK_UNDERFLOW(cs,stack_chain->call_region))
 		reset_callstack();
-	else if(STACK_OVERFLOW(cs,stack_chain->cs_region))
+	else if(STACK_OVERFLOW(cs,stack_chain->call_region))
 		reset_callstack();
 }
 
@@ -26,8 +26,8 @@ void fix_stacks(void)
 in registers, so callbacks must save and restore the correct values */
 void save_stacks(void)
 {
-	stack_chain->ds = ds;
-	stack_chain->cs = cs;
+	stack_chain->data = ds;
+	stack_chain->call = cs;
 }
 
 /* called on entry into a compiled callback */
@@ -45,12 +45,14 @@ void nest_stacks(void)
 	- Factor callback returns
 	- C function restores registers
 	- C function returns to Factor code */
-	new_stacks->ds_save = ds;
-	new_stacks->cs_save = cs;
+	new_stacks->data_save = ds;
+	new_stacks->call_save = cs;
 
 	new_stacks->callframe = callframe;
-	new_stacks->ds_region = alloc_bounded_block(ds_size);
-	new_stacks->cs_region = alloc_bounded_block(cs_size);
+	new_stacks->catch_save = userenv[CATCHSTACK_ENV];
+
+	new_stacks->data_region = alloc_bounded_block(ds_size);
+	new_stacks->call_region = alloc_bounded_block(cs_size);
 	new_stacks->next = stack_chain;
 	stack_chain = new_stacks;
 	callframe = F;
@@ -61,13 +63,15 @@ void nest_stacks(void)
 /* called when leaving a compiled callback */
 void unnest_stacks(void)
 {
-	dealloc_bounded_block(stack_chain->ds_region);
-	dealloc_bounded_block(stack_chain->cs_region);
+	dealloc_bounded_block(stack_chain->data_region);
+	dealloc_bounded_block(stack_chain->call_region);
 
-	ds = stack_chain->ds_save;
-	cs = stack_chain->cs_save;
+	ds = stack_chain->data_save;
+	cs = stack_chain->call_save;
 
 	callframe = stack_chain->callframe;
+	userenv[CATCHSTACK_ENV] = stack_chain->catch_save;
+
 	stack_chain = stack_chain->next;
 }
 

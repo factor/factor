@@ -7,14 +7,14 @@ void platform_run()
 {
 	for(;;)
 	{
-		SETJMP(toplevel);
+		SETJMP(stack_chain->toplevel);
 		handle_error();
 NS_DURING
-		run(false);
+		run();
 		NS_VOIDRETURN;
 NS_HANDLER
         	general_error(ERROR_OBJECTIVE_C,
-			tag_object(make_alien(F,localException)),
+			tag_object(make_alien(F,(CELL)localException)),
 			true);
 NS_ENDHANDLER
 	}

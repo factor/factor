@@ -31,16 +31,10 @@ void handle_error(void)
 	}
 }
 
-void run(bool handle_errors)
+void run(void)
 {
 	CELL next;
 
-	if(handle_errors)
-	{
-		SETJMP(toplevel);
-		handle_error();
-	}
-	
 	for(;;)
 	{
 		if(callframe == F)
@@ -74,14 +68,16 @@ void run(bool handle_errors)
 
 void run_toplevel(void)
 {
-	run(true);
+	SETJMP(stack_chain->toplevel);
+	handle_error();
+	run();
 }
 
 /* Called by compiled callbacks after nest_stacks() and boxing registers */
 void run_callback(CELL quot)
 {
 	call(quot);
-	run(false);
+	platform_run();
 }
 
 /* XT of deferred words */
