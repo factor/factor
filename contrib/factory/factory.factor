@@ -1,6 +1,6 @@
-USING: kernel namespaces generic math sequences hashtables io arrays words
-       prettyprint lists concurrency rectangle
-       xlib x concurrent-widgets simple-error-handler ;
+USING: kernel alien compiler namespaces generic math sequences hashtables io
+arrays words prettyprint lists concurrency
+process rectangle xlib x concurrent-widgets ;
 
 IN: factory
 
@@ -579,9 +579,16 @@ SYMBOL: window-list
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
+: xlib-error-handler ( -- xt ) "void" { "Display*" "XErrorEvent*" }
+[ "X11 : error-handler called" print flush ] alien-callback ; compiled
+
+: install-error-handler ( -- ) xlib-error-handler XSetErrorHandler drop ;
+
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
 : start-factory ( dpy-string -- )
   initialize-x
-  SetSimpleErrorHandler
+  install-error-handler
   root get [ make-drag-gc ] with-win drag-gc set
   root get [ black-pixel get set-window-background clear-window ] with-win
   root get create-wm-root
