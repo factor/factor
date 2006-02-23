@@ -193,7 +193,7 @@ M: promised-label set-label-color set-promised-label-color ;
 M: promised-label set-label-font set-promised-label-font ;
 
 : fib ( n -- n )
-  yield dup 2 < [ drop 1 ] [ dup 1 - fib swap 2 - fib + ] if ;
+  1 sleep dup 2 < [ drop 1 ] [ dup 1 - fib swap 2 - fib + ] if ;
   
 : test-promise-ui ( -- )
-  <promise> dup <promised-label> gadget. [ 30 fib unparse swap fulfill ] cons spawn drop ;
+  <promise> dup <promised-label> gadget. [ 15 fib unparse swap fulfill ] cons spawn drop ;
