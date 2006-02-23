@@ -83,7 +83,7 @@ drag-gc get [ (draw-move-outline) ] with-gcontext ;
 : drag-move-window ( -- )
 [ draw-move-outline ] drag-mouse swap v- window-position v+ move-window ;
 
-: drag-move-window% [ drag-move-window ] with-window-object ;
+: drag-move-window% [ drag-move-window raise-window ] with-window-object ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
