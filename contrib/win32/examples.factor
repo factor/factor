@@ -1,5 +1,6 @@
 IN: win32
-USING: alien namespaces math io prettyprint kernel ;
+USING: alien namespaces math io prettyprint kernel words ;
+USING: inspector ;
 
 SYMBOL: hInst
 SYMBOL: wc
@@ -12,23 +13,38 @@ SYMBOL: className "SimpleWindowClass" className set
 ! : message-loop ( -- )
     ! message-loop ;
 
-: app2
-    f GetModuleHandle hInst set
-    <WNDCLASSEX>
+: wndproc ( hwnd uMsg wParam lParam -- lresult )
+    "uint" { "void*" "uint" "long" "long" } [
+        pick WM_DESTROY = [
+            3drop drop
+            f PostQuitMessage 0
+        ] [
+            DefWindowProc
+        ] if 
+     ] alien-callback ;
+
+: register-wndclassex ( name wndproc -- )
+    "WNDCLASSEX" <c-object>
     "WNDCLASSEX" c-size over set-WNDCLASSEX-cbSize
     CS_HREDRAW CS_VREDRAW bitor over set-WNDCLASSEX-style
-    ! [ event-loop ] over set-WNDCLASSEX-lpfnWndProc
+    >r execute r> [ set-WNDCLASSEX-lpfnWndProc ] keep
     0 over set-WNDCLASSEX-cbClsExtra
     0 over set-WNDCLASSEX-cbWndExtra
     hInst get over set-WNDCLASSEX-hInstance
-    COLOR_WINDOW 1 + over set-WNDCLASSEX-hbrBackground
-    f over set-WNDCLASSEX-lpszMenuName
-    className get over set-WNDCLASSEX-lpszClassName
-    ! ! f IDI_APPLICATION LoadIcon over [ set-WNDCLASSEX-hIcon ] keep set-WNDCLASSEX-hIconSm
-    ! f IDC_ARROW LoadCursor over set-WNDCLASSEX-hCursor
+    ! COLOR_WINDOW 1+ GetSysColorBrush over set-WNDCLASSEX-hbrBackground
+    ! "" over set-WNDCLASSEX-lpszMenuName
+    ! [ set-WNDCLASSEX-lpszClassName ] keep
+    f IDI_APPLICATION LoadIcon over [ set-WNDCLASSEX-hIcon ] 2keep
+        set-WNDCLASSEX-hIconSm
+    f IDC_ARROW LoadCursor over set-WNDCLASSEX-hCursor
     ! RegisterClassEx
-    
-    ! 0 className get "Second Application" WS_OVERLAPPEDWINDOW CW_USEDEFAULT CW_USEDEFAULT CW_USEDEFAULT CW_USEDEFAULT f f hInst get f ! CreateWindowEx
+    ;
+
+: app2
+    f GetModuleHandle hInst set
+    "App2" \ wndproc register-wndclassex
+
+    ! 0 className get "Second Application" WS_OVERLAPPEDWINDOW CW_USEDEFAULT CW_USEDEFAULT CW_USEDEFAULT CW_USEDEFAULT f f hInst get f CreateWindowEx
     
     ! dup SW_SHOWDEFAULT ShowWindow
     ! dup UpdateWindow

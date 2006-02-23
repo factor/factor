@@ -185,6 +185,13 @@ TYPEDEF: void* MSGBOXPARAMSW
 : CF_GDIOBJLAST HEX: 3FF ; inline
 
 
+: WM_NULL                         0 ; inline
+: WM_CREATE                       1 ; inline
+: WM_DESTROY                      2 ; inline
+: WM_MOVE                         3 ; inline
+: WM_SIZE                         5 ; inline
+: WM_ACTIVATE                     6 ; inline
+
 
 
 
@@ -374,8 +381,9 @@ FUNCTION: HWND CreateWindowExW (
 ! FUNCTION: DefMDIChildProcA
 ! FUNCTION: DefMDIChildProcW
 ! FUNCTION: DefRawInputProc
-! FUNCTION: DefWindowProcA
-! FUNCTION: DefWindowProcW
+FUNCTION: LRESULT DefWindowProcA ( HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam ) ;
+FUNCTION: LRESULT DefWindowProcW ( HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam ) ;
+: DefWindowProc \ DefWindowProcW \ DefWindowProcA unicode-exec ;
 ! FUNCTION: DeleteMenu
 ! FUNCTION: DeregisterShellHookWindow
 ! FUNCTION: DestroyAcceleratorTable
@@ -586,7 +594,7 @@ FUNCTION: int GetPriorityClipboardFormat ( UINT* paFormatPriorityList, int cForm
 ! FUNCTION: GetShellWindow
 ! FUNCTION: GetSubMenu
 ! FUNCTION: GetSysColor
-! FUNCTION: GetSysColorBrush
+FUNCTION: HBRUSH GetSysColorBrush ( int nIndex ) ;
 ! FUNCTION: GetSystemMenu
 ! FUNCTION: GetSystemMetrics
 ! FUNCTION: GetTabbedTextExtentA
@@ -687,12 +695,16 @@ FUNCTION: BOOL IsZoomed ( HWND hWnd ) ;
 ! FUNCTION: LoadCursorFromFileW
 
 
-FUNCTION: HCURSOR LoadCursorA ( HINSTANCE hInstance, LPCTSTR lpCursorName ) ;
-FUNCTION: HCURSOR LoadCursorW ( HINSTANCE hInstance, LPCWSTR lpCursorName ) ;
+! FUNCTION: HCURSOR LoadCursorA ( HINSTANCE hInstance, LPCTSTR lpCursorName ) ;
+! FUNCTION: HCURSOR LoadCursorW ( HINSTANCE hInstance, LPCWSTR lpCursorName ) ;
+FUNCTION: HCURSOR LoadCursorA ( HINSTANCE hInstance, ushort lpCursorName ) ;
+FUNCTION: HCURSOR LoadCursorW ( HINSTANCE hInstance, ushort lpCursorName ) ;
 : LoadCursor \ LoadCursorW \ LoadCursorA unicode-exec ;
 
-FUNCTION: HICON LoadIconA ( HINSTANCE hInstance, LPCTSTR lpIconName ) ;
-FUNCTION: HICON LoadIconW ( HINSTANCE hInstance, LPCTSTR lpIconName ) ;
+! FUNCTION: HICON LoadIconA ( HINSTANCE hInstance, LPCTSTR lpIconName ) ;
+! FUNCTION: HICON LoadIconW ( HINSTANCE hInstance, LPCWSTR lpIconName ) ;
+FUNCTION: HICON LoadIconA ( HINSTANCE hInstance, ushort lpIconName ) ;
+FUNCTION: HICON LoadIconW ( HINSTANCE hInstance, ushort lpIconName ) ;
 : LoadIcon \ LoadIconW \ LoadIconA unicode-exec ;
 
 ! FUNCTION: LoadImageA
@@ -821,7 +833,7 @@ FUNCTION: BOOL OpenClipboard ( HWND hWndNewOwner ) ;
 ! FUNCTION: PeekMessageW
 ! FUNCTION: PostMessageA
 ! FUNCTION: PostMessageW
-! FUNCTION: PostQuitMessage
+FUNCTION: void PostQuitMessage ( int nExitCode ) ;
 ! FUNCTION: PostThreadMessageA
 ! FUNCTION: PostThreadMessageW
 ! FUNCTION: PrintWindow

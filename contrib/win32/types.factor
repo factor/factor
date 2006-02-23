@@ -273,8 +273,11 @@ BEGIN-STRUCT: WNDCLASSEX
     FIELD: int cbClsExtra
     FIELD: int cbWndExtra
     FIELD: HINSTANCE hInstance
-    FIELD: HICON hIcon
-    FIELD: HCURSOR hCursor
+    ! FIELD: HICON hIcon
+    FIELD: ushort* hIcon
+    ! FIELD: HCURSOR hCursor
+    FIELD: ushort* hCursor
+    ! FIELD: HBRUSH hbrBackground
     FIELD: HBRUSH hbrBackground
     FIELD: LPCTSTR lpszMenuName
     FIELD: LPCTSTR lpszClassName
