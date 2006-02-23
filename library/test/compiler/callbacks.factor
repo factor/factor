@@ -46,12 +46,12 @@ FUNCTION: void callback_test_1 void* callback ; compiled
 : callback-6
     "void" { } [ [ continue ] callcc0 ] alien-callback ; compiled
 
-[ ] [ callback-6 callback_test_1 ] unit-test
+[ 1 2 3 ] [ callback-6 callback_test_1 1 2 3 ] unit-test
 
 : callback-7
     "void" { } [ yield "hi" print flush yield ] alien-callback ; compiled
 
-[ ] [ callback-7 callback_test_1 ] unit-test
+[ 1 2 3 ] [ callback-7 callback_test_1 1 2 3 ] unit-test
 
 : callback-8
     "void" { "int" "int" } [ / "x" set ] alien-callback ;

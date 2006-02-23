@@ -28,7 +28,6 @@ void save_stacks(void)
 {
 	stack_chain->ds = ds;
 	stack_chain->cs = cs;
-	stack_chain->callframe = F;
 }
 
 /* called on entry into a compiled callback */

@@ -4,6 +4,7 @@
   - we need to unwind the stacks to the level where the exception handler
     was set
 - "localhost" 50 <client> won't fail
+- compiled gc check slows things down
 
 + portability:
 
