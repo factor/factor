@@ -110,28 +110,26 @@ TUPLE: indirect base index scale displacement ;
     #! quirks.
     dup canonicalize-EBP canonicalize-ESP ;
 
-: set-indirect-index/scale ( { index scale } indirect -- )
-    over first over set-indirect-index
-    swap second swap set-indirect-scale ;
+C: indirect ( base index scale displacement -- indirect )
+    [ set-indirect-displacement ] keep
+    [ set-indirect-scale ] keep
+    [ set-indirect-index ] keep
+    [ set-indirect-base ] keep
+    dup canonicalize ;
 
-C: indirect ( spec -- indirect )
-    swap [
-        {
-            { [ dup integer? ] [ over set-indirect-displacement ] }
-            { [ dup register? ] [ over set-indirect-base ] }
-            { [ dup array? ] [ over set-indirect-index/scale ] }
-        } cond
-    ] each dup canonicalize ;
+: [] ( reg/displacement -- indirect )
+    dup integer? [ >r f f f r> ] [ f f f ] if <indirect> ;
 
-: >operand dup array? [ <indirect> ] when ;
+: [+] ( reg displacement -- indirect )
+    dup integer? [ >r f f r> ] [ f f ] if <indirect> ;
 
 : reg-code "register" word-prop 7 bitand ;
 
-: indirect-base*
-    indirect-base [ EBP ] unless* reg-code ;
+: indirect-base* indirect-base [ EBP ] unless* reg-code ;
 
-: indirect-index*
-    indirect-index [ ESP ] unless* reg-code ;
+: indirect-index* indirect-index [ ESP ] unless* reg-code ;
+
+: indirect-scale* indirect-scale [ 0 ] unless* ;
 
 GENERIC: sib-present?
 
@@ -159,7 +157,7 @@ M: indirect modifier
         drop BIN: 00
     ] if ;
 
-M: register modifier drop BIN: 10 ;
+M: register modifier drop BIN: 11 ;
 
 : mod-r/m ( reg# indirect -- byte )
     dup modifier 6 shift rot 3 shift
@@ -169,7 +167,7 @@ M: register modifier drop BIN: 10 ;
     dup sib-present? [
         dup indirect-base*
         over indirect-index* 3 shift bitor
-        swap indirect-scale 6 shift bitor
+        swap indirect-scale* 6 shift bitor
     ] [
         drop f
     ] if ;
@@ -233,7 +231,7 @@ UNION: operand register indirect ;
     #! Sets the opcode's direction bit. It is set if the
     #! destination is a direct register operand.
     pick register? [ BIN: 10 bitor swapd ] when
-    >r 2dup t prefix r> assemble-1 register swap addressing ;
+    >r 2dup t prefix r> assemble-1 reg-code swap addressing ;
 
 : from ( addr -- addr )
     #! Relative to after next 32-bit immediate.
@@ -363,7 +361,7 @@ M: operand CMP OCT: 071 2-operand ;
 : 2-operand-sse ( dst src op1 op2 -- )
     pick register-128? [ nip ] [ drop swapd ] if
     >r 2dup t prefix HEX: 0f assemble-1 r>
-    assemble-1 register swap addressing ;
+    assemble-1 reg-code swap addressing ;
 
 : MOVLPD ( dest src -- )
     HEX: 66 assemble-1 HEX: 12 HEX: 13 2-operand-sse ;
