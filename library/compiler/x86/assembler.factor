@@ -142,9 +142,10 @@ M: register sib-present? drop f ;
 GENERIC: r/m
 
 M: indirect r/m ( indirect -- r/m )
-    dup sib-present? [ drop ESP ] [ indirect-base ] if ;
+    dup sib-present?
+    [ drop ESP reg-code ] [ indirect-base* ] if ;
 
-M: register r/m ( reg -- r/m ) ;
+M: register r/m ( reg -- r/m ) reg-code ;
 
 : byte? -128 127 between? ;
 
@@ -160,8 +161,7 @@ M: indirect modifier
 M: register modifier drop BIN: 11 ;
 
 : mod-r/m ( reg# indirect -- byte )
-    dup modifier 6 shift rot 3 shift
-    rot r/m reg-code bitor bitor ;
+    dup modifier 6 shift rot 3 shift rot r/m bitor bitor ;
 
 : sib ( indirect -- byte )
     dup sib-present? [

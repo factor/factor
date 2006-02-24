@@ -2,6 +2,9 @@
 - x86 SIB addressing modes
 - "localhost" 50 <client> won't fail
 - compiled gc check slows things down
+- delegating generic words with a non-standard picker
+  - pass an integer stack pos instead of a quotation
+- yield in a loop starves i/o
 
 + portability:
 
@@ -13,7 +16,6 @@
 - stream server can hang because of exception handler limitations
 - better i/o scheduler
 - out of memory error when printing global namespace
-- yield in a loop starves i/o
 
 + objective C/cocoa:
 
@@ -61,7 +63,5 @@
 
 - code walker & exceptions
 - slice: if sequence or seq start is changed, abstraction violation
-- delegating generic words with a non-standard picker
-  - pass an integer stack pos instead of a quotation
 - make 3.4 bits>double an error
 - colorcoded prettyprinting for vocabularies
