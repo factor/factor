@@ -25,7 +25,7 @@ math math-internals memory namespaces words ;
     ! Compute a result, this time it will fit.
     r> execute
     ! Create a bignum.
-    "s48_long_to_bignum" f 0 output-operand 1array compile-c-call*
+    "s48_long_to_bignum" f 0 output-operand [] compile-c-call*
     ! An untagged pointer to the bignum is now in EAX; tag it
     T{ int-regs } return-reg bignum-tag OR
     "end" get save-xt ; inline
@@ -45,11 +45,11 @@ M: %fixnum* generate-node ( vop -- )
     <label> "end" set
     "end" get JNO
     "s48_fixnum_pair_to_bignum" f
-    1 input-operand remainder-reg 2array compile-c-call*
+    1 input-operand remainder-reg [+] compile-c-call*
     ! now we have to shift it by three bits to remove the second
     ! tag
     "s48_bignum_arithmetic_shift" f
-    1 input-operand tag-bits neg 2array compile-c-call*
+    1 input-operand tag-bits neg [+] compile-c-call*
     ! an untagged pointer to the bignum is now in EAX; tag it
     T{ int-regs } return-reg bignum-tag OR
     "end" get save-xt ;
@@ -79,7 +79,7 @@ M: %fixnum-mod generate-node ( vop -- )
     ! save EDX since its volatile.
     remainder-reg PUSH
     "s48_long_to_bignum" f
-    0 input-operand 1array compile-c-call*
+    0 input-operand [] compile-c-call*
     ! An untagged pointer to the bignum is now in EAX; tag it
     T{ int-regs } return-reg bignum-tag OR
     ! the remainder is now in EDX

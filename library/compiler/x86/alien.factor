@@ -12,23 +12,20 @@ GENERIC: load-return-reg ( stack@ reg-class -- )
 
 M: int-regs push-return-reg drop EAX PUSH ;
 M: int-regs pop-return-reg drop EAX POP ;
-M: int-regs load-return-reg
-    drop ECX ESP MOV  EAX ECX rot 2array MOV ;
+M: int-regs load-return-reg drop EAX ESP rot [+] MOV ;
 
 : FSTP 4 = [ FSTPS ] [ FSTPL ] if ;
 
 M: float-regs push-return-reg
-    ESP swap reg-size [ SUB  { ECX } ] keep ECX ESP MOV FSTP ;
+    ESP swap reg-size [ SUB  ESP [] ] keep FSTP ;
 
 : FLD 4 = [ FLDS ] [ FLDL ] if ;
 
 M: float-regs pop-return-reg
-    ECX ESP MOV
-    { ECX } over reg-size FLD
-    drop-return-reg ;
+    ESP [] over reg-size FLD drop-return-reg ;
 
 M: float-regs load-return-reg
-    reg-size >r ECX ESP MOV  ECX swap 2array r> FLD ;
+    reg-size >r ESP swap [+] r> FLD ;
 
 M: %unbox generate-node
     drop 2 input f compile-c-call  1 input push-return-reg ;

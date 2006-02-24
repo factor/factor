@@ -66,7 +66,7 @@ CELL cs_bot;
 #if defined(FACTOR_PPC)
 	register CELL cards_offset asm("r16");
 #elif defined(FACTOR_AMD64)
-	register CELL cards_offset asm("r16");
+	register CELL cards_offset asm("r13");
 #else
 	CELL cards_offset;
 #endif

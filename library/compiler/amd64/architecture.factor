@@ -6,9 +6,9 @@ kernel-internals math namespaces sequences ;
 
 ! AMD64 register assignments
 ! RAX RCX RDX RSI RDI R8 R9 R10 R11 vregs
+! R13 cards_offset
 ! R14 datastack
 ! R15 callstack
-! R16 cards_offset
 
 : fixnum-imm? ( -- ? )
     #! Can fixnum operations take immediate operands?
@@ -51,7 +51,7 @@ M: float-regs fastcall-regs
 : load-indirect ( dest literal -- )
     #! We use RIP-relative addressing. The '3' is a hardcoded
     #! instruction length.
-    add-literal from 3 - 1array MOV ; inline
+    add-literal from 3 - [] MOV ; inline
 
 : stack-increment \ stack-reserve get 16 align 8 + ;
 

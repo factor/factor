@@ -8,7 +8,7 @@ GENERIC: freg>stack ( stack reg reg-class -- )
 
 GENERIC: stack>freg ( stack reg reg-class -- )
 
-: stack@ R10 RSP MOV  R10 swap 2array ;
+: stack@ RSP swap [+] ;
 
 M: int-regs freg>stack drop >r stack@ r> MOV ;
 

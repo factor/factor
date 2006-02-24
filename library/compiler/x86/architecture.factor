@@ -45,4 +45,4 @@ M: float-regs fastcall-regs drop { } ;
 : compile-epilogue ; inline
 
 : load-indirect ( dest literal -- )
-    add-literal 1array MOV rel-absolute-cell rel-address ; inline
+    add-literal [] MOV rel-absolute-cell rel-address ; inline
