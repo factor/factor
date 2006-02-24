@@ -5,6 +5,7 @@
 - delegating generic words with a non-standard picker
   - pass an integer stack pos instead of a quotation
 - yield in a loop starves i/o
+- factoring out the callback quotation
 
 + portability:
 

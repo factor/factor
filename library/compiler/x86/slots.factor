@@ -22,8 +22,14 @@ M: %write-barrier generate-node ( vop -- )
     #! Mark the card pointed to by vreg.
     drop
     0 input-operand card-bits SHR
-    0 input-operand card-offset [+] card-mark OR
-    rel-absolute-cell rel-cards ;
+    0 scratch card-offset MOV rel-absolute-cell rel-cards
+    0 scratch 0 input-operand ADD
+    0 scratch [] card-mark OR ;
+
+!    drop
+!    0 input-operand card-bits SHR
+!    0 input-operand card-offset [+] card-mark OR
+!    rel-absolute-cell rel-cards ;
 
 M: %set-slot generate-node ( vop -- )
     drop
