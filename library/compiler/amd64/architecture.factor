@@ -8,6 +8,7 @@ kernel-internals math namespaces sequences ;
 ! RAX RCX RDX RSI RDI R8 R9 R10 R11 vregs
 ! R14 datastack
 ! R15 callstack
+! R16 cards_offset
 
 : fixnum-imm? ( -- ? )
     #! Can fixnum operations take immediate operands?

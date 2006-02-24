@@ -1,5 +1,5 @@
-! Copyright (C) 2005 Slava Pestov.
-! See http://factor.sf.net/license.txt for BSD license.
+! Copyright (C) 2006 Slava Pestov.
+! See http://factorcode.org/license.txt for BSD license.
 IN: compiler-backend
 USING: alien arrays assembler compiler inference kernel
 kernel-internals lists math memory namespaces sequences words ;
@@ -19,16 +19,11 @@ M: %fast-slot generate-node ( vop -- )
 : card-offset 1 getenv ; inline
 
 M: %write-barrier generate-node ( vop -- )
-    #! Mark the card pointed to by vreg. This could be a tad
-    #! shorter on x86 (use indirect addressing instead of a
-    #! scratch register) however on AMD64, you cannot do this
-    #! with a 64-bit immediate. So we avoid code duplication by
-    #! sacrificing a few bytes of generated code size.
+    #! Mark the card pointed to by vreg.
     drop
     0 input-operand card-bits SHR
-    0 scratch card-offset MOV rel-absolute-cell rel-cards
-    0 scratch 0 input-operand ADD
-    0 scratch 1array card-mark OR ;
+    0 input-operand card-offset 2array card-mark OR
+    rel-absolute-cell rel-cards ;
 
 M: %set-slot generate-node ( vop -- )
     drop

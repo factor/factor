@@ -304,11 +304,11 @@ vectors words ;
             [ dup "amd64" = ] [
                 {
                     "/library/compiler/x86/assembler.factor"
-                    "/library/compiler/amd64/assembler.factor"
                     "/library/compiler/amd64/architecture.factor"
                     "/library/compiler/x86/generator.factor"
                     "/library/compiler/amd64/generator.factor"
                     "/library/compiler/x86/slots.factor"
+                    "/library/compiler/amd64/slots.factor"
                     "/library/compiler/x86/stack.factor"
                     "/library/compiler/x86/fixnum.factor"
                     "/library/compiler/amd64/alien.factor"

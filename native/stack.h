@@ -15,6 +15,8 @@ typedef struct _STACKS {
 	CELL callframe;
 	/* saved catchstack on entry to callback */
 	CELL catch_save;
+	/* saved cards_offset register on entry to callback */
+	CELL cards_offset;
 	/* error handler longjmp buffer */
 	JMP_BUF toplevel;
 

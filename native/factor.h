@@ -63,6 +63,14 @@ CELL cs_bot;
 	CELL cs;
 #endif
 
+#if defined(FACTOR_PPC)
+	register CELL cards_offset asm("r16");
+#elif defined(FACTOR_AMD64)
+	register CELL cards_offset asm("r16");
+#else
+	CELL cards_offset;
+#endif
+
 /* TAGGED currently executing quotation */
 CELL callframe;
 

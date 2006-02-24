@@ -43,12 +43,6 @@ INLINE u8 card_base(CARD c)
 	return c & CARD_BASE_MASK;
 }
 
-#ifdef FACTOR_PPC
-	register CELL cards_offset asm("r16");
-#else
-	CELL cards_offset;
-#endif
-
 #define ADDR_TO_CARD(a) (CARD*)(((CELL)a >> CARD_BITS) + cards_offset)
 #define CARD_TO_ADDR(c) (CELL*)(((CELL)c - cards_offset)<<CARD_BITS)
 

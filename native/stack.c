@@ -47,6 +47,7 @@ void nest_stacks(void)
 	- C function returns to Factor code */
 	new_stacks->data_save = ds;
 	new_stacks->call_save = cs;
+	new_stacks->cards_offset = cards_offset;
 
 	new_stacks->callframe = callframe;
 	new_stacks->catch_save = userenv[CATCHSTACK_ENV];
@@ -68,6 +69,7 @@ void unnest_stacks(void)
 
 	ds = stack_chain->data_save;
 	cs = stack_chain->call_save;
+	cards_offset = stack_chain->cards_offset;
 
 	callframe = stack_chain->callframe;
 	userenv[CATCHSTACK_ENV] = stack_chain->catch_save;
