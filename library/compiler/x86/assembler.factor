@@ -206,7 +206,7 @@ UNION: operand register indirect ;
 : short-operand ( reg rex.w n -- )
     #! Some instructions encode their single operand as part of
     #! the opcode.
-    >r dupd prefix-1 register r> + assemble-1 ;
+    >r dupd prefix-1 reg-code r> + assemble-1 ;
 
 : 1-operand ( op reg rex.w opcode -- )
     #! The 'reg' is not really a register, but a value for the
