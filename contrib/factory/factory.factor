@@ -558,15 +558,15 @@ SYMBOL: window-list
 : not-transient? ( frame -- ? ) wm-frame-child get-transient-for-hint% not ;
 
 : add-window-to-list ( window-list frame -- window-list )
-  dup					! window-list frame frame
-  wm-frame-child			! window-list frame child
-  fetch-name%				! window-list frame name-or-f
-  dup					! window-list frame name-or-f name-or-f
+  dup				! window-list frame frame
+  wm-frame-child		! window-list frame child
+  fetch-name%			! window-list frame name-or-f
+  dup				! window-list frame name-or-f name-or-f
   [ ] [ drop "*untitled*" ] if	! window-list frame name
-  swap					! window-list name frame
-  [ map-window% ]			! window-list name frame [ map-window% ]
-  cons					! window-list name action
-  pick					! window-list name action window-list
+  swap				! window-list name frame
+  [ map-window% ]		! window-list name frame [ map-window% ]
+  cons				! window-list name action
+  pick				! window-list name action window-list
   add-popup-menu-item ;
 
 : refresh-window-list ( window-list -- )
