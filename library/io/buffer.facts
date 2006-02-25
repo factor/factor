@@ -63,7 +63,7 @@ HELP: buffer-empty? "( buffer -- ? )"
 { $values { "buffer" "a buffer" } { "?" "a boolean" } }
 { $description "Tests if the buffer contains no more data to be read." } ;
 
-HELP: buffer-extend "( n buffer -- )"
+HELP: extend-buffer "( n buffer -- )"
 { $values { "n" "a non-negative integer" } { "buffer" "a buffer" } }
 { $description "Grows a buffer to fit " { $snippet "n" } " bytes of data." } ;
 
