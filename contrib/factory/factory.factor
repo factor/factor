@@ -591,16 +591,9 @@ SYMBOL: window-list
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-: xlib-error-handler ( -- xt ) "void" { "Display*" "XErrorEvent*" }
-[ "X11 : error-handler called" print flush ] alien-callback ; compiled
-
-: install-error-handler ( -- ) xlib-error-handler XSetErrorHandler drop ;
-
-! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-
 : start-factory ( dpy-string -- )
   initialize-x
-  install-error-handler
+  [ "X11 : error-handler called" print flush ] set-error-handler
   root get [ make-drag-gc ] with-win drag-gc set
   root get [ black-pixel get set-window-background clear-window ] with-win
   root get create-wm-root
