@@ -5,11 +5,12 @@ HELP: define-typecheck "( class generic quot -- )"
 { $description
     "Defines a generic word with the " { $link simple-combination } " and having one method on " { $snippet "class" } "."
     $terpri
-    "Analogous to the following code:"
+    "This creates a definition analogous to the following code:"
     { $code
         "GENERIC: generic"
         "M: class generic quot ;"
     }
+    "It checks if the top of the stack is an instance of " { $snippet "class" } ", and if so, executes the quotation. Delegation is respected."
 }
 { $notes "This word is used internally to wrap low-level code that does not do type-checking in safe user-visible words." } ;
 

@@ -247,3 +247,10 @@ GENERIC: void-generic
 : breakage "hi" void-generic ;
 [ ] [ \ breakage compile ] unit-test
 [ breakage ] unit-test-fails
+
+! regression
+: test-0 dup 0 = [ drop ] [ 1- test-0 ] if ; inline
+: test-1 t [ test-0 ] [ delegate dup [ test-1 ] [ drop ] if ] if ; inline
+: test-2 5 test-1 ; compiled
+
+[ f ] [ f test-2 ] unit-test

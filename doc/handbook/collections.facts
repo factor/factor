@@ -167,6 +167,6 @@ $terpri
 { $subsection buffer>> }
 { $subsection buffer-contents }
 "Writing to the buffer:"
-{ $subsection buffer-extend }
+{ $subsection extend-buffer }
 { $subsection ch>buffer }
 { $subsection >buffer } ;

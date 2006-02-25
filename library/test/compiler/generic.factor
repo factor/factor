@@ -5,6 +5,8 @@ USE: test
 USE: math
 USE: kernel
 USE: words
+USE: arrays
+USE: sequences
 
 GENERIC: single-combination-test
 
@@ -37,11 +39,11 @@ M: f single-combination-test-2 single-combination-test-4 ;
 
 GENERIC: broken-generic
 
-M: fixnum broken-generic 1.0 * broken-generic ;
-M: float broken-generic neg ;
+M: fixnum broken-generic 1array broken-generic ;
+M: array broken-generic first neg ;
 
 : broken-partial-eval 5 broken-generic ;
 
 \ broken-partial-eval compile
 
-[ -5.0 ] [ broken-partial-eval ] unit-test
+[ -5 ] [ broken-partial-eval ] unit-test
