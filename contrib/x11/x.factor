@@ -1,5 +1,6 @@
+USING: namespaces kernel compiler math arrays strings alien sequences
+xlib rectangle ;
 
-USING: namespaces kernel math arrays strings alien sequences xlib rectangle ;
 IN: x 
 
 SYMBOL: dpy
@@ -237,6 +238,16 @@ dpy get "XEvent" <c-object> dup >r XNextEvent drop r> ;
   >r dpy get r> "XEvent" <c-object> dup >r XMaskEvent drop r> ;
 
 : events-queued ( mode -- n ) >r dpy get r> XEventsQueued ;
+
+! 11.8 - Handling Protocol Errors
+
+SYMBOL: error-handler-quot
+
+: error-handler-callback ( -- xt ) "void" { "Display*" "XErrorEvent*" }
+[ error-handler-quot get call ] alien-callback ; compiled
+
+: set-error-handler ( quot -- )
+error-handler-quot set error-handler-callback XSetErrorHandler drop ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 ! 12 - Input Device Functions
