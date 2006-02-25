@@ -1,45 +1,24 @@
-USING: generic help ;
+USING: generic help sequences ;
 
-HELP: standard-combination "( word picker -- quot )"
-{ $values { "word" "a generic word" } { "picker" "a quotation with stack effect " { $snippet "( -- obj )" } } { "quot" "a new quotation" } }
+HELP: standard-combination "( word dispatch# -- quot )"
+{ $values { "word" "a generic word" } { "dispatch#" "a dispatch position" } { "quot" "a new quotation" } }
 { $description
-    "Performs standard method combination:"
-    { $list
-        "the word dispatches on the object produced by the picker,"
-        "only the method with most specific class is invoked."
-    }
-    "There is an additional feature if the picker is " { $snippet "[ dup ]" } ":"
-    { $list
-        "if no suitable method is found, the generic word is called on the object's delegate."
-    }
+    "Performs standard method combination."
+    "Generic words using the standard method combination dispatch on the class of the object at the given stack position, where 0 is the top of the stack, 1 is the object underneath, and 2 is the next one under that. If no suitable method is defined on the class of the dispatch object, the generic word is called on the dispatch object's delegate. If the delegate is " { $link f } ", an exception is thrown."
 }
 { $examples
-    "A generic word for append strings and characters to a sequence, dispatching on the second stack element:"
+    "A generic word for append strings and characters to a sequence, dispatching on the object underneath the top of the stack:"
     { $code
-        "G: build-string [ over ] standard-combination ;"
+        "G: build-string 1 standard-combination ;"
         "M: string build-string swap nappend ;"
         "M: integer build-string push ;"
     }
 }
-{ $see-also POSTPONE: G: define-generic* } ;
-
-HELP: simple-combination "( word -- quot )"
-{ $values { "word" "a generic word" } { "quot" "a new quotation" } }
-{ $description
-    "Performs standard method combination with " { $snippet "[ dup ]" } " as the picker quotation. That is,"
-    { $list
-        "the word dispatches on the top of the stack,"
-        "only the method with most specific class is invoked,"
-        "if no suitable method is found, the generic word is called on the object's delegate."
-    }
-}
-{ $examples "Most generic words in the standard library use this method combination." }
-{ $see-also POSTPONE: GENERIC: define-generic } ;
+{ $notes "The " { $link POSTPONE: GENERIC: } " parsing word defines generic words using the standard method combination with dispatch position 0." }
+{ $examples "Most generic words in the standard library use this method combination with a dispatch position of 0. A handful of combinators such as " { $link each } " dispatch on position 1, since position 0 (the top of the stack) is a quotation." }
+{ $see-also POSTPONE: GENERIC: define-generic POSTPONE: G: define-generic* } ;
 
 HELP: define-generic "( word -- )"
 { $values { "word" "a word" } }
-{ $description "Defines a generic word with the " { $link simple-combination } " method combination. If the word is already a generic word, existing methods are retained." }
+{ $description "Defines a generic word with the " { $link standard-combination } " method combination, and a dispatch position of 0." }
 { $see-also POSTPONE: GENERIC: define-generic* } ;
-
-HELP: simple-generic f
-{ $description "The class of generic words with the " { $link simple-combination } ". They are typically defined by the " { $link POSTPONE: GENERIC: } " parsing word." } ;

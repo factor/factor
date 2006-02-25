@@ -3,7 +3,7 @@ USING: generic help ;
 HELP: define-typecheck "( class generic quot -- )"
 { $values { "class" "a class word" } { "generic" "a generic word" } { "quot" "a quotation" } }
 { $description
-    "Defines a generic word with the " { $link simple-combination } " and having one method on " { $snippet "class" } "."
+    "Defines a generic word with the " { $link standard-combination } " using dispatch position 0, and having one method on " { $snippet "class" } "."
     $terpri
     "This creates a definition analogous to the following code:"
     { $code

@@ -62,7 +62,7 @@ sequences strings vectors words ;
     ] each-object nip ; inline
 
 G: each-slot ( obj quot -- )
-    [ over ] standard-combination ; inline
+    1 standard-combination ; inline
 
 M: array each-slot ( array quot -- ) each ;
 

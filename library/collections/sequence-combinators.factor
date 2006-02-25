@@ -40,7 +40,7 @@ vectors ;
 IN: sequences
 
 G: each ( seq quot -- | quot: elt -- )
-    [ over ] standard-combination ; inline
+    1 standard-combination ; inline
 
 M: object each ( seq quot -- )
     swap dup length [
@@ -54,12 +54,12 @@ M: object each ( seq quot -- )
     swapd each ; inline
 
 G: find ( seq quot -- i elt | quot: elt -- ? )
-    [ over ] standard-combination ; inline
+    1 standard-combination ; inline
 
 : find-with ( obj seq quot -- i elt | quot: elt -- ? )
     swap [ with rot ] find 2swap 2drop ; inline
 
-G: map [ over ] standard-combination ; inline
+G: map 1 standard-combination ; inline
 
 M: object map ( seq quot -- seq )
     swap [ dup length [ (map) ] collect ] keep like 2nip ;

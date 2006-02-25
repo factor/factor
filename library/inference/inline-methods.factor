@@ -10,7 +10,7 @@ GENERIC: dispatching-values ( node word -- seq )
 
 M: object dispatching-values 2drop { } ;
 
-M: simple-generic dispatching-values drop node-in-d peek 1array ;
+! M: simple-generic dispatching-values drop node-in-d peek 1array ;
 
 M: 2generic dispatching-values drop node-in-d 2 swap tail* ;
 

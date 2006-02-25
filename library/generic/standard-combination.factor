@@ -2,21 +2,26 @@ IN: generic
 USING: arrays errors hashtables kernel kernel-internals lists
 math namespaces sequences vectors words ;
 
-: error-method ( picker word -- method )
-    [ no-method ] curry append ;
+: picker ( dispatch# -- quot )
+    { [ dup ] [ over ] [ pick ] } nth ;
 
-: empty-method ( picker word -- method )
-    over [ dup ] = [
-        [
-            [ dup delegate ] % dup unit , error-method , \ ?if ,
-        ] [ ] make
-    ] [
-        error-method
-    ] if ;
+: unpicker ( dispatch# -- quot )
+    { [ nip ] [ >r nip r> swap ] [ >r >r nip r> r> -rot ] } nth ;
+
+: error-method ( dispatch# word -- method )
+    >r picker r> [ no-method ] curry append ;
+
+: empty-method ( dispatch# word -- method )
+    [
+        over picker % [ delegate dup ] %
+        over unpicker over add ,
+        [ drop ] -rot error-method append , \ if ,
+    ] [ ] make ;
 
 : class-predicates ( picker assoc -- assoc )
     [
-        first2 >r "predicate" word-prop append r> 2array
+        first2 >r >r picker r> "predicate" word-prop append
+        r> 2array
     ] map-with ;
 
 : sort-methods ( assoc n -- vtable )
@@ -38,22 +43,22 @@ math namespaces sequences vectors words ;
         nip car second [ ]
     ] if ;
 
-: vtable-methods ( picker alist-seq -- alist-seq )
+: vtable-methods ( dispatch# alist-seq -- alist-seq )
     dup length [
         type>class [ swap simplify-alist ] [ car second [ ] ] if*
         >r over r> class-predicates alist>quot
     ] 2map nip ;
 
-: <vtable> ( picker word n -- vtable )
+: <vtable> ( dispatch# word n -- vtable )
     #! n is vtable size; either num-types or num-tags.
     >r 2dup empty-method \ object bootstrap-word swap 2array
     >r methods >list r> swons r> sort-methods vtable-methods ;
 
-: small-generic ( picker word -- def )
+: small-generic ( dispatch# word -- def )
     2dup methods class-predicates >r empty-method r> alist>quot ;
 
-: big-generic ( picker word n dispatcher -- def )
-    [ >r pick % r> , <vtable> , \ dispatch , ] [ ] make ;
+: big-generic ( dispatch# word n dispatcher -- def )
+    [ >r pick picker % r> , <vtable> , \ dispatch , ] [ ] make ;
 
 : tag-generic? ( word -- ? )
     "methods" word-prop hash-keys [ types ] map concat
@@ -62,18 +67,16 @@ math namespaces sequences vectors words ;
 : small-generic? ( word -- ? )
     "methods" word-prop hash-size 3 <= ;
 
-: standard-combination ( word picker -- quot )
+: standard-combination ( word dispatch# -- quot )
     swap {
         { [ dup tag-generic? ] [ num-tags \ tag big-generic ] }
         { [ dup small-generic? ] [ small-generic ] }
         { [ t ] [ num-types \ type big-generic ] }
     } cond ;
 
-: simple-combination ( word -- quot )
-    [ dup ] standard-combination ;
-
 : define-generic ( word -- )
-    [ simple-combination ] define-generic* ;
+    [ 0 standard-combination ] define-generic* ;
 
-PREDICATE: generic simple-generic ( word -- ? )
-    "combination" word-prop [ simple-combination ] = ;
+PREDICATE: generic standard-generic
+    1 swap "combination" word-prop ?nth
+    \ standard-combination eq? ;

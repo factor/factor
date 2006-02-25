@@ -4,7 +4,7 @@ IN: sequences
 USING: generic kernel lists strings sequences-internals ;
 
 G: tree-each* ( obj quot -- | quot: elt -- )
-    [ over ] standard-combination ; inline
+    1 standard-combination ; inline
 
 : tree-each ( obj quot -- | quot: elt -- )
     [ call ] 2keep tree-each* ; inline

@@ -165,7 +165,7 @@ M: number union-containment drop 2 ;
 [ "M: vocabularies unhappy ;" eval ] unit-test-fails
 [ ] [ "GENERIC: unhappy" eval ] unit-test
 
-G: complex-combination [ over ] standard-combination ;
+G: complex-combination 1 standard-combination ;
 M: string complex-combination drop ;
 M: object complex-combination nip ;
 
@@ -197,9 +197,6 @@ TUPLE: delegating ;
 [ T{ shit f } "shit" ] [ T{ shit f } big-generic-test ] unit-test
 [ T{ shit f } "shit" ] [ T{ delegating T{ shit f } } big-generic-test ] unit-test
 
-[ t ] [ \ = simple-generic? ] unit-test
-[ f ] [ \ each simple-generic? ] unit-test
-[ f ] [ \ object simple-generic? ] unit-test
 [ t ] [ \ + 2generic? ] unit-test
 
 [ "SYMBOL: not-a-class C: not-a-class ;" parse ] unit-test-fails
