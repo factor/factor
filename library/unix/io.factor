@@ -58,14 +58,11 @@ TUPLE: port handle error timeout cutoff type sbuf eof? ;
         ] "" make throw
     ] unless 2drop ;
 
-: make-buffer ( n -- buffer/f )
-    dup 0 > [ <buffer> ] [ drop f ] if ;
-
 C: port ( handle buffer -- port )
+    [ set-delegate ] keep
+    [ >r dup init-handle r> set-port-handle ] keep
     [ 0 swap set-port-timeout ] keep
     [ 0 swap set-port-cutoff ] keep
-    [ >r make-buffer r> set-delegate ] keep
-    [ >r dup init-handle r> set-port-handle ] keep
     80 <sbuf> over set-port-sbuf ;
 
 : touch-port ( port -- )
@@ -75,7 +72,7 @@ C: port ( handle buffer -- port )
 M: port set-timeout ( timeout port -- )
     [ set-port-timeout ] keep touch-port ;
 
-: buffered-port 8192 <port> ;
+: buffered-port 8192 <buffer> <port> ;
 
 : >port< dup port-handle swap delegate ;
 

@@ -54,19 +54,12 @@ C: buffer ( size -- buffer )
 
 : buffer-empty? ( buffer -- ? ) buffer-fill zero? ;
 
-: buffer-extend ( length buffer -- )
+: extend-buffer ( length buffer -- )
     2dup buffer-ptr swap realloc check-ptr
     over set-buffer-ptr set-buffer-size ;
 
-: buffer-overflow ( ? quot -- )
-    [ "Buffer overflow" throw ] if ; inline
-
 : check-overflow ( length buffer -- )
-    2dup buffer-capacity > [
-        dup buffer-empty? [ buffer-extend ] buffer-overflow
-    ] [
-        2drop
-    ] if ;
+    2dup buffer-capacity > [ extend-buffer ] [ 2drop ] if ;
 
 : >buffer ( string buffer -- )
     over length over check-overflow
@@ -83,7 +76,7 @@ C: buffer ( size -- buffer )
 
 : n>buffer ( count buffer -- )
     [ buffer-fill + ] keep 
-    [ buffer-bound <= [ ] buffer-overflow ] 2keep
+    [ buffer-bound > [ "Buffer overflow" throw ] when ] 2keep
     set-buffer-fill ;
 
 : buffer-peek ( buffer -- char )

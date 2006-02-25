@@ -1,5 +1,3 @@
-- if two tasks write to a unix stream, the buffer can overflow
-- x86 SIB addressing modes
 - "localhost" 50 <client> won't fail
 - compiled gc check slows things down
 - delegating generic words with a non-standard picker
