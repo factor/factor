@@ -6,8 +6,11 @@ USING: kernel parser sequences words compiler ;
 {
     "common"
     "base64"
+    "barrett"
+    "montgomery"
     "random"
     "miller-rabin"
+    "blum-blum-shub"
     "md5"
     "sha1"
     "rsa"

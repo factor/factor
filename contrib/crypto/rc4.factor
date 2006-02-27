@@ -33,7 +33,6 @@ SYMBOL: l
 
 IN: crypto
 
-
 : rc4 ( key -- )
     [ key set ] keep
     length l set

@@ -1,6 +1,6 @@
+USING: kernel io strings sequences namespaces math parser
+    lists vectors hashtables kernel-internals math-contrib crypto ;
 IN: crypto-internals
-USING: kernel io strings sequences namespaces math prettyprint
-test parser lists vectors hashtables kernel-internals math-contrib crypto ;
 
 ! Implemented according to RFC 3174.
 
@@ -135,17 +135,6 @@ IN: crypto
         drop get-sha1
     ] with-scope ;
 
-: string>sha1str ( string -- sha1str )
-    string>sha1 hex-string ;
-
+: string>sha1str ( string -- sha1str ) string>sha1 hex-string ;
 : stream>sha1 ( stream -- sha1 ) contents string>sha1 ;
-
 : file>sha1 ( file -- sha1 ) <file-reader> stream>sha1 ;
-
-! unit test from the RFC
-: test-sha1 ( -- )
-    [ "a9993e364706816aba3e25717850c26c9cd0d89d" ] [ "abc" string>sha1str ] unit-test
-    [ "84983e441c3bd26ebaae4aa1f95129e5e54670f1" ] [ "abcdbcdecdefdefgefghfghighijhijkijkljklmklmnlmnomnopnopq" string>sha1str ] unit-test
-    ! [ "34aa973cd4c4daa4f61eeb2bdbad27316534016f" ] [ 1000000 CHAR: a fill string>sha1str ] unit-test ! takes a long time...
-    [ "dea356a2cddd90c7a7ecedc5ebb563934f460452" ] [ "0123456701234567012345670123456701234567012345670123456701234567" [ 10 [ dup % ] times ] "" make nip string>sha1str ] unit-test ;
-

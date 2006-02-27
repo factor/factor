@@ -1,21 +1,17 @@
-IN: crypto
 USING: kernel math sequences namespaces errors hashtables words arrays parser
        compiler syntax lists io threads ;
-USE: prettyprint
-USE: inspector
+IN: crypto
+: make-bits ( quot numbits -- n | quot: -- 0/1 )
+    0 -rot [ drop dup call rot 1 shift bitor swap ] each drop ;
 
-: add-bit ( bit integer -- integer )
-    1 shift bitor ;
+: add-bit ( bit integer -- integer ) 1 shift bitor ;
+: append-bits ( inta intb nbits -- int ) swapd shift bitor ;
+: random-bits ( n -- int ) random-int 2 swap ^ random-int ;
+: large-random-bits ( n -- int )
+    #! random number with high bit and low bit enabled (odd)
+    2 swap ^ [ random-int ] keep -1 shift 1 bitor bitor ;
+: next-double ( -- f ) 53 random-bits 9007199254740992 /f ;
 
-: append-bits ( inta intb nbits -- int )
-    swapd shift bitor ;
-
-! varying bit-length random number
-: random-bits ( n -- int )
-    random-int 2 swap ^ random-int ;
-
-: next-double ( -- f )
-    53 random-bits 9007199254740992 /f ;
 
 SYMBOL: last-keyboard
 : crypto-random-int ( numbits -- integer )
@@ -40,41 +36,11 @@ SYMBOL: last-keyboard
             last-keyboard set
         ] each
     ] with-scope ;
-
-IN: crypto-internals
-
-SYMBOL: q
-SYMBOL: m
-! : qm ( integer -- )
-    ! 1 swap - 2 mod dup 0 = [
-        ! 2 / 
-    ! ]
-    ! ;
-
-SYMBOL: test-count
-SYMBOL: num-tests
-! : (create-miller-rabin-prime) ( bitlength --  )
-    ! auto-crypto-random-int qm
     
 IN: crypto
 
-! one in 2 ^ numtests chance of being composite (i believe)
-! : create-miller-rabin-prime ( bitlength numtests -- prime )
-    ! [
-        ! num-tests set
-        ! 0 test-count set
-        ! (create-miller-rabin-prime)
-        ! ! dup -1 = [ create-miller-rabin-prime ] when
-    ! ] with-scope ;
-
-! : numbits ( integer -- n )
-!    dup 0 = [ log2 1+ ] unless ;
-
-: 0count ( integer -- n )
-    0 swap [ 0 = [ 1+ ] when ] each-bit ;
-
-: 1count ( integer -- n )
-    0 swap [ 1 = [ 1+ ] when ] each-bit ;
+: 0count ( integer -- n ) 0 swap [ 0 = [ 1+ ] when ] each-bit ;
+: 1count ( integer -- n ) 0 swap [ 1 = [ 1+ ] when ] each-bit ;
 
 IN: crypto-internals
 SYMBOL: a
@@ -105,8 +71,6 @@ IN: crypto
     HEX: 07 HEX: 87 HEX: 47 HEX: C7 HEX: 27 HEX: A7 HEX: 67 HEX: E7 HEX: 17 HEX: 97 HEX: 57 HEX: D7 HEX: 37 HEX: B7 HEX: 77 HEX: F7 
     HEX: 0F HEX: 8F HEX: 4F HEX: CF HEX: 2F HEX: AF HEX: 6F HEX: EF HEX: 1F HEX: 9F HEX: 5F HEX: DF HEX: 3F HEX: BF HEX: 7F HEX: FF
 } ; inline
-
-! : each-byte
 
 : modular-exp ( a b n -- d )
     n set b set a set 0 c set 1 d set
