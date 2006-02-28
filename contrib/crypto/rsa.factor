@@ -12,7 +12,7 @@ SYMBOL: ee
 TUPLE: rsa e d n ;
 
 ! n bits
-: generate-key-pair ( bitlen -- <rsa> )
+: generate-rsa-keypair ( bitlen -- <rsa> )
     [
         2 /i generate-two-unique-primes [ q set p set ] 2keep [ * n set ] 2keep
         [ 1- ] 2apply * m set

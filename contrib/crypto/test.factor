@@ -31,6 +31,8 @@ USING: kernel math test namespaces crypto ;
 [ 100000000000031 ] [ 100000000000000 next-miller-rabin-prime ] unit-test
 
 
-[ 123456789 ] [ 512 generate-key-pair 123456789 over rsa-encrypt swap rsa-decrypt ] unit-test
+[ 123456789 ] [ 128 generate-rsa-keypair 123456789 over rsa-encrypt swap rsa-decrypt ] unit-test
 
+[ 0 ] [ "" >crc32 ] unit-test
+[ HEX: cbf43926 ] [ "123456789" >crc32 ] unit-test
 
