@@ -137,6 +137,10 @@ TUPLE: %jump ;
 C: %jump make-vop ;
 : %jump label-vop <%jump> ;
 
+TUPLE: %jump-label ;
+C: %jump-label make-vop ;
+: %jump-label label-vop <%jump-label> ;
+
 TUPLE: %call ;
 C: %call make-vop ;
 : %call label-vop <%call> ;

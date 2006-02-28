@@ -20,15 +20,6 @@ GENERIC: live-values* ( node -- seq )
     #! All values that are returned or passed to calls.
     [ live-values* ] node-union ;
 
-GENERIC: returns* ( node -- )
-
-: returns ( node -- seq )
-    #! Trace all control flow paths, build a hash of
-    #! final #return nodes.
-    [ returns* ] { } make ;
-
-M: f returns* drop ;
-
 : kill-set ( node -- hash )
     #! Push a list of literals that may be killed in the IR.
     dup live-values swap literals hash-diff ;
@@ -48,16 +39,12 @@ M: node literals* ( node -- ) drop { } ;
 
 M: node live-values* ( node -- ) node-values ;
 
-M: node returns* ( node -- seq ) node-successor returns* ;
-
 ! #shuffle
 M: #shuffle literals* ( node -- seq )
     dup node-out-d swap node-out-r
     [ [ value? ] subset ] 2apply append ;
 
 ! #return
-M: #return returns* , ;
-
 M: #return live-values* ( node -- seq )
     #! Values returned by local labels can be killed.
     dup node-param [ drop { } ] [ delegate live-values* ] if ;
@@ -80,10 +67,9 @@ M: #label live-values* ( node -- seq )
 ! branching
 UNION: #branch #if #dispatch ;
 
-M: #branch returns* ( node -- ) node-children [ returns* ] each ;
-
 M: #branch live-values* ( node -- )
     #! This assumes that the last element of each branch is a
     #! #return node.
-    dup delegate live-values*
-    >r returns [ node-in-d ] map purge-invariants r> append ;
+    dup delegate live-values* >r
+    node-children [ last-node node-in-d ] map purge-invariants
+    r> append ;

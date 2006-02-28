@@ -2,7 +2,7 @@
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: compiler-frontend
 USING: arrays compiler-backend errors generic hashtables
-inference kernel lists math namespaces prettyprint sequences
+inference kernel math namespaces prettyprint sequences
 strings words ;
 
 : in-1 0 0 %peek-d , ;
@@ -68,10 +68,9 @@ M: #label linearize* ( node -- )
     [ node-param "if-intrinsic" word-prop ] [ drop f ] if ;
 
 : linearize-if ( node label -- )
-    #! Assume the quotation emits a VOP that jumps to the label
-    #! if some condition holds; we linearize the false branch,
-    #! then the label, then the true branch.
-    >r node-children first2 linearize* r> %label , linearize* ;
+    <label> dup >r >r >r dup node-children first2 linearize*
+    r> r> %jump-label , %label , linearize* r> %label ,
+    linearize-next ;
 
 M: #call linearize* ( node -- )
     dup if-intrinsic [
@@ -89,7 +88,7 @@ M: #call-label linearize* ( node -- )
     dup node-param renamed-label linearize-call ;
 
 M: #if linearize* ( node -- )
-    <label> dup in-1  -1 %inc-d , 0 %jump-t , linearize-if ;
+    in-1 -1 %inc-d , <label> dup 0 %jump-t , linearize-if ;
 
 : dispatch-head ( vtable -- label/code )
     #! Output the jump table insn and return a list of
@@ -97,15 +96,18 @@ M: #if linearize* ( node -- )
     in-1
     -1 %inc-d ,
     0 %dispatch ,
-    [ <label> dup %target-label ,  cons ] map ;
+    [ <label> dup %target-label ,  2array ] map ;
 
 : dispatch-body ( label/param -- )
-    [ uncons %label , linearize* ] each ;
+    <label> swap [
+        first2 %label , linearize* dup %jump-label ,
+    ] each %label , ;
 
 M: #dispatch linearize* ( vtable -- )
     #! The parameter is a list of nodes, each one is a branch to
     #! take in case the top of stack has that type.
-    node-children dispatch-head dispatch-body ;
+    dup node-children dispatch-head dispatch-body
+    linearize-next ;
 
 M: #return linearize* ( node -- )
     drop %return , ;

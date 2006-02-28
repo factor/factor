@@ -38,3 +38,7 @@ full-gc
 full-gc
 
 [ "hello world" ] [ indexed-literal-test ] unit-test
+
+: foo dup [ dup [ ] [ ] if drop ] [ drop ] if ; compiled
+
+[ 10 ] [ 10 2 foo ] unit-test

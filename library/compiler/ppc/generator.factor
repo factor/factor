@@ -47,6 +47,9 @@ M: %call generate-node ( vop -- )
 M: %jump generate-node ( vop -- )
     drop compile-epilogue label compile-jump ;
 
+M: %jump-label generate-node ( vop -- )
+    drop label compile-jump ;
+
 M: %jump-t generate-node ( vop -- )
     drop 0 input-operand 0 swap f address CMPI label BNE ;
 

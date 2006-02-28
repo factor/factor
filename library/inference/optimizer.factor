@@ -79,9 +79,9 @@ M: #shuffle optimize-node*  ( node -- node/t )
     over drop-inputs
     [ >r swap node-children nth r> set-node-successor ] keep ;
 
-M: #if optimize-node* ( node -- node )
-    dup static-branch?
-    [ value-literal 0 1 ? static-branch ] [ 2drop t ] if ;
+! M: #if optimize-node* ( node -- node )
+!     dup static-branch?
+!     [ value-literal 0 1 ? static-branch ] [ 2drop t ] if ;
 
 ! #values
 : optimize-fold ( node -- node/t )

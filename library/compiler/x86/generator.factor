@@ -17,6 +17,9 @@ M: %call generate-node ( vop -- )
 M: %jump generate-node ( vop -- )
     drop compile-epilogue (%call) JMP ;
 
+M: %jump-label generate-node ( vop -- )
+    drop label JMP ;
+
 M: %jump-t generate-node ( vop -- )
     drop
     ! Compare input with f

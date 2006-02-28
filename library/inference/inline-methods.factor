@@ -1,5 +1,5 @@
-! Copyright (C) 2004, 2005 Slava Pestov.
-! See http://factor.sf.net/license.txt for BSD license.
+! Copyright (C) 2004, 2006 Slava Pestov.
+! See http://factorcode.org/license.txt for BSD license.
 IN: optimizer
 USING: arrays generic hashtables inference kernel lists math
 namespaces sequences words ;
@@ -10,7 +10,9 @@ GENERIC: dispatching-values ( node word -- seq )
 
 M: object dispatching-values 2drop { } ;
 
-! M: simple-generic dispatching-values drop node-in-d peek 1array ;
+M: standard-generic dispatching-values
+    "combination" word-prop first swap
+    node-in-d reverse-slice nth 1array ;
 
 M: 2generic dispatching-values drop node-in-d 2 swap tail* ;
 

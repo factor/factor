@@ -45,7 +45,7 @@ math math-internals sequences words ;
 
 : flip-branches ( not -- #if )
     #! If a not is followed by an #if, flip branches and
-    #! remove the note.
+    #! remove the not.
     dup flip-subst node-successor dup
     dup node-children first2 swap 2array swap set-node-children ;
 
@@ -167,12 +167,12 @@ SYMBOL: @
     { { @ @ } [ 2drop t ] }
 } define-identities
 
-M: #call optimize-node* ( node -- node/t )
-    {
-        { [ dup partial-eval? ] [ partial-eval ] }
-        { [ dup find-identity nip ] [ apply-identities ] }
-        { [ dup optimizer-hooks ] [ optimize-hooks ] }
-        { [ dup inlining-class ] [ inline-method ] }
-        { [ dup optimize-predicate? ] [ optimize-predicate ] }
-        { [ t ] [ drop t ] }
-    } cond ;
+! M: #call optimize-node* ( node -- node/t )
+!     {
+!         { [ dup partial-eval? ] [ partial-eval ] }
+!         { [ dup find-identity nip ] [ apply-identities ] }
+!         { [ dup optimizer-hooks ] [ optimize-hooks ] }
+!         { [ dup inlining-class ] [ inline-method ] }
+!         { [ dup optimize-predicate? ] [ optimize-predicate ] }
+!         { [ t ] [ drop t ] }
+!     } cond ;

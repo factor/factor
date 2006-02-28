@@ -17,8 +17,8 @@ USING: arrays inference kernel lists sequences words ;
 
 GENERIC: split-node* ( node -- )
 
-: split-node ( node -- )
-    [ dup split-node* node-successor split-node ] when* ;
+: split-node ( node -- ) drop ;
+!    [ dup split-node* node-successor split-node ] when* ;
 
 M: node split-node* ( node -- ) drop ;
 
