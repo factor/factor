@@ -80,7 +80,7 @@ M: string do-write ( str -- )
         out-buffer get >buffer
     ] [
         dup length out-buffer get buffer-size > [
-            dup length out-buffer get buffer-extend do-write
+            dup length out-buffer get extend-buffer do-write
         ] [ flush-output do-write ] if
     ] if ;
 
