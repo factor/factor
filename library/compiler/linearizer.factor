@@ -4,32 +4,6 @@ USING: arrays compiler-backend hashtables inference kernel
 namespaces sequences words ;
 IN: compiler-frontend
 
-SYMBOL: node-stack
-
-: >node node-stack get push ;
-: node> node-stack get pop ;
-: node@ node-stack get peek ;
-
-DEFER: iterate-nodes
-
-: iterate-children ( quot -- )
-    node@ node-children [ swap iterate-nodes ] each ;
-
-: iterate-next ( -- node ) node@ node-successor ;
-
-: iterate-nodes ( node quot -- )
-    over [
-        [ swap >node call node> drop ] keep
-        over [ iterate-nodes ] [ 2drop ] if
-    ] [
-        2drop
-    ] if ; inline
-
-: with-node-iterator ( quot -- )
-    [
-        V{ } clone node-stack set call
-    ] with-scope ; inline
-
 DEFER: #terminal?
 
 PREDICATE: #merge #terminal-merge node-successor #terminal? ;

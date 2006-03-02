@@ -21,7 +21,7 @@ sequences sequences-internals words ;
         uncons 1+ 1- + <= > >= mod length
         nth-unsafe set-nth-unsafe
         = string>number number>string scan
-        kill-set kill-node (generate)
+        kill-values (generate)
     } [ compile ] each
 
     "Compiling system..." print flush
@@ -35,9 +35,9 @@ sequences sequences-internals words ;
     "Initializing native I/O..." print flush
     "native-io" get [ init-io ] when
     
-    os "macosx" = [
-        "/library/cocoa/load.factor" run-resource
-    ] when
+    ! os "macosx" = [
+    !     "/library/cocoa/load.factor" run-resource
+    ! ] when
 ] when
 
 [

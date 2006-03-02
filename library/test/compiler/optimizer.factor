@@ -38,18 +38,6 @@ IN: temporary
 
 : set= 2dup subset? >r swap subset? r> and ;
 
-: kill-set=
-    dataflow dup split-node
-    kill-set hash-keys [ value-literal ] map set= ;
-
-: foo 1 2 3 ;
-
-[ H{ } ] [ \ foo word-def dataflow kill-set ] unit-test
-
-[ t ] [ [ [ 1 ] [ 2 ] ] [ [ 1 ] [ 2 ] if ] kill-set= ] unit-test
-
-[ t ] [ [ [ 1 ] [ 2 ] ] [ [ 1 ] [ 2 ] if ] kill-set= ] unit-test
-
 : literal-kill-test-1 4 compiled-offset 2 cells - ; compiled
 
 [ 4 ] [ literal-kill-test-1 drop ] unit-test
@@ -62,18 +50,11 @@ IN: temporary
 
 [ 3 ] [ literal-kill-test-3 ] unit-test
 
-[ t ] [ [ [ 3 ] [ dup ] 3 ] [ [ 3 ] [ dup ] if drop ] kill-set= ] unit-test
-
 : literal-kill-test-4
     5 swap [ 3 ] [ dup ] if 2drop ; compiled
 
 [ ] [ t literal-kill-test-4 ] unit-test
 [ ] [ f literal-kill-test-4 ] unit-test
-
-[ t ] [
-    [ 5 [ 3 ] [ dup ] 3 ]
-    \ literal-kill-test-4 word-def kill-set=
-] unit-test
 
 : literal-kill-test-5
     5 swap [ 5 ] [ dup ] if 2drop ; compiled
@@ -81,20 +62,11 @@ IN: temporary
 [ ] [ t literal-kill-test-5 ] unit-test
 [ ] [ f literal-kill-test-5 ] unit-test
 
-[ t ] [
-    [ 5 [ 5 ] [ dup ] 5 ]
-    \ literal-kill-test-5 word-def kill-set=
-] unit-test
-
 : literal-kill-test-6
     5 swap [ dup ] [ dup ] if 2drop ; compiled
 
 [ ] [ t literal-kill-test-6 ] unit-test
 [ ] [ f literal-kill-test-6 ] unit-test
-
-[ t ] [ [
-    5 [ dup ] [ dup ] ] \ literal-kill-test-6 word-def kill-set=
-] unit-test
 
 : literal-kill-test-7
     [ 1 2 3 ] >r + r> drop ; compiled
@@ -103,11 +75,6 @@ IN: temporary
 
 : literal-kill-test-8
     dup [ >r dup slip r> literal-kill-test-8 ] [ 2drop ] if ; inline
-
-[ t ] [
-    [ [ ] swap literal-kill-test-8 ] dataflow
-    dup split-node live-values hash-values [ value? ] subset empty?
-] unit-test
 
 ! Test method inlining
 [ f ] [ fixnum { } min-class ] unit-test
