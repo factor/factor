@@ -120,7 +120,6 @@ vectors words ;
         "/library/inference/words.factor"
         "/library/inference/class-infer.factor"
         "/library/inference/kill-literals.factor"
-        "/library/inference/split-nodes.factor"
         "/library/inference/optimizer.factor"
         "/library/inference/inline-methods.factor"
         "/library/inference/known-words.factor"

@@ -43,7 +43,7 @@ SYMBOL: t
 : \ scan-word literalize swons ; parsing
 : parsing word t "parsing" set-word-prop ; parsing
 : inline word  t "inline" set-word-prop ; parsing
-: flushable ( not implemented ) ; parsing
+: flushable word t "flushable" set-word-prop ; parsing
 : foldable word t "foldable" set-word-prop ; parsing
 : SYMBOL: CREATE dup reset-generic define-symbol ; parsing
 DEFER: PRIMITIVE: parsing

@@ -62,4 +62,4 @@ M: alien-callback-error summary ( error -- )
     ] make-linear ;
 
 M: alien-callback linearize* ( node -- )
-    compile-gc dup linearize-callback linearize-next ;
+    compile-gc linearize-callback iterate-next ;

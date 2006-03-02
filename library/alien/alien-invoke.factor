@@ -73,9 +73,8 @@ M: alien-invoke linearize* ( node -- )
     compile-gc
     dup alien-invoke-parameters objects>registers
     dup alien-invoke-dlsym %alien-invoke ,
-    dup linearize-cleanup
-    dup box-return
-    linearize-next ;
+    dup linearize-cleanup box-return
+    iterate-next ;
 
 : parse-arglist ( return seq -- types stack-effect )
     unpair [

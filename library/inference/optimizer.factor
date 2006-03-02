@@ -1,12 +1,8 @@
-! Copyright (C) 2004, 2005 Slava Pestov.
-! See http://factor.sf.net/license.txt for BSD license.
+! Copyright (C) 2004, 2006 Slava Pestov.
+! See http://factorcode.org/license.txt for BSD license.
 IN: optimizer
 USING: compiler-backend generic hashtables inference kernel
 lists math namespaces sequences vectors ;
-
-! We use the recursive-state variable here, to track nested
-! label scopes, to prevent infinite loops when inlining
-! recursive methods.
 
 GENERIC: optimize-node* ( node -- node/t )
 
@@ -30,16 +26,10 @@ DEFER: optimize-node
     ] [ r> ] if ;
 
 : optimize-1 ( dataflow -- dataflow ? )
-    recursive-state off
-    dup kill-set over kill-node
-    dup infer-classes
-    optimize-node ;
-
-: optimize-loop ( dataflow -- dataflow )
-    optimize-1 [ optimize-loop ] when ;
+    dup kill-values dup infer-classes optimize-node ;
 
 : optimize ( dataflow -- dataflow )
-    [ dup split-node optimize-loop ] with-scope ;
+    [ optimize-1 ] with-scope [ optimize ] when ;
 
 : prune-if ( node quot -- successor/t )
     over >r call [ r> node-successor ] [ r> drop t ] if ;

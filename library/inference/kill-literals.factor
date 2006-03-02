@@ -2,7 +2,7 @@
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: optimizer
 USING: arrays generic hashtables inference kernel math
-namespaces sequences ;
+namespaces sequences words ;
 
 : node-union ( node quot -- hash | quot: node -- )
     [
@@ -14,17 +14,18 @@ GENERIC: literals* ( node -- seq )
 : literals ( node -- hash )
     [ literals* ] node-union ;
 
+GENERIC: flushable-values* ( node -- seq )
+
+: flushable-values ( node -- hash )
+    [ flushable-values* ] node-union ;
+
 GENERIC: live-values* ( node -- seq )
 
 : live-values ( node -- hash )
     #! All values that are returned or passed to calls.
     [ live-values* ] node-union ;
 
-: kill-set ( node -- hash )
-    #! Push a list of literals that may be killed in the IR.
-    dup live-values swap literals hash-diff ;
-
-: remove-values ( values node -- )
+: kill-node* ( values node -- )
     2dup [ node-in-d remove-all ] keep set-node-in-d
     2dup [ node-out-d remove-all ] keep set-node-out-d
     2dup [ node-in-r remove-all ] keep set-node-in-r
@@ -32,10 +33,18 @@ GENERIC: live-values* ( node -- seq )
 
 : kill-node ( values node -- )
     over hash-empty?
-    [ 2drop ] [ [ remove-values ] each-node-with ] if ;
+    [ 2drop ] [ [ kill-node* ] each-node-with ] if ;
+
+: kill-unused-literals ( node -- )
+    \ live-values get over literals hash-diff swap kill-node ;
+
+: kill-values ( node -- )
+    dup live-values over literals hash-diff swap kill-node ;
 
 ! Generic nodes
 M: node literals* ( node -- ) drop { } ;
+
+M: node flushable-values* ( node -- ) drop { } ;
 
 M: node live-values* ( node -- ) node-values ;
 
@@ -43,6 +52,11 @@ M: node live-values* ( node -- ) node-values ;
 M: #shuffle literals* ( node -- seq )
     dup node-out-d swap node-out-r
     [ [ value? ] subset ] 2apply append ;
+
+! #call
+M: #call flushable-values* ( node -- )
+    dup node-param "flushable" word-prop
+    [ node-out-d ] [ drop { } ] if ;
 
 ! #return
 M: #return live-values* ( node -- seq )

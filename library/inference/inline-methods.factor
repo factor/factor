@@ -54,6 +54,22 @@ M: 2generic dispatching-values drop node-in-d 2 swap tail* ;
 : method-dataflow ( node -- dataflow )
     dup will-inline swap node-in-d dataflow-with ;
 
+: post-inline ( #return/#values #call/#merge -- )
+    dup [
+        [
+            >r node-in-d r> node-out-d
+            2array unify-lengths first2
+        ] keep node-successor subst-values
+    ] [
+        2drop
+    ] if ;
+
+: subst-node ( old new -- )
+    #! The last node of 'new' becomes 'old', then values are
+    #! substituted. A subsequent optimizer phase kills the
+    #! last node of 'new' and the first node of 'old'.
+    last-node 2dup swap post-inline set-node-successor ;
+
 : inline-method ( node -- node )
     #! We set the #call node's param to f so that it gets killed
     #! later.
@@ -72,6 +88,13 @@ M: 2generic dispatching-values drop node-in-d 2 swap tail* ;
     ] [
         2drop f
     ] if ;
+
+: inline-literals ( node literals -- node )
+    #! Make #push -> #return -> successor
+    over drop-inputs [
+        >r >list [ literalize ] map dataflow [ subst-node ] keep
+        r> set-node-successor
+    ] keep ;
 
 : optimize-predicate ( #call -- node )
     dup node-param "predicating" word-prop >r
