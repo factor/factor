@@ -8,4 +8,4 @@ M: %write-barrier generate-node ( vop -- )
     #! Mark the card pointed to by vreg.
     drop
     0 input-operand card-bits SHR
-    0 input-operand R16 [+] card-mark OR ;
+    0 input-operand R13 [+] card-mark OR ;
