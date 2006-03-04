@@ -36,6 +36,7 @@
 
 + compiler/ffi:
 
+- inform-compile dies with funny error
 - amd64 %unbox-struct
 - float intrinsics
 - complex float type

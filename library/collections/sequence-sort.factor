@@ -15,7 +15,7 @@ C: sorter ( seq start end -- sorter )
 
 : exchange ( n n seq -- )
     [ tuck nth-unsafe >r nth r> ] 3keep tuck
-    >r >r set-nth-unsafe r> r> set-nth-unsafe ;
+    >r >r set-nth-unsafe r> r> set-nth-unsafe ; inline
 
 : s*/e* dup sorter-start swap sorter-end ; inline
 : s*/e dup sorter-start swap sorter-seq length 1- ; inline
