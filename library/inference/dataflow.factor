@@ -63,7 +63,7 @@ C: #label make-node ;
 
 TUPLE: #entry ;
 C: #entry make-node ;
-: #entry ( -- node ) f param-node <#entry> ;
+: #entry ( -- node ) meta-d get clone in-node <#entry> ;
 
 TUPLE: #call ;
 C: #call make-node ;

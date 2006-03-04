@@ -1,7 +1,7 @@
 ! Copyright (C) 2004, 2006 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 IN: optimizer
-USING: compiler-backend generic hashtables inference kernel
+USING: compiler-backend generic hashtables inference io kernel
 lists math namespaces sequences vectors ;
 
 GENERIC: optimize-node* ( node -- node/t )
@@ -25,11 +25,12 @@ DEFER: optimize-node
         over set-node-successor r> r> r> or or
     ] [ r> ] if ;
 
-: optimize-1 ( dataflow -- dataflow ? )
-    dup kill-values dup infer-classes optimize-node ;
+: (optimize) ( dataflow n -- dataflow n ? )
+    >r dup kill-values dup infer-classes optimize-node r> swap
+    [ 1+ (optimize) ] when ;
 
 : optimize ( dataflow -- dataflow )
-    [ optimize-1 ] with-scope [ optimize ] when ;
+    1 (optimize) [ "! Optimizer passes: " % # ] "" make print ;
 
 : prune-if ( node quot -- successor/t )
     over >r call [ r> node-successor ] [ r> drop t ] if ;

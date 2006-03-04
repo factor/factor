@@ -54,7 +54,7 @@
 - code gc
 - compiled gc check slows things down
 - fix branch folding
-- remove branch splitting
+- new x86 write barrier
 
 + misc:
 

@@ -35,8 +35,8 @@ sequences strings vectors words prettyprint ;
     dup "infer-effect" word-prop consume/produce
     [ [ t ] [ f ] if ] infer-quot ;
 
-{ fixnum<= fixnum< fixnum>= fixnum> eq? }
-[ dup [ manual-branch ] curry "infer" set-word-prop ] each
+! { fixnum<= fixnum< fixnum>= fixnum> eq? }
+! [ dup [ manual-branch ] curry "infer" set-word-prop ] each
 
 ! Primitive combinators
 \ call [ [ general-list ] [ ] ] "infer-effect" set-word-prop

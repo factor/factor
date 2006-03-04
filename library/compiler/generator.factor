@@ -12,14 +12,13 @@ GENERIC: generate-node ( vop -- )
     #! The %prologue node contains the maximum stack reserve of
     #! all VOPs. The precise meaning of stack reserve is
     #! platform-specific.
-    0 [ 0 [ stack-reserve max ] reduce max ] reduce
-    \ stack-reserve set ;
+    0 [ stack-reserve max ] reduce \ stack-reserve set ;
 
 : generate-code ( word linear -- length )
     compiled-offset >r
     compile-aligned
     swap save-xt
-    [ [ dup [ generate-node ] with-vop ] each ] each
+    [ dup [ generate-node ] with-vop ] each
     compile-aligned
     compiled-offset r> - ;
 

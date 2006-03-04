@@ -7,7 +7,7 @@ sequences words ;
 : (compile) ( word -- )
     #! Should be called inside the with-compiler scope.
     dup word-def dataflow optimize linearize
-    [ split-blocks simplify generate ] hash-each ;
+    [ generate ] hash-each ;
 
 : inform-compile ( word -- ) "Compiling " write . flush ;
 
@@ -47,8 +47,6 @@ sequences words ;
     ] if ;
 
 \ dataflow profile
-\ optimize profile
 \ linearize profile
-\ split-blocks profile
-\ simplify profile
 \ generate profile
+\ optimize profile

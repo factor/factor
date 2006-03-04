@@ -80,15 +80,15 @@ M: #label linearize* ( node -- next )
     dup node-successor #if?
     [ node-param "if-intrinsic" word-prop ] [ drop f ] if ;
 
-: linearize-if ( node label -- next )
+: linearize-if ( node label -- )
     <label> dup >r >r >r node-children first2 linearize-child
     r> r> %jump-label , %label , linearize-child r> %label ,
     iterate-next ;
 
-M: #call linearize* ( node -- )
+M: #call linearize* ( node -- next )
     dup if-intrinsic [
         >r <label> 2dup r> call
-        >r node-successor r> linearize-if
+        >r node-successor r> linearize-if node-successor
     ] [
         dup intrinsic
         [ call iterate-next ] [ node-param linearize-call ] if*

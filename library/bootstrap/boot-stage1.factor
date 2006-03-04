@@ -133,7 +133,6 @@ vectors words ;
         "/library/compiler/xt.factor"
         "/library/compiler/stack.factor"
         "/library/compiler/intrinsics.factor"
-        "/library/compiler/basic-blocks.factor"
         "/library/compiler/generator.factor"
         "/library/compiler/compiler.factor"
 

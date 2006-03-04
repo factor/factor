@@ -97,7 +97,7 @@ M: #call-label collect-recursion* ( label node -- )
     dup f inline-block over recursive-label? [
         meta-d get >r
         drop join-values f inline-block apply-infer
-        r> over node-child set-node-in-d node,
+        r> over set-node-in-d node,
     ] [
         apply-infer node-child node-successor splice-node drop
     ] if ;
