@@ -15,6 +15,8 @@ sequences sequences-internals words ;
         ] when
     ] when
     
+    parse-command-line
+
     "Compiling base..." print flush
 
     {

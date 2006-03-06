@@ -206,16 +206,6 @@ SYMBOL: current-node
         [ 2drop ] if
     ] each-node-with ;
 
-: (clone-node) ( node -- node )
-    clone dup node-shuffle clone over set-node-shuffle ;
-
-: clone-node ( node -- node )
-    dup [
-        (clone-node)
-        dup node-children [ clone-node ] map over set-node-children
-        dup node-successor clone-node over set-node-successor
-    ] when ;
-
 GENERIC: calls-label* ( label node -- ? )
 
 M: node calls-label* 2drop f ;
@@ -237,7 +227,7 @@ SYMBOL: node-stack
 DEFER: iterate-nodes
 
 : iterate-children ( quot -- )
-    node@ node-children [ swap iterate-nodes ] each ;
+    node@ node-children [ swap iterate-nodes ] each ; inline
 
 : iterate-next ( -- node ) node@ node-successor ;
 
@@ -250,6 +240,4 @@ DEFER: iterate-nodes
     ] if ; inline
 
 : with-node-iterator ( quot -- )
-    [
-        V{ } clone node-stack set call
-    ] with-scope ; inline
+    [ V{ } clone node-stack set call ] with-scope ; inline
