@@ -1,8 +1,8 @@
+IN: temporary
 USING: arrays assembler compiler compiler-backend generic
 hashtables inference kernel kernel-internals lists math
 optimizer prettyprint sequences strings test vectors words
 sequences-internals ;
-IN: temporary
 
 : kill-1
     [ 1 2 3 ] [ + ] over drop drop ; compiled

@@ -25,12 +25,9 @@ DEFER: optimize-node
         over set-node-successor r> r> r> or or
     ] [ r> ] if ;
 
-: (optimize) ( dataflow n -- dataflow n ? )
-    >r dup kill-values dup infer-classes optimize-node r> swap
-    [ 1+ (optimize) ] when ;
-
 : optimize ( dataflow -- dataflow )
-    1 (optimize) [ "! Optimizer passes: " % # ] "" make print ;
+    dup kill-values dup infer-classes optimize-node
+    [ optimize ] when ;
 
 : prune-if ( node quot -- successor/t )
     over >r call [ r> node-successor ] [ r> drop t ] if ;
@@ -39,8 +36,7 @@ DEFER: optimize-node
 ! Generic nodes
 M: f optimize-node* drop t ;
 
-M: node optimize-node* ( node -- t )
-    drop t ;
+M: node optimize-node* ( node -- t ) drop t ;
 
 ! #shuffle
 : can-compose? ( shuffle -- ? )

@@ -76,7 +76,7 @@ M: #killable live-values* ( node -- seq ) drop { } ;
 ! #label
 M: #label live-values* ( node -- seq )
     dup node-child node-in-d over node-in-d 2array
-    rot collect-recursion append purge-invariants ;
+    swap collect-recursion append purge-invariants ;
 
 ! branching
 UNION: #branch #if #dispatch ;
