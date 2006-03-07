@@ -53,25 +53,6 @@ M: #shuffle optimize-node*  ( node -- node/t )
         ] prune-if
     ] if ;
 
-! #if
-: static-branch? ( node -- lit ? )
-    node-in-d first dup value? ;
-
-: static-branch ( conditional n -- node )
-    over drop-inputs
-    [ >r swap node-children nth r> set-node-successor ] keep ;
-
-! M: #if optimize-node* ( node -- node )
-!     dup static-branch?
-!     [ value-literal 0 1 ? static-branch ] [ 2drop t ] if ;
-
-! #values
-: optimize-fold ( node -- node/t )
-    node-successor [ node-successor ] [ t ] if* ;
-
-M: #values optimize-node* ( node -- node/t )
-    optimize-fold ;
-
 ! #return
 M: #return optimize-node* ( node -- node/t )
-    optimize-fold ;
+    node-successor [ node-successor ] [ t ] if* ;

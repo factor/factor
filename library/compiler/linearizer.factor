@@ -80,7 +80,7 @@ M: #label linearize* ( node -- next )
     dup node-successor #if?
     [ node-param "if-intrinsic" word-prop ] [ drop f ] if ;
 
-: linearize-if ( node label -- )
+: linearize-if ( node label -- next )
     <label> dup >r >r >r node-children first2 linearize-child
     r> r> %jump-label , %label , linearize-child r> %label ,
     iterate-next ;
@@ -97,8 +97,17 @@ M: #call linearize* ( node -- next )
 M: #call-label linearize* ( node -- next )
     node-param renamed-label linearize-call ;
 
+: ?static-branch ( node -- n )
+    node-in-d first dup value?
+    [ value-literal 0 1 ? ] [ drop f ] if ;
+
 M: #if linearize* ( node -- next )
-    in-1 -1 %inc-d , <label> dup 0 %jump-t , linearize-if ;
+    dup ?static-branch [
+        -1 %inc-d ,
+        swap node-children nth linearize-child iterate-next
+    ] [
+        in-1 -1 %inc-d , <label> dup 0 %jump-t , linearize-if
+    ] if* ;
 
 : dispatch-head ( vtable -- label/node )
     #! Output the jump table insn and return a list of

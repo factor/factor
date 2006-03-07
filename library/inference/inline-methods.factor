@@ -59,7 +59,7 @@ M: 2generic dispatching-values drop node-in-d 2 swap tail* ;
         [
             >r node-in-d r> node-out-d
             2array unify-lengths first2
-        ] keep node-successor subst-values
+        ] keep subst-values
     ] [
         2drop
     ] if ;

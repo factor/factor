@@ -45,8 +45,3 @@ sequences words ;
     ] [
         call
     ] if ;
-
-\ dataflow profile
-\ linearize profile
-\ generate profile
-\ optimize profile

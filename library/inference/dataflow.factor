@@ -189,14 +189,6 @@ SYMBOL: current-node
 : all-nodes-with? ( obj node quot -- ? | quot: obj node -- ? )
     swap [ with rot ] all-nodes? 2nip ; inline
 
-: (subst-values) ( new old node -- )
-    [ node-in-d subst ] 3keep [ node-in-r subst ] 3keep
-    [ node-out-d subst ] 3keep node-out-r subst ;
-
-: subst-values ( new old node -- )
-    #! Mutates the node.
-    [ >r 2dup r> (subst-values) ] each-node 2drop ;
-
 : remember-node ( word node -- )
     #! Annotate each node with the fact it was inlined from
     #! 'word'.
@@ -277,3 +269,15 @@ DEFER: (map-nodes)
 
 : with-node-iterator ( quot -- )
     [ V{ } clone node-stack set call ] with-scope ; inline
+
+: (subst-values) ( new old node -- )
+    [
+        [ node-in-d subst ] 3keep [ node-in-r subst ] 3keep
+        [ node-out-d subst ] 3keep [ node-out-r subst ] 3keep
+        drop
+    ] each-node 2drop ;
+
+: subst-values ( new old node -- )
+    #! Mutates nodes.
+    1 node-stack get head* swap add
+    [ >r 2dup r> node-successor (subst-values) ] each 2drop ;
