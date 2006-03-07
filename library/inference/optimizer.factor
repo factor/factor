@@ -4,30 +4,25 @@ IN: optimizer
 USING: compiler-backend generic hashtables inference io kernel
 lists math namespaces sequences vectors ;
 
+SYMBOL: optimizer-changed
+
 GENERIC: optimize-node* ( node -- node/t )
 
 : keep-optimizing ( node -- node ? )
     dup optimize-node* dup t =
     [ drop f ] [ nip keep-optimizing t or ] if ;
 
-DEFER: optimize-node
+: optimize-node ( node -- node )
+    [
+        keep-optimizing [ optimizer-changed on ] when
+    ] map-nodes ;
 
-: optimize-children ( node -- ? )
-    f swap [
-        node-children [ optimize-node swap >r or r> ] map
-    ] keep set-node-children ;
-
-: optimize-node ( node -- node ? )
-    #! Outputs t if any changes were made.
-    keep-optimizing >r dup [
-        dup optimize-children >r
-        dup node-successor optimize-node >r
-        over set-node-successor r> r> r> or or
-    ] [ r> ] if ;
-
-: optimize ( dataflow -- dataflow )
-    dup kill-values dup infer-classes optimize-node
-    [ optimize ] when ;
+: optimize ( node -- node )
+    dup kill-values dup infer-classes [
+        optimizer-changed off
+        optimize-node
+        optimizer-changed get
+    ] with-node-iterator [ optimize ] when ;
 
 : prune-if ( node quot -- successor/t )
     over >r call [ r> node-successor ] [ r> drop t ] if ;

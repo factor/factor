@@ -2,6 +2,14 @@ IN: temporary
 USING: arrays errors generic inference kernel lists math
 math-internals namespaces parser sequences test vectors ;
 
+[ f ] [ f [ [ ] map-nodes ] with-node-iterator ] unit-test
+
+[ t ] [ [ ] dataflow dup [ [ ] map-nodes ] with-node-iterator = ] unit-test
+
+[ t ] [ [ 1 2 ] dataflow dup [ [ ] map-nodes ] with-node-iterator = ] unit-test
+
+[ t ] [ [ [ ] [ ] if ] dataflow dup [ [ ] map-nodes ] with-node-iterator = ] unit-test
+
 [
     T{ shuffle f { "a" } { } { "a" } { "a" } }
 ] [

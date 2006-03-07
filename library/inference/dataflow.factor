@@ -1,5 +1,5 @@
-! Copyright (C) 2004, 2005 Slava Pestov.
-! See http://factor.sf.net/license.txt for BSD license.
+! Copyright (C) 2004, 2006 Slava Pestov.
+! See http://factorcode.org/license.txt for BSD license.
 IN: inference
 USING: arrays generic hashtables interpreter kernel lists math
 namespaces parser sequences words ;
@@ -227,7 +227,8 @@ SYMBOL: node-stack
 DEFER: iterate-nodes
 
 : iterate-children ( quot -- )
-    node@ node-children [ swap iterate-nodes ] each ; inline
+    node@ node-children [ swap iterate-nodes ] each-with ;
+    inline
 
 : iterate-next ( -- node ) node@ node-successor ;
 
@@ -238,6 +239,41 @@ DEFER: iterate-nodes
     ] [
         2drop
     ] if ; inline
+
+: ?set-node-successor ( next prev -- )
+    [ set-node-successor ] [ drop ] if* ;
+
+: map-node ( prev quot -- )
+    swap >r node@ swap call dup r> ?set-node-successor
+    node> drop >node ; inline
+
+DEFER: map-children
+DEFER: (map-nodes)
+
+: map-next ( quot -- )
+    node@ [
+        swap [ map-children ] keep
+        node> node-successor >node (map-nodes)
+    ] [
+        drop
+    ] if* ; inline
+
+: (map-nodes) ( prev quot -- | quot: node -- node )
+    node@
+    [ [ map-node ] keep map-next ]
+    [ drop f swap ?set-node-successor ] if ; inline
+
+: map-first ( node quot -- node | quot: node -- node )
+    call node> drop dup >node ; inline
+
+: map-nodes ( node quot -- node | quot: node -- node )
+    over [
+        over >node [ map-first ] keep map-next node>
+    ] when drop ; inline
+
+: map-children ( quot -- | quot: node -- node )
+    node@ [ node-children [ swap map-nodes ] map-with ] keep
+    set-node-children ; inline
 
 : with-node-iterator ( quot -- )
     [ V{ } clone node-stack set call ] with-scope ; inline
