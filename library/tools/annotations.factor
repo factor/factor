@@ -28,7 +28,13 @@ sequences strings walker ;
 
 : break ( word -- )
     #! Cause the word to start the code walker when executed.
-    [ nip [ walk ] cons ] annotate ;
+    [ nip [ walk ] curry ] annotate ;
+
+: break-on ( word test -- | test: -- ? )
+    #! Conditional breakpoint.
+    swap [
+        nip [ swap % dup [ walk ] curry , , \ if , ] [ ] make
+    ] annotate ;
 
 : with-profile ( quot word -- )
     millis >r >r call r> millis r> - swap global [ +@ ] bind ;
