@@ -1,10 +1,11 @@
 USING: compiler io parser sequences words ;
 
 {
-    "/library/cocoa/objc-runtime.factor"
-    "/library/cocoa/objc-utils.factor"
+    "/library/cocoa/runtime.factor"
+    "/library/cocoa/utilities.factor"
+    "/library/cocoa/subclassing.factor"
     "/library/cocoa/core-foundation.factor"
-    "/library/cocoa/cocoa-types.factor"
+    "/library/cocoa/types.factor"
     "/library/cocoa/init-cocoa.factor"
     "/library/cocoa/application-utils.factor"
     "/library/cocoa/window-utils.factor"
