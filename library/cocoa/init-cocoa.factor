@@ -37,5 +37,5 @@ USING: cocoa compiler io kernel objc sequences words ;
     "WebFrame"
     "WebView"
 } [
-    dup print flush define-objc-class
+    dup print flush import-objc-class
 ] each

@@ -26,27 +26,33 @@ C: selector ( name -- sel ) [ set-selector-name ] keep ;
     >r method_getArgumentInfo drop
     r> *char* ;
 
-: objc-primitive-type ( char -- ctype )
-    H{
-        { CHAR: c "char" }
-        { CHAR: i "int" }
-        { CHAR: s "short" }
-        { CHAR: l "long" }
-        { CHAR: q "longlong" }
-        { CHAR: C "uchar" }
-        { CHAR: I "uint" }
-        { CHAR: S "ushort" }
-        { CHAR: L "ulong" }
-        { CHAR: Q "ulonglong" }
-        { CHAR: f "float" }
-        { CHAR: d "double" }
-        { CHAR: B "bool" }
-        { CHAR: v "void" }
-        { CHAR: * "char*" }
-        { CHAR: @ "id" }
-        { CHAR: # "id" }
-        { CHAR: : "SEL" }
-    } hash ;
+SYMBOL: objc>alien-types
+
+H{
+    { CHAR: c "char" }
+    { CHAR: i "int" }
+    { CHAR: s "short" }
+    { CHAR: l "long" }
+    { CHAR: q "longlong" }
+    { CHAR: C "uchar" }
+    { CHAR: I "uint" }
+    { CHAR: S "ushort" }
+    { CHAR: L "ulong" }
+    { CHAR: Q "ulonglong" }
+    { CHAR: f "float" }
+    { CHAR: d "double" }
+    { CHAR: B "bool" }
+    { CHAR: v "void" }
+    { CHAR: * "char*" }
+    { CHAR: @ "id" }
+    { CHAR: # "id" }
+    { CHAR: : "SEL" }
+} hash objc>alien-types set-global
+
+SYMBOL: alien>objc-types
+
+objc>alien-types get hash>alist [ reverse ] map alist>hash
+alien>objc-types get
 
 : objc-struct-type ( i string -- ctype )
     2dup CHAR: = -rot index* swap subseq ;
@@ -57,7 +63,7 @@ C: selector ( name -- sel ) [ set-selector-name ] keep ;
         { [ dup CHAR: ^ = ] [ 3drop "void*" ] }
         { [ dup CHAR: { = ] [ drop objc-struct-type ] }
         { [ dup CHAR: [ = ] [ 3drop "void*" ] }
-        { [ t ] [ 2nip objc-primitive-type ] }
+        { [ t ] [ 2nip objc>alien-types get hash ] }
     } cond ;
 
 : parse-objc-type ( string -- ctype ) 0 swap (parse-objc-type) ;
@@ -132,20 +138,23 @@ C: selector ( name -- sel ) [ set-selector-name ] keep ;
     pick c-struct?
     [ make-objc-send-stret ] [ make-objc-send ] if ;
 
-: define-objc-method ( returns types selector -- )
+: import-objc-method ( returns types selector -- )
     [ make-objc-method "[" ] keep "]" append3 create-in
     swap define-compound ;
 
-: define-objc-methods ( seq -- )
-    [ first3 swap define-objc-method ] each ;
+: import-objc-methods ( seq -- )
+    [ first3 swap import-objc-method ] each ;
 
 : define-objc-class-word ( name -- )
-    create-in over [ objc_getClass ] curry define-compound ;
+    create-in over [ objc-class ] curry define-compound ;
 
-: define-objc-class ( name -- )
+: import-objc-class ( name -- )
     [
         "objc-" over append in set
         dup define-objc-class-word
-        dup instance-methods define-objc-methods
-        class-methods define-objc-methods
+        dup instance-methods import-objc-methods
+        class-methods import-objc-methods
     ] with-scope ;
+
+: root-class ( class -- class )
+    dup objc-class-super-class [ root-class ] [ ] ?if ;

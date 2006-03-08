@@ -12,6 +12,16 @@ FUNCTION: bool sel_isMapped ( SEL aSelector ) ;
 
 FUNCTION: SEL sel_registerName ( char* str ) ;
 
+: CLS_CLASS        HEX: 1   ;
+: CLS_META         HEX: 2   ;
+: CLS_INITIALIZED  HEX: 4   ;
+: CLS_POSING       HEX: 8   ;
+: CLS_MAPPED       HEX: 10  ;
+: CLS_FLUSH_CACHE  HEX: 20  ;
+: CLS_GROW_CACHE   HEX: 40  ;
+: CLS_NEED_BIND    HEX: 80  ;
+: CLS_METHOD_ARRAY HEX: 100 ;
+
 BEGIN-STRUCT: objc-class
     FIELD: void* isa
     FIELD: void* super-class
@@ -34,6 +44,8 @@ FUNCTION: int objc_getClassList ( void* buffer, int bufferLen ) ;
 FUNCTION: objc-class* objc_getClass ( char* class ) ;
 
 FUNCTION: objc-class* objc_getMetaClass ( char* class ) ;
+
+FUNCTION: void objc_addClass ( objc-class* class ) ;
 
 FUNCTION: id class_createInstance ( objc-class* class, uint additionalByteCount ) ;
 
