@@ -36,10 +36,8 @@ M: alien-callback-error summary ( error -- )
     [ box-parameter ] map-parameters % ;
 
 : registers>objects ( parameters -- )
-    dup stack-space %parameters ,
     dup \ %freg>stack move-parameters %
-    "nest_stacks" f %alien-invoke ,
-    box-parameters ;
+    "nest_stacks" f %alien-invoke , box-parameters ;
 
 : unbox-return ( node -- )
     alien-callback-return [
@@ -54,6 +52,7 @@ M: alien-callback-error summary ( error -- )
 
 : linearize-callback ( node -- )
     dup alien-callback-xt [
+        dup stack-reserve* %prologue ,
         dup alien-callback-parameters registers>objects
         dup alien-callback-quot \ init-error-handler swons
         %alien-callback ,
@@ -63,3 +62,6 @@ M: alien-callback-error summary ( error -- )
 
 M: alien-callback linearize* ( node -- )
     compile-gc linearize-callback iterate-next ;
+
+M: alien-callback stack-reserve*
+    alien-callback-parameters stack-space ;

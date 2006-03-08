@@ -4,4 +4,6 @@ IN: compiler-backend
 USING: assembler kernel math namespaces ;
 
 M: %prologue generate-node ( vop -- )
-    drop RSP stack-increment SUB ;
+    drop
+    0 input \ stack-reserve set
+    RSP stack-increment SUB ;

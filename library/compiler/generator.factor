@@ -8,12 +8,6 @@ vectors words ;
 ! Compile a VOP.
 GENERIC: generate-node ( vop -- )
 
-: set-stack-reserve ( linear -- )
-    #! The %prologue node contains the maximum stack reserve of
-    #! all VOPs. The precise meaning of stack reserve is
-    #! platform-specific.
-    0 [ stack-reserve max ] reduce \ stack-reserve set ;
-
 : generate-code ( word linear -- length )
     compiled-offset >r
     compile-aligned
@@ -30,7 +24,6 @@ GENERIC: generate-node ( vop -- )
 : (generate) ( word linear -- )
     #! Compile a word definition from linear IR.
     V{ } clone relocation-table set
-    dup set-stack-reserve
     begin-assembly swap >r >r
         generate-code
         generate-reloc
@@ -56,8 +49,6 @@ M: %label generate-node ( vop -- )
 
 M: %target-label generate-node ( vop -- )
     drop label 0 assemble-cell absolute-cell ;
-
-M: %parameters generate-node ( vop -- ) drop ;
 
 M: %cleanup generate-node ( vop -- ) drop ;
 

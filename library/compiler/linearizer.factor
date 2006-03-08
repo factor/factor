@@ -1,8 +1,19 @@
 ! Copyright (C) 2004, 2006 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: arrays compiler-backend hashtables inference kernel
-namespaces sequences words ;
+USING: arrays compiler-backend generic hashtables inference
+kernel math namespaces sequences words ;
 IN: compiler-frontend
+
+! On PowerPC and AMD64, we use a stack discipline whereby
+! stack frames are used to hold parameters. We need to compute
+! the stack frame size to compile the prologue on entry to a
+! word.
+GENERIC: stack-reserve*
+
+M: object stack-reserve* drop 0 ;
+
+: stack-reserve ( node -- )
+    0 swap [ stack-reserve* max ] each-node ;
 
 DEFER: #terminal?
 
@@ -27,12 +38,13 @@ SYMBOL: renamed-labels
 
 : make-linear ( word quot -- )
     [
-        swap >r [ %prologue , call ] { } make r>
-        linearized get set-hash
+        swap >r { } make r> linearized get set-hash
     ] with-node-iterator ; inline
 
 : linearize-1 ( word node -- )
-    swap [ linearize-child ] make-linear ;
+    swap [
+        dup stack-reserve %prologue , linearize-child
+    ] make-linear ;
 
 : init-linearizer ( -- )
     H{ } clone linearized set

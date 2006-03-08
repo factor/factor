@@ -80,9 +80,7 @@ TUPLE: vop inputs outputs label ;
     \ scratch get nth ;
 
 : with-vop ( vop quot -- )
-    [
-        swap vop set (scratch) \ scratch set call
-    ] with-scope ; inline
+    swap vop set (scratch) \ scratch set call ; inline
 
 : input ( n -- obj ) vop get vop-inputs nth ;
 : input-operand ( n -- n ) input v>operand ;
@@ -95,12 +93,6 @@ M: vop basic-block? drop f ;
 
 ! simplifies some code
 M: f basic-block? drop f ;
-
-! Only on PowerPC. The %parameters node needs to reserve space
-! in the stack frame.
-GENERIC: stack-reserve
-
-M: vop stack-reserve drop 0 ;
 
 : make-vop ( inputs outputs label vop -- vop )
     [ >r <vop> r> set-delegate ] keep ;
@@ -120,7 +112,7 @@ M: vop stack-reserve drop 0 ;
 ! miscellanea
 TUPLE: %prologue ;
 C: %prologue make-vop ;
-: %prologue empty-vop <%prologue> ;
+: %prologue src-vop <%prologue> ;
 
 TUPLE: %label ;
 C: %label make-vop ;
@@ -357,12 +349,6 @@ M: %getenv basic-block? drop t ;
 TUPLE: %setenv ;
 C: %setenv make-vop ;
 : %setenv 2-in-vop <%setenv> ;
-
-! alien operations
-TUPLE: %parameters ;
-C: %parameters make-vop ;
-M: %parameters stack-reserve vop-inputs first ;
-: %parameters ( n -- vop ) src-vop <%parameters> ;
 
 TUPLE: %stack>freg ;
 C: %stack>freg make-vop ;

@@ -1,8 +1,8 @@
-! Copyright (C) 2005 Slava Pestov.
-! See http://factor.sf.net/license.txt for BSD license.
+! Copyright (C) 2005, 200 Slava Pestov.
+! See http://factorcode.org/license.txt for BSD license.
 IN: compiler-backend
-USING: alien assembler compiler inference kernel
-kernel-internals lists math memory namespaces words ;
+USING: alien assembler compiler compiler-frontend inference
+kernel kernel-internals lists math memory namespaces words ;
 
 : compile-dlsym ( symbol dll register -- )
     >r 2dup dlsym  r> LOAD32 rel-2/2 rel-dlsym ;
@@ -14,6 +14,7 @@ kernel-internals lists math memory namespaces words ;
 
 M: %prologue generate-node ( vop -- )
     drop
+    0 input \ stack-reserve set
     1 1 stack-increment neg STWU
     0 MFLR
     0 1 stack-increment lr@ STW ;

@@ -54,9 +54,7 @@ M: alien-invoke-error summary ( error -- )
     #! code for moving these parameters to register on
     #! architectures where parameters are passed in registers
     #! (PowerPC, AMD64).
-    dup stack-space %parameters ,
-    dup unbox-parameters
-    "save_stacks" f %alien-invoke ,
+    dup unbox-parameters "save_stacks" f %alien-invoke ,
     \ %stack>freg move-parameters % ;
 
 : box-return ( node -- )
@@ -75,6 +73,9 @@ M: alien-invoke linearize* ( node -- )
     dup alien-invoke-dlsym %alien-invoke ,
     dup linearize-cleanup box-return
     iterate-next ;
+
+M: alien-invoke stack-reserve*
+    alien-invoke-parameters stack-space ;
 
 : parse-arglist ( return seq -- types stack-effect )
     unpair [
