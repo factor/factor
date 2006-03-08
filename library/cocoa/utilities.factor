@@ -85,14 +85,26 @@ C: selector ( name -- sel ) [ set-selector-name ] keep ;
     [ method-list>seq % (objc-methods) ] [ 2drop ] if* ;
 
 : objc-methods ( class -- seq )
-    [ "Null pointer passed to objc-methods" throw ] unless*
     [ f <void*> (objc-methods) ] { } make ;
 
+: (objc-class) ( string word -- class )
+    dupd execute
+    [ ] [ "No such class: " swap append throw ] ?if ; inline
+
+: objc-class ( string -- class )
+    \ objc_getClass (objc-class) ;
+
+: objc-meta-class ( string -- class )
+    \ objc_getMetaClass (objc-class) ;
+
+: class-exists? ( string -- class )
+    objc_getClass >boolean ;
+
 : instance-methods ( classname -- seq )
-    objc_getClass objc-methods ;
+    objc-class objc-methods ;
 
 : class-methods ( classname -- seq )
-    objc_getMetaClass objc-methods ;
+    objc-meta-class objc-methods ;
 
 : make-dip ( quot n -- quot )
     dup \ >r <array> -rot \ r> <array> append3 ;

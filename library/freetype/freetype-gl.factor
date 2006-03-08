@@ -1,7 +1,7 @@
 ! Copyright (C) 2005, 2006 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: alien arrays errors hashtables io kernel
-kernel-internals math namespaces opengl prettyprint
+libc math namespaces opengl prettyprint
 sequences styles ;
 IN: freetype
 
@@ -124,7 +124,7 @@ C: font ( handle -- font )
     FT_RENDER_MODE_NORMAL FT_Render_Glyph freetype-error ;
 
 : with-locked-block ( size quot -- | quot: address -- )
-    swap 1 calloc [ swap call ] keep free ; inline
+    swap 1 calloc [ alien-address swap call ] keep free ; inline
 
 : copy-pixel ( bit tex -- bit tex )
     255 f pick set-alien-unsigned-1 1+

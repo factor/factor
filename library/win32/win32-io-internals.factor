@@ -73,7 +73,7 @@ GENERIC: expire
     ] with-scope ;
 
 : <overlapped> ( -- overlapped )
-    "overlapped-ext" c-size malloc <alien> ;
+    "overlapped-ext" <malloc-object> ;
 
 C: io-queue ( -- queue )
     V{ } clone over set-io-queue-callbacks ;

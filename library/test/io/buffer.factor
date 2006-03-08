@@ -1,10 +1,10 @@
 IN: temporary
-USING: io-internals kernel kernel-internals sequences test ;
+USING: alien io-internals kernel kernel-internals sequences test ;
 
 : buffer-append ( buffer buffer -- )
     #! Append first buffer to second buffer.
-    2dup buffer-end over buffer-ptr rot buffer-fill memcpy
-    >r buffer-fill r> n>buffer ;
+    2dup buffer-end <alien> over buffer-ptr <alien>
+    rot buffer-fill memcpy >r buffer-fill r> n>buffer ;
 
 : buffer-set ( string buffer -- )
     2dup buffer-ptr string>memory

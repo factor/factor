@@ -1,9 +1,9 @@
-! Copyright (C) 2004, 2005 Slava Pestov.
+! Copyright (C) 2004, 2006 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: alien
-USING: arrays assembler compiler compiler-backend errors generic
-hashtables kernel kernel-internals lists math namespaces parser
-sequences sequences-internals strings words ;
+USING: arrays compiler compiler-backend errors generic
+hashtables kernel kernel-internals libc lists math namespaces
+parser sequences strings words ;
 
 : <c-type> ( -- type )
     H{
@@ -33,11 +33,19 @@ SYMBOL: c-types
     >r <c-type> [ swap bind ] keep r> c-types get set-hash ;
     inline
 
-: <c-object> ( type -- c-ptr )
-    global [ c-size <byte-array> ] bind ;
-
 : <c-array> ( size type -- c-ptr )
     global [ c-size * <byte-array> ] bind ;
+
+: <c-object> ( type -- c-ptr ) 1 swap <c-array> ;
+
+: <malloc-array> ( size type -- malloc-ptr )
+    global [ c-size calloc ] bind check-ptr ;
+
+: <malloc-object> ( type -- malloc-ptr ) 1 swap <malloc-array> ;
+
+: <malloc-string> ( string -- alien )
+    "\0" append dup length malloc check-ptr
+    [ alien-address string>memory ] keep ;
 
 : define-pointer ( type -- )
     "void*" c-type swap "*" append c-types get set-hash ;

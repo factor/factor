@@ -2,19 +2,19 @@
 ! Copyright (C) 2006 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 IN: io-internals
-USING: alien errors kernel kernel-internals math sequences
+USING: alien errors kernel kernel-internals libc math sequences
 strings ;
 
 TUPLE: buffer size ptr fill pos ;
 
 C: buffer ( size -- buffer )
     2dup set-buffer-size
-    [ >r malloc check-ptr r> set-buffer-ptr ] keep
+    [ >r malloc check-ptr alien-address r> set-buffer-ptr ] keep
     0 over set-buffer-fill
     0 over set-buffer-pos ;
 
 : buffer-free ( buffer -- )
-    dup buffer-ptr free  0 swap set-buffer-ptr ;
+    dup buffer-ptr <alien> free  0 swap set-buffer-ptr ;
 
 : buffer-contents ( buffer -- string )
     dup buffer-ptr over buffer-pos +
@@ -55,7 +55,7 @@ C: buffer ( size -- buffer )
 : buffer-empty? ( buffer -- ? ) buffer-fill zero? ;
 
 : extend-buffer ( length buffer -- )
-    2dup buffer-ptr swap realloc check-ptr
+    2dup buffer-ptr <alien> swap realloc check-ptr alien-address
     over set-buffer-ptr set-buffer-size ;
 
 : check-overflow ( length buffer -- )

@@ -137,13 +137,13 @@ vectors words ;
         "/library/compiler/basic-blocks.factor"
         "/library/compiler/compiler.factor"
 
+        "/library/alien/malloc.factor"
         "/library/alien/c-types.factor"
         "/library/alien/structs.factor"
         "/library/alien/compiler.factor"
         "/library/alien/alien-invoke.factor"
         "/library/alien/alien-callback.factor"
         "/library/alien/syntax.factor"
-        "/library/alien/malloc.factor"
         
         "/library/io/buffer.factor"
 
