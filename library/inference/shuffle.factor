@@ -5,8 +5,6 @@ TUPLE: shuffle in-d in-r out-d out-r ;
 
 : empty-shuffle { } { } { } { } <shuffle> ;
 
-: cut* ( seq1 seq2 -- seq seq ) [ head* ] 2keep tail* ;
-
 : load-shuffle ( d r shuffle -- )
     tuck shuffle-in-r [ set ] 2each shuffle-in-d [ set ] 2each ;
 

@@ -54,7 +54,6 @@
 - the invalid recursion form case needs to be fixed, for inlines too
 - code gc
 - compiled gc check slows things down
-- fix branch folding
 - new x86 write barrier
 
 + misc:

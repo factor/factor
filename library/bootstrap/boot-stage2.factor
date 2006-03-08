@@ -37,9 +37,9 @@ sequences sequences-internals words ;
     "Initializing native I/O..." print flush
     "native-io" get [ init-io ] when
     
-    ! os "macosx" = [
-    !     "/library/cocoa/load.factor" run-resource
-    ! ] when
+    os "macosx" = [
+        "/library/cocoa/load.factor" run-resource
+    ] when
 ] when
 
 [

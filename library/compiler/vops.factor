@@ -156,22 +156,22 @@ C: %peek make-vop ;
 
 M: %peek basic-block? drop t ;
 
-: %peek-d ( vreg n -- vop )
-    <ds-loc> swap <vreg> src/dest-vop <%peek> ;
+: %peek swap <vreg> src/dest-vop <%peek> ;
 
-: %peek-r ( vreg n -- vop )
-    <cs-loc> swap <vreg> src/dest-vop <%peek> ;
+: %peek-d ( vreg n -- vop ) <ds-loc> %peek ;
+
+: %peek-r ( vreg n -- vop ) <cs-loc> %peek ;
 
 TUPLE: %replace ;
 C: %replace make-vop ;
 
 M: %replace basic-block? drop t ;
 
-: %replace-d ( vreg n -- vop )
-    <ds-loc> src/dest-vop <%replace> ;
+: %replace ( vreg loc -- vop ) src/dest-vop <%replace> ;
 
-: %replace-r ( vreg n -- vop )
-    <cs-loc> src/dest-vop <%replace> ;
+: %replace-d ( vreg n -- vop ) <ds-loc> %replace ;
+
+: %replace-r ( vreg n -- vop ) <cs-loc> %replace ;
 
 TUPLE: %inc-d ;
 C: %inc-d make-vop ;

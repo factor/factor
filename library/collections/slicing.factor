@@ -54,6 +54,9 @@ M: object tail ( index seq -- seq ) [ tail-slice ] keep like ;
 : cut ( n seq -- before after )
     [ (cut) ] keep like ; flushable
 
+: cut* ( seq1 seq2 -- seq seq )
+    [ head* ] 2keep tail* ; flushable
+
 : (group) ( n seq -- )
     2dup length >= [
         dup empty? [ 2drop ] [ dup like , drop ] if

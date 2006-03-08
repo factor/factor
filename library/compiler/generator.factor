@@ -12,7 +12,7 @@ GENERIC: generate-node ( vop -- )
     compiled-offset >r
     compile-aligned
     swap save-xt
-    [ dup [ generate-node ] with-vop ] each
+    [ [ dup [ generate-node ] with-vop ] each ] each
     compile-aligned
     compiled-offset r> - ;
 

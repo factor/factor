@@ -134,6 +134,7 @@ vectors words ;
         "/library/compiler/stack.factor"
         "/library/compiler/intrinsics.factor"
         "/library/compiler/generator.factor"
+        "/library/compiler/basic-blocks.factor"
         "/library/compiler/compiler.factor"
 
         "/library/alien/c-types.factor"
