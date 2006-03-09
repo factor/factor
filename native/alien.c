@@ -99,8 +99,12 @@ void primitive_alien_to_string(void)
 /* convert Factor string to C string allocated in the Factor heap */
 void primitive_string_to_alien(void)
 {
+	CELL string, type;
 	maybe_gc(0);
-	drepl(tag_object(string_to_alien(untag_string(dpeek()),true)));
+	string = dpeek();
+	type = type_of(string);
+	if(type != ALIEN_TYPE && type != BYTE_ARRAY_TYPE && type != F_TYPE)
+		drepl(tag_object(string_to_alien(untag_string(string),true)));
 }
 
 /* image loading */

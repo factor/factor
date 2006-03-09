@@ -381,9 +381,6 @@ sequences strings vectors words prettyprint ;
 \ dlsym [ [ string object ] [ integer ] ] "infer-effect" set-word-prop
 \ dlclose [ [ dll ] [ ] ] "infer-effect" set-word-prop
 
-\ <alien> [ [ integer ] [ alien ] ] "infer-effect" set-word-prop
-\ <alien> t "flushable" set-word-prop
-
 \ <byte-array> [ [ integer ] [ byte-array ] ] "infer-effect" set-word-prop
 \ <byte-array> t "flushable" set-word-prop
 

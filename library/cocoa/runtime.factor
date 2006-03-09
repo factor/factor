@@ -64,7 +64,6 @@ FUNCTION: objc-method* class_getClassMethod ( objc-class* class, SEL selector ) 
 BEGIN-STRUCT: objc-method-list
     FIELD: void* obsolete
     FIELD: int count
-    FIELD: objc-method elements
 END-STRUCT
 
 FUNCTION: objc-method-list* class_nextMethodList ( objc-class* class, void** iterator ) ;

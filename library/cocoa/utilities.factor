@@ -47,12 +47,12 @@ H{
     { CHAR: @ "id" }
     { CHAR: # "id" }
     { CHAR: : "SEL" }
-} hash objc>alien-types set-global
+} objc>alien-types set-global
 
 SYMBOL: alien>objc-types
 
 objc>alien-types get hash>alist [ reverse ] map alist>hash
-alien>objc-types get
+alien>objc-types set-global
 
 : objc-struct-type ( i string -- ctype )
     2dup CHAR: = -rot index* swap subseq ;

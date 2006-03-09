@@ -13,7 +13,7 @@ TUPLE: alien-callback-error ;
 M: alien-callback-error summary ( error -- )
     drop "Words calling ``alien-callback'' cannot run in the interpreter. Compile the caller word and try again." ;
 
-: alien-callback ( ... return parameters quot -- ... )
+: alien-callback ( return parameters quot -- address )
     <alien-callback-error> throw ;
 
 : callback-bottom ( node -- )

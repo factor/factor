@@ -88,7 +88,7 @@ bsd:
 macosx:
 	$(MAKE) $(BINARY) \
 		CFLAGS="$(DEFAULT_CFLAGS)" \
-		LIBS="$(DEFAULT_LIBS)" \
+		LIBS="$(DEFAULT_LIBS) -framework Cocoa -framework OpenGL" \
 		MACOSX=y
 
 macosx-sdl:

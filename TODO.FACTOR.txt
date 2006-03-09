@@ -19,6 +19,7 @@
 
 + ui/help:
 
+- changelog in the UI
 - make the UI look better, something like this:
   http://twb.ath.cx/~twb/darcs/OBSOLETE/factor/final.html
 - fix remaining HTML stream issues
@@ -29,9 +30,9 @@
 - document tools
 - document conventions
 - new turtle graphics tutorial
-- better line spacing in ui
+- better line spacing in ui and html
 - use vertex arrays and display lists to speed up ui
-- tabular formatting
+- tabular formatting - for inspector and changes
 - don't multiplex in the event loop if there is no pending i/o
 
 + compiler/ffi:
