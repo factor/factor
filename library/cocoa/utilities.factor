@@ -81,10 +81,12 @@ alien>objc-types set-global
     [ objc-method-name sel_getName ] keep
     method-arg-types 3array ;
 
+: method-list@ ( ptr -- ptr )
+    "objc-method-list" c-size swap <displaced-alien> ;
+
 : method-list>seq ( method-list -- seq )
-    dup objc-method-list-elements swap objc-method-list-count [
-        swap objc-method-nth objc-method-info
-    ] map-with ;
+    dup method-list@ swap objc-method-list-count
+    [ swap objc-method-nth objc-method-info ] map-with ;
 
 : (objc-methods) ( objc-class iterator -- )
     2dup class_nextMethodList
