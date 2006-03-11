@@ -64,17 +64,21 @@ void nest_stacks(void)
 /* called when leaving a compiled callback */
 void unnest_stacks(void)
 {
+	STACKS *old_stacks = stack_chain;
+
 	dealloc_bounded_block(stack_chain->data_region);
 	dealloc_bounded_block(stack_chain->call_region);
 
-	ds = stack_chain->data_save;
-	cs = stack_chain->call_save;
-	cards_offset = stack_chain->cards_offset;
+	ds = old_stacks->data_save;
+	cs = old_stacks->call_save;
+	cards_offset = old_stacks->cards_offset;
 
-	callframe = stack_chain->callframe;
-	userenv[CATCHSTACK_ENV] = stack_chain->catch_save;
+	callframe = old_stacks->callframe;
+	userenv[CATCHSTACK_ENV] = old_stacks->catch_save;
 
-	stack_chain = stack_chain->next;
+	stack_chain = old_stacks->next;
+	
+	free(old_stacks);
 }
 
 /* called on startup */

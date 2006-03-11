@@ -153,9 +153,9 @@ double callback_test_7(double (*callback)(void))
 
 int callback_test_8(int (*callback)(struct foo x), struct foo x)
 {
-	int x;
+	int y;
 	printf("callback_test_8 entry\n");
-	x = callback(x);
+	y = callback(x);
 	printf("callback_test_8 exit\n");
-	return x;
+	return y;
 }

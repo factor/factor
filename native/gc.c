@@ -74,13 +74,6 @@ void collect_roots(void)
 
 	while(stacks)
 	{
-		/* these two pointers are only set in inactive states */
-		if(stacks != stack_chain)
-		{
-			copy_handle(&stacks->callframe);
-			copy_handle(&stacks->catch_save);
-		}
-
 		CELL bottom = stacks->data_region->start;
 		CELL top = stacks->data;
 		
@@ -92,7 +85,10 @@ void collect_roots(void)
 		
 		for(ptr = bottom; ptr <= top; ptr += CELLS)
 			copy_handle((CELL*)ptr);
-		
+
+		copy_handle(&stacks->callframe);
+		copy_handle(&stacks->catch_save);
+
 		stacks = stacks->next;
 	}
 
