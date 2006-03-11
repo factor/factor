@@ -5,18 +5,18 @@ USING: alien arrays compiler hashtables kernel kernel-internals
 libc math namespaces sequences strings ;
 
 : encode-types ( return types -- encoding )
-    [ swap , { "id" "SEL" } % % ] { } make
+    >r 1array r> append
     [ [ alien>objc-types get hash % CHAR: 0 , ] each ] "" make ;
 
 : prepare-method ( { name return types quot } -- sel type imp )
-    [ first3 encode-types >r sel_registerName r> ] keep
+    [ first3 encode-types ] keep
     [ 1 swap tail % \ alien-callback , ] [ ] make ;
 
 : init-method ( method alien -- )
     >r prepare-method r>
     [ >r compile-1 r> set-objc-method-imp ] keep
     [ >r <malloc-string> r> set-objc-method-types ] keep
-    set-objc-method-name ;
+    >r sel_registerName r> set-objc-method-name ;
 
 : <empty-method-list> ( n -- alien )
     "objc-method-list" c-size
@@ -46,17 +46,23 @@ libc math namespaces sequences strings ;
 ! root class of X.
 : meta-meta-class ( class -- class ) root-class objc-class-isa ;
 
+: copy-instance-size ( class -- )
+    dup objc-class-super-class objc-class-instance-size
+    swap set-objc-class-instance-size ;
+
 : <meta-class> ( methods superclass name -- class )
     CLS_META <objc-class>
     [ >r dup objc-class-isa r> set-objc-class-super-class ] keep
     [ >r meta-meta-class r> set-objc-class-isa ] keep
-    [ >r <method-lists> r> set-objc-class-methodLists ] keep ;
+    [ >r <method-lists> r> set-objc-class-methodLists ] keep
+    dup copy-instance-size ;
 
 : <new-class> ( methods metaclass superclass name -- class )
     CLS_CLASS <objc-class>
     [ set-objc-class-super-class ] keep
     [ set-objc-class-isa ] keep
-    [ >r <method-lists> r> set-objc-class-methodLists ] keep ;
+    [ >r <method-lists> r> set-objc-class-methodLists ] keep
+    dup copy-instance-size ;
 
 : (define-objc-class) ( imeth cmeth superclass name -- class )
     >r objc-class r> [ <meta-class> ] 2keep <new-class>

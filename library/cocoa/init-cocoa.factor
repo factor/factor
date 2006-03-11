@@ -26,6 +26,7 @@ USING: cocoa compiler io kernel objc sequences words ;
     "NSInvocation"
     "NSMethodSignature"
     "NSObject"
+    "NSOpenGLContext"
     "NSOpenGLView"
     "NSSpeechSynthesizer"
     "NSURLRequest"
