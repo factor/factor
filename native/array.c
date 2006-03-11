@@ -1,8 +1,8 @@
 #include "factor.h"
 
 /* the array is full of undefined data, and must be correctly filled before the
-next GC. */
-F_ARRAY* allot_array(CELL type, F_FIXNUM capacity)
+next GC. size is in cells */
+F_ARRAY *allot_array(CELL type, F_FIXNUM capacity)
 {
 	F_ARRAY *array;
 
@@ -22,6 +22,13 @@ F_ARRAY* array(CELL type, F_FIXNUM capacity, CELL fill)
 	for(i = 0; i < capacity; i++)
 		put(AREF(array,i),fill);
 	return array;
+}
+
+/* size is in bytes this time */
+F_ARRAY *byte_array(F_FIXNUM size)
+{
+	F_FIXNUM byte_size = (size + sizeof(CELL) - 1) / sizeof(CELL);
+	return array(BYTE_ARRAY_TYPE,byte_size,0);
 }
 
 /* push a new array on the stack */
@@ -47,9 +54,8 @@ void primitive_tuple(void)
 void primitive_byte_array(void)
 {
 	F_FIXNUM size = to_fixnum(dpop());
-	maybe_gc(array_size(size));
-	F_FIXNUM byte_size = (size + sizeof(CELL) - 1) / sizeof(CELL);
-	dpush(tag_object(array(BYTE_ARRAY_TYPE,byte_size,0)));
+	maybe_gc(0);
+	dpush(tag_object(byte_array(size)));
 }
 
 F_ARRAY* resize_array(F_ARRAY* array, F_FIXNUM capacity, CELL fill)

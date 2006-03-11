@@ -109,3 +109,20 @@ FUNCTION: void callback_test_4 void* callback int a1 int a2 int a3 int a4 int a5
         "stack" get
     ] with-scope
 ] unit-test
+
+BEGIN-STRUCT: foo
+    FIELD: int x
+    FIELD: int y
+END-STRUCT
+
+: make-foo ( x y -- foo )
+    "foo" <c-object> [ set-foo-y ] keep [ set-foo-x ] keep ;
+
+: callback-10
+    "int"
+    { "foo" }
+    [ dup foo-x swap foo-y / ] alien-callback ; compiled
+
+FUNCTION: int callback_test_8 void* callback foo x ;
+
+[ 5 ] [ callback-10 10 2 make-foo callback_test_8 ] unit-test

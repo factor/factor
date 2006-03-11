@@ -151,3 +151,13 @@ void unbox_value_struct(void *dest, CELL size)
 {
 	memcpy(dest,unbox_alien(),size);
 }
+
+/* for FFI callbacks receiving structs by value */
+void box_value_struct(void *src, CELL size)
+{
+	F_ARRAY *array;
+	maybe_gc(0);
+	array = byte_array(size);
+	memcpy(array + 1,src,size);
+	dpush(tag_object(array));
+}

@@ -150,3 +150,12 @@ double callback_test_7(double (*callback)(void))
 	printf("callback_test_7 exit\n");
 	return x;
 }
+
+int callback_test_8(int (*callback)(struct foo x), struct foo x)
+{
+	int x;
+	printf("callback_test_8 entry\n");
+	x = callback(x);
+	printf("callback_test_8 exit\n");
+	return x;
+}

@@ -375,6 +375,11 @@ TUPLE: %box ;
 C: %box make-vop ;
 : %box ( n reg-class func -- vop ) 3-in-vop <%box> ;
 
+TUPLE: %box-struct ;
+C: %box-struct make-vop ;
+: %box-struct ( n reg-class size -- vop )
+    3-in-vop <%box-struct> ;
+
 TUPLE: %alien-invoke ;
 C: %alien-invoke make-vop ;
 : %alien-invoke ( func lib -- vop ) 2-in-vop <%alien-invoke> ;

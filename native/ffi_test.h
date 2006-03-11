@@ -21,3 +21,4 @@ DLLEXPORT void callback_test_4(void (*callback)(int a1, int a2, int a3, int a4, 
 DLLEXPORT int callback_test_5(int (*callback)(void));
 DLLEXPORT float callback_test_6(float (*callback)(void));
 DLLEXPORT double callback_test_7(double (*callback)(void));
+DLLEXPORT int callback_test_8(int (*callback)(struct foo x), struct foo x);

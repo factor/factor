@@ -36,14 +36,18 @@ M: %unbox generate-node ( vop -- )
     ! Store the return value on the C stack
     0 input 1 input [ return-reg ] keep freg>stack ;
 
-M: %unbox-struct generate-node ( vop -- )
-    drop
+: struct-ptr/size ( func -- )
     ! Load destination address
     3 1 0 input stack@ ADDI
     ! Load struct size
     2 input 4 LI
-    ! Copy the struct to the stack
-    "unbox_value_struct" f compile-c-call ;
+    f compile-c-call ;
+
+M: %unbox-struct generate-node ( vop -- )
+    drop "unbox_value_struct" struct-ptr/size ;
+
+M: %box-struct generate-node ( vop -- )
+    drop "box_value_struct" struct-ptr/size ;
 
 : (%move) 0 input 1 input 2 input [ fastcall-regs nth ] keep ;
 
