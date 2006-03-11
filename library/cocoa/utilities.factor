@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 IN: objc
 USING: alien arrays errors hashtables kernel lists math
-namespaces parser sequences words ;
+namespaces parser sequences strings words ;
 
 TUPLE: selector name object ;
 
@@ -29,30 +29,34 @@ C: selector ( name -- sel ) [ set-selector-name ] keep ;
 SYMBOL: objc>alien-types
 
 H{
-    { CHAR: c "char" }
-    { CHAR: i "int" }
-    { CHAR: s "short" }
-    { CHAR: l "long" }
-    { CHAR: q "longlong" }
-    { CHAR: C "uchar" }
-    { CHAR: I "uint" }
-    { CHAR: S "ushort" }
-    { CHAR: L "ulong" }
-    { CHAR: Q "ulonglong" }
-    { CHAR: f "float" }
-    { CHAR: d "double" }
-    { CHAR: B "bool" }
-    { CHAR: v "void" }
-    { CHAR: * "char*" }
-    { CHAR: @ "id" }
-    { CHAR: # "id" }
-    { CHAR: : "SEL" }
+    { "c" "char" }
+    { "i" "int" }
+    { "s" "short" }
+    { "l" "long" }
+    { "q" "longlong" }
+    { "C" "uchar" }
+    { "I" "uint" }
+    { "S" "ushort" }
+    { "L" "ulong" }
+    { "Q" "ulonglong" }
+    { "f" "float" }
+    { "d" "double" }
+    { "B" "bool" }
+    { "v" "void" }
+    { "*" "char*" }
+    { "@" "id" }
+    { "#" "id" }
+    { ":" "SEL" }
 } objc>alien-types set-global
 
 SYMBOL: alien>objc-types
 
 objc>alien-types get hash>alist [ reverse ] map alist>hash
-alien>objc-types set-global
+H{
+    { "NSPoint" "{_NSPoint=ff}" }
+    { "NSRect" "{_NSRect=ffff}" }
+    { "NSSize" "{_NSSize=ff}" }
+} hash-union alien>objc-types set-global
 
 : objc-struct-type ( i string -- ctype )
     2dup CHAR: = -rot index* swap subseq ;
@@ -63,7 +67,7 @@ alien>objc-types set-global
         { [ dup CHAR: ^ = ] [ 3drop "void*" ] }
         { [ dup CHAR: { = ] [ drop objc-struct-type ] }
         { [ dup CHAR: [ = ] [ 3drop "void*" ] }
-        { [ t ] [ 2nip objc>alien-types get hash ] }
+        { [ t ] [ 2nip ch>string objc>alien-types get hash ] }
     } cond ;
 
 : parse-objc-type ( string -- ctype ) 0 swap (parse-objc-type) ;

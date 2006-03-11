@@ -5,8 +5,8 @@ USING: alien arrays compiler hashtables kernel kernel-internals
 libc math namespaces sequences strings ;
 
 : encode-types ( return types -- encoding )
-    >r 1array r> append
-    [ [ alien>objc-types get hash , CHAR: 0 , ] each ] "" make ;
+    [ swap , { "id" "SEL" } % % ] { } make
+    [ [ alien>objc-types get hash % CHAR: 0 , ] each ] "" make ;
 
 : prepare-method ( { name return types quot } -- sel type imp )
     [ first3 encode-types >r sel_registerName r> ] keep

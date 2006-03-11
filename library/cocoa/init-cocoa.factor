@@ -29,6 +29,7 @@ USING: cocoa compiler io kernel objc sequences words ;
     "NSOpenGLView"
     "NSSpeechSynthesizer"
     "NSURLRequest"
+    "NSView"
     "NSWindow"
     "PDFDocument"
     "PDFView"

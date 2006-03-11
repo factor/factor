@@ -1,14 +1,21 @@
 IN: cocoa-opengl
-USING: alien cocoa compiler io kernel math objc objc-NSObject
-objc-NSOpenGLView objc-NSWindow parser sequences threads ;
+USING: alien cocoa compiler io kernel math objc objc-NSObject objc-NSOpenGLView objc-NSWindow parser sequences
+threads ;
 
-{
-    { "drawRect:" "void" { "int" "int" "int" "int" } [ drop ] }
-} { }
-"NSOpenGLView" "FactorView" define-objc-class
-"FactorView" import-objc-class
+: init-FactorView-class
+    {
+        {
+            "drawRect:" "void" { "NSRect" }
+            [ 3drop "drawRect: called" print ]
+        }
+    } { } "NSOpenGLView" "FactorView" define-objc-class drop
+    "FactorView" import-objc-class ; parsing
 
-: <NSOpenGLView>
+init-FactorView-class
+
+USE: objc-FactorView
+
+: <FactorView>
     NSOpenGLView [alloc]
     0 0 100 100 <NSRect> NSOpenGLView [defaultPixelFormat]
     [initWithFrame:pixelFormat:] ;
@@ -16,10 +23,10 @@ objc-NSOpenGLView objc-NSWindow parser sequences threads ;
 "OpenGL demo" 10 10 600 600 <NSRect> <NSWindow>
 dup
 
-<NSOpenGLView>
+<FactorView>
 
 [setContentView:]
 
-dup f [makeKeyAndOrderFront:]
+f [makeKeyAndOrderFront:]
 
 event-loop
