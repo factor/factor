@@ -6,25 +6,26 @@ libc math namespaces sequences strings ;
 
 : encode-types ( return types -- encoding )
     >r 1array r> append
-    [ alien>objc-types get hash ] map >string ;
+    [ [ alien>objc-types get hash , CHAR: 0 , ] each ] "" make ;
 
 : prepare-method ( { name return types quot } -- sel type imp )
     [ first3 encode-types >r sel_registerName r> ] keep
-    [ % \ alien-callback , ] [ ] make compile-1 ;
+    [ 1 swap tail % \ alien-callback , ] [ ] make ;
 
 : init-method ( method alien -- )
     >r prepare-method r>
-    [ set-objc-method-imp ] keep
-    [ set-objc-method-types ] keep
+    [ >r compile-1 r> set-objc-method-imp ] keep
+    [ >r <malloc-string> r> set-objc-method-types ] keep
     set-objc-method-name ;
 
 : <empty-method-list> ( n -- alien )
     "objc-method-list" c-size
-    "objc-method" c-size rot * + 1 calloc ;
+    "objc-method" c-size pick * + 1 calloc
+    [ set-objc-method-list-count ] keep ;
 
 : <method-list> ( methods -- alien )
     dup length dup <empty-method-list> -rot
-    [ pick objc-method-nth init-method ] 2each ;
+    [ pick method-list@ objc-method-nth init-method ] 2each ;
 
 : <method-lists> ( methods -- lists )
     <method-list> alien-address

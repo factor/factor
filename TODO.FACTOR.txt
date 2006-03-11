@@ -39,6 +39,7 @@
 
 - inform-compile dies with funny error
 - amd64 %unbox-struct
+- amd64 %write-barrier
 - float intrinsics
 - complex float type
 - complex float intrinsics
