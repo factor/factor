@@ -118,11 +118,11 @@ END-STRUCT
 : make-foo ( x y -- foo )
     "foo" <c-object> [ set-foo-y ] keep [ set-foo-x ] keep ;
 
-: callback-10
+: callback-14
     "int"
     { "foo" }
     [ dup foo-x swap foo-y / ] alien-callback ; compiled
 
-FUNCTION: int callback_test_8 void* callback foo x ;
+FUNCTION: int callback_test_8 void* callback foo x ; compiled
 
-[ 5 ] [ callback-10 10 2 make-foo callback_test_8 ] unit-test
+[ 5 ] [ callback-14 10 2 make-foo callback_test_8 ] unit-test
