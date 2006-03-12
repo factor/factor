@@ -1,5 +1,6 @@
 IN: temporary
-USING: alien io-internals kernel kernel-internals sequences test ;
+USING: alien io-internals kernel kernel-internals libc
+sequences test ;
 
 : buffer-append ( buffer buffer -- )
     #! Append first buffer to second buffer.

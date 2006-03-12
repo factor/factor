@@ -20,7 +20,6 @@
 
 - autoload frameworks in cocoa class words
 - auto-define classes in obj-c class words
-- subclassing
 - super message sends
 
 + ui/help:
@@ -43,7 +42,6 @@
 
 + compiler/ffi:
 
-- inform-compile dies with funny error
 - float intrinsics
 - complex float type
 - complex float intrinsics
