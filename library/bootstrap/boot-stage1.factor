@@ -154,13 +154,6 @@ vectors words ;
         ! This must be the last file of parsing words loaded
         "/library/syntax/parse-syntax.factor"
 
-        "/library/sdl/sdl.factor"
-        "/library/sdl/sdl-video.factor"
-        "/library/sdl/sdl-event.factor"
-        "/library/sdl/sdl-keysym.factor"
-        "/library/sdl/sdl-keyboard.factor"
-        "/library/sdl/sdl-utils.factor"
-
         "/library/opengl/gl.factor"
         "/library/opengl/glu.factor"
         "/library/opengl/opengl-utils.factor"
