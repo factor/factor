@@ -89,10 +89,6 @@ CELL executing;
 #include <string.h>
 #include <time.h>
 
-#ifdef FACTOR_SDL
-#include "SDL/SDL.h"
-#endif
-
 #include <sys/param.h>
 
 #ifdef WIN32

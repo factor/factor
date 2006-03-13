@@ -69,7 +69,6 @@ default:
 	@echo "linux"
 	@echo "linux-ppc"
 	@echo "macosx"
-	@echo "macosx-sdl -- if you wish to use the Factor GUI on Mac OS X"
 	@echo "solaris"
 	@echo "windows"
 	@echo ""
@@ -89,12 +88,6 @@ macosx:
 	$(MAKE) $(BINARY) \
 		CFLAGS="$(DEFAULT_CFLAGS)" \
 		LIBS="$(DEFAULT_LIBS) -framework Cocoa -framework OpenGL" \
-		MACOSX=y
-
-macosx-sdl:
-	$(MAKE) $(BINARY) \
-		CFLAGS="$(DEFAULT_CFLAGS) -DFACTOR_SDL" \
-		LIBS="$(DEFAULT_LIBS) -lSDL -lSDLmain -framework Cocoa -framework OpenGL" \
 		MACOSX=y
 
 linux linux-x86 linux-amd64:
