@@ -124,16 +124,31 @@ TUPLE: item expire? quot id time-added ;
 DEFER: show-final
 DEFER: show 
 
-: expired-page-handler ( alist -- )
+TUPLE: resume value stdio ;
+
+: (expired-page-handler) ( alist -- )
   #! Display a page has expired message.
   #! TODO: Need to handle this better to enable
   #!       returning back to root continuation.
-  drop
     <html>                
       <body> 
        <p> "This page has expired." write  </p> 
       </body>
-    </html> flush ;
+    </html> flush  ;
+
+: (expired-page-handler) ( alist -- )
+  #! Display a page has expired message.
+  #! TODO: Need to handle this better to enable
+  #!       returning back to root continuation.
+    drop
+    <html>                
+      <body> 
+       <p> "This page has expired." write  </p> 
+      </body>
+    </html> flush  ;
+
+: expired-page-handler ( alist -- )
+  [ (expired-page-handler) ] show-final ;
 
 : >callable ( quot|interp|f -- interp )
   dup continuation? [
@@ -148,10 +163,8 @@ DEFER: show
   get-continuation-item [
     item-quot
   ] [
-    [ expired-page-handler ]
+    [ (expired-page-handler) ]
   ] if* >callable ;
-
-TUPLE: resume value stdio ;
 
 : resume-continuation ( resumed-data id  -- ) 
   #! Call the continuation associated with the given id,
@@ -190,13 +203,13 @@ SYMBOL: callback-cc
   [  ( 0 -- )
     [ ( 0 1 -- )
       callback-cc set ( 0 -- )
-      continue
+      stdio get swap continue-with
     ] callcc1 ( 0 [ ] == )
     nip
     dup resume-stdio stdio set resume-value
     call
-    store-callback-cc
-  ] callcc0 ;
+    store-callback-cc stdio get 
+  ] callcc1 stdio set ;
 
 : forward-to-url ( url -- )
   #! When executed inside a 'show' call, this will force a
@@ -287,7 +300,7 @@ SYMBOL: root-continuation
      id-or-root [
       resume-continuation
     ] [
-      expired-page-handler 
+      (expired-page-handler) "" call-exit-continuation
     ] if* 
   ] with-exit-continuation drop ;
 
@@ -308,14 +321,14 @@ SYMBOL: root-continuation
   #! stack.
   <a quot-url =href a> write </a> ;
 
-: init-session-namespace ( -- )
+: init-session-namespace ( <resume> -- )
   #! Setup the initial session namespace. Currently this only
   #! sets the redirect flag so that the initial request of the
   #! responder will not do a post-refresh-get style redirect.
   #! This prevents the initial request to a responder from redirecting
   #! to an URL with a continuation id. This word must be run from
   #! within the session namespace.
-  f post-refresh-get? set ;
+  f post-refresh-get? set dup resume-stdio stdio set ;
 
 : install-cont-responder ( name quot -- )
   #! Install a cont-responder with the given name
