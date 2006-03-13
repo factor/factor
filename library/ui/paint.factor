@@ -1,7 +1,7 @@
 ! Copyright (C) 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
 USING: alien arrays freetype gadgets-layouts generic hashtables
-io kernel lists math namespaces opengl sdl sequences strings
+io kernel lists math namespaces opengl sequences strings
 styles vectors ;
 IN: gadgets
 

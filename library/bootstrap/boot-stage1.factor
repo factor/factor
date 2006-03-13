@@ -171,7 +171,6 @@ vectors words ;
         "/library/ui/hand.factor"
         "/library/ui/frames.factor"
         "/library/ui/world.factor"
-        "/library/ui/events.factor"
         "/library/ui/borders.factor"
         "/library/ui/labels.factor"
         "/library/ui/buttons.factor"
@@ -188,7 +187,6 @@ vectors words ;
         "/library/ui/listener.factor"
         "/library/ui/commands.factor"
         "/library/ui/presentations.factor"
-        "/library/ui/ui.factor"
 
         "/library/help/commands.factor"
 

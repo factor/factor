@@ -1,15 +1,17 @@
-! Copyright (C) 2005 Slava Pestov.
-! See http://factor.sf.net/license.txt for BSD license.
+! Copyright (C) 2005, 2006 Slava Pestov.
+! See http://factorcode.org/license.txt for BSD license.
 IN: gadgets
-USING: alien arrays errors freetype gadgets-layouts generic io
-kernel lists math memory namespaces opengl prettyprint sdl
-sequences sequences strings styles threads ;
+USING: alien arrays errors freetype gadgets-layouts
+gadgets-theme generic io kernel lists math memory namespaces
+opengl prettyprint sequences sequences strings styles threads ;
+
+DEFER: redraw-world
 
 ! The world gadget is the top level gadget that all (visible)
 ! gadgets are contained in. The current world is stored in the
 ! world variable. The invalid slot is a list of gadgets that
 ! need to be layout.
-TUPLE: world running? glass status invalid timers ;
+TUPLE: world glass status invalid timers handle ;
 
 : timers ( -- hash ) world get world-timers ;
 
@@ -38,12 +40,6 @@ C: world ( -- world )
     hide-glass
     <gadget> dup add-layer dup world get set-world-glass
     dupd add-gadget prefer ;
-
-: world-clip ( -- )
-    { 0 0 0 } width get height get 0 3array <rect> clip set ;
-
-: draw-world ( -- )
-    [ world-clip world get draw-gadget ] with-gl-surface ;
 
 ! Status bar protocol
 GENERIC: set-message ( string/f status -- )
@@ -88,33 +84,25 @@ M: f set-message 2drop ;
     #! Called when a gadget is removed or added.
     hand get rect-loc move-hand ;
 
-: stop-world ( -- )
-    f world get set-world-running? ;
-
 : ui-title
     [ "Factor " % version % " - " % image % ] "" make ;
 
-: start-world ( -- )
-    ui-title dup SDL_WM_SetCaption
-    world get dup relayout t swap set-world-running? ;
-
 : world-step ( -- )
+    do-timers
     world get world-invalid >r layout-world r>
-    [ update-hand draw-world ] when ;
+    [ update-hand redraw-world ] when ;
 
-: next-event ( -- event ? ) "event" <c-object> dup SDL_PollEvent ;
+SYMBOL: first-time
 
-GENERIC: handle-event ( event -- )
+global [ first-time on ] bind
 
-: world-loop ( -- )
-    #! Keep polling for events until there are no more events in
-    #! the queue; then block for the next event.
-    next-event [
-        handle-event world-loop
-    ] [
-        drop world-step do-timers
-        world get world-running? [ 10 sleep world-loop ] when
-    ] if ;
-
-: run-world ( -- )
-    [ start-world world-loop ] [ stop-world ] cleanup ;
+: init-world ( -- )
+    global [
+        first-time get [
+            <world> world set
+            world get solid-interior
+            { 600 700 0 } world get set-gadget-dim
+            <hand> hand set
+            first-time off
+        ] when
+    ] bind ;

@@ -64,10 +64,11 @@ libc math namespaces sequences strings ;
     [ >r <method-lists> r> set-objc-class-methodLists ] keep
     dup copy-instance-size ;
 
-: (define-objc-class) ( imeth cmeth superclass name -- class )
+: (define-objc-class) ( imeth cmeth superclass name -- )
     >r objc-class r> [ <meta-class> ] 2keep <new-class>
-    dup objc_addClass ;
+    objc_addClass ;
 
-: define-objc-class ( imeth cmeth superclass name -- class )
-    dup class-exists?
-    [ >r 3drop r> objc-class ] [ (define-objc-class) ] if ;
+: define-objc-class ( superclass name imeth cmeth -- )
+    2swap dup class-exists?
+    [ [ 2drop 2drop ] [ (define-objc-class) ] if ] keep
+    import-objc-class ;
