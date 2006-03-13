@@ -1,9 +1,9 @@
 ! Copyright (C) 2006 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
 USING: alien arrays cocoa freetype gadgets gadgets-layouts
-gadgets-listener kernel namespaces objc objc-NSApplication
+gadgets-listener io kernel namespaces objc objc-NSApplication
 objc-NSObject objc-NSOpenGLContext objc-NSOpenGLView objc-NSView
-objc-NSWindow opengl sequences threads walker ;
+objc-NSWindow opengl prettyprint sequences threads walker ;
 IN: gadgets-cocoa
 
 ! Cocoa backend for Factor UI
@@ -66,10 +66,12 @@ USE: objc-FactorView
 [
     [
         init-world
+    
+        world get ui-title <FactorWindow>
+
+        [contentView] [openGLContext] [makeCurrentContext]
         listener-application
-    
-        world get ui-title <FactorWindow> drop
-    
+        
         event-loop
     ] with-cocoa
 ] with-freetype

@@ -25,17 +25,10 @@ objc-NSObject objc-NSView threads ;
 : do-events ( app -- )
     dup next-event [ dupd [sendEvent:] do-events ] [ drop ] if* ;
 
-: (event-loop) ( -- )
+: event-loop ( -- )
     [
         NSApplication [sharedApplication] do-events world-step
-    ] with-autorelease-pool 10 sleep (event-loop) ;
-
-: event-loop ( -- )
-    \ NSApplication get expired? [
-        NSApplication [sharedApplication]
-        \ NSApplication set-global
-        [ (event-loop) ] in-thread
-    ] when ;
+    ] with-autorelease-pool 10 sleep event-loop ;
 
 IN: errors
 
