@@ -3,7 +3,7 @@
 USING: alien arrays cocoa freetype gadgets gadgets-layouts
 gadgets-listener kernel namespaces objc objc-NSApplication
 objc-NSObject objc-NSOpenGLContext objc-NSOpenGLView objc-NSView
-objc-NSWindow opengl threads ;
+objc-NSWindow opengl sequences threads walker ;
 IN: gadgets-cocoa
 
 ! Cocoa backend for Factor UI
@@ -56,15 +56,20 @@ USE: objc-FactorView
     FactorView [alloc]
     0 0 100 100 <NSRect> NSOpenGLView [defaultPixelFormat]
     [initWithFrame:pixelFormat:]
-    over set-world-handle ;
+    [ swap set-world-handle ] keep ;
+
+: <FactorWindow> ( gadget title -- window )
+    over rect-dim first2 0 0 2swap <NSRect> <NSWindow>
+    [ swap <FactorView> [setContentView:] ] keep
+    dup f [makeKeyAndOrderFront:] ;
 
 [
-    init-world
-    listener-application
-
-    ui-title 10 10 600 600 <NSRect> <NSWindow>
-    dup <FactorView> [setContentView:]
-    f [makeKeyAndOrderFront:]
-
-    event-loop
+    [
+        init-world
+        listener-application
+    
+        world get ui-title <FactorWindow> drop
+    
+        event-loop
+    ] with-cocoa
 ] with-freetype

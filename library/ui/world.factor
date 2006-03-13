@@ -90,7 +90,7 @@ M: f set-message 2drop ;
 : world-step ( -- )
     do-timers
     world get world-invalid >r layout-world r>
-    [ update-hand redraw-world ] when ;
+    [ update-hand world get redraw-world ] when ;
 
 SYMBOL: first-time
 

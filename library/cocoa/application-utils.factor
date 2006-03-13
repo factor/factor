@@ -8,6 +8,12 @@ objc-NSObject objc-NSView threads ;
 : with-autorelease-pool ( quot -- )
     NSAutoreleasePool [new] slip [release] ; inline
 
+: with-cocoa ( quot -- )
+    [
+        NSApplication [sharedApplication] drop
+        call
+    ] with-autorelease-pool ; inline
+
 : <NSString> <CFString> [autorelease] ;
 
 : CFRunLoopDefaultMode "kCFRunLoopDefaultMode" <NSString> ;

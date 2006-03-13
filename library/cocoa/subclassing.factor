@@ -69,6 +69,7 @@ libc math namespaces sequences strings ;
     objc_addClass ;
 
 : define-objc-class ( superclass name imeth cmeth -- )
-    2swap dup class-exists?
-    [ [ 2drop 2drop ] [ (define-objc-class) ] if ] keep
-    import-objc-class ;
+    2swap [
+        dup class-exists?
+        [ 2drop 2drop ] [ (define-objc-class) ] if
+    ] keep import-objc-class ;
