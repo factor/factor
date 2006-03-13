@@ -29,6 +29,6 @@ H{
 
     { "pdf"    "application/pdf"                  }
                                                     
-    { "factor" "application/x-factor"             }
+    { "factor" "text/plain"                       }
     { "factsp" "application/x-factor-server-page" }
 } "mime-types" global set-hash
