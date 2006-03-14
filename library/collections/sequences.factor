@@ -59,3 +59,7 @@ M: integer nth-unsafe drop ;
 : first2-unsafe [ 0 swap nth-unsafe ] keep 1 swap nth-unsafe ; inline
 : first3-unsafe [ first2-unsafe ] keep 2 swap nth-unsafe ; inline
 : first4-unsafe [ first3-unsafe ] keep 3 swap nth-unsafe ; inline
+
+: exchange-unsafe ( n n seq -- )
+    [ tuck nth-unsafe >r nth-unsafe r> ] 3keep tuck
+    >r >r set-nth-unsafe r> r> set-nth-unsafe ; inline

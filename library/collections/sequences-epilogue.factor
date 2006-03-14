@@ -114,6 +114,10 @@ M: object reverse ( seq -- seq ) [ <reversed> ] keep like ;
         [ swap [ nth ] map-with ] map-with
     ] unless ; flushable
 
+: exchange ( n n seq -- )
+    pick over bounds-check 2drop 2dup bounds-check 2drop
+    exchange-unsafe ;
+
 IN: kernel
 
 M: object <=>
