@@ -79,5 +79,5 @@ M: label set-message ( string/f status -- )
 
 : listener-application ( -- )
     <listener> set-application
-    ! [ clear listener-thread ] in-thread
+    [ clear listener-thread ] in-thread
     pane get request-focus ;

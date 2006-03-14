@@ -23,7 +23,11 @@ objc-NSObject objc-NSView threads ;
     [nextEventMatchingMask:untilDate:inMode:dequeue:] ;
 
 : do-events ( app -- )
-    dup next-event [ dupd [sendEvent:] do-events ] [ drop ] if* ;
+    dup next-event [
+        dupd [ [sendEvent:] ] with-autorelease-pool do-events
+    ] [
+        drop
+    ] if* ;
 
 : event-loop ( -- )
     [

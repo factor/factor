@@ -51,11 +51,6 @@ sequences ;
     #! Draw a polygon.
     GL_LINE_LOOP (gl-poly) ;
 
-: gl-set-clip ( loc dim -- )
-    dup first2 1+ >r >r
-    over second swap second + ( height get ) 600 swap - >r
-    first r> r> r> glScissor ;
-
 : prepare-gradient ( direction dim -- v1 v2 )
     tuck v* [ v- ] keep ;
 

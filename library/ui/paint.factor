@@ -27,6 +27,11 @@ DEFER: draw-gadget
         draw-gadget*
     ] keep vneg gl-translate ;
 
+: gl-set-clip ( loc dim -- )
+    dup first2 1+ >r >r
+    over second swap second + world get rect-dim second
+    swap - >r first r> r> r> glScissor ;
+
 : do-clip ( gadget -- )
     >absolute clip [ rect-intersect dup ] change
     dup rect-loc swap rect-dim gl-set-clip ;
