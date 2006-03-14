@@ -56,9 +56,11 @@ void nest_stacks(void)
 	new_stacks->call_region = alloc_bounded_block(cs_size);
 	new_stacks->next = stack_chain;
 	stack_chain = new_stacks;
+
 	callframe = F;
 	reset_datastack();
 	reset_callstack();
+	update_cards_offset();
 }
 
 /* called when leaving a compiled callback */

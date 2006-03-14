@@ -10,6 +10,14 @@ CELL init_zone(ZONE *z, CELL size, CELL base)
 	return z->limit;
 }
 
+/* update this global variable. since it is stored in a non-volatile register,
+we need to save its contents and re-initialize it when entering a callback,
+and restore its contents when leaving the callback. see stack.c */
+void update_cards_offset(void)
+{
+	cards_offset = (CELL)cards - (heap_start >> CARD_BITS);
+}
+
 /* input parameters must be 8 byte aligned */
 /* the heap layout is important:
 - two semispaces: tenured and prior
@@ -35,7 +43,7 @@ void init_arena(CELL gens, CELL young_size, CELL aging_size)
 
 	cards = safe_malloc(cards_size);
 	cards_end = cards + cards_size;
-	cards_offset = (CELL)cards - (heap_start >> CARD_BITS);
+	update_cards_offset();
 
 	alloter = heap_start;
 

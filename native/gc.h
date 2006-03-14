@@ -118,6 +118,7 @@ INLINE void* allot_object(CELL type, CELL length)
 	return object;
 }
 
+void update_cards_offset(void);
 CELL collect_next(CELL scan);
 void garbage_collection(CELL gen);
 void primitive_gc(void);
