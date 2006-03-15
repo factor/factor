@@ -1,14 +1,20 @@
 ! Copyright (C) 2005, 2006 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-IN: gadgets-layouts
 USING: errors gadgets generic hashtables kernel lists math
-namespaces sequences ;
+namespaces queues sequences ;
+IN: gadgets-layouts
 
 : invalidate ( gadget -- ) t swap set-gadget-relayout? ;
 
 : forget-pref-dim ( gadget -- ) f swap set-gadget-pref-dim ;
 
 : invalidate* ( gadget -- ) dup invalidate forget-pref-dim ;
+
+: invalid ( -- queue ) \ invalid global hash ;
+
+<queue> \ invalid set-global
+
+: add-invalid ( gadget -- ) invalid enque ;
 
 : relayout ( gadget -- )
     #! Relayout and redraw a gadget and its parent before the
@@ -68,6 +74,10 @@ DEFER: layout
         f over set-gadget-relayout?
         dup layout* dup layout-children
     ] when drop ;
+
+: layout-queued ( -- )
+    invalid dup queue-empty?
+    [ drop ] [ deque layout layout-queued ] if ;
 
 TUPLE: pack align fill gap ;
 

@@ -56,7 +56,9 @@ FUNCTION: void CFRelease ( void* cf ) ;
     CFRelease ;
 
 : <CFBundle> ( string -- cf )
-    t <CFFileSystemURL> f over CFBundleCreate swap CFRelease ;
+    t <CFFileSystemURL> [
+        f swap CFBundleCreate
+    ] keep CFRelease ;
 
 : load-framework ( name -- )
     dup <CFBundle> [

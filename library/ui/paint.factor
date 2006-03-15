@@ -8,9 +8,9 @@ IN: gadgets
 SYMBOL: clip
 
 : init-gl ( dim -- )
-    0.0 0.0 0.0 0.0 glClearColor 
-    { 1.0 0.0 0.0 0.0 } gl-color
+    1.0 1.0 1.0 1.0 glClearColor
     GL_COLOR_BUFFER_BIT glClear
+    { 1.0 0.0 0.0 0.0 } gl-color
     GL_PROJECTION glMatrixMode
     glLoadIdentity
     GL_MODELVIEW glMatrixMode

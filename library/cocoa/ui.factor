@@ -141,7 +141,8 @@ IN: gadgets-cocoa
     [initWithFrame:pixelFormat:]
     dup 1 [setPostsBoundsChangedNotifications:]
     dup 1 [setPostsFrameChangedNotifications:]
-    dup "updateFactorGadgetSize:" add-resize-observer ;
+    dup "updateFactorGadgetSize:" add-resize-observer
+    [autorelease] ;
 
 : <FactorWindow> ( gadget title -- window )
     over rect-dim first2 0 0 2swap <NSRect> <NSWindow>
@@ -149,14 +150,16 @@ IN: gadgets-cocoa
     [ swap set-world-handle ] keep
     dup 1 [setAcceptsMouseMovedEvents:]
     dup dup [contentView] [setInitialFirstResponder:]
-    dup f [makeKeyAndOrderFront:] ;
+    dup f [makeKeyAndOrderFront:]
+    [autorelease] ;
 
 IN: shells
 
 : ui
     [
         [
-            init-world
+            { 600 700 0 } <world> world set
+            <hand> hand set
 
             world get ui-title <FactorWindow>
 

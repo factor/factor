@@ -63,8 +63,6 @@ GENERIC: user-input* ( str gadget -- ? )
 
 M: gadget user-input* 2drop t ;
 
-DEFER: add-invalid
-
 GENERIC: children-on ( rect/point gadget -- list )
 
 M: gadget children-on ( rect/point gadget -- list )

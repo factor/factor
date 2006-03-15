@@ -3,7 +3,8 @@
 IN: gadgets
 USING: alien arrays errors freetype gadgets-layouts
 gadgets-theme generic io kernel lists math memory namespaces
-opengl prettyprint sequences sequences strings styles threads ;
+opengl prettyprint queues sequences sequences strings styles
+threads ;
 
 DEFER: redraw-world
 
@@ -11,28 +12,15 @@ DEFER: redraw-world
 ! gadgets are contained in. The current world is stored in the
 ! world variable. The invalid slot is a list of gadgets that
 ! need to be layout.
-TUPLE: world glass status invalid timers handle ;
-
-: timers ( -- hash ) world get world-timers ;
+TUPLE: world glass status handle ;
 
 : add-layer ( gadget -- )
     world get add-gadget ;
 
-C: world ( -- world )
+C: world ( dim -- world )
     <stack> over set-delegate
-    dup solid-interior
-    t over set-gadget-root?
-    H{ } clone over set-world-timers ;
-
-: add-invalid ( gadget -- )
-    world get [ world-invalid cons ] keep set-world-invalid ;
-
-: pop-invalid ( -- list )
-    world get [ world-invalid f ] keep set-world-invalid ;
-
-: layout-world ( -- )
-    world get world-invalid
-    [ pop-invalid [ layout ] each layout-world ] when ;
+    [ set-gadget-dim ] keep
+    t over set-gadget-root? ;
 
 : hide-glass ( -- )
     f world get dup world-glass unparent set-world-glass ;
@@ -84,19 +72,5 @@ M: f set-message 2drop ;
 
 : world-step ( -- )
     do-timers
-    world get world-invalid >r layout-world r>
-    [ update-hand world get redraw-world ] when ;
-
-SYMBOL: first-time
-
-global [ first-time on ] bind
-
-: init-world ( -- )
-    global [
-        first-time get [
-            <world> world set
-            { 600 700 0 } world get set-gadget-dim
-            <hand> hand set
-            first-time off
-        ] when
-    ] bind ;
+    invalid queue-empty? >r layout-queued r>
+    [ update-hand world get redraw-world ] unless ;

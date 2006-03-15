@@ -10,9 +10,8 @@ objc-NSNotificationCenter objc-NSObject objc-NSView threads ;
 
 : with-cocoa ( quot -- )
     [
-        NSApplication [sharedApplication] drop
-        call
-    ] with-autorelease-pool ; inline
+        NSApplication [sharedApplication] drop call
+    ] with-autorelease-pool ;
 
 : <NSString> <CFString> [autorelease] ;
 
@@ -23,11 +22,8 @@ objc-NSNotificationCenter objc-NSObject objc-NSView threads ;
     [nextEventMatchingMask:untilDate:inMode:dequeue:] ;
 
 : do-events ( app -- )
-    dup next-event [
-        dupd [ [sendEvent:] ] with-autorelease-pool do-events
-    ] [
-        drop
-    ] if* ;
+    dup next-event
+    [ dupd [sendEvent:] do-events ] [ drop ] if* ;
 
 : event-loop ( -- )
     [
