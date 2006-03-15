@@ -21,6 +21,7 @@
 - autoload frameworks in cocoa class words
 - auto-define classes in obj-c class words
 - super message sends
+  super [foo]...
 
 + ui/help:
 
@@ -42,6 +43,7 @@
 
 + compiler/ffi:
 
+- alien>utf16-string, utf16-string>alien words
 - float intrinsics
 - complex float type
 - complex float intrinsics

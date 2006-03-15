@@ -1,7 +1,7 @@
 ! Copyright (C) 2006 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
 USING: alien arrays cocoa freetype gadgets gadgets-layouts
-gadgets-listener io kernel math namespaces objc
+gadgets-listener hashtables io kernel lists math namespaces objc
 objc-NSApplication objc-NSEvent objc-NSMenu objc-NSObject
 objc-NSOpenGLContext objc-NSOpenGLView objc-NSView objc-NSWindow
 opengl prettyprint sequences threads walker ;
@@ -37,13 +37,17 @@ IN: gadgets-cocoa
     [ [makeCurrentContext] call glFlush ] keep
     [flushBuffer] ; inline
 
+: button ( event -- n )
+    #! Cocoa -> Factor UI button mapping
+    [buttonNumber] H{ { 0 1 } { 2 2 } { 1 3 } } hash ;
+
 : send-button-down ( event -- )
     update-clicked
-    [buttonNumber] dup hand get hand-buttons push
+    button dup hand get hand-buttons push
     [ button-down ] button-gesture ;
 
 : send-button-up ( event -- )
-    [buttonNumber] dup hand get hand-buttons delete
+    button dup hand get hand-buttons delete
     [ button-up ] button-gesture ;
 
 : mouse-location ( window -- loc )
@@ -61,17 +65,49 @@ IN: gadgets-cocoa
     [ wheel-up ] [ wheel-down ] ?
     hand get hand-clicked handle-gesture drop ;
 
-! M: key-down-event handle-event ( event -- )
-!     dup keyboard-event>binding
-!     hand get hand-focus handle-gesture [
-!         keyboard-event-unicode dup control? [
-!             drop
-!         ] [
-!             hand get hand-focus user-input drop
-!         ] if
-!     ] [
-!         drop
-!     ] if ;
+: modifiers
+    {
+        { "SHIFT" HEX: 10000 }
+        { "CTRL" HEX: 40000 }
+        { "ALT" HEX: 80000 }
+        { "META" HEX: 100000 }
+    } ;
+
+: key-codes
+    H{
+        { 36 "RETURN" }
+        { 48 "TAB" }
+        { 51 "BACKSPACE" }
+        { 115 "HOME" }
+        { 117 "DELETE" }
+        { 119 "END" }
+        { 123 "LEFT" }
+        { 124 "RIGHT" }
+        { 125 "DOWN" }
+        { 126 "UP" }
+    } hash ;
+
+: modifier ( mod -- seq )
+    modifiers
+    [ second swap bitand 0 > ] subset-with
+    [ first ] map ;
+
+: event>binding ( event -- binding )
+    dup [modifierFlags] modifier swap [keyCode] key-codes
+    [ add >list ] [ drop f ] if* ;
+
+: send-user-input ( event -- )
+    [characters] CF>string dup empty?
+    [ hand get hand-focus user-input ] unless drop ;
+
+: send-key-event ( event -- )
+    dup event>binding
+    [ hand get hand-focus handle-gesture ] [ t ] if*
+    [ send-user-input ] [ drop ] if ;
+
+: resize-world ( world -- )
+    dup world-handle [frame] dup NSRect-w swap NSRect-h 0 3array
+    swap set-gadget-dim ;
 
 : init-FactorView-class
     "NSOpenGLView" "FactorView" {
@@ -129,14 +165,11 @@ IN: gadgets-cocoa
         }
         
         { "keyDown:" "void" { "id" "SEL" "id" }
-            [
-                2nip [characters] CF>string dup . flush
-                hand get hand-focus user-input drop
-            ]
+            [ 2nip send-key-event ]
         }
 
         { "reshape" "void" { "id" "SEL" }
-            [ drop 1 [setNeedsDisplay:] ]
+            [ ( 2drop world get resize-world ) ]
         }
         
         { "acceptsFirstResponder" "bool" { "id" "SEL" }

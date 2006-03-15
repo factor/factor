@@ -47,8 +47,6 @@ SYMBOL: building
 
 : , ( obj -- ) building get push ;
 
-: ?, ( obj ? -- ) [ , ] [ drop ] if ;
-
 : % ( seq -- ) building get swap nappend ;
 
 : # ( n -- ) number>string % ;

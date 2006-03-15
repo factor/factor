@@ -20,6 +20,7 @@ TUPLE: world glass status invalid timers handle ;
 
 C: world ( -- world )
     <stack> over set-delegate
+    dup solid-interior
     t over set-gadget-root?
     H{ } clone over set-world-timers ;
 
@@ -100,7 +101,6 @@ global [ first-time on ] bind
     global [
         first-time get [
             <world> world set
-            world get solid-interior
             { 600 700 0 } world get set-gadget-dim
             <hand> hand set
             first-time off
