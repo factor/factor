@@ -157,13 +157,13 @@ IN: shells
     [
         [
             init-world
-        
+
             world get ui-title <FactorWindow>
-    
+
             listener-application
-            
+
             NSApplication [sharedApplication] [finishLaunching]
-            
+
             event-loop
         ] with-cocoa
     ] with-freetype ;

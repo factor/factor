@@ -28,9 +28,9 @@
 
 + ui/help:
 
+- unregister notifications in dealloc
 - segfault when closing window
 - wheel mouse is a bit funny
-- bootstrap in the ui
 - changelog in the UI
 - make the UI look better, something like this:
   http://twb.ath.cx/~twb/darcs/OBSOLETE/factor/final.html

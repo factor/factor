@@ -2,19 +2,11 @@
 ! See http://factorcode.org/license.txt for BSD license.
 IN: objc
 USING: alien arrays compiler hashtables kernel kernel-internals
-libc math namespaces sequences strings ;
-
-: encode-types ( return types -- encoding )
-    >r 1array r> append
-    [ [ alien>objc-types get hash % CHAR: 0 , ] each ] "" make ;
-
-: prepare-method ( { name return types quot } -- sel type imp )
-    [ first3 encode-types ] keep
-    [ 1 swap tail % \ alien-callback , ] [ ] make ;
+libc math namespaces sequences strings words ;
 
 : init-method ( method alien -- )
-    >r prepare-method r>
-    [ >r compile-1 r> set-objc-method-imp ] keep
+    >r first3 r>
+    [ >r execute r> set-objc-method-imp ] keep
     [ >r <malloc-string> r> set-objc-method-types ] keep
     >r sel_registerName r> set-objc-method-name ;
 
@@ -68,7 +60,20 @@ libc math namespaces sequences strings ;
     >r objc-class r> [ <meta-class> ] 2keep <new-class>
     objc_addClass ;
 
+: encode-types ( return types -- encoding )
+    >r 1array r> append
+    [ [ alien>objc-types get hash % CHAR: 0 , ] each ] "" make ;
+
+: prepare-method ( { name ret types quot } -- { name type imp  } )
+    [ first3 encode-types ] keep
+    [ 1 swap tail % \ alien-callback , ] [ ] make compile-quot
+    3array ;
+
+: prepare-methods ( methods -- methods )
+    [ prepare-method ] map ;
+
 : define-objc-class ( superclass name imeth cmeth -- )
     pick >r
+    [ prepare-methods ] 2apply
     [ 2array % 2array % \ (define-objc-class) , ] [ ] make
     r> swap import-objc-class ;

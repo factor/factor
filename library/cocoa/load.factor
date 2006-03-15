@@ -10,6 +10,7 @@ USING: compiler io parser sequences words ;
     "/library/cocoa/application-utils.factor"
     "/library/cocoa/window-utils.factor"
     "/library/cocoa/view-utils.factor"
+    "/library/cocoa/ui.factor"
 } [
     run-resource
 ] each

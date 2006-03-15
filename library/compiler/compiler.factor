@@ -39,10 +39,8 @@ sequences words ;
 
 : recompile ( word -- ) dup update-xt compile ;
 
-: compile-1 ( quot -- )
-    #! Compute and call a quotation.
-    "compile" get [
-        gensym [ swap define-compound ] keep dup compile execute
-    ] [
-        call
-    ] if ;
+: compile-quot ( quot -- word )
+    gensym [ swap define-compound ] keep
+    "compile" get [ dup compile ] when ;
+
+: compile-1 ( quot -- ) compile-quot execute ;
