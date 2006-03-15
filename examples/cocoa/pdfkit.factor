@@ -2,8 +2,6 @@ IN: cocoa-pdfkit
 USING: alien cocoa compiler errors io kernel math objc
 objc-NSObject objc-NSWindow objc-PDFDocument objc-PDFView ;
 
-"/System/Library/Frameworks/Quartz.framework/Frameworks/PDFKit.framework" load-framework
-
 : <PDFDocument> ( url -- document )
     <CFURL> [autorelease]
     PDFDocument [alloc] swap [initWithURL:] [autorelease] ;

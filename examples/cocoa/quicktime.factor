@@ -3,8 +3,6 @@ USING: alien cocoa compiler errors io kernel math objc
 objc-NSError objc-NSObject objc-NSURLRequest objc-NSWindow
 objc-QTMovie objc-QTMovieView parser sequences threads ;
 
-"/System/Library/Frameworks/QTKit.framework" load-framework
-
 : <QTMovie> ( url -- movie )
     <CFURL> [autorelease]
     QTMovie swap f <void*>

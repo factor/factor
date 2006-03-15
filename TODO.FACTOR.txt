@@ -22,13 +22,13 @@
 
 + objective C/cocoa:
 
-- autoload frameworks in cocoa class words
-- auto-define classes in obj-c class words
 - super message sends
-  super [foo]...
+  super-> [foo]...
+- core foundation should use unicode strings
 
 + ui/help:
 
+- segfault when closing window
 - wheel mouse is a bit funny
 - bootstrap in the ui
 - changelog in the UI
@@ -49,7 +49,7 @@
 
 + compiler/ffi:
 
-- core foundation should use unicode strings
+- improve callback efficiency
 - alien>utf16-string, utf16-string>alien words
 - float intrinsics
 - complex float type

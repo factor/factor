@@ -21,6 +21,12 @@ C: hand ( -- hand )
     swap hand get hand-clicked 3dup >r add r> handle-gesture
     [ nip handle-gesture drop ] [ 3drop ] if ;
 
+: update-clicked ( -- )
+    hand get
+    dup hand-gadget over set-hand-clicked
+    dup screen-loc over set-hand-click-loc
+    dup hand-gadget over relative swap set-hand-click-rel ;
+
 : send-button-down ( event -- )
     update-clicked
     dup hand get hand-buttons push

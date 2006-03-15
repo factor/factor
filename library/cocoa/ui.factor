@@ -1,11 +1,9 @@
 ! Copyright (C) 2006 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
-USING: alien arrays cocoa freetype gadgets gadgets-layouts
-gadgets-listener hashtables io kernel lists math namespaces objc
-objc-NSApplication objc-NSEvent objc-NSMenu
-objc-NSNotificationCenter objc-NSObject objc-NSOpenGLContext
-objc-NSOpenGLView objc-NSView objc-NSWindow opengl prettyprint
-sequences threads walker ;
+USING: arrays cocoa freetype gadgets-layouts gadgets-listener
+hashtables kernel lists math namespaces objc objc-NSApplication
+objc-NSEvent objc-NSObject objc-NSOpenGLView objc-NSView
+objc-NSWindow sequences ;
 
 IN: gadgets
 
@@ -169,5 +167,3 @@ IN: shells
             event-loop
         ] with-cocoa
     ] with-freetype ;
-
-ui

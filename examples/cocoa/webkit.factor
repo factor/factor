@@ -3,8 +3,6 @@ USING: alien cocoa compiler io kernel math objc objc-NSObject
 objc-NSURLRequest objc-NSWindow objc-WebFrame objc-WebView
 parser sequences threads ;
 
-"/System/Library/Frameworks/WebKit.framework" load-framework
-
 : <NSURLRequest> ( string -- id )
     NSURLRequest swap <CFURL> [requestWithURL:] ;
 

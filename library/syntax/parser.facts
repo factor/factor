@@ -87,8 +87,8 @@ HELP: save-location "( word -- )"
 { $description "Sets the " { $snippet "\"file\"" } " and " {  $snippet "\"line\"" } " word properties to the current parser location." }
 $parsing-note ;
 
-HELP: create-in "( word -- )"
-{ $values { "word" "a word name" } }
+HELP: create-in "( string -- word )"
+{ $values { "string" "a word name" } { "word" "a new word" } }
 { $description "Creates a word in the current vocabulary. Until re-defined, the word throws an error when invoked." }
 $parsing-note ;
 

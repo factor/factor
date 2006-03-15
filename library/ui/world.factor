@@ -75,12 +75,6 @@ M: f set-message 2drop ;
     update-hand-gadget
     under-hand r> hand-gestures update-help ;
 
-: update-clicked ( -- )
-    hand get
-    dup hand-gadget over set-hand-clicked
-    dup screen-loc over set-hand-click-loc
-    dup hand-gadget over relative swap set-hand-click-rel ;
-
 : update-hand ( -- )
     #! Called when a gadget is removed or added.
     hand get rect-loc move-hand ;

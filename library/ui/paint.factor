@@ -5,6 +5,8 @@ io kernel lists math namespaces opengl sequences strings
 styles vectors ;
 IN: gadgets
 
+SYMBOL: clip
+
 : init-gl ( dim -- )
     0.0 0.0 0.0 0.0 glClearColor 
     { 1.0 0.0 0.0 0.0 } gl-color
@@ -29,8 +31,6 @@ M: gadget draw-gadget* ( gadget -- ) drop ;
 GENERIC: draw-interior ( gadget interior -- )
 
 GENERIC: draw-boundary ( gadget boundary -- )
-
-SYMBOL: clip
 
 : visible-children ( gadget -- seq ) clip get swap children-on ;
 

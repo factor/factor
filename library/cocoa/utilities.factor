@@ -152,13 +152,21 @@ H{
 : import-objc-methods ( seq -- )
     [ first3 swap import-objc-method ] each ;
 
-: define-objc-class-word ( name -- )
-    create-in over [ objc-class ] curry define-compound ;
+: unless-defined ( class quot -- )
+    >r class-exists? r> unless ; inline
 
-: import-objc-class ( name -- )
+: define-objc-class-word ( name quot -- )
     [
-        "objc-" over append in set
-        dup define-objc-class-word
+        over , , \ unless-defined , dup , \ objc-class ,
+    ] [ ] make >r create-in r> define-compound ;
+
+: import-objc-class ( name quot -- )
+    #! The quotation is prepended to the class word. It should
+    #! "regenerate" the class as appropriate (by loading a
+    #! framework or defining the class in some manner).
+    2dup unless-defined [
+        "objc-" pick append in set
+        dupd define-objc-class-word
         dup instance-methods import-objc-methods
         class-methods import-objc-methods
     ] with-scope ;

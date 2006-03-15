@@ -6,15 +6,6 @@ USING: cocoa compiler io kernel objc sequences words ;
 
 { "cocoa" "objc" } compile-vocabs
 
-"Loading Cocoa frameworks..." print
-{
-    "/System/Library/Frameworks/WebKit.framework"
-    "/System/Library/Frameworks/QTKit.framework"
-    "/System/Library/Frameworks/Quartz.framework/Frameworks/PDFKit.framework"
-} [
-    dup print flush load-framework
-] each
-
 "Importing Cocoa classes..." print
 {
     "NSApplication"
@@ -32,12 +23,36 @@ USING: cocoa compiler io kernel objc sequences words ;
     "NSURLRequest"
     "NSView"
     "NSWindow"
+} [
+    f import-objc-class
+] each
+
+{
     "PDFDocument"
     "PDFView"
+} [
+    [
+        "/System/Library/Frameworks/Quartz.framework/Frameworks/PDFKit.framework"
+        load-framework
+    ] import-objc-class
+] each
+
+{
     "QTMovie"
     "QTMovieView"
+} [
+    [
+        "/System/Library/Frameworks/QTKit.framework"
+        load-framework
+    ] import-objc-class
+] each
+
+{
     "WebFrame"
     "WebView"
 } [
-    dup print flush import-objc-class
+    [
+        "/System/Library/Frameworks/WebKit.framework"
+        load-framework
+    ] import-objc-class
 ] each
