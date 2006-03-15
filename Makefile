@@ -1,6 +1,9 @@
 CC = gcc
+CP = cp
 
 BINARY = f
+BUNDLE = Factor.app
+BUNDLE_BINARY = $(BUNDLE)/Contents/MacOS/Factor
 
 ifdef DEBUG
 	DEFAULT_CFLAGS = -g
@@ -89,6 +92,7 @@ macosx:
 		CFLAGS="$(DEFAULT_CFLAGS)" \
 		LIBS="$(DEFAULT_LIBS) -framework Cocoa -framework OpenGL" \
 		MACOSX=y
+	$(CP) $(BINARY) $(BUNDLE_BINARY)
 
 linux linux-x86 linux-amd64:
 	$(MAKE) $(BINARY) \
