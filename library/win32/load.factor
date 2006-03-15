@@ -18,3 +18,7 @@ USING: alien io kernel parser sequences ;
 ] [
     run-resource
 ] each
+
+IN: kernel
+
+: default-shell "ui" ;

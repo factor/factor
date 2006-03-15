@@ -9,19 +9,25 @@ TYPEDEF: int CFIndex
 ! Core Foundation utilities -- will be moved elsewhere
 : kCFURLPOSIXPathStyle 0 ;
 
-: kCFStringEncodingMacRoman 0 ;
+: kCFStringEncodingUnicode HEX: 100 ;
 
 FUNCTION: void* CFURLCreateWithFileSystemPath ( void* allocator, void* filePath, int pathStyle, bool isDirectory ) ;
 
 FUNCTION: void* CFURLCreateWithString ( void* allocator, void* string, void* base ) ;
 
-FUNCTION: void* CFStringCreateWithCString ( void* allocator, char* cStr, int encoding ) ;
+FUNCTION: void* CFURLCopyFileSystemPath ( void* url, int pathStyle ) ;
+
+FUNCTION: void* CFStringCreateWithCString ( void* allocator, ushort* cStr, int encoding ) ;
 
 FUNCTION: CFIndex CFStringGetLength ( void* theString ) ;
 
-FUNCTION: char* CFStringGetCStringPtr ( void* theString, int encoding ) ;
+FUNCTION: ushort* CFStringGetCStringPtr ( void* theString, int encoding ) ;
 
 FUNCTION: void* CFBundleCreate ( void* allocator, void* bundleURL ) ;
+
+FUNCTION: void* CFBundleGetMainBundle ( ) ;
+
+FUNCTION: void* CFBundleCopyExecutableURL ( void* bundle ) ;
 
 FUNCTION: void* CFBundleGetFunctionPointerForName ( void* bundle, void* functionName ) ;
 
@@ -30,10 +36,10 @@ FUNCTION: bool CFBundleLoadExecutable ( void* bundle ) ;
 FUNCTION: void CFRelease ( void* cf ) ;
 
 : <CFString> ( string -- cf )
-    f swap kCFStringEncodingMacRoman CFStringCreateWithCString ;
+    f swap kCFStringEncodingUnicode CFStringCreateWithCString ;
 
 : CF>string ( string -- string )
-    kCFStringEncodingMacRoman CFStringGetCStringPtr ;
+    kCFStringEncodingUnicode CFStringGetCStringPtr ;
 
 : <CFFileSystemURL> ( string dir? -- cf )
     >r <CFString> f over kCFURLPOSIXPathStyle
@@ -53,3 +59,17 @@ FUNCTION: void CFRelease ( void* cf ) ;
     ] [
         "Cannot load bundled named " swap append throw
     ] ?if ;
+
+: executable ( -- path )
+    CFBundleGetMainBundle CFBundleCopyExecutableURL [
+        kCFURLPOSIXPathStyle CFURLCopyFileSystemPath
+        [ CF>string ] keep CFRelease
+    ] keep CFRelease ;
+
+: running.app? ( -- ? )
+    #! Test if we're running Factor.app.
+    executable "Contents/MacOS/Factor" tail? ;
+
+IN: kernel
+
+: default-shell running.app? "ui" "tty" ? ;

@@ -131,8 +131,8 @@ C: editor ( text -- )
 : caret-dim ( editor -- w h )
     rect-dim { 0 1 1 } v* { 1 0 0 } v+ ;
 
-M: editor user-input* ( ch editor -- ? )
-    [ insert-char ] with-editor f ;
+M: editor user-input* ( str editor -- ? )
+    [ insert-string ] with-editor f ;
 
 M: editor pref-dim* ( editor -- dim )
     label-size { 1 0 0 } v+ ;

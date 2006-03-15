@@ -103,9 +103,9 @@ M: document-elt prev-elt* 3drop 0 ;
 : delete-prev-elt ( element -- )
     prev-elt@ line-remove ;
 
-: insert-char ( ch -- )
+: insert-string ( str -- )
     #! Call this in the line editor scope.
-    ch>string caret-pos dup line-replace ;
+    caret-pos dup line-replace ;
 
 : commit-history ( -- )
     #! Call this in the line editor scope. Adds the currently

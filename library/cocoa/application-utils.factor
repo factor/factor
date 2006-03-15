@@ -38,8 +38,3 @@ IN: errors
 
 : objc-error. ( alien -- )
     "Objective C exception:" print  [reason] CF>string print ;
-
-IN: gadgets
-
-: redraw-world ( gadgets -- )
-    world-handle 1 [setNeedsDisplay:] ;

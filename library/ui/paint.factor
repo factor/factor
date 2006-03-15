@@ -19,6 +19,8 @@ SYMBOL: clip
 
 DEFER: draw-gadget
 
+DEFER: world
+
 : (draw-gadget) ( gadget -- )
     dup rect-loc translate [
         gl-translate

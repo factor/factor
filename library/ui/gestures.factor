@@ -26,7 +26,7 @@ USING: alien generic hashtables kernel lists math sequences ;
     #! gesture, otherwise returns f.
     [ dupd handle-gesture* ] each-parent nip ;
 
-: user-input ( ch gadget -- ? )
+: user-input ( str gadget -- ? )
     [ dupd user-input* ] each-parent nip ;
 
 ! Mouse gestures are lists where the first element is one of:

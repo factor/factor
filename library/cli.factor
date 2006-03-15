@@ -39,6 +39,8 @@ parser sequences strings ;
 
 : cli-args ( -- args ) 10 getenv ;
 
+: default-shell "tty" ;
+
 : default-cli-args
     #! Some flags are *on* by default, unless user specifies
     #! -no-<flag> CLI switch
@@ -46,7 +48,7 @@ parser sequences strings ;
     "compile" on
     "native-io" on
     "null-stdio" off
-    os "win32" = "ui" "tty" ? "shell" set ;
+    default-shell "shell" set ;
 
 : parse-command-line ( -- )
     cli-args [ cli-arg ] subset [ try-run-file ] each  ;
