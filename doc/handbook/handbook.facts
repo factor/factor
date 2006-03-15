@@ -1,7 +1,7 @@
 USING: help parser prettyprint ;
 
 ARTICLE: "handbook" "Factor documentation"
-"Welcome to Factor! Factor documentation is takes the form of an outline, with cross-referencing hyperlinks between topics. You can click the triangle next to a topic heading to expand the topic."
+"Welcome to Factor! Factor documentation takes the form of an outline, with cross-referencing hyperlinks between topics. You can click the triangle next to a topic heading to expand the topic."
 $terpri
 "There is some introductory material you will find useful when starting out:"
 { $subsection "presentation-intro" }
