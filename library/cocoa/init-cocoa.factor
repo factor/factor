@@ -24,6 +24,7 @@ USING: cocoa compiler io kernel objc sequences words ;
     "NSException"
     "NSMenu"
     "NSMenuItem"
+    "NSNotificationCenter"
     "NSObject"
     "NSOpenGLContext"
     "NSOpenGLView"

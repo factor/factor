@@ -52,6 +52,7 @@ H{
 SYMBOL: alien>objc-types
 
 objc>alien-types get hash>alist [ reverse ] map alist>hash
+! A hack...
 H{
     { "NSPoint" "{_NSPoint=ff}" }
     { "NSRect" "{_NSRect=ffff}" }

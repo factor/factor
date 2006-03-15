@@ -2,9 +2,10 @@
 ! See http://factor.sf.net/license.txt for BSD license.
 USING: alien arrays cocoa freetype gadgets gadgets-layouts
 gadgets-listener hashtables io kernel lists math namespaces objc
-objc-NSApplication objc-NSEvent objc-NSMenu objc-NSObject
-objc-NSOpenGLContext objc-NSOpenGLView objc-NSView objc-NSWindow
-opengl prettyprint sequences threads walker ;
+objc-NSApplication objc-NSEvent objc-NSMenu
+objc-NSNotificationCenter objc-NSObject objc-NSOpenGLContext
+objc-NSOpenGLView objc-NSView objc-NSWindow opengl prettyprint
+sequences threads walker ;
 
 IN: gadgets
 
@@ -106,16 +107,15 @@ IN: gadgets-cocoa
     [ send-user-input ] [ drop ] if ;
 
 : resize-world ( world -- )
-    dup world-handle [frame] dup NSRect-w swap NSRect-h 0 3array
-    swap set-gadget-dim ;
+    >r [bounds] dup NSRect-w swap NSRect-h 0 3array r>
+    set-gadget-dim ;
 
 : init-FactorView-class
     "NSOpenGLView" "FactorView" {
         { "drawRect:" "void" { "id" "SEL" "NSRect" }
             [
                 2drop dup [openGLContext] [
-                    [bounds] init-gl
-                    world get draw-gadget
+                    [bounds] init-gl world get draw-gadget
                 ] with-gl-context
             ]
         }
@@ -168,8 +168,8 @@ IN: gadgets-cocoa
             [ 2nip send-key-event ]
         }
 
-        { "reshape" "void" { "id" "SEL" }
-            [ ( 2drop world get resize-world ) ]
+        { "updateFactorGadgetSize:" "void" { "id" "SEL" "id" }
+            [ 2drop world get resize-world ]
         }
         
         { "acceptsFirstResponder" "bool" { "id" "SEL" }
@@ -185,17 +185,24 @@ USE: objc-FactorView
     drop
     FactorView [alloc]
     0 0 100 100 <NSRect> NSOpenGLView [defaultPixelFormat]
-    [initWithFrame:pixelFormat:] ;
+    [initWithFrame:pixelFormat:]
+    dup 1 [setPostsBoundsChangedNotifications:]
+    dup 1 [setPostsFrameChangedNotifications:] ;
 
 : <FactorWindow> ( gadget title -- window )
     over rect-dim first2 0 0 2swap <NSRect> <NSWindow>
     [ swap <FactorView> [setContentView:] ] 2keep
     [ swap set-world-handle ] keep ;
 
+: NSViewBoundsDidChangeNotification
+    "NSViewBoundsDidChangeNotification" <NSString> ;
+
+: NSViewFrameDidChangeNotification
+    "NSViewFrameDidChangeNotification" <NSString> ;
+
 : ui
     [
         [
-            ! NSApplication NSMenu [alloc] [init] [setMainMenu:]
             init-world
         
             world get ui-title <FactorWindow>
@@ -204,6 +211,13 @@ USE: objc-FactorView
     
             dup dup [contentView] [setInitialFirstResponder:]
     
+            NSNotificationCenter [defaultCenter]
+            over [contentView]
+            "updateFactorGadgetSize:" sel_registerName
+            NSViewFrameDidChangeNotification
+            pick
+            [addObserver:selector:name:object:]
+
             dup f [makeKeyAndOrderFront:]
     
             [contentView] [openGLContext] [makeCurrentContext]
