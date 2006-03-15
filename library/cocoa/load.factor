@@ -9,6 +9,7 @@ USING: compiler io parser sequences words ;
     "/library/cocoa/init-cocoa.factor"
     "/library/cocoa/application-utils.factor"
     "/library/cocoa/window-utils.factor"
+    "/library/cocoa/view-utils.factor"
 } [
     run-resource
 ] each

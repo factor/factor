@@ -1,5 +1,5 @@
-! Copyright (C) 2005 Slava Pestov.
-! See http://factor.sf.net/license.txt for BSD license.
+! Copyright (C) 2005, 2006 Slava Pestov.
+! See http://factorcode.org/license.txt for BSD license.
 IN: gadgets
 USING: kernel math namespaces sequences ;
 
@@ -21,6 +21,19 @@ C: hand ( -- hand )
     swap hand get hand-clicked 3dup >r add r> handle-gesture
     [ nip handle-gesture drop ] [ 3drop ] if ;
 
+: send-button-down ( event -- )
+    update-clicked
+    dup hand get hand-buttons push
+    [ button-down ] button-gesture ;
+
+: send-button-up ( event -- )
+    dup hand get hand-buttons delete
+    [ button-up ] button-gesture ;
+
+: send-scroll-wheel ( up/down -- )
+    [ wheel-up ] [ wheel-down ] ?
+    hand get hand-clicked handle-gesture drop ;
+
 : drag-gesture ( -- )
     #! Send a gesture like [ drag 2 ]; if nobody handles it,
     #! send [ drag ].
@@ -32,6 +45,10 @@ C: hand ( -- hand )
     #! gadget that was clicked.
     [ motion ] over hand-gadget handle-gesture drop
     hand-buttons empty? [ drag-gesture ] unless ;
+
+: send-user-input ( string -- )
+    dup empty?
+    [ hand get hand-focus user-input ] unless drop ;
 
 : each-gesture ( gesture seq -- )
     [ handle-gesture* drop ] each-with ;

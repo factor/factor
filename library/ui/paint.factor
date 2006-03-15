@@ -1,9 +1,26 @@
-! Copyright (C) 2005 Slava Pestov.
-! See http://factor.sf.net/license.txt for BSD license.
+! Copyright (C) 2005, 2006 Slava Pestov.
+! See http://factorcode.org/license.txt for BSD license.
 USING: alien arrays freetype gadgets-layouts generic hashtables
 io kernel lists math namespaces opengl sequences strings
 styles vectors ;
 IN: gadgets
+
+: init-gl ( dim -- )
+    0.0 0.0 0.0 0.0 glClearColor 
+    { 1.0 0.0 0.0 0.0 } gl-color
+    GL_COLOR_BUFFER_BIT glClear
+    GL_PROJECTION glMatrixMode
+    glLoadIdentity
+    GL_MODELVIEW glMatrixMode
+    glLoadIdentity
+    { 0 0 0 } over <rect> clip set
+    dup first2 0 0 2swap glViewport
+    0 swap first2 0 gluOrtho2D
+    GL_SMOOTH glShadeModel
+    GL_BLEND glEnable
+    GL_SRC_ALPHA GL_ONE_MINUS_SRC_ALPHA glBlendFunc
+    GL_SCISSOR_TEST glEnable
+    GL_MODELVIEW glMatrixMode ;
 
 GENERIC: draw-gadget* ( gadget -- )
 

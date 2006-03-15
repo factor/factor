@@ -15,41 +15,9 @@ IN: gadgets
 IN: gadgets-cocoa
 
 ! Cocoa backend for Factor UI
-: init-gl ( rect -- )
-    0.0 0.0 0.0 0.0 glClearColor 
-    { 1.0 0.0 0.0 0.0 } gl-color
-    GL_COLOR_BUFFER_BIT glClear
-    GL_PROJECTION glMatrixMode
-    glLoadIdentity
-    GL_MODELVIEW glMatrixMode
-    glLoadIdentity
-    { 0 0 0 } over NSRect-w pick NSRect-h 0 3array <rect>
-    clip set
-    dup NSRect-w over NSRect-h 0 0 2swap glViewport
-    dup NSRect-w swap NSRect-h >r >r 0 r> r> 0 gluOrtho2D
-    GL_SMOOTH glShadeModel
-    GL_BLEND glEnable
-    GL_SRC_ALPHA GL_ONE_MINUS_SRC_ALPHA glBlendFunc
-    GL_SCISSOR_TEST glEnable
-    GL_MODELVIEW glMatrixMode ;
-
-: with-gl-context ( context quot -- )
-    swap
-    [ [makeCurrentContext] call glFlush ] keep
-    [flushBuffer] ; inline
-
 : button ( event -- n )
     #! Cocoa -> Factor UI button mapping
     [buttonNumber] H{ { 0 1 } { 2 2 } { 1 3 } } hash ;
-
-: send-button-down ( event -- )
-    update-clicked
-    button dup hand get hand-buttons push
-    [ button-down ] button-gesture ;
-
-: send-button-up ( event -- )
-    button dup hand get hand-buttons delete
-    [ button-up ] button-gesture ;
 
 : mouse-location ( window -- loc )
     dup [contentView] [
@@ -60,11 +28,6 @@ IN: gadgets-cocoa
 
 : send-mouse-moved ( -- )
     world get world-handle mouse-location move-hand ;
-
-: send-scroll-wheel ( event -- )
-    [deltaY] 0 >
-    [ wheel-up ] [ wheel-down ] ?
-    hand get hand-clicked handle-gesture drop ;
 
 : modifiers
     {
@@ -97,89 +60,81 @@ IN: gadgets-cocoa
     dup [modifierFlags] modifier swap [keyCode] key-codes
     [ add >list ] [ drop f ] if* ;
 
-: send-user-input ( event -- )
-    [characters] CF>string dup empty?
-    [ hand get hand-focus user-input ] unless drop ;
-
 : send-key-event ( event -- )
     dup event>binding
     [ hand get hand-focus handle-gesture ] [ t ] if*
-    [ send-user-input ] [ drop ] if ;
+    [ [characters] CF>string send-user-input ] [ drop ] if ;
 
-: resize-world ( world -- )
-    >r [bounds] dup NSRect-w swap NSRect-h 0 3array r>
-    set-gadget-dim ;
+"NSOpenGLView" "FactorView" {
+    { "drawRect:" "void" { "id" "SEL" "NSRect" }
+        [
+            2drop dup [openGLContext] [
+                view-dim init-gl world get draw-gadget
+            ] with-gl-context
+        ]
+    }
+    
+    { "mouseMoved:" "void" { "id" "SEL" "id" }
+        [ 3drop send-mouse-moved ]
+    }
+    
+    { "mouseDragged:" "void" { "id" "SEL" "id" }
+        [ 3drop send-mouse-moved ]
+    }
+    
+    { "rightMouseDragged:" "void" { "id" "SEL" "id" }
+        [ 3drop send-mouse-moved ]
+    }
+    
+    { "otherMouseDragged:" "void" { "id" "SEL" "id" }
+        [ 3drop send-mouse-moved ]
+    }
+    
+    { "mouseDown:" "void" { "id" "SEL" "id" }
+        [ 2nip button send-button-down ]
+    }
+    
+    { "mouseUp:" "void" { "id" "SEL" "id" }
+        [ 2nip button send-button-up ]
+    }
+    
+    { "rightMouseDown:" "void" { "id" "SEL" "id" }
+        [ 2nip button send-button-down ]
+    }
+    
+    { "rightMouseUp:" "void" { "id" "SEL" "id" }
+        [ 2nip button send-button-up ]
+    }
+    
+    { "otherMouseDown:" "void" { "id" "SEL" "id" }
+        [ 2nip button send-button-down ]
+    }
+    
+    { "otherMouseUp:" "void" { "id" "SEL" "id" }
+        [ 2nip button send-button-up ]
+    }
+    
+    { "scrollWheel:" "void" { "id" "SEL" "id" }
+        [ 2nip [deltaY] 0 > send-scroll-wheel ]
+    }
+    
+    { "keyDown:" "void" { "id" "SEL" "id" }
+        [ 2nip send-key-event ]
+    }
 
-: init-FactorView-class
-    "NSOpenGLView" "FactorView" {
-        { "drawRect:" "void" { "id" "SEL" "NSRect" }
-            [
-                2drop dup [openGLContext] [
-                    [bounds] init-gl world get draw-gadget
-                ] with-gl-context
-            ]
-        }
-        
-        { "mouseMoved:" "void" { "id" "SEL" "id" }
-            [ 3drop send-mouse-moved ]
-        }
-        
-        { "mouseDragged:" "void" { "id" "SEL" "id" }
-            [ 3drop send-mouse-moved ]
-        }
-        
-        { "rightMouseDragged:" "void" { "id" "SEL" "id" }
-            [ 3drop send-mouse-moved ]
-        }
-        
-        { "otherMouseDragged:" "void" { "id" "SEL" "id" }
-            [ 3drop send-mouse-moved ]
-        }
-        
-        { "mouseDown:" "void" { "id" "SEL" "id" }
-            [ 2nip send-button-down ]
-        }
-        
-        { "mouseUp:" "void" { "id" "SEL" "id" }
-            [ 2nip send-button-up ]
-        }
-        
-        { "rightMouseDown:" "void" { "id" "SEL" "id" }
-            [ 2nip send-button-down ]
-        }
-        
-        { "rightMouseUp:" "void" { "id" "SEL" "id" }
-            [ 2nip send-button-up ]
-        }
-        
-        { "otherMouseDown:" "void" { "id" "SEL" "id" }
-            [ 2nip send-button-down ]
-        }
-        
-        { "otherMouseUp:" "void" { "id" "SEL" "id" }
-            [ 2nip send-button-up ]
-        }
-        
-        { "scrollWheel:" "void" { "id" "SEL" "id" }
-            [ 2nip send-scroll-wheel ]
-        }
-        
-        { "keyDown:" "void" { "id" "SEL" "id" }
-            [ 2nip send-key-event ]
-        }
+    { "updateFactorGadgetSize:" "void" { "id" "SEL" "id" }
+        [ 2drop view-dim world get set-gadget-dim ]
+    }
+    
+    { "acceptsFirstResponder" "bool" { "id" "SEL" }
+        [ 2drop 1 ]
+    }
+} { } define-objc-class
 
-        { "updateFactorGadgetSize:" "void" { "id" "SEL" "id" }
-            [ 2drop world get resize-world ]
-        }
-        
-        { "acceptsFirstResponder" "bool" { "id" "SEL" }
-            [ 2drop 1 ]
-        }
-    } { } define-objc-class ; parsing
+IN: objc-FactorView
+DEFER: FactorView
 
-init-FactorView-class
-
-USE: objc-FactorView
+IN: gadgets-cocoa
 
 : <FactorView> ( gadget -- view )
     drop
@@ -187,18 +142,18 @@ USE: objc-FactorView
     0 0 100 100 <NSRect> NSOpenGLView [defaultPixelFormat]
     [initWithFrame:pixelFormat:]
     dup 1 [setPostsBoundsChangedNotifications:]
-    dup 1 [setPostsFrameChangedNotifications:] ;
+    dup 1 [setPostsFrameChangedNotifications:]
+    dup "updateFactorGadgetSize:" add-resize-observer ;
 
 : <FactorWindow> ( gadget title -- window )
     over rect-dim first2 0 0 2swap <NSRect> <NSWindow>
     [ swap <FactorView> [setContentView:] ] 2keep
-    [ swap set-world-handle ] keep ;
+    [ swap set-world-handle ] keep
+    dup 1 [setAcceptsMouseMovedEvents:]
+    dup dup [contentView] [setInitialFirstResponder:]
+    dup f [makeKeyAndOrderFront:] ;
 
-: NSViewBoundsDidChangeNotification
-    "NSViewBoundsDidChangeNotification" <NSString> ;
-
-: NSViewFrameDidChangeNotification
-    "NSViewFrameDidChangeNotification" <NSString> ;
+IN: shells
 
 : ui
     [
@@ -207,23 +162,10 @@ USE: objc-FactorView
         
             world get ui-title <FactorWindow>
     
-            dup 1 [setAcceptsMouseMovedEvents:]
-    
-            dup dup [contentView] [setInitialFirstResponder:]
-    
-            NSNotificationCenter [defaultCenter]
-            over [contentView]
-            "updateFactorGadgetSize:" sel_registerName
-            NSViewFrameDidChangeNotification
-            pick
-            [addObserver:selector:name:object:]
-
-            dup f [makeKeyAndOrderFront:]
-    
-            [contentView] [openGLContext] [makeCurrentContext]
             listener-application
             
             NSApplication [sharedApplication] [finishLaunching]
+            
             event-loop
         ] with-cocoa
     ] with-freetype ;
