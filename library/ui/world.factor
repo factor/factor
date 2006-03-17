@@ -1,10 +1,10 @@
 ! Copyright (C) 2005, 2006 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 IN: gadgets
-USING: alien arrays errors freetype gadgets-layouts
-gadgets-theme generic io kernel lists math memory namespaces
-opengl prettyprint queues sequences sequences strings styles
-threads ;
+USING: alien arrays errors freetype gadgets-labels
+gadgets-layouts gadgets-theme generic io kernel lists math
+memory namespaces opengl prettyprint queues sequences sequences
+strings styles threads ;
 
 DEFER: redraw-world
 
@@ -14,58 +14,55 @@ DEFER: redraw-world
 ! need to be layout.
 TUPLE: world glass status handle ;
 
-: add-layer ( gadget -- )
-    world get add-gadget ;
-
-C: world ( dim -- world )
+C: world ( gadget status dim -- world )
     <stack> over set-delegate
+    t over set-gadget-root?
     [ set-gadget-dim ] keep
-    t over set-gadget-root? ;
+    [ set-world-status ] keep
+    [ add-gadget ] keep ;
 
-: hide-glass ( -- )
-    f world get dup world-glass unparent set-world-glass ;
+: hide-glass ( world -- )
+    dup world-glass unparent f swap set-world-glass ;
 
-: show-glass ( gadget -- )
-    hide-glass
-    <gadget> dup add-layer dup world get set-world-glass
-    dupd add-gadget prefer ;
+: <glass> ( gadget -- glass )
+    <gadget> 2dup add-gadget swap prefer ;
 
-! Status bar protocol
-GENERIC: set-message ( string/f status -- )
+: show-glass ( gadget world -- )
+    dup hide-glass
+    >r <glass> r> 2dup add-gadget
+    set-world-glass ;
 
-M: f set-message 2drop ;
+: relevant-help ( seq -- help )
+    [ gadget-help ] map [ ] find nip ;
 
 : show-message ( string/f -- )
     #! Show a message in the status bar.
-    world get world-status set-message ;
+    world-status set-label-text* ;
 
-: relevant-help ( -- string )
-    hand get hand-gadget
-    parents [ gadget-help ] map [ ] find nip ;
-
-: update-help ( -- )
+: update-help ( -- string )
     #! Update mouse-over help message.
-    relevant-help show-message ;
+    hand get hand-gadget parents [ relevant-help ] keep
+    dup empty? [ 2drop ] [ peek show-message ] if ;
 
 : under-hand ( -- seq )
     #! A sequence whose first element is the world and last is
     #! the current gadget, with all parents in between.
     hand get hand-gadget parents reverse-slice ;
 
-: hand-grab ( -- gadget )
-    hand get rect-loc world get pick-up ;
+: hand-grab ( world -- gadget )
+    hand get rect-loc swap pick-up ;
 
-: update-hand-gadget ( -- )
+: update-hand-gadget ( world -- )
     hand-grab hand get set-hand-gadget ;
 
-: move-hand ( loc -- )
-    under-hand >r hand get set-rect-loc
+: move-hand ( loc world -- )
+    swap under-hand >r hand get set-rect-loc
     update-hand-gadget
     under-hand r> hand-gestures update-help ;
 
-: update-hand ( -- )
+: update-hand ( world -- )
     #! Called when a gadget is removed or added.
-    hand get rect-loc move-hand ;
+    hand get rect-loc swap move-hand ;
 
 : ui-title
     [ "Factor " % version % " - " % image % ] "" make ;
@@ -73,4 +70,4 @@ M: f set-message 2drop ;
 : world-step ( -- )
     do-timers
     invalid queue-empty? >r layout-queued r>
-    [ update-hand world get redraw-world ] unless ;
+    [ world get update-hand world get redraw-world ] unless ;

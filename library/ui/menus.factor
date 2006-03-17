@@ -1,5 +1,5 @@
-! Copyright (C) 2005 Slava Pestov.
-! See http://factor.sf.net/license.txt for BSD license.
+! Copyright (C) 2005, 2006 Slava Pestov.
+! See http://factorcode.org/license.txt for BSD license.
 IN: gadgets-menus
 USING: gadgets gadgets-borders gadgets-buttons gadgets-layouts
 gadgets-labels gadgets-theme generic kernel lists math
@@ -7,10 +7,11 @@ namespaces sequences ;
 
 : retarget-drag ( -- )
     hand get [ hand-gadget ] keep 2dup hand-clicked eq?
-    [ 2dup set-hand-clicked update-hand ] unless 2drop ;
+    [ 2dup set-hand-clicked world get update-hand ] unless
+    2drop ;
 
 : retarget-click ( -- )
-    hide-glass update-hand-gadget update-clicked ;
+    world get dup hide-glass update-hand-gadget update-clicked ;
 
 : menu-actions ( glass -- )
     dup [ drop retarget-drag ] [ drag ] set-action
@@ -24,7 +25,7 @@ namespaces sequences ;
     swap rect-dim world get rect-dim fit-bounds ;
 
 : show-menu ( menu loc -- )
-    >r dup dup show-glass r>
+    >r dup dup world get show-glass r>
     menu-loc swap set-rect-loc
     world get world-glass dup menu-actions
     hand get set-hand-clicked ;
@@ -34,7 +35,10 @@ namespaces sequences ;
 : menu-items ( assoc -- pile )
     #! Given an association list mapping labels to quotations.
     #! Prepend a call to hide-menu to each quotation.
-    [ uncons \ hide-glass swons >r <label> r> <roll-button> ] map
+    [
+        uncons [ world get hide-glass ] swap append
+        >r <label> r> <roll-button>
+    ] map
     make-pile 1 over set-pack-fill ;
 
 : <menu> ( assoc -- gadget )

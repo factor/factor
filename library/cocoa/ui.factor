@@ -1,9 +1,9 @@
 ! Copyright (C) 2006 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: arrays cocoa freetype gadgets-layouts gadgets-listener
-hashtables kernel lists math namespaces objc objc-NSApplication
-objc-NSEvent objc-NSObject objc-NSOpenGLView objc-NSView
-objc-NSWindow sequences ;
+gadgets-panes hashtables kernel lists math namespaces objc
+objc-NSApplication objc-NSEvent objc-NSObject objc-NSOpenGLView
+objc-NSView objc-NSWindow sequences threads ;
 
 ! Cocoa backend for Factor UI
 
@@ -41,7 +41,7 @@ H{ } clone views set-global
     ] keep [frame] NSRect-h swap - 0 3array ;
 
 : send-mouse-moved ( event view -- )
-    mouse-location move-hand ;
+    [ mouse-location ] keep view move-hand ;
 
 : button ( event -- n )
     #! Cocoa -> Factor UI button mapping
@@ -158,9 +158,10 @@ IN: shells
 : ui
     [
         [
-            { 600 700 0 } <world> world set
+            { 600 700 0 } >r <listener> r> <world> world set
             world get ui-title <FactorWindow>
-            listener-application
+            [ clear listener-thread ] in-thread
+            pane get request-focus
             finish-launching
             event-loop
         ] with-cocoa

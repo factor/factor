@@ -52,15 +52,13 @@ SYMBOL: browser-pane
         listener
     ] with-stream* ;
 
-M: label set-message ( string/f status -- )
-    set-label-text* ;
-
 : <status-bar> ( -- gadget ) "" <label> dup status-theme ;
 
-: <bottom-bar> ( -- gadget )
-    <status-bar> dup world get set-world-status
-    <shelf> dup stack-bar set-global
-    2array make-pile 1 over set-pack-fill ;
+: <bottom-bar> ( -- gadget status )
+    <status-bar> [
+        <shelf> dup stack-bar set-global
+        2array make-pile 1 over set-pack-fill
+    ] keep ;
 
 : <browser-scroller> ( -- gadget )
     <pane> dup browser-pane set-global <scroller> ;
@@ -68,16 +66,8 @@ M: label set-message ( string/f status -- )
 : <listener-scroller> ( -- gadget )
     <input-pane> dup pane set-global <scroller> ;
 
-: <listener> ( -- gadget )
+: <listener> ( -- gadget status )
     <frame> dup solid-interior
     <browser-scroller> <listener-scroller>
     0 <x-splitter> over @center frame-add
-    <bottom-bar> over @bottom frame-add ;
-
-: set-application ( gadget -- )
-    world get dup clear-gadget add-gadget ;
-
-: listener-application ( -- )
-    <listener> set-application
-    [ clear listener-thread ] in-thread
-    pane get request-focus ;
+    <bottom-bar> >r over @bottom frame-add r> ;
