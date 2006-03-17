@@ -45,7 +45,7 @@ SYMBOL: crossref
 : (add-crossref) crossref get [ dupd nest set-hash ] bind ;
 
 : add-crossref ( word -- )
-    crossref get [
+    crossref get over word-vocabulary and [
         dup dup uses [ (add-crossref) ] each-with
     ] when drop ;
 
