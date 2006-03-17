@@ -23,7 +23,15 @@ sequences ;
 UNION: c-ptr byte-array alien ;
 
 M: alien = ( obj obj -- ? )
-    over alien? [ [ alien-address ] 2apply = ] [ 2drop f ] if ;
+    over alien? [
+        2dup [ expired? ] 2apply 2dup or [
+            2swap 2drop
+        ] [
+            2drop [ alien-address ] 2apply
+        ] if =
+    ] [
+        2drop f
+    ] if ;
 
 global [ "libraries" nest drop ] bind
 
