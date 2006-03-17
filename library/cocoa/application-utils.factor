@@ -34,6 +34,9 @@ objc-NSNotificationCenter objc-NSObject objc-NSView threads ;
     >r >r >r >r NSNotificationCenter [defaultCenter] r> r>
     sel_registerName r> r> [addObserver:selector:name:object:] ;
 
+: finish-launching ( -- )
+    NSApplication [sharedApplication] [finishLaunching] ;
+
 IN: errors
 
 : objc-error. ( alien -- )

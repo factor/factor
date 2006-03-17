@@ -1,7 +1,7 @@
 ! Copyright (C) 2006 Slava Pestov
 ! See http://factorcode.org/license.txt for BSD license.
 IN: cocoa
-USING: kernel math objc-NSObject objc-NSWindow ;
+USING: kernel math objc-NSObject objc-NSView objc-NSWindow ;
 
 : NSBorderlessWindowMask     0 ; inline
 : NSTitledWindowMask         1 ; inline
@@ -24,3 +24,11 @@ USING: kernel math objc-NSObject objc-NSWindow ;
     standard-window-type NSBackingStoreBuffered 1
     [initWithContentRect:styleMask:backing:defer:]
     [ swap <NSString> [setTitle:] ] keep ;
+
+: <ViewWindow> ( view title -- window )
+    over [bounds] <NSWindow>
+    [ swap [setContentView:] ] keep
+    dup dup [contentView] [setInitialFirstResponder:]
+    dup 1 [setAcceptsMouseMovedEvents:]
+    dup f [makeKeyAndOrderFront:]
+    [autorelease] ;

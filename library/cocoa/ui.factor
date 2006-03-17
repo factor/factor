@@ -1,31 +1,51 @@
 ! Copyright (C) 2006 Slava Pestov.
-! See http://factor.sf.net/license.txt for BSD license.
+! See http://factorcode.org/license.txt for BSD license.
 USING: arrays cocoa freetype gadgets-layouts gadgets-listener
 hashtables kernel lists math namespaces objc objc-NSApplication
 objc-NSEvent objc-NSObject objc-NSOpenGLView objc-NSView
 objc-NSWindow sequences ;
 
+! Cocoa backend for Factor UI
+
+IN: objc-FactorView
+DEFER: FactorView
+
 IN: gadgets
 
-: redraw-world ( gadgets -- )
-    world-handle [contentView] 1 [setNeedsDisplay:] ;
+: redraw-world ( gadget -- ) world-handle 1 [setNeedsDisplay:] ;
 
 IN: gadgets-cocoa
 
-! Cocoa backend for Factor UI
-: button ( event -- n )
-    #! Cocoa -> Factor UI button mapping
-    [buttonNumber] H{ { 0 1 } { 2 2 } { 1 3 } } hash ;
+! Hash mapping aliens to gadgets
+SYMBOL: views
 
-: mouse-location ( window -- loc )
-    dup [contentView] [
-        swap [mouseLocationOutsideOfEventStream] f
-        [convertPoint:fromView:]
+H{ } clone views set-global
+
+: register-view ( world -- )
+    dup world-handle views get set-hash ;
+
+: unregister-view ( world -- )
+    world-handle views get remove-hash ;
+
+: view ( handle -- world ) views get hash ;
+
+: draw-view ( view -- )
+    dup [openGLContext] [
+        dup view-dim init-gl view draw-gadget
+    ] with-gl-context ;
+
+: mouse-location ( event view -- loc )
+    [
+        swap [locationInWindow] f [convertPoint:fromView:]
         dup NSPoint-x swap NSPoint-y
     ] keep [frame] NSRect-h swap - 0 3array ;
 
-: send-mouse-moved ( -- )
-    world get world-handle mouse-location move-hand ;
+: send-mouse-moved ( event view -- )
+    mouse-location move-hand ;
+
+: button ( event -- n )
+    #! Cocoa -> Factor UI button mapping
+    [buttonNumber] H{ { 0 1 } { 2 2 } { 1 3 } } hash ;
 
 : modifiers
     {
@@ -65,27 +85,23 @@ IN: gadgets-cocoa
 
 "NSOpenGLView" "FactorView" {
     { "drawRect:" "void" { "id" "SEL" "NSRect" }
-        [
-            2drop dup [openGLContext] [
-                view-dim init-gl world get draw-gadget
-            ] with-gl-context
-        ]
+        [ 2drop draw-view ]
     }
     
     { "mouseMoved:" "void" { "id" "SEL" "id" }
-        [ 3drop send-mouse-moved ]
+        [ nip swap send-mouse-moved ]
     }
     
     { "mouseDragged:" "void" { "id" "SEL" "id" }
-        [ 3drop send-mouse-moved ]
+        [ nip swap send-mouse-moved ]
     }
     
     { "rightMouseDragged:" "void" { "id" "SEL" "id" }
-        [ 3drop send-mouse-moved ]
+        [ nip swap send-mouse-moved ]
     }
     
     { "otherMouseDragged:" "void" { "id" "SEL" "id" }
-        [ 3drop send-mouse-moved ]
+        [ nip swap send-mouse-moved ]
     }
     
     { "mouseDown:" "void" { "id" "SEL" "id" }
@@ -121,7 +137,7 @@ IN: gadgets-cocoa
     }
 
     { "updateFactorGadgetSize:" "void" { "id" "SEL" "id" }
-        [ 2drop view-dim world get set-gadget-dim ]
+        [ 2drop dup view-dim swap view set-gadget-dim ]
     }
     
     { "acceptsFirstResponder" "bool" { "id" "SEL" }
@@ -129,29 +145,13 @@ IN: gadgets-cocoa
     }
 } { } define-objc-class
 
-IN: objc-FactorView
-DEFER: FactorView
-
-IN: gadgets-cocoa
-
 : <FactorView> ( gadget -- view )
-    drop
-    FactorView [alloc]
-    0 0 100 100 <NSRect> NSOpenGLView [defaultPixelFormat]
-    [initWithFrame:pixelFormat:]
-    dup 1 [setPostsBoundsChangedNotifications:]
-    dup 1 [setPostsFrameChangedNotifications:]
+    FactorView over rect-dim <GLView>
     dup "updateFactorGadgetSize:" add-resize-observer
-    [autorelease] ;
+    [ over set-world-handle register-view ] keep ;
 
 : <FactorWindow> ( gadget title -- window )
-    over rect-dim first2 0 0 2swap <NSRect> <NSWindow>
-    [ swap <FactorView> [setContentView:] ] 2keep
-    [ swap set-world-handle ] keep
-    dup 1 [setAcceptsMouseMovedEvents:]
-    dup dup [contentView] [setInitialFirstResponder:]
-    dup f [makeKeyAndOrderFront:]
-    [autorelease] ;
+    >r <FactorView> r> <ViewWindow> ;
 
 IN: shells
 
@@ -159,14 +159,9 @@ IN: shells
     [
         [
             { 600 700 0 } <world> world set
-            <hand> hand set
-
             world get ui-title <FactorWindow>
-
             listener-application
-
-            NSApplication [sharedApplication] [finishLaunching]
-
+            finish-launching
             event-loop
         ] with-cocoa
     ] with-freetype ;

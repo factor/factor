@@ -1,7 +1,15 @@
 ! Copyright (C) 2006 Slava Pestov
 ! See http://factorcode.org/license.txt for BSD license.
 IN: cocoa
-USING: arrays kernel objc-NSOpenGLContext objc-NSView opengl ;
+USING: arrays kernel objc-NSObject objc-NSOpenGLContext
+objc-NSOpenGLView objc-NSView opengl sequences ;
+
+: <GLView> ( class dim -- view )
+    >r [alloc] 0 0 r> first2 <NSRect>
+    NSOpenGLView [defaultPixelFormat]
+    [initWithFrame:pixelFormat:] [autorelease]
+    dup 1 [setPostsBoundsChangedNotifications:]
+    dup 1 [setPostsFrameChangedNotifications:] ;
 
 : with-gl-context ( context quot -- )
     swap

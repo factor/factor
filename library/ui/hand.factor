@@ -15,6 +15,8 @@ TUPLE: hand click-loc click-rel clicked buttons gadget focus ;
 C: hand ( -- hand )
     dup delegate>gadget V{ } clone over set-hand-buttons ;
 
+<hand> hand set-global
+
 : button-gesture ( buttons gesture -- )
     #! Send a gesture like [ button-down 2 ]; if nobody
     #! handles it, send [ button-down ].
