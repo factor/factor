@@ -85,7 +85,7 @@ M: font = eq? ;
 
 C: font ( handle -- font )
     [ set-font-handle ] keep dup init-font
-    V{ } clone over set-font-widths- ;
+    V{ } clone over set-font-widths ;
 
 : open-font ( { font style ptsize } -- font )
     #! Open a font and set the point size of the font.
