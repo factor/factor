@@ -24,6 +24,9 @@
 ! Based on Scheme code for bshift and breset from:
 ! http://groups.google.com/group/comp.lang.scheme/msg/9f0d61da01540816
 !
+! See this blog entry for more details:
+! http://www.bluishcoder.co.nz/2006/03/factor-partial-continuation-updates.html
+!
 IN: continuations
 USING: kernel io math prettyprint inspector lists arrays sequences namespaces ;
 
