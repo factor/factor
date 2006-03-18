@@ -47,28 +47,35 @@ SYMBOL: mark-old
 
 : breset ( quot -- )
   #! Marks the boundary of the partial continuation.
-  #! The quotation has stack effect ( r -- v ).
-  [ 
-    [ 1array dup mark set swap call mark get first continue-with ] with-scope 
-  ] callcc1 nip ;
+  #! The quotation has stack effect ( r -- v ), where
+  #! 'r' identifies the breset in scope and should be passed
+  #! to bshift to mark the boundary of the continuation.
+  #! It is important to note that even if the quotation
+  #! discards items on the stack, the stack will be restored to
+  #! the way it was before it is called (which is true of callcc
+  #! usage in general).
+  [ 1array swap keep first continue-with ] callcc1 nip ;
 
-: (bshift) ( v r pcc -- )
-  [
-    swap mark set
-    [
-      [ set-mark continue-with ] callcc1 2nip 
-    ] with-mark 
-  ] with-scope ;
+: (bshift) ( v r k -- )
+  >r dup first -rot r> ( old-rc v r k )
+  [  ( old-rc v r k kstar  )
+    rot 0 swap set-nth ( old-rc v k )
+    continue-with  
+  ] callcc1 ( old-rc v r k v2 )
+  >r drop nip 0 swap set-nth r> ;
 
 : bshift ( r quot -- )
   #! Calls the quotation with the partial continuation 
   #! on the stack. The quotation should have stack effect
   #! ( pcc -- v ). The partial continuation can be called
   #! with 'call' and has stack effect ( a -- b ). 
-  [
-    over mark set
-    [ 
-      [ (bshift) ] cons swapd cons swap call get-mark continue-with        
-    ] callcc1 2nip 
-  ] with-scope ;
+  #! It is important to note that even if the quotation
+  #! discards items on the stack, the stack will be restored to
+  #! the way it was before it is called (which is true of callcc
+  #! usage in general).
+  [ ( r quot k )
+    [ (bshift) ] cons pick  swons swap ( r bshift quot )
+    rot >r call ( v )
+    r> first continue-with        
+  ] callcc1 2nip ;
 
