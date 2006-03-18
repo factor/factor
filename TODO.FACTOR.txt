@@ -1,6 +1,3 @@
-- return type stack effects show "void"
-- httpd fep
-
 + portability:
 
 - win64 port
@@ -17,6 +14,7 @@
 
 + io:
 
+- httpd fep
 - stream server can hang because of exception handler limitations
 - better i/o scheduler
 - out of memory error when printing global namespace
@@ -33,14 +31,11 @@
 
 - menu drag retarget broken
 - hang when scrolling
+- hang with multiple windows
 - C+k binding does not work
 - incremental layout flicker
 - expired aliens in view hash
-- try launchpad with bevel buttons replaced by buttons: there's
-  overpainting
-- artifacts while resizing
 - unregister notifications and the view in dealloc
-- segfault when closing window
 - changelog in the UI
 - make the UI look better, something like this:
   http://twb.ath.cx/~twb/darcs/OBSOLETE/factor/final.html
@@ -78,6 +73,7 @@
 
 + misc:
 
+- clean up stack effect generation code
 - code walker & exceptions
 - slice: if sequence or seq start is changed, abstraction violation
 - make 3.4 bits>double an error

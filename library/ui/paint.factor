@@ -15,7 +15,8 @@ SYMBOL: clip
     glLoadIdentity
     { 0 0 0 } over <rect> clip set
     dup first2 0 0 2swap glViewport
-    0 swap first2 0 gluOrtho2D
+    0 over first2 0 gluOrtho2D
+    first2 0 0 2swap glScissor
     GL_SMOOTH glShadeModel
     GL_BLEND glEnable
     GL_SRC_ALPHA GL_ONE_MINUS_SRC_ALPHA glBlendFunc
@@ -64,7 +65,7 @@ DEFER: draw-gadget
 
 : draw-world ( world -- )
     [
-        dup rect-dim init-gl dup world set draw-gadget
+        dup rect-dim init-gl dup world set draw-gadget gl-error
     ] with-scope ;
 
 ! Pen paint properties
