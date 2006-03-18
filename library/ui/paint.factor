@@ -7,7 +7,10 @@ IN: gadgets
 
 SYMBOL: clip
 
+SYMBOL: world-dim
+
 : init-gl ( dim -- )
+    dup world-dim set
     { 1.0 0.0 0.0 1.0 } gl-color
     GL_PROJECTION glMatrixMode
     glLoadIdentity
@@ -46,8 +49,6 @@ DEFER: world
         draw-gadget*
     ] keep vneg gl-translate ;
 
-SYMBOL: world-dim
-
 : gl-set-clip ( loc dim -- )
     dup first2 1+ >r >r
     over second swap second + world-dim get second
@@ -65,11 +66,6 @@ SYMBOL: world-dim
             dup visible-children [ draw-gadget ] each
         ] with-scope
     ] when drop ;
-
-: draw-world ( world -- )
-    [
-        dup rect-dim dup world-dim set init-gl draw-gadget
-    ] with-scope ;
 
 ! Pen paint properties
 M: f draw-interior 2drop ;

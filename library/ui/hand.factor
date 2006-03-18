@@ -40,7 +40,7 @@ C: hand ( -- hand )
 
 : send-scroll-wheel ( up/down -- )
     [ wheel-up ] [ wheel-down ] ?
-    hand get hand-clicked handle-gesture drop ;
+    hand get hand-gadget handle-gesture drop ;
 
 : drag-gesture ( -- )
     #! Send a gesture like [ drag 2 ]; if nobody handles it,

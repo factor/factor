@@ -1,8 +1,8 @@
 ! Copyright (C) 2006 Slava Pestov
 ! See http://factorcode.org/license.txt for BSD license.
 IN: cocoa
-USING: alien errors gadgets io kernel namespaces objc
-objc-NSApplication objc-NSAutoreleasePool objc-NSException
+USING: alien errors gadgets gadgets-layouts io kernel namespaces
+objc objc-NSApplication objc-NSAutoreleasePool objc-NSException
 objc-NSNotificationCenter objc-NSObject objc-NSView threads ;
 
 : with-autorelease-pool ( quot -- )
@@ -28,7 +28,7 @@ objc-NSNotificationCenter objc-NSObject objc-NSView threads ;
 : event-loop ( -- )
     [
         NSApplication [sharedApplication] do-events
-        world get world-step
+        do-timers layout-queued
     ] with-autorelease-pool 10 sleep event-loop ;
 
 : add-observer ( observer selector name object -- )

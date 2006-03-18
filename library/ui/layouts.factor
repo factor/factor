@@ -25,8 +25,7 @@ IN: gadgets-layouts
     ] [
         dup invalidate*
         dup gadget-root?
-        [ add-invalid ]
-        [ gadget-parent [ relayout ] when* ] if
+        [ add-invalid ] [ gadget-parent [ relayout ] when* ] if
     ] if ;
 
 : relayout-1 ( gadget -- )
@@ -77,7 +76,7 @@ DEFER: layout
 
 : layout-queued ( -- )
     invalid dup queue-empty?
-    [ drop ] [ deque layout layout-queued ] if ;
+    [ drop ] [ deque dup layout layout-done layout-queued ] if ;
 
 TUPLE: pack align fill gap ;
 

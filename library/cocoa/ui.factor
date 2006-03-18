@@ -12,7 +12,7 @@ DEFER: FactorView
 
 IN: gadgets
 
-: redraw-world ( gadget -- ) world-handle 1 [setNeedsDisplay:] ;
+: repaint-handle ( handle -- ) 1 [setNeedsDisplay:] ;
 
 IN: gadgets-cocoa
 
@@ -153,9 +153,8 @@ IN: shells
 : ui
     [
         [
-            <listener>
-            { 600 700 0 } <world> world set
-            world get "Listener" <FactorWindow> drop
+            <listener> { 600 700 0 } <world>
+            "Listener" <FactorWindow> drop
             [ clear listener-thread ] in-thread
             pane get request-focus
             finish-launching

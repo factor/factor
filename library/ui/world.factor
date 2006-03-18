@@ -1,12 +1,8 @@
 ! Copyright (C) 2005, 2006 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 IN: gadgets
-USING: alien arrays errors freetype gadgets-labels
-gadgets-layouts gadgets-theme generic io kernel lists math
-memory namespaces opengl prettyprint queues sequences sequences
-strings styles threads ;
-
-DEFER: redraw-world
+USING: freetype gadgets-labels gadgets-layouts gadgets-theme
+generic kernel namespaces queues sequences ;
 
 ! The world gadget is the top level gadget that all (visible)
 ! gadgets are contained in. The current world is stored in the
@@ -64,9 +60,8 @@ C: world ( gadget status dim -- world )
     #! Called when a gadget is removed or added.
     hand get rect-loc swap move-hand ;
 
-: world-step ( world -- )
-    do-timers invalid queue-empty? >r layout-queued r>
-    [ drop ] [ dup update-hand redraw-world ] if ;
+: draw-world ( world -- )
+    [ dup rect-dim init-gl draw-gadget ] with-scope ;
 
 GENERIC: find-world ( gadget -- world )
 
@@ -75,3 +70,11 @@ M: f find-world ;
 M: gadget find-world gadget-parent find-world ;
 
 M: world find-world ;
+
+: repaint ( gadget -- )
+    find-world [ world-handle repaint-handle ] when* ;
+
+: layout-done ( gadget -- )
+    find-world [
+        dup update-hand world-handle repaint-handle
+    ] when* ;
