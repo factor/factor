@@ -4,6 +4,10 @@ USING: compiler compiler-backend io io-internals kernel
 kernel-internals lists math memory namespaces optimizer parser
 sequences sequences-internals words ;
 
+"Building cross-referencing database..." print
+H{ } clone crossref set
+recrossref
+
 "compile" get [
     "native-io" get [
         os { "freebsd" "linux" "macosx" "solaris" } member? [
@@ -48,10 +52,6 @@ sequences sequences-internals words ;
     "shell" get "shells" lookup execute
     0 exit
 ] set-boot
-
-"Building cross-referencing database..." print
-H{ } clone crossref set
-recrossref
 
 "Setting the resource path..." print
 cwd "resource-path" set-global
