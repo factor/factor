@@ -71,3 +71,8 @@ SYMBOL: browser-pane
     <browser-scroller> <listener-scroller>
     0 <x-splitter> over @center frame-add
     <bottom-bar> >r over @bottom frame-add r> ;
+
+: listener-window ( -- )
+    <listener> { 600 700 0 } "Listener" in-window
+    [ clear listener-thread ] in-thread
+    pane get request-focus ;

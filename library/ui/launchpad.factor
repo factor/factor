@@ -1,18 +1,20 @@
 IN: gadgets-launchpad
-USING: gadgets-buttons gadgets-labels gadgets-layouts io kernel
-memory namespaces sequences ;
+USING: gadgets gadgets-buttons gadgets-labels gadgets-layouts
+gadgets-listener io kernel memory namespaces sequences ;
 
 : <launchpad> ( menu -- )
-    [ first2 >r <label> r> <bevel-button> ] map make-pile ;
+    [ first2 >r <label> r> <bevel-button> ] map make-pile
+    1 over set-pack-fill ;
 
 : default-launchpad
     {
-        { "Listener" [ global [ "Hi" print ] bind drop ] }
-        { "Browser" [ global [ "Hi" print ] bind drop ] }
-        { "Inspector" [ global [ "Hi" print ] bind drop ] }
-        { "Help" [ global [ "Hi" print ] bind drop ] }
-        { "Tutorial" [ global [ "Hi" print ] bind drop ] }
-        { "System" [ global [ "Hi" print ] bind drop ] }
+        { "Listener" [ listener-window ] }
         { "Save image" [ save ] }
         { "Exit" [ 0 exit ] }
     } <launchpad> ;
+
+: simple-window ( gadget title -- )
+    >r "" <label> over pref-dim r> in-window ;
+
+: launchpad-window ( -- )
+    default-launchpad "Factor" simple-window ;

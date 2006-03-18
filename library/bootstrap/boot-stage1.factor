@@ -161,6 +161,7 @@ vectors words ;
         "/library/freetype/freetype.factor"
         "/library/freetype/freetype-gl.factor"
 
+        "/library/ui/backend.factor"
         "/library/ui/timers.factor"
         "/library/ui/gadgets.factor"
         "/library/ui/layouts.factor"
@@ -185,6 +186,7 @@ vectors words ;
         "/library/ui/panes.factor"
         "/library/ui/outliner.factor"
         "/library/ui/listener.factor"
+        "/library/ui/launchpad.factor"
         "/library/ui/commands.factor"
         "/library/ui/presentations.factor"
 

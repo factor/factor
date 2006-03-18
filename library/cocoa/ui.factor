@@ -1,18 +1,15 @@
 ! Copyright (C) 2006 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: arrays cocoa freetype gadgets-layouts
-gadgets-listener gadgets-panes hashtables kernel lists math
-namespaces objc objc-NSApplication objc-NSEvent objc-NSObject
-objc-NSOpenGLView objc-NSView objc-NSWindow sequences threads ;
+USING: arrays cocoa freetype gadgets gadgets-launchpad
+gadgets-layouts gadgets-listener gadgets-panes hashtables kernel
+lists math namespaces objc objc-NSApplication objc-NSEvent
+objc-NSObject objc-NSOpenGLView objc-NSView objc-NSWindow
+sequences threads ;
 
 ! Cocoa backend for Factor UI
 
 IN: objc-FactorView
 DEFER: FactorView
-
-IN: gadgets
-
-: repaint-handle ( handle -- ) 1 [setNeedsDisplay:] ;
 
 IN: gadgets-cocoa
 
@@ -148,15 +145,20 @@ H{ } clone views set-global
 : <FactorWindow> ( gadget title -- window )
     >r <FactorView> r> <ViewWindow> ;
 
+IN: gadgets
+
+: repaint-handle ( handle -- ) 1 [setNeedsDisplay:] ;
+
+: in-window ( gadget status dim title -- )
+    >r <world> r> <FactorWindow> drop ;
+
 IN: shells
 
 : ui
     [
         [
-            <listener> { 600 700 0 } <world>
-            "Listener" <FactorWindow> drop
-            [ clear listener-thread ] in-thread
-            pane get request-focus
+            launchpad-window
+            listener-window
             finish-launching
             event-loop
         ] with-cocoa

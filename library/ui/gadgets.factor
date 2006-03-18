@@ -101,8 +101,3 @@ M: gadget children-on ( rect/point gadget -- list )
 GENERIC: gadget-help
 
 M: gadget gadget-help drop f ;
-
-! Repaint/relayout protocol
-
-! This word is defined in the backend
-DEFER: repaint-handle ( handle -- )
