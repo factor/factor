@@ -27,24 +27,6 @@
 IN: continuations
 USING: kernel io math prettyprint inspector lists arrays sequences namespaces ;
 
-SYMBOL: mark
-SYMBOL: mark-old
-
-: set-mark ( cc -- )
-  0 mark get set-nth ;
-
-: get-mark ( -- cc )
-  mark get first ;
-
-: save-mark ( -- )
-  get-mark mark-old set ;
-
-: restore-mark ( -- )
-  mark-old get set-mark ;
-
-: with-mark ( quot -- )
-  [ save-mark call restore-mark ] with-scope ;
-
 : breset ( quot -- )
   #! Marks the boundary of the partial continuation.
   #! The quotation has stack effect ( r -- v ), where
