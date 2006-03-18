@@ -13,6 +13,9 @@ sequences ;
 : do-state ( what quot -- )
     swap glBegin call glEnd ; inline
 
+: do-enabled ( what quot -- )
+    over glEnable swap slip glDisable ; inline
+
 : do-matrix ( mode quot -- )
     swap [ glMatrixMode glPushMatrix call ] keep
     glMatrixMode glPopMatrix ; inline
@@ -126,3 +129,9 @@ C: sprite ( loc dim dim2 -- )
 : init-sprite ( texture sprite -- )
     [ set-sprite-texture ] keep
     [ make-sprite-dlist ] keep set-sprite-dlist ;
+
+: free-sprite ( sprite -- )
+    dup sprite-dlist 1 glDeleteLists
+    sprite-texture <uint> 1 swap glDeleteTextures ;
+
+: free-sprites ( sprites -- ) [ [ free-sprite ] when* ] each ;

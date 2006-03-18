@@ -11,7 +11,7 @@ sequences strings walker ;
     over >r >r dup word-def r> call r> swap define-compound ;
     inline
 
-: watch-msg ( word prefix -- ) write word-name print .s ;
+: watch-msg ( word prefix -- ) write word-name print .s flush ;
 
 : (watch) ( word def -- def )
     [

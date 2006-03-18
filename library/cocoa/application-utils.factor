@@ -1,7 +1,7 @@
 ! Copyright (C) 2006 Slava Pestov
 ! See http://factorcode.org/license.txt for BSD license.
 IN: cocoa
-USING: alien errors gadgets gadgets-layouts io kernel namespaces
+USING: alien errors gadgets io kernel namespaces
 objc objc-NSApplication objc-NSAutoreleasePool objc-NSException
 objc-NSNotificationCenter objc-NSObject objc-NSView threads ;
 

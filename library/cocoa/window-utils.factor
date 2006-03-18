@@ -31,4 +31,4 @@ USING: kernel math objc-NSObject objc-NSView objc-NSWindow ;
     dup dup [contentView] [setInitialFirstResponder:]
     dup 1 [setAcceptsMouseMovedEvents:]
     dup f [makeKeyAndOrderFront:]
-    [autorelease] ;
+    ( [autorelease] ) ;

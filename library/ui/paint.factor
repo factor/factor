@@ -7,10 +7,7 @@ IN: gadgets
 
 SYMBOL: clip
 
-SYMBOL: world-dim
-
 : init-gl ( dim -- )
-    dup world-dim set
     { 1.0 0.0 0.0 1.0 } gl-color
     GL_PROJECTION glMatrixMode
     glLoadIdentity
@@ -39,8 +36,6 @@ GENERIC: draw-boundary ( gadget boundary -- )
 
 DEFER: draw-gadget
 
-DEFER: world
-
 : (draw-gadget) ( gadget -- )
     dup rect-loc translate [
         gl-translate
@@ -51,7 +46,7 @@ DEFER: world
 
 : gl-set-clip ( loc dim -- )
     dup first2 1+ >r >r
-    over second swap second + world-dim get second
+    over second swap second + world get rect-dim second
     swap - >r first r> r> r> glScissor ;
 
 : do-clip ( gadget -- )
@@ -66,6 +61,11 @@ DEFER: world
             dup visible-children [ draw-gadget ] each
         ] with-scope
     ] when drop ;
+
+: draw-world ( world -- )
+    [
+        dup rect-dim init-gl dup world set draw-gadget
+    ] with-scope ;
 
 ! Pen paint properties
 M: f draw-interior 2drop ;

@@ -74,10 +74,6 @@ DEFER: layout
         dup layout* dup layout-children
     ] when drop ;
 
-: layout-queued ( -- )
-    invalid dup queue-empty?
-    [ drop ] [ deque dup layout layout-done layout-queued ] if ;
-
 TUPLE: pack align fill gap ;
 
 : pref-dims ( gadget -- list ) [ pref-dim ] map ;

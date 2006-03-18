@@ -106,6 +106,3 @@ M: gadget gadget-help drop f ;
 
 ! This word is defined in the backend
 DEFER: repaint-handle ( handle -- )
-
-! This word is defined in world.factor
-DEFER: layout-done ( gadget -- )

@@ -1,7 +1,8 @@
 ! Copyright (C) 2005, 2006 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 IN: gadgets
-USING: kernel math namespaces sequences ;
+USING: gadgets-labels gadgets-layouts kernel math namespaces
+queues sequences ;
 
 ! The hand is a special gadget that holds mouse position and
 ! mouse button click state.
@@ -82,3 +83,44 @@ C: hand ( -- hand )
 
 : drag-loc ( gadget -- loc )
     hand get [ relative ] keep hand-click-rel v- ;
+
+: relevant-help ( seq -- help )
+    [ gadget-help ] map [ ] find nip ;
+
+: show-message ( string/f -- )
+    #! Show a message in the status bar.
+    world-status set-label-text* ;
+
+: update-help ( -- string )
+    #! Update mouse-over help message.
+    hand get hand-gadget parents [ relevant-help ] keep
+    dup empty? [ 2drop ] [ peek show-message ] if ;
+
+: under-hand ( -- seq )
+    #! A sequence whose first element is the world and last is
+    #! the current gadget, with all parents in between.
+    hand get hand-gadget parents reverse-slice ;
+
+: hand-grab ( world -- gadget )
+    hand get rect-loc swap pick-up ;
+
+: update-hand-gadget ( world -- )
+    hand-grab hand get set-hand-gadget ;
+
+: move-hand ( loc world -- )
+    swap under-hand >r hand get set-rect-loc
+    update-hand-gadget
+    under-hand r> hand-gestures update-help ;
+
+: update-hand ( world -- )
+    #! Called when a gadget is removed or added.
+    hand get rect-loc swap move-hand ;
+
+: layout-done ( gadget -- )
+    find-world [
+        dup update-hand world-handle repaint-handle
+    ] when* ;
+
+: layout-queued ( -- )
+    invalid dup queue-empty?
+    [ drop ] [ deque dup layout layout-done layout-queued ] if ;

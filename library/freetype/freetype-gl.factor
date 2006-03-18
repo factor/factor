@@ -20,34 +20,19 @@ SYMBOL: open-fonts
         H{ } clone open-fonts set
     ] bind ;
 
-: free-sprite ( sprite -- )
-    dup sprite-dlist 1 glDeleteLists
-    sprite-texture <uint> 1 swap glDeleteTextures ;
-
 ! A font object from FreeType.
 ! the handle is an FT_Face.
 ! sprites is a vector.
-TUPLE: font ascent descent height handle sprites ;
+TUPLE: font ascent descent height handle widths ;
 
 M: font = eq? ;
 
-: flush-font ( font -- )
-    #! Only do this after re-creating a GL context!
-    dup font-sprites [ [ free-sprite ] when* ] each
-    V{ } clone swap set-font-sprites ;
-
-: close-font ( font -- )
-    dup flush-font font-handle FT_Done_Face ;
-
-: flush-fonts ( -- )
-    #! Only do this after re-creating a GL context!
-    open-fonts get hash-values [ flush-font ] each ;
+: close-font ( font -- ) font-handle FT_Done_Face ;
 
 : close-freetype ( -- )
     global [
-        open-fonts get hash-values [ close-font ] each
-        open-fonts off
-        freetype get FT_Done_FreeType
+        open-fonts [ hash-values [ close-font ] each f ] change
+        freetype [ FT_Done_FreeType f ] change
     ] bind ;
 
 : with-freetype ( quot -- )
@@ -99,7 +84,8 @@ M: font = eq? ;
     swap set-font-height ;
 
 C: font ( handle -- font )
-    [ set-font-handle ] keep dup flush-font dup init-font ;
+    [ set-font-handle ] keep dup init-font
+    V{ } clone over set-font-widths- ;
 
 : open-font ( { font style ptsize } -- font )
     #! Open a font and set the point size of the font.
@@ -111,8 +97,16 @@ C: font ( handle -- font )
     open-fonts get [ open-font ] cache ;
 
 : load-glyph ( font char -- glyph )
-    >r font-handle r> dupd 0 FT_Load_Char
+    >r font-handle dup r> 0 FT_Load_Char
     freetype-error face-glyph ;
+
+: char-width ( open-font char -- w )
+    over font-widths [
+        dupd load-glyph glyph-hori-advance ft-ceil
+    ] cache-nth nip ;
+
+: string-width ( open-font string -- w )
+    0 -rot [ char-width + ] each-with ;
 
 : glyph-size ( glyph -- dim )
     dup glyph-hori-advance ft-ceil
@@ -169,21 +163,17 @@ C: font ( handle -- font )
     over glyph-size pick glyph-texture-size <sprite>
     [ bitmap>texture ] keep [ init-sprite ] keep ;
 
-: char-sprite ( open-font char -- sprite )
+: char-sprite ( open-font char sprites -- sprite )
     #! Get a cached display list of a FreeType-rendered
     #! glyph.
-    over font-sprites [ dupd <char-sprite> ] cache-nth nip ;
+    [ dupd <char-sprite> ] cache-nth nip ;
 
-: char-width ( open-font char -- w )
-    char-sprite sprite-width ;
-
-: string-width ( open-font string -- w )
-    0 -rot [ char-width + ] each-with ;
-
-: draw-string ( open-font string -- )
-    GL_TEXTURE_2D glEnable
-    0 -rot [
-        char-sprite [ sprite-width + ] keep
-        sprite-dlist glCallList
-    ] each-with neg 0 0 glTranslatef
-    GL_TEXTURE_2D glDisable ;
+: draw-string ( open-font sprites string -- )
+    GL_TEXTURE_2D [
+        GL_MODELVIEW [
+            [
+                >r 2dup r> swap char-sprite
+                sprite-dlist glCallList
+            ] each 2drop
+        ] do-matrix
+    ] do-enabled ;

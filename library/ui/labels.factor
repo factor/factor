@@ -29,6 +29,7 @@ M: label pref-dim* ( label -- dim )
 
 : draw-label ( label -- )
     dup label-color gl-color
-    dup label-font* swap label-text draw-string ;
+    dup label-font* dup world get font-sprites rot
+    label-text draw-string ;
 
 M: label draw-gadget* ( label -- ) draw-label ;

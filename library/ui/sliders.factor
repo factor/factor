@@ -40,8 +40,12 @@ TUPLE: slider elevator thumb value max page ;
 SYMBOL: slider-changed
 
 : set-slider-value* ( value slider -- )
-    [ set-slider-value ] keep [ fix-slider ] keep
-    [ slider-changed ] swap handle-gesture drop ;
+    2dup slider-value = [
+        2drop
+    ] [
+        [ set-slider-value ] keep [ fix-slider ] keep
+        [ slider-changed ] swap handle-gesture drop
+    ] if ;
 
 : elevator-drag ( elevator -- )
     [ find-slider ] keep drag-loc over gadget-orientation v.

@@ -6,8 +6,12 @@ gadgets-labels gadgets-theme generic kernel lists math
 namespaces sequences ;
 
 : retarget-drag ( gadget -- )
-    hand get [ hand-gadget ] keep 2dup hand-clicked eq?
-    [ 3drop ] [ set-hand-clicked update-hand ] if ;
+    find-world hand get [ hand-gadget ] keep
+    2dup hand-clicked eq? [
+        3drop
+    ] [
+        set-hand-clicked update-hand
+    ] if ;
 
 : retarget-click ( gadget -- )
     find-world dup hide-glass update-hand-gadget

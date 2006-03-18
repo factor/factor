@@ -31,6 +31,10 @@
 
 + ui/help:
 
+- menu drag retarget broken
+- hang when scrolling
+- C+k binding does not work
+- incremental layout flicker
 - expired aliens in view hash
 - try launchpad with bevel buttons replaced by buttons: there's
   overpainting
@@ -79,3 +83,4 @@
 - make 3.4 bits>double an error
 - colorcoded prettyprinting for vocabularies
 - signal handler should not lose stack pointers
+- code walker and callbacks is broken?
