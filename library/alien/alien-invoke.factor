@@ -79,7 +79,8 @@ M: alien-invoke stack-reserve*
 
 : parse-arglist ( return seq -- types stack-effect )
     unpair [
-        " " % [ "," ?tail drop ] map " " join % " -- " % swap %
+        [ "," ?tail drop ] map " " join % " -- " %
+        swap [ ] [ % ] if-void
     ] "" make ;
 
 : (define-c-word) ( type lib func types stack-effect -- )
