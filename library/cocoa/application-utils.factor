@@ -27,7 +27,8 @@ objc-NSNotificationCenter objc-NSObject objc-NSView threads ;
 
 : event-loop ( -- )
     [
-        NSApplication [sharedApplication] do-events world-step
+        NSApplication [sharedApplication] do-events
+        world get world-step
     ] with-autorelease-pool 10 sleep event-loop ;
 
 : add-observer ( observer selector name object -- )

@@ -1,5 +1,5 @@
 IN: gadgets-presentations
-USING: compiler gadgets gadgets-buttons gadgets-listener
+USING: arrays compiler gadgets gadgets-buttons gadgets-listener
 gadgets-menus gadgets-panes generic hashtables inference
 inspector io jedit kernel lists namespaces parser prettyprint
 sequences strings styles words ;
@@ -39,7 +39,7 @@ TUPLE: command-button object ;
 
 : <command-menu-item> ( presented command -- item )
     [ command>quot [ drop ] swap append ] keep
-    command-name swons ;
+    command-name swap 2array ;
 
 : <command-menu> ( presented -- menu )
     dup applicable
@@ -47,7 +47,7 @@ TUPLE: command-button object ;
 
 : command-menu ( command-button -- )
     dup button-update
-    command-button-object <command-menu>
+    [ command-button-object <command-menu> ] keep
     show-hand-menu ;
 
 : command-button-actions ( gadget -- )

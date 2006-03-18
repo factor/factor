@@ -8,9 +8,7 @@ IN: gadgets
 SYMBOL: clip
 
 : init-gl ( dim -- )
-    1.0 1.0 1.0 1.0 glClearColor
-    GL_COLOR_BUFFER_BIT glClear
-    { 1.0 0.0 0.0 0.0 } gl-color
+    { 1.0 0.0 0.0 1.0 } gl-color
     GL_PROJECTION glMatrixMode
     glLoadIdentity
     GL_MODELVIEW glMatrixMode
@@ -22,7 +20,9 @@ SYMBOL: clip
     GL_BLEND glEnable
     GL_SRC_ALPHA GL_ONE_MINUS_SRC_ALPHA glBlendFunc
     GL_SCISSOR_TEST glEnable
-    GL_MODELVIEW glMatrixMode ;
+    GL_MODELVIEW glMatrixMode
+    1.0 1.0 1.0 1.0 glClearColor
+    GL_COLOR_BUFFER_BIT glClear ;
 
 GENERIC: draw-gadget* ( gadget -- )
 
@@ -46,9 +46,11 @@ DEFER: world
         draw-gadget*
     ] keep vneg gl-translate ;
 
+SYMBOL: world-dim
+
 : gl-set-clip ( loc dim -- )
     dup first2 1+ >r >r
-    over second swap second + world get rect-dim second
+    over second swap second + world-dim get second
     swap - >r first r> r> r> glScissor ;
 
 : do-clip ( gadget -- )
@@ -63,6 +65,11 @@ DEFER: world
             dup visible-children [ draw-gadget ] each
         ] with-scope
     ] when drop ;
+
+: draw-world ( world -- )
+    [
+        dup rect-dim dup world-dim set init-gl draw-gadget
+    ] with-scope ;
 
 ! Pen paint properties
 M: f draw-interior 2drop ;

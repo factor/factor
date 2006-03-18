@@ -31,7 +31,12 @@
 
 + ui/help:
 
-- unregister notifications in dealloc
+- flickering incremental layout
+- expired aliens in view hash
+- try launchpad with bevel buttons replaced by buttons: there's
+  overpainting
+- artifacts while resizing
+- unregister notifications and the view in dealloc
 - segfault when closing window
 - wheel mouse is a bit funny
 - changelog in the UI

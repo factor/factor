@@ -5,40 +5,36 @@ USING: gadgets gadgets-borders gadgets-buttons gadgets-layouts
 gadgets-labels gadgets-theme generic kernel lists math
 namespaces sequences ;
 
-: retarget-drag ( -- )
+: retarget-drag ( gadget -- )
     hand get [ hand-gadget ] keep 2dup hand-clicked eq?
-    [ 2dup set-hand-clicked world get update-hand ] unless
-    2drop ;
+    [ 3drop ] [ set-hand-clicked update-hand ] if ;
 
-: retarget-click ( -- )
-    world get dup hide-glass update-hand-gadget update-clicked ;
+: retarget-click ( gadget -- )
+    find-world dup hide-glass update-hand-gadget
+    update-clicked ;
 
 : menu-actions ( glass -- )
-    dup [ drop retarget-drag ] [ drag ] set-action
-    [ drop retarget-click ] [ button-down ] set-action ;
+    dup [ retarget-drag ] [ drag ] set-action
+    [ retarget-click ] [ button-down ] set-action ;
 
-: fit-bounds ( loc dim max -- loc )
-    #! Adjust loc to fit inside max.
-    swap |v-| vmin ;
+: menu-loc ( loc menu world -- loc )
+    [ rect-dim ] 2apply swap |v-| vmin ;
 
-: menu-loc ( menu loc -- loc )
-    swap rect-dim world get rect-dim fit-bounds ;
+: show-menu ( loc menu gadget -- )
+    find-world 2dup show-glass
+    dup world-glass dup menu-actions hand get set-hand-clicked
+    over >r menu-loc r> set-rect-loc ;
 
-: show-menu ( menu loc -- )
-    >r dup dup world get show-glass r>
-    menu-loc swap set-rect-loc
-    world get world-glass dup menu-actions
-    hand get set-hand-clicked ;
+: show-hand-menu ( menu gadget -- )
+    hand get rect-loc -rot show-menu ;
 
-: show-hand-menu ( menu -- ) hand get rect-loc show-menu ;
+: menu-item-quot ( quot -- quot )
+    [ keep find-world hide-glass ] curry ;
 
 : menu-items ( assoc -- pile )
     #! Given an association list mapping labels to quotations.
     #! Prepend a call to hide-menu to each quotation.
-    [
-        uncons [ world get hide-glass ] swap append
-        >r <label> r> <roll-button>
-    ] map
+    [ first2 menu-item-quot >r <label> r> <roll-button> ] map
     make-pile 1 over set-pack-fill ;
 
 : <menu> ( assoc -- gadget )

@@ -1,9 +1,9 @@
 ! Copyright (C) 2006 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: arrays cocoa freetype gadgets-layouts gadgets-listener
-gadgets-panes hashtables kernel lists math namespaces objc
-objc-NSApplication objc-NSEvent objc-NSObject objc-NSOpenGLView
-objc-NSView objc-NSWindow sequences threads ;
+USING: arrays cocoa freetype gadgets-layouts
+gadgets-listener gadgets-panes hashtables kernel lists math
+namespaces objc objc-NSApplication objc-NSEvent objc-NSObject
+objc-NSOpenGLView objc-NSView objc-NSWindow sequences threads ;
 
 ! Cocoa backend for Factor UI
 
@@ -28,11 +28,6 @@ H{ } clone views set-global
     world-handle views get remove-hash ;
 
 : view ( handle -- world ) views get hash ;
-
-: draw-view ( view -- )
-    dup [openGLContext] [
-        dup view-dim init-gl view draw-gadget
-    ] with-gl-context ;
 
 : mouse-location ( event view -- loc )
     [
@@ -85,7 +80,7 @@ H{ } clone views set-global
 
 "NSOpenGLView" "FactorView" {
     { "drawRect:" "void" { "id" "SEL" "NSRect" }
-        [ 2drop draw-view ]
+        [ 2drop [ view draw-world ] with-gl-view ]
     }
     
     { "mouseMoved:" "void" { "id" "SEL" "id" }
@@ -158,8 +153,9 @@ IN: shells
 : ui
     [
         [
-            { 600 700 0 } >r <listener> r> <world> world set
-            world get ui-title <FactorWindow>
+            <listener>
+            { 600 700 0 } <world> world set
+            world get "Listener" <FactorWindow> drop
             [ clear listener-thread ] in-thread
             pane get request-focus
             finish-launching

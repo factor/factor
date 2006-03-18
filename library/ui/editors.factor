@@ -74,13 +74,14 @@ TUPLE: editor line caret font color ;
     dup screen-loc swap editor-caret rect-extent nip v+ ;
 
 : <completion-item> ( completion editor -- menu-item )
-    dupd [ [ complete ] with-editor drop ] curry curry cons ;
+    dupd [ [ complete ] with-editor drop ] curry curry 2array ;
 
 : <completion-menu> ( editor completions -- menu )
     [ swap <completion-item> ] map-with <menu> ;
 
 : completion-menu ( editor completions -- )
-    over >r <completion-menu> r> popup-location show-menu ;
+    over popup-location -rot
+    over >r <completion-menu> r> show-menu ;
 
 : do-completion-1 ( editor completions -- )
     swap [ first complete ] with-editor ;

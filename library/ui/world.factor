@@ -64,10 +64,14 @@ C: world ( gadget status dim -- world )
     #! Called when a gadget is removed or added.
     hand get rect-loc swap move-hand ;
 
-: ui-title
-    [ "Factor " % version % " - " % image % ] "" make ;
+: world-step ( world -- )
+    do-timers invalid queue-empty? >r layout-queued r>
+    [ drop ] [ dup update-hand redraw-world ] if ;
 
-: world-step ( -- )
-    do-timers
-    invalid queue-empty? >r layout-queued r>
-    [ world get update-hand world get redraw-world ] unless ;
+GENERIC: find-world ( gadget -- world )
+
+M: f find-world ;
+
+M: gadget find-world gadget-parent find-world ;
+
+M: world find-world ;
