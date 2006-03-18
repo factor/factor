@@ -66,8 +66,12 @@ H{ } clone views set-global
     [ second swap bitand 0 > ] subset-with
     [ first ] map ;
 
+: key-code ( event -- string )
+    dup [keyCode] key-codes
+    [ ] [ [charactersIgnoringModifiers] CF>string ] ?if ;
+
 : event>binding ( event -- binding )
-    dup [modifierFlags] modifier swap [keyCode] key-codes
+    dup [modifierFlags] modifier swap key-code
     [ add >list ] [ drop f ] if* ;
 
 : send-key-event ( event -- )
