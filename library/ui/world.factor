@@ -9,7 +9,7 @@ namespaces opengl sequences ;
 
 ! fonts: mapping font tuples to sprite vectors
 ! handle: native resource
-TUPLE: world glass status fonts handle ;
+TUPLE: world glass status focus fonts handle ;
 
 : free-fonts ( world -- )
     world-fonts dup hash-values [ free-sprites ] each
@@ -47,3 +47,6 @@ M: world find-world ;
 
 : repaint ( gadget -- )
     find-world [ world-handle repaint-handle ] when* ;
+
+: focused-ancestors ( world -- seq )
+    world-focus parents reverse-slice ;

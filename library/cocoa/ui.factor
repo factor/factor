@@ -26,14 +26,14 @@ H{ } clone views set-global
 
 : view ( handle -- world ) views get hash ;
 
-: mouse-location ( event view -- loc )
-    [
-        swap [locationInWindow] f [convertPoint:fromView:]
-        dup NSPoint-x swap NSPoint-y
-    ] keep [frame] NSRect-h swap - 0 3array ;
+: mouse-location ( view event -- loc )
+    over >r
+    [locationInWindow] f [convertPoint:fromView:]
+    dup NSPoint-x swap NSPoint-y
+    r> [frame] NSRect-h swap - 0 3array ;
 
-: send-mouse-moved ( event view -- )
-    [ mouse-location ] keep view move-hand ;
+: send-mouse-moved ( view event -- )
+    swap [ mouse-location ] keep view move-hand ;
 
 : button ( event -- n )
     #! Cocoa -> Factor UI button mapping
@@ -74,10 +74,10 @@ H{ } clone views set-global
     dup [modifierFlags] modifier swap key-code
     [ add >list ] [ drop f ] if* ;
 
-: send-key-event ( event -- )
-    dup event>binding
-    [ hand get hand-focus handle-gesture ] [ t ] if*
-    [ [characters] CF>string send-user-input ] [ drop ] if ;
+: send-key-event ( view event -- )
+    >r view world-focus r> dup event>binding
+    [ pick handle-gesture ] [ t ] if*
+    [ [characters] CF>string swap user-input ] [ 2drop ] if ;
 
 "NSOpenGLView" "FactorView" {
     { "drawRect:" "void" { "id" "SEL" "NSRect" }
@@ -85,19 +85,19 @@ H{ } clone views set-global
     }
     
     { "mouseMoved:" "void" { "id" "SEL" "id" }
-        [ nip swap send-mouse-moved ]
+        [ nip send-mouse-moved ]
     }
     
     { "mouseDragged:" "void" { "id" "SEL" "id" }
-        [ nip swap send-mouse-moved ]
+        [ nip send-mouse-moved ]
     }
     
     { "rightMouseDragged:" "void" { "id" "SEL" "id" }
-        [ nip swap send-mouse-moved ]
+        [ nip send-mouse-moved ]
     }
     
     { "otherMouseDragged:" "void" { "id" "SEL" "id" }
-        [ nip swap send-mouse-moved ]
+        [ nip send-mouse-moved ]
     }
     
     { "mouseDown:" "void" { "id" "SEL" "id" }
@@ -129,7 +129,7 @@ H{ } clone views set-global
     }
     
     { "keyDown:" "void" { "id" "SEL" "id" }
-        [ 2nip send-key-event ]
+        [ nip send-key-event ]
     }
 
     { "updateFactorGadgetSize:" "void" { "id" "SEL" "id" }

@@ -14,7 +14,7 @@ SYMBOL: hand-click-loc
 SYMBOL: hand-buttons
 V{ } clone hand-buttons set-global
 
-TUPLE: hand focus ;
+TUPLE: hand ;
 
 C: hand ( -- hand )
     dup delegate>gadget ;
@@ -56,9 +56,6 @@ C: hand ( -- hand )
     [ motion ] hand-gadget get-global handle-gesture drop
     hand-buttons get-global empty? [ drag-gesture ] unless ;
 
-: send-user-input ( string -- )
-    dup empty? [ hand get hand-focus user-input ] unless drop ;
-
 : each-gesture ( gesture seq -- )
     [ handle-gesture* drop ] each-with ;
 
@@ -73,13 +70,11 @@ C: hand ( -- hand )
     [ lose-focus ] swap each-gesture
     [ gain-focus ] swap each-gesture ;
 
-: focused-ancestors ( -- seq )
-    hand get hand-focus parents reverse-slice ;
-
 : request-focus ( gadget -- )
-    focusable-child focused-ancestors >r
-    hand get set-hand-focus focused-ancestors
-    r> focus-gestures ;
+    dup focusable-child swap find-world
+    dup focused-ancestors >r
+    [ set-world-focus ] keep
+    focused-ancestors r> focus-gestures ;
 
 : drag-loc ( gadget -- loc )
     hand get rect-loc hand-click-loc get-global v- ;
