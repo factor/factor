@@ -21,9 +21,13 @@ objc-NSNotificationCenter objc-NSObject objc-NSView threads ;
     0 f CFRunLoopDefaultMode 1
     [nextEventMatchingMask:untilDate:inMode:dequeue:] ;
 
+: do-event ( app -- ? )
+    [
+        dup next-event [ [sendEvent:] t ] [ drop f ] if*
+    ] with-autorelease-pool ;
+
 : do-events ( app -- )
-    dup next-event
-    [ dupd [sendEvent:] do-events ] [ drop ] if* ;
+    dup do-event [ do-events ] [ drop ] if ;
 
 : event-loop ( -- )
     [

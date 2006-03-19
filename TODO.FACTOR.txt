@@ -30,7 +30,6 @@
 
 - add some padding to launchpad ui
 - saving the image should save window configuration
-- memory leaks
 - menu drag retarget broken
 - hang with multiple windows
 - incremental layout flicker
