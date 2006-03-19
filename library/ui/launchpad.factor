@@ -13,8 +13,5 @@ gadgets-listener io kernel memory namespaces sequences ;
         { "Exit" [ 0 exit ] }
     } <launchpad> ;
 
-: simple-window ( gadget title -- )
-    >r "" <label> over pref-dim r> in-window ;
-
 : launchpad-window ( -- )
     default-launchpad "Factor" simple-window ;

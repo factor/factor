@@ -9,17 +9,12 @@ namespaces parser prettyprint sequences shells threads words
 help ;
 
 SYMBOL: stack-bar
-SYMBOL: browser-pane
-
-: reveal-in-split ( gadget n -- )
-    >r find-splitter dup splitter-split r> - abs 1/16 <
-    [ 1/3 over set-splitter-split dup relayout ] when drop ;
 
 : in-browser ( quot -- )
-    browser-pane get dup 0 reveal-in-split swap with-pane ; inline
+    make-pane <scroller> "Browser" simple-window ; inline
 
 : in-listener ( quot -- )
-    pane get dup 1 reveal-in-split pane-call ; inline
+    pane get pane-call ; inline
 
 : usable-words ( -- words )
     use get hash-concat hash-values ;
@@ -60,16 +55,13 @@ SYMBOL: browser-pane
         2array make-pile 1 over set-pack-fill
     ] keep ;
 
-: <browser-scroller> ( -- gadget )
-    <pane> dup browser-pane set-global <scroller> ;
-
-: <listener-scroller> ( -- gadget )
+: <scroller> ( -- gadget )
     <input-pane> dup pane set-global <scroller> ;
 
 : <listener> ( -- gadget status )
     <frame> dup solid-interior
-    <browser-scroller> <listener-scroller>
-    0 <x-splitter> over @center frame-add
+    <input-pane> dup pane set-global <scroller>
+    over @center frame-add
     <bottom-bar> >r over @bottom frame-add r> ;
 
 : listener-window ( -- )

@@ -84,7 +84,7 @@ C: hand ( -- hand )
 
 : show-message ( string/f -- )
     #! Show a message in the status bar.
-    world-status set-label-text* ;
+    world-status [ set-label-text* ] [ drop ] if* ;
 
 : update-help ( -- string )
     #! Update mouse-over help message.

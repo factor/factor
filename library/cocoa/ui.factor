@@ -33,7 +33,7 @@ H{ } clone views set-global
     r> [frame] NSRect-h swap - 0 3array ;
 
 : send-mouse-moved ( view event -- )
-    swap [ mouse-location ] keep view move-hand ;
+    over >r mouse-location r> view move-hand ;
 
 : button ( event -- n )
     #! Cocoa -> Factor UI button mapping

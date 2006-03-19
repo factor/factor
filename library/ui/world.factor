@@ -50,3 +50,6 @@ M: world find-world ;
 
 : focused-ancestors ( world -- seq )
     world-focus parents reverse-slice ;
+
+: simple-window ( gadget title -- )
+    >r f over pref-dim r> in-window ;
