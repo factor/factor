@@ -1,7 +1,10 @@
-/* Cocoa exception handling for Mac OS X */
+/* Cocoa exception handling and default image path for Mac OS X */
 
 #include "../factor.h"
+#import "Foundation/NSAutoreleasePool.h"
+#import "Foundation/NSBundle.h"
 #import "Foundation/NSException.h"
+#import "Foundation/NSString.h"
 
 /* This code is convoluted because Cocoa places restrictions on longjmp and
 exception handling. In particular, a longjmp can never cross an NS_DURING,
@@ -20,7 +23,7 @@ NS_DURING
 		{
 			CELL e = error;
 			error = F;
-			general_error(ERROR_OBJECTIVE_C,error,true);
+			general_error(ERROR_OBJECTIVE_C,e,true);
 		}
 
 		run();
@@ -31,3 +34,15 @@ NS_ENDHANDLER
 	}
 }
 
+void early_init(void)
+{
+	[[NSAutoreleasePool alloc] init];
+}
+
+const char *default_image_path(void)
+{
+	NSBundle *bundle = [NSBundle mainBundle];
+	NSString *path = [bundle bundlePath];
+	NSString *image = [path stringByAppendingString:@"/Contents/factor.image"];
+	return [image cString];
+}

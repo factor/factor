@@ -24,7 +24,14 @@ static long exception_handler(void *rec, void *frame, void *ctx, void *dispatch)
 	signal_error(SIGSEGV);
 }
 
-void platform_run ()
+void platform_run(void)
 {
 	seh_call(run_toplevel, exception_handler);
+}
+
+void early_init(void) {}
+
+const char *default_image_path()
+{
+	return "factor.image";
 }

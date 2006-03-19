@@ -20,11 +20,16 @@ void load_image(char* filename, int literal_table)
 	HEADER h;
 	HEADER_2 ext_h;
 
-	printf("Loading %s...",filename);
-
 	file = fopen(filename,"rb");
 	if(file == NULL)
-		fatal_error("Cannot open image for reading",errno);
+	{
+		fprintf(stderr,"Cannot open image file: %s\n",filename);
+		fprintf(stderr,"%s\n",strerror(errno));
+		usage();
+		exit(1);
+	}
+
+	printf("Loading %s...",filename);
 
 	/* read header */
 	{

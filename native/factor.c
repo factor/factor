@@ -37,9 +37,24 @@ INLINE bool factor_arg(const char* str, const char* arg, CELL* value)
 		return false;
 }
 
+void usage(void)
+{
+	printf("Usage: factor <image file> [ parameters ... ]\n");
+	printf("Runtime options -- n is a number:\n");
+	printf(" +Dn   Data stack size, kilobytes\n");
+	printf(" +Cn   Call stack size, kilobytes\n");
+	printf(" +Gn   Number of generations, must be >= 2\n");
+	printf(" +Yn   Size of n-1 youngest generations, megabytes\n");
+	printf(" +An   Size of tenured and semi-spaces, megabytes\n");
+	printf(" +Xn   Code heap size, megabytes\n");
+	printf("Other options are handled by the Factor library.\n");
+	printf("See the documentation for details.\n");
+	printf("Send bug reports to Slava Pestov <slava@factorcode.org>.\n");
+}
+
 int main(int argc, char** argv)
 {
-	char *image;
+	char *image = NULL;
 	CELL ds_size = 128;
 	CELL cs_size = 128;
 	CELL generations = 2;
@@ -50,21 +65,7 @@ int main(int argc, char** argv)
 	CELL args;
 	CELL i;
 
-	if(argc == 1)
-	{
-		printf("Usage: factor <image file> [ parameters ... ]\n");
-		printf("Runtime options -- n is a number:\n");
-		printf(" +Dn   Data stack size, kilobytes\n");
-		printf(" +Cn   Call stack size, kilobytes\n");
-		printf(" +Gn   Number of generations, must be >= 2\n");
-		printf(" +Yn   Size of n-1 youngest generations, megabytes\n");
-		printf(" +An   Size of tenured and semi-spaces, megabytes\n");
-		printf(" +Xn   Code heap size, megabytes\n");
-		printf("Other options are handled by the Factor library.\n");
-		printf("See the documentation for details.\n");
-		printf("Send bug reports to Slava Pestov <slava@factorcode.org>.\n");
-		return 1;
-	}
+	early_init();
 
 	for(i = 1; i < argc; i++)
 	{
@@ -78,11 +79,16 @@ int main(int argc, char** argv)
 		if(strncmp(argv[i],"+",1) == 0)
 		{
 			printf("Unknown option: %s\n",argv[i]);
+			usage();
 			return 1;
 		}
+
+		if(strncmp(argv[i],"-",1) != 0 && image == NULL)
+			image = argv[1];
 	}
 
-	image = argv[1];
+	if(image == NULL)
+		image = default_image_path();
 
 	init_factor(image,
 		ds_size * 1024,
@@ -94,7 +100,7 @@ int main(int argc, char** argv)
 		literal_size * 1024);
 
 	args = F;
-	while(--argc != 1)
+	while(--argc > 1)
 	{
 		args = cons(tag_object(from_c_string(argv[argc])),args);
 	}

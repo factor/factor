@@ -141,4 +141,10 @@ CELL executing;
 #include "dll.h"
 #include "wrapper.h"
 
+void usage(void);
+
+void early_init(void);
+
+const char *default_image_path(void);
+
 #endif /* __FACTOR_H__ */
