@@ -6,20 +6,18 @@ queues sequences ;
 
 ! Hand state
 
+! Note that these are only really useful inside an event
+! handler, and that the locations hand-loc and hand-click-loc
+! are in the co-ordinate system of the world which contains
+! the gadget in question.
 SYMBOL: hand-gadget
+SYMBOL: hand-loc
 
 SYMBOL: hand-clicked
 SYMBOL: hand-click-loc
 
 SYMBOL: hand-buttons
 V{ } clone hand-buttons set-global
-
-TUPLE: hand ;
-
-C: hand ( -- hand )
-    dup delegate>gadget ;
-
-<hand> hand set-global
 
 : button-gesture ( buttons gesture -- )
     #! Send a gesture like [ button-down 2 ]; if nobody
@@ -29,7 +27,7 @@ C: hand ( -- hand )
 
 : update-clicked ( -- )
     hand-gadget get-global hand-clicked set-global
-    hand get rect-loc hand-click-loc set-global ;
+    hand-loc get-global hand-click-loc set-global ;
 
 : send-button-down ( event -- )
     update-clicked
@@ -77,7 +75,7 @@ C: hand ( -- hand )
     focused-ancestors r> focus-gestures ;
 
 : drag-loc ( -- loc )
-    hand get rect-loc hand-click-loc get-global v- ;
+    hand-loc get-global hand-click-loc get-global v- ;
 
 : hand-click-rel ( gadget -- loc )
     hand-click-loc get-global relative-loc ;
@@ -100,13 +98,13 @@ C: hand ( -- hand )
     hand-gadget get-global parents reverse-slice ;
 
 : move-hand ( loc world -- )
-    under-hand >r over hand get set-rect-loc
+    under-hand >r over hand-loc set-global
     pick-up hand-gadget set-global
     under-hand r> hand-gestures update-help ;
 
 : update-hand ( world -- )
     #! Called when a gadget is removed or added.
-    hand get rect-loc swap move-hand ;
+    hand-loc get-global swap move-hand ;
 
 : layout-done ( gadget -- )
     find-world [
