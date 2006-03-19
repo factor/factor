@@ -79,6 +79,9 @@ C: hand ( -- hand )
 : drag-loc ( gadget -- loc )
     hand get rect-loc hand-click-loc get-global v- ;
 
+: hand-click-rel ( gadget -- loc )
+    hand-click-loc get-global relative-loc ;
+
 : relevant-help ( seq -- help )
     [ gadget-help ] map [ ] find nip ;
 

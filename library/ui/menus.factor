@@ -17,7 +17,7 @@ namespaces sequences ;
     find-world dup hide-glass update-hand update-clicked ;
 
 : menu-actions ( glass -- )
-    dup [ retarget-drag ] [ drag ] set-action
+    ! dup [ retarget-drag ] [ drag ] set-action
     [ retarget-click ] [ button-down ] set-action ;
 
 : menu-loc ( loc menu world -- loc )
