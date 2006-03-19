@@ -43,6 +43,6 @@ const char *default_image_path(void)
 {
 	NSBundle *bundle = [NSBundle mainBundle];
 	NSString *path = [bundle bundlePath];
-	NSString *image = [path stringByAppendingString:@"/Contents/factor.image"];
+	NSString *image = [path stringByAppendingString:@"/Contents/Resources/factor.image"];
 	return [image cString];
 }

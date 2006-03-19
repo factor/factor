@@ -8,7 +8,6 @@
 - x86 %box-struct
 - x86 %write-barrier
 - OS X stuff:
-  - look for image in bundle
   - set resource path to bundle path
   - link in freetype statically
 
@@ -29,6 +28,9 @@
 
 + ui/help:
 
+- add some padding to launchpad ui
+- saving the image should save window configuration
+- memory leaks
 - menu drag retarget broken
 - hang when scrolling
 - hang with multiple windows

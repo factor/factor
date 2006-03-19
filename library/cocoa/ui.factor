@@ -1,6 +1,6 @@
 ! Copyright (C) 2006 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: arrays cocoa freetype gadgets gadgets-launchpad
+USING: arrays cocoa errors freetype gadgets gadgets-launchpad
 gadgets-layouts gadgets-listener gadgets-panes hashtables kernel
 lists math namespaces objc objc-NSApplication objc-NSEvent
 objc-NSObject objc-NSOpenGLView objc-NSView objc-NSWindow
@@ -159,6 +159,9 @@ IN: gadgets
 IN: shells
 
 : ui
+    running.app? [
+        "The Factor UI requires you to run the supplied Factor.app." throw
+    ] unless
     [
         [
             launchpad-window
