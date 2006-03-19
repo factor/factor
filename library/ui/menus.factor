@@ -5,19 +5,10 @@ USING: gadgets gadgets-borders gadgets-buttons gadgets-layouts
 gadgets-labels gadgets-theme generic kernel lists math
 namespaces sequences ;
 
-: retarget-drag ( gadget -- )
-    hand-gadget get-global hand-clicked get-global eq? [
-        drop
-    ] [
-        hand-gadget get-global hand-clicked set-global
-        update-hand
-    ] if ;
-
 : retarget-click ( gadget -- )
     find-world dup hide-glass update-hand update-clicked ;
 
 : menu-actions ( glass -- )
-    ! dup [ retarget-drag ] [ drag ] set-action
     [ retarget-click ] [ button-down ] set-action ;
 
 : menu-loc ( loc menu world -- loc )
@@ -25,7 +16,7 @@ namespaces sequences ;
 
 : show-menu ( loc menu gadget -- )
     find-world 2dup show-glass
-    dup world-glass dup menu-actions hand-clicked set-global
+    dup world-glass menu-actions
     over >r menu-loc r> set-rect-loc ;
 
 : show-hand-menu ( menu gadget -- )
