@@ -5,7 +5,7 @@ BINARY = f
 IMAGE = factor.image
 BUNDLE = Factor.app
 BUNDLE_BINARY = $(BUNDLE)/Contents/MacOS/Factor
-BUNDLE_IMAGE = $(BUNDLE)/Contents/factor.image
+BUNDLE_IMAGE = $(BUNDLE)/Contents/Resources/factor.image
 
 ifdef DEBUG
 	DEFAULT_CFLAGS = -g
