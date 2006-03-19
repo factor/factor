@@ -26,7 +26,7 @@ namespaces sequences ;
 
 : show-menu ( loc menu gadget -- )
     find-world 2dup show-glass
-    dup world-glass dup menu-actions hand get set-hand-clicked
+    dup world-glass dup menu-actions hand-clicked set-global
     over >r menu-loc r> set-rect-loc ;
 
 : show-hand-menu ( menu gadget -- )

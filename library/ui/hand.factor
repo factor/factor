@@ -4,6 +4,16 @@ IN: gadgets
 USING: gadgets-labels gadgets-layouts kernel math namespaces
 queues sequences ;
 
+! Hand state
+
+SYMBOL: hand-gadget
+
+SYMBOL: hand-clicked
+SYMBOL: hand-click-loc
+
+SYMBOL: hand-buttons
+V{ } clone hand-buttons set-global
+
 ! The hand is a special gadget that holds mouse position and
 ! mouse button click state.
 
@@ -11,53 +21,50 @@ queues sequences ;
 ! - hand-gadget is the gadget under the mouse position
 ! - hand-clicked is the most recently clicked gadget
 ! - hand-focus is the gadget holding keyboard focus
-TUPLE: hand click-loc click-rel clicked buttons gadget focus ;
+TUPLE: hand focus ;
 
 C: hand ( -- hand )
-    dup delegate>gadget V{ } clone over set-hand-buttons ;
+    dup delegate>gadget ;
 
 <hand> hand set-global
 
 : button-gesture ( buttons gesture -- )
     #! Send a gesture like [ button-down 2 ]; if nobody
     #! handles it, send [ button-down ].
-    swap hand get hand-clicked 3dup >r add r> handle-gesture
+    swap hand-clicked get-global 3dup >r add r> handle-gesture
     [ nip handle-gesture drop ] [ 3drop ] if ;
 
 : update-clicked ( -- )
-    hand get
-    dup hand-gadget over set-hand-clicked
-    dup screen-loc over set-hand-click-loc
-    dup hand-gadget over relative swap set-hand-click-rel ;
+    hand-gadget get-global hand-clicked set-global
+    hand get rect-loc hand-click-loc set-global ;
 
 : send-button-down ( event -- )
     update-clicked
-    dup hand get hand-buttons push
+    dup hand-buttons get-global push
     [ button-down ] button-gesture ;
 
 : send-button-up ( event -- )
-    dup hand get hand-buttons delete
+    dup hand-buttons get-global delete
     [ button-up ] button-gesture ;
 
 : send-scroll-wheel ( up/down -- )
     [ wheel-up ] [ wheel-down ] ?
-    hand get hand-gadget handle-gesture drop ;
+    hand-gadget get-global handle-gesture drop ;
 
 : drag-gesture ( -- )
     #! Send a gesture like [ drag 2 ]; if nobody handles it,
     #! send [ drag ].
-    hand get hand-buttons first [ drag ] button-gesture ;
+    hand-buttons get-global first [ drag ] button-gesture ;
 
-: fire-motion ( hand -- )
+: fire-motion ( -- )
     #! Fire a motion gesture to the gadget underneath the hand,
     #! and if a mouse button is down, fire a drag gesture to the
     #! gadget that was clicked.
-    [ motion ] over hand-gadget handle-gesture drop
-    hand-buttons empty? [ drag-gesture ] unless ;
+    [ motion ] hand-gadget get-global handle-gesture drop
+    hand-buttons get-global empty? [ drag-gesture ] unless ;
 
 : send-user-input ( string -- )
-    dup empty?
-    [ hand get hand-focus user-input ] unless drop ;
+    dup empty? [ hand get hand-focus user-input ] unless drop ;
 
 : each-gesture ( gesture seq -- )
     [ handle-gesture* drop ] each-with ;
@@ -65,7 +72,7 @@ C: hand ( -- hand )
 : hand-gestures ( new old -- )
     drop-prefix reverse-slice
     [ mouse-leave ] swap each-gesture
-    hand get fire-motion
+    fire-motion
     [ mouse-enter ] swap each-gesture ;
 
 : focus-gestures ( new old -- )
@@ -73,7 +80,7 @@ C: hand ( -- hand )
     [ lose-focus ] swap each-gesture
     [ gain-focus ] swap each-gesture ;
 
-: focused-ancestors ( hand -- seq )
+: focused-ancestors ( -- seq )
     hand get hand-focus parents reverse-slice ;
 
 : request-focus ( gadget -- )
@@ -82,7 +89,7 @@ C: hand ( -- hand )
     r> focus-gestures ;
 
 : drag-loc ( gadget -- loc )
-    hand get [ relative ] keep hand-click-rel v- ;
+    hand get rect-loc relative-loc hand-click-rel v- ;
 
 : relevant-help ( seq -- help )
     [ gadget-help ] map [ ] find nip ;
@@ -93,19 +100,19 @@ C: hand ( -- hand )
 
 : update-help ( -- string )
     #! Update mouse-over help message.
-    hand get hand-gadget parents [ relevant-help ] keep
+    hand-gadget get-global parents [ relevant-help ] keep
     dup empty? [ 2drop ] [ peek show-message ] if ;
 
 : under-hand ( -- seq )
     #! A sequence whose first element is the world and last is
     #! the current gadget, with all parents in between.
-    hand get hand-gadget parents reverse-slice ;
+    hand-gadget get-global parents reverse-slice ;
 
 : hand-grab ( world -- gadget )
     hand get rect-loc swap pick-up ;
 
 : update-hand-gadget ( world -- )
-    hand-grab hand get set-hand-gadget ;
+    hand-grab hand-gadget set-global ;
 
 : move-hand ( loc world -- )
     swap under-hand >r hand get set-rect-loc

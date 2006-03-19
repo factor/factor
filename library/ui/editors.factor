@@ -68,7 +68,8 @@ TUPLE: editor line caret font color ;
     ] with-editor ;
 
 : click-editor ( editor -- )
-    dup hand get relative first over set-caret-x request-focus ;
+    dup hand get rect-loc relative-loc
+    first over set-caret-x request-focus ;
 
 : popup-location ( editor -- loc )
     dup screen-loc swap editor-caret rect-extent nip v+ ;

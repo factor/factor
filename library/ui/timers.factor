@@ -14,7 +14,7 @@ C: timer ( object delay -- timer )
 
 GENERIC: tick ( ms object -- )
 
-: timers \ timers global hash ;
+: timers \ timers get-global ;
 
 H{ } clone \ timers set-global
 

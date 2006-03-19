@@ -10,7 +10,7 @@ IN: gadgets-layouts
 
 : invalidate* ( gadget -- ) dup invalidate forget-pref-dim ;
 
-: invalid ( -- queue ) \ invalid global hash ;
+: invalid ( -- queue ) \ invalid get-global ;
 
 <queue> \ invalid set-global
 

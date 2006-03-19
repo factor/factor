@@ -15,6 +15,7 @@ sequences strings vectors words ;
 : set ( value variable -- ) namespace set-hash ;
 : on ( var -- ) t swap set ; inline
 : off ( var -- ) f swap set ; inline
+: get-global ( var -- value ) global hash ; inline
 : set-global ( value var -- ) global set-hash ; inline
 
 : nest ( variable -- hash )

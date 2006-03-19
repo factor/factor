@@ -8,7 +8,7 @@ SYMBOL: bootstrapping?
 
 SYMBOL: vocabularies
 
-: word ( -- word ) \ word global hash ;
+: word ( -- word ) \ word get-global ;
 
 : set-word ( word -- ) \ word set-global ;
 
