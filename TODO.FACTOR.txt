@@ -32,7 +32,6 @@
 - saving the image should save window configuration
 - memory leaks
 - menu drag retarget broken
-- hang when scrolling
 - hang with multiple windows
 - incremental layout flicker
 - expired aliens in view hash

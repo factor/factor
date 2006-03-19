@@ -64,7 +64,3 @@ FUNCTION: void CFRelease ( void* cf ) ;
 : running.app? ( -- ? )
     #! Test if we're running Factor.app.
     "Contents/Resources" image subseq? ;
-
-IN: kernel
-
-: default-shell running.app? "ui" "tty" ? ;

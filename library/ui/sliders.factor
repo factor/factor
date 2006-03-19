@@ -1,5 +1,5 @@
-! Copyright (C) 2005 Slava Pestov.
-! See http://factor.sf.net/license.txt for BSD license.
+! Copyright (C) 2005, 2006 Slava Pestov.
+! See http://factorcode.org/license.txt for BSD license.
 IN: gadgets-scrolling
 USING: arrays gadgets gadgets-buttons gadgets-layouts
 gadgets-theme generic kernel lists math namespaces sequences
@@ -11,7 +11,7 @@ TUPLE: elevator ;
 : find-elevator [ elevator? ] find-parent ;
 
 ! A slider scrolls a viewport.
-TUPLE: slider elevator thumb value max page ;
+TUPLE: slider elevator thumb value saved max page ;
 
 : find-slider [ slider? ] find-parent ;
 
@@ -19,7 +19,8 @@ TUPLE: slider elevator thumb value max page ;
     #! A scaling factor such that if x is a slider co-ordinate,
     #! x*n is the screen position of the thumb, and conversely
     #! for x/n. The '1 max' calls avoid division by zero.
-    dup slider-elevator rect-dim over gadget-orientation v. 1 max
+    dup slider-elevator rect-dim
+    over gadget-orientation v. 1 max
     swap slider-max 1 max / ;
 
 : slider>screen slider-scale * ;
@@ -30,31 +31,31 @@ TUPLE: slider elevator thumb value max page ;
     dup slider-max swap slider-page - min 0 max >fixnum ;
 
 : fix-slider ( slider -- )
-    #! Call after changing slots, to relayout and do invariants:
-    #! - max <= page
-    #! - 0 <= value <= max-page
     dup slider-elevator relayout-1
-    dup slider-max over slider-page max over set-slider-max
-    dup slider-value over fix-slider-value swap set-slider-value ;
+    dup slider-max over slider-page max swap set-slider-max ;
 
 SYMBOL: slider-changed
 
 : set-slider-value* ( value slider -- )
-    2dup slider-value = [
+    [ fix-slider-value ] keep 2dup slider-value = [
         2drop
     ] [
         [ set-slider-value ] keep [ fix-slider ] keep
         [ slider-changed ] swap handle-gesture drop
     ] if ;
 
-: elevator-drag ( elevator -- )
-    [ find-slider ] keep drag-loc over gadget-orientation v.
-    over screen>slider swap set-slider-value* ;
+: begin-drag ( thumb -- )
+    find-slider dup slider-value swap set-slider-saved ;
+
+: do-drag ( thumb -- )
+    find-slider drag-loc over gadget-orientation v.
+    over screen>slider swap [ slider-saved + ] keep
+    set-slider-value* ;
 
 : thumb-actions ( thumb -- )
     dup [ drop ] [ button-up ] set-action
-    dup [ drop ] [ button-down ] set-action
-    [ find-elevator elevator-drag ] [ drag ] set-action ;
+    dup [ begin-drag ] [ button-down ] set-action
+    [ do-drag ] [ drag ] set-action ;
 
 : <thumb> ( vector -- thumb )
     <gadget> [ set-gadget-orientation ] keep

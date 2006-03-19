@@ -170,3 +170,7 @@ IN: shells
             event-loop
         ] with-cocoa
     ] with-freetype ;
+
+IN: kernel
+
+: default-shell running.app? "ui" "tty" ? ;

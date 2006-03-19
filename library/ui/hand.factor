@@ -76,7 +76,7 @@ C: hand ( -- hand )
     [ set-world-focus ] keep
     focused-ancestors r> focus-gestures ;
 
-: drag-loc ( gadget -- loc )
+: drag-loc ( -- loc )
     hand get rect-loc hand-click-loc get-global v- ;
 
 : hand-click-rel ( gadget -- loc )
