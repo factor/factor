@@ -14,13 +14,6 @@ SYMBOL: hand-click-loc
 SYMBOL: hand-buttons
 V{ } clone hand-buttons set-global
 
-! The hand is a special gadget that holds mouse position and
-! mouse button click state.
-
-! Some comments on the slots:
-! - hand-gadget is the gadget under the mouse position
-! - hand-clicked is the most recently clicked gadget
-! - hand-focus is the gadget holding keyboard focus
 TUPLE: hand focus ;
 
 C: hand ( -- hand )
@@ -89,7 +82,7 @@ C: hand ( -- hand )
     r> focus-gestures ;
 
 : drag-loc ( gadget -- loc )
-    hand get rect-loc relative-loc hand-click-rel v- ;
+    hand get rect-loc hand-click-loc get-global v- ;
 
 : relevant-help ( seq -- help )
     [ gadget-help ] map [ ] find nip ;
@@ -108,15 +101,9 @@ C: hand ( -- hand )
     #! the current gadget, with all parents in between.
     hand-gadget get-global parents reverse-slice ;
 
-: hand-grab ( world -- gadget )
-    hand get rect-loc swap pick-up ;
-
-: update-hand-gadget ( world -- )
-    hand-grab hand-gadget set-global ;
-
 : move-hand ( loc world -- )
-    swap under-hand >r hand get set-rect-loc
-    update-hand-gadget
+    under-hand >r over hand get set-rect-loc
+    pick-up hand-gadget set-global
     under-hand r> hand-gestures update-help ;
 
 : update-hand ( world -- )

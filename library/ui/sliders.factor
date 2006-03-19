@@ -70,7 +70,7 @@ SYMBOL: slider-changed
     [ slider-page * ] keep slide-by ;
 
 : elevator-click ( elevator -- )
-    dup hand get rect-loc relative-loc >r find-slider r>
+    dup hand-click-loc relative-loc >r find-slider r>
     over gadget-orientation v.
     over screen>slider over slider-value - sgn
     swap slide-by-page ;

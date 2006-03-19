@@ -6,16 +6,15 @@ gadgets-labels gadgets-theme generic kernel lists math
 namespaces sequences ;
 
 : retarget-drag ( gadget -- )
-    find-world hand get [ hand-gadget ] keep
-    2dup hand-clicked eq? [
-        3drop
+    hand-gadget get-global hand-clicked get-global eq? [
+        drop
     ] [
-        set-hand-clicked update-hand
+        hand-gadget get-global hand-clicked set-global
+        update-hand
     ] if ;
 
 : retarget-click ( gadget -- )
-    find-world dup hide-glass update-hand-gadget
-    update-clicked ;
+    find-world dup hide-glass update-hand update-clicked ;
 
 : menu-actions ( glass -- )
     dup [ retarget-drag ] [ drag ] set-action
@@ -30,7 +29,7 @@ namespaces sequences ;
     over >r menu-loc r> set-rect-loc ;
 
 : show-hand-menu ( menu gadget -- )
-    hand get rect-loc -rot show-menu ;
+    hand-click-loc get-global -rot show-menu ;
 
 : menu-item-quot ( quot -- quot )
     [ keep find-world hide-glass ] curry ;
