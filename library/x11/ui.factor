@@ -1,17 +1,16 @@
-USING: kernel math namespaces opengl ;
-USE: x11
+USING: alien kernel math namespaces opengl threads x11 ;
 
-":0.0" initialize-x
+f initialize-x
 
-{ 500 500 0 } create-window
-dup map-window
+SYMBOL: window
 
-dup StructureNotifyMask select-input
+choose-visual
 
-dup choose-visual create-context make-current
+500 500 pick create-window window set
 
-: init ( -- )
-    0.0 0.0 0.0 0.0 glClearColor GL_FLAT glShadeModel ;
+window get map-window
+
+create-context window get swap make-current
 
 SYMBOL: pval
 
@@ -44,6 +43,7 @@ SYMBOL: pval
     glEnd ;
 
 : display ( -- )
+    0.0 0.0 0.0 0.0 glClearColor GL_FLAT glShadeModel
     GL_COLOR_BUFFER_BIT glClear
     1.0 1.0 1.0 glColor3f
     glLoadIdentity
@@ -52,8 +52,8 @@ SYMBOL: pval
     1.0 wire-cube
     glFlush ;
 
-init display
+display
 
-dup swap-buffers
+window get swap-buffers
 
 flush-dpy
