@@ -1,19 +1,20 @@
-! Eduardo Cavazos - wayo.cavazos@gmail.com
+! Copyright (C) 2005, 2006 Eduardo Cavazos
+! See http://factorcode.org/license.txt for BSD license.
 !
-! The most popular guides to programming the X Window System are the
-! series from Oreilly. For programming with Xlib, there is the
-! reference manual and the programmers guide. However, a lesser known
-! manual is the free Xlib manual that comes with the MIT X
-! distribution. The arrangement and order of these bindings follows
-! the structure of the free Xlib manual. If you add to this library
-! and are wondering what part of the file to modify, just find the
-! function or data structure in the manual and note the section.
+! The most popular guides to programming the X Window System are
+! the series from Oreilly. For programming with Xlib, there is
+! the reference manual and the programmers guide. However, a
+! lesser known manual is the free Xlib manual that comes with
+! the MIT X distribution. The arrangement and order of these
+! bindings follows the structure of the free Xlib manual. If you
+! add to this library and are wondering what part of the file to
+! modify, just find the function or data structure in the manual
+! and note the section.
 
-USING: kernel arrays alien math words sequences ; IN: x11
+USING: kernel arrays alien math words sequences ;
+IN: x11
 
 LIBRARY: xlib
-
-"xlib" "libX11.so" "cdecl" add-library
 
 TYPEDEF: ulong XID
 TYPEDEF: XID Window

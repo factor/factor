@@ -1,4 +1,7 @@
-#! based on glx.h from xfree86, and some of glxtokens.h
+! Copyright (C) 2005, 2006 Eduardo Cavazos
+! See http://factorcode.org/license.txt for BSD license.
+!
+! based on glx.h from xfree86, and some of glxtokens.h
 IN: x11
 USING: alien ;
 

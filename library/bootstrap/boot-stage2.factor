@@ -44,6 +44,10 @@ recrossref
     "cocoa" get [
         "/library/cocoa/load.factor" run-resource
     ] when
+    
+    "x11" get [
+        "/library/x11/load.factor" run-resource
+    ] when
 ] when
 
 [

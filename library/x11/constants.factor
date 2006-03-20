@@ -1,3 +1,6 @@
+! Copyright (C) 2005, 2006 Eduardo Cavazos
+! See http://factorcode.org/license.txt for BSD license.
+
 ! Based on X.h
 
 USING: alien math ; IN: x11
