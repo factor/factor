@@ -6,17 +6,10 @@
 IN: opengl 
 USING: alien kernel ;
 
-{
-    { [ os "macosx" = ] [ ] }
-    { [ os "win32" = ] [
-            "gl" "opengl32.dll" "stdcall" add-library
-            "glu" "glu32.dll" "stdcall" add-library
-    ] }
-    { [ t ] [
-            "gl" "libGL.so.1" "cdecl" add-library
-            "glu" "libGLU.so.1" "cdecl" add-library
-    ] }
-} cond
+os "win32" = [
+    "gl" "opengl32.dll" "stdcall" add-library
+    "glu" "glu32.dll" "stdcall" add-library
+]
 
 TYPEDEF: uint    GLenum
 TYPEDEF: uchar   GLboolean

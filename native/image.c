@@ -14,7 +14,7 @@ void init_objects(HEADER *h)
 	bignum_neg_one = h->bignum_neg_one;
 }
 
-void load_image(char* filename, int literal_table)
+void load_image(const char* filename, int literal_table)
 {
 	FILE* file;
 	HEADER h;
@@ -95,7 +95,7 @@ void load_image(char* filename, int literal_table)
 	fflush(stdout);
 }
 
-bool save_image(char* filename)
+bool save_image(const char* filename)
 {
 	FILE* file;
 	HEADER h;

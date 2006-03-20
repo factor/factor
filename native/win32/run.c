@@ -31,7 +31,7 @@ void platform_run(void)
 
 void early_init(void) {}
 
-const char *default_image_path()
+const char *default_image_path(void)
 {
 	return "factor.image";
 }

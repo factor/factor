@@ -37,6 +37,6 @@ typedef struct EXT_HEADER {
 } HEADER_2;
 
 void init_objects(HEADER *h);
-void load_image(char* file, int literal_size);
-bool save_image(char* file);
+void load_image(const char* file, int literal_size);
+bool save_image(const char* file);
 void primitive_save_image(void);

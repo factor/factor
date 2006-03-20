@@ -17,6 +17,12 @@ endif
 
 DEFAULT_LIBS = -lm
 
+ifdef NO_UI
+	UNIX_UI_LIBS =
+else
+	UNIX_UI_LIBS = -lfreetype -lGL -lX11
+endif
+
 WIN32_OBJS = native/win32/ffi.o \
 	native/win32/file.o \
 	native/win32/misc.o \
@@ -86,13 +92,13 @@ default:
 bsd:
 	$(MAKE) $(BINARY) \
 		CFLAGS="$(DEFAULT_CFLAGS) -export-dynamic -pthread" \
-		LIBS="$(DEFAULT_LIBS)" 
+		LIBS="$(DEFAULT_LIBS) $(UI_LIBS)" 
 	$(STRIP) $(BINARY)
 
 macosx:
 	$(MAKE) $(BINARY) \
 		CFLAGS="$(DEFAULT_CFLAGS)" \
-		LIBS="$(DEFAULT_LIBS) -framework Cocoa -framework OpenGL" \
+		LIBS="$(DEFAULT_LIBS) -framework Cocoa -framework OpenGL -lfreetype" \
 		MACOSX=y
 
 macosx.app:
@@ -102,19 +108,19 @@ macosx.app:
 linux linux-x86 linux-amd64:
 	$(MAKE) $(BINARY) \
 		CFLAGS="$(DEFAULT_CFLAGS) -export-dynamic" \
-		LIBS="-ldl $(DEFAULT_LIBS)"
+		LIBS="-ldl $(DEFAULT_LIBS) $(UNIX_UI_LIBS)"
 	$(STRIP) $(BINARY)
 
 linux-ppc:
 	$(MAKE) $(BINARY) \
 		CFLAGS="$(DEFAULT_CFLAGS) -export-dynamic -mregnames" \
-		LIBS="-ldl $(DEFAULT_LIBS)"
+		LIBS="-ldl $(DEFAULT_LIBS) $(UNIX_UI_LIBS)"
 	$(STRIP) $(BINARY)
 
 solaris solaris-x86:
 	$(MAKE) $(BINARY) \
 		CFLAGS="$(DEFAULT_CFLAGS) -D_STDC_C99 -Drestrict=\"\" " \
-		LIBS="-ldl -lsocket -lnsl $(DEFAULT_LIBS) -R/opt/PM/lib -R/opt/csw/lib -R/usr/local/lib -R/usr/sfw/lib -R/usr/X11R6/lib -R/opt/sfw/lib"
+		LIBS="-ldl -lsocket -lnsl $(DEFAULT_LIBS) -R/opt/PM/lib -R/opt/csw/lib -R/usr/local/lib -R/usr/sfw/lib -R/usr/X11R6/lib -R/opt/sfw/lib $(UNIX_UI_LIBS)"
 	$(STRIP) $(BINARY)
 
 windows:

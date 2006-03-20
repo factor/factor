@@ -1,6 +1,6 @@
 #include "factor.h"
 
-void init_factor(char* image, CELL ds_size, CELL cs_size,
+void init_factor(const char* image, CELL ds_size, CELL cs_size,
 	CELL gen_count,
 	CELL young_size, CELL aging_size,
 	CELL code_size, CELL literal_size)
@@ -54,7 +54,7 @@ void usage(void)
 
 int main(int argc, char** argv)
 {
-	char *image = NULL;
+	const char *image = NULL;
 	CELL ds_size = 128;
 	CELL cs_size = 128;
 	CELL generations = 2;
