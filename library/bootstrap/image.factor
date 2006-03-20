@@ -112,7 +112,7 @@ M: fixnum ' ( n -- tagged ) fixnum-tag immediate ;
 
 ( Bignums )
 
-: bignum-bits cell-bits 2 - ;
+: bignum-bits bootstrap-cell-bits 2 - ;
 
 : bignum-radix bignum-bits 1 swap shift 1- ;
 

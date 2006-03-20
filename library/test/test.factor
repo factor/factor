@@ -83,7 +83,7 @@ SYMBOL: failures
         "words" "prettyprint" "random" "stream" "math/bitops"
         "math/math-combinators" "math/rational" "math/float"
         "math/complex" "math/irrational"
-        "math/integer" "threads" "parsing-word"
+        "math/integer" "math/random" "threads" "parsing-word"
         "inference" "interpreter" "alien"
         "gadgets/line-editor" "gadgets/rectangles"
         "gadgets/frames" "memory"

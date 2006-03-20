@@ -10,6 +10,8 @@
 - OS X stuff:
   - set resource path to bundle path
   - link in freetype statically
+- when generating a 32-bit image on a 64-bit system, large numbers which should
+  be bignums become fixnums
 
 + io:
 

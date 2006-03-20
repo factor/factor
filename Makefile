@@ -125,7 +125,7 @@ solaris solaris-x86:
 
 windows:
 	$(MAKE) $(BINARY) \
-		CFLAGS="$(DEFAULT_CFLAGS) -DFFI -DWIN32" \
+		CFLAGS="$(DEFAULT_CFLAGS) -DWIN32" \
 		LIBS="$(DEFAULT_LIBS)" WIN32=y
 
 f: $(OBJS)
