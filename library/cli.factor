@@ -49,6 +49,7 @@ parser sequences strings ;
     "native-io" on
     "null-stdio" off
     os "macosx" = "cocoa" set
+    unix? os "macosx" = not and "x11" set
     default-shell "shell" set ;
 
 : parse-command-line ( -- )

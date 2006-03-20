@@ -1,8 +1,8 @@
 ! Copyright (C) 2005, 2006 Eduardo Cavazos and Slava Pestov
 ! See http://factorcode.org/license.txt for BSD license.
 IN: x11
-USING: alien arrays errors io kernel math namespaces prettyprint
-sequences threads ;
+USING: alien arrays errors gadgets hashtables io kernel math
+namespaces prettyprint sequences threads ;
 
 SYMBOL: dpy
 SYMBOL: scr
@@ -66,14 +66,28 @@ SYMBOL: root
     dpy get "XEvent" <c-object> dup >r XNextEvent drop r> ;
 
 : wait-event ( -- event )
-      QueuedAfterFlush events-queued 0 >
-      [ next-event ] [ 10 sleep wait-event ] if ;
+    QueuedAfterFlush events-queued 0 > [
+        next-event
+    ] [
+        do-timers layout-queued 10 sleep wait-event
+    ] if ;
 
-: handle-event ( event -- )
-    XAnyEvent-type . flush ;
+GENERIC: handle-expose-event ( event window -- )
+
+GENERIC: handle-resize-event ( event window -- )
+
+: handle-event ( event window -- )
+    over XAnyEvent-type {
+        { [ dup Expose = ] [ drop handle-expose-event ] }
+        { [ dup ConfigureNotify = ] [ drop handle-resize-event ] }
+        { [ t ] [ 3drop ] }
+    } cond ;
+
+SYMBOL: windows
 
 : event-loop ( -- )
-    wait-event handle-event event-loop ;
+    wait-event dup XAnyEvent-window windows get hash dup
+    [ handle-event ] [ 2drop ] if event-loop ;
 
 ! GLX
 
@@ -98,19 +112,22 @@ SYMBOL: root
 : swap-buffers ( win -- )
     dpy get swap glXSwapBuffers ;
 
+: with-glx-context ( win GLXContext quot -- )
+    pick >r >r make-current r> call r> swap-buffers ;
+
 ! Initialization
 
 : check-display
     [ "Cannot connect to X server - check $DISPLAY" throw ] unless* ;
 
-: (initialize-x) ( display-string -- )
+: initialize-x ( display-string -- )
     XOpenDisplay check-display dpy set
     dpy get XDefaultScreen scr set
     dpy get scr get XRootWindow root set ;
 
-: initialize-x ( display-string -- )
-    dpy get [
-        drop
-    ] [
-        (initialize-x) [ event-loop ] in-thread
-    ] if ;
+: with-x ( display-string quot -- )
+    [
+        H{ } clone windows set
+        swap initialize-x
+        call
+    ] with-scope ;

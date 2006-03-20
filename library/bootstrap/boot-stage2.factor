@@ -10,7 +10,7 @@ recrossref
 
 "compile" get [
     "native-io" get [
-        os { "freebsd" "linux" "macosx" "solaris" } member? [
+        unix? [
             "/library/unix/load.factor" run-resource
         ] when
 

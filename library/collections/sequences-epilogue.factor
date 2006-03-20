@@ -139,3 +139,5 @@ M: object <=>
 : with-datastack ( stack word -- stack )
     datastack >r >r set-datastack r> execute
     datastack r> [ push ] keep set-datastack 2nip ;
+
+: unix? os { "freebsd" "linux" "macosx" "solaris" } member? ;

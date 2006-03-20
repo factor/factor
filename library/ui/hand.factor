@@ -12,6 +12,7 @@ queues sequences ;
 ! the gadget in question.
 SYMBOL: hand-gadget
 SYMBOL: hand-loc
+{ 0 0 0 } hand-loc set-global
 
 SYMBOL: hand-clicked
 SYMBOL: hand-click-loc

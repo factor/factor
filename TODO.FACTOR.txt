@@ -29,6 +29,10 @@
 
 + ui/help:
 
+- speed up ideas:
+  - only do clipping for certain gadgets
+  - use glRect
+  - display lists
 - add some padding to launchpad ui
 - saving the image should save window configuration
 - menu drag retarget broken
@@ -47,8 +51,7 @@
 - document tools
 - document conventions
 - new turtle graphics tutorial
-- better line spacing in ui and html
-- use vertex arrays and display lists to speed up ui
+- better line spacing in ui and html=
 - tabular formatting - for inspector and changes
 - don't multiplex in the event loop if there is no pending i/o
 

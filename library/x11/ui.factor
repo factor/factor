@@ -1,59 +1,44 @@
-USING: alien kernel math namespaces opengl threads x11 ;
+IN: x11
+USING: arrays freetype gadgets gadgets-launchpad
+gadgets-layouts gadgets-listener hashtables kernel
+kernel-internals math namespaces opengl sequences x11 ;
 
-f initialize-x
+: draw-glx-world ( world -- )
+    dup world-handle first2 [ draw-world ] with-glx-context ;
 
-SYMBOL: window
+M: world handle-expose-event ( event world -- )
+    nip draw-glx-world ;
 
-choose-visual
+M: world handle-resize-event ( event world -- )
+    >r
+    dup XConfigureEvent-width swap XConfigureEvent-height 0
+    3array
+    r> set-gadget-dim ;
 
-500 500 pick create-window window set
+: gadget-window ( world -- window )
+    dup rect-dim first2 choose-visual [
+        create-window 2dup windows get set-hash dup map-window
+    ] keep create-context 2array swap set-world-handle ;
 
-window get map-window
+IN: gadgets
 
-create-context window get swap make-current
+: repaint-handle ( handle -- )
+    drop ; ! windows get hash draw-glx-world ;
 
-SYMBOL: pval
+: in-window ( gadget status dim title -- )
+    >r <world> r> drop gadget-window ;
 
-:  p pval get ;
-: -p pval get neg ;
+IN: shells
 
-: wire-cube ( size -- )
-    2.0 / pval set
-    GL_LINE_LOOP glBegin
-    -p -p -p glVertex3f
-     p -p -p glVertex3f
-     p  p -p glVertex3f
-    -p  p -p glVertex3f
-    glEnd
-    GL_LINE_LOOP glBegin
-    -p -p  p glVertex3f
-     p -p  p glVertex3f
-     p  p  p glVertex3f
-    -p  p  p glVertex3f
-    glEnd
-    GL_LINES glBegin
-    -p -p -p glVertex3f
-    -p -p  p glVertex3f
-     p -p -p glVertex3f
-     p -p  p glVertex3f
-    -p  p -p glVertex3f
-    -p  p  p glVertex3f
-     p  p -p glVertex3f
-     p  p  p glVertex3f
-    glEnd ;
+: ui ( -- )
+    [
+        f [
+            launchpad-window
+            listener-window
+            event-loop
+        ] with-x
+    ] with-freetype ;
 
-: display ( -- )
-    0.0 0.0 0.0 0.0 glClearColor GL_FLAT glShadeModel
-    GL_COLOR_BUFFER_BIT glClear
-    1.0 1.0 1.0 glColor3f
-    glLoadIdentity
-    0.0 0.0 5.0 0.0 0.0 0.0 0.0 1.0 0.0 gluLookAt
-    1.0 2.0 1.0 glScalef
-    1.0 wire-cube
-    glFlush ;
+IN: kernel
 
-display
-
-window get swap-buffers
-
-flush-dpy
+! : default-shell "DISPLAY" getenv empty? "tty" "ui" ? ;
