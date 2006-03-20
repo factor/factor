@@ -8,7 +8,7 @@ USING: namespaces math ;
 : bootstrap-cells bootstrap-cell * ; inline
 
 : cell-bits 8 cells ; inline
-: bootstrap-cell-bits 8 cells ; inline
+: bootstrap-cell-bits 8 bootstrap-cells ; inline
 
 IN: math
 
