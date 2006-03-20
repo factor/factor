@@ -3,7 +3,6 @@
 - win64 port
 - get factor running on mac intel
 - amd64 %unbox-struct
-- amd64 %write-barrier
 - amd64 %box-struct
 - x86 %box-struct
 - x86 %write-barrier

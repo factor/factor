@@ -82,12 +82,16 @@ PREDICATE: register register-32 "register-size" word-prop 32 = ;
 PREDICATE: register register-64 "register-size" word-prop 64 = ;
 PREDICATE: register register-128 "register-size" word-prop 128 = ;
 
+M: register extended? "register" word-prop 7 > ;
+
 ( Addressing modes                                             )
 TUPLE: indirect base index scale displacement ;
 
+M: indirect extended? indirect-base extended? ;
+
 : canonicalize-EBP
     #! { EBP } ==> { EBP 0 }
-    dup indirect-base { EBP RBP } memq? [
+    dup indirect-base { EBP RBP R13 } memq? [
         dup indirect-displacement [
             drop
         ] [
@@ -99,7 +103,7 @@ TUPLE: indirect base index scale displacement ;
 
 : canonicalize-ESP
     #! { ESP } ==> { ESP ESP }
-    dup indirect-base { ESP RSP } memq? [
+    dup indirect-base { ESP RSP R12 } memq? [
         dup indirect-base swap set-indirect-index
     ] [
         drop
@@ -189,11 +193,22 @@ UNION: operand register indirect ;
 : rex.w? ( reg mod-r/m rex.w -- ? )
     [ register-64? ] 2apply or and ;
 
+: lhs-prefix
+    extended? [ BIN: 00000100 bitor ] when ;
+
+: rhs-prefix
+    [ extended? [ BIN: 00000001 bitor ] when ] keep
+    dup indirect? [
+        indirect-index extended?
+        [ BIN: 00000010 bitor ] when
+    ] [
+        drop
+    ] if ;
+
 : rex-prefix ( reg r/m rex.w -- )
     #! Compile an AMD64 REX prefix.
     pick pick rex.w? BIN: 01001000 BIN: 01000000 ?
-    swap extended? [ BIN: 00000100 bitor ] when
-    swap extended? [ BIN: 00000001 bitor ] when
+    swap lhs-prefix swap rhs-prefix
     dup BIN: 01000000 = [ drop ] [ assemble-1 ] if ;
 
 : 16-prefix ( reg r/m -- )

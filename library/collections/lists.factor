@@ -76,8 +76,6 @@ M: cons = ( obj cons -- ? )
         { [ t ] [ 2dup 2car = >r 2cdr = r> and ] }
     } cond ;
 
-M: f = ( obj f -- ? ) eq? ;
-
 : curry ( obj quot -- quot ) >r literalize r> cons ;
 
 : assoc ( key alist -- value ) [ car = ] find-with nip cdr ;
