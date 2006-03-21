@@ -17,12 +17,20 @@ SYMBOL: root
     dpy get root get rot XVisualInfo-visual AllocNone
     XCreateColormap ;
 
+: event-mask ( -- n )
+    StructureNotifyMask ExposureMask bitor 
+    KeyPressMask bitor
+    KeyReleaseMask bitor
+    ButtonPressMask	bitor
+    ButtonReleaseMask bitor
+    PointerMotionMask bitor ;
+
 : window-attributes ( visinfo -- attributes )
     "XSetWindowAttributes" <c-object>
     0 over set-XSetWindowAttributes-background_pixel
     0 over set-XSetWindowAttributes-border_pixel
     [ >r create-colormap r> set-XSetWindowAttributes-colormap ] keep
-    StructureNotifyMask ExposureMask bitor over set-XSetWindowAttributes-event_mask ;
+    event-mask over set-XSetWindowAttributes-event_mask ;
 
 : create-window ( w h visinfo -- window )
     >r >r >r dpy get root get 0 0 r> r> 0 r>
@@ -69,14 +77,26 @@ SYMBOL: root
     QueuedAfterFlush events-queued 0 >
     [ next-event ] [ ui-step wait-event ] if ;
 
-GENERIC: handle-expose-event ( event window -- )
+GENERIC: expose-event ( event window -- )
 
-GENERIC: handle-resize-event ( event window -- )
+GENERIC: resize-event ( event window -- )
+
+GENERIC: button-down-event ( event window -- )
+
+GENERIC: button-up-event ( event window -- )
+
+GENERIC: motion-event ( event window -- )
+
+GENERIC: key-event ( event window -- )
 
 : handle-event ( event window -- )
     over XAnyEvent-type {
-        { [ dup Expose = ] [ drop handle-expose-event ] }
-        { [ dup ConfigureNotify = ] [ drop handle-resize-event ] }
+        { [ dup Expose = ] [ drop expose-event ] }
+        { [ dup ConfigureNotify = ] [ drop resize-event ] }
+        { [ dup ButtonPress = ] [ drop button-down-event ] }
+        { [ dup ButtonRelease = ] [ drop button-up-event ] }
+        { [ dup MotionNotify = ] [ drop motion-event ] }
+        { [ dup KeyPress = ] [ drop key-event ] }
         { [ t ] [ 3drop ] }
     } cond ;
 

@@ -80,21 +80,21 @@ FUNCTION: int XCloseDisplay ( Display* display ) ;
 
 ! 3.2 - Window Attributes
 
-: CWBackPixmap		1 0 shift ;
-: CWBackPixel		1 1 shift ;
-: CWBorderPixmap	1 2 shift ;
-: CWBorderPixel         1 3 shift ;
-: CWBitGravity		1 4 shift ;
-: CWWinGravity		1 5 shift ;
-: CWBackingStore        1 6 shift ;
-: CWBackingPlanes	1 7 shift ;
-: CWBackingPixel	1 8 shift ;
-: CWOverrideRedirect	1 9 shift ;
-: CWSaveUnder		1 10 shift ;
-: CWEventMask		1 11 shift ;
-: CWDontPropagate	1 12 shift ;
-: CWColormap		1 13 shift ;
-: CWCursor	        1 14 shift ;
+: CWBackPixmap		1 0 shift ; inline
+: CWBackPixel		1 1 shift ; inline
+: CWBorderPixmap	1 2 shift ; inline
+: CWBorderPixel         1 3 shift ; inline
+: CWBitGravity		1 4 shift ; inline
+: CWWinGravity		1 5 shift ; inline
+: CWBackingStore        1 6 shift ; inline
+: CWBackingPlanes	1 7 shift ; inline
+: CWBackingPixel	1 8 shift ; inline
+: CWOverrideRedirect	1 9 shift ; inline
+: CWSaveUnder		1 10 shift ; inline
+: CWEventMask		1 11 shift ; inline
+: CWDontPropagate	1 12 shift ; inline
+: CWColormap		1 13 shift ; inline
+: CWCursor	        1 14 shift ; inline
 
 BEGIN-STRUCT: XSetWindowAttributes
 	FIELD: Pixmap background_pixmap
@@ -114,19 +114,19 @@ BEGIN-STRUCT: XSetWindowAttributes
 	FIELD: Cursor cursor
 END-STRUCT
 
-: UnmapGravity		0 ;
+: UnmapGravity		0 ; inline
 
-: ForgetGravity		0 ;
-: NorthWestGravity	1 ;
-: NorthGravity		2 ;
-: NorthEastGravity	3 ;
-: WestGravity		4 ;
-: CenterGravity		5 ;
-: EastGravity		6 ;
-: SouthWestGravity	7 ;
-: SouthGravity		8 ;
-: SouthEastGravity	9 ;
-: StaticGravity		10 ;
+: ForgetGravity		0 ; inline
+: NorthWestGravity	1 ; inline
+: NorthGravity		2 ; inline
+: NorthEastGravity	3 ; inline
+: WestGravity		4 ; inline
+: CenterGravity		5 ; inline
+: EastGravity		6 ; inline
+: SouthWestGravity	7 ; inline
+: SouthGravity		8 ; inline
+: SouthEastGravity	9 ; inline
+: StaticGravity		10 ; inline
 
 ! 3.3 - Creating Windows
 
@@ -144,13 +144,13 @@ FUNCTION: int XMapRaised ( Display* display, Window w ) ;
 
 ! 3.7 - Configuring Windows
 
-: CWX			1 0 shift ;
-: CWY			1 1 shift ;
-: CWWidth		1 2 shift ;
-: CWHeight		1 3 shift ;
-: CWBorderWidth		1 4 shift ;
-: CWSibling		1 5 shift ;
-: CWStackMode		1 6 shift ;
+: CWX			1 0 shift ; inline
+: CWY			1 1 shift ; inline
+: CWWidth		1 2 shift ; inline
+: CWHeight		1 3 shift ; inline
+: CWBorderWidth		1 4 shift ; inline
+: CWSibling		1 5 shift ; inline
+: CWStackMode		1 6 shift ; inline
 
 BEGIN-STRUCT: XWindowChanges
 	FIELD: int x
@@ -221,9 +221,9 @@ END-STRUCT
 
 FUNCTION: Status XGetWindowAttributes ( Display* display, Window w, XWindowAttributes* attr ) ;
 
-: IsUnmapped		0 ;
-: IsUnviewable		1 ;
-: IsViewable		2 ;
+: IsUnmapped		0 ; inline
+: IsUnviewable		1 ; inline
+: IsViewable		2 ; inline
 
 FUNCTION: Status XGetGeometry (
   Display* display,
@@ -285,46 +285,46 @@ FUNCTION: Colormap XCreateColormap ( Display* display, Window w, Visual* visual,
 ! 7 - Graphics Context Functions
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-: GCFunction            1 0 shift ;
-: GCPlaneMask           1 1 shift ;
-: GCForeground          1 2 shift ;
-: GCBackground          1 3 shift ;
-: GCLineWidth           1 4 shift ;
-: GCLineStyle           1 5 shift ;
-: GCCapStyle            1 6 shift ;
-: GCJoinStyle		1 7 shift ;
-: GCFillStyle		1 8 shift ;
-: GCFillRule		1 9 shift ;
-: GCTile		1 10 shift ;
-: GCStipple		1 11 shift ;
-: GCTileStipXOrigin	1 12 shift ;
-: GCTileStipYOrigin	1 13 shift ;
-: GCFont 		1 14 shift ;
-: GCSubwindowMode	1 15 shift ;
-: GCGraphicsExposures   1 16 shift ;
-: GCClipXOrigin		1 17 shift ;
-: GCClipYOrigin		1 18 shift ;
-: GCClipMask		1 19 shift ;
-: GCDashOffset		1 20 shift ;
-: GCDashList		1 21 shift ;
-: GCArcMode		1 22 shift ;
+: GCFunction            1 0 shift ; inline
+: GCPlaneMask           1 1 shift ; inline
+: GCForeground          1 2 shift ; inline
+: GCBackground          1 3 shift ; inline
+: GCLineWidth           1 4 shift ; inline
+: GCLineStyle           1 5 shift ; inline
+: GCCapStyle            1 6 shift ; inline
+: GCJoinStyle		1 7 shift ; inline
+: GCFillStyle		1 8 shift ; inline
+: GCFillRule		1 9 shift ; inline
+: GCTile		1 10 shift ; inline
+: GCStipple		1 11 shift ; inline
+: GCTileStipXOrigin	1 12 shift ; inline
+: GCTileStipYOrigin	1 13 shift ; inline
+: GCFont 		1 14 shift ; inline
+: GCSubwindowMode	1 15 shift ; inline
+: GCGraphicsExposures   1 16 shift ; inline
+: GCClipXOrigin		1 17 shift ; inline
+: GCClipYOrigin		1 18 shift ; inline
+: GCClipMask		1 19 shift ; inline
+: GCDashOffset		1 20 shift ; inline
+: GCDashList		1 21 shift ; inline
+: GCArcMode		1 22 shift ; inline
 
-: GXclear		HEX: 0 ;
-: GXand			HEX: 1 ;
-: GXandReverse		HEX: 2 ;
-: GXcopy		HEX: 3 ;
-: GXandInverted		HEX: 4 ;
-: GXnoop		HEX: 5 ;
-: GXxor			HEX: 6 ;
-: GXor			HEX: 7 ;
-: GXnor			HEX: 8 ;
-: GXequiv		HEX: 9 ;
-: GXinvert		HEX: a ;
-: GXorReverse		HEX: b ;
-: GXcopyInverted	HEX: c ;
-: GXorInverted		HEX: d ;
-: GXnand		HEX: e ;
-: GXset			HEX: f ;
+: GXclear		HEX: 0 ; inline
+: GXand			HEX: 1 ; inline
+: GXandReverse		HEX: 2 ; inline
+: GXcopy		HEX: 3 ; inline
+: GXandInverted		HEX: 4 ; inline
+: GXnoop		HEX: 5 ; inline
+: GXxor			HEX: 6 ; inline
+: GXor			HEX: 7 ; inline
+: GXnor			HEX: 8 ; inline
+: GXequiv		HEX: 9 ; inline
+: GXinvert		HEX: a ; inline
+: GXorReverse		HEX: b ; inline
+: GXcopyInverted	HEX: c ; inline
+: GXorInverted		HEX: d ; inline
+: GXnand		HEX: e ; inline
+: GXset			HEX: f ; inline
 
 BEGIN-STRUCT: XGCValues
 	FIELD: int function
@@ -360,8 +360,8 @@ FUNCTION: Status XSetBackground ( Display* display, GC gc, ulong background ) ;
 FUNCTION: Status XSetFunction ( Display* display, GC gc, int function ) ;
 FUNCTION: Status XSetSubwindowMode ( Display* display, GC gc, int subwindow_mode ) ;
 
-: ClipByChildren 0 ;
-: IncludeInferiors 1 ;
+: ClipByChildren 0 ; inline
+: IncludeInferiors 1 ; inline
 
 FUNCTION: Status XSetFont ( Display* display, GC gc, Font font ) ;
 
@@ -439,67 +439,67 @@ FUNCTION: Status XKillClient ( Display* display, XID resource ) ;
 
 ! 10.3 - Event Masks
 
-: NoEventMask			0 ;
-: KeyPressMask			1 0 shift ;
-: KeyReleaseMask		1 1 shift ;
-: ButtonPressMask		1 2 shift ;
-: ButtonReleaseMask		1 3 shift ;
-: EnterWindowMask		1 4 shift ;
-: LeaveWindowMask		1 5 shift ;
-: PointerMotionMask		1 6 shift ;
-: PointerMotionHintMask		1 7 shift ;
-: Button1MotionMask		1 8 shift ;
-: Button2MotionMask		1 9 shift ;
-: Button3MotionMask		1 10 shift ;
-: Button4MotionMask		1 11 shift ;
-: Button5MotionMask		1 12 shift ;
-: ButtonMotionMask		1 13 shift ;
-: KeymapStateMask		1 14 shift ;
-: ExposureMask			1 15 shift ;
-: VisibilityChangeMask		1 16 shift ;
-: StructureNotifyMask		1 17 shift ;
-: ResizeRedirectMask		1 18 shift ;
-: SubstructureNotifyMask	1 19 shift ;
-: SubstructureRedirectMask	1 20 shift ;
-: FocusChangeMask		1 21 shift ;
-: PropertyChangeMask		1 22 shift ;
-: ColormapChangeMask		1 23 shift ;
-: OwnerGrabButtonMask		1 24 shift ;
+: NoEventMask			0 ; inline
+: KeyPressMask			1 0 shift ; inline
+: KeyReleaseMask		1 1 shift ; inline
+: ButtonPressMask		1 2 shift ; inline
+: ButtonReleaseMask		1 3 shift ; inline
+: EnterWindowMask		1 4 shift ; inline
+: LeaveWindowMask		1 5 shift ; inline
+: PointerMotionMask		1 6 shift ; inline
+: PointerMotionHintMask		1 7 shift ; inline
+: Button1MotionMask		1 8 shift ; inline
+: Button2MotionMask		1 9 shift ; inline
+: Button3MotionMask		1 10 shift ; inline
+: Button4MotionMask		1 11 shift ; inline
+: Button5MotionMask		1 12 shift ; inline
+: ButtonMotionMask		1 13 shift ; inline
+: KeymapStateMask		1 14 shift ; inline
+: ExposureMask			1 15 shift ; inline
+: VisibilityChangeMask		1 16 shift ; inline
+: StructureNotifyMask		1 17 shift ; inline
+: ResizeRedirectMask		1 18 shift ; inline
+: SubstructureNotifyMask	1 19 shift ; inline
+: SubstructureRedirectMask	1 20 shift ; inline
+: FocusChangeMask		1 21 shift ; inline
+: PropertyChangeMask		1 22 shift ; inline
+: ColormapChangeMask		1 23 shift ; inline
+: OwnerGrabButtonMask		1 24 shift ; inline
 
-: KeyPress		2 ;
-: KeyRelease		3 ;
-: ButtonPress		4 ;
-: ButtonRelease		5 ;
-: MotionNotify		6 ;
-: EnterNotify		7 ;
-: LeaveNotify		8 ;
-: FocusIn			9 ;
-: FocusOut		10 ;
-: KeymapNotify		11 ;
-: Expose			12 ;
-: GraphicsExpose		13 ;
-: NoExpose		14 ;
-: VisibilityNotify	15 ;
-: CreateNotify		16 ;
-: DestroyNotify		17 ;
-: UnmapNotify		18 ;
-: MapNotify		19 ;
-: MapRequest		20 ;
-: ReparentNotify		21 ;
-: ConfigureNotify		22 ;
-: ConfigureRequest	23 ;
-: GravityNotify		24 ;
-: ResizeRequest		25 ;
-: CirculateNotify		26 ;
-: CirculateRequest	27 ;
-: PropertyNotify		28 ;
-: SelectionClear		29 ;
-: SelectionRequest	30 ;
-: SelectionNotify		31 ;
-: ColormapNotify		32 ;
-: ClientMessage		33 ;
-: MappingNotify		34 ;
-: LASTEvent		35 ;
+: KeyPress		2 ; inline
+: KeyRelease		3 ; inline
+: ButtonPress		4 ; inline
+: ButtonRelease		5 ; inline
+: MotionNotify		6 ; inline
+: EnterNotify		7 ; inline
+: LeaveNotify		8 ; inline
+: FocusIn			9 ; inline
+: FocusOut		10 ; inline
+: KeymapNotify		11 ; inline
+: Expose			12 ; inline
+: GraphicsExpose		13 ; inline
+: NoExpose		14 ; inline
+: VisibilityNotify	15 ; inline
+: CreateNotify		16 ; inline
+: DestroyNotify		17 ; inline
+: UnmapNotify		18 ; inline
+: MapNotify		19 ; inline
+: MapRequest		20 ; inline
+: ReparentNotify		21 ; inline
+: ConfigureNotify		22 ; inline
+: ConfigureRequest	23 ; inline
+: GravityNotify		24 ; inline
+: ResizeRequest		25 ; inline
+: CirculateNotify		26 ; inline
+: CirculateRequest	27 ; inline
+: PropertyNotify		28 ; inline
+: SelectionClear		29 ; inline
+: SelectionRequest	30 ; inline
+: SelectionNotify		31 ; inline
+: ColormapNotify		32 ; inline
+: ClientMessage		33 ; inline
+: MappingNotify		34 ; inline
+: LASTEvent		35 ; inline
 
 
 
@@ -515,26 +515,26 @@ END-STRUCT
 
 ! 10.5 Keyboard and Pointer Events
 
-: Button1 1 ;
-: Button2 2 ;
-: Button3 3 ;
-: Button4 4 ;
-: Button5 5 ;
+: Button1 1 ; inline
+: Button2 2 ; inline
+: Button3 3 ; inline
+: Button4 4 ; inline
+: Button5 5 ; inline
 
-: Button1Mask		1 8  shift ;
-: Button2Mask		1 9  shift ;
-: Button3Mask		1 10 shift ;
-: Button4Mask		1 11 shift ;
-: Button5Mask		1 12 shift ;
+: Button1Mask		1 8  shift ; inline
+: Button2Mask		1 9  shift ; inline
+: Button3Mask		1 10 shift ; inline
+: Button4Mask		1 11 shift ; inline
+: Button5Mask		1 12 shift ; inline
 
-: ShiftMask	1 0 shift ;
-: LockMask	1 1 shift ;
-: ControlMask	1 2 shift ;
-: Mod1Mask	1 3 shift ;
-: Mod2Mask	1 4 shift ;
-: Mod3Mask	1 5 shift ;
-: Mod4Mask	1 6 shift ;
-: Mod5Mask	1 7 shift ;
+: ShiftMask	1 0 shift ; inline
+: LockMask	1 1 shift ; inline
+: ControlMask	1 2 shift ; inline
+: Mod1Mask	1 3 shift ; inline
+: Mod2Mask	1 4 shift ; inline
+: Mod3Mask	1 5 shift ; inline
+: Mod4Mask	1 6 shift ; inline
+: Mod5Mask	1 7 shift ; inline
 
 BEGIN-STRUCT: XButtonEvent
 	FIELD: int type
@@ -556,12 +556,6 @@ END-STRUCT
 
 TYPEDEF: XButtonEvent XButtonPressedEvent
 TYPEDEF: XButtonEvent XButtonReleasedEvent
-
-: XButtonEvent-position ( event -- { x y } )
-  dup XButtonEvent-x swap XButtonEvent-y 2array ;
-
-: XButtonEvent-root-position ( event -- { x y } )
-  dup XButtonEvent-x swap XButtonEvent-y 2array ;
 
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
@@ -1081,9 +1075,9 @@ FUNCTION: Status XMaskEvent ( Display* display, long event_mask, XEvent* event_r
 
 ! 11.3 - Event Queue Management
 
-: QueuedAlready 0 ;
-: QueuedAfterReading 1 ;
-: QueuedAfterFlush 2 ;
+: QueuedAlready 0 ; inline
+: QueuedAfterReading 1 ; inline
+: QueuedAfterFlush 2 ; inline
 
 FUNCTION: int XEventsQueued ( Display* display, int mode ) ;
 FUNCTION: int XPending ( Display* display ) ;
@@ -1100,15 +1094,15 @@ FUNCTION: int XSetErrorHandler ( void* handler ) ;
 ! 12 - Input Device Functions
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-: None 0 ;
-: PointerRoot 1 ;
+: None 0 ; inline
+: PointerRoot 1 ; inline
 
-: RevertToNone		None ;
-: RevertToPointerRoot	PointerRoot ;
-: RevertToParent	2 ;
+: RevertToNone		None ; inline
+: RevertToPointerRoot	PointerRoot ; inline
+: RevertToParent	2 ; inline
 
-: GrabModeSync		0 ;
-: GrabModeAsync		1 ;
+: GrabModeSync		0 ; inline
+: GrabModeAsync		1 ; inline
 
 
 FUNCTION: int XGrabPointer (
@@ -1143,18 +1137,18 @@ FUNCTION: Status XGetTransientForHint ( Display* display, Window w, Window* prop
 
 ! 17.1.7 - Setting and Reading the WM_NORMAL_HINTS Property
 
-: USPosition	1 0 shift ;
-: USSize	1 1 shift ;
-: PPosition	1 2 shift ;
-: PSize		1 3 shift ;
-: PMinSize	1 4 shift ;
-: PMaxSize	1 5 shift ;
-: PResizeInc	1 6 shift ;
-: PAspect	1 7 shift ;
-: PBaseSize	1 8 shift ;
-: PWinGravity	1 9 shift ;
+: USPosition	1 0 shift ; inline
+: USSize	1 1 shift ; inline
+: PPosition	1 2 shift ; inline
+: PSize		1 3 shift ; inline
+: PMinSize	1 4 shift ; inline
+: PMaxSize	1 5 shift ; inline
+: PResizeInc	1 6 shift ; inline
+: PAspect	1 7 shift ; inline
+: PBaseSize	1 8 shift ; inline
+: PWinGravity	1 9 shift ; inline
 : PAllHints [ PPosition PSize PMinSize PMaxSize PResizeInc PAspect ]
-0 [ execute bitor ] reduce ;
+0 [ execute bitor ] reduce ; inline
 
 BEGIN-STRUCT: XSizeHints
     FIELD: long flags
@@ -1194,17 +1188,17 @@ FUNCTION: int XLookupString (
 
 ! 16.7 Determining the Appropriate Visual Type
 
-: VisualNoMask			HEX: 0 ;
-: VisualIDMask 			HEX: 1 ;
-: VisualScreenMask		HEX: 2 ;
-: VisualDepthMask		HEX: 4 ;
-: VisualClassMask		HEX: 8 ;
-: VisualRedMaskMask		HEX: 10 ;
-: VisualGreenMaskMask		HEX: 20 ;
-: VisualBlueMaskMask		HEX: 40 ;
-: VisualColormapSizeMask	HEX: 80 ;
-: VisualBitsPerRGBMask		HEX: 100 ;
-: VisualAllMask			HEX: 1FF ;
+: VisualNoMask			HEX: 0 ; inline
+: VisualIDMask 			HEX: 1 ; inline
+: VisualScreenMask		HEX: 2 ; inline
+: VisualDepthMask		HEX: 4 ; inline
+: VisualClassMask		HEX: 8 ; inline
+: VisualRedMaskMask		HEX: 10 ; inline
+: VisualGreenMaskMask		HEX: 20 ; inline
+: VisualBlueMaskMask		HEX: 40 ; inline
+: VisualColormapSizeMask	HEX: 80 ; inline
+: VisualBitsPerRGBMask		HEX: 100 ; inline
+: VisualAllMask			HEX: 1FF ; inline
 
 BEGIN-STRUCT: XVisualInfo
 	FIELD: Visual* visual
@@ -1235,79 +1229,79 @@ FUNCTION: Status XSetStandardProperties (
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-: CurrentTime 0 ;
+: CurrentTime 0 ; inline
 
-: XA_PRIMARY  1 ;
-: XA_SECONDARY 2 ;
-: XA_ARC 3 ;
-: XA_ATOM 4 ;
-: XA_BITMAP 5 ;
-: XA_CARDINAL 6 ;
-: XA_COLORMAP 7 ;
-: XA_CURSOR 8 ;
-: XA_CUT_BUFFER0 9 ;
-: XA_CUT_BUFFER1 10 ;
-: XA_CUT_BUFFER2 11 ;
-: XA_CUT_BUFFER3 12 ;
-: XA_CUT_BUFFER4 13 ;
-: XA_CUT_BUFFER5 14 ;
-: XA_CUT_BUFFER6 15 ;
-: XA_CUT_BUFFER7 16 ;
-: XA_DRAWABLE 17 ;
-: XA_FONT 18 ;
-: XA_INTEGER 19 ;
-: XA_PIXMAP 20 ;
-: XA_POINT 21 ;
-: XA_RECTANGLE 22 ;
-: XA_RESOURCE_MANAGER 23 ;
-: XA_RGB_COLOR_MAP 24 ;
-: XA_RGB_BEST_MAP 25 ;
-: XA_RGB_BLUE_MAP 26 ;
-: XA_RGB_DEFAULT_MAP 27 ;
-: XA_RGB_GRAY_MAP 28 ;
-: XA_RGB_GREEN_MAP 29 ;
-: XA_RGB_RED_MAP 30 ;
-: XA_STRING 31 ;
-: XA_VISUALID 32 ;
-: XA_WINDOW 33 ;
-: XA_WM_COMMAND 34 ;
-: XA_WM_HINTS 35 ;
-: XA_WM_CLIENT_MACHINE 36 ;
-: XA_WM_ICON_NAME 37 ;
-: XA_WM_ICON_SIZE 38 ;
-: XA_WM_NAME 39 ;
-: XA_WM_NORMAL_HINTS 40 ;
-: XA_WM_SIZE_HINTS 41 ;
-: XA_WM_ZOOM_HINTS 42 ;
-: XA_MIN_SPACE 43 ;
-: XA_NORM_SPACE 44 ;
-: XA_MAX_SPACE 45 ;
-: XA_END_SPACE 46 ;
-: XA_SUPERSCRIPT_X 47 ;
-: XA_SUPERSCRIPT_Y 48 ;
-: XA_SUBSCRIPT_X 49 ;
-: XA_SUBSCRIPT_Y 50 ;
-: XA_UNDERLINE_POSITION 51 ;
-: XA_UNDERLINE_THICKNESS 52 ;
-: XA_STRIKEOUT_ASCENT 53 ;
-: XA_STRIKEOUT_DESCENT 54 ;
-: XA_ITALIC_ANGLE 55 ;
-: XA_X_HEIGHT 56 ;
-: XA_QUAD_WIDTH 57 ;
-: XA_WEIGHT 58 ;
-: XA_POINT_SIZE 59 ;
-: XA_RESOLUTION 60 ;
-: XA_COPYRIGHT 61 ;
-: XA_NOTICE 62 ;
-: XA_FONT_NAME 63 ;
-: XA_FAMILY_NAME 64 ;
-: XA_FULL_NAME 65 ;
-: XA_CAP_HEIGHT 66 ;
-: XA_WM_CLASS 67 ;
-: XA_WM_TRANSIENT_FOR 68 ;
+: XA_PRIMARY  1 ; inline
+: XA_SECONDARY 2 ; inline
+: XA_ARC 3 ; inline
+: XA_ATOM 4 ; inline
+: XA_BITMAP 5 ; inline
+: XA_CARDINAL 6 ; inline
+: XA_COLORMAP 7 ; inline
+: XA_CURSOR 8 ; inline
+: XA_CUT_BUFFER0 9 ; inline
+: XA_CUT_BUFFER1 10 ; inline
+: XA_CUT_BUFFER2 11 ; inline
+: XA_CUT_BUFFER3 12 ; inline
+: XA_CUT_BUFFER4 13 ; inline
+: XA_CUT_BUFFER5 14 ; inline
+: XA_CUT_BUFFER6 15 ; inline
+: XA_CUT_BUFFER7 16 ; inline
+: XA_DRAWABLE 17 ; inline
+: XA_FONT 18 ; inline
+: XA_INTEGER 19 ; inline
+: XA_PIXMAP 20 ; inline
+: XA_POINT 21 ; inline
+: XA_RECTANGLE 22 ; inline
+: XA_RESOURCE_MANAGER 23 ; inline
+: XA_RGB_COLOR_MAP 24 ; inline
+: XA_RGB_BEST_MAP 25 ; inline
+: XA_RGB_BLUE_MAP 26 ; inline
+: XA_RGB_DEFAULT_MAP 27 ; inline
+: XA_RGB_GRAY_MAP 28 ; inline
+: XA_RGB_GREEN_MAP 29 ; inline
+: XA_RGB_RED_MAP 30 ; inline
+: XA_STRING 31 ; inline
+: XA_VISUALID 32 ; inline
+: XA_WINDOW 33 ; inline
+: XA_WM_COMMAND 34 ; inline
+: XA_WM_HINTS 35 ; inline
+: XA_WM_CLIENT_MACHINE 36 ; inline
+: XA_WM_ICON_NAME 37 ; inline
+: XA_WM_ICON_SIZE 38 ; inline
+: XA_WM_NAME 39 ; inline
+: XA_WM_NORMAL_HINTS 40 ; inline
+: XA_WM_SIZE_HINTS 41 ; inline
+: XA_WM_ZOOM_HINTS 42 ; inline
+: XA_MIN_SPACE 43 ; inline
+: XA_NORM_SPACE 44 ; inline
+: XA_MAX_SPACE 45 ; inline
+: XA_END_SPACE 46 ; inline
+: XA_SUPERSCRIPT_X 47 ; inline
+: XA_SUPERSCRIPT_Y 48 ; inline
+: XA_SUBSCRIPT_X 49 ; inline
+: XA_SUBSCRIPT_Y 50 ; inline
+: XA_UNDERLINE_POSITION 51 ; inline
+: XA_UNDERLINE_THICKNESS 52 ; inline
+: XA_STRIKEOUT_ASCENT 53 ; inline
+: XA_STRIKEOUT_DESCENT 54 ; inline
+: XA_ITALIC_ANGLE 55 ; inline
+: XA_X_HEIGHT 56 ; inline
+: XA_QUAD_WIDTH 57 ; inline
+: XA_WEIGHT 58 ; inline
+: XA_POINT_SIZE 59 ; inline
+: XA_RESOLUTION 60 ; inline
+: XA_COPYRIGHT 61 ; inline
+: XA_NOTICE 62 ; inline
+: XA_FONT_NAME 63 ; inline
+: XA_FAMILY_NAME 64 ; inline
+: XA_FULL_NAME 65 ; inline
+: XA_CAP_HEIGHT 66 ; inline
+: XA_WM_CLASS 67 ; inline
+: XA_WM_TRANSIENT_FOR 68 ; inline
 
-: XA_LAST_PREDEFINED 68 ;
+: XA_LAST_PREDEFINED 68 ; inline
 
-: PropModeReplace         0 ;
-: PropModePrepend         1 ;
-: PropModeAppend          2 ;
+: PropModeReplace         0 ; inline
+: PropModePrepend         1 ; inline
+: PropModeAppend          2 ; inline
