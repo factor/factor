@@ -65,7 +65,9 @@ DEFER: draw-gadget
 
 : draw-world ( world -- )
     [
-        dup rect-dim init-gl dup world set draw-gadget gl-error
+        dup world-handle [
+            dup rect-dim init-gl dup world set draw-gadget
+        ] with-gl-context
     ] with-scope ;
 
 ! Pen paint properties

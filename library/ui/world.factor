@@ -19,6 +19,7 @@ TUPLE: world glass status focus fonts handle ;
     world-fonts [ drop V{ } clone ] cache ;
 
 : close-world ( world -- )
+    dup world-handle select-gl-context
     f over request-focus*
     dup remove-notify
     dup free-fonts

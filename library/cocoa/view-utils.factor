@@ -11,14 +11,6 @@ objc-NSOpenGLView objc-NSView opengl sequences ;
     dup 1 [setPostsBoundsChangedNotifications:]
     dup 1 [setPostsFrameChangedNotifications:] ;
 
-: with-gl-context ( context quot -- )
-    swap
-    [ [makeCurrentContext] call glFlush ] keep
-    [flushBuffer] ; inline
-
-: with-gl-view ( view quot -- | quot: view -- )
-    >r dup [openGLContext] r> with-gl-context ; inline
-
 : view-dim [bounds] dup NSRect-w swap NSRect-h 0 3array ;
 
 : NSViewFrameDidChangeNotification

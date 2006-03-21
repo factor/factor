@@ -6,8 +6,8 @@ DEFER: FactorView
 USING: arrays cocoa errors freetype gadgets gadgets-launchpad
 gadgets-layouts gadgets-listener gadgets-panes hashtables kernel
 lists math namespaces objc objc-NSApplication objc-NSEvent
-objc-NSObject objc-NSOpenGLView objc-NSView objc-NSWindow
-sequences threads ;
+objc-NSObject objc-NSOpenGLContext objc-NSOpenGLView objc-NSView
+objc-NSWindow sequences threads ;
 
 ! Cocoa backend for Factor UI
 
@@ -75,7 +75,7 @@ H{ } clone views set-global
 
 "NSOpenGLView" "FactorView" {
     { "drawRect:" "void" { "id" "SEL" "NSRect" }
-        [ 2drop [ view draw-world ] with-gl-view ]
+        [ 2drop view draw-world ]
     }
     
     { "mouseMoved:" "void" { "id" "SEL" "id" }
@@ -170,6 +170,12 @@ IN: gadgets
 
 : in-window ( gadget status dim title -- )
     >r <world> r> <FactorWindow> drop ;
+
+: select-gl-context ( handle -- )
+    [openGLContext] [makeCurrentContext] ;
+
+: flush-gl-context ( handle -- )
+    [openGLContext] [flushBuffer] ;
 
 IN: shells
 
