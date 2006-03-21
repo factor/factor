@@ -105,16 +105,6 @@ SYMBOL: windows
     >r dpy get r> f 1 glXCreateContext
     [ "Failed to create GLX context" throw ] unless* ;
 
-: make-current ( win GLXContext -- )
-    >r dpy get swap r> glXMakeCurrent
-    [ "Failed to set current GLX context" throw ] unless ;
-
-: swap-buffers ( win -- )
-    dpy get swap glXSwapBuffers ;
-
-: with-glx-context ( win GLXContext quot -- )
-    pick >r >r make-current r> call r> swap-buffers ;
-
 ! Initialization
 
 : check-display
