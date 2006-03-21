@@ -1,7 +1,7 @@
 ! Copyright (C) 2005, 2006 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 IN: gadgets
-USING: freetype gadgets-layouts generic hashtables kernel
+USING: errors freetype gadgets-layouts generic hashtables kernel
 namespaces opengl sequences ;
 
 ! The world gadget is the top level gadget that all (visible)
@@ -19,7 +19,10 @@ TUPLE: world glass status focus fonts handle ;
     world-fonts [ drop V{ } clone ] cache ;
 
 : close-world ( world -- )
-    dup remove-notify dup free-fonts f swap set-world-handle ;
+    f over request-focus*
+    dup remove-notify
+    dup free-fonts
+    f swap set-world-handle ;
 
 C: world ( gadget status dim -- world )
     <stack> over set-delegate
@@ -49,7 +52,7 @@ M: gadget find-world gadget-parent find-world ;
 M: world find-world ;
 
 : repaint ( gadget -- )
-    find-world [ world-handle repaint-handle ] when* ;
+    find-world [ world-handle [ repaint-handle ] when* ] when* ;
 
 : focused-ancestors ( world -- seq )
     world-focus parents reverse-slice ;

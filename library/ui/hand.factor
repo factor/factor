@@ -69,11 +69,13 @@ V{ } clone hand-buttons set-global
     [ lose-focus ] swap each-gesture
     [ gain-focus ] swap each-gesture ;
 
-: request-focus ( gadget -- )
-    dup focusable-child swap find-world
+: request-focus* ( gadget world -- )
     dup focused-ancestors >r
     [ set-world-focus ] keep
     focused-ancestors r> focus-gestures ;
+
+: request-focus ( gadget -- )
+    dup focusable-child swap find-world request-focus* ;
 
 : drag-loc ( -- loc )
     hand-loc get-global hand-click-loc get-global v- ;

@@ -59,7 +59,7 @@ SYMBOL: stack-bar
     <input-pane> dup pane set-global <scroller> ;
 
 : <listener> ( -- gadget status )
-    <frame> dup solid-interior
+    <frame>
     <input-pane> dup pane set-global <scroller>
     over @center frame-add
     <bottom-bar> >r over @bottom frame-add r> ;

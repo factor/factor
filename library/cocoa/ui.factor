@@ -134,10 +134,10 @@ H{ } clone views set-global
         [ 2drop 1 ]
     }
     
-    { "init" "id" { "id" "SEL" }
+    { "initWithFrame:pixelFormat:" "id" { "id" "SEL" "NSRect" "id" }
         [
-            drop
-            SUPER-> [init]
+            rot drop
+            SUPER-> [initWithFrame:pixelFormat:]
             dup "updateFactorGadgetSize:" add-resize-observer
         ]
     }
@@ -165,7 +165,8 @@ H{ } clone views set-global
 
 IN: gadgets
 
-: repaint-handle ( handle -- ) 1 [setNeedsDisplay:] ;
+: repaint-handle ( handle -- )
+    1 [setNeedsDisplay:] ;
 
 : in-window ( gadget status dim title -- )
     >r <world> r> <FactorWindow> drop ;
