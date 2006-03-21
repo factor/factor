@@ -135,7 +135,7 @@ H{
 
 : selector-quot ( string -- )
     [
-        [ >r dup ?super <super> r> ] % <selector> , \ selector ,
+        [ dup ?super <super> ] % <selector> , \ selector ,
     ] [ ] make ;
 
 : make-objc-invoke
