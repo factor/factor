@@ -1,7 +1,7 @@
 ! Copyright (C) 2004, 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: vectors
-USING: arrays errors generic kernel kernel-internals lists math
+USING: arrays errors generic kernel kernel-internals math
 math-internals sequences sequences-internals ;
 
 M: vector set-length ( len vec -- )
@@ -22,8 +22,6 @@ M: vector set-nth ( obj n vec -- )
 M: object thaw drop V{ } clone ;
 
 M: vector clone ( vector -- vector ) clone-growable ;
-
-M: general-list like drop >list ;
 
 M: vector like
     drop dup vector? [

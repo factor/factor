@@ -26,13 +26,14 @@ SYMBOL: builtins
 
 : members "members" word-prop ;
 
-: (flatten) ( class -- )
-    dup members [ [ (flatten) ] each ] [ dup set ] ?if ;
+: (flatten-class) ( class -- )
+    dup members [ [ (flatten-class) ] each ] [ dup set ] ?if ;
 
-: flatten ( class -- classes ) [ (flatten) ] make-hash ;
+: flatten-class ( class -- classes )
+    [ (flatten-class) ] make-hash ;
 
 : (types) ( class -- )
-    flatten [
+    flatten-class [
         drop dup superclass
         [ (types) ] [ "type" word-prop dup set ] ?if
     ] hash-each ;
@@ -46,7 +47,7 @@ DEFER: class<
     >r superclass r> 2dup and [ class< ] [ 2drop f ] if ;
 
 : union-class< ( cls1 cls2 -- ? )
-    >r flatten r> flatten hash-keys swap
+    >r flatten-class r> flatten-class hash-keys swap
     [ drop swap [ class< ] contains-with? ] hash-all-with? ;
 
 : class-empty? ( class -- ? )
@@ -145,7 +146,7 @@ M: generic definer drop \ G: ;
 
 : define-class ( class -- )
     dup t "class" set-word-prop
-    dup flatten typemap get set-hash ;
+    dup flatten-class typemap get set-hash ;
 
 : implementors ( class -- list )
     [ "methods" word-prop ?hash* nip ] word-subset-with ;

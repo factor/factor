@@ -87,7 +87,7 @@ TUPLE: editor line caret font color ;
     swap [ first complete ] with-editor ;
 
 : do-completion ( editor -- )
-    dup [ completions ] with-editor {
+    dup [ line-completions ] with-editor {
         { [ dup empty? ] [ 2drop ] }
         { [ dup length 1 = ] [ do-completion-1 ] }
         { [ t ] [ completion-menu ] }

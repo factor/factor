@@ -139,12 +139,21 @@ H{ } clone views set-global
     { "acceptsFirstResponder" "bool" { "id" "SEL" }
         [ 2drop 1 ]
     }
+    
+    { "dealloc" "void" { "id" "SEL" }
+        [
+            drop
+            dup view dup remove-notify free-fonts
+            dup views get remove-hash
+            SUPER-> [dealloc]
+        ]
+    }
 } { } define-objc-class
 
 : <FactorView> ( gadget -- view )
     FactorView over rect-dim <GLView>
     dup "updateFactorGadgetSize:" add-resize-observer
-    [ over set-world-handle register-view ] keep ;
+    [ over set-world-handle dup add-notify register-view ] keep ;
 
 : <FactorWindow> ( gadget title -- window )
     >r <FactorView> r> <ViewWindow> ;

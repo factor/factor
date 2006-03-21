@@ -16,11 +16,11 @@ strings vectors ;
 
 : subseq ( from to seq -- seq ) [ <slice> ] keep like ; flushable
 
-M: object head ( index seq -- seq ) [ head-slice ] keep like ;
+: head ( index seq -- seq ) [ head-slice ] keep like ;
 
 : head* ( n seq -- seq ) [ head-slice* ] keep like ; flushable
 
-M: object tail ( index seq -- seq ) [ tail-slice ] keep like ;
+: tail ( index seq -- seq ) [ tail-slice ] keep like ;
 
 : tail* ( n seq -- seq ) [ tail-slice* ] keep like ; flushable
 
@@ -114,12 +114,3 @@ M: object tail ( index seq -- seq ) [ tail-slice ] keep like ;
 : join ( seq glue -- seq )
     [ swap [ % ] [ dup % ] interleave drop ] over make ;
     flushable
-
-IN: strings
-
-: completion? ( partial completion quot -- ? )
-    #! Test if 'partial' is a completion of 'completion', by
-    #! comparing each "-"-delimited chunk using 'quot'. The
-    #! quotation is usually either [ subseq? ] or [ swap head? ].
-    >r [ "-" split ] 2apply 2dup [ length ] 2apply <=
-    [ r> 2map [ ] all? ] [ r> 3drop f ] if ; inline

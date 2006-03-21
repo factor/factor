@@ -1,5 +1,5 @@
-! Copyright (C) 2003, 2005 Slava Pestov.
-! See http://factor.sf.net/license.txt for BSD license.
+! Copyright (C) 2003, 2006 Slava Pestov.
+! See http://factorcode.org/license.txt for BSD license.
 IN: prettyprint
 USING: arrays generic hashtables io kernel lists math namespaces
 sequences strings styles words ;
@@ -117,9 +117,9 @@ M: word class. drop ;
         newline
     ] with-pprint ;
 
-: (apropos) ( substring -- seq )
-    all-words [ word-name [ subseq? ] completion? ] subset-with ;
+: completions ( substring words -- seq )
+    [ word-name subseq? ] subset-with ;
 
 : apropos ( substring -- )
-    (apropos) natural-sort
+    all-words completions natural-sort
     [ [ synopsis ] keep simple-object terpri ] each ;

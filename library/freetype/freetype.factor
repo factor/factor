@@ -3,7 +3,7 @@
 USING: alien kernel ;
 IN: freetype
 
-os "win32" = [
+windows? [
     "freetype" "freetype6.dll" "cdecl" add-library
 ] when
 

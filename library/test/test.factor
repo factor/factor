@@ -14,10 +14,13 @@ M: assert summary drop "Assertion failed" ;
 : print-test ( input output -- )
     "--> " write 2array . flush ;
 
+: benchmark ( quot -- gctime runtime )
+    millis >r gc-time >r call gc-time r> - millis r> - ;
+
 : time ( code -- )
     #! Evaluates the given code and prints the time taken to
     #! execute it.
-    millis >r gc-time >r call gc-time r> - millis r> -
+    benchmark
     [ # " ms run / " % # " ms GC time" % ] "" make print flush ;
 
 : unit-test ( output input -- )

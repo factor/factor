@@ -45,7 +45,8 @@ math namespaces sequences vectors words ;
 
 : vtable-methods ( dispatch# alist-seq -- alist-seq )
     dup length [
-        type>class [ swap simplify-alist ] [ car second [ ] ] if*
+        type>class
+        [ swap simplify-alist ] [ car second [ ] ] if*
         >r over r> class-predicates alist>quot
     ] 2map nip ;
 
@@ -55,7 +56,10 @@ math namespaces sequences vectors words ;
     >r methods >list r> swons r> sort-methods vtable-methods ;
 
 : small-generic ( dispatch# word -- def )
-    2dup methods class-predicates >r empty-method r> alist>quot ;
+    2dup empty-method object bootstrap-word swap 2array
+    swap methods >list cons
+    object bootstrap-word swap simplify-alist
+    swapd class-predicates alist>quot ;
 
 : big-generic ( dispatch# word n dispatcher -- def )
     [ >r pick picker % r> , <vtable> , \ dispatch , ] [ ] make ;

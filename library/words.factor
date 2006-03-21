@@ -1,7 +1,7 @@
 ! Copyright (C) 2004, 2006 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: words
-USING: generic hashtables kernel kernel-internals lists math
+USING: hashtables kernel kernel-internals lists math
 namespaces sequences strings vectors ;
 
 M: word <=> [ word-name ] 2apply <=> ;
@@ -38,7 +38,8 @@ M: word word-xt ( w -- xt ) 7 integer-slot ;
 GENERIC: set-word-xt
 M: word set-word-xt ( xt w -- ) 7 set-integer-slot ;
 
-: uses ( word -- uses ) word-def [ word? ] tree-subset prune ;
+: uses ( word -- uses )
+    word-def flatten [ word? ] subset prune ;
 
 SYMBOL: crossref
 

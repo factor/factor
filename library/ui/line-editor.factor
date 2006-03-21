@@ -1,7 +1,8 @@
 ! Copyright (C) 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: line-editor
-USING: kernel math namespaces sequences strings vectors ;
+USING: kernel math namespaces prettyprint sequences strings
+vectors ;
 
 SYMBOL: history
 SYMBOL: history-index
@@ -140,12 +141,11 @@ M: document-elt prev-elt* 3drop 0 ;
     history-index get dup 1+ history-length >=
     [ drop ] [ 1+ goto-history ] if ;
 
-: completions ( -- seq )
+: line-completions ( -- seq )
     T{ word-elt } prev-elt@ 2dup = [
         2drop f
     ] [
-        line-text get subseq possibilities get
-        [ [ swap head? ] completion? ] subset-with
+        line-text get subseq possibilities get completions
     ] if ;
 
 : complete ( completion -- )

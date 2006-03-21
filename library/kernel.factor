@@ -10,6 +10,9 @@ USING: generic kernel-internals math-internals ;
 GENERIC: hashcode ( obj -- n ) flushable
 M: object hashcode drop 0 ;
 
+GENERIC: hashcode* ( n obj -- n ) flushable
+M: object hashcode* nip hashcode ;
+
 GENERIC: = ( obj obj -- ? ) flushable
 M: object = eq? ;
 
@@ -30,6 +33,8 @@ M: object clone ;
 
 : cpu ( -- arch ) 7 getenv ;
 : os ( -- os ) 11 getenv ;
+: windows? ( -- ? ) os "win32" = ;
+: macosx? os "macosx" = ;
 
 : slip >r call r> ; inline
 

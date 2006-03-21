@@ -14,7 +14,7 @@ recrossref
             "/library/unix/load.factor" run-resource
         ] when
 
-        os "win32" = [
+        windows? [
             "/library/win32/load.factor" run-resource
         ] when
     ] when

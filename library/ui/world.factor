@@ -18,6 +18,9 @@ TUPLE: world glass status focus fonts handle ;
 : font-sprites ( font world -- sprites )
     world-fonts [ drop V{ } clone ] cache ;
 
+: close-world ( world -- )
+    dup remove-notify dup free-fonts f swap set-world-handle ;
+
 C: world ( gadget status dim -- world )
     <stack> over set-delegate
     t over set-gadget-root?

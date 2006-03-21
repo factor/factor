@@ -122,7 +122,21 @@ H{
 : make-dip ( quot n -- quot )
     dup \ >r <array> -rot \ r> <array> append3 ;
 
-: selector-quot ( string -- ) <selector> [ selector ] curry ;
+: <super> ( receiver class -- super )
+    "objc-super" <c-object>
+    [ set-objc-super-class ] keep
+    [ set-objc-super-receiver ] keep ;
+
+: SUPER-> \ SUPER-> on ; inline
+
+: ?super ( obj -- class )
+    objc-object-isa \ SUPER-> [ f ] change
+    [ objc-class-super-class ] when ; inline
+
+: selector-quot ( string -- )
+    [
+        [ >r dup ?super <super> r> ] % <selector> , \ selector ,
+    ] [ ] make ;
 
 : make-objc-invoke
     [
@@ -131,13 +145,13 @@ H{
 
 : make-objc-send ( returns args selector -- )
     selector-quot
-    [ swap , [ f "objc_msgSend" ] % , ] make-objc-invoke ;
+    [ swap , [ f "objc_msgSendSuper" ] % , ] make-objc-invoke ;
 
 : make-objc-send-stret ( returns args selector -- )
     >r swap [ <c-object> dup ] curry 1 make-dip r>
     selector-quot append [
         "void" ,
-        [ f "objc_msgSend_stret" ] %
+        [ f "objc_msgSendSuper_stret" ] %
         { "void*" } swap append ,
     ] make-objc-invoke ;
 

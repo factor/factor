@@ -1,6 +1,0 @@
-USING: help sequences ;
-
-HELP: tree-each "( seq quot -- )"
-{ $values { "obj" "an object" } { "quot" "a quotation with stack effect" { $snippet "( elt -- )" } } }
-{ $description "Traverses a tree where the root is the given object, the branches are arrays, vectors, lists and wrappers, and the leaves are all other types of objects. Traversal is pre-order; the quotation is first applied to a branch, then to the children." }
-{ $notes "This word does not descend into virtual sequences, or user-defined sequences." } ;

@@ -6,7 +6,7 @@
 IN: opengl 
 USING: alien kernel ;
 
-os "win32" = [
+windows? [
     "gl" "opengl32.dll" "stdcall" add-library
     "glu" "glu32.dll" "stdcall" add-library
 ]

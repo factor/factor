@@ -2,18 +2,31 @@
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: lists USING: errors generic kernel math sequences ;
 
+M: f car ;
+M: f cdr ;
+
+UNION: general-list POSTPONE: f cons ;
+
+GENERIC: >list ( seq -- list )
+M: general-list >list ( list -- list ) ;
+
+PREDICATE: general-list list ( list -- ? )
+    #! Proper list test. A proper list is either f, or a cons
+    #! cell whose cdr is a proper list.
+    [ cdr list? ] [ t ] if* ;
+
+: uncons ( [[ car cdr ]] -- car cdr ) dup car swap cdr ; inline
+: unswons ( [[ car cdr ]] -- cdr car ) dup cdr swap car ; inline
+
+: swons ( cdr car -- [[ car cdr ]] ) swap cons ; inline
+: unit ( a -- [ a ] ) f cons ; inline
+
+: 2car ( cons cons -- car car ) [ car ] 2apply ; inline
+: 2cdr ( cons cons -- car car ) [ cdr ] 2apply ; inline
+
 ! Sequence protocol
 M: f length drop 0 ;
 M: cons length cdr length 1+ ;
-
-M: f empty? drop t ;
-M: cons empty? drop f ;
-
-M: f peek ( f -- f ) ;
-
-M: cons peek ( list -- last )
-    #! Last element of a list.
-    last car ;
 
 : (list-each) ( list quot -- )
     over [
@@ -54,20 +67,8 @@ M: general-list reverse-slice ( list -- list )
 
 M: general-list reverse reverse-slice ;
 
-M: general-list head ( n list -- list )
-    #! Return the first n elements of the list.
-    over 0 > [
-        unswons >r >r 1- r> head r> swons
-    ] [
-        2drop f
-    ] if ;
-
-M: general-list tail ( n list -- tail )
-    #! Return the rest of the list, from the nth index onward.
-    swap [ cdr ] times ;
-
 M: general-list nth ( n list -- element )
-    over zero? [ nip car ] [ >r 1- r> cdr nth ] if ;
+    over 0 <= [ nip car ] [ >r 1- r> cdr nth ] if ;
 
 M: cons = ( obj cons -- ? )
     {
@@ -79,3 +80,14 @@ M: cons = ( obj cons -- ? )
 : curry ( obj quot -- quot ) >r literalize r> cons ;
 
 : assoc ( key alist -- value ) [ car = ] find-with nip cdr ;
+
+: (>list) ( n i seq -- list )
+    pick pick <= [
+        3drop [ ]
+    ] [
+        2dup nth >r >r 1+ r> (>list) r> swons
+    ] if ;
+
+M: object >list ( seq -- list ) dup length 0 rot (>list) ;
+
+M: general-list like drop >list ;

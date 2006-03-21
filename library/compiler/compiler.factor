@@ -3,12 +3,16 @@
 IN: compiler
 USING: compiler-backend compiler-frontend errors hashtables
 inference io kernel lists math namespaces optimizer prettyprint
-sequences words ;
+sequences test words ;
 
 : (compile) ( word -- )
     #! Should be called inside the with-compiler scope.
     dup word-def dataflow optimize linearize
     [ split-blocks simplify generate ] hash-each ;
+
+: benchmark-compile
+    [ [ (compile) ] keep ] benchmark nip
+    "compile-time" set-word-prop ;
 
 : inform-compile ( word -- ) "Compiling " write . flush ;
 
@@ -16,7 +20,7 @@ sequences words ;
     compile-words get dup empty? [
         dup pop
         dup inform-compile
-        (compile)
+        benchmark-compile
         compile-postponed
     ] unless drop ;
 
@@ -44,3 +48,5 @@ sequences words ;
     "compile" get [ dup compile ] when ;
 
 : compile-1 ( quot -- ) compile-quot execute ;
+
+\ dataflow profile

@@ -19,5 +19,5 @@ M: float-regs return-reg drop 1 ;
 M: float-regs fastcall-regs drop { 1 2 3 4 5 6 7 8 } ;
 
 ! Mach-O -vs- Linux/PPC
-: stack@ os "macosx" = 24 8 ? + ;
-: lr@ os "macosx" = 8 4 ? + ;
+: stack@ macosx? 24 8 ? + ;
+: lr@ macosx? 8 4 ? + ;

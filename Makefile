@@ -142,3 +142,8 @@ clean:
 
 .m.o:
 	$(CC) -c $(CFLAGS) -o $@ $<
+
+boot:
+	echo "USE: image \"$(ARCH)\" make-image bye" | ./f factor.image
+	./f boot.image.$(ARCH) $(BOOTSTRAP_FLAGS)
+	

@@ -42,7 +42,7 @@ M: int-regs reg-size drop cell ;
 
 : (inc-reg-class)
     dup class inc
-    os "macosx" = [ reg-size stack-params +@ ] [ drop ] if ;
+    macosx? [ reg-size stack-params +@ ] [ drop ] if ;
 
 M: int-regs inc-reg-class
     (inc-reg-class) ;
@@ -51,7 +51,7 @@ M: float-regs reg-size float-regs-size ;
 
 M: float-regs inc-reg-class
     dup (inc-reg-class)
-    os "macosx" = [ reg-size 4 / int-regs +@ ] [ drop ] if ;
+    macosx? [ reg-size 4 / int-regs +@ ] [ drop ] if ;
 
 ! A data stack location.
 TUPLE: ds-loc n ;

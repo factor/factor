@@ -3,7 +3,6 @@
 IN: sequences
 USING: errors generic kernel math math-internals strings vectors ;
 
-GENERIC: empty? ( sequence -- ? ) flushable
 GENERIC: length ( sequence -- n ) flushable
 GENERIC: set-length ( n sequence -- )
 GENERIC: nth ( n sequence -- obj ) flushable
@@ -12,9 +11,8 @@ GENERIC: thaw ( seq -- mutable-seq ) flushable
 GENERIC: like ( seq seq -- seq ) flushable
 GENERIC: reverse ( seq -- seq ) flushable
 GENERIC: reverse-slice ( seq -- seq ) flushable
-GENERIC: peek ( seq -- elt ) flushable
-GENERIC: head ( n seq -- seq ) flushable
-GENERIC: tail ( n seq -- seq ) flushable
+
+: empty? ( seq -- ? ) length zero? ;
 
 : first 0 swap nth ; inline
 : second 1 swap nth ; inline

@@ -215,6 +215,20 @@ M: hashtable = ( obj hash -- ? )
         { [ t ] [ hashtable= ] }
     } cond ;
 
+: hashtable-hashcode ( n hashtable -- n )
+    >r 1- r> 0 swap [
+        >r >r
+        over r> hashcode* bitxor
+        over r> hashcode* -1 shift bitxor
+    ] hash-each nip ;
+
+M: hashtable hashcode* ( n hash -- n )
+    dup hash-size 1 number=
+    [ hashtable-hashcode ] [ nip hash-size ] if ;
+
+M: hashtable hashcode ( hash -- n )
+    2 swap hashcode* ;
+
 : ?hash ( key hash/f -- value/f )
     dup [ hash ] [ 2drop f ] if ; flushable
 

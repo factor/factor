@@ -1,7 +1,7 @@
 ! Copyright (C) 2005, 2006 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 IN: sequences
-USING: errors generic kernel kernel-internals lists math
+USING: errors generic kernel kernel-internals math
 sequences-internals strings vectors words ;
 
 : first2 ( { x y } -- x y )
@@ -14,17 +14,6 @@ sequences-internals strings vectors words ;
     3 swap bounds-check nip first4-unsafe ; inline
 
 M: object like drop ;
-
-M: object empty? ( seq -- ? ) length zero? ;
-
-: (>list) ( n i seq -- list )
-    pick pick <= [
-        3drop [ ]
-    ] [
-        2dup nth >r >r 1+ r> (>list) r> swons
-    ] if ;
-
-M: object >list ( seq -- list ) dup length 0 rot (>list) ;
 
 : index   ( obj seq -- n )     [ = ] find-with drop ; flushable
 : index*  ( obj i seq -- n )   [ = ] find-with* drop ; flushable
@@ -84,8 +73,7 @@ M: object >list ( seq -- list ) dup length 0 rot (>list) ;
 : append3 ( s1 s2 s3 -- s1+s2+s3 )
     rot [ [ rot nappend ] keep swap nappend ] immutable ; flushable
 
-M: object peek ( sequence -- element )
-    dup length 1- swap nth ;
+: peek ( sequence -- element ) dup length 1- swap nth ;
 
 : pop* ( sequence -- )
     [ length 1- ] keep

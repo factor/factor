@@ -12,6 +12,11 @@ FUNCTION: bool sel_isMapped ( SEL aSelector ) ;
 
 FUNCTION: SEL sel_registerName ( char* str ) ;
 
+BEGIN-STRUCT: objc-super
+    FIELD: id receiver
+    FIELD: void* class
+END-STRUCT
+
 : CLS_CLASS        HEX: 1   ;
 : CLS_META         HEX: 2   ;
 : CLS_INITIALIZED  HEX: 4   ;
