@@ -161,7 +161,7 @@ H{ } clone views set-global
     [ over set-world-handle dup add-notify register-view ] keep ;
 
 : <FactorWindow> ( gadget title -- window )
-    >r <FactorView> r> <ViewWindow> ;
+    >r <FactorView> r> <ViewWindow> dup [contentView] [release] ;
 
 IN: gadgets
 

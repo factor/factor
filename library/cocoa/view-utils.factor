@@ -7,7 +7,7 @@ objc-NSOpenGLView objc-NSView opengl sequences ;
 : <GLView> ( class dim -- view )
     >r [alloc] 0 0 r> first2 <NSRect>
     NSOpenGLView [defaultPixelFormat]
-    [initWithFrame:pixelFormat:] [autorelease]
+    [initWithFrame:pixelFormat:]
     dup 1 [setPostsBoundsChangedNotifications:]
     dup 1 [setPostsFrameChangedNotifications:] ;
 

@@ -6,9 +6,7 @@
 - amd64 %box-struct
 - x86 %box-struct
 - x86 %write-barrier
-- OS X stuff:
-  - set resource path to bundle path
-  - link in freetype statically
+- statically link freetype on OS X
 - when generating a 32-bit image on a 64-bit system, large numbers which should
   be bignums become fixnums
 
@@ -23,6 +21,9 @@
 
 + ui/help:
 
+- finish x11 backend
+- sometimes clicks come through twice
+- hand is broken by design
 - speed up ideas:
   - only do clipping for certain gadgets
   - use glRect
@@ -30,7 +31,6 @@
 - add some padding to launchpad ui
 - saving the image should save window configuration
 - menu drag retarget broken
-- hang with multiple windows
 - incremental layout flicker
 - expired aliens in view hash
 - changelog in the UI
@@ -44,8 +44,9 @@
 - document tools
 - document conventions
 - new turtle graphics tutorial
-- better line spacing in ui and html=
+- better line spacing in ui and html
 - tabular formatting - for inspector and changes
+- grid layout
 - don't multiplex in the event loop if there is no pending i/o
 
 + compiler/ffi:
@@ -70,6 +71,7 @@
 
 + misc:
 
+- set resource path to image parent directory
 - clean up stack effect generation code
 - code walker & exceptions
 - slice: if sequence or seq start is changed, abstraction violation
