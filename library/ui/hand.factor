@@ -88,7 +88,7 @@ V{ } clone hand-buttons set-global
     #! Show a message in the status bar.
     world-status [ set-label-text* ] [ drop ] if* ;
 
-: update-help ( -- string )
+: update-help ( -- )
     #! Update mouse-over help message.
     hand-gadget get-global parents [ relevant-help ] keep
     dup empty? [ 2drop ] [ peek show-message ] if ;
@@ -107,11 +107,6 @@ V{ } clone hand-buttons set-global
     #! Called when a gadget is removed or added.
     hand-loc get-global swap move-hand ;
 
-: layout-done ( gadget -- )
-    find-world [
-        dup update-hand world-handle repaint-handle
-    ] when* ;
-
 : layout-queued ( -- )
     invalid dup queue-empty?
-    [ drop ] [ deque dup layout layout-done layout-queued ] if ;
+    [ drop ] [ deque dup layout repaint layout-queued ] if ;

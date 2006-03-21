@@ -1,5 +1,8 @@
 ! Copyright (C) 2006 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
+IN: objc-FactorView
+DEFER: FactorView
+
 USING: arrays cocoa errors freetype gadgets gadgets-launchpad
 gadgets-layouts gadgets-listener gadgets-panes hashtables kernel
 lists math namespaces objc objc-NSApplication objc-NSEvent
@@ -8,21 +11,12 @@ sequences threads ;
 
 ! Cocoa backend for Factor UI
 
-IN: objc-FactorView
-DEFER: FactorView
-
 IN: gadgets-cocoa
 
 ! Hash mapping aliens to gadgets
 SYMBOL: views
 
 H{ } clone views set-global
-
-: register-view ( world -- )
-    dup world-handle views get set-hash ;
-
-: unregister-view ( world -- )
-    world-handle views get remove-hash ;
 
 : view ( handle -- world ) views get hash ;
 
@@ -140,19 +134,30 @@ H{ } clone views set-global
         [ 2drop 1 ]
     }
     
+    { "init" "id" { "id" "SEL" }
+        [
+            drop
+            SUPER-> [init]
+            dup "updateFactorGadgetSize:" add-resize-observer
+        ]
+    }
+    
     { "dealloc" "void" { "id" "SEL" }
         [
             drop
-            dup view dup remove-notify free-fonts
+            dup view close-world
             dup views get remove-hash
+            dup remove-observer
             SUPER-> [dealloc]
         ]
     }
 } { } define-objc-class
 
+: register-view ( world -- )
+    dup world-handle views get set-hash ;
+
 : <FactorView> ( gadget -- view )
     FactorView over rect-dim <GLView>
-    dup "updateFactorGadgetSize:" add-resize-observer
     [ over set-world-handle dup add-notify register-view ] keep ;
 
 : <FactorWindow> ( gadget title -- window )

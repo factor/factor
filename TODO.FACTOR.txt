@@ -21,12 +21,6 @@
 - yield in a loop starves i/o
 - "localhost" 50 <client> won't fail
 
-+ objective C/cocoa:
-
-- super message sends
-  super-> [foo]...
-- core foundation should use unicode strings
-
 + ui/help:
 
 - speed up ideas:
@@ -39,7 +33,6 @@
 - hang with multiple windows
 - incremental layout flicker
 - expired aliens in view hash
-- unregister notifications and the view in dealloc
 - changelog in the UI
 - make the UI look better, something like this:
   http://twb.ath.cx/~twb/darcs/OBSOLETE/factor/final.html
@@ -57,6 +50,7 @@
 
 + compiler/ffi:
 
+- core foundation should use unicode strings
 - improve callback efficiency
 - alien>utf16-string, utf16-string>alien words
 - float intrinsics

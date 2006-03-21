@@ -39,6 +39,10 @@ objc-NSNotificationCenter objc-NSObject objc-NSView threads ;
     >r >r >r >r NSNotificationCenter [defaultCenter] r> r>
     sel_registerName r> r> [addObserver:selector:name:object:] ;
 
+: remove-observer ( observer -- )
+    >r NSNotificationCenter [defaultCenter] r>
+    [removeObserver:] ;
+
 : finish-launching ( -- )
     NSApplication [sharedApplication] [finishLaunching] ;
 
