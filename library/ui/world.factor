@@ -12,6 +12,7 @@ namespaces opengl sequences ;
 TUPLE: world glass status focus fonts handle ;
 
 : free-fonts ( world -- )
+    dup world-handle select-gl-context
     world-fonts dup hash-values [ free-sprites ] each
     clear-hash ;
 

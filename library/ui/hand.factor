@@ -114,8 +114,5 @@ V{ } clone hand-buttons set-global
     [ drop ] [ deque dup layout repaint layout-queued ] if ;
 
 : close-world ( world -- )
-    dup world-handle select-gl-context
-    f over request-focus*
-    dup remove-notify
-    dup free-fonts
-    f swap set-world-handle ;
+    f over request-focus* dup remove-notify
+    dup free-fonts f swap set-world-handle ;
