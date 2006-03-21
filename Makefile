@@ -20,7 +20,7 @@ DEFAULT_LIBS = -lm
 ifdef NO_UI
 	UNIX_UI_LIBS =
 else
-	UNIX_UI_LIBS = -lfreetype -lGL -lGLU -lX11
+	UNIX_UI_LIBS = -lfreetype -lGL -lGLU -L/usr/X11R6/lib -lX11
 endif
 
 WIN32_OBJS = native/win32/ffi.o \

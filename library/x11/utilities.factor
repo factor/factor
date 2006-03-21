@@ -66,11 +66,8 @@ SYMBOL: root
     dpy get "XEvent" <c-object> dup >r XNextEvent drop r> ;
 
 : wait-event ( -- event )
-    QueuedAfterFlush events-queued 0 > [
-        next-event
-    ] [
-        do-timers layout-queued 10 sleep wait-event
-    ] if ;
+    QueuedAfterFlush events-queued 0 >
+    [ next-event ] [ ui-step wait-event ] if ;
 
 GENERIC: handle-expose-event ( event window -- )
 

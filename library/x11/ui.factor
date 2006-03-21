@@ -3,8 +3,7 @@ USING: arrays errors freetype gadgets gadgets-launchpad
 gadgets-layouts gadgets-listener hashtables kernel
 kernel-internals math namespaces opengl sequences x11 ;
 
-M: world handle-expose-event ( event world -- )
-    nip draw-world ;
+M: world handle-expose-event ( event world -- ) nip draw-world ;
 
 M: world handle-resize-event ( event world -- )
     >r
@@ -19,14 +18,13 @@ M: world handle-resize-event ( event world -- )
 
 IN: gadgets
 
-: repaint-handle ( handle -- )
-    drop ; ! windows get hash draw-glx-world ;
+: draw-handle ( handle -- ) first windows get hash draw-world ;
 
 : in-window ( gadget status dim title -- )
     >r <world> r> drop gadget-window ;
 
 : select-gl-context ( handle -- )
-    second >r dpy get swap r> glXMakeCurrent
+    dpy get swap first2 glXMakeCurrent
     [ "Failed to set current GLX context" throw ] unless ;
 
 : flush-gl-context ( handle -- )

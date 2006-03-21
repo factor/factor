@@ -229,7 +229,6 @@ DEFER: do-crap
 [ { 1 2 } ] [ [ uncons ] infer ] unit-test
 [ { 1 1 } ] [ [ unit ] infer ] unit-test
 [ { 1 2 } ] [ [ unswons ] infer ] unit-test
-[ { 1 1 } ] [ [ last ] infer ] unit-test
 [ { 1 1 } ] [ [ list? ] infer ] unit-test
 
 [ { 1 0 } ] [ [ >n ] infer ] unit-test

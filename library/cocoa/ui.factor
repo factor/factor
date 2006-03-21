@@ -165,7 +165,7 @@ H{ } clone views set-global
 
 IN: gadgets
 
-: repaint-handle ( handle -- )
+: draw-handle ( handle -- )
     1 [setNeedsDisplay:] ;
 
 : in-window ( gadget status dim title -- )

@@ -1,8 +1,8 @@
 ! Copyright (C) 2005, 2006 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 IN: gadgets
-USING: gadgets-labels gadgets-layouts kernel math namespaces
-queues sequences ;
+USING: gadgets-labels gadgets-layouts hashtables kernel math
+namespaces queues sequences threads ;
 
 ! Hand state
 
@@ -110,8 +110,19 @@ V{ } clone hand-buttons set-global
     hand-loc get-global swap move-hand ;
 
 : layout-queued ( -- )
-    invalid dup queue-empty?
-    [ drop ] [ deque dup layout repaint layout-queued ] if ;
+    invalid dup queue-empty? [
+        drop
+    ] [
+        deque dup layout
+        find-world [ world-handle dup set ] when*
+        layout-queued
+    ] if ;
+
+: ui-step ( -- )
+    do-timers
+    [ layout-queued ] make-hash
+    [ drop [ draw-handle ] when* ] hash-each
+    10 sleep ;
 
 : close-world ( world -- )
     f over request-focus* dup remove-notify

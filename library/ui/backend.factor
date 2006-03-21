@@ -1,7 +1,7 @@
 IN: gadgets
 USING: kernel opengl ;
 
-DEFER: repaint-handle ( handle -- )
+DEFER: draw-handle ( handle -- )
 
 DEFER: in-window ( gadget status dim title -- )
 

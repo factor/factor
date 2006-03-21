@@ -1,10 +1,6 @@
 IN: temporary
 USING: kernel lists sequences test ;
 
-[ [ 3 ]     ] [ [ 3 ]         last ] unit-test
-[ [ 3 ]     ] [ [ 1 2 3 ]     last ] unit-test
-[ [[ 3 4 ]] ] [ [[ 1 [[ 2 [[ 3 4 ]] ]] ]] last ] unit-test
-
 [ 3 ] [ [ 3 ]         peek ] unit-test
 [ 3 ] [ [ 1 2 3 ]     peek ] unit-test
 [ 3 ] [ [[ 1 [[ 2 [[ 3 4 ]] ]] ]] peek ] unit-test

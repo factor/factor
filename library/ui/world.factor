@@ -46,9 +46,6 @@ M: gadget find-world gadget-parent find-world ;
 
 M: world find-world ;
 
-: repaint ( gadget -- )
-    find-world [ world-handle [ repaint-handle ] when* ] when* ;
-
 : focused-ancestors ( world -- seq )
     world-focus parents reverse-slice ;
 
