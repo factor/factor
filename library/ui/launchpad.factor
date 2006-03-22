@@ -1,6 +1,7 @@
 IN: gadgets-launchpad
 USING: gadgets gadgets-buttons gadgets-labels gadgets-layouts
-gadgets-listener io kernel memory namespaces sequences ;
+gadgets-listener help inspector io kernel memory namespaces
+sequences ;
 
 : <launchpad> ( menu -- )
     [ first2 >r <label> r> <bevel-button> ] map make-pile
@@ -9,6 +10,9 @@ gadgets-listener io kernel memory namespaces sequences ;
 : default-launchpad
     {
         { "Listener" [ listener-window ] }
+        { "Documentation" [ [ handbook ] in-browser ] }
+        { "Tutorial" [ [ tutorial ] in-browser ] }
+        { "Vocabularies" [ [ vocabs. ] in-browser ] }
         { "Save image" [ save ] }
         { "Exit" [ 0 exit ] }
     } <launchpad> ;

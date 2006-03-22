@@ -77,6 +77,10 @@ V{ } clone hand-buttons set-global
 : request-focus ( gadget -- )
     dup focusable-child swap find-world request-focus* ;
 
+: modifier ( mod modifiers -- seq )
+    [ second swap bitand 0 > ] subset-with
+    [ first ] map ;
+
 : drag-loc ( -- loc )
     hand-loc get-global hand-click-loc get-global v- ;
 
@@ -114,14 +118,18 @@ V{ } clone hand-buttons set-global
         drop
     ] [
         deque dup layout
-        find-world [ world-handle dup set ] when*
+        find-world [ dup world-handle set ] when*
         layout-queued
     ] if ;
 
+: init-ui ( -- )
+    H{ } clone \ timers set-global
+    <queue> \ invalid set-global ;
+    
 : ui-step ( -- )
     do-timers
     [ layout-queued ] make-hash
-    [ drop [ draw-handle ] when* ] hash-each
+    [ nip [ draw-world ] when* ] hash-each
     10 sleep ;
 
 : close-world ( world -- )

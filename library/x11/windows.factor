@@ -1,7 +1,7 @@
 ! Copyright (C) 2005, 2006 Eduardo Cavazos and Slava Pestov
 ! See http://factorcode.org/license.txt for BSD license.
 IN: x11
-USING: alien hashtables kernel math namespaces ;
+USING: alien hashtables kernel math namespaces sequences ;
 
 : create-window-mask ( -- n )
     CWBackPixel CWBorderPixel bitor
@@ -12,7 +12,7 @@ USING: alien hashtables kernel math namespaces ;
     XCreateColormap ;
 
 : event-mask ( -- n )
-    StructureNotifyMask ExposureMask bitor 
+    StructureNotifyMask
     KeyPressMask bitor
     KeyReleaseMask bitor
     ButtonPressMask	bitor
@@ -31,6 +31,9 @@ USING: alien hashtables kernel math namespaces ;
     [ XVisualInfo-depth InputOutput ] keep
     [ XVisualInfo-visual create-window-mask ] keep
     window-attributes XCreateWindow ;
+    
+: glx-window ( dim -- window context )
+    first2 choose-visual [ create-window ] keep create-context ;
 
 : destroy-window ( win -- )
     dpy get swap XDestroyWindow drop ;
@@ -38,17 +41,14 @@ USING: alien hashtables kernel math namespaces ;
 : destroy-window* ( win -- )
     dup windows get remove-hash destroy-window ;
 
-: map-window ( win -- )
-    dpy get swap XMapWindow drop ;
+: map-window ( win -- ) dpy get swap XMapWindow drop ;
 
 : map-window* ( world win -- )
     [ windows get set-hash ] keep map-window ;
 
-: map-subwindows ( win -- )
-    dpy get swap XMapSubwindows drop ;
+: glx-window* ( world dim -- win context )
+    glx-window >r [ map-window* ] keep r> ;
 
-: unmap-window ( win -- )
-    dpy get swap XUnmapWindow drop ;
+: unmap-window ( win -- ) dpy get swap XUnmapWindow drop ;
 
-: unmap-subwindows ( win -- )
-    dpy get swap XUnmapSubwindows drop ;
+: set-title ( string win -- ) dpy get -rot swap XStoreName drop ;

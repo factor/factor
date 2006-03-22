@@ -46,9 +46,17 @@ TYPEDEF: ulong Time
 
 TYPEDEF: void* Window**
 
-: False 0 ;
-: True 1 ;
+: <ulong> <uint> ;
+: <XID> <ulong> ;
+: <Window> <XID> ;
+: <Drawable> <XID> ;
+: <KeySym> <XID> ;
 
+: *ulong *uint ;
+: *XID *ulong ;
+: *Window *XID ;
+: *Drawable *XID ;
+: *KeySym *XID ;
 !
 ! 2 - Display Functions
 !
@@ -1306,3 +1314,6 @@ FUNCTION: Status XSetStandardProperties (
 : PropModeReplace         0 ; inline
 : PropModePrepend         1 ; inline
 : PropModeAppend          2 ; inline
+    
+! The rest of the stuff is not from the book.
+FUNCTION: int XStoreName ( Display* display, Window w, char* window_name ) ;

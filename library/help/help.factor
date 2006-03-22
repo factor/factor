@@ -17,3 +17,5 @@ DEFER: $heading
 : glossary ( name -- ) <term> help ;
 
 : handbook ( -- ) "handbook" help ;
+    
+: tutorial ( -- ) "tutorial" help ;

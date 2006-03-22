@@ -2,9 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 IN: x11
 USING: alien arrays errors gadgets hashtables io kernel math
-namespaces prettyprint sequences threads ;
-
-GENERIC: expose-event ( event window -- )
+namespaces prettyprint sequences strings threads ;
 
 GENERIC: resize-event ( event window -- )
 
@@ -14,7 +12,9 @@ GENERIC: button-up-event ( event window -- )
 
 GENERIC: motion-event ( event window -- )
 
-GENERIC: key-event ( event window -- )
+GENERIC: key-down-event ( event window -- )
+
+GENERIC: key-up-event ( event window -- )
 
 GENERIC: client-event ( event window -- )
 
@@ -35,12 +35,12 @@ GENERIC: client-event ( event window -- )
 
 : handle-event ( event window -- )
     over XAnyEvent-type {
-        { [ dup Expose = ] [ drop expose-event ] }
         { [ dup ConfigureNotify = ] [ drop resize-event ] }
         { [ dup ButtonPress = ] [ drop button-down-event ] }
         { [ dup ButtonRelease = ] [ drop button-up-event ] }
         { [ dup MotionNotify = ] [ drop motion-event ] }
-        { [ dup KeyPress = ] [ drop key-event ] }
+        { [ dup KeyPress = ] [ drop key-down-event ] }
+        { [ dup KeyRelease = ] [ drop key-up-event ] }
         { [ dup ClientMessage = ] [ drop client-event ] }
         { [ t ] [ 3drop ] }
     } cond ;
@@ -48,3 +48,15 @@ GENERIC: client-event ( event window -- )
 : event-loop ( -- )
     wait-event dup XAnyEvent-window windows get hash dup
     [ handle-event ] [ 2drop ] if event-loop ;
+
+: char-array>string ( n <char-array> -- string )
+    swap >string [ swap char-nth ] map-with ;
+
+: buf-size 100 ;
+
+: lookup-string ( event -- keysym string )
+    buf-size "char" <c-array> [
+        buf-size 0 <KeySym>
+        [ f XLookupString ] keep
+        *KeySym swap
+    ] keep char-array>string ;

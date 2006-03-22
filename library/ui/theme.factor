@@ -83,6 +83,4 @@ USING: arrays gadgets kernel sequences styles ;
     { "monospace" bold 12 } swap set-label-font ;
 
 : status-theme ( label -- )
-    dup reverse-video-theme
-    { 1.0 1.0 1.0 1.0 } over set-label-color
-    { "monospace" plain 12 } swap set-label-font ;
+    T{ solid f { 0.9 0.95 1.0 1.0 } } swap set-gadget-interior ;

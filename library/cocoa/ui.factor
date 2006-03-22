@@ -53,24 +53,18 @@ H{ } clone views set-global
         { 124 "RIGHT" }
         { 125 "DOWN" }
         { 126 "UP" }
-    } hash ;
-
-: modifier ( mod -- seq )
-    modifiers
-    [ second swap bitand 0 > ] subset-with
-    [ first ] map ;
+    } ;
 
 : key-code ( event -- string )
-    dup [keyCode] key-codes
+    dup [keyCode] key-codes hash
     [ ] [ [charactersIgnoringModifiers] CF>string ] ?if ;
 
-: event>binding ( event -- binding )
-    dup [modifierFlags] modifier swap key-code
-    [ add >list ] [ drop f ] if* ;
+: event>gesture ( event -- gesture )
+    dup [modifierFlags] modifiers modifier swap key-code
+    add >list ;
 
 : send-key-event ( view event -- )
-    >r view world-focus r> dup event>binding
-    [ pick handle-gesture ] [ t ] if*
+    >r view world-focus r> dup event>gesture pick handle-gesture
     [ [characters] CF>string swap user-input ] [ 2drop ] if ;
 
 "NSOpenGLView" "FactorView" {
@@ -165,8 +159,8 @@ H{ } clone views set-global
 
 IN: gadgets
 
-: draw-handle ( handle -- )
-    1 [setNeedsDisplay:] ;
+: redraw-world ( handle -- )
+    world-handle 1 [setNeedsDisplay:] ;
 
 : in-window ( gadget status dim title -- )
     >r <world> r> <FactorWindow> drop ;

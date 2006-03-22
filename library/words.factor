@@ -97,3 +97,6 @@ M: word literalize <wrapper> ;
 : gensym ( -- word )
     [ "G:" % \ gensym counter # ] "" make
     f <word> dup init-word ;
+
+: completions ( substring words -- seq )
+    [ word-name subseq? ] subset-with ;

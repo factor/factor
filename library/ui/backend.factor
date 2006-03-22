@@ -1,7 +1,9 @@
 IN: gadgets
 USING: kernel opengl ;
 
-DEFER: draw-handle ( handle -- )
+DEFER: draw-world ! defined in world.factor
+
+: redraw-world ( world -- ) draw-world ;
 
 DEFER: in-window ( gadget status dim title -- )
 

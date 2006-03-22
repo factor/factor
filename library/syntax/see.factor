@@ -117,9 +117,6 @@ M: word class. drop ;
         newline
     ] with-pprint ;
 
-: completions ( substring words -- seq )
-    [ word-name subseq? ] subset-with ;
-
 : apropos ( substring -- )
     all-words completions natural-sort
     [ [ synopsis ] keep simple-object terpri ] each ;

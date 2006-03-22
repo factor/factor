@@ -1,4 +1,4 @@
-! Copyright (C) 2005 Slava Pestov.
+! Copyright (C) 2005, 2006 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: gadgets-listener
 USING: arrays compiler gadgets gadgets-editors gadgets-labels
@@ -8,7 +8,7 @@ inference inspector io jedit kernel listener lists math
 namespaces parser prettyprint sequences shells threads words
 help ;
 
-SYMBOL: stack-bar
+TUPLE: listener-gadget pane stack status ;
 
 : in-browser ( quot -- )
     make-pane <scroller> "Browser" simple-window ; inline
@@ -19,9 +19,8 @@ SYMBOL: stack-bar
 : usable-words ( -- words )
     use get hash-concat hash-values ;
 
-: word-completion ( -- )
-    usable-words [ word-name ] map
-    pane get pane-input set-possibilities ;
+: word-completion ( pane -- )
+    usable-words swap pane-input set-possibilities ;
 
 : show-stack ( seq pack -- )
     dup clear-gadget [
@@ -33,21 +32,22 @@ SYMBOL: stack-bar
         ] if
     ] with-stream* ;
 
-: ui-listener-hook ( -- )
-    datastack-hook get call stack-bar get show-stack
-    word-completion ;
+: ui-listener-hook ( listener -- )
+    [
+        >r datastack-hook get call r>
+        listener-gadget-stack show-stack
+    ] keep
+    listener-gadget-pane word-completion ;
 
-: help-button
-    "Please read the " write { "handbook" } $link "." print ;
-
-: listener-thread
-    pane get [
-        [ ui-listener-hook ] listener-hook set
-        help-button
-        listener
+: listener-thread ( listener -- )
+    dup listener-gadget-pane [
+        [ ui-listener-hook ] curry listener-hook set
+        print-banner listener
     ] with-stream* ;
 
 : <status-bar> ( -- gadget ) "" <label> dup status-theme ;
+
+: <stack-bar> ( -- gadget ) <shelf> dup status-theme ;
 
 : <bottom-bar> ( -- gadget status )
     <status-bar> [
@@ -58,13 +58,17 @@ SYMBOL: stack-bar
 : <scroller> ( -- gadget )
     <input-pane> dup pane set-global <scroller> ;
 
-: <listener> ( -- gadget status )
-    <frame>
-    <input-pane> dup pane set-global <scroller>
-    over @center frame-add
-    <bottom-bar> >r over @bottom frame-add r> ;
+C: listener-gadget ( -- gadget )
+    <frame> over set-delegate
+    <input-pane> dup pick set-listener-gadget-pane
+    <scroller> over @center frame-add
+    <status-bar> dup pick set-listener-gadget-status
+    over @bottom frame-add
+    <stack-bar> dup pick set-listener-gadget-stack
+    over @top frame-add ;
 
 : listener-window ( -- )
-    <listener> { 600 700 0 } "Listener" in-window
-    [ clear listener-thread ] in-thread
-    pane get request-focus ;
+    <listener-gadget> dup dup listener-gadget-status
+    { 600 700 0 } "Listener" in-window
+    [ >r clear r> listener-thread ] in-thread
+    listener-gadget-pane request-focus ;

@@ -12,8 +12,6 @@ IN: gadgets-layouts
 
 : invalid ( -- queue ) \ invalid get-global ;
 
-<queue> \ invalid set-global
-
 : add-invalid ( gadget -- ) invalid enque ;
 
 : relayout ( gadget -- )
