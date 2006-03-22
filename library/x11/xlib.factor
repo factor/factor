@@ -51,12 +51,14 @@ TYPEDEF: void* Window**
 : <Window> <XID> ;
 : <Drawable> <XID> ;
 : <KeySym> <XID> ;
+: <Atom> <ulong> ;
 
 : *ulong *uint ;
 : *XID *ulong ;
 : *Window *XID ;
 : *Drawable *XID ;
 : *KeySym *XID ;
+: *Atom *ulong ;
 !
 ! 2 - Display Functions
 !

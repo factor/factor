@@ -80,13 +80,13 @@ M: world key-down-event ( event world -- )
 M: world key-up-event ( event world -- ) 2drop ;
 
 : close-box? ( event -- )
-    dup XClientMessageEvent-type "WM_PROTOCOLS" x-atom =
+    dup XClientMessageEvent-message_type "WM_PROTOCOLS" x-atom =
     swap XClientMessageEvent-data "WM_DELETE_WINDOW" x-atom =
     and ;
 
 M: world client-event ( event world -- )
     swap close-box? [
-        dup close-world world-handle destroy-window*
+        dup world-handle first >r close-world r> destroy-window*
     ] [
         drop
     ] if ;

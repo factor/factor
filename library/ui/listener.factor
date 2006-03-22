@@ -1,12 +1,11 @@
 ! Copyright (C) 2005, 2006 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: gadgets-listener
-USING: arrays compiler gadgets gadgets-editors gadgets-labels
+USING: arrays gadgets gadgets-editors gadgets-labels
 gadgets-layouts gadgets-panes gadgets-scrolling
 gadgets-splitters gadgets-theme generic hashtables
-inference inspector io jedit kernel listener lists math
-namespaces parser prettyprint sequences shells threads words
-help ;
+io jedit kernel listener lists math
+namespaces parser prettyprint sequences threads words ;
 
 TUPLE: listener-gadget pane stack status ;
 
@@ -48,12 +47,6 @@ TUPLE: listener-gadget pane stack status ;
 : <status-bar> ( -- gadget ) "" <label> dup status-theme ;
 
 : <stack-bar> ( -- gadget ) <shelf> dup status-theme ;
-
-: <bottom-bar> ( -- gadget status )
-    <status-bar> [
-        <shelf> dup stack-bar set-global
-        2array make-pile 1 over set-pack-fill
-    ] keep ;
 
 : <scroller> ( -- gadget )
     <input-pane> dup pane set-global <scroller> ;

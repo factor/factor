@@ -40,11 +40,15 @@ USING: alien hashtables kernel math namespaces sequences ;
 
 : destroy-window* ( win -- )
     dup windows get remove-hash destroy-window ;
+    
+: set-closable ( win -- )
+    dpy get swap "WM_DELETE_WINDOW" x-atom <Atom> 1
+    XSetWMProtocols drop ;
 
 : map-window ( win -- ) dpy get swap XMapWindow drop ;
 
 : map-window* ( world win -- )
-    [ windows get set-hash ] keep map-window ;
+    dup set-closable [ windows get set-hash ] keep map-window ;
 
 : glx-window* ( world dim -- win context )
     glx-window >r [ map-window* ] keep r> ;
