@@ -50,4 +50,4 @@ M: world find-world ;
     world-focus parents reverse-slice ;
 
 : simple-window ( gadget title -- )
-    >r f over pref-dim r> in-window ;
+    >r f over pref-dim { 800 800 0 } vmin r> in-window ;

@@ -13,6 +13,8 @@ sequences ;
         { "Documentation" [ [ handbook ] in-browser ] }
         { "Tutorial" [ [ tutorial ] in-browser ] }
         { "Vocabularies" [ [ vocabs. ] in-browser ] }
+        { "Globals" [ [ global describe ] in-browser ] }
+        { "Memory" [ [ heap-stats. terpri room. ] in-browser ] }
         { "Save image" [ save ] }
         { "Exit" [ 0 exit ] }
     } <launchpad> ;

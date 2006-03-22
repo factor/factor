@@ -72,9 +72,9 @@ M: world motion-event ( event world -- )
 M: world key-down-event ( event world -- )
     world-focus over event>gesture [
         over handle-gesture
-        [ over lookup-string nip swap user-input ] [ 2drop ] if
+        [ swap lookup-string nip swap user-input ] [ 2drop ] if
     ] [
-        drop
+        2drop
     ] if* ;
 
 M: world key-up-event ( event world -- ) 2drop ;

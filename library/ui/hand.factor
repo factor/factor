@@ -128,8 +128,8 @@ V{ } clone hand-buttons set-global
     
 : ui-step ( -- )
     do-timers
-    [ layout-queued ] make-hash
-    [ nip dup world-handle [ draw-world ] when ] hash-each
+    [ layout-queued ] make-hash hash-values
+    [ dup world-handle [ draw-world ] [ drop ] if ] each
     10 sleep ;
 
 : close-world ( world -- )

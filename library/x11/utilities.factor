@@ -26,9 +26,11 @@ SYMBOL: root
     dpy get XDefaultScreen scr set
     dpy get scr get XRootWindow root set ;
 
+: close-x ( -- ) dpy get XCloseDisplay drop ;
+    
 : with-x ( display-string quot -- )
     [
         H{ } clone windows set
         swap initialize-x
-        call
+        [ close-x ] cleanup
     ] with-scope ;
