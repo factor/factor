@@ -13,7 +13,6 @@
 + io:
 
 - httpd fep
-- httpd timeouts too quickly?
 - stream server can hang because of exception handler limitations
 - better i/o scheduler
 - out of memory error when printing global namespace
@@ -22,8 +21,14 @@
 
 + ui/help:
 
-- finish x11 backend
-- sometimes clicks come through twice
+- x11:
+  - dealloc glx context, call xfree, etc
+  - input methods
+- cocoa:
+  - global menu bar with useful commands
+  - make the launchpad a palette
+  - expired aliens in view hash
+  - don't multiplex in the event loop if there is no pending i/o
 - hand is broken by design
 - speed up ideas:
   - only do clipping for certain gadgets
@@ -33,7 +38,6 @@
 - saving the image should save window configuration
 - menu drag retarget broken
 - incremental layout flicker
-- expired aliens in view hash
 - changelog in the UI
 - make the UI look better, something like this:
   http://twb.ath.cx/~twb/darcs/OBSOLETE/factor/final.html
@@ -48,7 +52,8 @@
 - better line spacing in ui and html
 - tabular formatting - for inspector and changes
 - grid layout
-- don't multiplex in the event loop if there is no pending i/o
+- variable width word wrap
+- fix top level window positioning
 
 + compiler/ffi:
 
