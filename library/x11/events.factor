@@ -46,8 +46,10 @@ GENERIC: client-event ( event window -- )
     } cond ;
 
 : event-loop ( -- )
-    wait-event dup XAnyEvent-window windows get hash dup
-    [ handle-event ] [ 2drop ] if event-loop ;
+    windows get hash-empty? [
+        wait-event dup XAnyEvent-window windows get hash dup
+        [ handle-event ] [ 2drop ] if event-loop
+    ] unless ;
 
 : char-array>string ( n <char-array> -- string )
     swap >string [ swap char-nth ] map-with ;

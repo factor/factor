@@ -121,4 +121,4 @@ IN: shells
 
 IN: kernel
 
-! : default-shell "DISPLAY" os-env empty? "tty" "ui" ? ;
+: default-shell "DISPLAY" os-env empty? "tty" "ui" ? ;

@@ -8,8 +8,8 @@ USING: kernel parser words compiler sequences ;
     "/library/x11/constants.factor"
     "/library/x11/utilities.factor"
     "/library/x11/events.factor"
-    "/library/x11/windows.factor"
     "/library/x11/glx-utils.factor"
+    "/library/x11/windows.factor"
     "/library/x11/ui.factor"
 } [ run-resource ] each
 
