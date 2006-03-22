@@ -80,25 +80,26 @@ M: object each-slot ( obj quot -- )
     #! something referencing that, and so on.
     [ dupd refers? ] instances nip ;
 
-: seq+ ( n index vector -- )
-    [ nth + ] 2keep set-nth ;
+: hash+ ( n key hash -- )
+    [ hash [ 0 ] unless* + ] 2keep set-hash ;
 
 : heap-stat-step ( counts sizes obj -- )
-    [ dup size swap type rot seq+ ] keep
-    1 swap type rot seq+ ;
+    [ dup size swap class rot hash+ ] keep
+    1 swap class rot hash+ ;
 
 : heap-stats ( -- counts sizes )
     #! Return a list of instance count/total size pairs.
-    num-types 0 <array> num-types 0 <array>
+    H{ } clone H{ } clone
     [ >r 2dup r> heap-stat-step ] each-object ;
 
-: heap-stat. ( { instances bytes type } -- )
-    dup first zero? [
-        dup third type>class pprint ": " write
-        dup second pprint " bytes, " write
-        dup first pprint " instances" print
-    ] unless drop ;
+: heap-stat. ( instances bytes class -- )
+    pprint ": " write
+    pprint " bytes, " write
+    pprint " instances" print ;
 
 : heap-stats. ( -- )
     #! Print heap allocation breakdown.
-    heap-stats dup length 3array flip [ heap-stat. ] each ;
+    heap-stats dup hash-keys natural-sort [
+        ( hash hash key -- )
+        [ [ pick hash ] keep pick hash ] keep heap-stat.
+    ] each 2nip ;
