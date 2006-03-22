@@ -82,5 +82,5 @@ USING: arrays gadgets kernel sequences styles ;
     { 0.0 0.0 0.0 1.0 } over set-label-color
     { "monospace" bold 12 } swap set-label-font ;
 
-: status-theme ( label -- )
-    T{ solid f { 0.9 0.95 1.0 1.0 } } swap set-gadget-interior ;
+: highlight-theme ( label -- )
+    T{ solid f { 1.0 1.0 0.8 1.0 } } swap set-gadget-interior ;

@@ -1,11 +1,12 @@
 IN: gadgets-launchpad
-USING: gadgets gadgets-buttons gadgets-labels gadgets-layouts
-gadgets-listener help inspector io kernel memory namespaces
-sequences ;
+USING: gadgets gadgets-borders gadgets-buttons gadgets-labels
+gadgets-layouts gadgets-listener gadgets-theme help inspector io
+kernel memory namespaces sequences ;
 
 : <launchpad> ( menu -- )
-    [ first2 >r <label> r> <bevel-button> ] map make-pile
-    1 over set-pack-fill ;
+    [ first2 >r <label> [ drop ] r> append <bevel-button> ] map
+    make-pile 1 over set-pack-fill { 5 5 0 } over set-pack-gap
+    <default-border> dup highlight-theme ;
 
 : default-launchpad
     {

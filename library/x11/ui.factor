@@ -79,7 +79,7 @@ M: world key-down-event ( event world -- )
 
 M: world key-up-event ( event world -- ) 2drop ;
 
-: close-box? ( event -- )
+: close-box? ( event -- ? )
     dup XClientMessageEvent-message_type "WM_PROTOCOLS" x-atom =
     swap XClientMessageEvent-data "WM_DELETE_WINDOW" x-atom =
     and ;

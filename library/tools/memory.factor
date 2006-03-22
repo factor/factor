@@ -102,4 +102,4 @@ M: object each-slot ( obj quot -- )
     heap-stats dup hash-keys natural-sort [
         ( hash hash key -- )
         [ [ pick hash ] keep pick hash ] keep heap-stat.
-    ] each 2nip ;
+    ] each 2drop ;

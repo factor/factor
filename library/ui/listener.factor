@@ -44,9 +44,9 @@ TUPLE: listener-gadget pane stack status ;
         print-banner listener
     ] with-stream* ;
 
-: <status-bar> ( -- gadget ) "" <label> dup status-theme ;
+: <status-bar> ( -- gadget ) "" <label> dup highlight-theme ;
 
-: <stack-bar> ( -- gadget ) <shelf> dup status-theme ;
+: <stack-bar> ( -- gadget ) <shelf> dup highlight-theme ;
 
 : <scroller> ( -- gadget )
     <input-pane> dup pane set-global <scroller> ;

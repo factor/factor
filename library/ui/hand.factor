@@ -132,6 +132,12 @@ V{ } clone hand-buttons set-global
     [ dup world-handle [ draw-world ] [ drop ] if ] each
     10 sleep ;
 
+: close-global ( world global -- )
+    dup get-global find-world rot eq?
+    [ f swap set-global ] [ drop ] if ;
+
 : close-world ( world -- )
+    dup hand-clicked close-global
+    dup hand-gadget close-global
     f over request-focus* dup remove-notify
     dup free-fonts f swap set-world-handle ;
