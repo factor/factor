@@ -13,6 +13,7 @@
 + io:
 
 - httpd fep
+- httpd timeouts too quickly?
 - stream server can hang because of exception handler limitations
 - better i/o scheduler
 - out of memory error when printing global namespace

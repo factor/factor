@@ -1,7 +1,13 @@
+! Copyright (C) 2005, 2006 Eduardo Cavazos and Slava Pestov
+! See http://factorcode.org/license.txt for BSD license.
 IN: x11
 USING: arrays errors freetype gadgets gadgets-launchpad
 gadgets-layouts gadgets-listener hashtables kernel
 kernel-internals math namespaces opengl sequences x11 ;
+
+! In the X11 backend, world-handle is a pair { window context }.
+! The window is an X11 window ID, and the context is a
+! GLX context pointer.
 
 M: world expose-event ( event world -- ) nip draw-world ;
 
@@ -23,9 +29,21 @@ M: world motion-event ( event world -- )
 
 M: world key-event ( event world -- ) 2drop ;
 
+: close-box? ( event -- )
+    dup XClientMessageEvent-type "WM_PROTOCOLS" x-atom =
+    swap XClientMessageEvent-data "WM_DELETE_WINDOW" x-atom =
+    and ;
+
+M: world client-event ( event world -- )
+    swap close-box? [
+        dup close-world world-handle destroy-window*
+    ] [
+        drop
+    ] if ;
+
 : gadget-window ( world -- window )
     dup rect-dim first2 choose-visual [
-        create-window 2dup windows get set-hash dup map-window
+        create-window 2dup map-window*
     ] keep create-context 2array swap set-world-handle ;
 
 IN: gadgets

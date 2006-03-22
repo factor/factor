@@ -937,6 +937,7 @@ BEGIN-STRUCT: XClientMessageEvent
 	FIELD: Window window
 	FIELD: Atom message_type
 	FIELD: int format
+    FIELD: long data
 !       union {
 ! 		char  b[20];
 ! 		short s[10];
