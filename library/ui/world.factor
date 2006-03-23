@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 IN: gadgets
 USING: errors freetype gadgets-layouts generic hashtables kernel
-namespaces opengl sequences ;
+math namespaces opengl sequences ;
 
 ! The world gadget is the top level gadget that all (visible)
 ! gadgets are contained in.

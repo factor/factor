@@ -20,6 +20,12 @@ SYMBOL: hand-click-loc
 SYMBOL: hand-buttons
 V{ } clone hand-buttons set-global
 
+: button-gesture ( buttons gesture -- )
+    #! Send a gesture like [ button-down 2 ]; if nobody
+    #! handles it, send [ button-down ].
+    swap hand-clicked get-global 3dup >r add r> handle-gesture
+    [ nip handle-gesture drop ] [ 3drop ] if ;
+
 : drag-gesture ( -- )
     #! Send a gesture like [ drag 2 ]; if nobody handles it,
     #! send [ drag ].
@@ -85,12 +91,6 @@ V{ } clone hand-buttons set-global
     under-hand >r over hand-loc set-global
     pick-up hand-gadget set-global
     under-hand r> hand-gestures update-help ;
-
-: button-gesture ( buttons gesture -- )
-    #! Send a gesture like [ button-down 2 ]; if nobody
-    #! handles it, send [ button-down ].
-    swap hand-clicked get-global 3dup >r add r> handle-gesture
-    [ nip handle-gesture drop ] [ 3drop ] if ;
 
 : update-clicked ( loc world -- )
     move-hand

@@ -33,6 +33,9 @@ H{ } clone views set-global
     #! Cocoa -> Factor UI button mapping
     [buttonNumber] H{ { 0 1 } { 2 2 } { 1 3 } } hash ;
 
+: button&loc ( view event -- button# loc )
+    dup button -rot mouse-location ;
+
 : modifiers
     {
         { "SHIFT" HEX: 10000 }
@@ -67,7 +70,14 @@ H{ } clone views set-global
     >r view world-focus r> dup event>gesture pick handle-gesture
     [ [characters] CF>string swap user-input ] [ 2drop ] if ;
 
-: button... button >r view r> ;
+: send-button-down$ ( view event -- )
+    over >r button&loc r> view send-button-down ;
+
+: send-button-up$ ( view event -- )
+    over >r button&loc r> view send-button-up ;
+
+: send-wheel$ ( view event -- )
+    [ [deltaY] 0 > ] 2keep mouse-location rot view send-wheel ;
 
 "NSOpenGLView" "FactorView" {
     { "drawRect:" "void" { "id" "SEL" "NSRect" }
@@ -91,31 +101,31 @@ H{ } clone views set-global
     }
     
     { "mouseDown:" "void" { "id" "SEL" "id" }
-        [ nip button... send-button-down ]
+        [ nip send-button-down$ ]
     }
     
     { "mouseUp:" "void" { "id" "SEL" "id" }
-        [ nip button... send-button-up ]
+        [ nip send-button-up$ ]
     }
     
     { "rightMouseDown:" "void" { "id" "SEL" "id" }
-        [ nip button... send-button-down ]
+        [ nip send-button-down$ ]
     }
     
     { "rightMouseUp:" "void" { "id" "SEL" "id" }
-        [ nip button... send-button-up ]
+        [ nip send-button-up$ ]
     }
     
     { "otherMouseDown:" "void" { "id" "SEL" "id" }
-        [ nip button... send-button-down ]
+        [ nip send-button-down$ ]
     }
     
     { "otherMouseUp:" "void" { "id" "SEL" "id" }
-        [ nip button... send-button-up ]
+        [ nip send-button-up$ ]
     }
     
     { "scrollWheel:" "void" { "id" "SEL" "id" }
-        [ nip [deltaY] 0 > >r view r> send-scroll-wheel ]
+        [ nip send-wheel$ ]
     }
     
     { "keyDown:" "void" { "id" "SEL" "id" }
@@ -181,6 +191,7 @@ IN: shells
     ] unless
     [
         [
+            init-ui
             launchpad-window
             listener-window
             finish-launching
