@@ -39,7 +39,7 @@ V{ } clone hand-buttons set-global
     dup hand-buttons get-global delete
     [ button-up ] button-gesture ;
 
-: send-scroll-wheel ( up/down -- )
+: send-wheel ( up/down -- )
     [ wheel-up ] [ wheel-down ] ?
     hand-gadget get-global handle-gesture drop ;
 

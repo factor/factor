@@ -10,6 +10,8 @@ GENERIC: button-down-event ( event window -- )
 
 GENERIC: button-up-event ( event window -- )
 
+GENERIC: wheel-event ( event window -- )
+
 GENERIC: motion-event ( event window -- )
 
 GENERIC: key-down-event ( event window -- )
@@ -33,11 +35,19 @@ GENERIC: client-event ( event window -- )
     QueuedAfterFlush events-queued 0 >
     [ next-event ] [ ui-step wait-event ] if ;
 
+: wheel? ( event -- ? ) XButtonEvent-button { 4 5 } member? ;
+
+: button-down-event$ ( event window -- )
+    over wheel? [ wheel-event ] [ button-down-event ] if ;
+
+: button-up-event$ ( event window -- )
+    over wheel? [ 2drop ] [ button-up-event ] if ;
+
 : handle-event ( event window -- )
     over XAnyEvent-type {
         { [ dup ConfigureNotify = ] [ drop resize-event ] }
-        { [ dup ButtonPress = ] [ drop button-down-event ] }
-        { [ dup ButtonRelease = ] [ drop button-up-event ] }
+        { [ dup ButtonPress = ] [ drop button-down-event$ ] }
+        { [ dup ButtonRelease = ] [ drop button-up-event$ ] }
         { [ dup MotionNotify = ] [ drop motion-event ] }
         { [ dup KeyPress = ] [ drop key-down-event ] }
         { [ dup KeyRelease = ] [ drop key-up-event ] }

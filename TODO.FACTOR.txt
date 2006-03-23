@@ -21,6 +21,7 @@
 
 + ui/help:
 
+- collapsing an outliner is broken
 - x11:
   - dealloc glx context, call xfree, etc
   - input methods
@@ -30,6 +31,7 @@
   - expired aliens in view hash
   - don't multiplex in the event loop if there is no pending i/o
 - hand is broken by design
+  - maybe eliminate mouse-overs...?
 - speed up ideas:
   - only do clipping for certain gadgets
   - use glRect
