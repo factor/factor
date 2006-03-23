@@ -12,7 +12,8 @@ USING: alien hashtables kernel math namespaces sequences ;
     XCreateColormap ;
 
 : event-mask ( -- n )
-    StructureNotifyMask
+    ExposureMask
+    StructureNotifyMask bitor
     KeyPressMask bitor
     KeyReleaseMask bitor
     ButtonPressMask	bitor

@@ -4,6 +4,8 @@ IN: x11
 USING: alien arrays errors gadgets hashtables io kernel math
 namespaces prettyprint sequences strings threads ;
 
+GENERIC: expose-event ( event window -- )
+
 GENERIC: resize-event ( event window -- )
 
 GENERIC: button-down-event ( event window -- )
@@ -45,6 +47,7 @@ GENERIC: client-event ( event window -- )
 
 : handle-event ( event window -- )
     over XAnyEvent-type {
+        { [ dup Expose = ] [ drop expose-event ] }
         { [ dup ConfigureNotify = ] [ drop resize-event ] }
         { [ dup ButtonPress = ] [ drop button-down-event$ ] }
         { [ dup ButtonRelease = ] [ drop button-up-event$ ] }

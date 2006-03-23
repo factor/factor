@@ -10,6 +10,8 @@ strings x11 ;
 ! The window is an X11 window ID, and the context is a
 ! GLX context pointer.
 
+M: world expose-event ( event world -- ) nip relayout ;
+
 M: world resize-event ( event world -- )
     >r
     dup XConfigureEvent-width swap XConfigureEvent-height 0
