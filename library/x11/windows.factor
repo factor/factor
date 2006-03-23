@@ -34,14 +34,15 @@ USING: alien hashtables kernel math namespaces sequences ;
     window-attributes XCreateWindow ;
     
 : glx-window ( dim -- window context )
-    first2 choose-visual [ create-window ] keep create-context ;
+    first2 choose-visual
+    [ [ create-window ] keep create-context ] keep XFree ;
 
 : destroy-window ( win -- )
     dpy get swap XDestroyWindow drop ;
 
-: destroy-window* ( win -- )
-    dup windows get remove-hash destroy-window ;
-    
+: destroy-window* ( win context -- )
+    destroy-context dup windows get remove-hash destroy-window ;
+
 : set-closable ( win -- )
     dpy get swap "WM_DELETE_WINDOW" x-atom <Atom> 1
     XSetWMProtocols drop ;

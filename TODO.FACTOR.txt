@@ -23,7 +23,7 @@
 
 - collapsing an outliner is broken
 - x11:
-  - dealloc glx context, call xfree, etc
+  - title bars are funny
   - input methods
 - cocoa:
   - global menu bar with useful commands

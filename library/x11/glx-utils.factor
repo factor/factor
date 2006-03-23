@@ -16,3 +16,6 @@ USING: alien arrays errors kernel namespaces sequences ;
 : create-context ( XVisualInfo* -- GLXContext )
     >r dpy get r> f 1 glXCreateContext
     [ "Failed to create GLX context" throw ] unless* ;
+    
+: destroy-context ( GLXContext -- )
+    dpy get swap glXDestroyContext ;

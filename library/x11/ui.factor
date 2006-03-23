@@ -92,7 +92,9 @@ M: world key-up-event ( event world -- ) 2drop ;
 
 M: world client-event ( event world -- )
     swap close-box? [
-        dup world-handle first >r close-world r> destroy-window*
+        dup world-handle
+        >r close-world
+        r> first2 destroy-window*
     ] [
         drop
     ] if ;

@@ -1317,5 +1317,9 @@ FUNCTION: Status XSetStandardProperties (
 : PropModePrepend         1 ; inline
 : PropModeAppend          2 ; inline
     
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 ! The rest of the stuff is not from the book.
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+FUNCTION: void XFree ( void* data ) ;
 FUNCTION: int XStoreName ( Display* display, Window w, char* window_name ) ;
