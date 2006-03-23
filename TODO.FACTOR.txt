@@ -36,10 +36,8 @@
   - only do clipping for certain gadgets
   - use glRect
   - display lists
-- add some padding to launchpad ui
 - saving the image should save window configuration
 - menu drag retarget broken
-- incremental layout flicker
 - changelog in the UI
 - make the UI look better, something like this:
   http://twb.ath.cx/~twb/darcs/OBSOLETE/factor/final.html

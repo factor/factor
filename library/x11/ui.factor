@@ -18,15 +18,20 @@ M: world resize-event ( event world -- )
     3array
     r> set-gadget-dim ;
 
+: button&loc ( event -- button# loc )
+    dup XButtonEvent-button
+    over XButtonEvent-x
+    rot XButtonEvent-y 0 3array ;
+
 M: world button-down-event ( event world -- )
-    drop XButtonEvent-button send-button-down ;
+    >r button&loc r> send-button-down ;
 
 M: world button-up-event ( event world -- )
-    drop XButtonEvent-button send-button-up ;
+    >r button&loc r> send-button-up ;
 
 M: world wheel-event ( event world -- )
-    drop XButtonEvent-button
-    H{ { 4 -1 } { 5 1 } } hash send-wheel ;
+    >r button&loc >r H{ { 4 -1 } { 5 1 } } hash r>
+    r> send-wheel ;
 
 M: world motion-event ( event world -- )
     >r dup XMotionEvent-x swap XMotionEvent-y 0 3array r>

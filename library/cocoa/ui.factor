@@ -67,6 +67,8 @@ H{ } clone views set-global
     >r view world-focus r> dup event>gesture pick handle-gesture
     [ [characters] CF>string swap user-input ] [ 2drop ] if ;
 
+: button... button >r view r> ;
+
 "NSOpenGLView" "FactorView" {
     { "drawRect:" "void" { "id" "SEL" "NSRect" }
         [ 2drop view draw-world ]
@@ -89,31 +91,31 @@ H{ } clone views set-global
     }
     
     { "mouseDown:" "void" { "id" "SEL" "id" }
-        [ 2nip button send-button-down ]
+        [ nip button... send-button-down ]
     }
     
     { "mouseUp:" "void" { "id" "SEL" "id" }
-        [ 2nip button send-button-up ]
+        [ nip button... send-button-up ]
     }
     
     { "rightMouseDown:" "void" { "id" "SEL" "id" }
-        [ 2nip button send-button-down ]
+        [ nip button... send-button-down ]
     }
     
     { "rightMouseUp:" "void" { "id" "SEL" "id" }
-        [ 2nip button send-button-up ]
+        [ nip button... send-button-up ]
     }
     
     { "otherMouseDown:" "void" { "id" "SEL" "id" }
-        [ 2nip button send-button-down ]
+        [ nip button... send-button-down ]
     }
     
     { "otherMouseUp:" "void" { "id" "SEL" "id" }
-        [ 2nip button send-button-up ]
+        [ nip button... send-button-up ]
     }
     
     { "scrollWheel:" "void" { "id" "SEL" "id" }
-        [ 2nip [deltaY] 0 > send-scroll-wheel ]
+        [ nip [deltaY] 0 > >r view r> send-scroll-wheel ]
     }
     
     { "keyDown:" "void" { "id" "SEL" "id" }

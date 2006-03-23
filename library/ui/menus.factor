@@ -6,7 +6,8 @@ gadgets-labels gadgets-theme generic kernel lists math
 namespaces sequences ;
 
 : retarget-click ( gadget -- )
-    find-world dup hide-glass update-hand update-clicked ;
+    find-world dup hide-glass
+    hand-loc get-global swap move-hand update-clicked ;
 
 : menu-actions ( glass -- )
     [ retarget-click ] [ button-down ] set-action ;

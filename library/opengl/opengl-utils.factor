@@ -33,6 +33,9 @@ sequences ;
 : four-sides ( dim -- )
     dup top-left dup top-right dup bottom-right bottom-left ;
 
+: gl-line ( a b -- )
+    GL_LINES [ gl-vertex gl-vertex ] do-state ;
+
 : gl-fill-rect ( dim -- )
     #! Draws a two-dimensional box.
     GL_QUADS [ four-sides ] do-state ;
