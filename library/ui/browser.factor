@@ -44,10 +44,14 @@ M: book layout* ( book -- )
     >r swap hash-keys natural-sort
     [ swap <tab> ] map-with r> add-gadgets ;
 
-TUPLE: browser history tabs ;
+TUPLE: browser object history tabs ;
+
+: save-current ( browser -- )
+    dup browser-object swap browser-history push ;
 
 : browse ( obj browser -- )
-    [ browser-history push ] keep
+    [ set-browser-object ] 2keep
+    dup browser-tabs clear-gadget
     >r component-pages dup component-book r>
     [ @center frame-add ] 2keep browser-tabs tabs ;
 
@@ -69,13 +73,16 @@ C: browser ( obj -- browser )
 TUPLE: browser-button object ;
 
 : in-browser ( obj -- )
-    [ <browser> "Browser: " ] keep unparse-short append
-    simple-window ;
+    <browser> "Browser" simple-window ;
+
+: browser-button-action ( button -- )
+    [ browser-button-object ] keep find-browser
+    [ dup save-current browse ] [ in-browser ] if* ;
 
 C: browser-button ( gadget object -- button )
     [ set-browser-button-object ] keep
     [
-        >r [ browser-button-object in-browser ] <roll-button> r>
+        >r [ browser-button-action ] <roll-button> r>
         set-gadget-delegate
     ] keep ;
 

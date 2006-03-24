@@ -39,7 +39,6 @@
 - make the UI look better, something like this:
   http://twb.ath.cx/~twb/darcs/OBSOLETE/factor/final.html
 - fix remaining HTML stream issues
-- UI browser pane needs 'back' button
 - fix up the min thumb size hack
 - help cross-referencing
 - document FFI
