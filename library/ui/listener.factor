@@ -9,12 +9,6 @@ namespaces parser prettyprint sequences threads words ;
 
 TUPLE: listener-gadget pane stack status ;
 
-: in-browser ( quot -- )
-    make-pane <scroller> "Browser" simple-window ; inline
-
-: in-listener ( quot -- )
-    pane get pane-call ; inline
-
 : usable-words ( -- words )
     use get hash-concat hash-values ;
 
@@ -48,11 +42,8 @@ TUPLE: listener-gadget pane stack status ;
 
 : <stack-bar> ( -- gadget ) <shelf> dup highlight-theme ;
 
-: <scroller> ( -- gadget )
-    <input-pane> dup pane set-global <scroller> ;
-
 C: listener-gadget ( -- gadget )
-    <frame> over set-delegate
+    dup delegate>frame
     <input-pane> dup pick set-listener-gadget-pane
     <scroller> over @center frame-add
     <status-bar> dup pick set-listener-gadget-status

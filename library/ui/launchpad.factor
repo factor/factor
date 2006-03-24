@@ -1,21 +1,31 @@
 IN: gadgets-launchpad
-USING: gadgets gadgets-borders gadgets-buttons gadgets-labels
-gadgets-layouts gadgets-listener gadgets-theme help inspector io
-kernel memory namespaces sequences ;
+USING: gadgets gadgets-browser gadgets-borders gadgets-buttons
+gadgets-labels gadgets-layouts gadgets-listener gadgets-panes
+gadgets-scrolling gadgets-theme help inspector io kernel memory
+namespaces sequences ; 
 
 : <launchpad> ( menu -- )
     [ first2 >r <label> [ drop ] r> append <bevel-button> ] map
     make-pile 1 over set-pack-fill { 5 5 0 } over set-pack-gap
     <default-border> dup highlight-theme ;
 
+: scratch-window ( quot -- )
+    make-pane <scroller> "Scratch" simple-window ;
+
+: handbook-window ( -- )
+    T{ link f "handbook" } in-browser ;
+
+: tutorial-window ( -- )
+    T{ link f "tutorial" } in-browser ;
+
 : default-launchpad
     {
         { "Listener" [ listener-window ] }
-        { "Documentation" [ [ handbook ] in-browser ] }
-        { "Tutorial" [ [ tutorial ] in-browser ] }
-        { "Vocabularies" [ [ vocabs. ] in-browser ] }
-        { "Globals" [ [ global describe ] in-browser ] }
-        { "Memory" [ [ heap-stats. terpri room. ] in-browser ] }
+        { "Documentation" [ handbook-window ] }
+        { "Tutorial" [ tutorial-window ] }
+        { "Vocabularies" [ [ vocabs. ] scratch-window ] }
+        { "Globals" [ global in-browser ] }
+        { "Memory" [ [ heap-stats. terpri room. ] scratch-window ] }
         { "Save image" [ save ] }
         { "Exit" [ 0 exit ] }
     } <launchpad> ;

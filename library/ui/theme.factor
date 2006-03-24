@@ -70,10 +70,6 @@ USING: arrays gadgets kernel sequences styles ;
 : reverse-video-theme ( gadget -- )
     solid-black swap set-gadget-interior ;
 
-: menu-theme ( menu -- )
-    dup solid-boundary
-    T{ solid f { 0.9 0.9 0.9 0.9 } } swap set-gadget-interior ;
-
 : label-theme ( label -- )
     { 0.0 0.0 0.0 1.0 } over set-label-color
     { "monospace" plain 12 } swap set-label-font ;
@@ -83,4 +79,4 @@ USING: arrays gadgets kernel sequences styles ;
     { "monospace" bold 12 } swap set-label-font ;
 
 : highlight-theme ( label -- )
-    T{ solid f { 1.0 1.0 0.8 1.0 } } swap set-gadget-interior ;
+    T{ solid f { 0.7 0.7 0.7 1.0 } } swap set-gadget-interior ;

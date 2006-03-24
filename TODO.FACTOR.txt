@@ -36,7 +36,6 @@
   - use glRect
   - display lists
 - saving the image should save window configuration
-- menu drag retarget broken
 - changelog in the UI
 - make the UI look better, something like this:
   http://twb.ath.cx/~twb/darcs/OBSOLETE/factor/final.html

@@ -102,6 +102,7 @@ vectors words ;
 
         "/library/tools/annotations.factor"
         "/library/tools/inspector.factor"
+        "/library/tools/components.factor"
         
         "/library/test/test.factor"
 
@@ -177,7 +178,6 @@ vectors words ;
         "/library/ui/line-editor.factor"
         "/library/ui/sliders.factor"
         "/library/ui/scrolling.factor"
-        "/library/ui/menus.factor"
         "/library/ui/editors.factor"
         "/library/ui/splitters.factor"
         "/library/ui/incremental.factor"
@@ -185,11 +185,9 @@ vectors words ;
         "/library/ui/panes.factor"
         "/library/ui/outliner.factor"
         "/library/ui/listener.factor"
+        "/library/ui/browser.factor"
         "/library/ui/launchpad.factor"
-        "/library/ui/commands.factor"
         "/library/ui/presentations.factor"
-
-        "/library/help/commands.factor"
 
         "/library/continuations.facts"
         "/library/errors.facts"

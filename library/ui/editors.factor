@@ -2,7 +2,7 @@
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: gadgets-editors
 USING: arrays freetype gadgets gadgets-labels gadgets-layouts
-gadgets-menus gadgets-scrolling gadgets-theme generic kernel
+gadgets-scrolling gadgets-theme generic kernel
 lists math namespaces sequences strings styles threads ;
 
 ! A blinking caret
@@ -76,12 +76,13 @@ TUPLE: editor line caret font color ;
 : <completion-item> ( completion editor -- menu-item )
     dupd [ [ complete ] with-editor drop ] curry curry 2array ;
 
-: <completion-menu> ( editor completions -- menu )
-    [ swap <completion-item> ] map-with <menu> ;
+! : <completion-menu> ( editor completions -- menu )
+!     [ swap <completion-item> ] map-with <menu> ;
 
 : completion-menu ( editor completions -- )
-    over popup-location -rot
-    over >r <completion-menu> r> show-menu ;
+    2drop ;
+!    over popup-location -rot
+!    over >r <completion-menu> r> show-menu ;
 
 : do-completion-1 ( editor completions -- )
     swap [ first complete ] with-editor ;
