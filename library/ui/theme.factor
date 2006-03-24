@@ -79,4 +79,4 @@ USING: arrays gadgets kernel sequences styles ;
     { "monospace" bold 12 } swap set-label-font ;
 
 : highlight-theme ( label -- )
-    T{ solid f { 0.7 0.7 0.7 1.0 } } swap set-gadget-interior ;
+    T{ solid f { 0.8 0.8 0.8 1.0 } } swap set-gadget-interior ;

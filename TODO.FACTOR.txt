@@ -6,7 +6,7 @@
 - amd64 %box-struct
 - x86 %box-struct
 - x86 %write-barrier
-- statically link freetype on OS X
+- bundle freetype .dylib in the .app on OS X
 - when generating a 32-bit image on a 64-bit system, large numbers which should
   be bignums become fixnums
 
@@ -21,7 +21,6 @@
 
 + ui/help:
 
-- collapsing an outliner is broken
 - x11:
   - title bars are funny
   - input methods

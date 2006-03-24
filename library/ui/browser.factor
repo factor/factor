@@ -1,3 +1,5 @@
+! Copyright (C) 2006 Slava Pestov.
+! See http://factorcode.org/license.txt for BSD license.
 IN: gadgets-browser
 USING: components gadgets gadgets-buttons gadgets-labels
 gadgets-layouts gadgets-panes gadgets-scrolling gadgets-theme
@@ -38,20 +40,31 @@ M: book layout* ( book -- )
     dupd [ show-page ] curry curry
     >r <label> r> <bevel-button> ;
 
-: tabs ( hash book -- gadget )
-    swap hash-keys natural-sort
-    [ swap <tab> ] map-with make-pile
-    1 over set-pack-fill dup highlight-theme ;
+: tabs ( hash book gadget -- )
+    >r swap hash-keys natural-sort
+    [ swap <tab> ] map-with r> add-gadgets ;
 
-TUPLE: browser history ;
+TUPLE: browser history tabs ;
 
 : browse ( obj browser -- )
-    swap component-pages
-    [ component-book dup pick @center frame-add ] keep
-    swap tabs over @left frame-add ;
+    [ browser-history push ] keep
+    >r component-pages dup component-book r>
+    [ @center frame-add ] 2keep browser-tabs tabs ;
+
+: find-browser [ browser? ] find-parent ;
+
+: browse-back ( browser -- )
+    dup browser-history dup empty?
+    [ 2drop ] [ pop swap browse ] if ;
 
 C: browser ( obj -- browser )
-    dup delegate>frame [ browse ] keep ;
+    V{ } clone over set-browser-history
+    dup delegate>frame [
+        "<" <label> [ find-browser browse-back ] <bevel-button> ,
+        <shelf> dup pick set-browser-tabs ,
+    ] { } make make-shelf dup highlight-theme
+    over @top frame-add
+    [ browse ] keep ;
 
 TUPLE: browser-button object ;
 

@@ -1,3 +1,5 @@
+! Copyright (C) 2005, 2006 Slava Pestov.
+! See http://factorcode.org/license.txt for BSD license.
 IN: help
 USING: arrays hashtables io kernel namespaces ;
 
