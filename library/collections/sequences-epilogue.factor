@@ -106,6 +106,9 @@ M: object reverse ( seq -- seq ) [ <reversed> ] keep like ;
     pick over bounds-check 2drop 2dup bounds-check 2drop
     exchange-unsafe ;
 
+: assoc ( key assoc -- value ) 
+    [ first = ] find-with nip second ;
+
 IN: kernel
 
 M: object <=>

@@ -1,24 +1,21 @@
 IN: components
-USING: help inspector kernel namespaces sequences words ;
-
-! Component document framework, like OpenDoc.
-
-TUPLE: component name predicate builder ;
+USING: hashtables help inspector kernel namespaces sequences
+words ;
 
 SYMBOL: components
 
-V{ } clone components set-global
+H{ } clone components set-global
 
-: get-components ( obj -- seq )
-    components get-global
-    [ component-predicate call ] subset-with ;
+: get-components ( class -- assoc )
+    components get-global hash [ { } ] unless*
+    { "Slots" [ describe ] } append ;
 
-: define-component ( name predicate builder -- )
-    <component> components get-global push ;
+{
+    { "Definition" [ help ] }
+    { "Calls in" [ usage. ] }
+    { "Calls out" [ uses. ] }
+} word components get-global set-hash
 
-"Slots" [ drop t ] [ describe ] define-component
-"Documentation" [ word? ] [ help ] define-component
-"Calls in" [ word? ] [ usage. ] define-component
-"Calls out" [ word? ] [ uses. ] define-component
-"Definition" [ term? ] [ help ] define-component
-"Documentation" [ link? ] [ help ] define-component
+{
+    { "Documentation" [ help ] }
+} link components get-global set-hash

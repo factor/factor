@@ -79,8 +79,6 @@ M: cons = ( obj cons -- ? )
 
 : curry ( obj quot -- quot ) >r literalize r> cons ;
 
-: assoc ( key alist -- value ) [ car = ] find-with nip cdr ;
-
 : (>list) ( n i seq -- list )
     pick pick <= [
         3drop [ ]
