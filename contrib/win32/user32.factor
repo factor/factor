@@ -635,7 +635,7 @@ FUNCTION: LRESULT DefWindowProcW ( HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lP
 ! FUNCTION: DestroyIcon
 ! FUNCTION: DestroyMenu
 ! FUNCTION: DestroyReasons
-! FUNCTION: DestroyWindow
+FUNCTION: BOOL DestroyWindow ( HWND hWnd ) ;
 ! FUNCTION: DeviceEventWorker
 ! FUNCTION: DialogBoxIndirectParamA
 ! FUNCTION: DialogBoxIndirectParamAorW

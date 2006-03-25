@@ -18,3 +18,4 @@ USING: alien compiler kernel parser sequences words ;
     "clipboard"
     "ui"
 } [ "/contrib/win32/" swap ".factor" append3 run-resource ] each
+compile-all

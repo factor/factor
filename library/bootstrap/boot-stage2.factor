@@ -48,6 +48,10 @@ recrossref
     "x11" get [
         "/library/x11/load.factor" run-resource
     ] when
+
+    windows? [
+        "/contrib/win32/load.factor" run-resource
+    ] when
 ] when
 
 [
