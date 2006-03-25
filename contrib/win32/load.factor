@@ -8,10 +8,13 @@ USING: alien compiler kernel parser sequences words ;
 } [ first2 add-simple-library ] each
 
 { 
-    "utils"
+    "windows-messages"
     "types"
     "gdi32"
     "kernel32"
     "user32"
-    "examples"
+    "opengl32"
+    "utils"
+    "clipboard"
+    "ui"
 } [ "/contrib/win32/" swap ".factor" append3 run-resource ] each

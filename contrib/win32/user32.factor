@@ -1,5 +1,5 @@
-IN: win32
 USING: alien parser namespaces kernel syntax words math io prettyprint ;
+IN: win32
 
 
 TYPEDEF: void* MSGBOXPARAMSA
@@ -49,16 +49,30 @@ TYPEDEF: void* MSGBOXPARAMSW
 
 ! Extended window styles
 
-: WS_EX_DLGMODALFRAME     HEX: 00000001 ;
-: WS_EX_NOPARENTNOTIFY    HEX: 00000004 ;
-: WS_EX_TOPMOST           HEX: 00000008 ;
-: WS_EX_ACCEPTFILES       HEX: 00000010 ;
-: WS_EX_TRANSPARENT       HEX: 00000020 ;
-: WS_EX_MDICHILD          HEX: 00000040 ;
-: WS_EX_TOOLWINDOW        HEX: 00000080 ;
-: WS_EX_WINDOWEDGE        HEX: 00000100 ;
-: WS_EX_CLIENTEDGE        HEX: 00000200 ;
-: WS_EX_CONTEXTHELP       HEX: 00000400 ;
+: WS_EX_DLGMODALFRAME     HEX: 00000001 ; inline
+: WS_EX_NOPARENTNOTIFY    HEX: 00000004 ; inline
+: WS_EX_TOPMOST           HEX: 00000008 ; inline
+: WS_EX_ACCEPTFILES       HEX: 00000010 ; inline
+: WS_EX_TRANSPARENT       HEX: 00000020 ; inline
+: WS_EX_MDICHILD          HEX: 00000040 ; inline
+: WS_EX_TOOLWINDOW        HEX: 00000080 ; inline
+: WS_EX_WINDOWEDGE        HEX: 00000100 ; inline
+: WS_EX_CLIENTEDGE        HEX: 00000200 ; inline
+: WS_EX_CONTEXTHELP       HEX: 00000400 ; inline
+
+: WS_EX_RIGHT             HEX: 00001000 ; inline
+: WS_EX_LEFT              HEX: 00000000 ; inline
+: WS_EX_RTLREADING        HEX: 00002000 ; inline
+: WS_EX_LTRREADING        HEX: 00000000 ; inline
+: WS_EX_LEFTSCROLLBAR     HEX: 00004000 ; inline
+: WS_EX_RIGHTSCROLLBAR    HEX: 00000000 ; inline
+: WS_EX_CONTROLPARENT     HEX: 00010000 ; inline
+: WS_EX_STATICEDGE        HEX: 00020000 ; inline
+: WS_EX_APPWINDOW         HEX: 00040000 ; inline
+: WS_EX_OVERLAPPEDWINDOW WS_EX_WINDOWEDGE WS_EX_CLIENTEDGE bitor ; inline
+: WS_EX_PALETTEWINDOW
+    WS_EX_WINDOWEDGE WS_EX_TOOLWINDOW bitor WS_EX_TOPMOST bitor ; inline
+
 
 : CS_VREDRAW          HEX: 0001 ;
 : CS_HREDRAW          HEX: 0002 ;
@@ -118,29 +132,35 @@ TYPEDEF: void* MSGBOXPARAMSW
 : SW_FORCEMINIMIZE    11 ;
 : SW_MAX              11 ;
 
+! PeekMessage
+: PM_NOREMOVE   0 ;
+: PM_REMOVE     1 ;
+: PM_NOYIELD    2 ;
+! : PM_QS_INPUT         (QS_INPUT << 16) ;
+! : PM_QS_POSTMESSAGE   ((QS_POSTMESSAGE | QS_HOTKEY | QS_TIMER) << 16) ;
+! : PM_QS_PAINT         (QS_PAINT << 16) ;
+! : PM_QS_SENDMESSAGE   (QS_SENDMESSAGE << 16) ;
 
 
-: MAKEINTRESOURCE ( int -- something )
-    ;
 ! 
 ! Standard Cursor IDs
 !
-: IDC_ARROW           32512 MAKEINTRESOURCE ;
-: IDC_IBEAM           32513 MAKEINTRESOURCE ;
-: IDC_WAIT            32514 MAKEINTRESOURCE ;
-: IDC_CROSS           32515 MAKEINTRESOURCE ;
-: IDC_UPARROW         32516 MAKEINTRESOURCE ;
-: IDC_SIZE            32640 MAKEINTRESOURCE ; ! OBSOLETE: use IDC_SIZEALL
-: IDC_ICON            32641 MAKEINTRESOURCE ; ! OBSOLETE: use IDC_ARROW
-: IDC_SIZENWSE        32642 MAKEINTRESOURCE ;
-: IDC_SIZENESW        32643 MAKEINTRESOURCE ;
-: IDC_SIZEWE          32644 MAKEINTRESOURCE ;
-: IDC_SIZENS          32645 MAKEINTRESOURCE ;
-: IDC_SIZEALL         32646 MAKEINTRESOURCE ;
-: IDC_NO              32648 MAKEINTRESOURCE ; ! not in win3.1
-: IDC_HAND            32649 MAKEINTRESOURCE ;
-: IDC_APPSTARTING     32650 MAKEINTRESOURCE ; ! not in win3.1
-: IDC_HELP            32651 MAKEINTRESOURCE ;
+: IDC_ARROW           32512 ;
+: IDC_IBEAM           32513 ;
+: IDC_WAIT            32514 ;
+: IDC_CROSS           32515 ;
+: IDC_UPARROW         32516 ;
+: IDC_SIZE            32640 ; ! OBSOLETE: use IDC_SIZEALL
+: IDC_ICON            32641 ; ! OBSOLETE: use IDC_ARROW
+: IDC_SIZENWSE        32642 ;
+: IDC_SIZENESW        32643 ;
+: IDC_SIZEWE          32644 ;
+: IDC_SIZENS          32645 ;
+: IDC_SIZEALL         32646 ;
+: IDC_NO              32648 ; ! not in win3.1
+: IDC_HAND            32649 ;
+: IDC_APPSTARTING     32650 ; ! not in win3.1
+: IDC_HELP            32651 ;
 
 
 
@@ -193,14 +213,237 @@ TYPEDEF: void* MSGBOXPARAMSW
 : WM_ACTIVATE                     6 ; inline
 
 
+! Virtual Keys, Standard Set
+: VK_LBUTTON        HEX: 01 ; inline
+: VK_RBUTTON        HEX: 02 ; inline
+: VK_CANCEL         HEX: 03 ; inline
+: VK_MBUTTON        HEX: 04 ; inline  ! NOT contiguous with L & RBUTTON
+: VK_XBUTTON1       HEX: 05 ; inline  ! NOT contiguous with L & RBUTTON
+: VK_XBUTTON2       HEX: 06 ; inline  ! NOT contiguous with L & RBUTTON
+! 0x07 : unassigned
+: VK_BACK           HEX: 08 ; inline
+: VK_TAB            HEX: 09 ; inline
+! 0x0A - 0x0B : reserved
+
+: VK_CLEAR          HEX: 0C ; inline
+: VK_RETURN         HEX: 0D ; inline
+
+: VK_SHIFT          HEX: 10 ; inline
+: VK_CONTROL        HEX: 11 ; inline
+: VK_MENU           HEX: 12 ; inline
+: VK_PAUSE          HEX: 13 ; inline
+: VK_CAPITAL        HEX: 14 ; inline
+
+: VK_KANA           HEX: 15 ; inline
+: VK_HANGEUL        HEX: 15 ; inline ! old name - here for compatibility
+: VK_HANGUL         HEX: 15 ; inline
+: VK_JUNJA          HEX: 17 ; inline
+: VK_FINAL          HEX: 18 ; inline
+: VK_HANJA          HEX: 19 ; inline
+: VK_KANJI          HEX: 19 ; inline
+
+: VK_ESCAPE         HEX: 1B ; inline
+
+: VK_CONVERT        HEX: 1C ; inline
+: VK_NONCONVERT     HEX: 1D ; inline
+: VK_ACCEPT         HEX: 1E ; inline
+: VK_MODECHANGE     HEX: 1F ; inline
+
+: VK_SPACE          HEX: 20 ; inline
+: VK_PRIOR          HEX: 21 ; inline
+: VK_NEXT           HEX: 22 ; inline
+: VK_END            HEX: 23 ; inline
+: VK_HOME           HEX: 24 ; inline
+: VK_LEFT           HEX: 25 ; inline
+: VK_UP             HEX: 26 ; inline
+: VK_RIGHT          HEX: 27 ; inline
+: VK_DOWN           HEX: 28 ; inline
+: VK_SELECT         HEX: 29 ; inline
+: VK_PRINT          HEX: 2A ; inline
+: VK_EXECUTE        HEX: 2B ; inline
+: VK_SNAPSHOT       HEX: 2C ; inline
+: VK_INSERT         HEX: 2D ; inline
+: VK_DELETE         HEX: 2E ; inline
+: VK_HELP           HEX: 2F ; inline
+
+! VK_0 - VK_9 are the same as ASCII '0' - '9' (0x30 - 0x39)
+! 0x40 : unassigned
+! VK_A - VK_Z are the same as ASCII 'A' - 'Z' (0x41 - 0x5A)
+
+: VK_LWIN           HEX: 5B ; inline
+: VK_RWIN           HEX: 5C ; inline
+: VK_APPS           HEX: 5D ; inline
+
+! 0x5E : reserved
+
+: VK_SLEEP          HEX: 5F ; inline
+
+: VK_NUMPAD0        HEX: 60 ; inline
+: VK_NUMPAD1        HEX: 61 ; inline
+: VK_NUMPAD2        HEX: 62 ; inline
+: VK_NUMPAD3        HEX: 63 ; inline
+: VK_NUMPAD4        HEX: 64 ; inline
+: VK_NUMPAD5        HEX: 65 ; inline
+: VK_NUMPAD6        HEX: 66 ; inline
+: VK_NUMPAD7        HEX: 67 ; inline
+: VK_NUMPAD8        HEX: 68 ; inline
+: VK_NUMPAD9        HEX: 69 ; inline
+: VK_MULTIPLY       HEX: 6A ; inline
+: VK_ADD            HEX: 6B ; inline
+: VK_SEPARATOR      HEX: 6C ; inline
+: VK_SUBTRACT       HEX: 6D ; inline
+: VK_DECIMAL        HEX: 6E ; inline
+: VK_DIVIDE         HEX: 6F ; inline
+: VK_F1             HEX: 70 ; inline
+: VK_F2             HEX: 71 ; inline
+: VK_F3             HEX: 72 ; inline
+: VK_F4             HEX: 73 ; inline
+: VK_F5             HEX: 74 ; inline
+: VK_F6             HEX: 75 ; inline
+: VK_F7             HEX: 76 ; inline
+: VK_F8             HEX: 77 ; inline
+: VK_F9             HEX: 78 ; inline
+: VK_F10            HEX: 79 ; inline
+: VK_F11            HEX: 7A ; inline
+: VK_F12            HEX: 7B ; inline
+: VK_F13            HEX: 7C ; inline
+: VK_F14            HEX: 7D ; inline
+: VK_F15            HEX: 7E ; inline
+: VK_F16            HEX: 7F ; inline
+: VK_F17            HEX: 80 ; inline
+: VK_F18            HEX: 81 ; inline
+: VK_F19            HEX: 82 ; inline
+: VK_F20            HEX: 83 ; inline
+: VK_F21            HEX: 84 ; inline
+: VK_F22            HEX: 85 ; inline
+: VK_F23            HEX: 86 ; inline
+: VK_F24            HEX: 87 ; inline
+
+! 0x88 - 0x8F : unassigned
+
+: VK_NUMLOCK        HEX: 90 ; inline
+: VK_SCROLL         HEX: 91 ; inline
+
+! NEC PC-9800 kbd definitions
+: VK_OEM_NEC_EQUAL  HEX: 92 ; inline  ! '=' key on numpad
+
+! Fujitsu/OASYS kbd definitions
+: VK_OEM_FJ_JISHO   HEX: 92 ; inline  ! 'Dictionary' key
+: VK_OEM_FJ_MASSHOU HEX: 93 ; inline  ! 'Unregister word' key
+: VK_OEM_FJ_TOUROKU HEX: 94 ; inline  ! 'Register word' key
+: VK_OEM_FJ_LOYA    HEX: 95 ; inline  ! 'Left OYAYUBI' key
+: VK_OEM_FJ_ROYA    HEX: 96 ; inline  ! 'Right OYAYUBI' key
+
+! 0x97 - 0x9F : unassigned
+
+! VK_L* & VK_R* - left and right Alt, Ctrl and Shift virtual keys.
+! Used only as parameters to GetAsyncKeyState() and GetKeyState().
+! No other API or message will distinguish left and right keys in this way.
+: VK_LSHIFT         HEX: A0 ; inline
+: VK_RSHIFT         HEX: A1 ; inline
+: VK_LCONTROL       HEX: A2 ; inline
+: VK_RCONTROL       HEX: A3 ; inline
+: VK_LMENU          HEX: A4 ; inline
+: VK_RMENU          HEX: A5 ; inline
+
+: VK_BROWSER_BACK        HEX: A6 ; inline
+: VK_BROWSER_FORWARD     HEX: A7 ; inline
+: VK_BROWSER_REFRESH     HEX: A8 ; inline
+: VK_BROWSER_STOP        HEX: A9 ; inline
+: VK_BROWSER_SEARCH      HEX: AA ; inline
+: VK_BROWSER_FAVORITES   HEX: AB ; inline
+: VK_BROWSER_HOME        HEX: AC ; inline
+
+: VK_VOLUME_MUTE         HEX: AD ; inline
+: VK_VOLUME_DOWN         HEX: AE ; inline
+: VK_VOLUME_UP           HEX: AF ; inline
+: VK_MEDIA_NEXT_TRACK    HEX: B0 ; inline
+: VK_MEDIA_PREV_TRACK    HEX: B1 ; inline
+: VK_MEDIA_STOP          HEX: B2 ; inline
+: VK_MEDIA_PLAY_PAUSE    HEX: B3 ; inline
+: VK_LAUNCH_MAIL         HEX: B4 ; inline
+: VK_LAUNCH_MEDIA_SELECT HEX: B5 ; inline
+: VK_LAUNCH_APP1         HEX: B6 ; inline
+: VK_LAUNCH_APP2         HEX: B7 ; inline
+
+! 0xB8 - 0xB9 : reserved
+
+: VK_OEM_1          HEX: BA ; inline  ! ';:' for US
+: VK_OEM_PLUS       HEX: BB ; inline  ! '+' any country
+: VK_OEM_COMMA      HEX: BC ; inline  ! ',' any country
+: VK_OEM_MINUS      HEX: BD ; inline  ! '-' any country
+: VK_OEM_PERIOD     HEX: BE ; inline  ! '.' any country
+: VK_OEM_2          HEX: BF ; inline  ! '/?' for US
+: VK_OEM_3          HEX: C0 ; inline  ! '`~' for US
+
+! 0xC1 - 0xD7 : reserved
+
+! 0xD8 - 0xDA : unassigned
+
+: VK_OEM_4          HEX: DB ; inline !  '[{' for US
+: VK_OEM_5          HEX: DC ; inline !  '\|' for US
+: VK_OEM_6          HEX: DD ; inline !  ']}' for US
+: VK_OEM_7          HEX: DE ; inline !  ''"' for US
+: VK_OEM_8          HEX: DF ; inline
+
+! 0xE0 : reserved
+
+! Various extended or enhanced keyboards
+: VK_OEM_AX         HEX: E1 ; inline !  'AX' key on Japanese AX kbd
+: VK_OEM_102        HEX: E2 ; inline !  "<>" or "\|" on RT 102-key kbd.
+: VK_ICO_HELP       HEX: E3 ; inline !  Help key on ICO
+: VK_ICO_00         HEX: E4 ; inline !  00 key on ICO
+
+: VK_PROCESSKEY     HEX: E5 ; inline
+
+: VK_ICO_CLEAR      HEX: E6 ; inline
+
+: VK_PACKET         HEX: E7 ; inline
+
+! 0xE8 : unassigned
+
+! Nokia/Ericsson definitions
+: VK_OEM_RESET      HEX: E9 ; inline
+: VK_OEM_JUMP       HEX: EA ; inline
+: VK_OEM_PA1        HEX: EB ; inline
+: VK_OEM_PA2        HEX: EC ; inline
+: VK_OEM_PA3        HEX: ED ; inline
+: VK_OEM_WSCTRL     HEX: EE ; inline
+: VK_OEM_CUSEL      HEX: EF ; inline
+: VK_OEM_ATTN       HEX: F0 ; inline
+: VK_OEM_FINISH     HEX: F1 ; inline
+: VK_OEM_COPY       HEX: F2 ; inline
+: VK_OEM_AUTO       HEX: F3 ; inline
+: VK_OEM_ENLW       HEX: F4 ; inline
+: VK_OEM_BACKTAB    HEX: F5 ; inline
+
+: VK_ATTN           HEX: F6 ; inline
+: VK_CRSEL          HEX: F7 ; inline
+: VK_EXSEL          HEX: F8 ; inline
+: VK_EREOF          HEX: F9 ; inline
+: VK_PLAY           HEX: FA ; inline
+: VK_ZOOM           HEX: FB ; inline
+: VK_NONAME         HEX: FC ; inline
+: VK_PA1            HEX: FD ; inline
+: VK_OEM_CLEAR      HEX: FE ; inline
+! 0xFF : reserved
+
+! Key State Masks for Mouse Messages
+: MK_LBUTTON          HEX: 0001 ; inline
+: MK_RBUTTON          HEX: 0002 ; inline
+: MK_SHIFT            HEX: 0004 ; inline
+: MK_CONTROL          HEX: 0008 ; inline
+: MK_MBUTTON          HEX: 0010 ; inline
+: MK_XBUTTON1         HEX: 0020 ; inline
+: MK_XBUTTON2         HEX: 0040 ; inline
 
 
 
 LIBRARY: user
 FUNCTION: HKL ActivateKeyboardLayout ( HKL hkl, UINT Flags ) ;
 
-! FUNCTION: AdjustWindowRect
-! FUNCTION: AdjustWindowRectEx
+FUNCTION: BOOL AdjustWindowRect ( LPRECT lpRect, DWORD dwStyle, BOOL bMenu ) ;
+FUNCTION: BOOL AdjustWindowRectEx ( LPRECT lpRect, DWORD dwStyle, BOOL bMenu, DWORD dwExStyle ) ;
 ! FUNCTION: AlignRects
 ! FUNCTION: AllowForegroundActivation
 ! FUNCTION: AllowSetForegroundWindow
@@ -217,7 +460,7 @@ FUNCTION: BOOL AnyPopup ( ) ;
 ! FUNCTION: BeginDeferWindowPos
 
 
-! FUNCTION: HDC BeginPaint (   HWND hwnd,  LPPAINTSTRUCT lpPaint ) ;
+FUNCTION: HDC BeginPaint ( HWND hwnd, LPPAINTSTRUCT lpPaint ) ;
 
 ! FUNCTION: BlockInput
 ! FUNCTION: BringWindowToTop
@@ -307,10 +550,10 @@ FUNCTION: HWND CreateWindowExA (
                 LPCSTR lpClassName,
                 LPCSTR lpWindowName,
                 DWORD dwStyle,
-                int X,
-                int Y,
-                int nWidth,
-                int nHeight,
+                uint X,
+                uint Y,
+                uint nWidth,
+                uint nHeight,
                 HWND hWndParent,
                 HMENU hMenu,
                 HINSTANCE hInstance,
@@ -321,10 +564,10 @@ FUNCTION: HWND CreateWindowExW (
                 LPCWSTR lpClassName,
                 LPCWSTR lpWindowName,
                 DWORD dwStyle,
-                int X,
-                int Y,
-                int nWidth,
-                int nHeight,
+                uint X,
+                uint Y,
+                uint nWidth,
+                uint nHeight,
                 HWND hWndParent,
                 HMENU hMenu,
                 HINSTANCE hInstance,
@@ -400,8 +643,11 @@ FUNCTION: LRESULT DefWindowProcW ( HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lP
 ! FUNCTION: DialogBoxParamA
 ! FUNCTION: DialogBoxParamW
 ! FUNCTION: DisableProcessWindowsGhosting
-! FUNCTION: DispatchMessageA
-! FUNCTION: DispatchMessageW
+
+FUNCTION: LONG DispatchMessageA ( MSG* lpMsg ) ;
+FUNCTION: LONG DispatchMessageW ( MSG* lpMsg ) ;
+: DispatchMessage \ DispatchMessageW \ DispatchMessageA unicode-exec ;
+
 ! FUNCTION: DisplayExitWindowsWarnings
 ! FUNCTION: DlgDirListA
 ! FUNCTION: DlgDirListComboBoxA
@@ -441,10 +687,7 @@ FUNCTION: BOOL EmptyClipboard ( ) ;
 ! FUNCTION: EndDialog
 ! FUNCTION: EndMenu
 
-FUNCTION: BOOL EndPaint (
-    HWND hWnd,
-    PAINTSTRUCT* lpPaint
-    ) ;
+FUNCTION: BOOL EndPaint ( HWND hWnd, PAINTSTRUCT* lpPaint) ;
 
 ! FUNCTION: EndTask
 ! FUNCTION: EnterReaderModeHelper
@@ -515,8 +758,8 @@ FUNCTION: DWORD GetClipboardSequenceNumber ( ) ;
 ! FUNCTION: GetCursorFrameInfo
 ! FUNCTION: GetCursorInfo
 ! FUNCTION: GetCursorPos
-! FUNCTION: GetDC
-! FUNCTION: GetDCEx
+FUNCTION: HDC GetDC ( HWND hWnd ) ;
+FUNCTION: HDC GetDCEx ( HWND hWnd, HRGN hrgnClip, DWORD flags ) ;
 ! FUNCTION: GetDesktopWindow
 ! FUNCTION: GetDialogBaseUnits
 ! FUNCTION: GetDlgCtrlID
@@ -561,11 +804,14 @@ FUNCTION: HWND GetFocus ( ) ;
 ! FUNCTION: GetMenuState
 ! FUNCTION: GetMenuStringA
 ! FUNCTION: GetMenuStringW
-! FUNCTION: GetMessageA
+
+FUNCTION: BOOL GetMessageA ( LPMSG lpMsg, HWND hWnd, UINT wMsgFilterMin, UINT wMsgFilterMax ) ;
+FUNCTION: BOOL GetMessageW ( LPMSG lpMsg, HWND hWnd, UINT wMsgFilterMin, UINT wMsgFilterMax ) ;
+: GetMessage \ GetMessageW \ GetMessageA unicode-exec ;
+
 ! FUNCTION: GetMessageExtraInfo
 ! FUNCTION: GetMessagePos
 ! FUNCTION: GetMessageTime
-! FUNCTION: GetMessageW
 ! FUNCTION: GetMonitorInfoA
 ! FUNCTION: GetMonitorInfoW
 ! FUNCTION: GetMouseMovePointsEx
@@ -622,7 +868,7 @@ FUNCTION: HWND GetWindow ( HWND hWnd, UINT uCmd ) ;
 ! FUNCTION: GetWindowModuleFileNameA
 ! FUNCTION: GetWindowModuleFileNameW
 ! FUNCTION: GetWindowPlacement
-! FUNCTION: GetWindowRect
+! FUNCTION: BOOL GetWindowRect ( HWND hWnd, LPRECT lpRect ) ;
 ! FUNCTION: GetWindowRgn
 ! FUNCTION: GetWindowRgnBox
 ! FUNCTION: GetWindowTextA
@@ -829,8 +1075,10 @@ FUNCTION: BOOL OpenClipboard ( HWND hWndNewOwner ) ;
 ! FUNCTION: PackDDElParam
 ! FUNCTION: PaintDesktop
 ! FUNCTION: PaintMenuBar
-! FUNCTION: PeekMessageA
-! FUNCTION: PeekMessageW
+FUNCTION: BOOL PeekMessageA ( LPMSG lpMsg, HWND hWnd, UINT wMsgFilterMin, UINT wMsgFilterMax, UINT wRemoveMsg ) ;
+FUNCTION: BOOL PeekMessageW ( LPMSG lpMsg, HWND hWnd, UINT wMsgFilterMin, UINT wMsgFilterMax, UINT wRemoveMsg ) ;
+: PeekMessage \ PeekMessageW \ PeekMessageA unicode-exec ;
+
 ! FUNCTION: PostMessageA
 ! FUNCTION: PostMessageW
 FUNCTION: void PostQuitMessage ( int nExitCode ) ;
@@ -879,7 +1127,7 @@ FUNCTION: ATOM RegisterClassExW ( WNDCLASSEX* lpwcx ) ;
 ! FUNCTION: RegisterWindowMessageA
 ! FUNCTION: RegisterWindowMessageW
 ! FUNCTION: ReleaseCapture
-! FUNCTION: ReleaseDC
+FUNCTION: int ReleaseDC ( HWND hWnd, HDC hDC ) ;
 ! FUNCTION: RemoveMenu
 ! FUNCTION: RemovePropA
 ! FUNCTION: RemovePropW
@@ -923,11 +1171,13 @@ FUNCTION: HANDLE SetClipboardData ( UINT uFormat, HANDLE hMem ) ;
 ! FUNCTION: SetDlgItemTextA
 ! FUNCTION: SetDlgItemTextW
 ! FUNCTION: SetDoubleClickTime
-! FUNCTION: SetFocus
-! FUNCTION: SetForegroundWindow
+FUNCTION: HWND SetFocus ( HWND hWnd ) ;
+FUNCTION: BOOL SetForegroundWindow ( HWND hWnd ) ;
 ! FUNCTION: SetInternalWindowPos
 ! FUNCTION: SetKeyboardState
-! FUNCTION: SetLastErrorEx
+! type is ignored
+FUNCTION: void SetLastErrorEx ( DWORD dwErrCode, DWORD dwType ) ; 
+: SetLastError 0 SetLastErrorEx ;
 ! FUNCTION: SetLayeredWindowAttributes
 ! FUNCTION: SetLogonNotifyWindow
 ! FUNCTION: SetMenu
@@ -1009,8 +1259,8 @@ FUNCTION: BOOL ShowWindow ( HWND hWnd, int nCmdShow ) ;
 ! FUNCTION: TranslateAcceleratorA
 ! FUNCTION: TranslateAcceleratorW
 ! FUNCTION: TranslateMDISysAccel
-! FUNCTION: TranslateMessage
-! FUNCTION: TranslateMessageEx
+FUNCTION: BOOL TranslateMessage ( MSG* lpMsg ) ;
+
 ! FUNCTION: UnhookWindowsHook
 ! FUNCTION: UnhookWindowsHookEx
 ! FUNCTION: UnhookWinEvent
@@ -1018,8 +1268,9 @@ FUNCTION: BOOL ShowWindow ( HWND hWnd, int nCmdShow ) ;
 ! FUNCTION: UnloadKeyboardLayout
 ! FUNCTION: UnlockWindowStation
 ! FUNCTION: UnpackDDElParam
-! FUNCTION: UnregisterClassA
-! FUNCTION: UnregisterClassW
+FUNCTION: BOOL UnregisterClassA ( LPCTSTR lpClassName, HINSTANCE hInstance ) ;
+FUNCTION: BOOL UnregisterClassW ( LPCWSTR lpClassName, HINSTANCE hInstance ) ;
+: UnregisterClass \ UnregisterClassW \ UnregisterClassA unicode-exec ;
 ! FUNCTION: UnregisterDeviceNotification
 ! FUNCTION: UnregisterHotKey
 ! FUNCTION: UnregisterMessagePumpHook

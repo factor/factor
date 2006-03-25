@@ -26,4 +26,9 @@ LIBRARY: gdi
 : DC_PEN              19 ; inline
 
 FUNCTION: HGDIOBJ GetStockObject ( int fnObject ) ;
+FUNCTION: int ChoosePixelFormat ( HDC hDC, PFD* ppfd ) ;
+FUNCTION: BOOL SetPixelFormat ( HDC hDC, int iPixelFormat, PFD* ppfd ) ;
+
+FUNCTION: BOOL SwapBuffers ( HDC hDC ) ;
+
 

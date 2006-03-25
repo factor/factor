@@ -1,5 +1,5 @@
-IN: win32
 USING: alien namespaces kernel words ;
+IN: win32
 
 ! http://msdn.microsoft.com/library/default.asp?url=/library/en-us/winprog/winprog/windows_data_types.asp
 
@@ -21,6 +21,7 @@ SYMBOL: unicode f unicode set
 ! win32
 ! char uchar short ushort int uint long ulong longlong ulonglong
 ! 1    1     2     2      *   *    4    4     8        8
+
 
 TYPEDEF: char                CHAR
 TYPEDEF: uchar               UCHAR
@@ -123,7 +124,6 @@ TYPEDEF: BYTE                BOOLEAN
 TYPEDEF: DWORD               COLORREF
 TYPEDEF: ULONGLONG           DWORDLONG
 TYPEDEF: ULONG_PTR           DWORD_PTR
-! TYPEDEF: uint                HANDLE
 TYPEDEF: PVOID               HANDLE
 TYPEDEF: HANDLE              HACCEL
 TYPEDEF: HANDLE              HBITMAP
@@ -273,11 +273,8 @@ BEGIN-STRUCT: WNDCLASSEX
     FIELD: int cbClsExtra
     FIELD: int cbWndExtra
     FIELD: HINSTANCE hInstance
-    ! FIELD: HICON hIcon
-    FIELD: ushort* hIcon
-    ! FIELD: HCURSOR hCursor
-    FIELD: ushort* hCursor
-    ! FIELD: HBRUSH hbrBackground
+    FIELD: HICON hIcon
+    FIELD: HCURSOR hCursor
     FIELD: HBRUSH hbrBackground
     FIELD: LPCTSTR lpszMenuName
     FIELD: LPCTSTR lpszClassName
@@ -300,3 +297,62 @@ BEGIN-STRUCT: PAINTSTRUCT
     FIELD: BYTE rgbReserved[32]
 END-STRUCT
 
+TYPEDEF: PAINTSTRUCT* LPPAINTSTRUCT
+
+BEGIN-STRUCT: POINT
+    FIELD: LONG x
+    FIELD: LONG y
+END-STRUCT 
+
+BEGIN-STRUCT: MSG
+    FIELD: HWND        hWnd
+    FIELD: UINT        message
+    FIELD: WPARAM      wParam
+    FIELD: LPARAM      lParam
+    FIELD: DWORD       time
+    FIELD: POINT       pt
+END-STRUCT
+TYPEDEF: MSG*                LPMSG
+
+BEGIN-STRUCT: PIXELFORMATDESCRIPTOR
+  FIELD: WORD  nSize
+  FIELD: WORD  nVersion
+  FIELD: DWORD dwFlags 
+  FIELD: BYTE  iPixelType
+  FIELD: BYTE  cColorBits
+  FIELD: BYTE  cRedBits
+  FIELD: BYTE  cRedShift
+  FIELD: BYTE  cGreenBits
+  FIELD: BYTE  cGreenShift
+  FIELD: BYTE  cBlueBits
+  FIELD: BYTE  cBlueShift
+  FIELD: BYTE  cAlphaBits
+  FIELD: BYTE  cAlphaShift
+  FIELD: BYTE  cAccumBits
+  FIELD: BYTE  cAccumRedBits
+  FIELD: BYTE  cAccumGreenBits
+  FIELD: BYTE  cAccumBlueBits
+  FIELD: BYTE  cAccumAlphaBits
+  FIELD: BYTE  cDepthBits
+  FIELD: BYTE  cStencilBits
+  FIELD: BYTE  cAuxBuffers
+  FIELD: BYTE  iLayerType
+  FIELD: BYTE  bReserved
+  FIELD: DWORD dwLayerMask
+  FIELD: DWORD dwVisibleMask
+  FIELD: DWORD dwDamageMask
+END-STRUCT
+
+BEGIN-STRUCT: RECT
+    FIELD: LONG left
+    FIELD: LONG top
+    FIELD: LONG right
+    FIELD: LONG bottom
+END-STRUCT
+
+TYPEDEF: RECT* PRECT
+TYPEDEF: RECT* LPRECT
+TYPEDEF: PIXELFORMATDESCRIPTOR PFD
+TYPEDEF: PFD* LPPFD
+TYPEDEF: HANDLE HGLRC
+TYPEDEF: HANDLE HRGN
