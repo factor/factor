@@ -193,7 +193,6 @@ SYMBOL: hWnd
     f GetModuleHandle over set-WNDCLASSEX-hInstance
     f IDI_APPLICATION LoadIcon over set-WNDCLASSEX-hIcon
     f IDC_ARROW LoadCursor over set-WNDCLASSEX-hCursor
-    WHITE_BRUSH GetStockObject over set-WNDCLASSEX-hbrBackground
     [ set-WNDCLASSEX-lpszClassName ] keep
     RegisterClassEx dup win32-error=0 ;
 
