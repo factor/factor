@@ -98,5 +98,3 @@ IN: gadgets-layouts
 : make-pile ( children -- pack ) <pile> [ add-gadgets ] keep ;
 
 : make-shelf ( children -- pack ) <shelf> [ add-gadgets ] keep ;
-
-: make-stack ( children -- pack ) <stack> [ add-gadgets ] keep ;

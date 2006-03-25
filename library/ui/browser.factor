@@ -72,12 +72,12 @@ C: browser ( obj -- browser )
 
 TUPLE: browser-button object ;
 
-: in-browser ( obj -- )
+: browser-window ( obj -- )
     <browser> "Browser" simple-window ;
 
 : browser-button-action ( button -- )
     [ browser-button-object ] keep find-browser
-    [ dup save-current browse ] [ in-browser ] if* ;
+    [ dup save-current browse ] [ browser-window ] if* ;
 
 C: browser-button ( gadget object -- button )
     [ set-browser-button-object ] keep

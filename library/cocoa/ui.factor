@@ -166,16 +166,13 @@ H{ } clone views set-global
     FactorView over rect-dim <GLView>
     [ over set-world-handle dup add-notify register-view ] keep ;
 
-: <FactorWindow> ( gadget title -- window )
-    >r <FactorView> r> <ViewWindow> dup [contentView] [release] ;
-
 IN: gadgets
 
 : redraw-world ( handle -- )
     world-handle 1 [setNeedsDisplay:] ;
 
-: in-window ( gadget status dim title -- )
-    >r <world> r> <FactorWindow> drop ;
+: in-window ( world title -- )
+    >r <FactorView> r> <ViewWindow> [contentView] [release] ;
 
 : select-gl-context ( handle -- )
     [openGLContext] [makeCurrentContext] ;

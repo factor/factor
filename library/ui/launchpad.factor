@@ -13,10 +13,10 @@ namespaces sequences ;
     make-pane <scroller> "Scratch" simple-window ;
 
 : handbook-window ( -- )
-    T{ link f "handbook" } in-browser ;
+    T{ link f "handbook" } browser-window ;
 
 : tutorial-window ( -- )
-    T{ link f "tutorial" } in-browser ;
+    T{ link f "tutorial" } browser-window ;
 
 : default-launchpad
     {
@@ -24,7 +24,7 @@ namespaces sequences ;
         { "Documentation" [ handbook-window ] }
         { "Tutorial" [ tutorial-window ] }
         { "Vocabularies" [ [ vocabs. ] scratch-window ] }
-        { "Globals" [ global in-browser ] }
+        { "Globals" [ global browser-window ] }
         { "Memory" [ [ heap-stats. terpri room. ] scratch-window ] }
         { "Save image" [ save ] }
         { "Exit" [ 0 exit ] }

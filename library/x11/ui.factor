@@ -110,8 +110,7 @@ M: world client-event ( event world -- )
 
 IN: gadgets
 
-: in-window ( gadget status dim title -- )
-    >r <world> gadget-window r> swap set-title ;
+: in-window ( world title -- ) swap gadget-window set-title ;
 
 : select-gl-context ( handle -- )
     dpy get swap first2 glXMakeCurrent

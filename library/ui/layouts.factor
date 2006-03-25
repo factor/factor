@@ -142,12 +142,3 @@ M: pack children-on ( rect pack -- list )
         >r >r rect-loc r> r> fast-children-on 0 max
         r>
     ] keep <slice> ;
-
-TUPLE: stack ;
-
-C: stack ( -- gadget )
-    #! A stack lays out all its children on top of each other.
-    { 0 0 1 } over delegate>pack 1 over set-pack-fill ;
-
-M: stack children-on ( point stack -- gadget )
-    nip gadget-children ;

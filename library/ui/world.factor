@@ -19,13 +19,15 @@ TUPLE: world status focus fonts handle ;
 : font-sprites ( font world -- sprites )
     world-fonts [ drop V{ } clone ] cache ;
 
-C: world ( gadget status dim -- world )
-    <stack> over set-delegate
+: add-status ( status world -- )
+    [ set-world-status ] 2keep @bottom frame-add ;
+
+C: world ( gadget status -- world )
+    dup delegate>frame
     t over set-gadget-root?
     H{ } clone over set-world-fonts
-    [ set-gadget-dim ] keep
-    [ set-world-status ] keep
-    [ add-gadget ] keep ;
+    [ add-status ] keep
+    [ @center frame-add ] keep ;
 
 GENERIC: find-world ( gadget -- world )
 
@@ -35,8 +37,8 @@ M: gadget find-world gadget-parent find-world ;
 
 M: world find-world ;
 
+M: world pref-dim* ( world -- dim )
+    delegate pref-dim* { 1024 768 0 } vmin ;
+
 : focused-ancestors ( world -- seq )
     world-focus parents reverse-slice ;
-
-: simple-window ( gadget title -- )
-    >r f over pref-dim { 800 800 0 } vmin r> in-window ;

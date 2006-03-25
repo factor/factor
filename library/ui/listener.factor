@@ -1,5 +1,5 @@
 ! Copyright (C) 2005, 2006 Slava Pestov.
-! See http://factor.sf.net/license.txt for BSD license.
+! See http://factorcode.org/license.txt for BSD license.
 IN: gadgets-listener
 USING: arrays gadgets gadgets-editors gadgets-labels
 gadgets-layouts gadgets-panes gadgets-scrolling
@@ -7,7 +7,7 @@ gadgets-splitters gadgets-theme generic hashtables
 io jedit kernel listener lists math
 namespaces parser prettyprint sequences threads words ;
 
-TUPLE: listener-gadget pane stack status ;
+TUPLE: listener-gadget pane stack ;
 
 : usable-words ( -- words )
     use get hash-concat hash-values ;
@@ -38,21 +38,20 @@ TUPLE: listener-gadget pane stack status ;
         print-banner listener
     ] with-stream* ;
 
-: <status-bar> ( -- gadget ) "" <label> dup highlight-theme ;
-
 : <stack-bar> ( -- gadget ) <shelf> dup highlight-theme ;
+
+: start-listener ( listener -- )
+    [ >r clear r> listener-thread ] in-thread ;
 
 C: listener-gadget ( -- gadget )
     dup delegate>frame
     <input-pane> dup pick set-listener-gadget-pane
     <scroller> over @center frame-add
-    <status-bar> dup pick set-listener-gadget-status
-    over @bottom frame-add
     <stack-bar> dup pick set-listener-gadget-stack
-    over @top frame-add ;
+    over @top frame-add
+    dup start-listener ;
+
+M: listener-gadget pref-dim* drop { 600 600 0 } ;
 
 : listener-window ( -- )
-    <listener-gadget> dup dup listener-gadget-status
-    { 600 700 0 } "Listener" in-window
-    [ >r clear r> listener-thread ] in-thread
-    listener-gadget-pane request-focus ;
+    <listener-gadget> "Listener" simple-window ;
