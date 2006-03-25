@@ -1,11 +1,15 @@
-USING: help image inspector memory parser prettyprint sequences ;
+USING: help image inspector kernel listener memory parser
+prettyprint sequences test walker words ;
+
 ARTICLE: "tools" "Development tools"
 "This section covers words which are used during development, and not usually invoked directly by user code."
 { $subsection "listener" }
-{ $subsection "word-introspection" }
 { $subsection "describe" }
-{ $subsection "images" }
-{ $subsection "unit-test" } ;
+{ $subsection "word-introspection" }
+{ $subsection "annotations" }
+{ $subsection "timing" }
+{ $subsection "unit-test" }
+{ $subsection "images" } ;
 
 ARTICLE: "listener" "The listener"
 "The listener reads Factor expressions from a stream and evaluates them. The listener is the primary interface to the Factor runtime. Typically, you write Factor code in a text editor, then load it using the listener and test it."
@@ -22,8 +26,6 @@ $terpri
 $terpri
 "Source files can be loaded in:"
 { $subsection run-file }
-$terpri
-"An alternative way to load source is to use a handy word which reloads the original source file of a word definition:"
 { $subsection reload }
 "You can start a nested listener or exit a listener using the following words:"
 { $subsection listener }
@@ -40,9 +42,8 @@ ARTICLE: "word-introspection" "Word introspection"
 { $subsection see }
 "Find words whose name contains a given string:"
 { $subsection apropos }
-"List all vocabularies:"
+"List all vocabularies, and list words in a vocabulary:"
 { $subsection vocabs. }
-"List all words in a vocabulary:"
 { $subsection words. }
 "Display callers and words called by a given word:"
 { $subsection usage. }
@@ -60,33 +61,21 @@ ARTICLE: "describe" "Objects and the heap"
 "Finally, you can ask for a sequence of all objects which refer to a given object:"
 { $subsection references } ;
 
-ARTICLE: "images" "Working with images"
-"Factor is an " { $emphasis "image-based" } " system, meaning it integrates a persistence mechanism where the object heap can be checkpointed to disk and loaded back in. Every time Factor runs, it starts by loading an image. The image contains all code and data needed to run Factor in a \"ready-to-go\" form."
-$terpri
-"Image files are loaded by launching the Factor runtime with the image file as the first command line argument. Images are saved using one of the following two words; the latter takes an image path as a parameter:"
-{ $subsection save }
-{ $subsection save-image }
-"A new image can also be built from sources; this is known as " { $emphasis "bootstrap" } ". Bootstrap is a two-step process. The first stage is the creation of a bootstrap image inside a running Factor instance:"
-{ $subsection make-image }
-"The second stage is initiated by running the resulting bootstrap image. This stage loads any additional platform-specific code, compiles all words, and dumps a new, final image." ;
-
 ARTICLE: "walker" "The single stepper"
-
-;
-
-ARTICLE: "compiler" "The compiler"
-compile
-try-compile
-recompile
-compiled
-compiled?
-compile-vocabs
-compile-all
-;
-
-ARTICLE: "inference" "Stack effect inference"
-infer
-;
+"The single stepper evaluates a quotation a word at a time, offering the ability to look at stacks at any stage."
+$terpri
+"Single stepping is inititated by passing a quotation to a combinator:"
+{ $subsection walk }
+"The single stepper spawns a nested listener. You can exit the nested listener using " { $link bye } "; this resumes execution of the quotation."
+$terpri
+"The following words advance the single stepper; the latter recursively descends into compound definitions:"
+{ $subsection step }
+{ $subsection into }
+"At any point you can look at stacks and variables in the single stepper execution context:"
+{ $subsection &s }
+{ $subsection &r }
+{ $subsection &get }
+"You can annotate a word with a breakpoint, so that the single stepper is started every time the word is called. See " { $link "annotations" } "." ;
 
 ARTICLE: "unit-test" "Unit testing code"
 "A unit test is a piece of code which starts with known input values, then compares the output of a word with an expected output, where the expected output is defined by the word's contract."
@@ -100,9 +89,29 @@ $terpri
 { $subsection unit-test-fails } ;
 
 ARTICLE: "timing" "Timing code"
-time benchmark
-;
+"You can time the execution of a quotation in the listener:"
+{ $subsection time }
+"A lower-level word puts timings on the stack, intead of printing:"
+{ $subsection benchmark }
+"You can also read the system clock directly:"
+{ $subsection millis }
+"Another way to time code is to use the profiler. See " { $link "annotations" } "." ;
 
 ARTICLE: "annotations" "Word annotations"
-break break-on watch profile annotate
-;
+"The word annotation feature modifies word definitions to add debugging code. You can restore the old definition by calling " { $link reload } " on the word in question."
+{ $subsection watch }
+{ $subsection break }
+{ $subsection break-on }
+{ $subsection profile }
+"All of the above words are implemented using a single combinator which applies a quotation to a word definition to yield a new definition:"
+{ $subsection annotate } ;
+
+ARTICLE: "images" "Working with images"
+"Factor is an " { $emphasis "image-based" } " system, meaning it integrates a persistence mechanism where the object heap can be checkpointed to disk and loaded back in. Every time Factor runs, it starts by loading an image. The image contains all code and data needed to run Factor in a \"ready-to-go\" form."
+$terpri
+"Image files are loaded by launching the Factor runtime with the image file as the first command line argument. Images are saved using one of the following two words; the latter takes an image path as a parameter:"
+{ $subsection save }
+{ $subsection save-image }
+"A new image can also be built from sources; this is known as " { $emphasis "bootstrap" } ". Bootstrap is a two-step process. The first stage is the creation of a bootstrap image inside a running Factor instance:"
+{ $subsection make-image }
+"The second stage is initiated by running the resulting bootstrap image. This stage loads any additional platform-specific code, compiles all words, and dumps a new, final image." ;

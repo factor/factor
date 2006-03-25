@@ -59,7 +59,7 @@ SYMBOL: hand-click-loc
 SYMBOL: hand-buttons
 V{ } clone hand-buttons set-global
 
-: button-gesture ( buttons gesture -- )
+: button-gesture ( button gesture -- )
     #! Send a gesture like [ button-down 2 ]; if nobody
     #! handles it, send [ button-down ].
     swap hand-clicked get-global 3dup >r add r> handle-gesture
@@ -141,10 +141,10 @@ V{ } clone hand-buttons set-global
     dup hand-buttons get-global push
     [ button-down ] button-gesture ;
 
-: send-button-up ( event loc world -- )
+: send-button-up ( button# loc world -- )
     move-hand
-    dup hand-buttons get-global delete
-    [ button-up ] button-gesture ;
+    dup [ button-up ] button-gesture
+    hand-buttons get-global delete ;
 
 : send-wheel ( up/down loc world -- )
     move-hand

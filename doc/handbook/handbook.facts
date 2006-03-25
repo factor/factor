@@ -1,10 +1,13 @@
-USING: help parser prettyprint ;
+USING: help inspector parser prettyprint ;
 
 ARTICLE: "handbook" "Factor documentation"
 "Welcome to Factor!"
 $terpri
+"The Factor user interface centers on the concept of a " { $emphasis "presentation" } ". A presentation is a graphical view of a live object."
+$terpri
+"Placing the mouse over a presentation highlights it with a border. Presentations are everywhere; help links, words, and code examples are all presentations. Clicking a presentation displays a browser window looking at the underlying object. A left click will reuse the current browser window; a right click always opens a new window."
+$terpri
 "Introductory material:"
-{ $subsection "presentation-intro" }
 { $subsection "tutorial" }
 { $subsection "quickref" }
 "Detailed reference documentation:"
@@ -19,26 +22,14 @@ $terpri
 { $subsection "prettyprint" }
 { $subsection "tools" } ;
 
-ARTICLE: "presentation-intro" "The presentation-based UI"
-"Factor provides a " { $emphasis "presentation-based" } " user interface. A " { $emphasis "presentation" } " is a graphical representation of a live object. You can see presentations everywhere; help links, words, and code examples are all presentations."
-$terpri
-"When you place the mouse over a presentation, it is highlighted with a surrounding border."
-$terpri
-"Clicking a presentation with the left mouse button invokes a default command. Clicking the right mouse button displays a menu of applicable commands." ;
-
 ARTICLE: "quickref" "Quick reference"
-"Some words for performing common operations at the listener:"
-{ $list
-    {
-        "You can read the documentation for a word with " { $link help } ":"
-        { $code "\\ reverse help" }
-    }
-    { "You can print the top of the stack with " { $link . } }
-    {
-        "Source files are loaded with " { $link run-file } ":"
-        { $code "\"tetris.factor\" run-file" }
-    }
-}
+"Loading source files:"
+{ $subsection run-file }
+"Displaying word documentation:"
+{ $subsection help }
+"Printing the top of the stack, and displaying the stack without popping:"
+{ $subsection . }
+{ $subsection .s }
 "If you enter an invalid word name, you will get a \"not a number\" error:"
 { $example
     "fdafasfa"

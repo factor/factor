@@ -43,7 +43,6 @@
 - fix up the min thumb size hack
 - help cross-referencing
 - document FFI
-- document tools
 - document conventions
 - new turtle graphics tutorial
 - better line spacing in ui and html

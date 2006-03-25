@@ -37,8 +37,7 @@ C: book ( pages -- book )
     [ set-book-pages ] 2keep
     [ >r first first r> show-page ] keep ;
 
-M: book pref-dim* ( book -- dim )
-    book-pages { 0 0 0 } [ second pref-dim vmax ] reduce ;
+M: book pref-dim* ( book -- dim ) book-page pref-dim ;
 
 M: book layout* ( book -- )
     dup rect-dim swap book-page set-gadget-dim ;
@@ -48,7 +47,7 @@ M: book layout* ( book -- )
     [ first2 swapd make-pane <scroller> 2array ] map-with ;
 
 : <tab> ( name book -- button )
-    dupd [ show-page ] curry curry
+    dupd [ show-page drop ] curry curry
     >r <label> r> <bevel-button> ;
 
 : tabs ( assoc book gadget -- )
@@ -84,9 +83,15 @@ TUPLE: browser-button object ;
 
 : browser-window ( obj -- ) <browser> "Browser" open-window ;
 
+: new-browser? ( gadget -- ? )
+    find-browser not 3 hand-buttons get-global member? or ;
+
 : browser-button-action ( button -- )
-    [ browser-button-object ] keep find-browser
-    [ dup save-current browse ] [ browser-window ] if* ;
+    [ browser-button-object ] keep dup new-browser? [
+        drop browser-window
+    ] [
+        find-browser dup save-current browse
+    ] if ;
 
 C: browser-button ( gadget object -- button )
     [ set-browser-button-object ] keep
