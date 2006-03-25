@@ -27,9 +27,7 @@ sequences test words ;
 : compile ( word -- )
     [ postpone-word compile-postponed ] with-compiler ;
 
-: compiled ( -- )
-    #! Compile the most recently defined word.
-    "compile" get [ word compile ] when ; parsing
+: compiled ( -- ) "compile" get [ word compile ] when ; parsing
 
 : try-compile ( word -- )
     [ compile ] [ error. drop ] recover ;
@@ -48,5 +46,3 @@ sequences test words ;
     "compile" get [ dup compile ] when ;
 
 : compile-1 ( quot -- ) compile-quot execute ;
-
-\ dataflow profile

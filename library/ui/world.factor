@@ -22,6 +22,8 @@ TUPLE: world status focus fonts handle ;
 : add-status ( status world -- )
     [ set-world-status ] 2keep @bottom frame-add ;
 
+DEFER: request-focus
+
 C: world ( gadget status -- world )
     dup delegate>frame
     t over set-gadget-root?

@@ -24,6 +24,7 @@
 - x11:
   - title bars are funny
   - input methods
+  - wheel mouse test
 - cocoa:
   - global menu bar with useful commands
   - make the launchpad a palette

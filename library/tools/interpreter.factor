@@ -4,8 +4,9 @@ IN: interpreter
 USING: errors generic io kernel kernel-internals lists math
 namespaces prettyprint sequences strings vectors words ;
 
-! A Factor interpreter written in Factor. Used by compiler for
-! partial evaluation, also by the walker.
+! A Factor interpreter written in Factor. It can transfer the
+! continuation to and from the primary interpreter. Used by
+! compiler for partial evaluation, also by the walker. 
 
 ! Meta-stacks
 SYMBOL: meta-r

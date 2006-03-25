@@ -18,8 +18,6 @@ M: assert summary drop "Assertion failed" ;
     millis >r gc-time >r call gc-time r> - millis r> - ;
 
 : time ( code -- )
-    #! Evaluates the given code and prints the time taken to
-    #! execute it.
     benchmark
     [ # " ms run / " % # " ms GC time" % ] "" make print flush ;
 
@@ -33,12 +31,10 @@ M: assert summary drop "Assertion failed" ;
     ] time ;
 
 : unit-test-fails ( quot -- )
-    #! Assert that the quotation throws an error.
     [ f ] swap [ [ call t ] [ 2drop f ] recover ]
     curry unit-test ;
 
-: assert-depth ( quot -- )
-    depth slip depth assert= ;
+: assert-depth ( quot -- ) depth slip depth assert= ;
 
 SYMBOL: failures
 

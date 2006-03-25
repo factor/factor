@@ -1,12 +1,9 @@
-! Copyright (C) 2005 Slava Pestov.
-! See http://factor.sf.net/license.txt for BSD license.
+! Copyright (C) 2005, 2006 Slava Pestov.
+! See http://factorcode.org/license.txt for BSD license.
 IN: words
 USING: inspector io kernel lists math namespaces prettyprint
 sequences strings walker ;
 
-! The annotation words let you flag a word for either tracing
-! or single-stepping. Note that currently, words referring to
-! annotated words cannot be compiled.
 : annotate ( word quot -- | quot: word def -- def )
     over >r >r dup word-def r> call r> swap define-compound ;
     inline
@@ -21,17 +18,11 @@ sequences strings walker ;
         , "===> Leaving:  " , \ watch-msg ,
     ] [ ] make ;
 
-: watch ( word -- )
-    #! Cause a message to be printed out when the word is
-    #! executed.
-    [ (watch) ] annotate ;
+: watch ( word -- ) [ (watch) ] annotate ;
 
-: break ( word -- )
-    #! Cause the word to start the code walker when executed.
-    [ nip [ walk ] curry ] annotate ;
+: break ( word -- ) [ nip [ walk ] curry ] annotate ;
 
 : break-on ( word test -- | test: -- ? )
-    #! Conditional breakpoint.
     swap [
         nip [ swap % dup [ walk ] curry , , \ if , ] [ ] make
     ] annotate ;
@@ -41,6 +32,4 @@ sequences strings walker ;
     inline
 
 : profile ( word -- )
-    #! When the word is called, time it, and add the time to
-    #! the value in a global variable named by the word.
     [ swap [ with-profile ] curry cons ] annotate ;

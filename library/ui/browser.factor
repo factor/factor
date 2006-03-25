@@ -1,10 +1,28 @@
 ! Copyright (C) 2006 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 IN: gadgets-browser
-USING: arrays components gadgets gadgets-buttons gadgets-labels
+USING: arrays gadgets gadgets-buttons gadgets-labels
 gadgets-layouts gadgets-panes gadgets-scrolling gadgets-theme
 generic hashtables help inspector kernel lists math namespaces
 prettyprint sequences words ;
+
+SYMBOL: components
+
+H{ } clone components set-global
+
+: get-components ( class -- assoc )
+    components get-global hash [ { } ] unless*
+    { "Slots" [ describe ] } add ;
+
+{
+    { "Definition" [ help ] }
+    { "Calls in" [ usage. ] }
+    { "Calls out" [ uses. ] }
+} \ word components get-global set-hash
+
+{
+    { "Documentation" [ help ] }
+} \ link components get-global set-hash
 
 TUPLE: book page pages ;
 

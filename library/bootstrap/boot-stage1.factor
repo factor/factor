@@ -101,8 +101,6 @@ vectors words ;
         "/library/tools/walker.factor"
 
         "/library/tools/annotations.factor"
-        "/library/tools/inspector.factor"
-        "/library/tools/components.factor"
         
         "/library/test/test.factor"
 
@@ -211,12 +209,14 @@ vectors words ;
         "/library/collections/flatten.facts"
         "/library/collections/vectors.facts"
         "/library/collections/virtual-sequences.facts"
+        "/library/compiler/compiler.facts"
         "/library/generic/early-generic.facts"
         "/library/generic/generic.facts"
         "/library/generic/math-combination.facts"
         "/library/generic/slots.facts"
         "/library/generic/standard-combination.facts"
         "/library/generic/tuple.facts"
+        "/library/inference/inference.facts"
         "/library/io/binary.facts"
         "/library/io/buffer.facts"
         "/library/io/c-streams.facts"
@@ -246,7 +246,13 @@ vectors words ;
         "/library/syntax/parse-syntax.facts"
         "/library/syntax/prettyprint.facts"
         "/library/syntax/see.facts"
+        "/library/test/test.facts"
+        "/library/tools/annotations.facts"
         "/library/tools/debugger.facts"
+        "/library/tools/describe.facts"
+        "/library/tools/listener.facts"
+        "/library/tools/memory.facts"
+        "/library/tools/walker.facts"
 
         "/doc/handbook/collections.facts"
         "/doc/handbook/dataflow.facts"

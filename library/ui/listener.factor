@@ -57,4 +57,4 @@ M: listener-gadget focusable-child* ( listener -- gadget )
     listener-gadget-pane ;
 
 : listener-window ( -- )
-    <listener-gadget> "Listener" simple-window ;
+    <listener-gadget> "Listener" open-window ;

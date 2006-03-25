@@ -1,5 +1,5 @@
-! Copyright (C) 2004, 2005 Slava Pestov.
-! See http://factor.sf.net/license.txt for BSD license.
+! Copyright (C) 2004, 2006 Slava Pestov.
+! See http://factorcode.org/license.txt for BSD license.
 IN: memory
 USING: arrays errors generic hashtables io kernel
 kernel-internals lists math namespaces parser prettyprint
@@ -9,13 +9,9 @@ sequences strings vectors words ;
 
 : full-gc ( -- ) generations 1 - gc ;
 
-: image ( -- path )
-    #! Current image name.
-    16 getenv ;
+: image ( -- path ) 16 getenv ;
 
-: save
-    #! Save the current image.
-    image save-image ;
+: save ( -- ) image save-image ;
 
 ! Printing an overview of heap usage.
 
@@ -47,7 +43,6 @@ sequences strings vectors words ;
     [ swap [ call ] keep (each-object) ] [ 2drop ] if ; inline
 
 : each-object ( quot -- )
-    #! Applies the quotation to each object in the image.
     [ begin-scan [ (each-object) ] keep ]
     [ end-scan ] cleanup drop ; inline
 
@@ -55,8 +50,6 @@ sequences strings vectors words ;
     >r over >r call [ r> r> push ] [ r> r> 2drop ] if ; inline
 
 : instances ( quot -- seq )
-    #! Return a vector of all objects that return true when the
-    #! quotation is applied to them.
     10000 <vector> [
         -rot [ (instances) ] 2keep
     ] each-object nip ; inline
@@ -75,9 +68,6 @@ M: object each-slot ( obj quot -- )
     f swap [ pick eq? or ] each-slot nip ;
 
 : references ( obj -- list )
-    #! Return a list of all objects that refer to a given object
-    #! in the image. If only one reference exists, find
-    #! something referencing that, and so on.
     [ dupd refers? ] instances nip ;
 
 : hash+ ( n key hash -- )
@@ -98,7 +88,6 @@ M: object each-slot ( obj quot -- )
     pprint " instances" print ;
 
 : heap-stats. ( -- )
-    #! Print heap allocation breakdown.
     heap-stats dup hash-keys natural-sort [
         ( hash hash key -- )
         [ [ pick hash ] keep pick hash ] keep heap-stat.

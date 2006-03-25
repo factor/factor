@@ -1,0 +1,55 @@
+IN: inspector
+USING: help io prettyprint words ;
+
+HELP: summary "( object -- string )"
+{ $values { "object" "an object" } { "string" "a string" } }
+{ $contract "Outputs a brief description of the object." } ;
+
+HELP: sheet "( object -- sheet )"
+{ $values { "object" "an object" } { "sheet" "a sequence of sequences" } }
+{ $contract "Outputs a representation of the object for the " { $link describe } " word, which is a table where each row corresponds to an object slot, and consists of a number of columns, presumably including the slot name and value." } ;
+
+HELP: slot-sheet "( object -- sheet )"
+{ $values { "object" "an object" } { "sheet" "a sequence of sequences" } }
+{ $description "Outputs a table of object slot names and values. This is used by the default implementation of " { $link sheet } "." } ;
+
+HELP: describe "( object -- )"
+{ $values { "object" "an object" } }
+{ $description "Print a tabular overview of the object, featuring expanding outliners of the default stream supports them (for example, in the Factor UI)."
+"For sequences and hashtables, this outputs the entries of the collection. For all other object types, slot names and values are shown." }
+{ $notes "Slot values are converted to strings using " { $link unparse-short } "." } ;
+
+HELP: sequence-outliner "( seq quot -- )"
+{ $values { "seq" "a sequence" } { "quot" "a quotation with stack effect " { $snippet "( object -- )" } } }
+{ $description "Prints an expanding outliner to the default stream. The sequence elements are converted to strings using " { $link unparse-short } ", and each element is output on its own row. Expanding a row outliner applies the quotation to the object; the quotation should print output to the default stream to elaborate the object." }
+{ $notes "For a lower-level outliner output facility, use " { $link simple-outliner } " or " { $link write-outliner } "." } ;
+
+HELP: words. "( vocab -- )"
+{ $values { "vocab" "a string naming a vocabulary" } }
+{ $description "Prints an outliner listing all words in a vocabulary. Expanding a row shows the word documentation and definition using " { $link help } "." }
+{ $see-also words } ;
+
+HELP: vocabs. "( -- )"
+{ $description "Prints an outliner listing all vocabularies. Expanding a row lists the words in that vocabulary using " { $link words. } "." }
+{ $see-also vocabs } ;
+
+HELP: usage. "( word -- )"
+{ $values { "word" "a word" } }
+{ $description "Prints an outliner listing all callers of a word. This may include the word itself, if it is recursive." }
+{ $see-also usage usages } ;
+
+HELP: uses. "( word -- )"
+{ $values { "word" "a word" } }
+{ $description "Prints an outliner listing all words called by a word. This may include the word itself, if it is recursive." }
+{ $see-also uses } ;
+
+HELP: stack. "( seq -- )"
+{ $values { "seq" "a sequence" } }
+{ $description "Prints an outliner listing elements of a sequence in reverse order. Elements are coverted to strings using " { $link unparse-short } "." }
+{ $notes "This word is used in the implementation of " { $link .s } " and " { $link .r } "." } ;
+
+HELP: .s "( -- )"
+{ $description "Displays the contents of the data stack, with the top of the stack printed first." } ;
+
+HELP: .r "( -- )"
+{ $description "Displays the contents of the return stack, with the top of the stack printed first." } ;
