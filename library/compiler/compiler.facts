@@ -1,6 +1,11 @@
 IN: compiler
 USING: help words ;
 
+HELP: compiled? "( word -- ? )"
+{ $values { "word" "a word" } }
+{ $description "Tests if a word is compiled." }
+{ $notes "Primitives are considered as compiled words." } ;
+
 HELP: compile "( word -- )"
 { $values { "word" "a word" } }
 { $description "Compiles a word together with any uncompiled dependencies. Does nothing if the word is already compiled." }

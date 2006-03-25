@@ -60,5 +60,4 @@ HELP: see "( word -- )"
 
 HELP: apropos "( substr -- )"
 { $values { "substr" "a string" } }
-{ $description "Outputs a list of all words whose name is a completion for " { $snippet "substr" } ", in the sense that after tokenizing both the word name and " { $snippet "substr" } " on a set of dividers, each chunk in the word name contains the corresponding chunk from " { $snippet "substr" } "." }
-{ $examples { $example "\"h-e\" apropos" "IN: hashtables : hash-subset ( hash quot -- subhash )\nIN: hashtables : hash-subset-with" } } ;
+{ $description "Lists all words whose name contains " { $snippet "substr" } "." } ;

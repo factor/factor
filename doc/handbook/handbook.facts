@@ -1,9 +1,9 @@
 USING: help parser prettyprint ;
 
 ARTICLE: "handbook" "Factor documentation"
-"Welcome to Factor! Factor documentation takes the form of an outline, with cross-referencing hyperlinks between topics. You can click the triangle next to a topic heading to expand the topic."
+"Welcome to Factor!"
 $terpri
-"There is some introductory material you will find useful when starting out:"
+"Introductory material:"
 { $subsection "presentation-intro" }
 { $subsection "tutorial" }
 { $subsection "quickref" }
@@ -17,7 +17,7 @@ $terpri
 { $subsection "streams" }
 { $subsection "parser" }
 { $subsection "prettyprint" }
-;
+{ $subsection "tools" } ;
 
 ARTICLE: "presentation-intro" "The presentation-based UI"
 "Factor provides a " { $emphasis "presentation-based" } " user interface. A " { $emphasis "presentation" } " is a graphical representation of a live object. You can see presentations everywhere; help links, words, and code examples are all presentations."

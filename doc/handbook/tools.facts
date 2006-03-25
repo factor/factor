@@ -1,0 +1,108 @@
+USING: help image inspector memory parser prettyprint sequences ;
+ARTICLE: "tools" "Development tools"
+"This section covers words which are used during development, and not usually invoked directly by user code."
+{ $subsection "listener" }
+{ $subsection "word-introspection" }
+{ $subsection "describe" }
+{ $subsection "images" }
+{ $subsection "unit-test" } ;
+
+ARTICLE: "listener" "The listener"
+"The listener reads Factor expressions from a stream and evaluates them. The listener is the primary interface to the Factor runtime. Typically, you write Factor code in a text editor, then load it using the listener and test it."
+$terpri
+"The classical first program can be run in the listener:"
+{ $example "\"Hello, world\" print" "Hello, world" }
+"Multi-line phrases are supported:"
+{ $example "{ 1 2 3 } [\n    .\n] each" "1\n2\n3" }
+"The listener knows when to expect more input by looking at the height of the stack. Parsing words such as " { $link POSTPONE: { } " leave elements on the parser stack, and corresponding words such as " { $link POSTPONE: } } " pop them."
+$terpri
+"A very common operation is to inspect the contents of the data stack in the listener:"
+{ $subsection .s }
+"Note that calls to " { $link .s } " can also be included inside words as a debugging aid, however a more convenient way to achieve this is to use the annotation facility. See " { $link "annotations" } "."
+$terpri
+"Source files can be loaded in:"
+{ $subsection run-file }
+$terpri
+"An alternative way to load source is to use a handy word which reloads the original source file of a word definition:"
+{ $subsection reload }
+"You can start a nested listener or exit a listener using the following words:"
+{ $subsection listener }
+{ $subsection bye }
+"The following variables can be rebound inside a nested scope to customize the behavior of a listener; this can be done to create a development tool with a custom interaction loop:"
+{ $subsection listener-prompt }
+{ $subsection listener-hook }
+{ $subsection datastack-hook }
+"Finally, the multi-line expression reading word can be used independently of the rest of the listener:"
+{ $subsection read-multiline } ;
+
+ARTICLE: "word-introspection" "Word introspection"
+"You can display a word definition:"
+{ $subsection see }
+"Find words whose name contains a given string:"
+{ $subsection apropos }
+"List all vocabularies:"
+{ $subsection vocabs. }
+"List all words in a vocabulary:"
+{ $subsection words. }
+"Display callers and words called by a given word:"
+{ $subsection usage. }
+{ $subsection uses. } ;
+
+ARTICLE: "describe" "Objects and the heap"
+"The prettyprinter (see " { $link "prettyprint" } ") can turn any object into a source representation. Sometimes this source representation is hard to read for a human, so the " { $link describe } " word provides an alternative tabular view of an object:"
+{ $subsection describe }
+"You can print object heap status information:"
+{ $subsection room. }
+{ $subsection heap-stats. }
+"There are a pair of combinators, analogous to " { $link each } " and " { $link subset } ", which operate on the entire collection of objects in the object heap:"
+{ $subsection each-object }
+{ $subsection instances }
+"Finally, you can ask for a sequence of all objects which refer to a given object:"
+{ $subsection references } ;
+
+ARTICLE: "images" "Working with images"
+"Factor is an " { $emphasis "image-based" } " system, meaning it integrates a persistence mechanism where the object heap can be checkpointed to disk and loaded back in. Every time Factor runs, it starts by loading an image. The image contains all code and data needed to run Factor in a \"ready-to-go\" form."
+$terpri
+"Image files are loaded by launching the Factor runtime with the image file as the first command line argument. Images are saved using one of the following two words; the latter takes an image path as a parameter:"
+{ $subsection save }
+{ $subsection save-image }
+"A new image can also be built from sources; this is known as " { $emphasis "bootstrap" } ". Bootstrap is a two-step process. The first stage is the creation of a bootstrap image inside a running Factor instance:"
+{ $subsection make-image }
+"The second stage is initiated by running the resulting bootstrap image. This stage loads any additional platform-specific code, compiles all words, and dumps a new, final image." ;
+
+ARTICLE: "walker" "The single stepper"
+
+;
+
+ARTICLE: "compiler" "The compiler"
+compile
+try-compile
+recompile
+compiled
+compiled?
+compile-vocabs
+compile-all
+;
+
+ARTICLE: "inference" "Stack effect inference"
+infer
+;
+
+ARTICLE: "unit-test" "Unit testing code"
+"A unit test is a piece of code which starts with known input values, then compares the output of a word with an expected output, where the expected output is defined by the word's contract."
+$terpri
+"For example, if you were developing a word for computing symbolic derivatives, your unit tests would apply the word to certain input functions, comparing the results against the correct values."
+$terpri
+"If you maintain a complete collection of unit tests and run them frequently, then a failing unit test can allow you to accurately pinpoint a fault in your program. However, just because unit tests pass is not an indication the code is correct. Writing good unit tests is an art form, and encourages a certain approach to programming which results in simpler, more reusable code."
+$terpri
+"The following two words perform unit testing; they are usually placed inside test harness files which you run using " { $link run-file } ":"
+{ $subsection unit-test }
+{ $subsection unit-test-fails } ;
+
+ARTICLE: "timing" "Timing code"
+time benchmark
+;
+
+ARTICLE: "annotations" "Word annotations"
+break break-on watch profile annotate
+;

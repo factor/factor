@@ -148,6 +148,7 @@ vectors words ;
         "/library/cli.factor"
         
         "/library/bootstrap/init.factor"
+        "/library/bootstrap/image.factor"
         
         ! This must be the last file of parsing words loaded
         "/library/syntax/parse-syntax.factor"
@@ -193,6 +194,7 @@ vectors words ;
         "/library/threads.facts"
         "/library/vocabularies.facts"
         "/library/words.facts"
+        "/library/bootstrap/image.facts"
         "/library/collections/growable.facts"
         "/library/collections/arrays.facts"
         "/library/collections/hashtables.facts"
@@ -264,10 +266,9 @@ vectors words ;
         "/doc/handbook/sequences.facts"
         "/doc/handbook/streams.facts"
         "/doc/handbook/syntax.facts"
+        "/doc/handbook/tools.facts"
         "/doc/handbook/tutorial.facts"
         "/doc/handbook/words.facts"
-
-        "/library/bootstrap/image.factor"
     } [ parse-resource % ] each
     
     architecture get {

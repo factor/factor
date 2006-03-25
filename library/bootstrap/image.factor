@@ -352,8 +352,6 @@ M: hashtable ' ( hashtable -- pointer )
     800000 <vector> image set 20000 <hashtable> objects set ;
 
 : make-image ( architecture -- )
-    #! Make a bootstrap image for the given architecture
-    #! (x86, ppc, or amd64).
     [
         prepare-image
         begin-image
@@ -363,4 +361,4 @@ M: hashtable ' ( hashtable -- pointer )
     ] with-scope ;
 
 : make-images ( -- )
-    "x86" make-image "ppc" make-image "amd64" make-image ;
+    { "x86" "ppc" "amd64" } [ make-image ] each ;

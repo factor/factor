@@ -12,6 +12,10 @@ HELP: image "( -- path )"
 { $values { "path" "a path name string" } }
 { $description "Outputs the path name of the currently running Factor image." } ;
 
+HELP: save-image "( path -- )"
+{ $values { "path" "a path name string" } }
+{ $description "Saves a snapshot of the heap to the given file, overwriting the file if it already exists." } ;
+
 HELP: save "( -- )"
 { $description "Saves a snapshot of the heap to the current image file." } ;
 
