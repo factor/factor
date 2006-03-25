@@ -9,8 +9,8 @@ namespaces sequences ;
     make-pile 1 over set-pack-fill { 5 5 0 } over set-pack-gap
     <default-border> dup highlight-theme ;
 
-: scratch-window ( quot -- )
-    make-pane <scroller> "Scratch" simple-window ;
+: pane-window ( quot title -- )
+    >r make-pane <scroller> r> open-window ;
 
 : handbook-window ( -- )
     T{ link f "handbook" } browser-window ;
@@ -23,12 +23,12 @@ namespaces sequences ;
         { "Listener" [ listener-window ] }
         { "Documentation" [ handbook-window ] }
         { "Tutorial" [ tutorial-window ] }
-        { "Vocabularies" [ [ vocabs. ] scratch-window ] }
+        { "Vocabularies" [ [ vocabs. ] "Vocabularies" pane-window ] }
         { "Globals" [ global browser-window ] }
-        { "Memory" [ [ heap-stats. terpri room. ] scratch-window ] }
+        { "Memory" [ [ heap-stats. terpri room. ] "Memory" pane-window ] }
         { "Save image" [ save ] }
         { "Exit" [ 0 exit ] }
     } <launchpad> ;
 
 : launchpad-window ( -- )
-    default-launchpad "Factor" simple-window ;
+    default-launchpad "Factor" open-window ;

@@ -3,7 +3,7 @@
 IN: gadgets-browser
 USING: arrays components gadgets gadgets-buttons gadgets-labels
 gadgets-layouts gadgets-panes gadgets-scrolling gadgets-theme
-hashtables help inspector kernel lists math namespaces
+generic hashtables help inspector kernel lists math namespaces
 prettyprint sequences words ;
 
 TUPLE: book page pages ;
@@ -17,8 +17,7 @@ TUPLE: book page pages ;
 C: book ( pages -- book )
     dup delegate>gadget
     [ set-book-pages ] 2keep
-    [ >r first r> show-page ] keep
-    [ show-page ] keep ;
+    [ >r first first r> show-page ] keep ;
 
 M: book pref-dim* ( book -- dim )
     book-pages { 0 0 0 } [ second pref-dim vmax ] reduce ;
@@ -27,7 +26,7 @@ M: book layout* ( book -- )
     dup rect-dim swap book-page set-gadget-dim ;
 
 : component-pages ( obj -- assoc )
-    dup get-components
+    dup class get-components
     [ first2 swapd make-pane <scroller> 2array ] map-with ;
 
 : <tab> ( name book -- button )
@@ -65,8 +64,7 @@ C: browser ( obj -- browser )
 
 TUPLE: browser-button object ;
 
-: browser-window ( obj -- )
-    <browser> "Browser" simple-window ;
+: browser-window ( obj -- ) <browser> "Browser" open-window ;
 
 : browser-button-action ( button -- )
     [ browser-button-object ] keep find-browser

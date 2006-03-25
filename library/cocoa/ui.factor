@@ -171,7 +171,7 @@ IN: gadgets
 : redraw-world ( handle -- )
     world-handle 1 [setNeedsDisplay:] ;
 
-: in-window ( world title -- )
+: open-window* ( world title -- )
     >r <FactorView> r> <ViewWindow> [contentView] [release] ;
 
 : select-gl-context ( handle -- )

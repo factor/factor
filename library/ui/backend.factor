@@ -5,7 +5,7 @@ DEFER: draw-world ! defined in world.factor
 
 : redraw-world ( world -- ) draw-world ;
 
-DEFER: in-window ( world title -- )
+DEFER: open-window* ( world title -- )
 
 DEFER: select-gl-context ( handle -- )
 

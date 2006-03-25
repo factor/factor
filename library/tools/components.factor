@@ -8,14 +8,14 @@ H{ } clone components set-global
 
 : get-components ( class -- assoc )
     components get-global hash [ { } ] unless*
-    { "Slots" [ describe ] } append ;
+    { "Slots" [ describe ] } add ;
 
 {
     { "Definition" [ help ] }
     { "Calls in" [ usage. ] }
     { "Calls out" [ uses. ] }
-} word components get-global set-hash
+} \ word components get-global set-hash
 
 {
     { "Documentation" [ help ] }
-} link components get-global set-hash
+} \ link components get-global set-hash

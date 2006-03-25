@@ -91,7 +91,7 @@ M: gadget focusable-child* drop t ;
 
 : focusable-child ( gadget -- gadget )
     dup focusable-child*
-    dup t = [ drop ] [ nip focusable-child ] if ;
+    dup t eq? [ drop ] [ nip focusable-child ] if ;
 
 IN: gadgets-layouts
 

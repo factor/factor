@@ -53,5 +53,8 @@ C: listener-gadget ( -- gadget )
 
 M: listener-gadget pref-dim* drop { 600 600 0 } ;
 
+M: listener-gadget focusable-child* ( listener -- gadget )
+    listener-gadget-pane ;
+
 : listener-window ( -- )
     <listener-gadget> "Listener" simple-window ;

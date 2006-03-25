@@ -27,7 +27,8 @@ C: world ( gadget status -- world )
     t over set-gadget-root?
     H{ } clone over set-world-fonts
     [ add-status ] keep
-    [ @center frame-add ] keep ;
+    [ @center frame-add ] 2keep
+    swap request-focus ;
 
 GENERIC: find-world ( gadget -- world )
 

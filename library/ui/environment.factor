@@ -35,5 +35,5 @@ hashtables kernel math namespaces queues sequences threads ;
 
 : <status-bar> ( -- gadget ) "" <label> dup highlight-theme ;
 
-: simple-window ( gadget title -- )
-    >r <status-bar> <world> dup prefer r> in-window ;
+: open-window ( gadget title -- )
+    >r <status-bar> <world> dup prefer r> open-window* ;
