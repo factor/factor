@@ -143,8 +143,8 @@ V{ } clone hand-buttons set-global
 
 : send-button-up ( button# loc world -- )
     move-hand
-    dup [ button-up ] button-gesture
-    hand-buttons get-global delete ;
+    dup hand-buttons get-global delete
+    [ button-up ] button-gesture ;
 
 : send-wheel ( up/down loc world -- )
     move-hand

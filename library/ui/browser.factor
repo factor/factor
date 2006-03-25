@@ -83,22 +83,25 @@ TUPLE: browser-button object ;
 
 : browser-window ( obj -- ) <browser> "Browser" open-window ;
 
-: new-browser? ( gadget -- ? )
-    find-browser not 3 hand-buttons get-global member? or ;
-
 : browser-button-action ( button -- )
-    [ browser-button-object ] keep dup new-browser? [
-        drop browser-window
-    ] [
+    [ browser-button-object ] keep find-browser [
         find-browser dup save-current browse
-    ] if ;
+    ] [
+        browser-window
+    ] if* ;
+
+: browser-button-gestures ( gadget -- )
+    [
+        [ browser-button-object browser-window ] if-clicked
+    ] [ button-up 3 ] set-action ;
 
 C: browser-button ( gadget object -- button )
     [ set-browser-button-object ] keep
     [
         >r [ browser-button-action ] <roll-button> r>
         set-gadget-delegate
-    ] keep ;
+    ] keep
+    dup browser-button-gestures ;
 
 M: browser-button gadget-help ( button -- string )
     browser-button-object dup word? [ synopsis ] [ summary ] if ;

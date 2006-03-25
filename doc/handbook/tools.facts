@@ -12,7 +12,7 @@ ARTICLE: "tools" "Development tools"
 { $subsection "images" } ;
 
 ARTICLE: "listener" "The listener"
-"The listener reads Factor expressions from a stream and evaluates them. The listener is the primary interface to the Factor runtime. Typically, you write Factor code in a text editor, then load it using the listener and test it."
+"The listener evaluates Factor expressions read from a stream. The listener is the primary interface to the Factor runtime. Typically, you write Factor code in a text editor, then load it using the listener and test it."
 $terpri
 "The classical first program can be run in the listener:"
 { $example "\"Hello, world\" print" "Hello, world" }
