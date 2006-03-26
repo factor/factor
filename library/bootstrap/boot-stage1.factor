@@ -90,6 +90,7 @@ vectors words ;
         "/library/help/markup.factor"
         "/library/help/word-help.factor"
         "/library/help/syntax.factor"
+        "/library/help/crossref.factor"
         
         "/library/tools/describe.factor"
         "/library/tools/debugger.factor"
@@ -194,6 +195,10 @@ vectors words ;
         "/library/threads.facts"
         "/library/vocabularies.facts"
         "/library/words.facts"
+        "/library/alien/alien-callback.facts"
+        "/library/alien/alien-invoke.facts"
+        "/library/alien/aliens.facts"
+        "/library/alien/c-types.facts"
         "/library/bootstrap/image.facts"
         "/library/collections/growable.facts"
         "/library/collections/arrays.facts"

@@ -18,10 +18,13 @@ H{ } clone components set-global
     { "Definition" [ help ] }
     { "Calls in" [ usage. ] }
     { "Calls out" [ uses. ] }
+    { "Links out" [ links-out. ] }
+    { "Vocabulary" [ word-vocabulary words. ] }
 } \ word components get-global set-hash
 
 {
-    { "Documentation" [ help ] }
+    { "Article" [ help ] }
+    { "Links out" [ links-out. ] }
 } \ link components get-global set-hash
 
 TUPLE: book page pages ;

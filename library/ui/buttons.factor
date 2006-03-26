@@ -18,11 +18,12 @@ TUPLE: button rollover? pressed? quot ;
 
 : button-update ( button -- )
     dup mouse-over? over set-button-rollover?
-    dup mouse-clicked? button-down? and over set-button-pressed?
+    dup mouse-clicked? button-down? and
+    over button-rollover? and over set-button-pressed?
     relayout-1 ;
 
 : if-clicked ( button quot -- )
-    >r dup button-update dup button-rollover? r> when drop ;
+    >r dup button-update dup button-rollover? r> [ drop ] if ;
 
 : button-clicked ( button -- )
     dup button-quot if-clicked ;

@@ -36,4 +36,11 @@ ARTICLE: "quickref" "Quick reference"
     "An unhandled error was caught:\n\nParsing <interactive>:1\nfdafasfa\n        ^\n\"Not a number\"\n\n:s :r show stacks at time of error.\n:get ( var -- value ) inspects the error namestack."
 }
 "Sometimes, the word " { $emphasis "does" } " exist, but you might need to " { $link POSTPONE: USE: } " its vocabulary first. The " { $link apropos } " word can help locate the correct vocabulary:"
-{ $example "\"<label>\" apropos" "IN: gadgets-labels : <label>\nIN: compiler-backend : <label>" } ;
+{ $example "\"<label>\" apropos" "IN: gadgets-labels : <label>\nIN: compiler-backend : <label>" }
+$terpri
+"A simple program:"
+{ $code
+    "USING: kernel math ;"
+    ": factorial ( n -- n! )"
+    "    dup zero? [ drop 1 ] [ dup 1- factorial * ] if ;"
+} ;

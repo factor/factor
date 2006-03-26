@@ -122,14 +122,14 @@ M: link article-content link-name article-content ;
 
 DEFER: help
 
+: ($subsection) ( quot object -- )
+    subsection-style [
+        [ swap curry ] keep dup article-title swap <link>
+        rot simple-outliner
+    ] with-style ;
+
 : $subsection ( object -- )
-    [
-        subsection-style [
-            first dup article-title swap <link>
-            dup [ link-name (help) ] curry
-            simple-outliner
-        ] with-style
-    ] ($block) ;
+    [ first [ (help) ] swap ($subsection) ] ($block) ;
 
 : $link ( article -- )
     last-block off first dup word? [

@@ -1,0 +1,39 @@
+IN: alien
+USING: help ;
+
+HELP: <displaced-alien> "( displacement c-ptr -- alien )"
+{ $values { "displacement" "an integer" } { "c-ptr" "an alien, byte array, or " { $link f } } { "alien" "a new alien" } }
+{ $description "Creates a new alien address object, wrapping a raw memory address. The alien points to a location in memory which is offset by " { $snippet "displacement" } " from the address of " { $link "c-ptr" } ". Passing a value of " { $link f } " for " { $snippet "c-ptr" } " creates an alien with an absolute address." }
+{ $see-also <alien> alien-address } ;
+
+HELP: alien-address "( c-ptr -- addr )"
+{ $values { "c-ptr" "an alien, byte array, or " { $link f } } { "addr" "a non-negative integer" } }
+{ $description "Outputs the address of an alien." }
+{ $warning "Taking the address of a byte array is not safe. The byte array can be moved by the garbage collector between the time the address is taken, and when it is accessed. If you need to pass pointers to C functions which will persist across alien calls, you must allocate unmanaged memory instead. See " { $link "malloc" } "." } ;
+
+HELP: <alien> "( address -- alien )"
+{ $values { "address" "a non-negative integer" } { "alien" "a new alien address" } }
+{ $description "Creates an alien object, wrapping a raw memory address." }
+{ $see-also <displaced-alien> alien-address } ;
+
+HELP: c-ptr f
+{ $description "Class of objects consisting of aliens, byte arrays and " { $link f } ". These objects can convert to pointer C types, which are all aliases of " { $snippet "void*" } "." } ;
+
+HELP: library "( name -- library )"
+{ $values { "name" "a string" } { "library" "a hashtable" } }
+{ $description "Looks up a library by its logical name. The library object is a hashtable with the following keys:"
+    { $list
+        { { $snippet "name" } " - the full path of the C library binary" }
+        { { $snippet "abi" } " - the ABI used by the library, either " { $snippet "cdecl" } " or " { $snippet "stdcall" } }
+        { { $snippet "dll" } " - an instance of the " { $link dll } " class; only set if the library is loaded" }
+    }
+} ;
+
+HELP: load-library "( name -- dll )"
+{ $values { "name" "a string" } { "dll" "a DLL handle" } }
+{ $description "Loads a library by logical name. If the library is already loaded, returns the existing handle." }
+{ $errors "Throws an error if the library could not be found, or if loading fails for some other reason." } ;
+
+HELP: add-library "( name path abi -- )"
+{ $values { "name" "a string" } { "path" "a string" } { "abi" "one of " { $snippet "\"cdecl\"" } " or " { $snippet "\"stdcall\"" } } }
+{ $description "Defines a new logical library named " { $snippet "name" } " located in the file system at " { $snippet "path" } "and the specified ABI." } ;

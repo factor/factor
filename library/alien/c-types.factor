@@ -47,28 +47,26 @@ SYMBOL: c-types
     "\0" append dup length malloc check-ptr
     [ alien-address string>memory ] keep ;
 
-: define-pointer ( type -- )
-    "void*" c-type swap "*" append c-types get set-hash ;
+: (typedef) ( old new -- ) c-types get [ >r get r> set ] bind ;
+
+: define-pointer ( type -- ) "*" append "void*" swap (typedef) ;
 
 : define-deref ( name vocab -- )
     >r dup "*" swap append r> create
     swap c-getter 0 swons define-compound ;
 
 : (define-nth) ( word type quot -- )
-    >r c-size [ rot * ] cons r> append define-compound ;
+    >r c-size [ rot * ] curry r> append define-compound ;
 
 : define-nth ( name vocab -- )
-    #! Make a word foo-nth ( n alien -- alien ).
     >r dup "-nth" append r> create
     swap dup c-getter (define-nth) ;
 
 : define-set-nth ( name vocab -- )
-    #! Make a word set-foo-nth ( value n alien -- ).
     >r "set-" over "-nth" append3 r> create
     swap dup c-setter (define-nth) ;
 
 : define-out ( name vocab -- )
-    #! Out parameter constructor for integral types.
     over [ <c-object> tuck 0 ] over c-setter append
     >r >r constructor-word r> r> cons define-compound ;
 
@@ -81,8 +79,6 @@ SYMBOL: c-types
     2dup define-deref
     2dup define-set-nth
     define-out ;
-
-: (typedef) c-types get [ >r get r> set ] bind ;
 
 : typedef ( old new -- )
     over "*" append over "*" append (typedef) (typedef) ;

@@ -23,10 +23,6 @@ M: alien-invoke-error summary ( error -- )
     drop "Words calling ``alien-invoke'' cannot run in the interpreter. Compile the caller word and try again." ;
 
 : alien-invoke ( ... return library function parameters -- ... )
-    #! Call a C library function.
-    #! 'return' is a type spec, and 'parameters' is a list of
-    #! type specs. 'library' is an entry in the "libraries"
-    #! namespace.
     pick pick <alien-invoke-error> throw ;
 
 \ alien-invoke [ [ string object string object ] [ ] ]
@@ -88,7 +84,7 @@ M: alien-invoke stack-reserve*
     [ alien-invoke ] cons cons cons cons r> swap define-compound
     word r> "stack-effect" set-word-prop ;
 
-: define-c-word ( type lib func function-args -- )
+: define-c-word ( return library function parameters -- )
     [ "()" subseq? not ] subset >r pick r> parse-arglist
     (define-c-word) ;
 

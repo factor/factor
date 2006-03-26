@@ -1,0 +1,14 @@
+IN: alien
+USING: help ;
+
+HELP: alien-invoke "( ... return library function parameters -- ... )"
+{ $values { "return" "a C return type" } { "library" "a logical library name" } { "function" "a C function name" } { "parameters" "a sequence of C parameter types" } }
+{ $description "Calls a C library function with the given name. Input parameters are taken from the data stack, and the return value is pushed on the data stack after the function returns."
+$terpri
+"This word only runs when it is called from within a " { $emphasis "compiled" } " word, with all four parameters as literal inputs. See " { $link "compiler" } "." }
+{ $see-also alien-callback } ;
+
+HELP: define-c-word "( return library function parameters -- )"
+{ $values { "return" "a C return type" } { "library" "a logical library name" } { "function" "a C function name" } { "parameters" "a sequence of C parameter types" } }
+{ $description "Defines a word named " { $snippet "function" } " in the current vocabulary (see " { $link "vocabularies" } "). The word calls " { $link alien-invoke } " with the specified parameters." }
+{ $notes "This word is used to implement the " { $link POSTPONE: FUNCTION: } " parsing word." } ;

@@ -1,0 +1,22 @@
+IN: alien
+USING: errors help ;
+
+HELP: alien-callback "( return parameters quot -- alien )"
+{ $values { "return" "a C return type" } { "parameters" "a sequence of C parameter types" } { "quot" "a quotation" } { "alien" "an alien address" } }
+{ $description
+    "Defines a callback from C to Factor which accepts the given set of parameters from the C caller, pushes them on the data stack, calls the quotation, and passes a return value back to the C caller."
+    $terpri
+    "This word only runs when it is called from within a " { $emphasis "compiled" } " word, with all three parameters as literal inputs. See " { $link "compiler" } "."
+    $terpri
+    "When a compiled reference to this word is called, it pushes the callback's alien address on the data stack. This address can be passed to any C function expecting a C function pointer with the correct signature. The callback is actually generated when the word calling " { $link alien-callback } " is compiled."
+    $terpri
+    "Callback quotations run with freshly-allocated stacks. This means the data stack contains the values passed by the C function, and nothing else. It also means that if the callback throws an error which is not caught, the Factor runtime will halt. See " { $link "errors" } " for error handling options."
+}
+{ $examples
+    "A simple example, showing a C function which returns the difference of two given integers:"
+    { $code
+        ": difference-callback ( -- alien )"
+        "    \"int\" { \"int\" \"int\" } [ - ] alien-callback ;"
+    }
+}
+{ $see-also alien-invoke } ;

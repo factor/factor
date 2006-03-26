@@ -22,6 +22,7 @@ namespaces sequences ;
     {
         { "Listener" [ listener-window ] }
         { "Documentation" [ handbook-window ] }
+        { "Help index" [ [ articles. ] "Help index" pane-window ] }
         { "Tutorial" [ tutorial-window ] }
         { "Vocabularies" [ [ vocabs. ] "Vocabularies" pane-window ] }
         { "Globals" [ global browser-window ] }

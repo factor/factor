@@ -50,6 +50,7 @@
 - grid layout
 - variable width word wrap
 - fix top level window positioning
+- changing window titles
 
 + compiler/ffi:
 

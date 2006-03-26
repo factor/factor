@@ -7,8 +7,10 @@ M: word article-title "The " swap word-name " word" append3 ;
 
 M: word article-name word-name ;
 
+: word-article ( word -- article ) "help" word-prop ;
+
 : word-help ( word -- )
-    dup "help" word-prop [
+    dup word-article [
         % drop
     ] [
         "predicating" word-prop [
