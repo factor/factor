@@ -1,5 +1,5 @@
 USING: alien parser namespaces kernel syntax words math io prettyprint ;
-IN: win32
+IN: win32-api
 
 ! PIXELFORMATDESCRIPTOR flags
 : PFD_DOUBLEBUFFER            HEX: 00000001 ; inline

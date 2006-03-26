@@ -1,5 +1,5 @@
 USING: hashtables kernel math namespaces parser prettyprint words ;
-IN: windows-messages
+IN: win32-api-messages
 
 SYMBOL: windows-messages
 

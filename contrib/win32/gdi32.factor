@@ -1,7 +1,7 @@
 IN: win32
 USING: alien kernel errors ;
 
-LIBRARY: gdi
+LIBRARY: gdi32
 
 ! Stock Logical Objects
 : WHITE_BRUSH         0 ; inline

@@ -1,5 +1,5 @@
-USING: kernel win32 math namespaces io prettyprint errors sequences alien ;
-IN: clipboard
+USING: kernel win32-api math namespaces io prettyprint errors sequences alien ;
+IN: win32
 
 : (enum-clipboard) ( n -- )
     EnumClipboardFormats win32-error dup 0 > [ dup , (enum-clipboard) ] when ;

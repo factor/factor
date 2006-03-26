@@ -1,5 +1,5 @@
 USING: alien namespaces kernel words ;
-IN: win32
+IN: win32-api
 
 ! http://msdn.microsoft.com/library/default.asp?url=/library/en-us/winprog/winprog/windows_data_types.asp
 

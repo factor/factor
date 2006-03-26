@@ -1,7 +1,7 @@
 USING: alien kernel errors ;
-IN: win32
+IN: win32-api
 
-LIBRARY: kernel
+LIBRARY: kernel32
 
 ! FUNCTION: MAKEINTRESOURCEA
 ! FUNCTION: MAKEINTRESOURCEW

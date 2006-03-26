@@ -2,9 +2,9 @@ IN: scratchpad
 USING: alien compiler kernel parser sequences words ;
 
 {
-    { "gdi" "gdi32" }
-    { "user" "user32" }
-    { "kernel" "kernel32" }
+    { "gdi32" "gdi32" }
+    { "user32" "user32" }
+    { "kernel32" "kernel32" }
 } [ first2 add-simple-library ] each
 
 { 

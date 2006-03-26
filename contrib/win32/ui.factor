@@ -1,6 +1,6 @@
 USING: alien arrays errors freetype gadgets gadgets-launchpad gadgets-layouts
        gadgets-listener hashtables io kernel lists math namespaces prettyprint 
-       sequences strings vectors words windows-messages ;
+       sequences strings vectors words win32-api-messages win32-api ;
 USING: inspector threads memory ;
 IN: win32
 
@@ -10,6 +10,8 @@ SYMBOL: msg-obj
 ! 'SYMBOL: windows' is a hashtable of 'gadget-window' objects indexed by hWnd.
 ! hDC = handle to device context, hRC = handle to render context
 TUPLE: gadget-window world hWnd hDC hRC ;
+
+: class-name "Factor" ;
 
 : get-world ( hWnd -- world ) windows get hash gadget-window-world ;
 : get-gadget-window ( hWnd -- gadget-window )
@@ -41,7 +43,12 @@ TUPLE: gadget-window world hWnd hDC hRC ;
 
 : handle-wm-size ( hWnd uMsg wParam lParam -- )
     [ lo-word ] keep hi-word make-RECT get-RECT-dimensions 0 3array
-    2nip swap get-world set-gadget-dim ;
+    2nip
+    dup { 0 0 0 } = [
+        2drop
+    ] [
+        swap get-world set-gadget-dim
+    ] if ;
 
 : wm-keydown-codes ( n -- key )
     H{
@@ -212,11 +219,11 @@ SYMBOL: hWnd
 
 : init-win32-ui
     "MSG" <c-object> msg-obj set
-    "Factor" ui-wndproc register-wndclassex win32-error=0
+    class-name ui-wndproc register-wndclassex win32-error=0
     H{ } clone windows set
     init-ui ;
 
-: cleanup-win32-ui ( -- ) "Factor" f UnregisterClass drop ;
+: cleanup-win32-ui ( -- ) class-name f UnregisterClass drop ;
 
 : setup-pixel-format ( hdc -- )
     16 make-pfd [ ChoosePixelFormat dup win32-error=0 ] 2keep
@@ -234,7 +241,7 @@ SYMBOL: hWnd
     dup get-rc ;
 
 : make-gadget-window ( world title -- <gadget-window> )
-    "Factor" swap pick rect-dim first2 create-window
+    class-name swap pick rect-dim first2 create-window
     dup setup-gl <gadget-window> ;
 
 IN: gadgets
@@ -255,14 +262,14 @@ IN: gadgets
     get-gadget-window [ gadget-window-hDC SwapBuffers win32-error=0 ] when* ;
 
 IN: shells
-: ui ( -- )
+: ui
     [
         [
             init-win32-ui
             launchpad-window
             listener-window
             event-loop
-        ] with-freetype 
+        ] with-freetype
     ] [ cleanup-win32-ui ] cleanup ;
 
 : default-shell "ui" ;

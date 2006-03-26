@@ -1,5 +1,5 @@
 USING: alien parser namespaces kernel syntax words math io prettyprint ;
-IN: win32
+IN: win32-api
 
 
 TYPEDEF: void* MSGBOXPARAMSA
@@ -438,8 +438,53 @@ TYPEDEF: void* MSGBOXPARAMSW
 : MK_XBUTTON2         HEX: 0040 ; inline
 
 
+! Some fields are not defined for win64
+! Window field offsets for GetWindowLong()
+! TODO: win32 only!!
+windows? [
+    : GWL_WNDPROC         -4 ;
+    : GWL_HINSTANCE       -6 ;
+    : GWL_HWNDPARENT      -8 ;
+    : GWL_USERDATA        -21 ;
+    : GWL_ID              -12 ;
+] when
 
-LIBRARY: user
+: GWL_STYLE           -16 ;
+: GWL_EXSTYLE         -20 ;
+
+: GWLP_WNDPROC        -4 ;
+: GWLP_HINSTANCE      -6 ;
+: GWLP_HWNDPARENT     -8 ;
+: GWLP_USERDATA       -21 ;
+: GWLP_ID             -12 ;
+
+! Class field offsets for GetClassLong()
+! TODO: win32 only!
+windows? [
+    : GCL_MENUNAME        -8 ;
+    : GCL_HBRBACKGROUND   -10 ;
+    : GCL_HCURSOR         -12 ;
+    : GCL_HICON           -14 ;
+    : GCL_HMODULE         -16 ;
+    : GCL_WNDPROC         -24 ;
+    : GCL_HICONSM         -34 ;
+] when
+: GCL_CBWNDEXTRA      -18 ;
+: GCL_CBCLSEXTRA      -20 ;
+: GCL_STYLE           -26 ;
+: GCW_ATOM            -32 ;
+
+: GCLP_MENUNAME       -8 ;
+: GCLP_HBRBACKGROUND  -10 ;
+: GCLP_HCURSOR        -12 ;
+: GCLP_HICON          -14 ;
+: GCLP_HMODULE        -16 ;
+: GCLP_WNDPROC        -24 ;
+: GCLP_HICONSM        -34 ;
+
+
+
+LIBRARY: user32
 FUNCTION: HKL ActivateKeyboardLayout ( HKL hkl, UINT Flags ) ;
 
 FUNCTION: BOOL AdjustWindowRect ( LPRECT lpRect, DWORD dwStyle, BOOL bMenu ) ;
@@ -734,12 +779,20 @@ FUNCTION: UINT EnumClipboardFormats ( UINT format ) ;
 ! FUNCTION: GetCapture
 ! FUNCTION: GetCaretBlinkTime
 ! FUNCTION: GetCaretPos
-! FUNCTION: GetClassInfoA
-! FUNCTION: GetClassInfoExA
-! FUNCTION: GetClassInfoExW
-! FUNCTION: GetClassInfoW
-! FUNCTION: GetClassLongA
-! FUNCTION: GetClassLongW
+FUNCTION: BOOL GetClassInfoA ( HINSTANCE hInst, LPCTSTR lpszClass, LPWNDCLASS lpwcx ) ;
+FUNCTION: BOOL GetClassInfoW ( HINSTANCE hInst, LPCWSTR lpszClass, LPWNDCLASS lpwcx ) ;
+: GetClassInfo \ GetClassInfoW \ GetClassInfoA unicode-exec ;
+
+FUNCTION: BOOL GetClassInfoExA ( HINSTANCE hInst, LPCTSTR lpszClass, LPWNDCLASSEX lpwcx ) ;
+FUNCTION: BOOL GetClassInfoExW ( HINSTANCE hInst, LPCWSTR lpszClass, LPWNDCLASSEX lpwcx ) ;
+: GetClassInfoEx \ GetClassInfoExW \ GetClassInfoExA unicode-exec ;
+
+FUNCTION: ULONG_PTR GetClassLongA ( HWND hWnd, int nIndex ) ;
+FUNCTION: ULONG_PTR GetClassLongW ( HWND hWnd, int nIndex ) ;
+: GetClassLong \ GetClassLongW \ GetClassLongA unicode-exec ;
+: GetClassLongPtr \ GetClassLongW \ GetClassLongA unicode-exec ;
+
+
 ! FUNCTION: GetClassNameA
 ! FUNCTION: GetClassNameW
 ! FUNCTION: GetClassWord
@@ -1156,8 +1209,12 @@ FUNCTION: int ReleaseDC ( HWND hWnd, HDC hDC ) ;
 ! FUNCTION: SetCapture
 ! FUNCTION: SetCaretBlinkTime
 ! FUNCTION: SetCaretPos
-! FUNCTION: SetClassLongA
-! FUNCTION: SetClassLongW
+
+FUNCTION: ULONG_PTR SetClassLongW ( HWND hWnd, int nIndex, LONG_PTR dwNewLong ) ;
+FUNCTION: ULONG_PTR SetClassLongA ( HWND hWnd, int nIndex, LONG_PTR dwNewLong ) ;
+: SetClassLongPtr \ SetClassLongW \ SetClassLongA unicode-exec ;
+: SetClassLong \ SetClassLongW \ SetClassLongA unicode-exec ;
+
 ! FUNCTION: SetClassWord
 FUNCTION: HANDLE SetClipboardData ( UINT uFormat, HANDLE hMem ) ;
 ! FUNCTION: SetClipboardViewer
