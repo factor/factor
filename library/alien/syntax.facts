@@ -1,7 +1,7 @@
 IN: syntax
 USING: alien help ;
 
-HELP: DLL" "path\"
+HELP: DLL" "path\""
 { $values { "path" "a path name string" } }
 { $description "Constructs a DLL handle at parse time." }
 { $see-also dlopen } ;
