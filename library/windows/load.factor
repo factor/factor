@@ -25,7 +25,7 @@ USING: alien compiler kernel namespaces parser sequences words ;
     "win32-io-internals"
     "win32-stream"
     "win32-server"
-} [ "/library/win32/" swap ".factor" append3 run-resource ] each
+} [ "/library/windows/" swap ".factor" append3 run-resource ] each
     
 "native-io" get [
     "/library/bootstrap/win32-io.factor" run-resource
