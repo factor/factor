@@ -35,13 +35,11 @@ ARTICLE: "alien-invoke" "Calling C from Factor"
 $terpri
 "The above parsing words create word definitions which call a lower-level word; you can use it directly, too:"
 { $subsection alien-invoke }
-$terpri
 "There are some details concerning the conversion of Factor objects to C values, and vice versa. See " { $link "c-types" } "." ;
 
 ARTICLE: "alien-callback" "Calling Factor from C"
 "Callbacks can be defined and passed to C code as function pointers; the C code can then invoke the callback and run Factor code:"
 { $subsection alien-callback }
-$terpri
 "There are some details concerning the conversion of Factor objects to C values, and vice versa. See " { $link "c-types" } "." ;
 
 ARTICLE: "c-types" "C types"
@@ -262,6 +260,7 @@ $terpri
 { $subsection malloc }
 { $subsection calloc }
 { $subsection realloc }
+{ $subsection check-ptr }
 "You must always free pointers returned by any of the above words:"
 { $subsection free } ;
 

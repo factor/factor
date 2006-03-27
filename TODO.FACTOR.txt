@@ -51,6 +51,7 @@
 - variable width word wrap
 - fix top level window positioning
 - changing window titles
+- remove distinction between a word and a link to a word
 
 + compiler/ffi:
 

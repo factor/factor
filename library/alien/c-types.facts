@@ -56,21 +56,21 @@ HELP: alien>string "( c-ptr -- string )"
 HELP: <malloc-array> "( n type -- alien )"
 { $values { "n" "a non-negative integer" } { "type" "a string" } { "alien" "an alien address" } }
 { $description "Allocates an unmanaged memory block large enough to hold " { $snippet "n" } " values of a C type." }
-{ $warning "Don't forget to deallocate the memory with a call to  " { $link free } "." }
+{ $warning "Don't forget to deallocate the memory with a call to " { $link free } "." }
 { $errors "Throws an error if the type does not exist, if the requested size is negative, or if memory allocation fails." }
 { $see-also <c-array> } ;
 
 HELP: <malloc-object> "( type -- alien )"
 { $values { "type" "a string" } { "alien" "an alien address" } }
 { $description "Allocates an unmanaged memory block large enough to hold a value of a C type." }
-{ $warning "Don't forget to deallocate the memory with a call to  " { $link free } "." }
+{ $warning "Don't forget to deallocate the memory with a call to " { $link free } "." }
 { $errors "Throws an error if the type does not exist or if memory allocation fails." } 
 { $see-also <c-object> } ;
 
 HELP: <malloc-string> "( string -- alien )"
 { $values { "string" "a string" } { "alien" "an alien address" } }
 { $description "Copies a string to an unmanaged memory block large enough to hold a copy of the string in 8-bit ASCII encoding, with a trailing null byte." }
-{ $warning "Don't forget to deallocate the memory with a call to  " { $link free } "." }
+{ $warning "Don't forget to deallocate the memory with a call to " { $link free } "." }
 { $errors "Throws an error if memory allocation fails." }
 { $see-also string>alien } ;
 

@@ -22,8 +22,6 @@ SYMBOL: vocabularies
 
 : all-words ( -- list ) vocabs [ words ] map concat ;
 
-: each-word ( quot -- ) all-words swap each ; inline
-
 : word-subset ( pred -- list )
     all-words swap subset ; inline
 
@@ -31,7 +29,7 @@ SYMBOL: vocabularies
     all-words swap subset-with ; inline
 
 : recrossref ( -- )
-    crossref get clear-hash [ add-crossref ] each-word ;
+    crossref get clear-hash all-words [ add-crossref ] each ;
 
 : lookup ( name vocab -- word ) vocab ?hash ;
 

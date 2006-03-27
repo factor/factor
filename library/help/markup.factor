@@ -116,8 +116,6 @@ TUPLE: link name ;
 
 M: link article-title link-name article-title ;
 
-M: link article-name link-name article-name ;
-
 M: link article-content link-name article-content ;
 
 DEFER: help
@@ -136,7 +134,7 @@ DEFER: help
         pprint
     ] [
         link-style [
-            dup article-name swap <link> simple-object
+            dup article-title swap <link> simple-object
         ] with-style
     ] if ;
 

@@ -1,15 +1,9 @@
 ! Copyright (C) 2005, 2006 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 IN: help
-USING: arrays generic kernel namespaces prettyprint sequences
-words ;
+USING: arrays kernel namespaces prettyprint sequences words ;
 
-M: word article-title
-    [
-        "The " % dup word-name % class? " class" " word" ? %
-    ] "" make ;
-
-M: word article-name word-name ;
+M: word article-title word-name ;
 
 : word-article ( word -- article ) "help" word-prop ;
 
