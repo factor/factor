@@ -44,11 +44,7 @@ TUPLE: gadget-window world hWnd hDC hRC ;
 : handle-wm-size ( hWnd uMsg wParam lParam -- )
     [ lo-word ] keep hi-word make-RECT get-RECT-dimensions 0 3array
     2nip
-    dup { 0 0 0 } = [
-        2drop
-    ] [
-        swap get-world set-gadget-dim
-    ] if ;
+    dup { 0 0 0 } = [ 2drop ] [ swap get-world set-gadget-dim ] if ;
 
 : wm-keydown-codes ( n -- key )
     H{
@@ -74,9 +70,35 @@ TUPLE: gadget-window world hWnd hDC hRC ;
         { 13 "RETURN" }
     } ;
 
-: handle-key? ( n -- bool ) wm-keydown-codes hash* nip ;
-: exclude-key? ( n -- bool ) wm-char-exclude-keys hash* nip ;
-: keystroke>gesture ( n -- list ) wm-keydown-codes hash unit ;
+: key-state-down?
+    GetKeyState 1 16 shift bitand 0 > ;
+
+: left-shift? ( -- bool ) VK_LSHIFT key-state-down? ;
+: left-ctrl? ( -- bool ) VK_LCONTROL key-state-down? ;
+: left-alt? ( -- bool ) VK_LMENU key-state-down? ;
+: right-shift? ( -- bool ) VK_RSHIFT key-state-down? ;
+: right-ctrl? ( -- bool ) VK_RCONTROL key-state-down? ;
+: right-alt? ( -- bool ) VK_RMENU key-state-down? ;
+: shift? ( -- bool ) left-shift? right-shift? or ;
+: ctrl? ( -- bool ) left-ctrl? right-ctrl? or ;
+: alt? ( -- bool ) left-alt? right-alt? or ;
+
+: key-modifiers ( -- list )
+    [
+        shift? [ "SHIFT" , ] when
+        ctrl? [ "CTRL" , ] when
+        alt? [ "ALT" , ] when
+    ] V{ } make ;
+    
+: handle-key-as-gesture? ( n -- bool )
+    wm-keydown-codes hash* nip key-modifiers empty? not or ;
+
+: exclude-key? ( n -- bool )
+    wm-char-exclude-keys hash* nip ;
+
+: keystroke>gesture ( n -- list )
+    dup wm-keydown-codes hash* [ nip ] [ drop ch>string ] if
+    key-modifiers [ push ] keep >list ;
 
 SYMBOL: lParam
 SYMBOL: wParam
@@ -86,7 +108,7 @@ SYMBOL: hWnd
 ! wparam = keystroke, lparam = parameters
 : handle-wm-keydown ( hWnd uMsg wParam lParam -- )
     lParam set wParam set uMsg set hWnd set
-    wParam get handle-key? [
+    wParam get handle-key-as-gesture? [
         wParam get keystroke>gesture
         hWnd get get-world world-focus handle-gesture 0
     ] [
@@ -107,6 +129,7 @@ SYMBOL: hWnd
 
 : handle-wm-char ( hWnd uMsg wParam lParam -- )
     lParam set wParam set uMsg set hWnd set
+    ! "WM_CHAR" print
     wParam get exclude-key? [
         hWnd get uMsg get wParam get lParam get DefWindowProc
     ] [
@@ -117,7 +140,7 @@ SYMBOL: hWnd
 ! TODO: handle alt keystrokes as gestures
 : handle-wm-syschar ( hWnd uMsg wParam lParam -- )
     lParam set wParam set uMsg set hWnd set
-    ;
+    handle-wm-keydown ;
 
 : mouse-button ( uMsg -- n )
     {

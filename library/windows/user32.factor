@@ -838,7 +838,7 @@ FUNCTION: HWND GetFocus ( ) ;
 ! FUNCTION: GetKeyboardType
 ! FUNCTION: GetKeyNameTextA
 ! FUNCTION: GetKeyNameTextW
-! FUNCTION: GetKeyState
+FUNCTION: SHORT GetKeyState ( int nVirtKey ) ;
 ! FUNCTION: GetLastActivePopup
 ! FUNCTION: GetLastInputInfo
 ! FUNCTION: GetLayeredWindowAttributes
