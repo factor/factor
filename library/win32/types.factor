@@ -60,30 +60,37 @@ TYPEDEF: void*               LPVOID
 TYPEDEF: void*               LPCVOID
 
 TYPEDEF: float               FLOAT
-win64? [
-    ! TODO: check these!
-        TYPEDEF: INT32       HALF_PTR
-        TYPEDEF: UINT32      UHALF_PTR
-        TYPEDEF: long        INT_PTR
-        TYPEDEF: ulong       UINT_PTR
+! The following is commented out for two reasons.
+! 1) all of the code in both branches will be run because TYPEDEF: is a 
+!    parsing word
+! 2) we are waiting on gcc to be ported to win64/msys
+! 3) the TYPEDEF:s are probably wrong.
 
-        TYPEDEF: longlong    LONG_PTR ! 64bit
-        TYPEDEF: ulonglong   ULONG_PTR ! 64bit
-
-        TYPEDEF: int         INT32
-        TYPEDEF: uint        UINT32
-        TYPEDEF: uint        DWORD32
-        TYPEDEF: uint        ULONG32
-        TYPEDEF: ulong       ULONG64
-        TYPEDEF: int*        POINTER_32
-        TYPEDEF: long*       POINTER_64
-        TYPEDEF: longlong    INT64
-        TYPEDEF: ulonglong   UINT64
-        TYPEDEF: longlong    LONGLONG ! 64bit
-        TYPEDEF: ulonglong   ULONGLONG
-        TYPEDEF: longlong    LONG64
-        TYPEDEF: ulonglong   DWORD64
-    ] [
+! win64? [
+    ! ! TODO: check these!
+        ! TYPEDEF: INT32       HALF_PTR
+        ! TYPEDEF: UINT32      UHALF_PTR
+        ! TYPEDEF: long        INT_PTR
+        ! TYPEDEF: ulong       UINT_PTR
+ 
+        ! TYPEDEF: longlong    LONG_PTR ! 64bit
+        ! TYPEDEF: ulonglong   ULONG_PTR ! 64bit
+ 
+        ! TYPEDEF: int         INT32
+        ! TYPEDEF: uint        UINT32
+        ! TYPEDEF: uint        DWORD32
+        ! TYPEDEF: uint        ULONG32
+        ! TYPEDEF: ulong       ULONG64
+        ! TYPEDEF: int*        POINTER_32
+        ! TYPEDEF: long*       POINTER_64
+        ! TYPEDEF: longlong    INT64
+        ! TYPEDEF: ulonglong   UINT64
+        ! TYPEDEF: longlong    LONGLONG ! 64bit
+        ! TYPEDEF: ulonglong   ULONGLONG
+        ! TYPEDEF: longlong    LONG64
+        ! TYPEDEF: ulonglong   DWORD64
+    ! ] [
+! Correct for win32
         TYPEDEF: short       HALF_PTR
         TYPEDEF: ushort      UHALF_PTR
         TYPEDEF: int         INT_PTR
@@ -105,15 +112,15 @@ win64? [
         TYPEDEF: ulonglong   ULONGLONG
         TYPEDEF: longlong    LONG64
         TYPEDEF: ulonglong   DWORD64
-] if
+! ] if
 
-unicode? [
-        TYPEDEF: WCHAR       TBYTE
-        TYPEDEF: WCHAR       TCHAR
-    ] [
+! unicode? [
+        ! TYPEDEF: WCHAR       TBYTE
+        ! TYPEDEF: WCHAR       TCHAR
+    ! ] [
         TYPEDEF: uchar       TBYTE
         TYPEDEF: char        TCHAR
-] if
+! ] if
 
 ! Below down is based on the above definitions
 ! There should be no 32/64bit issues
