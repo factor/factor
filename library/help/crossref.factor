@@ -42,7 +42,8 @@ M: array elements*
 
 SYMBOL: help-graph
 
-: links-in ( article -- ) help-graph get in-edges ;
+: links-in ( article -- )
+    dup link? [ link-name ] when help-graph get in-edges ;
 
 : xref-article ( article -- )
     [ links-out ] help-graph get add-vertex ;

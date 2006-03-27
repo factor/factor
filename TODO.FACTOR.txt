@@ -1,12 +1,19 @@
+0.81:
+
+- x86 %box-struct
+- x86 %write-barrier
+- bundle freetype .dylib in the .app on OS X
+- x11 title bars are funny
+- x11 wheel mouse test
+- changelog in the UI
+- set resource path to image parent directory
+- amd64 %box-struct
+
 + portability:
 
 - win64 port
 - get factor running on mac intel
 - amd64 %unbox-struct
-- amd64 %box-struct
-- x86 %box-struct
-- x86 %write-barrier
-- bundle freetype .dylib in the .app on OS X
 - when generating a 32-bit image on a 64-bit system, large numbers which should
   be bignums become fixnums
 
@@ -21,10 +28,7 @@
 
 + ui/help:
 
-- x11:
-  - title bars are funny
-  - input methods
-  - wheel mouse test
+- x11 input methods
 - cocoa:
   - global menu bar with useful commands
   - make the launchpad a palette
@@ -37,7 +41,6 @@
   - use glRect
   - display lists
 - saving the image should save window configuration
-- changelog in the UI
 - make the UI look better, something like this:
   http://twb.ath.cx/~twb/darcs/OBSOLETE/factor/final.html
 - fix remaining HTML stream issues
@@ -77,7 +80,6 @@
 
 + misc:
 
-- set resource path to image parent directory
 - clean up stack effect generation code
 - code walker & exceptions
 - slice: if sequence or seq start is changed, abstraction violation
