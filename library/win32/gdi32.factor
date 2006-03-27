@@ -1,5 +1,5 @@
-IN: win32
 USING: alien kernel errors ;
+IN: win32-api
 
 LIBRARY: gdi32
 
