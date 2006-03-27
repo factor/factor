@@ -30,7 +30,7 @@ vocabularies get [ "syntax" set [ reveal ] each ] bind
 
 H{ } clone articles set
 H{ } clone terms set
-help-xref off
+help-graph off
 
 ! Call the quotation parsed from primitive-types.factor
 call
