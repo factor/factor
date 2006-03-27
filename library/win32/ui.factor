@@ -272,3 +272,5 @@ IN: shells
         ] with-freetype
     ] [ cleanup-win32-ui ] cleanup ;
 
+IN: kernel
+: default-shell "ui" ;
