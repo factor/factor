@@ -4,7 +4,7 @@
 ! This file is based on the gl.h that comes with xorg-x11 6.8.2
 
 IN: opengl 
-USING: alien kernel ;
+USING: alien kernel sequences words ;
 
 windows? [
     "gl" "opengl32.dll" "stdcall" add-library
@@ -1171,22 +1171,23 @@ FUNCTION: void glPopName ( ) ;
 : GL_ALIASED_POINT_SIZE_RANGE       HEX: 846D ; inline
 : GL_ALIASED_LINE_WIDTH_RANGE       HEX: 846E ; inline
 
-windows? [
 
-    FUNCTION: void glDrawRangeElements ( GLenum mode, GLuint start, GLuint end,
+FUNCTION: void glDrawRangeElements ( GLenum mode, GLuint start, GLuint end,
                                      GLsizei count, GLenum type, GLvoid* indices ) ;
 
-    FUNCTION: void glTexImage3D ( GLenum target, GLint level, GLint internalFormat,
+FUNCTION: void glTexImage3D ( GLenum target, GLint level, GLint internalFormat,
                               GLsizei width, GLsizei height, GLsizei depth, GLint border,
 			      GLenum format, GLenum type, GLvoid* pixels ) ;
 
-    FUNCTION: void glTexSubImage3D ( GLenum target, GLint level, GLint xoffset, GLint yoffset,
+FUNCTION: void glTexSubImage3D ( GLenum target, GLint level, GLint xoffset, GLint yoffset,
                                  GLint zoffset, GLsizei width, GLsizei height, GLsizei depth,
 				 GLenum format, GLenum type, GLvoid* pixels ) ;
 
-    FUNCTION: void glCopyTexSubImage3D ( GLenum target, GLint level,
+FUNCTION: void glCopyTexSubImage3D ( GLenum target, GLint level,
                                      GLint xoffset, GLint yoffset, GLint zoffset,
 				     GLint x, GLint y, GLsizei width, GLsizei height ) ;
+windows? [
+    { glDrawRangeElements glTexImage3D glTexSubImage3D glCopyTexSubImage3D } [ forget ] each
 ] unless
 
 

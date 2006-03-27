@@ -14,9 +14,9 @@ recrossref
             "/library/unix/load.factor" run-resource
         ] when
 
-        windows? [
-            "/library/win32/load.factor" run-resource
-        ] when
+    ] when
+    windows? [
+        "/library/win32/load.factor" run-resource
     ] when
     
     parse-command-line
@@ -49,8 +49,10 @@ recrossref
         "/library/x11/load.factor" run-resource
     ] when
 
-    windows? [
-        "/contrib/win32/load.factor" run-resource
+    windows? "native-io" get and [
+        "/library/win32/ui.factor" run-resource
+        "/library/win32/clipboard.factor" run-resource
+        compile-all
     ] when
 ] when
 

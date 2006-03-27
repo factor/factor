@@ -1,24 +1,35 @@
-USING: alien io kernel parser sequences ;
+IN: scratchpad
+USING: alien compiler kernel namespaces parser sequences words ;
 
-"kernel32" "kernel32.dll" "stdcall" add-library
-"user32"   "user32.dll"   "stdcall" add-library
-"gdi32"    "gdi32.dll"    "stdcall" add-library
-"winsock"  "ws2_32.dll"   "stdcall" add-library
-"mswsock"  "mswsock.dll"  "stdcall" add-library
+{
+    { "gdi32" "gdi32" }
+    { "user32" "user32" }
+    { "kernel32" "kernel32" }
+    { "winsock" "ws2_32" }
+    { "mswsock" "mswsock" }
+} [ first2 add-simple-library ] each
 "libc"     "msvcrt.dll"   "cdecl"   add-library
 
-[
-    "/library/win32/win32-io.factor"
-    "/library/win32/win32-errors.factor"
-    "/library/win32/winsock.factor"
-    "/library/win32/win32-io-internals.factor"
-    "/library/win32/win32-stream.factor"
-    "/library/win32/win32-server.factor"
-    "/library/bootstrap/win32-io.factor"
-] [
-    run-resource
-] each
+{ 
+    "windows-messages"
+    "types"
+    "gdi32"
+    "kernel32"
+    "user32"
+    "opengl32"
+    "utils"
+
+    "win32-io"
+    "win32-errors"
+    "winsock"
+    "win32-io-internals"
+    "win32-stream"
+    "win32-server"
+} [ "/library/win32/" swap ".factor" append3 run-resource ] each
+    
+"native-io" get [
+    "/library/bootstrap/win32-io.factor" run-resource
+] when
 
 IN: kernel
-
-: default-shell "ui" ;
+: default-shell "native-io" get "ui" "tty" ? ;
