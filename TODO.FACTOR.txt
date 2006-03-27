@@ -42,16 +42,15 @@
   http://twb.ath.cx/~twb/darcs/OBSOLETE/factor/final.html
 - fix remaining HTML stream issues
 - fix up the min thumb size hack
-- help cross-referencing
+- automatically update help graph when adding/removing articles/words
 - document conventions
 - new turtle graphics tutorial
 - better line spacing in ui and html
-- tabular formatting - for inspector and changes
+- tabular formatting - for inspector, changes and $values in help
 - grid layout
 - variable width word wrap
 - fix top level window positioning
 - changing window titles
-- remove distinction between a word and a link to a word
 
 + compiler/ffi:
 

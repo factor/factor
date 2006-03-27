@@ -88,7 +88,7 @@ M: alien-invoke stack-reserve*
     [ "()" subseq? not ] subset >r pick r> parse-arglist
     (define-c-word) ;
 
-M: compound (uncrossref)
+M: compound unxref-word*
     dup word-def \ alien-invoke swap member?
     over "infer" word-prop or [
         drop

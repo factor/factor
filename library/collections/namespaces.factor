@@ -52,28 +52,6 @@ SYMBOL: building
 
 : # ( n -- ) number>string % ;
 
-SYMBOL: hash-buffer
-
-: closure, ( value key -- old )
-    hash-buffer get [ hash swap ] 2keep set-hash ;
-
-: (closure) ( key hash -- )
-    tuck hash dup [
-        [
-            drop dup dup closure,
-            [ 2drop ] [ swap (closure) ] if
-        ] hash-each-with
-    ] [
-        2drop
-    ] if ;
-
-: closure ( key hash -- list )
-    [
-        H{ } clone hash-buffer set
-        (closure)
-        hash-buffer get hash-keys
-    ] with-scope ;
-
 IN: lists
 
 : alist>quot ( default alist -- quot )

@@ -1,8 +1,8 @@
 ! Copyright (C) 2004, 2006 Slava Pestov.
-! See http://factor.sf.net/license.txt for BSD license.
+! See http://factorcode.org/license.txt for BSD license.
 IN: words
-USING: hashtables kernel kernel-internals lists math
-namespaces sequences strings vectors ;
+USING: errors graphs hashtables kernel kernel-internals lists
+math namespaces sequences strings vectors ;
 
 M: word <=> [ word-name ] 2apply <=> ;
 
@@ -43,38 +43,28 @@ M: word set-word-xt ( xt w -- ) 7 set-integer-slot ;
 
 SYMBOL: crossref
 
-: (add-crossref) crossref get [ dupd nest set-hash ] bind ;
+: xref-word ( word -- )
+    dup word-vocabulary
+    [ [ uses ] crossref get add-vertex ] [ drop ] if ;
 
-: add-crossref ( word -- )
-    crossref get over word-vocabulary and [
-        dup dup uses [ (add-crossref) ] each-with
-    ] when drop ;
+: usage ( word -- seq ) crossref get in-edges ;
 
-: usage ( word -- seq )
-    crossref get ?hash dup [ hash-keys ] when ;
+: usages ( word -- deps ) crossref get closure ;
 
-: usages ( word -- deps )
-    crossref get dup [ closure ] [ 2drop { } ] if ;
+GENERIC: unxref-word* ( word -- )
 
-GENERIC: (uncrossref) ( word -- )
+M: word unxref-word* drop ;
 
-M: word (uncrossref) drop ;
-
-: remove-crossref ( callee caller -- )
-    crossref get [ nest remove-hash ] bind ;
-
-: uncrossref ( word -- )
-    crossref get [
-        dup dup uses [ remove-crossref ] each-with
-        dup (uncrossref) dup usages [ (uncrossref) ] each
-    ] when drop ;
+: unxref-word ( word -- )
+    dup unxref-word* dup usages [ unxref-word* ] each
+    [ uses ] crossref get remove-vertex ;
 
 : define ( word parameter primitive -- )
-    pick uncrossref
+    pick unxref-word
     pick set-word-primitive
     over set-word-def
     dup update-xt
-    add-crossref ;
+    xref-word ;
 
 : define-symbol ( word -- ) dup 2 define ;
 
@@ -100,3 +90,64 @@ M: word literalize <wrapper> ;
 
 : completions ( substring words -- seq )
     [ word-name subseq? ] subset-with ;
+
+SYMBOL: bootstrapping?
+
+SYMBOL: vocabularies
+
+: word ( -- word ) \ word get-global ;
+
+: set-word ( word -- ) \ word set-global ;
+
+: vocabs ( -- seq ) vocabularies get hash-keys natural-sort ;
+
+: vocab ( name -- vocab ) vocabularies get hash ;
+
+: ensure-vocab ( name -- ) vocabularies get [ nest drop ] bind ;
+
+: words ( vocab -- list ) vocab dup [ hash-values ] when ;
+
+: all-words ( -- list ) vocabs [ words ] map concat ;
+
+: word-subset ( pred -- list )
+    all-words swap subset ; inline
+
+: word-subset-with ( obj pred -- list | pred: obj word -- ? )
+    all-words swap subset-with ; inline
+
+: xref-words ( -- )
+    H{ } clone crossref set
+    all-words [ uses ] crossref get add-vertices ;
+
+: lookup ( name vocab -- word ) vocab ?hash ;
+
+: reveal ( word -- )
+    vocabularies get [
+        dup word-name over word-vocabulary nest set-hash
+    ] bind ;
+
+: check-create ( name vocab -- )
+    string? [ "Vocabulary name is not a string" throw ] unless
+    string? [ "Word name is not a string" throw ] unless ;
+
+: create ( name vocab -- word )
+    2dup check-create 2dup lookup dup
+    [ 2nip ] [ drop <word> dup init-word dup reveal ] if ;
+
+: constructor-word ( string vocab -- word )
+    >r "<" swap ">" append3 r> create ;
+
+: forget ( word -- )
+    dup unxref-word
+    dup word-name swap word-vocabulary vocab remove-hash ;
+
+: target-word ( word -- word )
+    dup word-name swap word-vocabulary lookup ;
+
+: interned? ( word -- ? ) dup target-word eq? ;
+
+: bootstrap-word ( word -- word )
+    dup word-name swap word-vocabulary
+    bootstrapping? get [
+        dup "syntax" = [ drop "!syntax" ] when
+    ] when lookup ;

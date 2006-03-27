@@ -1,12 +1,12 @@
 ! Copyright (C) 2006 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 IN: help
-USING: arrays generic hashtables io kernel lists namespaces
-sequences strings words ;
+USING: arrays generic graphs hashtables io kernel lists
+namespaces sequences strings words ;
 
 : all-articles ( -- seq )
     [
-        articles hash-keys %
+        articles get hash-keys %
         [ word-article ] word-subset %
         terms get hash-keys [ <term> ] map %
     ] { } make ;
@@ -40,8 +40,19 @@ M: array elements*
         \ $subsection swap collect-elements
     ] make-hash hash-keys ;
 
-: links-in ( article -- seq )
-    all-articles [ links-out member? ] subset-with ;
+SYMBOL: help-graph
+
+: links-in ( article -- ) help-graph get in-edges ;
+
+: xref-article ( article -- )
+    [ links-out ] help-graph get add-vertex ;
+
+: unxref-article ( article -- )
+    [ links-out ] help-graph get remove-vertex ;
+
+: xref-articles ( -- )
+    H{ } clone help-graph set
+    all-articles [ links-out ] help-graph get add-vertices ;
 
 : help-outliner ( seq quot -- | quot: obj -- )
     swap sort-articles [ ($subsection) terpri ] each-with ;

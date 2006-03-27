@@ -24,12 +24,13 @@ H{ } clone c-types set
 "syntax" vocab
 
 H{ } clone vocabularies set
-H{ } clone articles set
-H{ } clone terms set
-
 crossref off
 
 vocabularies get [ "syntax" set [ reveal ] each ] bind
+
+H{ } clone articles set
+H{ } clone terms set
+help-xref off
 
 ! Call the quotation parsed from primitive-types.factor
 call

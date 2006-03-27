@@ -303,7 +303,7 @@ M: hashtable ' ( hashtable -- pointer )
     [
         {
             vocabularies typemap builtins c-types crossref
-            articles terms
+            articles terms help-graph
         }
         [ [ ] change ] each
     ] make-hash '

@@ -129,12 +129,14 @@ DEFER: help
 : $subsection ( object -- )
     [ first [ (help) ] swap ($subsection) ] ($block) ;
 
+: >link ( obj -- obj ) dup string? [ <link> ] when ;
+
 : $link ( article -- )
     last-block off first dup word? [
         pprint
     ] [
         link-style [
-            dup article-title swap <link> simple-object
+            dup article-title swap >link simple-object
         ] with-style
     ] if ;
 

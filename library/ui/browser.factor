@@ -18,12 +18,14 @@ H{ } clone components set-global
     { "Definition" [ help ] }
     { "Calls in" [ usage. ] }
     { "Calls out" [ uses. ] }
+    { "Links in" [ links-in. ] }
     { "Links out" [ links-out. ] }
     { "Vocabulary" [ word-vocabulary words. ] }
 } \ word components get-global set-hash
 
 {
     { "Article" [ help ] }
+    { "Links in" [ links-in. ] }
     { "Links out" [ links-out. ] }
 } \ link components get-global set-hash
 

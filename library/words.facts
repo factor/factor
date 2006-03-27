@@ -1,4 +1,4 @@
-USING: help kernel words ;
+USING: help kernel parser words ;
 
 HELP: execute "( word -- )"
 { $values { "word" "a word" } }
@@ -83,9 +83,9 @@ HELP: uses "( word -- seq )"
 
 HELP: crossref f
 { $description "Variable. A hashtable mapping words to usages, where usages are a set represented by a hashtable with words as keys and dummy sentinels as values." }
-{ $see-also usages recrossref } ;
+{ $see-also usages xref-words } ;
 
-HELP: add-crossref "( word -- )"
+HELP: xref-word "( word -- )"
 { $values { "word" "a word" } }
 { $description "Adds dependencies from every word called by this word to this word." }
 $low-level-note ;
@@ -101,12 +101,12 @@ HELP: usages "( word -- seq )"
 { $description "Outputs a sequence of words that call the given word through some chain of callers." }
 { $notes "This word computes the transitive closure of the result of " { $link usage } ". The sequence will include the word itself if it is recursive." } ;
 
-HELP: (uncrossref) "( word -- )"
+HELP: unxref-word* "( word -- )"
 { $values { "word" "a word" } }
 { $contract "Updates the word to cope with a callee being redefined." }
 $low-level-note ;
 
-HELP: remove-crossref "( callee caller -- )"
+HELP: unxref-word "( callee caller -- )"
 { $values { "callee" "a word" } { "caller" "a word" } }
 { $description "Remove the fact that " { $snippet "caller" } " calls " { $snippet "callee" } " from the cross-referencing database." }
 $low-level-note ;
@@ -148,3 +148,81 @@ HELP: definer "( word -- definer )"
     { $example ": foo ; \\ foo definer ." "POSTPONE: :" }
     { $example "SYMBOL: foo \\ foo definer ." "POSTPONE: SYMBOL:" }
 } ;
+
+HELP: bootstrapping? f
+{ $description "Variable. Set by the library while bootstrap is in progress. Some parsing words need to behave differently during bootstrap." } ;
+
+HELP: vocabularies f
+{ $description "Variable. Holds a hashtable mapping vocabulary names to vocabularies." } ;
+
+HELP: word "( -- word )"
+{ $values { "word" "a word" } }
+{ $description "Outputs the most recently defined word." }
+{ $see-also save-location } ;
+
+HELP: set-word "( -- word )"
+{ $values { "word" "a word" } }
+{ $description "Sets the recently defined word. Usually you would call " { $link save-location } " on a newly-defined word instead, which will in turn call this word." }
+{ $see-also word } ;
+
+HELP: vocabs "( -- seq )"
+{ $values { "word" "a sequence of strings" } }
+{ $description "Outputs a sequence of all defined vocabulary names." } ;
+
+HELP: vocab "( name -- vocab )"
+{ $values { "name" "a string" } { "vocab" "a hashtable" } }
+{ $description "Outputs a named vocabulary, or " { $link f } " if no vocabulary with this name exists." } ;
+
+HELP: ensure-vocab "( name -- )"
+{ $values { "name" "a string" } }
+{ $description "Creates a vocabulary if it does not already exist." } ;
+
+HELP: words "( vocab -- seq )"
+{ $values { "vocab" "a string" } { "seq" "a sequence of words" } }
+{ $description "Outputs a sequence of words defined in the vocabulary, or " { $link f } " if no vocabulary with this name exists." } ;
+
+HELP: all-words "( -- seq )"
+{ $values { "seq" "a sequence of words" } }
+{ $description "Outputs a sequence of all words in the dictionary." } ;
+
+HELP: word-subset "( quot -- seq )"
+{ $values { "quot" "a quotation with stack effect " { $snippet "( word -- ? )" } } { "seq" "a sequence of words" } }
+{ $description "Outputs a sequence of words satisfying the predicate." } ;
+
+HELP: xref-words "( -- )"
+{ $description "Update the word dependency database. Usually this is done automatically." } ;
+
+HELP: lookup "( name vocab -- word )"
+{ $values { "name" "a string" } { "vocab" "a string" } { "word" "a word or " { $link f } } }
+{ $description "Looks up a word in the dictionary. If the vocabulary or the word is not defined, outputs " { $link f } "." } ;
+
+HELP: reveal "( word -- )"
+{ $values { "word" "a word" } }
+{ $description "Adds a newly-created word to the dictionary. Usually this word does not need to be called directly." }
+{ $see-also create } ;
+
+HELP: create "( name vocab -- word )"
+{ $values { "name" "a string" } { "vocab" "a string" } { "word" "a word" } }
+{ $description "Creates a new word. Creates the vocabulary first if it does not already exist. If the vocabulary exists and already contains a word with the requested name, outputs the existing word." } ;
+
+HELP: constructor-word "( name vocab -- word )"
+{ $values { "name" "a string" } { "vocab" "a string" } { "word" "a word" } }
+{ $description "Creates a new word, surrounding " { $snippet "name" } " in angle brackets." }
+{ $examples { $example "\"salmon\" \"scratchpad\" constructor-word ." "<salmon>" } } ;
+
+HELP: forget "( word -- )"
+{ $values { "word" "a word" } }
+{ $description "Removes the word from its vocabulary. The word becomes uninterned." }
+{ $see-also POSTPONE: FORGET: } ;
+
+HELP: target-word "( word -- target )"
+{ $values { "word" "a word" } { "target" "a word" } }
+{ $description "Looks up a word with the same name and vocabulary as the given word. Used during bootstrap to transfer host words to the target dictionary." } ;
+
+HELP: interned? "( word -- ? )"
+{ $values { "word" "a word" } { "?" "a boolean" } }
+{ $description "Test if the word is an interned word." } ;
+
+HELP: bootstrap-word "( word -- target )"
+{ $values { "word" "a word" } { "target" "a word" } }
+{ $description "Looks up a word with the same name and vocabulary as the given word, performing a transformation to handle parsing words in the target dictionary. Used during bootstrap to transfer host words to the target dictionary." } ;

@@ -43,6 +43,7 @@ vectors words ;
         "/library/collections/lists.factor"
         "/library/collections/flatten.factor"
         "/library/collections/queues.factor"
+        "/library/collections/graphs.factor"
 
         "/library/math/random.factor"
         "/library/math/constants.factor"
@@ -53,7 +54,6 @@ vectors words ;
         "/library/math/parse-numbers.factor"
 
         "/library/words.factor"
-        "/library/vocabularies.factor"
         "/library/continuations.factor"
         "/library/errors.factor"
         
@@ -84,13 +84,12 @@ vectors words ;
 
         "/library/tools/interpreter.factor"
         
-        "/library/help/database.factor"
         "/library/help/stylesheet.factor"
         "/library/help/help.factor"
         "/library/help/markup.factor"
         "/library/help/word-help.factor"
-        "/library/help/syntax.factor"
         "/library/help/crossref.factor"
+        "/library/help/syntax.factor"
         
         "/library/tools/describe.factor"
         "/library/tools/debugger.factor"
@@ -193,7 +192,6 @@ vectors words ;
         "/library/errors.facts"
         "/library/kernel.facts"
         "/library/threads.facts"
-        "/library/vocabularies.facts"
         "/library/words.facts"
         "/library/alien/alien-callback.facts"
         "/library/alien/alien-invoke.facts"

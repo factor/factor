@@ -1,12 +1,12 @@
 ! Copyright (C) 2004, 2006 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: compiler compiler-backend io io-internals kernel
+USING: compiler compiler-backend help io io-internals kernel
 kernel-internals lists math memory namespaces optimizer parser
 sequences sequences-internals words ;
 
-"Building cross-referencing database..." print
-H{ } clone crossref set
-recrossref
+"Cross-referencing..." print
+xref-words
+xref-articles
 
 "compile" get [
     "native-io" get [
