@@ -23,11 +23,11 @@ else
 	UNIX_UI_LIBS = -lfreetype -lGL -lGLU -L/usr/X11R6/lib -lX11
 endif
 
-WIN32_OBJS = native/win32/ffi.o \
-	native/win32/file.o \
-	native/win32/misc.o \
-	native/win32/run.o \
-	native/win32/memory.o
+WINDOWS_OBJS = native/windows/ffi.o \
+	native/windows/file.o \
+	native/windows/misc.o \
+	native/windows/run.o \
+	native/windows/memory.o
 
 UNIX_OBJS = native/unix/file.o \
 	native/unix/signal.o \
@@ -42,8 +42,8 @@ MACOSX_OBJS = $(UNIX_OBJS) \
 GENERIC_UNIX_OBJS = $(UNIX_OBJS) \
 	native/unix/run.o
 
-ifdef WIN32
- 	PLAF_OBJS = $(WIN32_OBJS)
+ifdef WINDOWS
+ 	PLAF_OBJS = $(WINDOWS_OBJS)
  	PLAF_SUFFIX = .exe
 else
 	ifdef MACOSX
@@ -125,8 +125,8 @@ solaris solaris-x86:
 
 windows:
 	$(MAKE) $(BINARY) \
-		CFLAGS="$(DEFAULT_CFLAGS) -DWIN32" \
-		LIBS="$(DEFAULT_LIBS)" WIN32=y
+		CFLAGS="$(DEFAULT_CFLAGS) -DWINDOWS" \
+		LIBS="$(DEFAULT_LIBS)" WINDOWS=y
 
 f: $(OBJS)
 	$(CC) $(LIBS) $(CFLAGS) -o $@$(PLAF_SUFFIX) $(OBJS)

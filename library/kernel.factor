@@ -31,10 +31,10 @@ M: object clone ;
 : and ( a b -- a&b ) f ? ; inline
 : or ( a b -- a|b ) t swap ? ; inline
 
-: cpu ( -- arch ) 7 getenv ;
-: os ( -- os ) 11 getenv ;
-: windows? ( -- ? ) os "win32" = ;
-: macosx? os "macosx" = ;
+: cpu ( -- arch ) 7 getenv ; foldable
+: os ( -- os ) 11 getenv ; foldable
+: windows? ( -- ? ) os "windows" = ; inline
+: macosx? os "macosx" = ; inline
 
 : slip >r call r> ; inline
 
@@ -100,3 +100,8 @@ IN: kernel-internals
 : complex-tag BIN: 110 ; inline
 
 : cell 17 getenv ; foldable
+
+IN: kernel
+
+: win32? windows? cell 4 = and ; inline
+: win64? windows? cell 8 = and ; inline
