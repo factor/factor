@@ -46,6 +46,7 @@ SYMBOL: t
 : flushable word t "flushable" set-word-prop ; parsing
 : foldable word t "foldable" set-word-prop ; parsing
 : SYMBOL: CREATE dup reset-generic define-symbol ; parsing
+
 DEFER: PRIMITIVE: parsing
 : DEFER: CREATE dup reset-generic drop ; parsing
 : : CREATE dup reset-generic [ define-compound ] [ ] ; parsing

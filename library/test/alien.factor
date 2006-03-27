@@ -4,6 +4,8 @@ USING: alien arrays kernel kernel-internals namespaces test ;
 [ t ] [ 0 <alien> 0 <alien> = ] unit-test
 [ f ] [ 0 <alien> 1024 <alien> = ] unit-test
 [ f ] [ "hello" 1024 <alien> = ] unit-test
+[ f ] [ 0 <alien> ] unit-test
+[ f ] [ 0 f <displaced-alien> ] unit-test
 
 ! Testing the various bignum accessor
 10 <byte-array> "dump" set

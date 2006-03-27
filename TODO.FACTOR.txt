@@ -66,7 +66,7 @@
 - FIELD: char key_vector[32];
 - FIELD: union { char b[20]; short s[10]; long l[5]; } data;
 - MEMBER: long pad[24];
-- C structs, enums, unions: use new-style string mode parsing
+- C structs: use new-style string mode parsing
 - [ [ dup call ] dup call ] infer hangs
 - the invalid recursion form case needs to be fixed, for inlines too
 - code gc

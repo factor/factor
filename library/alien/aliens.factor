@@ -4,8 +4,7 @@ IN: alien
 USING: arrays hashtables io kernel lists math namespaces parser
 sequences ;
 
-: <alien> ( address -- alien )
-    dup zero? [ drop f ] [ f <displaced-alien> ] if ; inline
+: <alien> ( address -- alien ) f <displaced-alien> ; inline
 
 UNION: c-ptr byte-array alien ;
 

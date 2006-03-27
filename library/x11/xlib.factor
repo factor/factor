@@ -999,79 +999,40 @@ BEGIN-STRUCT: XKeymapEvent
 	FIELD: int pad
 END-STRUCT
 
-! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-
-! BEGIN-UNION: XEvent
-!            int type;
-!            XAnyEvent xany;
-!            XKeyEvent xkey;
-!            XButtonEvent xbutton;
-!            XMotionEvent xmotion;
-!            XCrossingEvent xcrossing;
-!            XFocusChangeEvent xfocus;
-!            XExposeEvent xexpose;
-!            XGraphicsExposeEvent xgraphicsexpose;
-!            XNoExposeEvent xnoexpose;
-!            XVisibilityEvent xvisibility;
-!            XCreateWindowEvent xcreatewindow;
-!            XDestroyWindowEvent xdestroywindow;
-!            XUnmapEvent xunmap;
-!            XMapEvent xmap;
-!            XMapRequestEvent xmaprequest;
-!            XReparentEvent xreparent;
-!            XConfigureEvent xconfigure;
-!            XGravityEvent xgravity;
-!            XResizeRequestEvent xresizerequest;
-!            XConfigureRequestEvent xconfigurerequest;
-!            XCirculateEvent xcirculate;
-!            XCirculateRequestEvent xcirculaterequest;
-!            XPropertyEvent xproperty;
-!            XSelectionClearEvent xselectionclear;
-!            XSelectionRequestEvent xselectionrequest;
-!            XSelectionEvent xselection;
-!            XColormapEvent xcolormap;
-!            XClientMessageEvent xclient;
-!            XMappingEvent xmapping;
-!            XErrorEvent xerror;
-!            XKeymapEvent xkeymap;
-!            long pad[24];
-! END-UNION
-
-BEGIN-UNION: XEvent
-	MEMBER: int
-	MEMBER: XAnyEvent
-!	MEMBER: XKeyEvent
-	MEMBER: XButtonEvent
-!	MEMBER: XMotionEvent
-!	MEMBER: XCrossingEvent
-!	MEMBER: XFocusChangeEvent
-!	MEMBER: XExposeEvent
-!	MEMBER: XGraphicsExposeEvent
-!	MEMBER: XNoExposeEvent
-!	MEMBER: XVisibilityEvent
-!	MEMBER: XCreateWindowEvent
-!	MEMBER: XDestroyWindowEvent
-!	MEMBER: XUnmapEvent
-!	MEMBER: XMapEvent
-!	MEMBER: XMapRequestEvent
-!	MEMBER: XReparentEvent
-!	MEMBER: XConfigureEvent
-!	MEMBER: XGravityEvent
-!	MEMBER: XResizeRequestEvent
-!	MEMBER: XConfigureRequestEvent
-!	MEMBER: XCirculateEvent
-!	MEMBER: XCirculateRequestEvent
-!	MEMBER: XPropertyEvent
-!	MEMBER: XSelectionClearEvent
-!	MEMBER: XSelectionRequestEvent
-!	MEMBER: XSelectionEvent
-!	MEMBER: XColormapEvent
-!	MEMBER: XClientMessageEvent
-!	MEMBER: XMappingEvent
-!	MEMBER: XErrorEvent
-!	MEMBER: XKeymapEvent
-!            long pad[24];
-END-UNION
+C-UNION: XEvent
+	int
+	XAnyEvent
+	XKeyEvent
+	XButtonEvent
+	XMotionEvent
+	XCrossingEvent
+	XFocusChangeEvent
+	XExposeEvent
+	XGraphicsExposeEvent
+	XNoExposeEvent
+	XVisibilityEvent
+	XCreateWindowEvent
+	XDestroyWindowEvent
+	XUnmapEvent
+	XMapEvent
+	XMapRequestEvent
+	XReparentEvent
+	XConfigureEvent
+	XGravityEvent
+	XResizeRequestEvent
+	XConfigureRequestEvent
+	XCirculateEvent
+	XCirculateRequestEvent
+	XPropertyEvent
+	XSelectionClearEvent
+	XSelectionRequestEvent
+	XSelectionEvent
+	XColormapEvent
+	XClientMessageEvent
+	XMappingEvent
+	XErrorEvent
+	XKeymapEvent
+;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 ! 11 - Event Handling Functions

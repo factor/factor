@@ -80,7 +80,10 @@ void primitive_displaced_alien(void)
 	maybe_gc(sizeof(ALIEN));
 	alien = dpop();
 	displacement = unbox_unsigned_cell();
-	dpush(tag_object(make_alien(alien,displacement)));
+	if(alien == F && displacement == 0)
+		dpush(F);
+	else
+		dpush(tag_object(make_alien(alien,displacement)));
 }
 
 /* address of an object representing a C pointer */

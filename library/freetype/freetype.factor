@@ -162,13 +162,13 @@ FUNCTION: FT_Error FT_Set_Char_Size ( face* face, FT_F26Dot6 char_width, FT_F26D
 
 FUNCTION: FT_Error FT_Load_Char ( face* face, FT_ULong charcode, FT_Int32 load_flags ) ;
 
-BEGIN-ENUM: 0
-    ENUM: FT_RENDER_MODE_NORMAL
-    ENUM: FT_RENDER_MODE_LIGHT
-    ENUM: FT_RENDER_MODE_MONO
-    ENUM: FT_RENDER_MODE_LCD
-    ENUM: FT_RENDER_MODE_LCD_V
-END-ENUM
+C-ENUM:
+    FT_RENDER_MODE_NORMAL
+    FT_RENDER_MODE_LIGHT
+    FT_RENDER_MODE_MONO
+    FT_RENDER_MODE_LCD
+    FT_RENDER_MODE_LCD_V
+;
 
 FUNCTION: int FT_Render_Glyph ( glyph* slot, int render_mode ) ;
 
