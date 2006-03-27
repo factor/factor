@@ -75,7 +75,10 @@ $terpri
 { $subsection &s }
 { $subsection &r }
 { $subsection &get }
-"You can annotate a word with a breakpoint, so that the single stepper is started every time the word is called. See " { $link "annotations" } "." ;
+"You can annotate a word with a breakpoint, so that the single stepper is started every time the word is called. See " { $link "annotations" } "."
+$terpri
+"An example to try out in the single stepper:"
+{ $code "[ { 3 1 2 } reverse first3 * swap - ] walk" } ;
 
 ARTICLE: "unit-test" "Unit testing code"
 "A unit test is a piece of code which starts with known input values, then compares the output of a word with an expected output, where the expected output is defined by the word's contract."

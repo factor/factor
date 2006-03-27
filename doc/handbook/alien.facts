@@ -1,0 +1,274 @@
+USING: alien arrays help libc math ;
+ARTICLE: "alien" "The C library interface"
+"Factor can directly call C functions in native libraries. It is also possible to compile callbacks which run Factor code, and pass them to native libraries as function pointers."
+$terpri
+"The C library interface is entirely self-contained; there is no C code which one must write in order to wrap a library."
+$terpri
+"C library interface words are found in the " { $snippet "alien" } " vocabulary."
+{ $warning "Since C does not retain runtime type information or do any kind of runtime type checking, any C library interface is not pointer safe. Improper use of C functions can crash the runtime or corrupt memory in unpredictible ways." }
+{ $subsection "loading-libs" }
+{ $subsection "alien-invoke" }
+{ $subsection "alien-callback" }
+{ $subsection "c-types" }
+{ $subsection "c-objects" }
+{ $subsection "malloc" }
+{ $subsection "dll-internals" } ;
+
+ARTICLE: "loading-libs" "Loading native libraries"
+"Factor must be aware of what native libraries are in use. This is done by associating a logical library name with an operating system path name, and then referring to the library by its logical name. There are two ways to define libraries in this manner; you can either use command line parameters or the " { $link add-library } " word."
+$terpri
+"The following two command line parameters can be specified for each library to load; the second parameter is optional:"
+{ $list
+    { { $snippet "-libraries:" { $emphasis "logical" } ":name=" { $emphasis "name" } } " associates a logical name with a system-specific native library name," }
+    { { $snippet "-libraries:" { $emphasis "logical" } ":abi=" { $emphasis "type" } } " specifies the application binary interface (ABI) used by the library. On nearly all platforms, the default value of " { $snippet "cdecl" } " is correct. On Windows/x86, system DLLs use the " { $snippet "stdcall" } " ABI." }
+}
+"You can also define a logical library interactively:"
+{ $subsection add-library }
+"Once a library has been defined, you can try loading it to see if the path name is correct:"
+{ $subsection load-library } ;
+
+ARTICLE: "alien-invoke" "Calling C from Factor"
+"The easiest way to call into a C library is to define bindings using a pair of parsing words:"
+{ $subsection POSTPONE: LIBRARY: }
+{ $subsection POSTPONE: FUNCTION: }
+"Don't forget to compile your binding word after defining it; C library calls cannot be made from an interpreted definition."
+$terpri
+"The above parsing words create word definitions which call a lower-level word; you can use it directly, too:"
+{ $subsection alien-invoke }
+$terpri
+"There are some details concerning the conversion of Factor objects to C values, and vice versa. See " { $link "c-types" } "." ;
+
+ARTICLE: "alien-callback" "Calling Factor from C"
+"Callbacks can be defined and passed to C code as function pointers; the C code can then invoke the callback and run Factor code:"
+{ $subsection alien-callback }
+$terpri
+"There are some details concerning the conversion of Factor objects to C values, and vice versa. See " { $link "c-types" } "." ;
+
+ARTICLE: "c-types" "C types"
+"The " { $link POSTPONE: FUNCTION: } ", " { $link alien-invoke } " and " { $link alien-callback } " words convert Factor objects to and from C values."
+$terpri
+"The C library interface can handle a variety of native data types. C types are identified by strings, and a few utility words are defined for working with them:"
+{ $subsection c-type }
+{ $subsection c-size }
+{ $subsection c-align }
+"Support for a number of C types is built-in:"
+{ $subsection "c-types-numeric" }
+{ $subsection "c-types-pointers" }
+{ $subsection "c-types-strings" }
+"New C types can be defined using facilities which resemble C language features:"
+{ $subsection "c-structs" }
+{ $subsection "c-unions" } ;
+
+
+ARTICLE: "c-types-numeric" "Integer and floating point C types"
+"The following numerical types are available; a " { $snippet "u" } " prefix denotes an unsigned type:"
+{ $list
+    { { $snippet "char" } " - always 1 byte" }
+    { $snippet "uchar" }
+    { { $snippet "short" } " - always 2 bytes" }
+    { $snippet "ushort" }
+    { { $snippet "int" } " - always 4 bytes" }
+    { $snippet "uint" }
+    { { $snippet "long" } " - same size as CPU word size and " { $snippet "void*" } ", except on 64-bit Windows, where it is 4 bytes" }
+    { $snippet "ulong" }
+    { { $snippet "longlong" } " - always 8 bytes" }
+    { $snippet "ulonglong" }
+    { $snippet "float" }
+    { { $snippet "double" } " - same format as " { $link float } " objects" }
+}
+"When making alien calls, Factor numbers are converted to and from the above types in a canonical way. Converting a Factor number to a C value may result in a loss of precision."
+$terpri
+"Numerical values can be read from memory addresses and converted to Factor objects using the various typed memory accessor words:"
+{ $subsection alien-signed-1 }
+{ $subsection alien-unsigned-1 }
+{ $subsection alien-signed-2 }
+{ $subsection alien-unsigned-2 }
+{ $subsection alien-signed-4 }
+{ $subsection alien-unsigned-4 }
+{ $subsection alien-signed-cell }
+{ $subsection alien-unsigned-cell }
+{ $subsection alien-signed-8 }
+{ $subsection alien-unsigned-8 }
+{ $subsection alien-float }
+{ $subsection alien-double }
+"Factor numbers can also be converted to C values and stored to memory:"
+{ $subsection set-alien-signed-1 }
+{ $subsection set-alien-unsigned-1 }
+{ $subsection set-alien-signed-2 }
+{ $subsection set-alien-unsigned-2 }
+{ $subsection set-alien-signed-4 }
+{ $subsection set-alien-unsigned-4 }
+{ $subsection set-alien-signed-cell }
+{ $subsection set-alien-unsigned-cell }
+{ $subsection set-alien-signed-8 }
+{ $subsection set-alien-unsigned-8 }
+{ $subsection set-alien-float }
+{ $subsection set-alien-double } ;
+
+ARTICLE: "c-types-pointers" "C pointer types"
+"Every C type always has a corresponding pointer type whose name is suffixed by " { $snippet "*" } "; at the implementation level, all pointer types are equivalent to " { $snippet "void*" } "."
+$terpri
+"The Factor objects which can be converted to " { $snippet "void*" } " form a class:"
+{ $subsection c-ptr }
+{ $warning "Since byte arrays can move in the Factor heap, make sure to only pass a byte array to a C function expecting a pointer if you know the function will not retain the pointer after it returns. If you need permanent space for data which must not move, see " { $link "malloc" } "." }
+"C " { $snippet "void*" } " value returned by functions are wrapped inside fresh " { $link alien } " objects." ;
+
+ARTICLE: "c-types-strings" "C string types"
+"The C library interface defines two types of C strings:"
+{ $list
+    { { $snippet "char*" } " - 8-bit per character null-terminated ASCII" }
+    { { $snippet "ushort*" } " - 16-bit per character null-terminated UTF16" }
+}
+"Passing an instance of " { $link c-ptr } " to a C function expecting a C string will simply pass in the address of the " { $link c-ptr } "."
+$terpri
+"Passing a Factor string to a C function expecting a C string allocates a byte array in the Factor heap; the string is then converted to the requested format and a raw pointer is passed to the function. The function must not retain such pointers after it returns, since byte arrays in the Factor heap can be moved by the garbage collector. To allocate a string which will not move, use " { $link <malloc-string> } " and then " { $link free } "."
+$terpri
+"A couple of words can be used to read and write " { $snippet "char*" } " strings from arbitrary addresses:"
+{ $subsection alien>string }
+{ $subsection string>alien } ;
+
+ARTICLE: "c-structs" "C structure types"
+"A " { $snippet "struct" } " in C is essentially a block of memory with the value of each structure field stored at a fixed offset. The C library interface provides some utilities to define words which read and write structure fields given a base address."
+{ $subsection POSTPONE: BEGIN-STRUCT: }
+{ $subsection POSTPONE: FIELD: }
+{ $subsection POSTPONE: END-STRUCT }
+"Great care must be taken when working with C structures since no type or bounds checking is possible."
+$terpri
+"An example:"
+{ $code
+    "BEGIN-STRUCT: surface"
+    "    FIELD: uint    flags"
+    "    FIELD: format* format"
+    "    FIELD: int     w"
+    "    FIELD: int     h"
+    "    FIELD: ushort  pitch"
+    "    FIELD: void*   pixels"
+    "    FIELD: int     offset"
+    "    FIELD: void*   hwdata"
+    "    FIELD: short   clip-x"
+    "    FIELD: short   clip-y"
+    "    FIELD: ushort  clip-w"
+    "    FIELD: ushort  clip-h"
+    "    FIELD: uint    unused1"
+    "    FIELD: uint    locked"
+    "    FIELD: int     map"
+    "    FIELD: uint    format_version"
+    "    FIELD: int     refcount"
+    "END-STRUCT"
+}
+"When calling a C function expecting a structure as input, use a utility word which allocates a byte array of the correct size:"
+{ $subsection <c-object> }
+"To learn how to allocate an unmanaged block from the operating system suitable for holding a C structure, see " { $link "malloc" } "."
+$terpri
+"You can test if a C type is a structure type:"
+{ $subsection c-struct? } ;
+
+ARTICLE: "c-unions" "C unions"
+"A " { $snippet "union" } " in C defines a type large enough to hold its largest member. This is usually used to allocate a block of memory which can hold one of several types of values."
+{ $subsection POSTPONE: C-UNION: } ;
+
+ARTICLE: "c-objects" "C objects"
+"Alien address objects can be constructed and manipulated directly:"
+{ $subsection <alien> }
+{ $subsection <displaced-alien> }
+{ $subsection alien-address }
+{ $subsection expired? }
+"There are various ways to abstract the pointer manipulation associated with C arrays and out parameters:"
+{ $subsection "c-arrays" }
+{ $subsection "c-out-params" } ;
+
+ARTICLE: "c-arrays" "C arrays"
+"When calling a C function expecting an array as input, use a utility word which allocates a byte array of the correct size:"
+{ $subsection <c-array> }
+"To learn how to allocate an unmanaged block from the operating system suitable for holding a C array, see " { $link "malloc" } "."
+$terpri
+"Each C type has a pair of words, " { $snippet { $emphasis "type" } "-nth" } " and " 
+"Each C type has a pair of words, " { $snippet "set-" { $emphasis "type" } "-nth" } ", for reading and writing values of this type stored in an array. This set of words includes but is not limited to:"
+{ $subsection char-nth }
+{ $subsection set-char-nth }
+{ $subsection uchar-nth }
+{ $subsection set-uchar-nth }
+{ $subsection short-nth }
+{ $subsection set-short-nth }
+{ $subsection ushort-nth }
+{ $subsection set-ushort-nth }
+{ $subsection int-nth }
+{ $subsection set-int-nth }
+{ $subsection uint-nth }
+{ $subsection set-uint-nth }
+{ $subsection long-nth }
+{ $subsection set-long-nth }
+{ $subsection ulong-nth }
+{ $subsection set-ulong-nth }
+{ $subsection longlong-nth }
+{ $subsection set-longlong-nth }
+{ $subsection ulonglong-nth }
+{ $subsection set-ulonglong-nth }
+{ $subsection float-nth }
+{ $subsection set-float-nth }
+{ $subsection double-nth }
+{ $subsection set-double-nth }
+{ $subsection void*-nth }
+{ $subsection set-void*-nth }
+{ $subsection char*-nth }
+{ $subsection ushort*-nth }
+"Byte arrays can also be created with an arbitrary size:"
+{ $subsection <byte-array> }
+;
+
+ARTICLE: "c-out-params" "Output parameters in C"
+"A frequently-occurring idiom in C code is the \"out parameter\". If a C function returns more than one value, the caller passes pointers of the correct type, and the C function writes its return values to those locations."
+$terpri
+"Each numerical C type, together with " { $snippet "void*" } ", has an associated " { $emphasis "out parameter constructor" } " word which takes a Factor object as input, constructs a byte array of the correct size, and converts the Factor object to a C value stored into the byte array:"
+{ $subsection <char> }
+{ $subsection <uchar> }
+{ $subsection <short> }
+{ $subsection <ushort> }
+{ $subsection <int> }
+{ $subsection <uint> }
+{ $subsection <long> }
+{ $subsection <ulong> }
+{ $subsection <longlong> }
+{ $subsection <ulonglong> }
+{ $subsection <float> }
+{ $subsection <double> }
+{ $subsection <void*> }
+"You call the out parameter constructor with the required initial value, then pass the byte array to the C function, which receives a pointer to the start of the byte array's data area. The C function then returns, leaving the result in the byte array; you read it back using the next set of words:"
+{ $subsection *char }
+{ $subsection *uchar }
+{ $subsection *short }
+{ $subsection *ushort }
+{ $subsection *int }
+{ $subsection *uint }
+{ $subsection *long }
+{ $subsection *ulong }
+{ $subsection *longlong }
+{ $subsection *ulonglong }
+{ $subsection *float }
+{ $subsection *double }
+{ $subsection *void* }
+{ $subsection *char* }
+{ $subsection *ushort* }
+"Note that while structure and union types do not get these words defined for them, there is no loss of generality since " { $link <void*> } " and " { $link *void* } " may be used." ;
+
+ARTICLE: "malloc" "Manual memory management"
+"Sometimes data passed to C functions must be allocated at a fixed address so that C code can safely store pointers."
+$terpri
+"The following words mirror " { $link <c-object> } ", " { $link <c-array> } " and " { $link string>alien } ":"
+{ $subsection <malloc-object> }
+{ $subsection <malloc-array> }
+{ $subsection <malloc-string> }
+"These words are built on some words in the " { $snippet "libc" } " vocabulary, which themselves use the C library interface to call C standard library functions:"
+{ $subsection malloc }
+{ $subsection calloc }
+{ $subsection realloc }
+"You must always free pointers returned by any of the above words:"
+{ $subsection free } ;
+
+ARTICLE: "dll-internals" "DLL handles"
+"DLL handles are a built-in class of objects which represent loaded native libraries. DLL handles are instances of the " { $link dll } " class, and have a literal syntax used for debugging prinouts; see " { $link "syntax-aliens" } "."
+$terpri
+"Usually one never has to deal with DLL handles directly; the C library interface creates them as required. However if direct access to these operating system facilities is required, the following primitives can be used:"
+{ $subsection dlopen }
+{ $subsection dlsym }
+{ $subsection dlclose } ;

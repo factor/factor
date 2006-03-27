@@ -264,6 +264,7 @@ vectors words ;
         "/library/tools/memory.facts"
         "/library/tools/walker.facts"
 
+        "/doc/handbook/alien.facts"
         "/doc/handbook/collections.facts"
         "/doc/handbook/dataflow.facts"
         "/doc/handbook/handbook.facts"

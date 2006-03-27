@@ -1,9 +1,13 @@
 ! Copyright (C) 2005, 2006 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 IN: help
-USING: arrays kernel namespaces prettyprint sequences words ;
+USING: arrays generic kernel namespaces prettyprint sequences
+words ;
 
-M: word article-title "The " swap word-name " word" append3 ;
+M: word article-title
+    [
+        "The " % dup word-name % class? " class" " word" ? %
+    ] "" make ;
 
 M: word article-name word-name ;
 

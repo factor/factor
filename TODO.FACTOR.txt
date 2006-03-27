@@ -31,6 +31,7 @@
   - expired aliens in view hash
   - don't multiplex in the event loop if there is no pending i/o
 - fix mouse-overs...
+- clicks sent twice
 - speed up ideas:
   - only do clipping for certain gadgets
   - use glRect
@@ -42,7 +43,6 @@
 - fix remaining HTML stream issues
 - fix up the min thumb size hack
 - help cross-referencing
-- document FFI
 - document conventions
 - new turtle graphics tutorial
 - better line spacing in ui and html
@@ -54,6 +54,9 @@
 
 + compiler/ffi:
 
+- remove <char*>, <ushort*>, set-char*-nth, set-ushort*-nth since they
+  have incorrect semantics
+- can <void*> only be called with an alien?
 - core foundation should use unicode strings
 - improve callback efficiency
 - alien>utf16-string, utf16-string>alien words
