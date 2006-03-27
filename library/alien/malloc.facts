@@ -1,0 +1,32 @@
+IN: libc
+USING: help ;
+
+HELP: malloc "( size -- alien )"
+{ $values { "size" "a non-negative integer" } { "alien" "an alien address" } }
+{ $description "Allocates a block of " { $snippet "size" } " bytes from the operating system. The contents of the block are undefined."
+$terpri
+"Outputs " { $link f } " if memory allocation failed, so calls to this word should be followed by a call to " { $link check-ptr } "." }
+{ $warning "Don't forget to deallocate the memory with a call to  " { $link free } "." } ;
+
+HELP: calloc "( count size -- alien )"
+{ $values { "count" "a non-negative integer" } { "size" "a non-negative integer" } { "alien" "an alien address" } }
+{ $description "Allocates a block of " { $snippet "count * size" } " bytes from the operating system. The contents of the block are initially zero."
+$terpri
+"Outputs " { $link f } " if memory allocation failed, so calls to this word should be followed by a call to " { $link check-ptr } "." }
+{ $warning "Don't forget to deallocate the memory with a call to  " { $link free } "." } ;
+
+HELP: realloc "( alien size -- newalien )"
+{ $values { "alien" "an alien address" } { "size" "a non-negative integer" } { "newalien" "an alien address" } }
+{ $description "Allocates a new block of " { $snippet "size" } " bytes from the operating system. The contents of " { $snippet "alien" } ", which itself must be a block previously returned by " { $link malloc } " or " { $link realloc } ", are copied into the new block, and the old block is freed."
+$terpri
+"Outputs " { $link f } " if memory allocation failed, so calls to this word should be followed by a call to " { $link check-ptr } "." }
+{ $warning "Don't forget to deallocate the memory with a call to  " { $link free } "." } ;
+
+HELP: memcpy "( dst src size -- newalien )"
+{ $values { "dst" "an alien address" } { "src" "an alien address" } { "size" "a non-negative integer" } }
+{ $description "Copies " { $snippet "size" } " bytes from " { $snippet "src" } " to " { $snippet "dst" } "." }
+{ $warning "As per the BSD C library documentation, the behavior is undefined if the source and destination overlap." } ;
+
+HELP: check-ptr "( c-ptr -- checked )"
+{ $values { "c-ptr" "an alien address, byte array, or " { $link f } } { "checked" "an alien address or byte array with non-zero address" } }
+{ $description "Throws an error if the input is " { $link f } ". Otherwise the object remains on the data stack." } ;

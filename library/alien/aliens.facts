@@ -3,7 +3,10 @@ USING: help ;
 
 HELP: <displaced-alien> "( displacement c-ptr -- alien )"
 { $values { "displacement" "an integer" } { "c-ptr" "an alien, byte array, or " { $link f } } { "alien" "a new alien" } }
-{ $description "Creates a new alien address object, wrapping a raw memory address. The alien points to a location in memory which is offset by " { $snippet "displacement" } " from the address of " { $link "c-ptr" } ". Passing a value of " { $link f } " for " { $snippet "c-ptr" } " creates an alien with an absolute address." }
+{ $description "Creates a new alien address object, wrapping a raw memory address. The alien points to a location in memory which is offset by " { $snippet "displacement" } " from the address of " { $link "c-ptr" } "." }
+{ $notes "Passing a value of " { $link f } " for " { $snippet "c-ptr" } " creates an alien with an absolute address; this is how " { $link <alien> } " is implemented."
+$terpri
+"Passing a zero absolute address does not construct a new alien object, but instead makes the word output " { $link f } "." }
 { $see-also <alien> alien-address } ;
 
 HELP: alien-address "( c-ptr -- addr )"
@@ -14,6 +17,7 @@ HELP: alien-address "( c-ptr -- addr )"
 HELP: <alien> "( address -- alien )"
 { $values { "address" "a non-negative integer" } { "alien" "a new alien address" } }
 { $description "Creates an alien object, wrapping a raw memory address." }
+{ $notes "Alien objects are invalidated between image saves and loads." }
 { $see-also <displaced-alien> alien-address } ;
 
 HELP: c-ptr f
@@ -29,9 +33,24 @@ HELP: library "( name -- library )"
     }
 } ;
 
+HELP: dlopen "( path -- dll )"
+{ $values { "path" "a path name string" } { "dll" "a DLL handle" } }
+{ $description "Opens a native library and outputs a handle which may be passed to " { $link dlsym } " or " { $link dlclose } "." }
+{ $errors "Throws an error if the library could not be found, or if loading fails for some other reason." }
+{ $notes "This is the low-level facility used to implement " { $link load-library } ". Use the latter instead." } ;
+
+HELP: dlsym "( name dll -- alien )"
+{ $values { "name" "a C symbol name" } { "dll" "a DLL handle" } { "alien" "an alien pointer" } }
+{ $description "Looks up a symbol in a native library. If " { $snippet "dll" } " is " { $link f } " looks for the symbol in the runtime executable." }
+{ $errors "Throws an error if the symbol could not be found." } ;
+
+HELP: dlclose "( dll -- )"
+{ $values { "dll" "a DLL handle" } }
+{ $description "Closes a DLL handle created by " { $link dlopen } ". This word might not be implemented on all platforms." } ;
+
 HELP: load-library "( name -- dll )"
 { $values { "name" "a string" } { "dll" "a DLL handle" } }
-{ $description "Loads a library by logical name. If the library is already loaded, returns the existing handle." }
+{ $description "Loads a library by logical name and outputs a handle which may be passed to " { $link dlsym } " or " { $link dlclose } ". If the library is already loaded, returns the existing handle." }
 { $errors "Throws an error if the library could not be found, or if loading fails for some other reason." } ;
 
 HELP: add-library "( name path abi -- )"

@@ -384,7 +384,7 @@ sequences strings vectors words prettyprint ;
 \ <byte-array> [ [ integer ] [ byte-array ] ] "infer-effect" set-word-prop
 \ <byte-array> t "flushable" set-word-prop
 
-\ <displaced-alien> [ [ integer c-ptr ] [ alien ] ] "infer-effect" set-word-prop
+\ <displaced-alien> [ [ integer c-ptr ] [ c-ptr ] ] "infer-effect" set-word-prop
 \ <displaced-alien> t "flushable" set-word-prop
 
 \ alien-signed-cell [ [ c-ptr integer ] [ integer ] ] "infer-effect" set-word-prop
