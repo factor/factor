@@ -104,6 +104,13 @@ macosx:
 macosx.app:
 	$(CP) $(BINARY) $(BUNDLE_BINARY)
 	$(CP) $(IMAGE) $(BUNDLE_IMAGE)
+	install_name_tool \
+		-id @executable_path/../Frameworks/libfreetype.6.dylib \
+		Factor.app/Contents/Frameworks/libfreetype.6.dylib
+	install_name_tool \
+		-change /usr/local/lib/libfreetype.6.dylib \
+		@executable_path/../Frameworks/libfreetype.6.dylib \
+		Factor.app/Contents/MacOS/Factor
 
 linux linux-x86 linux-amd64:
 	$(MAKE) $(BINARY) \
