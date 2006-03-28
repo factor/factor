@@ -105,3 +105,11 @@ IN: kernel
 
 : win32? windows? cell 4 = and ; inline
 : win64? windows? cell 8 = and ; inline
+
+IN: memory
+
+: generations ( -- n ) 15 getenv ;
+
+: image ( -- path ) 16 getenv ;
+
+: save ( -- ) image save-image ;

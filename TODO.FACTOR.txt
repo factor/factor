@@ -2,11 +2,9 @@
 
 - x86 %box-struct
 - x86 %write-barrier
-- bundle freetype .dylib in the .app on OS X
 - x11 title bars are funny
 - x11 wheel mouse test
 - changelog in the UI
-- set resource path to image parent directory
 - amd64 %box-struct
 
 + portability:

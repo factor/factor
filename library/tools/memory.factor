@@ -5,13 +5,7 @@ USING: arrays errors generic hashtables io kernel
 kernel-internals lists math namespaces parser prettyprint
 sequences strings vectors words ;
 
-: generations ( -- n ) 15 getenv ;
-
 : full-gc ( -- ) generations 1 - gc ;
-
-: image ( -- path ) 16 getenv ;
-
-: save ( -- ) image save-image ;
 
 ! Printing an overview of heap usage.
 

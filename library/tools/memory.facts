@@ -1,23 +1,8 @@
 IN: memory
 USING: help ;
 
-HELP: generations "( -- n )"
-{ $values { "n" "a positive integer" } }
-{ $description "Outputs the number of generations partitioning the heap." } ;
-
 HELP: full-gc "( -- )"
 { $description "Performs a full garbage collection." } ;
-
-HELP: image "( -- path )"
-{ $values { "path" "a path name string" } }
-{ $description "Outputs the path name of the currently running Factor image." } ;
-
-HELP: save-image "( path -- )"
-{ $values { "path" "a path name string" } }
-{ $description "Saves a snapshot of the heap to the given file, overwriting the file if it already exists." } ;
-
-HELP: save "( -- )"
-{ $description "Saves a snapshot of the heap to the current image file." } ;
 
 HELP: room. "( -- )"
 { $description "Prints an overview of memory usage broken down by generation and zone." } ;
