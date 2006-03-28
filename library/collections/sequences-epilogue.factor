@@ -15,11 +15,26 @@ sequences-internals strings vectors words ;
 
 M: object like drop ;
 
-: index   ( obj seq -- n )     [ = ] find-with drop ; flushable
-: index*  ( obj i seq -- n )   [ = ] find-with* drop ; flushable
-: member? ( obj seq -- ? )     [ = ] contains-with? ; flushable
-: memq?   ( obj seq -- ? )     [ eq? ] contains-with? ; flushable
-: remove  ( obj list -- list ) [ = not ] subset-with ; flushable
+: index   ( obj seq -- n )
+    [ = ] find-with drop ; flushable
+
+: index*  ( obj i seq -- n )
+    [ = ] find-with* drop ; flushable
+
+: last-index   ( obj seq -- n )
+    [ = ] find-last-with drop ; flushable
+
+: last-index*  ( obj i seq -- n )
+    [ = ] find-last-with* drop ; flushable
+
+: member? ( obj seq -- ? )
+    [ = ] contains-with? ; flushable
+
+: memq?   ( obj seq -- ? )
+    [ eq? ] contains-with? ; flushable
+
+: remove  ( obj list -- list )
+    [ = not ] subset-with ; flushable
 
 : (subst) ( newseq oldseq elt -- new/elt )
     [ swap index ] keep

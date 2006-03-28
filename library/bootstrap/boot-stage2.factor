@@ -63,9 +63,6 @@ xref-articles
     0 exit
 ] set-boot
 
-"Setting the resource path..." print
-cwd "resource-path" set-global
-
 [ compiled? ] word-subset length
 number>string write " compiled words" print
 
