@@ -31,10 +31,6 @@ M: %unbox generate-node
     drop 2 input f compile-c-call  1 input push-return-reg ;
 
 : struct-ptr/size ( func -- )
-    ! Increase stack size
-    ESP 2 input SUB
-    ! Save destination address in EAX
-    EAX ESP MOV
     ! Load struct size
     2 input PUSH
     ! Load destination address
@@ -46,9 +42,17 @@ M: %unbox generate-node
     ECX POP ;
 
 M: %unbox-struct generate-node ( vop -- )
-    drop "unbox_value_struct" struct-ptr/size ;
+    drop
+    ! Increase stack size
+    ESP 2 input SUB
+    ! Save destination address in EAX
+    EAX ESP MOV
+    "unbox_value_struct" struct-ptr/size ;
 
 M: %box-struct generate-node ( vop -- )
+    ! Compute source address in EAX
+    EAX ESP MOV
+    EAX 4 ADD
     drop "box_value_struct" struct-ptr/size ;
 
 M: %box generate-node
