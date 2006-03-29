@@ -116,7 +116,16 @@ TUPLE: mailbox threads data ;
   #! The thread then resumes, leaving the item on the stack.
   (mailbox-block-if-empty)
   mailbox-data dlist-pop-front ;
- 
+
+: while-mailbox-empty ( mailbox quot -- )
+  #! Run the quotation until there is an item in the mailbox.
+  #! Quotation should have stack effect ( -- ).
+  over mailbox-empty? [
+    dup >r swap >r call r> r> while-mailbox-empty
+  ] [
+    2drop
+  ] if ; inline
+
 : mailbox-get? ( pred mailbox -- obj )
   #! Get the first item in the mailbox which satisfies the predicate.
   #! 'pred' will be called with each item on the stack. When pred returns
@@ -176,6 +185,12 @@ init-main-process
   [ in-thread ] make-process [ with-process ] over slip ;
 
 TUPLE: linked-exception error ;
+
+: while-no-messages ( quot -- )
+  #! Run the quotation in a loop while no messages are in
+  #! the processes mailbox. The quot should have stack effect
+  #! ( -- ).
+  >r self process-mailbox r> while-mailbox-empty ; inline
 
 : send ( message process -- )
   #! Send the message to the process by placing it in the
