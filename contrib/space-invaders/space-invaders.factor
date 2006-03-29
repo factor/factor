@@ -21,13 +21,34 @@
 ! OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
 ! ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 USING: alien cpu-8080 errors generic io kernel kernel-internals
-lists math namespaces sdl sequences styles threads ;
+lists math namespaces sequences styles threads gadgets gadgets-layouts opengl arrays ;
 IN: space-invaders
 
-TUPLE: space-invaders port1 port2i port2o port3o port4lo port4hi port5o ;
+TUPLE: space-invaders port1 port2i port2o port3o port4lo port4hi port5o bitmap ;
 
+SYMBOL: bitmap
+
+: make-opengl-bitmap ( -- array )
+  256 224 3 * * "char" <c-array> ;
+
+: bitmap-index ( x y -- index )
+  224 3 * * swap 3 * + ;
+
+: set-bitmap-pixel ( color x y array -- )
+  >r bitmap-index r> ( color index array -- )
+  [ >r >r first r> r> set-uchar-nth ] 3keep
+  [ >r >r second r> 1 + r> set-uchar-nth ] 3keep
+  >r >r third r> 2 + r> set-uchar-nth ;
+
+: get-bitmap-pixel ( x y array -- )
+  >r bitmap-index r> ( index array -- )
+  [ uint-nth ] 2keep
+  [ >r 1 + r> uchar-nth ] 2keep
+  >r 2 + r> uchar-nth 3array ;
+  
 C: space-invaders ( cpu -- cpu )
-  [ <cpu> swap set-delegate ] keep 
+  [ <cpu> swap set-delegate ] keep
+  [ make-opengl-bitmap swap set-space-invaders-bitmap ] keep
   [ reset ] keep ;
 
 M: space-invaders read-port ( port cpu -- byte )
@@ -63,6 +84,7 @@ M: space-invaders reset ( cpu -- )
   0 swap set-space-invaders-port5o ;
 
 : gui-step ( cpu -- )
+!  0 sleep
   [ read-instruction ] keep ( n cpu )
   over get-cycles over inc-cycles
   [ swap instructions dispatch ] keep  
@@ -86,61 +108,41 @@ M: space-invaders reset ( cpu -- )
 : gui-frame ( cpu -- )
   dup gui-frame/2 gui-frame/2 ;
 
-GENERIC: handle-si-event ( cpu event -- quit? )
+TUPLE: invaders-gadget cpu ;
 
-M: object handle-si-event ( cpu event -- quit? )
-  2drop f ;
+C: invaders-gadget dup delegate>gadget ;
 
-M: quit-event handle-si-event ( cpu event -- quit? )
-  2drop t ;
 
-USE: prettyprint 
+: do-draw2 ( gadget -- )
+  0 0 glRasterPos2i
+  1.0 -1.0 glPixelZoom
+  >r 224 256 GL_RGB GL_UNSIGNED_BYTE r>
+  invaders-gadget-cpu space-invaders-bitmap glDrawPixels ;
+  
+M: invaders-gadget draw-gadget* ( gadget -- )
+  do-draw2 ;
 
-M: key-down-event handle-si-event ( cpu event -- quit? )
-  keyboard-event>binding last car ( cpu key )
-  {
-    { [ dup "ESCAPE" = ] [ 2drop t ] }
-    { [ dup "BACKSPACE" = ] [ drop [ space-invaders-port1 1 bitor ] keep set-space-invaders-port1 f ] }
-    { [ dup 1 = ] [ drop [ space-invaders-port1 4 bitor ] keep set-space-invaders-port1 f ] }
-    { [ dup 2 = ] [ drop [ space-invaders-port1 2 bitor ] keep set-space-invaders-port1 f ] }
-    { [ dup "LCTRL" = ] [ drop [ space-invaders-port1 HEX: 10 bitor ] keep set-space-invaders-port1 f ] }
-    { [ dup "LEFT" = ] [ drop [ space-invaders-port1 HEX: 20 bitor ] keep set-space-invaders-port1 f ] }
-    { [ dup "RIGHT" = ] [ drop [ space-invaders-port1 HEX: 40 bitor ] keep set-space-invaders-port1 f ] }
-    { [ t ] [ . drop f ] }
-  } cond ;
-
-M: key-up-event handle-si-event ( cpu event -- quit? )
-  keyboard-event>binding last car ( cpu key )
-  {
-    { [ dup "ESCAPE" = ] [ 2drop t ] }
-    { [ dup "BACKSPACE" = ] [ drop [ space-invaders-port1 255 1 - bitand ] keep set-space-invaders-port1 f ] }
-    { [ dup 1 = ] [ drop [ space-invaders-port1 255 4 - bitand ] keep set-space-invaders-port1 f ] }
-    { [ dup 2 = ] [ drop [ space-invaders-port1 255 2 - bitand ] keep set-space-invaders-port1 f ] }
-    { [ dup "LCTRL" = ] [ drop [ space-invaders-port1 255 HEX: 10 - bitand ] keep set-space-invaders-port1 f ] }
-    { [ dup "LEFT" = ] [ drop [ space-invaders-port1 255 HEX: 20 - bitand ] keep set-space-invaders-port1 f ] }
-    { [ dup "RIGHT" = ] [ drop [ space-invaders-port1 255 HEX: 40 - bitand ] keep set-space-invaders-port1 f ] }
-    { [ t ] [ . drop f ] }
-  } cond ;
+M: invaders-gadget pref-dim* drop { 224 256 0 0 } ;
 
 : sync-frame ( millis -- millis )
   #! Sleep until the time for the next frame arrives.
   1000 60 / >fixnum + millis - dup 0 > [ sleep ] [ drop ] if millis ;
 
-: (event-loop) ( millis cpu event -- )
-    dup SDL_PollEvent [
-        2dup handle-si-event [
-            3drop
-        ] [
-            (event-loop)
-        ] if
-    ] [
-	>r >r sync-frame r> r>
-        [ over gui-frame ] with-surface
-        (event-loop)
-    ] if ; 
+: (event-loop) ( millis gadget -- )
+  >r sync-frame r> 
+  dup invaders-gadget-cpu gui-frame
+  dup relayout-1
+  (event-loop) ;
   
-: event-loop ( cpu event -- )
-    millis -rot (event-loop) ;
+: event-loop ( gadget -- )
+  [
+    dup invaders-gadget-cpu space-invaders-bitmap bitmap set
+    millis swap (event-loop) 
+  ] with-scope ;
+
+
+: black { 0 0 0 } ;
+: white { 255 255 255 } ;
 
 : addr>xy ( addr -- x y )
   #! Convert video RAM address to base X Y value
@@ -148,59 +150,34 @@ M: key-up-event handle-si-event ( cpu event -- quit? )
   dup HEX: 1f bitand 8 * 255 swap - ( n y )
   swap -5 shift swap ;
 
-: within ( n a b - bool )
-  #! n >= a and n <= b
-  rot tuck swap <= >r swap >= r> and ;
+: plot-bitmap-pixel ( x y color -- )
+  -rot bitmap get set-bitmap-pixel ;
 
-! : color ( x y -- color )
-!   #! Return the color to use for the given x/y position.
-!   {
-!     { [ dup 184 238 within pick 0 223 within and ] [ 2drop green ] }
-!     { [ dup 240 247 within pick 16 133 within and ] [ 2drop green ] }
-!     { [ dup 247 215 - 247 184 - within pick 0 223 within and ] [ 2drop red ] }
-!     { [ t ] [ 2drop white ] }
-!   } cond ;
-
-: black HEX: 0000 ;
-: white HEX: ffff ;
-
-: plot-pixel ( x y color -- )
-  -rot surface get [ surface-pitch * ] keep
-  [ surface-format sdl-format-BytesPerPixel rot * + ] keep
-  surface-pixels swap set-alien-unsigned-2 ;
-
-: plot-bits ( x y byte bit -- )
+: plot-bitmap-bits ( x y byte bit -- )
   dup swapd -1 * shift 1 bitand 0 =
   [ ( x y bit -- ) - black ] [ - white ] if
-  plot-pixel ;
+  plot-bitmap-pixel ;
 
-! : plot-bits ( x y byte bit -- )
-!   dup swapd -1 * shift 1 bitand 0 =
-!   [ ( x y bit -- ) - black ] [ - 2dup color ] if
-!   rgb plot-pixel ;
+: do-bitmap-update ( value addr -- )
+  addr>xy rot ( x y value )
+  [ 0 plot-bitmap-bits ] 3keep
+  [ 1 plot-bitmap-bits ] 3keep
+  [ 2 plot-bitmap-bits ] 3keep
+  [ 3 plot-bitmap-bits ] 3keep
+  [ 4 plot-bitmap-bits ] 3keep
+  [ 5 plot-bitmap-bits ] 3keep
+  [ 6 plot-bitmap-bits ] 3keep
+  7 plot-bitmap-bits ;
 
-: do-video-update ( value addr cpu -- )
-  drop addr>xy rot ( x y value )
-  [ 0 plot-bits ] 3keep
-  [ 1 plot-bits ] 3keep
-  [ 2 plot-bits ] 3keep
-  [ 3 plot-bits ] 3keep
-  [ 4 plot-bits ] 3keep
-  [ 5 plot-bits ] 3keep
-  [ 6 plot-bits ] 3keep
-  7 plot-bits ;
-
-M: space-invaders update-video ( value addr cpu -- )
+M: space-invaders update-video ( value addr cpu -- )  
   over HEX: 2400 >= [
-    do-video-update
+    drop do-bitmap-update
   ] [
     3drop
   ] if ;
 
-: run ( -- )
-  224 256 16 SDL_HWSURFACE [ 
-   <space-invaders> "invaders.rom" over load-rom
-   "event" <c-object> event-loop
-    SDL_Quit
-  ] with-screen ;
-
+: run ( -- )  
+  <space-invaders> "invaders.rom" over load-rom
+  <invaders-gadget> [ set-invaders-gadget-cpu ] keep 
+  dup "Space Invaders" open-window 
+  [ event-loop ] cons in-thread ;
