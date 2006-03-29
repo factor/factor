@@ -3,9 +3,9 @@
 - x86 %box-struct
 - x86 %write-barrier
 - x11 title bars are funny
-- x11 wheel mouse test
 - changelog in the UI
 - amd64 %box-struct
+- automate .dmg build, put sources there
 
 + portability:
 
@@ -20,18 +20,21 @@
 - httpd fep
 - stream server can hang because of exception handler limitations
 - better i/o scheduler
-- out of memory error when printing global namespace
 - yield in a loop starves i/o
 - "localhost" 50 <client> won't fail
 
 + ui/help:
 
+- help search
+- reimplement clicking input
+- reimplement tab completion
 - x11 input methods
 - cocoa:
   - global menu bar with useful commands
   - make the launchpad a palette
   - expired aliens in view hash
   - don't multiplex in the event loop if there is no pending i/o
+  - horizontal scrolling
 - fix mouse-overs...
 - clicks sent twice
 - speed up ideas:

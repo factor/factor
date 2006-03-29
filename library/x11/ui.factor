@@ -30,8 +30,7 @@ M: world button-up-event ( event world -- )
     >r button&loc r> send-button-up ;
 
 M: world wheel-event ( event world -- )
-    >r button&loc >r H{ { 4 -1 } { 5 1 } } hash r>
-    r> send-wheel ;
+    >r button&loc >r 4 = r> r> send-wheel ;
 
 M: world motion-event ( event world -- )
     >r dup XMotionEvent-x swap XMotionEvent-y 0 3array r>
