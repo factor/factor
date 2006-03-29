@@ -27,8 +27,6 @@ IN: space-invaders
 
 TUPLE: space-invaders port1 port2i port2o port3o port4lo port4hi port5o bitmap ;
 
-SYMBOL: bitmap
-
 : dip ( x y quot -- y )
   #! Showing my Joy roots...
   swap >r call r> ; inline
@@ -196,9 +194,9 @@ M: invaders-gadget draw-gadget* ( gadget -- )
   dup HEX: 1f bitand 8 * 255 swap - ( n y )
   swap -5 shift swap 2array ;
 
-: plot-bitmap-pixel ( point color -- )
+: plot-bitmap-pixel ( bitmap point color -- )
   #! point is a {x y}. color is a {r g b}.
-  swap bitmap get set-bitmap-pixel ;
+  swap rot set-bitmap-pixel ;
 
 : within ( n a b - bool )
   #! n >= a and n <= b
@@ -214,7 +212,7 @@ M: invaders-gadget draw-gadget* ( gadget -- )
     { [ t ] [ 2drop white ] }
   } cond ;
 
-: plot-bitmap-bits ( point byte bit -- )
+: plot-bitmap-bits ( bitmap point byte bit -- )
   #! point is a {x y}.
   [ first2 ] dipd
   dup swapd -1 * shift 1 bitand 0 =
@@ -222,20 +220,20 @@ M: invaders-gadget draw-gadget* ( gadget -- )
   [ black ] [ dup get-point-color ] if
   plot-bitmap-pixel ;
 
-: do-bitmap-update ( value addr -- )
-  addr>xy swap ( point value )
-  [ 0 plot-bitmap-bits ] 2keep
-  [ 1 plot-bitmap-bits ] 2keep
-  [ 2 plot-bitmap-bits ] 2keep
-  [ 3 plot-bitmap-bits ] 2keep
-  [ 4 plot-bitmap-bits ] 2keep
-  [ 5 plot-bitmap-bits ] 2keep
-  [ 6 plot-bitmap-bits ] 2keep
+: do-bitmap-update ( bitmap value addr -- )
+  addr>xy swap 
+  [ 0 plot-bitmap-bits ] 3keep
+  [ 1 plot-bitmap-bits ] 3keep
+  [ 2 plot-bitmap-bits ] 3keep
+  [ 3 plot-bitmap-bits ] 3keep
+  [ 4 plot-bitmap-bits ] 3keep
+  [ 5 plot-bitmap-bits ] 3keep
+  [ 6 plot-bitmap-bits ] 3keep
   7 plot-bitmap-bits ;
 
 M: space-invaders update-video ( value addr cpu -- )  
   over HEX: 2400 >= [
-    drop do-bitmap-update
+    space-invaders-bitmap -rot do-bitmap-update
   ] [
     3drop
   ] if ;
@@ -316,13 +314,12 @@ M: right-up-msg handle-invaders-message ( gadget message -- quit? )
   #! signal key presses, etc.
   [
     [ sync-frame ] dip
-    dup invaders-gadget-cpu space-invaders-bitmap bitmap set
     dup invaders-gadget-cpu gui-frame
     dup relayout-1
   ] while-no-messages 
   dup receive handle-invaders-message [ invaders-process ] unless ;
 
-: run ( -- )  
+: run ( -- process )  
   <space-invaders> "invaders.rom" over load-rom
   <invaders-gadget> [ set-invaders-gadget-cpu ] keep   
   dup "Space Invaders" open-window 
