@@ -28,23 +28,37 @@ TUPLE: space-invaders port1 port2i port2o port3o port4lo port4hi port5o bitmap ;
 
 SYMBOL: bitmap
 
+: dip ( x y quot -- y )
+  #! Showing my Joy roots...
+  swap >r call r> ; inline
+
+: dipd ( x y z quot -- y z )
+  #! Showing my Joy roots...
+  -rot >r >r call r> r> ; inline  
+
+: game-width 224  ; inline
+: game-height 256 ; inline
+
 : make-opengl-bitmap ( -- array )
-  256 224 3 * * "char" <c-array> ;
+  game-height game-width 3 * * "char" <c-array> ;
 
-: bitmap-index ( x y -- index )
-  224 3 * * swap 3 * + ;
+: bitmap-index ( point -- index )
+  #! Point is a {x y}.
+  first2 game-width 3 * * swap 3 * + ;
 
-: set-bitmap-pixel ( color x y array -- )
-  >r bitmap-index r> ( color index array -- )
-  [ >r >r first r> r> set-uchar-nth ] 3keep
-  [ >r >r second r> 1 + r> set-uchar-nth ] 3keep
-  >r >r third r> 2 + r> set-uchar-nth ;
+: set-bitmap-pixel ( color point array -- )
+  #! 'color' is a {r g b}. Point is {x y}.
+  [ bitmap-index ] dip ( color index array )
+  [ [ first ] dipd set-uchar-nth ] 3keep
+  [ [ second ] dipd [ 1 + ] dip set-uchar-nth ] 3keep
+  [ third ] dipd [ 2 + ] dip set-uchar-nth ;
 
-: get-bitmap-pixel ( x y array -- )
-  >r bitmap-index r> ( index array -- )
+: get-bitmap-pixel ( point array -- color )
+  #! Point is a {x y}. color is a {r g b} 
+  [ bitmap-index ] dip
   [ uint-nth ] 2keep
-  [ >r 1 + r> uchar-nth ] 2keep
-  >r 2 + r> uchar-nth 3array ;
+  [ [ 1 + ] dip uchar-nth ] 2keep
+  [ 2 + ] dip uchar-nth 3array ;
   
 C: space-invaders ( cpu -- cpu )
   [ <cpu> swap set-delegate ] keep
@@ -144,29 +158,33 @@ M: invaders-gadget pref-dim* drop { 224 256 0 0 } ;
 : black { 0 0 0 } ;
 : white { 255 255 255 } ;
 
-: addr>xy ( addr -- x y )
-  #! Convert video RAM address to base X Y value
+: addr>xy ( addr -- point )
+  #! Convert video RAM address to base X Y value. point is a {x y}.
   HEX: 2400 - ( n )
   dup HEX: 1f bitand 8 * 255 swap - ( n y )
-  swap -5 shift swap ;
+  swap -5 shift swap 2array ;
 
-: plot-bitmap-pixel ( x y color -- )
-  -rot bitmap get set-bitmap-pixel ;
+: plot-bitmap-pixel ( point color -- )
+  #! point is a {x y}. color is a {r g b}.
+  swap bitmap get set-bitmap-pixel ;
 
-: plot-bitmap-bits ( x y byte bit -- )
+: plot-bitmap-bits ( point byte bit -- )
+  #! point is a {x y}.
+  [ first2 ] dipd
   dup swapd -1 * shift 1 bitand 0 =
-  [ ( x y bit -- ) - black ] [ - white ] if
+  [ - 2array ] dip
+  [ black ] [ white ] if
   plot-bitmap-pixel ;
 
 : do-bitmap-update ( value addr -- )
-  addr>xy rot ( x y value )
-  [ 0 plot-bitmap-bits ] 3keep
-  [ 1 plot-bitmap-bits ] 3keep
-  [ 2 plot-bitmap-bits ] 3keep
-  [ 3 plot-bitmap-bits ] 3keep
-  [ 4 plot-bitmap-bits ] 3keep
-  [ 5 plot-bitmap-bits ] 3keep
-  [ 6 plot-bitmap-bits ] 3keep
+  addr>xy swap ( point value )
+  [ 0 plot-bitmap-bits ] 2keep
+  [ 1 plot-bitmap-bits ] 2keep
+  [ 2 plot-bitmap-bits ] 2keep
+  [ 3 plot-bitmap-bits ] 2keep
+  [ 4 plot-bitmap-bits ] 2keep
+  [ 5 plot-bitmap-bits ] 2keep
+  [ 6 plot-bitmap-bits ] 2keep
   7 plot-bitmap-bits ;
 
 M: space-invaders update-video ( value addr cpu -- )  
