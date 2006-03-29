@@ -187,6 +187,8 @@ M: invaders-gadget draw-gadget* ( gadget -- )
 
 : black { 0 0 0 } ;
 : white { 255 255 255 } ;
+: green { 0 255 0 } ;
+: red   { 255 0 0 } ;
 
 : addr>xy ( addr -- point )
   #! Convert video RAM address to base X Y value. point is a {x y}.
@@ -198,12 +200,26 @@ M: invaders-gadget draw-gadget* ( gadget -- )
   #! point is a {x y}. color is a {r g b}.
   swap bitmap get set-bitmap-pixel ;
 
+: within ( n a b - bool )
+  #! n >= a and n <= b
+  rot tuck swap <= >r swap >= r> and ;
+
+: get-point-color ( point -- color )
+  #! Return the color to use for the given x/y position.
+  first2
+  {
+    { [ dup 184 238 within pick 0 223 within and ] [ 2drop green ] }
+    { [ dup 240 247 within pick 16 133 within and ] [ 2drop green ] }
+    { [ dup 247 215 - 247 184 - within pick 0 223 within and ] [ 2drop red ] }
+    { [ t ] [ 2drop white ] }
+  } cond ;
+
 : plot-bitmap-bits ( point byte bit -- )
   #! point is a {x y}.
   [ first2 ] dipd
   dup swapd -1 * shift 1 bitand 0 =
   [ - 2array ] dip
-  [ black ] [ white ] if
+  [ black ] [ dup get-point-color ] if
   plot-bitmap-pixel ;
 
 : do-bitmap-update ( value addr -- )
