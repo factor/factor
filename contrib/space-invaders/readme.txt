@@ -7,7 +7,8 @@ If you are in the factor root directory, and have the ROM as a file
 'invaders.rom' in that same directory, the following starts the GUI:
 
   "contrib/space-invaders/load.factor" run-file
-  USE: space-invaders
+  compile-all
+  USE: space-invaders  
   run 
 
 'Backspace' inserts a coin, '1' is the one player button and '2' is
