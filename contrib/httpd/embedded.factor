@@ -53,13 +53,10 @@ USING: sequences kernel parser math namespaces io ;
 
 : eval-embedded ( string -- ) parse-embedded call ;
 
-: open-embedded-file ( filename -- str )
-    <file-reader> lines "\n" join ;
-
 : with-embedded-file ( filename quot -- )
     [
         over file set ! so that reload works properly
-        >r <file-reader> lines "\n" join r> call
+        >r <file-reader> contents r> call
     ] with-scope ;
 
 : parse-embedded-file ( filename -- quot )
@@ -68,3 +65,7 @@ USING: sequences kernel parser math namespaces io ;
 : run-embedded-file ( filename -- )
     [ eval-embedded ] with-embedded-file ;
 
+: embedded-convert ( infile outfile -- )
+    <file-writer> [
+	run-embedded-file
+    ] with-stream ;
