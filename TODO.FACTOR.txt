@@ -1,9 +1,6 @@
 0.81:
 
-- x86 %box-struct
-- x86 %write-barrier
 - x11 title bars are funny
-- changelog in the UI
 - amd64 %box-struct
 - automate .dmg build, put sources there
 
@@ -31,7 +28,6 @@
 - x11 input methods
 - cocoa:
   - global menu bar with useful commands
-  - make the launchpad a palette
   - expired aliens in view hash
   - don't multiplex in the event loop if there is no pending i/o
   - horizontal scrolling

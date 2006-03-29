@@ -15,15 +15,11 @@ namespaces sequences ;
 : handbook-window ( -- )
     T{ link f "handbook" } browser-window ;
 
-: tutorial-window ( -- )
-    T{ link f "tutorial" } browser-window ;
-
 : default-launchpad
     {
         { "Listener" [ listener-window ] }
         { "Documentation" [ handbook-window ] }
         { "Help index" [ [ articles. ] "Help index" pane-window ] }
-        { "Tutorial" [ tutorial-window ] }
         { "Vocabularies" [ [ vocabs. ] "Vocabularies" pane-window ] }
         { "Globals" [ global browser-window ] }
         { "Memory" [ [ heap-stats. terpri room. ] "Memory" pane-window ] }

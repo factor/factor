@@ -1,0 +1,84 @@
+USING: generic help inspector memory sequences ;
+
+ARTICLE: "changes" "Changes in the latest release"
+{ $subheading "Factor 0.81" }
+{ $subtopic "UI"
+    { $list
+        "Replaced SDL backend code with Mac OS X (Cocoa), X11 and Windows implementations"
+        { "The UI now starts by default under X11 if " { $snippet "$DISPLAY" } " is set" }
+        "Multiple windows are now supported"
+        "New browser gadget supports history and multiple views of an object"
+        "Preferred size cache to speed up gadget layout"
+        "Better-looking outliners"
+    }
+}
+{ $subtopic "Help system"
+    { $list
+        { "Help cross-referencing implemented - the " { $link links-in. } " and " { $link links-out. } " words are analogous to " { $link usage. } " and " { $link uses. } }
+        { "New documentation covers development tools and C library interface" }
+    }
+}
+{ $subtopic "Core language"
+    { $list
+        "Stack underflow and overflow errors are not reported as such, and not generic \"signal 11\" errors (Adam Langley)"
+        { "The " { $link standard-combination } " word now takes a stack position, not a picker quotation, and delegation is now supported for words which dispatch on a stack location other than the top" }
+        { "New " { $link exchange } " word" }
+        { "More useful " { $link heap-stats. } " output now shows count/allocation statistics per-class, instead of per-type" }
+        { "Factor now looks for a " { $snippet "factor.image" } " in the same directory as the runtime executable on Mac OS X and Windows, if you don't specify an image name parameter on the command line" }
+    }
+}
+{ $subtopic "Portability"
+    { $list
+        "Solaris x86 port (Patrick Mauritz)"
+    }
+}
+{ $subtopic "Compiler"
+    { $list
+        "Compiler no longer splits all branches, reducing compile time and generated code size"
+    }
+}
+{ $subtopic "C library interface"
+    { $list
+        "Structs can now be passed by value to C functions"
+        { "Callbacks from C code to Factor are now supported - see " { $link "alien-callback" } }
+        { "Improved support for passing UTF16 strings to and from C functions (" { $snippet "ushort*" } " type)" }
+        { "The " { $snippet "BEGIN-ENUM:" } " and " { $snippet "BEGIN-UNION:" } " parsing words have been annexed in favor of new, more consise syntax - see " { $link POSTPONE: C-ENUM: } " and " { $link POSTPONE: C-UNION: } }
+    }
+}
+{ $subtopic "Objective C library interface"
+    { $list
+        "Objective C classes can now be subclassed"
+        "Objective C exceptions are now caught and reported as Factor exceptions"
+        "Objective C messages returning structs by value are now supported"
+        
+    }
+}
+{ $subtopic "Contributed libraries"
+    { $subtopic { "HTTP server - " { $snippet "contrib/httpd/" } }
+        { $list
+            "File responder fixes"
+            "Inspector responder fixes"
+            "Continuation responder fixes"
+            { "Add templating engine in " { $snippet "embedded.factor" } " (Alex Chapman)" }
+        }
+    }
+    { $subtopic { "XML parser - " { $snippet "contrib/xml.factor" } }
+        { $list
+            "Various updates for recent Factor changes"
+            "Improved XML output capabilities"
+        }
+    }
+    { $subtopic { "External process interface - " { $snippet "contrib/processes.factor" } }
+        { $list "This is a new, experimental library." }
+    }
+    { $subtopic { "Factory window manager - " { $snippet "contrib/factory/" } }
+        { $list "Many updates" }
+    }
+    { $subtopic { "Cryptography library - " { $snippet "contrib/crypto/" } }
+        { $list
+            "Added Base64 encoding (Doug Coleman)"
+            "Added Blum Blum Shub random number generator (Doug Coleman)"
+            "Added CRC32 checksum (Doug Coleman)"
+        }
+    }
+} ;

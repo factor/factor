@@ -129,6 +129,19 @@ DEFER: help
 : $subsection ( object -- )
     [ first [ (help) ] swap ($subsection) ] ($block) ;
 
+: ($subtopic) ( element -- quot )
+    [
+        default-style
+        [ last-block on print-element ] with-nesting*
+    ] curry ;
+
+: $subtopic ( object -- )
+    [
+        uncons* ($subtopic) [
+            subtopic-style [ print-element ] with-style
+        ] write-outliner
+    ] ($block) ;
+
 : >link ( obj -- obj ) dup string? [ <link> ] when ;
 
 : $link ( article -- )

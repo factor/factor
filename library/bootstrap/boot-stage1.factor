@@ -263,6 +263,7 @@ vectors words ;
         "/library/tools/walker.facts"
 
         "/doc/handbook/alien.facts"
+        "/doc/handbook/changes.facts"
         "/doc/handbook/collections.facts"
         "/doc/handbook/dataflow.facts"
         "/doc/handbook/handbook.facts"
