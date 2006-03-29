@@ -1,21 +1,27 @@
-0.81:
+should fix in 0.82:
 
-- x11 title bars are funny
 - amd64 %box-struct
-- automate .dmg build, put sources there
+- get factor running on mac intel
+- when generating a 32-bit image on a 64-bit system, large numbers which should
+  be bignums become fixnums
+- httpd fep
 - defining methods returning structs in objc
+- expired aliens in view hash
+- clicks sent twice
+- speed up ideas:
+  - only do clipping for certain gadgets
+  - use glRect
+- remove <char*>, <ushort*>, set-char*-nth, set-ushort*-nth since they
+  have incorrect semantics
+- cocoa: global menu bar with useful commands
 
 + portability:
 
 - win64 port
-- get factor running on mac intel
 - amd64 %unbox-struct
-- when generating a 32-bit image on a 64-bit system, large numbers which should
-  be bignums become fixnums
 
 + io:
 
-- httpd fep
 - stream server can hang because of exception handler limitations
 - better i/o scheduler
 - yield in a loop starves i/o
@@ -27,17 +33,12 @@
 - reimplement clicking input
 - reimplement tab completion
 - x11 input methods
+- x11 title bars are funny
 - cocoa:
-  - global menu bar with useful commands
-  - expired aliens in view hash
   - don't multiplex in the event loop if there is no pending i/o
   - horizontal scrolling
 - fix mouse-overs...
-- clicks sent twice
-- speed up ideas:
-  - only do clipping for certain gadgets
-  - use glRect
-  - display lists
+- display lists
 - saving the image should save window configuration
 - make the UI look better, something like this:
   http://twb.ath.cx/~twb/darcs/OBSOLETE/factor/final.html
@@ -55,12 +56,10 @@
 
 + compiler/ffi:
 
-- remove <char*>, <ushort*>, set-char*-nth, set-ushort*-nth since they
-  have incorrect semantics
-- can <void*> only be called with an alien?
 - core foundation should use unicode strings
-- improve callback efficiency
 - alien>utf16-string, utf16-string>alien words
+- can <void*> only be called with an alien?
+- improve callback efficiency
 - float intrinsics
 - complex float type
 - complex float intrinsics
@@ -78,7 +77,6 @@
 
 + misc:
 
-- clean up stack effect generation code
 - code walker & exceptions
 - slice: if sequence or seq start is changed, abstraction violation
 - make 3.4 bits>double an error

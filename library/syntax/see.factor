@@ -25,22 +25,25 @@ sequences strings styles words ;
     [ H{ { font-style italic } } text ] when* ;
 
 : stack-picture ( seq -- string )
-    dup integer? [ object <array> ] when
-    [ word-name ] map " " join ;
+    [ [ % CHAR: \s , ] each ] "" make ;
 
 : effect>string ( effect -- string )
     [
         "( " %
         dup first stack-picture %
-        " -- " %
+        "-- " %
         second stack-picture %
-        " )" %
+        ")" %
     ] "" make ;
 
 : stack-effect ( word -- string )
     dup "stack-effect" word-prop [ ] [
-        "infer-effect" word-prop
-        dup [ effect>string ] when
+        "infer-effect" word-prop dup [
+            [
+                dup integer? [ object <array> ] when
+                [ word-name ] map
+            ] map effect>string
+        ] when
     ] ?if ;
 
 : synopsis ( word -- string )

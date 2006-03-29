@@ -43,6 +43,22 @@ unit-test
 
 : baz dup ;
 
+[ "( a b -- c d )" ] [
+    { { "a" "b" } { "c" "d" } } effect>string
+] unit-test
+
+[ "( -- c d )" ] [
+    { { } { "c" "d" } } effect>string
+] unit-test
+
+[ "( a b -- )" ] [
+    { { "a" "b" } { } } effect>string
+] unit-test
+
+[ "( -- )" ] [
+    { { } { } } effect>string
+] unit-test
+
 [ ] [ [ baz ] infer drop ] unit-test
 [ "IN: temporary : baz dup ;\n" ]
 [ [ \ baz see ] string-out ] unit-test
