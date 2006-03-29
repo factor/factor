@@ -1,11 +1,10 @@
 CC = gcc
-CP = cp
 
 BINARY = f
 IMAGE = factor.image
 BUNDLE = Factor.app
-BUNDLE_BINARY = $(BUNDLE)/Contents/MacOS/Factor
-BUNDLE_IMAGE = $(BUNDLE)/Contents/Resources/factor.image
+DISK_IMAGE_DIR = Factor-0.81
+DISK_IMAGE = Factor-0.81.dmg
 
 ifdef DEBUG
 	DEFAULT_CFLAGS = -g
@@ -83,6 +82,9 @@ default:
 	@echo "solaris"
 	@echo "windows"
 	@echo ""
+	@echo "On Unix, pass NO_UI=1 if you don't want to link with the"
+	@echo "X11 and OpenGL libraries."
+	@echo
 	@echo "Also, you might want to set the SITE_CFLAGS environment"
 	@echo "variable to enable some CPU-specific optimizations; this"
 	@echo "can make a huge difference. Eg:"
@@ -102,8 +104,21 @@ macosx:
 		MACOSX=y
 
 macosx.app:
-	$(CP) $(BINARY) $(BUNDLE_BINARY)
-	$(CP) $(IMAGE) $(BUNDLE_IMAGE)
+	cp $(BINARY) $(BUNDLE)/Contents/MacOS/Factor
+
+	rm -rf $(BUNDLE)/Contents/Resources/
+	mkdir -p $(BUNDLE)/Contents/Resources/fonts/
+	cp -R fonts/*.ttf $(BUNDLE)/Contents/Resources/fonts/
+
+	find doc library contrib \( -name '*.factor' \
+		-o -name '*.facts' \
+		-o -name '*.txt' \
+		-o -name '*.html' \
+		-o -name '*.js' \) \
+		-exec ./cp_dir {} $(BUNDLE)/Contents/Resources/{} \;
+
+	cp $(IMAGE) $(BUNDLE)/Contents/Resources/factor.image
+
 	install_name_tool \
 		-id @executable_path/../Frameworks/libfreetype.6.dylib \
 		Factor.app/Contents/Frameworks/libfreetype.6.dylib
@@ -111,6 +126,13 @@ macosx.app:
 		-change /usr/local/lib/libfreetype.6.dylib \
 		@executable_path/../Frameworks/libfreetype.6.dylib \
 		Factor.app/Contents/MacOS/Factor
+
+macosx.dmg:
+	rm -rf $(DISK_IMAGE_DIR)
+	mkdir $(DISK_IMAGE_DIR)
+	cp -R $(BUNDLE) $(DISK_IMAGE_DIR)/$(BUNDLE)
+	hdiutil create -srcfolder "$(DISK_IMAGE_DIR)" -fs HFS+ \
+		-volname "$(DISK_IMAGE_DIR)" "$(DISK_IMAGE)"
 
 linux linux-x86 linux-amd64:
 	$(MAKE) $(BINARY) \

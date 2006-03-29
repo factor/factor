@@ -3,6 +3,7 @@
 - x11 title bars are funny
 - amd64 %box-struct
 - automate .dmg build, put sources there
+- defining methods returning structs in objc
 
 + portability:
 
