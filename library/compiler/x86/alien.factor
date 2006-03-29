@@ -31,7 +31,6 @@ M: %unbox generate-node
     drop 2 input f compile-c-call  1 input push-return-reg ;
 
 : struct-ptr/size ( func -- )
-    unbox-struct generate-node ( vop -- )
     drop
     ! Increase stack size
     ESP 2 input SUB
