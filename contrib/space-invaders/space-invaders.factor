@@ -21,7 +21,8 @@
 ! OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
 ! ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 USING: alien cpu-8080 errors generic io kernel kernel-internals
-lists math namespaces sequences styles threads gadgets gadgets-layouts opengl arrays ;
+lists math namespaces sequences styles threads gadgets gadgets-layouts opengl arrays 
+concurrency ;
 IN: space-invaders
 
 TUPLE: space-invaders port1 port2i port2o port3o port4lo port4hi port5o bitmap ;
@@ -122,38 +123,66 @@ M: space-invaders reset ( cpu -- )
 : gui-frame ( cpu -- )
   dup gui-frame/2 gui-frame/2 ;
 
-TUPLE: invaders-gadget cpu ;
+TUPLE: invaders-gadget cpu process ;
 
-C: invaders-gadget dup delegate>gadget ;
+TUPLE: coin-down-msg ;
+TUPLE: coin-up-msg ;
+TUPLE: player1-down-msg ;
+TUPLE: player1-up-msg ;
+TUPLE: player2-down-msg ;
+TUPLE: player2-up-msg ;
+TUPLE: fire-down-msg ;
+TUPLE: fire-up-msg ;
+TUPLE: left-down-msg ;
+TUPLE: left-up-msg ;
+TUPLE: right-down-msg ;
+TUPLE: right-up-msg ;
 
+: coin-key-pressed ( process -- )
+  #! Workaround lack of up event from gui.
+  <coin-down-msg> over send [ 10 sleep <coin-up-msg> swap send ] spawn drop  ;
 
-: do-draw2 ( gadget -- )
+: player1-key-pressed ( process -- )
+  #! Workaround lack of up event from gui.
+  <player1-down-msg> over send [ 10 sleep <player1-up-msg> swap send ] spawn drop ;
+
+: player2-key-pressed ( process -- )
+  #! Workaround lack of up event from gui.
+  <player2-down-msg> over send [ 10 sleep <player2-up-msg> swap send ] spawn drop ;
+
+: fire-key-pressed ( process -- )
+  #! Workaround lack of up event from gui.
+  <fire-down-msg> over send [ 10 sleep <fire-up-msg> swap send ] spawn drop ;
+
+: left-key-pressed ( process -- )
+  #! Workaround lack of up event from gui.
+  <left-down-msg> over send [ 10 sleep <left-up-msg> swap send ] spawn drop ;
+
+: right-key-pressed ( process -- )
+  #! Workaround lack of up event from gui.
+  <right-down-msg> over send [ 10 sleep <right-up-msg> swap send ] spawn drop ;
+
+: set-key-actions ( gadget -- )
+  H{
+    { [ "BACKSPACE" ] [ invaders-gadget-process coin-key-pressed ] }
+    { [ "1" ] [ invaders-gadget-process player1-key-pressed ] }
+    { [ "2" ] [ invaders-gadget-process player2-key-pressed ] }
+    { [ "UP" ] [ invaders-gadget-process fire-key-pressed ] }
+    { [ "LEFT" ] [ invaders-gadget-process left-key-pressed ] }
+    { [ "RIGHT" ] [ invaders-gadget-process right-key-pressed ] }
+  } add-actions ;
+
+C: invaders-gadget ( gadget -- )
+  dup delegate>gadget 
+  dup set-key-actions ;
+
+M: invaders-gadget pref-dim* drop { 224 256 0 0 } ;
+
+M: invaders-gadget draw-gadget* ( gadget -- )
   0 0 glRasterPos2i
   1.0 -1.0 glPixelZoom
   >r 224 256 GL_RGB GL_UNSIGNED_BYTE r>
   invaders-gadget-cpu space-invaders-bitmap glDrawPixels ;
-  
-M: invaders-gadget draw-gadget* ( gadget -- )
-  do-draw2 ;
-
-M: invaders-gadget pref-dim* drop { 224 256 0 0 } ;
-
-: sync-frame ( millis -- millis )
-  #! Sleep until the time for the next frame arrives.
-  1000 60 / >fixnum + millis - dup 0 > [ sleep ] [ drop ] if millis ;
-
-: (event-loop) ( millis gadget -- )
-  >r sync-frame r> 
-  dup invaders-gadget-cpu gui-frame
-  dup relayout-1
-  (event-loop) ;
-  
-: event-loop ( gadget -- )
-  [
-    dup invaders-gadget-cpu space-invaders-bitmap bitmap set
-    millis swap (event-loop) 
-  ] with-scope ;
-
 
 : black { 0 0 0 } ;
 : white { 255 255 255 } ;
@@ -194,8 +223,91 @@ M: space-invaders update-video ( value addr cpu -- )
     3drop
   ] if ;
 
+GENERIC: handle-invaders-message ( gadget message -- quit? )
+
+! Any unknown message quits the process
+M: object handle-invaders-message ( gadget message -- quit? )
+  2drop t ;
+
+M: coin-down-msg handle-invaders-message ( gadget message -- quit? )
+  drop invaders-gadget-cpu 
+  [ space-invaders-port1 1 bitor ] keep 
+  set-space-invaders-port1 f ;
+
+M: coin-up-msg handle-invaders-message ( gadget message -- quit? )
+  drop invaders-gadget-cpu 
+  [ space-invaders-port1 255 1 - bitand ] keep 
+  set-space-invaders-port1 f ;
+
+M: player1-down-msg handle-invaders-message ( gadget message -- quit? )
+  drop invaders-gadget-cpu 
+  [ space-invaders-port1 4 bitor ] keep 
+  set-space-invaders-port1 f ;
+
+M: player1-up-msg handle-invaders-message ( gadget message -- quit? )
+  drop invaders-gadget-cpu 
+  [ space-invaders-port1 255 4 - bitand ] keep 
+  set-space-invaders-port1 f ;
+
+M: player2-down-msg handle-invaders-message ( gadget message -- quit? )
+  drop invaders-gadget-cpu 
+  [ space-invaders-port1 2 bitor ] keep 
+  set-space-invaders-port1 f ;
+
+M: player2-up-msg handle-invaders-message ( gadget message -- quit? )
+  drop invaders-gadget-cpu 
+  [ space-invaders-port1 255 2 - bitand ] keep 
+  set-space-invaders-port1 f ;
+
+M: fire-down-msg handle-invaders-message ( gadget message -- quit? )
+  drop invaders-gadget-cpu 
+  [ space-invaders-port1 HEX: 10 bitor ] keep 
+  set-space-invaders-port1 f ;
+
+M: fire-up-msg handle-invaders-message ( gadget message -- quit? )
+  drop invaders-gadget-cpu 
+  [ space-invaders-port1 255 HEX: 10 - bitand ] keep 
+  set-space-invaders-port1 f ;
+
+M: left-down-msg handle-invaders-message ( gadget message -- quit? )
+  drop invaders-gadget-cpu 
+  [ space-invaders-port1 HEX: 20 bitor ] keep 
+  set-space-invaders-port1 f ;
+
+M: left-up-msg handle-invaders-message ( gadget message -- quit? )
+  drop invaders-gadget-cpu 
+  [ space-invaders-port1 255 HEX: 20 - bitand ] keep 
+  set-space-invaders-port1 f ;
+
+M: right-down-msg handle-invaders-message ( gadget message -- quit? )
+  drop invaders-gadget-cpu 
+  [ space-invaders-port1 HEX: 40 bitor ] keep 
+  set-space-invaders-port1 f ;
+
+M: right-up-msg handle-invaders-message ( gadget message -- quit? )
+  drop invaders-gadget-cpu 
+  [ space-invaders-port1 255 HEX: 40 - bitand ] keep 
+  set-space-invaders-port1 f ;
+
+: sync-frame ( millis -- millis )
+  #! Sleep until the time for the next frame arrives.
+  1000 60 / >fixnum + millis - dup 0 > [ sleep ] [ drop ] if millis ;
+
+: invaders-process ( millis gadget -- )
+  #! Run a space invaders gadget inside a 
+  #! concurrent process. Messages can be sent to
+  #! signal key presses, etc.
+  [
+    [ sync-frame ] dip
+    dup invaders-gadget-cpu space-invaders-bitmap bitmap set
+    dup invaders-gadget-cpu gui-frame
+    dup relayout-1
+  ] while-no-messages 
+  dup receive handle-invaders-message [ invaders-process ] unless ;
+
 : run ( -- )  
   <space-invaders> "invaders.rom" over load-rom
-  <invaders-gadget> [ set-invaders-gadget-cpu ] keep 
+  <invaders-gadget> [ set-invaders-gadget-cpu ] keep   
   dup "Space Invaders" open-window 
-  [ event-loop ] cons in-thread ;
+  dup [ millis swap invaders-process ] cons spawn 
+  swap dupd set-invaders-gadget-process ;
