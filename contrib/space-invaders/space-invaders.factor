@@ -164,6 +164,7 @@ TUPLE: right-up-msg ;
 
 : set-key-actions ( gadget -- )
   H{
+    { [ "ESCAPE" ] [ invaders-gadget-process "stop" swap send ] }
     { [ "BACKSPACE" ] [ invaders-gadget-process coin-key-pressed ] }
     { [ "1" ] [ invaders-gadget-process player1-key-pressed ] }
     { [ "2" ] [ invaders-gadget-process player2-key-pressed ] }
