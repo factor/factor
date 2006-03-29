@@ -30,3 +30,7 @@ HELP: memcpy "( dst src size -- newalien )"
 HELP: check-ptr "( c-ptr -- checked )"
 { $values { "c-ptr" "an alien address, byte array, or " { $link f } } { "checked" "an alien address or byte array with non-zero address" } }
 { $description "Throws an error if the input is " { $link f } ". Otherwise the object remains on the data stack." } ;
+
+HELP: free "( ptr -- )"
+{ $values { "ptr" "an alien address" } }
+{ $description "Deallocates a block of memory allocated by " { $link malloc } ", " { $link calloc } " or " { $link realloc } "." } ;

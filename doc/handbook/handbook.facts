@@ -7,7 +7,6 @@ $terpri
 "Placing the mouse over a presentation highlights it with a border. Presentations are everywhere; help links, words, and code examples are all presentations. Clicking a presentation displays a browser window looking at the underlying object."
 $terpri
 "A left click will reuse the current browser window; a right click always opens a new window."
-$terpri
 { $subsection "changes" }
 "The environment:"
 { $subsection "quickref" }

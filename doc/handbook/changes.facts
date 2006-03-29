@@ -54,11 +54,17 @@ ARTICLE: "changes" "Changes in the latest release"
     }
 }
 { $subtopic "Contributed libraries"
+    { $subtopic { "External process interface - " { $snippet "contrib/processes.factor" } }
+        { $list "This is a new library" }
+    }
+    { $subtopic { "Partial continuations - " { $snippet "contrib/partial-continuations.factor" } }
+        { $list "This is a new library (Chris Double)" }
+    }
     { $subtopic { "HTTP server - " { $snippet "contrib/httpd/" } }
         { $list
             "File responder fixes"
             "Inspector responder fixes"
-            "Continuation responder fixes"
+            "Continuation responder fixes (Chris Double)"
             { "Add templating engine in " { $snippet "embedded.factor" } " (Alex Chapman)" }
         }
     }
@@ -68,9 +74,6 @@ ARTICLE: "changes" "Changes in the latest release"
             "Improved XML output capabilities"
         }
     }
-    { $subtopic { "External process interface - " { $snippet "contrib/processes.factor" } }
-        { $list "This is a new, experimental library." }
-    }
     { $subtopic { "Factory window manager - " { $snippet "contrib/factory/" } }
         { $list "Many updates" }
     }
@@ -79,6 +82,11 @@ ARTICLE: "changes" "Changes in the latest release"
             "Added Base64 encoding (Doug Coleman)"
             "Added Blum Blum Shub random number generator (Doug Coleman)"
             "Added CRC32 checksum (Doug Coleman)"
+        }
+    }
+    { $subtopic { "Space invaders/Intel 8080 emulator - " { $snippet "contrib/space-invaders/" } }
+        { $list
+            "Updated to use Factor UI instead of SDL (Chris Double)"
         }
     }
 } ;
