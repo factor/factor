@@ -5,7 +5,6 @@ should fix in 0.82:
 - when generating a 32-bit image on a 64-bit system, large numbers which should
   be bignums become fixnums
 - httpd fep
-- defining methods returning structs in objc
 - expired aliens in view hash
 - clicks sent twice
 - speed up ideas:
