@@ -32,4 +32,4 @@ USING: alien compiler kernel namespaces parser sequences words ;
 ] when
 
 IN: kernel
-: default-shell "tty" ;
+: default-shell "ui" ;
