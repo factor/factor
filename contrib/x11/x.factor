@@ -1,5 +1,5 @@
-USING: namespaces kernel compiler math arrays strings alien sequences
-xlib rectangle ;
+USING: namespaces kernel compiler math arrays strings alien sequences io
+prettyprint xlib rectangle ;
 
 IN: x 
 
@@ -134,11 +134,98 @@ DEFER: with-win
 : get-window-attributes ( -- <XWindowAttributes> )
   dpy get win get "XWindowAttributes" <c-object> dup >r XGetWindowAttributes drop r> ;
 
+: window-root get-window-attributes XWindowAttributes-root ;
+
 : window-map-state
   get-window-attributes XWindowAttributes-map_state ;
 
+: window-event-mask
+get-window-attributes XWindowAttributes-your_event_mask ;
+
+: window-all-event-masks
+get-window-attributes XWindowAttributes-all_event_masks ;
+
 : window-override-redirect
   get-window-attributes XWindowAttributes-override_redirect ;
+
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+SYMBOL: event-masks
+
+{ { "NoEventMask" 0 }
+  { "KeyPressMask" 1 }
+  { "KeyReleaseMask" 2 }
+  { "ButtonPressMask" 4 }
+  { "ButtonReleaseMask" 8 }
+  { "EnterWindowMask" 16 }
+  { "LeaveWindowMask" 32 }
+  { "PointerMotionMask" 64 }
+  { "PointerMotionHintMask" 128 }
+  { "Button1MotionMask" 256 }
+  { "Button2MotionMask" 512 }
+  { "Button3MotionMask" 1024 }
+  { "Button4MotionMask" 2048 }
+  { "Button5MotionMask" 4096 }
+  { "ButtonMotionMask" 8192 }
+  { "KeymapStateMask" 16384 }
+  { "ExposureMask" 32768 }
+  { "VisibilityChangeMask" 65536 }
+  { "StructureNotifyMask" 131072 }
+  { "ResizeRedirectMask" 262144 }
+  { "SubstructureNotifyMask" 524288 }
+  { "SubstructureRedirectMask" 1048576 }
+  { "FocusChangeMask" 2097152 }
+  { "PropertyChangeMask" 4194304 }
+  { "ColormapChangeMask" 8388608 }
+  { "OwnerGrabButtonMask" 16777216 }
+} event-masks set-global
+
+: bit-test ( a b -- t-or-f ) bitand 0 = not ;
+  
+: name>event-mask ( str -- i )
+event-masks get [ first over = ] find 2nip second ;
+
+: event-mask>name ( i -- str )
+event-masks get [ second over = ] find 2nip first ;
+
+: event-mask-names ( -- seq ) event-masks get [ first ] map ;
+
+: event-mask>names ( mask -- seq )
+event-mask-names [ name>event-mask bit-test ] subset-with ;
+
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+! Pretty printing window information
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+: print-field ( name value -- ) swap "=" append write pprint ;
+
+: spc ( -- ) " " write ;
+
+: print-window-geometry ( -- )
+window-width pprint "x" write window-height pprint "+" write
+window-x pprint "+" write window-y pprint ;
+
+: print-map-state ( -- )
+"map-state=" write
+window-map-state
+{ { [ dup 0 = ] [ drop "IsUnmapped" write ] }
+  { [ dup 1 = ] [ drop "IsUnviewable" write ] }
+  { [ dup 2 = ] [ drop "IsViewable" write ] }
+} cond ;
+
+: print-window-info ( -- )
+"id" win get print-field spc
+"parent" window-parent print-field spc
+"root" window-root print-field spc
+print-window-geometry terpri
+"children" window-children print-field terpri
+"override-redirect" window-override-redirect print-field spc
+print-map-state terpri
+"event-mask" window-event-mask event-mask>names print-field terpri
+"all-event-masks" window-all-event-masks event-mask>names print-field
+terpri ;
+
+: .win print-window-info ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 ! 6 - Color Management Functions
@@ -206,14 +293,15 @@ dup length 1 - [ swap 2nth draw-line ] each-with ;
 
 ! 8.6 - Drawing Text
 
-: draw-string ( { x y } string -- )
-  >r >r dpy get win get gcontext get r> [ ] each r> dup length XDrawString drop ;
+: draw-string ( { x y } string -- ) >r >r
+dpy get win get gcontext get r> [ ] each r> dup length XDrawString drop ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 ! 9 - Window and Session Manager Functions
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-: reparent-window ( parent -- ) >r dpy get win get r> 0 0 XReparentWindow drop ;
+: reparent-window ( parent -- ) >r
+dpy get win get r> 0 0 XReparentWindow drop ;
 
 : add-to-save-set ( -- ) dpy get win get XAddToSaveSet drop ;
 
@@ -257,8 +345,8 @@ error-handler-quot set error-handler-callback XSetErrorHandler drop ;
   >r >r dpy get win get r> r> XSetInputFocus drop ;
 
 : grab-pointer ( mask -- )
-  >r dpy get win get False r> GrabModeAsync GrabModeAsync None None CurrentTime
-  XGrabPointer drop ;
+>r dpy get win get False r> GrabModeAsync GrabModeAsync None None CurrentTime
+XGrabPointer drop ;
 
 : ungrab-pointer ( time -- )
   >r dpy get r> XUngrabPointer drop ;
@@ -295,6 +383,7 @@ error-handler-quot set error-handler-callback XSetErrorHandler drop ;
 : destroy-window+		[ destroy-window ] with-win ;
 : map-window+			[ map-window ] with-win ;
 : unmap-window+			[ unmap-window ] with-win ;
+: window-parent+		[ window-parent ] with-win ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 

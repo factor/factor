@@ -472,7 +472,7 @@ FUNCTION: Status XKillClient ( Display* display, XID resource ) ;
 : MotionNotify		6 ;
 : EnterNotify		7 ;
 : LeaveNotify		8 ;
-: FocusIn			9 ;
+: FocusIn		9 ;
 : FocusOut		10 ;
 : KeymapNotify		11 ;
 : Expose		12 ;
