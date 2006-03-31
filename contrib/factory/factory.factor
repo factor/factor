@@ -151,6 +151,7 @@ TUPLE: wm-root ;
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 M: wm-root handle-map-request-event ( event <wm-root> -- )
+"handle-map-request-event called on wm-root" print flush
   drop XMapRequestEvent-window id>obj				! obj
 
   { { [ dup wm-frame? ]
@@ -163,6 +164,9 @@ M: wm-root handle-map-request-event ( event <wm-root> -- )
       [ "Not reparenting: " print 
         "new window has override_redirect attribute set." print flush
         drop ] }
+
+    { [ dup window-id window-parent+ id>obj wm-frame? ]
+      [ "Window is already managed" print flush drop ] }
 
     { [ t ] [ window-id manage-window ] } }
 
@@ -332,7 +336,9 @@ TUPLE: wm-frame child ;
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 : manage-window ( window -- )
+  flush-dpy
   grab-server
+  flush-dpy
 
   create-wm-child				! child
   create-wm-frame				! frame
@@ -360,8 +366,11 @@ TUPLE: wm-frame child ;
   dup map-subwindows%
 
   dup wm-frame-child PropertyChangeMask swap select-input%
-  
-  flush-dpy 0 sync-dpy ungrab-server ;
+
+  flush-dpy
+  0 sync-dpy
+  ungrab-server
+  flush-dpy ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
