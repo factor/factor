@@ -30,9 +30,6 @@ GENERIC: client-event ( event window -- )
 
 : events-queued ( mode -- n ) >r dpy get r> XEventsQueued ;
 
-: next-event ( -- event )
-    dpy get "XEvent" <c-object> dup >r XNextEvent drop r> ;
-
 : wait-event ( -- event )
     QueuedAfterFlush events-queued 0 >
     [ next-event ] [ ui-step wait-event ] if ;
