@@ -3,11 +3,11 @@
 IN: objc-FactorView
 DEFER: FactorView
 
-USING: arrays cocoa errors freetype gadgets gadgets-launchpad
-gadgets-layouts gadgets-listener gadgets-panes hashtables kernel
-lists math namespaces objc objc-NSApplication objc-NSEvent
-objc-NSObject objc-NSOpenGLContext objc-NSOpenGLView objc-NSView
-objc-NSWindow sequences threads ;
+USING: alien arrays cocoa errors freetype gadgets
+gadgets-launchpad gadgets-layouts gadgets-listener gadgets-panes
+hashtables kernel lists math namespaces objc objc-NSApplication
+objc-NSEvent objc-NSObject objc-NSOpenGLContext
+objc-NSOpenGLView objc-NSView objc-NSWindow sequences threads ;
 
 ! Cocoa backend for Factor UI
 
@@ -17,6 +17,9 @@ IN: gadgets-cocoa
 SYMBOL: views
 
 H{ } clone views set-global
+
+: purge-expired ( hash -- hash )
+    [ drop expired? not ] hash-subset ;
 
 : view ( handle -- world ) views get hash ;
 
@@ -189,6 +192,7 @@ IN: shells
     [
         [
             init-ui
+            purge-expired
             launchpad-window
             listener-window
             finish-launching

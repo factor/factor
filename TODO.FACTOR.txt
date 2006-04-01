@@ -1,17 +1,15 @@
 should fix in 0.82:
 
+- 3 >n fep
 - amd64 %box-struct
 - get factor running on mac intel
 - when generating a 32-bit image on a 64-bit system, large numbers which should
   be bignums become fixnums
 - httpd fep
-- expired aliens in view hash
 - clicks sent twice
 - speed up ideas:
   - only do clipping for certain gadgets
   - use glRect
-- remove <char*>, <ushort*>, set-char*-nth, set-ushort*-nth since they
-  have incorrect semantics
 - cocoa: global menu bar with useful commands
 
 + portability:
@@ -58,6 +56,8 @@ should fix in 0.82:
 - core foundation should use unicode strings
 - alien>utf16-string, utf16-string>alien words
 - can <void*> only be called with an alien?
+- remove <char*>, <ushort*>, set-char*-nth, set-ushort*-nth since they
+  have incorrect semantics
 - improve callback efficiency
 - float intrinsics
 - complex float type
