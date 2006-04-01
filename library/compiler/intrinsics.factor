@@ -64,7 +64,7 @@ namespaces sequences words ;
     in-2
     -1 %inc-d ,
     0 1 %char-slot ,
-    1 <vreg> 0 %replace-d ,
+    T{ vreg f 1 } T{ ds-loc f 0 } %replace ,
 ] "intrinsic" set-word-prop
 
 \ set-char-slot [
@@ -102,23 +102,27 @@ namespaces sequences words ;
     -1 %inc-d ,
 ] "intrinsic" set-word-prop
 
-: value/vreg-list ( in -- list )
-    [ 0 swap length 1- ] keep
-    [ >r 2dup r> 3array >r 1- >r 1+ r> r> ] map 2nip ;
+GENERIC: load-value ( vreg loc value -- )
 
-: values>vregs ( in -- in )
-    value/vreg-list
-    dup [ first3 load-value ] each
-    [ first <vreg> ] map ;
+M: object load-value ( vreg loc value -- )
+    drop %peek , ;
+
+M: value load-value ( vreg loc value -- )
+    nip value-literal swap load-literal ;
 
 : binary-inputs ( node -- in1 in2 )
-    node-in-d values>vregs first2 swap ;
+    node-in-d
+    T{ vreg f 0 } T{ ds-loc f 1 } pick first load-value
+    T{ vreg f 1 } T{ ds-loc f 0 } rot second load-value
+    T{ vreg f 1 } T{ vreg f 0 } ;
 
 : binary-op-reg ( node op -- )
     >r binary-inputs dup -1 %inc-d , r> execute , out-1 ; inline
 
 : binary-imm ( node -- in1 in2 )
-    -1 %inc-d , in-1 node-peek value-literal 0 <vreg> ;
+    -1 %inc-d ,
+    T{ vreg f 0 } T{ ds-loc f 1 } pick node-peek load-value
+    node-peek value-literal T{ vreg f 0 } ;
 
 : binary-op-imm ( node op -- )
     >r binary-imm dup r> execute , out-1 ; inline
@@ -176,7 +180,7 @@ namespaces sequences words ;
     in-2
     -1 %inc-d ,
     1 <vreg> 0 <vreg> 2 <vreg> %fixnum-mod ,
-    T{ vreg f 2 } 0 %replace-d ,
+    T{ vreg f 2 } T{ ds-loc f 0 } %replace ,
 ] "intrinsic" set-word-prop
 
 \ fixnum/mod [
@@ -186,8 +190,8 @@ namespaces sequences words ;
     { T{ vreg f 1 } T{ vreg f 0 } }
     { T{ vreg f 2 } T{ vreg f 0 } }
     %fixnum/mod ,
-    T{ vreg f 2 } 0 %replace-d ,
-    T{ vreg f 0 } 1 %replace-d ,
+    T{ vreg f 2 } T{ ds-loc f 0 } %replace ,
+    T{ vreg f 0 } T{ ds-loc f 1 } %replace ,
 ] "intrinsic" set-word-prop
 
 \ fixnum-bitnot [
@@ -208,7 +212,7 @@ namespaces sequences words ;
     in-1
     dup cell-bits neg <= [
         drop 0 <vreg> 2 <vreg> %fixnum-sgn ,
-        T{ vreg f 2 } 0 %replace-d ,
+        T{ vreg f 2 } T{ ds-loc f 0 } %replace ,
     ] [
         neg 0 <vreg> 0 <vreg> %fixnum>> ,
         out-1

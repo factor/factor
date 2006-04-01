@@ -10,16 +10,8 @@ sequences vectors words ;
     #! by GC, and is indexed through a table.
     dup fixnum? swap f eq? or ;
 
-GENERIC: load-value ( vreg n value -- )
-
-M: object load-value ( vreg n value -- )
-    drop %peek-d , ;
-
-: load-literal ( vreg obj -- )
-    dup immediate? [ %immediate ] [ %indirect ] if , ;
-
-M: value load-value ( vreg n value -- )
-    nip value-literal load-literal ;
+: load-literal ( obj vreg -- )
+    over immediate? [ %immediate ] [ %indirect ] if , ;
 
 SYMBOL: vreg-allocator
 SYMBOL: live-d
@@ -31,53 +23,49 @@ SYMBOL: live-r
     rot live-r get member? not and
     or ;
 
-: stack>vreg ( value stack-pos loader -- )
-    pick >r vreg-allocator get r> set
-    pick value-dropped? [ pick get pick pick execute , ] unless
-    3drop vreg-allocator inc ; inline
+: stack>vreg ( value stack-pos -- )
+    vreg-allocator get <vreg> pick set
+    over value-dropped? [ 2drop ] [ >r get r> %peek , ] if
+    vreg-allocator inc ;
 
-: (stacks>vregs) ( stack loader -- )
-    swap reverse-slice dup length
-    [ pick stack>vreg ] 2each drop ; inline
+: stacks<>vregs ( values quot quot -- )
+    >r >r dup reverse-slice swap length r> map r> 2each ; inline
 
 : stacks>vregs ( #shuffle -- )
     dup
-    node-in-d \ %peek-d (stacks>vregs)
-    node-in-r \ %peek-r (stacks>vregs) ;
+    node-in-d [ <ds-loc> ] [ stack>vreg ] stacks<>vregs
+    node-in-r [ <cs-loc> ] [ stack>vreg ] stacks<>vregs ;
 
 : shuffle-height ( #shuffle -- )
     dup node-out-d length over node-in-d length - %inc-d ,
     dup node-out-r length swap node-in-r length - %inc-r , ;
 
-: literal>stack ( stack-pos value storer -- )
-    >r value-literal r> fixnum-imm? pick immediate? and [
-        >r 0 swap load-literal 0 <vreg> r>
-    ] unless swapd execute , ; inline
+: literal>stack ( value stack-pos -- )
+    swap value-literal fixnum-imm? over immediate? and
+    [ T{ vreg f 0 } load-literal T{ vreg f 0 } ] unless
+    swap %replace , ; inline
 
-: computed>stack >r get <vreg> swap r> execute , ;
-
-: vreg>stack ( stack-pos value storer -- )
+: vreg>stack ( value stack-pos -- )
     {
-        { [ over not ] [ 3drop ] }
+        { [ over not ] [ 2drop ] }
         { [ over value? ] [ literal>stack ] }
-        { [ t ] [ computed>stack ] }
-    } cond ; inline
-
-: (vregs>stack) ( stack storer -- )
-    swap reverse-slice [ length ] keep
-    [ pick vreg>stack ] 2each drop ; inline
+        { [ t ] [ >r get r> %replace , ] }
+    } cond ;
 
 : (vregs>stacks) ( stack stack -- )
-    \ %replace-r (vregs>stack) \ %replace-d (vregs>stack) ;
+    [ <cs-loc> ] [ vreg>stack ] stacks<>vregs
+    [ <ds-loc> ] [ vreg>stack ] stacks<>vregs ;
 
 : literals/computed ( stack -- literals computed )
     dup [ dup value? [ drop f ] unless ] map
     swap [ dup value? [ drop f ] when ] map ;
 
 : vregs>stacks ( -- )
+    #! We store literals last because storing a literal to a
+    #! stack slot actually clobbers a vreg.
     live-d get literals/computed
     live-r get literals/computed
-    swapd (vregs>stacks) (vregs>stacks) ;
+    swapd vregs>stacks vregs>stacks ;
 
 : live-stores ( instack outstack -- stack )
     #! Avoid storing a value into its former position.

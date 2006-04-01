@@ -153,53 +153,37 @@ C: %target-label make-vop ;
 ! stack operations
 TUPLE: %peek ;
 C: %peek make-vop ;
-
+: %peek swap src/dest-vop <%peek> ;
 M: %peek basic-block? drop t ;
-
-: %peek swap <vreg> src/dest-vop <%peek> ;
-
-: %peek-d ( vreg n -- vop ) <ds-loc> %peek ;
-
-: %peek-r ( vreg n -- vop ) <cs-loc> %peek ;
 
 TUPLE: %replace ;
 C: %replace make-vop ;
-
-M: %replace basic-block? drop t ;
-
 : %replace ( vreg loc -- vop ) src/dest-vop <%replace> ;
-
-: %replace-d ( vreg n -- vop ) <ds-loc> %replace ;
-
-: %replace-r ( vreg n -- vop ) <cs-loc> %replace ;
+M: %replace basic-block? drop t ;
 
 TUPLE: %inc-d ;
 C: %inc-d make-vop ;
 : %inc-d ( n -- node ) src-vop <%inc-d> ;
-
 M: %inc-d basic-block? drop t ;
 
 TUPLE: %inc-r ;
-
 C: %inc-r make-vop ;
-
 : %inc-r ( n -- ) src-vop <%inc-r> ;
-
 M: %inc-r basic-block? drop t ;
 
 TUPLE: %immediate ;
 C: %immediate make-vop ;
 
-: %immediate ( vreg obj -- vop )
-    swap <vreg> src/dest-vop <%immediate> ;
+: %immediate ( obj vreg -- vop )
+    src/dest-vop <%immediate> ;
 
 M: %immediate basic-block? drop t ;
 
 ! indirect load of a literal through a table
 TUPLE: %indirect ;
 C: %indirect make-vop ;
-: %indirect ( vreg obj -- )
-    swap <vreg> src/dest-vop <%indirect> ;
+: %indirect ( obj vreg -- )
+    src/dest-vop <%indirect> ;
 M: %indirect basic-block? drop t ;
 
 ! object slot accessors

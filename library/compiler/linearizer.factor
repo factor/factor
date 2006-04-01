@@ -81,10 +81,20 @@ M: #label linearize* ( node -- next )
     renamed-label swap node-child linearize-1
     r> ;
 
-: in-1 0 0 %peek-d , ;
-: in-2 0 1 %peek-d ,  1 0 %peek-d , ;
-: in-3 0 2 %peek-d ,  1 1 %peek-d ,  2 0 %peek-d , ;
-: out-1 T{ vreg f 0 } 0 %replace-d , ;
+: in-1
+    T{ vreg f 0 } T{ ds-loc f 0 } %peek , ;
+
+: in-2
+    T{ vreg f 0 } T{ ds-loc f 1 } %peek ,
+    T{ vreg f 1 } T{ ds-loc f 0 } %peek , ;
+
+: in-3
+    T{ vreg f 0 } T{ ds-loc f 2 } %peek ,
+    T{ vreg f 1 } T{ ds-loc f 1 } %peek ,
+    T{ vreg f 2 } T{ ds-loc f 0 } %peek , ;
+
+: out-1
+    T{ vreg f 0 } T{ ds-loc f 0 } %replace , ;
 
 : intrinsic ( #call -- quot ) node-param "intrinsic" word-prop ;
 

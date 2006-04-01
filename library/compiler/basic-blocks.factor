@@ -19,6 +19,7 @@ USING: arrays hashtables kernel lists math namespaces sequences ;
 : vop-in ( vop n -- input ) swap vop-inputs nth ;
 : set-vop-in ( input vop n -- ) swap vop-inputs set-nth ;
 : vop-out ( vop n -- input ) swap vop-outputs nth ;
+: set-vop-out ( output vop n -- ) swap vop-outputs set-nth ;
 
 : (split-blocks) ( n linear -- )
     2dup length = [
@@ -49,17 +50,17 @@ M: %inc-d simplify-stack* ( vop -- ) d-height accum-height ;
 
 M: %inc-r simplify-stack* ( vop -- ) r-height accum-height ;
 
-GENERIC: update-loc ( loc -- )
+GENERIC: update-loc ( loc -- loc )
 
-M: ds-loc update-loc
-    dup ds-loc-n d-height get - swap set-ds-loc-n ;
+M: ds-loc update-loc ds-loc-n d-height get - <ds-loc> ;
 
-M: cs-loc update-loc
-    dup cs-loc-n r-height get - swap set-cs-loc-n ;
+M: cs-loc update-loc cs-loc-n r-height get - <cs-loc> ;
 
-M: %peek simplify-stack* ( vop -- ) 0 vop-in update-loc ;
+M: %peek simplify-stack* ( vop -- )
+    0 [ vop-in update-loc ] 2keep set-vop-in ;
 
-M: %replace simplify-stack* ( vop -- ) 0 vop-out update-loc ;
+M: %replace simplify-stack* ( vop -- )
+    0 [ vop-out update-loc ] 2keep set-vop-out ;
 
 : simplify-stack ( block -- )
     #! Combine all %inc-d/%inc-r into two final ones.
