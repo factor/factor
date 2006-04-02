@@ -18,8 +18,10 @@ SYMBOL: views
 
 H{ } clone views set-global
 
-: purge-expired ( hash -- hash )
-    [ drop expired? not ] hash-subset ;
+: purge-views ( hash -- hash )
+    global [
+        views [ [ drop expired? not ] hash-subset ] change
+    ] bind ;
 
 : view ( handle -- world ) views get hash ;
 
@@ -192,7 +194,7 @@ IN: shells
     [
         [
             init-ui
-            purge-expired
+            purge-views
             launchpad-window
             listener-window
             finish-launching

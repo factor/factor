@@ -117,6 +117,8 @@ macosx.app:
 		-o -name '*.js' \) \
 		-exec ./cp_dir {} $(BUNDLE)/Contents/Resources/{} \;
 
+	cp version.factor $(BUNDLE)/Contents/Resources/
+
 	cp $(IMAGE) $(BUNDLE)/Contents/Resources/factor.image
 
 	install_name_tool \
