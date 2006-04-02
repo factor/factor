@@ -98,28 +98,29 @@ M: object load-value ( vreg loc value -- operand )
 M: value load-value ( vreg loc value -- operand )
     nip value-literal swap [ [ load-literal ] keep ] when* ;
 
-: intrinsic-inputs ( seq template -- inputs )
+: (template-inputs) ( seq template -- inputs )
     dup length reverse-slice [ <ds-loc> ] map rot 3array flip
     [ first3 load-value ] map ;
 
-: in-1 ( node -- operand )
-    node-in-d { T{ vreg f 0 } } intrinsic-inputs first ;
-
-: in-2 ( node -- operand operand )
-    node-in-d { T{ vreg f 0 } T{ vreg f 1 } }
-    intrinsic-inputs first2 ;
-
-: in-3 ( node -- operand operand operand )
-    node-in-d { T{ vreg f 0 } T{ vreg f 1 } T{ vreg f 2 } }
-    intrinsic-inputs first3 ;
+: template-inputs ( node template -- )
+    flip first2 >r [ dup [ <vreg> ] when ] map
+    >r node-in-d r> (template-inputs)
+    r> [ set ] 2each ;
 
 : stacks<>vregs ( values quot quot -- )
     >r >r dup reverse-slice swap length r> map r> 2each ; inline
 
-: out-n ( vregs -- )
-    [ <ds-loc> ] [ %replace , ] stacks<>vregs ;
+: template-outputs ( template -- )
+    [ get ] map [ <ds-loc> ] [ %replace , ] stacks<>vregs ;
 
-: out-1 ( vreg -- ) 1array out-n ;
+: with-template ( node in out quot -- )
+    [
+        >r
+        pick pick template-inputs
+        dup rot [ length ] 2apply - %inc-d ,
+        swap node set
+        r> swap slip template-outputs
+    ] with-scope ; inline
 
 : intrinsic ( #call -- quot ) node-param "intrinsic" word-prop ;
 
@@ -153,16 +154,15 @@ M: #if linearize* ( node -- next )
         -1 %inc-d ,
         swap node-children nth linearize-child iterate-next
     ] [
-        dup in-1 -1 %inc-d , >r <label> dup r> %jump-t ,
-        linearize-if
+        dup { { 0 "flag" } } { } [
+            <label> dup "flag" get %jump-t ,
+        ] with-template linearize-if
     ] if* ;
 
 : dispatch-head ( node -- label/node )
     #! Output the jump table insn and return a list of
     #! label/branch pairs.
-    dup in-1
-    -1 %inc-d ,
-    %dispatch ,
+    dup { { 0 "n" } } { } [ "n" get %dispatch , ] with-template
     node-children [ <label> dup %target-label ,  2array ] map ;
 
 : dispatch-body ( label/node -- )

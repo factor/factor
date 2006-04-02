@@ -5,8 +5,6 @@ USING: arrays assembler compiler-backend generic hashtables
 inference kernel kernel-internals lists math math-internals
 namespaces sequences words ;
 
-: node-peek ( node -- value ) node-in-d peek ;
-
 : type-tag ( type -- tag )
     #! Given a type number, return the tag number.
     dup 6 > [ drop 3 ] when ;
@@ -31,93 +29,82 @@ namespaces sequences words ;
 
 \ slot [
     dup slot@ [
-        -1 %inc-d ,
-        dup in-1 >r slot@ r> %fast-slot ,
+        { { 0 "obj" } { f "slot" } } { "obj" } [
+            node get slot@ "obj" get %fast-slot ,
+        ] with-template
     ] [
-        in-2 swap
-        -1 %inc-d ,
-        dup %untag ,
-        %slot ,
-    ] if  T{ vreg f 0 } out-1
+        { { 0 "obj" } { 1 "n" } } { "obj" } [
+            "obj" get %untag ,
+            "n" get "obj" get %slot ,
+        ] with-template
+    ] if
 ] "intrinsic" set-word-prop
 
 \ set-slot [
     dup slot@ [
-        -1 %inc-d ,
-        dup in-2
-        -2 %inc-d ,
-        rot slot@ %fast-set-slot ,
+        { { 0 "val" } { 1 "obj" } { f "slot" } } { } [
+            "val" get "obj" get node get slot@ %fast-set-slot ,
+        ] with-template
     ] [
-        in-3
-        -3 %inc-d ,
-        over %untag ,
-        %set-slot ,
+        { { 0 "val" } { 1 "obj" } { 2 "slot" } } { } [
+            "obj" get %untag ,
+            "val" get "obj" get "slot" get %set-slot ,
+        ] with-template
     ] if
     T{ vreg f 1 } %write-barrier ,
 ] "intrinsic" set-word-prop
 
 \ char-slot [
-    in-2
-    -1 %inc-d ,
-    [ %char-slot , ] keep
-    out-1
+    { { 0 "n" } { 1 "str" } } { "str" } [
+        "n" get "str" get %char-slot ,
+    ] with-template
 ] "intrinsic" set-word-prop
 
 \ set-char-slot [
-    in-3
-    -3 %inc-d ,
-    swap %set-char-slot ,
+    { { 0 "ch" } { 1 "n" } { 2 "str" } } { } [
+        "ch" get "str" get "n" get %set-char-slot ,
+    ] with-template
 ] "intrinsic" set-word-prop
 
 \ type [
-    in-1 [ %type , ] keep out-1
+    { { 0 "in" } } { "in" } [ "in" get %type , ] with-template
 ] "intrinsic" set-word-prop
 
 \ tag [
-    in-1 [ %tag , ] keep out-1
+    { { 0 "in" } } { "in" } [ "in" get %tag , ] with-template
 ] "intrinsic" set-word-prop
 
 \ getenv [
-    T{ vreg f 0 } [
-        -1 %inc-d ,
-        swap node-peek value-literal %getenv ,
-        1 %inc-d ,
-    ] keep out-1
+    { { f "env" } } { "out" } [
+        T{ vreg f 0 } "out" set
+        "out" get "env" get %getenv ,
+    ] with-template
 ] "intrinsic" set-word-prop
-
-: binary-imm ( node -- in1 in2 )
-    node-in-d { T{ vreg f 0 } f } intrinsic-inputs first2 swap
-    -2 %inc-d , ;
 
 \ setenv [
-    binary-imm
-    %setenv ,
+    { { 0 "value" } { f "env" } } { } [
+        "env" get "value" get %setenv ,
+    ] with-template
 ] "intrinsic" set-word-prop
 
-: binary-reg ( node -- in1 in2 )
-    node-in-d { T{ vreg f 0 } T{ vreg f 1 } } intrinsic-inputs
-    first2 swap -2 %inc-d , ;
+: literal-immediate? ( node -- ? )
+    node-in-d peek dup value?
+    [ value-literal immediate? ] [ drop f ] if ;
 
-: literal-immediate? ( value -- ? )
-    dup value? [ value-literal immediate? ] [ drop f ] if ;
+: binary-in ( node -- in )
+    literal-immediate? fixnum-imm? and
+    { { 0 "x" } { f "y" } } { { 0 "x" } { 1 "y" } } ? ;
 
-: (binary-op) ( node -- in1 in2 )
-    fixnum-imm? [
-        dup node-peek literal-immediate?
-        [ binary-imm ] [ binary-reg ] if
-    ] [
-        binary-reg
-    ] if ;
+: (binary-op) ( node in -- )
+    { "x" } [
+        >r "y" get "x" get dup r> execute ,
+    ] with-template ; inline
 
 : binary-op ( node op -- )
-    >r (binary-op) dup r> execute ,
-    1 %inc-d ,
-    T{ vreg f 0 } out-1 ; inline
+    swap dup binary-in (binary-op) ; inline
 
 : binary-op-reg ( node op -- )
-    >r binary-reg dup r> execute ,
-    1 %inc-d ,
-    T{ vreg f 0 } out-1 ; inline
+    swap { { 0 "x" } { 1 "y" } } (binary-op) ; inline
 
 {
     { fixnum+       %fixnum+       }
@@ -130,7 +117,9 @@ namespaces sequences words ;
 ] each
 
 : binary-jump ( node label op -- )
-    >r >r (binary-op) r> r> execute , ; inline
+    rot dup binary-in { } [
+        >r >r "y" get "x" get r> r> execute ,
+    ] with-template ; inline
 
 {
     { fixnum<= %jump-fixnum<= }
@@ -150,21 +139,26 @@ namespaces sequences words ;
     ! This is not clever. Because of x86, %fixnum-mod is
     ! hard-coded to put its output in vreg 2, which happends to
     ! be EDX there.
-    in-2 swap
-    -1 %inc-d ,
-    [ dup %fixnum-mod , ] keep out-1
+    { { 0 "x" } { 1 "y" } } { "out" } [
+        T{ vreg f 2 } "out" set
+        "y" get "x" get "out" get %fixnum-mod ,
+    ] with-template
 ] "intrinsic" set-word-prop
 
 \ fixnum/mod [
     ! See the remark on fixnum-mod for vreg usage
-    in-2 swap 2array
-    { T{ vreg f 2 } T{ vreg f 0 } }
-    %fixnum/mod ,
-    { T{ vreg f 0 } T{ vreg f 2 } } out-n
+    { { 0 "x" } { 1 "y" } } { "quo" "rem" } [
+        T{ vreg f 0 } "quo" set
+        T{ vreg f 2 } "rem" set
+        "y" get "x" get 2array
+        "rem" get "quo" get 2array %fixnum/mod ,
+    ] with-template
 ] "intrinsic" set-word-prop
 
 \ fixnum-bitnot [
-    in-1 [ dup %fixnum-bitnot , ] keep out-1
+    { { 0 "x" } } { "x" } [
+        "x" get dup %fixnum-bitnot ,
+    ] with-template
 ] "intrinsic" set-word-prop
 
 \ fixnum* [
@@ -173,32 +167,32 @@ namespaces sequences words ;
 
 : slow-shift ( -- ) \ fixnum-shift %call , ;
 
-: negative-shift ( n -- )
-    -1 %inc-d ,
-    { f } { T{ vreg f 0 } } intrinsic-inputs drop
-    dup cell-bits neg <= [
-        drop T{ vreg f 0 } T{ vreg f 2 } %fixnum-sgn ,
-        T{ vreg f 2 } out-1
-    ] [
-        neg T{ vreg f 0 } T{ vreg f 0 } %fixnum>> ,
-        T{ vreg f 0 } out-1
-    ] if ;
+: negative-shift ( n node -- )
+    { { 0 "x" } { f "n" } } { "out" } [
+        dup cell-bits neg <= [
+            drop
+            T{ vreg f 2 } "out" set
+            "x" get "out" get %fixnum-sgn ,
+        ] [
+            "x" get "out" set
+            neg "x" get "out" get %fixnum>> ,
+        ] if
+    ] with-template ;
 
-: fast-shift ( n -- )
-    dup zero? [
-        -1 %inc-d ,
-        drop
+: fast-shift ( n node -- )
+    over zero? [
+        -1 %inc-d , 2drop
     ] [
-        dup 0 < [
+        over 0 < [
             negative-shift
         ] [
-            drop slow-shift
+            2drop slow-shift
         ] if
     ] if ;
 
 \ fixnum-shift [
-    node-peek dup value? [
-        value-literal fast-shift
+    dup literal-immediate? [
+        [ node-in-d peek value-literal ] keep fast-shift
     ] [
         drop slow-shift
     ] if
