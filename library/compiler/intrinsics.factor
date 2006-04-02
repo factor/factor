@@ -1,5 +1,5 @@
-! Copyright (C) 2005 Slava Pestov.
-! See http://factor.sf.net/license.txt for BSD license.
+! Copyright (C) 2005, 2006 Slava Pestov.
+! See http://factorcode.org/license.txt for BSD license.
 IN: compiler-frontend
 USING: arrays assembler compiler-backend generic hashtables
 inference kernel kernel-internals lists math math-internals
@@ -32,111 +32,92 @@ namespaces sequences words ;
 \ slot [
     dup slot@ [
         -1 %inc-d ,
-        in-1
-        0 swap slot@ %fast-slot ,
+        dup in-1 >r slot@ r> %fast-slot ,
     ] [
-        drop
-        in-2
+        in-2 swap
         -1 %inc-d ,
-        0 %untag ,
-        1 0 %slot ,
-    ] if  out-1
+        dup %untag ,
+        %slot ,
+    ] if  T{ vreg f 0 } out-1
 ] "intrinsic" set-word-prop
 
 \ set-slot [
     dup slot@ [
         -1 %inc-d ,
-        in-2
+        dup in-2
         -2 %inc-d ,
-        slot@ >r 0 1 r> %fast-set-slot ,
+        rot slot@ %fast-set-slot ,
     ] [
-        drop
         in-3
         -3 %inc-d ,
-        1 %untag ,
-        0 1 2 %set-slot ,
+        over %untag ,
+        %set-slot ,
     ] if
-    1 %write-barrier ,
+    T{ vreg f 1 } %write-barrier ,
 ] "intrinsic" set-word-prop
 
 \ char-slot [
-    drop
     in-2
     -1 %inc-d ,
-    0 1 %char-slot ,
-    T{ vreg f 1 } T{ ds-loc f 0 } %replace ,
+    [ %char-slot , ] keep
+    out-1
 ] "intrinsic" set-word-prop
 
 \ set-char-slot [
-    drop
     in-3
     -3 %inc-d ,
-    0 2 1 %set-char-slot ,
+    swap %set-char-slot ,
 ] "intrinsic" set-word-prop
 
 \ type [
-    drop
-    in-1
-    0 %type ,
-    out-1
+    in-1 [ %type , ] keep out-1
 ] "intrinsic" set-word-prop
 
 \ tag [
-    drop
-    in-1
-    0 %tag ,
-    out-1
+    in-1 [ %tag , ] keep out-1
 ] "intrinsic" set-word-prop
 
 \ getenv [
-    -1 %inc-d ,
-    node-peek value-literal 0 <vreg> swap %getenv ,
-    1 %inc-d ,
-    out-1
+    T{ vreg f 0 } [
+        -1 %inc-d ,
+        swap node-peek value-literal %getenv ,
+        1 %inc-d ,
+    ] keep out-1
 ] "intrinsic" set-word-prop
-
-\ setenv [
-    -1 %inc-d ,
-    in-1
-    node-peek value-literal 0 <vreg> swap %setenv ,
-    -1 %inc-d ,
-] "intrinsic" set-word-prop
-
-GENERIC: load-value ( vreg loc value -- )
-
-M: object load-value ( vreg loc value -- )
-    drop %peek , ;
-
-M: value load-value ( vreg loc value -- )
-    nip value-literal swap load-literal ;
-
-: binary-inputs ( node -- in1 in2 )
-    node-in-d
-    T{ vreg f 0 } T{ ds-loc f 1 } pick first load-value
-    T{ vreg f 1 } T{ ds-loc f 0 } rot second load-value
-    T{ vreg f 1 } T{ vreg f 0 } ;
-
-: binary-op-reg ( node op -- )
-    >r binary-inputs dup -1 %inc-d , r> execute , out-1 ; inline
 
 : binary-imm ( node -- in1 in2 )
-    -1 %inc-d ,
-    T{ vreg f 0 } T{ ds-loc f 1 } pick node-peek load-value
-    node-peek value-literal T{ vreg f 0 } ;
+    node-in-d { T{ vreg f 0 } f } intrinsic-inputs first2 swap
+    -2 %inc-d , ;
 
-: binary-op-imm ( node op -- )
-    >r binary-imm dup r> execute , out-1 ; inline
+\ setenv [
+    binary-imm
+    %setenv ,
+] "intrinsic" set-word-prop
+
+: binary-reg ( node -- in1 in2 )
+    node-in-d { T{ vreg f 0 } T{ vreg f 1 } } intrinsic-inputs
+    first2 swap -2 %inc-d , ;
 
 : literal-immediate? ( value -- ? )
     dup value? [ value-literal immediate? ] [ drop f ] if ;
 
-: binary-op-imm? ( node -- ? )
-    fixnum-imm? >r node-peek literal-immediate? r> and ;
+: (binary-op) ( node -- in1 in2 )
+    fixnum-imm? [
+        dup node-peek literal-immediate?
+        [ binary-imm ] [ binary-reg ] if
+    ] [
+        binary-reg
+    ] if ;
 
 : binary-op ( node op -- )
-    #! out is a vreg where the vop stores the result.
-    over binary-op-imm?
-    [ binary-op-imm ] [ binary-op-reg ] if ;
+    >r (binary-op) dup r> execute ,
+    1 %inc-d ,
+    T{ vreg f 0 } out-1 ; inline
+
+: binary-op-reg ( node op -- )
+    >r binary-reg dup r> execute ,
+    1 %inc-d ,
+    T{ vreg f 0 } out-1 ; inline
 
 {
     { fixnum+       %fixnum+       }
@@ -148,15 +129,8 @@ M: value load-value ( vreg loc value -- )
     first2 [ binary-op ] curry "intrinsic" set-word-prop
 ] each
 
-: binary-jump-reg ( node label op -- )
-    >r >r binary-inputs -2 %inc-d , r> r> execute , ; inline
-
-: binary-jump-imm ( node label op -- )
-    >r >r binary-imm -1 %inc-d , r> r> execute , ; inline
-
 : binary-jump ( node label op -- )
-    pick binary-op-imm?
-    [ binary-jump-imm ] [ binary-jump-reg ] if ;
+    >r >r (binary-op) r> r> execute , ; inline
 
 {
     { fixnum<= %jump-fixnum<= }
@@ -176,29 +150,21 @@ M: value load-value ( vreg loc value -- )
     ! This is not clever. Because of x86, %fixnum-mod is
     ! hard-coded to put its output in vreg 2, which happends to
     ! be EDX there.
-    drop
-    in-2
+    in-2 swap
     -1 %inc-d ,
-    1 <vreg> 0 <vreg> 2 <vreg> %fixnum-mod ,
-    T{ vreg f 2 } T{ ds-loc f 0 } %replace ,
+    [ dup %fixnum-mod , ] keep out-1
 ] "intrinsic" set-word-prop
 
 \ fixnum/mod [
     ! See the remark on fixnum-mod for vreg usage
-    drop
-    in-2
-    { T{ vreg f 1 } T{ vreg f 0 } }
+    in-2 swap 2array
     { T{ vreg f 2 } T{ vreg f 0 } }
     %fixnum/mod ,
-    T{ vreg f 2 } T{ ds-loc f 0 } %replace ,
-    T{ vreg f 0 } T{ ds-loc f 1 } %replace ,
+    { T{ vreg f 0 } T{ vreg f 2 } } out-n
 ] "intrinsic" set-word-prop
 
 \ fixnum-bitnot [
-    drop
-    in-1
-    0 <vreg> 0 <vreg> %fixnum-bitnot ,
-    out-1
+    in-1 [ dup %fixnum-bitnot , ] keep out-1
 ] "intrinsic" set-word-prop
 
 \ fixnum* [
@@ -209,13 +175,13 @@ M: value load-value ( vreg loc value -- )
 
 : negative-shift ( n -- )
     -1 %inc-d ,
-    in-1
+    { f } { T{ vreg f 0 } } intrinsic-inputs drop
     dup cell-bits neg <= [
-        drop 0 <vreg> 2 <vreg> %fixnum-sgn ,
-        T{ vreg f 2 } T{ ds-loc f 0 } %replace ,
+        drop T{ vreg f 0 } T{ vreg f 2 } %fixnum-sgn ,
+        T{ vreg f 2 } out-1
     ] [
-        neg 0 <vreg> 0 <vreg> %fixnum>> ,
-        out-1
+        neg T{ vreg f 0 } T{ vreg f 0 } %fixnum>> ,
+        T{ vreg f 0 } out-1
     ] if ;
 
 : fast-shift ( n -- )

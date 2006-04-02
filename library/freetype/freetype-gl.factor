@@ -168,7 +168,7 @@ C: font ( handle -- font )
     #! glyph.
     [ dupd <char-sprite> ] cache-nth nip ;
 
-: draw-string ( open-font sprites string -- )
+: (draw-string) ( open-font sprites string -- )
     GL_TEXTURE_2D [
         GL_MODELVIEW [
             [

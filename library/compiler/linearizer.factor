@@ -81,20 +81,45 @@ M: #label linearize* ( node -- next )
     renamed-label swap node-child linearize-1
     r> ;
 
-: in-1
-    T{ vreg f 0 } T{ ds-loc f 0 } %peek , ;
+: immediate? ( obj -- ? )
+    #! fixnums and f have a pointerless representation, and
+    #! are compiled immediately. Everything else can be moved
+    #! by GC, and is indexed through a table.
+    dup fixnum? swap f eq? or ;
 
-: in-2
-    T{ vreg f 0 } T{ ds-loc f 1 } %peek ,
-    T{ vreg f 1 } T{ ds-loc f 0 } %peek , ;
+: load-literal ( obj vreg -- )
+    over immediate? [ %immediate ] [ %indirect ] if , ;
 
-: in-3
-    T{ vreg f 0 } T{ ds-loc f 2 } %peek ,
-    T{ vreg f 1 } T{ ds-loc f 1 } %peek ,
-    T{ vreg f 2 } T{ ds-loc f 0 } %peek , ;
+GENERIC: load-value ( vreg loc value -- operand )
 
-: out-1
-    T{ vreg f 0 } T{ ds-loc f 0 } %replace , ;
+M: object load-value ( vreg loc value -- operand )
+    drop dupd %peek , ;
+
+M: value load-value ( vreg loc value -- operand )
+    nip value-literal swap [ [ load-literal ] keep ] when* ;
+
+: intrinsic-inputs ( seq template -- inputs )
+    dup length reverse-slice [ <ds-loc> ] map rot 3array flip
+    [ first3 load-value ] map ;
+
+: in-1 ( node -- operand )
+    node-in-d { T{ vreg f 0 } } intrinsic-inputs first ;
+
+: in-2 ( node -- operand operand )
+    node-in-d { T{ vreg f 0 } T{ vreg f 1 } }
+    intrinsic-inputs first2 ;
+
+: in-3 ( node -- operand operand operand )
+    node-in-d { T{ vreg f 0 } T{ vreg f 1 } T{ vreg f 2 } }
+    intrinsic-inputs first3 ;
+
+: stacks<>vregs ( values quot quot -- )
+    >r >r dup reverse-slice swap length r> map r> 2each ; inline
+
+: out-n ( vregs -- )
+    [ <ds-loc> ] [ %replace , ] stacks<>vregs ;
+
+: out-1 ( vreg -- ) 1array out-n ;
 
 : intrinsic ( #call -- quot ) node-param "intrinsic" word-prop ;
 
@@ -128,14 +153,17 @@ M: #if linearize* ( node -- next )
         -1 %inc-d ,
         swap node-children nth linearize-child iterate-next
     ] [
-        in-1 -1 %inc-d , <label> dup 0 %jump-t , linearize-if
+        dup in-1 -1 %inc-d , >r <label> dup r> %jump-t ,
+        linearize-if
     ] if* ;
 
-: dispatch-head ( vtable -- label/node )
+: dispatch-head ( node -- label/node )
     #! Output the jump table insn and return a list of
     #! label/branch pairs.
-    in-1 -1 %inc-d , 0 %dispatch ,
-    [ <label> dup %target-label ,  2array ] map ;
+    dup in-1
+    -1 %inc-d ,
+    %dispatch ,
+    node-children [ <label> dup %target-label ,  2array ] map ;
 
 : dispatch-body ( label/node -- )
     <label> swap [
@@ -145,6 +173,6 @@ M: #if linearize* ( node -- next )
 M: #dispatch linearize* ( node -- next )
     #! The parameter is a list of nodes, each one is a branch to
     #! take in case the top of stack has that type.
-    node-children dispatch-head dispatch-body iterate-next ;
+    dispatch-head dispatch-body iterate-next ;
 
 M: #return linearize* drop %return , f ;

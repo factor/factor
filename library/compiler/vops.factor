@@ -1,5 +1,5 @@
-! Copyright (C) 2004, 2005 Slava Pestov.
-! See http://factor.sf.net/license.txt for BSD license.
+! Copyright (C) 2004, 2006 Slava Pestov.
+! See http://factorcode.org/license.txt for BSD license.
 IN: compiler-backend
 USING: arrays errors generic hashtables kernel kernel-internals
 lists math memory namespaces parser sequences words ;
@@ -139,12 +139,12 @@ C: %call make-vop ;
 
 TUPLE: %jump-t ;
 C: %jump-t make-vop ;
-: %jump-t <vreg> label/src-vop <%jump-t> ;
+: %jump-t label/src-vop <%jump-t> ;
 
 ! dispatch tables
 TUPLE: %dispatch ;
 C: %dispatch make-vop ;
-: %dispatch <vreg> src-vop <%dispatch> ;
+: %dispatch src-vop <%dispatch> ;
 
 TUPLE: %target-label ;
 C: %target-label make-vop ;
@@ -189,18 +189,16 @@ M: %indirect basic-block? drop t ;
 ! object slot accessors
 TUPLE: %untag ;
 C: %untag make-vop ;
-: %untag <vreg> dest-vop <%untag> ;
+: %untag dest-vop <%untag> ;
 M: %untag basic-block? drop t ;
-
-: slot-vop [ <vreg> ] 2apply 2-vop ;
 
 TUPLE: %slot ;
 C: %slot make-vop ;
-: %slot ( n vreg ) slot-vop <%slot> ;
+: %slot ( n vreg ) 2-vop <%slot> ;
 M: %slot basic-block? drop t ;
 
 : set-slot-vop
-    rot <vreg> rot <vreg> rot <vreg> dup >r 3array r> 1array f ;
+    [ 3array ] keep 1array f ;
 
 TUPLE: %set-slot ;
 C: %set-slot make-vop ;
@@ -215,22 +213,21 @@ M: %set-slot basic-block? drop t ;
 ! known at compile time, so these become a single instruction
 TUPLE: %fast-slot ;
 C: %fast-slot make-vop ;
-: %fast-slot ( vreg n )
-    swap <vreg> 2-vop <%fast-slot> ;
+: %fast-slot ( n vreg )
+    2-vop <%fast-slot> ;
 M: %fast-slot basic-block? drop t ;
 
 TUPLE: %fast-set-slot ;
 C: %fast-set-slot make-vop ;
 : %fast-set-slot ( value obj n )
     #! %fast-set-slot writes to vreg obj.
-    >r >r <vreg> r> <vreg> r> over >r 3array r> 1array f
-    <%fast-set-slot> ;
+    over >r 3array r> 1array f <%fast-set-slot> ;
 M: %fast-set-slot basic-block? drop t ;
 
 ! Char readers and writers
 TUPLE: %char-slot ;
 C: %char-slot make-vop ;
-: %char-slot ( n vreg ) slot-vop <%char-slot> ;
+: %char-slot ( n vreg ) 2-vop <%char-slot> ;
 M: %char-slot basic-block? drop t ;
 
 TUPLE: %set-char-slot ;
@@ -244,7 +241,7 @@ M: %set-char-slot basic-block? drop t ;
 
 TUPLE: %write-barrier ;
 C: %write-barrier make-vop ;
-: %write-barrier ( ptr ) <vreg> dest-vop <%write-barrier> ;
+: %write-barrier ( ptr ) dest-vop <%write-barrier> ;
 
 ! fixnum intrinsics
 TUPLE: %fixnum+ ;
@@ -318,11 +315,11 @@ C: %jump-eq? make-vop ;
 ! some slightly optimized inline assembly
 TUPLE: %type ;
 C: %type make-vop ;
-: %type ( vreg ) <vreg> dest-vop <%type> ;
+: %type ( vreg ) dest-vop <%type> ;
 
 TUPLE: %tag ;
 C: %tag make-vop ;
-: %tag ( vreg ) <vreg> dest-vop <%tag> ;
+: %tag ( vreg ) dest-vop <%tag> ;
 M: %tag basic-block? drop t ;
 
 TUPLE: %getenv ;

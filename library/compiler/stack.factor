@@ -4,15 +4,6 @@ IN: compiler-frontend
 USING: compiler-backend generic inference kernel math namespaces
 sequences vectors words ;
 
-: immediate? ( obj -- ? )
-    #! fixnums and f have a pointerless representation, and
-    #! are compiled immediately. Everything else can be moved
-    #! by GC, and is indexed through a table.
-    dup fixnum? swap f eq? or ;
-
-: load-literal ( obj vreg -- )
-    over immediate? [ %immediate ] [ %indirect ] if , ;
-
 SYMBOL: vreg-allocator
 SYMBOL: live-d
 SYMBOL: live-r
@@ -27,9 +18,6 @@ SYMBOL: live-r
     vreg-allocator get <vreg> pick set
     over value-dropped? [ 2drop ] [ >r get r> %peek , ] if
     vreg-allocator inc ;
-
-: stacks<>vregs ( values quot quot -- )
-    >r >r dup reverse-slice swap length r> map r> 2each ; inline
 
 : stacks>vregs ( #shuffle -- )
     dup
@@ -65,7 +53,7 @@ SYMBOL: live-r
     #! stack slot actually clobbers a vreg.
     live-d get literals/computed
     live-r get literals/computed
-    swapd vregs>stacks vregs>stacks ;
+    swapd (vregs>stacks) (vregs>stacks) ;
 
 : live-stores ( instack outstack -- stack )
     #! Avoid storing a value into its former position.
