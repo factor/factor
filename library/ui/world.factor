@@ -45,3 +45,6 @@ M: world pref-dim* ( world -- dim )
 
 : focused-ancestors ( world -- seq )
     world-focus parents reverse-slice ;
+
+: draw-string ( open-fonts string -- )
+    >r dup world get font-sprites r> (draw-string) ;
