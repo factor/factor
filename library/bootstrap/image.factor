@@ -337,7 +337,7 @@ M: hashtable ' ( hashtable -- pointer )
     ] if ;
 
 : image-name
-    "boot.image." architecture get append ;
+    "boot.image." architecture get append resource-path ;
 
 : write-image ( image -- )
     "Writing image to " write dup write "..." print flush

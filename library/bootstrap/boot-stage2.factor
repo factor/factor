@@ -78,5 +78,5 @@ number>string write " ms" print
 "Bootstrapping is complete." print
 "Now, you can run ./f factor.image" print flush
 
-"factor.image" save-image
+"factor.image" resource-path save-image
 0 exit
