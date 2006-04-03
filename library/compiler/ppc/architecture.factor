@@ -1,5 +1,5 @@
-IN: compiler-backend
-USING: assembler compiler-backend kernel kernel-internals math ;
+IN: compiler
+USING: assembler kernel kernel-internals math ;
 
 ! PowerPC register assignments
 ! r3-r10 vregs

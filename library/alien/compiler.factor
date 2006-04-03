@@ -1,7 +1,7 @@
 ! Copyright (C) 2006 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 IN: alien
-USING: arrays compiler-backend generic hashtables kernel
+USING: arrays compiler generic hashtables kernel
 kernel-internals math namespaces sequences words ;
 
 : parameter-size c-size cell align ;

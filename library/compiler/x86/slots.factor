@@ -1,7 +1,7 @@
 ! Copyright (C) 2006 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-IN: compiler-backend
-USING: alien arrays assembler compiler inference kernel
+IN: compiler
+USING: alien arrays assembler inference kernel
 kernel-internals lists math memory namespaces sequences words ;
 
 M: %slot generate-node ( vop -- )

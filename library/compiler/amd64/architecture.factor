@@ -1,7 +1,7 @@
 ! Copyright (C) 2005, 2006 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-IN: compiler-backend
-USING: alien arrays assembler compiler compiler-frontend kernel
+IN: compiler
+USING: alien arrays assembler kernel
 kernel-internals math namespaces sequences ;
 
 ! AMD64 register assignments

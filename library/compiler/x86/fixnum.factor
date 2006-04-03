@@ -1,7 +1,7 @@
 ! Copyright (C) 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
-IN: compiler-backend
-USING: arrays assembler compiler errors kernel kernel-internals
+IN: compiler
+USING: arrays assembler errors kernel kernel-internals
 math math-internals memory namespaces words ;
 
 : literal-overflow ( -- dest src )

@@ -1,6 +1,6 @@
 ! Copyright (C) 2005, 2006 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-IN: compiler-backend
+IN: compiler
 USING: alien assembler kernel kernel-internals math sequences ;
 
 GENERIC: freg>stack ( stack reg reg-class -- )

@@ -1,6 +1,6 @@
 ! Copyright (C) 2004, 2006 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: compiler compiler-backend help io io-internals kernel
+USING: compiler help io io-internals kernel
 kernel-internals lists math memory namespaces optimizer parser
 sequences sequences-internals words ;
 

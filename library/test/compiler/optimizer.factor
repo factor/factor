@@ -1,5 +1,5 @@
 IN: temporary
-USING: arrays assembler compiler compiler-backend generic
+USING: arrays assembler compiler generic
 hashtables inference kernel kernel-internals lists math
 optimizer prettyprint sequences strings test vectors words
 sequences-internals ;

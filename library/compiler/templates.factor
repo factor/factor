@@ -1,23 +1,35 @@
 ! Copyright (C) 2006 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-IN: compiler-frontend
-USING: arrays compiler-backend generic inference kernel math
+IN: compiler
+USING: arrays generic inference kernel math
 namespaces sequences vectors words ;
 
-! SYMBOL: d-height
-! SYMBOL: r-height
-! 
-! : adjust-stacks ( inc-d inc-r -- )
-!     r-height [ + ] change d-height [ + ] change ;
-! 
-! : finalize-stack ( quot symbol -- )
-!     [
-!         get dup zero? [ 2drop ] [ swap execute , ] if 0
-!     ] keep set ; inline
-! 
-! : end-basic-block ( -- )
-!     \ %inc-r r-height finalize-stack
-!     \ %inc-d d-height finalize-stack ;
+SYMBOL: d-height
+SYMBOL: r-height
+
+! A data stack location.
+TUPLE: ds-loc n ;
+
+C: ds-loc ( n -- ds-loc ) 
+    [ >r d-height get + r> set-ds-loc-n ] keep ;
+
+! A call stack location.
+TUPLE: cs-loc n ;
+
+C: cs-loc ( n -- ds-loc ) 
+    [ >r r-height get + r> set-cs-loc-n ] keep ;
+
+: adjust-stacks ( inc-d inc-r -- )
+    r-height [ + ] change d-height [ + ] change ;
+
+: finalize-stack ( quot symbol -- )
+    [
+        get dup zero? [ 2drop ] [ swap execute , ] if 0
+    ] keep set ; inline
+
+: end-basic-block ( -- )
+    \ %inc-r r-height finalize-stack
+    \ %inc-d d-height finalize-stack ;
 
 : immediate? ( obj -- ? )
     #! fixnums and f have a pointerless representation, and
@@ -88,7 +100,7 @@ SYMBOL: template-height
         pick length pick length swap - template-height set
         swap >r >r
         >r dup node-in-d r> { } { } template-inputs
-        template-height get %inc-d ,
+        template-height get 0 adjust-stacks end-basic-block
          node set r> call r> { } template-outputs
     ] with-scope ; inline
 

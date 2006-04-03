@@ -2,7 +2,6 @@ IN: temporary
 USE: test
 USE: kernel
 USE: compiler
-USE: compiler-frontend
 USE: inference
 USE: words
 USE: sequences

@@ -1,7 +1,7 @@
 ! Copyright (C) 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
-IN: compiler-backend
-USING: alien assembler compiler inference kernel
+IN: compiler
+USING: alien assembler inference kernel
 kernel-internals lists math memory namespaces sequences words ;
 
 : generate-slot ( size quot -- )

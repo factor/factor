@@ -1,7 +1,7 @@
 ! Copyright (C) 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
-IN: compiler-backend
-USING: assembler compiler errors kernel kernel-internals math
+IN: compiler
+USING: assembler errors kernel kernel-internals math
 memory namespaces words ;
 
 GENERIC: loc>operand

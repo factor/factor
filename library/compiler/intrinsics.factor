@@ -1,7 +1,7 @@
 ! Copyright (C) 2005, 2006 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-IN: compiler-frontend
-USING: arrays assembler compiler-backend generic hashtables
+IN: compiler
+USING: arrays assembler generic hashtables
 inference kernel kernel-internals lists math math-internals
 namespaces sequences words ;
 
@@ -181,7 +181,7 @@ namespaces sequences words ;
 
 : fast-shift ( n node -- )
     over zero? [
-        -1 %inc-d , 2drop
+        -1 0 adjust-stacks end-basic-block 2drop
     ] [
         over 0 < [
             negative-shift

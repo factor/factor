@@ -1,9 +1,9 @@
 ! Copyright (C) 2004, 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: compiler
-USING: assembler compiler-backend compiler-frontend errors
-generic hashtables kernel kernel-internals lists math namespaces
-prettyprint sequences strings vectors words ;
+USING: assembler errors generic hashtables kernel
+kernel-internals lists math namespaces prettyprint sequences
+strings vectors words ;
 
 ! We use a hashtable "compiled-xts" that maps words to
 ! xt's that are currently being compiled. The commit-xt's word

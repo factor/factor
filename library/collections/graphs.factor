@@ -17,8 +17,7 @@ USING: hashtables kernel namespaces sequences ;
         swap [ swap (add-vertex) ] each-with
     ] if-graph ;
 
-: (remove-vertex) ( vertex graph -- )
-    nest remove-hash ;
+: (remove-vertex) ( vertex graph -- ) nest remove-hash ;
 
 : remove-vertex ( vertex edges graph -- )
     [

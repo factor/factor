@@ -1,6 +1,6 @@
 ! Copyright (C) 2004, 2006 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-IN: compiler-backend
+IN: compiler
 USING: arrays errors generic hashtables kernel kernel-internals
 lists math memory namespaces parser sequences words ;
 
@@ -52,12 +52,6 @@ M: float-regs reg-size float-regs-size ;
 M: float-regs inc-reg-class
     dup (inc-reg-class)
     macosx? [ reg-size 4 / int-regs +@ ] [ drop ] if ;
-
-! A data stack location.
-TUPLE: ds-loc n ;
-
-! A call stack location.
-TUPLE: cs-loc n ;
 
 GENERIC: v>operand
 

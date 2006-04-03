@@ -1,8 +1,8 @@
 ! Copyright (C) 2004, 2006 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: arrays compiler-backend generic hashtables inference
+IN: compiler
+USING: arrays generic hashtables inference
 kernel math namespaces sequences words ;
-IN: compiler-frontend
 
 ! On PowerPC and AMD64, we use a stack discipline whereby
 ! stack frames are used to hold parameters. We need to compute
@@ -38,12 +38,15 @@ SYMBOL: renamed-labels
 
 : make-linear ( word quot -- )
     [
+        0 { d-height r-height } [ set ] each-with
         swap >r { } make r> linearized get set-hash
     ] with-node-iterator ; inline
 
 : linearize-1 ( word node -- )
     swap [
-        dup stack-reserve %prologue , linearize-child
+        dup stack-reserve %prologue ,
+        linearize-child
+        end-basic-block
     ] make-linear ;
 
 : init-linearizer ( -- )
@@ -123,8 +126,9 @@ SYMBOL: live-r
     dup length [ pick ?nth dupd eq? [ drop f ] when ] 2map nip ;
 
 : shuffle-height ( node -- )
-    dup node-out-d length over node-in-d length - %inc-d ,
-    dup node-out-r length swap node-in-r length - %inc-r , ;
+    [ dup node-out-d length swap node-in-d length - ] keep
+    dup node-out-r length swap node-in-r length -
+    adjust-stacks end-basic-block ;
 
 M: #shuffle linearize* ( #shuffle -- )
     [
@@ -142,7 +146,7 @@ M: #shuffle linearize* ( #shuffle -- )
 
 M: #if linearize* ( node -- next )
     dup ?static-branch [
-        -1 %inc-d ,
+        -1 0 adjust-stacks end-basic-block
         swap node-children nth linearize-child iterate-next
     ] [
         dup { { 0 "flag" } } { } [

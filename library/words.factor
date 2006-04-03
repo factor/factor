@@ -116,7 +116,6 @@ SYMBOL: vocabularies
     all-words swap subset-with ; inline
 
 : xref-words ( -- )
-    crossref get clear-hash
     all-words [ uses ] crossref get add-vertices ;
 
 : lookup ( name vocab -- word ) vocab ?hash ;

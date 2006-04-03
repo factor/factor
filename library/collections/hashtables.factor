@@ -28,9 +28,11 @@ TUPLE: tombstone ;
 
 : <hash-array> ( n -- array ) 1+ 4 * ((empty)) <array> ;
 
-: reset-hash ( n hash -- )
-    swap <hash-array> over set-hash-array
+: init-hash ( hash -- )
     0 over set-hash-count 0 swap set-hash-deleted ;
+
+: reset-hash ( n hash -- )
+    swap <hash-array> over set-hash-array init-hash ;
 
 : (new-key@) ( key keys i -- n )
     3dup swap nth-unsafe dup tombstone? [
@@ -124,7 +126,7 @@ IN: hashtables
     dup [ hash ] [ 2drop f ] if ;
 
 : clear-hash ( hash -- )
-    [ hash-array length ] keep reset-hash ;
+    dup init-hash hash-array [ drop ((empty)) ] inject ;
 
 : remove-hash ( key hash -- )
     [

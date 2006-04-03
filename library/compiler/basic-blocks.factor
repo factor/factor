@@ -1,6 +1,6 @@
 ! Copyright (C) 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
-IN: compiler-backend
+IN: compiler
 USING: arrays hashtables kernel lists math namespaces sequences ;
 
 ! Optimizations performed here:

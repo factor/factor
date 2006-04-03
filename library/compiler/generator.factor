@@ -1,7 +1,7 @@
 ! Copyright (C) 2004, 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
-IN: compiler-backend
-USING: alien assembler compiler errors inference kernel
+IN: compiler
+USING: alien assembler errors inference kernel
 kernel-internals lists math memory namespaces sequences strings
 vectors words ;
 
@@ -12,7 +12,7 @@ GENERIC: generate-node ( vop -- )
     compiled-offset >r
     compile-aligned
     swap save-xt
-    [ [ dup [ generate-node ] with-vop ] each ] each
+    [ dup [ generate-node ] with-vop ] each
     compile-aligned
     compiled-offset r> - ;
 

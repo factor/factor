@@ -1,8 +1,8 @@
 ! Copyright (C) 2004, 2006 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 IN: alien
-USING: arrays assembler compiler compiler-backend
-compiler-frontend errors generic hashtables inference inspector
+USING: arrays assembler compiler compiler
+errors generic hashtables inference inspector
 io kernel kernel-internals lists math namespaces parser
 prettyprint sequences strings words ;
 

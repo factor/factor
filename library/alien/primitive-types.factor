@@ -1,5 +1,4 @@
-USING: alien compiler-backend kernel kernel-internals
-math namespaces ;
+USING: alien compiler kernel kernel-internals math namespaces ;
 
 [
     [ alien-unsigned-cell <alien> ] "getter" set
