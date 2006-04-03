@@ -60,7 +60,7 @@ M: alien-callback-error summary ( error -- )
     ] make-linear ;
 
 M: alien-callback linearize* ( node -- )
-    compile-gc linearize-callback iterate-next ;
+    end-basic-block compile-gc linearize-callback iterate-next ;
 
 M: alien-callback stack-reserve*
     alien-callback-parameters stack-space ;

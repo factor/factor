@@ -82,12 +82,6 @@ TUPLE: vop inputs outputs label ;
 : output-operand ( n -- n ) output v>operand ;
 : label ( -- label ) vop get vop-label ;
 
-GENERIC: basic-block? ( vop -- ? )
-M: vop basic-block? drop f ;
-
-! simplifies some code
-M: f basic-block? drop f ;
-
 : make-vop ( inputs outputs label vop -- vop )
     [ >r <vop> r> set-delegate ] keep ;
 
@@ -148,22 +142,18 @@ C: %target-label make-vop ;
 TUPLE: %peek ;
 C: %peek make-vop ;
 : %peek swap src/dest-vop <%peek> ;
-M: %peek basic-block? drop t ;
 
 TUPLE: %replace ;
 C: %replace make-vop ;
 : %replace ( vreg loc -- vop ) src/dest-vop <%replace> ;
-M: %replace basic-block? drop t ;
 
 TUPLE: %inc-d ;
 C: %inc-d make-vop ;
 : %inc-d ( n -- node ) src-vop <%inc-d> ;
-M: %inc-d basic-block? drop t ;
 
 TUPLE: %inc-r ;
 C: %inc-r make-vop ;
 : %inc-r ( n -- ) src-vop <%inc-r> ;
-M: %inc-r basic-block? drop t ;
 
 TUPLE: %immediate ;
 C: %immediate make-vop ;
@@ -171,25 +161,20 @@ C: %immediate make-vop ;
 : %immediate ( obj vreg -- vop )
     src/dest-vop <%immediate> ;
 
-M: %immediate basic-block? drop t ;
-
 ! indirect load of a literal through a table
 TUPLE: %indirect ;
 C: %indirect make-vop ;
 : %indirect ( obj vreg -- )
     src/dest-vop <%indirect> ;
-M: %indirect basic-block? drop t ;
 
 ! object slot accessors
 TUPLE: %untag ;
 C: %untag make-vop ;
 : %untag dest-vop <%untag> ;
-M: %untag basic-block? drop t ;
 
 TUPLE: %slot ;
 C: %slot make-vop ;
 : %slot ( n vreg ) 2-vop <%slot> ;
-M: %slot basic-block? drop t ;
 
 : set-slot-vop
     [ 3array ] keep 1array f ;
@@ -201,28 +186,23 @@ C: %set-slot make-vop ;
     #! %set-slot writes to vreg obj.
     set-slot-vop <%set-slot> ;
 
-M: %set-slot basic-block? drop t ;
-
 ! in the 'fast' versions, the object's type and slot number is
 ! known at compile time, so these become a single instruction
 TUPLE: %fast-slot ;
 C: %fast-slot make-vop ;
 : %fast-slot ( n vreg )
     2-vop <%fast-slot> ;
-M: %fast-slot basic-block? drop t ;
 
 TUPLE: %fast-set-slot ;
 C: %fast-set-slot make-vop ;
 : %fast-set-slot ( value obj n )
     #! %fast-set-slot writes to vreg obj.
     over >r 3array r> 1array f <%fast-set-slot> ;
-M: %fast-set-slot basic-block? drop t ;
 
 ! Char readers and writers
 TUPLE: %char-slot ;
 C: %char-slot make-vop ;
 : %char-slot ( n vreg ) 2-vop <%char-slot> ;
-M: %char-slot basic-block? drop t ;
 
 TUPLE: %set-char-slot ;
 C: %set-char-slot make-vop ;
@@ -230,8 +210,6 @@ C: %set-char-slot make-vop ;
 : %set-char-slot ( value ch n )
     #! %set-char-slot writes to vreg obj.
     set-slot-vop <%set-char-slot> ;
-
-M: %set-char-slot basic-block? drop t ;
 
 TUPLE: %write-barrier ;
 C: %write-barrier make-vop ;
@@ -253,19 +231,15 @@ C: %fixnum/mod make-vop ;    : %fixnum/mod f <%fixnum/mod> ;
 
 TUPLE: %fixnum-bitand ;
 C: %fixnum-bitand make-vop ; : %fixnum-bitand 3-vop <%fixnum-bitand> ;
-M: %fixnum-bitand basic-block? drop t ;
 
 TUPLE: %fixnum-bitor ;
 C: %fixnum-bitor make-vop ;  : %fixnum-bitor 3-vop <%fixnum-bitor> ;
-M: %fixnum-bitor basic-block? drop t ;
 
 TUPLE: %fixnum-bitxor ;
 C: %fixnum-bitxor make-vop ; : %fixnum-bitxor 3-vop <%fixnum-bitxor> ;
-M: %fixnum-bitxor basic-block? drop t ;
 
 TUPLE: %fixnum-bitnot ;
 C: %fixnum-bitnot make-vop ; : %fixnum-bitnot 2-vop <%fixnum-bitnot> ;
-M: %fixnum-bitnot basic-block? drop t ;
 
 ! At the VOP level, the 'shift' operation is split into four
 ! distinct operations:
@@ -276,13 +250,11 @@ M: %fixnum-bitnot basic-block? drop t ;
 ! - shifts with a large negative count: %fixnum-sgn
 TUPLE: %fixnum>> ;
 C: %fixnum>> make-vop ;   : %fixnum>>   3-vop <%fixnum>>> ;
-M: %fixnum>> basic-block? drop t ;
 
 ! due to x86 limitations the destination of this VOP must be
 ! vreg 2 (EDX), and the source must be vreg 0 (EAX).
 TUPLE: %fixnum-sgn ;
 C: %fixnum-sgn make-vop ; : %fixnum-sgn src/dest-vop <%fixnum-sgn> ;
-M: %fixnum-sgn basic-block? drop t ;
 
 ! Integer comparison followed by a conditional branch is
 ! optimized
@@ -314,12 +286,10 @@ C: %type make-vop ;
 TUPLE: %tag ;
 C: %tag make-vop ;
 : %tag ( vreg ) dest-vop <%tag> ;
-M: %tag basic-block? drop t ;
 
 TUPLE: %getenv ;
 C: %getenv make-vop ;
 : %getenv src/dest-vop <%getenv> ;
-M: %getenv basic-block? drop t ;
 
 TUPLE: %setenv ;
 C: %setenv make-vop ;

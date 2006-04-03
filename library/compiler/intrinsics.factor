@@ -51,6 +51,7 @@ namespaces sequences words ;
             "val" get "obj" get "slot" get %set-slot ,
         ] with-template
     ] if
+    end-basic-block
     T{ vreg f 1 } %write-barrier ,
 ] "intrinsic" set-word-prop
 
@@ -67,7 +68,8 @@ namespaces sequences words ;
 ] "intrinsic" set-word-prop
 
 \ type [
-    { { 0 "in" } } { "in" } [ "in" get %type , ] with-template
+    { { 0 "in" } } { "in" }
+    [ end-basic-block "in" get %type , ] with-template
 ] "intrinsic" set-word-prop
 
 \ tag [
@@ -97,7 +99,7 @@ namespaces sequences words ;
 
 : (binary-op) ( node in -- )
     { "x" } [
-        >r "y" get "x" get dup r> execute ,
+        end-basic-block >r "y" get "x" get dup r> execute ,
     ] with-template ; inline
 
 : binary-op ( node op -- )
@@ -118,7 +120,7 @@ namespaces sequences words ;
 
 : binary-jump ( node label op -- )
     rot dup binary-in { } [
-        >r >r "y" get "x" get r> r> execute ,
+        end-basic-block >r >r "y" get "x" get r> r> execute ,
     ] with-template ; inline
 
 {
@@ -140,6 +142,7 @@ namespaces sequences words ;
     ! hard-coded to put its output in vreg 2, which happends to
     ! be EDX there.
     { { 0 "x" } { 1 "y" } } { "out" } [
+        end-basic-block
         T{ vreg f 2 } "out" set
         "y" get "x" get "out" get %fixnum-mod ,
     ] with-template
@@ -148,6 +151,7 @@ namespaces sequences words ;
 \ fixnum/mod [
     ! See the remark on fixnum-mod for vreg usage
     { { 0 "x" } { 1 "y" } } { "quo" "rem" } [
+        end-basic-block
         T{ vreg f 0 } "quo" set
         T{ vreg f 2 } "rem" set
         "y" get "x" get 2array
@@ -191,6 +195,7 @@ namespaces sequences words ;
     ] if ;
 
 \ fixnum-shift [
+    end-basic-block
     dup literal-immediate? [
         [ node-in-d peek value-literal ] keep fast-shift
     ] [

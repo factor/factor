@@ -27,7 +27,7 @@ UNION: #terminal POSTPONE: f #return #values #terminal-merge ;
 GENERIC: linearize* ( node -- next )
 
 : linearize-child ( node -- )
-    [ node@ linearize* ] iterate-nodes ;
+    [ node@ linearize* ] iterate-nodes end-basic-block ;
 
 ! A map from words to linear IR.
 SYMBOL: linearized
@@ -44,9 +44,7 @@ SYMBOL: renamed-labels
 
 : linearize-1 ( word node -- )
     swap [
-        dup stack-reserve %prologue ,
-        linearize-child
-        end-basic-block
+        dup stack-reserve %prologue , linearize-child
     ] make-linear ;
 
 : init-linearizer ( -- )
@@ -61,6 +59,7 @@ SYMBOL: renamed-labels
 M: node linearize* ( node -- next ) drop iterate-next ;
 
 : linearize-call ( label -- next )
+    end-basic-block
     tail-call? [ %jump , f ] [ %call , iterate-next ] if ;
 
 : rename-label ( label -- label )
@@ -86,9 +85,10 @@ M: #label linearize* ( node -- next )
     [ node-param "if-intrinsic" word-prop ] [ drop f ] if ;
 
 : linearize-if ( node label -- next )
-    <label> dup >r >r >r node-children first2 linearize-child
-    r> r> %jump-label , %label , linearize-child r> %label ,
-    iterate-next ;
+    <label> [
+        >r >r node-children first2 linearize-child
+        r> r> %jump-label , %label , linearize-child
+    ] keep %label , iterate-next ;
 
 M: #call linearize* ( node -- next )
     dup if-intrinsic [
@@ -128,17 +128,16 @@ SYMBOL: live-r
 : shuffle-height ( node -- )
     [ dup node-out-d length swap node-in-d length - ] keep
     dup node-out-r length swap node-in-r length -
-    adjust-stacks end-basic-block ;
+    adjust-stacks ;
 
 M: #shuffle linearize* ( #shuffle -- )
-    [
-        0 vreg-allocator set
-        dup node-in-d over node-out-d live-stores live-d set
-        dup node-in-r over node-out-r live-stores live-r set
-        dup do-inputs
-        shuffle-height
-        live-d get live-r get template-outputs
-    ] with-scope iterate-next ;
+    0 vreg-allocator set
+    dup node-in-d over node-out-d live-stores live-d set
+    dup node-in-r over node-out-r live-stores live-r set
+    dup do-inputs
+    shuffle-height
+    live-d get live-r get template-outputs
+    iterate-next ;
 
 : ?static-branch ( node -- n )
     node-in-d first dup value?
@@ -146,10 +145,11 @@ M: #shuffle linearize* ( #shuffle -- )
 
 M: #if linearize* ( node -- next )
     dup ?static-branch [
-        -1 0 adjust-stacks end-basic-block
+        -1 0 adjust-stacks
         swap node-children nth linearize-child iterate-next
     ] [
         dup { { 0 "flag" } } { } [
+            end-basic-block
             <label> dup "flag" get %jump-t ,
         ] with-template linearize-if
     ] if* ;
@@ -157,12 +157,14 @@ M: #if linearize* ( node -- next )
 : dispatch-head ( node -- label/node )
     #! Output the jump table insn and return a list of
     #! label/branch pairs.
-    dup { { 0 "n" } } { } [ "n" get %dispatch , ] with-template
+    dup { { 0 "n" } } { }
+    [ end-basic-block "n" get %dispatch , ] with-template
     node-children [ <label> dup %target-label ,  2array ] map ;
 
 : dispatch-body ( label/node -- )
     <label> swap [
-        first2 %label , linearize-child dup %jump-label ,
+        first2 %label , linearize-child end-basic-block
+        dup %jump-label ,
     ] each %label , ;
 
 M: #dispatch linearize* ( node -- next )
@@ -170,4 +172,4 @@ M: #dispatch linearize* ( node -- next )
     #! take in case the top of stack has that type.
     dispatch-head dispatch-body iterate-next ;
 
-M: #return linearize* drop %return , f ;
+M: #return linearize* drop end-basic-block %return , f ;

@@ -11,13 +11,13 @@ SYMBOL: r-height
 TUPLE: ds-loc n ;
 
 C: ds-loc ( n -- ds-loc ) 
-    [ >r d-height get + r> set-ds-loc-n ] keep ;
+    [ >r d-height get - r> set-ds-loc-n ] keep ;
 
 ! A call stack location.
 TUPLE: cs-loc n ;
 
 C: cs-loc ( n -- ds-loc ) 
-    [ >r r-height get + r> set-cs-loc-n ] keep ;
+    [ >r r-height get - r> set-cs-loc-n ] keep ;
 
 : adjust-stacks ( inc-d inc-r -- )
     r-height [ + ] change d-height [ + ] change ;
@@ -95,14 +95,11 @@ SYMBOL: any-reg
 SYMBOL: template-height
 
 : with-template ( node in out quot -- )
-    [
-        0 vreg-allocator set
-        pick length pick length swap - template-height set
-        swap >r >r
-        >r dup node-in-d r> { } { } template-inputs
-        template-height get 0 adjust-stacks end-basic-block
-         node set r> call r> { } template-outputs
-    ] with-scope ; inline
+    pick length pick length swap - template-height set
+    swap >r >r
+    >r dup node-in-d r> { } { } template-inputs
+    template-height get 0 adjust-stacks
+    node set r> call r> { } template-outputs ; inline
 
 : literals/computed ( stack -- literals computed )
     dup [ dup value? [ drop f ] unless ] map

@@ -64,7 +64,7 @@ M: alien-invoke-error summary ( error -- )
     ] if ;
 
 M: alien-invoke linearize* ( node -- )
-    compile-gc
+    end-basic-block compile-gc
     dup alien-invoke-parameters objects>registers
     dup alien-invoke-dlsym %alien-invoke ,
     dup linearize-cleanup box-return
