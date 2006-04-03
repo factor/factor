@@ -3,7 +3,7 @@ USING: kernel ;
 
 ! Think '/dev/null'.
 M: f stream-close drop ;
-M: f set-timeout drop ;
+M: f set-timeout 2drop ;
 
 M: f stream-readln drop f ;
 M: f stream-read1 drop f ;

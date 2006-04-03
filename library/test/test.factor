@@ -1,8 +1,8 @@
 ! Factor test suite.
 
 IN: test
-USING: arrays errors inspector io kernel lists math memory
-namespaces parser prettyprint sequences strings words ;
+USING: arrays errors hashtables inspector io kernel lists math
+memory namespaces parser prettyprint sequences strings words ;
 
 TUPLE: assert got expect ;
 
@@ -54,9 +54,7 @@ SYMBOL: failures
         ] assert-depth drop
     ] test-handler ;
 
-: prepare-tests ( -- )
-    failures off
-    vocabularies get [ "temporary" off ] bind ;
+: prepare-tests ( -- ) failures off "temporary" forget-vocab ;
 
 : passed.
     "Tests passed:" print . ;

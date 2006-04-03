@@ -27,6 +27,9 @@ math-internals sequences strings test words ;
 [ "axc" ] [ CHAR: x 1 [ "abc" [ set-char-slot ] keep dup rehash-string ] compile-1 ] unit-test
 [ "axc" ] [ CHAR: x [ 1 "abc" [ set-char-slot ] keep dup rehash-string ] compile-1 ] unit-test
 
+[ ] [ [ 0 getenv ] compile-1 drop ] unit-test
+[ ] [ 1 getenv [ 1 setenv ] compile-1 ] unit-test
+
 [ ] [ 1 [ drop ] compile-1 ] unit-test
 [ ] [ [ 1 drop ] compile-1 ] unit-test
 [ ] [ [ 1 2 2drop ] compile-1 ] unit-test

@@ -77,13 +77,13 @@ namespaces sequences words ;
 \ getenv [
     { { f "env" } } { "out" } [
         T{ vreg f 0 } "out" set
-        "out" get "env" get %getenv ,
+        "env" get "out" get %getenv ,
     ] with-template
 ] "intrinsic" set-word-prop
 
 \ setenv [
     { { 0 "value" } { f "env" } } { } [
-        "env" get "value" get %setenv ,
+        "value" get "env" get %setenv ,
     ] with-template
 ] "intrinsic" set-word-prop
 

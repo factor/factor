@@ -324,7 +324,7 @@ M: %tag basic-block? drop t ;
 
 TUPLE: %getenv ;
 C: %getenv make-vop ;
-: %getenv swap src/dest-vop <%getenv> ;
+: %getenv src/dest-vop <%getenv> ;
 M: %getenv basic-block? drop t ;
 
 TUPLE: %setenv ;

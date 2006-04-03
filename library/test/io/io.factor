@@ -60,3 +60,5 @@ unit-test
 [ f ]
 [ "" <string-reader> stream-readln ]
 unit-test
+
+[ ] [ 10000 f set-timeout ] unit-test

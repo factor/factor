@@ -58,11 +58,7 @@ SYMBOL: renamed-labels
 M: node linearize* ( node -- next ) drop iterate-next ;
 
 : linearize-call ( label -- next )
-    tail-call? [
-        %jump , f
-    ] [
-        %call , iterate-next
-    ] if ;
+    tail-call? [ %jump , f ] [ %call , iterate-next ] if ;
 
 : rename-label ( label -- label )
     <label> dup rot renamed-labels get set-hash ;
@@ -78,49 +74,7 @@ M: #label linearize* ( node -- next )
     #! to avoid problems with two IR #label nodes having the
     #! same label in different lexical scopes.
     dup node-param dup linearize-call-label >r
-    renamed-label swap node-child linearize-1
-    r> ;
-
-: immediate? ( obj -- ? )
-    #! fixnums and f have a pointerless representation, and
-    #! are compiled immediately. Everything else can be moved
-    #! by GC, and is indexed through a table.
-    dup fixnum? swap f eq? or ;
-
-: load-literal ( obj vreg -- )
-    over immediate? [ %immediate ] [ %indirect ] if , ;
-
-GENERIC: load-value ( vreg loc value -- operand )
-
-M: object load-value ( vreg loc value -- operand )
-    drop dupd %peek , ;
-
-M: value load-value ( vreg loc value -- operand )
-    nip value-literal swap [ [ load-literal ] keep ] when* ;
-
-: (template-inputs) ( seq template -- inputs )
-    dup length reverse-slice [ <ds-loc> ] map rot 3array flip
-    [ first3 load-value ] map ;
-
-: template-inputs ( node template -- )
-    flip first2 >r [ dup [ <vreg> ] when ] map
-    >r node-in-d r> (template-inputs)
-    r> [ set ] 2each ;
-
-: stacks<>vregs ( values quot quot -- )
-    >r >r dup reverse-slice swap length r> map r> 2each ; inline
-
-: template-outputs ( template -- )
-    [ get ] map [ <ds-loc> ] [ %replace , ] stacks<>vregs ;
-
-: with-template ( node in out quot -- )
-    [
-        >r
-        pick pick template-inputs
-        dup rot [ length ] 2apply - %inc-d ,
-        swap node set
-        r> swap slip template-outputs
-    ] with-scope ; inline
+    renamed-label swap node-child linearize-1 r> ;
 
 : intrinsic ( #call -- quot ) node-param "intrinsic" word-prop ;
 
@@ -144,6 +98,43 @@ M: #call linearize* ( node -- next )
 
 M: #call-label linearize* ( node -- next )
     node-param renamed-label linearize-call ;
+
+SYMBOL: live-d
+SYMBOL: live-r
+
+: value-dropped? ( value -- ? )
+    dup value?
+    over live-d get member? not
+    rot live-r get member? not and
+    or ;
+
+: filter-dropped ( seq -- seq )
+    [ dup value-dropped? [ drop f ] when ] map ;
+
+: prepare-inputs ( values -- values templates )
+    filter-dropped dup [ any-reg swap 2array ] map ;
+
+: do-inputs ( node -- )
+    dup node-in-d prepare-inputs rot node-in-r prepare-inputs
+    template-inputs ;
+
+: live-stores ( instack outstack -- stack )
+    #! Avoid storing a value into its former position.
+    dup length [ pick ?nth dupd eq? [ drop f ] when ] 2map nip ;
+
+: shuffle-height ( node -- )
+    dup node-out-d length over node-in-d length - %inc-d ,
+    dup node-out-r length swap node-in-r length - %inc-r , ;
+
+M: #shuffle linearize* ( #shuffle -- )
+    [
+        0 vreg-allocator set
+        dup node-in-d over node-out-d live-stores live-d set
+        dup node-in-r over node-out-r live-stores live-r set
+        dup do-inputs
+        shuffle-height
+        live-d get live-r get template-outputs
+    ] with-scope iterate-next ;
 
 : ?static-branch ( node -- n )
     node-in-d first dup value?

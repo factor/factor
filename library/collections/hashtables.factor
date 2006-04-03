@@ -235,9 +235,6 @@ M: hashtable hashcode ( hash -- n )
 : ?hash* ( key hash/f -- value/f )
     dup [ hash* ] [ 2drop f f ] if ; flushable
 
-: ?set-hash ( value key hash/f -- hash )
-    [ [ set-hash ] keep ] [ associate ] if ;
-
 : hash-stack ( key seq -- value )
     [ dupd hash-member? ] find-last nip ?hash ; flushable
 

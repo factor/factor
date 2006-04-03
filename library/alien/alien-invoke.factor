@@ -74,7 +74,8 @@ M: alien-invoke stack-reserve*
     alien-invoke-parameters stack-space ;
 
 : parse-arglist ( return seq -- types stack-effect )
-    unpair rot dup "void" = [ drop { } ] [ 1array ] if 2array
+    2 swap group unpair
+    rot dup "void" = [ drop { } ] [ 1array ] if 2array
     effect>string ;
 
 : (define-c-word) ( type lib func types stack-effect -- )

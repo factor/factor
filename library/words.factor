@@ -116,7 +116,7 @@ SYMBOL: vocabularies
     all-words swap subset-with ; inline
 
 : xref-words ( -- )
-    H{ } clone crossref set
+    crossref get clear-hash
     all-words [ uses ] crossref get add-vertices ;
 
 : lookup ( name vocab -- word ) vocab ?hash ;
@@ -140,6 +140,9 @@ SYMBOL: vocabularies
 : forget ( word -- )
     dup unxref-word
     dup word-name swap word-vocabulary vocab remove-hash ;
+
+: forget-vocab ( vocab -- )
+    vocabularies get remove-hash xref-words ;
 
 : target-word ( word -- word )
     dup word-name swap word-vocabulary lookup ;

@@ -5,8 +5,8 @@ kernel-internals lists math memory namespaces optimizer parser
 sequences sequences-internals words ;
 
 "Cross-referencing..." print
-xref-words
-xref-articles
+H{ } clone crossref set-global xref-words
+H{ } clone help-graph set-global xref-articles
 
 "compile" get [
     "native-io" get [

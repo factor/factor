@@ -146,11 +146,6 @@ HELP: set-hash "( value key hash -- )"
 { $description "Stores an entry into the hashtable." }
 { $see-also hash remove-hash } ;
 
-HELP: ?set-hash "( value key hash/f -- hash )"
-{ $values { "value" "a value" } { "key" "a key" } { "hash/f" "a hashtable or " { $link f } } }
-{ $description "If the mapping is " { $link f } ", constructs a new hashtable storing the given key/value pair. Otherwise, stores the key/value pair into the hashtable." }
-{ $see-also hash remove-hash } ;
-
 HELP: hash-keys "( hash -- keys )"
 { $values { "hash" "a hashtable" } { "keys" "an array of keys" } }
 { $description "Outputs an array of all keys in the hashtable." }

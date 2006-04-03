@@ -52,7 +52,6 @@ ARTICLE: "hashtables-lookup" "Looking up keys in hashtables"
 
 ARTICLE: "hashtables-mutation" "Storing keys in hashtables"
 { $subsection set-hash }
-{ $subsection ?set-hash }
 { $subsection remove-hash }
 { $subsection clear-hash } ;
 
