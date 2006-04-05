@@ -38,7 +38,7 @@ SYMBOL: renamed-labels
 
 : make-linear ( word quot -- )
     [
-        0 { d-height r-height } [ set ] each-with
+        init-templates
         swap >r { } make r> linearized get set-hash
     ] with-node-iterator ; inline
 
@@ -125,17 +125,11 @@ SYMBOL: live-r
     #! Avoid storing a value into its former position.
     dup length [ pick ?nth dupd eq? [ drop f ] when ] 2map nip ;
 
-: shuffle-height ( node -- )
-    [ dup node-out-d length swap node-in-d length - ] keep
-    dup node-out-r length swap node-in-r length -
-    adjust-stacks ;
-
 M: #shuffle linearize* ( #shuffle -- )
     0 vreg-allocator set
     dup node-in-d over node-out-d live-stores live-d set
     dup node-in-r over node-out-r live-stores live-r set
-    dup do-inputs
-    shuffle-height
+    do-inputs
     live-d get live-r get template-outputs
     iterate-next ;
 
@@ -145,7 +139,7 @@ M: #shuffle linearize* ( #shuffle -- )
 
 M: #if linearize* ( node -- next )
     dup ?static-branch [
-        -1 0 adjust-stacks
+        end-basic-block -1 0 adjust-stacks
         swap node-children nth linearize-child iterate-next
     ] [
         dup { { 0 "flag" } } { } [

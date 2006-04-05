@@ -7,29 +7,24 @@ namespaces sequences vectors words ;
 SYMBOL: d-height
 SYMBOL: r-height
 
+! Uncomitted values
+SYMBOL: phantom-d
+SYMBOL: phantom-r
+
+: init-templates
+    0 d-height set 0 r-height set
+    V{ } clone phantom-d set V{ } clone phantom-r set ;
+
 ! A data stack location.
 TUPLE: ds-loc n ;
-
-C: ds-loc ( n -- ds-loc ) 
-    [ >r d-height get - r> set-ds-loc-n ] keep ;
+C: ds-loc [ >r d-height get - r> set-ds-loc-n ] keep ;
 
 ! A call stack location.
 TUPLE: cs-loc n ;
-
-C: cs-loc ( n -- ds-loc ) 
-    [ >r r-height get - r> set-cs-loc-n ] keep ;
+C: cs-loc [ >r r-height get - r> set-cs-loc-n ] keep ;
 
 : adjust-stacks ( inc-d inc-r -- )
     r-height [ + ] change d-height [ + ] change ;
-
-: finalize-stack ( quot symbol -- )
-    [
-        get dup zero? [ 2drop ] [ swap execute , ] if 0
-    ] keep set ; inline
-
-: end-basic-block ( -- )
-    \ %inc-r r-height finalize-stack
-    \ %inc-d d-height finalize-stack ;
 
 : immediate? ( obj -- ? )
     #! fixnums and f have a pointerless representation, and
@@ -40,73 +35,86 @@ C: cs-loc ( n -- ds-loc )
 : load-literal ( obj vreg -- )
     over immediate? [ %immediate ] [ %indirect ] if , ;
 
-GENERIC: stack>vreg* ( vreg loc value -- operand )
+: literal>stack ( value loc -- )
+    swap value-literal fixnum-imm? over immediate? and
+    [ T{ vreg f 0 } load-literal T{ vreg f 0 } ] unless
+    swap %replace , ; inline
 
-M: object stack>vreg* ( vreg loc value -- operand )
-    drop >r <vreg> dup r> %peek , ;
+G: vreg>stack ( value loc -- ) 1 standard-combination ;
 
-M: value stack>vreg* ( vreg loc value -- operand )
-    nip value-literal swap <vreg> [ load-literal ] keep ;
+M: f vreg>stack ( value loc -- ) 2drop ;
+
+M: value vreg>stack ( value loc -- )
+    swap value-literal fixnum-imm? over immediate? and
+    [ T{ vreg f 0 } load-literal T{ vreg f 0 } ] unless
+    swap %replace , ;
+
+M: object vreg>stack ( value loc -- )
+    %replace , ;
+
+: vregs>stack ( values quot literals -- )
+    -rot >r [ dup value? rot eq? [ drop f ] unless ] map-with
+    dup reverse-slice swap length r> map
+    [ vreg>stack ] 2each ; inline
+
+: finalize-height ( word symbol -- )
+    [ dup zero? [ 2drop ] [ swap execute , ] if 0 ] change ;
+    inline
+
+: end-basic-block ( -- )
+    \ %inc-d d-height finalize-height
+    \ %inc-r r-height finalize-height
+    phantom-d get [ <ds-loc> ] f vregs>stack
+    phantom-r get [ <cs-loc> ] f vregs>stack
+    phantom-d get [ <ds-loc> ] t vregs>stack
+    phantom-r get [ <cs-loc> ] t vregs>stack
+    0 phantom-d get set-length
+    0 phantom-r get set-length ;
+
+G: stack>vreg ( value vreg loc -- operand )
+    2 standard-combination ;
+
+M: f stack>vreg ( value vreg loc -- operand ) 2drop ;
+
+M: object stack>vreg ( value vreg loc -- operand )
+    >r <vreg> dup r> %peek , nip ;
+
+M: value stack>vreg ( value vreg loc -- operand )
+    drop >r value-literal r> dup value eq?
+    [ drop ] [ <vreg> [ load-literal ] keep ] if ;
 
 SYMBOL: vreg-allocator
 
 SYMBOL: any-reg
 
-: alloc-value ( loc value -- operand )
-    vreg-allocator [ inc ] keep get -rot stack>vreg* ;
+: alloc-reg ( template -- template )
+    dup any-reg eq? [
+        drop vreg-allocator dup get swap inc
+    ] when ;
 
-: stack>vreg ( vreg loc value -- operand )
-    {
-        { [ dup not ] [ 3drop f ] }
-        { [ pick any-reg eq? ] [ alloc-value nip ] }
-        { [ pick not ] [ 2nip value-literal ] }
-        { [ t ] [ stack>vreg* ] }
-    } cond ;
+: alloc-regs ( template -- template ) [ alloc-reg ] map ;
 
-: (stack>vregs) ( names values template quot -- inputs )
-    >r dup length reverse r> map 3array flip
-    [ first3 rot stack>vreg ] map swap [ set ] 2each ; inline
+: (stack>vregs) ( values template locs -- inputs )
+    3array flip
+    [ first3 over [ stack>vreg ] [ 3drop f ] if ] map ;
 
 : stack>vregs ( stack template quot -- )
-    >r unpair -rot r> (stack>vregs) ; inline
+    >r unpair -rot alloc-regs dup length reverse r> map
+    (stack>vregs) swap [ set ] 2each ; inline
 
 : template-inputs ( stack template stack template -- )
-    [ <cs-loc> ] stack>vregs [ <ds-loc> ] stack>vregs ;
+    end-basic-block
+    over >r [ <cs-loc> ] stack>vregs
+    over >r [ <ds-loc> ] stack>vregs
+    r> r> [ length neg ] 2apply adjust-stacks ;
 
-: literal>stack ( value stack-pos -- )
-    swap value-literal fixnum-imm? over immediate? and
-    [ T{ vreg f 0 } load-literal T{ vreg f 0 } ] unless
-    swap %replace , ; inline
-
-: vreg>stack ( value stack-pos -- )
-    {
-        { [ over not ] [ 2drop ] }
-        { [ over value? ] [ literal>stack ] }
-        { [ t ] [ >r get r> %replace , ] }
-    } cond ;
-
-: vregs>stack ( values quot -- )
-    >r dup reverse-slice swap length r> map
-    [ vreg>stack ] 2each ; inline
+: >phantom ( seq stack -- )
+    get swap [ dup value? [ get ] unless ] map nappend ;
 
 : template-outputs ( stack stack -- )
-    [ <cs-loc> ] vregs>stack [ <ds-loc> ] vregs>stack ;
-
-SYMBOL: template-height
+    2dup [ length ] 2apply adjust-stacks
+    phantom-r >phantom phantom-d >phantom ;
 
 : with-template ( node in out quot -- )
-    pick length pick length swap - template-height set
-    swap >r >r
-    >r dup node-in-d r> { } { } template-inputs
-    template-height get 0 adjust-stacks
+    swap >r >r >r dup node-in-d r> { } { } template-inputs
     node set r> call r> { } template-outputs ; inline
-
-: literals/computed ( stack -- literals computed )
-    dup [ dup value? [ drop f ] unless ] map
-    swap [ dup value? [ drop f ] when ] map ;
-
-: vregs>stacks ( ds cs -- )
-    #! We store literals last because storing a literal to a
-    #! stack slot actually clobbers a vreg.
-    >r literals/computed r> literals/computed swapd
-    template-outputs template-outputs ;

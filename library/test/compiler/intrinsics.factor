@@ -54,6 +54,8 @@ math-internals sequences strings test words ;
 [ 2 ] [ 1 [ 2 nip ] compile-1 ] unit-test
 [ 2 ] [ 1 2 [ nip ] compile-1 ] unit-test
 
+[ 2 1 "hi" ] [ 1 2 [ swap "hi" ] compile-1 ] unit-test
+
 [ 4 ] [ 12 7 [ fixnum-bitand ] compile-1 ] unit-test
 [ 4 ] [ 12 [ 7 fixnum-bitand ] compile-1 ] unit-test
 [ 4 ] [ [ 12 7 fixnum-bitand ] compile-1 ] unit-test

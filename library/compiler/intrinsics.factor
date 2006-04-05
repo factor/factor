@@ -29,7 +29,7 @@ namespaces sequences words ;
 
 \ slot [
     dup slot@ [
-        { { 0 "obj" } { f "slot" } } { "obj" } [
+        { { 0 "obj" } { value "slot" } } { "obj" } [
             node get slot@ "obj" get %fast-slot ,
         ] with-template
     ] [
@@ -42,7 +42,7 @@ namespaces sequences words ;
 
 \ set-slot [
     dup slot@ [
-        { { 0 "val" } { 1 "obj" } { f "slot" } } { } [
+        { { 0 "val" } { 1 "obj" } { value "slot" } } { } [
             "val" get "obj" get node get slot@ %fast-set-slot ,
         ] with-template
     ] [
@@ -77,14 +77,14 @@ namespaces sequences words ;
 ] "intrinsic" set-word-prop
 
 \ getenv [
-    { { f "env" } } { "out" } [
+    { { value "env" } } { "out" } [
         T{ vreg f 0 } "out" set
         "env" get "out" get %getenv ,
     ] with-template
 ] "intrinsic" set-word-prop
 
 \ setenv [
-    { { 0 "value" } { f "env" } } { } [
+    { { 0 "value" } { value "env" } } { } [
         "value" get "env" get %setenv ,
     ] with-template
 ] "intrinsic" set-word-prop
@@ -95,7 +95,7 @@ namespaces sequences words ;
 
 : binary-in ( node -- in )
     literal-immediate? fixnum-imm? and
-    { { 0 "x" } { f "y" } } { { 0 "x" } { 1 "y" } } ? ;
+    { { 0 "x" } { value "y" } } { { 0 "x" } { 1 "y" } } ? ;
 
 : (binary-op) ( node in -- )
     { "x" } [
@@ -172,7 +172,7 @@ namespaces sequences words ;
 : slow-shift ( -- ) \ fixnum-shift %call , ;
 
 : negative-shift ( n node -- )
-    { { 0 "x" } { f "n" } } { "out" } [
+    { { 0 "x" } { value "n" } } { "out" } [
         dup cell-bits neg <= [
             drop
             T{ vreg f 2 } "out" set
@@ -185,7 +185,7 @@ namespaces sequences words ;
 
 : fast-shift ( n node -- )
     over zero? [
-        -1 0 adjust-stacks end-basic-block 2drop
+        end-basic-block -1 0 adjust-stacks 2drop
     ] [
         over 0 < [
             negative-shift
