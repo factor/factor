@@ -102,35 +102,18 @@ M: #call linearize* ( node -- next )
 M: #call-label linearize* ( node -- next )
     node-param renamed-label linearize-call ;
 
-SYMBOL: live-d
-SYMBOL: live-r
-
-: value-dropped? ( value -- ? )
-    dup value?
-    over live-d get member? not
-    rot live-r get member? not and
-    or ;
-
-: filter-dropped ( seq -- seq )
-    [ dup value-dropped? [ drop f ] when ] map ;
-
 : prepare-inputs ( values -- values templates )
-    filter-dropped dup [ any-reg swap 2array ] map ;
+    dup [ any-reg swap 2array ] map ;
 
-: do-inputs ( node -- )
-    dup node-in-d prepare-inputs rot node-in-r prepare-inputs
+: do-inputs ( shuffle -- )
+    dup shuffle-in-d prepare-inputs
+    rot shuffle-in-r prepare-inputs
     template-inputs ;
-
-: live-stores ( instack outstack -- stack )
-    #! Avoid storing a value into its former position.
-    dup length [ pick ?nth dupd eq? [ drop f ] when ] 2map nip ;
 
 M: #shuffle linearize* ( #shuffle -- )
     0 vreg-allocator set
-    dup node-in-d over node-out-d live-stores live-d set
-    dup node-in-r over node-out-r live-stores live-r set
-    do-inputs
-    live-d get live-r get template-outputs
+    node-shuffle dup do-inputs
+    dup shuffle-out-d swap shuffle-out-r template-outputs
     iterate-next ;
 
 : ?static-branch ( node -- n )
