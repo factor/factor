@@ -4,26 +4,6 @@ IN: inference
 USING: arrays generic hashtables interpreter kernel lists math
 namespaces parser sequences words ;
 
-! Recursive state. An alist, mapping words to labels.
-SYMBOL: recursive-state
-
-: <computed> \ <computed> counter ;
-
-TUPLE: value uid literal recursion ;
-
-C: value ( obj -- value )
-    <computed> over set-value-uid
-    recursive-state get over set-value-recursion
-    [ set-value-literal ] keep ;
-
-M: value hashcode value-uid ;
-
-M: value = eq? ;
-
-M: integer value-uid ;
-
-M: integer value-recursion drop f ;
-
 ! The dataflow IR is the first of the two intermediate
 ! representations used by Factor. It annotates concatenative
 ! code with stack flow information and types.

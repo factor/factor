@@ -1,5 +1,27 @@
+! Copyright (C) 2005, 2006 Slava Pestov.
+! See http://factorcode.org/license.txt for BSD license.
 IN: inference
 USING: hashtables kernel math namespaces sequences ;
+
+! Recursive state. An alist, mapping words to labels.
+SYMBOL: recursive-state
+
+: <computed> \ <computed> counter ;
+
+TUPLE: value uid literal recursion ;
+
+C: value ( obj -- value )
+    <computed> over set-value-uid
+    recursive-state get over set-value-recursion
+    [ set-value-literal ] keep ;
+
+M: value hashcode value-uid ;
+
+M: value = eq? ;
+
+M: integer value-uid ;
+
+M: integer value-recursion drop f ;
 
 TUPLE: shuffle in-d in-r out-d out-r ;
 

@@ -4,6 +4,22 @@ IN: compiler
 USING: arrays generic inference kernel math
 namespaces sequences vectors words ;
 
+! TUPLE: phantom-stack height elements ;
+! 
+! GENERIC: <loc> ( n stack -- loc )
+! 
+! TUPLE: phantom-datastack ;
+! 
+! C: phantom-datastack [ >r <phantom-stack> r> ] set-delegate ;
+! 
+! M: phantom-datastack <loc> drop <ds-loc> ;
+! 
+! TUPLE: phantom-callstack ;
+! 
+! C: phantom-callstack [ >r <phantom-stack> r> ] set-delegate ;
+! 
+! M: phantom-callstack <loc> drop <cs-loc> ;
+
 SYMBOL: d-height
 SYMBOL: r-height
 
@@ -34,11 +50,6 @@ C: cs-loc [ >r r-height get - r> set-cs-loc-n ] keep ;
 
 : load-literal ( obj vreg -- )
     over immediate? [ %immediate ] [ %indirect ] if , ;
-
-: literal>stack ( value loc -- )
-    swap value-literal fixnum-imm? over immediate? and
-    [ T{ vreg f 0 } load-literal T{ vreg f 0 } ] unless
-    swap %replace , ; inline
 
 G: vreg>stack ( value loc -- ) 1 standard-combination ;
 
@@ -83,8 +94,11 @@ M: object stack>vreg ( value vreg loc -- operand )
     >r <vreg> dup r> %peek , nip ;
 
 M: value stack>vreg ( value vreg loc -- operand )
-    drop >r value-literal r> dup value eq?
-    [ drop ] [ <vreg> [ load-literal ] keep ] if ;
+    drop dup value eq? [
+        drop
+    ] [
+        >r value-literal r> <vreg> [ load-literal ] keep
+    ] if ;
 
 SYMBOL: vreg-allocator
 
@@ -102,7 +116,9 @@ SYMBOL: any-reg
     [ first3 over [ stack>vreg ] [ 3drop f ] if ] map ;
 
 : phantom-vregs ( phantom template -- )
-    [ second ] map [ set ] 2each ;
+    >r [ dup value? [ value-literal ] when ] map r>
+    [ second ] map
+    [ set ] 2each ;
 
 : stack>vregs ( stack template quot -- )
     >r dup [ first ] map swapd alloc-regs
@@ -110,18 +126,19 @@ SYMBOL: any-reg
     (stack>vregs) swap phantom-vregs ; inline
 
 : compatible-vreg?
-    swap dup value? [ 2drop t ] [ vreg-n = ] if ;
+    swap dup value? [ 2drop f ] [ vreg-n = ] if ;
 
 : compatible-values? ( value template -- ? )
     {
-        { [ dup any-reg eq? ] [ 2drop t ] }
+        { [ dup any-reg eq? ] [ drop vreg? ] }
         { [ dup integer? ] [ compatible-vreg? ] }
         { [ dup value eq? ] [ drop value? ] }
+        { [ dup not ] [ 2drop t ] }
     } cond ;
 
 : template-match? ( phantom template -- ? )
     2dup [ length ] 2apply = [
-        f [ first compatible-values? and ] 2reduce
+        t [ first compatible-values? and ] 2reduce
     ] [
         2drop f
     ] if ;
