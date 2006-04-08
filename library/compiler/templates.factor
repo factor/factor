@@ -61,6 +61,9 @@ M: object vreg>stack ( value loc -- )
     [ dup zero? [ 2drop ] [ swap execute , ] if 0 ] change ;
     inline
 
+: reset-stack ( vector -- )
+    0 swap set-length ;
+
 : end-basic-block ( -- )
     \ %inc-d d-height finalize-height
     \ %inc-r r-height finalize-height
@@ -68,8 +71,8 @@ M: object vreg>stack ( value loc -- )
     phantom-r get [ <cs-loc> ] f vregs>stack
     phantom-d get [ <ds-loc> ] t vregs>stack
     phantom-r get [ <cs-loc> ] t vregs>stack
-    0 phantom-d get set-length
-    0 phantom-r get set-length ;
+    phantom-d get reset-stack
+    phantom-r get reset-stack ;
 
 G: stack>vreg ( value vreg loc -- operand )
     2 standard-combination ;
@@ -98,14 +101,41 @@ SYMBOL: any-reg
     3array flip
     [ first3 over [ stack>vreg ] [ 3drop f ] if ] map ;
 
+: phantom-vregs ( phantom template -- )
+    [ second ] map [ set ] 2each ;
+
 : stack>vregs ( stack template quot -- )
-    >r unpair -rot alloc-regs dup length reverse r> map
-    (stack>vregs) swap [ set ] 2each ; inline
+    >r dup [ first ] map swapd alloc-regs
+    dup length reverse r> map
+    (stack>vregs) swap phantom-vregs ; inline
+
+: compatible-vreg?
+    swap dup value? [ 2drop t ] [ vreg-n = ] if ;
+
+: compatible-values? ( value template -- ? )
+    {
+        { [ dup any-reg eq? ] [ 2drop t ] }
+        { [ dup integer? ] [ compatible-vreg? ] }
+        { [ dup value eq? ] [ drop value? ] }
+    } cond ;
+
+: template-match? ( phantom template -- ? )
+    2dup [ length ] 2apply = [
+        f [ first compatible-values? and ] 2reduce
+    ] [
+        2drop f
+    ] if ;
+
+: template-input ( values template phantom quot -- )
+    >r swap [ template-match? ] 2keep rot [
+        rot r> 2drop over >r phantom-vregs r> reset-stack
+    ] [
+        nip end-basic-block r> stack>vregs
+    ] if ; inline
 
 : template-inputs ( stack template stack template -- )
-    end-basic-block
-    over >r [ <cs-loc> ] stack>vregs
-    over >r [ <ds-loc> ] stack>vregs
+    over >r phantom-r get [ <cs-loc> ] template-input
+    over >r phantom-d get [ <ds-loc> ] template-input
     r> r> [ length neg ] 2apply adjust-stacks ;
 
 : >phantom ( seq stack -- )
