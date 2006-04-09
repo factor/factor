@@ -64,6 +64,7 @@ int main(int argc, char** argv)
 	CELL literal_size = 128;
 	CELL args;
 	CELL i;
+	bool image_given = true;
 
 	early_init();
 
@@ -88,7 +89,10 @@ int main(int argc, char** argv)
 	}
 
 	if(image == NULL)
+	{
+		image_given = false;
 		image = default_image_path();
+	}
 
 	init_factor(image,
 		ds_size * 1024,
@@ -100,7 +104,7 @@ int main(int argc, char** argv)
 		literal_size * 1024);
 
 	args = F;
-	while(--argc > 1)
+	while(--argc > (image_given ? 1 : 0))
 	{
 		args = cons(tag_object(from_c_string(argv[argc])),args);
 	}
