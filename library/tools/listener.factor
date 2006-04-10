@@ -9,8 +9,10 @@ SYMBOL: quit-flag
 
 SYMBOL: listener-hook
 SYMBOL: datastack-hook
+SYMBOL: error-hook
 
 "  " listener-prompt set-global
+[ drop terpri debug-help ] error-hook set-global
 
 : bye ( -- ) quit-flag on ;
 
@@ -28,10 +30,16 @@ SYMBOL: datastack-hook
 : read-multiline ( -- quot ? )
     [ f depth (read-multiline) >r reverse r> ] with-parser ;
 
+: listen-try
+    [
+        print-error error-continuation get error-hook get call
+    ] recover ;
+
 : listen ( -- )
     listener-hook get call
     listener-prompt get write flush
-    [ read-multiline [ call ] [ bye ] if ] try ;
+    [ read-multiline [ call ] [ bye ] if ]
+    listen-try ;
 
 : (listener) ( -- )
     quit-flag get [ quit-flag off ] [ listen (listener) ] if ;

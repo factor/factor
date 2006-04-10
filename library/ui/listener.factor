@@ -3,9 +3,9 @@
 IN: gadgets-listener
 USING: arrays gadgets gadgets-editors gadgets-labels
 gadgets-layouts gadgets-panes gadgets-scrolling
-gadgets-splitters gadgets-theme generic hashtables
-io jedit kernel listener lists math
-namespaces parser prettyprint sequences threads words ;
+gadgets-splitters gadgets-theme generic hashtables io jedit
+kernel listener lists math namespaces parser prettyprint
+sequences styles threads words ;
 
 TUPLE: listener-gadget pane stack ;
 
@@ -32,9 +32,15 @@ TUPLE: listener-gadget pane stack ;
     ] keep
     listener-gadget-pane word-completion ;
 
+: ui-error-hook ( error -- )
+    terpri H{ { font-style bold } } [
+        "Debug this error" swap simple-object terpri
+    ] with-style ;
+
 : listener-thread ( listener -- )
     dup listener-gadget-pane [
         [ ui-listener-hook ] curry listener-hook set
+        [ ui-error-hook ] error-hook set
         print-banner listener
     ] with-stream* ;
 
