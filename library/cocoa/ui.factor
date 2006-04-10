@@ -2,6 +2,8 @@
 ! See http://factorcode.org/license.txt for BSD license.
 IN: objc-FactorView
 DEFER: FactorView
+IN: objc-FactorUIWindowDelegate
+DEFER: FactorUIWindowDelegate
 
 USING: alien arrays cocoa errors freetype gadgets
 gadgets-launchpad gadgets-layouts gadgets-listener gadgets-panes
@@ -171,13 +173,42 @@ H{ } clone views set-global
     FactorView over rect-dim <GLView>
     [ over set-world-handle dup add-notify register-view ] keep ;
 
+
+: window-root-gadget-pref-dim  [contentView] view pref-dim ;
+
+: frame-rect-for-window-content-rect ( window rect -- rect )
+    swap [styleMask] NSWindow -rot [frameRectForContentRect:styleMask:] ;
+
+: content-rect-for-window-frame-rect ( window rect -- rect )
+    swap [styleMask] NSWindow -rot [contentRectForFrameRect:styleMask:] ;
+
+: window-content-rect ( window -- rect )
+    dup [frame] content-rect-for-window-frame-rect ;
+
+"NSObject" "FactorUIWindowDelegate" {
+    { "windowWillUseStandardFrame:defaultFrame:" "NSRect" { "id" "SEL" "id" "NSRect" }
+        [
+            drop 2nip ( self sel window default-frame -- window )
+            dup window-content-rect NSRect-x-far-y ( window -- window x y )
+            pick window-root-gadget-pref-dim first2 ( window x y -- window x y w h )
+            <far-y-NSRect>
+            frame-rect-for-window-content-rect
+        ]
+    }
+} { } define-objc-class
+
+: install-window-delegate ( window -- )
+    FactorUIWindowDelegate [alloc] [init] [setDelegate:] ;
+
 IN: gadgets
 
 : redraw-world ( handle -- )
     world-handle 1 [setNeedsDisplay:] ;
 
 : open-window* ( world title -- )
-    >r <FactorView> r> <ViewWindow> [contentView] [release] ;
+    >r <FactorView> r> <ViewWindow> 
+    dup install-window-delegate
+    [contentView] [release] ;
 
 : select-gl-context ( handle -- )
     [openGLContext] [makeCurrentContext] ;
