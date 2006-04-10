@@ -226,7 +226,7 @@ IN: shells
         [
             init-ui
             purge-views
-            launchpad-window
+            default-main-menu
             listener-window
             finish-launching
             event-loop
