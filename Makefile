@@ -110,6 +110,7 @@ macosx.app:
 	mkdir -p $(BUNDLE)/Contents/Resources/fonts/
 	cp -R fonts/*.ttf $(BUNDLE)/Contents/Resources/fonts/
 
+	chmod +x cp_dir
 	find doc library contrib \( -name '*.factor' \
 		-o -name '*.facts' \
 		-o -name '*.txt' \
