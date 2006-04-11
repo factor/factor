@@ -100,10 +100,6 @@ M: object vreg>stack ( value loc -- )
     phantom-d get finalize-phantom
     phantom-r get finalize-phantom ;
 
-: end-basic-block* ( -- )
-    phantom-d get vregs>stack
-    phantom-r get vregs>stack ;
-
 G: stack>vreg ( value vreg loc -- operand )
     2 standard-combination ;
 

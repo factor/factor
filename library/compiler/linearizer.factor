@@ -112,7 +112,7 @@ M: #call-label linearize* ( node -- next )
 
 M: #shuffle linearize* ( #shuffle -- )
     compute-free-vregs
-    node-shuffle dup do-inputs
+    node-shuffle trim-shuffle dup do-inputs
     dup shuffle-out-d swap shuffle-out-r template-outputs
     iterate-next ;
 
