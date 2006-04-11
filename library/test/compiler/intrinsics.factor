@@ -2,10 +2,6 @@ IN: temporary
 USING: arrays compiler kernel kernel-internals lists math
 math-internals sequences strings test words ;
 
-! Oops!
-[ 5000 ] [ [ 5000 ] compile-1 ] unit-test
-[ "hi" ] [ [ "hi" ] compile-1 ] unit-test
-
 ! Make sure that intrinsic ops compile to correct code.
 [ 1 ] [ [[ 1 2 ]] [ 0 slot ] compile-1 ] unit-test
 [ 1 ] [ [ [[ 1 2 ]] 0 slot ] compile-1 ] unit-test

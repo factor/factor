@@ -101,7 +101,7 @@ SYMBOL: failures
 : compiler-tests
     {
         "io/buffer"
-        "compiler/simple"
+        "compiler/simple" "compiler/templates"
         "compiler/stack" "compiler/ifte"
         "compiler/generic" "compiler/bail-out"
         "compiler/linearizer" "compiler/intrinsics"

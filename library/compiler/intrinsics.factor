@@ -68,12 +68,12 @@ namespaces sequences words ;
 ] "intrinsic" set-word-prop
 
 \ type [
-    { { 0 "in" } } { "in" }
+    { { any-reg "in" } } { "in" }
     [ end-basic-block "in" get %type , ] with-template
 ] "intrinsic" set-word-prop
 
 \ tag [
-    { { 0 "in" } } { "in" } [ "in" get %tag , ] with-template
+    { { any-reg "in" } } { "in" } [ "in" get %tag , ] with-template
 ] "intrinsic" set-word-prop
 
 \ getenv [
@@ -84,7 +84,7 @@ namespaces sequences words ;
 ] "intrinsic" set-word-prop
 
 \ setenv [
-    { { 0 "value" } { value "env" } } { } [
+    { { any-reg "value" } { value "env" } } { } [
         "value" get "env" get %setenv ,
     ] with-template
 ] "intrinsic" set-word-prop
@@ -119,7 +119,7 @@ namespaces sequences words ;
 ] each
 
 : binary-jump ( node label op -- )
-    rot dup binary-in { } [
+    rot { { any-reg "x" } { any-reg "y" } } { } [
         end-basic-block >r >r "y" get "x" get r> r> execute ,
     ] with-template ; inline
 
@@ -185,7 +185,7 @@ namespaces sequences words ;
 
 : fast-shift ( n node -- )
     over zero? [
-        end-basic-block -1 0 adjust-stacks 2drop
+        drop-phantom 2drop
     ] [
         over 0 < [
             negative-shift

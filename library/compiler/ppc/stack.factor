@@ -9,14 +9,22 @@ GENERIC: loc>operand
 M: ds-loc loc>operand ds-loc-n cells neg 14 swap ;
 M: cs-loc loc>operand cs-loc-n cells neg 15 swap ;
 
+: %literal ( quot -- )
+    0 output vreg? [
+        0 input 0 output-operand rot call
+    ] [
+        0 input 11 rot call
+        11 0 output loc>operand STW
+    ] if ; inline
+
 M: %immediate generate-node ( vop -- )
-    drop 0 input address 0 output-operand LOAD ;
+    drop [ >r address r> LOAD ] %literal ;
 
 : load-indirect ( dest literal -- )
     add-literal over LOAD32 rel-2/2 rel-address dup 0 LWZ ;
 
 M: %indirect generate-node ( vop -- )
-    drop 0 output-operand 0 input load-indirect ;
+    drop [ swap load-indirect ] %literal ;
 
 M: %peek generate-node ( vop -- )
     drop 0 output-operand 0 input loc>operand LWZ ;

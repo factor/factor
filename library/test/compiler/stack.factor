@@ -18,6 +18,3 @@ USING: compiler kernel math-internals test ;
 [ 1 2 1 ] [ 1 2 [ over ] compile-1 ] unit-test
 [ 1 2 3 1 ] [ 1 2 3 [ pick ] compile-1 ] unit-test
 [ 2 1 ] [ 1 2 [ swap ] compile-1 ] unit-test
-
-! Test literals in either side of a shuffle
-[ 4 1 ] [ 1 [ [ 3 fixnum+ ] keep ] compile-1 ] unit-test

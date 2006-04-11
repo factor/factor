@@ -49,9 +49,6 @@ M: phantom-callstack <loc> (loc) <cs-loc> ;
 M: phantom-callstack finalize-height
     \ %inc-r (finalize-height) ;
 
-: phantom-append ( seq phantom -- )
-    phantom-stack-elements swap nappend ;
-
 : phantom-locs ( n phantom -- locs )
     swap reverse-slice [ swap <loc> ] map-with ;
 
@@ -61,8 +58,10 @@ M: phantom-callstack finalize-height
 : adjust-phantom ( n phantom -- )
     [ phantom-stack-height + ] keep set-phantom-stack-height ;
 
-: reset-phantom ( phantom -- )
-    0 swap set-length ;
+GENERIC: cut-phantom ( n phantom -- seq )
+
+M: phantom-stack cut-phantom ( n phantom -- seq )
+    [ delegate cut* swap ] keep set-delegate ;
 
 SYMBOL: phantom-d
 SYMBOL: phantom-r
@@ -71,17 +70,13 @@ SYMBOL: phantom-r
     <phantom-datastack> phantom-d set
     <phantom-callstack> phantom-r set ;
 
-: adjust-stacks ( inc-d inc-r -- )
-    phantom-r get adjust-phantom
-    phantom-d get adjust-phantom ;
-
 : immediate? ( obj -- ? )
     #! fixnums and f have a pointerless representation, and
     #! are compiled immediately. Everything else can be moved
     #! by GC, and is indexed through a table.
     dup fixnum? swap f eq? or ;
 
-: load-literal ( obj vreg -- )
+: load-literal ( obj dest -- )
     over immediate? [ %immediate ] [ %indirect ] if , ;
 
 G: vreg>stack ( value loc -- ) 1 standard-combination ;
@@ -89,27 +84,25 @@ G: vreg>stack ( value loc -- ) 1 standard-combination ;
 M: f vreg>stack ( value loc -- ) 2drop ;
 
 M: value vreg>stack ( value loc -- )
-    swap value-literal fixnum-imm? over immediate? and
-    [ T{ vreg f 0 } load-literal T{ vreg f 0 } ] unless
-    swap %replace , ;
+    >r value-literal r> load-literal ;
 
 M: object vreg>stack ( value loc -- )
     %replace , ;
 
-: vregs>stack ( values? phantom -- )
-    [
-        [ dup value? rot eq? [ drop f ] unless ] map-with
-    ] keep phantom-locs* [ vreg>stack ] 2each ;
+: vregs>stack ( phantom -- )
+    dup dup phantom-locs* [ vreg>stack ] 2each
+    0 swap set-length ;
+
+: finalize-phantom ( phantom -- )
+    dup finalize-height vregs>stack ;
 
 : end-basic-block ( -- )
-    phantom-d get finalize-height
-    phantom-r get finalize-height
-    f phantom-d get vregs>stack
-    f phantom-r get vregs>stack
-    t phantom-d get vregs>stack
-    t phantom-r get vregs>stack
-    phantom-d get reset-phantom
-    phantom-r get reset-phantom ;
+    phantom-d get finalize-phantom
+    phantom-r get finalize-phantom ;
+
+: end-basic-block* ( -- )
+    phantom-d get vregs>stack
+    phantom-r get vregs>stack ;
 
 G: stack>vreg ( value vreg loc -- operand )
     2 standard-combination ;
@@ -126,16 +119,26 @@ M: value stack>vreg ( value vreg loc -- operand )
         >r value-literal r> <vreg> [ load-literal ] keep
     ] if ;
 
-SYMBOL: vreg-allocator
-
 SYMBOL: any-reg
 
-: alloc-reg ( template -- template )
-    dup any-reg eq? [
-        drop vreg-allocator dup get swap inc
-    ] when ;
+SYMBOL: free-vregs
 
-: alloc-regs ( template -- template ) [ alloc-reg ] map ;
+: compute-free-vregs ( -- )
+    phantom-d get [ vreg? ] subset
+    phantom-r get [ vreg? ] subset append
+    [ vreg-n ] map vregs length reverse diff
+    >vector free-vregs set ;
+
+: requested-vregs ( template -- n )
+    [ any-reg eq? ] subset length ;
+
+: sufficient-vregs? ( template template -- ? )
+    [ requested-vregs ] 2apply + free-vregs get length <= ;
+
+: alloc-regs ( template -- template )
+    free-vregs get swap [
+        dup any-reg eq? [ drop pop ] [ nip ] if
+    ] map-with ;
 
 : (stack>vregs) ( values template locs -- inputs )
     3array flip
@@ -145,54 +148,71 @@ SYMBOL: any-reg
     >r [ dup value? [ value-literal ] when ] map
     r> [ second set ] 2each ;
 
-: stack>vregs ( values phantom template -- )
+: stack>vregs ( values phantom template -- values )
     [
         [ first ] map alloc-regs
         pick length rot phantom-locs
         (stack>vregs)
-    ] keep phantom-vregs ;
+    ] 2keep length neg swap adjust-phantom ;
 
 : compatible-vreg? ( value vreg -- ? )
     swap dup value? [ 2drop f ] [ vreg-n = ] if ;
 
 : compatible-values? ( value template -- ? )
     {
+        { [ dup not ] [ 2drop t ] }
+        { [ over not ] [ 2drop f ] }
         { [ dup any-reg eq? ] [ drop vreg? ] }
         { [ dup integer? ] [ compatible-vreg? ] }
         { [ dup value eq? ] [ drop value? ] }
-        { [ dup not ] [ 2drop t ] }
     } cond ;
 
-: template-match? ( phantom template -- ? )
-    2dup [ length ] 2apply = [
-        f [ first compatible-values? and ] 2reduce
+: template-match? ( template phantom -- ? )
+    2dup [ length ] 2apply <= [
+        >r dup length r> tail-slice*
+        t [ swap first compatible-values? and ] 2reduce
     ] [
         2drop f
     ] if ;
 
-: optimized-input ( phantom template -- )
-    over >r phantom-vregs r> reset-phantom ;
+: templates-match? ( template template -- ? )
+    2dup sufficient-vregs? [
+        phantom-r get template-match?
+        >r phantom-d get template-match? r> and
+    ] [
+        2drop f
+    ] if ;
+
+: optimized-input ( template phantom -- )
+    over length neg over adjust-phantom
+    over length over cut-phantom
+    >r dup empty? [ drop ] [ vregs>stack ] if r>
+    swap phantom-vregs ;
 
 : template-input ( values template phantom -- )
-    swap 2dup template-match? [
-        optimized-input drop
-    ] [
-        end-basic-block stack>vregs
-    ] if ; inline
+    dup vregs>stack swap [ stack>vregs ] keep phantom-vregs ;
 
 : template-inputs ( values template values template -- )
-    over >r phantom-r get template-input
-    over >r phantom-d get template-input
-    r> r> [ length neg ] 2apply adjust-stacks ;
+    pick over templates-match? [
+        phantom-r get optimized-input drop
+        phantom-d get optimized-input drop
+    ] [
+        phantom-r get template-input
+        phantom-d get template-input
+    ] if ;
 
-: (template-outputs) ( seq stack -- )
+: drop-phantom ( -- )
+    end-basic-block -1 phantom-d get adjust-phantom ;
+
+: template-output ( seq stack -- )
+    over length over adjust-phantom
     swap [ dup value? [ get ] unless ] map nappend ;
 
 : template-outputs ( stack stack -- )
-    [ [ length ] 2apply adjust-stacks ] 2keep
-    phantom-r get (template-outputs)
-    phantom-d get (template-outputs) ;
+    phantom-r get template-output
+    phantom-d get template-output ;
 
 : with-template ( node in out quot -- )
+    compute-free-vregs
     swap >r >r >r dup node-in-d r> { } { } template-inputs
     node set r> call r> { } template-outputs ; inline

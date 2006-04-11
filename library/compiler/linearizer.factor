@@ -111,7 +111,7 @@ M: #call-label linearize* ( node -- next )
     template-inputs ;
 
 M: #shuffle linearize* ( #shuffle -- )
-    0 vreg-allocator set
+    compute-free-vregs
     node-shuffle dup do-inputs
     dup shuffle-out-d swap shuffle-out-r template-outputs
     iterate-next ;
@@ -122,7 +122,7 @@ M: #shuffle linearize* ( #shuffle -- )
 
 M: #if linearize* ( node -- next )
     dup ?static-branch [
-        end-basic-block -1 0 adjust-stacks
+        end-basic-block drop-phantom
         swap node-children nth linearize-child iterate-next
     ] [
         dup { { 0 "flag" } } { } [
