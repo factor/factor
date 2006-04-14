@@ -10,6 +10,11 @@ TUPLE: ds-loc n ;
 ! A call stack location.
 TUPLE: cs-loc n ;
 
+! A marker for values which are already stored in this location
+TUPLE: clean ;
+
+C: clean [ set-delegate ] keep ;
+
 TUPLE: phantom-stack height ;
 
 C: phantom-stack ( -- stack )
@@ -89,6 +94,8 @@ M: value vreg>stack ( value loc -- )
 M: object vreg>stack ( value loc -- )
     %replace , ;
 
+M: clean vreg>stack ( value loc -- ) 2drop ;
+
 : vregs>stack ( phantom -- )
     dup dup phantom-locs* [ vreg>stack ] 2each
     0 swap set-length ;
@@ -120,9 +127,9 @@ SYMBOL: any-reg
 SYMBOL: free-vregs
 
 : compute-free-vregs ( -- )
-    phantom-d get [ vreg? ] subset
-    phantom-r get [ vreg? ] subset append
-    [ vreg-n ] map vregs length reverse diff
+    phantom-d get phantom-r get append
+    [ vreg? ] subset [ vreg-n ] map
+    vregs length reverse diff
     >vector free-vregs set ;
 
 : requested-vregs ( template -- n )
@@ -138,11 +145,16 @@ SYMBOL: free-vregs
 
 : (stack>vregs) ( values template locs -- inputs )
     3array flip
-    [ first3 over [ stack>vreg ] [ 3drop f ] if ] map ;
+    [ first3 over [ stack>vreg <clean> ] [ 3drop f ] if ] map ;
+
+: ?clean ( obj -- obj )
+    dup clean? [ delegate ] when ;
+
+: %get ( obj -- value )
+    get ?clean dup value? [ value-literal ] when ;
 
 : phantom-vregs ( values template -- )
-    >r [ dup value? [ value-literal ] when ] map
-    r> [ second set ] 2each ;
+    [ second set ] 2each ;
 
 : stack>vregs ( values phantom template -- values )
     [
@@ -155,7 +167,7 @@ SYMBOL: free-vregs
     swap dup value? [ 2drop f ] [ vreg-n = ] if ;
 
 : compatible-values? ( value template -- ? )
-    {
+    >r ?clean r> {
         { [ dup not ] [ 2drop t ] }
         { [ over not ] [ 2drop f ] }
         { [ dup any-reg eq? ] [ drop vreg? ] }
@@ -200,9 +212,16 @@ SYMBOL: free-vregs
 : drop-phantom ( -- )
     end-basic-block -1 phantom-d get adjust-phantom ;
 
+: prep-output ( value -- value )
+    {
+        { [ dup value? ] [ ] }
+        { [ dup clean? ] [ delegate dup value? [ get ] unless ] }
+        { [ t ] [ get ?clean ] }
+    } cond ;
+
 : template-output ( seq stack -- )
     over length over adjust-phantom
-    swap [ dup value? [ get ] unless ] map nappend ;
+    swap [ prep-output ] map nappend ;
 
 : template-outputs ( stack stack -- )
     phantom-r get template-output

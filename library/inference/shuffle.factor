@@ -79,26 +79,3 @@ M: shuffle clone ( shuffle -- shuffle )
     [ shuffle-out-d clone ] keep
     shuffle-out-r clone
     <shuffle> ;
-
-SYMBOL: live-d
-SYMBOL: live-r
-
-: value-dropped? ( value -- ? )
-    dup value?
-    over live-d get member? not
-    rot live-r get member? not and
-    or ;
-
-: filter-dropped ( seq -- seq )
-    [ dup value-dropped? [ drop f ] when ] map ;
-
-: live-stores ( instack outstack -- stack )
-    #! Avoid storing a value into its former position.
-    dup length [ pick ?nth dupd eq? [ drop f ] when ] 2map nip ;
-
-: trim-shuffle ( shuffle -- shuffle )
-    dup shuffle-in-d over shuffle-out-d live-stores live-d set
-    dup shuffle-in-r over shuffle-out-r live-stores live-r set
-    dup shuffle-in-d filter-dropped
-    swap shuffle-in-r filter-dropped
-    live-d get live-r get <shuffle> ;

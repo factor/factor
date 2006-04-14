@@ -30,12 +30,12 @@ namespaces sequences words ;
 \ slot [
     dup slot@ [
         { { 0 "obj" } { value "slot" } } { "obj" } [
-            node get slot@ "obj" get %fast-slot ,
+            node %get slot@ "obj" %get %fast-slot ,
         ] with-template
     ] [
         { { 0 "obj" } { 1 "n" } } { "obj" } [
-            "obj" get %untag ,
-            "n" get "obj" get %slot ,
+            "obj" %get %untag ,
+            "n" %get "obj" %get %slot ,
         ] with-template
     ] if
 ] "intrinsic" set-word-prop
@@ -43,12 +43,13 @@ namespaces sequences words ;
 \ set-slot [
     dup slot@ [
         { { 0 "val" } { 1 "obj" } { value "slot" } } { } [
-            "val" get "obj" get node get slot@ %fast-set-slot ,
+            "val" %get "obj" %get node %get slot@
+            %fast-set-slot ,
         ] with-template
     ] [
         { { 0 "val" } { 1 "obj" } { 2 "slot" } } { } [
-            "obj" get %untag ,
-            "val" get "obj" get "slot" get %set-slot ,
+            "obj" %get %untag ,
+            "val" %get "obj" %get "slot" %get %set-slot ,
         ] with-template
     ] if
     end-basic-block
@@ -57,35 +58,35 @@ namespaces sequences words ;
 
 \ char-slot [
     { { 0 "n" } { 1 "str" } } { "str" } [
-        "n" get "str" get %char-slot ,
+        "n" %get "str" %get %char-slot ,
     ] with-template
 ] "intrinsic" set-word-prop
 
 \ set-char-slot [
     { { 0 "ch" } { 1 "n" } { 2 "str" } } { } [
-        "ch" get "str" get "n" get %set-char-slot ,
+        "ch" %get "str" %get "n" %get %set-char-slot ,
     ] with-template
 ] "intrinsic" set-word-prop
 
 \ type [
     { { any-reg "in" } } { "in" }
-    [ end-basic-block "in" get %type , ] with-template
+    [ end-basic-block "in" %get %type , ] with-template
 ] "intrinsic" set-word-prop
 
 \ tag [
-    { { any-reg "in" } } { "in" } [ "in" get %tag , ] with-template
+    { { any-reg "in" } } { "in" } [ "in" %get %tag , ] with-template
 ] "intrinsic" set-word-prop
 
 \ getenv [
     { { value "env" } } { "out" } [
         T{ vreg f 0 } "out" set
-        "env" get "out" get %getenv ,
+        "env" %get "out" %get %getenv ,
     ] with-template
 ] "intrinsic" set-word-prop
 
 \ setenv [
     { { any-reg "value" } { value "env" } } { } [
-        "value" get "env" get %setenv ,
+        "value" %get "env" %get %setenv ,
     ] with-template
 ] "intrinsic" set-word-prop
 
@@ -99,7 +100,7 @@ namespaces sequences words ;
 
 : (binary-op) ( node in -- )
     { "x" } [
-        end-basic-block >r "y" get "x" get dup r> execute ,
+        end-basic-block >r "y" %get "x" %get dup r> execute ,
     ] with-template ; inline
 
 : binary-op ( node op -- )
@@ -120,7 +121,7 @@ namespaces sequences words ;
 
 : binary-jump ( node label op -- )
     rot { { any-reg "x" } { any-reg "y" } } { } [
-        end-basic-block >r >r "y" get "x" get r> r> execute ,
+        end-basic-block >r >r "y" %get "x" %get r> r> execute ,
     ] with-template ; inline
 
 {
@@ -144,7 +145,7 @@ namespaces sequences words ;
     { { 0 "x" } { 1 "y" } } { "out" } [
         end-basic-block
         T{ vreg f 2 } "out" set
-        "y" get "x" get "out" get %fixnum-mod ,
+        "y" %get "x" %get "out" %get %fixnum-mod ,
     ] with-template
 ] "intrinsic" set-word-prop
 
@@ -154,14 +155,14 @@ namespaces sequences words ;
         end-basic-block
         T{ vreg f 0 } "quo" set
         T{ vreg f 2 } "rem" set
-        "y" get "x" get 2array
-        "rem" get "quo" get 2array %fixnum/mod ,
+        "y" %get "x" %get 2array
+        "rem" %get "quo" %get 2array %fixnum/mod ,
     ] with-template
 ] "intrinsic" set-word-prop
 
 \ fixnum-bitnot [
     { { 0 "x" } } { "x" } [
-        "x" get dup %fixnum-bitnot ,
+        "x" %get dup %fixnum-bitnot ,
     ] with-template
 ] "intrinsic" set-word-prop
 
@@ -176,10 +177,10 @@ namespaces sequences words ;
         dup cell-bits neg <= [
             drop
             T{ vreg f 2 } "out" set
-            "x" get "out" get %fixnum-sgn ,
+            "x" %get "out" %get %fixnum-sgn ,
         ] [
-            "x" get "out" set
-            neg "x" get "out" get %fixnum>> ,
+            "x" %get "out" set
+            neg "x" %get "out" %get %fixnum>> ,
         ] if
     ] with-template ;
 

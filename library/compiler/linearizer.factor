@@ -1,13 +1,9 @@
 ! Copyright (C) 2004, 2006 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-IN: compiler
 USING: arrays generic hashtables inference
 kernel math namespaces sequences words ;
+IN: compiler
 
-! On PowerPC and AMD64, we use a stack discipline whereby
-! stack frames are used to hold parameters. We need to compute
-! the stack frame size to compile the prologue on entry to a
-! word.
 GENERIC: stack-reserve*
 
 M: object stack-reserve* drop 0 ;
@@ -102,18 +98,37 @@ M: #call linearize* ( node -- next )
 M: #call-label linearize* ( node -- next )
     node-param renamed-label linearize-call ;
 
-: prepare-inputs ( values -- values templates )
+SYMBOL: live-d
+SYMBOL: live-r
+
+: value-dropped? ( value -- ? )
+    dup value?
+    over live-d get member? not
+    rot live-r get member? not and
+    or ;
+
+: shuffle-in-template ( values -- value template )
+    [ dup value-dropped? [ drop f ] when ] map
     dup [ any-reg swap 2array ] map ;
 
-: do-inputs ( shuffle -- )
-    dup shuffle-in-d prepare-inputs
-    rot shuffle-in-r prepare-inputs
-    template-inputs ;
+: shuffle-out-template ( instack outstack -- stack )
+    #! Avoid storing a value into its former position.
+    dup length [
+        pick ?nth dupd eq? [ <clean> ] when
+    ] 2map nip ;
+
+: linearize-shuffle ( shuffle -- )
+    dup shuffle-in-d over shuffle-out-d
+    shuffle-out-template live-d set
+    dup shuffle-in-r over shuffle-out-r
+    shuffle-out-template live-r set
+    dup shuffle-in-d shuffle-in-template
+    rot shuffle-in-r shuffle-in-template template-inputs
+    live-d get live-r get template-outputs ;
 
 M: #shuffle linearize* ( #shuffle -- )
     compute-free-vregs
-    node-shuffle trim-shuffle dup do-inputs
-    dup shuffle-out-d swap shuffle-out-r template-outputs
+    node-shuffle linearize-shuffle
     iterate-next ;
 
 : ?static-branch ( node -- n )
@@ -127,7 +142,7 @@ M: #if linearize* ( node -- next )
     ] [
         dup { { 0 "flag" } } { } [
             end-basic-block
-            <label> dup "flag" get %jump-t ,
+            <label> dup "flag" %get %jump-t ,
         ] with-template linearize-if
     ] if* ;
 
@@ -135,7 +150,7 @@ M: #if linearize* ( node -- next )
     #! Output the jump table insn and return a list of
     #! label/branch pairs.
     dup { { 0 "n" } } { }
-    [ end-basic-block "n" get %dispatch , ] with-template
+    [ end-basic-block "n" %get %dispatch , ] with-template
     node-children [ <label> dup %target-label ,  2array ] map ;
 
 : dispatch-body ( label/node -- )

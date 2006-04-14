@@ -17,3 +17,13 @@ unit-test
 
 ! Test literals in either side of a shuffle
 [ 4 1 ] [ 1 [ [ 3 fixnum+ ] keep ] compile-1 ] unit-test
+
+: foo ;
+
+[ 4 4 ]
+[ 1/2 [ tag [ foo ] keep ] compile-1 ]
+unit-test
+
+[ 1 2 2 ]
+[ 1/2 [ dup 0 slot swap 1 slot [ foo ] keep ] compile-1 ]
+unit-test
