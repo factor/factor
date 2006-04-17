@@ -116,8 +116,7 @@ SYMBOL: live-r
         pick ?nth dupd ( eq? ) 2drop f [ <clean> ] when
     ] 2map nip ;
 
-: linearize-shuffle ( node -- )
-    compute-free-vregs node-shuffle
+: linearize-shuffle ( shuffle -- )
     dup shuffle-in-d over shuffle-out-d
     shuffle-out-template live-d set
     dup shuffle-in-r over shuffle-out-r
@@ -127,11 +126,16 @@ SYMBOL: live-r
     live-d get live-r get template-outputs ;
 
 M: #shuffle linearize* ( #shuffle -- )
-    linearize-shuffle iterate-next ;
+    node-shuffle linearize-shuffle iterate-next ;
+
+: ensure-vregs ( n -- )
+    sufficient-vregs?
+    [ end-basic-block compute-free-vregs ] unless ;
 
 : linearize-push ( node -- )
     compute-free-vregs
-    >#push< dup length alloc-reg# [ <vreg> ] map
+    >#push< dup length dup ensure-vregs
+    alloc-reg# [ <vreg> ] map
     [ [ load-literal ] 2each ] keep
     phantom-d get phantom-append ;
 

@@ -8,6 +8,8 @@ math-internals namespaces test ;
 [ 5000 ] [ [ 5000 ] compile-1 ] unit-test
 [ "hi" ] [ [ "hi" ] compile-1 ] unit-test
 
+[ 1 2 3 4 ] [ [ 1 2 3 4 ] compile-1 ] unit-test
+
 [ 1 1 ] [ 1 [ dup ] compile-1 ] unit-test
 [ 0 ] [ 3 [ tag ] compile-1 ] unit-test
 [ 0 3 ] [ 3 [ [ tag ] keep ] compile-1 ] unit-test

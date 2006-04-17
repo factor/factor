@@ -118,8 +118,10 @@ SYMBOL: free-vregs
 : requested-vregs ( template -- n )
     [ any-reg eq? ] subset length ;
 
-: sufficient-vregs? ( template template -- ? )
-    [ requested-vregs ] 2apply + free-vregs get length <= ;
+: sufficient-vregs? ( n -- ? ) free-vregs get length <= ;
+
+: template-vreg# ( template template -- n )
+    [ requested-vregs ] 2apply + ;
 
 : alloc-regs ( template -- template )
     free-vregs get swap [
@@ -161,7 +163,7 @@ SYMBOL: free-vregs
     ] if ;
 
 : templates-match? ( template template -- ? )
-    2dup sufficient-vregs? [
+    2dup template-vreg# sufficient-vregs? [
         phantom-r get template-match?
         >r phantom-d get template-match? r> and
     ] [
@@ -175,13 +177,17 @@ SYMBOL: free-vregs
     swap phantom-vregs ;
 
 : template-input ( template phantom -- )
-    dup vregs>stack swap [ stack>vregs ] keep phantom-vregs ;
+    swap [ stack>vregs ] keep phantom-vregs ;
 
 : template-inputs ( template template -- )
     2dup templates-match? [
         phantom-r get optimized-input
         phantom-d get optimized-input
+        compute-free-vregs
     ] [
+        phantom-r get vregs>stack
+        phantom-d get vregs>stack
+        compute-free-vregs
         phantom-r get template-input
         phantom-d get template-input
     ] if ;
@@ -207,6 +213,5 @@ SYMBOL: free-vregs
     phantom-d get template-output ;
 
 : with-template ( in out quot -- )
-    compute-free-vregs swap >r
-    >r { } template-inputs r> call r> { } template-outputs ;
-    inline
+    swap >r >r { } template-inputs
+    r> call r> { } template-outputs ; inline

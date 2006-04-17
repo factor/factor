@@ -7,7 +7,7 @@ namespaces sequences words ;
 
 \ slot [
     drop
-    { { 0 "obj" } { 1 "n" } } { "obj" } [
+    { { any-reg "obj" } { any-reg "n" } } { "obj" } [
         "obj" %get %untag ,
         "n" %get "obj" %get %slot ,
     ] with-template
@@ -15,24 +15,25 @@ namespaces sequences words ;
 
 \ set-slot [
     drop
-    { { 0 "val" } { 1 "obj" } { 2 "slot" } } { } [
+    { { any-reg "val" } { any-reg "obj" } { any-reg "slot" } }
+    { } [
         "obj" %get %untag ,
         "val" %get "obj" %get "slot" %get %set-slot ,
+        end-basic-block
+        "obj" get %write-barrier ,
     ] with-template
-    end-basic-block
-    T{ vreg f 1 } %write-barrier ,
 ] "intrinsic" set-word-prop
 
 \ char-slot [
     drop
-    { { 0 "n" } { 1 "str" } } { "str" } [
+    { { any-reg "n" } { any-reg "str" } } { "str" } [
         "n" %get "str" %get %char-slot ,
     ] with-template
 ] "intrinsic" set-word-prop
 
 \ set-char-slot [
     drop
-    { { 0 "ch" } { 1 "n" } { 2 "str" } } { } [
+    { { any-reg "ch" } { any-reg "n" } { any-reg "str" } } { } [
         "ch" %get "str" %get "n" %get %set-char-slot ,
     ] with-template
 ] "intrinsic" set-word-prop
@@ -108,7 +109,7 @@ namespaces sequences words ;
 
 \ fixnum-bitnot [
     drop
-    { { 0 "x" } } { "x" } [
+    { { any-reg "x" } } { "x" } [
         "x" %get dup %fixnum-bitnot ,
     ] with-template
 ] "intrinsic" set-word-prop
