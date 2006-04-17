@@ -102,54 +102,52 @@ SYMBOL: live-d
 SYMBOL: live-r
 
 : value-dropped? ( value -- ? )
-    dup value?
-    over live-d get member? not
-    rot live-r get member? not and
-    or ;
+    dup live-d get member? not
+    swap live-r get member? not and ;
 
-: shuffle-in-template ( values -- value template )
-    [ dup value-dropped? [ drop f ] when ] map
-    dup [ any-reg swap 2array ] map ;
+: shuffle-in-template ( values -- template )
+    [
+        dup value-dropped? [ drop f ] when any-reg swap 2array
+    ] map ;
 
 : shuffle-out-template ( instack outstack -- stack )
     #! Avoid storing a value into its former position.
     dup length [
-        pick ?nth dupd eq? [ <clean> ] when
+        pick ?nth dupd ( eq? ) 2drop f [ <clean> ] when
     ] 2map nip ;
 
-: linearize-shuffle ( shuffle -- )
+: linearize-shuffle ( node -- )
+    compute-free-vregs node-shuffle
     dup shuffle-in-d over shuffle-out-d
     shuffle-out-template live-d set
     dup shuffle-in-r over shuffle-out-r
     shuffle-out-template live-r set
     dup shuffle-in-d shuffle-in-template
-    rot shuffle-in-r shuffle-in-template template-inputs
+    swap shuffle-in-r shuffle-in-template template-inputs
     live-d get live-r get template-outputs ;
 
 M: #shuffle linearize* ( #shuffle -- )
-    compute-free-vregs
-    node-shuffle linearize-shuffle
-    iterate-next ;
+    linearize-shuffle iterate-next ;
 
-: ?static-branch ( node -- n )
-    node-in-d first dup value?
-    [ value-literal 0 1 ? ] [ drop f ] if ;
+: linearize-push ( node -- )
+    compute-free-vregs
+    >#push< dup length alloc-reg# [ <vreg> ] map
+    [ [ load-literal ] 2each ] keep
+    phantom-d get phantom-append ;
+
+M: #push linearize* ( #push -- )
+    linearize-push iterate-next ;
 
 M: #if linearize* ( node -- next )
-    dup ?static-branch [
-        end-basic-block drop-phantom
-        swap node-children nth linearize-child iterate-next
-    ] [
-        dup { { 0 "flag" } } { } [
-            end-basic-block
-            <label> dup "flag" %get %jump-t ,
-        ] with-template linearize-if
-    ] if* ;
+    { { 0 "flag" } } { } [
+        end-basic-block
+        <label> dup "flag" %get %jump-t ,
+    ] with-template linearize-if ;
 
 : dispatch-head ( node -- label/node )
     #! Output the jump table insn and return a list of
     #! label/branch pairs.
-    dup { { 0 "n" } } { }
+    { { 0 "n" } } { }
     [ end-basic-block "n" %get %dispatch , ] with-template
     node-children [ <label> dup %target-label ,  2array ] map ;
 

@@ -10,6 +10,7 @@ sequences strings vectors words ;
 : namespace ( -- namespace ) namestack* peek ; inline
 : >n ( namespace -- n:namespace ) namestack* push ; inline
 : n> ( n:namespace -- namespace ) namestack* pop ; inline
+: ndrop ( n:namespace -- ) namestack* pop* ; inline
 : global ( -- g ) 4 getenv ; inline
 : get ( variable -- value ) namestack* hash-stack ; flushable
 : set ( value variable -- ) namespace set-hash ;
@@ -30,13 +31,13 @@ sequences strings vectors words ;
 
 : dec ( var -- ) -1 swap +@ ; inline
 
-: bind ( namespace quot -- ) swap >n call n> drop ; inline
+: bind ( namespace quot -- ) swap >n call ndrop ; inline
 
 : counter ( var -- n ) global [ dup inc get ] bind ;
 
 : make-hash ( quot -- hash ) H{ } clone >n call n> ; inline
 
-: with-scope ( quot -- ) make-hash drop ; inline
+: with-scope ( quot -- ) H{ } clone >n call ndrop ; inline
 
 ! Building sequences
 SYMBOL: building

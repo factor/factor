@@ -122,8 +122,8 @@ M: #call infer-classes* ( node -- )
         [ over node-out-d intersect-classes ] when*
     ] when drop ;
 
-M: #shuffle infer-classes* ( node -- )
-    node-out-d [ value? ] subset
+M: #push infer-classes* ( node -- )
+    node-out-d
     [ [ value-literal ] keep set-value-literal* ] each ;
 
 M: #if child-ties ( node -- seq )

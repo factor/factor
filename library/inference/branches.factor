@@ -31,8 +31,7 @@ namespaces parser prettyprint sequences strings vectors words ;
 
 : unbalanced-branches ( in out -- )
     { "Unbalanced branches:" } -rot [
-        swap number>string " " rot length number>string
-        append3
+        swap unparse " " rot length unparse append3
     ] 2map append "\n" join inference-error ;
 
 : unify-effect ( in out -- in out )

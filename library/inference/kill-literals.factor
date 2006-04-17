@@ -53,6 +53,10 @@ M: #shuffle literals* ( node -- seq )
     dup node-out-d swap node-out-r
     [ [ value? ] subset ] 2apply append ;
 
+! #push
+M: #push literals* ( node -- seq )
+    node-values ;
+
 ! #call
 ! M: #call flushable-values* ( node -- )
 !     dup node-param "flushable" word-prop
@@ -63,8 +67,9 @@ M: #return live-values* ( node -- seq )
     #! Values returned by local labels can be killed.
     dup node-param [ drop { } ] [ delegate live-values* ] if ;
 
-! nodes that don't use their input values directly
-UNION: #killable #shuffle #call-label #merge #values #entry ;
+! nodes that don't use their values directly
+UNION: #killable
+    #push #shuffle #call-label #merge #values #entry ;
 
 M: #killable live-values* ( node -- seq ) drop { } ;
 

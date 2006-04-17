@@ -53,10 +53,14 @@ TUPLE: #call-label ;
 C: #call-label make-node ;
 : #call-label ( label -- node ) param-node <#call-label> ;
 
+TUPLE: #push ;
+C: #push make-node ;
+: #push ( outputs -- node ) d-tail out-node <#push> ;
+: >#push< ( node -- seq ) node-out-d [ value-literal ] map ;
+
 TUPLE: #shuffle ;
 C: #shuffle make-node ;
 : #shuffle ( -- node ) empty-node <#shuffle> ;
-: #push ( outputs -- node ) d-tail out-node <#shuffle> ;
 
 TUPLE: #values ;
 C: #values make-node ;

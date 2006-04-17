@@ -53,6 +53,10 @@ M: #shuffle optimize-node*  ( node -- node/t )
         ] prune-if
     ] if ;
 
+! #push
+M: #push optimize-node*  ( node -- node/t )
+    [ node-out-d empty? ] prune-if ;
+
 ! #return
 M: #return optimize-node* ( node -- node/t )
     node-successor [ node-successor ] [ t ] if* ;

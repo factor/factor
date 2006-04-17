@@ -38,6 +38,8 @@ M: comment pprint* ( ann -- )
 M: #shuffle node>quot ( ? node -- )
     >r drop t r> dup effect-str "#shuffle: " swap append comment, ;
 
+M: #push node>quot ( ? node -- ) nip >#push< % ;
+
 DEFER: dataflow>quot
 
 : #call>quot ( ? node -- )

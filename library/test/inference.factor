@@ -225,6 +225,14 @@ DEFER: do-crap
 : do-crap dup [ do-crap ] [ more-crap ] if ;
 [ [ do-crap ] infer ] unit-test-fails
 
+! Error reporting is wrong
+G: xyz math-combination ;
+M: fixnum xyz 2array ;
+M: ratio xyz 
+    [ >fraction ] 2apply swapd >r 2array swap r> 2array swap ;
+
+[ t ] [ [ [ xyz ] infer ] catch inference-error? ] unit-test
+
 [ { 2 1 } ] [ [ swons ] infer ] unit-test
 [ { 1 2 } ] [ [ uncons ] infer ] unit-test
 [ { 1 1 } ] [ [ unit ] infer ] unit-test

@@ -1,8 +1,8 @@
 ! Copyright (C) 2006 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 IN: compiler
-USING: arrays generic inference kernel math
-namespaces sequences vectors words ;
+USING: arrays generic inference io kernel math
+namespaces prettyprint sequences vectors words ;
 
 ! A data stack location.
 TUPLE: ds-loc n ;
@@ -84,17 +84,12 @@ SYMBOL: phantom-r
 : load-literal ( obj dest -- )
     over immediate? [ %immediate ] [ %indirect ] if , ;
 
-G: vreg>stack ( value loc -- ) 1 standard-combination ;
-
-M: f vreg>stack ( value loc -- ) 2drop ;
-
-M: value vreg>stack ( value loc -- )
-    >r value-literal r> load-literal ;
-
-M: object vreg>stack ( value loc -- )
-    %replace , ;
-
-M: clean vreg>stack ( value loc -- ) 2drop ;
+: vreg>stack ( value loc -- )
+    {
+        { [ over not ] [ 2drop ] }
+        { [ over clean? ] [ 2drop ] }
+        { [ t ] [ %replace , ] }
+    } cond ;
 
 : vregs>stack ( phantom -- )
     dup dup phantom-locs* [ vreg>stack ] 2each
@@ -107,20 +102,8 @@ M: clean vreg>stack ( value loc -- ) 2drop ;
     phantom-d get finalize-phantom
     phantom-r get finalize-phantom ;
 
-G: stack>vreg ( value vreg loc -- operand )
-    2 standard-combination ;
-
-M: f stack>vreg ( value vreg loc -- operand ) 2drop ;
-
-M: object stack>vreg ( value vreg loc -- operand )
-    >r <vreg> dup r> %peek , nip ;
-
-M: value stack>vreg ( value vreg loc -- operand )
-    drop dup value eq? [
-        drop
-    ] [
-        >r value-literal r> <vreg> [ load-literal ] keep
-    ] if ;
+: stack>vreg ( vreg loc -- operand )
+    over [ >r <vreg> dup r> %peek , ] [ 2drop f ] if ;
 
 SYMBOL: any-reg
 
@@ -143,9 +126,8 @@ SYMBOL: free-vregs
         dup any-reg eq? [ drop pop ] [ nip ] if
     ] map-with ;
 
-: (stack>vregs) ( values template locs -- inputs )
-    3array flip
-    [ first3 over [ stack>vreg <clean> ] [ 3drop f ] if ] map ;
+: alloc-reg# ( n -- regs )
+    free-vregs [ cut ] change ;
 
 : ?clean ( obj -- obj )
     dup clean? [ delegate ] when ;
@@ -153,26 +135,21 @@ SYMBOL: free-vregs
 : %get ( obj -- value )
     get ?clean dup value? [ value-literal ] when ;
 
-: phantom-vregs ( values template -- )
-    [ second set ] 2each ;
+: phantom-vregs ( values template -- ) [ second set ] 2each ;
 
-: stack>vregs ( values phantom template -- values )
+: stack>vregs ( phantom template -- values )
     [
         [ first ] map alloc-regs
-        pick length rot phantom-locs
-        (stack>vregs)
+        dup length rot phantom-locs
+        [ stack>vreg ] 2map
     ] 2keep length neg swap adjust-phantom ;
-
-: compatible-vreg? ( value vreg -- ? )
-    swap dup value? [ 2drop f ] [ vreg-n = ] if ;
 
 : compatible-values? ( value template -- ? )
     >r ?clean r> {
         { [ dup not ] [ 2drop t ] }
         { [ over not ] [ 2drop f ] }
-        { [ dup any-reg eq? ] [ drop vreg? ] }
-        { [ dup integer? ] [ compatible-vreg? ] }
-        { [ dup value eq? ] [ drop value? ] }
+        { [ dup any-reg eq? ] [ 2drop t ] }
+        { [ dup integer? ] [ swap vreg-n = ] }
     } cond ;
 
 : template-match? ( template phantom -- ? )
@@ -197,13 +174,13 @@ SYMBOL: free-vregs
     >r dup empty? [ drop ] [ vregs>stack ] if r>
     swap phantom-vregs ;
 
-: template-input ( values template phantom -- )
+: template-input ( template phantom -- )
     dup vregs>stack swap [ stack>vregs ] keep phantom-vregs ;
 
-: template-inputs ( values template values template -- )
-    pick over templates-match? [
-        phantom-r get optimized-input drop
-        phantom-d get optimized-input drop
+: template-inputs ( template template -- )
+    2dup templates-match? [
+        phantom-r get optimized-input
+        phantom-d get optimized-input
     ] [
         phantom-r get template-input
         phantom-d get template-input
@@ -213,21 +190,23 @@ SYMBOL: free-vregs
     end-basic-block -1 phantom-d get adjust-phantom ;
 
 : prep-output ( value -- value )
-    {
-        { [ dup value? ] [ ] }
-        { [ dup clean? ] [ delegate dup value? [ get ] unless ] }
-        { [ t ] [ get ?clean ] }
-    } cond ;
+    dup clean? [ delegate ] [ get ?clean ] if ;
+
+: phantom-append ( seq stack -- )
+    over length over adjust-phantom swap nappend ;
 
 : template-output ( seq stack -- )
-    over length over adjust-phantom
-    swap [ prep-output ] map nappend ;
+    >r [ prep-output ] map r> phantom-append ;
+
+: trace-outputs ( stack stack -- )
+    "==== Template output:" print [ . ] 2apply ;
 
 : template-outputs ( stack stack -- )
+   !  2dup trace-outputs
     phantom-r get template-output
     phantom-d get template-output ;
 
-: with-template ( node in out quot -- )
-    compute-free-vregs
-    swap >r >r >r dup node-in-d r> { } { } template-inputs
-    node set r> call r> { } template-outputs ; inline
+: with-template ( in out quot -- )
+    compute-free-vregs swap >r
+    >r { } template-inputs r> call r> { } template-outputs ;
+    inline
