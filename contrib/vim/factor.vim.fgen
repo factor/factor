@@ -29,7 +29,11 @@ syn keyword factorTodo TODO FIXME XXX contained
 
 syn keyword factorBoolean	boolean f general-t t
 
-<% ! vocabs [ words "syn keyword " write [ pprint " " write ] each "\n" write ] each %>
+" use this to have keywords as all words from all vocabs (currently broken by | characters)
+<% ! vocabs [ words [ "syn keyword factorKeyword " write [ pprint " " write ] each "\n" write ] when* ] each %>
+
+" use this to only have keywords highlighted from the kernel vocab
+<% "kernel" words "syn keyword factorKeyword " write [ pprint " " write ] each "\n" write %>
 
 syn cluster factorNumber contains=factorInt,factorFloat,factorRatio,factorComplex
 syn cluster factorReal   contains=factorInt,factorFloat,factorRatio

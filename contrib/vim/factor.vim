@@ -47,6 +47,11 @@ syn keyword factorTodo TODO FIXME XXX contained
 
 syn keyword factorBoolean	boolean f general-t t
 
+" use this to have keywords as all words from all vocabs (currently broken by | characters)
+
+
+" use this to only have keywords highlighted from the kernel vocab
+syn keyword factorKeyword continuation-name set-datastack wrapper continuation-catch set-continuation-name cli-bool-param slip pick 2slip tuple 2nip set-boot default-cli-args with-datastack clone cpu tuck -rot swapd <continuation> >boolean wrapper? ifcc dupd dup 3dup callstack windows? os-env over = continue <wrapper> ? 2dup continuation cond win64? set-path run-user-init 3drop when hashcode cli-param default-shell millis set-callstack unless >r version die callcc0 callcc1 num-types or os depth 3keep cli-var-param continue-with if exit tuple? unix? cli-args (continue-with) general-t continuation? hashcode* parse-command-line macosx? r> rot win32? 2apply >continuation< type continuation-call clear no-cond call continuation-data 2drop cli-arg set-continuation-call drop set-continuation-data keep-datastack and when* swap ?if 2swap literalize datastack set-continuation-catch unless* not eq? with wrapped keep 2keep <=> nip if* 
 
 
 syn cluster factorNumber contains=factorInt,factorFloat,factorRatio,factorComplex
