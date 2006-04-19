@@ -4,16 +4,13 @@ IN: compiler
 USING: arrays generic inference io kernel math
 namespaces prettyprint sequences vectors words ;
 
+SYMBOL: free-vregs
+
 ! A data stack location.
 TUPLE: ds-loc n ;
 
 ! A call stack location.
 TUPLE: cs-loc n ;
-
-! A marker for values which are already stored in this location
-TUPLE: clean ;
-
-C: clean [ set-delegate ] keep ;
 
 TUPLE: phantom-stack height ;
 
@@ -84,35 +81,46 @@ SYMBOL: phantom-r
 : load-literal ( obj dest -- )
     over immediate? [ %immediate ] [ %indirect ] if , ;
 
-: vreg>stack ( value loc -- )
-    {
-        { [ over not ] [ 2drop ] }
-        { [ over clean? ] [ 2drop ] }
-        { [ t ] [ %replace , ] }
-    } cond ;
+: finalize-heights ( -- )
+    phantom-d get finalize-height
+    phantom-r get finalize-height ;
 
-: vregs>stack ( phantom -- )
-    dup dup phantom-locs* [ vreg>stack ] 2each
-    0 swap set-length ;
+: alloc-reg ( -- n ) free-vregs get pop ;
 
-: finalize-phantom ( phantom -- )
-    dup finalize-height vregs>stack ;
+: lazy-load ( value loc -- value )
+    over ds-loc? pick cs-loc? or [
+        dupd = [
+            drop f
+        ] [
+            >r alloc-reg <vreg> dup r> %peek ,
+        ] if
+    ] [
+        drop
+    ] if ;
+
+: vregs>stack ( values locs -- )
+    [ over [ %replace , ] [ 2drop ] if ] 2each ;
+
+: finalize-contents ( -- )
+    phantom-d get phantom-r get 2dup
+    [ dup phantom-locs* [ [ lazy-load ] 2map ] keep ] 2apply
+    vregs>stack vregs>stack
+    [ 0 swap set-length ] 2apply ;
 
 : end-basic-block ( -- )
-    phantom-d get finalize-phantom
-    phantom-r get finalize-phantom ;
+    finalize-contents finalize-heights ;
 
 : stack>vreg ( vreg loc -- operand )
-    over [ >r <vreg> dup r> %peek , ] [ 2drop f ] if ;
+    >r <vreg> dup r> %peek , ;
 
 SYMBOL: any-reg
 
-SYMBOL: free-vregs
+: used-vregs ( -- seq )
+    phantom-d get phantom-r get append
+    [ vreg? ] subset [ vreg-n ] map ;
 
 : compute-free-vregs ( -- )
-    phantom-d get phantom-r get append
-    [ vreg? ] subset [ vreg-n ] map
-    vregs length reverse diff
+    used-vregs vregs length reverse diff
     >vector free-vregs set ;
 
 : requested-vregs ( template -- n )
@@ -124,20 +132,13 @@ SYMBOL: free-vregs
     [ requested-vregs ] 2apply + ;
 
 : alloc-regs ( template -- template )
-    free-vregs get swap [
-        dup any-reg eq? [ drop pop ] [ nip ] if
-    ] map-with ;
+    [ dup any-reg eq? [ drop alloc-reg ] when ] map ;
 
 : alloc-reg# ( n -- regs )
     free-vregs [ cut ] change ;
 
-: ?clean ( obj -- obj )
-    dup clean? [ delegate ] when ;
-
-: %get ( obj -- value )
-    get ?clean dup value? [ value-literal ] when ;
-
-: phantom-vregs ( values template -- ) [ second set ] 2each ;
+: phantom-vregs ( values template -- )
+    [ >r f lazy-load r> second set ] 2each ;
 
 : stack>vregs ( phantom template -- values )
     [
@@ -147,7 +148,9 @@ SYMBOL: free-vregs
     ] 2keep length neg swap adjust-phantom ;
 
 : compatible-values? ( value template -- ? )
-    >r ?clean r> {
+    {
+        { [ over ds-loc? ] [ 2drop t ] }
+        { [ over cs-loc? ] [ 2drop t ] }
         { [ dup not ] [ 2drop t ] }
         { [ over not ] [ 2drop f ] }
         { [ dup any-reg eq? ] [ 2drop t ] }
@@ -155,62 +158,64 @@ SYMBOL: free-vregs
     } cond ;
 
 : template-match? ( template phantom -- ? )
-    2dup [ length ] 2apply <= [
-        >r dup length r> tail-slice*
-        t [ swap first compatible-values? and ] 2reduce
-    ] [
-        2drop f
-    ] if ;
+    [ reverse-slice ] 2apply
+    t [ swap first compatible-values? and ] 2reduce ;
 
 : templates-match? ( template template -- ? )
-    2dup template-vreg# sufficient-vregs? [
-        phantom-r get template-match?
-        >r phantom-d get template-match? r> and
+    phantom-r get template-match?
+    >r phantom-d get template-match? r> and ;
+
+: split-template ( template phantom -- slow fast )
+    over length over length <= [
+        drop { } swap
     ] [
-        2drop f
+        length swap cut*
     ] if ;
 
-: optimized-input ( template phantom -- )
+: split-templates ( template template -- slow slow fast fast )
+    >r phantom-d get split-template r>
+    phantom-r get split-template swapd ;
+
+: match-templates ( template template -- slow slow fast fast )
+    2dup templates-match? [ split-templates ] [ { } { } ] if ;
+
+: (fast-input) ( template phantom -- )
     over length neg over adjust-phantom
-    over length over cut-phantom
-    >r dup empty? [ drop ] [ vregs>stack ] if r>
+    over length swap cut-phantom
     swap phantom-vregs ;
 
-: template-input ( template phantom -- )
+: fast-input ( template template -- )
+    phantom-r get (fast-input)
+    phantom-d get (fast-input) ;
+
+: (slow-input) ( template phantom -- )
     swap [ stack>vregs ] keep phantom-vregs ;
 
+: slow-input ( template template -- )
+    phantom-r get (slow-input)
+    phantom-d get (slow-input) ;
+
+: adjust-free-vregs ( -- )
+    used-vregs free-vregs [ diff ] change ;
+
 : template-inputs ( template template -- )
-    2dup templates-match? [
-        phantom-r get optimized-input
-        phantom-d get optimized-input
-        compute-free-vregs
-    ] [
-        phantom-r get vregs>stack
-        phantom-d get vregs>stack
-        compute-free-vregs
-        phantom-r get template-input
-        phantom-d get template-input
-    ] if ;
+    compute-free-vregs
+    match-templates fast-input
+    adjust-free-vregs
+    finalize-contents
+    slow-input ;
 
 : drop-phantom ( -- )
     end-basic-block -1 phantom-d get adjust-phantom ;
 
-: prep-output ( value -- value )
-    dup clean? [ delegate ] [ get ?clean ] if ;
-
 : phantom-append ( seq stack -- )
     over length over adjust-phantom swap nappend ;
 
-: template-output ( seq stack -- )
-    >r [ prep-output ] map r> phantom-append ;
-
-: trace-outputs ( stack stack -- )
-    "==== Template output:" print [ . ] 2apply ;
+: (template-outputs) ( seq stack -- )
+    phantom-r get phantom-append phantom-d get phantom-append ;
 
 : template-outputs ( stack stack -- )
-   !  2dup trace-outputs
-    phantom-r get template-output
-    phantom-d get template-output ;
+    [ [ get ] map ] 2apply (template-outputs) ;
 
 : with-template ( in out quot -- )
     swap >r >r { } template-inputs

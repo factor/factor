@@ -88,45 +88,15 @@ M: #label linearize* ( node -- next )
 
 M: #call linearize* ( node -- next )
     dup if-intrinsic [
-        >r <label> 2dup r> call
+        >r <label> dup r> call
         >r node-successor r> linearize-if node-successor
     ] [
         dup intrinsic
-        [ call iterate-next ] [ node-param linearize-call ] if*
+        [ call iterate-next ] [ node-param linearize-call ] ?if
     ] if* ;
 
 M: #call-label linearize* ( node -- next )
     node-param renamed-label linearize-call ;
-
-SYMBOL: live-d
-SYMBOL: live-r
-
-: value-dropped? ( value -- ? )
-    dup live-d get member? not
-    swap live-r get member? not and ;
-
-: shuffle-in-template ( values -- template )
-    [
-        dup value-dropped? [ drop f ] when any-reg swap 2array
-    ] map ;
-
-: shuffle-out-template ( instack outstack -- stack )
-    #! Avoid storing a value into its former position.
-    dup length [
-        pick ?nth dupd ( eq? ) 2drop f [ <clean> ] when
-    ] 2map nip ;
-
-: linearize-shuffle ( shuffle -- )
-    dup shuffle-in-d over shuffle-out-d
-    shuffle-out-template live-d set
-    dup shuffle-in-r over shuffle-out-r
-    shuffle-out-template live-r set
-    dup shuffle-in-d shuffle-in-template
-    swap shuffle-in-r shuffle-in-template template-inputs
-    live-d get live-r get template-outputs ;
-
-M: #shuffle linearize* ( #shuffle -- )
-    node-shuffle linearize-shuffle iterate-next ;
 
 : ensure-vregs ( n -- )
     sufficient-vregs?
@@ -145,14 +115,14 @@ M: #push linearize* ( #push -- )
 M: #if linearize* ( node -- next )
     { { 0 "flag" } } { } [
         end-basic-block
-        <label> dup "flag" %get %jump-t ,
+        <label> dup "flag" get %jump-t ,
     ] with-template linearize-if ;
 
 : dispatch-head ( node -- label/node )
     #! Output the jump table insn and return a list of
     #! label/branch pairs.
     { { 0 "n" } } { }
-    [ end-basic-block "n" %get %dispatch , ] with-template
+    [ end-basic-block "n" get %dispatch , ] with-template
     node-children [ <label> dup %target-label ,  2array ] map ;
 
 : dispatch-body ( label/node -- )

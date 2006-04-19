@@ -129,6 +129,7 @@ vectors words ;
         "/library/compiler/vops.factor"
         "/library/compiler/templates.factor"
         "/library/compiler/linearizer.factor"
+        "/library/compiler/stack.factor"
         "/library/compiler/xt.factor"
         "/library/compiler/intrinsics.factor"
         "/library/compiler/generator.factor"
