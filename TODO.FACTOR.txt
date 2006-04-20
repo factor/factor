@@ -1,5 +1,7 @@
 should fix in 0.82:
 
+- constant branch folding
+- getenv, setenv, fast-slot stuff
 - 3 >n fep
 - amd64 %box-struct
 - get factor running on mac intel
@@ -27,6 +29,7 @@ should fix in 0.82:
 
 + ui/help:
 
+- polish OS X menu bar code
 - help search
 - reimplement clicking input
 - reimplement tab completion
@@ -74,7 +77,6 @@ should fix in 0.82:
 - the invalid recursion form case needs to be fixed, for inlines too
 - code gc
 - compiled gc check slows things down
-- fix branch folding
 
 + misc:
 

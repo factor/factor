@@ -14,6 +14,10 @@ math-internals namespaces test ;
 [ 0 ] [ 3 [ tag ] compile-1 ] unit-test
 [ 0 3 ] [ 3 [ [ tag ] keep ] compile-1 ] unit-test
 
+[ 2 3 ] [ 3 [ 2 swap ] compile-1 ] unit-test
+
+[ 2 3 4 ] [ 3 [ 2 swap 4 ] compile-1 ] unit-test
+
 [ { 1 2 3 } { 1 4 3 } 8 8 ]
 [ { 1 2 3 } { 1 4 3 } [ over type over type ] compile-1 ]
 unit-test

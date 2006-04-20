@@ -8,8 +8,8 @@ namespaces prettyprint sequences vectors words ;
     2dup length <= [
         cut-phantom
     ] [
-        [ phantom-locs ] keep [ length swap tail-slice ] keep
-        append
+        [ phantom-locs ] keep [ length swap head-slice* ] keep
+        [ append 0 ] keep set-length
     ] if ;
 
 : phantom-shuffle-inputs ( shuffle -- locs locs )
@@ -26,9 +26,9 @@ namespaces prettyprint sequences vectors words ;
     free-vregs get length <= ;
 
 : phantom-shuffle ( shuffle -- )
-    ! compute-free-vregs sufficient-shuffle-vregs? [
+    compute-free-vregs sufficient-shuffle-vregs? [
         end-basic-block compute-free-vregs
-    ! ] unless
+    ] unless
     [ phantom-shuffle-inputs ] keep
     [ shuffle* ] keep adjust-shuffle
     (template-outputs) ;

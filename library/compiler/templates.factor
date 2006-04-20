@@ -90,7 +90,7 @@ SYMBOL: phantom-r
 : lazy-load ( value loc -- value )
     over ds-loc? pick cs-loc? or [
         dupd = [
-            drop f
+            >r alloc-reg <vreg> dup r> %peek , ! drop f
         ] [
             >r alloc-reg <vreg> dup r> %peek ,
         ] if
@@ -166,11 +166,8 @@ SYMBOL: any-reg
     >r phantom-d get template-match? r> and ;
 
 : split-template ( template phantom -- slow fast )
-    over length over length <= [
-        drop { } swap
-    ] [
-        length swap cut*
-    ] if ;
+    over length over length <=
+    [ drop { } swap ] [ length swap cut* ] if ;
 
 : split-templates ( template template -- slow slow fast fast )
     >r phantom-d get split-template r>
