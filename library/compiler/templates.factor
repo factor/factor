@@ -90,7 +90,7 @@ SYMBOL: phantom-r
 : lazy-load ( value loc -- value )
     over ds-loc? pick cs-loc? or [
         dupd = [
-            >r alloc-reg <vreg> dup r> %peek , ! drop f
+            drop f
         ] [
             >r alloc-reg <vreg> dup r> %peek ,
         ] if

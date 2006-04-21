@@ -73,7 +73,7 @@ M: %type generate-node ( vop -- )
     0 scratch object-tag CMP
     "f" get JE
     ! The pointer is not equal to 3. Load the object header.
-    0 output-operand ECX object-tag neg [+] MOV
+    0 output-operand 0 scratch object-tag neg [+] MOV
     ! Mask off header tag, making a fixnum.
     0 output-operand object-tag XOR
     "end" get JMP
