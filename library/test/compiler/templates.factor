@@ -20,6 +20,7 @@ math-internals namespaces test ;
 
 [ { 1 2 3 } { 1 4 3 } 3 3 ]
 [ { 1 2 3 } { 1 4 3 } [ over tag over tag ] compile-1 ]
+unit-test
 
 [ { 1 2 3 } { 1 4 3 } 8 8 ]
 [ { 1 2 3 } { 1 4 3 } [ over type over type ] compile-1 ]

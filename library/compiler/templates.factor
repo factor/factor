@@ -1,7 +1,7 @@
 ! Copyright (C) 2006 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 IN: compiler
-USING: arrays generic inference io kernel math
+USING: arrays generic hashtables inference io kernel math
 namespaces prettyprint sequences vectors words ;
 
 SYMBOL: free-vregs
@@ -87,31 +87,58 @@ SYMBOL: phantom-r
 
 : alloc-reg ( -- n ) free-vregs get pop ;
 
-: lazy-load ( value loc -- value )
-    over ds-loc? pick cs-loc? or [
-        dupd = [
-            drop f
-        ] [
-            >r alloc-reg <vreg> dup r> %peek ,
-        ] if
+: loc? ( obj -- ? ) dup ds-loc? swap cs-loc? or ;
+
+: stack>vreg ( vreg# loc -- operand )
+    >r <vreg> dup r> %peek , ;
+
+: stack>new-vreg ( loc -- vreg )
+    alloc-reg swap stack>vreg ;
+
+: vreg>stack ( value loc -- )
+    over loc? [
+        2drop
     ] [
-        drop
+        over [ %replace , ] [ 2drop ] if
     ] if ;
 
-: vregs>stack ( values locs -- )
-    [ over [ %replace , ] [ 2drop ] if ] 2each ;
+: vregs>stack ( phantom -- )
+    [
+        dup phantom-locs* [ vreg>stack ] 2each 0
+    ] keep set-length ;
+
+: (live-locs) ( seq -- seq )
+    dup phantom-locs* [ 2array ] 2map
+    [ first2 over loc? >r = not r> and ] subset
+    [ first ] map ;
+
+: live-locs ( phantom phantom -- hash )
+    [ (live-locs) ] 2apply append prune
+    [ dup stack>new-vreg ] map>hash ;
+
+: lazy-store ( value loc -- )
+    over loc? [
+        2dup = [
+            2drop
+        ] [
+            >r \ live-locs get hash r> vreg>stack 
+        ] if
+    ] [
+        2drop
+    ] if ;
+
+: flush-locs ( phantom phantom -- )
+    [
+        2dup live-locs \ live-locs set
+        [ dup phantom-locs* [ lazy-store ] 2each ] 2apply
+    ] with-scope ;
 
 : finalize-contents ( -- )
-    phantom-d get phantom-r get 2dup
-    [ dup phantom-locs* [ [ lazy-load ] 2map ] keep ] 2apply
-    vregs>stack vregs>stack
-    [ 0 swap set-length ] 2apply ;
+    phantom-d get phantom-r get
+    2dup flush-locs vregs>stack vregs>stack ;
 
 : end-basic-block ( -- )
     finalize-contents finalize-heights ;
-
-: stack>vreg ( vreg loc -- operand )
-    >r <vreg> dup r> %peek , ;
 
 SYMBOL: any-reg
 
@@ -136,6 +163,10 @@ SYMBOL: any-reg
 
 : alloc-reg# ( n -- regs )
     free-vregs [ cut ] change ;
+
+: lazy-load ( value loc -- value )
+    over loc?
+    [ dupd = [ drop f ] [ stack>new-vreg ] if ] [ drop ] if ;
 
 : phantom-vregs ( values template -- )
     [ >r f lazy-load r> second set ] 2each ;
