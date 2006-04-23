@@ -5,5 +5,8 @@ USE: test
 USE: words
 USE: kernel
 USE: sequences
+USE: io
 
-[ ] [ vocabs [ words [ see ] each ] each ] unit-test
+[ ] [
+    [ vocabs [ words [ see ] each ] each ] string-out drop
+] unit-test

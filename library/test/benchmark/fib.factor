@@ -54,4 +54,4 @@ SYMBOL: n
         ] if
     ] with-scope ; compiled
 
-[ 9227465 ] [ 34 namespace-fib ] unit-test
+[ 1346269 ] [ 30 namespace-fib ] unit-test

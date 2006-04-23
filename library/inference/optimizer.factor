@@ -24,38 +24,14 @@ GENERIC: optimize-node* ( node -- node/t )
         optimizer-changed get
     ] with-node-iterator [ optimize ] when ;
 
-: prune-if ( node quot -- successor/t )
-    over >r call [ r> node-successor ] [ r> drop t ] if ;
-    inline
-
 ! Generic nodes
 M: f optimize-node* drop t ;
 
 M: node optimize-node* ( node -- t ) drop t ;
 
-! #shuffle
-: can-compose? ( shuffle -- ? )
-    dup shuffle-in-d length swap shuffle-in-r length +
-    vregs length <= ;
-
-: compose-shuffle-nodes ( #shuffle #shuffle -- #shuffle/t )
-    [ [ node-shuffle ] 2apply compose-shuffle ] keep
-    over can-compose?
-    [ [ set-node-shuffle ] keep ] [ 2drop t ] if ;
-
-M: #shuffle optimize-node*  ( node -- node/t )
-    dup node-successor dup #shuffle? [
-        compose-shuffle-nodes
-    ] [
-        drop [
-            dup node-in-d over node-out-d sequence=
-            >r dup node-in-r swap node-out-r sequence= r> and
-        ] prune-if
-    ] if ;
-
 ! #push
 M: #push optimize-node*  ( node -- node/t )
-    [ node-out-d empty? ] prune-if ;
+    dup node-out-d empty? [ node-successor ] [ drop t ] if ;
 
 ! #return
 M: #return optimize-node* ( node -- node/t )
