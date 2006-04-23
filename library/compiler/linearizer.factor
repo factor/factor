@@ -98,20 +98,6 @@ M: #call linearize* ( node -- next )
 M: #call-label linearize* ( node -- next )
     node-param renamed-label linearize-call ;
 
-: ensure-vregs ( n -- )
-    sufficient-vregs?
-    [ end-basic-block compute-free-vregs ] unless ;
-
-: linearize-push ( node -- )
-    compute-free-vregs
-    >#push< dup length dup ensure-vregs
-    alloc-reg# [ <vreg> ] map
-    [ [ load-literal ] 2each ] keep
-    phantom-d get phantom-append ;
-
-M: #push linearize* ( #push -- )
-    linearize-push iterate-next ;
-
 M: #if linearize* ( node -- next )
     { { 0 "flag" } } { } [
         end-basic-block

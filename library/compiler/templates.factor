@@ -127,6 +127,8 @@ SYMBOL: phantom-r
         2drop
     ] if ;
 
+: phantoms ( -- phantom phantom ) phantom-d get phantom-r get ;
+
 : flush-locs ( phantom phantom -- )
     [
         2dup live-locs \ live-locs set
@@ -134,8 +136,7 @@ SYMBOL: phantom-r
     ] with-scope ;
 
 : finalize-contents ( -- )
-    phantom-d get phantom-r get
-    2dup flush-locs vregs>stack vregs>stack ;
+    phantoms 2dup flush-locs [ vregs>stack ] 2apply ;
 
 : end-basic-block ( -- )
     finalize-contents finalize-heights ;
@@ -143,8 +144,7 @@ SYMBOL: phantom-r
 SYMBOL: any-reg
 
 : used-vregs ( -- seq )
-    phantom-d get phantom-r get append
-    [ vreg? ] subset [ vreg-n ] map ;
+    phantoms append [ vreg? ] subset [ vreg-n ] map ;
 
 : compute-free-vregs ( -- )
     used-vregs vregs length reverse diff
@@ -152,8 +152,6 @@ SYMBOL: any-reg
 
 : requested-vregs ( template -- n )
     [ any-reg eq? ] subset length ;
-
-: sufficient-vregs? ( n -- ? ) free-vregs get length <= ;
 
 : template-vreg# ( template template -- n )
     [ requested-vregs ] 2apply + ;
@@ -163,6 +161,18 @@ SYMBOL: any-reg
 
 : alloc-reg# ( n -- regs )
     free-vregs [ cut ] change ;
+
+: additional-vregs# ( seq seq -- n )
+    2array phantoms 2array [ [ length ] map ] 2apply v-
+    0 [ 0 max + ] reduce ;
+
+: free-vregs* ( -- n )
+    free-vregs get length
+    phantoms [ [ loc? ] subset length ] 2apply + - ;
+
+: ensure-vregs ( n -- )
+    compute-free-vregs free-vregs* <=
+    [ finalize-contents compute-free-vregs ] unless ;
 
 : lazy-load ( value loc -- value )
     over loc?
@@ -227,14 +237,11 @@ SYMBOL: any-reg
     used-vregs free-vregs [ diff ] change ;
 
 : template-inputs ( template template -- )
-    compute-free-vregs
+    2dup additional-vregs# ensure-vregs
     match-templates fast-input
     adjust-free-vregs
     finalize-contents
     slow-input ;
-
-: drop-phantom ( -- )
-    end-basic-block -1 phantom-d get adjust-phantom ;
 
 : phantom-append ( seq stack -- )
     over length over adjust-phantom swap nappend ;

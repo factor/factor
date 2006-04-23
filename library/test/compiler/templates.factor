@@ -16,6 +16,8 @@ math-internals namespaces test ;
 
 [ 2 3 ] [ 3 [ 2 swap ] compile-1 ] unit-test
 
+[ 2 1 3 4 ] [ 1 2 [ swap 3 4 ] compile-1 ] unit-test
+
 [ 2 3 4 ] [ 3 [ 2 swap 4 ] compile-1 ] unit-test
 
 [ { 1 2 3 } { 1 4 3 } 3 3 ]

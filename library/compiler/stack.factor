@@ -20,18 +20,24 @@ namespaces prettyprint sequences vectors words ;
     dup shuffle-in-d length neg phantom-d get adjust-phantom
     shuffle-in-r length neg phantom-r get adjust-phantom ;
 
-: sufficient-shuffle-vregs? ( shuffle -- ? )
-    dup shuffle-in-d length phantom-d get length - 0 max
-    over shuffle-in-r length phantom-r get length - 0 max +
-    free-vregs get length <= ;
+: shuffle-vregs# ( shuffle -- n )
+    dup shuffle-in-d swap shuffle-in-r additional-vregs# ;
 
 : phantom-shuffle ( shuffle -- )
-    compute-free-vregs sufficient-shuffle-vregs? [
-        end-basic-block compute-free-vregs
-    ] unless
+    dup shuffle-vregs# ensure-vregs
     [ phantom-shuffle-inputs ] keep
     [ shuffle* ] keep adjust-shuffle
     (template-outputs) ;
 
 M: #shuffle linearize* ( #shuffle -- )
     node-shuffle phantom-shuffle iterate-next ;
+
+: linearize-push ( node -- )
+    compute-free-vregs
+    >#push< dup length dup ensure-vregs
+    alloc-reg# [ <vreg> ] map
+    [ [ load-literal ] 2each ] keep
+    phantom-d get phantom-append ;
+
+M: #push linearize* ( #push -- )
+    linearize-push iterate-next ;
