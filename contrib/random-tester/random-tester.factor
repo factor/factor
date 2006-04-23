@@ -241,7 +241,7 @@ SYMBOL: first-arg
     dup .
     [ last-quot set ] keep
     [ call ] keep
-    [ last car update-xt ] keep call
+    [ peek update-xt ] keep call
     2dup swap unparse write " " write unparse print
     = [ "update-xt problem" throw ] unless ;
 
