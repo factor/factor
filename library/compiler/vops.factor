@@ -106,9 +106,6 @@ TUPLE: %label ;
 C: %label make-vop ;
 : %label label-vop <%label> ;
 
-! Return vops take a label that is ignored, to have the
-! same stack effect as jumps. This is needed for the
-! simplifier.
 TUPLE: %return ;
 C: %return make-vop ;
 : %return empty-vop <%return> ;

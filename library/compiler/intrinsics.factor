@@ -6,15 +6,20 @@ inference kernel kernel-internals lists math math-internals
 namespaces sequences words ;
 
 \ slot [
-    { { any-reg "obj" } { any-reg "n" } } { "obj" } [
+    H{
+        { +input-d { { f "obj" } { f "n" } } }
+        { +output-d { "obj" } }
+    } [
         "obj" get %untag ,
         "n" get "obj" get %slot ,
     ] with-template
 ] "intrinsic" set-word-prop
 
 \ set-slot [
-    { { any-reg "val" } { any-reg "obj" } { any-reg "slot" } }
-    { } [
+    H{
+        { +input-d { { f "val" } { f "obj" } { f "slot" } } }
+        { +clobber { "obj" } }
+    } [
         "obj" get %untag ,
         "val" get "obj" get "slot" get %set-slot ,
         finalize-contents
@@ -23,29 +28,41 @@ namespaces sequences words ;
 ] "intrinsic" set-word-prop
 
 \ char-slot [
-    { { any-reg "n" } { any-reg "str" } } { "str" } [
+    H{
+        { +input-d { { f "n" } { f "str" } } }
+        { +output-d { "str" } }
+    } [
         "n" get "str" get %char-slot ,
     ] with-template
 ] "intrinsic" set-word-prop
 
 \ set-char-slot [
-    { { any-reg "ch" } { any-reg "n" } { any-reg "str" } } { } [
+    H{
+        { +input-d { { f "ch" } { f "n" } { f "str" } } }
+    } [
         "ch" get "str" get "n" get %set-char-slot ,
     ] with-template
 ] "intrinsic" set-word-prop
 
 \ type [
-    { { any-reg "in" } } { "in" }
-    [ finalize-contents "in" get %type , ] with-template
+    H{
+        { +input-d { { f "in" } } }
+        { +output-d { "in" } }
+    } [ finalize-contents "in" get %type , ] with-template
 ] "intrinsic" set-word-prop
 
 \ tag [
-    { { any-reg "in" } } { "in" }
-    [ "in" get %tag , ] with-template
+    H{
+        { +input-d { { f "in" } } }
+        { +output-d { "in" } }
+    } [ "in" get %tag , ] with-template
 ] "intrinsic" set-word-prop
 
 : binary-op ( op -- )
-    { { 0 "x" } { 1 "y" } } { "x" } [
+    H{
+        { +input-d { { 0 "x" } { 1 "y" } } }
+        { +output-d { "x" } }
+    } [
         finalize-contents >r "y" get "x" get dup r> execute ,
     ] with-template ; inline
 
@@ -63,7 +80,9 @@ namespaces sequences words ;
 ] each
 
 : binary-jump ( label op -- )
-    { { any-reg "x" } { any-reg "y" } } { } [
+    H{
+        { +input-d { { f "x" } { f "y" } } }
+    } [
         end-basic-block >r >r "y" get "x" get r> r> execute ,
     ] with-template ; inline
 
@@ -82,7 +101,10 @@ namespaces sequences words ;
     ! This is not clever. Because of x86, %fixnum-mod is
     ! hard-coded to put its output in vreg 2, which happends to
     ! be EDX there.
-    { { 0 "x" } { 1 "y" } } { "out" } [
+    H{
+        { +input-d { { 0 "x" } { 1 "y" } } }
+        { +output-d { "out" } }
+    } [
         finalize-contents
         T{ vreg f 2 } "out" set
         "y" get "x" get "out" get %fixnum-mod ,
@@ -91,7 +113,10 @@ namespaces sequences words ;
 
 \ fixnum/mod [
     ! See the remark on fixnum-mod for vreg usage
-    { { 0 "x" } { 1 "y" } } { "quo" "rem" } [
+    H{
+        { +input-d { { 0 "x" } { 1 "y" } } }
+        { +output-d { "quo" "rem" } }
+    } [
         finalize-contents
         T{ vreg f 0 } "quo" set
         T{ vreg f 2 } "rem" set
@@ -101,7 +126,8 @@ namespaces sequences words ;
 ] "intrinsic" set-word-prop
 
 \ fixnum-bitnot [
-    { { any-reg "x" } } { "x" } [
-        "x" get dup %fixnum-bitnot ,
-    ] with-template
+    H{
+        { +input-d { { f "x" } } }
+        { +output-d { "x" } }
+    } [ "x" get dup %fixnum-bitnot , ] with-template
 ] "intrinsic" set-word-prop

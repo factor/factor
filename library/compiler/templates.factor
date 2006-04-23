@@ -141,8 +141,6 @@ SYMBOL: phantom-r
 : end-basic-block ( -- )
     finalize-contents finalize-heights ;
 
-SYMBOL: any-reg
-
 : used-vregs ( -- seq )
     phantoms append [ vreg? ] subset [ vreg-n ] map ;
 
@@ -151,13 +149,13 @@ SYMBOL: any-reg
     >vector free-vregs set ;
 
 : requested-vregs ( template -- n )
-    [ any-reg eq? ] subset length ;
+    0 [ [ 1+ ] unless ] reduce ;
 
 : template-vreg# ( template template -- n )
     [ requested-vregs ] 2apply + ;
 
 : alloc-regs ( template -- template )
-    [ dup any-reg eq? [ drop alloc-reg ] when ] map ;
+    [ [ alloc-reg ] unless* ] map ;
 
 : alloc-reg# ( n -- regs )
     free-vregs [ cut ] change ;
@@ -190,11 +188,9 @@ SYMBOL: any-reg
 
 : compatible-values? ( value template -- ? )
     {
-        { [ over ds-loc? ] [ 2drop t ] }
-        { [ over cs-loc? ] [ 2drop t ] }
+        { [ over loc? ] [ 2drop t ] }
         { [ dup not ] [ 2drop t ] }
         { [ over not ] [ 2drop f ] }
-        { [ dup any-reg eq? ] [ 2drop t ] }
         { [ dup integer? ] [ swap vreg-n = ] }
     } cond ;
 
@@ -223,35 +219,62 @@ SYMBOL: any-reg
     swap phantom-vregs ;
 
 : fast-input ( template template -- )
-    phantom-r get (fast-input)
-    phantom-d get (fast-input) ;
+    phantoms swapd (fast-input) (fast-input) ;
 
 : (slow-input) ( template phantom -- )
     swap [ stack>vregs ] keep phantom-vregs ;
-
-: slow-input ( template template -- )
-    phantom-r get (slow-input)
-    phantom-d get (slow-input) ;
-
-: adjust-free-vregs ( -- )
-    used-vregs free-vregs [ diff ] change ;
-
-: template-inputs ( template template -- )
-    2dup additional-vregs# ensure-vregs
-    match-templates fast-input
-    adjust-free-vregs
-    finalize-contents
-    slow-input ;
 
 : phantom-append ( seq stack -- )
     over length over adjust-phantom swap nappend ;
 
 : (template-outputs) ( seq stack -- )
-    phantom-r get phantom-append phantom-d get phantom-append ;
+    phantoms swapd phantom-append phantom-append ;
 
-: template-outputs ( stack stack -- )
-    [ [ get ] map ] 2apply (template-outputs) ;
+SYMBOL: +input-d
+SYMBOL: +input-r
+SYMBOL: +output-d
+SYMBOL: +output-r
+SYMBOL: +scratch
+SYMBOL: +clobber
 
-: with-template ( in out quot -- )
-    swap >r >r { } template-inputs
-    r> call r> { } template-outputs ; inline
+: fix-spec ( spec -- spec )
+    H{
+        { +input-d { } }
+        { +input-r { } }
+        { +output-d { } }
+        { +output-r { } }
+        { +scratch { } }
+        { +clobber { } }
+    } swap hash-union ;
+
+: adjust-free-vregs ( -- )
+    used-vregs free-vregs [ diff ] change ;
+
+: output-vregs ( -- seq )
+    { +output-d +output-r +clobber }
+    [ get [ get ] map ] map concat ;
+
+: finalize-contents? ( -- ? )
+    output-vregs phantoms append
+    [ swap member? ] contains-with? ;
+
+: slow-input ( template template -- )
+    2dup [ empty? not ] 2apply or finalize-contents? or
+    [ finalize-contents ] when
+    phantoms swapd (slow-input) (slow-input) ;
+
+: template-inputs ( -- )
+    +input-d get +input-r get
+    2dup additional-vregs# ensure-vregs
+    match-templates fast-input
+    adjust-free-vregs
+    slow-input ;
+
+: template-outputs ( -- )
+    +output-d get +output-r get [ [ get ] map ] 2apply
+    (template-outputs) ;
+
+: with-template ( spec quot -- )
+    swap fix-spec [
+        template-inputs call template-outputs
+    ] bind ; inline
