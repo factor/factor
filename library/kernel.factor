@@ -81,8 +81,8 @@ IN: kernel-internals
 ! These words are unsafe. Don't use them.
 
 : array-capacity 1 slot ; inline
-: array-nth swap 2 fixnum+ slot ; inline
-: set-array-nth swap 2 fixnum+ set-slot ; inline
+: array-nth swap 2 fixnum+fast slot ; inline
+: set-array-nth swap 2 fixnum+fast set-slot ; inline
 
 : make-tuple <tuple> [ 2 set-slot ] keep ; flushable
 

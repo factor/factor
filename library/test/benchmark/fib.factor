@@ -6,8 +6,19 @@ USE: test
 USE: math-internals
 USE: namespaces
 
-! Four fibonacci implementations, each one slower than the
+! Five fibonacci implementations, each one slower than the
 ! previous.
+
+: fast-fixnum-fib ( n -- nth fibonacci number )
+    dup 1 fixnum<= [
+        drop 1
+    ] [
+        1 fixnum-fast dup fast-fixnum-fib
+        swap 1 fixnum-fast fast-fixnum-fib fixnum+fast
+    ] if ;
+    compiled
+
+[ 9227465 ] [ 34 fast-fixnum-fib ] unit-test
 
 : fixnum-fib ( n -- nth fibonacci number )
     dup 1 fixnum<= [

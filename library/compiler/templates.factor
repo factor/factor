@@ -22,9 +22,14 @@ GENERIC: finalize-height ( n stack -- )
 
 GENERIC: <loc> ( n stack -- loc )
 
-: (loc) phantom-stack-height - ;
+: (loc)
+    #! Utility for methods on <loc>
+    phantom-stack-height - ;
 
 : (finalize-height) ( stack word -- )
+    #! We consolidate multiple stack height changes until the
+    #! last moment, and we emit the final height changing
+    #! instruction here.
     swap [
         phantom-stack-height
         dup zero? [ 2drop ] [ swap execute , ] if
@@ -52,12 +57,14 @@ M: phantom-callstack finalize-height
     \ %inc-r (finalize-height) ;
 
 : phantom-locs ( n phantom -- locs )
+    #! A sequence of n ds-locs or cs-locs indexing the stack.
     swap reverse-slice [ swap <loc> ] map-with ;
 
 : phantom-locs* ( phantom -- locs )
     dup length swap phantom-locs ;
 
 : adjust-phantom ( n phantom -- )
+    #! Change stack heiht.
     [ phantom-stack-height + ] keep set-phantom-stack-height ;
 
 GENERIC: cut-phantom ( n phantom -- seq )
@@ -71,15 +78,6 @@ SYMBOL: phantom-r
 : init-templates ( -- )
     <phantom-datastack> phantom-d set
     <phantom-callstack> phantom-r set ;
-
-: immediate? ( obj -- ? )
-    #! fixnums and f have a pointerless representation, and
-    #! are compiled immediately. Everything else can be moved
-    #! by GC, and is indexed through a table.
-    dup fixnum? swap f eq? or ;
-
-: load-literal ( obj dest -- )
-    over immediate? [ %immediate ] [ %indirect ] if , ;
 
 : finalize-heights ( -- )
     phantom-d get finalize-height
@@ -198,51 +196,36 @@ SYMBOL: phantom-r
     [ reverse-slice ] 2apply
     t [ swap first compatible-values? and ] 2reduce ;
 
-: templates-match? ( template template -- ? )
-    phantom-r get template-match?
-    >r phantom-d get template-match? r> and ;
-
 : split-template ( template phantom -- slow fast )
     over length over length <=
     [ drop { } swap ] [ length swap cut* ] if ;
 
-: split-templates ( template template -- slow slow fast fast )
-    >r phantom-d get split-template r>
-    phantom-r get split-template swapd ;
+: match-template ( template -- slow fast )
+    phantom-d get 2dup template-match?
+    [ split-template ] [ drop { } ] if ;
 
-: match-templates ( template template -- slow slow fast fast )
-    2dup templates-match? [ split-templates ] [ { } { } ] if ;
-
-: (fast-input) ( template phantom -- )
+: fast-input ( template -- )
+    phantom-d get
     over length neg over adjust-phantom
     over length swap cut-phantom
     swap phantom-vregs ;
-
-: fast-input ( template template -- )
-    phantoms swapd (fast-input) (fast-input) ;
-
-: (slow-input) ( template phantom -- )
-    swap [ stack>vregs ] keep phantom-vregs ;
 
 : phantom-append ( seq stack -- )
     over length over adjust-phantom swap nappend ;
 
 : (template-outputs) ( seq stack -- )
-    phantoms swapd phantom-append phantom-append ;
+    phantoms swapd phantom-append phantom-append
+    compute-free-vregs ;
 
-SYMBOL: +input-d
-SYMBOL: +input-r
-SYMBOL: +output-d
-SYMBOL: +output-r
+SYMBOL: +input
+SYMBOL: +output
 SYMBOL: +scratch
 SYMBOL: +clobber
 
 : fix-spec ( spec -- spec )
     H{
-        { +input-d { } }
-        { +input-r { } }
-        { +output-d { } }
-        { +output-r { } }
+        { +input { } }
+        { +output { } }
         { +scratch { } }
         { +clobber { } }
     } swap hash-union ;
@@ -250,31 +233,38 @@ SYMBOL: +clobber
 : adjust-free-vregs ( -- )
     used-vregs free-vregs [ diff ] change ;
 
-: output-vregs ( -- seq )
-    { +output-d +output-r +clobber }
-    [ get [ get ] map ] map concat ;
+: output-vregs ( -- seq seq )
+    +output get +clobber get [ [ get ] map ] 2apply ;
 
-: finalize-contents? ( -- ? )
-    output-vregs phantoms append
+: outputs-clash? ( -- ? )
+    output-vregs append phantoms append
     [ swap member? ] contains-with? ;
 
-: slow-input ( template template -- )
-    2dup [ empty? not ] 2apply or finalize-contents? or
+: finalize-carefully ( -- )
+    #! If the phantom callstack has datastack locations on it,
+    #! we cannot rearrange the datastack and expect meaningful
+    #! results.
+    phantom-r get [ ds-loc? ] contains? [
+        finalize-contents
+    ] [
+        phantom-d get dup { } flush-locs vregs>stack
+    ] if ;
+
+: slow-input ( template -- )
+    dup empty?
+    [ finalize-carefully ] unless
+    outputs-clash?
     [ finalize-contents ] when
-    phantoms swapd (slow-input) (slow-input) ;
+    phantom-d get swap [ stack>vregs ] keep phantom-vregs ;
 
 : template-inputs ( -- )
-    +input-d get +input-r get
-    2dup additional-vregs# ensure-vregs
-    match-templates fast-input
-    adjust-free-vregs
-    slow-input ;
+    +input get dup { } additional-vregs# ensure-vregs
+    match-template fast-input adjust-free-vregs slow-input ;
 
 : template-outputs ( -- )
-    +output-d get +output-r get [ [ get ] map ] 2apply
-    (template-outputs) ;
+    +output get [ get ] map { } (template-outputs) ;
 
 : with-template ( spec quot -- )
-    swap fix-spec [
-        template-inputs call template-outputs
-    ] bind ; inline
+    swap fix-spec
+    [ template-inputs call template-outputs ] bind
+    compute-free-vregs ; inline

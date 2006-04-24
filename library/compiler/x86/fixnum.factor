@@ -34,8 +34,12 @@ math math-internals memory namespaces words ;
 M: %fixnum+ generate-node ( vop -- )
     drop dest/src ADD  \ SUB \ ADD simple-overflow ;
 
+M: %fixnum+fast generate-node ( vop -- ) drop dest/src ADD ;
+
 M: %fixnum- generate-node ( vop -- )
     drop dest/src SUB  \ ADD \ SUB simple-overflow ;
+
+M: %fixnum-fast generate-node ( vop -- ) drop dest/src SUB ;
 
 M: %fixnum* generate-node ( vop -- )
     drop

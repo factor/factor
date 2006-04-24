@@ -215,8 +215,12 @@ C: %write-barrier make-vop ;
 ! fixnum intrinsics
 TUPLE: %fixnum+ ;
 C: %fixnum+ make-vop ;       : %fixnum+ 3-vop <%fixnum+> ;
+TUPLE: %fixnum+fast ;
+C: %fixnum+fast make-vop ;   : %fixnum+fast 3-vop <%fixnum+fast> ;
 TUPLE: %fixnum- ;
 C: %fixnum- make-vop ;       : %fixnum- 3-vop <%fixnum-> ;
+TUPLE: %fixnum-fast ;
+C: %fixnum-fast make-vop ;   : %fixnum-fast 3-vop <%fixnum-fast> ;
 TUPLE: %fixnum* ;
 C: %fixnum* make-vop ;       : %fixnum* 3-vop <%fixnum*> ;
 TUPLE: %fixnum-mod ;

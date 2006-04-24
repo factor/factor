@@ -23,6 +23,10 @@ math-internals memory namespaces words ;
 M: %fixnum+ generate-node ( vop -- )
     drop 0 MTXER >3-vop< ADDO. \ SUBF \ ADD simple-overflow ;
 
+M: %fixnum+fast generate-node ( vop -- ) drop >3-vop< ADD ;
+
+M: %fixnum-fast generate-node ( vop -- ) drop >3-vop< SUBF ;
+
 M: %fixnum- generate-node ( vop -- )
     drop 0 MTXER >3-vop< SUBFO. \ ADD \ SUBF simple-overflow ;
 

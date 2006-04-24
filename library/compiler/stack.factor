@@ -4,6 +4,11 @@ IN: compiler
 USING: arrays generic inference io kernel math
 namespaces prettyprint sequences vectors words ;
 
+: immediate? ( obj -- ? ) dup fixnum? swap not or ;
+
+: load-literal ( obj dest -- )
+    over immediate? [ %immediate ] [ %indirect ] if , ;
+
 : phantom-shuffle-input ( n phantom -- seq )
     2dup length <= [
         cut-phantom
@@ -33,7 +38,6 @@ M: #shuffle linearize* ( #shuffle -- )
     node-shuffle phantom-shuffle iterate-next ;
 
 : linearize-push ( node -- )
-    compute-free-vregs
     >#push< dup length dup ensure-vregs
     alloc-reg# [ <vreg> ] map
     [ [ load-literal ] 2each ] keep

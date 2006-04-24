@@ -2,7 +2,7 @@
 
 IN: temporary
 USING: arrays compiler kernel kernel-internals math
-math-internals namespaces test ;
+math-internals namespaces sequences sequences-internals test ;
 
 ! Oops!
 [ 5000 ] [ [ 5000 ] compile-1 ] unit-test
@@ -41,6 +41,21 @@ unit-test
 [ 1/2 [ dup 0 slot swap 1 slot [ foo ] keep ] compile-1 ]
 unit-test
 
+[ 41 5 4 ] [
+    5/4 4/5 [
+        dup ratio? [
+            over ratio? [
+                2dup 2>fraction >r * swap r> * swap
+                + -rot denominator swap denominator
+            ] [
+                2drop f f f
+            ] if
+        ] [
+            2drop f f f
+        ] if
+    ] compile-1
+] unit-test
+
 : jxyz
     over bignum? [
         dup ratio? [
@@ -77,4 +92,32 @@ unit-test
 [
     global [ 3 \ foo set ] bind
     \ foo [ global [ get ] bind ] compile-1
+] unit-test
+
+[ 12 13 ] [
+    -12 -13 [ [ 0 swap fixnum-fast ] 2apply ] compile-1
+] unit-test
+
+[ -1 2 ] [ 1 2 [ >r 0 swap fixnum- r> ] compile-1 ] unit-test
+
+[ 12 13 ] [
+    -12 -13 [ [ 0 swap fixnum- ] 2apply ] compile-1
+] unit-test
+
+[ { t t } ] [
+    { t } { t } [
+        dup array-capacity [
+            2dup swap swap 2 fixnum+fast slot
+            >r pick swap 2 fixnum+fast slot r> 2array
+        ] collect 2nip
+    ] compile-1 first
+] unit-test
+
+[ { t t } ] [
+    { t } { t } [
+        dup array-capacity [
+            2dup swap swap 2 fixnum+ slot
+            >r pick swap 2 fixnum+ slot r> 2array
+        ] collect 2nip
+    ] compile-1 first
 ] unit-test

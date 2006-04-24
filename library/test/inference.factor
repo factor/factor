@@ -10,22 +10,6 @@ math-internals namespaces parser sequences test vectors ;
 
 [ t ] [ [ [ ] [ ] if ] dataflow dup [ [ ] map-nodes ] with-node-iterator = ] unit-test
 
-[
-    T{ shuffle f { "a" } { } { "a" } { "a" } }
-] [
-    T{ shuffle f { "a" } { } { "a" "a" } { } }
-    T{ shuffle f { "b" } { } { } { "b" } }
-    compose-shuffle
-] unit-test
-
-[
-    T{ shuffle f { "b" "a" } { } { "b" "b" } { } }
-] [
-    T{ shuffle f { "a" } { } { } { } }
-    T{ shuffle f { "b" } { } { "b" "b" } { } }
-    compose-shuffle
-] unit-test
-
 [ { 0 2 } ] [ [ 2 "Hello" ] infer ] unit-test
 [ { 1 2 } ] [ [ dup ] infer ] unit-test
 

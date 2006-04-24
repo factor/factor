@@ -42,11 +42,25 @@ void primitive_fixnum_add(void)
 	box_signed_cell(x + y);
 }
 
+void primitive_fixnum_add_fast(void)
+{
+	F_FIXNUM y = untag_fixnum_fast(dpop());
+	F_FIXNUM x = untag_fixnum_fast(dpop());
+	dpush(tag_fixnum(x + y));
+}
+
 void primitive_fixnum_subtract(void)
 {
 	F_FIXNUM y = untag_fixnum_fast(dpop());
 	F_FIXNUM x = untag_fixnum_fast(dpop());
 	box_signed_cell(x - y);
+}
+
+void primitive_fixnum_subtract_fast(void)
+{
+	F_FIXNUM y = untag_fixnum_fast(dpop());
+	F_FIXNUM x = untag_fixnum_fast(dpop());
+	dpush(tag_fixnum(x - y));
 }
 
 /**

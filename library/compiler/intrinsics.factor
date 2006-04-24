@@ -7,8 +7,8 @@ namespaces sequences words ;
 
 \ slot [
     H{
-        { +input-d { { f "obj" } { f "n" } } }
-        { +output-d { "obj" } }
+        { +input { { f "obj" } { f "n" } } }
+        { +output { "obj" } }
     } [
         "obj" get %untag ,
         "n" get "obj" get %slot ,
@@ -17,7 +17,7 @@ namespaces sequences words ;
 
 \ set-slot [
     H{
-        { +input-d { { f "val" } { f "obj" } { f "slot" } } }
+        { +input { { f "val" } { f "obj" } { f "slot" } } }
         { +clobber { "obj" } }
     } [
         "obj" get %untag ,
@@ -29,8 +29,8 @@ namespaces sequences words ;
 
 \ char-slot [
     H{
-        { +input-d { { f "n" } { f "str" } } }
-        { +output-d { "str" } }
+        { +input { { f "n" } { f "str" } } }
+        { +output { "str" } }
     } [
         "n" get "str" get %char-slot ,
     ] with-template
@@ -38,7 +38,7 @@ namespaces sequences words ;
 
 \ set-char-slot [
     H{
-        { +input-d { { f "ch" } { f "n" } { f "str" } } }
+        { +input { { f "ch" } { f "n" } { f "str" } } }
     } [
         "ch" get "str" get "n" get %set-char-slot ,
     ] with-template
@@ -46,22 +46,22 @@ namespaces sequences words ;
 
 \ type [
     H{
-        { +input-d { { f "in" } } }
-        { +output-d { "in" } }
+        { +input { { f "in" } } }
+        { +output { "in" } }
     } [ finalize-contents "in" get %type , ] with-template
 ] "intrinsic" set-word-prop
 
 \ tag [
     H{
-        { +input-d { { f "in" } } }
-        { +output-d { "in" } }
+        { +input { { f "in" } } }
+        { +output { "in" } }
     } [ "in" get %tag , ] with-template
 ] "intrinsic" set-word-prop
 
 : binary-op ( op -- )
     H{
-        { +input-d { { 0 "x" } { 1 "y" } } }
-        { +output-d { "x" } }
+        { +input { { 0 "x" } { 1 "y" } } }
+        { +output { "x" } }
     } [
         finalize-contents >r "y" get "x" get dup r> execute ,
     ] with-template ; inline
@@ -69,9 +69,6 @@ namespaces sequences words ;
 {
     { fixnum+       %fixnum+       }
     { fixnum-       %fixnum-       }
-    { fixnum-bitand %fixnum-bitand }
-    { fixnum-bitor  %fixnum-bitor  }
-    { fixnum-bitxor %fixnum-bitxor }
     { fixnum/i      %fixnum/i      }
     { fixnum*       %fixnum*       }
 } [
@@ -79,9 +76,28 @@ namespaces sequences words ;
     "intrinsic" set-word-prop
 ] each
 
+: binary-op-fast ( op -- )
+    H{
+        { +input { { f "x" } { f "y" } } }
+        { +output { "x" } }
+    } [
+        >r "y" get "x" get dup r> execute ,
+    ] with-template ; inline
+
+{
+    { fixnum-bitand %fixnum-bitand }
+    { fixnum-bitor  %fixnum-bitor  }
+    { fixnum-bitxor %fixnum-bitxor }
+    { fixnum+fast   %fixnum+fast   }
+    { fixnum-fast   %fixnum-fast   }
+} [
+    first2 [ binary-op-fast ] curry
+    "intrinsic" set-word-prop
+] each
+
 : binary-jump ( label op -- )
     H{
-        { +input-d { { f "x" } { f "y" } } }
+        { +input { { f "x" } { f "y" } } }
     } [
         end-basic-block >r >r "y" get "x" get r> r> execute ,
     ] with-template ; inline
@@ -102,8 +118,8 @@ namespaces sequences words ;
     ! hard-coded to put its output in vreg 2, which happends to
     ! be EDX there.
     H{
-        { +input-d { { 0 "x" } { 1 "y" } } }
-        { +output-d { "out" } }
+        { +input { { 0 "x" } { 1 "y" } } }
+        { +output { "out" } }
     } [
         finalize-contents
         T{ vreg f 2 } "out" set
@@ -114,8 +130,8 @@ namespaces sequences words ;
 \ fixnum/mod [
     ! See the remark on fixnum-mod for vreg usage
     H{
-        { +input-d { { 0 "x" } { 1 "y" } } }
-        { +output-d { "quo" "rem" } }
+        { +input { { 0 "x" } { 1 "y" } } }
+        { +output { "quo" "rem" } }
     } [
         finalize-contents
         T{ vreg f 0 } "quo" set
@@ -127,7 +143,7 @@ namespaces sequences words ;
 
 \ fixnum-bitnot [
     H{
-        { +input-d { { f "x" } } }
-        { +output-d { "x" } }
+        { +input { { f "x" } } }
+        { +output { "x" } }
     } [ "x" get dup %fixnum-bitnot , ] with-template
 ] "intrinsic" set-word-prop

@@ -24,14 +24,22 @@ GENERIC: optimize-node* ( node -- node/t )
         optimizer-changed get
     ] with-node-iterator [ optimize ] when ;
 
+: prune-if ( node quot -- successor/t )
+    over >r call [ r> node-successor ] [ r> drop t ] if ;
+    inline
+
 ! Generic nodes
 M: f optimize-node* drop t ;
 
 M: node optimize-node* ( node -- t ) drop t ;
 
+! #shuffle
+M: #shuffle optimize-node*  ( node -- node/t )
+    [ node-values empty? ] prune-if ;
+
 ! #push
 M: #push optimize-node*  ( node -- node/t )
-    dup node-out-d empty? [ node-successor ] [ drop t ] if ;
+    [ node-out-d empty? ] prune-if ;
 
 ! #return
 M: #return optimize-node* ( node -- node/t )

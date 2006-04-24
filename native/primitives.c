@@ -24,7 +24,9 @@ void* primitives[] = {
 	primitive_bits_double,
 	primitive_from_rect,
 	primitive_fixnum_add,
+	primitive_fixnum_add_fast,
 	primitive_fixnum_subtract,
+	primitive_fixnum_subtract_fast,
 	primitive_fixnum_multiply,
 	primitive_fixnum_divint,
 	primitive_fixnum_divfloat,
@@ -191,8 +193,5 @@ void* primitives[] = {
 
 CELL primitive_to_xt(CELL primitive)
 {
-	if(primitive < 0 || primitive >= PRIMITIVE_COUNT)
-		return (CELL)undefined;
-	else
-		return (CELL)primitives[primitive];
+	return (CELL)primitives[primitive];
 }
