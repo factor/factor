@@ -99,19 +99,18 @@ M: #call-label linearize* ( node -- next )
     node-param renamed-label linearize-call ;
 
 M: #if linearize* ( node -- next )
-    H{
-        { +input { { 0 "flag" } } }
-    } [
+    [
         end-basic-block
         <label> dup "flag" get %jump-t ,
-    ] with-template linearize-if ;
+    ] H{
+        { +input { { 0 "flag" } } }
+    } with-template linearize-if ;
 
 : dispatch-head ( node -- label/node )
     #! Output the jump table insn and return a list of
     #! label/branch pairs.
-    H{
-        { +input { { 0 "n" } } }
-    } [ end-basic-block "n" get %dispatch , ] with-template
+    [ end-basic-block "n" get %dispatch , ]
+    H{ { +input { { 0 "n" } } } } with-template
     node-children [ <label> dup %target-label ,  2array ] map ;
 
 : dispatch-body ( label/node -- )

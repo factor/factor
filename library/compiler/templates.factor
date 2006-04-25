@@ -128,10 +128,8 @@ SYMBOL: phantom-r
 : phantoms ( -- phantom phantom ) phantom-d get phantom-r get ;
 
 : flush-locs ( phantom phantom -- )
-    [
-        2dup live-locs \ live-locs set
-        [ dup phantom-locs* [ lazy-store ] 2each ] 2apply
-    ] with-scope ;
+    2dup live-locs \ live-locs set
+    [ dup phantom-locs* [ lazy-store ] 2each ] 2apply ;
 
 : finalize-contents ( -- )
     phantoms 2dup flush-locs [ vregs>stack ] 2apply ;
@@ -214,8 +212,7 @@ SYMBOL: phantom-r
     over length over adjust-phantom swap nappend ;
 
 : (template-outputs) ( seq stack -- )
-    phantoms swapd phantom-append phantom-append
-    compute-free-vregs ;
+    phantoms swapd phantom-append phantom-append ;
 
 SYMBOL: +input
 SYMBOL: +output
@@ -230,41 +227,34 @@ SYMBOL: +clobber
         { +clobber { } }
     } swap hash-union ;
 
-: adjust-free-vregs ( -- )
-    used-vregs free-vregs [ diff ] change ;
+: adjust-free-vregs ( seq -- ) free-vregs [ diff ] change ;
 
 : output-vregs ( -- seq seq )
-    +output get +clobber get [ [ get ] map ] 2apply ;
+    +output +clobber [ get [ get ] map ] 2apply ;
 
 : outputs-clash? ( -- ? )
     output-vregs append phantoms append
     [ swap member? ] contains-with? ;
 
-: finalize-carefully ( -- )
-    #! If the phantom callstack has datastack locations on it,
-    #! we cannot rearrange the datastack and expect meaningful
-    #! results.
-    phantom-r get [ ds-loc? ] contains? [
-        finalize-contents
-    ] [
-        phantom-d get dup { } flush-locs vregs>stack
-    ] if ;
-
 : slow-input ( template -- )
-    dup empty?
-    [ finalize-carefully ] unless
-    outputs-clash?
-    [ finalize-contents ] when
+    dup empty? [ finalize-contents ] unless
+    outputs-clash? [ finalize-contents ] when
     phantom-d get swap [ stack>vregs ] keep phantom-vregs ;
+
+: input-vregs ( -- seq )
+    +input +scratch [ get [ second get vreg-n ] map ] 2apply
+    append ;
 
 : template-inputs ( -- )
     +input get dup { } additional-vregs# ensure-vregs
-    match-template fast-input adjust-free-vregs slow-input ;
+    match-template fast-input
+    used-vregs adjust-free-vregs
+    slow-input
+    input-vregs adjust-free-vregs ;
 
 : template-outputs ( -- )
     +output get [ get ] map { } (template-outputs) ;
 
-: with-template ( spec quot -- )
-    swap fix-spec
-    [ template-inputs call template-outputs ] bind
+: with-template ( quot spec -- )
+    fix-spec [ template-inputs call template-outputs ] bind
     compute-free-vregs ; inline
