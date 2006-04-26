@@ -15,10 +15,23 @@ DEFER: #terminal?
 
 PREDICATE: #merge #terminal-merge node-successor #terminal? ;
 
-UNION: #terminal POSTPONE: f #return #values #terminal-merge ;
+: intrinsic ( #call -- quot ) node-param "intrinsic" word-prop ;
+
+: if-intrinsic ( #call -- quot )
+    dup node-successor #if?
+    [ node-param "if-intrinsic" word-prop ] [ drop f ] if ;
+
+PREDICATE: #call #terminal-call
+    dup node-successor node-successor #terminal?
+    swap if-intrinsic and ;
+
+UNION: #terminal
+    POSTPONE: f #return #values #terminal-merge ;
 
 : tail-call? ( -- ? )
-    node-stack get [ node-successor ] map [ #terminal? ] all? ;
+    node-stack get [
+        dup #terminal-call? swap node-successor #terminal? or
+    ] all? ;
 
 GENERIC: linearize* ( node -- next )
 
@@ -73,12 +86,6 @@ M: #label linearize* ( node -- next )
     #! same label in different lexical scopes.
     dup node-param dup linearize-call-label >r
     renamed-label swap node-child linearize-1 r> ;
-
-: intrinsic ( #call -- quot ) node-param "intrinsic" word-prop ;
-
-: if-intrinsic ( #call -- quot )
-    dup node-successor #if?
-    [ node-param "if-intrinsic" word-prop ] [ drop f ] if ;
 
 : linearize-if ( node label -- next )
     <label> [

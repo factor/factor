@@ -12,6 +12,8 @@ TUPLE: ds-loc n ;
 ! A call stack location.
 TUPLE: cs-loc n ;
 
+UNION: loc ds-loc cs-loc ;
+
 TUPLE: phantom-stack height ;
 
 C: phantom-stack ( -- stack )
@@ -75,17 +77,16 @@ M: phantom-stack cut-phantom ( n phantom -- seq )
 SYMBOL: phantom-d
 SYMBOL: phantom-r
 
+: phantoms ( -- phantom phantom ) phantom-d get phantom-r get ;
+
 : init-templates ( -- )
     <phantom-datastack> phantom-d set
     <phantom-callstack> phantom-r set ;
 
 : finalize-heights ( -- )
-    phantom-d get finalize-height
-    phantom-r get finalize-height ;
+    phantoms [ finalize-height ] 2apply ;
 
 : alloc-reg ( -- n ) free-vregs get pop ;
-
-: loc? ( obj -- ? ) dup ds-loc? swap cs-loc? or ;
 
 : stack>vreg ( vreg# loc -- operand )
     >r <vreg> dup r> %peek , ;
@@ -124,8 +125,6 @@ SYMBOL: phantom-r
     ] [
         2drop
     ] if ;
-
-: phantoms ( -- phantom phantom ) phantom-d get phantom-r get ;
 
 : flush-locs ( phantom phantom -- )
     2dup live-locs \ live-locs set

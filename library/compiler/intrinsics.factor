@@ -123,6 +123,7 @@ namespaces sequences words ;
         "y" get "x" get "out" get %fixnum-mod ,
     ] H{
         { +input { { 0 "x" } { 1 "y" } } }
+        ! { +scratch { { 2 "out" } } }
         { +output { "out" } }
     } with-template
 ] "intrinsic" set-word-prop
@@ -131,13 +132,13 @@ namespaces sequences words ;
     ! See the remark on fixnum-mod for vreg usage
     [
         finalize-contents
-        T{ vreg f 0 } "quo" set
         T{ vreg f 2 } "rem" set
         "y" get "x" get 2array
-        "rem" get "quo" get 2array %fixnum/mod ,
+        "rem" get "x" get 2array %fixnum/mod ,
     ] H{
         { +input { { 0 "x" } { 1 "y" } } }
-        { +output { "quo" "rem" } }
+        ! { +scratch { { 2 "rem" } } }
+        { +output { "x" "rem" } }
     } with-template
 ] "intrinsic" set-word-prop
 
