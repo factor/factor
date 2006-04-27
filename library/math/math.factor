@@ -53,25 +53,14 @@ M: object zero? drop f ;
 
 : ceiling ( x -- y ) neg floor neg ; foldable
 
-G: repeat 1 standard-combination ; inline
-
-: (repeat-fixnum) ( i n quot -- )
-    pick pick fixnum>= [
+: (repeat) ( i n quot -- )
+    pick pick >= [
         3drop
     ] [
-        [ swap >r call 1 fixnum+fast r> ] keep (repeat-fixnum)
+        [ swap >r call 1+ r> ] keep (repeat)
     ] if ; inline
 
-M: fixnum repeat 0 -rot (repeat-fixnum) ;
-
-: (repeat-bignum) ( i n quot -- )
-    pick pick bignum>= [
-        3drop
-    ] [
-        [ swap >r call 1 bignum+ r> ] keep (repeat-bignum)
-    ] if ; inline
-
-M: bignum repeat 0 -rot (repeat-bignum) ;
+: repeat 0 -rot (repeat) ; inline
 
 : times ( n quot -- | quot: -- )
     swap [ >r dup slip r> ] repeat drop ; inline
