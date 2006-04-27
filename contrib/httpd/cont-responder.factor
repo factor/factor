@@ -136,17 +136,6 @@ TUPLE: resume value stdio ;
       </body>
     </html> flush  ;
 
-: (expired-page-handler) ( alist -- )
-  #! Display a page has expired message.
-  #! TODO: Need to handle this better to enable
-  #!       returning back to root continuation.
-    drop
-    <html>                
-      <body> 
-       <p> "This page has expired." write  </p> 
-      </body>
-    </html> flush  ;
-
 : expired-page-handler ( alist -- )
   [ (expired-page-handler) ] show-final ;
 

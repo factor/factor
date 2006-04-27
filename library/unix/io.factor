@@ -66,7 +66,7 @@ C: port ( handle buffer -- port )
     80 <sbuf> over set-port-sbuf ;
 
 : touch-port ( port -- )
-    dup port-timeout dup 0 =
+    dup port-timeout dup zero?
     [ 2drop ] [ millis + swap set-port-cutoff ] if ;
 
 M: port set-timeout ( timeout port -- )
@@ -115,11 +115,8 @@ GENERIC: task-container ( task -- vector )
     queue-empty? [ remove-io-task ] [ drop ] if r> ;
 
 : handle-fd ( task -- )
-    dup do-io-task [
-        dup io-task-port touch-port pop-callback continue
-    ] [
-        drop
-    ] if ;
+    dup io-task-port touch-port dup do-io-task
+    [ pop-callback continue ] [ drop ] if ;
 
 : timeout? ( port -- ? )
     port-cutoff dup zero? not swap millis < and ;
@@ -145,7 +142,7 @@ GENERIC: task-container ( task -- vector )
     f ;
 
 : io-multiplex ( timeout -- )
-    >r FD_SETSIZE init-fdsets r> make-timeval select ( io-error ) drop
+    >r FD_SETSIZE init-fdsets r> make-timeval select io-error
     read-fdset get read-tasks get handle-fdset
     write-fdset get write-tasks get handle-fdset ;
 

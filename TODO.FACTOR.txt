@@ -2,6 +2,8 @@ should fix in 0.82:
 
 - constant branch folding
 - getenv, setenv, fast-slot stuff
+- more flexible fixnum intrinsics
+- compile if-intrinsic even if there is no #if there
 - 3 >n fep
 - amd64 %box-struct
 - get factor running on mac intel
