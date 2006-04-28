@@ -12,6 +12,10 @@ M: object stack-reserve* drop 0 ;
 : stack-reserve ( node -- n )
     0 swap [ stack-reserve* max ] each-node ;
 
+: if-intrinsic ( #call -- quot )
+    dup node-successor #if?
+    [ node-param "if-intrinsic" word-prop ] [ drop f ] if ;
+
 DEFER: #terminal?
 
 PREDICATE: #merge #terminal-merge node-successor #terminal? ;
@@ -129,10 +133,6 @@ M: #if generate-node ( node -- next )
 
 : define-if-intrinsic ( word quot template -- | quot: label -- )
     [with-template] "if-intrinsic" set-word-prop ;
-
-: if-intrinsic ( #call -- quot )
-    dup node-successor #if?
-    [ node-param "if-intrinsic" word-prop ] [ drop f ] if ;
 
 M: #call generate-node ( node -- next )
     dup if-intrinsic [

@@ -11,7 +11,7 @@ vectors words ;
 "Creating primitives and basic runtime structures..." print flush
 
 H{ } clone c-types set
-"/library/alien/primitive-types.factor" parse-resource
+"/library/compiler/alien/primitive-types.factor" parse-resource
 
 ! These symbols need the same hashcode in the target as in the
 ! host.

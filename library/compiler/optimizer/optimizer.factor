@@ -1,7 +1,7 @@
 ! Copyright (C) 2004, 2006 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 IN: optimizer
-USING: compiler generic hashtables inference io kernel
+USING: generic hashtables inference io kernel
 lists math namespaces sequences vectors ;
 
 SYMBOL: optimizer-changed

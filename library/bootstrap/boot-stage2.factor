@@ -23,6 +23,8 @@ H{ } clone help-graph set-global xref-articles
 
     "Compiling base..." print flush
 
+    \ + compile
+    \ = compile
     { "kernel" "sequences" "assembler" } compile-vocabs
 
     "Compiling system..." print flush
