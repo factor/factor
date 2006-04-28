@@ -1,6 +1,8 @@
+! Copyright (C) 2005, 2006 Slava Pestov.
+! See http://factorcode.org/license.txt for BSD license.
 IN: compiler
 USING: alien arrays assembler generic kernel kernel-internals
-sequences words ;
+math sequences words ;
 
 ! x86 register assignments
 ! EAX, ECX, EDX vregs
@@ -9,16 +11,22 @@ sequences words ;
 
 : ds-reg ESI ; inline
 : cs-reg EBX ; inline
+: reg-stack ( n reg -- op ) swap cells neg [+] ;
+
+M: ds-loc v>operand ds-loc-n ds-reg reg-stack ;
+
+M: cs-loc v>operand cs-loc-n cs-reg reg-stack ;
+
 : remainder-reg EDX ; inline
 
 : vregs { EAX ECX EDX } ; inline
 
-: compile-c-call ( symbol dll -- )
+: %alien-invoke ( symbol dll -- )
     2dup dlsym CALL rel-relative rel-dlsym ;
 
 : compile-c-call* ( symbol dll args -- operands )
     reverse-slice
-    [ [ PUSH ] each compile-c-call ] keep
+    [ [ PUSH ] each %alien-invoke ] keep
     [ drop EDX POP ] each ;
 
 ! On x86, parameters are never passed in registers.
@@ -36,9 +44,52 @@ M: float-regs fastcall-regs drop { } ;
 
 : prepare-division CDQ ; inline
 
-: compile-prologue ; inline
+M: immediate load-literal ( dest literal -- )
+    address MOV ;
 
-: compile-epilogue ; inline
+M: object load-literal ( dest literal -- )
+    add-literal [] MOV rel-absolute-cell rel-address ;
 
-: load-indirect ( dest literal -- )
-    add-literal [] MOV rel-absolute-cell rel-address ; inline
+: (%call) ( label -- label )
+    dup postpone-word dup primitive? [ address-operand ] when ;
+
+: %call ( label -- ) (%call) CALL ;
+
+: %jump ( label -- ) %epilogue (%call) JMP ;
+
+: %jump-label ( label -- ) JMP ;
+
+: %jump-t ( label vreg -- )
+    v>operand f v>operand CMP JNE ;
+
+: %dispatch ( vreg -- )
+    #! Compile a piece of code that jumps to an offset in a
+    #! jump table indexed by the fixnum at the top of the stack.
+    #! The jump table must immediately follow this macro.
+    drop
+    <label> "end" set
+    ! Untag and multiply to get a jump table offset
+    dup fixnum>slot@
+    ! Add to jump table base. We use a temporary register since
+    ! on AMD4 we have to load a 64-bit immediate. On x86, this
+    ! is redundant.
+    0 scratch HEX: ffffffff MOV "end" get absolute-cell
+    dup 0 scratch ADD
+    ! Jump to jump table entry
+    dup [] JMP
+    ! Align for better performance
+    compile-aligned
+    ! Fix up jump table pointer
+    "end" get save-xt ;
+
+: %return ( -- ) %epilogue RET ;
+
+: %peek ( vreg loc -- ) [ v>operand ] 2apply MOV ;
+
+: %replace ( vreg loc -- ) swap %peek ;
+
+: (%inc) 0 input cells dup 0 > [ ADD ] [ neg SUB ] if ;
+
+: %inc-d ( n -- ) ds-reg (%inc) ;
+
+: %inc-r ( n -- ) cs-reg (%inc) ;

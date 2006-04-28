@@ -1,3 +1,5 @@
+! Copyright (C) 2005, 2006 Slava Pestov.
+! See http://factorcode.org/license.txt for BSD license.
 IN: compiler
 USING: alien assembler generic kernel kernel-internals math
 memory namespaces sequences words ;
@@ -42,7 +44,7 @@ M: object load-literal ( literal vreg -- )
     0 MFLR
     0 1 stack-increment lr@ STW ;
 
-: compile-epilogue ( -- )
+: %epilogue ( -- )
     #! At the end of each word that calls a subroutine, we store
     #! the previous link register value in r0 by popping it off
     #! the stack, set the link register to the contents of r0,
@@ -65,7 +67,7 @@ M: object load-literal ( literal vreg -- )
     dup primitive? [ word-addr  3 MTCTR  BCTR ] [ B ] if ;
 
 : %jump ( label -- )
-    compile-epilogue dup postpone-word %jump-label ;
+    %epilogue dup postpone-word %jump-label ;
 
 : %jump-t ( label vreg -- )
     0 swap v>operand f address CMPI BNE ;
@@ -80,7 +82,7 @@ M: object load-literal ( literal vreg -- )
     MTLR
     BLR ;
 
-: %return ( -- ) compile-epilogue BLR ;
+: %return ( -- ) %epilogue BLR ;
 
 : %peek ( vreg loc -- ) >r v>operand r> loc>operand LWZ ;
 

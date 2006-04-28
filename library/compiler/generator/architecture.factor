@@ -25,7 +25,10 @@ DEFER: vregs ( -- regs )
 G: load-literal ( obj vreg -- ) 1 standard-combination ;
 
 ! Set up caller stack frame (PowerPC and AMD64)
-DEFER: %prologue ( n -- )
+: %prologue ( n -- ) drop ;
+
+! Tear down stack frame (PowerPC and AMD64)
+: %epilogue ( n -- ) drop ;
 
 ! Tail call another word
 DEFER: %jump ( label -- )

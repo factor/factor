@@ -1,5 +1,5 @@
-! Copyright (C) 2005 Slava Pestov.
-! See http://factor.sf.net/license.txt for BSD license.
+! Copyright (C) 2005, 2006 Slava Pestov.
+! See http://factorcode.org/license.txt for BSD license.
 IN: compiler
 USING: alien arrays assembler inference kernel
 kernel-internals lists math memory namespaces words ;
@@ -30,55 +30,52 @@ M: float-regs load-return-reg
 M: %unbox generate-node
     drop 2 input f compile-c-call  1 input push-return-reg ;
 
-: struct-ptr/size ( func -- )
+: struct-ptr/size ( size func -- )
     ! Load struct size
-    2 input PUSH
+    swap PUSH
     ! Load destination address
     EAX PUSH
     ! Copy the struct to the stack
-    f compile-c-call
+    f %alien-invoke
     ! Clean up
     EAX POP
     ECX POP ;
 
-M: %unbox-struct generate-node ( vop -- )
-    drop
+: %unbox-struct ( n reg-class size -- )
+    2nip
     ! Increase stack size
-    ESP 2 input SUB
+    ESP over SUB
     ! Save destination address in EAX
     EAX ESP MOV
     "unbox_value_struct" struct-ptr/size ;
 
-M: %box-struct generate-node ( vop -- )
+: %box-struct ( n reg-class size -- )
+    2nip
     ! Compute source address in EAX
     EAX ESP MOV
     EAX 4 ADD
-    drop "box_value_struct" struct-ptr/size ;
+    "box_value_struct" struct-ptr/size ;
 
-M: %box generate-node
-    drop
-    0 input [ 4 + 1 input load-return-reg ] when*
-    1 input push-return-reg
-    2 input f compile-c-call
-    1 input drop-return-reg ;
+: %box ( n reg-class func -- )
+    rot [ 4 + pick load-return-reg ] when*
+    over push-return-reg
+    f %alien-invoke
+    drop-return-reg ;
 
-M: %alien-callback generate-node ( vop -- )
-    drop
-    EAX 0 input load-indirect
+: %alien-callback ( quot -- )
+    EAX swap load-literal
     EAX PUSH
-    "run_callback" f compile-c-call
+    "run_callback" f %alien-invoke
     EAX POP ;
 
-M: %callback-value generate-node ( vop -- )
-    drop
+: %callback-value ( reg-class func -- )
     ! Call the unboxer
-    1 input f compile-c-call
+    f %alien-invoke
     ! Save return register
-    0 input push-return-reg
+    dup push-return-reg
     ! Restore data/callstacks
-    "unnest_stacks" f compile-c-call
+    "unnest_stacks" f %alien-invoke
     ! Restore return register
-    0 input pop-return-reg ;
+    dup pop-return-reg ;
 
-M: %cleanup generate-node
-    drop 0 input dup zero? [ drop ] [ ESP swap ADD ] if ;
+: %cleanup ( n -- ) dup zero? [ drop ] [ ESP swap ADD ] if ;
