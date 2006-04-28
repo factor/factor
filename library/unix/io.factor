@@ -137,14 +137,16 @@ GENERIC: task-container ( task -- vector )
     [ drop t swap rot set-bit-nth ] hash-each-with ;
 
 : init-fdsets ( -- read write except )
-    read-fdset get [ read-tasks get init-fdset ] keep
-    write-fdset get [ write-tasks get init-fdset ] keep
+    read-fdset get-global
+    [ read-tasks get-global init-fdset ] keep
+    write-fdset get-global
+    [ write-tasks get-global init-fdset ] keep
     f ;
 
 : io-multiplex ( timeout -- )
     >r FD_SETSIZE init-fdsets r> make-timeval select io-error
-    read-fdset get read-tasks get handle-fdset
-    write-fdset get write-tasks get handle-fdset ;
+    read-fdset get-global read-tasks get-global handle-fdset
+    write-fdset get-global write-tasks get-global handle-fdset ;
 
 ! Readers
 
@@ -203,7 +205,7 @@ M: read-task do-io-task ( task -- ? )
         2drop f
     ] if ;
 
-M: read-task task-container drop read-tasks get ;
+M: read-task task-container drop read-tasks get-global ;
 
 : wait-to-read ( count port -- )
     2dup can-read-count? [
@@ -258,10 +260,10 @@ M: write-task do-io-task
         write-step f
     ] if ;
 
-M: write-task task-container drop write-tasks get ;
+M: write-task task-container drop write-tasks get-global ;
 
 : add-write-io-task ( callback task -- )
-    dup io-task-fd write-tasks get hash [
+    dup io-task-fd write-tasks get-global hash [
         dup write-task? [
             nip io-task-callbacks enque
         ] [
