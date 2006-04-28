@@ -260,8 +260,8 @@ M: write-task do-io-task
 M: write-task task-container drop write-tasks get-global ;
 
 : add-write-io-task ( callback task -- )
-    write-tasks get-global hash [
-        [ io-task-callbacks enque ] [ add-io-task ] ?if
+    dup io-task-fd write-tasks get-global hash [
+        io-task-callbacks enque
     ] [
         add-io-task
     ] if* ;
