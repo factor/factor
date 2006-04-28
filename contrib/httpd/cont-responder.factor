@@ -176,8 +176,8 @@ SYMBOL: callback-cc
             stdio get swap continue-with
         ] callcc1
         nip
-        dup resume-stdio stdio set resume-value
-        call
+        dup resume-stdio stdio set
+        resume-value call
         store-callback-cc stdio get 
     ] callcc1 stdio set ;
 
