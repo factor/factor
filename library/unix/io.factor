@@ -254,21 +254,14 @@ C: write-task ( port -- task )
     [ >r <io-task> r> set-delegate ] keep ;
 
 M: write-task do-io-task
-    io-task-port dup buffer-length zero? over port-error or [
-        0 swap buffer-reset t
-    ] [
-        write-step f
-    ] if ;
+    io-task-port dup buffer-length zero? over port-error or
+    [ 0 swap buffer-reset t ] [ write-step f ] if ;
 
 M: write-task task-container drop write-tasks get-global ;
 
 : add-write-io-task ( callback task -- )
-    dup io-task-fd write-tasks get-global hash [
-        dup write-task? [
-            nip io-task-callbacks enque
-        ] [
-            drop add-io-task
-        ] if
+    write-tasks get-global hash [
+        [ io-task-callbacks enque ] [ add-io-task ] ?if
     ] [
         add-io-task
     ] if* ;
@@ -291,8 +284,8 @@ M: port stream-write ( string writer -- )
 
 M: port stream-close ( stream -- )
     dup port-type closed eq? [
-        dup port-type output eq? >r closed over set-port-type r>
-        [ dup port-flush ] when dup port-handle close
+        dup port-type >r closed over set-port-type r>
+        output eq? [ dup port-flush ] when dup port-handle close
         dup delegate [ buffer-free ] when* f over set-delegate
     ] unless drop ;
 
