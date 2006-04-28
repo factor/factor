@@ -23,12 +23,7 @@ H{ } clone help-graph set-global xref-articles
 
     "Compiling base..." print flush
 
-    {
-        uncons 1+ 1- + <= > >= mod length
-        nth-unsafe set-nth-unsafe
-        = string>number number>string scan
-        kill-values (generate)
-    } [ compile ] each
+    { "kernel" "sequences" "assembler" } compile-vocabs
 
     "Compiling system..." print flush
     compile-all

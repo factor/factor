@@ -64,48 +64,54 @@ math-internals sequences strings test words ;
 [ 11 ] [ 12 [ 7 fixnum-bitxor ] compile-1 ] unit-test
 [ 11 ] [ [ 12 7 fixnum-bitxor ] compile-1 ] unit-test
 
-[ f ] [ 12 7 [ fixnum< ] compile-1 ] unit-test
-[ f ] [ 12 [ 7 fixnum< ] compile-1 ] unit-test
-[ f ] [ [ 12 7 fixnum< ] compile-1 ] unit-test
-[ f ] [ [ 12 12 fixnum< ] compile-1 ] unit-test
+[ f ] [ 12 7 [ fixnum< [ t ] [ f ] if ] compile-1 ] unit-test
+[ f ] [ 12 [ 7 fixnum< [ t ] [ f ] if ] compile-1 ] unit-test
+[ f ] [ [ 12 7 fixnum< [ t ] [ f ] if ] compile-1 ] unit-test
+[ f ] [ [ 12 12 fixnum< [ t ] [ f ] if ] compile-1 ] unit-test
+[ f ] [ 12 12 [ fixnum< [ t ] [ f ] if ] compile-1 ] unit-test
 
-[ t ] [ 12 70 [ fixnum< ] compile-1 ] unit-test
-[ t ] [ 12 [ 70 fixnum< ] compile-1 ] unit-test
-[ t ] [ [ 12 70 fixnum< ] compile-1 ] unit-test
+[ t ] [ 12 70 [ fixnum< [ t ] [ f ] if ] compile-1 ] unit-test
+[ t ] [ 12 [ 70 fixnum< [ t ] [ f ] if ] compile-1 ] unit-test
+[ t ] [ [ 12 70 fixnum< [ t ] [ f ] if ] compile-1 ] unit-test
 
-[ f ] [ 12 7 [ fixnum<= ] compile-1 ] unit-test
-[ f ] [ 12 [ 7 fixnum<= ] compile-1 ] unit-test
-[ f ] [ [ 12 7 fixnum<= ] compile-1 ] unit-test
-[ t ] [ [ 12 12 fixnum<= ] compile-1 ] unit-test
+[ f ] [ 12 7 [ fixnum<= [ t ] [ f ] if ] compile-1 ] unit-test
+[ f ] [ 12 [ 7 fixnum<= [ t ] [ f ] if ] compile-1 ] unit-test
+[ f ] [ [ 12 7 fixnum<= [ t ] [ f ] if ] compile-1 ] unit-test
+[ t ] [ [ 12 12 fixnum<= [ t ] [ f ] if ] compile-1 ] unit-test
+[ t ] [ [ 12 12 fixnum<= [ t ] [ f ] if ] compile-1 ] unit-test
+[ t ] [ 12 12 [ fixnum<= [ t ] [ f ] if ] compile-1 ] unit-test
 
-[ t ] [ 12 70 [ fixnum<= ] compile-1 ] unit-test
-[ t ] [ 12 [ 70 fixnum<= ] compile-1 ] unit-test
-[ t ] [ [ 12 70 fixnum<= ] compile-1 ] unit-test
+[ t ] [ 12 70 [ fixnum<= [ t ] [ f ] if ] compile-1 ] unit-test
+[ t ] [ 12 [ 70 fixnum<= [ t ] [ f ] if ] compile-1 ] unit-test
+[ t ] [ [ 12 70 fixnum<= [ t ] [ f ] if ] compile-1 ] unit-test
 
-[ t ] [ 12 7 [ fixnum> ] compile-1 ] unit-test
-[ t ] [ 12 [ 7 fixnum> ] compile-1 ] unit-test
-[ t ] [ [ 12 7 fixnum> ] compile-1 ] unit-test
-[ f ] [ [ 12 12 fixnum> ] compile-1 ] unit-test
+[ t ] [ 12 7 [ fixnum> [ t ] [ f ] if ] compile-1 ] unit-test
+[ t ] [ 12 [ 7 fixnum> [ t ] [ f ] if ] compile-1 ] unit-test
+[ t ] [ [ 12 7 fixnum> [ t ] [ f ] if ] compile-1 ] unit-test
+[ f ] [ [ 12 12 fixnum> [ t ] [ f ] if ] compile-1 ] unit-test
+[ f ] [ [ 12 12 fixnum> [ t ] [ f ] if ] compile-1 ] unit-test
+[ f ] [ 12 12 [ fixnum> [ t ] [ f ] if ] compile-1 ] unit-test
 
-[ f ] [ 12 70 [ fixnum> ] compile-1 ] unit-test
-[ f ] [ 12 [ 70 fixnum> ] compile-1 ] unit-test
-[ f ] [ [ 12 70 fixnum> ] compile-1 ] unit-test
+[ f ] [ 12 70 [ fixnum> [ t ] [ f ] if ] compile-1 ] unit-test
+[ f ] [ 12 [ 70 fixnum> [ t ] [ f ] if ] compile-1 ] unit-test
+[ f ] [ [ 12 70 fixnum> [ t ] [ f ] if ] compile-1 ] unit-test
 
-[ t ] [ 12 7 [ fixnum>= ] compile-1 ] unit-test
-[ t ] [ 12 [ 7 fixnum>= ] compile-1 ] unit-test
-[ t ] [ [ 12 7 fixnum>= ] compile-1 ] unit-test
-[ t ] [ [ 12 12 fixnum>= ] compile-1 ] unit-test
+[ t ] [ 12 7 [ fixnum>= [ t ] [ f ] if ] compile-1 ] unit-test
+[ t ] [ 12 [ 7 fixnum>= [ t ] [ f ] if ] compile-1 ] unit-test
+[ t ] [ [ 12 7 fixnum>= [ t ] [ f ] if ] compile-1 ] unit-test
+[ t ] [ [ 12 12 fixnum>= [ t ] [ f ] if ] compile-1 ] unit-test
+[ t ] [ 12 12 [ fixnum>= [ t ] [ f ] if ] compile-1 ] unit-test
 
-[ f ] [ 12 70 [ fixnum>= ] compile-1 ] unit-test
-[ f ] [ 12 [ 70 fixnum>= ] compile-1 ] unit-test
-[ f ] [ [ 12 70 fixnum>= ] compile-1 ] unit-test
+[ f ] [ 12 70 [ fixnum>= [ t ] [ f ] if ] compile-1 ] unit-test
+[ f ] [ 12 [ 70 fixnum>= [ t ] [ f ] if ] compile-1 ] unit-test
+[ f ] [ [ 12 70 fixnum>= [ t ] [ f ] if ] compile-1 ] unit-test
 
-[ f ] [ 1 2 [ eq? ] compile-1 ] unit-test
-[ f ] [ 1 [ 2 eq? ] compile-1 ] unit-test
-[ f ] [ [ 1 2 eq? ] compile-1 ] unit-test
-[ t ] [ 3 3 [ eq? ] compile-1 ] unit-test
-[ t ] [ 3 [ 3 eq? ] compile-1 ] unit-test
-[ t ] [ [ 3 3 eq? ] compile-1 ] unit-test
+[ f ] [ 1 2 [ eq? [ t ] [ f ] if ] compile-1 ] unit-test
+[ f ] [ 1 [ 2 eq? [ t ] [ f ] if ] compile-1 ] unit-test
+[ f ] [ [ 1 2 eq? [ t ] [ f ] if ] compile-1 ] unit-test
+[ t ] [ 3 3 [ eq? [ t ] [ f ] if ] compile-1 ] unit-test
+[ t ] [ 3 [ 3 eq? [ t ] [ f ] if ] compile-1 ] unit-test
+[ t ] [ [ 3 3 eq? [ t ] [ f ] if ] compile-1 ] unit-test
 
 [ -1 ] [ 0 [ fixnum-bitnot ] compile-1 ] unit-test
 [ -1 ] [ [ 0 fixnum-bitnot ] compile-1 ] unit-test

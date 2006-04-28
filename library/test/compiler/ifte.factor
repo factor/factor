@@ -96,6 +96,7 @@ DEFER: countdown-b
 [ 3 ] [ f dummy-unless-3 ] unit-test
 [ 4 ] [ 4 dummy-unless-3 ] unit-test
 
+! Test cond expansion
 [ "even" ] [
     [
         2 {

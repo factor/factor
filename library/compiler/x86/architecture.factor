@@ -7,10 +7,6 @@ sequences words ;
 ! ESI datastack
 ! EBX callstack
 
-: fixnum-imm? ( -- ? )
-    #! Can fixnum operations take immediate operands?
-    t ; inline
-
 : ds-reg ESI ; inline
 : cs-reg EBX ; inline
 : remainder-reg EDX ; inline

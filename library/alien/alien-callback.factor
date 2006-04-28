@@ -32,35 +32,34 @@ M: alien-callback-error summary ( error -- )
 ] "infer" set-word-prop
 
 : box-parameters ( parameters -- )
-    [ box-parameter ] map-parameters % ;
+    [ box-parameter ] each-parameter ;
 
 : registers>objects ( parameters -- )
-    dup \ %freg>stack move-parameters %
-    "nest_stacks" f %alien-invoke , box-parameters ;
+    dup \ %freg>stack move-parameters
+    "nest_stacks" f %alien-invoke box-parameters ;
 
 : unbox-return ( node -- )
     alien-callback-return [
-        "unnest_stacks" f %alien-invoke ,
+        "unnest_stacks" f %alien-invoke
     ] [
         c-type [
             "reg-class" get
             "unboxer-function" get
-            %callback-value ,
+            %callback-value
         ] bind
     ] if-void ;
 
-: linearize-callback ( node -- )
-    dup alien-callback-xt [
-        dup stack-reserve* %prologue ,
+: generate-callback ( node -- )
+    [ alien-callback-xt ] keep [
         dup alien-callback-parameters registers>objects
         dup alien-callback-quot \ init-error-handler swons
-        %alien-callback ,
+        %alien-callback
         unbox-return
-        %return ,
-    ] make-linear ;
+        %return
+    ] generate-block ;
 
-M: alien-callback linearize* ( node -- )
-    end-basic-block compile-gc linearize-callback iterate-next ;
+M: alien-callback generate-node ( node -- )
+    end-basic-block compile-gc generate-callback iterate-next ;
 
 M: alien-callback stack-reserve*
     alien-callback-parameters stack-space ;

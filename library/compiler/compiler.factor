@@ -5,23 +5,21 @@ USING: errors hashtables inference io kernel lists math
 namespaces optimizer prettyprint sequences test words ;
 
 : (compile) ( word -- )
-    #! Should be called inside the with-compiler scope.
-    dup word-def dataflow optimize linearize
-    [ generate ] hash-each ;
-
-: benchmark-compile
-    [ [ (compile) ] keep ] benchmark nip
+    [
+        [
+            dup word-def dataflow optimize generate
+        ] keep
+    ] benchmark nip
     "compile-time" set-word-prop ;
 
 : inform-compile ( word -- ) "Compiling " write . flush ;
 
 : compile-postponed ( -- )
     compile-words get dup empty? [
-        dup pop
-        dup inform-compile
-        benchmark-compile
-        compile-postponed
-    ] unless drop ;
+        drop
+    ] [
+        pop dup inform-compile (compile) compile-postponed
+    ] if ;
 
 : compile ( word -- )
     [ postpone-word compile-postponed ] with-compiler ;

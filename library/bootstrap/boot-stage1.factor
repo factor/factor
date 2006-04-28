@@ -126,12 +126,8 @@ vectors words ;
         "/library/inference/print-dataflow.factor"
 
         "/library/compiler/assembler.factor"
-        "/library/compiler/vops.factor"
         "/library/compiler/templates.factor"
-        "/library/compiler/linearizer.factor"
-        "/library/compiler/stack.factor"
         "/library/compiler/xt.factor"
-        "/library/compiler/intrinsics.factor"
         "/library/compiler/generator.factor"
         "/library/compiler/compiler.factor"
 
@@ -297,11 +293,11 @@ vectors words ;
                 {
                     "/library/compiler/ppc/assembler.factor"
                     "/library/compiler/ppc/architecture.factor"
-                    "/library/compiler/ppc/generator.factor"
-                    "/library/compiler/ppc/slots.factor"
-                    "/library/compiler/ppc/stack.factor"
-                    "/library/compiler/ppc/fixnum.factor"
-                    "/library/compiler/ppc/alien.factor"
+                    ! "/library/compiler/ppc/generator.factor"
+                    ! "/library/compiler/ppc/slots.factor"
+                    ! "/library/compiler/ppc/stack.factor"
+                    ! "/library/compiler/ppc/fixnum.factor"
+                    ! "/library/compiler/ppc/alien.factor"
                 }
             ]
         } {

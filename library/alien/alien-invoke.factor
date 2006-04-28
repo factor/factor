@@ -39,35 +39,35 @@ M: alien-invoke-error summary ( error -- )
     node,
 ] "infer" set-word-prop
 
-: unbox-parameter ( stack# type -- node )
+: unbox-parameter ( stack# type -- )
     c-type [ "reg-class" get "unboxer" get call ] bind ;
 
 : unbox-parameters ( parameters -- )
-    [ unbox-parameter , ] reverse-each-parameter ;
+    [ unbox-parameter ] reverse-each-parameter ;
 
 : objects>registers ( parameters -- )
     #! Generate code for boxing a list of C types, then generate
     #! code for moving these parameters to register on
     #! architectures where parameters are passed in registers
     #! (PowerPC, AMD64).
-    dup unbox-parameters "save_stacks" f %alien-invoke ,
-    \ %stack>freg move-parameters % ;
+    dup unbox-parameters "save_stacks" f %alien-invoke
+    \ %stack>freg move-parameters ;
 
 : box-return ( node -- )
-    alien-invoke-return [ ] [ f swap box-parameter , ] if-void ;
+    alien-invoke-return [ ] [ f swap box-parameter ] if-void ;
 
-: linearize-cleanup ( node -- )
+: generate-cleanup ( node -- )
     dup alien-invoke-library library-abi "stdcall" = [
         drop
     ] [
-        alien-invoke-parameters stack-space %cleanup ,
+        alien-invoke-parameters stack-space %cleanup
     ] if ;
 
-M: alien-invoke linearize* ( node -- )
+M: alien-invoke generate-node ( node -- )
     end-basic-block compile-gc
     dup alien-invoke-parameters objects>registers
-    dup alien-invoke-dlsym %alien-invoke ,
-    dup linearize-cleanup box-return
+    dup alien-invoke-dlsym %alien-invoke
+    dup generate-cleanup box-return
     iterate-next ;
 
 M: alien-invoke stack-reserve*

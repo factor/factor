@@ -34,7 +34,7 @@ GENERIC: <loc> ( n stack -- loc )
     #! instruction here.
     swap [
         phantom-stack-height
-        dup zero? [ 2drop ] [ swap execute , ] if
+        dup zero? [ 2drop ] [ swap execute ] if
         0
     ] keep set-phantom-stack-height ; inline
 
@@ -89,7 +89,7 @@ SYMBOL: phantom-r
 : alloc-reg ( -- n ) free-vregs get pop ;
 
 : stack>vreg ( vreg# loc -- operand )
-    >r <vreg> dup r> %peek , ;
+    >r <vreg> dup r> %peek ;
 
 : stack>new-vreg ( loc -- vreg )
     alloc-reg swap stack>vreg ;
@@ -98,7 +98,7 @@ SYMBOL: phantom-r
     over loc? [
         2drop
     ] [
-        over [ %replace , ] [ 2drop ] if
+        over [ %replace ] [ 2drop ] if
     ] if ;
 
 : vregs>stack ( phantom -- )
@@ -257,3 +257,5 @@ SYMBOL: +clobber
 : with-template ( quot spec -- )
     fix-spec [ template-inputs call template-outputs ] bind
     compute-free-vregs ; inline
+
+: operand ( var -- op ) get v>operand ; inline

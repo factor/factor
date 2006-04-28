@@ -42,3 +42,8 @@ full-gc
 : foo dup [ dup [ ] [ ] if drop ] [ drop ] if ; compiled
 
 [ 10 ] [ 10 2 foo ] unit-test
+
+: foox dup [ foox ] when ; inline
+: bar foox ;
+
+[ ] [ \ bar compile ] unit-test

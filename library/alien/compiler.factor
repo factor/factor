@@ -36,22 +36,22 @@ kernel-internals math namespaces sequences words ;
         [ c-size cell / "void*" <array> ] [ 1array ] if
     ] map concat ;
 
+: each-parameter ( parameters quot -- )
+    >r [ parameter-sizes ] keep r> 2each ; inline
+
 : reverse-each-parameter ( parameters quot -- )
     >r [ parameter-sizes ] keep
     [ reverse-slice ] 2apply r> 2each ; inline
 
-: map-parameters ( parameters quot -- seq )
-    >r [ parameter-sizes ] keep r> 2map ; inline
-
-: move-parameters ( params vop -- seq )
+: move-parameters ( params vop -- )
     #! Moves values from C stack to registers (if vop is
     #! %stack>freg) and registers to C stack (if vop is
     #! %freg>stack).
     swap [
         flatten-value-types
         0 { int-regs float-regs stack-params } [ set ] each-with
-        [ pick >r alloc-parameter r> execute ] map-parameters
-        nip
+        [ pick >r alloc-parameter r> execute ] each-parameter
+        drop
     ] with-scope ; inline
 
 : box-parameter ( stack# type -- node )

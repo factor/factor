@@ -5,6 +5,13 @@ USING: assembler errors generic hashtables kernel
 kernel-internals lists math namespaces prettyprint sequences
 strings vectors words ;
 
+: <label> ( -- label )
+    #! Make a label.
+    gensym  dup t "label" set-word-prop ;
+
+: label? ( obj -- ? )
+    dup word? [ "label" word-prop ] [ drop f ] if ;
+
 ! We use a hashtable "compiled-xts" that maps words to
 ! xt's that are currently being compiled. The commit-xt's word
 ! sets the xt of each word in the hashtable to the value in the
@@ -170,7 +177,6 @@ SYMBOL: compile-words
     #! added to the list of words to be compiled.
     dup compiled?
     over label? or
-    over linearized get ?hash or
     over compile-words get member? or
     swap compiled-xts get hash or ;
 

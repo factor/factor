@@ -10,10 +10,6 @@ kernel-internals math namespaces sequences ;
 ! R14 datastack
 ! R15 callstack
 
-: fixnum-imm? ( -- ? )
-    #! Can fixnum operations take immediate operands?
-    f ; inline
-
 : ds-reg R14 ; inline
 : cs-reg R15 ; inline
 : remainder-reg RDX ; inline

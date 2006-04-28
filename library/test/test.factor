@@ -104,7 +104,7 @@ SYMBOL: failures
         "compiler/simple" "compiler/templates"
         "compiler/stack" "compiler/ifte"
         "compiler/generic" "compiler/bail-out"
-        "compiler/linearizer" "compiler/intrinsics"
+        "compiler/intrinsics"
         "compiler/identities" "compiler/optimizer"
         "compiler/alien" "compiler/callbacks"
     } run-tests ;
