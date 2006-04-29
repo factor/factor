@@ -1,5 +1,5 @@
-! Copyright (C) 2004, 2005 Slava Pestov.
-! See http://factor.sf.net/license.txt for BSD license.
+! Copyright (C) 2004, 2006 Slava Pestov.
+! See http://factorcode.org/license.txt for BSD license.
 IN: io-internals
 USING: alien arrays errors generic hashtables io kernel
 kernel-internals lists math parser queues sequences strings
