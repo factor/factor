@@ -1,8 +1,8 @@
 ! Copyright (C) 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
-IN: assembler
 USING: arrays compiler errors generic kernel kernel-internals
 lists math namespaces parser sequences words ;
+IN: assembler
 
 ! A postfix assembler for x86 and AMD64.
 

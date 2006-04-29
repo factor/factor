@@ -27,8 +27,8 @@ M: float-regs pop-return-reg
 M: float-regs load-return-reg
     reg-size >r ESP swap [+] r> FLD ;
 
-M: %unbox generate-node
-    drop 2 input f compile-c-call  1 input push-return-reg ;
+: %unbox ( n reg-class func -- )
+    f %alien-invoke push-return-reg drop ;
 
 : struct-ptr/size ( size func -- )
     ! Load struct size
