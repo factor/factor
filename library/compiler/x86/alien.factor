@@ -63,7 +63,7 @@ M: float-regs load-return-reg
     drop-return-reg ;
 
 : %alien-callback ( quot -- )
-    EAX swap load-literal
+    T{ vreg f 0 } load-literal
     EAX PUSH
     "run_callback" f %alien-invoke
     EAX POP ;
@@ -76,6 +76,6 @@ M: float-regs load-return-reg
     ! Restore data/callstacks
     "unnest_stacks" f %alien-invoke
     ! Restore return register
-    dup pop-return-reg ;
+    pop-return-reg ;
 
 : %cleanup ( n -- ) dup zero? [ drop ] [ ESP swap ADD ] if ;

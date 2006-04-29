@@ -1,8 +1,8 @@
 ! Copyright (C) 2005, 2006 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-IN: compiler
 USING: alien arrays assembler generic kernel kernel-internals
 math memory namespaces sequences words ;
+IN: compiler
 
 ! x86 register assignments
 ! EAX, ECX, EDX vregs
@@ -44,9 +44,11 @@ M: float-regs fastcall-regs drop { } ;
 
 : prepare-division CDQ ; inline
 
-M: immediate load-literal ( dest literal -- ) address MOV ;
+M: immediate load-literal ( literal vreg -- )
+    v>operand swap address MOV ;
 
-M: object load-literal ( dest literal -- )
+M: object load-literal ( literal vreg -- )
+    v>operand swap
     add-literal [] MOV rel-absolute-cell rel-address ;
 
 : (%call) ( label -- label )
@@ -70,8 +72,8 @@ M: object load-literal ( dest literal -- )
     ! Add to jump table base. We use a temporary register since
     ! on AMD4 we have to load a 64-bit immediate. On x86, this
     ! is redundant.
-    "scratch" get HEX: ffffffff MOV "end" get absolute-cell
-    "n" operand "scratch" get ADD
+    "scratch" operand HEX: ffffffff MOV "end" get absolute-cell
+    "n" operand "scratch" operand ADD
     ! Jump to jump table entry
     "n" operand [] JMP
     ! Align for better performance
@@ -85,7 +87,7 @@ M: object load-literal ( dest literal -- )
 
 : %replace ( vreg loc -- ) swap %peek ;
 
-: (%inc) cells dup 0 > [ ADD ] [ neg SUB ] if ;
+: (%inc) swap cells dup 0 > [ ADD ] [ neg SUB ] if ;
 
 : %inc-d ( n -- ) ds-reg (%inc) ;
 
