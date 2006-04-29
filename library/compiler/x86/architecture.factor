@@ -2,24 +2,24 @@
 ! See http://factorcode.org/license.txt for BSD license.
 IN: compiler
 USING: alien arrays assembler generic kernel kernel-internals
-math namespaces sequences words ;
+math memory namespaces sequences words ;
 
 ! x86 register assignments
 ! EAX, ECX, EDX vregs
 ! ESI datastack
 ! EBX callstack
 
+! AMD64 redefines these four
 : ds-reg ESI ; inline
 : cs-reg EBX ; inline
+: remainder-reg EDX ; inline
+: vregs { EAX ECX EDX } ; inline
+
 : reg-stack ( n reg -- op ) swap cells neg [+] ;
 
 M: ds-loc v>operand ds-loc-n ds-reg reg-stack ;
 
 M: cs-loc v>operand cs-loc-n cs-reg reg-stack ;
-
-: remainder-reg EDX ; inline
-
-: vregs { EAX ECX EDX } ; inline
 
 : %alien-invoke ( symbol dll -- )
     2dup dlsym CALL rel-relative rel-dlsym ;
@@ -44,8 +44,7 @@ M: float-regs fastcall-regs drop { } ;
 
 : prepare-division CDQ ; inline
 
-M: immediate load-literal ( dest literal -- )
-    address MOV ;
+M: immediate load-literal ( dest literal -- ) address MOV ;
 
 M: object load-literal ( dest literal -- )
     add-literal [] MOV rel-absolute-cell rel-address ;
@@ -59,8 +58,7 @@ M: object load-literal ( dest literal -- )
 
 : %jump-label ( label -- ) JMP ;
 
-: %jump-t ( label -- )
-    "flag" operand f v>operand CMP JNE ;
+: %jump-t ( label -- ) "flag" operand f v>operand CMP JNE ;
 
 : %dispatch ( -- )
     #! Compile a piece of code that jumps to an offset in a
@@ -87,7 +85,7 @@ M: object load-literal ( dest literal -- )
 
 : %replace ( vreg loc -- ) swap %peek ;
 
-: (%inc) 0 input cells dup 0 > [ ADD ] [ neg SUB ] if ;
+: (%inc) cells dup 0 > [ ADD ] [ neg SUB ] if ;
 
 : %inc-d ( n -- ) ds-reg (%inc) ;
 
