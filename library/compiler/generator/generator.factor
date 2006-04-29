@@ -117,7 +117,7 @@ M: #label generate-node ( node -- next )
 M: #if generate-node ( node -- next )
     [
         end-basic-block
-        <label> dup "flag" get %jump-t
+        <label> dup %jump-t
     ] H{
         { +input { { 0 "flag" } } }
     } with-template generate-if ;
@@ -153,8 +153,10 @@ M: #call-label generate-node ( node -- next )
 : dispatch-head ( node -- label/node )
     #! Output the jump table insn and return a list of
     #! label/branch pairs.
-    [ end-basic-block "n" get %dispatch ]
-    H{ { +input { { 0 "n" } } } } with-template
+    [ end-basic-block %dispatch ] H{
+        { +input { { f "n" } } }
+        { +scratch { { f "scratch" } } }
+    } with-template
     node-children [ <label> dup target-label 2array ] map ;
 
 : dispatch-body ( label/node -- )

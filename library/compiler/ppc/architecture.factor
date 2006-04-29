@@ -69,17 +69,18 @@ M: object load-literal ( literal vreg -- )
 : %jump ( label -- )
     %epilogue dup postpone-word %jump-label ;
 
-: %jump-t ( label vreg -- )
-    0 swap v>operand f address CMPI BNE ;
+: %jump-t ( label -- )
+    0 "flag" operand f address CMPI BNE ;
 
-: %dispatch ( vreg -- )
-    v>operand dup dup 1 SRAWI
+: %dispatch ( -- )
+    "n" operand dup 1 SRAWI
     ! The value 24 is a magic number. It is the length of the
     ! instruction sequence that follows to be generated.
-    compiled-offset 24 + 11 LOAD32  rel-2/2 rel-address
-    dup dup 11 ADD
-    dup dup 0 LWZ
-    MTLR
+    compiled-offset 24 + "scratch" operand LOAD32
+    rel-2/2 rel-address
+    "n" operand dup "scratch" operand ADD
+    "n" operand dup 0 LWZ
+    "n" operand MTLR
     BLR ;
 
 : %return ( -- ) %epilogue BLR ;

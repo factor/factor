@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 IN: compiler
 USING: alien arrays assembler generic kernel kernel-internals
-math sequences words ;
+math namespaces sequences words ;
 
 ! x86 register assignments
 ! EAX, ECX, EDX vregs
@@ -59,24 +59,23 @@ M: object load-literal ( dest literal -- )
 
 : %jump-label ( label -- ) JMP ;
 
-: %jump-t ( label vreg -- )
-    v>operand f v>operand CMP JNE ;
+: %jump-t ( label -- )
+    "flag" operand f v>operand CMP JNE ;
 
-: %dispatch ( vreg -- )
+: %dispatch ( -- )
     #! Compile a piece of code that jumps to an offset in a
     #! jump table indexed by the fixnum at the top of the stack.
     #! The jump table must immediately follow this macro.
-    drop
     <label> "end" set
     ! Untag and multiply to get a jump table offset
-    dup fixnum>slot@
+    "n" operand fixnum>slot@
     ! Add to jump table base. We use a temporary register since
     ! on AMD4 we have to load a 64-bit immediate. On x86, this
     ! is redundant.
-    0 scratch HEX: ffffffff MOV "end" get absolute-cell
-    dup 0 scratch ADD
+    "scratch" get HEX: ffffffff MOV "end" get absolute-cell
+    "n" operand "scratch" get ADD
     ! Jump to jump table entry
-    dup [] JMP
+    "n" operand [] JMP
     ! Align for better performance
     compile-aligned
     ! Fix up jump table pointer

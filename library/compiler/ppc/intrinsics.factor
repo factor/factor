@@ -1,8 +1,8 @@
 ! Copyright (C) 2005, 2006 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 IN: compiler
-USING: assembler kernel kernel-internals math math-internals
-namespaces sequences ;
+USING: alien assembler kernel kernel-internals math
+math-internals namespaces sequences words ;
 
 : untag ( dest src -- ) 0 0 31 tag-bits - RLWINM ;
 
@@ -11,11 +11,12 @@ namespaces sequences ;
 : untag-fixnum ( src dest -- ) tag-bits SRAWI ;
 
 \ tag [
-    "in" operand dup tag-mask ANDI
-    "in" operand dup tag-fixnum
+    "in" operand "out" operand tag-mask ANDI
+    "out" operand dup tag-fixnum
 ] H{
     { +input { { f "in" } } }
-    { +output { "in" } }
+    { +scratch { { f "out" } } }
+    { +output { "out" } }
 } define-intrinsic
 
 : generate-slot ( size quot -- )
@@ -43,6 +44,42 @@ namespaces sequences ;
     { +output { "obj" } }
 } define-intrinsic
 
+: generate-set-slot ( size quot -- )
+    >r >r
+    ! turn tagged fixnum slot # into an offset, multiple of 4
+    "slot" operand dup tag-bits r> - SRAWI
+    ! compute slot address in 1st input
+    "slot" operand dup "obj" operand ADD
+    ! store new slot value
+    "val" operand "slot" operand r> call ; inline
+
+: generate-write-barrier ( -- )
+    #! Mark the card pointed to by vreg.
+    "obj" operand dup card-bits SRAWI
+    "obj" operand dup 16 ADD
+    "x" operand "obj" operand 0 LBZ
+    "x" operand dup card-mark ORI
+    "x" operand "obj" operand 0 STB ;
+
+\ set-slot [
+    "obj" operand dup untag
+    cell log2 [ 0 STW ] generate-set-slot generate-write-barrier
+] H{
+    { +input { { f "val" } { f "obj" } { f "slot" } } }
+    { +scratch { { f "x" } } }
+    { +clobber { "obj" } }
+} define-intrinsic
+
+\ set-char-slot [
+    ! untag the new value in 0th input
+    "val" operand dup untag-fixnum
+    1 [ string-offset STH ] generate-set-slot
+] H{
+    { +input { { f "val" } { f "slot" } { f "obj" } } }
+    { +scratch { { f "x" } } }
+    { +clobber { "obj" } }
+} define-intrinsic
+
 : define-binary-op ( word op -- )
     [ [ "x" operand "y" operand "x" operand ] % , ] [ ] make H{
         { +input { { f "x" } { f "y" } } }
@@ -58,6 +95,23 @@ namespaces sequences ;
 } [
     first2 define-binary-op
 ] each
+
+: generate-fixnum-mod
+    #! PowerPC doesn't have a MOD instruction; so we compute
+    #! x-(x/y)*y. Puts the result in "s" operand.
+    "s" operand "r" operand "y" operand MULLW
+    "s" operand "s" operand "x" operand SUBF ;
+
+\ fixnum-mod [
+    ! divide x by y, store result in x
+    "r" operand "x" operand "y" operand DIVW
+    generate-fixnum-mod
+    "x" operand "s" operand MR
+] H{
+    { +input { { f "x" } { f "y" } } }
+    { +scratch { { f "r" } { f "s" } } }
+    { +output { "x" } }
+} define-intrinsic
 
 \ fixnum-bitnot [
     "x" operand dup NOT
@@ -83,143 +137,163 @@ namespaces sequences ;
     first2 define-binary-jump
 ] each
 
-! M: %type generate-node ( vop -- )
-!     drop
-!     <label> "f" set
-!     <label> "end" set
-!     ! Get the tag
-!     0 input-operand 1 scratch tag-mask ANDI
-!     ! Tag the tag
-!     1 scratch 0 scratch tag-fixnum
-!     ! Compare with object tag number (3).
-!     0 1 scratch object-tag CMPI
-!     ! Jump if the object doesn't store type info in its header
-!     "end" get BNE
-!     ! It does store type info in its header
-!     ! Is the pointer itself equal to 3? Then its F_TYPE (9).
-!     0 0 input-operand object-tag CMPI
-!     "f" get BEQ
-!     ! The pointer is not equal to 3. Load the object header.
-!     0 scratch 0 input-operand object-tag neg LWZ
-!     0 scratch dup untag
-!     "end" get B
-!     "f" get save-xt
-!     ! The pointer is equal to 3. Load F_TYPE (9).
-!     f type tag-bits shift 0 scratch LI
-!     "end" get save-xt
-!     0 output-operand 0 scratch MR ;
-! 
-! : generate-set-slot ( size quot -- )
-!     >r >r
-!     ! turn tagged fixnum slot # into an offset, multiple of 4
-!     2 input-operand dup tag-bits r> - SRAWI
-!     ! compute slot address in 1st input
-!     2 input-operand dup 1 input-operand ADD
-!     ! store new slot value
-!     0 input-operand 2 input-operand r> call ; inline
-! 
-! M: %set-slot generate-node ( vop -- )
-!     drop cell log2 [ 0 STW ] generate-set-slot ;
-! 
-! M: %write-barrier generate-node ( vop -- )
-!     #! Mark the card pointed to by vreg.
-!     drop
-!     0 input-operand dup card-bits SRAWI
-!     0 input-operand dup 16 ADD
-!     0 scratch 0 input-operand 0 LBZ
-!     0 scratch dup card-mark ORI
-!     0 scratch 0 input-operand 0 STB ;
-! 
-! : simple-overflow ( inv word -- )
-!     >r >r
-!     <label> "end" set
-!     "end" get BNO
-!     >3-vop< r> execute
-!     0 input-operand dup untag-fixnum
-!     1 input-operand dup untag-fixnum
-!     >3-vop< r> execute
-!     "s48_long_to_bignum" f compile-c-call
-!     ! An untagged pointer to the bignum is now in r3; tag it
-!     0 output-operand dup bignum-tag ORI
-!     "end" get save-xt ; inline
-! 
-! M: %fixnum+ generate-node ( vop -- )
-!     drop 0 MTXER >3-vop< ADDO. \ SUBF \ ADD simple-overflow ;
-! 
-! M: %fixnum- generate-node ( vop -- )
-!     drop 0 MTXER >3-vop< SUBFO. \ ADD \ SUBF simple-overflow ;
-! 
-! M: %fixnum* generate-node ( vop -- )
-!     #! Note that this assumes the output will be in r3.
-!     drop
-!     <label> "end" set
-!     1 input-operand dup untag-fixnum
-!     0 MTXER
-!     0 scratch 0 input-operand 1 input-operand MULLWO.
-!     "end" get BNO
-!     1 scratch 0 input-operand 1 input-operand MULHW
-!     4 1 scratch MR
-!     3 0 scratch MR
-!     "s48_fixnum_pair_to_bignum" f compile-c-call
-!     ! now we have to shift it by three bits to remove the second
-!     ! tag
-!     tag-bits neg 4 LI
-!     "s48_bignum_arithmetic_shift" f compile-c-call
-!     ! An untagged pointer to the bignum is now in r3; tag it
-!     0 output-operand 0 scratch bignum-tag ORI
-!     "end" get save-xt
-!     0 output-operand 0 scratch MR ;
-! 
-! : generate-fixnum/i
-!     #! This VOP is funny. If there is an overflow, it falls
-!     #! through to the end, and the result is in 0 output-operand.
-!     #! Otherwise it jumps to the "no-overflow" label and the
-!     #! result is in 0 scratch.
-!     0 scratch 1 input-operand 0 input-operand DIVW
-!     ! if the result is greater than the most positive fixnum,
-!     ! which can only ever happen if we do
-!     ! most-negative-fixnum -1 /i, then the result is a bignum.
-!     <label> "end" set
-!     <label> "no-overflow" set
-!     most-positive-fixnum 1 scratch LOAD
-!     0 scratch 0 1 scratch CMP
-!     "no-overflow" get BLE
-!     most-negative-fixnum neg 3 LOAD
-!     "s48_long_to_bignum" f compile-c-call
-!     3 dup bignum-tag ORI ;
-! 
-! M: %fixnum/i generate-node ( vop -- )
-!     #! This has specific vreg requirements.
-!     drop
-!     generate-fixnum/i
-!     "end" get B
-!     "no-overflow" get save-xt
-!     0 scratch 0 output-operand tag-fixnum
-!     "end" get save-xt ;
-! 
-! : generate-fixnum-mod
-!     #! PowerPC doesn't have a MOD instruction; so we compute
-!     #! x-(x/y)*y. Puts the result in 1 scratch.
-!     1 scratch 0 scratch 0 input-operand MULLW
-!     1 scratch 1 scratch 1 input-operand SUBF ;
-! 
-! M: %fixnum-mod generate-node ( vop -- )
-!     drop
-!     ! divide in2 by in1, store result in out1
-!     0 scratch 1 input-operand 0 input-operand DIVW
-!     generate-fixnum-mod
-!     0 output-operand 1 scratch MR ;
-! 
-! M: %fixnum/mod generate-node ( vop -- )
-!     #! This has specific vreg requirements. Note: if there's an
-!     #! overflow, (most-negative-fixnum 1 /mod) the modulus is
-!     #! always zero.
-!     drop
-!     generate-fixnum/i
-!     0 0 output-operand LI
-!     "end" get B
-!     "no-overflow" get save-xt
-!     generate-fixnum-mod
-!     0 scratch 1 output-operand tag-fixnum
-!     0 output-operand 1 scratch MR
-!     "end" get save-xt ;
+\ type [
+    <label> "f" set
+    <label> "end" set
+    ! Get the tag
+    "obj" operand "y" operand tag-mask ANDI
+    ! Tag the tag
+    "y" operand "x" operand tag-fixnum
+    ! Compare with object tag number (3).
+    0 "y" operand object-tag CMPI
+    ! Jump if the object doesn't store type info in its header
+    "end" get BNE
+    ! It does store type info in its header
+    ! Is the pointer itself equal to 3? Then its F_TYPE (9).
+    0 "obj" operand object-tag CMPI
+    "f" get BEQ
+    ! The pointer is not equal to 3. Load the object header.
+    "x" operand "obj" operand object-tag neg LWZ
+    "x" operand dup untag
+    "end" get B
+    "f" get save-xt
+    ! The pointer is equal to 3. Load F_TYPE (9).
+    f type tag-bits shift "x" operand LI
+    "end" get save-xt
+] H{
+    { +input { { f "obj" } } }
+    { +scratch { { f "x" } { f "y" } } }
+    { +output { "x" } }
+} define-intrinsic
+
+: simple-overflow ( word -- )
+    >r
+    <label> "end" set
+    "end" get BNO
+    { "x" "y" } [ operand ] map prune [ dup untag-fixnum ] each
+    3 "y" operand "x" operand r> execute
+    "s48_long_to_bignum" f %alien-invoke
+    ! An untagged pointer to the bignum is now in r3; tag it
+    3 "r" operand bignum-tag ORI
+    "end" get save-xt ; inline
+
+\ fixnum+ [
+    finalize-contents
+    0 MTXER
+    "r" operand "y" operand "x" operand ADDO.
+    \ ADD simple-overflow
+] H{
+    { +input { { f "x" } { f "y" } } }
+    { +scratch { { f "r" } } }
+    { +output { "r" } }
+} define-intrinsic
+
+\ fixnum- [
+    finalize-contents
+    0 MTXER
+    "r" operand "y" operand "x" operand SUBFO.
+    \ SUBF simple-overflow
+] H{
+    { +input { { f "x" } { f "y" } } }
+    { +scratch { { f "r" } } }
+    { +output { "r" } }
+} define-intrinsic
+
+: ?MR 2dup = [ 2drop ] [ MR ] if ;
+
+\ fixnum* [
+    finalize-contents
+    <label> "end" set
+    "r" operand "x" operand untag-fixnum
+    0 MTXER
+    11 "y" operand "r" operand MULLWO.
+    "end" get BNO
+    4 "y" operand "r" operand MULHW
+    3 11 ?MR
+    "s48_fixnum_pair_to_bignum" f %alien-invoke
+    ! now we have to shift it by three bits to remove the second
+    ! tag
+    tag-bits neg 4 LI
+    "s48_bignum_arithmetic_shift" f %alien-invoke
+    ! An untagged pointer to the bignum is now in r3; tag it
+    3 11 bignum-tag ORI
+    "end" get save-xt
+    "s" operand 11 MR
+] H{
+    { +input { { f "x" } { f "y" } } }
+    { +scratch { { f "r" } { f "s" } } }
+    { +output { "s" } }
+} define-intrinsic
+
+: generate-fixnum/i
+    #! This VOP is funny. If there is an overflow, it falls
+    #! through to the end, and the result is in "x" operand.
+    #! Otherwise it jumps to the "no-overflow" label and the
+    #! result is in "r" operand.
+    <label> "end" set
+    <label> "no-overflow" set
+    "r" operand "x" operand "y" operand DIVW
+    ! if the result is greater than the most positive fixnum,
+    ! which can only ever happen if we do
+    ! most-negative-fixnum -1 /i, then the result is a bignum.
+    most-positive-fixnum "s" operand LOAD
+    "r" operand 0 "s" operand CMP
+    "no-overflow" get BLE
+    most-negative-fixnum neg 3 LOAD
+    "s48_long_to_bignum" f %alien-invoke
+    "x" operand 3 bignum-tag ORI ;
+
+\ fixnum/i [
+    finalize-contents
+    generate-fixnum/i
+    "end" get B
+    "no-overflow" get save-xt
+    "r" operand "x" operand tag-fixnum
+    "end" get save-xt
+] H{
+    { +input { { f "x" } { f "y" } } }
+    { +scratch { { f "r" } { f "s" } } }
+    { +output { "x" } }
+} define-intrinsic
+
+\ fixnum/mod [
+    finalize-contents
+    generate-fixnum/i
+    0 "s" operand LI
+    "end" get B
+    "no-overflow" get save-xt
+    generate-fixnum-mod
+    "r" operand "x" operand tag-fixnum
+    "end" get save-xt
+] H{
+    { +input { { f "x" } { f "y" } } }
+    { +scratch { { f "r" } { f "s" } } }
+    { +output { "x" "s" } }
+} define-intrinsic
+
+: userenv ( reg -- )
+    #! Load the userenv pointer in a register.
+    "userenv" f dlsym swap LOAD32 0 rel-2/2 rel-userenv ;
+
+\ getenv [
+    "n" operand dup 1 SRAWI
+    "x" operand userenv
+    "x" operand "n" operand "x" operand ADD
+    "x" operand dup 0 LWZ
+] H{
+    { +input { { f "n" } } }
+    { +scratch { { f "x" } } }
+    { +output { "x" } }
+    { +clobber { "n" } }
+} define-intrinsic
+
+\ setenv [
+    "n" operand dup 1 SRAWI
+    "x" operand userenv
+    "x" operand "n" operand "x" operand ADD
+    "val" operand "x" operand 0 STW
+] H{
+    { +input { { f "val" } { f "n" } } }
+    { +scratch { { f "x" } } }
+    { +clobber { "n" } }
+} define-intrinsic

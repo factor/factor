@@ -1,8 +1,8 @@
 should fix in 0.82:
 
+- type inference busted for tuple constructors
 - constant branch folding
-- getenv, setenv, fast-slot stuff
-- more flexible fixnum intrinsics
+- fast-slot stuff
 - compile if-intrinsic even if there is no #if there
 - 3 >n fep
 - amd64 %box-struct
@@ -13,7 +13,6 @@ should fix in 0.82:
 - speed up ideas:
   - only do clipping for certain gadgets
   - use glRect
-- cocoa: global menu bar with useful commands
 
 + portability:
 

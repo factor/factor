@@ -4,7 +4,26 @@ IN: compiler
 USING: arrays generic hashtables inference io kernel math
 namespaces prettyprint sequences vectors words ;
 
+! Register allocation
 SYMBOL: free-vregs
+
+: alloc-reg ( -- n )
+    free-vregs get pop ;
+
+: alloc-reg# ( n -- regs )
+    free-vregs [ cut ] change ;
+
+: requested-vregs ( template -- n )
+    0 [ [ 1+ ] unless ] reduce ;
+
+: template-vreg# ( template template -- n )
+    [ requested-vregs ] 2apply + ;
+
+: alloc-vregs ( template -- template )
+    [ first [ alloc-reg ] unless* ] map ;
+
+: adjust-free-vregs ( seq -- )
+    free-vregs [ diff ] change ;
 
 ! A data stack location.
 TUPLE: ds-loc n ;
@@ -86,8 +105,6 @@ SYMBOL: phantom-r
 : finalize-heights ( -- )
     phantoms [ finalize-height ] 2apply ;
 
-: alloc-reg ( -- n ) free-vregs get pop ;
-
 : stack>vreg ( vreg# loc -- operand )
     >r <vreg> dup r> %peek ;
 
@@ -143,18 +160,6 @@ SYMBOL: phantom-r
     used-vregs vregs length reverse diff
     >vector free-vregs set ;
 
-: requested-vregs ( template -- n )
-    0 [ [ 1+ ] unless ] reduce ;
-
-: template-vreg# ( template template -- n )
-    [ requested-vregs ] 2apply + ;
-
-: alloc-regs ( template -- template )
-    [ [ alloc-reg ] unless* ] map ;
-
-: alloc-reg# ( n -- regs )
-    free-vregs [ cut ] change ;
-
 : additional-vregs# ( seq seq -- n )
     2array phantoms 2array [ [ length ] map ] 2apply v-
     0 [ 0 max + ] reduce ;
@@ -176,8 +181,7 @@ SYMBOL: phantom-r
 
 : stack>vregs ( phantom template -- values )
     [
-        [ first ] map alloc-regs
-        dup length rot phantom-locs
+        alloc-vregs dup length rot phantom-locs
         [ stack>vreg ] 2map
     ] 2keep length neg swap adjust-phantom ;
 
@@ -226,8 +230,6 @@ SYMBOL: +clobber
         { +clobber { } }
     } swap hash-union ;
 
-: adjust-free-vregs ( seq -- ) free-vregs [ diff ] change ;
-
 : output-vregs ( -- seq seq )
     +output +clobber [ get [ get ] map ] 2apply ;
 
@@ -236,7 +238,11 @@ SYMBOL: +clobber
     [ swap member? ] contains-with? ;
 
 : slow-input ( template -- )
+    ! Are we loading stuff from the stack? Then flush out
+    ! remaining vregs, not slurped in by fast-input.
     dup empty? [ finalize-contents ] unless
+    ! Do the outputs clash with vregs on the phantom stacks?
+    ! Then we must flush them first.
     outputs-clash? [ finalize-contents ] when
     phantom-d get swap [ stack>vregs ] keep phantom-vregs ;
 
@@ -244,11 +250,23 @@ SYMBOL: +clobber
     +input +scratch [ get [ second get vreg-n ] map ] 2apply
     append ;
 
+: guess-vregs ( -- n )
+    +input get dup { } additional-vregs# +scratch get length + ;
+
+: alloc-scratch ( -- )
+    +scratch get [ alloc-vregs [ <vreg> ] map ] keep
+    phantom-vregs ;
+
 : template-inputs ( -- )
-    +input get dup { } additional-vregs# ensure-vregs
+    ! Ensure we have enough to hold any new stack elements we
+    ! will read (if any), and scratch.
+    guess-vregs ensure-vregs
+    ! Split the template into available (fast) parts and those
+    ! that require allocating registers and reading the stack
     match-template fast-input
     used-vregs adjust-free-vregs
     slow-input
+    alloc-scratch
     input-vregs adjust-free-vregs ;
 
 : template-outputs ( -- )
