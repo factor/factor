@@ -186,6 +186,7 @@ math-internals namespaces sequences words ;
     { +input { { f "x" } { f "y" } } }
     { +scratch { { f "r" } } }
     { +output { "r" } }
+    { +clobber { "x" "y" } }
 } define-intrinsic
 
 \ fixnum- [
@@ -197,6 +198,7 @@ math-internals namespaces sequences words ;
     { +input { { f "x" } { f "y" } } }
     { +scratch { { f "r" } } }
     { +output { "r" } }
+    { +clobber { "x" "y" } }
 } define-intrinsic
 
 : ?MR 2dup = [ 2drop ] [ MR ] if ;
@@ -223,6 +225,7 @@ math-internals namespaces sequences words ;
     { +input { { f "x" } { f "y" } } }
     { +scratch { { f "r" } { f "s" } } }
     { +output { "s" } }
+    { +clobber { "x" "y" } }
 } define-intrinsic
 
 : generate-fixnum/i
@@ -254,6 +257,7 @@ math-internals namespaces sequences words ;
     { +input { { f "x" } { f "y" } } }
     { +scratch { { f "r" } { f "s" } } }
     { +output { "x" } }
+    { +clobber { "y" } }
 } define-intrinsic
 
 \ fixnum/mod [
@@ -269,6 +273,7 @@ math-internals namespaces sequences words ;
     { +input { { f "x" } { f "y" } } }
     { +scratch { { f "r" } { f "s" } } }
     { +output { "x" "s" } }
+    { +clobber { "y" } }
 } define-intrinsic
 
 : userenv ( reg -- )
