@@ -107,8 +107,14 @@ M: node child-ties ( node -- seq )
     ] if ;
 
 \ make-tuple [
-    dup node-in-d first value-literal 1array
+    node-in-d first value-literal 1array
 ] "output-classes" set-word-prop
+
+{ clone (clone) } [
+    [
+        node-in-d [ value-class* ] map
+    ] "output-classes" set-word-prop
+] each
 
 : output-classes ( node -- seq )
     dup node-param "output-classes" word-prop [
@@ -116,14 +122,11 @@ M: node child-ties ( node -- seq )
     ] [
         node-param "infer-effect" word-prop second
         dup integer? [ drop f ] when
-    ] ?if ;
+    ] if* ;
 
 M: #call infer-classes* ( node -- )
-    dup node-param [
-        dup create-ties
-        dup output-classes
-        [ over node-out-d intersect-classes ] when*
-    ] when drop ;
+    dup create-ties dup output-classes
+    [ swap node-out-d intersect-classes ] [ drop ] if* ;
 
 M: #push infer-classes* ( node -- )
     node-out-d
