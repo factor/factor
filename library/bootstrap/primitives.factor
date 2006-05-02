@@ -258,12 +258,10 @@ num-types f <array> builtins set
 
 "fixnum?" "math" create t "inline" set-word-prop
 "fixnum" "math" create 0 "fixnum?" "math" create { } define-builtin
-"fixnum" "math" create 0 "math-priority" set-word-prop
 "fixnum" "math" create ">fixnum" "math" lookup unit "coercer" set-word-prop
 
 "bignum?" "math" create t "inline" set-word-prop
 "bignum" "math" create 1 "bignum?" "math" create { } define-builtin
-"bignum" "math" create 1 "math-priority" set-word-prop
 "bignum" "math" create ">bignum" "math" lookup unit "coercer" set-word-prop
 
 "cons?" "lists" create t "inline" set-word-prop
@@ -279,11 +277,9 @@ num-types f <array> builtins set
     { 0 integer { "numerator" "math" } f }
     { 1 integer { "denominator" "math" } f }
 } define-builtin
-"ratio" "math" create 2 "math-priority" set-word-prop
 
 "float?" "math" create t "inline" set-word-prop
 "float" "math" create 5 "float?" "math" create { } define-builtin
-"float" "math" create 3 "math-priority" set-word-prop
 "float" "math" create ">float" "math" lookup unit "coercer" set-word-prop
 
 "complex?" "math" create t "inline" set-word-prop
@@ -292,7 +288,6 @@ num-types f <array> builtins set
     { 0 real { "real" "math" } f }
     { 1 real { "imaginary" "math" } f }
 } define-builtin
-"complex" "math" create 4 "math-priority" set-word-prop
 
 "alien" "alien" create 7 "alien?" "alien" create
 { { 1 object { "underlying-alien" "alien" } f } } define-builtin

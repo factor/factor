@@ -9,6 +9,9 @@ kernel-internals math namespaces sequences words ;
 : node-class ( value node -- class )
     node-classes ?hash [ object ] unless* ;
 
+: node-class# ( node n -- class )
+    swap [ node-in-d reverse-slice nth ] keep node-class ;
+
 ! Variables used by the class inferencer
 
 ! Current value --> class mapping

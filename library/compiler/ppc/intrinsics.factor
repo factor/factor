@@ -67,7 +67,7 @@ math-internals namespaces sequences words ;
 ] H{
     { +input { { f "val" } { f "obj" } { f "slot" } } }
     { +scratch { { f "x" } } }
-    { +clobber { "obj" } }
+    { +clobber { "obj" "slot" } }
 } define-intrinsic
 
 \ set-char-slot [
@@ -77,7 +77,7 @@ math-internals namespaces sequences words ;
 ] H{
     { +input { { f "val" } { f "slot" } { f "obj" } } }
     { +scratch { { f "x" } } }
-    { +clobber { "obj" } }
+    { +clobber { "val" "slot" "obj" } }
 } define-intrinsic
 
 : define-binary-op ( word op -- )

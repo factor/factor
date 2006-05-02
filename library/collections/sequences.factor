@@ -26,7 +26,7 @@ GENERIC: reverse-slice ( seq -- seq ) flushable
     [ 1 <vector> ] unless* [ push ] keep ;
 
 : bounds-check? ( n seq -- ? )
-    over 0 >= [ length < ] [ 2drop f ] if ;
+    over 0 >= [ length < ] [ 2drop f ] if ; inline
 
 : ?nth ( n seq/f -- elt/f )
     2dup bounds-check? [ nth ] [ 2drop f ] if ;

@@ -119,9 +119,6 @@ H{
 : class-methods ( classname -- seq )
     objc-meta-class objc-methods ;
 
-: make-dip ( quot n -- quot )
-    dup \ >r <array> -rot \ r> <array> append3 ;
-
 : <super> ( receiver class -- super )
     "objc-super" <c-object>
     [ set-objc-super-class ] keep

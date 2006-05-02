@@ -1,35 +1,29 @@
 ! Copyright (C) 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: generic
-USING: errors generic hashtables kernel kernel-internals lists
-math namespaces sequences words ;
+USING: arrays errors generic hashtables kernel kernel-internals
+lists math namespaces sequences words ;
 
 ! Math combination for generic dyadic upgrading arithmetic.
 
-: math-priority ( class -- n )
-    dup "members" word-prop [
-        0 [ math-priority max ] reduce
-    ] [
-        "math-priority" word-prop [ 100 ] unless*
-    ] ?if ;
+: first/last ( seq -- pair ) dup first swap peek 2array ;
 
-: math-class< ( class class -- ? )
-    [ math-priority ] 2apply < ;
+: math-class-compare ( class class -- n )
+    [
+        dup number class<
+        [ types first/last ] [ drop { 100 100 } ] if
+    ] 2apply <=> ;
 
 : math-class-max ( class class -- class )
-    [ swap math-class< ] 2keep ? ;
+    [ math-class-compare 0 > ] 2keep ? ;
+
+: (math-upgrade) ( max class -- quot )
+    dupd = [ drop [ ] ] [ "coercer" word-prop ] if ;
 
 : math-upgrade ( left right -- quot )
-    2dup math-class< [
-        nip "coercer" word-prop
-        dup [ [ >r ] swap [ r> ] append3 ] when
-    ] [
-        2dup swap math-class< [
-            drop "coercer" word-prop
-        ] [
-            2drop [ ]
-        ] if
-    ] if ;
+    [ math-class-max ] 2keep
+    >r over r> (math-upgrade)
+    >r (math-upgrade) dup [ 1 make-dip ] when r> append ;
 
 TUPLE: no-math-method left right generic ;
 
@@ -52,12 +46,15 @@ TUPLE: no-math-method left right generic ;
         2drop object-method
     ] if ;
 
-: math-vtable ( picker quot -- quot )
+: math-vtable* ( picker max quot -- quot )
     [
-        swap , \ tag ,
-        [ num-tags [ type>class ] map swap map % ] { } make ,
+        rot , \ tag ,
+        [ >r [ type>class ] map r> map % ] { } make ,
         \ dispatch ,
     ] [ ] make ; inline
+
+: math-vtable ( picker quot -- quot )
+    num-tags swap math-vtable* ; inline
 
 : math-class? ( object -- ? )
     dup word? [ "math-priority" word-prop ] [ drop f ] if ;

@@ -63,7 +63,7 @@ math math-internals sequences words ;
 } define-optimizers
 
 : useless-coerce? ( node -- )
-    dup node-in-d first over node-class
+    dup 0 node-class#
     swap node-param "infer-effect" word-prop second first eq? ;
 
 : call>no-op ( node -- node )

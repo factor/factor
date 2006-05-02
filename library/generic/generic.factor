@@ -39,7 +39,7 @@ SYMBOL: builtins
     ] hash-each ;
 
 : types ( class -- types )
-    [ (types) ] make-hash hash-keys ;
+    [ (types) ] make-hash hash-keys natural-sort ;
 
 DEFER: class<
 

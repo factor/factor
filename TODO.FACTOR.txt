@@ -1,6 +1,5 @@
 should fix in 0.82:
 
-- type inference busted for tuple constructors
 - constant branch folding
 - fast-slot stuff
 - 3 >n fep
