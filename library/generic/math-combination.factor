@@ -7,7 +7,11 @@ math namespaces sequences words ;
 ! Math combination for generic dyadic upgrading arithmetic.
 
 : math-priority ( class -- n )
-    "math-priority" word-prop [ 100 ] unless* ;
+    dup "members" word-prop [
+        0 [ math-priority max ] reduce
+    ] [
+        "math-priority" word-prop [ 100 ] unless*
+    ] ?if ;
 
 : math-class< ( class class -- ? )
     [ math-priority ] 2apply < ;
@@ -66,12 +70,6 @@ TUPLE: no-math-method left right generic ;
             over object-method
         ] if nip
     ] math-vtable nip ;
-
-: partial-math-dispatch ( word class left/right -- vtable )
-    dup \ dup \ over ? [
-        ( word class left/right class )
-        >r 3dup r> swap [ swap ] unless math-method
-    ] math-vtable >r 3drop r> ;
 
 PREDICATE: generic 2generic ( word -- ? )
     "combination" word-prop [ math-combination ] = ;

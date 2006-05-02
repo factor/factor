@@ -1,5 +1,5 @@
-! Copyright (C) 2005 Slava Pestov.
-! See http://factor.sf.net/license.txt for BSD license.
+! Copyright (C) 2005, 2006 Slava Pestov.
+! See http://factorcode.org/license.txt for BSD license.
 IN: optimizer
 USING: arrays errors generic hashtables inference kernel lists
 math math-internals sequences words ;
@@ -63,7 +63,7 @@ math math-internals sequences words ;
 } define-optimizers
 
 : useless-coerce? ( node -- )
-    dup node-in-d first over node-classes ?hash
+    dup node-in-d first over node-class
     swap node-param "infer-effect" word-prop second first eq? ;
 
 : call>no-op ( node -- node )
@@ -185,7 +185,6 @@ M: #call optimize-node* ( node -- node/t )
         { [ dup partial-eval? ] [ partial-eval ] }
         { [ dup find-identity nip ] [ apply-identities ] }
         { [ dup optimizer-hooks ] [ optimize-hooks ] }
-        { [ dup inlining-class ] [ inline-method ] }
         { [ dup optimize-predicate? ] [ optimize-predicate ] }
-        { [ t ] [ drop t ] }
+        { [ t ] [ inline-method ] }
     } cond ;

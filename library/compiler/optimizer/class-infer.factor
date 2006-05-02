@@ -6,6 +6,9 @@ kernel-internals math namespaces sequences words ;
 
 ! Infer possible classes of values in a dataflow IR.
 
+: node-class ( value node -- class )
+    node-classes ?hash [ object ] unless* ;
+
 ! Variables used by the class inferencer
 
 ! Current value --> class mapping

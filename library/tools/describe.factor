@@ -31,7 +31,7 @@ M: object summary
 
 : slot-sheet ( obj -- sheet )
     dup class "slots" word-prop
-    dup [ second ] map -rot
+    dup [ third ] map -rot
     [ first slot ] map-with
     2array ;
 
