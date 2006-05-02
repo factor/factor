@@ -106,11 +106,10 @@ math-internals namespaces sequences words ;
     ! divide x by y, store result in x
     "r" operand "x" operand "y" operand DIVW
     generate-fixnum-mod
-    "x" operand "s" operand MR
 ] H{
     { +input { { f "x" } { f "y" } } }
     { +scratch { { f "r" } { f "s" } } }
-    { +output { "x" } }
+    { +output { "s" } }
 } define-intrinsic
 
 \ fixnum-bitnot [

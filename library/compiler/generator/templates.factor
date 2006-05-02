@@ -211,6 +211,9 @@ SYMBOL: phantom-r
     over length swap cut-phantom
     swap phantom-vregs ;
 
+: phantom-push ( obj stack -- )
+    1 over adjust-phantom push ;
+
 : phantom-append ( seq stack -- )
     over length over adjust-phantom swap nappend ;
 
@@ -251,7 +254,7 @@ SYMBOL: +clobber
     append ;
 
 : guess-vregs ( -- n )
-    +input get dup { } additional-vregs# +scratch get length + ;
+    +input get { } additional-vregs# +scratch get length + ;
 
 : alloc-scratch ( -- )
     +scratch get [ alloc-vregs [ <vreg> ] map ] keep
@@ -263,7 +266,7 @@ SYMBOL: +clobber
     guess-vregs ensure-vregs
     ! Split the template into available (fast) parts and those
     ! that require allocating registers and reading the stack
-    match-template fast-input
+    +input get match-template fast-input
     used-vregs adjust-free-vregs
     slow-input
     alloc-scratch

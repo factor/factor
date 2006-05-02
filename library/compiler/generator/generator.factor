@@ -12,16 +12,19 @@ M: object stack-reserve* drop 0 ;
 : stack-reserve ( node -- n )
     0 swap [ stack-reserve* max ] each-node ;
 
+: intrinsic ( #call -- quot )
+    node-param "intrinsic" word-prop ;
+
 : if-intrinsic ( #call -- quot )
-    dup node-successor #if?
-    [ node-param "if-intrinsic" word-prop ] [ drop f ] if ;
+    node-param "if-intrinsic" word-prop ;
 
 DEFER: #terminal?
 
 PREDICATE: #merge #terminal-merge node-successor #terminal? ;
 
 PREDICATE: #call #terminal-call
-    dup node-successor node-successor #terminal?
+    dup node-successor #if?
+    over node-successor node-successor #terminal? and
     swap if-intrinsic and ;
 
 UNION: #terminal
@@ -108,10 +111,13 @@ M: #label generate-node ( node -- next )
     swap node-child generate-word r> ;
 
 ! #if
+: end-false-branch ( label -- )
+    tail-call? [ %return drop ] [ %jump-label ] if ;
+
 : generate-if ( node label -- next )
     <label> [
         >r >r node-children first2 generate-nodes
-        r> r> %jump-label save-xt generate-nodes
+        r> r> end-false-branch save-xt generate-nodes
     ] keep save-xt iterate-next ;
 
 M: #if generate-node ( node -- next )
@@ -129,19 +135,32 @@ M: #if generate-node ( node -- next )
 : define-intrinsic ( word quot template -- | quot: -- )
     [with-template] "intrinsic" set-word-prop ;
 
-: intrinsic ( #call -- quot ) node-param "intrinsic" word-prop ;
-
 : define-if-intrinsic ( word quot template -- | quot: label -- )
     [with-template] "if-intrinsic" set-word-prop ;
 
-M: #call generate-node ( node -- next )
-    dup if-intrinsic [
-        >r <label> dup r> call
-        >r node-successor r> generate-if node-successor
+: if>boolean-intrinsic ( label -- )
+    <label> "end" set
+    f T{ vreg f 0 } load-literal
+    "end" get %jump-label
+    save-xt
+    t T{ vreg f 0 } load-literal
+    "end" get save-xt
+    T{ vreg f 0 } phantom-d get phantom-push ;
+
+: do-if-intrinsic ( node -- next )
+    [ <label> dup ] keep if-intrinsic call
+    >r node-successor dup #if? [
+        r> generate-if node-successor
     ] [
-        dup intrinsic
-        [ call iterate-next ] [ node-param generate-call ] ?if
-    ] if* ;
+        drop r> if>boolean-intrinsic iterate-next
+    ] if ;
+
+M: #call generate-node ( node -- next )
+    {
+        { [ dup if-intrinsic ] [ do-if-intrinsic ] }
+        { [ dup intrinsic ] [ intrinsic call iterate-next ] }
+        { [ t ] [ node-param generate-call ] }
+    } cond ;
 
 ! #call-label
 M: #call-label generate-node ( node -- next )
