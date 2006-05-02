@@ -1,8 +1,8 @@
 ! Copyright (C) 2005, 2006 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
+USING: alien arrays assembler kernel kernel-internals lists math
+math-internals namespaces sequences words ;
 IN: compiler
-USING: alien assembler kernel kernel-internals math
-math-internals namespaces sequences ;
 
 \ tag [
     "in" operand tag-mask AND
@@ -83,7 +83,6 @@ math-internals namespaces sequences ;
     generate-write-barrier
 ] H{
     { +input { { f "val" } { f "obj" } { f "slot" } } }
-    { +scratch { { f "x" } } }
     { +clobber { "obj" } }
 } define-intrinsic
 
@@ -91,7 +90,7 @@ math-internals namespaces sequences ;
     EBX PUSH
     "n" operand 2 SHR
     EBX dup XOR
-    EBX "n" operand ADD
+    "obj" operand "n" operand ADD
     BX "obj" operand string-offset [+] MOV
     EBX tag-bits SHL
     "obj" operand EBX MOV
@@ -103,7 +102,6 @@ math-internals namespaces sequences ;
 } define-intrinsic
 
 \ set-char-slot [
-    "obj" operand untag
     EBX PUSH
     "val" operand tag-bits SHR
     "slot" operand 2 SHR
@@ -113,7 +111,7 @@ math-internals namespaces sequences ;
     EBX POP
 ] H{
     { +input { { f "val" } { f "slot" } { f "obj" } } }
-    { +clobber { "obj" } }
+    { +clobber { "val" "slot" "obj" } }
 } define-intrinsic
 
 : define-binary-op ( word op -- )
@@ -144,91 +142,104 @@ math-internals namespaces sequences ;
 ! ECX and EAX, and the result is in EDX.
 \ fixnum-mod [
     prepare-division
-    "x" operand IDIV
+    "y" operand IDIV
 ] H{
-    { +input { { 0 "x" } { 2 "y" } } }
+    { +input { { 0 "x" } { 1 "y" } } }
+    { +scratch { { 2 "out" } } }
+    { +output { "out" } }
+} define-intrinsic
+
+: ?MOV ( dst src -- ) 2dup = [ 2drop ] [ MOV ] if ;
+
+: unique-operands ( operands quot -- )
+    >r [ operand ] map prune r> each ; inline
+
+: simple-overflow ( word -- )
+    finalize-contents
+    "z" operand "x" operand MOV
+    "z" operand "y" operand pick execute
+    ! If the previous arithmetic operation overflowed, then we
+    ! turn the result into a bignum and leave it in EAX.
+    <label> "end" set
+    "end" get JNO
+    ! There was an overflow. Recompute the original operand.
+    { "y" "x" } [ tag-bits SAR ] unique-operands
+    "x" operand "y" operand rot execute
+    "s48_long_to_bignum" f "x" operand 1array compile-c-call*
+    ! An untagged pointer to the bignum is now in EAX; tag it
+    T{ int-regs } return-reg bignum-tag OR
+    "z" operand T{ int-regs } return-reg ?MOV
+    "end" get save-xt ; inline
+
+: simple-overflow-template ( word insn -- )
+    [ simple-overflow ] curry H{
+        { +input { { f "x" } { f "y" } } }
+        { +scratch { { f "z" } } }
+        { +output { "z" } }
+        { +clobber { "x" "y" } }
+    } define-intrinsic ;
+
+\ fixnum+ \ ADD simple-overflow-template
+\ fixnum- \ SUB simple-overflow-template
+
+\ fixnum* [
+    finalize-contents
+    "y" operand tag-bits SAR
+    "y" operand IMUL
+    <label> "end" set
+    "end" get JNO
+    "s48_fixnum_pair_to_bignum" f
+    "x" operand remainder-reg 2array compile-c-call*
+    ! now we have to shift it by three bits to remove the second
+    ! tag
+    "s48_bignum_arithmetic_shift" f
+    "x" operand tag-bits neg 2array compile-c-call*
+    ! an untagged pointer to the bignum is now in EAX; tag it
+    T{ int-regs } return-reg bignum-tag OR
+    "end" get save-xt
+] H{
+    { +input { { 0 "x" } { 1 "y" } } }
     { +output { "x" } }
 } define-intrinsic
 
-! : literal-overflow ( -- dest src )
-!     #! Called if the src operand is a literal.
-!     #! Untag the dest operand.
-!     dest/src over tag-bits SAR tag-bits neg shift ;
+: generate-fixnum/mod
+    #! The same code is used for fixnum/i and fixnum/mod.
+    #! This has specific register
+    #! ECX and EAX, and the result is in EDX.
+    <label> "end" set
+    prepare-division
+    "y" operand IDIV
+    ! Make a copy since following shift is destructive
+    "y" operand "x" operand MOV
+    ! Tag the value, since division cancelled tags from both
+    ! inputs
+    "x" operand tag-bits SHL
+    ! Did it overflow?
+    "end" get JNO
+    ! There was an overflow, so make ECX into a bignum. we must
+    ! save EDX since its volatile.
+    remainder-reg PUSH
+    "s48_long_to_bignum" f
+    "y" operand 1array compile-c-call*
+    ! An untagged pointer to the bignum is now in EAX; tag it
+    T{ int-regs } return-reg bignum-tag OR
+    ! the remainder is now in EDX
+    remainder-reg POP
+    "end" get save-xt ;
+
+\ fixnum/i [ generate-fixnum/mod ] H{
+    { +input { { 0 "x" } { 1 "y" } } }
+    { +scratch { { 2 "out" } } }
+    { +output { "x" } }
+    { +clobber { "x" "y" } }
+} define-intrinsic
 ! 
-! : computed-overflow ( -- dest src )
-!     #! Called if the src operand is a register.
-!     #! Untag both operands.
-!     dest/src 2dup tag-bits SAR tag-bits SAR ;
-! 
-! : simple-overflow ( inverse word -- )
-!     #! If the previous arithmetic operation overflowed, then we
-!     #! turn the result into a bignum and leave it in EAX.
-!     <label> "end" set
-!     "end" get JNO
-!     ! There was an overflow. Recompute the original operand.
-!     >r >r dest/src r> execute
-!     0 input integer? [ literal-overflow ] [ computed-overflow ] if
-!     ! Compute a result, this time it will fit.
-!     r> execute
-!     ! Create a bignum.
-!     "s48_long_to_bignum" f 0 output-operand
-!     1array compile-c-call*
-!     ! An untagged pointer to the bignum is now in EAX; tag it
-!     T{ int-regs } return-reg bignum-tag OR
-!     "end" get save-xt ; inline
-! 
-! M: %fixnum+ generate-node ( vop -- )
-!     drop dest/src ADD  \ SUB \ ADD simple-overflow ;
-! 
-! M: %fixnum- generate-node ( vop -- )
-!     drop dest/src SUB  \ ADD \ SUB simple-overflow ;
-! 
-! M: %fixnum* generate-node ( vop -- )
-!     drop
-!     ! both inputs are tagged, so one of them needs to have its
-!     ! tag removed.
-!     1 input-operand tag-bits SAR
-!     0 input-operand IMUL
-!     <label> "end" set
-!     "end" get JNO
-!     "s48_fixnum_pair_to_bignum" f
-!     1 input-operand remainder-reg 2array compile-c-call*
-!     ! now we have to shift it by three bits to remove the second
-!     ! tag
-!     "s48_bignum_arithmetic_shift" f
-!     1 input-operand tag-bits neg 2array compile-c-call*
-!     ! an untagged pointer to the bignum is now in EAX; tag it
-!     T{ int-regs } return-reg bignum-tag OR
-!     "end" get save-xt ;
-! 
-! : generate-fixnum/mod
-!     #! The same code is used for %fixnum/i and %fixnum/mod.
-!     #! This has specific register requirements. Inputs are in
-!     #! ECX and EAX, and the result is in EDX.
-!     <label> "end" set
-!     prepare-division
-!     0 input-operand IDIV
-!     ! Make a copy since following shift is destructive
-!     0 input-operand 1 input-operand MOV
-!     ! Tag the value, since division cancelled tags from both
-!     ! inputs
-!     1 input-operand tag-bits SHL
-!     ! Did it overflow?
-!     "end" get JNO
-!     ! There was an overflow, so make ECX into a bignum. we must
-!     ! save EDX since its volatile.
-!     remainder-reg PUSH
-!     "s48_long_to_bignum" f
-!     0 input-operand 1array compile-c-call*
-!     ! An untagged pointer to the bignum is now in EAX; tag it
-!     T{ int-regs } return-reg bignum-tag OR
-!     ! the remainder is now in EDX
-!     remainder-reg POP
-!     "end" get save-xt ;
-! 
-! M: %fixnum/i generate-node drop generate-fixnum/mod ;
-! 
-! M: %fixnum/mod generate-node drop generate-fixnum/mod ;
+\ fixnum/mod [ generate-fixnum/mod ] H{
+    { +input { { 0 "x" } { 1 "y" } } }
+    { +scratch { { 2 "out" } } }
+    { +output { "x" "out" } }
+    { +clobber { "x" "y" } }
+} define-intrinsic
 
 : define-binary-jump ( word op -- )
     [
@@ -249,7 +260,7 @@ math-internals namespaces sequences ;
 
 : %userenv ( -- )
     "x" operand "userenv" f dlsym MOV
-    rel-absolute-cell rel-userenv
+    0 rel-absolute-cell rel-userenv
     "n" operand 1 SHR
     "n" operand "x" operand ADD ;
 
