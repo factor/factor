@@ -5,6 +5,7 @@ USE: math
 USE: test
 USE: math-internals
 USE: namespaces
+USE: words
 
 ! Five fibonacci implementations, each one slower than the
 ! previous.
@@ -31,8 +32,10 @@ USE: namespaces
 [ 9227465 ] [ 34 fixnum-fib ] unit-test
 
 : fib ( n -- nth fibonacci number )
-    dup 1 <= [ drop 1 ] [ 1- dup fib swap 1- fib + ] if ;
-    compiled
+    dup 1 <= [ drop 1 ] [ dup 1 - fib swap 2 - fib + ] if ;
+
+\ fib { fixnum } "specializer" set-word-prop
+\ fib compile
 
 [ 9227465 ] [ 34 fib ] unit-test
 

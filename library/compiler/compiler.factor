@@ -7,7 +7,7 @@ namespaces optimizer prettyprint sequences test words ;
 : (compile) ( word -- )
     [
         [
-            dup word-def dataflow optimize generate
+            dup specialized-def dataflow optimize generate
         ] keep
     ] benchmark nip
     "compile-time" set-word-prop ;

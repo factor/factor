@@ -117,6 +117,7 @@ vectors words ;
         "/library/compiler/inference/stack.factor"
         "/library/compiler/inference/known-words.factor"
 
+        "/library/compiler/optimizer/specializers.factor"
         "/library/compiler/optimizer/class-infer.factor"
         "/library/compiler/optimizer/kill-literals.factor"
         "/library/compiler/optimizer/optimizer.factor"

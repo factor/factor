@@ -3,7 +3,6 @@ should fix in 0.82:
 - type inference busted for tuple constructors
 - constant branch folding
 - fast-slot stuff
-- compile if-intrinsic even if there is no #if there
 - 3 >n fep
 - amd64 %box-struct
 - get factor running on mac intel

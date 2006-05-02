@@ -2,7 +2,7 @@
 ! http://www.ffconsultancy.com/free/ray_tracer/languages.html
 
 USING: arrays compiler generic io kernel lists math namespaces
-sequences test ;
+sequences test words ;
 IN: ray
 
 ! parameters
@@ -27,24 +27,26 @@ GENERIC: intersect-scene ( hit ray scene -- hit )
 TUPLE: sphere center radius ;
 
 : sphere-v ( sphere ray -- v )
-    swap sphere-center swap ray-orig v- ;
+    swap sphere-center swap ray-orig v- ; inline
 
-: sphere-b ( ray v -- b ) swap ray-dir v. ;
+: sphere-b ( ray v -- b ) swap ray-dir v. ; inline
 
 : sphere-disc ( sphere v b -- d )
-    sq swap norm-sq - swap sphere-radius sq + ;
+    sq swap norm-sq - swap sphere-radius sq + ; inline
 
-: -+ ( x y -- x-y x+y ) [ - ] 2keep + ;
+: -+ ( x y -- x-y x+y ) [ - ] 2keep + ; inline
 
 : sphere-b/d ( b d -- t )
-    -+ dup 0.0 < [ 2drop 1.0/0.0 ] [ >r [ 0.0 > ] keep r> ? ] if ;
+    -+ dup 0.0 < [ 2drop 1.0/0.0 ] [ >r [ 0.0 > ] keep r> ? ] if ; inline
 
 : ray-sphere ( sphere ray -- t )
     2dup sphere-v tuck sphere-b [ sphere-disc ] keep
     over 0.0 < [ 2drop 1.0/0.0 ] [ swap sqrt sphere-b/d ] if ;
+    inline
 
 : sphere-n ( ray sphere l -- n )
     pick ray-dir n*v swap sphere-center v- swap ray-orig v+ ;
+    inline
 
 : if-ray-sphere ( hit ray sphere quot -- hit )
     #! quot: hit ray sphere l -- hit
@@ -69,20 +71,20 @@ M: group intersect-scene ( hit ray group -- hit )
         drop
     ] if-ray-sphere ;
 
-: initial-hit T{ hit f { 0.0 0.0 0.0 } 1.0/0.0 } ;
+: initial-hit T{ hit f { 0.0 0.0 0.0 } 1.0/0.0 } ; inline
 
 : initial-intersect ( ray scene -- hit )
-    initial-hit -rot intersect-scene ;
+    initial-hit -rot intersect-scene ; inline
 
 : ray-o ( ray hit -- o )
     over ray-dir over hit-lambda v*n
     swap hit-normal delta v*n v+
-    swap ray-orig v+ ;
+    swap ray-orig v+ ; inline
 
 : sray-intersect ( ray scene hit -- ray )
-    swap >r ray-o light vneg <ray> r> initial-intersect ;
+    swap >r ray-o light vneg <ray> r> initial-intersect ; inline
 
-: ray-g ( hit -- g ) hit-normal light v. ;
+: ray-g ( hit -- g ) hit-normal light v. ; inline
 
 : cast-ray ( ray scene -- g )
     2dup initial-intersect dup hit-lambda 1.0/0.0 = [
@@ -90,9 +92,10 @@ M: group intersect-scene ( hit ray group -- hit )
     ] [
         dup ray-g >r sray-intersect hit-lambda 1.0/0.0 =
         [ r> neg ] [ r> drop 0.0 ] if
-    ] if ;
+    ] if ; inline
 
-: create-center ( c r d -- c2 ) >r 3.0 12.0 sqrt / * r> n*v v+ ;
+: create-center ( c r d -- c2 )
+    >r 3.0 12.0 sqrt / * r> n*v v+ ; inline
 
 DEFER: create ( level c r -- scene )
 
