@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 IN: compiler
 USING: arrays generic hashtables kernel math namespaces
-sequences words ;
+sequences vectors words ;
 
 : make-specializer ( quot class picker -- quot )
     over \ object eq? [
@@ -33,9 +33,13 @@ sequences words ;
     { array array } "specializer" set-word-prop
 ] each
 
-\ hash* { object hashtable } "specializer" set-word-prop
-\ remove-hash { object hashtable } "specializer" set-word-prop
-\ set-hash { object object hashtable } "specializer" set-word-prop
+{ hash* remove-hash set-hash } [
+    { hashtable } "specializer" set-word-prop
+] each
 
 { first first2 first3 first4 }
 [ { array } "specializer" set-word-prop ] each
+
+{ peek pop* pop push } [
+    { vector } "specializer" set-word-prop
+] each

@@ -65,7 +65,7 @@ M: #dispatch node>quot ( ? node -- )
 M: #return node>quot ( ? node -- )
     dup node-param unparse "#return " swap append comment, ;
 
-M: object node>quot ( ? node -- ) dup class comment, ;
+M: object node>quot ( ? node -- ) dup class word-name comment, ;
 
 : (dataflow>quot) ( ? node -- )
     dup [

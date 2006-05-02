@@ -13,7 +13,7 @@ GENERIC: set-fill
 : capacity ( seq -- n ) underlying length ; inline
 
 : expand ( len seq -- )
-    [ underlying resize ] keep set-underlying ;
+    [ underlying resize ] keep set-underlying ; inline
 
 : new-size ( n -- n ) 3 * dup 50 < [ drop 50 ] when ;
 
@@ -22,7 +22,7 @@ GENERIC: set-fill
         >r 1+ r>
         2dup capacity > [ over new-size over expand ] when
         2dup set-fill
-    ] when 2drop ;
+    ] when 2drop ; inline
 
 TUPLE: bounds-error index seq ;
 
@@ -35,7 +35,8 @@ TUPLE: bounds-error index seq ;
     2dup bounds-check? [ bounds-error ] unless ; inline
 
 : grow-length ( len seq -- )
-    growable-check 2dup capacity > [ 2dup expand ] when set-fill ;
+    growable-check 2dup capacity > [ 2dup expand ] when set-fill
+    ; inline
 
 : clone-growable ( obj -- obj )
-    (clone) dup underlying clone over set-underlying ;
+    (clone) dup underlying clone over set-underlying ; inline

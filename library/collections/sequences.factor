@@ -12,7 +12,7 @@ GENERIC: like ( seq seq -- seq ) flushable
 GENERIC: reverse ( seq -- seq ) flushable
 GENERIC: reverse-slice ( seq -- seq ) flushable
 
-: empty? ( seq -- ? ) length zero? ;
+: empty? ( seq -- ? ) length zero? ; inline
 
 : first 0 swap nth ; inline
 : second 1 swap nth ; inline
@@ -20,7 +20,7 @@ GENERIC: reverse-slice ( seq -- seq ) flushable
 : fourth 3 swap nth ; inline
 
 : push ( element sequence -- )
-    dup length swap set-nth ; inline
+    dup length swap set-nth ;
 
 : ?push ( elt seq/f -- seq )
     [ 1 <vector> ] unless* [ push ] keep ;

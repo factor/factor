@@ -1,19 +1,23 @@
-! Copyright (C) 2003, 2005 Slava Pestov.
+! Copyright (C) 2003, 2006 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
+IN: kernel-internals
+USING: vectors ;
+
+: namestack* ( -- ns ) 3 getenv { vector } declare ; inline
+
 IN: namespaces
 USING: arrays hashtables kernel kernel-internals lists math
-sequences strings vectors words ;
+sequences strings words ;
 
-: namestack* ( -- ns ) 3 getenv ; inline
 : namestack ( -- ns ) namestack* clone ; inline
-: set-namestack ( ns -- ) clone 3 setenv ; inline
-: namespace ( -- namespace ) namestack* peek ; inline
-: >n ( namespace -- n:namespace ) namestack* push ; inline
-: n> ( n:namespace -- namespace ) namestack* pop ; inline
-: ndrop ( n:namespace -- ) namestack* pop* ; inline
-: global ( -- g ) 4 getenv ; inline
+: set-namestack ( ns -- ) >vector 3 setenv ; inline
+: namespace ( -- namespace ) namestack* peek ;
+: >n ( namespace -- n:namespace ) namestack* push ;
+: n> ( n:namespace -- namespace ) namestack* pop ;
+: ndrop ( n:namespace -- ) namestack* pop* ;
+: global ( -- g ) 4 getenv { hashtable } declare ; inline
 : get ( variable -- value ) namestack* hash-stack ; flushable
-: set ( value variable -- ) namespace set-hash ;
+: set ( value variable -- ) namespace set-hash ; inline
 : on ( var -- ) t swap set ; inline
 : off ( var -- ) f swap set ; inline
 : get-global ( var -- value ) global hash ; inline
