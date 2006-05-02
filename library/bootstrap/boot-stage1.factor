@@ -283,7 +283,7 @@ vectors words ;
                     "/library/compiler/x86/assembler.factor"
                     "/library/compiler/x86/architecture.factor"
                     "/library/compiler/x86/alien.factor"
-                    ! "/library/compiler/x86/intrinsics.factor"
+                    "/library/compiler/x86/intrinsics.factor"
                 }
             ]
         } {

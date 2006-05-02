@@ -72,19 +72,19 @@ IN: compiler
     "obj" operand card-offset ADD rel-absolute-cell rel-cards
     "obj" operand [] card-mark OR ;
 
-\ set-slot [
-    "obj" operand untag
-    ! turn tagged fixnum slot # into an offset
-    "slot" operand fixnum>slot@
-    ! compute slot address
-    "obj" operand "slot" operand ADD
-    ! store new slot value
-    "obj" operand [] "val" operand MOV
-    generate-write-barrier
-] H{
-    { +input { { f "val" } { f "obj" } { f "slot" } } }
-    { +clobber { "obj" } }
-} define-intrinsic
+! \ set-slot [
+!     "obj" operand untag
+!     ! turn tagged fixnum slot # into an offset
+!     "slot" operand fixnum>slot@
+!     ! compute slot address
+!     "obj" operand "slot" operand ADD
+!     ! store new slot value
+!     "obj" operand [] "val" operand MOV
+!     generate-write-barrier
+! ] H{
+!     { +input { { f "val" } { f "obj" } { f "slot" } } }
+!     { +clobber { "obj" "slot" } }
+! } define-intrinsic
 
 \ char-slot [
     EBX PUSH
@@ -233,7 +233,7 @@ IN: compiler
     { +output { "x" } }
     { +clobber { "x" "y" } }
 } define-intrinsic
-! 
+
 \ fixnum/mod [ generate-fixnum/mod ] H{
     { +input { { 0 "x" } { 1 "y" } } }
     { +scratch { { 2 "out" } } }
