@@ -4,13 +4,14 @@ hashtables-internals interpreter io io-internals kernel
 kernel-internals lists math math-internals memory parser
 sequences strings vectors words prettyprint ;
 
-! We transform calls to these words into 'branched' forms;
-! eg, there is no VOP for fixnum<=, only fixnum<= followed
-! by an #if, so if we have a 'bare' fixnum<= we add
-! [ t ] [ f ] if at the end.
+\ declare [
+    pop-literal nip
+    dup length ensure-values
+    dup #declare [ >r length d-tail r> set-node-in-d ] keep
+    node,
+] "infer" set-word-prop
+\ declare [ [ object ] [ ] ] "infer-effect" set-word-prop
 
-! This transformation really belongs in the optimizer, but it
-! is simpler to do it here.
 \ fixnum< [ [ fixnum fixnum ] [ object ] ] "infer-effect" set-word-prop
 \ fixnum< t "flushable" set-word-prop
 \ fixnum< t "foldable" set-word-prop
@@ -30,13 +31,6 @@ sequences strings vectors words prettyprint ;
 \ eq? [ [ object object ] [ object ] ] "infer-effect" set-word-prop
 \ eq? t "flushable" set-word-prop
 \ eq? t "foldable" set-word-prop
-
-: manual-branch ( word -- )
-    dup "infer-effect" word-prop consume/produce
-    [ [ t ] [ f ] if ] infer-quot ;
-
-! { fixnum<= fixnum< fixnum>= fixnum> eq? }
-! [ dup [ manual-branch ] curry "infer" set-word-prop ] each
 
 ! Primitive combinators
 \ call [ [ general-list ] [ ] ] "infer-effect" set-word-prop

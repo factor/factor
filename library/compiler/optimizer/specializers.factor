@@ -1,7 +1,8 @@
 ! Copyright (C) 2006 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 IN: compiler
-USING: arrays generic kernel math namespaces sequences words ;
+USING: arrays generic hashtables kernel math namespaces
+sequences words ;
 
 : make-specializer ( quot class picker -- quot )
     over \ object eq? [
@@ -31,3 +32,10 @@ USING: arrays generic kernel math namespaces sequences words ;
 { v+ v- v* v/ vmax vmin v. } [
     { array array } "specializer" set-word-prop
 ] each
+
+\ hash* { object hashtable } "specializer" set-word-prop
+\ remove-hash { object hashtable } "specializer" set-word-prop
+\ set-hash { object object hashtable } "specializer" set-word-prop
+
+{ first first2 first3 first4 }
+[ { array } "specializer" set-word-prop ] each

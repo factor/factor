@@ -15,20 +15,24 @@ parser sequences strings words ;
         2drop 2drop
     ] if ;
 
-: define-reader ( class slot reader -- )
-    [ slot ] define-slot-word ;
+: define-reader ( class slot decl reader -- )
+    [ slot ] rot dup object eq? [
+        drop
+    ] [
+        1array [ declare ] curry append
+    ] if define-slot-word ;
 
 : define-writer ( class slot writer -- )
     [ set-slot ] define-slot-word ;
 
-: define-slot ( class slot reader writer -- )
-    >r >r 2dup r> define-reader r> define-writer ;
+: define-slot ( class slot decl reader writer -- )
+    >r >r >r 2dup r> r> define-reader r> define-writer ;
 
 : intern-slots ( spec -- spec )
-    [ first3 [ dup [ first2 create ] when ] 2apply 3array ] map ;
+    [ [ dup array? [ first2 create ] when ] map ] map ;
 
 : define-slots ( class spec -- )
-    [ first3 define-slot ] each-with ;
+    [ first4 define-slot ] each-with ;
 
 : reader-word ( class name -- word )
     >r word-name "-" r> append3 in get 2array ;
@@ -36,10 +40,9 @@ parser sequences strings words ;
 : writer-word ( class name -- word )
     [ swap "set-" % word-name % "-" % % ] "" make in get 2array ;
 
-: simple-slot ( class name -- reader writer )
-    [ reader-word ] 2keep writer-word ;
+: simple-slot ( class name -- )
+    2dup reader-word , writer-word , ;
 
 : simple-slots ( class slots base -- spec )
     over length [ + ] map-with
-    [ >r dupd simple-slot r> -rot 3array ] 2map nip
-    intern-slots ;
+    [ [ , object , dupd simple-slot ] { } make ] 2map nip intern-slots ;

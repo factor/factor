@@ -71,26 +71,24 @@ M: 2generic dispatching-values drop node-in-d 2 swap tail* ;
     last-node 2dup swap post-inline set-node-successor ;
 
 : inline-method ( node -- node )
-    #! We set the #call node's param to f so that it gets killed
-    #! later.
     dup method-dataflow
     [ >r node-param r> remember-node ] 2keep
     [ subst-node ] keep ;
 
-: related? ( actual testing -- ? )
+: comparable? ( actual testing -- ? )
     #! If actual is a subset of testing or if the two classes
     #! are disjoint, return t.
     2dup class< >r classes-intersect? not r> or ;
 
 : optimize-predicate? ( #call -- ? )
     dup node-param "predicating" word-prop dup [
-        >r dup node-in-d node-classes* first r> related?
+        >r dup node-in-d node-classes* first r> comparable?
     ] [
         2drop f
     ] if ;
 
 : inline-literals ( node literals -- node )
-    #! Make #push -> #return -> successor
+    #! Make #shuffle -> #push -> #return -> successor
     over drop-inputs [
         >r >list [ literalize ] map dataflow [ subst-node ] keep
         r> set-node-successor

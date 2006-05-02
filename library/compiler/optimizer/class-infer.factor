@@ -134,6 +134,9 @@ M: #dispatch child-ties ( node -- seq )
     dup node-in-d first
     swap node-children length [ <literal-tie> ] map-with ;
 
+M: #declare infer-classes* ( node -- )
+    dup node-param swap node-in-d [ set-value-class* ] 2each ;
+
 DEFER: (infer-classes)
 
 : infer-children ( node -- )

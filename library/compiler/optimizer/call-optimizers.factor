@@ -62,6 +62,19 @@ math math-internals sequences words ;
     { [ dup disjoint-eq? ] [ [ f ] inline-literals ] }
 } define-optimizers
 
+: useless-coerce? ( node -- )
+    dup node-in-d first over node-classes ?hash
+    swap node-param "infer-effect" word-prop second first eq? ;
+
+: call>no-op ( node -- node )
+    [ ] dataflow [ subst-node ] keep ;
+
+{ >fixnum >bignum >float } [
+    {
+        { [ dup useless-coerce? ] [ call>no-op ] }
+    } define-optimizers
+] each
+
 ! Arithmetic identities
 SYMBOL: @
 

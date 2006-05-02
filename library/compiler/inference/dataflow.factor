@@ -90,6 +90,10 @@ TUPLE: #terminate ;
 C: #terminate make-node ;
 : #terminate ( -- node ) empty-node <#terminate> ;
 
+TUPLE: #declare ;
+C: #declare make-node ;
+: #declare ( classes -- node ) param-node <#declare> ;
+
 : node-inputs ( d-count r-count node -- )
     tuck
     >r r-tail r> set-node-in-r

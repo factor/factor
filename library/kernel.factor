@@ -79,6 +79,7 @@ M: wrapper literalize <wrapper> ;
 IN: kernel-internals
 
 ! These words are unsafe. Don't use them.
+: declare ( types -- ) drop ;
 
 : array-capacity 1 slot ; inline
 : array-nth swap 2 fixnum+fast slot ; inline

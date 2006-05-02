@@ -48,7 +48,7 @@ TUPLE: no-math-method left right generic ;
         2drop object-method
     ] if ;
 
-: math-vtable ( picker quot -- )
+: math-vtable ( picker quot -- quot )
     [
         swap , \ tag ,
         [ num-tags [ type>class ] map swap map % ] { } make ,
@@ -58,7 +58,7 @@ TUPLE: no-math-method left right generic ;
 : math-class? ( object -- ? )
     dup word? [ "math-priority" word-prop ] [ drop f ] if ;
 
-: math-combination ( word -- vtable )
+: math-combination ( word -- quot )
     \ over [
         dup math-class? [
             \ dup [ >r 2dup r> math-method ] math-vtable
@@ -66,6 +66,12 @@ TUPLE: no-math-method left right generic ;
             over object-method
         ] if nip
     ] math-vtable nip ;
+
+: partial-math-dispatch ( word class left/right -- vtable )
+    dup \ dup \ over ? [
+        ( word class left/right class )
+        >r 3dup r> swap [ swap ] unless math-method
+    ] math-vtable >r 3drop r> ;
 
 PREDICATE: generic 2generic ( word -- ? )
     "combination" word-prop [ math-combination ] = ;

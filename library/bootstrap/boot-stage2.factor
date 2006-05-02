@@ -23,6 +23,9 @@ H{ } clone help-graph set-global xref-articles
 
     "Compiling base..." print flush
 
+    \ slot \ set-slot [ usage ] 2apply append
+    [ try-compile ] each
+
     \ + compile
     \ = compile
     { "kernel" "sequences" "assembler" } compile-vocabs
