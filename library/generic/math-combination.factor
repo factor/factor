@@ -8,9 +8,12 @@ lists math namespaces sequences words ;
 
 : first/last ( seq -- pair ) dup first swap peek 2array ;
 
+: math-class? ( object -- ? )
+    dup word? [ number bootstrap-word class< ] [ drop f ] if ;
+
 : math-class-compare ( class class -- n )
     [
-        dup number class<
+        dup math-class?
         [ types first/last ] [ drop { 100 100 } ] if
     ] 2apply <=> ;
 
@@ -55,9 +58,6 @@ TUPLE: no-math-method left right generic ;
 
 : math-vtable ( picker quot -- quot )
     num-tags swap math-vtable* ; inline
-
-: math-class? ( object -- ? )
-    dup word? [ "math-priority" word-prop ] [ drop f ] if ;
 
 : math-combination ( word -- quot )
     \ over [

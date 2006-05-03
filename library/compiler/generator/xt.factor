@@ -2,8 +2,8 @@
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: compiler
 USING: assembler errors generic hashtables kernel
-kernel-internals lists math namespaces prettyprint sequences
-strings vectors words ;
+kernel-internals lists math namespaces prettyprint queues
+sequences strings vectors words ;
 
 : <label> ( -- label )
     #! Make a label.

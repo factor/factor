@@ -36,9 +36,9 @@ GENERIC: absq ( n -- |n|^2 ) foldable
 GENERIC: zero? ( x -- ? ) foldable
 M: object zero? drop f ;
 
-: sq dup * ; inline
-: neg 0 swap - ; inline
-: recip 1 swap / ; inline
+: sq dup * ; foldable
+: neg 0 swap - ; foldable
+: recip 1 swap / ; foldable
 : max ( x y -- z ) [ > ] 2keep ? ; foldable
 : min ( x y -- z ) [ < ] 2keep ? ; foldable
 : between? ( x min max -- ? ) pick >= >r >= r> and ; foldable
@@ -48,7 +48,7 @@ M: object zero? drop f ;
 : truncate ( x -- y ) dup 1 mod - ; foldable
 
 : floor ( x -- y )
-    dup 1 mod dup 0 =
+    dup 1 mod dup zero?
     [ drop ] [ dup 0 < [ - 1- ] [ - ] if ] if ; foldable
 
 : ceiling ( x -- y ) neg floor neg ; foldable

@@ -70,7 +70,7 @@ strings test ;
     ] map-with ;
 
 : iter ( c z nb-iter -- x )
-    over absq 4.0 >= over 0 = or
+    over absq 4.0 >= over zero? or
     [ 2nip ] [ 1- >r sq dupd + r> iter ] if ; inline
 
 SYMBOL: cols

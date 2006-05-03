@@ -139,7 +139,6 @@ ARTICLE: "namespaces-make" "Constructing sequences"
 
 ARTICLE: "namespaces-internals" "Namespace implementation details"
 "The namestack holds namespaces."
-{ $subsection namestack* }
 { $subsection namestack }
 { $subsection set-namestack }
 "A pair of words push and pop namespaces on the namestack."

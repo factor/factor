@@ -1,5 +1,5 @@
 IN: namespaces
-USING: help ;
+USING: help kernel-internals ;
 
 HELP: get "( variable -- value )"
 { $values { "variable" "a variable, by convention a symbol" } { "value" "the value, or " { $link f } } }

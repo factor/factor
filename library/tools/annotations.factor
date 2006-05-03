@@ -27,9 +27,5 @@ sequences strings walker ;
         nip [ swap % dup [ walk ] curry , , \ if , ] [ ] make
     ] annotate ;
 
-: with-profile ( quot word -- )
-    millis >r >r call r> millis r> - swap global [ +@ ] bind ;
-    inline
-
 : profile ( word -- )
-    [ swap [ with-profile ] curry cons ] annotate ;
+    [ swap [ global [ inc ] bind call ] curry cons ] annotate ;

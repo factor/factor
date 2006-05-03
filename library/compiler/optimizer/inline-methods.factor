@@ -45,8 +45,7 @@ kernel-internals lists math namespaces sequences words ;
 : inlining-class ( #call -- class )
     #! If the generic dispatch can be eliminated, return the
     #! class of the method that will always be invoked here.
-    dup node-param swap dispatching-class
-    specific-method ;
+    dup node-param swap dispatching-class specific-method ;
 
 : will-inline-method ( node -- quot/t )
     #! t indicates failure
@@ -83,8 +82,8 @@ kernel-internals lists math namespaces sequences words ;
     #! t indicates failure
     {
         { [ 3dup math-both-known? ] [ math-method ] }
-        { [ 3dup drop specific-method ] [ left-partial-math ] }
-        { [ 3dup nip specific-method ] [ right-partial-math ] }
+        ! { [ 3dup drop specific-method ] [ left-partial-math ] }
+        ! { [ 3dup nip specific-method ] [ right-partial-math ] }
         { [ t ] [ 3drop t ] }
     } cond ;
 
@@ -93,7 +92,8 @@ kernel-internals lists math namespaces sequences words ;
     will-inline-math-method (inline-method) ;
 
 : inline-math-method? ( #call -- ? )
-    dup node-history empty? swap node-param 2generic? and ;
+    dup node-history [ 2generic? ] contains? not
+    swap node-param 2generic? and ;
 
 : inline-method ( #call -- node )
     {
@@ -110,7 +110,7 @@ kernel-internals lists math namespaces sequences words ;
 
 : optimize-predicate? ( #call -- ? )
     dup node-param "predicating" word-prop dup [
-        >r dup 0 node-class# r> comparable?
+        >r 0 node-class# r> comparable?
     ] [
         2drop f
     ] if ;
