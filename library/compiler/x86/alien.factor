@@ -63,7 +63,7 @@ M: float-regs load-return-reg
     drop-return-reg ;
 
 : %alien-callback ( quot -- )
-    T{ vreg f 0 } load-literal
+    0 <int-vreg> load-literal
     EAX PUSH
     "run_callback" f %alien-invoke
     EAX POP ;

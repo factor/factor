@@ -4,6 +4,7 @@ USING: alien arrays assembler kernel kernel-internals lists math
 math-internals namespaces sequences words ;
 IN: compiler
 
+! Type checks
 \ tag [
     "in" operand tag-mask AND
     "in" operand tag-bits SHL
@@ -48,6 +49,7 @@ IN: compiler
     { +output { "obj" } }
 } define-intrinsic
 
+! Slots
 : untag ( reg -- ) tag-mask bitnot AND ;
 
 \ slot [
@@ -114,7 +116,8 @@ IN: compiler
     { +clobber { "val" "slot" "obj" } }
 } define-intrinsic
 
-: define-binary-op ( word op -- )
+! Fixnums
+: define-fixnum-op ( word op -- )
     [ [ "x" operand "y" operand ] % , ] [ ] make H{
         { +input { { f "x" } { f "y" } } }
         { +output { "x" } }
@@ -127,7 +130,7 @@ IN: compiler
     { fixnum-bitor OR }
     { fixnum-bitxor XOR }
 } [
-    first2 define-binary-op
+    first2 define-fixnum-op
 ] each
 
 \ fixnum-bitnot [
@@ -241,7 +244,7 @@ IN: compiler
     { +clobber { "x" "y" } }
 } define-intrinsic
 
-: define-binary-jump ( word op -- )
+: define-fixnum-jump ( word op -- )
     [
         [ end-basic-block "x" operand "y" operand CMP ] % ,
     ] [ ] make H{
@@ -255,9 +258,10 @@ IN: compiler
     { fixnum>= JGE }
     { eq? JE }
 } [
-    first2 define-binary-jump
+    first2 define-fixnum-jump
 ] each
 
+! User environment
 : %userenv ( -- )
     "x" operand "userenv" f dlsym MOV
     0 rel-absolute-cell rel-userenv

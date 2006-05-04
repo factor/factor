@@ -5,7 +5,8 @@ USING: alien arrays assembler kernel
 kernel-internals math namespaces sequences ;
 
 ! AMD64 register assignments
-! RAX RCX RDX RSI RDI R8 R9 R10 R11 vregs
+! RAX RCX RDX RSI RDI R8 R9 R10 R11 integer vregs
+! XMM0 - XMM7 float vregs
 ! R13 cards_offset
 ! R14 datastack
 ! R15 callstack
@@ -14,11 +15,9 @@ kernel-internals math namespaces sequences ;
 : cs-reg R15 ; inline
 : remainder-reg RDX ; inline
 
-: vregs { RAX RCX RDX RSI RDI R8 R9 R10 R11 } ; inline
-
 M: int-regs return-reg drop RAX ;
-
-M: int-regs fastcall-regs drop { RDI RSI RDX RCX R8 R9 } ;
+M: int-regs vregs { RAX RCX RDX RSI RDI R8 R9 R10 R11 } ;
+M: int-regs fastcall-regs { RDI RSI RDX RCX R8 R9 } ;
 
 : compile-c-call ( symbol dll -- )
     2dup dlsym R10 swap MOV
@@ -29,9 +28,8 @@ M: int-regs fastcall-regs drop { RDI RSI RDX RCX R8 R9 } ;
     swap [ MOV ] 2each compile-c-call ;
 
 M: float-regs return-reg drop XMM0 ;
-
-M: float-regs fastcall-regs
-    drop { XMM0 XMM1 XMM2 XMM3 XMM4 XMM5 XMM6 XMM7 } ;
+M: float-regs vregs drop { XMM0 XMM1 XMM2 XMM3 XMM4 XMM5 XMM6 XMM7 } ;
+M: float-regs fastcall-regs vregs ;
 
 : address-operand ( address -- operand )
     #! On AMD64, we have to load 64-bit addresses into a

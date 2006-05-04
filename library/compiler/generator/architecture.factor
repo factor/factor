@@ -5,9 +5,15 @@ sequences ;
 ! A scratch register for computations
 TUPLE: vreg n ;
 
+C: vreg ( n reg-class -- vreg )
+    [ set-delegate ] keep [ set-vreg-n ] keep ;
+
 ! Register classes
 TUPLE: int-regs ;
 TUPLE: float-regs size ;
+
+: <int-vreg> ( n -- vreg ) T{ int-regs } <vreg> ;
+: <float-vreg> ( n -- vreg ) T{ float-regs f 8 } <vreg> ;
 
 ! A pseudo-register class for parameters spilled on the stack
 TUPLE: stack-params ;
@@ -19,7 +25,7 @@ GENERIC: return-reg ( register-class -- reg )
 GENERIC: fastcall-regs ( register-class -- regs )
 
 ! Sequence mapping vreg-n to native assembler registers
-DEFER: vregs ( -- regs )
+GENERIC: vregs ( register-class -- regs )
 
 ! Load a literal (immediate or indirect)
 G: load-literal ( obj vreg -- ) 1 standard-combination ;
@@ -105,9 +111,6 @@ M: float-regs inc-reg-class
     macosx? [ reg-size 4 / int-regs +@ ] [ drop ] if ;
 
 GENERIC: v>operand
-
 M: integer v>operand tag-bits shift ;
-
-M: vreg v>operand vreg-n vregs nth ;
-
+M: vreg v>operand dup vreg-n swap vregs nth ;
 M: f v>operand address ;

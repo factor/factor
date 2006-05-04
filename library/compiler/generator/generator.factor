@@ -140,12 +140,12 @@ M: #if generate-node ( node -- next )
 
 : if>boolean-intrinsic ( label -- )
     <label> "end" set
-    f T{ vreg f 0 } load-literal
+    f 0 <int-vreg> load-literal
     "end" get %jump-label
     save-xt
-    t T{ vreg f 0 } load-literal
+    t 0 <int-vreg> load-literal
     "end" get save-xt
-    T{ vreg f 0 } phantom-d get phantom-push ;
+    0 <int-vreg> phantom-d get phantom-push ;
 
 : do-if-intrinsic ( node -- next )
     [ <label> dup ] keep if-intrinsic call
@@ -194,7 +194,7 @@ UNION: immediate fixnum POSTPONE: f ;
 
 : generate-push ( node -- )
     >#push< dup length dup ensure-vregs
-    alloc-reg# [ <vreg> ] map
+    alloc-reg# [ <int-vreg> ] map
     [ [ load-literal ] 2each ] keep
     phantom-d get phantom-append ;
 

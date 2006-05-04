@@ -1,6 +1,6 @@
 IN: temporary
-USING: alien compiler errors inference io kernel math memory
-namespaces test threads ;
+USING: alien compiler errors inference io kernel kernel-internals
+math memory namespaces test threads ;
 
 : callback-1 "void" { } [ ] alien-callback ; compiled
 

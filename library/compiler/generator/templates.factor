@@ -106,7 +106,7 @@ SYMBOL: phantom-r
     phantoms [ finalize-height ] 2apply ;
 
 : stack>vreg ( vreg# loc -- operand )
-    >r <vreg> dup r> %peek ;
+    >r <int-vreg> dup r> %peek ;
 
 : stack>new-vreg ( loc -- vreg )
     alloc-reg swap stack>vreg ;
@@ -157,7 +157,7 @@ SYMBOL: phantom-r
     phantoms append [ vreg? ] subset [ vreg-n ] map ;
 
 : compute-free-vregs ( -- )
-    used-vregs vregs length reverse diff
+    used-vregs T{ int-regs } vregs length reverse diff
     >vector free-vregs set ;
 
 : additional-vregs# ( seq seq -- n )
@@ -257,7 +257,7 @@ SYMBOL: +clobber
     +input get { } additional-vregs# +scratch get length + ;
 
 : alloc-scratch ( -- )
-    +scratch get [ alloc-vregs [ <vreg> ] map ] keep
+    +scratch get [ alloc-vregs [ <int-vreg> ] map ] keep
     phantom-vregs ;
 
 : template-inputs ( -- )

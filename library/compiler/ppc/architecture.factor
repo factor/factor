@@ -10,10 +10,9 @@ memory namespaces sequences words ;
 ! r14 data stack
 ! r15 call stack
 
-: vregs { 3 4 5 6 7 8 9 10 } ; inline
-
 M: int-regs return-reg drop 3 ;
 M: int-regs fastcall-regs drop { 3 4 5 6 7 8 9 10 } ;
+M: int-regs vregs drop { 3 4 5 6 7 8 9 10 } ;
 
 M: float-regs return-reg drop 1 ;
 M: float-regs fastcall-regs drop { 1 2 3 4 5 6 7 8 } ;
@@ -163,7 +162,7 @@ M: stack-params freg>stack
     11 [ compile-dlsym ] keep MTLR BLRL ;
 
 : %alien-callback ( quot -- )
-    T{ vreg f 0 } load-literal "run_callback" f %alien-invoke ;
+    0 <int-vreg> load-literal "run_callback" f %alien-invoke ;
 
 : save-return 0 swap [ return-reg ] keep freg>stack ;
 : load-return 0 swap [ return-reg ] keep stack>freg ;

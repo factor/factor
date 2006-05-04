@@ -5,20 +5,20 @@ math memory namespaces sequences words ;
 IN: compiler
 
 ! x86 register assignments
-! EAX, ECX, EDX vregs
+! EAX, ECX, EDX integer vregs
+! XMM0 - XMM7 float vregs
 ! ESI datastack
 ! EBX callstack
 
-! AMD64 redefines these four
+! AMD64 redefines a lot of words in this file
+
 : ds-reg ESI ; inline
 : cs-reg EBX ; inline
 : remainder-reg EDX ; inline
-: vregs { EAX ECX EDX } ; inline
 
 : reg-stack ( n reg -- op ) swap cells neg [+] ;
 
 M: ds-loc v>operand ds-loc-n ds-reg reg-stack ;
-
 M: cs-loc v>operand cs-loc-n cs-reg reg-stack ;
 
 : %alien-invoke ( symbol dll -- )
@@ -32,8 +32,10 @@ M: cs-loc v>operand cs-loc-n cs-reg reg-stack ;
 ! On x86, parameters are never passed in registers.
 M: int-regs return-reg drop EAX ;
 M: int-regs fastcall-regs drop { } ;
+M: int-regs vregs drop { EAX ECX EDX } ;
 
 M: float-regs fastcall-regs drop { } ;
+M: float-regs vregs drop { XMM0 XMM1 XMM2 XMM3 XMM4 XMM5 XMM6 XMM7 } ;
 
 : address-operand ( address -- operand )
     #! On x86, we can always use an address as an operand
