@@ -374,12 +374,20 @@ M: operand CMP OCT: 071 2-operand ;
 ( SSE multimedia instructions )
 
 : 2-operand-sse ( dst src op1 op2 -- )
-    pick register-128? [ nip ] [ drop swapd ] if
+    #! We swap the operands here to make everything consistent
+    #! with the integer instructions.
+    swap assemble-1 swapd
     >r 2dup t prefix HEX: 0f assemble-1 r>
     assemble-1 reg-code swap addressing ;
 
-: MOVLPD ( dest src -- )
-    HEX: 66 assemble-1 HEX: 12 HEX: 13 2-operand-sse ;
-
-: MOVSS ( dest src -- )
-    HEX: f3 assemble-1 HEX: 10 HEX: 11 2-operand-sse ;
+: MOVSS ( dest src -- ) HEX: f3 HEX: 10 2-operand-sse ;
+: MOVSD ( dest src -- ) HEX: f2 HEX: 10 2-operand-sse ;
+: ADDSD ( dest src -- ) HEX: f2 HEX: 58 2-operand-sse ;
+: MULSD ( dest src -- ) HEX: f2 HEX: 59 2-operand-sse ;
+: SUBSD ( dest src -- ) HEX: f2 HEX: 5c 2-operand-sse ;
+: DIVSD ( dest src -- ) HEX: f2 HEX: 5e 2-operand-sse ;
+: SQRTSD ( dest src -- ) HEX: f2 HEX: 51 2-operand-sse ;
+: UCOMISD ( dest src -- ) HEX: 66 HEX: 2e 2-operand-sse ;
+: COMISD ( dest src -- ) HEX: 66 HEX: 2f 2-operand-sse ;
+: CVTSI2SD ( dest src -- ) HEX: f2 HEX: 2a 2-operand-sse ;
+: CVTSD2SI ( dest src -- ) HEX: f2 HEX: 2d 2-operand-sse ;

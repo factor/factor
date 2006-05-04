@@ -14,11 +14,11 @@ M: int-regs freg>stack drop >r stack@ r> MOV ;
 
 M: int-regs stack>freg drop swap stack@ MOV ;
 
-: MOVSS/LPD float-regs-size 4 = [ MOVSS ] [ MOVLPD ] if ;
+: MOVSS/D float-regs-size 4 = [ MOVSS ] [ MOVSD ] if ;
 
-M: float-regs freg>stack >r >r stack@ r> r> MOVSS/LPD ;
+M: float-regs freg>stack >r >r stack@ r> r> MOVSS/D ;
 
-M: float-regs stack>freg >r swap stack@ r> MOVSS/LPD ;
+M: float-regs stack>freg >r swap stack@ r> MOVSS/D ;
 
 M: stack-params stack>freg
     drop >r R11 swap stack@ MOV r> stack@ R11 MOV ;
