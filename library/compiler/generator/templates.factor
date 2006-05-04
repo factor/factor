@@ -5,13 +5,12 @@ USING: arrays generic hashtables inference io kernel math
 namespaces prettyprint sequences vectors words ;
 
 ! Register allocation
+
+! Hash mapping reg-classes to mutable vectors
 SYMBOL: free-vregs
 
-: alloc-reg ( -- n )
-    free-vregs get pop ;
-
-: alloc-reg# ( n -- regs )
-    free-vregs [ cut ] change ;
+: alloc-reg ( reg-class -- vreg )
+    >r free-vregs get pop r> <vreg> ;
 
 : requested-vregs ( template -- n )
     0 [ [ 1+ ] unless ] reduce ;
@@ -20,7 +19,7 @@ SYMBOL: free-vregs
     [ requested-vregs ] 2apply + ;
 
 : alloc-vregs ( template -- template )
-    [ first [ alloc-reg ] unless* ] map ;
+    [ first [ <int-vreg> ] [ T{ int-regs } alloc-reg ] if* ] map ;
 
 : adjust-free-vregs ( seq -- )
     free-vregs [ diff ] change ;
@@ -105,11 +104,8 @@ SYMBOL: phantom-r
 : finalize-heights ( -- )
     phantoms [ finalize-height ] 2apply ;
 
-: stack>vreg ( vreg# loc -- operand )
-    >r <int-vreg> dup r> %peek ;
-
 : stack>new-vreg ( loc -- vreg )
-    alloc-reg swap stack>vreg ;
+    T{ int-regs } alloc-reg [ swap %peek ] keep ;
 
 : vreg>stack ( value loc -- )
     over loc? [
@@ -182,7 +178,7 @@ SYMBOL: phantom-r
 : stack>vregs ( phantom template -- values )
     [
         alloc-vregs dup length rot phantom-locs
-        [ stack>vreg ] 2map
+        [ dupd %peek ] 2map
     ] 2keep length neg swap adjust-phantom ;
 
 : compatible-values? ( value template -- ? )
@@ -257,8 +253,7 @@ SYMBOL: +clobber
     +input get { } additional-vregs# +scratch get length + ;
 
 : alloc-scratch ( -- )
-    +scratch get [ alloc-vregs [ <int-vreg> ] map ] keep
-    phantom-vregs ;
+    +scratch get [ alloc-vregs ] keep phantom-vregs ;
 
 : template-inputs ( -- )
     ! Ensure we have enough to hold any new stack elements we
