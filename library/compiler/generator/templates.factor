@@ -7,22 +7,18 @@ namespaces prettyprint sequences vectors words ;
 ! Register allocation
 
 ! Hash mapping reg-classes to mutable vectors
-SYMBOL: free-vregs
+: free-vregs ( reg-class -- seq ) \ free-vregs get hash ;
 
-: alloc-reg ( reg-class -- vreg )
-    >r free-vregs get pop r> <vreg> ;
+: alloc-reg ( reg-class -- vreg ) free-vregs pop ;
 
-: requested-vregs ( template -- n )
-    0 [ [ 1+ ] unless ] reduce ;
-
-: template-vreg# ( template template -- n )
-    [ requested-vregs ] 2apply + ;
+: take-reg ( vreg -- ) dup delegate free-vregs delete ;
 
 : alloc-vregs ( template -- template )
-    [ first [ <int-vreg> ] [ T{ int-regs } alloc-reg ] if* ] map ;
-
-: adjust-free-vregs ( seq -- )
-    free-vregs [ diff ] change ;
+    [
+        first dup
+        H{ { f T{ int-regs } } { float T{ float-regs f 8 } } }
+        hash [ alloc-reg ] [ <int-vreg> dup take-reg ] ?if
+    ] map ;
 
 ! A data stack location.
 TUPLE: ds-loc n ;
@@ -84,7 +80,6 @@ M: phantom-callstack finalize-height
     dup length swap phantom-locs ;
 
 : adjust-phantom ( n phantom -- )
-    #! Change stack heiht.
     [ phantom-stack-height + ] keep set-phantom-stack-height ;
 
 GENERIC: cut-phantom ( n phantom -- seq )
@@ -150,22 +145,29 @@ SYMBOL: phantom-r
     finalize-contents finalize-heights ;
 
 : used-vregs ( -- seq )
-    phantoms append [ vreg? ] subset [ vreg-n ] map ;
+    phantoms append [ vreg? ] subset ;
+
+: (compute-free-vregs) ( used class -- vector )
+    dup vregs length reverse [ swap <vreg> ] map-with diff
+    >vector ;
 
 : compute-free-vregs ( -- )
-    used-vregs T{ int-regs } vregs length reverse diff
-    >vector free-vregs set ;
+    used-vregs
+    { T{ int-regs } T{ float-regs f 8 } }
+    [ 2dup (compute-free-vregs) ] map>hash \ free-vregs set
+    drop ;
 
 : additional-vregs# ( seq seq -- n )
     2array phantoms 2array [ [ length ] map ] 2apply v-
     0 [ 0 max + ] reduce ;
 
-: free-vregs* ( -- n )
-    free-vregs get length
-    phantoms [ [ loc? ] subset length ] 2apply + - ;
+: free-vregs* ( -- int# float# )
+    T{ int-regs } free-vregs length
+    phantoms [ [ loc? ] subset length ] 2apply + -
+    T{ float-regs f 8 } free-vregs length ;
 
-: ensure-vregs ( n -- )
-    compute-free-vregs free-vregs* <=
+: ensure-vregs ( int# float# -- )
+    compute-free-vregs free-vregs* swapd <= >r <= r> and
     [ finalize-contents compute-free-vregs ] unless ;
 
 : lazy-load ( value loc -- value )
@@ -181,12 +183,18 @@ SYMBOL: phantom-r
         [ dupd %peek ] 2map
     ] 2keep length neg swap adjust-phantom ;
 
+: compatible-vreg? ( n vreg -- ? )
+    {
+        { [ dup [ int-regs? ] is? ] [ vreg-n = ] }
+        { [ dup [ float-regs? ] is? ] [ 2drop t ] }
+        { [ t ] [ 2drop f ] }
+    } cond ;
+
 : compatible-values? ( value template -- ? )
     {
         { [ over loc? ] [ 2drop t ] }
-        { [ dup not ] [ 2drop t ] }
-        { [ over not ] [ 2drop f ] }
-        { [ dup integer? ] [ swap vreg-n = ] }
+        { [ dup { f float } memq? ] [ 2drop t ] }
+        { [ dup integer? ] [ swap compatible-vreg? ] }
     } cond ;
 
 : template-match? ( template phantom -- ? )
@@ -245,12 +253,12 @@ SYMBOL: +clobber
     outputs-clash? [ finalize-contents ] when
     phantom-d get swap [ stack>vregs ] keep phantom-vregs ;
 
-: input-vregs ( -- seq )
-    +input +scratch [ get [ second get vreg-n ] map ] 2apply
-    append ;
+: requested-vregs ( template -- int# float# )
+    dup length swap [ float eq? ] subset length [ - ] keep ;
 
-: guess-vregs ( -- n )
-    +input get { } additional-vregs# +scratch get length + ;
+: guess-vregs ( -- int# float# )
+    +input get { } additional-vregs#
+    +scratch get requested-vregs >r + r> ;
 
 : alloc-scratch ( -- )
     +scratch get [ alloc-vregs ] keep phantom-vregs ;
@@ -261,11 +269,9 @@ SYMBOL: +clobber
     guess-vregs ensure-vregs
     ! Split the template into available (fast) parts and those
     ! that require allocating registers and reading the stack
-    +input get match-template fast-input
-    used-vregs adjust-free-vregs
-    slow-input
-    alloc-scratch
-    input-vregs adjust-free-vregs ;
+    +input get match-template fast-input slow-input
+    ! Finally allocate scratch registers
+    alloc-scratch ;
 
 : template-outputs ( -- )
     +output get [ get ] map { } (template-outputs) ;

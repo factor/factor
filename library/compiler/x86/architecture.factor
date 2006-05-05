@@ -46,12 +46,23 @@ M: float-regs vregs drop { XMM0 XMM1 XMM2 XMM3 XMM4 XMM5 XMM6 XMM7 } ;
 
 : prepare-division CDQ ; inline
 
+: unboxify-float ( obj vreg quot -- | quot: obj int-vreg )
+    over [ float-regs? ] is? [
+        swap >r T{ int-regs } alloc-reg [ swap call ] keep
+        r> swap [ v>operand ] 2apply float-offset [+] MOVSD
+    ] [
+        call
+    ] if ; inline
+
 M: immediate load-literal ( literal vreg -- )
-    v>operand swap address MOV ;
+    v>operand swap v>operand MOV ;
+
+: load-indirect ( literal vreg -- )
+    v>operand swap add-literal [] MOV
+    rel-absolute-cell rel-address ;
 
 M: object load-literal ( literal vreg -- )
-    v>operand swap
-    add-literal [] MOV rel-absolute-cell rel-address ;
+    [ load-indirect ] unboxify-float ;
 
 : (%call) ( label -- label )
     dup postpone-word dup primitive? [ address-operand ] when ;
@@ -85,9 +96,22 @@ M: object load-literal ( literal vreg -- )
 
 : %return ( -- ) %epilogue RET ;
 
-: %peek ( vreg loc -- ) [ v>operand ] 2apply MOV ;
+: vreg-mov [ v>operand ] 2apply MOV ;
 
-: %replace ( vreg loc -- ) swap %peek ;
+: %peek ( vreg loc -- )
+    swap [ swap vreg-mov ] unboxify-float ;
+
+: %replace ( vreg loc -- )
+    over [ float-regs? ] is? [
+        ! >r
+        ! "fp-scratch" operand "allot.here" f dlsym [] MOV
+        ! "fp-scratch" operand [] float-tag >header MOV
+        ! "fp-scratch" operand 8 [+] r> MOVSD
+        ! "allot.here" f dlsym [] 16 ADD
+        vreg-mov
+    ] [
+        vreg-mov
+    ] if ;
 
 : (%inc) swap cells dup 0 > [ ADD ] [ neg SUB ] if ;
 

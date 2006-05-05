@@ -16,8 +16,8 @@ kernel-internals math namespaces sequences ;
 : remainder-reg RDX ; inline
 
 M: int-regs return-reg drop RAX ;
-M: int-regs vregs { RAX RCX RDX RSI RDI R8 R9 R10 R11 } ;
-M: int-regs fastcall-regs { RDI RSI RDX RCX R8 R9 } ;
+M: int-regs vregs drop { RAX RCX RDX RSI RDI R8 R9 R10 R11 } ;
+M: int-regs fastcall-regs drop { RDI RSI RDX RCX R8 R9 } ;
 
 : compile-c-call ( symbol dll -- )
     2dup dlsym R10 swap MOV

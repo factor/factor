@@ -261,6 +261,39 @@ IN: compiler
     first2 define-fixnum-jump
 ] each
 
+! Floats
+! : define-float-op ( word op -- )
+!     [ [ "x" operand "y" operand ] % , ] [ ] make H{
+!         { +input { { float "x" } { float "y" } } }
+!         { +output { "x" } }
+!     } define-intrinsic ;
+! 
+! {
+!     { float+ ADDSD }
+!     { float- SUBSD }
+!     { float* MULSD }
+!     { float/f DIVSD }
+! } [
+!     first2 define-float-op
+! ] each
+! 
+! : define-float-jump ( word op -- )
+!     [
+!         [ end-basic-block "x" operand "y" operand COMISD ] % ,
+!     ] [ ] make H{
+!         { +input { { float "x" } { float "y" } } }
+!     } define-if-intrinsic ;
+! 
+! {
+!     { float< JL }
+!     { float<= JLE }
+!     { float> JG }
+!     { float>= JGE }
+!     { float= JE }
+! } [
+!     first2 define-float-jump
+! ] each
+
 ! User environment
 : %userenv ( -- )
     "x" operand "userenv" f dlsym MOV

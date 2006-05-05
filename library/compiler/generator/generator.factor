@@ -192,8 +192,16 @@ M: #dispatch generate-node ( node -- next )
 ! #push
 UNION: immediate fixnum POSTPONE: f ;
 
+: alloc-literal-reg ( literal -- vreg )
+    float? T{ float-regs f 8 } T{ int-regs } ? alloc-reg ;
+
+! : generate-push ( node -- )
+!     >#push< dup [ class ] map requested-vregs ensure-vregs
+!     [ dup alloc-literal-reg [ load-literal ] keep ] map
+!     phantom-d get phantom-append ;
+
 : generate-push ( node -- )
-    >#push< dup length ensure-vregs
+    >#push< dup length 0 ensure-vregs
     [ T{ int-regs } alloc-reg [ load-literal ] keep ] map
     phantom-d get phantom-append ;
 
@@ -221,7 +229,7 @@ M: #push generate-node ( #push -- )
     dup shuffle-in-d swap shuffle-in-r additional-vregs# ;
 
 : phantom-shuffle ( shuffle -- )
-    dup shuffle-vregs# ensure-vregs
+    dup shuffle-vregs# 0 ensure-vregs
     [ phantom-shuffle-inputs ] keep
     [ shuffle* ] keep adjust-shuffle
     (template-outputs) ;
@@ -236,4 +244,5 @@ M: #return generate-node drop end-basic-block %return f ;
 : card-bits 7 ;
 : card-mark HEX: 80 ;
 
+: float-offset 8 float-tag - ;
 : string-offset 3 cells object-tag - ;
