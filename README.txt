@@ -94,11 +94,19 @@ To run the Factor system, issue the following command:
 This will start the interactive listener where Factor expressions may
 be entered.
 
-To run the graphical user interface, issue the following command:
+To run the graphical user interface on non-Mac OS X systems, issue the
+following command:
 
   ./f factor.image -shell=ui
 
 Note that on Windows, this is the default.
+
+To prepare to run the GUI on Mac OS X, issue the following command:
+
+  make macosx.app
+
+once after bootstrapping, then double-click the Factor application to
+run it.
 
 On Unix, this might fail if the SDL libraries are not installed, or are
 installed under unconventional names. This can be solved by explicitly
