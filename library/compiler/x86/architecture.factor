@@ -47,6 +47,8 @@ M: float-regs vregs drop { XMM0 XMM1 XMM2 XMM3 XMM4 XMM5 XMM6 XMM7 } ;
 : prepare-division CDQ ; inline
 
 : unboxify-float ( obj vreg quot -- | quot: obj int-vreg )
+    #! The SSE2 code here will never be generated unless SSE2
+    #! intrinsics are loaded.
     over [ float-regs? ] is? [
         swap >r T{ int-regs } alloc-reg [ swap call ] keep
         r> swap [ v>operand ] 2apply float-offset [+] MOVSD
@@ -102,6 +104,8 @@ M: object load-literal ( literal vreg -- )
     swap [ swap vreg-mov ] unboxify-float ;
 
 : %replace ( vreg loc -- )
+    #! The SSE2 code here will never be generated unless SSE2
+    #! intrinsics are loaded.
     over [ float-regs? ] is? [
         ! >r
         ! "fp-scratch" operand "allot.here" f dlsym [] MOV

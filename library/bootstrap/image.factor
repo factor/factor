@@ -361,4 +361,4 @@ M: hashtable ' ( hashtable -- pointer )
     ] with-scope ;
 
 : make-images ( -- )
-    { "x86" "ppc" "amd64" } [ make-image ] each ;
+    { "x86" "pentium4" "ppc" "amd64" } [ make-image ] each ;

@@ -9,6 +9,10 @@ vectors words ;
 
 "/library/bootstrap/primitives.factor" run-resource
 
+: if-arch ( arch seq -- )
+    architecture rot member?
+    [ [ parse-resource % ] each ] [ drop ] if ;
+
 ! The [ ] make form creates a boot quotation
 [
     \ boot ,
@@ -277,40 +281,34 @@ vectors words ;
         "/doc/handbook/words.facts"
     } [ parse-resource % ] each
     
-    architecture get {
-        {
-            [ dup "x86" = ] [
-                {
-                    "/library/compiler/x86/assembler.factor"
-                    "/library/compiler/x86/architecture.factor"
-                    "/library/compiler/x86/alien.factor"
-                    "/library/compiler/x86/intrinsics.factor"
-                }
-            ]
-        } {
-            [ dup "ppc" = ] [
-                {
-                    "/library/compiler/ppc/assembler.factor"
-                    "/library/compiler/ppc/architecture.factor"
-                    "/library/compiler/ppc/intrinsics.factor"
-                }
-            ]
-        } {
-            [ dup "amd64" = ] [
-                {
-                    "/library/compiler/x86/assembler.factor"
-                    "/library/compiler/amd64/architecture.factor"
-                    "/library/compiler/x86/generator.factor"
-                    "/library/compiler/amd64/generator.factor"
-                    "/library/compiler/x86/slots.factor"
-                    "/library/compiler/amd64/slots.factor"
-                    "/library/compiler/x86/stack.factor"
-                    "/library/compiler/x86/fixnum.factor"
-                    "/library/compiler/amd64/alien.factor"
-                }
-            ]
-        }
-    } cond [ parse-resource % ] each drop
+    { "x86" "pentium4" } {
+        "/library/compiler/x86/assembler.factor"
+        "/library/compiler/x86/architecture.factor"
+        "/library/compiler/x86/alien.factor"
+        "/library/compiler/x86/intrinsics.factor"
+    } if-arch
+    
+    { "pentium4" } {
+        "/library/compiler/x86/intrinsics-sse2.factor"
+    } if-arch
+
+    { "ppc" } {
+        "/library/compiler/ppc/assembler.factor"
+        "/library/compiler/ppc/architecture.factor"
+        "/library/compiler/ppc/intrinsics.factor"
+    } if-arch
+
+    { "amd64" } {
+        "/library/compiler/x86/assembler.factor"
+        "/library/compiler/amd64/architecture.factor"
+        "/library/compiler/x86/generator.factor"
+        "/library/compiler/amd64/generator.factor"
+        "/library/compiler/x86/slots.factor"
+        "/library/compiler/amd64/slots.factor"
+        "/library/compiler/x86/stack.factor"
+        "/library/compiler/x86/fixnum.factor"
+        "/library/compiler/amd64/alien.factor"
+    } if-arch
     
     [
         "/library/bootstrap/boot-stage2.factor" run-resource
@@ -330,3 +328,5 @@ vocabularies get [
 "Building generic words..." print flush
 
 all-words [ generic? ] subset [ make-generic ] each
+
+FORGET: if-arch
