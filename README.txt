@@ -4,6 +4,19 @@ The Factor programming language
 This file covers installation and basic usage of the Factor
 implementation. It is not an introduction to the language itself.
 
+* Contents
+
+- Platform support
+- Compiling Factor
+- Building Factor
+- Running Factor on Unix with X11
+- Running Factor on Mac OS X
+- Running Factor on Windows
+- Source organization
+- Learning Factor
+- Community
+- Credits
+
 * Platform support
 
 Factor is fully supported on the following platforms:
@@ -28,9 +41,8 @@ Other platforms are not supported.
 
 The Factor runtime is written in C, and is built with GNU make and gcc.
 
-Note that on x86 systems, Factor _cannot_ be compiled with gcc 3.3. This
-is due to a bug in gcc and there is nothing we can do about it. Please
-use gcc 2.95, 3.4, or 4.0.
+Factor requires gcc 3.4 or later. On x86, it /will not/ build using gcc
+3.3 or earlier.
 
 Run 'make' (or 'gmake' on non-Linux platforms) with one of the following
 parameters to build the Factor runtime:
@@ -48,9 +60,9 @@ The following options can be given to make:
   DEBUG=1
 
 The former allows optimization flags to be specified, for example
-"-march=pentium4 -ffast-math -O3". Optimization flags can make a *huge*
-difference in Factor's performance, so willing hackers should
-experiment.
+"-march=pentium4 -ffast-math -O3". Nowadays most of the hard work is
+done by Factor compiled code, so optimizing the runtime is not that
+important. Usually the defaults are fine.
 
 The DEBUG flag disables optimization and builds an executable with
 debug symbols. This is probably only of interest to people intending to
@@ -85,80 +97,69 @@ completes, a 'factor.image' file will be generated. Note that this image
 is both CPU and OS-specific, so in general cannot be shared between
 machines.
 
-* Running Factor
+* Running Factor on Unix with X11
 
-To run the Factor system, issue the following command:
+On Unix, Factor can either run a graphical user interface using X11, or
+a terminal listener.
+
+If your DISPLAY environment variable is set, the UI will start
+automatically:
 
   ./f factor.image
 
-This will start the interactive listener where Factor expressions may
-be entered.
+To run an interactive terminal listener:
 
-To run the graphical user interface on non-Mac OS X systems, issue the
-following command:
+  ./f factor.image -shell=tty
 
-  ./f factor.image -shell=ui
+If you're inside a terminal session, you can start the UI with one of
+the following two commands:
 
-Note that on Windows, this is the default.
+  ui
+  [ ui ] in-thread
+  
+The latter keeps the terminal listener running.
 
-To prepare to run the GUI on Mac OS X, issue the following command:
+* Running Factor on Mac OS X
+
+On Mac OS X, a Cocoa UI is available in addition to the terminal
+listener.
+
+The 'f' executable runs the terminal listener:
+
+  ./f factor.image
+
+The Cocoa UI requires that after bootstrapping you build the Factor.app
+application bundle:
 
   make macosx.app
 
-once after bootstrapping, then double-click the Factor application to
-run it.
+This copies the runtime executable, factor.image (which must exist at
+this point), and the library source into a self-contained Factor.app.
 
-On Unix, this might fail if the SDL libraries are not installed, or are
-installed under unconventional names. This can be solved by explicitly
-naming the libraries during bootstrap, as in the next section.
+Factor.app runs the UI when double-clicked and can be transported
+between PowerPC Macs.
 
-* Setting up SDL libraries for use with Factor
+* Running Factor on Windows
 
-The Windows binary package for Factor includes all prerequisite DLLs.
-On Unix, you need recent versions of SDL and FreeType.
+On Windows, double-clicking f.exe will start running the Win32-based UI
+with the factor.image in the same directory as the executable.
 
-If you have installed these libraries but the UI still fails with an
-error, you will need to find out the exact names that they are installed
-as, and issue a command similar to the following to bootstrap Factor:
-
-  ./f boot.image.<foo> -libraries:sdl:name=libSDL-1.2.so
-                       -libraries:freetype:name=libfreetype.so
+Bootstrap runs in a Windows command prompt, however after bootstrapping
+only the UI can be used.
 
 * Source organization
 
   doc/ - the developer's handbook, and various other bits and pieces
   native/ - sources for the Factor runtime, written in C
   library/ - sources for the library, written in Factor
-    alien/ - C library interface
-    bootstrap/ - code for generating boot images
-    cocoa/ - Mac OS X Cocoa API and Objective-C runtime binding
-    collections/ - data types including but not limited to lists,
-      vectors, hashtables, and operations on them
-    compiler/ - optimizing native compiler
-    freetype/ - FreeType binding, rendering glyphs to OpenGL textures
-    generic/ - generic words, for object oriented programming style
-    help/ - online help system
-    inference/ - stack effect inference, used by compiler, as well as a
-      useful development tool of its own
-    io/ - input and output streams
-    math/ - integers, ratios, floats, complex numbers, vectors, matrices
-    opengl/ - OpenGL graphics library binding
-    syntax/ - parser and object prettyprinter
-    test/ - unit test framework and test suite
-    tools/ - interactive development tools
-    ui/ - UI framework
-    unix/ - Unix-specific I/O code
-    win32/ - Windows-specific I/O code
   contrib/ - various handy libraries not part of the core
   examples/ - small examples illustrating various language features
   fonts/ - TrueType fonts used by UI
 
 * Learning Factor
 
-The UI has a simple tutorial that will show you the most basic concepts.
-
-There is a detailed language and library reference available at
-http://factorcode.org/handbook.pdf.
+The UI has a tutorial and defailed reference documentation. You can
+browse it in the UI or by running the HTTP server (contrib/httpd).
 
 You can browse the source code; it is organized into small,
 well-commented files and should be easy to follow once you have a good
