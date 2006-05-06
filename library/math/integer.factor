@@ -59,17 +59,12 @@ M: fixnum mod fixnum-mod ;
 
 M: fixnum /mod fixnum/mod ;
 
-M: fixnum 1+ 1 fixnum+ ;
-M: fixnum 1- 1 fixnum- ;
-
 M: fixnum bitand fixnum-bitand ;
 M: fixnum bitor fixnum-bitor ;
 M: fixnum bitxor fixnum-bitxor ;
 M: fixnum shift fixnum-shift ;
 
 M: fixnum bitnot fixnum-bitnot ;
-
-M: fixnum zero? 0 eq? ;
 
 M: bignum number= bignum= ;
 M: bignum < bignum< ;
@@ -86,9 +81,6 @@ M: bignum mod bignum-mod ;
 
 M: bignum /mod bignum/mod ;
 
-M: bignum 1+ 1 >bignum bignum+ ;
-M: bignum 1- 1 >bignum bignum- ;
-
 M: bignum bitand bignum-bitand ;
 M: bignum bitor bignum-bitor ;
 M: bignum bitxor bignum-bitxor ;
@@ -96,4 +88,4 @@ M: bignum shift bignum-shift ;
 
 M: bignum bitnot bignum-bitnot ;
 
-M: bignum zero? 0 >bignum bignum= ;
+M: integer zero? 0 number= ;

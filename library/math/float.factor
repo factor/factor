@@ -20,8 +20,7 @@ M: real <=> - ;
 : fp-nan? ( float -- ? )
     double>bits -51 shift BIN: 111111111111 [ bitand ] keep = ;
 
-M: float zero?
-    double>bits HEX: 8000000000000000 [ bitor ] keep number= ;
+M: float zero? ( float -- ? ) dup 0.0 = swap -0.0 = or ;
 
 M: float < float< ;
 M: float <= float<= ;
@@ -35,6 +34,3 @@ M: float * float* ;
 M: float / float/f ;
 M: float /f float/f ;
 M: float mod float-mod ;
-
-M: float 1+ 1.0 float+ ;
-M: float 1- 1.0 float- ;

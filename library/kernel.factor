@@ -102,9 +102,6 @@ IN: kernel-internals
 
 : cell 17 getenv ; foldable
 
-: tag-address ( x tag -- tagged ) swap tag-bits shift bitor ;
-: tag-header ( id -- tagged ) object-tag tag-address ;
-
 IN: kernel
 
 : win32? windows? cell 4 = and ; inline
@@ -113,7 +110,5 @@ IN: kernel
 IN: memory
 
 : generations ( -- n ) 15 getenv ;
-
 : image ( -- path ) 16 getenv ;
-
 : save ( -- ) image save-image ;

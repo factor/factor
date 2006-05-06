@@ -1,7 +1,7 @@
 ! Copyright (C) 2004, 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: kernel-internals
-USING: namespaces math ;
+USING: kernel namespaces math ;
 
 : bootstrap-cell \ cell get ; inline
 : cells cell * ; inline
@@ -9,6 +9,9 @@ USING: namespaces math ;
 
 : cell-bits 8 cells ; inline
 : bootstrap-cell-bits 8 bootstrap-cells ; inline
+
+: tag-address ( x tag -- tagged ) swap tag-bits shift bitor ;
+: tag-header ( id -- tagged ) object-tag tag-address ;
 
 IN: math
 

@@ -61,9 +61,6 @@ M: complex * ( x y -- x*y ) 2dup *re - -rot *im + (rect>) ;
 M: complex / ( x y -- x/y ) complex/ tuck / >r / r> (rect>) ;
 M: complex /f ( x y -- x/y ) complex/ tuck /f >r /f r> (rect>) ;
 
-M: complex 1+ >rect >r 1+ r> (rect>) ;
-M: complex 1- >rect >r 1- r> (rect>) ;
-
 M: complex abs ( z -- |z| ) absq fsqrt ;
 
 M: complex hashcode ( n -- n )

@@ -192,9 +192,6 @@ M: #dispatch generate-node ( node -- next )
 ! #push
 UNION: immediate fixnum POSTPONE: f ;
 
-: alloc-literal-reg ( literal -- vreg )
-    float? T{ float-regs f 8 } T{ int-regs } ? alloc-reg ;
-
 : generate-push ( node -- )
     >#push< dup literal-template
     dup requested-vregs ensure-vregs

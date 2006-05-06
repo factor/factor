@@ -1,4 +1,3 @@
-IN: temporary
 USE: compiler
 USE: test
 USE: math
@@ -7,6 +6,7 @@ USE: words
 USE: kernel
 USE: math-internals
 USE: memory
+IN: temporary
 
 : no-op ; compiled
 

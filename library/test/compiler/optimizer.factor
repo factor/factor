@@ -1,8 +1,8 @@
-IN: temporary
 USING: arrays assembler compiler generic
 hashtables inference kernel kernel-internals lists math
 optimizer prettyprint sequences strings test vectors words
 sequences-internals ;
+IN: temporary
 
 : kill-1
     [ 1 2 3 ] [ + ] over drop drop ; compiled
@@ -37,6 +37,8 @@ sequences-internals ;
 : subset? swap [ swap member? ] all-with? ;
 
 : set= 2dup subset? >r swap subset? r> and ;
+
+USE: optimizer
 
 : kill-set dup live-values swap literals hash-diff ;
 

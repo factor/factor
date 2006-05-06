@@ -1,8 +1,8 @@
 ! Black box testing of templater optimization
 
-IN: temporary
 USING: arrays compiler kernel kernel-internals math
 math-internals namespaces sequences sequences-internals test ;
+IN: temporary
 
 ! Oops!
 [ 5000 ] [ [ 5000 ] compile-1 ] unit-test

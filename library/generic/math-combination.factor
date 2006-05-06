@@ -6,7 +6,7 @@ lists math namespaces sequences words ;
 
 ! Math combination for generic dyadic upgrading arithmetic.
 
-: first/last ( seq -- pair ) dup first swap peek 2array ;
+: last/first ( seq -- pair ) dup peek swap first 2array ;
 
 : math-class? ( object -- ? )
     dup word? [ number bootstrap-word class< ] [ drop f ] if ;
@@ -14,7 +14,7 @@ lists math namespaces sequences words ;
 : math-class-compare ( class class -- n )
     [
         dup math-class?
-        [ types first/last ] [ drop { 100 100 } ] if
+        [ types last/first ] [ drop { 100 100 } ] if
     ] 2apply <=> ;
 
 : math-class-max ( class class -- class )

@@ -28,14 +28,14 @@ G: shift  ( x n -- y ) math-combination ; foldable
 
 GENERIC: bitnot ( n -- n ) foldable
 
-GENERIC: 1+ ( x -- x+1 ) foldable
-GENERIC: 1- ( x -- x-1 ) foldable
 GENERIC: abs ( z -- |z| ) foldable
 GENERIC: absq ( n -- |n|^2 ) foldable
 
 GENERIC: zero? ( x -- ? ) foldable
 M: object zero? drop f ;
 
+: 1+ 1 + ; foldable
+: 1- 1 - ; foldable
 : sq dup * ; foldable
 : neg 0 swap - ; foldable
 : recip 1 swap / ; foldable

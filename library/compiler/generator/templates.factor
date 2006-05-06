@@ -13,11 +13,16 @@ namespaces prettyprint sequences vectors words ;
 
 : take-reg ( vreg -- ) dup delegate free-vregs delete ;
 
+: reg-spec>class ( spec -- class )
+    float eq? T{ float-regs f 8 } T{ int-regs } ? ;
+
 : alloc-vregs ( template -- template )
     [
-        dup
-        H{ { f T{ int-regs } } { float T{ float-regs f 8 } } }
-        hash [ alloc-reg ] [ <int-vreg> dup take-reg ] ?if
+        dup integer? [
+            <int-vreg> dup take-reg
+        ] [
+            reg-spec>class alloc-reg
+        ] if
     ] map ;
 
 ! A data stack location.
@@ -99,8 +104,8 @@ SYMBOL: phantom-r
 : finalize-heights ( -- )
     phantoms [ finalize-height ] 2apply ;
 
-: stack>new-vreg ( loc -- vreg )
-    T{ int-regs } alloc-reg [ swap %peek ] keep ;
+: stack>new-vreg ( loc spec -- vreg )
+    reg-spec>class alloc-reg [ swap %peek ] keep ;
 
 : vreg>stack ( value loc -- )
     over loc? [
@@ -121,7 +126,7 @@ SYMBOL: phantom-r
 
 : live-locs ( phantom phantom -- hash )
     [ (live-locs) ] 2apply append prune
-    [ dup stack>new-vreg ] map>hash ;
+    [ dup f stack>new-vreg ] map>hash ;
 
 : lazy-store ( value loc -- )
     over loc? [
@@ -170,12 +175,18 @@ SYMBOL: phantom-r
     compute-free-vregs free-vregs* swapd <= >r <= r> and
     [ finalize-contents compute-free-vregs ] unless ;
 
-: lazy-load ( value loc -- value )
-    over loc?
-    [ dupd = [ drop f ] [ stack>new-vreg ] if ] [ drop ] if ;
-
-: phantom-vregs ( values template -- )
-    [ >r f lazy-load r> second set ] 2each ;
+: lazy-load ( values template -- template )
+    [
+        first2 >r over loc? [
+            over integer? [
+                >r <int-vreg> dup r> %peek
+            ] [
+                stack>new-vreg
+            ] if
+        ] [
+            drop
+        ] if r> 2array
+    ] 2map ;
 
 : stack>vregs ( phantom template -- values )
     [
@@ -213,7 +224,7 @@ SYMBOL: phantom-r
     phantom-d get
     over length neg over adjust-phantom
     over length swap cut-phantom
-    swap phantom-vregs ;
+    swap lazy-load [ first2 set ] each ;
 
 : phantom-push ( obj stack -- )
     1 over adjust-phantom push ;
@@ -243,6 +254,8 @@ SYMBOL: +clobber
 : outputs-clash? ( -- ? )
     output-vregs append phantoms append
     [ swap member? ] contains-with? ;
+
+: phantom-vregs ( values template -- ) [ second set ] 2each ;
 
 : slow-input ( template -- )
     ! Are we loading stuff from the stack? Then flush out

@@ -1,11 +1,5 @@
 should fix in 0.82:
 
-- callback segv
-- generate-push should not do anything without sse2
-- get literals working
-- get loads from stack working
-- get boxing working
-- straighten out "fp-scratch"
 - clean up/rewrite register allocation
 
 - amd64 %box-struct

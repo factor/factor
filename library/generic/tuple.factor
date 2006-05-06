@@ -39,7 +39,7 @@ IN: generic
         r> 2drop
     ] if ;
 
-: delegate-slots { { 3 delegate set-delegate } } ;
+: delegate-slots { { 3 object delegate set-delegate } } ;
 
 : tuple-slots ( tuple slots -- )
     2dup "slot-names" set-word-prop

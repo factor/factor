@@ -37,6 +37,3 @@ M: ratio / scale / ;
 M: ratio /i scale /i ;
 M: ratio mod 2dup >r >r /i r> r> rot * - ;
 M: ratio /f scale /f ;
-
-M: ratio 1+ >fraction [ + ] keep fraction> ;
-M: ratio 1- >fraction [ - ] keep fraction> ;
