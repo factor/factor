@@ -194,12 +194,11 @@ M: #dispatch generate-node ( node -- next )
 UNION: immediate fixnum POSTPONE: f ;
 
 : generate-push ( node -- )
-    [
-        >#push< dup literal-template
-        dup requested-vregs ensure-vregs
-        alloc-vregs [ [ load-literal ] 2each ] keep
-        phantom-d get phantom-append
-    ] with-scope ;
+    >#push< dup literal-template
+    dup requested-vregs ensure-vregs
+    alloc-vregs [ [ load-literal ] 2each ] keep
+    phantom-d get phantom-append
+    "fp-scratch" off ;
 
 M: #push generate-node ( #push -- )
     generate-push iterate-next ;
