@@ -3,9 +3,9 @@
 IN: math-internals
 USING: math kernel ;
 
-: float= ( n n -- )
+: float= ( n n -- ? )
     #! The compiler replaces this with a better intrinsic.
-    [ double>bits ] 2apply number= ;
+    [ double>bits ] 2apply number= ; foldable
 
 IN: math
 
@@ -20,7 +20,8 @@ M: real <=> - ;
 : fp-nan? ( float -- ? )
     double>bits -51 shift BIN: 111111111111 [ bitand ] keep = ;
 
-M: float zero? ( float -- ? ) dup 0.0 = swap -0.0 = or ;
+M: float zero? ( float -- ? )
+    dup 0.0 float= swap -0.0 float= or ;
 
 M: float < float< ;
 M: float <= float<= ;

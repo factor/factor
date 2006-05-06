@@ -122,7 +122,7 @@ SYMBOL: @
     { { -1 @ } [ nip 0 swap - ]  }
 } define-identities
 
-[ / /i /f fixnum/i fixnum/f bignum/i bignum/f float/f ] {
+[ / fixnum/i fixnum/f bignum/i bignum/f float/f ] {
     { { @ 1 }  [ drop ]          }
     { { @ -1 } [ drop 0 swap - ] }
 } define-identities
@@ -176,7 +176,7 @@ SYMBOL: @
     { { @ @ } [ 2drop t ] }
 } define-identities
 
-[ eq? number= = ] {
+[ eq? bignum= float= number= = ] {
     { { @ @ } [ 2drop t ] }
 } define-identities
 

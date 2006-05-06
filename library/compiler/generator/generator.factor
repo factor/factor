@@ -125,7 +125,7 @@ M: #if generate-node ( node -- next )
         end-basic-block
         <label> dup %jump-t
     ] H{
-        { +input { { 0 "flag" } } }
+        { +input { { f "flag" } } }
     } with-template generate-if ;
 
 ! #call
@@ -145,7 +145,8 @@ M: #if generate-node ( node -- next )
     save-xt
     t 0 <int-vreg> load-literal
     "end" get save-xt
-    0 <int-vreg> phantom-d get phantom-push ;
+    0 <int-vreg> phantom-d get phantom-push
+    compute-free-vregs ;
 
 : do-if-intrinsic ( node -- next )
     [ <label> dup ] keep if-intrinsic call
@@ -193,10 +194,12 @@ M: #dispatch generate-node ( node -- next )
 UNION: immediate fixnum POSTPONE: f ;
 
 : generate-push ( node -- )
-    >#push< dup literal-template
-    dup requested-vregs ensure-vregs
-    alloc-vregs [ [ load-literal ] 2each ] keep
-    phantom-d get phantom-append ;
+    [
+        >#push< dup literal-template
+        dup requested-vregs ensure-vregs
+        alloc-vregs [ [ load-literal ] 2each ] keep
+        phantom-d get phantom-append
+    ] with-scope ;
 
 M: #push generate-node ( #push -- )
     generate-push iterate-next ;

@@ -286,28 +286,28 @@ M: integer CALL HEX: e8 assemble-1 from assemble-4 ;
 M: callable CALL 0 CALL relative-4 ;
 M: operand CALL BIN: 010 t HEX: ff 1-operand ;
 
-GENERIC: JUMPcc ( opcode addr -- )
-M: integer JUMPcc ( opcode addr -- )
-    HEX: 0f assemble-1  swap assemble-1  from assemble-4 ;
-M: callable JUMPcc ( opcode addr -- )
-    >r 0 JUMPcc r> relative-4 ;
+G: JUMPcc ( addr opcode -- ) 1 standard-combination ;
+M: integer JUMPcc ( addr opcode -- )
+    swap HEX: 0f assemble-1  swap assemble-1  from assemble-4 ;
+M: callable JUMPcc ( addr opcode -- )
+    swap >r 0 swap JUMPcc r> relative-4 ;
 
-: JO  HEX: 80 swap JUMPcc ;
-: JNO HEX: 81 swap JUMPcc ;
-: JB  HEX: 82 swap JUMPcc ;
-: JAE HEX: 83 swap JUMPcc ;
-: JE  HEX: 84 swap JUMPcc ; ! aka JZ
-: JNE HEX: 85 swap JUMPcc ;
-: JBE HEX: 86 swap JUMPcc ;
-: JA  HEX: 87 swap JUMPcc ;
-: JS  HEX: 88 swap JUMPcc ;
-: JNS HEX: 89 swap JUMPcc ;
-: JP  HEX: 8a swap JUMPcc ;
-: JNP HEX: 8b swap JUMPcc ;
-: JL  HEX: 8c swap JUMPcc ;
-: JGE HEX: 8d swap JUMPcc ;
-: JLE HEX: 8e swap JUMPcc ;
-: JG  HEX: 8f swap JUMPcc ;
+: JO  HEX: 80 JUMPcc ;
+: JNO HEX: 81 JUMPcc ;
+: JB  HEX: 82 JUMPcc ;
+: JAE HEX: 83 JUMPcc ;
+: JE  HEX: 84 JUMPcc ; ! aka JZ
+: JNE HEX: 85 JUMPcc ;
+: JBE HEX: 86 JUMPcc ;
+: JA  HEX: 87 JUMPcc ;
+: JS  HEX: 88 JUMPcc ;
+: JNS HEX: 89 JUMPcc ;
+: JP  HEX: 8a JUMPcc ;
+: JNP HEX: 8b JUMPcc ;
+: JL  HEX: 8c JUMPcc ;
+: JGE HEX: 8d JUMPcc ;
+: JLE HEX: 8e JUMPcc ;
+: JG  HEX: 8f JUMPcc ;
 
 : RET ( -- ) HEX: c3 assemble-1 ;
 

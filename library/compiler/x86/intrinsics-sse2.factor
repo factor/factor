@@ -60,10 +60,10 @@ M: float-regs (%replace) ( vreg loc reg-class -- )
     } define-if-intrinsic ;
 
 {
-    { float< JL }
-    { float<= JLE }
-    { float> JG }
-    { float>= JGE }
+    { float< JB }
+    { float<= JBE }
+    { float> JA }
+    { float>= JAE }
     { float= JE }
 } [
     first2 define-float-jump

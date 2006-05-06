@@ -23,3 +23,54 @@ USING: compiler kernel memory math math-internals test ;
 [ 2.0 ] [ 1.0 [ 2.0 swap float/f ] compile-1 ] unit-test
 [ 0.5 ] [ 1.0 2.0 [ float/f ] compile-1 ] unit-test
 [ 2.0 ] [ 1.0 2.0 [ swap float/f ] compile-1 ] unit-test
+
+[ t ] [ 1.0 2.0 [ float< ] compile-1 ] unit-test
+[ t ] [ 1.0 [ 2.0 float< ] compile-1 ] unit-test
+[ f ] [ 1.0 [ 2.0 swap float< ] compile-1 ] unit-test
+[ f ] [ 1.0 1.0 [ float< ] compile-1 ] unit-test
+[ f ] [ 1.0 [ 1.0 float< ] compile-1 ] unit-test
+[ f ] [ 1.0 [ 1.0 swap float< ] compile-1 ] unit-test
+[ f ] [ 3.0 1.0 [ float< ] compile-1 ] unit-test
+[ f ] [ 3.0 [ 1.0 float< ] compile-1 ] unit-test
+[ t ] [ 3.0 [ 1.0 swap float< ] compile-1 ] unit-test
+
+[ t ] [ 1.0 2.0 [ float<= ] compile-1 ] unit-test
+[ t ] [ 1.0 [ 2.0 float<= ] compile-1 ] unit-test
+[ f ] [ 1.0 [ 2.0 swap float<= ] compile-1 ] unit-test
+[ t ] [ 1.0 1.0 [ float<= ] compile-1 ] unit-test
+[ t ] [ 1.0 [ 1.0 float<= ] compile-1 ] unit-test
+[ t ] [ 1.0 [ 1.0 swap float<= ] compile-1 ] unit-test
+[ f ] [ 3.0 1.0 [ float<= ] compile-1 ] unit-test
+[ f ] [ 3.0 [ 1.0 float<= ] compile-1 ] unit-test
+[ t ] [ 3.0 [ 1.0 swap float<= ] compile-1 ] unit-test
+
+[ f ] [ 1.0 2.0 [ float> ] compile-1 ] unit-test
+[ f ] [ 1.0 [ 2.0 float> ] compile-1 ] unit-test
+[ t ] [ 1.0 [ 2.0 swap float> ] compile-1 ] unit-test
+[ f ] [ 1.0 1.0 [ float> ] compile-1 ] unit-test
+[ f ] [ 1.0 [ 1.0 float> ] compile-1 ] unit-test
+[ f ] [ 1.0 [ 1.0 swap float> ] compile-1 ] unit-test
+[ t ] [ 3.0 1.0 [ float> ] compile-1 ] unit-test
+[ t ] [ 3.0 [ 1.0 float> ] compile-1 ] unit-test
+[ f ] [ 3.0 [ 1.0 swap float> ] compile-1 ] unit-test
+
+[ f ] [ 1.0 2.0 [ float>= ] compile-1 ] unit-test
+[ f ] [ 1.0 [ 2.0 float>= ] compile-1 ] unit-test
+[ t ] [ 1.0 [ 2.0 swap float>= ] compile-1 ] unit-test
+[ t ] [ 1.0 1.0 [ float>= ] compile-1 ] unit-test
+[ t ] [ 1.0 [ 1.0 float>= ] compile-1 ] unit-test
+[ t ] [ 1.0 [ 1.0 swap float>= ] compile-1 ] unit-test
+[ t ] [ 3.0 1.0 [ float>= ] compile-1 ] unit-test
+[ t ] [ 3.0 [ 1.0 float>= ] compile-1 ] unit-test
+[ f ] [ 3.0 [ 1.0 swap float>= ] compile-1 ] unit-test
+
+[ f ] [ 1.0 2.0 [ float= ] compile-1 ] unit-test
+[ t ] [ 1.0 1.0 [ float= ] compile-1 ] unit-test
+[ f ] [ 1.0 [ 2.0 float= ] compile-1 ] unit-test
+[ t ] [ 1.0 [ 1.0 float= ] compile-1 ] unit-test
+[ f ] [ 1.0 [ 2.0 swap float= ] compile-1 ] unit-test
+[ t ] [ 1.0 [ 1.0 swap float= ] compile-1 ] unit-test
+
+[ t ] [ 0.0 [ dup 0.0 float= swap -0.0 float= or ] compile-1 ] unit-test
+[ t ] [ -0.0 [ dup 0.0 float= swap -0.0 float= or ] compile-1 ] unit-test
+[ f ] [ 3.0 [ dup 0.0 float= swap -0.0 float= or ] compile-1 ] unit-test
