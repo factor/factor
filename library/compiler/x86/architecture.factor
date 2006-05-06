@@ -46,15 +46,25 @@ M: float-regs vregs drop { XMM0 XMM1 XMM2 XMM3 XMM4 XMM5 XMM6 XMM7 } ;
 
 : prepare-division CDQ ; inline
 
+: fp-scratch ( -- vreg )
+    "fp-scratch" get [
+        T{ int-regs } alloc-reg dup "fp-scratch" set
+    ] unless* ;
+
 : unboxify-float ( obj vreg quot -- | quot: obj int-vreg )
     #! The SSE2 code here will never be generated unless SSE2
     #! intrinsics are loaded.
     over [ float-regs? ] is? [
-        swap >r T{ int-regs } alloc-reg [ swap call ] keep
+        swap >r fp-scratch [ swap call ] keep
         r> swap [ v>operand ] 2apply float-offset [+] MOVSD
     ] [
         call
     ] if ; inline
+
+: literal-template
+    #! All literals go into integer registers unless SSE2
+    #! intrinsics are loaded.
+    length f <array> ;
 
 M: immediate load-literal ( literal vreg -- )
     v>operand swap v>operand MOV ;
@@ -98,24 +108,16 @@ M: object load-literal ( literal vreg -- )
 
 : %return ( -- ) %epilogue RET ;
 
-: vreg-mov [ v>operand ] 2apply MOV ;
+: vreg-mov swap [ v>operand ] 2apply MOV ;
 
 : %peek ( vreg loc -- )
-    swap [ swap vreg-mov ] unboxify-float ;
+    swap [ vreg-mov ] unboxify-float ;
 
-: %replace ( vreg loc -- )
-    #! The SSE2 code here will never be generated unless SSE2
-    #! intrinsics are loaded.
-    over [ float-regs? ] is? [
-        ! >r
-        ! "fp-scratch" operand "allot.here" f dlsym [] MOV
-        ! "fp-scratch" operand [] float-tag >header MOV
-        ! "fp-scratch" operand 8 [+] r> MOVSD
-        ! "allot.here" f dlsym [] 16 ADD
-        vreg-mov
-    ] [
-        vreg-mov
-    ] if ;
+GENERIC: (%replace) ( vreg loc reg-class -- )
+
+M: int-regs (%replace) drop vreg-mov ;
+
+: %replace ( vreg loc -- ) over (%replace) ;
 
 : (%inc) swap cells dup 0 > [ ADD ] [ neg SUB ] if ;
 

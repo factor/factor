@@ -1,21 +1,17 @@
 should fix in 0.82:
 
-- constant branch folding
-- fast-slot stuff
-- 3 >n fep
+- callback segv
+- generate-push should not do anything without sse2
+- get literals working
+- get loads from stack working
+- get boxing working
+- straighten out "fp-scratch"
+- clean up/rewrite register allocation
+
 - amd64 %box-struct
-- get factor running on mac intel
 - when generating a 32-bit image on a 64-bit system, large numbers which should
   be bignums become fixnums
-- clicks sent twice
-- speed up ideas:
-  - only do clipping for certain gadgets
-  - use glRect
-
-+ portability:
-
-- win64 port
-- amd64 %unbox-struct
+- get factor running on mac intel
 
 + io:
 
@@ -23,9 +19,14 @@ should fix in 0.82:
 - better i/o scheduler
 - yield in a loop starves i/o
 - "localhost" 50 <client> won't fail
+- issues with timeouts
 
 + ui/help:
 
+- clicks sent twice
+- speed up ideas:
+  - only do clipping for certain gadgets
+  - use glRect
 - polish OS X menu bar code
 - help search
 - reimplement clicking input
@@ -54,16 +55,16 @@ should fix in 0.82:
 
 + compiler/ffi:
 
+- win64 port
+- amd64 %unbox-struct
+- constant branch folding
 - core foundation should use unicode strings
 - alien>utf16-string, utf16-string>alien words
 - can <void*> only be called with an alien?
 - remove <char*>, <ushort*>, set-char*-nth, set-ushort*-nth since they
   have incorrect semantics
-- improve callback efficiency
-- float intrinsics
 - complex float type
 - complex float intrinsics
-- out of memory from overflow check
 - remove literal table
 - C functions returning structs by value
 - FIELD: char key_vector[32];
@@ -73,10 +74,11 @@ should fix in 0.82:
 - [ [ dup call ] dup call ] infer hangs
 - the invalid recursion form case needs to be fixed, for inlines too
 - code gc
-- compiled gc check slows things down
+- fix compiled gc check
 
 + misc:
 
+- 3 >n fep
 - code walker & exceptions
 - slice: if sequence or seq start is changed, abstraction violation
 - make 3.4 bits>double an error

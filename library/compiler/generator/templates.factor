@@ -15,7 +15,7 @@ namespaces prettyprint sequences vectors words ;
 
 : alloc-vregs ( template -- template )
     [
-        first dup
+        dup
         H{ { f T{ int-regs } } { float T{ float-regs f 8 } } }
         hash [ alloc-reg ] [ <int-vreg> dup take-reg ] ?if
     ] map ;
@@ -179,7 +179,7 @@ SYMBOL: phantom-r
 
 : stack>vregs ( phantom template -- values )
     [
-        alloc-vregs dup length rot phantom-locs
+        [ first ] map alloc-vregs dup length rot phantom-locs
         [ dupd %peek ] 2map
     ] 2keep length neg swap adjust-phantom ;
 
@@ -258,10 +258,11 @@ SYMBOL: +clobber
 
 : guess-vregs ( -- int# float# )
     +input get { } additional-vregs#
-    +scratch get requested-vregs >r + r> ;
+    +scratch get [ first ] map requested-vregs >r + r> ;
 
 : alloc-scratch ( -- )
-    +scratch get [ alloc-vregs ] keep phantom-vregs ;
+    +scratch get
+    [ [ first ] map alloc-vregs ] keep phantom-vregs ;
 
 : template-inputs ( -- )
     ! Ensure we have enough to hold any new stack elements we

@@ -10,7 +10,7 @@ vectors words ;
 "/library/bootstrap/primitives.factor" run-resource
 
 : if-arch ( arch seq -- )
-    architecture rot member?
+    architecture get rot member?
     [ [ parse-resource % ] each ] [ drop ] if ;
 
 ! The [ ] make form creates a boot quotation

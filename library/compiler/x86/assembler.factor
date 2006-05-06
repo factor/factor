@@ -376,7 +376,7 @@ M: operand CMP OCT: 071 2-operand ;
 : 2-operand-sse ( dst src op1 op2 -- )
     #! We swap the operands here to make everything consistent
     #! with the integer instructions.
-    swap assemble-1 swapd
+    swap assemble-1 pick register-128? [ swapd ] [ 1 bitor ] if
     >r 2dup t prefix HEX: 0f assemble-1 r>
     assemble-1 reg-code swap addressing ;
 

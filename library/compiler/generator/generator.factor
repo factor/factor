@@ -195,14 +195,10 @@ UNION: immediate fixnum POSTPONE: f ;
 : alloc-literal-reg ( literal -- vreg )
     float? T{ float-regs f 8 } T{ int-regs } ? alloc-reg ;
 
-! : generate-push ( node -- )
-!     >#push< dup [ class ] map requested-vregs ensure-vregs
-!     [ dup alloc-literal-reg [ load-literal ] keep ] map
-!     phantom-d get phantom-append ;
-
 : generate-push ( node -- )
-    >#push< dup length 0 ensure-vregs
-    [ T{ int-regs } alloc-reg [ load-literal ] keep ] map
+    >#push< dup literal-template
+    dup requested-vregs ensure-vregs
+    alloc-vregs [ [ load-literal ] 2each ] keep
     phantom-d get phantom-append ;
 
 M: #push generate-node ( #push -- )

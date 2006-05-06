@@ -27,6 +27,9 @@ GENERIC: fastcall-regs ( register-class -- regs )
 ! Sequence mapping vreg-n to native assembler registers
 GENERIC: vregs ( register-class -- regs )
 
+! Map a sequence of literals to f or float
+DEFER: literal-template ( literals -- template )
+
 ! Load a literal (immediate or indirect)
 G: load-literal ( obj vreg -- ) 1 standard-combination ;
 

@@ -62,9 +62,6 @@ SYMBOL: architecture
 : word-type      16 ; inline
 : tuple-type     17 ; inline
 
-: immediate ( x tag -- tagged ) swap tag-bits shift bitor ;
-: >header ( id -- tagged ) object-tag immediate ;
-
 ( Image header )
 
 : base 1024 ;
@@ -106,9 +103,9 @@ GENERIC: ' ( obj -- ptr )
 
 ( Fixnums )
 
-: emit-fixnum ( n -- ) fixnum-tag immediate emit ;
+: emit-fixnum ( n -- ) fixnum-tag tag-address emit ;
 
-M: fixnum ' ( n -- tagged ) fixnum-tag immediate ;
+M: fixnum ' ( n -- tagged ) fixnum-tag tag-address ;
 
 ( Bignums )
 
@@ -136,14 +133,14 @@ M: fixnum ' ( n -- tagged ) fixnum-tag immediate ;
 M: bignum ' ( bignum -- tagged )
     #! This can only emit 0, -1 and 1.
     bignum-tag here-as >r
-    bignum-tag >header emit
+    bignum-tag tag-header emit
     emit-bignum align-here r> ;
 
 ( Floats )
 
 M: float ' ( float -- tagged )
     float-tag here-as >r
-    float-tag >header emit
+    float-tag tag-header emit
     align-here
     double>bits emit-64
     r> ;
@@ -177,7 +174,7 @@ M: f ' ( obj -- ptr )
     dup word-vocabulary ' >r
     dup word-name ' >r
     object-tag here-as over objects get set-hash
-    word-type >header emit
+    word-type tag-header emit
     hashcode emit-fixnum
     r> emit
     r> emit
@@ -209,7 +206,7 @@ M: word ' ( word -- pointer ) ;
 M: wrapper ' ( wrapper -- pointer )
     wrapped '
     object-tag here-as >r
-    wrapper-type >header emit
+    wrapper-type tag-header emit
     emit r> ;
 
 ( Conses )
@@ -234,7 +231,7 @@ M: complex ' ( c -- tagged ) >rect complex-tag emit-cons ;
 
 : emit-string ( string -- ptr )
     object-tag here-as swap
-    string-type >header emit
+    string-type tag-header emit
     dup length emit-fixnum
     dup hashcode emit-fixnum
     pack-string emit-chars
@@ -250,7 +247,7 @@ M: string ' ( string -- pointer )
 : emit-array ( list type -- pointer )
     >r [ ' ] map r>
     object-tag here-as >r
-    >header emit
+    tag-header emit
     dup length emit-fixnum
     ( elements -- ) emit-seq
     align-here r> ;
@@ -270,7 +267,7 @@ M: array ' ( array -- pointer )
 M: vector ' ( vector -- pointer )
     dup underlying ' swap length
     object-tag here-as >r
-    vector-type >header emit
+    vector-type tag-header emit
     emit-fixnum ( length )
     emit ( array ptr )
     align-here r> ;
@@ -278,7 +275,7 @@ M: vector ' ( vector -- pointer )
 M: sbuf ' ( sbuf -- pointer )
     dup underlying ' swap length
     object-tag here-as >r
-    sbuf-type >header emit
+    sbuf-type tag-header emit
     emit-fixnum ( length )
     emit ( array ptr )
     align-here r> ;
@@ -288,7 +285,7 @@ M: sbuf ' ( sbuf -- pointer )
 M: hashtable ' ( hashtable -- pointer )
     [ hash-array ' ] keep
     object-tag here-as >r
-    hashtable-type >header emit
+    hashtable-type tag-header emit
     dup hash-count emit-fixnum
     hash-deleted emit-fixnum
     emit ( array ptr )
