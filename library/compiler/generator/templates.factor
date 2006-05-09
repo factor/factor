@@ -16,14 +16,12 @@ namespaces prettyprint sequences vectors words ;
 : reg-spec>class ( spec -- class )
     float eq? T{ float-regs f 8 } T{ int-regs } ? ;
 
-: alloc-vregs ( template -- template )
-    [
-        dup integer? [
-            <int-vreg> dup take-reg
-        ] [
-            reg-spec>class alloc-reg
-        ] if
-    ] map ;
+: spec>vreg ( spec -- vreg )
+    dup integer? [
+        <int-vreg> dup take-reg
+    ] [
+        reg-spec>class alloc-reg
+    ] if ;
 
 ! A data stack location.
 TUPLE: ds-loc n ;
@@ -175,26 +173,17 @@ SYMBOL: phantom-r
     compute-free-vregs free-vregs* swapd <= >r <= r> and
     [ finalize-contents compute-free-vregs ] unless ;
 
-: spec>vreg ( spec -- vreg )
-    dup integer? [ <int-vreg> ] [ reg-spec>class alloc-reg ] if ;
+: (lazy-load) ( spec value -- value )
+    {
+        { [ dup loc? ] [ >r spec>vreg dup r> %peek ] }
+        { [ dup [ float-regs? ] is? ] [ nip ] }
+        { [ over float eq? ] [ >r spec>vreg dup r> %move ] }
+        { [ t ] [ nip ] }
+    } cond ;
 
-: (lazy-load) ( value spec -- value )
-    spec>vreg [
-        swap {
-            { [ dup loc? ] [ %peek ] }
-            { [ dup vreg? ] [ %move ] }
-            { [ t ] [ 2drop ] }
-        } cond
-    ] keep ;
-
-: lazy-load ( values template -- template )
-    [ first2 >r (lazy-load) r> 2array ] 2map ;
-
-: stack>vregs ( phantom template -- values )
-    [
-        [ first ] map alloc-vregs dup length rot phantom-locs
-        [ dupd %peek ] 2map
-    ] 2keep length neg swap adjust-phantom ;
+: lazy-load ( values template -- )
+    dup length neg phantom-d get adjust-phantom
+    [ first2 >r swap (lazy-load) r> set ] 2each ;
 
 : compatible-vreg? ( n vreg -- ? )
     dup [ int-regs? ] is? [ vreg-n = ] [ 2drop f ] if ;
@@ -219,10 +208,7 @@ SYMBOL: phantom-r
     [ split-template ] [ drop { } ] if ;
 
 : fast-input ( template -- )
-    phantom-d get
-    over length neg over adjust-phantom
-    over length swap cut-phantom
-    swap lazy-load [ first2 set ] each ;
+    phantom-d get over length swap cut-phantom swap lazy-load ;
 
 : phantom-push ( obj stack -- )
     1 over adjust-phantom push ;
@@ -253,16 +239,13 @@ SYMBOL: +clobber
     output-vregs append phantoms append
     [ swap member? ] contains-with? ;
 
-: phantom-vregs ( values template -- ) [ second set ] 2each ;
-
 : slow-input ( template -- )
-    ! Are we loading stuff from the stack? Then flush out
-    ! remaining vregs, not slurped in by fast-input.
-    dup empty? [ finalize-contents ] unless
-    ! Do the outputs clash with vregs on the phantom stacks?
-    ! Then we must flush them first.
-    outputs-clash? [ finalize-contents ] when
-    phantom-d get swap [ stack>vregs ] keep phantom-vregs ;
+    #! Are we loading stuff from the stack? Then flush out
+    #! remaining vregs, not slurped in by fast-input.
+    #! Do the outputs clash with vregs on the phantom stacks?
+    #! Then we must flush them first.
+    dup empty? not outputs-clash? or [ finalize-contents ] when
+    [ length phantom-d get phantom-locs ] keep lazy-load ;
 
 : requested-vregs ( template -- int# float# )
     dup length swap [ float eq? ] subset length [ - ] keep ;
@@ -272,8 +255,7 @@ SYMBOL: +clobber
     +scratch get [ first ] map requested-vregs >r + r> ;
 
 : alloc-scratch ( -- )
-    +scratch get
-    [ [ first ] map alloc-vregs ] keep phantom-vregs ;
+    +scratch get [ first2 >r spec>vreg r> set ] each ;
 
 : template-inputs ( -- )
     ! Ensure we have enough to hold any new stack elements we
