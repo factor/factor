@@ -16,7 +16,6 @@ PREDICATE: general-list list ( list -- ? )
     [ cdr list? ] [ t ] if* ;
 
 : uncons ( [[ car cdr ]] -- car cdr ) dup car swap cdr ; inline
-: unswons ( [[ car cdr ]] -- cdr car ) dup cdr swap car ; inline
 
 : swons ( cdr car -- [[ car cdr ]] ) swap cons ; inline
 : unit ( a -- [ a ] ) f cons ; inline

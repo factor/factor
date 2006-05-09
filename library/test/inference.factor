@@ -220,7 +220,6 @@ M: ratio xyz
 [ { 2 1 } ] [ [ swons ] infer ] unit-test
 [ { 1 2 } ] [ [ uncons ] infer ] unit-test
 [ { 1 1 } ] [ [ unit ] infer ] unit-test
-[ { 1 2 } ] [ [ unswons ] infer ] unit-test
 [ { 1 1 } ] [ [ list? ] infer ] unit-test
 
 [ { 1 0 } ] [ [ >n ] infer ] unit-test
