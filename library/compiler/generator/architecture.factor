@@ -78,8 +78,8 @@ DEFER: %move-int>float ( dst src -- )
         2drop
     ] [
         2dup [ delegate class ] 2apply 2array {
-            { [ { int-regs int-regs } = ] [ %move-int>int ] }
-            { [ { float-regs int-regs } = ] [ %move-int>float ] }
+            { [ dup { int-regs int-regs } = ] [ drop %move-int>int ] }
+            { [ dup { float-regs int-regs } = ] [ drop %move-int>float ] }
         } cond
     ] if ;
 
@@ -92,7 +92,13 @@ DEFER: %box ( n reg-class func -- )
 
 DEFER: %box-struct ( n reg-class size -- )
 
+DEFER: %stack>freg ( n reg reg-class -- )
+
+DEFER: %freg>stack ( n reg reg-class -- )
+
 DEFER: %alien-invoke ( library function -- )
+
+DEFER: %cleanup ( n -- )
 
 DEFER: %alien-callback ( quot -- )
 

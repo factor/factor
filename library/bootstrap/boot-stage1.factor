@@ -9,9 +9,17 @@ vectors words ;
 
 "/library/bootstrap/primitives.factor" run-resource
 
+: parse-resource* ( path -- )
+    [ parse-resource ] catch [
+        dup error.
+        "Try again? [yn]" print
+        readln "yY" subseq?
+        [ drop parse-resource* ] [ rethrow ] if
+    ] when* ;
+
 : if-arch ( arch seq -- )
     architecture get rot member?
-    [ [ parse-resource % ] each ] [ drop ] if ;
+    [ [ parse-resource* % ] each ] [ drop ] if ;
 
 ! The [ ] make form creates a boot quotation
 [
@@ -279,7 +287,7 @@ vectors words ;
         "/doc/handbook/tools.facts"
         "/doc/handbook/tutorial.facts"
         "/doc/handbook/words.facts"
-    } [ parse-resource % ] each
+    } [ parse-resource* % ] each
     
     { "x86" "pentium4" } {
         "/library/compiler/x86/assembler.factor"
@@ -330,3 +338,4 @@ vocabularies get [
 all-words [ generic? ] subset [ make-generic ] each
 
 FORGET: if-arch
+FORGET: parse-resource*

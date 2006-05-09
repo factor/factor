@@ -1,8 +1,9 @@
 ! Copyright (C) 2003, 2006 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 IN: test
-USING: arrays errors hashtables inspector io kernel math
-memory namespaces parser prettyprint sequences strings words ;
+USING: arrays errors hashtables inspector io kernel lists math
+memory namespaces parser prettyprint sequences strings words
+vectors ;
 
 TUPLE: assert got expect ;
 
@@ -36,7 +37,7 @@ M: assert summary drop "Assertion failed" ;
 
 SYMBOL: failures
 
-: failure failures get push ;
+: failure failures [ ?push ] change ;
 
 : test-handler ( name quot -- ? )
     catch [ dup error. 2array failure f ] [ t ] if* ;
@@ -53,7 +54,7 @@ SYMBOL: failures
     ] test-handler ;
 
 : prepare-tests ( -- )
-    V{ } clone failures set "temporary" forget-vocab ;
+    failures off "temporary" forget-vocab ;
 
 : passed.
     "Tests passed:" print . ;

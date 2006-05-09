@@ -179,8 +179,8 @@ SYMBOL: phantom-r
     dup integer? [ <int-vreg> ] [ reg-spec>class alloc-reg ] if ;
 
 : (lazy-load) ( value spec -- value )
-    spec>vreg swap [
-        {
+    spec>vreg [
+        swap {
             { [ dup loc? ] [ %peek ] }
             { [ dup vreg? ] [ %move ] }
             { [ t ] [ 2drop ] }

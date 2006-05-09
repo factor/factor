@@ -27,7 +27,7 @@ kernel-internals lists math namespaces sequences words ;
     ] [
         over node-in-d dataflow-with
         [ >r node-param r> remember-node ] 2keep
-        [ subst-node ] keep [ infer-classes ] keep
+        [ subst-node ] keep
     ] if ;
 
 ! Single dispatch method inlining optimization
