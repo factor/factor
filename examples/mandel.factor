@@ -88,7 +88,7 @@ SYMBOL: cols
 : render ( -- )
     height [
         width [
-            2dup swap c 0 nb-iter iter dup 0 = [
+            2dup swap c 0 nb-iter iter dup zero? [
                 drop "\0\0\0"
             ] [
                 cols get [ length mod ] keep nth
