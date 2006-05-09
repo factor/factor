@@ -1,6 +1,6 @@
 IN: compiler
-USING: generic kernel kernel-internals math memory namespaces
-sequences ;
+USING: arrays generic kernel kernel-internals math memory
+namespaces sequences ;
 
 ! A scratch register for computations
 TUPLE: vreg n ;
@@ -69,6 +69,20 @@ DEFER: %peek ( vreg loc -- )
 ! Store vreg to stack
 DEFER: %replace ( vreg loc -- )
 
+! Move one vreg to another
+DEFER: %move-int>int ( dst src -- )
+DEFER: %move-int>float ( dst src -- )
+
+: %move ( dst src -- )
+    2dup = [
+        2drop
+    ] [
+        2dup [ delegate class ] 2apply 2array {
+            { [ { int-regs int-regs } = ] [ %move-int>int ] }
+            { [ { float-regs int-regs } = ] [ %move-int>float ] }
+        } cond
+    ] if ;
+
 ! FFI stuff
 DEFER: %unbox ( n reg-class func -- )
 
@@ -84,14 +98,6 @@ DEFER: %alien-callback ( quot -- )
 
 DEFER: %callback-value ( reg-class func -- )
 
-! A few FFI operations have default implementations
-: %cleanup ( n -- ) drop ;
-
-: %stack>freg ( n reg reg-class -- ) 3drop ;
-
-: %freg>stack ( n reg reg-class -- ) 3drop ;
-
-! Some stuff probably not worth redefining in other backends
 M: stack-params fastcall-regs drop 0 ;
 
 GENERIC: reg-size ( register-class -- n )

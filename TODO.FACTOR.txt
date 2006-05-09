@@ -1,7 +1,6 @@
 should fix in 0.82:
 
 - clean up/rewrite register allocation
-- moving between int and float vregs
 - intrinsic fixnum>float float>fixnum
 
 - amd64 %box-struct

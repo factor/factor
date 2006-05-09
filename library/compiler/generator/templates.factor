@@ -175,18 +175,20 @@ SYMBOL: phantom-r
     compute-free-vregs free-vregs* swapd <= >r <= r> and
     [ finalize-contents compute-free-vregs ] unless ;
 
+: spec>vreg ( spec -- vreg )
+    dup integer? [ <int-vreg> ] [ reg-spec>class alloc-reg ] if ;
+
+: (lazy-load) ( value spec -- value )
+    spec>vreg swap [
+        {
+            { [ dup loc? ] [ %peek ] }
+            { [ dup vreg? ] [ %move ] }
+            { [ t ] [ 2drop ] }
+        } cond
+    ] keep ;
+
 : lazy-load ( values template -- template )
-    [
-        first2 >r over loc? [
-            over integer? [
-                >r <int-vreg> dup r> %peek
-            ] [
-                stack>new-vreg
-            ] if
-        ] [
-            drop
-        ] if r> 2array
-    ] 2map ;
+    [ first2 >r (lazy-load) r> 2array ] 2map ;
 
 : stack>vregs ( phantom template -- values )
     [
@@ -195,11 +197,7 @@ SYMBOL: phantom-r
     ] 2keep length neg swap adjust-phantom ;
 
 : compatible-vreg? ( n vreg -- ? )
-    {
-        { [ dup [ int-regs? ] is? ] [ vreg-n = ] }
-        { [ dup [ float-regs? ] is? ] [ 2drop t ] }
-        { [ t ] [ 2drop f ] }
-    } cond ;
+    dup [ int-regs? ] is? [ vreg-n = ] [ 2drop f ] if ;
 
 : compatible-values? ( value template -- ? )
     {

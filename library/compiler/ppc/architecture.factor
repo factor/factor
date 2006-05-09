@@ -176,3 +176,5 @@ M: stack-params freg>stack
     "unnest_stacks" f %alien-invoke
     ! Restore return register
     load-return ;
+
+: %cleanup ( n -- ) drop ;

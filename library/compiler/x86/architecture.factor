@@ -46,35 +46,12 @@ M: float-regs vregs drop { XMM0 XMM1 XMM2 XMM3 XMM4 XMM5 XMM6 XMM7 } ;
 
 : prepare-division CDQ ; inline
 
-: fp-scratch ( -- vreg )
-    "fp-scratch" get [
-        T{ int-regs } alloc-reg dup "fp-scratch" set
-    ] unless* ;
-
-: unboxify-float ( obj vreg quot -- | quot: obj int-vreg )
-    #! The SSE2 code here will never be generated unless SSE2
-    #! intrinsics are loaded.
-    over [ float-regs? ] is? [
-        swap >r fp-scratch [ swap call ] keep
-        r> swap [ v>operand ] 2apply float-offset [+] MOVSD
-    ] [
-        call
-    ] if ; inline
-
-: literal-template
-    #! All literals go into integer registers unless SSE2
-    #! intrinsics are loaded.
-    length f <array> ;
-
 M: immediate load-literal ( literal vreg -- )
     v>operand swap v>operand MOV ;
 
-: load-indirect ( literal vreg -- )
+M: object load-literal ( literal vreg -- )
     v>operand swap add-literal [] MOV
     rel-absolute-cell rel-address ;
-
-M: object load-literal ( literal vreg -- )
-    [ load-indirect ] unboxify-float ;
 
 : (%call) ( label -- label )
     dup postpone-word dup primitive? [ address-operand ] when ;
@@ -108,14 +85,21 @@ M: object load-literal ( literal vreg -- )
 
 : %return ( -- ) %epilogue RET ;
 
-: vreg-mov swap [ v>operand ] 2apply MOV ;
+: %move-int>int ( dst src -- )
+    [ v>operand ] 2apply MOV ;
 
-: %peek ( vreg loc -- )
-    swap [ vreg-mov ] unboxify-float ;
+: %move-int>float ( dst src -- )
+    [ v>operand ] 2apply float-offset [+] MOVSD ;
+
+GENERIC: (%peek) ( vreg loc reg-class -- )
+
+M: int-regs (%peek) drop %move-int>int ;
+
+: %peek ( vreg loc -- ) over (%peek) ;
 
 GENERIC: (%replace) ( vreg loc reg-class -- )
 
-M: int-regs (%replace) drop vreg-mov ;
+M: int-regs (%replace) drop swap %move-int>int ;
 
 : %replace ( vreg loc -- ) over (%replace) ;
 
@@ -124,3 +108,7 @@ M: int-regs (%replace) drop vreg-mov ;
 : %inc-d ( n -- ) ds-reg (%inc) ;
 
 : %inc-r ( n -- ) cs-reg (%inc) ;
+
+: %stack>freg ( n reg reg-class -- ) 3drop ;
+
+: %freg>stack ( n reg reg-class -- ) 3drop ;

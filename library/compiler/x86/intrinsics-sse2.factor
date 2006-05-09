@@ -4,10 +4,15 @@ USING: alien arrays assembler generic kernel kernel-internals
 lists math math-internals memory namespaces sequences words ;
 IN: compiler
 
-: literal-template
-    #! floats map to 'float' so we put float literals in float
-    #! vregs
-    [ class ] map ;
+: fp-scratch ( -- vreg )
+    "fp-scratch" get [
+        T{ int-regs } alloc-reg dup "fp-scratch" set
+    ] unless* ;
+
+M: float-regs (%peek) ( vreg loc reg-class -- )
+    drop
+    fp-scratch swap %move-int>int
+    fp-scratch %move-int>float ;
 
 : load-zone-ptr ( vreg -- )
     #! Load pointer to start of zone array

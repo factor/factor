@@ -31,6 +31,8 @@ unit-test
 ! Test literals in either side of a shuffle
 [ 4 1 ] [ 1 [ [ 3 fixnum+ ] keep ] compile-1 ] unit-test
 
+[ 2 ] [ 1 2 [ swap fixnum/i ] compile-1 ] unit-test
+
 : foo ;
 
 [ 4 4 ]

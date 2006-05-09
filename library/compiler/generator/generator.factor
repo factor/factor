@@ -194,7 +194,7 @@ M: #dispatch generate-node ( node -- next )
 UNION: immediate fixnum POSTPONE: f ;
 
 : generate-push ( node -- )
-    >#push< dup literal-template
+    >#push< dup length f <array>
     dup requested-vregs ensure-vregs
     alloc-vregs [ [ load-literal ] 2each ] keep
     phantom-d get phantom-append
