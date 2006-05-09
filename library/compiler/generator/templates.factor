@@ -103,14 +103,10 @@ SYMBOL: phantom-r
     phantoms [ finalize-height ] 2apply ;
 
 : stack>new-vreg ( loc spec -- vreg )
-    reg-spec>class alloc-reg [ swap %peek ] keep ;
+    spec>vreg [ swap %peek ] keep ;
 
 : vreg>stack ( value loc -- )
-    over loc? [
-        2drop
-    ] [
-        over [ %replace ] [ 2drop ] if
-    ] if ;
+    over loc? over not or [ 2drop ] [ %replace ] if ;
 
 : vregs>stack ( phantom -- )
     [
@@ -144,11 +140,9 @@ SYMBOL: phantom-r
 : finalize-contents ( -- )
     phantoms 2dup flush-locs [ vregs>stack ] 2apply ;
 
-: end-basic-block ( -- )
-    finalize-contents finalize-heights ;
+: end-basic-block ( -- ) finalize-contents finalize-heights ;
 
-: used-vregs ( -- seq )
-    phantoms append [ vreg? ] subset ;
+: used-vregs ( -- seq ) phantoms append [ vreg? ] subset ;
 
 : (compute-free-vregs) ( used class -- vector )
     dup vregs length reverse [ swap <vreg> ] map-with diff
@@ -160,17 +154,17 @@ SYMBOL: phantom-r
     [ 2dup (compute-free-vregs) ] map>hash \ free-vregs set
     drop ;
 
-: additional-vregs# ( seq seq -- n )
+: additional-vregs ( seq seq -- n )
     2array phantoms 2array [ [ length ] map ] 2apply v-
     0 [ 0 max + ] reduce ;
 
-: free-vregs* ( -- int# float# )
+: free-vregs# ( -- int# float# )
     T{ int-regs } free-vregs length
     phantoms [ [ loc? ] subset length ] 2apply + -
     T{ float-regs f 8 } free-vregs length ;
 
 : ensure-vregs ( int# float# -- )
-    compute-free-vregs free-vregs* swapd <= >r <= r> and
+    compute-free-vregs free-vregs# swapd <= >r <= r> and
     [ finalize-contents compute-free-vregs ] unless ;
 
 : (lazy-load) ( spec value -- value )
@@ -191,7 +185,8 @@ SYMBOL: phantom-r
 : compatible-values? ( value template -- ? )
     {
         { [ over loc? ] [ 2drop t ] }
-        { [ dup { f float } memq? ] [ 2drop t ] }
+        { [ dup not ] [ drop [ float-regs? ] is? not ] }
+        { [ dup float eq? ] [ 2drop t ] }
         { [ dup integer? ] [ swap compatible-vreg? ] }
     } cond ;
 
@@ -251,7 +246,7 @@ SYMBOL: +clobber
     dup length swap [ float eq? ] subset length [ - ] keep ;
 
 : guess-vregs ( -- int# float# )
-    +input get { } additional-vregs#
+    +input get { } additional-vregs
     +scratch get [ first ] map requested-vregs >r + r> ;
 
 : alloc-scratch ( -- )
