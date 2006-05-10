@@ -11,7 +11,8 @@ M: float-regs (%peek) ( vreg loc reg-class -- )
 
 : load-zone-ptr ( vreg -- )
     #! Load pointer to start of zone array
-    "generations" f 2dup dlsym [] MOV rel-dlsym ;
+    "generations" f [ dlsym [] MOV ] 2keep
+    rel-absolute rel-dlsym ;
 
 : load-allot-ptr ( vreg -- )
     dup load-zone-ptr dup cell [+] MOV ;
@@ -55,7 +56,7 @@ M: float-regs (%replace) ( vreg loc reg-class -- )
 
 : define-float-jump ( word op -- )
     [
-        [ end-basic-block "x" operand "y" operand COMISD ] % ,
+        [ end-basic-block "x" operand "y" operand UCOMISD ] % ,
     ] [ ] make H{
         { +input { { float "x" } { float "y" } } }
     } define-if-intrinsic ;
