@@ -14,11 +14,6 @@ GENERIC: literals* ( node -- seq )
 : literals ( node -- hash )
     [ literals* ] node-union ;
 
-! GENERIC: flushable-values* ( node -- seq )
-! 
-! : flushable-values ( node -- hash )
-!     [ flushable-values* ] node-union ;
-
 GENERIC: live-values* ( node -- seq )
 
 : live-values ( node -- hash )
@@ -35,32 +30,17 @@ GENERIC: live-values* ( node -- seq )
     over hash-empty?
     [ 2drop ] [ [ kill-node* ] each-node-with ] if ;
 
-: kill-unused-literals ( node -- )
-    \ live-values get over literals hash-diff swap kill-node ;
-
 : kill-values ( node -- )
     dup live-values over literals hash-diff swap kill-node ;
 
 ! Generic nodes
 M: node literals* ( node -- ) drop { } ;
 
-! M: node flushable-values* ( node -- ) drop { } ;
-
-M: node live-values* ( node -- ) node-values ;
-
-! #shuffle
-M: #shuffle literals* ( node -- seq )
-    dup node-out-d swap node-out-r
-    [ [ value? ] subset ] 2apply append ;
+M: node live-values* ( node -- seq )
+    node-in-d [ value? ] subset ;
 
 ! #push
-M: #push literals* ( node -- seq )
-    node-values ;
-
-! #call
-! M: #call flushable-values* ( node -- )
-!     dup node-param "flushable" word-prop
-!     [ node-out-d ] [ drop { } ] if ;
+M: #push literals* ( node -- seq ) node-out-d ;
 
 ! #return
 M: #return live-values* ( node -- seq )

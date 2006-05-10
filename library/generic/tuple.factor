@@ -5,13 +5,10 @@ USING: arrays errors hashtables kernel kernel-internals lists
 math namespaces parser sequences sequences-internals strings
 vectors words ;
 
-: class ( object -- class )
-    dup tuple? [ 2 slot ] [ type type>class ] if ; inline
+IN: kernel-internals
 
 : class-tuple ( object -- class )
     dup tuple? [ 2 slot ] [ drop f ] if ; inline
-
-IN: kernel-internals
 
 : tuple= ( tuple tuple -- ? )
     2dup [ array-capacity ] 2apply number= [
@@ -22,9 +19,13 @@ IN: kernel-internals
     ] if ; inline
 
 : tuple-hashcode ( n tuple -- n )
-    dup class hashcode >r >r 1- r> 4 slot hashcode* r> bitxor ;
+    dup class-tuple hashcode >r >r 1-
+    r> 4 slot hashcode* r> bitxor ;
 
 IN: generic
+
+: class ( object -- class )
+    dup tuple? [ 2 slot ] [ type type>class ] if ; inline
 
 : tuple-predicate ( word -- )
     dup predicate-word

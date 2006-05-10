@@ -57,7 +57,7 @@ C: #call-label make-node ;
 
 TUPLE: #push ;
 C: #push make-node ;
-: #push ( -- node ) peek-d out-node <#push> ;
+: #push ( -- node ) peek-d 1array out-node <#push> ;
 : >#push< ( node -- seq ) node-out-d [ value-literal ] map ;
 
 TUPLE: #shuffle ;
@@ -77,11 +77,11 @@ C: #return make-node ;
 
 TUPLE: #if ;
 C: #if make-node ;
-: #if ( in -- node ) peek-d in-node <#if> ;
+: #if ( in -- node ) peek-d 1array in-node <#if> ;
 
 TUPLE: #dispatch ;
 C: #dispatch make-node ;
-: #dispatch ( in -- node ) peek-d in-node <#dispatch> ;
+: #dispatch ( in -- node ) peek-d 1array in-node <#dispatch> ;
 
 TUPLE: #merge ;
 C: #merge make-node ;
@@ -123,11 +123,6 @@ SYMBOL: current-node
         dup node-in-d % dup node-out-d %
         dup node-in-r % node-out-r %
     ] { } make ;
-
-: uses-value? ( value node -- ? ) node-values memq? ;
-
-: outputs-value? ( value node -- ? )
-    2dup node-out-d member? >r node-out-r member? r> or ;
 
 : last-node ( node -- last )
     dup node-successor [ last-node ] [ ] ?if ;
