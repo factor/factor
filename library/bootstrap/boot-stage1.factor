@@ -12,8 +12,7 @@ vectors words ;
 : parse-resource* ( path -- )
     [ parse-resource ] catch [
         dup error.
-        "Try again? [yn]" print
-        readln "yY" subseq?
+        "Try again? [yn]" print flush readln "yY" subseq?
         [ drop parse-resource* ] [ rethrow ] if
     ] when* ;
 

@@ -4,11 +4,6 @@ USING: alien arrays assembler generic kernel kernel-internals
 lists math math-internals memory namespaces sequences words ;
 IN: compiler
 
-: fp-scratch ( -- vreg )
-    "fp-scratch" get [
-        T{ int-regs } alloc-reg dup "fp-scratch" set
-    ] unless* ;
-
 M: float-regs (%peek) ( vreg loc reg-class -- )
     drop
     fp-scratch swap %move-int>int
@@ -16,7 +11,7 @@ M: float-regs (%peek) ( vreg loc reg-class -- )
 
 : load-zone-ptr ( vreg -- )
     #! Load pointer to start of zone array
-    "generations" f dlsym [] MOV ;
+    "generations" f 2dup dlsym [] MOV rel-dlsym ;
 
 : load-allot-ptr ( vreg -- )
     dup load-zone-ptr dup cell [+] MOV ;
@@ -24,9 +19,9 @@ M: float-regs (%peek) ( vreg loc reg-class -- )
 : inc-allot-ptr ( vreg n -- )
     >r dup load-zone-ptr cell [+] r> ADD ;
 
-: with-inline-alloc ( vreg spec prequot postquot -- )
+: with-inline-alloc ( vreg prequot postquot spec -- )
     #! both quotations are called with the vreg
-    rot [
+    [
         >r >r v>operand dup load-allot-ptr
         dup [] \ tag-header get call tag-header MOV
         r> over slip dup \ tag get call OR
@@ -34,12 +29,13 @@ M: float-regs (%peek) ( vreg loc reg-class -- )
     ] bind ; inline
 
 M: float-regs (%replace) ( vreg loc reg-class -- )
-    drop fp-scratch H{
+    drop fp-scratch
+    [ 8 [+] rot v>operand MOVSD ]
+    [ >r v>operand r> MOV ] H{
         { tag-header [ float-tag ] }
         { tag [ float-tag ] }
         { size [ 16 ] }
-    } [ 8 [+] rot v>operand MOVSD ]
-    [ >r v>operand r> MOV ] with-inline-alloc ;
+    } with-inline-alloc ;
 
 ! Floats
 : define-float-op ( word op -- )

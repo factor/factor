@@ -104,7 +104,7 @@ GENERIC: task-container ( task -- vector )
 : add-io-task ( callback task -- )
     [ >r <queue> [ enque ] keep r> set-io-task-callbacks ] keep
     dup io-task-fd over task-container 2dup hash [
-        "Cannot perform multiple I/O ops on the same port" throw
+        "Cannot perform multiple reads from the same port" throw
     ] when set-hash ;
 
 : remove-io-task ( task -- )

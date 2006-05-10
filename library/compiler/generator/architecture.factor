@@ -64,10 +64,12 @@ DEFER: %inc-d ( n -- )
 DEFER: %inc-r ( n -- )
 
 ! Load stack into vreg
-DEFER: %peek ( vreg loc -- )
+GENERIC: (%peek) ( vreg loc reg-class -- )
+: %peek ( vreg loc -- ) over (%peek) ;
 
 ! Store vreg to stack
-DEFER: %replace ( vreg loc -- )
+GENERIC: (%replace) ( vreg loc reg-class -- )
+: %replace ( vreg loc -- ) over (%replace) ;
 
 ! Move one vreg to another
 DEFER: %move-int>int ( dst src -- )

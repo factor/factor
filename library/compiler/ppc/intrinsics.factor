@@ -10,15 +10,6 @@ math-internals namespaces sequences words ;
 
 : untag-fixnum ( src dest -- ) tag-bits SRAWI ;
 
-\ tag [
-    "in" operand "out" operand tag-mask ANDI
-    "out" operand dup tag-fixnum
-] H{
-    { +input { { f "in" } } }
-    { +scratch { { f "out" } } }
-    { +output { "out" } }
-} define-intrinsic
-
 : generate-slot ( size quot -- )
     >r >r
     ! turn tagged fixnum slot # into an offset, multiple of 4
@@ -80,7 +71,7 @@ math-internals namespaces sequences words ;
     { +clobber { "val" "slot" "obj" } }
 } define-intrinsic
 
-: define-binary-op ( word op -- )
+: define-fixnum-op ( word op -- )
     [ [ "x" operand "y" operand "x" operand ] % , ] [ ] make H{
         { +input { { f "x" } { f "y" } } }
         { +output { "x" } }
@@ -93,7 +84,7 @@ math-internals namespaces sequences words ;
     { fixnum-bitor OR }
     { fixnum-bitxor XOR }
 } [
-    first2 define-binary-op
+    first2 define-fixnum-op
 ] each
 
 : generate-fixnum-mod
@@ -120,7 +111,7 @@ math-internals namespaces sequences words ;
     { +output { "x" } }
 } define-intrinsic
 
-: define-binary-jump ( word op -- )
+: define-fixnum-jump ( word op -- )
     [
         [ end-basic-block "x" operand 0 "y" operand CMP ] % ,
      ] [ ] make H{ { +input { { f "x" } { f "y" } } } }
@@ -133,37 +124,8 @@ math-internals namespaces sequences words ;
     { fixnum>= BGE }
     { eq? BEQ }
 } [
-    first2 define-binary-jump
+    first2 define-fixnum-jump
 ] each
-
-\ type [
-    <label> "f" set
-    <label> "end" set
-    ! Get the tag
-    "obj" operand "y" operand tag-mask ANDI
-    ! Tag the tag
-    "y" operand "x" operand tag-fixnum
-    ! Compare with object tag number (3).
-    0 "y" operand object-tag CMPI
-    ! Jump if the object doesn't store type info in its header
-    "end" get BNE
-    ! It does store type info in its header
-    ! Is the pointer itself equal to 3? Then its F_TYPE (9).
-    0 "obj" operand object-tag CMPI
-    "f" get BEQ
-    ! The pointer is not equal to 3. Load the object header.
-    "x" operand "obj" operand object-tag neg LWZ
-    "x" operand dup untag
-    "end" get B
-    "f" get save-xt
-    ! The pointer is equal to 3. Load F_TYPE (9).
-    f type tag-bits shift "x" operand LI
-    "end" get save-xt
-] H{
-    { +input { { f "obj" } } }
-    { +scratch { { f "x" } { f "y" } } }
-    { +output { "x" } }
-} define-intrinsic
 
 : simple-overflow ( word -- )
     >r
@@ -200,8 +162,6 @@ math-internals namespaces sequences words ;
     { +clobber { "x" "y" } }
 } define-intrinsic
 
-: ?MR 2dup = [ 2drop ] [ MR ] if ;
-
 \ fixnum* [
     finalize-contents
     <label> "end" set
@@ -210,7 +170,7 @@ math-internals namespaces sequences words ;
     11 "y" operand "r" operand MULLWO.
     "end" get BNO
     4 "y" operand "r" operand MULHW
-    3 11 ?MR
+    3 11 MR
     "s48_fixnum_pair_to_bignum" f %alien-invoke
     ! now we have to shift it by three bits to remove the second
     ! tag
@@ -273,6 +233,75 @@ math-internals namespaces sequences words ;
     { +scratch { { f "r" } { f "s" } } }
     { +output { "x" "s" } }
     { +clobber { "y" } }
+} define-intrinsic
+
+: define-float-op ( word op -- )
+    [ [ "x" operand "x" operand "y" operand ] % , ] [ ] make H{
+        { +input { { float "x" } { float "y" } } }
+        { +output { "x" } }
+    } define-intrinsic ;
+
+{
+    { float+ FADD }
+    { float- FSUB }
+    { float* FMUL }
+    { float/f FDIV }
+} [
+    first2 define-float-op
+] each
+
+: define-float-jump ( word op -- )
+    [
+        [ end-basic-block "x" operand 0 "y" operand FCMPU ] % ,
+     ] [ ] make H{ { +input { { float "x" } { float "y" } } } }
+    define-if-intrinsic ;
+
+{
+    { float< BLT }
+    { float<= BLE }
+    { float> BGT }
+    { float>= BGE }
+    { float= BEQ }
+} [
+    first2 define-float-jump
+] each
+
+\ tag [
+    "in" operand "out" operand tag-mask ANDI
+    "out" operand dup tag-fixnum
+] H{
+    { +input { { f "in" } } }
+    { +scratch { { f "out" } } }
+    { +output { "out" } }
+} define-intrinsic
+
+\ type [
+    <label> "f" set
+    <label> "end" set
+    ! Get the tag
+    "obj" operand "y" operand tag-mask ANDI
+    ! Tag the tag
+    "y" operand "x" operand tag-fixnum
+    ! Compare with object tag number (3).
+    0 "y" operand object-tag CMPI
+    ! Jump if the object doesn't store type info in its header
+    "end" get BNE
+    ! It does store type info in its header
+    ! Is the pointer itself equal to 3? Then its F_TYPE (9).
+    0 "obj" operand object-tag CMPI
+    "f" get BEQ
+    ! The pointer is not equal to 3. Load the object header.
+    "x" operand "obj" operand object-tag neg LWZ
+    "x" operand dup untag
+    "end" get B
+    "f" get save-xt
+    ! The pointer is equal to 3. Load F_TYPE (9).
+    f type tag-bits shift "x" operand LI
+    "end" get save-xt
+] H{
+    { +input { { f "obj" } } }
+    { +scratch { { f "x" } { f "y" } } }
+    { +output { "x" } }
 } define-intrinsic
 
 : userenv ( reg -- )

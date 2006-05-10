@@ -196,9 +196,8 @@ UNION: immediate fixnum POSTPONE: f ;
 : generate-push ( node -- )
     >#push< dup length f <array>
     dup requested-vregs ensure-vregs
-    alloc-vregs [ [ load-literal ] 2each ] keep
-    phantom-d get phantom-append
-    "fp-scratch" off ;
+    [ spec>vreg [ load-literal ] keep ] 2map
+    phantom-d get phantom-append ;
 
 M: #push generate-node ( #push -- )
     generate-push iterate-next ;
@@ -221,7 +220,7 @@ M: #push generate-node ( #push -- )
     shuffle-in-r length neg phantom-r get adjust-phantom ;
 
 : shuffle-vregs# ( shuffle -- n )
-    dup shuffle-in-d swap shuffle-in-r additional-vregs# ;
+    dup shuffle-in-d swap shuffle-in-r additional-vregs ;
 
 : phantom-shuffle ( shuffle -- )
     dup shuffle-vregs# 0 ensure-vregs
@@ -241,3 +240,8 @@ M: #return generate-node drop end-basic-block %return f ;
 
 : float-offset 8 float-tag - ;
 : string-offset 3 cells object-tag - ;
+
+: fp-scratch ( -- vreg )
+    "fp-scratch" get [
+        T{ int-regs } alloc-reg dup "fp-scratch" set
+    ] unless* ;

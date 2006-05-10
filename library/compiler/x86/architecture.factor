@@ -91,17 +91,9 @@ M: object load-literal ( literal vreg -- )
 : %move-int>float ( dst src -- )
     [ v>operand ] 2apply float-offset [+] MOVSD ;
 
-GENERIC: (%peek) ( vreg loc reg-class -- )
-
 M: int-regs (%peek) drop %move-int>int ;
 
-: %peek ( vreg loc -- ) over (%peek) ;
-
-GENERIC: (%replace) ( vreg loc reg-class -- )
-
 M: int-regs (%replace) drop swap %move-int>int ;
-
-: %replace ( vreg loc -- ) over (%replace) ;
 
 : (%inc) swap cells dup 0 > [ ADD ] [ neg SUB ] if ;
 

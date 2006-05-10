@@ -5,7 +5,8 @@ USING: alien assembler generic kernel kernel-internals math
 memory namespaces sequences words ;
 
 ! PowerPC register assignments
-! r3-r10 vregs
+! r3-r10 integer vregs
+! f0-f13 float vregs
 ! r11 linkage
 ! r14 data stack
 ! r15 call stack
@@ -16,6 +17,7 @@ M: int-regs vregs drop { 3 4 5 6 7 8 9 10 } ;
 
 M: float-regs return-reg drop 1 ;
 M: float-regs fastcall-regs drop { 1 2 3 4 5 6 7 8 } ;
+M: float-regs vregs drop { 0 1 2 3 4 5 6 7 8 9 10 11 12 13 } ;
 
 ! Mach-O -vs- Linux/PPC
 : stack@ macosx? 24 8 ? + ;
@@ -27,7 +29,7 @@ M: ds-loc loc>operand ds-loc-n cells neg 14 swap ;
 M: cs-loc loc>operand cs-loc-n cells neg 15 swap ;
 
 M: immediate load-literal ( literal vreg -- )
-    >r address r> v>operand LOAD ;
+    [ v>operand ] 2apply LOAD ;
 
 M: object load-literal ( literal vreg -- )
     v>operand swap
@@ -84,9 +86,50 @@ M: object load-literal ( literal vreg -- )
 
 : %return ( -- ) %epilogue BLR ;
 
-: %peek ( vreg loc -- ) >r v>operand r> loc>operand LWZ ;
+: compile-dlsym ( symbol dll register -- )
+    >r 2dup dlsym r> LOAD32 rel-2/2 rel-dlsym ;
 
-: %replace ( vreg loc -- ) >r v>operand r> loc>operand STW ;
+M: int-regs (%peek) ( vreg loc -- )
+    drop >r v>operand r> loc>operand LWZ ;
+
+M: float-regs (%peek) ( vreg loc -- )
+    drop 11 swap loc>operand LWZ
+    v>operand 11 float-offset LFD ;
+
+M: int-regs (%replace) ( vreg loc -- )
+    drop >r v>operand r> loc>operand STW ;
+
+: %move-int>int ( dst src -- )
+    [ v>operand ] 2apply MR ;
+
+: %move-int>float ( dst src -- )
+    [ v>operand ] 2apply float-offset LFD ;
+
+: load-zone-ptr ( reg -- )
+    "generations" f pick compile-dlsym dup 0 LWZ ;
+
+: load-allot-ptr ( -- ) 12 load-zone-ptr 12 12 cell LWZ ;
+
+: save-allot-ptr ( -- ) 11 load-zone-ptr 12 11 cell STW ;
+
+: with-inline-alloc ( vreg prequot postquot spec -- )
+    #! both quotations are called with the vreg
+    load-allot-ptr [
+        >r >r v>operand dup 12 MR
+        \ tag-header get call tag-header 11 LI
+        11 12 0 STW
+        r> over slip dup dup \ tag get call ORI
+        r> call 12 12 \ size get call ADDI
+    ] bind save-allot-ptr ; inline
+
+M: float-regs (%replace) ( vreg loc reg-class -- )
+    drop swap fp-scratch
+    [ >r v>operand r> 8 STFD ]
+    [ swap loc>operand STW ] H{
+        { tag-header [ float-tag ] }
+        { tag [ float-tag ] }
+        { size [ 16 ] }
+    } with-inline-alloc ;
 
 : %inc-d ( n -- ) 14 14 rot cells ADDI ;
 
@@ -118,11 +161,11 @@ M: stack-params stack>freg
 M: stack-params freg>stack
    >r stack-increment + swap r> stack>freg ;
 
-: (%move) [ fastcall-regs nth ] keep ;
+: %stack>freg ( n reg reg-class -- )
+    [ fastcall-regs nth ] keep stack>freg ;
 
-: %stack>freg ( n reg reg-class -- ) (%move) stack>freg ;
-
-: %freg>stack ( n reg reg-class -- ) (%move) freg>stack ;
+: %freg>stack ( n reg reg-class -- )
+    [ fastcall-regs nth ] keep freg>stack ;
 
 : %unbox ( n reg-class func -- )
     ! Call the unboxer
@@ -154,9 +197,6 @@ M: stack-params freg>stack
 
 : %box-struct ( n reg-class size -- )
     "box_value_struct" struct-ptr/size ;
-
-: compile-dlsym ( symbol dll register -- )
-    >r 2dup dlsym r> LOAD32 rel-2/2 rel-dlsym ;
 
 : %alien-invoke ( symbol dll -- )
     11 [ compile-dlsym ] keep MTLR BLRL ;
