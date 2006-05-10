@@ -104,7 +104,7 @@ M: #call-label collect-recursion* ( label node -- )
 
 : infer-compound ( word base-case -- terminates? effect )
     #! Infer a word's stack effect in a separate inferencer
-    #! instance. Outputs a boolean if the word terminates
+    #! instance. Outputs a true boolean if the word terminates
     #! control flow by throwing an exception or restoring a
     #! continuation.
     [

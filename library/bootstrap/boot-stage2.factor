@@ -1,6 +1,6 @@
 ! Copyright (C) 2004, 2006 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: compiler help io io-internals kernel
+USING: compiler generic help io io-internals kernel
 kernel-internals lists math memory namespaces optimizer parser
 sequences sequences-internals words ;
 
@@ -23,15 +23,14 @@ H{ } clone help-graph set-global xref-articles
 
     "Compiling base..." print flush
 
-    \ slot \ set-slot [ usage ] 2apply append
-    [ try-compile ] each
-
-    \ + compile
-    \ = compile
-    { "kernel" "sequences" "assembler" } compile-vocabs
-
-    "Compiling system..." print flush
-    compile-all
+    [
+        \ + compile
+        \ = compile
+        { "kernel" "sequences" "assembler" } compile-vocabs
+    
+        "Compiling system..." print flush
+        compile-all
+    ] with-class<cache
     
     terpri
     "Unless you're working on the compiler, ignore the errors above." print

@@ -111,7 +111,7 @@ macosx.app:
 	cp -R fonts/*.ttf $(BUNDLE)/Contents/Resources/fonts/
 
 	chmod +x cp_dir
-	find doc library contrib \( -name '*.factor' \
+	find doc library contrib examples \( -name '*.factor' \
 		-o -name '*.facts' \
 		-o -name '*.txt' \
 		-o -name '*.html' \

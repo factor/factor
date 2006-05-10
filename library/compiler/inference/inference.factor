@@ -76,7 +76,7 @@ GENERIC: apply-object
 : apply-literal ( obj -- )
     #! Literals are annotated with the current recursive
     #! state.
-    <value> push-d  1 #push node, ;
+    <value> push-d #push node, ;
 
 M: object apply-object apply-literal ;
 

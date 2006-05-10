@@ -3,7 +3,7 @@ should fix in 0.82:
 - clean up fp-scratch
 - intrinsic fixnum>float float>fixnum
 - update amd64 backend
-
+- float= on powerpc doesn't consider nans equal
 - amd64 %box-struct
 - when generating a 32-bit image on a 64-bit system, large numbers which should
   be bignums become fixnums

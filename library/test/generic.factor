@@ -69,34 +69,39 @@ M: very-funny gooey sq ;
 
 [ cons ] [ [ 1 2 ] class ] unit-test
 
-[ object ] [ object object class-and ] unit-test
-[ fixnum ] [ fixnum object class-and ] unit-test
-[ fixnum ] [ object fixnum class-and ] unit-test
-[ fixnum ] [ fixnum fixnum class-and ] unit-test
-[ fixnum ] [ fixnum integer class-and ] unit-test
-[ fixnum ] [ integer fixnum class-and ] unit-test
-[ null ] [ vector fixnum class-and ] unit-test
-[ number ] [ number object class-and ] unit-test
-[ number ] [ object number class-and ] unit-test
+: class<tests
+    [ object ] [ object object class-and ] unit-test
+    [ fixnum ] [ fixnum object class-and ] unit-test
+    [ fixnum ] [ object fixnum class-and ] unit-test
+    [ fixnum ] [ fixnum fixnum class-and ] unit-test
+    [ fixnum ] [ fixnum integer class-and ] unit-test
+    [ fixnum ] [ integer fixnum class-and ] unit-test
+    [ null ] [ vector fixnum class-and ] unit-test
+    [ number ] [ number object class-and ] unit-test
+    [ number ] [ object number class-and ] unit-test
+    
+    [ t ] [ \ fixnum \ integer class< ] unit-test
+    [ t ] [ \ fixnum \ fixnum class< ] unit-test
+    [ f ] [ \ integer \ fixnum class< ] unit-test
+    [ t ] [ \ integer \ object class< ] unit-test
+    [ f ] [ \ integer \ null class< ] unit-test
+    [ t ] [ \ null \ object class< ] unit-test
+    [ t ] [ \ list \ general-list class< ] unit-test
+    [ t ] [ \ list \ object class< ] unit-test
+    [ t ] [ \ null \ list class< ] unit-test
+    
+    [ t ] [ \ generic \ compound class< ] unit-test
+    [ f ] [ \ compound \ generic class< ] unit-test
+    
+    [ f ] [ \ cons \ list class< ] unit-test
+    [ f ] [ \ list \ cons class< ] unit-test
+    
+    [ f ] [ \ reversed \ slice class< ] unit-test
+    [ f ] [ \ slice \ reversed class< ] unit-test ;
 
-[ t ] [ \ fixnum \ integer class< ] unit-test
-[ t ] [ \ fixnum \ fixnum class< ] unit-test
-[ f ] [ \ integer \ fixnum class< ] unit-test
-[ t ] [ \ integer \ object class< ] unit-test
-[ f ] [ \ integer \ null class< ] unit-test
-[ t ] [ \ null \ object class< ] unit-test
-[ t ] [ \ list \ general-list class< ] unit-test
-[ t ] [ \ list \ object class< ] unit-test
-[ t ] [ \ null \ list class< ] unit-test
+class<tests
 
-[ t ] [ \ generic \ compound class< ] unit-test
-[ f ] [ \ compound \ generic class< ] unit-test
-
-[ f ] [ \ cons \ list class< ] unit-test
-[ f ] [ \ list \ cons class< ] unit-test
-
-[ f ] [ \ reversed \ slice class< ] unit-test
-[ f ] [ \ slice \ reversed class< ] unit-test
+[ class<tests ] with-class<cache
 
 PREDICATE: word no-docs "documentation" word-prop not ;
 

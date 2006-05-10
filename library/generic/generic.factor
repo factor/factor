@@ -1,9 +1,13 @@
-! Copyright (C) 2004, 2005 Slava Pestov.
-! See http://factor.sf.net/license.txt for BSD license.
+! Copyright (C) 2004, 2006 Slava Pestov.
+! See http://factorcode.org/license.txt for BSD license.
 IN: generic
 USING: arrays errors hashtables kernel kernel-internals lists
 namespaces parser sequences strings words vectors math
 math-internals ;
+
+: class? ( word -- ? ) "class" word-prop ;
+
+: classes ( -- list ) [ class? ] word-subset ;
 
 SYMBOL: typemap
 SYMBOL: builtins
@@ -41,19 +45,19 @@ SYMBOL: builtins
 : types ( class -- types )
     [ (types) ] make-hash hash-keys natural-sort ;
 
-DEFER: class<
+DEFER: (class<)
 
 : superclass< ( cls1 cls2 -- ? )
-    >r superclass r> 2dup and [ class< ] [ 2drop f ] if ;
+    >r superclass r> 2dup and [ (class<) ] [ 2drop f ] if ;
 
 : union-class< ( cls1 cls2 -- ? )
     >r flatten-class r> flatten-class hash-keys swap
-    [ drop swap [ class< ] contains-with? ] hash-all-with? ;
+    [ drop swap [ (class<) ] contains-with? ] hash-all-with? ;
 
 : class-empty? ( class -- ? )
     members dup [ empty? ] when ;
 
-: class< ( cls1 cls2 -- ? )
+: (class<) ( cls1 cls2 -- ? )
     {
         { [ 2dup eq? ] [ 2drop t ] }
         { [ over class-empty? ] [ 2drop t ] }
@@ -61,6 +65,21 @@ DEFER: class<
         { [ 2dup [ members ] 2apply or not ] [ 2drop f ] }
         { [ t ] [ union-class< ] }
     } cond ;
+
+SYMBOL: class<cache
+
+: class< ( cls1 cls2 -- ? )
+    class<cache get [ hash hash-member? ] [ (class<) ] if* ;
+
+: smaller-classes ( class -- )
+    classes [ swap (class<) ] subset-with ;
+
+: make-class<cache ( -- hash )
+    classes [ dup smaller-classes [ dup ] map>hash ] map>hash ;
+
+: with-class<cache ( quot -- )
+    [ make-class<cache class<cache set call ] with-scope ;
+    inline
 
 : class-compare ( cls1 cls2 -- -1/0/1 )
     2dup eq? [ 2drop 0 ] [ class< 1 -1 ? ] if ;
@@ -79,8 +98,6 @@ M: generic definer drop \ G: ;
 
 : make-generic ( word -- )
     dup dup "combination" word-prop call define-compound ;
-
-: class? ( word -- ? ) "class" word-prop ;
 
 : check-method ( class generic -- )
     dup generic? [
@@ -146,12 +163,11 @@ M: generic definer drop \ G: ;
 
 : define-class ( class -- )
     dup t "class" set-word-prop
+    dup H{ } clone "class<" set-word-prop
     dup flatten-class typemap get set-hash ;
 
 : implementors ( class -- list )
     [ "methods" word-prop ?hash* nip ] word-subset-with ;
-
-: classes ( -- list ) [ class? ] word-subset ;
 
 ! Predicate classes for generalized predicate dispatch.
 : define-predicate-class ( class predicate definition -- )

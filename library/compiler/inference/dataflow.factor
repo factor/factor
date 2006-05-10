@@ -31,6 +31,7 @@ M: node = eq? ;
 : param-node ( label) { } { } { } { } ;
 : in-node ( inputs) >r f r> { } { } { } ;
 : out-node ( outputs) >r f { } r> { } { } ;
+: meta-d-node meta-d get clone in-node ;
 
 : d-tail ( n -- list ) meta-d get tail* ;
 : r-tail ( n -- list ) meta-r get tail* ;
@@ -43,7 +44,8 @@ C: #label make-node ;
 
 TUPLE: #entry ;
 C: #entry make-node ;
-: #entry ( -- node ) meta-d get clone in-node <#entry> ;
+
+: #entry ( -- node ) meta-d-node <#entry> ;
 
 TUPLE: #call ;
 C: #call make-node ;
@@ -55,7 +57,7 @@ C: #call-label make-node ;
 
 TUPLE: #push ;
 C: #push make-node ;
-: #push ( outputs -- node ) d-tail out-node <#push> ;
+: #push ( -- node ) peek-d out-node <#push> ;
 : >#push< ( node -- seq ) node-out-d [ value-literal ] map ;
 
 TUPLE: #shuffle ;
@@ -64,23 +66,22 @@ C: #shuffle make-node ;
 
 TUPLE: #values ;
 C: #values make-node ;
-: #values ( -- node ) meta-d get clone in-node <#values> ;
+: #values ( -- node ) meta-d-node <#values> ;
 
 TUPLE: #return ;
 C: #return make-node ;
 : #return ( label -- node )
     #! The parameter is the label we are returning from, or if
     #! f, this is a top-level return.
-    meta-d get clone in-node <#return>
-    [ set-node-param ] keep ;
+    meta-d-node <#return> [ set-node-param ] keep ;
 
 TUPLE: #if ;
 C: #if make-node ;
-: #if ( in -- node ) 1 d-tail in-node <#if> ;
+: #if ( in -- node ) peek-d in-node <#if> ;
 
 TUPLE: #dispatch ;
 C: #dispatch make-node ;
-: #dispatch ( in -- node ) 1 d-tail in-node <#dispatch> ;
+: #dispatch ( in -- node ) peek-d in-node <#dispatch> ;
 
 TUPLE: #merge ;
 C: #merge make-node ;

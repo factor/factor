@@ -1,10 +1,17 @@
-! Copyright (C) 2005 Slava Pestov.
-! See http://factor.sf.net/license.txt for BSD license.
-IN: kernel-internals
-USING: arrays errors hashtables kernel lists math namespaces parser sequences sequences-internals strings vectors words ;
+! Copyright (C) 2005, 2006 Slava Pestov.
+! See http://factorcode.org/license.txt for BSD license.
+IN: generic
+USING: arrays errors hashtables kernel kernel-internals lists
+math namespaces parser sequences sequences-internals strings
+vectors words ;
+
+: class ( object -- class )
+    dup tuple? [ 2 slot ] [ type type>class ] if ; inline
 
 : class-tuple ( object -- class )
     dup tuple? [ 2 slot ] [ drop f ] if ; inline
+
+IN: kernel-internals
 
 : tuple= ( tuple tuple -- ? )
     2dup [ array-capacity ] 2apply number= [
@@ -15,13 +22,9 @@ USING: arrays errors hashtables kernel lists math namespaces parser sequences se
     ] if ; inline
 
 : tuple-hashcode ( n tuple -- n )
-    dup class-tuple hashcode >r >r 1- r>
-    4 slot hashcode* r> bitxor ;
+    dup class hashcode >r >r 1- r> 4 slot hashcode* r> bitxor ;
 
 IN: generic
-
-: class ( object -- class )
-    dup tuple? [ 2 slot ] [ type type>class ] if ; inline
 
 : tuple-predicate ( word -- )
     dup predicate-word
@@ -80,7 +83,7 @@ M: tuple clone ( tuple -- tuple )
 M: tuple hashcode* ( n tuple -- n )
     {
         { [ over 0 <= ] [ 2drop 0 ] }
-        { [ dup array-capacity 2 <= ] [ nip class-tuple hashcode ] }
+        { [ dup array-capacity 2 <= ] [ nip class hashcode ] }
         { [ t ] [ tuple-hashcode ] }
     } cond ;
 

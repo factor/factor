@@ -12,9 +12,11 @@ namespaces prettyprint sequences strings vectors words ;
 SYMBOL: meta-r
 : push-r meta-r get push ;
 : pop-r meta-r get pop ;
+: peek-r meta-r get peek ;
 SYMBOL: meta-d
 : push-d meta-d get push ;
 : pop-d meta-d get pop ;
+: peek-d meta-d get peek ;
 SYMBOL: meta-n
 SYMBOL: meta-c
 

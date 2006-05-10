@@ -66,26 +66,9 @@ kernel-internals lists math namespaces sequences words ;
 : math-both-known? ( word left right -- ? )
     math-class-max specific-method ;
 
-: max-tag ( class -- n ) types peek 1+ num-tags min ;
-
-: left-partial-math ( word left right -- quot/t )
-    #! The left type is known; dispatch on right
-    \ dup swap max-tag
-    [ >r 2dup r> math-method ] math-vtable* 2nip ;
-
-: right-partial-math ( word left right -- quot/t )
-    #! The right type is known; dispatch on left
-    \ over rot max-tag
-    [ >r 2dup r> swap math-method ] math-vtable* 2nip ;
-
 : will-inline-math-method ( word left right -- quot/t )
     #! t indicates failure
-    {
-        { [ 3dup math-both-known? ] [ math-method ] }
-        ! { [ 3dup drop specific-method ] [ left-partial-math ] }
-        ! { [ 3dup nip specific-method ] [ right-partial-math ] }
-        { [ t ] [ 3drop t ] }
-    } cond ;
+    3dup math-both-known? [ math-method ] [ 3drop t ] if ;
 
 : inline-math-method ( #call -- node )
     dup node-param over 1 node-class# pick 0 node-class#
