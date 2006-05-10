@@ -4,7 +4,7 @@ USING: compiler generic help io io-internals kernel
 kernel-internals lists math memory namespaces optimizer parser
 sequences sequences-internals words ;
 
-"Cross-referencing..." print
+"Cross-referencing..." print flush
 H{ } clone crossref set-global xref-words
 H{ } clone help-graph set-global xref-articles
 
@@ -13,8 +13,8 @@ H{ } clone help-graph set-global xref-articles
         unix? [
             "/library/unix/load.factor" run-resource
         ] when
-
     ] when
+
     windows? [
         "/library/windows/load.factor" run-resource
     ] when

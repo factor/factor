@@ -1,5 +1,5 @@
-! Copyright (C) 2004, 2005 Slava Pestov.
-! See http://factor.sf.net/license.txt for BSD license.
+! Copyright (C) 2004, 2006 Slava Pestov.
+! See http://factorcode.org/license.txt for BSD license.
 IN: optimizer
 USING: arrays generic hashtables inference kernel
 kernel-internals math namespaces sequences words ;
@@ -166,10 +166,20 @@ DEFER: (infer-classes)
         node-successor (infer-classes)
     ] when* ;
 
-: infer-classes ( node -- )
+: ?<hashtable> [ H{ } clone ] unless* ;
+
+: infer-classes-with ( node classes literals -- )
     [
-        H{ } clone value-classes set
-        H{ } clone value-literals set
+        ?<hashtable> value-literals set
+        ?<hashtable> value-classes set
         H{ } clone ties set
         (infer-classes)
     ] with-scope ;
+
+: infer-classes ( node -- )
+    f f infer-classes-with ;
+
+: infer-classes/node ( existing node -- )
+    #! Infer classes, using the existing node's class info as a
+    #! starting point.
+    over node-classes rot node-literals infer-classes-with ;

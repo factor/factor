@@ -36,17 +36,17 @@ math math-internals sequences words ;
     [ with-datastack ] catch
     [ 3drop t ] [ inline-literals ] if ;
 
-: flip-subst ( not -- )
+: call>no-op ( not -- )
     #! Note: cloning the vectors, since subst-values will modify
     #! them.
     [ node-in-d clone ] keep
     [ node-out-d clone ] keep
-    subst-values ;
+    [ subst-values ] keep node-successor ;
 
 : flip-branches ( not -- #if )
     #! If a not is followed by an #if, flip branches and
     #! remove the not.
-    dup flip-subst node-successor dup
+    call>no-op dup
     dup node-children reverse swap set-node-children ;
 
 \ not {
@@ -65,9 +65,6 @@ math math-internals sequences words ;
 : useless-coerce? ( node -- )
     dup 0 node-class#
     swap node-param "infer-effect" word-prop second first eq? ;
-
-: call>no-op ( node -- node )
-    [ ] dataflow [ subst-node ] keep ;
 
 { >fixnum >bignum >float } [
     {

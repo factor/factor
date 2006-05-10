@@ -9,7 +9,7 @@ SYMBOL: optimizer-changed
 GENERIC: optimize-node* ( node -- node/t )
 
 : keep-optimizing ( node -- node ? )
-    dup optimize-node* dup t =
+    dup optimize-node* dup t eq?
     [ drop f ] [ nip keep-optimizing t or ] if ;
 
 : optimize-node ( node -- node )

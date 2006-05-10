@@ -5,9 +5,7 @@ USING: errors hashtables inference io kernel lists math
 namespaces optimizer prettyprint sequences test words ;
 
 : (compile) ( word -- )
-    [
-        [ dup specialized-def dataflow optimize generate ] keep
-    ] benchmark nip "compile-time" set-word-prop ;
+    dup specialized-def dataflow optimize generate ;
 
 : inform-compile ( word -- ) "Compiling " write . flush ;
 
