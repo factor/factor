@@ -101,6 +101,6 @@ M: int-regs (%replace) drop swap %move-int>int ;
 
 : %inc-r ( n -- ) cs-reg (%inc) ;
 
-: %stack>freg ( n reg reg-class -- ) 3drop ;
+M: object %stack>freg ( n reg reg-class -- ) 3drop ;
 
-: %freg>stack ( n reg reg-class -- ) 3drop ;
+M: object %freg>stack ( n reg reg-class -- ) 3drop ;

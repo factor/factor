@@ -27,7 +27,8 @@ kernel-internals math namespaces sequences words ;
     #! n is a stack location, and the value of the class
     #! variable is a register number.
     c-type "reg-class" swap hash dup reg-class-full?
-    [ spill-param ] [ fastcall-param ] if ;
+    [ spill-param ] [ fastcall-param ] if
+    [ fastcall-regs nth ] keep ;
 
 : flatten-value-types ( params -- params )
     #! Convert value type structs to consecutive void*s.
@@ -43,13 +44,16 @@ kernel-internals math namespaces sequences words ;
     >r [ parameter-sizes ] keep
     [ reverse-slice ] 2apply r> 2each ; inline
 
-: move-parameters ( params vop -- )
-    #! Moves values from C stack to registers (if vop is
-    #! %stack>freg) and registers to C stack (if vop is
+: reset-freg-counts ( -- )
+    0 { int-regs float-regs stack-params } [ set ] each-with ;
+
+: move-parameters ( params word -- )
+    #! Moves values from C stack to registers (if word is
+    #! %stack>freg) and registers to C stack (if word is
     #! %freg>stack).
     swap [
         flatten-value-types
-        0 { int-regs float-regs stack-params } [ set ] each-with
+        reset-freg-counts
         [ pick >r alloc-parameter r> execute ] each-parameter
         drop
     ] with-scope ; inline

@@ -135,50 +135,40 @@ M: float-regs (%replace) ( vreg loc reg-class -- )
 
 : %inc-r ( n -- ) 15 15 rot cells ADDI ;
 
-GENERIC: freg>stack ( stack reg reg-class -- )
+M: int-regs %freg>stack drop 1 rot stack@ STW ;
 
-GENERIC: stack>freg ( stack reg reg-class -- )
-
-M: int-regs freg>stack drop 1 rot stack@ STW ;
-
-M: int-regs stack>freg drop 1 rot stack@ LWZ ;
+M: int-regs %stack>freg drop 1 rot stack@ LWZ ;
 
 : STF float-regs-size 4 = [ STFS ] [ STFD ] if ;
 
-M: float-regs freg>stack >r 1 rot stack@ r> STF ;
+M: float-regs %freg>stack >r 1 rot stack@ r> STF ;
 
 : LF float-regs-size 4 = [ LFS ] [ LFD ] if ;
 
-M: float-regs stack>freg >r 1 rot stack@ r> LF ;
+M: float-regs %stack>freg >r 1 rot stack@ r> LF ;
 
-M: stack-params stack>freg
+M: stack-params %stack>freg
     drop 2dup = [
         2drop
     ] [
         >r 0 1 rot stack@ LWZ 0 1 r> stack@ STW
     ] if ;
 
-M: stack-params freg>stack
-   >r stack-increment + swap r> stack>freg ;
-
-: %stack>freg ( n reg reg-class -- )
-    [ fastcall-regs nth ] keep stack>freg ;
-
-: %freg>stack ( n reg reg-class -- )
-    [ fastcall-regs nth ] keep freg>stack ;
+M: stack-params %freg>stack
+   >r stack-increment + swap r> %stack>freg ;
 
 : %unbox ( n reg-class func -- )
     ! Call the unboxer
     f %alien-invoke
     ! Store the return value on the C stack
-    [ return-reg ] keep freg>stack ;
+    [ return-reg ] keep %freg>stack ;
 
 : %box ( n reg-class func -- )
     ! If the source is a stack location, load it into freg #0.
     ! If the source is f, then we assume the value is already in
     ! freg #0.
     pick [
-        >r [ fastcall-regs first ] keep stack>freg r>
+        >r [ fastcall-regs first ] keep %stack>freg r>
     ] [
         2nip
     ] if
@@ -204,8 +194,8 @@ M: stack-params freg>stack
 : %alien-callback ( quot -- )
     0 <int-vreg> load-literal "run_callback" f %alien-invoke ;
 
-: save-return 0 swap [ return-reg ] keep freg>stack ;
-: load-return 0 swap [ return-reg ] keep stack>freg ;
+: save-return 0 swap [ return-reg ] keep %freg>stack ;
+: load-return 0 swap [ return-reg ] keep %stack>freg ;
 
 : %callback-value ( reg-class func -- )
     ! Call the unboxer

@@ -94,9 +94,9 @@ DEFER: %box ( n reg-class func -- )
 
 DEFER: %box-struct ( n reg-class size -- )
 
-DEFER: %stack>freg ( n reg reg-class -- )
+GENERIC: %freg>stack ( stack reg reg-class -- )
 
-DEFER: %freg>stack ( n reg reg-class -- )
+GENERIC: %stack>freg ( stack reg reg-class -- )
 
 DEFER: %alien-invoke ( library function -- )
 

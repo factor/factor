@@ -1,10 +1,8 @@
 should fix in 0.82:
 
+- test x86 set-slot
 - clean up fp-scratch
-- intrinsic fixnum>float float>fixnum
 - update amd64 backend
-- float= on powerpc doesn't consider nans equal
-- amd64 %box-struct
 - when generating a 32-bit image on a 64-bit system, large numbers which should
   be bignums become fixnums
 - get factor running on mac intel
@@ -51,6 +49,9 @@ should fix in 0.82:
 
 + compiler/ffi:
 
+- amd64 %box-struct
+- float= on powerpc doesn't consider nans equal
+- intrinsic fixnum>float float>fixnum
 - win64 port
 - amd64 %unbox-struct
 - constant branch folding
