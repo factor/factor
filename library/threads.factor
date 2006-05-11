@@ -17,7 +17,7 @@ namespaces queues sequences vectors ;
     sleep-queue dup [ [ first ] 2apply swap - ] nsort ;
 
 : sleep-time ( sorted-queue -- ms )
-    dup empty? [ drop -1 ] [ peek first millis - 0 max ] if ;
+    dup empty? [ drop 1000 ] [ peek first millis - 0 max ] if ;
 
 DEFER: next-thread
 

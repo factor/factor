@@ -14,10 +14,11 @@ H{ } clone c-types set
 "/library/compiler/alien/primitive-types.factor" parse-resource
 
 ! These symbols need the same hashcode in the target as in the
-! host.
+! host. They must be symbols -- colon definitions are not
+! permitted to be carried over
 {
     vocabularies typemap builtins c-types
-    cell crossref articles terms
+    crossref articles terms
 }
 
 ! Bring up a bare cross-compiling vocabulary.

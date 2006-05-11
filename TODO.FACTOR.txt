@@ -16,7 +16,6 @@ should fix in 0.82:
 - better i/o scheduler
 - yield in a loop starves i/o
 - "localhost" 50 <client> won't fail
-- issues with timeouts
 
 + ui/help:
 
@@ -75,7 +74,6 @@ should fix in 0.82:
 
 + misc:
 
-- make-image then compiler-tests sometimes reveals weird ghost words
 - 3 >n fep
 - code walker & exceptions
 - slice: if sequence or seq start is changed, abstraction violation
