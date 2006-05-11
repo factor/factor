@@ -1,6 +1,5 @@
 should fix in 0.82:
 
-- test x86 set-slot
 - clean up fp-scratch
 - update amd64 backend
 - when generating a 32-bit image on a 64-bit system, large numbers which should
