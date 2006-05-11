@@ -1,7 +1,7 @@
 ! Copyright (C) 2005, 2006 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 IN: sequences
-USING: errors generic kernel kernel-internals math
+USING: arrays errors generic kernel kernel-internals math
 sequences-internals strings vectors words ;
 
 : first2 ( { x y } -- x y )
@@ -81,6 +81,11 @@ M: object like drop ;
 
 : add ( seq elt -- seq )
     swap [ push ] immutable ; flushable
+
+: add* ( seq elt -- seq )
+    over >r
+    over thaw [ push ] keep [ swap nappend ] keep
+    r> like ; flushable
 
 : diff ( seq1 seq2 -- seq2-seq1 )
     [ swap member? not ] subset-with ; flushable

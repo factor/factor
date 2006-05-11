@@ -33,7 +33,7 @@ IN: generic
     define-predicate ;
 
 : forget-tuple ( class -- )
-    dup forget "predicate" word-prop car [ forget ] when* ;
+    dup forget "predicate" word-prop first [ forget ] when* ;
 
 : check-shape ( word slots -- )
     >r in get lookup dup [

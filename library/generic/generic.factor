@@ -181,9 +181,8 @@ PREDICATE: word predicate "definition" word-prop ;
 
 ! Union classes for dispatch on multiple classes.
 : union-predicate ( members -- list )
-    [
-        "predicate" word-prop \ dup swons [ drop t ] 2array
-    ] map [ drop f ] swap alist>quot ;
+    [ dup ] swap [ "predicate" word-prop append ] map-with
+    [ [ drop t ] 2array ] map [ drop f ] swap alist>quot ;
 
 : set-members ( class members -- )
     [ bootstrap-word ] map "members" set-word-prop ;

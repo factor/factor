@@ -28,4 +28,4 @@ sequences strings walker ;
     ] annotate ;
 
 : profile ( word -- )
-    [ swap [ global [ inc ] bind call ] curry cons ] annotate ;
+    [ swap [ global [ inc ] bind ] curry swap append ] annotate ;

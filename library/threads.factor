@@ -1,8 +1,8 @@
-! Copyright (C) 2004, 2005 Slava Pestov.
+! Copyright (C) 2004, 2006 Slava Pestov.
 ! Copyright (C) 2005 Mackenzie Straight.
-! See http://factor.sf.net/license.txt for BSD license.
+! See http://factorcode.org/license.txt for BSD license.
 IN: threads
-USING: errors hashtables io-internals kernel lists math
+USING: arrays errors hashtables io-internals kernel math
 namespaces queues sequences vectors ;
 
 ! Co-operative multitasker.
@@ -14,16 +14,16 @@ namespaces queues sequences vectors ;
 : sleep-queue ( -- vec ) \ sleep-queue get-global ;
 
 : sleep-queue* ( -- vec )
-    sleep-queue dup [ 2car swap - ] nsort ;
+    sleep-queue dup [ [ first ] 2apply swap - ] nsort ;
 
 : sleep-time ( sorted-queue -- ms )
-    dup empty? [ drop -1 ] [ peek car millis - 0 max ] if ;
+    dup empty? [ drop -1 ] [ peek first millis - 0 max ] if ;
 
 DEFER: next-thread
 
 : do-sleep ( -- continuation )
     sleep-queue* dup sleep-time dup zero?
-    [ drop pop cdr ] [ nip io-multiplex next-thread ] if ;
+    [ drop pop second ] [ nip io-multiplex next-thread ] if ;
 
 : next-thread ( -- continuation )
     run-queue dup queue-empty? [ drop do-sleep ] [ deque ] if ;
@@ -33,7 +33,7 @@ DEFER: next-thread
 : yield ( -- ) [ schedule-thread stop ] callcc0 ;
 
 : sleep ( ms -- )
-    millis + [ cons sleep-queue push stop ] callcc0 drop ;
+    millis + [ 2array sleep-queue push stop ] callcc0 drop ;
 
 : in-thread ( quot -- )
     [

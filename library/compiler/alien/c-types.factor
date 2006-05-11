@@ -53,10 +53,10 @@ SYMBOL: c-types
 
 : define-deref ( name vocab -- )
     >r dup "*" swap append r> create
-    swap c-getter 0 swons define-compound ;
+    swap c-getter 0 add* define-compound ;
 
 : (define-nth) ( word type quot -- )
-    >r c-size [ rot * ] curry r> append define-compound ;
+    >r c-size [ rot * ] swap add* r> append define-compound ;
 
 : define-nth ( name vocab -- )
     >r dup "-nth" append r> create
@@ -67,8 +67,8 @@ SYMBOL: c-types
     swap dup c-setter (define-nth) ;
 
 : define-out ( name vocab -- )
-    over [ <c-object> tuck 0 ] over c-setter append
-    >r >r constructor-word r> r> cons define-compound ;
+    over [ <c-object> tuck 0 ] over c-setter append swap
+    >r >r constructor-word r> r> add* define-compound ;
 
 : init-c-type ( name vocab -- )
     over define-pointer define-nth ;

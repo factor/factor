@@ -80,8 +80,9 @@ M: alien-invoke stack-reserve*
 
 : (define-c-word) ( type lib func types stack-effect -- )
     >r over create-in >r 
-    [ alien-invoke ] cons cons cons cons r> swap define-compound
-    word r> "stack-effect" set-word-prop ;
+    [ alien-invoke ] curry curry curry curry
+    r> swap define-compound word r>
+    "stack-effect" set-word-prop ;
 
 : define-c-word ( return library function parameters -- )
     [ "()" subseq? not ] subset >r pick r> parse-arglist

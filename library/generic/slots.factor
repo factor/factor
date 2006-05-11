@@ -10,7 +10,7 @@ parser sequences strings words ;
 
 : define-slot-word ( class slot word quot -- )
     over [
-        >r swap >fixnum r> cons define-typecheck
+        rot >fixnum add* define-typecheck
     ] [
         2drop 2drop
     ] if ;
@@ -19,7 +19,7 @@ parser sequences strings words ;
     [ slot ] rot dup object eq? [
         drop
     ] [
-        1array [ declare ] curry append
+        1array [ declare ] swap add* append
     ] if define-slot-word ;
 
 : define-writer ( class slot writer -- )

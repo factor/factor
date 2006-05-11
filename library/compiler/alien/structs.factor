@@ -10,12 +10,12 @@ sequences strings words ;
 : define-getter ( offset type name -- )
     #! Define a word with stack effect ( alien -- obj ) in the
     #! current 'in' vocabulary.
-    create-in >r c-getter cons r> swap define-compound ;
+    create-in >r c-getter swap add* r> swap define-compound ;
 
 : define-setter ( offset type name -- )
     #! Define a word with stack effect ( obj alien -- ) in the
     #! current 'in' vocabulary.
-    "set-" swap append create-in >r c-setter cons r>
+    "set-" swap append create-in >r c-setter swap add* r>
     swap define-compound ;
 
 : define-field ( offset type name -- offset )

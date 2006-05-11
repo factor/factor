@@ -52,7 +52,7 @@ M: alien-callback-error summary ( error -- )
 : generate-callback ( node -- )
     [ alien-callback-xt ] keep [
         dup alien-callback-parameters registers>objects
-        dup alien-callback-quot \ init-error-handler swons
+        dup alien-callback-quot \ init-error-handler add*
         %alien-callback
         unbox-return
         %return

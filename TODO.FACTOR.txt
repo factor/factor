@@ -75,10 +75,9 @@ should fix in 0.82:
 
 + misc:
 
+- make-image then compiler-tests sometimes reveals weird ghost words
 - 3 >n fep
 - code walker & exceptions
 - slice: if sequence or seq start is changed, abstraction violation
 - make 3.4 bits>double an error
-- colorcoded prettyprinting for vocabularies
-- signal handler should not lose stack pointers
 - code walker and callbacks is broken?

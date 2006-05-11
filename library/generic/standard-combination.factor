@@ -32,34 +32,40 @@ math namespaces sequences vectors words ;
         swap [ first classes-intersect? ] subset-with
     ] map-with ;
 
-: simplify-alist ( class assoc -- default assoc )
-    dup cdr [
-        2dup cdr car first class< [
-            cdr simplify-alist
-        ] [
-            uncons >r second nip r>
-        ] if
+: (simplify-alist) ( class i assoc -- default assoc )
+    2dup length 1- = [
+        nth second [ ] rot drop
     ] [
-        nip car second [ ]
+        3dup >r 1+ r> nth first class< [
+            >r 1+ r> (simplify-alist)
+        ] [
+            [ nth second ] 2keep >r 1+ r> tail rot drop
+        ] if
     ] if ;
+
+: simplify-alist ( class assoc -- default assoc )
+    0 swap (simplify-alist) ;
+
+: methods* ( dispatch# word -- assoc )
+    #! Make a class->method association, together with a
+    #! default delegating method at the end.
+    empty-method object bootstrap-word swap 2array 1array
+    swap methods append ;
+
+: small-generic ( dispatch# word -- def )
+    2dup methods* object bootstrap-word swap simplify-alist
+    swapd class-predicates alist>quot ;
 
 : vtable-methods ( dispatch# alist-seq -- alist-seq )
     dup length [
         type>class
-        [ swap simplify-alist ] [ car second [ ] ] if*
+        [ swap simplify-alist ] [ first second [ ] ] if*
         >r over r> class-predicates alist>quot
     ] 2map nip ;
 
 : <vtable> ( dispatch# word n -- vtable )
     #! n is vtable size; either num-types or num-tags.
-    >r 2dup empty-method \ object bootstrap-word swap 2array
-    >r methods >list r> swons r> sort-methods vtable-methods ;
-
-: small-generic ( dispatch# word -- def )
-    2dup empty-method object bootstrap-word swap 2array
-    swap methods >list cons
-    object bootstrap-word swap simplify-alist
-    swapd class-predicates alist>quot ;
+    >r 2dup methods* r> sort-methods vtable-methods ;
 
 : big-generic ( dispatch# word n dispatcher -- def )
     [ >r pick picker % r> , <vtable> , \ dispatch , ] [ ] make ;

@@ -24,7 +24,6 @@ SYMBOL: string-limit
 global [
     4 tab-size set
     64 margin set
-    recursion-check off
     0 position set
     0 indent set
     0 last-newline set
@@ -230,9 +229,9 @@ M: dll pprint* ( obj -- str ) dll-path "DLL\" " pprint-string ;
         over recursion-check get memq? [
             2drop "&" plain-text
         ] [
-            over recursion-check [ cons ] change
+            over recursion-check get push
             call
-            recursion-check [ cdr ] change
+            recursion-check get pop*
         ] if
     ] if ; inline
 
@@ -294,6 +293,7 @@ M: wrapper pprint* ( wrapper -- )
 
 : with-pprint ( quot -- )
     [
+        V{ } clone recursion-check set
         <block> f ?push pprinter-stack set
         call end-blocks do-pprint
     ] with-scope ; inline
