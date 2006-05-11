@@ -307,14 +307,12 @@ vectors words ;
 
     { "amd64" } {
         "/library/compiler/x86/assembler.factor"
+        "/library/compiler/x86/architecture.factor"
         "/library/compiler/amd64/architecture.factor"
-        "/library/compiler/x86/generator.factor"
-        "/library/compiler/amd64/generator.factor"
-        "/library/compiler/x86/slots.factor"
-        "/library/compiler/amd64/slots.factor"
-        "/library/compiler/x86/stack.factor"
-        "/library/compiler/x86/fixnum.factor"
         "/library/compiler/amd64/alien.factor"
+        "/library/compiler/x86/intrinsics.factor"
+        "/library/compiler/x86/intrinsics-sse2.factor"
+        "/library/compiler/amd64/intrinsics.factor"
     } if-arch
     
     [
