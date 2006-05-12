@@ -51,7 +51,7 @@ DEFER: (class<)
     >r superclass r> 2dup and [ (class<) ] [ 2drop f ] if ;
 
 : union-class< ( cls1 cls2 -- ? )
-    >r flatten-class r> flatten-class hash-keys swap
+    [ flatten-class ] 2apply hash-keys swap
     [ drop swap [ (class<) ] contains-with? ] hash-all-with? ;
 
 : class-empty? ( class -- ? )

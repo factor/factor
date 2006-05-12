@@ -16,7 +16,7 @@ IN: kernel-internals
         [ 2dup swap array-nth >r pick array-nth r> = ] all? 2nip
     ] [
         2drop f
-    ] if ; inline
+    ] if ;
 
 : tuple-hashcode ( n tuple -- n )
     dup class-tuple hashcode >r >r 1-

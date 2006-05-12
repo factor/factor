@@ -167,19 +167,19 @@ math-internals namespaces sequences words ;
     <label> "end" set
     "r" operand "x" operand untag-fixnum
     0 MTXER
-    11 "y" operand "r" operand MULLWO.
+    12 "y" operand "r" operand MULLWO.
     "end" get BNO
     4 "y" operand "r" operand MULHW
-    3 11 MR
+    3 12 MR
     "s48_fixnum_pair_to_bignum" f %alien-invoke
     ! now we have to shift it by three bits to remove the second
     ! tag
     tag-bits neg 4 LI
     "s48_bignum_arithmetic_shift" f %alien-invoke
     ! An untagged pointer to the bignum is now in r3; tag it
-    3 11 bignum-tag ORI
+    3 12 bignum-tag ORI
     "end" get save-xt
-    "s" operand 11 MR
+    "s" operand 12 MR
 ] H{
     { +input { { f "x" } { f "y" } } }
     { +scratch { { f "r" } { f "s" } } }

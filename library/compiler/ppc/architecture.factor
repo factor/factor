@@ -5,15 +5,15 @@ USING: alien assembler generic kernel kernel-internals math
 memory namespaces sequences words ;
 
 ! PowerPC register assignments
-! r3-r10 integer vregs
+! r3-r11 integer vregs
 ! f0-f13 float vregs
-! r11 linkage
+! r12 linkage
 ! r14 data stack
 ! r15 call stack
 
 M: int-regs return-reg drop 3 ;
 M: int-regs fastcall-regs drop { 3 4 5 6 7 8 9 10 } ;
-M: int-regs vregs drop { 3 4 5 6 7 8 9 10 } ;
+M: int-regs vregs drop { 3 4 5 6 7 8 9 10 11 } ;
 
 M: float-regs return-reg drop 1 ;
 M: float-regs fastcall-regs drop { 1 2 3 4 5 6 7 8 } ;
@@ -93,8 +93,8 @@ M: int-regs (%peek) ( vreg loc -- )
     drop >r v>operand r> loc>operand LWZ ;
 
 M: float-regs (%peek) ( vreg loc -- )
-    drop 11 swap loc>operand LWZ
-    v>operand 11 float-offset LFD ;
+    drop fp-scratch v>operand swap loc>operand LWZ
+    fp-scratch [ v>operand ] 2apply float-offset LFD ;
 
 M: int-regs (%replace) ( vreg loc -- )
     drop >r v>operand r> loc>operand STW ;
@@ -108,24 +108,24 @@ M: int-regs (%replace) ( vreg loc -- )
 : load-zone-ptr ( reg -- )
     "generations" f pick compile-dlsym dup 0 LWZ ;
 
-: load-allot-ptr ( -- ) 12 load-zone-ptr 12 12 cell LWZ ;
+: load-allot-ptr ( -- )
+    12 load-zone-ptr 12 12 cell LWZ ;
 
-: save-allot-ptr ( -- ) 11 load-zone-ptr 12 11 cell STW ;
+: save-allot-ptr ( -- )
+    fp-scratch v>operand [ load-zone-ptr 12 ] keep cell STW ;
 
-: with-inline-alloc ( vreg prequot postquot spec -- )
-    #! both quotations are called with the vreg
+: with-inline-alloc ( prequot postquot spec -- )
     load-allot-ptr [
-        >r >r v>operand dup 12 MR
-        \ tag-header get call tag-header 11 LI
-        11 12 0 STW
-        r> over slip dup dup \ tag get call ORI
+        \ tag-header get call tag-header fp-scratch v>operand LI
+        fp-scratch v>operand 12 0 STW
+        >r call 12 fp-scratch v>operand \ tag get call ORI
         r> call 12 12 \ size get call ADDI
     ] bind save-allot-ptr ; inline
 
 M: float-regs (%replace) ( vreg loc reg-class -- )
-    drop swap fp-scratch
-    [ >r v>operand r> 8 STFD ]
-    [ swap loc>operand STW ] H{
+    drop swap
+    [ v>operand 12 8 STFD ]
+    [ fp-scratch v>operand swap loc>operand STW ] H{
         { tag-header [ float-tag ] }
         { tag [ float-tag ] }
         { size [ 16 ] }
@@ -189,7 +189,7 @@ M: stack-params %freg>stack
     "box_value_struct" struct-ptr/size ;
 
 : %alien-invoke ( symbol dll -- )
-    11 [ compile-dlsym ] keep MTLR BLRL ;
+    12 [ compile-dlsym ] keep MTLR BLRL ;
 
 : %alien-callback ( quot -- )
     0 <int-vreg> load-literal "run_callback" f %alien-invoke ;

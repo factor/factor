@@ -1,5 +1,6 @@
 should fix in 0.82:
 
+- another i/o bug: on factorcode eventually all i/o times out
 - clean up fp-scratch
 - update amd64 backend
 - when generating a 32-bit image on a 64-bit system, large numbers which should
@@ -48,6 +49,7 @@ should fix in 0.82:
 
 + compiler/ffi:
 
+- free up r12 as a vreg on ppc
 - amd64 %box-struct
 - float= on powerpc doesn't consider nans equal
 - intrinsic fixnum>float float>fixnum

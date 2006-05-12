@@ -102,9 +102,6 @@ SYMBOL: phantom-r
 : finalize-heights ( -- )
     phantoms [ finalize-height ] 2apply ;
 
-: stack>new-vreg ( loc spec -- vreg )
-    spec>vreg [ swap %peek ] keep ;
-
 : vreg>stack ( value loc -- )
     over loc? over not or [ 2drop ] [ %replace ] if ;
 
@@ -118,17 +115,17 @@ SYMBOL: phantom-r
     [ first2 over loc? >r = not r> and ] subset
     [ first ] map ;
 
+: stack>new-vreg ( loc spec -- vreg )
+    spec>vreg [ swap %peek ] keep ;
+
 : live-locs ( phantom phantom -- hash )
     [ (live-locs) ] 2apply append prune
     [ dup f stack>new-vreg ] map>hash ;
 
 : lazy-store ( value loc -- )
     over loc? [
-        2dup = [
-            2drop
-        ] [
-            >r \ live-locs get hash r> vreg>stack 
-        ] if
+        2dup =
+        [ 2drop ] [ >r \ live-locs get hash r> vreg>stack ] if
     ] [
         2drop
     ] if ;
