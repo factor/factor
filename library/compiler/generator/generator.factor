@@ -194,9 +194,9 @@ M: #dispatch generate-node ( node -- next )
 UNION: immediate fixnum POSTPONE: f ;
 
 : generate-push ( node -- )
-    >#push< dup length f <array>
-    dup requested-vregs ensure-vregs
-    [ spec>vreg [ load-literal ] keep ] 2map
+    >#push<
+    dup length ?fp-scratch + 0 ensure-vregs
+    [ f spec>vreg [ load-literal ] keep ] map
     phantom-d get phantom-append ;
 
 M: #push generate-node ( #push -- )

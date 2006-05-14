@@ -1,7 +1,6 @@
 should fix in 0.82:
 
 - another i/o bug: on factorcode eventually all i/o times out
-- clean up fp-scratch
 - update amd64 backend
 - when generating a 32-bit image on a 64-bit system, large numbers which should
   be bignums become fixnums

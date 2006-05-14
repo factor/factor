@@ -20,19 +20,21 @@ M: float-regs (%peek) ( vreg loc reg-class -- )
 : inc-allot-ptr ( vreg n -- )
     >r dup load-zone-ptr cell [+] r> ADD ;
 
-: with-inline-alloc ( vreg prequot postquot spec -- )
+: with-inline-alloc ( prequot postquot spec -- )
     #! both quotations are called with the vreg
     [
-        >r >r v>operand dup load-allot-ptr
-        dup [] \ tag-header get call tag-header MOV
-        r> over slip dup \ tag get call OR
-        r> over slip \ size get call inc-allot-ptr
+        EBX PUSH
+        EBX load-allot-ptr
+        EBX [] \ tag-header get call tag-header MOV
+        >r call EBX \ tag get call OR
+        r> call EBX \ size get call inc-allot-ptr
+        EBX POP
     ] bind ; inline
 
 M: float-regs (%replace) ( vreg loc reg-class -- )
-    drop fp-scratch
-    [ 8 [+] rot v>operand MOVSD ]
-    [ >r v>operand r> MOV ] H{
+    drop
+    [ EBX 8 [+] rot v>operand MOVSD ]
+    [ v>operand EBX MOV ] H{
         { tag-header [ float-tag ] }
         { tag [ float-tag ] }
         { size [ 16 ] }
