@@ -240,8 +240,3 @@ M: #return generate-node drop end-basic-block %return f ;
 
 : float-offset 8 float-tag - ;
 : string-offset 3 cells object-tag - ;
-
-: fp-scratch ( -- vreg )
-    "fp-scratch" get [
-        T{ int-regs } alloc-reg dup "fp-scratch" set
-    ] unless* ;

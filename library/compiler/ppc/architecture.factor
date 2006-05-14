@@ -123,7 +123,7 @@ M: int-regs (%replace) ( vreg loc -- )
     ] bind save-allot-ptr ; inline
 
 M: float-regs (%replace) ( vreg loc reg-class -- )
-    drop swap
+    drop swap fp-scratch drop
     [ v>operand 12 8 STFD ]
     [ fp-scratch v>operand swap loc>operand STW ] H{
         { tag-header [ float-tag ] }

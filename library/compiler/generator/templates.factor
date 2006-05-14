@@ -242,8 +242,31 @@ SYMBOL: +clobber
 : requested-vregs ( template -- int# float# )
     dup length swap [ float eq? ] subset length [ - ] keep ;
 
+: (holds-class?) ( class phantom -- ? )
+    [ delegate class eq? ] contains-with? ;
+
+: holds-class? ( class -- ? )
+    dup phantom-d get (holds-class?) swap
+    phantom-r get (holds-class?) or ;
+
+: (requests-class?) ( class template -- )
+    [ second reg-spec>class eq? ] contains-with? ;
+
+: requests-class? ( class -- ? )
+    dup +input get (requests-class?) swap
+    +scratch get (requests-class?) or ;
+
+: ?fp-scratch ( -- n )
+    T{ float-regs f 8 } dup holds-class? >r requests-class? r>
+    or 1 0 ? ;
+
+: fp-scratch ( -- vreg )
+    "fp-scratch" get [
+        T{ int-regs } alloc-reg dup "fp-scratch" set
+    ] unless* ;
+
 : guess-vregs ( -- int# float# )
-    +input get { } additional-vregs
+    +input get { } additional-vregs ?fp-scratch +
     +scratch get [ first ] map requested-vregs >r + r> ;
 
 : alloc-scratch ( -- )

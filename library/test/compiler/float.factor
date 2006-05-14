@@ -6,6 +6,9 @@ math-internals test ;
 [ 2.0 3.0 ] [ 3.0 [ 2.0 swap ] compile-1 ] unit-test
 
 [ 1 2 3 4.0 ] [ [ 1 2 3 4.0 ] compile-1 ] unit-test
+
+[ 3.0 1 2 3 ] [ 1.0 2.0 [ float+ 1 2 3 ] compile-1 ] unit-test
+
 [ 5 ] [ 1.0 [ 2.0 float+ tag ] compile-1 ] unit-test
 
 [ 3.0 ] [ 1.0 [ 2.0 float+ ] compile-1 ] unit-test
