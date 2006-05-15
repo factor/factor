@@ -80,8 +80,9 @@ INLINE CELL align8(CELL a)
 #define WORD_TYPE 16
 #define TUPLE_TYPE 17
 #define BYTE_ARRAY_TYPE 18
+#define QUOTATION_TYPE 19
 
-#define TYPE_COUNT 19
+#define TYPE_COUNT 20
 
 /* Canonical T object. It's just a word */
 CELL T;

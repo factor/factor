@@ -1,9 +1,9 @@
 ! Copyright (C) 2004, 2006 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-IN: inference
 USING: arrays errors generic hashtables interpreter kernel
 math math-internals namespaces parser prettyprint sequences
 strings vectors words ;
+IN: inference
 
 : consume-values ( n node -- )
     over ensure-values
@@ -201,7 +201,7 @@ M: symbol apply-object ( word -- )
 
 M: compound apply-object ( word -- )
     #! Apply the word's stack effect to the inferencer state.
-    dup recursive-state get assoc [
+    dup recursive-state get <reversed> assoc [
         recursive-word
     ] [
         dup "inline" word-prop

@@ -54,8 +54,8 @@ namespaces parser prettyprint sequences strings vectors words ;
 
 : callstack-effect ( seq -- )
     dup length 0 <array>
-    swap meta-c active-variable
-    unify-effect meta-c set drop ;
+    swap meta-r active-variable
+    unify-effect meta-r set drop ;
 
 : unify-effects ( seq -- )
     dup datastack-effect dup callstack-effect
@@ -65,7 +65,7 @@ namespaces parser prettyprint sequences strings vectors words ;
     [ [ dataflow-graph get ] bind ] map ;
 
 : copy-inference ( -- )
-    meta-c [ clone ] change
+    meta-r [ clone ] change
     meta-d [ clone ] change
     d-in [ ] change
     dataflow-graph off

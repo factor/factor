@@ -9,19 +9,13 @@ CELL object_size(CELL pointer)
 	case FIXNUM_TYPE:
 		size = 0;
 		break;
+	case RATIO_TYPE:
+	case FLOAT_TYPE:
+	case COMPLEX_TYPE:
 	case BIGNUM_TYPE:
 		size = untagged_object_size(UNTAG(pointer));
 		break;
 	case CONS_TYPE:
-		size = sizeof(F_CONS);
-		break;
-	case RATIO_TYPE:
-		size = sizeof(F_RATIO);
-		break;
-	case FLOAT_TYPE:
-		size = sizeof(F_FLOAT);
-		break;
-	case COMPLEX_TYPE:
 		size = sizeof(F_CONS);
 		break;
 	case OBJECT_TYPE:
@@ -66,8 +60,14 @@ CELL untagged_object_size(CELL pointer)
 	case SBUF_TYPE:
 		size = sizeof(F_SBUF);
 		break;
+	case RATIO_TYPE:
+		size = sizeof(F_RATIO);
+		break;
 	case FLOAT_TYPE:
 		size = sizeof(F_FLOAT);
+		break;
+	case COMPLEX_TYPE:
+		size = sizeof(F_COMPLEX);
 		break;
 	case DLL_TYPE:
 		size = sizeof(DLL);

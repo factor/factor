@@ -4,6 +4,12 @@ void relocate_object(CELL relocating)
 {
 	switch(untag_header(get(relocating)))
 	{
+	case RATIO_TYPE:
+		fixup_ratio((F_RATIO*)relocating);
+		break;
+	case COMPLEX_TYPE:
+		fixup_complex((F_COMPLEX*)relocating);
+		break;
 	case WORD_TYPE:
 		fixup_word((F_WORD*)relocating);
 		break;

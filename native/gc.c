@@ -175,6 +175,12 @@ INLINE void collect_object(CELL scan)
 {
 	switch(untag_header(get(scan)))
 	{
+	case RATIO_TYPE:
+		collect_ratio((F_RATIO*)scan);
+		break;
+	case COMPLEX_TYPE:
+		collect_complex((F_COMPLEX*)scan);
+		break;
 	case WORD_TYPE:
 		collect_word((F_WORD*)scan);
 		break;

@@ -277,8 +277,8 @@ num-types f <array> builtins set
 "ratio?" "math" create t "inline" set-word-prop
 "ratio" "math" create 4 "ratio?" "math" create
 {
-    { 0 integer { "numerator" "math" } f }
-    { 1 integer { "denominator" "math" } f }
+    { 1 integer { "numerator" "math" } f }
+    { 2 integer { "denominator" "math" } f }
 } define-builtin
 
 "float?" "math" create t "inline" set-word-prop
@@ -288,8 +288,8 @@ num-types f <array> builtins set
 "complex?" "math" create t "inline" set-word-prop
 "complex" "math" create 6 "complex?" "math" create
 {
-    { 0 real { "real" "math" } f }
-    { 1 real { "imaginary" "math" } f }
+    { 1 real { "real" "math" } f }
+    { 2 real { "imaginary" "math" } f }
 } define-builtin
 
 "alien" "alien" create 7 "alien?" "alien" create

@@ -11,8 +11,20 @@ void primitive_from_fraction(void)
 
 	denominator = dpop();
 	numerator = dpop();
-	ratio = allot(sizeof(F_RATIO));
+	ratio = allot_object(RATIO_TYPE,sizeof(F_RATIO));
 	ratio->numerator = numerator;
 	ratio->denominator = denominator;
 	dpush(RETAG(ratio,RATIO_TYPE));
+}
+
+void fixup_ratio(F_RATIO* ratio)
+{
+	data_fixup(&ratio->numerator);
+	data_fixup(&ratio->denominator);
+}
+
+void collect_ratio(F_RATIO* ratio)
+{
+	copy_handle(&ratio->numerator);
+	copy_handle(&ratio->denominator);
 }

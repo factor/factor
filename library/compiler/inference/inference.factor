@@ -64,7 +64,7 @@ SYMBOL: terminated?
 
 : init-inference ( recursive-state -- )
     terminated? off
-    V{ } clone meta-c set
+    V{ } clone meta-r set
     V{ } clone meta-d set
     0 d-in set
     recursive-state set
@@ -101,7 +101,7 @@ M: quotation infer-quot ( quot -- )
     #! Raise an error if word leaves values on return stack.
     meta-r get empty? [
         "Word leaves " meta-r get length number>string
-        " element(s) on return stack. Check >r/r> usage." append3
+        " element(s) on retain stack. Check >r/r> usage." append3
         inference-error
     ] unless ;
 
