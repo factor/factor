@@ -77,7 +77,7 @@ M: phantom-callstack finalize-height
 
 : phantom-locs ( n phantom -- locs )
     #! A sequence of n ds-locs or cs-locs indexing the stack.
-    swap reverse-slice [ swap <loc> ] map-with ;
+    swap <reversed> [ swap <loc> ] map-with ;
 
 : phantom-locs* ( phantom -- locs )
     dup length swap phantom-locs ;
@@ -188,7 +188,7 @@ SYMBOL: phantom-r
     } cond ;
 
 : template-match? ( template phantom -- ? )
-    [ reverse-slice ] 2apply
+    [ <reversed> ] 2apply
     t [ swap first compatible-values? and ] 2reduce ;
 
 : split-template ( template phantom -- slow fast )

@@ -73,7 +73,7 @@ M: gadget children-on ( rect/point gadget -- list )
     [ >absolute intersects? ] [ 2drop f ] if ;
 
 : pick-up-list ( rect/point gadget -- gadget/f )
-    dupd children-on reverse-slice [ inside? ] find-with nip ;
+    dupd children-on <reversed> [ inside? ] find-with nip ;
 
 : translate ( rect/point -- new-origin )
     rect-loc origin [ v+ dup ] change ;

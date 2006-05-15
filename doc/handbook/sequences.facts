@@ -36,7 +36,7 @@ ARTICLE: "sequence-implementations" "Sequence implementations"
 { $subsection "sbufs" }
 "Virtual sequences wrap an underlying sequence to present an alternative view of its elements:"
 { $subsection <slice> }
-{ $subsection reverse-slice }
+{ $subsection <reversed> }
 "Integers support the sequence protocol:"
 { $subsection "sequences-integers" } ;
 

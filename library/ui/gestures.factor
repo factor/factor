@@ -81,13 +81,13 @@ V{ } clone hand-buttons set-global
     [ handle-gesture* drop ] each-with ;
 
 : hand-gestures ( new old -- )
-    drop-prefix reverse-slice
+    drop-prefix <reversed>
     [ mouse-leave ] swap each-gesture
     fire-motion
     [ mouse-enter ] swap each-gesture ;
 
 : focus-gestures ( new old -- )
-    drop-prefix reverse-slice
+    drop-prefix <reversed>
     [ lose-focus ] swap each-gesture
     [ gain-focus ] swap each-gesture ;
 
@@ -124,7 +124,7 @@ V{ } clone hand-buttons set-global
 : under-hand ( -- seq )
     #! A sequence whose first element is the world and last is
     #! the current gadget, with all parents in between.
-    hand-gadget get-global parents reverse-slice ;
+    hand-gadget get-global parents <reversed> ;
 
 : move-hand ( loc world -- )
     under-hand >r over hand-loc set-global

@@ -207,6 +207,6 @@ unit-test
 [ { } ] [ 0 { } group ] unit-test
 
 ! Pathological case
-[ "ihbye" ] [ "hi" reverse-slice "bye" append ] unit-test
+[ "ihbye" ] [ "hi" <reversed> "bye" append ] unit-test
 
 [ 10 "hi" "bye" copy-into ] unit-test-fails

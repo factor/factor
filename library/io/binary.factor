@@ -4,7 +4,7 @@ IN: io
 USING: kernel lists math sequences strings ;
 
 : be> ( seq -- x ) 0 [ >r 8 shift r> bitor ] reduce ;
-: le> ( seq -- x ) reverse-slice be> ;
+: le> ( seq -- x ) <reversed> be> ;
 
 : nth-byte ( x n -- b ) -8 * shift HEX: ff bitand ;
 

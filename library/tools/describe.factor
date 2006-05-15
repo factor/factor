@@ -75,7 +75,7 @@ M: word summary ( word -- )
 : format-sheet ( sheet -- list )
     #! We use an idiom to notify format-column if it is
     #! formatting the last column.
-    dup length reverse-slice [ zero? format-column ] 2map
+    dup length <reversed> [ zero? format-column ] 2map
     flip [ " " join ] map ;
 
 DEFER: describe
@@ -105,7 +105,7 @@ DEFER: describe
 
 : uses. ( word -- ) uses [ uses. ] sequence-outliner ;
 
-: stack. ( seq -- seq ) reverse-slice >array describe ;
+: stack. ( seq -- seq ) <reversed> >array describe ;
 
 : .s datastack stack. ;
 : .r retainstack stack. ;

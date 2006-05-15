@@ -23,6 +23,8 @@ M: reversed like ( seq reversed -- seq ) delegate like ;
 
 M: reversed thaw ( seq -- seq ) delegate thaw ;
 
+: reverse ( seq -- seq ) [ <reversed> ] keep like ;
+
 ! A slice of another sequence.
 TUPLE: slice seq from to ;
 

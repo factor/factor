@@ -53,7 +53,7 @@ sequences strings vectors words prettyprint ;
 \ cond [ [ object ] [ ] ] "infer-effect" set-word-prop
 
 \ cond [
-    pop-literal reverse-slice
+    pop-literal <reversed>
     [ no-cond ] swap alist>quot infer-quot-value
 ] "infer" set-word-prop
 

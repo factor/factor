@@ -64,7 +64,7 @@ PREDICATE: word tuple-class "tuple-size" word-prop ;
 
 : default-constructor ( tuple -- )
     [ create-constructor ] keep dup [
-        "slots" word-prop 1 swap tail-slice reverse-slice
+        "slots" word-prop 1 swap tail-slice <reversed>
         [ peek unit , \ keep , ] each
     ] [ ] make define-constructor ;
 

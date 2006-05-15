@@ -20,7 +20,7 @@ TUPLE: listener-gadget pane stack ;
         dup empty? [
             "Empty stack" write drop
         ] [
-            "Stack top: " write reverse-slice
+            "Stack top: " write <reversed>
             [ [ unparse-short ] keep simple-object bl ] each bl
         ] if
     ] with-stream* ;

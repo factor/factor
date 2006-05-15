@@ -44,14 +44,6 @@ HELP: like "( seq prototype -- newseq )"
 $terpri
 "This generic word is flushable, so user-defined methods must satisfy the flushable contract (see " { $link "declarations" } ")." } ;
 
-HELP: reverse "( seq -- reversed )"
-{ $values { "seq" "a sequence" } { "reversed" "a sequence" } }
-{ $description "Outputs a new sequence with the reverse element order." } ;
-
-HELP: reverse-slice "( seq -- reversed )"
-{ $values { "seq" "a sequence" } { "reversed" "a sequence" } }
-{ $description "Outputs a virtual sequence sharing storage with " { $snippet "seq" } " but with reverse element order." } ;
-
 HELP: peek "( seq -- elt )"
 { $values { "seq" "a sequence" } { "elt" "an object" } }
 { $description "Outputs the last element of the sequence." }

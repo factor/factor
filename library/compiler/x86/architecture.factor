@@ -26,7 +26,7 @@ M: cs-loc v>operand cs-loc-n cs-reg reg-stack ;
     2dup dlsym CALL rel-relative rel-dlsym ;
 
 : compile-c-call* ( symbol dll args -- operands )
-    reverse-slice
+    <reversed>
     [ [ PUSH ] each %alien-invoke ] keep
     [ drop EDX POP ] each ;
 

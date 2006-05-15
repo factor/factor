@@ -44,7 +44,7 @@ M: world pref-dim* ( world -- dim )
     delegate pref-dim* { 1024 768 0 } vmin ;
 
 : focused-ancestors ( world -- seq )
-    world-focus parents reverse-slice ;
+    world-focus parents <reversed> ;
 
 : draw-string ( open-fonts string -- )
     >r dup world get font-sprites r> (draw-string) ;

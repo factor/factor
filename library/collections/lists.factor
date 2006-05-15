@@ -61,11 +61,6 @@ M: general-list map ( list quot -- list ) (list-map) ;
 M: general-list find ( list quot -- i elt )
     0 (list-find) ;
 
-M: general-list reverse-slice ( list -- list )
-    [ ] [ swons ] reduce ;
-
-M: general-list reverse reverse-slice ;
-
 M: general-list nth ( n list -- element )
     over 0 <= [ nip car ] [ >r 1- r> cdr nth ] if ;
 

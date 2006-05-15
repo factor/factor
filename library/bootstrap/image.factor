@@ -230,7 +230,7 @@ M: complex ' ( c -- tagged ) >rect complex-tag emit-cons ;
 ( Strings )
 
 : emit-chars ( seq -- )
-    big-endian get [ [ reverse-slice ] map ] unless
+    big-endian get [ [ <reversed> ] map ] unless
     [ 0 [ swap 16 shift + ] reduce emit ] each ;
 
 : pack-string ( string -- seq )

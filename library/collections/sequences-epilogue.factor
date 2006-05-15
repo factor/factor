@@ -103,10 +103,6 @@ M: object like drop ;
 : pop ( sequence -- element )
     dup peek swap pop* ;
 
-M: object reverse-slice ( seq -- seq ) <reversed> ;
-
-M: object reverse ( seq -- seq ) [ <reversed> ] keep like ;
-
 : all-equal? ( seq -- ? ) [ = ] monotonic? ;
 
 : all-eq? ( seq -- ? ) [ eq? ] monotonic? ;

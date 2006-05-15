@@ -9,8 +9,6 @@ GENERIC: nth ( n sequence -- obj ) flushable
 GENERIC: set-nth ( value n sequence -- obj )
 GENERIC: thaw ( seq -- mutable-seq ) flushable
 GENERIC: like ( seq seq -- seq ) flushable
-GENERIC: reverse ( seq -- seq ) flushable
-GENERIC: reverse-slice ( seq -- seq ) flushable
 
 : empty? ( seq -- ? ) length zero? ; inline
 
