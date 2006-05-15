@@ -186,6 +186,7 @@ INLINE void collect_object(CELL scan)
 		break;
 	case ARRAY_TYPE:
 	case TUPLE_TYPE:
+	case QUOTATION_TYPE:
 		collect_array((F_ARRAY*)scan);
 		break;
 	case HASHTABLE_TYPE:

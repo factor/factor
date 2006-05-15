@@ -425,6 +425,10 @@ num-types f <array> builtins set
 "byte-array?" "arrays" create
 { } define-builtin
 
+"quotation?" "kernel" create t "inline" set-word-prop
+"quotation" "kernel" create 19 "quotation?" "kernel" create
+{ } define-builtin
+
 ! Define general-t type, which is any object that is not f.
 "general-t" "kernel" create dup define-symbol
 f "f" "!syntax" lookup builtins get remove [ ] subset

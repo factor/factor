@@ -136,7 +136,7 @@ USE: optimizer
 ] unit-test
 
 GENERIC: xyz
-M: cons xyz xyz ;
+M: array xyz xyz ;
 
 [ ] [ \ xyz compile ] unit-test
 
@@ -195,12 +195,6 @@ TUPLE: pred-test ;
 [ 3 ] [ t bad-kill-2 ] unit-test
 
 ! regression
-: bleh 3 ;
-: blah over cons? [ bleh >r 2cdr r> ] [ 2drop f f f ] if ; compiled
-
-[ f ] [ [ 1 2 3 ] [ 1 3 2 ] blah drop 2car = ] unit-test
-
-! regression
 : (the-test) dup 0 > [ 1- (the-test) ] when ; inline
 : the-test 2 dup (the-test) ; compiled
 
@@ -221,7 +215,7 @@ TUPLE: pred-test ;
 : double-label-1
     [ f double-label-1 ] [ swap nth-unsafe ] if ; inline
 : double-label-2
-    dup general-list? [ ] [ ] if 0 t double-label-1 ; compiled
+    dup array? [ ] [ ] if 0 t double-label-1 ; compiled
 
 [ 0 ] [ 10 double-label-2 ] unit-test
 

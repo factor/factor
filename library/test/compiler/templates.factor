@@ -40,7 +40,7 @@ unit-test
 unit-test
 
 [ 1 2 2 ]
-[ 1/2 [ dup 0 slot swap 1 slot [ foo ] keep ] compile-1 ]
+[ 1/2 [ dup 1 slot swap 2 slot [ foo ] keep ] compile-1 ]
 unit-test
 
 [ 41 5 4 ] [

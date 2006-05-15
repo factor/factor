@@ -46,6 +46,7 @@ CELL untagged_object_size(CELL pointer)
 	case TUPLE_TYPE:
 	case BIGNUM_TYPE:
 	case BYTE_ARRAY_TYPE:
+	case QUOTATION_TYPE:
 		size = array_size(array_capacity((F_ARRAY*)(pointer)));
 		break;
 	case HASHTABLE_TYPE:

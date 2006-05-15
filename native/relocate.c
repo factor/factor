@@ -15,6 +15,7 @@ void relocate_object(CELL relocating)
 		break;
 	case ARRAY_TYPE:
 	case TUPLE_TYPE:
+	case QUOTATION_TYPE:
 		fixup_array((F_ARRAY*)relocating);
 		break;
 	case HASHTABLE_TYPE:
