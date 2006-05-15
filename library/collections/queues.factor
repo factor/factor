@@ -1,26 +1,41 @@
-! Copyright (C) 2005 Slava Pestov.
+! Copyright (C) 2005, 2006 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 IN: queues
-USING: errors kernel lists math sequences vectors ;
+USING: errors kernel ;
 
-TUPLE: queue in out ;
+TUPLE: entry obj next ;
+
+C: entry ( obj -- entry ) [ set-entry-obj ] keep ;
+
+TUPLE: queue head tail ;
 
 C: queue ( -- queue ) ;
 
-: queue-empty? ( queue -- ? )
-    dup queue-in swap queue-out or not ;
+: queue-empty? ( queue -- ? ) queue-head not ;
+
+: clear-queue ( queue -- )
+    f over set-queue-head f swap set-queue-tail ;
+
+: enque-first ( entry queue -- )
+    [ set-queue-head ] 2keep set-queue-tail ;
 
 : enque ( obj queue -- )
-    [ queue-in cons ] keep set-queue-in ;
+    >r <entry> r> dup queue-empty? [
+        enque-first
+    ] [
+        [ queue-tail set-entry-next ] 2keep set-queue-tail
+    ] if ;
+
+: (deque) ( queue -- )
+    dup queue-head over queue-tail eq? [
+        clear-queue
+    ] [
+        dup queue-head entry-next swap set-queue-head
+    ] if ;
 
 : deque ( queue -- obj )
-    dup queue-out [
-        uncons rot set-queue-out
+    dup queue-empty? [
+        "Empty queue" throw
     ] [
-        dup queue-in [
-            reverse uncons pick set-queue-out
-            f rot set-queue-in
-        ] [
-            "Empty queue" throw
-        ] if*
-    ] if* ;
+        dup queue-head entry-obj >r (deque) r>
+    ] if ;
