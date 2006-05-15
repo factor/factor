@@ -19,13 +19,17 @@ static bool in_page(void *fault, void *i_area, CELL area_size, int offset)
 void signal_handler(int signal, siginfo_t* siginfo, void* uap)
 {
 	if(in_page(siginfo->si_addr, (void *) ds_bot, 0, -1))
-		signal_stack_error(false, false);
+		general_error(ERROR_DS_UNDERFLOW,F,F,false);
 	else if(in_page(siginfo->si_addr, (void *) ds_bot, ds_size, 0))
-		signal_stack_error(false, true);
+		general_error(ERROR_DS_OVERFLOW,F,F,false);
+	else if(in_page(siginfo->si_addr, (void *) rs_bot, 0, -1))
+		general_error(ERROR_RS_UNDERFLOW,F,F,false);
+	else if(in_page(siginfo->si_addr, (void *) rs_bot, rs_size, 0))
+		general_error(ERROR_RS_OVERFLOW,F,F,false);
 	else if(in_page(siginfo->si_addr, (void *) cs_bot, 0, -1))
-		signal_stack_error(true, false);
+		general_error(ERROR_CS_UNDERFLOW,F,F,false);
 	else if(in_page(siginfo->si_addr, (void *) cs_bot, cs_size, 0))
-		signal_stack_error(true, true);
+		general_error(ERROR_CS_OVERFLOW,F,F,false);
 	else
 		signal_error(signal);
 }

@@ -1,42 +1,42 @@
 ! Copyright (C) 2004, 2006 Slava Pestov.
-! See http://factor.sf.net/license.txt for BSD license.
+! See http://factorcode.org/license.txt for BSD license.
 IN: errors
-USING: generic hashtables inspector io kernel kernel-internals
-lists math namespaces parser prettyprint sequences
+USING: arrays generic hashtables inspector io kernel
+kernel-internals math namespaces parser prettyprint sequences
 sequences-internals strings vectors words ;
 
 SYMBOL: error
 SYMBOL: error-continuation
 
 : expired-error. ( obj -- )
-    "Object did not survive image save/load: " write . ;
+    "Object did not survive image save/load: " write third . ;
 
 : undefined-word-error. ( obj -- )
-    "Undefined word: " write . ;
+    "Undefined word: " write third . ;
 
 : io-error. ( error -- )
-    "I/O error: " write print ;
+    "I/O error: " write third print ;
 
 : type-check-error. ( list -- )
     "Type check error" print
-    uncons car dup "Object: " write short.
-    "Object type: " write class .
-    "Expected type: " write type>class . ;
+    "Object: " write dup fourth short.
+    "Object type: " write dup fourth class .
+    "Expected type: " write third type>class . ;
 
 : float-format-error. ( list -- )
-    "Invalid floating point literal format: " write . ;
+    "Invalid floating point literal format: " write third . ;
 
 : signal-error. ( obj -- )
-    "Operating system signal " write . ;
+    "Operating system signal " write third . ;
 
 : negative-array-size-error. ( obj -- )
-    "Cannot allocate array with negative size " write . ;
+    "Cannot allocate array with negative size " write third . ;
 
 : c-string-error. ( obj -- )
-    "Cannot convert to C string: " write . ;
+    "Cannot convert to C string: " write third . ;
 
 : ffi-error. ( obj -- )
-    "FFI: " write print ;
+    "FFI: " write third print ;
 
 : heap-scan-error. ( obj -- )
     "Cannot do next-object outside begin/end-scan" print drop ;
@@ -48,27 +48,21 @@ SYMBOL: error-continuation
 : user-interrupt. ( obj -- )
     "User interrupt" print drop ;
 
-: datastack-underflow. ( obj -- )
-    "Data stack underflow" print drop ;
+: stack-underflow. ( obj name -- )
+    write " stack underflow" print drop ;
 
-: datastack-overflow. ( obj -- )
-    "Data stack overflow" print drop ;
-
-: callstack-underflow. ( obj -- )
-    "Return stack underflow" print drop ;
-
-: callstack-overflow. ( obj -- )
-    "Return stack overflow" print drop ;
+: stack-overflow. ( obj name -- )
+    write " stack overflow" print drop ;
 
 ! Hook for library/cocoa/
 DEFER: objc-error. ( alien -- )
 
-PREDICATE: cons kernel-error ( obj -- ? )
-    dup first kernel-error = swap second 0 16 between? and ;
+PREDICATE: array kernel-error ( obj -- ? )
+    dup first kernel-error eq? swap second 0 18 between? and ;
 
 M: kernel-error error. ( error -- )
     #! Kernel errors are indexed by integers.
-    cdr uncons car swap {
+    dup second {
         [ expired-error. ]
         [ io-error. ]
         [ undefined-word-error. ]
@@ -81,10 +75,12 @@ M: kernel-error error. ( error -- )
         [ heap-scan-error. ]
         [ undefined-symbol-error. ]
         [ user-interrupt. ]
-        [ datastack-underflow. ]
-        [ datastack-overflow. ]
-        [ callstack-underflow. ]
-        [ callstack-overflow. ]
+        [ "Data" stack-underflow. ]
+        [ "Data" stack-overflow. ]
+        [ "Retain" stack-underflow. ]
+        [ "Retain" stack-overflow. ]
+        [ "Call" stack-underflow. ]
+        [ "Call" stack-overflow. ]
         [ objc-error. ]
     } dispatch ;
 

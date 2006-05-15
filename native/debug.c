@@ -261,7 +261,7 @@ void factorbug(void)
 			fprintf(stderr,"%lx\n",(CELL)CARD_TO_ADDR(card));
 		}
 		else if(strcmp(cmd,"t") == 0)
-			general_error(ERROR_USER_INTERRUPT,F,true);
+			general_error(ERROR_USER_INTERRUPT,F,F,true);
 		else if(strcmp(cmd,"q") == 0)
 			return;
 		else if(strcmp(cmd,"x") == 0)

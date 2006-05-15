@@ -29,11 +29,14 @@ F_ARRAY *allot_array(CELL type, F_FIXNUM capacity);
 F_ARRAY *array(CELL type, F_FIXNUM capacity, CELL fill);
 F_ARRAY *byte_array(F_FIXNUM size);
 
+CELL make_array_2(CELL v1, CELL v2);
+CELL make_array_4(CELL v1, CELL v2, CELL v3, CELL v4);
+
 void primitive_array(void);
 void primitive_tuple(void);
 void primitive_byte_array(void);
 
-F_ARRAY* resize_array(F_ARRAY* array, F_FIXNUM capacity, CELL fill);
+F_ARRAY *resize_array(F_ARRAY* array, F_FIXNUM capacity, CELL fill);
 void primitive_resize_array(void);
 void primitive_array_to_tuple(void);
 void primitive_tuple_to_array(void);

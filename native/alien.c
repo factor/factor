@@ -30,7 +30,7 @@ void *alien_offset(CELL object)
 	case ALIEN_TYPE:
 		alien = untag_alien_fast(object);
 		if(alien->expired)
-			general_error(ERROR_EXPIRED,object,true);
+			general_error(ERROR_EXPIRED,object,F,true);
 		return alien_offset(alien->alien) + alien->displacement;
 	case F_TYPE:
 		return NULL;

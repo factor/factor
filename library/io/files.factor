@@ -1,5 +1,5 @@
-! Copyright (C) 2004, 2005 Slava Pestov.
-! See http://factor.sf.net/license.txt for BSD license.
+! Copyright (C) 2004, 2006 Slava Pestov.
+! See http://factorcode.org/license.txt for BSD license.
 IN: io
 USING: hashtables kernel lists math memory namespaces sequences
 strings styles ;
@@ -11,7 +11,7 @@ strings styles ;
 
 : exists? ( file -- ? ) stat >boolean ;
 
-: directory? ( file -- ? ) stat car ;
+: directory? ( file -- ? ) stat first ;
 
 : directory ( dir -- list )
     (directory)

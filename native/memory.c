@@ -154,20 +154,19 @@ void primitive_clone(void)
 
 void primitive_room(void)
 {
-	CELL list = F;
+	F_ARRAY *a = array(ARRAY_TYPE,gen_count,F);
 	int gen;
 	box_unsigned_cell(compiling.limit - compiling.here);
 	box_unsigned_cell(compiling.limit - compiling.base);
 	box_unsigned_cell(cards_end - cards);
 	box_unsigned_cell(prior.limit - prior.base);
-	for(gen = gen_count - 1; gen >= 0; gen--)
+	for(gen = 0; gen < gen_count; gen++)
 	{
 		ZONE *z = &generations[gen];
-		list = cons(cons(tag_cell(z->limit - z->here),
-			tag_cell(z->limit - z->base)),
-			list);
+		put(AREF(a,gen),make_array_2(tag_cell(z->limit - z->here),
+			tag_cell(z->limit - z->base)));
 	}
-	dpush(list);
+	dpush(tag_object(a));
 }
 
 void primitive_begin_scan(void)
@@ -184,7 +183,7 @@ void primitive_next_object(void)
 	CELL size, type;
 
 	if(!heap_scan)
-		general_error(ERROR_HEAP_SCAN,F,true);
+		general_error(ERROR_HEAP_SCAN,F,F,true);
 
 	if(heap_scan_ptr >= tenured.here)
 	{

@@ -23,7 +23,7 @@ NS_DURING
 		{
 			CELL e = error;
 			error = F;
-			general_error(ERROR_OBJECTIVE_C,e,true);
+			general_error(ERROR_OBJECTIVE_C,e,F,true);
 		}
 
 		run();

@@ -84,15 +84,15 @@ void relocate_data()
 
 void undefined_symbol(void)
 {
-	general_error(ERROR_UNDEFINED_SYMBOL,F,true);
+	general_error(ERROR_UNDEFINED_SYMBOL,F,F,true);
 }
 
 CELL get_rel_symbol(F_REL* rel)
 {
 	CELL arg = REL_ARGUMENT(rel);
-	F_CONS* cons = untag_cons(get(compiling.base + arg * sizeof(CELL)));
-	F_STRING* symbol = untag_string(cons->car);
-	DLL* dll = (cons->cdr == F ? NULL : untag_dll(cons->cdr));
+	F_ARRAY *pair = untag_array(get(compiling.base + arg * sizeof(CELL)));
+	F_STRING *symbol = untag_string(AREF(pair,0));
+	DLL* dll = (AREF(pair,1) == F ? NULL : untag_dll(AREF(pair,1)));
 	CELL sym;
 
 	if(dll != NULL && !dll->dll)

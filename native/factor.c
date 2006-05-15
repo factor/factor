@@ -64,7 +64,8 @@ int main(int argc, char** argv)
 	CELL aging_size = 4 * CELLS;
 	CELL code_size = CELLS;
 	CELL literal_size = 128;
-	CELL args;
+	F_ARRAY *args;
+	CELL arg_count;
 	CELL i;
 	bool image_given = true;
 
@@ -107,13 +108,15 @@ int main(int argc, char** argv)
 		code_size * 1024 * 1024,
 		literal_size * 1024);
 
-	args = F;
-	while(--argc > (image_given ? 1 : 0))
+	arg_count = (image_given ? 2 : 1);
+	args = array(ARRAY_TYPE,argc,F);
+	while(arg_count < argc)
 	{
-		args = cons(tag_object(from_c_string(argv[argc])),args);
+		put(AREF(args,arg_count),tag_object(from_c_string(argv[arg_count])));
+		arg_count++;
 	}
 
-	userenv[ARGS_ENV] = args;
+	userenv[ARGS_ENV] = tag_object(args);
 
 	platform_run();
 

@@ -7,7 +7,7 @@ F_ARRAY *allot_array(CELL type, F_FIXNUM capacity)
 	F_ARRAY *array;
 
 	if(capacity < 0)
-		general_error(ERROR_NEGATIVE_ARRAY_SIZE,tag_integer(capacity),true);
+		general_error(ERROR_NEGATIVE_ARRAY_SIZE,tag_integer(capacity),F,true);
 
 	array = allot_object(type,array_size(capacity));
 	array->capacity = tag_fixnum(capacity);
@@ -15,7 +15,7 @@ F_ARRAY *allot_array(CELL type, F_FIXNUM capacity)
 }
 
 /* make a new array with an initial element */
-F_ARRAY* array(CELL type, F_FIXNUM capacity, CELL fill)
+F_ARRAY *array(CELL type, F_FIXNUM capacity, CELL fill)
 {
 	int i;
 	F_ARRAY* array = allot_array(type, capacity);
@@ -40,6 +40,24 @@ void primitive_array(void)
 	initial = dpop();
 	size = to_fixnum(dpop());
 	dpush(tag_object(array(ARRAY_TYPE,size,initial)));
+}
+
+CELL make_array_2(CELL v1, CELL v2)
+{
+	F_ARRAY *a = array(ARRAY_TYPE,2,F);
+	put(AREF(a,0),v1);
+	put(AREF(a,1),v2);
+	return tag_object(a);
+}
+
+CELL make_array_4(CELL v1, CELL v2, CELL v3, CELL v4)
+{
+	F_ARRAY *a = array(ARRAY_TYPE,4,F);
+	put(AREF(a,0),v1);
+	put(AREF(a,1),v2);
+	put(AREF(a,2),v3);
+	put(AREF(a,3),v4);
+	return tag_object(a);
 }
 
 /* push a new tuple on the stack */
