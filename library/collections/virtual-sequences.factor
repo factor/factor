@@ -6,7 +6,9 @@ USING: errors generic kernel math sequences-internals vectors ;
 ! A reversal of an underlying sequence.
 TUPLE: reversed ;
 
-C: reversed [ set-delegate ] keep ;
+C: reversed
+    #! A delegate f means no delegate...
+    [ >r [ { } ] unless* r> set-delegate ] keep ;
 
 : reversed@ delegate [ length swap - 1- ] keep ; inline
 

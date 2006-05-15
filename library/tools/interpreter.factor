@@ -8,17 +8,21 @@ namespaces prettyprint sequences strings vectors words ;
 ! continuation to and from the primary interpreter. Used by
 ! compiler for partial evaluation, also by the walker. 
 
-! Meta-stacks
-SYMBOL: meta-r
-: push-r meta-r get push ;
-: pop-r meta-r get pop ;
-: peek-r meta-r get peek ;
+! Meta-stacks;
 SYMBOL: meta-d
 : push-d meta-d get push ;
 : pop-d meta-d get pop ;
 : peek-d meta-d get peek ;
-SYMBOL: meta-n
+SYMBOL: meta-r
+: push-r meta-r get push ;
+: pop-r meta-r get pop ;
+: peek-r meta-r get peek ;
 SYMBOL: meta-c
+: push-c meta-c get push ;
+: pop-c meta-c get pop ;
+: peek-c meta-c get peek ;
+SYMBOL: meta-name
+SYMBOL: meta-catch
 
 ! Call frame
 SYMBOL: meta-cf
@@ -27,28 +31,34 @@ SYMBOL: meta-cf
 SYMBOL: meta-executing
 
 ! Callframe.
-: up ( -- ) pop-r meta-cf set  pop-r drop ;
+: up ( -- ) pop-c meta-cf set  pop-c drop ;
 
 : next ( -- obj )
     meta-cf get [ meta-cf [ uncons ] change ] [ up next ] if ;
 
 : meta-interp ( -- interp )
-    meta-d get meta-r get meta-n get meta-c get <continuation> ;
+    meta-d get meta-r get meta-c get
+    meta-name get meta-catch get <continuation> ;
 
 : set-meta-interp ( interp -- )
-    >continuation< meta-c set meta-n set meta-r set meta-d set ;
+    >continuation<
+    meta-catch set
+    meta-name set
+    meta-c set
+    meta-r set
+    meta-d set ;
 
 : host-word ( word -- )
     [
-        \ call push-r
-        [ continuation swap continue-with ] cons cons push-r
+        \ call push-c
+        [ continuation swap continue-with ] cons cons push-c
         meta-interp continue
     ] callcc1 set-meta-interp pop-d 2drop ;
 
 : meta-call ( quot -- )
     #! Note we do tail call optimization here.
     meta-cf [
-        [ meta-executing get push-r  push-r ] when*
+        [ meta-executing get push-c  push-c ] when*
     ] change ;
 
 GENERIC: do-1 ( object -- )

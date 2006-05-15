@@ -34,7 +34,7 @@ M: node = eq? ;
 : meta-d-node meta-d get clone in-node ;
 
 : d-tail ( n -- list ) meta-d get tail* ;
-: r-tail ( n -- list ) meta-r get tail* ;
+: c-tail ( n -- list ) meta-c get tail* ;
 
 : node-child node-children first ;
 
@@ -97,12 +97,12 @@ C: #declare make-node ;
 
 : node-inputs ( d-count r-count node -- )
     tuck
-    >r r-tail r> set-node-in-r
+    >r c-tail r> set-node-in-r
     >r d-tail r> set-node-in-d ;
 
 : node-outputs ( d-count r-count node -- )
     tuck
-    >r r-tail r> set-node-out-r
+    >r c-tail r> set-node-out-r
     >r d-tail r> set-node-out-d ;
 
 ! Variable holding dataflow graph being built.

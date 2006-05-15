@@ -39,7 +39,7 @@ M: object sorting-test drop "object" ;
 [ "object" ] [ f sorting-test ] unit-test
 
 ! Testing unions
-UNION: funnies ratio complex ;
+UNION: funnies quotation ratio complex ;
 
 GENERIC: funny
 M: funnies funny drop 2 ;

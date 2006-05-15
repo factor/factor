@@ -1,18 +1,19 @@
+IN: temporary
 USING: errors interpreter io kernel lists math math-internals
 namespaces prettyprint sequences test ;
-IN: temporary
 
 : done-cf? ( -- ? ) meta-cf get not ;
-: done? ( -- ? ) done-cf? meta-r get length 0 = and ;
+: done? ( -- ? ) done-cf? meta-c get empty? and ;
 
 : run ( -- )
     done? [ next do run ] unless ;
 
 : init-interpreter ( -- )
-    V{ } clone meta-r set
     V{ } clone meta-d set
-    namestack meta-n set
-    catchstack meta-c set
+    V{ } clone meta-r set
+    V{ } clone meta-c set
+    namestack meta-name set
+    catchstack meta-catch set
     meta-cf off
     meta-executing off ;
 

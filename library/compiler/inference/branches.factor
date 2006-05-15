@@ -54,8 +54,8 @@ namespaces parser prettyprint sequences strings vectors words ;
 
 : callstack-effect ( seq -- )
     dup length 0 <array>
-    swap meta-r active-variable
-    unify-effect meta-r set drop ;
+    swap meta-c active-variable
+    unify-effect meta-c set drop ;
 
 : unify-effects ( seq -- )
     dup datastack-effect dup callstack-effect
@@ -65,7 +65,7 @@ namespaces parser prettyprint sequences strings vectors words ;
     [ [ dataflow-graph get ] bind ] map ;
 
 : copy-inference ( -- )
-    meta-r [ clone ] change
+    meta-c [ clone ] change
     meta-d [ clone ] change
     d-in [ ] change
     dataflow-graph off
@@ -73,7 +73,7 @@ namespaces parser prettyprint sequences strings vectors words ;
 
 : infer-branch ( value -- namespace )
     #! Return a namespace with inferencer variables:
-    #! meta-d, meta-r, d-in. They are set to f if
+    #! meta-d, meta-c, d-in. They are set to f if
     #! terminate was called.
     [
         [

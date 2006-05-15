@@ -15,7 +15,7 @@ SYMBOL: base-case-continuation
 TUPLE: inference-error message rstate data-stack call-stack ;
 
 : inference-error ( msg -- )
-    recursive-state get meta-d get meta-r get
+    recursive-state get meta-d get meta-c get
     <inference-error> throw ;
 
 M: inference-error error. ( error -- )
@@ -64,7 +64,7 @@ SYMBOL: terminated?
 
 : init-inference ( recursive-state -- )
     terminated? off
-    V{ } clone meta-r set
+    V{ } clone meta-c set
     V{ } clone meta-d set
     0 d-in set
     recursive-state set

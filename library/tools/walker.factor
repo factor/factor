@@ -7,12 +7,14 @@ vectors words ;
 
 : &s ( -- ) meta-d get stack. ;
 
-: meta-r*
-    [ meta-r get % meta-executing get , meta-cf get , ] { } make ;
+: &r ( -- ) meta-r get stack. ;
 
-: &r ( -- ) meta-r* stack. ;
+: meta-c*
+    [ meta-c get % meta-executing get , meta-cf get , ] { } make ;
 
-: &get ( var -- value ) meta-n get hash-stack ;
+: &c ( -- ) meta-c* stack. ;
+
+: &get ( var -- value ) meta-name get hash-stack ;
 
 : report ( -- ) meta-cf get . ;
 
@@ -21,10 +23,10 @@ vectors words ;
 : into ( -- ) next do report ;
 
 : end-walk ( -- )
-    \ call push-r meta-cf get push-r meta-interp continue ;
+    \ call push-c meta-cf get push-c meta-interp continue ;
 
 : walk-banner ( -- )
-    "&s &r show stepper stacks" print
+    "&s &r &c show stepper stacks" print
     "&get ( var -- value ) get stepper variable value" print
     "step -- single step over" print
     "into -- single step into" print
@@ -36,8 +38,16 @@ vectors words ;
     "walk " listener-prompt set ;
 
 : walk ( quot -- )
-    datastack dup pop* callstack namestack catchstack [
-        meta-c set meta-n set meta-r set meta-d set
+    datastack dup pop*
+    retainstack
+    callstack
+    namestack
+    catchstack [
+        meta-catch set
+        meta-name set
+        meta-c set
+        meta-r set
+        meta-d set
         meta-cf set
         meta-executing off
         set-walk-hooks
