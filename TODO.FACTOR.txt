@@ -45,8 +45,7 @@ should fix in 0.82:
 
 + compiler/ffi:
 
-- free up r12 as a vreg on ppc
-- amd64 %box-struct
+- free up r11, r12 as a vreg on ppc
 - float= on powerpc doesn't consider nans equal
 - intrinsic fixnum>float float>fixnum
 - win64 port
