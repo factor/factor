@@ -4,9 +4,9 @@ IN: !syntax
 USING: alien compiler kernel lists math namespaces parser
 sequences syntax words ;
 
-: DLL" skip-blank parse-string dlopen swons ; parsing
+: DLL" skip-blank parse-string dlopen parsed ; parsing
 
-: ALIEN: scan-word <alien> swons ; parsing
+: ALIEN: scan-word <alien> parsed ; parsing
 
 : LIBRARY: scan "c-library" set ; parsing
 

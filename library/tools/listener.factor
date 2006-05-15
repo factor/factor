@@ -28,7 +28,7 @@ SYMBOL: error-hook
     ] if ;
 
 : read-multiline ( -- quot ? )
-    [ f depth (read-multiline) >r reverse r> ] with-parser ;
+    [ f depth (read-multiline) >r >list r> ] with-parser ;
 
 : listen-try
     [

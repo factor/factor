@@ -37,7 +37,7 @@ USE: words
 USE: sequences
 
 : CONSTANT: CREATE 
-    [ [ [ swons ] each ] cons define-compound POSTPONE: parsing ] 
+    [ [ [ parsed ] each ] cons define-compound POSTPONE: parsing ] 
     [ ] ; parsing
 
 CONSTANT: ERROR_SUCCESS 0 ;

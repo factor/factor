@@ -18,29 +18,29 @@ words ;
 : IN: scan set-in ; parsing
 : USE: scan use+ ; parsing
 : USING: string-mode on [ string-mode off add-use ] f ; parsing
-: (BASE) scan swap base> swons ;
+: (BASE) scan swap base> parsed ;
 : HEX: 16 (BASE) ; parsing
 : OCT: 8 (BASE) ; parsing
 : BIN: 2 (BASE) ; parsing
 SYMBOL: t
-: f f swons ; parsing
-: CHAR: 0 scan next-char nip swons ; parsing
-: " parse-string swons ; parsing
-: SBUF" skip-blank parse-string >sbuf swons ; parsing
+: f f parsed ; parsing
+: CHAR: 0 scan next-char nip parsed ; parsing
+: " parse-string parsed ; parsing
+: SBUF" skip-blank parse-string >sbuf parsed ; parsing
 : [ f ; parsing
-: ] reverse swons ; parsing
+: ] >list parsed ; parsing
 : [[ f ; parsing
-: ]] first2 swons swons ; parsing
-: ; reverse swap call ; parsing
-: } POSTPONE: ; swons ; parsing
+: ]] first2 parsed parsed ; parsing
+: ; >list swap call ; parsing
+: } swap call parsed ; parsing
 : { [ >array ] [ ] ; parsing
 : V{ [ >vector ] [ ] ; parsing
 : H{ [ alist>hash ] [ ] ; parsing
 : C{ [ first2 rect> ] [ ] ; parsing
 : T{ [ >tuple ] [ ] ; parsing
 : W{ [ first <wrapper> ] [ ] ; parsing
-: POSTPONE: scan-word swons ; parsing
-: \ scan-word literalize swons ; parsing
+: POSTPONE: scan-word parsed ; parsing
+: \ scan-word literalize parsed ; parsing
 : parsing word t "parsing" set-word-prop ; parsing
 : inline word  t "inline" set-word-prop ; parsing
 : flushable word t "flushable" set-word-prop ; parsing

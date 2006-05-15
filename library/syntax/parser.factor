@@ -1,7 +1,7 @@
 ! Copyright (C) 2005, 2006 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: parser
-USING: errors generic hashtables kernel lists math namespaces
+USING: errors generic hashtables kernel math namespaces
 sequences strings vectors words ;
 
 SYMBOL: use
@@ -76,9 +76,11 @@ SYMBOL: string-mode
         ] unless
     ] when ;
 
+: parsed ( parse-tree obj -- parse-tree ) swap ?push ;
+
 : parse-loop ( -- )
     scan-word [
-        dup parsing? [ execute ] [ swons ] if  parse-loop
+        dup parsing? [ execute ] [ parsed ] if  parse-loop
     ] when* ;
 
 : (parse) ( str -- ) line-text set 0 column set parse-loop ;

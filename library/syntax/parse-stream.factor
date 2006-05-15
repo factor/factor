@@ -12,7 +12,7 @@ words ;
 : parse-lines ( lines -- quot )
     [
         dup length [ ] [ 1+ line-number set (parse) ] 2reduce
-        reverse
+        >list
     ] with-parser ;
 
 : parse ( str -- code ) <string-reader> lines parse-lines ;
