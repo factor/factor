@@ -1,6 +1,5 @@
 IN: temporary
 USE: kernel
-USE: lists
 USE: math
 USE: namespaces
 USE: io

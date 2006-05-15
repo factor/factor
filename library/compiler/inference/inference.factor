@@ -15,7 +15,7 @@ SYMBOL: base-case-continuation
 TUPLE: inference-error message rstate data-stack call-stack ;
 
 : inference-error ( msg -- )
-    recursive-state get meta-d get meta-c get
+    recursive-state get meta-d get meta-r get
     <inference-error> throw ;
 
 M: inference-error error. ( error -- )
@@ -109,6 +109,7 @@ M: quotation infer-quot ( quot -- )
     [
         inferring-base-case off
         base-case-continuation off
+        { } recursive-state set
         f init-inference
         call
         check-return

@@ -69,5 +69,5 @@ namespaces prettyprint sequences test ;
 ] unit-test
 
 [ V{ "4\n" } ] [
-    [ [ 2 2 + . ] string-out ] test-interpreter
+    [ [ 2 2 + number>string print ] string-out ] test-interpreter
 ] unit-test

@@ -1,7 +1,7 @@
-! Copyright (C) 2004, 2005 Slava Pestov.
-! See http://factor.sf.net/license.txt for BSD license.
+! Copyright (C) 2004, 2006 Slava Pestov.
+! See http://factorcode.org/license.txt for BSD license.
 IN: inference
-USING: arrays errors generic hashtables interpreter kernel lists
+USING: arrays errors generic hashtables interpreter kernel
 math math-internals namespaces parser prettyprint sequences
 strings vectors words ;
 
@@ -37,7 +37,7 @@ TUPLE: rstate label base-case? ;
     r> current-node set ;
 
 : with-recursive-state ( word label base-case quot -- )
-    >r <rstate> 2array recursive-state [ cons ] change r>
+    >r <rstate> 2array recursive-state [ swap add ] change r>
     nest-node 2slip unnest-node ; inline
 
 : inline-block ( word base-case -- node-block variables )
