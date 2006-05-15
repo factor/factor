@@ -101,11 +101,7 @@ GENERIC: ' ( obj -- ptr )
 : align-here ( -- )
     here 8 mod 4 = [ 0 emit ] when ;
 
-( Fixnums )
-
 : emit-fixnum ( n -- ) fixnum-tag tag-address emit ;
-
-M: fixnum ' ( n -- tagged ) fixnum-tag tag-address ;
 
 ( Bignums )
 
@@ -135,6 +131,17 @@ M: bignum ' ( bignum -- tagged )
     bignum-tag here-as >r
     bignum-tag tag-header emit
     emit-bignum align-here r> ;
+
+( Fixnums )
+
+M: fixnum ' ( n -- tagged )
+    #! When generating a 32-bit image on a 64-bit system,
+    #! some fixnums should be bignums.
+    dup most-negative-fixnum most-positive-fixnum between? [
+        fixnum-tag tag-address
+    ] [
+        >bignum '
+    ] if ;
 
 ( Floats )
 

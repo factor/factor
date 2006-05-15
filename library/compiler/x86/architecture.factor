@@ -15,6 +15,7 @@ IN: compiler
 : ds-reg ESI ; inline
 : cs-reg EBX ; inline
 : remainder-reg EDX ; inline
+: alloc-tmp-reg EDI ; inline
 
 : reg-stack ( n reg -- op ) swap cells neg [+] ;
 

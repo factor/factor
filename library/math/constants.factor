@@ -20,6 +20,6 @@ IN: math
 : e 2.7182818284590452354 ; inline
 : pi 3.14159265358979323846 ; inline
 : epsilon 2.2204460492503131e-16 ; inline
-: first-bignum 1 cell-bits tag-bits - 1- shift ; inline
-: most-positive-fixnum first-bignum 1- >fixnum ; inline
-: most-negative-fixnum first-bignum neg >fixnum ; inline
+: first-bignum 1 bootstrap-cell-bits tag-bits - 1- shift ;
+: most-positive-fixnum first-bignum 1- >fixnum ;
+: most-negative-fixnum first-bignum neg >fixnum ;

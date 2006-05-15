@@ -245,11 +245,8 @@ IN: compiler
 } define-intrinsic
 
 : define-fixnum-jump ( word op -- )
-    [
-        [ end-basic-block "x" operand "y" operand CMP ] % ,
-    ] [ ] make H{
-        { +input { { f "x" } { f "y" } } }
-    } define-if-intrinsic ;
+    [ end-basic-block "x" operand "y" operand CMP ] swap add
+    H{ { +input { { f "x" } { f "y" } } } } define-if-intrinsic ;
 
 {
     { fixnum< JL }
@@ -265,7 +262,7 @@ IN: compiler
 : %userenv ( -- )
     "x" operand "userenv" f dlsym MOV
     0 rel-absolute-cell rel-userenv
-    "n" operand 1 SHR
+    "n" operand fixnum>slot@
     "n" operand "x" operand ADD ;
 
 \ getenv [

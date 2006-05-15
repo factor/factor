@@ -22,15 +22,18 @@ M: stack-params %stack>freg
 M: stack-params %freg>stack
     >r stack-increment + cell + swap r> %stack>freg ;
 
-: %unbox-struct ( n reg-class size -- )
-    nip
+: struct-ptr/size ( n reg-class size func -- )
+    rot drop
     ! Load destination address
-    RDI RSP MOV
+    >r RDI RSP MOV
     RDI rot ADD
     ! Load struct size
     RSI swap MOV
     ! Copy the struct to the stack
-    "unbox_value_struct" f compile-c-call ;
+    r> f compile-c-call ;
+
+: %unbox-struct ( n reg-class size -- )
+    "unbox_value_struct" struct-ptr/size ;
 
 : %unbox ( n reg-class func -- )
     ! Call the unboxer
@@ -38,15 +41,18 @@ M: stack-params %freg>stack
     ! Store the return value on the C stack
     [ return-reg ] keep %freg>stack ;
 
+: %box-struct ( n reg-class size -- )
+    "box_value_struct" struct-ptr/size ;
+
 : load-return-value ( reg-class -- )
     dup fastcall-regs first swap return-reg
     2dup eq? [ 2drop ] [ MOV ] if ;
 
 : %box ( n reg-class func -- )
     rot [
-        swap [ fastcall-regs first ] keep %stack>freg
+        rot [ fastcall-regs first ] keep %stack>freg
     ] [
-        load-return-value
+        swap load-return-value
     ] if*
     f compile-c-call ;
 
@@ -56,7 +62,7 @@ M: stack-params %freg>stack
     reset-sse compile-c-call ;
 
 : %alien-callback ( quot -- )
-    RDI swap load-literal "run_callback" f compile-c-call ;
+    RDI load-indirect "run_callback" f compile-c-call ;
 
 : save-return 0 swap [ return-reg ] keep %freg>stack ;
 : load-return 0 swap [ return-reg ] keep %stack>freg ;
@@ -70,3 +76,5 @@ M: stack-params %freg>stack
     "unnest_stacks" f compile-c-call
     ! Restore return register
     load-return ;
+
+: %cleanup ( n -- ) drop ;
