@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 IN: objc
 USING: alien arrays compiler hashtables kernel kernel-internals
-libc lists math namespaces sequences strings words ;
+libc math namespaces sequences strings words ;
 
 : init-method ( method alien -- )
     >r first3 r>

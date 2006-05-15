@@ -1,7 +1,11 @@
-USING: kernel sequences objc cocoa objc-NSObject objc-NSApplication objc-NSWindow objc-NSMenu objc-NSMenuItem objc-FactorCallback gadgets gadgets-layouts gadgets-listener words compiler strings lists ;
+USING: kernel sequences objc cocoa objc-NSObject
+objc-NSApplication objc-NSWindow objc-NSMenu objc-NSMenuItem
+objc-FactorCallback gadgets gadgets-layouts gadgets-listener
+words compiler strings ;
 
 ! for words used by menu bar actions (copied from launchpad.factor)
-USING: gadgets gadgets-browser gadgets-listener help inspector io kernel memory namespaces sequences gadgets-launchpad ; 
+USING: gadgets gadgets-browser gadgets-listener help inspector
+io kernel memory namespaces sequences gadgets-launchpad ;
 
 IN: cocoa
 
@@ -13,7 +17,7 @@ GENERIC: to-target-and-action ( selector-string-or-quotation -- target action )
 
 M: string to-target-and-action sel_registerName f swap ;
 M: f to-target-and-action f ;
-M: list to-target-and-action \ drop swons <FactorCallback> "perform:" sel_registerName ;
+M: quotation to-target-and-action \ drop add* <FactorCallback> "perform:" sel_registerName ;
 
 
 : <NSMenu> NSMenu [alloc] swap <NSString> [initWithTitle:] [autorelease] ;

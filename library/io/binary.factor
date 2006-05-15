@@ -1,7 +1,7 @@
 ! Copyright (C) 2003, 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: io
-USING: kernel lists math sequences strings ;
+USING: kernel math sequences strings ;
 
 : be> ( seq -- x ) 0 [ >r 8 shift r> bitor ] reduce ;
 : le> ( seq -- x ) <reversed> be> ;

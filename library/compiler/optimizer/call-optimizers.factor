@@ -1,7 +1,7 @@
 ! Copyright (C) 2005, 2006 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 IN: optimizer
-USING: arrays errors generic hashtables inference kernel lists
+USING: arrays errors generic hashtables inference kernel
 math math-internals sequences words ;
 
 ! A system for associating dataflow optimizers with words.

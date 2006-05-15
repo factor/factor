@@ -1,7 +1,7 @@
 ! Copyright (C) 2005 Alex Chapman.
 ! See http://factorcode.org/license.txt for BSD license.
 IN: !syntax
-USING: alien compiler kernel lists math namespaces parser
+USING: alien compiler kernel math namespaces parser
 sequences syntax words ;
 
 : DLL" skip-blank parse-string dlopen parsed ; parsing

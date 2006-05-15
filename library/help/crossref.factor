@@ -1,7 +1,7 @@
 ! Copyright (C) 2006 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 IN: help
-USING: arrays generic graphs hashtables io kernel lists
+USING: arrays generic graphs hashtables io kernel
 namespaces sequences strings words ;
 
 : all-articles ( -- seq )

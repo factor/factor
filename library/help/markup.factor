@@ -1,7 +1,7 @@
 ! Copyright (C) 2005, 2006 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 IN: help
-USING: arrays generic hashtables io kernel lists namespaces
+USING: arrays generic hashtables io kernel namespaces
 parser prettyprint sequences strings styles vectors words ;
 
 : uncons* dup first swap 1 swap tail ;

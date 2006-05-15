@@ -4,7 +4,7 @@ IN: gadgets-listener
 USING: arrays gadgets gadgets-editors gadgets-labels
 gadgets-layouts gadgets-panes gadgets-scrolling
 gadgets-splitters gadgets-theme generic hashtables io jedit
-kernel listener lists math namespaces parser prettyprint
+kernel listener math namespaces parser prettyprint
 sequences styles threads words ;
 
 TUPLE: listener-gadget pane stack ;

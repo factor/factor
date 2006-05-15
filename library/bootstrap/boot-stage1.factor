@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 IN: image
 USING: errors generic hashtables io kernel kernel-internals
-lists math memory namespaces parser prettyprint sequences
+math memory namespaces parser prettyprint sequences
 vectors words ;
 
 "Bootstrap stage 1..." print flush
@@ -55,6 +55,8 @@ vectors words ;
         "/library/collections/flatten.factor"
         "/library/collections/queues.factor"
         "/library/collections/graphs.factor"
+
+        "/library/quotations.factor"
 
         "/library/math/random.factor"
         "/library/math/constants.factor"

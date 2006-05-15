@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 IN: compiler
 USING: alien arrays assembler inference kernel
-kernel-internals lists math memory namespaces words ;
+kernel-internals math memory namespaces words ;
 
 GENERIC: push-return-reg ( reg-class -- )
 GENERIC: pop-return-reg ( reg-class -- )

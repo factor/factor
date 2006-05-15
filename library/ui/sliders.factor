@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 IN: gadgets-scrolling
 USING: arrays gadgets gadgets-buttons gadgets-layouts
-gadgets-theme generic kernel lists math namespaces sequences
+gadgets-theme generic kernel math namespaces sequences
 styles threads vectors ;
 
 ! An elevator has a thumb that may be moved up and down.

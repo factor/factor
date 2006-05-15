@@ -1,6 +1,5 @@
 IN: temporary
 USE: kernel
-USE: lists
 USE: math
 USE: namespaces
 USE: test
@@ -26,13 +25,12 @@ unit-test
 unit-test
 
 [ f ]
-[ [[ 1 [[ 2 3 ]] ]] hashtable? ]
+[ { 1 { 2 3 } } hashtable? ]
 unit-test
 
 ! Test some hashcodes.
 
 [ t ] [ [ 1 2 3 ] hashcode [ 1 2 3 ] hashcode = ] unit-test
-[ t ] [ [[ f t ]] hashcode [[ f t ]] hashcode = ] unit-test
 [ t ] [ [ 1 [ 2 3 ] 4 ] hashcode [ 1 [ 2 3 ] 4 ] hashcode = ] unit-test
 
 [ t ] [ 12 hashcode 12 hashcode = ] unit-test

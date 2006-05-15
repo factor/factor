@@ -2,7 +2,7 @@
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: walker
 USING: errors hashtables inspector interpreter io kernel
-listener lists math namespaces prettyprint sequences strings
+listener math namespaces prettyprint sequences strings
 vectors words ;
 
 : &s ( -- ) meta-d get stack. ;

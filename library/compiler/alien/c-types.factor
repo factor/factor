@@ -2,7 +2,7 @@
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: alien
 USING: arrays compiler errors generic
-hashtables kernel kernel-internals libc lists math namespaces
+hashtables kernel kernel-internals libc math namespaces
 parser sequences strings words ;
 
 : <c-type> ( -- type )

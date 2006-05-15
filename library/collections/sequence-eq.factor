@@ -1,11 +1,9 @@
 ! Copyright (C) 2005 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 IN: sequences
-USING: arrays kernel lists math sequences-internals strings
+USING: arrays kernel math sequences-internals strings
 vectors ;
 
-! Note that the sequence union does not include lists, or user
-! defined tuples that respond to the sequence protocol.
 UNION: sequence array string sbuf vector ;
 
 : sequence= ( seq seq -- ? )

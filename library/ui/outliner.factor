@@ -3,7 +3,7 @@
 IN: gadgets-outliner
 USING: arrays gadgets gadgets-borders gadgets-buttons
 gadgets-labels gadgets-layouts gadgets-panes gadgets-theme
-generic io kernel lists math opengl sequences styles ;
+generic io kernel math opengl sequences styles ;
 
 ! Vertical line.
 TUPLE: guide color ;

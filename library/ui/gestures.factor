@@ -30,7 +30,7 @@ namespaces queues sequences threads ;
 : user-input ( str gadget -- )
     [ dupd user-input* ] each-parent 2drop ;
 
-! Mouse gestures are lists where the first element is one of:
+! Mouse gestures are arrays where the first element is one of:
 SYMBOL: motion
 SYMBOL: drag
 SYMBOL: button-up

@@ -1,7 +1,7 @@
 ! Copyright (C) 2004, 2006 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 IN: io
-USING: hashtables kernel lists math memory namespaces sequences
+USING: hashtables kernel math memory namespaces sequences
 strings styles ;
 
 ! Words for accessing filesystem meta-data.

@@ -2,7 +2,7 @@
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: inference
 USING: arrays errors generic inspector interpreter io kernel
-lists math namespaces parser prettyprint sequences strings
+math namespaces parser prettyprint sequences strings
 vectors words ;
 
 ! This variable takes a boolean value.
@@ -88,7 +88,7 @@ M: wrapper apply-object wrapped apply-literal ;
 
 GENERIC: infer-quot
 
-M: general-list infer-quot ( quot -- )
+M: quotation infer-quot ( quot -- )
     #! Recursive calls to this word are made for nested
     #! quotations.
     [ terminated? get [ drop f ] [ apply-object t ] if ] all? drop ;

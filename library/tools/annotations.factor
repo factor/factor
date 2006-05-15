@@ -1,7 +1,7 @@
 ! Copyright (C) 2005, 2006 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 IN: words
-USING: inspector io kernel lists math namespaces prettyprint
+USING: inspector io kernel math namespaces prettyprint
 sequences strings walker ;
 
 : annotate ( word quot -- | quot: word def -- def )

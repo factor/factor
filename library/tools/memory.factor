@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 IN: memory
 USING: arrays errors generic hashtables io kernel
-kernel-internals lists math namespaces parser prettyprint
+kernel-internals math namespaces parser prettyprint
 sequences strings vectors words ;
 
 : full-gc ( -- ) generations 1 - gc ;

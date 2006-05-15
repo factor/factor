@@ -1,7 +1,7 @@
 ! Copyright (C) 2004, 2006 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 IN: words
-USING: errors graphs hashtables kernel kernel-internals lists
+USING: errors graphs hashtables kernel kernel-internals
 math namespaces sequences strings vectors ;
 
 M: word <=> [ word-name ] 2apply <=> ;

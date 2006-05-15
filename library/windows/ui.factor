@@ -1,5 +1,5 @@
 USING: alien arrays errors freetype gadgets gadgets-launchpad gadgets-layouts
-       gadgets-listener hashtables io kernel lists math namespaces prettyprint 
+       gadgets-listener hashtables io kernel \ math namespaces prettyprint 
        sequences strings vectors words win32-api-messages win32-api ;
 USING: inspector threads memory ;
 IN: win32
@@ -98,7 +98,7 @@ TUPLE: gadget-window world hWnd hDC hRC ;
 
 : keystroke>gesture ( n -- list )
     dup wm-keydown-codes hash* [ nip ] [ drop ch>string ] if
-    key-modifiers [ push ] keep >list ;
+    key-modifiers [ push ] keep ;
 
 SYMBOL: lParam
 SYMBOL: wParam

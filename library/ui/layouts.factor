@@ -1,6 +1,6 @@
 ! Copyright (C) 2005, 2006 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: errors gadgets generic hashtables kernel lists math
+USING: errors gadgets generic hashtables kernel math
 namespaces queues sequences ;
 IN: gadgets-layouts
 

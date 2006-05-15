@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 IN: alien
 USING: compiler errors generic hashtables inference inspector
-kernel lists namespaces sequences strings words ;
+kernel namespaces sequences strings words ;
 
 TUPLE: alien-callback return parameters quot xt ;
 C: alien-callback make-node ;
@@ -18,7 +18,7 @@ M: alien-callback-error summary ( error -- )
 : callback-bottom ( node -- )
     alien-callback-xt [ word-xt <alien> ] curry infer-quot ;
 
-\ alien-callback [ [ string object general-list ] [ alien ] ]
+\ alien-callback [ [ string object quotation ] [ alien ] ]
 "infer-effect" set-word-prop
 
 \ alien-callback [

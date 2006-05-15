@@ -1,15 +1,13 @@
-USING: hashtables namespaces generic test kernel math words
-lists vectors alien sequences prettyprint io parser strings ;
+USING: alien arrays generic hashtables io kernel math namespaces
+parser prettyprint sequences strings test vectors words ;
 IN: temporary
 
 GENERIC: class-of
 
 M: fixnum class-of drop "fixnum" ;
 M: word   class-of drop "word"   ;
-M: cons   class-of drop "cons"   ;
 
 [ "fixnum" ] [ 5 class-of ] unit-test
-[ "cons" ] [ [ 1 2 3 ] class-of ] unit-test
 [ "word" ] [ \ class-of class-of ] unit-test
 [ 3.4 class-of ] unit-test-fails
 
@@ -33,16 +31,6 @@ M: f bool>str drop "false" ;
 [ t ] [ t bool>str str>bool ] unit-test
 [ f ] [ f bool>str str>bool ] unit-test
 
-PREDICATE: cons nonempty-list list? ;
-
-GENERIC: funny-length
-M: cons funny-length drop 0 ;
-M: nonempty-list funny-length length ;
-
-[ 0 ] [ [[ 1 [[ 2 3 ]] ]] funny-length ] unit-test
-[ 3 ] [ [ 1 2 3 ] funny-length ] unit-test
-[ "hello" funny-length ] unit-test-fails
-
 ! Testing method sorting
 GENERIC: sorting-test
 M: fixnum sorting-test drop "fixnum" ;
@@ -51,7 +39,7 @@ M: object sorting-test drop "object" ;
 [ "object" ] [ f sorting-test ] unit-test
 
 ! Testing unions
-UNION: funnies cons ratio complex ;
+UNION: funnies ratio complex ;
 
 GENERIC: funny
 M: funnies funny drop 2 ;
@@ -66,8 +54,6 @@ GENERIC: gooey
 M: very-funny gooey sq ;
 
 [ 1/4 ] [ 1/2 gooey ] unit-test
-
-[ cons ] [ [ 1 2 ] class ] unit-test
 
 : class<tests
     [ object ] [ object object class-and ] unit-test
@@ -86,15 +72,9 @@ M: very-funny gooey sq ;
     [ t ] [ \ integer \ object class< ] unit-test
     [ f ] [ \ integer \ null class< ] unit-test
     [ t ] [ \ null \ object class< ] unit-test
-    [ t ] [ \ list \ general-list class< ] unit-test
-    [ t ] [ \ list \ object class< ] unit-test
-    [ t ] [ \ null \ list class< ] unit-test
     
     [ t ] [ \ generic \ compound class< ] unit-test
     [ f ] [ \ compound \ generic class< ] unit-test
-    
-    [ f ] [ \ cons \ list class< ] unit-test
-    [ f ] [ \ list \ cons class< ] unit-test
     
     [ f ] [ \ reversed \ slice class< ] unit-test
     [ f ] [ \ slice \ reversed class< ] unit-test ;
@@ -152,12 +132,6 @@ GENERIC: stack-underflow
 M: object stack-underflow 2drop ;
 M: word stack-underflow 2drop ;
 
-GENERIC: testing
-M: cons testing 2 ;
-M: f testing 3 ;
-M: sequence testing 4 ;
-[ [ 1 2 ] 2 ] [ [ 1 2 ] testing ] unit-test
-
 GENERIC: union-containment
 M: integer union-containment drop 1 ;
 M: number union-containment drop 2 ;
@@ -179,16 +153,10 @@ M: object complex-combination nip ;
 
 TUPLE: shit ;
 
-M: shit complex-combination cons ;
-[ [[ T{ shit f } 5 ]] ] [ T{ shit f } 5 complex-combination ] unit-test
+M: shit complex-combination 2array ;
+[ { T{ shit f } 5 } ] [ T{ shit f } 5 complex-combination ] unit-test
 
 [ t ] [ \ complex-combination generic? >boolean ] unit-test
-
-! TUPLE: delegating-small-generic ;
-! G: small-delegation [ over ] [ type ] ;
-! M: shit small-delegation cons ;
-! 
-! [ [[ T{ shit f } 5 ]] ] [ T{ delegating-small-generic T{ shit f } } 5 small-delegation ] unit-test
 
 GENERIC: big-generic-test
 M: fixnum big-generic-test "fixnum" ;

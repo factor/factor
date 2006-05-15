@@ -1,7 +1,7 @@
 ! Copyright (C) 2005, 2006 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 IN: generic
-USING: arrays errors hashtables kernel kernel-internals lists
+USING: arrays errors hashtables kernel kernel-internals
 math namespaces parser sequences sequences-internals strings
 vectors words ;
 

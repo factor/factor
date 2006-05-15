@@ -1,11 +1,10 @@
 ! Copyright (C) 2004, 2006 Slava Pestov.
-! See http://factor.sf.net/license.txt for BSD license.
+! See http://factorcode.org/license.txt for BSD license.
 
 ! Bootstrapping trick; see doc/bootstrap.txt.
 IN: !syntax
-USING: alien arrays errors generic hashtables kernel lists math
-namespaces parser sequences strings syntax vectors
-words ;
+USING: alien arrays errors generic hashtables kernel math
+namespaces parser sequences strings syntax vectors words ;
 
 : (
     CHAR: ) column [
@@ -28,10 +27,8 @@ SYMBOL: t
 : " parse-string parsed ; parsing
 : SBUF" skip-blank parse-string >sbuf parsed ; parsing
 : [ f ; parsing
-: ] >list parsed ; parsing
-: [[ f ; parsing
-: ]] first2 parsed parsed ; parsing
-: ; >list swap call ; parsing
+: ] >quotation parsed ; parsing
+: ; >quotation swap call ; parsing
 : } swap call parsed ; parsing
 : { [ >array ] [ ] ; parsing
 : V{ [ >vector ] [ ] ; parsing

@@ -1,9 +1,9 @@
 IN: temporary
+USING: sequences ;
 USE: errors
 USE: kernel
 USE: namespaces
 USE: test
-USE: lists
 USE: parser
 USE: io
 USE: memory
@@ -25,8 +25,6 @@ USE: memory
 "!!! The following error is part of the test" print
 
 [ [ "2 car" ] parse ] catch print-error
-
-[ car ] [ [ 5 car ] catch no-method-generic ] unit-test
 
 [ f throw ] unit-test-fails
 

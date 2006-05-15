@@ -6,7 +6,6 @@ USE: namespaces
 USE: strings
 USE: test
 USE: sequences
-USE: lists
 USE: vectors
 
 [ ] [ 10 [ [ -1000000 <sbuf> ] catch drop ] times ] unit-test

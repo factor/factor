@@ -1,7 +1,7 @@
 ! Copyright (C) 2003, 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: listener
-USING: errors hashtables io kernel lists math memory namespaces
+USING: errors hashtables io kernel math memory namespaces
 parser sequences strings styles vectors words ;
 
 SYMBOL: listener-prompt
@@ -28,7 +28,7 @@ SYMBOL: error-hook
     ] if ;
 
 : read-multiline ( -- quot ? )
-    [ f depth (read-multiline) >r >list r> ] with-parser ;
+    [ f depth (read-multiline) >r >quotation r> ] with-parser ;
 
 : listen-try
     [

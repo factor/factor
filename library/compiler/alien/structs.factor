@@ -2,7 +2,7 @@
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: alien
 USING: assembler compiler errors generic
-hashtables kernel kernel-internals lists math namespaces parser
+hashtables kernel kernel-internals math namespaces parser
 sequences strings words ;
 
 ! Some code for interfacing with C structures.

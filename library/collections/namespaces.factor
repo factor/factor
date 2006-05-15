@@ -6,7 +6,7 @@ USING: vectors ;
 : namestack* ( -- ns ) 3 getenv { vector } declare ; inline
 
 IN: namespaces
-USING: arrays hashtables kernel kernel-internals lists math
+USING: arrays hashtables kernel kernel-internals math
 sequences strings words ;
 
 : namestack ( -- ns ) namestack* clone ; inline
@@ -56,11 +56,6 @@ SYMBOL: building
 : % ( seq -- ) building get swap nappend ;
 
 : # ( n -- ) number>string % ;
-
-IN: lists
-
-: alist>quot ( default alist -- quot )
-    [ [ first2 swap % , , \ if , ] [ ] make ] each ;
 
 IN: sequences
 

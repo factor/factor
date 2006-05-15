@@ -85,7 +85,6 @@ M: object map ( seq quot -- seq )
     [ length ] 2apply max ; flushable
 
 : 2each ( seq seq quot -- )
-    #! Don't use with lists.
     -rot 2dup min-length [ (2each) ] repeat 3drop ; inline
 
 : 2reduce ( seq seq identity quot -- value | quot: e x y -- z )

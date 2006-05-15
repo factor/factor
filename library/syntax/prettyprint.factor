@@ -1,5 +1,5 @@
 ! Copyright (C) 2003, 2006 Slava Pestov.
-! See http://factor.sf.net/license.txt for BSD license.
+! See http://factorcode.org/license.txt for BSD license.
 IN: prettyprint
 USING: alien arrays generic hashtables io kernel lists math
 namespaces parser sequences strings styles vectors words ;
@@ -254,11 +254,8 @@ M: dll pprint* ( obj -- str ) dll-path "DLL\" " pprint-string ;
 M: complex pprint* ( num -- )
     >rect 2array \ C{ \ } pprint-sequence ;
 
-M: cons pprint* ( list -- )
-   [
-       dup list? [ \ [ \ ] ] [ uncons 2array \ [[ \ ]] ] if
-       pprint-sequence
-   ] check-recursion ;
+M: quotation pprint* ( list -- )
+    [ \ [ \ ] pprint-sequence ] check-recursion ;
 
 M: array pprint* ( vector -- )
     [ \ { \ } pprint-sequence ] check-recursion ;
@@ -328,11 +325,11 @@ M: wrapper pprint* ( wrapper -- )
 : define-close t "pprint-close" set-word-prop ;
 
 { 
-    POSTPONE: [ POSTPONE: [[
+    POSTPONE: [
     POSTPONE: { POSTPONE: V{ POSTPONE: H{
     POSTPONE: W{
 } [ define-open ] each
 
 {
-    POSTPONE: ] POSTPONE: } POSTPONE: ]]
+    POSTPONE: ] POSTPONE: }
 } [ define-close ] each

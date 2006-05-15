@@ -1,7 +1,7 @@
 ! Copyright (C) 2003, 2006 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 IN: test
-USING: arrays errors hashtables inspector io kernel lists math
+USING: arrays errors hashtables inspector io kernel math
 memory namespaces parser prettyprint sequences strings words
 vectors ;
 
@@ -68,8 +68,6 @@ SYMBOL: failures
 
 : tests
     {
-        "lists/cons" "lists/lists"
-        "lists/namespaces"
         "combinators"
         "continuations" "errors"
         "collections/hashtables" "collections/sbuf"

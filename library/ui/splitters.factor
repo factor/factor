@@ -2,7 +2,7 @@
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: gadgets-splitters
 USING: arrays gadgets gadgets-layouts gadgets-theme generic
-kernel lists math namespaces sequences styles ;
+kernel math namespaces sequences styles ;
 
 TUPLE: divider splitter ;
 

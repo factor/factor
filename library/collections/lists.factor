@@ -17,9 +17,6 @@ PREDICATE: general-list list ( list -- ? )
 
 : uncons ( [[ car cdr ]] -- car cdr ) dup car swap cdr ; inline
 
-: swons ( cdr car -- [[ car cdr ]] ) swap cons ; inline
-: unit ( a -- [ a ] ) f cons ; inline
-
 : 2car ( cons cons -- car car ) [ car ] 2apply ; inline
 : 2cdr ( cons cons -- car car ) [ cdr ] 2apply ; inline
 
@@ -40,7 +37,7 @@ M: general-list each ( list quot -- | quot: elt -- )
 : (list-map) ( list quot -- list )
     over [
         over cdr over >r >r >r car r> call
-        r> r> rot >r (list-map) r> swons
+        r> r> rot >r (list-map) r> swap cons
     ] [
         drop
     ] if ; inline
@@ -71,16 +68,11 @@ M: cons = ( obj cons -- ? )
         { [ t ] [ 2dup 2car = >r 2cdr = r> and ] }
     } cond ;
 
-: curry ( obj quot -- quot ) >r literalize r> cons ;
-
-: make-dip ( quot n -- quot )
-    dup \ >r <array> -rot \ r> <array> append3 >list ;
-
 : (>list) ( n i seq -- list )
     pick pick <= [
         3drop [ ]
     ] [
-        2dup nth >r >r 1+ r> (>list) r> swons
+        2dup nth >r >r 1+ r> (>list) r> swap cons
     ] if ;
 
 M: object >list ( seq -- list ) dup length 0 rot (>list) ;

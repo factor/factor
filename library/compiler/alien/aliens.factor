@@ -1,7 +1,7 @@
 ! Copyright (C) 2004, 2006 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 IN: alien
-USING: arrays hashtables io kernel lists math namespaces parser
+USING: arrays hashtables io kernel math namespaces parser
 sequences ;
 
 : <alien> ( address -- alien ) f <displaced-alien> ; inline

@@ -1,5 +1,5 @@
 IN: temporary
-USING: arrays kernel lists math namespaces sequences
+USING: arrays kernel math namespaces sequences
 sequences-internals strings test vectors ;
 
 [ V{ 1 2 3 4 } ] [ 1 5 dup <slice> >vector ] unit-test

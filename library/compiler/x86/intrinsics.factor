@@ -1,6 +1,6 @@
 ! Copyright (C) 2005, 2006 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: alien arrays assembler kernel kernel-internals lists math
+USING: alien arrays assembler kernel kernel-internals math
 math-internals namespaces sequences words ;
 IN: compiler
 

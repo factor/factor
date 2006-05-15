@@ -7,7 +7,7 @@ DEFER: FactorUIWindowDelegate
 
 USING: alien arrays cocoa errors freetype gadgets
 gadgets-launchpad gadgets-layouts gadgets-listener gadgets-panes
-hashtables kernel lists math namespaces objc objc-NSApplication
+hashtables kernel math namespaces objc objc-NSApplication
 objc-NSEvent objc-NSObject objc-NSOpenGLContext
 objc-NSOpenGLView objc-NSView objc-NSWindow sequences threads ;
 
@@ -70,8 +70,7 @@ H{ } clone views set-global
     [ ] [ [charactersIgnoringModifiers] CF>string ] ?if ;
 
 : event>gesture ( event -- gesture )
-    dup [modifierFlags] modifiers modifier swap key-code
-    add >list ;
+    dup [modifierFlags] modifiers modifier swap key-code add ;
 
 : send-key-event ( view event -- )
     >r view world-focus r> dup event>gesture pick handle-gesture

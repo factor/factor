@@ -1,5 +1,5 @@
 IN: temporary
-USING: arrays generic hashtables kernel lists math namespaces
+USING: arrays generic hashtables kernel math namespaces
 sequences test words ;
 
 [ 4 ] [
@@ -29,7 +29,7 @@ DEFER: plist-test
 ] unit-test
 
 [
-    [ t ] [ \ car "car" "lists" lookup = ] unit-test
+    [ t ] [ \ array? "array?" "arrays" lookup = ] unit-test
 
     "test-scope" "scratchpad" create drop
 ] with-scope
@@ -73,7 +73,7 @@ FORGET: forgotten
 FORGET: another-forgotten
 : another-forgotten ;
 
-[ t ] [ \ car interned? ] unit-test
+[ t ] [ \ + interned? ] unit-test
 
 ! I forgot remove-crossref calls!
 : fee ;

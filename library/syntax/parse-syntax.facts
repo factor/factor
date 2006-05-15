@@ -51,15 +51,6 @@ HELP: ] ""
 { $description "Marks the end of a literal list." }
 { $see-also POSTPONE: [ } ;
 
-HELP: [[ "car cdr ]]"
-{ $description "Parses two components making up a cons cell." }
-{ $notes "The lists parsed with " { $link POSTPONE: [ } " and " { $link POSTPONE: ] } " are just a special case of " { $link POSTPONE: [[ } " and " { $link POSTPONE: ]] } ". The following two lines are equivalent:" { $code "[ 1 2 3 ]\n[[ 1 [[ 2 [[ 3 f ]] ]] ]]" } }
-{ $see-also POSTPONE: ]] } ;
-
-HELP: ]] ""
-{ $description "Marks the end of a literal cons cell." }
-{ $see-also POSTPONE: [[ } ;
-
 HELP: } ""
 { $description "Marks the end of an array, vector, hashtable, complex number, tuple, or wrapper." }
 { $see-also POSTPONE: { POSTPONE: V{ POSTPONE: H{ POSTPONE: C{ POSTPONE: T{ POSTPONE: W{ } ;

@@ -1,7 +1,7 @@
 ! Copyright (C) 2003, 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: strings
-USING: generic kernel kernel-internals lists math sequences
+USING: generic kernel kernel-internals math sequences
 sequences-internals ;
 
 M: string hashcode

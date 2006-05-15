@@ -1,5 +1,5 @@
 IN: generic
-USING: arrays errors hashtables kernel kernel-internals lists
+USING: arrays errors hashtables kernel kernel-internals
 math namespaces sequences vectors words ;
 
 : picker ( dispatch# -- quot )

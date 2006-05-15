@@ -1,7 +1,7 @@
-! Copyright (C) 2003, 2004 Slava Pestov.
-! See http://factor.sf.net/license.txt for BSD license.
+! Copyright (C) 2003, 2006 Slava Pestov.
+! See http://factorcode.org/license.txt for BSD license.
 IN: kernel
-USING: errors hashtables io kernel-internals lists namespaces
+USING: errors hashtables io kernel-internals namespaces
 parser sequences strings ;
 
 : run-user-init ( -- )
@@ -11,11 +11,7 @@ parser sequences strings ;
         [ try-run-file ] [ drop ] if
     ] when ;
 
-: set-path ( value seq -- )
-    uncons swap over [ nest [ set-path ] bind ] [ nip set ] if ;
-
-: cli-var-param ( name value -- )
-    swap ":" split >list set-path ;
+: cli-var-param ( name value -- ) swap set-global ;
 
 : cli-bool-param ( name -- ) "no-" ?head not cli-var-param ;
 

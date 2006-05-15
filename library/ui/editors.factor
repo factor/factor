@@ -2,8 +2,8 @@
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: gadgets-editors
 USING: arrays freetype gadgets gadgets-labels gadgets-layouts
-gadgets-scrolling gadgets-theme generic kernel
-lists math namespaces sequences strings styles threads ;
+gadgets-scrolling gadgets-theme generic kernel math namespaces
+sequences strings styles threads ;
 
 ! A blinking caret
 TUPLE: caret ;

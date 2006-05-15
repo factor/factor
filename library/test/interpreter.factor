@@ -39,10 +39,6 @@ IN: temporary
     [ 2 2 fixnum+ ] test-interpreter
 ] unit-test
 
-[ V{ "Hey" "there" } ] [
-    [ [[ "Hey" "there" ]] uncons ] test-interpreter
-] unit-test
-
 [ V{ t } ] [
     [ "XYZ" "XYZ" = ] test-interpreter
 ] unit-test

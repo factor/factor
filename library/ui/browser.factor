@@ -3,7 +3,7 @@
 IN: gadgets-browser
 USING: arrays gadgets gadgets-buttons gadgets-labels
 gadgets-layouts gadgets-panes gadgets-scrolling gadgets-theme
-generic hashtables help inspector kernel lists math namespaces
+generic hashtables help inspector kernel math namespaces
 prettyprint sequences words ;
 
 SYMBOL: components

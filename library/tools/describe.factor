@@ -2,7 +2,7 @@
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: inspector
 USING: arrays generic hashtables help io kernel kernel-internals
-lists math prettyprint sequences strings vectors words ;
+math prettyprint sequences strings vectors words ;
 
 GENERIC: summary ( object -- string )
 
@@ -45,7 +45,7 @@ M: sequence summary
         " elements" append3
     ] if ;
 
-M: list sheet 1array ;
+M: quotation sheet 1array ;
 
 M: vector sheet 1array ;
 

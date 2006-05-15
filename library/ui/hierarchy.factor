@@ -1,7 +1,7 @@
 ! Copyright (C) 2005, 2006 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 IN: gadgets
-USING: gadgets-layouts generic hashtables kernel lists math
+USING: gadgets-layouts generic hashtables kernel math
 namespaces sequences vectors ;
 
 GENERIC: add-notify* ( gadget -- )

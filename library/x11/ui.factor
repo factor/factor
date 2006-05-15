@@ -3,7 +3,7 @@
 IN: x11
 USING: arrays errors freetype gadgets gadgets-launchpad
 gadgets-layouts gadgets-listener hashtables kernel
-kernel-internals lists math namespaces opengl sequences
+kernel-internals math namespaces opengl sequences
 strings x11 ;
 
 ! In the X11 backend, world-handle is a pair { window context }.
@@ -77,7 +77,7 @@ M: world motion-event ( event world -- )
 
 : event>gesture ( event -- gesture )
     dup XKeyEvent-state modifiers modifier
-    swap key-code [ add >list ] [ drop f ] if* ;
+    swap key-code [ add ] [ drop f ] if* ;
 
 M: world key-down-event ( event world -- )
     world-focus over event>gesture [

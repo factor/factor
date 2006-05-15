@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 IN: io-internals
 USING: alien arrays errors generic hashtables io kernel
-kernel-internals lists math parser queues sequences strings
+kernel-internals math parser queues sequences strings
 threads unix-internals vectors words ;
 
 ! We want namespaces::bind to shadow the bind system call from

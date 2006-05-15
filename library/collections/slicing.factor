@@ -1,7 +1,7 @@
 ! Copyright (C) 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: sequences
-USING: generic kernel kernel-internals lists math namespaces
+USING: generic kernel kernel-internals math namespaces
 strings vectors ;
 
 : head-slice ( n seq -- slice ) 0 -rot <slice> ; flushable

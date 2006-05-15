@@ -33,7 +33,7 @@ sequences strings vectors words prettyprint ;
 \ eq? t "foldable" set-word-prop
 
 ! Primitive combinators
-\ call [ [ general-list ] [ ] ] "infer-effect" set-word-prop
+\ call [ [ quotation ] [ ] ] "infer-effect" set-word-prop
 
 \ call [ pop-literal infer-quot-value ] "infer" set-word-prop
 
@@ -43,7 +43,7 @@ sequences strings vectors words prettyprint ;
     pop-literal unit infer-quot-value
 ] "infer" set-word-prop
 
-\ if [ [ object general-list general-list ] [ ] ] "infer-effect" set-word-prop
+\ if [ [ object quotation quotation ] [ ] ] "infer-effect" set-word-prop
 
 \ if [
     2 #drop node, pop-d pop-d swap 2array
@@ -345,13 +345,13 @@ sequences strings vectors words prettyprint ;
 
 \ getenv [ [ fixnum ] [ object ] ] "infer-effect" set-word-prop
 \ setenv [ [ object fixnum ] [ ] ] "infer-effect" set-word-prop
-\ stat [ [ string ] [ general-list ] ] "infer-effect" set-word-prop
-\ (directory) [ [ string ] [ general-list ] ] "infer-effect" set-word-prop
+\ stat [ [ string ] [ array ] ] "infer-effect" set-word-prop
+\ (directory) [ [ string ] [ array ] ] "infer-effect" set-word-prop
 \ gc [ [ fixnum ] [ ] ] "infer-effect" set-word-prop
 \ gc-time [ [ string ] [ ] ] "infer-effect" set-word-prop
 \ save-image [ [ string ] [ ] ] "infer-effect" set-word-prop
 \ exit [ [ integer ] [ ] ] "infer-effect" set-word-prop
-\ room [ [ ] [ integer integer integer integer general-list ] ] "infer-effect" set-word-prop
+\ room [ [ ] [ integer integer integer integer array ] ] "infer-effect" set-word-prop
 \ os-env [ [ string ] [ object ] ] "infer-effect" set-word-prop
 \ millis [ [ ] [ integer ] ] "infer-effect" set-word-prop
 

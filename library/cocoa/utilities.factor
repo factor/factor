@@ -1,7 +1,7 @@
 ! Copyright (C) 2006 Slava Pestov
 ! See http://factorcode.org/license.txt for BSD license.
 IN: objc
-USING: alien arrays errors hashtables kernel lists math
+USING: alien arrays errors hashtables kernel math
 namespaces parser sequences strings words ;
 
 TUPLE: selector name object ;

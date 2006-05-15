@@ -2,7 +2,6 @@ IN: temporary
 USE: kernel
 USE: math
 USE: test
-USE: lists
 USE: sequences
 
 [ -2 ] [ 1 bitnot ] unit-test

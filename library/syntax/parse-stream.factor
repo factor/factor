@@ -1,7 +1,7 @@
 ! Copyright (C) 2004, 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: parser
-USING: errors generic io kernel lists math namespaces sequences
+USING: errors generic io kernel math namespaces sequences
 words ;
 
 : file-vocabs ( -- )
@@ -12,7 +12,7 @@ words ;
 : parse-lines ( lines -- quot )
     [
         dup length [ ] [ 1+ line-number set (parse) ] 2reduce
-        >list
+        >quotation
     ] with-parser ;
 
 : parse ( str -- code ) <string-reader> lines parse-lines ;

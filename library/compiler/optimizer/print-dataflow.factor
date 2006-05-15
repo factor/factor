@@ -1,6 +1,6 @@
 IN: optimizer
 USING: generic hashtables inference io kernel kernel-internals
-lists math namespaces prettyprint sequences styles vectors words ;
+math namespaces prettyprint sequences styles vectors words ;
 
 ! A simple tool for turning dataflow IR into quotations, for
 ! debugging purposes.

@@ -2,7 +2,7 @@
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: generic
 USING: arrays errors generic hashtables kernel kernel-internals
-lists math namespaces sequences words ;
+math namespaces sequences words ;
 
 ! Math combination for generic dyadic upgrading arithmetic.
 

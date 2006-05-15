@@ -3,7 +3,7 @@
 IN: alien
 USING: arrays assembler compiler compiler
 errors generic hashtables inference inspector
-io kernel kernel-internals lists math namespaces parser
+io kernel kernel-internals math namespaces parser
 prettyprint sequences strings words ;
 
 TUPLE: alien-invoke library function return parameters ;

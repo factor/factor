@@ -1,5 +1,5 @@
 IN: temporary
-USING: arrays errors generic inference kernel lists math
+USING: arrays errors generic inference kernel math
 math-internals namespaces parser sequences test vectors ;
 
 [ f ] [ f [ [ ] map-nodes ] with-node-iterator ] unit-test
@@ -70,7 +70,7 @@ math-internals namespaces parser sequences test vectors ;
 [ { 1 1 } ] [ [ simple-recursion-2 ] infer ] unit-test
 
 : bad-recursion-2
-    dup [ uncons bad-recursion-2 ] [ ] if ;
+    dup [ dup first swap second bad-recursion-2 ] [ ] if ;
 
 [ [ bad-recursion-2 ] infer ] unit-test-fails
 
@@ -82,20 +82,20 @@ math-internals namespaces parser sequences test vectors ;
 [ { 1 1 } ] [ [ funny-recursion ] infer ] unit-test
 
 ! Simple combinators
-[ { 1 2 } ] [ [ [ car ] keep cdr ] infer ] unit-test
+[ { 1 2 } ] [ [ [ first ] keep second ] infer ] unit-test
 
 ! Mutual recursion
 DEFER: foe
 
 : fie ( element obj -- ? )
-    dup cons? [ foe ] [ eq? ] if ;
+    dup array? [ foe ] [ eq? ] if ;
 
 : foe ( element tree -- ? )
     dup [
-        2dup car fie [
+        2dup first fie [
             nip
         ] [
-            cdr dup cons? [
+            second dup array? [
                 foe
             ] [
                 fie
@@ -132,7 +132,7 @@ SYMBOL: sym-test
 
 : terminator-branch
     dup [
-        car
+        length
     ] [
         not-a-number
     ] if ;
@@ -217,10 +217,7 @@ M: ratio xyz
 
 [ t ] [ [ [ xyz ] infer ] catch inference-error? ] unit-test
 
-[ { 2 1 } ] [ [ swons ] infer ] unit-test
-[ { 1 2 } ] [ [ uncons ] infer ] unit-test
 [ { 1 1 } ] [ [ unit ] infer ] unit-test
-[ { 1 1 } ] [ [ list? ] infer ] unit-test
 
 [ { 1 0 } ] [ [ >n ] infer ] unit-test
 [ { 0 1 } ] [ [ n> ] infer ] unit-test
@@ -255,10 +252,6 @@ M: ratio xyz
 [ { 1 1 } ] [ [ reverse ] infer ] unit-test
 [ { 2 1 } ] [ [ member? ] infer ] unit-test
 [ { 2 1 } ] [ [ remove ] infer ] unit-test
-
-: bad-code "1234" car ;
-
-[ { 0 1 } ] [ [ bad-code ] infer ] unit-test
 
 [ 1234 infer ] unit-test-fails
 

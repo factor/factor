@@ -1,5 +1,5 @@
 USING: arrays assembler compiler generic
-hashtables inference kernel kernel-internals lists math
+hashtables inference kernel kernel-internals math
 optimizer prettyprint sequences strings test vectors words
 sequences-internals ;
 IN: temporary
@@ -107,7 +107,7 @@ USE: optimizer
 [ string ] [
     \ string
     [ integer string array reversed sbuf
-    slice vector general-list ]
+    slice vector quotation ]
     [ class-compare ] sort min-class
 ] unit-test
 
@@ -142,42 +142,33 @@ M: cons xyz xyz ;
 
 ! Test predicate inlining
 : pred-test-1
-    dup cons? [
-        dup general-list? [ "general-list" ] [ "nope" ] if
-    ] [
-        "not a cons"
-    ] if ; compiled
-
-[ [[ 1 2 ]] "general-list" ] [ [[ 1 2 ]] pred-test-1 ] unit-test
-
-: pred-test-2
     dup fixnum? [
         dup integer? [ "integer" ] [ "nope" ] if
     ] [
         "not a fixnum"
     ] if ; compiled
 
-[ 1 "integer" ] [ 1 pred-test-2 ] unit-test
+[ 1 "integer" ] [ 1 pred-test-1 ] unit-test
 
 TUPLE: pred-test ;
 
-: pred-test-3
+: pred-test-2
     dup tuple? [
         dup pred-test? [ "pred-test" ] [ "nope" ] if
     ] [
         "not a tuple"
     ] if ; compiled
 
-[ T{ pred-test } "pred-test" ] [ T{ pred-test } pred-test-3 ] unit-test
+[ T{ pred-test } "pred-test" ] [ T{ pred-test } pred-test-2 ] unit-test
 
-: pred-test-4
+: pred-test-3
     dup pred-test? [
         dup tuple? [ "pred-test" ] [ "nope" ] if
     ] [
         "not a tuple"
     ] if ; compiled
 
-[ T{ pred-test } "pred-test" ] [ T{ pred-test } pred-test-4 ] unit-test
+[ T{ pred-test } "pred-test" ] [ T{ pred-test } pred-test-3 ] unit-test
 
 ! : inline-test
 !     "nom" = ; compiled
