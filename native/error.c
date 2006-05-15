@@ -32,6 +32,7 @@ void throw_error(CELL error, bool keep_stacks)
 	thrown_error = error;
 	thrown_keep_stacks = keep_stacks;
 	thrown_ds = ds;
+	thrown_rs = rs;
 	thrown_cs = cs;
 	thrown_callframe = callframe;
 	thrown_executing = executing;

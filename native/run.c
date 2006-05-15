@@ -14,6 +14,7 @@ void handle_error(void)
 		{
 			ds = thrown_ds;
 			cs = thrown_cs;
+			rs = thrown_rs;
 			callframe = thrown_callframe;
 			executing = thrown_executing;
 		}

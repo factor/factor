@@ -124,13 +124,15 @@ M: object error. ( error -- ) . ;
 
 : :s ( -- ) error-continuation get continuation-data stack. ;
 
-: :r ( -- ) error-continuation get continuation-call stack. ;
+: :r ( -- ) error-continuation get continuation-retain stack. ;
+
+: :c ( -- ) error-continuation get continuation-call stack. ;
 
 : :get ( var -- value )
     error-continuation get continuation-name hash-stack ;
 
 : debug-help ( -- )
-    ":s :r show stacks at time of error" print
+    ":s :r :c show stacks at time of error" print
     ":get ( var -- value ) accesses variables at time of error" print
     ":error starts the inspector with the error" print
     ":cc starts the inspector with the error continuation" print

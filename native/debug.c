@@ -174,8 +174,8 @@ void factorbug(void)
 	fprintf(stderr,"d <addr> <count> -- dump memory\n");
 	fprintf(stderr,"u <addr>         -- dump object at tagged <addr>\n");
 	fprintf(stderr,". <addr>         -- print object at tagged <addr>\n");
-	fprintf(stderr,"s s              -- dump data and return stacks\n");
-	fprintf(stderr,".s .r            -- print data and return stacks\n");
+	fprintf(stderr,"s r c            -- dump data, retain, call stacks\n");
+	fprintf(stderr,".s .r .c         -- print data, retain, call stacks\n");
 	fprintf(stderr,"i                -- dump interpreter state\n");
 	fprintf(stderr,"e                -- dump environment\n");
 	fprintf(stderr,"g                -- dump generations\n");
@@ -216,10 +216,14 @@ void factorbug(void)
 		else if(strcmp(cmd,"s") == 0)
 			dump_memory(ds_bot,ds);
 		else if(strcmp(cmd,"r") == 0)
+			dump_memory(rs_bot,rs);
+		else if(strcmp(cmd,"c") == 0)
 			dump_memory(cs_bot,cs);
 		else if(strcmp(cmd,".s") == 0)
 			print_objects(ds_bot,ds);
 		else if(strcmp(cmd,".r") == 0)
+			print_objects(rs_bot,rs);
+		else if(strcmp(cmd,".c") == 0)
 			print_objects(cs_bot,cs);
 		else if(strcmp(cmd,"i") == 0)
 		{

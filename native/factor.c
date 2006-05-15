@@ -1,14 +1,14 @@
 #include "factor.h"
 
-void init_factor(const char* image, CELL ds_size, CELL cs_size,
-	CELL gen_count,
-	CELL young_size, CELL aging_size,
+void init_factor(const char* image,
+	CELL ds_size, CELL rs_size, CELL cs_size,
+	CELL gen_count, CELL young_size, CELL aging_size,
 	CELL code_size, CELL literal_size)
 {
 	init_ffi();
 	init_arena(gen_count,young_size,aging_size);
 	init_compiler(code_size);
-	init_stacks(ds_size,cs_size);
+	init_stacks(ds_size,rs_size,cs_size);
 	/* callframe must be valid in case load_image() does GC */
 	callframe = F;
 	thrown_error = F;
@@ -42,6 +42,7 @@ void usage(void)
 	printf("Usage: factor <image file> [ parameters ... ]\n");
 	printf("Runtime options -- n is a number:\n");
 	printf(" +Dn   Data stack size, kilobytes\n");
+	printf(" +Rn   Retain stack size, kilobytes\n");
 	printf(" +Cn   Call stack size, kilobytes\n");
 	printf(" +Gn   Number of generations, must be >= 2\n");
 	printf(" +Yn   Size of n-1 youngest generations, megabytes\n");
@@ -56,6 +57,7 @@ int main(int argc, char** argv)
 {
 	const char *image = NULL;
 	CELL ds_size = 128;
+	CELL rs_size = 128;
 	CELL cs_size = 128;
 	CELL generations = 2;
 	CELL young_size = 2 * CELLS;
@@ -71,6 +73,7 @@ int main(int argc, char** argv)
 	for(i = 1; i < argc; i++)
 	{
 		if(factor_arg(argv[i],"+D%d",&ds_size)) continue;
+		if(factor_arg(argv[i],"+R%d",&rs_size)) continue;
 		if(factor_arg(argv[i],"+C%d",&cs_size)) continue;
 		if(factor_arg(argv[i],"+G%d",&generations)) continue;
 		if(factor_arg(argv[i],"+Y%d",&young_size)) continue;
@@ -96,6 +99,7 @@ int main(int argc, char** argv)
 
 	init_factor(image,
 		ds_size * 1024,
+		rs_size * 1024,
 		cs_size * 1024,
 		generations,
 		young_size * 1024 * 1024,

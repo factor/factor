@@ -108,4 +108,5 @@ DEFER: describe
 : stack. ( seq -- seq ) reverse-slice >array describe ;
 
 : .s datastack stack. ;
-: .r callstack stack. ;
+: .r retainstack stack. ;
+: .c callstack stack. ;

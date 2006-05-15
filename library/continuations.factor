@@ -14,14 +14,15 @@ USING: kernel kernel-internals ;
 IN: kernel
 USING: namespaces sequences ;
 
-TUPLE: continuation data call name catch ;
+TUPLE: continuation data retain call name catch ;
 
 : continuation ( -- interp )
-    datastack callstack dup pop* dup pop*
+    datastack retainstack callstack dup pop* dup pop*
     namestack catchstack <continuation> ; inline
 
-: >continuation< ( continuation -- data call name catch )
+: >continuation< ( continuation -- data retain call name catch )
     [ continuation-data ] keep
+    [ continuation-retain ] keep
     [ continuation-call ] keep
     [ continuation-name ] keep
     continuation-catch ; inline
@@ -36,7 +37,11 @@ TUPLE: continuation data call name catch ;
 
 : continue ( continuation -- )
     >continuation<
-    set-catchstack set-namestack set-callstack set-datastack ;
+    set-catchstack
+    set-namestack
+    set-callstack
+    set-retainstack
+    set-datastack ;
     inline
 
 : (continue-with) 9 getenv ;

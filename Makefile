@@ -165,7 +165,7 @@ f: $(OBJS)
 	$(CC) $(LIBS) $(CFLAGS) -o $@$(PLAF_SUFFIX) $(OBJS)
 
 clean:
-	rm -f $(OBJS)
+	rm -f $(OBJS) $(UNIX_OBJS) $(WINDOWS_OBJS) $(MACOSX_OBJS)
 
 .c.o:
 	$(CC) -c $(CFLAGS) -o $@ $<

@@ -5,6 +5,11 @@ void reset_datastack(void)
 	ds = ds_bot - CELLS;
 }
 
+void reset_retainstack(void)
+{
+	rs = rs_bot - CELLS;
+}
+
 void reset_callstack(void)
 {
 	cs = cs_bot - CELLS;
@@ -16,17 +21,22 @@ void fix_stacks(void)
 		reset_datastack();
 	else if(STACK_OVERFLOW(ds,stack_chain->data_region))
 		reset_datastack();
+	else if(STACK_UNDERFLOW(rs,stack_chain->retain_region))
+		reset_retainstack();
+	else if(STACK_OVERFLOW(rs,stack_chain->retain_region))
+		reset_retainstack();
 	else if(STACK_UNDERFLOW(cs,stack_chain->call_region))
 		reset_callstack();
 	else if(STACK_OVERFLOW(cs,stack_chain->call_region))
 		reset_callstack();
 }
 
-/* called before entry into foreign C code. Note that ds and cs are stored
-in registers, so callbacks must save and restore the correct values */
+/* called before entry into foreign C code. Note that ds, rs and cs might
+be stored in registers, so callbacks must save and restore the correct values */
 void save_stacks(void)
 {
 	stack_chain->data = ds;
+	stack_chain->retain = rs;
 	stack_chain->call = cs;
 }
 
@@ -46,6 +56,7 @@ void nest_stacks(void)
 	- C function restores registers
 	- C function returns to Factor code */
 	new_stacks->data_save = ds;
+	new_stacks->retain_save = rs;
 	new_stacks->call_save = cs;
 	new_stacks->cards_offset = cards_offset;
 
@@ -53,12 +64,15 @@ void nest_stacks(void)
 	new_stacks->catch_save = userenv[CATCHSTACK_ENV];
 
 	new_stacks->data_region = alloc_bounded_block(ds_size);
+	new_stacks->retain_region = alloc_bounded_block(rs_size);
 	new_stacks->call_region = alloc_bounded_block(cs_size);
+
 	new_stacks->next = stack_chain;
 	stack_chain = new_stacks;
 
 	callframe = F;
 	reset_datastack();
+	reset_retainstack();
 	reset_callstack();
 	update_cards_offset();
 }
@@ -69,9 +83,11 @@ void unnest_stacks(void)
 	STACKS *old_stacks = stack_chain;
 
 	dealloc_bounded_block(stack_chain->data_region);
+	dealloc_bounded_block(stack_chain->retain_region);
 	dealloc_bounded_block(stack_chain->call_region);
 
 	ds = old_stacks->data_save;
+	rs = old_stacks->retain_save;
 	cs = old_stacks->call_save;
 	cards_offset = old_stacks->cards_offset;
 
@@ -79,14 +95,15 @@ void unnest_stacks(void)
 	userenv[CATCHSTACK_ENV] = old_stacks->catch_save;
 
 	stack_chain = old_stacks->next;
-	
+
 	free(old_stacks);
 }
 
 /* called on startup */
-void init_stacks(CELL ds_size_, CELL cs_size_)
+void init_stacks(CELL ds_size_, CELL rs_size_, CELL cs_size_)
 {
 	ds_size = ds_size_;
+	rs_size = rs_size_;
 	cs_size = cs_size_;
 	stack_chain = NULL;
 	nest_stacks();
@@ -211,12 +228,12 @@ void primitive_swap(void)
 
 void primitive_to_r(void)
 {
-	cpush(dpop());
+	rpush(dpop());
 }
 
 void primitive_from_r(void)
 {
-	dpush(cpop());
+	dpush(rpop());
 }
 
 F_VECTOR* stack_to_vector(CELL bottom, CELL top)
@@ -233,6 +250,12 @@ void primitive_datastack(void)
 {
 	maybe_gc(0);
 	dpush(tag_object(stack_to_vector(ds_bot,ds)));
+}
+
+void primitive_retainstack(void)
+{
+	maybe_gc(0);
+	dpush(tag_object(stack_to_vector(rs_bot,rs)));
 }
 
 void primitive_callstack(void)
@@ -253,6 +276,11 @@ CELL vector_to_stack(F_VECTOR* vector, CELL bottom)
 void primitive_set_datastack(void)
 {
 	ds = vector_to_stack(untag_vector(dpop()),ds_bot);
+}
+
+void primitive_set_retainstack(void)
+{
+	rs = vector_to_stack(untag_vector(dpop()),rs_bot);
 }
 
 void primitive_set_callstack(void)

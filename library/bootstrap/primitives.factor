@@ -145,8 +145,10 @@ call
     { "gc-time" "memory"                    }
     { "save-image" "memory"                 }
     { "datastack" "kernel"                  }
+    { "retainstack" "kernel"                }
     { "callstack" "kernel"                  }
     { "set-datastack" "kernel"              }
+    { "set-retainstack" "kernel"            }
     { "set-callstack" "kernel"              }
     { "exit" "kernel"                       }
     { "room" "memory"                       }

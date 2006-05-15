@@ -64,10 +64,18 @@ void init_arena(CELL gens, CELL young_size, CELL aging_size)
 	cards_scanned = 0;
 }
 
+void collect_stack(BOUNDED_BLOCK *region, CELL top)
+{
+	CELL bottom = region->start;
+	CELL ptr;
+
+	for(ptr = bottom; ptr <= top; ptr += CELLS)
+		copy_handle((CELL*)ptr);
+}
+
 void collect_roots(void)
 {
 	int i;
-	CELL ptr;
 	STACKS *stacks;
 
 	copy_handle(&T);
@@ -82,17 +90,9 @@ void collect_roots(void)
 
 	while(stacks)
 	{
-		CELL bottom = stacks->data_region->start;
-		CELL top = stacks->data;
-		
-		for(ptr = bottom; ptr <= top; ptr += CELLS)
-			copy_handle((CELL*)ptr);
-	
-		bottom = stacks->call_region->start;
-		top = stacks->call;
-		
-		for(ptr = bottom; ptr <= top; ptr += CELLS)
-			copy_handle((CELL*)ptr);
+		collect_stack(stacks->data_region,stacks->data);
+		collect_stack(stacks->retain_region,stacks->retain);
+		collect_stack(stacks->call_region,stacks->call);
 
 		copy_handle(&stacks->callframe);
 		copy_handle(&stacks->catch_save);

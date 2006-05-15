@@ -63,6 +63,19 @@ INLINE void cpush(CELL top)
 	put(cs,top);
 }
 
+INLINE CELL rpop(void)
+{
+	CELL value = get(rs);
+	rs -= CELLS;
+	return value;
+}
+
+INLINE void rpush(CELL top)
+{
+	rs += CELLS;
+	put(rs,top);
+}
+
 INLINE void call(CELL quot)
 {
 	/* tail call optimization */

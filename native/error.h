@@ -13,8 +13,10 @@
 #define ERROR_DS_UNDERFLOW (12<<3)
 #define ERROR_DS_OVERFLOW (13<<3)
 #define ERROR_CS_UNDERFLOW (14<<3)
-#define ERROR_CS_OVERFLOW (15<<3)
-#define ERROR_OBJECTIVE_C (16<<3)
+#define ERROR_RS_OVERFLOW (15<<3)
+#define ERROR_RS_UNDERFLOW (16<<3)
+#define ERROR_CS_OVERFLOW (17<<3)
+#define ERROR_OBJECTIVE_C (18<<3)
 
 /* Are we throwing an error? */
 bool throwing;
@@ -25,6 +27,7 @@ CELL thrown_keep_stacks;
 /* Since longjmp restores registers, we must save all these values.
 On x86, only the first is in a register; on PowerPC, all are. */
 CELL thrown_ds;
+CELL thrown_rs;
 CELL thrown_cs;
 CELL thrown_callframe;
 CELL thrown_executing;

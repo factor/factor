@@ -5,6 +5,12 @@ typedef struct _STACKS {
 	CELL data_save;
 	/* memory region holding current datastack */
 	BOUNDED_BLOCK *data_region;
+	/* current retain stack top pointer */
+	CELL retain;
+	/* saved contents of rs register on entry to callback */
+	CELL retain_save;
+	/* memory region holding current retain stack */
+	BOUNDED_BLOCK *retain_region;
 	/* current callstack top pointer */
 	CELL call;
 	/* saved contents of cs register on entry to callback */
@@ -25,21 +31,23 @@ typedef struct _STACKS {
 
 STACKS *stack_chain;
 
-CELL ds_size, cs_size;
+CELL ds_size, rs_size, cs_size;
 
 #define ds_bot ((CELL)(stack_chain->data_region->start))
+#define rs_bot ((CELL)(stack_chain->retain_region->start))
 #define cs_bot ((CELL)(stack_chain->call_region->start))
 
 #define STACK_UNDERFLOW(stack,region) ((stack) + CELLS < (region)->start)
 #define STACK_OVERFLOW(stack,region) ((stack) + CELLS >= (region)->start + (region)->size)
 
 void reset_datastack(void);
+void reset_retainstack(void);
 void reset_callstack(void);
 void fix_stacks(void);
 DLLEXPORT void save_stacks(void);
 DLLEXPORT void nest_stacks(void);
 DLLEXPORT void unnest_stacks(void);
-void init_stacks(CELL ds_size, CELL cs_size);
+void init_stacks(CELL ds_size, CELL rs_size, CELL cs_size);
 
 void primitive_drop(void);
 void primitive_2drop(void);
@@ -61,7 +69,9 @@ void primitive_to_r(void);
 void primitive_from_r(void);
 F_VECTOR* stack_to_vector(CELL bottom, CELL top);
 void primitive_datastack(void);
+void primitive_retainstack(void);
 void primitive_callstack(void);
 CELL vector_to_stack(F_VECTOR* vector, CELL bottom);
 void primitive_set_datastack(void);
+void primitive_set_retainstack(void);
 void primitive_set_callstack(void);

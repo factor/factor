@@ -35,39 +35,23 @@ typedef signed long long s64;
 /* must always be 8 bits */
 typedef unsigned char BYTE;
 
-/* raw pointer to datastack bottom */
-CELL ds_bot;
+CELL cs;
 
-/* raw pointer to datastack top */
 #if defined(FACTOR_X86)
 	register CELL ds asm("esi");
+	register CELL rs asm("ebx");
+	CELL cards_offset;
 #elif defined(FACTOR_PPC)
 	register CELL ds asm("r14");
-#elif defined(FACTOR_AMD64)
-        register CELL ds asm("r14");
-#else
-	CELL ds;
-#endif
-
-/* raw pointer to callstack bottom */
-CELL cs_bot;
-
-/* raw pointer to callstack top */
-#if defined(FACTOR_X86)
-	register CELL cs asm("ebx");
-#elif defined(FACTOR_PPC)
-	register CELL cs asm("r15");
-#elif defined(FACTOR_AMD64)
-        register CELL cs asm("r15");
-#else
-	CELL cs;
-#endif
-
-#if defined(FACTOR_PPC)
+	register CELL rs asm("r15");
 	register CELL cards_offset asm("r16");
 #elif defined(FACTOR_AMD64)
+        register CELL ds asm("r14");
+        register CELL rs asm("r15");
 	register CELL cards_offset asm("r13");
 #else
+	CELL ds;
+	CELL rs;
 	CELL cards_offset;
 #endif
 
@@ -104,7 +88,7 @@ CELL executing;
 	#include <sys/stat.h>
 	#include <unistd.h>
 	#include <sys/time.h>
-    #include <dlfcn.h>
+	#include <dlfcn.h>
 #endif
 
 #include "debug.h"
