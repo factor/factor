@@ -512,3 +512,6 @@ sequences strings vectors words prettyprint ;
 
 \ <string> [ [ integer integer ] [ string ] ] "infer-effect" set-word-prop
 \ <string> t "flushable" set-word-prop
+
+\ <quotation> [ [ integer ] [ quotation ] ] "infer-effect" set-word-prop
+\ <quotation> t "flushable" set-word-prop

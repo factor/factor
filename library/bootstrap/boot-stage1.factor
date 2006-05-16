@@ -51,7 +51,6 @@ vectors words ;
         "/library/collections/sequence-eq.factor"
         "/library/collections/slicing.factor"
         "/library/collections/sequence-sort.factor"
-        "/library/collections/lists.factor"
         "/library/collections/flatten.factor"
         "/library/collections/queues.factor"
         "/library/collections/graphs.factor"

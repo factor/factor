@@ -42,6 +42,31 @@ void primitive_array(void)
 	dpush(tag_object(array(ARRAY_TYPE,size,initial)));
 }
 
+/* push a new tuple on the stack */
+void primitive_tuple(void)
+{
+	F_FIXNUM size = to_fixnum(dpop());
+	maybe_gc(array_size(size));
+	dpush(tag_object(array(TUPLE_TYPE,size,F)));
+}
+
+/* push a new byte on the stack */
+void primitive_byte_array(void)
+{
+	F_FIXNUM size = to_fixnum(dpop());
+	maybe_gc(0);
+	dpush(tag_object(byte_array(size)));
+}
+
+/* push a new quotation on the stack */
+void primitive_quotation(void)
+{
+	F_FIXNUM size;
+	maybe_gc(0);
+	size = to_fixnum(dpop());
+	dpush(tag_object(array(QUOTATION_TYPE,size,F)));
+}
+
 CELL make_array_2(CELL v1, CELL v2)
 {
 	F_ARRAY *a = array(ARRAY_TYPE,2,F);
@@ -58,22 +83,6 @@ CELL make_array_4(CELL v1, CELL v2, CELL v3, CELL v4)
 	put(AREF(a,2),v3);
 	put(AREF(a,3),v4);
 	return tag_object(a);
-}
-
-/* push a new tuple on the stack */
-void primitive_tuple(void)
-{
-	F_FIXNUM size = to_fixnum(dpop());
-	maybe_gc(array_size(size));
-	dpush(tag_object(array(TUPLE_TYPE,size,F)));
-}
-
-/* push a new byte on the stack */
-void primitive_byte_array(void)
-{
-	F_FIXNUM size = to_fixnum(dpop());
-	maybe_gc(0);
-	dpush(tag_object(byte_array(size)));
 }
 
 F_ARRAY* resize_array(F_ARRAY* array, F_FIXNUM capacity, CELL fill)

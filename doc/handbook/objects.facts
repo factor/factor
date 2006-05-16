@@ -33,25 +33,25 @@ $terpri
 { $subsection POSTPONE: GENERIC: }
 { $subsection POSTPONE: M: }
 "Since classes are not linearly ordered, method ordering is an issue to keep in mind."
-{ $subsection "method-order" }
+! { $subsection "method-order" }
 { $subsection "method-combination" } ;
 
-ARTICLE: "method-order" "Method ordering"
-"If two classes have a non-empty intersection, there is no guarantee that one is a subclass of the other. This means there is no canonical linear ordering of classes."
-$terpri
-"Consider the following set of definitions:"
-{ $code
-    "GENERIC: explain"
-    "M: general-t explain drop \"a true value\" print ;"
-    "M: general-list explain drop \"a list\" print ;"
-    "M: object explain drop \"an object\" print ;"
-}
-"Neither " { $link general-t } " nor " { $link general-list } " contains the other, yet their intersection is the non-empty " { $link cons } " class. So the generic word system will place " { $link object } " first in the method order, however either " { $link general-t } " or " { $link general-list } " may come next, and it is pretty much a random choice that depends on hashing:"
-{ $example "\\ bar order ."  "{ object general-list general-t }" }
-"Therefore, the outcome of calling " { $snippet "bar" } " with a cons cell as input is undefined."
-$terpri
-"As you can see above, the " { $link order } " word can be useful to clarify method dispatch."
-{ $subsection order } ;
+! ARTICLE: "method-order" "Method ordering"
+! "If two classes have a non-empty intersection, there is no guarantee that one is a subclass of the other. This means there is no canonical linear ordering of classes."
+! $terpri
+! "Consider the following set of definitions:"
+! { $code
+!     "GENERIC: explain"
+!     "M: general-t explain drop \"a true value\" print ;"
+!     "M:  explain drop \"a list\" print ;"
+!     "M: object explain drop \"an object\" print ;"
+! }
+! "Neither " { $link general-t } " nor " { $link general-list } " contains the other, yet their intersection is the non-empty " { $link cons } " class. So the generic word system will place " { $link object } " first in the method order, however either " { $link general-t } " or " { $link general-list } " may come next, and it is pretty much a random choice that depends on hashing:"
+! { $example "\\ bar order ."  "{ object general-list general-t }" }
+! "Therefore, the outcome of calling " { $snippet "bar" } " with a cons cell as input is undefined."
+! $terpri
+! "As you can see above, the " { $link order } " word can be useful to clarify method dispatch."
+! { $subsection order } ;
 
 GLOSSARY: "method combination" "control flow glue between methods in a generic word" ;
 

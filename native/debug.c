@@ -42,11 +42,20 @@ void print_string(F_STRING* str)
 	fprintf(stderr,"\"");
 }
 
+void print_array(F_ARRAY* array)
+{
+	CELL length = array_capacity(array);
+	CELL i;
+
+	for(i = 0; i < length; i++)
+	{
+		fprintf(stderr," ");
+		print_obj(get(AREF(array,i)));
+	}
+}
+
 void print_obj(CELL obj)
 {
-	F_ARRAY *array;
-	CELL class;
-
 	switch(type_of(obj))
 	{
 	case FIXNUM_TYPE:
@@ -65,14 +74,19 @@ void print_obj(CELL obj)
 		fprintf(stderr,"f");
 		break;
 	case TUPLE_TYPE:
-		array = (F_ARRAY*)UNTAG(obj);
-		fprintf(stderr,"<< ");
-		class = get(AREF(array,0));
-		if(type_of(class) == WORD_TYPE)
-			print_word(untag_word(class));
-		else
-			fprintf(stderr," corrupt tuple: %lx ",class);
-		fprintf(stderr," %lx >>",obj);
+		fprintf(stderr,"T{");
+		print_array((F_ARRAY*)UNTAG(obj));
+		fprintf(stderr," }");
+		break;
+	case ARRAY_TYPE:
+		fprintf(stderr,"{");
+		print_array((F_ARRAY*)UNTAG(obj));
+		fprintf(stderr," }");
+		break;
+	case QUOTATION_TYPE:
+		fprintf(stderr,"[");
+		print_array((F_ARRAY*)UNTAG(obj));
+		fprintf(stderr," ]");
 		break;
 	default:
 		fprintf(stderr,"#<type %ld @ %lx>",type_of(obj),obj);

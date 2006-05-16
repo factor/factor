@@ -35,6 +35,7 @@ CELL make_array_4(CELL v1, CELL v2, CELL v3, CELL v4);
 void primitive_array(void);
 void primitive_tuple(void);
 void primitive_byte_array(void);
+void primitive_quotation(void);
 
 F_ARRAY *resize_array(F_ARRAY* array, F_FIXNUM capacity, CELL fill);
 void primitive_resize_array(void);

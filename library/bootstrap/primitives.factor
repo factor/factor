@@ -227,6 +227,7 @@ call
     { "tuple>array" "generic"               }
     { "array>vector" "vectors"              }
     { "<string>" "strings"                  }
+    { "<quotation>" "kernel"                }
 } dup length 3 swap [ + ] map-with [ make-primitive ] 2each
 
 FORGET: make-primitive

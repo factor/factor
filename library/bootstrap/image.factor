@@ -25,15 +25,16 @@ IN: image
 : untag ( cell tag -- ) tag-mask bitnot bitand ; inline
 : tag ( cell -- tag ) tag-mask bitand ; inline
 
-: array-type     8  ; inline
-: hashtable-type 10 ; inline
-: vector-type    11 ; inline
-: string-type    12 ; inline
-: sbuf-type      13 ; inline
-: wrapper-type   14 ; inline
-: word-type      16 ; inline
-: tuple-type     17 ; inline
-
+: array-type      8  ; inline
+: hashtable-type  10 ; inline
+: vector-type     11 ; inline
+: string-type     12 ; inline
+: sbuf-type       13 ; inline
+: wrapper-type    14 ; inline
+: word-type       16 ; inline
+: tuple-type      17 ; inline
+: byte-array-type 18 ; inline
+: quotation-type  19 ; inline
 
 : base 1024 ;
 
@@ -204,12 +205,7 @@ M: word ' ( word -- pointer ) ;
 M: wrapper ' ( wrapper -- pointer )
     wrapped ' wrapper-type object-tag [ emit ] emit-object ;
 
-( Conses )
-
-: emit-cons ( first second tag -- pointer )
-    >r ' swap ' r> here-as -rot emit emit ;
-
-M: cons ' ( c -- tagged ) uncons cons-tag emit-cons ;
+( Ratios and complexes )
 
 : emit-pair
     [ [ emit ] 2apply ] emit-object ;
@@ -260,6 +256,12 @@ M: tuple ' ( tuple -- pointer )
 
 M: array ' ( array -- pointer )
     array-type emit-array ;
+
+! M: quotation ' ( array -- pointer )
+!     quotation-type emit-array ;
+
+M: cons ' ( c -- tagged )
+    objects get [ quotation-type emit-array ] cache ;
 
 M: vector ' ( vector -- pointer )
     dup underlying ' swap length

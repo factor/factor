@@ -190,7 +190,8 @@ void* primitives[] = {
 	primitive_array_to_tuple,
 	primitive_tuple_to_array,
 	primitive_array_to_vector,
-	primitive_string
+	primitive_string,
+	primitive_quotation
 };
 
 CELL primitive_to_xt(CELL primitive)

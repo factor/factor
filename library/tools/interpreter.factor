@@ -1,7 +1,7 @@
 ! Copyright (C) 2004, 2006 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 IN: interpreter
-USING: errors generic io kernel kernel-internals lists math
+USING: errors generic io kernel kernel-internals math
 namespaces prettyprint sequences strings vectors words ;
 
 ! A Factor interpreter written in Factor. It can transfer the
@@ -34,7 +34,7 @@ SYMBOL: meta-executing
 : up ( -- ) pop-c meta-cf set  pop-c drop ;
 
 : next ( -- obj )
-    meta-cf get [ meta-cf [ uncons ] change ] [ up next ] if ;
+    meta-cf get [ meta-cf [ ( uncons ) ] change ] [ up next ] if ;
 
 : meta-interp ( -- interp )
     meta-d get meta-r get meta-c get
@@ -51,7 +51,7 @@ SYMBOL: meta-executing
 : host-word ( word -- )
     [
         \ call push-c
-        [ continuation swap continue-with ] cons cons push-c
+        [ continuation swap continue-with ] ( cons cons ) push-c
         meta-interp continue
     ] callcc1 set-meta-interp pop-d 2drop ;
 

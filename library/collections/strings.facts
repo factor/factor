@@ -1,4 +1,4 @@
-USING: arrays help lists strings vectors ;
+USING: arrays help kernel lists strings vectors ;
 
 HELP: <string> "( n ch -- string )"
 { $values { "n" "a positive integer specifying string length" } { "elt" "an initial character" } }
@@ -71,4 +71,4 @@ HELP: >string "( seq -- str )"
 { $values { "seq" "a sequence of characters" } { "str" "a new string" } }
 { $description "Outputs a freshly-allocated string with the same elements as a given sequence." }
 { $errors "Throws an error if the sequence contains elements other than real numbers." }
-{ $see-also >array >sbuf >vector >list } ;
+{ $see-also >array >sbuf >vector >quotation } ;

@@ -1,5 +1,6 @@
 IN: arrays
-USING: help kernel-internals lists prettyprint strings vectors ;
+USING: help kernel kernel-internals lists prettyprint strings
+vectors ;
 
 HELP: <array> "( n elt -- array )"
 { $values { "n" "a positive integer specifying array length" } { "elt" "an initial element" } }
@@ -9,7 +10,7 @@ HELP: <array> "( n elt -- array )"
 HELP: >array "( seq -- array )"
 { $values { "seq" "a sequence" } { "array" "an array" } }
 { $description "Outputs a freshly-allocated array with the same elements as a given sequence." }
-{ $see-also >string >sbuf >vector >list } ;
+{ $see-also >string >sbuf >vector >quotation } ;
 
 HELP: 1array "( x -- array )"
 { $values { "x" "an object" } { "array" "an array" } }
