@@ -258,7 +258,7 @@ M: array ' ( array -- pointer )
     array-type emit-array ;
 
 M: quotation ' ( array -- pointer )
-    objects get [ quotation-type emit-array ] cache ;
+    quotation-type emit-array ;
 
 M: vector ' ( vector -- pointer )
     dup underlying ' swap length

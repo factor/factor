@@ -12,7 +12,7 @@ sequences syntax words ;
 
 : FUNCTION:
     scan "c-library" get scan string-mode on
-    [ string-mode off define-c-word ] [ ] ; parsing
+    [ string-mode off define-c-word ] f ; parsing
 
 : TYPEDEF: scan scan typedef ; parsing
 
@@ -30,11 +30,11 @@ sequences syntax words ;
     string-mode on [
         string-mode off
         0 [ define-member ] reduce define-struct-type
-    ] [ ] ; parsing
+    ] f ; parsing
 
 : C-ENUM:
     string-mode on [
         string-mode off 0 [
             create-in swap [ unit define-compound ] keep 1+
         ] reduce drop
-    ] [ ] ; parsing
+    ] f ; parsing

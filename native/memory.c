@@ -192,7 +192,7 @@ void primitive_next_object(void)
 	type = untag_header(value);
 	heap_scan_ptr += align8(untagged_object_size(heap_scan_ptr));
 
-	if(type < HEADER_TYPE)
+	if(type <= HEADER_TYPE)
 		dpush(RETAG(obj,type));
 	else
 		dpush(RETAG(obj,OBJECT_TYPE));

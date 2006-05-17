@@ -17,10 +17,10 @@ void call(CELL quot)
 	/* tail call optimization */
 	if(callframe_scan < callframe_end)
 	{
-		put(cs + CELLS,callframe);
-		put(cs + CELLS * 2,callframe_scan);
-		put(cs + CELLS * 3,callframe_end);
 		cs += CELLS * 3;
+		put(cs - CELLS * 2,callframe);
+		put(cs - CELLS,callframe_scan);
+		put(cs,callframe_end);
 	}
 
 	callframe = quot;
@@ -41,6 +41,8 @@ void handle_error(void)
 		}
 		else
 			fix_stacks();
+
+		callframe_scan = callframe_end = 0;
 
 		dpush(thrown_error);
 		/* Notify any 'catch' blocks */

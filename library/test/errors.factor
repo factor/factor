@@ -1,5 +1,5 @@
 IN: temporary
-USING: sequences ;
+USE: sequences
 USE: errors
 USE: kernel
 USE: namespaces

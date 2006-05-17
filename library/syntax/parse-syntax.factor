@@ -30,12 +30,12 @@ SYMBOL: t
 : ] >quotation parsed ; parsing
 : ; >quotation swap call ; parsing
 : } swap call parsed ; parsing
-: { [ >array ] [ ] ; parsing
-: V{ [ >vector ] [ ] ; parsing
-: H{ [ alist>hash ] [ ] ; parsing
-: C{ [ first2 rect> ] [ ] ; parsing
-: T{ [ >tuple ] [ ] ; parsing
-: W{ [ first <wrapper> ] [ ] ; parsing
+: { [ >array ] f ; parsing
+: V{ [ >vector ] f ; parsing
+: H{ [ alist>hash ] f ; parsing
+: C{ [ first2 rect> ] f ; parsing
+: T{ [ >tuple ] f ; parsing
+: W{ [ first <wrapper> ] f ; parsing
 : POSTPONE: scan-word parsed ; parsing
 : \ scan-word literalize parsed ; parsing
 : parsing word t "parsing" set-word-prop ; parsing
@@ -46,20 +46,20 @@ SYMBOL: t
 
 DEFER: PRIMITIVE: parsing
 : DEFER: CREATE dup reset-generic drop ; parsing
-: : CREATE dup reset-generic [ define-compound ] [ ] ; parsing
+: : CREATE dup reset-generic [ define-compound ] f ; parsing
 : GENERIC: CREATE dup reset-word define-generic ; parsing
-: G: CREATE dup reset-word [ define-generic* ] [ ] ; parsing
-: M: scan-word scan-word [ -rot define-method ] [ ] ; parsing
+: G: CREATE dup reset-word [ define-generic* ] f ; parsing
+: M: scan-word scan-word [ -rot define-method ] f ; parsing
 
 : UNION: ( -- class predicate definition )
     CREATE dup intern-symbol dup predicate-word
     [ dupd unit "predicate" set-word-prop ] keep
-    [ define-union ] [ ] ; parsing
+    [ define-union ] f ; parsing
 
 : PREDICATE: ( -- class predicate definition )
     scan-word CREATE dup intern-symbol
     dup rot "superclass" set-word-prop dup predicate-word
-    [ define-predicate-class ] [ ] ; parsing
+    [ define-predicate-class ] f ; parsing
 
 : TUPLE:
     scan string-mode on [ string-mode off define-tuple ] f ;
@@ -67,6 +67,6 @@ DEFER: PRIMITIVE: parsing
 
 : C:
     scan-word [ create-constructor ] keep
-    [ define-constructor ] [ ] ; parsing
+    [ define-constructor ] f ; parsing
 
 : FORGET: scan use get hash-stack [ forget ] when* ; parsing

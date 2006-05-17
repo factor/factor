@@ -19,15 +19,15 @@ void fix_stacks(void)
 {
 	if(STACK_UNDERFLOW(ds,stack_chain->data_region))
 		reset_datastack();
-	else if(STACK_OVERFLOW(ds,stack_chain->data_region))
+	if(STACK_OVERFLOW(ds,stack_chain->data_region))
 		reset_datastack();
-	else if(STACK_UNDERFLOW(rs,stack_chain->retain_region))
+	if(STACK_UNDERFLOW(rs,stack_chain->retain_region))
 		reset_retainstack();
-	else if(STACK_OVERFLOW(rs,stack_chain->retain_region))
+	if(STACK_OVERFLOW(rs,stack_chain->retain_region))
 		reset_retainstack();
-	else if(STACK_UNDERFLOW(cs,stack_chain->call_region))
+	if(STACK_UNDERFLOW(cs,stack_chain->call_region))
 		reset_callstack();
-	else if(STACK_OVERFLOW(cs,stack_chain->call_region))
+	if(STACK_OVERFLOW(cs,stack_chain->call_region))
 		reset_callstack();
 }
 
