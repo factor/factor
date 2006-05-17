@@ -1,7 +1,7 @@
 USING: kernel math sequences namespaces errors hashtables words arrays parser
        compiler syntax lists io ;
 USING: inspector prettyprint ;
-USING: optimizer compiler-frontend compiler-backend inference ;
+USING: optimizer inference ;
 IN: random-tester
 
 ! Tweak me
