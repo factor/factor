@@ -1,5 +1,5 @@
 IN: temporary
-USING: generic kernel lists math memory words prettyprint 
+USING: generic kernel math memory words prettyprint 
 sequences test ;
 
 TUPLE: testing x y z ;
@@ -9,14 +9,9 @@ TUPLE: testing x y z ;
 [ ] [
     num-types [
         type>class [
-            dup \ cons = [
-                ! too many conses!
-                drop
-            ] [
-                "predicate" word-prop instances [
-                    class drop
-                ] each
-            ] if
+            "predicate" word-prop instances [
+                class drop
+            ] each
         ] when*
     ] each
 ] unit-test

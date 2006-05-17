@@ -21,12 +21,17 @@ math namespaces sequences words ;
     [ math-class-compare 0 > ] 2keep ? ;
 
 : (math-upgrade) ( max class -- quot )
-    dupd = [ drop [ ] ] [ "coercer" word-prop ] if ;
+    dupd = [
+        drop [ ]
+    ] [
+        "coercer" word-prop [ [ ] ] unless*
+    ] if ;
 
 : math-upgrade ( left right -- quot )
     [ math-class-max ] 2keep
     >r over r> (math-upgrade)
-    >r (math-upgrade) dup [ 1 make-dip ] when r> append ;
+    >r (math-upgrade) dup empty? [ 1 make-dip ] unless
+    r> append ;
 
 TUPLE: no-math-method left right generic ;
 

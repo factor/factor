@@ -51,6 +51,7 @@ M: object set-nth-unsafe set-nth ;
 M: f length drop 0 ;
 M: f nth nip ;
 M: f nth-unsafe nip ;
+M: f like drop dup empty? [ drop f ] when ;
 
 ! Integers support the sequence protocol
 M: integer length ;
