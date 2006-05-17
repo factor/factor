@@ -15,9 +15,6 @@ CELL object_size(CELL pointer)
 	case BIGNUM_TYPE:
 		size = untagged_object_size(UNTAG(pointer));
 		break;
-	case CONS_TYPE:
-		size = sizeof(F_CONS);
-		break;
 	case OBJECT_TYPE:
 		if(pointer == F)
 			size = 0;
@@ -181,7 +178,7 @@ void primitive_next_object(void)
 {
 	CELL value = get(heap_scan_ptr);
 	CELL obj = heap_scan_ptr;
-	CELL size, type;
+	CELL type;
 
 	if(!heap_scan)
 		general_error(ERROR_HEAP_SCAN,F,F,true);
@@ -192,18 +189,8 @@ void primitive_next_object(void)
 		return;
 	}
 	
-	if(headerp(value))
-	{
-		size = align8(untagged_object_size(heap_scan_ptr));
-		type = untag_header(value);
-	}
-	else
-	{
-		size = CELLS * 2;
-		type = CONS_TYPE;
-	}
-
-	heap_scan_ptr += size;
+	type = untag_header(value);
+	heap_scan_ptr += align8(untagged_object_size(heap_scan_ptr));
 
 	if(type < HEADER_TYPE)
 		dpush(RETAG(obj,type));

@@ -76,17 +76,7 @@ INLINE void rpush(CELL top)
 	put(rs,top);
 }
 
-INLINE void call(CELL quot)
-{
-	/* tail call optimization */
-	if(callframe != F)
-	{
-		cpush(executing);
-		cpush(callframe);
-	}
-
-	callframe = quot;
-}
+void call(CELL quot);
 
 void handle_error();
 void run(void);

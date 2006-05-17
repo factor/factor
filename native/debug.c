@@ -1,26 +1,5 @@
 #include "factor.h"
 
-void print_cons(CELL cons)
-{
-	fprintf(stderr,"[ ");
-
-	do
-	{
-		print_obj(untag_cons(cons)->car);
-		fprintf(stderr," ");
-		cons = untag_cons(cons)->cdr;
-	}
-	while(TAG(cons) == CONS_TYPE);
-
-	if(cons != F)
-	{
-		fprintf(stderr,"| ");
-		print_obj(cons);
-		fprintf(stderr," ");
-	}
-	fprintf(stderr,"]");
-}
-
 void print_word(F_WORD* word)
 {
 	if(type_of(word->name) == STRING_TYPE)
@@ -60,9 +39,6 @@ void print_obj(CELL obj)
 	{
 	case FIXNUM_TYPE:
 		fprintf(stderr,"%ld",untag_fixnum_fast(obj));
-		break;
-	case CONS_TYPE:
-		print_cons(obj);
 		break;
 	case WORD_TYPE:
 		print_word(untag_word(obj));
@@ -243,9 +219,6 @@ void factorbug(void)
 		{
 			fprintf(stderr,"Call frame:\n");
 			print_obj(callframe);
-			fprintf(stderr,"\n");
-			fprintf(stderr,"Executing:\n");
-			print_obj(executing);
 			fprintf(stderr,"\n");
 		}
 		else if(strcmp(cmd,"e") == 0)

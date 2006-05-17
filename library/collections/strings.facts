@@ -1,4 +1,4 @@
-USING: arrays help kernel lists strings vectors ;
+USING: arrays help kernel strings vectors ;
 
 HELP: <string> "( n ch -- string )"
 { $values { "n" "a positive integer specifying string length" } { "elt" "an initial character" } }

@@ -47,6 +47,11 @@ M: object set-nth-unsafe set-nth ;
     pick pick >r >r >r swap nth-unsafe
     r> call r> r> swap set-nth-unsafe ; inline
 
+! The f object supports the sequence protocol trivially
+M: f length drop 0 ;
+M: f nth nip ;
+M: f nth-unsafe nip ;
+
 ! Integers support the sequence protocol
 M: integer length ;
 M: integer nth drop ;

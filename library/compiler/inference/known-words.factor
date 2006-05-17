@@ -1,7 +1,7 @@
 IN: inference
 USING: arrays alien assembler errors generic hashtables
 hashtables-internals interpreter io io-internals kernel
-kernel-internals lists math math-internals memory parser
+kernel-internals math math-internals memory parser
 sequences strings vectors words prettyprint ;
 
 \ declare [
@@ -73,10 +73,6 @@ sequences strings vectors words prettyprint ;
 ] "infer" set-word-prop
 
 ! Stack effects for all primitives
-\ cons [ [ object object ] [ cons ] ] "infer-effect" set-word-prop
-\ cons t "foldable" set-word-prop
-\ cons t "flushable" set-word-prop
-
 \ <vector> [ [ integer ] [ vector ] ] "infer-effect" set-word-prop
 \ <vector> t "flushable" set-word-prop
 

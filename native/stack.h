@@ -19,6 +19,8 @@ typedef struct _STACKS {
 	BOUNDED_BLOCK *call_region;
 	/* saved callframe on entry to callback */
 	CELL callframe;
+	CELL callframe_scan;
+	CELL callframe_end;
 	/* saved catchstack on entry to callback */
 	CELL catch_save;
 	/* saved cards_offset register on entry to callback */

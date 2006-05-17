@@ -44,17 +44,8 @@ void relocate_object(CELL relocating)
 
 INLINE CELL relocate_data_next(CELL relocating)
 {
-	CELL size = CELLS;
-	CELL cell = get(relocating);
-
-	if(headerp(cell))
-	{
-		size = untagged_object_size(relocating);
-		relocate_object(relocating);
-	}
-	else if(cell != F)
-		data_fixup((CELL*)relocating);
-
+	CELL size = untagged_object_size(relocating);
+	relocate_object(relocating);
 	return relocating + size;
 }
 

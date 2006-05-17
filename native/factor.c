@@ -11,9 +11,10 @@ void init_factor(const char* image,
 	init_stacks(ds_size,rs_size,cs_size);
 	/* callframe must be valid in case load_image() does GC */
 	callframe = F;
+	callframe_scan = callframe_end = 0;
 	thrown_error = F;
 	load_image(image,literal_size);
-	callframe = userenv[BOOT_ENV];
+	call(userenv[BOOT_ENV]);
 	init_c_io();
 	init_signals();
 	userenv[CPU_ENV] = tag_object(from_c_string(FACTOR_CPU_STRING));

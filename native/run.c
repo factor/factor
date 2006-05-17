@@ -5,6 +5,30 @@ INLINE void execute(F_WORD* word)
 	((XT)(word->xt))(word);
 }
 
+void call(CELL quot)
+{
+	F_ARRAY *untagged;
+
+	if(quot == F)
+		return;
+
+	type_check(QUOTATION_TYPE,quot);
+
+	/* tail call optimization */
+	if(callframe_scan < callframe_end)
+	{
+		put(cs + CELLS,callframe);
+		put(cs + CELLS * 2,callframe_scan);
+		put(cs + CELLS * 3,callframe_end);
+		cs += CELLS * 3;
+	}
+
+	callframe = quot;
+	untagged = (F_ARRAY*)UNTAG(quot);
+	callframe_scan = AREF(untagged,0);
+	callframe_end = AREF(untagged,array_capacity(untagged));
+}
+
 /* Called from platform_run() */
 void handle_error(void)
 {
@@ -13,17 +37,10 @@ void handle_error(void)
 		if(thrown_keep_stacks)
 		{
 			ds = thrown_ds;
-			cs = thrown_cs;
 			rs = thrown_rs;
-			callframe = thrown_callframe;
-			executing = thrown_executing;
 		}
 		else
-		{
 			fix_stacks();
-			callframe = F;
-			executing = F;
-		}
 
 		dpush(thrown_error);
 		/* Notify any 'catch' blocks */
@@ -38,19 +55,20 @@ void run(void)
 
 	for(;;)
 	{
-		if(callframe == F)
+		if(callframe_scan == callframe_end)
 		{
 			if(cs_bot - cs == CELLS)
 				return;
 
-			callframe = cpop();
-			executing = cpop();
+			callframe_end = get(cs);
+			callframe_scan = get(cs - CELLS);
+			callframe = get(cs - CELLS * 2);
+			cs -= CELLS * 3;
 			continue;
 		}
 
-		callframe = (CELL)untag_cons(callframe);
-		next = get(callframe);
-		callframe = get(callframe + CELLS);
+		next = get(callframe_scan);
+		callframe_scan += CELLS;
 
 		switch(type_of(next))
 		{
@@ -91,7 +109,6 @@ void undefined(F_WORD* word)
 void docol(F_WORD* word)
 {
 	call(word->def);
-	executing = tag_object(word);
 }
 
 /* pushes word parameter */

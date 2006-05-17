@@ -8,7 +8,6 @@ void* primitives[] = {
 	primitive_call,
 	primitive_ifte,
 	primitive_dispatch,
-	primitive_cons,
 	primitive_vector,
 	primitive_rehash_string,
 	primitive_sbuf,

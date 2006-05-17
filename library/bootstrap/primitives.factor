@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 IN: image
 USING: alien arrays generic hashtables help io kernel
-kernel-internals lists math namespaces parser sequences strings
+kernel-internals math namespaces parser sequences strings
 vectors words ;
 
 ! Some very tricky code creating a bootstrap embryo in the
@@ -44,7 +44,6 @@ call
     { "call" "kernel"                       }
     { "if" "kernel"                         }
     { "dispatch" "kernel-internals"         }
-    { "cons" "lists"                        }
     { "<vector>" "vectors"                  }
     { "rehash-string" "strings"             }
     { "<sbuf>" "strings"                    }
@@ -267,13 +266,6 @@ num-types f <array> builtins set
 "bignum?" "math" create t "inline" set-word-prop
 "bignum" "math" create 1 "bignum?" "math" create { } define-builtin
 "bignum" "math" create ">bignum" "math" lookup unit "coercer" set-word-prop
-
-"cons?" "lists" create t "inline" set-word-prop
-"cons" "lists" create 2 "cons?" "lists" create
-{
-    { 0 object { "car" "lists" } f }
-    { 1 object { "cdr" "lists" } f }
-} define-builtin
 
 "ratio?" "math" create t "inline" set-word-prop
 "ratio" "math" create 4 "ratio?" "math" create

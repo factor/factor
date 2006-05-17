@@ -4,7 +4,7 @@ IN: sequences
 USING: arrays kernel math sequences-internals strings
 vectors ;
 
-UNION: sequence array string sbuf vector ;
+UNION: sequence array string sbuf vector quotation ;
 
 : sequence= ( seq seq -- ? )
     2dup [ length ] 2apply = [

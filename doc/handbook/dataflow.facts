@@ -1,4 +1,4 @@
-USING: errors help kernel lists namespaces threads words ;
+USING: errors help kernel namespaces threads words ;
 
 GLOSSARY: "stack" "see datastack" ;
 
@@ -50,20 +50,20 @@ GLOSSARY: "combinator" "a word taking quotations or other words as input" ;
 
 ARTICLE: "quotations" "Quotations and combinators"
 "An evaluator executes quotations. Quotations are lists, and since lists can contain any Factor object, they can contain words. It is words that give quotations their operational behavior, as you can see in the following description of the evaluator algorithm."
-{ $list
-    { "If the callframe is " { $link f } ", the callstack is popped and becomes the new call frame." }
-    { "If the " { $link car } " of the callframe is a word, the word is executed:"
-        { $list
-            { "If the word is a symbol, it is pushed on the datastack. See " { $link "symbols" } }
-            { "If the word is a compound definition, the current callframe is pushed on the callstack, and the new callframe becomes the word definition. See " { $link "colon-definition" } }
-            { "If the word is compiled or primitive, the interpreter jumps to a machine code definition. See " { $link "primitives" } }
-            { "If the word is undefined, an error is raised. See " { $link "deferred" } }
-        }
-    }
-    { "If the " { $link car } " of the callframe is a wrapper, the wrapped object is pushed on the datastack. Wrappers arise from the " { $link POSTPONE: \ } " parsing word." }
-    { "Otherwise, the " { $link car } " of the call frame is pushed on the datastack." }
-    { "The callframe is set to the " { $link cdr } ", and the loop continues." }
-}
+! { $list
+!     { "If the callframe is " { $link f } ", the callstack is popped and becomes the new call frame." }
+!     { "If the " { $link car } " of the callframe is a word, the word is executed:"
+!         { $list
+!             { "If the word is a symbol, it is pushed on the datastack. See " { $link "symbols" } }
+!             { "If the word is a compound definition, the current callframe is pushed on the callstack, and the new callframe becomes the word definition. See " { $link "colon-definition" } }
+!             { "If the word is compiled or primitive, the interpreter jumps to a machine code definition. See " { $link "primitives" } }
+!             { "If the word is undefined, an error is raised. See " { $link "deferred" } }
+!         }
+!     }
+!     { "If the " { $link car } " of the callframe is a wrapper, the wrapped object is pushed on the datastack. Wrappers arise from the " { $link POSTPONE: \ } " parsing word." }
+!     { "Otherwise, the " { $link car } " of the call frame is pushed on the datastack." }
+!     { "The callframe is set to the " { $link cdr } ", and the loop continues." }
+! }
 "The interpreter performs the above steps literally. The compiler generates machine code which perform the steps in a more efficient manner than the interpreter."
 $terpri
 "The following pair of words are central. They invoke the evaluator reflectively, allowing higher-order programming and meta-programming techniques that lie at the heart of Factor's expressive power."

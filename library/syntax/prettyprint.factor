@@ -1,7 +1,7 @@
 ! Copyright (C) 2003, 2006 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 IN: prettyprint
-USING: alien arrays generic hashtables io kernel lists math
+USING: alien arrays generic hashtables io kernel math
 namespaces parser sequences strings styles vectors words ;
 
 ! State

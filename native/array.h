@@ -43,6 +43,7 @@ void primitive_array_to_tuple(void);
 void primitive_tuple_to_array(void);
 
 #define AREF(array,index) ((CELL)(array) + sizeof(F_ARRAY) + (index) * CELLS)
+#define UNAREF(array,ptr) (((CELL)(ptr)-(CELL)(array)-sizeof(F_ARRAY)) / CELLS)
 
 INLINE CELL array_capacity(F_ARRAY* array)
 {

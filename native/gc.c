@@ -64,6 +64,16 @@ void init_arena(CELL gens, CELL young_size, CELL aging_size)
 	cards_scanned = 0;
 }
 
+void collect_callframe_triple(CELL *callframe,
+	CELL *callframe_scan, CELL *callframe_end)
+{
+	*callframe_scan -= *callframe;
+	*callframe_end -= *callframe;
+	copy_handle(callframe);
+	*callframe_scan += *callframe;
+	*callframe_end += *callframe;
+}
+
 void collect_stack(BOUNDED_BLOCK *region, CELL top)
 {
 	CELL bottom = region->start;
@@ -71,6 +81,16 @@ void collect_stack(BOUNDED_BLOCK *region, CELL top)
 
 	for(ptr = bottom; ptr <= top; ptr += CELLS)
 		copy_handle((CELL*)ptr);
+}
+
+void collect_callstack(BOUNDED_BLOCK *region, CELL top)
+{
+	CELL bottom = region->start;
+	CELL ptr;
+
+	for(ptr = bottom; ptr <= top; ptr += CELLS * 3)
+		collect_callframe_triple((CELL*)ptr,
+			(CELL*)ptr + 1, (CELL*)ptr + 2);
 }
 
 void collect_roots(void)
@@ -82,8 +102,7 @@ void collect_roots(void)
 	copy_handle(&bignum_zero);
 	copy_handle(&bignum_pos_one);
 	copy_handle(&bignum_neg_one);
-	copy_handle(&executing);
-	copy_handle(&callframe);
+	collect_callframe_triple(&callframe,&callframe_scan,&callframe_end);
 
 	save_stacks();
 	stacks = stack_chain;
@@ -92,9 +111,12 @@ void collect_roots(void)
 	{
 		collect_stack(stacks->data_region,stacks->data);
 		collect_stack(stacks->retain_region,stacks->retain);
-		collect_stack(stacks->call_region,stacks->call);
+		
+		collect_callstack(stacks->call_region,stacks->call);
 
-		copy_handle(&stacks->callframe);
+		collect_callframe_triple(&stacks->callframe,
+			&stacks->callframe_scan,&stacks->callframe_end);
+
 		copy_handle(&stacks->catch_save);
 
 		stacks = stacks->next;
@@ -212,19 +234,8 @@ INLINE void collect_object(CELL scan)
 
 CELL collect_next(CELL scan)
 {
-	CELL size;
-	
-	if(headerp(get(scan)))
-	{
-		size = untagged_object_size(scan);
-		collect_object(scan);
-	}
-	else
-	{
-		size = CELLS;
-		copy_handle((CELL*)scan);
-	}
-
+	CELL size = untagged_object_size(scan);
+	collect_object(scan);
 	return scan + size;
 }
 

@@ -1,4 +1,4 @@
-USING: generic help kernel lists sequences ;
+USING: generic help kernel sequences ;
 GLOSSARY: "object" "a datum which may appear on the stack" ;
 
 ARTICLE: "objects" "Objects"

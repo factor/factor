@@ -61,6 +61,8 @@ void nest_stacks(void)
 	new_stacks->cards_offset = cards_offset;
 
 	new_stacks->callframe = callframe;
+	new_stacks->callframe_scan = callframe_scan;
+	new_stacks->callframe_end = callframe_end;
 	new_stacks->catch_save = userenv[CATCHSTACK_ENV];
 
 	new_stacks->data_region = alloc_bounded_block(ds_size);
@@ -71,6 +73,7 @@ void nest_stacks(void)
 	stack_chain = new_stacks;
 
 	callframe = F;
+	callframe_scan = callframe_end = 0;
 	reset_datastack();
 	reset_retainstack();
 	reset_callstack();
@@ -92,6 +95,8 @@ void unnest_stacks(void)
 	cards_offset = old_stacks->cards_offset;
 
 	callframe = old_stacks->callframe;
+	callframe_scan = old_stacks->callframe_scan;
+	callframe_end = old_stacks->callframe_end;
 	userenv[CATCHSTACK_ENV] = old_stacks->catch_save;
 
 	stack_chain = old_stacks->next;
@@ -239,8 +244,8 @@ void primitive_from_r(void)
 F_VECTOR* stack_to_vector(CELL bottom, CELL top)
 {
 	CELL depth = (top - bottom + CELLS) / CELLS;
-	F_VECTOR* v = vector(depth);
-	F_ARRAY* a = untag_array_fast(v->array);
+	F_VECTOR *v = vector(depth);
+	F_ARRAY *a = untag_array_fast(v->array);
 	memcpy(a + 1,(void*)bottom,depth * CELLS);
 	v->top = tag_fixnum(depth);
 	return v;
@@ -261,7 +266,26 @@ void primitive_retainstack(void)
 void primitive_callstack(void)
 {
 	maybe_gc(0);
-	dpush(tag_object(stack_to_vector(cs_bot,cs)));
+	
+	CELL depth = (cs - cs_bot + CELLS) / CELLS;
+	F_VECTOR *v = vector(depth);
+	F_ARRAY *a = untag_array_fast(v->array);
+	CELL i;
+	CELL ptr = cs_bot;
+	
+	for(i = 0; i < depth; i += 3, ptr += 3 * CELLS)
+	{
+		CELL quot = get(ptr);
+		CELL untagged = UNTAG(quot);
+		CELL position = UNAREF(untagged,get(ptr + CELLS));
+		CELL end = UNAREF(untagged,get(ptr + CELLS * 2));
+		put(AREF(a,i),quot);
+		put(AREF(a,i + 1),tag_fixnum(position));
+		put(AREF(a,i + 2),tag_fixnum(end));
+	}
+
+	v->top = tag_fixnum(depth);
+	dpush(tag_object(v));
 }
 
 /* returns pointer to top of stack */
@@ -285,5 +309,33 @@ void primitive_set_retainstack(void)
 
 void primitive_set_callstack(void)
 {
-	cs = vector_to_stack(untag_vector(dpop()),cs_bot);
+	F_VECTOR *v = untag_vector(dpop());
+	F_ARRAY *a = untag_array_fast(v->array);
+
+	CELL depth = untag_fixnum_fast(v->top);
+	depth -= (depth % 3);
+
+	CELL i, ptr;
+	for(i = 0, ptr = cs_bot; i < depth; i += 3, ptr += 3 * CELLS)
+	{
+		CELL quot = get(AREF(a,i));
+		type_check(QUOTATION_TYPE,quot);
+
+		F_ARRAY *untagged = (F_ARRAY*)UNTAG(quot);
+		CELL length = array_capacity(untagged);
+
+		F_FIXNUM position = to_fixnum(get(AREF(a,i + 1)));
+		F_FIXNUM end = to_fixnum(get(AREF(a,i + 2)));
+
+		if(end < 0) end = 0;
+		if(end > length) end = length;
+		if(position < 0) position = 0;
+		if(position > end) position = end;
+
+		put(ptr,quot);
+		put(ptr + CELLS,AREF(untagged,position));
+		put(ptr + CELLS * 2,AREF(untagged,end));
+	}
+
+	cs = cs_bot + depth * CELLS - CELLS;
 }

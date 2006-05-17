@@ -10,7 +10,7 @@
 ! format.
 
 USING: alien arrays errors generic hashtables
-hashtables-internals help io kernel kernel-internals lists math
+hashtables-internals help io kernel kernel-internals math
 namespaces parser prettyprint sequences sequences-internals
 strings vectors words ;
 IN: image
@@ -257,10 +257,7 @@ M: tuple ' ( tuple -- pointer )
 M: array ' ( array -- pointer )
     array-type emit-array ;
 
-! M: quotation ' ( array -- pointer )
-!     quotation-type emit-array ;
-
-M: cons ' ( c -- tagged )
+M: quotation ' ( array -- pointer )
     objects get [ quotation-type emit-array ] cache ;
 
 M: vector ' ( vector -- pointer )

@@ -58,8 +58,11 @@ CELL cs;
 /* TAGGED currently executing quotation */
 CELL callframe;
 
-/* TAGGED pointer to currently executing word */
-CELL executing;
+/* UNTAGGED currently executing word in quotation */
+CELL callframe_scan;
+
+/* UNTAGGED end of quotation */
+CELL callframe_end;
 
 #include <errno.h>
 #include <fcntl.h>
@@ -100,7 +103,6 @@ CELL executing;
 #include "word.h"
 #include "run.h"
 #include "signal.h"
-#include "cons.h"
 #include "fixnum.h"
 #include "array.h"
 #include "s48_bignumint.h"

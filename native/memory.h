@@ -42,7 +42,7 @@ INLINE void bput(CELL where, BYTE what)
 
 INLINE CELL align8(CELL a)
 {
-	return ((a & 7) == 0) ? a : ((a + 8) & ~7);
+	return (a + 7) & ~7;
 }
 
 #define TAG_MASK 7
@@ -54,7 +54,6 @@ INLINE CELL align8(CELL a)
 /*** Tags ***/
 #define FIXNUM_TYPE 0
 #define BIGNUM_TYPE 1
-#define CONS_TYPE 2
 #define OBJECT_TYPE 3
 #define RATIO_TYPE 4
 #define FLOAT_TYPE 5
@@ -89,13 +88,6 @@ CELL T;
 
 #define SLOT(obj,slot) ((obj) + (slot) * CELLS)
 
-INLINE bool headerp(CELL cell)
-{
-	return (cell != F
-		&& TAG(cell) == OBJECT_TYPE
-		&& cell < RETAG(TYPE_COUNT << TAG_BITS,OBJECT_TYPE));
-}
-
 INLINE CELL tag_header(CELL cell)
 {
 	return RETAG(cell << TAG_BITS,OBJECT_TYPE);
@@ -113,35 +105,23 @@ INLINE CELL tag_object(void* cell)
 
 INLINE CELL object_type(CELL tagged)
 {
-	if(tagged == F)
-		return F_TYPE;
-	else
-		return untag_header(get(UNTAG(tagged)));
-}
-
-INLINE void type_check(CELL type, CELL tagged)
-{
-	if(type < HEADER_TYPE)
-	{
-		if(TAG(tagged) == type)
-			return;
-	}
-	else if(TAG(tagged) == OBJECT_TYPE
-		&& object_type(tagged) == type)
-	{
-		return;
-	}
-
-	type_error(type,tagged);
+	return untag_header(get(UNTAG(tagged)));
 }
 
 INLINE CELL type_of(CELL tagged)
 {
-	CELL tag = TAG(tagged);
-	if(tag == OBJECT_TYPE)
-		return object_type(tagged);
+	if(tagged == F)
+		return F_TYPE;
+	else if(TAG(tagged) == FIXNUM_TYPE)
+		return FIXNUM_TYPE;
 	else
-		return tag;
+		return object_type(tagged);
+}
+
+INLINE void type_check(CELL type, CELL tagged)
+{
+	if(type_of(tagged) != type)
+		type_error(type,tagged);
 }
 
 CELL untagged_object_size(CELL pointer);

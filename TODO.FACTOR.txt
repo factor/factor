@@ -1,5 +1,4 @@
-should fix in 0.82:
-
+- method ordering and interpreter algorithm sections need updates
 - another i/o bug: on factorcode eventually all i/o times out
 - get factor running on mac intel
 

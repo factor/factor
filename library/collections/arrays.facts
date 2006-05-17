@@ -1,5 +1,5 @@
 IN: arrays
-USING: help kernel kernel-internals lists prettyprint strings
+USING: help kernel kernel-internals prettyprint strings
 vectors ;
 
 HELP: <array> "( n elt -- array )"

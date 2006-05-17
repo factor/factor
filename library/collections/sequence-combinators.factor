@@ -1,4 +1,4 @@
-! Copyright (C) 2005 Slava Pestov.
+! Copyright (C) 2005, 2006 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 IN: sequences-internals
 USING: arrays generic kernel kernel-internals math sequences
@@ -39,13 +39,10 @@ vectors ;
 
 IN: sequences
 
-G: each ( seq quot -- | quot: elt -- )
-    1 standard-combination ; inline
-
-M: object each ( seq quot -- )
+: each ( seq quot -- | quot: elt -- )
     swap dup length [
         [ swap nth-unsafe swap call ] 3keep
-    ] repeat 2drop ;
+    ] repeat 2drop ; inline
 
 : each-with ( obj seq quot -- | quot: obj elt -- )
     swap [ with ] each 2drop ; inline
@@ -53,16 +50,9 @@ M: object each ( seq quot -- )
 : reduce ( seq identity quot -- value | quot: x y -- z )
     swapd each ; inline
 
-G: find ( seq quot -- i elt | quot: elt -- ? )
-    1 standard-combination ; inline
-
-: find-with ( obj seq quot -- i elt | quot: elt -- ? )
-    swap [ with rot ] find 2swap 2drop ; inline
-
-G: map 1 standard-combination ; inline
-
-M: object map ( seq quot -- seq )
+: map ( seq quot -- seq | quot: elt -- elt )
     swap [ dup length [ (map) ] collect ] keep like 2nip ;
+    inline
 
 : map-with ( obj list quot -- list | quot: obj elt -- elt )
     swap [ with rot ] map 2nip ; inline
@@ -110,8 +100,11 @@ M: object map ( seq quot -- seq )
 : find-with* ( obj i seq quot -- i elt | quot: elt -- ? )
     -rot [ with rot ] find* 2swap 2drop ; inline
 
-M: object find ( seq quot -- i elt )
-    0 -rot find* ;
+: find ( seq quot -- i elt | quot: elt -- ? )
+    0 -rot find* ; inline
+
+: find-with ( obj seq quot -- i elt | quot: elt -- ? )
+    swap [ with rot ] find 2swap 2drop ; inline
 
 : find-last* ( i seq quot -- i elt )
     [
