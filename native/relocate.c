@@ -78,8 +78,9 @@ CELL get_rel_symbol(F_REL* rel)
 {
 	CELL arg = REL_ARGUMENT(rel);
 	F_ARRAY *pair = untag_array(get(compiling.base + arg * CELLS));
-	F_STRING *symbol = untag_string(AREF(pair,0));
-	DLL* dll = (AREF(pair,1) == F ? NULL : untag_dll(AREF(pair,1)));
+	F_STRING *symbol = untag_string(get(AREF(pair,0)));
+	CELL library = get(AREF(pair,1));
+	DLL *dll = (library == F ? NULL : untag_dll(library));
 	CELL sym;
 
 	if(dll != NULL && !dll->dll)

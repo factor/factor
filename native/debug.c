@@ -16,9 +16,7 @@ void print_word(F_WORD* word)
 
 void print_string(F_STRING* str)
 {
-	fprintf(stderr,"\"");
-	fprintf(stderr,"%s",to_c_string(str,true));
-	fprintf(stderr,"\"");
+	fprintf(stderr,"\"%s\"",to_c_string(str,true));
 }
 
 void print_array(F_ARRAY* array)
