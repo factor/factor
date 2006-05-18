@@ -32,34 +32,35 @@ void primitive_to_fixnum(void)
 	drepl(tag_fixnum(to_fixnum(dpeek())));
 }
 
+#define POP_FIXNUMS(x,y) \
+	F_FIXNUM x, y; \
+	y = untag_fixnum_fast(dpop()); \
+	x = untag_fixnum_fast(dpop());
+	
 /* The fixnum arithmetic operations defined in C are relatively slow.
 The Factor compiler has optimized assembly intrinsics for all these
 operations. */
 void primitive_fixnum_add(void)
 {
-	F_FIXNUM y = untag_fixnum_fast(dpop());
-	F_FIXNUM x = untag_fixnum_fast(dpop());
+	POP_FIXNUMS(x,y)
 	box_signed_cell(x + y);
 }
 
 void primitive_fixnum_add_fast(void)
 {
-	F_FIXNUM y = untag_fixnum_fast(dpop());
-	F_FIXNUM x = untag_fixnum_fast(dpop());
+	POP_FIXNUMS(x,y)
 	dpush(tag_fixnum(x + y));
 }
 
 void primitive_fixnum_subtract(void)
 {
-	F_FIXNUM y = untag_fixnum_fast(dpop());
-	F_FIXNUM x = untag_fixnum_fast(dpop());
+	POP_FIXNUMS(x,y)
 	box_signed_cell(x - y);
 }
 
 void primitive_fixnum_subtract_fast(void)
 {
-	F_FIXNUM y = untag_fixnum_fast(dpop());
-	F_FIXNUM x = untag_fixnum_fast(dpop());
+	POP_FIXNUMS(x,y)
 	dpush(tag_fixnum(x - y));
 }
 
@@ -69,8 +70,7 @@ void primitive_fixnum_subtract_fast(void)
  */
 void primitive_fixnum_multiply(void)
 {
-	F_FIXNUM y = untag_fixnum_fast(dpop());
-	F_FIXNUM x = untag_fixnum_fast(dpop());
+	POP_FIXNUMS(x,y)
 
 	if(x == 0 || y == 0)
 		dpush(tag_fixnum(0));
@@ -92,51 +92,44 @@ void primitive_fixnum_multiply(void)
 
 void primitive_fixnum_divint(void)
 {
-	F_FIXNUM y = untag_fixnum_fast(dpop());
-	F_FIXNUM x = untag_fixnum_fast(dpop());
+	POP_FIXNUMS(x,y)
 	box_signed_cell(x / y);
 }
 
 void primitive_fixnum_divfloat(void)
 {
-	F_FIXNUM y = untag_fixnum_fast(dpop());
-	F_FIXNUM x = untag_fixnum_fast(dpop());
+	POP_FIXNUMS(x,y)
 	dpush(tag_float((double)x / (double)y));
 }
 
 void primitive_fixnum_divmod(void)
 {
-	F_FIXNUM y = untag_fixnum_fast(dpop());
-	F_FIXNUM x = untag_fixnum_fast(dpop());
+	POP_FIXNUMS(x,y)
 	box_signed_cell(x / y);
 	box_signed_cell(x % y);
 }
 
 void primitive_fixnum_mod(void)
 {
-	F_FIXNUM y = untag_fixnum_fast(dpop());
-	F_FIXNUM x = untag_fixnum_fast(dpop());
+	POP_FIXNUMS(x,y)
 	dpush(tag_fixnum(x % y));
 }
 
 void primitive_fixnum_and(void)
 {
-	F_FIXNUM y = untag_fixnum_fast(dpop());
-	F_FIXNUM x = untag_fixnum_fast(dpop());
+	POP_FIXNUMS(x,y)
 	dpush(tag_fixnum(x & y));
 }
 
 void primitive_fixnum_or(void)
 {
-	F_FIXNUM y = untag_fixnum_fast(dpop());
-	F_FIXNUM x = untag_fixnum_fast(dpop());
+	POP_FIXNUMS(x,y)
 	dpush(tag_fixnum(x | y));
 }
 
 void primitive_fixnum_xor(void)
 {
-	F_FIXNUM y = untag_fixnum_fast(dpop());
-	F_FIXNUM x = untag_fixnum_fast(dpop());
+	POP_FIXNUMS(x,y)
 	dpush(tag_fixnum(x ^ y));
 }
 
@@ -147,8 +140,7 @@ void primitive_fixnum_xor(void)
  */
 void primitive_fixnum_shift(void)
 {
-	F_FIXNUM y = untag_fixnum_fast(dpop());
-	F_FIXNUM x = untag_fixnum_fast(dpop());
+	POP_FIXNUMS(x,y)
 
 	if(x == 0 || y == 0)
 	{
@@ -179,29 +171,25 @@ void primitive_fixnum_shift(void)
 
 void primitive_fixnum_less(void)
 {
-	F_FIXNUM y = untag_fixnum_fast(dpop());
-	F_FIXNUM x = untag_fixnum_fast(dpop());
+	POP_FIXNUMS(x,y)
 	box_boolean(x < y);
 }
 
 void primitive_fixnum_lesseq(void)
 {
-	F_FIXNUM y = untag_fixnum_fast(dpop());
-	F_FIXNUM x = untag_fixnum_fast(dpop());
+	POP_FIXNUMS(x,y)
 	box_boolean(x <= y);
 }
 
 void primitive_fixnum_greater(void)
 {
-	F_FIXNUM y = untag_fixnum_fast(dpop());
-	F_FIXNUM x = untag_fixnum_fast(dpop());
+	POP_FIXNUMS(x,y)
 	box_boolean(x > y);
 }
 
 void primitive_fixnum_greatereq(void)
 {
-	F_FIXNUM y = untag_fixnum_fast(dpop());
-	F_FIXNUM x = untag_fixnum_fast(dpop());
+	POP_FIXNUMS(x,y)
 	box_boolean(x >= y);
 }
 
@@ -213,13 +201,13 @@ void primitive_fixnum_not(void)
 #define DEFBOX(name,type)                                                      \
 void name (type integer)                                                       \
 {                                                                              \
-	dpush(tag_integer(integer));                                               \
+	dpush(tag_integer(integer));                                           \
 }
 
 #define DEFUNBOX(name,type)                                                    \
 type name(void)                                                                \
 {                                                                              \
-	return to_fixnum(dpop());                                                  \
+	return to_fixnum(dpop());                                              \
 }
 
 DEFBOX(box_signed_1, signed char)

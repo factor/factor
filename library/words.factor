@@ -82,8 +82,6 @@ M: word unxref-word* drop ;
 : reset-generic ( word -- )
     dup reset-word { "methods" "combination" } reset-props ;
 
-M: word literalize <wrapper> ;
-
 : gensym ( -- word )
     [ "G:" % \ gensym counter # ] "" make
     f <word> dup init-word ;

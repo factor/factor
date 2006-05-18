@@ -267,6 +267,42 @@ num-types f <array> builtins set
 "bignum" "math" create 1 "bignum?" "math" create { } define-builtin
 "bignum" "math" create ">bignum" "math" lookup unit "coercer" set-word-prop
 
+"word?" "words" create t "inline" set-word-prop
+"word" "words" create 2 "word?" "words" create
+{
+    { 1 fixnum { "hashcode" "kernel" } f }
+    {
+        2
+        object
+        { "word-name" "words" }
+        f
+    }
+    {
+        3
+        object
+        { "word-vocabulary" "words" }
+        { "set-word-vocabulary" "words" }
+    }
+    {
+        4
+        object
+        { "word-primitive" "words" }
+        { "set-word-primitive" "words" }
+    }
+    {
+        5
+        object
+        { "word-def" "words" }
+        { "set-word-def" "words" }
+    }
+    {
+        6
+        object
+        { "word-props" "words" }
+        { "set-word-props" "words" }
+    }
+} define-builtin
+
 "ratio?" "math" create t "inline" set-word-prop
 "ratio" "math" create 4 "ratio?" "math" create
 {
@@ -285,8 +321,9 @@ num-types f <array> builtins set
     { 2 real { "imaginary" "math" } f }
 } define-builtin
 
-"alien" "alien" create 7 "alien?" "alien" create
-{ { 1 object { "underlying-alien" "alien" } f } } define-builtin
+"wrapper?" "kernel" create t "inline" set-word-prop
+"wrapper" "kernel" create 7 "wrapper?" "kernel" create
+{ { 1 object { "wrapped" "kernel" } f } } define-builtin
 
 "array?" "arrays" create t "inline" set-word-prop
 "array" "arrays" create 8 "array?" "arrays" create
@@ -365,49 +402,16 @@ num-types f <array> builtins set
     }
 } define-builtin
 
-"wrapper?" "kernel" create t "inline" set-word-prop
-"wrapper" "kernel" create 14 "wrapper?" "kernel" create
-{ { 1 object { "wrapped" "kernel" } f } } define-builtin
+"quotation?" "kernel" create t "inline" set-word-prop
+"quotation" "kernel" create 14 "quotation?" "kernel" create
+{ } define-builtin
 
 "dll?" "alien" create t "inline" set-word-prop
 "dll" "alien" create 15 "dll?" "alien" create
 { { 1 object { "dll-path" "alien" } f } } define-builtin
 
-"word?" "words" create t "inline" set-word-prop
-"word" "words" create 16 "word?" "words" create
-{
-    { 1 fixnum { "hashcode" "kernel" } f }
-    {
-        2
-        object
-        { "word-name" "words" }
-        f
-    }
-    {
-        3
-        object
-        { "word-vocabulary" "words" }
-        { "set-word-vocabulary" "words" }
-    }
-    {
-        4
-        object
-        { "word-primitive" "words" }
-        { "set-word-primitive" "words" }
-    }
-    {
-        5
-        object
-        { "word-def" "words" }
-        { "set-word-def" "words" }
-    }
-    {
-        6
-        object
-        { "word-props" "words" }
-        { "set-word-props" "words" }
-    }
-} define-builtin
+"alien" "alien" create 16 "alien?" "alien" create
+{ { 1 object { "underlying-alien" "alien" } f } } define-builtin
 
 "tuple?" "kernel" create t "inline" set-word-prop
 "tuple" "kernel" create 17 "tuple?" "kernel" create
@@ -416,10 +420,6 @@ num-types f <array> builtins set
 "byte-array?" "arrays" create t "inline" set-word-prop
 "byte-array" "arrays" create 18
 "byte-array?" "arrays" create
-{ } define-builtin
-
-"quotation?" "kernel" create t "inline" set-word-prop
-"quotation" "kernel" create 19 "quotation?" "kernel" create
 { } define-builtin
 
 ! Define general-t type, which is any object that is not f.

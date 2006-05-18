@@ -26,7 +26,7 @@ void primitive_word(void)
 	word->def = F;
 	word->props = F;
 	word->xt = (CELL)undefined;
-	dpush(tag_object(word));
+	dpush(tag_word(word));
 }
 
 void primitive_update_xt(void)

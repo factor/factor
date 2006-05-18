@@ -42,16 +42,9 @@ void relocate_object(CELL relocating)
 	}
 }
 
-INLINE CELL relocate_data_next(CELL relocating)
-{
-	CELL size = untagged_object_size(relocating);
-	relocate_object(relocating);
-	return relocating + size;
-}
-
 void relocate_data()
 {
-	CELL relocating = tenured.base;
+	CELL relocating;
 
 	data_fixup(&userenv[BOOT_ENV]);
 	data_fixup(&userenv[GLOBAL_ENV]);
@@ -60,23 +53,19 @@ void relocate_data()
 	data_fixup(&bignum_pos_one);
 	data_fixup(&bignum_neg_one);
 
-	for(;;)
+	for(relocating = tenured.base;
+		relocating < tenured.here;
+		relocating += untagged_object_size(relocating))
 	{
-		if(relocating >= tenured.here)
-			break;
-
 		allot_barrier(relocating);
-		relocating = relocate_data_next(relocating);
+		relocate_object(relocating);
 	}
 
-	relocating = compiling.base;
-
-	for(;;)
+	for(relocating = compiling.base;
+		relocating < literal_top;
+		relocating += CELLS)
 	{
-		if(relocating >= literal_top)
-			break;
-
-		relocating = relocate_data_next(relocating);
+		data_fixup((CELL*)relocating);
 	}
 }
 
@@ -88,7 +77,7 @@ void undefined_symbol(void)
 CELL get_rel_symbol(F_REL* rel)
 {
 	CELL arg = REL_ARGUMENT(rel);
-	F_ARRAY *pair = untag_array(get(compiling.base + arg * sizeof(CELL)));
+	F_ARRAY *pair = untag_array(get(compiling.base + arg * CELLS));
 	F_STRING *symbol = untag_string(AREF(pair,0));
 	DLL* dll = (AREF(pair,1) == F ? NULL : untag_dll(AREF(pair,1)));
 	CELL sym;
@@ -199,12 +188,6 @@ void relocate_code()
 {
 	/* start relocating from the end of the space reserved for literals */
 	CELL relocating = literal_max;
-
-	for(;;)
-	{
-		if(relocating >= compiling.here)
-			break;
-
+	while(relocating < compiling.here)
 		relocating = relocate_code_next(relocating);
-	}
 }

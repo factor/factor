@@ -13,21 +13,26 @@ typedef struct {
 	CELL def;
 	/* TAGGED property hash for library code */
 	CELL props;
-	/* untagged execution token: jump here to execute word */
+	/* UNTAGGED execution token: jump here to execute word */
 	CELL xt;
 } F_WORD;
 
-typedef void (*XT)(F_WORD* word);
+typedef void (*XT)(F_WORD *word);
 
-INLINE F_WORD* untag_word_fast(CELL tagged)
+INLINE F_WORD *untag_word_fast(CELL tagged)
 {
 	return (F_WORD*)UNTAG(tagged);
 }
 
-INLINE F_WORD* untag_word(CELL tagged)
+INLINE F_WORD *untag_word(CELL tagged)
 {
 	type_check(WORD_TYPE,tagged);
 	return untag_word_fast(tagged);
+}
+
+INLINE CELL tag_word(F_WORD *word)
+{
+	return RETAG(word,WORD_TYPE);
 }
 
 void update_xt(F_WORD* word);

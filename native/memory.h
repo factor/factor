@@ -54,16 +54,17 @@ INLINE CELL align8(CELL a)
 /*** Tags ***/
 #define FIXNUM_TYPE 0
 #define BIGNUM_TYPE 1
+#define WORD_TYPE 2
 #define OBJECT_TYPE 3
 #define RATIO_TYPE 4
 #define FLOAT_TYPE 5
 #define COMPLEX_TYPE 6
-#define HEADER_TYPE 7 /* anything less than this is a tag */
-#define GC_COLLECTED 7 /* See gc.c */
+#define WRAPPER_TYPE 7
+
+#define HEADER_TYPE 7 /* anything less than or equal to this is a tag */
+#define GC_COLLECTED 0 /* See gc.c */
 
 /*** Header types ***/
-
-#define ALIEN_TYPE 7
 #define ARRAY_TYPE 8
 
 /* Canonical F object */
@@ -74,14 +75,13 @@ INLINE CELL align8(CELL a)
 #define VECTOR_TYPE 11
 #define STRING_TYPE 12
 #define SBUF_TYPE 13
-#define WRAPPER_TYPE 14
+#define QUOTATION_TYPE 14
 #define DLL_TYPE 15
-#define WORD_TYPE 16
+#define ALIEN_TYPE 16
 #define TUPLE_TYPE 17
 #define BYTE_ARRAY_TYPE 18
-#define QUOTATION_TYPE 19
 
-#define TYPE_COUNT 20
+#define TYPE_COUNT 19
 
 /* Canonical T object. It's just a word */
 CELL T;

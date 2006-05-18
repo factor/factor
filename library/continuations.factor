@@ -9,7 +9,7 @@ IN: errors
 USING: kernel kernel-internals ;
 
 : catchstack ( -- cs ) catchstack* clone ; inline
-: set-catchstack ( cs -- ) clone 6 setenv ; inline
+: set-catchstack ( cs -- ) >vector 6 setenv ; inline
 
 IN: kernel
 USING: namespaces sequences ;

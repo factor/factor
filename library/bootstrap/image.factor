@@ -30,11 +30,11 @@ IN: image
 : vector-type     11 ; inline
 : string-type     12 ; inline
 : sbuf-type       13 ; inline
-: wrapper-type    14 ; inline
-: word-type       16 ; inline
+: quotation-type  14 ; inline
+: dll-type        15 ; inline
+: alien-type      16 ; inline
 : tuple-type      17 ; inline
 : byte-array-type 18 ; inline
-: quotation-type  19 ; inline
 
 : base 1024 ;
 
@@ -179,7 +179,7 @@ M: f ' ( obj -- ptr )
         dup word-props ' ,
         0 ,
     ] { } make
-    word-type object-tag [ emit-seq ] emit-object
+    word-tag word-tag [ emit-seq ] emit-object
     swap objects get set-hash ;
 
 : word-error ( word msg -- )
@@ -203,7 +203,7 @@ M: word ' ( word -- pointer ) ;
 ( Wrappers )
 
 M: wrapper ' ( wrapper -- pointer )
-    wrapped ' wrapper-type object-tag [ emit ] emit-object ;
+    wrapped ' wrapper-tag wrapper-tag [ emit ] emit-object ;
 
 ( Ratios and complexes )
 

@@ -1,33 +1,13 @@
 #include "factor.h"
 
-CELL object_size(CELL pointer)
+CELL object_size(CELL tagged)
 {
-	CELL size;
-
-	switch(TAG(pointer))
-	{
-	case FIXNUM_TYPE:
-		size = 0;
-		break;
-	case RATIO_TYPE:
-	case FLOAT_TYPE:
-	case COMPLEX_TYPE:
-	case BIGNUM_TYPE:
-		size = untagged_object_size(UNTAG(pointer));
-		break;
-	case OBJECT_TYPE:
-		if(pointer == F)
-			size = 0;
-		else
-			size = untagged_object_size(UNTAG(pointer));
-		break;
-	default:
-		critical_error("Cannot determine object_size",pointer);
-		size = 0; /* Can't happen */
-		break;
-	}
-
-	return align8(size);
+	if(tagged == F)
+		return 0;
+	else if(TAG(tagged) == FIXNUM_TYPE)
+		return 0;
+	else
+		return untagged_object_size(UNTAG(tagged));
 }
 
 CELL untagged_object_size(CELL pointer)
@@ -167,6 +147,7 @@ void primitive_room(void)
 	dpush(tag_object(a));
 }
 
+/* Disables GC and activates next-object ( -- obj ) primitive */
 void primitive_begin_scan(void)
 {
 	garbage_collection(TENURED);
@@ -174,6 +155,7 @@ void primitive_begin_scan(void)
 	heap_scan = true;
 }
 
+/* Push object at heap scan cursor and advance; pushes f when done */
 void primitive_next_object(void)
 {
 	CELL value = get(heap_scan_ptr);
@@ -190,7 +172,7 @@ void primitive_next_object(void)
 	}
 	
 	type = untag_header(value);
-	heap_scan_ptr += align8(untagged_object_size(heap_scan_ptr));
+	heap_scan_ptr += untagged_object_size(heap_scan_ptr);
 
 	if(type <= HEADER_TYPE)
 		dpush(RETAG(obj,type));
@@ -198,6 +180,7 @@ void primitive_next_object(void)
 		dpush(RETAG(obj,OBJECT_TYPE));
 }
 
+/* Re-enables GC */
 void primitive_end_scan(void)
 {
 	heap_scan = false;

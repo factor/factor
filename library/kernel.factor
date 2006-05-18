@@ -23,8 +23,6 @@ M: object clone ;
 
 : set-boot ( quot -- ) 8 setenv ;
 
-: num-types ( -- n ) 20 ; inline
-
 : ? ( cond t f -- t/f ) rot [ drop ] [ nip ] if ; inline
 
 : >boolean t f ? ; inline
@@ -67,15 +65,6 @@ inline
 
 : keep-datastack datastack slip set-datastack drop ; inline
 
-M: wrapper =
-    over wrapper? [ [ wrapped ] 2apply = ] [ 2drop f ] if ;
-
-GENERIC: literalize ( obj -- obj )
-
-M: object literalize ;
-
-M: wrapper literalize <wrapper> ;
-
 IN: kernel-internals
 
 ! These words are unsafe. Don't use them.
@@ -88,17 +77,19 @@ IN: kernel-internals
 : make-tuple <tuple> [ 2 set-slot ] keep ; flushable
 
 ! Some runtime implementation details
+: num-types 19 ; inline
 : tag-mask BIN: 111 ; inline
 : num-tags 8 ; inline
 : tag-bits 3 ; inline
 
 : fixnum-tag  BIN: 000 ; inline
 : bignum-tag  BIN: 001 ; inline
-: cons-tag    BIN: 010 ; inline
+: word-tag    BIN: 010 ; inline
 : object-tag  BIN: 011 ; inline
 : ratio-tag   BIN: 100 ; inline
 : float-tag   BIN: 101 ; inline
 : complex-tag BIN: 110 ; inline
+: wrapper-tag BIN: 111 ; inline
 
 : cell 17 getenv ; foldable
 

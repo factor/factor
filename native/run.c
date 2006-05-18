@@ -72,7 +72,7 @@ void run(void)
 		next = get(callframe_scan);
 		callframe_scan += CELLS;
 
-		switch(type_of(next))
+		switch(TAG(next))
 		{
 		case WORD_TYPE:
 			execute(untag_word_fast(next));
@@ -131,10 +131,9 @@ void primitive_call(void)
 
 void primitive_ifte(void)
 {
-	CELL f = dpop();
-	CELL t = dpop();
-	CELL cond = dpop();
-	call(cond == F ? f : t);
+	ds -= CELLS * 3;
+	CELL cond = get(ds + CELLS);
+	call(cond == F ? get(ds + CELLS * 3) : get(ds + CELLS * 2));
 }
 
 void primitive_dispatch(void)
