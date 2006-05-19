@@ -1,9 +1,10 @@
 ! Copyright (C) 2006 Slava Pestov
 ! See http://factorcode.org/license.txt for BSD license.
 IN: cocoa
-USING: alien errors gadgets io kernel namespaces
-objc objc-NSApplication objc-NSAutoreleasePool objc-NSException
-objc-NSNotificationCenter objc-NSObject objc-NSView threads ;
+USING: alien errors gadgets io kernel namespaces objc
+objc-NSApplication objc-NSAutoreleasePool objc-NSException
+objc-NSNotificationCenter objc-NSObject objc-NSView sequences
+threads ;
 
 : with-autorelease-pool ( quot -- )
     NSAutoreleasePool [new] slip [release] ; inline
@@ -45,5 +46,6 @@ objc-NSNotificationCenter objc-NSObject objc-NSView threads ;
 
 IN: errors
 
-: objc-error. ( alien -- )
-    "Objective C exception:" print  [reason] CF>string print ;
+: objc-error. ( error -- )
+    "Objective C exception:" print
+    third [reason] CF>string print ;

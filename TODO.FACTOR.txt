@@ -1,10 +1,6 @@
-- method ordering and interpreter algorithm sections need updates
-- another i/o bug: on factorcode eventually all i/o times out
-- get factor running on mac intel
-- remove F_USERENV rel
-
 + io:
 
+- another i/o bug: on factorcode eventually all i/o times out
 - gdb triggers 'mutliple i/o ops on port' error
 - stream server can hang because of exception handler limitations
 - better i/o scheduler
@@ -13,13 +9,18 @@
 
 + ui/help:
 
+- method ordering and interpreter algorithm sections need updates
+- run file dialog is broken
+- implement handlers for open, quit events, and whatever else
+- fix top level window positioning
+- changing window titles
+- reimplement clicking input
+- polish OS X menu bar code
 - clicks sent twice
 - speed up ideas:
   - only do clipping for certain gadgets
   - use glRect
-- polish OS X menu bar code
 - help search
-- reimplement clicking input
 - reimplement tab completion
 - x11 input methods
 - x11 title bars are funny
@@ -40,11 +41,12 @@
 - tabular formatting - for inspector, changes and $values in help
 - grid layout
 - variable width word wrap
-- fix top level window positioning
-- changing window titles
 
 + compiler/ffi:
 
+- get factor running on mac intel
+- remove F_USERENV rel
+- cocoa exceptions are broken
 - free up r11, r12 as a vreg on ppc
 - float= on powerpc doesn't consider nans equal
 - intrinsic fixnum>float float>fixnum
