@@ -4,7 +4,12 @@ IN: words
 USING: errors graphs hashtables kernel kernel-internals
 math namespaces sequences strings vectors ;
 
-M: word <=> [ word-name ] 2apply <=> ;
+M: word <=>
+    2dup [ word-vocabulary ] 2apply <=> dup zero? [
+        drop [ word-name ] 2apply <=>
+    ] [
+        2nip
+    ] if ;
 
 GENERIC: definer ( word -- word )
 
