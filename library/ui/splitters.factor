@@ -21,9 +21,9 @@ TUPLE: splitter split ;
     0 max 1 min over set-splitter-split relayout-1 ;
 
 : divider-actions ( thumb -- )
-    dup [ drop ] [ button-down ] set-action
-    dup [ drop ] [ button-up ] set-action
-    [ gadget-parent divider-motion ] [ drag ] set-action ;
+    dup [ drop ] T{ button-down } set-action
+    dup [ drop ] T{ button-up } set-action
+    [ gadget-parent divider-motion ] T{ drag } set-action ;
 
 C: divider ( -- divider )
     dup delegate>gadget

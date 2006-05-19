@@ -38,9 +38,9 @@ M: world motion-event ( event world -- )
 
 : modifiers
     {
-        { "SHIFT" HEX: 1 }
-        { "CTRL" HEX: 4 }
-        { "ALT" HEX: 8 }
+        { S+ HEX: 1 }
+        { C+ HEX: 4 }
+        { A+ HEX: 8 }
     } ;
     
 : key-codes
@@ -77,7 +77,7 @@ M: world motion-event ( event world -- )
 
 : event>gesture ( event -- gesture )
     dup XKeyEvent-state modifiers modifier
-    swap key-code [ add ] [ drop f ] if* ;
+    swap key-code [ <key-down> ] [ drop f ] if* ;
 
 M: world key-down-event ( event world -- )
     world-focus over event>gesture [

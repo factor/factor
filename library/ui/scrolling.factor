@@ -88,9 +88,9 @@ M: viewport focusable-child* ( viewport -- gadget )
 : scroll-down-line scroller-y 1 swap slide-by-line ;
 
 : scroller-actions ( scroller -- )
-    dup [ scroll-up-line ] [ wheel-up ] set-action
-    dup [ scroll-down-line ] [ wheel-down ] set-action
-    [ scroller-viewport relayout-1 ] [ slider-changed ] set-action ;
+    dup [ scroll-up-line ] T{ wheel-up } set-action
+    dup [ scroll-down-line ] T{ wheel-down } set-action
+    [ scroller-viewport relayout-1 ] T{ slider-changed } set-action ;
 
 C: scroller ( gadget -- scroller )
     #! Wrap a scrolling pane around the gadget.

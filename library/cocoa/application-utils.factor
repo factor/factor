@@ -8,10 +8,10 @@ objc-NSNotificationCenter objc-NSObject objc-NSView threads ;
 : with-autorelease-pool ( quot -- )
     NSAutoreleasePool [new] slip [release] ; inline
 
+: NSApp NSApplication [sharedApplication] ;
+
 : with-cocoa ( quot -- )
-    [
-        NSApplication [sharedApplication] drop call
-    ] with-autorelease-pool ;
+    [ NSApp drop call ] with-autorelease-pool ;
 
 : <NSString> <CFString> [autorelease] ;
 
@@ -30,9 +30,8 @@ objc-NSNotificationCenter objc-NSObject objc-NSView threads ;
     dup do-event [ do-events ] [ drop ] if ;
 
 : event-loop ( -- )
-    [
-        NSApplication [sharedApplication] do-events ui-step
-    ] with-autorelease-pool event-loop ;
+    [ NSApp do-events ui-step ] with-autorelease-pool
+    event-loop ;
 
 : add-observer ( observer selector name object -- )
     >r >r >r >r NSNotificationCenter [defaultCenter] r> r>
@@ -42,8 +41,7 @@ objc-NSNotificationCenter objc-NSObject objc-NSView threads ;
     >r NSNotificationCenter [defaultCenter] r>
     [removeObserver:] ;
 
-: finish-launching ( -- )
-    NSApplication [sharedApplication] [finishLaunching] ;
+: finish-launching ( -- ) NSApp [finishLaunching] ;
 
 IN: errors
 

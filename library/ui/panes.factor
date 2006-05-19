@@ -43,10 +43,6 @@ SYMBOL: structured-input
     "\"structured-input\" \"gadgets-panes\" lookup get-global call"
     r> pane-eval ;
 
-: editor-commit ( editor -- line )
-    #! Add current line to the history, and clear the editor.
-    [ commit-history line-text get line-clear ] with-editor ;
-
 : replace-input ( string pane -- )
     pane-input set-editor-text ;
 
@@ -59,18 +55,19 @@ SYMBOL: structured-input
     ] with-stream* ;
 
 : pane-commit ( pane -- )
-    dup pane-input editor-commit swap 2dup print-input pane-eval ;
+    dup pane-input commit-editor-text
+    swap 2dup print-input pane-eval ;
 
 : pane-clear ( pane -- )
     dup pane-output clear-incremental pane-current clear-gadget ;
  
 : pane-actions ( line -- )
     H{
-        { [ button-down ] [ pane-input click-editor ] }
-        { [ "RETURN" ] [ pane-commit ] }
-        { [ "UP" ] [ pane-input [ history-prev ] with-editor ] }
-        { [ "DOWN" ] [ pane-input [ history-next ] with-editor ] }
-        { [ "CTRL" "l" ] [ pane-clear ] }
+        { T{ button-down } [ pane-input click-editor ] }
+        { T{ key-down f f "RETURN" } [ pane-commit ] }
+        { T{ key-down f f "UP" } [ pane-input [ history-prev ] with-editor ] }
+        { T{ key-down f f "DOWN" } [ pane-input [ history-next ] with-editor ] }
+        { T{ key-down f { C+ } "l" } [ pane-clear ] }
     } add-actions ;
 
 C: pane ( -- pane )

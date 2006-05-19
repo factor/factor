@@ -6,11 +6,11 @@ USING: hashtables kernel namespaces objc objc-NSObject ;
 
 SYMBOL: callbacks
 
-H{ } clone callbacks set
+H{ } clone callbacks set-global
 
 "NSObject" "FactorCallback" {
     { "perform:" "void" { "id" "SEL" "id" }
-        [ nip swap callbacks get hash call ]
+        [ 2drop callbacks get hash call ]
     }
     
     { "dealloc" "void" { "id" "SEL" }

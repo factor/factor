@@ -46,6 +46,10 @@ TUPLE: editor line caret font color ;
 : set-editor-text ( text editor -- )
     [ set-line-text ] with-editor ;
 
+: commit-editor-text ( editor -- line )
+    #! Add current line to the history, and clear the editor.
+    [ commit-history line-text get line-clear ] with-editor ;
+
 : focus-editor ( editor -- )
     dup editor-caret swap add-caret ;
 
@@ -96,23 +100,23 @@ TUPLE: editor line caret font color ;
 
 : editor-actions ( editor -- )
     H{
-        { [ gain-focus ] [ focus-editor ] }
-        { [ lose-focus ] [ unfocus-editor ] }
-        { [ button-down ] [ click-editor ] }
-        { [ "BACKSPACE" ] [ [ T{ char-elt } delete-prev-elt ] with-editor ] }
-        { [ "DELETE" ] [ [ T{ char-elt } delete-next-elt ] with-editor ] }
-        { [ "CTRL" "BACKSPACE" ] [ [ T{ word-elt } delete-prev-elt ] with-editor ] }
-        { [ "CTRL" "DELETE" ] [ [ T{ word-elt } delete-next-elt ] with-editor ] }
-        { [ "ALT" "BACKSPACE" ] [ [ T{ document-elt } delete-prev-elt ] with-editor ] }
-        { [ "ALT" "DELETE" ] [ [ T{ document-elt } delete-next-elt ] with-editor ] }
-        { [ "LEFT" ] [ [ T{ char-elt } prev-elt ] with-editor ] }
-        { [ "RIGHT" ] [ [ T{ char-elt } next-elt ] with-editor ] }
-        { [ "CTRL" "LEFT" ] [ [ T{ word-elt } prev-elt ] with-editor ] }
-        { [ "CTRL" "RIGHT" ] [ [ T{ word-elt } next-elt ] with-editor ] }
-        { [ "HOME" ] [ [ T{ document-elt } prev-elt ] with-editor ] }
-        { [ "END" ] [ [ T{ document-elt } next-elt ] with-editor ] }
-        { [ "CTRL" "k" ] [ [ line-clear ] with-editor ] }
-        { [ "TAB" ] [ do-completion ] }
+        { T{ gain-focus } [ focus-editor ] }
+        { T{ lose-focus } [ unfocus-editor ] }
+        { T{ button-down } [ click-editor ] }
+        { T{ key-down f f "BACKSPACE" } [ [ T{ char-elt } delete-prev-elt ] with-editor ] }
+        { T{ key-down f f "DELETE" } [ [ T{ char-elt } delete-next-elt ] with-editor ] }
+        { T{ key-down f { C+ } "BACKSPACE" } [ [ T{ word-elt } delete-prev-elt ] with-editor ] }
+        { T{ key-down f { C+ } "DELETE" } [ [ T{ word-elt } delete-next-elt ] with-editor ] }
+        { T{ key-down f { A+ } "BACKSPACE" } [ [ T{ document-elt } delete-prev-elt ] with-editor ] }
+        { T{ key-down f { A+ } "DELETE" } [ [ T{ document-elt } delete-next-elt ] with-editor ] }
+        { T{ key-down f f "LEFT" } [ [ T{ char-elt } prev-elt ] with-editor ] }
+        { T{ key-down f f "RIGHT" } [ [ T{ char-elt } next-elt ] with-editor ] }
+        { T{ key-down f { C+ } "LEFT" } [ [ T{ word-elt } prev-elt ] with-editor ] }
+        { T{ key-down f { C+ } "RIGHT" } [ [ T{ word-elt } next-elt ] with-editor ] }
+        { T{ key-down f f "HOME" } [ [ T{ document-elt } prev-elt ] with-editor ] }
+        { T{ key-down f f "END" } [ [ T{ document-elt } next-elt ] with-editor ] }
+        { T{ key-down f { C+ } "k" } [ [ line-clear ] with-editor ] }
+        { T{ key-down f f "TAB" } [ do-completion ] }
     } add-actions ;
 
 C: editor ( text -- )

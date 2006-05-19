@@ -6,7 +6,7 @@ generic io kernel math namespaces sequences styles threads ;
 
 TUPLE: button rollover? pressed? quot ;
 
-: button-down? ( -- ? )
+: buttons-down? ( -- ? )
     hand-buttons get-global empty? not ;
 
 : mouse-over? ( gadget -- ? )
@@ -17,7 +17,7 @@ TUPLE: button rollover? pressed? quot ;
 
 : button-update ( button -- )
     dup mouse-over? over set-button-rollover?
-    dup mouse-clicked? button-down? and
+    dup mouse-clicked? buttons-down? and
     over button-rollover? and over set-button-pressed?
     relayout-1 ;
 
@@ -29,10 +29,10 @@ TUPLE: button rollover? pressed? quot ;
 
 : button-gestures ( button quot -- )
     over set-button-quot
-    dup [ button-clicked ] [ button-up ] set-action
-    dup [ button-update ] [ button-down ] set-action
-    dup [ button-update ] [ mouse-leave ] set-action
-    [ button-update ] [ mouse-enter ] set-action ;
+    dup [ button-clicked ] T{ button-up } set-action
+    dup [ button-update ] T{ button-down } set-action
+    dup [ button-update ] T{ mouse-leave } set-action
+    [ button-update ] T{ mouse-enter } set-action ;
 
 C: button ( gadget quot -- button )
     rot <default-border> over set-gadget-delegate
@@ -54,8 +54,8 @@ C: button ( gadget quot -- button )
     dup button-update remove-timer ;
 
 : repeat-actions ( button -- )
-    dup [ repeat-button-down ] [ button-down ] set-action
-    [ repeat-button-up ] [ button-up ] set-action ;
+    dup [ repeat-button-down ] T{ button-down } set-action
+    [ repeat-button-up ] T{ button-up } set-action ;
 
 : <repeat-button> ( gadget quot -- button )
     #! Button that calls the quotation every 100ms as long as

@@ -1,28 +1,24 @@
-USING: kernel sequences objc cocoa objc-NSObject
-objc-NSApplication objc-NSWindow objc-NSMenu objc-NSMenuItem
-objc-FactorCallback gadgets gadgets-layouts gadgets-listener
-words compiler strings ;
-
-! for words used by menu bar actions (copied from launchpad.factor)
-USING: gadgets gadgets-browser gadgets-listener help inspector
-io kernel memory namespaces sequences gadgets-launchpad ;
-
-IN: cocoa
-
-: NSApp NSApplication [sharedApplication] ;
+USING: cocoa compiler gadgets gadgets-launchpad gadgets-layouts
+gadgets-listener kernel memory objc objc-FactorCallback
+objc-NSApplication objc-NSMenu objc-NSMenuItem objc-NSObject
+objc-NSWindow sequences strings words ;
+IN: gadgets-cocoa
 
 ! -------------------------------------------------------------------------
 
-GENERIC: to-target-and-action ( selector-string-or-quotation -- target action )
+GENERIC: to-target-and-action ( spec -- target action )
 
-M: string to-target-and-action sel_registerName f swap ;
 M: f to-target-and-action f ;
-M: quotation to-target-and-action \ drop add* <FactorCallback> "perform:" sel_registerName ;
+M: string to-target-and-action sel_registerName f swap ;
+M: word to-target-and-action
+    unit <FactorCallback> "perform:" sel_registerName ;
 
+: <NSMenu> ( title -- )
+    NSMenu [alloc]
+    swap <NSString> [initWithTitle:]
+    [autorelease] ;
 
-: <NSMenu> NSMenu [alloc] swap <NSString> [initWithTitle:] [autorelease] ;
-
-: set-main-menu NSApp swap [setMainMenu:] ;
+: set-main-menu ( menu -- ) NSApp swap [setMainMenu:] ;
 
 : <NSMenuItem> ( title action equivalent -- item )
     >r >r >r
@@ -32,7 +28,7 @@ M: quotation to-target-and-action \ drop add* <FactorCallback> "perform:" sel_re
     r> <NSString>
     [initWithTitle:action:keyEquivalent:] [autorelease] ;
 
-: make-menu-item-2 ( title selector-string-or-quotation equivalent -- item )
+: make-menu-item-2 ( title spec -- item )
     swap to-target-and-action swap >r swap <NSMenuItem> dup r> [setTarget:] ;
 
 : submenu-to-item ( menu -- item )
@@ -96,23 +92,24 @@ DEFER: described-menu
             ! Preferences goes here
             { {
                 "Services"
-            } [ dup NSApp swap [setServicesMenu:] ] }
+            } [ NSApp over [setServicesMenu:] ] }
             { }
             { "Hide Factor" "hide:" "h" }
             { "Hide Others" "hideOtherApplications:" "h" [ and-option-equivalent-modifier ] }
             { "Show All" "unhideAllApplications:" "" }
             { }
-            { "Save Image" [ save ] "s" }
+            { "Save Image" save "s" }
             { }
             { "Quit" "terminate:" "q" }
-        } [ dup NSApp swap [setAppleMenu:] ] }
+        } [ NSApp over [setAppleMenu:] ] }
         { {
             ! Tools is standing in for the File menu
             "Tools"
-            { "Listener" [ listener-window ] "n" }
-            { "Vocabulary List" [ [ vocabs. ] "Vocabularies" pane-window ] "y" }
-            { "Globals" [ global browser-window ] "u" }
-            { "Memory" [ [ heap-stats. terpri room. ] "Memory" pane-window ] "u" }
+            { "Listener" listener-window "n" }
+            { "Apropos" apropos-window "r" }
+            { "Vocabularies" vocabs-window "y" }
+            { "Globals" global-window "u" }
+            { "Memory" memory-window "m" }
         } }
         { {
             "Edit"
@@ -136,11 +133,10 @@ DEFER: described-menu
             { "Minimize All" "miniaturizeAll:" "m"  [ and-alternate and-option-equivalent-modifier ] }
             { }
             { "Bring All to Front" "arrangeInFront:" "" }
-        } [ dup NSApp swap [setWindowsMenu:] ] }
+        } [ NSApp over [setWindowsMenu:] ] }
         { {
             "Help"
-            { "Factor Documentation" [ handbook-window ] "?" }
-            { "Help Index" [ [ articles. ] "Help index" pane-window ] "" }
-            { "Vocabularies" [ [ vocabs. ] "Vocabularies" pane-window ] "" }
+            { "Factor Documentation" handbook-window "?" }
+            { "Help Index" articles-window "" }
         } }
     } described-menu set-main-menu ;

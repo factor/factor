@@ -98,7 +98,7 @@ TUPLE: browser-button object ;
 : browser-button-gestures ( gadget -- )
     [
         [ browser-button-object browser-window ] if-clicked
-    ] [ button-up 3 ] set-action ;
+    ] T{ button-up f 3 } set-action ;
 
 C: browser-button ( gadget object -- button )
     [ set-browser-button-object ] keep

@@ -34,14 +34,14 @@ TUPLE: slider elevator thumb value saved max page ;
     dup slider-elevator relayout-1
     dup slider-max over slider-page max swap set-slider-max ;
 
-SYMBOL: slider-changed
+TUPLE: slider-changed ;
 
 : set-slider-value* ( value slider -- )
     [ fix-slider-value ] keep 2dup slider-value = [
         2drop
     ] [
         [ set-slider-value ] keep [ fix-slider ] keep
-        [ slider-changed ] swap handle-gesture drop
+        T{ slider-changed } swap handle-gesture drop
     ] if ;
 
 : begin-drag ( thumb -- )
@@ -53,9 +53,9 @@ SYMBOL: slider-changed
     set-slider-value* ;
 
 : thumb-actions ( thumb -- )
-    dup [ drop ] [ button-up ] set-action
-    dup [ begin-drag ] [ button-down ] set-action
-    [ do-drag ] [ drag ] set-action ;
+    dup [ drop ] T{ button-up } set-action
+    dup [ begin-drag ] T{ button-down } set-action
+    [ do-drag ] T{ drag } set-action ;
 
 : <thumb> ( vector -- thumb )
     <gadget> [ set-gadget-orientation ] keep
@@ -77,7 +77,7 @@ SYMBOL: slider-changed
     swap slide-by-page ;
 
 : elevator-actions ( elevator -- )
-    [ elevator-click ] [ button-down ] set-action ;
+    [ elevator-click ] T{ button-down } set-action ;
 
 C: elevator ( vector -- elevator )
     dup delegate>gadget [ set-gadget-orientation ] keep

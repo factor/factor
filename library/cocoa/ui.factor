@@ -45,10 +45,10 @@ H{ } clone views set-global
 
 : modifiers
     {
-        { "SHIFT" HEX: 10000 }
-        { "CTRL" HEX: 40000 }
-        { "ALT" HEX: 80000 }
-        { "META" HEX: 100000 }
+        { S+ HEX: 10000 }
+        { C+ HEX: 40000 }
+        { A+ HEX: 80000 }
+        { M+ HEX: 100000 }
     } ;
 
 : key-codes
@@ -70,7 +70,8 @@ H{ } clone views set-global
     [ ] [ [charactersIgnoringModifiers] CF>string ] ?if ;
 
 : event>gesture ( event -- gesture )
-    dup [modifierFlags] modifiers modifier swap key-code add ;
+    dup [modifierFlags] modifiers modifier swap key-code
+    <key-down> ;
 
 : send-key-event ( view event -- )
     >r view world-focus r> dup event>gesture pick handle-gesture
@@ -187,9 +188,9 @@ H{ } clone views set-global
 "NSObject" "FactorUIWindowDelegate" {
     { "windowWillUseStandardFrame:defaultFrame:" "NSRect" { "id" "SEL" "id" "NSRect" }
         [
-            drop 2nip ( self sel window default-frame -- window )
-            dup window-content-rect NSRect-x-far-y ( window -- window x y )
-            pick window-root-gadget-pref-dim first2 ( window x y -- window x y w h )
+            drop 2nip
+            dup window-content-rect NSRect-x-far-y
+            pick window-root-gadget-pref-dim first2
             <far-y-NSRect>
             frame-rect-for-window-content-rect
         ]
