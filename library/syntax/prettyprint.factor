@@ -158,7 +158,10 @@ M: block pprint-section* ( block -- )
 GENERIC: pprint* ( obj -- )
 
 : word-style ( word -- style )
-    parsing? H{ { font-style bold } } H{ } ? ;
+    [
+        dup presented set
+        parsing? [ bold font-style set ] when
+    ] make-hash ;
 
 : pprint-word ( obj -- )
     dup word-name [ "( ? )" ] unless*

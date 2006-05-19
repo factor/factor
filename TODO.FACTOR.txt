@@ -1,7 +1,5 @@
 - remove F_USERENV rel
-- cocoa exceptions are broken
 - method ordering and interpreter algorithm sections need updates
-- run file dialog is broken
 - update walker for new interpreter
 - quotations should store their originating word
 - core foundation should use unicode strings
