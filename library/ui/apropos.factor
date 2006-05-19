@@ -1,6 +1,7 @@
 IN: gadgets-apropos
 USING: gadgets gadgets-editors gadgets-labels gadgets-layouts
-gadgets-panes gadgets-scrolling generic kernel inspector ;
+gadgets-panes gadgets-scrolling gadgets-theme generic inspector
+kernel ;
 
 TUPLE: apropos-gadget pane input ;
 
@@ -26,7 +27,8 @@ TUPLE: apropos-gadget pane input ;
 C: apropos-gadget ( -- )
     <frame> over set-delegate
     <pane> over add-apropos-gadget-pane
-    [ show-apropos ] <prompt> over add-apropos-gadget-input ;
+    [ show-apropos ] <prompt> dup faint-boundary 
+    over add-apropos-gadget-input ;
 
 M: apropos-gadget pref-dim* drop { 350 200 0 } ;
 
