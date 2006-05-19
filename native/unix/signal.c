@@ -18,6 +18,9 @@ static bool in_page(void *fault, void *i_area, CELL area_size, int offset)
 
 void signal_handler(int signal, siginfo_t* siginfo, void* uap)
 {
+	printf("fucked\n");
+	fflush(stdout);
+
 	if(in_page(siginfo->si_addr, (void *) ds_bot, 0, -1))
 		general_error(ERROR_DS_UNDERFLOW,F,F,false);
 	else if(in_page(siginfo->si_addr, (void *) ds_bot, ds_size, 0))

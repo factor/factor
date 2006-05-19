@@ -114,8 +114,11 @@ void collect_roots(void)
 		
 		collect_callstack(stacks->call_region,stacks->call);
 
-		collect_callframe_triple(&stacks->callframe,
-			&stacks->callframe_scan,&stacks->callframe_end);
+		if(stacks != stack_chain)
+		{
+			collect_callframe_triple(&stacks->callframe,
+				&stacks->callframe_scan,&stacks->callframe_end);
+		}
 
 		copy_handle(&stacks->catch_save);
 

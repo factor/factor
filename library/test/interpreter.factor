@@ -1,24 +1,20 @@
 IN: temporary
-USING: errors interpreter io kernel lists math math-internals
+USING: errors interpreter io kernel math math-internals
 namespaces prettyprint sequences test ;
 
-: done-cf? ( -- ? ) meta-cf get not ;
-: done? ( -- ? ) done-cf? meta-c get empty? and ;
+: done-all? ( -- ? ) done? meta-c get empty? and ;
 
-: run ( -- )
-    done? [ next do run ] unless ;
+: run ( -- ) done-all? [ next do run ] unless ;
 
 : init-interpreter ( -- )
     V{ } clone meta-d set
     V{ } clone meta-r set
     V{ } clone meta-c set
     namestack meta-name set
-    catchstack meta-catch set
-    meta-cf off
-    meta-executing off ;
+    catchstack meta-catch set ;
 
 : test-interpreter
-    init-interpreter meta-cf set run meta-d get ;
+    init-interpreter (meta-call) run meta-d get ;
 
 [ V{ 1 2 3 } ] [
     [ 1 2 3 ] test-interpreter

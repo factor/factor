@@ -6,12 +6,14 @@
 #import "Foundation/NSException.h"
 #import "Foundation/NSString.h"
 
+static CELL error;
+
 /* This code is convoluted because Cocoa places restrictions on longjmp and
 exception handling. In particular, a longjmp can never cross an NS_DURING,
 NS_HANDLER or NS_ENDHANDLER. */
 void platform_run()
 {
-	CELL error = F;
+	error = F;
 
 	for(;;)
 	{

@@ -4,8 +4,6 @@
 - run file dialog is broken
 - update walker for new interpreter
 - quotations should store their originating word
-- single-stepper: use highlight trick
-- plain-stream should do highlights
 - core foundation should use unicode strings
 - alien>utf16-string, utf16-string>alien words
 - can <void*> only be called with an alien?
@@ -15,6 +13,7 @@
 - 3 >n fep
 - code walker & exceptions
 - code walker and callbacks is broken?
+- prettyprinter's highlighting of non-leaves looks bad
 
 + io:
 

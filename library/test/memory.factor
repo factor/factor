@@ -1,6 +1,6 @@
 IN: temporary
-USING: generic kernel math memory words prettyprint 
-sequences test ;
+USING: generic kernel kernel-internals math memory prettyprint
+sequences test words ;
 
 TUPLE: testing x y z ;
 
