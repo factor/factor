@@ -6,6 +6,13 @@ namespaces sequences ;
 
 TYPEDEF: int CFIndex
 
+FUNCTION: void* CFArrayGetValueAtIndex ( void* array, CFIndex idx ) ;
+
+FUNCTION: CFIndex CFArrayGetCount ( void* array ) ;
+
+: CF>array ( alien -- array )
+    dup CFArrayGetCount [ CFArrayGetValueAtIndex ] map-with ;
+
 ! Core Foundation utilities -- will be moved elsewhere
 : kCFURLPOSIXPathStyle 0 ;
 

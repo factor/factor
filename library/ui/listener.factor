@@ -47,7 +47,7 @@ TUPLE: listener-gadget pane stack ;
 : <stack-bar> ( -- gadget ) <shelf> dup highlight-theme ;
 
 : start-listener ( listener -- )
-    [ >r clear r> listener-thread ] in-thread ;
+    [ >r clear r> listener-thread ] in-thread drop ;
 
 C: listener-gadget ( -- gadget )
     dup delegate>frame
@@ -64,3 +64,10 @@ M: listener-gadget focusable-child* ( listener -- gadget )
 
 : listener-window ( -- )
     <listener-gadget> "Listener" open-window ;
+
+: listener-window* ( quot -- )
+    <listener-gadget> [ listener-gadget-pane pane-call ] keep
+    "Listener" open-window ;
+
+: listener-run-files ( seq -- )
+    [ [ run-file ] each ] curry listener-window* ;

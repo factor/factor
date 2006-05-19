@@ -11,6 +11,7 @@ USING: compiler io parser sequences words ;
     "/library/cocoa/application-utils.factor"
     "/library/cocoa/window-utils.factor"
     "/library/cocoa/view-utils.factor"
+    "/library/cocoa/dialogs.factor"
     "/library/cocoa/menu-bar.factor"
     "/library/cocoa/ui.factor"
 } [

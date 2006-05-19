@@ -4,7 +4,7 @@ IN: gadgets-panes
 USING: arrays gadgets gadgets-buttons gadgets-editors
 gadgets-labels gadgets-layouts gadgets-scrolling gadgets-theme
 generic hashtables io kernel line-editor math namespaces
-sequences strings styles threads ;
+prettyprint sequences strings styles threads ;
 
 ! A pane is an area that can display text.
 
@@ -38,7 +38,7 @@ continuation scrolls? ;
 SYMBOL: structured-input
 
 : pane-call ( quot pane -- )
-    "<< command >>" over stream-print
+    dup [ "Command: " write over . ] with-stream*
     >r structured-input set-global
     "\"structured-input\" \"gadgets-panes\" lookup get-global call"
     r> pane-eval ;

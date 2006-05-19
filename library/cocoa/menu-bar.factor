@@ -82,6 +82,8 @@ DEFER: described-menu
 
 ! -------------------------------------------------------------------------
 
+: menu-run-file ( -- )
+    open-panel [ listener-run-files ] when* ;
 
 : default-main-menu 
     {
@@ -98,18 +100,19 @@ DEFER: described-menu
             { "Hide Others" "hideOtherApplications:" "h" [ and-option-equivalent-modifier ] }
             { "Show All" "unhideAllApplications:" "" }
             { }
-            { "Save Image" save "s" }
-            { }
             { "Quit" "terminate:" "q" }
         } [ NSApp over [setAppleMenu:] ] }
         { {
-            ! Tools is standing in for the File menu
-            "Tools"
+            "File"
             { "Listener" listener-window "n" }
+            { "Run..." menu-run-file "o" }
+            { }
             { "Apropos" apropos-window "r" }
-            { "Vocabularies" vocabs-window "y" }
-            { "Globals" global-window "u" }
-            { "Memory" memory-window "m" }
+            { "Vocabularies" vocabs-window "" }
+            { "Globals" global-window "" }
+            { "Memory" memory-window "" }
+            { }
+            { "Save Image" save "s" }
         } }
         { {
             "Edit"
