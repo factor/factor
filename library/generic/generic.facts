@@ -1,4 +1,4 @@
-USING: generic help kernel ;
+USING: generic help kernel kernel-internals ;
 
 HELP: typemap f
 { $description "Global variable. Hashtable mapping unions to class words." }

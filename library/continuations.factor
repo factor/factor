@@ -17,7 +17,7 @@ USING: namespaces sequences ;
 TUPLE: continuation data retain call name catch ;
 
 : continuation ( -- interp )
-    datastack retainstack callstack dup pop* dup pop*
+    datastack retainstack callstack dup pop* dup pop* dup pop*
     namestack catchstack <continuation> ; inline
 
 : >continuation< ( continuation -- data retain call name catch )

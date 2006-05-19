@@ -1,12 +1,18 @@
-IN: generic
+! Copyright (C) 2005, 2006 Slava Pestov.
+! See http://factorcode.org/license.txt for BSD license.
 USING: arrays errors hashtables kernel kernel-internals
 math namespaces sequences vectors words ;
+IN: generic
 
 : picker ( dispatch# -- quot )
     { [ dup ] [ over ] [ pick ] } nth ;
 
 : unpicker ( dispatch# -- quot )
     { [ nip ] [ >r nip r> swap ] [ >r >r nip r> r> -rot ] } nth ;
+
+TUPLE: no-method object generic ;
+
+: no-method ( object generic -- ) <no-method> throw ;
 
 : error-method ( dispatch# word -- method )
     >r picker r> [ no-method ] curry append ;

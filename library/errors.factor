@@ -3,10 +3,6 @@
 IN: errors
 USING: kernel kernel-internals sequences ;
 
-TUPLE: no-method object generic ;
-
-: no-method ( object generic -- ) <no-method> throw ;
-
 : >c ( continuation -- ) catchstack* push ;
 : c> ( -- continuation ) catchstack* pop ;
 

@@ -42,8 +42,6 @@ void handle_error(void)
 		else
 			fix_stacks();
 
-		callframe_scan = callframe_end = 0;
-
 		dpush(thrown_error);
 		/* Notify any 'catch' blocks */
 		call(userenv[BREAK_ENV]);

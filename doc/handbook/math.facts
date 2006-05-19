@@ -74,8 +74,7 @@ ARTICLE: "bitwise-arithmetic" "Bitwise arithmetic"
 { $subsection shift }
 { $subsection log2 }
 { $subsection power-of-2? }
-{ $subsection next-power-of-2 }
-{ $subsection each-bit } ;
+{ $subsection next-power-of-2 } ;
 
 ARTICLE: "random-numbers" "Generating random integers"
 { $subsection (random-int) }

@@ -17,10 +17,6 @@ HELP: ^ "( x y -- z )"
 { $description "Raises " { $snippet "x" } " to the power of " { $snippet "y" } ". If " { $snippet "y" } " is an integer the answer is computed exactly, otherwise a floating point approximation is used." }
 { $errors "Throws an error if " { $snippet "x" } " and " { $snippet "y" } " are both integer 0." } ;
 
-HELP: each-bit "( n quot -- )"
-{ $values { "n" "an integer" } { "quot" "a quotation with stack effect " { $snippet "( 0/1 -- )" } } }
-{ $description "Applies the quotation to each bit of the input, ranging from least significant to most significant." } ;
-
 HELP: power-of-2? "( n -- ? )"
 { $values { "n" "an integer" } { "?" "a boolean" } }
 { $description "Tests if " { $snippet "n" } " is a power of 2." } ;

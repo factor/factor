@@ -1,9 +1,5 @@
 USING: errors help kernel ;
 
-HELP: no-method "( object generic -- )"
-{ $values { "object" "an object" } { "generic" "a generic word" } }
-{ $description "Throws an error indicating that " { $snippet "object" } " does not respond to the " { $snippet "generic" } " word." } ;
-
 HELP: >c "( continuation -- )"
 { $values { "continuation" "a continuation" } }
 { $description "Pushes an exception handler continuation on the catch stack. The continuation must have been reified by " { $link callcc1 } "." } ;

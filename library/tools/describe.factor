@@ -90,23 +90,31 @@ DEFER: describe
 
 : describe ( object -- ) dup summary print sheet sheet. ;
 
-: sequence-outliner ( seq quot -- | quot: obj -- )
-    swap [
-        [ unparse-short ] keep rot dupd curry
-        simple-outliner terpri
-    ] each-with ;
+: sequence-outliner ( strings objects quot -- )
+    over curry-each 3array flip
+    [ first3 simple-outliner terpri ] each ;
 
-: words. ( vocab -- )
-    words natural-sort [ (help) ] sequence-outliner ;
+: unparse-outliner ( seq quot -- | quot: obj -- )
+    >r [ [ unparse-short ] map ] keep r> sequence-outliner ;
 
-: vocabs. ( -- ) vocabs [ words. ] sequence-outliner ;
+: word-outliner ( seq quot -- )
+    >r natural-sort [ [ synopsis ] map ] keep
+    r> sequence-outliner ;
 
-: usage. ( word -- ) usage [ usage. ] sequence-outliner ;
+: words. ( vocab -- ) words [ (help) ] unparse-outliner ;
 
-: uses. ( word -- ) uses [ uses. ] sequence-outliner ;
+: vocabs. ( -- ) vocabs [ words. ] unparse-outliner ;
+
+: usage. ( word -- ) usage [ usage. ] word-outliner ;
+
+: uses. ( word -- ) uses [ uses. ] word-outliner ;
 
 : stack. ( seq -- seq ) <reversed> >array describe ;
 
 : .s datastack stack. ;
 : .r retainstack stack. ;
 : .c callstack stack. ;
+
+: apropos ( substring -- )
+    all-words completions natural-sort
+    [ (help) ] word-outliner ;

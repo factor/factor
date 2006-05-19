@@ -119,7 +119,3 @@ M: word class. drop ;
         methods.
         newline
     ] with-pprint ;
-
-: apropos ( substring -- )
-    all-words completions natural-sort
-    [ [ synopsis ] keep simple-object terpri ] each ;

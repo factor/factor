@@ -21,6 +21,11 @@ SYMBOL: length-limit
 SYMBOL: line-limit
 SYMBOL: string-limit
 
+! Special trick to highlight a word in a quotation
+SYMBOL: hilite-quotation
+SYMBOL: hilite-index
+SYMBOL: hilite-now?
+
 global [
     4 tab-size set
     64 margin set
@@ -158,11 +163,8 @@ GENERIC: pprint* ( obj -- )
 : word-style ( word -- style )
     [
         dup presented set
-        parsing? [
-            bold font-style
-        ] [
-            { 0 0 0.3 1 } foreground
-        ] if set
+        parsing? [ bold font-style set ] when
+        hilite-now? get [ { 0.9 0.9 0.9 1 } background set ] when
     ] make-hash ;
 
 : pprint-word ( obj -- )
@@ -243,10 +245,16 @@ M: dll pprint* ( obj -- str ) dll-path "DLL\" " pprint-string ;
 : pprint-element ( object -- )
     dup parsing? [ \ POSTPONE: pprint-word ] when pprint* ;
 
+: pprint-hilite ( object n -- )
+    hilite-index get = hilite-now? set
+    pprint-element hilite-now? off ;
+
 : pprint-elements ( seq -- )
-    length-limit? >r
-    [ pprint-element ] each
-    r> [ "..." plain-text ] when ;
+    length-limit? >r dup hilite-quotation get eq? [
+        dup length [ pprint-hilite ] 2each
+    ] [
+        [ pprint-element ] each
+    ] if r> [ "..." plain-text ] when ;
 
 : pprint-sequence ( seq start end -- )
     swap pprint* swap pprint-elements pprint* ;
