@@ -16,6 +16,9 @@ SYMBOL: font-style
 SYMBOL: presented
 SYMBOL: file
 
+! Only for plain-stream
+SYMBOL: highlight
+
 ! Paragraph styles
 SYMBOL: page-color
 SYMBOL: border-color

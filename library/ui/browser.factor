@@ -12,7 +12,7 @@ H{ } clone components set-global
 
 : get-components ( class -- assoc )
     components get-global hash [
-        { "Slots" [ describe ] }
+        { { "Slots" [ describe ] } }
     ] unless* ;
 
 {

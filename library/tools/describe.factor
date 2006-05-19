@@ -95,7 +95,8 @@ DEFER: describe
     [ first3 simple-outliner terpri ] each ;
 
 : unparse-outliner ( seq quot -- | quot: obj -- )
-    >r [ [ unparse-short ] map ] keep r> sequence-outliner ;
+    >r natural-sort [ [ unparse-short ] map ] keep
+    r> sequence-outliner ;
 
 : word-outliner ( seq quot -- )
     >r natural-sort [ [ synopsis ] map ] keep
@@ -116,11 +117,11 @@ DEFER: describe
 
 : callframe. ( seq pos -- )
     [
-        1- hilite-index set dup hilite-quotation set .
+        hilite-index set dup hilite-quotation set .
     ] with-scope ;
 
 : callstack. ( seq -- seq )
-    3 swap group <reversed> [ first2 callframe. ] each ;
+    3 swap group <reversed> [ first2 1- callframe. ] each ;
 
 : .c callstack callstack. ;
 

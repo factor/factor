@@ -24,7 +24,6 @@ SYMBOL: string-limit
 ! Special trick to highlight a word in a quotation
 SYMBOL: hilite-quotation
 SYMBOL: hilite-index
-SYMBOL: hilite-now?
 
 global [
     4 tab-size set
@@ -63,9 +62,9 @@ C: section ( length -- section )
 
 TUPLE: text string style ;
 
-C: text ( string style -- section )
-    pick length 1+ <section> over set-delegate
-    [ set-text-style ] keep
+C: text ( string -- section )
+    over length 1+ <section> over set-delegate
+    current-style over set-text-style
     [ set-text-string ] keep ;
 
 M: text pprint-section*
@@ -88,9 +87,7 @@ C: block ( -- block )
     dup block-empty?
     [ drop ] [ pprinter-block block-sections push ] if ;
 
-: text ( string style -- ) <text> add-section ;
-
-: plain-text ( string -- ) H{ } text ;
+: text ( string -- ) <text> add-section ;
 
 : <indent ( section -- ) section-indent indent [ + ] change ;
 
@@ -161,20 +158,17 @@ M: block pprint-section* ( block -- )
 GENERIC: pprint* ( obj -- )
 
 : word-style ( word -- style )
-    [
-        dup presented set
-        parsing? [ bold font-style set ] when
-        hilite-now? get [ { 0.9 0.9 0.9 1 } background set ] when
-    ] make-hash ;
+    parsing? H{ { font-style bold } } H{ } ? ;
 
 : pprint-word ( obj -- )
-    dup word-name [ "( ? )" ] unless* swap word-style text ;
+    dup word-name [ "( ? )" ] unless*
+    swap word-style [ text ] with-style ;
 
 M: object pprint* ( obj -- )
     "( unprintable object: " swap class word-name " )" append3
-    plain-text ;
+    text ;
 
-M: real pprint* ( obj -- ) number>string plain-text ;
+M: real pprint* ( obj -- ) number>string text ;
 
 : ch>ascii-escape ( ch -- esc )
     H{
@@ -206,7 +200,7 @@ M: real pprint* ( obj -- ) number>string plain-text ;
 
 : pprint-string ( string prefix -- )
     [ % [ unparse-ch ] each CHAR: " , ] "" make
-    do-string-limit plain-text ;
+    do-string-limit text ;
 
 M: string pprint* ( str -- str ) "\"" pprint-string ;
 
@@ -217,7 +211,7 @@ M: word pprint* ( word -- )
     dup pprint-word
     "pprint-open" word-prop [ <block ] when ;
 
-M: f pprint* drop "f" plain-text ;
+M: f pprint* drop "f" text ;
 
 M: dll pprint* ( obj -- str ) dll-path "DLL\" " pprint-string ;
 
@@ -226,10 +220,10 @@ M: dll pprint* ( obj -- str ) dll-path "DLL\" " pprint-string ;
 
 : check-recursion ( obj quot -- )
     nesting-limit? [
-        2drop "#" plain-text
+        2drop "#" text
     ] [
         over recursion-check get memq? [
-            2drop "&" plain-text
+            2drop "&" text
         ] [
             over recursion-check get push
             call
@@ -246,15 +240,19 @@ M: dll pprint* ( obj -- str ) dll-path "DLL\" " pprint-string ;
     dup parsing? [ \ POSTPONE: pprint-word ] when pprint* ;
 
 : pprint-hilite ( object n -- )
-    hilite-index get = hilite-now? set
-    pprint-element hilite-now? off ;
+    hilite-index get = [
+        H{ { background { 0.9 0.9 0.9 1 } } { highlight t } }
+        [ pprint-element ] with-style
+    ] [
+        pprint-element
+    ] if ;
 
 : pprint-elements ( seq -- )
     length-limit? >r dup hilite-quotation get eq? [
         dup length [ pprint-hilite ] 2each
     ] [
         [ pprint-element ] each
-    ] if r> [ "..." plain-text ] when ;
+    ] if r> [ "..." text ] when ;
 
 : pprint-sequence ( seq start end -- )
     swap pprint* swap pprint-elements pprint* ;
@@ -287,7 +285,7 @@ M: alien pprint* ( alien -- )
         drop "( alien expired )"
     ] [
         \ ALIEN: pprint-word alien-address number>string
-    ] if plain-text ;
+    ] if text ;
 
 M: wrapper pprint* ( wrapper -- )
     dup wrapped word? [

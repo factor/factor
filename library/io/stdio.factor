@@ -33,14 +33,19 @@ SYMBOL: stdio
 
 SYMBOL: style-stack
 
+V{ } clone style-stack set-global
+
 : >style ( style -- )
     dup hashtable? [ "Style must be a hashtable" throw ] unless
-    style-stack [ ?push ] change ;
+    style-stack get push ;
 
-: style> ( -- style ) style-stack get pop ;
+: drop-style ( -- ) style-stack get pop* ;
 
 : with-style ( style quot -- )
-    [ >r >style r> call style> drop ] with-scope ; inline
+    swap >style call drop-style ; inline
+
+: with-style-stack ( quot -- )
+    [ V{ } clone style-stack set call ] with-scope ;
 
 : current-style ( -- style )
     style-stack get hash-concat ;

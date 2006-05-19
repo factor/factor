@@ -10,20 +10,22 @@ vectors words ;
 : &r ( -- ) meta-r get stack. ;
 
 : meta-c*
-    [ meta-c get % meta-executing get , meta-cf get , ] { } make ;
+    [
+        meta-c get % { callframe callframe-scan callframe-end } [ get , ] each
+    ] { } make ;
 
-: &c ( -- ) meta-c* stack. ;
+: &c ( -- ) meta-c* callstack. ;
 
 : &get ( var -- value ) meta-name get hash-stack ;
 
-: report ( -- ) meta-cf get . ;
+: report ( -- ) callframe get callframe-scan get callframe. ;
 
 : step ( -- ) next do-1 report ;
 
 : into ( -- ) next do report ;
 
 : end-walk ( -- )
-    \ call push-c meta-cf get push-c meta-interp continue ;
+    save-callframe meta-interp continue ;
 
 : walk-banner ( -- )
     "&s &r &c show stepper stacks" print
@@ -38,19 +40,7 @@ vectors words ;
     "walk " listener-prompt set ;
 
 : walk ( quot -- )
-    datastack dup pop*
-    retainstack
-    callstack
-    namestack
-    catchstack [
-        meta-catch set
-        meta-name set
-        meta-c set
-        meta-r set
-        meta-d set
-        meta-cf set
-        meta-executing off
-        set-walk-hooks
-        walk-banner
-        listener end-walk
+    continuation [
+        set-meta-interp pop-d drop (meta-call)
+        set-walk-hooks walk-banner listener end-walk
     ] with-scope ;

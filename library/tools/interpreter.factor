@@ -25,16 +25,24 @@ SYMBOL: meta-name
 SYMBOL: meta-catch
 
 ! Call frame
-SYMBOL: meta-cf
-
-! Currently executing word.
-SYMBOL: meta-executing
+SYMBOL: callframe
+SYMBOL: callframe-scan
+SYMBOL: callframe-end
 
 ! Callframe.
-: up ( -- ) pop-c meta-cf set  pop-c drop ;
+: up ( -- )
+    pop-c callframe-end set
+    pop-c callframe-scan set
+    pop-c callframe set ;
+
+: done? ( -- ? ) callframe-scan get callframe-end get >= ;
 
 : next ( -- obj )
-    meta-cf get [ meta-cf [ ( uncons ) ] change ] [ up next ] if ;
+    done? [
+        up next
+    ] [
+        callframe-scan get callframe get nth callframe-scan inc
+    ] if ;
 
 : meta-interp ( -- interp )
     meta-d get meta-r get meta-c get
@@ -48,18 +56,27 @@ SYMBOL: meta-executing
     meta-r set
     meta-d set ;
 
-: host-word ( word -- )
-    [
-        \ call push-c
-        [ continuation swap continue-with ] ( cons cons ) push-c
-        meta-interp continue
-    ] callcc1 set-meta-interp pop-d 2drop ;
+: save-callframe ( -- )
+    callframe get push-c
+    callframe-scan get push-c
+    callframe-end get push-c ;
+
+: (meta-call) ( quot -- )
+    dup callframe set
+    length callframe-end set
+    0 callframe-scan set ;
 
 : meta-call ( quot -- )
     #! Note we do tail call optimization here.
-    meta-cf [
-        [ meta-executing get push-c  push-c ] when*
-    ] change ;
+    done? [ save-callframe ] unless (meta-call) ;
+
+: host-word ( word -- )
+    [
+        [
+            swap , \ continuation , , \ continue-with ,
+        ] [ ] make dup push-c 0 push-c length push-c
+        meta-interp continue
+    ] callcc1 set-meta-interp drop ;
 
 GENERIC: do-1 ( object -- )
 
@@ -76,11 +93,7 @@ M: word do ( word -- )
     dup "meta-word" word-prop [
         call
     ] [
-        dup compound? [
-            dup word-def meta-call  meta-executing set
-        ] [
-            host-word
-        ] if
+        dup compound? [ word-def meta-call ] [ host-word ] if
     ] ?if ;
 
 M: object do ( object -- ) do-1 ;

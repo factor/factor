@@ -16,13 +16,13 @@ sequences strings styles words ;
     } [ declaration. ] each-with ;
 
 : in. ( word -- )
-    <block \ IN: pprint-word word-vocabulary plain-text block; ;
+    <block \ IN: pprint-word word-vocabulary text block; ;
 
 : (synopsis) ( word -- )
     dup in. dup definer pprint-word pprint-word ;
 
 : comment. ( comment -- )
-    [ H{ { font-style italic } } text ] when* ;
+    [ H{ { font-style italic } } [ text ] with-style ] when* ;
 
 : stack-picture ( seq -- string )
     [ [ % CHAR: \s , ] each ] "" make ;
@@ -106,7 +106,7 @@ M: tuple-class class.
     newline
     \ TUPLE: pprint-word
     dup pprint-word
-    "slot-names" word-prop [ plain-text ] each
+    "slot-names" word-prop [ text ] each
     pprint-; ;
 
 M: word class. drop ;
