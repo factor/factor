@@ -6,8 +6,6 @@ math namespaces sequences words ;
 
 ! Math combination for generic dyadic upgrading arithmetic.
 
-: last/first ( seq -- pair ) dup peek swap first 2array ;
-
 : math-class? ( object -- ? )
     dup word? [ number bootstrap-word class< ] [ drop f ] if ;
 

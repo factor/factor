@@ -4,10 +4,6 @@ IN: help
 USING: arrays generic hashtables io kernel namespaces
 parser prettyprint sequences strings styles vectors words ;
 
-: uncons* dup first swap 1 swap tail ;
-
-: unswons* uncons* swap ;
-
 ! Simple markup language.
 
 ! <element> ::== <string> | <simple-element> | <fancy-element>
@@ -21,7 +17,7 @@ PREDICATE: array simple-element
 
 M: string print-element last-block off format* ;
 
-M: array print-element unswons* execute ;
+M: array print-element unclip execute ;
 
 M: word print-element { } swap execute ;
 
@@ -161,7 +157,7 @@ DEFER: help
 
 : $values ( content -- )
     "Arguments and values" $subheading
-    [ unswons* $snippet " -- " format* print-element ]
+    [ unclip $snippet " -- " format* print-element ]
     [ terpri ] interleave ;
 
 : $predicate ( content -- )

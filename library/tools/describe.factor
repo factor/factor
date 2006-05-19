@@ -2,7 +2,7 @@
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: inspector
 USING: arrays generic hashtables help io kernel kernel-internals
-math prettyprint sequences strings vectors words ;
+math namespaces prettyprint sequences strings vectors words ;
 
 GENERIC: summary ( object -- string )
 
@@ -113,7 +113,16 @@ DEFER: describe
 
 : .s datastack stack. ;
 : .r retainstack stack. ;
-: .c callstack stack. ;
+
+: callframe. ( seq pos -- )
+    [
+        1- hilite-index set dup hilite-quotation set .
+    ] with-scope ;
+
+: callstack. ( seq -- seq )
+    3 swap group [ first2 print-callframe ] each ;
+
+: .c callstack callstack. ;
 
 : apropos ( substring -- )
     all-words completions natural-sort

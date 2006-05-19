@@ -122,7 +122,7 @@ M: object error. ( error -- ) . ;
 
 : :r ( -- ) error-continuation get continuation-retain stack. ;
 
-: :c ( -- ) error-continuation get continuation-call stack. ;
+: :c ( -- ) error-continuation get continuation-call callstack. ;
 
 : :get ( var -- value )
     error-continuation get continuation-name hash-stack ;

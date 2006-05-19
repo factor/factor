@@ -125,6 +125,10 @@ M: object like drop ;
 : assoc ( key assoc -- value ) 
     [ first = ] find-with nip second ;
 
+: unclip ( seq -- rest first ) 1 over tail swap first ;
+
+: last/first ( seq -- pair ) dup peek swap first 2array ;
+
 IN: kernel
 
 M: object <=>
