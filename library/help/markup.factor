@@ -133,7 +133,7 @@ DEFER: help
 
 : $subtopic ( object -- )
     [
-        uncons* ($subtopic) [
+        unclip swap ($subtopic) [
             subtopic-style [ print-element ] with-style
         ] write-outliner
     ] ($block) ;

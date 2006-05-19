@@ -1,5 +1,5 @@
 IN: sequences
-USING: help ;
+USING: help kernel ;
 
 HELP: first2 "( seq -- first second )"
 { $values { "seq" "a sequence" } { "first" "the first element" } { "second" "the second element" } }
@@ -125,3 +125,7 @@ HELP: flip "( matrix -- newmatrix )"
 { $values { "matrix" "a sequence of equal-length sequences" } { "newmatrix" "a sequence of equal-length sequences" } }
 { $description "Transposes the matrix; that is, rows become columns and columns become rows." }
 { $examples { $example "{ { 1 2 3 } { 4 5 6 } } flip ." "{ { 1 4 } { 2 5 } { 3 6 } }" } } ;
+
+HELP: sequence= "( seq1 seq2 -- ? )"
+{ $values { "seq1" "a sequence" } { "seq2" "a sequence" } { "?" "a boolean" } }
+{ $description "Tests if the two sequences have the same length and elements. This is weaker than " { $link = } ", since it does not ensure that the sequences are instances of the same class." } ;

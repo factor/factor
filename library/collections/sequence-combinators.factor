@@ -160,3 +160,15 @@ IN: sequences
     ] [
         drop swap >r over >r call dup r> r> set-nth
     ] if ; inline
+
+: copy-into-check ( start to from -- start to from )
+    pick over length + pick 2dup length >
+    [ set-length ] [ 2drop ] if ;
+
+: copy-into ( start to from -- )
+    copy-into-check dup length
+    [ >r pick r> + pick set-nth-unsafe ] 2each 2drop ;
+    inline
+
+: >sequence ( seq quot -- )
+    over >r >r length r> call dup 0 swap r> copy-into ; inline

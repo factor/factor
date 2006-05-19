@@ -120,7 +120,7 @@ DEFER: describe
     ] with-scope ;
 
 : callstack. ( seq -- seq )
-    3 swap group [ first2 print-callframe ] each ;
+    3 swap group [ first2 callframe. ] each ;
 
 : .c callstack callstack. ;
 

@@ -56,18 +56,6 @@ M: object like drop ;
 
 : delete ( elt seq -- ) 0 0 rot (delete) nip set-length drop ;
 
-: copy-into-check ( start to from -- start to from )
-    pick over length + pick 2dup length >
-    [ set-length ] [ 2drop ] if ;
-
-: copy-into ( start to from -- )
-    copy-into-check dup length
-    [ >r pick r> + pick set-nth-unsafe ] 2each 2drop ;
-    inline
-
-: >sequence ( seq quot -- )
-    over >r >r length r> call dup 0 swap r> copy-into ; inline
-
 : nappend ( to from -- )
     >r [ length ] keep r> copy-into ; inline
 
@@ -118,6 +106,9 @@ M: object like drop ;
         [ swap [ nth ] map-with ] map-with
     ] unless ; flushable
 
+: unpair ( seq -- firsts seconds )
+    flip dup empty? [ drop { } { } ] [ first2 ] if ;
+
 : exchange ( n n seq -- )
     pick over bounds-check 2drop 2dup bounds-check 2drop
     exchange-unsafe ;
@@ -125,9 +116,27 @@ M: object like drop ;
 : assoc ( key assoc -- value ) 
     [ first = ] find-with nip second ;
 
-: unclip ( seq -- rest first ) 1 over tail swap first ;
-
 : last/first ( seq -- pair ) dup peek swap first 2array ;
+
+: sequence= ( seq seq -- ? )
+    2dup [ length ] 2apply = [
+        dup length [ >r 2dup r> 2nth-unsafe = ] all? 2nip
+    ] [
+        2drop f
+    ] if ;
+
+UNION: sequence array string sbuf vector quotation ;
+
+M: sequence = ( obj seq -- ? )
+    2dup eq? [
+        2drop t
+    ] [
+        over type over type eq? [ sequence= ] [ 2drop f ] if
+    ] if ;
+
+M: sequence hashcode ( seq -- n )
+    #! Poor
+    length ;
 
 IN: kernel
 

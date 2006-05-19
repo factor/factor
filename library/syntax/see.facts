@@ -57,7 +57,3 @@ $prettyprinting-note ;
 HELP: see "( word -- )"
 { $values { "word" "a word" } }
 { $description "Prettyprints the definition of a word." } ;
-
-HELP: apropos "( substr -- )"
-{ $values { "substr" "a string" } }
-{ $description "Lists all words whose name contains " { $snippet "substr" } "." } ;

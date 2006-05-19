@@ -11,8 +11,9 @@ SYMBOL: components
 H{ } clone components set-global
 
 : get-components ( class -- assoc )
-    components get-global hash [ { } ] unless*
-    { "Slots" [ describe ] } add ;
+    components get-global hash [
+        { "Slots" [ describe ] }
+    ] unless* ;
 
 {
     { "Definition" [ help ] }
@@ -21,6 +22,7 @@ H{ } clone components set-global
     { "Links in" [ links-in. ] }
     { "Links out" [ links-out. ] }
     { "Vocabulary" [ word-vocabulary words. ] }
+    { "Properties" [ word-props describe ] }
 } \ word components get-global set-hash
 
 {
@@ -28,6 +30,14 @@ H{ } clone components set-global
     { "Links in" [ links-in. ] }
     { "Links out" [ links-out. ] }
 } \ link components get-global set-hash
+
+{
+    { "Call stack" [ continuation-call callstack. ] }
+    { "Data stack" [ continuation-data stack. ] }
+    { "Retain stack" [ continuation-retain stack. ] }
+    { "Name stack" [ continuation-name stack. ] }
+    { "Catch stack" [ continuation-catch stack. ] }
+} \ continuation components get-global set-hash
 
 TUPLE: book page pages ;
 

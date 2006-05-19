@@ -58,3 +58,7 @@ HELP: .s "( -- )"
 
 HELP: .r "( -- )"
 { $description "Displays the contents of the return stack, with the top of the stack printed first." } ;
+
+HELP: apropos "( substr -- )"
+{ $values { "substr" "a string" } }
+{ $description "Lists all words whose name contains " { $snippet "substr" } "." } ;

@@ -3,7 +3,6 @@
 IN: strings
 USING: kernel math strings sequences-internals sequences ;
 
-M: string resize resize-string ;
 M: sbuf set-length grow-length ;
 M: sbuf nth-unsafe underlying nth-unsafe ;
 M: sbuf nth bounds-check nth-unsafe ;

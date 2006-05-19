@@ -4,6 +4,14 @@ IN: strings
 USING: generic kernel kernel-internals math sequences
 sequences-internals ;
 
+M: string = ( obj str -- ? )
+    over string? [
+        over hashcode over hashcode number=
+        [ sequence= ] [ 2drop f ] if
+    ] [
+        2drop f
+    ] if ;
+
 M: string hashcode
     dup string-hashcode [ ] [
         dup rehash-string string-hashcode
@@ -20,6 +28,8 @@ M: string set-nth-unsafe
     >r >fixnum >r >fixnum r> r> set-char-slot ;
 
 M: string clone (clone) ;
+
+M: string resize resize-string ;
 
 ! Characters
 PREDICATE: integer blank     " \t\n\r" member? ;

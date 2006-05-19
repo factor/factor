@@ -103,13 +103,4 @@ strings vectors ;
     2dup mismatch dup -1 = [ drop 2dup min-length ] when
     tuck swap tail-slice >r swap tail-slice r> ;
 
-: unpair ( seq -- firsts seconds )
-    flip dup empty? [ drop { } { } ] [ first2 ] if ;
-
-: concat ( seq -- seq )
-    dup empty? [ [ [ % ] each ] over first make ] unless ;
-    flushable
-
-: join ( seq glue -- seq )
-    [ swap [ % ] [ dup % ] interleave drop ] over make ;
-    flushable
+: unclip ( seq -- rest first ) 1 over tail swap first ;
