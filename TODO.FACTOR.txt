@@ -1,12 +1,8 @@
 - remove F_USERENV rel
-- method ordering and interpreter algorithm sections need updates
 - update walker for new interpreter
 - quotations should store their originating word
 - core foundation should use unicode strings
 - alien>utf16-string, utf16-string>alien words
-- can <void*> only be called with an alien?
-- remove <char*>, <ushort*>, set-char*-nth, set-ushort*-nth since they
-  have incorrect semantics
 - fix compiled gc check
 - 3 >n fep
 - code walker & exceptions
@@ -22,6 +18,19 @@
 - yield in a loop starves i/o
 - "localhost" 50 <client> won't fail
 
++ help:
+
+- method ordering and interpreter algorithm sections need updates
+- document that can <void*> only be called with an alien
+- help search
+- fix remaining HTML stream issues
+- automatically update help graph when adding/removing articles/words
+- document conventions
+- new turtle graphics tutorial
+- better line spacing in ui and html
+- tabular formatting - for inspector, changes and $values in help
+- grid layout
+
 + ui/help:
 
 - implement handlers for open, quit events, and whatever else
@@ -33,7 +42,6 @@
 - speed up ideas:
   - only do clipping for certain gadgets
   - use glRect
-- help search
 - reimplement tab completion
 - x11 input methods
 - x11 title bars are funny
@@ -45,14 +53,7 @@
 - saving the image should save window configuration
 - make the UI look better, something like this:
   http://twb.ath.cx/~twb/darcs/OBSOLETE/factor/final.html
-- fix remaining HTML stream issues
 - fix up the min thumb size hack
-- automatically update help graph when adding/removing articles/words
-- document conventions
-- new turtle graphics tutorial
-- better line spacing in ui and html
-- tabular formatting - for inspector, changes and $values in help
-- grid layout
 - variable width word wrap
 
 + compiler/ffi:

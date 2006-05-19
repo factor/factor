@@ -7,8 +7,6 @@ parser sequences strings words ;
 
 : <c-type> ( -- type )
     H{
-        { "setter" [ "Cannot read struct fields with type" throw ] }
-        { "getter" [ "Cannot write struct fields with type" throw ] }
         { "boxer" [ "boxer-function" get %box ] }
         { "unboxer" [ "unboxer-function" get %unbox ] }
         { "reg-class" T{ int-regs f } }
@@ -77,8 +75,7 @@ SYMBOL: c-types
     [ define-c-type ] keep "alien"
     2dup init-c-type
     2dup define-deref
-    2dup define-set-nth
-    define-out ;
+    over c-setter [ 2dup define-set-nth define-out ] when ;
 
 : typedef ( old new -- )
     over "*" append over "*" append (typedef) (typedef) ;

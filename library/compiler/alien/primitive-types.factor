@@ -103,10 +103,6 @@ USING: alien compiler kernel kernel-internals math namespaces ;
 
 [
     [ alien-unsigned-cell <alien> alien>string ] "getter" set
-    [
-        >r >r string>alien alien-address r> r>
-        set-alien-unsigned-cell
-    ] "setter" set
     bootstrap-cell "width" set
     bootstrap-cell "align" set
     "box_c_string" "boxer-function" set
@@ -115,7 +111,6 @@ USING: alien compiler kernel kernel-internals math namespaces ;
 
 [
     [ alien-unsigned-4 ] "getter" set
-    [ set-alien-unsigned-4 ] "setter" set
     bootstrap-cell "width" set
     bootstrap-cell "align" set
     "box_utf16_string" "boxer-function" set
