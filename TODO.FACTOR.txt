@@ -1,5 +1,3 @@
-- redefine generic as tuple constructor -- still appears generic
-
 - remove F_USERENV rel
 - update walker for new interpreter
 - quotations should store their originating word

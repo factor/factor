@@ -108,7 +108,8 @@ C: browser ( -- browser )
     { 1/4 1/4 1/2 } over set-track-sizes ;
 
 : browser-window ( word -- )
-    <browser> [ "Browser" open-window ] keep show-word ;
+    <browser> [ "Browser" open-window ] keep
+    over [ show-word ] [ 2drop ] if ;
 
 M: word show-object ( word button -- )
     find-browser [ show-word ] [ browser-window ] if* ;

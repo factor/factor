@@ -1,3 +1,5 @@
+! Copyright (C) 2005, 2006 Kevin Reid.
+! See http://factorcode.org/license.txt for BSD license.
 USING: cocoa compiler gadgets gadgets-browser gadgets-launchpad
 gadgets-layouts gadgets-listener kernel memory objc
 objc-FactorCallback objc-NSApplication objc-NSMenu
@@ -9,10 +11,11 @@ IN: gadgets-cocoa
 
 GENERIC: to-target-and-action ( spec -- target action )
 
-M: f to-target-and-action f ;
-M: string to-target-and-action sel_registerName f swap ;
-M: word to-target-and-action
-    unit <FactorCallback> "perform:" sel_registerName ;
+M: f to-target-and-action f swap ;
+M: string to-target-and-action sel_registerName f ;
+M: word to-target-and-action unit to-target-and-action ;
+M: quotation to-target-and-action
+    <FactorCallback> "perform:" sel_registerName swap ;
 
 : <NSMenu> ( title -- )
     NSMenu [alloc]
@@ -29,8 +32,8 @@ M: word to-target-and-action
     r> <NSString>
     [initWithTitle:action:keyEquivalent:] [autorelease] ;
 
-: make-menu-item-2 ( title spec -- item )
-    swap to-target-and-action swap >r swap <NSMenuItem> dup r> [setTarget:] ;
+: make-menu-item ( title spec -- item )
+    to-target-and-action >r swap <NSMenuItem> dup r> [setTarget:] ;
 
 : submenu-to-item ( menu -- item )
     dup [title] CF>string f "" <NSMenuItem> dup rot [setSubmenu:] ;
@@ -62,7 +65,7 @@ DEFER: described-menu
         drop NSMenuItem [separatorItem]
     ] [
         dup first string? [
-            [ first3 make-menu-item-2 ] keep
+            [ first3 swap make-menu-item ] keep
             dup length 4 = [ fourth call ] [ drop ] if
         ] [
             [ first described-menu ] keep
@@ -105,10 +108,11 @@ DEFER: described-menu
         } [ NSApp over [setAppleMenu:] ] }
         { {
             "File"
-            { "Listener" listener-window "n" }
+            { "New Listener" listener-window "n" }
+            { "New Browser" [ f browser-window ] "b" }
+            { }
             { "Run..." menu-run-file "o" }
             { }
-            { "Browser" browser-window "b" }
             { "Apropos" apropos-window "r" }
             { "Globals" globals-window "" }
             { "Memory" memory-window "" }

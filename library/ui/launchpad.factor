@@ -13,7 +13,7 @@ help inspector io kernel memory namespaces sequences ;
     >r make-pane <scroller> r> open-window ;
 
 : handbook-window ( -- )
-    T{ link f "handbook" } browser-window ;
+    T{ link f "handbook" } inspector-window ;
 
 : memory-window ( -- )
     [ heap-stats. terpri room. ] "Memory" pane-window ;
@@ -32,7 +32,7 @@ help inspector io kernel memory namespaces sequences ;
         { "Listener" [ listener-window ] }
         { "Documentation" [ handbook-window ] }
         { "Help index" [ articles-window ] }
-        { "Browser" [ browser-window ] }
+        { "Browser" [ f browser-window ] }
         { "Apropos" [ apropos-window ] }
         { "Globals" [ globals-window ] }
         { "Memory" [ memory-window ] }
