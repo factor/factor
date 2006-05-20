@@ -111,3 +111,9 @@ TUPLE: size-test a b c d ;
     T{ size-test } array-capacity
     size-test "tuple-size" word-prop =
 ] unit-test
+
+GENERIC: <yo-momma>
+
+TUPLE: yo-momma ;
+
+[ f ] [ \ <yo-momma> generic? ] unit-test

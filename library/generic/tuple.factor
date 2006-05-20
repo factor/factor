@@ -58,15 +58,18 @@ PREDICATE: word tuple-class "tuple-size" word-prop ;
     tuple-class? [ "Not a tuple class" throw ] unless ;
 
 : define-constructor ( word class def -- )
-    over check-tuple-class >r [
-        dup literalize , "tuple-size" word-prop , \ make-tuple ,
-    ] [ ] make r> append define-compound ;
+    pick reset-generic
+    swap dup check-tuple-class [
+        dup literalize ,
+        "tuple-size" word-prop ,
+        \ make-tuple , %
+    ] [ ] make define-compound ;
 
 : default-constructor ( tuple -- )
-    [ create-constructor ] keep dup [
-        "slots" word-prop 1 swap tail-slice <reversed>
-        [ peek unit , \ keep , ] each
-    ] [ ] make define-constructor ;
+    [ create-constructor ] keep
+    dup "slots" word-prop unclip drop <reversed>
+    [ [ tuck ] swap peek add ] map concat >quotation
+    define-constructor ;
 
 : define-tuple ( tuple slots -- )
     2dup check-shape
