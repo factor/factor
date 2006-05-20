@@ -17,7 +17,7 @@ HELP: <file-writer> "( path -- stream )"
 
 HELP: <client> "( host port -- stream )"
 { $values { "host" "a string" } { "port" "an integer between 0 and 65535" } { "stream" "a bidirectional stream" } }
-{ $description "Connects to TCP/IP port number \texttt{port} on the host named by \texttt{host}, and outputs a bidirectional stream." }
+{ $description "Connects to TCP/IP port number " { $code "port" } " on the host named by " { $code "host" } ", and outputs a bidirectional stream." }
 { $errors "Throws an error if domain name lookup fails, or if there is a connection cannot be established." } ;
 
 HELP: <server> "( port -- server )"

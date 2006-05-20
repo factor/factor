@@ -36,6 +36,7 @@
 - new browser:
   - separate definition & documentation tabs
   - browse generic words and classes
+  - initial size sucks
 - toggle/radio buttons/tabs or something
 - make-frame should compile
 - track:
