@@ -123,7 +123,9 @@ DEFER: help
     ] with-style ;
 
 : $subsection ( object -- )
-    [ first [ (help) ] swap ($subsection) ] ($block) ;
+    [
+        first [ article-content (help) ] swap ($subsection)
+    ] ($block) ;
 
 : ($subtopic) ( element -- quot )
     [

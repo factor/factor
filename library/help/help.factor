@@ -39,16 +39,16 @@ M: term article-content
 
 SYMBOL: last-block
 
-: (help) ( topic -- )
+: (help) ( element -- )
     default-style [
-        last-block on article-content print-element
+        last-block on print-element
     ] with-nesting* terpri ;
 
 DEFER: $heading
 
 : help ( topic -- )
     default-style [ dup article-title $heading ] with-style
-    (help) ;
+    article-content (help) ;
 
 : glossary ( name -- ) <term> help ;
 

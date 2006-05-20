@@ -7,18 +7,17 @@ M: word article-title word-name ;
 
 : word-article ( word -- article ) "help" word-prop ;
 
-: word-help ( word -- )
-    dup word-article [
-        % drop
-    ] [
-        "predicating" word-prop [
-            \ $predicate swap 2array ,
-        ] when*
-    ] if* ;
-
-M: word article-content
+: word-help ( word -- article )
     [
         \ $synopsis over 2array ,
-        dup word-help
-        \ $definition swap 2array ,
+        dup word-article [
+            %
+        ] [
+            "predicating" word-prop [
+                \ $predicate swap 2array ,
+            ] when*
+        ] ?if
     ] { } make ;
+
+M: word article-content
+    dup word-help { $definition } rot add add ;

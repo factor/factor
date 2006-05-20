@@ -16,7 +16,8 @@ H{ } clone components set-global
     ] unless* ;
 
 {
-    { "Definition" [ help ] }
+    { "Definition" [ see ] }
+    { "Documentation" [ word-help (help) ] }
     { "Calls in" [ usage. ] }
     { "Calls out" [ uses. ] }
     { "Links in" [ links-in. ] }

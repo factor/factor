@@ -56,7 +56,7 @@ TUPLE: tile ;
     } make-frame ;
 
 : <title> ( title closable? -- gadget )
-    [ <closable-title> ] [ <label> ] if dup highlight-theme ;
+    [ <closable-title> ] [ <label> ] if dup title-theme ;
 
 C: tile ( gadget title closable? -- gadget )
     {

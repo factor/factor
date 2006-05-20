@@ -112,4 +112,4 @@ DEFER: describe
 
 : apropos ( substring -- )
     all-words completions natural-sort
-    [ (help) ] word-outliner ;
+    [ article-content (help) ] word-outliner ;
