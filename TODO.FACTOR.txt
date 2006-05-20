@@ -33,8 +33,11 @@
 
 + ui/help:
 
+- track:
+  - don't allow negative dimensions
+  - support removing items
+  - fix round-off error
 - zooming doesn't work
-- sort out various round-off issues
 - implement handlers for open, quit events, and whatever else
 - fix top level window positioning
 - changing window titles

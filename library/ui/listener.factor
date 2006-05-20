@@ -7,7 +7,10 @@ gadgets-theme generic hashtables io jedit
 kernel listener math namespaces parser prettyprint
 sequences styles threads words ;
 
-TUPLE: listener-gadget pane stack ;
+TUPLE: listener-gadget scroller stack ;
+
+: listener-gadget-pane ( listener -- pane )
+    listener-gadget-scroller scroller-gadget ;
 
 : usable-words ( -- words )
     use get hash-concat hash-values ;
@@ -50,12 +53,10 @@ TUPLE: listener-gadget pane stack ;
     [ >r clear r> listener-thread ] in-thread drop ;
 
 C: listener-gadget ( -- gadget )
-    dup delegate>frame
-    <input-pane> dup pick set-listener-gadget-pane
-    <scroller> over @center frame-add
-    <stack-bar> dup pick set-listener-gadget-stack
-    over @top frame-add
-    dup start-listener ;
+    {
+        { [ <stack-bar> ] set-listener-gadget-stack @top }
+        { [ <input-pane> <scroller> ] set-listener-gadget-scroller @center }
+    } make-frame dup start-listener ;
 
 M: listener-gadget pref-dim* drop { 600 600 0 } ;
 

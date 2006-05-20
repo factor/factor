@@ -1,8 +1,8 @@
 ! Copyright (C) 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: gadgets-layouts
-USING: arrays gadgets generic kernel math namespaces
-sequences ;
+USING: arrays gadgets generic kernel math namespaces sequences
+words ;
 
 ! A frame arranges gadgets in a 3x3 grid, where the center
 ! gadgets gets left-over space.
@@ -83,3 +83,20 @@ M: frame layout* ( frame -- dim )
         swap reduce-grid [ second ] map
         2dup
     ] keep rect-dim fill-center 3dup position-grid resize-grid ;
+
+: frame-add-spec ( { quot setter loc } -- )
+    first3 >r >r call
+    frame get 2dup r> dup [ execute ] [ 3drop ] if
+    r> execute frame-add ;
+
+: build-frame ( gadget specs -- )
+    #! Specs is an array of triples { quot setter loc }.
+    #! The setter has stack effect ( new gadget -- ),
+    #! the loc is @center, @top, etc.
+    [ swap frame set [ frame-add-spec ] each ] with-scope ;
+
+: make-frame ( gadget specs -- gadget )
+    #! Specs is an array of triples { quot setter loc }.
+    #! The setter has stack effect ( new gadget -- ),
+    #! the loc is @center, @top, etc.
+    over [ delegate>frame build-frame ] keep ;

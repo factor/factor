@@ -71,12 +71,6 @@ M: viewport layout* ( viewport -- )
 M: viewport focusable-child* ( viewport -- gadget )
     gadget-child ;
 
-: add-viewport 2dup set-scroller-viewport @center frame-add ;
-
-: add-x-slider 2dup set-scroller-x @bottom frame-add ;
-
-: add-y-slider 2dup set-scroller-y @right frame-add ;
-
 : scroll-to ( gadget -- )
     #! Scroll the scroller that contains this gadget, if any, so
     #! that the gadget becomes visible.
@@ -94,11 +88,15 @@ M: viewport focusable-child* ( viewport -- gadget )
 
 C: scroller ( gadget -- scroller )
     #! Wrap a scrolling pane around the gadget.
-    dup delegate>frame
-    [ >r <viewport> r> add-viewport ] keep
-    <x-slider> over add-x-slider
-    <y-slider> over add-y-slider
-    dup scroller-actions ;
+    {
+        { [ <viewport> ] set-scroller-viewport @center }
+        { [ <x-slider> ] set-scroller-x @bottom }
+        { [ <y-slider> ] set-scroller-y @right }
+    } make-frame dup scroller-actions ;
 
 M: scroller focusable-child* ( scroller -- viewport )
     scroller-viewport ;
+
+: scroller-gadget ( scroller -- gadget )
+    #! Gadget being scrolled.
+    scroller-viewport gadget-child ;

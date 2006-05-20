@@ -108,44 +108,46 @@ M: elevator layout* ( elevator -- )
 
 : slide-by-line ( -1/1 slider -- ) >r 32 * r> slide-by ;
 
-: slider-vertical? gadget-orientation { 0 1 0 } = ;
-
-: <slide-button> ( orientation polygon amount -- )
+: <slide-button> ( vector polygon amount -- )
     >r { 0.5 0.5 0.5 1.0 } swap <polygon-gadget> r>
     [ swap slide-by-line ] curry <repeat-button>
     [ set-gadget-orientation ] keep ;
 
-: <up-button> ( slider orientation -- button )
-    swap slider-vertical? arrow-up arrow-left ? -1
-    <slide-button> ;
+: <left-button> { 0 1 0 } arrow-left -1 <slide-button> ;
+: <right-button> { 0 1 0 } arrow-right 1 <slide-button> ;
 
-: add-up { 1 1 1 } over gadget-orientation v- first2 frame-add ;
+: build-x-slider ( slider -- slider )
+    {
+        { [ <left-button> ] f @left }
+        { [ { 0 1 0 } <elevator> ] set-slider-elevator @center }
+        { [ <right-button> ] f @right }
+    } build-frame ;
 
-: <down-button> ( slider orientation -- button )
-    swap slider-vertical? arrow-down arrow-right ? 1
-    <slide-button> ;
+: <up-button> { 1 0 0 } arrow-up -1 <slide-button> ;
+: <down-button> { 1 0 0 } arrow-down 1 <slide-button> ;
 
-: add-down { 1 1 1 } over gadget-orientation v+ first2 frame-add ;
+: build-y-slider ( slider -- slider )
+    {
+        { [ <up-button> ] f @top }
+        { [ { 1 0 0 } <elevator> ] set-slider-elevator @center }
+        { [ <down-button> ] f @bottom }
+    } build-frame ;
 
-: add-elevator 2dup set-slider-elevator @center frame-add ;
-
-: add-thumb 2dup slider-elevator add-gadget set-slider-thumb ;
-
-: slider-opposite ( slider -- vector )
-    gadget-orientation { 1 1 0 } swap v- ;
+: add-thumb ( slider vector -- )
+    <thumb> swap 2dup slider-elevator add-gadget
+    set-slider-thumb ;
 
 C: slider ( vector -- slider )
     dup delegate>frame
     [ set-gadget-orientation ] keep
     0 over set-slider-value
     0 over set-slider-page
-    0 over set-slider-max
-    dup slider-opposite
-    dup <elevator> pick add-elevator
-    2dup <up-button> pick add-up
-    2dup <down-button> pick add-down
-    <thumb> over add-thumb ;
+    0 over set-slider-max ;
 
-: <x-slider> ( -- slider ) { 1 0 0 } <slider> ;
+: <x-slider> ( -- slider )
+    { 1 0 0 } <slider> dup build-x-slider
+    dup { 0 1 0 } add-thumb ;
 
-: <y-slider> ( -- slider ) { 0 1 0 } <slider> ;
+: <y-slider> ( -- slider )
+    { 0 1 0 } <slider> dup build-y-slider
+    dup { 1 0 0 } add-thumb ;

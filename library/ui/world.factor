@@ -9,7 +9,7 @@ math namespaces opengl sequences ;
 
 ! fonts: mapping font tuples to sprite vectors
 ! handle: native resource
-TUPLE: world status focus fonts handle ;
+TUPLE: world gadget status focus fonts handle ;
 
 : free-fonts ( world -- )
     dup world-handle select-gl-context
@@ -19,18 +19,16 @@ TUPLE: world status focus fonts handle ;
 : font-sprites ( font world -- sprites )
     world-fonts [ drop V{ } clone ] cache ;
 
-: add-status ( status world -- )
-    [ set-world-status ] 2keep @bottom frame-add ;
-
 DEFER: request-focus
 
 C: world ( gadget status -- world )
-    dup delegate>frame
+    {
+        { [ ] set-world-status @bottom }
+        { [ ] f @center }
+    } make-frame
     t over set-gadget-root?
     H{ } clone over set-world-fonts
-    [ add-status ] keep
-    [ @center frame-add ] 2keep
-    swap request-focus ;
+    dup world-gadget request-focus ;
 
 GENERIC: find-world ( gadget -- world )
 
