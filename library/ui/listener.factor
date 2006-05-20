@@ -3,7 +3,7 @@
 IN: gadgets-listener
 USING: arrays gadgets gadgets-editors gadgets-labels
 gadgets-layouts gadgets-panes gadgets-scrolling
-gadgets-splitters gadgets-theme generic hashtables io jedit
+gadgets-theme generic hashtables io jedit
 kernel listener math namespaces parser prettyprint
 sequences styles threads words ;
 

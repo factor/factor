@@ -186,7 +186,7 @@ vectors words ;
         "/library/ui/sliders.factor"
         "/library/ui/scrolling.factor"
         "/library/ui/editors.factor"
-        "/library/ui/splitters.factor"
+        "/library/ui/tracks.factor"
         "/library/ui/incremental.factor"
         "/library/ui/paragraphs.factor"
         "/library/ui/panes.factor"

@@ -24,3 +24,6 @@ USING: arrays generic kernel sequences ;
 
 : set-axis ( x y axis -- v )
     dup length [ >r zero? pick pick ? r> swap nth ] 2map 2nip ;
+
+: sum ( seq -- n ) 0 [ + ] reduce ;
+: product ( seq -- n ) 1 [ * ] reduce ;

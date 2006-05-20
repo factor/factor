@@ -210,3 +210,5 @@ unit-test
 [ "ihbye" ] [ "hi" <reversed> "bye" append ] unit-test
 
 [ 10 "hi" "bye" copy-into ] unit-test-fails
+
+[ { 1 2 3 5 6 } ] [ 3 { 1 2 3 4 5 6 } remove-index ] unit-test

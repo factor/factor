@@ -60,9 +60,13 @@ IN: sequences
 : accumulate ( list identity quot -- values | quot: x y -- z )
     rot [ pick >r swap call r> ] map-with nip ; inline
 
+: change-nth ( seq i quot -- )
+    pick pick >r >r >r swap nth
+    r> call r> r> swap set-nth ; inline
+
 : inject ( seq quot -- | quot: elt -- elt )
     over length
-    [ [ swap change-nth-unsafe ] 3keep ] repeat 2drop ;
+    [ [ swap change-nth ] 3keep ] repeat 2drop ;
     inline
 
 : inject-with ( obj seq quot -- | quot: obj elt -- elt )

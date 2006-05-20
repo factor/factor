@@ -80,13 +80,18 @@ TUPLE: pack align fill gap ;
     >r >r gadget-orientation r> r> [ pick set-axis ] 2map nip ;
 
 : packed-dim-2 ( gadget sizes -- list )
-    [ over rect-dim over v- rot pack-fill v*n v+ ] map-with ;
+    [
+        over rect-dim over v- rot pack-fill v*n v+
+        [ >fixnum ] map 
+    ] map-with ;
 
 : packed-dims ( gadget sizes -- seq )
     2dup packed-dim-2 swap orient ;
 
 : packed-loc-1 ( gadget sizes -- seq )
-    { 0 0 0 } [ v+ over pack-gap v+ ] accumulate nip ;
+    { 0 0 0 } [
+        v+ over pack-gap v+ [ >fixnum ] map
+    ] accumulate nip ;
 
 : packed-loc-2 ( gadget sizes -- seq )
     [

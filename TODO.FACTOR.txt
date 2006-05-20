@@ -33,6 +33,8 @@
 
 + ui/help:
 
+- zooming doesn't work
+- sort out various round-off issues
 - implement handlers for open, quit events, and whatever else
 - fix top level window positioning
 - changing window titles

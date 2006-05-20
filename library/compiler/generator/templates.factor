@@ -153,7 +153,7 @@ SYMBOL: phantom-r
 
 : additional-vregs ( seq seq -- n )
     2array phantoms 2array [ [ length ] map ] 2apply v-
-    0 [ 0 max + ] reduce ;
+    [ 0 max ] map sum ;
 
 : free-vregs# ( -- int# float# )
     T{ int-regs } free-vregs length

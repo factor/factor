@@ -43,10 +43,6 @@ M: object set-nth-unsafe set-nth ;
 : 2nth-unsafe ( s s n -- x x )
     tuck swap nth-unsafe >r swap nth-unsafe r> ; inline
 
-: change-nth-unsafe ( seq i quot -- )
-    pick pick >r >r >r swap nth-unsafe
-    r> call r> r> swap set-nth-unsafe ; inline
-
 ! The f object supports the sequence protocol trivially
 M: f length drop 0 ;
 M: f nth nip ;
