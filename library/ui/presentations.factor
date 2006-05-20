@@ -1,9 +1,26 @@
 ! Copyright (C) 2005, 2006 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 IN: gadgets-presentations
-USING: arrays gadgets gadgets-borders gadgets-browser
-gadgets-labels gadgets-layouts gadgets-outliner gadgets-panes
-hashtables io kernel sequences strings styles ;
+USING: arrays gadgets gadgets-borders
+gadgets-buttons gadgets-labels gadgets-layouts gadgets-outliner
+gadgets-panes generic hashtables inspector io kernel prettyprint
+sequences strings styles words ;
+
+! Clickable objects
+TUPLE: object-button object ;
+
+G: show-object ( object gadget -- ) 1 standard-combination ;
+
+C: object-button ( gadget object -- button )
+    [ set-object-button-object ] keep
+    [
+        >r [
+            [ object-button-object ] keep show-object
+        ] <roll-button> r> set-gadget-delegate
+    ] keep ;
+
+M: object-button gadget-help ( button -- string )
+    object-button-object dup word? [ synopsis ] [ summary ] if ;
 
 ! Character styles
 
@@ -25,7 +42,7 @@ hashtables io kernel sequences strings styles ;
     over specified-font over set-label-font ;
 
 : apply-browser-style ( style gadget -- style gadget )
-    presented [ <browser-button> ] apply-style ;
+    presented [ <object-button> ] apply-style ;
 
 : <presentation> ( style text -- gadget )
     <label>

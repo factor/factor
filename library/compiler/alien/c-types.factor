@@ -71,11 +71,15 @@ SYMBOL: c-types
 : init-c-type ( name vocab -- )
     over define-pointer define-nth ;
 
-: define-primitive-type ( quot name -- )
+: (define-primitive-type) ( quot name -- )
     [ define-c-type ] keep "alien"
     2dup init-c-type
     2dup define-deref
     over c-setter [ 2dup define-set-nth define-out ] when ;
+
+: define-primitive-type ( quot name -- )
+    [ (define-primitive-type) ] keep dup c-setter
+    [ "alien" 2dup define-set-nth define-out ] [ drop ] if ;
 
 : typedef ( old new -- )
     over "*" append over "*" append (typedef) (typedef) ;

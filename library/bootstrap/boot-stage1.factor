@@ -193,10 +193,11 @@ vectors words ;
         "/library/ui/outliner.factor"
         "/library/ui/environment.factor"
         "/library/ui/listener.factor"
+        "/library/ui/presentations.factor"
+        "/library/ui/inspector.factor"
         "/library/ui/browser.factor"
         "/library/ui/apropos.factor"
         "/library/ui/launchpad.factor"
-        "/library/ui/presentations.factor"
 
         "/library/continuations.facts"
         "/library/errors.facts"

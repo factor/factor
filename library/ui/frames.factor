@@ -95,8 +95,8 @@ M: frame layout* ( frame -- dim )
     #! the loc is @center, @top, etc.
     [ swap frame set [ frame-add-spec ] each ] with-scope ;
 
-: make-frame ( gadget specs -- gadget )
-    #! Specs is an array of triples { quot setter loc }.
-    #! The setter has stack effect ( new gadget -- ),
-    #! the loc is @center, @top, etc.
+: make-frame ( specs -- gadget )
+    <frame> [ swap build-frame ] keep ;
+
+: make-frame* ( gadget specs -- gadget )
     over [ delegate>frame build-frame ] keep ;

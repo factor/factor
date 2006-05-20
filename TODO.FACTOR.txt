@@ -1,3 +1,5 @@
+- redefine generic as tuple constructor -- still appears generic
+
 - remove F_USERENV rel
 - update walker for new interpreter
 - quotations should store their originating word
@@ -33,16 +35,13 @@
 
 + ui/help:
 
+- make-frame should compile
 - track:
   - don't allow negative dimensions
-  - support removing items
   - fix round-off error
-- zooming doesn't work
-- implement handlers for open, quit events, and whatever else
 - fix top level window positioning
 - changing window titles
 - reimplement clicking input
-- polish OS X menu bar code
 - clicks sent twice
 - speed up ideas:
   - only do clipping for certain gadgets
@@ -51,8 +50,12 @@
 - x11 input methods
 - x11 title bars are funny
 - cocoa:
+  - need to flush callbacks
   - don't multiplex in the event loop if there is no pending i/o
   - horizontal scrolling
+  - zooming doesn't work
+  - implement handlers for open, quit events, and whatever else
+  - polish OS X menu bar code
 - fix mouse-overs...
 - display lists
 - saving the image should save window configuration

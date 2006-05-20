@@ -71,6 +71,9 @@ M: viewport layout* ( viewport -- )
 M: viewport focusable-child* ( viewport -- gadget )
     gadget-child ;
 
+M: viewport pref-dim* ( viewport -- dim )
+    gadget-child pref-dim ;
+
 : scroll-to ( gadget -- )
     #! Scroll the scroller that contains this gadget, if any, so
     #! that the gadget becomes visible.
@@ -92,7 +95,7 @@ C: scroller ( gadget -- scroller )
         { [ <viewport> ] set-scroller-viewport @center }
         { [ <x-slider> ] set-scroller-x @bottom }
         { [ <y-slider> ] set-scroller-y @right }
-    } make-frame dup scroller-actions ;
+    } make-frame* dup scroller-actions ;
 
 M: scroller focusable-child* ( scroller -- viewport )
     scroller-viewport ;

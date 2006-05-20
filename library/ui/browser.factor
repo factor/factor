@@ -1,122 +1,114 @@
 ! Copyright (C) 2006 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 IN: gadgets-browser
-USING: arrays gadgets gadgets-buttons gadgets-labels
-gadgets-layouts gadgets-panes gadgets-scrolling gadgets-theme
-generic hashtables help inspector kernel math namespaces
-prettyprint sequences words ;
+USING: gadgets gadgets-buttons gadgets-inspector gadgets-labels
+gadgets-layouts gadgets-panes gadgets-presentations
+gadgets-scrolling gadgets-theme gadgets-tracks generic
+hashtables help inspector kernel math prettyprint sequences
+words ;
 
-SYMBOL: components
-
-H{ } clone components set-global
-
-: get-components ( class -- assoc )
-    components get-global hash [
-        { { "Slots" [ describe ] } }
-    ] unless* ;
-
-{
-    { "Definition" [ help ] }
-    { "Calls in" [ usage. ] }
-    { "Calls out" [ uses. ] }
-    { "Links in" [ links-in. ] }
-    { "Links out" [ links-out. ] }
-    { "Vocabulary" [ word-vocabulary words. ] }
-    { "Properties" [ word-props describe ] }
-} \ word components get-global set-hash
-
-{
-    { "Article" [ help ] }
-    { "Links in" [ links-in. ] }
-    { "Links out" [ links-out. ] }
-} \ link components get-global set-hash
-
-{
-    { "Call stack" [ continuation-call callstack. ] }
-    { "Data stack" [ continuation-data stack. ] }
-    { "Retain stack" [ continuation-retain stack. ] }
-    { "Name stack" [ continuation-name stack. ] }
-    { "Catch stack" [ continuation-catch stack. ] }
-} \ continuation components get-global set-hash
-
-TUPLE: book page pages ;
-
-: show-page ( key book -- )
-    dup book-page unparent
-    [ book-pages assoc ] keep
-    [ set-book-page ] 2keep
-    add-gadget ;
-
-C: book ( pages -- book )
-    dup delegate>gadget
-    [ set-book-pages ] 2keep
-    [ >r first first r> show-page ] keep ;
-
-M: book pref-dim* ( book -- dim ) book-page pref-dim ;
-
-M: book layout* ( book -- )
-    dup rect-dim swap book-page set-gadget-dim ;
-
-: component-pages ( obj -- assoc )
-    dup class get-components
-    [ first2 swapd make-pane <scroller> 2array ] map-with ;
-
-: <tab> ( name book -- button )
-    dupd [ show-page drop ] curry curry
-    >r <label> r> <bevel-button> ;
-
-: tabs ( assoc book gadget -- )
-    >r swap [ first swap <tab> ] map-with r> add-gadgets ;
-
-TUPLE: browser object history tabs ;
-
-: save-current ( browser -- )
-    dup browser-object swap browser-history push ;
-
-: browse ( obj browser -- )
-    [ set-browser-object ] 2keep
-    dup browser-tabs clear-gadget
-    >r component-pages dup <book> r>
-    [ @center frame-add ] 2keep browser-tabs tabs ;
+TUPLE: browser
+    vocabs
+    vocab-track showing-vocabs
+    word-track showing-words ;
 
 : find-browser [ browser? ] find-parent ;
 
-: browse-back ( browser -- )
-    dup browser-history dup empty?
-    [ 2drop ] [ pop swap browse ] if ;
+: <title-border> ( gadget title -- gadget )
+    {
+        { [ <label> dup highlight-theme ] f @top }
+        { [ ] f @center }
+    } make-frame ;
 
-C: browser ( obj -- browser )
-    V{ } clone over set-browser-history
-    dup delegate>frame [
-        "<" <label> [ find-browser browse-back ] <bevel-button> ,
-        <shelf> dup pick set-browser-tabs ,
-    ] { } make make-shelf dup highlight-theme
-    over @top frame-add
-    [ browse ] keep ;
+: showing-word? ( word browser -- ? )
+    browser-showing-words hash-member? ;
 
-TUPLE: browser-button object ;
+: (show-word) ( gadget word browser -- )
+    [ browser-showing-words set-hash ] 3keep nip
+    browser-word-track track-add ;
 
-: browser-window ( obj -- ) <browser> "Browser" open-window ;
+DEFER: show-vocab
 
-: browser-button-action ( button -- )
-    [ browser-button-object ] keep find-browser [
-        find-browser dup save-current browse
+: show-word ( word browser -- )
+    2dup showing-word? [
+        2drop
     ] [
-        browser-window
-    ] if* ;
+        over word-vocabulary over show-vocab
+        >r [ f <inspector> ] keep r> (show-word)
+    ] if ;
 
-: browser-button-gestures ( gadget -- )
+: hide-word ( word browser -- )
+    [ browser-showing-words remove-hash* ] keep
+    browser-word-track track-remove ;
+
+: toggle-word ( word browser -- )
+    2dup showing-word? [ hide-word ] [ show-word ] if ;
+
+: <word-button> ( word -- gadget )
+    dup word-name <label> swap
+    [ swap find-browser toggle-word ] curry
+    <roll-button> ;
+
+: <vocab> ( vocab -- gadget )
     [
-        [ browser-button-object browser-window ] if-clicked
-    ] T{ button-up f 3 } set-action ;
+        words natural-sort
+        [ <word-button> ] map make-pile <scroller>
+    ] keep <title-border> ;
 
-C: browser-button ( gadget object -- button )
-    [ set-browser-button-object ] keep
+: showing-vocab? ( vocab browser -- ? )
+    browser-showing-vocabs hash-member? ;
+
+: (show-vocab) ( gadget vocab browser -- )
+    [ browser-showing-vocabs set-hash ] 3keep nip
+    browser-vocab-track track-add ;
+
+: show-vocab ( vocab browser -- )
+    2dup showing-vocab?
+    [ 2drop ] [ >r [ <vocab> ] keep r> (show-vocab) ] if ;
+
+: hide-vocab-words ( vocab browser -- )
     [
-        >r [ browser-button-action ] <roll-button> r>
-        set-gadget-delegate
-    ] keep
-    dup browser-button-gestures ;
+        browser-showing-words hash-keys
+        [ word-vocabulary = ] subset-with
+    ] keep swap [ swap hide-word ] each-with ;
 
-M: browser-button gadget-help ( button -- string )
-    browser-button-object dup word? [ synopsis ] [ summary ] if ;
+: hide-vocab ( vocab browser -- )
+    2dup hide-vocab-words
+    [ browser-showing-vocabs remove-hash* ] keep
+    browser-vocab-track track-remove ;
+
+: toggle-vocab ( word browser -- )
+    2dup showing-vocab? [ hide-vocab ] [ show-vocab ] if ;
+
+: <vocab-button> ( vocab -- gadget )
+    dup <label> swap
+    [ swap find-browser toggle-vocab ] curry
+    <roll-button> ;
+
+: <vocabs> ( -- gadget )
+    vocabs [ <vocab-button> ] map make-pile <scroller>
+    "Vocabularies" <title-border> ;
+
+: add-vocabs ( vocabs browser -- )
+    [ set-browser-vocabs ] 2keep track-add ;
+
+: add-vocab-track ( track browser -- )
+    [ set-browser-vocab-track ] 2keep track-add ;
+
+: add-word-track ( track browser -- )
+    [ set-browser-word-track ] 2keep track-add ;
+
+C: browser ( -- browser )
+    H{ } clone over set-browser-showing-vocabs
+    H{ } clone over set-browser-showing-words
+    <y-track> over set-delegate
+    <vocabs> over add-vocabs
+    <x-track> over add-vocab-track
+    <x-track> over add-word-track
+    { 1/4 1/4 1/2 } over set-track-sizes ;
+
+: browser-window ( word -- )
+    <browser> [ "Browser" open-window ] keep show-word ;
+
+M: word show-object ( word button -- )
+    find-browser [ show-word ] [ browser-window ] if* ;

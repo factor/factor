@@ -143,6 +143,9 @@ IN: hashtables
         3drop
     ] if-key ;
 
+: remove-hash* ( key hash -- oldvalue )
+    [ hash ] 2keep remove-hash ;
+
 : hash-size ( hash -- n )
     dup hash-count swap hash-deleted - ; inline
 

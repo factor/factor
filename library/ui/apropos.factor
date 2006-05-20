@@ -25,7 +25,7 @@ C: apropos-gadget ( -- )
     {
         { [ <pane> <scroller> ] set-apropos-gadget-scroller @center }
         { [ <apropos-prompt> ] set-apropos-gadget-input @top }
-    } make-frame ;
+    } make-frame* ;
 
 M: apropos-gadget pref-dim* drop { 350 200 0 } ;
 

@@ -56,7 +56,7 @@ C: listener-gadget ( -- gadget )
     {
         { [ <stack-bar> ] set-listener-gadget-stack @top }
         { [ <input-pane> <scroller> ] set-listener-gadget-scroller @center }
-    } make-frame dup start-listener ;
+    } make-frame* dup start-listener ;
 
 M: listener-gadget pref-dim* drop { 600 600 0 } ;
 

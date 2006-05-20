@@ -103,25 +103,27 @@ USING: alien compiler kernel kernel-internals math namespaces ;
 
 [
     [ alien-unsigned-cell <alien> alien>string ] "getter" set
+    [ >r >r alien-address r> r> set-alien-unsigned-cell ] "setter" set
     bootstrap-cell "width" set
     bootstrap-cell "align" set
     "box_c_string" "boxer-function" set
     "unbox_c_string" "unboxer-function" set
-] "char*" define-primitive-type
+] "char*" (define-primitive-type)
 
 [
     [ alien-unsigned-4 ] "getter" set
-    bootstrap-cell "width" set
-    bootstrap-cell "align" set
+    [ >r >r alien-address r> r> set-alien-unsigned-4 ] "setter" set
+    4 "width" set
+    4 "align" set
     "box_utf16_string" "boxer-function" set
     "unbox_utf16_string" "unboxer-function" set
-] "ushort*" define-primitive-type
+] "ushort*" (define-primitive-type)
 
 [
     [ alien-unsigned-4 zero? not ] "getter" set
     [ 1 0 ? set-alien-unsigned-4 ] "setter" set
-    bootstrap-cell "width" set
-    bootstrap-cell "align" set
+    4 "width" set
+    4 "align" set
     "box_boolean" "boxer-function" set
     "unbox_boolean" "unboxer-function" set
 ] "bool" define-primitive-type

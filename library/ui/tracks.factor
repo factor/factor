@@ -4,7 +4,10 @@ IN: gadgets-tracks
 USING: gadgets gadgets-layouts gadgets-theme io kernel math
 namespaces sequences ;
 
-TUPLE: divider # splitter ;
+TUPLE: divider ;
+
+: divider-# ( divider -- n )
+    dup gadget-parent gadget-children index 2 /i ;
 
 : divider-size { 8 8 0 } ;
 
@@ -14,6 +17,10 @@ TUPLE: track sizes saved-sizes ;
 
 C: track ( orientation -- track )
     [ delegate>pack ] keep 1 over set-pack-fill ;
+
+: <x-track> { 0 1 0 } <track> ;
+
+: <y-track> { 1 0 0 } <track> ;
 
 : track-dim ( track -- dim )
     #! Space available for content (minus dividers)
@@ -58,8 +65,7 @@ M: track layout* ( splitter -- )
     dup [ drop ] T{ button-up } set-action
     [ divider-motion ] T{ drag } set-action ;
 
-C: divider ( n -- divider )
-    [ set-divider-# ] keep
+C: divider ( -- divider )
     dup delegate>gadget
     dup divider-actions
     dup reverse-video-theme ;
@@ -71,14 +77,24 @@ C: divider ( n -- divider )
     dup length 1 max recip add normalize-sizes ;
 
 : add-divider ( track -- )
-    dup track-sizes length dup zero?
-    [ 2drop ] [ 1- <divider> swap add-gadget ] if ;
+    dup track-sizes empty?
+    [ drop ] [ <divider> swap add-gadget ] if ;
 
 : track-add ( gadget track -- )
     dup add-divider [ add-gadget ] keep
     dup track-sizes track-add-size swap set-track-sizes ;
 
+: nth-gadget gadget-children nth ;
+
+: track-remove@ ( n track -- )
+    #! Remove the divider if this is not the last child.
+    2dup nth-gadget unparent
+    dup gadget-children empty? [
+        2dup gadget-children length = [ >r 1- r> ] when
+        2dup nth-gadget unparent
+    ] unless
+    [ >r 2 /i r> track-sizes remove-index normalize-sizes ] keep
+    [ set-track-sizes ] keep relayout-1 ;
+
 : track-remove ( gadget track -- )
-    ! wrong
-    [ gadget-children index ] 2keep swap unparent
-    [ remove-index ] keep set-track-sizes ;
+    [ gadget-children index ] keep track-remove@ ;

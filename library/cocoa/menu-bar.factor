@@ -1,7 +1,8 @@
-USING: cocoa compiler gadgets gadgets-launchpad gadgets-layouts
-gadgets-listener kernel memory objc objc-FactorCallback
-objc-NSApplication objc-NSMenu objc-NSMenuItem objc-NSObject
-objc-NSWindow sequences strings words ;
+USING: cocoa compiler gadgets gadgets-browser gadgets-launchpad
+gadgets-layouts gadgets-listener kernel memory objc
+objc-FactorCallback objc-NSApplication objc-NSMenu
+objc-NSMenuItem objc-NSObject objc-NSWindow sequences strings
+words ;
 IN: gadgets-cocoa
 
 ! -------------------------------------------------------------------------
@@ -107,9 +108,9 @@ DEFER: described-menu
             { "Listener" listener-window "n" }
             { "Run..." menu-run-file "o" }
             { }
+            { "Browser" browser-window "b" }
             { "Apropos" apropos-window "r" }
-            { "Vocabularies" vocabs-window "" }
-            { "Globals" global-window "" }
+            { "Globals" globals-window "" }
             { "Memory" memory-window "" }
             { }
             { "Save Image" save "s" }

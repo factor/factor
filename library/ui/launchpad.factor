@@ -1,8 +1,8 @@
 IN: gadgets-launchpad
-USING: gadgets gadgets-apropos gadgets-browser gadgets-borders
-gadgets-buttons gadgets-labels gadgets-layouts gadgets-listener
-gadgets-panes gadgets-scrolling gadgets-theme help inspector io
-kernel memory namespaces sequences ; 
+USING: gadgets gadgets-apropos gadgets-borders gadgets-browser
+gadgets-buttons gadgets-inspector gadgets-labels gadgets-layouts
+gadgets-listener gadgets-panes gadgets-scrolling gadgets-theme
+help inspector io kernel memory namespaces sequences ; 
 
 : <launchpad> ( menu -- )
     [ first2 >r <label> [ drop ] r> append <bevel-button> ] map
@@ -24,20 +24,17 @@ kernel memory namespaces sequences ;
 : apropos-window ( -- )
     <apropos-gadget> "Apropos" open-window ;
 
-: vocabs-window ( -- )
-    [ vocabs. ] "Vocabularies" pane-window ;
-
-: global-window ( -- )
-    global browser-window ;
+: globals-window ( -- )
+    global inspector-window ;
 
 : default-launchpad
     {
         { "Listener" [ listener-window ] }
         { "Documentation" [ handbook-window ] }
         { "Help index" [ articles-window ] }
+        { "Browser" [ browser-window ] }
         { "Apropos" [ apropos-window ] }
-        { "Vocabularies" [ vocabs-window ] }
-        { "Globals" [ global-window ] }
+        { "Globals" [ globals-window ] }
         { "Memory" [ memory-window ] }
         { "Save image" [ save ] }
         { "Exit" [ 0 exit ] }
