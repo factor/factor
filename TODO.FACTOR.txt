@@ -1,4 +1,3 @@
-- remove F_USERENV rel
 - core foundation should use unicode strings
 - alien>utf16-string, utf16-string>alien words
 - fix compiled gc check
@@ -41,8 +40,7 @@
 - toggle/radio buttons/tabs or something
 - inspector: less clutter when browsing words
 - make-frame should compile
-- track:
-  - don't allow negative dimensions
+- track: don't allow negative dimensions
 - fix top level window positioning
 - changing window titles
 - clicks sent twice

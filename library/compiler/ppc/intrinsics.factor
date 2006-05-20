@@ -306,7 +306,7 @@ math-internals namespaces sequences words ;
 
 : userenv ( reg -- )
     #! Load the userenv pointer in a register.
-    "userenv" f dlsym swap LOAD32 0 rel-2/2 rel-userenv ;
+    "userenv" f rot compile-dlsym ;
 
 \ getenv [
     "n" operand dup 1 SRAWI

@@ -260,8 +260,8 @@ IN: compiler
 
 ! User environment
 : %userenv ( -- )
-    "x" operand "userenv" f dlsym MOV
-    0 rel-absolute-cell rel-userenv
+    "x" operand "userenv" f [ MOV ] 2keep
+    rel-absolute-cell rel-dlsym
     "n" operand fixnum>slot@
     "n" operand "x" operand ADD ;
 

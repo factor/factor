@@ -104,8 +104,6 @@ INLINE CELL compute_code_rel(F_REL *rel, CELL original)
 		return get_rel_symbol(rel);
 	case F_ABSOLUTE:
 		return original + (compiling.base - code_relocation_base);
-	case F_USERENV:
-		return (CELL)&userenv[REL_ARGUMENT(rel)];
 	case F_CARDS:
 		return cards_offset;
 	default:

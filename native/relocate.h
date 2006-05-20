@@ -15,8 +15,6 @@ typedef enum {
 	F_DLSYM,
 	/* relocate an address to start of code heap */
 	F_ABSOLUTE,
-	/* store a pointer to environment table */
-	F_USERENV,
 	/* store the offset of the card table from the data heap base */
 	F_CARDS
 } F_RELTYPE;

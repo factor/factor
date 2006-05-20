@@ -71,9 +71,7 @@ SYMBOL: relocation-table
         rel-address drop
     ] if ;
 
-: rel-userenv ( n class -- ) 3 rel-type, ;
-
-: rel-cards ( class -- ) 0 swap 4 rel-type, ;
+: rel-cards ( class -- ) 0 swap 3 rel-type, ;
 
 ! This is for fixing up forward references
 GENERIC: resolve ( fixup -- addr )
