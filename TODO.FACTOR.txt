@@ -1,11 +1,10 @@
 - remove F_USERENV rel
-- update walker for new interpreter
 - quotations should store their originating word
 - core foundation should use unicode strings
 - alien>utf16-string, utf16-string>alien words
 - fix compiled gc check
 - 3 >n fep
-- code walker & exceptions
+- code walker & exceptions -- test and debug problems
 - code walker and callbacks is broken?
 - prettyprinter's highlighting of non-leaves looks bad
 
@@ -30,9 +29,15 @@
 - better line spacing in ui and html
 - tabular formatting - for inspector, changes and $values in help
 - grid layout
+- make the help look better, something like this:
+  http://twb.ath.cx/~twb/darcs/OBSOLETE/factor/final.html
 
 + ui/help:
 
+- new browser:
+  - close boxes
+  - separate definition & documentation tabs
+- toggle/radio buttons/tabs or something
 - make-frame should compile
 - track:
   - don't allow negative dimensions
@@ -54,11 +59,10 @@
   - zooming doesn't work
   - implement handlers for open, quit events, and whatever else
   - polish OS X menu bar code
-- fix mouse-overs...
+- when scrolling wheel, or moving mouse out of window, rollover is not
+  updated
 - display lists
 - saving the image should save window configuration
-- make the UI look better, something like this:
-  http://twb.ath.cx/~twb/darcs/OBSOLETE/factor/final.html
 - fix up the min thumb size hack
 - variable width word wrap
 

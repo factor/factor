@@ -1,10 +1,13 @@
 ! Copyright (C) 2004, 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
-IN: errors
-USING: kernel kernel-internals sequences ;
+IN: kernel-internals
+USING: sequences ;
 
 : >c ( continuation -- ) catchstack* push ;
 : c> ( -- continuation ) catchstack* pop ;
+
+IN: errors
+USING: kernel ;
 
 : catch ( try -- error | try: -- )
     [ >c call f c> drop f ] callcc1 nip ; inline

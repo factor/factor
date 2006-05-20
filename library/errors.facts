@@ -1,4 +1,4 @@
-USING: errors help kernel ;
+USING: errors help kernel kernel-internals ;
 
 HELP: >c "( continuation -- )"
 { $values { "continuation" "a continuation" } }

@@ -1,5 +1,5 @@
 USING: hashtables hashtables-internals help io-internals kernel
-namespaces queues ;
+kernel-internals namespaces queues ;
 
 GLOSSARY: "collection" "an object whose primary purpose is to aggregate other objects; examples include sequences, queues and hashtables" ;
 
