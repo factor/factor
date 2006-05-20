@@ -116,6 +116,9 @@ M: object like drop ;
 : assoc ( key assoc -- value ) 
     [ first = ] find-with nip second ;
 
+: rassoc ( value assoc -- key ) 
+    [ second = ] find-with nip first ;
+
 : last/first ( seq -- pair ) dup peek swap first 2array ;
 
 : sequence= ( seq seq -- ? )

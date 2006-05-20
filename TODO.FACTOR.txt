@@ -1,5 +1,4 @@
 - remove F_USERENV rel
-- quotations should store their originating word
 - core foundation should use unicode strings
 - alien>utf16-string, utf16-string>alien words
 - fix compiled gc check
@@ -35,13 +34,12 @@
 + ui/help:
 
 - new browser:
-  - close boxes
   - separate definition & documentation tabs
+  - browse generic words and classes
 - toggle/radio buttons/tabs or something
 - make-frame should compile
 - track:
   - don't allow negative dimensions
-  - fix round-off error
 - fix top level window positioning
 - changing window titles
 - reimplement clicking input
@@ -65,6 +63,7 @@
 - saving the image should save window configuration
 - fix up the min thumb size hack
 - variable width word wrap
+- new gesture style
 
 + compiler/ffi:
 

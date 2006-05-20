@@ -7,39 +7,77 @@ gadgets-scrolling gadgets-theme gadgets-tracks generic
 hashtables help inspector kernel math prettyprint sequences
 words ;
 
-TUPLE: browser
-    vocabs
-    vocab-track showing-vocabs
-    word-track showing-words ;
+TUPLE: browser-track showing builder closer ;
+
+C: browser-track ( builder closer -- gadget )
+    <x-track> over set-delegate
+    H{ } clone over set-browser-track-showing
+    [ set-browser-track-closer ] keep
+    [ set-browser-track-builder ] keep ;
+
+: showing-asset? ( asset track -- ? )
+    browser-track-showing hash-member? ;
+
+: (show-asset) ( gadget asset track -- )
+    [ browser-track-showing set-hash ] 3keep nip track-add ;
+
+: show-asset ( asset track -- )
+    2dup showing-asset? [
+        2drop
+    ] [
+        [ browser-track-builder call ] 2keep (show-asset)
+    ] if ;
+
+: hide-asset ( asset track -- )
+    [ dup browser-track-closer call ] 2keep
+    [ browser-track-showing remove-hash* ] keep track-remove ;
+
+TUPLE: browser vocabs vocab-track word-track ;
 
 : find-browser [ browser? ] find-parent ;
 
-: <title-border> ( gadget title -- gadget )
+TUPLE: tile ;
+
+: find-tile [ tile? ] find-parent ;
+
+: close-tile ( tile -- )
+    dup gadget-parent [
+        browser-track-showing hash>alist rassoc
+    ] keep hide-asset ;
+
+: <close-button> ( -- gadget )
+    { 0.0 0.0 0.0 1.0 } close-box <polygon-gadget>
+    [ find-tile close-tile ] <bevel-button> ;
+
+: <closable-title> ( title -- gadget )
     {
-        { [ <label> dup highlight-theme ] f @top }
-        { [ ] f @center }
+        { [ <label> ] f @center }
+        { [ <close-button> ] f @right }
     } make-frame ;
 
-: showing-word? ( word browser -- ? )
-    browser-showing-words hash-member? ;
+: <title> ( title closable? -- gadget )
+    [ <closable-title> ] [ <label> ] if dup highlight-theme ;
 
-: (show-word) ( gadget word browser -- )
-    [ browser-showing-words set-hash ] 3keep nip
-    browser-word-track track-add ;
+C: tile ( gadget title closable? -- gadget )
+    {
+        { [ <title> ] f @top }
+        { [ ] f @center }
+    } make-frame* ;
+
+: showing-word? ( word browser -- ? )
+    browser-word-track showing-asset? ;
 
 DEFER: show-vocab
 
+: <word-view> ( word -- gadget )
+    [ f <inspector> ] keep word-name t <tile> ;
+
 : show-word ( word browser -- )
-    2dup showing-word? [
-        2drop
-    ] [
-        over word-vocabulary over show-vocab
-        >r [ f <inspector> ] keep r> (show-word)
-    ] if ;
+    over word-vocabulary over show-vocab
+    browser-word-track show-asset ;
 
 : hide-word ( word browser -- )
-    [ browser-showing-words remove-hash* ] keep
-    browser-word-track track-remove ;
+    browser-word-track hide-asset ;
 
 : toggle-word ( word browser -- )
     2dup showing-word? [ hide-word ] [ show-word ] if ;
@@ -49,33 +87,26 @@ DEFER: show-vocab
     [ swap find-browser toggle-word ] curry
     <roll-button> ;
 
-: <vocab> ( vocab -- gadget )
+: <vocab-view> ( vocab -- gadget )
     [
         words natural-sort
         [ <word-button> ] map make-pile <scroller>
-    ] keep <title-border> ;
+    ] keep t <tile> ;
 
 : showing-vocab? ( vocab browser -- ? )
-    browser-showing-vocabs hash-member? ;
-
-: (show-vocab) ( gadget vocab browser -- )
-    [ browser-showing-vocabs set-hash ] 3keep nip
-    browser-vocab-track track-add ;
+    browser-vocab-track showing-asset? ;
 
 : show-vocab ( vocab browser -- )
-    2dup showing-vocab?
-    [ 2drop ] [ >r [ <vocab> ] keep r> (show-vocab) ] if ;
+    browser-vocab-track show-asset ;
 
 : hide-vocab-words ( vocab browser -- )
     [
-        browser-showing-words hash-keys
+        browser-word-track browser-track-showing hash-keys
         [ word-vocabulary = ] subset-with
     ] keep swap [ swap hide-word ] each-with ;
 
 : hide-vocab ( vocab browser -- )
-    2dup hide-vocab-words
-    [ browser-showing-vocabs remove-hash* ] keep
-    browser-vocab-track track-remove ;
+    browser-vocab-track hide-asset ;
 
 : toggle-vocab ( word browser -- )
     2dup showing-vocab? [ hide-vocab ] [ show-vocab ] if ;
@@ -87,7 +118,7 @@ DEFER: show-vocab
 
 : <vocabs> ( -- gadget )
     vocabs [ <vocab-button> ] map make-pile <scroller>
-    "Vocabularies" <title-border> ;
+    "Vocabularies" f <tile> ;
 
 : add-vocabs ( vocabs browser -- )
     [ set-browser-vocabs ] 2keep track-add ;
@@ -98,13 +129,18 @@ DEFER: show-vocab
 : add-word-track ( track browser -- )
     [ set-browser-word-track ] 2keep track-add ;
 
+: <vocab-track> ( -- track )
+    [ <vocab-view> ] [ find-browser hide-vocab-words ]
+    <browser-track> ;
+
+: <word-track> ( -- track )
+    [ <word-view> ] [ 2drop ] <browser-track> ;
+
 C: browser ( -- browser )
-    H{ } clone over set-browser-showing-vocabs
-    H{ } clone over set-browser-showing-words
     <y-track> over set-delegate
     <vocabs> over add-vocabs
-    <x-track> over add-vocab-track
-    <x-track> over add-word-track
+    <vocab-track> over add-vocab-track
+    <word-track> over add-word-track
     { 1/4 1/4 1/2 } over set-track-sizes ;
 
 : browser-window ( word -- )

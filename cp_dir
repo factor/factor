@@ -1,4 +1,4 @@
 #!/bin/sh
 
 mkdir -p `dirname $2`
-cp -v $1 $2
+cp $1 $2

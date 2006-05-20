@@ -43,8 +43,8 @@ ARTICLE: "word-introspection" "Word introspection"
 "Find words whose name contains a given string:"
 { $subsection apropos }
 "List all vocabularies, and list words in a vocabulary:"
-{ $subsection vocabs. }
-{ $subsection words. }
+{ $subsection vocabs }
+{ $subsection words }
 "Display callers and words called by a given word:"
 { $subsection usage. }
 { $subsection uses. } ;

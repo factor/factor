@@ -30,7 +30,5 @@ M: wrapper literalize <wrapper> ;
 
 : curry ( obj quot -- quot ) >r literalize unit r> append ;
 
-: curry-each ( seq quot -- seq ) [ swap curry ] map-with ;
-
 : alist>quot ( default alist -- quot )
     [ [ first2 swap % , , \ if , ] [ ] make ] each ;

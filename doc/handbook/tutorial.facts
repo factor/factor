@@ -147,11 +147,11 @@ ARTICLE: "tutorial-library" "The library"
 { $list
     {
         "To list all vocabularies:"
-        { $code "vocabs." }
+        { $code "vocabs ." }
     }
     {
         "To list all words in a vocabulary:"
-        { $code "\"sequences\" words." }
+        { $code "\"sequences\" words ." }
     }
     {
         "To show a word definition:"

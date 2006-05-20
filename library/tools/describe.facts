@@ -20,21 +20,10 @@ HELP: describe "( object -- )"
 { $notes "Slot values are converted to strings using " { $link unparse-short } "." }
 { $examples { $code "global describe" } } ;
 
-HELP: sequence-outliner "( seq quot -- )"
-{ $values { "seq" "a sequence" } { "quot" "a quotation with stack effect " { $snippet "( object -- )" } } }
-{ $description "Prints an expanding outliner to the default stream. The sequence elements are converted to strings using " { $link unparse-short } ", and each element is output on its own row. Expanding a row outliner applies the quotation to the object; the quotation should print output to the default stream to elaborate the object." }
-{ $notes "For a lower-level outliner output facility, use " { $link simple-outliner } " or " { $link write-outliner } "." } ;
-
-HELP: words. "( vocab -- )"
-{ $values { "vocab" "a string naming a vocabulary" } }
-{ $description "Prints an outliner listing all words in a vocabulary. Expanding a row shows the word documentation and definition using " { $link help } "." }
-{ $examples { $code "\"sequences\" words." } }
-{ $see-also words } ;
-
-HELP: vocabs. "( -- )"
-{ $description "Prints an outliner listing all vocabularies. Expanding a row lists the words in that vocabulary using " { $link words. } "." }
-{ $examples { $code "vocabs." } }
-{ $see-also vocabs } ;
+HELP: word-outliner "( seq quot -- )"
+{ $values { "seq" "a sequence of words" } { "quot" "a quotation with stack effect " { $snippet "( word -- )" } } }
+{ $description "Prints an expanding outliner to the default stream. The sequence elements are converted to strings using " { $link synopsis } ", and each element is output on its own row. Expanding a row outliner applies the quotation to the word; the quotation should print output to the default stream to elaborate the word." }
+{ $notes "For a more general outliner output facility, use " { $link simple-outliner } " or " { $link write-outliner } "." } ;
 
 HELP: usage. "( word -- )"
 { $values { "word" "a word" } }

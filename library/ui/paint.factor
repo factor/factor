@@ -107,12 +107,11 @@ M: polygon draw-interior ( gadget polygon -- )
 : arrow-right { { { 0 0 0 } { 6 3 0 } { 0 6 0 } } } ;
 : arrow-down  { { { 0 0 0 } { 6 0 0 } { 3 6 0 } } } ;
 : arrow-left  { { { 0 3 0 } { 6 0 0 } { 6 6 0 } } } ;
-
-: arrow-right|
-    { { { 6 0 0 } { 6 6 0 } } } arrow-right append ;
-
-: arrow-|left
-    { { { 1 0 0 } { 1 6 0 } } } arrow-left append ;
+: close-box
+    {
+        { { 0 0 0 } { 6 6 0 } }
+        { { 0 6 0 } { 6 0 0 } }
+    } ;
 
 : <polygon-gadget> ( color points -- gadget )
     dup { 0 0 0 } [ max-dim vmax ] reduce

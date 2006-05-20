@@ -1,5 +1,5 @@
-! Copyright (C) 2005 Slava Pestov.
-! See http://factor.sf.net/license.txt for BSD license.
+! Copyright (C) 2005, 2006 Slava Pestov.
+! See http://factorcode.org/license.txt for BSD license.
 IN: inspector
 USING: arrays generic hashtables help io kernel kernel-internals
 math namespaces prettyprint sequences strings vectors words ;
@@ -38,12 +38,7 @@ M: object summary
 M: object sheet ( obj -- sheet ) slot-sheet ;
 
 M: sequence summary
-    dup length 1 = [
-        drop "a sequence containing 1 element"
-    ] [
-        "a sequence containing " swap length number>string
-        " elements" append3
-    ] if ;
+    [ dup length # " element " % class word-name % ] "" make ;
 
 M: quotation sheet 1array ;
 
@@ -90,26 +85,6 @@ DEFER: describe
 
 : describe ( object -- ) dup summary print sheet sheet. ;
 
-: sequence-outliner ( strings objects quot -- )
-    over curry-each 3array flip
-    [ first3 simple-outliner terpri ] each ;
-
-: unparse-outliner ( seq quot -- | quot: obj -- )
-    >r natural-sort [ [ unparse-short ] map ] keep
-    r> sequence-outliner ;
-
-: word-outliner ( seq quot -- )
-    >r natural-sort [ [ synopsis ] map ] keep
-    r> sequence-outliner ;
-
-: words. ( vocab -- ) words [ (help) ] unparse-outliner ;
-
-: vocabs. ( -- ) vocabs [ words. ] unparse-outliner ;
-
-: usage. ( word -- ) usage [ usage. ] word-outliner ;
-
-: uses. ( word -- ) uses [ uses. ] word-outliner ;
-
 : stack. ( seq -- seq ) <reversed> >array describe ;
 
 : .s datastack stack. ;
@@ -124,6 +99,16 @@ DEFER: describe
     3 swap group <reversed> [ first2 1- callframe. ] each ;
 
 : .c callstack callstack. ;
+
+: word-outliner ( seq quot -- )
+    swap natural-sort [
+        [ synopsis ] keep rot dupd curry
+        simple-outliner terpri
+    ] each-with ;
+
+: usage. ( word -- ) usage [ usage. ] word-outliner ;
+
+: uses. ( word -- ) uses [ uses. ] word-outliner ;
 
 : apropos ( substring -- )
     all-words completions natural-sort

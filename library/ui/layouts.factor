@@ -80,32 +80,26 @@ TUPLE: pack align fill gap ;
     >r >r gadget-orientation r> r> [ pick set-axis ] 2map nip ;
 
 : packed-dim-2 ( gadget sizes -- list )
-    [
-        over rect-dim over v- rot pack-fill v*n v+
-        [ >fixnum ] map 
-    ] map-with ;
+    [ over rect-dim over v- rot pack-fill v*n v+ ] map-with ;
 
 : packed-dims ( gadget sizes -- seq )
     2dup packed-dim-2 swap orient ;
 
 : packed-loc-1 ( gadget sizes -- seq )
-    { 0 0 0 } [
-        v+ over pack-gap v+ [ >fixnum ] map
-    ] accumulate nip ;
+    { 0 0 0 } [ v+ over pack-gap v+ ] accumulate nip ;
 
 : packed-loc-2 ( gadget sizes -- seq )
-    [
-        >r dup pack-align swap rect-dim r> v- n*v
-        [ >fixnum ] map
-    ] map-with ;
+    [ >r dup pack-align swap rect-dim r> v- n*v ] map-with ;
 
 : packed-locs ( gadget sizes -- seq )
     2dup packed-loc-1 >r dupd packed-loc-2 r> orient ;
 
 : packed-layout ( gadget sizes -- )
     over gadget-children
-    >r dupd packed-dims r> 2dup [ set-gadget-dim ] 2each
-    >r packed-locs r> [ set-rect-loc ] 2each ;
+    >r dupd packed-dims r> 2dup
+    [ >r [ ceiling >fixnum ] map r> set-gadget-dim ] 2each
+    >r packed-locs r>
+    [ >r [ >fixnum ] map r> set-rect-loc ] 2each ;
 
 C: pack ( vector -- pack )
     #! gap: between each child.
