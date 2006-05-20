@@ -18,6 +18,7 @@
 
 + help:
 
+- tools section needs updates
 - method ordering and interpreter algorithm sections need updates
 - document that can <void*> only be called with an alien
 - help search
@@ -34,16 +35,16 @@
 + ui/help:
 
 - new browser:
-  - separate definition & documentation tabs
   - browse generic words and classes
   - initial size sucks
+  - need actions for reloading the source file and opening word in jEdit
 - toggle/radio buttons/tabs or something
+- inspector: less clutter when browsing words
 - make-frame should compile
 - track:
   - don't allow negative dimensions
 - fix top level window positioning
 - changing window titles
-- reimplement clicking input
 - clicks sent twice
 - speed up ideas:
   - only do clipping for certain gadgets
@@ -60,6 +61,7 @@
   - polish OS X menu bar code
 - when scrolling wheel, or moving mouse out of window, rollover is not
   updated
+- focus is not top-level window aware
 - display lists
 - saving the image should save window configuration
 - fix up the min thumb size hack

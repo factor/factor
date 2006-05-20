@@ -2,10 +2,10 @@
 ! See http://factorcode.org/license.txt for BSD license.
 IN: gadgets-listener
 USING: arrays gadgets gadgets-editors gadgets-labels
-gadgets-layouts gadgets-panes gadgets-scrolling
-gadgets-theme generic hashtables io jedit
-kernel listener math namespaces parser prettyprint
-sequences styles threads words ;
+gadgets-layouts gadgets-panes gadgets-presentations
+gadgets-scrolling gadgets-theme generic hashtables io jedit
+kernel listener math namespaces parser prettyprint sequences
+styles threads words ;
 
 TUPLE: listener-gadget scroller stack ;
 
@@ -66,9 +66,20 @@ M: listener-gadget focusable-child* ( listener -- gadget )
 : listener-window ( -- )
     <listener-gadget> "Listener" open-window ;
 
-: listener-window* ( quot -- )
-    <listener-gadget> [ listener-gadget-pane pane-call ] keep
-    "Listener" open-window ;
+: listener-window* ( quot/string -- )
+    <listener-gadget> [
+        listener-gadget-pane over quotation?
+        [ pane-call ] [ replace-input ] if
+    ] keep "Listener" open-window ;
 
 : listener-run-files ( seq -- )
     [ [ run-file ] each ] curry listener-window* ;
+
+: find-listener [ listener-gadget? ] find-parent ;
+
+M: input show-object ( input button -- )
+    >r input-string r> find-listener [
+        listener-gadget-pane replace-input
+    ] [
+        listener-window*
+    ] if* ;
