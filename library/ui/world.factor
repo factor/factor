@@ -30,13 +30,7 @@ C: world ( gadget status -- world )
     H{ } clone over set-world-fonts
     dup world-gadget request-focus ;
 
-GENERIC: find-world ( gadget -- world )
-
-M: f find-world ;
-
-M: gadget find-world gadget-parent find-world ;
-
-M: world find-world ;
+: find-world [ world? ] find-parent ;
 
 M: world pref-dim* ( world -- dim )
     delegate pref-dim* { 1024 768 0 } vmin ;

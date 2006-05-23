@@ -69,13 +69,22 @@ H{ } clone views set-global
     dup [keyCode] key-codes hash
     [ ] [ [charactersIgnoringModifiers] CF>string ] ?if ;
 
-: event>gesture ( event -- gesture )
-    dup [modifierFlags] modifiers modifier swap key-code
-    <key-down> ;
+: event>gesture ( event -- modifiers keycode )
+    dup [modifierFlags] modifiers modifier swap key-code ;
 
-: send-key-event ( view event -- )
-    >r view world-focus r> dup event>gesture pick handle-gesture
-    [ [characters] CF>string swap user-input ] [ 2drop ] if ;
+: send-key-event ( view event quot -- )
+    >r event>gesture r> call swap view world-focus
+    handle-gesture ; inline
+
+: send-user-input ( view event -- )
+    [characters] CF>string swap view world-focus user-input ;
+
+: send-key-down-event ( view event -- )
+    2dup [ <key-down> ] send-key-event
+    [ send-user-input ] [ 2drop ] if ;
+
+: send-key-up-event ( view event -- )
+    [ <key-up> ] send-key-event ;
 
 : send-button-down$ ( view event -- )
     over >r button&loc r> view send-button-down ;
@@ -136,7 +145,11 @@ H{ } clone views set-global
     }
     
     { "keyDown:" "void" { "id" "SEL" "id" }
-        [ nip send-key-event ]
+        [ nip send-key-down-event ]
+    }
+    
+    { "keyUp:" "void" { "id" "SEL" "id" }
+        [ nip send-key-up-event ]
     }
 
     { "updateFactorGadgetSize:" "void" { "id" "SEL" "id" }

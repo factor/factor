@@ -8,7 +8,6 @@ IN: gadgets
 SYMBOL: clip
 
 : init-gl ( dim -- )
-    { 1.0 0.0 0.0 1.0 } gl-color
     GL_PROJECTION glMatrixMode
     glLoadIdentity
     GL_MODELVIEW glMatrixMode
@@ -21,7 +20,6 @@ SYMBOL: clip
     GL_BLEND glEnable
     GL_SRC_ALPHA GL_ONE_MINUS_SRC_ALPHA glBlendFunc
     GL_SCISSOR_TEST glEnable
-    GL_MODELVIEW glMatrixMode
     1.0 1.0 1.0 1.0 glClearColor
     GL_COLOR_BUFFER_BIT glClear ;
 
