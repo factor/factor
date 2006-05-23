@@ -108,13 +108,13 @@ macosx.app:
 
 	rm -rf $(BUNDLE)/Contents/Resources/
 	mkdir -p $(BUNDLE)/Contents/Resources/fonts/
-	cp -R fonts/*.ttf $(BUNDLE)/Contents/Resources/fonts/
 
 	chmod +x cp_dir
-	find doc library contrib examples \( -name '*.factor' \
+	find doc library contrib examples fonts \( -name '*.factor' \
 		-o -name '*.facts' \
 		-o -name '*.txt' \
 		-o -name '*.html' \
+		-o -name '*.ttf' \
 		-o -name '*.js' \) \
 		-exec ./cp_dir {} $(BUNDLE)/Contents/Resources/{} \;
 
@@ -166,6 +166,8 @@ f: $(OBJS)
 
 clean:
 	rm -f $(OBJS) $(UNIX_OBJS) $(WINDOWS_OBJS) $(MACOSX_OBJS)
+	rm -rf $(BUNDLE)/Contents/Resources/
+	rm -f $(BUNDLE)/Contents/MacOS/Factor
 
 .c.o:
 	$(CC) -c $(CFLAGS) -o $@ $<
