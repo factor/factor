@@ -1,6 +1,6 @@
 IN: temporary
-USING: arrays errors generic inference kernel math
-math-internals namespaces parser sequences test vectors ;
+USING: arrays errors generic inference kernel kernel-internals
+math math-internals namespaces parser sequences test vectors ;
 
 [ f ] [ f [ [ ] map-nodes ] with-node-iterator ] unit-test
 
@@ -73,8 +73,6 @@ math-internals namespaces parser sequences test vectors ;
     dup [ dup first swap second bad-recursion-2 ] [ ] if ;
 
 [ [ bad-recursion-2 ] infer ] unit-test-fails
-
-! Not sure how to fix this one
 
 : funny-recursion
     dup [ funny-recursion 1 ] [ 2 ] if drop ;
@@ -208,6 +206,10 @@ DEFER: do-crap
 : more-crap dup [ drop ] [ dup do-crap call ] if ;
 : do-crap dup [ do-crap ] [ more-crap ] if ;
 [ [ do-crap ] infer ] unit-test-fails
+
+! Regression
+: too-deep dup [ drop ] [ 2dup too-deep too-deep * ] if ; inline
+[ { 2 1 } ] [ [ too-deep ] infer ] unit-test
 
 ! Error reporting is wrong
 G: xyz math-combination ;

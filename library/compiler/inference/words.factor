@@ -68,18 +68,13 @@ M: #call-label collect-recursion* ( label node -- )
     dup node-param swap
     [ [ collect-recursion* ] each-node-with ] { } make ;
 
-: amend-d-in ( new old -- )
-    [ length ] 2apply - d-in [ + ] change ;
-
 : join-values ( node -- )
     #! We have to infer recursive labels twice to determine
     #! which literals survive the recursion (eg, quotations)
     #! and which don't (loop indices, etc). The latter cannot
     #! be folded.
-    meta-d get [
-        >r collect-recursion r> add unify-lengths
-        flip [ unify-values ] map dup meta-d set
-    ] keep amend-d-in ;
+    collect-recursion meta-d get add unify-stacks
+    meta-d [ length swap tail* ] change ;
 
 : splice-node ( node -- )
     #! Labels which do not call themselves are just spliced into
@@ -174,7 +169,7 @@ M: symbol apply-object ( word -- )
     {
         "The base case of a recursive word could not be inferred.\n"
         "This means the word calls itself in every control flow path.\n"
-        "See the handbook for details."
+        "See the documentation for details."
     } concat inference-error ;
 
 : notify-base-case ( -- )
