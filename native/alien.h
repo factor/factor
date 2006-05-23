@@ -18,9 +18,6 @@ void primitive_alien_address(void);
 
 void* alien_offset(CELL object);
 
-void primitive_alien_to_string(void);
-void primitive_string_to_alien(void);
-
 void fixup_alien(ALIEN* d);
 void collect_alien(ALIEN* d);
 

@@ -8,7 +8,7 @@ void primitive_stat(void)
 	maybe_gc(0);
 
 	path = untag_string(dpop());
-	if(stat(to_c_string(path,true),&sb) < 0)
+	if(stat(to_char_string(path,true),&sb) < 0)
 		dpush(F);
 	else
 	{
@@ -32,14 +32,14 @@ void primitive_read_dir(void)
 	result = array(ARRAY_TYPE,100,F);
 
 	path = untag_string(dpop());
-	dir = opendir(to_c_string(path,true));
+	dir = opendir(to_char_string(path,true));
 	if(dir != NULL)
 	{
 		struct dirent* file;
 
 		while((file = readdir(dir)) != NULL)
 		{
-			CELL name = tag_object(from_c_string(file->d_name));
+			CELL name = tag_object(from_char_string(file->d_name));
 			if(result_count == array_capacity(result))
 			{
 				result = resize_array(result,
@@ -64,12 +64,12 @@ void primitive_cwd(void)
 	maybe_gc(0);
 	if(getcwd(wd,MAXPATHLEN) == NULL)
 		io_error();
-	box_c_string(wd);
+	box_char_string(wd);
 }
 
 void primitive_cd(void)
 {
 	maybe_gc(0);
-	chdir(pop_c_string());
+	chdir(pop_char_string());
 }
 

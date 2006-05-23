@@ -1,5 +1,3 @@
-- core foundation should use unicode strings
-- alien>utf16-string, utf16-string>alien words
 - fix compiled gc check
 - 3 >n fep
 - code walker & exceptions -- test and debug problems

@@ -19,12 +19,12 @@ void primitive_os_env(void)
 
 	maybe_gc(0);
 
-	name = pop_c_string();
+	name = pop_char_string();
 	value = getenv(name);
 	if(value == NULL)
 		dpush(F);
 	else
-		box_c_string(getenv(name));
+		box_char_string(getenv(name));
 }
 
 void primitive_eq(void)
@@ -61,7 +61,7 @@ char *buffer_to_c_string(char *buffer)
 {
 	int capacity = strlen(buffer);
 	F_STRING *_c_str = allot_string(capacity / CHARS + 1);
-	BYTE *c_str = (BYTE*)(_c_str + 1);
+	u8 *c_str = (u8*)(_c_str + 1);
 	strcpy(c_str, buffer);
 	LocalFree(buffer);
 	return (char*)c_str;

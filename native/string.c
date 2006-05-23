@@ -86,143 +86,122 @@ void primitive_resize_string(void)
 	drepl(tag_object(resize_string(string,capacity,F)));
 }
 
-F_STRING *memory_to_string(const BYTE* string, CELL length)
-{
-	F_STRING* s = allot_string(length);
-	CELL i;
+/* Some ugly macros to prevent a 2x code duplication */
 
-	for(i = 0; i < length; i++)
-	{
-		cput(SREF(s,i),*string);
-		string++;
+#define MEMORY_TO_STRING(type,utype) \
+	F_STRING *memory_to_##type##_string(const type *string, CELL length) \
+	{ \
+		F_STRING* s = allot_string(length); \
+		CELL i; \
+		for(i = 0; i < length; i++) \
+		{ \
+			cput(SREF(s,i),(utype)*string); \
+			string++; \
+		} \
+		rehash_string(s); \
+		return s; \
+	} \
+	void primitive_memory_to_##type##_string(void) \
+	{ \
+		CELL length = unbox_unsigned_cell(); \
+		type *string = (type*)unbox_unsigned_cell(); \
+		dpush(tag_object(memory_to_##type##_string(string,length))); \
+	} \
+	F_STRING *from_##type##_string(const type *str) \
+	{ \
+		CELL length = 0; \
+		type *scan = str; \
+		while(*scan++) length++; \
+		return memory_to_##type##_string((type*)str,length); \
+	} \
+	void box_##type##_string(const type *str) \
+	{ \
+		dpush(str ? tag_object(from_##type##_string(str)) : F); \
+	} \
+	void primitive_alien_to_##type##_string(void) \
+	{ \
+		maybe_gc(0); \
+		drepl(tag_object(from_##type##_string(alien_offset(dpeek())))); \
 	}
 
-	rehash_string(s);
-	
-	return s;
-}
+MEMORY_TO_STRING(char,u8)
+MEMORY_TO_STRING(u16,u16)
 
-void primitive_memory_to_string(void)
-{
-	CELL length = unbox_unsigned_cell();
-	BYTE *string = (BYTE*)unbox_unsigned_cell();
-	dpush(tag_object(memory_to_string(string,length)));
-}
-
-/* untagged */
-F_STRING *from_c_string(const char *c_string)
-{
-	return memory_to_string((BYTE*)c_string,strlen(c_string));
-}
-
-/* FFI calls this */
-void box_c_string(const char *c_string)
-{
-	dpush(c_string ? tag_object(from_c_string(c_string)) : F);
-}
-
-F_ARRAY *string_to_alien(F_STRING *s, bool check)
+void check_string(F_STRING *s, CELL max)
 {
 	CELL capacity = string_capacity(s);
-	F_ARRAY *_c_str;
-	
-	if(check)
-	{
-		CELL i;
-		for(i = 0; i < capacity; i++)
-		{
-			u16 ch = string_nth(s,i);
-			if(ch == '\0' || ch > 255)
-				general_error(ERROR_C_STRING,tag_object(s),F,true);
-		}
-	}
-
-	_c_str = allot_array(BYTE_ARRAY_TYPE,capacity / CELLS + 1);
-	BYTE *c_str = (BYTE*)(_c_str + 1);
-	string_to_memory(s,c_str);
-	c_str[capacity] = '\0';
-	return _c_str;
-}
-
-/* untagged */
-char *to_c_string(F_STRING *s, bool check)
-{
-	return (char*)(string_to_alien(s,check) + 1);
-}
-
-void string_to_memory(F_STRING *s, BYTE *string)
-{
 	CELL i;
-	CELL capacity = string_capacity(s);
 	for(i = 0; i < capacity; i++)
-		string[i] = string_nth(s,i);
-}
-
-void primitive_string_to_memory(void)
-{
-	BYTE *address = (BYTE*)unbox_unsigned_cell();
-	F_STRING *str = untag_string(dpop());
-	string_to_memory(str,address);
-}
-
-/* FFI calls this */
-char *unbox_c_string(void)
-{
-	CELL str = dpop();
-	if(type_of(str) == STRING_TYPE)
-		return to_c_string(untag_string(str),true);
-	else
-		return (char*)alien_offset(str);
-}
-
-/* this function is used when we really want only Factor strings as input, not
-aliens. In particular, certian primitives crash if given a null pointer (f), so
-we protect against this by using this function instead of unbox_c_string() */
-char *pop_c_string(void)
-{
-	return to_c_string(untag_string(dpop()),true);
-}
-
-/* FFI calls this */
-u16 *unbox_utf16_string(void)
-{
-	/* Return pointer to first character */
-	CELL obj = dpop();
-
-	if(type_of(obj) == STRING_TYPE)
 	{
-		F_STRING* str = untag_string(obj);
-		u16 *unboxed = (u16*)(str + 1);
-
-		CELL length = string_capacity(str);
-		CELL i;
-
-		for(i = 0; i < length; i++)
-		{
-			if(unboxed[i] == 0)
-				general_error(ERROR_C_STRING,obj,F,true);
-		}
-
-		return unboxed;
+		u16 ch = string_nth(s,i);
+		if(ch == '\0' || ch >= (1 << (max * 8)))
+			general_error(ERROR_C_STRING,tag_object(s),F,true);
 	}
-	else
-		return (u16*)alien_offset(obj);
 }
 
-/* FFI calls this */
-void box_utf16_string(u16 *unboxed)
+F_ARRAY *allot_c_string(CELL capacity, CELL size)
 {
-	CELL length = 0;
-	u16 *scan = unboxed;
-	F_STRING *str;
-
-	while(*scan++) length++;
-
-	str = allot_string(length);
-	memcpy((u16*)(str + 1),unboxed,length * sizeof(u16));
-	rehash_string(str);
-	dpush(tag_object(str));
+	return allot_array(BYTE_ARRAY_TYPE,capacity * size / CELLS + 1);
 }
+
+#define STRING_TO_MEMORY(type) \
+	void type##_string_to_memory(F_STRING *s, type *string) \
+	{ \
+		CELL i; \
+		CELL capacity = string_capacity(s); \
+		for(i = 0; i < capacity; i++) \
+			string[i] = string_nth(s,i); \
+	} \
+	void primitive_##type##_string_to_memory(void) \
+	{ \
+		type *address = (type*)unbox_unsigned_cell(); \
+		F_STRING *str = untag_string(dpop()); \
+		type##_string_to_memory(str,address); \
+	} \
+	F_ARRAY *string_to_##type##_alien(F_STRING *s, bool check) \
+	{ \
+		CELL capacity = string_capacity(s); \
+		F_ARRAY *_c_str; \
+		if(check) check_string(s,sizeof(type)); \
+		_c_str = allot_c_string(capacity,sizeof(type)); \
+		type *c_str = (type*)(_c_str + 1); \
+		type##_string_to_memory(s,c_str); \
+		c_str[capacity] = 0; \
+		return _c_str; \
+	} \
+	type *to_##type##_string(F_STRING *s, bool check) \
+	{ \
+		if(sizeof(type) == sizeof(u16)) \
+		{ \
+			if(check) check_string(s,sizeof(type)); \
+			return (type*)(s + 1); \
+		} \
+		else \
+			return (type*)(string_to_##type##_alien(s,check) + 1); \
+	} \
+	type *pop_##type##_string(void) \
+	{ \
+		return to_##type##_string(untag_string(dpop()),true); \
+	} \
+	type *unbox_##type##_string(void) \
+	{ \
+		if(type_of(dpeek()) == STRING_TYPE) \
+			return pop_##type##_string(); \
+		else \
+			return unbox_alien(); \
+	} \
+	void primitive_string_to_##type##_alien(void) \
+	{ \
+		CELL string, t; \
+		maybe_gc(0); \
+		string = dpeek(); \
+		t = type_of(string); \
+		if(t != ALIEN_TYPE && t != BYTE_ARRAY_TYPE && t != F_TYPE) \
+			drepl(tag_object(string_to_##type##_alien(untag_string(string),true))); \
+	}
+
+STRING_TO_MEMORY(char);
+STRING_TO_MEMORY(u16);
 
 void primitive_char_slot(void)
 {

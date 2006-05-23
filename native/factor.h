@@ -32,9 +32,6 @@ typedef signed short s16;
 typedef signed int s32;
 typedef signed long long s64;
 
-/* must always be 8 bits */
-typedef unsigned char BYTE;
-
 CELL cs;
 
 #if defined(FACTOR_X86)

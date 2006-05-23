@@ -17,11 +17,11 @@ void init_factor(const char* image,
 	call(userenv[BOOT_ENV]);
 	init_c_io();
 	init_signals();
-	userenv[CPU_ENV] = tag_object(from_c_string(FACTOR_CPU_STRING));
-	userenv[OS_ENV] = tag_object(from_c_string(FACTOR_OS_STRING));
+	userenv[CPU_ENV] = tag_object(from_char_string(FACTOR_CPU_STRING));
+	userenv[OS_ENV] = tag_object(from_char_string(FACTOR_OS_STRING));
 	userenv[GEN_ENV] = tag_fixnum(gen_count);
 	userenv[CARD_OFF_ENV] = tag_cell(cards_offset);
-	userenv[IMAGE_ENV] = tag_object(from_c_string(image));
+	userenv[IMAGE_ENV] = tag_object(from_char_string(image));
 	userenv[CELL_SIZE_ENV] = tag_fixnum(sizeof(CELL));
 	userenv[COMPILED_BASE_ENV] = tag_cell(compiling.base);
 }
@@ -113,7 +113,7 @@ int main(int argc, char** argv)
 	args = array(ARRAY_TYPE,argc,F);
 	while(arg_count < argc)
 	{
-		put(AREF(args,arg_count),tag_object(from_c_string(argv[arg_count])));
+		put(AREF(args,arg_count),tag_object(from_char_string(argv[arg_count])));
 		arg_count++;
 	}
 

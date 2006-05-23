@@ -122,8 +122,8 @@ $terpri
 "Passing a Factor string to a C function expecting a C string allocates a byte array in the Factor heap; the string is then converted to the requested format and a raw pointer is passed to the function. The function must not retain such pointers after it returns, since byte arrays in the Factor heap can be moved by the garbage collector. To allocate a string which will not move, use " { $link <malloc-string> } " and then " { $link free } "."
 $terpri
 "A couple of words can be used to read and write " { $snippet "char*" } " strings from arbitrary addresses:"
-{ $subsection alien>string }
-{ $subsection string>alien } ;
+{ $subsection alien>char-string }
+{ $subsection string>char-alien } ;
 
 ARTICLE: "c-structs" "C structure types"
 "A " { $snippet "struct" } " in C is essentially a block of memory with the value of each structure field stored at a fixed offset. The C library interface provides some utilities to define words which read and write structure fields given a base address."
@@ -252,7 +252,7 @@ $terpri
 ARTICLE: "malloc" "Manual memory management"
 "Sometimes data passed to C functions must be allocated at a fixed address so that C code can safely store pointers."
 $terpri
-"The following words mirror " { $link <c-object> } ", " { $link <c-array> } " and " { $link string>alien } ":"
+"The following words mirror " { $link <c-object> } ", " { $link <c-array> } " and " { $link string>char-alien } ":"
 { $subsection <malloc-object> }
 { $subsection <malloc-array> }
 { $subsection <malloc-string> }

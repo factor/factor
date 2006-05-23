@@ -191,8 +191,10 @@ call
     { "set-alien-float" "alien"             }
     { "alien-double" "alien"                }
     { "set-alien-double" "alien"            }
-    { "alien>string" "alien"                }
-    { "string>alien" "alien"                }
+    { "alien>char-string" "alien"           }
+    { "string>char-alien" "alien"           }
+    { "alien>u16-string" "alien"            }
+    { "string>u16-alien" "alien"            }
     { "throw" "errors"                      }
     { "string>memory" "kernel-internals"    }
     { "memory>string" "kernel-internals"    }

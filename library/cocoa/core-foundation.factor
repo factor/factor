@@ -16,20 +16,17 @@ FUNCTION: CFIndex CFArrayGetCount ( void* array ) ;
 ! Core Foundation utilities -- will be moved elsewhere
 : kCFURLPOSIXPathStyle 0 ;
 
-: kCFStringEncodingMacRoman HEX: 0 ;
-: kCFStringEncodingUnicode HEX: 100 ;
-
 FUNCTION: void* CFURLCreateWithFileSystemPath ( void* allocator, void* filePath, int pathStyle, bool isDirectory ) ;
 
 FUNCTION: void* CFURLCreateWithString ( void* allocator, void* string, void* base ) ;
 
 FUNCTION: void* CFURLCopyFileSystemPath ( void* url, int pathStyle ) ;
 
-FUNCTION: void* CFStringCreateWithCString ( void* allocator, char* cStr, int encoding ) ;
+FUNCTION: void* CFStringCreateWithCharacters ( void* allocator, ushort* cStr, CFIndex numChars ) ;
 
 FUNCTION: CFIndex CFStringGetLength ( void* theString ) ;
 
-FUNCTION: bool CFStringGetCString ( void* theString, void* buffer, CFIndex bufferSize, int encoding ) ;
+FUNCTION: void CFStringGetCharacters ( void* theString, CFIndex start, CFIndex length, void* buffer ) ;
 
 FUNCTION: CFIndex CFStringGetLength ( void* string ) ;
 
@@ -40,12 +37,12 @@ FUNCTION: bool CFBundleLoadExecutable ( void* bundle ) ;
 FUNCTION: void CFRelease ( void* cf ) ;
 
 : <CFString> ( string -- cf )
-    f swap kCFStringEncodingMacRoman CFStringCreateWithCString ;
+    f swap dup length CFStringCreateWithCharacters ;
 
 : CF>string ( string -- string )
-    dup CFStringGetLength 1+ dup <byte-array> [
-        swap kCFStringEncodingMacRoman CFStringGetCString drop
-    ] keep alien>string ;
+    dup CFStringGetLength 1+ "ushort" <c-array> [
+        >r 0 over CFStringGetLength r> CFStringGetCharacters
+    ] keep alien>u16-string ;
 
 : <CFFileSystemURL> ( string dir? -- cf )
     >r <CFString> f over kCFURLPOSIXPathStyle

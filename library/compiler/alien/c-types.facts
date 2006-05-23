@@ -42,16 +42,16 @@ HELP: <c-object> "( n type -- array )"
 { $errors "Throws an error if the type does not exist." }
 { $see-also <malloc-object> } ;
 
-HELP: string>alien "( string -- array )"
+HELP: string>char-alien "( string -- array )"
 { $values { "string" "a string" } { "array" "a byte array" } }
 { $description "Copies the string to a new byte array, converting it to 8-bit ASCII and adding a trailing null byte." }
 { $errors "Throws an error if the string contains null characters, or characters beyond the 8-bit range." } 
-{ $see-also alien>string <malloc-string> } ;
+{ $see-also alien>char-string <malloc-string> } ;
 
-HELP: alien>string "( c-ptr -- string )"
+HELP: alien>char-string "( c-ptr -- string )"
 { $values { "c-ptr" "an alien, byte array or " { $link f } } { "string" "a string" } }
 { $description "Reads a null-terminated 8-bit C string from the specified address." }
-{ $see-also string>alien } ;
+{ $see-also string>char-alien } ;
 
 HELP: <malloc-array> "( n type -- alien )"
 { $values { "n" "a non-negative integer" } { "type" "a string" } { "alien" "an alien address" } }
@@ -72,7 +72,7 @@ HELP: <malloc-string> "( string -- alien )"
 { $description "Copies a string to an unmanaged memory block large enough to hold a copy of the string in 8-bit ASCII encoding, with a trailing null byte." }
 { $warning "Don't forget to deallocate the memory with a call to " { $link free } "." }
 { $errors "Throws an error if memory allocation fails." }
-{ $see-also string>alien } ;
+{ $see-also string>char-alien } ;
 
 HELP: (typedef) "( old new -- )"
 { $values { "old" "a string" } { "new" "a string" } }

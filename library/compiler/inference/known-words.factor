@@ -436,11 +436,17 @@ sequences strings vectors words prettyprint ;
 \ alien-double [ [ c-ptr integer ] [ float ] ] "infer-effect" set-word-prop
 \ alien-double t "flushable" set-word-prop
 
-\ alien>string [ [ c-ptr ] [ string ] ] "infer-effect" set-word-prop
-\ alien>string t "flushable" set-word-prop
+\ alien>char-string [ [ c-ptr ] [ string ] ] "infer-effect" set-word-prop
+\ alien>char-string t "flushable" set-word-prop
 
-\ string>alien [ [ string ] [ byte-array ] ] "infer-effect" set-word-prop
-\ string>alien t "flushable" set-word-prop
+\ string>char-alien [ [ string ] [ byte-array ] ] "infer-effect" set-word-prop
+\ string>char-alien t "flushable" set-word-prop
+
+\ alien>u16-string [ [ c-ptr ] [ string ] ] "infer-effect" set-word-prop
+\ alien>u16-string t "flushable" set-word-prop
+
+\ string>u16-alien [ [ string ] [ byte-array ] ] "infer-effect" set-word-prop
+\ string>u16-alien t "flushable" set-word-prop
 
 \ string>memory [ [ string integer ] [ ] ] "infer-effect" set-word-prop
 \ memory>string [ [ integer integer ] [ string ] ] "infer-effect" set-word-prop

@@ -26,7 +26,7 @@ void init_c_io(void)
 
 void io_error(void)
 {
-	CELL error = tag_object(from_c_string(strerror(errno)));
+	CELL error = tag_object(from_char_string(strerror(errno)));
 	general_error(ERROR_IO,error,F,true);
 }
 
@@ -35,8 +35,8 @@ void primitive_fopen(void)
 	char *path, *mode;
 	FILE* file;
 	maybe_gc(0);
-	mode = pop_c_string();
-	path = pop_c_string();
+	mode = pop_char_string();
+	path = pop_char_string();
 	file = fopen(path,mode);
 	if(file == NULL)
 		io_error();
@@ -64,7 +64,7 @@ void primitive_fwrite(void)
 	if(string_capacity(text) == 0)
 		return;
 
-	if(fwrite(to_c_string(text,false),1,
+	if(fwrite(to_char_string(text,false),1,
 		untag_fixnum_fast(text->length),
 		file) == 0)
 		io_error();

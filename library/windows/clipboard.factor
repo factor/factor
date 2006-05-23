@@ -17,7 +17,7 @@ IN: win32
             dup GlobalLock swap
             GlobalUnlock drop
     ] if
-    CloseClipboard drop alien>string ;
+    CloseClipboard drop alien>char-string ;
 
 LIBRARY: libc
 FUNCTION: void memcpy ( char* dst, char* src, ulong size ) ;

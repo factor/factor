@@ -92,24 +92,6 @@ void primitive_alien_address(void)
 	box_unsigned_cell((CELL)alien_offset(dpop()));
 }
 
-/* convert C string at address to Factor string */
-void primitive_alien_to_string(void)
-{
-	maybe_gc(0);
-	drepl(tag_object(from_c_string(alien_offset(dpeek()))));
-}
-
-/* convert Factor string to C string allocated in the Factor heap */
-void primitive_string_to_alien(void)
-{
-	CELL string, type;
-	maybe_gc(0);
-	string = dpeek();
-	type = type_of(string);
-	if(type != ALIEN_TYPE && type != BYTE_ARRAY_TYPE && type != F_TYPE)
-		drepl(tag_object(string_to_alien(untag_string(string),true)));
-}
-
 /* image loading */
 void fixup_alien(ALIEN *d)
 {
@@ -144,8 +126,8 @@ DEF_ALIEN_SLOT(signed_4,s32,signed_4)
 DEF_ALIEN_SLOT(unsigned_4,u32,unsigned_4)
 DEF_ALIEN_SLOT(signed_2,s16,signed_2)
 DEF_ALIEN_SLOT(unsigned_2,u16,unsigned_2)
-DEF_ALIEN_SLOT(signed_1,BYTE,signed_1)
-DEF_ALIEN_SLOT(unsigned_1,BYTE,unsigned_1)
+DEF_ALIEN_SLOT(signed_1,u8,signed_1)
+DEF_ALIEN_SLOT(unsigned_1,u8,unsigned_1)
 DEF_ALIEN_SLOT(float,float,float)
 DEF_ALIEN_SLOT(double,double,double)
 

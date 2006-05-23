@@ -9,14 +9,14 @@ void init_ffi(void)
 
 void ffi_dlopen(DLL *dll, bool error)
 {
-	void *dllptr = dlopen(to_c_string(untag_string(dll->path),true), RTLD_LAZY);
+	void *dllptr = dlopen(to_char_string(untag_string(dll->path),true), RTLD_LAZY);
 
 	if(dllptr == NULL)
 	{
 		if(error)
 		{
 			general_error(ERROR_FFI,tag_object(
-				from_c_string(dlerror())),F,true);
+				from_char_string(dlerror())),F,true);
 		}
 		else
 			dll->dll = NULL;
@@ -30,13 +30,13 @@ void ffi_dlopen(DLL *dll, bool error)
 void *ffi_dlsym(DLL *dll, F_STRING *symbol, bool error)
 {
 	void *handle = (dll == NULL ? null_dll : dll->dll);
-	void *sym = dlsym(handle,to_c_string(symbol,true));
+	void *sym = dlsym(handle,to_char_string(symbol,true));
 	if(sym == NULL)
 	{
 		if(error)
 		{
 			general_error(ERROR_FFI,tag_object(
-				from_c_string(dlerror())),F,true);
+				from_char_string(dlerror())),F,true);
 		}
 
 		return NULL;
@@ -49,7 +49,7 @@ void ffi_dlclose(DLL *dll)
 	if(dlclose(dll->dll))
 	{
 		general_error(ERROR_FFI,tag_object(
-			from_c_string(dlerror())),F,true);
+			from_char_string(dlerror())),F,true);
 	}
 	dll->dll = NULL;
 }

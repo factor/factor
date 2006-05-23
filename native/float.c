@@ -40,7 +40,7 @@ void primitive_str_to_float(void)
 	maybe_gc(sizeof(F_FLOAT));
 
 	str = untag_string(dpeek());
-	c_str = to_c_string(str,true);
+	c_str = to_char_string(str,true);
 	end = c_str;
 	f = strtod(c_str,&end);
 	if(end != c_str + string_capacity(str))
@@ -56,7 +56,7 @@ void primitive_float_to_str(void)
 
 	snprintf(tmp,32,"%.16g",to_float(dpop()));
 	tmp[32] = '\0';
-	box_c_string(tmp);
+	box_char_string(tmp);
 }
 
 #define GC_AND_POP_FLOATS(x,y) \

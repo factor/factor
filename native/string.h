@@ -30,24 +30,40 @@ INLINE CELL string_size(CELL size)
 }
 
 F_STRING* allot_string(F_FIXNUM capacity);
-F_STRING* string(F_FIXNUM capacity, CELL fill);
-void primitive_string(void);
 void rehash_string(F_STRING* str);
 void primitive_rehash_string(void);
-F_STRING* resize_string(F_STRING* string, F_FIXNUM capacity, u16 fill);
+F_STRING* string(F_FIXNUM capacity, CELL fill);
+void primitive_string(void);
+F_STRING *resize_string(F_STRING *string, F_FIXNUM capacity, u16 fill);
 void primitive_resize_string(void);
-F_ARRAY *string_to_alien(F_STRING *s, bool check);
-char* to_c_string(F_STRING* s, bool check);
-void string_to_memory(F_STRING* s, BYTE* string);
-void primitive_string_to_memory(void);
-DLLEXPORT void box_c_string(const char* c_string);
-F_STRING* from_c_string(const char* c_string);
-F_STRING* memory_to_string(const BYTE* string, CELL length);
-void primitive_memory_to_string(void);
-DLLEXPORT char* unbox_c_string(void);
-char *pop_c_string(void);
-DLLEXPORT u16* unbox_utf16_string(void);
-DLLEXPORT void box_utf16_string(u16 *unboxed);
+
+F_STRING *memory_to_char_string(const char *string, CELL length);
+void primitive_memory_to_char_string(void);
+F_STRING *from_char_string(const char *c_string);
+DLLEXPORT void box_char_string(const char *c_string);
+void primitive_alien_to_char_string(void);
+
+F_STRING *memory_to_u16_string(const u16 *string, CELL length);
+void primitive_memory_to_u16_string(void);
+F_STRING *from_u16_string(const u16 *c_string);
+DLLEXPORT void box_u16_string(const u16 *c_string);
+void primitive_alien_to_u16_string(void);
+
+void char_string_to_memory(F_STRING *s, char *string);
+void primitive_char_string_to_memory(void);
+F_ARRAY *string_to_char_alien(F_STRING *s, bool check);
+char* to_char_string(F_STRING *s, bool check);
+char *pop_char_string(void);
+DLLEXPORT char *unbox_char_string(void);
+void primitive_string_to_char_alien(void);
+
+void u16_string_to_memory(F_STRING *s, u16 *string);
+void primitive_u16_string_to_memory(void);
+F_ARRAY *string_to_u16_alien(F_STRING *s, bool check);
+u16* to_u16_string(F_STRING *s, bool check);
+u16 *pop_u16_string(void);
+DLLEXPORT u16 *unbox_u16_string(void);
+void primitive_string_to_u16_alien(void);
 
 /* untagged & unchecked */
 INLINE CELL string_nth(F_STRING* string, CELL index)
