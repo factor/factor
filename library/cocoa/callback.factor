@@ -6,7 +6,10 @@ USING: hashtables kernel namespaces objc objc-NSObject ;
 
 SYMBOL: callbacks
 
-H{ } clone callbacks set-global
+: reset-callbacks ( -- )
+    H{ } clone callbacks set-global ;
+
+reset-callbacks
 
 "NSObject" "FactorCallback" {
     { "perform:" "void" { "id" "SEL" "id" }

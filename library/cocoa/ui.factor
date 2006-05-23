@@ -18,12 +18,9 @@ IN: gadgets-cocoa
 ! Hash mapping aliens to gadgets
 SYMBOL: views
 
-H{ } clone views set-global
+: reset-views ( hash -- hash ) H{ } clone views set-global ;
 
-: purge-views ( hash -- hash )
-    global [
-        views [ [ drop expired? not ] hash-subset ] change
-    ] bind ;
+reset-views
 
 : view ( handle -- world ) views get hash ;
 
@@ -237,8 +234,9 @@ IN: shells
     ] unless
     [
         [
+            reset-views
+            reset-callbacks
             init-ui
-            purge-views
             default-main-menu
             listener-window
             finish-launching

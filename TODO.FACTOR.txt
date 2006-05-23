@@ -1,5 +1,4 @@
 - fix compiled gc check
-- 3 >n fep
 - code walker & exceptions -- test and debug problems
 - code walker and callbacks is broken?
 - prettyprinter's highlighting of non-leaves looks bad
@@ -49,10 +48,8 @@
 - x11 input methods
 - x11 title bars are funny
 - cocoa:
-  - need to flush callbacks
-  - don't multiplex in the event loop if there is no pending i/o
   - horizontal scrolling
-  - zooming doesn't work
+  - window zooming doesn't work
   - implement handlers for open, quit events, and whatever else
   - polish OS X menu bar code
 - when scrolling wheel, or moving mouse out of window, rollover is not
