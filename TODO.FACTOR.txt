@@ -32,7 +32,6 @@
 
 - new browser:
   - browse generic words and classes
-  - initial size sucks
   - need actions for reloading the source file and opening word in jEdit
 - toggle/radio buttons/tabs or something
 - inspector: less clutter when browsing words

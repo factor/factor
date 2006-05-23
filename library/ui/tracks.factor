@@ -22,18 +22,31 @@ C: track ( orientation -- track )
 
 : <y-track> { 1 0 0 } <track> ;
 
+: divider-sizes ( seq -- dim )
+    length 1- 0 max divider-size n*v ;
+
 : track-dim ( track -- dim )
     #! Space available for content (minus dividers)
-    dup rect-dim swap track-sizes length 1-
-    divider-size n*v v- ;
+    dup rect-dim swap track-sizes divider-sizes v- ;
 
 : track-layout ( track -- sizes )
     dup track-dim swap track-sizes
     [ [ over n*v , ] [ divider-size , ] interleave ] { } make
     nip ;
 
-M: track layout* ( splitter -- )
+M: track layout* ( track -- )
     dup track-layout packed-layout ;
+
+: track-pref-dims ( dims sizes -- dims )
+    [ [ dup zero? [ nip ] [ v/n ] if ] 2map max-dim ] keep
+    divider-sizes v+ ;
+
+M: track pref-dim* ( track -- dim )
+    [
+        dup gadget-children
+        2 swap group [ first ] map pref-dims
+        dup rot track-sizes track-pref-dims >r max-dim r>
+    ] keep gadget-orientation set-axis ;
 
 : divider-delta ( track -- delta )
     #! How far the divider has moved along the track?

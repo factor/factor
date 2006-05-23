@@ -1,5 +1,5 @@
 ! Copyright (C) 2006 Slava Pestov.
-! See http://factor.sf.net/license.txt for BSD license.
+! See http://factorcode.org/license.txt for BSD license.
 IN: gadgets
 USING: gadgets gadgets-labels gadgets-layouts gadgets-theme
 hashtables kernel math namespaces queues sequences threads ;
