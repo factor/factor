@@ -6,14 +6,14 @@ namespaces sequences ;
 
 TYPEDEF: int CFIndex
 
+FUNCTION void* CFArrayCreateMutable ( void* allocator, CFIndex capacity, void* callbacks ) ;
+
 FUNCTION: void* CFArrayGetValueAtIndex ( void* array, CFIndex idx ) ;
+
+FUNCTION: void* CFArraySetValueAtIndex ( void* array, CFIndex index, void* value ) ;
 
 FUNCTION: CFIndex CFArrayGetCount ( void* array ) ;
 
-: CF>array ( alien -- array )
-    dup CFArrayGetCount [ CFArrayGetValueAtIndex ] map-with ;
-
-! Core Foundation utilities -- will be moved elsewhere
 : kCFURLPOSIXPathStyle 0 ;
 
 FUNCTION: void* CFURLCreateWithFileSystemPath ( void* allocator, void* filePath, int pathStyle, bool isDirectory ) ;
@@ -36,6 +36,14 @@ FUNCTION: bool CFBundleLoadExecutable ( void* bundle ) ;
 
 FUNCTION: void CFRelease ( void* cf ) ;
 
+: CF>array ( alien -- array )
+    dup CFArrayGetCount [ CFArrayGetValueAtIndex ] map-with ;
+
+: <CFArray> ( seq -- array )
+    [ f swap length f CFArrayCreateMutable ] keep
+    [ length ] keep
+    [ >r dupd r> CFArraySetValueAtIndex ] 2each ;
+
 : <CFString> ( string -- cf )
     f swap dup length CFStringCreateWithCharacters ;
 
@@ -43,6 +51,9 @@ FUNCTION: void CFRelease ( void* cf ) ;
     dup CFStringGetLength 1+ "ushort" <c-array> [
         >r 0 over CFStringGetLength r> CFStringGetCharacters
     ] keep alien>u16-string ;
+
+: CF>string-array ( alien -- seq )
+    CF>array [ CF>string ] map ;
 
 : <CFFileSystemURL> ( string dir? -- cf )
     >r <CFString> f over kCFURLPOSIXPathStyle

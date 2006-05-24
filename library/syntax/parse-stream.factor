@@ -32,6 +32,9 @@ words ;
 
 : try-run-file ( file -- ) [ [ run-file ] keep ] try drop ;
 
+: eval>string ( str -- str )
+    [ [ [ eval ] keep ] try drop ] string-out ;
+
 : parse-resource ( path -- quot )
     dup parsing-file
     [ <resource-stream> "resource:" ] keep append parse-stream ;

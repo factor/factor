@@ -9,10 +9,12 @@ USING: compiler io parser sequences words ;
     "/library/cocoa/init-cocoa.factor"
     "/library/cocoa/callback.factor"
     "/library/cocoa/application-utils.factor"
-    "/library/cocoa/window-utils.factor"
     "/library/cocoa/view-utils.factor"
+    "/library/cocoa/window-utils.factor"
     "/library/cocoa/dialogs.factor"
     "/library/cocoa/menu-bar.factor"
+    "/library/cocoa/pasteboard-utils.factor"
+    "/library/cocoa/services.factor"
     "/library/cocoa/ui.factor"
 } [
     run-resource

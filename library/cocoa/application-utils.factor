@@ -6,6 +6,10 @@ objc-NSApplication objc-NSAutoreleasePool objc-NSException
 objc-NSNotificationCenter objc-NSObject objc-NSView sequences
 threads ;
 
+: NSApplicationDelegateReplySuccess 0 ;
+: NSApplicationDelegateReplyCancel  1 ;
+: NSApplicationDelegateReplyFailure 2 ;
+
 : with-autorelease-pool ( quot -- )
     NSAutoreleasePool [new] slip [release] ; inline
 
@@ -14,7 +18,9 @@ threads ;
 : with-cocoa ( quot -- )
     [ NSApp drop call ] with-autorelease-pool ;
 
-: <NSString> <CFString> [autorelease] ;
+: <NSString> ( str -- alien ) <CFString> [autorelease] ;
+
+: <NSArray> ( seq -- alien ) <CFArray> [autorelease] ;
 
 : CFRunLoopDefaultMode "kCFRunLoopDefaultMode" <NSString> ;
 

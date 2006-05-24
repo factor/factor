@@ -16,4 +16,4 @@ sequences ;
 
 : open-panel ( -- paths )
     <NSOpenPanel> dup f [runModalForTypes:] NSOKButton =
-    [ [filenames] CF>array [ CF>string ] map ] [ drop f ] if ;
+    [ [filenames] CF>string-array ] [ drop f ] if ;

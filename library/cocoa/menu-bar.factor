@@ -33,18 +33,22 @@ M: quotation to-target-and-action
     [initWithTitle:action:keyEquivalent:] [autorelease] ;
 
 : make-menu-item ( title spec -- item )
-    to-target-and-action >r swap <NSMenuItem> dup r> [setTarget:] ;
+    to-target-and-action >r swap <NSMenuItem> dup
+    r> [setTarget:] ;
 
 : submenu-to-item ( menu -- item )
-    dup [title] CF>string f "" <NSMenuItem> dup rot [setSubmenu:] ;
+    dup [title] CF>string f "" <NSMenuItem> dup
+    rot [setSubmenu:] ;
 
 : add-submenu ( menu submenu -- )
     submenu-to-item [addItem:] ;
 
 : and-modifiers ( item key-equivalent-modifier-mask -- item )
     dupd [setKeyEquivalentModifierMask:] ;
+
 : and-alternate ( item -- item )
     dup 1 [setAlternate:] ;
+
 : and-option-equivalent-modifier 1572864 and-modifiers ;
 
 ! -------------------------------------------------------------------------
@@ -130,7 +134,6 @@ DEFER: described-menu
             { "Paste and Match Style" "pasteAsPlainText:" "V" [ and-option-equivalent-modifier ] }
             { "Delete" "delete:" "" }
             { "Select All" "selectAll:" "a" }
-            ! { }
             ! Find, Spelling, and Speech submenus go here
         } }
         { {

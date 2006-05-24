@@ -20,6 +20,7 @@ USING: cocoa compiler io kernel objc sequences words ;
     "NSOpenGLContext"
     "NSOpenGLView"
     "NSOpenPanel"
+    "NSPasteboard"
     "NSSavePanel"
     "NSView"
     "NSWindow"
