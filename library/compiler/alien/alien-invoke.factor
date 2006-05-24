@@ -79,7 +79,7 @@ M: alien-invoke stack-reserve*
     effect>string ;
 
 : (define-c-word) ( type lib func types stack-effect -- )
-    >r over create-in >r 
+    >r over create-in dup reset-generic >r 
     [ alien-invoke ] curry curry curry curry
     r> swap define-compound word r>
     "stack-effect" set-word-prop ;
@@ -89,11 +89,10 @@ M: alien-invoke stack-reserve*
     (define-c-word) ;
 
 M: compound unxref-word*
-    dup word-def \ alien-invoke swap member?
-    over "infer" word-prop or [
-        drop
-    ] [
+    dup "infer" word-prop [
         dup
         { "infer-effect" "base-case" "no-effect" "terminates" }
-        reset-props update-xt
-    ] if ;
+        reset-props
+        dup word-def \ alien-invoke swap member?
+        [ dup update-xt ] unless
+    ] unless drop ;

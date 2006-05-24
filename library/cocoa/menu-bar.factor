@@ -5,7 +5,7 @@ gadgets-layouts gadgets-listener kernel memory objc
 objc-FactorCallback objc-NSApplication objc-NSMenu
 objc-NSMenuItem objc-NSObject objc-NSWindow sequences strings
 words ;
-IN: gadgets-cocoa
+IN: cocoa
 
 ! -------------------------------------------------------------------------
 

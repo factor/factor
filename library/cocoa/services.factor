@@ -2,31 +2,35 @@ IN: objc-FactorServiceProvider
 DEFER: FactorServiceProvider
 
 IN: cocoa
-USING: alien gadgets-presentations kernel objc
-objc-NSApplication objc-NSObject parser styles ;
+USING: alien gadgets-presentations io kernel namespaces objc
+objc-NSApplication objc-NSObject parser prettyprint styles ;
 
 : pasteboard-error ( error str -- f )
     "Pasteboard does not hold a string" <NSString>
-    0 rot set-void*-nth f ;
+    0 swap rot set-void*-nth f ;
 
 : ?pasteboard-string ( pboard error -- str/f )
-    NSStringPboardType pick pasteboard-type? [
+    over pasteboard-string? [
         swap pasteboard-string [ ] [ pasteboard-error ] ?if
     ] [
         nip pasteboard-error
     ] if ;
 
 : do-service ( pboard error quot -- | quot: str -- str/f )
-    [
-        >r ?pasteboard-string dup [ r> call ] [ r> 2drop ] if
-    ] keep over [ set-pasteboard-string ] [ 2drop ] if ;
+    pick >r >r
+    ?pasteboard-string dup [ r> call ] [ r> 2drop f ] if
+    dup [ r> set-pasteboard-string ] [ r> 2drop ] if ;
 
 "NSObject" "FactorServiceProvider" {
-    { "evalInListener:" "void" { "id" "SEL" "id" "id" "void*" }
-        [ nip [ <input> f show-object f ] do-service ]
+    {
+        "evalInListener:userData:error:" "void"
+        { "id" "SEL" "id" "id" "void*" }
+        [ nip [ <input> f show-object f ] do-service 2drop ]
     }
-    { "evalToString:" "void" { "id" "SEL" "id" "id" "void*" }
-        [ nip [ eval>string ] do-service ]
+    {
+        "evalToString:userData:error:" "void"
+        { "id" "SEL" "id" "id" "void*" }
+        [ nip [ eval>string ] do-service 2drop ]
     }
 } { } define-objc-class
 

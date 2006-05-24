@@ -1,3 +1,5 @@
+! Copyright (C) 2005, 2006 Kevin Reid.
+! See http://factorcode.org/license.txt for BSD license.
 IN: objc-FactorCallback
 DEFER: FactorCallback
 

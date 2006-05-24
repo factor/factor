@@ -5,7 +5,7 @@ IN: objc-FactorApplicationDelegate
 DEFER: FactorApplicationDelegate
 
 IN: cocoa
-USING: gadgets-listener kernel objc objc-NSApplication
+USING: gadgets gadgets-listener kernel objc objc-NSApplication
 objc-NSObject ;
 
 : finder-run-files ( alien -- )
@@ -24,8 +24,16 @@ objc-NSObject ;
     NSApp
     FactorApplicationDelegate [alloc] [init] [setDelegate:] ;
 
+: init-cocoa-ui ( -- )
+    reset-views
+    reset-callbacks
+    init-ui
+    install-app-delegate
+    register-services
+    default-main-menu ;
+
 IN: gadgets
-USING: errors freetype gadgets-cocoa objc-NSOpenGLContext
+USING: errors freetype objc-NSOpenGLContext
 objc-NSOpenGLView objc-NSView objc-NSWindow ;
 
 : redraw-world ( handle -- )
@@ -50,11 +58,7 @@ IN: shells
     ] unless
     [
         [
-            install-app-delegate
-            reset-views
-            reset-callbacks
-            init-ui
-            default-main-menu
+            init-cocoa-ui
             listener-window
             finish-launching
             event-loop

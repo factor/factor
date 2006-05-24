@@ -1,16 +1,21 @@
+! Copyright (C) 2006 Slava Pestov.
+! See http://factorcode.org/license.txt for BSD license.
 IN: cocoa
-USING: kernel sequences objc-NSPasteboard ;
+USING: arrays kernel objc-NSPasteboard sequences ;
 
-: NSStringPboardType "NSStringPboardType" <NSString> ;
+: NSStringPboardType "NSStringPboardType" ;
 
-: pasteboard-type? ( type id -- seq )
-    NSStringPboardType swap [types] CF>array member? ;
+: pasteboard-string? ( type id -- seq )
+    NSStringPboardType swap [types] CF>string-array member? ;
 
 : pasteboard-string ( id -- str )
-    NSStringPboardType [stringForType:] dup [ CF>string ] when ;
+    NSStringPboardType <NSString> [stringForType:]
+    dup [ CF>string ] when ;
 
 : set-pasteboard-types ( seq id -- )
-    swap <NSArray> f [declareTypes:owner:] ;
+    swap <NSArray> f [declareTypes:owner:] drop ;
 
 : set-pasteboard-string ( str id -- )
-    swap <NSString> NSStringPboardType [setString:forType:] ;
+    NSStringPboardType <NSString>
+    dup 1array pick set-pasteboard-types
+    >r swap <NSString> r> [setString:forType:] drop ;

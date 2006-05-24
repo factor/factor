@@ -6,11 +6,11 @@ namespaces sequences ;
 
 TYPEDEF: int CFIndex
 
-FUNCTION void* CFArrayCreateMutable ( void* allocator, CFIndex capacity, void* callbacks ) ;
+FUNCTION: void* CFArrayCreateMutable ( void* allocator, CFIndex capacity, void* callbacks ) ;
 
 FUNCTION: void* CFArrayGetValueAtIndex ( void* array, CFIndex idx ) ;
 
-FUNCTION: void* CFArraySetValueAtIndex ( void* array, CFIndex index, void* value ) ;
+FUNCTION: void CFArraySetValueAtIndex ( void* array, CFIndex index, void* value ) ;
 
 FUNCTION: CFIndex CFArrayGetCount ( void* array ) ;
 
