@@ -74,14 +74,14 @@ SYMBOL: hand-buttons
 V{ } clone hand-buttons set-global
 
 : button-gesture ( button gesture -- )
-    #! Send a gesture like [ button-down 2 ]; if nobody
+    #! Send a gesture like T{ button-down f 2 }; if nobody
     #! handles it, send T{ button-down }.
     hand-clicked get-global
     3dup >r with-button r> handle-gesture
     [ handle-gesture 2drop ] [ 3drop ] if ;
 
 : drag-gesture ( -- )
-    #! Send a gesture like [ drag 2 ]; if nobody handles it,
+    #! Send a gesture like T{ drag f 2 }; if nobody handles it,
     #! send T{ drag }.
     hand-buttons get-global first T{ drag } button-gesture ;
 

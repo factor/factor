@@ -15,24 +15,31 @@ TUPLE: slider elevator thumb value saved max page ;
 
 : find-slider [ slider? ] find-parent ;
 
+: elevator-length ( slider -- n )
+    dup slider-elevator rect-dim
+    swap gadget-orientation v. ;
+
+: min-thumb-dim 30 ;
+
+: thumb-dim ( slider -- h )
+    dup slider-page over slider-max 1 max / 1 min
+    swap elevator-length * min-thumb-dim max ;
+
+: slider-max* dup slider-max swap slider-page - 1 max ;
+
 : slider-scale ( slider -- n )
     #! A scaling factor such that if x is a slider co-ordinate,
     #! x*n is the screen position of the thumb, and conversely
     #! for x/n. The '1 max' calls avoid division by zero.
-    dup slider-elevator rect-dim
-    over gadget-orientation v. 1 max
-    swap slider-max 1 max / ;
+    dup elevator-length over thumb-dim - 1 max
+    swap slider-max* / ;
 
 : slider>screen slider-scale * ;
 
 : screen>slider slider-scale / ;
 
 : fix-slider-value ( n slider -- n )
-    dup slider-max swap slider-page - min 0 max >fixnum ;
-
-: fix-slider ( slider -- )
-    dup slider-elevator relayout-1
-    dup slider-max over slider-page max swap set-slider-max ;
+    slider-max* min 0 max >fixnum ;
 
 TUPLE: slider-changed ;
 
@@ -40,7 +47,8 @@ TUPLE: slider-changed ;
     [ fix-slider-value ] keep 2dup slider-value = [
         2drop
     ] [
-        [ set-slider-value ] keep [ fix-slider ] keep
+        [ set-slider-value ] keep
+        dup slider-elevator relayout-1
         T{ slider-changed } swap handle-gesture drop
     ] if ;
 
@@ -83,7 +91,7 @@ C: elevator ( vector -- elevator )
     dup delegate>gadget [ set-gadget-orientation ] keep
     dup elevator-theme dup elevator-actions ;
 
-: (layout-thumb) ( slider n -- n )
+: (layout-thumb) ( slider n -- n thumb )
     over gadget-orientation n*v swap slider-thumb ;
 
 : thumb-loc ( slider -- loc )
@@ -91,9 +99,6 @@ C: elevator ( vector -- elevator )
 
 : layout-thumb-loc ( slider -- )
     dup thumb-loc (layout-thumb) set-rect-loc ;
-
-: thumb-dim ( slider -- h )
-    dup slider-page swap slider>screen ;
 
 : layout-thumb-dim ( slider -- )
     dup dup thumb-dim (layout-thumb)

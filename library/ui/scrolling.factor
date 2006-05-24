@@ -1,11 +1,8 @@
 ! Copyright (C) 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: gadgets-scrolling
-USING: arrays gadgets gadgets-layouts kernel math namespaces
-sequences ;
-
-! A viewport can be scrolled.
-TUPLE: viewport ;
+USING: arrays gadgets gadgets-layouts generic kernel math
+namespaces sequences ;
 
 ! A scroller combines a viewport with two x and y sliders.
 ! The follows slot is set by scroll-to.
@@ -18,27 +15,39 @@ TUPLE: scroller viewport x y follows ;
 
 : find-scroller [ scroller? ] find-parent ;
 
-: find-viewport [ viewport? ] find-parent ;
+: scroll-to ( gadget -- )
+    #! Scroll the scroller that contains this gadget, if any, so
+    #! that the gadget becomes visible.
+    dup find-scroller dup
+    [ [ set-scroller-follows ] keep relayout ] [ 2drop ] if ;
 
-: viewport-dim gadget-child pref-dim ;
+: scroll-up-line scroller-y -1 swap slide-by-line ;
 
-C: viewport ( content -- viewport )
-    dup delegate>gadget
-    t over set-gadget-root?
-    [ add-gadget ] keep ;
+: scroll-down-line scroller-y 1 swap slide-by-line ;
 
-M: viewport pref-dim* gadget-child pref-dim ;
+: scroller-actions ( scroller -- )
+    dup [ scroll-up-line ] T{ wheel-up } set-action
+    dup [ scroll-down-line ] T{ wheel-down } set-action
+    [ relayout-1 ] T{ slider-changed } set-action ;
 
-: set-slider ( page max value slider -- )
+C: scroller ( gadget -- scroller )
+    #! Wrap a scrolling pane around the gadget.
+    {
+        { [ <viewport> ] set-scroller-viewport @center }
+        { [ <x-slider> ] set-scroller-x @bottom }
+        { [ <y-slider> ] set-scroller-y @right }
+    } make-frame* dup scroller-actions ;
+
+: set-slider ( value page max slider -- )
     #! page/max/value are 3-vectors.
-    [ [ gadget-orientation v. ] keep set-slider-value ] keep
     [ [ gadget-orientation v. ] keep set-slider-max ] keep
     [ [ gadget-orientation v. ] keep set-slider-page ] keep
-    fix-slider ;
+    [ [ gadget-orientation v. ] keep set-slider-value* ] keep
+    slider-elevator relayout-1 ;
 
 : update-slider ( scroller value slider -- )
-    >r >r scroller-viewport dup rect-dim swap viewport-dim
-    r> r> set-slider ;
+    >r swap scroller-viewport dup rect-dim swap viewport-dim
+    r> set-slider ;
 
 : scroll ( scroller value -- )
     2dup over scroller-x update-slider
@@ -61,41 +70,15 @@ M: viewport pref-dim* gadget-child pref-dim ;
 : update-scroller ( scroller -- )
     [ dup do-scroll ] keep scroller-origin v+ scroll ;
 
-: position-viewport ( viewport scroller -- )
-    scroller-origin vneg swap gadget-child set-rect-loc ;
+: position-viewport ( scroller -- )
+    dup scroller-origin vneg
+    swap scroller-viewport gadget-child
+    set-rect-loc ;
 
-M: viewport layout* ( viewport -- )
-    dup gadget-child dup prefer layout
-    dup find-scroller dup update-scroller position-viewport ;
-
-M: viewport focusable-child* ( viewport -- gadget )
-    gadget-child ;
-
-M: viewport pref-dim* ( viewport -- dim )
-    gadget-child pref-dim ;
-
-: scroll-to ( gadget -- )
-    #! Scroll the scroller that contains this gadget, if any, so
-    #! that the gadget becomes visible.
-    dup find-scroller dup
-    [ [ set-scroller-follows ] keep relayout ] [ 2drop ] if ;
-
-: scroll-up-line scroller-y -1 swap slide-by-line ;
-
-: scroll-down-line scroller-y 1 swap slide-by-line ;
-
-: scroller-actions ( scroller -- )
-    dup [ scroll-up-line ] T{ wheel-up } set-action
-    dup [ scroll-down-line ] T{ wheel-down } set-action
-    [ scroller-viewport relayout-1 ] T{ slider-changed } set-action ;
-
-C: scroller ( gadget -- scroller )
-    #! Wrap a scrolling pane around the gadget.
-    {
-        { [ <viewport> ] set-scroller-viewport @center }
-        { [ <x-slider> ] set-scroller-x @bottom }
-        { [ <y-slider> ] set-scroller-y @right }
-    } make-frame* dup scroller-actions ;
+M: scroller layout* ( scroller -- )
+    dup delegate layout*
+    dup layout-children
+    dup update-scroller position-viewport ;
 
 M: scroller focusable-child* ( scroller -- viewport )
     scroller-viewport ;

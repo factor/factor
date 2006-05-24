@@ -33,8 +33,7 @@ M: gadget remove-notify* drop ;
     ] when* ;
 
 : (clear-gadget) ( gadget -- )
-    dup gadget-children [ (unparent) ] each
-    f swap set-gadget-children ;
+    dup [ (unparent) ] each-child f swap set-gadget-children ;
 
 : clear-gadget ( gadget -- )
     dup (clear-gadget) relayout ;

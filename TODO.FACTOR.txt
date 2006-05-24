@@ -2,6 +2,7 @@
 - code walker & exceptions -- test and debug problems
 - code walker and callbacks is broken?
 - prettyprinter's highlighting of non-leaves looks bad
+- look at xref issue
 
 + io:
 

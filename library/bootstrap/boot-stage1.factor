@@ -184,6 +184,7 @@ vectors words ;
         "/library/ui/buttons.factor"
         "/library/ui/line-editor.factor"
         "/library/ui/sliders.factor"
+        "/library/ui/viewports.factor"
         "/library/ui/scrolling.factor"
         "/library/ui/editors.factor"
         "/library/ui/tracks.factor"
