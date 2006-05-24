@@ -1,5 +1,5 @@
 USING: kernel sequences namespaces math hashtables threads io opengl
-concurrency x xlib x11 gl concurrent-widgets ;
+concurrency x11 x gl concurrent-widgets ;
 
 SYMBOL: loop-action
 
