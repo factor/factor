@@ -1,5 +1,5 @@
-! Copyright (C) 2004, 2005 Slava Pestov.
-! See http://factor.sf.net/license.txt for BSD license.
+! Copyright (C) 2004, 2006 Slava Pestov.
+! See http://factorcode.org/license.txt for BSD license.
 IN: kernel-internals
 USING: generic sequences ;
 
@@ -31,7 +31,7 @@ C: condition ( error restarts cc -- condition )
     [ set-condition-restarts ] keep
     [ set-delegate ] keep ;
 
-: condition ( error restarts -- value )
+: condition ( error restarts -- restart )
     [ <condition> throw ] callcc1 2nip ;
 
 GENERIC: compute-restarts
