@@ -1,4 +1,4 @@
-USING: kernel words namespaces sequences x x11 opengl gl ;
+USING: kernel words namespaces sequences x11 opengl x gl ;
 
 : display ( -- )
 GL_COLOR_BUFFER_BIT glClear
