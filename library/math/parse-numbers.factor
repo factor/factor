@@ -1,34 +1,34 @@
-! Copyright (C) 2004, 2005 Slava Pestov.
+! Copyright (C) 2004, 2006 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 IN: math
 USING: errors generic kernel math-internals namespaces sequences
 strings ;
 
-: not-a-number "Not a number" throw ;
-
 DEFER: base>
 
 : string>ratio ( "a/b" radix -- a/b )
-    >r "/" split1 r> tuck base> >r base> r> / ;
+    >r "/" split1 r> tuck base> >r base> r>
+    2dup and [ / ] [ 2drop f ] if ;
 
 GENERIC: digit> ( ch -- n )
 M: digit  digit> CHAR: 0 - ;
 M: letter digit> CHAR: a - 10 + ;
 M: LETTER digit> CHAR: A - 10 + ;
-M: object digit> not-a-number ;
+M: object digit> drop f ;
 
 : digit+ ( num digit base -- num )
-    2dup < [ rot * + ] [ not-a-number ] if ;
+    pick pick and
+    [ 2dup < [ rot * + ] [ 3drop f ] if ] [ 3drop f ] if ;
 
-: (string>integer) ( base str -- num )
+: (string>integer) ( radix str -- num )
     dup empty? [
-        not-a-number
+        2drop f
     ] [
         0 [ digit> pick digit+ ] reduce nip
     ] if ;
 
-: string>integer ( string -- n )
-    swap "-" ?head >r (string>integer) r> [ neg ] when ;
+: string>integer ( string radix -- n )
+    swap "-" ?head >r (string>integer) dup r> and [ neg ] when ;
 
 : base> ( string radix -- n )
     {

@@ -11,9 +11,8 @@ vectors words ;
 
 : parse-resource* ( path -- )
     [ parse-resource ] catch [
-        dup error.
-        "Try again? [yn]" print flush readln "yY" subseq?
-        [ drop parse-resource* ] [ rethrow ] if
+        { { "Parse file again" t } } condition drop
+        parse-resource*
     ] when* ;
 
 : if-arch ( arch seq -- )
@@ -80,7 +79,7 @@ vectors words ;
         "/library/io/files.factor"
         "/library/io/binary.factor"
 
-        "/library/syntax/parser.factor"
+        "/library/syntax/early-parser.factor"
 
         "/library/generic/generic.factor"
         "/library/generic/standard-combination.factor"
@@ -92,6 +91,7 @@ vectors words ;
         
         "/library/syntax/prettyprint.factor"
         "/library/syntax/see.factor"
+        "/library/syntax/parser.factor"
 
         "/library/tools/interpreter.factor"
         
@@ -104,9 +104,9 @@ vectors words ;
         
         "/library/tools/describe.factor"
         "/library/tools/debugger.factor"
-
-        "/library/syntax/parse-stream.factor"
         
+        "/library/syntax/parse-stream.factor"
+
         "/library/tools/memory.factor"
         "/library/tools/listener.factor"
         "/library/tools/walker.factor"
@@ -260,6 +260,7 @@ vectors words ;
         "/library/math/ratio.facts"
         "/library/math/trig-hyp.facts"
         "/library/math/vectors.facts"
+        "/library/syntax/early-parser.facts"
         "/library/syntax/parse-stream.facts"
         "/library/syntax/parser.facts"
         "/library/syntax/parse-syntax.facts"

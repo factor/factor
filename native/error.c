@@ -48,10 +48,10 @@ void primitive_die(void)
 	factorbug();
 }
 
-void general_error(CELL error, CELL arg1, CELL arg2, bool keep_stacks)
+void general_error(F_ERRORTYPE error, CELL arg1, CELL arg2, bool keep_stacks)
 {
-	CELL thrown = make_array_4(userenv[ERROR_ENV],error,arg1,arg2);
-	throw_error(thrown,keep_stacks);
+	throw_error(make_array_4(userenv[ERROR_ENV],
+		tag_fixnum(error),arg1,arg2),keep_stacks);
 }
 
 /* It is not safe to access 'ds' from a signal handler, so we just not

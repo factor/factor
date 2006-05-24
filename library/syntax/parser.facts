@@ -1,65 +1,5 @@
 USING: help kernel parser sequences ;
 
-IN: help : $parsing-note
-    drop "This word should only be called from parsing words." $notes ;
-
-HELP: use f
-{ $description "A variable holding the current vocabulary search path as a sequence of hashtables." }
-{ $see-also in use+ set-use POSTPONE: USING: POSTPONE: USE: } ;
-
-HELP: in f
-{ $description "A variable holding the current vocabulary for new definitions." }
-{ $see-also use set-in POSTPONE: IN: } ;
-
-HELP: check-vocab "( name -- vocab )"
-{ $values { "name" "a string" } { "vocab" "a hashtable" } }
-{ $description "Outputs a named vocabulary." }
-{ $errors "Throws an error if the vocabulary does not exist." } ;
-
-HELP: use+ "( vocab -- )"
-{ $values { "vocab" "a string" } }
-{ $description "Adds a new vocabulary at the front of the search path. Subsequent word lookups by the parser will search this vocabulary first." }
-$parsing-note
-{ $errors "Throws an error if the vocabulary does not exist." }
-{ $see-also in use add-use set-use POSTPONE: USE: } ;
-
-HELP: set-use "( seq -- )"
-{ $values { "seq" "a sequence of strings" } }
-{ $description "Sets the vocabulary search path. Later vocabularies take precedence." }
-{ $errors "Throws an error if one of the vocabularies does not exist." }
-$parsing-note
-{ $see-also in use use+ add-use file-vocabs } ;
-
-HELP: add-use "( seq -- )"
-{ $values { "seq" "a sequence of strings" } }
-{ $description "Adds multiple vocabularies to the search path, with later vocabularies taking precedence." }
-{ $errors "Throws an error if one of the vocabularies does not exist." }
-$parsing-note
-{ $see-also in use use+ set-use POSTPONE: USING: } ;
-
-HELP: set-in "( name -- )"
-{ $values { "name" "a string" } }
-{ $description "Sets the current vocabulary where new words will be defined, creating the vocabulary first if it does not exist." }
-$parsing-note
-{ $see-also in use POSTPONE: IN: } ;
-
-HELP: parsing? "( obj -- ? )"
-{ $values { "obj" "an object" } { "?" "a boolean" } }
-{ $description "Tests if an object is a parsing word." }
-{ $notes "Outputs " { $link f } " if the object is not a word." } ;
-
-HELP: file f
-{ $description "Variable stores the file name being parsed. This is the input parameter to " { $link parse-stream } "." } ;
-
-HELP: line-number f
-{ $description "Variable holds the line number being parsed." } ;
-
-HELP: line-text f
-{ $description "Variable holds the text of the line being parsed." } ;
-
-HELP: column f
-{ $description "Variable holds the column number being parsed." } ;
-
 HELP: skip "( i seq quot -- n )"
 { $values { "n" "a starting index" } { "seq" "a sequence" } { "quot" "a quotation with stack effect " { $snippet "( elt -- ? )" } } }
 { $description "Variant of " { $link find* } " that outputs the length of the sequence instead of -1 if no elements satisfy the predicate." } ;
@@ -81,20 +21,6 @@ HELP: scan "( -- token )"
 { $values { "token" "a string" } }
 { $description "Reads the next token from the line currently being parsed. This is the key word that the Factor parser is built on." }
 $parsing-note ;
-
-HELP: save-location "( word -- )"
-{ $values { "word" "a word" } }
-{ $description "Sets the " { $snippet "\"file\"" } " and " {  $snippet "\"line\"" } " word properties to the current parser location." }
-$parsing-note ;
-
-HELP: create-in "( string -- word )"
-{ $values { "string" "a word name" } { "word" "a new word" } }
-{ $description "Creates a word in the current vocabulary. Until re-defined, the word throws an error when invoked." }
-$parsing-note ;
-
-HELP: create-constructor "( word -- constructor )"
-{ $values { "class" "a word" } { "constructor" "a new word" } }
-{ $description "Creates a new word in the current vocabulary, named by surrounding " { $snippet "word" } " with angle brackets." } ;
 
 HELP: CREATE "( -- word )"
 { $values { "word" "a word" } }

@@ -7,6 +7,7 @@ sequences-internals strings vectors words ;
 
 SYMBOL: error
 SYMBOL: error-continuation
+SYMBOL: restarts
 
 : expired-error. ( obj -- )
     "Object did not survive image save/load: " write third . ;
@@ -22,9 +23,6 @@ SYMBOL: error-continuation
     "Object: " write dup fourth short.
     "Object type: " write dup fourth class .
     "Expected type: " write third type>class . ;
-
-: float-format-error. ( list -- )
-    "Invalid floating point literal format: " write third . ;
 
 : signal-error. ( obj -- )
     "Operating system signal " write third . ;
@@ -67,7 +65,6 @@ M: kernel-error error. ( error -- )
         [ io-error. ]
         [ undefined-word-error. ]
         [ type-check-error. ]
-        [ float-format-error. ]
         [ signal-error. ]
         [ negative-array-size-error. ]
         [ c-string-error. ]
@@ -114,6 +111,8 @@ M: parse-error error. ( error -- )
 
 M: bounds-error summary drop "Sequence index out of bounds" ;
 
+M: condition error. delegate error. ;
+
 M: tuple error. ( error -- ) describe ;
 
 M: object error. ( error -- ) . ;
@@ -127,7 +126,20 @@ M: object error. ( error -- ) . ;
 : :get ( var -- value )
     error-continuation get continuation-name hash-stack ;
 
+: :res ( n -- ) restarts get nth first3 continue-with ;
+
+: restarts. ( -- )
+    restarts get dup empty? [
+        drop
+    ] [
+        "The following restarts are available:" print
+        dup length [
+            number>string write " :res  " write first print
+        ] 2each
+    ] if ;
+
 : debug-help ( -- )
+    restarts.
     ":s :r :c show stacks at time of error" print
     ":get ( var -- value ) accesses variables at time of error" print
     ":error starts the inspector with the error" print
@@ -144,7 +156,9 @@ M: object error. ( error -- ) . ;
 : try ( quot -- ) [ print-error terpri debug-help ] recover ;
 
 : save-error ( error continuation -- )
-    error-continuation set-global error set-global ;
+    error-continuation set-global
+    dup error set-global
+    compute-restarts restarts set-global ;
 
 : error-handler ( error -- )
     dup continuation save-error rethrow ;

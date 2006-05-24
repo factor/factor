@@ -1,22 +1,24 @@
-#define ERROR_EXPIRED (0<<3)
-#define ERROR_IO (1<<3)
-#define ERROR_UNDEFINED_WORD (2<<3)
-#define ERROR_TYPE (3<<3)
-#define ERROR_FLOAT_FORMAT (4<<3)
-#define ERROR_SIGNAL (5<<3)
-#define ERROR_NEGATIVE_ARRAY_SIZE (6<<3)
-#define ERROR_C_STRING (7<<3)
-#define ERROR_FFI (8<<3)
-#define ERROR_HEAP_SCAN (9<<3)
-#define ERROR_UNDEFINED_SYMBOL (10<<3)
-#define ERROR_USER_INTERRUPT (11<<3)
-#define ERROR_DS_UNDERFLOW (12<<3)
-#define ERROR_DS_OVERFLOW (13<<3)
-#define ERROR_RS_UNDERFLOW (14<<3)
-#define ERROR_RS_OVERFLOW (15<<3)
-#define ERROR_CS_UNDERFLOW (16<<3)
-#define ERROR_CS_OVERFLOW (17<<3)
-#define ERROR_OBJECTIVE_C (18<<3)
+typedef enum
+{
+	ERROR_EXPIRED
+	ERROR_IO
+	ERROR_UNDEFINED_WORD
+	ERROR_TYPE
+	ERROR_SIGNAL
+	ERROR_NEGATIVE_ARRAY_SIZE
+	ERROR_C_STRING
+	ERROR_FFI
+	ERROR_HEAP_SCAN
+	ERROR_UNDEFINED_SYMBOL
+	ERROR_USER_INTERRUPT
+	ERROR_DS_UNDERFLOW
+	ERROR_DS_OVERFLOW
+	ERROR_RS_UNDERFLOW
+	ERROR_RS_OVERFLOW
+	ERROR_CS_UNDERFLOW
+	ERROR_CS_OVERFLOW
+	ERROR_OBJECTIVE_C
+} F_ERRORTYPE;
 
 /* Are we throwing an error? */
 bool throwing;
@@ -32,7 +34,7 @@ void fatal_error(char* msg, CELL tagged);
 void critical_error(char* msg, CELL tagged);
 void throw_error(CELL error, bool keep_stacks);
 void early_error(CELL error);
-void general_error(CELL error, CELL arg1, CELL arg2, bool keep_stacks);
+void general_error(F_ERRORTYPE error, CELL arg1, CELL arg2, bool keep_stacks);
 void signal_error(int signal);
 void type_error(CELL type, CELL tagged);
 void primitive_throw(void);

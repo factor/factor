@@ -1,41 +1,8 @@
 ! Copyright (C) 2005, 2006 Slava Pestov.
-! See http://factor.sf.net/license.txt for BSD license.
+! See http://factorcode.org/license.txt for BSD license.
 IN: parser
-USING: errors generic hashtables kernel math namespaces
-sequences strings vectors words ;
-
-SYMBOL: use
-SYMBOL: in
-
-: check-vocab ( name -- vocab )
-    dup vocab
-    [ ] [ " is not a vocabulary name" append throw ] ?if ;
-
-: use+ ( string -- ) check-vocab use get push ;
-
-: add-use ( seq -- ) [ use+ ] each ;
-
-: set-use ( seq -- ) [ check-vocab ] map >vector use set ;
-
-: set-in ( name -- ) dup ensure-vocab dup in set use+ ;
-
-: parsing? ( word -- ? )
-    dup word? [ "parsing" word-prop ] [ drop f ] if ;
-
-SYMBOL: file
-SYMBOL: line-number
-
-SYMBOL: line-text
-SYMBOL: column
-
-TUPLE: parse-error file line col text ;
-
-C: parse-error ( error -- error )
-    file get over set-parse-error-file
-    line-number get over set-parse-error-line
-    column get over set-parse-error-col
-    line-text get over set-parse-error-text
-    [ set-delegate ] keep ;
+USING: arrays errors generic hashtables kernel math namespaces
+prettyprint sequences strings vectors words ;
 
 : skip ( i seq quot -- n | quot: elt -- ? )
     over >r find* drop dup -1 =
@@ -55,24 +22,29 @@ C: parse-error ( error -- error )
     column [ line-text get (scan) dup ] change
     2dup = [ 2drop f ] [ line-text get subseq ] if ;
 
-: save-location ( word -- )
-    dup set-word
-    dup line-number get "line" set-word-prop
-    file get "file" set-word-prop ;
-
-: create-in in get create dup save-location ;
-
-: create-constructor ( class -- word )
-    word-name in get constructor-word dup save-location ;
-
 : CREATE ( -- word ) scan create-in ;
 
 SYMBOL: string-mode
 
+: do-what-i-mean ( string -- restarts )
+    all-words [ word-name = ] subset-with natural-sort [
+        [ "Use the word " swap synopsis append ] keep 2array
+    ] map ;
+
+: word-not-found ( str -- word )
+    "No word named "
+    over
+    " found in current vocabulary search path" append3
+    swap do-what-i-mean condition ;
+
 : scan-word ( -- obj )
     scan dup [
         dup ";" = not string-mode get and [
-            dup use get hash-stack [ ] [ string>number ] ?if
+            dup use get hash-stack [ ] [
+                dup string>number [ ] [
+                    word-not-found dup word-vocabulary use+
+                ] ?if
+            ] ?if
         ] unless
     ] when ;
 
@@ -118,11 +90,11 @@ SYMBOL: string-mode
 
 global [
     {
-        "scratchpad" "syntax" "alien" "arrays" "compiler"
+        "scratchpad" "syntax" "arrays" "compiler"
         "errors" "generic" "hashtables" "help" "inference"
         "inspector" "io" "jedit" "kernel" "listener" "math"
-        "memory" "namespaces" "optimizer" "parser" "prettyprint"
-        "queues" "sequences" "shells" "strings" "styles" "test"
+        "memory" "namespaces" "parser" "prettyprint"
+        "sequences" "shells" "strings" "styles" "test"
         "threads" "vectors" "walker" "words"
     } set-use
     "scratchpad" set-in

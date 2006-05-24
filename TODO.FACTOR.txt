@@ -57,7 +57,6 @@
 - focus is not top-level window aware
 - display lists
 - saving the image should save window configuration
-- fix up the min thumb size hack
 - variable width word wrap
 - new gesture style
 
