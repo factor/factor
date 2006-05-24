@@ -15,7 +15,7 @@ SYMBOL: error-hook
 [ drop terpri debug-help ] error-hook set-global
 
 : bye ( -- ) quit-flag on ;
-help
+
 : (read-multiline) ( quot depth -- quot ? )
     >r readln dup [
         (parse) depth r> dup >r <= [
