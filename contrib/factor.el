@@ -6,13 +6,18 @@
 (defvar factor-binary "/storage/factor/factor-0.82/f")
 (defvar factor-image "/scratch/factor-darcs/repos/Factor/factor.image")
 
-(defun factor-server () (interactive)
+(defun factor-server ()
+  (interactive)
   (make-comint "factor-server" factor-binary nil factor-image "-shell=tty")
   (comint-send-string "*factor-server*" "USE: jedit telnet\n"))
 
-(defun factor-listener () (interactive) (factor-server) (sleep-for 0 500)
+(defun factor-listener ()
+  (interactive)
+  (factor-server)
+  (sleep-for 0 500)
   (switch-to-buffer (make-comint "factor-listener" '("localhost" . 9999)))
-  (rename-uniquely) (factor-listener-mode))
+  (rename-uniquely)
+  (factor-listener-mode))
 
 (defun factor-listener-restart ()
   (interactive)
@@ -21,12 +26,15 @@
   (make-comint-in-buffer
    "factor-listener" (current-buffer) '("localhost" . 9999)))
 
-(defun load-factor-file (file-name) (interactive "fLoad Factor file: ")
+(defun load-factor-file (file-name)
+  (interactive "fLoad Factor file: ")
   (comint-send-string nil (format "\"%s\" run-file\n" file-name)))
 
-(defun factor-update-stack-buffer (&optional string) (interactive)
+(defun factor-update-stack-buffer (&optional string)
+  (interactive)
   (save-excursion
-    (set-buffer (get-buffer-create "*factor-stack*")) (erase-buffer)
+    (set-buffer (get-buffer-create "*factor-stack*"))
+    (erase-buffer)
     (comint-redirect-send-command-to-process
      ".s" "*factor-stack*" "*factor-0.81-tty*" nil)))
 
