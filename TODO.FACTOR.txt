@@ -1,3 +1,7 @@
++ httpd:
+  - outliners don't work
+  - browser responder doesn't work
+
 + refactor style stack code so that nested styles are handled at a lower-level
   - in HTML, we can nest div tags, etc
   - fix prettyprinter's highlighting of non-leaves looks bad

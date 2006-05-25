@@ -22,7 +22,7 @@
 ! ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 !
 IN: coroutines
-USING: kernel lists generic ;
+USING: kernel generic ;
 
 TUPLE: coroutine resumecc exitcc ;
 
@@ -32,7 +32,7 @@ TUPLE: coroutine resumecc exitcc ;
   #! on the stack and an initial value (received from coresume)
   #! when first resumed. ie. The quotation should have stack
   #! effect ( co value -- ).
-  f f <coroutine> dup rot cons over set-coroutine-resumecc ;
+  f f <coroutine> dup rot curry over set-coroutine-resumecc ;
 
 : coresume ( v co -- result )
   #! Resume a coroutine with 'v' as the first item on the
@@ -48,7 +48,7 @@ TUPLE: coroutine resumecc exitcc ;
   #! Suspend a coroutine, leaving the value 'v' on the 
   #! stack when control is passed to the 'coresume' caller.
   [  
-    [ continue-with ] cons
+    [ continue-with ] curry
     over set-coroutine-resumecc  
     coroutine-exitcc continue-with
   ] callcc1 rot drop ;

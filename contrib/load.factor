@@ -18,7 +18,7 @@ USING: alien compiler kernel memory parser sequences words ;
   "sqlite"
   "win32"
   "x11"
-  ! "factory" has a C component, ick.
+  "factory"
   "postgresql"
   "parser-combinators"
   "cont-responder"
