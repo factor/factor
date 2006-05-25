@@ -7,8 +7,7 @@ threads ;
 SYMBOL: log-stream
 
 : log-message ( msg -- )
-    log-stream get [ stdio get ] unless*
-    [ stream-print ] keep stream-flush ;
+    log-stream get [ stream-print ] keep stream-flush ;
 
 : log-error ( error -- ) "Error: " swap append log-message ;
 

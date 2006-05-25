@@ -44,6 +44,5 @@ IN: io-internals
     dup -1 = [ drop INFINITE ] when cancel-timedout wait-for-io 
     swap [ continue-with ] [ drop ] if* ;
 
-: init-io ( -- )
-    win32-init-stdio ;
+: init-io ( -- ) win32-init-io ;
 

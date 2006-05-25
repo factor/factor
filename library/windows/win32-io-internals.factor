@@ -117,7 +117,8 @@ C: io-callback ( -- callback )
     (wait-for-io) overlapped>callback swap *int 
     rot [ queue-error ] unless ;
 
-: win32-init-stdio ( -- )
+: win32-init-io ( -- )
+    stdio off
     INVALID_HANDLE_VALUE f f 1 CreateIoCompletionPort
     completion-port set 
     <io-queue> io-queue set ;
