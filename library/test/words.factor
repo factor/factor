@@ -85,12 +85,21 @@ FORGET: another-forgotten
 
 FORGET: foe
 
-! This has to be the last test in the file.
-: test-last ( -- ) ;
-word word-name "last-word-test" set
-
-[ "test-last" ] [ "last-word-test" get ] unit-test
-
 ! xref should not retain references to gensyms
 gensym [ * ] define-compound
 [ t ] [ \ * usage [ interned? not ] subset empty? ] unit-test
+
+DEFER: calls-a-gensym
+\ calls-a-gensym gensym dup "x" set unit define-compound
+[ f ] [ "x" get crossref get hash ] unit-test
+
+! regression
+GENERIC: freakish
+: bar freakish ;
+M: array freakish ;
+[ t ] [ \ bar \ freakish usage member? ] unit-test
+
+! This has to be the last test in the file.
+: test-last ( -- ) ;
+
+[ "test-last" ] [ word word-name ] unit-test

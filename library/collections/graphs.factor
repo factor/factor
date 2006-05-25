@@ -20,10 +20,8 @@ USING: hashtables kernel namespaces sequences ;
 : (remove-vertex) ( vertex graph -- ) nest remove-hash ;
 
 : remove-vertex ( vertex edges graph -- )
-    [
-        >r dup dup r> call [ nest remove-hash ] each-with
-        namespace remove-hash
-    ] if-graph ; inline
+    [ dupd call [ nest remove-hash ] each-with ] if-graph ;
+    inline
 
 : in-edges ( vertex graph -- seq )
     ?hash dup [ hash-keys ] when ;

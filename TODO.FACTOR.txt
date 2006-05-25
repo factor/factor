@@ -23,7 +23,6 @@
 
 - code walker & exceptions -- test and debug problems
 - code walker and callbacks is broken?
-- look at xref issue
 
 + io:
 

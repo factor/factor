@@ -49,8 +49,12 @@ M: word set-word-xt ( xt w -- ) 7 set-integer-slot ;
 SYMBOL: crossref
 
 : xref-word ( word -- )
-    dup word-vocabulary
-    [ [ uses ] crossref get add-vertex ] [ drop ] if ;
+    dup word-vocabulary [
+        [ uses [ word-vocabulary ] subset ]
+        crossref get add-vertex
+    ] [
+        drop
+    ] if ;
 
 : usage ( word -- seq ) crossref get in-edges ;
 
@@ -141,6 +145,7 @@ SYMBOL: vocabularies
 
 : forget ( word -- )
     dup unxref-word
+    crossref get [ dupd remove-hash ] when*
     dup word-name swap word-vocabulary vocab remove-hash ;
 
 : forget-vocab ( vocab -- )
