@@ -1,6 +1,6 @@
 USING: kernel alien compiler namespaces generic math sequences hashtables io
 arrays words prettyprint lists concurrency
-process rectangle xlib x concurrent-widgets ;
+process rectangle x11 x concurrent-widgets ;
 
 IN: factory
 
@@ -253,6 +253,12 @@ M: wm-root handle-configure-request-event ( event wm-root -- )
 ! M: wm-root handle-button-press-event
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
+: XButtonEvent-position ( event -- { x y } )
+  dup XButtonEvent-x swap XButtonEvent-y 2array ;
+
+: XButtonEvent-root-position ( event -- { x y } )
+  dup XButtonEvent-x_root swap XButtonEvent-y_root 2array ;
+
 M: wm-root handle-button-press-event ( event wm-root -- )
   drop						! event
 
@@ -280,6 +286,9 @@ M: wm-root handle-button-press-event ( event wm-root -- )
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 ! M: wm-root handle-key-press-event
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+: True 1 ;
+: False 0 ;
 
 SYMBOL: f1-keycode   67 f1-keycode set-global
 SYMBOL: f2-keycode   68 f2-keycode set-global
