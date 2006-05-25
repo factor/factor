@@ -75,19 +75,24 @@ M: world motion-event ( event world -- )
         dup key-codes hash [ ] [ ch>string ] ?if
     ] if ;
 
-: event>gesture ( event -- gesture )
-    dup XKeyEvent-state modifiers modifier
-    swap key-code [ <key-down> ] [ drop f ] if* ;
+: event>gesture ( event quot -- gesture )
+    >r dup XKeyEvent-state modifiers modifier swap key-code
+    r> [ drop f ] if* ;
 
 M: world key-down-event ( event world -- )
-    world-focus over event>gesture [
+    world-focus over [ <key-down> ] event>gesture [
         over handle-gesture
         [ swap lookup-string nip swap user-input ] [ 2drop ] if
     ] [
         2drop
     ] if* ;
 
-M: world key-up-event ( event world -- ) 2drop ;
+M: world key-up-event ( event world -- )
+    world-focus over [ <key-up> ] event>gesture [
+        over handle-gesture drop
+    ] [
+        2drop
+    ] if* ;
 
 : close-box? ( event -- ? )
     dup XClientMessageEvent-message_type "WM_PROTOCOLS" x-atom =
