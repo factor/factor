@@ -56,7 +56,7 @@ HELP: head "( n seq -- headseq )"
 
 HELP: tail "( n seq -- tailseq )"
 { $values { "n" "a non-negative integer" } { "seq" "a sequence" } { "tailseq" "a new sequence" } }
-{ $description "Outputs a new sequence consisting of all elements up to the " { $snippet "n" } "th element of the input sequence." }
+{ $description "Outputs a new sequence consisting of the input sequence with the first n items removed." }
 { $errors "Throws an error if the index is out of bounds." } ;
 
 HELP: resize "( n seq -- newseq )"
