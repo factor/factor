@@ -5,7 +5,7 @@
 ! To run the program:
 !   USE: boids setup-window run-boids
 
-USING: namespaces math kernel sequences arrays xlib x ; IN: boids
+USING: namespaces math kernel sequences arrays x11 x ; IN: boids
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 

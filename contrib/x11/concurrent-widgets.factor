@@ -1,5 +1,5 @@
 USING: io namespaces kernel hashtables math generic threads concurrency
-lists sequences arrays xlib x ;
+lists sequences arrays x11 x ;
 
 IN: concurrent-widgets
 

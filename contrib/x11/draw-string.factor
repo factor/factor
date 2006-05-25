@@ -1,7 +1,7 @@
 
 IN: x
 
-USING: kernel math arrays namespaces sequences xlib x rectangle ;
+USING: kernel math arrays namespaces sequences x11 x rectangle ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 

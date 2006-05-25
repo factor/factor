@@ -1,5 +1,5 @@
 USING: namespaces kernel compiler math arrays strings alien sequences io
-prettyprint xlib rectangle ;
+prettyprint x11 rectangle ;
 
 IN: x 
 
@@ -345,7 +345,7 @@ error-handler-quot set error-handler-callback XSetErrorHandler drop ;
   >r >r dpy get win get r> r> XSetInputFocus drop ;
 
 : grab-pointer ( mask -- )
->r dpy get win get False r> GrabModeAsync GrabModeAsync None None CurrentTime
+>r dpy get win get 0 r> GrabModeAsync GrabModeAsync None None CurrentTime
 XGrabPointer drop ;
 
 : ungrab-pointer ( time -- )
