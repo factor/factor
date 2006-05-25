@@ -1,5 +1,5 @@
 USING: kernel alien math arrays sequences opengl namespaces concurrency
-xlib x x11 gl concurrent-widgets lindenmayer ;
+x11 x gl concurrent-widgets lindenmayer ;
 
 IN: lindenmayer
 

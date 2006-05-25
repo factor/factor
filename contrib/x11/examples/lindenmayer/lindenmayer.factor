@@ -145,6 +145,8 @@ cond ;
 ! Lindenmayer string interpretation
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
+: last ( seq -- [ last-item ] ) dup length* 1 - swap tail ;
+
 SYMBOL: command-table
 
 : segment-command ( seg -- command ) 1 swap head ;
