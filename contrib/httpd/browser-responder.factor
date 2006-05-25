@@ -25,7 +25,7 @@
 ! cont-responder facilities.
 !
 IN: browser-responder
-USING: cont-responder hashtables help html io kernel lists
+USING: cont-responder hashtables help html io kernel
 memory namespaces prettyprint sequences words xml ;
 
 : option ( current text -- )
@@ -56,7 +56,7 @@ memory namespaces prettyprint sequences words xml ;
 
 : word-source ( vocab word -- )
     #! Write the source for the given word from the vocab as HTML.
-    swap lookup [ [ (help) ] with-html-stream ] when* ;
+    swap lookup [ [ help ] with-html-stream ] when* ;
 
 : browser-body ( vocab word -- )
     #! Write out the HTML for the body of the main browser page.
@@ -80,7 +80,8 @@ memory namespaces prettyprint sequences words xml ;
 : browse ( vocab word -- )
     #! Display a Smalltalk like browser for exploring words.
     [
-        2dup browser-title [
+        2dup browser-title dup [
+            <h1> write </h1>
             <form "main" =name "" =action "get" =method form> browser-body </form>
         ] html-document
     ] show-final ;

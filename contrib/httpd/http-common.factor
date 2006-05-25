@@ -1,6 +1,6 @@
 ! Copyright (C) 2003, 2005 Slava Pestov
 IN: http
-USING: errors hashtables io kernel lists math namespaces parser
+USING: errors hashtables io kernel math namespaces parser
 sequences strings ;
 
 : header-line ( line -- )

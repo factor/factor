@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 IN: inspect-responder
 USING: cont-responder generic hashtables help html inspector
-kernel lists namespaces sequences ;
+kernel namespaces sequences ;
 
 ! Mini object inspector
 : http-inspect ( obj -- )

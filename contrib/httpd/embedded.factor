@@ -1,5 +1,5 @@
 IN: embedded
-USING: sequences kernel parser math namespaces io lists ;
+USING: sequences kernel parser math namespaces io ;
 
 ! if example.fhtml contains:
 ! <html>

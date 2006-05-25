@@ -9,5 +9,5 @@ sequences ;
         "topic" "query" get hash
         dup empty? [ drop "handbook" ] when
         dup article-title
-        [ [ (help) ] with-html-stream ] html-document
+        [ [ help ] with-html-stream ] html-document
     ] show-final ;

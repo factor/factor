@@ -5,7 +5,7 @@
 ! For information and license details for protoype 
 ! see http://prototype.conio.net
 IN: prototype-js
-USING: io httpd cont-responder html kernel lists namespaces strings ;
+USING: io httpd cont-responder html kernel namespaces strings ;
 
 : include-prototype-js ( -- )
   #! Write out the HTML script tag to include the prototype

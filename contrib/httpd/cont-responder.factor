@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 
 USING: http httpd math namespaces io
-lists strings kernel html hashtables
+strings kernel html hashtables
 parser generic sequences ;
 IN: cont-responder
 
@@ -122,7 +122,7 @@ TUPLE: resume value stdio ;
 
 : >callable ( quot|interp|f -- interp )
     dup continuation? [
-        [ continue-with ] cons
+        [ continue-with ] curry
     ] when ;
 
 : get-registered-continuation ( id -- cont ) 
@@ -232,7 +232,7 @@ SYMBOL: callback-cc
     #! NOTE: On return from 'show' the stack is exactly the same as
     #! initial entry with 'quot' popped off an <namespace> put on. Even
     #! if the quotation consumes items on the stack.
-    \ serving-html swons (show) ;
+    [ serving-html ] swap append (show) ;
 
 : (show-final) ( quot -- namespace )
     #! See comments for show-final. The difference is the 
@@ -248,7 +248,7 @@ SYMBOL: callback-cc
     #! when a page is to be displayed with no further action to occur. Its
     #! use is an optimisation to save having to generate and save a continuation
     #! in that special case.
-    \ serving-html swons (show-final) ;
+    [ serving-html ] swap append (show-final) ;
 
 #! Name of variable for holding initial continuation id that starts
 #! the responder.
@@ -281,7 +281,8 @@ SYMBOL: root-continuation
     #! by returning a quotation that will pass the original 
     #! quotation to the callback continuation.
     [
-        , \ stdio ,  \ get , \ <resume> , callback-cc get ,
+        , [ stdio get <resume> ] %
+        callback-cc get ,
         \ continue-with ,
     ] [ ] make ;
 
@@ -305,14 +306,17 @@ SYMBOL: root-continuation
     #! within the session namespace.
     f post-refresh-get? set dup resume-stdio stdio set ;
 
+: prepare-cont-quot ( quot -- quot )
+    [ init-session-namespace ] swap append
+    [ with-scope ] curry ;
+
 : install-cont-responder ( name quot -- )
     #! Install a cont-responder with the given name
     #! that will initially run the given quotation.
     #!
     #! Convert the quotation so it is run within a session namespace
     #! and that namespace is initialized first.
-    \ init-session-namespace swons [ , \ with-scope , ] [ ] make
-    [ 
+    prepare-cont-quot [ 
         [ cont-get/post-responder ] "get" set 
         [ cont-get/post-responder ] "post" set 
         swap "responder" set

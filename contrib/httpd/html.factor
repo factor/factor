@@ -1,7 +1,7 @@
 ! Copyright (C) 2004, 2006 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: cont-responder generic hashtables help http inspector io
-kernel lists prototype-js math namespaces sequences strings
+kernel prototype-js math namespaces sequences strings
 styles words xml ;
 IN: html
 
@@ -195,7 +195,7 @@ M: html-stream stream-terpri [ <br/> ] with-stream* ;
 
 : html-document ( title quot -- )
     xhtml-preamble
-    swap chars>entities dup
+    swap chars>entities
     <html>
         <head>
             <title> write </title>
@@ -203,7 +203,6 @@ M: html-stream stream-terpri [ <br/> ] with-stream* ;
             include-prototype-js
         </head>
         <body>
-            <h1> write </h1>
             call
         </body>
     </html> ;

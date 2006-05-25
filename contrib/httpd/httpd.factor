@@ -1,7 +1,7 @@
 ! Copyright (C) 2003, 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: httpd
-USING: errors hashtables kernel lists namespaces io strings 
+USING: errors hashtables kernel namespaces io strings 
 threads http sequences ;
 
 : (url>path) ( uri -- path )

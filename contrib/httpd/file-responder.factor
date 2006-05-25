@@ -1,7 +1,7 @@
 ! Copyright (C) 2004,2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: file-responder
-USING: cont-responder html httpd io kernel lists math namespaces
+USING: cont-responder html httpd io kernel math namespaces
 parser sequences strings ;
 
 : serving-path ( filename -- filename )

@@ -1,7 +1,7 @@
 ! Copyright (C) 2004, 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: httpd
-USING: arrays hashtables http kernel lists math namespaces
+USING: arrays hashtables http kernel math namespaces
 parser sequences io strings ;
 
 ! Variables

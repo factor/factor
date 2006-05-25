@@ -26,7 +26,6 @@
 IN: html
 USE: prettyprint
 USE: strings
-USE: lists
 USE: kernel
 USE: io
 USE: namespaces
@@ -86,7 +85,7 @@ SYMBOL: html
 : def-for-html-word-<foo> ( name -- )
     #! Return the name and code for the <foo> patterned
     #! word.
-    dup <foo> swap [ <foo> write-html ] cons html-word
+    dup <foo> swap [ <foo> write-html ] curry html-word
     define-open ;
 
 : <foo "<" swap append ;
@@ -94,7 +93,7 @@ SYMBOL: html
 : def-for-html-word-<foo ( name -- )
     #! Return the name and code for the <foo patterned
     #! word.
-    <foo dup [ write-html ] cons html-word drop ;
+    <foo dup [ write-html ] curry html-word drop ;
 
 : foo> ">" append ;
 
@@ -108,14 +107,14 @@ SYMBOL: html
 : def-for-html-word-</foo> ( name -- )
     #! Return the name and code for the </foo> patterned
     #! word.    
-    </foo> dup [ write-html ] cons html-word define-close ;
+    </foo> dup [ write-html ] curry html-word define-close ;
 
 : <foo/> [ "<" % % "/>" % ] "" make ;
 
 : def-for-html-word-<foo/> ( name -- )
     #! Return the name and code for the <foo/> patterned
     #! word.
-    dup <foo/> swap [ <foo/> write-html ] cons html-word drop ;
+    dup <foo/> swap [ <foo/> write-html ] curry html-word drop ;
 
 : foo/> "/>" append ;
 
