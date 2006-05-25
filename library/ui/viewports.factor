@@ -12,9 +12,7 @@ TUPLE: viewport ;
 : viewport-dim gadget-child pref-dim ;
 
 C: viewport ( content -- viewport )
-    dup delegate>gadget
-    t over set-gadget-root?
-    [ add-gadget ] keep ;
+    dup delegate>gadget [ add-gadget ] keep ;
 
 M: viewport pref-dim* gadget-child pref-dim ;
 

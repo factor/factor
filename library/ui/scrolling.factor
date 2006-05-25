@@ -36,7 +36,9 @@ C: scroller ( gadget -- scroller )
         { [ <viewport> ] set-scroller-viewport @center }
         { [ <x-slider> ] set-scroller-x @bottom }
         { [ <y-slider> ] set-scroller-y @right }
-    } make-frame* dup scroller-actions ;
+    } make-frame*
+    dup scroller-actions
+    t over set-gadget-root? ;
 
 : set-slider ( value page max slider -- )
     #! page/max/value are 3-vectors.
