@@ -42,6 +42,7 @@
 
 + ui/help:
 
+- clearing pane with ^L leaves scrollbar a pixel off
 - new leaner help viewer
 - new inspector style:
   - clicking objects sends them to the listener
@@ -69,7 +70,6 @@
 - cocoa:
   - horizontal scrolling
   - window zooming doesn't work
-  - implement handlers for open, quit events, and whatever else
   - polish OS X menu bar code
 - when scrolling wheel, or moving mouse out of window, rollover is not
   updated
