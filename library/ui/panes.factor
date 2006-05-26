@@ -11,8 +11,7 @@ prettyprint sequences strings styles threads ;
 ! output: pile
 ! current: shelf
 ! input: editor
-TUPLE: pane output active current input prototype
-continuation input? ;
+TUPLE: pane output active current input prototype continuation ;
 
 : add-output 2dup set-pane-output add-gadget ;
 
