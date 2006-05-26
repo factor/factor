@@ -212,3 +212,9 @@ unit-test
 [ 10 "hi" "bye" copy-into ] unit-test-fails
 
 [ { 1 2 3 5 6 } ] [ 3 { 1 2 3 4 5 6 } remove-index ] unit-test
+
+[ V{ 1 2 3 } ]
+[ 3 V{ 1 2 } clone [ push-new ] keep ] unit-test
+
+[ V{ 1 2 3 } ]
+[ 3 V{ 1 3 2 } clone [ push-new ] keep ] unit-test

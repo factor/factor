@@ -89,7 +89,7 @@ M: frame layout* ( frame -- dim )
     frame get 2dup r> dup [ execute ] [ 3drop ] if
     r> execute frame-add ;
 
-: build-frame ( gadget specs -- )
+: build-frame ( frame specs -- )
     #! Specs is an array of triples { quot setter loc }.
     #! The setter has stack effect ( new gadget -- ),
     #! the loc is @center, @top, etc.

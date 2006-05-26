@@ -38,7 +38,7 @@ continuation scrolls? ;
 SYMBOL: structured-input
 
 : pane-call ( quot pane -- )
-    dup [ "Command: " write over . ] with-stream*
+    dup [ "Command: " write over short. ] with-stream*
     >r structured-input set-global
     "\"structured-input\" \"gadgets-panes\" lookup get-global call"
     r> pane-eval ;

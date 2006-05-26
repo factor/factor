@@ -1,9 +1,9 @@
 ! Copyright (C) 2004, 2006 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-IN: errors
 USING: arrays generic hashtables inspector io kernel
 kernel-internals math namespaces parser prettyprint sequences
-sequences-internals strings vectors words ;
+sequences-internals strings styles vectors words ;
+IN: errors
 
 SYMBOL: error
 SYMBOL: error-continuation
@@ -128,32 +128,51 @@ M: object error. ( error -- ) . ;
 
 : :res ( n -- ) restarts get nth first3 continue-with ;
 
+: (debug-help) ( string quot -- )
+    <input> simple-object terpri ;
+
+: restart. ( restart n -- )
+    [ [ # " :res  " % first % ] "" make ] keep
+    [ :res ] curry (debug-help) ;
+
 : restarts. ( -- )
     restarts get dup empty? [
         drop
     ] [
+        terpri
         "The following restarts are available:" print
-        dup length [
-            number>string write " :res  " write first print
-        ] 2each
+        terpri
+        dup length [ restart. ] 2each
     ] if ;
 
+DEFER: :error
+DEFER: :cc
+
 : debug-help ( -- )
-    restarts.
-    ":s :r :c show stacks at time of error" print
+    terpri
+    "Debugger commands:" print
+    terpri
+    ":s  data stack at exception time" [ :s ] (debug-help)
+    ":r  retain stack at exception time" [ :r ] (debug-help)
+    ":c  call stack at exception time" [ :c ] (debug-help)
+    ":error starts the inspector with the error" [ :error ] (debug-help)
+    ":cc starts the inspector with the error continuation" [ :cc ] (debug-help)
     ":get ( var -- value ) accesses variables at time of error" print
-    ":error starts the inspector with the error" print
-    ":cc starts the inspector with the error continuation" print
     flush ;
 
 : flush-error-handler ( -- )
     [ "Error in default error handler!" print ] when ;
 
 : print-error ( error -- )
-    "An unhandled error was caught:" print terpri
-    [ dup error. ] catch nip flush-error-handler ;
+    [
+        dup error.
+        restarts.
+        debug-help
+    ] [
+        "Error in print-error!" print
+    ] recover drop ;
 
-: try ( quot -- ) [ print-error terpri debug-help ] recover ;
+: try ( quot -- ) [ print-error ] recover ;
 
 : save-error ( error continuation -- )
     error-continuation set-global

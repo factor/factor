@@ -109,6 +109,7 @@ vectors words ;
 
         "/library/tools/memory.factor"
         "/library/tools/listener.factor"
+        "/library/tools/inspector.factor"
         "/library/tools/walker.factor"
 
         "/library/tools/annotations.factor"
@@ -182,6 +183,7 @@ vectors words ;
         "/library/ui/gestures.factor"
         "/library/ui/borders.factor"
         "/library/ui/buttons.factor"
+        "/library/ui/tiles.factor"
         "/library/ui/line-editor.factor"
         "/library/ui/sliders.factor"
         "/library/ui/viewports.factor"
@@ -191,13 +193,14 @@ vectors words ;
         "/library/ui/incremental.factor"
         "/library/ui/paragraphs.factor"
         "/library/ui/panes.factor"
+        "/library/ui/tabs.factor"
         "/library/ui/outliner.factor"
         "/library/ui/environment.factor"
         "/library/ui/presentations.factor"
         "/library/ui/listener.factor"
-        "/library/ui/inspector.factor"
         "/library/ui/browser.factor"
         "/library/ui/apropos.factor"
+        "/library/ui/help.factor"
         "/library/ui/launchpad.factor"
 
         "/library/continuations.facts"

@@ -3,9 +3,9 @@
 IN: gadgets-listener
 USING: arrays gadgets gadgets-editors gadgets-labels
 gadgets-layouts gadgets-panes gadgets-presentations
-gadgets-scrolling gadgets-theme generic hashtables io jedit
-kernel listener math namespaces parser prettyprint sequences
-styles threads words ;
+gadgets-scrolling gadgets-theme generic hashtables inspector io
+jedit kernel listener math namespaces parser prettyprint
+sequences styles threads words ;
 
 TUPLE: listener-gadget scroller stack ;
 
@@ -35,15 +35,9 @@ TUPLE: listener-gadget scroller stack ;
     ] keep
     listener-gadget-pane word-completion ;
 
-: ui-error-hook ( error -- )
-    terpri H{ { font-style bold } } [
-        "Debug this error" swap simple-object terpri
-    ] with-style ;
-
 : listener-thread ( listener -- )
     dup listener-gadget-pane [
         [ ui-listener-hook ] curry listener-hook set
-        [ ui-error-hook ] error-hook set
         print-banner listener
     ] with-stream* ;
 
@@ -66,20 +60,20 @@ M: listener-gadget focusable-child* ( listener -- gadget )
 : listener-window ( -- )
     <listener-gadget> "Listener" open-window ;
 
-: listener-window* ( quot/string -- )
-    <listener-gadget> [
-        listener-gadget-pane over quotation?
-        [ pane-call ] [ replace-input ] if
-    ] keep "Listener" open-window ;
+: call-listener ( quot/string listener -- )
+    listener-gadget-pane over quotation?
+    [ pane-call ] [ replace-input ] if ;
+
+: listener-tool
+    [ listener-gadget? ]
+    [ <listener-gadget> ]
+    [ call-listener ] ;
 
 : listener-run-files ( seq -- )
-    [ [ run-file ] each ] curry listener-window* ;
-
-: find-listener [ listener-gadget? ] find-parent ;
+    [ [ run-file ] each ] curry listener-tool open-tool ;
 
 M: input show-object ( input button -- )
-    >r input-string r> find-listener [
-        listener-gadget-pane replace-input
-    ] [
-        listener-window*
-    ] if* ;
+    >r input-string r> listener-tool call-tool ;
+
+M: object show-object ( object button -- )
+    >r [ inspect ] curry r> listener-tool call-tool ;

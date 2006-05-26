@@ -1,9 +1,9 @@
 ! Copyright (C) 2006 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 IN: gadgets-browser
-USING: gadgets gadgets-buttons gadgets-inspector gadgets-labels
-gadgets-layouts gadgets-panes gadgets-presentations
-gadgets-scrolling gadgets-theme gadgets-tracks generic
+USING: gadgets gadgets-buttons gadgets-labels gadgets-layouts
+gadgets-panes gadgets-presentations gadgets-scrolling
+gadgets-tabs gadgets-tiles gadgets-theme gadgets-tracks generic
 hashtables help inspector kernel math prettyprint sequences
 words ;
 
@@ -36,41 +36,32 @@ TUPLE: browser vocabs vocab-track word-track ;
 
 : find-browser [ browser? ] find-parent ;
 
-TUPLE: tile ;
-
-: find-tile [ tile? ] find-parent ;
-
 : close-tile ( tile -- )
     dup gadget-parent [
         browser-track-showing hash>alist rassoc
     ] keep hide-asset ;
 
-: <close-button> ( -- gadget )
-    { 0.0 0.0 0.0 1.0 } close-box <polygon-gadget>
-    [ find-tile close-tile ] <bevel-button> ;
-
-: <closable-title> ( title -- gadget )
-    {
-        { [ <label> ] f @center }
-        { [ <close-button> ] f @right }
-    } make-frame ;
-
-: <title> ( title closable? -- gadget )
-    [ <closable-title> ] [ <label> ] if dup title-theme ;
-
-C: tile ( gadget title closable? -- gadget )
-    {
-        { [ <title> ] f @top }
-        { [ ] f @center }
-    } make-frame* ;
+: <browser-tile> ( gadget title -- gadget )
+    [ close-tile ] <tile> ;
 
 : showing-word? ( word browser -- ? )
     browser-word-track showing-asset? ;
 
 DEFER: show-vocab
 
+: <word-pages> ( word -- tabs )
+    {
+        { "Definition" [ see ] }
+        { "Documentation" [ word-help (help) ] }
+        { "Calls in" [ usage. ] }
+        { "Calls out" [ uses. ] }
+        { "Links in" [ links-in. ] }
+        { "Links out" [ links-out. ] }
+        { "Properties" [ word-props describe ] }
+    } <pages> ;
+
 : <word-view> ( word -- gadget )
-    [ f <inspector> ] keep word-name t <tile> ;
+    [ <word-pages> ] keep word-name <browser-tile> ;
 
 : show-word ( word browser -- )
     over word-vocabulary over show-vocab
@@ -91,7 +82,7 @@ DEFER: show-vocab
     [
         words natural-sort
         [ <word-button> ] map make-pile <scroller>
-    ] keep t <tile> ;
+    ] keep <browser-tile> ;
 
 : showing-vocab? ( vocab browser -- ? )
     browser-vocab-track showing-asset? ;
@@ -137,15 +128,19 @@ DEFER: show-vocab
     [ <word-view> ] [ 2drop ] <browser-track> ;
 
 C: browser ( -- browser )
-    <y-track> over set-delegate
-    <vocabs> over add-vocabs
-    <vocab-track> over add-vocab-track
-    <word-track> over add-word-track
-    { 1/4 1/4 1/2 } over set-track-sizes ;
+    {
+        { [ <vocabs> ] set-browser-vocabs 1/4 }
+        { [ <vocab-track> ] set-browser-vocab-track 1/4 }
+        { [ <word-track> ] set-browser-word-track 1/2 }
+    } { 1 0 0 } make-track* ;
 
-: browser-window ( word -- )
-    <browser> [ "Browser" open-window ] keep
-    over [ show-word ] [ 2drop ] if ;
+: browser-window ( -- )
+    <browser> "Browser" open-window ;
+
+: browser-tool
+    [ browser? ]
+    [ <browser> ]
+    [ show-word ] ;
 
 M: word show-object ( word button -- )
-    find-browser [ show-word ] [ browser-window ] if* ;
+    browser-tool call-tool ;

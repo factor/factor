@@ -37,3 +37,16 @@ hashtables kernel math namespaces queues sequences threads ;
 
 : open-window ( gadget title -- )
     >r <status-bar> <world> dup prefer r> open-window* ;
+
+: (open-tool) ( arg cons setter -- )
+    >r call tuck r> call "Tool" open-window ; inline
+
+: open-tool ( arg pred cons setter -- )
+    rot drop (open-tool) ;
+
+: call-tool ( arg gadget pred cons setter -- )
+    >r >r find-parent dup [
+        r> drop r> call
+    ] [
+        drop r> r> (open-tool)
+    ] if ;

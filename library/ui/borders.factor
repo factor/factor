@@ -12,7 +12,7 @@ C: border ( child gap -- border )
     [ add-gadget ] keep ;
 
 : <default-border> ( child -- border )
-    5 <border> ;
+    3 <border> ;
 
 : layout-border-loc ( border -- )
     dup border-size swap gadget-child set-rect-loc ;

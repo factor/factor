@@ -1,8 +1,8 @@
 ! Copyright (C) 2006 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 IN: gadgets-tracks
-USING: gadgets gadgets-layouts gadgets-theme io kernel math
-namespaces sequences ;
+USING: gadgets gadgets-layouts gadgets-theme generic io kernel
+math namespaces sequences words ;
 
 TUPLE: divider ;
 
@@ -111,3 +111,24 @@ C: divider ( -- divider )
 
 : track-remove ( gadget track -- )
     [ gadget-children index ] keep track-remove@ ;
+
+: track-add-spec ( { quot setter loc } -- )
+    first2
+    >r call track get 2dup track-add
+    r> dup [ execute ] [ 3drop ] if ;
+
+: build-track ( track specs -- )
+    #! Specs is an array of triples { quot setter loc }.
+    #! The setter has stack effect ( new gadget -- ),
+    #! the loc is a ratio from 0 to 1.
+    [
+        swap track set
+        [ [ track-add-spec ] each ] keep
+        [ third ] map track get set-track-sizes
+    ] with-scope ;
+
+: make-track ( specs orientation -- gadget )
+    <track> [ swap build-track ] keep ;
+
+: make-track* ( gadget specs orientation -- gadget )
+    <track> pick [ set-delegate build-track ] keep ;

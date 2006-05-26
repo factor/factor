@@ -1,5 +1,5 @@
 IN: temporary
-USING: arrays generic hashtables kernel math namespaces
+USING: arrays errors generic hashtables kernel math namespaces
 sequences test words ;
 
 [ 4 ] [
@@ -98,6 +98,9 @@ GENERIC: freakish
 : bar freakish ;
 M: array freakish ;
 [ t ] [ \ bar \ freakish usage member? ] unit-test
+
+DEFER: x
+[ t ] [ [ x ] catch third \ x eq? ] unit-test
 
 ! This has to be the last test in the file.
 : test-last ( -- ) ;

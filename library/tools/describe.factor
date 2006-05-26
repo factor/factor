@@ -2,7 +2,8 @@
 ! See http://factorcode.org/license.txt for BSD license.
 IN: inspector
 USING: arrays generic hashtables help io kernel kernel-internals
-math namespaces prettyprint sequences strings vectors words ;
+math namespaces prettyprint sequences strings styles vectors
+words ;
 
 GENERIC: summary ( object -- string )
 
@@ -60,6 +61,9 @@ M: word summary ( word -- )
     ] [
         drop "a uniquely generated symbol"
     ] if ;
+
+M: input summary ( input -- )
+    "Input: " swap input-string unparse-short append ;
 
 : format-column ( list ? -- list )
     >r [ unparse-short ] map r> [

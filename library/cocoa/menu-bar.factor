@@ -113,7 +113,7 @@ DEFER: described-menu
         { {
             "File"
             { "New Listener" listener-window "n" }
-            { "New Browser" [ f browser-window ] "b" }
+            { "New Browser" browser-window "b" }
             { }
             { "Run..." menu-run-file "o" }
             { }

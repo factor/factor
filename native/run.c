@@ -102,7 +102,7 @@ void run_callback(CELL quot)
 /* XT of deferred words */
 void undefined(F_WORD* word)
 {
-	general_error(ERROR_UNDEFINED_WORD,tag_object(word),F,true);
+	general_error(ERROR_UNDEFINED_WORD,tag_word(word),F,true);
 }
 
 /* XT of compound definitions */

@@ -23,7 +23,9 @@ SYMBOL: inspector-stack
     sheet sheet-numbers sheet. ;
 
 : inspector-help ( -- )
+    terpri
     "Object inspector." print
+    terpri
     "inspecting ( -- obj ) push current object" print
     "go ( n -- ) inspect nth slot" print
     "up -- return to previous object" print
