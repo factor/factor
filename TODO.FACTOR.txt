@@ -1,3 +1,20 @@
++ prettyprinter bug:
+
+IN: gadgets-listener SYMBOL: listener-gadget
+TUPLE: listener-gadget scroller stack ;
+IN: gadgets M: listener-gadget focusable-child* 
+    listener-gadget-pane ;
+IN: gadgets-layouts M: listener-gadget pref-dim* 
+    drop { 600 600 0 } ;
+IN: gadgets-listener M: listener-gadget 
+set-listener-gadget-scroller 4 set-slot ;
+IN: gadgets-listener M: listener-gadget listener-gadget-stack 
+    5 slot ;
+IN: gadgets-listener M: listener-gadget 
+set-listener-gadget-stack 5 set-slot ;
+IN: gadgets-listener M: listener-gadget 
+listener-gadget-scroller 4 slot ;
+
 + httpd:
   - outliners don't work
   - browser responder doesn't work
@@ -45,8 +62,8 @@
 
 + ui/help:
 
+- roundoff is still not quite right with tracks
 - clearing pane with ^L leaves scrollbar a pixel off
-- right click sends to listener & pushes on the stack
 - new browser:
   - browse generic words and classes
   - need actions for reloading the source file and opening word in jEdit
@@ -64,7 +81,6 @@
 - x11 title bars are funny
 - cocoa:
   - horizontal scrolling
-  - window zooming doesn't work
   - polish OS X menu bar code
   - dock menu
   - services do not launch if factor not running

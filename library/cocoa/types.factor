@@ -27,7 +27,7 @@ TYPEDEF: NSRect CGRect
     [ NSRect-x-y ] keep NSRect-h + ;
   
 : <far-y-NSRect> ( x y w h -- rect )
-    rot dupd swap - -rot <NSRect> ;
+    tuck >r >r - r> r> <NSRect> ;
 
 BEGIN-STRUCT: NSPoint
     FIELD: float x

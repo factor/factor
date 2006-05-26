@@ -13,13 +13,10 @@ TUPLE: viewport ;
 C: viewport ( content -- viewport )
     dup delegate>gadget [ add-gadget ] keep ;
 
-M: viewport pref-dim* gadget-child pref-dim ;
-
 M: viewport layout* ( viewport -- )
-    gadget-child dup prefer layout ;
+    gadget-child prefer ;
 
 M: viewport focusable-child* ( viewport -- gadget )
     gadget-child ;
 
-M: viewport pref-dim* ( viewport -- dim )
-    gadget-child pref-dim ;
+M: viewport pref-dim* ( viewport -- dim ) viewport-dim ;

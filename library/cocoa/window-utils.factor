@@ -4,7 +4,7 @@ IN: objc-FactorWindowDelegate
 DEFER: FactorWindowDelegate
 
 IN: cocoa
-USING: gadgets-layouts kernel math objc objc-NSObject
+USING: gadgets gadgets-layouts kernel math objc objc-NSObject
 objc-NSView objc-NSWindow sequences ;
 
 : NSBorderlessWindowMask     0 ; inline
@@ -34,18 +34,15 @@ objc-NSView objc-NSWindow sequences ;
     dup dup [contentView] [setInitialFirstResponder:]
     dup 1 [setAcceptsMouseMovedEvents:] ;
 
-: window-root-gadget-pref-dim  [contentView] view pref-dim ;
+: window-pref-dim [contentView] view pref-dim ;
 
-: frame-rect-for-window-content-rect ( window rect -- rect )
+: frame-content-rect ( window rect -- rect )
     swap [styleMask] NSWindow -rot
     [frameRectForContentRect:styleMask:] ;
 
-: content-rect-for-window-frame-rect ( window rect -- rect )
-    swap [styleMask] NSWindow -rot
-    [contentRectForFrameRect:styleMask:] ;
-
 : window-content-rect ( window -- rect )
-    dup [frame] content-rect-for-window-frame-rect ;
+    NSWindow over [frame] rot [styleMask]
+    [contentRectForFrameRect:styleMask:] ;
 
 "NSObject" "FactorWindowDelegate" {
     {
@@ -54,9 +51,8 @@ objc-NSView objc-NSWindow sequences ;
         [
             drop 2nip
             dup window-content-rect NSRect-x-far-y
-            pick window-root-gadget-pref-dim first2
-            <far-y-NSRect>
-            frame-rect-for-window-content-rect
+            pick window-pref-dim first2 <far-y-NSRect>
+            frame-content-rect
         ]
     }
 } { } define-objc-class

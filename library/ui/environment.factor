@@ -46,9 +46,15 @@ TUPLE: titled-gadget title ;
 
 M: titled-gadget gadget-title titled-gadget-title ;
 
+M: titled-gadget pref-dim* viewport-dim ;
+
+M: titled-gadget layout*
+    dup rect-dim swap gadget-child set-gadget-dim ;
+
 C: titled-gadget ( gadget title -- )
+    dup delegate>gadget
     [ set-titled-gadget-title ] keep
-    [ >r <viewport> r> set-gadget-delegate ] keep ;
+    [ add-gadget ] keep ;
 
 : update-title ( gadget -- )
     dup gadget-parent dup world?
