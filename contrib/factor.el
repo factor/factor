@@ -3,7 +3,7 @@
 (define-derived-mode factor-listener-mode comint-mode "Factor listener"
   (setq comint-prompt-regexp "^  "))
 
-(defvar factor-binary "/storage/factor/factor-0.82/f")
+(defvar factor-binary "/scratch/factor-darcs/repos/Factor/f")
 (defvar factor-image "/scratch/factor-darcs/repos/Factor/factor.image")
 
 (defun factor-server ()
@@ -11,12 +11,23 @@
   (make-comint "factor-server" factor-binary nil factor-image "-shell=tty")
   (comint-send-string "*factor-server*" "USE: jedit telnet\n"))
 
+;; (defun factor-listener ()
+;;   (interactive)
+;;   (factor-server)
+;;   (sleep-for 0 500)
+;;   (switch-to-buffer (make-comint "factor-listener" '("localhost" . 9999)))
+;;   (rename-uniquely)
+;;   (factor-listener-mode))
+
 (defun factor-listener ()
   (interactive)
   (factor-server)
   (sleep-for 0 500)
+  (if (get-buffer "*factor-listener*")
+      (save-excursion
+	(set-buffer "*factor-listener*")
+	(rename-uniquely)))
   (switch-to-buffer (make-comint "factor-listener" '("localhost" . 9999)))
-  (rename-uniquely)
   (factor-listener-mode))
 
 (defun factor-listener-restart ()
@@ -40,10 +51,23 @@
 
 (defvar factor-update-stackp nil "*")
 
-(defun factor-send-input () (interactive)
+(defun factor-send-input ()
+  (interactive)
   (comint-send-input)
   (if factor-update-stackp
       (progn (sleep-for 0 250) (factor-update-stack-buffer))))
+
+(defun factor-synopsis ()
+  (interactive)
+  (message
+   (first
+    (comint-redirect-results-list-from-process 
+     (get-buffer-process "*factor-listener*")
+     (format "\\ %s synopsis print" (thing-at-point 'symbol))
+     ;; "[ ]*\\(.*\\)\n"
+     "\\(.*\\)\n"
+     1))))
+
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
