@@ -42,9 +42,4 @@ C: help-gadget ( -- gadget )
     [ <help-gadget> ]
     [ show-help ] ;
 
-M: link show-object ( link button -- )
-    over link-name word? [
-        >r link-name r> show-object
-    ] [
-        help-tool call-tool
-    ] if ;
+M: link show-object ( link button -- ) help-tool call-tool ;
