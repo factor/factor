@@ -46,21 +46,21 @@ USING: errors freetype objc-NSOpenGLContext
 objc-NSOpenGLView objc-NSView ;
 
 : redraw-world ( world -- )
-    world-handle second 1 [setNeedsDisplay:] ;
+    world-handle first 1 [setNeedsDisplay:] ;
 
 : set-title ( string world -- )
-    world-handle first swap <NSString> [setTitle:] ;
+    world-handle second swap <NSString> [setTitle:] ;
 
 : open-window* ( world -- )
     dup gadget-window dup add-notify
-    dup gadget-title swap set-title
-    f [makeKeyAndOrderFront:] ;
+    dup gadget-title over set-title
+    world-handle second f [makeKeyAndOrderFront:] ;
 
 : select-gl-context ( handle -- )
-    [openGLContext] [makeCurrentContext] ;
+    first [openGLContext] [makeCurrentContext] ;
 
 : flush-gl-context ( handle -- )
-    [openGLContext] [flushBuffer] ;
+    first [openGLContext] [flushBuffer] ;
 
 IN: shells
 

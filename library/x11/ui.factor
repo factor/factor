@@ -118,7 +118,8 @@ IN: gadgets
 
 : open-window* ( world -- )
     dup gadget-window dup add-notify
-    dup gadget-title swap set-title ;
+    dup gadget-title over set-title
+    world-handle first map-window* ;
 
 : select-gl-context ( handle -- )
     dpy get swap first2 glXMakeCurrent

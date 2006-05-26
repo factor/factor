@@ -5,7 +5,7 @@ USING: gadgets gadgets-panes gadgets-presentations
 gadgets-scrolling gadgets-tabs gadgets-tiles gadgets-tracks help
 io kernel sequences words ;
 
-TUPLE: help-gadget history tabs ;
+TUPLE: help-gadget showing history tabs ;
 
 TUPLE: history pane seq ;
 
@@ -16,13 +16,14 @@ C: history ( -- gadget )
 
 : update-history ( history -- )
     dup history-seq swap history-pane [
-        <reversed> 1 swap tail [
+        <reversed> [
             [ article-title ] keep simple-object terpri
         ] each
     ] with-pane ;
 
-: add-history ( link history -- )
-    [ history-seq push-new ] keep update-history ;
+: add-history ( help -- )
+    dup help-gadget-history swap help-gadget-showing dup
+    [ over history-seq push-new update-history ] [ 2drop ] if ;
 
 C: help-gadget ( -- gadget )
     {
@@ -30,10 +31,12 @@ C: help-gadget ( -- gadget )
         { [ <tabs> ] set-help-gadget-tabs 3/4 }
     } { 1 0 0 } make-track* ;
 
-M: help-gadget gadget-title drop "Help" ;
+M: help-gadget gadget-title
+    "Help - " swap help-gadget-showing article-title append ;
 
 : show-help ( link help -- )
-    2dup help-gadget-history add-history {
+    dup add-history [ set-help-gadget-showing ] 2keep
+    dup update-title {
         { "Article" [ help ] }
         { "Links in" [ links-in. ] }
         { "Links out" [ links-out. ] }

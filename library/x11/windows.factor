@@ -50,9 +50,9 @@ USING: alien hashtables kernel math namespaces sequences ;
 : map-window ( win -- ) dpy get swap XMapWindow drop ;
 
 : map-window* ( world win -- )
-    dup set-closable [ windows get set-hash ] keep map-window ;
+    dup set-closable map-window ;
 
 : glx-window* ( world dim -- win context )
-    glx-window >r [ map-window* ] keep r> ;
+    glx-window >r [ windows get set-hash ] keep r> ;
 
 : unmap-window ( win -- ) dpy get swap XUnmapWindow drop ;

@@ -185,6 +185,6 @@ reset-views
     }
 } { } define-objc-class
 
-: <FactorView> ( gadget -- view )
+: <FactorView> ( world -- view )
     FactorView over rect-dim <GLView>
     [ views get set-hash ] keep ;

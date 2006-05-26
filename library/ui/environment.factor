@@ -46,17 +46,16 @@ TUPLE: titled-gadget title ;
 
 M: titled-gadget gadget-title titled-gadget-title ;
 
-C: titled-gadget ( title gadget -- )
-    [ >r <viewport> r> set-gadget-delegate ] keep
-    [ set-titled-gadget-title ] keep ;
+C: titled-gadget ( gadget title -- )
+    [ set-titled-gadget-title ] keep
+    [ >r <viewport> r> set-gadget-delegate ] keep ;
 
 : update-title ( gadget -- )
     dup gadget-parent dup world?
     [ >r gadget-title r> set-title ] [ 2drop ] if ;
 
 : open-window ( gadget -- )
-    [ <status-bar> <world> dup prefer ] keep
-    gadget-title open-window* ;
+    <status-bar> <world> dup prefer open-window* ;
 
 : open-titled-window ( gadget title -- )
     <titled-gadget> open-window ;
