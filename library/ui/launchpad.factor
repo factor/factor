@@ -3,7 +3,7 @@ USING: gadgets gadgets-apropos gadgets-borders gadgets-browser
 gadgets-buttons gadgets-labels gadgets-layouts gadgets-listener
 gadgets-panes gadgets-presentations gadgets-scrolling
 gadgets-theme help inspector io kernel memory namespaces
-sequences ; 
+prettyprint sequences ; 
 
 : <launchpad> ( menu -- )
     [ first2 >r <label> [ drop ] r> append <bevel-button> ] map
@@ -11,7 +11,7 @@ sequences ;
     <default-border> dup highlight-theme ;
 
 : pane-window ( quot title -- )
-    >r make-pane <scroller> r> open-window ;
+    >r make-pane <scroller> r> open-titled-window ;
 
 : handbook-window ( -- )
     T{ link f "handbook" } f show-object ;
@@ -23,7 +23,7 @@ sequences ;
     [ articles. ] "Help index" pane-window ;
 
 : apropos-window ( -- )
-    <apropos-gadget> "Apropos" open-window ;
+    <apropos-gadget> open-window ;
 
 : globals-window ( -- )
     global f show-object ;
@@ -42,4 +42,4 @@ sequences ;
     } <launchpad> ;
 
 : launchpad-window ( -- )
-    default-launchpad "Factor" open-window ;
+    default-launchpad open-window ;

@@ -23,18 +23,16 @@ objc-NSView objc-NSWindow sequences ;
     NSMiniaturizableWindowMask bitor
     NSResizableWindowMask bitor ; inline
 
-: <NSWindow> ( title rect -- window )
+: <NSWindow> ( rect -- window )
     NSWindow [alloc] swap
     standard-window-type NSBackingStoreBuffered 1
-    [initWithContentRect:styleMask:backing:defer:]
-    [ swap <NSString> [setTitle:] ] keep ;
+    [initWithContentRect:styleMask:backing:defer:] ;
 
-: <ViewWindow> ( view title -- window )
-    over [bounds] <NSWindow>
+: <ViewWindow> ( view -- window )
+    dup [bounds] <NSWindow>
     [ swap [setContentView:] ] keep
     dup dup [contentView] [setInitialFirstResponder:]
-    dup 1 [setAcceptsMouseMovedEvents:]
-    dup f [makeKeyAndOrderFront:] ;
+    dup 1 [setAcceptsMouseMovedEvents:] ;
 
 : window-root-gadget-pref-dim  [contentView] view pref-dim ;
 

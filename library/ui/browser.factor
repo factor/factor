@@ -129,13 +129,14 @@ DEFER: show-vocab
 
 C: browser ( -- browser )
     {
-        { [ <vocabs> ] set-browser-vocabs 1/4 }
-        { [ <vocab-track> ] set-browser-vocab-track 1/4 }
-        { [ <word-track> ] set-browser-word-track 1/2 }
+        { [ <vocabs> ] set-browser-vocabs 1/5 }
+        { [ <vocab-track> ] set-browser-vocab-track 1/5 }
+        { [ <word-track> ] set-browser-word-track 3/5 }
     } { 1 0 0 } make-track* ;
 
-: browser-window ( -- )
-    <browser> "Browser" open-window ;
+M: browser gadget-title drop "Browser" ;
+
+: browser-window ( -- ) <browser> open-window ;
 
 : browser-tool
     [ browser? ]

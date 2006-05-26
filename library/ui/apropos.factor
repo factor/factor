@@ -31,3 +31,5 @@ M: apropos-gadget pref-dim* drop { 350 200 0 } ;
 
 M: apropos-gadget focusable-child* ( pane -- editor )
     apropos-gadget-input ;
+
+M: apropos-gadget gadget-title drop "Apropos" ;

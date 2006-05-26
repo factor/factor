@@ -185,10 +185,6 @@ reset-views
     }
 } { } define-objc-class
 
-: register-view ( world -- )
-    dup world-handle views get set-hash ;
-
 : <FactorView> ( gadget -- view )
-    FactorView over rect-dim <GLView> [
-        over set-world-handle dup add-notify register-view
-    ] keep ;
+    FactorView over rect-dim <GLView>
+    [ views get set-hash ] keep ;

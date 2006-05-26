@@ -30,6 +30,8 @@ C: help-gadget ( -- gadget )
         { [ <tabs> ] set-help-gadget-tabs 3/4 }
     } { 1 0 0 } make-track* ;
 
+M: help-gadget gadget-title drop "Help" ;
+
 : show-help ( link help -- )
     2dup help-gadget-history add-history {
         { "Article" [ help ] }

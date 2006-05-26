@@ -56,5 +56,3 @@ USING: alien hashtables kernel math namespaces sequences ;
     glx-window >r [ map-window* ] keep r> ;
 
 : unmap-window ( win -- ) dpy get swap XUnmapWindow drop ;
-
-: set-title ( string win -- ) dpy get -rot swap XStoreName drop ;

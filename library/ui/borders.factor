@@ -11,8 +11,7 @@ C: border ( child gap -- border )
     [ >r dup 0 3array r> set-border-size ] keep
     [ add-gadget ] keep ;
 
-: <default-border> ( child -- border )
-    3 <border> ;
+: <default-border> ( child -- border ) 5 <border> ;
 
 : layout-border-loc ( border -- )
     dup border-size swap gadget-child set-rect-loc ;

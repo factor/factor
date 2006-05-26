@@ -1,6 +1,8 @@
 IN: gadgets
 USING: kernel opengl ;
 
+DEFER: set-title ( string handle -- )
+
 DEFER: draw-world ! defined in world.factor
 
 : redraw-world ( world -- ) draw-world ;

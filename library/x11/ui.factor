@@ -108,13 +108,17 @@ M: world client-event ( event world -- )
         drop
     ] if ;
 
-: gadget-window ( world -- window )
-    [ dup rect-dim glx-window* dupd 2array ] keep
-    set-world-handle ;
+: gadget-window ( world -- )
+    [ dup rect-dim glx-window* 2array ] keep set-world-handle ;
 
 IN: gadgets
 
-: open-window* ( world title -- ) swap gadget-window set-title ;
+: set-title ( string world -- )
+    world-handle first dpy get -rot swap XStoreName drop ;
+
+: open-window* ( world -- )
+    dup gadget-window dup add-notify
+    dup gadget-title swap set-title ;
 
 : select-gl-context ( handle -- )
     dpy get swap first2 glXMakeCurrent

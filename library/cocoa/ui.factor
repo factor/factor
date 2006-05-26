@@ -5,8 +5,8 @@ IN: objc-FactorApplicationDelegate
 DEFER: FactorApplicationDelegate
 
 IN: cocoa
-USING: gadgets gadgets-listener kernel objc objc-NSApplication
-objc-NSObject ;
+USING: arrays gadgets gadgets-listener kernel objc
+objc-NSApplication objc-NSObject objc-NSWindow sequences ;
 
 : finder-run-files ( alien -- )
     CF>string-array listener-run-files
@@ -32,17 +32,29 @@ objc-NSObject ;
     register-services
     default-main-menu ;
 
+: gadget-window ( world -- )
+    [
+        <FactorView>
+        dup <ViewWindow>
+        dup install-window-delegate
+        dup [contentView] [release]
+        2array
+    ] keep set-world-handle ;
+
 IN: gadgets
 USING: errors freetype objc-NSOpenGLContext
-objc-NSOpenGLView objc-NSView objc-NSWindow ;
+objc-NSOpenGLView objc-NSView ;
 
-: redraw-world ( handle -- )
-    world-handle 1 [setNeedsDisplay:] ;
+: redraw-world ( world -- )
+    world-handle second 1 [setNeedsDisplay:] ;
 
-: open-window* ( world title -- )
-    >r <FactorView> r> <ViewWindow> 
-    dup install-window-delegate
-    [contentView] [release] ;
+: set-title ( string world -- )
+    world-handle first swap <NSString> [setTitle:] ;
+
+: open-window* ( world -- )
+    dup gadget-window dup add-notify
+    dup gadget-title swap set-title
+    f [makeKeyAndOrderFront:] ;
 
 : select-gl-context ( handle -- )
     [openGLContext] [makeCurrentContext] ;

@@ -1,8 +1,8 @@
-! Copyright (C) 2005 Slava Pestov.
-! See http://factor.sf.net/license.txt for BSD license.
+! Copyright (C) 2005, 2006 Slava Pestov.
+! See http://factorcode.org/license.txt for BSD license.
 IN: gadgets-scrolling
-USING: arrays gadgets gadgets-layouts generic kernel math
-namespaces sequences ;
+USING: arrays gadgets gadgets-layouts gadgets-viewports generic
+kernel math namespaces sequences ;
 
 ! A scroller combines a viewport with two x and y sliders.
 ! The follows slot is set by scroll-to.

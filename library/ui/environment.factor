@@ -2,7 +2,8 @@
 ! See http://factorcode.org/license.txt for BSD license.
 IN: gadgets
 USING: gadgets gadgets-labels gadgets-layouts gadgets-theme
-hashtables kernel math namespaces queues sequences threads ;
+gadgets-viewports hashtables kernel math namespaces queues
+sequences threads ;
 
 : layout-queued ( -- )
     invalid dup queue-empty? [
@@ -35,11 +36,33 @@ hashtables kernel math namespaces queues sequences threads ;
 
 : <status-bar> ( -- gadget ) "" <label> dup highlight-theme ;
 
-: open-window ( gadget title -- )
-    >r <status-bar> <world> dup prefer r> open-window* ;
+GENERIC: gadget-title ( gadget -- string )
+
+M: gadget gadget-title drop "Factor" ;
+
+M: world gadget-title world-gadget gadget-title ;
+
+TUPLE: titled-gadget title ;
+
+M: titled-gadget gadget-title titled-gadget-title ;
+
+C: titled-gadget ( title gadget -- )
+    [ >r <viewport> r> set-gadget-delegate ] keep
+    [ set-titled-gadget-title ] keep ;
+
+: update-title ( gadget -- )
+    dup gadget-parent dup world?
+    [ >r gadget-title r> set-title ] [ 2drop ] if ;
+
+: open-window ( gadget -- )
+    [ <status-bar> <world> dup prefer ] keep
+    gadget-title open-window* ;
+
+: open-titled-window ( gadget title -- )
+    <titled-gadget> open-window ;
 
 : (open-tool) ( arg cons setter -- )
-    >r call tuck r> call "Tool" open-window ; inline
+    >r call tuck r> call open-window ; inline
 
 : open-tool ( arg pred cons setter -- )
     rot drop (open-tool) ;
