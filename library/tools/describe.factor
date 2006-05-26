@@ -115,5 +115,4 @@ DEFER: describe
 : uses. ( word -- ) uses [ uses. ] word-outliner ;
 
 : apropos ( substring -- )
-    all-words completions natural-sort
-    [ article-content (help) ] word-outliner ;
+    all-words completions natural-sort [ help ] word-outliner ;

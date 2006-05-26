@@ -56,6 +56,8 @@ M: object like drop ;
 
 : delete ( elt seq -- ) 0 0 rot (delete) nip set-length drop ;
 
+: push-new ( elt seq -- ) [ delete ] 2keep push ;
+
 : nappend ( to from -- )
     >r [ length ] keep r> copy-into ; inline
 

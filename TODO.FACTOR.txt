@@ -46,13 +46,8 @@
 + ui/help:
 
 - clearing pane with ^L leaves scrollbar a pixel off
-- new leaner help viewer
-- new inspector style:
   - clicking objects sends them to the listener
   - right click sends to listener & pushes on the stack
-- debugger:
-  - continuation viewer tool, reuse old inspector code
-  - show a clickable menu of restarts...
 - reuse windows where possible
 - new browser:
   - browse generic words and classes

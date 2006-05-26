@@ -46,9 +46,7 @@ SYMBOL: last-block
 
 DEFER: $heading
 
-: help ( topic -- )
-    default-style [ dup article-title $heading ] with-style
-    article-content (help) ;
+: help ( topic -- ) article-content (help) ;
 
 : glossary ( name -- ) <term> help ;
 

@@ -3,7 +3,7 @@
 IN: gadgets-help
 USING: gadgets gadgets-panes gadgets-presentations
 gadgets-scrolling gadgets-tabs gadgets-tiles gadgets-tracks help
-io kernel sequences ;
+io kernel sequences words ;
 
 TUPLE: help-gadget history tabs ;
 
@@ -16,7 +16,7 @@ C: history ( -- gadget )
 
 : update-history ( history -- )
     dup history-seq swap history-pane [
-        <reversed> [
+        <reversed> 1 swap tail [
             [ article-title ] keep simple-object terpri
         ] each
     ] with-pane ;
@@ -42,4 +42,9 @@ C: help-gadget ( -- gadget )
     [ <help-gadget> ]
     [ show-help ] ;
 
-M: link show-object ( link button -- ) help-tool call-tool ;
+M: link show-object ( link button -- )
+    over link-name word? [
+        >r link-name r> show-object
+    ] [
+        help-tool call-tool
+    ] if ;

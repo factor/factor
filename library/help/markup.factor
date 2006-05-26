@@ -114,8 +114,6 @@ M: link article-title link-name article-title ;
 
 M: link article-content link-name article-content ;
 
-DEFER: help
-
 : ($subsection) ( quot object -- )
     subsection-style [
         [ swap curry ] keep dup article-title swap <link>
@@ -124,7 +122,7 @@ DEFER: help
 
 : $subsection ( object -- )
     [
-        first [ article-content (help) ] swap ($subsection)
+        first [ help ] swap ($subsection)
     ] ($block) ;
 
 : ($subtopic) ( element -- quot )

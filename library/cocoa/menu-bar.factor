@@ -131,7 +131,6 @@ DEFER: described-menu
             { "Cut" "cut:" "x" }
             { "Copy" "copy:" "c" }
             { "Paste" "paste:" "v" }
-            { "Paste and Match Style" "pasteAsPlainText:" "V" [ and-option-equivalent-modifier ] }
             { "Delete" "delete:" "" }
             { "Select All" "selectAll:" "a" }
             ! Find, Spelling, and Speech submenus go here
