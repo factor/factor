@@ -46,9 +46,7 @@
 + ui/help:
 
 - clearing pane with ^L leaves scrollbar a pixel off
-  - clicking objects sends them to the listener
-  - right click sends to listener & pushes on the stack
-- reuse windows where possible
+- right click sends to listener & pushes on the stack
 - new browser:
   - browse generic words and classes
   - need actions for reloading the source file and opening word in jEdit
@@ -57,7 +55,6 @@
 - make-frame should compile
 - track: don't allow negative dimensions
 - fix top level window positioning
-- changing window titles
 - clicks sent twice
 - speed up ideas:
   - only do clipping for certain gadgets
@@ -70,7 +67,7 @@
   - window zooming doesn't work
   - polish OS X menu bar code
   - dock menu
-  - services do not launch if not running
+  - services do not launch if factor not running
 - when scrolling wheel, or moving mouse out of window, rollover is not
   updated
 - focus is not top-level window aware
@@ -81,6 +78,7 @@
 
 + compiler/ffi:
 
+- amd64 crash
 - get factor running on mac intel
 - free up r11, r12 as a vreg on ppc
 - float= on powerpc doesn't consider nans equal

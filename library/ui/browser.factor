@@ -32,7 +32,7 @@ C: browser-track ( builder closer -- gadget )
     [ dup browser-track-closer call ] 2keep
     [ browser-track-showing remove-hash* ] keep track-remove ;
 
-TUPLE: browser vocabs vocab-track word-track ;
+TUPLE: browser vocab-track word-track ;
 
 : find-browser [ browser? ] find-parent ;
 
@@ -111,15 +111,6 @@ DEFER: show-vocab
     vocabs [ <vocab-button> ] map make-pile <scroller>
     "Vocabularies" f <tile> ;
 
-: add-vocabs ( vocabs browser -- )
-    [ set-browser-vocabs ] 2keep track-add ;
-
-: add-vocab-track ( track browser -- )
-    [ set-browser-vocab-track ] 2keep track-add ;
-
-: add-word-track ( track browser -- )
-    [ set-browser-word-track ] 2keep track-add ;
-
 : <vocab-track> ( -- track )
     [ <vocab-view> ] [ find-browser hide-vocab-words ]
     <browser-track> ;
@@ -129,7 +120,7 @@ DEFER: show-vocab
 
 C: browser ( -- browser )
     {
-        { [ <vocabs> ] set-browser-vocabs 1/5 }
+        { [ <vocabs> ] f 1/5 }
         { [ <vocab-track> ] set-browser-vocab-track 1/5 }
         { [ <word-track> ] set-browser-word-track 3/5 }
     } { 1 0 0 } make-track* ;
