@@ -12,7 +12,7 @@ prettyprint sequences strings styles threads ;
 ! current: shelf
 ! input: editor
 TUPLE: pane output active current input prototype
-continuation scrolls? ;
+continuation input? ;
 
 : add-output 2dup set-pane-output add-gadget ;
 
@@ -60,15 +60,6 @@ SYMBOL: structured-input
 
 : pane-clear ( pane -- )
     dup pane-output clear-incremental pane-current clear-gadget ;
- 
-: pane-actions ( line -- )
-    H{
-        { T{ button-down } [ pane-input click-editor ] }
-        { T{ key-down f f "RETURN" } [ pane-commit ] }
-        { T{ key-down f f "UP" } [ pane-input [ history-prev ] with-editor ] }
-        { T{ key-down f f "DOWN" } [ pane-input [ history-next ] with-editor ] }
-        { T{ key-down f { C+ } "l" } [ pane-clear ] }
-    } add-actions ;
 
 C: pane ( -- pane )
     <pile> over set-delegate
@@ -76,9 +67,21 @@ C: pane ( -- pane )
     <pile> <incremental> over add-output
     dup prepare-line ;
 
+M: pane gadget-gestures
+    pane-input [
+        H{
+            { T{ button-down } [ pane-input click-editor ] }
+            { T{ key-down f f "RETURN" } [ pane-commit ] }
+            { T{ key-down f f "UP" } [ pane-input [ history-prev ] with-editor ] }
+            { T{ key-down f f "DOWN" } [ pane-input [ history-next ] with-editor ] }
+            { T{ key-down f { C+ } "l" } [ pane-clear ] }
+        }
+    ] [
+        H{ }
+    ] if ;
+
 : <input-pane> ( -- pane )
-    <pane> t over set-pane-scrolls?
-    "" <editor> over set-pane-input dup pane-actions ;
+    <pane> "" <editor> over set-pane-input ;
 
 M: pane focusable-child* ( pane -- editor )
     pane-input [ t ] unless* ;
@@ -118,8 +121,7 @@ M: pane stream-flush ( pane -- ) drop ;
 M: pane stream-readln ( pane -- line )
     [ over set-pane-continuation stop ] callcc1 nip ;
 
-: scroll-pane ( pane -- )
-    dup pane-scrolls? [ pane-input scroll>caret ] [ drop ] if ;
+: scroll-pane ( pane -- ) pane-input [ scroll>caret ] when* ;
 
 M: pane stream-write1 ( char pane -- )
     [ pane-current stream-write1 ] keep scroll-pane ;

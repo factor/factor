@@ -5,21 +5,20 @@ kernel ;
 
 TUPLE: apropos-gadget scroller input ;
 
-: apropos-pane ( gadget -- pane )
-    [ apropos-gadget? ] find-parent
+: apropos-gadget-pane ( apropos -- pane )
     apropos-gadget-scroller scroller-gadget ;
 
-: <prompt> ( quot -- editor )
-    "" <editor> [
-        swap T{ key-down f f "RETURN" } set-action
-    ] keep ;
-
-: show-apropos ( editor -- )
-    dup commit-editor-text
-    swap apropos-pane [ apropos ] with-pane ;
-
 : <apropos-prompt> ( -- gadget )
-    [ show-apropos ] <prompt> dup faint-boundary ;
+    "" <editor> dup faint-boundary ;
+
+: show-apropos ( apropos -- )
+    dup apropos-gadget-input commit-editor-text
+    swap apropos-gadget-pane [ apropos ] with-pane ;
+
+M: apropos-gadget gadget-gestures
+    drop H{
+        { T{ key-down f f "RETURN" } [ show-apropos ] }
+    } ;
 
 C: apropos-gadget ( -- )
     {

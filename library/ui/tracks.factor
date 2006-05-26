@@ -69,15 +69,15 @@ M: track pref-dim* ( track -- dim )
     dup gadget-parent divider-delta
     over divider-# rot gadget-parent change-divider ;
 
-: divider-actions ( divider -- )
-    dup [ gadget-parent save-sizes ] T{ button-down } set-action
-    dup [ drop ] T{ button-up } set-action
-    [ divider-motion ] T{ drag } set-action ;
+M: divider gadget-gestures
+    drop H{
+        { T{ button-down } [ gadget-parent save-sizes ] }
+        { T{ button-up } [ drop ] }
+        { T{ drag } [ divider-motion ] }
+    } ;
 
 C: divider ( -- divider )
-    dup delegate>gadget
-    dup divider-actions
-    dup reverse-video-theme ;
+    dup delegate>gadget dup reverse-video-theme ;
 
 : normalize-sizes ( sizes -- sizes )
     dup sum swap [ swap / ] map-with ;

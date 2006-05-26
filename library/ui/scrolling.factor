@@ -25,10 +25,12 @@ TUPLE: scroller viewport x y follows ;
 
 : scroll-down-line scroller-y 1 swap slide-by-line ;
 
-: scroller-actions ( scroller -- )
-    dup [ scroll-up-line ] T{ wheel-up } set-action
-    dup [ scroll-down-line ] T{ wheel-down } set-action
-    [ relayout-1 ] T{ slider-changed } set-action ;
+M: scroller gadget-gestures
+    drop H{
+        { T{ wheel-up } [ scroll-up-line ] }
+        { T{ wheel-down } [ scroll-down-line ] }
+        { T{ slider-changed } [ relayout-1 ] }
+    } ;
 
 C: scroller ( gadget -- scroller )
     #! Wrap a scrolling pane around the gadget.
@@ -37,7 +39,6 @@ C: scroller ( gadget -- scroller )
         { [ <x-slider> ] set-scroller-x @bottom }
         { [ <y-slider> ] set-scroller-y @right }
     } make-frame*
-    dup scroller-actions
     t over set-gadget-root? ;
 
 : set-slider ( value page max slider -- )

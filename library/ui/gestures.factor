@@ -4,21 +4,12 @@ IN: gadgets
 USING: gadgets-labels gadgets-layouts hashtables kernel math
 namespaces queues sequences threads ;
 
-: action ( gadget gesture -- quot )
-    swap gadget-gestures ?hash ;
+GENERIC: gadget-gestures ( gadget -- hash )
 
-: init-gestures ( gadget -- gestures )
-    dup gadget-gestures
-    [ ] [ H{ } clone dup rot set-gadget-gestures ] ?if ;
+M: gadget gadget-gestures drop H{ } ;
 
-: set-action ( gadget quot gesture -- )
-    rot init-gestures set-hash ;
-
-: add-actions ( gadget hash -- )
-    dup [ >r init-gestures r> hash-update ] [ 2drop ] if ;
-
-: handle-gesture* ( gesture gadget -- ? )
-    tuck gadget-gestures ?hash dup [ call f ] [ 2drop t ] if ;
+: handle-gesture* ( gesture gadget -- )
+    tuck gadget-gestures hash [ call f ] [ drop t ] if* ;
 
 : handle-gesture ( gesture gadget -- ? )
     #! If a gadget's handle-gesture* generic returns t, the

@@ -90,7 +90,6 @@ listener-gadget-scroller 4 slot ;
 - display lists
 - saving the image should save window configuration
 - variable width word wrap
-- new gesture style
 
 + compiler/ffi:
 

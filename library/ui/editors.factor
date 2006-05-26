@@ -74,35 +74,11 @@ TUPLE: editor line caret font color ;
 : click-editor ( editor -- )
     dup hand-click-rel first over set-caret-x request-focus ;
 
-: popup-location ( editor -- loc )
-    dup screen-loc swap editor-caret rect-extent nip v+ ;
-
-: <completion-item> ( completion editor -- menu-item )
-    dupd [ [ complete ] with-editor drop ] curry curry 2array ;
-
-! : <completion-menu> ( editor completions -- menu )
-!     [ swap <completion-item> ] map-with <menu> ;
-
-: completion-menu ( editor completions -- )
-    2drop ;
-!    over popup-location -rot
-!    over >r <completion-menu> r> show-menu ;
-
-: do-completion-1 ( editor completions -- )
-    swap [ first complete ] with-editor ;
-
-: do-completion ( editor -- )
-    dup [ line-completions ] with-editor {
-        { [ dup empty? ] [ 2drop ] }
-        { [ dup length 1 = ] [ do-completion-1 ] }
-        { [ t ] [ completion-menu ] }
-    } cond ;
-
-: editor-actions ( editor -- )
-    H{
+M: editor gadget-gestures
+    drop H{
+        { T{ button-down } [ click-editor ] }
         { T{ gain-focus } [ focus-editor ] }
         { T{ lose-focus } [ unfocus-editor ] }
-        { T{ button-down } [ click-editor ] }
         { T{ key-down f f "BACKSPACE" } [ [ T{ char-elt } delete-prev-elt ] with-editor ] }
         { T{ key-down f f "DELETE" } [ [ T{ char-elt } delete-next-elt ] with-editor ] }
         { T{ key-down f { C+ } "BACKSPACE" } [ [ T{ word-elt } delete-prev-elt ] with-editor ] }
@@ -117,15 +93,14 @@ TUPLE: editor line caret font color ;
         { T{ key-down f f "END" } [ [ T{ document-elt } next-elt ] with-editor ] }
         { T{ key-down f { C+ } "k" } [ [ line-clear ] with-editor ] }
         { T{ key-down f f "TAB" } [ do-completion ] }
-    } add-actions ;
+    } ;
 
 C: editor ( text -- )
     dup delegate>gadget
     dup editor-theme
     <line-editor> over set-editor-line
     <caret> over set-editor-caret
-    [ set-editor-text ] keep
-    dup editor-actions ;
+    [ set-editor-text ] keep ;
 
 : offset>x ( gadget offset str -- x )
     head-slice >r label-font* r> string-width ;

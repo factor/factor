@@ -27,16 +27,17 @@ TUPLE: button rollover? pressed? quot ;
 : button-clicked ( button -- )
     dup button-quot if-clicked ;
 
-: button-gestures ( button quot -- )
-    over set-button-quot
-    dup [ button-clicked ] T{ button-up } set-action
-    dup [ button-update ] T{ button-down } set-action
-    dup [ button-update ] T{ mouse-leave } set-action
-    [ button-update ] T{ mouse-enter } set-action ;
+M: button gadget-gestures
+    drop H{
+        { T{ button-up } [ button-clicked ] }
+        { T{ button-down } [ button-update ] }
+        { T{ mouse-leave } [ button-update ] }
+        { T{ mouse-enter } [ button-update ] }
+    } ;
 
 C: button ( gadget quot -- button )
     rot <default-border> over set-gadget-delegate
-    [ swap button-gestures ] keep ;
+    [ set-button-quot ] keep ;
 
 : <highlight-button> ( gadget quot -- button )
     <button> { 0 0 0 } over set-border-size ;
@@ -53,16 +54,22 @@ C: button ( gadget quot -- button )
 : repeat-button-up ( button -- )
     dup button-update remove-timer ;
 
-: repeat-actions ( button -- )
-    dup [ repeat-button-down ] T{ button-down } set-action
-    [ repeat-button-up ] T{ button-up } set-action ;
+TUPLE: repeat-button ;
 
-: <repeat-button> ( gadget quot -- button )
+M: repeat-button gadget-gestures
+    drop H{
+        { T{ button-down } [ repeat-button-down ] }
+        { T{ button-up } [ repeat-button-up ] }
+        { T{ mouse-leave } [ button-update ] }
+        { T{ mouse-enter } [ button-update ] }
+    } ;
+
+C: repeat-button ( gadget quot -- button )
     #! Button that calls the quotation every 100ms as long as
     #! the mouse is held down.
-    <bevel-button> dup repeat-actions ;
+    [ >r <bevel-button> r> set-gadget-delegate ] keep ;
 
-M: button tick ( ms object -- ) nip button-clicked ;
+M: repeat-button tick ( ms object -- ) nip button-clicked ;
 
 TUPLE: button-paint plain rollover pressed ;
 

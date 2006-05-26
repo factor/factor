@@ -52,6 +52,8 @@ TUPLE: slider-changed ;
         T{ slider-changed } swap handle-gesture drop
     ] if ;
 
+TUPLE: thumb ;
+
 : begin-drag ( thumb -- )
     find-slider dup slider-value swap set-slider-saved ;
 
@@ -60,16 +62,18 @@ TUPLE: slider-changed ;
     over screen>slider swap [ slider-saved + ] keep
     set-slider-value* ;
 
-: thumb-actions ( thumb -- )
-    dup [ drop ] T{ button-up } set-action
-    dup [ begin-drag ] T{ button-down } set-action
-    [ do-drag ] T{ drag } set-action ;
+M: thumb gadget-gestures
+    drop H{
+        { T{ button-down } [ begin-drag ] }
+        { T{ button-up } [ drop ] }
+        { T{ drag } [ do-drag ] }
+    } ;
 
-: <thumb> ( vector -- thumb )
-    <gadget> [ set-gadget-orientation ] keep
+C: thumb ( vector -- thumb )
+    dup delegate>gadget
     t over set-gadget-root?
     dup thumb-theme
-    dup thumb-actions ;
+    [ set-gadget-orientation ] keep ;
 
 : slide-by ( amount gadget -- )
     #! The gadget can be any child of a slider.
@@ -84,12 +88,13 @@ TUPLE: slider-changed ;
     over screen>slider over slider-value - sgn
     swap slide-by-page ;
 
-: elevator-actions ( elevator -- )
-    [ elevator-click ] T{ button-down } set-action ;
+M: elevator gadget-gestures
+    drop H{ { T{ button-down } [ elevator-click ] } } ;
 
 C: elevator ( vector -- elevator )
-    dup delegate>gadget [ set-gadget-orientation ] keep
-    dup elevator-theme dup elevator-actions ;
+    dup delegate>gadget
+    dup elevator-theme
+    [ set-gadget-orientation ] keep ;
 
 : (layout-thumb) ( slider n -- n thumb )
     over gadget-orientation n*v swap slider-thumb ;

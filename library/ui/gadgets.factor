@@ -42,8 +42,7 @@ M: array rect-dim drop { 0 0 0 } ;
 
 TUPLE: gadget
     pref-dim parent children orientation
-    gestures visible? relayout? root?
-    interior boundary ;
+    visible? relayout? root? interior boundary ;
 
 : show-gadget t swap set-gadget-visible? ;
 
