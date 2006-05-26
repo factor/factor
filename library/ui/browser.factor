@@ -10,7 +10,7 @@ words ;
 TUPLE: browser-track showing builder closer ;
 
 C: browser-track ( builder closer -- gadget )
-    <x-track> over set-delegate
+    { 0 1 0 } <track> over set-delegate
     H{ } clone over set-browser-track-showing
     [ set-browser-track-closer ] keep
     [ set-browser-track-builder ] keep ;

@@ -18,10 +18,6 @@ TUPLE: track sizes saved-sizes ;
 C: track ( orientation -- track )
     [ delegate>pack ] keep 1 over set-pack-fill ;
 
-: <x-track> { 0 1 0 } <track> ;
-
-: <y-track> { 1 0 0 } <track> ;
-
 : divider-sizes ( seq -- dim )
     length 1- 0 max divider-size n*v ;
 
@@ -39,7 +35,7 @@ M: track layout* ( track -- )
 
 : track-pref-dims ( dims sizes -- dims )
     [ [ dup zero? [ nip ] [ v/n ] if ] 2map max-dim ] keep
-    divider-sizes v+ ;
+    divider-sizes v+ [ >fixnum ] map ;
 
 M: track pref-dim* ( track -- dim )
     [
