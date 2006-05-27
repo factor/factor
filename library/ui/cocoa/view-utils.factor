@@ -25,7 +25,7 @@ sequences ;
     r> [frame] NSRect-h swap - 0 3array ;
 
 : send-mouse-moved ( view event -- )
-    over >r mouse-location r> view move-hand ;
+    over >r mouse-location r> window move-hand ;
 
 : button ( event -- n )
     #! Cocoa -> Factor UI button mapping
@@ -64,11 +64,11 @@ sequences ;
     dup [modifierFlags] modifiers modifier swap key-code ;
 
 : send-key-event ( view event quot -- )
-    >r event>gesture r> call swap view world-focus
+    >r event>gesture r> call swap window world-focus
     handle-gesture ; inline
 
 : send-user-input ( view event -- )
-    [characters] CF>string swap view world-focus user-input ;
+    [characters] CF>string swap window world-focus user-input ;
 
 : send-key-down-event ( view event -- )
     2dup [ <key-down> ] send-key-event
@@ -78,10 +78,10 @@ sequences ;
     [ <key-up> ] send-key-event ;
 
 : send-button-down$ ( view event -- )
-    over >r button&loc r> view send-button-down ;
+    over >r button&loc r> window send-button-down ;
 
 : send-button-up$ ( view event -- )
-    over >r button&loc r> view send-button-up ;
+    over >r button&loc r> window send-button-up ;
 
 : send-wheel$ ( view event -- )
     [ [deltaY] 0 > ] 2keep mouse-location

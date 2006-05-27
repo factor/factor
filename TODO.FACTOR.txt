@@ -1,9 +1,24 @@
 - make-image in the UI leaks memory...
-
 + httpd:
   - outliners don't work
   - browser responder doesn't work
 - code walker & exceptions -- test and debug problems
+- another i/o bug: on factorcode eventually all i/o times out
+- x11 title bars are funny
+- save window positions on x11
+- restore windows with the correct stacking order
+- if the listener is running a command when the image is saved, it
+  restores to an unresponsive gadget
+- track: don't allow negative dimensions
+- fix top level window positioning
+- services do not launch if factor not running
+- when scrolling wheel, or moving mouse out of window, rollover is not
+  updated
+- focus is not top-level window aware
+- amd64 crash
+- get factor running on mac intel
+- constant branch folding
+- new objc syntax
 
 + refactor style stack code so that nested styles are handled at a lower-level
   - in HTML, we can nest div tags, etc
@@ -24,14 +39,10 @@
   - there was a performance hit, investigate
   - float boxing and overflow checks need a gc check too
 
-
 + io:
 
-- another i/o bug: on factorcode eventually all i/o times out
 - gdb triggers 'mutliple i/o ops on port' error
-- stream server can hang because of exception handler limitations
-- better i/o scheduler
-- yield in a loop starves i/o
+- better i/o scheduler - eg, yield in a loop starves i/o
 - "localhost" 50 <client> won't fail
 
 + help:
@@ -46,13 +57,7 @@
 
 + ui/help:
 
-- x11:
-  - x11 input methods
-  - x11 title bars are funny
-  - save window positions on x11
-- restore windows with the correct stacking order
-- if the listener is running a command when the image is saved, it
-  restores to an unresponsive gadget
+- x11 input methods
 - roundoff is still not quite right with tracks
 - clearing pane with ^L leaves scrollbar a pixel off
 - new browser:
@@ -61,8 +66,6 @@
 - toggle/radio buttons/tabs or something
 - inspector: less clutter when browsing words
 - make-frame should compile
-- track: don't allow negative dimensions
-- fix top level window positioning
 - clicks sent twice
 - speed up ideas:
   - only do clipping for certain gadgets
@@ -72,24 +75,17 @@
   - horizontal scrolling
   - polish OS X menu bar code
   - dock menu
-  - services do not launch if factor not running
-  - new syntax
-- when scrolling wheel, or moving mouse out of window, rollover is not
-  updated
-- focus is not top-level window aware
 - display lists
 - variable width word wrap
 
 + compiler/ffi:
 
-- amd64 crash
-- get factor running on mac intel
+- type inference at branch merge points
 - free up r11, r12 as a vreg on ppc
 - float= on powerpc doesn't consider nans equal
 - intrinsic fixnum>float float>fixnum
 - win64 port
 - amd64 %unbox-struct
-- constant branch folding
 - complex float type
 - complex float intrinsics
 - remove literal table
