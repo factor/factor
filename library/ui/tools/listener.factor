@@ -52,7 +52,8 @@ C: listener-gadget ( -- gadget )
         { [ <input-pane> <scroller> ] set-listener-gadget-scroller @center }
     } make-frame* dup start-listener ;
 
-M: listener-gadget pref-dim* drop { 600 600 0 } ;
+M: listener-gadget pref-dim*
+    delegate pref-dim* { 600 600 0 } vmax ;
 
 M: listener-gadget focusable-child* ( listener -- gadget )
     listener-gadget-pane ;

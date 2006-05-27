@@ -41,11 +41,11 @@ H{ } clone help-graph set-global xref-articles
     "native-io" get [ init-io ] when
     
     "cocoa" get [
-        "/library/cocoa/load.factor" run-resource
+        "/library/ui/cocoa/load.factor" run-resource
     ] when
     
     "x11" get [
-        "/library/x11/load.factor" run-resource
+        "/library/ui/x11/load.factor" run-resource
     ] when
 
     windows? "native-io" get and [

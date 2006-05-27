@@ -92,7 +92,6 @@ M: editor gadget-gestures
         { T{ key-down f f "HOME" } [ [ T{ document-elt } prev-elt ] with-editor ] }
         { T{ key-down f f "END" } [ [ T{ document-elt } next-elt ] with-editor ] }
         { T{ key-down f { C+ } "k" } [ [ line-clear ] with-editor ] }
-        { T{ key-down f f "TAB" } [ do-completion ] }
     } ;
 
 C: editor ( text -- )

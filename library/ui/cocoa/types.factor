@@ -1,7 +1,7 @@
 ! Copyright (C) 2006 Slava Pestov
 ! See http://factorcode.org/license.txt for BSD license.
 IN: cocoa
-USING: alien kernel math ;
+USING: alien gadgets kernel math sequences ;
 
 BEGIN-STRUCT: NSRect
     FIELD: float x
@@ -20,13 +20,13 @@ TYPEDEF: NSRect CGRect
     [ set-NSRect-y ] keep
     [ set-NSRect-x ] keep ;
 
-: NSRect-x-y ( rect -- origin-x origin-y )
+: NSRect-x-y ( alien -- origin-x origin-y )
     [ NSRect-x ] keep NSRect-y ;
 
-: NSRect-x-far-y ( rect -- origin-x far-y )
+: NSRect-x-far-y ( alien -- origin-x far-y )
     [ NSRect-x-y ] keep NSRect-h + ;
   
-: <far-y-NSRect> ( x y w h -- rect )
+: <far-y-NSRect> ( x y w h -- alien )
     tuck >r >r - r> r> <NSRect> ;
 
 BEGIN-STRUCT: NSPoint

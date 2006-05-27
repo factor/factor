@@ -1,7 +1,7 @@
 ! Copyright (C) 2005, 2006 Eduardo Cavazos and Slava Pestov
 ! See http://factorcode.org/license.txt for BSD license.
 IN: x11
-USING: alien hashtables kernel math namespaces sequences ;
+USING: alien gadgets hashtables kernel math namespaces sequences ;
 
 : create-window-mask ( -- n )
     CWBackPixel CWBorderPixel bitor
@@ -41,7 +41,7 @@ USING: alien hashtables kernel math namespaces sequences ;
     dpy get swap XDestroyWindow drop ;
 
 : destroy-window* ( win context -- )
-    destroy-context dup windows get remove-hash destroy-window ;
+    destroy-context dup views get remove-hash destroy-window ;
 
 : set-closable ( win -- )
     dpy get swap "WM_DELETE_WINDOW" x-atom <Atom> 1
@@ -52,6 +52,6 @@ USING: alien hashtables kernel math namespaces sequences ;
 : map-window* ( world win -- ) dup set-closable map-window ;
 
 : glx-window* ( world dim -- win context )
-    glx-window >r [ windows get set-hash ] keep r> ;
+    glx-window >r [ views get set-hash ] keep r> ;
 
 : unmap-window ( win -- ) dpy get swap XUnmapWindow drop ;

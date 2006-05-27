@@ -4,10 +4,6 @@ IN: x11
 USING: alien arrays errors gadgets hashtables io kernel math
 namespaces prettyprint sequences threads ;
 
-! Global variable; maps X11 window handles to objects responding
-! to the event protocol in /library/x11/events.factor
-SYMBOL: windows
-
 SYMBOL: dpy
 SYMBOL: scr
 SYMBOL: root
@@ -30,7 +26,7 @@ SYMBOL: root
     
 : with-x ( display-string quot -- )
     [
-        H{ } clone windows set
+        reset-views
         swap initialize-x
         [ close-x ] cleanup
     ] with-scope ;

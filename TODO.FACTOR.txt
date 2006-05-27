@@ -1,19 +1,4 @@
-+ prettyprinter bug:
-
-IN: gadgets-listener SYMBOL: listener-gadget
-TUPLE: listener-gadget scroller stack ;
-IN: gadgets M: listener-gadget focusable-child* 
-    listener-gadget-pane ;
-IN: gadgets-layouts M: listener-gadget pref-dim* 
-    drop { 600 600 0 } ;
-IN: gadgets-listener M: listener-gadget 
-set-listener-gadget-scroller 4 set-slot ;
-IN: gadgets-listener M: listener-gadget listener-gadget-stack 
-    5 slot ;
-IN: gadgets-listener M: listener-gadget 
-set-listener-gadget-stack 5 set-slot ;
-IN: gadgets-listener M: listener-gadget 
-listener-gadget-scroller 4 slot ;
+- make-image in the UI leaks memory...
 
 + httpd:
   - outliners don't work
@@ -62,6 +47,10 @@ listener-gadget-scroller 4 slot ;
 
 + ui/help:
 
+- restore windows with the correct stacking order
+- if the listener is running a command when the image is saved, it
+  restores to an unresponsive gadget
+- save window positions on x11
 - roundoff is still not quite right with tracks
 - clearing pane with ^L leaves scrollbar a pixel off
 - new browser:
@@ -84,11 +73,11 @@ listener-gadget-scroller 4 slot ;
   - polish OS X menu bar code
   - dock menu
   - services do not launch if factor not running
+  - new syntax
 - when scrolling wheel, or moving mouse out of window, rollover is not
   updated
 - focus is not top-level window aware
 - display lists
-- saving the image should save window configuration
 - variable width word wrap
 
 + compiler/ffi:

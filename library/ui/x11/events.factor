@@ -56,8 +56,8 @@ GENERIC: client-event ( event window -- )
     } cond ;
 
 : event-loop ( -- )
-    windows get hash-empty? [
-        wait-event dup XAnyEvent-window windows get hash dup
+    views get hash-empty? [
+        wait-event dup XAnyEvent-window views get hash dup
         [ handle-event ] [ 2drop ] if event-loop
     ] unless ;
 

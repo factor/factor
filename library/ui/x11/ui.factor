@@ -134,8 +134,12 @@ IN: shells
     [
         f [
             init-ui
-            launchpad-window
-            listener-window
+            restore-windows? [
+                restore-windows
+            ] [
+                launchpad-window
+                listener-window
+            ] if
             event-loop
         ] with-x
     ] with-freetype ;

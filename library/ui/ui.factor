@@ -5,6 +5,17 @@ USING: gadgets gadgets-labels gadgets-layouts gadgets-theme
 gadgets-viewports hashtables kernel math namespaces queues
 sequences threads ;
 
+! Hash mapping aliens to gadgets
+SYMBOL: windows
+
+: reset-windows ( hash -- hash ) H{ } clone windows set-global ;
+
+: view ( handle -- world ) windows get hash ;
+
+: register-view ( world handle -- ) windows get set-hash ;
+
+: unregister-view ( handle -- ) windows get remove-hash ;
+
 : layout-queued ( -- )
     invalid dup queue-empty? [
         drop
@@ -23,16 +34,6 @@ sequences threads ;
     [ layout-queued ] make-hash hash-values
     [ dup world-handle [ draw-world ] [ drop ] if ] each
     10 sleep ;
-
-: close-global ( world global -- )
-    dup get-global find-world rot eq?
-    [ f swap set-global ] [ drop ] if ;
-
-: close-world ( world -- )
-    dup hand-clicked close-global
-    dup hand-gadget close-global
-    f over request-focus* dup remove-notify
-    dup free-fonts f swap set-world-handle ;
 
 : <status-bar> ( -- gadget ) "" <label> dup highlight-theme ;
 
@@ -66,6 +67,13 @@ C: titled-gadget ( gadget title -- )
 : open-titled-window ( gadget title -- )
     <titled-gadget> open-window ;
 
+: restore-windows ( -- )
+    windows get hash-values reset-windows
+    [ dup reset-world open-window* ] each ;
+
+: restore-windows? ( -- ? )
+    windows get [ hash-empty? not ] [ f ] if* ;
+
 : (open-tool) ( arg cons setter -- )
     >r call tuck r> call open-window ; inline
 
@@ -78,3 +86,21 @@ C: titled-gadget ( gadget title -- )
     ] [
         drop r> r> (open-tool)
     ] if ;
+
+: start-world ( world -- )
+    dup add-notify
+    dup gadget-title over set-title
+    dup relayout
+    world-gadget request-focus ;
+
+: close-global ( world global -- )
+    dup get-global find-world rot eq?
+    [ f swap set-global ] [ drop ] if ;
+
+: close-world ( world -- )
+    dup hand-clicked close-global
+    dup hand-gadget close-global
+    f over request-focus*
+    dup remove-notify
+    dup free-fonts
+    reset-world ;

@@ -18,21 +18,6 @@ sequences ;
 
 : view-dim [bounds] dup NSRect-w swap NSRect-h 0 3array ;
 
-: NSViewFrameDidChangeNotification
-    "NSViewFrameDidChangeNotification" <NSString> ;
-
-: add-resize-observer ( view selector -- )
-    NSViewFrameDidChangeNotification pick add-observer ;
-
-! Hash mapping aliens to gadgets
-SYMBOL: views
-
-: reset-views ( hash -- hash ) H{ } clone views set-global ;
-
-reset-views
-
-: view ( handle -- world ) views get hash ;
-
 : mouse-location ( view event -- loc )
     over >r
     [locationInWindow] f [convertPoint:fromView:]
@@ -100,6 +85,11 @@ reset-views
 
 : send-wheel$ ( view event -- )
     [ [deltaY] 0 > ] 2keep mouse-location rot view send-wheel ;
+
+: add-resize-observer ( observer object -- )
+    >r "updateFactorGadgetSize:"
+    "NSViewFrameDidChangeNotification" <NSString>
+    r> add-observer ;
 
 "NSOpenGLView" "FactorView" {
     { "drawRect:" "void" { "id" "SEL" "NSRect" }
@@ -170,7 +160,7 @@ reset-views
         [
             rot drop
             SUPER-> [initWithFrame:pixelFormat:]
-            dup "updateFactorGadgetSize:" add-resize-observer
+            dup dup add-resize-observer
         ]
     }
     
@@ -178,7 +168,7 @@ reset-views
         [
             drop
             dup view close-world
-            dup views get remove-hash
+            dup unregister-view
             dup remove-observer
             SUPER-> [dealloc]
         ]
@@ -186,5 +176,4 @@ reset-views
 } { } define-objc-class
 
 : <FactorView> ( world -- view )
-    FactorView over rect-dim <GLView>
-    [ views get set-hash ] keep ;
+    FactorView over rect-dim <GLView> [ register-view ] keep ;

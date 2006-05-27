@@ -5,8 +5,9 @@ IN: objc-FactorApplicationDelegate
 DEFER: FactorApplicationDelegate
 
 IN: cocoa
-USING: arrays gadgets gadgets-listener kernel objc
-objc-NSApplication objc-NSObject objc-NSWindow sequences ;
+USING: arrays gadgets gadgets-layouts gadgets-listener
+hashtables kernel namespaces objc objc-NSApplication
+objc-NSObject objc-NSWindow sequences ;
 
 : finder-run-files ( alien -- )
     CF>string-array listener-run-files
@@ -25,19 +26,21 @@ objc-NSApplication objc-NSObject objc-NSWindow sequences ;
     FactorApplicationDelegate [alloc] [init] [setDelegate:] ;
 
 : init-cocoa-ui ( -- )
-    reset-views
     reset-callbacks
     init-ui
     install-app-delegate
     register-services
     default-main-menu ;
 
+: rect>NSRect
+    dup world-loc first2 rot rect-dim first2 <NSRect> ;
+
 : gadget-window ( world -- )
     [
-        <FactorView>
-        dup <ViewWindow>
+        dup <FactorView>
+        dup rot rect>NSRect <ViewWindow>
         dup install-window-delegate
-        dup [contentView] [release]
+        over [release]
         2array
     ] keep set-world-handle ;
 
@@ -52,8 +55,8 @@ objc-NSOpenGLView objc-NSView ;
     world-handle second swap <NSString> [setTitle:] ;
 
 : open-window* ( world -- )
-    dup gadget-window dup add-notify
-    dup gadget-title over set-title
+    dup gadget-window
+    dup start-world
     world-handle second f [makeKeyAndOrderFront:] ;
 
 : select-gl-context ( handle -- )
@@ -61,6 +64,13 @@ objc-NSOpenGLView objc-NSView ;
 
 : flush-gl-context ( handle -- )
     first [openGLContext] [flushBuffer] ;
+
+: restore-windows ( -- )
+    views get hash-values reset-views
+    [ dup reset-world open-window* ] each ;
+
+: restore-windows? ( -- ? )
+    views get [ hash-empty? not ] [ f ] if* ;
 
 IN: shells
 
@@ -71,7 +81,11 @@ IN: shells
     [
         [
             init-cocoa-ui
-            listener-window
+            restore-windows? [
+                restore-windows
+            ] [
+                listener-window
+            ] if
             finish-launching
             event-loop
         ] with-cocoa

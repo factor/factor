@@ -4,8 +4,9 @@ IN: objc-FactorWindowDelegate
 DEFER: FactorWindowDelegate
 
 IN: cocoa
-USING: gadgets gadgets-layouts kernel math objc objc-NSObject
-objc-NSView objc-NSWindow sequences ;
+USING: arrays gadgets gadgets-layouts kernel math objc
+objc-NSNotification objc-NSObject objc-NSView objc-NSWindow
+sequences ;
 
 : NSBorderlessWindowMask     0 ; inline
 : NSTitledWindowMask         1 ; inline
@@ -28,9 +29,8 @@ objc-NSView objc-NSWindow sequences ;
     standard-window-type NSBackingStoreBuffered 1
     [initWithContentRect:styleMask:backing:defer:] ;
 
-: <ViewWindow> ( view -- window )
-    dup [bounds] <NSWindow>
-    [ swap [setContentView:] ] keep
+: <ViewWindow> ( view bounds -- window )
+    <NSWindow> [ swap [setContentView:] ] keep
     dup dup [contentView] [setInitialFirstResponder:]
     dup 1 [setAcceptsMouseMovedEvents:] ;
 
@@ -53,6 +53,14 @@ objc-NSView objc-NSWindow sequences ;
             dup window-content-rect NSRect-x-far-y
             pick window-pref-dim first2 <far-y-NSRect>
             frame-content-rect
+        ]
+    }
+        
+    {
+        "windowDidMove:" "void" { "id" "SEL" "id" } [
+            2nip [object]
+            dup window-content-rect NSRect-x-y 0 3array
+            swap [contentView] view set-world-loc
         ]
     }
 } { } define-objc-class

@@ -88,6 +88,8 @@ M: wrapper apply-object wrapped apply-literal ;
 
 GENERIC: infer-quot
 
+M: f infer-quot ( f -- ) drop ;
+
 M: quotation infer-quot ( quot -- )
     #! Recursive calls to this word are made for nested
     #! quotations.

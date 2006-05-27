@@ -42,8 +42,7 @@ SYMBOL: structured-input
     "\"structured-input\" \"gadgets-panes\" lookup get-global call"
     r> pane-eval ;
 
-: replace-input ( string pane -- )
-    pane-input set-editor-text ;
+: replace-input ( string pane -- ) pane-input set-editor-text ;
 
 : print-input ( string pane -- )
     [

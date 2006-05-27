@@ -10,6 +10,7 @@ math math-internals namespaces parser sequences test vectors ;
 
 [ t ] [ [ [ ] [ ] if ] dataflow dup [ [ ] map-nodes ] with-node-iterator = ] unit-test
 
+[ { 0 0 } ] [ f infer ] unit-test
 [ { 0 2 } ] [ [ 2 "Hello" ] infer ] unit-test
 [ { 1 2 } ] [ [ dup ] infer ] unit-test
 
@@ -132,7 +133,7 @@ SYMBOL: sym-test
     dup [
         length
     ] [
-        not-a-number
+        "foo" throw
     ] if ;
 
 [ { 1 1 } ] [ [ terminator-branch ] infer ] unit-test
