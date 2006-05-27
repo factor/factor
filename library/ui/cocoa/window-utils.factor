@@ -34,7 +34,7 @@ sequences ;
     dup dup [contentView] [setInitialFirstResponder:]
     dup 1 [setAcceptsMouseMovedEvents:] ;
 
-: window-pref-dim [contentView] view pref-dim ;
+: window-pref-dim [contentView] window pref-dim ;
 
 : frame-content-rect ( window rect -- rect )
     swap [styleMask] NSWindow -rot
@@ -60,7 +60,7 @@ sequences ;
         "windowDidMove:" "void" { "id" "SEL" "id" } [
             2nip [object]
             dup window-content-rect NSRect-x-y 0 3array
-            swap [contentView] view set-world-loc
+            swap [contentView] window set-world-loc
         ]
     }
 } { } define-objc-class

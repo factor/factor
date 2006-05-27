@@ -10,11 +10,11 @@ SYMBOL: windows
 
 : reset-windows ( hash -- hash ) H{ } clone windows set-global ;
 
-: view ( handle -- world ) windows get hash ;
+: window ( handle -- world ) windows get hash ;
 
-: register-view ( world handle -- ) windows get set-hash ;
+: register-window ( world handle -- ) windows get set-hash ;
 
-: unregister-view ( handle -- ) windows get remove-hash ;
+: unregister-window ( handle -- ) windows get remove-hash ;
 
 : layout-queued ( -- )
     invalid dup queue-empty? [

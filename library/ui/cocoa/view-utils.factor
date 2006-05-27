@@ -84,7 +84,8 @@ sequences ;
     over >r button&loc r> view send-button-up ;
 
 : send-wheel$ ( view event -- )
-    [ [deltaY] 0 > ] 2keep mouse-location rot view send-wheel ;
+    [ [deltaY] 0 > ] 2keep mouse-location
+    rot window send-wheel ;
 
 : add-resize-observer ( observer object -- )
     >r "updateFactorGadgetSize:"
@@ -93,7 +94,7 @@ sequences ;
 
 "NSOpenGLView" "FactorView" {
     { "drawRect:" "void" { "id" "SEL" "NSRect" }
-        [ 2drop view draw-world ]
+        [ 2drop window draw-world ]
     }
     
     { "mouseMoved:" "void" { "id" "SEL" "id" }
@@ -149,7 +150,7 @@ sequences ;
     }
 
     { "updateFactorGadgetSize:" "void" { "id" "SEL" "id" }
-        [ 2drop dup view-dim swap view set-gadget-dim ]
+        [ 2drop dup view-dim swap world set-gadget-dim ]
     }
     
     { "acceptsFirstResponder" "bool" { "id" "SEL" }
@@ -167,8 +168,8 @@ sequences ;
     { "dealloc" "void" { "id" "SEL" }
         [
             drop
-            dup view close-world
-            dup unregister-view
+            dup window close-world
+            dup unregister-window
             dup remove-observer
             SUPER-> [dealloc]
         ]
@@ -176,4 +177,4 @@ sequences ;
 } { } define-objc-class
 
 : <FactorView> ( world -- view )
-    FactorView over rect-dim <GLView> [ register-view ] keep ;
+    FactorView over rect-dim <GLView> [ register-window ] keep ;

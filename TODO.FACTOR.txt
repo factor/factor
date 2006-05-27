@@ -3,6 +3,7 @@
 + httpd:
   - outliners don't work
   - browser responder doesn't work
+- code walker & exceptions -- test and debug problems
 
 + refactor style stack code so that nested styles are handled at a lower-level
   - in HTML, we can nest div tags, etc
@@ -23,8 +24,6 @@
   - there was a performance hit, investigate
   - float boxing and overflow checks need a gc check too
 
-- code walker & exceptions -- test and debug problems
-- code walker and callbacks is broken?
 
 + io:
 
@@ -47,10 +46,13 @@
 
 + ui/help:
 
+- x11:
+  - x11 input methods
+  - x11 title bars are funny
+  - save window positions on x11
 - restore windows with the correct stacking order
 - if the listener is running a command when the image is saved, it
   restores to an unresponsive gadget
-- save window positions on x11
 - roundoff is still not quite right with tracks
 - clearing pane with ^L leaves scrollbar a pixel off
 - new browser:
@@ -66,8 +68,6 @@
   - only do clipping for certain gadgets
   - use glRect
 - reimplement tab completion
-- x11 input methods
-- x11 title bars are funny
 - cocoa:
   - horizontal scrolling
   - polish OS X menu bar code
@@ -106,3 +106,4 @@
 
 - slice: if sequence or seq start is changed, abstraction violation
 - make 3.4 bits>double an error
+- break: perhaps use current stdio to run break listener

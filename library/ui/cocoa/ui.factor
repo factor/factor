@@ -65,13 +65,6 @@ objc-NSOpenGLView objc-NSView ;
 : flush-gl-context ( handle -- )
     first [openGLContext] [flushBuffer] ;
 
-: restore-windows ( -- )
-    views get hash-values reset-views
-    [ dup reset-world open-window* ] each ;
-
-: restore-windows? ( -- ? )
-    views get [ hash-empty? not ] [ f ] if* ;
-
 IN: shells
 
 : ui
