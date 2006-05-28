@@ -137,6 +137,7 @@ IN: shells
             restore-windows? [
                 restore-windows
             ] [
+                reset-windows
                 launchpad-window
                 listener-window
             ] if

@@ -150,7 +150,7 @@ sequences ;
     }
 
     { "updateFactorGadgetSize:" "void" { "id" "SEL" "id" }
-        [ 2drop dup view-dim swap world set-gadget-dim ]
+        [ 2drop dup view-dim swap window set-gadget-dim ]
     }
     
     { "acceptsFirstResponder" "bool" { "id" "SEL" }

@@ -13,25 +13,17 @@ vectors words ;
 H{ } clone c-types set
 "/library/compiler/alien/primitive-types.factor" parse-resource
 
-! These symbols need the same hashcode in the target as in the
-! host. They must be symbols -- colon definitions are not
-! permitted to be carried over
-{
-    vocabularies typemap builtins c-types
-    crossref articles terms
-}
-
 ! Bring up a bare cross-compiling vocabulary.
 "syntax" vocab
 
 H{ } clone vocabularies set
-crossref off
 
-vocabularies get [ "syntax" set [ reveal ] each ] bind
+vocabularies get [ "syntax" set ] bind
 
 H{ } clone articles set
 H{ } clone terms set
 help-graph off
+crossref off
 
 ! Call the quotation parsed from primitive-types.factor
 call

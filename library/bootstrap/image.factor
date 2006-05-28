@@ -36,16 +36,16 @@ IN: image
 : tuple-type      17 ; inline
 : byte-array-type 18 ; inline
 
-: base 1024 ;
+: base 1024 ; inline
 
-: boot-quot-offset 3 ;
-: global-offset    4 ;
-: t-offset         5 ;
-: 0-offset         6 ;
-: 1-offset         7 ;
-: -1-offset        8 ;
-: heap-size-offset 9 ;
-: header-size      10 ;
+: boot-quot-offset 3 ; inline
+: global-offset    4 ; inline
+: t-offset         5 ; inline
+: 0-offset         6 ; inline
+: 1-offset         7 ; inline
+: -1-offset        8 ; inline
+: heap-size-offset 9 ; inline
+: header-size      10 ; inline
 
 ! The image being constructed; a vector of word-size integers
 SYMBOL: image
@@ -189,11 +189,9 @@ M: f ' ( obj -- ptr )
     #! This is a hack. See doc/bootstrap.txt.
     dup target-word [ ] [ "Missing DEFER: " word-error ] ?if ;
 
-: pooled-object ( object -- ptr ) objects get hash ;
-
 : fixup-word ( word -- offset )
-    transfer-word dup pooled-object dup
-    [ nip ] [ "Not in image: " word-error ] if ;
+    transfer-word dup objects get hash
+    [ ] [ "Not in image: " word-error ] ?if ;
 
 : fixup-words ( -- )
     image get [ dup word? [ fixup-word ] when ] inject ;
@@ -294,8 +292,7 @@ M: hashtable ' ( hashtable -- pointer )
         {
             vocabularies typemap builtins c-types crossref
             articles terms help-graph
-        }
-        [ [ ] change ] each
+        } [ dup get swap bootstrap-word set ] each
     ] make-hash '
     global-offset fixup ;
 

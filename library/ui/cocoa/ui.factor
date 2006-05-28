@@ -77,6 +77,7 @@ IN: shells
             restore-windows? [
                 restore-windows
             ] [
+                reset-windows
                 listener-window
             ] if
             finish-launching
