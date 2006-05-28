@@ -63,7 +63,8 @@ M: word summary ( word -- )
     ] if ;
 
 M: input summary ( input -- )
-    "Input: " swap input-string unparse-short append ;
+    "Input: " swap input-string
+    dup string? [ unparse-short ] unless append ;
 
 : format-column ( list ? -- list )
     >r [ unparse-short ] map r> [

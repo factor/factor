@@ -55,12 +55,24 @@ sequences ;
             frame-content-rect
         ]
     }
-        
+
     {
         "windowDidMove:" "void" { "id" "SEL" "id" } [
             2nip [object]
             dup window-content-rect NSRect-x-y 0 3array
             swap [contentView] window set-world-loc
+        ]
+    }
+
+    {
+        "windowDidBecomeKey:" "void" { "id" "SEL" "id" } [
+            2nip [object] [contentView] window focus-world
+        ]
+    }
+
+    {
+        "windowDidResignKey:" "void" { "id" "SEL" "id" } [
+            2nip [object] [contentView] window unfocus-world
         ]
     }
 } { } define-objc-class

@@ -105,6 +105,14 @@ V{ } clone hand-buttons set-global
 : request-focus ( gadget -- )
     dup focusable-child swap find-world request-focus* ;
 
+: focus-world ( world -- )
+    #! Sent when native window receives focus
+    focused-ancestors f focus-gestures ;
+
+: unfocus-world ( world -- )
+    #! Sent when native window loses focus.
+    focused-ancestors f swap focus-gestures ;
+
 : modifier ( mod modifiers -- seq )
     [ second swap bitand 0 > ] subset-with
     [ first ] map f like ;
