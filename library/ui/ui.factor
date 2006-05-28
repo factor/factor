@@ -1,20 +1,28 @@
 ! Copyright (C) 2006 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 IN: gadgets
-USING: gadgets gadgets-labels gadgets-layouts gadgets-theme
-gadgets-viewports hashtables kernel math namespaces queues
-sequences threads ;
+USING: arrays gadgets gadgets-labels gadgets-layouts
+gadgets-theme gadgets-viewports hashtables kernel math
+namespaces queues sequences threads ;
 
-! Hash mapping aliens to gadgets
+! Assoc mapping aliens to gadgets
 SYMBOL: windows
 
-: reset-windows ( hash -- hash ) H{ } clone windows set-global ;
+: reset-windows ( hash -- hash ) V{ } clone windows set-global ;
 
-: window ( handle -- world ) windows get hash ;
+: window ( handle -- world ) windows get-global assoc ;
 
-: register-window ( world handle -- ) windows get set-hash ;
+: register-window ( world handle -- )
+    swap 2array windows get-global push ;
 
-: unregister-window ( handle -- ) windows get remove-hash ;
+: unregister-window ( handle -- )
+    windows get-global
+    [ first = ] subset-with
+    windows set-global  ;
+
+: raised-window ( world -- )
+    windows get-global [ second eq? ] find-with drop
+    windows get-global [ length 1- ] keep exchange ;
 
 : layout-queued ( -- )
     invalid dup queue-empty? [
@@ -68,11 +76,12 @@ C: titled-gadget ( gadget title -- )
     <titled-gadget> open-window ;
 
 : restore-windows ( -- )
-    windows get hash-values reset-windows
+    windows get [ second ] map
+    reset-windows
     [ dup reset-world open-window* ] each ;
 
 : restore-windows? ( -- ? )
-    windows get [ hash-empty? not ] [ f ] if* ;
+    windows get [ empty? not ] [ f ] if* ;
 
 : (open-tool) ( arg cons setter -- )
     >r call tuck r> call open-window ; inline
@@ -96,6 +105,15 @@ C: titled-gadget ( gadget title -- )
 : close-global ( world global -- )
     dup get-global find-world rot eq?
     [ f swap set-global ] [ drop ] if ;
+
+: focus-world ( world -- )
+    #! Sent when native window receives focus
+    dup raised-window
+    focused-ancestors f focus-gestures ;
+
+: unfocus-world ( world -- )
+    #! Sent when native window loses focus.
+    focused-ancestors f swap focus-gestures ;
 
 : close-world ( world -- )
     dup hand-clicked close-global

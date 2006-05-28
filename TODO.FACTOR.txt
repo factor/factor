@@ -12,7 +12,6 @@
 - x11 title bars are funny
 - save window positions on x11
 - do top-level window focus on x11
-- restore windows with the correct stacking order
 - if the listener is running a command when the image is saved, it
   restores to an unresponsive gadget
 - track: don't allow negative dimensions
