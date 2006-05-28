@@ -18,10 +18,6 @@ IN: kernel-internals
         2drop f
     ] if ;
 
-: tuple-hashcode ( n tuple -- n )
-    dup class-tuple hashcode >r >r 1-
-    r> 4 slot hashcode* r> bitxor ;
-
 IN: generic
 
 : class ( object -- class )
@@ -84,14 +80,7 @@ PREDICATE: word tuple-class "tuple-size" word-prop ;
 M: tuple clone ( tuple -- tuple )
     (clone) dup delegate clone over set-delegate ;
 
-M: tuple hashcode* ( n tuple -- n )
-    {
-        { [ over 0 <= ] [ 2drop 0 ] }
-        { [ dup array-capacity 2 <= ] [ nip class hashcode ] }
-        { [ t ] [ tuple-hashcode ] }
-    } cond ;
-
-M: tuple hashcode ( tuple -- n ) 2 swap hashcode* ;
+M: tuple hashcode ( tuple -- n ) class hashcode ;
 
 M: tuple = ( obj tuple -- ? )
     2dup eq?

@@ -38,11 +38,11 @@ TUPLE: tombstone ;
     swap <hash-array> over set-hash-array init-hash ;
 
 : (new-key@) ( key keys i -- n )
-    3dup swap nth-unsafe dup tombstone? [
-        2drop 2nip
-    ] [
-        = [ 2nip ] [ probe (new-key@) ] if
-    ] if ; inline
+    3dup swap nth-unsafe {
+        { [ dup ((empty)) eq? ] [ 2drop 2nip ] }
+        { [ = ] [ 2nip ] }
+        { [ t ] [ probe (new-key@) ] }
+    } cond ; inline
 
 : new-key@ ( key hash -- n )
     hash-array 2dup hash@ (new-key@) ; inline
@@ -59,15 +59,8 @@ TUPLE: tombstone ;
 : hash-deleted+
     dup hash-deleted 1+ swap set-hash-deleted ; inline
 
-: hash-deleted-
-    dup hash-deleted 1- swap set-hash-deleted ; inline
-
 : change-size ( hash old -- )
-    dup ((tombstone)) eq? [
-        drop hash-deleted-
-    ] [
-        ((empty)) eq? [ hash-count+ ] [ drop ] if
-    ] if ; inline
+    ((empty)) eq? [ hash-count+ ] [ drop ] if ; inline
 
 : (set-hash) ( value key hash -- )
     2dup new-key@ swap

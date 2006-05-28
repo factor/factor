@@ -49,6 +49,14 @@ f 100000000000000000000000000 "testhash" get set-hash
 [ f ] [ 100000000000000000000000000 "testhash" get hash* drop ] unit-test
 [ { } ] [ { [ { } ] } clone "testhash" get hash* drop ] unit-test
 
+! Regression
+3 <hashtable> "broken-remove" set
+1 W{ \ + } dup "x" set "broken-remove" get set-hash
+2 W{ \ = } dup "y" set "broken-remove" get set-hash
+"x" get "broken-remove" get remove-hash
+2 "y" get "broken-remove" get set-hash
+[ 1 ] [ "broken-remove" get hash-keys length ] unit-test
+
 {
     { "salmon" "fish" }
     { "crocodile" "reptile" }

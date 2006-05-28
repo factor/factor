@@ -62,10 +62,6 @@ HELP: hash-deleted+ "( hash -- )"
 { $values { "hash" "a hashtable" } }
 { $description "Called to increment the deleted entry counter when an entry is removed with " { $link remove-hash } } ;
 
-HELP: hash-deleted- "( hash -- )"
-{ $values { "hash" "a hashtable" } }
-{ $description "Called to decrement the deleted entry counter when a deleted entry storing the " { $link ((tombstone)) } " sentinel is overwritten with a new entry." } ;
-
 HELP: change-size "( hash old -- )"
 { $values { "hash" "a hashtable" } { "old" "the key about to be overwritten" } }
 { $description "Called to update the hashtable counters when a new entry is added with " { $link set-hash } "." } ;
