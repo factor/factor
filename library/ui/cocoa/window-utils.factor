@@ -78,4 +78,4 @@ sequences ;
 } { } define-objc-class
 
 : install-window-delegate ( window -- )
-    FactorWindowDelegate [alloc] [init] [setDelegate:] ;
+    FactorWindowDelegate install-delegate ;

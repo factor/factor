@@ -50,6 +50,9 @@ threads ;
 
 : finish-launching ( -- ) NSApp [finishLaunching] ;
 
+: install-delegate ( receiver delegate -- )
+    [alloc] [init] [setDelegate:] ;
+
 IN: errors
 
 : objc-error. ( error -- )

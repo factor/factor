@@ -22,8 +22,7 @@ objc-NSObject objc-NSWindow sequences ;
 } { } define-objc-class
 
 : install-app-delegate ( -- )
-    NSApp
-    FactorApplicationDelegate [alloc] [init] [setDelegate:] ;
+    NSApp FactorApplicationDelegate install-delegate ;
 
 : init-cocoa-ui ( -- )
     reset-callbacks
