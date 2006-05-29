@@ -47,7 +47,7 @@
     (set-buffer (get-buffer-create "*factor-stack*"))
     (erase-buffer)
     (comint-redirect-send-command-to-process
-     ".s" "*factor-stack*" "*factor-0.81-tty*" nil)))
+     ".s" "*factor-stack*" "*factor-listener*" nil)))
 
 (defvar factor-update-stackp nil "*")
 
