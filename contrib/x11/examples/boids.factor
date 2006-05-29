@@ -5,7 +5,7 @@
 ! To run the program:
 !   USE: boids setup-window run-boids
 
-USING: namespaces math kernel sequences arrays x11 x ; IN: boids
+USING: threads namespaces math kernel sequences arrays x11 x ; IN: boids
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
@@ -263,7 +263,7 @@ SYMBOL: boids
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 : iterate-boids ( -- )
-  boids get [ iterate-boid ] map   boids set ;
+  boids get [ iterate-boid ] map boids set ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
@@ -271,7 +271,7 @@ SYMBOL: boids
   boids get [ draw-boid ] each flush-dpy ;
 
 : run-boids ( -- )
-  iterate-boids clear-window draw-boids run-boids ;
+  iterate-boids clear-window draw-boids 1 sleep run-boids ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 ! Comments from others:
