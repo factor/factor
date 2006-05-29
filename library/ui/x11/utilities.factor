@@ -26,7 +26,7 @@ SYMBOL: root
     
 : with-x ( display-string quot -- )
     [
-        reset-views
+        reset-windows
         swap initialize-x
         [ close-x ] cleanup
     ] with-scope ;
