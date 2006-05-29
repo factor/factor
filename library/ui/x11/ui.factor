@@ -17,8 +17,8 @@ M: world expose-event ( event world -- ) nip relayout ;
     0 3array ;
 
 : configured-dim ( event -- dim )
-    dup XConfigureEvent-width swap XConfigureEvent-height 0
-    3array ;
+    dup XConfigureEvent-width swap XConfigureEvent-height
+    0 3array ;
 
 M: world configure-event ( event world -- )
     over configured-loc over set-world-loc

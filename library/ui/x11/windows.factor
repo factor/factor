@@ -42,7 +42,7 @@ USING: alien gadgets hashtables kernel math namespaces sequences ;
     dpy get swap XDestroyWindow drop ;
 
 : destroy-window* ( win context -- )
-    destroy-context dup views get remove-hash destroy-window ;
+    destroy-context dup unregister-window destroy-window ;
 
 : set-closable ( win -- )
     dpy get swap "WM_DELETE_WINDOW" x-atom <Atom> 1
@@ -53,6 +53,6 @@ USING: alien gadgets hashtables kernel math namespaces sequences ;
 : map-window* ( world win -- ) dup set-closable map-window ;
 
 : glx-window* ( world dim -- win context )
-    glx-window >r [ views get set-hash ] keep r> ;
+    glx-window >r [ register-window ] keep r> ;
 
 : unmap-window ( win -- ) dpy get swap XUnmapWindow drop ;
