@@ -216,3 +216,6 @@ H{
     dupd define-objc-class-word
     dup objc-class register-objc-methods
     objc-meta-class register-objc-methods ;
+
+: root-class ( class -- class )
+    dup objc-class-super-class [ root-class ] [ ] ?if ;
