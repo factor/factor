@@ -119,7 +119,10 @@ M: world client-event ( event world -- )
     ] if ;
 
 : gadget-window ( world -- )
-    [ dup rect-dim glx-window* 2array ] keep set-world-handle ;
+    [
+        dup world-loc over rect-dim glx-window >r
+        [ register-window ] keep r> 2array
+    ] keep set-world-handle ;
 
 IN: gadgets
 

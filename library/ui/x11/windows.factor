@@ -28,15 +28,16 @@ USING: alien gadgets hashtables kernel math namespaces sequences ;
     [ >r create-colormap r> set-XSetWindowAttributes-colormap ] keep
     event-mask over set-XSetWindowAttributes-event_mask ;
 
-: create-window ( w h visinfo -- window )
-    >r >r >r dpy get root get 0 0 r> r> 0 r>
+: create-window ( loc dim visinfo -- window )
+    >r >r >r dpy get root get r> first2 r> first2 0 r>
     [ XVisualInfo-depth InputOutput ] keep
     [ XVisualInfo-visual create-window-mask ] keep
     window-attributes XCreateWindow ;
     
-: glx-window ( dim -- window context )
-    first2 choose-visual
-    [ [ create-window ] keep create-context ] keep XFree ;
+: glx-window ( loc dim -- window context )
+    choose-visual
+    [ create-window ] keep [ create-context ] keep
+    XFree ;
 
 : destroy-window ( win -- )
     dpy get swap XDestroyWindow drop ;
@@ -51,8 +52,5 @@ USING: alien gadgets hashtables kernel math namespaces sequences ;
 : map-window ( win -- ) dpy get swap XMapWindow drop ;
 
 : map-window* ( world win -- ) dup set-closable map-window ;
-
-: glx-window* ( world dim -- win context )
-    glx-window >r [ register-window ] keep r> ;
 
 : unmap-window ( win -- ) dpy get swap XUnmapWindow drop ;
