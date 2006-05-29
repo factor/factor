@@ -21,4 +21,4 @@ USING: compiler io parser sequences words ;
 ] each
 
 "Compiling Cocoa bindings..." print
-{ "cocoa" "objc" "objc-classes" } compile-vocabs
+{ "cocoa" "objc" "objc-classes" "gadgets" } compile-vocabs

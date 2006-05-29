@@ -1,6 +1,6 @@
 IN: objc
-USING: alien arrays errors hashtables inference kernel math
-namespaces parser sequences strings words ;
+USING: alien arrays compiler errors generic hashtables inference
+kernel math namespaces parser sequences strings words ;
 
 : make-alien-invoke [ ] make \ alien-invoke add ; inline
 
@@ -46,8 +46,8 @@ H{ } clone super-msg-senders set-global
     ] keep
     [ set-objc-super-receiver ] keep ;
 
-: make-stret-quot ( returns -- quot )
-    [ <c-object> dup ] curry 1 make-dip ;
+: make-stret-quot ( method -- quot )
+    first [ <c-object> dup ] curry 1 make-dip ;
 
 TUPLE: selector name object ;
 
@@ -94,15 +94,18 @@ H{ } clone objc-methods set-global
 : compile-send-error
     "Objective C message sends must be compiled" throw ;
 
-: send ( ... selector -- ... ) compile-send-error ;
+: (send) ( ... selector super? -- ... )
+    make-objc-send dup peek compile call ;
 
-\ send [ f infer-send ] "infer" set-word-prop
+\ (send) [ pop-literal nip infer-send ] "infer" set-word-prop
+
+\ (send) [ [ object object ] [ ] ] "infer-effect" set-word-prop
+
+: send ( ... selector -- ... ) f (send) ; inline
 
 : -> scan parsed \ send parsed ; parsing
 
-: super-send ( ... selector -- ... ) compile-send-error ;
-
-\ super-send [ t infer-send ] "infer" set-word-prop
+: super-send ( ... selector -- ... ) t (send) ; inline
 
 : SUPER-> scan parsed \ super-send parsed ; parsing
 
