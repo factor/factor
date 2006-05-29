@@ -96,13 +96,13 @@ H{ } clone objc-methods set-global
 
 : send ( ... selector -- ... ) compile-send-error ;
 
-\ send [ f infer-send ] "infer-quot" set-word-prop
+\ send [ f infer-send ] "infer" set-word-prop
 
 : -> scan parsed \ send parsed ; parsing
 
 : super-send ( ... selector -- ... ) compile-send-error ;
 
-\ super-send [ t infer-send ] "infer-quot" set-word-prop
+\ super-send [ t infer-send ] "infer" set-word-prop
 
 : SUPER-> scan parsed \ super-send parsed ; parsing
 

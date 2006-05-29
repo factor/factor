@@ -1,7 +1,7 @@
 ! Copyright (C) 2006 Slava Pestov
 ! See http://factorcode.org/license.txt for BSD license.
 IN: cocoa
-USING: kernel objc-classes sequences ;
+USING: kernel objc objc-classes sequences ;
 
 : <NSOpenPanel> ( -- panel )
     NSOpenPanel -> openPanel

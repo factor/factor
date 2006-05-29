@@ -1,7 +1,7 @@
 ! Copyright (C) 2006 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 IN: cocoa
-USING: arrays kernel objc-classes sequences ;
+USING: arrays kernel objc objc-classes sequences ;
 
 : NSStringPboardType "NSStringPboardType" ;
 
