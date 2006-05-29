@@ -6,7 +6,7 @@ namespaces prettyprint sequences strings threads ;
 
 GENERIC: expose-event ( event window -- )
 
-GENERIC: resize-event ( event window -- )
+GENERIC: configure-event ( event window -- )
 
 GENERIC: button-down-event ( event window -- )
 
@@ -19,6 +19,10 @@ GENERIC: motion-event ( event window -- )
 GENERIC: key-down-event ( event window -- )
 
 GENERIC: key-up-event ( event window -- )
+
+GENERIC: focus-in-event ( event window -- )
+
+GENERIC: focus-out-event ( event window -- )
 
 GENERIC: client-event ( event window -- )
 
@@ -45,12 +49,14 @@ GENERIC: client-event ( event window -- )
 : handle-event ( event window -- )
     over XAnyEvent-type {
         { [ dup Expose = ] [ drop expose-event ] }
-        { [ dup ConfigureNotify = ] [ drop resize-event ] }
+        { [ dup ConfigureNotify = ] [ drop configure-event ] }
         { [ dup ButtonPress = ] [ drop button-down-event$ ] }
         { [ dup ButtonRelease = ] [ drop button-up-event$ ] }
         { [ dup MotionNotify = ] [ drop motion-event ] }
         { [ dup KeyPress = ] [ drop key-down-event ] }
         { [ dup KeyRelease = ] [ drop key-up-event ] }
+        { [ dup FocusIn = ] [ drop focus-in-event ] }
+        { [ dup FocusOut = ] [ drop focus-out-event ] }
         { [ dup ClientMessage = ] [ drop client-event ] }
         { [ t ] [ 3drop ] }
     } cond ;

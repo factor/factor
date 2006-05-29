@@ -10,8 +10,7 @@
 - code walker & exceptions -- test and debug problems
 - another i/o bug: on factorcode eventually all i/o times out
 - x11 title bars are funny
-- save window positions on x11
-- do top-level window focus on x11
+- quit fep
 - if the listener is running a command when the image is saved, it
   restores to an unresponsive gadget
 - track: don't allow negative dimensions

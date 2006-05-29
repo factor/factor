@@ -12,11 +12,17 @@ strings x11 ;
 
 M: world expose-event ( event world -- ) nip relayout ;
 
-M: world resize-event ( event world -- )
-    >r
+: configured-loc ( event -- dim )
+    dup XConfigureEvent-x swap XConfigureEvent-y
+    0 3array ;
+
+: configured-dim ( event -- dim )
     dup XConfigureEvent-width swap XConfigureEvent-height 0
-    3array
-    r> set-gadget-dim ;
+    3array ;
+
+M: world configure-event ( event world -- )
+    over configured-loc over set-world-loc
+    swap configured-dim swap set-gadget-dim ;
 
 : button&loc ( event -- button# loc )
     dup XButtonEvent-button
@@ -93,6 +99,10 @@ M: world key-up-event ( event world -- )
     ] [
         2drop
     ] if* ;
+
+M: world focus-in-event ( event world -- ) nip focus-world ;
+
+M: world focus-out-event ( event world -- ) nip unfocus-world ;
 
 : close-box? ( event -- ? )
     dup XClientMessageEvent-message_type "WM_PROTOCOLS" x-atom =

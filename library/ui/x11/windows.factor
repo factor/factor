@@ -18,7 +18,8 @@ USING: alien gadgets hashtables kernel math namespaces sequences ;
     KeyReleaseMask bitor
     ButtonPressMask	bitor
     ButtonReleaseMask bitor
-    PointerMotionMask bitor ;
+    PointerMotionMask bitor
+    FocusChangeMask bitor ;
 
 : window-attributes ( visinfo -- attributes )
     "XSetWindowAttributes" <c-object>
