@@ -106,7 +106,7 @@ call
     { "fsin" "math-internals"               }
     { "fsinh" "math-internals"              }
     { "fsqrt" "math-internals"              }
-    { "<word>" "words"                      }
+    { "(word)" "kernel-internals"           }
     { "update-xt" "words"                   }
     { "compiled?" "words"                   }
     { "drop" "kernel"                       }

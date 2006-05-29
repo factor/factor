@@ -34,7 +34,6 @@ namespaces optimizer prettyprint sequences test words ;
 : recompile ( word -- ) dup update-xt compile ;
 
 : compile-quot ( quot -- word )
-    gensym [ swap define-compound ] keep
-    "compile" get [ dup compile ] when ;
+    define-temp "compile" get [ dup compile ] when ;
 
 : compile-1 ( quot -- ) compile-quot execute ;

@@ -91,9 +91,13 @@ M: word unxref-word* drop ;
 : reset-generic ( word -- )
     dup reset-word { "methods" "combination" } reset-props ;
 
+: <word> ( name vocab -- word ) (word) dup init-word ;
+
 : gensym ( -- word )
-    [ "G:" % \ gensym counter # ] "" make
-    f <word> dup init-word ;
+    [ "G:" % \ gensym counter # ] "" make f <word> ;
+
+: define-temp ( quot -- word )
+    gensym [ swap define-compound ] keep ;
 
 : completions ( substring words -- seq )
     [ word-name subseq? ] subset-with ;
@@ -138,7 +142,7 @@ SYMBOL: vocabularies
 
 : create ( name vocab -- word )
     2dup check-create 2dup lookup dup
-    [ 2nip ] [ drop <word> dup init-word dup reveal ] if ;
+    [ 2nip ] [ drop <word> dup reveal ] if ;
 
 : constructor-word ( string vocab -- word )
     >r "<" swap ">" append3 r> create ;
