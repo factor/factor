@@ -1,9 +1,11 @@
-IN: objc-FactorServiceProvider
+! Copyright (C) 2006 Slava Pestov
+! See http://factorcode.org/license.txt for BSD license.
+IN: objc-classes
 DEFER: FactorServiceProvider
 
 IN: cocoa
 USING: alien gadgets-presentations io kernel namespaces objc
-objc-NSApplication objc-NSObject parser prettyprint styles ;
+parser prettyprint styles ;
 
 : pasteboard-error ( error str -- f )
     "Pasteboard does not hold a string" <NSString>
@@ -36,5 +38,5 @@ objc-NSApplication objc-NSObject parser prettyprint styles ;
 
 : register-services ( -- )
     NSApp
-    FactorServiceProvider [alloc] [init]
-    [setServicesProvider:] ;
+    FactorServiceProvider -> alloc -> init
+    -> setServicesProvider: ;

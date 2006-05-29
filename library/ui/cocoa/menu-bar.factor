@@ -2,9 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: cocoa compiler gadgets gadgets-browser gadgets-launchpad
 gadgets-layouts gadgets-listener kernel memory objc
-objc-FactorCallback objc-NSApplication objc-NSMenu
-objc-NSMenuItem objc-NSObject objc-NSWindow sequences strings
-words ;
+objc-classes sequences strings words ;
 IN: cocoa
 
 ! -------------------------------------------------------------------------
@@ -18,36 +16,36 @@ M: quotation to-target-and-action
     <FactorCallback> "perform:" sel_registerName swap ;
 
 : <NSMenu> ( title -- )
-    NSMenu [alloc]
-    swap <NSString> [initWithTitle:]
-    [autorelease] ;
+    NSMenu -> alloc
+    swap <NSString> -> initWithTitle:
+    -> autorelease ;
 
-: set-main-menu ( menu -- ) NSApp swap [setMainMenu:] ;
+: set-main-menu ( menu -- ) NSApp swap -> setMainMenu: ;
 
 : <NSMenuItem> ( title action equivalent -- item )
     >r >r >r
-    NSMenuItem [alloc]
+    NSMenuItem -> alloc
     r> <NSString>
     r> dup [ sel_registerName ] when
     r> <NSString>
-    [initWithTitle:action:keyEquivalent:] [autorelease] ;
+    -> initWithTitle:action:keyEquivalent: -> autorelease ;
 
 : make-menu-item ( title spec -- item )
     to-target-and-action >r swap <NSMenuItem> dup
-    r> [setTarget:] ;
+    r> -> setTarget: ;
 
 : submenu-to-item ( menu -- item )
-    dup [title] CF>string f "" <NSMenuItem> dup
-    rot [setSubmenu:] ;
+    dup -> title CF>string f "" <NSMenuItem> dup
+    rot -> setSubmenu: ;
 
 : add-submenu ( menu submenu -- )
-    submenu-to-item [addItem:] ;
+    submenu-to-item -> addItem: ;
 
 : and-modifiers ( item key-equivalent-modifier-mask -- item )
-    dupd [setKeyEquivalentModifierMask:] ;
+    dupd -> setKeyEquivalentModifierMask: ;
 
 : and-alternate ( item -- item )
-    dup 1 [setAlternate:] ;
+    dup 1 -> setAlternate: ;
 
 : and-option-equivalent-modifier 1572864 and-modifiers ;
 
@@ -66,7 +64,7 @@ DEFER: described-menu
 ! this is a mess
 : described-item ( desc -- menu-item )
     dup length 0 = [
-        drop NSMenuItem [separatorItem]
+        drop NSMenuItem -> separatorItem
     ] [
         dup first string? [
             [ first3 swap make-menu-item ] keep
@@ -79,7 +77,7 @@ DEFER: described-menu
     ] if ;
 
 : and-described-item ( menu desc -- same-menu )
-    described-item dupd [addItem:] ;
+    described-item dupd -> addItem: ;
 
 : described-menu ( { title items* } -- menu )
     [ first <NSMenu> ] keep
@@ -102,14 +100,14 @@ DEFER: described-menu
             ! Preferences goes here
             { {
                 "Services"
-            } [ NSApp over [setServicesMenu:] ] }
+            } [ NSApp over -> setServicesMenu: ] }
             { }
             { "Hide Factor" "hide:" "h" }
             { "Hide Others" "hideOtherApplications:" "h" [ and-option-equivalent-modifier ] }
             { "Show All" "unhideAllApplications:" "" }
             { }
             { "Quit" "terminate:" "q" }
-        } [ NSApp over [setAppleMenu:] ] }
+        } [ NSApp over -> setAppleMenu: ] }
         { {
             "File"
             { "New Listener" listener-window "n" }
@@ -143,7 +141,7 @@ DEFER: described-menu
             { "Minimize All" "miniaturizeAll:" "m"  [ and-alternate and-option-equivalent-modifier ] }
             { }
             { "Bring All to Front" "arrangeInFront:" "" }
-        } [ NSApp over [setWindowsMenu:] ] }
+        } [ NSApp over -> setWindowsMenu: ] }
         { {
             "Help"
             { "Factor Documentation" handbook-window "?" }

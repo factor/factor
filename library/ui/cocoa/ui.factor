@@ -1,18 +1,16 @@
 ! Copyright (C) 2006 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-IN: objc-FactorApplicationDelegate
-
+IN: objc-classes
 DEFER: FactorApplicationDelegate
 
 IN: cocoa
 USING: arrays gadgets gadgets-layouts gadgets-listener
-hashtables kernel namespaces objc objc-NSApplication
-objc-NSObject objc-NSWindow sequences ;
+hashtables kernel namespaces objc sequences errors freetype ;
 
 : finder-run-files ( alien -- )
     CF>string-array listener-run-files
     NSApp NSApplicationDelegateReplySuccess
-    [replyToOpenOrPrint:] ;
+    -> replyToOpenOrPrint: ;
 
 ! Handle Open events from the Finder
 "NSObject" "FactorApplicationDelegate" {
@@ -39,30 +37,28 @@ objc-NSObject objc-NSWindow sequences ;
         dup <FactorView>
         dup rot rect>NSRect <ViewWindow>
         dup install-window-delegate
-        over [release]
+        over -> release
         2array
     ] keep set-world-handle ;
 
 IN: gadgets
-USING: errors freetype objc-NSOpenGLContext
-objc-NSOpenGLView objc-NSView ;
 
 : redraw-world ( world -- )
-    world-handle first 1 [setNeedsDisplay:] ;
+    world-handle first 1 -> setNeedsDisplay: ;
 
 : set-title ( string world -- )
-    world-handle second swap <NSString> [setTitle:] ;
+    world-handle second swap <NSString> -> setTitle: ;
 
 : open-window* ( world -- )
     dup gadget-window
     dup start-world
-    world-handle second f [makeKeyAndOrderFront:] ;
+    world-handle second f -> makeKeyAndOrderFront: ;
 
 : select-gl-context ( handle -- )
-    first [openGLContext] [makeCurrentContext] ;
+    first -> openGLContext -> makeCurrentContext ;
 
 : flush-gl-context ( handle -- )
-    first [openGLContext] [flushBuffer] ;
+    first -> openGLContext -> flushBuffer ;
 
 IN: shells
 

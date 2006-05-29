@@ -1,35 +1,33 @@
 ! Copyright (C) 2006 Slava Pestov
 ! See http://factorcode.org/license.txt for BSD license.
-IN: objc-FactorView
+IN: objc-classes
 DEFER: FactorView
 
 IN: cocoa
 USING: arrays gadgets gadgets-layouts hashtables kernel math
-namespaces objc objc-NSEvent objc-NSObject
-objc-NSOpenGLContext objc-NSOpenGLView objc-NSView opengl
-sequences ;
+namespaces objc opengl sequences ;
 
 : <GLView> ( class dim -- view )
-    >r [alloc] 0 0 r> first2 <NSRect>
-    NSOpenGLView [defaultPixelFormat]
-    [initWithFrame:pixelFormat:]
-    dup 1 [setPostsBoundsChangedNotifications:]
-    dup 1 [setPostsFrameChangedNotifications:] ;
+    >r -> alloc 0 0 r> first2 <NSRect>
+    NSOpenGLView -> defaultPixelFormat
+    -> initWithFrame:pixelFormat:
+    dup 1 -> setPostsBoundsChangedNotifications:
+    dup 1 -> setPostsFrameChangedNotifications: ;
 
-: view-dim [bounds] dup NSRect-w swap NSRect-h 0 3array ;
+: view-dim -> bounds dup NSRect-w swap NSRect-h 0 3array ;
 
 : mouse-location ( view event -- loc )
     over >r
-    [locationInWindow] f [convertPoint:fromView:]
+    -> locationInWindow f -> convertPoint:fromView:
     dup NSPoint-x swap NSPoint-y
-    r> [frame] NSRect-h swap - 0 3array ;
+    r> -> frame NSRect-h swap - 0 3array ;
 
 : send-mouse-moved ( view event -- )
     over >r mouse-location r> window move-hand ;
 
 : button ( event -- n )
     #! Cocoa -> Factor UI button mapping
-    [buttonNumber] H{ { 0 1 } { 2 2 } { 1 3 } } hash ;
+    -> buttonNumber H{ { 0 1 } { 2 2 } { 1 3 } } hash ;
 
 : button&loc ( view event -- button# loc )
     dup button -rot mouse-location ;
@@ -57,18 +55,18 @@ sequences ;
     } ;
 
 : key-code ( event -- string )
-    dup [keyCode] key-codes hash
-    [ ] [ [charactersIgnoringModifiers] CF>string ] ?if ;
+    dup -> keyCode key-codes hash
+    [ ] [ -> charactersIgnoringModifiers CF>string ] ?if ;
 
 : event>gesture ( event -- modifiers keycode )
-    dup [modifierFlags] modifiers modifier swap key-code ;
+    dup -> modifierFlags modifiers modifier swap key-code ;
 
 : send-key-event ( view event quot -- )
     >r event>gesture r> call swap window world-focus
     handle-gesture ; inline
 
 : send-user-input ( view event -- )
-    [characters] CF>string swap window world-focus user-input ;
+    -> characters CF>string swap window world-focus user-input ;
 
 : send-key-down-event ( view event -- )
     2dup [ <key-down> ] send-key-event
@@ -84,7 +82,7 @@ sequences ;
     over >r button&loc r> window send-button-up ;
 
 : send-wheel$ ( view event -- )
-    [ [deltaY] 0 > ] 2keep mouse-location
+    [ -> deltaY 0 > ] 2keep mouse-location
     rot window send-wheel ;
 
 : add-resize-observer ( observer object -- )
@@ -160,7 +158,7 @@ sequences ;
     { "initWithFrame:pixelFormat:" "id" { "id" "SEL" "NSRect" "id" }
         [
             rot drop
-            SUPER-> [initWithFrame:pixelFormat:]
+            SUPER-> initWithFrame:pixelFormat:
             dup dup add-resize-observer
         ]
     }
@@ -171,7 +169,7 @@ sequences ;
             dup window close-world
             dup unregister-window
             dup remove-observer
-            SUPER-> [dealloc]
+            SUPER-> dealloc
         ]
     }
 } { } define-objc-class

@@ -1,11 +1,10 @@
 ! Copyright (C) 2006 Slava Pestov
 ! See http://factorcode.org/license.txt for BSD license.
-IN: objc-FactorWindowDelegate
+IN: objc-classes
 DEFER: FactorWindowDelegate
 
 IN: cocoa
 USING: arrays gadgets gadgets-layouts kernel math objc
-objc-NSNotification objc-NSObject objc-NSView objc-NSWindow
 sequences ;
 
 : NSBorderlessWindowMask     0 ; inline
@@ -25,24 +24,24 @@ sequences ;
     NSResizableWindowMask bitor ; inline
 
 : <NSWindow> ( rect -- window )
-    NSWindow [alloc] swap
+    NSWindow -> alloc swap
     standard-window-type NSBackingStoreBuffered 1
-    [initWithContentRect:styleMask:backing:defer:] ;
+    -> initWithContentRect:styleMask:backing:defer: ;
 
 : <ViewWindow> ( view bounds -- window )
-    <NSWindow> [ swap [setContentView:] ] keep
-    dup dup [contentView] [setInitialFirstResponder:]
-    dup 1 [setAcceptsMouseMovedEvents:] ;
+    <NSWindow> [ swap -> setContentView: ] keep
+    dup dup -> contentView -> setInitialFirstResponder:
+    dup 1 -> setAcceptsMouseMovedEvents: ;
 
-: window-pref-dim [contentView] window pref-dim ;
+: window-pref-dim -> contentView window pref-dim ;
 
 : frame-content-rect ( window rect -- rect )
-    swap [styleMask] NSWindow -rot
-    [frameRectForContentRect:styleMask:] ;
+    swap -> styleMask NSWindow -rot
+    -> frameRectForContentRect:styleMask: ;
 
 : window-content-rect ( window -- rect )
-    NSWindow over [frame] rot [styleMask]
-    [contentRectForFrameRect:styleMask:] ;
+    NSWindow over -> frame rot -> styleMask
+    -> contentRectForFrameRect:styleMask: ;
 
 "NSObject" "FactorWindowDelegate" {
     {
@@ -58,21 +57,21 @@ sequences ;
 
     {
         "windowDidMove:" "void" { "id" "SEL" "id" } [
-            2nip [object]
+            2nip -> object
             dup window-content-rect NSRect-x-y 0 3array
-            swap [contentView] window set-world-loc
+            swap -> contentView window set-world-loc
         ]
     }
 
     {
         "windowDidBecomeKey:" "void" { "id" "SEL" "id" } [
-            2nip [object] [contentView] window focus-world
+            2nip -> object -> contentView window focus-world
         ]
     }
 
     {
         "windowDidResignKey:" "void" { "id" "SEL" "id" } [
-            2nip [object] [contentView] window unfocus-world
+            2nip -> object -> contentView window unfocus-world
         ]
     }
 } { } define-objc-class
