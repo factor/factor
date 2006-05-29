@@ -17,7 +17,7 @@ SYMBOL: windows
 
 : unregister-window ( handle -- )
     windows get-global
-    [ first = ] subset-with
+    [ first = not ] subset-with
     windows set-global  ;
 
 : raised-window ( world -- )
