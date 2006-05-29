@@ -5,6 +5,7 @@
 ]
 
 - x11: rollover highlight is not reliable
+- x11: window positioning not reliable
 + httpd:
   - outliners don't work
   - browser responder doesn't work

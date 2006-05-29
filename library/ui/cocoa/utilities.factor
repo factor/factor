@@ -27,10 +27,10 @@ H{ } clone super-msg-senders set-global
 
 : (cache-stub) ( method function hash -- word )
     [
-        over second get dup [
+        over get dup [
             2nip
         ] [
-            drop over >r sender-stub dup r> second set
+            drop over >r sender-stub dup r> set
         ] if
     ] bind ;
 
