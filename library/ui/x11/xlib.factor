@@ -948,7 +948,11 @@ BEGIN-STRUCT: XClientMessageEvent
 	FIELD: Window window
 	FIELD: Atom message_type
 	FIELD: int format
-    FIELD: long data
+	FIELD: long data0
+	FIELD: long data1
+	FIELD: long data2
+	FIELD: long data3
+	FIELD: long data4
 !       union {
 ! 		char  b[20];
 ! 		short s[10];
@@ -1106,11 +1110,11 @@ FUNCTION: Status XGetTransientForHint ( Display* display, Window w, Window* prop
 
 ! 14.1.1.  Manipulating Top-Level Windows
 
-FUNCTION: Status XIconifyWindow(
-	Display* display , Window w , int screen_number ) ;
+FUNCTION: Status XIconifyWindow (
+	Display* display, Window w, int screen_number ) ;
 
-FUNCTION: Status XWithdrawWindow(
-	Display* display , Window w , int screen_number ) ;
+FUNCTION: Status XWithdrawWindow (
+	Display* display, Window w, int screen_number ) ;
 
 ! 14.1.6 - Setting and Reading the WM_HINTS Property
 
