@@ -1100,8 +1100,6 @@ FUNCTION: Status XWarpPointer ( Display* display, Window src_w, Window dest_w, i
 
 ! 14.1 Client to Window Manager Communication
 
-FUNCTION: Status XSetWMProtocols ( Display* display, Window w, Atom* protocols, int count ) ;
-
 FUNCTION: Status XFetchName ( Display* display, Window w, char** window_name_return ) ;
 FUNCTION: Status XGetTransientForHint ( Display* display, Window w, Window* prop_window_return ) ;
 
@@ -1142,6 +1140,10 @@ BEGIN-STRUCT: XSizeHints
     FIELD: int base_height
     FIELD: int win_gravity;
 END-STRUCT
+
+! 14.1.10.  Setting and Reading the WM_PROTOCOLS Property
+
+FUNCTION: Status XSetWMProtocols ( Display* display, Window w, Atom* protocols, int count ) ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 ! 16 - Application Utility Functions
