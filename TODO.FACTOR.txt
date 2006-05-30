@@ -11,10 +11,10 @@
   - browser responder doesn't work
 - code walker & exceptions -- test and debug problems
 - another i/o bug: on factorcode eventually all i/o times out
+  - bug in pound?
 - x11 title bars are funny
 - if the listener is running a command when the image is saved, it
   restores to an unresponsive gadget
-- track: don't allow negative dimensions
 - fix top level window positioning
 - services do not launch if factor not running
 - when scrolling wheel, or moving mouse out of window, rollover is not

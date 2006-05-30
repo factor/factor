@@ -88,7 +88,7 @@ DEFER: show-vocab
     browser-vocab-track showing-asset? ;
 
 : show-vocab ( vocab browser -- )
-    browser-vocab-track show-asset ;
+    over [ browser-vocab-track show-asset ] [ 2drop ] if ;
 
 : hide-vocab-words ( vocab browser -- )
     [

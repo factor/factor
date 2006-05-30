@@ -49,21 +49,43 @@ M: track pref-dim* ( track -- dim )
     drag-loc over track-dim { 1 1 1 } vmax v/
     swap gadget-orientation v. ;
 
-: +nth ( delta n seq -- ) swap [ + ] change-nth ;
-
 : save-sizes ( track -- )
     dup track-sizes clone swap set-track-saved-sizes ;
 
 : restore-sizes ( track -- )
     dup track-saved-sizes clone swap set-track-sizes ;
 
+: set-nth-0 ( n seq -- old ) 2dup nth >r 0 -rot set-nth r> ;
+
+: +nth ( delta n seq -- ) swap [ + ] change-nth ;
+
+: clamp-nth ( i j sizes -- ) [ set-nth-0 swap ] keep +nth ;
+
+: clamp-up? ( delta n sizes -- ? ) nth + 0 < ;
+
+: clamp-down? ( delta n sizes -- ? ) >r 1+ r> nth swap - 0 < ;
+
+: change-last-size ( delta n sizes -- )
+    #! Its a bit simpler to resize the last divider since we
+    #! don't have to adjust the next one.
+    3dup clamp-up? [ set-nth-0 2drop ] [ +nth ] if ;
+
+: change-inner-size ( delta n sizes -- )
+    #! When changing a divider which isn't the last, we have to
+    #! resize the next area, too.
+    {
+        { [ 3dup clamp-up? ] [ >r dup 1+ swap r> clamp-nth drop ] }
+        { [ 3dup clamp-down? ] [ >r dup 1+ r> clamp-nth drop ] }
+        { [ t ] [ pick neg pick 1+ pick +nth +nth ] }
+    } cond ;
+
+: change-size ( delta n sizes -- )
+    over 1+ over length =
+    [ change-last-size ] [ change-inner-size ] if ;
+
 : change-divider ( delta n track -- )
-    [
-        dup restore-sizes
-        track-sizes
-        [ +nth ] 3keep
-        >r 1+ >r neg r> r> 2dup length = [ 3drop ] [ +nth ] if
-    ] keep relayout-1 ;
+    [ dup restore-sizes track-sizes change-size ] keep
+    relayout-1 ;
 
 : divider-motion ( divider -- )
     dup gadget-parent divider-delta

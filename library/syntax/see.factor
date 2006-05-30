@@ -16,7 +16,9 @@ sequences strings styles words ;
     } [ declaration. ] each-with ;
 
 : in. ( word -- )
-    <block \ IN: pprint-word word-vocabulary text block; ;
+    word-vocabulary [
+        <block \ IN: pprint-word text block;
+    ] when* ;
 
 : (synopsis) ( word -- )
     dup in. dup definer pprint-word pprint-word ;
