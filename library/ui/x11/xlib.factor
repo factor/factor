@@ -186,8 +186,10 @@ FUNCTION: Status XLowerWindow ( Display* display, Window w ) ;
 
 ! 3.9 - Changing Window Attributes
 
-FUNCTION: Status XChangeWindowAttributes ( Display* display, Window w, ulong valuemask, XSetWindowAttributes* attr ) ;
-FUNCTION: Status XSetWindowBackground ( Display* display, Window w, ulong background_pixel ) ;
+FUNCTION: Status XChangeWindowAttributes (
+  Display* display, Window w, ulong valuemask, XSetWindowAttributes* attr ) ;
+FUNCTION: Status XSetWindowBackground (
+  Display* display, Window w, ulong background_pixel ) ;
 FUNCTION: Status XDefineCursor ( Display* display, Window w, Cursor cursor ) ;
 FUNCTION: Status XUndefineCursor ( Display* display, Window w ) ;
 
