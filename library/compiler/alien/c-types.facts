@@ -36,7 +36,7 @@ HELP: <c-array> "( n type -- array )"
 { $errors "Throws an error if the type does not exist or the requested size is negative." } 
 { $see-also <malloc-array> } ;
 
-HELP: <c-object> "( n type -- array )"
+HELP: <c-object> "( type -- array )"
 { $values { "type" "a string" } { "array" "a byte array" } }
 { $description "Creates a byte array suitable for holding a value with the given C type." }
 { $errors "Throws an error if the type does not exist." }
