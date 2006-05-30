@@ -45,6 +45,7 @@ TYPEDEF: ulong VisualID
 TYPEDEF: ulong Time
 
 TYPEDEF: void* Window**
+TYPEDEF: void* Atom**
 
 : <ulong> <uint> ;
 : <XID> <ulong> ;
@@ -1103,6 +1104,14 @@ FUNCTION: Status XWarpPointer ( Display* display, Window src_w, Window dest_w, i
 FUNCTION: Status XFetchName ( Display* display, Window w, char** window_name_return ) ;
 FUNCTION: Status XGetTransientForHint ( Display* display, Window w, Window* prop_window_return ) ;
 
+! 14.1.1.  Manipulating Top-Level Windows
+
+FUNCTION: Status XIconifyWindow(
+	Display* display , Window w , int screen_number ) ;
+
+FUNCTION: Status XWithdrawWindow(
+	Display* display , Window w , int screen_number ) ;
+
 ! 14.1.6 - Setting and Reading the WM_HINTS Property
 
 ! 17.1.7 - Setting and Reading the WM_NORMAL_HINTS Property
@@ -1143,7 +1152,8 @@ END-STRUCT
 
 ! 14.1.10.  Setting and Reading the WM_PROTOCOLS Property
 
-FUNCTION: Status XSetWMProtocols ( Display* display, Window w, Atom* protocols, int count ) ;
+FUNCTION: Status XSetWMProtocols (
+	Display* display, Window w, Atom* protocols, int count ) ;
 
 FUNCTION: Status XGetWMProtocols (
 	Display* display,
