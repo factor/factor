@@ -91,9 +91,6 @@ H{ } clone objc-methods set-global
 : infer-send ( super? -- )
     pop-literal rot make-objc-send infer-quot-value ;
 
-: compile-send-error
-    "Objective C message sends must be compiled" throw ;
-
 : (send) ( ... selector super? -- ... )
     make-objc-send dup peek compile call ;
 

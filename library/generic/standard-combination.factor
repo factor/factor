@@ -76,12 +76,16 @@ TUPLE: no-method object generic ;
 : big-generic ( dispatch# word n dispatcher -- def )
     [ >r pick picker % r> , <vtable> , \ dispatch , ] [ ] make ;
 
-: tag-generic? ( word -- ? )
-    "methods" word-prop hash-keys [ types ] map concat
-    [ tag-mask < ] all? ;
+: generic-tags ( word -- seq )
+    "methods" word-prop hash-keys [ types ] map concat prune ;
 
-: small-generic? ( word -- ? )
-    "methods" word-prop hash-size 3 <= ;
+: tag-generic? ( word -- ? )
+    #! If all the types we dispatch upon can be identified
+    #! based on tag alone, we change the dispatcher primitive
+    #! from 'type' to 'tag'.
+    generic-tags [ tag-mask < ] all? ;
+
+: small-generic? ( word -- ? ) generic-tags length 3 <= ;
 
 : standard-combination ( word dispatch# -- quot )
     swap {
