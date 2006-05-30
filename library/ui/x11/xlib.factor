@@ -1145,6 +1145,12 @@ END-STRUCT
 
 FUNCTION: Status XSetWMProtocols ( Display* display, Window w, Atom* protocols, int count ) ;
 
+FUNCTION: Status XGetWMProtocols (
+	Display* display,
+	Window w,
+	Atom** protocols_return,
+	int* count_return ) ;
+
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 ! 16 - Application Utility Functions
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
