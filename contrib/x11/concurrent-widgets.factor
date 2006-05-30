@@ -351,6 +351,7 @@ dup pwindow-expose-action call ;
 : window-position%		[ window-position ] with-window-object ;
 : window-size%			[ window-size ] with-window-object ;
 : window-map-state%		[ window-map-state ] with-window-object ;
+: window-parent%		[ window-parent ] with-window-object ;
 
 : reparent-window% ( parent window -- )
   >r window-id r> [ reparent-window ] with-window-object ;
@@ -376,3 +377,5 @@ dup pwindow-expose-action call ;
 : get-transient-for-hint% [ get-transient-for-hint ] with-window-object ;
 
 : fetch-name%			[ fetch-name ] with-window-object ;
+
+: clear-window%			[ clear-window ] with-window-object ;

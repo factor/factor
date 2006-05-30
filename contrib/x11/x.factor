@@ -26,9 +26,14 @@ SYMBOL: font
 : *Window *XID ;
 : *Drawable *XID ;
 
+: True 1 ;
+: False 0 ;
+
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+! 3 - Window Functions
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
 ! 3.3 - Creating Windows
-! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 ! create-window is radically simple. It takes no arguments but you get
 ! a window back! After you create-window you should modify it's
@@ -89,8 +94,17 @@ DEFER: with-win
 
 ! 3.9 - Changing Window Attributes
 
+: change-window-attributes ( valuemask attr -- )
+>r >r dpy get win get r> r> XChangeWindowAttributes drop ;
+
 : set-window-background ( pixel -- )
   >r dpy get win get r> XSetWindowBackground drop ;
+
+: set-window-gravity ( gravity -- )
+CWWinGravity swap
+"XSetWindowAttributes" <c-object> tuck
+set-XSetWindowAttributes-win_gravity
+change-window-attributes ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 ! 4 - Window Information Functions
@@ -147,6 +161,13 @@ get-window-attributes XWindowAttributes-all_event_masks ;
 
 : window-override-redirect
   get-window-attributes XWindowAttributes-override_redirect ;
+
+! 4.3 - Properties and Atoms
+
+: intern-atom ( atom-name only-if-exists? -- atom )
+>r >r dpy get r> r> XInternAtom ;
+
+: get-atom-name ( atom -- name ) dpy get swap XGetAtomName ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
@@ -366,6 +387,18 @@ XGrabPointer drop ;
   dpy get win get 0 <Window> dup >r XGetTransientForHint r>
   swap 0 = [ drop f ] [ *Window ] if ;
 
+! 14.1.10.  Setting and Reading the WM_PROTOCOLS Property
+
+: <Atom**> ( value -- address ) <Atom> <void*> ;
+
+: get-wm-protocols ( -- protocols )
+dpy get win get 0 <Atom**> 0 <int> 2dup >r >r XGetWMProtocols drop
+r> r>				! protocols-return count-return
+swap *void* swap *int		! protocols count
+[ over int-nth ] map
+nip ;
+
+
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 ! Not Categorized Yet
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
@@ -485,3 +518,16 @@ swap >array [ swap char-nth ] map-with >string ;
 : lookup-string ( event -- string )
 10 "char" <c-array> dup >r 10 0 <alien> 0 <alien> XLookupString r>
 char-array>string ;
+
+: send-client-message ( atom x -- )
+
+"XClientMessageEvent" <c-object>			! atom x event
+
+ClientMessage over set-XClientMessageEvent-type
+win get over set-XClientMessageEvent-window
+rot over set-XClientMessageEvent-message_type		! x event
+32 over set-XClientMessageEvent-format
+swap over set-XClientMessageEvent-data0			! event
+CurrentTime over set-XClientMessageEvent-data1		! event
+
+>r dpy get win get False NoEventMask r> XSendEvent drop ;

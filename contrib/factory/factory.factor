@@ -15,6 +15,7 @@ DEFER: layout-frame
 DEFER: mapped-windows
 DEFER: workspace-1 DEFER: workspace-2 DEFER: workspace-3 DEFER: workspace-4
 DEFER: switch-to
+DEFER: update-title
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
@@ -318,8 +319,10 @@ TUPLE: wm-child ;
   [ set-delegate ] keep
   [ add-to-window-table ] keep ;
 
-M: wm-child handle-property-event ( child event -- )
-  "A <wm-child> received a property event" print flush drop drop ;
+M: wm-child handle-property-event ( event <wm-child> -- )
+  "A <wm-child> received a property event" print flush
+  nip
+  window-parent% window-table get hash dup [ update-title ] [ drop ] if ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
@@ -344,6 +347,11 @@ TUPLE: wm-frame child ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
+: update-title ( <wm-frame> -- )
+dup clear-window%
+{ 5 1 } swap dup wm-frame-child fetch-name% swap
+[ draw-string-top-left ] with-window-object ;
+
 : manage-window ( window -- )
   flush-dpy
   grab-server
@@ -365,14 +373,31 @@ TUPLE: wm-frame child ;
   reparent-window%
 
   dup wm-frame-child window-size%		! frame child-size
-  { 20 20 } v+					! frame child-size+
+  { 10 20 } v+					! frame child-size+
   over						! frame child-size+ frame
-  resize-window%
+  resize-window%				! frame
 
-  dup wm-frame-child { 10 10 } swap move-window%
+  
+
+  dup wm-frame-child { 5 15 } swap move-window%
 
   dup map-window%
-  dup map-subwindows%
+  dup map-subwindows%				! frame
+
+!  dup wm-frame-child fetch-name%		! frame title
+!  { 5 1 } swap					! frame point title
+!  pick						! frame point title frame
+!  [ draw-string-top-left ] with-window-object	! frame
+
+  dup update-title				! frame
+
+  "" over [ delete-frame ] curry create-button	! frame button
+  >r dup window-id r>
+  [ reparent-window { 13 13 } resize-window
+    dup window-width% 13 - 1 - 1 2array move-window
+    NorthEastGravity set-window-gravity
+    black-pixel get set-window-background map-window ]
+  with-window-object				! frame
 
   dup wm-frame-child PropertyChangeMask swap select-input%
 
@@ -451,7 +476,7 @@ M: wm-frame size-request-size ( event frame -- size )
   dup wm-frame-child -rot size-request-size swap resize-window% ;
 
 : execute-size-request/frame ( event frame )
-  dup -rot size-request-size { 20 20 } v+ swap resize-window% ;
+  dup -rot size-request-size { 10 20 } v+ swap resize-window% ;
 
 M: wm-frame execute-size-request ( event frame )
   2dup execute-size-request/child execute-size-request/frame ;
@@ -495,18 +520,31 @@ M: wm-frame handle-enter-window-event ( event frame )
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-M: wm-frame handle-property-event ( event frame )
-  "Inside handle-property-event" print flush drop drop ;
+M: wm-frame handle-property-event ( event frame -- )
+"Inside handle-property-event" print flush 2drop ;
+
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+M: wm-frame handle-expose-event ( event frame -- )
+nip dup clear-window% update-title ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 : layout-frame ( frame -- )
-  dup wm-frame-child { 10 10 } swap move-window%
+  dup wm-frame-child { 5 15 } swap move-window%
   dup wm-frame-child				! frame child
   over window-size%				! frame child size
-  { 20 20 } v-					! frame child child-size
+  { 10 20 } v-					! frame child child-size
   swap resize-window%				! frame
   drop ;
+
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+SYMBOL: WM_PROTOCOLS
+SYMBOL: WM_DELETE_WINDOW
+
+: delete-frame ( frame -- ) wm-frame-child window-id
+[ WM_PROTOCOLS get WM_DELETE_WINDOW get send-client-message ] with-win ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 ! Workspaces
@@ -616,6 +654,8 @@ SYMBOL: window-list
   root get [ black-pixel get set-window-background clear-window ] with-win
   root get create-wm-root
   root get [ grab-keys ] with-win
+  "WM_PROTOCOLS" False intern-atom WM_PROTOCOLS set
+  "WM_DELETE_WINDOW" False intern-atom WM_DELETE_WINDOW set
   setup-root-menu
   setup-window-list
   setup-workspace-menu
