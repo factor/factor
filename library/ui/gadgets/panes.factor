@@ -2,7 +2,7 @@
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: gadgets-panes
 USING: arrays gadgets gadgets-buttons gadgets-editors
-gadgets-labels gadgets-layouts gadgets-scrolling gadgets-theme
+gadgets-labels gadgets-scrolling gadgets-theme
 generic hashtables io kernel line-editor math namespaces
 prettyprint sequences strings styles threads ;
 

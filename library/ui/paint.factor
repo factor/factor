@@ -1,6 +1,6 @@
 ! Copyright (C) 2005, 2006 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: alien arrays freetype gadgets-layouts generic hashtables
+USING: alien arrays freetype generic hashtables
 io kernel math namespaces opengl sequences strings
 styles vectors ;
 IN: gadgets

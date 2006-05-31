@@ -1,8 +1,8 @@
 ! Copyright (C) 2005, 2006 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 IN: gadgets
-USING: gadgets-labels gadgets-layouts hashtables kernel math
-namespaces queues sequences threads ;
+USING: gadgets-labels hashtables kernel math namespaces queues
+sequences ;
 
 GENERIC: gadget-gestures ( gadget -- hash )
 

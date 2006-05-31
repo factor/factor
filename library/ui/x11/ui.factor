@@ -2,9 +2,8 @@
 ! See http://factorcode.org/license.txt for BSD license.
 IN: x11
 USING: arrays errors freetype gadgets gadgets-launchpad
-gadgets-layouts gadgets-listener hashtables kernel
-kernel-internals math namespaces opengl sequences
-strings x11 ;
+gadgets-listener hashtables kernel kernel-internals math
+namespaces opengl sequences strings ;
 
 ! In the X11 backend, world-handle is a pair { window context }.
 ! The window is an X11 window ID, and the context is a

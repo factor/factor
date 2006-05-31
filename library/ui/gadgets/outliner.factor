@@ -2,8 +2,8 @@
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: gadgets-outliner
 USING: arrays gadgets gadgets-borders gadgets-buttons
-gadgets-labels gadgets-layouts gadgets-panes gadgets-theme
-generic io kernel math opengl sequences styles ;
+gadgets-labels gadgets-panes gadgets-theme generic io kernel
+math opengl sequences styles ;
 
 ! Vertical line.
 TUPLE: guide color ;

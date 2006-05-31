@@ -1,8 +1,8 @@
 ! Copyright (C) 2005, 2006 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 IN: gadgets
-USING: gadgets-layouts generic hashtables kernel math
-namespaces sequences vectors ;
+USING: generic hashtables kernel mathnamespaces sequences
+vectors ;
 
 GENERIC: add-notify* ( gadget -- )
 
@@ -91,8 +91,6 @@ M: gadget focusable-child* drop t ;
 : focusable-child ( gadget -- gadget )
     dup focusable-child*
     dup t eq? [ drop ] [ nip focusable-child ] if ;
-
-IN: gadgets-layouts
 
 : make-pile ( children -- pack ) <pile> [ add-gadgets ] keep ;
 

@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 IN: gadgets-presentations
 USING: arrays gadgets gadgets-borders
-gadgets-buttons gadgets-labels gadgets-layouts gadgets-outliner
+gadgets-buttons gadgets-labels gadgets-outliner
 gadgets-panes generic hashtables inspector io kernel prettyprint
 sequences strings styles words ;
 

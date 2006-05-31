@@ -1,8 +1,7 @@
 ! Copyright (C) 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
-IN: gadgets-layouts
-USING: arrays gadgets generic kernel math namespaces sequences
-words ;
+IN: gadgets
+USING: arrays generic kernel math namespaces sequences words ;
 
 ! A frame arranges gadgets in a 3x3 grid, where the center
 ! gadgets gets left-over space.

@@ -1,9 +1,10 @@
+! Copyright (C) 2006 Slava Pestov
+! See http://factorcode.org/license.txt for BSD license.
 IN: gadgets-launchpad
 USING: gadgets gadgets-apropos gadgets-borders gadgets-browser
-gadgets-buttons gadgets-labels gadgets-layouts gadgets-listener
-gadgets-panes gadgets-presentations gadgets-scrolling
-gadgets-theme help inspector io kernel memory namespaces
-prettyprint sequences ; 
+gadgets-buttons gadgets-labels gadgets-listener gadgets-panes
+gadgets-presentations gadgets-scrolling gadgets-theme help
+inspector io kernel memory namespaces prettyprint sequences ;
 
 : <launchpad> ( menu -- )
     [ first2 >r <label> [ drop ] r> append <bevel-button> ] map

@@ -4,8 +4,7 @@ IN: objc-classes
 DEFER: FactorWindowDelegate
 
 IN: cocoa
-USING: arrays gadgets gadgets-layouts kernel math objc
-sequences ;
+USING: arrays gadgets kernel math objc sequences ;
 
 : NSBorderlessWindowMask     0 ; inline
 : NSTitledWindowMask         1 ; inline

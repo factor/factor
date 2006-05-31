@@ -4,8 +4,8 @@ IN: objc-classes
 DEFER: FactorApplicationDelegate
 
 IN: cocoa
-USING: arrays gadgets gadgets-layouts gadgets-listener
-hashtables kernel namespaces objc sequences errors freetype ;
+USING: arrays gadgets gadgets-listener hashtables kernel
+namespaces objc sequences errors freetype ;
 
 : finder-run-files ( alien -- )
     CF>string-array listener-run-files

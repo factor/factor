@@ -1,8 +1,8 @@
 ! Copyright (C) 2005, 2006 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 IN: gadgets
-USING: errors freetype gadgets-layouts generic hashtables kernel
-math namespaces opengl sequences ;
+USING: errors freetype generic hashtables kernel math namespaces
+opengl sequences ;
 
 ! The world gadget is the top level gadget that all (visible)
 ! gadgets are contained in. There is one world per top-level

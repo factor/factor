@@ -1,9 +1,9 @@
 ! Copyright (C) 2006 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 IN: gadgets
-USING: arrays gadgets gadgets-labels gadgets-layouts
-gadgets-theme gadgets-viewports hashtables kernel math
-namespaces queues sequences threads ;
+USING: arrays gadgets gadgets-labels gadgets-theme
+gadgets-viewports hashtables kernel math namespaces queues
+sequences threads ;
 
 ! Assoc mapping aliens to gadgets
 SYMBOL: windows

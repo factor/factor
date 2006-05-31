@@ -1,8 +1,8 @@
 ! Copyright (C) 2005, 2006 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: errors gadgets generic hashtables kernel math
+USING: errors generic hashtables kernel math
 namespaces queues sequences ;
-IN: gadgets-layouts
+IN: gadgets
 
 : invalidate ( gadget -- ) t swap set-gadget-relayout? ;
 
@@ -34,8 +34,13 @@ IN: gadgets-layouts
     dup gadget-relayout?
     [ drop ] [ dup invalidate add-invalid ] if ;
 
+
+: show-gadget t over set-gadget-visible? relayout-1 ;
+
+: hide-gadget f over set-gadget-visible? relayout-1 ;
+
 : toggle-visible ( gadget -- )
-    dup gadget-visible? not over set-gadget-visible? relayout-1 ;
+    dup gadget-visible? [ hide-gadget ] [ show-gadget ] if ;
 
 : set-gadget-dim ( dim gadget -- )
     2dup rect-dim = [

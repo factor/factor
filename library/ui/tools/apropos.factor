@@ -1,7 +1,6 @@
 IN: gadgets-apropos
-USING: gadgets gadgets-editors gadgets-labels gadgets-layouts
-gadgets-panes gadgets-scrolling gadgets-theme generic inspector
-kernel ;
+USING: gadgets gadgets-editors gadgets-labels gadgets-panes
+gadgets-scrolling gadgets-theme generic inspector kernel ;
 
 TUPLE: apropos-gadget scroller input ;
 

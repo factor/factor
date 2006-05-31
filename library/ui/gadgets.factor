@@ -1,5 +1,5 @@
-! Copyright (C) 2005 Slava Pestov.
-! See http://factor.sf.net/license.txt for BSD license.
+! Copyright (C) 2005, 2006 Slava Pestov.
+! See http://factorcode.org/license.txt for BSD license.
 IN: gadgets
 USING: arrays generic hashtables kernel math
 namespaces sequences styles ;
@@ -44,17 +44,14 @@ TUPLE: gadget
     pref-dim parent children orientation
     visible? relayout? root? interior boundary ;
 
-: show-gadget t swap set-gadget-visible? ;
-
-: hide-gadget f swap set-gadget-visible? ;
-
 M: gadget = eq? ;
 
 : gadget-child gadget-children first ;
 
 C: gadget ( -- gadget )
-    { 0 0 0 } dup <rect> over set-delegate dup show-gadget
-    { 0 1 0 } over set-gadget-orientation ;
+    { 0 0 0 } dup <rect> over set-delegate
+    { 0 1 0 } over set-gadget-orientation
+    t over set-gadget-visible? ;
 
 : delegate>gadget ( tuple -- ) <gadget> swap set-delegate ;
 

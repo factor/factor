@@ -1,9 +1,9 @@
 ! Copyright (C) 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: gadgets-editors
-USING: arrays freetype gadgets gadgets-labels gadgets-layouts
-gadgets-scrolling gadgets-theme generic kernel math namespaces
-sequences strings styles threads ;
+USING: arrays freetype gadgets gadgets-labels gadgets-scrolling
+gadgets-theme generic kernel math namespaces sequences strings
+styles threads ;
 
 ! A blinking caret
 TUPLE: caret ;
@@ -15,14 +15,14 @@ M: caret tick ( ms caret -- ) nip toggle-visible ;
 
 : caret-blink 500 ;
 
-: add-caret ( caret parent -- )
-    dupd add-gadget caret-blink add-timer ;
+: show-caret ( caret -- )
+    dup show-gadget dup relayout-1 caret-blink add-timer ;
 
-: unparent-caret ( caret -- )
-    dup remove-timer unparent ;
+: hide-caret ( caret -- )
+    dup remove-timer dup hide-gadget relayout-1 ;
 
 : reset-caret ( caret -- )
-    dup restart-timer show-gadget ;
+    dup restart-timer dup show-gadget relayout-1 ;
 
 USE: line-editor
 
@@ -50,12 +50,6 @@ TUPLE: editor line caret font color ;
     #! Add current line to the history, and clear the editor.
     [ commit-history line-text get line-clear ] with-editor ;
 
-: focus-editor ( editor -- )
-    dup editor-caret swap add-caret ;
-
-: unfocus-editor ( editor -- )
-    editor-caret unparent-caret ;
-
 : run-char-widths ( font str -- wlist )
     #! List of x co-ordinates of each character.
     >array [ char-width ] map-with
@@ -77,8 +71,8 @@ TUPLE: editor line caret font color ;
 M: editor gadget-gestures
     drop H{
         { T{ button-down } [ click-editor ] }
-        { T{ gain-focus } [ focus-editor ] }
-        { T{ lose-focus } [ unfocus-editor ] }
+        { T{ gain-focus } [ editor-caret show-caret ] }
+        { T{ lose-focus } [ editor-caret hide-caret ] }
         { T{ key-down f f "BACKSPACE" } [ [ T{ char-elt } delete-prev-elt ] with-editor ] }
         { T{ key-down f f "DELETE" } [ [ T{ char-elt } delete-next-elt ] with-editor ] }
         { T{ key-down f { C+ } "BACKSPACE" } [ [ T{ word-elt } delete-prev-elt ] with-editor ] }
@@ -94,11 +88,13 @@ M: editor gadget-gestures
         { T{ key-down f { C+ } "k" } [ [ line-clear ] with-editor ] }
     } ;
 
+: add-editor-caret 2dup set-editor-caret add-gadget ;
+
 C: editor ( text -- )
     dup delegate>gadget
     dup editor-theme
     <line-editor> over set-editor-line
-    <caret> over set-editor-caret
+    <caret> over add-editor-caret
     [ set-editor-text ] keep ;
 
 : offset>x ( gadget offset str -- x )

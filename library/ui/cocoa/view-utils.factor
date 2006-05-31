@@ -4,8 +4,8 @@ IN: objc-classes
 DEFER: FactorView
 
 IN: cocoa
-USING: arrays gadgets gadgets-layouts hashtables kernel math
-namespaces objc opengl sequences ;
+USING: arrays gadgets hashtables kernel math namespaces objc
+opengl sequences ;
 
 : <GLView> ( class dim -- view )
     >r -> alloc 0 0 r> first2 <NSRect>
@@ -93,6 +93,10 @@ namespaces objc opengl sequences ;
 "NSOpenGLView" "FactorView" {
     { "drawRect:" "void" { "id" "SEL" "NSRect" }
         [ 2drop window draw-world ]
+    }
+    
+    { "acceptsFirstMouse:" "bool" { "id" "SEL" "id" }
+        [ 3drop 1 ]
     }
     
     { "mouseMoved:" "void" { "id" "SEL" "id" }

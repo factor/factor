@@ -17,10 +17,11 @@
   restores to an unresponsive gadget
 - fix top level window positioning
 - services do not launch if factor not running
-- rollover is not updated on focus changes
+- rollover is not updated on window focus changes
 - amd64 crash
 - get factor running on mac intel
 - constant branch folding
+- we want scrolling to follow the caret even if it is invisible
 
 + refactor style stack code so that nested styles are handled at a lower-level
   - in HTML, we can nest div tags, etc
@@ -67,16 +68,19 @@
 - toggle/radio buttons/tabs or something
 - inspector: less clutter when browsing words
 - make-frame should compile
-- clicks sent twice
 - speed up ideas:
   - only do clipping for certain gadgets
   - use glRect
+  - use complex numbers instead of arrays for co-ordinates
+  - decrease minimum growable size from 50 to 4 or something, to reduce
+    memory consumption of a gadget with one child
+  - use vertex arrays
+  - use display lists
 - reimplement tab completion
 - cocoa:
   - horizontal scrolling
   - polish OS X menu bar code
   - dock menu
-- display lists
 - variable width word wrap
 
 + compiler/ffi:

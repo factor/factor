@@ -1,7 +1,7 @@
 ! Copyright (C) 2005, 2006 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 IN: gadgets-scrolling
-USING: arrays gadgets gadgets-buttons gadgets-layouts
+USING: arrays gadgets gadgets-buttons
 gadgets-theme generic kernel math namespaces sequences
 styles threads vectors ;
 

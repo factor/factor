@@ -1,8 +1,8 @@
 ! Copyright (C) 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: gadgets-buttons
-USING: gadgets gadgets-borders gadgets-layouts gadgets-theme
-generic io kernel math namespaces sequences styles threads ;
+USING: gadgets gadgets-borders gadgets-theme generic io kernel
+math namespaces sequences styles threads ;
 
 TUPLE: button rollover? pressed? quot ;
 

@@ -1,8 +1,8 @@
 ! Copyright (C) 2005, 2006 Kevin Reid.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: cocoa compiler gadgets gadgets-browser gadgets-launchpad
-gadgets-layouts gadgets-listener kernel memory objc
-objc-classes sequences strings words ;
+gadgets-listener kernel memory objc objc-classes sequences
+strings words ;
 IN: cocoa
 
 ! -------------------------------------------------------------------------

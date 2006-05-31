@@ -1,7 +1,7 @@
 ! Copyright (C) 2006 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 IN: gadgets-tracks
-USING: gadgets gadgets-layouts gadgets-theme generic io kernel
+USING: gadgets gadgets-theme generic io kernel
 math namespaces sequences words ;
 
 TUPLE: divider ;

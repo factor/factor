@@ -1,11 +1,10 @@
 ! Copyright (C) 2006 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 IN: gadgets-browser
-USING: gadgets gadgets-buttons gadgets-labels gadgets-layouts
-gadgets-panes gadgets-presentations gadgets-scrolling
-gadgets-tabs gadgets-tiles gadgets-theme gadgets-tracks generic
-hashtables help inspector kernel math prettyprint sequences
-words ;
+USING: gadgets gadgets-buttons gadgets-labels gadgets-panes
+gadgets-presentations gadgets-scrolling gadgets-tabs
+gadgets-tiles gadgets-theme gadgets-tracks generic hashtables
+help inspector kernel math prettyprint sequences words ;
 
 TUPLE: browser-track showing builder closer ;
 

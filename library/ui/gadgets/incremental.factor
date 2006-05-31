@@ -1,7 +1,7 @@
 ! Copyright (C) 2005, 2006 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-IN: gadgets-layouts
-USING: gadgets generic io kernel math namespaces ;
+IN: gadgets
+USING: generic io kernel math namespaces ;
 
 ! Incremental layout allows adding lines to panes to be O(1).
 ! Note that incremental packs are distinct from ordinary packs
