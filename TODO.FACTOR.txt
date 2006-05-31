@@ -17,8 +17,7 @@
   restores to an unresponsive gadget
 - fix top level window positioning
 - services do not launch if factor not running
-- when scrolling wheel, or moving mouse out of window, rollover is not
-  updated
+- rollover is not updated on focus changes
 - amd64 crash
 - get factor running on mac intel
 - constant branch folding
@@ -62,7 +61,6 @@
 
 - x11 input methods
 - roundoff is still not quite right with tracks
-- clearing pane with ^L leaves scrollbar a pixel off
 - new browser:
   - browse generic words and classes
   - need actions for reloading the source file and opening word in jEdit

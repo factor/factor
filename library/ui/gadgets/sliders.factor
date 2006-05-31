@@ -25,14 +25,14 @@ TUPLE: slider elevator thumb value saved max page ;
     dup slider-page over slider-max 1 max / 1 min
     swap elevator-length * min-thumb-dim max ;
 
-: slider-max* dup slider-max swap slider-page - 1 max ;
+: slider-max* dup slider-max swap slider-page - 0 max ;
 
 : slider-scale ( slider -- n )
     #! A scaling factor such that if x is a slider co-ordinate,
     #! x*n is the screen position of the thumb, and conversely
     #! for x/n. The '1 max' calls avoid division by zero.
     dup elevator-length over thumb-dim - 1 max
-    swap slider-max* / ;
+    swap slider-max* 1 max / ;
 
 : slider>screen slider-scale * ;
 
