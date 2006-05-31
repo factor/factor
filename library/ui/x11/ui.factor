@@ -106,7 +106,7 @@ M: world focus-out-event ( event world -- ) nip unfocus-world ;
 
 : close-box? ( event -- ? )
     dup XClientMessageEvent-message_type "WM_PROTOCOLS" x-atom =
-    swap XClientMessageEvent-data "WM_DELETE_WINDOW" x-atom =
+    swap XClientMessageEvent-data0 "WM_DELETE_WINDOW" x-atom =
     and ;
 
 M: world client-event ( event world -- )
