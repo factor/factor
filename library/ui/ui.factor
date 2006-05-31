@@ -24,12 +24,14 @@ SYMBOL: windows
     windows get-global [ second eq? ] find-with drop
     windows get-global [ length 1- ] keep exchange ;
 
-: update-hand ( world -- )
-    dup hand-gadget get-global find-world eq?
-    [ hand-loc get-global swap move-hand ] [ drop ] if ;
+: update-hand ( gadget -- )
+    find-world [
+        dup hand-gadget get-global find-world eq?
+        [ hand-loc get-global swap move-hand ] [ drop ] if
+    ] when* ;
 
 : post-layout ( gadget -- )
-    find-world [ dup update-hand dup world-handle set ] when* ;
+    find-world [ dup world-handle set ] when* ;
 
 : layout-queued ( -- )
     invalid dup queue-empty? [
@@ -44,8 +46,11 @@ SYMBOL: windows
     
 : ui-step ( -- )
     do-timers
-    [ layout-queued ] make-hash hash-values
-    [ dup world-handle [ draw-world ] [ drop ] if ] each
+    [ layout-queued ] make-hash hash-values [
+        dup update-hand
+        dup world-handle [ dup draw-world ] when
+        drop
+    ] each
     10 sleep ;
 
 : <status-bar> ( -- gadget ) "" <label> dup highlight-theme ;
