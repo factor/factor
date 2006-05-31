@@ -24,13 +24,18 @@ SYMBOL: windows
     windows get-global [ second eq? ] find-with drop
     windows get-global [ length 1- ] keep exchange ;
 
+: update-hand ( world -- )
+    dup hand-gadget get-global find-world eq?
+    [ hand-loc get-global swap move-hand ] [ drop ] if ;
+
+: post-layout ( gadget -- )
+    find-world [ dup update-hand dup world-handle set ] when* ;
+
 : layout-queued ( -- )
     invalid dup queue-empty? [
         drop
     ] [
-        deque dup layout
-        find-world [ dup world-handle set ] when*
-        layout-queued
+        deque dup layout post-layout layout-queued
     ] if ;
 
 : init-ui ( -- )
