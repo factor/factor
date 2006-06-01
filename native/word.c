@@ -5,7 +5,7 @@
    number that indexes a list of xts. */
 void update_xt(F_WORD* word)
 {
-	word->xt = primitive_to_xt(untag_fixnum_fast(word->primitive));
+	word->xt = primitive_to_xt(to_fixnum(word->primitive));
 }
 
 /* <word> ( name vocabulary -- word ) */
@@ -42,6 +42,8 @@ void primitive_word_compiledp(void)
 
 void fixup_word(F_WORD* word)
 {
+	data_fixup(&word->primitive);
+
 	/* If this is a compiled word, relocate the code pointer. Otherwise,
 	reset it based on the primitive number of the word. */
 	if(word->xt >= code_relocation_base

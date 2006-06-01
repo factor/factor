@@ -21,5 +21,5 @@ IN: math
 : pi 3.14159265358979323846 ; inline
 : epsilon 2.2204460492503131e-16 ; inline
 : first-bignum 1 bootstrap-cell-bits tag-bits - 1- shift ;
-: most-positive-fixnum first-bignum 1- >fixnum ;
-: most-negative-fixnum first-bignum neg >fixnum ;
+: most-positive-fixnum first-bignum 1- ;
+: most-negative-fixnum first-bignum neg ;
