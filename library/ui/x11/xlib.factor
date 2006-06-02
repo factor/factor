@@ -1308,3 +1308,37 @@ FUNCTION: Status XSetStandardProperties (
 
 FUNCTION: void XFree ( void* data ) ;
 FUNCTION: int XStoreName ( Display* display, Window w, char* window_name ) ;
+
+: USPosition  1 0 shift ; inline
+: USSize      1 1 shift ; inline
+: PPosition   1 2 shift ; inline
+: PSize       1 3 shift ; inline
+: PMinSize    1 4 shift ; inline
+: PMaxSize    1 5 shift ; inline
+: PResizeInc  1 6 shift ; inline
+: PAspect     1 7 shift ; inline
+: PBaseSize   1 8 shift ; inline
+: PWinGravity 1 9 shift ; inline
+
+BEGIN-STRUCT: XSizeHints
+    FIELD: long flags
+    FIELD: int x
+    FIELD: int y
+    FIELD: int width
+    FIELD: int height
+    FIELD: int min_width
+    FIELD: int min_height
+    FIELD: int max_width
+    FIELD: int max_height
+    FIELD: int width_inc
+    FIELD: int height_inc
+    FIELD: int min_aspect_x
+    FIELD: int min_aspect_y
+    FIELD: int max_aspect_x
+    FIELD: int max_aspect_y
+    FIELD: int base_width
+    FIELD: int base_height
+    FIELD: int win_gravity
+END-STRUCT
+
+FUNCTION: void XSetWMNormalHints ( Display* display, Window w, XSizeHints* hints ) ;
