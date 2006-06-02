@@ -6,13 +6,14 @@
 
 - x11: rollover highlight is not reliable
 - x11: window positioning not reliable
+- x11 title bars are funny
+
 + httpd:
   - outliners don't work
   - browser responder doesn't work
 - code walker & exceptions -- test and debug problems
 - another i/o bug: on factorcode eventually all i/o times out
   - bug in pound?
-- x11 title bars are funny
 - if the listener is running a command when the image is saved, it
   restores to an unresponsive gadget
 - fix top level window positioning
@@ -21,7 +22,7 @@
 - amd64 crash
 - get factor running on mac intel
 - constant branch folding
-- we want scrolling to follow the caret even if it is invisible
+- starting the UI with +foo switches opens them as files
 
 + refactor style stack code so that nested styles are handled at a lower-level
   - in HTML, we can nest div tags, etc
@@ -65,6 +66,7 @@
 - new browser:
   - browse generic words and classes
   - need actions for reloading the source file and opening word in jEdit
+  - highlight showing panes in originating list
 - toggle/radio buttons/tabs or something
 - inspector: less clutter when browsing words
 - make-frame should compile
