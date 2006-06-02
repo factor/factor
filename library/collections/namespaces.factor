@@ -57,6 +57,8 @@ SYMBOL: building
 
 : # ( n -- ) number>string % ;
 
+: init-namespaces ( -- ) global 1array >vector set-namestack ;
+
 IN: sequences
 
 : prune ( seq -- seq )
@@ -69,7 +71,3 @@ IN: sequences
 : join ( seq glue -- seq )
     [ swap [ % ] [ dup % ] interleave drop ] over make ;
     flushable
-
-IN: kernel-internals
-
-: init-namespaces ( -- ) global 1array >vector set-namestack ;

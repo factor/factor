@@ -239,6 +239,7 @@ SYMBOL: hWnd
     "MSG" <c-object> msg-obj set
     class-name ui-wndproc register-wndclassex win32-error=0
     H{ } clone windows set
+    init-timers
     init-ui ;
 
 : cleanup-win32-ui ( -- ) class-name f UnregisterClass drop ;

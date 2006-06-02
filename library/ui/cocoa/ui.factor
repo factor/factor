@@ -22,9 +22,8 @@ namespaces objc sequences errors freetype ;
 : install-app-delegate ( -- )
     NSApp FactorApplicationDelegate install-delegate ;
 
-: init-cocoa-ui ( -- )
+: init-cocoa ( -- )
     reset-callbacks
-    init-ui
     install-app-delegate
     register-services
     default-main-menu ;
@@ -68,11 +67,12 @@ IN: shells
     ] unless
     [
         [
-            init-cocoa-ui
+            init-timers
+            init-cocoa
             restore-windows? [
                 restore-windows
             ] [
-                reset-windows
+                init-ui
                 listener-window
             ] if
             finish-launching

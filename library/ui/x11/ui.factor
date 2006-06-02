@@ -145,11 +145,11 @@ IN: shells
 : ui ( -- )
     [
         f [
-            init-ui
+            init-timers
             restore-windows? [
                 restore-windows
             ] [
-                reset-windows
+                init-ui
                 launchpad-window
                 listener-window
             ] if

@@ -44,7 +44,8 @@ TUPLE: listener-gadget scroller stack ;
 : <stack-bar> ( -- gadget ) <shelf> dup highlight-theme ;
 
 : start-listener ( listener -- )
-    [ >r clear r> listener-thread ] in-thread drop ;
+    [ >r clear r> init-namespaces listener-thread ] in-thread
+    drop ;
 
 C: listener-gadget ( -- gadget )
     {

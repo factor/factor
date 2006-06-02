@@ -16,6 +16,8 @@ GENERIC: tick ( ms object -- )
 
 : timers \ timers get-global ;
 
+: init-timers ( -- ) H{ } clone \ timers set-global ;
+
 : add-timer ( object delay -- )
     over >r <timer> r> timers set-hash ;
 

@@ -8,8 +8,6 @@ sequences threads ;
 ! Assoc mapping aliens to gadgets
 SYMBOL: windows
 
-: reset-windows ( hash -- hash ) V{ } clone windows set-global ;
-
 : window ( handle -- world ) windows get-global assoc ;
 
 : register-window ( world handle -- )
@@ -41,9 +39,9 @@ SYMBOL: windows
     ] if ;
 
 : init-ui ( -- )
-    H{ } clone \ timers set-global
-    <queue> \ invalid set-global ;
-    
+    <queue> \ invalid set-global
+    V{ } clone windows set-global ;
+
 : ui-step ( -- )
     do-timers
     [ layout-queued ] make-hash hash-values [
@@ -85,10 +83,18 @@ C: titled-gadget ( gadget title -- )
 : open-titled-window ( gadget title -- )
     <titled-gadget> open-window ;
 
+: fix-rollover ( -- )
+    #! After we restore the UI, send mouse leave events to all
+    #! gadgets that were under the mouse at the time of the
+    #! save, since the mouse is in a different location now.
+    f hand-gadget [ get-global ] 2keep set-global
+    parents hand-gestures ;
+
 : restore-windows ( -- )
     windows get [ second ] map
-    reset-windows
-    [ dup reset-world open-window* ] each ;
+    0 windows get set-length
+    [ dup reset-world open-window* ] each
+    fix-rollover ;
 
 : restore-windows? ( -- ? )
     windows get [ empty? not ] [ f ] if* ;
