@@ -99,6 +99,14 @@ opengl sequences ;
         [ 3drop 1 ]
     }
     
+    { "mouseEntered:" "void" { "id" "SEL" "id" }
+        [ nip send-mouse-moved ]
+    }
+    
+    { "mouseExited:" "void" { "id" "SEL" "id" }
+        [ 3drop forget-rollover ]
+    }
+    
     { "mouseMoved:" "void" { "id" "SEL" "id" }
         [ nip send-mouse-moved ]
     }
@@ -149,6 +157,19 @@ opengl sequences ;
     
     { "keyUp:" "void" { "id" "SEL" "id" }
         [ nip send-key-up-event ]
+    }
+
+    { "cut:" "id" { "id" "SEL" "id" }
+        USE: io
+        [ 3drop global [ "cut:" print flush ] bind f ]
+    }
+
+    { "copy:" "id" { "id" "SEL" "id" }
+        [ 3drop global [ "copy:" print flush ] bind f ]
+    }
+
+    { "paste:" "id" { "id" "SEL" "id" }
+        [ 3drop global [ "paste:" print flush ] bind f ]
     }
 
     { "updateFactorGadgetSize:" "void" { "id" "SEL" "id" }

@@ -5,7 +5,6 @@
 ]
 
 - x11 title bars are funny
-- x11 mouse enter/leave events: update rollover
 - x11: when starting with restored windows, caret invisible
 + httpd:
   - outliners don't work
@@ -91,7 +90,6 @@
 - float= on powerpc doesn't consider nans equal
 - intrinsic fixnum>float float>fixnum
 - win64 port
-- amd64 %unbox-struct
 - complex float type
 - complex float intrinsics
 - remove literal table
