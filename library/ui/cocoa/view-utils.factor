@@ -85,6 +85,9 @@ opengl sequences ;
     [ -> deltaY 0 > ] 2keep mouse-location
     rot window send-wheel ;
 
+: send-action ( view event class -- f )
+    >r drop window r> handle-action f ;
+
 : add-resize-observer ( observer object -- )
     >r "updateFactorGadgetSize:"
     "NSViewFrameDidChangeNotification" <NSString>
@@ -160,16 +163,15 @@ opengl sequences ;
     }
 
     { "cut:" "id" { "id" "SEL" "id" }
-        USE: io
-        [ 3drop global [ "cut:" print flush ] bind f ]
+        [ nip <cut-action> send-action ]
     }
 
     { "copy:" "id" { "id" "SEL" "id" }
-        [ 3drop global [ "copy:" print flush ] bind f ]
+        [ nip <copy-action> send-action ]
     }
 
     { "paste:" "id" { "id" "SEL" "id" }
-        [ 3drop global [ "paste:" print flush ] bind f ]
+        [ nip <paste-action> send-action ]
     }
 
     { "updateFactorGadgetSize:" "void" { "id" "SEL" "id" }

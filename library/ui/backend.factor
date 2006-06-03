@@ -1,5 +1,5 @@
 IN: gadgets
-USING: kernel opengl ;
+USING: kernel namespaces opengl ;
 
 DEFER: set-title ( string handle -- )
 
@@ -16,3 +16,13 @@ DEFER: flush-gl-context ( handle -- )
 : with-gl-context ( handle quot -- )
     swap [ select-gl-context call ] keep
     glFlush flush-gl-context gl-error ; inline
+
+! Two text transfer buffers
+TUPLE: clipboard contents ;
+C: clipboard "" over set-clipboard-contents ;
+
+SYMBOL: clipboard
+SYMBOL: selection
+
+<clipboard> clipboard set-global
+<clipboard> selection set-global

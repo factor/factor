@@ -49,7 +49,7 @@ TUPLE: slider-changed ;
     ] [
         [ set-slider-value ] keep
         dup slider-elevator relayout-1
-        T{ slider-changed } swap handle-gesture drop
+        <slider-changed> handle-action
     ] if ;
 
 TUPLE: thumb ;

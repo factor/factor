@@ -68,6 +68,10 @@ TUPLE: editor line caret font color ;
 : click-editor ( editor -- )
     dup hand-click-rel first over set-caret-x request-focus ;
 
+: editor-paste ( editor clipboard -- )
+    clipboard-contents dup
+    [ swap user-input* drop ] [ 2drop ] if ;
+
 M: editor gadget-gestures
     drop H{
         { T{ button-down } [ click-editor ] }
@@ -86,6 +90,8 @@ M: editor gadget-gestures
         { T{ key-down f f "HOME" } [ [ T{ document-elt } prev-elt ] with-editor ] }
         { T{ key-down f f "END" } [ [ T{ document-elt } next-elt ] with-editor ] }
         { T{ key-down f { C+ } "k" } [ [ line-clear ] with-editor ] }
+        { T{ button-down f 2 } [ selection get editor-paste ] }
+        { T{ paste-action } [ clipboard get editor-paste ] }
     } ;
 
 : add-editor-caret 2dup set-editor-caret add-gadget ;

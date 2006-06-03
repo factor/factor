@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 IN: gadgets
 USING: gadgets-labels hashtables kernel math namespaces queues
-sequences ;
+sequences words ;
 
 GENERIC: gadget-gestures ( gadget -- hash )
 
@@ -32,6 +32,15 @@ TUPLE: mouse-enter ;
 TUPLE: mouse-leave ;
 TUPLE: lose-focus ;
 TUPLE: gain-focus ;
+
+! Higher-level actions
+TUPLE: cut-action ;
+TUPLE: copy-action ;
+TUPLE: paste-action ;
+TUPLE: delete-action ;
+
+: handle-action ( gadget constructor -- )
+    execute swap handle-gesture drop ; inline
 
 GENERIC: with-button ( button# tuple -- tuple )
 
