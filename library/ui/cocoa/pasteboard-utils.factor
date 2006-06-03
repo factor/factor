@@ -1,7 +1,8 @@
 ! Copyright (C) 2006 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 IN: cocoa
-USING: arrays gadgets kernel objc objc-classes sequences ;
+USING: arrays gadgets kernel namespaces objc objc-classes
+sequences ;
 
 : NSStringPboardType "NSStringPboardType" ;
 
@@ -27,3 +28,7 @@ M: pasteboard clipboard-contents ( pb -- str )
 
 M: pasteboard set-clipboard-contents ( str pb -- )
     pasteboard-handle set-pasteboard-string ;
+
+: init-clipboard ( -- )
+    NSPasteboard -> generalPasteboard <pasteboard>
+    clipboard set-global ;

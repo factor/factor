@@ -21,6 +21,7 @@
 - get factor running on mac intel
 - constant branch folding
 - cocoa: starting the UI with +foo switches opens them as files
+- pasting from clipboard on x11
 
 + refactor style stack code so that nested styles are handled at a lower-level
   - in HTML, we can nest div tags, etc

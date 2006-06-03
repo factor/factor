@@ -26,6 +26,7 @@ namespaces objc sequences errors freetype ;
     reset-callbacks
     install-app-delegate
     register-services
+    init-clipboard
     default-main-menu ;
 
 : rect>NSRect
