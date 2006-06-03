@@ -4,10 +4,8 @@
 [ 1 2 3 4 5 6 7 8 9 10 10 10 10 10 10 10 10 10 10 11 11 11 113 
 ]
 
-- x11: rollover highlight is not reliable
-- x11: window positioning not reliable
 - x11 title bars are funny
-
+- x11 mouse enter/leave events: update rollover
 + httpd:
   - outliners don't work
   - browser responder doesn't work
@@ -22,7 +20,7 @@
 - amd64 crash
 - get factor running on mac intel
 - constant branch folding
-- starting the UI with +foo switches opens them as files
+- cocoa: starting the UI with +foo switches opens them as files
 
 + refactor style stack code so that nested styles are handled at a lower-level
   - in HTML, we can nest div tags, etc

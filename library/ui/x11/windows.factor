@@ -31,14 +31,14 @@ USING: alien gadgets hashtables kernel math namespaces sequences ;
 : set-size-hints ( window -- )
     "XSizeHints" <c-object>
     USPosition over set-XSizeHints-flags
-    dpy get -rot XSetNormalWMHints ;
+    dpy get -rot XSetWMNormalHints ;
 
 : create-window ( loc dim visinfo -- window )
     >r >r >r dpy get root get r> first2 r> first2 0 r>
     [ XVisualInfo-depth InputOutput ] keep
     [ XVisualInfo-visual create-window-mask ] keep
     window-attributes XCreateWindow
-    dup size-size-hints ;
+    dup set-size-hints ;
 
 : glx-window ( loc dim -- window context )
     choose-visual
