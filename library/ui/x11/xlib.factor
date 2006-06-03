@@ -47,19 +47,17 @@ TYPEDEF: ulong Time
 TYPEDEF: void* Window**
 TYPEDEF: void* Atom**
 
-: <ulong> <uint> ;
-: <XID> <ulong> ;
-: <Window> <XID> ;
-: <Drawable> <XID> ;
-: <KeySym> <XID> ;
-: <Atom> <ulong> ;
+: <XID> <ulong> ; inline
+: <Window> <XID> ; inline
+: <Drawable> <XID> ; inline
+: <KeySym> <XID> ; inline
+: <Atom> <ulong> ; inline
 
-: *ulong *uint ;
-: *XID *ulong ;
-: *Window *XID ;
-: *Drawable *XID ;
-: *KeySym *XID ;
-: *Atom *ulong ;
+: *XID *ulong ; inline
+: *Window *XID ; inline
+: *Drawable *XID ; inline
+: *KeySym *XID ; inline
+: *Atom *ulong ; inline
 !
 ! 2 - Display Functions
 !
@@ -260,6 +258,8 @@ FUNCTION: Atom XInternAtom ( Display* display, char* atom_name, Bool only_if_exi
 FUNCTION: char* XGetAtomName ( Display* display, Atom atom ) ;
 
 ! 4.4 - Obtaining and Changing Window Properties
+
+: AnyPropertyType 0 ; inline
 
 FUNCTION: int XGetWindowProperty ( Display* display, Window w, Atom property, long long_offset, long long_length, Bool delete, Atom req_type, Atom* actual_type_return, int* actual_format_return, ulong* nitems_return, ulong* bytes_after_return, char** prop_return ) ;
 
