@@ -105,9 +105,6 @@ void dump_cell(CELL cell)
 				fprintf(stderr," header corrupt");
 		}
 		break;
-	case GC_COLLECTED:
-		fprintf(stderr," -- forwarding pointer");
-		break;
 	}
 	
 	fprintf(stderr,"\n");

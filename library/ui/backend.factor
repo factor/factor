@@ -1,5 +1,5 @@
 IN: gadgets
-USING: kernel namespaces opengl ;
+USING: generic kernel namespaces opengl ;
 
 DEFER: set-title ( string handle -- )
 
@@ -12,6 +12,8 @@ DEFER: open-window* ( world title -- )
 DEFER: select-gl-context ( handle -- )
 
 DEFER: flush-gl-context ( handle -- )
+
+DEFER: user-input ( string gadget -- )
 
 : with-gl-context ( handle quot -- )
     swap [ select-gl-context call ] keep

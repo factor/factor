@@ -1,6 +1,6 @@
 ! Copyright (C) 2006 Slava Pestov
 ! See http://factorcode.org/license.txt for BSD license.
-USING: alien kernel math namespaces ;
+USING: alien gadgets kernel math namespaces sequences ;
 IN: x11
 
 ! This code was inspired by McCLIM's Backends/CLX/port.lisp.
@@ -27,7 +27,7 @@ IN: x11
 TUPLE: x-clipboard atom ;
 
 M: x-clipboard paste-clipboard ( gadget clipboard -- )
-    >r find-world world-handle first r> clipboard-atom
+    >r find-world world-handle first r> x-clipboard-atom
     convert-selection ;
 
 : init-clipboard ( -- )

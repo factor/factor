@@ -10,6 +10,7 @@ USING: kernel parser words compiler sequences ;
     "/library/ui/x11/events.factor"
     "/library/ui/x11/glx-utils.factor"
     "/library/ui/x11/windows.factor"
+    "/library/ui/x11/clipboard.factor"
     "/library/ui/x11/ui.factor"
 } [ run-resource ] each
 
