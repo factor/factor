@@ -6,6 +6,7 @@
 
 - x11 title bars are funny
 - x11 mouse enter/leave events: update rollover
+- x11: when starting with restored windows, caret invisible
 + httpd:
   - outliners don't work
   - browser responder doesn't work

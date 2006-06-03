@@ -92,6 +92,13 @@ V{ } clone hand-buttons set-global
     fire-motion
     T{ mouse-enter } swap each-gesture ;
 
+: forget-rollover ( -- )
+    #! After we restore the UI, send mouse leave events to all
+    #! gadgets that were under the mouse at the time of the
+    #! save, since the mouse is in a different location now.
+    f hand-gadget [ get-global ] 2keep set-global
+    parents hand-gestures ;
+
 : focus-gestures ( new old -- )
     drop-prefix <reversed>
     T{ lose-focus } swap each-gesture

@@ -37,6 +37,10 @@ M: world button-up-event ( event world -- )
 M: world wheel-event ( event world -- )
     >r button&loc >r 4 = r> r> send-wheel ;
 
+M: world enter-event ( event world -- ) motion-event ;
+
+M: world leave-event ( event world -- ) 2drop forget-rollover ;
+
 M: world motion-event ( event world -- )
     >r dup XMotionEvent-x swap XMotionEvent-y 0 3array r>
     move-hand ;

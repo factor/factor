@@ -83,18 +83,11 @@ C: titled-gadget ( gadget title -- )
 : open-titled-window ( gadget title -- )
     <titled-gadget> open-window ;
 
-: fix-rollover ( -- )
-    #! After we restore the UI, send mouse leave events to all
-    #! gadgets that were under the mouse at the time of the
-    #! save, since the mouse is in a different location now.
-    f hand-gadget [ get-global ] 2keep set-global
-    parents hand-gestures ;
-
 : restore-windows ( -- )
     windows get [ second ] map
     0 windows get set-length
     [ dup reset-world open-window* ] each
-    fix-rollover ;
+    forget-rollover ;
 
 : restore-windows? ( -- ? )
     windows get [ empty? not ] [ f ] if* ;

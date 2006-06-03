@@ -12,6 +12,10 @@ GENERIC: button-down-event ( event window -- )
 
 GENERIC: button-up-event ( event window -- )
 
+GENERIC: enter-event ( event window -- )
+
+GENERIC: leave-event ( event window -- )
+
 GENERIC: wheel-event ( event window -- )
 
 GENERIC: motion-event ( event window -- )
@@ -52,6 +56,8 @@ GENERIC: client-event ( event window -- )
         { [ dup ConfigureNotify = ] [ drop configure-event ] }
         { [ dup ButtonPress = ] [ drop button-down-event$ ] }
         { [ dup ButtonRelease = ] [ drop button-up-event$ ] }
+        { [ dup EnterNotify = ] [ drop enter-event ] }
+        { [ dup LeaveNotify = ] [ drop leave-event ] }
         { [ dup MotionNotify = ] [ drop motion-event ] }
         { [ dup KeyPress = ] [ drop key-down-event ] }
         { [ dup KeyRelease = ] [ drop key-up-event ] }
