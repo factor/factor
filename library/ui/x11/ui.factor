@@ -133,8 +133,7 @@ IN: gadgets
     world-handle first dpy get -rot swap XStoreName drop ;
 
 : open-window* ( world -- )
-    dup gadget-window dup add-notify
-    dup gadget-title over set-title
+    dup gadget-window dup start-world
     world-handle first map-window* ;
 
 : select-gl-context ( handle -- )
