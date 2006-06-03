@@ -21,6 +21,11 @@ DEFER: flush-gl-context ( handle -- )
 TUPLE: clipboard contents ;
 C: clipboard "" over set-clipboard-contents ;
 
+GENERIC: paste-clipboard ( gadget clipboard -- )
+
+M: object paste-clipboard ( gadget clipboard -- )
+    clipboard-contents dup [ swap user-input ] [ 2drop ] if ;
+
 SYMBOL: clipboard
 SYMBOL: selection
 

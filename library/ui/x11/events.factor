@@ -28,6 +28,8 @@ GENERIC: focus-in-event ( event window -- )
 
 GENERIC: focus-out-event ( event window -- )
 
+GENERIC: selection-event ( event window -- )
+
 GENERIC: client-event ( event window -- )
 
 : next-event ( -- event )
@@ -63,6 +65,7 @@ GENERIC: client-event ( event window -- )
         { [ dup KeyRelease = ] [ drop key-up-event ] }
         { [ dup FocusIn = ] [ drop focus-in-event ] }
         { [ dup FocusOut = ] [ drop focus-out-event ] }
+        { [ dup SelectionNotify = ] [ drop selection-event ] }
         { [ dup ClientMessage = ] [ drop client-event ] }
         { [ t ] [ 3drop ] }
     } cond ;

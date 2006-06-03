@@ -97,15 +97,15 @@ M: world key-down-event ( event world -- )
     ] if* ;
 
 M: world key-up-event ( event world -- )
-    world-focus over [ <key-up> ] event>gesture [
-        over handle-gesture drop
-    ] [
-        2drop
-    ] if* ;
+    world-focus over [ <key-up> ] event>gesture
+    [ over handle-gesture drop ] [ 2drop ] if* ;
 
 M: world focus-in-event ( event world -- ) nip focus-world ;
 
 M: world focus-out-event ( event world -- ) nip unfocus-world ;
+
+M: world selection-event ( event world -- )
+    >r selection-from-event r> world-focus user-input ;
 
 : close-box? ( event -- ? )
     dup XClientMessageEvent-message_type "WM_PROTOCOLS" x-atom =
@@ -149,6 +149,7 @@ IN: shells
     [
         f [
             init-timers
+            init-clipboard
             restore-windows? [
                 restore-windows
             ] [
