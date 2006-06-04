@@ -1,9 +1,5 @@
 USING: help sequences sequences-internals ;
 
-HELP: empty? "( seq -- ? )"
-{ $values { "seq" "a sequence" } { "?" "a boolean" } }
-{ $description "Tests if the sequence has zero length." } ;
-
 HELP: length "( seq -- n )"
 { $values { "seq" "a sequence" } { "n" "a non-negative integer" } }
 { $contract "Outputs the length of the sequence. All sequences support this operation."
@@ -44,6 +40,10 @@ HELP: like "( seq prototype -- newseq )"
 $terpri
 "This generic word is flushable, so user-defined methods must satisfy the flushable contract (see " { $link "declarations" } ")." } ;
 
+HELP: empty? "( seq -- ? )"
+{ $values { "seq" "a sequence" } { "?" "a boolean" } }
+{ $description "Tests if the sequence has zero length." } ;
+
 HELP: peek "( seq -- elt )"
 { $values { "seq" "a sequence" } { "elt" "an object" } }
 { $description "Outputs the last element of the sequence." }
@@ -63,11 +63,6 @@ HELP: resize "( n seq -- newseq )"
 { $values { "n" "a non-negative integer" } { "seq" "a sequence" } { "newseq" "a new sequence" } }
 { $description "Creates a new sequence of the same type as " { $snippet "seq" } " with " { $snippet "n" } " elements, and copies the contents of " { $snippet "seq" } " into the new sequence. If " { $snippet "n" } " exceeds the length of " { $snippet "seq" } ", the remaining elements are filled with a default value; " { $link f } " for arrays and 0 for strings." }
 { $notes "This generic word is only implemented for strings and arrays." } ;
-
-HELP: first "( seq -- first )"
-{ $values { "seq" "a sequence" } { "first" "the first element of the sequence" } }
-{ $description "Outputs the first element of the sequence." }
-{ $errors "Throws an error if the sequence is empty." } ;
 
 HELP: first "( seq -- first )"
 { $values { "seq" "a sequence" } { "first" "the first element of the sequence" } }
@@ -117,3 +112,7 @@ HELP: nth-unsafe "( n seq -- elt )"
 HELP: set-nth-unsafe "( elt n seq -- )"
 { $values { "elt" "an object" } { "n" "an integer" } { "seq" "a sequence" } }
 { $contract "Unsafe variant of " { $link set-nth } " that does not perform bounds checks." } ;
+
+HELP: exchange "( m n seq -- )"
+{ $values { "m" "a non-negative integer" } { "n" "a non-negative integer" } { "seq" "a mutable sequence" } }
+{ $description "Unsafe variant of " { $link exchange } " that does not perform bounds checks." } ;

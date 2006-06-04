@@ -52,9 +52,30 @@ HELP: ?tail "( seq end -- newseq ? )"
 { $description "Tests if " { $snippet "seq" } " ends with " { $snippet "end" } ". If there is a match, outputs the subrange of " { $snippet "seq" } " excluding " { $snippet "begin" } ", and " { $link t } ". If there is no match, outputs " { $snippet "seq" } " and " { $link f } "." } ;
 
 HELP: replace-slice "( new m n seq -- replaced )"
-{ $values { "new" "a sequence" } { "seq" "a sequence" } { "m" "a non-negative integer" } { "n" "a non-negative integer" } { "reokaced" "a new sequence" } }
+{ $values { "new" "a sequence" } { "seq" "a sequence" } { "m" "a non-negative integer" } { "n" "a non-negative integer" } { "replaced" "a new sequence" } }
 { $description "Outputs a new sequence consisting of the elements of " { $snippet "seq" } ", with the range from " { $snippet "m" } " to " { $snippet "n" } " replaced by " { $snippet "new" } "." }
 { $errors "Throws an error if " { $snippet "new" } " contains elements whose types are not permissible in sequences of the same class as " { $snippet "seq" } "." } ;
+
+HELP: remove-nth "( n seq -- newseq )"
+{ $values { "n" "a non-negative integer" } { "seq" "a sequence" } { "newseq" "a new sequence" } }
+{ $description "Outputs a new sequence with the same elements as " { $snippet "seq" } " except omitting the " { $snippet "n" } "th element." }
+{ $examples
+    { $example "2 { + - = * / } remove-nth ." "{ + - * / }" }
+} ;
+
+HELP: (cut) "( n seq -- before after )"
+{ $values { "n" "a non-negative integer" } { "seq" "a sequence" } { "before" "a sequence" } { "after" "a slice" } }
+{ $description "Outputs a pair of sequences, where " { $snippet "before" } " consists of the first " { $snippet "n" } " elements of " { $snippet "seq" } " and has the same type, while " { $snippet "after" } " is a slice of the remaining elements." }
+{ $notes "Unlike " { $link cut } ", the run time of this word is proportional to the length of " { $snippet "before" } ", not " { $snippet "after" } ", so it is suitable for use in an iterative algorithm which cuts successive pieces off a sequence." } ;
+
+HELP: cut "( n seq -- before after )"
+{ $values { "n" "a non-negative integer" } { "seq" "a sequence" } { "before" "a sequence" } { "after" "a sequence" } }
+{ $description "Outputs a pair of sequences, where " { $snippet "before" } " consists of the first " { $snippet "n" } " elements of " { $snippet "seq" } ", while " { $snippet "after" } " holds the remaining elements. Both output sequences have the same type as " { $snippet "seq" } "." }
+{ $notes "Since this word copies the entire tail of the sequence, it should not be used in a loop. If this is important, consider using " { $link (cut) } " instead, since it returns a slice for the tail instead of copying." } ;
+
+HELP: cut* "( n seq -- before after )"
+{ $values { "n" "a non-negative integer" } { "seq" "a sequence" } { "before" "a sequence" } { "after" "a sequence" } }
+{ $description "Outputs a pair of sequences, where " { $snippet "after" } " consists of the last " { $snippet "n" } " elements of " { $snippet "seq" } ", while " { $snippet "before" } " holds the remaining elements. Both output sequences have the same type as " { $snippet "seq" } "." } ;
 
 HELP: group "( n seq -- groups )"
 { $values { "n" "a non-negative integer" } { "seq" "a sequence" } { "groups" "a sequence of sequences" } }
@@ -90,6 +111,9 @@ HELP: drop-prefix "( seq1 seq2 -- slice1 slice2 )"
 { $values { "seq1" "a sequence" } { "seq2" "a sequence" } { "slice1" "a slice" } { "slice2" "a slice" } }
 { $description "Outputs a pair of virtual sequences with the common prefix of " { $snippet "seq1" } " and " { $snippet "seq2" } " removed." } ;
 
-HELP: unpair "( assoc -- keys values )"
-{ $values { "assoc" "a sequence of pairs" } { "keys" "a new sequence" } { "values" "a new sequence" } }
-{ $description "Given a sequence of two-element sequences, outputs a new sequence with the first element of each pair, and a new sequence with the second element of each pair." } ;
+HELP: unclip "( seq -- rest first )"
+{ $values { "seq" "a sequence" } { "rest" "a sequence" } { "first" "an object" } }
+{ $description "Outputs a tail sequence and the first element of " { $snippet "seq" } "; the tail sequence consists of all elements of " { $snippet "seq" } " but the first." }
+{ $examples
+    { $example "{ 1 2 3 } unclip add ." "{ 2 3 1 }" }
+} ;

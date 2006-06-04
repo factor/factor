@@ -84,14 +84,30 @@ HELP: >resizable "( seq -- newseq )"
 { $values { "seq" "a sequence" } { "newseq" "a mutable resizable sequence" } }
 { $description "Outputs a new, mutable resizable sequence having the same elements as " { $snippet "seq" } "." } ;
 
-HELP: immutable "( seq -- newseq )"
-{ $values { "seq" "a sequence" } { "newseq" "a mutable resizable sequence" } }
-{ $description "Outputs a new, mutable resizable sequence having the same elements as " { $snippet "seq" } "." } ;
+HELP: immutable "( seq quot -- newseq )"
+{ $values { "seq" "a sequence" } { "quot" "a quotation with stack effect " { $snippet "( seq -- )" } { "newseq" "a sequence" } }
+{ $description "A utility combinator transforming a word which modifies its input sequence into a word which returns a new output sequence. "
+$terpri
+"A mutable, resizable copy of " { $snippet "seq" } " is made, then the quotation is called to modify this copy and consume it. Finally, the copy is converted into a sequence of the same type as the original." }
+{ $examples
+    "Take a look at " { $link append } ", which is built off the mutating word " { $link nappend } ", or " { $link add } " which is built from " { $link push } "."
+} ;
 
 HELP: add "( seq elt -- newseq )"
 { $values { "seq" "a sequence" } { "elt" "an object" } { "newseq" "a sequence" } }
-{ $description "Outputs a new sequence consisting of the elements of " { $snippet "seq1" } " followed by " { $snippet "elt" } "." }
-{ $errors "Throws an error if the type of " { $snippet "elt" } " is not permitted in sequences of the same class as " { $snippet "seq1" } "." } ;
+{ $description "Outputs a new sequence obtained by adding " { $snippet "elt" } " at the end of " { $snippet "seq" } "." }
+{ $errors "Throws an error if the type of " { $snippet "elt" } " is not permitted in sequences of the same class as " { $snippet "seq1" } "." }
+{ $examples
+    { $example "{ 1 2 3 } 4 add ." "{ 1 2 3 4 }" }
+} ;
+
+HELP: add* "( seq elt -- newseq )"
+{ $values { "seq" "a sequence" } { "elt" "an object" } { "newseq" "a sequence" } }
+{ $description "Outputs a new sequence obtained by adding " { $snippet "elt" } " at the beginning of " { $snippet "seq" } "." }
+{ $errors "Throws an error if the type of " { $snippet "elt" } " is not permitted in sequences of the same class as " { $snippet "seq1" } "." } 
+{ $examples
+    { $example "{ 1 2 3 } 0 add* ." "{ 0 1 2 3 }" }
+} ;
 
 HELP: diff "( seq1 seq2 -- newseq )"
 { $values { "seq1" "a sequence" } { "seq2" "a sequence" } { "newseq" "a sequence" } }
@@ -139,6 +155,55 @@ HELP: flip "( matrix -- newmatrix )"
 { $description "Transposes the matrix; that is, rows become columns and columns become rows." }
 { $examples { $example "{ { 1 2 3 } { 4 5 6 } } flip ." "{ { 1 4 } { 2 5 } { 3 6 } }" } } ;
 
+HELP: unpair "( assoc -- keys values )"
+{ $values { "assoc" "a sequence of pairs" } { "keys" "a new sequence" } { "values" "a new sequence" } }
+{ $description "Given a sequence of two-element sequences, outputs a new sequence with the first element of each pair, and a new sequence with the second element of each pair." } ;
+
+HELP: exchange "( m n seq -- )"
+{ $values { "m" "a non-negative integer" } { "n" "a non-negative integer" } { "seq" "a mutable sequence" } }
+{ $description "Exchanges the " { $snippet "m" } "th and " { $snippet "n" } "th elements of " { $snippet "seq" } "." } ;
+
+HELP: assoc "( key assoc -- value )"
+{ $values { "key" "an object" } { "assoc" "a sequence of pairs" } { "value" "the associated value, or " { $link f } }
+{ $description "Searches for a pair whose first element is equal to the key and outputs the second element of the pair. Keys are compared for equality using " { $link = } ". Outputs " { $link f } " if no matching key is found." }
+{ $see-also rassoc } ;
+
+HELP: rassoc "( value assoc -- key )"
+{ $values { "value" "an object" } { "assoc" "a sequence of pairs" } { "key" "the associated key, or " { $link f } }
+{ $description "Searches for a pair whose second element is equal to the value and outputs the first element of the pair. Values are compared for equality using " { $link = } ". Outputs " { $link f } " if no matching value is found." } 
+{ $see-also rassoc } ;
+
+HELP: last/first "( seq -- pair )"
+{ $values { "seq" "a sequence" } { "pair" "a two-element array" } }
+{ $description "Creates an array holding the first and last element of the sequence." } ;
+
 HELP: sequence= "( seq1 seq2 -- ? )"
 { $values { "seq1" "a sequence" } { "seq2" "a sequence" } { "?" "a boolean" } }
 { $description "Tests if the two sequences have the same length and elements. This is weaker than " { $link = } ", since it does not ensure that the sequences are instances of the same class." } ;
+
+HELP: depth "( -- n )"
+{ $values { "n" "a non-negative integer" } }
+{ $description "Outputs the number of elements on the data stack." } ;
+
+HELP: cond "( assoc -- )"
+{ $values { "assoc" "a sequence of quotation pairs" } }
+{ $description
+    "Calls the first quotation in each pair in turn, until a quotation outputs a true value, in which case the second quotation in the corresponding pair is called."
+    $terpri
+    "The following two phrases are equivalent:"
+    { $code "{ { [ X ] [ Y ] } { [ Z ] [ T ] } } cond" }
+    { $code "X [ Y ] [ Z [ T ] [ no-cond ] if ] if" }
+    "Note that the base case is " { $link no-cond } " which throws an error."
+}
+{ $errors "Throws an error if the first quotation in every pair yields " { $link f } "." } ;
+
+HELP: with-datastack "( stack word -- newstack )"
+{ $values { "stack" "a sequence" } { "word" "a word" } { "newstack" "a sequence" } }
+{ $description "Executes " { $snippet "word" } " with the given data stack contents, and outputs the new data stack after the word returns. Does not affect the data stack in surrounding code, other than consuming the two inputs and pushing the output." }
+{ $examples
+    { $example "{ 3 7 } \ + with-datastack ." "V{ 10 }" }
+} ;
+
+HELP: unix? "( -- ? )"
+{ $values { "?" "a boolean" } }
+{ $description "Tests if Factor is running on a Unix-like system. While this is a rather vague notion, one can use it to make certain assumptions about system calls and file structure which are not valid on Windows." } ;

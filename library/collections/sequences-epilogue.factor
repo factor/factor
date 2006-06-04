@@ -154,15 +154,10 @@ M: object <=>
 : no-cond "cond fall-through" throw ;
 
 : cond ( conditions -- )
-    #! Conditions is a sequence of quotation pairs.
-    #! { { [ X ] [ Y ] } { [ Z ] [ T ] } }
-    #! => X [ Y ] [ Z [ T ] [ ] if ] if
-    #! The last condition should be a catch-all 't'.
-    [ first call ] find nip dup
-    [ second call ] [ no-cond ] if ;
+    [ first call ] find nip dup [ second call ] [ no-cond ] if ;
 
 : with-datastack ( stack word -- stack )
-    datastack >r >r set-datastack r> execute
+    datastack >r >r >vector set-datastack r> execute
     datastack r> [ push ] keep set-datastack 2nip ;
 
 : unix? os { "freebsd" "linux" "macosx" "solaris" } member? ;

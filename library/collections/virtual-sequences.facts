@@ -7,7 +7,7 @@ HELP: <slice> "( m n seq -- slice )"
 
 HELP: reverse "( seq -- reversed )"
 { $values { "seq" "a sequence" } { "reversed" "a sequence" } }
-{ $description "Outputs a new sequence with the reverse element order." } ;
+{ $description "Outputs a new sequence having the same elements as " { $snippet "seq" } " but in reverse order." } ;
 
 HELP: <reversed> "( seq -- reversed )"
 { $values { "seq" "a sequence" } { "reversed" "a sequence" } }

@@ -124,7 +124,7 @@ C: divider ( -- divider )
         2dup gadget-children length = [ >r 1- r> ] when
         2dup nth-gadget unparent
     ] unless
-    [ >r 2 /i r> track-sizes remove-index normalize-sizes ] keep
+    [ >r 2 /i r> track-sizes remove-nth normalize-sizes ] keep
     [ set-track-sizes ] keep relayout-1 ;
 
 : track-remove ( gadget track -- )

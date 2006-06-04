@@ -48,14 +48,14 @@ strings vectors ;
     tuck >r >r head-slice r> r> tail-slice swapd append3 ;
     flushable
 
-: remove-index ( n seq -- seq )
+: remove-nth ( n seq -- seq )
     [ head-slice ] 2keep >r 1+ r> tail-slice append ;
 
 : (cut) ( n seq -- before after )
     [ head ] 2keep tail-slice ; flushable
 
 : cut ( n seq -- before after )
-    [ (cut) ] keep like ; flushable
+    [ head ] 2keep tail ; flushable
 
 : cut* ( seq1 seq2 -- seq seq )
     [ head* ] 2keep tail* ; flushable
