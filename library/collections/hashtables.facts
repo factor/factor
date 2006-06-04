@@ -148,8 +148,6 @@ HELP: remove-hash "( key hash -- )"
 { $see-also clear-hash } ;
 
 HELP: remove-hash* "( key hash -- old )"
-{ $values { "key" "a key" } { "hash" "a hashtable" } { "old" "the previous value associated to " { $snippet "key" } ", or " { $link f } } }
-HELP: set-hash "( value key hash -- )"
 { $values { "value" "a value" } { "key" "a key" } { "hash" "a hashtable" } }
 { $description "Stores an entry into the hashtable." }
 { $side-effects "hash" }
