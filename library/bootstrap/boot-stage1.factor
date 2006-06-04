@@ -275,6 +275,7 @@ vectors words ;
         "/library/tools/annotations.facts"
         "/library/tools/debugger.facts"
         "/library/tools/describe.facts"
+        "/library/tools/inspector.facts"
         "/library/tools/listener.facts"
         "/library/tools/memory.facts"
         "/library/tools/walker.facts"

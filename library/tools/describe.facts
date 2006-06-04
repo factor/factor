@@ -1,5 +1,5 @@
 IN: inspector
-USING: help io prettyprint words ;
+USING: help io kernel prettyprint words ;
 
 HELP: summary "( object -- string )"
 { $values { "object" "an object" } { "string" "a string" } }
@@ -42,8 +42,9 @@ HELP: stack. "( seq -- )"
 { $description "Prints an outliner listing elements of a sequence in reverse order. Elements are coverted to strings using " { $link unparse-short } "." }
 { $notes "This word is used in the implementation of " { $link .s } " and " { $link .r } "." } ;
 
-HELP: .s "( -- )"
-{ $description "Displays the contents of the data stack, with the top of the stack printed first." } ;
+HELP: callstack. "( seq -- )"
+{ $values { "seq" "a sequence" } }
+{ $description "Displays a sequence output by " { $link callstack } " in a nice way, by highlighting the current execution point in every call frame." } ;
 
 HELP: .r "( -- )"
 { $description "Displays the contents of the return stack, with the top of the stack printed first." } ;

@@ -20,9 +20,4 @@ HELP: break-on "( word quot -- )"
 
 HELP: profile "( word -- )"
 { $values { "word" "a word" } }
-{ $description "Changes a word definition so that the total runtime is added to a variable keyed by the word in the global namespace." }
-{ $examples
-    { $example 
-        ": foo 1000000 [ drop ] each ;\n\\ foo profile\n\\ foo get ." "931"
-    }
-} ;
+{ $description "Changes a word definition so the variable named by the word in the global namespace is incremented every time the word is executed." } ;

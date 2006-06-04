@@ -1,4 +1,4 @@
-USING: help kernel parser words ;
+USING: help inspector kernel parser words ;
 
 HELP: execute "( word -- )"
 { $values { "word" "a word" } }

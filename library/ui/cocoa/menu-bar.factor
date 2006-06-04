@@ -145,6 +145,10 @@ DEFER: described-menu
         { {
             "Help"
             { "Factor Documentation" handbook-window "?" }
+            { }
             { "Help Index" articles-window "" }
+            { "Types" types-window "" }
+            { "Classes" classes-window "" }
+            { "Primitives" primitives-window "" }
         } }
     } described-menu set-main-menu ;

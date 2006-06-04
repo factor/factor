@@ -8,6 +8,8 @@ TUPLE: reversed seq ;
 
 : reversed@ reversed-seq [ length swap - 1- ] keep ; inline
 
+M: reversed length ( seq -- n ) reversed-seq length ;
+
 M: reversed nth ( n seq -- elt ) reversed@ nth ;
 
 M: reversed nth-unsafe ( n seq -- elt ) reversed@ nth-unsafe ;

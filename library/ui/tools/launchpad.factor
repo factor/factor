@@ -3,8 +3,9 @@
 IN: gadgets-launchpad
 USING: gadgets gadgets-apropos gadgets-borders gadgets-browser
 gadgets-buttons gadgets-labels gadgets-listener gadgets-panes
-gadgets-presentations gadgets-scrolling gadgets-theme help
-inspector io kernel memory namespaces prettyprint sequences ;
+gadgets-presentations gadgets-scrolling gadgets-theme generic
+help inspector io kernel memory namespaces prettyprint sequences
+words ;
 
 : <launchpad> ( menu -- )
     [ first2 >r <label> [ drop ] r> append <bevel-button> ] map
@@ -23,6 +24,18 @@ inspector io kernel memory namespaces prettyprint sequences ;
 : articles-window ( -- )
     [ articles. ] "Help index" pane-window ;
 
+: types-window ( -- )
+    [ builtins get [ help ] word-outliner ]
+    "Types" pane-window ;
+
+: classes-window ( -- )
+    [ classes [ help ] word-outliner ]
+    "Types" pane-window ;
+
+: primitives-window ( -- )
+    [ all-words [ primitive? ] subset [ help ] word-outliner ]
+    "Primitives" pane-window ;
+
 : apropos-window ( -- )
     <apropos-gadget> open-window ;
 
@@ -37,6 +50,9 @@ inspector io kernel memory namespaces prettyprint sequences ;
         { "Browser" [ f browser-window ] }
         { "Apropos" [ apropos-window ] }
         { "Globals" [ globals-window ] }
+        { "Types" [ types-window ] }
+        { "Classes" [ classes-window ] }
+        { "Primitives" [ primitives-window ] }
         { "Memory" [ memory-window ] }
         { "Save image" [ save ] }
         { "Exit" [ 0 exit ] }

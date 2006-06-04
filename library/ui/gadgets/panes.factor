@@ -69,7 +69,6 @@ C: pane ( -- pane )
 M: pane gadget-gestures
     pane-input [
         H{
-            { T{ button-down } [ pane-input click-editor ] }
             { T{ key-down f f "RETURN" } [ pane-commit ] }
             { T{ key-down f f "UP" } [ pane-input [ history-prev ] with-editor ] }
             { T{ key-down f f "DOWN" } [ pane-input [ history-next ] with-editor ] }

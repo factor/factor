@@ -160,9 +160,6 @@ DEFER: :cc
     ":get ( var -- value ) accesses variables at time of error" print
     flush ;
 
-: flush-error-handler ( -- )
-    [ "Error in default error handler!" print ] when ;
-
 : print-error ( error -- )
     [
         dup error.

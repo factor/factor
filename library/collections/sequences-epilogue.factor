@@ -156,8 +156,4 @@ M: object <=>
 : cond ( conditions -- )
     [ first call ] find nip dup [ second call ] [ no-cond ] if ;
 
-: with-datastack ( stack word -- stack )
-    datastack >r >r >vector set-datastack r> execute
-    datastack r> [ push ] keep set-datastack 2nip ;
-
 : unix? os { "freebsd" "linux" "macosx" "solaris" } member? ;

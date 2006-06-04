@@ -85,7 +85,7 @@ HELP: >resizable "( seq -- newseq )"
 { $description "Outputs a new, mutable resizable sequence having the same elements as " { $snippet "seq" } "." } ;
 
 HELP: immutable "( seq quot -- newseq )"
-{ $values { "seq" "a sequence" } { "quot" "a quotation with stack effect " { $snippet "( seq -- )" } { "newseq" "a sequence" } }
+{ $values { "seq" "a sequence" } { "quot" "a quotation with stack effect " { $snippet "( seq -- )" } } { "newseq" "a sequence" } }
 { $description "A utility combinator transforming a word which modifies its input sequence into a word which returns a new output sequence. "
 $terpri
 "A mutable, resizable copy of " { $snippet "seq" } " is made, then the quotation is called to modify this copy and consume it. Finally, the copy is converted into a sequence of the same type as the original." }
@@ -164,12 +164,12 @@ HELP: exchange "( m n seq -- )"
 { $description "Exchanges the " { $snippet "m" } "th and " { $snippet "n" } "th elements of " { $snippet "seq" } "." } ;
 
 HELP: assoc "( key assoc -- value )"
-{ $values { "key" "an object" } { "assoc" "a sequence of pairs" } { "value" "the associated value, or " { $link f } }
+{ $values { "key" "an object" } { "assoc" "a sequence of pairs" } { "value" "the associated value, or " { $link f } } }
 { $description "Searches for a pair whose first element is equal to the key and outputs the second element of the pair. Keys are compared for equality using " { $link = } ". Outputs " { $link f } " if no matching key is found." }
 { $see-also rassoc } ;
 
 HELP: rassoc "( value assoc -- key )"
-{ $values { "value" "an object" } { "assoc" "a sequence of pairs" } { "key" "the associated key, or " { $link f } }
+{ $values { "value" "an object" } { "assoc" "a sequence of pairs" } { "key" "the associated key, or " { $link f } } }
 { $description "Searches for a pair whose second element is equal to the value and outputs the first element of the pair. Values are compared for equality using " { $link = } ". Outputs " { $link f } " if no matching value is found." } 
 { $see-also rassoc } ;
 
@@ -196,13 +196,6 @@ HELP: cond "( assoc -- )"
     "Note that the base case is " { $link no-cond } " which throws an error."
 }
 { $errors "Throws an error if the first quotation in every pair yields " { $link f } "." } ;
-
-HELP: with-datastack "( stack word -- newstack )"
-{ $values { "stack" "a sequence" } { "word" "a word" } { "newstack" "a sequence" } }
-{ $description "Executes " { $snippet "word" } " with the given data stack contents, and outputs the new data stack after the word returns. Does not affect the data stack in surrounding code, other than consuming the two inputs and pushing the output." }
-{ $examples
-    { $example "{ 3 7 } \ + with-datastack ." "V{ 10 }" }
-} ;
 
 HELP: unix? "( -- ? )"
 { $values { "?" "a boolean" } }

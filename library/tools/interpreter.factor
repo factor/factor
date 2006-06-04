@@ -100,7 +100,7 @@ M: object do ( object -- ) do-1 ;
 
 ! The interpreter loses object identity of the name and catch
 ! stacks -- they are copied after each step -- so we execute
-! them atomically and don't allow stepping into these words
+! these atomically and don't allow stepping into these words
 \ >n [ \ >n host-word ] "meta-word" set-word-prop
 \ n> [ \ n> host-word ] "meta-word" set-word-prop
 \ >c [ \ >c host-word ] "meta-word" set-word-prop

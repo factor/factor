@@ -4,7 +4,6 @@ IN: inspector
 USING: arrays generic io kernel listener memory namespaces
 prettyprint sequences words ;
 
-! Interactive inspector
 SYMBOL: inspector-slots
 
 : sheet-numbers ( sheet -- sheet )
