@@ -86,7 +86,7 @@ M: editor gadget-gestures
         { T{ key-down f f "HOME" } [ [ T{ document-elt } prev-elt ] with-editor ] }
         { T{ key-down f f "END" } [ [ T{ document-elt } next-elt ] with-editor ] }
         { T{ key-down f { C+ } "k" } [ [ line-clear ] with-editor ] }
-        { T{ button-down f 2 } [ selection get paste-clipboard ] }
+        { T{ button-up f 2 } [ dup click-editor selection get paste-clipboard ] }
         { T{ paste-action } [ clipboard get paste-clipboard ] }
     } ;
 

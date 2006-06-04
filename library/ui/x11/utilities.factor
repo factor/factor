@@ -18,14 +18,11 @@ SYMBOL: root
     [ "Cannot connect to X server - check $DISPLAY" throw ] unless* ;
 
 : initialize-x ( display-string -- )
-    XOpenDisplay check-display dpy set
-    dpy get XDefaultScreen scr set
-    dpy get scr get XRootWindow root set ;
+    XOpenDisplay check-display dpy set-global
+    dpy get XDefaultScreen scr set-global
+    dpy get scr get XRootWindow root set-global ;
 
 : close-x ( -- ) dpy get XCloseDisplay drop ;
     
 : with-x ( display-string quot -- )
-    [
-        swap initialize-x
-        [ close-x ] cleanup
-    ] with-scope ;
+    >r initialize-x r> [ close-x ] cleanup ;

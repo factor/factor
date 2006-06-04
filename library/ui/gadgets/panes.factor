@@ -16,7 +16,7 @@ TUPLE: pane output active current input prototype continuation ;
 : add-output 2dup set-pane-output add-gadget ;
 
 : <active-line> ( current input -- line )
-    [ 2array ] [ 1array ] if* make-shelf ;
+    { { [ ] f @center } { [ ] f @left } } make-frame ;
 
 : init-line ( pane -- )
     dup pane-prototype clone swap set-pane-current ;
@@ -61,6 +61,7 @@ SYMBOL: structured-input
 
 C: pane ( -- pane )
     <pile> over set-delegate
+    1 over set-pack-fill
     <shelf> over set-pane-prototype
     <pile> <incremental> over add-output
     dup prepare-line ;

@@ -9,7 +9,7 @@ IN: x11
     "org.factorcode.Factor.SELECTION" x-atom ;
 
 : convert-selection ( win selection -- n )
-    >r >r dpy get r> XA_STRING selection-property r>
+    swap >r >r dpy get r> XA_STRING selection-property r>
     CurrentTime XConvertSelection drop ;
 
 : snarf-property ( prop-return -- string )
@@ -20,9 +20,12 @@ IN: x11
     0 <Atom> 0 <int> 0 <ulong> 0 <ulong> f <void*>
     [ XGetWindowProperty drop ] keep snarf-property ;
 
-: selection-from-event ( event -- string )
-    dup XSelectionEvent-property zero?
-    [ drop f ] [ selection-property 1 window-property ] if ;
+: selection-from-event ( event window -- string )
+    >r dup XSelectionEvent-property zero? [
+        r> 2drop f
+    ] [
+        r> selection-property 1 window-property
+    ] if ;
 
 TUPLE: x-clipboard atom ;
 
