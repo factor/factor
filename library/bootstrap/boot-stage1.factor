@@ -206,6 +206,7 @@ vectors words ;
         "/library/continuations.facts"
         "/library/errors.facts"
         "/library/kernel.facts"
+        "/library/quotations.facts"
         "/library/threads.facts"
         "/library/words.facts"
         "/library/bootstrap/image.facts"

@@ -1,4 +1,5 @@
-USING: generic help kernel kernel-internals memory sequences ;
+USING: generic help kernel kernel-internals math memory
+sequences ;
 
 HELP: eq? "( obj1 obj2 -- ? )"
 { $values { "obj1" "an object" } { "obj2" "an object" } }
@@ -48,7 +49,7 @@ HELP: hashcode "( obj -- n )"
 { $values { "obj" "an object" } { "n" "a fixnum" } }
 { $contract "Outputs the hashcode of the object. The hashcode operation must satisfy the following properties:"
 { $list
-    "the hashcode must be a fixnum. Returning a bignum will not cause any problems other than potential performance degradation. Returning other types will result in type errors."
+    "the hashcode should be a fixnum, however returning a bignum will not cause any problems other than potential performance degradation."
     { "if two objects are equal under " { $link = } ", they must have equal hashcodes" }
     "the hashcode is only permitted to change if the object is mutated in some way"
     { "the word must satisfy the " { $link POSTPONE: flushable } " contract" }
@@ -144,6 +145,14 @@ HELP: os "( -- os )"
     { $code "freebsd" "linux" "macosx" "solaris" "win32" "unix" }
 } ;
 
+HELP: windows? "( -- ? )"
+{ $values { "?" "a boolean" } }
+{ $description "Tests if Factor is running on Windows." } ;
+
+HELP: macosx? "( -- ? )"
+{ $values { "?" "a boolean" } }
+{ $description "Tests if Factor is running on Mac OS X." } ;
+
 HELP: call "( quot -- )"
 { $values { "quot" "a quotation" } }
 { $description "Push the current callframe on the callstack, and set the callframe to the given quotation. Conceptually, calls the quotation, as if its definition was substituted at the location of the call." }
@@ -232,6 +241,17 @@ HELP: literalize "( obj -- wrapper )"
 { $values { "obj" "an object" } { "wrapper" "a wrapper or the original object" } }
 { $description "Turns non-self-evaluating objects (words and wrappers) into wrappers that push those objects, and is a no-op on everything else." } ;
 
+HELP: declare "( spec -- )"
+{ $values { "spec" "an array of classes" } }
+{ $description "Declares that the elements at the top of the stack are instances of the classes in " { $snippet "spec" } "." }
+{ $warning "The compiler blindly trusts declarations, and false declarations can lead to crashes, memory corruption and other undesirable behavior." }
+{ $examples
+    "The optimizer cannot do anything with the below quotation:"
+    { $example "[ 2 + 10 * ] f dataflow." "[ 2 + 10 * ]" }
+    "However, if we declare that the top of the stack is a " { $link float } ", then type checks and generic dispatch are eliminated, and the compiler can use unsafe intrinsics:"
+    { $example "[ { float } declare 2 + 10 * ] f dataflow." "[ 2.0 float+ 10.0 float* ]" }
+} ;
+
 HELP: array-capacity "( array -- n )"
 { $values { "array" "an array" } { "n" "a non-negative fixnum" } }
 { $description "Low-level array length accessor." }
@@ -246,6 +266,18 @@ HELP: set-array-nth "( elt n array -- )"
 { $values { "elt" "an object" } { "n" "a non-negative fixnum" } { "array" "an array" }  }
 { $description "Low-level array element mutator." }
 { $warning "This word is in the " { $snippet "kernel-internals" } " vocabulary because it is unsafe. It does not check types or array bounds, and improper use can corrupt memory." } ;
+
+HELP: cell "( -- n )"
+{ $values { "n" "a positive integer" } }
+{ $description "Outputs the pointer size in bytes of the current CPU architecture." } ;
+
+HELP: win32? "( -- ? )"
+{ $values { "?" "a boolean" } }
+{ $description "Tests if Factor is running on 32-bit Windows." } ;
+
+HELP: win64? "( -- ? )"
+{ $values { "?" "a boolean" } }
+{ $description "Tests if Factor is running on 64-bit Windows." } ;
 
 HELP: generations "( -- n )"
 { $values { "n" "a positive integer" } }

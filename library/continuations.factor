@@ -5,6 +5,8 @@ USING: vectors ;
 
 : catchstack* ( -- cs ) 6 getenv { vector } declare ; inline
 
+: (continue-with) 9 getenv ;
+
 IN: errors
 USING: kernel kernel-internals ;
 
@@ -43,8 +45,6 @@ TUPLE: continuation data retain call name catch ;
     set-retainstack
     set-datastack ;
     inline
-
-: (continue-with) 9 getenv ;
 
 : callcc1 [ drop (continue-with) ] ifcc ; inline
 

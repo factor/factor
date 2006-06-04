@@ -4,6 +4,10 @@ HELP: >c "( continuation -- )"
 { $values { "continuation" "a continuation" } }
 { $description "Pushes an exception handler continuation on the catch stack. The continuation must have been reified by " { $link callcc1 } "." } ;
 
+HELP: c> "( -- continuation )"
+{ $values { "continuation" "a continuation" } }
+{ $description "Pops an exception handler continuation from the catch stack." } ;
+
 HELP: throw "( error -- )"
 { $values { "error" "an object" } }
 { $description "Saves the current continuation in the " { $link error-continuation } " global variable and throws an error. Execution does not continue at the point after the " { $link throw } " call. Rather, the innermost catch block is invoked, and execution continues at that point." }
@@ -39,3 +43,22 @@ HELP: rethrow "( error -- )"
 HELP: error. "( error -- )"
 { $values { "error" "an object" } }
 { $contract "Prints an error in human-readable form." } ;
+
+HELP: condition "( error restarts -- restart )"
+{ $values { "error" "an object" } { "restarts" "a sequence of pairs" } { "restart" "an object" } }
+{ $description "Throws a restartable error. The " { $snippet "restarts" } " parameter is a sequence of pairs where the first element in each pair is a human-readable description and the second is an arbitrary object. If the error reaches the top-level error handler, the user will be presented with the list of possible restarts, and upon invoking one with the " { $link :res } " word, execution will continue after the call to " { $link condition } " with the object associated to the chosen restart on the stack." }
+{ $examples
+    "Try invoking one of the two restarts which are offered after the below code throws an error:"
+    { $code
+        ": restart-test"
+        "    \"Oops!\" { { \"One\" 1 } { \"Two\" 2 } } condition"
+        "    \"You restarted: \" write . ;"
+        "restart-test"
+    }
+} ;
+
+HELP: compute-restarts "( error -- seq )"
+{ $values { "error" "an object" } { "seq" "a sequence" } }
+{ $description "Outputs a sequence of triples, where each triple consists of a human-readable string, an object, and a continuation. Resuming a continuation with the corresponding object restarts execution immediately after the corresponding call to " { $link condition } "."
+$terpri
+"This word recursively travels up the delegation chain to collate restarts from nested and wrapped conditions." } ;

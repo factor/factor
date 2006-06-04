@@ -4,6 +4,9 @@
 [ 1 2 3 4 5 6 7 8 9 10 10 10 10 10 10 10 10 10 10 11 11 11 113 
 ]
 
+- running all help entries:
+  - without a yield UI runs out of memory
+  - leaves array array on the stack
 - x11 title bars are funny
 + httpd:
   - outliners don't work
@@ -11,6 +14,8 @@
 - code walker & exceptions -- test and debug problems
 - another i/o bug: on factorcode eventually all i/o times out
   - bug in pound?
+- factorcode httpd started using 99% CPU, but still received connections;
+  closing read-fds solved it
 - if the listener is running a command when the image is saved, it
   restores to an unresponsive gadget
 - fix top level window positioning

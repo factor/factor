@@ -82,8 +82,7 @@ M: object each-slot ( obj quot -- )
     pprint " instances" print ;
 
 : heap-stats. ( -- )
-    heap-stats dup hash-keys
-    [ [ word-name ] 2apply <=> ] sort [
+    heap-stats dup hash-keys natural-sort [
         ( hash hash key -- )
         [ [ pick hash ] keep pick hash ] keep heap-stat.
     ] each 2drop ;

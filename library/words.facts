@@ -121,6 +121,10 @@ HELP: define-symbol "( word -- )"
 { $values { "word" "a word" } }
 { $description "Defines the word to push itself on the stack when executed." } ;
 
+HELP: intern-symbol "( word -- )"
+{ $values { "word" "a word" } }
+{ $description "If the word is undefined, makes it into a symbol which pushes itself on the stack when executed. If the word already has a definition, does nothing." } ;
+
 HELP: define-compound "( word def -- )"
 { $values { "word" "a word" } { "def" "a quotation" } }
 { $description "Defines the word to call a quotation when executed." } ;
@@ -135,11 +139,29 @@ HELP: reset-generic "( word -- )"
 { $description "Reset word declarations and generic word properties." }
 $low-level-note ;
 
+HELP: <word> "( name vocab -- word )"
+{ $values { "name" "a string" } { "vocab" "a string" } { "word" "a word" } }
+{ $description "Creates an uninterned word with the specified name and vocabulary. Note that this does not create the vocabulary, nor does it add the word to an existing vocabulary with that name. In most cases, " { $link create } " should be used instead." } ;
+
 HELP: gensym "( -- word )"
 { $values { "word" "a word" } }
 { $description "Creates an uninterned word that is not equal to any other word in the system. Gensyms have an automatically-generated name based on a prefix and an incrementing counter." }
 { $examples { $example "gensym ." "G:260561" } }
 { $notes "Gensyms are often used as placeholder values that have no meaning of their own but must be unique. For example, the compiler uses gensyms to label sections of assembly code." } ;
+
+HELP: define-temp "( quot -- word )"
+{ $values { "quot" "a quotation" } { "word" "a word" } }
+{ $description "Creates an uninterned word that will call " { $snippet "quot" } " when executed." }
+{ $notes
+    "The following phrases are equivalent:"
+    { $code "[ 2 2 + . ] call" }
+    { $code "[ 2 2 + . ] define-temp execute" }
+} ;
+
+HELP: completions "( string words -- seq )"
+{ $values { "string" "a string" } { "words" "a sequence of words" } { "seq" "a sequence of words" } }
+{ $description "Outputs a sequence of words whose name contains " { $snippet "string" } "." }
+{ $examples "This word is used to implement " { $link apropos } "." } ;
 
 HELP: definer "( word -- definer )"
 { $values { "word" "a word" } { "definer" "a word" } }
@@ -212,8 +234,13 @@ HELP: constructor-word "( name vocab -- word )"
 
 HELP: forget "( word -- )"
 { $values { "word" "a word" } }
-{ $description "Removes the word from its vocabulary. The word becomes uninterned." }
-{ $see-also POSTPONE: FORGET: } ;
+{ $description "Removes a word from its vocabulary. The word becomes uninterned." }
+{ $see-also POSTPONE: FORGET: forget-vocab } ;
+
+HELP: forget-vocab "( vocab -- )"
+{ $values { "vocab" "a string" } }
+{ $description "Removes a vocabulary. All words in the vocabulary become uninterned." }
+{ $see-also forget } ;
 
 HELP: target-word "( word -- target )"
 { $values { "word" "a word" } { "target" "a word" } }
