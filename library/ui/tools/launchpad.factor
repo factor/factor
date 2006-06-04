@@ -25,12 +25,12 @@ words ;
     [ articles. ] "Help index" pane-window ;
 
 : types-window ( -- )
-    [ builtins get [ help ] word-outliner ]
+    [ builtins get [ ] subset [ help ] word-outliner ]
     "Types" pane-window ;
 
 : classes-window ( -- )
     [ classes [ help ] word-outliner ]
-    "Types" pane-window ;
+    "Classes" pane-window ;
 
 : primitives-window ( -- )
     [ all-words [ primitive? ] subset [ help ] word-outliner ]
