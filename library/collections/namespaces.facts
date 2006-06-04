@@ -1,5 +1,5 @@
 IN: namespaces
-USING: help kernel-internals ;
+USING: help kernel kernel-internals sequences words ;
 
 HELP: get "( variable -- value )"
 { $values { "variable" "a variable, by convention a symbol" } { "value" "the value, or " { $link f } } }
@@ -25,16 +25,28 @@ HELP: change "( variable quot -- )"
 { $description "Applies the quotation to the old value of the variable, and assigns the resulting value to the variable." }
 { $side-effects "variable" } ;
 
-HELP: inc "( variable -- ) "
+HELP: +@ "( n variable -- )"
+{ $values { "n" "a number" } { "variable" "a variable, by convention a symbol" } }
+{ $description "Adds " { $snippet "n" } " to the value of the variable. A variable value of " { $link f } " is interpreted as being zero." }
+{ $side-effects "variable" }
+{ $examples
+    { $example "SYMBOL: foo\n1 foo +@\n10 foo +@\nfoo get ." "11" }
+} ;
+
+HELP: inc "( variable -- )"
 { $values { "variable" "a variable, by convention a symbol" } }
-{ $description "Increments the value of the variable by 1." }
-{ $errors "An error is thrown if the variable does not hold a number." }
+{ $description "Increments the value of the variable by 1. A variable value of " { $link f } " is interpreted as being zero." }
 { $side-effects "variable" } ;
 
-HELP: dec "( variable -- ) "
+HELP: dec "( variable -- )"
 { $values { "variable" "a variable, by convention a symbol" } }
-{ $description "Decrements the value of the variable by 1." }
-{ $errors "An error is thrown if the variable does not hold a number." }
+{ $description "Decrements the value of the variable by 1. A variable value of " { $link f } " is interpreted as being zero." }
+{ $side-effects "variable" } ;
+
+HELP: counter "( variable -- n )"
+{ $values { "variable" "a variable, by convention a symbol" } }
+{ $description "Increments the value of the variable by 1, and returns its new value." }
+{ $notes "This word is useful for generating (somewhat) unique identifiers. For example, the " { $link gensym } " word uses it." }
 { $side-effects "variable" } ;
 
 HELP: with-scope "( quot -- )"
@@ -103,3 +115,26 @@ HELP: % "( seq -- )"
 HELP: # "( n -- )"
 { $values { "n" "a real number" } }
 { $description "Appends the string representation of a real number to the end of the sequence being constructed by " { $link make } "." } ;
+
+HELP: init-namespaces "( -- )"
+{ $description "Resets the name stack to its initial state, holding a single copy of the global namespace. This word is called during startup and is rarely useful, except in certain situations such as the example below." }
+{ $examples
+    "You can use this word to spawn a new thread which does not inherit the parent thread's name stack:"
+    { $code "[ init-namestack do-some-work ] in-thread" }
+} ;
+
+HELP: prune "( seq -- newseq )"
+{ $values { "seq" "a sequence" } { "newseq" "a sequence" } }
+{ $description "Outputs a new sequence with each distinct element of " { $snippet "seq" } " appearing only once. Elements are compared for equality using " { $link = } " and the ordering of elements in the new sequence is arbitrary." } ;
+
+HELP: concat "( seq -- newseq )"
+{ $values { "seq" "a sequence" } { "newseq" "a sequence" } }
+{ $description "Concatenates a sequence of sequences together into one sequence. The resulting sequence is of the same class as the first element of " { $snippet "seq" } "." }
+{ $errors "Throws an error if one of the sequences in " { $snippet "seq" } " contains elements not permitted in sequences of the same class as the first element of " { $snippet "seq" } "." }
+{ $see-also join } ;
+
+HELP: join "( seq glue -- newseq )"
+{ $values { "seq" "a sequence" } { "glue" "a sequence" } { "newseq" "a sequence" } }
+{ $description "Concatenates a sequence of sequences together into one sequence, placing a copy of " { $snippet "glue" } " between each pair of sequences. The resulting sequence is of the same class as " { $snippet "glue" } "." }
+{ $errors "Throws an error if one of the sequences in " { $snippet "seq" } " contains elements not permitted in sequences of the same class as " { $snippet "glue" } "." }
+{ $see-also concat } ;

@@ -38,6 +38,7 @@ HELP: set-nth-pair "( key value n seq -- )"
 { $values { "key" "the first element of the pair" } { "value" "the second element of the pair" } { "n" "an index in the sequence" } { "seq" "a sequence" } }
 { $description "Stores a pair of values into the elements with index " { $snippet "n" } " and " { $snippet "n+1" } ", respectively." }
 { $warning "This word is in the " { $snippet "hashtables-internals" } " vocabulary because it does not perform bounds checks." }
+{ $side-effects "seq" }
 { $see-also nth-pair } ;
 
 HELP: each-pair "( array quot -- )"
@@ -52,33 +53,40 @@ HELP: all-pairs? "( array quot -- ? )"
 
 HELP: reset-hash "( n hash -- )"
 { $values { "n" "a positive integer specifying hashtable capacity" } { "hash" "a hashtable" } }
-{ $description "Resets the underlying array of the hashtable to a new array with the given capacity. Removes all entries from the hashtable." } ;
+{ $description "Resets the underlying array of the hashtable to a new array with the given capacity. Removes all entries from the hashtable." }
+{ $side-effects "hash" } ;
 
 HELP: hash-count+ "( hash -- )"
 { $values { "hash" "a hashtable" } }
-{ $description "Called to increment the hashtable size when a new entry is added with " { $link set-hash } } ;
+{ $description "Called to increment the hashtable size when a new entry is added with " { $link set-hash } }
+{ $side-effects "hash" } ;
 
 HELP: hash-deleted+ "( hash -- )"
 { $values { "hash" "a hashtable" } }
-{ $description "Called to increment the deleted entry counter when an entry is removed with " { $link remove-hash } } ;
+{ $description "Called to increment the deleted entry counter when an entry is removed with " { $link remove-hash } }
+{ $side-effects "hash" } ;
 
 HELP: change-size "( hash old -- )"
 { $values { "hash" "a hashtable" } { "old" "the key about to be overwritten" } }
-{ $description "Called to update the hashtable counters when a new entry is added with " { $link set-hash } "." } ;
+{ $description "Called to update the hashtable counters when a new entry is added with " { $link set-hash } "." }
+{ $side-effects "hash" } ;
 
 HELP: (set-hash) "( value key hash -- )"
 { $values { "value" "a value" } { "key" "a key to add" } { "hash" "a hashtable" } }
-{ $description "Stores the key/value pair into the hashtable. This word does not grow the hashtable if it exceeds capacity, therefore a hang can result. Client code should use " { $link set-hash } " instead, which grows the hashtable if necessary." } ;
+{ $description "Stores the key/value pair into the hashtable. This word does not grow the hashtable if it exceeds capacity, therefore a hang can result. Client code should use " { $link set-hash } " instead, which grows the hashtable if necessary." }
+{ $side-effects "hash" } ;
 
 HELP: grow-hash "( hash -- )"
 { $values { "hash" "a hashtable" } }
 { $description "Enlarges the capacity of a hashtable. Client code does not need to call this word directly." }
-{ $see-also (set-hash) ?grow-hash set-hash } ;
+{ $see-also (set-hash) ?grow-hash set-hash }
+{ $side-effects "hash" } ;
 
 HELP: ?grow-hash "( hash -- )"
 { $values { "hash" "a hashtable" } }
 { $description "Enlarges the capacity of a hashtable if it is almost full. Client code does not need to call this word directly." }
-{ $see-also (set-hash) grow-hash set-hash } ;
+{ $see-also (set-hash) grow-hash set-hash }
+{ $side-effects "hash" } ;
 
 HELP: hash>seq "( i hash -- seq )"
 { $values { "i" "0 or 1" } { "hash" "a hashtable" } { "seq" "a sequence of keys or values" } }
@@ -97,7 +105,8 @@ HELP: associate "( value key -- hash )"
 HELP: clear-hash "( hash -- )"
 { $values { "hash" "a hashtable" } }
 { $description "Removes all entries from the hashtable."  }
-{ $see-also remove-hash } ;
+{ $see-also remove-hash }
+{ $side-effects "hash" } ;
 
 HELP: hash-size "( hash -- n )"
 { $values { "hash" "a hashtable" } { "n" "a non-negative integer" } }
@@ -135,11 +144,15 @@ HELP: ?hash "( key hash/f -- ? )"
 HELP: remove-hash "( key hash -- )"
 { $values { "key" "a key" } { "hash" "a hashtable" } }
 { $description "Removes an entry from the hashtable." }
+{ $side-effects "hash" }
 { $see-also clear-hash } ;
 
+HELP: remove-hash* "( key hash -- old )"
+{ $values { "key" "a key" } { "hash" "a hashtable" } { "old" "the previous value associated to " { $snippet "key" } ", or " { $link f } } }
 HELP: set-hash "( value key hash -- )"
 { $values { "value" "a value" } { "key" "a key" } { "hash" "a hashtable" } }
 { $description "Stores an entry into the hashtable." }
+{ $side-effects "hash" }
 { $see-also hash remove-hash } ;
 
 HELP: hash-keys "( hash -- keys )"
@@ -164,18 +177,27 @@ HELP: alist>hash "( alist -- hash )"
 
 HELP: hash-each "( hash quot -- )"
 { $values { "hash" "a hashtable" } { "quot" "a quotation with stack effect " { $snippet "( key value -- )" } } }
-{ $description "Applies a quotation to each key/value pair in the hashtable." }
-{ $see-also hash-each-with hash-all? hash-all-with? hash-subset hash-subset-with } ;
+{ $description "Applies a quotation to each key/value pair in the hashtable." } ;
+
+HELP: hash-each-with "( obj hash quot -- )"
+{ $values { "obj" "an object" } { "hash" "a hashtable" } { "quot" "a quotation with stack effect " { $snippet "( obj key value -- )" } } }
+{ $description "Variant of " { $link hash-each } " which pushes a retained object on each invocation of the quotation." } ;
 
 HELP: hash-all? "( hash quot -- ? )"
 { $values { "hash" "a hashtable" } { "quot" "a quotation with stack effect " { $snippet "( key value -- ? )" } } { "?" "a boolean" } }
-{ $description "Applies a predicate quotation to each key/value pair in the hashtable. Outputs true if the hashtable is empty or the quotation yields true for each entry." }
-{ $see-also hash-each hash-each-with hash-all-with? hash-subset hash-subset-with } ;
+{ $description "Applies a predicate quotation to each key/value pair in the hashtable. Outputs true if the hashtable is empty or the quotation yields true for each entry." } ;
+
+HELP: hash-all-with? "( obj hash quot -- )"
+{ $values { "obj" "an object" } { "hash" "a hashtable" } { "quot" "a quotation with stack effect " { $snippet "( obj key value -- ? )" } } { "?" "a boolean" } }
+{ $description "Variant of " { $link hash-all? } " which pushes a retained object on each invocation of the quotation." } ;
 
 HELP: hash-subset "( hash quot -- subhash )"
 { $values { "hash" "a hashtable" } { "quot" "a quotation with stack effect " { $snippet "( key value -- ? )" } } { "subhash" "a new hashtable" } }
-{ $description "Constructs a hashtable consisting of all key/value pairs for which the predicate quotation yields true." }
-{ $see-also hash-each hash-each-with hash-all? hash-all-with? hash-subset-with } ;
+{ $description "Constructs a hashtable consisting of all key/value pairs for which the predicate quotation yields true." } ;
+
+HELP: hash-subset-with "( obj hash quot -- )"
+{ $values { "obj" "an object" } { "hash" "a hashtable" } { "quot" "a quotation with stack effect " { $snippet "( obj key value -- ? )" } } { "subhash" "a new hashtable" } }
+{ $description "Variant of " { $link hash-all? } " which pushes a retained object on each invocation of the quotation." } ;
 
 HELP: subhash? "( hash1 hash2 -- ? )"
 { $values { "hash1" "a hashtable" } { "hash2" "a hashtable" } { "?" "a new hashtable" } }
@@ -197,7 +219,8 @@ HELP: hash-diff "( hash1 hash2 -- difference )"
 
 HELP: hash-update "( hash1 hash2 -- )"
 { $values { "hash1" "a hashtable" } { "hash2" "a hashtable" } }
-{ $description "Adds all key/value pairs from " { $snippet "hash2" } " to " { $snippet "hash1" } "." } ;
+{ $description "Adds all key/value pairs from " { $snippet "hash2" } " to " { $snippet "hash1" } "." }
+{ $side-effects "hash" } ;
 
 HELP: hash-concat "( seq -- hash )"
 { $values { "seq" "a sequence of hashtables" } { "hash" "a new hashtable" } }
@@ -215,7 +238,8 @@ HELP: remove-all "( hash seq -- subseq )"
 
 HELP: cache "( key hash quot -- value )"
 { $values { "key" "a key" } { "hash" "a hashtable" } { "quot" "a quotation with stack effect " { $snippet "( key -- value )" } } { "value" "a previously-retained or freshly-computed value" } }
-{ $description "If the key is present in the hashtable, outputs the associated value, otherwise calls the quotation to produce a value and stores the key/value pair into the hashtable." } ;
+{ $description "If the key is present in the hashtable, outputs the associated value, otherwise calls the quotation to produce a value and stores the key/value pair into the hashtable." }
+{ $side-effects "hash" } ;
 
 HELP: map>hash "( seq quot -- hash )"
 { $values { "seq" "a sequence" } { "quot" "a quotation with stack effect " { $snippet "( key -- value )" } } { "hash" "a hashtable" } { "value" "a previously-retained or freshly-computed value" } }

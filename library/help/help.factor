@@ -44,8 +44,6 @@ SYMBOL: last-block
         last-block on print-element
     ] with-nesting* terpri ;
 
-DEFER: $heading
-
 : help ( topic -- ) article-content (help) ;
 
 : glossary ( name -- ) <term> help ;

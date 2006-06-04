@@ -155,8 +155,6 @@ unit-test
 
 [ { 1 4 9 } ] [ { 1 2 3 } clone dup [ sq ] inject ] unit-test
 
-[ { 3 4 5 } ] [ 2 { 1 2 3 } clone [ [ + ] inject-with ] keep ] unit-test
-
 [ { "one" "two" "three" 4 5 6 } ]
 [
     { "one" "two" "three" }

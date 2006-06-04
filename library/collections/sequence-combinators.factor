@@ -69,9 +69,6 @@ IN: sequences
     [ [ swap change-nth ] 3keep ] repeat 2drop ;
     inline
 
-: inject-with ( obj seq quot -- | quot: obj elt -- elt )
-    swap [ with rot ] inject 2drop ; inline
-
 : min-length ( seq seq -- n )
     [ length ] 2apply min ; flushable
 
@@ -174,5 +171,5 @@ IN: sequences
     [ >r pick r> + pick set-nth-unsafe ] 2each 2drop ;
     inline
 
-: >sequence ( seq quot -- )
+: >sequence ( seq quot -- newseq )
     over >r >r length r> call dup 0 swap r> copy-into ; inline

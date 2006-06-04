@@ -16,12 +16,12 @@ C: queue ( -- queue ) ;
 : clear-queue ( queue -- )
     f over set-queue-head f swap set-queue-tail ;
 
-: enque-first ( entry queue -- )
+: (enque) ( entry queue -- )
     [ set-queue-head ] 2keep set-queue-tail ;
 
 : enque ( obj queue -- )
     >r <entry> r> dup queue-empty? [
-        enque-first
+        (enque)
     ] [
         [ queue-tail set-entry-next ] 2keep set-queue-tail
     ] if ;

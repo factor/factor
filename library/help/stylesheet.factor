@@ -16,9 +16,13 @@ USING: styles ;
 : emphasis-style
     H{ { font-style italic } } ;
 
-: heading-style H{ { font "serif" } { font-size 16 } } ;
-
-: subheading-style H{ { font "sans-serif" } { font-style bold } } ;
+: heading-style
+    H{
+        { font "sans-serif" }
+        { font-size 14 }
+        { font-style bold }
+        { foreground { 0.2 0.2 0.4 1 } }
+    } ;
 
 : subsection-style
     H{

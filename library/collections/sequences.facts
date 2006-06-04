@@ -93,7 +93,8 @@ HELP: push "( elt seq -- )"
 { $values { "elt" "an object" } { "seq" "a resizable mutable sequence" } }
 { $description "Adds an element at the end of the sequence. The sequence length is adjusted accordingly." }
 { $errors "Throws an error if " { $snippet "seq" } " is not resizable, or if the type of " { $snippet "elt" } " is not permitted in " { $snippet "seq" } "." }
-{ $side-effects "seq" } ;
+{ $side-effects "seq" }
+{ $see-also pop push-new } ;
 
 HELP: ?push "( elt seq/f -- seq )"
 { $values { "elt" "an object" } { "seq/f" "a resizable mutable sequence, or " { $link f } } { "seq" "a resizable mutable sequence" } }

@@ -32,9 +32,7 @@ M: word print-element { } swap execute ;
 
 ! Some spans
 
-: $heading heading-style ($span) terpri terpri ;
-
-: $subheading [ subheading-style ($span) ] ($block) ;
+: $heading [ heading-style ($span) ] ($block) ;
 
 : $snippet snippet-style ($span) ;
 
@@ -61,7 +59,7 @@ M: simple-element print-element
 
 : $syntax ( word -- )
     dup stack-effect [
-        "Syntax" $subheading
+        "Syntax" $heading
         >r word-name $snippet " " $snippet r> $snippet
     ] [
         drop
@@ -69,11 +67,11 @@ M: simple-element print-element
 
 : $stack-effect ( word -- )
     stack-effect [
-        "Stack effect" $subheading $snippet
+        "Stack effect" $heading $snippet
     ] when* ;
 
 : $vocabulary ( content -- )
-    "Vocabulary" $subheading $snippet ;
+    "Vocabulary" $heading $snippet ;
 
 : $synopsis ( content -- )
     first dup
@@ -81,18 +79,18 @@ M: simple-element print-element
     dup parsing? [ $syntax ] [ $stack-effect ] if ;
 
 : $description ( content -- )
-    "Description" $subheading print-element ;
+    "Description" $heading print-element ;
 
 : $contract ( content -- )
-    "Contract" $subheading print-element ;
+    "Contract" $heading print-element ;
 
 : $examples ( content -- )
-    "Examples" $subheading print-element ;
+    "Examples" $heading print-element ;
 
 : $warning ( content -- )
     [
         current-style warning-style hash-union [
-            "Warning" $subheading print-element
+            "Warning" $heading print-element
         ] with-nesting
     ] ($block) ;
 
@@ -103,8 +101,8 @@ M: simple-element print-element
     code-style [ first see ] with-nesting* ;
 
 : $example ( content -- )
-    first2 swap dup <input> [
-        input-style [ format* ] with-style terpri format*
+    1 swap cut* swap "\n" join dup <input> [
+        input-style [ format* ] with-style terpri print-element
     ] ($code) ;
 
 ! Some links
@@ -150,13 +148,13 @@ M: link article-content link-name article-content ;
     ] if ;
 
 : $definition ( content -- )
-    "Definition" $subheading $see ;
+    "Definition" $heading $see ;
 
 : $see-also ( content -- )
-    "See also" $subheading [ 1array $link ] textual-list ;
+    "See also" $heading [ 1array $link ] textual-list ;
 
 : $values ( content -- )
-    "Arguments and values" $subheading
+    "Arguments and values" $heading
     [ unclip $snippet " -- " format* print-element ]
     [ terpri ] interleave ;
 
@@ -176,14 +174,14 @@ M: link article-content link-name article-content ;
     ] each ;
 
 : $errors ( content -- )
-    "Errors" $subheading print-element ;
+    "Errors" $heading print-element ;
 
 : $side-effects ( content -- )
-    "Side effects" $subheading "Modifies " print-element
+    "Side effects" $heading "Modifies " print-element
     [ $snippet ] textual-list ;
 
 : $notes ( content -- )
-    "Notes" $subheading print-element ;
+    "Notes" $heading print-element ;
 
 : $shuffle ( content -- )
     drop

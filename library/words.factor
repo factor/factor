@@ -127,7 +127,7 @@ SYMBOL: vocabularies
     all-words swap subset-with ; inline
 
 : xref-words ( -- )
-    all-words [ uses ] crossref get add-vertices ;
+    all-words [ uses ] crossref get build-graph ;
 
 : lookup ( name vocab -- word ) vocab ?hash ;
 

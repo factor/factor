@@ -1,5 +1,5 @@
 IN: sequences
-USING: help math sequences-internals ;
+USING: arrays help math sequences-internals ;
 
 HELP: collect "( n quot -- array )"
 { $values { "n" "a non-negative integer" } { "quot" "a quotation with stack effect " { $snippet "( n -- value )" } } { "array" "an array with " { $snippet "n" } " elements" } }
@@ -8,6 +8,10 @@ HELP: collect "( n quot -- array )"
 HELP: each "( seq quot -- )"
 { $values { "seq" "a sequence" } { "quot" "a quotation with stack effect " { $snippet "( elt -- )" } } }
 { $description "Applies the quotation to each element of the sequence in turn." } ;
+
+HELP: each-with "( obj seq quot -- )"
+{ $values { "obj" "an object" } { "seq" "a sequence" } { "quot" "a quotation with stack effect " { $snippet "( obj elt -- )" } } }
+{ $description "Variant of " { $link each } " which pushes a retained object on each invocation of the quotation." } ;
 
 HELP: reduce "( seq identity quot -- result )"
 { $values { "seq" "a sequence" } { "quot" "a quotation with stack effect " { $snippet "( prev elt -- next )" } } }
@@ -27,10 +31,29 @@ HELP: map "( seq quot -- newseq )"
 { $values { "seq" "a sequence" } { "quot" "a quotation with stack effect " { $snippet "( old -- new )" } } { "newseq" "a new sequence" } }
 { $description "Applies the quotation to each element yielding a new element. The new elements are collected into a sequence of the same class as the input sequence." } ;
 
+HELP: map-with "( obj seq quot -- newseq )"
+{ $values { "obj" "an object" } { "seq" "a sequence" } { "quot" "a quotation with stack effect " { $snippet "( obj elt -- new )" } } }
+{ $description "Variant of " { $link map } " which pushes a retained object on each invocation of the quotation." } ;
+
+HELP: change-nth "( seq i quot -- )"
+{ $values { "seq" "a mutable sequence" } { "i" "a non-negative integer" } { "quot" "a quotation with stack effect " { $snippet "( elt -- newelt )" } } }
+{ $description "Applies the quotation to the " { $snippet "i" } "th element of the sequence, storing the result back into the sequence." }
+{ $errors "Throws an error if the sequence is immutable, if the index is out of bounds, or the sequence cannot hold elements of the type output by " { $snippet "quot" } "." }
+{ $side-effects "seq" } ;
+
 HELP: inject "( seq quot -- )"
 { $values { "seq" "a mutable sequence" } { "quot" "a quotation with stack effect " { $snippet "( old -- new )" } } }
 { $description "Applies the quotation to each element yielding a new element, storing the new elements back in the original sequence." }
+{ $errors "Throws an error if the sequence is immutable, or the sequence cannot hold elements of the type output by " { $snippet "quot" } "." }
 { $side-effects "seq" } ;
+
+HELP: min-length "( seq1 seq2 -- n )"
+{ $values { "seq1" "a sequence" } { "seq2" "a sequence" } { "n" "a non-negative integer" } }
+{ $description "Outputs the minimum of the lengths of the two sequences." } ;
+
+HELP: max-length "( seq1 seq2 -- n )"
+{ $values { "seq1" "a sequence" } { "seq2" "a sequence" } { "n" "a non-negative integer" } }
+{ $description "Outputs the maximum of the lengths of the two sequences." } ;
 
 HELP: 2each "( seq1 seq2 quot -- )"
 { $values { "seq1" "a sequence" } { "seq2" "a sequence" } { "quot" "a quotation with stack effect " { $snippet "( elt1 elt2 -- )" } } }
@@ -50,28 +73,44 @@ HELP: 2map "( seq1 seq2 quot -- seq )"
 { $notes "If one sequence is shorter than the other, than only the prefix having the length of the minimum of the two is examined." } ;
 
 HELP: find "( seq quot -- i elt )"
-{ $values { "seq" "a sequence" } { "quot" "a quotation with stack effect " { $snippet "( elt -- ? )" } } }
-{ $description "A simpler variant of " { $link find* } " where the starting index is 0." }
-{ $see-also find* find-last find-last* contains? all? index index* member? } ;
+{ $values { "seq" "a sequence" } { "quot" "a quotation with stack effect " { $snippet "( elt -- ? )" } } { "i" "the index of the first match, or -1" } { "elt" "the first matching element, or " { $link f } } }
+{ $description "A simpler variant of " { $link find* } " where the starting index is 0." } ;
+
+HELP: find-with "( obj seq quot -- i elt )"
+{ $values { "obj" "an object" } { "seq" "a sequence" } { "quot" "a quotation with stack effect " { $snippet "( obj elt -- ? )" } } { "i" "the index of the first match, or -1" } { "elt" "the first matching element, or " { $link f } } }
+{ $description "Variant of " { $link find } " which pushes a retained object on each invocation of the quotation." } ;
 
 HELP: find* "( n seq quot -- i elt )"
 { $values { "n" "a starting index" } { "seq" "a sequence" } { "quot" "a quotation with stack effect " { $snippet "( elt -- ? )" } } }
-{ $description "Applies the quotation to each element of the sequence in turn, until it outputs a true value or the end of the sequence is reached. If the quotation yields a true value for some sequence element, the word outputs the element index and the element itself. Otherwise, the word outputs an index of -1 and " { $link f } " as the element." }
-{ $see-also find find-last find-last* contains? all? index index* member? } ;
+{ $description "Applies the quotation to each element of the sequence in turn, until it outputs a true value or the end of the sequence is reached. If the quotation yields a true value for some sequence element, the word outputs the element index and the element itself. Otherwise, the word outputs an index of -1 and " { $link f } " as the element." } ;
+
+HELP: find-with* "( obj n seq quot -- i elt )"
+{ $values { "obj" "an object" } { "n" "a starting index" } { "seq" "a sequence" } { "quot" "a quotation with stack effect " { $snippet "( obj elt -- ? )" } } { "i" "the index of the first match, or -1" } { "elt" "the first matching element, or " { $link f } } }
+{ $description "Variant of " { $link find* } " which pushes a retained object on each invocation of the quotation." } ;
 
 HELP: find-last "( seq quot -- i elt )"
-{ $values { "seq" "a sequence" } { "quot" "a quotation with stack effect " { $snippet "( elt -- ? )" } } }
-{ $description "A simpler variant of " { $link find-last* } " where the starting index is one less than the length of the sequence." }
-{ $see-also find find* find-last find-last* contains? all? index index* member? } ;
+{ $values { "seq" "a sequence" } { "quot" "a quotation with stack effect " { $snippet "( elt -- ? )" } } { "i" "the index of the first match, or -1" } { "elt" "the first matching element, or " { $link f } } }
+{ $description "A simpler variant of " { $link find-last* } " where the starting index is one less than the length of the sequence." } ;
+
+HELP: find-last-with "( obj seq quot -- i elt )"
+{ $values { "obj" "an object" } { "seq" "a sequence" } { "quot" "a quotation with stack effect " { $snippet "( obj elt -- ? )" } } { "i" "the index of the first match, or -1" } { "elt" "the first matching element, or " { $link f } } }
+{ $description "Variant of " { $link find } " which pushes a retained object on each invocation of the quotation." } ;
 
 HELP: find-last* "( n seq quot -- i elt )"
-{ $values { "n" "a starting index" } { "seq" "a sequence" } { "quot" "a quotation with stack effect " { $snippet "( elt -- ? )" } } }
-{ $description "Applies the quotation to each element of the sequence in reverse order, until it outputs a true value or the start of the sequence is reached. If the quotation yields a true value for some sequence element, the word outputs the element index and the element itself. Otherwise, the word outputs an index of -1 and " { $link f } " as the element." }
-{ $see-also find find* find-last contains? all? index index* member? } ;
+{ $values { "n" "a starting index" } { "seq" "a sequence" } { "quot" "a quotation with stack effect " { $snippet "( elt -- ? )" } } { "i" "the index of the first match, or -1" } { "elt" "the first matching element, or " { $link f } } }
+{ $description "Applies the quotation to each element of the sequence in reverse order, until it outputs a true value or the start of the sequence is reached. If the quotation yields a true value for some sequence element, the word outputs the element index and the element itself. Otherwise, the word outputs an index of -1 and " { $link f } " as the element." } ;
+
+HELP: find-last-with* "( obj n seq quot -- i elt )"
+{ $values { "obj" "an object" } { "n" "a starting index" } { "seq" "a sequence" } { "quot" "a quotation with stack effect " { $snippet "( obj elt -- ? )" } } { "i" "the index of the first match, or -1" } { "elt" "the first matching element, or " { $link f } } }
+{ $description "Variant of " { $link find } " which pushes a retained object on each invocation of the quotation." } ;
 
 HELP: contains? "( seq quot -- ? )"
 { $values { "seq" "a sequence" } { "quot" "a quotation with stack effect " { $snippet "( elt -- ? )" } } { "?" "a boolean" } }
 { $description "Tests if the sequence contains an element satisfying the predicate, by applying the predicate to each element in turn until a true value is found. If the sequence is empty or if the end of the sequence is reached, outputs " { $link f } "." } ;
+
+HELP: contains-with? "( obj seq quot -- ? )"
+{ $values { "obj" "an object" } { "seq" "a sequence" } { "quot" "a quotation with stack effect " { $snippet "( obj elt -- ? )" } } { "?" "a boolean" } }
+{ $description "Variant of " { $link contains? } " which pushes a retained object on each invocation of the quotation." } ;
 
 HELP: all? "( seq quot -- ? )"
 { $values { "seq" "a sequence" } { "quot" "a quotation with stack effect " { $snippet "( elt -- ? )" } } { "?" "a boolean" } }
@@ -82,9 +121,17 @@ HELP: all? "( seq quot -- ? )"
     { $snippet "P[x] for all x <==> not ((not P[x]) for some x)" }
 } ;
 
+HELP: all-with? "( obj seq quot -- ? )"
+{ $values { "obj" "an object" } { "seq" "a sequence" } { "quot" "a quotation with stack effect " { $snippet "( obj elt -- ? )" } } { "?" "a boolean" } }
+{ $description "Variant of " { $link all? } " which pushes a retained object on each invocation of the quotation." } ;
+
 HELP: subset "( seq quot -- subseq )"
-{ $values { "seq" "a sequence" } { "quot" "a quotation with stack effect " { $snippet "( elt -- ? )" } } { "newseq" "a new sequence" } }
+{ $values { "seq" "a sequence" } { "quot" "a quotation with stack effect " { $snippet "( elt -- ? )" } } { "subseq" "a new sequence" } }
 { $description "Applies the quotation to each element in turn, and outputs a new sequence containing the elements of the original sequence for which the quotation output a true value." } ;
+
+HELP: subset-with "( obj seq quot -- subseq )"
+{ $values { "obj" "an object" } { "seq" "a sequence" } { "quot" "a quotation with stack effect " { $snippet "( obj elt -- ? )" } } { "subseq" "a new sequence" } }
+{ $description "Variant of " { $link subset } " which pushes a retained object on each invocation of the quotation." } ;
 
 HELP: monotonic? "( seq quot -- ? )"
 { $values { "seq" "a sequence" } { "quot" "a quotation with stack effect " { $snippet "( elt elt -- ? )" } } { "?" "a boolean" } }
@@ -106,3 +153,13 @@ HELP: cache-nth "( i seq quot -- elt )"
 { $values { "i" "a non-negative integer" } { "seq" "a mutable sequence" } { "quot" "a quotation with stack effect " { $snippet "( i -- elt )" } } }
 { $description "If the sequence does not contain at least " { $snippet "i" } " elements or if the " { $snippet "i" } "th element of the sequence is " { $link f } ", calls the quotation to produce a new value, and stores it back into the sequence. Otherwise, this word outputs the " { $snippet "i" } "th element of the sequence." }
 { $side-effects "seq" } ;
+
+HELP: copy-into "( n dest src -- )"
+{ $values { "n" "an index in " { $snippet "dest" } } { "dest" "a mutable sequence" } { "src" "a sequence" } }
+{ $description "Copies all elements of " { $snippet "src" } " to " { $snippet "dest" } ", with destination indices starting from " { $snippet "n" } ". Grows " { $snippet "to" } " first if necessary." }
+{ $errors "An error is thrown if " { $snippet "to" } " is not resizable, and not large enough to hold the copied elements." } ;
+
+HELP: >sequence "( seq quot -- )"
+{ $values { "seq" "a sequence" } { "quot" "a quotation with stack effect " { $snippet "( n -- newseq )" } } { "newseq" "a sequence" } }
+{ $description "Calls the quotation with the length of " { $snippet "seq" } ", creating a new sequence, and copies the contents of " { $snippet "seq" } " into the new sequence." }
+{ $notes "This word is used to implement words which convert one type of sequence into another, for example " { $link >array } "." } ;

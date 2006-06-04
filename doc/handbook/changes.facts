@@ -1,7 +1,7 @@
 USING: generic help inspector memory sequences ;
 
 ARTICLE: "changes" "Changes in the latest release"
-{ $subheading "Factor 0.82" }
+{ $heading "Factor 0.82" }
 { $list
     "New code generator framework in compiler"
     "Floating point operations are now open-coded, resulting in a performance gain"
@@ -11,7 +11,7 @@ ARTICLE: "changes" "Changes in the latest release"
     "Standard OS X-style menu bar in the Cocoa UI (Kevin Reid)"
     "Objective C methods defined in Factor can now return C structures by value"
 }
-{ $subheading "Factor 0.81" }
+{ $heading "Factor 0.81" }
 { $subtopic "UI"
     { $list
         "Replaced SDL backend code with Mac OS X (Cocoa), X11 and Windows implementations"

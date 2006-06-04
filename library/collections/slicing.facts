@@ -93,15 +93,3 @@ HELP: drop-prefix "( seq1 seq2 -- slice1 slice2 )"
 HELP: unpair "( assoc -- keys values )"
 { $values { "assoc" "a sequence of pairs" } { "keys" "a new sequence" } { "values" "a new sequence" } }
 { $description "Given a sequence of two-element sequences, outputs a new sequence with the first element of each pair, and a new sequence with the second element of each pair." } ;
-
-HELP: concat "( seq -- newseq )"
-{ $values { "seq" "a sequence" } { "newseq" "a sequence" } }
-{ $description "Concatenates a sequence of sequences together into one sequence. The resulting sequence is of the same class as the first element of " { $snippet "seq" } "." }
-{ $errors "Throws an error if one of the sequences in " { $snippet "seq" } " contains elements not permitted in sequences of the same class as the first element of " { $snippet "seq" } "." }
-{ $see-also join } ;
-
-HELP: join "( seq glue -- newseq )"
-{ $values { "seq" "a sequence" } { "glue" "a sequence" } { "newseq" "a sequence" } }
-{ $description "Concatenates a sequence of sequences together into one sequence, placing a copy of " { $snippet "glue" } " between each pair of sequences. The resulting sequence is of the same class as " { $snippet "glue" } "." }
-{ $errors "Throws an error if one of the sequences in " { $snippet "seq" } " contains elements not permitted in sequences of the same class as " { $snippet "glue" } "." }
-{ $see-also concat } ;

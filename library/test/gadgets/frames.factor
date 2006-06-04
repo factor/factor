@@ -1,6 +1,5 @@
 IN: temporary
-USING: gadgets gadgets-labels gadgets-layouts kernel namespaces
-test ;
+USING: gadgets gadgets-labels kernel namespaces test ;
 
 [ "Hello world" ]
 [

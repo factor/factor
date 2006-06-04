@@ -11,7 +11,7 @@ HELP: first3 "( seq -- first second third )"
 { $description "Pushes the first three elements of a sequence." }
 { $errors "Throws an error if the sequence has less than three elements." } ;
 
-HELP: first4 "( seq -- first second third )"
+HELP: first4 "( seq -- first second third fourth )"
 { $values { "seq" "a sequence" } { "first" "the first element" } { "second" "the second element" } { "third" "the third element" } { "fourth" "the fourth element" } }
 { $description "Pushes the first four elements of a sequence." }
 { $errors "Throws an error if the sequence has less than four elements." } ;
@@ -59,10 +59,20 @@ HELP: delete "( elt seq -- )"
 { $description "Removes all elements equal to " { $snippet "elt" } " from " { $snippet "seq" } "." }
 { $side-effects "seq" } ;
 
-HELP: copy-into "( n dest src -- )"
-{ $values { "n" "an index in " { $snippet "dest" } } { "dest" "a mutable sequence" } { "src" "a sequence" } }
-{ $description "Copies all elements of " { $snippet "src" } " to " { $snippet "dest" } ", with destination indices starting from " { $snippet "n" } ". Grows " { $snippet "to" } " first if necessary." }
-{ $errors "An error is thrown if " { $snippet "to" } " is not resizable, and not large enough to hold the copied elements." } ;
+HELP: push-new "( elt seq -- )"
+{ $values { "elt" "an object" } { "seq" "a resizable mutable sequence" } }
+{ $description "Removes all elements equal to " { $snippet "elt" } ", and adds " { $snippet "elt" } " at the end of the sequence." }
+{ $examples
+    { $example
+        "V{ \"beans\" \"salsa\" \"cheese\" } \"v\" set"
+        "\"nachos\" \"v\" get push-new"
+        "\"salsa\" \"v\" get push-new"
+        "\"v\" get ."
+        "V{ \"beans\" \"cheese\" \"salsa\" \"nachos\" }"
+    }
+}
+{ $side-effects "seq" }
+{ $see-also push } ;
 
 HELP: nappend "( dest src -- )"
 { $values { "n" "an index in " { $snippet "dest" } } { "dest" "a resizable mutable sequence" } { "src" "a sequence" } }
@@ -70,10 +80,13 @@ HELP: nappend "( dest src -- )"
 { $side-effects "dest" }
 { $errors "Throws an error if " { $snippet "src" } " contains elements not permitted in " { $snippet "dest" } "." } ;
 
-HELP: append "( seq1 seq2 -- seq )"
-{ $values { "seq1" "a sequence" } { "seq2" "a sequence" } { "seq" "a sequence" } }
-{ $description "Outputs a new sequence consisting of the elements of " { $snippet "seq1" } " followed by the elements of " { $snippet "seq2" } "." }
-{ $errors "Throws an error if " { $snippet "seq2" } " contains elements not permitted in sequences of the same class as " { $snippet "seq1" } "." } ;
+HELP: >resizable "( seq -- newseq )"
+{ $values { "seq" "a sequence" } { "newseq" "a mutable resizable sequence" } }
+{ $description "Outputs a new, mutable resizable sequence having the same elements as " { $snippet "seq" } "." } ;
+
+HELP: immutable "( seq -- newseq )"
+{ $values { "seq" "a sequence" } { "newseq" "a mutable resizable sequence" } }
+{ $description "Outputs a new, mutable resizable sequence having the same elements as " { $snippet "seq" } "." } ;
 
 HELP: add "( seq elt -- newseq )"
 { $values { "seq" "a sequence" } { "elt" "an object" } { "newseq" "a sequence" } }

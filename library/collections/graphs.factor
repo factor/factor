@@ -11,7 +11,7 @@ USING: hashtables kernel namespaces sequences ;
 : add-vertex ( vertex edges graph -- | edges: vertex -- seq )
     [ (add-vertex) ] if-graph ; inline
 
-: add-vertices ( seq edges graph -- | edges: vertex -- seq )
+: build-graph ( seq edges graph -- | edges: vertex -- seq )
     [
         namespace clear-hash
         swap [ swap (add-vertex) ] each-with

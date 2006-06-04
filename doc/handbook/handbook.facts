@@ -1,18 +1,15 @@
 USING: help inspector parser prettyprint ;
 
 ARTICLE: "handbook" "Factor documentation"
-{ $subheading "Factor UI basics" }
-"The Factor user interface centers on the concept of a " { $emphasis "presentation" } ". A presentation is a graphical view of a live object."
+{ $heading "Quick start" }
+"Factor is a dynamically-typed stack based language."
 $terpri
-"Placing the mouse over a presentation highlights it with a border. Presentations are everywhere; help links, words, and code examples are all presentations. Clicking a presentation displays a browser window looking at the underlying object."
-$terpri
-"A left click will reuse the current browser window; a right click always opens a new window."
+"Factor is an interactive language, and you are encouraged to experiment with it by entering expressions in the listener. If you are reading this from the Factor UI, you can click on code examples in the documentation to try them out:"
+{ $code "\"Hello, world.\" print" }
+{ $heading "Reference documentation" }
 { $subsection "changes" }
-"The environment:"
 { $subsection "quickref" }
 { $subsection "tools" }
-"The language:"
-{ $subsection "tutorial" }
 { $subsection "syntax" }
 { $subsection "dataflow" }
 { $subsection "words" }
@@ -23,26 +20,3 @@ $terpri
 { $subsection "parser" }
 { $subsection "prettyprint" }
 { $subsection "alien" } ;
-
-ARTICLE: "quickref" "Quick reference"
-"Loading source files:"
-{ $subsection run-file }
-"Displaying word documentation:"
-{ $subsection help }
-"Printing the top of the stack, and displaying the stack without popping:"
-{ $subsection . }
-{ $subsection .s }
-"If you enter an invalid word name, you will get a \"not a number\" error:"
-{ $example
-    "fdafasfa"
-    "An unhandled error was caught:\n\nParsing <interactive>:1\nfdafasfa\n        ^\n\"Not a number\"\n\n:s :r show stacks at time of error.\n:get ( var -- value ) inspects the error namestack."
-}
-"Sometimes, the word " { $emphasis "does" } " exist, but you might need to " { $link POSTPONE: USE: } " its vocabulary first. The " { $link apropos } " word can help locate the correct vocabulary:"
-{ $example "\"<label>\" apropos" "IN: gadgets-labels : <label>\nIN: compiler-backend : <label>" }
-$terpri
-"A simple program:"
-{ $code
-    "USING: kernel math ;"
-    ": factorial ( n -- n! )"
-    "    dup zero? [ drop 1 ] [ dup 1- factorial * ] if ;"
-} ;

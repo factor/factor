@@ -52,7 +52,7 @@ SYMBOL: help-graph
     [ links-out ] help-graph get remove-vertex ;
 
 : xref-articles ( -- )
-    all-articles [ links-out ] help-graph get add-vertices ;
+    all-articles [ links-out ] help-graph get build-graph ;
 
 : help-outliner ( seq quot -- | quot: obj -- )
     swap sort-articles [ ($subsection) terpri ] each-with ;

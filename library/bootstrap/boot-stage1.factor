@@ -211,6 +211,7 @@ vectors words ;
         "/library/bootstrap/image.facts"
         "/library/collections/growable.facts"
         "/library/collections/arrays.facts"
+        "/library/collections/graphs.facts"
         "/library/collections/hashtables.facts"
         "/library/collections/namespaces.facts"
         "/library/collections/queues.facts"

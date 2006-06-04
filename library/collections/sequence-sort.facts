@@ -13,3 +13,15 @@ HELP: nsort "( seq quot -- sortedseq )"
 HELP: natural-sort "( seq -- sortedseq )"
 { $values { "seq" "a sequence of real numbers" } { "sortedseq" "a new sorted sequence" } }
 { $description "Sorts a sequence of objects in natural order using the " { $link <=> } " word." } ;
+
+HELP: binsearch "( elt seq quot -- i )"
+{ $values { "elt" "an object" } { "seq" "a sorted sequence" } { "quot" "a comparator quotation" } { "i" "the index of the search result" } }
+{ $description "Given a sequence that is sorted with respect to the " { $snippet "quot" } " comparator, searches for an element equal to " { $snippet "elt" } ", or failing that, the greatest element smaller than " { $snippet "elt" } ". Comparison is performed with " { $snippet "quot" } "."
+$terpri
+"Outputs -1 if the sequence is empty. If the sequence has at least one element, this word always outputs a valid index." } ;
+
+HELP: binsearch* "( elt seq quot -- result )"
+{ $values { "elt" "an object" } { "seq" "a sorted sequence" } { "quot" "a comparator quotation" } { "result" "the search result" } }
+{ $description "Variant of " { $link binsearch } " which outputs the found element rather than its index in the sequence."
+$terpri
+"Outputs " { $link f } " if the sequence is empty. If the sequence has at least one element, this word always outputs a sequence element." } ;
