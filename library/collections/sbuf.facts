@@ -1,10 +1,10 @@
 IN: strings
-USING: arrays help vectors ;
+USING: arrays help kernel vectors ;
 
 HELP: <sbuf> "( n -- sbuf )"
 { $values { "n" "a positive integer specifying initial capacity" } { "sbuf" "a new string buffer" } }
 { $description "Creates a new string buffer that can hold " { $snippet "n" } " characters before resizing." }
-{ $see-also <array> <string> <vector> } ;
+{ $see-also <array> <quotation> <string> <vector> } ;
 
 HELP: >sbuf "( seq -- sbuf )"
 { $values { "seq" "a sequence of non-negative integers" } { "sbuf" "a string buffer" } }

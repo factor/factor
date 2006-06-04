@@ -53,6 +53,17 @@ HELP: alien>char-string "( c-ptr -- string )"
 { $description "Reads a null-terminated 8-bit C string from the specified address." }
 { $see-also string>char-alien } ;
 
+HELP: string>u16-alien "( string -- array )"
+{ $values { "string" "a string" } { "array" "a byte array" } }
+{ $description "Copies the string to a new byte array in UTF16 format with a trailing null byte." }
+{ $errors "Throws an error if the string contains null characters." }
+{ $see-also alien>u16-string } ;
+
+HELP: alien>u16-string "( c-ptr -- string )"
+{ $values { "c-ptr" "an alien, byte array or " { $link f } } { "string" "a string" } }
+{ $description "Reads a null-terminated UTF16 string from the specified address." }
+{ $see-also string>u16-alien } ;
+
 HELP: <malloc-array> "( n type -- alien )"
 { $values { "n" "a non-negative integer" } { "type" "a string" } { "alien" "an alien address" } }
 { $description "Allocates an unmanaged memory block large enough to hold " { $snippet "n" } " values of a C type." }

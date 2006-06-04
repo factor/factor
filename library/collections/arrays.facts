@@ -2,10 +2,14 @@ IN: arrays
 USING: help kernel kernel-internals prettyprint strings
 vectors ;
 
+HELP: <byte-array> "( n -- byte-array )"
+{ $values { "n" "a non-negative integer" } { "byte-array" "a new byte array" } }
+{ $description "Creates a new byte array holding " { $snippet "n" } " cells." } ;
+
 HELP: <array> "( n elt -- array )"
-{ $values { "n" "a positive integer specifying array length" } { "elt" "an initial element" } }
+{ $values { "n" "a non-negative integer" } { "elt" "an initial element" } { "array" "a new array" } }
 { $description "Creates a new array with the given length and all elements initially set to " { $snippet "elt" } "." }
-{ $see-also <string> <sbuf> <vector> } ;
+{ $see-also <quotation> <string> <sbuf> <vector> } ;
 
 HELP: >array "( seq -- array )"
 { $values { "seq" "a sequence" } { "array" "an array" } }

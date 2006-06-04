@@ -58,7 +58,7 @@ PREDICATE: word tuple-class "tuple-size" word-prop ;
     swap dup check-tuple-class [
         dup literalize ,
         "tuple-size" word-prop ,
-        \ make-tuple , %
+        \ <tuple> , %
     ] [ ] make define-compound ;
 
 : default-constructor ( tuple -- )

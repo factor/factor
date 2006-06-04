@@ -45,9 +45,15 @@ void primitive_array(void)
 /* push a new tuple on the stack */
 void primitive_tuple(void)
 {
-	F_FIXNUM size = to_fixnum(dpop());
-	maybe_gc(array_size(size));
-	dpush(tag_object(array(TUPLE_TYPE,size,F)));
+	CELL class;
+	F_FIXNUM size;
+	F_ARRAY *tuple;
+	maybe_gc(0);
+	size = to_fixnum(dpop());
+	class = dpop();
+	tuple = array(TUPLE_TYPE,size,F);
+	put(AREF(tuple,0),class);
+	dpush(tag_object(tuple));
 }
 
 /* push a new byte on the stack */

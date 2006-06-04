@@ -21,3 +21,7 @@ HELP: >fraction "( a/b -- a b )"
 HELP: 2>fraction "( a/b c/d -- a c b d )"
 { $values { "a/b" "a rational number" } { "a" "an integer" } { "c" "an integer" } { "b" "a positive integer" } { "d" "a positive integer" } }
 { $description "Extracts the numerator and denominator of two rational numbers at once." } ;
+
+HELP: (fraction>) "( a b -- a/b )"
+{ $values { "a" "an integer" } { "b" "an integer" } { "a/b" "a ratio" } }
+{ $description "Low-level ratio constructor. User code should call " { $link / } " to create ratios instead." } ;

@@ -333,8 +333,8 @@ sequences strings vectors words prettyprint ;
 \ fsqrt t "flushable" set-word-prop
 \ fsqrt t "foldable" set-word-prop
 
-\ <word> [ [ object object ] [ word ] ] "infer-effect" set-word-prop
-\ <word> t "flushable" set-word-prop
+\ (word) [ [ object object ] [ word ] ] "infer-effect" set-word-prop
+\ (word) t "flushable" set-word-prop
 
 \ update-xt [ [ word ] [ ] ] "infer-effect" set-word-prop
 \ compiled? [ [ word ] [ object ] ] "infer-effect" set-word-prop
@@ -343,8 +343,8 @@ sequences strings vectors words prettyprint ;
 \ setenv [ [ object fixnum ] [ ] ] "infer-effect" set-word-prop
 \ stat [ [ string ] [ array ] ] "infer-effect" set-word-prop
 \ (directory) [ [ string ] [ array ] ] "infer-effect" set-word-prop
-\ gc [ [ fixnum ] [ ] ] "infer-effect" set-word-prop
-\ gc-time [ [ string ] [ ] ] "infer-effect" set-word-prop
+\ gc [ [ integer ] [ ] ] "infer-effect" set-word-prop
+\ gc-time [ [ ] [ integer ] ] "infer-effect" set-word-prop
 \ save-image [ [ string ] [ ] ] "infer-effect" set-word-prop
 \ exit [ [ integer ] [ ] ] "infer-effect" set-word-prop
 \ room [ [ ] [ integer integer integer integer array ] ] "infer-effect" set-word-prop
@@ -476,7 +476,7 @@ sequences strings vectors words prettyprint ;
 \ <array> [ [ integer object ] [ array ] ] "infer-effect" set-word-prop
 \ <array> t "flushable" set-word-prop
 
-\ <tuple> [ [ integer ] [ tuple ] ] "infer-effect" set-word-prop
+\ <tuple> [ [ integer word ] [ tuple ] ] "infer-effect" set-word-prop
 \ <tuple> t "flushable" set-word-prop
 
 \ begin-scan [ [ ] [ ] ] "infer-effect" set-word-prop

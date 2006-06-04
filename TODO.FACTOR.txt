@@ -4,6 +4,7 @@
 [ 1 2 3 4 5 6 7 8 9 10 10 10 10 10 10 10 10 10 10 11 11 11 113 
 ]
 
+- if a primitive throws an error, :c doesn't show the call frame there
 - running all help entries:
   - without a yield UI runs out of memory
   - leaves array array on the stack

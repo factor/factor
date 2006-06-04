@@ -74,8 +74,6 @@ IN: kernel-internals
 : array-nth swap 2 fixnum+fast slot ; inline
 : set-array-nth swap 2 fixnum+fast set-slot ; inline
 
-: make-tuple <tuple> [ 2 set-slot ] keep ; flushable
-
 ! Some runtime implementation details
 : num-types 19 ; inline
 : tag-mask BIN: 111 ; inline

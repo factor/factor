@@ -1,4 +1,4 @@
-USING: help inspector kernel parser words ;
+USING: help inspector kernel kernel-internals parser words ;
 
 HELP: execute "( word -- )"
 { $values { "word" "a word" } }
@@ -138,6 +138,10 @@ HELP: reset-generic "( word -- )"
 { $values { "word" "a word" } }
 { $description "Reset word declarations and generic word properties." }
 $low-level-note ;
+
+HELP: (word) "( name vocab -- word )"
+{ $values { "name" "a string" } { "vocab" "a string" } { "word" "a word" } }
+{ $description "Low-level word constructor. User code should call " { $link <word> } " instead." } ;
 
 HELP: <word> "( name vocab -- word )"
 { $values { "name" "a string" } { "vocab" "a string" } { "word" "a word" } }

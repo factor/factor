@@ -3,7 +3,7 @@ USING: arrays help kernel strings vectors ;
 HELP: <string> "( n ch -- string )"
 { $values { "n" "a positive integer specifying string length" } { "elt" "an initial character" } }
 { $description "Creates a new string with the given length and all characters initially set to " { $snippet "ch" } "." }
-{ $see-also <array> <sbuf> <vector> } ;
+{ $see-also <array> <quotation> <sbuf> <vector> } ;
 
 HELP: blank? "( ch -- ? )"
 { $values { "ch" "a character" } { "?" "a boolean" } }

@@ -50,6 +50,10 @@ HELP: set-callstack "( cs -- )"
 { $values { "cs" "a vector" } }
 { $description "Replaces the call stack contents with a copy of a vector. The end of the vector becomes the top of the stack. The current quotation continues executing. The new callstack takes effect when the current quotation returns, resulting in a callframe being popped." } ;
 
+HELP: (clone) "( obj -- newobj )"
+{ $values { "obj" "an object" } { "newobj" "a shallow copy" } }
+{ $description "Outputs a byte-by-byte copy of the given object. User code should call " { $link clone } " instead." } ;
+
 HELP: clear "( -- )"
 { $description "Clears the data stack." } ;
 

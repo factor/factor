@@ -78,3 +78,12 @@ $terpri
 HELP: tuple>array "( tuple -- array )"
 { $values { "tuple" "a tuple" } { "array" "a new array" } }
 { $description "Outputs an array having the tuple's slots as elements. The first element is the tuple class word and the second is the delegate; the remainder are declared slots." } ;
+
+HELP: array>tuple "( array -- tuple )"
+{ $values { "array" "a array" } { "tuple" "a new tuple" } }
+{ $description "Outputs a tuple having the same slot values as the array." }
+{ $warning "This word is in the " { $snippet "kernel-internals" } " vocabulary since it is unsafe. Creating a tuple with the wrong shape can cause crashes or memory corruption. User code should construct tuples using generated tuple constructors instead; see " { $link "tuples" } "." } ;
+
+HELP: <tuple> "( class n -- tuple )"
+{ $values { "class" "a class word" } { "n" "a non-negative integer" } { "tuple" "a new tuple" } }
+{ $description "Low-level tuple constructor. User code should never call this directly, and instead use the constructor word which is defined for each tuple. See " { $link "tuples" } "." } ;

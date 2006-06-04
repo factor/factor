@@ -109,7 +109,7 @@ M: node child-ties ( node -- seq )
         ] if
     ] if ;
 
-\ make-tuple [
+\ <tuple> [
     node-in-d first value-literal 1array
 ] "output-classes" set-word-prop
 

@@ -37,3 +37,84 @@ HELP: next-power-of-2 "( m -- n )"
 HELP: fraction> "( a b -- a/b )"
 { $values { "a" "an integer" } { "b" "a positive integer" } { "a/b" "a rational number" } }
 { $description "Creates a new ratio, or outputs the numerator if the denominator is 1. This word does not reduce the fraction to lowest terms, and should not be called directly; use " { $link / } " instead." } ;
+
+! Unsafe primitives
+HELP: bignum+ "( x y -- z )"
+{ $values { "x" "a bignum" } { "y" "a bignum" } { "z" "a bignum" } }
+{ $description "Primitive version of " { $link + } "." }
+{ $warning "This word does not perform type checking, and passing objects of the wrong type can crash the runtime. User code should call the generic word " { $link + } " instead." } ;
+
+HELP: bignum- "( x y -- z )"
+{ $values { "x" "a bignum" } { "y" "a bignum" } { "z" "a bignum" } }
+{ $description "Primitive version of " { $link - } "." }
+{ $warning "This word does not perform type checking, and passing objects of the wrong type can crash the runtime. User code should call the generic word " { $link - } " instead." } ;
+
+HELP: bignum* "( x y -- z )"
+{ $values { "x" "a bignum" } { "y" "a bignum" } { "z" "a bignum" } }
+{ $description "Primitive version of " { $link * } "." }
+{ $warning "This word does not perform type checking, and passing objects of the wrong type can crash the runtime. User code should call the generic word " { $link * } " instead." } ;
+
+HELP: bignum/f "( x y -- z )"
+{ $values { "x" "a bignum" } { "y" "a bignum" } { "z" "a float" } }
+{ $description "Primitive version of " { $link /f } "." }
+{ $warning "This word does not perform type checking, and passing objects of the wrong type can crash the runtime. User code should call the generic word " { $link /f } " instead." } ;
+
+HELP: bignum/i "( x y -- z )"
+{ $values { "x" "a bignum" } { "y" "a bignum" } { "z" "a bignum" } }
+{ $description "Primitive version of " { $link /i } "." }
+{ $warning "This word does not perform type checking, and passing objects of the wrong type can crash the runtime. User code should call the generic word " { $link /i } " instead." } ;
+
+HELP: bignum-mod "( x y -- z w )"
+{ $values { "x" "a bignum" } { "y" "a bignum" } { "z" "a bignum" } { "w" "a bignum" } }
+{ $description "Primitive version of " { $link mod } "." }
+{ $warning "This word does not perform type checking, and passing objects of the wrong type can crash the runtime. User code should call the generic word " { $link mod } " instead." } ;
+
+HELP: bignum/mod "( x y -- z )"
+{ $values { "x" "a bignum" } { "y" "a bignum" } { "z" "a bignum" } }
+{ $description "Primitive version of " { $link /mod } "." }
+{ $warning "This word does not perform type checking, and passing objects of the wrong type can crash the runtime. User code should call the generic word " { $link /mod } " instead." } ;
+
+HELP: bignum< "( x y -- z )"
+{ $values { "x" "a bignum" } { "y" "a bignum" } { "?" "a boolean" } }
+{ $description "Primitive version of " { $link < } "." }
+{ $warning "This word does not perform type checking, and passing objects of the wrong type can crash the runtime. User code should call the generic word " { $link < } " instead." } ;
+
+HELP: bignum<= "( x y -- z )"
+{ $values { "x" "a bignum" } { "y" "a bignum" } { "?" "a boolean" } }
+{ $description "Primitive version of " { $link <= } "." }
+{ $warning "This word does not perform type checking, and passing objects of the wrong type can crash the runtime. User code should call the generic word " { $link <= } " instead." } ;
+
+HELP: bignum> "( x y -- z )"
+{ $values { "x" "a bignum" } { "y" "a bignum" } { "?" "a boolean" } }
+{ $description "Primitive version of " { $link > } "." }
+{ $warning "This word does not perform type checking, and passing objects of the wrong type can crash the runtime. User code should call the generic word " { $link > } " instead." } ;
+
+HELP: bignum>= "( x y -- z )"
+{ $values { "x" "a bignum" } { "y" "a bignum" } { "?" "a boolean" } }
+{ $description "Primitive version of " { $link >= } "." }
+{ $warning "This word does not perform type checking, and passing objects of the wrong type can crash the runtime. User code should call the generic word " { $link >= } " instead." } ;
+
+HELP: bignum= "( x y -- ? )"
+{ $values { "x" "a bignum" } { "y" "a bignum" } { "?" "a boolean" } }
+{ $description "Primitive version of " { $link number= } "." }
+{ $warning "This word does not perform type checking, and passing objects of the wrong type can crash the runtime. User code should call the generic word " { $link number= } " instead." } ;
+
+HELP: bignum-bitand "( x y -- z )"
+{ $values { "x" "a bignum" } { "y" "a bignum" } { "z" "a bignum" } }
+{ $description "Primitive version of " { $link bitand } "." }
+{ $warning "This word does not perform type checking, and passing objects of the wrong type can crash the runtime. User code should call the generic word " { $link bitand } " instead." } ;
+
+HELP: bignum-bitor "( x y -- z )"
+{ $values { "x" "a bignum" } { "y" "a bignum" } { "z" "a bignum" } }
+{ $description "Primitive version of " { $link bitor } "." }
+{ $warning "This word does not perform type checking, and passing objects of the wrong type can crash the runtime. User code should call the generic word " { $link bitor } " instead." } ;
+
+HELP: bignum-bitxor "( x y -- z )"
+{ $values { "x" "a bignum" } { "y" "a bignum" } { "z" "a bignum" } }
+{ $description "Primitive version of " { $link bitxor } "." }
+{ $warning "This word does not perform type checking, and passing objects of the wrong type can crash the runtime. User code should call the generic word " { $link bitxor } " instead." } ;
+
+HELP: bignum-shift "( x y -- z )"
+{ $values { "x" "a bignum" } { "y" "a bignum" } { "z" "a bignum" } }
+{ $description "Primitive version of " { $link shift } "." }
+{ $warning "This word does not perform type checking, and passing objects of the wrong type can crash the runtime. User code should call the generic word " { $link shift } " instead." } ;
