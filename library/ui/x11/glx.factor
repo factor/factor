@@ -1,4 +1,4 @@
-! Copyright (C) 2005, 2006 Eduardo Cavazos
+! Copyright (C) 2005, 2006 Eduardo Cavazos and Alex Chapman
 ! See http://factorcode.org/license.txt for BSD license.
 !
 ! based on glx.h from xfree86, and some of glxtokens.h
