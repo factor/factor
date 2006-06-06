@@ -22,24 +22,24 @@ else
 	UNIX_UI_LIBS = -lfreetype -lGL -lGLU -L/usr/X11R6/lib -lX11
 endif
 
-WINDOWS_OBJS = native/windows/ffi.o \
-	native/windows/file.o \
-	native/windows/misc.o \
-	native/windows/run.o \
-	native/windows/memory.o
+WINDOWS_OBJS = vm/windows/ffi.o \
+	vm/windows/file.o \
+	vm/windows/misc.o \
+	vm/windows/run.o \
+	vm/windows/memory.o
 
-UNIX_OBJS = native/unix/file.o \
-	native/unix/signal.o \
-	native/unix/ffi.o \
-	native/unix/memory.o \
-	native/unix/icache.o
+UNIX_OBJS = vm/unix/file.o \
+	vm/unix/signal.o \
+	vm/unix/ffi.o \
+	vm/unix/memory.o \
+	vm/unix/icache.o
 
 MACOSX_OBJS = $(UNIX_OBJS) \
-	native/macosx/run.o \
-	native/macosx/mach_signal.o
+	vm/macosx/run.o \
+	vm/macosx/mach_signal.o
 
 GENERIC_UNIX_OBJS = $(UNIX_OBJS) \
-	native/unix/run.o
+	vm/unix/run.o
 
 ifdef WINDOWS
  	PLAF_OBJS = $(WINDOWS_OBJS)
@@ -52,25 +52,25 @@ else
 	endif
 endif
 
-OBJS = $(PLAF_OBJS) native/array.o native/bignum.o \
-	native/s48_bignum.o \
-	native/complex.o native/error.o \
-	native/factor.o native/fixnum.o \
-	native/float.o native/gc.o \
-	native/image.o native/memory.o \
-	native/misc.o native/primitives.o \
-	native/ratio.o native/relocate.o \
-	native/run.o \
-	native/sbuf.o native/stack.o \
-	native/string.o native/cards.o native/vector.o \
-	native/word.o native/compiler.o \
-	native/alien.o native/dll.o \
-	native/boolean.o \
-	native/debug.o \
-	native/hashtable.o \
-	native/io.o \
-	native/wrapper.o \
-	native/ffi_test.o
+OBJS = $(PLAF_OBJS) vm/array.o vm/bignum.o \
+	vm/s48_bignum.o \
+	vm/complex.o vm/error.o \
+	vm/factor.o vm/fixnum.o \
+	vm/float.o vm/gc.o \
+	vm/image.o vm/memory.o \
+	vm/misc.o vm/primitives.o \
+	vm/ratio.o vm/relocate.o \
+	vm/run.o \
+	vm/sbuf.o vm/stack.o \
+	vm/string.o vm/cards.o vm/vector.o \
+	vm/word.o vm/compiler.o \
+	vm/alien.o vm/dll.o \
+	vm/boolean.o \
+	vm/debug.o \
+	vm/hashtable.o \
+	vm/io.o \
+	vm/wrapper.o \
+	vm/ffi_test.o
 
 default:
 	@echo "Run 'make' with one of the following parameters:"
