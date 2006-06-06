@@ -1,6 +1,6 @@
 USING: help math prettyprint sequences ;
 
-ARTICLE: "math" "Mathematics"
+ARTICLE: "math" "Numbers"
 "Factor attempts to preserve natural mathematical semantics for numbers. Multiplying two large integers never results in overflow, and dividing two integers yields an exact ratio. Floating point numbers are also supported, along with complex numbers."
 $terpri
 "Math words are in the " { $snippet "math" } " vocabulary. Implementation details are in the " { $snippet "math-internals" } " vocabulary."
@@ -8,7 +8,8 @@ $terpri
 { $subsection "number-types" }
 { $subsection "math-functions" }
 { $subsection "math-constants" }
-{ $subsection "math-vectors" } ;
+{ $subsection "math-vectors" }
+{ $subsection "number-strings" } ;
 
 ARTICLE: "number-types" "Types of numbers"
 { $subsection "integers" }
@@ -222,3 +223,22 @@ $terpri
 { $subsection norm }
 { $subsection norm-sq }
 { $subsection normalize } ;
+
+ARTICLE: "number-strings" "Converting between numbers and strings"
+"These words only convert between real numbers and strings. Complex numbers are constructed by the parser (" { $link "parser" } ") and printed by the prettyprinter (" { $link "prettyprint" } ")."
+$terpri
+"Note that only integers can be converted to and from strings using a representation other than base 10. Calling a word such as " { $link >oct } " on a float will give a result in base 10."
+$terpri
+"Converting numbers to strings:"
+{ $subsection number>string }
+{ $subsection >bin }
+{ $subsection >oct }
+{ $subsection >hex }
+{ $subsection >base }
+"Converting strings to numbers:"
+{ $subsection string>number }
+{ $subsection bin> }
+{ $subsection oct> }
+{ $subsection hex> }
+{ $subsection base> }
+"You can also input literal numbers in a different base (" { $link "syntax-integers" } ")." ;

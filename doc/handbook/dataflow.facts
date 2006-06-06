@@ -5,6 +5,7 @@ ARTICLE: "dataflow" "Data and control flow"
 { $subsection "quotations" }
 { $subsection "combinators" }
 { $subsection "conditionals" }
+{ $subsection "interpreter" }
 { $subsection "continuations" } ;
 
 ARTICLE: "shuffle-words" "Shuffle words"
@@ -42,29 +43,15 @@ $terpri
 } ;
 
 ARTICLE: "quotations" "Quotations"
-"A quotation is a sequence of objects, some of which may be words. When evaluating a quotation, the interpreter looks at each element in turn, and executes words while pushing other types of objects on the stack."
+"Conceptually, a quotation is a snippet of code which can be passed around and called. Concretely, a quotation is a sequence of objects, some of which may be words. When evaluating a quotation, the interpreter looks at each element in turn, and executes words while pushing other types of objects on the stack. Details can be found in " { $link "interpreter" } "."
 $terpri
-"Quotation literal syntax is documented in " { $link "quotation-syntax" } "."
+"Quotation literal syntax is documented in " { $link "syntax-quots" } "."
 $terpri
-"More precisely, the interpreter runs in a loop which repeatedly performs the following steps:"
-{ $list
-    { "If the end of the current quotation has been reached, the parent quotation is popped from the call stack and execution resumes from the saved location" }
-    { "Otherwise, the interpreter performs an action depending on the type of the object at the instruction pointer:"
-        { $list
-            { { $emphasis "Symbol word" } " - pushed on the datastack. See " { $link "symbols" } }
-            { { $emphasis "Compound word" } " - the associated quotation is called. See " { $link "colon-definition" } }
-            { { $emphasis "Compiled or primitive word" } " - the interpreter jumps to machine code. See " { $link "primitives" } }
-            { { $emphasis "Undefined word" } " -  an error is raised. See " { $link "deferred" } }
-            { { $emphasis "Wrapper" } " - the wrapped object is pushed on the data stack. Wrappers are used to push word objects directly on the stack when they would otherwise execute. See the " { $link POSTPONE: \ } " parsing word." }
-            { "All other types of objects are pushed on the data stack." }
-        }
-    }
-}
-"At each stage, the instruction pointer is advanced by one position."
-$terpri
-"If the instruction pointer is at the end of a quotation when a nested quotation is called, the quotation which just finished executing is not pushed on the call stack. Therefore the last call in a quotation does not grow the call stack, and tail recursion executes in bounded space."
-$terpri
-"The compiler generates machine code which perform the steps in a more efficient manner than the interpreter, however the observable semantics remain the same." ;
+"Quotations implement the sequence protocol (" { $link "sequences" } "). Much of the power of Factor comes from the fact that not only can you have literal quotations in your program, but you can also construct new quotations at run time using general sequence words, or the following quotation-specific words:"
+{ $subsection unit }
+{ $subsection literalize }
+{ $subsection curry }
+{ $subsection alist>quot } ;
 
 ARTICLE: "combinators" "Combinators"
 "The following pair of words invoke the interpreter reflectively:"
@@ -106,6 +93,27 @@ $terpri
 { $subsection >boolean }
 { $subsection and }
 { $subsection or } ;
+
+ARTICLE: "interpreter" "The interpreter"
+"The interpreter runs in a loop which repeatedly performs the following steps:"
+{ $list
+    { "If the end of the current quotation has been reached, the parent quotation is popped from the call stack and execution resumes from the saved location" }
+    { "Otherwise, the interpreter performs an action depending on the type of the object at the instruction pointer:"
+        { $list
+            { { $emphasis "Symbol word" } " - pushed on the datastack. See " { $link "symbols" } }
+            { { $emphasis "Compound word" } " - the associated quotation is called. See " { $link "colon-definition" } }
+            { { $emphasis "Compiled or primitive word" } " - the interpreter jumps to machine code. See " { $link "primitives" } }
+            { { $emphasis "Undefined word" } " -  an error is raised. See " { $link "deferred" } }
+            { { $emphasis "Wrapper" } " - the wrapped object is pushed on the data stack. Wrappers are used to push word objects directly on the stack when they would otherwise execute. See the " { $link POSTPONE: \ } " parsing word." }
+            { "All other types of objects are pushed on the data stack." }
+        }
+    }
+}
+"At each stage, the instruction pointer is advanced by one position."
+$terpri
+"If the instruction pointer is at the end of a quotation when a nested quotation is called, the quotation which just finished executing is not pushed on the call stack. Therefore the last call in a quotation does not grow the call stack, and tail recursion executes in bounded space."
+$terpri
+"The compiler generates machine code which perform the steps in a more efficient manner than the interpreter, however the observable semantics remain the same." ;
 
 ARTICLE: "continuations" "Continuations"
 "At any point in the execution of a program, the " { $emphasis "current continuation" } " represents the future of the computation. This object can be reified with the following two words:"

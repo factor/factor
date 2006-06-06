@@ -4,4 +4,4 @@ USING: help ;
 HELP: infer "( quot -- effect )"
 { $values { "quot" "a quotation" } { "effect" "a pair of integers" } }
 { $description "Attempts to infer the quotation's stack effect, outputting a pair holding the correct of data stack inputs and outputs for the quotation." }
-{ $errors "Throws an error if stack effect inference fails. See " { $link "inference" } "." } ;
+{ $errors "Throws an error if stack effect inference fails." } ;

@@ -1,7 +1,7 @@
-USING: help io parser words ;
+USING: help io parser sequences words ;
 
 ARTICLE: "parser" "The parser"
-"This section concerns itself with reflective access and extension of the Factor parser. The parser algorithm and standard syntax is described in " { $link "syntax" } ". Before the parser proper is documented, we draw attention to a set of words for parsing numbers. They are called by the parser, and are useful in their own right."
+"This section concerns itself with reflective access and extension of the Factor parser. The parser algorithm and standard syntax is described in " { $link "syntax" } "."
 $terpri
 "The set of words making up the parser are found in the " { $snippet "parser" } " and " { $snippet "syntax" } " vocabularies."
 $terpri
@@ -13,6 +13,7 @@ $terpri
 { $subsection eval }
 "More sophisticated facilities exist, too."
 { $subsection "parse-stream" }
+"The parser can be extended with new parsing word definitions."
 { $subsection "parsing-words" } ;
 
 ARTICLE: "parse-stream" "Parsing from streams"
@@ -36,42 +37,45 @@ $terpri
 { $subsection "parsing-word-nest" }
 { $subsection "reading-ahead" }
 { $subsection "defining-words" }
-{ $subsection "string-mode" } ;
+{ $subsection "string-mode" }
+{ $subsection "parser-internals" } ;
 
 ARTICLE: "parsing-word-nest" "Nested structure"
-"The first thing to look at is how the parse tree is built. When parsing begins, the empty list is pushed on the data stack; whenever the parser algorithm appends an object to the parse tree, it conses the object onto the quotation at the top of the stack. This builds the quotation in reverse order, so when parsing is done, the quotation is reversed before it is called."
+"The first thing to look at is how the parse tree is built. When parsing begins, " { $link f } " is pushed on the data stack; when a new object is parsed, " { $link ?push } " is called to add it to the parse tree. The first call to " { $link ?push } " creates a new one-element vector, and subsequent calls add elements to the end of this vector. When parsing is complete, the vector is converted into a quotation."
 $terpri
 "Lets look at a simple example; the parsing of " { $snippet "1 2 3" } ":"
-$terpri
 { $list
-    { "Token: " { $snippet "1" } " - stack: " { $snippet "[ 1 ]" } }
-    { "Token: " { $snippet "2" } " - stack: " { $snippet "[ 2 1 ]" } }
-    { "Token: " { $snippet "3" } " - stack: " { $snippet "[ 3 2 1 ]" } }
+    { "Initial stack after parsing begins:" { $snippet "f" } }
+    { "Token: " { $snippet "1" } " - stack top: " { $snippet "V{ 1 }" } }
+    { "Token: " { $snippet "2" } " - stack top: " { $snippet "V{ 1 2 }" } }
+    { "Token: " { $snippet "3" } " - stack top: " { $snippet "V{ 1 2 3 }" } }
+    { "Final stack upon completion:" { $snippet "[ 1 2 3 ]" } }
 }
-"Once the end of the string has been reached, the quotation is reversed, leaving the following output:"
-{ $code "[ 1 2 3 ]" }
-"Nested structure is a bit more involved. The basic idea is that parsing words can push an empty list on the stack, then all subsequent tokens are consed onto this list, until another parsing word adds this list to the list underneath."
+"Nested structure is a bit more involved. The basic idea is that parsing words can push " { $link f } " on the stack to begin a new level of nesting, then all subsequent objects are pushed onto this sequence, until another parsing word adds this sequence to the vector underneath."
 $terpri
 "The parsing words that delimit the beginning and the end of a quotation illustrate the idiom:"
 { $subsection POSTPONE: [ }
 { $subsection POSTPONE: ] }
-"Let us ponder, then, how one particular string will parse::"
+"Let us ponder, then, how one particular string will parse:"
 { $snippet "\"1 [ 2 3 ] 4\"" }
 { $list
-    { "Token: " { $snippet "1" } " - stack: " { $snippet "[ 1 ]" } }
-    { "Token: " { $snippet "[" } " - stack: " { $snippet "[ ] [ 1 ]" } }
-    { "Token: " { $snippet "2" } " - stack: " { $snippet "[ 2 ] [ 1 ]" } }
-    { "Token: " { $snippet "3" } " - stack: " { $snippet "[ 3 2 ] [ 1 ]" } }
-    { "Token: " { $snippet "]" } " - stack: " { $snippet "[ [ 2 3 ] 1 ]" } }
-    { "Token: " { $snippet "4" } " - stack: " { $snippet "[ 4 [ 2 3 ] 1 ]" } }
+    { "Initial stack after parsing begins:" { $snippet "f" } }
+    { "Token: " { $snippet "1" } " - stack top: " { $snippet "V{ 1 }" } }
+    { "Token: " { $snippet "[" } " - stack top: " { $snippet "f V{ 1 }" } }
+    { "Token: " { $snippet "2" } " - stack top: " { $snippet "V{ 2 } V{ 1 }" } }
+    { "Token: " { $snippet "3" } " - stack top: " { $snippet "V{ 2 3 } V{ 1 }" } }
+    { "Token: " { $snippet "]" } " - stack top: " { $snippet "V{ 1 [ 2 3 ] }" } }
+    { "Token: " { $snippet "4" } " - stack top: " { $snippet "V{ 1 [ 2 3 ] 4 }" } }
+    { "Final stack upon completion:" { $snippet "[ 1 [ 2 3 ] 4 ]" } }
 }
-"Having done all that, the parser reverses the original quotation, and the expected output is now on the stack:"
-{ $code "[ 1 [ 2 3 ] 4 ]" }
-"Notice how in the definition of the list parsing words, the final word " { $link POSTPONE: ] } " does all the work. A closely related set of parsing words for reading various other literal types implements another useful idiom."
+"Notice how in the definition of the quotation parsing words, the final word " { $link POSTPONE: ] } " does all the work. A closely related set of parsing words for reading various other literal types implements another useful idiom."
 $terpri
-"The word set in question consists of various start delimiters, such a " { $link POSTPONE: { } " for arrays and " { $link POSTPONE: H{ } " for hashtables, together with one end delimiter " { $link POSTPONE: } } ". The start words push a quotation in addition to an empty list; the end word reverses the empty list, and applies the quotation to the newly-parsed list; the quotation converts it to the appropriate type of literal."
+"The word set in question consists of various start delimiters, such a " { $link POSTPONE: { } " for arrays and " { $link POSTPONE: H{ } " for hashtables, together with one end delimiter " { $link POSTPONE: } } ". The start words push a quotation in addition to pushing " { $link f } "; the end word applies the quotation to the newly-parsed vector; the quotation converts it to the appropriate type of literal."
 { $subsection POSTPONE: { }
 { $subsection POSTPONE: H{ }
+{ $subsection POSTPONE: V{ }
+{ $subsection POSTPONE: W{ }
+{ $subsection POSTPONE: T{ }
 { $subsection POSTPONE: } } ;
 
 ARTICLE: "reading-ahead" "Reading ahead"
@@ -91,23 +95,29 @@ ARTICLE: "defining-words" "Defining words"
 { $subsection CREATE }
 "Colon definitions are defined in a more elaborate way. The  definition of " { $link POSTPONE: : } " introduces the next idiom, and that is building a quotation and then adding a definition using " { $link POSTPONE: ; } "."
 $terpri
-"Recall the colon definition syntax. When the " { $link POSTPONE: : } " word executes, it reads ahead from the input and defines a word. Then, it places a quotation and an empty list on the stack. The parser conses tokens onto the empty list, and the quotation is called by " { $link POSTPONE: ; } "."
+"Recall the colon definition syntax. When the " { $link POSTPONE: : } " word executes, it reads ahead from the input and defines a word. Then, it places a quotation and " { $link f } " on the data stack. The parser builds up a parse tree, and the quotation pushed by " { $link POSTPONE: : } " is called by " { $link POSTPONE: ; } "."
 { $subsection POSTPONE: : }
 { $subsection POSTPONE: ; }
 "There are additional parsing words whose syntax is delimited by  " { $link POSTPONE: ; } ", and they are all implemented in the same way -- first they read some input, then they leave a quotation followed by an empty list on the stack."
+{ $subsection POSTPONE: C: }
+{ $subsection POSTPONE: G: }
 { $subsection POSTPONE: M: }
-{ $subsection POSTPONE: C: } ;
+{ $subsection POSTPONE: PREDICATE: }
+{ $subsection POSTPONE: TUPLE: }
+{ $subsection POSTPONE: UNION: }
+{ $subsection POSTPONE: USING: } ;
 
-ARTICLE: "string-mode" "String mode and parser internals"
+ARTICLE: "string-mode" "String mode"
 "String mode allows custom parsing of tokenized input. For even more esoteric situations, the input text can be accessed directly."
 $terpri
 "String mode is controlled by a boolean variable in the parser scope:"
 { $subsection string-mode }
 "An illustration of this idiom is found in the " { $link POSTPONE: USING: } " parsing word. It reads a list of vocabularies, terminated by " { $link POSTPONE: ; } ". However, the vocabulary names do not name words, except by coincidence; so string mode is used to read them."
 { $subsection POSTPONE: USING: }
-"Make note of the quotation that is left in position for " { $link POSTPONE: ; } " to call. It switches off string mode, so that normal parsing can resume, then adds the given vocabularies to the search path."
-$terpri
-"Some additional variables that encapsulate internal parser state:"
+"Make note of the quotation that is left in position for " { $link POSTPONE: ; } " to call. It switches off string mode, so that normal parsing can resume, then adds the given vocabularies to the search path." ;
+
+ARTICLE: "parser-internals" "Parser internals"
+"Some variables that encapsulate internal parser state:"
 { $subsection file }
 { $subsection line-number }
 { $subsection line-text }

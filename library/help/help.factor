@@ -1,7 +1,8 @@
 ! Copyright (C) 2005, 2006 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 IN: help
-USING: arrays hashtables io kernel namespaces strings ;
+USING: arrays errors hashtables io kernel namespaces sequences
+strings ;
 
 ! Markup
 GENERIC: print-element
@@ -11,13 +12,14 @@ SYMBOL: articles
 
 TUPLE: article title content ;
 
-: article ( name -- article ) articles get hash ;
+: article ( name -- article )
+    dup articles get hash
+    [ ] [ "No such article: " swap append throw ] ?if ;
 
 : add-article ( name title element -- )
     <article> swap articles get set-hash ;
 
 M: string article-title article article-title ;
-
 M: string article-content article article-content ;
 
 ! Special case: f help

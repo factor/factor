@@ -68,6 +68,11 @@ HELP: T{ "class delegate slots... }"
 { $values { "class" "a tuple class word" } { "delegate" "a delegate" } { "slots" "list of objects" } }
 { $description "Marks the beginning of a literal tuple. The class word must always be specified. If an insufficient number of values is given after the class word, the remaining slots of the tuple are set to " { $link f } ". If too many values are given, an error is thrown." } ;
 
+HELP: W{ "object }"
+{ $values { "object" "an object" } }
+{ $description "Marks the beginning of a literal wrapper." }
+{ $see-also POSTPONE: \ <wrapper> literalize } ;
+
 HELP: POSTPONE: "word"
 { $values { "word" "a word" } }
 { $description "Reads the next word from the input string and appends the word to the parse tree, even if it is a parsing word." }

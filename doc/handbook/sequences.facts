@@ -20,6 +20,7 @@ $terpri
 { $subsection "sequences-sorting" }
 { $subsection "sequences-stacks" }
 { $subsection "sequences-comparing" }
+{ $subsection "sequences-assoc" }
 "Some implementation details which your code should probably not care about:"
 { $subsection "sequences-unsafe" }
 { $subsection "sequences-growable" }
@@ -31,11 +32,13 @@ ARTICLE: "sequence-implementations" "Sequence implementations"
 { $subsection "vectors" }
 { $subsection "strings" }
 { $subsection "sbufs" }
+{ $subsection "quotations" }
 "Virtual sequences wrap an underlying sequence to present an alternative view of its elements:"
 { $subsection <slice> }
 { $subsection <reversed> }
 "Integers support the sequence protocol:"
-{ $subsection "sequences-integers" } ;
+{ $subsection "sequences-integers" }
+"The " { $link f } " object also supports the sequence protocol. It responds with a length of zero, and instead of throwing an out of bounds error, outputs " { $link f } " when an element is accessed. This can simplify code that would like a dummy sequence behaving as if it has arbitrary length." ;
 
 ARTICLE: "sequences-integers" "Integer sequences and counted loops"
 "Integers support the sequence protocol in a trivial fashion; a non-negative integer presents its non-negative predecessors as elements. For example, the integer 3, when viewed as a sequence, contains the elements 0, 1, and 2. This is very useful for performing counted loops."
@@ -44,7 +47,7 @@ $terpri
 { $example "3 [ . ] each" "0\n1\n2" }
 "A common idiom is to iterate over a sequence, while also maintaining a loop counter. This can be done using " { $link 2each } ":"
 { $example "{ \"a\" \"b\" \"c\" } dup length [\n    \"Index: \" write . \"Element: \" write .\n] 2each" "Index: 0\nElement: \"a\"\nIndex: 1\nElement: \"b\"\nIndex: 2\nElement: \"c\"" }
-"Combinators that produce new sequences, such as " { $snippet map } ", will output an array if the input is an integer." ;
+"Combinators that produce new sequences, such as " { $link map } ", will output an array if the input is an integer." ;
 
 ARTICLE: "sequences-utilities" "Basic utilities"
 "Some utilities for accessing various common indices:"
@@ -104,7 +107,7 @@ ARTICLE: "sequences-slicing" "Slicing and splitting"
 { $subsection (split1) }
 { $subsection split1 }
 { $subsection split }
-{ $subsection unpair } ;
+{ $subsection unclip } ;
 
 ARTICLE: "sequences-indices" "Order-sensitive operations"
 "Searching for the index of an element and or beginning of a subsequence:"
@@ -157,6 +160,13 @@ ARTICLE: "sequences-comparing" "Comparing sequences"
 { $subsection mismatch }
 "Lexicographic order:"
 { $subsection <=> } ;
+
+ARTICLE: "sequences-assoc" "Association lists"
+"An " { $emphasis "association list" } " is a sequence of pairs. Association lists come up from time to time; for example, the " { $link cond } " combinator takes an association list of quotations as input. You can perform lookups and take association lists apart:"
+{ $subsection assoc }
+{ $subsection rassoc }
+{ $subsection unpair }
+"An association list is slower to search than a hashtable. The main advantage of an association list is that the elements are ordered; also sometimes it is more convenient to construct an association list with sequence words than to construct a hashtable with hastable words. Most of the time, hashtables are more appropriate. See " { $link "hashtables" } "." ;
 
 ARTICLE: "sequence-protocol" "Sequence protocol"
 "All sequences must know their length, and provide a way to access elements:"
@@ -211,18 +221,22 @@ $terpri
 { $subsection ch>upper } ;
 
 ARTICLE: "sbufs" "String buffers"
-"A string buffer is a resizable mutable sequence of characters. String buffers can be used to construct new strings by accumilating substrings and characters, however usually they are only used indirectly, since the sequence construction words are more convenient to use in most cases (see " { $link "sequences-make" } ")."
+"A string buffer is a resizable mutable sequence of characters. String buffers can be used to construct new strings by accumilating substrings and characters, however usually they are only used indirectly, since the sequence construction words are more convenient to use in most cases (see " { $link "namespaces-make" } ")."
 $terpri
 "String buffer words are found in the " { $snippet "strings" } " vocabulary."
 { $subsection sbuf? }
 { $subsection >sbuf }
-{ $subsection <sbuf> } ;
+{ $subsection <sbuf> }
+"If you don't care about initial capacity, a more elegant way to create a new string buffer is to write:"
+{ $code "SBUF\" \" clone" } ;
 
 ARTICLE: "vectors" "Vectors"
 "A vector is a resizable mutable sequence of objects. Vector words are found in the " { $snippet "vectors" } " vocabulary."
 { $subsection vector? }
 { $subsection >vector }
-{ $subsection <vector> } ;
+{ $subsection <vector> }
+"If you don't care about initial capacity, a more elegant way to create a new vector is to write:"
+{ $code "V{ } clone" } ;
 
 ARTICLE: "sequences-sorting" "Sorting and binary search"
 "Sorting and binary search combinators all take comparator quotations with stack effect " { $snippet "( elt1 elt2 -- n )" } " that order the two given elements and output a value whose sign denotes the result:"

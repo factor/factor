@@ -28,7 +28,7 @@ HELP: class "( object -- class )"
 
 HELP: tuple-predicate "( class -- )"
 { $values { "class" "a tuple class word" } }
-{ $description "Defines a predicate word that tests if the top of the stack is an instance of " { $snippet class } ". This will only work if " { $snippet class } " is a tuple class." } 
+{ $description "Defines a predicate word that tests if the top of the stack is an instance of " { $snippet "class" } ". This will only work if " { $snippet "class" } " is a tuple class." }
 $low-level-note ;
 
 HELP: check-shape "( class slots -- )"

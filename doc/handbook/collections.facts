@@ -1,135 +1,52 @@
-USING: hashtables hashtables-internals help io-internals kernel
-kernel-internals namespaces queues ;
+USING: graphs hashtables hashtables-internals help io-internals
+kernel kernel-internals namespaces queues ;
 
 ARTICLE: "collections" "Collections"
 "Classical data structures:"
 { $subsection "sequences" }
-{ $subsection "queues" }
 { $subsection "hashtables" }
 "An abstraction on hashtables:"
 { $subsection "namespaces" }
+"Special-purpose data structures:"
+{ $subsection "queues" }
+{ $subsection "graphs" }
 "A low-level facility:"
 { $subsection "buffers" } ;
 
 ARTICLE: "queues" "Queues"
-"A simple last-in-first-out queue data structure."
+"Last-in-first-out queues can be found in the " { $snippet "queues" } " vocabulary."
 { $subsection queue? }
 { $subsection <queue> }
 { $subsection queue-empty? }
+{ $subsection deque }
 { $subsection enque }
-{ $subsection deque } ;
+"An example:"
+{ $snippet
+    "<queue> \"q\" set"
+    "5 \"q\" get enque"
+    "3 \"q\" get enque"
+    "7 \"q\" get enque"
+    "\"q\" get deque ."
+    "  5"
+    "\"q\" get deque ."
+    "  3"
+    "\"q\" get deque ."
+    "  7"
+} ;
 
-ARTICLE: "hashtables" "Hashtables"
-"A hashtable provides efficient (expected constant time) lookup and storage of key/value pairs. Keys are compared for equality, and a hashing function is used to reduce the number of comparisons made."
+ARTICLE: "graphs" "Directed graphs"
+"A minimalist directed graph data type can be found in the " { $snippet "graphs" } " vocabulary. A directed graph is represented as a hashtable mapping each vertex to a set of edges entering that vertex, where the set is represented as a hashtable with equal keys and values."
 $terpri
-"Hashtable words are in the " { $snippet "hashtables" } " vocabulary. Unsafe implementation words are in the " { $snippet "hashtables-internals" } " vocabulary."
-$terpri
-"Hashtables form a class of objects."
-{ $subsection hashcode }
-{ $subsection hashtable? }
-{ $subsection <hashtable> }
-"There are some primitive operations on hashes, and many utilities."
-{ $subsection "hashtables-lookup" }
-{ $subsection "hashtables-mutation" }
-{ $subsection "hashtables-combinators" }
-{ $subsection "hashtables-utilities" }
-{ $subsection "hashtables-internals" } ;
-
-ARTICLE: "hashtables-lookup" "Looking up keys in hashtables"
-{ $subsection hash }
-{ $subsection hash* }
-{ $subsection ?hash }
-{ $subsection ?hash* }
-{ $subsection hash-member? } ;
-
-ARTICLE: "hashtables-mutation" "Storing keys in hashtables"
-{ $subsection set-hash }
-{ $subsection remove-hash }
-{ $subsection clear-hash } ;
-
-ARTICLE: "hashtables-combinators" "Hashtable combinators"
-"We have the standard functional programming idioms."
-{ $subsection hash-each }
-{ $subsection hash-all? }
-{ $subsection hash-subset }
-"There are curried forms of the above."
-{ $subsection hash-each-with }
-{ $subsection hash-all-with? }
-{ $subsection hash-subset-with }
-"Two oddball combinators."
-{ $subsection cache }
-{ $subsection map>hash } ;
-
-ARTICLE: "hashtables-utilities" "Hashtable utilities"
-"Set-theoretic operations exploit the expected constant lookup time of a hashtable."
-{ $subsection hash-intersect }
-{ $subsection hash-diff }
-{ $subsection hash-union }
-{ $subsection hash-concat }
-{ $subsection hash-update }
-{ $subsection remove-all }
-"A combinator used to implement notions of nested scope. This includes various fundamental abstractions like variables, vocabulary search and cascading styles."
-{ $subsection hash-stack } ;
-
-ARTICLE: "hashtables-internals" "Hashtable implementation details"
-"This hashtable implementation uses only one auxilliary array in addition to the hashtable tuple itself. The array stores keys in even slots and values in odd slots. Values are looked up with a hashing strategy that uses linear probing to resolve collisions."
-{ $terpri }
-"There are two special objects: the " { $link ((tombstone)) } " marker and the " { $link ((empty)) } " marker. Neither of these markers can be used as hashtable keys."
-{ $terpri }
-"The " { $link hash-count } " slot is the number of entries including deleted entries, and " { $link hash-deleted } " is the number of deleted entries."
-{ $subsection <hash-array> }
-{ $subsection nth-pair }
-{ $subsection set-nth-pair }
-{ $subsection each-pair }
-{ $subsection all-pairs? } ;
-
-ARTICLE: "namespaces" "Variables and namespaces"
-"A variable is an entry in a hashtable of bindings, with the hashtable being implicit rather than passed on the stack. These hashtables are termed " { $emphasis "namespaces" } ". Nesting of scopes is implemented with a search order on namespaces, defined by a " { $emphasis "namestack" } ". Since namespaces are just hashtables, any object can be used as a variable, however by convention, variables are keyed by symbols (see " { $link "symbols" } ")."
-$terpri
-"The " { $snippet "get" } " and " { $snippet "set" } " words read and write variable values. The " { $snippet "get" } " word searches up the chain of nested namespaces, while " { $snippet "set" } " always sets variable values in the current namespace only. Namespaces are dynamically scoped; when a quotation is called from a nested scope, any words called by the quotation also execute in that scope."
-{ $subsection get }
-{ $subsection set }
-"Various utility words abstract away common variable access patterns:"
-{ $subsection "namespaces-change" }
-{ $subsection "namespaces-combinators" }
-{ $subsection "namespaces-utilities" }
-"A useful facility for constructing sequences by holding an accumulator sequence in a variable:"
-{ $subsection "namespaces-make" }
-"Implementation details your code probably does not care about:"
-{ $subsection "namespaces-internals" } ;
-
-ARTICLE: "namespaces-combinators" "Namespace combinators"
-{ $subsection make-hash }
-{ $subsection with-scope }
-{ $subsection bind } ;
-
-ARTICLE: "namespaces-change" "Ways to change variable values"
-{ $subsection on }
-{ $subsection off }
-{ $subsection inc }
-{ $subsection dec }
-{ $subsection change } ;
-
-ARTICLE: "namespaces-utilities" "Namespace utilities"
-{ $subsection namespace }
-{ $subsection nest }
-{ $subsection global }
-{ $subsection set-global } ;
-
-ARTICLE: "namespaces-make" "Constructing sequences"
-"There is a lexicon of words for constructing sequences without passing the partial sequence being built on the stack. This reduces stack noise."
-{ $subsection make }
-{ $subsection , }
-{ $subsection % }
-{ $subsection # } ;
-
-ARTICLE: "namespaces-internals" "Namespace implementation details"
-"The namestack holds namespaces."
-{ $subsection namestack }
-{ $subsection set-namestack }
-"A pair of words push and pop namespaces on the namestack."
-{ $subsection >n }
-{ $subsection n> } ;
+"To create a new graph, just call " { $link <hashtable> } " or construct a hashtable by some other means. To add vertices and edges to a graph:"
+{ $subsection add-vertex }
+{ $subsection build-graph }
+"To remove vertices from the graph:"
+{ $subsection remove-vertex }
+{ $subsection clear-hash }
+"You can perform queries on the graph:"
+{ $subsection in-edges }
+{ $subsection closure }
+"Directed graphs are used to maintain cross-referencing information for words (" { $link "word-crossref" } ")." ;
 
 ARTICLE: "buffers" "Locked I/O buffers"
 "I/O buffers are a circular ring structure, a fixed-size queue of characters. Their key feature is that they are backed by manually allocated storage that does not get moved by the garbage collector. They are typically used for asynchronous I/O in conjunction with the C library interface in Factor's implementation."

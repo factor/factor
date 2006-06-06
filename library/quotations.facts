@@ -2,7 +2,7 @@ IN: kernel
 USING: arrays help strings vectors ;
 
 HELP: quotation f
-{ $description "The class of quotations. See " { $link "syntax-quotations" } " for syntax and " { $link "quotations" } " for general information." } ;
+{ $description "The class of quotations. See " { $link "syntax-quots" } " for syntax and " { $link "quotations" } " for general information." } ;
 
 HELP: <quotation> "( n -- quot )"
 { $values { "n" "a non-negative integer" } { "quot" "a new quotation" } }
@@ -32,7 +32,7 @@ HELP: unit "( obj -- quot )"
 { $see-also 1array } ;
 
 HELP: wrapper f
-{ $description "The class of wrappers. See " { $link "syntax-wrappers" } " for syntax." } ;
+{ $description "The class of wrappers. See " { $link "syntax-words" } " for syntax." } ;
 
 HELP: <wrapper> "( obj -- wrapper )"
 { $values { "obj" "an object" } { "wrapper" "a new wrapper" } }

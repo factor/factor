@@ -6,7 +6,7 @@ HELP: alien-callback "( return parameters quot -- alien )"
 { $description
     "Defines a callback from C to Factor which accepts the given set of parameters from the C caller, pushes them on the data stack, calls the quotation, and passes a return value back to the C caller. A return type of " { $snippet "\"void\"" } " indicates that no value is to be returned."
     $terpri
-    "This word only runs when it is called from within a " { $emphasis "compiled" } " word, with all three parameters as literal inputs. See " { $link "compiler" } "."
+    "This word only runs when it is called from within a " { $emphasis "compiled" } " word, with all three parameters as literal inputs."
     $terpri
     "When a compiled reference to this word is called, it pushes the callback's alien address on the data stack. This address can be passed to any C function expecting a C function pointer with the correct signature. The callback is actually generated when the word calling " { $link alien-callback } " is compiled."
     $terpri

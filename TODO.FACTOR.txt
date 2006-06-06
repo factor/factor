@@ -1,3 +1,5 @@
+- in the ui, run a bunch of files, unfocus; when its done caret appears
+
 - fix this:
 
   [ 1 2 3 4 5 6 7 8 9 10 10 10 10 10 10 10 10 10 10 11 11 11 113 ] .

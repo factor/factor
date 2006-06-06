@@ -15,7 +15,7 @@ $terpri
 
 HELP: <displaced-alien> "( displacement c-ptr -- alien )"
 { $values { "displacement" "an integer" } { "c-ptr" "an alien, byte array, or " { $link f } } { "alien" "a new alien" } }
-{ $description "Creates a new alien address object, wrapping a raw memory address. The alien points to a location in memory which is offset by " { $snippet "displacement" } " from the address of " { $link "c-ptr" } "." }
+{ $description "Creates a new alien address object, wrapping a raw memory address. The alien points to a location in memory which is offset by " { $snippet "displacement" } " from the address of " { $snippet "c-ptr" } "." }
 { $notes "Passing a value of " { $link f } " for " { $snippet "c-ptr" } " creates an alien with an absolute address; this is how " { $link <alien> } " is implemented."
 $terpri
 "Passing a zero absolute address does not construct a new alien object, but instead makes the word output " { $link f } "." }

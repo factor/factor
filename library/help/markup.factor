@@ -16,11 +16,8 @@ PREDICATE: array simple-element
     dup empty? [ drop t ] [ first word? not ] if ;
 
 M: simple-element print-element [ print-element ] each ;
-
 M: string print-element last-block off format* ;
-
 M: array print-element unclip execute ;
-
 M: word print-element { } swap execute ;
 
 : ($span) ( content style -- )
@@ -110,12 +107,13 @@ M: word print-element { } swap execute ;
 TUPLE: link name ;
 
 M: link article-title link-name article-title ;
-
 M: link article-content link-name article-content ;
-
 M: link summary "Link to " swap link-name unparse append ;
 
-: >link ( obj -- obj ) dup string? [ <link> ] when ;
+GENERIC: >link
+M: object >link ;
+M: string >link <link> ;
+M: f >link <link> ;
 
 : ($subsection) ( quot object -- )
     subsection-style [

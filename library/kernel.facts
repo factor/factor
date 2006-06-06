@@ -316,11 +316,11 @@ HELP: exit "( n -- )"
 
 HELP: getenv "( n -- obj )"
 { $values { "n" "a non-negative integer" } { "obj" "an object" } }
-{ $values "Reads an object from the Factor runtime's environment table. User code never has to read the environment table directly; instead, use one of the callers of this word." } ;
+{ $description "Reads an object from the Factor runtime's environment table. User code never has to read the environment table directly; instead, use one of the callers of this word." } ;
 
 HELP: setenv "( obj n -- )"
 { $values { "n" "a non-negative integer" } { "obj" "an object" } }
-{ $values "Writes an object to the Factor runtime's environment table. User code never has to write to the environment table directly; instead, use one of the callers of this word." } ;
+{ $description "Writes an object to the Factor runtime's environment table. User code never has to write to the environment table directly; instead, use one of the callers of this word." } ;
 
 HELP: integer-slot "( obj m -- n )"
 { $values { "obj" "an object" } { "m" "a non-negative fixnum" } { "n" "an integer" } }

@@ -195,7 +195,16 @@ HELP: cond "( assoc -- )"
     { $code "X [ Y ] [ Z [ T ] [ no-cond ] if ] if" }
     "Note that the base case is " { $link no-cond } " which throws an error."
 }
-{ $errors "Throws an error if the first quotation in every pair yields " { $link f } "." } ;
+{ $errors "Throws an error if the first quotation in every pair yields " { $link f } "." }
+{ $examples
+    { $example
+        "{"
+        "    { [ dup 0 > ] [ \"positive\" ] }"
+        "    { [ dup 0 < ] [ \"negative\" ] }"
+        "    { [ dup zero? ] [ \"zero\" ] }"
+        "} cond"
+    }
+} ;
 
 HELP: unix? "( -- ? )"
 { $values { "?" "a boolean" } }

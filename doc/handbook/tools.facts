@@ -116,7 +116,8 @@ $terpri
 $terpri
 "The following two words perform unit testing; they are usually placed inside test harness files which you run using " { $link run-file } ":"
 { $subsection unit-test }
-{ $subsection unit-test-fails } ;
+{ $subsection unit-test-fails }
+{ $subsection assert-depth } ;
 
 ARTICLE: "timing" "Timing code"
 "You can time the execution of a quotation in the listener:"
