@@ -104,7 +104,7 @@ HELP: <=> "( obj1 obj2 -- n )"
 
 HELP: clone "( obj -- cloned )"
 { $values { "obj" "an object" } { "cloned" "a new object" } }
-{ $contract "Outputs a new object equal to the given object. This is not guaranteed to actually copy the object; it does nothing with immutable objects, and does not copy words either. However, sequences and tuples can be cloned to obtain a shallow copy of the original." ;
+{ $contract "Outputs a new object equal to the given object. This is not guaranteed to actually copy the object; it does nothing with immutable objects, and does not copy words either. However, sequences and tuples can be cloned to obtain a shallow copy of the original." } ;
 
 HELP: set-boot "( quot -- )"
 { $values { "quot" "a quotation" } }

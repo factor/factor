@@ -13,19 +13,15 @@ HELP: inline ""
 
 HELP: foldable ""
 { $description
-    "Declares that the most recently defined word can be evaluated at compile-time. Foldable words are always " { $link POSTPONE: } "."
-    $terpri
-    "Foldable words are evaluated at compile time if all inputs are literal. Foldable words must satisfy a very strong contract:"
+    "Declares that the most recently defined word may be evaluated at compile-time if all inputs are literal. Foldable words must satisfy a very strong contract:"
     { $list
-        { "foldable words must not have any observable side effects," }
-        { "foldable words must halt - for example, a word computing a series until it coverges should not be foldable, since compilation will not halt in the event the series does not converge." }
-        { "both inputs and outputs of foldable words must be immutable." }
+        "foldable words must not have any observable side effects,"
+        "foldable words must halt - for example, a word computing a series until it coverges should not be foldable, since compilation will not halt in the event the series does not converge."
+        "both inputs and outputs of foldable words must be immutable."
     }
     "The last restriction ensures that words such as " { $link clone } " do not satisfy the foldable word contract. Indeed, " { $link clone } " will output a mutable object if its input is mutable, and so it is undesirable to evaluate it at compile-time, since doing so would give incorrect semantics for code that clones mutable objects and proceeds to mutate them."
 }
-{ $examples
-    "Most operations on numbers are foldable. For example, " { $snippet "2 2 +" } " compiles to a literal 4, since " { $link + } " is declared foldable."
-} ;
+{ $examples "Most operations on numbers are foldable. For example, " { $snippet "2 2 +" } " compiles to a literal 4, since " { $link + } " is declared foldable." } ;
 
 HELP: t "( -- t )"
 { $values { "t" "the canonical truth value" } }
