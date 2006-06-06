@@ -1,6 +1,9 @@
 IN: hashtables
 USING: hashtables-internals help inspector kernel prettyprint ;
 
+HELP: hashtable f
+{ $description "The class of hashtables. See " { $link "syntax-hashtables" } " for syntax and " { $link "hashtables" } " for general information." } ;
+
 HELP: hashcode "( object -- n )"
 { $values { "object" "an object" } { "n" "an integer" } }
 { $contract "Outputs the hashcode of the object. The fundamental invariant that must never be violated is that if two objects are equal under " { $link = } ", they must have the same hashcode." }

@@ -8,7 +8,6 @@ $terpri
 { $code "\"Hello, world.\" print" }
 { $heading "Reference documentation" }
 { $subsection "changes" }
-{ $subsection "quickref" }
 { $subsection "tools" }
 { $subsection "syntax" }
 { $subsection "dataflow" }

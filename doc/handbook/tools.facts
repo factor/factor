@@ -4,7 +4,8 @@ prettyprint sequences test walker words ;
 ARTICLE: "tools" "Development tools"
 "This section covers words which are used during development, and not usually invoked directly by user code."
 { $subsection "listener" }
-{ $subsection "describe" }
+{ $subsection "inspector" }
+{ $subsection "memory" }
 { $subsection "word-introspection" }
 { $subsection "annotations" }
 { $subsection "timing" }
@@ -37,6 +38,30 @@ $terpri
 "Finally, the multi-line expression reading word can be used independently of the rest of the listener:"
 { $subsection read-multiline } ;
 
+ARTICLE: "inspector" "The inspector"
+"The prettyprinter (see " { $link "prettyprint" } ") can turn any object into a source representation. Sometimes this source representation is hard to read for a human, so the inspector provides an alternative tabular view of an object:"
+{ $subsection inspect }
+"Once running, the inspector spawns a new nested listener with an " { $snippet "inspector" } " prompt. The inspector supports a number of commands:"
+{ $subsection inspecting }
+{ $subsection go }
+{ $subsection up }
+{ $subsection bye }
+"An one-time inspector-like display can be shown without starting the inspector:"
+{ $subsection describe }
+"Word for getting very brief descriptions of words and general objects:"
+{ $subsection synopsis }
+{ $subsection summary } ;
+
+ARTICLE: "memory" "Object memory"
+"You can print object heap status information:"
+{ $subsection room. }
+{ $subsection heap-stats. }
+"There are a pair of combinators, analogous to " { $link each } " and " { $link subset } ", which operate on the entire collection of objects in the object heap:"
+{ $subsection each-object }
+{ $subsection instances }
+"Finally, you can ask for a sequence of all objects which refer to a given object:"
+{ $subsection references } ;
+
 ARTICLE: "word-introspection" "Word introspection"
 "You can display a word definition:"
 { $subsection see }
@@ -48,18 +73,6 @@ ARTICLE: "word-introspection" "Word introspection"
 "Display callers and words called by a given word:"
 { $subsection usage. }
 { $subsection uses. } ;
-
-ARTICLE: "describe" "Objects and the heap"
-"The prettyprinter (see " { $link "prettyprint" } ") can turn any object into a source representation. Sometimes this source representation is hard to read for a human, so the " { $link describe } " word provides an alternative tabular view of an object:"
-{ $subsection describe }
-"You can print object heap status information:"
-{ $subsection room. }
-{ $subsection heap-stats. }
-"There are a pair of combinators, analogous to " { $link each } " and " { $link subset } ", which operate on the entire collection of objects in the object heap:"
-{ $subsection each-object }
-{ $subsection instances }
-"Finally, you can ask for a sequence of all objects which refer to a given object:"
-{ $subsection references } ;
 
 ARTICLE: "walker" "The single stepper"
 "The single stepper evaluates a quotation a word at a time, offering the ability to look at stacks at any stage."
@@ -74,6 +87,7 @@ $terpri
 "At any point you can look at stacks and variables in the single stepper execution context:"
 { $subsection &s }
 { $subsection &r }
+{ $subsection &c }
 { $subsection &get }
 "You can annotate a word with a breakpoint, so that the single stepper is started every time the word is called. See " { $link "annotations" } "."
 $terpri
@@ -96,9 +110,9 @@ ARTICLE: "timing" "Timing code"
 { $subsection time }
 "A lower-level word puts timings on the stack, intead of printing:"
 { $subsection benchmark }
-"You can also read the system clock directly:"
-{ $subsection millis }
-"Another way to time code is to use the profiler. See " { $link "annotations" } "." ;
+"You can also read the system clock and total garbage collection time directly:"
+{ $subsection millis } 
+{ $subsection gc-time } ;
 
 ARTICLE: "annotations" "Word annotations"
 "The word annotation feature modifies word definitions to add debugging code. You can restore the old definition by calling " { $link reload } " on the word in question."

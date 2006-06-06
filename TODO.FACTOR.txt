@@ -55,7 +55,6 @@
 
 + help:
 
-- tools section needs updates
 - method ordering and interpreter algorithm sections need updates
 - document that can <void*> only be called with an alien
 - help search
@@ -63,7 +62,7 @@
 - document conventions
 - new turtle graphics tutorial
 
-+ ui/help:
++ ui:
 
 - x11 input methods
 - roundoff is still not quite right with tracks

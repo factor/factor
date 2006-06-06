@@ -1,6 +1,9 @@
 IN: strings
 USING: arrays help kernel vectors ;
 
+HELP: sbuf f
+{ $description "The class of resizable character strings. See " { $link "syntax-sbufs" } " for syntax and " { $link "sbufs" } " for general information." } ;
+
 HELP: <sbuf> "( n -- sbuf )"
 { $values { "n" "a positive integer specifying initial capacity" } { "sbuf" "a new string buffer" } }
 { $description "Creates a new string buffer that can hold " { $snippet "n" } " characters before resizing." }

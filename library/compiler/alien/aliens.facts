@@ -1,6 +1,12 @@
 IN: alien
 USING: help ;
 
+HELP: alien f
+{ $description "The class of alien pointers. See " { $link "syntax-aliens" } " for syntax and " { $link "c-objects" } " for general information." } ;
+
+HELP: dll f
+{ $description "The class of native library handles. See " { $link "dll-internals" } " for syntax and " { $link "c-objects" } " for general information." } ;
+
 HELP: expired? "( c-ptr -- ? )"
 { $values { "c-ptr" "an alien, byte array, or " { $link f } } { "?" "a boolean" } }
 { $description "Tests if the alien is a relic from an earlier session. When an image is loaded, any alien objects which persisted in the image are marked as being expired."

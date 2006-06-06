@@ -1,6 +1,9 @@
 IN: kernel
 USING: arrays help strings vectors ;
 
+HELP: quotation f
+{ $description "The class of quotations. See " { $link "syntax-quotations" } " for syntax and " { $link "quotations" } " for general information." } ;
+
 HELP: <quotation> "( n -- quot )"
 { $values { "n" "a non-negative integer" } { "quot" "a new quotation" } }
 { $description "Creates a new quotation with the given length and all elements initially set to " { $link f } "." }
@@ -27,6 +30,9 @@ HELP: unit "( obj -- quot )"
     { $code "\\ reverse unit call" }
 }
 { $see-also 1array } ;
+
+HELP: wrapper f
+{ $description "The class of wrappers. See " { $link "syntax-wrappers" } " for syntax." } ;
 
 HELP: <wrapper> "( obj -- wrapper )"
 { $values { "obj" "an object" } { "wrapper" "a new wrapper" } }

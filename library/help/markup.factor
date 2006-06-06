@@ -1,7 +1,7 @@
 ! Copyright (C) 2005, 2006 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 IN: help
-USING: arrays generic hashtables io kernel namespaces
+USING: arrays generic hashtables inspector io kernel namespaces
 parser prettyprint sequences strings styles vectors words ;
 
 ! Simple markup language.
@@ -111,6 +111,8 @@ TUPLE: link name ;
 M: link article-title link-name article-title ;
 
 M: link article-content link-name article-content ;
+
+M: link summary "Link to " swap link-name unparse append ;
 
 : ($subsection) ( quot object -- )
     subsection-style [

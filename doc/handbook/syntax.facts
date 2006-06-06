@@ -113,9 +113,13 @@ $terpri
 { $subsection "syntax-numbers" }
 { $subsection "syntax-words" }
 { $subsection "syntax-booleans" }
+{ $subsection "syntax-quots" }
+{ $subsection "syntax-arrays" }
+{ $subsection "syntax-vectors" }
 { $subsection "syntax-strings" }
 { $subsection "syntax-sbufs" }
-{ $subsection "syntax-lists" }
+{ $subsection "syntax-hashtables" }
+{ $subsection "syntax-tuples" }
 { $subsection "syntax-aliens" } ;
 
 GLOSSARY: "number" "an instance of the " { $link number } " class" ;
@@ -195,7 +199,7 @@ GLOSSARY: "t" "the canonical truth value, the symbol " { $link t } ;
 
 GLOSSARY: "f" "the singleton false value, or the " { $link f } " class whose sole instance is the singleton false value; the two are distinct" ;
 
-ARTICLE: "syntax-booleans" "Booleans"
+ARTICLE: "syntax-booleans" "Boolean syntax"
 "Any Factor object may be used as a truth value in a conditional expression. The " { $link f } " object is false and anything else is true. The " { $link f } " object is also used to represent the empty list, as well as the concept of a missing value. The canonical truth value is the " { $link t } " object."
 { $subsection POSTPONE: f }
 { $subsection t } ;
@@ -252,12 +256,12 @@ ARTICLE: "syntax-tuples" "Tuple syntax"
 { $subsection POSTPONE: } }
 "Tuples are documented in " { $link "tuples" } "."  ;
 
-ARTICLE: "syntax-lists" "Quotation syntax"
+ARTICLE: "syntax-quots" "Quotation syntax"
 { $subsection POSTPONE: [ }
 { $subsection POSTPONE: ] }
 "Quotations are documented in " { $link "quotations" } "." ;
 
-ARTICLE: "syntax-aliens" "Alien interface objects"
+ARTICLE: "syntax-aliens" "Alien object syntax"
 "These literal forms mainly exist for print-outs, and should not be input unless you know what you are doing."
 { $subsection POSTPONE: DLL" }
 { $subsection POSTPONE: ALIEN: }
