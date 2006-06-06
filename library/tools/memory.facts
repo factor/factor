@@ -3,7 +3,7 @@ USING: help test ;
 
 HELP: address "( obj -- n )"
 { $values { "obj" "an object" } { "n" "a memory address" } }
-{ $description "Outputs the address where " { $snippet "obj" } " is located in memory. Objects can be moved around by the GC and there is almost never any reason for user code to need to know object addresses." } ;
+{ $description "Outputs the address of an object in memory. Objects can be moved around by the garbage collector and there is almost never any reason for user code to need to know object addresses." } ;
 
 HELP: gc "( n -- )"
 { $values { "n" "a positive integer" } }

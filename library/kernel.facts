@@ -1,5 +1,5 @@
 USING: generic help kernel kernel-internals math memory
-sequences ;
+namespaces sequences ;
 
 HELP: eq? "( obj1 obj2 -- ? )"
 { $values { "obj1" "an object" } { "obj2" "an object" } }
@@ -120,8 +120,13 @@ HELP: num-types "( -- n )"
 
 HELP: type "( object -- n )"
 { $values { "object" "an object" } { "n" "a type number" } }
-{ $description "Outputs an object's type number. Often, the " { $link class } " word is more useful." }
-{ $see-also type>class } ;
+{ $description "Outputs an object's type number, between zero and one less than " { $link num-types } ". This is implementation detail and user code should call " { $link class } " instead." }
+{ $see-also type>class tag } ;
+
+HELP: tag "( object -- n )"
+{ $values { "object" "an object" } { "n" "a tag number" } }
+{ $description "Outputs an object's tag number, between zero and one less than " { $link num-tags } ". This is implementation detail and user code should call " { $link class } " instead." }
+{ $see-also type } ;
 
 HELP: ? "( cond true false -- true/false )"
 { $values { "cond" "a generalized boolean" } { "true" "an object" } { "false" "an object" } { "true/false" "one two input objects" } }
@@ -305,3 +310,55 @@ HELP: save-image "( path -- )"
 
 HELP: save "( -- )"
 { $description "Saves a snapshot of the heap to the current image file." } ;
+
+HELP: die "( -- )"
+{ $description "Starts the front-end processor (FEP), which is a low-level debugger which can inspect memory addresses and the like. The FEP is also entered when a critical error occurs." } ;
+
+HELP: exit "( n -- )"
+{ $values { "n" "an integer exit code" } }
+{ $description "Exits the Factor process." } ;
+
+HELP: getenv "( n -- obj )"
+{ $values { "n" "a non-negative integer" } { "obj" "an object" } }
+{ $values "Reads an object from the Factor runtime's environment table. User code never has to read the environment table directly; instead, use one of the callers of this word." } ;
+
+HELP: setenv "( obj n -- )"
+{ $values { "n" "a non-negative integer" } { "obj" "an object" } }
+{ $values "Writes an object to the Factor runtime's environment table. User code never has to write to the environment table directly; instead, use one of the callers of this word." } ;
+
+HELP: integer-slot "( obj m -- n )"
+{ $values { "obj" "an object" } { "m" "a non-negative fixnum" } { "n" "an integer" } }
+{ $description "Reads the untagged integer stored at the " { $snippet "n" } "th slot of " { $snippet "obj" } "." }
+{ $warning "This word is in the " { $snippet "kernel-internals" } " vocabulary because it does not perform type or bounds checks, and slot numbers are implementation detail." } ;
+
+HELP: set-integer-slot "( m obj n -- )"
+{ $values { "n" "an integer" }  { "obj" "an object" } { "m" "a non-negative fixnum" } }
+{ $description "Writes an untagged integer to the " { $snippet "n" } "th slot of " { $snippet "obj" } "." }
+{ $warning "This word is in the " { $snippet "kernel-internals" } " vocabulary because it does not perform type or bounds checks, and slot numbers are implementation detail." } ;
+
+HELP: slot "( obj m -- value )"
+{ $values { "obj" "an object" } { "m" "a non-negative fixnum" } { "value" "an object" } }
+{ $description "Reads the object stored at the " { $snippet "n" } "th slot of " { $snippet "obj" } "." }
+{ $warning "This word is in the " { $snippet "kernel-internals" } " vocabulary because it does not perform type or bounds checks, and slot numbers are implementation detail." } ;
+
+HELP: set-slot "( value obj n -- )"
+{ $values { "value" "an object" } { "obj" "an object" } { "m" "a non-negative fixnum" } }
+{ $description "Writes " { $snippet "value" } " to the " { $snippet "n" } "th slot of " { $snippet "obj" } "." }
+{ $warning "This word is in the " { $snippet "kernel-internals" } " vocabulary because it does not perform type or bounds checks, and slot numbers are implementation detail." } ;
+
+HELP: millis "( -- n )"
+{ $values { "n" "an integer" } }
+{ $description "Outputs the number of milliseconds ellapsed since midnight January 1, 1970." } ;
+
+HELP: os-env "( key -- value )"
+{ $values { "key" "a string" } { "value" "a string" } }
+{ $description "Looks up the value of a shell environment variable." }
+{ $examples 
+    "This is an operating system-specific feature. On Unix, you can do:"
+    { $example "\"USER\" os-env print" "slava" }
+} ;
+
+HELP: dispatch "( n array -- )"
+{ $values { "n" "a fixnum" } { "array" "an array of quotations" } }
+{ $description "Calls the " { $snippet "n" } "th quotation in the array." }
+{ $warning "This word is in the " { $snippet "kernel-internals" } " vocabulary because it is an implementation detail used by the generic word system to accelerate method dispatch. It does not perform type or bounds checks, and user code should not need to call it directly." } ;

@@ -93,3 +93,6 @@ unit-test
 [ -6 "hello" nth ] unit-test-fails
 
 [ t ] [ "hello world" dup >vector >string = ] unit-test 
+
+[ "ab" ] [ 2 "abc" resize-string ] unit-test
+[ "abc\0\0\0" ] [ 6 "abc" resize-string ] unit-test

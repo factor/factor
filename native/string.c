@@ -83,7 +83,7 @@ void primitive_resize_string(void)
 	CELL capacity = to_fixnum(dpeek2());
 	maybe_gc(string_size(capacity));
 	string = untag_string_fast(dpop());
-	drepl(tag_object(resize_string(string,capacity,F)));
+	drepl(tag_object(resize_string(string,capacity,0)));
 }
 
 /* Some ugly macros to prevent a 2x code duplication */

@@ -39,6 +39,96 @@ HELP: fraction> "( a b -- a/b )"
 { $description "Creates a new ratio, or outputs the numerator if the denominator is 1. This word does not reduce the fraction to lowest terms, and should not be called directly; use " { $link / } " instead." } ;
 
 ! Unsafe primitives
+HELP: fixnum+ "( x y -- z )"
+{ $values { "x" "a fixnum" } { "y" "a fixnum" } { "z" "an integer" } }
+{ $description "Primitive version of " { $link + } ". The result may overflow to a bignum." }
+{ $warning "This word does not perform type checking, and passing objects of the wrong type can crash the runtime. User code should call the generic word " { $link + } " instead." } ;
+
+HELP: fixnum- "( x y -- z )"
+{ $values { "x" "a fixnum" } { "y" "a fixnum" } { "z" "an integer" } }
+{ $description "Primitive version of " { $link - } ". The result may overflow to a bignum." }
+{ $warning "This word does not perform type checking, and passing objects of the wrong type can crash the runtime. User code should call the generic word " { $link - } " instead." } ;
+
+HELP: fixnum* "( x y -- z )"
+{ $values { "x" "a fixnum" } { "y" "a fixnum" } { "z" "an integer" } }
+{ $description "Primitive version of " { $link * } ". The result may overflow to a bignum." }
+{ $warning "This word does not perform type checking, and passing objects of the wrong type can crash the runtime. User code should call the generic word " { $link * } " instead." } ;
+
+HELP: fixnum/f "( x y -- z )"
+{ $values { "x" "a fixnum" } { "y" "a fixnum" } { "z" "a float" } }
+{ $description "Primitive version of " { $link /f } "." }
+{ $warning "This word does not perform type checking, and passing objects of the wrong type can crash the runtime. User code should call the generic word " { $link /f } " instead." } ;
+
+HELP: fixnum/i "( x y -- z )"
+{ $values { "x" "a fixnum" } { "y" "a fixnum" } { "z" "an integer" } }
+{ $description "Primitive version of " { $link /i } ". The result may overflow to a bignum." }
+{ $warning "This word does not perform type checking, and passing objects of the wrong type can crash the runtime. User code should call the generic word " { $link /i } " instead." } ;
+
+HELP: fixnum-mod "( x y -- z )"
+{ $values { "x" "a fixnum" } { "y" "a fixnum" } { "z" "a fixnum" } }
+{ $description "Primitive version of " { $link mod } ". The result always fits in a fixnum." }
+{ $warning "This word does not perform type checking, and passing objects of the wrong type can crash the runtime. User code should call the generic word " { $link mod } " instead." } ;
+
+HELP: fixnum/mod "( x y -- z w )"
+{ $values { "x" "a fixnum" } { "y" "a fixnum" } { "z" "an integer" } { "w" "a fixnum" } }
+{ $description "Primitive version of " { $link /mod } ". The result may overflow to a bignum." }
+{ $warning "This word does not perform type checking, and passing objects of the wrong type can crash the runtime. User code should call the generic word " { $link /mod } " instead." } ;
+
+HELP: fixnum< "( x y -- ? )"
+{ $values { "x" "a fixnum" } { "y" "a fixnum" } { "?" "a boolean" } }
+{ $description "Primitive version of " { $link < } ". The result may overflow to a bignum." }
+{ $warning "This word does not perform type checking, and passing objects of the wrong type can crash the runtime. User code should call the generic word " { $link < } " instead." } ;
+
+HELP: fixnum<= "( x y -- z )"
+{ $values { "x" "a fixnum" } { "y" "a fixnum" } { "z" "an integer" } }
+{ $description "Primitive version of " { $link <= } ". The result may overflow to a bignum." }
+{ $warning "This word does not perform type checking, and passing objects of the wrong type can crash the runtime. User code should call the generic word " { $link <= } " instead." } ;
+
+HELP: fixnum> "( x y -- ? )"
+{ $values { "x" "a fixnum" } { "y" "a fixnum" } { "?" "a boolean" } }
+{ $description "Primitive version of " { $link > } ". The result may overflow to a bignum." }
+{ $warning "This word does not perform type checking, and passing objects of the wrong type can crash the runtime. User code should call the generic word " { $link > } " instead." } ;
+
+HELP: fixnum>= "( x y -- ? )"
+{ $values { "x" "a fixnum" } { "y" "a fixnum" } { "?" "a boolean" } }
+{ $description "Primitive version of " { $link >= } ". The result may overflow to a bignum." }
+{ $warning "This word does not perform type checking, and passing objects of the wrong type can crash the runtime. User code should call the generic word " { $link >= } " instead." } ;
+
+HELP: fixnum-bitand "( x y -- z )"
+{ $values { "x" "a fixnum" } { "y" "a fixnum" } { "z" "a fixnum" } }
+{ $description "Primitive version of " { $link bitand } ". The result always fits in a fixnum." }
+{ $warning "This word does not perform type checking, and passing objects of the wrong type can crash the runtime. User code should call the generic word " { $link bitand } " instead." } ;
+
+HELP: fixnum-bitor "( x y -- z )"
+{ $values { "x" "a fixnum" } { "y" "a fixnum" } { "z" "a fixnum" } }
+{ $description "Primitive version of " { $link bitor } ". The result always fits in a fixnum." }
+{ $warning "This word does not perform type checking, and passing objects of the wrong type can crash the runtime. User code should call the generic word " { $link bitor } " instead." } ;
+
+HELP: fixnum-bitxor "( x y -- z )"
+{ $values { "x" "a fixnum" } { "y" "a fixnum" } { "z" "a fixnum" } }
+{ $description "Primitive version of " { $link bitxor } ". The result always fits in a fixnum." }
+{ $warning "This word does not perform type checking, and passing objects of the wrong type can crash the runtime. User code should call the generic word " { $link bitxor } " instead." } ;
+
+HELP: fixnum-bitnot "( x -- y )"
+{ $values { "x" "a fixnum" } { "y" "a fixnum" } }
+{ $description "Primitive version of " { $link bitnot } ". The result always fits in a fixnum." }
+{ $warning "This word does not perform type checking, and passing objects of the wrong type can crash the runtime. User code should call the generic word " { $link bitnot } " instead." } ;
+
+HELP: fixnum-shift "( x y -- z )"
+{ $values { "x" "a fixnum" } { "y" "a fixnum" } { "z" "a fixnum" } }
+{ $description "Primitive version of " { $link shift } ". The result may overflow to a bignum." }
+{ $warning "This word does not perform type checking, and passing objects of the wrong type can crash the runtime. User code should call the generic word " { $link shift } " instead." } ;
+
+HELP: fixnum+fast "( x y -- z )"
+{ $values { "x" "a fixnum" } { "y" "a fixnum" } { "z" "a fixnum" } }
+{ $description "Primitive version of " { $link + } ". Unlike " { $link fixnum+ } ", does not perform an overflow check, so the result may be incorrect." }
+{ $warning "This word does not perform type checking, and passing objects of the wrong type can crash the runtime. User code should call the generic word " { $link + } " instead." } ;
+
+HELP: fixnum-fast "( x y -- z )"
+{ $values { "x" "a fixnum" } { "y" "a fixnum" } { "z" "a fixnum" } }
+{ $description "Primitive version of " { $link - } ". Unlike " { $link fixnum- } ", does not perform an overflow check, so the result may be incorrect." }
+{ $warning "This word does not perform type checking, and passing objects of the wrong type can crash the runtime. User code should call the generic word " { $link - } " instead." } ;
+
 HELP: bignum+ "( x y -- z )"
 { $values { "x" "a bignum" } { "y" "a bignum" } { "z" "a bignum" } }
 { $description "Primitive version of " { $link + } "." }
@@ -74,22 +164,22 @@ HELP: bignum/mod "( x y -- z )"
 { $description "Primitive version of " { $link /mod } "." }
 { $warning "This word does not perform type checking, and passing objects of the wrong type can crash the runtime. User code should call the generic word " { $link /mod } " instead." } ;
 
-HELP: bignum< "( x y -- z )"
+HELP: bignum< "( x y -- ? )"
 { $values { "x" "a bignum" } { "y" "a bignum" } { "?" "a boolean" } }
 { $description "Primitive version of " { $link < } "." }
 { $warning "This word does not perform type checking, and passing objects of the wrong type can crash the runtime. User code should call the generic word " { $link < } " instead." } ;
 
-HELP: bignum<= "( x y -- z )"
+HELP: bignum<= "( x y -- ? )"
 { $values { "x" "a bignum" } { "y" "a bignum" } { "?" "a boolean" } }
 { $description "Primitive version of " { $link <= } "." }
 { $warning "This word does not perform type checking, and passing objects of the wrong type can crash the runtime. User code should call the generic word " { $link <= } " instead." } ;
 
-HELP: bignum> "( x y -- z )"
+HELP: bignum> "( x y -- ? )"
 { $values { "x" "a bignum" } { "y" "a bignum" } { "?" "a boolean" } }
 { $description "Primitive version of " { $link > } "." }
 { $warning "This word does not perform type checking, and passing objects of the wrong type can crash the runtime. User code should call the generic word " { $link > } " instead." } ;
 
-HELP: bignum>= "( x y -- z )"
+HELP: bignum>= "( x y -- ? )"
 { $values { "x" "a bignum" } { "y" "a bignum" } { "?" "a boolean" } }
 { $description "Primitive version of " { $link >= } "." }
 { $warning "This word does not perform type checking, and passing objects of the wrong type can crash the runtime. User code should call the generic word " { $link >= } " instead." } ;
@@ -113,6 +203,11 @@ HELP: bignum-bitxor "( x y -- z )"
 { $values { "x" "a bignum" } { "y" "a bignum" } { "z" "a bignum" } }
 { $description "Primitive version of " { $link bitxor } "." }
 { $warning "This word does not perform type checking, and passing objects of the wrong type can crash the runtime. User code should call the generic word " { $link bitxor } " instead." } ;
+
+HELP: bignum-bitnot "( x -- y )"
+{ $values { "x" "a bignum" } { "y" "a bignum" } }
+{ $description "Primitive version of " { $link bitnot } "." }
+{ $warning "This word does not perform type checking, and passing objects of the wrong type can crash the runtime. User code should call the generic word " { $link bitnot } " instead." } ;
 
 HELP: bignum-shift "( x y -- z )"
 { $values { "x" "a bignum" } { "y" "a bignum" } { "z" "a bignum" } }

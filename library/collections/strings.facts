@@ -1,4 +1,15 @@
-USING: arrays help kernel strings vectors ;
+USING: arrays help kernel kernel-internals sequences strings
+vectors ;
+
+HELP: char-slot "( n string -- ch )"
+{ $values { "n" "a fixnum" } { "string" "a string" } { "ch" "the character at the " { $snippet "n" } "th index" } }
+{ $description "Unsafe string accessor, used to define " { $link nth } " on strings." }
+{ $warning "This word is in the " { $snippet "kernel-internals" } " vocabulary because it does not perform type or bounds checking. User code should call " { $link nth } " instead." } ;
+
+HELP: set-char-slot "( ch n string -- )"
+{ $values { "ch" "a character" } { "n" "a fixnum" } { "string" "a string" }  }
+{ $description "Unsafe string mutator, used to define " { $link set-nth } " on strings." }
+{ $warning "This word is in the " { $snippet "kernel-internals" } " vocabulary because it does not perform type or bounds checking. User code should call " { $link set-nth } " instead." } ;
 
 HELP: <string> "( n ch -- string )"
 { $values { "n" "a positive integer specifying string length" } { "elt" "an initial character" } }
@@ -72,3 +83,7 @@ HELP: >string "( seq -- str )"
 { $description "Outputs a freshly-allocated string with the same elements as a given sequence." }
 { $errors "Throws an error if the sequence contains elements other than real numbers." }
 { $see-also >array >sbuf >vector >quotation } ;
+
+HELP: resize-string "( n str -- newstr )"
+{ $values { "n" "a non-negative integer" } { "str" "a string" } { "newstr" "a new string" } }
+{ $description "Creates a new string " { $snippet "n" } " characters long The contents of the existing string are copied into the new string; if the new string is shorter, only an initial segment is copied, and if the new string is longer the remaining space is filled with " { $snippet "\u0000" } "." } ;

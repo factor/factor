@@ -141,11 +141,12 @@ $low-level-note ;
 
 HELP: (word) "( name vocab -- word )"
 { $values { "name" "a string" } { "vocab" "a string" } { "word" "a word" } }
-{ $description "Low-level word constructor. User code should call " { $link <word> } " instead." } ;
+{ $description "Allocates an uninterned word with the specified name and vocabulary. User code should call " { $link gensym } " to create uninterned words and " { $link create } " to create interned words." }
+{ $see-also <word> } ;
 
 HELP: <word> "( name vocab -- word )"
 { $values { "name" "a string" } { "vocab" "a string" } { "word" "a word" } }
-{ $description "Creates an uninterned word with the specified name and vocabulary. Note that this does not create the vocabulary, nor does it add the word to an existing vocabulary with that name. In most cases, " { $link create } " should be used instead." } ;
+{ $description "Allocates an uninterned word with the specified name and vocabulary, and a blank word properties hashtable. User code should call " { $link gensym } " to create uninterned words and " { $link create } " to create interned words." } ;
 
 HELP: gensym "( -- word )"
 { $values { "word" "a word" } }
@@ -257,3 +258,7 @@ HELP: interned? "( word -- ? )"
 HELP: bootstrap-word "( word -- target )"
 { $values { "word" "a word" } { "target" "a word" } }
 { $description "Looks up a word with the same name and vocabulary as the given word, performing a transformation to handle parsing words in the target dictionary. Used during bootstrap to transfer host words to the target dictionary." } ;
+
+HELP: update-xt "( word -- )"
+{ $values { "word" "a word" } }
+{ $description "Updates a word's execution token based on the value of the " { $link word-primitive } " slot. If the word was compiled, this will lose the compiled definition and make it run in the interpreter." } ;

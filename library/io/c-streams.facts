@@ -38,3 +38,33 @@ $terpri
 "The client socket supports two accessor words to get the host name and port number of the incoming connection:"
 { $list { $link client-stream-host } { $link client-stream-port } } }
 { $errors "Throws an error if the server socket is closed or otherwise is unavailable." } ;
+
+HELP: <c-stream> "( in out -- stream )"
+{ $values { "in" "a C FILE* handle" } { "out" "a C FILE* handle" } }
+{ $description "Creates a stream which reads and writes data by calling C standard library functions." }
+{ $notes "Usually C streams are only used during bootstrap, and non-blocking OS-specific I/O routines are used during normal operation." } ;
+
+HELP: fopen "( path mode -- alien )"
+{ $values { "path" "a pathname string" } { "mode" "an access mode specifier" } { "alien" "a C FILE* handle" } }
+{ $description "Opens a file named by " { $snippet "path" } ". The " { $snippet "mode" } " parameter should be something like " { $snippet "\"r\"" } " or " { $snippet "\"rw\"" } "; consult the " { $snippet "fopen(3)" } " manual page for details." }
+{ $errors "Throws an error if the file could not be opened." }
+{ $notes "User code should call " { $link <file-reader> } " or " { $link <file-writer> } " to get a high level stream." } ;
+
+HELP: fwrite "( string alien -- )"
+{ $values { "string" "a string" } { "alien" "a C FILE* handle" } }
+{ $description "Writes a string of text to a C FILE* handle." }
+{ $errors "Throws an error if the output operation failed." } ;
+
+HELP: fflush "( alien -- )"
+{ $values { "alien" "a C FILE* handle" } }
+{ $description "Forces pending output on a C FILE* handle to complete." }
+{ $errors "Throws an error if the output operation failed." } ;
+
+HELP: fclose "( alien -- )"
+{ $values { "alien" "a C FILE* handle" } }
+{ $description "Closes a C FILE* handle." } ;
+
+HELP: fgetc "( alien -- ch )"
+{ $values { "alien" "a C FILE* handle" } { "ch" "a character" } }
+{ $description "Reads a single character from a C FILE* handle." } 
+{ $errors "Throws an error if the input operation failed." } ;

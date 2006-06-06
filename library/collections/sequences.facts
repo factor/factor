@@ -13,7 +13,7 @@ HELP: set-length "( n seq -- )"
 { $side-effects "seq" } ;
 
 HELP: nth "( n seq -- elt )"
-{ $values { "n" "a non-negative integer" } { "seq" "a sequence" } }
+{ $values { "n" "a non-negative integer" } { "seq" "a sequence" } { "elt" "the element at the " { $snippet "n" } "th index" } }
 { $contract "Outputs the " { $snippet "n" } "th element of the sequence. Elements are numbered from zero, so the last element has an index one less than the length of the sequence. All sequences support this operation."
 $terpri
 "This generic word is flushable, so user-defined methods must satisfy the flushable contract (see " { $link "declarations" } ")." }

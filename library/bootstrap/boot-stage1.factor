@@ -233,6 +233,7 @@ vectors words ;
         "/library/compiler/alien/malloc.facts"
         "/library/compiler/alien/structs.facts"
         "/library/compiler/alien/syntax.facts"
+        "/library/compiler/generator/assembler.facts"
         "/library/compiler/inference/inference.facts"
         "/library/compiler/compiler.facts"
         "/library/generic/early-generic.facts"

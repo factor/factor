@@ -98,6 +98,10 @@ HELP: <hashtable> "( n -- hash )"
 { $description "Create a new hashtable capable of storing " { $snippet "n" } " key/value pairs before growing." }
 { $see-also clear-hash hash-size hash-empty? } ;
 
+HELP: (hashtable) "( -- hash )"
+{ $values { "hash" "a new hashtable" } }
+{ $description "Allocates a hashtable stub object without an underlying array. User code should call " { $link <hashtable> } " instead." } ;
+
 HELP: associate "( value key -- hash )"
 { $values { "value" "a value" } { "key" "a key" } }
 { $description "Create a new hashtable holding one key/value pair." } ;

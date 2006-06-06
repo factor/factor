@@ -1,13 +1,23 @@
 USING: help io ;
 
-HELP: stat "( path -- list )"
-{ $values { "path" "a pathname string" } { "list" "a new list" } }
+HELP: cwd "( -- path )"
+{ $values { "path" "a pathname string" } }
+{ $description "Outputs the current working directory of the Factor process." }
+{ $see-also cd } ;
+
+HELP: cd "( path -- )"
+{ $values { "path" "a pathname string" } }
+{ $description "Changes the current working directory of the Factor process." }
+{ $see-also cwd } ;
+
+HELP: stat "( path -- array/f )"
+{ $values { "path" "a pathname string" } { "array/f" "a four-element array or " { $link f } } }
 { $description
-    "Outputs a list of file system attributes, or " { $link f } " if the file does not exist. The elements of the list are precisely the following:"
+    "If the file does not exist, outputs " { $link f } ". Otherwise, outputs a four-element array:"
     { $list
         "boolean indicating if the file is a directory"
         "the length in bytes as an integer"
-        "a Unix permission bitmap, or 0 if not supported"
+        "a Unix permission bitmap (0 on Windows)"
         "the last modification time, as milliseconds since midnight, January 1st 1970 GMT"
     }
 } ;

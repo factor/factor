@@ -30,3 +30,7 @@ HELP: 3array "( x y z -- array )"
 { $values { "x" "an object" } { "y" "an object" } { "z" "an object" } { "array" "an array" } }
 { $description "Create a new array with three elements." }
 { $see-also 1array 2array ch>string } ;
+
+HELP: resize-array "( n array -- newarray )"
+{ $values { "n" "a non-negative integer" } { "array" "an array" } { "newarray" "a new array" } }
+{ $description "Creates a new array of " { $snippet "n" } " elements. The contents of the existing array are copied into the new array; if the new array is shorter, only an initial segment is copied, and if the new array is longer the remaining space is filled in with "{ $link f } "." } ;
