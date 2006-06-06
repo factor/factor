@@ -59,7 +59,7 @@ HELP: each-slot "( obj quot -- )"
 
 HELP: refers? "( obj1 obj2 -- ? )"
 { $values { "obj1" "an object" } { "obj2" "an object" } { "?" "a boolean" } }
-{ $description "Tests if any one of " { $snippet "obj2" } "'s slots point to " { $link "obj1" } "." } ;
+{ $description "Tests if any one of " { $snippet "obj2" } "'s slots point to " { $snippet "obj1" } "." } ;
 
 HELP: references "( obj -- seq )"
 { $values { "obj" "an object" } { "seq" "a fresh sequence" } }
