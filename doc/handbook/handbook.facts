@@ -4,7 +4,7 @@ ARTICLE: "handbook" "Factor documentation"
 { $heading "Quick start" }
 "Factor is a dynamically-typed stack based language."
 $terpri
-"Factor is an interactive language, and you are encouraged to experiment with it by entering expressions in the listener. If you are reading this from the Factor UI, you can click on code examples in the documentation to try them out:"
+"Factor is interactive and you are encouraged to experiment with it by entering expressions in the listener. If you are reading this from the Factor UI, you can click on code examples in the documentation to try them out:"
 { $code "\"Hello, world.\" print" }
 { $heading "Reference documentation" }
 { $subsection "changes" }

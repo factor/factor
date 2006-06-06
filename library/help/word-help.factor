@@ -3,7 +3,8 @@
 IN: help
 USING: arrays kernel namespaces prettyprint sequences words ;
 
-M: word article-title word-name ;
+M: word article-title
+    dup word-name swap stack-effect [ " " swap append3 ] when* ;
 
 : word-article ( word -- article ) "help" word-prop ;
 

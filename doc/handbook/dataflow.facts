@@ -3,6 +3,7 @@ USING: errors help kernel namespaces threads words ;
 ARTICLE: "dataflow" "Data and control flow"
 { $subsection "shuffle-words" }
 { $subsection "quotations" }
+{ $subsection "combinators" }
 { $subsection "conditionals" }
 { $subsection "continuations" } ;
 
@@ -34,16 +35,18 @@ $terpri
 { $subsection r> }
 "The top of the data stack is ``hidden'' between " { $link >r } " and " { $link r> } ":"
 { $example "1 2 3 >r .s r>" "2\n1" }
-"Words must not leave objects on the retain stack, nor expect values to be there on entry. The retain stack is for local storage within a word only, and occurrences of " { $link >r } and { $link r> } " must be balanced inside a single quotation. One exception is the following trick involving " { $link if } "; values may be pushed on the retain stack before the condition value is computed, as long as both branches of the " { $link if } " pop the values off the retain stack before returning:"
+"Words must not leave objects on the retain stack, nor expect values to be there on entry. The retain stack is for local storage within a word only, and occurrences of " { $link >r } " and " { $link r> } " must be balanced inside a single quotation. One exception is the following trick involving " { $link if } "; values may be pushed on the retain stack before the condition value is computed, as long as both branches of the " { $link if } " pop the values off the retain stack before returning:"
 { $code
     ": foo ( m ? n -- m+n/n )"
-    "    >r [ r> + ] [ drop r> ] if ; ! Okay"
+    "    >r [ r> + ] [ drop r> ] if ; ! This is OK"
 } ;
 
-ARTICLE: "quotations" "Quotations and combinators"
-"A quotation is a sequence of objects, some of which may be words. When evaluating a quotation, the interpreter executes words, and pushes other types of objects on the stack."
+ARTICLE: "quotations" "Quotations"
+"A quotation is a sequence of objects, some of which may be words. When evaluating a quotation, the interpreter looks at each element in turn, and executes words while pushing other types of objects on the stack."
 $terpri
-"In detail, the interpreter algorithm proceeds as follows:"
+"Quotation literal syntax is documented in " { $link "quotation-syntax" } "."
+$terpri
+"More precisely, the interpreter runs in a loop which repeatedly performs the following steps:"
 { $list
     { "If the end of the current quotation has been reached, the parent quotation is popped from the call stack and execution resumes from the saved location" }
     { "Otherwise, the interpreter performs an action depending on the type of the object at the instruction pointer:"
@@ -59,9 +62,12 @@ $terpri
 }
 "At each stage, the instruction pointer is advanced by one position."
 $terpri
-"The compiler generates machine code which perform the steps in a more efficient manner than the interpreter, however the observable semantics remain the same."
+"If the instruction pointer is at the end of a quotation when a nested quotation is called, the quotation which just finished executing is not pushed on the call stack. Therefore the last call in a quotation does not grow the call stack, and tail recursion executes in bounded space."
 $terpri
-"The following pair of words are central. They invoke the interpreter reflectively, allowing higher-order programming and meta-programming techniques that lie at the heart of Factor's expressive power."
+"The compiler generates machine code which perform the steps in a more efficient manner than the interpreter, however the observable semantics remain the same." ;
+
+ARTICLE: "combinators" "Combinators"
+"The following pair of words invoke the interpreter reflectively:"
 { $subsection call }
 { $subsection execute }
 "These words are used to implement " { $emphasis "combinators" } ", which are words that take code from the stack. Combinator definitions must be followed by the " { $link POSTPONE: inline } " declaration in order to compile; for example:"
@@ -70,14 +76,8 @@ $terpri
     "    over >r call r> ; inline"
 }
 "Word inlining is documented in " { $link "declarations" } "."
-{ $subsection "tail-call-optimization" }
-{ $subsection "quotation-variants" } ;
-
-ARTICLE: "tail-call-optimization" "Tail call optimization"
-"When a call is made to a quotation from the last word in the call frame, there is no purpose in pushing the empty call frame on the call stack. Therefore the last call in a quotation does not grow the call stack, and tail recursion executes in bounded space." ;
-
-ARTICLE: "quotation-variants" "Quotation variants"
-"There are some words that combine shuffle words with " { $link call } ". They are useful for implementing combinators."
+$terpri
+"There are some words that combine shuffle words with " { $link call } ". They are useful for implementing higher-level combinators."
 { $subsection slip }
 { $subsection 2slip }
 { $subsection keep }
@@ -98,6 +98,8 @@ $terpri
 { $subsection unless* }
 "Another form encapsulating a common stack shuffle pattern:"
 { $subsection ?if }
+"A form used when multiple conditional tests are to be performed:"
+{ $subsection cond }
 "Sometimes instead of executing one of two quotations, you just need to pick one of two values:"
 { $subsection ? }
 "There are some logical operations on booleans:"
@@ -117,7 +119,7 @@ ARTICLE: "continuations" "Continuations"
 { $subsection "threads" }
 { $subsection "continuations-internals" } ;
 
-ARTICLE: "errors" "Handling errors"
+ARTICLE: "errors" "Error handling"
 "Support for handling exceptional situations such as bad user input, implementation bugs, and input/output errors is provided by a set of words built using continuations."
 $terpri
 "Two words raise an error in the innermost error handler for the current dynamic extent:"
@@ -133,10 +135,9 @@ $terpri
 "Information relating to the most recently thrown error is stored in a pair of global variables:"
 { $subsection error }
 { $subsection error-continuation }
-"When an error is thrown and caught by the listener, a number of words facilitate interactive debugging of the error:"
-{ $subsection :s }
-{ $subsection :r }
-{ $subsection :get } ;
+"Support for recoverable errors is built on top of the basic error handling facility. The following word signals a recoverable error:"
+{ $subsection condition }
+"Unhandled errors are reported in the listener and can be debugged using various tools. See " { $link "debugger" } "." ;
 
 ARTICLE: "threads" "Multitasking"
 "Continuations are used to implements co-operative multitasking, where the runtime switches between threads during I/O calls, and explicit yields."
@@ -153,9 +154,11 @@ ARTICLE: "threads" "Multitasking"
 ARTICLE: "continuations-internals" "Continuation implementation details"
 "A continuation is simply a tuple holding the contents of the four stacks:"
 { $subsection continuation }
-"The four stacks can be read and written:"
+"The five stacks can be read and written:"
 { $subsection datastack }
 { $subsection set-datastack }
+{ $subsection retainstack }
+{ $subsection set-retainstack }
 { $subsection callstack }
 { $subsection set-callstack }
 { $subsection namestack }

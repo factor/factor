@@ -28,7 +28,7 @@ sequences strings vectors words prettyprint ;
 \ eq? t "foldable" set-word-prop
 
 ! Primitive combinators
-\ call [ [ quotation ] [ ] ] "infer-effect" set-word-prop
+\ call [ [ object ] [ ] ] "infer-effect" set-word-prop
 
 \ call [ pop-literal infer-quot-value ] "infer" set-word-prop
 
@@ -38,7 +38,7 @@ sequences strings vectors words prettyprint ;
     pop-literal unit infer-quot-value
 ] "infer" set-word-prop
 
-\ if [ [ object quotation quotation ] [ ] ] "infer-effect" set-word-prop
+\ if [ [ object object object ] [ ] ] "infer-effect" set-word-prop
 
 \ if [
     2 #drop node, pop-d pop-d swap 2array

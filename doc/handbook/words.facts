@@ -6,13 +6,9 @@ ARTICLE: "words" "Words"
     "a word name,"
     "a vocabulary name,"
     "a definition, specifying the behavior of the word when executed,"
-    "a set of word properties, including documentation strings and other meta-data."
+    "a set of word properties, including documentation and other meta-data."
 }
-"Words for working with words are in the " { $snippet "words" } " vocabulary, and words form a class of objects."
-{ $subsection word }
-{ $subsection word? }
-{ $subsection word-name }
-{ $subsection word-vocabulary }
+"Words for working with words are in the " { $snippet "words" } " vocabulary."
 { $subsection "vocabularies" }
 { $subsection "word-definition" }
 { $subsection "word-crossref" }
@@ -29,7 +25,10 @@ $terpri
 { $subsection create }
 { $subsection create-in }
 { $subsection gensym }
-{ $subsection lookup } ;
+{ $subsection lookup }
+"Words can output their name and vocabulary:"
+{ $subsection word-name }
+{ $subsection word-vocabulary } ;
 
 ARTICLE: "word-definition" "Defining words"
 "There are two approaches to creating word definitions:"

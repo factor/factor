@@ -55,7 +55,6 @@
 
 + help:
 
-- method ordering and interpreter algorithm sections need updates
 - document that can <void*> only be called with an alien
 - help search
 - automatically update help graph when adding/removing articles/words

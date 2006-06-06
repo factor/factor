@@ -1,9 +1,10 @@
-USING: help image inspector kernel listener memory parser
+USING: errors help image inspector kernel listener memory parser
 prettyprint sequences test walker words ;
 
 ARTICLE: "tools" "Development tools"
 "This section covers words which are used during development, and not usually invoked directly by user code."
 { $subsection "listener" }
+{ $subsection "debugger" }
 { $subsection "inspector" }
 { $subsection "memory" }
 { $subsection "word-introspection" }
@@ -37,6 +38,18 @@ $terpri
 { $subsection datastack-hook }
 "Finally, the multi-line expression reading word can be used independently of the rest of the listener:"
 { $subsection read-multiline } ;
+
+ARTICLE: "debugger" "The debugger"
+"If an expression entered in the listener throws an error, the error is printed to the output stream. A number of words facilitate interactive debugging of the error:"
+{ $subsection :s }
+{ $subsection :r }
+{ $subsection :c }
+{ $subsection :get }
+{ $subsection :error }
+{ $subsection :cc }
+"If the error is recoverable, a list of restarts is also printed, and a numbered restart can be invoked:"
+{ $subsection :res }
+"You can read more about error handling in " { $link "errors" } "." ;
 
 ARTICLE: "inspector" "The inspector"
 "The prettyprinter (see " { $link "prettyprint" } ") can turn any object into a source representation. Sometimes this source representation is hard to read for a human, so the inspector provides an alternative tabular view of an object:"

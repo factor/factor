@@ -15,6 +15,8 @@ parser prettyprint sequences strings styles vectors words ;
 PREDICATE: array simple-element
     dup empty? [ drop t ] [ first word? not ] if ;
 
+M: simple-element print-element [ print-element ] each ;
+
 M: string print-element last-block off format* ;
 
 M: array print-element unclip execute ;
@@ -43,8 +45,6 @@ M: word print-element { } swap execute ;
 : $terpri last-block off terpri terpri drop ;
 
 ! Some blocks
-M: simple-element print-element
-    [ print-element ] each ;
 
 : ($code) ( presentation quot -- )
     [
@@ -71,12 +71,13 @@ M: simple-element print-element
     ] when* ;
 
 : $vocabulary ( content -- )
-    "Vocabulary" $heading $snippet ;
+    first word-vocabulary [
+        "Vocabulary" $heading $snippet
+    ] when* ;
 
 : $synopsis ( content -- )
-    first dup
-    word-vocabulary [ $vocabulary ] when*
-    dup parsing? [ $syntax ] [ $stack-effect ] if ;
+    dup $vocabulary
+    first dup parsing? [ $syntax ] [ $stack-effect ] if ;
 
 : $description ( content -- )
     "Description" $heading print-element ;

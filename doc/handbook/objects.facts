@@ -1,4 +1,5 @@
-USING: generic help kernel sequences ;
+USING: alien arrays compiler generic help kernel math sequences
+strings vectors words ;
 
 ARTICLE: "objects" "Objects"
 "Objects model data in Factor. Objects have unique identity, and either hold intrinsic value -- for example, an integer object -- or are composed from named slots, each slot holding an object."
@@ -25,25 +26,25 @@ $terpri
 { $subsection POSTPONE: GENERIC: }
 { $subsection POSTPONE: M: }
 "Since classes are not linearly ordered, method ordering is an issue to keep in mind."
-! { $subsection "method-order" }
+{ $subsection "method-order" }
 { $subsection "method-combination" } ;
 
-! ARTICLE: "method-order" "Method ordering"
-! "If two classes have a non-empty intersection, there is no guarantee that one is a subclass of the other. This means there is no canonical linear ordering of classes."
-! $terpri
-! "Consider the following set of definitions:"
-! { $code
-!     "GENERIC: explain"
-!     "M: general-t explain drop \"a true value\" print ;"
-!     "M:  explain drop \"a list\" print ;"
-!     "M: object explain drop \"an object\" print ;"
-! }
-! "Neither " { $link general-t } " nor " { $link general-list } " contains the other, yet their intersection is the non-empty " { $link cons } " class. So the generic word system will place " { $link object } " first in the method order, however either " { $link general-t } " or " { $link general-list } " may come next, and it is pretty much a random choice that depends on hashing:"
-! { $example "\\ bar order ."  "{ object general-list general-t }" }
-! "Therefore, the outcome of calling " { $snippet "bar" } " with a cons cell as input is undefined."
-! $terpri
-! "As you can see above, the " { $link order } " word can be useful to clarify method dispatch."
-! { $subsection order } ;
+ARTICLE: "method-order" "Method ordering"
+"It is possible that two classes have a non-empty intersectionand neither is a subclass of the other. This means there is no canonical linear ordering of classes."
+$terpri
+"Consider the following set of definitions:"
+{ $code
+    "GENERIC: explain"
+    "M: general-t explain drop \"a true value\" print ;"
+    "M: immediate explain drop \"a tagged immediate\" print ;"
+    "M: object explain drop \"an object\" print ;"
+}
+"Neither " { $link general-t } " nor " { $link immediate } " are subclasses of each other, yet their intersection is the non-empty " { $link POSTPONE: f } " class. So the generic word system will place " { $link object } " first in the method order, however either " { $link general-t } " or " { $link immediate } " may come next, and it is pretty much a random choice that depends on hashing:"
+{ $example "\\ bar order ."  "{ object general-list general-t }" }
+"Therefore, the outcome of calling " { $snippet "bar" } " with " { $link f } " on the stack is undefined."
+$terpri
+"As you can see above, the " { $link order } " word can be useful to clarify method dispatch."
+{ $subsection order } ;
 
 ARTICLE: "method-combination" "Method combination"
 "Abstractly, a generic word can be thought of as a big chain of type conditional tests applied to the top of the stack, with methods as the bodies of each test. The " { $emphasis "method combination" } " is this control flow glue between the set of methods, and several aspects of it can be customized:"
@@ -79,42 +80,45 @@ $terpri
 { $subsection object-method } ;
 
 ARTICLE: "classes" "Classes"
-"A class is a set of objects on which generic words can specialize methods. Each class has a membership predicate named after the class with a \"?\" suffix, with the following two exceptions:"
+"A class is a set of objects on which generic words can specialize methods. Classes are organized into a general partial order, and an object may be an instance of more than one class."
+$terpri
+"You can ask an object for its class:"
+{ $subsection class }
+"Each class has a membership predicate named after the class with a \"?\" suffix, with the following two exceptions:"
 { $list
     { { $link object } " - there is no need for a predicate word, since every object is an instance of this class" }
+    { { $link null } " - there is no need for a predicate word, since no object is an instance of this class" }
     { { $link general-t } " - there is no need for a predicate word, since the " { $link if } " combinator makes an implicit test for instances of this class" }
 }
+"There is a universal class which all objects are an instance of, and an empty class with no instances:"
 { $subsection object }
+{ $subsection null }
+"Other sorts of clases are described next."
 { $subsection "builtin-classes" }
 { $subsection "unions" }
 { $subsection "predicates" }
 { $subsection "class-operations" } ;
 
 ARTICLE: "builtin-classes" "Built-in classes"
-"Every object is an instance of to exactly one type, and the type is constant for the lifetime of the object. There is only a fixed number of types built-in to the run-time, and corresponding to each type is a " { $emphasis "built-in class" } ":"
-{ $code
-    "alien"
-    "array"
-    "bignum"
-    "byte-array"
-    "complex"
-    "cons"
-    "displaced-alien"
-    "dll"
-    "f"
-    "fixnum"
-    "float"
-    "ratio"
-    "sbuf"
-    "string"
-    "t"
-    "tuple"
-    "vector"
-    "word"
-    "wrapper"
-}
-{ $subsection type }
-{ $subsection class } ;
+"Every object is an instance of to exactly one canonical " { $emphasis "built-in class" } " which defines its layout in memory and basic behavior:"
+{ $subsection alien }
+{ $subsection array }
+{ $subsection bignum }
+{ $subsection byte-array }
+{ $subsection complex }
+{ $subsection dll }
+{ $subsection f }
+{ $subsection fixnum }
+{ $subsection float }
+{ $subsection ratio }
+{ $subsection quotation }
+{ $subsection sbuf }
+{ $subsection string }
+{ $subsection t }
+{ $subsection tuple }
+{ $subsection vector }
+{ $subsection word }
+{ $subsection wrapper } ;
 
 ARTICLE: "unions" "Union classes"
 "An object is an instance of a union class if it is an instance of one of its members. Union classes are used to associate the same method with several different classes, as well as to conveniently define predicates."

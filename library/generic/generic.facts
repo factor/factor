@@ -13,6 +13,12 @@ HELP: object f
     { $code "GENERIC: enclose" "M: number enclose 1array ;" "M: object enclose ;" }
 } ;
 
+HELP: null f
+{ $description
+    "The canonical empty class with no instances."
+} ;
+
+
 HELP: type>class "( n -- class )"
 { $values { "n" "a non-negative integer" } { "class" "a class word" } }
 { $description "Outputs a builtin class whose instances are precisely those of a builtin type." }

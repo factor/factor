@@ -60,7 +60,7 @@ DEFER: show-vocab
     } <pages> ;
 
 : <word-view> ( word -- gadget )
-    [ <word-pages> ] keep word-name <browser-tile> ;
+    [ <word-pages> ] keep article-title <browser-tile> ;
 
 : show-word ( word browser -- )
     over word-vocabulary over show-vocab

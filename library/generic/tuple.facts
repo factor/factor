@@ -23,7 +23,7 @@ $terpri
 
 HELP: class "( object -- class )"
 { $values { "object" "an object" } { "class" "a class word" } }
-{ $description "Outputs an object's canonical class. While an object may be an instance of more than one class, the canonical class is either the built-in class, or if the object is a tuple, the tuple class." }
+{ $description "Outputs an object's canonical class. While an object may be an instance of more than one class, the canonical class is either its built-in class, or if the object is a tuple, its tuple class." }
 { $examples { $example "1.0 class ." "float" } { $example "TUPLE: point x y z ;\nT{ point f 1 2 3 } class ." "point" } } ;
 
 HELP: tuple-predicate "( class -- )"

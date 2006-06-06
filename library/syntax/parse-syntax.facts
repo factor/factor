@@ -23,11 +23,11 @@ HELP: foldable ""
 }
 { $examples "Most operations on numbers are foldable. For example, " { $snippet "2 2 +" } " compiles to a literal 4, since " { $link + } " is declared foldable." } ;
 
-HELP: t "( -- t )"
+HELP: t ""
 { $values { "t" "the canonical truth value" } }
 { $description "The canonical instance of " { $link general-t } ". It is just a symbol." } ;
 
-HELP: f "( -- f )"
+HELP: f ""
 { $values { "f" "the singleton false value" } }
 { $description "The " { $link f } " parsing word adds the " { $link f } " object to the parse tree, and is also the class whose sole instance is the " { $link f } " object. The " { $link f } " object is the singleton false value, the only object that is not true. The " { $link f } " object is not equal to the " { $link f } " class word, which can be pushed on the stack using word wrapper syntax:"
 { $code "f    ! the singleton f object denoting falsity\n\\ f  ! the f class word" } } ;
