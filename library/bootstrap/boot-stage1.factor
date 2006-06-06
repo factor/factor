@@ -94,6 +94,8 @@ vectors words ;
         "/library/syntax/parser.factor"
 
         "/library/tools/interpreter.factor"
+        "/library/tools/describe.factor"
+        "/library/tools/debugger.factor"
         
         "/library/help/stylesheet.factor"
         "/library/help/help.factor"
@@ -101,17 +103,14 @@ vectors words ;
         "/library/help/word-help.factor"
         "/library/help/crossref.factor"
         "/library/help/syntax.factor"
-        
-        "/library/tools/describe.factor"
-        "/library/tools/debugger.factor"
-        
+
         "/library/syntax/parse-stream.factor"
 
+        "/library/tools/outliners.factor"
         "/library/tools/memory.factor"
         "/library/tools/listener.factor"
         "/library/tools/inspector.factor"
         "/library/tools/walker.factor"
-
         "/library/tools/annotations.factor"
         
         "/library/test/test.factor"

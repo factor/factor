@@ -50,15 +50,15 @@ PREDICATE: integer control   "\0\e\r\n\t\u0008\u007f" member? ;
     dup printable? swap "\"\\" member? not and ; foldable
 
 : padding ( string count char -- string )
-    >r swap length - 0 max r> <string> ; flushable
+    >r swap length - 0 max r> <string> ;
 
 : pad-left ( string count char -- string )
-    pick >r padding r> append ; flushable
+    pick >r padding r> append ;
 
 : pad-right ( string count char -- string )
-    pick >r padding r> swap append ; flushable
+    pick >r padding r> swap append ;
 
-: ch>string ( ch -- str ) 1 swap <string> ; flushable
+: ch>string ( ch -- str ) 1 swap <string> ;
 
 : >string ( seq -- array ) [ 0 <string> ] >sequence ; inline
 

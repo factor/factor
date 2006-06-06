@@ -1,5 +1,5 @@
 USING: alien arrays help libc math ;
-ARTICLE: "alien" "The C library interface"
+ARTICLE: "alien" "C library interface"
 "Factor can directly call C functions in native libraries. It is also possible to compile callbacks which run Factor code, and pass them to native libraries as function pointers."
 $terpri
 "The C library interface is entirely self-contained; there is no C code which one must write in order to wrap a library."

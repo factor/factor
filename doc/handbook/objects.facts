@@ -1,5 +1,4 @@
 USING: generic help kernel sequences ;
-GLOSSARY: "object" "a datum which may appear on the stack" ;
 
 ARTICLE: "objects" "Objects"
 "Objects model data in Factor. Objects have unique identity, and either hold intrinsic value -- for example, an integer object -- or are composed from named slots, each slot holding an object."
@@ -7,8 +6,6 @@ ARTICLE: "objects" "Objects"
 { $subsection "generic" }
 { $subsection "classes" }
 { $subsection "tuples" } ;
-
-GLOSSARY: "equal" "two objects are equal if they have the same class and if their slots are equal, or alternatively, if both are numbers denoting the same value" ;
 
 ARTICLE: "equality" "Equality and comparison testing"
 "There are two distinct notions of ``sameness'' when it comes to objects. You can test if two references point to the same object, or you can test if two objects are equal in some sense, usually by being instances of the same class, and having equal slot values. Both notions of equality are equality relations in the mathematical sense."
@@ -18,11 +15,6 @@ ARTICLE: "equality" "Equality and comparison testing"
 { $subsection <=> }
 "An object can be cloned; the clone has distinct identity but equal value:"
 { $subsection clone } ;
-
-GLOSSARY: "generic word" "a word defined via the " { $link POSTPONE: GENERIC: } " or " { $link POSTPONE: G: } " parsing word.  A generic word is comprised of a set of methods and a method combination. Methods are keyed by classes, and the method combination determines which stack element is inspected and which methods are called when the generic word executes." ;
-
-GLOSSARY: "method"
-"gives the behavior of a generic word when dispatching on a specific class" ;
 
 ARTICLE: "generic" "Generic words and methods"
 "A generic word's behavior depends on the class of the object at the top of the stack, although this can be generalized using custom method combination. A specific behavior of a generic word on a class is called a " { $emphasis "method" } "."
@@ -52,8 +44,6 @@ $terpri
 ! $terpri
 ! "As you can see above, the " { $link order } " word can be useful to clarify method dispatch."
 ! { $subsection order } ;
-
-GLOSSARY: "method combination" "control flow glue between methods in a generic word" ;
 
 ARTICLE: "method-combination" "Method combination"
 "Abstractly, a generic word can be thought of as a big chain of type conditional tests applied to the top of the stack, with methods as the bodies of each test. The " { $emphasis "method combination" } " is this control flow glue between the set of methods, and several aspects of it can be customized:"
@@ -88,8 +78,6 @@ $terpri
 { $subsection math-upgrade }
 { $subsection object-method } ;
 
-GLOSSARY: "class" "a set of objects on which generic words can specialize methods" ;
-
 ARTICLE: "classes" "Classes"
 "A class is a set of objects on which generic words can specialize methods. Each class has a membership predicate named after the class with a \"?\" suffix, with the following two exceptions:"
 { $list
@@ -101,10 +89,6 @@ ARTICLE: "classes" "Classes"
 { $subsection "unions" }
 { $subsection "predicates" }
 { $subsection "class-operations" } ;
-
-GLOSSARY: "type" "an object invariant that describes its shape. An object's type is constant for the lifetime of the object, and there is only a fixed number of types built-in to the run-time. See class" ;
-
-GLOSSARY: "built-in class" "see type" ;
 
 ARTICLE: "builtin-classes" "Built-in classes"
 "Every object is an instance of to exactly one type, and the type is constant for the lifetime of the object. There is only a fixed number of types built-in to the run-time, and corresponding to each type is a " { $emphasis "built-in class" } ":"
@@ -132,15 +116,11 @@ ARTICLE: "builtin-classes" "Built-in classes"
 { $subsection type }
 { $subsection class } ;
 
-GLOSSARY: "union" "a class whose set of instances is the union of the set of instances of a list of member classes" ;
-
 ARTICLE: "unions" "Union classes"
 "An object is an instance of a union class if it is an instance of one of its members. Union classes are used to associate the same method with several different classes, as well as to conveniently define predicates."
 { $subsection POSTPONE: UNION: }
 { $subsection define-union }
 { $subsection union } ;
-
-GLOSSARY: "predicate" "a word with stack effect " { $snippet "( object -- ? )" } ", or alternatively, a class whose instances are the instances of a superclass that satisfy an arbitrary predicate" ;
 
 ARTICLE: "predicates" "Predicate classes"
 "Predicate classes allow fine-grained control over method dispatch."
@@ -162,8 +142,6 @@ $terpri
 { $subsection "tuple-constructors" }
 { $subsection "tuple-delegation" } ;
 
-GLOSSARY: "constructor" "a word whose primary role is to create new instances of a class" ;
-
 ARTICLE: "tuple-constructors" "Constructors and slots"
 "New instances of tuple classes are created by calling a constructor word, whose name is the tuple's name surrounded by angle brackets:"
 { $code "TUPLE: point x y z ;\n1 2 3 <point>" }
@@ -173,8 +151,6 @@ $terpri
 $terpri
 "Custom constructors can be defined:"
 { $subsection POSTPONE: C: } ;
-
-GLOSSARY: "delegate" "an object acting as a sink for unhandled method calls on behalf of another object" ;
 
 ARTICLE: "tuple-delegation" "Delegation"
 "Each tuple can have an optional delegate tuple. Most generic words called on the tuple that do not have a method for the tuple's class will be passed on to the delegate."

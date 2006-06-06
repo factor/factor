@@ -188,7 +188,7 @@ IN: hashtables
 : subhash? ( h1 h2 -- ? )
     swap [
         >r swap hash* [ r> = ] [ r> 2drop f ] if
-    ] hash-all-with? ; flushable
+    ] hash-all-with? ;
 
 : hash-subset ( hash quot -- hash | quot: k v -- ? )
     over hash-size <hashtable> rot [
@@ -235,13 +235,13 @@ M: hashtable hashcode ( hash -- n )
     2 swap hashcode* ;
 
 : ?hash ( key hash/f -- value/f )
-    dup [ hash ] [ 2drop f ] if ; flushable
+    dup [ hash ] [ 2drop f ] if ;
 
 : ?hash* ( key hash/f -- value/f )
-    dup [ hash* ] [ 2drop f f ] if ; flushable
+    dup [ hash* ] [ 2drop f f ] if ;
 
 : hash-stack ( key seq -- value )
-    [ dupd hash-member? ] find-last nip ?hash ; flushable
+    [ dupd hash-member? ] find-last nip ?hash ;
 
 : hash-intersect ( hash1 hash2 -- hash1/\hash2 )
     [ drop swap hash ] hash-subset-with ;
@@ -259,7 +259,7 @@ M: hashtable hashcode ( hash -- n )
     >r clone dup r> hash-update ;
 
 : remove-all ( hash seq -- seq )
-    [ swap hash-member? not ] subset-with ; flushable
+    [ swap hash-member? not ] subset-with ;
 
 : cache ( key hash quot -- value | quot: key -- value )
     pick pick hash [

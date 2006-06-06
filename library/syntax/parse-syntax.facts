@@ -11,25 +11,19 @@ HELP: inline ""
     "The compiler copies the definitions of inline words directly into the word being compiled. Combinators must be inlined in order to compile. For any other word, inlining is merely an optimization. Inlining does not affect the execution of the word in the interpreter."
 } ;
 
-HELP: flushable ""
-{ $description
-    "Declares that the most recently defined word may be removed if the value it computes is unused."
-    $terpri
-    "Flushable words must be side-effect-free; that is, their outputs must solely depend on inputs, and they must not modify their inputs, or any other object visible outside the dynamic extent of the flushable word. A pathological case of is when a word with no outputs is declared flushable, in which case calls to this word will " { $emphasis "never" } " be compiled in."
-} ;
-
 HELP: foldable ""
 { $description
-    "Declares that the most recently defined word can be evaluated at compile-time. Foldable words are always " { $link POSTPONE: flushable } "."
+    "Declares that the most recently defined word can be evaluated at compile-time. Foldable words are always " { $link POSTPONE: } "."
     $terpri
     "Foldable words are evaluated at compile time if all inputs are literal. Foldable words must satisfy a very strong contract:"
     { $list
-        { "foldable words must satisfy the contract of " { $link POSTPONE: flushable } " words," }
+        { "foldable words must not have any observable side effects," }
         { "foldable words must halt - for example, a word computing a series until it coverges should not be foldable, since compilation will not halt in the event the series does not converge." }
         { "both inputs and outputs of foldable words must be immutable." }
     }
-    "The last restriction ensures that words such as " { $link clone } " do not satisfy the foldable word contract. Indeed, " { $link clone } " is " { $link POSTPONE: flushable } ", however it may output a mutable object if its input is mutable, and so it is undesirable to evaluate it at compile-time, since doing so would give incorrect semantics for code that clones mutable objects."
-    $terpri
+    "The last restriction ensures that words such as " { $link clone } " do not satisfy the foldable word contract. Indeed, " { $link clone } " will output a mutable object if its input is mutable, and so it is undesirable to evaluate it at compile-time, since doing so would give incorrect semantics for code that clones mutable objects and proceeds to mutate them."
+}
+{ $examples
     "Most operations on numbers are foldable. For example, " { $snippet "2 2 +" } " compiles to a literal 4, since " { $link + } " is declared foldable."
 } ;
 
@@ -43,12 +37,12 @@ HELP: f "( -- f )"
 { $code "f    ! the singleton f object denoting falsity\n\\ f  ! the f class word" } } ;
 
 HELP: [ ""
-{ $description "Marks the beginning of a literal list." }
+{ $description "Marks the beginning of a literal quotation." }
 { $examples { $code "[ 1 2 3 ]" } }
 { $see-also POSTPONE: ] } ;
 
 HELP: ] ""
-{ $description "Marks the end of a literal list." }
+{ $description "Marks the end of a literal quotation." }
 { $see-also POSTPONE: [ } ;
 
 HELP: } ""

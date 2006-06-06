@@ -114,9 +114,11 @@ M: link article-content link-name article-content ;
 
 M: link summary "Link to " swap link-name unparse append ;
 
+: >link ( obj -- obj ) dup string? [ <link> ] when ;
+
 : ($subsection) ( quot object -- )
     subsection-style [
-        [ swap curry ] keep dup article-title swap <link>
+        [ swap curry ] keep dup article-title swap >link
         rot simple-outliner
     ] with-style ;
 
@@ -137,8 +139,6 @@ M: link summary "Link to " swap link-name unparse append ;
             subtopic-style [ print-element ] with-style
         ] write-outliner
     ] ($block) ;
-
-: >link ( obj -- obj ) dup string? [ <link> ] when ;
 
 : $link ( article -- )
     last-block off first dup word? [

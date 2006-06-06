@@ -7,18 +7,18 @@ USING: generic kernel-internals math math-internals ;
 
 : clear V{ } set-datastack ;
 
-GENERIC: hashcode ( obj -- n ) flushable
+GENERIC: hashcode ( obj -- n )
 M: object hashcode drop 0 ;
 
-GENERIC: hashcode* ( n obj -- n ) flushable
+GENERIC: hashcode* ( n obj -- n )
 M: object hashcode* nip hashcode ;
 
-GENERIC: = ( obj obj -- ? ) flushable
+GENERIC: = ( obj obj -- ? )
 M: object = eq? ;
 
-GENERIC: <=> ( obj1 obj2 -- n ) flushable
+GENERIC: <=> ( obj1 obj2 -- n )
 
-GENERIC: clone ( obj -- obj ) flushable
+GENERIC: clone ( obj -- obj )
 M: object clone ;
 
 : set-boot ( quot -- ) 8 setenv ;

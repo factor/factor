@@ -1,8 +1,6 @@
 USING: hashtables hashtables-internals help io-internals kernel
 kernel-internals namespaces queues ;
 
-GLOSSARY: "collection" "an object whose primary purpose is to aggregate other objects; examples include sequences, queues and hashtables" ;
-
 ARTICLE: "collections" "Collections"
 "Classical data structures:"
 { $subsection "sequences" }
@@ -20,12 +18,6 @@ ARTICLE: "queues" "Queues"
 { $subsection queue-empty? }
 { $subsection enque }
 { $subsection deque } ;
-
-GLOSSARY: "hashtable"
-"An instance of the " { $link hashtable } " class, implementing a mutable mapping from keys to values with expected constant lookup time" ;
-
-GLOSSARY: "hashcode"
-"an integer chosen so that equal objects have equal hashcodes, and unequal objects' hashcodes are distributed as evently as possible" ;
 
 ARTICLE: "hashtables" "Hashtables"
 "A hashtable provides efficient (expected constant time) lookup and storage of key/value pairs. Keys are compared for equality, and a hashing function is used to reduce the number of comparisons made."
@@ -90,12 +82,6 @@ ARTICLE: "hashtables-internals" "Hashtable implementation details"
 { $subsection set-nth-pair }
 { $subsection each-pair }
 { $subsection all-pairs? } ;
-
-GLOSSARY: "namestack" "a stack holding namespaces. Entering a dynamic scope pushes the name stack, leaving a scope pops it" ;
-
-GLOSSARY: "namespace" "a hashtable pushed on the name stack and used as a set of variable bindings" ;
-
-GLOSSARY: "dynamic scope" "a variable binding policy where bindings established in a scope are visible to all code executed while the scope is active" ;
 
 ARTICLE: "namespaces" "Variables and namespaces"
 "A variable is an entry in a hashtable of bindings, with the hashtable being implicit rather than passed on the stack. These hashtables are termed " { $emphasis "namespaces" } ". Nesting of scopes is implemented with a search order on namespaces, defined by a " { $emphasis "namestack" } ". Since namespaces are just hashtables, any object can be used as a variable, however by convention, variables are keyed by symbols (see " { $link "symbols" } ")."

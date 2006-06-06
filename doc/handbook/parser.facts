@@ -74,8 +74,6 @@ $terpri
 { $subsection POSTPONE: H{ }
 { $subsection POSTPONE: } } ;
 
-GLOSSARY: "reading ahead" "a parsing word reads ahead of it scans following tokens from the input string" ;
-
 ARTICLE: "reading-ahead" "Reading ahead"
 "Parsing words can consume input from the current line to implement various forms of custom syntax."
 { $subsection scan }

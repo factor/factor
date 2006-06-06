@@ -64,7 +64,6 @@ HELP: hashcode "( obj -- n )"
     "the hashcode should be a fixnum, however returning a bignum will not cause any problems other than potential performance degradation."
     { "if two objects are equal under " { $link = } ", they must have equal hashcodes" }
     "the hashcode is only permitted to change if the object is mutated in some way"
-    { "the word must satisfy the " { $link POSTPONE: flushable } " contract" }
 }
 "If mutable objects are used as hashtable keys, they must not be mutated in such a way that their hashcode changes. Doing so will violate bucket sorting invariants and result in undefined behavior." } ;
 
@@ -81,7 +80,6 @@ HELP: = "( obj1 obj2 -- ? )"
     }
     "The precise contract is as follows:"
     { $list
-        { "methods must satisfy the " { $link POSTPONE: flushable } " contract" }
         { "if no more specific method is defined, " { $link = } "  calls " { $link eq? } }
         { "two numbers are equal if they have the same numerical value after being upgraded to the highest type of the two (see " { $link "number-protocol" } ")" }
         "two sequences are equal if they have the same type and elements"
@@ -106,9 +104,7 @@ HELP: <=> "( obj1 obj2 -- n )"
 
 HELP: clone "( obj -- cloned )"
 { $values { "obj" "an object" } { "cloned" "a new object" } }
-{ $contract "Outputs a new object equal to the given object. This is not guaranteed to actually copy the object; it does nothing with immutable objects, and does not copy words either. However, sequences and tuples can be cloned to obtain a shallow copy of the original."
-$terpri
-"Methods must satisfy the " { $link POSTPONE: flushable } " contract." } ;
+{ $contract "Outputs a new object equal to the given object. This is not guaranteed to actually copy the object; it does nothing with immutable objects, and does not copy words either. However, sequences and tuples can be cloned to obtain a shallow copy of the original." ;
 
 HELP: set-boot "( quot -- )"
 { $values { "quot" "a quotation" } }

@@ -3,12 +3,12 @@
 IN: sequences
 USING: errors generic kernel math math-internals strings vectors ;
 
-GENERIC: length ( sequence -- n ) flushable
+GENERIC: length ( sequence -- n )
 GENERIC: set-length ( n sequence -- )
-GENERIC: nth ( n sequence -- obj ) flushable
+GENERIC: nth ( n sequence -- obj )
 GENERIC: set-nth ( value n sequence -- obj )
-GENERIC: thaw ( seq -- mutable-seq ) flushable
-GENERIC: like ( seq seq -- seq ) flushable
+GENERIC: thaw ( seq -- mutable-seq )
+GENERIC: like ( seq seq -- seq )
 
 : empty? ( seq -- ? ) length zero? ; inline
 

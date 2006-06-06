@@ -5,36 +5,36 @@ USING: arrays errors generic kernel kernel-internals math
 sequences-internals strings vectors words ;
 
 : first2 ( { x y } -- x y )
-    1 swap bounds-check nip first2-unsafe ; flushable
+    1 swap bounds-check nip first2-unsafe ;
 
 : first3 ( { x y z } -- x y z )
-    2 swap bounds-check nip first3-unsafe ; flushable
+    2 swap bounds-check nip first3-unsafe ;
 
 : first4 ( { x y z w } -- x y z w )
-    3 swap bounds-check nip first4-unsafe ; flushable
+    3 swap bounds-check nip first4-unsafe ;
 
 M: object like drop ;
 
 : index   ( obj seq -- n )
-    [ = ] find-with drop ; flushable
+    [ = ] find-with drop ;
 
 : index*  ( obj i seq -- n )
-    [ = ] find-with* drop ; flushable
+    [ = ] find-with* drop ;
 
 : last-index   ( obj seq -- n )
-    [ = ] find-last-with drop ; flushable
+    [ = ] find-last-with drop ;
 
 : last-index*  ( obj i seq -- n )
-    [ = ] find-last-with* drop ; flushable
+    [ = ] find-last-with* drop ;
 
 : member? ( obj seq -- ? )
-    [ = ] contains-with? ; flushable
+    [ = ] contains-with? ;
 
 : memq?   ( obj seq -- ? )
-    [ eq? ] contains-with? ; flushable
+    [ eq? ] contains-with? ;
 
 : remove  ( obj list -- list )
-    [ = not ] subset-with ; flushable
+    [ = not ] subset-with ;
 
 : (subst) ( newseq oldseq elt -- new/elt )
     [ swap index ] keep
@@ -67,21 +67,21 @@ M: object like drop ;
     swap [ >resizable [ swap call ] keep ] keep like ; inline
 
 : append ( s1 s2 -- s1+s2 )
-    swap [ swap nappend ] immutable ; flushable
+    swap [ swap nappend ] immutable ;
 
 : add ( seq elt -- seq )
-    swap [ push ] immutable ; flushable
+    swap [ push ] immutable ;
 
 : add* ( seq elt -- seq )
     over >r
     over thaw [ push ] keep [ swap nappend ] keep
-    r> like ; flushable
+    r> like ;
 
 : diff ( seq1 seq2 -- seq2-seq1 )
-    [ swap member? not ] subset-with ; flushable
+    [ swap member? not ] subset-with ;
 
 : append3 ( s1 s2 s3 -- s1+s2+s3 )
-    rot [ [ rot nappend ] keep swap nappend ] immutable ; flushable
+    rot [ [ rot nappend ] keep swap nappend ] immutable ;
 
 : peek ( sequence -- element ) dup length 1- swap nth ;
 
@@ -100,13 +100,13 @@ M: object like drop ;
 : mismatch ( seq1 seq2 -- i )
     2dup min-length
     [ >r 2dup r> 2nth-unsafe = not ] find
-    swap >r 3drop r> ; flushable
+    swap >r 3drop r> ;
 
 : flip ( seq -- seq )
     dup empty? [
         dup first [ length ] keep like
         [ swap [ nth ] map-with ] map-with
-    ] unless ; flushable
+    ] unless ;
 
 : unpair ( seq -- firsts seconds )
     flip dup empty? [ drop { } { } ] [ first2 ] if ;

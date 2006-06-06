@@ -1,7 +1,5 @@
 USING: help io prettyprint ;
 
-GLOSSARY: "prettyprinter" "a set of words for printing objects in readable form" ;
-
 ARTICLE: "prettyprint" "The prettyprinter"
 "One of Factor's key features is the ability to print almost any object as a valid source literal expression. This greatly aids debugging and provides the building blocks for light-weight object serialization facilities."
 $terpri

@@ -14,7 +14,9 @@ SYMBOL: line-text
 SYMBOL: column
 
 : check-vocab ( name -- vocab )
-    vocab [ "No such vocabulary" throw ] unless* ;
+    dup vocab [ ] [
+        "No such vocabulary: " swap >string append throw
+    ] ?if ;
 
 : use+ ( string -- ) check-vocab use get push ;
 

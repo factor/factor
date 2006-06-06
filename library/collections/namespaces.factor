@@ -16,7 +16,7 @@ words ;
 : namespace ( -- namespace ) namestack* peek ;
 : ndrop ( n:namespace -- ) namestack* pop* ;
 : global ( -- g ) 4 getenv { hashtable } declare ; inline
-: get ( variable -- value ) namestack* hash-stack ; flushable
+: get ( variable -- value ) namestack* hash-stack ;
 : set ( value variable -- ) namespace set-hash ; inline
 : on ( var -- ) t swap set ; inline
 : off ( var -- ) f swap set ; inline
@@ -66,8 +66,6 @@ IN: sequences
 
 : concat ( seq -- seq )
     dup empty? [ [ [ % ] each ] over first make ] unless ;
-    flushable
 
 : join ( seq glue -- seq )
     [ swap [ % ] [ dup % ] interleave drop ] over make ;
-    flushable

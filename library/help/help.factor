@@ -24,19 +24,6 @@ M: string article-content article article-content ;
 M: f article-title drop \ f article-title ;
 M: f article-content drop \ f article-content ;
 
-! Glossary of terms
-SYMBOL: terms
-
-TUPLE: term entry ;
-
-M: term article-title term-entry ;
-
-M: term article-content
-    term-entry terms get hash
-    [ "No such glossary entry" ] unless* ;
-
-: add-term ( term element -- ) swap terms get set-hash ;
-
 SYMBOL: last-block
 
 : (help) ( element -- )
@@ -46,8 +33,4 @@ SYMBOL: last-block
 
 : help ( topic -- ) article-content (help) ;
 
-: glossary ( name -- ) <term> help ;
-
 : handbook ( -- ) "handbook" help ;
-    
-: tutorial ( -- ) "tutorial" help ;

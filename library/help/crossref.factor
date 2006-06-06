@@ -8,7 +8,6 @@ namespaces sequences strings words ;
     [
         articles get hash-keys %
         [ word-article ] word-subset %
-        terms get hash-keys [ <term> ] map %
     ] { } make ;
 
 : sort-articles ( seq -- assoc )

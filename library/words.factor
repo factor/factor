@@ -81,8 +81,7 @@ M: word unxref-word* drop ;
 : reset-props ( word seq -- ) [ remove-word-prop ] each-with ;
 
 : reset-word ( word -- )
-    { "parsing" "inline" "foldable" "flushable" "predicating" }
-    reset-props ;
+    { "parsing" "inline" "foldable" "predicating" } reset-props ;
 
 : reset-generic ( word -- )
     dup reset-word { "methods" "combination" } reset-props ;

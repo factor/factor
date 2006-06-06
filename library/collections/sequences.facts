@@ -2,9 +2,7 @@ USING: help sequences sequences-internals ;
 
 HELP: length "( seq -- n )"
 { $values { "seq" "a sequence" } { "n" "a non-negative integer" } }
-{ $contract "Outputs the length of the sequence. All sequences support this operation."
-$terpri
-"This generic word is flushable, so user-defined methods must satisfy the flushable contract (see " { $link "declarations" } ")." } ;
+{ $contract "Outputs the length of the sequence. All sequences support this operation." } ;
 
 HELP: set-length "( n seq -- )"
 { $values { "n" "a non-negative integer" } { "seq" "a resizable sequence" } }
@@ -14,14 +12,12 @@ HELP: set-length "( n seq -- )"
 
 HELP: nth "( n seq -- elt )"
 { $values { "n" "a non-negative integer" } { "seq" "a sequence" } { "elt" "the element at the " { $snippet "n" } "th index" } }
-{ $contract "Outputs the " { $snippet "n" } "th element of the sequence. Elements are numbered from zero, so the last element has an index one less than the length of the sequence. All sequences support this operation."
-$terpri
-"This generic word is flushable, so user-defined methods must satisfy the flushable contract (see " { $link "declarations" } ")." }
+{ $contract "Outputs the " { $snippet "n" } "th element of the sequence. Elements are numbered from zero, so the last element has an index one less than the length of the sequence. All sequences support this operation." }
 { $errors "Throws an error if the index is negative, or greater than or equal to the length of the sequence." } ;
 
 HELP: set-nth "( elt n seq -- )"
 { $values { "elt" "an object" } { "n" "a non-negative integer" } { "seq" "a mutable sequence" } }
-{ $contract "Sets the $n$th element of the sequence. Storing beyond the end of a resizable sequence such as a vector or string buffer grows the sequence." }
+{ $contract "Sets the " { $snippet "n" } "th element of the sequence. Storing beyond the end of a resizable sequence such as a vector or string buffer grows the sequence." }
 { $errors "Throws an error if the index is negative, or if the sequence is not resizable and the index is greater than or equal to the length of the sequence."
 $terpri
 "Throws an error if the sequence cannot hold elements of the given type." }
@@ -29,16 +25,12 @@ $terpri
 
 HELP: thaw "( seq -- resizable-seq )"
 { $values { "seq" "a sequence" } { "resizable-seq" "a resizable mutable sequence" } }
-{ $contract "Outputs an empty, resizable mutable sequence that can hold the elements of " { $snippet "seq" } "."
-$terpri
-"This generic word is flushable, so user-defined methods must satisfy the flushable contract (see " { $link "declarations" } ")." }
+{ $contract "Outputs an empty, resizable mutable sequence that can hold the elements of " { $snippet "seq" } "." }
 { $examples "The default implementation returns a new vector, but given a string, it returns a string buffer, since string buffers are more efficient in terms of memory usage." } ;
 
 HELP: like "( seq prototype -- newseq )"
 { $values { "seq" "a sequence" } { "prototype" "a sequence" } { "newseq" "a sequence" } }
-{ $contract "Outputs a sequence with the same elements as the input sequence, but " { $emphasis "like" } " the template sequence, in the sense that it either has the same class as the template sequence, or if the template sequence is a virtual sequence, the same class as the template sequence's underlying sequence. The default implementation does nothing."
-$terpri
-"This generic word is flushable, so user-defined methods must satisfy the flushable contract (see " { $link "declarations" } ")." } ;
+{ $contract "Outputs a sequence with the same elements as the input sequence, but " { $emphasis "like" } " the template sequence, in the sense that it either has the same class as the template sequence, or if the template sequence is a virtual sequence, the same class as the template sequence's underlying sequence. The default implementation does nothing." } ;
 
 HELP: empty? "( seq -- ? )"
 { $values { "seq" "a sequence" } { "?" "a boolean" } }

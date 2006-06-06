@@ -12,7 +12,6 @@ sequences strings styles words ;
         POSTPONE: parsing
         POSTPONE: inline
         POSTPONE: foldable
-        POSTPONE: flushable
     } [ declaration. ] each-with ;
 
 : in. ( word -- )

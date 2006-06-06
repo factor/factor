@@ -3,8 +3,6 @@ help
 io
 styles ;
 
-GLOSSARY: "stream" "an endpoint for input/output operations, supporting the " { $link "stream-protocol" } ;
-
 ARTICLE: "streams" "Streams"
 "Input and output centers on the concept of a " { $emphasis "stream" } ", which is a source or sink of characters. Streams also support formatted output, which may be used to present styled text in a manner independent of output medium."
 $terpri
@@ -16,12 +14,6 @@ $terpri
 { $subsection "stream-binary" }
 { $subsection "stream-impls" }
 ;
-
-GLOSSARY: "input stream" "an object responding to the input words of the " { $link "stream-protocol" } ;
-
-GLOSSARY: "output stream" "an object responding to the output words of the " { $link "stream-protocol" } ;
-
-GLOSSARY: "bidirectional stream" "an object that is both an input and output stream" ;
 
 ARTICLE: "stream-protocol" "Stream protocol"
 "The stream protocol consists of a large number of generic words, many of which are optional."
@@ -53,8 +45,6 @@ $terpri
 { $subsection contents }
 "Finally, a word to copy the contents of one stream to another:"
 { $subsection stream-copy } ;
-
-GLOSSARY: "default stream" "see " { $link stdio } ;
 
 ARTICLE: "stdio" "The default stream"
 "Various words take an implicit stream parameter from the " { $link stdio } " variable to reduce stack shuffling. Unless rebound in a child namespace, this variable will be set to a console stream for interacting with the user."
@@ -122,10 +112,6 @@ $terpri
 { $subsection write-outliner }
 { $subsection simple-outliner } ;
 
-GLOSSARY: "big endian" "a representation of an integer as a sequence of bytes, ordered from most significant to least significant. This is the native byte ordering for PowerPC processors" ;
-
-GLOSSARY: "little endian" "a representation of an integer as a sequence of bytes, ordered from least significant to most significant. This is the native byte ordering for x86 and AMD64 processors" ;
-
 ARTICLE: "stream-binary" "Working with binary data"
 "The core stream words read and write strings. Packed binary integers can be read and written by converting to and from sequences of bytes. Floating point numbers can be read and written by converting them into a their bitwise integer representation (" { $link "floats" } ")."
 $terpri
@@ -169,10 +155,6 @@ ARTICLE: "file-streams" "Reading and writing files"
 { $subsection directory? }
 { $subsection file-length }
 { $subsection stat } ;
-
-GLOSSARY: "server stream" "a stream listening on a TCP/IP socket" ;
-
-GLOSSARY: "client stream" "a bidirectional stream for an to end-point of a TCP/IP connection" ;
 
 ARTICLE: "network-streams" "TCP/IP networking"
 "Client connections are bidirectional streams opened with this word:"

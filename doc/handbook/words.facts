@@ -1,9 +1,5 @@
 USING: help kernel parser words ;
 
-GLOSSARY: "defining word" "a word that adds definitions to the dictionary" ;
-
-GLOSSARY: "dictionary" "the collection of vocabularies making up the code in the Factor image" ;
-
 ARTICLE: "words" "Words"
 "Words are the fundamental unit of code in Factor, analogous to functions or procedures in other languages. Words are also objects, and this concept forms the basis for Factor's meta-programming facilities. A word consists of several parts:"
 { $list
@@ -21,10 +17,6 @@ ARTICLE: "words" "Words"
 { $subsection "word-definition" }
 { $subsection "word-crossref" }
 { $subsection "word-internals" } ;
-
-GLOSSARY: "interned word" "a word that is a member of the vocabulary named by its vocabulary slot. Interned words are created by calls to " { $link create } ;
-
-GLOSSARY: "uninterned word" "a word whose vocabulary slot is either set to " { $link f } ", or that does not belong to the vocabulary named by its vocabulary slot. Uninterned words are created by calls to " { $link gensym } ", and interned words can become uninterned via calls to " { $link forget } ;
 
 ARTICLE: "vocabularies" "Vocabularies"
 "Words are organized into named vocabularies, stored in a global variable."
@@ -53,18 +45,12 @@ ARTICLE: "word-definition" "Defining words"
 { $subsection "undefining" }
 { $subsection "declarations" } ;
 
-GLOSSARY: "compound definition" "a word that calls a quotation when executed" ;
-
-GLOSSARY: "colon definition" "see compound definition" ;
-
 ARTICLE: "colon-definition" "Compound definitions"
 "A compound definition associates a word name with a quotation that is called when the word is executed."
 { $subsection POSTPONE: : }
 { $subsection define-compound }
 { $subsection compound? }
 { $subsection compound } ;
-
-GLOSSARY: "symbol" "a word defined to push itself on the stack when executed, created by the " { $link POSTPONE: SYMBOL: } " parsing word" ;
 
 ARTICLE: "symbols" "Symbols"
 { $subsection POSTPONE: SYMBOL: }
@@ -87,12 +73,6 @@ ARTICLE: "undefining" "Undefining words"
 { $subsection forget }
 { $subsection interned? } ;
 
-GLOSSARY: "inline word" "calls to inline words are replaced with the inline word's body by the compiler. Inline words are declared via the " { $link POSTPONE: inline } " parsing word" ;
-
-GLOSSARY: "flushable word" "calls to flushable words may be removed from compiled code if their outputs are subsequently discarded by calls to " { $link drop } ". Flushable words are declared via the " { $link POSTPONE: flushable } " parsing word" ;
-
-GLOSSARY: "foldable word" "calls to foldable words may be evaluated at compile time if all inputs are literal. Foldable words are declared via the " { $link POSTPONE: foldable } " parsing word" ;
-
 ARTICLE: "declarations" "Declarations"
 "Declarations give special behavior to a word. Declarations are parsing words that set a word property in the most recently defined word."
 $terpri
@@ -100,14 +80,9 @@ $terpri
 { $subsection POSTPONE: parsing }
 "The remaining declarations only affect compiled definitions. They do not change evaluation semantics of a word, but instead declare that the word follows a certain contract, and thus may be compiled differently."
 $terpri
-{ $warning "If a generic word is defined as " { $link POSTPONE: flushable } " or " { $link POSTPONE: foldable } ", all methods must satisfy the contract, otherwise unpredicable behavior will occur." }
+{ $warning "If a generic word is declared " { $link POSTPONE: foldable } ", all methods must satisfy the contract, otherwise unpredicable behavior will occur." }
 { $subsection POSTPONE: inline }
-{ $subsection POSTPONE: flushable }
 { $subsection POSTPONE: foldable } ;
-
-GLOSSARY: "word property" "a name/value pair stored in the word properties of a word" ;
-
-GLOSSARY: "word properties" "a hashtable associated with each word storing various sundry properties" ;
 
 ARTICLE: "word-props" "Word properties"
 "Each word has a hashtable of properties."
@@ -119,7 +94,7 @@ ARTICLE: "word-props" "Word properties"
 $terpri
 "The following properties are set by the library:"
 { $list
-    { { $snippet "\"parsing\"" } ", " { $snippet "\"inline\"" } ", " { $snippet "\"flushable\"" } ", " { $snippet "\"fondable\"" } " - declarations (see " { $link "declarations" } ")" }
+    { { $snippet "\"parsing\"" } ", " { $snippet "\"inline\"" } ", " { $snippet "\"foldable\"" } " - declarations (see " { $link "declarations" } ")" }
     { { $snippet "\"file\"" } " - the source file storing the word definition" }
     { { $snippet "\"line\"" } " - the line number in the source file storing the word definition" }
     { { $snippet "\"methods\"" } ", " { $snippet "\"combination\"" } " - only defined on generic words (see " { $link "generic" } ")" }

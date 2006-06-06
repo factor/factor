@@ -2,9 +2,6 @@ IN: sequences
 USING: arrays help kernel kernel-internals sequences-internals
 strings vectors words ;
 
-GLOSSARY: "sequence"
-"a linearly-ordered finite collection of elements responding to the " { $link "sequence-protocol" "sequence protocol" } "." ;
-
 ARTICLE: "sequences" "Sequences"
 "A sequence is a linearly-ordered finite collection of elements."
 $terpri
@@ -48,8 +45,6 @@ $terpri
 "A common idiom is to iterate over a sequence, while also maintaining a loop counter. This can be done using " { $link 2each } ":"
 { $example "{ \"a\" \"b\" \"c\" } dup length [\n    \"Index: \" write . \"Element: \" write .\n] 2each" "Index: 0\nElement: \"a\"\nIndex: 1\nElement: \"b\"\nIndex: 2\nElement: \"c\"" }
 "Combinators that produce new sequences, such as " { $snippet map } ", will output an array if the input is an integer." ;
-
-GLOSSARY: "slice" "an instance of the " { $link slice } " class, which is a virtual sequence sharing structure with a subrange of some underlying sequence" ;
 
 ARTICLE: "sequences-utilities" "Basic utilities"
 "Some utilities for accessing various common indices:"
@@ -163,12 +158,6 @@ ARTICLE: "sequences-comparing" "Comparing sequences"
 "Lexicographic order:"
 { $subsection <=> } ;
 
-GLOSSARY: "resizable sequence"
-"a sequence implementing the " { $link set-length } " generic word. For example, vectors and string buffers" ;
-
-GLOSSARY: "mutable sequence"
-"a sequence implementing the " { $link set-nth } " generic word. For example, arrays and strings" ;
-
 ARTICLE: "sequence-protocol" "Sequence protocol"
 "All sequences must know their length, and provide a way to access elements:"
 { $subsection length }
@@ -181,9 +170,6 @@ ARTICLE: "sequence-protocol" "Sequence protocol"
 { $subsection like }
 "Another optional generic word for optimization purposes:"
 { $subsection thaw } ;
-
-GLOSSARY: "array"
-"an instance of the" { $link array } "class, implementing a fixed-length mutable sequence of objects" ;
 
 ARTICLE: "arrays" "Arrays"
 "An array is a fixed-size mutable sequence whose elements are stored in a contiguous range of memory. The literal syntax is covered in " { $link "syntax-arrays" } ". Sometimes you need a growable array -- this is called a vector, and vectors are documented in " { $link "vectors" } "."
@@ -202,10 +188,6 @@ $terpri
 "Arrays can be accessed without bounds checks in a pointer unsafe way."
 { $subsection array-nth }
 { $subsection set-array-nth } ;
-
-GLOSSARY: "string" "an instance of the " { $link "string" } " class, representing a fixed-size mutable sequence of characters" ;
-
-GLOSSARY: "character" "an integer between 0 and 63335, inclusive" ;
 
 ARTICLE: "strings" "Strings"
 "A string is a fixed-size mutable sequence of characters."
@@ -228,10 +210,6 @@ $terpri
 { $subsection ch>lower }
 { $subsection ch>upper } ;
 
-GLOSSARY: "string buffer" "an instance of the " { $link "sbuf" } " class, representing a mutable and growable sequence of characters" ;
-
-GLOSSARY: "sbuf" "see string buffer" ;
-
 ARTICLE: "sbufs" "String buffers"
 "A string buffer is a resizable mutable sequence of characters. String buffers can be used to construct new strings by accumilating substrings and characters, however usually they are only used indirectly, since the sequence construction words are more convenient to use in most cases (see " { $link "sequences-make" } ")."
 $terpri
@@ -240,16 +218,11 @@ $terpri
 { $subsection >sbuf }
 { $subsection <sbuf> } ;
 
-GLOSSARY: "vector" "an instance of the " { $link "vector" } " class, representing a resizable mutable sequence of objects" ;
-
 ARTICLE: "vectors" "Vectors"
 "A vector is a resizable mutable sequence of objects. Vector words are found in the " { $snippet "vectors" } " vocabulary."
 { $subsection vector? }
 { $subsection >vector }
 { $subsection <vector> } ;
-
-GLOSSARY: "comparator"
-"a quotation with stack effect " { $snippet "( elt1 elt2 -- n )" } " that orders the two given elements and outputs a value whose sign denotes the result. See " { $link "sequence-sorting" } ;
 
 ARTICLE: "sequences-sorting" "Sorting and binary search"
 "Sorting and binary search combinators all take comparator quotations with stack effect " { $snippet "( elt1 elt2 -- n )" } " that order the two given elements and output a value whose sign denotes the result:"

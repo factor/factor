@@ -70,10 +70,10 @@ IN: sequences
     inline
 
 : min-length ( seq seq -- n )
-    [ length ] 2apply min ; flushable
+    [ length ] 2apply min ;
 
 : max-length ( seq seq -- n )
-    [ length ] 2apply max ; flushable
+    [ length ] 2apply max ;
 
 : 2each ( seq seq quot -- )
     -rot 2dup min-length [ (2each) ] repeat 3drop ; inline

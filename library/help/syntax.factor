@@ -11,6 +11,3 @@ USING: arrays help kernel parser sequences syntax words ;
 
 : ARTICLE:
     [ >array [ first2 2 ] keep tail add-article ] f ; parsing
-
-: GLOSSARY:
-    [ >array [ first 1 ] keep tail add-term ] f ; parsing

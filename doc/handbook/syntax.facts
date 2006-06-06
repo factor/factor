@@ -1,21 +1,11 @@
 USING: help kernel math parser words ;
 
-GLOSSARY: "parser" "a facility for creating objects from printed representations, and for defining words from Factor source code" ;
-
 ARTICLE: "syntax" "Syntax"
 "In Factor, an " { $emphasis "object" } " is a piece of data that can be identified. Code is data, so Factor syntax is actually a syntax for describing objects, of which code is a special case. Factor syntax is read by the parser. The parser performs two kinds of tasks -- it creates objects from their " { $emphasis "printed representations" } ", and it adds " { $emphasis "word definitions" } " to the dictionary (see " { $link "words" } "). The parser can be extended (see " { $link "parser" } ")."
 { $subsection "parser-algorithm" }
 { $subsection "vocabulary-search" }
 { $subsection "syntax-comments" }
 { $subsection "syntax-literals" } ;
-
-GLOSSARY: "token" "a whitespace-delimited piece of text, the primary unit of Factor syntax" ;
-
-GLOSSARY: "whitespace" "a space (ASCII 32), newline (ASCII 10) or carriage-return (ASCII 13)" ;
-
-GLOSSARY: "string mode" "a parser mode where token are added to the parse tree as strings, without being looked up in the dictionary or converted into numbers first. Activated by switching on the " { $link string-mode } " variable" ;
-
-GLOSSARY: "parsing word" "a word that is run at parse time. Parsing words can be defined by suffixing the compound definition with " { $link POSTPONE: parsing } ". Parsing words have the " { $snippet "parsing" } " word property set to true, and satisfy the " { $link parsing? } " predicate." ;
 
 ARTICLE: "parser-algorithm" "Parser algorithm"
 "At the most abstract level, Factor syntax consists of whitespace-separated tokens. The parser tokenizes the input on whitespace boundaries.  The parser is case-sensitive and whitesapce between tokens is significant, so the following three expressions tokenize differently:"
@@ -39,10 +29,6 @@ $terpri
 "Parsing words play a key role in parsing; while ordinary words and numbers are simply added to the parse tree, parsing words execute in the context of the parser, and can do their own parsing and create nested data structures in the parse tree. Parsing words are also able to define new words."
 $terpri
 "While parsing words supporting arbitrary syntax can be defined, the default set is found in the " { $snippet "syntax" } " vocabulary and provides the basis for all further syntactic interaction with Factor." ;
-
-GLOSSARY: "word" "an object holding a code definition and set of properties. Words are organized into vocabularies, and are uniquely identified by name within a vocabulary" ;
-
-GLOSSARY: "vocabulary" "a collection of words, uniquely identified by name. The hashtable of vocabularies is stored in the " { $link vocabularies } " global variable, and the " { $link POSTPONE: USE: } " and " { $link POSTPONE: USING: } " parsing words add vocabularies to the parser's search path" ;
 
 ARTICLE: "vocabulary-search" "Vocabulary search"
 "A " { $emphasis "word" } " is a code definition identified by a name. Words are sorted into " { $emphasis "vocabularies" } ". Words are discussed in depth in " { $link "words" } "."
@@ -91,18 +77,12 @@ $terpri
     "12345678"
 } ;
 
-GLOSSARY: "stack effect" "a string of the form " { $snippet "( inputs -- outputs )" } ", where the inputs and outputs are a whitespace-separated list of names or types. The top of the stack is the right-most token on both sides" ;
-
 ARTICLE: "syntax-comments" "Comments"
 "Stack effect comments:"
 { $subsection POSTPONE: ( }
 "End of line comments:"
 { $subsection POSTPONE: ! }
 { $subsection POSTPONE: #! } ;
-
-GLOSSARY: "mutable object" "an object whose slot values can be changed. Mutable built-in types are arrays, strings, vectors, string buffers, and tuples" ;
-
-GLOSSARY: "immutable object" "an object whose slot values cannot be changed. Immutable built-in types are numbers, booleans, and lists" ;
 
 ARTICLE: "syntax-literals" "Literals"
 "Many different types of objects can be constructed at parse time via literal syntax. Numbers are a special case since support for reading them is built-in to the parser. All other literals are constructed via parsing words."
@@ -122,20 +102,12 @@ $terpri
 { $subsection "syntax-tuples" }
 { $subsection "syntax-aliens" } ;
 
-GLOSSARY: "number" "an instance of the " { $link number } " class" ;
-
 ARTICLE: "syntax-numbers" "Number syntax"
 "If a vocabulary lookup of a token fails, the parser attempts to parse it as a number."
 { $subsection "syntax-integers" }
 { $subsection "syntax-ratios" }
 { $subsection "syntax-floats" }
 { $subsection "syntax-complex-numbers" } ;
-
-GLOSSARY: "integer" "an instance of the " { $link integer } " class, a fixnum or a bignum" ;
-
-GLOSSARY: "fixnum" "an instance of the " { $link fixnum } " class, representing a fixed precision integer. On 32-bit systems, an element of the interval (-2^-29,2^29], and on 64-bit systems, the interval (-2^-61,2^61]" ;
-
-GLOSSARY: "bignum" "an instance of the " { $link bignum } " class, representing an arbitrary-precision integer whose value is bounded by available object memory" ;
 
 ARTICLE: "syntax-integers" "Integer syntax"
 "The printed representation of an integer consists of a sequence of digits, optionally prefixed by a sign."
@@ -150,8 +122,6 @@ ARTICLE: "syntax-integers" "Integer syntax"
 { $subsection POSTPONE: HEX: }
 "More information on integers can be found in " { $link "integers" } "." ;
 
-GLOSSARY: "ratio" "an instance of the " { $link ratio } " class, representing an exact ratio of two integers" ;
-
 ARTICLE: "syntax-ratios" "Ratio syntax"
 "The printed representation of a ratio is a pair of integers separated by a slash (/). No intermediate whitespace is permitted. Either integer may be signed, however the ratio will be normalized into a form where the denominator is positive and the greatest common divisor of the two terms is 1."
 { $code
@@ -160,8 +130,6 @@ ARTICLE: "syntax-ratios" "Ratio syntax"
     "-5/-6"
 }
 "More information on ratios can be found in " { $link "rationals" } ;
-
-GLOSSARY: "float" "an instance of the " { $link float } " class, representing an IEEE 754 double-precision floating point number" ;
 
 ARTICLE: "syntax-floats" "Float syntax"
 "Floating point numbers contain an optional decimal part, an optional exponent, with an optional sign prefix on either the mantissa or exponent."
@@ -173,8 +141,6 @@ ARTICLE: "syntax-floats" "Float syntax"
 }
 "More information on floats can be found in " { $link "floats" } "." ;
 
-GLOSSARY: "complex" "an instance of the " { $link complex } " class, representing a complex number with real and imaginary components, where both components are real numbers" ;
-
 ARTICLE: "syntax-complex-numbers" "Complex number syntax"
 "A complex number is given by two components, a ``real'' part and ''imaginary'' part. The components must either be integers, ratios or floats."
 { $code
@@ -183,28 +149,16 @@ ARTICLE: "syntax-complex-numbers" "Complex number syntax"
 }
 "More information on complex numbers can be found in " { $link "complex-numbers" } "." ;
 
-GLOSSARY: "wrapper" "an instance of the " { $link wrapper } " class, holding a reference to a single object. When the evaluator encounters a wrapper, it pushes the wrapped object on the data stack. Wrappers are used to push words literally on the data stack" ;
-
 ARTICLE: "syntax-words" "Word syntax"
 "A word occurring inside a quotation is executed when the quotation is called. Sometimes a word needs to be pushed on the data stack instead. The canonical use-case for this is passing the word to the " { $link execute } " combinator, or alternatively, reflectively accessing word properties (" { $link "word-props" } ")."
 { $subsection POSTPONE: \ }
 { $subsection POSTPONE: POSTPONE: }
 "The implementation of the " { $link POSTPONE: \ } " word is discussed in detail in " { $link "reading-ahead" } ". Words are documented in " { $link "words" } "." ;
 
-GLOSSARY: "boolean" "either the " { $link f } " or the " { $link t } " object. See generalized boolean" ;
-
-GLOSSARY: "generalized boolean" "an object used as a truth vlaue. The " { $link f } " object is false and anything else is true. See boolean" ;
-
-GLOSSARY: "t" "the canonical truth value, the symbol " { $link t } ;
-
-GLOSSARY: "f" "the singleton false value, or the " { $link f } " class whose sole instance is the singleton false value; the two are distinct" ;
-
 ARTICLE: "syntax-booleans" "Boolean syntax"
 "Any Factor object may be used as a truth value in a conditional expression. The " { $link f } " object is false and anything else is true. The " { $link f } " object is also used to represent the empty list, as well as the concept of a missing value. The canonical truth value is the " { $link t } " object."
 { $subsection POSTPONE: f }
 { $subsection t } ;
-
-GLOSSARY: "escape" "a sequence allowing a non-literal character to be inserted in a string. For a list of escapes, see " { $link "escape" } ;
 
 ARTICLE: "syntax-strings" "Character and string syntax"
 "Factor has no distinct character type, however Unicode character value integers can be read by specifying a literal character, or an escaped representation thereof."
