@@ -148,11 +148,11 @@ terminal listener and after bootstrapping only the UI can be used.
 * Source organization
 
   doc/ - the developer's handbook, and various other bits and pieces
-  native/ - sources for the Factor runtime, written in C
-  library/ - sources for the library, written in Factor
   contrib/ - various handy libraries not part of the core
   examples/ - small examples illustrating various language features
   fonts/ - TrueType fonts used by UI
+  library/ - sources for the library, written in Factor
+  vm/ - sources for the Factor runtime, written in C
 
 * Community
 
