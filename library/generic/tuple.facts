@@ -66,7 +66,7 @@ HELP: is? "( obj quot -- ? )"
 { $values { "obj" "an object" } { "quot" "a quotation with stack effect " { $snippet "( obj -- ? )" } } { "?" "a boolean" } }
 { $description "Tests if the object or one of its delegates satisfies the predicate quotation."
 $terpri
-"Class membership test pridicates only test if an object is a direct instance of that class. Sometimes, you need to check delegates, since this gives a clearer picture of what operations the object supports." } ;
+"Class membership test predicates only test if an object is a direct instance of that class. Sometimes, you need to check delegates, since this gives a clearer picture of what operations the object supports." } ;
 
 HELP: >tuple "( seq -- tuple )"
 { $values { "seq" "a sequence" } { "tuple" "a new tuple" } }
