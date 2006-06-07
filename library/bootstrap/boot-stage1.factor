@@ -283,6 +283,7 @@ vectors words ;
         "/doc/handbook/alien.facts"
         "/doc/handbook/changes.facts"
         "/doc/handbook/collections.facts"
+        "/doc/handbook/cookbook.facts"
         "/doc/handbook/dataflow.facts"
         "/doc/handbook/handbook.facts"
         "/doc/handbook/hashtables.facts"

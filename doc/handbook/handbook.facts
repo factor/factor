@@ -1,13 +1,23 @@
 USING: help inspector parser prettyprint ;
 
 ARTICLE: "handbook" "Factor documentation"
-{ $heading "Quick start" }
-"Factor is a dynamically-typed stack based language."
-$terpri
-"Factor is interactive and you are encouraged to experiment with it by entering expressions in the listener. If you are reading this from the Factor UI, you can click on code examples in the documentation to try them out:"
-{ $code "\"Hello, world.\" print" }
-{ $heading "Reference documentation" }
+"Factor is a dynamically-typed stack based language. I hope you like it."
 { $subsection "changes" }
+{ $heading "Survival guide" }
+{ $list
+    { "Load source files using " { $link run-file } ":" }
+    { $code "\"contrib/httpd/load.factor\" run-file" }
+    { { $link .s } " prints the contents of the stack." }
+    { { $link . } " prints the object at the top of the stack." }
+}
+{ $heading "Cookbook" }
+{ $subsection "cookbook-syntax" }
+{ $subsection "cookbook-colon-defs" }
+{ $subsection "cookbook-combinators" }
+{ $subsection "cookbook-variables" }
+{ $subsection "cookbook-vocabs" }
+{ $subsection "cookbook-io" }
+{ $heading "Reference" }
 { $subsection "tools" }
 { $subsection "syntax" }
 { $subsection "dataflow" }

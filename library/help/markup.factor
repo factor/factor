@@ -184,6 +184,13 @@ M: f >link <link> ;
 : $notes ( content -- )
     "Notes" $heading print-element ;
 
+: $curious ( content -- )
+    "For the curious..." $heading print-element ;
+
+: $references ( content -- )
+    "References" $heading
+    unclip print-element [ \ $link swap 2array ] map $list ;
+
 : $shuffle ( content -- )
     drop
     "Shuffle word. Re-arranges the stack according to the stack effect pattern." $description ;

@@ -61,9 +61,9 @@ $terpri
 { $list
     { "Initial stack after parsing begins:" { $snippet "f" } }
     { "Token: " { $snippet "1" } " - stack top: " { $snippet "V{ 1 }" } }
-    { "Token: " { $snippet "[" } " - stack top: " { $snippet "f V{ 1 }" } }
-    { "Token: " { $snippet "2" } " - stack top: " { $snippet "V{ 2 } V{ 1 }" } }
-    { "Token: " { $snippet "3" } " - stack top: " { $snippet "V{ 2 3 } V{ 1 }" } }
+    { "Token: " { $snippet "[" } " - stack top: " { $snippet "V{ 1 } f" } }
+    { "Token: " { $snippet "2" } " - stack top: " { $snippet "V{ 1 } V{ 2 }" } }
+    { "Token: " { $snippet "3" } " - stack top: " { $snippet "V{ 1 } V{ 2 3 }" } }
     { "Token: " { $snippet "]" } " - stack top: " { $snippet "V{ 1 [ 2 3 ] }" } }
     { "Token: " { $snippet "4" } " - stack top: " { $snippet "V{ 1 [ 2 3 ] 4 }" } }
     { "Final stack upon completion:" { $snippet "[ 1 [ 2 3 ] 4 ]" } }
