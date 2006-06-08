@@ -174,6 +174,7 @@ vectors words ;
         "/library/ui/gadgets.factor"
         "/library/ui/layouts.factor"
         "/library/ui/hierarchy.factor"
+        "/library/ui/gadgets/grids.factor"
         "/library/ui/gadgets/frames.factor"
         "/library/ui/world.factor"
         "/library/ui/paint.factor"

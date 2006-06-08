@@ -34,7 +34,6 @@ IN: gadgets
     dup gadget-relayout?
     [ drop ] [ dup invalidate add-invalid ] if ;
 
-
 : show-gadget t over set-gadget-visible? relayout-1 ;
 
 : hide-gadget f over set-gadget-visible? relayout-1 ;

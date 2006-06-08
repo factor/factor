@@ -61,7 +61,6 @@
 - help search
 - automatically update help graph when adding/removing articles/words
 - document conventions
-- new turtle graphics tutorial
 
 + ui:
 
