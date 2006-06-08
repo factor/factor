@@ -38,7 +38,7 @@ C: tabs dup delegate>frame ;
     {
         { [ <book> tuck ] set-tabs-book @center }
         { [ make-tabs ] set-tabs-buttons @top }
-    } build-frame ;
+    } build-grid ;
 
 : set-pages ( obj assoc tabs -- )
     >r flip first2 swapd [ make-pane <scroller> ] map-with

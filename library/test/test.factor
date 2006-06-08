@@ -80,8 +80,7 @@ SYMBOL: failures
         "math/complex" "math/irrational"
         "math/integer" "math/random" "threads" "parsing-word"
         "inference" "interpreter" "alien"
-        "gadgets/line-editor" "gadgets/rectangles"
-        "gadgets/frames" "memory"
+        "gadgets/line-editor" "gadgets/rectangles" "memory"
         "redefine" "annotate" "binary" "inspector"
         "kernel"
     } run-tests ;

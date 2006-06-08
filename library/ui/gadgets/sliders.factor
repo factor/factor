@@ -131,7 +131,7 @@ M: elevator layout* ( elevator -- )
         { [ <left-button> ] f @left }
         { [ { 0 1 0 } <elevator> ] set-slider-elevator @center }
         { [ <right-button> ] f @right }
-    } build-frame ;
+    } build-grid ;
 
 : <up-button> { 1 0 0 } arrow-up -1 <slide-button> ;
 : <down-button> { 1 0 0 } arrow-down 1 <slide-button> ;
@@ -141,7 +141,7 @@ M: elevator layout* ( elevator -- )
         { [ <up-button> ] f @top }
         { [ { 1 0 0 } <elevator> ] set-slider-elevator @center }
         { [ <down-button> ] f @bottom }
-    } build-frame ;
+    } build-grid ;
 
 : add-thumb ( slider vector -- )
     <thumb> swap 2dup slider-elevator add-gadget

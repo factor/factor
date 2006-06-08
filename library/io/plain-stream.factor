@@ -1,5 +1,8 @@
+! Copyright (C) 2005, 2006 Slava Pestov.
+! See http://factorcode.org/license.txt for BSD license.
 IN: io
-USING: generic hashtables kernel namespaces sequences styles ;
+USING: generic hashtables kernel math namespaces sequences
+strings styles ;
 
 TUPLE: plain-writer ;
 

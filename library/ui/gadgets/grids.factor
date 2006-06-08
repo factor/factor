@@ -1,7 +1,7 @@
 ! Copyright (C) 2006 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 IN: gadgets
-USING: arrays kernel math sequences ;
+USING: arrays kernel math namespaces sequences words ;
 
 TUPLE: grid children ;
 
@@ -62,3 +62,14 @@ M: grid pref-dim* ( frame -- dim )
 
 M: grid layout* ( frame -- dim )
     grid-children dup compute-grid grid-layout ;
+
+: grid-add-spec ( { quot setter loc } -- )
+    first3 >r >r call
+    grid get 2dup r> dup [ execute ] [ 3drop ] if
+    r> execute grid-add ;
+
+: build-grid ( grid specs -- )
+    #! Specs is an array of triples { quot setter loc }.
+    #! The setter has stack effect ( new gadget -- ),
+    #! the loc is @center, @top, etc.
+    [ swap grid set [ grid-add-spec ] each ] with-scope ;

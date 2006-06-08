@@ -23,6 +23,9 @@ SYMBOL: stdio
 : with-nesting ( style quot -- )
     swap stdio get with-nested-stream ;
 
+: tabular-output ( grid quot -- )
+    swap stdio get with-stream-table ;
+
 : print ( string -- ) stdio get stream-print ;
 
 : with-stream* ( stream quot -- )

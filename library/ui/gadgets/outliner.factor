@@ -21,7 +21,7 @@ TUPLE: outliner quot ;
 
 : outliner-expanded? ( outliner -- ? )
     #! If the outliner is expanded, it has a center gadget.
-    @center frame-child >boolean ;
+    @center grid-child >boolean ;
 
 : find-outliner ( gadget -- outliner )
     [ outliner? ] find-parent ;
@@ -38,14 +38,14 @@ DEFER: set-outliner-expanded?
     >r <expand-arrow> r> <highlight-button> ;
 
 : setup-expand ( expanded? outliner -- )
-    >r not <expand-button> r> @top-left frame-add ;
+    >r not <expand-button> r> @top-left grid-add ;
 
 : setup-center ( expanded? outliner -- )
     [ swap [ outliner-quot make-pane ] [ drop f ] if ] keep
-    @center frame-add ;
+    @center grid-add ;
 
 : setup-guide ( expanded? outliner -- )
-    >r [ <guide-gadget> ] [ f ] if r> @left frame-add ;
+    >r [ <guide-gadget> ] [ f ] if r> @left grid-add ;
 
 : set-outliner-expanded? ( expanded? outliner -- )
     #! Call the expander quotation if expanding.
@@ -55,5 +55,5 @@ C: outliner ( gadget quot -- gadget )
     #! The quotation generates child gadgets.
     dup delegate>frame
     [ set-outliner-quot ] keep
-    [ >r 1array make-shelf r> @top frame-add ] keep
+    [ >r 1array make-shelf r> @top grid-add ] keep
     f over set-outliner-expanded? ;

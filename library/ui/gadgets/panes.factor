@@ -144,3 +144,7 @@ M: pane stream-close ( pane -- ) drop ;
 : make-pane ( quot -- pane )
     #! Execute the quotation with output to an output-only pane.
     <pane> [ swap with-pane ] keep ; inline
+
+M: pane with-stream-table ( quot grid pane -- )
+    >r [ [ swap make-pane ] map-with ] map-with <grid>
+    r> write-gadget ;

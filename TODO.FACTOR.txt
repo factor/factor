@@ -7,9 +7,7 @@
 ]
 
 - if a primitive throws an error, :c doesn't show the call frame there
-- running all help entries:
-  - without a yield UI runs out of memory
-  - leaves array array on the stack
+- "benchmark/help": without a yield UI runs out of memory
 - x11 title bars are funny
 + httpd:
   - outliners don't work
@@ -39,11 +37,9 @@
   - better line spacing in ui and html - related issue
 
 + tabular formatting in UI
-  - inspector
-    - how does this interact with outliner?
   - $values
   - other help aspects
-  - grid layout
+  - setting grid gap
 
 + fix compiled gc check
   - there was a performance hit, investigate

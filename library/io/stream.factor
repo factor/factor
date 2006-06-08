@@ -4,17 +4,18 @@ IN: io
 USING: errors hashtables generic kernel math namespaces
 sequences strings ;
 
-GENERIC: stream-close  ( stream -- )
-GENERIC: set-timeout   ( timeout stream -- )
+GENERIC: stream-close ( stream -- )
+GENERIC: set-timeout ( timeout stream -- )
 GENERIC: stream-readln ( stream -- string )
-GENERIC: stream-read1  ( stream -- char/f )
-GENERIC: stream-read   ( count stream -- string )
+GENERIC: stream-read1 ( stream -- char/f )
+GENERIC: stream-read ( count stream -- string )
 GENERIC: stream-write1 ( char stream -- )
-GENERIC: stream-write  ( string stream -- )
-GENERIC: stream-flush  ( stream -- )
+GENERIC: stream-write ( string stream -- )
+GENERIC: stream-flush ( stream -- )
 GENERIC: stream-terpri ( stream -- )
 GENERIC: stream-format ( string style stream -- )
 GENERIC: with-nested-stream ( quot style stream -- )
+GENERIC: with-stream-table ( quot grid stream -- )
 
 : stream-print ( string stream -- )
     [ stream-write ] keep stream-terpri ;

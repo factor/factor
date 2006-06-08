@@ -32,23 +32,11 @@ C: frame ( -- frame )
     tuck second (fill-center) first (fill-center) ;
 
 M: frame layout* ( frame -- dim )
-    dup grid-children swap rect-dim
-    >r compute-grid 2dup r>
-    fill-center grid-layout ;
-
-: frame-add-spec ( { quot setter loc } -- )
-    first3 >r >r call
-    frame get 2dup r> dup [ execute ] [ 3drop ] if
-    r> execute frame-add ;
-
-: build-frame ( frame specs -- )
-    #! Specs is an array of triples { quot setter loc }.
-    #! The setter has stack effect ( new gadget -- ),
-    #! the loc is @center, @top, etc.
-    [ swap frame set [ frame-add-spec ] each ] with-scope ;
+    [ grid-children dup compute-grid 2dup ] keep
+    rect-dim fill-center grid-layout ;
 
 : make-frame ( specs -- gadget )
-    <frame> [ swap build-frame ] keep ;
+    <frame> [ swap build-grid ] keep ;
 
 : make-frame* ( gadget specs -- gadget )
-    over [ delegate>frame build-frame ] keep ;
+    over [ delegate>frame build-grid ] keep ;

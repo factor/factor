@@ -66,27 +66,11 @@ M: input summary ( input -- )
     "Input: " swap input-string
     dup string? [ unparse-short ] unless append ;
 
-: format-column ( list ? -- list )
-    >r [ unparse-short ] map r> [
-        [ 0 [ length max ] reduce ] keep
-        [ swap CHAR: \s pad-right ] map-with
-    ] unless ;
-
-: format-sheet ( sheet -- list )
-    #! We use an idiom to notify format-column if it is
-    #! formatting the last column.
-    dup length <reversed> [ zero? format-column ] 2map
-    flip [ " " join ] map ;
-
 DEFER: describe
 
 : sheet. ( sheet -- )
-    dup empty? [
-        drop
-    ] [
-        dup format-sheet swap peek
-        [ dup [ describe ] curry simple-outliner terpri ] 2each
-    ] if ;
+    flip
+    [ dup unparse-short swap simple-object ] tabular-output ;
 
 : describe ( object -- ) dup summary print sheet sheet. ;
 
