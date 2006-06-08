@@ -1,7 +1,7 @@
 ! Copyright (C) 2006 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 IN: gadgets
-USING: arrays gadgets-panes kernel math sequences ;
+USING: arrays kernel math sequences ;
 
 TUPLE: grid children ;
 
@@ -62,6 +62,3 @@ M: grid pref-dim* ( frame -- dim )
 
 M: grid layout* ( frame -- dim )
     grid-children dup compute-grid grid-layout ;
-
-: pane-grid ( quot grid -- gadget )
-    [ [ swap make-pane ] map-with ] map-with <grid> ;
