@@ -154,10 +154,12 @@ M: f >link <link> ;
 : $see-also ( content -- )
     "See also" $heading [ 1array $link ] textual-list ;
 
+: $table ( content -- ) [ print-element ] tabular-output ;
+
 : $values ( content -- )
     "Arguments and values" $heading
-    [ unclip $snippet " -- " format* print-element ]
-    [ terpri ] interleave ;
+    [ first2 >r \ $snippet swap 2array r> 2array ] map
+    $table ;
 
 : $predicate ( content -- )
     { { "object" "an object" } } $values
@@ -167,12 +169,7 @@ M: f >link <link> ;
         " class." ,
     ] { } make $description ;
 
-: $list ( content -- )
-    [
-        [
-            list-element-style [ print-element ] with-nesting*
-        ] ($block)
-    ] each ;
+: $list ( content -- ) [  "-" swap 2array ] map $table ;
 
 : $errors ( content -- )
     "Errors" $heading print-element ;

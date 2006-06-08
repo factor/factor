@@ -168,16 +168,16 @@ ARTICLE: "syntax-strings" "Character and string syntax"
 "Strings are documented in " { $link "strings" } "." ;
 
 ARTICLE: "escape" "Character escape codes"
-"The following escape codes may be used:"
-{ $list
-    { { $snippet "\\\\" } " - " { $snippet "\\" } }
-    { { $snippet "\\s" } " - a space" }
-    { { $snippet "\\t" } " - a tab" }
-    { { $snippet "\\n" } " - a newline" }
-    { { $snippet "\\r" } " - a carriage return" }
-    { { $snippet "\\0" } " - a null byte (ASCII 0)" }
-    { { $snippet "\\e" } " - escape (ASCII 27)" }
-    { { $snippet "\\\"" } " - " { $snippet "\"" } }
+{ $table
+    { "Escape code" "Meaning" }
+    { { $snippet "\\\\" } { $snippet "\\" } }
+    { { $snippet "\\s" } "a space" }
+    { { $snippet "\\t" } "a tab" }
+    { { $snippet "\\n" } "a newline" }
+    { { $snippet "\\r" } "a carriage return" }
+    { { $snippet "\\0" } "a null byte (ASCII 0)" }
+    { { $snippet "\\e" } "escape (ASCII 27)" }
+    { { $snippet "\\\"" } { $snippet "\"" } }
 }
 "A Unicode character can be specified by its code number by writing " { $snippet "\\u" } " followed by a four-digit hexadecimal number. That is, the following two expressions are equivalent:"
 { $code

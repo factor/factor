@@ -296,7 +296,6 @@ vectors words ;
         "/doc/handbook/streams.facts"
         "/doc/handbook/syntax.facts"
         "/doc/handbook/tools.facts"
-        "/doc/handbook/tutorial.facts"
         "/doc/handbook/words.facts"
     } [ parse-resource* % ] each
     

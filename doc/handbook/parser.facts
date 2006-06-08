@@ -44,11 +44,12 @@ ARTICLE: "parsing-word-nest" "Nested structure"
 "The first thing to look at is how the parse tree is built. When parsing begins, " { $link f } " is pushed on the data stack; when a new object is parsed, " { $link ?push } " is called to add it to the parse tree. The first call to " { $link ?push } " creates a new one-element vector, and subsequent calls add elements to the end of this vector. When parsing is complete, the vector is converted into a quotation."
 $terpri
 "Lets look at a simple example; the parsing of " { $snippet "1 2 3" } ":"
-{ $list
-    { "Initial stack after parsing begins:" { $snippet "f" } }
-    { "Token: " { $snippet "1" } " - stack top: " { $snippet "V{ 1 }" } }
-    { "Token: " { $snippet "2" } " - stack top: " { $snippet "V{ 1 2 }" } }
-    { "Token: " { $snippet "3" } " - stack top: " { $snippet "V{ 1 2 3 }" } }
+{ $table
+    { "Action" "Stack" }
+    { "Initial stack after parsing begins" { $snippet "f" } }
+    { { "Token: " { $snippet "1" } } { $snippet "V{ 1 }" } }
+    { { "Token: " { $snippet "2" } } { $snippet "V{ 1 2 }" } }
+    { { "Token: " { $snippet "3" } } { $snippet "V{ 1 2 3 }" } }
     { "Final stack upon completion:" { $snippet "[ 1 2 3 ]" } }
 }
 "Nested structure is a bit more involved. The basic idea is that parsing words can push " { $link f } " on the stack to begin a new level of nesting, then all subsequent objects are pushed onto this sequence, until another parsing word adds this sequence to the vector underneath."
@@ -58,15 +59,16 @@ $terpri
 { $subsection POSTPONE: ] }
 "Let us ponder, then, how one particular string will parse:"
 { $snippet "\"1 [ 2 3 ] 4\"" }
-{ $list
-    { "Initial stack after parsing begins:" { $snippet "f" } }
-    { "Token: " { $snippet "1" } " - stack top: " { $snippet "V{ 1 }" } }
-    { "Token: " { $snippet "[" } " - stack top: " { $snippet "V{ 1 } f" } }
-    { "Token: " { $snippet "2" } " - stack top: " { $snippet "V{ 1 } V{ 2 }" } }
-    { "Token: " { $snippet "3" } " - stack top: " { $snippet "V{ 1 } V{ 2 3 }" } }
-    { "Token: " { $snippet "]" } " - stack top: " { $snippet "V{ 1 [ 2 3 ] }" } }
-    { "Token: " { $snippet "4" } " - stack top: " { $snippet "V{ 1 [ 2 3 ] 4 }" } }
-    { "Final stack upon completion:" { $snippet "[ 1 [ 2 3 ] 4 ]" } }
+{ $table
+    { "Action" "Stack" }
+    { "Initial stack after parsing begins" { $snippet "f" } }
+    { { "Token: " { $snippet "1" } } { $snippet "V{ 1 }" } }
+    { { "Token: " { $snippet "[" } } { $snippet "V{ 1 } f" } }
+    { { "Token: " { $snippet "2" } } { $snippet "V{ 1 } V{ 2 }" } }
+    { { "Token: " { $snippet "3" } } { $snippet "V{ 1 } V{ 2 3 }" } }
+    { { "Token: " { $snippet "]" } } { $snippet "V{ 1 [ 2 3 ] }" } }
+    { { "Token: " { $snippet "4" } } { $snippet "V{ 1 [ 2 3 ] 4 }" } }
+    { "Final stack upon completion" { $snippet "[ 1 [ 2 3 ] 4 ]" } }
 }
 "Notice how in the definition of the quotation parsing words, the final word " { $link POSTPONE: ] } " does all the work. A closely related set of parsing words for reading various other literal types implements another useful idiom."
 $terpri

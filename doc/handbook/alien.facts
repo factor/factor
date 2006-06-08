@@ -60,19 +60,20 @@ $terpri
 
 ARTICLE: "c-types-numeric" "Integer and floating point C types"
 "The following numerical types are available; a " { $snippet "u" } " prefix denotes an unsigned type:"
-{ $list
-    { { $snippet "char" } " - always 1 byte" }
+{ $table
+    { "C type" "Notes" }
+    { { $snippet "char" } "always 1 byte" }
     { $snippet "uchar" }
-    { { $snippet "short" } " - always 2 bytes" }
+    { { $snippet "short" } "always 2 bytes" }
     { $snippet "ushort" }
-    { { $snippet "int" } " - always 4 bytes" }
+    { { $snippet "int" } "always 4 bytes" }
     { $snippet "uint" }
-    { { $snippet "long" } " - same size as CPU word size and " { $snippet "void*" } ", except on 64-bit Windows, where it is 4 bytes" }
-    { $snippet "ulong" }
-    { { $snippet "longlong" } " - always 8 bytes" }
-    { $snippet "ulonglong" }
-    { $snippet "float" }
-    { { $snippet "double" } " - same format as " { $link float } " objects" }
+    { { $snippet "long" } { "same size as CPU word size and " { $snippet "void*" } ", except on 64-bit Windows, where it is 4 bytes" } }
+    { { $snippet "ulong" } { }
+    { { $snippet "longlong" } "always 8 bytes" }
+    { { $snippet "ulonglong" } { }
+    { { $snippet "float" } { } }
+    { { $snippet "double" } "same format as " { $link float } " objects" }
 }
 "When making alien calls, Factor numbers are converted to and from the above types in a canonical way. Converting a Factor number to a C value may result in a loss of precision."
 $terpri
@@ -113,9 +114,10 @@ $terpri
 
 ARTICLE: "c-types-strings" "C string types"
 "The C library interface defines two types of C strings:"
-{ $list
-    { { $snippet "char*" } " - 8-bit per character null-terminated ASCII" }
-    { { $snippet "ushort*" } " - 16-bit per character null-terminated UTF16" }
+{ $table
+    { "C type" "Notes" }
+    { { $snippet "char*" } "8-bit per character null-terminated ASCII" }
+    { { $snippet "ushort*" } "16-bit per character null-terminated UTF16" }
 }
 "Passing an instance of " { $link c-ptr } " to a C function expecting a C string will simply pass in the address of the " { $link c-ptr } "."
 $terpri

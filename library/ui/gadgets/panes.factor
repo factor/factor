@@ -141,5 +141,6 @@ M: pane stream-close ( pane -- ) drop ;
     <pane> [ swap with-pane ] keep ; inline
 
 M: pane with-stream-table ( quot grid pane -- )
-    >r [ [ swap make-pane ] map-with ] map-with <grid>
+    >r [ [ swap make-pane ] map-with ] map-with
+    <grid> 5 over set-grid-gap
     r> [ write-gadget ] keep stream-terpri ;

@@ -9,26 +9,31 @@ sequences strings vectors words ;
 
 ! Printing an overview of heap usage.
 
-: kb.
-    1024 /i number>string
-    6 CHAR: \s pad-left  write
-    " KB" write ;
+: total/used/free, ( free total str -- )
+    [
+        ,
+        dup number>string ,
+        over - number>string ,
+        number>string ,
+    ] { } make , ;
 
-: (room.) ( free total -- )
-    2dup swap - swap ( free used total )
-    kb. " total " write
-    kb. " used " write
-    kb. " free" print ;
+: total, ( n str -- )
+    [ , number>string , "" , "" , ] { } make , ;
+
+: room-table ( -- table )
+    room [
+        { "" "Total" "Used" "Free" } ,
+        0 [
+            "Generation " pick number>string append
+            >r first2 r> total/used/free, 1+
+        ] reduce drop
+        "Semi-space" total,
+        "Cards" total,
+        "Code space" total/used/free,
+    ] [ ] make ;
 
 : room. ( -- )
-    room
-    0 swap [
-        "Generation " write over pprint ":" write
-        first2 (room.) 1+
-    ] each drop
-    "Semi-space:  " write kb. terpri
-    "Cards:       " write kb. terpri
-    "Code space:  " write (room.) ;
+    room-table [ write ] tabular-output ;
 
 ! Some words for iterating through the heap.
 
@@ -76,13 +81,12 @@ M: object each-slot ( obj quot -- )
     H{ } clone H{ } clone
     [ >r 2dup r> heap-stat-step ] each-object ;
 
-: heap-stat. ( instances bytes class -- )
-    pprint ": " write
-    pprint " bytes, " write
-    pprint " instances" print ;
-
 : heap-stats. ( -- )
     heap-stats dup hash-keys natural-sort [
-        ( hash hash key -- )
-        [ [ pick hash ] keep pick hash ] keep heap-stat.
-    ] each 2drop ;
+        { "Class" "Bytes" "Instances" } ,
+        [
+            ( hash hash key -- )
+            [ dup , dup pick hash , pick hash , ] { } make ,
+        ] each 2drop
+    ] { } make
+    [ dup string? [ write ] [ pprint ] if ] tabular-output ;

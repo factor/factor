@@ -36,10 +36,15 @@ C: grid ( children -- grid )
 : with-grid ( grid quot -- | quot: horiz vert -- )
     [ >r grid set compute-grid r> call ] with-scope ; inline
 
-: +gap+ + grid get grid-gap + ;
+: gap grid get grid-gap ;
 
 M: grid pref-dim* ( grid -- dim )
-    [ [ 0 [ +gap+ ] reduce ] 2apply 0 3array ] with-grid ;
+    [
+        [
+            [ 0 [ + ] reduce ] keep length
+            1- 0 max gap * +
+        ] 2apply 0 3array
+    ] with-grid ;
 
 : pair-up ( horiz vert -- dims )
     [ swap [ swap 0 3array ] map-with ] map-with ;
@@ -50,7 +55,7 @@ M: grid pref-dim* ( grid -- dim )
     ] 2each drop ; inline
 
 : position-grid ( horiz vert -- )
-    [ 0 [ +gap+ ] accumulate ] 2apply
+    [ 0 [ + gap + ] accumulate ] 2apply
     pair-up [ set-rect-loc ] do-grid ;
 
 : resize-grid ( horiz vert -- )
