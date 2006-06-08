@@ -1,4 +1,5 @@
 USING: alien arrays help libc math ;
+
 ARTICLE: "alien" "C library interface"
 "Factor can directly call C functions in native libraries. It is also possible to compile callbacks which run Factor code, and pass them to native libraries as function pointers."
 $terpri
@@ -57,7 +58,6 @@ $terpri
 { $subsection "c-structs" }
 { $subsection "c-unions" } ;
 
-
 ARTICLE: "c-types-numeric" "Integer and floating point C types"
 "The following numerical types are available; a " { $snippet "u" } " prefix denotes an unsigned type:"
 { $table
@@ -69,9 +69,9 @@ ARTICLE: "c-types-numeric" "Integer and floating point C types"
     { { $snippet "int" } "always 4 bytes" }
     { $snippet "uint" }
     { { $snippet "long" } { "same size as CPU word size and " { $snippet "void*" } ", except on 64-bit Windows, where it is 4 bytes" } }
-    { { $snippet "ulong" } { }
+    { { $snippet "ulong" } { } }
     { { $snippet "longlong" } "always 8 bytes" }
-    { { $snippet "ulonglong" } { }
+    { { $snippet "ulonglong" } { } }
     { { $snippet "float" } { } }
     { { $snippet "double" } "same format as " { $link float } " objects" }
 }

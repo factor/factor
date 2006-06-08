@@ -151,8 +151,11 @@ M: f >link <link> ;
 : $definition ( content -- )
     "Definition" $heading $see ;
 
+: $links ( content -- )
+    [ 1array $link ] textual-list ;
+
 : $see-also ( content -- )
-    "See also" $heading [ 1array $link ] textual-list ;
+    "See also" $heading $links ;
 
 : $table ( content -- ) [ print-element ] tabular-output ;
 

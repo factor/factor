@@ -18,6 +18,7 @@ ARTICLE: "handbook" "Factor documentation"
 { $subsection "cookbook-vocabs" }
 { $subsection "cookbook-io" }
 { $heading "Reference" }
+{ $subsection "conventions" }
 { $subsection "tools" }
 { $subsection "syntax" }
 { $subsection "dataflow" }

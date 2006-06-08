@@ -36,9 +36,7 @@
     - fix remaining HTML stream issues
     - need to present $list in a useful way
   - better line spacing in ui and html - related issue
-
-+ tabular formatting in UI
-  - other help aspects
+- fix word wrap with tables in panes
 
 + fix compiled gc check
   - there was a performance hit, investigate
@@ -55,7 +53,6 @@
 - document that can <void*> only be called with an alien
 - help search
 - automatically update help graph when adding/removing articles/words
-- document conventions
 
 + ui:
 

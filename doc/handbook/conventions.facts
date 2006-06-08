@@ -1,0 +1,34 @@
+USING: arrays gadgets hashtables help io kernel-internals
+namespaces sequences ;
+
+ARTICLE: "conventions" "Conventions"
+"Various conventions are used throughout the Factor documentation and source code."
+{ $heading "Stack effect conventions" }
+"A stack effect comment lists word inputs and outputs, separated by " { $snippet "--" } ". Stack elements are ordered so that the top of the stack is on the right side. Each value can be named by a data type or description. The following are some examples of value names:"
+{ $table
+    { { { $snippet "?" } } "a boolean" }
+    { { { $snippet "elt" } } "an object which is an element of a sequence" }
+    { { { $snippet "m" } ", " { $snippet "n" } } "an integer" }
+    { { { $snippet "obj" } } "an object" }
+    { { { $snippet "quot" } } "a quotation" }
+    { { { $snippet "seq" } } "a sequence" }
+    { { { $snippet "str" } } "a string" }
+    { { { $snippet "x" } ", " { $snippet "y" } ", " { $snippet "z" } } "a number" }
+    { { { $snippet "{ " { $emphasis "a b c" } " }" } } "an array with specific length and elements" }
+}
+{ $heading "Word naming conventions" }
+"These conventions are not hard and fast, but are usually a good first step in understanding a word's behavior:"
+{ $table
+    { "General form" "Description" "Examples" }
+    { { $snippet { $emphasis "foo" } "?" } "outputs a boolean" { { $link empty? } } }
+    { { $snippet "?" { $emphasis "foo" } } { "conditionally performs " { $snippet { $emphasis "foo" } } } { { $links ?nth ?hash } } }
+    { { $snippet "<" { $emphasis "foo" } ">" } { "creates a new " { $snippet "foo" } } { { $link <array> } } }
+    { { $snippet { $emphasis "foo" } "*" } { "alternative form of " { $snippet "foo" } ", or a generic word called by " { $snippet "foo" } } { { $links hash* draw-gadget* } } }
+    { { $snippet "(" { $emphasis "foo" } ")" } { "implementation detail word used by " { $snippet "foo" } } { { $link (clone) } } }
+    { { $snippet "n" { $emphasis "foo" } } { "(sequence words only) performs " { $snippet "foo" } " but modifies an input sequence instead of creating a new sequence" } { { $links nappend nsort } } }
+    { { $snippet "set-" { $emphasis "foo" } } { "sets " { $snippet "foo" } " to a new value" } { set-length } }
+    { { $snippet { $emphasis "foo" } "-" { $emphasis "bar" } } { "(tuple accessors) outputs the value of the " { $snippet "bar" } " slot of the " { $snippet "foo" } " at the top of the stack" } { } }
+    { { $snippet "set-" { $emphasis "foo" } "-" { $emphasis "bar" } } { "(tuple mutators) sets the value of the " { $snippet "bar" } " slot of the " { $snippet "foo" } " at the top of the stack" } { } }
+    { { $snippet "with-" { $emphasis "foo" } } { "performs some kind of initialization and cleanup related to " { $snippet "foo" } ", usually in a new dynamic scope" } { $links with-scope with-stream } }
+    { { $snippet "$" { $emphasis "foo" } } { "help markup" } { $links $heading $emphasis } }
+} ;
