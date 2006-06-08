@@ -1,16 +1,11 @@
-! Copyright (C) 2005 Slava Pestov.
-! See http://factor.sf.net/license.txt for BSD license.
+! Copyright (C) 2005, 2006 Slava Pestov.
+! See http://factorcode.org/license.txt for BSD license.
 IN: gadgets-panes
 USING: arrays gadgets gadgets-buttons gadgets-editors
-gadgets-labels gadgets-scrolling gadgets-theme
-generic hashtables io kernel line-editor math namespaces
-prettyprint sequences strings styles threads ;
+gadgets-frames gadgets-grids gadgets-labels gadgets-scrolling
+gadgets-theme generic hashtables io kernel line-editor math
+namespaces prettyprint sequences strings styles threads ;
 
-! A pane is an area that can display text.
-
-! output: pile
-! current: shelf
-! input: editor
 TUPLE: pane output active current input prototype continuation ;
 
 : add-output 2dup set-pane-output add-gadget ;
@@ -147,4 +142,4 @@ M: pane stream-close ( pane -- ) drop ;
 
 M: pane with-stream-table ( quot grid pane -- )
     >r [ [ swap make-pane ] map-with ] map-with <grid>
-    r> write-gadget ;
+    r> [ write-gadget ] keep stream-terpri ;

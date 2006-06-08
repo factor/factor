@@ -1,7 +1,8 @@
 ! Copyright (C) 2005, 2006 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-IN: gadgets
-USING: arrays generic kernel math namespaces sequences words ;
+IN: gadgets-frames
+USING: arrays gadgets gadgets-grids generic kernel math
+namespaces sequences words ;
 
 ! A frame arranges gadgets in a 3x3 grid, where the center
 ! gadgets gets left-over space.
@@ -32,8 +33,9 @@ C: frame ( -- frame )
     tuck second (fill-center) first (fill-center) ;
 
 M: frame layout* ( frame -- dim )
-    [ grid-children dup compute-grid 2dup ] keep
-    rect-dim fill-center grid-layout ;
+    dup [
+        [ rot rect-dim fill-center ] 2keep grid-layout
+    ] with-grid ;
 
 : make-frame ( specs -- gadget )
     <frame> [ swap build-grid ] keep ;

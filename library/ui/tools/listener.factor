@@ -1,11 +1,11 @@
 ! Copyright (C) 2005, 2006 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 IN: gadgets-listener
-USING: arrays gadgets gadgets-editors gadgets-labels
-gadgets-panes gadgets-presentations gadgets-scrolling
-gadgets-theme generic hashtables inspector io jedit kernel
-listener math namespaces parser prettyprint sequences styles
-threads words ;
+USING: arrays gadgets gadgets-editors gadgets-frames
+gadgets-labels gadgets-panes gadgets-presentations
+gadgets-scrolling gadgets-theme generic hashtables inspector io
+jedit kernel listener math namespaces parser prettyprint
+sequences styles threads words ;
 
 TUPLE: listener-gadget scroller stack ;
 

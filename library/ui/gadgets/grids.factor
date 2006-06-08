@@ -1,9 +1,9 @@
 ! Copyright (C) 2006 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-IN: gadgets
-USING: arrays kernel math namespaces sequences words ;
+IN: gadgets-grids
+USING: arrays gadgets kernel math namespaces sequences words ;
 
-TUPLE: grid children ;
+TUPLE: grid children gap ;
 
 : collapse-grid concat [ ] subset ;
 
@@ -12,7 +12,9 @@ TUPLE: grid children ;
     >r collapse-grid r> add-gadgets ;
 
 C: grid ( children -- grid )
-    dup delegate>gadget [ set-grid-children* ] keep ;
+    dup delegate>gadget
+    [ set-grid-children* ] keep
+    0 over set-grid-gap ;
 
 : grid-child ( grid i j -- gadget ) rot grid-children nth nth ;
 
@@ -23,45 +25,42 @@ C: grid ( children -- grid )
 : grid-remove ( grid i j -- )
     >r >r >r f r> r> r> grid-add ;
 
-: reduce-grid [ max-dim ] map ;
-
-: grid-pref-dim ( dims -- dim )
-    reduce-grid { 0 0 0 } [ v+ ] reduce ;
-
-: pref-dim-grid ( children -- dims )
+: pref-dim-grid ( -- dims )
+    grid get grid-children
     [ [ [ pref-dim ] [ { 0 0 0 } ] if* ] map ] map ;
 
-M: grid pref-dim* ( frame -- dim )
-    grid-children pref-dim-grid
-    dup flip grid-pref-dim first
-    swap grid-pref-dim second
-    0 3array ;
+: compute-grid ( -- horiz vert )
+    pref-dim-grid
+    dup flip [ max-dim first ] map swap [ max-dim second ] map ;
+
+: with-grid ( grid quot -- | quot: horiz vert -- )
+    [ >r grid set compute-grid r> call ] with-scope ; inline
+
+: +gap+ + grid get grid-gap + ;
+
+M: grid pref-dim* ( grid -- dim )
+    [ [ 0 [ +gap+ ] reduce ] 2apply 0 3array ] with-grid ;
 
 : pair-up ( horiz vert -- dims )
     [ swap [ swap 0 3array ] map-with ] map-with ;
 
-: do-grid ( children dims quot -- )
-    -rot swap [
+: do-grid ( dims quot -- )
+    swap grid get grid-children [
         [ dup [ pick call ] [ 2drop ] if ] 2each
     ] 2each drop ; inline
 
-: position-grid ( children horiz vert -- )
-    [ 0 [ + ] accumulate ] 2apply
+: position-grid ( horiz vert -- )
+    [ 0 [ +gap+ ] accumulate ] 2apply
     pair-up [ set-rect-loc ] do-grid ;
 
-: resize-grid ( children horiz vert -- )
+: resize-grid ( horiz vert -- )
     pair-up [ set-gadget-dim ] do-grid ;
 
-: grid-layout ( children horiz vert -- )
-    3dup position-grid resize-grid ;
-
-: compute-grid ( children -- horiz vert )
-    pref-dim-grid
-    dup flip reduce-grid [ first ] map
-    swap reduce-grid [ second ] map ;
+: grid-layout ( horiz vert -- )
+    2dup position-grid resize-grid ;
 
 M: grid layout* ( frame -- dim )
-    grid-children dup compute-grid grid-layout ;
+    [ grid-layout ] with-grid ;
 
 : grid-add-spec ( { quot setter loc } -- )
     first3 >r >r call

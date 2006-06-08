@@ -89,14 +89,14 @@ TUPLE: pack align fill gap ;
 : packed-dims ( gadget sizes -- seq )
     2dup packed-dim-2 swap orient ;
 
-: packed-loc-1 ( gadget sizes -- seq )
-    { 0 0 0 } [ v+ over pack-gap v+ ] accumulate nip ;
+: gap-locs ( gap sizes -- seq )
+    { 0 0 0 } [ v+ over v+ ] accumulate nip ;
 
-: packed-loc-2 ( gadget sizes -- seq )
+: aligned-locs ( gadget sizes -- seq )
     [ >r dup pack-align swap rect-dim r> v- n*v ] map-with ;
 
 : packed-locs ( gadget sizes -- seq )
-    2dup packed-loc-1 >r dupd packed-loc-2 r> orient ;
+    over pack-gap over gap-locs >r dupd aligned-locs r> orient ;
 
 : packed-layout ( gadget sizes -- )
     over gadget-children
@@ -121,12 +121,13 @@ C: pack ( vector -- pack )
 
 : <shelf> ( -- pack ) { 1 0 0 } <pack> ;
 
+: gap-dims ( gap sizes -- seeq )
+    [ { 0 0 0 } [ v+ ] reduce ] keep
+    length 1- 0 max rot n*v v+ ;
+
 : pack-pref-dim ( children gadget -- dim )
-    [
-        >r [ max-dim ] keep
-        [ { 0 0 0 } [ v+ ] reduce ] keep length 1 - 0 max
-        r> pack-gap n*v v+
-    ] keep gadget-orientation set-axis ;
+    [ >r [ max-dim ] keep r> pack-gap swap gap-dims ] keep
+    gadget-orientation set-axis ;
 
 M: pack pref-dim* ( pack -- dim )
     [ gadget-children pref-dims ] keep pack-pref-dim ;

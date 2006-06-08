@@ -1,9 +1,9 @@
-! Copyright (C) 2005 Slava Pestov.
-! See http://factor.sf.net/license.txt for BSD license.
+! Copyright (C) 2005, 2006 Slava Pestov.
+! See http://factorcode.org/license.txt for BSD license.
 IN: gadgets-outliner
 USING: arrays gadgets gadgets-borders gadgets-buttons
-gadgets-labels gadgets-panes gadgets-theme generic io kernel
-math opengl sequences styles ;
+gadgets-frames gadgets-grids gadgets-labels gadgets-panes
+gadgets-theme generic io kernel math opengl sequences styles ;
 
 ! Vertical line.
 TUPLE: guide color ;

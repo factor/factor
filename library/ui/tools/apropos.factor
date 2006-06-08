@@ -1,6 +1,9 @@
+! Copyright (C) 2006 Slava Pestov.
+! See http://factorcode.org/license.txt for BSD license.
 IN: gadgets-apropos
-USING: gadgets gadgets-editors gadgets-labels gadgets-panes
-gadgets-scrolling gadgets-theme generic inspector kernel ;
+USING: gadgets gadgets-editors gadgets-frames gadgets-labels
+gadgets-panes gadgets-scrolling gadgets-theme generic inspector
+kernel ;
 
 TUPLE: apropos-gadget scroller input ;
 

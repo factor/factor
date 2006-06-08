@@ -1,8 +1,8 @@
 ! Copyright (C) 2006 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 IN: gadgets-tiles
-USING: gadgets gadgets-buttons gadgets-labels gadgets-theme
-kernel sequences ;
+USING: gadgets gadgets-buttons gadgets-labels gadgets-frames
+gadgets-theme kernel sequences ;
 
 TUPLE: tile ;
 

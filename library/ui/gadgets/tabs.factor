@@ -1,8 +1,9 @@
 ! Copyright (C) 2006 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 IN: gadgets-tabs
-USING: arrays gadgets gadgets-buttons gadgets-labels
-gadgets-panes gadgets-scrolling gadgets-theme kernel sequences ;
+USING: arrays gadgets gadgets-buttons gadgets-frames
+gadgets-grids gadgets-labels gadgets-panes gadgets-scrolling
+gadgets-theme kernel sequences ;
 
 TUPLE: book page pages ;
 
