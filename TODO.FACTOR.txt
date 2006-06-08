@@ -1,11 +1,4 @@
 - in the ui, run a bunch of files, unfocus; when its done caret appears
-
-- fix this:
-
-  [ 1 2 3 4 5 6 7 8 9 10 10 10 10 10 10 10 10 10 10 11 11 11 113 ] .
-[ 1 2 3 4 5 6 7 8 9 10 10 10 10 10 10 10 10 10 10 11 11 11 113 
-]
-
 - unix i/o: problems with passing f to syscalls
 - if a primitive throws an error, :c doesn't show the call frame there
 - "benchmark/help": without a yield UI runs out of memory
@@ -13,6 +6,15 @@
 + httpd:
   - outliners don't work
   - browser responder doesn't work
+- tests in a loop runs out of memory eventually
+- fix word wrap with tables in panes
+
+- fix this:
+
+  [ 1 2 3 4 5 6 7 8 9 10 10 10 10 10 10 10 10 10 10 11 11 11 113 ] .
+[ 1 2 3 4 5 6 7 8 9 10 10 10 10 10 10 10 10 10 10 11 11 11 113 
+]
+
 - code walker & exceptions -- test and debug problems
 - another i/o bug: on factorcode eventually all i/o times out
   - bug in pound?
@@ -28,7 +30,6 @@
 - get factor running on mac intel
 - constant branch folding
 - cocoa: starting the UI with +foo switches opens them as files
-- tests in a loop runs out of memory eventually
 + refactor style stack code so that nested styles are handled at a lower-level
   - in HTML, we can nest div tags, etc
   - fix prettyprinter's highlighting of non-leaves looks bad
@@ -36,7 +37,6 @@
     - fix remaining HTML stream issues
     - need to present $list in a useful way
   - better line spacing in ui and html - related issue
-- fix word wrap with tables in panes
 
 + fix compiled gc check
   - there was a performance hit, investigate
