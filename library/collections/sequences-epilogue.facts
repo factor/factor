@@ -188,7 +188,7 @@ HELP: depth "( -- n )"
 HELP: cond "( assoc -- )"
 { $values { "assoc" "a sequence of quotation pairs" } }
 { $description
-    "Calls the first quotation in each pair in turn, until a quotation outputs a true value, in which case the second quotation in the corresponding pair is called."
+    "Calls the second quotation in the first pair whose first quotation yields a true value."
     $terpri
     "The following two phrases are equivalent:"
     { $code "{ { [ X ] [ Y ] } { [ Z ] [ T ] } } cond" }

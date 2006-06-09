@@ -5,24 +5,10 @@ USING: arrays freetype gadgets gadgets-labels gadgets-scrolling
 gadgets-theme generic kernel math namespaces sequences strings
 styles threads ;
 
-! A blinking caret
+! A caret
 TUPLE: caret ;
 
-C: caret ( -- caret )
-    dup delegate>gadget dup caret-theme ;
-
-M: caret tick ( ms caret -- ) nip toggle-visible ;
-
-: caret-blink 500 ;
-
-: show-caret ( caret -- )
-    dup show-gadget dup relayout-1 caret-blink add-timer ;
-
-: hide-caret ( caret -- )
-    dup remove-timer dup hide-gadget relayout-1 ;
-
-: reset-caret ( caret -- )
-    dup restart-timer dup show-gadget relayout-1 ;
+C: caret ( -- caret ) dup delegate>gadget dup caret-theme ;
 
 USE: line-editor
 
@@ -37,7 +23,6 @@ TUPLE: editor line caret font color ;
     #! Execute a quotation in the line editor scope, then
     #! update the display.
     swap [ editor-line swap bind ] keep
-    dup editor-caret reset-caret
     dup relayout scroll>caret ; inline
 
 : editor-text ( editor -- text )
@@ -71,8 +56,8 @@ TUPLE: editor line caret font color ;
 M: editor gadget-gestures
     drop H{
         { T{ button-down } [ click-editor ] }
-        { T{ gain-focus } [ editor-caret show-caret ] }
-        { T{ lose-focus } [ editor-caret hide-caret ] }
+        { T{ gain-focus } [ editor-caret show-gadget ] }
+        { T{ lose-focus } [ editor-caret hide-gadget ] }
         { T{ key-down f f "BACKSPACE" } [ [ T{ char-elt } delete-prev-elt ] with-editor ] }
         { T{ key-down f f "DELETE" } [ [ T{ char-elt } delete-next-elt ] with-editor ] }
         { T{ key-down f { C+ } "BACKSPACE" } [ [ T{ word-elt } delete-prev-elt ] with-editor ] }

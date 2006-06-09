@@ -14,7 +14,7 @@ math namespaces opengl sequences ;
 !   we don't store this in the world's rect-loc, since the
 !   co-ordinate system might be different, and generally the
 !   UI code assumes that everything starts at { 0 0 0 }.
-TUPLE: world gadget status focus fonts handle loc ;
+TUPLE: world gadget status focus focused? fonts handle loc ;
 
 : free-fonts ( world -- )
     dup world-handle select-gl-context
@@ -48,5 +48,6 @@ M: world pref-dim* ( world -- dim )
 
 : reset-world ( world -- )
     f over set-world-focus
+    f over set-world-focused?
     f over set-world-handle
     world-fonts clear-hash ;

@@ -5,12 +5,10 @@ USING: hashtables kernel math namespaces sequences ;
 
 TUPLE: timer object delay last ;
 
-: timer-now millis swap set-timer-last ;
-
 C: timer ( object delay -- timer )
     [ set-timer-delay ] keep
     [ set-timer-object ] keep
-    dup timer-now ;
+    millis over set-timer-last ;
 
 GENERIC: tick ( ms object -- )
 
@@ -23,13 +21,10 @@ GENERIC: tick ( ms object -- )
 
 : remove-timer ( object -- ) timers remove-hash ;
 
-: restart-timer ( object -- )
-    timers hash [ timer-now ] when* ;
-
 : next-time ( timer -- ms ) dup timer-delay swap timer-last + ;
 
 : advance-timer ( ms timer -- delay )
-    [ timer-last - 0 max ] 2keep set-timer-last ;
+    [ timer-last [-] ] 2keep set-timer-last ;
 
 : do-timer ( ms timer -- )
     dup next-time pick <= [

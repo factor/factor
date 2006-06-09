@@ -123,7 +123,7 @@ C: pack ( vector -- pack )
 
 : gap-dims ( gap sizes -- seeq )
     [ { 0 0 0 } [ v+ ] reduce ] keep
-    length 1- 0 max rot n*v v+ ;
+    length 1 [-] rot n*v v+ ;
 
 : pack-pref-dim ( children gadget -- dim )
     [ >r [ max-dim ] keep r> pack-gap swap gap-dims ] keep

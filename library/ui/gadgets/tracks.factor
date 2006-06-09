@@ -19,7 +19,7 @@ C: track ( orientation -- track )
     [ delegate>pack ] keep 1 over set-pack-fill ;
 
 : divider-sizes ( seq -- dim )
-    length 1- 0 max divider-size n*v ;
+    length 1 [-] divider-size n*v ;
 
 : track-dim ( track -- dim )
     #! Space available for content (minus dividers)

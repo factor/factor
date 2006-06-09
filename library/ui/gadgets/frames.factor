@@ -27,7 +27,7 @@ C: frame ( -- frame )
 : delegate>frame ( tuple -- ) <frame> swap set-delegate ;
 
 : (fill-center) ( vec n -- )
-    over first pick third + - 0 max 1 rot set-nth ;
+    over first pick third + [-] 1 rot set-nth ;
 
 : fill-center ( horiz vert dim -- )
     tuck second (fill-center) first (fill-center) ;

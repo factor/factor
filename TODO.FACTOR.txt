@@ -1,4 +1,3 @@
-- in the ui, run a bunch of files, unfocus; when its done caret appears
 - unix i/o: problems with passing f to syscalls
 - if a primitive throws an error, :c doesn't show the call frame there
 - "benchmark/help": without a yield UI runs out of memory

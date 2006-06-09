@@ -53,7 +53,7 @@ SYMBOL: d-in
     [ value-vector swap append ] [ drop ] if ;
 
 : ensure-values ( n -- )
-    dup meta-d get length - 0 max d-in [ + ] change
+    dup meta-d get length [-] d-in [ + ] change
     meta-d [ add-inputs ] change ;
 
 : effect ( -- { in# out# } )

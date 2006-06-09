@@ -42,7 +42,7 @@ M: grid pref-dim* ( grid -- dim )
     [
         [
             [ 0 [ + ] reduce ] keep length
-            1- 0 max gap * +
+            1 [-] gap * +
         ] 2apply 0 3array
     ] with-grid ;
 

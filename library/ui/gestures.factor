@@ -113,10 +113,15 @@ V{ } clone hand-buttons set-global
     T{ lose-focus } swap each-gesture
     T{ gain-focus } swap each-gesture ;
 
+: focus-receiver ( world -- seq )
+    #! If the world is not focused, we want focus-gestures to
+    #! only send focus-lost and not focus-gained.
+    dup world-focused? [ focused-ancestors ] [ drop f ] if ;
+
 : request-focus* ( gadget world -- )
     dup focused-ancestors >r
     [ set-world-focus ] keep
-    focused-ancestors r> focus-gestures ;
+    focus-receiver r> focus-gestures ;
 
 : request-focus ( gadget -- )
     dup focusable-child swap find-world request-focus* ;

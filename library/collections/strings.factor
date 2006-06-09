@@ -50,7 +50,7 @@ PREDICATE: integer control   "\0\e\r\n\t\u0008\u007f" member? ;
     dup printable? swap "\"\\" member? not and ; foldable
 
 : padding ( string count char -- string )
-    >r swap length - 0 max r> <string> ;
+    >r swap length [-] r> <string> ;
 
 : pad-left ( string count char -- string )
     pick >r padding r> append ;
