@@ -16,13 +16,20 @@ M: sbuf stream-flush drop ;
     <string-writer> [ call stdio get >string ] with-stream* ;
     inline
 
-: format-column ( seq -- seq )
-    [ 0 [ length max ] reduce ] keep
-    [ swap CHAR: \s pad-right ] map-with ;
+: format-column ( seq ? -- seq )
+    [
+        [ 0 [ length max ] reduce ] keep
+        [ swap CHAR: \s pad-right ] map-with
+    ] unless ;
+
+: map-last ( seq quot -- seq | quot: elt last? )
+    swap dup length <reversed>
+    [ zero? rot [ call ] keep swap ] 2map nip ;
 
 M: plain-writer with-stream-table ( quot grid stream -- )
     -rot [ [ swap string-out ] map-with ] map-with
-    flip [ format-column ] map flip [ " " join ] map
+    flip [ format-column ] map-last
+    flip [ " " join ] map
     [ swap stream-print ] each-with ;
 
 ! Reversed string buffers support the stream input protocol.
