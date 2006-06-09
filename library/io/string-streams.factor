@@ -24,7 +24,7 @@ M: sbuf stream-flush drop ;
 
 : map-last ( seq quot -- seq | quot: elt last? )
     swap dup length <reversed>
-    [ zero? rot [ call ] keep swap ] 2map nip ;
+    [ zero? rot [ call ] keep swap ] 2map nip ; inline
 
 M: plain-writer with-stream-table ( quot grid stream -- )
     -rot [ [ swap string-out ] map-with ] map-with

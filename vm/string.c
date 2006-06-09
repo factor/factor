@@ -16,6 +16,7 @@ F_STRING* allot_string(F_FIXNUM capacity)
 	UTF16 string for C library calls. */
 	cput(SREF(string,capacity),(u16)'\0');
 	string->length = tag_fixnum(capacity);
+	string->hashcode = F;
 	return string;
 }
 
