@@ -139,6 +139,9 @@ IN: hashtables
 : remove-hash* ( key hash -- oldvalue )
     [ hash ] 2keep remove-hash ;
 
+: ?remove-hash ( key hash -- )
+    [ remove-hash ] [ drop ] if* ;
+
 : hash-size ( hash -- n )
     dup hash-count swap hash-deleted - ; inline
 

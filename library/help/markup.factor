@@ -23,8 +23,11 @@ M: word print-element { } swap execute ;
 : ($span) ( content style -- )
     last-block off [ print-element ] with-style ;
 
+: ?terpri ( -- )
+    last-block [ [ terpri ] unless t ] change ;
+
 : ($block) ( quot -- )
-    last-block [ [ terpri ] unless t ] change
+    ?terpri
     call
     terpri
     last-block on ; inline
@@ -140,13 +143,8 @@ M: f >link <link> ;
     ] ($block) ;
 
 : $link ( article -- )
-    last-block off first dup word? [
-        pprint
-    ] [
-        link-style [
-            dup article-title swap >link simple-object
-        ] with-style
-    ] if ;
+    last-block off first link-style
+    [ dup article-title swap >link simple-object ] with-style ;
 
 : $definition ( content -- )
     "Definition" $heading $see ;
@@ -158,11 +156,9 @@ M: f >link <link> ;
     "See also" $heading $links ;
 
 : $table ( content -- )
-    [
-        table-style [
-            current-style [ print-element ] tabular-output
-        ] with-style
-    ] ($block) ;
+    ?terpri table-style [
+        current-style [ print-element ] tabular-output
+    ] with-style ;
 
 : $values ( content -- )
     "Arguments and values" $heading

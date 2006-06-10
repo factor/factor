@@ -40,14 +40,16 @@ GENERIC: set-word-xt
 M: word set-word-xt ( xt w -- ) 7 set-integer-slot ;
 
 : uses ( word -- uses )
-    word-def flatten [ word? ] subset prune ;
+    word-def flatten
+    [ word? ] subset
+    [ word-vocabulary ] subset
+    prune ;
 
 SYMBOL: crossref
 
 : xref-word ( word -- )
     dup word-vocabulary [
-        [ uses [ word-vocabulary ] subset ]
-        crossref get add-vertex
+        [ uses ] crossref get add-vertex
     ] [
         drop
     ] if ;
@@ -89,7 +91,7 @@ M: word unxref-word* drop ;
 : <word> ( name vocab -- word ) (word) dup init-word ;
 
 : gensym ( -- word )
-    [ "G:" % \ gensym counter # ] "" make f <word> ;
+    "G:" \ gensym counter number>string append f <word> ;
 
 : define-temp ( quot -- word )
     gensym [ swap define-compound ] keep ;
@@ -144,11 +146,12 @@ SYMBOL: vocabularies
 
 : forget ( word -- )
     dup unxref-word
+    dup "forget-hook" word-prop call
     crossref get [ dupd remove-hash ] when*
     dup word-name swap word-vocabulary vocab remove-hash ;
 
 : forget-vocab ( vocab -- )
-    vocabularies get remove-hash xref-words ;
+    words [ forget ] each ;
 
 : target-word ( word -- word )
     dup word-name swap word-vocabulary lookup ;

@@ -161,10 +161,16 @@ M: generic definer drop \ G: ;
         tuck [ class< ] all-with? [ peek ] [ drop f ] if
     ] if ;
 
+: class-forget-hook ( class flattened -- )
+    [ typemap get remove-hash ] curry
+    "forget-hook" set-word-prop ;
+
 : define-class ( class -- )
     dup t "class" set-word-prop
     dup H{ } clone "class<" set-word-prop
-    dup flatten-class typemap get set-hash ;
+    dup flatten-class
+    2dup class-forget-hook
+    typemap get set-hash ;
 
 : implementors ( class -- list )
     [ "methods" word-prop ?hash* nip ] word-subset-with ;
