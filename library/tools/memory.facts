@@ -46,7 +46,7 @@ HELP: end-scan "( -- )"
 HELP: each-object "( quot -- )"
 { $values { "quot" "a quotation with stack effect " { $snippet "( obj -- )" } } }
 { $description "Applies a quotation to each object in the heap. The garbage collector is switched off while this combinator runs, so the given quotation must not allocate too much memory." }
-{ $notes "This word is the low-level facility used to implement the " { $link instances } ", " { $link references } " and " { $link heap-stats. } " words." } ;
+{ $notes "This word is the low-level facility used to implement the " { $link instances } " and " { $link heap-stats. } " words." } ;
 
 HELP: instances "( quot -- seq )"
 { $values { "quot" "a quotation with stack effect " { $snippet "( obj -- ? )" } } { "seq" "a fresh sequence" } }

@@ -39,6 +39,17 @@ M: word word-xt ( w -- xt ) 7 integer-slot ;
 GENERIC: set-word-xt
 M: word set-word-xt ( xt w -- ) 7 set-integer-slot ;
 
+SYMBOL: vocabularies
+
+: vocab ( name -- vocab ) vocabularies get hash ;
+
+: lookup ( name vocab -- word ) vocab ?hash ;
+
+: target-word ( word -- word )
+    dup word-name swap word-vocabulary lookup ;
+
+: interned? ( word -- ? ) dup target-word eq? ;
+
 : uses ( word -- uses )
     word-def flatten
     [ word? ] subset
@@ -101,15 +112,11 @@ M: word unxref-word* drop ;
 
 SYMBOL: bootstrapping?
 
-SYMBOL: vocabularies
-
 : word ( -- word ) \ word get-global ;
 
 : set-word ( word -- ) \ word set-global ;
 
 : vocabs ( -- seq ) vocabularies get hash-keys natural-sort ;
-
-: vocab ( name -- vocab ) vocabularies get hash ;
 
 : ensure-vocab ( name -- ) vocabularies get [ nest drop ] bind ;
 
@@ -125,8 +132,6 @@ SYMBOL: vocabularies
 
 : xref-words ( -- )
     all-words [ uses ] crossref get build-graph ;
-
-: lookup ( name vocab -- word ) vocab ?hash ;
 
 : reveal ( word -- )
     vocabularies get [
@@ -152,11 +157,6 @@ SYMBOL: vocabularies
 
 : forget-vocab ( vocab -- )
     words [ forget ] each ;
-
-: target-word ( word -- word )
-    dup word-name swap word-vocabulary lookup ;
-
-: interned? ( word -- ? ) dup target-word eq? ;
 
 : bootstrap-word ( word -- word )
     dup word-name swap word-vocabulary
