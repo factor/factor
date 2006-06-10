@@ -1,12 +1,11 @@
 USING: help inspector parser prettyprint ;
 
 ARTICLE: "handbook" "Factor documentation"
-"Factor is a dynamically-typed stack based language. I hope you like it."
 { $subsection "changes" }
 { $heading "Survival guide" }
 { $list
-    { "Load source files using " { $link run-file } ":" }
-    { $code "\"contrib/httpd/load.factor\" run-file" }
+    { "Load source files using " { $link run-file } ":"
+    { $code "\"contrib/httpd/load.factor\" run-file" } }
     { { $link .s } " prints the contents of the stack." }
     { { $link . } " prints the object at the top of the stack." }
 }

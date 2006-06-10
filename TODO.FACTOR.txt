@@ -6,7 +6,6 @@
   - outliners don't work
   - browser responder doesn't work
 - tests in a loop runs out of memory eventually
-- fix word wrap with tables in panes
 
 - fix this:
 

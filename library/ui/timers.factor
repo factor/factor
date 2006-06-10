@@ -27,11 +27,8 @@ GENERIC: tick ( ms object -- )
     [ timer-last [-] ] 2keep set-timer-last ;
 
 : do-timer ( ms timer -- )
-    dup next-time pick <= [
-        [ advance-timer ] keep timer-object tick
-    ] [
-        2drop
-    ] if ;
+    dup next-time pick <=
+    [ [ advance-timer ] keep timer-object tick ] [ 2drop ] if ;
 
 : do-timers ( -- )
     millis timers hash-values [ do-timer ] each-with ;

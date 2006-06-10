@@ -1,10 +1,10 @@
 ! Copyright (C) 2005, 2006 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 IN: gadgets-presentations
-USING: arrays gadgets gadgets-borders
-gadgets-buttons gadgets-labels gadgets-outliner
-gadgets-panes generic hashtables inspector io kernel prettyprint
-sequences strings styles words ;
+USING: arrays gadgets gadgets-borders gadgets-buttons
+gadgets-labels gadgets-outliner gadgets-panes gadgets-paragraphs
+generic hashtables inspector io kernel prettyprint sequences
+strings styles words ;
 
 ! Clickable objects
 TUPLE: object-button object ;
