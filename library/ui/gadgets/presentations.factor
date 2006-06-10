@@ -2,9 +2,9 @@
 ! See http://factorcode.org/license.txt for BSD license.
 IN: gadgets-presentations
 USING: arrays gadgets gadgets-borders gadgets-buttons
-gadgets-labels gadgets-outliner gadgets-panes gadgets-paragraphs
-generic hashtables inspector io kernel prettyprint sequences
-strings styles words ;
+gadgets-grids gadgets-labels gadgets-outliner gadgets-panes
+gadgets-paragraphs generic hashtables inspector io kernel
+prettyprint sequences strings styles words ;
 
 ! Clickable objects
 TUPLE: object-button object ;
@@ -85,13 +85,21 @@ M: object-button gadget-help ( button -- string )
     apply-outliner-style
     nip ;
 
-: <nested-pane> ( quot style -- gadget )
+: styled-pane ( quot style -- gadget )
     #! Create a pane, call the quotation to fill it out.
     >r <pane> dup r> swap <styled-paragraph>
     >r swap with-pane r> ; inline
 
+: <pane-grid> ( quot style grid -- gadget )
+    [
+        [ pick pick >r >r -rot styled-pane r> r> rot ] map
+    ] map 2nip <grid> 5 over set-grid-gap ;
+
+M: pane with-stream-table ( quot grid style pane -- )
+    >r swap <pane-grid> r> print-gadget ;
+
 M: pane with-nested-stream ( quot style stream -- )
-    >r <nested-pane> r> write-gadget ;
+    >r styled-pane r> write-gadget ;
 
 ! Stream utilities
 M: pack stream-close ( stream -- ) drop ;

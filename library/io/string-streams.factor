@@ -26,8 +26,8 @@ M: sbuf stream-flush drop ;
     swap dup length <reversed>
     [ zero? rot [ call ] keep swap ] 2map nip ; inline
 
-M: plain-writer with-stream-table ( quot grid stream -- )
-    -rot [ [ swap string-out ] map-with ] map-with
+M: plain-writer with-stream-table ( quot grid style stream -- )
+    nip -rot [ [ swap string-out ] map-with ] map-with
     flip [ format-column ] map-last
     flip [ " " join ] map
     [ swap stream-print ] each-with ;

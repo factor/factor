@@ -158,7 +158,11 @@ M: f >link <link> ;
     "See also" $heading $links ;
 
 : $table ( content -- )
-    [ [ print-element ] tabular-output ] ($block) ;
+    [
+        table-style [
+            current-style [ print-element ] tabular-output
+        ] with-style
+    ] ($block) ;
 
 : $values ( content -- )
     "Arguments and values" $heading

@@ -104,9 +104,12 @@ M: pane stream-terpri ( pane -- )
     #! Print a gadget to the given pane.
     pane-current add-gadget ;
 
+: print-gadget ( gadget pane -- )
+    tuck write-gadget stream-terpri ;
+
 : gadget. ( gadget -- )
     #! Print a gadget to the current pane.
-    stdio get write-gadget terpri ;
+    stdio get print-gadget ;
 
 ! Panes are streams.
 M: pane stream-flush ( pane -- ) drop ;
@@ -139,8 +142,3 @@ M: pane stream-close ( pane -- ) drop ;
 : make-pane ( quot -- pane )
     #! Execute the quotation with output to an output-only pane.
     <pane> [ swap with-pane ] keep ; inline
-
-M: pane with-stream-table ( quot grid pane -- )
-    >r [ [ swap make-pane ] map-with ] map-with
-    <grid> 5 over set-grid-gap
-    r> [ write-gadget ] keep stream-terpri ;

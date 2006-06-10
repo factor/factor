@@ -33,7 +33,7 @@ sequences strings vectors words ;
     ] [ ] make ;
 
 : room. ( -- )
-    room-table [ write ] tabular-output ;
+    room-table H{ } [ write ] tabular-output ;
 
 ! Some words for iterating through the heap.
 
@@ -89,4 +89,5 @@ M: object each-slot ( obj quot -- )
             [ dup , dup pick hash , pick hash , ] { } make ,
         ] each 2drop
     ] { } make
-    [ dup string? [ write ] [ pprint ] if ] tabular-output ;
+    H{ } [ dup string? [ write ] [ pprint ] if ]
+    tabular-output ;

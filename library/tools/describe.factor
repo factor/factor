@@ -70,7 +70,8 @@ DEFER: describe
 
 : sheet. ( sheet -- )
     flip
-    [ dup unparse-short swap simple-object ] tabular-output ;
+    H{ } [ dup unparse-short swap simple-object ]
+    tabular-output ;
 
 : describe ( object -- ) dup summary print sheet sheet. ;
 

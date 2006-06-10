@@ -63,3 +63,8 @@ USING: styles ;
         { border-color { 1 0 0 1 } }
         { border-width 5 }
     } ;
+
+: table-style
+    H{
+        { wrap-margin 350 }
+    } ;
