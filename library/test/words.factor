@@ -93,6 +93,16 @@ DEFER: calls-a-gensym
 \ calls-a-gensym gensym dup "x" set unit define-compound
 [ f ] [ "x" get crossref get hash ] unit-test
 
+! more xref buggery
+[ f ] [
+    GENERIC: xyzzle
+    : a ; \ a
+    M: integer xyzzle a ;
+    FORGET: a
+    M: object xyzzle ;
+    crossref get hash
+] unit-test
+
 ! regression
 GENERIC: freakish
 : bar freakish ;

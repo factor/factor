@@ -27,10 +27,8 @@ USING: hashtables kernel namespaces sequences ;
 : in-edges ( vertex graph -- seq )
     ?hash dup [ hash-keys ] when ;
 
-SYMBOL: hash-buffer
-
 : closure, ( value key -- old )
-    hash-buffer get [ hash swap ] 2keep set-hash ;
+    building get [ hash swap ] 2keep set-hash ;
 
 : (closure) ( key hash -- )
     tuck ?hash dup [
@@ -44,7 +42,7 @@ SYMBOL: hash-buffer
 
 : closure ( vertex graph -- seq )
     [
-        H{ } clone hash-buffer set
+        H{ } clone building set
         (closure)
-        hash-buffer get hash-keys
+        building get hash-keys
     ] with-scope ;

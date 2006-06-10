@@ -53,22 +53,6 @@ sequences strings vectors words ;
         -rot [ (instances) ] 2keep
     ] each-object nip ; inline
 
-G: each-slot ( obj quot -- )
-    1 standard-combination ; inline
-
-M: array each-slot ( array quot -- ) each ;
-
-M: object each-slot ( obj quot -- )
-    over class "slots" word-prop [
-        -rot [ >r swap first slot r> call ] 2keep
-    ] each 2drop ;
-
-: refers? ( to obj -- ? )
-    f swap [ pick eq? or ] each-slot nip ;
-
-: references ( obj -- list )
-    [ dupd refers? ] instances nip ;
-
 : hash+ ( n key hash -- )
     [ hash [ 0 ] unless* + ] 2keep set-hash ;
 

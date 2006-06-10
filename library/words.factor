@@ -42,7 +42,7 @@ M: word set-word-xt ( xt w -- ) 7 set-integer-slot ;
 : uses ( word -- uses )
     word-def flatten
     [ word? ] subset
-    [ word-vocabulary ] subset
+    [ global [ interned? ] bind ] subset
     prune ;
 
 SYMBOL: crossref

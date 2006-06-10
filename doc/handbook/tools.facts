@@ -71,9 +71,7 @@ ARTICLE: "memory" "Object memory"
 { $subsection heap-stats. }
 "There are a pair of combinators, analogous to " { $link each } " and " { $link subset } ", which operate on the entire collection of objects in the object heap:"
 { $subsection each-object }
-{ $subsection instances }
-"Finally, you can ask for a sequence of all objects which refer to a given object:"
-{ $subsection references } ;
+{ $subsection instances } ;
 
 ARTICLE: "word-introspection" "Word introspection"
 "You can display a word definition:"

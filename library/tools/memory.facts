@@ -53,19 +53,6 @@ HELP: instances "( quot -- seq )"
 { $description "Outputs a sequence of all objects in the heap which satisfy the quotation." }
 { $notes "This word relies on " { $link each-object } ", so in particular the garbage collector is switched off while it runs and the given quotation must not allocate too much memory." } ;
 
-HELP: each-slot "( obj quot -- )"
-{ $values { "obj" "an object" } { "quot" "a quotation with stack effect " { $snippet "( slot -- )" } } }
-{ $description "Applies a quotation to the value of each one of an object's slots." } ;
-
-HELP: refers? "( obj1 obj2 -- ? )"
-{ $values { "obj1" "an object" } { "obj2" "an object" } { "?" "a boolean" } }
-{ $description "Tests if any one of " { $snippet "obj2" } "'s slots point to " { $snippet "obj1" } "." } ;
-
-HELP: references "( obj -- seq )"
-{ $values { "obj" "an object" } { "seq" "a fresh sequence" } }
-{ $description "Outputs a sequence of all objects in the heap which refer to the given object via one of their slots." }
-{ $notes "The output sequence sometimes refers to temporary objects created by the execution of the " { $link references } " word itself." } ;
-
 HELP: heap-stats "( -- counts sizes )"
 { $values { "counts" "a hashtable mapping class words to integers" } { "sizes" "a hashtable mapping class words to integers" } }
 { $description "Outputs a pair of hashtables, holding class instance counts and instance memory usage, respectively." } ;

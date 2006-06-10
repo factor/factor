@@ -92,7 +92,6 @@ TUPLE: delegate-clone ;
 ! Compiler regression
 [ t ] [ [ t length ] catch no-method-object ] unit-test
 
-! This must be the last test in the file!
 [ "<constructor-test>" ]
 [ "TUPLE: constructor-test ; C: constructor-test ;" eval word word-name ] unit-test
 
