@@ -159,6 +159,9 @@ IN: hashtables
 : set-hash ( value key hash -- )
     [ (set-hash) ] keep ?grow-hash ;
 
+: hash+ ( n key hash -- )
+    [ hash [ 0 ] unless* + ] 2keep set-hash ;
+
 : associate ( value key -- hashtable )
     2 <hashtable> [ set-hash ] keep ;
 

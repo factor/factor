@@ -5,7 +5,6 @@
 + httpd:
   - outliners don't work
   - browser responder doesn't work
-- tests in a loop runs out of memory eventually
 
 - fix this:
 
@@ -48,7 +47,6 @@
 
 + help:
 
-- document that can <void*> only be called with an alien
 - help search
 - automatically update help graph when adding/removing articles/words
 

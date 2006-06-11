@@ -53,9 +53,6 @@ sequences strings vectors words ;
         -rot [ (instances) ] 2keep
     ] each-object nip ; inline
 
-: hash+ ( n key hash -- )
-    [ hash [ 0 ] unless* + ] 2keep set-hash ;
-
 : heap-stat-step ( counts sizes obj -- )
     [ dup size swap class rot hash+ ] keep
     1 swap class rot hash+ ;

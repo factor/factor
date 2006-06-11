@@ -10,34 +10,34 @@ USING: io kernel math parser strings test ;
     "This is a line."
     "This is another line."
 ] [
-    "/library/test/io/windows-eol.txt" <resource-stream> lines-test
+    "/library/test/io/windows-eol.txt" <resource-reader> lines-test
 ] unit-test
 
 [
     "This is a line."
     "This is another line."
 ] [
-    "/library/test/io/mac-os-eol.txt" <resource-stream> lines-test
+    "/library/test/io/mac-os-eol.txt" <resource-reader> lines-test
 ] unit-test
 
 [
     "This is a line."
     "This is another line."
 ] [
-    "/library/test/io/unix-eol.txt" <resource-stream> lines-test
+    "/library/test/io/unix-eol.txt" <resource-reader> lines-test
 ] unit-test
 
 [
     "This is a line.\rThis is another line.\r"
 ] [
-    "/library/test/io/mac-os-eol.txt" <resource-stream>
+    "/library/test/io/mac-os-eol.txt" <resource-reader>
     [ 500 read ] with-stream
 ] unit-test
 
 [
     255
 ] [
-    "/library/test/io/binary.txt" <resource-stream>
+    "/library/test/io/binary.txt" <resource-reader>
     [ read1 ] with-stream >fixnum
 ] unit-test
 

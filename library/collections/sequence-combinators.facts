@@ -3,7 +3,7 @@ USING: arrays help math sequences-internals ;
 
 HELP: collect "( n quot -- array )"
 { $values { "n" "a non-negative integer" } { "quot" "a quotation with stack effect " { $snippet "( n -- value )" } } { "array" "an array with " { $snippet "n" } " elements" } }
-{ $description "A primitive mapping operation that applies a quotation to all integers from 0 up to but not including " { $snippet "n" } ", and collects the results in a new array. Client code should use " { $link map } " instead." } ;
+{ $description "A primitive mapping operation that applies a quotation to all integers from 0 up to but not including " { $snippet "n" } ", and collects the results in a new array. User code should use " { $link map } " instead." } ;
 
 HELP: each "( seq quot -- )"
 { $values { "seq" "a sequence" } { "quot" "a quotation with stack effect " { $snippet "( elt -- )" } } }

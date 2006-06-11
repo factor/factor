@@ -2,7 +2,7 @@ USING: generic help kernel kernel-internals ;
 
 HELP: tuple= "( tuple1 tuple2 -- ? )"
 { $values { "tuple1" "a tuple" } { "tuple2" "a tuple" } }
-{ $description "Low-level tuple equality test. Client code should use " { $link = } " instead." }
+{ $description "Low-level tuple equality test. User code should use " { $link = } " instead." }
 { $warning "This word is in the " { $snippet "kernel-internals" } " vocabulary because it does not do any type checking. Passing values which are not tuples can result in memory corruption." } ;
 
 HELP: tuple f
@@ -12,13 +12,6 @@ $terpri
 { $list
     { { $snippet "\"slot-names\"" } " - a sequence of strings naming the tuple's slots" }
     { { $snippet "\"tuple-size\"" } " - the number of slots" }
-} }
-{ $notes "Low-level facilities need to be aware of tuple object layout. It is of no concern to client code. The layout of a tuple in memory is straightforward:"
-{ $list
-    "slot 0 - object header with type number (as usual)"
-    "slot 1 - number of slots, include class and delegate"
-    "slot 2 - the tuple's class word"
-    { "slot 3 - a delegate or " { $link f } }
 } } ;
 
 HELP: class "( object -- class )"

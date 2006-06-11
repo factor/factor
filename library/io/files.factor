@@ -26,8 +26,7 @@ strings styles ;
 : resource-path ( path -- path )
     image parent-dir swap path+ ;
 
-: <resource-stream> ( path -- stream )
-    #! Open a file path relative to the Factor source code root.
+: <resource-reader> ( path -- stream )
     resource-path <file-reader> ;
 
 : (file.) ( name path -- )

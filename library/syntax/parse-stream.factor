@@ -37,7 +37,7 @@ words ;
 
 : parse-resource ( path -- quot )
     dup parsing-file
-    [ <resource-stream> "resource:" ] keep append parse-stream ;
+    [ <resource-reader> "resource:" ] keep append parse-stream ;
 
 : run-resource ( file -- ) parse-resource call ;
 

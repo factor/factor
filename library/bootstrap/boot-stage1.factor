@@ -102,6 +102,7 @@ vectors words ;
         "/library/help/markup.factor"
         "/library/help/word-help.factor"
         "/library/help/crossref.factor"
+        "/library/help/porter-stemmer.factor"
         "/library/help/syntax.factor"
 
         "/library/syntax/parse-stream.factor"

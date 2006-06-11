@@ -13,7 +13,7 @@ $terpri
 "The string representation of an object can be requested:"
 { $subsection unparse }
 { $subsection unparse-short }
-"The prettyprinter is flexible and extensible."
+"Advanced topics:"
 { $subsection "prettyprint-limitations" }
 { $subsection "prettyprint-variables" }
 { $subsection "prettyprint-extension" }

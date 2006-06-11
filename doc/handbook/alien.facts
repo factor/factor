@@ -16,14 +16,7 @@ $terpri
 { $subsection "dll-internals" } ;
 
 ARTICLE: "loading-libs" "Loading native libraries"
-"Factor must be aware of what native libraries are in use. This is done by associating a logical library name with an operating system path name, and then referring to the library by its logical name. There are two ways to define libraries in this manner; you can either use command line parameters or the " { $link add-library } " word."
-$terpri
-"The following two command line parameters can be specified for each library to load; the second parameter is optional:"
-{ $list
-    { { $snippet "-libraries:" { $emphasis "logical" } ":name=" { $emphasis "name" } } " associates a logical name with a system-specific native library name," }
-    { { $snippet "-libraries:" { $emphasis "logical" } ":abi=" { $emphasis "type" } } " specifies the application binary interface (ABI) used by the library. On nearly all platforms, the default value of " { $snippet "cdecl" } " is correct. On Windows/x86, system DLLs use the " { $snippet "stdcall" } " ABI." }
-}
-"You can also define a logical library interactively:"
+"Before calling a C library, you must associate its path name on disk with a logical name which Factor uses to identify the library:"
 { $subsection add-library }
 "Once a library has been defined, you can try loading it to see if the path name is correct:"
 { $subsection load-library } ;
@@ -123,9 +116,11 @@ ARTICLE: "c-types-strings" "C string types"
 $terpri
 "Passing a Factor string to a C function expecting a C string allocates a byte array in the Factor heap; the string is then converted to the requested format and a raw pointer is passed to the function. The function must not retain such pointers after it returns, since byte arrays in the Factor heap can be moved by the garbage collector. To allocate a string which will not move, use " { $link <malloc-string> } " and then " { $link free } "."
 $terpri
-"A couple of words can be used to read and write " { $snippet "char*" } " strings from arbitrary addresses:"
+"A couple of words can be used to read and write " { $snippet "char*" } " and " { $snippet "ushort*" } " strings from arbitrary addresses:"
 { $subsection alien>char-string }
-{ $subsection string>char-alien } ;
+{ $subsection alien>u16-string }
+{ $subsection string>char-alien }
+{ $subsection string>u16-alien } ;
 
 ARTICLE: "c-structs" "C structure types"
 "A " { $snippet "struct" } " in C is essentially a block of memory with the value of each structure field stored at a fixed offset. The C library interface provides some utilities to define words which read and write structure fields given a base address."

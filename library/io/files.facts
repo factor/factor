@@ -46,7 +46,7 @@ HELP: resource-path "( resource -- path )"
 { $values { "resource" "a string" } { "path" "a string" } }
 { $description "Resolve a path relative to the Factor source code location." } ;
 
-HELP: <resource-stream> "( resource -- stream )"
+HELP: <resource-reader> "( resource -- stream )"
 { $values { "resource" "a string" } { "stream" "an input stream" } }
 { $description "Opens a file relative to the Factor source code location." } ;
 

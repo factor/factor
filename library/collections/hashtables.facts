@@ -76,24 +76,24 @@ HELP: change-size "( hash old -- )"
 
 HELP: (set-hash) "( value key hash -- )"
 { $values { "value" "a value" } { "key" "a key to add" } { "hash" "a hashtable" } }
-{ $description "Stores the key/value pair into the hashtable. This word does not grow the hashtable if it exceeds capacity, therefore a hang can result. Client code should use " { $link set-hash } " instead, which grows the hashtable if necessary." }
+{ $description "Stores the key/value pair into the hashtable. This word does not grow the hashtable if it exceeds capacity, therefore a hang can result. User code should use " { $link set-hash } " instead, which grows the hashtable if necessary." }
 { $side-effects "hash" } ;
 
 HELP: grow-hash "( hash -- )"
 { $values { "hash" "a hashtable" } }
-{ $description "Enlarges the capacity of a hashtable. Client code does not need to call this word directly." }
+{ $description "Enlarges the capacity of a hashtable. User code does not need to call this word directly." }
 { $see-also (set-hash) ?grow-hash set-hash }
 { $side-effects "hash" } ;
 
 HELP: ?grow-hash "( hash -- )"
 { $values { "hash" "a hashtable" } }
-{ $description "Enlarges the capacity of a hashtable if it is almost full. Client code does not need to call this word directly." }
+{ $description "Enlarges the capacity of a hashtable if it is almost full. User code does not need to call this word directly." }
 { $see-also (set-hash) grow-hash set-hash }
 { $side-effects "hash" } ;
 
 HELP: hash>seq "( i hash -- seq )"
 { $values { "i" "0 or 1" } { "hash" "a hashtable" } { "seq" "a sequence of keys or values" } }
-{ $description "Client code should not call this word. It is unsafe and only used in the implementation of " { $link hash-keys } " and " { $link hash-values } ", both of which are safe." }
+{ $description "User code should not call this word. It is unsafe and only used in the implementation of " { $link hash-keys } " and " { $link hash-values } ", both of which are safe." }
 { $warning "This word is in the " { $snippet "hashtables-internals" } " vocabulary because passing an invalid value for " { $snippet "i" } " can lead to memory corruption." } ;
 
 HELP: <hashtable> "( n -- hash )"
@@ -159,6 +159,11 @@ HELP: remove-hash* "( key hash -- old )"
 { $description "Stores an entry into the hashtable." }
 { $side-effects "hash" }
 { $see-also hash remove-hash } ;
+
+HELP: set-hash "( value key hash -- )"
+{ $values { "value" "a value" } { "key" "a key to add" } { "hash" "a hashtable" } }
+{ $description "Stores the key/value pair into the hashtable." }
+{ $side-effects "hash" } ;
 
 HELP: hash-keys "( hash -- keys )"
 { $values { "hash" "a hashtable" } { "keys" "an array of keys" } }

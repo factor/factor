@@ -82,7 +82,7 @@ SYMBOL: failures
         "inference" "interpreter" "alien"
         "gadgets/line-editor" "gadgets/rectangles" "memory"
         "redefine" "annotate" "binary" "inspector"
-        "kernel"
+        "kernel" "help/porter-stemmer"
     } run-tests ;
 
 : benchmarks
