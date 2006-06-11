@@ -11,7 +11,7 @@
 !   Porter, 1980, An algorithm for suffix stripping, Program,
 !   Vol. 14, no. 3, pp 130-137.
 IN: porter-stemmer
-USING: kernel math parser sequences test ;
+USING: kernel math parser sequences ;
 
 : consonant? ( i str -- ? )
     2dup nth dup "aeiou" member? [
