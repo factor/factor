@@ -1,4 +1,5 @@
-USING: help inspector parser prettyprint ;
+USING: generic hashtables help inspector namespaces parser
+prettyprint sequences words ;
 
 ARTICLE: "handbook" "Factor documentation"
 { $subsection "changes" }
@@ -28,4 +29,21 @@ ARTICLE: "handbook" "Factor documentation"
 { $subsection "streams" }
 { $subsection "parser" }
 { $subsection "prettyprint" }
-{ $subsection "alien" } ;
+{ $subsection "alien" }
+{ $heading "Index" }
+{ $subsection "article-index" }
+{ $subsection "primitive-index" }
+{ $subsection "type-index" }
+{ $subsection "class-index" } ;
+
+ARTICLE: "article-index" "Article index"
+{ $outliner [ articles get hash-keys ] } ;
+
+ARTICLE: "primitive-index" "Primitive index"
+{ $outliner [ all-words [ primitive? ] subset ] } ;
+
+ARTICLE: "type-index" "Type index"
+{ $outliner [ builtins get [ ] subset ] } ;
+
+ARTICLE: "class-index" "Class index"
+{ $outliner [ classes get [ ] subset ] } ;

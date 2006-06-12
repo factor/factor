@@ -204,3 +204,9 @@ M: link summary
 : $io-error
     drop
     "Throws an error if the I/O operation fails." $errors ;
+
+: help-outliner ( seq quot -- | quot: obj -- )
+    swap sort-articles [ ($subsection) terpri ] each-with ;
+
+: $outliner ( content -- )
+    first call natural-sort [ help ] help-outliner ;

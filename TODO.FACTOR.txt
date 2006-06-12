@@ -1,5 +1,4 @@
 - UI word wrap problem
-- UI focus problem after restoring
 
 - unix i/o: problems with passing f to syscalls
 - if a primitive throws an error, :c doesn't show the call frame there
@@ -51,10 +50,15 @@
 + help:
 
 - automatically update help graph when adding/removing articles/words
+- help search:
+  - edit distance algorithm
+  - store positions in index
+  - phrase scoring algorithm based on how close the terms occur?
 
 + ui:
 
-- initial track size is still wrong
+- word wrap in UI broken again
+- table line styles
 - x11 input methods
 - roundoff is still not quite right with tracks
 - new browser:
@@ -73,7 +77,7 @@
   - use display lists
 - reimplement tab completion
 - cocoa:
-  - horizontal scrolling
+  - horizontal wheel scrolling
   - polish OS X menu bar code
   - dock menu
 - variable width word wrap

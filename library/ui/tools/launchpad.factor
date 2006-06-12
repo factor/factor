@@ -21,38 +21,15 @@ prettyprint sequences words ;
 : memory-window ( -- )
     [ heap-stats. terpri room. ] "Memory" pane-window ;
 
-: articles-window ( -- )
-    [ articles. ] "Help index" pane-window ;
-
-: types-window ( -- )
-    [ builtins get [ ] subset [ help ] word-outliner ]
-    "Types" pane-window ;
-
-: classes-window ( -- )
-    [ classes [ help ] word-outliner ]
-    "Classes" pane-window ;
-
-: primitives-window ( -- )
-    [ all-words [ primitive? ] subset [ help ] word-outliner ]
-    "Primitives" pane-window ;
-
-: apropos-window ( -- )
-    [ apropos ] <search-gadget> open-window ;
-
 : globals-window ( -- )
     global show ;
 
 : default-launchpad
     {
         { "Listener" [ listener-window ] }
+        { "Browser" [ browser-window ] }
         { "Documentation" [ handbook-window ] }
-        { "Help index" [ articles-window ] }
-        { "Browser" [ f browser-window ] }
-        { "Apropos" [ apropos-window ] }
         { "Globals" [ globals-window ] }
-        { "Types" [ types-window ] }
-        { "Classes" [ classes-window ] }
-        { "Primitives" [ primitives-window ] }
         { "Memory" [ memory-window ] }
         { "Save image" [ save ] }
         { "Exit" [ 0 exit ] }

@@ -115,7 +115,6 @@ DEFER: described-menu
             { }
             { "Run..." menu-run-file "o" }
             { }
-            { "Apropos" apropos-window "r" }
             { "Globals" globals-window "" }
             { "Memory" memory-window "" }
             { }
@@ -145,10 +144,5 @@ DEFER: described-menu
         { {
             "Help"
             { "Factor Documentation" handbook-window "?" }
-            { }
-            { "Help Index" articles-window "" }
-            { "Types" types-window "" }
-            { "Classes" classes-window "" }
-            { "Primitives" primitives-window "" }
         } }
     } described-menu set-main-menu ;

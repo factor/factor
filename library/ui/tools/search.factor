@@ -25,10 +25,8 @@ M: search-gadget gadget-gestures
 
 C: search-gadget ( quot -- )
     [ set-search-gadget-quot ] keep {
-        { [ <pane> <scroller> dup faint-boundary ] set-search-gadget-scroller @center }
+        { [ <pane> <scroller> ] set-search-gadget-scroller @center }
         { [ "" <editor> ] set-search-gadget-input @top }
     } make-frame* ;
-
-M: search-gadget pref-dim* drop { 350 200 0 } ;
 
 M: search-gadget focusable-child* search-gadget-input ;

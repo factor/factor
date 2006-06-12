@@ -53,11 +53,5 @@ SYMBOL: help-graph
 : xref-articles ( -- )
     all-articles [ links-out ] help-graph get build-graph ;
 
-: help-outliner ( seq quot -- | quot: obj -- )
-    swap sort-articles [ ($subsection) terpri ] each-with ;
-
-: articles. ( -- )
-    articles get hash-keys [ help ] help-outliner ;
-
 : links-in. ( article -- )
     links-in [ links-in. ] help-outliner ;

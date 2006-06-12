@@ -1,8 +1,8 @@
 ! Copyright (C) 2005, 2006 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 IN: gadgets-scrolling
-USING: arrays gadgets gadgets-frames gadgets-viewports generic
-kernel math namespaces sequences ;
+USING: arrays gadgets gadgets-frames gadgets-theme
+gadgets-viewports generic kernel math namespaces sequences ;
 
 ! A scroller combines a viewport with two x and y sliders.
 ! The follows slot is set by scroll-to.
@@ -39,7 +39,8 @@ C: scroller ( gadget -- scroller )
         { [ <x-slider> ] set-scroller-x @bottom }
         { [ <y-slider> ] set-scroller-y @right }
     } make-frame*
-    t over set-gadget-root? ;
+    t over set-gadget-root?
+    dup faint-boundary ;
 
 : set-slider ( value page max slider -- )
     #! page/max/value are 3-vectors.
