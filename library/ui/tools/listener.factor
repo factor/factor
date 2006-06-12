@@ -73,10 +73,10 @@ M: listener-gadget gadget-title drop "Listener" ;
     [ call-listener ] ;
 
 : listener-run-files ( seq -- )
-    [ [ run-file ] each ] curry listener-tool open-tool ;
+    [ [ run-file ] each ] curry listener-tool call-tool ;
 
-M: input show-object ( input button -- )
-    >r input-string r> listener-tool call-tool ;
+M: input show ( input -- )
+    input-string listener-tool call-tool ;
 
-M: object show-object ( object button -- )
-    >r [ inspect ] curry r> listener-tool call-tool ;
+M: object show ( object -- )
+    [ inspect ] curry listener-tool call-tool ;

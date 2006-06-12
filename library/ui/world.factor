@@ -45,9 +45,3 @@ M: world pref-dim* ( world -- dim )
 
 : draw-string ( open-fonts string -- )
     >r dup world get font-sprites r> (draw-string) ;
-
-: reset-world ( world -- )
-    f over set-world-focus
-    f over set-world-focused?
-    f over set-world-handle
-    world-fonts clear-hash ;

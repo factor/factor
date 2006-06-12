@@ -1,3 +1,6 @@
+- UI word wrap problem
+- UI focus problem after restoring
+
 - unix i/o: problems with passing f to syscalls
 - if a primitive throws an error, :c doesn't show the call frame there
 - "benchmark/help": without a yield UI runs out of memory
@@ -47,11 +50,11 @@
 
 + help:
 
-- help search
 - automatically update help graph when adding/removing articles/words
 
 + ui:
 
+- initial track size is still wrong
 - x11 input methods
 - roundoff is still not quite right with tracks
 - new browser:
@@ -59,7 +62,6 @@
   - need actions for reloading the source file and opening word in jEdit
   - highlight showing panes in originating list
 - toggle/radio buttons/tabs or something
-- inspector: less clutter when browsing words
 - make-frame should compile
 - speed up ideas:
   - only do clipping for certain gadgets

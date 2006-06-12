@@ -4,6 +4,9 @@ IN: help
 USING: arrays graphs hashtables help io kernel math namespaces
 porter-stemmer prettyprint sequences strings ;
 
+! Right now this code is specific to the help. It will be
+! generalized to an abstract full text search engine later.
+
 : ignored-word? ( str -- ? )
     { "the" "of" "is" "to" "an" "and" "if" "in" "with" "this" "not" "are" "for" "by" "can" "be" "or" "from" "it" "does" "as" } member? ;
 
@@ -14,28 +17,44 @@ porter-stemmer prettyprint sequences strings ;
         dup ignored-word? over length 1 = or swap empty? or not
     ] subset ;
 
+: index-text ( score article string -- )
+    tokenize [ >r 2dup r> nest hash+ ] each 2drop ;
+
+: index-article-title ( article -- )
+    10 swap dup article-title index-text ;
+
+: index-article-content ( article -- )
+    1 swap dup [ help ] string-out index-text ;
+
+: index-article ( article -- )
+    dup index-article-title index-article-content ;
+
+SYMBOL: term-index
+
+: discard-irrelevant ( results -- results )
+    #! Discard results in the low 33%
+    dup 0 [ second max ] reduce
+    swap [ first2 rot / 2array ] map-with
+    [ second 1/3 > ] subset ;
+
 : count-occurrences ( seq -- hash )
     [
         dup [ hash-keys [ off ] each ] each
-        [ [ drop inc ] hash-each ] each
+        [ [ swap +@ ] hash-each ] each
     ] make-hash ;
 
-: search-index ( phrase index -- assoc )
-    swap tokenize [ swap hash ] map-with [ ] subset
-    count-occurrences hash>alist
-    [ first2 dup zero? [ 1- 10 * 1+ ] unless 2array ] map
-    [ [ second ] 2apply swap - ] sort ;
-
-SYMBOL: help-index
-
-: index-help
-    H{ } clone help-index set
-    all-articles
-    [ [ help ] string-out tokenize ]
-    help-index get build-graph ;
-
 : search-help ( phrase -- assoc )
-    help-index get search-index ;
+    tokenize [ term-index get hash ] map [ ] subset
+    count-occurrences hash>alist
+    [ first2 2array ] map
+    [ [ second ] 2apply swap - ] sort discard-irrelevant ;
+
+: index-help ( -- )
+    [ all-articles [ index-article ] each ] make-hash
+    term-index set-global ;
 
 : search-help. ( phrase -- )
-    search-help H{ } [ pprint ] tabular-output ;
+    "Search results for ``" write dup write "'':" print
+    search-help [
+        first <link> [ article-title ] keep simple-object terpri
+    ] each ;

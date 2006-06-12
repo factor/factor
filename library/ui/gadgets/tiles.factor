@@ -4,7 +4,7 @@ IN: gadgets-tiles
 USING: gadgets gadgets-buttons gadgets-labels gadgets-frames
 gadgets-theme kernel sequences ;
 
-TUPLE: tile ;
+TUPLE: tile gadget ;
 
 : find-tile [ tile? ] find-parent ;
 
@@ -24,5 +24,7 @@ TUPLE: tile ;
 C: tile ( gadget title quot -- gadget )
     {
         { [ <title> ] f @top }
-        { [ ] f @center }
+        { [ ] set-tile-gadget @center }
     } make-frame* ;
+
+M: tile focusable-child* tile-gadget ;

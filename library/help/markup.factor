@@ -108,16 +108,13 @@ TUPLE: link name ;
 
 M: link article-title link-name article-title ;
 M: link article-content link-name article-content ;
-M: link summary "Link to " swap link-name unparse append ;
-
-GENERIC: >link
-M: object >link ;
-M: string >link <link> ;
-M: f >link <link> ;
+M: link summary
+    link-name dup word?
+    [ synopsis ] [ "Link to " swap unparse append ] if ;
 
 : ($subsection) ( quot object -- )
     subsection-style [
-        [ swap curry ] keep dup article-title swap >link
+        [ swap curry ] keep dup article-title swap <link>
         rot simple-outliner
     ] with-style ;
 
@@ -141,7 +138,7 @@ M: f >link <link> ;
 
 : $link ( article -- )
     last-block off first link-style
-    [ dup article-title swap >link simple-object ] with-style ;
+    [ dup article-title swap <link> simple-object ] with-style ;
 
 : $links ( content -- )
     [ 1array $link ] textual-list ;
@@ -178,6 +175,12 @@ M: f >link <link> ;
 
 : $notes ( content -- )
     "Notes" $heading print-element ;
+
+: $see ( content -- )
+    code-style [ first see ] with-nesting* ;
+
+: $definition ( content -- )
+    "Definition" $heading $see ;
 
 : $curious ( content -- )
     "For the curious..." $heading print-element ;

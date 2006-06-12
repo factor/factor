@@ -1,6 +1,16 @@
 IN: words
 USING: help ;
 
+HELP: usage. "( word -- )"
+{ $values { "word" "a word" } }
+{ $description "Prints an outliner listing all callers of a word. This may include the word itself, if it is recursive." }
+{ $examples { $code "\\ reverse usage." } }
+{ $see-also usage usages } ;
+
+HELP: apropos "( substr -- )"
+{ $values { "substr" "a string" } }
+{ $description "Lists all words whose name contains " { $snippet "substr" } "." } ;
+
 HELP: annotate "( word quot -- )"
 { $values { "word" "a word" } { "quot" "a quotation with stack effect " { $snippet "( word def -- def )" } } }
 { $description "Changes a word definition to the result of applying a quotation to the old definition." }

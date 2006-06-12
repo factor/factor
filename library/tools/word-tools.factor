@@ -4,6 +4,21 @@ IN: words
 USING: inspector io kernel math namespaces prettyprint
 sequences strings walker ;
 
+: usage. ( word -- )
+    usage natural-sort [
+        [ synopsis ] keep dup [ usage. ] curry
+        simple-outliner terpri
+    ] each ;
+
+: apropos ( substring -- )
+    "Word names containing ``" write dup write "'':" print
+    all-words completions
+    [
+        [
+            dup word-name % " (" % dup word-vocabulary % ")" %
+        ] "" make swap simple-object terpri
+    ] each ;
+
 : annotate ( word quot -- | quot: word def -- def )
     over >r >r dup word-def r> call r> swap define-compound ;
     inline

@@ -9,14 +9,13 @@ prettyprint sequences strings styles words ;
 ! Clickable objects
 TUPLE: object-button object ;
 
-G: show-object ( object gadget -- ) 1 standard-combination ;
+GENERIC: show ( object -- )
 
 C: object-button ( gadget object -- button )
     [ set-object-button-object ] keep
     [
-        >r [
-            [ object-button-object ] keep show-object
-        ] <roll-button> r> set-gadget-delegate
+        >r [ object-button-object show ] <roll-button>
+        r> set-gadget-delegate
     ] keep ;
 
 M: object-button gadget-help ( button -- string )
@@ -93,7 +92,7 @@ M: object-button gadget-help ( button -- string )
 : <pane-grid> ( quot style grid -- gadget )
     [
         [ pick pick >r >r -rot styled-pane r> r> rot ] map
-    ] map 2nip <grid> 5 over set-grid-gap ;
+    ] map 2nip <grid> 5 over set-grid-gap <default-border> ;
 
 M: pane with-stream-table ( quot grid style pane -- )
     >r swap <pane-grid> r> print-gadget ;

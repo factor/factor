@@ -27,7 +27,7 @@ parser prettyprint styles ;
     {
         "evalInListener:userData:error:" "void"
         { "id" "SEL" "id" "id" "void*" }
-        [ nip [ <input> f show-object f ] do-service 2drop ]
+        [ nip [ <input> show f ] do-service 2drop ]
     }
     {
         "evalToString:userData:error:" "void"

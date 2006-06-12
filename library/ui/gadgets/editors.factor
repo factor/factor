@@ -8,7 +8,10 @@ styles threads ;
 ! A caret
 TUPLE: caret ;
 
-C: caret ( -- caret ) dup delegate>gadget dup caret-theme ;
+C: caret ( -- caret )
+    dup delegate>gadget
+    dup caret-theme
+    f over set-gadget-visible? ;
 
 USE: line-editor
 

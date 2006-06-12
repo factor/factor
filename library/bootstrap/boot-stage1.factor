@@ -108,12 +108,11 @@ vectors words ;
 
         "/library/syntax/parse-stream.factor"
 
-        "/library/tools/outliners.factor"
         "/library/tools/memory.factor"
         "/library/tools/listener.factor"
         "/library/tools/inspector.factor"
         "/library/tools/walker.factor"
-        "/library/tools/annotations.factor"
+        "/library/tools/word-tools.factor"
         
         "/library/test/test.factor"
 
@@ -200,8 +199,8 @@ vectors words ;
         "/library/ui/ui.factor"
         "/library/ui/gadgets/presentations.factor"
         "/library/ui/tools/listener.factor"
+        "/library/ui/tools/search.factor"
         "/library/ui/tools/browser.factor"
-        "/library/ui/tools/apropos.factor"
         "/library/ui/tools/help.factor"
         "/library/ui/tools/launchpad.factor"
 
@@ -275,7 +274,7 @@ vectors words ;
         "/library/syntax/prettyprint.facts"
         "/library/syntax/see.facts"
         "/library/test/test.facts"
-        "/library/tools/annotations.facts"
+        "/library/tools/word-tools.facts"
         "/library/tools/debugger.facts"
         "/library/tools/describe.facts"
         "/library/tools/inspector.facts"

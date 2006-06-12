@@ -22,6 +22,9 @@ SYMBOL: windows
     windows get-global [ second eq? ] find-with drop
     windows get-global [ length 1- ] keep exchange ;
 
+: frontmost-window ( -- world )
+    windows get dup empty? [ drop f ] [ peek second ] if ;
+
 : update-hand ( gadget -- )
     find-world [
         dup hand-gadget get-global find-world eq?
@@ -83,27 +86,15 @@ C: titled-gadget ( gadget title -- )
 : open-titled-window ( gadget title -- )
     <titled-gadget> open-window ;
 
-: restore-windows ( -- )
-    windows get [ second ] map
-    0 windows get set-length
-    [ dup reset-world open-window* ] each
-    forget-rollover ;
-
-: restore-windows? ( -- ? )
-    windows get [ empty? not ] [ f ] if* ;
-
-: (open-tool) ( arg cons setter -- )
+: open-tool ( arg cons setter -- )
     >r call tuck r> call open-window ; inline
 
-: open-tool ( arg pred cons setter -- )
-    rot drop (open-tool) ;
-
-: call-tool ( arg gadget pred cons setter -- )
-    >r >r find-parent dup [
-        r> drop r> call
+: call-tool ( arg pred cons setter -- )
+    >r >r frontmost-window world-gadget swap call [
+        frontmost-window world-gadget r> drop r> call
     ] [
-        drop r> r> (open-tool)
-    ] if ;
+        r> r> open-tool
+    ] if ; inline
 
 : start-world ( world -- )
     dup add-notify
@@ -126,6 +117,12 @@ C: titled-gadget ( gadget title -- )
     #! Sent when native window loses focus.
     focused-ancestors f swap focus-gestures ;
 
+: reset-world ( world -- )
+    dup unfocus-world
+    f over set-world-focus
+    f over set-world-handle
+    world-fonts clear-hash ;
+
 : close-world ( world -- )
     dup hand-clicked close-global
     dup hand-gadget close-global
@@ -133,3 +130,12 @@ C: titled-gadget ( gadget title -- )
     dup remove-notify
     dup free-fonts
     reset-world ;
+
+: restore-windows ( -- )
+    windows get [ second ] map
+    0 windows get set-length
+    [ dup reset-world open-window* ] each
+    forget-rollover ;
+
+: restore-windows? ( -- ? )
+    windows get [ empty? not ] [ f ] if* ;

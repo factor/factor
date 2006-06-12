@@ -2,9 +2,10 @@
 ! See http://factorcode.org/license.txt for BSD license.
 IN: gadgets-browser
 USING: gadgets gadgets-buttons gadgets-labels gadgets-panes
-gadgets-presentations gadgets-scrolling gadgets-tabs
-gadgets-tiles gadgets-theme gadgets-tracks generic hashtables
-help inspector kernel math prettyprint sequences words ;
+gadgets-presentations gadgets-scrolling gadgets-search
+gadgets-tabs gadgets-theme gadgets-tiles gadgets-tracks generic
+hashtables help inspector kernel math prettyprint sequences
+words ;
 
 TUPLE: browser-track showing builder closer ;
 
@@ -31,7 +32,7 @@ C: browser-track ( builder closer -- gadget )
     [ dup browser-track-closer call ] 2keep
     [ browser-track-showing remove-hash* ] keep track-remove ;
 
-TUPLE: browser vocab-track word-track ;
+TUPLE: browser main-track vocab-track word-track ;
 
 : find-browser [ browser? ] find-parent ;
 
@@ -108,6 +109,17 @@ DEFER: show-vocab
     vocabs [ <vocab-button> ] map make-pile <scroller>
     "Vocabularies" f <tile> ;
 
+: <apropos-gadget>
+    [ apropos ] <search-gadget> "Apropos" f <tile> ;
+
+TUPLE: main-track vocabs apropos ;
+
+C: main-track ( -- gadget )
+    {
+        { [ <vocabs> ] set-main-track-vocabs 2/3 }
+        { [ <apropos-gadget> ] set-main-track-apropos 1/3 }
+    } { 0 1 0 } make-track* ;
+
 : <vocab-track> ( -- track )
     [ <vocab-view> ] [ find-browser hide-vocab-words ]
     <browser-track> ;
@@ -117,12 +129,15 @@ DEFER: show-vocab
 
 C: browser ( -- browser )
     {
-        { [ <vocabs> ] f 1/5 }
+        { [ <main-track> ] set-browser-main-track 1/5 }
         { [ <vocab-track> ] set-browser-vocab-track 1/5 }
         { [ <word-track> ] set-browser-word-track 3/5 }
     } { 1 0 0 } make-track* ;
 
 M: browser gadget-title drop "Browser" ;
+
+M: browser focusable-child*
+    browser-main-track main-track-apropos ;
 
 : browser-window ( -- ) <browser> open-window ;
 
@@ -131,5 +146,4 @@ M: browser gadget-title drop "Browser" ;
     [ <browser> ]
     [ show-word ] ;
 
-M: word show-object ( word button -- )
-    browser-tool call-tool ;
+M: word show ( word -- ) browser-tool call-tool ;
