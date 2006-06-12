@@ -34,17 +34,10 @@ C: help-gadget ( -- gadget )
 M: help-gadget gadget-title
     "Help - " swap help-gadget-showing article-title append ;
 
-: fancy-help ( article -- )
-    dup word? [
-        dup article-content { $definition } rot add add
-    ] [
-        article-content
-    ] if (help) ;
-
 : show-help ( link help -- )
     dup add-history [ set-help-gadget-showing ] 2keep
     dup update-title {
-        { "Article" [ fancy-help ] }
+        { "Article" [ help ] }
         { "Links in" [ links-in. ] }
     } swap help-gadget-tabs set-pages ;
 

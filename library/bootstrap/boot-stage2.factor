@@ -40,6 +40,9 @@ parser sequences sequences-internals words ;
         "Not every word compiles, by design." print
         terpri flush
         
+        "Building online help search index..." print flush
+        index-help
+
         "Initializing native I/O..." print flush
         "native-io" get [ init-io ] when
         

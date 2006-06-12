@@ -104,7 +104,6 @@ ARTICLE: "sequences-slicing" "Slicing and splitting"
 { $subsection ?head }
 { $subsection ?tail }
 { $subsection group }
-{ $subsection (split1) }
 { $subsection split1 }
 { $subsection split }
 { $subsection unclip } ;

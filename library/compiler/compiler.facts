@@ -13,7 +13,7 @@ HELP: compile "( word -- )"
 
 HELP: compiled f
 { $description "Compiles the most recently defined word." }
-{ $see word } ;
+{ $see-also word } ;
 
 HELP: try-compile "( word -- )"
 { $values { "word" "a word" } }

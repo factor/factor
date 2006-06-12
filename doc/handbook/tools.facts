@@ -81,9 +81,8 @@ ARTICLE: "word-introspection" "Word introspection"
 "List all vocabularies, and list words in a vocabulary:"
 { $subsection vocabs }
 { $subsection words }
-"Display callers and words called by a given word:"
-{ $subsection usage. }
-{ $subsection uses. } ;
+"Display callers of a given word:"
+{ $subsection usage. } ;
 
 ARTICLE: "walker" "The single stepper"
 "The single stepper evaluates a quotation a word at a time, offering the ability to look at stacks at any stage."

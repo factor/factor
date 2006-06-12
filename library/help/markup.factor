@@ -98,9 +98,6 @@ M: word print-element { } swap execute ;
 : textual-list ( seq quot -- )
     [ ", " print-element ] interleave ; inline
 
-: $see ( content -- )
-    code-style [ first see ] with-nesting* ;
-
 : $example ( content -- )
     1 swap cut* swap "\n" join dup <input> [
         input-style [ format* ] with-style terpri print-element
@@ -145,9 +142,6 @@ M: f >link <link> ;
 : $link ( article -- )
     last-block off first link-style
     [ dup article-title swap >link simple-object ] with-style ;
-
-: $definition ( content -- )
-    "Definition" $heading $see ;
 
 : $links ( content -- )
     [ 1array $link ] textual-list ;
