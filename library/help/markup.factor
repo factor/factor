@@ -205,8 +205,13 @@ M: link summary
     drop
     "Throws an error if the I/O operation fails." $errors ;
 
+: sort-articles ( seq -- assoc )
+    [ [ article-title ] keep 2array ] map
+    [ [ first ] 2apply <=> ] sort
+    [ second ] map ;
+
 : help-outliner ( seq quot -- | quot: obj -- )
     swap sort-articles [ ($subsection) terpri ] each-with ;
 
 : $outliner ( content -- )
-    first call natural-sort [ help ] help-outliner ;
+    first call [ help ] help-outliner ;

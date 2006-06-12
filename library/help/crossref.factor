@@ -10,11 +10,6 @@ namespaces sequences strings words ;
         [ word-article ] word-subset %
     ] { } make ;
 
-: sort-articles ( seq -- assoc )
-    [ [ article-title ] keep 2array ] map
-    [ [ first ] 2apply <=> ] sort
-    [ second ] map ;
-
 : each-article ( quot -- ) all-articles swap each ; inline
 
 GENERIC: elements* ( elt-type element -- )

@@ -1,4 +1,4 @@
-USING: generic help inspector memory sequences ;
+USING: generic help memory sequences words ;
 
 ARTICLE: "changes" "Changes in the latest release"
 { $heading "Factor 0.82" }
