@@ -12,7 +12,5 @@ sequences words ;
 
 : usage. ( word -- ) usage [ usage. ] word-outliner ;
 
-: uses. ( word -- ) uses [ uses. ] word-outliner ;
-
 : apropos ( substring -- )
     all-words completions natural-sort [ help ] word-outliner ;

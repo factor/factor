@@ -6,9 +6,7 @@ USING: arrays kernel namespaces prettyprint sequences words ;
 M: word article-title
     dup word-name swap stack-effect [ " " swap append3 ] when* ;
 
-: word-article ( word -- article ) "help" word-prop ;
-
-: word-help ( word -- article )
+M: word article-content
     [
         \ $synopsis over 2array ,
         dup word-article [
@@ -19,6 +17,3 @@ M: word article-title
             ] when*
         ] ?if
     ] { } make ;
-
-M: word article-content
-    dup word-help { $definition } rot add add ;

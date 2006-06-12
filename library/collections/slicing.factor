@@ -86,20 +86,30 @@ strings vectors ;
 
 : subseq? ( subseq seq -- ? ) start -1 > ;
 
-: (split1) ( seq subseq -- before after )
+: split1 ( seq subseq -- before after )
     dup pick start dup -1 = [
         2drop dup like f
     ] [
-        [ swap length + over tail-slice ] keep rot head swap
+        [ swap length + over tail ] keep rot head swap
     ] if ;
 
-: split1 ( seq subseq -- before after )
-    (split1) dup like ;
+: split,, building get peek push ;
 
-: (split) ( seq subseq -- )
-    tuck (split1) >r , r> dup [ swap (split) ] [ 2drop ] if ;
+: split-next, V{ } clone , ;
 
-: split ( seq subseq -- seq ) [ (split) ] { } make ;
+: split-end, building get dup peek empty? [ pop* ] [ drop ] if ;
+
+: (split) ( separator elt -- | separator: elt -- ? )
+    [ swap call ] keep swap
+    [ drop split-next, ] [ split,, ] if ; inline
+
+: split* ( seq separator -- split | separator: elt -- ? )
+    over >r
+    [ split-next, swap [ (split) ] each-with split-end, ]
+    { } make r> swap [ swap like ] map-with ; inline
+
+: split ( seq separators -- split )
+    swap [ over member? ] split* nip ;
 
 : drop-prefix ( seq1 seq2 -- seq1 seq2 )
     2dup mismatch dup -1 = [ drop 2dup min-length ] when

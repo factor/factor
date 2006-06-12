@@ -94,18 +94,14 @@ HELP: subseq? "( subseq seq -- ? )"
 { $values { "subseq" "a sequence" } { "seq" "a sequence" } { "?" "a boolean" } }
 { $description "Tests if " { $snippet "seq" } " contains the elements of " { $snippet "subseq" } " as a contiguous subsequence." } ;
 
-HELP: (split1) "( seq subseq -- before after )"
-{ $values { "seq" "a sequence" } { "subseq" "a sequence" } { "before" "a new sequence" } { "after" "a slice" } }
+HELP: split1 "( seq subseq -- before after )"
+{ $values { "seq" "a sequence" } { "subseq" "a sequence" } { "before" "a new sequence" } { "after" "a new sequence" } }
 { $description "Splits " { $snippet "seq" } " at the first occurrence of " { $snippet "subseq" } ", and outputs the pieces before and after the split. If " { $snippet "subseq" } " does not occur in " { $snippet "seq" } ", then " { $snippet "before" } " is just " { $snippet "seq" } " and " { $snippet "after" } " is " { $link f } "." } ;
 
-HELP: split1 "( seq subseq -- before after )"
-{ $values { "seq" "a sequence" } { "subseq" "a sequence" } { "before" "a new sequence" } { "after" "a sequence" } }
-{ $description "A variant of " { $link (split1) } " where " { $snippet "after" } " is converted to a sequence of the same class as " { $snippet "seq" } "." } ;
-
 HELP: split "( seq subseq -- pieces )"
-{ $values { "seq" "a sequence" } { "subseq" "a sequence" } { "pieces" "a new array" } }
-{ $description "Splits " { $snippet "seq" } " at each occurrence of " { $snippet "subseq" } ", and outputs an array of pieces." }
-{ $examples { $example "\"hello world how are you?\" \" \" split ." "{ \"hello\" \"world\" \"how\" \"are\" \"you?\" }" } } ;
+{ $values { "seq" "a sequence" } { "separators" "a sequence" } { "pieces" "a new array" } }
+{ $description "Splits " { $snippet "seq" } " at each occurrence of an element of " { $snippet "separators" } ", and outputs an array of pieces." }
+{ $examples { $example "\"hello world-how are you?\" \" -\" split ." "{ \"hello\" \"world\" \"how\" \"are\" \"you?\" }" } } ;
 
 HELP: drop-prefix "( seq1 seq2 -- slice1 slice2 )"
 { $values { "seq1" "a sequence" } { "seq2" "a sequence" } { "slice1" "a slice" } { "slice2" "a slice" } }

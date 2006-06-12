@@ -59,8 +59,5 @@ SYMBOL: help-graph
 : articles. ( -- )
     articles get hash-keys [ help ] help-outliner ;
 
-: links-out. ( article -- )
-    links-out [ links-out. ] help-outliner ;
-
 : links-in. ( article -- )
     links-in [ links-in. ] help-outliner ;

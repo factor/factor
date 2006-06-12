@@ -51,11 +51,9 @@ DEFER: show-vocab
 : <word-pages> ( word -- tabs )
     {
         { "Definition" [ see ] }
-        { "Documentation" [ word-help (help) ] }
+        { "Documentation" [ help ] }
         { "Calls in" [ usage. ] }
-        { "Calls out" [ uses. ] }
         { "Links in" [ links-in. ] }
-        { "Links out" [ links-out. ] }
         { "Properties" [ word-props describe ] }
     } <pages> ;
 
