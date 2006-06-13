@@ -16,10 +16,6 @@ math memory namespaces ;
 : compile-aligned ( n -- )
     compiled-offset 8 align set-compiled-offset ; inline
 
-: add-literal ( obj -- lit# )
-    address literal-top [ set-compiled-cell ] keep
-    dup cell + set-literal-top ;
-
 : assemble-1 ( n -- )
     compiled-offset set-compiled-1
     compiled-offset 1+ set-compiled-offset ; inline

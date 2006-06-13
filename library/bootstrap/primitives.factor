@@ -150,8 +150,7 @@ call
     { "cd" "io"                             }
     { "compiled-offset" "assembler"         }
     { "set-compiled-offset" "assembler"     }
-    { "literal-top" "assembler"             }
-    { "set-literal-top" "assembler"         }
+    { "add-literal" "assembler"             }
     { "address" "memory"                    }
     { "dlopen" "alien"                      }
     { "dlsym" "alien"                       }

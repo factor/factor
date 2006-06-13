@@ -15,7 +15,7 @@ GENERIC: set-fill
 : expand ( len seq -- )
     [ underlying resize ] keep set-underlying ; inline
 
-: new-size ( n -- n ) 3 * dup 50 < [ drop 50 ] when ;
+: new-size ( n -- n ) 1+ 3 * ; inline
 
 : ensure ( n seq -- )
     2dup length >= [

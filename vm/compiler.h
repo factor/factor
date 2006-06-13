@@ -16,8 +16,7 @@ CELL literal_max;
 void init_compiler(CELL size);
 void primitive_compiled_offset(void);
 void primitive_set_compiled_offset(void);
-void primitive_literal_top(void);
-void primitive_set_literal_top(void);
+void primitive_add_literal(void);
 void collect_literals(void);
 
 #ifdef FACTOR_PPC

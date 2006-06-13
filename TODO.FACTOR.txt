@@ -1,4 +1,9 @@
-- UI word wrap problem
+- crash:
+  - start UI
+  - redefine new-size
+  - recompile all
+  - full gc
+  - crash!
 
 - unix i/o: problems with passing f to syscalls
 - if a primitive throws an error, :c doesn't show the call frame there
@@ -36,6 +41,7 @@
     - fix remaining HTML stream issues
     - need to present $list in a useful way
   - better line spacing in ui and html - related issue
+  - get rid of style stack
 
 + fix compiled gc check
   - there was a performance hit, investigate
@@ -57,6 +63,8 @@
 
 + ui:
 
+- { } H{ } [ ] tabular-output -- excess newline
+- multiple listener-run-files is broken
 - word wrap in UI broken again
 - table line styles
 - x11 input methods
@@ -65,6 +73,7 @@
   - browse generic words and classes
   - need actions for reloading the source file and opening word in jEdit
   - highlight showing panes in originating list
+  - single set of tabs across the top
 - toggle/radio buttons/tabs or something
 - make-frame should compile
 - speed up ideas:

@@ -293,9 +293,7 @@ sequences strings vectors words prettyprint ;
 
 \ set-compiled-offset [ [ integer ] [ ] ] "infer-effect" set-word-prop
 
-\ literal-top [ [ ] [ integer ] ] "infer-effect" set-word-prop
-
-\ set-literal-top [ [ integer ] [ ] ] "infer-effect" set-word-prop
+\ add-literal [ [ object ] [ integer ] ] "infer-effect" set-word-prop
 
 \ address [ [ object ] [ integer ] ] "infer-effect" set-word-prop
 

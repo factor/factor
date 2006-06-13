@@ -85,6 +85,9 @@ INLINE CELL tag_header(CELL cell)
 
 INLINE CELL untag_header(CELL cell)
 {
+	/* if((cell & TAG_MASK) != OBJECT_TYPE)
+		critical_error("Corrupt object header",cell); */
+
 	return cell >> TAG_BITS;
 }
 

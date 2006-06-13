@@ -25,17 +25,15 @@ void primitive_set_compiled_offset(void)
 	}
 }
 
-void primitive_literal_top(void)
+void primitive_add_literal(void)
 {
-	box_unsigned_cell(literal_top);
-}
-
-void primitive_set_literal_top(void)
-{
-	CELL offset = unbox_unsigned_cell();
-	if(offset >= literal_max)
-		critical_error("Too many compiled literals",offset);
-	literal_top = offset;
+	CELL object = dpeek();
+	CELL offset = literal_top;
+	put(literal_top,object);
+	literal_top += CELLS;
+	if(literal_top >= literal_max)
+		critical_error("Too many compiled literals",literal_top);
+	drepl(tag_cell(offset));
 }
 
 void primitive_flush_icache(void)
