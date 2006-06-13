@@ -179,8 +179,6 @@ CELL copy_object(CELL pointer)
 	CELL tag;
 	CELL header;
 
-	gc_debug("copy object",pointer);
-
 	if(pointer == F)
 		return F;
 
@@ -347,11 +345,7 @@ void garbage_collection(CELL gen)
 
 	end_gc(gen);
 
-	gc_debug("gc done",gen);
-
 	gc_time += (current_millis() - start);
-	
-	gc_debug("total gc time",gc_time);
 }
 
 void primitive_gc(void)

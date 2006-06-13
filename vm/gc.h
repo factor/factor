@@ -53,14 +53,6 @@ so we have to check that the pointer occurs after the beginning of
 the requested generation. */
 #define COLLECTING_GEN(ptr) (collecting_gen_start <= ptr)
 
-/* #define GC_DEBUG */
-
-INLINE void gc_debug(char* msg, CELL x) {
-#ifdef GC_DEBUG
-	printf("%s %ld\n",msg,x);
-#endif
-}
-
 INLINE bool should_copy(CELL untagged)
 {
 	if(collecting_gen == TENURED)
