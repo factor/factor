@@ -114,7 +114,7 @@ void collect_roots(void)
 		
 		collect_callstack(stacks->call_region,stacks->call);
 
-		if(stacks != stack_chain)
+		if(stacks->next != NULL)
 		{
 			collect_callframe_triple(&stacks->callframe,
 				&stacks->callframe_scan,&stacks->callframe_end);
