@@ -29,10 +29,8 @@ M: f article-content drop \ f article-content ;
 SYMBOL: last-block
 
 : (help) ( element -- )
-    default-style [
-        last-block on print-element
-    ] with-nesting* terpri ;
+    default-style [ last-block on print-element ] with-nesting ;
 
-: help ( topic -- ) article-content (help) ;
+: help ( topic -- ) article-content (help) terpri ;
 
 : handbook ( -- ) "handbook" help ;

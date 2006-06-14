@@ -24,6 +24,7 @@ SYMBOL: string-limit
 ! Special trick to highlight a word in a quotation
 SYMBOL: hilite-quotation
 SYMBOL: hilite-index
+SYMBOL: hilite-next?
 
 global [
     4 tab-size set
@@ -62,9 +63,9 @@ C: section ( length -- section )
 
 TUPLE: text string style ;
 
-C: text ( string -- section )
-    over length 1+ <section> over set-delegate
-    current-style over set-text-style
+C: text ( string style -- section )
+    pick length 1+ <section> over set-delegate
+    [ set-text-style ] keep
     [ set-text-string ] keep ;
 
 M: text pprint-section*
@@ -87,7 +88,9 @@ C: block ( -- block )
     dup block-empty?
     [ drop ] [ pprinter-block block-sections push ] if ;
 
-: text ( string -- ) <text> add-section ;
+: styled-text ( string style -- ) <text> add-section ;
+
+: text ( string -- ) H{ } styled-text ;
 
 : <indent ( section -- ) section-indent indent [ + ] change ;
 
@@ -159,13 +162,16 @@ GENERIC: pprint* ( obj -- )
 
 : word-style ( word -- style )
     [
+        hilite-next? get [
+            { 0.9 0.9 0.9 1 } background set
+            highlight on
+        ] when
         dup presented set
         parsing? [ bold font-style set ] when
     ] make-hash ;
 
 : pprint-word ( obj -- )
-    dup word-name [ "( ? )" ] unless*
-    swap word-style [ text ] with-style ;
+    dup word-name swap word-style styled-text ;
 
 M: object pprint* ( obj -- )
     "( unprintable object: " swap class word-name " )" append3
@@ -243,12 +249,7 @@ M: dll pprint* ( obj -- str ) dll-path "DLL\" " pprint-string ;
     dup parsing? [ \ POSTPONE: pprint-word ] when pprint* ;
 
 : pprint-hilite ( object n -- )
-    hilite-index get = [
-        H{ { background { 0.9 0.9 0.9 1 } } { highlight t } }
-        [ pprint-element ] with-style
-    ] [
-        pprint-element
-    ] if ;
+    hilite-index get = hilite-next? set pprint-element ;
 
 : pprint-elements ( seq -- )
     length-limit? >r dup hilite-quotation get eq? [

@@ -72,6 +72,7 @@ vectors words ;
         "/library/io/duplex-stream.factor"
         "/library/io/stdio.factor"
         "/library/io/null-stream.factor"
+        "/library/io/nested-style.factor"
         "/library/io/lines.factor"
         "/library/io/plain-stream.factor"
         "/library/io/string-streams.factor"

@@ -16,7 +16,7 @@ PREDICATE: array simple-element
     dup empty? [ drop t ] [ first word? not ] if ;
 
 M: simple-element print-element [ print-element ] each ;
-M: string print-element last-block off format* ;
+M: string print-element last-block off write ;
 M: array print-element unclip execute ;
 M: word print-element { } swap execute ;
 
@@ -49,13 +49,12 @@ M: word print-element { } swap execute ;
 : ($code) ( presentation quot -- )
     [
         code-style [
-            >r current-style swap presented pick set-hash r>
-            with-nesting
+            >r presented associate r> with-nesting
         ] with-style
     ] ($block) ; inline
 
 : $code ( content -- )
-    "\n" join dup <input> [ format* ] ($code) ;
+    "\n" join dup <input> [ write ] ($code) ;
 
 : $syntax ( word -- )
     dup stack-effect [
@@ -90,7 +89,7 @@ M: word print-element { } swap execute ;
 
 : $warning ( content -- )
     [
-        current-style warning-style hash-union [
+        warning-style [
             "Warning" $heading print-element
         ] with-nesting
     ] ($block) ;
@@ -100,7 +99,7 @@ M: word print-element { } swap execute ;
 
 : $example ( content -- )
     1 swap cut* swap "\n" join dup <input> [
-        input-style [ format* ] with-style terpri print-element
+        input-style format terpri print-element
     ] ($code) ;
 
 ! Some links
@@ -115,7 +114,7 @@ M: link summary
 : ($subsection) ( quot object -- )
     subsection-style [
         [ swap curry ] keep dup article-title swap <link>
-        rot simple-outliner
+        rot write-outliner
     ] with-style ;
 
 : $subsection ( object -- )
@@ -123,22 +122,16 @@ M: link summary
         first [ help ] swap ($subsection)
     ] ($block) ;
 
-: ($subtopic) ( element -- quot )
-    [
-        default-style
-        [ last-block on print-element ] with-nesting*
-    ] curry ;
-
 : $subtopic ( object -- )
     [
-        unclip swap ($subtopic) [
-            subtopic-style [ print-element ] with-style
-        ] write-outliner
+        subtopic-style [
+            unclip f rot [ (help) ] curry write-outliner
+        ] with-style
     ] ($block) ;
 
 : $link ( article -- )
     last-block off first link-style
-    [ dup article-title swap <link> simple-object ] with-style ;
+    [ dup article-title swap <link> write-object ] with-style ;
 
 : $links ( content -- )
     [ 1array $link ] textual-list ;
@@ -148,7 +141,7 @@ M: link summary
 
 : $table ( content -- )
     ?terpri table-style [
-        current-style [ print-element ] tabular-output
+        H{ } [ print-element ] tabular-output
     ] with-style ;
 
 : $values ( content -- )
@@ -177,7 +170,7 @@ M: link summary
     "Notes" $heading print-element ;
 
 : $see ( content -- )
-    code-style [ first see ] with-nesting* ;
+    code-style [ first see ] with-nesting ;
 
 : $definition ( content -- )
     "Definition" $heading $see ;

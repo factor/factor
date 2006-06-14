@@ -73,54 +73,16 @@ HELP: with-stream* "( stream quot -- )"
 { $notes "This word differs from " { $link with-stream } " in that if an error is thrown while the quotation is executing, the stream is " { $emphasis "not" } " closed." }
 { $see-also with-stream } ;
 
-HELP: style-stack f
-{ $description "Variable. Holds a vector of hashtables." }
-{ $see-also with-style format* } ;
-
-HELP: with-style "( style quot -- )"
-{ $values { "style" "a hashtable" } { "quot" "a quotation" } }
-{ $description "Pushes a style on the style stack, and calls the quotation." }
-{ $see-also format* with-nesting* } ;
-
-HELP: current-style "( -- style )"
-{ $values { "style" "a hashtable" } }
-{ $description "Creates a new hashtable by concatenating all styles on the style stack, with keys in more recently pushed styles taking precedence." }
-{ $see-also format* with-nesting* } ;
-
-HELP: format* "( str -- )"
-{ $values { "str" "a string" } }
-{ $description "Writes formatted text to the " { $link stdio } " stream using the current style." }
-{ $see-also current-style } 
-$io-error ;
-
 HELP: bl "( -- )"
-{ $description "Writes a word break to the " { $link stdio } " stream using the current style." }
-{ $notes "This word is useful even when not doing formatting. If " { $link stdio } " is a plain text stream, it simply outputs a space." }
-{ $see-also current-style } 
+{ $description "Outputs a space character (" { $snippet "\" \"" } ")." }
 $io-error ;
 
-HELP: with-nesting* "( style quot -- )"
-{ $values { "style" "a hashtable" } { "quot" "a quotation" } }
-{ $description "Calls the quotation in a new dynamic scope with the " { $link stdio } " stream rebound to a nested paragraph stream with the current style." }
-$io-error
-{ $see-also current-style } ;
-
-HELP: write-object "( obj quot -- )"
-{ $values { "obj" "an object" } { "quot" "a quotation" } }
-{ $description "Pushes a style on the style stack associating all output with the object, and calls the quotation. If the " { $link stdio } " stream supports it, any text output by the quotation will become a clickable presentation of the object." }
-$io-error ;
-
-HELP: simple-object "( str obj -- )"
+HELP: write-object "( str obj -- )"
 { $values { "str" "a string" } { "obj" "an object" } }
 { $description "Writes a string to the " { $link stdio } " stream, associating it with the object. If formatted output is supported, the string will become a clickable presentation of the object, otherwise this word behaves like a call to " { $link write } "." }
 $io-error ;
 
-HELP: write-outliner "( content caption -- )"
-{ $values { "content" "a quotation" } { "caption" "a quotation" } }
-{ $description "Writes an outliner to the " { $link stdio } " stream. The " { $snippet "caption" } " quotation is called to produce a label for an outliner. Expanding the outliner calls " { $snippet "content" } " in a new dynamic scope with " { $link stdio } " rebound to the body of the outliner. If the stream does not support formatted output, this simply calls " { $snippet "caption" } " and ignores " { $snippet "content" } "." }
-$io-error ;
-
-HELP: simple-outliner "( str obj content -- )"
+HELP: write-outliner "( str obj content -- )"
 { $values { "str" "a string" } { "obj" "an object" } { "content" "a quotation" } }
 { $description "Writes an outliner to the " { $link stdio } " stream. The outliner's caption is a the string " { $snippet "str" } " with an associated presentation of " { $snippet "obj" } ". Expanding the outliner calls " { $snippet "content" } " in a new dynamic scope with " { $link stdio } " rebound to the body of the outliner. If the stream does not support formatted output, this simply writes " { $snippet "str" } " and ignores everything else." }
 $io-error ;

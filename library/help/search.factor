@@ -56,5 +56,5 @@ SYMBOL: term-index
 : search-help. ( phrase -- )
     "Search results for ``" write dup write "'':" print
     search-help [
-        first <link> [ article-title ] keep simple-object terpri
+        first <link> [ article-title ] keep write-object terpri
     ] each ;

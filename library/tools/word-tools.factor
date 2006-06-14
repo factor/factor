@@ -7,7 +7,7 @@ sequences strings walker ;
 : usage. ( word -- )
     usage natural-sort [
         [ synopsis ] keep dup [ usage. ] curry
-        simple-outliner terpri
+        write-outliner terpri
     ] each ;
 
 : apropos ( substring -- )
@@ -16,7 +16,7 @@ sequences strings walker ;
     [
         [
             dup word-name % " (" % dup word-vocabulary % ")" %
-        ] "" make swap simple-object terpri
+        ] "" make swap write-object terpri
     ] each ;
 
 : annotate ( word quot -- | quot: word def -- def )

@@ -15,7 +15,7 @@ C: history ( -- gadget )
 : update-history ( history -- )
     dup history-seq swap history-pane [
         <reversed> [
-            [ article-title ] keep simple-object terpri
+            [ article-title ] keep write-object terpri
         ] each
     ] with-pane ;
 

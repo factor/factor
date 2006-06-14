@@ -24,7 +24,7 @@ TUPLE: listener-gadget scroller stack ;
             "Empty stack" write drop
         ] [
             "Stack top: " write <reversed>
-            [ [ unparse-short ] keep simple-object bl ] each bl
+            [ [ unparse-short ] keep write-object bl ] each bl
         ] if
     ] with-stream* ;
 

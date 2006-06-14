@@ -1,5 +1,5 @@
-! Copyright (C) 2003, 2005 Slava Pestov.
-! See http://factor.sf.net/license.txt for BSD license.
+! Copyright (C) 2003, 2006 Slava Pestov.
+! See http://factorcode.org/license.txt for BSD license.
 IN: io
 USING: errors generic hashtables kernel namespaces sequences
 strings styles ;
@@ -34,40 +34,10 @@ SYMBOL: stdio
 : with-stream ( stream quot -- )
     swap [ [ close ] cleanup ] with-stream* ; inline
 
-SYMBOL: style-stack
+: bl ( -- ) " " write ;
 
-V{ } clone style-stack set-global
+: write-object ( string object -- )
+    presented associate format ;
 
-: >style ( style -- )
-    dup hashtable? [ "Style must be a hashtable" throw ] unless
-    style-stack get push ;
-
-: drop-style ( -- ) style-stack get pop* ;
-
-: with-style ( style quot -- )
-    swap >style call drop-style ; inline
-
-: with-style-stack ( quot -- )
-    [ V{ } clone style-stack set call ] with-scope ;
-
-: current-style ( -- style )
-    style-stack get hash-concat ;
-
-: format* ( string -- ) current-style format ;
-
-: bl ( -- ) " " format* ;
-
-: with-nesting* ( style quot -- )
-    swap [ current-style swap with-nesting ] with-style ; inline
-
-: write-object ( object quot -- )
-    >r presented associate r> with-style ;
-
-: simple-object ( string object -- )
-    [ format* ] write-object ;
-
-: write-outliner ( content caption -- )
-    >r outline associate r> with-nesting* ;
-
-: simple-outliner ( string object content -- )
-    [ simple-object ] write-outliner ;
+: write-outliner ( string object content -- )
+    outline associate [ write-object ] with-nesting ;

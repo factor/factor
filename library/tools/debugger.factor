@@ -129,7 +129,7 @@ M: object error. ( error -- ) . ;
 : :res ( n -- ) restarts get nth first3 continue-with ;
 
 : (debug-help) ( string quot -- )
-    <input> simple-object terpri ;
+    <input> write-object terpri ;
 
 : restart. ( restart n -- )
     [ [ # " :res  " % first % ] "" make ] keep

@@ -57,10 +57,7 @@ HELP: font-style f
 
 HELP: presented f
 { $description "Character and paragraph style. An object associated with the text. In the Factor UI, this is shown as a clickable presentation of the object; left-clicking invokes a default command, and right-clicking shows a menu of commands." }
-{ $see-also simple-object write-object } ;
-
-HELP: file f
-{ $description "Character style. A pathname associated with the text. In the Factor HTTP server, this is rendered as a link to this path on the server." } ;
+{ $see-also write-object } ;
 
 HELP: page-color f
 { $description "Paragraph style. Background color of the paragraph block, denoted by a sequence of four numbers between 0 and 1 (red, green, blue and alpha)." } 
@@ -86,11 +83,11 @@ HELP: wrap-margin f
 
 HELP: outline f
 { $description "Paragraph style. In the Factor UI, a quotation executed to produce outliner content when the outliner widget next to the paragraph block is expanded." }
-{ $see-also simple-outliner write-outliner } ;
+{ $see-also write-outliner } ;
 
 HELP: input f
 { $description "A wrapper class. In the Factor UI, presentations of this class are output as blocks of text which insert themselves in the listener's input area when clicked." }
 { $examples
     "This presentation class is used for the code examples you see in the online help:"
-    { $code "\"2 3 + .\" dup <input> simple-object terpri" }
+    { $code "\"2 3 + .\" dup <input> write-object terpri" }
 } ;

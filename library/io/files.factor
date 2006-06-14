@@ -29,14 +29,16 @@ strings styles ;
 : <resource-reader> ( path -- stream )
     resource-path <file-reader> ;
 
+TUPLE: file path ;
+
 : (file.) ( name path -- )
-    file associate [ format* ] with-style ;
+    file associate format ;
 
 DEFER: directory.
 
 : (directory.) ( name path -- )
-    dup [ directory. ] curry
-    [ "/" append (file.) ] write-outliner terpri ;
+    >r "/" append r> dup <file> swap [ directory. ] curry
+    write-outliner terpri ;
 
 : file. ( dir name -- )
     tuck path+
