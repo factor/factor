@@ -55,6 +55,12 @@ unit-test
 [ { "a" "b" "c" "d" "e" "f" } ]
 [ "aXbYcXdYeXf" "XY" split ] unit-test
 
+[ { "" "" } ]
+[ " " " " split ] unit-test
+
+[ { "hey" } ]
+[ "hey" " " split ] unit-test
+
 [ "Hello world" t ] [ "Hello world\n" "\n" ?tail ] unit-test
 [ "Hello world" f ] [ "Hello world" "\n" ?tail ] unit-test
 [ "" t ] [ "\n" "\n" ?tail ] unit-test

@@ -24,7 +24,7 @@ SYMBOL: stdio
     swap stdio get with-nested-stream ;
 
 : tabular-output ( grid style quot -- )
-    -rot stdio get with-stream-table ;
+    swap stdio get with-stream-table ;
 
 : print ( string -- ) stdio get stream-print ;
 

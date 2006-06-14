@@ -58,7 +58,6 @@
 - fix listener scroll to
 - { } H{ } [ ] tabular-output -- excess newline
 - multiple listener-run-files is broken
-- word wrap in UI broken again
 - table line styles
 - x11 input methods
 - roundoff is still not quite right with tracks

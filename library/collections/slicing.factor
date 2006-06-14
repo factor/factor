@@ -97,15 +97,13 @@ strings vectors ;
 
 : split-next, V{ } clone , ;
 
-: split-end, building get dup peek empty? [ pop* ] [ drop ] if ;
-
 : (split) ( separator elt -- | separator: elt -- ? )
     [ swap call ] keep swap
     [ drop split-next, ] [ split,, ] if ; inline
 
 : split* ( seq separator -- split | separator: elt -- ? )
     over >r
-    [ split-next, swap [ (split) ] each-with split-end, ]
+    [ split-next, swap [ (split) ] each-with ]
     { } make r> swap [ swap like ] map-with ; inline
 
 : split ( seq separators -- split )

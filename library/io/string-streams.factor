@@ -28,7 +28,7 @@ M: sbuf stream-flush drop ;
 
 M: plain-writer with-stream-table ( grid quot style stream -- )
     [
-        nip swap
+        drop swap
         [ [ swap string-out ] map-with ] map-with
         flip [ format-column ] map-last
         flip [ " " join ] map
