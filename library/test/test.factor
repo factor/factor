@@ -74,7 +74,7 @@ SYMBOL: failures
         "collections/strings" "collections/namespaces"
         "collections/vectors" "collections/sequences"
         "collections/queues" "generic" "tuple" "parser"
-        "parse-number" "init" "io/io"
+        "parse-number" "init" "io/io" "io/nested-style"
         "words" "prettyprint" "random" "stream" "math/bitops"
         "math/math-combinators" "math/rational" "math/float"
         "math/complex" "math/irrational"

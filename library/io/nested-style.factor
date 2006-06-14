@@ -1,9 +1,12 @@
 ! Copyright (C) 2006 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 IN: io
-USING: generic hashtables kernel namespaces strings ;
+USING: arrays generic hashtables kernel namespaces strings ;
 
 TUPLE: nested-style-stream style ;
+
+: with-style ( style quot -- )
+    >r stdio get <nested-style-stream> r> with-stream* ; inline
 
 : do-nested-style ( style stream -- style delegate )
     [ nested-style-stream-style hash-union ] keep delegate ;
@@ -25,11 +28,12 @@ M: nested-style-stream stream-write
 M: nested-style-stream stream-write1
     >r ch>string r> H{ } swap do-nested-style stream-format ;
 
+: do-nested-quot ( quot style stream -- quot style stream )
+    do-nested-style
+    >r [ swap \ with-style 3array >quotation ] keep r> ;
+
 M: nested-style-stream with-nested-stream
-    do-nested-style with-nested-stream ;
+    do-nested-quot with-nested-stream ;
 
 M: nested-style-stream with-stream-table
-    do-nested-style with-stream-table ;
-
-: with-style ( style quot -- )
-    >r stdio get <nested-style-stream> r> with-stream* ; inline
+    do-nested-quot with-stream-table ;

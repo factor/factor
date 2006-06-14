@@ -94,8 +94,8 @@ M: object-button gadget-help ( button -- string )
         [ pick pick >r >r -rot styled-pane r> r> rot ] map
     ] map 2nip <grid> 5 over set-grid-gap <default-border> ;
 
-M: pane with-stream-table ( quot grid style pane -- )
-    >r swap <pane-grid> r> print-gadget ;
+M: pane with-stream-table ( grid quot style pane -- )
+    >r rot <pane-grid> r> print-gadget ;
 
 M: pane with-nested-stream ( quot style stream -- )
     >r styled-pane r> write-gadget ;

@@ -5,6 +5,8 @@
 + httpd:
   - outliners don't work
   - browser responder doesn't work
+  - fix remaining HTML stream issues
+  - update for file style prop becoming presented <file>
 
 - fix this:
 
@@ -28,13 +30,10 @@
 - constant branch folding
 - cocoa: starting the UI with +foo switches opens them as files
 + refactor style stack code so that nested styles are handled at a lower-level
-  - in HTML, we can nest div tags, etc
-  - fix prettyprinter's highlighting of non-leaves looks bad
-  - maybe even go from markup to HTML?
-    - fix remaining HTML stream issues
-    - need to present $list in a useful way
+  - with-style & with-stream-style
+    - in HTML, we can nest div tags, etc
+  - prettyprinter's highlighting of non-leaves looks bad
   - better line spacing in ui and html - related issue
-  - get rid of style stack
 
 + fix compiled gc check
   - there was a performance hit, investigate
