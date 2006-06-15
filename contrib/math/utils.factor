@@ -13,6 +13,13 @@ USING: errors kernel sequences math sequences-internals namespaces arrays ;
     gcd 1 = [ "Non-trivial divisor found" throw ] unless ;
     foldable
 
+: each-bit ( n quot -- | quot: 0/1 -- )
+    over zero? pick -1 number= or [
+        2drop
+    ] [
+        2dup >r >r >r 1 bitand r> call r> -1 shift r> each-bit
+    ] if ; inline
+
 : (^mod) ( n z w -- z^w )
     1 swap [
         1 number= [ dupd * pick mod ] when >r sq over mod r>
