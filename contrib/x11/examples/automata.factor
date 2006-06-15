@@ -63,7 +63,8 @@ f initialize-x create-window win set
 
 : show-point ( { x y } p -- ) 1 = [ draw-point ] [ drop ] if ;
 
-: (show-line) ( { x y } line -- ) [ >r dup r> show-point { 1 0 } v+ ] each drop ;
+: (show-line) ( { x y } line -- )
+[ >r dup r> show-point { 1 0 } v+ ] each drop ;
 
 : show-line ( y line -- ) >r >r 0 r> 2array r> (show-line) ;
 
@@ -72,8 +73,8 @@ f initialize-x create-window win set
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 : run-rule ( -- last-line ) clear-window
-0 random-line window-height [ drop 2dup show-line >r 1 + r> step-line ] each nip
-flush-dpy ;
+0 random-line window-height [ drop 2dup show-line >r 1 + r> step-line ]
+each nip flush-dpy ;
 
 : run-rule-wrapped ( -- last-line ) clear-window
 0 random-line 400 [ drop 2dup show-line >r 1 + r> step-line-wrapped ] each nip

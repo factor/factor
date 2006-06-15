@@ -48,11 +48,9 @@ SYMBOL: time-slice   0.5 time-slice set-global
 ! : random-n ( n -- random-0-to-n-1 )
 !   1 - 0 swap random-int ;
 
-: random-pos ( -- pos )
-  world-size get [ random-int ] map ;
+: random-pos ( -- pos ) world-size get [ random-int ] map ;
 
-: random-vel ( -- vel )
-  2 >array [ drop -10 10 random-range ] map ;
+: random-vel ( -- vel ) 2 >array [ drop -10 10 random-range ] map ;
 
 : random-boid ( -- boid ) random-pos random-vel <boid> ;
 
@@ -63,7 +61,7 @@ SYMBOL: time-slice   0.5 time-slice set-global
 SYMBOL: boids
 
 : setup-window
-  ":0.0" initialize-x
+  f initialize-x
   create-window win set
   world-size get resize-window
   map-window
@@ -88,15 +86,13 @@ SYMBOL: boids
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-: distance ( boid boid -- n )
-  boid-pos swap boid-pos v- norm ;
+: distance ( boid boid -- n ) boid-pos swap boid-pos v- norm ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 : r->d ( radians -- degrees ) 180 * pi / ;
-  
-: constrain ( n a b -- n )
-  >r max r> min ;
+
+: constrain ( n a b -- n ) >r max r> min ;
 
 : angle-between ( vec vec -- angle )
   2dup >r >r
@@ -110,8 +106,7 @@ SYMBOL: boids
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-: vsum ( vector-of-vectors --- vec )
-  { 0 0 } [ v+ ] reduce ;
+: vsum ( vector-of-vectors --- vec ) { 0 0 } [ v+ ] reduce ;
 
 : average-position ( boids -- pos )
   [ boid-pos ] map   dup >r   vsum   r>   length   v/n ;
@@ -126,8 +121,7 @@ SYMBOL: boids
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-: within-radius? ( self other radius -- ? )
-  >r distance r> <= ;
+: within-radius? ( self other radius -- ? ) >r distance r> <= ;
 
 : within-view-angle? ( self other view-angle -- ? )
   >r relative-angle r> 2 / <= ;
@@ -253,25 +247,19 @@ SYMBOL: boids
   dup   1 world-size get nth   >=   [ drop 0 ] when
   dup   0 < [ drop 1 world-size get nth   1 - ] when ;
 
-: wrap-pos ( pos -- pos )
-  [ ] each
-  wrap-y swap wrap-x swap 2array ;
+: wrap-pos ( pos -- pos ) [ ] each wrap-y swap wrap-x swap 2array ;
 
-: iterate-boid ( self -- self )
-  dup >r new-pos wrap-pos r> new-vel <boid> ;
+: iterate-boid ( self -- self ) dup >r new-pos wrap-pos r> new-vel <boid> ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-: iterate-boids ( -- )
-  boids get [ iterate-boid ] map boids set ;
+: iterate-boids ( -- ) boids get [ iterate-boid ] map boids set ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-: draw-boids ( -- )
-  boids get [ draw-boid ] each flush-dpy ;
+: draw-boids ( -- ) boids get [ draw-boid ] each flush-dpy ;
 
-: run-boids ( -- )
-  iterate-boids clear-window draw-boids 1 sleep run-boids ;
+: run-boids ( -- ) iterate-boids clear-window draw-boids 1 sleep run-boids ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 ! Comments from others:
