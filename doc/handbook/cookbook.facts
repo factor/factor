@@ -1,0 +1,203 @@
+USING: help io kernel math namespaces prettyprint sequences ;
+
+ARTICLE: "cookbook-syntax" "Basic syntax cookbook"
+"The following is a simple snippet of Factor code:"
+{ $example "10 sq 5 - ." "95" }
+"You can click on it to evaluate it in the listener, and it will print the same output value as indicated above."
+$terpri
+"Factor has a very simple syntax. Your program consists of " { $emphasis "words" } " and " { $emphasis "literals" } ". In the above snippet, the words are " { $link sq } ", " { $link - } " and " { $link . } ". The two integers 10 and 5 are literals."
+$terpri
+"Factor evaluates code left to right, and stores intermediate values on a " { $emphasis "stack" } ". If you think of the stack as a pile of papers, then " { $emphasis "pushing" } " a value on the stack corresponds to placing a piece of paper at the top of the pile, while " { $emphasis "popping" } " a value corresponds to removing the topmost piece."
+$terpri
+"In the above example, the following series of steps occurs as the code is evaluated:"
+{ $table
+    { "Action" "Stack contents" }
+    { "10 is pushed on the stack." { $snippet "10" } }
+    { { "The " { $link sq } " word is executed. It pops one input from the stack - the integer 10 - and squares it, pushing the result." } { $snippet "100" } }
+    { { "5 is pushed on the stack." } { $snippet "100 5" } }
+    { { "The " { $link - } " word is executed. It pops two inputs from the stack - the integers 100 and 5 - and subtracts 5 from 100, pushing the result." } { $snippet "95" } }
+    { { "The " { $link . } " word is executed. It pops one input from the stack - the integer 95 - and prints it in the listener's output area." } { } }
+}
+"Factor supports many other data types:"
+{ $code
+    "10.5"
+    "\"character strings\""
+    "{ 1 2 3 }"
+    "! And by the way, comments look like this"
+    "( Or like this )"
+}
+{ $curious
+    "You can step through the execution of the above code interactively by clicking below:"
+    { $code "[ 10 sq 5 - . ] walk" }
+}
+{ $references
+    { "Factor's syntax can be extended, the parser can be called reflectively, and the " { $link . } " word is in fact a general facility for turning almost any object into a form which can be parsed back in again. If this interests you, consult the following sections:" }
+    "syntax"
+    "parser"
+    "prettyprint"
+} ;
+
+ARTICLE: "cookbook-colon-defs" "Shuffle word and definition cookbook"
+"The " { $link dup } " word makes a copy of the value at the top of the stack:"
+{ $example "5 dup ." "25" }
+"The " { $link sq } " word is actually defined as follows:"
+{ $code ": sq dup * ;" }
+"(You could have looked this up yourself by clicking on the " { $link sq } " word itself.)"
+$terpri
+"Note the key elements in a word definition: The colon (" { $link POSTPONE: : } " denotes the start of a word definition. The name of the new word must immediately follow. The word definition then continues on until the " { $link POSTPONE: ; } " token signifies the end of the definition. This type of word definition is called a " { $emphasis "colon definition." }
+$terpri
+"Factor is all about code reuse through short and logical colon definitions. Breaking up a problem into small pieces which are easy to test is called " { $emphasis "factoring." }
+$terpri
+"Another example of a colon definition:"
+{ $code ": neg ( x -- -x ) 0 swap - ;" }
+"Here the " { $link swap } " shuffle word is used to interchange the top two stack elements. Note the difference that " { $link swap } " makes in the following two snippets:"
+{ $code
+    "5 0 -       ! Computes 5-0"
+    "5 0 swap -  ! Computes 0-5"
+}
+"Also, in the above example a stack comment is written between " { $snippet "(" } " and " { $snippet ")" } " with a mnemonic description of what the word does to the stack."
+{ $curious
+    "This syntax will be familiar to anybody who has used FORTH before. However the behavior is slightly different. In most FORTH systems, the below code prints 2, because the definition of " { $snippet "b" } " still refers to the previous definition of " { $snippet "b" } ":"
+    { $code
+        ": a 1 ;"
+        ": b a 1 + ;"
+        ": a 2 ;"
+        "b ."
+    }
+    "In Factor, this example will print 3 since word redefinition is explicitly supported."
+}
+{ $references
+    { "A whole slew of shuffle words can be used to rearrange the stack. There are forms of word definition other than colon definition, words can be defined entirely at runtime, and word definitions can be " { $emphasis "annotated" } " with tracing calls and breakpoints without modifying the source code." }
+    "shuffle-words"
+    "words"
+    "word-introspection"
+    "annotations"
+} ;
+
+ARTICLE: "cookbook-combinators" "Control flow cookbook"
+"A " { $emphasis "quotation" } " is an object containing code which can be evaluated."
+{ $code
+    "2 2 + .     ! Prints 4"
+    "[ 2 2 + . ] ! Pushes a quotation"
+}
+"The quotation pushed by the second example will push 4 when called by " { $link call } "."
+$terpri
+"Quotations are used to implement control flow. For example, conditional execution is done with " { $link if } ":"
+{ $code
+    ": sign-test ( n -- )"
+    "    dup 0 < ["
+    "        drop \"negative\""
+    "    ] ["
+    "        zero? [ \"zero\" ] [ \"negative\" ] if"
+    "    ] if print ;"
+}
+"The " { $link if } " word takes a boolean, a true quotation, and a false quotation, and executes one of the two quotations depending on the value of the boolean. In Factor, any object not equal to the special value " { $link f } " is considered true, while " { $link f } " is false."
+$terpri
+"Another useful form of control flow is iteration. You can do something several times:"
+{ $code "10 [ \"Factor rocks!\" print ] times" }
+"Now we can look at a new data type, the array:"
+{ $code "{ 1 2 3 }" }
+"An array looks like a quotation except it cannot be evaluated; it simply stores data."
+$terpri
+"You can perform an operation on each element of an array:"
+{ $code "{ 1 2 3 } [ \"The number is \" write . ] each" }
+"You can transform each element, collecting the results in a new array:"
+{ $example "{ 5 12 0 -12 -5 } [ sq ] map ." "{ 25 144 0 144 25 }" }
+"You can create a new array, only containing elements which satisfy some condition:"
+{ $example
+    ": negative? ( n -- ? ) 0 < ;"
+    "{ -12 10 16 0 -1 -3 -9 } [ negative? ] subset ."
+    "{ -12 -1 -3 -9 }"
+}
+{ $references
+    { "Since quotations are real objects, they can be constructed and taken apart at will. You can write code that writes code. Arrays are just one of the various types of sequences, and the sequence operations such as " { $link each } " and " { $link map } " operate on all types of sequences. There are many more sequence iteration operations than the ones above, too." }
+    "dataflow"
+    "sequences"
+} ;
+
+ARTICLE: "cookbook-variables" "Variables cookbook"
+"Before using a variable, you must define a symbol for it:"
+{ $code "SYMBOL: name" }
+"A symbol is a word which pushes itself on the stack when executed. Try it:"
+{ $example "SYMBOL: foo" "foo ." "foo" }
+"Symbols can be passed to the " { $link get } " and " { $link set } " words to read and write variable values:"
+{ $example "\"Slava\" name set" "name get print" "Slava" }
+"If you set variables inside a " { $link with-scope } ", their values will be lost after leaving the scope:"
+{ $example
+    ": print-name name get print ;"
+    "\"Slava\" name set"
+    "["
+    "    \"Diana\" name set"
+    "    \"There, the name is \" write  print-name"
+    "] with-scope"
+    "\"Here, the name is \" write  print-name"
+    "There, the name is Diana\nHere, the name is Slava"
+}
+{ $curious
+    "Variables are dynamically-scoped in Factor."
+}
+{ $references
+    "There is a lot more to be said about variables and namespaces."
+    "namespaces"
+} ;
+
+ARTICLE: "cookbook-vocabs" "Vocabularies and source files cookbook"
+"Rather than being in one flat list, words belong to vocabularies; every word is contained in exactly one. When parsing a word name, the parser searches the " { $emphasis "vocabulary search path" } ". When working at the listener, a useful set of vocabularies is already available. In a source file, all used vocabularies must be imported."
+$terpri
+"For example, a source file containing the following code will print a parse error if you try loading it:"
+{ $code "\"Hello world\" print" }
+"The " { $link print } " word is contained inside the " { $snippet "io" } " vocabulary, which is available in the listener but must be explicitly added to the search path in source files:"
+{ $code
+    "USE: io"
+    "\"Hello world\" print"
+}
+"Typically a source file will refer to words in multiple vocabularies, and they can all be added to the search path in one go:"
+{ $code "USING: arrays kernel math ;" }
+"New words go into the " { $snippet "scratchpad" } " vocabulary by default. You can change this with " { $link POSTPONE: IN: } ":"
+{ $code
+    "IN: time-machine"
+    ": time-travel ( when what -- ) frob fizz flap ;"
+}
+"Note that words must be defined before being referenced. The following is generally invalid:"
+{ $code
+    ": frob accelerate particles ;"
+    ": accelerate accelerator on ;"
+    ": particles [ (particles) ] each ;"
+}
+"You would have to place the first definition after the two others for the parser to accept the file."
+{ $references
+    { }
+    "vocabulary-search"
+    "words"
+    "parser"
+} ;
+
+ARTICLE: "cookbook-io" "I/O cookbook"
+"Ask the user for their age, and print it back:"
+{ $code
+    ": ask-age ( -- ) \"How old are you?\" print ;"
+    ": read-age ( -- n ) readln string>number ;"
+    ": print-age ( n -- )"
+    "    \"You are \" write"
+    "    number>string write"
+    "    \" years old.\" print ;"
+    ": example ( -- ) ask-age read-age print-age ;"
+    "example"
+}
+"Print the lines of a file in sorted order:"
+{ $code
+    "\"lines.txt\" <file-reader> lines natural-sort [ print ] each"
+}
+"Read 1024 bytes from a file:"
+{ $code
+    "\"data.bin\" <file-reader> [ 1024 read ] with-stream"
+}
+"Send some bytes to a remote host:"
+{ $code
+    "\"myhost\" 1033 [ { 12 17 102 } write ] with-stream"
+}
+{ $references
+    { }
+    "number-strings"
+    "streams"
+} ;
