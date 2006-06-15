@@ -1,6 +1,6 @@
 USING: kernel alien compiler namespaces generic math sequences hashtables io
-arrays words prettyprint lists concurrency
-process rectangle x11 x concurrent-widgets ;
+arrays words prettyprint concurrency process
+rectangle x11 x concurrent-widgets ;
 
 IN: factory
 
@@ -16,6 +16,7 @@ DEFER: mapped-windows
 DEFER: workspace-1 DEFER: workspace-2 DEFER: workspace-3 DEFER: workspace-4
 DEFER: switch-to
 DEFER: update-title
+DEFER: delete-frame
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
@@ -48,10 +49,9 @@ create-gc dup
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-: MouseMask
-  [ ButtonPressMask
-    ButtonReleaseMask
-    PointerMotionMask ] 0 [ execute bitor ] reduce ;
+: MouseMask ( -- mask )
+[ ButtonPressMask ButtonReleaseMask PointerMotionMask ]
+0 [ execute bitor ] reduce ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
@@ -377,24 +377,17 @@ dup clear-window%
   over						! frame child-size+ frame
   resize-window%				! frame
 
-  
-
   dup wm-frame-child { 5 15 } swap move-window%
 
   dup map-window%
   dup map-subwindows%				! frame
 
-!  dup wm-frame-child fetch-name%		! frame title
-!  { 5 1 } swap					! frame point title
-!  pick						! frame point title frame
-!  [ draw-string-top-left ] with-window-object	! frame
-
   dup update-title				! frame
 
   "" over [ delete-frame ] curry create-button	! frame button
   >r dup window-id r>
-  [ reparent-window { 13 13 } resize-window
-    dup window-width% 13 - 1 - 1 2array move-window
+  [ reparent-window { 9 9 } resize-window
+    dup window-width% 9 - 5 - 3 2array move-window
     NorthEastGravity set-window-gravity
     black-pixel get set-window-background map-window ]
   with-window-object				! frame
@@ -621,7 +614,7 @@ SYMBOL: window-list
   [ ] [ drop "*untitled*" ] if	! window-list frame name
   swap				! window-list name frame
   [ map-window% ]		! window-list name frame [ map-window% ]
-  cons				! window-list name action
+  curry				! window-list name action
   pick				! window-list name action window-list
   add-popup-menu-item ;
 
