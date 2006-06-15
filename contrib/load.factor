@@ -1,27 +1,21 @@
-! Load all contrib libs, compile them, and save a new image.
-IN: scratchpad
-USING: alien compiler kernel memory parser sequences words ;
-
+USING: kernel parser sequences ;
 { 
     "coroutines"
     "dlists"
+    "process"
     "splay-trees"
-} [ "/contrib/" swap ".factor" append3 run-resource clear ] each
+} [ "/contrib/" swap ".factor" append3 run-resource ] each
 
-{ "aim"
+{
   "cairo"
   "concurrency"
   "math"
   "crypto"
   "aim"
+  "gap-buffer"
   "httpd"
   "units"
   "sqlite"
-  "win32"
-  "x11"
-  "factory"
   "postgresql"
-  "parser-combinators"
-  "cont-responder"
-  "space-invaders"
-} [ "/contrib/" swap "/load.factor" append3 run-resource clear ] each
+  "random-tester"
+} [ "/contrib/" swap "/load.factor" append3 run-resource ] each

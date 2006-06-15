@@ -1,5 +1,6 @@
 IN: scratchpad
 USING: kernel parser compiler words sequences ;
 
-"/contrib/dlists.factor" run-resource
 "/contrib/concurrency/concurrency.factor" run-resource
+"/contrib/concurrency/concurrency-examples.factor" run-resource
+"/contrib/concurrency/concurrency-tests.factor" run-resource
