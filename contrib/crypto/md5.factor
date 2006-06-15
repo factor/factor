@@ -1,4 +1,4 @@
-USING: kernel io strings sequences namespaces math parser lists crypto ;
+USING: kernel io strings sequences namespaces math parser crypto ;
 IN: crypto-internals
 
 SYMBOL: a
