@@ -23,7 +23,7 @@
 !
 ! Concurrency library for Factor based on Erlang/Termite style
 ! concurrency.
-USING: kernel lists generic threads io namespaces errors words 
+USING: kernel generic threads io namespaces errors words 
        math sequences hashtables strings vectors dlists ;
 IN: concurrency
 
@@ -224,7 +224,7 @@ TUPLE: linked-exception error ;
   #! Same as spawn but if the quotation throws an error that
   #! is uncaught, that error gets propogated to the process
   #! performing the spawn-link.
-  [ catch [ rethrow-linked ] when* ] cons
+  [ catch [ rethrow-linked ] when* ] curry
   [ in-thread ] self make-linked-process [ with-process ] over slip ;
 
 #! A common operation is to send a message to a process containing
@@ -248,11 +248,7 @@ TUPLE: tagged-message data from tag ;
   #! 'match-quot' is a quotation with stack effect ( msg -- ). It
   #! will be called with the message on the top of the stack if
   #! the 'pred' word returned true.
-  uncons >r dupd execute [
-    r> car call
-  ] [
-    r> 2drop
-  ] if ;
+  [ first execute ] 2keep rot [ second call ] [ 2drop ] if ;
 
 : recv ( forms -- ) 
   #! Get a message from the processes mailbox. Compare it against the
@@ -289,7 +285,7 @@ TUPLE: tagged-message data from tag ;
   #! is matched up with the request by generating a message tag
   #! which should be sent back with the reply.
   >r tag-message [ tagged-message-tag ] keep r> send
-  unit [ car tag-match? ] cons receive-if tagged-message-data ;
+  unit [ first tag-match? ] curry receive-if tagged-message-data ;
 
 : reply ( tagged-message message -- )
   #! Replies to the tagged-message which should have been a result of a 
@@ -321,7 +317,7 @@ SYMBOL: quit-cc
   [  
     (spawn-server)
     "Exiting process: " write self process-pid print
-  ] cons spawn ;
+  ] curry spawn ;
 
 : spawn-linked-server ( quot -- process )
   #! Similar to 'spawn-server' but the parent process will be linked
@@ -329,7 +325,7 @@ SYMBOL: quit-cc
   [  
     (spawn-server)
     "Exiting process: " write self process-pid print
-  ] cons spawn-link ;
+  ] curry spawn-link ;
 
 : send-reply ( message pred quot -- )
   #! The intent of this word is to provde an easy way to
@@ -392,7 +388,7 @@ SYMBOL: quit-cc
   #! ?future. If the quotation has completed the result will be returned.
   #! If not, the process will block until the quotation completes.
   #! 'quot' must have stack effect ( -- X ).
-  [ call self send ] cons spawn ;
+  [ self send ] append spawn ;
 
 : ?future ( future -- result )
   #! Block the process until the future has completed and then place the
@@ -443,7 +439,7 @@ SYMBOL: lazy-quot
         [ tagged-message? [ [ drop t ] [ get call ] send-reply ] ]
       ] recv
     ] with-scope
-  ] cons spawn ;
+  ] curry spawn ;
 
 : ?lazy ( lazy -- result )
   #! Given a process spawned using 'lazy', evaluate it and return the result.
