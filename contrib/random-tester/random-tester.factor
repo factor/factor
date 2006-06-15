@@ -1,7 +1,6 @@
-USING: kernel math math-internals sequences namespaces errors hashtables words
-       arrays parser compiler syntax lists io ;
-USING: inspector prettyprint ;
-USING: optimizer inference ;
+USING: kernel math math-internals sequences namespaces errors
+hashtables words  arrays parser compiler syntax io
+inspector prettyprint optimizer inference ;
 IN: random-tester
 
 ! n-foo>bar -- list of words of type 'foo' that take n parameters
