@@ -116,7 +116,7 @@ GENERIC: task-container ( task -- vector )
 
 : handle-fd ( task -- )
     dup io-task-port touch-port dup do-io-task
-    [ pop-callback continue ] [ drop ] if ;
+    [ pop-callback schedule-thread ] [ drop ] if ;
 
 : timeout? ( port -- ? )
     port-cutoff dup zero? not swap millis < and ;
@@ -125,7 +125,7 @@ GENERIC: task-container ( task -- vector )
     [
         nip dup io-task-port timeout? [
             dup io-task-port "Timeout" swap report-error
-            nip pop-callback continue
+            nip pop-callback schedule-thread
         ] [
             tuck io-task-fd swap bit-nth
             [ handle-fd ] [ drop ] if
