@@ -1,7 +1,7 @@
 ! All Talk
 
 IN: aim-internals
-USING: kernel sequences lists prettyprint strings namespaces math threads vectors errors parser interpreter test io crypto words hashtables inspector aim-internals generic queues arrays ;
+USING: kernel sequences prettyprint strings namespaces math threads vectors errors parser interpreter test io crypto words hashtables inspector aim-internals generic queues arrays ;
 
 SYMBOL: username
 SYMBOL: password
@@ -261,15 +261,12 @@ M: object get-banned ( name -- <buddy> )
 : family-table ( -- hash ) H{ } ;
 
 : FAMILY: ( -- fam# )
-    scan hex> swons dup car family-table hash dup [
-        drop
-    ] [
-        drop H{ } clone over car family-table set-hash
-    ] if ; parsing
+    scan hex> dup family-table hash [
+        H{ } clone over family-table set-hash
+    ] unless ; parsing
 
 : OPCODE: ( fam# -- )
-    car family-table hash word scan hex> rot set-hash f ; parsing
-
+    family-table hash word scan hex> rot set-hash ; parsing
 
 ! Generic, Capabilities
 : send-generic-capabilities

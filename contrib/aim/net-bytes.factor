@@ -1,5 +1,5 @@
 IN: aim-internals
-USING: kernel sequences lists prettyprint strings namespaces math threads vectors errors parser interpreter test io crypto arrays ;
+USING: kernel sequences prettyprint strings namespaces math threads vectors errors parser interpreter test io crypto arrays ;
 
 SYMBOL: big-endian t big-endian set
 SYMBOL: unscoped-stream
@@ -31,7 +31,7 @@ SYMBOL: unscoped-stack
 
 ! TODO: make this work for types other than ""
 : papply ( seq seq -- seq )
-    [ [ 2array >list call % ] 2each ] "" make ;
+    [ [ 2array >quotation call % ] 2each ] "" make ;
 
 : writeln ( string -- )
     write terpri ;
