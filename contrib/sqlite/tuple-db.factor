@@ -24,8 +24,8 @@
 ! A tuple that is persistent has its delegate set as 'persistent'.
 ! 'persistent' holds the numeric rowid for that tuple in its table.
 IN: tuple-db
-USING: io kernel kernel-internals sequences namespaces hashtables 
-       lists sqlite errors math words generic ;
+USING: io kernel kernel-internals sequences namespaces
+hashtables sqlite errors math words generic ;
 
 ! Each slot in a tuple that is storable in the database has
 ! an instance of a db-field object the gives the name of the 
@@ -285,10 +285,12 @@ M: mapping select-sql ( tuple mapping -- select )
   dup class-tuple get-mapping dupd select-sql ( db tuple sql )
   swapd sqlite-prepare swap ( statement tuple )
   2dup bind-for-select ( statement tuple ) 
-  f pick [ ( tuple accum statement )
-    pick restore-tuple swons
-  ] sqlite-each ( statement tuple accum )
-  rot sqlite-finalize nip ;
+  [
+    over [ ( tuple statement )
+      over restore-tuple ,
+    ] sqlite-each nip
+  ] [ ] make ( statement tuple accum )
+  swap sqlite-finalize ;
   
  
 get-mappings [ init-mappings ] unless 

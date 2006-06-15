@@ -32,7 +32,6 @@ USE: sqlite
 USE: kernel
 USE: io
 USE: prettyprint
-USE: lists
 
 : test.db "contrib/sqlite/test.db" ;
 
@@ -57,7 +56,7 @@ USE: lists
 : find-all ( -- )
   test.db sqlite-open  ( db )
   dup "select * from test" sqlite-prepare ( db stmt )
-  [ [ [ 0 column-text ] keep 1 column-text cons ] sqlite-map ] keep
+  [ [ [ 0 column-text ] keep 1 column-text curry ] sqlite-map ] keep
   sqlite-finalize
   swap sqlite-close ;  
 
