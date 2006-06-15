@@ -15,7 +15,7 @@ USING: html http io kernel namespaces styles test xml ;
 [
     [
         "/home/slava/doc/" "doc-root" set
-        "/home/slava/doc/foo/bar" file-link-href
+        "/home/slava/doc/foo/bar" <pathname> browser-link-href
     ] with-scope
 ] unit-test
 

@@ -54,7 +54,7 @@ namespaces queues sequences vectors ;
 : (idle-thread) ( fast? -- )
     #! If fast, then we don't sleep, just select()
     sleep-queue* dup sleep-time dup zero?
-    [ drop pop second schedule-thread ]
+    [ drop pop second schedule-thread drop ]
     [ nip 0 ? io-multiplex ] if ;
 
 : idle-thread ( -- )

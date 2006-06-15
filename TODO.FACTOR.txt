@@ -1,11 +1,4 @@
 - if a primitive throws an error, :c doesn't show the call frame there
-- "benchmark/help": without a yield UI runs out of memory
-
-+ httpd:
-  - outliners don't work
-  - browser responder doesn't work
-  - fix remaining HTML stream issues
-  - update for file style prop becoming presented <file>
 
 + io:
 
@@ -13,7 +6,6 @@
 - factorcode httpd started using 99% CPU, but still received connections;
   closing read-fds solved it
 - gdb triggers 'mutliple i/o ops on port' error
-- better i/o scheduler - eg, yield in a loop starves i/o
 - "localhost" 50 <client> won't fail
 
 + help:
@@ -26,6 +18,7 @@
   - edit distance algorithm
   - store positions in index
   - phrase scoring algorithm based on how close the terms occur?
+- fix remaining HTML stream issues
 
 + ui:
 

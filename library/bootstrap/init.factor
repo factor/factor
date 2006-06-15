@@ -9,10 +9,10 @@ parser threads words ;
     init-namespaces
     cell \ cell set
     millis init-random
-    init-threads
     init-io
     "HOME" os-env [ "." ] unless* "~" set
     init-error-handler
+    init-threads
     default-cli-args
     parse-command-line
     "null-stdio" get [ stdio off ] when ;

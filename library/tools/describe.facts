@@ -29,5 +29,11 @@ HELP: callstack. "( seq -- )"
 { $values { "seq" "a sequence" } }
 { $description "Displays a sequence output by " { $link callstack } " in a nice way, by highlighting the current execution point in every call frame." } ;
 
+HELP: .c "( -- )"
+{ $description "Displays the contents of the call stack, with the top of the stack printed first." } ;
+
 HELP: .r "( -- )"
-{ $description "Displays the contents of the return stack, with the top of the stack printed first." } ;
+{ $description "Displays the contents of the retain stack, with the top of the stack printed first." } ;
+
+HELP: .s "( -- )"
+{ $description "Displays the contents of the data stack, with the top of the stack printed first." } ;

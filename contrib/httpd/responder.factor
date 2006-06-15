@@ -1,8 +1,8 @@
 ! Copyright (C) 2004, 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: httpd
-USING: arrays hashtables http kernel math namespaces
-parser sequences io strings ;
+USING: arrays hashtables html http io kernel math namespaces
+parser sequences strings ;
 
 ! Variables
 SYMBOL: vhosts
@@ -15,7 +15,7 @@ SYMBOL: responders
     "HTTP/1.0 " write print print-header ;
 
 : error-body ( error -- body )
-    "<html><body><h1>" swap "</h1></body></html>" append3 print ;
+    <html> <body> <h1> write </h1> </body> </html> ;
 
 : error-head ( error -- )
     dup log-error
@@ -91,9 +91,17 @@ SYMBOL: responders
 ! - header -- a hashtable of headers from the user's client
 ! - response -- a hashtable of the POST request response
 
+: query-param ( key -- value ) "query" get hash ;
+
 : add-responder ( responder -- )
     #! Add a responder object to the list.
     "responder" over hash  responders get set-hash ;
+
+: add-simple-responder ( name quot -- )
+    [
+        [ drop ] swap append dup "get" set "post" set
+        "responder" set
+    ] make-hash add-responder ;
 
 : make-responder ( quot -- responder )
     [

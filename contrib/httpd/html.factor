@@ -1,8 +1,8 @@
 ! Copyright (C) 2004, 2006 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: cont-responder generic hashtables help http inspector io
-kernel prototype-js math namespaces sequences strings
-styles words xml ;
+USING: callback-responder generic hashtables help http inspector
+io kernel math namespaces prototype-js sequences strings styles
+words xml ;
 IN: html
 
 : hex-color, ( triplet -- )
@@ -81,23 +81,6 @@ IN: html
         <div =style div> call </div>
     ] if ;
 
-: resolve-file-link ( path -- link )
-    #! The file responder needs relative links not absolute
-    #! links.
-    "doc-root" get [
-        ?head [ "/" ?head drop ] when
-    ] when* "/" ?tail drop ;
-
-: file-link-href ( path -- href )
-    [ "/" % resolve-file-link url-encode % ] "" make ;
-
-: file-link-tag ( style quot -- )
-    over file swap hash [
-        <a file-link-href =href a> call </a>
-    ] [
-        call
-    ] if* ;
-
 : do-escaping ( string style -- string )
     html swap hash [ chars>entities ] unless ;
 
@@ -116,6 +99,17 @@ M: link browser-link-href
     ] [
         "/responder/help/" swap "topic" associate build-url
     ] if ;
+
+: resolve-file-link ( path -- link )
+    #! The file responder needs relative links not absolute
+    #! links.
+    "doc-root" get [
+        ?head [ "/" ?head drop ] when
+    ] when* "/" ?tail drop ;
+
+M: pathname browser-link-href
+    pathname-string
+    "/" swap resolve-file-link url-encode append ;
 
 : object-link-tag ( style quot -- )
     presented pick hash browser-link-href
@@ -143,10 +137,8 @@ M: html-stream stream-format ( str style stream -- )
     [
         [
             [
-                [
-                    do-escaping stdio get delegate-write
-                ] span-tag
-            ] file-link-tag
+                do-escaping stdio get delegate-write
+            ] span-tag
         ] object-link-tag
     ] with-stream* ;
 
@@ -158,7 +150,7 @@ M: html-stream stream-format ( str style stream -- )
         <div "padding-left:10px;" =style div>
             with-html-stream
         </div>
-    ] curry [ , \ show-final , ] [ ] make ;
+    ] curry ;
             
 : html-outliner ( caption contents -- )
     "+ " get-random-id dup >r
@@ -177,6 +169,16 @@ M: html-stream with-nested-stream ( quot style stream -- )
                 ] div-tag
             ] object-link-tag
         ] outliner-tag
+    ] with-stream* ;
+
+M: html-stream with-stream-table ( grid quot style stream -- )
+    [
+        <table> rot [
+            <tr> [
+                <td>
+                pick pick stdio get with-nested-stream </td>
+            ] each </tr>
+        ] each 2drop </table>
     ] with-stream* ;
 
 M: html-stream stream-terpri [ <br/> ] with-stream* ;

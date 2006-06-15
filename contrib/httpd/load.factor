@@ -9,6 +9,7 @@ USING: words kernel parser sequences io compiler ;
     "responder"
     "httpd"
     "cont-responder"
+    "callback-responder"
     "prototype-js"
     "html"
     "file-responder"

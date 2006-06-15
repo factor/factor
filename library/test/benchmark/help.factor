@@ -3,9 +3,9 @@ sequences test threads words ;
 
 [
     all-articles [
-        ! stdio get pane-clear
+        stdio get pane-clear
         dup global [ . flush ] bind
         [ dup help ] assert-depth drop
-        1 sleep
+        yield
     ] each
 ] time

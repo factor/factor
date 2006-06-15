@@ -257,7 +257,7 @@ SYMBOL: root-continuation
 : id-or-root ( -- id )
     #! Return the continuation id for the current requested continuation
     #! or the root continuation if no id is supplied.
-    "id" "query" get hash [ root-continuation get ] unless* ;
+    "id" query-param [ root-continuation get ] unless* ;
 
 : cont-get/post-responder ( id-or-f -- ) 
     #! httpd responder that retrieves a continuation and calls it.

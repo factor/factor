@@ -19,3 +19,6 @@ M: word article-content
             ] when*
         ] ?if
     ] { } make ;
+
+: word-help ( word -- )
+    dup article-content { $definition } rot add add (help) ;

@@ -5,7 +5,8 @@
 ! For information and license details for protoype 
 ! see http://prototype.conio.net
 IN: prototype-js
-USING: io httpd cont-responder html kernel namespaces strings ;
+USING: callback-responder html httpd io kernel namespaces
+strings ;
 
 : include-prototype-js ( -- )
   #! Write out the HTML script tag to include the prototype
@@ -16,7 +17,7 @@ USING: io httpd cont-responder html kernel namespaces strings ;
 : updating-javascript ( id quot -- string )
   #! Return the javascript code to perform the updating
   #! ajax call.
-  quot-url swap 
+  t register-html-callback swap 
   [ "new Ajax.Updater(\"" % % "\",\"" % % "\", { method: \"get\" });" % ] "" make ;
 
 : updating-anchor ( text id quot -- )
