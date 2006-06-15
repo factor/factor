@@ -1,5 +1,5 @@
 USING: io namespaces kernel hashtables math generic threads concurrency
-lists sequences arrays x11 x ;
+ sequences arrays x11 x ;
 
 IN: concurrent-widgets
 
@@ -215,7 +215,7 @@ TUPLE: menu item-width item-height space ;
   refresh-menu ;
 
 : modify-action-to-unmap ( action menu -- action )
-  [ unmap-window% ] cons append ;
+  [ unmap-window% ] curry append ;
 
 : add-popup-menu-item ( text action menu -- )
   tuck modify-action-to-unmap
