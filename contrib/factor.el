@@ -22,7 +22,7 @@
 (defun factor-listener ()
   (interactive)
   (factor-server)
-  (sleep-for 0 500)
+  (sleep-for 0 1000)
   (if (get-buffer "*factor-listener*")
       (save-excursion
 	(set-buffer "*factor-listener*")
@@ -33,7 +33,7 @@
 (defun factor-listener-restart ()
   (interactive)
   (factor-server)
-  (sleep-for 0 500)
+  (sleep-for 0 1000)
   (make-comint-in-buffer
    "factor-listener" (current-buffer) '("localhost" . 9999)))
 
