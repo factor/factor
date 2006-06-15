@@ -1,8 +1,6 @@
 IN: scratchpad
 USING: kernel parser sequences words compiler ;
 
-"/contrib/math/load.factor" run-resource
-
 {
     "common"
     "base64"

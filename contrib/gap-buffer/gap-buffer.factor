@@ -5,11 +5,16 @@
 USING: kernel arrays sequences sequences-internals circular math generic ;
 IN: gap-buffer
 
+! gap-start     -- the first element of the gap
+! gap-end       -- the first element after the gap
+! expand-factor -- should be > 1
+! min-size      -- < 5 is not sensible
+
 TUPLE: gb
-    gap-start     ! the first element of the gap
-    gap-end       ! the first element after the gap
-    expand-factor ! should be > 1
-    min-size ;    ! < 5 is not sensible
+    gap-start
+    gap-end
+    expand-factor
+    min-size ;
 
 : required-space ( n gb -- n )
     tuck gb-expand-factor * ceiling >fixnum swap gb-min-size max ;

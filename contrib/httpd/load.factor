@@ -12,6 +12,7 @@ USING: words kernel parser sequences io compiler ;
     "callback-responder"
     "prototype-js"
     "html"
+    "embedded"
     "file-responder"
     "help-responder"
     "inspect-responder"

@@ -1,12 +1,9 @@
-USING: kernel prettyprint io sequences words lists vectors inspector math errors namespaces ;
-
-IN: units-internal
-: seq-intersect ( seq1 seq2 -- seq1/\seq2 )
-    [ swap member? ] subset-with ; flushable
-
-: 2list ( x y -- [ x y ] ) f cons cons ;
-
+USING: arrays errors inspector io kernel math namespaces
+prettyprint sequences vectors words ;
 IN: units
+
+: seq-intersect ( seq1 seq2 -- seq1/\seq2 )
+    [ swap member? ] subset-with ;
 
 TUPLE: dimensioned val top bot ;
 C: dimensioned 
@@ -46,7 +43,7 @@ C: dimensioned
     [ dimensioned-val ] 2apply ;
 
 : =units?
-    >r dimensions 2list r> dimensions 2list = ;
+    >r dimensions 2array r> dimensions 2array = ;
     
 
 : d+ ( d d -- )

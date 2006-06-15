@@ -8,9 +8,10 @@ USING: alien compiler kernel memory parser sequences words ;
     "splay-trees"
 } [ "/contrib/" swap ".factor" append3 run-resource clear ] each
 
-{ "cairo"
-  "math"
+{ "aim"
+  "cairo"
   "concurrency"
+  "math"
   "crypto"
   "aim"
   "httpd"
