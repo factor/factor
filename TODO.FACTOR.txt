@@ -14,7 +14,6 @@
 - automatically update help graph and search index when adding/removing
   articles/words
 - help search:
-  - edit distance algorithm
   - store positions in index
   - phrase scoring algorithm based on how close the terms occur?
 - fix remaining HTML stream issues

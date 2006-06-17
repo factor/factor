@@ -5,16 +5,14 @@ USING: arrays gadgets kernel math namespaces sequences words ;
 
 TUPLE: grid children gap ;
 
-: collapse-grid concat [ ] subset ;
-
 : set-grid-children* ( children grid -- )
     [ set-grid-children ] 2keep
-    >r collapse-grid r> add-gadgets ;
+    >r concat [ ] subset r> add-gadgets ;
 
 C: grid ( children -- grid )
     dup delegate>gadget
     [ set-grid-children* ] keep
-    0 over set-grid-gap ;
+    { 0 0 0 } over set-grid-gap ;
 
 : grid-child ( grid i j -- gadget ) rot grid-children nth nth ;
 
@@ -31,22 +29,21 @@ C: grid ( children -- grid )
 
 : compute-grid ( -- horiz vert )
     pref-dim-grid
-    dup flip [ max-dim first ] map swap [ max-dim second ] map ;
+    dup flip [ max-dim ] map swap [ max-dim ] map ;
 
 : with-grid ( grid quot -- | quot: horiz vert -- )
     [ >r grid set compute-grid r> call ] with-scope ; inline
 
 : gap grid get grid-gap ;
 
+: pair-up ( horiz vert -- dims )
+    [ >r first r> second 0 3array ] 2map ;
+
 M: grid pref-dim* ( grid -- dim )
     [
-        [
-            [ sum ] keep length 1 [-] gap * +
-        ] 2apply 0 3array
+        [ [ length 1 [-] ] 2apply 0 3array gap v*n ] 2keep
+        [ { 0 0 0 } [ v+ ] reduce ] 2apply pair-up v+
     ] with-grid ;
-
-: pair-up ( horiz vert -- dims )
-    [ swap [ swap 0 3array ] map-with ] map-with ;
 
 : do-grid ( dims quot -- )
     swap grid get grid-children [
@@ -54,7 +51,7 @@ M: grid pref-dim* ( grid -- dim )
     ] 2each drop ; inline
 
 : position-grid ( horiz vert -- )
-    [ 0 [ + gap + ] accumulate ] 2apply
+    [ { 0 0 0 } [ v+ gap v+ ] accumulate ] 2apply
     pair-up [ set-rect-loc ] do-grid ;
 
 : resize-grid ( horiz vert -- )
