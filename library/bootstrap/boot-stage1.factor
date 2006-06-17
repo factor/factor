@@ -212,6 +212,7 @@ vectors words ;
         "/library/threads.facts"
         "/library/words.facts"
         "/library/bootstrap/image.facts"
+        "/library/bootstrap/init.facts"
         "/library/collections/growable.facts"
         "/library/collections/arrays.facts"
         "/library/collections/graphs.facts"

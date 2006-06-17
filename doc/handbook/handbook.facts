@@ -16,6 +16,7 @@ ARTICLE: "handbook" "Factor documentation"
 { $subsection "cookbook-combinators" }
 { $subsection "cookbook-variables" }
 { $subsection "cookbook-vocabs" }
+{ $subsection "cookbook-sources" }
 { $subsection "cookbook-io" }
 { $heading "Language reference" }
 { $subsection "conventions" }

@@ -1,4 +1,5 @@
-USING: help io kernel math namespaces prettyprint sequences ;
+USING: help io kernel math namespaces parser prettyprint
+sequences ;
 
 ARTICLE: "cookbook-syntax" "Basic syntax cookbook"
 "The following is a simple snippet of Factor code:"
@@ -141,7 +142,7 @@ ARTICLE: "cookbook-variables" "Variables cookbook"
     "namespaces"
 } ;
 
-ARTICLE: "cookbook-vocabs" "Vocabularies and source files cookbook"
+ARTICLE: "cookbook-vocabs" "Vocabularies cookbook"
 "Rather than being in one flat list, words belong to vocabularies; every word is contained in exactly one. When parsing a word name, the parser searches the " { $emphasis "vocabulary search path" } ". When working at the listener, a useful set of vocabularies is already available. In a source file, all used vocabularies must be imported."
 $terpri
 "For example, a source file containing the following code will print a parse error if you try loading it:"
@@ -170,6 +171,16 @@ $terpri
     "vocabulary-search"
     "words"
     "parser"
+} ;
+
+ARTICLE: "cookbook-sources" "Source file cookbook"
+"By convention, code  is stored in files with the " { $snippet ".factor" } " filename extension. You can load source files using " { $link run-file } ":"
+{ $code "\"hello.factor\" run-file" }
+"You can load source files from the Factor source code directory using " { $link run-resource } ":"
+{ $code "\"/examples/lcd.factor\" run-resource" }
+{ $references
+    "You can learn more about parsing external content:"
+    "parse-stream"
 } ;
 
 ARTICLE: "cookbook-io" "I/O cookbook"
