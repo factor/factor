@@ -5,7 +5,7 @@ USING: styles ;
 
 : default-char-style
     H{
-        { font "sans-serif" }
+        { font "serif" }
         { font-size 12 }
     } ;
 
@@ -22,14 +22,20 @@ USING: styles ;
 
 : title-style
     H{
-        { font "sans-serif" }
+        { font "serif" }
         { font-size 16 }
         { font-style bold }
     } ;
 
+: where-style
+    H{
+        { font "serif" }
+        { font-size 10 }
+    } ;
+
 : heading-style
     H{
-        { font "sans-serif" }
+        { font "serif" }
         { font-size 14 }
         { font-style bold }
         { foreground { 0.2 0.2 0.4 1 } }
@@ -37,7 +43,7 @@ USING: styles ;
 
 : subsection-style
     H{
-        { font "sans-serif" }
+        { font "serif" }
         { font-size 14 }
         { font-style bold }
     } ;

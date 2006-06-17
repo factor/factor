@@ -1,0 +1,51 @@
+IN: help
+USING: namespaces ;
+
+HELP: ignored-word? "( string -- ? )"
+{ $values { "string" "a string" } } { $description "Tests for English stop words." } ;
+
+HELP: tokenize "( string -- seq )"
+{ $values { "string" "a string" } { "seq" "a sequence of strings" } }
+{ $description "Split a string along whitespace boundaries, convert all tokens to lower case, and stem all tokens." } ;
+
+HELP: index-text "( score topic string -- )"
+{ $values { "score" "a relevance score" } { "topic" "a help article name or a word" } { "string" "a string" } }
+{ $description "Tokenizes the string and adds each token to the term index, with the specified score placed on the topic." }
+{ $notes "This word operates on the current namespace, and so must be wrapped in a " { $link bind } " to specify the term index hashtable." } ;
+
+HELP: index-article-title "( topic -- )"
+{ $values { "topic" "a help article name or a word" } }
+{ $description "Adds the tokens making up the article's title to the term index with a high relevancy score." } ;
+
+HELP: index-article-content "( topic -- )"
+{ $values { "topic" "a help article name or a word" } }
+{ $description "Adds the tokens making up the article's content to the term index with a regular relevancy score." } ;
+
+HELP: index-article "( topic -- )"
+{ $values { "topic" "a help article name or a word" } }
+{ $description "Adds the tokens making up the article's title and content to the term index, with the title terms having a higher relevancy score." } ;
+
+HELP: term-index f
+{ $description "Variable. A hashtable mapping stemmed search terms to hashtables mapping help topics to relevancy scores."
+$terpri
+"The " { $link search-help } " word searches the term index and the " { $link index-help } " word updates it." }
+{ $see-also help } ;
+
+HELP: discard-irrelevant "( results -- results )"
+{ $values }
+{ $description "Discard search results which rank in the lower 33% compared to the top scoring result, since they are most likely irrelevant." } ;
+
+HELP: count-occurrences "( seq -- hash )"
+{ $values { "seq" "a sequence of hashtables" } { "hash" "a hashtable" } }
+{ $description "Collates all keys from the hashtables in " { $snippet "seq" } " and sums their values, which must be numbers." } ;
+
+HELP: search-help "( phrase -- assoc )"
+{ $values { "phrase" "a string" } { "assoc" "a sequence of pairs" } }
+{ $description "Performs a full-text search in the term index for help topics relating to " { $snippet "phrase" } ". The result is an association list of topic names paired with scores, sorted by decreasing score." } ;
+
+HELP: index-help "( -- )"
+{ $description "Updates the full-text search term index for use by " { $link search-help } " and " { $link search-help. } "." } ;
+
+HELP: search-help. "( phrase -- )"
+{ $values { "phrase" "a string" } }
+{ $description "Performs a full-text search in the term index for help topics relating to " { $snippet "phrase" } ", and prints an outliner with the results." } ;

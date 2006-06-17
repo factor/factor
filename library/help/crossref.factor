@@ -5,10 +5,7 @@ USING: arrays generic graphs hashtables io kernel
 namespaces sequences strings words ;
 
 : all-articles ( -- seq )
-    [
-        articles get hash-keys %
-        [ word-article ] word-subset %
-    ] { } make ;
+    articles get hash-keys all-words append ;
 
 GENERIC: elements* ( elt-type element -- )
 
@@ -22,29 +19,55 @@ M: array elements*
 
 : elements ( elt-type element -- seq ) [ elements* ] { } make ;
 
-: collect-elements ( elt-type article -- )
-    elements [ 1 swap tail [ dup set ] each ] each ;
-
-: links-out ( article -- seq )
-    article-content [
-        \ $link over collect-elements
-        \ $see-also over collect-elements
-        \ $subsection swap collect-elements
+: collect-elements ( element seq -- )
+    [
+        [
+            swap elements [
+                1 swap tail [ dup set ] each
+            ] each
+        ] each-with
     ] make-hash hash-keys ;
 
-SYMBOL: help-graph
+SYMBOL: link-graph
+
+: links-out ( article -- seq )
+    article-content { $link $see-also } collect-elements ;
+
+: ?link dup link? [ link-name ] when ;
 
 : links-in ( article -- seq )
-    dup link? [ link-name ] when help-graph get in-edges ;
+    ?link link-graph get in-edges ;
+
+SYMBOL: parent-graph
+
+: children ( article -- seq )
+    article-content { $subsection } collect-elements ;
+
+: ?link dup link? [ link-name ] when ;
+
+: parents ( article -- seq )
+    ?link parent-graph get in-edges ;
+
+: (where) ( article -- )
+    dup , parents [ word? not ] subset dup empty?
+    [ drop ] [ [ (where) ] each ] if ;
+
+: where ( article -- seq )
+    [ (where) ] { } make 1 swap tail ;
 
 : xref-article ( article -- )
-    [ links-out ] help-graph get add-vertex ;
+    dup
+    [ links-out ] link-graph get add-vertex
+    [ children ] parent-graph get add-vertex ;
 
 : unxref-article ( article -- )
-    [ links-out ] help-graph get remove-vertex ;
+    dup [ links-out ] link-graph get remove-vertex
+    [ children ] parent-graph get remove-vertex ;
 
 : xref-articles ( -- )
-    all-articles [ links-out ] help-graph get build-graph ;
+    all-articles dup
+    [ links-out ] link-graph get build-graph
+    [ children ] parent-graph get build-graph ;
 
 : links-in. ( article -- )
     links-in [ links-in. ] help-outliner ;

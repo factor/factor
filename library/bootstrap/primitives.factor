@@ -21,7 +21,8 @@ H{ } clone vocabularies set
 vocabularies get [ "syntax" set ] bind
 
 H{ } clone articles set
-help-graph off
+link-graph off
+parent-graph off
 crossref off
 
 ! Call the quotation parsed from primitive-types.factor

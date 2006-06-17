@@ -1,0 +1,29 @@
+IN: help
+USING: io ;
+
+HELP: print-element "( element -- )"
+{ $values { "element" "a markup element" } }
+{ $description "Prints a markup element to the " { $link stdio } " stream." } ;
+
+HELP: articles f
+{ $description "Variable. Hashtable mapping article names to " { $link article } " instances." } ;
+
+HELP: article "( name -- article )"
+{ $values { "name" "an article name" } { "article" "an " { $link article } " object" } }
+{ $description "Outputs a named " { $link article } " object." } ;
+
+HELP: article-title "( topic -- string )"
+{ $values { "topic" "an article name or a word" } { "string" "a string" } }
+{ $description "Outputs the title of a specific help article." } ;
+
+HELP: article-content "( topic -- element )"
+{ $values { "topic" "an article name or a word" } { "element" "a markup element" } }
+{ $description "Outputs the content of a specific help article." } ;
+
+HELP: add-article "( name title element -- )"
+{ $values { "name" "a string" } { "title" "a string" } { "element" "a markup element" } }
+{ $description "Adds a help article to the " { $link articles } " hashtable." }
+{ $notes "This word is used to implement " { $link POSTPONE: ARTICLE: } "." } ;
+
+HELP: last-block f
+{ $description "Variable. Set by " { $link print-element } " if the last element output was a block element, thus if the next element is a block element no newline needs to be output." } ;

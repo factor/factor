@@ -41,21 +41,9 @@ HELP: $code "( element -- )"
     { $markup-example { $code "2 2 + ." } }
 } ;
 
-HELP: $syntax "( word -- )"
-{ $values { "word" "a word" } }
-{ $description "Prints a description of a parsing word's syntax. This element is automatically output by the help system, so help descriptions of parsing words should not call it." } ;
-
-HELP: $stack-effect "( word -- )"
-{ $values { "word" "a word" } }
-{ $description "Prints a description of a word's stack effect. This element is automatically output by the help system, so help descriptions of parsing words should not call it." } ;
-
-HELP: $vocabulary "( element -- )"
-{ $values { "element" "a markup element of the form " { $snippet "{ word }" } } }
+HELP: $vocabulary "( word -- )"
+{ $values { "word" "a markup element of the form " { $snippet "{ word }" } } }
 { $description "Prints a word's vocabulary. This markup element is automatically output by the help system, so help descriptions of parsing words should not call it." } ;
-
-HELP: $synopsis "( element -- )"
-{ $values { "element" "a markup element of the form " { $snippet "{ word }" } } }
-{ $description "Prints a the header material found on every word help page -- the word's vocabulary, stack effect and syntax, printing the latter only for parsing words. This markup element is automatically output by the help system, so help descriptions of parsing words should not call it." } ;
 
 HELP: $description "( element -- )"
 { $values { "element" "a markup element" } }
@@ -98,23 +86,6 @@ HELP: $warning "( element -- )"
 { $description "Prints an element inset in a block styled as so to draw the reader's attention towards it." }
 { $examples
     { $markup-example { $warning "Incorrect use of this product may cause serious injury or death." } }
-} ;
-
-HELP: $subsection "( element -- )"
-{ $values { "element" "a markup element of the form " { $snippet "{ topic }" } } }
-{ $description "Prints an expandable outliner containing the body of the help topic named by the first string element of " { $snippet "element" } "." }
-{ $examples
-    { $markup-example { $subsection "sequences" } }
-} ;
-
-HELP: $subtopic "( element -- )"
-{ $values { "element" "a markup element of the form " { $snippet "{ title content }" } } }
-{ $description "Prints an expandable outliner with the given title containing an arbitrary markup element." }
-{ $examples
-    { $markup-example { $subtopic "Subtopic example"
-    "Subtopics are useful for short notes, sidebars "
-    "and other bits of info which don't really deserve "
-    "their own help article." } }
 } ;
 
 HELP: $link "( element -- )"
@@ -215,10 +186,10 @@ HELP: $see "( element -- )"
 } ;
 
 HELP: $definition "( word -- )"
-{ $values { "word" "a word" } } }
+{ $values { "word" "a word" } }
 { $description "Prints a heading followed by the definition of " { $snippet "word" } " by calling " { $link see } "." }
 { $notes
-    "This markup element is output by " { $link show } " but not " { $link help } "."
+    "This markup element is output by " { $link see-help } " but not " { $link help } "."
 } ;
 
 HELP: $curious "( element -- )"
@@ -238,7 +209,3 @@ HELP: sort-articles "( seq -- assoc )"
 HELP: help-outliner "( seq quot -- )"
 { $values { "seq" "a sequence of help article names and words" } { "quot" "a quotation with stack effect " { $snippet "( topic -- )" } } }
 { $description "Writes an outliner of help topics to the " { $link stdio } " stream. Expanding a help topic calls " { $snippet "quot" } " with the topic on the data stack." } ;
-
-HELP: $outliner "( element -- )"
-{ $values { "element" "a markup element of the form " { $snippet "( quot -- )" } } }
-{ $description "Calls the quotation to generate a sequence of help topics, and outputs an outliner for each one. Expanding a help topic shows the article body." } ;

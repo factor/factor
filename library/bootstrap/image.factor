@@ -291,7 +291,7 @@ M: hashtable ' ( hashtable -- pointer )
     [
         {
             vocabularies typemap builtins c-types crossref
-            articles help-graph
+            articles link-graph parent-graph
         } [ dup get swap bootstrap-word set ] each
     ] make-hash '
     global-offset fixup ;

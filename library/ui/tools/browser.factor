@@ -52,14 +52,14 @@ DEFER: show-vocab
 : <word-pages> ( word -- tabs )
     {
         { "Definition" [ see ] }
-        { "Documentation" [ (help) ] }
+        { "Documentation" [ help ] }
         { "Calls in" [ usage. ] }
         { "Links in" [ links-in. ] }
         { "Properties" [ word-props describe ] }
     } <pages> ;
 
 : <word-view> ( word -- gadget )
-    [ <word-pages> ] keep article-title <browser-tile> ;
+    [ <word-pages> ] keep word-name <browser-tile> ;
 
 : show-word ( word browser -- )
     over word-vocabulary over show-vocab

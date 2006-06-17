@@ -57,27 +57,9 @@ M: word print-element { } swap execute ;
 : $code ( content -- )
     "\n" join dup <input> [ write ] ($code) ;
 
-: $syntax ( word -- )
-    dup stack-effect [
-        "Syntax" $heading
-        >r word-name $snippet " " $snippet r> $snippet
-    ] [
-        drop
-    ] if* ;
-
-: $stack-effect ( word -- )
-    stack-effect [
-        "Stack effect" $heading $snippet
-    ] when* ;
-
 : $vocabulary ( content -- )
-    first word-vocabulary [
-        "Vocabulary" $heading $snippet
-    ] when* ;
-
-: $synopsis ( content -- )
-    dup $vocabulary
-    first dup parsing? [ $syntax ] [ $stack-effect ] if ;
+    first word-vocabulary
+    [ "Vocabulary" $heading $snippet ] when* ;
 
 : $description ( content -- )
     "Description" $heading print-element ;
@@ -109,9 +91,7 @@ TUPLE: link name ;
 
 M: link article-title link-name article-title ;
 M: link article-content link-name article-content ;
-M: link summary
-    link-name dup word?
-    [ synopsis ] [ "Link to " swap unparse append ] if ;
+M: link summary "Link: " swap link-name append ;
 
 : ($subsection) ( quot object -- )
     subsection-style [
@@ -119,25 +99,26 @@ M: link summary
         rot write-outliner
     ] with-style ;
 
-: $subsection ( object -- )
-    [ first [ (help) ] swap ($subsection) ] ($block) ;
-
-: $subtopic ( object -- )
-    [
-        subtopic-style [
-            unclip f rot [ print-content ] curry write-outliner
-        ] with-style
-    ] ($block) ;
+: >link ( obj -- obj ) dup word? [ <link> ] unless ;
 
 : $link ( article -- )
     last-block off first link-style
-    [ dup article-title swap <link> write-object ] with-style ;
+    [ dup article-title swap >link write-object ] with-style ;
 
 : textual-list ( seq quot -- )
     [ ", " print-element ] interleave ; inline
 
 : $links ( content -- )
     [ 1array $link ] textual-list ;
+
+: $where ( article -- )
+    where dup empty? [
+        drop
+    ] [
+        where-style [
+            [ "Parent topics: " write $links ] ($block)
+        ] with-style
+    ] if ;
 
 : $see-also ( content -- )
     "See also" $heading $links ;
@@ -207,6 +188,3 @@ M: link summary
 
 : help-outliner ( seq quot -- | quot: obj -- )
     swap sort-articles [ ($subsection) terpri ] each-with ;
-
-: $outliner ( content -- )
-    first call [ (help) ] help-outliner ;

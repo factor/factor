@@ -39,7 +39,7 @@ SYMBOL: term-index
 
 : count-occurrences ( seq -- hash )
     [
-        dup [ hash-keys [ off ] each ] each
+        dup [ [ drop off ] hash-each ] each
         [ [ swap +@ ] hash-each ] each
     ] make-hash ;
 

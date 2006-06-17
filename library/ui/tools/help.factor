@@ -50,7 +50,7 @@ M: help-gadget focusable-child*
     [ over history-seq push-new update-history ] [ 2drop ] if ;
 
 : fancy-help ( obj -- )
-    link-name dup word? [ show ] [ help ] if ;
+    link-name dup word? [ see-help ] [ help ] if ;
 
 : show-help ( link help -- )
     dup add-history [ set-help-gadget-showing ] 2keep
