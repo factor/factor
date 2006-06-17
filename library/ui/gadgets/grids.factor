@@ -36,13 +36,16 @@ C: grid ( children -- grid )
 
 : gap grid get grid-gap ;
 
+: (pair-up) ( horiz vert -- dim )
+    >r first r> second 0 3array ;
+
 : pair-up ( horiz vert -- dims )
-    [ >r first r> second 0 3array ] 2map ;
+    [ swap [ swap (pair-up) ] map-with ] map-with ;
 
 M: grid pref-dim* ( grid -- dim )
     [
-        [ [ length 1 [-] ] 2apply 0 3array gap v*n ] 2keep
-        [ { 0 0 0 } [ v+ ] reduce ] 2apply pair-up v+
+        [ [ length 1 [-] ] 2apply 0 3array gap v* ] 2keep
+        [ { 0 0 0 } [ v+ ] reduce ] 2apply (pair-up) v+
     ] with-grid ;
 
 : do-grid ( dims quot -- )

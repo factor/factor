@@ -21,9 +21,7 @@ M: array rect-dim drop { 0 0 0 } ;
 : 2rect-extent ( rect rect -- loc1 loc2 ext1 ext2 )
     [ rect-extent ] 2apply swapd ;
 
-: |v-| ( vec vec -- vec ) v- [ 0 max ] map ;
-
-: <extent-rect> ( loc ext -- rect ) dupd swap |v-| <rect> ;
+: <extent-rect> ( loc ext -- rect ) dupd swap [v-] <rect> ;
 
 : >absolute ( rect -- rect )
     rect-bounds >r origin get v+ r> <rect> ;

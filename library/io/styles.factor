@@ -25,5 +25,9 @@ SYMBOL: border-width
 SYMBOL: wrap-margin
 SYMBOL: outline
 
+! Table styles
+SYMBOL: table-gap
+SYMBOL: table-padding
+
 ! Input history
 TUPLE: input string ;

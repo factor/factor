@@ -90,8 +90,9 @@ M: object-button gadget-help ( button -- string )
     >r swap with-pane r> ; inline
 
 : styled-grid ( style grid -- )
-    <grid> { 5 5 0 } over set-grid-gap
-    border-width rot hash [ 5 ] unless* <border> ;
+    <grid>
+    table-gap pick hash [ { 0 0 0 } ] unless* over set-grid-gap
+    table-padding rot hash [ 0 ] unless* <border> ;
 
 : <pane-grid> ( quot style grid -- gadget )
     [

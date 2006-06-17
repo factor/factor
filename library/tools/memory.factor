@@ -2,8 +2,8 @@
 ! See http://factorcode.org/license.txt for BSD license.
 IN: memory
 USING: arrays errors generic hashtables io kernel
-kernel-internals math namespaces parser prettyprint
-sequences strings vectors words ;
+kernel-internals math namespaces parser prettyprint sequences
+strings styles vectors words ;
 
 : full-gc ( -- ) generations 1- gc ;
 
@@ -33,7 +33,8 @@ sequences strings vectors words ;
     ] [ ] make ;
 
 : room. ( -- )
-    room-table H{ } [ write ] tabular-output ;
+    room-table H{ { table-gap { 10 0 0 } } }
+    [ write ] tabular-output ;
 
 ! Some words for iterating through the heap.
 
@@ -70,5 +71,6 @@ sequences strings vectors words ;
             [ dup , dup pick hash , pick hash , ] { } make ,
         ] each 2drop
     ] { } make
-    H{ } [ dup string? [ write ] [ pprint ] if ]
+    H{ { table-gap { 10 0 0 } } }
+    [ dup string? [ write ] [ pprint ] if ]
     tabular-output ;

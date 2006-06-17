@@ -21,6 +21,7 @@
 
 + ui:
 
+- clipping seems off
 - x11 title bars are funny
 - cocoa: starting the UI with +foo switches opens them as files
 - if the listener is running a command when the image is saved, it
@@ -30,7 +31,6 @@
 - prettyprinter's highlighting of non-leaves doesn't really work
 - rollover is not updated on window focus changes
 - fix listener scroll to
-- { } H{ } [ ] tabular-output -- excess newline
 - multiple listener-run-files is broken
 - table line styles
 - x11 input methods

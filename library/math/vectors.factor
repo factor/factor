@@ -12,6 +12,7 @@ USING: arrays generic kernel sequences ;
 
 : v+   ( v v -- v ) [ + ] 2map ;
 : v-   ( v v -- v ) [ - ] 2map ;
+: [v-] ( v v -- v ) [ [-] ] 2map ;
 : v*   ( v v -- v ) [ * ] 2map ;
 : v/   ( v v -- v ) [ / ] 2map ;
 : vmax ( v v -- v ) [ max ] 2map ;

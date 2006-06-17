@@ -116,7 +116,8 @@ M: link summary "Link: " swap link-name append ;
 
 : $table ( content -- )
     ?terpri table-style [
-        H{ } [ print-element ] tabular-output
+        H{ { table-padding 5 } { table-gap { 5 5 0 } } }
+        [ print-element ] tabular-output
     ] with-style ;
 
 : $values ( content -- )
