@@ -93,13 +93,13 @@ M: link article-title link-name article-title ;
 M: link article-content link-name article-content ;
 M: link summary "Link: " swap link-name append ;
 
+: >link ( obj -- obj ) dup word? [ <link> ] unless ;
+
 : ($subsection) ( quot object -- )
     subsection-style [
-        [ swap curry ] keep dup article-title swap <link>
+        [ swap curry ] keep dup article-title swap >link
         rot write-outliner
     ] with-style ;
-
-: >link ( obj -- obj ) dup word? [ <link> ] unless ;
 
 : $link ( article -- )
     last-block off first link-style

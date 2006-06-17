@@ -6,7 +6,7 @@ HELP: ignored-word? "( string -- ? )"
 
 HELP: tokenize "( string -- seq )"
 { $values { "string" "a string" } { "seq" "a sequence of strings" } }
-{ $description "Split a string along whitespace boundaries, convert all tokens to lower case, and stem all tokens." } ;
+{ $description "Split a string along whitespace boundaries, convert all tokens to lower case, stem all tokens, and discards one-letter words and stop words." } ;
 
 HELP: index-text "( topic string -- )"
 { $values { "topic" "a help article name or a word" } { "string" "a string" } }

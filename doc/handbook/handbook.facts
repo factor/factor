@@ -17,9 +17,8 @@ ARTICLE: "handbook" "Factor documentation"
 { $subsection "cookbook-variables" }
 { $subsection "cookbook-vocabs" }
 { $subsection "cookbook-io" }
-{ $heading "Reference" }
+{ $heading "Language reference" }
 { $subsection "conventions" }
-{ $subsection "tools" }
 { $subsection "syntax" }
 { $subsection "dataflow" }
 { $subsection "words" }
@@ -30,6 +29,9 @@ ARTICLE: "handbook" "Factor documentation"
 { $subsection "parser" }
 { $subsection "prettyprint" }
 { $subsection "alien" }
+{ $heading "Environment reference" }
+{ $subsection "tools" }
+{ $subsection "help" }
 { $heading "Index" }
 { $subsection "article-index" }
 { $subsection "primitive-index" }

@@ -74,8 +74,9 @@ ARTICLE: "memory" "Object memory"
 { $subsection instances } ;
 
 ARTICLE: "word-introspection" "Word introspection"
-"You can display a word definition:"
+"You can display a word's definition or documentation:"
 { $subsection see }
+{ $subsection see-help }
 "Find words whose name contains a given string:"
 { $subsection apropos }
 "List all vocabularies, and list words in a vocabulary:"

@@ -1,0 +1,94 @@
+USING: help ;
+
+ARTICLE: "help" "The help system"
+"The help system maintains documentation written in a simple markup language, along with cross-referencing and search. Documentation can either exist as free-standing " { $emphasis "articles" } " or be associated with words."
+{ $subsection "browsing-help" }
+{ $subsection "searching-help" }
+{ $subsection "writing-help" } ;
+
+ARTICLE: "browsing-help" "Browsing documentation"
+"The easiest way to browse the help is from the help browser tool in the UI, however you can also display help topics in the listener."
+{ $subsection handbook }
+"Help topics are identified by article name strings, or words. You can request a specific help topic:"
+{ $subsection help }
+"You can also view a word's documentation and definition at once:"
+{ $subsection see-help }
+"You can request a list of topics linking to a specific topic:"
+{ $subsection links-in. } ;
+
+ARTICLE: "searching-help" "Searching documentation"
+"The help system maintains a full-text term index. The easiest way to search the help is from the help browser tool in the UI, however you can also search in the listener."
+{ $subsection search-help. }
+"A lower-level word:"
+{ $subsection search-help }
+{ $subsection "searching-help-impl" } ;
+
+ARTICLE: "searching-help-impl" "Full-text search implementation"
+"The help system search engine is a very simple full-text indexer. The index is rebuilt with a call to this word:"
+{ $subsection index-help }
+"This indexes every help topic by first tokenizing the article content and discarding certain words,"
+{ $subsection tokenize }
+"and then by adding it to the index:"
+{ $subsection index-text } ;
+
+ARTICLE: "writing-help" "Writing documentation"
+"A pair of parsing words are used to define free-standing articles and to associate documentation with words:"
+{ $subsection POSTPONE: ARTICLE: }
+{ $subsection POSTPONE: HELP: }
+"The " { $emphasis "content" } " in both cases is a " { $emphasis "markup element" } ", a recursive structure taking one of the following forms:"
+{ $list
+    { "a string," }
+    { "an array of markup elements," }
+    { "or an array of the form " { $snippet "{ $directive content... }" } ", where " { $snippet "$directive" } " is a markup word whose name starts with " { $snippet "$" } ", and " { $snippet "content..." } " is a series of markup elements" }
+}
+"Markup elements are therefore effectively just Factor objects, written using Factor syntax."
+{ $subsection "printing-elements" }
+{ $subsection "element-types" } ;
+
+ARTICLE: "printing-elements" "Printing markup elements"
+"When writing documentation, it is useful to be able to print markup elements for testing purposes. Markup elements which are strings or arrays of elements are printed in the obvious way. Markup elements of the form " { $snippet "{ $directive content... }" } " are printed by executing the " { $snippet "$directive" } " word with the element content on the stack."
+{ $subsection print-element }
+{ $subsection print-content } ;
+
+ARTICLE: "element-types" "Element types"
+"Markup elements can be classified into two broad categories, block elements and span elements. Block elements are inset with newlines before and after, whereas span elements flow with the paragraph text."
+{ $subsection "span-elements" }
+{ $subsection "block-elements" }
+{ $subsection "markup-utils" } ;
+
+ARTICLE: "span-elements" "Span elements"
+{ $subsection $emphasis }
+{ $subsection $link }
+{ $subsection $snippet }
+{ $subsection $url } ;
+
+ARTICLE: "block-elements" "Block elements"
+"The following are the standard headings found in word documentation:"
+{ $subsection $values }
+{ $subsection $description }
+{ $subsection $contract }
+{ $subsection $examples }
+{ $subsection $warning }
+{ $subsection $notes }
+{ $subsection $side-effects }
+{ $subsection $errors }
+{ $subsection $see-also }
+"Some additional elements:"
+{ $subsection $code }
+{ $subsection $curious }
+{ $subsection $example }
+{ $subsection $heading }
+{ $subsection $links }
+{ $subsection $list }
+{ $subsection $markup-example }
+{ $subsection $references }
+{ $subsection $see }
+{ $subsection $subsection }
+{ $subsection $table } ;
+
+ARTICLE: "markup-utils" "Markup element utilities"
+"Utility words to assist in defining new elements:"
+{ $subsection simple-element }
+{ $subsection ($span) }
+{ $subsection ($block) }
+{ $subsection ?terpri } ;
