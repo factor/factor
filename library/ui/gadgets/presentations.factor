@@ -89,10 +89,14 @@ M: object-button gadget-help ( button -- string )
     >r <pane> dup r> swap <styled-paragraph>
     >r swap with-pane r> ; inline
 
+: styled-grid ( style grid -- )
+    <grid> 5 over set-grid-gap
+    border-width rot hash [ 5 ] unless* <border> ;
+
 : <pane-grid> ( quot style grid -- gadget )
     [
         [ pick pick >r >r -rot styled-pane r> r> rot ] map
-    ] map 2nip <grid> 5 over set-grid-gap <default-border> ;
+    ] map styled-grid nip ;
 
 M: pane with-stream-table ( grid quot style pane -- )
     >r rot <pane-grid> r> print-gadget ;

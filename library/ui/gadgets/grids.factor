@@ -41,8 +41,7 @@ C: grid ( children -- grid )
 M: grid pref-dim* ( grid -- dim )
     [
         [
-            [ 0 [ + ] reduce ] keep length
-            1 [-] gap * +
+            [ sum ] keep length 1 [-] gap * +
         ] 2apply 0 3array
     ] with-grid ;
 
