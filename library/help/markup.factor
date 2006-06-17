@@ -111,15 +111,6 @@ M: link summary "Link: " swap link-name append ;
 : $links ( content -- )
     [ 1array $link ] textual-list ;
 
-: $where ( article -- )
-    where dup empty? [
-        drop
-    ] [
-        where-style [
-            [ "Parent topics: " write $links ] ($block)
-        ] with-style
-    ] if ;
-
 : $see-also ( content -- )
     "See also" $heading $links ;
 

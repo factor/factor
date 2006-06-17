@@ -8,22 +8,14 @@ HELP: tokenize "( string -- seq )"
 { $values { "string" "a string" } { "seq" "a sequence of strings" } }
 { $description "Split a string along whitespace boundaries, convert all tokens to lower case, and stem all tokens." } ;
 
-HELP: index-text "( score topic string -- )"
-{ $values { "score" "a relevance score" } { "topic" "a help article name or a word" } { "string" "a string" } }
-{ $description "Tokenizes the string and adds each token to the term index, with the specified score placed on the topic." }
+HELP: index-text "( topic string -- )"
+{ $values { "topic" "a help article name or a word" } { "string" "a string" } }
+{ $description "Tokenizes the string and adds each token to the term index." }
 { $notes "This word operates on the current namespace, and so must be wrapped in a " { $link bind } " to specify the term index hashtable." } ;
-
-HELP: index-article-title "( topic -- )"
-{ $values { "topic" "a help article name or a word" } }
-{ $description "Adds the tokens making up the article's title to the term index with a high relevancy score." } ;
-
-HELP: index-article-content "( topic -- )"
-{ $values { "topic" "a help article name or a word" } }
-{ $description "Adds the tokens making up the article's content to the term index with a regular relevancy score." } ;
 
 HELP: index-article "( topic -- )"
 { $values { "topic" "a help article name or a word" } }
-{ $description "Adds the tokens making up the article's title and content to the term index, with the title terms having a higher relevancy score." } ;
+{ $description "Adds the tokens making up the article to the term index." } ;
 
 HELP: term-index f
 { $description "Variable. A hashtable mapping stemmed search terms to hashtables mapping help topics to relevancy scores."

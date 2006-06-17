@@ -8,7 +8,7 @@ M: word article-title
 
 M: word article-content
     [
-        \ $synopsis over 2array ,
+        \ $vocabulary over 2array ,
         dup "help" word-prop [
             %
         ] [

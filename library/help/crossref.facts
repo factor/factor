@@ -8,35 +8,54 @@ HELP: elements "( elt-type element -- seq )"
 { $values { "elt-type" "a word" } { "element" "a markup element" } { "seq" "a new sequence" } }
 { $description "Outputs a sequence of all elements of type " { $snippet "elt-type" } " found by traversing " { $snippet "element" } "." } ;
 
-HELP: collect-elements "( elt-type element -- )"
-{ $values { "elt-type" "a word" } { "element" "a markup element" } { "seq" "a new sequence" } }
-{ $description "Sets a variable for each child element of every element of type " { $snippet "elt-type" } " found by traversing " { $snippet "element" } "." }
-{ $notes "This word is used in the implementation of " { $link links-out } "." } ;
+HELP: collect-elements "( element seq -- )"
+{ $values { "element" "a markup element" } { "seq" "a sequence of words" } { "elements" "a new sequence" } }
+{ $description "Collects the arguments of all sub-elements of " { $snippet "element" } " whose markup element type occurs in " { $snippet "seq" } "." }
+{ $notes "Used to implement " { $link links-out } " and " { $link children } "." } ;
+
+HELP: link-graph f
+{ $description "Variable. A graph whose vertices are help articles and edges are links. See " { $link "graphs" } "." }
+{ $see-also links-out links-in xref-articles } ;
 
 HELP: links-out "( topic -- seq )"
 { $values { "topic" "an article name or a word" } { "seq" "a new sequence" } }
 { $description "Outputs a sequence of all help articles and words linked to from " { $snippet "article" } "." } ;
 
-HELP: help-graph f
-{ $description "Variable. A graph whose vertices are help articles and edges are links. See " { $link "graphs" } "." }
-{ $see-also links-in xref-articles } ;
-
 HELP: links-in "( topic -- seq )"
 { $values { "topic" "an article name or a word" } { "seq" "a new sequence" } }
 { $description "Outputs a sequence of all help articles and words which link to " { $snippet "article" } "." } ;
 
+HELP: parent-graph f
+{ $description "Variable. A graph whose vertices are help articles and edges are subsections. See " { $link "graphs" } "." }
+{ $see-also children parents xref-articles } ;
+
+HELP: children "( topic -- seq )"
+{ $values { "topic" "an article name or a word" } { "seq" "a new sequence" } }
+{ $description "Outputs a sequence of all subsections of " { $snippet "topic" } "." } ;
+
+HELP: parents "( topic -- seq )"
+{ $values { "topic" "an article name or a word" } { "seq" "a new sequence" } }
+{ $description "Outputs a sequence of all help articles which contain " { $snippet "topic" } " as a subsection." } ;
+
+HELP: where "( topic -- seq )"
+{ $values { "topic" "an article name or a word" } { "seq" "a new sequence" } }
+{ $description "Outputs a sequence of all help articles which contain " { $snippet "topic" } " as a subsection, traversing all the way up to the root." }
+{ $examples
+    { $example "\"sequences\" where ." "{ \"collections\" \"handbook\" }" }
+} ;
+
 HELP: xref-article "( topic -- )"
 { $values { "topic" "an article name or a word" } }
-{ $description "Adds a vertex representing this article, along with edges representing links to the " { $link help-graph } " graph." }
+{ $description "Adds an article to the " { $link link-graph } " and " { $link parent-graph } " graphs." }
 $low-level-note ;
 
 HELP: unxref-article "( topic -- )"
 { $values { "topic" "an article name or a word" } }
-{ $description "Remove the vertex representing the article from the " { $link help-graph } " graph." }
+{ $description "Removes an article to the " { $link link-graph } " and " { $link parent-graph } " graphs." }
 $low-level-note ;
 
 HELP: xref-articles "( -- )"
-{ $description "Update the " { $link help-graph } " graph of article links. Usually this is done automatically." } ;
+{ $description "Update the " { $link link-graph } " and " { $link parent-graph } " graphs. Usually this is done automatically." } ;
 
 HELP: links-in. "( topic -- )"
 { $values { "topic" "an article name or a word" } }

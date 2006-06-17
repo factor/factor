@@ -19,7 +19,7 @@ M: array elements*
 
 : elements ( elt-type element -- seq ) [ elements* ] { } make ;
 
-: collect-elements ( element seq -- )
+: collect-elements ( element seq -- elements )
     [
         [
             swap elements [
@@ -40,6 +40,8 @@ SYMBOL: link-graph
 
 SYMBOL: parent-graph
 
+DEFER: $subsection
+
 : children ( article -- seq )
     article-content { $subsection } collect-elements ;
 
@@ -54,6 +56,15 @@ SYMBOL: parent-graph
 
 : where ( article -- seq )
     [ (where) ] { } make 1 swap tail ;
+
+: $where ( article -- )
+    where dup empty? [
+        drop
+    ] [
+        where-style [
+            [ "Parent topics: " write $links ] ($block)
+        ] with-style
+    ] if ;
 
 : xref-article ( article -- )
     dup

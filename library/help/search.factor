@@ -17,17 +17,11 @@ porter-stemmer prettyprint sequences strings ;
         dup ignored-word? over length 1 = or swap empty? or not
     ] subset ;
 
-: index-text ( score article string -- )
-    tokenize [ >r 2dup r> nest hash+ ] each 2drop ;
-
-: index-article-title ( article -- )
-    3 swap dup article-title index-text ;
-
-: index-article-content ( article -- )
-    1 swap dup [ help ] string-out index-text ;
+: index-text ( article string -- )
+    tokenize [ 1 -rot nest hash+ ] each-with ;
 
 : index-article ( article -- )
-    dup index-article-title index-article-content ;
+    dup [ help ] string-out index-text ;
 
 SYMBOL: term-index
 
