@@ -68,7 +68,7 @@ HELP: hashcode "( obj -- n )"
 "If mutable objects are used as hashtable keys, they must not be mutated in such a way that their hashcode changes. Doing so will violate bucket sorting invariants and result in undefined behavior." } ;
 
 HELP: = "( obj1 obj2 -- ? )"
-{ $values { "obj1" "an object" } { "obj2" "an object" } }
+{ $values { "obj1" "an object" } { "obj2" "an object" } { "?" "a boolean" } }
 { $contract
     "Tests if two objects are equal. If two objects are equal, they should the same printed representation, although the converse is not always true."
     $terpri
@@ -80,7 +80,7 @@ HELP: = "( obj1 obj2 -- ? )"
     }
     "The precise contract is as follows:"
     { $list
-        { "if no more specific method is defined, " { $link = } "  calls " { $link eq? } }
+        { "if no more specific method is defined, " { $link = } " calls " { $link eq? } }
         { "two numbers are equal if they have the same numerical value after being upgraded to the highest type of the two (see " { $link "number-protocol" } ")" }
         "two sequences are equal if they have the same type and elements"
         "two tuples are equal if their classes and slot values are equal"

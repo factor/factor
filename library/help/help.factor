@@ -7,6 +7,8 @@ strings ;
 ! Markup
 GENERIC: print-element
 
+DEFER: $title
+
 ! Help articles
 SYMBOL: articles
 
@@ -28,9 +30,19 @@ M: f article-content drop \ f article-content ;
 
 SYMBOL: last-block
 
-: (help) ( element -- )
-    default-style [ last-block on print-element ] with-nesting ;
+: print-title ( article -- )
+    article-title $title ;
 
-: help ( topic -- ) article-content (help) terpri ;
+: with-default-style ( quot -- )
+    default-char-style [
+        default-para-style [ last-block on call ] with-nesting
+    ] with-style ; inline
+
+: print-content ( element -- )
+    [ print-element ] with-default-style ;
+
+: (help) ( topic -- ) article-content print-content terpri ;
+
+: help ( topic -- ) dup print-title (help) ;
 
 : handbook ( -- ) "handbook" help ;

@@ -10,8 +10,6 @@ namespaces sequences strings words ;
         [ word-article ] word-subset %
     ] { } make ;
 
-: each-article ( quot -- ) all-articles swap each ; inline
-
 GENERIC: elements* ( elt-type element -- )
 
 M: simple-element elements* [ elements* ] each-with ;
@@ -25,7 +23,7 @@ M: array elements*
 : elements ( elt-type element -- seq ) [ elements* ] { } make ;
 
 : collect-elements ( elt-type article -- )
-    elements [ 1 swap tail [ dup set ] each ] each ; inline
+    elements [ 1 swap tail [ dup set ] each ] each ;
 
 : links-out ( article -- seq )
     article-content [
@@ -36,7 +34,7 @@ M: array elements*
 
 SYMBOL: help-graph
 
-: links-in ( article -- )
+: links-in ( article -- seq )
     dup link? [ link-name ] when help-graph get in-edges ;
 
 : xref-article ( article -- )

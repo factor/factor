@@ -8,6 +8,6 @@ USING: hashtables help html httpd io kernel namespaces sequences ;
 
 : help-responder ( -- )
     serving-html
-    help-topic dup article-title dup [
-        <h1> write </h1> [ help ] with-html-stream
+    help-topic dup article-title [
+        [ help ] with-html-stream
     ] html-document ;

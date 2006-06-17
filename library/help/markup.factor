@@ -34,8 +34,6 @@ M: word print-element { } swap execute ;
 
 ! Some spans
 
-: $heading [ heading-style ($span) ] ($block) ;
-
 : $snippet snippet-style ($span) ;
 
 : $emphasis emphasis-style ($span) ;
@@ -45,6 +43,9 @@ M: word print-element { } swap execute ;
 : $terpri last-block off terpri terpri drop ;
 
 ! Some blocks
+: $title [ title-style ($span) ] ($block) ;
+
+: $heading [ heading-style ($span) ] ($block) ;
 
 : ($code) ( presentation quot -- )
     [
@@ -87,20 +88,21 @@ M: word print-element { } swap execute ;
 : $examples ( content -- )
     "Examples" $heading print-element ;
 
+: $example ( content -- )
+    1 swap cut* swap "\n" join dup <input> [
+        input-style format terpri print-element
+    ] ($code) ;
+
+: $markup-example ( content -- )
+    first dup unparse " print-element" append 1array $code
+    print-element ;
+
 : $warning ( content -- )
     [
         warning-style [
             "Warning" $heading print-element
         ] with-nesting
     ] ($block) ;
-
-: textual-list ( seq quot -- )
-    [ ", " print-element ] interleave ; inline
-
-: $example ( content -- )
-    1 swap cut* swap "\n" join dup <input> [
-        input-style format terpri print-element
-    ] ($code) ;
 
 ! Some links
 TUPLE: link name ;
@@ -118,20 +120,21 @@ M: link summary
     ] with-style ;
 
 : $subsection ( object -- )
-    [
-        first [ help ] swap ($subsection)
-    ] ($block) ;
+    [ first [ (help) ] swap ($subsection) ] ($block) ;
 
 : $subtopic ( object -- )
     [
         subtopic-style [
-            unclip f rot [ (help) ] curry write-outliner
+            unclip f rot [ print-content ] curry write-outliner
         ] with-style
     ] ($block) ;
 
 : $link ( article -- )
     last-block off first link-style
     [ dup article-title swap <link> write-object ] with-style ;
+
+: textual-list ( seq quot -- )
+    [ ", " print-element ] interleave ; inline
 
 : $links ( content -- )
     [ 1array $link ] textual-list ;
@@ -146,8 +149,7 @@ M: link summary
 
 : $values ( content -- )
     "Arguments and values" $heading
-    [ first2 >r \ $snippet swap 2array r> 2array ] map
-    $table ;
+    [ unclip \ $snippet swap 2array swap 2array ] map $table ;
 
 : $predicate ( content -- )
     { { "object" "an object" } } $values
@@ -170,7 +172,7 @@ M: link summary
     "Notes" $heading print-element ;
 
 : $see ( content -- )
-    code-style [ first see ] with-nesting ;
+    code-style [ dup array? [ first ] when see ] with-nesting ;
 
 : $definition ( content -- )
     "Definition" $heading $see ;
@@ -188,7 +190,7 @@ M: link summary
 
 : $low-level-note
     drop
-    "Calling this word directly is not necessary in most cases. Higher-level words call it automatically." print-element ;
+    "Calling this word directly is not necessary in most cases. Higher-level words call it automatically." $notes ;
 
 : $values-x/y
     drop
@@ -207,4 +209,4 @@ M: link summary
     swap sort-articles [ ($subsection) terpri ] each-with ;
 
 : $outliner ( content -- )
-    first call [ help ] help-outliner ;
+    first call [ (help) ] help-outliner ;

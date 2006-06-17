@@ -9,7 +9,8 @@ TUPLE: nested-style-stream style ;
     >r stdio get <nested-style-stream> r> with-stream* ; inline
 
 : do-nested-style ( style stream -- style delegate )
-    [ nested-style-stream-style hash-union ] keep delegate ;
+    [ nested-style-stream-style swap hash-union ] keep
+    delegate ;
 
 : collapse-nested-style ( style delegate -- style delegate )
     dup nested-style-stream? [ do-nested-style ] when ;

@@ -1,0 +1,244 @@
+IN: help
+USING: arrays inspector io math prettyprint sequences ;
+
+HELP: simple-element f
+{ $description "Class of simple elements, which are just arrays of elements." } ;
+
+HELP: ($span) "( content style -- )"
+{ $values { "content" "a markup element" } { "style" "a hashtable" } }
+{ $description "Prints an inline markup element." } ;
+
+HELP: ?terpri "( -- )"
+{ $description "Prints a newline if the last element which was output is not a block." } ;
+
+HELP: ($block) "( quot -- )"
+{ $values { "quot" "a quotation" } }
+{ $description "Prints a block markup element with newlines before and after." } ;
+
+HELP: $title "( element -- )"
+{ $values { "element" "a markup element" } }
+{ $description "Prints a markup element, usually a string, as a block with the " { $link title-style } "." }
+{ $examples
+    { $markup-example { $title "Fermat's Last Theorem" } }
+} ;
+
+HELP: $heading "( element -- )"
+{ $values { "element" "a markup element" } }
+{ $description "Prints a markup element, usually a string, as a block with the " { $link heading-style } "." }
+{ $examples
+    { $markup-example { $heading "What remains to be discovered" } }
+} ;
+
+HELP: $code "( element -- )"
+{ $values { "element" "a markup element of the form " { $snippet "{ string... }" } } }
+{ $description "Prints code examples, as seen in many help articles. The markup element must be an array of strings." }
+{ $notes
+    "The code becomes clickable if the output stream supports it, and clicking it opens a listener window with the text inserted at the input prompt."
+    $terpri
+    "If you want to show code along with sample output, use the " { $link $example } " element."
+}
+{ $examples
+    { $markup-example { $code "2 2 + ." } }
+} ;
+
+HELP: $syntax "( word -- )"
+{ $values { "word" "a word" } }
+{ $description "Prints a description of a parsing word's syntax. This element is automatically output by the help system, so help descriptions of parsing words should not call it." } ;
+
+HELP: $stack-effect "( word -- )"
+{ $values { "word" "a word" } }
+{ $description "Prints a description of a word's stack effect. This element is automatically output by the help system, so help descriptions of parsing words should not call it." } ;
+
+HELP: $vocabulary "( element -- )"
+{ $values { "element" "a markup element of the form " { $snippet "{ word }" } } }
+{ $description "Prints a word's vocabulary. This markup element is automatically output by the help system, so help descriptions of parsing words should not call it." } ;
+
+HELP: $synopsis "( element -- )"
+{ $values { "element" "a markup element of the form " { $snippet "{ word }" } } }
+{ $description "Prints a the header material found on every word help page -- the word's vocabulary, stack effect and syntax, printing the latter only for parsing words. This markup element is automatically output by the help system, so help descriptions of parsing words should not call it." } ;
+
+HELP: $description "( element -- )"
+{ $values { "element" "a markup element" } }
+{ $description "Prints the description subheading found on the help page of most words." } ;
+
+HELP: $contract "( element -- )"
+{ $values { "element" "a markup element" } }
+{ $description "Prints a heading followed by a contract, found on the help page of generic words. Every generic word should document a contract which specifies method behavior that callers can rely upon, and implementations must obey." }
+{ $examples
+    { $markup-example { $contract "Methods of this generic word must always crash." } }
+} ;
+
+HELP: $examples "( element -- )"
+{ $values { "element" "a markup element" } }
+{ $description "Prints a heading followed by some examples. Word documentation should include examples, at least if the usage of the word is not entirely obvious." }
+{ $examples
+    { $markup-example { $examples { $example "2 2 + ." "4" } } }
+} ;
+
+HELP: $example "( element -- )"
+{ $values { "element" "a markup element of the form " { $snippet "{ inputs... output }" } } }
+{ $description "Prints a clickable example with sample output. The markup element must be an array of strings. All but the last string are joined by newlines and taken as the input text, and the last string is the output. The example becomes clickable if the output stream supports it, and clicking it opens a listener window with the input text inserted at the input prompt." }
+{ $examples
+    "The output text should be a string of what the input prints when executed, not the final stack contents or anything like that. So the following is an incorrect example:"
+    { $markup-example { $example "2 2 +" "4" } }
+    "However the following is right:"
+    { $markup-example { $example "2 2 + ." "4" } }
+    "Examples can incorporate a call to " { $link .s } " to show multiple output values; the convention is that you may assume the stack is empty before the example evaluates."
+} ;
+
+HELP: $markup-example "( element -- )"
+{ $values { "element" "a markup element" } }
+{ $description "Prints a clickable example showing the prettyprinted source text of " { $snippet "element" } " followed by rendered output. The example becomes clickable if the output stream supports it." }
+{ $examples
+    { $markup-example { $markup-example { $emphasis "Hi" } } }
+} ;
+
+HELP: $warning "( element -- )"
+{ $values { "element" "a markup element" } }
+{ $description "Prints an element inset in a block styled as so to draw the reader's attention towards it." }
+{ $examples
+    { $markup-example { $warning "Incorrect use of this product may cause serious injury or death." } }
+} ;
+
+HELP: $subsection "( element -- )"
+{ $values { "element" "a markup element of the form " { $snippet "{ topic }" } } }
+{ $description "Prints an expandable outliner containing the body of the help topic named by the first string element of " { $snippet "element" } "." }
+{ $examples
+    { $markup-example { $subsection "sequences" } }
+} ;
+
+HELP: $subtopic "( element -- )"
+{ $values { "element" "a markup element of the form " { $snippet "{ title content }" } } }
+{ $description "Prints an expandable outliner with the given title containing an arbitrary markup element." }
+{ $examples
+    { $markup-example { $subtopic "Subtopic example"
+    "Subtopics are useful for short notes, sidebars "
+    "and other bits of info which don't really deserve "
+    "their own help article." } }
+} ;
+
+HELP: $link "( element -- )"
+{ $values { "element" "a markup element of the form " { $snippet "{ topic }" } } }
+{ $description "Prints a link to a help article or word." }
+{ $examples
+    { $markup-example { $link "queues" } }
+    { $markup-example { $link + } }
+} ;
+
+HELP: textual-list "( seq -- str )"
+{ $values { "seq" "a sequence of strings" } { "str" "a string" } }
+{ $description "Concatenates a sequence of strings together, separated by " { $snippet "\", \"" } "." }
+{ $examples
+    { $example "{ \"fish\" \"chips\" \"salt\" } textual-list print" "fish, chips, salt" }
+} ;
+
+HELP: $links "( topics -- )"
+{ $values { "topics" "a sequence of article names or words" } }
+{ $description "Prints a series of links to help articles or word documentation." }
+{ $notes "This markup element is used to implement " { $link $links } "." }
+{ $examples
+    { $markup-example { $links + - * / } }
+} ;
+
+HELP: $see-also "( topics -- )"
+{ $values { "topics" "a sequence of article names or words" } }
+{ $description "Prints a heading followed by a series of links." }
+{ $examples
+    { $markup-example { $see-also "graphs" "queues" } }
+} ;
+
+HELP: $table "( element -- )"
+{ $values { "element" "an array of arrays of markup elements" } }
+{ $description "Prints a table given as an array of rows, where each row must have the same number of columns." }
+{ $examples
+    { $markup-example
+        { $table
+            { "a" "b" "c" }
+            { "d" "e" "f" } 
+        }
+    }
+} ;
+
+HELP: $values "( element -- )"
+{ $values { "element" "an array of pairs of markup elements" } }
+{ $description "Prints the description of arguments and values found on every word help page. The first element of a pair is the argument name and is output with " { $link $snippet } ". The remainder can be an element of any form." } ;
+
+HELP: $predicate "( element -- )"
+{ $values { "element" "a markup element of the form " { $snippet "{ word }" } } }
+{ $description "Prints the boilerplate description of a class membership predicate word such as " { $link array? } " or " { $link integer? } "." } ;
+
+HELP: $list "( element -- )"
+{ $values { "element" "an array of markup elements" } }
+{ $description "Prints a bulleted list of markup elements." }
+{ $notes
+    "A common mistake is that if an item consists of more than just a string, it will be broken up as several items:"
+    { $markup-example
+        { $list
+            "First item"
+            "Second item " { $emphasis "with emphasis" }
+        }
+    }
+    "The fix is easy; just group the two markup elements making up the second item into one markup element:"
+    { $markup-example
+        { $list
+            "First item"
+            { "Second item " { $emphasis "with emphasis" } }
+        }
+    }
+} ;
+
+HELP: $errors "( element -- )"
+{ $values { "element" "a markup element" } }
+{ $description "Prints the errors subheading found on the help page of some words. This section should document any errors thrown by the word." }
+{ $examples
+    { $markup-example { $errors "I/O errors, network errors, hardware errors... oh my!" } }
+} ;
+
+HELP: $side-effects "( element -- )"
+{ $values { "element" "a markup element of the form " { $snippet "{ string... }" } } }
+{ $description "Prints a heading followed by a list of input values or variables which are modified by the word being documented." }
+{ $examples
+    { $markup-example
+        { { $values { "seq" "a mutable sequence" } } { $side-effects "seq" } }
+    }
+} ;
+
+HELP: $notes "( element -- )"
+{ $values { "element" "a markup element" } }
+{ $description "Prints the errors subheading found on the help page of some words. This section should usage tips and pitfalls." } ;
+
+HELP: $see "( element -- )"
+{ $values { "element" "a markup element of the form " { $snippet "{ word }" } } }
+{ $description "Prints the definition of " { $snippet "word" } " by calling " { $link see } "." }
+{ $examples
+    { $markup-example { "Here is a word definition:" { $see reverse } } }
+} ;
+
+HELP: $definition "( word -- )"
+{ $values { "word" "a word" } } }
+{ $description "Prints a heading followed by the definition of " { $snippet "word" } " by calling " { $link see } "." }
+{ $notes
+    "This markup element is output by " { $link show } " but not " { $link help } "."
+} ;
+
+HELP: $curious "( element -- )"
+{ $values { "element" "a markup element" } }
+{ $description "Prints a heading followed by a markup element." }
+{ $notes "This element type is used by the cookbook-style introductory articles in the " { $link "handbook" } "." } ;
+
+HELP: $references "( element -- )"
+{ $values { "element" "a markup element of the form " { $snippet "{ topic... }" } } }
+{ $description "Prints a heading followed by a series of links." }
+{ $notes "This element type is used by the cookbook-style introductory articles in the " { $link "handbook" } "." } ;
+
+HELP: sort-articles "( seq -- assoc )"
+{ $values { "seq" "a sequence of help article names and words" } { "assoc" "a new sequence of pairs" } }
+{ $description "Constructs a key-sorted association list mapping article titles to help topics." } ;
+
+HELP: help-outliner "( seq quot -- )"
+{ $values { "seq" "a sequence of help article names and words" } { "quot" "a quotation with stack effect " { $snippet "( topic -- )" } } }
+{ $description "Writes an outliner of help topics to the " { $link stdio } " stream. Expanding a help topic calls " { $snippet "quot" } " with the topic on the data stack." } ;
+
+HELP: $outliner "( element -- )"
+{ $values { "element" "a markup element of the form " { $snippet "( quot -- )" } } }
+{ $description "Calls the quotation to generate a sequence of help topics, and outputs an outliner for each one. Expanding a help topic shows the article body." } ;

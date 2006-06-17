@@ -21,7 +21,7 @@ porter-stemmer prettyprint sequences strings ;
     tokenize [ >r 2dup r> nest hash+ ] each 2drop ;
 
 : index-article-title ( article -- )
-    10 swap dup article-title index-text ;
+    3 swap dup article-title index-text ;
 
 : index-article-content ( article -- )
     1 swap dup [ help ] string-out index-text ;

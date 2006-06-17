@@ -1,5 +1,6 @@
 + io:
 
+- pop all callbacks at once
 - unix i/o: problems with passing f to syscalls
 - factorcode httpd started using 99% CPU, but still received connections;
   closing read-fds solved it
@@ -8,10 +9,12 @@
 
 + help:
 
+- double 'presented' for the block & char style
 - refactor style stack code so that nested styles are handled at a lower-level
   - with-style & with-stream-style
     - in HTML, we can nest div tags, etc
-- automatically update help graph when adding/removing articles/words
+- automatically update help graph and search index when adding/removing
+  articles/words
 - help search:
   - edit distance algorithm
   - store positions in index
@@ -21,6 +24,7 @@
 
 + ui:
 
+- help viewer in ui: show title
 - x11 title bars are funny
 - cocoa: starting the UI with +foo switches opens them as files
 - if the listener is running a command when the image is saved, it

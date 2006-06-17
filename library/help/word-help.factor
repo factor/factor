@@ -1,7 +1,7 @@
 ! Copyright (C) 2005, 2006 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 IN: help
-USING: arrays kernel namespaces prettyprint sequences words ;
+USING: arrays io kernel namespaces prettyprint sequences words ;
 
 M: word article-title
     dup word-name swap stack-effect [ " " swap append3 ] when* ;
@@ -20,5 +20,4 @@ M: word article-content
         ] ?if
     ] { } make ;
 
-: word-help ( word -- )
-    dup article-content { $definition } rot add add (help) ;
+: show ( word -- ) dup help $definition terpri ;

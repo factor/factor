@@ -3,10 +3,14 @@
 IN: help
 USING: styles ;
 
-: default-style
+: default-char-style
     H{
         { font "sans-serif" }
         { font-size 12 }
+    } ;
+
+: default-para-style
+    H{
         { wrap-margin 500 }
     } ;
 
@@ -15,6 +19,13 @@ USING: styles ;
 
 : emphasis-style
     H{ { font-style italic } } ;
+
+: title-style
+    H{
+        { font "sans-serif" }
+        { font-size 16 }
+        { font-style bold }
+    } ;
 
 : heading-style
     H{

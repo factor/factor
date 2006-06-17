@@ -82,12 +82,12 @@ HELP: uses "( word -- seq )"
 { $see-also uses } ;
 
 HELP: crossref f
-{ $description "Variable. A hashtable mapping words to usages, where usages are a set represented by a hashtable with words as keys and dummy sentinels as values." }
+{ $description "Variable. A graph whose vertices are words and edges are usages. See " { $link "graphs" } "." }
 { $see-also usages xref-words } ;
 
 HELP: xref-word "( word -- )"
 { $values { "word" "a word" } }
-{ $description "Adds dependencies from every word called by this word to this word." }
+{ $description "Adds a vertex representing this word, along with edges representing dependencies to the " { $link crossref } " graph." }
 $low-level-note ;
 
 HELP: usage "( word -- seq )"
@@ -106,9 +106,9 @@ HELP: unxref-word* "( word -- )"
 { $contract "Updates the word to cope with a callee being redefined." }
 $low-level-note ;
 
-HELP: unxref-word "( callee caller -- )"
-{ $values { "callee" "a word" } { "caller" "a word" } }
-{ $description "Remove the fact that " { $snippet "caller" } " calls " { $snippet "callee" } " from the cross-referencing database." }
+HELP: unxref-word "( word -- )"
+{ $values { "word" "a word" } }
+{ $description "Remove the vertex representing the word from the " { $link crossref } " graph." }
 $low-level-note ;
 
 HELP: define "( word def primitive -- )"
@@ -217,7 +217,7 @@ HELP: word-subset "( quot -- seq )"
 { $description "Outputs a sequence of words satisfying the predicate." } ;
 
 HELP: xref-words "( -- )"
-{ $description "Update the word dependency database. Usually this is done automatically." } ;
+{ $description "Update the " { $link crossref } " graph of word dependencies. Usually this is done automatically." } ;
 
 HELP: lookup "( name vocab -- word )"
 { $values { "name" "a string" } { "vocab" "a string" } { "word" "a word or " { $link f } } }

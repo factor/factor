@@ -1,0 +1,43 @@
+IN: help
+
+HELP: all-articles "( -- seq )"
+{ $values { "seq" "a sequence" } }
+{ $description "Outputs a sequence of all help article names, and all words with documentation." } ;
+
+HELP: elements "( elt-type element -- seq )"
+{ $values { "elt-type" "a word" } { "element" "a markup element" } { "seq" "a new sequence" } }
+{ $description "Outputs a sequence of all elements of type " { $snippet "elt-type" } " found by traversing " { $snippet "element" } "." } ;
+
+HELP: collect-elements "( elt-type element -- )"
+{ $values { "elt-type" "a word" } { "element" "a markup element" } { "seq" "a new sequence" } }
+{ $description "Sets a variable for each child element of every element of type " { $snippet "elt-type" } " found by traversing " { $snippet "element" } "." }
+{ $notes "This word is used in the implementation of " { $link links-out } "." } ;
+
+HELP: links-out "( topic -- seq )"
+{ $values { "topic" "an article name or a word" } { "seq" "a new sequence" } }
+{ $description "Outputs a sequence of all help articles and words linked to from " { $snippet "article" } "." } ;
+
+HELP: help-graph f
+{ $description "Variable. A graph whose vertices are help articles and edges are links. See " { $link "graphs" } "." }
+{ $see-also links-in xref-articles } ;
+
+HELP: links-in "( topic -- seq )"
+{ $values { "topic" "an article name or a word" } { "seq" "a new sequence" } }
+{ $description "Outputs a sequence of all help articles and words which link to " { $snippet "article" } "." } ;
+
+HELP: xref-article "( topic -- )"
+{ $values { "topic" "an article name or a word" } }
+{ $description "Adds a vertex representing this article, along with edges representing links to the " { $link help-graph } " graph." }
+$low-level-note ;
+
+HELP: unxref-article "( topic -- )"
+{ $values { "topic" "an article name or a word" } }
+{ $description "Remove the vertex representing the article from the " { $link help-graph } " graph." }
+$low-level-note ;
+
+HELP: xref-articles "( -- )"
+{ $description "Update the " { $link help-graph } " graph of article links. Usually this is done automatically." } ;
+
+HELP: links-in. "( topic -- )"
+{ $values { "topic" "an article name or a word" } }
+{ $description "Prints an outliner listing all help articles linking to " { $snippet "article" } "." } ;

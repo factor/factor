@@ -38,7 +38,7 @@ HELP: define-predicate "( class predicate quot -- )"
     }
     "These properties allow the method combination code to generate method dispatch logic."
 }
-{ $notes $low-level-note } ;
+$low-level-note ;
 
 HELP: superclass "( class -- super )"
 { $values { "class" "a class word" } { "super" "a class word" } }
@@ -88,7 +88,7 @@ HELP: generic f
 HELP: make-generic "( word -- )"
 { $values { "word" "a generic word" } }
 { $description "Regenerates the definition of a generic word by applying the method combination to the set of defined methods." }
-{ $notes $low-level-note } ;
+$low-level-note ;
 
 HELP: check-method "( class generic -- )"
 { $values { "class" "a class word" } { "generic" "a generic word" } }
@@ -97,12 +97,12 @@ HELP: check-method "( class generic -- )"
 HELP: ?make-generic "( word -- )"
 { $values { "word" "a generic word" } }
 { $description "Regenerates the definition of a generic word, unless bootstrap is in progress, in which case nothing is done. This avoids regenerating generic words multiple times during bootstrap as methods are defined. Instead, all generic words are built once at the end of the process, resulting in a performance improvement." }
-{ $notes $low-level-note } ;
+$low-level-note ;
 
 HELP: with-methods "( word quot -- )"
 { $values { "word" "a generic word" } { "quot" "a quotation with stack effect " { $snippet "( methods -- )" } } }
 { $description "Applies a quotation to the generic word's methods hashtable, and regenerates the generic word's definition when the quotation returns." }
-{ $notes $low-level-note } ;
+$low-level-note ;
 
 HELP: define-method "( quot class generic -- )"
 { $values { "quot" "a quotation" } { "class" "a class word" } { "generic" "a generic word" } }
@@ -144,7 +144,7 @@ HELP: min-class "( class seq -- class/f )"
 HELP: define-class "( class -- )"
 { $values { "class" "a class word" } }
 { $description "Sets a property indicating this is a class word, and registers the class in the global union lookup map." }
-{ $notes $low-level-note } ;
+$low-level-note ;
 
 HELP: implementors "( class -- seq )"
 { $values { "class" "a class word" } { "seq" "a sequence of generic words" } }
