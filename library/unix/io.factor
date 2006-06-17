@@ -2,8 +2,8 @@
 ! See http://factorcode.org/license.txt for BSD license.
 IN: io-internals
 USING: alien arrays errors generic hashtables io kernel
-kernel-internals math parser queues sequences strings
-threads unix-internals vectors words ;
+kernel-internals math parser sequences strings threads
+unix-internals vectors words ;
 
 ! We want namespaces::bind to shadow the bind system call from
 ! unix-internals
@@ -93,7 +93,7 @@ M: port set-timeout ( timeout port -- )
 TUPLE: io-task port callbacks ;
 C: io-task ( port -- )
     [ set-io-task-port ] keep
-    <queue> over set-io-task-callbacks ;
+    V{ } clone over set-io-task-callbacks ;
 
 ! Multiplexer
 GENERIC: do-io-task ( task -- ? )
@@ -102,7 +102,7 @@ GENERIC: task-container ( task -- vector )
 : io-task-fd io-task-port port-handle ;
 
 : add-io-task ( callback task -- )
-    [ >r <queue> [ enque ] keep r> set-io-task-callbacks ] keep
+    [ io-task-callbacks push ] keep
     dup io-task-fd over task-container 2dup hash [
         "Cannot perform multiple reads from the same port" throw
     ] when set-hash ;
@@ -110,13 +110,13 @@ GENERIC: task-container ( task -- vector )
 : remove-io-task ( task -- )
     dup io-task-fd swap task-container remove-hash ;
 
-: pop-callback ( task -- callback )
-    dup io-task-callbacks dup deque >r
-    queue-empty? [ remove-io-task ] [ drop ] if r> ;
+: pop-callbacks ( task -- )
+    dup io-task-callbacks swap remove-io-task
+    [ schedule-thread ] each ;
 
 : handle-fd ( task -- )
-    dup io-task-port touch-port dup do-io-task
-    [ pop-callback schedule-thread ] [ drop ] if ;
+    dup io-task-port touch-port
+    dup do-io-task [ pop-callbacks ] [ drop ] if ;
 
 : timeout? ( port -- ? )
     port-cutoff dup zero? not swap millis < and ;
@@ -125,7 +125,7 @@ GENERIC: task-container ( task -- vector )
     [
         nip dup io-task-port timeout? [
             dup io-task-port "Timeout" swap report-error
-            nip pop-callback schedule-thread
+            nip pop-callbacks
         ] [
             tuck io-task-fd swap bit-nth
             [ handle-fd ] [ drop ] if
@@ -264,7 +264,7 @@ M: write-task task-container drop write-tasks get-global ;
 
 : add-write-io-task ( callback task -- )
     dup io-task-fd write-tasks get-global hash
-    [ io-task-callbacks enque ] [ add-io-task ] ?if ;
+    [ io-task-callbacks push ] [ add-io-task ] ?if ;
 
 : port-flush ( port -- )
     [ swap <write-task> add-write-io-task stop ] callcc0 drop ;

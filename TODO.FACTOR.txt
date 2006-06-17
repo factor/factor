@@ -1,6 +1,5 @@
 + io:
 
-- pop all callbacks at once
 - unix i/o: problems with passing f to syscalls
 - factorcode httpd started using 99% CPU, but still received connections;
   closing read-fds solved it
