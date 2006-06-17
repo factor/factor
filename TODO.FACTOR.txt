@@ -8,7 +8,6 @@
 
 + help:
 
-- double 'presented' for the block & char style
 - refactor style stack code so that nested styles are handled at a lower-level
   - with-style & with-stream-style
     - in HTML, we can nest div tags, etc

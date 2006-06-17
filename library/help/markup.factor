@@ -144,7 +144,7 @@ M: link summary "Link: " swap link-name append ;
     "Notes" $heading print-element ;
 
 : $see ( content -- )
-    code-style [ dup array? [ first ] when see ] with-nesting ;
+    code-style [ H{ } [ first see ] with-nesting ] with-style ;
 
 : $definition ( content -- )
     "Definition" $heading $see ;

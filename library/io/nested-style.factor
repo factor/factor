@@ -30,8 +30,10 @@ M: nested-style-stream stream-write1
     >r ch>string r> H{ } swap do-nested-style stream-format ;
 
 : do-nested-quot ( quot style stream -- quot style stream )
-    do-nested-style
-    >r [ swap \ with-style 3array >quotation ] keep r> ;
+    tuck >r >r
+    nested-style-stream-style swap \ with-style
+    3array >quotation
+    r> r> do-nested-style ;
 
 M: nested-style-stream with-nested-stream
     do-nested-quot with-nested-stream ;

@@ -19,8 +19,8 @@ M: word article-content
     ] { } make ;
 
 : with-default-style ( quot -- )
-    default-char-style [
-        default-para-style [ last-block on call ] with-nesting
+    default-style [
+        H{ } [ last-block on call ] with-nesting
     ] with-style ; inline
 
 : print-title ( article -- )
