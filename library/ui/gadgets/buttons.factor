@@ -4,7 +4,7 @@ IN: gadgets-buttons
 USING: gadgets gadgets-borders gadgets-theme generic io kernel
 math namespaces sequences styles threads ;
 
-TUPLE: button rollover? pressed? quot ;
+TUPLE: button rollover? pressed? selected? quot ;
 
 : buttons-down? ( -- ? )
     hand-buttons get-global empty? not ;
@@ -71,11 +71,12 @@ C: repeat-button ( gadget quot -- button )
 
 M: repeat-button tick ( ms object -- ) nip button-clicked ;
 
-TUPLE: button-paint plain rollover pressed ;
+TUPLE: button-paint plain rollover pressed selected ;
 
 : button-paint ( button paint -- button paint )
     {
         { [ over button-pressed? ] [ button-paint-pressed ] }
+        { [ over button-selected? ] [ button-paint-selected ] }
         { [ over button-rollover? ] [ button-paint-rollover ] }
         { [ t ] [ button-paint-plain ] }
     } cond ;

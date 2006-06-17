@@ -23,7 +23,6 @@
 
 + ui:
 
-- help viewer in ui: show title
 - x11 title bars are funny
 - cocoa: starting the UI with +foo switches opens them as files
 - if the listener is running a command when the image is saved, it
@@ -43,7 +42,6 @@
   - need actions for reloading the source file and opening word in jEdit
   - highlight showing panes in originating list
   - single set of tabs across the top
-- toggle/radio buttons/tabs or something
 - make-frame should compile
 - speed up ideas:
   - only do clipping for certain gadgets

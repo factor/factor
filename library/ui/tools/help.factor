@@ -49,13 +49,10 @@ M: help-gadget focusable-child*
     swap help-gadget-showing dup
     [ over history-seq push-new update-history ] [ 2drop ] if ;
 
-: fancy-help ( obj -- )
-    link-name dup word? [ see-help ] [ help ] if ;
-
 : show-help ( link help -- )
     dup add-history [ set-help-gadget-showing ] 2keep
     dup update-title {
-        { "Article" [ fancy-help ] }
+        { "Article" [ help ] }
         { "Links in" [ links-in. ] }
     } swap help-gadget-tabs set-pages ;
 

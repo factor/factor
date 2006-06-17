@@ -33,7 +33,7 @@ prettyprint sequences words xml ;
 
 : word-source ( -- )
     #! Write the source for the given word from the vocab as HTML.
-    current-word [ [ word-help ] with-html-stream ] when* ;
+    current-word [ [ see-help ] with-html-stream ] when* ;
 
 : browser-body ( -- )
     #! Write out the HTML for the body of the main browser page.
