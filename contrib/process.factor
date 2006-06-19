@@ -9,3 +9,5 @@ FUNCTION: void* popen ( char* command, char* type ) ; compiled
     popen dup <c-stream> ;
 
 : !" parse-string system drop ; parsing
+
+PROVIDE: process ;

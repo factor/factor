@@ -113,3 +113,5 @@ USING: namespaces words ;
 <splay-tree> "foo" set
 all-words [ dup word-name "foo" get set-splay ] each
 all-words [ dup word-name "foo" get get-splay drop ] each
+
+PROVIDE: splay-trees ;

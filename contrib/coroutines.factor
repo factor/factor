@@ -69,3 +69,5 @@ test2 f swap coresume . f swap coresume . f swap coresume . drop
 
 test3 f swap coresume . f swap coresume . f swap coresume . drop
 
+PROVIDE: coroutines ;
+

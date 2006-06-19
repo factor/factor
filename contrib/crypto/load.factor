@@ -1,26 +1,28 @@
 IN: scratchpad
 USING: kernel parser sequences words compiler ;
 
-{
-    "common"
-    "base64"
-    "barrett"
-    "montgomery"
-    "random"
-    "miller-rabin"
+REQUIRE: math ;
+
+PROVIDE: crypto {
+    "common.factor"
+    "base64.factor"
+    "barrett.factor"
+    "montgomery.factor"
+    "random.factor"
+    "miller-rabin.factor"
 
 ! Rngs
-    "blum-blum-shub"
+    "blum-blum-shub.factor"
 
 ! Hash
-    "crc32"
-    "md5"
-    "sha1"
+    "crc32.factor"
+    "md5.factor"
+    "sha1.factor"
 
 ! Block ciphers
-    "rc4"
+    "rc4.factor"
 
 ! Public key
-    "rsa"
+    "rsa.factor"
 
-} [ "/contrib/crypto/" swap ".factor" append3 run-resource ] each
+} ;

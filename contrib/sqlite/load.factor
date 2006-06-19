@@ -1,9 +1,7 @@
-IN: scratchpad
-USING: kernel alien parser compiler words sequences ;
+USING: alien ;
 
 "sqlite" "libsqlite3" add-simple-library
 
-{
-    "sqlite"
-    "tuple-db"
-} [ "/contrib/sqlite/" swap ".factor" append3 run-resource ] each
+PROVIDE: sqlite
+{ "sqlite.factor" "tuple-db.factor" }
+{ "tuple-db-tests.factor" } ;

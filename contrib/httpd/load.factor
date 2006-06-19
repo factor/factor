@@ -1,30 +1,30 @@
 IN: scratchpad
 USING: words kernel parser sequences io compiler ;
 
-{ 
-    "mime"
-    "xml"
-    "http-common"
-    "html-tags"
-    "responder"
-    "httpd"
-    "cont-responder"
-    "callback-responder"
-    "prototype-js"
-    "html"
-    "embedded"
-    "file-responder"
-    "help-responder"
-    "inspect-responder"
-    "browser-responder"
-    "default-responders"
-    "http-client"
+PROVIDE: httpd { 
+    "mime.factor"
+    "xml.factor"
+    "http-common.factor"
+    "html-tags.factor"
+    "responder.factor"
+    "httpd.factor"
+    "cont-responder.factor"
+    "callback-responder.factor"
+    "prototype-js.factor"
+    "html.factor"
+    "embedded.factor"
+    "file-responder.factor"
+    "help-responder.factor"
+    "inspect-responder.factor"
+    "browser-responder.factor"
+    "default-responders.factor"
+    "http-client.factor"
 
-    "test/html"
-    "test/http-client"
-    "test/httpd"
-    "test/url-encoding"
-} [ "/contrib/httpd/" swap ".factor" append3 run-resource ] each
+    "test/html.factor"
+    "test/http-client.factor"
+    "test/httpd.factor"
+    "test/url-encoding.factor"
+} ;
 
 "To start the HTTP server, issue the following command in the listener:" print
 "  USE: httpd" print

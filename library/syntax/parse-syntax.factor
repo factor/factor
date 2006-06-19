@@ -4,7 +4,7 @@
 ! Bootstrapping trick; see doc/bootstrap.txt.
 IN: !syntax
 USING: alien arrays errors generic hashtables kernel math
-namespaces parser sequences strings syntax vectors words ;
+modules namespaces parser sequences strings syntax vectors words ;
 
 : (
     CHAR: ) column [
@@ -69,3 +69,10 @@ DEFER: PRIMITIVE: parsing
     [ define-constructor ] f ; parsing
 
 : FORGET: scan use get hash-stack [ forget ] when* ; parsing
+
+: PROVIDE:
+    scan [ { { } { } } append first2 provide ] f ; parsing
+
+: REQUIRE:
+    string-mode on
+    [ string-mode off [ require ] each ] f ; parsing

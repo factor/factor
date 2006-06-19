@@ -117,6 +117,7 @@ vectors words ;
         
         "/library/test/test.factor"
 
+        "/library/modules.factor"
         "/library/threads.factor"
         
         "/library/io/server.factor"

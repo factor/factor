@@ -1,13 +1,13 @@
 IN: scratchpad
-USING: kernel parser sequences words compiler ;
+USING: modules ;
 
-{ 
-    "utils"
-    "combinatorics"
-    "analysis"
-    "polynomials"
-    "quaternions"
-    "matrices"
-    "statistics"
-    "numerical-integration"
-} [ "/contrib/math/" swap ".factor" append3 run-resource ] each
+PROVIDE: math { 
+    "utils.factor"
+    "combinatorics.factor"
+    "analysis.factor"
+    "polynomials.factor"
+    "quaternions.factor"
+    "matrices.factor"
+    "statistics.factor"
+    "numerical-integration.factor"
+} ;
