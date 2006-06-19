@@ -1,9 +1,9 @@
 ! Copyright (C) 2004, 2006 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 IN: image
-USING: errors generic hashtables io kernel kernel-internals
-math memory namespaces parser prettyprint sequences
-vectors words ;
+USING: arrays errors generic hashtables io kernel
+kernel-internals math memory namespaces parser prettyprint
+sequences vectors words ;
 
 "Bootstrap stage 1..." print flush
 
@@ -345,10 +345,12 @@ vectors words ;
 ] [ ] make
 
 vocabularies get [
-    "!syntax" get "syntax" set
-
-    "syntax" get hash-values [ word? ] subset
-    [ "syntax" swap set-word-vocabulary ] each
+    "!syntax" get hash>alist [
+        first2
+        "syntax" over set-word-vocabulary
+        >r "!" ?head drop r> 2dup set-word-name
+        2array
+    ] map alist>hash "syntax" set
 ] bind
 
 "!syntax" vocabularies get remove-hash

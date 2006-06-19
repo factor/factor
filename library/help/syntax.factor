@@ -3,11 +3,11 @@
 IN: !syntax
 USING: arrays help kernel parser sequences syntax words ;
 
-: HELP:
+: !HELP:
     scan-word bootstrap-word dup [
         >array unclip swap >r "stack-effect" set-word-prop r>
         "help" set-word-prop
     ] f ; parsing
 
-: ARTICLE:
+: !ARTICLE:
     [ >array [ first2 2 ] keep tail add-article ] f ; parsing

@@ -1,9 +1,9 @@
 IN: process
 USING: compiler io io-internals kernel parser ;
 
-FUNCTION: int system ( char* command ) ; compiled
+FUNCTION: int system ( char* command ) ;
 
-FUNCTION: void* popen ( char* command, char* type ) ; compiled
+FUNCTION: void* popen ( char* command, char* type ) ;
 
 : <process-stream> ( command mode -- stream )
     popen dup <c-stream> ;

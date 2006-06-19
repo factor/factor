@@ -27,17 +27,13 @@ H{ } clone modules set-global
 
 : module modules get hash ;
 
-: (require) ( name -- )
+: require ( name -- )
     dup module [
         drop
     ] [
         "Loading module " write dup write "..." print
         module-def run-resource
     ] if ;
-
-: require ( name -- )
-    [ \ require on (require) ] with-scope
-    \ require get [ compile-all ] unless ;
 
 : run-resources ( seq -- )
     bootstrapping? get

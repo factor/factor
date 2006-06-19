@@ -268,7 +268,7 @@ num-types f <array> builtins set
         2
         object
         { "word-name" "words" }
-        f
+        { "set-word-name" "words" }
     }
     {
         3
@@ -322,7 +322,7 @@ num-types f <array> builtins set
 "array" "arrays" create 8 "array?" "arrays" create
 { } define-builtin
 
-"f" "!syntax" create 9 "not" "kernel" create
+"!f" "!syntax" create 9 "not" "kernel" create
 { } define-builtin
 
 "hashtable?" "hashtables" create t "inline" set-word-prop
@@ -417,7 +417,7 @@ num-types f <array> builtins set
 
 ! Define general-t type, which is any object that is not f.
 "general-t" "kernel" create dup define-symbol
-f "f" "!syntax" lookup builtins get remove [ ] subset
+f "!f" "!syntax" lookup builtins get remove [ ] subset
 define-union
 
 ! Catch-all class for providing a default method.
