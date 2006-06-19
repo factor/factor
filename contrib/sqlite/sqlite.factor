@@ -31,7 +31,6 @@
 IN: sqlite
 USE: kernel
 USE: alien
-USE: compiler
 USE: errors
 USE: strings
 USE: namespaces
@@ -258,6 +257,3 @@ END-STRUCT
 
 : sqlite-map ( statement quot -- )
   [ ] (sqlite-map) ;
-
-
-{ "sqlite" } compile-vocabs

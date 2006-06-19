@@ -11,14 +11,13 @@ PROVIDE: httpd {
     "callback-responder.factor"
     "prototype-js.factor"
     "html.factor"
-    "embedded.factor"
     "file-responder.factor"
     "help-responder.factor"
     "inspect-responder.factor"
     "browser-responder.factor"
     "default-responders.factor"
     "http-client.factor"
-
+} {
     "test/html.factor"
     "test/http-client.factor"
     "test/httpd.factor"

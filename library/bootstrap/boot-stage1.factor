@@ -117,7 +117,6 @@ vectors words ;
         
         "/library/test/test.factor"
 
-        "/library/modules.factor"
         "/library/threads.factor"
         
         "/library/io/server.factor"
@@ -158,6 +157,7 @@ vectors words ;
         "/library/io/buffer.factor"
 
         "/library/cli.factor"
+        "/library/modules.factor"
         
         "/library/bootstrap/init.factor"
         "/library/bootstrap/image.factor"

@@ -3,5 +3,5 @@ USING: alien ;
 "postgresql" "libpq" add-simple-library
 
 PROVIDE: postgresql
-{ "libpq" "postgresql" }
+{ "libpq.factor" "postgresql.factor" }
 { "postgresql-test" } ;

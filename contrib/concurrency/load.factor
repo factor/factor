@@ -1,4 +1,4 @@
-REQUIRE: dlists ;
+REQUIRES: dlists ;
 
 PROVIDE: concurrency
 { "concurrency.factor" }

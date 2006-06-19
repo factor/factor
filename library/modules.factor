@@ -1,7 +1,8 @@
 ! Copyright (C) 2006 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 IN: modules
-USING: hashtables io kernel namespaces parser sequences words ;
+USING: compiler hashtables io kernel namespaces parser sequences
+words ;
 
 TUPLE: module name files tests ;
 
@@ -26,13 +27,17 @@ H{ } clone modules set-global
 
 : module modules get hash ;
 
-: require ( name -- )
+: (require) ( name -- )
     dup module [
         drop
     ] [
         "Loading module " write dup write "..." print
         module-def run-resource
     ] if ;
+
+: require ( name -- )
+    [ \ require on (require) ] with-scope
+    \ require get [ compile-all ] unless ;
 
 : run-resources ( seq -- )
     bootstrapping? get
@@ -47,3 +52,5 @@ H{ } clone modules set-global
 : reload-module ( name -- ) module load-module ;
 
 : test-module ( name -- ) module module-tests run-resources ;
+
+: test-modules ( -- ) modules hash-keys [ test-module ] each ;

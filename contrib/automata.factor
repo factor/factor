@@ -1,5 +1,7 @@
 ! Copyright (C) 2006 Eduardo Cavazos.
 
+REQUIRES: slate ;
+
 USING: parser kernel hashtables namespaces sequences math io
 math-contrib threads strings arrays prettyprint gadgets slate ;
 
@@ -130,3 +132,5 @@ interesting get random-item set-rule 1000 sleep run-rule ;
 : automata-gallery ( -- )
 <slate> dup self set open-window 1000 sleep init-interesting init-rule
 random-interesting-gallery ;
+
+PROVIDE: automata ;

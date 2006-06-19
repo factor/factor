@@ -2,6 +2,8 @@
 
 ! To run the demo do:	USE: boids boids-go
 
+REQUIRES: slate ;
+
 USING: generic threads namespaces math kernel sequences arrays gadgets slate ;
 
 IN: boids
@@ -277,4 +279,6 @@ iterate-boids draw-boids 1 sleep run-boids ;
 
 ! : execute-with ( item [ word word ... ] -- results ... )
 !   [ over >r execute r> ] each drop ;
+
+PROVIDE: boids ;
 

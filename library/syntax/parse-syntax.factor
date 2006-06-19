@@ -73,6 +73,8 @@ DEFER: PRIMITIVE: parsing
 : PROVIDE:
     scan [ { { } { } } append first2 provide ] f ; parsing
 
-: REQUIRE:
+: REQUIRE: scan require ; parsing
+
+: REQUIRES:
     string-mode on
-    [ string-mode off [ require ] each ] f ; parsing
+    [ string-mode off [ (require) ] each ] f ; parsing

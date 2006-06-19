@@ -3,7 +3,7 @@
 #! "contrib/httpd/embedded.factor" run-file
 #! "contrib/vim/load.factor" run-file
 
-REQUIRE: embedded ;
+REQUIRES: embedded ;
 
 USING: embedded io ;
 

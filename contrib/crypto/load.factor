@@ -1,4 +1,4 @@
-REQUIRE: math ;
+REQUIRES: math ;
 
 PROVIDE: crypto {
     "common.factor"

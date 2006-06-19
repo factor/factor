@@ -1,3 +1,3 @@
-REQUIRE: process concurrency x11 ;
+REQUIRES: process concurrency x11 ;
 
 PROVIDE: factory { "factory.factor" } ;
