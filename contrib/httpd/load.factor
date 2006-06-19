@@ -1,5 +1,4 @@
-IN: scratchpad
-USING: words kernel parser sequences io compiler ;
+USING: io ;
 
 PROVIDE: httpd { 
     "mime.factor"

@@ -1,5 +1,3 @@
-USING: modules ;
-
 REQUIRE: dlists ;
 
 PROVIDE: concurrency

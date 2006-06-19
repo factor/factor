@@ -1,6 +1,3 @@
-IN: scratchpad
-USING: modules ;
-
 PROVIDE: math { 
     "utils.factor"
     "combinatorics.factor"

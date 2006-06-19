@@ -69,3 +69,5 @@ USING: sequences kernel parser math namespaces io ;
     <file-writer> [
 	run-embedded-file
     ] with-stream ;
+
+PROVIDE: embedded ;

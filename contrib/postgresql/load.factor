@@ -1,4 +1,4 @@
-USING: alien modules ;
+USING: alien ;
 
 "postgresql" "libpq" add-simple-library
 

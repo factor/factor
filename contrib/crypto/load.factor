@@ -1,6 +1,3 @@
-IN: scratchpad
-USING: kernel parser sequences words compiler ;
-
 REQUIRE: math ;
 
 PROVIDE: crypto {
