@@ -25,5 +25,3 @@ M: string article-content article article-content ;
 ! Special case: f help
 M: f article-title drop \ f article-title ;
 M: f article-content drop \ f article-content ;
-
-SYMBOL: last-block

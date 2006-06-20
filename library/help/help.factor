@@ -18,24 +18,19 @@ M: word article-content
         ] ?if
     ] { } make ;
 
-: with-default-style ( quot -- )
-    default-style [
-        H{ } [ last-block on call ] with-nesting
-    ] with-style ; inline
+: $title ( article -- )
+    title-style [
+        title-style [
+            dup [ article-title write ] ($block) $where
+        ] with-nesting
+    ] with-style terpri ;
 
-: print-title ( article -- )
-    [ dup article-title $title $where ] with-default-style
-    terpri ;
+: (help) ( topic -- ) article-content print-content ;
 
-: print-content ( element -- )
-    [ print-element ] with-default-style ;
-
-: (help) ( topic -- ) article-content print-content terpri ;
-
-: help ( topic -- ) dup print-title (help) ;
+: help ( topic -- ) dup $title (help) terpri ;
 
 : see-help ( word -- )
-    dup help [ $definition terpri ] with-default-style ;
+    dup help [ terpri $definition terpri ] with-default-style ;
 
 : handbook ( -- ) "handbook" help ;
 

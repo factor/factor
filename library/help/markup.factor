@@ -1,8 +1,8 @@
 ! Copyright (C) 2005, 2006 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-IN: help
 USING: arrays generic hashtables inspector io kernel namespaces
 parser prettyprint sequences strings styles vectors words ;
+IN: help
 
 ! Simple markup language.
 
@@ -12,45 +12,69 @@ parser prettyprint sequences strings styles vectors words ;
 
 ! Element types are words whose name begins with $.
 
+SYMBOL: last-element
+SYMBOL: span
+SYMBOL: block
+SYMBOL: table
+
+: last-span? last-element get span eq? ;
+: last-block? last-element get block eq? ;
+
+: ($span) ( quot -- )
+    last-block? [ terpri ] when
+    span last-element set
+    call ; inline
+
 PREDICATE: array simple-element
     dup empty? [ drop t ] [ first word? not ] if ;
 
 M: simple-element print-element [ print-element ] each ;
-M: string print-element last-block off write ;
+M: string print-element [ write ] ($span) ;
 M: array print-element unclip execute ;
 M: word print-element { } swap execute ;
 
-: ($span) ( content style -- )
-    last-block off [ print-element ] with-style ;
+: print-element* ( element style -- )
+    [ print-element ] with-style ;
 
-: ?terpri ( -- )
-    last-block [ [ terpri ] unless t ] change ;
+: with-default-style ( quot -- )
+    default-style [
+        last-element off
+        H{ } swap with-nesting
+    ] with-style ; inline
+
+: print-content ( element -- )
+    last-element off
+    [ print-element ] with-default-style ;
 
 : ($block) ( quot -- )
-    ?terpri
+    last-element get { f table } member? [ terpri ] unless
+    span last-element set
     call
-    terpri
-    last-block on ; inline
+    block last-element set ; inline
 
 ! Some spans
 
-: $snippet snippet-style ($span) ;
+: $snippet [ snippet-style print-element* ] ($span) ;
 
-: $emphasis emphasis-style ($span) ;
+: $emphasis [ emphasis-style print-element* ] ($span) ;
 
-: $url url-style ($span) ;
+: $url [ url-style print-element* ] ($span) ;
 
-: $terpri last-block off terpri terpri drop ;
+: $terpri terpri terpri drop ;
 
 ! Some blocks
-: $title [ title-style ($span) ] ($block) ;
+: ($heading)
+    last-element get [ terpri ] when ($block) ; inline
 
-: $heading [ heading-style ($span) ] ($block) ;
+: $heading
+    [ heading-style print-element* ] ($heading) ;
 
 : ($code) ( presentation quot -- )
     [
         code-style [
-            >r presented associate r> with-nesting
+            last-element off
+            >r presented associate code-style hash-union r>
+            with-nesting
         ] with-style
     ] ($block) ; inline
 
@@ -82,9 +106,10 @@ M: word print-element { } swap execute ;
 : $warning ( content -- )
     [
         warning-style [
+            last-element off
             "Warning" $heading print-element
         ] with-nesting
-    ] ($block) ;
+    ] ($heading) ;
 
 ! Some links
 TUPLE: link name ;
@@ -102,23 +127,26 @@ M: link summary "Link: " swap link-name append ;
     ] with-style ;
 
 : $link ( article -- )
-    last-block off first link-style
-    [ dup article-title swap >link write-object ] with-style ;
+    first link-style [
+        dup article-title swap >link write-object
+    ] with-style ;
 
 : textual-list ( seq quot -- )
     [ ", " print-element ] interleave ; inline
 
 : $links ( content -- )
-    [ 1array $link ] textual-list ;
+    [ [ 1array $link ] textual-list ] ($span) ;
 
 : $see-also ( content -- )
     "See also" $heading $links ;
 
 : $table ( content -- )
-    ?terpri table-style [
-        H{ { table-padding 5 } { table-gap { 5 5 0 } } }
-        [ print-element ] tabular-output
-    ] with-style ;
+    [
+        table-style [
+            H{ { table-gap { 5 5 0 } } }
+            [ print-element ] tabular-output
+        ] with-style
+    ] ($block) table last-element set ;
 
 : $values ( content -- )
     "Arguments and values" $heading
@@ -144,11 +172,13 @@ M: link summary "Link: " swap link-name append ;
 : $notes ( content -- )
     "Notes" $heading print-element ;
 
-: $see ( content -- )
-    code-style [ H{ } [ first see ] with-nesting ] with-style ;
+: ($see) ( word -- )
+    code-style [ code-style [ see ] with-nesting ] with-style ;
+
+: $see ( content -- ) first ($see) ;
 
 : $definition ( content -- )
-    "Definition" $heading $see ;
+    "Definition" $heading ($see) ;
 
 : $curious ( content -- )
     "For the curious..." $heading print-element ;

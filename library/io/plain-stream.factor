@@ -16,3 +16,6 @@ M: plain-writer stream-format ( string style stream -- )
 
 M: plain-writer with-nested-stream ( quot style stream -- )
     nip swap with-stream* ;
+
+M: plain-writer with-stream-style ( quot style stream -- )
+    (with-stream-style) ;

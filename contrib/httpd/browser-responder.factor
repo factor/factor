@@ -54,14 +54,13 @@ prettyprint sequences words xml ;
         </tr>
     </table> ;
 
-: browser-title ( -- )
+: browser-title ( -- str )
     current-word
     [ synopsis ] [ "IN: " current-vocab append ] if* ;
 
 : browser-responder ( -- )
     #! Display a Smalltalk like browser for exploring words.
-    serving-html browser-title dup [
-        <h1> write </h1>
+    serving-html browser-title [
         <form "main" =name "" =action "get" =method form>
             browser-body
         </form>

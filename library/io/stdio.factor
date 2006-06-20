@@ -26,6 +26,9 @@ SYMBOL: stdio
 : tabular-output ( grid style quot -- )
     swap stdio get with-stream-table ;
 
+: with-style ( style quot -- )
+    swap stdio get with-stream-style ;
+
 : print ( string -- ) stdio get stream-print ;
 
 : with-stream* ( stream quot -- )

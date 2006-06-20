@@ -16,6 +16,7 @@ GENERIC: stream-terpri ( stream -- )
 GENERIC: stream-format ( string style stream -- )
 GENERIC: with-nested-stream ( quot style stream -- )
 GENERIC: with-stream-table ( grid quot style stream -- )
+GENERIC: with-stream-style ( quot style stream -- )
 
 : stream-print ( string stream -- )
     [ stream-write ] keep stream-terpri ;

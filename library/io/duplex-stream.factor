@@ -46,6 +46,9 @@ M: duplex-stream stream-terpri
 M: duplex-stream stream-format
     duplex-stream-out+ stream-format ;
 
+M: duplex-stream with-stream-style
+    duplex-stream-out+ with-stream-style ;
+
 M: duplex-stream with-nested-stream
     duplex-stream-out+ with-nested-stream ;
 

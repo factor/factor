@@ -5,7 +5,7 @@ USING: styles ;
 
 : default-style
     H{
-        { font "serif" }
+        { font "sans-serif" }
         { font-size 12 }
         { wrap-margin 500 }
     } ;
@@ -18,20 +18,19 @@ USING: styles ;
 
 : title-style
     H{
-        { font "serif" }
+        { font "sans-serif" }
         { font-size 16 }
         { font-style bold }
+        { wrap-margin 500 }
+        { page-color { 0.8 0.8 1 1 } }
+        { border-width 5 }
     } ;
 
 : where-style
-    H{
-        { font "serif" }
-        { font-size 10 }
-    } ;
+    H{ { font-size 10 } } ;
 
 : heading-style
     H{
-        { font "serif" }
         { font-size 14 }
         { font-style bold }
         { foreground { 0.2 0.2 0.4 1 } }
@@ -39,7 +38,6 @@ USING: styles ;
 
 : subsection-style
     H{
-        { font "serif" }
         { font-size 14 }
         { font-style bold }
     } ;
@@ -56,7 +54,7 @@ USING: styles ;
 : code-style
     H{
         { font "monospace" }
-        { page-color { 0.9 0.9 1 0.5 } }
+        { page-color { 0.8 0.8 0.8 0.5 } }
         { border-width 5 }
         { wrap-margin f }
     } ;

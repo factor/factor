@@ -130,6 +130,9 @@ M: pane stream-format ( string style pane -- )
 
 M: pane stream-close ( pane -- ) drop ;
 
+M: pane with-stream-style ( quot style pane -- )
+    (with-stream-style) ;
+
 : ?terpri
     dup pane-current gadget-children empty?
     [ dup stream-terpri ] unless drop ;

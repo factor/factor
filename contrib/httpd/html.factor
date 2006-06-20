@@ -18,9 +18,9 @@ IN: html
 : style-css, ( flag -- )
     dup
     { italic bold-italic } member?
-    [ "font-style: italic; " % ] when
+    "font-style: " % "italic" "normal" ? % ";" %
     { bold bold-italic } member?
-    [ "font-weight: bold; " % ] when ;
+    "font-weight: " % "bold" "normal" ? % ";" % ;
 
 : size-css, ( size -- )
     "font-size: " % # "pt; " % ;
@@ -133,21 +133,22 @@ M: html-stream stream-write1 ( char stream -- )
 M: html-stream stream-write ( str stream -- )
     >r chars>entities r> delegate-write ;
 
+: with-html-style ( quot style stream -- )
+    [ [ swap span-tag ] object-link-tag ] with-stream* ; inline
+
+M: html-stream with-stream-style ( quot style stream -- )
+    [ drop call ] -rot with-html-style ;
+
 M: html-stream stream-format ( str style stream -- )
-    [
-        [
-            [
-                do-escaping stdio get delegate-write
-            ] span-tag
-        ] object-link-tag
-    ] with-stream* ;
+    [ do-escaping stdio get delegate-write ] -rot
+    with-html-style ;
 
 : with-html-stream ( quot -- )
     stdio get <html-stream> swap with-stream* ;
 
 : make-outliner-quot
     [
-        <div "padding-left:10px;" =style div>
+        <div "padding-left:20px;" =style div>
             with-html-stream
         </div>
     ] curry ;
@@ -175,7 +176,7 @@ M: html-stream with-stream-table ( grid quot style stream -- )
     [
         <table> rot [
             <tr> [
-                <td>
+                <td "top" =valign td>
                 pick pick stdio get with-nested-stream </td>
             ] each </tr>
         ] each 2drop </table>
@@ -188,7 +189,7 @@ M: html-stream stream-terpri [ <br/> ] with-stream* ;
     "A:link { text-decoration: none; color: black; }" print
     "A:visited { text-decoration: none; color: black; }" print
     "A:active { text-decoration: none; color: black; }" print
-    "A:hover, A:hover { text-decoration: none; color: black; }" print
+    "A:hover, A:hover { text-decoration: underline; color: black; }" print
   </style> ;
 
 : xhtml-preamble

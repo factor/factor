@@ -91,8 +91,7 @@ M: object-button gadget-help ( button -- string )
 
 : styled-grid ( style grid -- )
     <grid>
-    table-gap pick hash [ { 0 0 0 } ] unless* over set-grid-gap
-    table-padding rot hash [ 0 ] unless* <border> ;
+    table-gap rot hash [ { 0 0 0 } ] unless* over set-grid-gap ;
 
 : <pane-grid> ( quot style grid -- gadget )
     [

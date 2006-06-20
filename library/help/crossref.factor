@@ -61,9 +61,11 @@ DEFER: $subsection
     where dup empty? [
         drop
     ] [
-        where-style [
-            [ "Parent topics: " write $links ] ($block)
-        ] with-style
+        [
+            where-style [
+                "Parent topics: " write $links
+            ] with-style
+        ] ($block)
     ] if ;
 
 : xref-article ( article -- )
