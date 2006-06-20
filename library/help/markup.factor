@@ -150,8 +150,6 @@ M: link summary "Link: " swap link-name append ;
 : $definition ( content -- )
     "Definition" $heading $see ;
 
-: $call ( content -- ) first call ;
-
 : $curious ( content -- )
     "For the curious..." $heading print-element ;
 
