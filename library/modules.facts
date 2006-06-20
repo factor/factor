@@ -1,0 +1,57 @@
+IN: modules
+USING: help io ;
+
+HELP: module-path "( name -- path )"
+{ $values { "name" "a module name string" } { "path" "a path name string" } }
+{ $description "Outputs the location of the module named " { $snippet "name" } "." } ;
+
+HELP: module-paths "( name seq -- newseq )"
+{ $values { "name" "a module name string" } { "seq" "a sequence of strings" } { "newseq" "a new sequence of path name strings" } }
+{ $description "Prepend the location of the module named " { $snippet "name" } " to every file name in " { $snippet "seq" } "." } ;
+
+HELP: module-def "( name -- path )"
+{ $values { "name" "a module name string" } { "path" "a path name string" } }
+{ $description "Outputs the location of the module definition file. This word looks for the module definition in two locations:"
+    { $list
+        { $snippet "contrib/" { $emphasis "name" } ".factor" }
+        { $snippet "contrib/" { $emphasis "name" } "/load.factor" }
+    }
+}
+{ $notes "This file is loaded by " { $link require } ", and should contain the necessary " { $link POSTPONE: REQUIRES: } " and " { $link POSTPONE: PROVIDE: } " declarations for the module." } ;
+
+HELP: modules f
+{ $description "Variable. Hashtable mapping loaded module names to " { $link module } " instances." }
+{ $see-also require reload-module } ;
+
+HELP: load-module "( name -- )"
+{ $values { "name" "a module name string" } }
+{ $description "Runs the module definition file given by " { $link module-def } ", which loads the module's dependencies and source files." }
+{ $notes "Unless you want to explicitly reload the sources of a module (for example, after making changes), you should use " { $link (require) } " or " { $link require } " instead." } ;
+
+HELP: (require) "( name -- )"
+{ $values { "name" "a module name string" } }
+{ $description "Ensures that a module has been loaded, along with all its dependencies."
+$terpri
+"If this module is already listed in the " { $link modules } " hashtable, this word does nothing. Otherwise, it calls " { $link load-module } "." }
+{ $notes "Module definitions should use the " { $link POSTPONE: REQUIRES: } " parsing word instead. In the listener, the " { $link require } " word might be more useful since it recompiles new words after loading the module." } ;
+
+HELP: require "( name -- )"
+{ $values { "name" "a module name string" } }
+{ $description "Ensures that a module has been loaded, along with all its dependencies, and recompiles all new words. This word is only for interactive use in the listener; to avoid recompiling words multiple times, any user code which needs to load modules should call " { $link (require) } " instead." } ;
+
+HELP: run-resources "( seq -- )"
+{ $values { "seq" "a sequence of strings" } }
+{ $description "Load a collection of source files identified by resource paths (see " { $link resource-path } ")."
+$terpri
+"If bootstrapping, this word appends the top-level forms to the currently constructing quotation instead." } ;
+
+HELP: provide "( name files tests -- )"
+{ $values { "name" "a string" } { "files" "a sequence of strings" } { "tests" "a sequence of strings" } }
+{ $description "Registers a module definition and loads the source files. Usually instead of calling this word, module definitions use the parsing word " { $link POSTPONE: PROVIDE: } " instead." } ;
+
+HELP: test-module "( name -- )"
+{ $values { "name" "a module name string" } }
+{ $description "Runs the unit test files associated to the module by a previous call to " { $link provide } " or " { $link POSTPONE: PROVIDE: } "." } ;
+
+HELP: test-modules "( -- )"
+{ $description "Runs unit test files for all loaded modules." } ;

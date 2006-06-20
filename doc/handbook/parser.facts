@@ -8,26 +8,17 @@ $terpri
 "As documented in " { $link "vocabulary-search" } ", the parser looks up words in the vocabulary search path. New word definitions are added to the current vocabulary. These two parameters are stored in a pair of variables:"
 { $subsection use }
 { $subsection in }
-"There are two simple ways to call the parser:"
+"There are two simple ways to call the parser which use the vocabulary search path currently in scope, which is usually the default listener search path:"
 { $subsection parse }
 { $subsection eval }
-"More sophisticated facilities exist, too."
-{ $subsection "parse-stream" }
-"The parser can be extended with new parsing word definitions."
-{ $subsection "parsing-words" } ;
-
-ARTICLE: "parse-stream" "Parsing from streams"
+"The parser can also take input from a stream (" { $link "streams" } "):"
+{ $subsection parse-stream }
 "By convention, words for parsing input from streams use a certain default vocabulary search path:"
 { $subsection file-vocabs }
-"The central word for parsing input from a stream:"
-{ $subsection parse-stream }
-"Utilities for working with files:"
-{ $subsection parse-file }
-{ $subsection run-file }
-"Utilities for working with Factor libarary files:"
-{ $subsection resource-path }
-{ $subsection parse-resource }
-{ $subsection run-resource } ;
+"More details on working with source files can be found in " { $link "sources" } "."
+$terpri
+"The parser can be extended with new parsing word definitions."
+{ $subsection "parsing-words" } ;
 
 ARTICLE: "parsing-words" "Parsing words"
 "Parsing words execute at parse time, and therefore can access and modify the state of the parser, as well as add objects to the parse tree. Parsing words are a difficult concept to grasp, so this section has several examples and explains the workings of some of the parsing words provided in the library."

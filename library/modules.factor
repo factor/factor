@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 IN: modules
 USING: compiler hashtables io kernel namespaces parser sequences
-words ;
+test words ;
 
 TUPLE: module name files tests ;
 
@@ -27,25 +27,22 @@ H{ } clone modules set-global
 
 : module modules get hash ;
 
-: require ( name -- )
-    dup module [
-        drop
-    ] [
-        "Loading module " write dup write "..." print
-        module-def run-resource
-    ] if ;
+: load-module ( name -- )
+    "Loading module " write dup write "..." print
+    [ dup module-def run-resource ] assert-depth drop ;
+
+: (require) ( name -- )
+    dup module [ drop ] [ load-module ] if ;
+
+: require ( name -- ) (require) compile-all ;
 
 : run-resources ( seq -- )
     bootstrapping? get
     [ parse-resource % ] [ run-resource ] ? each ;
 
-: load-module ( module -- ) module-files run-resources ;
-
 : provide ( name files tests -- )
-    <module> dup load-module
+    <module> dup module-files run-resources
     dup module-name modules get set-hash ;
-
-: reload-module ( name -- ) module load-module ;
 
 : test-module ( name -- ) module module-tests run-resources ;
 

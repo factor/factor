@@ -93,7 +93,7 @@ global [
         "scratchpad" "syntax" "arrays" "compiler"
         "errors" "generic" "hashtables" "help" "inference"
         "inspector" "io" "jedit" "kernel" "listener" "math"
-        "memory" "namespaces" "parser" "prettyprint"
+        "memory" "modules" "namespaces" "parser" "prettyprint"
         "sequences" "shells" "strings" "styles" "test"
         "threads" "vectors" "walker" "words"
     } set-use

@@ -1,17 +1,17 @@
 USING: help io ;
 
 HELP: cwd "( -- path )"
-{ $values { "path" "a pathname string" } }
+{ $values { "path" "a path name string" } }
 { $description "Outputs the current working directory of the Factor process." }
 { $see-also cd } ;
 
 HELP: cd "( path -- )"
-{ $values { "path" "a pathname string" } }
+{ $values { "path" "a path name string" } }
 { $description "Changes the current working directory of the Factor process." }
 { $see-also cwd } ;
 
 HELP: stat "( path -- array/f )"
-{ $values { "path" "a pathname string" } { "array/f" "a four-element array or " { $link f } } }
+{ $values { "path" "a path name string" } { "array/f" "a four-element array or " { $link f } } }
 { $description
     "If the file does not exist, outputs " { $link f } ". Otherwise, outputs a four-element array:"
     { $list

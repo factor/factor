@@ -1,0 +1,24 @@
+USING: help ;
+
+HELP: HELP: "word stack-effect content..."
+{ $values { "word" "a word" } { "stack-effect" "a stack effect or syntax string" } { "content" "markup elements" } }
+{ $description "Defines documentation for a word." }
+{ $examples
+    { $code
+        ": foo 2 + ;"
+        "HELP: foo \"( m -- n )\""
+        "{ $values { \"m\" \"an integer\" } { \"n\" \"an integer\" } }"
+        "{ $description \"Increments a value by 2.\" } ;"
+        "\ foo help"
+    }
+} ;
+
+HELP: ARTICLE: "topic title content..."
+{ $values { "topic" "a string" } { "title" "a string" } { "content" "markup elements" } }
+{ $description "Defines a help article." }
+{ $examples
+    { $code
+        "ARTICLE: \"example\" \"An example article\""
+        "\"Hello world.\" ;"
+    }
+} ;

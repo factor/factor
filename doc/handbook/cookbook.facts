@@ -179,8 +179,10 @@ ARTICLE: "cookbook-sources" "Source file cookbook"
 "You can load source files from the Factor source code directory using " { $link run-resource } ":"
 { $code "\"/examples/lcd.factor\" run-resource" }
 { $references
-    "You can learn more about parsing external content:"
-    "parse-stream"
+    { }
+    "sources"
+    "modules"
+    "parser"
 } ;
 
 ARTICLE: "cookbook-io" "I/O cookbook"

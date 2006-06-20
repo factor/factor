@@ -77,8 +77,6 @@ DEFER: !PRIMITIVE: parsing
 : !PROVIDE:
     scan [ { { } { } } append first2 provide ] f ; parsing
 
-: !REQUIRE: scan require compile-all ; parsing
-
 : !REQUIRES:
     string-mode on
-    [ string-mode off [ require ] each ] f ; parsing
+    [ string-mode off [ (require) ] each ] f ; parsing

@@ -1,17 +1,24 @@
-USING: errors help image inspector kernel listener memory parser
-prettyprint sequences test walker words ;
+USING: errors help image inspector io kernel listener memory
+modules parser prettyprint sequences test walker words ;
 
 ARTICLE: "tools" "Development tools"
 "This section covers words which are used during development, and not usually invoked directly by user code."
+$terpri
+"Interactive development:"
 { $subsection "listener" }
 { $subsection "debugger" }
-{ $subsection "inspector" }
-{ $subsection "memory" }
 { $subsection "word-introspection" }
+{ $subsection "inspector" }
+{ $subsection "walker" }
 { $subsection "annotations" }
-{ $subsection "timing" }
+"Working on a project:"
+{ $subsection "sources" }
+{ $subsection "modules" }
+{ $subsection "images" }
 { $subsection "unit-test" }
-{ $subsection "images" } ;
+"Advanced features:"
+{ $subsection "memory" }
+{ $subsection "timing" } ;
 
 ARTICLE: "listener" "The listener"
 "The listener evaluates Factor expressions read from a stream. The listener is the primary interface to the Factor runtime. Typically, you write Factor code in a text editor, then load it using the listener and test it."
@@ -26,9 +33,6 @@ $terpri
 { $subsection .s }
 "Note that calls to " { $link .s } " can also be included inside words as a debugging aid, however a more convenient way to achieve this is to use the annotation facility. See " { $link "annotations" } "."
 $terpri
-"Source files can be loaded in:"
-{ $subsection run-file }
-{ $subsection reload }
 "You can start a nested listener or exit a listener using the following words:"
 { $subsection listener }
 { $subsection bye }
@@ -38,6 +42,42 @@ $terpri
 { $subsection datastack-hook }
 "Finally, the multi-line expression reading word can be used independently of the rest of the listener:"
 { $subsection read-multiline } ;
+
+ARTICLE: "sources" "Source files"
+"The simplest way to distribute a piece of Factor code is in the form of a source file. Source files can be loaded in the listener:"
+{ $subsection run-file }
+"Another way to load a source file is to provide a path relative to the Factor installation directory:"
+{ $subsection run-resource }
+"Words remember which source file defines them; this can be used to update word definitions during development:"
+{ $subsection reload }
+"Details on the Factor source parser itself can be found in " { $link "parser" } "."
+$terpri
+"User-contributed libraries in the " { $snippet "contrib/" } " directory of the Factor distribution should be loaded via the high-level module system instead of the above words (" { $link "modules" } ")." ;
+
+ARTICLE: "modules" "Modules and contributed libraries"
+"The Factor distribution includes a selection of contributed libraries in the " { $snippet "contrib/" } " directory, which are managed by a simple module system."
+$terpri
+"To load " { $snippet "contrib/aim/" } " for instance, you simply issue the following command in the listener:"
+{ $code "\"aim\" require" }
+"The " { $link require } " word will load all dependencies and source files of the " { $snippet "aim" } " module."
+{ $subsection require }
+{ $subsection (require) }
+"To define a new module named " { $snippet "frob" } ", create one of the following two files:"
+{ $code "contrib/frob.factor" "contrib/frob/load.factor" }
+"The module definition file should first list all required modules:"
+{ $subsection POSTPONE: REQUIRES: }
+"These modules will be loaded first. Next, the source files and unit tests, if any, have to be registered:"
+{ $subsection POSTPONE: PROVIDE: }
+"It is important that the module path name matches the module name passed to " { $link POSTPONE: PROVIDE: } ", which should be " { $snippet "frob" } " in the above example."
+$terpri
+"Here is a simple module definition taken from " { $snippet "contrib/concurrency/load.factor" } ":"
+{ $code "REQUIRES: dlists ;"
+"PROVIDE: concurrency"
+"{ \"concurrency.factor\" }"
+"{ \"concurrency-examples.factor\" \"concurrency-tests.factor\" } ;" }
+"The following two words are useful during development of modules:"
+{ $subsection load-module }
+{ $subsection test-module } ;
 
 ARTICLE: "debugger" "The debugger"
 "If an expression entered in the listener throws an error, the error is printed to the output stream. A number of words facilitate interactive debugging of the error:"
