@@ -1,5 +1,5 @@
 USING: io namespaces kernel hashtables math generic threads concurrency
- sequences arrays x11 x ;
+sequences arrays x11 x ;
 
 IN: concurrent-widgets
 
@@ -7,12 +7,7 @@ IN: concurrent-widgets
 
 TUPLE: window display id ;
 
-! dpy get create-window <window>
-
-! window-object [ { 100 100 } move-window ] with-window-object
-
-: create-window-object
-  dpy get create-window <window> ;
+: create-window-object ( -- <window> ) dpy get create-window <window> ;
 
 : with-window-object ( <window> quot -- )
 [ swap dup window-display dpy set window-id win set call ] with-scope ; inline
@@ -25,8 +20,7 @@ SYMBOL: window-table
 
 10 <hashtable> window-table set-global
 
-: add-to-window-table ( <window> -- )
-dup window-id window-table get set-hash ;
+: add-to-window-table ( <window> -- ) dup window-id window-table get set-hash ;
 
 : clean-window-table ( -- )
 window-table get
@@ -99,6 +93,12 @@ M: window handle-key-press-event ( event obj -- )
 M: window handle-key-release-event ( event obj -- )
   "Basic handle-key-release-event called" print flush drop drop ;
 
+M: window handle-enter-window-event ( event obj -- )
+  "Basic handle-enter-window-event called" print flush drop drop ;
+
+M: window handle-leave-window-event ( event obj -- )
+  "Basic handle-leave-window-event called" print flush drop drop ;
+
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 ! <label>
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
@@ -106,13 +106,13 @@ M: window handle-key-release-event ( event obj -- )
 TUPLE: label text ;
 
 : create-label ( text -- <label> )
-  >r create-window-object r> <label> dup >r set-delegate r>
-  dup add-to-window-table
-  dup >r
-  >r ExposureMask r> [ select-input ] with-window-object
-  r> ;
+<label>
+create-window-object over set-delegate
+dup add-to-window-table
+ExposureMask over select-input% ;
 
 DEFER: draw-string%
+DEFER: draw-string-middle-center%
 DEFER: window-size%
 DEFER: window-children%
 DEFER: set-window-width%
@@ -121,37 +121,46 @@ DEFER: vertical-layout%
 DEFER: map-subwindows%
 DEFER: reparent-window%
 DEFER: unmap-window%
-
-! M: label handle-expose-event ( event <label> -- )
-!   nip dup window-size% { 1/2 1/2 } v* swap
-!   dup label-text swap
-!   [ draw-string-middle-center ] with-window-object ;
+DEFER: add-input%
 
 M: label handle-expose-event ( event <label> -- )
-  nip
-  [ window-size% { 1/2 1/2 } v* ] keep
-  [ label-text ] keep
-  [ draw-string-middle-center ] with-window-object ;
+nip
+[ window-size% { 1/2 1/2 } v* ] keep
+[ label-text ] keep
+[ draw-string-middle-center ] with-window-object ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 ! <button>
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-TUPLE: button action ;
+TUPLE: button action enter-color leave-color ;
 
 : create-button ( text action -- <button> )
-swap create-label swap <button> dup >r set-delegate r>
+f f <button> swap create-label over set-delegate
 dup add-to-window-table
->r ExposureMask ButtonPressMask bitor r>
-dup >r [ select-input ] with-window-object
-r> ;
+ButtonPressMask EnterWindowMask bitor LeaveWindowMask bitor over add-input% ;
 
 M: button handle-button-press-event ( event <button> -- )
 nip button-action call ;
 
+M: button handle-enter-window-event ( event obj -- )
+dup button-enter-color 
+[ dup button-enter-color over set-window-background% dup clear-window%
+  handle-expose-event ]
+[ 2drop ] if ;
+
+M: button handle-leave-window-event ( event obj -- )
+dup button-leave-color 
+[ dup button-leave-color over set-window-background% dup clear-window%
+  handle-expose-event ]
+[ 2drop ] if ;
+
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 ! <menu>
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+SYMBOL: menu-enter-color
+SYMBOL: menu-leave-color
 
 TUPLE: menu item-width item-height space ;
 
@@ -211,7 +220,10 @@ TUPLE: menu item-width item-height space ;
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 : add-menu-item ( text action menu -- )
-  -rot create-button dupd reparent-window%
+  -rot create-button
+  menu-enter-color get over set-button-enter-color
+  menu-leave-color get over set-button-leave-color
+  dupd reparent-window%
   refresh-menu ;
 
 : modify-action-to-unmap ( action menu -- action )
@@ -341,6 +353,7 @@ dup pwindow-expose-action call ;
 : set-window-height%		[ set-window-height ] with-window-object ;
 
 : select-input% 		[ select-input ] with-window-object ;
+: add-input%			[ add-input ] with-window-object ;
 : set-input-focus%		[ set-input-focus ] with-window-object ;
 : move-window% 			[ move-window ] with-window-object ;
 : resize-window% 		[ resize-window ] with-window-object ;
@@ -373,8 +386,11 @@ dup pwindow-expose-action call ;
 : vertical-layout%		[ vertical-layout ] with-window-object ;
 
 : draw-string%			[ draw-string ] with-window-object ;
+: draw-string-middle-center%	[ draw-string-middle-center ]
+				with-window-object ;
 
-: get-transient-for-hint% [ get-transient-for-hint ] with-window-object ;
+: get-transient-for-hint%	[ get-transient-for-hint ]
+				with-window-object ;
 
 : fetch-name%			[ fetch-name ] with-window-object ;
 

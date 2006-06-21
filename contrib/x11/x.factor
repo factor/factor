@@ -336,6 +336,9 @@ dpy get win get r> 0 0 XReparentWindow drop ;
 
 : select-input ( mask -- ) >r dpy get win get r> XSelectInput drop ;
 
+: add-input ( mask -- )
+window-event-mask bitor dpy get win get rot XSelectInput drop ;
+
 : flush-dpy ( -- ) dpy get XFlush drop ;
 
 : sync-dpy ( discard -- ) >r dpy get r> XSync ;

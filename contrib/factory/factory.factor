@@ -649,6 +649,8 @@ SYMBOL: window-list
   root get [ grab-keys ] with-win
   "WM_PROTOCOLS" False intern-atom WM_PROTOCOLS set
   "WM_DELETE_WINDOW" False intern-atom WM_DELETE_WINDOW set
+  "cornflowerblue" lookup-color menu-enter-color set
+  "white" lookup-color menu-leave-color set
   setup-root-menu
   setup-window-list
   setup-workspace-menu

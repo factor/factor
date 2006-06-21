@@ -1,7 +1,6 @@
+USING: kernel math arrays namespaces sequences x11 x rectangle ;
 
 IN: x
-
-USING: kernel math arrays namespaces sequences x11 x rectangle ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
@@ -32,3 +31,8 @@ USING: kernel math arrays namespaces sequences x11 x rectangle ;
 
 : draw-string-middle-center ( point string -- )
   dup string-rect swapd move-middle-center base-point swap draw-string ;
+
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+: draw-string-centered ( string -- )
+window-size { 1/2 1/2 } v* swap draw-string-middle-center ;
