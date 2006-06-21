@@ -24,6 +24,3 @@ HELP: add-article "( name title element -- )"
 { $values { "name" "a string" } { "title" "a string" } { "element" "a markup element" } }
 { $description "Adds a help article to the " { $link articles } " hashtable." }
 { $notes "This word is used to implement " { $link POSTPONE: ARTICLE: } "." } ;
-
-HELP: last-block f
-{ $description "Variable. Set by " { $link print-element } " if the last element output was a block element, thus if the next element is a block element no newline needs to be output." } ;

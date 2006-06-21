@@ -30,12 +30,14 @@ C: help-sidebar ( -- gadget )
         { [ <help-search> ] set-help-sidebar-search 1/2 }
     } { 0 1 0 } make-track* ;
 
-TUPLE: help-gadget showing sidebar tabs ;
+TUPLE: help-gadget showing sidebar scroller ;
+
+: help-gadget-pane help-gadget-scroller scroller-gadget ;
 
 C: help-gadget ( -- gadget )
     {
         { [ <help-sidebar> ] set-help-gadget-sidebar 1/4 }
-        { [ <tabs> ] set-help-gadget-tabs 3/4 }
+        { [ <pane> <scroller> ] set-help-gadget-scroller 3/4 }
     } { 1 0 0 } make-track* ;
 
 M: help-gadget gadget-title
@@ -50,11 +52,10 @@ M: help-gadget focusable-child*
     [ over history-seq push-new update-history ] [ 2drop ] if ;
 
 : show-help ( link help -- )
-    dup add-history [ set-help-gadget-showing ] 2keep
-    dup update-title {
-        { "Article" [ help ] }
-        { "Links in" [ links-in. ] }
-    } swap help-gadget-tabs set-pages ;
+    dup add-history
+    [ set-help-gadget-showing ] 2keep
+    dup update-title
+    help-gadget-pane [ help ] with-pane ;
 
 : help-tool
     [ help-gadget? ]

@@ -226,7 +226,7 @@ $terpri
 { $see-also define-tuple } ;
 
 HELP: C: "class definition... ;"
-{ $values { "class" "a class word" } { "generic" "a generic word" } { "definition" "a constructor definition" } }
+{ $values { "class" "a class word" } { "definition" "a constructor definition" } }
 { $description "Define a constructor word for a tuple class. The constructor definition receives a new instance of the class on the stack, with all slots initially set to " { $link f } "."
 $terpri
 "Constructors are named after the tuple class surrounded in angle brackets: " { $snippet "<" } " and " { $snippet ">" } "."  }

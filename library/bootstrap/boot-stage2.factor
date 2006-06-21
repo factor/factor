@@ -9,7 +9,6 @@ parser sequences sequences-internals words ;
 [
     "Cross-referencing..." print flush
     H{ } clone crossref set-global xref-words
-    H{ } clone link-graph set-global
     H{ } clone parent-graph set-global xref-articles
 
     "compile" get [

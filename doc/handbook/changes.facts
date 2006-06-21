@@ -24,7 +24,7 @@ ARTICLE: "changes" "Changes in the latest release"
 }
 { $subtopic "Help system"
     { $list
-        { "Help cross-referencing implemented - the " { $link links-in. } " and " { $snippet "links-out." } " words are analogous to " { $link usage. } " and " { $snippet "uses." } }
+        { "Help cross-referencing implemented - the " { $snippet "links-in." } " and " { $snippet "links-out." } " words are analogous to " { $link usage. } " and " { $snippet "uses." } }
         { "New documentation covers development tools and C library interface" }
     }
 }

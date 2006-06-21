@@ -11,19 +11,7 @@ HELP: elements "( elt-type element -- seq )"
 HELP: collect-elements "( element seq -- )"
 { $values { "element" "a markup element" } { "seq" "a sequence of words" } { "elements" "a new sequence" } }
 { $description "Collects the arguments of all sub-elements of " { $snippet "element" } " whose markup element type occurs in " { $snippet "seq" } "." }
-{ $notes "Used to implement " { $link links-out } " and " { $link children } "." } ;
-
-HELP: link-graph f
-{ $description "Variable. A graph whose vertices are help articles and edges are links. See " { $link "graphs" } "." }
-{ $see-also links-out links-in xref-articles } ;
-
-HELP: links-out "( topic -- seq )"
-{ $values { "topic" "an article name or a word" } { "seq" "a new sequence" } }
-{ $description "Outputs a sequence of all help articles and words linked to from " { $snippet "article" } "." } ;
-
-HELP: links-in "( topic -- seq )"
-{ $values { "topic" "an article name or a word" } { "seq" "a new sequence" } }
-{ $description "Outputs a sequence of all help articles and words which link to " { $snippet "article" } "." } ;
+{ $notes "Used to implement " { $link children } "." } ;
 
 HELP: parent-graph f
 { $description "Variable. A graph whose vertices are help articles and edges are subsections. See " { $link "graphs" } "." }
@@ -56,7 +44,3 @@ $low-level-note ;
 
 HELP: xref-articles "( -- )"
 { $description "Update the " { $link link-graph } " and " { $link parent-graph } " graphs. Usually this is done automatically." } ;
-
-HELP: links-in. "( topic -- )"
-{ $values { "topic" "an article name or a word" } }
-{ $description "Prints an outliner listing all help articles linking to " { $snippet "article" } "." } ;

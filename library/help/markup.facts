@@ -8,9 +8,6 @@ HELP: ($span) "( content style -- )"
 { $values { "content" "a markup element" } { "style" "a hashtable" } }
 { $description "Prints an inline markup element." } ;
 
-HELP: ?terpri "( -- )"
-{ $description "Prints a newline if the last element which was output is not a block." } ;
-
 HELP: ($block) "( quot -- )"
 { $values { "quot" "a quotation" } }
 { $description "Prints a block markup element with newlines before and after." } ;

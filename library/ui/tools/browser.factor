@@ -54,7 +54,6 @@ DEFER: show-vocab
         { "Definition" [ see ] }
         { "Documentation" [ help ] }
         { "Calls in" [ usage. ] }
-        { "Links in" [ links-in. ] }
         { "Properties" [ word-props describe ] }
     } <pages> ;
 

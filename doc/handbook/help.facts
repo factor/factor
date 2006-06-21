@@ -12,9 +12,7 @@ ARTICLE: "browsing-help" "Browsing documentation"
 "Help topics are identified by article name strings, or words. You can request a specific help topic:"
 { $subsection help }
 "You can also view a word's documentation and definition at once:"
-{ $subsection see-help }
-"You can request a list of topics linking to a specific topic:"
-{ $subsection links-in. } ;
+{ $subsection see-help } ;
 
 ARTICLE: "searching-help" "Searching documentation"
 "The help system maintains a full-text term index. The easiest way to search the help is from the help browser tool in the UI, however you can also search in the listener."
@@ -92,5 +90,4 @@ ARTICLE: "markup-utils" "Markup element utilities"
 "Utility words to assist in defining new elements:"
 { $subsection simple-element }
 { $subsection ($span) }
-{ $subsection ($block) }
-{ $subsection ?terpri } ;
+{ $subsection ($block) } ;

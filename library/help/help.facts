@@ -1,7 +1,7 @@
 IN: help
 USING: io prettyprint ;
 
-HELP: print-title "( topic -- )"
+HELP: $title "( topic -- )"
 { $values { "topic" "a help article name or a word" } }
 { $description "Prints a help article's title, or a word's " { $link synopsis } ", depending on the type of " { $snippet "topic" } "." } ;
 

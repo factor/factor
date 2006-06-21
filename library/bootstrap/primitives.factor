@@ -21,7 +21,6 @@ H{ } clone vocabularies set
 vocabularies get [ "syntax" set ] bind
 
 H{ } clone articles set
-link-graph off
 parent-graph off
 crossref off
 

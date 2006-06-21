@@ -28,16 +28,6 @@ M: array elements*
         ] each-with
     ] make-hash hash-keys ;
 
-SYMBOL: link-graph
-
-: links-out ( article -- seq )
-    article-content { $link $see-also } collect-elements ;
-
-: ?link dup link? [ link-name ] when ;
-
-: links-in ( article -- seq )
-    ?link link-graph get in-edges ;
-
 SYMBOL: parent-graph
 
 DEFER: $subsection
@@ -45,10 +35,8 @@ DEFER: $subsection
 : children ( article -- seq )
     article-content { $subsection } collect-elements ;
 
-: ?link dup link? [ link-name ] when ;
-
 : parents ( article -- seq )
-    ?link parent-graph get in-edges ;
+    dup link? [ link-name ] when parent-graph get in-edges ;
 
 : (where) ( article -- )
     dup , parents [ word? not ] subset dup empty?
@@ -69,18 +57,10 @@ DEFER: $subsection
     ] if ;
 
 : xref-article ( article -- )
-    dup
-    [ links-out ] link-graph get add-vertex
     [ children ] parent-graph get add-vertex ;
 
 : unxref-article ( article -- )
-    dup [ links-out ] link-graph get remove-vertex
     [ children ] parent-graph get remove-vertex ;
 
 : xref-articles ( -- )
-    all-articles dup
-    [ links-out ] link-graph get build-graph
-    [ children ] parent-graph get build-graph ;
-
-: links-in. ( article -- )
-    links-in [ links-in. ] help-outliner ;
+    all-articles [ children ] parent-graph get build-graph ;
