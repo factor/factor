@@ -1,4 +1,4 @@
-USING: generic help kernel math words ;
+USING: generic help kernel math modules words ;
 
 HELP: parsing ""
 { $description "Declares the most recently defined word as a parsing word." }
@@ -236,7 +236,7 @@ $terpri
 
 HELP: REQUIRES: "modules... ;"
 { $values { "modules" "module name strings" } }
-{ $description "Loads a list of modules by calling " { $link (require) " on each one." } ;
+{ $description "Loads a list of modules by calling " { $link (require) } " on each one." } ;
 
 HELP: PROVIDE: "name files tests ;"
 { $values { "name" "a string" } { "files" "a sequence of strings" } { "tests" "a sequence of strings" } }
