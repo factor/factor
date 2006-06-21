@@ -61,9 +61,6 @@ SYMBOL: building
 
 IN: sequences
 
-: prune ( seq -- seq )
-    [ [ dup set ] each ] make-hash hash-keys ;
-
 : concat ( seq -- seq )
     dup empty? [ [ [ % ] each ] over first make ] unless ;
 

@@ -58,6 +58,9 @@ M: object like drop ;
 
 : push-new ( elt seq -- ) [ delete ] 2keep push ;
 
+: prune ( seq -- seq )
+    [ V{ } clone swap [ over push-new ] each ] keep like ;
+
 : nappend ( to from -- )
     >r [ length ] keep r> copy-into ; inline
 

@@ -43,7 +43,7 @@ DEFER: $subsection
     [ drop ] [ [ (where) ] each ] if ;
 
 : where ( article -- seq )
-    [ (where) ] { } make 1 swap tail ;
+    [ (where) ] { } make 1 swap tail prune ;
 
 : $where ( article -- )
     where dup empty? [

@@ -209,6 +209,7 @@ sequences vectors words ;
         "/library/continuations.facts"
         "/library/errors.facts"
         "/library/kernel.facts"
+        "/library/modules.facts"
         "/library/quotations.facts"
         "/library/threads.facts"
         "/library/words.facts"

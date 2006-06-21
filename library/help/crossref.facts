@@ -34,13 +34,13 @@ HELP: where "( topic -- seq )"
 
 HELP: xref-article "( topic -- )"
 { $values { "topic" "an article name or a word" } }
-{ $description "Adds an article to the " { $link link-graph } " and " { $link parent-graph } " graphs." }
+{ $description "Adds an article to the " { $link parent-graph } " graph." }
 $low-level-note ;
 
 HELP: unxref-article "( topic -- )"
 { $values { "topic" "an article name or a word" } }
-{ $description "Removes an article to the " { $link link-graph } " and " { $link parent-graph } " graphs." }
+{ $description "Removes an article to the " { $link parent-graph } " graph." }
 $low-level-note ;
 
 HELP: xref-articles "( -- )"
-{ $description "Update the " { $link link-graph } " and " { $link parent-graph } " graphs. Usually this is done automatically." } ;
+{ $description "Update the " { $link parent-graph } ". Usually this is done automatically." } ;

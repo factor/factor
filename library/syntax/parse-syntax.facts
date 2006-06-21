@@ -233,3 +233,11 @@ $terpri
 { $contract "The definition must only have one output, the new tuple itself." }
 { $notes "Each tuple class defines a default constructor that reads slot values from the stack. This parsing word redefines the default constructor." }
 { $see-also define-constructor } ;
+
+HELP: REQUIRES: "modules... ;"
+{ $values { "modules" "module name strings" } }
+{ $description "Loads a list of modules by calling " { $link (require) " on each one." } ;
+
+HELP: PROVIDE: "name files tests ;"
+{ $values { "name" "a string" } { "files" "a sequence of strings" } { "tests" "a sequence of strings" } }
+{ $description "Registers a module definition and loads its source files by calling " { $link provide } "." } ;

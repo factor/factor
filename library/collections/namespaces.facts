@@ -123,10 +123,6 @@ HELP: init-namespaces "( -- )"
     { $code "[ init-namestack do-some-work ] in-thread" }
 } ;
 
-HELP: prune "( seq -- newseq )"
-{ $values { "seq" "a sequence" } { "newseq" "a sequence" } }
-{ $description "Outputs a new sequence with each distinct element of " { $snippet "seq" } " appearing only once. Elements are compared for equality using " { $link = } " and the ordering of elements in the new sequence is arbitrary." } ;
-
 HELP: concat "( seq -- newseq )"
 { $values { "seq" "a sequence" } { "newseq" "a sequence" } }
 { $description "Concatenates a sequence of sequences together into one sequence. The resulting sequence is of the same class as the first element of " { $snippet "seq" } "." }

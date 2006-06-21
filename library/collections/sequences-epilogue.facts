@@ -74,6 +74,10 @@ HELP: push-new "( elt seq -- )"
 { $side-effects "seq" }
 { $see-also push } ;
 
+HELP: prune "( seq -- newseq )"
+{ $values { "seq" "a sequence" } { "newseq" "a sequence" } }
+{ $description "Outputs a new sequence with each distinct element of " { $snippet "seq" } " appearing only once. Elements are compared for equality using " { $link = } " and elements are ordered according to their position in " { $snippet "seq" } "." } ;
+
 HELP: nappend "( dest src -- )"
 { $values { "n" "an index in " { $snippet "dest" } } { "dest" "a resizable mutable sequence" } { "src" "a sequence" } }
 { $description "Appends " { $snippet "src" } " to the end of " { $snippet "dest" } "." }
