@@ -12,13 +12,6 @@ HELP: ($block) "( quot -- )"
 { $values { "quot" "a quotation" } }
 { $description "Prints a block markup element with newlines before and after." } ;
 
-HELP: $title "( element -- )"
-{ $values { "element" "a markup element" } }
-{ $description "Prints a markup element, usually a string, as a block with the " { $link title-style } "." }
-{ $examples
-    { $markup-example { $title "Fermat's Last Theorem" } }
-} ;
-
 HELP: $heading "( element -- )"
 { $values { "element" "a markup element" } }
 { $description "Prints a markup element, usually a string, as a block with the " { $link heading-style } "." }

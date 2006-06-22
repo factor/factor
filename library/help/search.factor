@@ -47,6 +47,9 @@ SYMBOL: term-index
     [ all-articles [ index-article ] each ] make-hash
     term-index set-global ;
 
+: add-article ( name title element -- )
+    (add-article) ;
+
 : search-help. ( phrase -- )
     "Search results for ``" write dup write "'':" print
     search-help [

@@ -20,7 +20,52 @@ HELP: article-content "( topic -- element )"
 { $values { "topic" "an article name or a word" } { "element" "a markup element" } }
 { $description "Outputs the content of a specific help article." } ;
 
-HELP: add-article "( name title element -- )"
+HELP: (add-article) "( name title element -- )"
 { $values { "name" "a string" } { "title" "a string" } { "element" "a markup element" } }
 { $description "Adds a help article to the " { $link articles } " hashtable." }
 { $notes "This word is used to implement " { $link POSTPONE: ARTICLE: } "." } ;
+
+HELP: all-articles "( -- seq )"
+{ $values { "seq" "a sequence" } }
+{ $description "Outputs a sequence of all help article names, and all words with documentation." } ;
+
+HELP: elements "( elt-type element -- seq )"
+{ $values { "elt-type" "a word" } { "element" "a markup element" } { "seq" "a new sequence" } }
+{ $description "Outputs a sequence of all elements of type " { $snippet "elt-type" } " found by traversing " { $snippet "element" } "." } ;
+
+HELP: collect-elements "( element seq -- )"
+{ $values { "element" "a markup element" } { "seq" "a sequence of words" } { "elements" "a new sequence" } }
+{ $description "Collects the arguments of all sub-elements of " { $snippet "element" } " whose markup element type occurs in " { $snippet "seq" } "." }
+{ $notes "Used to implement " { $link children } "." } ;
+
+HELP: parent-graph f
+{ $description "Variable. A graph whose vertices are help articles and edges are subsections. See " { $link "graphs" } "." }
+{ $see-also children parents xref-articles } ;
+
+HELP: children "( topic -- seq )"
+{ $values { "topic" "an article name or a word" } { "seq" "a new sequence" } }
+{ $description "Outputs a sequence of all subsections of " { $snippet "topic" } "." } ;
+
+HELP: parents "( topic -- seq )"
+{ $values { "topic" "an article name or a word" } { "seq" "a new sequence" } }
+{ $description "Outputs a sequence of all help articles which contain " { $snippet "topic" } " as a subsection." } ;
+
+HELP: where "( topic -- seq )"
+{ $values { "topic" "an article name or a word" } { "seq" "a new sequence" } }
+{ $description "Outputs a sequence of all help articles which contain " { $snippet "topic" } " as a subsection, traversing all the way up to the root." }
+{ $examples
+    { $example "\"sequences\" where ." "{ \"collections\" \"handbook\" }" }
+} ;
+
+HELP: xref-article "( topic -- )"
+{ $values { "topic" "an article name or a word" } }
+{ $description "Adds an article to the " { $link parent-graph } " graph." }
+$low-level-note ;
+
+HELP: unxref-article "( topic -- )"
+{ $values { "topic" "an article name or a word" } }
+{ $description "Removes an article to the " { $link parent-graph } " graph." }
+$low-level-note ;
+
+HELP: xref-articles "( -- )"
+{ $description "Update the " { $link parent-graph } ". Usually this is done automatically." } ;

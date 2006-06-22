@@ -12,6 +12,17 @@ IN: help
 
 ! Element types are words whose name begins with $.
 
+PREDICATE: array simple-element
+    dup empty? [ drop t ] [ first word? not ] if ;
+
+M: simple-element elements* [ elements* ] each-with ;
+
+M: object elements* 2drop ;
+
+M: array elements*
+    [ [ elements* ] each-with ] 2keep
+    [ first eq? ] keep swap [ , ] [ drop ] if ;
+
 SYMBOL: last-element
 SYMBOL: span
 SYMBOL: block
@@ -24,9 +35,6 @@ SYMBOL: table
     last-block? [ terpri ] when
     span last-element set
     call ; inline
-
-PREDICATE: array simple-element
-    dup empty? [ drop t ] [ first word? not ] if ;
 
 M: simple-element print-element [ print-element ] each ;
 M: string print-element [ write ] ($span) ;
@@ -112,8 +120,6 @@ M: word print-element { } swap execute ;
     ] ($heading) ;
 
 ! Some links
-TUPLE: link name ;
-
 M: link article-title link-name article-title ;
 M: link article-content link-name article-content ;
 M: link summary "Link: " swap link-name append ;
@@ -139,6 +145,17 @@ M: link summary "Link: " swap link-name append ;
 
 : $see-also ( content -- )
     "See also" $heading $links ;
+
+: $where ( article -- )
+    where dup empty? [
+        drop
+    ] [
+        [
+            where-style [
+                "Parent topics: " write $links
+            ] with-style
+        ] ($block)
+    ] if ;
 
 : $table ( content -- )
     [
