@@ -57,7 +57,7 @@ USING: arrays gadgets kernel math objc sequences ;
     {
         "windowDidMove:" "void" { "id" "SEL" "id" } [
             2nip -> object
-            dup window-content-rect NSRect-x-y 0 3array
+            dup window-content-rect NSRect-x-y 2array
             swap -> contentView window set-world-loc
         ]
     }

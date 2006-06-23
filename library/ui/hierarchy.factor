@@ -69,12 +69,12 @@ M: gadget remove-notify* drop ;
 
 : screen-loc ( gadget -- point )
     #! The position of the gadget on the screen.
-    parents { 0 0 0 } [ rect-loc v+ ] reduce ;
+    parents { 0 0 } [ rect-loc v+ ] reduce ;
 
 : gadget-point ( gadget vector -- point )
-    #! { 0 0 0 } - top left corner
-    #! { 1/2 1/2 0 } - middle
-    #! { 1 1 0 } - bottom right corner
+    #! { 0 0 } - top left corner
+    #! { 1/2 1/2 } - middle
+    #! { 1 1 } - bottom right corner
     >r dup screen-loc swap rect-dim r> v* v+ ;
 
 : relative-loc ( g1 point -- point-g1 ) swap screen-loc v- ;

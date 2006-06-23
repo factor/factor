@@ -5,8 +5,7 @@ USING: arrays help kernel parser sequences syntax words ;
 
 : !HELP:
     scan-word bootstrap-word dup [
-        >array unclip swap
-        >r "stack-effect" set-word-prop r>
+        >array unclip swap >r "stack-effect" set-word-prop r>
         set-word-help
     ] f ; parsing
 

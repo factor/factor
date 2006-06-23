@@ -8,7 +8,7 @@ TUPLE: border size ;
 
 C: border ( child gap -- border )
     dup delegate>gadget
-    [ >r dup 0 3array r> set-border-size ] keep
+    [ >r dup 2array r> set-border-size ] keep
     [ add-gadget ] keep ;
 
 : <default-border> ( child -- border ) 5 <border> ;

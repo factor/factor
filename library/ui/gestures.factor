@@ -65,7 +65,7 @@ TUPLE: key-up mods sym ;
 ! the gadget in question.
 SYMBOL: hand-gadget
 SYMBOL: hand-loc
-{ 0 0 0 } hand-loc set-global
+{ 0 0 } hand-loc set-global
 
 SYMBOL: hand-clicked
 SYMBOL: hand-click-loc

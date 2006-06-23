@@ -11,7 +11,7 @@ TUPLE: scroller viewport x y follows ;
 : scroller-origin ( scroller -- { x y 0 } )
     dup scroller-x slider-value
     swap scroller-y slider-value
-    0 3array ;
+    2array ;
 
 : find-scroller [ scroller? ] find-parent ;
 
@@ -68,7 +68,7 @@ C: scroller ( gadget -- scroller )
     dup pop-follows dup [
         swap scroller-viewport (do-scroll)
     ] [
-        2drop { 0 0 0 }
+        2drop { 0 0 }
     ] if ;
 
 : update-scroller ( scroller -- )

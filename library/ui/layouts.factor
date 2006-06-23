@@ -90,7 +90,7 @@ TUPLE: pack align fill gap ;
     2dup packed-dim-2 swap orient ;
 
 : gap-locs ( gap sizes -- seq )
-    { 0 0 0 } [ v+ over v+ ] accumulate nip ;
+    { 0 0 } [ v+ over v+ ] accumulate nip ;
 
 : aligned-locs ( gadget sizes -- seq )
     [ >r dup pack-align swap rect-dim r> v- n*v ] map-with ;
@@ -113,16 +113,16 @@ C: pack ( vector -- pack )
     [ set-gadget-orientation ] keep
     0 over set-pack-align
     0 over set-pack-fill
-    { 0 0 0 } over set-pack-gap ;
+    { 0 0 } over set-pack-gap ;
 
 : delegate>pack ( vector tuple -- ) >r <pack> r> set-delegate ;
 
-: <pile> ( -- pack ) { 0 1 0 } <pack> ;
+: <pile> ( -- pack ) { 0 1 } <pack> ;
 
-: <shelf> ( -- pack ) { 1 0 0 } <pack> ;
+: <shelf> ( -- pack ) { 1 0 } <pack> ;
 
 : gap-dims ( gap sizes -- seeq )
-    [ { 0 0 0 } [ v+ ] reduce ] keep
+    [ { 0 0 } [ v+ ] reduce ] keep
     length 1 [-] rot n*v v+ ;
 
 : pack-pref-dim ( children gadget -- dim )

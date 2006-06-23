@@ -10,7 +10,7 @@ words ;
 TUPLE: browser-track showing builder closer ;
 
 C: browser-track ( builder closer -- gadget )
-    { 0 1 0 } <track> over set-delegate
+    { 0 1 } <track> over set-delegate
     H{ } clone over set-browser-track-showing
     [ set-browser-track-closer ] keep
     [ set-browser-track-builder ] keep ;
@@ -117,7 +117,7 @@ C: main-track ( -- gadget )
     {
         { [ <vocabs> ] set-main-track-vocabs 2/3 }
         { [ <apropos-gadget> ] set-main-track-apropos 1/3 }
-    } { 0 1 0 } make-track* ;
+    } { 0 1 } make-track* ;
 
 : <vocab-track> ( -- track )
     [ <vocab-view> ] [ find-browser hide-vocab-words ]
@@ -131,7 +131,7 @@ C: browser ( -- browser )
         { [ <main-track> ] set-browser-main-track 1/5 }
         { [ <vocab-track> ] set-browser-vocab-track 1/5 }
         { [ <word-track> ] set-browser-word-track 3/5 }
-    } { 1 0 0 } make-track* ;
+    } { 1 0 } make-track* ;
 
 M: browser gadget-title drop "Browser" ;
 

@@ -28,7 +28,7 @@ C: help-sidebar ( -- gadget )
     {
         { [ <history> ] set-help-sidebar-history 1/2 }
         { [ <help-search> ] set-help-sidebar-search 1/2 }
-    } { 0 1 0 } make-track* ;
+    } { 0 1 } make-track* ;
 
 TUPLE: help-gadget showing sidebar scroller ;
 
@@ -38,7 +38,7 @@ C: help-gadget ( -- gadget )
     {
         { [ <help-sidebar> ] set-help-gadget-sidebar 1/4 }
         { [ <pane> <scroller> ] set-help-gadget-scroller 3/4 }
-    } { 1 0 0 } make-track* ;
+    } { 1 0 } make-track* ;
 
 M: help-gadget gadget-title
     "Help - " swap help-gadget-showing article-title append ;

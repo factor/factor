@@ -9,7 +9,7 @@ TUPLE: divider ;
 : divider-# ( divider -- n )
     dup gadget-parent gadget-children index 2 /i ;
 
-: divider-size { 8 8 0 } ;
+: divider-size { 8 8 } ;
 
 M: divider pref-dim* drop divider-size ;
 
@@ -46,7 +46,7 @@ M: track pref-dim* ( track -- dim )
 
 : divider-delta ( track -- delta )
     #! How far the divider has moved along the track?
-    drag-loc over track-dim { 1 1 1 } vmax v/
+    drag-loc over track-dim { 1 1 } vmax v/
     swap gadget-orientation v. ;
 
 : save-sizes ( track -- )

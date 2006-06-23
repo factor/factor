@@ -12,14 +12,14 @@ SYMBOL: clip
     glLoadIdentity
     GL_MODELVIEW glMatrixMode
     glLoadIdentity
-    { 0 0 0 } over <rect> clip set
+    { 0 0 } over <rect> clip set
     dup first2 0 0 2swap glViewport
     0 over first2 0 gluOrtho2D
     first2 0 0 2swap glScissor
     GL_SMOOTH glShadeModel
     GL_BLEND glEnable
     GL_SRC_ALPHA GL_ONE_MINUS_SRC_ALPHA glBlendFunc
-    GL_SCISSOR_TEST glEnable
+    ! GL_SCISSOR_TEST glEnable
     1.0 1.0 1.0 1.0 glClearColor
     GL_COLOR_BUFFER_BIT glClear ;
 
@@ -35,13 +35,18 @@ GENERIC: draw-boundary ( gadget boundary -- )
 
 DEFER: draw-gadget
 
+: with-translation ( loc quot -- )
+    over translate over gl-translate
+    swap slip
+    vneg dup translate gl-translate ; inline
+
 : (draw-gadget) ( gadget -- )
-    dup rect-loc translate [
-        gl-translate
+    dup rect-loc [
         dup dup gadget-interior draw-interior
         dup dup gadget-boundary draw-boundary
-        draw-gadget*
-    ] keep vneg gl-translate ;
+        dup draw-gadget*
+        gadget-children [ draw-gadget ] each
+    ] with-translation ;
 
 : gl-set-clip ( loc dim -- )
     dup first2 1+ >r >r
@@ -53,20 +58,23 @@ DEFER: draw-gadget
     dup rect-loc swap rect-dim gl-set-clip ;
 
 : draw-gadget ( gadget -- )
-    clip get over inside? [
-        [
-            dup do-clip
-            dup (draw-gadget)
-            dup visible-children [ draw-gadget ] each
-        ] with-scope
-    ] when drop ;
+    ! clip get over inside? [
+    !    [
+     !       dup do-clip
+            
+     (draw-gadget) ;
+   !     ] with-scope
+   ! ] when drop ;
 
 : draw-world ( world -- )
     [
-        dup world-handle [
-            dup rect-dim init-gl dup world set draw-gadget
-        ] with-gl-context
-    ] with-scope ;
+        [
+            dup world-handle [
+                dup rect-dim init-gl dup world set
+                draw-gadget
+            ] with-gl-context
+        ] with-scope
+    ] USE: test USE: prettyprint benchmark nip global [ . flush ] bind ;
 
 ! Pen paint properties
 M: f draw-interior 2drop ;
@@ -101,17 +109,17 @@ M: polygon draw-boundary ( gadget polygon -- )
 M: polygon draw-interior ( gadget polygon -- )
     [ gl-fill-poly ] draw-polygon drop ;
 
-: arrow-up    { { { 3 0 0 } { 6 6 0 } { 0 6 0 } } } ;
-: arrow-right { { { 0 0 0 } { 6 3 0 } { 0 6 0 } } } ;
-: arrow-down  { { { 0 0 0 } { 6 0 0 } { 3 6 0 } } } ;
-: arrow-left  { { { 0 3 0 } { 6 0 0 } { 6 6 0 } } } ;
+: arrow-up    { { { 3 0 } { 6 6 } { 0 6 } } } ;
+: arrow-right { { { 0 0 } { 6 3 } { 0 6 } } } ;
+: arrow-down  { { { 0 0 } { 6 0 } { 3 6 } } } ;
+: arrow-left  { { { 0 3 } { 6 0 } { 6 6 } } } ;
 : close-box
     {
-        { { 0 0 0 } { 6 6 0 } }
-        { { 0 6 0 } { 6 0 0 } }
+        { { 0 0 } { 6 6 } }
+        { { 0 6 } { 6 0 } }
     } ;
 
 : <polygon-gadget> ( color points -- gadget )
-    dup { 0 0 0 } [ max-dim vmax ] reduce
+    dup { 0 0 } [ max-dim vmax ] reduce
     >r <polygon> <gadget> r> over set-rect-dim
     [ set-gadget-interior ] keep ;

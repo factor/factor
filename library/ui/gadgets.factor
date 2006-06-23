@@ -6,13 +6,13 @@ namespaces sequences styles ;
 
 SYMBOL: origin
 
-{ 0 0 0 } origin set-global
+{ 0 0 } origin set-global
 
 TUPLE: rect loc dim ;
 
 M: array rect-loc ;
 
-M: array rect-dim drop { 0 0 0 } ;
+M: array rect-dim drop { 0 0 } ;
 
 : rect-bounds ( rect -- loc dim ) dup rect-loc swap rect-dim ;
 
@@ -47,8 +47,8 @@ M: gadget = eq? ;
 : gadget-child gadget-children first ;
 
 C: gadget ( -- gadget )
-    { 0 0 0 } dup <rect> over set-delegate
-    { 0 1 0 } over set-gadget-orientation
+    { 0 0 } dup <rect> over set-delegate
+    { 0 1 } over set-gadget-orientation
     t over set-gadget-visible? ;
 
 : delegate>gadget ( tuple -- ) <gadget> swap set-delegate ;
@@ -70,17 +70,17 @@ M: gadget children-on ( rect/point gadget -- list )
     dupd children-on <reversed> [ inside? ] find-with nip ;
 
 : translate ( rect/point -- new-origin )
-    rect-loc origin [ v+ dup ] change ;
+    rect-loc origin [ v+ ] change ;
 
 : pick-up ( rect/point gadget -- gadget )
     [
         2dup inside? [
-            dup translate drop 2dup pick-up-list dup
+            dup translate 2dup pick-up-list dup
             [ nip pick-up ] [ rot 2drop ] if
         ] [ 2drop f ] if
     ] with-scope ;
 
-: max-dim ( dims -- dim ) { 0 0 0 } [ vmax ] reduce ;
+: max-dim ( dims -- dim ) { 0 0 } [ vmax ] reduce ;
 
 : each-child ( gadget quot -- )
     >r gadget-children r> each ; inline

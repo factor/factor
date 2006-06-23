@@ -30,7 +30,7 @@ SYMBOL: margin
     line-height get y +@
     0 { x line-height } [ set ] each-with ;
 
-: wrap-pos ( -- pos ) x get y get 0 3array ;
+: wrap-pos ( -- pos ) x get y get 2array ;
 
 : advance-x ( x -- )
     x +@
@@ -47,7 +47,7 @@ SYMBOL: margin
         ] unless drop wrap-pos rot call
     ] keep first2 advance-y advance-x ; inline
 
-: wrap-dim ( -- dim ) max-x get max-y get 0 3array ;
+: wrap-dim ( -- dim ) max-x get max-y get 2array ;
 
 : init-wrap ( paragraph -- )
     paragraph-margin margin set

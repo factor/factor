@@ -40,7 +40,7 @@ C: button ( gadget quot -- button )
     [ set-button-quot ] keep ;
 
 : <highlight-button> ( gadget quot -- button )
-    <button> { 0 0 0 } over set-border-size ;
+    <button> { 0 0 } over set-border-size ;
 
 : <roll-button> ( gadget quot -- button )
     <highlight-button> dup roll-button-theme ;

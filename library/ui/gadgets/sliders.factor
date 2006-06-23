@@ -123,23 +123,23 @@ M: elevator layout* ( elevator -- )
     [ swap slide-by-line ] curry <repeat-button>
     [ set-gadget-orientation ] keep ;
 
-: <left-button> { 0 1 0 } arrow-left -1 <slide-button> ;
-: <right-button> { 0 1 0 } arrow-right 1 <slide-button> ;
+: <left-button> { 0 1 } arrow-left -1 <slide-button> ;
+: <right-button> { 0 1 } arrow-right 1 <slide-button> ;
 
 : build-x-slider ( slider -- slider )
     {
         { [ <left-button> ] f @left }
-        { [ { 0 1 0 } <elevator> ] set-slider-elevator @center }
+        { [ { 0 1 } <elevator> ] set-slider-elevator @center }
         { [ <right-button> ] f @right }
     } build-grid ;
 
-: <up-button> { 1 0 0 } arrow-up -1 <slide-button> ;
-: <down-button> { 1 0 0 } arrow-down 1 <slide-button> ;
+: <up-button> { 1 0 } arrow-up -1 <slide-button> ;
+: <down-button> { 1 0 } arrow-down 1 <slide-button> ;
 
 : build-y-slider ( slider -- slider )
     {
         { [ <up-button> ] f @top }
-        { [ { 1 0 0 } <elevator> ] set-slider-elevator @center }
+        { [ { 1 0 } <elevator> ] set-slider-elevator @center }
         { [ <down-button> ] f @bottom }
     } build-grid ;
 
@@ -155,9 +155,9 @@ C: slider ( vector -- slider )
     0 over set-slider-max ;
 
 : <x-slider> ( -- slider )
-    { 1 0 0 } <slider> dup build-x-slider
-    dup { 0 1 0 } add-thumb ;
+    { 1 0 } <slider> dup build-x-slider
+    dup { 0 1 } add-thumb ;
 
 : <y-slider> ( -- slider )
-    { 0 1 0 } <slider> dup build-y-slider
-    dup { 1 0 0 } add-thumb ;
+    { 0 1 } <slider> dup build-y-slider
+    dup { 1 0 } add-thumb ;

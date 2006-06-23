@@ -9,7 +9,7 @@ prettyprint sequences words ;
 
 : <launchpad> ( menu -- )
     [ first2 >r <label> [ drop ] r> append <bevel-button> ] map
-    make-pile 1 over set-pack-fill { 5 5 0 } over set-pack-gap
+    make-pile 1 over set-pack-fill { 5 5 } over set-pack-gap
     <default-border> dup highlight-theme ;
 
 : pane-window ( quot title -- )

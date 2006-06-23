@@ -20,7 +20,7 @@ C: label ( text -- label )
 
 : label-size ( gadget text -- dim )
     dup label-font* dup font-height >r
-    swap label-text string-width r> 0 3array ;
+    swap label-text string-width r> 2array ;
 
 M: label pref-dim* ( label -- dim ) label-size ;
 

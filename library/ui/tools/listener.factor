@@ -54,7 +54,7 @@ C: listener-gadget ( -- gadget )
     } make-frame* dup start-listener ;
 
 M: listener-gadget pref-dim*
-    delegate pref-dim* { 600 600 0 } vmax ;
+    delegate pref-dim* { 600 600 } vmax ;
 
 M: listener-gadget focusable-child* ( listener -- gadget )
     listener-gadget-pane ;

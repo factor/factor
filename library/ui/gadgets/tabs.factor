@@ -43,7 +43,7 @@ TUPLE: radio-box value buttons quot ;
     [ select-value ] curry >r <label> r> <bevel-button> ;
 
 C: radio-box ( assoc quot -- gadget )
-    { 1 0 0 } over delegate>pack
+    { 1 0 } over delegate>pack
     [ set-radio-box-quot ] keep
     >r [ first2 tuck <radio-button> 2array ] map r>
     [ >r [ second ] map r> add-gadgets ] 2keep

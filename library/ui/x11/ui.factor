@@ -12,12 +12,10 @@ namespaces opengl sequences strings ;
 M: world expose-event ( event world -- ) nip relayout ;
 
 : configured-loc ( event -- dim )
-    dup XConfigureEvent-x swap XConfigureEvent-y
-    0 3array ;
+    dup XConfigureEvent-x swap XConfigureEvent-y 2array ;
 
 : configured-dim ( event -- dim )
-    dup XConfigureEvent-width swap XConfigureEvent-height
-    0 3array ;
+    dup XConfigureEvent-width swap XConfigureEvent-height 2array ;
 
 M: world configure-event ( event world -- )
     over configured-loc over set-world-loc
@@ -26,7 +24,7 @@ M: world configure-event ( event world -- )
 : button&loc ( event -- button# loc )
     dup XButtonEvent-button
     over XButtonEvent-x
-    rot XButtonEvent-y 0 3array ;
+    rot XButtonEvent-y 2array ;
 
 M: world button-down-event ( event world -- )
     >r button&loc r> send-button-down ;
@@ -42,7 +40,7 @@ M: world enter-event ( event world -- ) motion-event ;
 M: world leave-event ( event world -- ) 2drop forget-rollover ;
 
 M: world motion-event ( event world -- )
-    >r dup XMotionEvent-x swap XMotionEvent-y 0 3array r>
+    >r dup XMotionEvent-x swap XMotionEvent-y 2array r>
     move-hand ;
 
 : modifiers

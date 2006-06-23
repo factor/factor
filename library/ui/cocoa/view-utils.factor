@@ -14,13 +14,13 @@ opengl sequences ;
     dup 1 -> setPostsBoundsChangedNotifications:
     dup 1 -> setPostsFrameChangedNotifications: ;
 
-: view-dim -> bounds dup NSRect-w swap NSRect-h 0 3array ;
+: view-dim -> bounds dup NSRect-w swap NSRect-h 2array ;
 
 : mouse-location ( view event -- loc )
     over >r
     -> locationInWindow f -> convertPoint:fromView:
     dup NSPoint-x swap NSPoint-y
-    r> -> frame NSRect-h swap - 0 3array ;
+    r> -> frame NSRect-h swap - 2array ;
 
 : send-mouse-moved ( view event -- )
     over >r mouse-location r> window move-hand ;

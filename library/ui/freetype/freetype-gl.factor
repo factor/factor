@@ -110,7 +110,7 @@ C: font ( handle -- font )
 
 : glyph-size ( glyph -- dim )
     dup glyph-hori-advance ft-ceil
-    swap glyph-height ft-ceil 0 3array ;
+    swap glyph-height ft-ceil 2array ;
 
 : render-glyph ( font char -- bitmap )
     #! Render a character and return a pointer to the bitmap.
@@ -150,11 +150,11 @@ C: font ( handle -- font )
 
 : glyph-texture-loc ( glyph font -- loc )
     over glyph-hori-bearing-x ft-floor -rot
-    font-ascent swap glyph-hori-bearing-y - ft-floor 0 3array ;
+    font-ascent swap glyph-hori-bearing-y - ft-floor 2array ;
 
 : glyph-texture-size ( glyph -- dim )
     dup glyph-bitmap-width next-power-of-2
-    swap glyph-bitmap-rows next-power-of-2 0 3array ;
+    swap glyph-bitmap-rows next-power-of-2 2array ;
 
 : <char-sprite> ( font char -- sprite )
     #! Create a new display list of a rendered glyph. This
