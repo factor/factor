@@ -50,7 +50,8 @@ TUPLE: editor line caret font color ;
 : set-caret-x ( x editor -- )
     #! Move the caret to a clicked location.
     dup [
-        label-font* line-text get x>offset set-caret-pos
+        label-font lookup-font line-text get
+        x>offset set-caret-pos
     ] with-editor ;
 
 : click-editor ( editor -- )
@@ -88,7 +89,7 @@ C: editor ( text -- )
     [ set-editor-text ] keep ;
 
 : offset>x ( gadget offset str -- x )
-    head-slice >r label-font* r> string-width ;
+    head-slice >r label-font lookup-font r> string-width ;
 
 : caret-loc ( editor -- x y )
     dup editor-line [ caret-pos line-text get ] bind offset>x

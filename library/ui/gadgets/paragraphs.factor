@@ -10,6 +10,8 @@ TUPLE: word-break-gadget ;
 C: word-break-gadget ( gadget -- gadget )
     [ set-delegate ] keep ;
 
+M: word-break-gadget draw-gadget* ( gadget -- ) drop ;
+
 ! A gadget that arranges its children in a word-wrap style.
 TUPLE: paragraph margin ;
 

@@ -1,8 +1,8 @@
 ! Copyright (C) 2005, 2006 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 IN: gadgets
-USING: errors freetype gadgets-frames generic hashtables kernel
-math namespaces opengl sequences ;
+USING: arrays errors freetype gadgets-frames generic hashtables
+kernel math namespaces opengl sequences ;
 
 ! The world gadget is the top level gadget that all (visible)
 ! gadgets are contained in. There is one world per top-level
@@ -18,10 +18,7 @@ TUPLE: world gadget status focus focused? fonts handle loc ;
 
 : free-fonts ( world -- )
     dup world-handle select-gl-context
-    world-fonts hash-values [ free-sprites ] each ;
-
-: font-sprites ( font world -- sprites )
-    world-fonts [ drop V{ } clone ] cache ;
+    world-fonts hash-values [ second free-sprites ] each ;
 
 DEFER: request-focus
 
@@ -43,5 +40,8 @@ M: world pref-dim* ( world -- dim )
 : focused-ancestors ( world -- seq )
     world-focus parents <reversed> ;
 
-: draw-string ( open-fonts string -- )
-    >r dup world get font-sprites r> (draw-string) ;
+: font-sprites ( font world -- { open-font sprites } )
+    world-fonts [ lookup-font V{ } clone 2array ] cache ;
+
+: draw-string ( font string -- )
+    >r world get font-sprites first2 r> (draw-string) ;

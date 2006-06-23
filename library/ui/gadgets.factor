@@ -40,7 +40,7 @@ M: array rect-dim drop { 0 0 } ;
 
 TUPLE: gadget
     pref-dim parent children orientation
-    visible? relayout? root? interior boundary ;
+    visible? relayout? root? clipped? interior boundary ;
 
 M: gadget = eq? ;
 

@@ -10,7 +10,8 @@ TUPLE: viewport ;
 : viewport-dim gadget-child pref-dim ;
 
 C: viewport ( content -- viewport )
-    dup delegate>gadget [ add-gadget ] keep ;
+    dup delegate>gadget [ add-gadget ] keep
+    t over set-gadget-clipped? ;
 
 M: viewport layout* ( viewport -- )
     gadget-child prefer ;

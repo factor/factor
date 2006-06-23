@@ -19,7 +19,7 @@ SYMBOL: clip
     GL_SMOOTH glShadeModel
     GL_BLEND glEnable
     GL_SRC_ALPHA GL_ONE_MINUS_SRC_ALPHA glBlendFunc
-    ! GL_SCISSOR_TEST glEnable
+    GL_SCISSOR_TEST glEnable
     1.0 1.0 1.0 1.0 glClearColor
     GL_COLOR_BUFFER_BIT glClear ;
 
@@ -45,36 +45,44 @@ DEFER: draw-gadget
         dup dup gadget-interior draw-interior
         dup dup gadget-boundary draw-boundary
         dup draw-gadget*
-        gadget-children [ draw-gadget ] each
+        visible-children [ draw-gadget ] each
     ] with-translation ;
 
-: gl-set-clip ( loc dim -- )
-    dup first2 1+ >r >r
-    over second swap second + world get rect-dim second
-    swap - >r first r> r> r> glScissor ;
+: change-clip ( gadget -- )
+    >absolute clip [ rect-intersect ] change ;
 
-: do-clip ( gadget -- )
-    >absolute clip [ rect-intersect dup ] change
-    dup rect-loc swap rect-dim gl-set-clip ;
+: clip-x/y ( loc dim -- x y )
+    >r [ first ] keep r>
+    [ second ] 2apply + world get rect-dim second swap - ;
+
+: clip-w/h ( dim -- w h )
+    first2 1- ;
+
+: gl-set-clip ( loc dim -- )
+    dup clip-w/h >r >r clip-x/y r> r> glScissor ;
+
+: do-clip ( -- ) clip get rect-bounds gl-set-clip ;
+
+: with-clipping ( gadget quot -- )
+    clip get >r
+    over change-clip do-clip call
+    r> clip set do-clip ; inline
 
 : draw-gadget ( gadget -- )
-    ! clip get over inside? [
-    !    [
-     !       dup do-clip
-            
-     (draw-gadget) ;
-   !     ] with-scope
-   ! ] when drop ;
+    dup gadget-clipped? [
+        [ (draw-gadget) ] with-clipping
+    ] [
+        (draw-gadget)
+    ] if ;
 
 : draw-world ( world -- )
     [
-        [
-            dup world-handle [
-                dup rect-dim init-gl dup world set
-                draw-gadget
-            ] with-gl-context
-        ] with-scope
-    ] USE: test USE: prettyprint benchmark nip global [ . flush ] bind ;
+        dup world-handle [
+            dup rect-dim init-gl
+            dup world set
+            draw-gadget
+        ] with-gl-context
+    ] with-scope ;
 
 ! Pen paint properties
 M: f draw-interior 2drop ;

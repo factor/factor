@@ -16,7 +16,8 @@ M: divider pref-dim* drop divider-size ;
 TUPLE: track sizes saved-sizes ;
 
 C: track ( orientation -- track )
-    [ delegate>pack ] keep 1 over set-pack-fill ;
+    [ delegate>pack ] keep 1 over set-pack-fill
+    t over set-gadget-clipped? ;
 
 : divider-sizes ( seq -- dim )
     length 1 [-] divider-size n*v ;
