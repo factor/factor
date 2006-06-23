@@ -1,5 +1,8 @@
 ! Copyright (C) 2004, 2006 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
+IN: help
+DEFER: remove-word-help
+
 IN: words
 USING: arrays errors graphs hashtables kernel kernel-internals
 math namespaces sequences strings vectors ;
@@ -151,6 +154,7 @@ SYMBOL: bootstrapping?
 
 : forget ( word -- )
     dup unxref-word
+    dup remove-word-help
     dup "forget-hook" word-prop call
     crossref get [ dupd remove-hash ] when*
     dup word-name swap word-vocabulary vocab remove-hash ;

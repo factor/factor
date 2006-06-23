@@ -21,7 +21,7 @@ ARTICLE: "queues" "Queues"
 { $subsection deque }
 { $subsection enque }
 "An example:"
-{ $snippet
+{ $code
     "<queue> \"q\" set"
     "5 \"q\" get enque"
     "3 \"q\" get enque"

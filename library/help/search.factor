@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 IN: help
 USING: arrays graphs hashtables help io kernel math namespaces
-porter-stemmer prettyprint sequences strings ;
+porter-stemmer prettyprint sequences strings words ;
 
 ! Right now this code is specific to the help. It will be
 ! generalized to an abstract full text search engine later.
@@ -20,10 +20,21 @@ porter-stemmer prettyprint sequences strings ;
 : index-text ( article string -- )
     tokenize [ 1 -rot nest hash+ ] each-with ;
 
-: index-article ( article -- )
-    dup [ help ] string-out index-text ;
-
 SYMBOL: term-index
+
+: index-article ( article -- )
+    term-index get [
+        [ dup [ help ] string-out index-text ] bind
+    ] [
+        drop
+    ] if* ;
+
+: unindex-article ( article -- )
+    term-index get [
+        [ nip remove-hash ] hash-each-with
+    ] [
+        drop
+    ] if* ;
 
 : discard-irrelevant ( results -- results )
     #! Discard results in the low 33%
@@ -44,11 +55,33 @@ SYMBOL: term-index
     [ [ second ] 2apply swap - ] sort discard-irrelevant ;
 
 : index-help ( -- )
-    [ all-articles [ index-article ] each ] make-hash
-    term-index set-global ;
+    term-index get [
+        dup clear-hash
+        [ all-articles [ index-article ] each ] bind
+    ] when* ;
+
+: remove-article ( name -- )
+    dup articles get hash-member? [
+        dup unxref-article
+        dup unindex-article
+        dup articles get remove-hash
+    ] when drop ;
 
 : add-article ( name title element -- )
-    (add-article) ;
+    pick remove-article
+    pick >r (add-article) r>
+    dup xref-article index-article ;
+
+: remove-word-help ( word -- )
+    dup word-help [
+        dup unxref-article
+        dup unindex-article
+    ] when drop ;
+
+: set-word-help ( word content -- )
+    over remove-word-help
+    over >r "help" set-word-prop r>
+    dup xref-article index-article ;
 
 : search-help. ( phrase -- )
     "Search results for ``" write dup write "'':" print

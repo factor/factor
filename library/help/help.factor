@@ -9,7 +9,7 @@ M: word article-title
 M: word article-content
     [
         \ $vocabulary over 2array ,
-        dup "help" word-prop [
+        dup word-help [
             %
         ] [
             "predicating" word-prop [

@@ -31,4 +31,8 @@ ARTICLE: "conventions" "Conventions"
     { { $snippet "set-" { $emphasis "foo" } "-" { $emphasis "bar" } } { "(tuple mutators) sets the value of the " { $snippet "bar" } " slot of the " { $snippet "foo" } " at the top of the stack" } { } }
     { { $snippet "with-" { $emphasis "foo" } } { "performs some kind of initialization and cleanup related to " { $snippet "foo" } ", usually in a new dynamic scope" } { $links with-scope with-stream } }
     { { $snippet "$" { $emphasis "foo" } } { "help markup" } { $links $heading $emphasis } }
-} ;
+}
+{ $heading "Vocabulary naming conventions" }
+"A vocabulary name ending in " { $snippet "-internals" } " contains words which are either implementation detail, unsafe, or both. For example, the " { $snippet "sequence-internals" } " vocabulary contains words which access sequence elements without bounds checking (" { $link "sequences-unsafe" } ")."
+$terpri
+"You should should avoid using internal words from the Factor library unless absolutely necessary. In your own code, place words in internal vocabularies if you do not want other people to use them unless they have a good reason." ;

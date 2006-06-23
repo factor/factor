@@ -21,7 +21,7 @@ HELP: article-content "( topic -- element )"
 { $description "Outputs the content of a specific help article." } ;
 
 HELP: (add-article) "( name title element -- )"
-{ $values { "name" "a string" } { "title" "a string" } { "element" "a markup element" } }
+{ $values { "name" "an object" } { "title" "a string" } { "element" "a markup element" } }
 { $description "Adds a help article to the " { $link articles } " hashtable." }
 { $notes "This word is used to implement " { $link POSTPONE: ARTICLE: } "." } ;
 
@@ -40,7 +40,7 @@ HELP: collect-elements "( element seq -- )"
 
 HELP: parent-graph f
 { $description "Variable. A graph whose vertices are help articles and edges are subsections. See " { $link "graphs" } "." }
-{ $see-also children parents xref-articles } ;
+{ $see-also children parents xref-help } ;
 
 HELP: children "( topic -- seq )"
 { $values { "topic" "an article name or a word" } { "seq" "a new sequence" } }
@@ -67,5 +67,5 @@ HELP: unxref-article "( topic -- )"
 { $description "Removes an article to the " { $link parent-graph } " graph." }
 $low-level-note ;
 
-HELP: xref-articles "( -- )"
+HELP: xref-help "( -- )"
 { $description "Update the " { $link parent-graph } ". Usually this is done automatically." } ;

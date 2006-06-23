@@ -122,7 +122,7 @@ M: word print-element { } swap execute ;
 ! Some links
 M: link article-title link-name article-title ;
 M: link article-content link-name article-content ;
-M: link summary "Link: " swap link-name append ;
+M: link summary "Link: " swap link-name unparse append ;
 
 : >link ( obj -- obj ) dup word? [ <link> ] unless ;
 

@@ -9,7 +9,6 @@ parser sequences sequences-internals words ;
 [
     "Cross-referencing..." print flush
     H{ } clone crossref set-global xref-words
-    H{ } clone parent-graph set-global xref-articles
 
     "compile" get [
         "native-io" get [
@@ -59,7 +58,8 @@ parser sequences sequences-internals words ;
     ] when
         
     "Building online help search index..." print flush
-    index-help
+    H{ } clone parent-graph set-global xref-help
+    H{ } clone term-index set-global index-help
     
     [
         boot
