@@ -127,7 +127,7 @@ M: object like drop ;
 : last/first ( seq -- pair ) dup peek swap first 2array ;
 
 : sequence= ( seq seq -- ? )
-    2dup [ length ] 2apply = [
+    2dup [ length ] 2apply number= [
         dup length [ >r 2dup r> 2nth-unsafe = ] all? 2nip
     ] [
         2drop f
@@ -142,9 +142,8 @@ M: sequence = ( obj seq -- ? )
         over type over type eq? [ sequence= ] [ 2drop f ] if
     ] if ;
 
-M: sequence hashcode ( seq -- n )
-    #! Poor
-    length ;
+M: sequence hashcode ( hash -- n )
+    dup empty? [ drop 0 ] [ first hashcode ] if ;
 
 IN: kernel
 

@@ -10,9 +10,6 @@ USING: generic kernel-internals math math-internals ;
 GENERIC: hashcode ( obj -- n )
 M: object hashcode drop 0 ;
 
-GENERIC: hashcode* ( n obj -- n )
-M: object hashcode* nip hashcode ;
-
 GENERIC: = ( obj obj -- ? )
 M: object = eq? ;
 

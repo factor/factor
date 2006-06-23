@@ -12,7 +12,7 @@ TUPLE: tombstone ;
 : hash@ ( key keys -- n )
     >r hashcode r> length 2 /i rem 2 * ; inline
 
-: probe ( heys i -- hash i ) 2 + over length mod ; inline
+: probe ( keys i -- hash i ) 2 + over length mod ; inline
 
 : (key@) ( key keys i -- n )
     3dup swap nth-unsafe {
@@ -226,19 +226,14 @@ M: hashtable = ( obj hash -- ? )
         { [ t ] [ hashtable= ] }
     } cond ;
 
-: hashtable-hashcode ( n hashtable -- n )
-    >r 1- r> 0 swap [
-        >r >r
-        over r> hashcode* bitxor
-        over r> hashcode* -1 shift bitxor
-    ] hash-each nip ;
-
-M: hashtable hashcode* ( n hash -- n )
-    dup hash-size 1 number=
-    [ hashtable-hashcode ] [ nip hash-size ] if ;
+: hashtable-hashcode ( hashtable -- n )
+    0 swap [
+        hashcode >r hashcode -1 shift r> bitxor bitxor
+    ] hash-each ;
 
 M: hashtable hashcode ( hash -- n )
-    2 swap hashcode* ;
+    dup hash-size 1 number=
+    [ hashtable-hashcode ] [ hash-size ] if ;
 
 : ?hash ( key hash/f -- value/f )
     dup [ hash ] [ 2drop f ] if ;
