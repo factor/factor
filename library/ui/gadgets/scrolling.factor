@@ -5,7 +5,7 @@ USING: arrays gadgets gadgets-frames gadgets-theme
 gadgets-viewports generic kernel math namespaces sequences ;
 
 ! A scroller combines a viewport with two x and y sliders.
-! The follows slot is set by scroll-to.
+! The follows slot is set by scroll>gadget.
 TUPLE: scroller viewport x y follows ;
 
 : scroller-origin ( scroller -- { x y 0 } )
@@ -15,7 +15,7 @@ TUPLE: scroller viewport x y follows ;
 
 : find-scroller [ scroller? ] find-parent ;
 
-: scroll-to ( gadget -- )
+: scroll>gadget ( gadget -- )
     #! Scroll the scroller that contains this gadget, if any, so
     #! that the gadget becomes visible.
     dup find-scroller dup
@@ -53,36 +53,43 @@ C: scroller ( gadget -- scroller )
     >r swap scroller-viewport dup rect-dim swap viewport-dim
     r> set-slider ;
 
-: scroll ( scroller value -- )
-    2dup over scroller-x update-slider
-    over scroller-y update-slider ;
-
-: pop-follows ( scroller -- follows )
-    dup scroller-follows f rot set-scroller-follows ;
-
-: (do-scroll) ( gadget viewport -- point )
-    [ [ swap relative-rect ] keep rect-union ] keep
-    [ rect-extent v+ ] 2apply v- ;
-
-: do-scroll ( scroller -- delta )
-    dup pop-follows dup [
-        swap scroller-viewport (do-scroll)
-    ] [
-        2drop { 0 0 }
-    ] if ;
-
-: update-scroller ( scroller -- )
-    [ dup do-scroll ] keep scroller-origin v+ scroll ;
-
 : position-viewport ( scroller -- )
     dup scroller-origin vneg
     swap scroller-viewport gadget-child
     set-rect-loc ;
 
+: scroll ( scroller value -- )
+    2dup over scroller-x update-slider
+    dupd over scroller-y update-slider
+    position-viewport ;
+
+: include-point ( point rect -- rect )
+    rect-extent >r over r> vmax >r vmin r> <extent-rect> ;
+
+: scroll>point ( point scroller -- )
+    [
+        scroller-viewport [ include-point ] keep
+        [ rect-extent v+ ] 2apply v-
+    ] keep dup scroller-origin rot v+ scroll ;
+
+: (scroll>gadget) ( gadget scroller -- )
+    #! First ensure top left is visible, then bottom right.
+    over screen-loc over scroll>point
+    over screen-loc rot rect-dim v+ swap scroll>point ;
+
+: update-scroller ( scroller -- )
+    dup scroller-follows dup [
+        swap
+        f over set-scroller-follows
+        (scroll>gadget)
+    ] [
+        drop dup scroller-origin scroll
+    ] if ;
+
 M: scroller layout* ( scroller -- )
     dup delegate layout*
     dup layout-children
-    dup update-scroller position-viewport ;
+    update-scroller ;
 
 M: scroller focusable-child* ( scroller -- viewport )
     scroller-viewport ;

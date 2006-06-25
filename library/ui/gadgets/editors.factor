@@ -20,13 +20,11 @@ USE: line-editor
 
 TUPLE: editor line caret font color ;
 
-: scroll>caret ( editor -- ) editor-caret scroll-to ;
-
 : with-editor ( editor quot -- )
     #! Execute a quotation in the line editor scope, then
     #! update the display.
     swap [ editor-line swap bind ] keep
-    dup relayout scroll>caret ; inline
+    dup relayout editor-caret scroll>gadget ; inline
 
 : editor-text ( editor -- text )
     editor-line [ line-text get ] bind ;

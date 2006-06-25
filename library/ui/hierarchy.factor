@@ -79,9 +79,6 @@ M: gadget remove-notify* drop ;
 
 : relative-loc ( g1 point -- point-g1 ) swap screen-loc v- ;
 
-: relative-rect ( g1 g2 -- rect )
-    [ screen-loc relative-loc ] keep rect-dim <rect> ;
-
 : child? ( parent child -- ? ) parents memq? ;
 
 GENERIC: focusable-child* ( gadget -- gadget/t )

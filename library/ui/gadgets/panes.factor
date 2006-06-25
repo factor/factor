@@ -11,7 +11,7 @@ TUPLE: pane output active current input prototype continuation ;
 : add-output 2dup set-pane-output add-gadget ;
 
 : <active-line> ( current input -- line )
-    { { [ ] f @center } { [ ] f @left } } make-frame ;
+    2array [ ] subset make-shelf ;
 
 : init-line ( pane -- )
     dup pane-prototype clone swap set-pane-current ;
@@ -56,22 +56,21 @@ SYMBOL: structured-input
 
 C: pane ( -- pane )
     <pile> over set-delegate
-    1 over set-pack-fill
     <shelf> over set-pane-prototype
     <pile> <incremental> over add-output
     dup prepare-line ;
 
 M: pane gadget-gestures
-    pane-input [
-        H{
-            { T{ key-down f f "RETURN" } [ pane-commit ] }
-            { T{ key-down f f "UP" } [ pane-input [ history-prev ] with-editor ] }
-            { T{ key-down f f "DOWN" } [ pane-input [ history-next ] with-editor ] }
-            { T{ key-down f { C+ } "l" } [ pane-clear ] }
-        }
-    ] [
-        H{ }
-    ] if ;
+    pane-input
+    H{
+        { T{ button-down } [ pane-input click-editor ] }
+        { T{ key-down f f "RETURN" } [ pane-commit ] }
+        { T{ key-down f f "UP" } [ pane-input [ history-prev ] with-editor ] }
+        { T{ key-down f f "DOWN" } [ pane-input [ history-next ] with-editor ] }
+        { T{ key-down f { C+ } "l" } [ pane-clear ] }
+    }
+    H{ }
+    ? ;
 
 : <input-pane> ( -- pane )
     <pane> "" <editor> over set-pane-input ;
@@ -117,7 +116,7 @@ M: pane stream-flush ( pane -- ) drop ;
 M: pane stream-readln ( pane -- line )
     [ over set-pane-continuation stop ] callcc1 nip ;
 
-: scroll-pane ( pane -- ) pane-input [ scroll>caret ] when* ;
+: scroll-pane ( pane -- ) pane-active [ scroll>gadget ] when* ;
 
 M: pane stream-write1 ( char pane -- )
     [ pane-current stream-write1 ] keep scroll-pane ;

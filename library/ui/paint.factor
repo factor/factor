@@ -69,11 +69,12 @@ DEFER: draw-gadget
     r> clip set do-clip ; inline
 
 : draw-gadget ( gadget -- )
-    dup gadget-clipped? [
-        [ (draw-gadget) ] with-clipping
-    ] [
-        (draw-gadget)
-    ] if ;
+    {
+        { [ dup gadget-relayout? ] [ drop ] }
+        { [ dup gadget-visible? not ] [ drop ] }
+        { [ dup gadget-clipped? not ] [ (draw-gadget) ] }
+        { [ t ] [ [ (draw-gadget) ] with-clipping ] }
+    } cond ;
 
 : draw-world ( world -- )
     [

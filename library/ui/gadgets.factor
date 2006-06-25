@@ -35,9 +35,6 @@ M: array rect-dim drop { 0 0 } ;
 : intersects? ( rect/point rect -- ? )
     (rect-intersect) v- [ 0 <= ] all? ;
 
-: rect-union ( rect rect -- rect )
-    2rect-extent vmax >r vmin r> <extent-rect> ;
-
 TUPLE: gadget
     pref-dim parent children orientation
     visible? relayout? root? clipped? interior boundary ;
