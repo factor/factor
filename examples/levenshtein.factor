@@ -1,6 +1,7 @@
 ! Copyright (C) 2006 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: arrays kernel math namespaces sequences test ;
+USING: arrays compiler help io kernel math namespaces sequences
+test words ;
 IN: levenshtein
 
 : <matrix> ( m n -- matrix )
@@ -43,9 +44,18 @@ SYMBOL: costs
             swap [ swap levenshtein-step ] each-with
         ] each-with
         levenshtein-result
-    ] with-scope ;
+    ] with-scope ; compiled
 
 [ 3 ] [ "sitting" "kitten" levenshtein ] unit-test
 [ 3 ] [ "kitten" "sitting" levenshtein ] unit-test
 [ 1 ] [ "freshpak" "freshpack" levenshtein ] unit-test
 [ 1 ] [ "freshpack" "freshpak" levenshtein ] unit-test
+
+: fancy-apropos ( str -- )
+    all-words
+    [ [ word-name levenshtein ] keep 2array ] map-with
+    [ first 3 <= ] subset
+    natural-sort [
+        second [ word-name ] keep [ help ] write-outliner
+        terpri
+    ] each ;
