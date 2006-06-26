@@ -39,13 +39,9 @@ C: grid ( children -- grid )
 : (pair-up) ( horiz vert -- dim )
     >r first r> second 2array ;
 
-: pair-up ( horiz vert -- dims )
-    [ swap [ swap (pair-up) ] map-with ] map-with ;
-
 M: grid pref-dim* ( grid -- dim )
     [
-        [ [ length 1 [-] ] 2apply 2array gap v* ] 2keep
-        [ { 0 0 } [ v+ ] reduce ] 2apply (pair-up) v+
+        [ gap [ v+ gap v+ ] reduce ] 2apply (pair-up)
     ] with-grid ;
 
 : do-grid ( dims quot -- )
@@ -53,8 +49,14 @@ M: grid pref-dim* ( grid -- dim )
         [ dup [ pick call ] [ 2drop ] if ] 2each
     ] 2each drop ; inline
 
+: pair-up ( horiz vert -- dims )
+    [ swap [ swap (pair-up) ] map-with ] map-with ;
+
+: grid-positions ( dims -- locs )
+    gap [ v+ gap v+ ] accumulate ;
+
 : position-grid ( horiz vert -- )
-    [ { 0 0 } [ v+ gap v+ ] accumulate ] 2apply
+    [ grid-positions ] 2apply
     pair-up [ set-rect-loc ] do-grid ;
 
 : resize-grid ( horiz vert -- )

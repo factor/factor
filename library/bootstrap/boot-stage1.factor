@@ -180,6 +180,7 @@ sequences vectors words ;
         "/library/ui/gadgets/frames.factor"
         "/library/ui/world.factor"
         "/library/ui/paint.factor"
+        "/library/ui/gadgets/grid-lines.factor"
         "/library/ui/gadgets/theme.factor"
         "/library/ui/gadgets/labels.factor"
         "/library/ui/gestures.factor"

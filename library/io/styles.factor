@@ -27,6 +27,7 @@ SYMBOL: outline
 
 ! Table styles
 SYMBOL: table-gap
+SYMBOL: table-border
 
 ! Input history
 TUPLE: input string ;

@@ -11,7 +11,10 @@ USING: styles ;
     } ;
 
 : link-style
-    H{ { foreground { 0.3 0 0 1 } } { font-style bold } } ;
+    H{
+        { foreground { 0 0 0.3 1 } }
+        { font-style bold }
+    } ;
 
 : emphasis-style
     H{ { font-style italic } } ;
@@ -33,7 +36,6 @@ USING: styles ;
     H{
         { font-size 14 }
         { font-style bold }
-        { foreground { 0.2 0.2 0.4 1 } }
     } ;
 
 : subsection-style
@@ -75,7 +77,16 @@ USING: styles ;
         { border-width 5 }
     } ;
 
-: table-style
+: table-content-style
     H{
         { wrap-margin 350 }
     } ;
+
+: table-style
+    H{
+        { table-gap { 5 5 0 } }
+        { table-border { 0.8 0.8 0.8 1.0 } }
+    } ;
+
+: list-style
+    H{ { table-gap { 10 2 0 } } } ;

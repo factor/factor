@@ -157,13 +157,18 @@ M: link summary "Link: " swap link-name unparse append ;
         ] ($block)
     ] if ;
 
-: $table ( content -- )
+: $grid ( content style -- )
     [
-        table-style [
-            H{ { table-gap { 5 5 0 } } }
+        table-content-style [
             [ print-element ] tabular-output
         ] with-style
     ] ($block) table last-element set ;
+
+: $list ( content -- )
+    [  "\u00b7" swap 2array ] map list-style $grid ;
+
+: $table ( content -- )
+    table-style $grid ;
 
 : $values ( content -- )
     "Arguments and values" $heading
@@ -176,8 +181,6 @@ M: link summary "Link: " swap link-name unparse append ;
         { $link } swap append ,
         " class." ,
     ] { } make $description ;
-
-: $list ( content -- ) [  "-" swap 2array ] map $table ;
 
 : $errors ( content -- )
     "Errors" $heading print-element ;

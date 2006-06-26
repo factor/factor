@@ -89,9 +89,18 @@ M: object-button gadget-help ( button -- string )
     >r <pane> dup r> swap <styled-paragraph>
     >r swap with-pane r> ; inline
 
-: styled-grid ( style grid -- )
+: apply-table-gap-style ( grid style -- grid style )
+    table-gap [ over set-grid-gap ] apply-style ;
+
+: apply-table-border-style ( grid style -- grid style )
+    table-border [ <grid-lines> over set-gadget-boundary ]
+    apply-style ;
+
+: styled-grid ( style grid -- grid )
     <grid>
-    table-gap rot hash [ { 0 0 } ] unless* over set-grid-gap ;
+    apply-table-gap-style
+    apply-table-border-style
+    nip ;
 
 : <pane-grid> ( quot style grid -- gadget )
     [
