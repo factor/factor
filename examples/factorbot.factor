@@ -2,8 +2,9 @@
 
 ! Load the HTTP server first (contrib/httpd/load.factor).
 
-USING: errors generic hashtables html http io kernel math memory
-namespaces parser prettyprint sequences strings threads words ;
+USING: errors generic hashtables help html http io kernel math
+memory namespaces parser prettyprint sequences strings threads
+words ;
 IN: factorbot
 
 SYMBOL: irc-stream
@@ -77,22 +78,36 @@ M: ping handle-irc ( line -- )
 : multiline-respond ( string -- )
     <string-reader> lines [ respond ] each ;
 
+: object-href
+    "http://factorcode.org" swap browser-link-href append ;
+
+: not-found ( str -- )
+    "Sorry, I couldn't find anything for " swap append respond ;
+
 IN: factorbot-commands
 
 : see ( text -- )
-    dup vocabs [ vocab ?hash ] map-with [ ] subset
+    all-words [ word-name = ] subset-with
     dup empty? [
         drop
-        "Sorry, I couldn't find anything for " swap append respond
+        not-found
     ] [
         nip [
-            dup synopsis " -- http://factorcode.org"
-            rot browser-link-href append3 respond
+            dup synopsis " -- " 
+            rot object-href append3 respond
         ] each
+    ] if ;
+
+: memory ( text -- )
+    drop [ room. ] string-out multiline-respond ;
+
+: search ( text -- )
+    search-help dup empty? [
+        not-found
+    ] [
+        first first dup article-title
+        " -- " rot <link> object-href append3 respond
     ] if ;
 
 : quit ( text -- )
     drop speaker get "slava" = [ disconnect ] when ;
-
-: memory ( text -- )
-    drop [ room. ] string-out multiline-respond ;
