@@ -1,23 +1,20 @@
 ! Copyright (C) 2005, 2006 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 IN: words
-USING: inspector io kernel math namespaces prettyprint
+USING: help inspector io kernel math namespaces prettyprint
 sequences strings walker ;
 
-: usage. ( word -- )
-    usage natural-sort [
-        [ synopsis ] keep dup [ usage. ] curry
+: word-outliner ( word quot -- )
+    swap natural-sort [
+        dup rot curry >r [ synopsis ] keep r>
         write-outliner terpri
-    ] each ;
+    ] each-with ;
+
+: usage. ( word -- )
+    usage [ usage. ] word-outliner ;
 
 : apropos ( substring -- )
-    "Word names containing ``" write dup write "'':" print
-    all-words completions
-    [
-        [
-            dup word-name % " (" % dup word-vocabulary % ")" %
-        ] "" make swap write-object terpri
-    ] each ;
+    all-words completions [ (help) ] word-outliner ;
 
 : annotate ( word quot -- | quot: word def -- def )
     over >r >r dup word-def r> call r> swap define-compound ;

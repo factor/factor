@@ -71,6 +71,8 @@ M: titled-gadget pref-dim* viewport-dim ;
 M: titled-gadget layout*
     dup rect-dim swap gadget-child set-gadget-dim ;
 
+M: titled-gadget focusable-child* gadget-child ;
+
 C: titled-gadget ( gadget title -- )
     dup delegate>gadget
     [ set-titled-gadget-title ] keep

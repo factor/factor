@@ -84,7 +84,4 @@ SYMBOL: term-index
     dup xref-article index-article ;
 
 : search-help. ( phrase -- )
-    "Search results for ``" write dup write "'':" print
-    search-help [
-        first >link [ article-title ] keep write-object terpri
-    ] each ;
+    search-help [ first ] map help-outliner ;

@@ -126,12 +126,6 @@ M: link summary "Link: " swap link-name unparse append ;
 
 : >link ( obj -- obj ) dup word? [ <link> ] unless ;
 
-: ($subsection) ( quot object -- )
-    subsection-style [
-        [ swap curry ] keep dup article-title swap >link
-        rot write-outliner
-    ] with-style ;
-
 : $link ( article -- )
     first link-style [
         dup article-title swap >link write-object
@@ -227,6 +221,3 @@ M: link summary "Link: " swap link-name unparse append ;
     [ [ article-title ] keep 2array ] map
     [ [ first ] 2apply <=> ] sort
     [ second ] map ;
-
-: help-outliner ( seq quot -- | quot: obj -- )
-    swap sort-articles [ ($subsection) terpri ] each-with ;

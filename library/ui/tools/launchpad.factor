@@ -28,7 +28,9 @@ prettyprint sequences words ;
     {
         { "Listener" [ listener-window ] }
         { "Browser" [ browser-window ] }
+        { "Apropos" [ apropos-window ] }
         { "Documentation" [ handbook-window ] }
+        { "Search help" [ search-help-window ] }
         { "Globals" [ globals-window ] }
         { "Memory" [ memory-window ] }
         { "Save image" [ save ] }

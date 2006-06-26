@@ -19,35 +19,21 @@ C: history ( -- gadget )
         ] each
     ] with-pane ;
 
-TUPLE: help-sidebar history search ;
-
-: <help-search> ( -- gadget )
-    [ search-help. ] <search-gadget> "Search" f <tile> ;
-
-C: help-sidebar ( -- gadget )
-    {
-        { [ <history> ] set-help-sidebar-history 1/2 }
-        { [ <help-search> ] set-help-sidebar-search 1/2 }
-    } { 0 1 } make-track* ;
-
-TUPLE: help-gadget showing sidebar scroller ;
+TUPLE: help-gadget showing history scroller ;
 
 : help-gadget-pane help-gadget-scroller scroller-gadget ;
 
 C: help-gadget ( -- gadget )
     {
-        { [ <help-sidebar> ] set-help-gadget-sidebar 1/4 }
+        { [ <history> ] set-help-gadget-history 1/4 }
         { [ <pane> <scroller> ] set-help-gadget-scroller 3/4 }
     } { 1 0 } make-track* ;
 
 M: help-gadget gadget-title
     "Help - " swap help-gadget-showing article-title append ;
 
-M: help-gadget focusable-child*
-    help-gadget-sidebar help-sidebar-search ;
-
 : add-history ( help -- )
-    dup help-gadget-sidebar help-sidebar-history
+    dup help-gadget-history
     swap help-gadget-showing dup
     [ over history-seq push-new update-history ] [ 2drop ] if ;
 

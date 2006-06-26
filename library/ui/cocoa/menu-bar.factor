@@ -1,8 +1,8 @@
 ! Copyright (C) 2005, 2006 Kevin Reid.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: cocoa compiler gadgets gadgets-browser gadgets-launchpad
-gadgets-listener kernel memory objc objc-classes sequences
-strings words ;
+gadgets-listener gadgets-search kernel memory objc objc-classes
+sequences strings words ;
 IN: cocoa
 
 ! -------------------------------------------------------------------------
@@ -112,6 +112,7 @@ DEFER: described-menu
             "File"
             { "New Listener" listener-window "n" }
             { "New Browser" browser-window "b" }
+            { "Apropos" apropos-window "r" }
             { }
             { "Run..." menu-run-file "o" }
             { }
@@ -144,5 +145,6 @@ DEFER: described-menu
         { {
             "Help"
             { "Factor Documentation" handbook-window "?" }
+            { "Search" search-help-window "" }
         } }
     } described-menu set-main-menu ;

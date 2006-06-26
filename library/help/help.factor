@@ -41,8 +41,18 @@ M: word article-content
         ] with-style
     ] ($block) ;
 
+: ($subsection) ( object -- )
+    [ article-title ] keep >link
+    dup [ (help) ] curry
+    write-outliner ;
+
 : $subsection ( object -- )
-    [ first [ (help) ] swap ($subsection) ] ($block) ;
+    [
+        subsection-style [ first ($subsection) ] with-style
+    ] ($block) ;
+
+: help-outliner ( seq  -- | quot: obj -- )
+    sort-articles [ ($subsection) terpri ] each ;
 
 : $outliner ( content -- )
-    first call [ (help) ] help-outliner ;
+    subsection-style [ first call help-outliner ] with-style ;
