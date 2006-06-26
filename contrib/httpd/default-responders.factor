@@ -20,10 +20,9 @@ global [
     "callback" [ callback-responder ] add-simple-responder
 
     ! Javascript source used by ajax libraries
-    "javascript" [ 
+    "resources" [ 
         [
-            "contrib/httpd/javascript/" resource-path
-            "doc-root" set
+            "" resource-path "doc-root" set
             file-responder
         ] with-scope
     ] add-simple-responder

@@ -18,9 +18,9 @@ IN: html
 : style-css, ( flag -- )
     dup
     { italic bold-italic } member?
-    "font-style: " % "italic" "normal" ? % ";" %
+    "font-style: " % "italic" "normal" ? % "; " %
     { bold bold-italic } member?
-    "font-weight: " % "bold" "normal" ? % ";" % ;
+    "font-weight: " % "bold" "normal" ? % "; " % ;
 
 : size-css, ( size -- )
     "font-size: " % # "pt; " % ;
@@ -148,7 +148,7 @@ M: html-stream stream-format ( str style stream -- )
 
 : make-outliner-quot
     [
-        <div "padding-left:20px;" =style div>
+        <div "padding-left: 20px; " =style div>
             with-html-stream
         </div>
     ] curry ;
@@ -156,7 +156,7 @@ M: html-stream stream-format ( str style stream -- )
 : html-outliner ( caption contents -- )
     "+ " get-random-id dup >r
     rot make-outliner-quot updating-anchor call
-    <span r> =id span> </span> ;
+    <span r> =id "display: none; " =style span> </span> ;
 
 : outliner-tag ( style quot -- )
     outline pick hash [ html-outliner ] [ call ] if* ;
@@ -172,12 +172,27 @@ M: html-stream with-nested-stream ( quot style stream -- )
         ] outliner-tag
     ] with-stream* ;
 
+: border-spacing-css,
+    "padding: " % first2 max 2 /i # "px; " % ;
+
+: table-style ( style -- str )
+    [
+        H{
+            { table-border [ border-css,         ] }
+            { table-gap    [ border-spacing-css, ] }
+        } hash-apply
+    ] "" make ;
+
+: table-attrs ( style -- )
+    table-style " border-collapse: collapse;" append =style ;
+
 M: html-stream with-stream-table ( grid quot style stream -- )
     [
-        <table> rot [
+        <table dup table-attrs table> rot [
             <tr> [
-                <td "top" =valign td>
-                pick pick stdio get with-nested-stream </td>
+                <td "top" =valign over table-style =style td>
+                    pick H{ } swap with-nesting
+                </td>
             ] each </tr>
         ] each 2drop </table>
     ] with-stream* ;
