@@ -220,7 +220,7 @@ M: word pprint* ( word -- )
     dup pprint-word
     "pprint-open" word-prop [ <block ] when ;
 
-M: f pprint* drop "f" text ;
+M: f pprint* drop \ f pprint-word ;
 
 M: dll pprint* ( obj -- str ) dll-path "DLL\" " pprint-string ;
 
