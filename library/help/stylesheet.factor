@@ -7,6 +7,7 @@ USING: styles ;
     H{
         { font "sans-serif" }
         { font-size 12 }
+        { font-style plain }
         { wrap-margin 500 }
     } ;
 
@@ -34,6 +35,7 @@ USING: styles ;
 
 : heading-style
     H{
+        { font "sans-serif" }
         { font-size 14 }
         { font-style bold }
     } ;
@@ -56,6 +58,7 @@ USING: styles ;
 : code-style
     H{
         { font "monospace" }
+        { font-size 12 }
         { page-color { 0.8 0.8 0.8 0.5 } }
         { border-width 5 }
         { wrap-margin f }

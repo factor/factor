@@ -30,7 +30,7 @@ M: word article-content
 : help ( topic -- ) dup $title (help) terpri ;
 
 : see-help ( word -- )
-    dup help [ terpri $definition terpri ] with-default-style ;
+    dup help terpri $definition terpri ;
 
 : handbook ( -- ) "handbook" help ;
 

@@ -159,7 +159,7 @@ M: link summary "Link: " swap link-name unparse append ;
     ] ($block) table last-element set ;
 
 : $list ( content -- )
-    [  "\u00b7" swap 2array ] map list-style $grid ;
+    [  "-" swap 2array ] map list-style $grid ;
 
 : $table ( content -- )
     table-style $grid ;
@@ -192,7 +192,7 @@ M: link summary "Link: " swap link-name unparse append ;
 : $see ( content -- ) first ($see) ;
 
 : $definition ( content -- )
-    "Definition" $heading ($see) ;
+    "Definition" $heading terpri ($see) ;
 
 : $curious ( content -- )
     "For the curious..." $heading print-element ;
