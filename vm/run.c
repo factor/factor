@@ -5,28 +5,33 @@ INLINE void execute(F_WORD* word)
 	((XT)(word->xt))(word);
 }
 
+INLINE void push_callframe(void)
+{
+	cs += CELLS * 3;
+	put(cs - CELLS * 2,callframe);
+	put(cs - CELLS,callframe_scan);
+	put(cs,callframe_end);
+}
+
+INLINE void set_callframe(CELL quot)
+{
+	F_ARRAY *untagged = (F_ARRAY*)UNTAG(quot);
+	type_check(QUOTATION_TYPE,quot);
+	callframe = quot;
+	callframe_scan = AREF(untagged,0);
+	callframe_end = AREF(untagged,array_capacity(untagged));
+}
+
 void call(CELL quot)
 {
-	F_ARRAY *untagged;
-
 	if(quot == F)
 		return;
 
-	type_check(QUOTATION_TYPE,quot);
-
 	/* tail call optimization */
 	if(callframe_scan < callframe_end)
-	{
-		cs += CELLS * 3;
-		put(cs - CELLS * 2,callframe);
-		put(cs - CELLS,callframe_scan);
-		put(cs,callframe_end);
-	}
+		push_callframe();
 
-	callframe = quot;
-	untagged = (F_ARRAY*)UNTAG(quot);
-	callframe_scan = AREF(untagged,0);
-	callframe_end = AREF(untagged,array_capacity(untagged));
+	set_callframe(quot);
 }
 
 /* Called from platform_run() */
@@ -44,7 +49,8 @@ void handle_error(void)
 
 		dpush(thrown_error);
 		/* Notify any 'catch' blocks */
-		call(userenv[BREAK_ENV]);
+		push_callframe();
+		set_callframe(userenv[BREAK_ENV]);
 		throwing = false;
 	}
 }
