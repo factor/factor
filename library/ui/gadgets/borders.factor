@@ -26,3 +26,6 @@ M: border pref-dim* ( border -- dim )
 
 M: border layout* ( border -- )
     dup layout-border-loc layout-border-dim ;
+
+: <spacing> ( -- gadget )
+    <gadget> { 10 10 } over set-gadget-dim ;

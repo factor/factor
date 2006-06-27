@@ -83,7 +83,7 @@ C: titled-gadget ( gadget title -- )
     [ >r gadget-title r> set-title ] [ 2drop ] if ;
 
 : open-window ( gadget -- )
-    <status-bar> <world> dup prefer open-window* ;
+    <world> dup prefer open-window* ;
 
 : open-titled-window ( gadget title -- )
     <titled-gadget> open-window ;

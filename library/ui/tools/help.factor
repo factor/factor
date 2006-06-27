@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 IN: gadgets-help
 USING: gadgets gadgets-panes gadgets-presentations
-gadgets-scrolling gadgets-search gadgets-tabs gadgets-tiles
+gadgets-scrolling gadgets-search gadgets-tiles
 gadgets-tracks help io kernel sequences words ;
 
 TUPLE: history pane seq ;

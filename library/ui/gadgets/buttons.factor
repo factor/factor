@@ -1,8 +1,9 @@
 ! Copyright (C) 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: gadgets-buttons
-USING: gadgets gadgets-borders gadgets-theme generic io kernel
-math namespaces sequences styles threads ;
+USING: gadgets gadgets-borders gadgets-controls gadgets-labels
+gadgets-theme generic io kernel math models namespaces sequences
+strings styles threads ;
 
 TUPLE: button rollover? pressed? selected? quot ;
 
@@ -35,8 +36,12 @@ M: button gadget-gestures
         { T{ mouse-enter } [ button-update ] }
     } ;
 
+GENERIC: >label ( obj -- gadget )
+M: string >label <label> ;
+M: object >label ;
+
 C: button ( gadget quot -- button )
-    rot <default-border> over set-gadget-delegate
+    rot >label <default-border> over set-gadget-delegate
     [ set-button-quot ] keep ;
 
 : <highlight-button> ( gadget quot -- button )
@@ -86,3 +91,10 @@ M: button-paint draw-interior ( button paint -- )
 
 M: button-paint draw-boundary ( button paint -- )
     button-paint draw-boundary ;
+
+: <radio-control> ( model value gadget -- gadget )
+    over [ swap control-model set-model ] curry <bevel-button>
+    swap [ swap >r = r> set-button-selected? ] curry <control> ;
+
+: <radio-box> ( model assoc -- gadget )
+    [ first2 <radio-control> ] map-with make-shelf ;

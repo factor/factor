@@ -1,8 +1,8 @@
 ! Copyright (C) 2005, 2006 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 IN: gadgets
-USING: gadgets-labels hashtables kernel math namespaces queues
-sequences words ;
+USING: hashtables kernel math models namespaces queues sequences
+words ;
 
 GENERIC: gadget-gestures ( gadget -- hash )
 
@@ -139,9 +139,9 @@ V{ } clone hand-buttons set-global
 : relevant-help ( seq -- help )
     [ gadget-help ] map [ ] find nip ;
 
-: show-message ( string/f -- )
+: show-message ( string/f world -- )
     #! Show a message in the status bar.
-    world-status [ set-label-text* ] [ drop ] if* ;
+    world-status set-model ;
 
 : update-help ( -- )
     #! Update mouse-over help message.

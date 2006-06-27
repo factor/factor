@@ -1,10 +1,11 @@
 ! Copyright (C) 2005, 2006 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 IN: gadgets-panes
-USING: arrays gadgets gadgets-buttons gadgets-editors
-gadgets-frames gadgets-grids gadgets-labels gadgets-scrolling
-gadgets-theme generic hashtables io kernel line-editor math
-namespaces prettyprint sequences strings styles threads ;
+USING: arrays gadgets gadgets-buttons gadgets-controls
+gadgets-editors gadgets-frames gadgets-grids gadgets-labels
+gadgets-scrolling gadgets-theme generic hashtables io kernel
+line-editor math namespaces prettyprint sequences strings styles
+threads ;
 
 TUPLE: pane output active current input prototype continuation ;
 
@@ -144,3 +145,6 @@ M: pane with-stream-style ( quot style pane -- )
 : make-pane ( quot -- pane )
     #! Execute the quotation with output to an output-only pane.
     <pane> [ swap with-pane ] keep ; inline
+
+: <pane-control> ( model quot -- pane )
+    [ with-pane ] curry <pane> swap <control> ;

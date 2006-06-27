@@ -1,44 +1,51 @@
 ! Copyright (C) 2006 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 IN: gadgets-browser
-USING: gadgets gadgets-buttons gadgets-labels gadgets-panes
+USING: arrays gadgets gadgets-borders gadgets-buttons
+gadgets-frames gadgets-labels gadgets-panes
 gadgets-presentations gadgets-scrolling gadgets-search
-gadgets-tabs gadgets-theme gadgets-tiles gadgets-tracks generic
-hashtables help inspector kernel math prettyprint sequences
-words ;
+gadgets-books gadgets-theme gadgets-tiles gadgets-tracks generic
+hashtables help inspector kernel math models namespaces
+prettyprint sequences words ;
 
-TUPLE: browser-track showing builder closer ;
+TUPLE: asset-track showing builder closer ;
 
-C: browser-track ( builder closer -- gadget )
+C: asset-track ( builder closer -- gadget )
     { 0 1 } <track> over set-delegate
-    H{ } clone over set-browser-track-showing
-    [ set-browser-track-closer ] keep
-    [ set-browser-track-builder ] keep ;
+    H{ } clone over set-asset-track-showing
+    [ set-asset-track-closer ] keep
+    [ set-asset-track-builder ] keep ;
 
 : showing-asset? ( asset track -- ? )
-    browser-track-showing hash-member? ;
+    asset-track-showing hash-member? ;
 
 : (show-asset) ( gadget asset track -- )
-    [ browser-track-showing set-hash ] 3keep nip track-add ;
+    [ asset-track-showing set-hash ] 3keep nip track-add ;
 
 : show-asset ( asset track -- )
     2dup showing-asset? [
         2drop
     ] [
-        [ browser-track-builder call ] 2keep (show-asset)
+        [ asset-track-builder call ] 2keep (show-asset)
     ] if ;
 
 : hide-asset ( asset track -- )
-    [ dup browser-track-closer call ] 2keep
-    [ browser-track-showing remove-hash* ] keep track-remove ;
+    [ dup asset-track-closer call ] 2keep
+    [ asset-track-showing remove-hash* ] keep track-remove ;
 
-TUPLE: browser vocab-track word-track ;
+TUPLE: browser track page ;
+
+TUPLE: browser-tracks vocabs words ;
+
+: browser-vocab-track browser-track browser-tracks-vocabs ;
+
+: browser-word-track browser-track browser-tracks-words ;
 
 : find-browser [ browser? ] find-parent ;
 
 : close-tile ( tile -- )
     dup gadget-parent [
-        browser-track-showing hash>alist rassoc
+        asset-track-showing hash>alist rassoc
     ] keep hide-asset ;
 
 : <browser-tile> ( gadget title -- gadget )
@@ -49,16 +56,20 @@ TUPLE: browser vocab-track word-track ;
 
 DEFER: show-vocab
 
-: <word-pages> ( word -- tabs )
+: browser-tabs
     {
-        { "Definition" [ see ] }
         { "Documentation" [ help ] }
-        { "Calls in" [ usage. ] }
-        { "Properties" [ word-props describe ] }
-    } <pages> ;
+        { "Definition"    [ see ] } 
+        { "Calls in"      [ usage. ] }
+        { "Properties"    [ word-props describe ] }
+    } ;
 
-: <word-view> ( word -- gadget )
-    [ <word-pages> ] keep word-name <browser-tile> ;
+: <word-book> ( model word -- book )
+    browser-tabs [ second ] map make-book ;
+
+: <word-view> ( word browser -- gadget )
+    browser-page swap [ <word-book> ] keep
+    word-name <browser-tile> ;
 
 : show-word ( word browser -- )
     over word-vocabulary over show-vocab
@@ -71,7 +82,7 @@ DEFER: show-vocab
     2dup showing-word? [ hide-word ] [ show-word ] if ;
 
 : <word-button> ( word -- gadget )
-    dup word-name <label> swap
+    dup word-name swap
     [ swap find-browser toggle-word ] curry
     <roll-button> ;
 
@@ -89,7 +100,7 @@ DEFER: show-vocab
 
 : hide-vocab-words ( vocab browser -- )
     [
-        browser-word-track browser-track-showing hash-keys
+        browser-word-track asset-track-showing hash-keys
         [ word-vocabulary = ] subset-with
     ] keep swap [ swap hide-word ] each-with ;
 
@@ -100,8 +111,7 @@ DEFER: show-vocab
     2dup showing-vocab? [ hide-vocab ] [ show-vocab ] if ;
 
 : <vocab-button> ( vocab -- gadget )
-    dup <label> swap
-    [ swap find-browser toggle-vocab ] curry
+    dup [ swap find-browser toggle-vocab ] curry
     <roll-button> ;
 
 : <vocabs> ( -- gadget )
@@ -110,17 +120,39 @@ DEFER: show-vocab
 
 : <vocab-track> ( -- track )
     [ <vocab-view> ] [ find-browser hide-vocab-words ]
-    <browser-track> ;
+    <asset-track> ;
 
-: <word-track> ( -- track )
-    [ <word-view> ] [ 2drop ] <browser-track> ;
+: <word-track> ( browser -- track )
+    [ <word-view> ] curry [ 2drop ] <asset-track> ;
 
-C: browser ( -- browser )
+C: browser-tracks ( browser -- browser-track )
     {
         { [ <vocabs> ] f 1/5 }
-        { [ <vocab-track> ] set-browser-vocab-track 1/5 }
-        { [ <word-track> ] set-browser-word-track 3/5 }
+        { [ <vocab-track> ] set-browser-tracks-vocabs 1/5 }
+        { [ <word-track> ] set-browser-tracks-words 3/5 }
     } { 1 0 } make-track* ;
+
+: <browser-tabs> ( browser -- tabs )
+    browser-page
+    browser-tabs dup length [ swap first 2array ] 2map
+    <radio-box> ;
+
+: make-toolbar ( quot -- gadget )
+    { } make make-shelf dup highlight-theme ; inline
+
+: <browser-toolbar> ( browser -- toolbar )
+    [
+        <browser-tabs> ,
+        <spacing> ,
+        "Apropos" [ drop apropos-window ] <bevel-button> ,
+    ] make-toolbar ;
+
+C: browser ( -- browser )
+    0 <model> over set-browser-page
+    dup dup {
+        { [ <browser-toolbar> ] f @top }
+        { [ <browser-tracks> ] set-browser-track @center }
+    } make-frame* ;
 
 M: browser gadget-title drop "Browser" ;
 

@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 IN: gadgets
 USING: arrays errors freetype gadgets-frames generic hashtables
-kernel math namespaces opengl sequences ;
+kernel math models namespaces opengl sequences ;
 
 ! The world gadget is the top level gadget that all (visible)
 ! gadgets are contained in. There is one world per top-level
@@ -22,11 +22,9 @@ TUPLE: world gadget status focus focused? fonts handle loc ;
 
 DEFER: request-focus
 
-C: world ( gadget status -- world )
-    {
-        { [ ] set-world-status @bottom }
-        { [ ] set-world-gadget @center }
-    } make-frame*
+C: world ( gadget -- world )
+    f <model> over set-world-status
+    { { [ ] set-world-gadget @center } } make-frame*
     t over set-gadget-root?
     H{ } clone over set-world-fonts
     dup world-gadget request-focus
