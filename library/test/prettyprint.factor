@@ -84,3 +84,9 @@ TUPLE: cat gender declawed? castrated? ;
         T{ cat f "m" t f } unparse
     ] with-scope
 ] unit-test
+
+[ "[ 1 2 >> + << ]" ]
+[
+    [ 1 2 + ] dup hilite-quotation set 2 hilite-index set
+    [ pprint ] string-out
+] unit-test

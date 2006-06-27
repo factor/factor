@@ -249,7 +249,9 @@ M: dll pprint* ( obj -- str ) dll-path "DLL\" " pprint-string ;
     dup parsing? [ \ POSTPONE: pprint-word ] when pprint* ;
 
 : pprint-hilite ( object n -- )
-    hilite-index get = hilite-next? set pprint-element ;
+    hilite-index get = hilite-next? set
+    pprint-element
+    hilite-next? off ;
 
 : pprint-elements ( seq -- )
     length-limit? >r dup hilite-quotation get eq? [
