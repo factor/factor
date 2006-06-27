@@ -30,7 +30,7 @@ $parsing-note ;
 
 HELP: string-mode f
 { $description
-    "Variable toggling strong mode. In string mode, the parser does not look up words, and instead just appends strings to the parse tree as they are read."
+    "Variable toggling string mode. In string mode, the parser does not look up words, and instead just appends strings to the parse tree as they are read."
     $terpri
     "Since no parsing words are invoked in string mode, there is a special case that ends it; if the token " { $snippet ";" } " is read, string mode is switched off and the " { $link POSTPONE: ; } " parsing word is called."
 } ;
