@@ -46,8 +46,8 @@ $terpri
 "Nested structure is a bit more involved. The basic idea is that parsing words can push " { $link f } " on the stack to begin a new level of nesting, then all subsequent objects are pushed onto this sequence, until another parsing word adds this sequence to the vector underneath."
 $terpri
 "The parsing words that delimit the beginning and the end of a quotation illustrate the idiom:"
-{ $subsection POSTPONE: [ }
-{ $subsection POSTPONE: ] }
+{ $see POSTPONE: [ }
+{ $see POSTPONE: ] }
 "Let us ponder, then, how one particular string will parse:"
 { $snippet "\"1 [ 2 3 ] 4\"" }
 { $table
@@ -64,22 +64,17 @@ $terpri
 "Notice how in the definition of the quotation parsing words, the final word " { $link POSTPONE: ] } " does all the work. A closely related set of parsing words for reading various other literal types implements another useful idiom."
 $terpri
 "The word set in question consists of various start delimiters, such a " { $link POSTPONE: { } " for arrays and " { $link POSTPONE: H{ } " for hashtables, together with one end delimiter " { $link POSTPONE: } } ". The start words push a quotation in addition to pushing " { $link f } "; the end word applies the quotation to the newly-parsed vector; the quotation converts it to the appropriate type of literal."
-{ $subsection POSTPONE: { }
-{ $subsection POSTPONE: H{ }
-{ $subsection POSTPONE: V{ }
-{ $subsection POSTPONE: W{ }
-{ $subsection POSTPONE: T{ }
-{ $subsection POSTPONE: } } ;
+{ $see-also POSTPONE: { POSTPONE: H{ POSTPONE: V{ POSTPONE: W{ POSTPONE: T{ POSTPONE: } } ;
 
 ARTICLE: "reading-ahead" "Reading ahead"
 "Parsing words can consume input from the current line to implement various forms of custom syntax."
 { $subsection scan }
 { $subsection scan-word }
 "For example, the " { $link POSTPONE: HEX: } " word, for reading hexadecimal literals, uses this facility. It is defined in terms of a lower-level " { $link (BASE) } " word that takes the numerical base on the data stack, but reads the number from the parser and then adds it to the parse tree:"
-{ $subsection POSTPONE: HEX: }
-{ $subsection (BASE) }
+{ $see (BASE) }
+{ $see POSTPONE: HEX: }
 "Another simple example is the " { $link POSTPONE: \ } " word:"
-{ $subsection POSTPONE: \ } ;
+{ $see POSTPONE: \ } ;
 
 ARTICLE: "defining-words" "Defining words"
 "Defining words add definitions to the dictionary without modifying the parse tree. The simplest example is the " { $link POSTPONE: SYMBOL: } " word:"
@@ -89,16 +84,10 @@ ARTICLE: "defining-words" "Defining words"
 "Colon definitions are defined in a more elaborate way. The  definition of " { $link POSTPONE: : } " introduces the next idiom, and that is building a quotation and then adding a definition using " { $link POSTPONE: ; } "."
 $terpri
 "Recall the colon definition syntax. When the " { $link POSTPONE: : } " word executes, it reads ahead from the input and defines a word. Then, it places a quotation and " { $link f } " on the data stack. The parser builds up a parse tree, and the quotation pushed by " { $link POSTPONE: : } " is called by " { $link POSTPONE: ; } "."
-{ $subsection POSTPONE: : }
-{ $subsection POSTPONE: ; }
+{ $see POSTPONE: : }
+{ $see POSTPONE: ; }
 "There are additional parsing words whose syntax is delimited by  " { $link POSTPONE: ; } ", and they are all implemented in the same way -- first they read some input, then they leave a quotation followed by an empty list on the stack."
-{ $subsection POSTPONE: C: }
-{ $subsection POSTPONE: G: }
-{ $subsection POSTPONE: M: }
-{ $subsection POSTPONE: PREDICATE: }
-{ $subsection POSTPONE: TUPLE: }
-{ $subsection POSTPONE: UNION: }
-{ $subsection POSTPONE: USING: } ;
+{ $see-also POSTPONE: C: POSTPONE: G: POSTPONE: M: POSTPONE: PREDICATE: POSTPONE: TUPLE: POSTPONE: UNION: POSTPONE: USING: } ;
 
 ARTICLE: "string-mode" "String mode"
 "String mode allows custom parsing of tokenized input. For even more esoteric situations, the input text can be accessed directly."
@@ -106,7 +95,7 @@ $terpri
 "String mode is controlled by a boolean variable in the parser scope:"
 { $subsection string-mode }
 "An illustration of this idiom is found in the " { $link POSTPONE: USING: } " parsing word. It reads a list of vocabularies, terminated by " { $link POSTPONE: ; } ". However, the vocabulary names do not name words, except by coincidence; so string mode is used to read them."
-{ $subsection POSTPONE: USING: }
+{ $see POSTPONE: USING: }
 "Make note of the quotation that is left in position for " { $link POSTPONE: ; } " to call. It switches off string mode, so that normal parsing can resume, then adds the given vocabularies to the search path." ;
 
 ARTICLE: "parser-internals" "Parser internals"

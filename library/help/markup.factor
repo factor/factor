@@ -191,12 +191,16 @@ M: object >link <link> ;
     "Notes" $heading print-element ;
 
 : ($see) ( word -- )
-    code-style [ code-style [ see ] with-nesting ] with-style ;
+    [
+        code-style [
+            code-style [ see ] with-nesting
+        ] with-style
+    ] ($block) ;
 
 : $see ( content -- ) first ($see) ;
 
 : $definition ( content -- )
-    "Definition" $heading terpri ($see) ;
+    "Definition" $heading ($see) ;
 
 : $curious ( content -- )
     "For the curious..." $heading print-element ;

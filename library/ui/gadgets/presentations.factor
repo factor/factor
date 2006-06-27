@@ -141,7 +141,7 @@ M: paragraph stream-write1 ( char stream -- )
     [ H{ } swap gadget-bl drop ] [ gadget-write1 ] if ;
 
 : gadget-format ( string style stream -- )
-    pick empty? pick hash-empty? and
+    pick empty?
     [ 3drop ] [ >r swap <presentation> r> add-gadget ] if ;
 
 M: pack stream-format ( string style stream -- )
