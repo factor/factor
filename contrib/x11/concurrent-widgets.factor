@@ -100,16 +100,6 @@ M: window handle-leave-window-event ( event obj -- )
   "Basic handle-leave-window-event called" print flush drop drop ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-! <label>
-! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-
-TUPLE: label text ;
-
-: create-label ( text -- <label> )
-<label>
-create-window-object over set-delegate
-dup add-to-window-table
-ExposureMask over select-input% ;
 
 DEFER: draw-string%
 DEFER: draw-string-middle-center%
@@ -122,6 +112,21 @@ DEFER: map-subwindows%
 DEFER: reparent-window%
 DEFER: unmap-window%
 DEFER: add-input%
+DEFER: select-input%
+DEFER: set-window-background%
+DEFER: clear-window%
+
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+! <label>
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+TUPLE: label text ;
+
+: create-label ( text -- <label> )
+<label>
+create-window-object over set-delegate
+dup add-to-window-table
+ExposureMask over select-input% ;
 
 M: label handle-expose-event ( event <label> -- )
 nip
@@ -363,6 +368,7 @@ dup pwindow-expose-action call ;
 : valid-window?%		[ valid-window? ] with-window-object ;
 : window-position%		[ window-position ] with-window-object ;
 : window-size%			[ window-size ] with-window-object ;
+: window-rect%			[ window-rect ] with-window-object ;
 : window-map-state%		[ window-map-state ] with-window-object ;
 : window-parent%		[ window-parent ] with-window-object ;
 
@@ -388,6 +394,7 @@ dup pwindow-expose-action call ;
 : draw-string%			[ draw-string ] with-window-object ;
 : draw-string-middle-center%	[ draw-string-middle-center ]
 				with-window-object ;
+: draw-string-top-left%		[ draw-string-top-left ] with-window-object ;
 
 : get-transient-for-hint%	[ get-transient-for-hint ]
 				with-window-object ;
@@ -395,3 +402,6 @@ dup pwindow-expose-action call ;
 : fetch-name%			[ fetch-name ] with-window-object ;
 
 : clear-window%			[ clear-window ] with-window-object ;
+
+: init-widgets ( display-string -- )
+initialize-x [ concurrent-event-loop ] in-thread ;

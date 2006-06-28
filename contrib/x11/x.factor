@@ -1,4 +1,4 @@
-USING: namespaces kernel compiler math arrays strings alien sequences io
+USING: namespaces kernel words compiler math arrays strings alien sequences io
 prettyprint x11 rectangle ;
 
 IN: x 
@@ -57,7 +57,7 @@ SYMBOL: font
 
 ! 3.7 - Configuring Windows
 
-: move-window ( { x y } -- ) >r dpy get win get r> [ ] each XMoveWindow drop ;
+: move-window ( { x y } -- ) dpy get win get rot first2 XMoveWindow drop ;
 
 DEFER: window-position
 DEFER: window-width
@@ -145,6 +145,8 @@ change-window-attributes ;
 : window-x 0 window-position nth ;
 : window-y 1 window-position nth ;
 
+: window-rect ( -- <rect> ) window-position window-size <rect> ;
+
 : get-window-attributes ( -- <XWindowAttributes> )
   dpy get win get "XWindowAttributes" <c-object> dup >r XGetWindowAttributes drop r> ;
 
@@ -202,7 +204,7 @@ SYMBOL: event-masks
 } event-masks set-global
 
 : bit-test ( a b -- t-or-f ) bitand 0 = not ;
-  
+
 : name>event-mask ( str -- i )
 event-masks get [ first over = ] find 2nip second ;
 
@@ -253,9 +255,9 @@ terpri ;
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 : lookup-color ( name -- pixel )
-  >r dpy get colormap get r> "XColor" <c-object> dup >r "XColor" <c-object> XLookupColor drop
-  dpy get colormap get r> dup >r XAllocColor drop
-  r> XColor-pixel ;
+>r dpy get colormap get r> "XColor" <c-object> dup >r "XColor" <c-object>
+XLookupColor drop
+dpy get colormap get r> dup >r XAllocColor drop r> XColor-pixel ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 ! 7 - Graphics Context Functions
@@ -331,9 +333,69 @@ dpy get win get r> 0 0 XReparentWindow drop ;
 : ungrab-server ( -- ) dpy get XUngrabServer drop ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+! 10 - Events
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+: event-types ( -- seq )
+{ f
+  f
+  "KeyPress"
+  "KeyRelease"
+  "ButtonPress"
+  "ButtonRelease"
+  "MotionNotify"
+  "EnterNotify"
+  "LeaveNotify"
+  "FocusIn"
+  "FocusOut"
+  "KeymapNotify"
+  "Expose"
+  "GraphicsExpose"
+  "NoExpose"
+  "VisibilityNotify"
+  "CreateNotify"
+  "DestroyNotify"
+  "UnmapNotify"
+  "MapNotify"
+  "MapRequest"
+  "ReparentNotify"
+  "ConfigureNotify"
+  "ConfigureRequest"
+  "GravityNotify"
+  "ResizeRequest"
+  "CirculateNotify"
+  "CirculateRequest"
+  "PropertyNotify"
+  "SelectionClear"
+  "SelectionRequest"
+  "SelectionNotify"
+  "ColormapNotify"
+  "ClientMessage"
+  "MappingNotify"
+  "LASTEvent" } ;
+
+: event-type>name ( i -- str ) event-types nth ;
+
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+: XButtonEvent-position ( event -- { x y } )
+dup XButtonEvent-x swap XButtonEvent-y 2array ;
+
+: XButtonEvent-root-position ( event -- { x y } )
+dup XButtonEvent-x_root swap XButtonEvent-y_root 2array ;
+
+: XMotionEvent-position ( event -- { x y } )
+dup XMotionEvent-x swap XMotionEvent-y 2array ;
+
+: XMotionEvent-root-position ( event -- { x y } )
+dup XMotionEvent-x_root swap XMotionEvent-y_root 2array ;
+
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 ! 11 - Event Handling Functions
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
+: bitmask ( seq -- mask ) 0 [ execute bitor ] reduce ;
+  
 : select-input ( mask -- ) >r dpy get win get r> XSelectInput drop ;
 
 : add-input ( mask -- )
@@ -365,8 +427,7 @@ error-handler-quot set error-handler-callback XSetErrorHandler drop ;
 ! 12 - Input Device Functions
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-: set-input-focus ( revert-to time -- )
-  >r >r dpy get win get r> r> XSetInputFocus drop ;
+! 12.1 - Pointer Grabbing
 
 : grab-pointer ( mask -- )
 >r dpy get win get 0 r> GrabModeAsync GrabModeAsync None None CurrentTime
@@ -375,8 +436,18 @@ XGrabPointer drop ;
 : ungrab-pointer ( time -- )
   >r dpy get r> XUngrabPointer drop ;
 
+: change-active-pointer-grab ( mask -- )
+dpy get swap None CurrentTime XChangeActivePointerGrab drop ;
+
+! 12.2 -  Keyboard Grabbing
+
 : grab-key ( keycode modifiers owner-events pointer-mode keyboard-mode -- )
 >r >r >r >r >r dpy get r> r> win get r> r> r> XGrabKey drop ;
+
+! 12.5 - Controlling Input Focus
+
+: set-input-focus ( revert-to time -- )
+  >r >r dpy get win get r> r> XSetInputFocus drop ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 ! 14 - Inter-Client Communication Functions
