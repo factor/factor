@@ -1,5 +1,10 @@
 ! Copyright (C) 2006 Eduardo Cavazos.
 
+! Quick start:		USE: automata automata-gallery
+!
+! This will open a new window that will display a random automata rule
+! every 10 seconds. Resize the window to make the display larger.
+
 REQUIRES: slate ;
 
 USING: parser kernel hashtables namespaces sequences math io
