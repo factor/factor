@@ -1,9 +1,9 @@
 ! Copyright (C) 2006 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 IN: gadgets
-USING: arrays gadgets gadgets-labels gadgets-theme
-gadgets-viewports hashtables kernel math namespaces queues
-sequences threads ;
+USING: arrays gadgets gadgets-frames gadgets-labels
+gadgets-theme gadgets-viewports hashtables kernel math
+namespaces queues sequences threads ;
 
 ! Assoc mapping aliens to gadgets
 SYMBOL: windows
@@ -66,17 +66,11 @@ TUPLE: titled-gadget title ;
 
 M: titled-gadget gadget-title titled-gadget-title ;
 
-M: titled-gadget pref-dim* viewport-dim ;
-
-M: titled-gadget layout*
-    dup rect-dim swap gadget-child set-layout-dim ;
-
 M: titled-gadget focusable-child* gadget-child ;
 
 C: titled-gadget ( gadget title -- )
-    dup delegate>gadget
     [ set-titled-gadget-title ] keep
-    [ add-gadget ] keep ;
+    { { [ ] f @center } } make-frame* ;
 
 : update-title ( gadget -- )
     dup gadget-parent dup world?
@@ -88,15 +82,21 @@ C: titled-gadget ( gadget title -- )
 : open-titled-window ( gadget title -- )
     <titled-gadget> open-window ;
 
+: find-window ( quot -- world )
+    windows get [ second ] map
+    [ world-gadget swap call ] find-last-with nip ; inline
+
 : open-tool ( arg cons setter -- )
     >r call tuck r> call open-window ; inline
 
 : call-tool ( arg pred cons setter -- )
-    >r >r frontmost-window world-gadget swap call [
-        frontmost-window world-gadget r> drop r> call
+    rot find-window [
+        rot drop
+        dup raise-window
+        world-gadget swap call
     ] [
-        r> r> open-tool
-    ] if ; inline
+        open-tool
+    ] if* ; inline
 
 : start-world ( world -- )
     dup add-notify

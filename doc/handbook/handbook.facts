@@ -49,4 +49,4 @@ ARTICLE: "type-index" "Type index"
 { $outliner [ builtins get [ ] subset ] } ;
 
 ARTICLE: "class-index" "Class index"
-{ $outliner [ classes get [ ] subset ] } ;
+{ $outliner [ classes ] } ;

@@ -7,6 +7,8 @@ DEFER: draw-world ! defined in world.factor
 
 DEFER: open-window* ( world title -- )
 
+DEFER: raise-window ( world -- )
+
 DEFER: select-gl-context ( handle -- )
 
 DEFER: flush-gl-context ( handle -- )

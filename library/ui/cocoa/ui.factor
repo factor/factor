@@ -51,6 +51,9 @@ IN: gadgets
     dup start-world
     world-handle second f -> makeKeyAndOrderFront: ;
 
+: raise-window ( world -- )
+    world-handle second -> makeMainWindow ;
+
 : select-gl-context ( handle -- )
     first -> openGLContext -> makeCurrentContext ;
 

@@ -35,10 +35,8 @@ M: search-gadget pref-dim* drop { 400 500 } ;
 
 : apropos-window
     [ apropos ] <search-gadget>
-    "Apropos" <titled-gadget>
-    open-window ;
+    "Apropos" open-titled-window ;
 
 : search-help-window
     [ search-help. ] <search-gadget>
-    "Search help" <titled-gadget>
-    open-window ;
+    "Search help" open-titled-window ;
