@@ -33,7 +33,7 @@ M: array rect-dim drop { 0 0 } ;
     (rect-intersect) <extent-rect> ;
 
 : intersects? ( rect/point rect -- ? )
-    (rect-intersect) v- [ 0 <= ] all? ;
+    (rect-intersect) [v-] { 0 0 } = ;
 
 TUPLE: gadget
     pref-dim parent children orientation

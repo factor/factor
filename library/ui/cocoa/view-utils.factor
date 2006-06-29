@@ -94,10 +94,6 @@ opengl sequences ;
     r> add-observer ;
 
 "NSOpenGLView" "FactorView" {
-    { "drawRect:" "void" { "id" "SEL" "NSRect" }
-        [ 2drop window draw-world ]
-    }
-    
     { "acceptsFirstMouse:" "bool" { "id" "SEL" "id" }
         [ 3drop 1 ]
     }

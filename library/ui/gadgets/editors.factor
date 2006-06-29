@@ -103,7 +103,7 @@ M: editor pref-dim* ( editor -- dim )
     label-size { 1 0 } v+ ;
 
 M: editor layout* ( editor -- )
-    dup editor-caret over caret-dim swap set-gadget-dim
+    dup editor-caret over caret-dim swap set-layout-dim
     dup editor-caret swap caret-loc swap set-rect-loc ;
 
 M: editor label-text editor-text ;

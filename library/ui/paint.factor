@@ -70,7 +70,6 @@ DEFER: draw-gadget
 
 : draw-gadget ( gadget -- )
     {
-        { [ dup gadget-relayout? ] [ drop ] }
         { [ dup gadget-visible? not ] [ drop ] }
         { [ dup gadget-clipped? not ] [ (draw-gadget) ] }
         { [ t ] [ [ (draw-gadget) ] with-clipping ] }

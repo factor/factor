@@ -5,8 +5,6 @@ DEFER: set-title ( string handle -- )
 
 DEFER: draw-world ! defined in world.factor
 
-: redraw-world ( world -- ) draw-world ;
-
 DEFER: open-window* ( world title -- )
 
 DEFER: select-gl-context ( handle -- )

@@ -23,7 +23,7 @@ C: book ( pages -- book )
 M: book pref-dim* ( book -- dim ) book-page pref-dim ;
 
 M: book layout* ( book -- )
-    dup rect-dim swap book-page set-gadget-dim ;
+    dup rect-dim swap book-page set-layout-dim ;
 
 : make-book ( model obj quots -- assoc )
     [ make-pane <scroller> ] map-with <book-control> ;

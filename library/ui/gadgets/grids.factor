@@ -60,7 +60,7 @@ M: grid pref-dim* ( grid -- dim )
     pair-up [ set-rect-loc ] do-grid ;
 
 : resize-grid ( horiz vert -- )
-    pair-up [ set-gadget-dim ] do-grid ;
+    pair-up [ set-layout-dim ] do-grid ;
 
 : grid-layout ( horiz vert -- )
     2dup position-grid resize-grid ;

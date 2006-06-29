@@ -69,7 +69,7 @@ M: titled-gadget gadget-title titled-gadget-title ;
 M: titled-gadget pref-dim* viewport-dim ;
 
 M: titled-gadget layout*
-    dup rect-dim swap gadget-child set-gadget-dim ;
+    dup rect-dim swap gadget-child set-layout-dim ;
 
 M: titled-gadget focusable-child* gadget-child ;
 
@@ -83,7 +83,7 @@ C: titled-gadget ( gadget title -- )
     [ >r gadget-title r> set-title ] [ 2drop ] if ;
 
 : open-window ( gadget -- )
-    <world> dup prefer open-window* ;
+    <world> dup pref-dim over set-gadget-dim open-window* ;
 
 : open-titled-window ( gadget title -- )
     <titled-gadget> open-window ;

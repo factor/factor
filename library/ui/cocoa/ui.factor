@@ -43,9 +43,6 @@ namespaces objc sequences errors freetype ;
 
 IN: gadgets
 
-: redraw-world ( world -- )
-    world-handle first 1 -> setNeedsDisplay: ;
-
 : set-title ( string world -- )
     world-handle second swap <NSString> -> setTitle: ;
 

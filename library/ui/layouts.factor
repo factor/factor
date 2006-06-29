@@ -8,23 +8,24 @@ IN: gadgets
 
 : forget-pref-dim ( gadget -- ) f swap set-gadget-pref-dim ;
 
-: invalidate* ( gadget -- ) dup invalidate forget-pref-dim ;
-
 : invalid ( -- queue ) \ invalid get-global ;
 
 : add-invalid ( gadget -- ) invalid enque ;
+
+DEFER: relayout
+
+: invalidate* ( gadget -- )
+    dup invalidate
+    dup forget-pref-dim
+    dup gadget-root?
+    [ add-invalid ] [ gadget-parent [ relayout ] when* ] if ;
 
 : relayout ( gadget -- )
     #! Relayout and redraw a gadget and its parent before the
     #! next iteration of the event loop. Should be used when the
     #! gadget's size has potentially changed. See relayout-1.
-    dup gadget-relayout? [
-        drop
-    ] [
-        dup invalidate*
-        dup gadget-root?
-        [ add-invalid ] [ gadget-parent [ relayout ] when* ] if
-    ] if ;
+    dup gadget-relayout?
+    [ drop ] [ invalidate* ] if ;
 
 : relayout-1 ( gadget -- )
     #! Relayout and redraw a gadget before th next iteration of
@@ -41,12 +42,17 @@ IN: gadgets
 : toggle-visible ( gadget -- )
     dup gadget-visible? [ hide-gadget ] [ show-gadget ] if ;
 
+: (set-rect-dim) ( dim gadget quot -- )
+    >r 2dup rect-dim =
+    [ [ 2drop ] [ set-rect-dim ] if ] 2keep
+    [ drop ] r> if ; inline
+
+: set-layout-dim ( dim gadget -- )
+    #! Can only be used inside layout*.
+    [ invalidate ] (set-rect-dim) ;
+
 : set-gadget-dim ( dim gadget -- )
-    2dup rect-dim = [
-        2drop
-    ] [
-        [ set-rect-dim ] keep dup add-invalid invalidate
-    ] if ;
+    [ invalidate* ] (set-rect-dim) ;
 
 GENERIC: pref-dim* ( gadget -- dim )
 
@@ -61,7 +67,7 @@ GENERIC: layout* ( gadget -- )
 
 M: gadget layout* drop ;
 
-: prefer ( gadget -- ) dup pref-dim swap set-gadget-dim ;
+: prefer ( gadget -- ) dup pref-dim swap set-layout-dim ;
 
 DEFER: layout
 
@@ -101,7 +107,7 @@ TUPLE: pack align fill gap ;
 : packed-layout ( gadget sizes -- )
     over gadget-children
     >r dupd packed-dims r> 2dup
-    [ >r [ ceiling >fixnum ] map r> set-gadget-dim ] 2each
+    [ >r [ ceiling >fixnum ] map r> set-layout-dim ] 2each
     >r packed-locs r>
     [ >r [ >fixnum ] map r> set-rect-loc ] 2each ;
 

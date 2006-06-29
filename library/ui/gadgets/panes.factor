@@ -87,11 +87,6 @@ M: pane focusable-child* ( pane -- editor )
         { [ t ] [ drop ] }
     } cond ;
 
-M: pane stream-terpri ( pane -- )
-    dup pane-current prepare-print
-    over pane-output add-incremental
-    prepare-line ;
-
 : pane-write ( pane seq -- )
     [ over pane-current stream-write ]
     [ dup stream-terpri ] interleave drop ;
@@ -118,6 +113,12 @@ M: pane stream-readln ( pane -- line )
     [ over set-pane-continuation stop ] callcc1 nip ;
 
 : scroll-pane ( pane -- ) pane-active [ scroll>gadget ] when* ;
+
+M: pane stream-terpri ( pane -- )
+    dup pane-current prepare-print
+    over pane-output add-incremental
+    dup prepare-line
+    scroll-pane ;
 
 M: pane stream-write1 ( char pane -- )
     [ pane-current stream-write1 ] keep scroll-pane ;

@@ -7,8 +7,9 @@ sequences ;
 : gl-color ( { r g b a } -- ) first4 glColor4d ; inline
 
 : gl-error ( -- )
-    glGetError dup zero?
-    [ drop ] [ "GL error: " write gluErrorString print ] if ;
+    glGetError dup zero? [
+        "GL error: " write dup gluErrorString print flush
+    ] unless drop ;
 
 : do-state ( what quot -- )
     swap glBegin call glEnd ; inline

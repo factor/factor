@@ -108,7 +108,7 @@ C: elevator ( vector -- elevator )
 : layout-thumb-dim ( slider -- )
     dup dup thumb-dim (layout-thumb)
     >r >r dup rect-dim r> rot gadget-orientation set-axis r>
-    set-gadget-dim ;
+    set-layout-dim ;
 
 : layout-thumb ( slider -- )
     dup layout-thumb-loc layout-thumb-dim ;
