@@ -19,14 +19,12 @@ C: history ( -- gadget )
         ] each
     ] with-pane ;
 
-TUPLE: help-gadget showing history scroller ;
-
-: help-gadget-pane help-gadget-scroller scroller-gadget ;
+TUPLE: help-gadget showing history pane ;
 
 C: help-gadget ( -- gadget )
     {
-        { [ <history> ] set-help-gadget-history 1/4 }
-        { [ <pane> <scroller> ] set-help-gadget-scroller 3/4 }
+        { [ <history> ] set-help-gadget-history f 1/4 }
+        { [ <pane> ] set-help-gadget-pane [ <scroller> ] 3/4 }
     } { 1 0 } make-track* ;
 
 M: help-gadget gadget-title

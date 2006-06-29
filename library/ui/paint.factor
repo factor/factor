@@ -43,9 +43,9 @@ DEFER: draw-gadget
 : (draw-gadget) ( gadget -- )
     dup rect-loc [
         dup dup gadget-interior draw-interior
-        dup dup gadget-boundary draw-boundary
         dup draw-gadget*
-        visible-children [ draw-gadget ] each
+        dup visible-children [ draw-gadget ] each
+        dup gadget-boundary draw-boundary
     ] with-translation ;
 
 : change-clip ( gadget -- )
@@ -55,11 +55,8 @@ DEFER: draw-gadget
     >r [ first ] keep r>
     [ second ] 2apply + world get rect-dim second swap - ;
 
-: clip-w/h ( dim -- w h )
-    first2 1- ;
-
 : gl-set-clip ( loc dim -- )
-    dup clip-w/h >r >r clip-x/y r> r> glScissor ;
+    [ clip-x/y ] keep first2 glScissor ;
 
 : do-clip ( -- ) clip get rect-bounds gl-set-clip ;
 

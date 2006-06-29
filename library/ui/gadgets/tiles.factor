@@ -14,8 +14,8 @@ TUPLE: tile gadget ;
 
 : <closable-title> ( title quot -- gadget )
     {
-        { [ <close-button> ] f @right }
-        { [ <label> ] f @center }
+        { [ <close-button> ] f f @right  }
+        { [ <label> ]        f f @center }
     } make-frame ;
 
 : <title> ( title quot -- gadget | quot: tile -- )
@@ -23,8 +23,8 @@ TUPLE: tile gadget ;
 
 C: tile ( gadget title quot -- gadget )
     {
-        { [ <title> ] f @top }
-        { [ ] set-tile-gadget @center }
+        { [ <title> ] f f @top }
+        { f set-tile-gadget f @center }
     } make-frame* ;
 
 M: tile focusable-child* tile-gadget ;

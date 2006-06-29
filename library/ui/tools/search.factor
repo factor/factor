@@ -5,10 +5,7 @@ USING: gadgets gadgets-editors gadgets-frames gadgets-labels
 gadgets-panes gadgets-scrolling gadgets-theme generic help
 inspector kernel sequences words ;
 
-TUPLE: search-gadget scroller input quot ;
-
-: search-gadget-pane ( apropos -- pane )
-    search-gadget-scroller scroller-gadget ;
+TUPLE: search-gadget pane input quot ;
 
 : do-search ( apropos -- )
     dup search-gadget-input commit-editor-text dup empty? [
@@ -25,8 +22,8 @@ M: search-gadget gadget-gestures
 
 C: search-gadget ( quot -- )
     [ set-search-gadget-quot ] keep {
-        { [ <pane> <scroller> ] set-search-gadget-scroller @center }
-        { [ "" <editor> ] set-search-gadget-input @top }
+        { [ <pane> ] set-search-gadget-scroller [ <scroller> ] @center }
+        { [ "" <editor> ] set-search-gadget-input f @top }
     } make-frame* ;
 
 M: search-gadget focusable-child* search-gadget-input ;

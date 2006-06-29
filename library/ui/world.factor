@@ -24,7 +24,7 @@ DEFER: request-focus
 
 C: world ( gadget -- world )
     f <model> over set-world-status
-    { { [ ] set-world-gadget @center } } make-frame*
+    { { f set-world-gadget f @center } } make-frame*
     t over set-gadget-root?
     H{ } clone over set-world-fonts
     dup world-gadget request-focus

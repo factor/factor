@@ -68,13 +68,8 @@ M: grid pref-dim* ( grid -- dim )
 M: grid layout* ( frame -- dim )
     [ grid-layout ] with-grid ;
 
-: grid-add-spec ( { quot setter loc } -- )
-    first3 >r >r call
-    grid get 2dup r> dup [ execute ] [ 3drop ] if
-    r> execute grid-add ;
-
 : build-grid ( grid specs -- )
-    #! Specs is an array of triples { quot setter loc }.
+    #! Specs is an array of quadruples { quot post setter loc }.
     #! The setter has stack effect ( new gadget -- ),
     #! the loc is @center, @top, etc.
-    [ swap grid set [ grid-add-spec ] each ] with-scope ;
+    [ [ [ execute grid-add ] add-spec ] each ] with-gadget ;

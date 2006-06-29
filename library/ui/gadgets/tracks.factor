@@ -16,7 +16,8 @@ M: divider pref-dim* drop divider-size ;
 TUPLE: track sizes saved-sizes ;
 
 C: track ( orientation -- track )
-    [ delegate>pack ] keep 1 over set-pack-fill
+    [ delegate>pack ] keep
+    1 over set-pack-fill
     t over set-gadget-clipped? ;
 
 : divider-sizes ( seq -- dim )
@@ -131,20 +132,14 @@ C: divider ( -- divider )
 : track-remove ( gadget track -- )
     [ gadget-children index ] keep track-remove@ ;
 
-: track-add-spec ( { quot setter loc } -- )
-    first2
-    >r call track get 2dup track-add
-    r> dup [ execute ] [ 3drop ] if ;
-
 : build-track ( track specs -- )
-    #! Specs is an array of triples { quot setter loc }.
+    #! Specs is an array of quadruples { quot post setter loc }.
     #! The setter has stack effect ( new gadget -- ),
     #! the loc is a ratio from 0 to 1.
     [
-        swap track set
-        [ [ track-add-spec ] each ] keep
-        [ third ] map track get set-track-sizes
-    ] with-scope ;
+        [ [ [ drop track-add ] add-spec ] each ] keep
+        [ third ] map gadget get set-track-sizes
+    ] with-gadget ;
 
 : make-track ( specs orientation -- gadget )
     <track> [ swap build-track ] keep ;

@@ -8,8 +8,9 @@ gadgets-theme generic help inspector io kernel memory namespaces
 prettyprint sequences words ;
 
 : <launchpad> ( menu -- )
-    [ first2 [ drop ] append <bevel-button> ] map
-    make-pile 1 over set-pack-fill { 5 5 } over set-pack-gap
+    [ first2 [ drop ] append <bevel-button> ] map make-pile
+    1 over set-pack-fill
+    { 5 5 } over set-pack-gap
     <default-border> dup highlight-theme ;
 
 : pane-window ( quot title -- )

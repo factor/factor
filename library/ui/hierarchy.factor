@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 IN: gadgets
 USING: generic hashtables kernel math namespaces sequences
-vectors ;
+vectors words ;
 
 GENERIC: add-notify* ( gadget -- )
 
@@ -51,6 +51,11 @@ M: gadget remove-notify* drop ;
 : add-gadgets ( seq parent -- )
     #! Add all gadgets in a sequence to a parent gadget.
     swap [ over (add-gadget) ] each relayout ;
+
+: add-spec ( { quot setter post loc } quot -- )
+    >r first4 >r >r >r call dup r>
+    dup [ gadget get execute ] [ 2drop ] if
+    r> call gadget get r> r> call ; inline
 
 : (parents) ( gadget vector -- )
     over

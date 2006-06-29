@@ -127,9 +127,9 @@ DEFER: show-vocab
 
 C: browser-tracks ( browser -- browser-track )
     {
-        { [ <vocabs> ] f 1/5 }
-        { [ <vocab-track> ] set-browser-tracks-vocabs 1/5 }
-        { [ <word-track> ] set-browser-tracks-words 3/5 }
+        { [ <vocabs> ] f f 1/5 }
+        { [ <vocab-track> ] set-browser-tracks-vocabs f 1/5 }
+        { [ <word-track> ] set-browser-tracks-words f 3/5 }
     } { 1 0 } make-track* ;
 
 : <browser-tabs> ( browser -- tabs )
@@ -150,8 +150,8 @@ C: browser-tracks ( browser -- browser-track )
 C: browser ( -- browser )
     0 <model> over set-browser-page
     dup dup {
-        { [ <browser-toolbar> ] f @top }
-        { [ <browser-tracks> ] set-browser-track @center }
+        { [ <browser-toolbar> ] f f @top }
+        { [ <browser-tracks> ] set-browser-track f @center }
     } make-frame* ;
 
 M: browser gadget-title drop "Browser" ;

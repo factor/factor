@@ -27,7 +27,7 @@ sequences ;
 
 : bottom-left 0 1 glTexCoord2i second 0.0 swap glVertex2d ; inline
 
-: gl-vertex first2 glVertex2d ; inline
+: gl-vertex first2 glVertex2i ; inline
 
 : bottom-right 1 1 glTexCoord2i gl-vertex ; inline
 

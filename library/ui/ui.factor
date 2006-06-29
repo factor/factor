@@ -70,7 +70,7 @@ M: titled-gadget focusable-child* gadget-child ;
 
 C: titled-gadget ( gadget title -- )
     [ set-titled-gadget-title ] keep
-    { { [ ] f @center } } make-frame* ;
+    { { f f f @center } } make-frame* ;
 
 : update-title ( gadget -- )
     dup gadget-parent dup world?

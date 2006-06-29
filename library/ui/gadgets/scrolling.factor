@@ -35,9 +35,9 @@ M: scroller gadget-gestures
 C: scroller ( gadget -- scroller )
     #! Wrap a scrolling pane around the gadget.
     {
-        { [ <viewport> ] set-scroller-viewport @center }
-        { [ <x-slider> ] set-scroller-x @bottom }
-        { [ <y-slider> ] set-scroller-y @right }
+        { [ <viewport> ] set-scroller-viewport f @center }
+        { [ <x-slider> ] set-scroller-x        f @bottom }
+        { [ <y-slider> ] set-scroller-y        f @right  }
     } make-frame*
     t over set-gadget-root?
     dup faint-boundary ;
@@ -93,7 +93,3 @@ M: scroller layout* ( scroller -- )
 
 M: scroller focusable-child* ( scroller -- viewport )
     scroller-viewport ;
-
-: scroller-gadget ( scroller -- gadget )
-    #! Gadget being scrolled.
-    scroller-viewport gadget-child ;

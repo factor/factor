@@ -92,3 +92,6 @@ M: gadget children-on ( rect/point gadget -- list )
 GENERIC: gadget-help
 
 M: gadget gadget-help drop f ;
+
+: with-gadget ( gadget quot -- )
+    [ swap gadget set call ] with-scope ; inline
