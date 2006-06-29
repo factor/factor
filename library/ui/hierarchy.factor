@@ -4,22 +4,28 @@ IN: gadgets
 USING: generic hashtables kernel math namespaces sequences
 vectors words ;
 
-GENERIC: add-notify* ( gadget -- )
+GENERIC: graft* ( gadget -- )
 
-M: gadget add-notify* drop ;
+M: gadget graft* drop ;
 
-: add-notify ( gadget -- )
-    dup [ add-notify ] each-child add-notify* ;
+: graft ( gadget -- )
+    t over set-gadget-grafted?
+    dup graft*
+    dup [ graft ] each-child ;
 
-GENERIC: remove-notify* ( gadget -- )
+GENERIC: ungraft* ( gadget -- )
 
-M: gadget remove-notify* drop ;
+M: gadget ungraft* drop ;
 
-: remove-notify ( gadget -- )
-    dup [ remove-notify* ] each-child remove-notify* ;
+: ungraft ( gadget -- )
+    dup gadget-grafted? [
+        dup [ ungraft* ] each-child
+        dup ungraft*
+        f over set-gadget-grafted?
+    ] when drop ;
 
 : (unparent) ( gadget -- )
-    dup remove-notify
+    dup ungraft
     dup forget-pref-dim f swap set-gadget-parent ;
 
 : unparent ( gadget -- )
@@ -38,11 +44,14 @@ M: gadget remove-notify* drop ;
 : clear-gadget ( gadget -- )
     dup (clear-gadget) relayout ;
 
+: ((add-gadget)) ( gadget box -- )
+    [ gadget-children ?push ] keep set-gadget-children ;
+
 : (add-gadget) ( gadget box -- )
     over unparent
     dup pick set-gadget-parent
-    [ gadget-children ?push ] 2keep swapd set-gadget-children
-    add-notify ;
+    [ ((add-gadget)) ] 2keep
+    gadget-grafted? [ graft ] [ drop ] if ;
 
 : add-gadget ( gadget parent -- )
     #! Add a gadget to a parent gadget.

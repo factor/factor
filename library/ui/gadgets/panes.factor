@@ -112,7 +112,9 @@ M: pane stream-flush ( pane -- ) drop ;
 M: pane stream-readln ( pane -- line )
     [ over set-pane-continuation stop ] callcc1 nip ;
 
-: scroll-pane ( pane -- ) pane-active [ scroll>gadget ] when* ;
+: scroll-pane ( pane -- )
+    #! Only input panes scroll.
+    dup pane-input [ dup pane-active scroll>gadget ] when drop ;
 
 M: pane stream-terpri ( pane -- )
     dup pane-current prepare-print

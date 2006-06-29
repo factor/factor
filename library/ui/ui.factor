@@ -96,7 +96,7 @@ C: titled-gadget ( gadget title -- )
     ] if* ; inline
 
 : start-world ( world -- )
-    dup add-notify
+    dup graft
     dup gadget-title over set-title
     dup relayout
     world-gadget request-focus ;
@@ -112,12 +112,13 @@ C: titled-gadget ( gadget title -- )
     focused-ancestors f focus-gestures ;
 
 : unfocus-world ( world -- )
-    f over set-world-focused?
     #! Sent when native window loses focus.
+    f over set-world-focused?
     focused-ancestors f swap focus-gestures ;
 
 : reset-world ( world -- )
     dup unfocus-world
+    dup ungraft
     f over set-world-focus
     f over set-world-handle
     world-fonts clear-hash ;
@@ -126,7 +127,7 @@ C: titled-gadget ( gadget title -- )
     dup hand-clicked close-global
     dup hand-gadget close-global
     f over request-focus*
-    dup remove-notify
+    dup ungraft
     dup free-fonts
     reset-world ;
 

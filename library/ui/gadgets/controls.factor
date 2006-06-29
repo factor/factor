@@ -11,10 +11,10 @@ C: control ( model gadget quot -- gadget )
     [ set-control-model ] keep
     dup model-changed ;
 
-M: control add-notify*
+M: control graft*
     dup control-model add-connection ;
 
-M: control remove-notify*
+M: control ungraft*
     dup control-model remove-connection ;
 
 M: control model-changed ( gadget -- )
