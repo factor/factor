@@ -52,7 +52,7 @@ IN: gadgets
     world-handle second f -> makeKeyAndOrderFront: ;
 
 : raise-window ( world -- )
-    world-handle second -> makeMainWindow ;
+    world-handle second dup f -> orderFront: -> makeKeyWindow ;
 
 : select-gl-context ( handle -- )
     first -> openGLContext -> makeCurrentContext ;
