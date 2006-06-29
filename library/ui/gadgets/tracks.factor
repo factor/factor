@@ -136,9 +136,9 @@ C: divider ( -- divider )
     #! Specs is an array of quadruples { quot post setter loc }.
     #! The setter has stack effect ( new gadget -- ),
     #! the loc is a ratio from 0 to 1.
-    [
+    swap [
         [ [ [ drop track-add ] add-spec ] each ] keep
-        [ third ] map gadget get set-track-sizes
+        [ peek ] map gadget get set-track-sizes
     ] with-gadget ;
 
 : make-track ( specs orientation -- gadget )

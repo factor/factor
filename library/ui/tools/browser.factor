@@ -137,9 +137,6 @@ C: browser-tracks ( browser -- browser-track )
     browser-tabs dup length [ swap first 2array ] 2map
     <radio-box> ;
 
-: make-toolbar ( quot -- gadget )
-    { } make make-shelf dup highlight-theme ; inline
-
 : <browser-toolbar> ( browser -- toolbar )
     [
         <browser-tabs> ,

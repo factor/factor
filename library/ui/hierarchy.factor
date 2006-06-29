@@ -53,9 +53,14 @@ M: gadget remove-notify* drop ;
     swap [ over (add-gadget) ] each relayout ;
 
 : add-spec ( { quot setter post loc } quot -- )
-    >r first4 >r >r >r call dup r>
-    dup [ gadget get execute ] [ 2drop ] if
-    r> call gadget get r> r> call ; inline
+    [
+        over first %
+        over second [ [ dup gadget get ] % , ] when*
+        over third %
+        [ gadget get ] %
+        swap fourth ,
+        %
+    ] [ ] make call ;
 
 : (parents) ( gadget vector -- )
     over

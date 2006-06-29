@@ -128,9 +128,9 @@ M: elevator layout* ( elevator -- )
 
 : build-x-slider ( slider -- slider )
     {
-        { [ <left-button> ] f @left }
-        { [ { 0 1 } <elevator> ] set-slider-elevator @center }
-        { [ <right-button> ] f @right }
+        { [ <left-button> ] f f @left }
+        { [ { 0 1 } <elevator> ] set-slider-elevator f @center }
+        { [ <right-button> ] f f @right }
     } build-grid ;
 
 : <up-button> { 1 0 } arrow-up -1 <slide-button> ;
@@ -138,9 +138,9 @@ M: elevator layout* ( elevator -- )
 
 : build-y-slider ( slider -- slider )
     {
-        { [ <up-button> ] f @top }
-        { [ { 1 0 } <elevator> ] set-slider-elevator @center }
-        { [ <down-button> ] f @bottom }
+        { [ <up-button> ] f f @top }
+        { [ { 1 0 } <elevator> ] set-slider-elevator f @center }
+        { [ <down-button> ] f f @bottom }
     } build-grid ;
 
 : add-thumb ( slider vector -- )

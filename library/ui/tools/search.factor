@@ -22,7 +22,7 @@ M: search-gadget gadget-gestures
 
 C: search-gadget ( quot -- )
     [ set-search-gadget-quot ] keep {
-        { [ <pane> ] set-search-gadget-scroller [ <scroller> ] @center }
+        { [ <pane> ] set-search-gadget-pane [ <scroller> ] @center }
         { [ "" <editor> ] set-search-gadget-input f @top }
     } make-frame* ;
 

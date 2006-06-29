@@ -22,9 +22,6 @@ SYMBOL: windows
     windows get-global [ second eq? ] find-with drop
     windows get-global [ length 1- ] keep exchange ;
 
-: frontmost-window ( -- world )
-    windows get dup empty? [ drop f ] [ peek second ] if ;
-
 : update-hand ( gadget -- )
     find-world [
         dup hand-gadget get-global find-world eq?
@@ -141,3 +138,6 @@ C: titled-gadget ( gadget title -- )
 
 : restore-windows? ( -- ? )
     windows get [ empty? not ] [ f ] if* ;
+
+: make-toolbar ( quot -- gadget )
+    { } make make-shelf dup highlight-theme ; inline
