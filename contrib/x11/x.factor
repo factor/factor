@@ -222,8 +222,6 @@ event-mask-names [ name>event-mask bit-test ] subset-with ;
 
 : print-field ( name value -- ) swap "=" append write pprint ;
 
-: spc ( -- ) " " write ;
-
 : print-window-geometry ( -- )
 window-width pprint "x" write window-height pprint "+" write
 window-x pprint "+" write window-y pprint ;
@@ -237,12 +235,12 @@ window-map-state
 } cond ;
 
 : print-window-info ( -- )
-"id" win get print-field spc
-"parent" window-parent print-field spc
-"root" window-root print-field spc
+"id" win get print-field bl
+"parent" window-parent print-field bl
+"root" window-root print-field bl
 print-window-geometry terpri
 "children" window-children print-field terpri
-"override-redirect" window-override-redirect print-field spc
+"override-redirect" window-override-redirect print-field bl
 print-map-state terpri
 "event-mask" window-event-mask event-mask>names print-field terpri
 "all-event-masks" window-all-event-masks event-mask>names print-field
@@ -491,6 +489,7 @@ nip ;
 : map-window+			[ map-window ] with-win ;
 : unmap-window+			[ unmap-window ] with-win ;
 : window-parent+		[ window-parent ] with-win ;
+: fetch-name+			[ fetch-name ] with-win ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
