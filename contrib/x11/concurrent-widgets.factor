@@ -356,6 +356,7 @@ dup pwindow-expose-action call ;
 
 : set-window-width%		[ set-window-width ] with-window-object ;
 : set-window-height%		[ set-window-height ] with-window-object ;
+: set-window-gravity%		[ set-window-gravity ] with-window-object ;
 
 : select-input% 		[ select-input ] with-window-object ;
 : add-input%			[ add-input ] with-window-object ;

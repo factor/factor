@@ -24,4 +24,6 @@ dup define-var-symbol dup define-var-getter define-var-setter ;
 : VARS: ( vars ... -- )
 string-mode on [ string-mode off define-vars ] f ; parsing
 
+: let ( vars body -- result ) [ >r reverse [ set ] each r> call ] with-scope ;
+
 PROVIDE: vars ;

@@ -97,7 +97,8 @@ cond ;
   event> XButtonEvent-root-position >push
   event> XButtonEvent-root-position >position
   draw-frame-outline
-  drag-move-frame-loop ]
+  drag-move-frame-loop
+  frame> raise-window% ]
 with-scope ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
@@ -368,52 +369,35 @@ wm-frame-mask over select-input% ;
 dup clear-window%
 { 5 1 } swap dup wm-frame-child fetch-name% swap draw-string-top-left% ;
 
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+VARS: child frame button ;
+
 : manage-window ( window -- )
-  flush-dpy
-  grab-server
-  flush-dpy
-
-  create-wm-child				! child
-  create-wm-frame				! frame
-
-  dup "cornflowerblue" lookup-color swap set-window-background%
-
-  dup wm-frame-child add-to-save-set%		! frame
-
-  dup wm-frame-child window-position%		! frame position
-  over						! frame position frame
-  move-window%
-  
-  dup wm-frame-child 0 swap set-window-border-width%
-  dup dup wm-frame-child			! frame frame child
-  reparent-window%
-
-  dup wm-frame-child window-size%		! frame child-size
-  { 10 20 } v+					! frame child-size+
-  over						! frame child-size+ frame
-  resize-window%				! frame
-
-  dup wm-frame-child { 5 15 } swap move-window%
-
-  dup map-window%
-  dup map-subwindows%				! frame
-
-  dup update-title				! frame
-
-  "" over [ delete-frame ] curry create-button	! frame button
-  >r dup window-id r>
-  [ reparent-window { 9 9 } resize-window
-    dup window-width% 9 - 5 - 3 2array move-window
-    NorthEastGravity set-window-gravity
-    black-pixel get set-window-background map-window ]
-  with-window-object				! frame
-
-  dup wm-frame-child PropertyChangeMask swap select-input%
-
-  flush-dpy
-  0 sync-dpy
-  ungrab-server
-  flush-dpy ;
+flush-dpy grab-server flush-dpy
+create-wm-child dup create-wm-frame
+[ child frame ]
+[ "cornflowerblue" lookup-color frame> set-window-background%
+  child> add-to-save-set%
+  child> window-position% frame> move-window%
+  0 child> set-window-border-width%
+  frame> child> reparent-window%
+  child> window-size% { 10 20 } v+ frame> resize-window%
+  { 5 15 } child> move-window%
+  "" frame> [ delete-frame ] curry create-button
+  [ button ]
+  [ frame> button> reparent-window%
+    { 9 9 } button> resize-window%
+    frame> window-width% 9 - 5 - 3 2array button> move-window%
+    NorthEastGravity button> set-window-gravity%
+    black-pixel get button> set-window-background% ]
+  let
+  PropertyChangeMask child> select-input%
+  frame> map-subwindows%
+  frame> map-window%
+  frame> update-title
+  flush-dpy 0 sync-dpy ungrab-server flush-dpy ]
+let ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
@@ -534,13 +518,12 @@ nip dup clear-window% update-title ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-: layout-frame ( frame -- )
-  dup wm-frame-child { 5 15 } swap move-window%
-  dup wm-frame-child				! frame child
-  over window-size%				! frame child size
-  { 10 20 } v-					! frame child child-size
-  swap resize-window%				! frame
-  drop ;
+: frame-position-child ( frame -- ) wm-frame-child { 5 15 } swap move-window% ;
+
+: frame-fit-child ( frame -- )
+dup window-size% { 10 20 } v- swap wm-frame-child resize-window% ;
+
+: layout-frame ( frame -- ) dup frame-position-child frame-fit-child ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
@@ -613,7 +596,8 @@ SYMBOL: window-list
 
 : setup-window-list ( -- )
   create-menu window-list set-global
-  "black" lookup-color window-list get set-window-background% ;
+  "black" lookup-color window-list get set-window-background%
+  300 window-list get set-menu-item-width ;
 
 : not-transient? ( frame -- ? ) wm-frame-child get-transient-for-hint% not ;
 
