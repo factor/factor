@@ -25,7 +25,7 @@ M: model-tester model-changed t swap set-model-tester-hit? ;
 
 [ { 3 4 } ] [ "model-c" get model-value  ] unit-test
 
-T{ model-tester f f } dup "tester" set
+T{ model-tester f f } "tester" set
 
 [ T{ model-tester f t } { 6 4 } ]
 [
