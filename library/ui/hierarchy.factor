@@ -11,7 +11,7 @@ M: gadget graft* drop ;
 : graft ( gadget -- )
     t over set-gadget-grafted?
     dup graft*
-    dup [ graft ] each-child ;
+    [ graft ] each-child ;
 
 GENERIC: ungraft* ( gadget -- )
 

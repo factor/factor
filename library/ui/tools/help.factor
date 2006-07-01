@@ -2,53 +2,40 @@
 ! See http://factorcode.org/license.txt for BSD license.
 IN: gadgets-help
 USING: gadgets gadgets-buttons gadgets-frames gadgets-panes
-gadgets-presentations gadgets-scrolling gadgets-search
-gadgets-tiles gadgets-tracks help io kernel models namespaces
-sequences words ;
+gadgets-presentations gadgets-scrolling help kernel models
+namespaces sequences ;
 
-TUPLE: help-gadget showing history pane ;
+TUPLE: help-gadget history ;
 
 : find-help-gadget [ help-gadget? ] find-parent ;
 
-: go-back ( help -- )
-    dup help-gadget-history dup empty? [
-        2drop
-    ] [
-        pop swap help-gadget-showing set-model
-    ] if ;
-
-: add-history ( help -- )
-    dup help-gadget-showing model-value dup [
-        swap help-gadget-history push
-    ] [
-        2drop
-    ] if ;
-
 : show-help ( link help -- )
-    dup add-history
-    [ help-gadget-showing set-model ] keep
+    dup help-gadget-history add-history
+    [ help-gadget-history set-model ] keep
     dup update-title ;
 
 : go-home ( help -- ) "handbook" swap show-help ;
 
+: history-action find-help-gadget help-gadget-history ;
+
 : <help-toolbar> ( -- gadget )
     [
-        "Back" [ find-help-gadget go-back ] <bevel-button> ,
-        "Home" [ find-help-gadget go-home ] <bevel-button> ,
+        "Back" [ history-action go-back ] <bevel-button> ,
+        "Forward" [ history-action go-forward ] <bevel-button> ,
+        "Home" [ history-action go-home ] <bevel-button> ,
     ] make-toolbar ;
 
 : <help-pane> ( -- gadget )
-    gadget get help-gadget-showing [ help ] <pane-control> ;
+    gadget get help-gadget-history [ help ] <pane-control> ;
 
 C: help-gadget ( -- gadget )
-    V{ } over set-help-gadget-history
-    f <model> over set-help-gadget-showing {
+    <history> over set-help-gadget-history {
         { [ <help-toolbar> ] f f @top }
         { [ <help-pane> <scroller> ] f f @center }
     } make-frame* ;
 
 M: help-gadget gadget-title
-    "Help - " swap help-gadget-showing model-value
+    "Help - " swap help-gadget-history model-value
     article-title append ;
 
 : help-tool

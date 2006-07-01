@@ -28,7 +28,7 @@ DEFER: remove-connection
 : deactivate-model ( model -- )
     dup model-dependencies [ remove-connection ] each-with ;
 
-GENERIC: model-changed ( model -- )
+GENERIC: model-changed ( observer -- )
 
 : add-connection ( obj model -- )
     dup model-connections empty? [ dup activate-model ] when
@@ -76,3 +76,28 @@ C: compose ( models -- compose )
 M: compose model-changed ( compose -- )
     dup model-dependencies [ model-value ] map
     swap set-model ;
+
+TUPLE: history back forward ;
+
+C: history ( -- history )
+    dup delegate>model
+    V{ } clone over set-history-back
+    V{ } clone over set-history-forward ;
+
+: (add-history) ( history vector -- )
+    swap model-value dup [ swap push ] [ 2drop ] if ;
+
+: go-back/forward ( history to from -- )
+    dup empty?
+    [ 3drop ]
+    [ >r dupd (add-history) r> pop swap set-model ] if ;
+
+: go-back ( history -- )
+    dup history-forward over history-back go-back/forward ;
+
+: go-forward ( history -- )
+    dup history-back over history-forward go-back/forward ;
+
+: add-history ( history -- )
+    0 over history-forward set-length
+    dup history-back (add-history) ;
