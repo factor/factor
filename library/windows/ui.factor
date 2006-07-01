@@ -196,7 +196,7 @@ SYMBOL: hWnd
 
                 { [ t ] [ drop DefWindowProc ] }
             } cond
-        ] catch [ error. 0 ] when*
+        ] [ error. 0 ] recover
      ] alien-callback ;
 
 : event-loop ( -- )

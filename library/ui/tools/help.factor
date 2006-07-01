@@ -22,7 +22,7 @@ TUPLE: help-gadget history ;
     [
         "Back" [ history-action go-back ] <bevel-button> ,
         "Forward" [ history-action go-forward ] <bevel-button> ,
-        "Home" [ history-action go-home ] <bevel-button> ,
+        "Home" [ find-help-gadget go-home ] <bevel-button> ,
     ] make-toolbar ;
 
 : <help-pane> ( -- gadget )

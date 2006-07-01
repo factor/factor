@@ -10,10 +10,10 @@ sequences vectors words ;
 "/library/bootstrap/primitives.factor" run-resource
 
 : parse-resource* ( path -- )
-    [ parse-resource ] catch [
+    [ parse-resource ] [
         { { "Parse file again" t } } condition drop
         parse-resource*
-    ] when* ;
+    ] recover ;
 
 : if-arch ( arch seq -- )
     architecture get rot member?

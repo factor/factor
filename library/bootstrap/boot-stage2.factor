@@ -84,6 +84,6 @@ parser sequences sequences-internals words ;
     "Now, you can run ./f factor.image" print flush
     
     "factor.image" resource-path save-image
-] catch [ print-error listener ] when*
+] [ print-error listener ] recover
 
 0 exit
