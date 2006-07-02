@@ -76,7 +76,7 @@ DEFER: with-win
   2 / set-window-center-x ;
 
 : resize-window ( { width height } -- )
-  >r dpy get win get r> [ ] each XResizeWindow drop ;
+dpy get win get rot first2 XResizeWindow drop ;
 
 : set-window-width ( width -- )
   window-height 2array resize-window ;
@@ -281,10 +281,10 @@ dpy get gcontext get rot XSetSubwindowMode drop ;
 : clear-window ( -- ) dpy get win get XClearWindow drop ;
 
 : draw-point ( { x y } -- )
-  >r dpy get win get gcontext get r> [ ] each XDrawPoint drop ;
+>r dpy get win get gcontext get r> first2 XDrawPoint drop ;
 
 : draw-line ( { x1 y1 } { x2 y2 } -- )
-  >r >r dpy get win get gcontext get r> [ ] each r> [ ] each XDrawLine drop ;
+>r >r dpy get win get gcontext get r> first2 r> first2 XDrawLine drop ;
 
 : 2nth ( i seq -- item-i item-i+1 ) 2dup nth -rot swap 1 + swap nth ;
 
@@ -315,7 +315,7 @@ dup length 1 - [ swap 2nth draw-line ] each-with ;
 ! 8.6 - Drawing Text
 
 : draw-string ( { x y } string -- ) >r >r
-dpy get win get gcontext get r> [ ] each r> dup length XDrawString drop ;
+dpy get win get gcontext get r> first2 r> dup length XDrawString drop ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 ! 9 - Window and Session Manager Functions
