@@ -28,10 +28,7 @@ parser sequences strings ;
     #! Handle a command-line argument. If the argument was
     #! consumed, returns f. Otherwise returns the argument.
     #! Parameters that start with + are runtime parameters.
-    dup empty? [
-        "-" ?head [ cli-param f ] when
-        dup [ "+" ?head [ drop f ] when ] when
-    ] unless ;
+    "-" ?head [ cli-param f ] when ;
 
 : cli-args ( -- args ) 10 getenv ;
 
@@ -48,5 +45,11 @@ parser sequences strings ;
     unix? macosx? not and "x11" set
     default-shell "shell" set ;
 
+: ignore-cli-args? ( -- ? )
+    #! On Mac OS X, files to run are given to us via a Cocoa API
+    #! so we ignore any command line switches which name files.
+    macosx? "shell" get "ui" = and ;
+
 : parse-command-line ( -- )
-    cli-args [ cli-arg ] subset [ try-run-file ] each  ;
+    cli-args [ cli-arg ] subset
+    ignore-cli-args? [ drop ] [ [ try-run-file ] each ] if ;

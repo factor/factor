@@ -70,7 +70,11 @@ M: listener-gadget gadget-title drop "Listener" ;
     [ call-listener ] ;
 
 : listener-run-files ( seq -- )
-    [ [ run-file ] each ] curry listener-tool call-tool ;
+    dup empty? [
+        drop
+    ] [
+        [ [ run-file ] each ] curry listener-tool call-tool
+    ] if ;
 
 M: input show ( input -- )
     input-string listener-tool call-tool ;

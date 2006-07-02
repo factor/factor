@@ -7,14 +7,14 @@ namespaces sequences ;
 
 TUPLE: help-gadget history ;
 
-: find-help-gadget [ help-gadget? ] find-parent ;
-
 : show-help ( link help -- )
     dup help-gadget-history add-history
     [ help-gadget-history set-model ] keep
     dup update-title ;
 
 : go-home ( help -- ) "handbook" swap show-help ;
+
+: find-help-gadget [ help-gadget? ] find-parent ;
 
 : history-action find-help-gadget help-gadget-history ;
 

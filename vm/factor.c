@@ -42,13 +42,13 @@ void usage(void)
 {
 	printf("Usage: factor <image file> [ parameters ... ]\n");
 	printf("Runtime options -- n is a number:\n");
-	printf(" +Dn   Data stack size, kilobytes\n");
-	printf(" +Rn   Retain stack size, kilobytes\n");
-	printf(" +Cn   Call stack size, kilobytes\n");
-	printf(" +Gn   Number of generations, must be >= 2\n");
-	printf(" +Yn   Size of n-1 youngest generations, megabytes\n");
-	printf(" +An   Size of tenured and semi-spaces, megabytes\n");
-	printf(" +Xn   Code heap size, megabytes\n");
+	printf(" -D=n   Data stack size, kilobytes\n");
+	printf(" -R=n   Retain stack size, kilobytes\n");
+	printf(" -C=n   Call stack size, kilobytes\n");
+	printf(" -G=n   Number of generations, must be >= 2\n");
+	printf(" -Y=n   Size of n-1 youngest generations, megabytes\n");
+	printf(" -A=n   Size of tenured and semi-spaces, megabytes\n");
+	printf(" -X=n   Code heap size, megabytes\n");
 	printf("Other options are handled by the Factor library.\n");
 	printf("See the documentation for details.\n");
 	printf("Send bug reports to Slava Pestov <slava@factorcode.org>.\n");
@@ -74,13 +74,13 @@ int main(int argc, char** argv)
 
 	for(i = 1; i < argc; i++)
 	{
-		if(factor_arg(argv[i],"+D%d",&ds_size)) continue;
-		if(factor_arg(argv[i],"+R%d",&rs_size)) continue;
-		if(factor_arg(argv[i],"+C%d",&cs_size)) continue;
-		if(factor_arg(argv[i],"+G%d",&generations)) continue;
-		if(factor_arg(argv[i],"+Y%d",&young_size)) continue;
-		if(factor_arg(argv[i],"+A%d",&aging_size)) continue;
-		if(factor_arg(argv[i],"+X%d",&code_size)) continue;
+		if(factor_arg(argv[i],"-D=%d",&ds_size)) continue;
+		if(factor_arg(argv[i],"-R=%d",&rs_size)) continue;
+		if(factor_arg(argv[i],"-C=%d",&cs_size)) continue;
+		if(factor_arg(argv[i],"-G=%d",&generations)) continue;
+		if(factor_arg(argv[i],"-Y=%d",&young_size)) continue;
+		if(factor_arg(argv[i],"-A=%d",&aging_size)) continue;
+		if(factor_arg(argv[i],"-X=%d",&code_size)) continue;
 
 		if(strncmp(argv[i],"+",1) == 0)
 		{

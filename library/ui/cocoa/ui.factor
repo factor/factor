@@ -4,11 +4,13 @@ IN: objc-classes
 DEFER: FactorApplicationDelegate
 
 IN: cocoa
-USING: arrays gadgets gadgets-listener hashtables kernel
+USING: arrays gadgets gadgets-listener hashtables kernel memory
 namespaces objc sequences errors freetype ;
 
 : finder-run-files ( alien -- )
-    CF>string-array listener-run-files
+    #! We filter out the image name since that might be there on
+    #! first launch.
+    CF>string-array [ image = not ] subset listener-run-files
     NSApp NSApplicationDelegateReplySuccess
     -> replyToOpenOrPrint: ;
 
