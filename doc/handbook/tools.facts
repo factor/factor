@@ -183,4 +183,6 @@ $terpri
 { $subsection save-image }
 "A new image can also be built from sources; this is known as " { $emphasis "bootstrap" } ". Bootstrap is a two-step process. The first stage is the creation of a bootstrap image inside a running Factor instance:"
 { $subsection make-image }
-"The second stage is initiated by running the resulting bootstrap image. This stage loads any additional platform-specific code, compiles all words, and dumps a new, final image." ;
+"The second stage is initiated by running the resulting bootstrap image. This stage loads any additional platform-specific code, compiles all words, and dumps a new, final image."
+$terpri
+"The bootstrap image supports a number of command line arguments; see " { $link "bootstrap-cli-args" } "." ;

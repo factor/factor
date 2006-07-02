@@ -1,5 +1,5 @@
-USING: generic hashtables help inspector namespaces parser
-prettyprint sequences words ;
+USING: generic hashtables help inspector modules namespaces
+parser prettyprint sequences words ;
 
 ARTICLE: "handbook" "Factor documentation"
 { $subsection "changes" }
@@ -7,6 +7,8 @@ ARTICLE: "handbook" "Factor documentation"
 { $list
     { "Load source files using " { $link run-file } ":"
     { $code "\"contrib/httpd/load.factor\" run-file" } }
+    { "Load modules from " { $snippet "contrib/" } " using " { $link require } ":" }
+    { $code "\"httpd\" require" }
     { { $link .s } " prints the contents of the stack." }
     { { $link . } " prints the object at the top of the stack." }
 }
@@ -31,6 +33,7 @@ ARTICLE: "handbook" "Factor documentation"
 { $subsection "prettyprint" }
 { $subsection "alien" }
 { $heading "Environment reference" }
+{ $subsection "cli" }
 { $subsection "tools" }
 { $subsection "help" }
 { $heading "Index" }

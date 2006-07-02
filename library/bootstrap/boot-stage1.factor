@@ -295,6 +295,7 @@ sequences vectors words ;
 
         "/doc/handbook/alien.facts"
         "/doc/handbook/changes.facts"
+        "/doc/handbook/cli.facts"
         "/doc/handbook/collections.facts"
         "/doc/handbook/conventions.facts"
         "/doc/handbook/cookbook.facts"
