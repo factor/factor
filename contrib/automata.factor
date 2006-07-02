@@ -5,7 +5,7 @@
 ! This will open a new window that will display a random automata rule
 ! every 10 seconds. Resize the window to make the display larger.
 
-REQUIRES: slate ;
+REQUIRES: math slate ;
 
 USING: parser kernel hashtables namespaces sequences math io
 math-contrib threads strings arrays prettyprint gadgets slate ;
@@ -21,14 +21,14 @@ SYMBOL: rule
 : init-rule ( -- ) 8 <hashtable> rule set ;
 
 : rule-keys ( -- { ... } )
-{ { 0 0 0 }
-  { 0 0 1 }
-  { 0 1 0 }
-  { 0 1 1 }
-  { 1 0 0 }
-  { 1 0 1 }
+{ { 1 1 1 }
   { 1 1 0 }
-  { 1 1 1 } } ;
+  { 1 0 1 }
+  { 1 0 0 }
+  { 0 1 1 }
+  { 0 1 0 }
+  { 0 0 1 }
+  { 0 0 0 } } ;
 
 : rule-values ( n -- { ... } ) >bin 8 CHAR: 0 pad-left >array [ 48 - ] map ;
 
