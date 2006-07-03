@@ -71,15 +71,25 @@ catch_exception_raise_state_identity (mach_port_t exception_port,
                                       thread_state_t out_state,
                                       mach_msg_type_number_t *out_state_count);
 
-#define SIGSEGV_EXC_STATE_TYPE                      ppc_exception_state_t
-#define SIGSEGV_EXC_STATE_FLAVOR                    PPC_EXCEPTION_STATE
-#define SIGSEGV_EXC_STATE_COUNT                     PPC_EXCEPTION_STATE_COUNT
-#define SIGSEGV_THREAD_STATE_TYPE                   ppc_thread_state_t
-#define SIGSEGV_THREAD_STATE_FLAVOR                 PPC_THREAD_STATE
-#define SIGSEGV_THREAD_STATE_COUNT                  PPC_THREAD_STATE_COUNT
-#define SIGSEGV_FAULT_ADDRESS(thr_state,exc_state)  (exc_state).dar
-#define SIGSEGV_STACK_POINTER(thr_state)            (thr_state).r1
-#define SIGSEGV_PROGRAM_COUNTER(thr_state)          (thr_state).srr0
+#ifdef __i386__
+	#define SIGSEGV_EXC_STATE_TYPE i386_exception_state_t
+	#define SIGSEGV_EXC_STATE_FLAVOR i386_EXCEPTION_STATE
+	#define SIGSEGV_EXC_STATE_COUNT i386_EXCEPTION_STATE_COUNT
+	#define SIGSEGV_THREAD_STATE_TYPE i386_thread_state_t
+	#define SIGSEGV_THREAD_STATE_FLAVOR i386_THREAD_STATE
+	#define SIGSEGV_THREAD_STATE_COUNT i386_THREAD_STATE_COUNT
+	#define SIGSEGV_STACK_POINTER(thr_state) (thr_state).esp
+	#define SIGSEGV_PROGRAM_COUNTER(thr_state) (thr_state).eip
+#else
+	#define SIGSEGV_EXC_STATE_TYPE ppc_exception_state_t
+	#define SIGSEGV_EXC_STATE_FLAVOR ppc_EXCEPTION_STATE
+	#define SIGSEGV_EXC_STATE_COUNT ppc_EXCEPTION_STATE_COUNT
+	#define SIGSEGV_THREAD_STATE_TYPE ppc_thread_state_t
+	#define SIGSEGV_THREAD_STATE_FLAVOR PPC_THREAD_STATE
+	#define SIGSEGV_THREAD_STATE_COUNT PPC_THREAD_STATE_COUNT
+	#define SIGSEGV_STACK_POINTER(thr_state) (thr_state).r1
+	#define SIGSEGV_PROGRAM_COUNTER(thr_state) (thr_state).srr0
+#endif
 
 int mach_initialize ();
 

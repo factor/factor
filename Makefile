@@ -100,7 +100,7 @@ bsd:
 macosx:
 	$(MAKE) $(BINARY) \
 		CFLAGS="$(DEFAULT_CFLAGS)" \
-		LIBS="$(DEFAULT_LIBS) -framework Cocoa -framework OpenGL -lfreetype" \
+		LIBS="$(DEFAULT_LIBS) -framework Cocoa -framework OpenGL -L/usr/X11R6/lib/ -lfreetype" \
 		MACOSX=y
 
 macosx.app:

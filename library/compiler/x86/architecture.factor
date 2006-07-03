@@ -8,14 +8,14 @@ IN: compiler
 ! EAX, ECX, EDX integer vregs
 ! XMM0 - XMM7 float vregs
 ! ESI datastack
-! EBX callstack
+! EDI callstack
 
 ! AMD64 redefines a lot of words in this file
 
 : ds-reg ESI ; inline
-: cs-reg EBX ; inline
+: cs-reg EDI ; inline
 : remainder-reg EDX ; inline
-: alloc-tmp-reg EDI ; inline
+: alloc-tmp-reg EBX ; inline
 
 : reg-stack ( n reg -- op ) swap cells neg [+] ;
 

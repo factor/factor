@@ -36,7 +36,7 @@ CELL cs;
 
 #if defined(FACTOR_X86)
 	register CELL ds asm("esi");
-	register CELL rs asm("ebx");
+	register CELL rs asm("edi");
 	CELL cards_offset;
 #elif defined(FACTOR_PPC)
 	register CELL ds asm("r14");

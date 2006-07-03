@@ -48,7 +48,6 @@ catch_exception_raise (mach_port_t exception_port,
 #endif
   SIGSEGV_THREAD_STATE_TYPE thread_state;
   mach_msg_type_number_t state_count;
-  unsigned long addr;
   unsigned long sp;
 
   /* See http://web.mit.edu/darwin/src/modules/xnu/osfmk/man/thread_get_state.html.  */
@@ -74,15 +73,10 @@ catch_exception_raise (mach_port_t exception_port,
       return KERN_FAILURE;
     }
 
-  addr = (unsigned long) (SIGSEGV_FAULT_ADDRESS (thread_state, exc_state));
   sp = (unsigned long) (SIGSEGV_STACK_POINTER (thread_state));
 
-  /* Got the thread's state. Now extract the address that caused the
-     fault and invoke the user's handler.  */
   save_thread_state = thread_state;
 
-  /* If the fault address is near the stack pointer, it's a stack overflow.
-     Otherwise, treat it like a normal SIGSEGV.  */
   SIGSEGV_PROGRAM_COUNTER (thread_state) = (unsigned long) terminating_handler;
 
   /* See http://web.mit.edu/darwin/src/modules/xnu/osfmk/man/thread_set_state.html.  */
