@@ -317,7 +317,6 @@ sequences vectors words ;
     { "x86" "pentium4" } {
         "/library/compiler/x86/assembler.factor"
         "/library/compiler/x86/architecture.factor"
-        "/library/compiler/x86/alien.factor"
         "/library/compiler/x86/intrinsics.factor"
     } if-arch
     
