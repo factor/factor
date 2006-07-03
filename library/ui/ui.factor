@@ -142,3 +142,7 @@ C: titled-gadget ( gadget title -- )
 
 : make-toolbar ( quot -- gadget )
     { } make make-shelf dup highlight-theme ; inline
+
+IN: shells
+
+DEFER: ui
