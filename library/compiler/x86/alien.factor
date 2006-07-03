@@ -4,28 +4,7 @@ IN: compiler
 USING: alien arrays assembler inference kernel
 kernel-internals math memory namespaces words ;
 
-GENERIC: push-return-reg ( reg-class -- )
-GENERIC: pop-return-reg ( reg-class -- )
-GENERIC: load-return-reg ( stack@ reg-class -- )
-
 : drop-return-reg ESP swap reg-size ADD ;
-
-M: int-regs push-return-reg drop EAX PUSH ;
-M: int-regs pop-return-reg drop EAX POP ;
-M: int-regs load-return-reg drop EAX ESP rot [+] MOV ;
-
-: FSTP 4 = [ FSTPS ] [ FSTPL ] if ;
-
-M: float-regs push-return-reg
-    ESP swap reg-size [ SUB  ESP [] ] keep FSTP ;
-
-: FLD 4 = [ FLDS ] [ FLDL ] if ;
-
-M: float-regs pop-return-reg
-    ESP [] over reg-size FLD drop-return-reg ;
-
-M: float-regs load-return-reg
-    reg-size >r ESP swap [+] r> FLD ;
 
 : %unbox ( n reg-class func -- )
     f %alien-invoke push-return-reg drop ;
@@ -41,16 +20,16 @@ M: float-regs load-return-reg
     EAX POP
     ECX POP ;
 
-: %unbox-struct ( n reg-class size -- )
-    2nip
+: %unbox-struct ( n size -- )
+    nip
     ! Increase stack size
     ESP over SUB
     ! Save destination address in EAX
     EAX ESP MOV
     "unbox_value_struct" struct-ptr/size ;
 
-: %box-struct ( n reg-class size -- )
-    2nip
+: %box-struct ( n size -- )
+    nip
     ! Compute source address in EAX
     EAX ESP MOV
     EAX 4 ADD

@@ -4,26 +4,13 @@ IN: compiler
 USING: alien arrays assembler kernel kernel-internals math
 sequences ;
 
-: stack@ RSP swap [+] ;
-
-M: int-regs %freg>stack drop >r stack@ r> MOV ;
-
-M: int-regs %stack>freg drop swap stack@ MOV ;
-
-: MOVSS/D float-regs-size 4 = [ MOVSS ] [ MOVSD ] if ;
-
-M: float-regs %freg>stack >r >r stack@ r> r> MOVSS/D ;
-
-M: float-regs %stack>freg >r swap stack@ r> MOVSS/D ;
-
 M: stack-params %stack>freg
     drop >r R11 swap stack@ MOV r> stack@ R11 MOV ;
 
 M: stack-params %freg>stack
     >r stack-increment + cell + swap r> %stack>freg ;
 
-: struct-ptr/size ( n reg-class size func -- )
-    rot drop
+: struct-ptr/size ( n size func -- )
     ! Load destination address
     >r RDI RSP MOV
     RDI rot ADD
@@ -32,7 +19,7 @@ M: stack-params %freg>stack
     ! Copy the struct to the stack
     r> f compile-c-call ;
 
-: %unbox-struct ( n reg-class size -- )
+: %unbox-struct ( n size -- )
     "unbox_value_struct" struct-ptr/size ;
 
 : %unbox ( n reg-class func -- )
@@ -41,7 +28,7 @@ M: stack-params %freg>stack
     ! Store the return value on the C stack
     [ return-reg ] keep %freg>stack ;
 
-: %box-struct ( n reg-class size -- )
+: %box-struct ( n size -- )
     "box_value_struct" struct-ptr/size ;
 
 : load-return-value ( reg-class -- )

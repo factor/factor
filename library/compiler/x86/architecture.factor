@@ -16,6 +16,8 @@ IN: compiler
 : cs-reg EDI ; inline
 : remainder-reg EDX ; inline
 : alloc-tmp-reg EBX ; inline
+: stack-reg ESP ; inline
+: stack@ stack-reg swap [+] ;
 
 : reg-stack ( n reg -- op ) swap cells neg [+] ;
 
@@ -30,13 +32,39 @@ M: cs-loc v>operand cs-loc-n cs-reg reg-stack ;
     [ [ PUSH ] each %alien-invoke ] keep
     [ drop EDX POP ] each ;
 
+GENERIC: push-return-reg ( reg-class -- )
+GENERIC: pop-return-reg ( reg-class -- )
+GENERIC: load-return-reg ( stack@ reg-class -- )
+
 ! On x86, parameters are never passed in registers.
 M: int-regs return-reg drop EAX ;
 M: int-regs fastcall-regs drop { } ;
 M: int-regs vregs drop { EAX ECX EDX } ;
+M: int-regs %freg>stack drop >r stack@ r> MOV ;
+M: int-regs %stack>freg drop swap stack@ MOV ;
+M: int-regs push-return-reg return-reg PUSH ;
+M: int-regs pop-return-reg return-reg POP ;
+M: int-regs load-return-reg return-reg stack-reg rot [+] MOV ;
+
+: MOVSS/D float-regs-size 4 = [ MOVSS ] [ MOVSD ] if ;
 
 M: float-regs fastcall-regs drop { } ;
 M: float-regs vregs drop { XMM0 XMM1 XMM2 XMM3 XMM4 XMM5 XMM6 XMM7 } ;
+M: float-regs %freg>stack >r >r stack@ r> r> MOVSS/D ;
+M: float-regs %stack>freg >r swap stack@ r> MOVSS/D ;
+
+: FSTP 4 = [ FSTPS ] [ FSTPL ] if ;
+
+M: float-regs push-return-reg
+    stack-reg swap reg-size [ SUB  stack-reg [] ] keep FSTP ;
+
+: FLD 4 = [ FLDS ] [ FLDL ] if ;
+
+M: float-regs pop-return-reg
+    stack-reg [] over reg-size FLD drop-return-reg ;
+
+M: float-regs load-return-reg
+    reg-size >r stack-reg swap [+] r> FLD ;
 
 : address-operand ( address -- operand )
     #! On x86, we can always use an address as an operand

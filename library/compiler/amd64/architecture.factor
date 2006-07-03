@@ -15,6 +15,7 @@ math namespaces sequences ;
 : cs-reg R15 ; inline
 : remainder-reg RDX ; inline
 : alloc-tmp-reg RBX ; inline
+: stack-reg RSP ; inline
 
 M: int-regs return-reg drop RAX ;
 M: int-regs vregs drop { RAX RCX RDX RSI RDI R8 R9 R10 R11 } ;
@@ -44,11 +45,11 @@ M: float-regs fastcall-regs vregs ;
 : prepare-division CQO ; inline
 
 : load-indirect ( vreg literal -- )
+    #! We use RIP-relative addressing. The '3' is a hardcoded
+    #! instruction length.
     swap add-literal from 3 - [] MOV ;
 
 M: object load-literal ( literal vreg -- )
-    #! We use RIP-relative addressing. The '3' is a hardcoded
-    #! instruction length.
     v>operand load-indirect ;
 
 : stack-increment \ stack-reserve get 16 align 8 + ;

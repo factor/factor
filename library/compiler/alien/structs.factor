@@ -45,8 +45,8 @@ sequences strings words ;
         "width" set
         bootstrap-cell "align" set
         [ swap <displaced-alien> ] "getter" set
-        "width" get [ %unbox-struct ] curry "unboxer" set
-        "width" get [ %box-struct ] curry "boxer" set
+        "width" get [ nip %unbox-struct ] curry "unboxer" set
+        "width" get [ nip %box-struct ] curry "boxer" set
         "struct" on
     ] "struct-name" get define-c-type
     "struct-name" get in get init-c-type ;

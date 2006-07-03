@@ -174,18 +174,17 @@ M: stack-params %freg>stack
     ] if
     f %alien-invoke ;
 
-: struct-ptr/size ( n reg-class size func -- )
-    rot drop
+: struct-ptr/size ( n size func -- )
     ! Load destination address
     >r >r 3 1 rot stack@ ADDI r>
     ! Load struct size
     4 LI
     r> f %alien-invoke ;
 
-: %unbox-struct ( n reg-class size -- )
+: %unbox-struct ( n size -- )
     "unbox_value_struct" struct-ptr/size ;
 
-: %box-struct ( n reg-class size -- )
+: %box-struct ( n size -- )
     "box_value_struct" struct-ptr/size ;
 
 : %alien-invoke ( symbol dll -- )
