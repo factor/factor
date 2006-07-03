@@ -4,8 +4,6 @@ IN: compiler
 USING: alien arrays assembler inference kernel
 kernel-internals math memory namespaces words ;
 
-: drop-return-reg ESP swap reg-size ADD ;
-
 : %unbox ( n reg-class func -- )
     f %alien-invoke push-return-reg drop ;
 

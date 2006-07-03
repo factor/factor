@@ -60,6 +60,8 @@ M: float-regs push-return-reg
 
 : FLD 4 = [ FLDS ] [ FLDL ] if ;
 
+: drop-return-reg stack-reg swap reg-size ADD ;
+
 M: float-regs pop-return-reg
     stack-reg [] over reg-size FLD drop-return-reg ;
 
