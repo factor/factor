@@ -26,7 +26,7 @@ ARTICLE: "runtime-cli-args" "Runtime command line switches"
     { { $snippet "-R=" { $emphasis "n" } } "Retain stack size, kilobytes" }
     { { $snippet "-C=" { $emphasis "n" } } "Call stack size, kilobytes" }
     { { $snippet "-G=" { $emphasis "n" } } "Number of generations, must be >= 2" }
-    { { $snippet "-Y=" { $emphasis "n" } } "Size of n-1 youngest generations, megabytes" }
+    { { $snippet "-Y=" { $emphasis "n" } } "Size of " { $snippet { $emphasis "n" } "-1" } " youngest generations, megabytes" }
     { { $snippet "-A=" { $emphasis "n" } } "Size of tenured and semi-spaces, megabytes" }
     { { $snippet "-X=" { $emphasis "n" } } "Code heap size, megabytes" }
 } ;
