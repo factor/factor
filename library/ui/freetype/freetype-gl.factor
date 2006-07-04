@@ -117,9 +117,6 @@ C: font ( handle -- font )
     load-glyph dup
     FT_RENDER_MODE_NORMAL FT_Render_Glyph freetype-error ;
 
-: with-locked-block ( size quot -- | quot: address -- )
-    swap 1 calloc [ alien-address swap call ] keep free ; inline
-
 : copy-pixel ( bit tex -- bit tex )
     255 f pick set-alien-unsigned-1 1+
     f pick alien-unsigned-1
@@ -145,8 +142,8 @@ C: font ( handle -- font )
     #! Given a glyph bitmap, copy it to a texture with the given
     #! width/height (which must be powers of two).
     tuck sprite-size2 * 2 * [
-        [ copy-bitmap ] keep <alien> gray-texture
-    ] with-locked-block ;
+        alien-address [ copy-bitmap ] keep <alien> gray-texture
+    ] with-malloc ;
 
 : glyph-texture-loc ( glyph font -- loc )
     over glyph-hori-bearing-x ft-floor -rot
