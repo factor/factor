@@ -14,7 +14,7 @@ parser sequences sequences-internals words ;
         macosx?
         "/library/compiler/x86/alien-macosx.factor"
         "/library/compiler/x86/alien.factor"
-        ?
+        ? run-resource
     ] when
 
     "compile" get [
