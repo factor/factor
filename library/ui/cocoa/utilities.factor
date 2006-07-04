@@ -1,6 +1,8 @@
+! Copyright (C) 2006 Slava Pestov.
+! See http://factorcode.org/license.txt for BSD license.
 IN: objc
 USING: alien arrays compiler errors generic hashtables inference
-kernel math namespaces parser sequences strings words ;
+kernel libc math namespaces parser sequences strings words ;
 
 : make-alien-invoke [ ] make \ alien-invoke add ; inline
 
@@ -46,9 +48,6 @@ H{ } clone super-msg-senders set-global
     ] keep
     [ set-objc-super-receiver ] keep ;
 
-: make-stret-quot ( method -- quot )
-    first [ <c-object> dup ] curry 1 make-dip ;
-
 TUPLE: selector name object ;
 
 C: selector ( name -- sel ) [ set-selector-name ] keep ;
@@ -74,19 +73,32 @@ H{ } clone objc-methods set-global
     dup objc-methods get hash
     [ ] [ "No such method: " swap append throw ] ?if ;
 
-: (make-prepare-send) ( selector method -- quot )
-    [
-        [ \ <super> , ] when
-        dup first c-struct? [ make-stret-quot % ] [ drop ] if
-        cache-selector , \ selector ,
-    ] [ ] make ;
+: make-stret-quot ( method -- quot )
+    first [ <c-object> dup ] curry 1 make-dip ;
+
+: stret-prolog ( type -- )
+    dup c-struct?
+    [ [ >r ] % , [ <malloc-object> dup r> ] % ] [ drop ] if ;
 
 : make-prepare-send ( selector method super? -- quot )
-    over second length 2 - >r (make-prepare-send) r> make-dip ;
+    over second length 2 - >r [
+        [ \ <super> , ] when
+        first stret-prolog
+        cache-selector , \ selector ,
+    ] [ ] make r> make-dip ;
+
+: block>byte-array ( block type -- byte-array )
+    dup <c-object> -rot c-size >r 2dup r> memcpy free ;
+
+: stret-epilog ( type -- )
+    dup c-struct? [ , \ block>byte-array , ] [ drop ] if ;
 
 : make-objc-send ( selector super? -- quot )
-    >r dup lookup-method r> 2dup cache-stub >r
-    make-prepare-send r> add ;
+    [
+        over lookup-method [
+            swap [ make-prepare-send % ] 2keep cache-stub ,
+        ] keep first stret-epilog
+    ] [ ] make ;
 
 : infer-send ( super? -- )
     pop-literal rot make-objc-send infer-quot-value ;
