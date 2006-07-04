@@ -82,8 +82,8 @@ catch_exception_raise_state_identity (mach_port_t exception_port,
 	#define SIGSEGV_PROGRAM_COUNTER(thr_state) (thr_state).eip
 #else
 	#define SIGSEGV_EXC_STATE_TYPE ppc_exception_state_t
-	#define SIGSEGV_EXC_STATE_FLAVOR ppc_EXCEPTION_STATE
-	#define SIGSEGV_EXC_STATE_COUNT ppc_EXCEPTION_STATE_COUNT
+	#define SIGSEGV_EXC_STATE_FLAVOR PPC_EXCEPTION_STATE
+	#define SIGSEGV_EXC_STATE_COUNT PPC_EXCEPTION_STATE_COUNT
 	#define SIGSEGV_THREAD_STATE_TYPE ppc_thread_state_t
 	#define SIGSEGV_THREAD_STATE_FLAVOR PPC_THREAD_STATE
 	#define SIGSEGV_THREAD_STATE_COUNT PPC_THREAD_STATE_COUNT
