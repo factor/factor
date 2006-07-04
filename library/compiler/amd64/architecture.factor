@@ -49,13 +49,10 @@ M: float-regs fastcall-regs vregs ;
     #! instruction length.
     swap add-literal from 3 - [] MOV ;
 
-M: object load-literal ( literal vreg -- )
-    v>operand load-indirect ;
-
 : stack-increment \ stack-reserve get 16 align 8 + ;
 
 : %prologue ( n -- )
-    \ stack-reserve set RSP stack-increment SUB ;
+    \ stack-reserve set stack-reg stack-increment SUB ;
 
 : %epilogue ( -- )
-    RSP stack-increment ADD ;
+    stack-reg stack-increment ADD ;

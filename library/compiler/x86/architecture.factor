@@ -35,6 +35,7 @@ M: cs-loc v>operand cs-loc-n cs-reg reg-stack ;
 GENERIC: push-return-reg ( reg-class -- )
 GENERIC: pop-return-reg ( reg-class -- )
 GENERIC: load-return-reg ( stack@ reg-class -- )
+GENERIC: store-return-reg ( stack@ reg-class -- )
 
 ! On x86, parameters are never passed in registers.
 M: int-regs return-reg drop EAX ;
@@ -44,7 +45,9 @@ M: int-regs %freg>stack drop >r stack@ r> MOV ;
 M: int-regs %stack>freg drop swap stack@ MOV ;
 M: int-regs push-return-reg return-reg PUSH ;
 M: int-regs pop-return-reg return-reg POP ;
-M: int-regs load-return-reg return-reg stack-reg rot [+] MOV ;
+: load/store-int-return return-reg stack-reg rot [+] ;
+M: int-regs load-return-reg load/store-int-return MOV ;
+M: int-regs store-return-reg load/store-int-return swap MOV ;
 
 : MOVSS/D float-regs-size 4 = [ MOVSS ] [ MOVSD ] if ;
 
@@ -65,8 +68,9 @@ M: float-regs push-return-reg
 M: float-regs pop-return-reg
     stack-reg [] over reg-size FLD drop-return-reg ;
 
-M: float-regs load-return-reg
-    reg-size >r stack-reg swap [+] r> FLD ;
+: load/store-float-return reg-size >r stack-reg swap [+] r> ;
+M: float-regs load-return-reg load/store-float-return FLD ;
+M: float-regs store-return-reg load/store-float-return FSTP ;
 
 : address-operand ( address -- operand )
     #! On x86, we can always use an address as an operand
@@ -80,9 +84,11 @@ M: float-regs load-return-reg
 M: immediate load-literal ( literal vreg -- )
     v>operand swap v>operand MOV ;
 
+: load-indirect ( literal reg -- )
+    swap add-literal [] MOV rel-absolute-cell rel-address ;
+
 M: object load-literal ( literal vreg -- )
-    v>operand swap add-literal [] MOV
-    rel-absolute-cell rel-address ;
+    v>operand load-indirect ;
 
 : (%call) ( label -- label )
     dup postpone-word dup primitive? [ address-operand ] when ;
