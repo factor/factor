@@ -13,5 +13,4 @@ FUNCTION: void memcpy ( void* dst, void* src, ulong size ) ;
 : check-ptr [ "Out of memory" throw ] unless* ;
 
 : with-malloc ( size quot -- | quot: alien -- )
-    swap 1 calloc dup check-ptr
-    [ swap call ] keep free ; inline
+    swap 1 calloc check-ptr [ swap call ] keep free ; inline
