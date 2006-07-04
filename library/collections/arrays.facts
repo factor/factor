@@ -39,4 +39,4 @@ HELP: byte-array f
 
 HELP: <byte-array> "( n -- byte-array )"
 { $values { "n" "a non-negative integer" } { "byte-array" "a new byte array" } }
-{ $description "Creates a new byte array holding " { $snippet "n" } " cells." } ;
+{ $description "Creates a new byte array holding " { $snippet "n" } " bytes." } ;
