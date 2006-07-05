@@ -6,7 +6,7 @@ ARTICLE: "handbook" "Factor documentation"
 { $heading "Survival guide" }
 { $list
     { "Load source files using " { $link run-file } ":"
-    { $code "\"contrib/httpd/load.factor\" run-file" } }
+    { $code "\"examples/lcd.factor\" run-file" } }
     { "Load modules from " { $snippet "contrib/" } " using " { $link require } ":" }
     { $code "\"httpd\" require" }
     { { $link .s } " prints the contents of the stack." }
