@@ -8,7 +8,6 @@
 
 - multiple listener-run-files is broken
 - roundoff is still not quite right with tracks
-- world title a model? gadget-title returns one
 - httpd search tools
 - get embedded factor templates in httpd working better
 - docs: slice: if sequence or seq start is changed, abstraction violation
@@ -29,10 +28,10 @@ tathi: hrm.  wish I knew more about OpenGL.
 
 + ui:
 
+- xref f and \ f together
 - grid slows down with 2000 lines
 - f should be clickable
 - clickable vocabs
-- x11 raise-window
 - remaining HTML issues need fixing
 - better component padding and spacing in UI
 - see if its possible to only repaint dirty regions

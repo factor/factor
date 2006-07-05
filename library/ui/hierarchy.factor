@@ -19,7 +19,7 @@ M: gadget ungraft* drop ;
 
 : ungraft ( gadget -- )
     dup gadget-grafted? [
-        dup [ ungraft* ] each-child
+        dup [ ungraft ] each-child
         dup ungraft*
         f over set-gadget-grafted?
     ] when drop ;

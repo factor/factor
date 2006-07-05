@@ -1,7 +1,7 @@
 USING: io kernel parser sequences ;
 
-"/library/unix/types.factor" run-resource
-"/library/unix/syscalls-" os ".factor" append3 run-resource
+"/library/io/unix/types.factor" run-resource
+"/library/io/unix/syscalls-" os ".factor" append3 run-resource
 
 [
     "/library/io/unix/syscalls.factor"
