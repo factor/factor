@@ -70,7 +70,10 @@ C: titled-gadget ( gadget title -- )
     { { f f f @center } } make-frame* ;
 
 : open-window ( gadget -- )
-    <world> dup pref-dim over set-gadget-dim open-window* ;
+    <world>
+    dup pref-dim over set-gadget-dim
+    dup world-gadget gadget-title over set-world-title
+    open-window* ;
 
 : open-titled-window ( gadget title -- )
     <model> <titled-gadget> open-window ;
@@ -121,8 +124,6 @@ C: titled-gadget ( gadget title -- )
 : close-world ( world -- )
     dup hand-clicked close-global
     dup hand-gadget close-global
-    f over request-focus*
-    dup ungraft
     dup free-fonts
     reset-world ;
 

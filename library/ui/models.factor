@@ -1,16 +1,17 @@
 ! Copyright (C) 2006 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 IN: models
-USING: generic kernel sequences ;
+USING: generic kernel math sequences ;
 
-TUPLE: model connections value dependencies ;
+TUPLE: model connections value dependencies ref ;
 
 M: model = eq? ;
 
 C: model ( value -- model )
     [ set-model-value ] keep
     V{ } clone over set-model-connections
-    V{ } clone over set-model-dependencies ;
+    V{ } clone over set-model-dependencies
+    0 over set-model-ref ;
 
 : add-dependency ( model model -- )
     model-dependencies push ;
@@ -20,13 +21,29 @@ C: model ( value -- model )
 
 DEFER: add-connection
 
+: ref-model ( model -- n )
+    dup model-ref 1+ dup rot set-model-ref ;
+
+: unref-model ( model -- n )
+    dup model-ref 1- dup rot set-model-ref ;
+
 : activate-model ( model -- )
-    dup model-dependencies [ add-connection ] each-with ;
+    dup ref-model 1 = [
+        dup model-dependencies
+        [ dup activate-model add-connection ] each-with
+    ] [
+        drop
+    ] if ;
 
 DEFER: remove-connection
 
 : deactivate-model ( model -- )
-    dup model-dependencies [ remove-connection ] each-with ;
+    dup unref-model zero? [
+        dup model-dependencies
+        [ dup deactivate-model remove-connection ] each-with
+    ] [
+        drop
+    ] if ;
 
 GENERIC: model-changed ( observer -- )
 

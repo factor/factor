@@ -1,5 +1,6 @@
 IN: temporary
-USING: arrays kernel models namespaces sequences test ;
+USING: arrays generic kernel math models namespaces sequences
+test ;
 
 TUPLE: model-tester hit? ;
 
@@ -67,3 +68,15 @@ T{ model-tester f f } "tester" set
 
 [ f ] [ "history" get history-back empty? ] unit-test
 [ t ] [ "history" get history-forward empty? ] unit-test
+
+! Test multiple filters
+3 <model> "x" set
+"x" get [ 2 * ] <filter> dup "z" set
+[ 1+ ] <filter> "y" set
+[ ] [ "y" get activate-model ] unit-test
+[ t ] [ "z" get "x" get model-connections memq? ] unit-test
+[ 7 ] [ "y" get model-value ] unit-test
+[ ] [ 4 "x" get set-model ] unit-test
+[ 9 ] [ "y" get model-value ] unit-test
+[ ] [ "y" get deactivate-model ] unit-test
+[ f ] [ "z" get "x" get model-connections memq? ] unit-test
