@@ -9,8 +9,7 @@ TUPLE: help-gadget history ;
 
 : show-help ( link help -- )
     dup help-gadget-history add-history
-    [ help-gadget-history set-model ] keep
-    dup update-title ;
+    help-gadget-history set-model ;
 
 : go-home ( help -- ) "handbook" swap show-help ;
 
@@ -35,8 +34,8 @@ C: help-gadget ( -- gadget )
     } make-frame* ;
 
 M: help-gadget gadget-title
-    "Help - " swap help-gadget-history model-value
-    article-title append ;
+    help-gadget-history
+    [ "Help - " swap article-title append ] <filter> ;
 
 : help-tool
     [ help-gadget? ]

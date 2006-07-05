@@ -151,7 +151,7 @@ C: browser ( -- browser )
         { [ <browser-tracks> ] set-browser-track f @center }
     } make-frame* ;
 
-M: browser gadget-title drop "Browser" ;
+M: browser gadget-title drop "Browser" <model> ;
 
 : browser-window ( -- ) <browser> open-window ;
 

@@ -14,7 +14,7 @@ kernel math models namespaces opengl sequences ;
 !   we don't store this in the world's rect-loc, since the
 !   co-ordinate system might be different, and generally the
 !   UI code assumes that everything starts at { 0 0 }.
-TUPLE: world gadget status focus focused? fonts handle loc ;
+TUPLE: world gadget title status focus focused? fonts handle loc ;
 
 : free-fonts ( world -- )
     dup world-handle select-gl-context
@@ -23,6 +23,7 @@ TUPLE: world gadget status focus focused? fonts handle loc ;
 DEFER: request-focus
 
 C: world ( gadget -- world )
+    f <model> over set-world-title
     f <model> over set-world-status
     { { f set-world-gadget f @center } } make-frame*
     t over set-gadget-root?
@@ -34,6 +35,25 @@ C: world ( gadget -- world )
 
 M: world pref-dim* ( world -- dim )
     delegate pref-dim* { 1024 768 } vmin ;
+
+: activate-world-model ( world model -- )
+    [ add-connection ] keep activate-model ;
+
+M: world graft* ( world -- )
+    dup dup world-title activate-world-model
+    dup dup world-status activate-world-model
+    model-changed ;
+
+: deactivate-world-model ( world model -- )
+    [ remove-connection ] keep deactivate-model ;
+
+M: world ungraft* ( world -- )
+    dup
+    dup world-title deactivate-world-model
+    dup world-status deactivate-world-model ;
+
+M: world model-changed ( world -- )
+    dup world-title model-value swap set-title ;
 
 : focused-ancestors ( world -- seq )
     world-focus parents <reversed> ;

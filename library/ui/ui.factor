@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 IN: gadgets
 USING: arrays gadgets gadgets-frames gadgets-labels
-gadgets-theme gadgets-viewports hashtables kernel math
+gadgets-theme gadgets-viewports hashtables kernel math models
 namespaces queues sequences threads ;
 
 ! Assoc mapping aliens to gadgets
@@ -55,7 +55,7 @@ SYMBOL: windows
 
 GENERIC: gadget-title ( gadget -- string )
 
-M: gadget gadget-title drop "Factor" ;
+M: gadget gadget-title drop "Factor" <model> ;
 
 M: world gadget-title world-gadget gadget-title ;
 
@@ -69,15 +69,11 @@ C: titled-gadget ( gadget title -- )
     [ set-titled-gadget-title ] keep
     { { f f f @center } } make-frame* ;
 
-: update-title ( gadget -- )
-    dup gadget-parent dup world?
-    [ >r gadget-title r> set-title ] [ 2drop ] if ;
-
 : open-window ( gadget -- )
     <world> dup pref-dim over set-gadget-dim open-window* ;
 
 : open-titled-window ( gadget title -- )
-    <titled-gadget> open-window ;
+    <model> <titled-gadget> open-window ;
 
 : find-window ( quot -- world )
     windows get [ second ] map
@@ -97,7 +93,6 @@ C: titled-gadget ( gadget title -- )
 
 : start-world ( world -- )
     dup graft
-    dup gadget-title over set-title
     dup relayout
     world-gadget request-focus ;
 

@@ -4,7 +4,7 @@ IN: gadgets-listener
 USING: arrays gadgets gadgets-editors gadgets-frames
 gadgets-labels gadgets-panes gadgets-presentations
 gadgets-scrolling gadgets-theme generic hashtables inspector io
-jedit kernel listener math namespaces parser prettyprint
+jedit kernel listener math models namespaces parser prettyprint
 sequences styles threads words ;
 
 TUPLE: listener-gadget pane stack ;
@@ -56,7 +56,7 @@ M: listener-gadget pref-dim*
 M: listener-gadget focusable-child* ( listener -- gadget )
     listener-gadget-pane ;
 
-M: listener-gadget gadget-title drop "Listener" ;
+M: listener-gadget gadget-title drop "Listener" <model> ;
 
 : listener-window ( -- ) <listener-gadget> open-window ;
 

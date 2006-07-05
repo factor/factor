@@ -1,3 +1,24 @@
++ tomorrow:
+
+- help gadget: opens 'f' initially
+- amd64 crash
+- get factor running on mac intel
+
++ day after:
+
+- multiple listener-run-files is broken
+- roundoff is still not quite right with tracks
+- world title a model? gadget-title returns one
+- httpd search tools
+- get embedded factor templates in httpd working better
+- docs: slice: if sequence or seq start is changed, abstraction violation
+tathi: hrm.  wish I knew more about OpenGL.
+[2:45pm] tathi: Factor's text display is a bit odd sometimes, until you mouse over (or click, if there's no "live" text)
+[2:46pm] tathi: but the text display code looks good as far as I can tell
+[2:48pm] tathi: it appears to be using the font metrics from the sprite tuple, but re-using the texture from the previous letter
+[2:48pm] tathi: very odd
+[2:59pm] tathi: hmm...and it looks like it's only be happening the first time you use a given character (from a given font face)
+
 + io:
 
 - unix i/o: problems with passing f to syscalls
@@ -6,83 +27,60 @@
 - gdb triggers 'mutliple i/o ops on port' error
 - "localhost" 50 <client> won't fail
 
-+ help:
-
-- document module system
-- refactor style stack code so that nested styles are handled at a lower-level
-  - with-style & with-stream-style
-    - in HTML, we can nest div tags, etc
-- automatically update help graph and search index when adding/removing
-  articles/words
-- help search:
-  - store positions in index
-  - phrase scoring algorithm based on how close the terms occur?
-- fix remaining HTML stream issues
-- better line spacing in ui and html - related issue
-
 + ui:
 
-- clipping seems off
+- grid slows down with 2000 lines
+- f should be clickable
+- clickable vocabs
+- x11 raise-window
+- remaining HTML issues need fixing
+- better component padding and spacing in UI
+- see if its possible to only repaint dirty regions
 - x11 title bars are funny
-- cocoa: starting the UI with +foo switches opens them as files
 - if the listener is running a command when the image is saved, it
   restores to an unresponsive gadget
 - fix top level window positioning
 - services do not launch if factor not running
 - prettyprinter's highlighting of non-leaves doesn't really work
 - rollover is not updated on window focus changes
-- fix listener scroll to
-- multiple listener-run-files is broken
-- table line styles
 - x11 input methods
-- roundoff is still not quite right with tracks
 - new browser:
   - browse generic words and classes
   - need actions for reloading the source file and opening word in jEdit
   - highlight showing panes in originating list
-  - single set of tabs across the top
 - make-frame should compile
-- speed up ideas:
-  - only do clipping for certain gadgets
-  - use glRect
-  - use complex numbers instead of arrays for co-ordinates
-  - use vertex arrays
-  - use display lists
 - reimplement tab completion
 - cocoa:
   - horizontal wheel scrolling
   - polish OS X menu bar code
-  - dock menu
 - variable width word wrap
+- use models for the following:
+  - editor gadgets
+  - validator models
+  - search tool
+  - slider needs range-model or similar
+  - outliner
 
 + compiler/ffi:
 
+- faster sequence= for UI
 - fix compiled gc check
   - there was a performance hit, investigate
   - float boxing and overflow checks need a gc check too
-- amd64 crash
-- get factor running on mac intel
 - constant branch folding
 - type inference at branch merge points
 - free up r11, r12 as a vreg on ppc
 - float= on powerpc doesn't consider nans equal
 - intrinsic fixnum>float float>fixnum
-- win64 port
-- complex float type
-- complex float intrinsics
 - remove literal table
 - C functions returning structs by value
-- FIELD: char key_vector[32];
-- FIELD: union { char b[20]; short s[10]; long l[5]; } data;
-- MEMBER: long pad[24];
-- C structs: use new-style string mode parsing
 - [ [ dup call ] dup call ] infer hangs
 - the invalid recursion form case needs to be fixed, for inlines too
 - code gc
 
 + misc:
 
-- if a primitive throws an error, :c doesn't show the call frame there
+- hashed generic method dispatch
 - fix this:
 
   [ 1 2 3 4 5 6 7 8 9 10 10 10 10 10 10 10 10 10 10 11 11 11 113 ] .
@@ -90,6 +88,4 @@
 ]
 
 - code walker & exceptions -- test and debug problems
-- slice: if sequence or seq start is changed, abstraction violation
-- make 3.4 bits>double an error
 - break: perhaps use current stdio to run break listener
