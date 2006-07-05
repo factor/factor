@@ -20,7 +20,7 @@ parser sequences sequences-internals words ;
     "compile" get [
         "native-io" get [
             unix? [
-                "/library/unix/load.factor" run-resource
+                "/library/io/unix/load.factor" run-resource
             ] when
         ] when
 
