@@ -14,6 +14,7 @@ DLLEXPORT int ffi_test_11(int a, struct foo b, int c);
 struct rect { float x, y, w, h; };
 DLLEXPORT int ffi_test_12(int a, int b, struct rect c, int d, int e, int f);
 DLLEXPORT int ffi_test_13(int a, int b, int c, int d, int e, int f, int g, int h, int i, int j, int k);
+DLLEXPORT struct foo ffi_test_14(int x, int y);
 DLLEXPORT void callback_test_1(void (*callback)(void));
 DLLEXPORT void callback_test_2(void (*callback)(int x, int y), int x, int y);
 DLLEXPORT void callback_test_3(void (*callback)(int x, double y, int z), int x, double y, int z);

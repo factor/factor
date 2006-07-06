@@ -10,7 +10,7 @@ parser sequences sequences-internals words ;
     "Cross-referencing..." print flush
     H{ } clone crossref set-global xref-words
 
-    cpu { "x86" "pentium4" } member? [
+    cpu "x86" = [
         macosx?
         "/library/compiler/x86/alien-macosx.factor"
         "/library/compiler/x86/alien.factor"

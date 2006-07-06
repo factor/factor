@@ -87,6 +87,13 @@ int ffi_test_13(int a, int b, int c, int d, int e, int f, int g, int h, int i, i
 	return a + b + c + d + e + f + g + h + i + j + k;
 }
 
+struct foo ffi_test_14(int x, int y)
+{
+	struct foo r;
+	r.x = x; r.y = y;
+	return r;
+}
+
 void callback_test_1(void (*callback)(void))
 {
 	printf("callback_test_1 entry\n");

@@ -144,3 +144,13 @@ void box_value_struct(void *src, CELL size)
 	memcpy(array + 1,src,size);
 	dpush(tag_object(array));
 }
+
+/* for FFI calls returning an 8-byte struct. This only
+happends on Intel Mac OS X */
+void box_value_pair(CELL x, CELL y)
+{
+	F_ARRAY *array = byte_array(8);
+	put(AREF(array,0),x);
+	put(AREF(array,1),y);
+	dpush(tag_object(array));
+}

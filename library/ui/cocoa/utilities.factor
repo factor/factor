@@ -16,8 +16,19 @@ kernel libc math namespaces parser sequences strings words ;
         { "void*" } swap second append ,
     ] make-alien-invoke ;
 
+: use-stret? ( type -- ? )
+    #! We use the objc_msgSend_stret form in either of the
+    #! following two cases:
+    #! - type is a struct, and we're on PowerPC
+    #! - type is a struct <= 8 bytes, and we're on x86
+    {
+        { [ dup c-struct? not ] [ drop f ] }
+        { [ cpu "ppc" = ] [ drop t ] }
+        { [ cpu "x86" = ] [ c-size 8 > ] }
+    } cond ;
+    
 : sender-stub ( method function -- word )
-    over first c-struct?
+    over first use-stret?
     [ make-sender-stret ] [ make-sender ] if
     define-temp ;
 
@@ -77,7 +88,7 @@ H{ } clone objc-methods set-global
     first [ <c-object> dup ] curry 1 make-dip ;
 
 : stret-prolog ( type -- )
-    dup c-struct?
+    dup use-stret?
     [ [ >r ] % , [ <malloc-object> dup r> ] % ] [ drop ] if ;
 
 : make-prepare-send ( selector method super? -- quot )
@@ -91,7 +102,7 @@ H{ } clone objc-methods set-global
     dup <c-object> -rot c-size >r 2dup r> memcpy free ;
 
 : stret-epilog ( type -- )
-    dup c-struct? [ , \ block>byte-array , ] [ drop ] if ;
+    dup use-stret? [ , \ block>byte-array , ] [ drop ] if ;
 
 : make-objc-send ( selector super? -- quot )
     [

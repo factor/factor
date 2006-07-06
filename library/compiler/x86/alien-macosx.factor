@@ -1,7 +1,7 @@
 ! Copyright (C) 2005, 2006 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 IN: compiler
-USING: assembler kernel kernel-internals math namespaces ;
+USING: assembler errors kernel kernel-internals math namespaces ;
 
 ! OS X uses a different ABI. The stack must be 16-byte aligned.
 
@@ -43,9 +43,26 @@ USING: assembler kernel kernel-internals math namespaces ;
     ! Store the return value on the C stack
     store-return-reg ;
 
+: %box-pair ( -- )
+    #! Box an 8-byte struct returned in EAX:EDX.
+    #! Why did Apple have to make things so complex?
+    #! Just use objc_msgSend_stret for all structs... jesus.
+    8 [
+        EDX PUSH
+        EAX PUSH
+        "box_value_pair" f %alien-invoke
+    ] with-aligned-stack ;
+
 : %box-struct ( n size -- )
-    >r stack-increment + cell + r>
-    "box_value_struct" struct-ptr/size ;
+    over [
+        >r stack-increment + cell + r>
+        "box_value_struct" struct-ptr/size 
+    ] [
+        nip 8 = [
+            "Cannot %box-struct which is not 8 bytes." throw
+        ] unless
+        %box-pair
+    ] if ;
 
 : box@ ( n reg-class -- stack@ )
     #! Used for callbacks; we want to box the values given to
