@@ -23,7 +23,9 @@ sequences strings ;
 SYMBOL: page
 
 : run-page ( filename -- )
-    [ dup page set run-embedded-file ] with-scope ;
+    dup
+    [ [ dup page set run-embedded-file ] with-scope ] try
+    drop ;
 
 : include-page ( filename -- )
     "doc-root" get swap path+ run-page ;
