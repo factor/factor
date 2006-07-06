@@ -216,7 +216,7 @@ IN: compiler
     "y" operand "x" operand MOV
     ! Tag the value, since division cancelled tags from both
     ! inputs
-    "x" operand tag-bits SHL
+    "x" operand 1 tag-bits shift IMUL2
     ! Did it overflow?
     "end" get JNO
     ! There was an overflow, so make ECX into a bignum. we must

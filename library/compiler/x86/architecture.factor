@@ -27,10 +27,15 @@ M: cs-loc v>operand cs-loc-n cs-reg reg-stack ;
 : %alien-invoke ( symbol dll -- )
     2dup dlsym CALL rel-relative rel-dlsym ;
 
+: with-aligned-stack ( n quot -- )
+    #! On Linux, there is no requirement to align stack frames,
+    #! so this is mostly a no-op.
+    swap slip stack-reg swap ADD ; inline
+
 : compile-c-call* ( symbol dll args -- operands )
-    <reversed>
-    [ [ PUSH ] each %alien-invoke ] keep
-    [ drop EDX POP ] each ;
+    dup length cells [
+        <reversed> [ PUSH ] each %alien-invoke
+    ] with-aligned-stack ;
 
 GENERIC: push-return-reg ( reg-class -- )
 GENERIC: pop-return-reg ( reg-class -- )

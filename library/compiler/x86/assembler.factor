@@ -352,6 +352,9 @@ M: operand CMP OCT: 071 2-operand ;
 : DIV  ( dst -- ) BIN: 110 t HEX: f7 1-operand ;
 : IDIV ( src -- ) BIN: 111 t HEX: f7 1-operand ;
 
+GENERIC: IMUL2 ( dst src -- )
+M: integer IMUL2 swap dup reg-code t HEX: 69 immediate-1/4 ;
+
 : CDQ HEX: 99 assemble-1 ;
 : CQO HEX: 48 assemble-1 CDQ ;
 
