@@ -2,14 +2,11 @@
 
 - help gadget: opens 'f' initially
 - amd64 crash
-- get factor running on mac intel
 
 + day after:
 
-- multiple listener-run-files is broken
 - roundoff is still not quite right with tracks
 - httpd search tools
-- docs: slice: if sequence or seq start is changed, abstraction violation
 tathi: hrm.  wish I knew more about OpenGL.
 [2:45pm] tathi: Factor's text display is a bit odd sometimes, until you mouse over (or click, if there's no "live" text)
 [2:46pm] tathi: but the text display code looks good as far as I can tell
@@ -27,6 +24,9 @@ tathi: hrm.  wish I knew more about OpenGL.
 
 + ui:
 
+- add some handy services:
+  - base conversion
+  - search help for selection
 - grid slows down with 2000 lines
 - f should be clickable
 - clickable vocabs
@@ -53,20 +53,19 @@ tathi: hrm.  wish I knew more about OpenGL.
 - variable width word wrap
 - use models for the following:
   - editor gadgets
-  - validator models
   - search tool
   - slider needs range-model or similar
-  - outliner
 
 + compiler/ffi:
 
+- mac intel: struct returns from objc methods
+- see if alien calls can be made faster
 - faster sequence= for UI
 - fix compiled gc check
   - there was a performance hit, investigate
   - float boxing and overflow checks need a gc check too
 - constant branch folding
 - type inference at branch merge points
-- free up r11, r12 as a vreg on ppc
 - float= on powerpc doesn't consider nans equal
 - intrinsic fixnum>float float>fixnum
 - remove literal table
@@ -77,6 +76,8 @@ tathi: hrm.  wish I knew more about OpenGL.
 
 + misc:
 
+- mac intel: fault address not reported
+- slice: if sequence or seq start is changed, abstraction violation
 - hashed generic method dispatch
 - fix this:
 

@@ -1,9 +1,9 @@
 ! Copyright (C) 2006 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 IN: gadgets-help
-USING: gadgets gadgets-buttons gadgets-frames gadgets-panes
-gadgets-presentations gadgets-search gadgets-scrolling help
-kernel models namespaces sequences ;
+USING: gadgets gadgets-borders gadgets-buttons gadgets-frames
+gadgets-panes gadgets-presentations gadgets-search
+gadgets-scrolling help kernel models namespaces sequences ;
 
 TUPLE: help-gadget history ;
 
