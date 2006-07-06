@@ -113,7 +113,9 @@ SYMBOL: failures
         "threads"
         "tuple"
         "words"
-    } run-tests ;
+    }
+    macosx? [ "cocoa" add ] when
+    run-tests ;
 
 : benchmarks
     {
