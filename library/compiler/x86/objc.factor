@@ -13,9 +13,3 @@ USING: assembler compiler ;
 : (post-stret) ;
 
 \ (post-stret) [ EAX PUSH ] H{ } define-intrinsic
-
-! when an _stret is being called, we must pop the struct off
-! the stack before returning
-: (pre-stret) ;
-
-\ (pre-stret) [ EAX POP ECX POP EAX PUSH ] H{ } define-intrinsic

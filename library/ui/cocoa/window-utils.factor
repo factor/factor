@@ -43,16 +43,16 @@ USING: arrays gadgets kernel math objc sequences ;
     -> contentRectForFrameRect:styleMask: ;
 
 "NSObject" "FactorWindowDelegate" {
-    {
-        "windowWillUseStandardFrame:defaultFrame:" "NSRect"
-        { "id" "SEL" "id" "NSRect" }
-        [
-            drop 2nip
-            dup window-content-rect NSRect-x-far-y
-            pick window-pref-dim first2 <far-y-NSRect>
-            frame-content-rect
-        ]
-    }
+    ! {
+    !     "windowWillUseStandardFrame:defaultFrame:" "NSRect"
+    !     { "id" "SEL" "id" "NSRect" }
+    !     [
+    !         drop 2nip
+    !         dup window-content-rect NSRect-x-far-y
+    !         pick window-pref-dim first2 <far-y-NSRect>
+    !         frame-content-rect
+    !     ]
+    ! }
 
     {
         "windowDidMove:" "void" { "id" "SEL" "id" } [

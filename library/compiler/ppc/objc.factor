@@ -3,5 +3,3 @@
 IN: objc
 
 : (post-stret) ; inline
-
-: (pre-stret) ; inline
