@@ -2,8 +2,8 @@
 ! See http://factorcode.org/license.txt for BSD license.
 IN: gadgets-help
 USING: gadgets gadgets-buttons gadgets-frames gadgets-panes
-gadgets-presentations gadgets-scrolling help kernel models
-namespaces sequences ;
+gadgets-presentations gadgets-search gadgets-scrolling help
+kernel models namespaces sequences ;
 
 TUPLE: help-gadget history ;
 
@@ -22,6 +22,8 @@ TUPLE: help-gadget history ;
         "Back" [ history-action go-back ] <bevel-button> ,
         "Forward" [ history-action go-forward ] <bevel-button> ,
         "Home" [ find-help-gadget go-home ] <bevel-button> ,
+        <spacing> ,
+        "Search" [ drop search-help-window ] <bevel-button> ,
     ] make-toolbar ;
 
 : <help-pane> ( -- gadget )
