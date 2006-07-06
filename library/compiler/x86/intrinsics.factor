@@ -222,10 +222,14 @@ IN: compiler
     ! There was an overflow, so make ECX into a bignum. we must
     ! save EDX since its volatile.
     remainder-reg PUSH
+    ! Align the stack -- only needed on Mac OS X
+    ESP 12 SUB
     "s48_long_to_bignum" f
     "y" operand 1array compile-c-call*
     ! An untagged pointer to the bignum is now in EAX; tag it
     T{ int-regs } return-reg bignum-tag OR
+    ! Align the stack -- only needed on Mac OS X
+    ESP 12 ADD
     ! the remainder is now in EDX
     remainder-reg POP
     "end" get save-xt ;

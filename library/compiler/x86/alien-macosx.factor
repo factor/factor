@@ -76,15 +76,19 @@ USING: assembler kernel kernel-internals math namespaces ;
         "run_callback" f %alien-invoke
     ] with-aligned-stack ;
 
+: align-callback-value ( reg-class -- reg n )
+    ESP 16 rot reg-size - ;
+    
 : %callback-value ( reg-class func -- )
-    f %alien-invoke ! Call the unboxer
-    ESP 12 ADD
+    ! Call the unboxer
+    f %alien-invoke
+    dup align-callback-value SUB
     ! Save return register
     dup push-return-reg
     ! Restore data/call/retain stacks
     "unnest_stacks" f %alien-invoke
     ! Restore return register
-    pop-return-reg
-    ESP 12 SUB ;
+    dup pop-return-reg
+    align-callback-value ADD ;
 
 : %cleanup ( n -- ) drop ;
