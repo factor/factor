@@ -1,6 +1,7 @@
 ! Copyright (C) 2006 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 IN: objc
+USING: assembler compiler ;
 
 ! In their infinite wisdom, Apple's struct-returning Objective C
 ! messages do not use their own documented ABI; instead they

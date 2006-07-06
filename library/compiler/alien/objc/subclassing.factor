@@ -66,7 +66,7 @@ libc math namespaces sequences strings words ;
 
 : struct-return ( ret types quot -- ret types quot )
     pick c-struct? [
-        pick c-size [ memcpy (pre-stret) ] curry append
+        pick c-size [ memcpy ] curry append
         >r { "void*" } swap append >r drop "void" r> r>
     ] when ;
 
