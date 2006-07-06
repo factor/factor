@@ -8,6 +8,8 @@ USE: parser
 USE: io
 USE: memory
 
+[ clear drop ] unit-test-fails
+
 [ f ] [ [ ] catch ] unit-test
 
 [ 5 ] [ [ 5 throw ] catch ] unit-test
