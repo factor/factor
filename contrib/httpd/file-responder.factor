@@ -1,8 +1,8 @@
 ! Copyright (C) 2004, 2006 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 IN: file-responder
-USING: html httpd io kernel math namespaces
-parser sequences strings ;
+USING: embedded html httpd io kernel math namespaces parser
+sequences strings ;
 
 : serving-path ( filename -- filename )
     [ "" ] unless* "doc-root" get swap append ;
@@ -20,12 +20,17 @@ parser sequences strings ;
         <file-reader> stdio get stream-copy
     ] if ;
 
+SYMBOL: page
+
+: run-page ( filename -- )
+    [ dup page set run-embedded-file ] with-scope ;
+
+: include-page ( filename -- )
+    "doc-root" get swap path+ run-page ;
+
 : serve-file ( filename -- )
-    dup mime-type dup "application/x-factor-server-page" = [
-        drop run-file
-    ] [
-        serve-static
-    ] if ;
+    dup mime-type dup "application/x-factor-server-page" =
+    [ drop serving-html run-page ] [ serve-static ] if ;
 
 : list-directory ( directory -- )
     serving-html
@@ -35,13 +40,15 @@ parser sequences strings ;
         "request" get [ dup log-message directory. ] simple-html-document
     ] if ;
 
+: find-index ( filename -- path )
+    { "index.html" "index.fhtml" }
+    [ dupd path+ exists? ] find nip
+    dup [ path+ ] [ nip ] if ;
+
 : serve-directory ( filename -- )
     dup "/" tail? [
-        dup "index.html" append dup exists? [
-            nip serve-file
-        ] [
-            drop list-directory
-        ] if
+        dup find-index
+        [ serve-file ] [ list-directory ] ?if
     ] [
         drop directory-no/
     ] if ;

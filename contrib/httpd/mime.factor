@@ -28,7 +28,7 @@ H{
     { "gz"     "application/octet-stream"         }
 
     { "pdf"    "application/pdf"                  }
-                                                    
+
     { "factor" "text/plain"                       }
-    { "factsp" "application/x-factor-server-page" }
+    { "fhtml"  "application/x-factor-server-page" }
 } "mime-types" global set-hash

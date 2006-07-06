@@ -1,5 +1,7 @@
 USING: io ;
 
+REQUIRES: embedded ;
+
 PROVIDE: httpd { 
     "mime.factor"
     "xml.factor"

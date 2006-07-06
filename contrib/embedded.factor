@@ -49,7 +49,7 @@ USING: sequences kernel parser math namespaces io ;
 : parse-embedded ( string -- quot )
     #! simple example: "numbers: <% 3 [ 1 + pprint ] each %>"
     #! => "\"numbers: \" write 3 [ 1 + pprint ] each"
-    [ embedded>factor ] f make ;
+    [ embedded>factor ] [ ] make ;
 
 : eval-embedded ( string -- ) parse-embedded call ;
 
@@ -66,8 +66,6 @@ USING: sequences kernel parser math namespaces io ;
     [ eval-embedded ] with-embedded-file ;
 
 : embedded-convert ( infile outfile -- )
-    <file-writer> [
-	run-embedded-file
-    ] with-stream ;
+    <file-writer> [ run-embedded-file ] with-stream ;
 
 PROVIDE: embedded ;
