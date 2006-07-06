@@ -56,6 +56,7 @@ void init_signals(void)
 	sigaction_safe(SIGBUS,&custom_sigaction,NULL);
 	sigaction_safe(SIGQUIT,&custom_sigaction,NULL);
 	sigaction_safe(SIGSEGV,&custom_sigaction,NULL);
+	sigaction_safe(SIGILL,&custom_sigaction,NULL);
 	
 	sigemptyset(&ign_sigaction.sa_mask);
 	ign_sigaction.sa_handler = SIG_IGN;
