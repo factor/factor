@@ -50,6 +50,7 @@ parser sequences sequences-internals words ;
         "native-io" get [ init-io ] when
 
         "cocoa" get [
+            "/library/compiler/alien/objc/load.factor" run-resource
             "/library/ui/cocoa/load.factor" run-resource
         ] when
 

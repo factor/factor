@@ -14,7 +14,7 @@ kernel libc math namespaces parser sequences strings words ;
         [ "void" f ] %
         "_stret" append ,
         { "void*" } swap second append ,
-    ] make-alien-invoke ;
+    ] make-alien-invoke \ (post-stret) add ;
 
 : use-stret? ( type -- ? )
     #! We use the objc_msgSend_stret form in either of the

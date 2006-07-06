@@ -1,9 +1,6 @@
 USING: compiler io parser sequences words ;
 
 {
-    "/library/ui/cocoa/runtime.factor"
-    "/library/ui/cocoa/utilities.factor"
-    "/library/ui/cocoa/subclassing.factor"
     "/library/ui/cocoa/core-foundation.factor"
     "/library/ui/cocoa/types.factor"
     "/library/ui/cocoa/init-cocoa.factor"
