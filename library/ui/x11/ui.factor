@@ -136,7 +136,7 @@ IN: gadgets
     world-handle first map-window* ;
 
 : raise-window ( world -- )
-    dpy get swap second XRaiseWindow drop ;
+    dpy get swap world-handle first XRaiseWindow drop ;
 
 : select-gl-context ( handle -- )
     dpy get swap first2 glXMakeCurrent
