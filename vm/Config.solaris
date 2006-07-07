@@ -1,3 +1,5 @@
+include vm/Config.unix
+PLAF_OBJS += vm/os-genunix.o
 CFLAGS += -D_STDC_C99 -Drestrict=""
 LIBS += -ldl -lsocket -lnsl -lm -R/opt/PM/lib -R/opt/csw/lib \
 	-R/usr/local/lib -R/usr/sfw/lib -R/usr/X11R6/lib \

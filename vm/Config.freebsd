@@ -1,4 +1,4 @@
 include vm/Config.unix
-PLAF_OBJS += vm/genunix.o
+PLAF_OBJS += vm/os-genunix.o
 CFLAGS += -export-dynamic -pthread
 LIBS = -ldl -lm $(X11_UI_LIBS)
