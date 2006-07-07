@@ -21,6 +21,7 @@
 
 + ui:
 
+- why is the thumb skewed?
 - add some handy services:
   - base conversion
   - search help for selection

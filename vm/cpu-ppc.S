@@ -4,9 +4,7 @@ On PowerPC processors, we must flush the instruction cache manually
 after writing to the code heap.
 
 Callable from C as
-void flush_icache(void *start, int len)
-
-This function is called from compiler.c. */
+void flush_icache(void *start, int len) */
 
 #ifdef __APPLE__
 	#define MANGLE(sym) _##sym

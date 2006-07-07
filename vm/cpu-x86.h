@@ -1,4 +1,4 @@
-#define FACTOR_CPU_STRING "ppc"
+#define FACTOR_CPU_STRING "x86"
 
 register CELL ds asm("esi");
 register CELL rs asm("edi");

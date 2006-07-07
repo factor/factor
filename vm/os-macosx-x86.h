@@ -7,7 +7,7 @@
 #define SIGSEGV_STACK_POINTER(thr_state) (thr_state).esp
 #define SIGSEGV_PROGRAM_COUNTER(thr_state) (thr_state).eip
 
-INLINE void fix_stack_ptr(unsigned long sp)
+INLINE unsigned long fix_stack_ptr(unsigned long sp)
 {
 	  if ((sp & 0xf) != 0) sp -= (sp & 0xf);
 	  sp -= 4;

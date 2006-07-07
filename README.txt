@@ -11,7 +11,6 @@ implementation. It is not an introduction to the language itself.
 - Building Factor
 - Running Factor on Unix with X11
 - Running Factor on Mac OS X
-- Running Factor on Windows
 - Source organization
 - Community
 - Credits
@@ -163,6 +162,7 @@ Slava Pestov:       Lead developer
 Alex Chapman:       OpenGL binding
 Doug Coleman:       Mersenne Twister RNG, Windows port
 Eduardo Cavazos:    X11 binding
+Joshua Grams:       PowerPC instruction cache flush code
 Mackenzie Straight: Windows port
 Trent Buck:         Debian package
 
