@@ -6,3 +6,8 @@
 #define SIGSEGV_THREAD_STATE_COUNT PPC_THREAD_STATE_COUNT
 #define SIGSEGV_STACK_POINTER(thr_state) (thr_state).r1
 #define SIGSEGV_PROGRAM_COUNTER(thr_state) (thr_state).srr0
+
+INLINE void fix_stack_ptr(unsigned long sp)
+{
+	  return sp;
+}
