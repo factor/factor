@@ -1,14 +1,9 @@
 ! Copyright (C) 2006 Eduardo Cavazos.
 
-! Quick start:		USE: automata automata-gallery
-!
-! This will open a new window that will display a random automata rule
-! every 10 seconds. Resize the window to make the display larger.
-
-REQUIRES: math slate ;
+REQUIRES: math slate vars ;
 
 USING: parser kernel hashtables namespaces sequences math io
-math-contrib threads strings arrays prettyprint gadgets slate ;
+math-contrib threads strings arrays prettyprint gadgets vars slate ;
 
 IN: automata
 
@@ -16,7 +11,13 @@ IN: automata
 ! set-rule
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-SYMBOL: rule
+: char>digit ( c -- i ) 48 - ;
+
+: string>digits ( s -- seq ) >array [ char>digit ] map ;
+
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+SYMBOL: rule   SYMBOL: rule-number
 
 : init-rule ( -- ) 8 <hashtable> rule set ;
 
@@ -30,38 +31,53 @@ SYMBOL: rule
   { 0 0 1 }
   { 0 0 0 } } ;
 
-: rule-values ( n -- { ... } ) >bin 8 CHAR: 0 pad-left >array [ 48 - ] map ;
+: rule-values ( n -- seq ) >bin 8 CHAR: 0 pad-left string>digits ;
 
-: set-rule ( n -- ) rule-values rule-keys [ rule get set-hash ] 2each ;
+: set-rule ( n -- )
+dup rule-number set
+rule-values rule-keys [ rule get set-hash ] 2each ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-! step
+! step-capped-line
+! step-wrapped-line
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 : 3nth ( n seq -- slice ) >r dup 3 + r> <slice> ;
 
-: next-chunk ( << slice: a b c >> -- value ) >array rule get hash ;
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-: (step) ( line -- new-line )
-dup length 2 - [ swap 3nth next-chunk ] map-with ;
+: map3-i ( seq -- i ) length 2 - ;
 
-: step-line ( line -- new-line ) >r { 0 } r> { 0 } append append (step) ;
+: map3-quot ( quot -- quot ) [ swap 3nth ] swap append ;
 
-: last ( seq -- item ) dup length 1 - swap nth ;
+: map3 ( seq quot -- seq ) over map3-i swap map3-quot map-with ;
 
-: step-line-wrapped ( line -- new-line )
-dup last 1array swap dup first 1array append append (step) ;
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+: pattern>state ( { a b c } -- state ) rule get hash ;
+
+: cap-line ( line -- 0-line-0 ) { 0 } swap append { 0 } append ;
+
+: wrap-line ( a-line-z -- za-line-za )
+dup last 1array swap dup first 1array append append ;
+
+: step-line ( line -- new-line ) [ >array pattern>state ] map3 ;
+
+: step-capped-line ( line -- new-line ) cap-line step-line ;
+
+: step-wrapped-line ( line -- new-line ) wrap-line step-line ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 ! Display the rule
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-DEFER: run-rule
-
-: test-automata ( -- )
-<slate> dup self set open-window init-rule 150 set-rule run-rule ;
-
 : random-line ( -- line ) window-width [ drop 2 random-int ] map ;
+
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+: center-i ( -- i ) window-width dup 2 / >fixnum ;
+
+: center-line ( -- line ) center-i window-width [ = [ 1 ] [ 0 ] if ] map-with ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 ! show-line
@@ -69,73 +85,58 @@ DEFER: run-rule
 
 : show-point ( { x y } p -- ) 1 = [ draw-point ] [ drop ] if ;
 
-: (show-line) ( { x y } line -- )
-[ >r dup r> show-point { 1 0 } v+ ] each drop ;
+: (show-line) ( { x y } line -- ) [ dupd show-point { 1 0 } v+ ] each drop ;
 
-: show-line ( y line -- ) >r >r 0 r> 2array r> (show-line) yield ;
+: show-line ( y line -- ) 0 rot 2array swap (show-line) yield ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-! Go
+! run-rule
+! start-random
+! start-center
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-SYMBOL: last-line
+VAR: last-line
 
-! : run-rule ( -- last-line ) clear-window
-! 0 random-line window-height [ drop 2dup show-line >r 1 + r> step-line ]
-! each last-line set drop ;
-
-: estimate-capacity ( -- ) window-width window-height * 1000 + capacity set ;
+: estimate-capacity ( -- ) window-width window-height * 2 * capacity set ;
 
 : check-capacity ( -- )
 "capacity: " write capacity get number>string write terpri
 "dlist length: " write dlist get length number>string write terpri ;
 
-! : run-rule ( -- )
-! [ ] set-action
-! window-width window-height * 1000 + capacity set reset-dlist
-! white set-clear-color black set-color clear-window
-! 0 random-line window-height [ drop 2dup show-line >r 1 + r> step-line ] each
-! last-line set drop
-! "capacity: " print capacity get unparse print terpri
-! "dlist length: " print dlist get length unparse print terpri
-! flush-dlist slate-flush ;
-
-: run-rule ( -- )
+: start-slate ( -- )
 estimate-capacity reset-slate
-white set-clear-color black set-color clear-window
-0 random-line window-height [ drop 2dup show-line >r 1 + r> step-line ] each
-last-line set drop check-capacity flush-dlist flush-slate ;
+white set-clear-color black set-color clear-window ;
 
-: run-rule-wrapped ( -- last-line )
-clear-window 0 random-line 400
-[ drop 2dup show-line >r 1 + r> step-line-wrapped ] each nip ;
+: finish-slate ( -- ) check-capacity flush-dlist flush-slate ;
 
-: continue-rule ( first-line -- last-line ) clear-window
-0 swap 400 [ drop 2dup show-line swap 1 + swap step-line ] each nip ;
+: run-line ( line y -- line ) swap tuck show-line step-capped-line ;
 
-: continue-rule-wrapped ( first-line -- last-line ) clear-window
-0 swap 400 [ drop 2dup show-line swap 1 + swap step-line-wrapped ] each nip ;
+: run-lines ( -- ) last-line> window-height [ run-line ] each >last-line ;
 
-: random-gallery ( -- )
-255 random-int 1 + dup unparse print flush
-set-rule run-rule 5000 sleep random-gallery ;
+: run-rule ( -- ) start-slate run-lines finish-slate ;
 
-SYMBOL: interesting
+: start-random ( -- ) random-line >last-line run-rule ;
 
-: init-interesting ( -- ) { 26 150 193 165 146 144 86 104 } interesting set ;
+: start-center ( -- ) center-line >last-line run-rule ;
+
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 : random-item ( seq -- item ) dup length random-int swap nth ;
 
-: random-interesting-gallery ( -- )
-interesting get random-item set-rule run-rule 10000 sleep
-random-interesting-gallery ;
+: interesting ( -- seq )
+{ 18 22 26 30 41 45 54 60 73 75 82 86 89 90 97 101 102 105 106 107 109
+  110 120 121 122 124 126 129 137 146 147 149 150 151 153 154 161 165 } ;
+
+
+: mild ( -- seq )
+{ 6 9 11 57 62 74 118 } ;
+
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 : automata ( -- )
-<slate> dup self set open-window init-interesting init-rule
-interesting get random-item set-rule 1000 sleep run-rule ;
+<slate> dup self set "Cellular Automata" open-titled-window
+init-rule interesting random-item set-rule 1000 sleep start-random ;
 
-: automata-gallery ( -- )
-<slate> dup self set open-window 1000 sleep init-interesting init-rule
-random-interesting-gallery ;
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 PROVIDE: automata ;
