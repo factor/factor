@@ -1,3 +1,57 @@
+INLINE CELL dpop(void)
+{
+	CELL value = get(ds);
+	ds -= CELLS;
+	return value;
+}
+
+INLINE void drepl(CELL top)
+{
+	put(ds,top);
+}
+
+INLINE void dpush(CELL top)
+{
+	ds += CELLS;
+	put(ds,top);
+}
+
+INLINE CELL dpeek(void)
+{
+	return get(ds);
+}
+
+INLINE CELL dpeek2(void)
+{
+	return get(ds - CELLS);
+}
+
+INLINE CELL cpop(void)
+{
+	CELL value = get(cs);
+	cs -= CELLS;
+	return value;
+}
+
+INLINE void cpush(CELL top)
+{
+	cs += CELLS;
+	put(cs,top);
+}
+
+INLINE CELL rpop(void)
+{
+	CELL value = get(rs);
+	rs -= CELLS;
+	return value;
+}
+
+INLINE void rpush(CELL top)
+{
+	rs += CELLS;
+	put(rs,top);
+}
+
 typedef struct _STACKS {
 	/* current datastack top pointer */
 	CELL data;

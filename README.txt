@@ -22,6 +22,7 @@ Factor is fully supported on the following platforms:
 
   Linux/x86
   Linux/AMD64
+  Mac OS X/x86
   Mac OS X/PowerPC
 
 The following platforms should work, but are not tested on a
@@ -32,7 +33,6 @@ regular basis:
   Solaris/x86
   Solaris/AMD64
   Linux/PowerPC
-  Microsoft Windows 2000 or later
 
 Please donate time or hardware if you wish to see Factor running on
 other platforms.
@@ -47,12 +47,13 @@ Factor requires gcc 3.4 or later. On x86, it /will not/ build using gcc
 Run 'make' (or 'gmake' on non-Linux platforms) with one of the following
 parameters to build the Factor runtime:
 
-  bsd
-  linux
+  freebsd
+  linux-x86
+  linux-amd64
   linux-ppc
-  macosx
+  macosx-x86
+  macosx-ppc
   solaris
-  windows
 
 The following options can be given to make:
 
@@ -136,14 +137,6 @@ this point), and the library source into a self-contained Factor.app.
 
 Factor.app runs the UI when double-clicked and can be transported
 between PowerPC Macs.
-
-* Running Factor on Windows
-
-On Windows, double-clicking f.exe will start running the Win32-based UI
-with the factor.image in the same directory as the executable.
-
-Bootstrap runs in a Windows command prompt, however there is no
-terminal listener and after bootstrapping only the UI can be used.
 
 * Source organization
 

@@ -1,11 +1,11 @@
 This directory contains Factor code that is not part of the core
 library, but is useful enough to ship with the Factor distribution.
 
-You can load these modules by typing:
+Modules can be loaded from the listener:
 
-REQUIRE: modulename
+  "modulename" require
 
-in the listener.
+Credits:
 
 - aim -- AOL Instant Messenger client library (Doug Coleman)
 - automata -- Graphics demo for the UI (Eduardo Cavazos)

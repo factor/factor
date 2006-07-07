@@ -1,0 +1,3 @@
+include vm/Config.unix
+PLAF_OBJS += vm/os-macosx.o vm/mach_signal.o
+LIBS= -lm -framework Cocoa -framework OpenGL -LFactor.app/Contents/Frameworks/ -lfreetype

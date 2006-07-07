@@ -145,12 +145,11 @@ void dump_generations(void)
 
 void factorbug(void)
 {
-#ifndef WIN32
-	fcntl(0,F_SETFL,0);
-	fcntl(1,F_SETFL,0);
-#endif
+	reset_stdio();
 
-	fprintf(stderr,"  Front end processor commands:\n");
+	fprintf(stderr,"A fatal error has occurred and Factor cannot continue.\n");
+	fprintf(stderr,"The low-level debugger has been started to help diagnose the problem.\n");
+	fprintf(stderr,"  Basic commands:\n");
 	fprintf(stderr,"t                -- throw exception in Factor\n");
 	fprintf(stderr,"q                -- continue executing Factor\n");
 	fprintf(stderr,"im               -- save image to fep.image\n");
@@ -172,7 +171,7 @@ void factorbug(void)
 	{
 		char cmd[1024];
 
-		fprintf(stderr,"fep> ");
+		fprintf(stderr,"READY\n");
 		fflush(stdout);
 
 		if(scanf("%1000s",cmd) <= 0)

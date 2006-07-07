@@ -3,82 +3,51 @@ CC = gcc
 BINARY = f
 IMAGE = factor.image
 BUNDLE = Factor.app
-DISK_IMAGE_DIR = Factor-0.81
-DISK_IMAGE = Factor-0.81.dmg
+DISK_IMAGE_DIR = Factor-0.83
+DISK_IMAGE = Factor-0.83.dmg
 
 ifdef DEBUG
-	DEFAULT_CFLAGS = -g
+	CFLAGS = -g
 	STRIP = touch
 else
-	DEFAULT_CFLAGS = -Wall -O3 -ffast-math -fomit-frame-pointer $(SITE_CFLAGS)
+	CFLAGS = -Wall -O3 -ffast-math -fomit-frame-pointer $(SITE_CFLAGS)
 	STRIP = strip
 endif
 
-DEFAULT_LIBS = -lm
-
 ifdef NO_UI
-	UNIX_UI_LIBS =
+	X11_UI_LIBS =
 else
-	UNIX_UI_LIBS = -lfreetype -lGL -lGLU -L/usr/X11R6/lib -lX11
+	X11_UI_LIBS = -lfreetype -lGL -lGLU -L/usr/X11R6/lib -lX11
 endif
 
-WINDOWS_OBJS = vm/windows/ffi.o \
-	vm/windows/file.o \
-	vm/windows/misc.o \
-	vm/windows/run.o \
-	vm/windows/memory.o
-
-UNIX_OBJS = vm/unix/file.o \
-	vm/unix/signal.o \
-	vm/unix/ffi.o \
-	vm/unix/memory.o \
-	vm/unix/icache.o
-
-MACOSX_OBJS = $(UNIX_OBJS) \
-	vm/macosx/run.o \
-	vm/macosx/mach_signal.o
-
-GENERIC_UNIX_OBJS = $(UNIX_OBJS) \
-	vm/unix/run.o
-
-ifdef WINDOWS
- 	PLAF_OBJS = $(WINDOWS_OBJS)
- 	PLAF_SUFFIX = .exe
-else
-	ifdef MACOSX
-		PLAF_OBJS = $(MACOSX_OBJS)
-	else
-		PLAF_OBJS = $(GENERIC_UNIX_OBJS)
-	endif
+ifdef CONFIG
+	include $(CONFIG)
 endif
 
-OBJS = $(PLAF_OBJS) vm/array.o vm/bignum.o \
-	vm/s48_bignum.o \
-	vm/complex.o vm/error.o \
-	vm/factor.o vm/fixnum.o \
-	vm/float.o vm/gc.o \
-	vm/image.o vm/memory.o \
-	vm/misc.o vm/primitives.o \
-	vm/ratio.o vm/relocate.o \
-	vm/run.o \
-	vm/sbuf.o vm/stack.o \
-	vm/string.o vm/cards.o vm/vector.o \
-	vm/word.o vm/compiler.o \
-	vm/alien.o vm/dll.o \
-	vm/boolean.o \
+OBJS = $(PLAF_OBJS) \
+	vm/alien.o \
+	vm/bignum.o \
 	vm/debug.o \
-	vm/hashtable.o \
+	vm/factor.o \
+	vm/ffi_test.o \
+	vm/image.o \
 	vm/io.o \
-	vm/wrapper.o \
-	vm/ffi_test.o
+	vm/math.o \
+	vm/memory.o \
+	vm/primitives.o \
+	vm/run.o \
+	vm/stack.o \
+	vm/types.o
 
 default:
 	@echo "Run 'make' with one of the following parameters:"
 	@echo ""
-	@echo "bsd"
-	@echo "linux"
+	@echo "freebsd"
+	@echo "linux-x86"
+	@echo "linux-amd64"
 	@echo "linux-ppc"
-	@echo "macosx"
+	@echo "macosx-x86"
+	@echo "macosx-ppc"
 	@echo "solaris"
 	@echo "windows"
 	@echo ""
@@ -91,17 +60,29 @@ default:
 	@echo ""
 	@echo "export SITE_CFLAGS=\"-march=pentium4 -ffast-math\""
 
-bsd:
-	$(MAKE) $(BINARY) \
-		CFLAGS="$(DEFAULT_CFLAGS) -export-dynamic -pthread" \
-		LIBS="$(DEFAULT_LIBS) $(UI_LIBS)" 
+freebsd:
+	$(MAKE) $(BINARY) CONFIG=vm/Config.freebsd
+
+macosx-ppc:
+	$(MAKE) $(BINARY) CONFIG=vm/Config.macosx.ppc
+
+macosx-x86:
+	$(MAKE) $(BINARY) CONFIG=vm/Config.macosx
+
+linux linux-x86 linux-amd64:
+	$(MAKE) $(BINARY) CONFIG=vm/Config.linux
 	$(STRIP) $(BINARY)
 
-macosx:
-	$(MAKE) $(BINARY) \
-		CFLAGS="$(DEFAULT_CFLAGS)" \
-		LIBS="$(DEFAULT_LIBS) -framework Cocoa -framework OpenGL -L/usr/X11R6/lib/ -lfreetype" \
-		MACOSX=y
+linux-ppc:
+	$(MAKE) $(BINARY) CONFIG=vm/Config.linux.ppc
+	$(STRIP) $(BINARY)
+
+solaris solaris-x86 solaris-amd64:
+	$(MAKE) $(BINARY) CONFIG=vm/Config.solaris
+	$(STRIP) $(BINARY)
+
+windows:
+	$(MAKE) $(BINARY) CONFIG=vm/Config.windows
 
 macosx.app:
 	cp $(BINARY) $(BUNDLE)/Contents/MacOS/Factor
@@ -138,29 +119,6 @@ macosx.dmg:
 	hdiutil create -srcfolder "$(DISK_IMAGE_DIR)" -fs HFS+ \
 		-volname "$(DISK_IMAGE_DIR)" "$(DISK_IMAGE)"
 
-linux linux-x86 linux-amd64:
-	$(MAKE) $(BINARY) \
-		CFLAGS="$(DEFAULT_CFLAGS) -export-dynamic" \
-		LIBS="-ldl $(DEFAULT_LIBS) $(UNIX_UI_LIBS)"
-	$(STRIP) $(BINARY)
-
-linux-ppc:
-	$(MAKE) $(BINARY) \
-		CFLAGS="$(DEFAULT_CFLAGS) -export-dynamic -mregnames" \
-		LIBS="-ldl $(DEFAULT_LIBS) $(UNIX_UI_LIBS)"
-	$(STRIP) $(BINARY)
-
-solaris solaris-x86:
-	$(MAKE) $(BINARY) \
-		CFLAGS="$(DEFAULT_CFLAGS) -D_STDC_C99 -Drestrict=\"\" " \
-		LIBS="-ldl -lsocket -lnsl $(DEFAULT_LIBS) -R/opt/PM/lib -R/opt/csw/lib -R/usr/local/lib -R/usr/sfw/lib -R/usr/X11R6/lib -R/opt/sfw/lib $(UNIX_UI_LIBS)"
-	$(STRIP) $(BINARY)
-
-windows:
-	$(MAKE) $(BINARY) \
-		CFLAGS="$(DEFAULT_CFLAGS) -DWINDOWS" \
-		LIBS="$(DEFAULT_LIBS)" WINDOWS=y
-
 f: $(OBJS)
 	$(CC) $(LIBS) $(CFLAGS) -o $@$(PLAF_SUFFIX) $(OBJS)
 
@@ -177,8 +135,3 @@ clean:
 
 .m.o:
 	$(CC) -c $(CFLAGS) -o $@ $<
-
-boot:
-	echo "USE: image \"$(ARCH)\" make-image bye" | ./f factor.image
-	./f boot.image.$(ARCH) $(BOOTSTRAP_FLAGS)
-	

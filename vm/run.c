@@ -159,3 +159,148 @@ void primitive_setenv(void)
 	CELL value = dpop();
 	userenv[e] = value;
 }
+
+void primitive_exit(void)
+{
+	exit(to_fixnum(dpop()));
+}
+
+void primitive_os_env(void)
+{
+	char *name, *value;
+
+	maybe_gc(0);
+
+	name = pop_char_string();
+	value = getenv(name);
+	if(value == NULL)
+		dpush(F);
+	else
+		box_char_string(getenv(name));
+}
+
+void primitive_eq(void)
+{
+	box_boolean(dpop() == dpop());
+}
+
+void primitive_millis(void)
+{
+	maybe_gc(0);
+	dpush(tag_bignum(s48_long_long_to_bignum(current_millis())));
+}
+
+void fatal_error(char* msg, CELL tagged)
+{
+	fprintf(stderr,"Fatal error: %s %ld\n",msg,tagged);
+	exit(1);
+}
+
+void critical_error(char* msg, CELL tagged)
+{
+	fprintf(stderr,"Critical error: %s %ld\n",msg,tagged);
+	factorbug();
+}
+
+void early_error(CELL error)
+{
+	if(userenv[BREAK_ENV] == F)
+	{
+		/* Crash at startup */
+		fprintf(stderr,"Error during startup: ");
+		print_obj(error);
+		fprintf(stderr,"\n");
+		factorbug();
+	}
+}
+
+void throw_error(CELL error, bool keep_stacks)
+{
+	early_error(error);
+
+	throwing = true;
+	thrown_error = error;
+	thrown_keep_stacks = keep_stacks;
+	thrown_ds = ds;
+	thrown_rs = rs;
+
+	/* Return to run() method */
+	LONGJMP(stack_chain->toplevel,1);
+}
+
+void primitive_throw(void)
+{
+	throw_error(dpop(),true);
+}
+
+void primitive_die(void)
+{
+	factorbug();
+}
+
+void general_error(F_ERRORTYPE error, CELL arg1, CELL arg2, bool keep_stacks)
+{
+	throw_error(make_array_4(userenv[ERROR_ENV],
+		tag_fixnum(error),arg1,arg2),keep_stacks);
+}
+
+/* It is not safe to access 'ds' from a signal handler, so we just not
+touch it */
+void signal_error(int signal)
+{
+	general_error(ERROR_SIGNAL,tag_fixnum(signal),F,false);
+}
+
+void type_error(CELL type, CELL tagged)
+{
+	general_error(ERROR_TYPE,tag_fixnum(type),tagged,true);
+}
+
+void init_compiler(CELL size)
+{
+	compiling.base = compiling.here = (CELL)(alloc_bounded_block(size)->start);
+	if(compiling.base == 0)
+		fatal_error("Cannot allocate code heap",size);
+	compiling.limit = compiling.base + size;
+	last_flush = compiling.base;
+}
+
+void primitive_compiled_offset(void)
+{
+	box_unsigned_cell(compiling.here);
+}
+
+void primitive_set_compiled_offset(void)
+{
+	CELL offset = unbox_unsigned_cell();
+	compiling.here = offset;
+	if(compiling.here >= compiling.limit)
+	{
+		fprintf(stderr,"Code space exhausted\n");
+		factorbug();
+	}
+}
+
+void primitive_add_literal(void)
+{
+	CELL object = dpeek();
+	CELL offset = literal_top;
+	put(literal_top,object);
+	literal_top += CELLS;
+	if(literal_top >= literal_max)
+		critical_error("Too many compiled literals",literal_top);
+	drepl(tag_cell(offset));
+}
+
+void primitive_flush_icache(void)
+{
+	flush_icache((void*)last_flush,compiling.here - last_flush);
+	last_flush = compiling.here;
+}
+
+void collect_literals(void)
+{
+	CELL i;
+	for(i = compiling.base; i < literal_top; i += CELLS)
+		copy_handle((CELL*)i);
+}

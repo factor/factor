@@ -1,10 +1,3 @@
-typedef struct {
-	CELL header;
-	CELL alien;
-	CELL displacement;
-	bool expired;
-} ALIEN;
-
 INLINE ALIEN* untag_alien_fast(CELL tagged)
 {
 	return (ALIEN*)UNTAG(tagged);
@@ -52,3 +45,16 @@ void primitive_set_alien_double(void);
 DLLEXPORT void unbox_value_struct(void *dest, CELL size);
 DLLEXPORT void box_value_struct(void *src, CELL size);
 DLLEXPORT void box_value_pair(CELL x, CELL y);
+
+INLINE DLL *untag_dll(CELL tagged)
+{
+	type_check(DLL_TYPE,tagged);
+	return (DLL*)UNTAG(tagged);
+}
+
+void primitive_dlopen(void);
+void primitive_dlsym(void);
+void primitive_dlclose(void);
+
+void fixup_dll(DLL* dll);
+void collect_dll(DLL* dll);

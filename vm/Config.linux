@@ -1,0 +1,4 @@
+include vm/Config.unix
+PLAF_OBJS += vm/genunix.o
+CFLAGS += -export-dynamic
+LIBS = -ldl -lm $(X11_UI_LIBS)

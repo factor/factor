@@ -1,3 +1,15 @@
+/* Callstack top pointer */
+CELL cs;
+
+/* TAGGED currently executing quotation */
+CELL callframe;
+
+/* UNTAGGED currently executing word in quotation */
+CELL callframe_scan;
+
+/* UNTAGGED end of quotation */
+CELL callframe_end;
+
 #define USER_ENV 32
 
 #define CARD_OFF_ENV      1 /* for compiling set-slot */
@@ -22,60 +34,6 @@
 /* TAGGED user environment data; see getenv/setenv prims */
 DLLEXPORT CELL userenv[USER_ENV];
 
-INLINE CELL dpop(void)
-{
-	CELL value = get(ds);
-	ds -= CELLS;
-	return value;
-}
-
-INLINE void drepl(CELL top)
-{
-	put(ds,top);
-}
-
-INLINE void dpush(CELL top)
-{
-	ds += CELLS;
-	put(ds,top);
-}
-
-INLINE CELL dpeek(void)
-{
-	return get(ds);
-}
-
-INLINE CELL dpeek2(void)
-{
-	return get(ds - CELLS);
-}
-
-INLINE CELL cpop(void)
-{
-	CELL value = get(cs);
-	cs -= CELLS;
-	return value;
-}
-
-INLINE void cpush(CELL top)
-{
-	cs += CELLS;
-	put(cs,top);
-}
-
-INLINE CELL rpop(void)
-{
-	CELL value = get(rs);
-	rs -= CELLS;
-	return value;
-}
-
-INLINE void rpush(CELL top)
-{
-	rs += CELLS;
-	put(rs,top);
-}
-
 void call(CELL quot);
 
 void handle_error();
@@ -92,3 +50,73 @@ void primitive_ifte(void);
 void primitive_dispatch(void);
 void primitive_getenv(void);
 void primitive_setenv(void);
+void primitive_exit(void);
+void primitive_os_env(void);
+void primitive_eq(void);
+void primitive_millis(void);
+
+/* Runtime errors */
+typedef enum
+{
+	ERROR_EXPIRED,
+	ERROR_IO,
+	ERROR_UNDEFINED_WORD,
+	ERROR_TYPE,
+	ERROR_SIGNAL,
+	ERROR_NEGATIVE_ARRAY_SIZE,
+	ERROR_C_STRING,
+	ERROR_FFI,
+	ERROR_HEAP_SCAN,
+	ERROR_UNDEFINED_SYMBOL,
+	ERROR_USER_INTERRUPT,
+	ERROR_DS_UNDERFLOW,
+	ERROR_DS_OVERFLOW,
+	ERROR_RS_UNDERFLOW,
+	ERROR_RS_OVERFLOW,
+	ERROR_CS_UNDERFLOW,
+	ERROR_CS_OVERFLOW,
+	ERROR_OBJECTIVE_C
+} F_ERRORTYPE;
+
+/* Are we throwing an error? */
+bool throwing;
+/* When throw_error throws an error, it sets this global and
+longjmps back to the top-level. */
+CELL thrown_error;
+CELL thrown_keep_stacks;
+/* Since longjmp restores registers, we must save all these values. */
+CELL thrown_ds;
+CELL thrown_rs;
+
+void fatal_error(char* msg, CELL tagged);
+void critical_error(char* msg, CELL tagged);
+void throw_error(CELL error, bool keep_stacks);
+void early_error(CELL error);
+void general_error(F_ERRORTYPE error, CELL arg1, CELL arg2, bool keep_stacks);
+void signal_error(int signal);
+void type_error(CELL type, CELL tagged);
+void primitive_throw(void);
+void primitive_die(void);
+
+/* The compiled code heap is structured into blocks. */
+typedef struct
+{
+	CELL header; /* = COMPILED_HEADER */
+	CELL code_length;
+	CELL reloc_length; /* see relocate.h */
+} F_COMPILED;
+
+#define COMPILED_HEADER 0x01c3babe
+
+CELL literal_top;
+CELL literal_max;
+
+void init_compiler(CELL size);
+void primitive_compiled_offset(void);
+void primitive_set_compiled_offset(void);
+void primitive_add_literal(void);
+void collect_literals(void);
+
+CELL last_flush;
+
+void primitive_flush_icache(void);

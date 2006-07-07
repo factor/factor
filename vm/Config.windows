@@ -1,0 +1,3 @@
+CFLAGS += -DWINDOWS
+LIBS = -lm
+PLAF_SUFFIX = .exe
