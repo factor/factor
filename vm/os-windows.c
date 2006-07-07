@@ -1,6 +1,6 @@
 #include "factor.h"
 
-// frees memory allocated by win32 api calls
+/* frees memory allocated by win32 api calls */
 char *buffer_to_c_string(char *buffer)
 {
 	int capacity = strlen(buffer);
@@ -31,7 +31,7 @@ char *error_message(DWORD id)
 		(LPTSTR) &buffer,
 		0, NULL);
 
-	// strip whitespace from end
+	/* strip whitespace from end */
 	index = strlen(buffer) - 1;
 	while(index >= 0 && isspace(buffer[index]))
 		buffer[index--] = 0;

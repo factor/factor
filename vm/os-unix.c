@@ -172,9 +172,9 @@ void dealloc_bounded_block(BOUNDED_BLOCK *block)
 	free(block);
 }
 
-// this function tests if a given faulting location is in a poison page. The
-// page address is taken from area + round_up_to_page_size(area_size) + 
-// pagesize*offset
+/* this function tests if a given faulting location is in a poison page. The
+page address is taken from area + round_up_to_page_size(area_size) + 
+ pagesize*offset */
 static bool in_page(void *fault, void *i_area, CELL area_size, int offset)
 {
 	const int pagesize = getpagesize();
