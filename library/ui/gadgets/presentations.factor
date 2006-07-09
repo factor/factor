@@ -55,8 +55,10 @@ M: object-button gadget-help ( button -- string )
 
 : apply-wrap-style ( style pane -- style pane )
     wrap-margin [
-        2dup <paragraph> swap set-pane-prototype
-        <paragraph> over set-pane-current
+        [
+            2dup <paragraph> swap set-pane-prototype
+            <paragraph> over set-pane-current
+        ] when*
     ] apply-style ;
 
 : apply-border-width-style ( style gadget -- style gadget )
