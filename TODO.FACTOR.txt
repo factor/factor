@@ -1,8 +1,6 @@
-+ tomorrow:
 
 - amd64 crash
-
-+ day after:
+- make-frame should compile
 
 - httpd search tools
 [2:45pm] tathi: Factor's text display is a bit odd sometimes, until you mouse over (or click, if there's no "live" text)
@@ -14,29 +12,28 @@
 - unix i/o: problems with passing f to syscalls
 - factorcode httpd started using 99% CPU, but still received connections;
   closing read-fds solved it
+- sometimes darcs get fails with the httpd
 - gdb triggers 'mutliple i/o ops on port' error
 - "localhost" 50 <client> won't fail
 
 + ui:
 
-- integrated error documentation
-- roundoff is still not quite right with tracks and sliders
-- 'show' doesn't work if invoked from a listener on an object which is
-  itself inspected in the listener
-- ui uses too much cpu time idling
 - add some handy services:
   - base conversion
   - search help for selection
+- services do not launch if factor not running
 - grid slows down with 2000 lines
-- clickable vocabs
+- integrated error documentation
+- roundoff is still not quite right with tracks
+- 'show' doesn't work if invoked from a listener on an object which is
+  itself inspected in the listener
+- ui uses too much cpu time idling
 - remaining HTML issues need fixing
-- better component padding and spacing in UI
 - see if its possible to only repaint dirty regions
 - x11 title bars are funny
 - if the listener is running a command when the image is saved, it
   restores to an unresponsive gadget
 - fix top level window positioning
-- services do not launch if factor not running
 - prettyprinter's highlighting of non-leaves doesn't really work
 - rollover is not updated on window focus changes
 - x11 input methods
@@ -44,7 +41,6 @@
   - browse generic words and classes
   - need actions for reloading the source file and opening word in jEdit
   - highlight showing panes in originating list
-- make-frame should compile
 - reimplement tab completion
 - cocoa:
   - horizontal wheel scrolling
@@ -57,7 +53,6 @@
 
 + compiler/ffi:
 
-- mach_signal: fault address reporting is not reliable
 - mac intel: struct returns from objc methods
 - see if alien calls can be made faster
 - faster sequence= for UI
@@ -66,7 +61,7 @@
   - float boxing and overflow checks need a gc check too
 - constant branch folding
 - type inference at branch merge points
-- float= on powerpc doesn't consider nans equal
+- float= doesn't consider nans equal
 - intrinsic fixnum>float float>fixnum
 - remove literal table
 - C functions returning structs by value
@@ -76,7 +71,7 @@
 
 + misc:
 
-- mac intel: fault address not reported
+- mach_signal: fault address reporting is not reliable
 - slice: if sequence or seq start is changed, abstraction violation
 - hashed generic method dispatch
 - fix this:

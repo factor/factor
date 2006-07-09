@@ -5,7 +5,7 @@ ARTICLE: "alien" "C library interface"
 $terpri
 "The C library interface is entirely self-contained; there is no C code which one must write in order to wrap a library."
 $terpri
-"C library interface words are found in the " { $snippet "alien" } " vocabulary."
+"C library interface words are found in the " { $vocab-link "alien" } " vocabulary."
 { $warning "Since C does not retain runtime type information or do any kind of runtime type checking, any C library interface is not pointer safe. Improper use of C functions can crash the runtime or corrupt memory in unpredictible ways." }
 { $subsection "loading-libs" }
 { $subsection "alien-invoke" }
@@ -253,7 +253,7 @@ $terpri
 { $subsection <malloc-object> }
 { $subsection <malloc-array> }
 { $subsection <malloc-string> }
-"These words are built on some words in the " { $snippet "libc" } " vocabulary, which themselves use the C library interface to call C standard library functions:"
+"These words are built on some words in the " { $vocab-link "libc" } " vocabulary, which themselves use the C library interface to call C standard library functions:"
 { $subsection malloc }
 { $subsection calloc }
 { $subsection realloc }

@@ -7,12 +7,12 @@ HELP: string f
 HELP: char-slot "( n string -- ch )"
 { $values { "n" "a fixnum" } { "string" "a string" } { "ch" "the character at the " { $snippet "n" } "th index" } }
 { $description "Unsafe string accessor, used to define " { $link nth } " on strings." }
-{ $warning "This word is in the " { $snippet "kernel-internals" } " vocabulary because it does not perform type or bounds checking. User code should call " { $link nth } " instead." } ;
+{ $warning "This word is in the " { $vocab-link "kernel-internals" } " vocabulary because it does not perform type or bounds checking. User code should call " { $link nth } " instead." } ;
 
 HELP: set-char-slot "( ch n string -- )"
 { $values { "ch" "a character" } { "n" "a fixnum" } { "string" "a string" }  }
 { $description "Unsafe string mutator, used to define " { $link set-nth } " on strings." }
-{ $warning "This word is in the " { $snippet "kernel-internals" } " vocabulary because it does not perform type or bounds checking. User code should call " { $link set-nth } " instead." } ;
+{ $warning "This word is in the " { $vocab-link "kernel-internals" } " vocabulary because it does not perform type or bounds checking. User code should call " { $link set-nth } " instead." } ;
 
 HELP: <string> "( n ch -- string )"
 { $values { "n" "a positive integer specifying string length" } { "elt" "an initial character" } }

@@ -268,17 +268,17 @@ HELP: declare "( spec -- )"
 HELP: array-capacity "( array -- n )"
 { $values { "array" "an array" } { "n" "a non-negative fixnum" } }
 { $description "Low-level array length accessor." }
-{ $warning "This word is in the " { $snippet "kernel-internals" } " vocabulary because it is unsafe. It does not check types, so improper use can corrupt memory." } ;
+{ $warning "This word is in the " { $vocab-link "kernel-internals" } " vocabulary because it is unsafe. It does not check types, so improper use can corrupt memory." } ;
 
 HELP: array-nth "( n array -- elt )"
 { $values { "n" "a non-negative fixnum" } { "array" "an array" }  { "elt" "an object" } }
 { $description "Low-level array element accessor." }
-{ $warning "This word is in the " { $snippet "kernel-internals" } " vocabulary because it is unsafe. It does not check types or array bounds, and improper use can corrupt memory." } ;
+{ $warning "This word is in the " { $vocab-link "kernel-internals" } " vocabulary because it is unsafe. It does not check types or array bounds, and improper use can corrupt memory." } ;
 
 HELP: set-array-nth "( elt n array -- )"
 { $values { "elt" "an object" } { "n" "a non-negative fixnum" } { "array" "an array" }  }
 { $description "Low-level array element mutator." }
-{ $warning "This word is in the " { $snippet "kernel-internals" } " vocabulary because it is unsafe. It does not check types or array bounds, and improper use can corrupt memory." } ;
+{ $warning "This word is in the " { $vocab-link "kernel-internals" } " vocabulary because it is unsafe. It does not check types or array bounds, and improper use can corrupt memory." } ;
 
 HELP: cell "( -- n )"
 { $values { "n" "a positive integer" } }
@@ -325,22 +325,22 @@ HELP: setenv "( obj n -- )"
 HELP: integer-slot "( obj m -- n )"
 { $values { "obj" "an object" } { "m" "a non-negative fixnum" } { "n" "an integer" } }
 { $description "Reads the untagged integer stored at the " { $snippet "n" } "th slot of " { $snippet "obj" } "." }
-{ $warning "This word is in the " { $snippet "kernel-internals" } " vocabulary because it does not perform type or bounds checks, and slot numbers are implementation detail." } ;
+{ $warning "This word is in the " { $vocab-link "kernel-internals" } " vocabulary because it does not perform type or bounds checks, and slot numbers are implementation detail." } ;
 
 HELP: set-integer-slot "( m obj n -- )"
 { $values { "n" "an integer" }  { "obj" "an object" } { "m" "a non-negative fixnum" } }
 { $description "Writes an untagged integer to the " { $snippet "n" } "th slot of " { $snippet "obj" } "." }
-{ $warning "This word is in the " { $snippet "kernel-internals" } " vocabulary because it does not perform type or bounds checks, and slot numbers are implementation detail." } ;
+{ $warning "This word is in the " { $vocab-link "kernel-internals" } " vocabulary because it does not perform type or bounds checks, and slot numbers are implementation detail." } ;
 
 HELP: slot "( obj m -- value )"
 { $values { "obj" "an object" } { "m" "a non-negative fixnum" } { "value" "an object" } }
 { $description "Reads the object stored at the " { $snippet "n" } "th slot of " { $snippet "obj" } "." }
-{ $warning "This word is in the " { $snippet "kernel-internals" } " vocabulary because it does not perform type or bounds checks, and slot numbers are implementation detail." } ;
+{ $warning "This word is in the " { $vocab-link "kernel-internals" } " vocabulary because it does not perform type or bounds checks, and slot numbers are implementation detail." } ;
 
 HELP: set-slot "( value obj n -- )"
 { $values { "value" "an object" } { "obj" "an object" } { "m" "a non-negative fixnum" } }
 { $description "Writes " { $snippet "value" } " to the " { $snippet "n" } "th slot of " { $snippet "obj" } "." }
-{ $warning "This word is in the " { $snippet "kernel-internals" } " vocabulary because it does not perform type or bounds checks, and slot numbers are implementation detail." } ;
+{ $warning "This word is in the " { $vocab-link "kernel-internals" } " vocabulary because it does not perform type or bounds checks, and slot numbers are implementation detail." } ;
 
 HELP: millis "( -- n )"
 { $values { "n" "an integer" } }
@@ -357,4 +357,4 @@ HELP: os-env "( key -- value )"
 HELP: dispatch "( n array -- )"
 { $values { "n" "a fixnum" } { "array" "an array of quotations" } }
 { $description "Calls the " { $snippet "n" } "th quotation in the array." }
-{ $warning "This word is in the " { $snippet "kernel-internals" } " vocabulary because it is an implementation detail used by the generic word system to accelerate method dispatch. It does not perform type or bounds checks, and user code should not need to call it directly." } ;
+{ $warning "This word is in the " { $vocab-link "kernel-internals" } " vocabulary because it is an implementation detail used by the generic word system to accelerate method dispatch. It does not perform type or bounds checks, and user code should not need to call it directly." } ;

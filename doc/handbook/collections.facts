@@ -14,7 +14,7 @@ ARTICLE: "collections" "Collections"
 { $subsection "buffers" } ;
 
 ARTICLE: "queues" "Queues"
-"Last-in-first-out queues can be found in the " { $snippet "queues" } " vocabulary."
+"Last-in-first-out queues can be found in the " { $vocab-link "queues" } " vocabulary."
 { $subsection queue? }
 { $subsection <queue> }
 { $subsection queue-empty? }
@@ -35,7 +35,7 @@ ARTICLE: "queues" "Queues"
 } ;
 
 ARTICLE: "graphs" "Directed graphs"
-"A minimalist directed graph data type can be found in the " { $snippet "graphs" } " vocabulary. A directed graph is represented as a hashtable mapping each vertex to a set of edges entering that vertex, where the set is represented as a hashtable with equal keys and values."
+"A minimalist directed graph data type can be found in the " { $vocab-link "graphs" } " vocabulary. A directed graph is represented as a hashtable mapping each vertex to a set of edges entering that vertex, where the set is represented as a hashtable with equal keys and values."
 $terpri
 "To create a new graph, just call " { $link <hashtable> } " or construct a hashtable by some other means. To add vertices and edges to a graph:"
 { $subsection add-vertex }
@@ -51,7 +51,7 @@ $terpri
 ARTICLE: "buffers" "Locked I/O buffers"
 "I/O buffers are a circular ring structure, a fixed-size queue of characters. Their key feature is that they are backed by manually allocated storage that does not get moved by the garbage collector. They are typically used for asynchronous I/O in conjunction with the C library interface in Factor's implementation."
 $terpri
-"Buffer words are in the " { $snippet "io-internals" } " vocabulary."
+"Buffer words are in the " { $vocab-link "io-internals" } " vocabulary."
 { $subsection buffer }
 { $subsection <buffer> }
 "Buffers must be manually deallocated:"

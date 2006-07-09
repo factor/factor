@@ -3,7 +3,7 @@ USING: help math prettyprint sequences ;
 ARTICLE: "math" "Numbers"
 "Factor attempts to preserve natural mathematical semantics for numbers. Multiplying two large integers never results in overflow, and dividing two integers yields an exact ratio. Floating point numbers are also supported, along with complex numbers."
 $terpri
-"Math words are in the " { $snippet "math" } " vocabulary. Implementation details are in the " { $snippet "math-internals" } " vocabulary."
+"Math words are in the " { $vocab-link "math" } " vocabulary. Implementation details are in the " { $vocab-link "math-internals" } " vocabulary."
 { $subsection "number-protocol" }
 { $subsection "number-types" }
 { $subsection "math-functions" }
@@ -50,7 +50,7 @@ $terpri
 { $subsection bignum? }
 { $subsection >fixnum }
 { $subsection >bignum }
-"The " { $link . } " word prints numbers in decimal. A set of words in the " { $snippet "prettyprint" } " vocabulary is provided to print integers using another base."
+"The " { $link . } " word prints numbers in decimal. A set of words in the " { $vocab-link "prettyprint" } " vocabulary is provided to print integers using another base."
 { $subsection .b }
 { $subsection .o }
 { $subsection .h }

@@ -4,7 +4,7 @@ kernel-internals namespaces queues ;
 ARTICLE: "hashtables" "Hashtables"
 "A hashtable provides efficient (expected constant time) lookup and storage of key/value pairs. Keys are compared for equality, and a hashing function is used to reduce the number of comparisons made."
 $terpri
-"Hashtable words are in the " { $snippet "hashtables" } " vocabulary. Unsafe implementation words are in the " { $snippet "hashtables-internals" } " vocabulary."
+"Hashtable words are in the " { $vocab-link "hashtables" } " vocabulary. Unsafe implementation words are in the " { $vocab-link "hashtables-internals" } " vocabulary."
 $terpri
 "Hashtables form a class of objects."
 { $subsection hashcode }

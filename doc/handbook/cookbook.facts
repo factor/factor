@@ -147,14 +147,14 @@ ARTICLE: "cookbook-vocabs" "Vocabularies cookbook"
 $terpri
 "For example, a source file containing the following code will print a parse error if you try loading it:"
 { $code "\"Hello world\" print" }
-"The " { $link print } " word is contained inside the " { $snippet "io" } " vocabulary, which is available in the listener but must be explicitly added to the search path in source files:"
+"The " { $link print } " word is contained inside the " { $vocab-link "io" } " vocabulary, which is available in the listener but must be explicitly added to the search path in source files:"
 { $code
     "USE: io"
     "\"Hello world\" print"
 }
 "Typically a source file will refer to words in multiple vocabularies, and they can all be added to the search path in one go:"
 { $code "USING: arrays kernel math ;" }
-"New words go into the " { $snippet "scratchpad" } " vocabulary by default. You can change this with " { $link POSTPONE: IN: } ":"
+"New words go into the " { $vocab-link "scratchpad" } " vocabulary by default. You can change this with " { $link POSTPONE: IN: } ":"
 { $code
     "IN: time-machine"
     ": time-travel ( when what -- ) frob fizz flap ;"

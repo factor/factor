@@ -6,7 +6,7 @@ styles ;
 ARTICLE: "streams" "Streams"
 "Input and output centers on the concept of a " { $emphasis "stream" } ", which is a source or sink of characters. Streams also support formatted output, which may be used to present styled text in a manner independent of output medium."
 $terpri
-"Stream words are in the " { $snippet "io" } " vocabulary."
+"Stream words are in the " { $vocab-link "io" } " vocabulary."
 { $subsection "stream-protocol" }
 { $subsection "stream-utils" }
 { $subsection "stdio" }
@@ -66,7 +66,7 @@ ARTICLE: "stdio" "The default stream"
 ARTICLE: "styles" "Formatted output"
 "The " { $link stream-format } " and " { $link with-nested-stream } " words take a hashtable of style attributes. The former acts on character styles, and the latter acts on paragraph styles. Output stream implementations are free to ignore style information."
 $terpri
-"Style hashtables are keyed by symbols from the " { $snippet "styles" } " vocabulary."
+"Style hashtables are keyed by symbols from the " { $vocab-link "styles" } " vocabulary."
 { $subsection "character-styles" }
 { $subsection "paragraph-styles" }
 { $subsection "presentations" } ;

@@ -94,7 +94,7 @@ ARTICLE: "debugger" "The debugger"
 ARTICLE: "inspector" "The inspector"
 "The prettyprinter (see " { $link "prettyprint" } ") can turn any object into a source representation. Sometimes this source representation is hard to read for a human, so the inspector provides an alternative tabular view of an object:"
 { $subsection inspect }
-"Once running, the inspector spawns a new nested listener with an " { $snippet "inspector" } " prompt. The inspector supports a number of commands:"
+"Once running, the inspector spawns a new nested listener with an " { $vocab-link "inspector" } " prompt. The inspector supports a number of commands:"
 { $subsection inspecting }
 { $subsection go }
 { $subsection up }

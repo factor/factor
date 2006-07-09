@@ -5,7 +5,7 @@ HELP: set-fill "( n seq -- )"
 { $values { "n" "a new fill pointer" } { "seq" "a growable sequence" } }
 { $contract "Sets the fill pointer (number of occupied elements in the underlying storage) of a growable sequence." }
 { $side-effects "seq" }
-{ $warning "This word is in the " { $snippet "sequences-internals" } " vocabulary because it is not safe. Changing the fill pointer to a negative value, or a value higher than the underlying sequence length can lead to memory corruption. User code should use " { $link set-length } " instead." } ;
+{ $warning "This word is in the " { $vocab-link "sequences-internals" } " vocabulary because it is not safe. Changing the fill pointer to a negative value, or a value higher than the underlying sequence length can lead to memory corruption. User code should use " { $link set-length } " instead." } ;
 
 HELP: underlying "( seq -- underlying )"
 { $values { "seq" "a growable sequence" } { "underlying" "the underlying sequence" } }
@@ -14,7 +14,7 @@ HELP: underlying "( seq -- underlying )"
 HELP: set-underlying "( underlying seq -- )"
 { $values { "underlying" "a growable sequence" } { "seq" "a vector, string buffer or hashtable" } }
 { $contract "Modifies the underlying storage of a growable sequence." }
-{ $warning "This word is in the " { $snippet "sequences-internals" } " vocabulary because it is not safe. Setting an underlying sequence shorter than the fill pointer can lead to memory corruption." } ;
+{ $warning "This word is in the " { $vocab-link "sequences-internals" } " vocabulary because it is not safe. Setting an underlying sequence shorter than the fill pointer can lead to memory corruption." } ;
 
 HELP: capacity "( seq -- n )"
 { $values { "seq" "a vector or string buffer" } { "n" "the capacity of the sequence" } }

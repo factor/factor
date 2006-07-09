@@ -28,7 +28,7 @@ $terpri
 $terpri
 "Parsing words play a key role in parsing; while ordinary words and numbers are simply added to the parse tree, parsing words execute in the context of the parser, and can do their own parsing and create nested data structures in the parse tree. Parsing words are also able to define new words."
 $terpri
-"While parsing words supporting arbitrary syntax can be defined, the default set is found in the " { $snippet "syntax" } " vocabulary and provides the basis for all further syntactic interaction with Factor." ;
+"While parsing words supporting arbitrary syntax can be defined, the default set is found in the " { $vocab-link "syntax" } " vocabulary and provides the basis for all further syntactic interaction with Factor." ;
 
 ARTICLE: "vocabulary-search" "Vocabulary search"
 "A " { $emphasis "word" } " is a code definition identified by a name. Words are sorted into " { $emphasis "vocabularies" } ". Words are discussed in depth in " { $link "words" } "."
@@ -39,7 +39,7 @@ $terpri
 $terpri
 "For a source file the vocabulary search path starts off with two vocabularies:"
 { $code "syntax\nscratchpad" }
-"The " { $snippet "syntax" } " vocabulary consists of a set of parsing words for reading Factor data and defining new words. The " { $snippet "scratchpad" } " vocabulary is the default vocabulary for new word definitions."
+"The " { $vocab-link "syntax" } " vocabulary consists of a set of parsing words for reading Factor data and defining new words. The " { $vocab-link "scratchpad" } " vocabulary is the default vocabulary for new word definitions."
 $terpri
 "At the interactive listener, the default search path contains many more vocabularies. Details on the default search path and parser invocation are found in " { $link "parser" } "."
 $terpri

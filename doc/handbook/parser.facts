@@ -3,7 +3,7 @@ USING: help io parser sequences words ;
 ARTICLE: "parser" "The parser"
 "This section concerns itself with reflective access and extension of the Factor parser. The parser algorithm and standard syntax is described in " { $link "syntax" } "."
 $terpri
-"The set of words making up the parser are found in the " { $snippet "parser" } " and " { $snippet "syntax" } " vocabularies."
+"The set of words making up the parser are found in the " { $vocab-link "parser" } " and " { $vocab-link "syntax" } " vocabularies."
 $terpri
 "As documented in " { $link "vocabulary-search" } ", the parser looks up words in the vocabulary search path. New word definitions are added to the current vocabulary. These two parameters are stored in a pair of variables:"
 { $subsection use }

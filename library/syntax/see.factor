@@ -14,9 +14,12 @@ sequences strings styles words ;
         POSTPONE: foldable
     } [ declaration. ] each-with ;
 
+: write-vocab ( vocab -- )
+    dup <vocab-link> presented associate styled-text ;
+
 : in. ( word -- )
     word-vocabulary [
-        <block \ IN: pprint-word text block;
+        <block \ IN: pprint-word write-vocab block;
     ] when* ;
 
 : (synopsis) ( word -- )
@@ -82,7 +85,7 @@ GENERIC: class. ( word -- )
     dup class? [
         dup implementors [
             newline
-            dup in. tuck dupd "methods" word-prop hash method.
+            tuck dupd "methods" word-prop hash method.
         ] each-with
     ] [
         drop

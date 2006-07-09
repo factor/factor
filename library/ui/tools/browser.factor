@@ -1,12 +1,12 @@
 ! Copyright (C) 2006 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 IN: gadgets-browser
-USING: arrays gadgets gadgets-borders gadgets-buttons
-gadgets-frames gadgets-labels gadgets-panes
+USING: arrays gadgets gadgets-books gadgets-borders
+gadgets-buttons gadgets-frames gadgets-labels gadgets-panes
 gadgets-presentations gadgets-scrolling gadgets-search
-gadgets-books gadgets-theme gadgets-tiles gadgets-tracks generic
-hashtables help inspector kernel math models namespaces
-prettyprint sequences words ;
+gadgets-theme gadgets-tiles gadgets-tracks generic hashtables
+help inspector kernel math models namespaces prettyprint
+sequences styles words ;
 
 TUPLE: asset-track showing builder closer ;
 
@@ -155,9 +155,17 @@ M: browser gadget-title drop "Browser" <model> ;
 
 : browser-window ( -- ) <browser> open-window ;
 
-: browser-tool
-    [ browser? ]
-    [ <browser> ]
-    [ show-word ] ;
+: browse ( obj browser -- )
+    over vocab-link? [
+        >r vocab-link-name r> show-vocab
+    ] [
+        show-word
+    ] if ;
+
+: browser-tool [ browser? ] [ <browser> ] [ browse ] ;
 
 M: word show ( word -- ) browser-tool call-tool ;
+
+M: vocab-link show ( vocab -- ) browser-tool call-tool ;
+
+M: f show ( f -- ) class show ;

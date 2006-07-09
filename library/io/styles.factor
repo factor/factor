@@ -31,3 +31,6 @@ SYMBOL: table-border
 
 ! Input history
 TUPLE: input string ;
+
+! Vocabulary links
+TUPLE: vocab-link name ;

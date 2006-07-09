@@ -89,10 +89,6 @@ M: word print-element { } swap execute ;
 : $code ( content -- )
     "\n" join dup <input> [ write ] ($code) ;
 
-: $vocabulary ( content -- )
-    first word-vocabulary
-    [ "Vocabulary" $heading $snippet ] when* ;
-
 : $description ( content -- )
     "Description" $heading print-element ;
 
@@ -134,6 +130,15 @@ M: object >link <link> ;
     first link-style [
         dup article-title swap >link write-object
     ] with-style ;
+
+: $vocab-link ( content -- )
+    first link-style [
+        dup <vocab-link> write-object
+    ] with-style ;
+
+: $vocabulary ( content -- )
+    [ word-vocabulary ] map
+    [ "Vocabulary" $heading terpri $vocab-link ] when* ;
 
 : textual-list ( seq quot -- )
     [ ", " print-element ] interleave ; inline

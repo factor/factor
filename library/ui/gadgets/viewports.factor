@@ -1,7 +1,8 @@
 ! Copyright (C) 2005, 2006 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 IN: gadgets-viewports
-USING: arrays gadgets generic kernel math namespaces sequences ;
+USING: arrays gadgets gadgets-borders generic kernel math
+namespaces sequences ;
 
 TUPLE: viewport ;
 
@@ -10,7 +11,8 @@ TUPLE: viewport ;
 : viewport-dim gadget-child pref-dim ;
 
 C: viewport ( content -- viewport )
-    dup delegate>gadget [ add-gadget ] keep
+    dup delegate>gadget
+    [ >r 2 <border> r> add-gadget ] keep
     t over set-gadget-clipped? ;
 
 M: viewport layout* ( viewport -- )

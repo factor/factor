@@ -183,7 +183,7 @@ ARTICLE: "sequence-protocol" "Sequence protocol"
 ARTICLE: "arrays" "Arrays"
 "An array is a fixed-size mutable sequence whose elements are stored in a contiguous range of memory. The literal syntax is covered in " { $link "syntax-arrays" } ". Sometimes you need a growable array -- this is called a vector, and vectors are documented in " { $link "vectors" } "."
 $terpri
-"Array words are in the " { $snippet "arrays" } " vocabulary. Unsafe implementation words are in the " { $snippet "kernel-internals" } " vocabulary."
+"Array words are in the " { $vocab-link "arrays" } " vocabulary. Unsafe implementation words are in the " { $vocab-link "kernel-internals" } " vocabulary."
 $terpri
 "Arrays form a class of objects."
 { $subsection array }
@@ -201,7 +201,7 @@ $terpri
 ARTICLE: "strings" "Strings"
 "A string is a fixed-size mutable sequence of characters."
 $terpri
-"String words are found in the " { $snippet "strings" } " vocabulary."
+"String words are found in the " { $vocab-link "strings" } " vocabulary."
 { $subsection string? }
 { $subsection >string }
 { $subsection <string> }
@@ -222,7 +222,7 @@ $terpri
 ARTICLE: "sbufs" "String buffers"
 "A string buffer is a resizable mutable sequence of characters. String buffers can be used to construct new strings by accumilating substrings and characters, however usually they are only used indirectly, since the sequence construction words are more convenient to use in most cases (see " { $link "namespaces-make" } ")."
 $terpri
-"String buffer words are found in the " { $snippet "strings" } " vocabulary."
+"String buffer words are found in the " { $vocab-link "strings" } " vocabulary."
 { $subsection sbuf? }
 { $subsection >sbuf }
 { $subsection <sbuf> }
@@ -230,7 +230,7 @@ $terpri
 { $code "SBUF\" \" clone" } ;
 
 ARTICLE: "vectors" "Vectors"
-"A vector is a resizable mutable sequence of objects. Vector words are found in the " { $snippet "vectors" } " vocabulary."
+"A vector is a resizable mutable sequence of objects. Vector words are found in the " { $vocab-link "vectors" } " vocabulary."
 { $subsection vector? }
 { $subsection >vector }
 { $subsection <vector> }

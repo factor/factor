@@ -3,7 +3,7 @@ USING: help io prettyprint ;
 ARTICLE: "prettyprint" "The prettyprinter"
 "One of Factor's key features is the ability to print almost any object as a valid source literal expression. This greatly aids debugging and provides the building blocks for light-weight object serialization facilities."
 $terpri
-"Prettyprinter words are found in the " { $snippet "prettyprint" } " vocabulary."
+"Prettyprinter words are found in the " { $vocab-link "prettyprint" } " vocabulary."
 $terpri
 "The key words to print an object to the " { $link stdio } " stream; the first two emit a trailing newline, the second two do not:"
 { $subsection . }
