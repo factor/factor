@@ -97,19 +97,20 @@ C: elevator ( vector -- elevator )
     [ set-gadget-orientation ] keep ;
 
 : (layout-thumb) ( slider n -- n thumb )
-    over gadget-orientation n*v [ >fixnum ] map
-    swap slider-thumb ;
+    over gadget-orientation n*v swap slider-thumb ;
 
 : thumb-loc ( slider -- loc )
     dup slider-value swap slider>screen ;
 
 : layout-thumb-loc ( slider -- )
-    dup thumb-loc (layout-thumb) set-rect-loc ;
+    dup thumb-loc (layout-thumb)
+    >r [ floor ] map r> set-rect-loc ;
 
 : layout-thumb-dim ( slider -- )
-    dup dup thumb-dim (layout-thumb)
-    >r >r dup rect-dim r> rot gadget-orientation set-axis r>
-    set-layout-dim ;
+    dup dup thumb-dim (layout-thumb) >r
+    >r dup rect-dim r>
+    rot gadget-orientation set-axis [ ceiling ] map
+    r> set-layout-dim ;
 
 : layout-thumb ( slider -- )
     dup layout-thumb-loc layout-thumb-dim ;
