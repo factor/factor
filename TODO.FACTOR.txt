@@ -1,6 +1,5 @@
 + tomorrow:
 
-- help gadget: opens 'f' initially
 - amd64 crash
 
 + day after:
@@ -21,6 +20,9 @@
 
 + ui:
 
+- markup: goofy if a block is the first thing in a table cell
+- ui uses too much cpu time idling
+- table borders rendered badly
 - why is the thumb skewed?
 - add some handy services:
   - base conversion

@@ -45,7 +45,8 @@ M: incremental pref-dim* ( incremental -- dim )
     over prefer-incremental
     2dup incremental-loc
     tuck update-cursor
-    prefer-incremental ;
+    dup prefer-incremental
+    gadget-parent [ invalidate* ] when* ;
 
 : clear-incremental ( incremental -- )
     dup (clear-gadget) dup forget-pref-dim

@@ -11,6 +11,7 @@ implementation. It is not an introduction to the language itself.
 - Building Factor
 - Running Factor on Unix with X11
 - Running Factor on Mac OS X
+- Running Factor on Windows
 - Source organization
 - Community
 - Credits
@@ -23,6 +24,7 @@ Factor is fully supported on the following platforms:
   Linux/AMD64
   Mac OS X/x86
   Mac OS X/PowerPC
+  MS Windows XP
 
 The following platforms should work, but are not tested on a
 regular basis:
@@ -136,6 +138,16 @@ this point), and the library source into a self-contained Factor.app.
 
 Factor.app runs the UI when double-clicked and can be transported
 between PowerPC Macs.
+
+* Running Factor on Windows
+
+If you did not download the binary package, you can bootstrap Factor in
+the command prompt:
+
+  f.exe boot.image.pentium4 (or boot.image.x86)
+
+Once bootstrapped, double-clicking f.exe starts the Factor UI. There is
+no option to run the listener in the command prompt on Windows.
 
 * Source organization
 

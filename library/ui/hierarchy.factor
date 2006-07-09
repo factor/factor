@@ -71,14 +71,13 @@ M: gadget ungraft* drop ;
         %
     ] [ ] make call ;
 
-: (parents) ( gadget vector -- )
-    over
-    [ 2dup push >r gadget-parent r> (parents) ] [ 2drop ] if ;
+: (parents) ( gadget -- )
+    [ dup , gadget-parent (parents) ] when* ;
 
 : parents ( gadget -- vector )
     #! A list of all parents of the gadget, the first element
     #! is the gadget itself.
-    V{ } clone [ (parents) ] keep ;
+    [ (parents) ] { } make ;
 
 : each-parent ( gadget quot -- ? )
     >r parents r> all? ; inline
@@ -89,12 +88,6 @@ M: gadget ungraft* drop ;
 : screen-loc ( gadget -- point )
     #! The position of the gadget on the screen.
     parents { 0 0 } [ rect-loc v+ ] reduce ;
-
-: gadget-point ( gadget vector -- point )
-    #! { 0 0 } - top left corner
-    #! { 1/2 1/2 } - middle
-    #! { 1 1 } - bottom right corner
-    >r dup screen-loc swap rect-dim r> v* v+ ;
 
 : relative-loc ( g1 point -- point-g1 ) swap screen-loc v- ;
 

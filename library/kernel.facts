@@ -240,11 +240,11 @@ $terpri
 { $code "X [ Y ] unless*" "X dup [ ] [ drop Y ] if" } } ;
 
 HELP: ?if "( default cond true false -- )"
-{ $values { "cond" "a generalized boolean" } { "true" "a quotation with stack effect " { $snippet "( cond -- )" } } { "false" "a quotation with stack effect " { $snippet "( default -- )" } } }
+{ $values { "default" "an object" } { "cond" "a generalized boolean" } { "true" "a quotation with stack effect " { $snippet "( cond -- )" } } { "false" "a quotation with stack effect " { $snippet "( default -- )" } } }
 { $description "If the condition is " { $link f } ", the " { $snippet "false" } " quotation is called with the " { $snippet "default" } " value on the stack. Otherwise, the " { $snippet "true" } " quotation is called with the condition on the stack."
 $terpri
 "The following two lines are equivalent:"
-{ $code "X [ Y ] [ Z ] ?if" "X dup [ nip Y ] [ drop Z ] if" } } ;
+{ $code "[ X ] [ Y ] ?if" "dup [ nip X ] [ drop Y ] if" } } ;
 
 HELP: keep-datastack "( quot -- )"
 { $values { "quot" "a quotation" } }

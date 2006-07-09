@@ -39,6 +39,9 @@ M: help-gadget gadget-title
     help-gadget-history
     [ "Help - " swap article-title append ] <filter> ;
 
+M: help-gadget pref-dim*
+    drop { 500 600 } ;
+
 : help-tool
     [ help-gadget? ]
     [ <help-gadget> ]

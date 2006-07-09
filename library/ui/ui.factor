@@ -83,7 +83,7 @@ C: titled-gadget ( gadget title -- )
     [ world-gadget swap call ] find-last-with nip ; inline
 
 : open-tool ( arg cons setter -- )
-    >r call tuck r> call open-window ; inline
+    >r call dup open-window r> call ; inline
 
 : call-tool ( arg pred cons setter -- )
     rot find-window [
