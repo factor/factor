@@ -23,7 +23,6 @@ SYMBOL: grid-dim
 M: grid-lines draw-boundary ( gadget paint -- )
     #! Clean this up later.
     GL_MODELVIEW [
-        0.5 0.5 0 glTranslated
         grid-lines-color gl-color [
             grid get rect-dim half-gap v- grid-dim set
             { 0 1 } draw-grid-lines

@@ -158,7 +158,7 @@ M: object >link <link> ;
 : $grid ( content style -- )
     [
         table-content-style [
-            [ print-element ] tabular-output
+            [ last-element off print-element ] tabular-output
         ] with-style
     ] ($block) table last-element set ;
 

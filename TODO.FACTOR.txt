@@ -20,15 +20,13 @@
 
 + ui:
 
-- markup: goofy if a block is the first thing in a table cell
+- 'show' doesn't work if invoked from a listener on an object which is
+  itself inspected in the listener
 - ui uses too much cpu time idling
-- table borders rendered badly
-- why is the thumb skewed?
 - add some handy services:
   - base conversion
   - search help for selection
 - grid slows down with 2000 lines
-- f should be clickable
 - clickable vocabs
 - remaining HTML issues need fixing
 - better component padding and spacing in UI

@@ -97,7 +97,8 @@ C: elevator ( vector -- elevator )
     [ set-gadget-orientation ] keep ;
 
 : (layout-thumb) ( slider n -- n thumb )
-    over gadget-orientation n*v swap slider-thumb ;
+    over gadget-orientation n*v [ >fixnum ] map
+    swap slider-thumb ;
 
 : thumb-loc ( slider -- loc )
     dup slider-value swap slider>screen ;

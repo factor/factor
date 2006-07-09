@@ -24,7 +24,7 @@ M: object-button gadget-help ( button -- string )
 ! Character styles
 
 : apply-style ( style gadget key quot -- style gadget )
-    >r pick hash r> when* ; inline
+    >r pick hash* r> [ drop ] if ; inline
 
 : apply-foreground-style ( style gadget -- style gadget )
     foreground [ over set-label-color ] apply-style ;
