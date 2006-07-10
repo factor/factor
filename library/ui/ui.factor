@@ -73,7 +73,8 @@ C: titled-gadget ( gadget title -- )
     <world>
     dup pref-dim over set-gadget-dim
     dup world-gadget gadget-title over set-world-title
-    open-window* ;
+    dup open-window*
+    draw-world ;
 
 : open-titled-window ( gadget title -- )
     <model> <titled-gadget> open-window ;
