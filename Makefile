@@ -63,13 +63,17 @@ default:
 freebsd:
 	$(MAKE) $(BINARY) CONFIG=vm/Config.freebsd
 
-macosx-ppc:
+macosx-freetype:
+	ln -sf libfreetype.6.dylib \
+		Factor.app/Contents/Frameworks/libfreetype.dylib
+
+macosx-ppc: macosx-freetype
 	$(MAKE) $(BINARY) CONFIG=vm/Config.macosx.ppc
 
-macosx-x86:
+macosx-x86: macosx-freetype
 	$(MAKE) $(BINARY) CONFIG=vm/Config.macosx
 
-linux linux-x86 linux-amd64:
+linux-x86 linux-amd64:
 	$(MAKE) $(BINARY) CONFIG=vm/Config.linux
 	$(STRIP) $(BINARY)
 
