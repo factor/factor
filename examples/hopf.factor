@@ -7,11 +7,21 @@ IN: hopf
 ! An element is represented as a hashtable mapping basis
 ! elements to scalars.
 
-! A generator is a pair of arrays, odd/even generators.
+! A basis element is a pair of arrays, odd/even generators.
 
-! Example:
+! Define degrees using deg=
 
-SYMBOLS: a b c ;
+! Add elements using h+
+
+! Multiply elements using /\
+
+! The co-unit is co1
+
+! Print elements using h.
+
+! Define the differential using d=
+
+! Differentiate using d
 
 : SYMBOLS:
     string-mode on
@@ -59,6 +69,8 @@ H{ } clone degrees set
         { [ dup -1 = ] [ drop " - " ] }
         { [ t ] [ number>string " + " swap append ] }
     } cond ;
+
+: co1 ( vec -- n ) { { } { } } swap hash [ 0 ] unless* ;
 
 : h. ( vec -- )
     dup hash-empty? [
