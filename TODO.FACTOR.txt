@@ -17,6 +17,7 @@
 
 + ui:
 
+- graphical module manager tool
 - add some handy services:
   - base conversion
   - search help for selection
