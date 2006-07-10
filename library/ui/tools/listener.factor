@@ -3,52 +3,40 @@
 IN: gadgets-listener
 USING: arrays gadgets gadgets-editors gadgets-frames
 gadgets-labels gadgets-panes gadgets-presentations
-gadgets-scrolling gadgets-theme generic hashtables inspector io
-jedit kernel listener math models namespaces parser prettyprint
-sequences styles threads words ;
+gadgets-scrolling gadgets-theme gadgets-tiles gadgets-tracks
+generic hashtables inspector io jedit kernel listener math
+models namespaces parser prettyprint sequences shells styles
+threads words ;
 
 TUPLE: listener-gadget pane stack ;
 
-: usable-words ( -- words )
-    use get hash-concat hash-values ;
-
-: word-completion ( pane -- )
-    usable-words swap pane-input set-possibilities ;
-
-: show-stack ( seq pack -- )
-    dup clear-gadget [
-        dup empty? [
-            "Empty stack" write drop
-        ] [
-            "Stack top: " write <reversed>
-            [ [ unparse-short ] keep write-object bl ] each bl
-        ] if
-    ] with-stream* ;
-
 : ui-listener-hook ( listener -- )
-    [
-        >r datastack-hook get call r>
-        listener-gadget-stack show-stack
-    ] keep
-    listener-gadget-pane word-completion ;
+    >r datastack-hook get call r>
+    listener-gadget-stack set-model ;
 
 : listener-thread ( listener -- )
     dup listener-gadget-pane [
-        [ ui-listener-hook ] curry listener-hook set
-        print-banner listener
+        [ ui-listener-hook ] curry listener-hook set tty
     ] with-stream* ;
-
-: <stack-bar> ( -- gadget ) <shelf> dup highlight-theme ;
 
 : start-listener ( listener -- )
     [ >r clear r> init-namespaces listener-thread ] in-thread
     drop ;
 
+: <pane-tile> ( model quot title -- gadget )
+    >r <pane-control> <scroller> r> f <tile> ;
+
+: <stack-tile> ( model title -- gadget )
+    [ stack. ] swap <pane-tile> ;
+
+: <stack-display> ( -- gadget )
+    gadget get listener-gadget-stack "Stack" <stack-tile> ;
+
 C: listener-gadget ( -- gadget )
-    {
-        { [ <stack-bar> ] set-listener-gadget-stack f @top }
-        { [ <input-pane> ] set-listener-gadget-pane [ <scroller>  ] @center }
-    } make-frame* dup start-listener ;
+    f <model> over set-listener-gadget-stack {
+        { [ <input-pane> ] set-listener-gadget-pane [ <scroller> ] 5/6 }
+        { [ <stack-display> ] f f 1/6 }
+    } { 0 1 } make-track* dup start-listener ;
 
 M: listener-gadget pref-dim*
     delegate pref-dim* { 600 600 } vmax ;

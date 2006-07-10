@@ -9,10 +9,7 @@ vectors words ;
 
 : &r ( -- ) meta-r get stack. ;
 
-: meta-c*
-    [
-        meta-c get % { callframe callframe-scan callframe-end } [ get , ] each
-    ] { } make ;
+: meta-c* ( -- seq ) meta-c get meta-callframe append ;
 
 : &c ( -- ) meta-c* callstack. ;
 
@@ -42,5 +39,5 @@ vectors words ;
 : walk ( quot -- )
     continuation [
         set-meta-interp pop-d drop (meta-call)
-        set-walk-hooks walk-banner listener end-walk
+        set-walk-hooks walk-banner (listener) end-walk
     ] with-scope ;

@@ -29,6 +29,9 @@ SYMBOL: callframe
 SYMBOL: callframe-scan
 SYMBOL: callframe-end
 
+: meta-callframe ( -- seq )
+    { callframe callframe-scan callframe-end } [ get ] map ;
+
 ! Callframe.
 : up ( -- )
     pop-c callframe-end set

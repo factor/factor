@@ -76,7 +76,7 @@ DEFER: describe
 
 : describe ( object -- ) dup summary print sheet sheet. ;
 
-: stack. ( seq -- seq ) <reversed> >array describe ;
+: stack. ( seq -- seq ) <reversed> >array sheet sheet. ;
 
 : .s datastack stack. ;
 : .r retainstack stack. ;
