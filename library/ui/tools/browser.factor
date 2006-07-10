@@ -167,5 +167,3 @@ M: browser gadget-title drop "Browser" <model> ;
 M: word show ( word -- ) browser-tool call-tool ;
 
 M: vocab-link show ( vocab -- ) browser-tool call-tool ;
-
-M: f show ( f -- ) class show ;

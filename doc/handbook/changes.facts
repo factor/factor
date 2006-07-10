@@ -1,6 +1,70 @@
-USING: generic help memory sequences words ;
+USING: errors gadgets-tracks generic hashtables help io kernel math memory sequences words ;
 
 ARTICLE: "changes" "Changes in the latest release"
+{ $heading "Factor 0.83" }
+{ $subtopic "First class quotations"
+    { $list
+        "Support for cons cells and linked lists has been removed from the core language."
+        "Quotations are now a first-class array-like type with the same literal syntax that linked lists used to have."
+        { "A few quotation construction words such as " { $link curry } ", " { $link unit } " and " { $link alist>quot } " have been moved to the " { $snippet "kernel" } " vocabulary." }
+    }
+}
+{ $subtopic "UI"
+    { $list
+        "New apropos tool."
+        "New word browser tool."
+        { "New " { $link track } " gadget replaces the old " { $snippet "splitter" } "; it behaves similarly but supports more than two children." }
+        "Key down and key up gestures have been made separate."
+        "Window positions and contents are now saved in the image."
+        "You can now paste from the clipboard using Control-V (Mac OS) or by middle-clicking (X11)."
+        "The UI now uses 2-dimensional rather than 3-dimensional co-ordinates, since the third dimension was never used."
+        "Beginnings of an MVC framework taking some cues from functional reactive programming."
+    }
+}
+{ $subtopic "Documentation"
+    { $list
+        "Better looking markup output."
+        "Expanded and improved documentation."
+        "Full-text search."
+    }
+}
+{ $subtopic "Mac OS X-specific"
+    { $list
+        "Factor now runs on Intel-based Macs."
+        { "Redesigned Cocoa binding. Messages are now sent via the " { $snippet "->" } " parsing word, for example:"
+            { $code "NSObject -> alloc -> init" }
+        }
+        "Files can be run by dropping them on the Factor icon in the dock"
+        { "Services support; if you drop " { $snippet "Factor.app" } " in your " { $snippet "Applications" } " directory, you will be able to evaluate Factor code from other applications." }
+        "File->Run command."
+    }
+}
+{ $subtopic "Core language changes"
+    { $list
+        { "The " { $snippet "reverse-slice" } " word has been removed; call " { $link <reversed> } " instead." }
+        { "The " { $link sum } " and " { $link product } " words have been moved into the core." }
+        { "New " { $link remove-hash* } " word removes the former value." }
+        { "C library interface now features full support for " { $snippet "ushort*" } " UTF-16 strings." }
+        { "Restartable errors are now supported; throw them using " { $link condition } ", and invoke restarts in the listener using " { $link :res } "." }
+        { { $link with-stream-table } " word for tabular formatting." }
+        { "Style stack and associated words such as " { $snippet "format*" } " have been removed in favor of a better abstraction, " { $link with-style } " and " { $link with-stream-style } "." }
+    }
+}
+{ $subtopic "Contributed libraries"
+    { $list
+        { "There is a new mechanism for loading contributed libraries that correctly handles dependencies; see " { $link "modules" } "." }
+        "Factory window manager updates (Eduardo Cavazos)"
+        { "New " { $snippet "slate" } " gadget for easier graphical output for simulations and demos. (Eduardo Cavazos)" }
+        "Automata and boids demos. (Eduardo Cavazos)"
+        { "More concise syntax for variables in " { $snippet "contrib/vars.factor" } ". (Eduardo Cavazos)" }
+    }
+}
+{ $subtopic "HTTP server"
+    { $list
+        "Improved AJAX outliners in the help responder can now be collapsed."
+        { "Files with the " { $snippet ".fhtml" } " extension are run through the " { $snippet "embedded.factor" } " module; snippets of Factor code between " { $snippet "<%" } " and " { $snippet "%>" } " are evaluated and their output intermingled with the HTML text." }
+    }
+}
 { $heading "Factor 0.82" }
 { $list
     "New code generator framework in compiler"

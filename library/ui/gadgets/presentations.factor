@@ -24,7 +24,7 @@ M: object-button gadget-help ( button -- string )
 ! Character styles
 
 : apply-style ( style gadget key quot -- style gadget )
-    >r pick hash* r> [ drop ] if ; inline
+    >r pick hash r> when* ; inline
 
 : apply-foreground-style ( style gadget -- style gadget )
     foreground [ over set-label-color ] apply-style ;
@@ -55,10 +55,8 @@ M: object-button gadget-help ( button -- string )
 
 : apply-wrap-style ( style pane -- style pane )
     wrap-margin [
-        [
-            2dup <paragraph> swap set-pane-prototype
-            <paragraph> over set-pane-current
-        ] when*
+        2dup <paragraph> swap set-pane-prototype
+        <paragraph> over set-pane-current
     ] apply-style ;
 
 : apply-border-width-style ( style gadget -- style gadget )
