@@ -66,6 +66,14 @@ M: input summary ( input -- )
     "Input: " swap input-string
     dup string? [ unparse-short ] unless append ;
 
+M: vocab-link summary ( vocab-link -- )
+    [
+        vocab-link-name dup %
+        " vocabulary (" %
+        words length #
+        " words)" %
+    ] "" make ;
+
 DEFER: describe
 
 : sheet. ( sheet -- )

@@ -17,7 +17,8 @@
 
 + ui:
 
-- new windows don't redraw?
+- finish gui stepper
+- windows are not updated while resizing
 - graphical module manager tool
 - add some handy services:
   - base conversion

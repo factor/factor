@@ -1,9 +1,9 @@
 ! Copyright (C) 2006 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 IN: gadgets
-USING: arrays gadgets gadgets-frames gadgets-labels
-gadgets-theme gadgets-viewports hashtables kernel math models
-namespaces queues sequences threads ;
+USING: arrays gadgets gadgets-frames gadgets-grids
+gadgets-labels gadgets-theme gadgets-viewports hashtables kernel
+math models namespaces queues sequences threads ;
 
 ! Assoc mapping aliens to gadgets
 SYMBOL: windows
@@ -69,8 +69,12 @@ C: titled-gadget ( gadget title -- )
     [ set-titled-gadget-title ] keep
     { { f f f @center } } make-frame* ;
 
+: init-status ( world -- )
+    dup world-status <label-control> dup highlight-theme
+    swap @bottom grid-add ;
+
 : open-window ( gadget -- )
-    <world>
+    <world> dup init-status
     dup pref-dim over set-gadget-dim
     dup world-gadget gadget-title over set-world-title
     dup open-window*
