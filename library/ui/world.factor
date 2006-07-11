@@ -23,13 +23,13 @@ TUPLE: world gadget title status focus focused? fonts handle loc ;
 DEFER: request-focus
 
 C: world ( gadget -- world )
-    f <model> over set-world-title
     f <model> over set-world-status
+    [ >r dup gadget-title r> set-world-title ] keep
     { { f set-world-gadget f @center } } make-frame*
     t over set-gadget-root?
     H{ } clone over set-world-fonts
-    dup world-gadget request-focus
-    { 0 0 } over set-world-loc ;
+    { 0 0 } over set-world-loc
+    dup world-gadget request-focus ;
 
 : find-world [ world? ] find-parent ;
 
@@ -63,3 +63,5 @@ M: world model-changed ( world -- )
 
 : draw-string ( font string -- )
     >r world get font-sprites first2 r> (draw-string) ;
+
+M: world gadget-title world-gadget gadget-title ;

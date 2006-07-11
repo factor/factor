@@ -60,6 +60,4 @@ USING: alien gadgets hashtables kernel math namespaces sequences ;
 
 : map-window ( win -- ) dpy get swap XMapWindow drop ;
 
-: map-window* ( world win -- ) dup set-closable map-window ;
-
 : unmap-window ( win -- ) dpy get swap XUnmapWindow drop ;

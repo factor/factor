@@ -96,3 +96,8 @@ M: gadget gadget-help drop f ;
 
 : with-gadget ( gadget quot -- )
     [ swap gadget set call ] with-scope ; inline
+
+! Title bar protocol
+GENERIC: gadget-title ( gadget -- string )
+
+M: gadget gadget-title drop "Factor" <model> ;

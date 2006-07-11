@@ -53,12 +53,6 @@ SYMBOL: windows
 
 : <status-bar> ( -- gadget ) "" <label> dup highlight-theme ;
 
-GENERIC: gadget-title ( gadget -- string )
-
-M: gadget gadget-title drop "Factor" <model> ;
-
-M: world gadget-title world-gadget gadget-title ;
-
 TUPLE: titled-gadget title ;
 
 M: titled-gadget gadget-title titled-gadget-title ;
@@ -76,7 +70,6 @@ C: titled-gadget ( gadget title -- )
 : open-window ( gadget -- )
     <world> dup init-status
     dup pref-dim over set-gadget-dim
-    dup world-gadget gadget-title over set-world-title
     dup open-window*
     draw-world ;
 

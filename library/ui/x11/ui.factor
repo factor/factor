@@ -132,8 +132,9 @@ IN: gadgets
     world-handle first dpy get -rot swap XStoreName drop ;
 
 : open-window* ( world -- )
-    dup gadget-window dup start-world
-    world-handle first map-window* ;
+    dup gadget-window
+    dup start-world
+    world-handle first dup set-closable map-window ;
 
 : raise-window ( world -- )
     dpy get swap world-handle first XRaiseWindow drop ;
