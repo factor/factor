@@ -88,15 +88,18 @@ IN: compiler
     { +clobber { "obj" "slot" } }
 } define-intrinsic
 
+: char-reg cell 8 = RBX EBX ? ; inline
+: char-reg-16 BX ; inline
+
 \ char-slot [
-    EBX PUSH
+    char-reg PUSH
     "n" operand 2 SHR
-    EBX dup XOR
+    char-reg dup XOR
     "obj" operand "n" operand ADD
-    BX "obj" operand string-offset [+] MOV
-    EBX tag-bits SHL
-    "obj" operand EBX MOV
-    EBX POP
+    char-reg-16 "obj" operand string-offset [+] MOV
+    char-reg tag-bits SHL
+    "obj" operand char-reg MOV
+    char-reg POP
 ] H{
     { +input { { f "n" } { f "obj" } } }
     { +output { "obj" } }
@@ -104,13 +107,13 @@ IN: compiler
 } define-intrinsic
 
 \ set-char-slot [
-    EBX PUSH
+    char-reg PUSH
     "val" operand tag-bits SHR
     "slot" operand 2 SHR
     "obj" operand "slot" operand ADD
-    EBX "val" operand MOV
-    "obj" operand string-offset [+] BX MOV
-    EBX POP
+    char-reg "val" operand MOV
+    "obj" operand string-offset [+] char-reg-16 MOV
+    char-reg POP
 ] H{
     { +input { { f "val" } { f "slot" } { f "obj" } } }
     { +clobber { "val" "slot" "obj" } }
@@ -223,13 +226,13 @@ IN: compiler
     ! save EDX since its volatile.
     remainder-reg PUSH
     ! Align the stack -- only needed on Mac OS X
-    ESP 12 SUB
+    stack-reg 16 cell - SUB
     "s48_long_to_bignum" f
     "y" operand 1array compile-c-call*
     ! An untagged pointer to the bignum is now in EAX; tag it
     T{ int-regs } return-reg bignum-tag OR
     ! Align the stack -- only needed on Mac OS X
-    ESP 12 ADD
+    stack-reg 16 cell - ADD
     ! the remainder is now in EDX
     remainder-reg POP
     "end" get save-xt ;

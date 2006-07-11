@@ -114,7 +114,7 @@ M: object load-literal ( literal vreg -- )
     ! Untag and multiply to get a jump table offset
     "n" operand fixnum>slot@
     ! Add to jump table base. We use a temporary register since
-    ! on AMD4 we have to load a 64-bit immediate. On x86, this
+    ! on AMD64 we have to load a 64-bit immediate. On x86, this
     ! is redundant.
     "scratch" operand HEX: ffffffff MOV "end" get absolute-cell
     "n" operand "scratch" operand ADD

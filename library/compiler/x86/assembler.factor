@@ -190,8 +190,16 @@ M: register displacement drop f ;
 ( Utilities                                                    )
 UNION: operand register indirect ;
 
-: rex.w? ( reg mod-r/m rex.w -- ? )
-    [ register-64? ] 2apply or and ;
+: operand-64? ( operand -- ? )
+    dup indirect? [
+        dup indirect-base register-64?
+        swap indirect-index register-64? or
+    ] [
+        register-64?
+    ] if ;
+
+: rex.w? ( rex.w reg mod-r/m -- ? )
+    [ operand-64? ] [ operand-64? ] ?if and ;
 
 : lhs-prefix
     extended? [ BIN: 00000100 bitor ] when ;

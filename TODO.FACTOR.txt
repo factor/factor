@@ -1,4 +1,3 @@
-- amd64 crash
 - make-frame should compile
 
 - httpd search tools
