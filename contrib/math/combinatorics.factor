@@ -17,19 +17,24 @@ USING: kernel sequences errors namespaces math ;
     #! calculate n! given n, k, k!
     (k..n] product * ;
 
-
 : nCk ( n k -- nCk )
     #! uses the results from min(k!,(n-k)!) to compute max(k!,(n-k)!)
     #! use max(k!,(n-k)!) to compute n!
-    2dup < [ "n >= k only" throw ] when
-    [ - ] 2keep rot 2dup < [ swap ] when
-    [ factorial ] keep over
-    >r rot [ factorial-part ] keep rot pick >r factorial-part r> r> * / ;
+    2dup < [
+        2drop 0
+    ] [
+        [ - ] 2keep rot 2dup < [ swap ] when
+        [ factorial ] keep over
+        >r rot [ factorial-part ] keep rot pick >r factorial-part r> r> * /
+    ] if ;
 
 : nPk ( n k -- nPk )
     #! uses the results from (n-k)! to compute n!
-    2dup < [ "n >= k only" throw ] when
-    2dup - nip [ factorial ] keep rot pick >r factorial-part r> / ;
+    2dup < [
+        2drop 0
+    ] [
+        2dup - nip [ factorial ] keep rot pick >r factorial-part r> /
+    ] if ;
 
 : binomial ( n k -- nCk )
     #! same as nCk
