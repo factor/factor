@@ -61,9 +61,9 @@ opengl sequences ;
 : event>gesture ( event -- modifiers keycode )
     dup -> modifierFlags modifiers modifier swap key-code ;
 
-: send-key-event ( view event quot -- )
+: send-key-event ( view event quot -- ? )
     >r event>gesture r> call swap window world-focus
-    handle-gesture drop ; inline
+    handle-gesture ; inline
 
 : send-user-input ( view event -- )
     -> characters CF>string swap window world-focus user-input ;
@@ -73,7 +73,7 @@ opengl sequences ;
     [ send-user-input ] [ 2drop ] if ;
 
 : send-key-up-event ( view event -- )
-    [ <key-up> ] send-key-event ;
+    [ <key-up> ] send-key-event drop ;
 
 : send-button-down$ ( view event -- )
     over >r button&loc r> window send-button-down ;

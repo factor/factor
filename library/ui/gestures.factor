@@ -133,6 +133,9 @@ V{ } clone hand-buttons set-global
 : drag-loc ( -- loc )
     hand-loc get-global hand-click-loc get-global v- ;
 
+: hand-rel ( gadget -- loc )
+    hand-loc get-global relative-loc ;
+
 : hand-click-rel ( gadget -- loc )
     hand-click-loc get-global relative-loc ;
 

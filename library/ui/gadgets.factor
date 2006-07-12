@@ -1,7 +1,7 @@
 ! Copyright (C) 2005, 2006 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 IN: gadgets
-USING: arrays generic hashtables kernel math
+USING: arrays generic hashtables kernel models math
 namespaces sequences styles ;
 
 SYMBOL: origin
