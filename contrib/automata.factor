@@ -1,9 +1,15 @@
 ! Copyright (C) 2006 Eduardo Cavazos.
 
+! Quickstart:
+!     USE: automata
+!     automata-window
+
 REQUIRES: math slate vars ;
 
 USING: parser kernel hashtables namespaces sequences math io
-math-contrib threads strings arrays prettyprint gadgets vars slate ;
+math-contrib threads strings arrays prettyprint
+gadgets gadgets-editors gadgets-frames gadgets-buttons gadgets-grids
+vars slate ;
 
 IN: automata
 
@@ -51,6 +57,10 @@ rule-values rule-keys [ rule get set-hash ] 2each ;
 : map3-quot ( quot -- quot ) [ swap 3nth ] swap append ;
 
 : map3 ( seq quot -- seq ) over map3-i swap map3-quot map-with ;
+
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+: last ( seq -- elt ) dup length 1- swap nth ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
@@ -133,9 +143,45 @@ white set-clear-color black set-color clear-window ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-: automata ( -- )
-<slate> dup self set "Cellular Automata" open-titled-window
-init-rule interesting random-item set-rule 1000 sleep start-random ;
+! : automata ( -- )
+! <slate> dup self set "Cellular Automata" open-titled-window
+! init-rule interesting random-item set-rule 1000 sleep start-random ;
+
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+! automata-window
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+: bind-button ( ns button -- )
+tuck button-quot \ bind 3array >quotation swap set-button-quot ;
+
+VARS: ns editor frame ;
+
+: init-slate ( -- ) <slate> t over set-gadget-clipped? self set ;
+
+: init-editor ( -- ) "" <editor> >editor ;
+
+: set-editor-rule ( n -- ) number>string editor> set-editor-text ;
+
+: open-rule ( -- ) editor> editor-text string>number set-rule start-center ;
+
+: automata-window ( -- )
+<frame> >frame
+[ ] make-hash >ns
+ns> [ init-rule init-slate init-editor ] bind
+ns> [ editor> ] bind 1array
+ns>
+{ { "Open"     [ open-rule ]  }
+  { "Center"   [ start-center ] }
+  { "Random"   [ start-random ] }
+  { "Continue" [ run-rule ] } }
+[ first2 <bevel-button> tuck bind-button ]
+map-with append make-pile 1 over set-pack-fill
+frame> @left grid-add
+ns> [ self get ] bind
+frame> @center grid-add
+frame> "Cellular Automata" open-titled-window
+1000 sleep
+ns> [ interesting random-item set-editor-rule open-rule ] bind ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
