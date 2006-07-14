@@ -2,10 +2,10 @@ PROVIDE: topology
 {
     "matrix.factor"
     "linear.factor"
-    "homology.factor"
+    "simplex.factor"
     "hopf.factor"
 } {
     "test/matrix.factor"
-    "test/homology.factor"
+    "test/simplex.factor"
     "test/hopf.factor"
 } ;

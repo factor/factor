@@ -1,5 +1,5 @@
 IN: temporary
-USING: homology test ;
+USING: simplex test ;
 
 [ { 1 } ] [ {*} H ] unit-test
 [ { 2 } ] [ S^0 H ] unit-test

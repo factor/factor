@@ -1,6 +1,6 @@
 ! Copyright (C) 2006 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-IN: homology
+IN: simplex
 USING: arrays hashtables io kernel math matrices namespaces
 prettyprint sequences topology words ;
 
