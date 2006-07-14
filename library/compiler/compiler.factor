@@ -1,8 +1,8 @@
 ! Copyright (C) 2004, 2006 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 IN: compiler
-USING: errors hashtables inference io kernel math
-namespaces optimizer prettyprint sequences test words ;
+USING: errors hashtables inference io kernel math namespaces
+optimizer prettyprint sequences test threads words ;
 
 : (compile) ( word -- )
     dup specialized-def dataflow optimize generate ;
@@ -27,7 +27,7 @@ namespaces optimizer prettyprint sequences test words ;
 : compile-vocabs ( vocabs -- )
     [ words ] map concat
     dup [ f "no-effect" set-word-prop ] each
-    [ try-compile ] each ;
+    [ try-compile yield ] each ;
 
 : compile-all ( -- ) vocabs compile-vocabs ;
 

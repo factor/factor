@@ -11,7 +11,9 @@ M: assert summary drop "Assertion failed" ;
 
 : assert= ( a b -- ) 2dup = [ 2drop ] [ <assert> throw ] if ;
 
-: print-test ( input output -- ) "--> " write 2array . flush ;
+: print-test ( input output -- )
+    "----> Quotation: " write .
+    "Expected output: " write . flush ;
 
 : benchmark ( quot -- gctime runtime )
     millis >r gc-time >r call gc-time r> - millis r> - ;
