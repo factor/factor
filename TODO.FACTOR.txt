@@ -16,6 +16,7 @@
 
 + ui:
 
+- x11 copy to clipboard
 - finish gui stepper
 - windows are not updated while resizing
 - graphical module manager tool
@@ -72,6 +73,7 @@
 
 + misc:
 
+- consider: swap tail --> tail, swap head --> head
 - mach_signal: fault address reporting is not reliable
 - slice: if sequence or seq start is changed, abstraction violation
 - hashed generic method dispatch

@@ -69,6 +69,9 @@ IN: sequences
     [ [ swap change-nth ] 3keep ] repeat 2drop ;
     inline
 
+: inject-with ( obj seq quot -- | quot: obj elt -- elt )
+    swap [ with rot ] inject 2drop ; inline
+
 : min-length ( seq seq -- n )
     [ length ] 2apply min ;
 

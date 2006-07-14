@@ -203,7 +203,6 @@ sequences vectors words ;
         "/library/ui/ui.factor"
         "/library/ui/gadgets/presentations.factor"
         "/library/ui/tools/listener.factor"
-        "/library/ui/tools/walker.factor"
         "/library/ui/tools/search.factor"
         "/library/ui/tools/browser.factor"
         "/library/ui/tools/help.factor"
