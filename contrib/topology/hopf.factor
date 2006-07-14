@@ -1,8 +1,10 @@
-! Finitely generated Hopf algebras.
-! Making this efficient is left as an exercise for the reader.
+! Copyright (C) 2006 Slava Pestov.
+! See http://factorcode.org/license.txt for BSD license.
 USING: arrays errors hashtables io kernel math namespaces parser
 prettyprint sequences words ;
 IN: hopf
+
+! Finitely generated Hopf algebras.
 
 ! An element is represented as a hashtable mapping basis
 ! elements to scalars.
