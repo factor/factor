@@ -25,7 +25,7 @@ parser sequences sequences-internals words ;
         ] when
 
         windows? [
-            "/library/windows/load.factor" run-resource
+            "/library/io/windows/load.factor" run-resource
         ] when
 
         parse-command-line
@@ -47,7 +47,7 @@ parser sequences sequences-internals words ;
         terpri flush
 
         "Initializing native I/O..." print flush
-        "native-io" get [ init-io ] when
+        "native-io" get windows? not and [ init-io ] when
 
         "cocoa" get [
             "/library/compiler/alien/objc/load.factor" run-resource
@@ -58,9 +58,9 @@ parser sequences sequences-internals words ;
             "/library/ui/x11/load.factor" run-resource
         ] when
 
-        windows? "native-io" get and [
-            "/library/windows/ui.factor" run-resource
-            "/library/windows/clipboard.factor" run-resource
+        windows? [
+            "/library/ui/windows/ui.factor" run-resource
+            "/library/ui/windows/clipboard.factor" run-resource
             compile-all
         ] when
     ] when

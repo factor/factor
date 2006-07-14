@@ -1,7 +1,7 @@
 #include "factor.h"
 
 /* frees memory allocated by win32 api calls */
-char *buffer_to_c_string(char *buffer)
+char *buffer_to_char_string(char *buffer)
 {
 	int capacity = strlen(buffer);
 	F_STRING *_c_str = allot_string(capacity / CHARS + 1);
@@ -14,7 +14,7 @@ char *buffer_to_c_string(char *buffer)
 F_STRING *get_error_message()
 {
 	DWORD id = GetLastError();
-	return from_c_string(error_message(id));
+	return from_char_string(error_message(id));
 }
 
 char *error_message(DWORD id)
@@ -36,7 +36,7 @@ char *error_message(DWORD id)
 	while(index >= 0 && isspace(buffer[index]))
 		buffer[index--] = 0;
 	
-	return buffer_to_c_string(buffer);
+	return buffer_to_char_string(buffer);
 }
 
 s64 current_millis(void)
@@ -50,7 +50,7 @@ s64 current_millis(void)
 void ffi_dlopen (DLL *dll, bool error)
 {
 	HMODULE module;
-	char *path = to_c_string(untag_string(dll->path),true);
+	char *path = to_char_string(untag_string(dll->path),true);
 
 	module = LoadLibrary(path);
 
@@ -58,7 +58,7 @@ void ffi_dlopen (DLL *dll, bool error)
 	{
 		dll->dll = NULL;
 		if(error)
-			general_error(ERROR_FFI, tag_object(get_error_message()),true);
+			general_error(ERROR_FFI, tag_object(get_error_message()),F,true);
 		else
 			return;
 	}
@@ -69,12 +69,12 @@ void ffi_dlopen (DLL *dll, bool error)
 void *ffi_dlsym (DLL *dll, F_STRING *symbol, bool error)
 {
 	void *sym = GetProcAddress(dll ? (HMODULE)dll->dll : GetModuleHandle(NULL),
-		to_c_string(symbol,true));
+		to_char_string(symbol,true));
 
 	if (!sym)
 	{
 		if(error)
-			general_error(ERROR_FFI, tag_object(get_error_message()),true);
+			general_error(ERROR_FFI, tag_object(get_error_message()),F,true);
 		else
 			return NULL;
 	}
@@ -96,7 +96,7 @@ void primitive_stat(void)
 	maybe_gc(0);
 	path = untag_string(dpop());
 
-	if(!GetFileAttributesEx(to_c_string(path,true), GetFileExInfoStandard, &st)) 
+	if(!GetFileAttributesEx(to_char_string(path,true), GetFileExInfoStandard, &st)) 
 	{
 		dpush(F);
 	} 
@@ -128,7 +128,7 @@ void primitive_read_dir(void)
 	{
 		do
 		{
-			CELL name = tag_object(from_c_string(
+			CELL name = tag_object(from_char_string(
 				find_data.cFileName));
 
 			if(result_count == array_capacity(result))
@@ -157,13 +157,13 @@ void primitive_cwd(void)
 	if(!GetCurrentDirectory(MAX_PATH, buf))
 		io_error();
 
-	box_c_string(buf);
+	box_char_string(buf);
 }
 
 void primitive_cd(void)
 {
 	maybe_gc(0);
-	SetCurrentDirectory(pop_c_string());
+	SetCurrentDirectory(pop_char_string());
 }
 
 BOUNDED_BLOCK *alloc_bounded_block(CELL size)
