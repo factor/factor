@@ -18,7 +18,7 @@ Credits:
 - factory -- X11 window manager (Eduardo Cavazos)
 - gap-buffer -- Efficient text editor buffer (Alex Chapman)
 - httpd -- Web framework (HTTP server, client, XML parser, HTML generation...) (Slava Pestov, Chris Double, Daniel Ehrenberg)
-- math -- extended math library (Doug Coleman, Daniel Ehrenberg, Slava Pestov)
+- math -- extended math library (Doug Coleman, Slava Pestov)
 - parser-combinators -- Lazy lists and Haskell-style parser combinators (Chris Double)
 - postgresql -- PostgreSQL binding (Doug Coleman)
 - process -- Run external programs (Slava Pestov)
