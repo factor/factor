@@ -1,3 +1,4 @@
+IN: temporary
 USING: kernel matrices test ;
 
 {
@@ -222,12 +223,12 @@ USING: kernel matrices test ;
 ] unit-test
 
 [
-    3 1
+    1 3
 ] [
     {
         { 0 1 0 1 }
         { 1 0 0 1 }
         { 1 0 0 0 }
         { 1 1 0 1 }
-    } rank/null
+    } null/rank
 ] unit-test

@@ -71,6 +71,6 @@ SYMBOL: matrix
 : row-reduce ( matrix -- matrix' )
     [ (row-reduce) ] with-matrix ;
 
-: rank/null ( matrix -- rank null )
-    row-reduce [ [ peek zero? not ] subset ] keep
+: null/rank ( matrix -- null rank )
+    row-reduce [ [ [ zero? ] all? ] subset ] keep
     [ length ] 2apply over - ;

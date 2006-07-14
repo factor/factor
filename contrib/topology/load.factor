@@ -1,3 +1,11 @@
 PROVIDE: topology
-{ "matrix.factor" "homology.factor" "hopf.factor" }
-{ "test/matrix.factor" } ;
+{
+    "matrix.factor"
+    "linear.factor"
+    "homology.factor"
+    "hopf.factor"
+} {
+    "test/matrix.factor"
+    "test/homology.factor"
+    "test/hopf.factor"
+} ;
