@@ -47,7 +47,7 @@ parser sequences sequences-internals words ;
         terpri flush
 
         "Initializing native I/O..." print flush
-        "native-io" get windows? not and [ init-io ] when
+        "native-io" get [ init-io ] when
 
         "cocoa" get [
             "/library/compiler/alien/objc/load.factor" run-resource
