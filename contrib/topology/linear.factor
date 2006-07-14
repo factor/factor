@@ -63,3 +63,13 @@ namespaces parser prettyprint sequences words ;
         ( domain quot basis-elt )
         >r 2dup r> (op-matrix)
     ] map 2nip ; inline
+
+: rot-seq 1 swap cut swap append ;
+
+: (H) ( sim -- ) flip first2 rot-seq v- ;
+
+: -rot-seq 1 swap cut* swap append ;
+
+: (H*) ( sim -- ) flip first2 -rot-seq v- ;
+
+: -rot-seq 1 swap cut* swap append ;

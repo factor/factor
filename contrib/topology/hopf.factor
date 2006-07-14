@@ -1,7 +1,7 @@
 ! Copyright (C) 2006 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: arrays errors hashtables io kernel math namespaces parser
-prettyprint sequences topology words ;
+USING: arrays errors hashtables io kernel math matrices
+namespaces parser prettyprint sequences topology words ;
 IN: hopf
 
 ! Finitely generated Hopf algebras.
@@ -111,7 +111,35 @@ DEFER: (d)
 : (d) ( product -- value )
     #! d(x.y)=dx.y + (-1)^deg y x.dy
     dup empty?
-    [ drop 0 ] [ unclip swap [ x.dy ] 2keep dx.y l+ ] if ;
+    [ drop H{ } ] [ unclip swap [ x.dy ] 2keep dx.y l+ ] if ;
 
 : d ( x -- dx )
     >h [ concat (d) ] linear-op ;
+
+: d-matrix ( n sim -- matrix )
+    [ ?nth ] 2keep >r 1+ r> ?nth [ concat (d) ] op-matrix ;
+
+: ker/im-d ( sim -- seq )
+    #! Dimension of kernel of C_{n+1} --> C_n, subsp. of C_{n+1}
+    #! Dimension of image  C_{n+1} --> C_n, subsp. of C_n
+    dup length [ swap d-matrix null/rank 2array ] map-with ;
+
+: nth-bit? ( m bit# -- ? )
+    1 swap shift bitand 0 > ;
+
+: nth-basis-elt ( generators n -- elt )
+    over length [
+        ( generators n bit# -- )
+        3dup nth-bit? [ nth ] [ 2drop f ] if
+    ] map [ ] subset 2nip ;
+
+: basis ( generators -- seq )
+    [
+        dup length 1+ [ drop V{ } clone ] map \ basis set
+        1 over length shift [
+            nth-basis-elt dup length \ basis get nth push
+        ] each-with
+        \ basis get [ [ { } 2array ] map ] map
+    ] with-scope ;
+
+: H* ( generators -- seq ) basis ker/im-d (H*) ;

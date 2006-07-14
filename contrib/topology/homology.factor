@@ -19,8 +19,6 @@ prettyprint sequences topology words ;
 : (\/) ( sim sim -- sim )
     lengthen [ append natural-sort ] 2map ;
 
-: rot-seq unclip add ;
-
 ! Simplicial complexes
 SYMBOL: basepoint
 
@@ -75,13 +73,9 @@ SYMBOL: basepoint
 : d-matrix ( n sim -- matrix )
     [ ?nth ] 2keep >r 1- r> ?nth [ (d) ] op-matrix ;
 
-: ker/im-d ( n sim -- ker im )
+: ker/im-d ( sim -- seq )
     #! Dimension of kernel of C_{n-1} --> C_n, subsp. of C_{n-1}
     #! Dimension of image  C_{n-1} --> C_n, subsp. of C_n
-    d-matrix null/rank ;
+    dup length [ swap d-matrix null/rank 2array ] map-with ;
 
-: (H) ( sim -- )
-    dup length [ swap ker/im-d 2array ] map-with ;
-
-: H ( sim -- seq )
-    (H) flip first2 rot-seq v- ;
+: H ( sim -- seq ) ker/im-d (H) ;

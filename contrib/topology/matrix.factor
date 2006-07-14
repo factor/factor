@@ -1,7 +1,7 @@
 ! Copyright (C) 2006 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 IN: matrices
-USING: kernel math namespaces parser prettyprint sequences test ;
+USING: kernel math namespaces parser sequences ;
 
 SYMBOL: matrix
 
