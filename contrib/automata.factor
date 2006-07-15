@@ -1,6 +1,6 @@
 ! Copyright (C) 2006 Eduardo Cavazos.
 
-! Quickstart:
+! To run:
 !     USE: automata
 !     automata-window
 
