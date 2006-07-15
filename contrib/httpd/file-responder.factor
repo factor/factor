@@ -1,7 +1,7 @@
 ! Copyright (C) 2004, 2006 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 IN: file-responder
-USING: embedded html httpd io kernel math namespaces parser
+USING: embedded errors html httpd io kernel math namespaces parser
 sequences strings ;
 
 : serving-path ( filename -- filename )

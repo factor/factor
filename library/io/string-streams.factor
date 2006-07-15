@@ -44,7 +44,7 @@ M: sbuf stream-read ( count sbuf -- string )
         2drop f
     ] [
         swap over length min 0 <string>
-        [ [ drop dup pop ] inject drop ] keep
+        [ [ drop pop ] inject-with ] keep
     ] if ;
 
 : <string-reader> ( string -- stream )
