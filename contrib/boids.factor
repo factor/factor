@@ -8,7 +8,7 @@
 ! results, increase the size of the window (larger than 400x400 is
 ! good). Then press the "Reset" button to start the demo over.
 
-REQUIRES: slate ;
+REQUIRES: math slate vars ;
 
 USING: generic threads namespaces math kernel sequences arrays gadgets
        math-contrib slate vars ;
@@ -320,6 +320,25 @@ run-boids ;
 
 USING: gadgets-frames gadgets-labels gadgets-theme gadgets-grids
        gadgets-editors gadgets-buttons ;
+
+! USING: kernel arrays gadgets  gadgets-labels gadgets-editors vars ;
+
+TUPLE: field label editor quot ;
+
+VAR: field
+
+C: field ( label-text editor-text quot -- <field> )
+[ field ]
+[ field> set-field-quot
+  <editor> field> set-field-editor
+  <label> field> set-field-label
+  field> field-label field> field-editor 2array make-shelf
+  field> set-gadget-delegate
+  field> ]
+let ;
+
+M: field gadget-gestures
+drop H{ { T{ key-down f f "RETURN" } [ dup field-quot call ] } } ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
