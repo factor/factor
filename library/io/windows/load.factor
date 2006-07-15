@@ -11,14 +11,6 @@ USING: alien compiler kernel namespaces parser sequences words ;
 "libc"     "msvcrt.dll"   "cdecl"   add-library
 
 { 
-    "windows-messages"
-    "types"
-    "gdi32"
-    "kernel32"
-    "user32"
-    "opengl32"
-    "utils"
-
     "io"
     "errors"
     "winsock"
@@ -27,9 +19,10 @@ USING: alien compiler kernel namespaces parser sequences words ;
     "server"
 } [ "/library/io/windows/" swap ".factor" append3 run-resource ] each
     
-"native-io" get [
-    "/library/bootstrap/win32-io.factor" run-resource
-] when
+! Not for .83
+! "native-io" get [
+    ! "/library/bootstrap/win32-io.factor" run-resource
+! ] when
 
 IN: kernel
 : default-shell "ui" ;

@@ -59,8 +59,7 @@ parser sequences sequences-internals words ;
         ] when
 
         windows? [
-            "/library/ui/windows/ui.factor" run-resource
-            "/library/ui/windows/clipboard.factor" run-resource
+            "/library/ui/windows/load.factor" run-resource
             compile-all
         ] when
     ] when
