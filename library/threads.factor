@@ -48,4 +48,5 @@ namespaces queues sequences vectors ;
 
 : init-threads ( -- )
     <queue> \ run-queue set-global
-    V{ } clone \ sleep-queue set-global ;
+    V{ } clone \ sleep-queue set-global
+    [ idle-thread ] in-thread ;

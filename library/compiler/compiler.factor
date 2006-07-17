@@ -27,7 +27,7 @@ optimizer prettyprint sequences test threads words ;
 : compile-vocabs ( vocabs -- )
     [ words ] map concat
     dup [ f "no-effect" set-word-prop ] each
-    [ try-compile yield ] each ;
+    [ try-compile ] each ;
 
 : compile-all ( -- ) vocabs compile-vocabs ;
 
