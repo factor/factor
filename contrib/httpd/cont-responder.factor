@@ -11,17 +11,26 @@ SYMBOL: exit-continuation
 
 #! Tuple to hold global request data. This gets passed to
 #! the continuation when resumed so it can restore things
-#! like 'stdio' so it writes to the correct socket. Currently
-#! the stdio stream and the exit continuation need to be handled
-#! in this manner.
-TUPLE: request stream exitcc ;
+#! like 'stdio' so it writes to the correct socket. 
+TUPLE: request stream exitcc method url raw-query query header response ;
 
 C: request ( -- request )
   [ stdio get swap set-request-stream ] keep 
+  [ "method" get swap set-request-method ] keep 
+  [ "request" get swap set-request-url ] keep 
+  [ "raw-query" get swap set-request-raw-query ] keep 
+  [ "query" get swap set-request-query ] keep 
+  [ "header" get swap set-request-header ] keep 
+  [ "response" get swap set-request-response ] keep 
   [ exit-continuation get swap set-request-exitcc ] keep ;
 
 : restore-request ( request -- )
   dup request-stream stdio set 
+  dup request-method "method" set 
+  dup request-raw-query "raw-query" set 
+  dup request-query "query" set 
+  dup request-header "header" set 
+  dup request-response "response" set 
   request-exitcc exit-continuation set ;
 
 : >callable ( quot|interp|f -- interp )
@@ -60,7 +69,7 @@ C: request ( -- request )
     [ 
         >callable t register-callback swap with-scope 
         exit-continuation get  continue
-    ] callcc1 nip restore-request ;
+    ] callcc1 nip restore-request "response" get ;
 
 : show ( quot -- namespace )   
     #! Call the quotation with the URL associated with the current
