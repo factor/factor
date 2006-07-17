@@ -5,8 +5,6 @@ USING: generic kernel math sequences ;
 
 TUPLE: model connections value dependencies ref ;
 
-M: model = eq? ;
-
 C: model ( value -- model )
     [ set-model-value ] keep
     V{ } clone over set-model-connections
@@ -56,13 +54,11 @@ GENERIC: model-changed ( observer -- )
     dup model-connections empty? [ dup deactivate-model ] when
     drop ;
 
-: set-model ( value model -- )
-    2dup model-value = [
-        2drop
-    ] [
-        [ set-model-value ] keep
-        model-connections [ model-changed ] each
-    ] if ;
+GENERIC: set-model ( value model -- )
+
+M: model set-model ( value model -- )
+    [ set-model-value ] keep
+    model-connections [ model-changed ] each ;
 
 : change-model ( model quot -- )
     over >r >r model-value r> call r> set-model ; inline
@@ -83,6 +79,30 @@ M: filter model-changed ( filter -- )
     dup filter-model model-value over filter-quot call
     swap set-model ;
 
+TUPLE: validator model quot ;
+
+C: validator ( model quot -- filter )
+    dup delegate>model
+    [ set-validator-quot ] keep
+    [ set-validator-model ] 2keep
+    [ add-dependency ] keep
+    dup model-changed ;
+
+M: validator model-changed ( validator -- )
+    dup validator-model model-value dup
+    pick validator-quot call [
+        swap delegate set-model
+    ] [
+        2drop
+    ] if ;
+
+M: validator set-model ( value validator -- )
+    2dup validator-quot call [
+        validator-model set-model
+    ] [
+        2drop
+    ] if ;
+
 TUPLE: compose ;
 
 C: compose ( models -- compose )
@@ -92,7 +112,10 @@ C: compose ( models -- compose )
 
 M: compose model-changed ( compose -- )
     dup model-dependencies [ model-value ] map
-    swap set-model ;
+    swap delegate set-model ;
+
+M: compose set-model ( value compose -- )
+    model-dependencies [ set-model ] 2map ;
 
 TUPLE: history back forward ;
 
