@@ -24,11 +24,11 @@
 ! Simple test applications
 IN: cont-examples
 USE: cont-responder
+USE: hashtables
 USE: html
 USE: kernel
 USE: io
 USE: html
-USE: lists
 USE: strings
 USE: math
 USE: namespaces
@@ -40,24 +40,24 @@ USE: sequences
   #! Display a page with some text to test the cont-responder.
   #! The page has a link to the 'next' continuation.
   [ 
+    <h1> over write </h1>
     swap [ 
       <a =href a> "Next" write </a>
     ] html-document 
-  ] show drop drop ;
+  ] show drop ;
 
 : display-get-name-page ( -- name )
   #! Display a page prompting for input of a name and return that name.
-  [ 
+  dup [ 
     "Enter your name" [
+      <h1> swap write </h1>
       <form "post" =method =action form> 
         "Name: " write
         <input "text" =type "name" =name "20" =size input/>
         <input "submit" =type "Ok" =value input/>
       </form>
     ] html-document
-  ] show [
-    "name" get 
-  ] bind ;
+  ] show "name" swap hash ;
 
 : test-cont-responder ( - )
   #! Test the cont-responder responder by displaying a few pages in a row.
@@ -67,22 +67,21 @@ USE: sequences
 
 : test-cont-responder2 ( - )
   #! Test the cont-responder responder by displaying a few pages in a loop.
-  [ "one" "two" "three" "four" ] [ display-page [ .s ] string-out display-page ]  each 
+  [ "one" "two" "three" "four" ] [ display-page ]  each 
   "Done!" display-page  ;
 
 : test-cont-responder3 ( - )
   #! Test the quot-href word by displaying a menu of the current
-  #! test words. Note that we drop the 'url' argument to the show
-  #! quotation as we don't link to a 'next' page.
+  #! test words. Note that we use show-final as we don't link to a 'next' page.
   [ 
-    drop     
     "Menu" [ 
+      <h1> "Menu" write </h1>
       <ol> 
         <li> "Test responder1" [ test-cont-responder ] quot-href </li>
         <li> "Test responder2" [ [ .s ] string-out display-page test-cont-responder2 [ .s ] string-out display-page ] quot-href </li>
       </ol>
     ] html-document 
-  ] show drop ;
+  ] show-final ;
 
 : counter-example ( count - )
   #! Display a counter which can be incremented or decremented
@@ -119,6 +118,6 @@ USE: sequences
 ! Install the examples
 "counter1" [ drop 0 counter-example ] install-cont-responder
 "counter2" [ drop counter-example2 ] install-cont-responder
-"test1" [ drop test-cont-responder ] install-cont-responder
+"test1" [ test-cont-responder ] install-cont-responder
 "test2" [ drop test-cont-responder2 ] install-cont-responder
 "test3" [ drop test-cont-responder3 ] install-cont-responder
