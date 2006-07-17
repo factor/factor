@@ -19,22 +19,6 @@ namespaces queues sequences vectors ;
 : sleep-time ( sorted-queue -- ms )
     dup empty? [ drop 1000 ] [ peek first millis [-] ] if ;
 
-! DEFER: next-thread
-! 
-! : do-sleep ( -- continuation )
-!     sleep-queue* dup sleep-time dup zero?
-!     [ drop pop second ] [ nip io-multiplex next-thread ] if ;
-! 
-! : next-thread ( -- continuation )
-!     run-queue dup queue-empty? [ drop do-sleep ] [ deque ] if ;
-! 
-! : stop ( -- ) next-thread continue ;
-!
-! : init-threads ( -- )
-!     global [
-!         <queue> \ run-queue set
-!         V{ } clone \ sleep-queue set
-!     ] bind ;
 : stop ( -- ) run-queue deque continue ;
 
 : yield ( -- ) [ schedule-thread stop ] callcc0 ;
@@ -64,5 +48,4 @@ namespaces queues sequences vectors ;
 
 : init-threads ( -- )
     <queue> \ run-queue set-global
-    V{ } clone \ sleep-queue set-global
-    [ idle-thread ] in-thread ;
+    V{ } clone \ sleep-queue set-global ;

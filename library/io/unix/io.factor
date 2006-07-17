@@ -305,4 +305,5 @@ USE: io
         H{ } clone write-tasks set
         FD_SETSIZE <byte-array> write-fdset set
         0 1 <fd-stream> stdio set
+        [ idle-thread ] in-thread
     ] bind ;
