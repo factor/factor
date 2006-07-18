@@ -126,6 +126,11 @@ M: world client-event ( event world -- )
         [ register-window ] keep r> 2array
     ] keep set-world-handle ;
 
+: event-loop ( -- )
+    windows get empty? [
+        [ do-events ] ui-try event-loop
+    ] unless ;
+
 IN: gadgets
 
 : set-title ( string world -- )

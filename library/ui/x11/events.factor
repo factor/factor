@@ -70,11 +70,9 @@ GENERIC: client-event ( event window -- )
         { [ t ] [ 3drop ] }
     } cond ;
 
-: event-loop ( -- )
-    windows get empty? [
-        wait-event dup XAnyEvent-window window dup
-        [ handle-event ] [ 2drop ] if event-loop
-    ] unless ;
+: do-events ( -- )
+    wait-event dup XAnyEvent-window window dup
+    [ handle-event ] [ 2drop ] if ;
 
 : char-array>string ( n <char-array> -- string )
     swap >string [ swap char-nth ] map-with ;

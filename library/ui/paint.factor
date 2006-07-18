@@ -72,14 +72,34 @@ DEFER: draw-gadget
         { [ t ] [ [ (draw-gadget) ] with-clipping ] }
     } cond ;
 
+: (draw-world) ( world -- )
+    dup world-handle [
+        dup rect-dim init-gl draw-gadget
+    ] with-gl-context ;
+
+TUPLE: world-error world ;
+
+C: world-error ( error world -- error )
+    [ set-world-error-world ] keep
+    [ set-delegate ] keep ;
+
+M: world-error error. ( world-error -- )
+    "An error occurred while drawing the world " write
+    dup world-error-world pprint-short "." print
+    "This world has been deactivated to prevent cascading errors." print
+    delegate error. ;
+
 : draw-world ( world -- )
-    [
-        dup world-handle [
-            dup rect-dim init-gl
-            dup world set
-            draw-gadget
-        ] with-gl-context
-    ] with-scope ;
+    dup world-active? [
+        [
+            dup world set [
+                dup (draw-world)
+            ] [
+                over <world-error> error-window
+                f over set-world-active?
+            ] recover
+        ] with-scope
+    ] when drop ;
 
 ! Pen paint properties
 M: f draw-interior 2drop ;

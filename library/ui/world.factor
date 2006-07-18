@@ -14,7 +14,13 @@ kernel math models namespaces opengl sequences ;
 !   we don't store this in the world's rect-loc, since the
 !   co-ordinate system might be different, and generally the
 !   UI code assumes that everything starts at { 0 0 }.
-TUPLE: world gadget title status focus focused? fonts handle loc ;
+TUPLE: world
+active?
+gadget
+title status
+focus focused?
+fonts handle
+loc ;
 
 : free-fonts ( world -- )
     dup world-handle select-gl-context
@@ -27,6 +33,7 @@ C: world ( gadget -- world )
     [ >r dup gadget-title r> set-world-title ] keep
     { { f set-world-gadget f @center } } make-frame*
     t over set-gadget-root?
+    t over set-world-active?
     H{ } clone over set-world-fonts
     { 0 0 } over set-world-loc
     dup world-gadget request-focus ;

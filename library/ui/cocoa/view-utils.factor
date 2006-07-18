@@ -99,79 +99,83 @@ opengl sequences ;
     }
     
     { "mouseEntered:" "void" { "id" "SEL" "id" }
-        [ nip send-mouse-moved ]
+        [ [ nip send-mouse-moved ] ui-try ]
     }
     
     { "mouseExited:" "void" { "id" "SEL" "id" }
-        [ 3drop forget-rollover ]
+        [ [ 3drop forget-rollover ] ui-try ]
     }
     
     { "mouseMoved:" "void" { "id" "SEL" "id" }
-        [ nip send-mouse-moved ]
+        [ [ nip send-mouse-moved ] ui-try ]
     }
     
     { "mouseDragged:" "void" { "id" "SEL" "id" }
-        [ nip send-mouse-moved ]
+        [ [ nip send-mouse-moved ] ui-try ]
     }
     
     { "rightMouseDragged:" "void" { "id" "SEL" "id" }
-        [ nip send-mouse-moved ]
+        [ [ nip send-mouse-moved ] ui-try ]
     }
     
     { "otherMouseDragged:" "void" { "id" "SEL" "id" }
-        [ nip send-mouse-moved ]
+        [ [ nip send-mouse-moved ] ui-try ]
     }
     
     { "mouseDown:" "void" { "id" "SEL" "id" }
-        [ nip send-button-down$ ]
+        [ [ nip send-button-down$ ] ui-try ]
     }
     
     { "mouseUp:" "void" { "id" "SEL" "id" }
-        [ nip send-button-up$ ]
+        [ [ nip send-button-up$ ] ui-try ]
     }
     
     { "rightMouseDown:" "void" { "id" "SEL" "id" }
-        [ nip send-button-down$ ]
+        [ [ nip send-button-down$ ] ui-try ]
     }
     
     { "rightMouseUp:" "void" { "id" "SEL" "id" }
-        [ nip send-button-up$ ]
+        [ [ nip send-button-up$ ] ui-try ]
     }
     
     { "otherMouseDown:" "void" { "id" "SEL" "id" }
-        [ nip send-button-down$ ]
+        [ [ nip send-button-down$ ] ui-try ]
     }
     
     { "otherMouseUp:" "void" { "id" "SEL" "id" }
-        [ nip send-button-up$ ]
+        [ [ nip send-button-up$ ] ui-try ]
     }
     
     { "scrollWheel:" "void" { "id" "SEL" "id" }
-        [ nip send-wheel$ ]
+        [ [ nip send-wheel$ ] ui-try ]
     }
     
     { "keyDown:" "void" { "id" "SEL" "id" }
-        [ nip send-key-down-event ]
+        [ [ nip send-key-down-event ] ui-try ]
     }
     
     { "keyUp:" "void" { "id" "SEL" "id" }
-        [ nip send-key-up-event ]
+        [ [ nip send-key-up-event ] ui-try ]
     }
 
     { "cut:" "id" { "id" "SEL" "id" }
-        [ nip T{ cut-action } send-action ]
+        [ [ nip T{ cut-action } send-action ] ui-try ]
     }
 
     { "copy:" "id" { "id" "SEL" "id" }
-        [ nip T{ copy-action } send-action ]
+        [ [ nip T{ copy-action } send-action ] ui-try ]
     }
 
     { "paste:" "id" { "id" "SEL" "id" }
-        [ nip T{ paste-action } send-action ]
+        [ [ nip T{ paste-action } send-action ] ui-try ]
     }
 
     { "updateFactorGadgetSize:" "void" { "id" "SEL" "id" }
-        [ 2drop dup view-dim swap window set-gadget-dim ]
+        [
+            [
+                2drop dup view-dim swap window set-gadget-dim
+            ] ui-try
+        ]
     }
     
     { "acceptsFirstResponder" "bool" { "id" "SEL" }

@@ -35,7 +35,7 @@ objc-classes sequences threads ;
     dup do-event [ do-events ] [ drop ] if ;
 
 : event-loop ( -- )
-    [ NSApp do-events ui-step ] with-autorelease-pool
+    [ [ NSApp do-events ui-step ] ui-try ] with-autorelease-pool
     event-loop ;
 
 : add-observer ( observer selector name object -- )

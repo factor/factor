@@ -1,9 +1,10 @@
 ! Copyright (C) 2006 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 IN: gadgets
-USING: arrays gadgets gadgets-frames gadgets-grids
-gadgets-labels gadgets-theme gadgets-viewports hashtables kernel
-math models namespaces queues sequences threads ;
+USING: arrays errors gadgets gadgets-frames gadgets-grids
+gadgets-labels gadgets-panes gadgets-theme gadgets-viewports
+hashtables kernel math models namespaces queues sequences
+threads ;
 
 ! Assoc mapping aliens to gadgets
 SYMBOL: windows
@@ -136,6 +137,12 @@ C: titled-gadget ( gadget title -- )
 
 : make-toolbar ( quot -- gadget )
     { } make make-shelf dup highlight-theme ; inline
+
+: error-window ( error -- )
+    [ print-error ] make-pane "Error" open-titled-window ;
+
+: ui-try ( quot -- )
+    [ error-window ] recover ;
 
 IN: shells
 

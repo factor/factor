@@ -16,6 +16,7 @@
 
 + ui:
 
+- shift modifier not delivered
 - x11 copy to clipboard
 - finish gui stepper
 - windows are not updated while resizing
