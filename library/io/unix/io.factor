@@ -41,7 +41,12 @@ SYMBOL: write-tasks
 
 : io-error ( n -- ) 0 < [ (io-error) ] when ;
 
-: init-handle ( fd -- ) F_SETFL O_NONBLOCK fcntl io-error ;
+: init-handle ( fd -- )
+    #! We drop the error code rather than calling io-error,
+    #! since on OS X 10.3, this operation fails from init-io
+    #! when running the Factor.app (presumably because fd 0 and
+    #! 1 are closed).
+    F_SETFL O_NONBLOCK fcntl drop ;
 
 ! Common delegate of native stream readers and writers
 SYMBOL: input
