@@ -3,8 +3,8 @@
 IN: gadgets
 USING: arrays errors gadgets gadgets-frames gadgets-grids
 gadgets-labels gadgets-panes gadgets-theme gadgets-viewports
-hashtables kernel math models namespaces queues sequences
-threads ;
+generic hashtables io kernel math models namespaces prettyprint
+queues sequences threads ;
 
 ! Assoc mapping aliens to gadgets
 SYMBOL: windows
@@ -143,6 +143,30 @@ C: titled-gadget ( gadget title -- )
 
 : ui-try ( quot -- )
     [ error-window ] recover ;
+
+TUPLE: world-error world ;
+
+C: world-error ( error world -- error )
+    [ set-world-error-world ] keep
+    [ set-delegate ] keep ;
+
+M: world-error error. ( world-error -- )
+    "An error occurred while drawing the world " write
+    dup world-error-world pprint-short "." print
+    "This world has been deactivated to prevent cascading errors." print
+    delegate error. ;
+
+: draw-world ( world -- )
+    dup world-active? [
+        [
+            dup world set [
+                dup (draw-world)
+            ] [
+                over <world-error> error-window
+                f over set-world-active?
+            ] recover
+        ] with-scope
+    ] when drop ;
 
 IN: shells
 

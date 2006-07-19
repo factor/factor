@@ -1,8 +1,8 @@
 ! Copyright (C) 2005, 2006 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: alien arrays freetype generic hashtables
-io kernel math namespaces opengl sequences strings
-styles vectors ;
+USING: alien arrays freetype generic hashtables io kernel
+math namespaces opengl sequences strings styles
+vectors ;
 IN: gadgets
 
 SYMBOL: clip
@@ -76,30 +76,6 @@ DEFER: draw-gadget
     dup world-handle [
         dup rect-dim init-gl draw-gadget
     ] with-gl-context ;
-
-TUPLE: world-error world ;
-
-C: world-error ( error world -- error )
-    [ set-world-error-world ] keep
-    [ set-delegate ] keep ;
-
-M: world-error error. ( world-error -- )
-    "An error occurred while drawing the world " write
-    dup world-error-world pprint-short "." print
-    "This world has been deactivated to prevent cascading errors." print
-    delegate error. ;
-
-: draw-world ( world -- )
-    dup world-active? [
-        [
-            dup world set [
-                dup (draw-world)
-            ] [
-                over <world-error> error-window
-                f over set-world-active?
-            ] recover
-        ] with-scope
-    ] when drop ;
 
 ! Pen paint properties
 M: f draw-interior 2drop ;
