@@ -85,8 +85,8 @@ opengl sequences ;
     [ -> deltaY 0 > ] 2keep mouse-location
     rot window send-wheel ;
 
-: send-action ( view event gesture -- junk )
-    -rot drop window world-focus handle-gesture drop f ;
+: send-action$ ( view event gesture -- junk )
+    >r drop window r> send-action drop f ;
 
 : add-resize-observer ( observer object -- )
     >r "updateFactorGadgetSize:"
@@ -159,15 +159,23 @@ opengl sequences ;
     }
 
     { "cut:" "id" { "id" "SEL" "id" }
-        [ [ nip T{ cut-action } send-action ] ui-try ]
+        [ [ nip T{ cut-action } send-action$ ] ui-try ]
     }
 
     { "copy:" "id" { "id" "SEL" "id" }
-        [ [ nip T{ copy-action } send-action ] ui-try ]
+        [ [ nip T{ copy-action } send-action$ ] ui-try ]
     }
 
     { "paste:" "id" { "id" "SEL" "id" }
-        [ [ nip T{ paste-action } send-action ] ui-try ]
+        [ [ nip T{ paste-action } send-action$ ] ui-try ]
+    }
+
+    { "delete:" "id" { "id" "SEL" "id" }
+        [ [ nip T{ delete-action } send-action$ ] ui-try ]
+    }
+
+    { "selectAll:" "id" { "id" "SEL" "id" }
+        [ [ nip T{ select-all-action } send-action$ ] ui-try ]
     }
 
     { "updateFactorGadgetSize:" "void" { "id" "SEL" "id" }

@@ -38,6 +38,7 @@ TUPLE: cut-action ;
 TUPLE: copy-action ;
 TUPLE: paste-action ;
 TUPLE: delete-action ;
+TUPLE: select-all-action ;
 
 : handle-action ( gadget constructor -- )
     execute swap handle-gesture drop ; inline
