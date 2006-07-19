@@ -71,15 +71,4 @@ M: world model-changed ( world -- )
 : draw-string ( font string -- )
     >r world get font-sprites first2 r> (draw-string) ;
 
-: send-action ( world gesture -- ? )
-    swap world-focus handle-gesture ;
-
 M: world gadget-title world-gadget gadget-title ;
-
-M: world gadget-gestures
-    drop H{
-        { T{ key-down f { C+ } "x" } [ T{ cut-action } send-action ] }
-        { T{ key-down f { C+ } "c" } [ T{ copy-action } send-action ] }
-        { T{ key-down f { C+ } "v" } [ T{ paste-action } send-action ] }
-        { T{ key-down f { C+ } "a" } [ T{ select-all-action } send-action ] }
-    } ;

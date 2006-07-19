@@ -83,6 +83,7 @@ SYMBOL: failures
         "combinators"
         "continuations"
         "errors"
+        "gadgets/document"
         "gadgets/line-editor"
         "gadgets/models"
         "gadgets/rectangles"
