@@ -13,12 +13,13 @@ C: field ( model -- field )
 
 : field-next editor-document go-forward ;
 
-: field-commit ( field -- )
-    dup field-model [ >r editor-text r> set-model ] when*
+: field-commit ( field -- string )
+    [ editor-text ] keep
+    dup field-model [ dupd set-model ] when*
     editor-document dup add-history clear-doc ;
 
 field H{
     { T{ key-down f { C+ } "p" } [ field-prev ] }
     { T{ key-down f { C+ } "n" } [ field-next ] }
-    { T{ key-down f f "ENTER" } [ field-commit ] }
+    { T{ key-down f f "RETURN" } [ field-commit drop ] }
 } set-gestures

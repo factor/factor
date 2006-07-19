@@ -4,7 +4,7 @@ IN: objc-classes
 DEFER: FactorCallback
 
 IN: cocoa
-USING: hashtables kernel namespaces objc ;
+USING: gadgets hashtables kernel namespaces objc ;
 
 SYMBOL: callbacks
 
@@ -15,7 +15,7 @@ reset-callbacks
 
 "NSObject" "FactorCallback" {
     { "perform:" "void" { "id" "SEL" "id" }
-        [ 2drop callbacks get hash call ]
+        [ 2drop callbacks get hash ui-try ]
     }
     
     { "dealloc" "void" { "id" "SEL" }

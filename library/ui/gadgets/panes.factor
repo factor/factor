@@ -2,55 +2,21 @@
 ! See http://factorcode.org/license.txt for BSD license.
 IN: gadgets-panes
 USING: arrays gadgets gadgets-buttons gadgets-controls
-gadgets-editors gadgets-frames gadgets-grids gadgets-labels
-gadgets-scrolling gadgets-theme generic hashtables io kernel
-line-editor math namespaces prettyprint sequences strings styles
-threads ;
+gadgets-frames gadgets-grids gadgets-labels gadgets-scrolling
+gadgets-theme generic hashtables io kernel math namespaces
+sequences strings ;
 
-TUPLE: pane output active current input prototype continuation ;
+TUPLE: pane output active current prototype ;
 
 : add-output 2dup set-pane-output add-gadget ;
-
-: <active-line> ( current input -- line )
-    2array [ ] subset make-shelf ;
 
 : init-line ( pane -- )
     dup pane-prototype clone swap set-pane-current ;
 
 : prepare-line ( pane -- )
     dup init-line dup pane-active unparent
-    [ dup pane-current swap pane-input <active-line> ] keep
+    [ pane-current 1array make-shelf ] keep
     2dup set-pane-active add-gadget ;
-
-: pop-continuation ( pane -- quot )
-    dup pane-continuation f rot set-pane-continuation ;
-
-: pane-eval ( string pane -- )
-    pop-continuation dup [
-        [ continue-with ] in-thread
-    ] when 2drop ;
-
-SYMBOL: structured-input
-
-: pane-call ( quot pane -- )
-    dup [ "Command: " write over short. ] with-stream*
-    >r structured-input set-global
-    "\"structured-input\" \"gadgets-panes\" lookup get-global call"
-    r> pane-eval ;
-
-: replace-input ( string pane -- ) pane-input set-editor-text ;
-
-: print-input ( string pane -- )
-    [
-        dup [
-            <input> presented set
-            bold font-style set
-        ] make-hash format terpri
-    ] with-stream* ;
-
-: pane-commit ( pane -- )
-    dup pane-input commit-editor-text
-    swap 2dup print-input pane-eval ;
 
 : pane-clear ( pane -- )
     dup pane-output clear-incremental pane-current clear-gadget ;
@@ -60,20 +26,6 @@ C: pane ( -- pane )
     <shelf> over set-pane-prototype
     <pile> <incremental> over add-output
     dup prepare-line ;
-
-pane H{
-    { T{ button-down } [ pane-input click-editor ] }
-    { T{ key-down f f "RETURN" } [ pane-commit ] }
-    { T{ key-down f f "UP" } [ pane-input [ history-prev ] with-editor ] }
-    { T{ key-down f f "DOWN" } [ pane-input [ history-next ] with-editor ] }
-    { T{ key-down f { C+ } "l" } [ pane-clear ] }
-} set-gestures
-
-: <input-pane> ( -- pane )
-    <pane> "" <editor> over set-pane-input ;
-
-M: pane focusable-child* ( pane -- editor )
-    pane-input [ t ] unless* ;
 
 : prepare-print ( current -- gadget )
     #! Optimization: if line has 1 child, add the child.
@@ -105,12 +57,10 @@ M: pane focusable-child* ( pane -- editor )
 ! Panes are streams.
 M: pane stream-flush ( pane -- ) drop ;
 
-M: pane stream-readln ( pane -- line )
-    [ over set-pane-continuation stop ] callcc1 nip ;
-
 : scroll-pane ( pane -- )
     #! Only input panes scroll.
-    dup pane-input [ dup pane-active scroll>gadget ] when drop ;
+    drop ;
+    ! dup pane-input [ dup pane-active scroll>gadget ] when drop ;
 
 M: pane stream-terpri ( pane -- )
     dup pane-current prepare-print

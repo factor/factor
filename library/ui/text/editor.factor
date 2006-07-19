@@ -3,7 +3,7 @@
 IN: gadgets-text
 USING: arrays errors freetype gadgets gadgets-borders
 gadgets-buttons gadgets-frames gadgets-labels gadgets-scrolling
-gadgets-theme io kernel math models namespaces opengl sequences
+io kernel math models namespaces opengl sequences
 strings styles ;
 
 TUPLE: editor

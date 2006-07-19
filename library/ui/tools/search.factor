@@ -1,27 +1,20 @@
 ! Copyright (C) 2006 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 IN: gadgets-search
-USING: gadgets gadgets-editors gadgets-frames gadgets-labels
-gadgets-panes gadgets-scrolling gadgets-theme generic help
-inspector kernel sequences words ;
+USING: gadgets gadgets-frames gadgets-labels gadgets-panes
+gadgets-scrolling gadgets-text gadgets-theme generic help
+inspector kernel models sequences words ;
 
-TUPLE: search-gadget pane input quot ;
+TUPLE: search-gadget input ;
 
-: do-search ( apropos -- )
-    dup search-gadget-input commit-editor-text dup empty? [
-        2drop
-    ] [
-        over search-gadget-pane
-        rot search-gadget-quot with-pane
-    ] if ;
-
-search-gadget H{ { T{ key-down f f "RETURN" } [ do-search ] } }
-set-gestures
+: <search-pane> ( model quot -- )
+    [ over empty? [ 2drop ] [ call ] if ] curry
+    <pane-control> ;
 
 C: search-gadget ( quot -- )
-    [ set-search-gadget-quot ] keep {
-        { [ <pane> ] set-search-gadget-pane [ <scroller> ] @center }
-        { [ "" <editor> ] set-search-gadget-input f @top }
+    >r f <model> dup r> {
+        { [ <field> ] set-search-gadget-input f @top }
+        { [ swap <search-pane> <scroller> ] f f @center }
     } make-frame* ;
 
 M: search-gadget focusable-child* search-gadget-input ;

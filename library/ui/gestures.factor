@@ -6,7 +6,8 @@ sequences words ;
 
 : (gestures) ( gadget -- )
     [
-        dup "gestures" word-prop [ , ] when* delegate (gestures)
+        dup class "gestures" word-prop [ , ] when*
+        delegate (gestures)
     ] when* ;
 
 : gestures ( gadget -- seq ) [ (gestures) ] { } make ;

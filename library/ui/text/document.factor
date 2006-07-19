@@ -17,7 +17,7 @@ test ;
 TUPLE: document locs ;
 
 C: document ( -- document )
-    { "" } <history> over set-delegate
+    V{ "" } clone <history> over set-delegate
     V{ } clone over set-document-locs ;
 
 : add-loc document-locs push ;
