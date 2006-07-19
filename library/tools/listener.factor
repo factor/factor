@@ -10,7 +10,7 @@ SYMBOL: quit-flag
 SYMBOL: listener-hook
 SYMBOL: datastack-hook
 
-"  " listener-prompt set-global
+"ok " listener-prompt set-global
 
 : bye ( -- ) quit-flag on ;
 

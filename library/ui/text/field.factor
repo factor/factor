@@ -21,5 +21,6 @@ C: field ( model -- field )
 field H{
     { T{ key-down f { C+ } "p" } [ field-prev ] }
     { T{ key-down f { C+ } "n" } [ field-next ] }
+    { T{ key-down f { C+ } "k" } [ editor-document clear-doc ] }
     { T{ key-down f f "RETURN" } [ field-commit drop ] }
 } set-gestures

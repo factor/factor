@@ -6,7 +6,7 @@ gadgets-frames gadgets-grids gadgets-labels gadgets-scrolling
 gadgets-theme generic hashtables io kernel math namespaces
 sequences strings ;
 
-TUPLE: pane output active current prototype ;
+TUPLE: pane output active current prototype scrolls? ;
 
 : add-output 2dup set-pane-output add-gadget ;
 
@@ -58,9 +58,11 @@ C: pane ( -- pane )
 M: pane stream-flush ( pane -- ) drop ;
 
 : scroll-pane ( pane -- )
-    #! Only input panes scroll.
-    drop ;
-    ! dup pane-input [ dup pane-active scroll>gadget ] when drop ;
+    dup pane-scrolls? [
+        find-scroller [ scroll>bottom ] when*
+    ] [
+        drop
+    ] if ;
 
 M: pane stream-terpri ( pane -- )
     dup pane-current prepare-print
@@ -94,6 +96,9 @@ M: pane with-stream-style ( quot style pane -- )
 : make-pane ( quot -- pane )
     #! Execute the quotation with output to an output-only pane.
     <pane> [ swap with-pane ] keep ; inline
+
+: <scrolling-pane> ( -- pane )
+    <pane> t over set-pane-scrolls? ;
 
 : <pane-control> ( model quot -- pane )
     [ with-pane ] curry <pane> swap <control> ;

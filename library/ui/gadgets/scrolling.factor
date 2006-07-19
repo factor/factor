@@ -5,10 +5,11 @@ USING: arrays gadgets gadgets-frames gadgets-theme
 gadgets-viewports generic kernel math namespaces sequences ;
 
 ! A scroller combines a viewport with two x and y sliders.
-! The follows slot is set by scroll>gadget.
+! The follows slot is a boolean, if true scroller will scroll
+! down on the next relayout.
 TUPLE: scroller viewport x y follows ;
 
-: scroller-origin ( scroller -- { x y 0 } )
+: scroller-origin ( scroller -- { x y } )
     dup scroller-x slider-value
     swap scroller-y slider-value
     2array ;
@@ -62,28 +63,16 @@ C: scroller ( gadget -- scroller )
     dupd over scroller-y update-slider
     position-viewport ;
 
-: include-point ( point rect -- rect )
-    rect-extent >r over r> vmax >r vmin r> <extent-rect> ;
-
-: scroll>point ( point scroller -- )
-    [
-        scroller-viewport [ include-point ] keep
-        [ rect-extent v+ ] 2apply v-
-    ] keep dup scroller-origin rot v+ scroll ;
-
-: (scroll>gadget) ( gadget scroller -- )
-    #! First ensure top left is visible, then bottom right.
-    over screen-loc over scroll>point
-    over screen-loc rot rect-dim v+ swap scroll>point ;
+: scroll>bottom ( scroller -- )
+    t swap set-scroller-follows ;
 
 : update-scroller ( scroller -- )
-    dup scroller-follows dup [
-        swap
+    dup scroller-follows [
         f over set-scroller-follows
-        (scroll>gadget)
+        dup rect-dim { 0 1 } v*
     ] [
-        drop dup scroller-origin scroll
-    ] if ;
+        drop dup scroller-origin
+    ] if scroll ;
 
 M: scroller layout* ( scroller -- )
     dup delegate layout*

@@ -16,6 +16,18 @@
 
 + ui:
 
+- editor:
+  - multi-line inserts
+  - scroll to caret
+  - only redraw visible lines
+  - bug after removing all lines
+  - word-at-a-time commands
+  - deleting words, lines
+  - undo and redo
+  - transpose char/word/line
+  - autoscroll
+  - page up/down
+  - search and replace
 - shift modifier not delivered
 - x11 copy to clipboard
 - finish gui stepper
@@ -31,11 +43,10 @@
 - 'show' doesn't work if invoked from a listener on an object which is
   itself inspected in the listener
 - ui uses too much cpu time idling
+- too many motion events, etc
 - remaining HTML issues need fixing
 - see if its possible to only repaint dirty regions
 - x11 title bars are funny
-- if the listener is running a command when the image is saved, it
-  restores to an unresponsive gadget
 - fix top level window positioning
 - prettyprinter's highlighting of non-leaves doesn't really work
 - rollover is not updated on window focus changes

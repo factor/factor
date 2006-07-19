@@ -94,9 +94,6 @@ M: editor model-changed ( editor -- )
 : y>line ( y editor -- line# )
     [ line-height / >fixnum ] keep editor-lines length 1- min ;
 
-: set-caret-y ( y editor -- )
-    [ y>line ] keep [ drop =line ] change-caret&mark ;
-
 : point>loc ( point editor -- loc )
     over second over y>line [
         >r >r first r> r> swap x>offset

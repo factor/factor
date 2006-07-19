@@ -41,7 +41,7 @@ TUPLE: listener-gadget input output stack ;
 
 C: listener-gadget ( -- gadget )
     f <model> over set-listener-gadget-stack {
-        { [ <pane> ] set-listener-gadget-output [ <scroller> ] 4/6 }
+        { [ <scrolling-pane> ] set-listener-gadget-output [ <scroller> ] 4/6 }
         { [ <listener-input> ] set-listener-gadget-input [ <scroller> ] 1/6 }
         { [ <stack-display> ] f f 1/6 }
     } { 0 1 } make-track* dup start-listener ;
