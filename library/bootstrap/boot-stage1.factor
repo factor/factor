@@ -200,6 +200,8 @@ sequences vectors words ;
         "/library/ui/gadgets/panes.factor"
         "/library/ui/gadgets/books.factor"
         "/library/ui/gadgets/outliner.factor"
+        "/library/ui/text/document.factor"
+        "/library/ui/text/editor.factor"
         "/library/ui/ui.factor"
         "/library/ui/gadgets/presentations.factor"
         "/library/ui/tools/listener.factor"
