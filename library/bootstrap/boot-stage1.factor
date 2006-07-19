@@ -202,6 +202,8 @@ sequences vectors words ;
         "/library/ui/gadgets/outliner.factor"
         "/library/ui/text/document.factor"
         "/library/ui/text/editor.factor"
+        "/library/ui/text/commands.factor"
+        "/library/ui/text/field.factor"
         "/library/ui/ui.factor"
         "/library/ui/gadgets/presentations.factor"
         "/library/ui/tools/listener.factor"

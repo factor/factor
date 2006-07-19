@@ -93,12 +93,11 @@ M: track pref-dim* ( track -- dim )
     dup gadget-parent divider-delta
     over divider-# rot gadget-parent change-divider ;
 
-M: divider gadget-gestures
-    drop H{
-        { T{ button-down } [ gadget-parent save-sizes ] }
-        { T{ button-up } [ drop ] }
-        { T{ drag } [ divider-motion ] }
-    } ;
+divider H{
+    { T{ button-down } [ gadget-parent save-sizes ] }
+    { T{ button-up } [ drop ] }
+    { T{ drag } [ divider-motion ] }
+} set-gestures
 
 C: divider ( -- divider )
     dup delegate>gadget dup reverse-video-theme ;

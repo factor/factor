@@ -3,7 +3,7 @@
 IN: gadgets-buttons
 USING: gadgets gadgets-borders gadgets-controls gadgets-labels
 gadgets-theme generic io kernel math models namespaces sequences
-strings styles threads ;
+strings styles threads words ;
 
 TUPLE: button rollover? pressed? selected? quot ;
 
@@ -28,13 +28,12 @@ TUPLE: button rollover? pressed? selected? quot ;
 : button-clicked ( button -- )
     dup button-quot if-clicked ;
 
-M: button gadget-gestures
-    drop H{
-        { T{ button-up } [ button-clicked ] }
-        { T{ button-down } [ button-update ] }
-        { T{ mouse-leave } [ button-update ] }
-        { T{ mouse-enter } [ button-update ] }
-    } ;
+button H{
+    { T{ button-up } [ button-clicked ] }
+    { T{ button-down } [ button-update ] }
+    { T{ mouse-leave } [ button-update ] }
+    { T{ mouse-enter } [ button-update ] }
+} set-gestures
 
 GENERIC: >label ( obj -- gadget )
 M: string >label <label> ;
@@ -61,13 +60,10 @@ C: button ( gadget quot -- button )
 
 TUPLE: repeat-button ;
 
-M: repeat-button gadget-gestures
-    drop H{
-        { T{ button-down } [ repeat-button-down ] }
-        { T{ button-up } [ repeat-button-up ] }
-        { T{ mouse-leave } [ button-update ] }
-        { T{ mouse-enter } [ button-update ] }
-    } ;
+repeat-button H{
+    { T{ button-down } [ repeat-button-down ] }
+    { T{ button-up } [ repeat-button-up ] }
+} set-gestures
 
 C: repeat-button ( gadget quot -- button )
     #! Button that calls the quotation every 100ms as long as

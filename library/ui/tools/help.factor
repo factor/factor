@@ -30,7 +30,7 @@ TUPLE: help-gadget history ;
     gadget get help-gadget-history [ help ] <pane-control> ;
 
 C: help-gadget ( -- gadget )
-    <history> over set-help-gadget-history {
+    f <history> over set-help-gadget-history {
         { [ <help-toolbar> ] f f @top }
         { [ <help-pane> <scroller> ] f f @center }
     } make-frame* ;

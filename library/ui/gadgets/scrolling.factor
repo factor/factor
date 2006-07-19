@@ -25,12 +25,11 @@ TUPLE: scroller viewport x y follows ;
 
 : scroll-down-line scroller-y 1 swap slide-by-line ;
 
-M: scroller gadget-gestures
-    drop H{
-        { T{ wheel-up } [ scroll-up-line ] }
-        { T{ wheel-down } [ scroll-down-line ] }
-        { T{ slider-changed } [ relayout-1 ] }
-    } ;
+scroller H{
+    { T{ wheel-up } [ scroll-up-line ] }
+    { T{ wheel-down } [ scroll-down-line ] }
+    { T{ slider-changed } [ relayout-1 ] }
+} set-gestures
 
 C: scroller ( gadget -- scroller )
     #! Wrap a scrolling pane around the gadget.

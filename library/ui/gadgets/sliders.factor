@@ -62,12 +62,11 @@ TUPLE: thumb ;
     over screen>slider swap [ slider-saved + ] keep
     set-slider-value* ;
 
-M: thumb gadget-gestures
-    drop H{
-        { T{ button-down } [ begin-drag ] }
-        { T{ button-up } [ drop ] }
-        { T{ drag } [ do-drag ] }
-    } ;
+thumb H{
+    { T{ button-down } [ begin-drag ] }
+    { T{ button-up } [ drop ] }
+    { T{ drag } [ do-drag ] }
+} set-gestures
 
 C: thumb ( vector -- thumb )
     dup delegate>gadget
@@ -88,8 +87,8 @@ C: thumb ( vector -- thumb )
     over screen>slider over slider-value - sgn
     swap slide-by-page ;
 
-M: elevator gadget-gestures
-    drop H{ { T{ button-down } [ elevator-click ] } } ;
+elevator H{ { T{ button-down } [ elevator-click ] } }
+set-gestures
 
 C: elevator ( vector -- elevator )
     dup delegate>gadget

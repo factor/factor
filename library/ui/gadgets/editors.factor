@@ -55,27 +55,26 @@ TUPLE: editor line caret font color ;
 : click-editor ( editor -- )
     dup hand-click-rel first over set-caret-x request-focus ;
 
-M: editor gadget-gestures
-    drop H{
-        { T{ button-down } [ click-editor ] }
-        { T{ gain-focus } [ editor-caret show-gadget ] }
-        { T{ lose-focus } [ editor-caret hide-gadget ] }
-        { T{ key-down f f "BACKSPACE" } [ [ T{ char-elt } delete-prev-elt ] with-editor ] }
-        { T{ key-down f f "DELETE" } [ [ T{ char-elt } delete-next-elt ] with-editor ] }
-        { T{ key-down f { C+ } "BACKSPACE" } [ [ T{ word-elt } delete-prev-elt ] with-editor ] }
-        { T{ key-down f { C+ } "DELETE" } [ [ T{ word-elt } delete-next-elt ] with-editor ] }
-        { T{ key-down f { A+ } "BACKSPACE" } [ [ T{ document-elt } delete-prev-elt ] with-editor ] }
-        { T{ key-down f { A+ } "DELETE" } [ [ T{ document-elt } delete-next-elt ] with-editor ] }
-        { T{ key-down f f "LEFT" } [ [ T{ char-elt } prev-elt ] with-editor ] }
-        { T{ key-down f f "RIGHT" } [ [ T{ char-elt } next-elt ] with-editor ] }
-        { T{ key-down f { C+ } "LEFT" } [ [ T{ word-elt } prev-elt ] with-editor ] }
-        { T{ key-down f { C+ } "RIGHT" } [ [ T{ word-elt } next-elt ] with-editor ] }
-        { T{ key-down f f "HOME" } [ [ T{ document-elt } prev-elt ] with-editor ] }
-        { T{ key-down f f "END" } [ [ T{ document-elt } next-elt ] with-editor ] }
-        { T{ key-down f { C+ } "k" } [ [ line-clear ] with-editor ] }
-        { T{ button-up f 2 } [ dup click-editor selection get paste-clipboard ] }
-        { T{ paste-action } [ clipboard get paste-clipboard ] }
-    } ;
+editor H{
+    { T{ button-down } [ click-editor ] }
+    { T{ gain-focus } [ editor-caret show-gadget ] }
+    { T{ lose-focus } [ editor-caret hide-gadget ] }
+    { T{ key-down f f "BACKSPACE" } [ [ T{ char-elt } delete-prev-elt ] with-editor ] }
+    { T{ key-down f f "DELETE" } [ [ T{ char-elt } delete-next-elt ] with-editor ] }
+    { T{ key-down f { C+ } "BACKSPACE" } [ [ T{ word-elt } delete-prev-elt ] with-editor ] }
+    { T{ key-down f { C+ } "DELETE" } [ [ T{ word-elt } delete-next-elt ] with-editor ] }
+    { T{ key-down f { A+ } "BACKSPACE" } [ [ T{ document-elt } delete-prev-elt ] with-editor ] }
+    { T{ key-down f { A+ } "DELETE" } [ [ T{ document-elt } delete-next-elt ] with-editor ] }
+    { T{ key-down f f "LEFT" } [ [ T{ char-elt } prev-elt ] with-editor ] }
+    { T{ key-down f f "RIGHT" } [ [ T{ char-elt } next-elt ] with-editor ] }
+    { T{ key-down f { C+ } "LEFT" } [ [ T{ word-elt } prev-elt ] with-editor ] }
+    { T{ key-down f { C+ } "RIGHT" } [ [ T{ word-elt } next-elt ] with-editor ] }
+    { T{ key-down f f "HOME" } [ [ T{ document-elt } prev-elt ] with-editor ] }
+    { T{ key-down f f "END" } [ [ T{ document-elt } next-elt ] with-editor ] }
+    { T{ key-down f { C+ } "k" } [ [ line-clear ] with-editor ] }
+    { T{ button-up f 2 } [ dup click-editor selection get paste-clipboard ] }
+    { T{ paste-action } [ clipboard get paste-clipboard ] }
+} set-gestures
 
 : add-editor-caret 2dup set-editor-caret add-gadget ;
 

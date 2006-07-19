@@ -1,15 +1,20 @@
 ! Copyright (C) 2005, 2006 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 IN: gadgets
-USING: hashtables kernel math models namespaces queues sequences
-words ;
+USING: generic hashtables kernel math models namespaces queues
+sequences words ;
 
-GENERIC: gadget-gestures ( gadget -- hash )
+: (gestures) ( gadget -- )
+    [
+        dup "gestures" word-prop [ , ] when* delegate (gestures)
+    ] when* ;
 
-M: gadget gadget-gestures drop H{ } ;
+: gestures ( gadget -- seq ) [ (gestures) ] { } make ;
+
+: set-gestures ( class hash -- ) "gestures" set-word-prop ;
 
 : handle-gesture* ( gesture gadget -- )
-    tuck gadget-gestures hash [ call f ] [ drop t ] if* ;
+    tuck gestures hash-stack [ call f ] [ drop t ] if* ;
 
 : handle-gesture ( gesture gadget -- ? )
     #! If a gadget's handle-gesture* generic returns t, the
@@ -185,10 +190,9 @@ V{ } clone hand-buttons set-global
 : send-action ( world gesture -- ? )
     swap world-focus handle-gesture ;
 
-M: world gadget-gestures
-    drop H{
-        { T{ key-down f { C+ } "x" } [ T{ cut-action } send-action ] }
-        { T{ key-down f { C+ } "c" } [ T{ copy-action } send-action ] }
-        { T{ key-down f { C+ } "v" } [ T{ paste-action } send-action ] }
-        { T{ key-down f { C+ } "a" } [ T{ select-all-action } send-action ] }
-    } ;
+world H{
+    { T{ key-down f { C+ } "x" } [ T{ cut-action } send-action ] }
+    { T{ key-down f { C+ } "c" } [ T{ copy-action } send-action ] }
+    { T{ key-down f { C+ } "v" } [ T{ paste-action } send-action ] }
+    { T{ key-down f { C+ } "a" } [ T{ select-all-action } send-action ] }
+} set-gestures

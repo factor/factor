@@ -119,8 +119,8 @@ M: compose set-model ( value compose -- )
 
 TUPLE: history back forward ;
 
-C: history ( -- history )
-    dup delegate>model
+C: history ( value -- history )
+    [ >r <model> r> set-delegate ] keep
     V{ } clone over set-history-back
     V{ } clone over set-history-forward ;
 

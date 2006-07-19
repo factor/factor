@@ -15,10 +15,8 @@ TUPLE: search-gadget pane input quot ;
         rot search-gadget-quot with-pane
     ] if ;
 
-M: search-gadget gadget-gestures
-    drop H{
-        { T{ key-down f f "RETURN" } [ do-search ] }
-    } ;
+search-gadget H{ { T{ key-down f f "RETURN" } [ do-search ] } }
+set-gestures
 
 C: search-gadget ( quot -- )
     [ set-search-gadget-quot ] keep {

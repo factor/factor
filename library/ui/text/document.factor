@@ -17,18 +17,15 @@ test ;
 TUPLE: document locs ;
 
 C: document ( -- document )
-    { "" } <model> over set-delegate
+    { "" } <history> over set-delegate
     V{ } clone over set-document-locs ;
 
 : add-loc document-locs push ;
 
 : remove-loc document-locs delete ;
 
-: doc-text ( document -- str )
-    model-value "\n" join ;
-
-: set-doc-text ( string document -- )
-    >r <string-reader> lines r> set-model ;
+: update-locs ( loc document -- )
+    document-locs [ set-model ] each-with ;
 
 : doc-line ( line# document -- str ) model-value nth ;
 
@@ -36,11 +33,7 @@ C: document ( -- document )
     >r 1+ r> model-value <slice> ;
 
 : start-on-line ( document from line# -- n1 )
-    >r dup first r> = [
-        nip second
-    ] [
-        2drop 0
-    ] if ;
+    >r dup first r> = [ nip second ] [ 2drop 0 ] if ;
 
 : end-on-line ( document to line# -- n2 )
     over first over = [
@@ -102,9 +95,6 @@ C: document ( -- document )
         first swap length 1- + 0
     ] if r> peek length + 2array ;
 
-: update-locs ( loc document -- )
-    document-locs [ set-model ] each-with ;
-
 : set-doc-range ( str startloc endloc document -- )
     [
         >r >r >r "\n" split r> [ text+loc ] 2keep r> r>
@@ -156,3 +146,13 @@ TUPLE: line-elt ;
 
 M: line-elt prev-elt 2drop -1 +line ;
 M: line-elt next-elt 2drop 1 +line ;
+
+: doc-text ( document -- str )
+    model-value "\n" join ;
+
+: set-doc-text ( string document -- )
+    [ >r "\n" split r> set-model ] keep
+    dup doc-end swap update-locs ;
+
+: clear-doc ( document -- )
+    "" swap set-doc-text ;
