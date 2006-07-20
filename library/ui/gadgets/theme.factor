@@ -7,6 +7,12 @@ IN: gadgets-labels
 DEFER: set-label-color
 DEFER: set-label-font
 
+IN: gadgets-text
+DEFER: set-editor-color
+DEFER: set-editor-caret-color
+DEFER: set-editor-selection-color
+DEFER: set-editor-font
+
 IN: gadgets-theme
 USING: arrays gadgets kernel sequences styles ;
 
@@ -87,9 +93,11 @@ USING: arrays gadgets kernel sequences styles ;
     { 0.0 0.0 0.0 1.0 } over set-label-color
     { "monospace" plain 12 } swap set-label-font ;
 
-: editor-theme ( gadget -- )
-    { 0.0 0.0 0.0 1.0 } over set-label-color
-    { "monospace" bold 12 } swap set-label-font ;
+: editor-theme ( editor -- )
+    { 0.0 0.0 0.0 1.0 } over set-editor-color
+    { 1.0 0.0 0.0 1.0 } over set-editor-caret-color
+    { 0.8 0.8 1.0 1.0 } over set-editor-selection-color
+    { "monospace" plain 12 } swap set-editor-font ;
 
 : highlight-theme ( gadget -- )
     T{ solid f { 0.8 0.8 0.8 1.0 } } swap set-gadget-interior ;

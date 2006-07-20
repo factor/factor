@@ -12,12 +12,6 @@ font color caret-color selection-color
 caret mark
 focused? ;
 
-: editor-theme ( editor -- )
-    { 0.0 0.0 0.0 1.0 } over set-editor-color
-    { 1.0 0.0 0.0 1.0 } over set-editor-caret-color
-    { 0.8 0.8 1.0 1.0 } over set-editor-selection-color
-    { "monospace" plain 12 } swap set-editor-font ;
-
 TUPLE: action-relayout-1 editor ;
 
 M: action-relayout-1 model-changed
