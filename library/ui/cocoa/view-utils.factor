@@ -23,7 +23,7 @@ opengl sequences ;
     r> -> frame NSRect-h swap - 2array ;
 
 : send-mouse-moved ( view event -- )
-    over >r mouse-location r> window move-hand ;
+    over >r mouse-location r> window move-hand fire-motion ;
 
 : button ( event -- n )
     #! Cocoa -> Factor UI button mapping

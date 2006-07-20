@@ -96,8 +96,11 @@ V{ } clone hand-buttons set-global
     #! Fire a motion gesture to the gadget underneath the hand,
     #! and if a mouse button is down, fire a drag gesture to the
     #! gadget that was clicked.
-    T{ motion } hand-gadget get-global handle-gesture drop
-    hand-buttons get-global empty? [ drag-gesture ] unless ;
+    hand-buttons get-global empty? [
+        T{ motion } hand-gadget get-global handle-gesture drop
+    ] [
+        drag-gesture
+    ] if ;
 
 : each-gesture ( gesture seq -- )
     [ handle-gesture* drop ] each-with ;
@@ -105,7 +108,6 @@ V{ } clone hand-buttons set-global
 : hand-gestures ( new old -- )
     drop-prefix <reversed>
     T{ mouse-leave } swap each-gesture
-    fire-motion
     T{ mouse-enter } swap each-gesture ;
 
 : forget-rollover ( -- )

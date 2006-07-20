@@ -41,11 +41,6 @@ parser sequences sequences-internals words ;
             compile-all
         ] with-class<cache
 
-        terpri
-        "Unless you're working on the compiler, ignore the errors above." print
-        "Not every word compiles, by design." print
-        terpri flush
-
         "Initializing native I/O..." print flush
         "native-io" get [ init-io ] when
 
@@ -60,7 +55,6 @@ parser sequences sequences-internals words ;
 
         windows? [
             "/library/ui/windows/load.factor" run-resource
-            compile-all
         ] when
     ] when
 
