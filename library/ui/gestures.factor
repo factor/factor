@@ -153,7 +153,7 @@ V{ } clone hand-buttons set-global
 
 : show-message ( string/f world -- )
     #! Show a message in the status bar.
-    world-status set-model ;
+    world-status set-model* ;
 
 : update-help ( -- )
     #! Update mouse-over help message.

@@ -60,6 +60,9 @@ M: model set-model ( value model -- )
     [ set-model-value ] keep
     model-connections [ model-changed ] each ;
 
+: set-model* ( value model -- )
+    2dup model-value = [ 2drop ] [ set-model ] if ;
+
 : change-model ( model quot -- )
     over >r >r model-value r> call r> set-model ; inline
 
