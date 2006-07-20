@@ -7,10 +7,12 @@ IN: inference
 
 : consume-values ( n node -- )
     over ensure-values
-    over 0 rot node-inputs [ pop-d 2drop ] each ;
+    over 0 rot node-inputs
+    meta-d get [ length swap - ] keep set-length ;
 
 : produce-values ( n node -- )
-    over [ drop <computed> push-d ] each 0 swap node-outputs ;
+    >r [ drop <computed> ] map dup r> set-node-out-d
+    meta-d get swap nappend ;
 
 : consume/produce ( word effect -- )
     #! Add a node to the dataflow graph that consumes and

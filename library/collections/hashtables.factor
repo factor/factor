@@ -15,12 +15,16 @@ TUPLE: tombstone ;
 : probe ( keys i -- hash i ) 2 + over length mod ; inline
 
 : (key@) ( key keys i -- n )
-    3dup swap nth-unsafe {
-        { [ dup ((tombstone)) eq? ] [ 2drop probe (key@) ] }
-        { [ dup ((empty)) eq? ] [ 2drop 3drop -1 ] }
-        { [ = ] [ 2nip ] }
-        { [ t ] [ probe (key@) ] }
-    } cond ;
+    #! cond form expanded by hand for better interpreter speed
+    3dup swap nth-unsafe dup ((tombstone)) eq? [
+        2drop probe (key@)
+    ] [
+        dup ((empty)) eq? [
+            2drop 3drop -1
+        ] [
+            = [ 2nip ] [ probe (key@) ] if
+        ] if
+    ] if ; inline
 
 : key@ ( key hash -- n )
     hash-array 2dup hash@ (key@) ; inline
@@ -38,11 +42,16 @@ TUPLE: tombstone ;
     swap <hash-array> over set-hash-array init-hash ;
 
 : (new-key@) ( key keys i -- n )
-    3dup swap nth-unsafe {
-        { [ dup ((empty)) eq? ] [ 2drop 2nip ] }
-        { [ = ] [ 2nip ] }
-        { [ t ] [ probe (new-key@) ] }
-    } cond ; inline
+    #! cond form expanded by hand for better interpreter speed
+    3dup swap nth-unsafe dup ((empty)) eq? [
+        2drop 2nip
+    ] [
+        = [
+            2nip
+        ] [
+            probe (new-key@)
+        ] if
+    ] if ; inline
 
 : new-key@ ( key hash -- n )
     hash-array 2dup hash@ (new-key@) ; inline
@@ -241,8 +250,27 @@ M: hashtable hashcode ( hash -- n )
 : ?hash* ( key hash/f -- value/f )
     dup [ hash* ] [ 2drop f f ] if ;
 
+IN: hashtables-internals
+
+: (hash-stack) ( key i seq -- value )
+    over 0 < [
+        3drop f
+    ] [
+        3dup nth-unsafe dup [
+            hash* [
+                >r 3drop r>
+            ] [
+                drop >r 1- r> (hash-stack)
+            ] if
+        ] [
+            2drop >r 1- r> (hash-stack)
+        ] if
+    ] if ;
+
+IN: hashtables
+
 : hash-stack ( key seq -- value )
-    [ dupd hash-member? ] find-last nip ?hash ;
+    dup length 1- swap (hash-stack) ;
 
 : hash-intersect ( hash1 hash2 -- hash1/\hash2 )
     [ drop swap hash ] hash-subset-with ;

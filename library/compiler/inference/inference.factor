@@ -48,13 +48,13 @@ SYMBOL: d-in
 
 : value-vector ( n -- vector ) [ drop <computed> ] map >vector ;
 
-: add-inputs ( n stack -- stack )
-    tuck length - dup 0 >
-    [ value-vector swap append ] [ drop ] if ;
-
 : ensure-values ( n -- )
-    dup meta-d get length [-] d-in [ + ] change
-    meta-d [ add-inputs ] change ;
+    meta-d get length 2dup > [
+        - dup d-in [ + ] change
+        value-vector meta-d [ dupd nappend ] change 
+    ] [
+        2drop
+    ] if ;
 
 : effect ( -- { in# out# } )
     #! After inference is finished, collect information.

@@ -33,8 +33,11 @@ M: node = eq? ;
 : out-node ( outputs) >r f { } r> { } { } ;
 : meta-d-node meta-d get clone in-node ;
 
-: d-tail ( n -- list ) meta-d get tail* ;
-: r-tail ( n -- list ) meta-r get tail* ;
+: d-tail ( n -- list )
+    dup zero? [ drop f ] [ meta-d get tail* ] if ;
+
+: r-tail ( n -- list )
+    dup zero? [ drop f ] [ meta-r get tail* ] if ;
 
 : node-child node-children first ;
 

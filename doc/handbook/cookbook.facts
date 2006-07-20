@@ -207,7 +207,7 @@ ARTICLE: "cookbook-io" "I/O cookbook"
 }
 "Send some bytes to a remote host:"
 { $code
-    "\"myhost\" 1033 [ { 12 17 102 } write ] with-stream"
+    "\"myhost\" 1033 <client> [ { 12 17 102 } write ] with-stream"
 }
 { $references
     { }

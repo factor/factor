@@ -4,6 +4,10 @@ IN: inference
 USING: arrays errors generic hashtables interpreter kernel math
 namespaces parser prettyprint sequences strings vectors words ;
 
+: add-inputs ( n stack -- stack )
+    tuck length - dup 0 >
+    [ value-vector dup rot nappend ] [ drop ] if ;
+
 : unify-lengths ( seq -- seq )
     #! Pad all vectors to the same length. If one vector is
     #! shorter, pad it with unknown results at the bottom.
