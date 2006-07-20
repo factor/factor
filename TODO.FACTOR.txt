@@ -61,10 +61,7 @@
   - horizontal wheel scrolling
   - polish OS X menu bar code
 - variable width word wrap
-- use models for the following:
-  - editor gadgets
-  - search tool
-  - slider needs range-model or similar
+- slider needs to be modelized
 
 + compiler/ffi:
 

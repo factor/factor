@@ -84,7 +84,6 @@ SYMBOL: failures
         "continuations"
         "errors"
         "gadgets/document"
-        "gadgets/line-editor"
         "gadgets/models"
         "gadgets/rectangles"
         "generic"

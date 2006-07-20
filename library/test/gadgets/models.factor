@@ -30,7 +30,7 @@ T{ model-tester f f } "tester" set
     "model-c" get model-value
 ] unit-test
 
-<history> "history" set
+f <history> "history" set
 
 "history" get add-history
 
