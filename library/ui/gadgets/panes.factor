@@ -1,25 +1,23 @@
 ! Copyright (C) 2005, 2006 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 IN: gadgets-panes
-USING: arrays gadgets gadgets-buttons gadgets-controls
-gadgets-frames gadgets-grids gadgets-labels gadgets-scrolling
-gadgets-theme generic hashtables io kernel math namespaces
-sequences strings ;
+USING: gadgets gadgets-buttons gadgets-controls gadgets-labels
+gadgets-scrolling gadgets-theme generic hashtables io kernel
+namespaces sequences ;
 
-TUPLE: pane output active current prototype scrolls? ;
+TUPLE: pane output current prototype scrolls? ;
 
 : add-output 2dup set-pane-output add-gadget ;
 
-: init-line ( pane -- )
-    dup pane-prototype clone swap set-pane-current ;
+: add-current 2dup set-pane-current add-gadget ;
 
 : prepare-line ( pane -- )
-    dup init-line dup pane-active unparent
-    [ pane-current 1array make-shelf ] keep
-    2dup set-pane-active add-gadget ;
+    dup pane-prototype clone swap add-current ;
 
 : pane-clear ( pane -- )
-    dup pane-output clear-incremental pane-current clear-gadget ;
+    dup
+    pane-output clear-incremental
+    pane-current clear-gadget ;
 
 C: pane ( -- pane )
     <pile> over set-delegate
@@ -58,11 +56,7 @@ C: pane ( -- pane )
 M: pane stream-flush ( pane -- ) drop ;
 
 : scroll-pane ( pane -- )
-    dup pane-scrolls? [
-        find-scroller [ scroll>bottom ] when*
-    ] [
-        drop
-    ] if ;
+    dup pane-scrolls? [ scroll>bottom ] [ drop ] if ;
 
 M: pane stream-terpri ( pane -- )
     dup pane-current prepare-print

@@ -17,6 +17,7 @@
 + ui:
 
 - editor:
+  - delegation issue with fields and interactors
   - multi-line inserts
   - scroll to caret
   - only redraw visible lines

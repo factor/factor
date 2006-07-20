@@ -16,12 +16,6 @@ TUPLE: scroller viewport x y follows ;
 
 : find-scroller [ scroller? ] find-parent ;
 
-: scroll>gadget ( gadget -- )
-    #! Scroll the scroller that contains this gadget, if any, so
-    #! that the gadget becomes visible.
-    dup find-scroller dup
-    [ [ set-scroller-follows ] keep relayout ] [ 2drop ] if ;
-
 : scroll-up-line scroller-y -1 swap slide-by-line ;
 
 : scroll-down-line scroller-y 1 swap slide-by-line ;
@@ -63,15 +57,15 @@ C: scroller ( gadget -- scroller )
     dupd over scroller-y update-slider
     position-viewport ;
 
-: scroll>bottom ( scroller -- )
-    t swap set-scroller-follows ;
+: scroll>bottom ( gadget -- )
+    find-scroller [ t swap set-scroller-follows ] when* ;
 
 : update-scroller ( scroller -- )
-    dup scroller-follows [
+    dup dup scroller-follows [
         f over set-scroller-follows
-        dup rect-dim { 0 1 } v*
+        scroller-viewport viewport-dim { 0 1 } v*
     ] [
-        drop dup scroller-origin
+        scroller-origin
     ] if scroll ;
 
 M: scroller layout* ( scroller -- )

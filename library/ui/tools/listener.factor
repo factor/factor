@@ -27,23 +27,34 @@ TUPLE: listener-gadget input output stack ;
     [ >r clear r> init-namespaces listener-thread ] in-thread
     drop ;
 
-: <listener-input> ( -- gadget )
-    gadget get listener-gadget-output <interactor> ;
-
 : <pane-tile> ( model quot title -- gadget )
     >r <pane-control> <scroller> r> f <tile> ;
 
 : <stack-tile> ( model title -- gadget )
     [ stack. ] swap <pane-tile> ;
 
-: <stack-display> ( -- gadget )
-    gadget get listener-gadget-stack "Stack" <stack-tile> ;
+: <listener-input> ( listener -- gadget )
+    listener-gadget-input <scroller> "Input" f <tile> ;
+
+: <stack-display> ( listener -- gadget )
+    listener-gadget-stack "Stack" <stack-tile> ;
+
+: <listener-bar> ( listener -- gadget )
+    dup {
+        { [ <listener-input> ] f f 1/2 }
+        { [ <stack-display> ] f f 1/2 }
+    } { 1 0 } make-track ;
+
+: init-listener ( listener -- )
+    f <model> over set-listener-gadget-stack
+    <scrolling-pane> over set-listener-gadget-output
+    dup listener-gadget-output <interactor>
+    swap set-listener-gadget-input ;
 
 C: listener-gadget ( -- gadget )
-    f <model> over set-listener-gadget-stack {
-        { [ <scrolling-pane> ] set-listener-gadget-output [ <scroller> ] 4/6 }
-        { [ <listener-input> ] set-listener-gadget-input [ <scroller> ] 1/6 }
-        { [ <stack-display> ] f f 1/6 }
+    dup init-listener {
+        { [ gadget get listener-gadget-output <scroller> ] f f 5/6 }
+        { [ gadget get <listener-bar> ] f f 1/6 }
     } { 0 1 } make-track* dup start-listener ;
 
 M: listener-gadget pref-dim*
