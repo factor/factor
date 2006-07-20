@@ -9,6 +9,7 @@ $terpri
 "Hashtables form a class of objects."
 { $subsection hashcode }
 { $subsection hashtable? }
+"You can create a new hashtable with an initial capacity."
 { $subsection <hashtable> }
 "If you don't care about initial capacity, a more elegant way to create a new hashtable is to write:"
 { $code "H{ } clone" }

@@ -39,6 +39,7 @@ SYMBOL: structured-input
 interactor H{
     { T{ key-down f f "RETURN" } [ interactor-commit ] }
     { T{ key-down f { C+ } "l" } [ interactor-output pane-clear ] }
+    { T{ key-down f { C+ } "d" } [ f swap interactor-eval ] }
 } set-gestures
 
 M: interactor stream-readln ( pane -- line )
