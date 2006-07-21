@@ -1,3 +1,5 @@
+! Rewritten by Matthew Willis, July 2006
+!
 ! Copyright (C) 2004 Chris Double.
 ! 
 ! Redistribution and use in source and binary forms, with or without
@@ -21,26 +23,7 @@
 ! OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
 ! ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 IN: lazy-examples
-USE: lazy
-USE: math
-USE: lists
-USE: parser-combinators
-USE: kernel
-USE: sequences
-USE: namespaces
-
-: lfrom ( n -- llist )
-  #! Return a lazy list of increasing numbers starting
-  #! from the initial value 'n'.
-  dup unit delay swap
-  [ 1 + lfrom ] cons delay lcons ;
-  
-: lfrom-by ( n quot -- llist )
-  #! Return a lazy list of values starting from n, with
-  #! each successive value being the result of applying quot to
-  #! n.
-  swap dup unit delay -rot 
-  [ , dup , \ call , , \ lfrom-by , ] [ ] make delay lcons ;
+USING: lazy math kernel sequences namespaces ;
 
 : lnaturals 0 lfrom ;
 : lpositves 1 lfrom ;
@@ -55,12 +38,10 @@ USE: namespaces
   #! Return true if a is divisible by b
   mod 0 = ;
 
-: sieve ( llist - llist )
-  #! Given a lazy list of numbers, use the sieve of eratosthenes
-  #! algorithm to return a lazy list of primes.
-  luncons over [ divisible-by? not ] 
-  cons lsubset [ sieve ] cons delay >r unit delay r> lcons ;
+: filter-multiples ( n llist - llist )
+  #! Given a lazy list of numbers, filter multiples of n
+	swap [ divisible-by? not ] curry lsubset ;
 
-: lprimes 2 lfrom sieve ;
+: lprimes 2 lfrom [ filter-multiples ] lapply ;
 
 : first-ten-primes 10 lprimes ltake llist>list ;
