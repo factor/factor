@@ -1,7 +1,8 @@
 ! Copyright (C) 2006 Slava Pestov
 ! See http://factorcode.org/license.txt for BSD license.
 IN: gadgets-text
-USING: gadgets kernel models namespaces sequences ;
+USING: gadgets gadgets-controls kernel models namespaces
+sequences ;
 
 : editor-mouse-down ( editor -- )
     dup request-focus
@@ -23,8 +24,8 @@ USING: gadgets kernel models namespaces sequences ;
     dupd editor-copy remove-editor-selection ;
 
 : remove-at-caret ( editor quot -- | quot: caret editor -- from to )
-    over >r >r dup editor-caret* swap editor-document
-    r> call r> editor-document remove-doc-range ; inline
+    over >r >r dup editor-caret* swap control-model
+    r> call r> control-model remove-doc-range ; inline
 
 : editor-delete ( editor -- )
     dup editor-selection? [
@@ -71,14 +72,14 @@ USING: gadgets kernel models namespaces sequences ;
     dup editor-select-end mark>caret ;
 
 : editor-select-doc-end ( editor -- )
-    dup editor-document doc-end swap editor-caret set-model ;
+    dup control-model doc-end swap editor-caret set-model ;
 
 : editor-doc-end ( editor -- )
     editor-select-doc-end mark>caret ;
 
 : editor-select-all ( editor -- )
     { 0 0 } over editor-caret set-model
-    dup editor-document doc-end swap editor-mark set-model ;
+    dup control-model doc-end swap editor-mark set-model ;
 
 editor H{
     { T{ button-down } [ editor-mouse-down ] }

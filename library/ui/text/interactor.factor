@@ -1,14 +1,15 @@
 ! Copyright (C) 2006 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 IN: gadgets-text
-USING: gadgets gadgets-panes io kernel namespaces prettyprint
-styles threads ;
+USING: gadgets gadgets-controls gadgets-panes io kernel
+namespaces prettyprint styles threads ;
 
 TUPLE: interactor output continuation ;
 
 C: interactor ( output -- gadget )
     [ set-interactor-output ] keep
-    f <field> over set-gadget-delegate ;
+    f <field> over set-gadget-delegate
+    dup dup set-control-self ;
 
 : interactor-eval ( string gadget -- )
     interactor-continuation dup

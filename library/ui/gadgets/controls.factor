@@ -3,20 +3,25 @@
 IN: gadgets-controls
 USING: gadgets kernel models ;
 
-TUPLE: control model quot ;
+TUPLE: control self model quot ;
 
 C: control ( model gadget quot -- gadget )
+    dup dup set-control-self
     [ set-control-quot ] keep
     [ set-gadget-delegate ] keep
-    [ set-control-model ] keep
-    dup model-changed ;
+    [ set-control-model ] keep ;
 
 M: control graft*
-    dup control-model add-connection ;
+    dup control-self over control-model add-connection
+    model-changed ;
 
 M: control ungraft*
-    dup control-model remove-connection ;
+    dup control-self swap control-model remove-connection ;
 
 M: control model-changed ( gadget -- )
     [ control-model model-value ] keep
-    [ dup control-quot call ] keep relayout ;
+    [ dup control-self swap control-quot call ] keep
+    control-self relayout ;
+
+: delegate>control ( gadget model -- )
+    <gadget> [ drop ] <control> swap set-gadget-delegate ;

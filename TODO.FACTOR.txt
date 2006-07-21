@@ -10,6 +10,8 @@
   - bug after removing all lines
   - word-at-a-time commands
   - deleting words, lines
+  - better listener multi-line expression handling
+  - stack display: trim at 32 columns
 - shift modifier not delivered
 - x11 copy to clipboard
   
@@ -43,6 +45,7 @@
 - add some handy services:
   - base conversion
   - search help for selection
+- make factor a services client
 - services do not launch if factor not running
 - grid slows down with 2000 lines
 - integrated error documentation

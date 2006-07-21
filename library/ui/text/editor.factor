@@ -2,12 +2,11 @@
 ! See http://factorcode.org/license.txt for BSD license.
 IN: gadgets-text
 USING: arrays errors freetype gadgets gadgets-borders
-gadgets-buttons gadgets-frames gadgets-labels gadgets-scrolling
-gadgets-theme io kernel math models namespaces opengl sequences
-strings styles ;
+gadgets-buttons gadgets-controls gadgets-frames gadgets-labels
+gadgets-scrolling gadgets-theme io kernel math models namespaces
+opengl sequences strings styles ;
 
 TUPLE: editor
-document
 font color caret-color selection-color
 caret mark
 focused? ;
@@ -16,47 +15,46 @@ TUPLE: action-relayout-1 editor ;
 
 M: action-relayout-1 model-changed
     #! Caret changed
-    action-relayout-1-editor relayout-1 ;
+    action-relayout-1-editor control-self relayout-1 ;
 
 : init-editor-models ( editor -- )
     dup <action-relayout-1> over editor-caret add-connection
     dup <action-relayout-1> swap editor-mark add-connection ;
 
 C: editor ( document -- editor )
-    dup delegate>gadget
-    <document> over set-editor-document
+    dup <document> delegate>control
     { 0 0 } <model> over set-editor-caret
     { 0 0 } <model> over set-editor-mark
     dup init-editor-models
     dup editor-theme ;
 
 : activate-editor-model ( editor model -- )
-    dup activate-model swap editor-document add-loc ;
+    dup activate-model swap control-model add-loc ;
 
 : deactivate-editor-model ( editor model -- )
-    dup deactivate-model swap editor-document remove-loc ;
+    dup deactivate-model swap control-model remove-loc ;
 
 M: editor graft* ( editor -- )
-    dup
-    dup editor-caret activate-editor-model
-    dup editor-mark activate-editor-model ;
+    dup dup editor-caret activate-editor-model
+    dup dup editor-mark activate-editor-model
+    dup control-self swap control-model add-connection ;
 
 M: editor ungraft* ( editor -- )
-    dup
-    dup editor-caret deactivate-editor-model
-    dup editor-mark deactivate-editor-model ;
+    dup dup editor-caret deactivate-editor-model
+    dup dup editor-mark deactivate-editor-model
+    dup control-self swap control-model remove-connection ;
 
 M: editor model-changed ( editor -- )
     #! Document changed
-    relayout ;
+    control-self relayout ;
 
 : editor-caret* editor-caret model-value ;
 
 : editor-mark* editor-mark model-value ;
 
 : change-caret ( editor quot -- )
-    over >r >r dup editor-caret* swap editor-document r> call r>
-    [ editor-document validate-loc ] keep
+    over >r >r dup editor-caret* swap control-model r> call r>
+    [ control-model validate-loc ] keep
     editor-caret set-model ; inline
 
 : mark>caret ( editor -- )
@@ -66,7 +64,7 @@ M: editor model-changed ( editor -- )
     over >r change-caret r> mark>caret ; inline
 
 : editor-lines ( editor -- seq )
-    editor-document model-value ;
+    control-model model-value ;
 
 : editor-line ( n editor -- str ) editor-lines nth ;
 
@@ -132,7 +130,7 @@ M: editor model-changed ( editor -- )
 
 : with-editor ( editor quot -- )
     [
-        swap dup editor-document document set editor set call
+        swap dup control-model document set editor set call
     ] with-scope ; inline
 
 : draw-lines ( editor -- )
@@ -189,17 +187,17 @@ M: editor pref-dim* ( editor -- dim )
     selection-start/end = not ;
 
 : editor-selection ( editor -- str )
-    [ selection-start/end ] keep editor-document doc-range ;
+    [ selection-start/end ] keep control-model doc-range ;
 
 : remove-editor-selection ( editor -- )
-    [ selection-start/end ] keep editor-document
+    [ selection-start/end ] keep control-model
     remove-doc-range ;
 
 M: editor user-input* ( str editor -- ? )
-    [ selection-start/end ] keep editor-document set-doc-range t ;
+    [ selection-start/end ] keep control-model set-doc-range t ;
 
 : editor-text ( editor -- str )
-    editor-document doc-text ;
+    control-model doc-text ;
 
 : set-editor-text ( str editor -- )
-    editor-document set-doc-text ;
+    control-model set-doc-text ;
