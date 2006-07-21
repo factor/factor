@@ -295,6 +295,7 @@ M: port stream-close ( stream -- )
     ] unless drop ;
 
 ! Make a duplex stream for reading/writing a pair of fds
+: open-r/w ( path -- fd ) O_RDWR file-mode open dup io-error ;
 
 : <fd-stream> ( infd outfd -- stream )
     >r <reader> r> <writer> <duplex-stream> ;
