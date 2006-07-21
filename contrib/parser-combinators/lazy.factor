@@ -1,3 +1,5 @@
+! Updated by Matthew Willis, July 2006
+!
 ! Copyright (C) 2004 Chris Double.
 ! 
 ! Redistribution and use in source and binary forms, with or without
@@ -24,7 +26,6 @@ IN: lazy
 USE: kernel
 USE: sequences
 USE: namespaces
-USE: lists
 USE: math
 
 TUPLE: promise quot forced? value ;
@@ -45,47 +46,37 @@ TUPLE: promise quot forced? value ;
     t over set-promise-forced?
   ] unless
   promise-value ;
-
-: force ( <promise> -- value )
-  (force) dup promise? [
-    force
-  ] when ;
   
 TUPLE: lcons car cdr ;
 
 SYMBOL: lazy-nil
-DEFER: lnil
-[ [ ] ] delay  lazy-nil set
+[ [ ] ] delay lazy-nil set
 
-: lnil ( -- lcons )
+: lnil ( -- llist )
   #! Return the nil lazy list.
   lazy-nil get ;
 
-: lnil? ( lcons -- bool )
+: lnil? ( llist -- bool )
   #! Is the given lazy cons the nil value
-  force not ;
+  (force) dup quotation? [ empty? ] [ drop f ] if ;
 
-: lcar ( lcons -- car )
-  #! Return the value of the head of the lazy list.
-  dup lnil? [ 
-    force lcons-car (force) 
-  ] unless ;
+: lcar ( llist -- car )
+  #! Return the value of the head of the lazy list. 
+  (force) lcons-car ;
 
-: lcdr ( lcons -- cdr )
-  #! Return the value of the rest of the lazy list.
+: lcdr ( llist -- cdr )
+  #! Return the rest of the lazy list.
   #! This is itself a lazy list.
-  dup lnil? [
-    force lcons-cdr (force) 
-  ] unless ;
+  (force) lcons-cdr ;
 
-: lcons ( lcar lcdr -- promise )
+: lcons ( lcar lcdr -- llist )
   #! Given a car and cdr, both lazy values, return a lazy cons.
-  swap [ , , \ <lcons> , ] [ ] make delay ;
+  [ <lcons> ] curry curry delay ;
 
 : lunit ( lvalue -- llist )
   #! Given a lazy value (a quotation that when called produces
   #! the value) produce a lazy list containing that value.
-  [ lnil ] delay lcons ;
+  lnil lcons ;
 
 : lnth ( n llist -- value )
   #! Return the nth item in a lazy list
@@ -95,171 +86,111 @@ DEFER: lnil
   #! Return the car and cdr of the lazy list
   dup lcar swap lcdr ;
 
+DEFER: lmap
+: (lmap) ( llist quot -- list )
+	over lnil? [ drop ] 
+	[
+  	swap 2dup
+  	lcdr swap lmap >r
+  	lcar swap call r> 
+  	lcons
+	] if ;
+
 : lmap ( llist quot -- llist )
   #! Return a lazy list containing the collected result of calling
   #! quot on the original lazy list.
-  over lnil? [
-    drop
-  ] [
-    swap 2dup
-    [ , \ lcdr , , \ lmap , ] [ ] make delay >r
-    [ , \ lcar , , \ call , ] [ ] make delay r> 
-    lcons 
-  ] if ;
+  [ (lmap) (force) ] curry curry delay ;
+
+DEFER: ltake
+: (ltake) ( n llist -- llist )
+  over 0 = [ 2drop lnil ] 
+	[ dup lnil? [ nip	] 
+		[
+      swap  ( llist n -- )
+      1 - >r luncons r> swap ltake 
+      lcons
+  	] if 
+	] if ;
 
 : ltake ( n llist -- llist )
   #! Return a lazy list containing the first n items from
   #! the original lazy list.
-  over 0 = [
-    2drop lnil 
-  ] [
-    dup lnil? [
-      nip
-    ] [
-        swap dupd     ( llist llist n  -- )
-        [ [ 1 - ] cons , \ call , , \ lcdr , \ ltake , ] [ ] make delay >r
-        [ , \ lcar , ] [ ] make delay r> 
-        lcons 
-    ] if 
-  ] if ;
+  [ (ltake) (force) ] curry curry delay ;
 
 DEFER: lsubset
-TUPLE: lsubset-state llist pred ;
-
-: (lsubset-cdr) ( state -- llist )
-  #! Given a predicate and a lazy list, do the cdr
-  #! portion of lsubset.
-  dup lsubset-state-llist lcdr swap lsubset-state-pred lsubset ;
-
-: (lsubset-car) ( state -- value )
-  #! Given a predicate and a lazy list, do the car
-  #! portion of lsubset.
-  dup lsubset-state-llist lcar over 
-  lsubset-state-pred dupd call [ ( state lcar -- )
-    nip
-  ] [ ( state lcar -- )
-    drop dup lsubset-state-llist lcdr over set-lsubset-state-llist
-    (lsubset-car)
-  ] if ;
-
-: (lsubset-set-first-car) ( state -- bool )
-  #! Set the state to the first valid car. If none found
-  #! return false.
-  dup lsubset-state-llist lcar over 
-  lsubset-state-pred dupd call [ ( state lcar -- )
-    2drop t 
-  ] [ ( state lcar -- )
-    drop dup lsubset-state-llist lcdr dup lnil? [
-      2drop f
-    ] [
-      over set-lsubset-state-llist
-      (lsubset-set-first-car)
-    ] if
-  ] if ;
-
+: (lsubset) ( llist pred -- llist )
+	>r dup lnil? [ r> drop ] 
+	[
+		luncons swap dup r> dup >r call 
+		[ swap r> lsubset lcons ] 
+		[ drop r> (lsubset) ] if
+	] if ;
+	
 : lsubset ( llist pred -- llist )
-  #! Return a lazy list containing only the items from the original
-  #! lazy list for which the predicate returns a value other than f.
-  over lnil? [ 
-    drop
-  ] [
-    <lsubset-state> dup
-    (lsubset-set-first-car) [
-      dup
-      [ (lsubset-cdr) ] cons delay >r 
-      [ (lsubset-car) ] cons delay r> lcons
-    ] [
-      drop lnil
-    ] if
-  ] if ;
-
-DEFER: lappend*
-DEFER: (lappend*)
-TUPLE: lappend*-state current rest ;
-
-USE: io 
-
-: (lappend*-cdr) ( state -- llist )
-  #! Given the state object, do the cdr portion of the
-  #! lazy append.
-  dup lappend*-state-current dup lnil? [ ( state current -- )
-    nip
-  ] [ ( state current -- )
-    lcdr ( state cdr -- )
-    dup lnil? [ ( state cdr -- ) 
-      drop dup lappend*-state-rest dup lnil? [ ( state rest )
-        nip
-      ] [
-        nip
-        luncons ( state rest-car rest-cdr -- )
-        <lappend*-state> (lappend*)
-      ] if 
-    ] [ ( state cdr -- )
-      swap lappend*-state-rest <lappend*-state> (lappend*)
-    ] if 
-  ] if ;
-
-: (lappend*-car) ( state -- value )
-  #! Given the state object, do the car portion of the 
-  #! lazy append.
-  dup lappend*-state-current dup lnil? [ ( state current -- )
-    nip
-  ] [ ( state current -- )
-    lcar nip
-  ] if ;
-
-: (lappend*) ( state -- llist )
-  #! Do the main work of the lazy list appending using a
-  #! state object.
-  dup 
-  [ (lappend*-cdr) ] cons delay >r
-  [ (lappend*-car) ] cons delay r> lcons ;    
-
-: lappend* ( llists -- llist )
-  #! Given a lazy list of lazy lists, return a lazy list that
-  #! works through all of the sub-lists in sequence.
-  [ lnil? not ] lsubset
-  dup lnil? [
-    luncons <lappend*-state> (lappend*)
-  ] unless ;
-
-DEFER: list>llist
-
-: lappend ( llist1 llist2 -- llist )
-  #! Concatenate two lazy lists such that they appear to be one big
-  #! lazy list.
-  [ ] cons cons list>llist lappend* ;
-
-: leach ( llist quot -- )
-  #! Call the quotation on each item in the lazy list. 
-  #! Warning: If the list is infinite then this will
-  #! never return.  
-  over lnil? [
-      2drop
-  ] [
-      >r luncons r> tuck >r >r call r> r> leach
-  ] if ;
-
-
-: (llist>list) ( result llist -- list )
-  #! Helper function for llist>list.
-  dup lnil? [
-    drop
-  ] [
-    dup lcar ( result llist car )
-    swap lcdr >r swons r> (llist>list)  
-  ] if ;
+  #! Return a lazy list containing the elements in llist 
+  #! satisfying pred	
+	[ (lsubset) (force) ] curry curry delay ;
 
 : llist>list ( llist -- list )
   #! Convert a lazy list to a normal list. This will cause
   #! an infinite loop if the lazy list is an infinite list.
-  f swap (llist>list) reverse ;
+  dup lnil? [ drop [ ] ]
+	[ luncons llist>list curry ] if ;
+
+DEFER: list>llist
+: (list>llist) ( list -- llist )
+  dup empty? [ drop lnil ]
+	[ dup first 0 rot remove-nth list>llist lcons ] if ;
 
 : list>llist ( list -- llist )
   #! Convert a list to a lazy list.
-  dup [
-    uncons [ list>llist ] cons delay >r unit delay r> lcons 
-  ] [ 
-    drop lnil
-  ] if ;
+  [ (list>llist) (force) ] curry delay ;
 
+DEFER: lappend*
+: (lappend*) ( llists -- list )
+	dup lnil? [ 
+		luncons >r dup lnil? [ drop r> (lappend*) ]
+		[ luncons r> lcons lappend* lcons ] if
+	] unless ;
+
+: lappend* ( llists -- list )
+  #! Given a lazy list of lazy lists, concatenate them 
+  #! together in a lazy fashion. The actual appending is 
+  #! done lazily on iteration rather than immediately
+  #! so it works very fast no matter how large the lists.
+	[ (lappend*) (force) ] curry delay ;
+
+: lappend ( llist1 llist2 -- llist )
+  #! Concatenate two lazy lists such that they appear to be one big
+  #! lazy list.
+  lunit lcons lappend* ;
+
+: leach ( llist quot -- )
+  #! Call the quotation on each item in the lazy list. 
+  #! Warning: If the list is infinite then this will
+  #! never return. 
+	swap dup lnil? [ 2drop ] [
+		luncons swap pick call swap leach
+	] if ;
+	
+: lapply ( llist quot )
+	#! Returns a lazy list which is
+	#! (cons (car llist)
+	#!		   (lappy (quot (car llist) (cdr llist)) quot))
+	#! This allows for complicated list functions
+	[ over lnil? [ drop ] [ 
+			swap dup lcar >r luncons pick call swap lapply
+			r> swap lcons 
+		] if (force) 
+	] curry curry delay ;
+	
+: lfrom ( n -- llist )
+	#! Return a lazy list of increasing numbers starting
+	#! from the initial value 'n'.
+	[ dup 1 + lfrom lcons (force) ] curry delay ;
+
+: lfrom-by ( n quot -- llist )
+	#! Return a lazy list of values starting from n, with
+	#! each successive value being the result of applying quot to
+	#! n.
+	[ 2dup call swap lfrom-by lcons (force) ] curry curry delay ;
