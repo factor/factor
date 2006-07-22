@@ -22,11 +22,6 @@ M: object clone ;
 
 : ? ( cond t f -- t/f ) rot [ drop ] [ nip ] if ; inline
 
-: >boolean t f ? ; inline
-: and ( a b -- a&b ) f ? ; inline
-: or ( a b -- a|b ) t swap ? ; inline
-: xor ( a b -- a^b ) [ not ] when ; inline
-
 : cpu ( -- arch ) 7 getenv ; foldable
 : os ( -- os ) 11 getenv ; foldable
 : windows? ( -- ? ) os "windows" = ; inline
@@ -57,6 +52,11 @@ inline
 : when [ ] if ; inline
 
 : when* dupd [ drop ] if ; inline
+
+: >boolean t f ? ; inline
+: and ( a b -- a&b ) f ? ; inline
+: or ( a b -- a|b ) t swap ? ; inline
+: xor ( a b -- a^b ) [ not ] when ; inline
 
 : with ( obj quot elt -- obj quot )
     pick pick >r >r swap call r> r> ; inline
