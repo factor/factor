@@ -3,14 +3,11 @@
 - windows port from erg
 - why aren't some cocoa words compiled?
 - editor:
-  - multi-line inserts
   - scroll to caret
-  - only redraw visible lines
   - clicking input doesn't resize editor gadget
   - better listener multi-line expression handling
 - shift modifier not delivered
 - x11 copy to clipboard
-- one-column table doesn't need borders...?
 
 - httpd search tools
 - remaining HTML issues need fixing
@@ -26,6 +23,7 @@
 
 + ui:
 
+- one-column table doesn't need borders...?
 [2:45pm] tathi: Factor's text display is a bit odd sometimes, until you mouse over (or click, if there's no "live" text)
 [2:48pm] tathi: it appears to be using the font metrics from the sprite tuple, but re-using the texture from the previous letter
 [2:59pm] tathi: hmm...and it looks like it's only be happening the first time you use a given character (from a given font face)
@@ -36,6 +34,8 @@
   - autoscroll
   - page up/down
   - search and replace
+  - only redraw visible lines
+  - more efficient multi-line inserts
 - finish gui stepper
 - windows are not updated while resizing
 - graphical module manager tool

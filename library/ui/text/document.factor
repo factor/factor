@@ -63,31 +63,6 @@ C: document ( -- document )
         ] each-line 2drop
     ] { } make "\n" join ;
 
-: replace-columns ( str start# end# line# document -- )
-    [
-        [ swap [ replace-slice ] change-nth ] keep
-    ] change-model ;
-
-: set-on-1 ( lines startloc endloc document -- )
-    >r >r >r first r> second r> first2 swap r> replace-columns ;
-
-: loc-col/str ( loc lines -- col str )
-    >r first2 swap r> nth ;
-
-: merge-lines ( lines startloc endloc lines -- str )
-    #! Start line from 0 to start col + end line from end col
-    #! to length
-    tuck loc-col/str tail-slice
-    >r loc-col/str head-slice
-    swap first r> append3 ;
-
-: set-on>1pre ( str startloc endloc lines -- )
-    [ merge-lines 1array ] 3keep
-    >r [ first ] 2apply 1+ r> replace-slice ;
-
-: set-on>1 ( str startloc endloc document -- )
-    [ set-on>1pre ] change-model ;
-
 : text+loc ( lines loc -- loc )
     over >r over length 1 = [
         nip first2
@@ -95,10 +70,25 @@ C: document ( -- document )
         first swap length 1- + 0
     ] if r> peek length + 2array ;
 
+: prepend-first ( str seq -- seq )
+    0 [ append ] change-nth ;
+
+: append-last ( str seq -- seq )
+    dup length 1- [ swap append ] change-nth ;
+
+: prepare-insert ( newinput startloc endloc lines -- newinput )
+    tuck loc-col/str tail-slice >r loc-col/str head-slice r>
+    pick append-last over prepend-first ;
+
+: (set-doc-range) ( newlines startloc endloc lines -- newlines )
+    [ prepare-insert ] 3keep
+    >r [ first ] 2apply 1+ r>
+    replace-slice ;
+
 : set-doc-range ( str startloc endloc document -- )
     [
         >r >r >r "\n" split r> [ text+loc ] 2keep r> r>
-        pick pick lines-equal? [ set-on-1 ] [ set-on>1 ] if
+        [ (set-doc-range) ] change-model
     ] keep update-locs ;
 
 : remove-doc-range ( startloc endloc document -- )
@@ -122,72 +112,6 @@ C: document ( -- document )
 
 : doc-end ( document -- loc )
     model-value dup length 1- swap peek length 2array ;
-
-GENERIC: prev-elt ( loc document elt -- loc )
-GENERIC: next-elt ( loc document elt -- loc )
-
-TUPLE: char-elt ;
-
-: (prev-char) ( loc document quot -- loc )
-    -rot {
-        { [ over { 0 0 } = ] [ drop ] }
-        { [ over second zero? ] [ >r first 1- r> line-end ] }
-        { [ t ] [ pick call ] }
-    } cond nip ; inline
-
-: (next-char) ( loc document quot -- loc )
-    -rot {
-        { [ 2dup doc-end = ] [ drop ] }
-        { [ 2dup line-end? ] [ drop first 1+ 0 2array ] }
-        { [ t ] [ pick call ] }
-    } cond nip ; inline
-
-M: char-elt prev-elt
-    drop [ drop -1 +col ] (prev-char) ;
-
-M: char-elt next-elt
-    drop [ drop 1 +col ] (next-char) ;
-
-TUPLE: word-elt ;
-
-: (word-elt) ( loc document quot -- loc )
-    pick >r
-    >r >r first2 swap r> doc-line r> call
-    r> =col ; inline
-
-: ((word-elt)) [ ?nth blank? ] 2keep ;
-
-: (prev-word) ( col str -- col )
-    >r 1- r> ((word-elt))
-    [ blank? xor ] find-last-with* drop 1+ ;
-
-M: word-elt prev-elt
-    drop [ [ (prev-word) ] (word-elt) ] (prev-char) ;
-
-: (next-word) ( col str -- col )
-    ((word-elt))
-    [ [ blank? xor ] find-with* drop ] keep
-    over -1 = [ nip length ] [ drop ] if ;
-
-M: word-elt next-elt
-    drop [ [ (next-word) ] (word-elt) ] (next-char) ;
-
-TUPLE: one-line-elt ;
-
-M: one-line-elt prev-elt
-    2drop first 0 2array ;
-M: one-line-elt next-elt
-    drop >r first dup r> doc-line length 2array ;
-
-TUPLE: line-elt ;
-
-M: line-elt prev-elt 2drop -1 +line ;
-M: line-elt next-elt 2drop 1 +line ;
-
-TUPLE: doc-elt ;
-
-M: doc-elt prev-elt 3drop { 0 0 } ;
-M: doc-elt next-elt drop nip doc-end ;
 
 : doc-text ( document -- str )
     model-value "\n" join ;

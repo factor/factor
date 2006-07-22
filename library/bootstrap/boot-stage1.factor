@@ -199,6 +199,7 @@ sequences vectors words ;
         "/library/ui/gadgets/books.factor"
         "/library/ui/gadgets/outliner.factor"
         "/library/ui/text/document.factor"
+        "/library/ui/text/elements.factor"
         "/library/ui/text/editor.factor"
         "/library/ui/text/commands.factor"
         "/library/ui/text/field.factor"
