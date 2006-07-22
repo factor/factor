@@ -17,42 +17,42 @@ IN: boids
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-SYMBOL: separation-radius
-SYMBOL: alignment-radius
-SYMBOL: cohesion-radius
-
-SYMBOL: separation-view-angle
-SYMBOL: alignment-view-angle
-SYMBOL: cohesion-view-angle
-
-SYMBOL: separation-weight
-SYMBOL: alignment-weight
-SYMBOL: cohesion-weight
-
-: init-variables ( -- )
-25 separation-radius set
-50 alignment-radius set
-75 cohesion-radius set
-
-180 separation-view-angle set
-180 alignment-view-angle set
-180 cohesion-view-angle set
-
-1.0 separation-weight set
-1.0 alignment-weight set
-1.0 cohesion-weight set ;
-
-! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-
-SYMBOL: world-size
-
-! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-
 TUPLE: boid pos vel ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
+VAR: boids
+VAR: world-size
 VAR: time-slice
+
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+VAR: cohesion-weight
+VAR: alignment-weight
+VAR: separation-weight
+
+VAR: cohesion-view-angle
+VAR: alignment-view-angle
+VAR: separation-view-angle
+
+VAR: cohesion-radius
+VAR: alignment-radius
+VAR: separation-radius
+
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+: init-variables ( -- )
+1.0 >cohesion-weight
+1.0 >alignment-weight
+1.0 >separation-weight
+
+75 >cohesion-radius
+50 >alignment-radius
+25 >separation-radius
+
+180 >cohesion-view-angle
+180 >alignment-view-angle
+180 >separation-view-angle ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 ! random-boid and random-boids
@@ -67,10 +67,6 @@ VAR: time-slice
 : random-boid ( -- boid ) random-pos random-vel <boid> ;
 
 : random-boids ( n -- boids ) [ drop random-boid ] map ;
-
-! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-
-SYMBOL: boids
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 ! draw-boid
@@ -114,14 +110,23 @@ over boid-vel -rot relative-position angle-between ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-: subset-with ( obj seq quot -- seq ) [ dupd ] swap append subset ;
+: within-radius? ( self other radius -- ? ) >r distance r> <= ;
+
+: within-view-angle? ( self other angle -- ? ) >r relative-angle r> 2 / <= ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-: within-radius? ( self other radius -- ? ) >r distance r> <= ;
+: within-cohesion-radius? ( self other -- ? )
+  cohesion-radius get within-radius? ;
 
-: within-view-angle? ( self other view-angle -- ? )
-  >r relative-angle r> 2 / <= ;
+: within-cohesion-view? ( self other -- ? )
+  cohesion-view-angle get within-view-angle? ;
+
+: within-cohesion-neighborhood? ( self other -- ? )
+  [ eq? not ] 2keep
+  [ within-cohesion-radius? ] 2keep
+  within-cohesion-view?
+  and and ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
@@ -153,59 +158,39 @@ over boid-vel -rot relative-position angle-between ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-: within-cohesion-radius? ( self other -- ? )
-  cohesion-radius get within-radius? ;
-
-: within-cohesion-view? ( self other -- ? )
-  cohesion-view-angle get within-view-angle? ;
-
-: within-cohesion-neighborhood? ( self other -- ? )
-  [ eq? not ] 2keep
-  [ within-cohesion-radius? ] 2keep
-  within-cohesion-view?
-  and and ;
-
-! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-
-: separation-force ( self -- force )
-  ! boids get [ within-separation-neighborhood? ] subset-with
-  boids get [ >r dup r> within-separation-neighborhood? ] subset
-  dup length 0 =
-  [ drop drop { 0 0 } ]
-  [ average-position
-    >r boid-pos r> v-
-    normalize
-    separation-weight get
-    v*n ]
-  if ;
-
-! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-
-: alignment-force ( self -- force )
-  ! boids get [ within-alignment-neighborhood? ] subset-with
-  boids get [ >r dup r> within-alignment-neighborhood? ] subset swap drop
-  dup length 0 =
-  [ drop { 0 0 } ]
-  [ average-velocity
-    normalize
-    alignment-weight get
-    v*n ]
-  if ;
-
-! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+: cohesion-neighborhood ( self -- boids )
+boids> [ within-cohesion-neighborhood? ] subset-with ;
 
 : cohesion-force ( self -- force )
-  ! boids get [ within-cohesion-neighborhood? ] subset-with
-  boids get [ >r dup r> within-cohesion-neighborhood? ] subset
-  dup length 0 =
-  [ drop drop { 0 0 } ]
-  [ average-position
-    swap ! avg-pos self
-    boid-pos v-
-    normalize
-    cohesion-weight get
-    v*n ]
-  if ;
+dup cohesion-neighborhood
+dup length 0 =
+[ 2drop { 0 0 } ]
+[ average-position swap boid-pos v- normalize cohesion-weight> v*n ]
+if ;
+
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+: separation-neighborhood ( self -- boids )
+boids> [ within-separation-neighborhood? ] subset-with ;
+
+: separation-force ( self -- force )
+dup separation-neighborhood
+dup length 0 =
+[ 2drop { 0 0 } ]
+[ average-position swap boid-pos swap v- normalize separation-weight> v*n ]
+if ;
+
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+: alignment-neighborhood ( self -- boids )
+boids> [ within-alignment-neighborhood? ] subset-with ;
+
+: alignment-force ( self -- force )
+alignment-neighborhood
+dup length 0 =
+[ drop { 0 0 } ]
+[ average-velocity normalize alignment-weight get v*n ]
+if ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
@@ -250,26 +235,7 @@ cond ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-! : new-pos ( boid -- pos )
-!   dup >r   boid-pos   r> boid-vel time-slice get v*n   v+ ;
-
-! : new-vel ( boid -- vel )
-!   dup >r   boid-vel   r> acceleration time-slice get v*n   v+ ;
-
-! : new-vel ( boid -- vel )
-!   dup boid-vel swap acceleration time-slice get v*n   v+ ;
-
-! : wrap-x ( x -- x )
-!   dup   0 world-size get nth   >=   [ drop 0 ] when
-!   dup   0 < [ drop 0 world-size get nth   1 - ] when ;
-
-! : wrap-y ( y -- y )
-!   dup   1 world-size get nth   >=   [ drop 0 ] when
-!   dup   0 < [ drop 1 world-size get nth   1 - ] when ;
-
 : new-pos ( boid -- pos ) dup boid-vel time-slice> v*n swap boid-pos v+ ;
-
-! : new-vel ( boid -- vel ) dup acceleration time-slice> v*n swap boid-vel v+ ;
 
 : new-vel ( boid -- vel )
 dup acceleration time-slice> v*n swap boid-vel v+ normalize ;
@@ -280,7 +246,7 @@ dup acceleration time-slice> v*n swap boid-vel v+ normalize ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-: iterate-boids ( -- ) boids get [ iterate-boid ] map boids set ;
+: iterate-boids ( -- ) boids> [ iterate-boid ] map >boids ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
@@ -292,7 +258,7 @@ boids get [ draw-boid ] each   flush-dlist flush-slate ;
 
 ! : run-boids ( -- ) iterate-boids clear-window draw-boids 1 sleep run-boids ;
 
-SYMBOL: stop?
+VAR: stop?
 
 : run-boids ( -- )
 self get rect-dim world-size set
@@ -320,8 +286,6 @@ run-boids ;
 
 USING: gadgets-frames gadgets-labels gadgets-theme gadgets-grids
        gadgets-editors gadgets-buttons ;
-
-! USING: kernel arrays gadgets  gadgets-labels gadgets-editors vars ;
 
 TUPLE: field label editor quot ;
 
