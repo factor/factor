@@ -24,4 +24,4 @@ M: control model-changed ( gadget -- )
     control-self relayout ;
 
 : delegate>control ( gadget model -- )
-    <gadget> [ drop ] <control> swap set-gadget-delegate ;
+    <gadget> [ 2drop ] <control> swap set-gadget-delegate ;

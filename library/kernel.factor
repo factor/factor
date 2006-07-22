@@ -25,6 +25,7 @@ M: object clone ;
 : >boolean t f ? ; inline
 : and ( a b -- a&b ) f ? ; inline
 : or ( a b -- a|b ) t swap ? ; inline
+: xor ( a b -- a^b ) [ not ] when ; inline
 
 : cpu ( -- arch ) 7 getenv ; foldable
 : os ( -- os ) 11 getenv ; foldable

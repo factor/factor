@@ -41,9 +41,14 @@ C: pane ( -- pane )
     [ pick pick pane-current stream-format ]
     [ dup stream-terpri ] interleave 2drop ;
 
-: write-gadget ( gadget pane -- )
+GENERIC: write-gadget ( gadget stream -- )
+
+M: pane write-gadget ( gadget pane -- )
     #! Print a gadget to the given pane.
     pane-current add-gadget ;
+
+M: duplex-stream write-gadget ( gadget stream -- )
+    duplex-stream-out write-gadget ;
 
 : print-gadget ( gadget pane -- )
     tuck write-gadget stream-terpri ;

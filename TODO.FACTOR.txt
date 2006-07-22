@@ -7,13 +7,11 @@
   - scroll to caret
   - only redraw visible lines
   - clicking input doesn't resize editor gadget
-  - word-at-a-time commands
-  - deleting words, lines
   - better listener multi-line expression handling
-  - stack display: trim at 32 columns
 - shift modifier not delivered
 - x11 copy to clipboard
-  
+- one-column table doesn't need borders...?
+
 - httpd search tools
 - remaining HTML issues need fixing
 

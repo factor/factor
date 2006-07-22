@@ -11,18 +11,13 @@ font color caret-color selection-color
 caret mark
 focused? ;
 
-TUPLE: action-relayout-1 editor ;
-
-M: action-relayout-1 model-changed
-    #! Caret changed
-    action-relayout-1-editor control-self relayout-1 ;
-
 : init-editor-models ( editor -- )
-    dup <action-relayout-1> over editor-caret add-connection
-    dup <action-relayout-1> swap editor-mark add-connection ;
+    dup control-self over editor-caret add-connection
+    dup control-self swap editor-mark add-connection ;
 
 C: editor ( document -- editor )
     dup <document> delegate>control
+    dup dup set-control-self
     { 0 0 } <model> over set-editor-caret
     { 0 0 } <model> over set-editor-mark
     dup init-editor-models
