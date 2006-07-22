@@ -25,37 +25,37 @@ USING: test kernel math io ;
 
 IN: lazy
 
-[ t ] [ lnil lnil? ] unit-test
-[ 5 ] [ 5 lunit lcar ] unit-test
-[ f ] [ lnil lnil lcons lnil? ] unit-test
-[ 5 t ] [ 5 lunit luncons lnil? ] unit-test
+[ t ] [ nil nil? ] unit-test
+[ 5 ] [ 5 lunit car ] unit-test
+[ f ] [ nil nil cons nil? ] unit-test
+[ 5 t ] [ 5 lunit uncons nil? ] unit-test
 [ 6 ] [ 
-		5 6 lunit lcons
+		5 6 lunit cons
 		1 swap lnth 
 	  ] unit-test
 [ 12 13 t ] [ 
-				5 6 lunit lcons 
-				[ 7 + ] lmap luncons luncons lnil? 
+				5 6 lunit cons 
+				[ 7 + ] lmap uncons uncons nil? 
 	  		] unit-test
 [ 5 6 t ] [
-			5 6 7 lunit lcons lcons 2 swap ltake 
-			luncons luncons lnil? 
+			    5 6 7 lunit cons cons 2 swap ltake 
+			    uncons uncons nil? 
 		  ] unit-test
-[ 6 7 t ] [	5 6 7 lunit lcons lcons [ 5 > ] lsubset 
-			luncons luncons lnil? ] unit-test
-[ 7 t ] [	5 6 7 lunit lcons lcons [ 6 > ] lsubset 
-			luncons lnil? ] unit-test
-[ 1 3 5 t ] [ [ 1 3 5 ] list>llist 
-			luncons luncons luncons lnil? ] unit-test
-[ [ 1 3 5 ] ] [ [ 1 3 5 ] list>llist llist>list ] unit-test
-[ [ 1 2 3 4 5 6 7 8 9 ] ] [
-	[ 1 2 3 ] list>llist
-	[ 4 5 6 ] list>llist
-	[ 7 8 9 ] list>llist 
-	lunit lcons lcons lappend* llist>list ] unit-test
-[ [ 1 2 3 4 5 6 ] ]
-[ [ 1 2 3 ] list>llist [ 4 5 6 ] list>llist 
-	lappend llist>list ] unit-test
-[ ] [ [ 1 2 3 ] list>llist [ 3 + number>string print ] leach ] unit-test
-[ [ 1 2 3 4 ] ]
-	[ 0 lfrom [ 5 < ] lsubset [ 0 > ] lsubset 4 swap ltake llist>list ] unit-test
+[ 6 7 t ] [	5 6 7 lunit cons cons [ 5 > ] lsubset 
+			uncons uncons nil? ] unit-test
+[ 7 t ] [	5 6 7 lunit cons cons [ 6 > ] lsubset 
+			uncons nil? ] unit-test
+[ 1 3 5 t ] [ { 1 3 5 } array>list 
+			uncons uncons uncons nil? ] unit-test
+[ { 1 3 5 } ] [ { 1 3 5 } array>list list>array ] unit-test
+[ { 1 2 3 4 5 6 7 8 9 } ] [
+	{ 1 2 3 } array>list
+	{ 4 5 6 } array>list
+	{ 7 8 9 } array>list 
+	lunit cons cons lappend* list>array ] unit-test
+[ { 1 2 3 4 5 6 } ]
+[ { 1 2 3 } array>list { 4 5 6 } array>list 
+	lappend list>array ] unit-test
+[ ] [ { 1 2 3 } array>list [ 3 + number>string print ] leach ] unit-test
+[ { 1 2 3 4 } ]
+	[ 0 lfrom [ 5 < ] lsubset [ 0 > ] lsubset 4 swap ltake list>array ] unit-test

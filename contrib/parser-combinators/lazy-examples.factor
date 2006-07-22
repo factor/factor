@@ -25,23 +25,23 @@
 IN: lazy-examples
 USING: lazy math kernel sequences namespaces ;
 
-: lnaturals 0 lfrom ;
-: lpositves 1 lfrom ;
-: levens 0 [ 2 + ] lfrom-by ;
-: lodds 1 lfrom [ 2 mod 1 = ] lsubset ;
-: lpowers-of-2 1 [ 2 * ] lfrom-by ;
-: lones 1 [ ] lfrom-by ;
-: lsquares lnaturals [ dup * ] lmap ;
+: naturals 0 lfrom ;
+: positves 1 lfrom ;
+: evens 0 [ 2 + ] lfrom-by ;
+: odds 1 lfrom [ 2 mod 1 = ] lsubset ;
+: powers-of-2 1 [ 2 * ] lfrom-by ;
+: ones 1 [ ] lfrom-by ;
+: squares lnaturals [ dup * ] lmap ;
 : first-five-squares 5 lsquares ltake ;
 
 : divisible-by? ( a b -- bool )
-  #! Return true if a is divisible by b
-  mod 0 = ;
+    #! Return true if a is divisible by b
+    mod 0 = ;
 
-: filter-multiples ( n llist - llist )
-  #! Given a lazy list of numbers, filter multiples of n
+: filter-multiples ( n list - list )
+    #! Given a lazy list of numbers, filter multiples of n
 	swap [ divisible-by? not ] curry lsubset ;
 
-: lprimes 2 lfrom [ filter-multiples ] lapply ;
+: primes 2 lfrom [ filter-multiples ] lapply ;
 
-: first-ten-primes 10 lprimes ltake llist>list ;
+: first-ten-primes 10 lprimes ltake list>array ;
