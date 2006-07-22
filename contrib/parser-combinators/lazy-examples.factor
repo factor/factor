@@ -22,8 +22,9 @@
 ! WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
 ! OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
 ! ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+USING: lazy-lists math kernel sequences test ;
 IN: lazy-examples
-USING: lazy math kernel sequences ;
 
 : naturals 0 lfrom ;
 : positves 1 lfrom ;
@@ -32,7 +33,7 @@ USING: lazy math kernel sequences ;
 : powers-of-2 1 [ 2 * ] lfrom-by ;
 : ones 1 [ ] lfrom-by ;
 : squares naturals [ dup * ] lmap ;
-: first-five-squares 5 squares ltake ;
+: first-five-squares 5 squares ltake list>array ;
 
 : divisible-by? ( a b -- bool )
     #! Return true if a is divisible by b

@@ -22,8 +22,9 @@
 ! WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
 ! OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
 ! ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-IN: lazy
+
 USING: kernel sequences math vectors arrays namespaces ;
+IN: lazy-lists
 
 TUPLE: promise quot forced? value ;
 

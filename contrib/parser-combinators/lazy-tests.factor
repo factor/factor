@@ -21,9 +21,8 @@
 ! OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
 ! ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-USING: test kernel math io ;
-
-IN: lazy
+USING: lazy-lists test kernel math io ;
+IN: temporary
 
 [ t ] [ nil nil? ] unit-test
 [ 5 ] [ 5 lunit car ] unit-test
