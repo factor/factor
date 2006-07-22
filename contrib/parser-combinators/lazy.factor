@@ -23,18 +23,13 @@
 ! OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
 ! ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 IN: lazy
-USING: kernel sequences namespaces math vectors arrays ;
+USING: kernel sequences math vectors arrays namespaces ;
 
 TUPLE: promise quot forced? value ;
 
-: delay ( quot -- <promise> )
-    #! Given a quotation, create a promise which may later be forced.
-    #! When forced the quotation will execute returning the value. Future
-    #! forces of the promise will return that value and not re-execute
-    #! the quotation.
-    f f <promise> ;
+C: promise ( quot -- promise ) [ set-promise-quot ] keep ;
 
-: force ( <promise> -- value )
+: force ( promise -- value )
     #! Force the given promise leaving the value of calling the
     #! promises quotation on the stack. Re-forcing the promise
     #! will return the same value and not recall the quotation.
@@ -52,7 +47,7 @@ TUPLE: cons car cdr ;
 
 : nil? ( list -- bool )
     #! Is the given lazy cons the nil value
-    force dup array? [ empty? ] [ drop f ] if ;
+    force { } = ;
 
 : car ( list -- car )
     #! Return the value of the head of the lazy list. 
@@ -65,7 +60,7 @@ TUPLE: cons car cdr ;
 
 : cons ( car cdr -- list )
     #! Given a car and cdr, both lazy values, return a lazy cons.
-    [ swap , , \ <cons> , ] [ ] make delay ;
+    [ swap , , \ <cons> , ] [ ] make <promise> ;
 
 : lunit ( obj -- list )
     #! Given a value produce a lazy list containing that value.
@@ -78,6 +73,12 @@ TUPLE: cons car cdr ;
 : uncons ( cons -- car cdr )
     #! Return the car and cdr of the lazy list
     force dup cons-car swap cons-cdr ;
+    
+: force-promise ( list-quot -- list )
+    #! Promises to force list-quot, which should be
+    #! a quot that produces a list.
+    #! This allows caching of the resultant list value.
+    [ call \ force , ] [ ] make <promise> ; inline
 
 DEFER: lmap
 : (lmap) ( list quot -- list )
@@ -90,9 +91,9 @@ DEFER: lmap
 	] if ;
 
 : lmap ( list quot -- list )
-  #! Return a lazy list containing the collected result of calling
-  #! quot on the original lazy list.
-  [ swap , , \ (lmap) , \ force , ] [ ] make delay ;
+    #! Return a lazy list containing the collected result of calling
+    #! quot on the original lazy list.
+    [ swap , , \ (lmap) ,  ] force-promise ;
 
 DEFER: ltake
 : (ltake) ( n list -- list )
@@ -106,9 +107,9 @@ DEFER: ltake
 	] if ;
 
 : ltake ( n list -- list )
-  #! Return a lazy list containing the first n items from
-  #! the original lazy list.
-  [ swap , , \ (ltake) , \ force , ] [ ] make delay ;
+    #! Return a lazy list containing the first n items from
+    #! the original lazy list.
+    [ swap , , \ (ltake) , ] force-promise ;
 
 DEFER: lsubset
 : (lsubset) ( list pred -- list )
@@ -122,7 +123,7 @@ DEFER: lsubset
 : lsubset ( list pred -- list )
     #! Return a lazy list containing the elements in llist 
     #! satisfying pred	
-	[ swap , , \ (lsubset) , \ force , ] [ ] make delay ;
+	[ swap , , \ (lsubset) , ] force-promise ;
 
 : (list>backwards-vector) ( list -- vector )
     dup nil? [ drop V{ } clone ]
@@ -142,7 +143,7 @@ DEFER: backwards-vector>list
 	[ dup pop swap backwards-vector>list cons ] if ;
 
 : backwards-vector>list ( vector -- list )
-    [ , \ (backwards-vector>list) , \ force , ] [ ] make delay ;
+    [ , \ (backwards-vector>list) , ] force-promise ;
     
 : array>list ( array -- list )
     #! Convert a list to a lazy list.
@@ -160,7 +161,7 @@ DEFER: lappend*
     #! together in a lazy fashion. The actual appending is 
     #! done lazily on iteration rather than immediately
     #! so it works very fast no matter how large the lists.
-	[ , \ (lappend*) , \ force , ] [ ] make delay ;
+	[ , \ (lappend*) , ] force-promise ;
 
 : lappend ( list1 list2 -- llist )
     #! Concatenate two lazy lists such that they appear to be one big
@@ -187,12 +188,7 @@ DEFER: lapply
 	#! (cons (car list)
 	#!		   (lapply (quot (car list) (cdr list)) quot))
 	#! This allows for complicated list functions
-    [ swap , , \ (lapply) , \ force , ] [ ] make delay ;
-    
-: lfrom ( n -- list )
-	#! Return a lazy list of increasing numbers starting
-	#! from the initial value 'n'.
-	[ dup 1 + lfrom cons force ] curry delay ;
+    [ swap , , \ (lapply) , ] force-promise ;
 
 DEFER: lfrom-by
 : (lfrom-by) ( n quot -- list )
@@ -202,4 +198,9 @@ DEFER: lfrom-by
     #! Return a lazy list of values starting from n, with
     #! each successive value being the result of applying quot to
     #! n.
-    [ swap , , \ (lfrom-by) , \ force , ] [ ] make delay ;
+    [ swap , , \ (lfrom-by) , ] force-promise ;
+    
+: lfrom ( n -- list )
+	#! Return a lazy list of increasing numbers starting
+	#! from the initial value 'n'.
+	[ 1 + ] lfrom-by ;

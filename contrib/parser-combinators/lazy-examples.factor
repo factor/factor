@@ -23,7 +23,7 @@
 ! OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
 ! ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 IN: lazy-examples
-USING: lazy math kernel sequences namespaces ;
+USING: lazy math kernel sequences ;
 
 : naturals 0 lfrom ;
 : positves 1 lfrom ;
@@ -31,8 +31,8 @@ USING: lazy math kernel sequences namespaces ;
 : odds 1 lfrom [ 2 mod 1 = ] lsubset ;
 : powers-of-2 1 [ 2 * ] lfrom-by ;
 : ones 1 [ ] lfrom-by ;
-: squares lnaturals [ dup * ] lmap ;
-: first-five-squares 5 lsquares ltake ;
+: squares naturals [ dup * ] lmap ;
+: first-five-squares 5 squares ltake ;
 
 : divisible-by? ( a b -- bool )
     #! Return true if a is divisible by b
@@ -44,4 +44,4 @@ USING: lazy math kernel sequences namespaces ;
 
 : primes 2 lfrom [ filter-multiples ] lapply ;
 
-: first-ten-primes 10 lprimes ltake list>array ;
+: first-ten-primes 10 primes ltake list>array ;
