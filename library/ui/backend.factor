@@ -25,8 +25,12 @@ C: clipboard "" over set-clipboard-contents ;
 
 GENERIC: paste-clipboard ( gadget clipboard -- )
 
-M: object paste-clipboard ( gadget clipboard -- )
+M: object paste-clipboard
     clipboard-contents dup [ swap user-input ] [ 2drop ] if ;
+
+GENERIC: copy-clipboard ( string gadget clipboard -- )
+
+M: object copy-clipboard nip set-clipboard-contents ;
 
 SYMBOL: clipboard
 SYMBOL: selection

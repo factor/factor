@@ -56,16 +56,37 @@
 - prettyprinter's highlighting of non-leaves doesn't really work
 - rollover is not updated on window focus changes
 - x11 input methods
-- new browser:
-  - browse generic words and classes
-  - need actions for reloading the source file and opening word in jEdit
-  - highlight showing panes in originating list
-- reimplement tab completion
 - cocoa:
   - horizontal wheel scrolling
   - polish OS X menu bar code
 - variable width word wrap
 - slider needs to be modelized
+
++ module system:
+
+- 'see' should show tuple constructors
+- forgetting a class should remove its methods from all generic words
+- forgetting a tuple class should forget the constructor
+- seeing a tuple class should show the constructor
+- C types should be words
+  - TYPEDEF: float { ... } { ... } ;   ==> \ float T{ c-type ... } "c-type" swp
+  - TYPEDEF: float FTFloat ;  ==> \ float \ FTFloat "c-type" swp
+  - make typedef aliasing explicit
+- seeing a C struct word should show its def
+- see by itself only shows the G: def
+- { class generic } see supports forms:
+  { f generic } to show all methods
+  { class f } to show all methods
+- modularize core
+- TUPLE: module files tests articles article main ;
+- methods: remember their file/line
+- { class generic } jedit, reload DTRT
+- requesting a list of assets loaded from a specific file
+- T{ link f "foo" "bar" } see
+- T{ link f "foo" "bar" } jedit
+- T{ link f "foo" "bar" } reload
+- file out
+- make 'forget' generic
 
 + compiler/ffi:
 

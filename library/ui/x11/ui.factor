@@ -102,9 +102,13 @@ M: world focus-in-event ( event world -- ) nip focus-world ;
 
 M: world focus-out-event ( event world -- ) nip unfocus-world ;
 
-M: world selection-event ( event world -- )
+M: world selection-notify-event ( event world -- )
     [ world-handle first selection-from-event ] keep
     world-focus user-input ;
+
+M: world selection-request-event ( event world -- )
+    USE: io
+    global [ "Hi" print flush ] bind ;
 
 : close-box? ( event -- ? )
     dup XClientMessageEvent-message_type "WM_PROTOCOLS" x-atom =

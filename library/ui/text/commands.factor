@@ -15,7 +15,7 @@ sequences ;
 
 : editor-copy ( editor clipboard -- )
     over editor-selection? [
-        >r editor-selection r> set-clipboard-contents
+        >r [ editor-selection ] keep r> copy-clipboard
     ] [
         2drop
     ] if ;

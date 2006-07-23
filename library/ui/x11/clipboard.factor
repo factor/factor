@@ -27,7 +27,17 @@ IN: x11
         r> selection-property 1 window-property
     ] if ;
 
-TUPLE: x-clipboard atom ;
+: own-selection ( prop win -- )
+    dpy get -rot CurrentTime XSetSelectionOwner drop ;
+
+TUPLE: x-clipboard atom contents ;
+
+: x-clipboard@ ( gadget clipboard -- prop win )
+    x-clipboard-atom swap find-world world-handle first ;
+
+M: x-clipboard copy-clipboard ( string gadget clipboard -- )
+    [ x-clipboard@ own-selection ] keep
+    set-x-clipboard-contents ;
 
 M: x-clipboard paste-clipboard ( gadget clipboard -- )
     >r find-world world-handle first r> x-clipboard-atom
