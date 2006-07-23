@@ -79,7 +79,7 @@ M: editor model-changed ( editor -- )
     [ drop r> length ] [ r> drop ] if ;
 
 : y>line ( y editor -- line# )
-    [ line-height / >fixnum ] keep editor-lines length 1- min ;
+    [ line-height / >fixnum ] keep control-model validate-line ;
 
 : point>loc ( point editor -- loc )
     over second over y>line [
