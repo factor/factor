@@ -76,6 +76,9 @@ C: document ( -- document )
 : append-last ( str seq -- seq )
     dup length 1- [ swap append ] change-nth ;
 
+: loc-col/str ( loc document -- col str )
+    >r first2 swap r> nth ;
+
 : prepare-insert ( newinput startloc endloc lines -- newinput )
     tuck loc-col/str tail-slice >r loc-col/str head-slice r>
     pick append-last over prepend-first ;
