@@ -35,7 +35,7 @@ M: assert summary drop "Assertion failed" ;
     [ f ] swap [ [ call t ] [ 2drop f ] recover ]
     curry unit-test ;
 
-: assert-depth ( quot -- ) depth slip depth assert= ;
+: assert-depth ( quot -- ) depth slip depth swap assert= ;
 
 SYMBOL: failures
 

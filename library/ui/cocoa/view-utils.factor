@@ -86,7 +86,7 @@ opengl sequences ;
     rot window send-wheel ;
 
 : send-action$ ( view event gesture -- junk )
-    >r drop window r> send-action drop f ;
+    >r drop window r> send-action f ;
 
 : add-resize-observer ( observer object -- )
     >r "updateFactorGadgetSize:"

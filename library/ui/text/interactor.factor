@@ -13,7 +13,7 @@ C: interactor ( output -- gadget )
 
 : interactor-eval ( string gadget -- )
     interactor-continuation dup
-    [ [ continue-with ] in-thread ] [ 2drop ] if ;
+    [ [ continue-with ] in-thread ] when 2drop ;
 
 SYMBOL: structured-input
 

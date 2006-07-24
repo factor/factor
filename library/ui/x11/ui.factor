@@ -41,7 +41,7 @@ M: world leave-event ( event world -- ) 2drop forget-rollover ;
 
 M: world motion-event ( event world -- )
     >r dup XMotionEvent-x swap XMotionEvent-y 2array r>
-    move-hand ;
+    move-hand fire-motion ;
 
 : modifiers
     {
@@ -84,7 +84,7 @@ M: world motion-event ( event world -- )
 
 : event>gesture ( event quot -- gesture )
     >r dup XKeyEvent-state modifiers modifier swap key-code
-    r> [ drop f ] if* ;
+    r> [ drop f ] if* ; inline
 
 M: world key-down-event ( event world -- )
     world-focus over [ <key-down> ] event>gesture [
@@ -95,8 +95,8 @@ M: world key-down-event ( event world -- )
     ] if* ;
 
 M: world key-up-event ( event world -- )
-    world-focus over [ <key-up> ] event>gesture
-    [ over handle-gesture drop ] [ 2drop ] if* ;
+    world-focus swap [ <key-up> ] event>gesture dup
+    [ swap handle-gesture drop ] [ 2drop ] if ;
 
 M: world focus-in-event ( event world -- ) nip focus-world ;
 
@@ -107,8 +107,14 @@ M: world selection-notify-event ( event world -- )
     world-focus user-input ;
 
 M: world selection-request-event ( event world -- )
-    USE: io
-    global [ "Hi" print flush ] bind ;
+    drop dup XSelectionRequestEvent-target
+    {
+        { [ dup XA_STRING = ] [ drop dup set-selection-prop send-notify-success ] }
+        { [ dup "UTF8_STRING" = ] [ drop dup set-selection-prop send-notify-success ] }
+        { [ dup "TARGETS" x-atom = ] [ drop dup set-targets-prop send-notify-success ] }
+        { [ dup "TIMESTAMP" x-atom = ] [ drop dup set-timestamp-prop send-notify-success ] }
+        { [ t ] [ 2drop send-notify-failure ] }
+    } cond ;
 
 : close-box? ( event -- ? )
     dup XClientMessageEvent-message_type "WM_PROTOCOLS" x-atom =

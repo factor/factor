@@ -3,10 +3,6 @@
 IN: x11
 USING: alien arrays errors kernel namespaces sequences ;
 
-: >int-array ( seq -- <int-array> )
-    dup length dup "int" <c-array> -rot
-    [ pick set-int-nth ] 2each ;
-
 : choose-visual ( -- XVisualInfo* )
     dpy get scr get
     GLX_RGBA GLX_DOUBLEBUFFER 0 3array >int-array

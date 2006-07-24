@@ -6,6 +6,7 @@
   - scroll to caret
   - clicking input doesn't resize editor gadget
   - better listener multi-line expression handling
+  - C+p/C+n with empty history bombs
 - shift modifier not delivered
 - x11 copy to clipboard
 

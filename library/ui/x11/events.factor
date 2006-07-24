@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 IN: x11
 USING: alien arrays errors gadgets hashtables io kernel math
-namespaces prettyprint sequences strings threads ;
+namespaces prettyprint sequences strings test threads ;
 
 GENERIC: expose-event ( event window -- )
 
@@ -75,7 +75,7 @@ GENERIC: client-event ( event window -- )
 
 : do-events ( -- )
     wait-event dup XAnyEvent-window window dup
-    [ handle-event ] [ 2drop ] if ;
+    [ [ 2dup handle-event ] assert-depth ] when 2drop ;
 
 : char-array>string ( n <char-array> -- string )
     swap >string [ swap char-nth ] map-with ;

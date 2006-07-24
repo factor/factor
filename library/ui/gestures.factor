@@ -190,8 +190,8 @@ V{ } clone hand-buttons set-global
     T{ wheel-up } T{ wheel-down } ?
     hand-gadget get-global handle-gesture drop ;
 
-: send-action ( world gesture -- ? )
-    swap world-focus handle-gesture ;
+: send-action ( world gesture -- )
+    swap world-focus handle-gesture drop ;
 
 world H{
     { T{ key-down f { C+ } "x" } [ T{ cut-action } send-action ] }

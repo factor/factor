@@ -82,7 +82,7 @@ M: kernel-error error. ( error -- )
     } dispatch ;
 
 M: no-method summary
-    "No suitable method" ;
+    drop "No suitable method" ;
 
 M: no-method error. ( error -- )
     "Generic word " write
@@ -93,7 +93,8 @@ M: no-method error. ( error -- )
     "Allowed classes: " write dup no-method-generic order .
     "Dispatching on object: " write no-method-object short. ;
 
-M: no-math-method summary drop "No suitable arithmetic method" ;
+M: no-math-method summary
+    drop "No suitable arithmetic method" ;
 
 : parse-dump ( error -- )
     "Parsing " write
