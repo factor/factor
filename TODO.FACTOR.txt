@@ -23,6 +23,7 @@
 + ui:
 
 - support x11's large selections, if needed
+- own-selection violates ICCCM
 - one-column table doesn't need borders...?
 [2:45pm] tathi: Factor's text display is a bit odd sometimes, until you mouse over (or click, if there's no "live" text)
 [2:48pm] tathi: it appears to be using the font metrics from the sprite tuple, but re-using the texture from the previous letter
