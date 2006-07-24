@@ -106,14 +106,16 @@ M: world selection-notify-event ( event world -- )
     [ world-handle first selection-from-event ] keep
     world-focus user-input ;
 
+: supported-type? ( atom -- ? )
+    { "STRING" "UTF8_STRING" "TEXT" }
+    [ x-atom = ] contains-with? ;
+
 M: world selection-request-event ( event world -- )
-    drop dup XSelectionRequestEvent-target
-    {
-        { [ dup XA_STRING = ] [ drop dup set-selection-prop send-notify-success ] }
-        { [ dup "UTF8_STRING" = ] [ drop dup set-selection-prop send-notify-success ] }
+    drop dup XSelectionRequestEvent-target {
+        { [ dup supported-type? ] [ drop dup set-selection-prop send-notify-success ] }
         { [ dup "TARGETS" x-atom = ] [ drop dup set-targets-prop send-notify-success ] }
         { [ dup "TIMESTAMP" x-atom = ] [ drop dup set-timestamp-prop send-notify-success ] }
-        { [ t ] [ 2drop send-notify-failure ] }
+        { [ t ] [ drop send-notify-failure ] }
     } cond ;
 
 : close-box? ( event -- ? )
