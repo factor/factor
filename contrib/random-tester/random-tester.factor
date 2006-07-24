@@ -1,4 +1,4 @@
-USING: kernel math math-internals sequences namespaces errors
+USING: kernel math math-internals memory sequences namespaces errors
 hashtables words  arrays parser compiler syntax io
 inspector prettyprint optimizer inference ;
 IN: random-tester
@@ -14,7 +14,7 @@ IN: random-tester
         1+ 1- >bignum >digit >fixnum abs absq arg 
         bitnot bits>double bits>float ceiling cis conjugate cos cosec cosech
         cosh cot coth denominator double>bits exp float>bits floor imaginary
-        log neg next-power-of-2 numerator quadrant real sec
+        log neg numerator quadrant real sec ! next-power-of-2
         sech sgn sin sinh sq sqrt tan tanh truncate 
     } ;
 
@@ -57,7 +57,7 @@ IN: random-tester
         1+ 1- >bignum >digit >fixnum abs absq arg 
         ceiling cis conjugate cos cosec cosech
         cosh cot coth double>bits exp float>bits floor imaginary
-        log neg next-power-of-2 quadrant real sec
+        log neg quadrant real sec ! next-power-of-2
         sech sgn sin sinh sq sqrt tan tanh truncate
     } ;
 
@@ -139,7 +139,7 @@ SYMBOL: second-arg
     [ last-quot set ] keep
     [ call ] keep
     call
-    ! 2dup swap unparse write " " write unparse print
+    ! 2dup swap unparse write " " write unparse print flush
     = [ last-quot get . "problem in runtime" throw ] unless ;
 
 : 1-runtime-check ( quot -- )
@@ -149,16 +149,16 @@ SYMBOL: second-arg
     [ last-quot set first-arg set ] 2keep
     [ call ] 2keep
     call
-    2dup swap unparse write " " write unparse print
+    2dup swap unparse write " " write unparse print flush
     = [ "problem in runtime" throw ] unless ;
 
 : 1-interpreted-vs-compiled-check ( x quot -- ) 
     #! Checks the runtime output vs the compiler output
     #! quot: ( x -- y )
-    2dup swap unparse write " " write .
+    2dup swap unparse write " " write . flush
     [ last-quot set first-arg set ] 2keep
     [ call ] 2keep compile-1
-    2dup swap unparse write " " write unparse print
+    2dup swap unparse write " " write unparse print flush
     = [ "problem in math1" throw ] unless ;
 
 : 2-interpreted-vs-compiled-check ( x y quot -- )
@@ -167,7 +167,7 @@ SYMBOL: second-arg
     .s flush
     [ last-quot set first-arg set second-arg set ] 3keep
     [ call ] 3keep compile-1
-    2dup swap unparse write " " write unparse print
+    2dup swap unparse write " " write unparse print flush
     = [ "problem in math2" throw ] unless ;
 
 : 0-interpreted-vs-compiled-check-catch ( quot -- )
@@ -276,8 +276,8 @@ SYMBOL: second-arg
     ] [ ] make 0-runtime-check ;
 
 : test-1-integer?-when
-    random-float [
-        \ dup , \ float? , 1-float>x nth-rand unit , \ when ,
+    random-integer [
+        \ dup , \ integer? , 1-integer>x nth-rand unit , \ when ,
     ] [ ] make 1-interpreted-vs-compiled-check ;
 
 : test-1-ratio?-when
@@ -294,6 +294,20 @@ SYMBOL: second-arg
     random-complex [
         \ dup , \ complex? , 1-complex>x nth-rand unit , \ when ,
     ] [ ] make 1-interpreted-vs-compiled-check ;
+
+
+: many-word-test ( -- )
+    #! defines words a1000 down to a0, which does a trivial addition
+    "random-tester-scratchpad" vocabularies get remove-hash
+    "random-tester-scratchpad" [ ensure-vocab ] keep use+
+    "a0" "random-tester-scratchpad" create [ 1 1 + ] define-compound
+    100 [
+        [ 1+ "a" swap unparse append "random-tester-scratchpad" create ] keep
+        "a" swap unparse append [ parse ] catch [ 0 :res ] when define-compound
+    ] each ;
+
+: compile-loop ( -- )
+    10 [ many-word-test "a100" parse first compile ] times ;
 
 : random-test
     {
@@ -312,5 +326,6 @@ SYMBOL: second-arg
         test-1-ratio?-when
         test-1-float?-when
         test-1-complex?-when
+        full-gc
     } nth-rand execute ;
 
