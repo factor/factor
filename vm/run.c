@@ -136,8 +136,7 @@ void primitive_call(void)
 void primitive_ifte(void)
 {
 	ds -= CELLS * 3;
-	CELL cond = get(ds + CELLS);
-	call(cond == F ? get(ds + CELLS * 3) : get(ds + CELLS * 2));
+	call(get(ds + CELLS) == F ? get(ds + CELLS * 3) : get(ds + CELLS * 2));
 }
 
 void primitive_dispatch(void)
@@ -181,7 +180,9 @@ void primitive_os_env(void)
 
 void primitive_eq(void)
 {
-	box_boolean(dpop() == dpop());
+	CELL lhs = dpop();
+	CELL rhs = dpeek();
+	drepl((lhs == rhs) ? T : F);
 }
 
 void primitive_millis(void)
