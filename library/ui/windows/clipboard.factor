@@ -45,5 +45,3 @@ M: pasteboard set-clipboard-contents ( str pb -- ) drop copy ;
 
 : init-clipboard ( -- )
     <pasteboard> clipboard set-global ;
-
-! Notes: SetClipboardViewer, ChangeClipboardChaifn
