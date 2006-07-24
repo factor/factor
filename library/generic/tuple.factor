@@ -7,9 +7,6 @@ vectors words ;
 
 IN: kernel-internals
 
-: class-tuple ( object -- class )
-    dup tuple? [ 2 slot ] [ drop f ] if ; inline
-
 : tuple= ( tuple tuple -- ? )
     2dup [ array-capacity ] 2apply number= [
         dup array-capacity
@@ -24,9 +21,11 @@ IN: generic
     dup tuple? [ 2 slot ] [ type type>class ] if ; inline
 
 : tuple-predicate ( word -- )
-    dup predicate-word
-    [ \ class-tuple , over literalize , \ eq? , ] [ ] make
-    define-predicate ;
+    dup predicate-word [
+        [ dup tuple? ] %
+        [ [ 2 slot ] % over literalize , \ eq? , ] [ ] make ,
+        [ [ drop f ] if ] %
+    ] [ ] make define-predicate ;
 
 : forget-tuple ( class -- )
     dup forget "predicate" word-prop first [ forget ] when* ;
