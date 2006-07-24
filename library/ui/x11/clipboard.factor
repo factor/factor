@@ -3,7 +3,14 @@
 USING: alien arrays gadgets kernel math namespaces sequences ;
 IN: x11
 
-! This code was inspired by McCLIM's Backends/CLX/port.lisp.
+! This code was based on by McCLIM's Backends/CLX/port.lisp
+! and http://common-lisp.net/~crhodes/clx/demo/clipboard.lisp.
+
+TUPLE: x-clipboard atom contents ;
+
+C: x-clipboard ( atom -- clipboard )
+    [ set-x-clipboard-atom ] keep
+    "" over set-x-clipboard-contents ;
 
 : selection-property ( -- n )
     "org.factorcode.Factor.SELECTION" x-atom ;
@@ -78,12 +85,6 @@ IN: x11
 
 : send-notify-failure ( evt -- )
     0 send-notify ;
-
-TUPLE: x-clipboard atom contents ;
-
-C: x-clipboard ( atom -- clipboard )
-    [ set-x-clipboard-atom ] keep
-    "" over set-x-clipboard-contents ;
 
 : x-clipboard@ ( gadget clipboard -- prop win )
     x-clipboard-atom swap find-world world-handle first ;
