@@ -5,47 +5,10 @@ USING: http httpd math namespaces io strings kernel html hashtables
        parser generic sequences callback-responder ;
 IN: cont-responder
 
-#! Name of the variable holding the continuation used to exit
-#! back to the httpd responder.
-SYMBOL: exit-continuation 
-
-#! Tuple to hold global request data. This gets passed to
-#! the continuation when resumed so it can restore things
-#! like 'stdio' so it writes to the correct socket. 
-TUPLE: request stream exitcc method url raw-query query header response ;
-
-C: request ( -- request )
-  [ stdio get swap set-request-stream ] keep 
-  [ "method" get swap set-request-method ] keep 
-  [ "request" get swap set-request-url ] keep 
-  [ "raw-query" get swap set-request-raw-query ] keep 
-  [ "query" get swap set-request-query ] keep 
-  [ "header" get swap set-request-header ] keep 
-  [ "response" get swap set-request-response ] keep 
-  [ exit-continuation get swap set-request-exitcc ] keep ;
-
-: restore-request ( request -- )
-  dup request-stream stdio set 
-  dup request-method "method" set 
-  dup request-raw-query "raw-query" set 
-  dup request-query "query" set 
-  dup request-header "header" set 
-  dup request-response "response" set 
-  request-exitcc exit-continuation set ;
-
 : >callable ( quot|interp|f -- interp )
     dup continuation? [        
-        [ <request> swap continue-with ] curry 
-        [ with-exit-continuation ] curry
+        [ continue ] curry
     ] when ;
-
-: with-exit-continuation ( quot -- ) 
-    #! Call the quotation with the variable exit-continuation bound 
-    #! such that when the exit continuation is called, computation 
-    #! will resume from the end of this 'with-exit-continuation' call. 
-    [ 
-        exit-continuation set call exit-continuation get continue
-    ] callcc0 drop ;
 
 : forward-to-url ( url -- )
     #! When executed inside a 'show' call, this will force a
@@ -69,7 +32,25 @@ C: request ( -- request )
     [ 
         >callable t register-callback swap with-scope 
         exit-continuation get  continue
-    ] callcc1 nip restore-request "response" get ;
+    ] callcc0 drop restore-request "response" get ;
+
+SYMBOL: current-show
+
+: store-callback-cc ( -- )
+  #! Store the current continuation in the variable 'callback-cc' 
+  #! so it can be returned to later by callbacks. Note that it
+  #! recalls itself when the continuation is called to ensure that
+  #! it resets its value back to the most recent show call.
+  [  ( 0 -- )
+    [ ( 0 1 -- )
+      current-show set ( 0 -- )
+      continue
+    ] callcc1 ( 0 [ ] == )
+    nip
+    restore-request
+    call
+    store-callback-cc
+  ] callcc0 restore-request ;
 
 : show ( quot -- namespace )   
     #! Call the quotation with the URL associated with the current
@@ -81,6 +62,7 @@ C: request ( -- request )
     #! NOTE: On return from 'show' the stack is exactly the same as
     #! initial entry with 'quot' popped off and the hashtable pushed on. Even
     #! if the quotation consumes items on the stack.
+    store-callback-cc
     [ serving-html ] swap append (show) ;
 
 : (show-final) ( quot -- namespace )
@@ -97,6 +79,7 @@ C: request ( -- request )
     #! use is an optimisation to save having to generate and save a continuation
     #! in that special case.
     #! 'quot' has stack effect ( -- ).
+    store-callback-cc
     [ serving-html ] swap append (show-final) ;
 
 #! Name of variable for holding initial continuation id that starts
@@ -107,13 +90,13 @@ SYMBOL: root-callback
     #! httpd responder that handles the root continuation request.
     #! The requests for actual continuation are processed by the
     #! 'callback-responder'.
-    [ 
-        root-callback get call
+    [         
+        [ <request> request set root-callback get call ] with-scope
         exit-continuation get continue
-    ] with-exit-continuation ;
+    ] with-exit-continuation  ;
 
 : quot-url ( quot -- url )
-    t register-callback ;
+    current-show get [ continue-with ] curry curry t register-callback ;
 
 : quot-href ( text quot -- )
     #! Write to standard output an HTML HREF where the href,
