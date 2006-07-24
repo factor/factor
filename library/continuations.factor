@@ -30,10 +30,7 @@ TUPLE: continuation data retain call name catch ;
     continuation-catch ; inline
 
 : ifcc ( terminator balance -- | quot: continuation -- )
-    [
-        continuation
-        dup continuation-data f over push f swap push dup
-    ] call 2swap if ; inline
+    [ f f continuation 2nip dup ] call 2swap if ; inline
 
 : callcc0 [ drop ] ifcc ; inline
 

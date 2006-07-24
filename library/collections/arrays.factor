@@ -12,7 +12,8 @@ M: array nth-unsafe >r >fixnum r> array-nth ;
 M: array set-nth-unsafe >r >fixnum r> set-array-nth ;
 M: array resize resize-array ;
 
-: >array ( seq -- array ) [ f <array> ] >sequence ; inline
+: >array ( seq -- array )
+    [ array? ] [ f <array> ] >sequence ; inline
 
 M: array like drop dup array? [ >array ] unless ;
 

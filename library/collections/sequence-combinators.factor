@@ -174,5 +174,9 @@ IN: sequences
     [ >r pick r> + pick set-nth-unsafe ] 2each 2drop ;
     inline
 
-: >sequence ( seq quot -- newseq )
-    over >r >r length r> call dup 0 swap r> copy-into ; inline
+: >sequence ( seq pred quot -- newseq )
+    pick rot call [
+        drop clone
+    ] [
+        over >r >r length r> call dup 0 swap r> copy-into
+    ] if ; inline

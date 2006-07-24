@@ -60,7 +60,8 @@ PREDICATE: integer control   "\0\e\r\n\t\u0008\u007f" member? ;
 
 : ch>string ( ch -- str ) 1 swap <string> ;
 
-: >string ( seq -- array ) [ 0 <string> ] >sequence ; inline
+: >string ( seq -- array )
+    [ string? ] [ 0 <string> ] >sequence ; inline
 
 M: string thaw drop SBUF" " clone ;
 

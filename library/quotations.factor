@@ -14,7 +14,8 @@ M: quotation set-nth bounds-check set-nth-unsafe ;
 M: quotation nth-unsafe >r >fixnum r> array-nth ;
 M: quotation set-nth-unsafe >r >fixnum r> set-array-nth ;
 
-: >quotation ( seq -- array ) [ <quotation> ] >sequence ; inline
+: >quotation ( seq -- array )
+    [ quotation? ] [ <quotation> ] >sequence ; inline
 
 M: quotation like drop dup quotation? [ >quotation ] unless ;
 

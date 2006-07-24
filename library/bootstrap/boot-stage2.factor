@@ -33,6 +33,7 @@ parser sequences sequences-internals words ;
         "Compiling base..." print flush
 
         [
+            \ number= compile
             \ + compile
             \ = compile
             { "kernel" "sequences" "assembler" } compile-vocabs
