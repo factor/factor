@@ -1,7 +1,7 @@
 USING: kernel modules words ;
 
-REQUIRES: aim automata boids cairo concurrency coroutines
-crypto dlists embedded gap-buffer httpd math postgresql process
+REQUIRES: automata boids cairo calendar concurrency coroutines
+crypto dlists embedded gap-buffer hexdump httpd math postgresql process
 random-tester slate splay-trees sqlite topology units vars ;
 
 "x11" vocab [

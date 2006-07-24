@@ -7,16 +7,17 @@ Modules can be loaded from the listener:
 
 Credits:
 
-- aim -- AOL Instant Messenger client library (Doug Coleman)
 - automata -- Graphics demo for the UI (Eduardo Cavazos)
 - boids -- Graphics demo for the UI (Eduardo Cavazos)
 - cairo -- cairo bindings (Sampo Vuori)
+- calendar -- timestamp/calendar with timezones (Doug Coleman)
 - concurrency -- Erlang/Termite-style concurrency (Chris Double)
 - coroutines -- coroutines (Chris Double)
 - crypto -- Various cryptographic algorithms (Doug Coleman)
 - dlists -- double-linked-lists (Mackenzie Straight)
 - factory -- X11 window manager (Eduardo Cavazos)
 - gap-buffer -- Efficient text editor buffer (Alex Chapman)
+- hexdump -- Hexdump routine (Doug Coleman)
 - httpd -- Web framework (HTTP server, client, XML parser, HTML generation...) (Slava Pestov, Chris Double, Daniel Ehrenberg)
 - lazy-lists -- Lazy evaluation lists (Chris Double, Matthew Willis)
 - math -- extended math library (Doug Coleman, Slava Pestov)
