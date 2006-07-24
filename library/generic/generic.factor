@@ -71,11 +71,13 @@ SYMBOL: class<cache
 : class< ( cls1 cls2 -- ? )
     class<cache get [ hash hash-member? ] [ (class<) ] if* ;
 
-: smaller-classes ( class -- )
-    classes [ swap (class<) ] subset-with ;
+: smaller-classes ( class seq -- )
+    [ swap (class<) ] subset-with ;
 
 : make-class<cache ( -- hash )
-    classes [ dup smaller-classes [ dup ] map>hash ] map>hash ;
+    classes dup [
+        2dup swap smaller-classes [ dup ] map>hash
+    ] map>hash nip ;
 
 : with-class<cache ( quot -- )
     [ make-class<cache class<cache set call ] with-scope ;
