@@ -25,15 +25,6 @@ IN: cont-responder
     #! the request URL.
     >r "request" get r> id>url append forward-to-url ;
 
-: (show) ( quot -- hashtable )   
-    #! See comments for show. The difference is the 
-    #! quotation MUST set the content-type using 'serving-html'
-    #! or similar.
-    [ 
-        >callable t register-callback swap with-scope 
-        exit-continuation get  continue
-    ] callcc0 drop restore-request "response" get ;
-
 SYMBOL: current-show
 
 : store-callback-cc ( -- )
@@ -52,6 +43,16 @@ SYMBOL: current-show
     store-callback-cc
   ] callcc0 restore-request ;
 
+: (show) ( quot -- hashtable )   
+    #! See comments for show. The difference is the 
+    #! quotation MUST set the content-type using 'serving-html'
+    #! or similar.
+    store-callback-cc
+    [ 
+        >callable t register-callback swap with-scope 
+        exit-continuation get  continue
+    ] callcc0 drop restore-request "response" get ;
+
 : show ( quot -- namespace )   
     #! Call the quotation with the URL associated with the current
     #! continuation. All output from the quotation goes to the client
@@ -62,13 +63,13 @@ SYMBOL: current-show
     #! NOTE: On return from 'show' the stack is exactly the same as
     #! initial entry with 'quot' popped off and the hashtable pushed on. Even
     #! if the quotation consumes items on the stack.
-    store-callback-cc
     [ serving-html ] swap append (show) ;
 
 : (show-final) ( quot -- namespace )
     #! See comments for show-final. The difference is the 
     #! quotation MUST set the content-type using 'serving-html'
     #! or similar.
+    store-callback-cc
     with-scope exit-continuation get continue ;
 
 : show-final ( quot -- namespace )
@@ -79,7 +80,6 @@ SYMBOL: current-show
     #! use is an optimisation to save having to generate and save a continuation
     #! in that special case.
     #! 'quot' has stack effect ( -- ).
-    store-callback-cc
     [ serving-html ] swap append (show-final) ;
 
 #! Name of variable for holding initial continuation id that starts

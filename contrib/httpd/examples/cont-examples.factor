@@ -44,11 +44,11 @@ USE: sequences
     swap [ 
       <a =href a> "Next" write </a>
     ] html-document 
-  ] show drop ;
+  ] show 2drop ;
 
 : display-get-name-page ( -- name )
   #! Display a page prompting for input of a name and return that name.
-  dup [ 
+  [ 
     "Enter your name" [
       <h1> swap write </h1>
       <form "post" =method =action form> 
@@ -78,7 +78,7 @@ USE: sequences
       <h1> "Menu" write </h1>
       <ol> 
         <li> "Test responder1" [ test-cont-responder ] quot-href </li>
-        <li> "Test responder2" [ [ .s ] string-out display-page test-cont-responder2 [ .s ] string-out display-page ] quot-href </li>
+        <li> "Test responder2" [ test-cont-responder2 ] quot-href </li>
       </ol>
     ] html-document 
   ] show-final ;
