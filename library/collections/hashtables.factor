@@ -1,8 +1,8 @@
-! Copyright (C) 2005 Slava Pestov.
+! Copyright (C) 2005, 2006 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 IN: hashtables-internals
-USING: arrays hashtables kernel kernel-internals math sequences
-sequences-internals ;
+USING: arrays hashtables kernel kernel-internals math
+math-internals sequences sequences-internals ;
 
 TUPLE: tombstone ;
 
@@ -10,13 +10,14 @@ TUPLE: tombstone ;
 : ((tombstone)) T{ tombstone t } ; inline
 
 : hash@ ( key keys -- n )
-    >r hashcode r> length 2 /i rem 2 * ; inline
+    >r hashcode r> array-capacity 2 /i rem 2 * >fixnum ; inline
 
-: probe ( keys i -- hash i ) 2 + over length mod ; inline
+: probe ( keys i -- hash i )
+    2 fixnum+fast over array-capacity fixnum-mod ; inline
 
 : (key@) ( key keys i -- n )
     #! cond form expanded by hand for better interpreter speed
-    3dup swap nth-unsafe dup ((tombstone)) eq? [
+    3dup swap array-nth dup ((tombstone)) eq? [
         2drop probe (key@)
     ] [
         dup ((empty)) eq? [
@@ -43,7 +44,7 @@ TUPLE: tombstone ;
 
 : (new-key@) ( key keys i -- n )
     #! cond form expanded by hand for better interpreter speed
-    3dup swap nth-unsafe dup ((empty)) eq? [
+    3dup swap array-nth dup ((empty)) eq? [
         2drop 2nip
     ] [
         = [
@@ -57,10 +58,10 @@ TUPLE: tombstone ;
     hash-array 2dup hash@ (new-key@) ; inline
 
 : nth-pair ( n seq -- key value )
-    [ nth-unsafe ] 2keep >r 1+ r> nth-unsafe ; inline
+    [ array-nth ] 2keep >r 1+ r> array-nth ; inline
 
 : set-nth-pair ( value key n seq -- )
-    [ set-nth-unsafe ] 2keep >r 1+ r> set-nth-unsafe ; inline
+    [ set-array-nth ] 2keep >r 1+ r> set-array-nth ; inline
 
 : hash-count+
     dup hash-count 1+ swap set-hash-count ; inline
@@ -73,32 +74,35 @@ TUPLE: tombstone ;
 
 : (set-hash) ( value key hash -- )
     2dup new-key@ swap
-    [ hash-array 2dup nth-unsafe ] keep
+    [ hash-array 2dup array-nth ] keep
     ( value key n hash-array old hash )
     swap change-size set-nth-pair ; inline
 
 : (each-pair) ( quot array i -- | quot: k v -- )
-    over length over number= [
+    over array-capacity over eq? [
         3drop
     ] [
         [
             swap nth-pair over tombstone?
             [ 3drop ] [ rot call ] if
-        ] 3keep 2 + (each-pair)
+        ] 3keep 2 fixnum+fast (each-pair)
     ] if ; inline
 
 : each-pair ( array quot -- | quot: k v -- )
     swap 0 (each-pair) ; inline
 
 : (all-pairs?) ( quot array i -- ? | quot: k v -- ? )
-    over length over number= [
+    over array-capacity over eq? [
         3drop t
     ] [
         3dup >r >r >r swap nth-pair over tombstone? [
-            3drop r> r> r> 2 + (all-pairs?)
+            3drop r> r> r> 2 fixnum+fast (all-pairs?)
         ] [
-            rot call
-            [ r> r> r> 2 + (all-pairs?) ] [ r> r> r> 3drop f ] if
+            rot call [
+                r> r> r> 2 fixnum+fast (all-pairs?)
+            ] [
+                r> r> r> 3drop f
+            ] if
         ] if
     ] if ; inline
 
@@ -106,8 +110,8 @@ TUPLE: tombstone ;
     swap 0 (all-pairs?) ; inline
 
 : hash>seq ( i hash -- seq )
-    hash-array dup length 2 /i
-    [ 2 * pick + over nth-unsafe ] map
+    hash-array dup array-capacity 2 /i
+    [ 2 * pick + over array-nth ] map
     [ tombstone? not ] subset 2nip ;
 
 IN: hashtables
@@ -117,7 +121,7 @@ IN: hashtables
 
 : hash* ( key hash -- value ? )
     [
-        nip >r 1+ r> hash-array nth-unsafe t
+        nip >r 1 fixnum+fast r> hash-array array-nth t
     ] [
         3drop f f
     ] if-key ;
@@ -162,7 +166,7 @@ IN: hashtables
     drop ;
 
 : ?grow-hash ( hash -- )
-    dup hash-count 3 * over hash-array length >
+    dup hash-count 3 * over hash-array array-capacity >
     [ dup grow-hash ] when drop ; inline
 
 : set-hash ( value key hash -- )

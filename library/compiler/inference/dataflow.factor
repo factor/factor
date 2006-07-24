@@ -266,5 +266,5 @@ DEFER: (map-nodes)
 
 : subst-values ( new old node -- )
     #! Mutates nodes.
-    1 node-stack get head* swap add
+    1 node-stack get head-slice* swap add
     [ >r 2dup r> node-successor (subst-values) ] each 2drop ;

@@ -163,9 +163,9 @@ SYMBOL: bootstrapping?
     words [ forget ] each ;
 
 : bootstrap-word ( word -- word )
-    dup word-name swap word-vocabulary
     bootstrapping? get [
+    dup word-name swap word-vocabulary
         dup "syntax" = [
             drop "!syntax" >r "!" swap append r>
-        ] when
-    ] when lookup ;
+        ] when lookup
+    ] when ;
