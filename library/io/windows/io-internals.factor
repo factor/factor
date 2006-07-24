@@ -1,27 +1,4 @@
-! $Id: win32-io-internals.factor,v 1.15 2006/01/28 20:49:31 spestov Exp $
-!
 ! Copyright (C) 2004, 2005 Mackenzie Straight.
-! 
-! Redistribution and use in source and binary forms, with or without
-! modification, are permitted provided that the following conditions are met:
-! 
-! 1. Redistributions of source code must retain the above copyright notice,
-!    this list of conditions and the following disclaimer.
-! 
-! 2. Redistributions in binary form must reproduce the above copyright notice,
-!    this list of conditions and the following disclaimer in the documentation
-!    and/or other materials provided with the distribution.
-! 
-! THIS SOFTWARE IS PROVIDED ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES,
-! INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND
-! FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
-! DEVELOPERS AND CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
-! SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
-! PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS;
-! OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
-! WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
-! OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
-! ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 IN: win32-io-internals
 USING: alien arrays errors kernel kernel-internals math namespaces threads 
@@ -76,15 +53,15 @@ GENERIC: expire
     "overlapped-ext" <malloc-object> ;
 
 C: io-queue ( -- queue )
-    [ V{ } clone swap set-io-queue-callbacks ] keep ;
+    V{ } clone over set-io-queue-callbacks ;
 
 C: io-callback ( -- callback )
     io-queue get io-queue-callbacks [ push ] 2keep
-    length 1- <overlapped> [ set-overlapped-ext-user-data ] keep
+    length 1 - <overlapped> [ set-overlapped-ext-user-data ] keep
     swap [ set-io-callback-overlapped ] keep ;
 
 : alloc-io-callback ( quot stream -- overlapped )
-    io-queue get io-queue-free-list [
+    io-queue get io-queue-free-list [ 
         first2 io-queue get [ set-io-queue-free-list ] keep
         io-queue-callbacks nth
     ] [ <io-callback> ] if*
@@ -117,8 +94,7 @@ C: io-callback ( -- callback )
     (wait-for-io) overlapped>callback swap *int 
     rot [ queue-error ] unless ;
 
-: win32-init-io ( -- )
-    stdio off
+: win32-init-stdio ( -- )
     INVALID_HANDLE_VALUE f f 1 CreateIoCompletionPort
     completion-port set 
     <io-queue> io-queue set ;

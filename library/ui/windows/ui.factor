@@ -37,9 +37,9 @@ SYMBOL: class-name
     3drop window dup rect-dim first2 [ 0 > ] 2apply and [ draw-world ] when ;
 
 : handle-wm-size ( hWnd uMsg wParam lParam -- )
-    [ lo-word ] keep hi-word make-RECT get-RECT-dimensions 0 3array
+    [ lo-word ] keep hi-word make-RECT get-RECT-dimensions 2array
     2nip
-    dup { 0 0 0 } = [ 2drop ] [ swap window set-gadget-dim ] if ;
+    dup { 0 0 } = [ 2drop ] [ swap window set-gadget-dim ] if ;
 
 : wm-keydown-codes ( n -- key )
     H{
@@ -58,7 +58,6 @@ SYMBOL: class-name
         { 45 "INSERT" }
         { 46 "DELETE" }
     } ;
-
 
 : key-state-down?
     GetKeyState 1 16 shift bitand 0 > ;
@@ -86,6 +85,7 @@ SYMBOL: class-name
         { 8 "BACKSPACE" }
         { 9 "TAB" }
         { 13 "RETURN" }
+        { 27 "ESCAPE" }
     } ;
 
 : exclude-key? ( n -- bool ) wm-char-exclude-keys hash* nip ;
@@ -106,8 +106,10 @@ SYMBOL: hWnd
 : handle-wm-keydown ( hWnd uMsg wParam lParam -- )
     lParam set wParam set uMsg set hWnd set
     wParam get handle-key? [
-    wParam get keystroke>gesture <key-down> hWnd get get-focus handle-gesture
-    [ wParam get ch>string hWnd get get-focus user-input ] when
+        wParam get keystroke>gesture <key-down>
+        hWnd get get-focus handle-gesture [
+            wParam get ch>string hWnd get get-focus user-input
+        ] when
     ] when ;
 
 : handle-wm-keyup ( hWnd uMsg wParam lParam -- )
@@ -132,12 +134,10 @@ SYMBOL: hWnd
 
 : handle-wm-destroy ( hWnd uMsg wParam lParam -- )
     3drop
-    [
-        window [ world-handle ] keep
-        [ close-world ] keep
-        [ drop win-hWnd unregister-window ] 2keep
-        drop cleanup-window
-    ] keep
+    window [ world-handle ] keep
+    [ close-world ] keep
+    [ drop win-hWnd unregister-window ] 2keep
+    drop cleanup-window
     0 PostQuitMessage ;
 
 : handle-wm-set-focus ( hWnd uMsg wParam lParam -- )
@@ -157,23 +157,32 @@ SYMBOL: hWnd
         { [ t ] [ "bad button" throw ] }
     } cond ;
 
-: mouse-coordinate ( lParam -- seq ) [ lo-word ] keep hi-word 0 3array ;
+: mouse-coordinate ( lParam -- seq ) [ lo-word ] keep hi-word 2array ;
 : mouse-wheel ( lParam -- n ) hi-word 0 > 1 -1 ? ;
 
 : prepare-mouse ( hWnd uMsg wParam lParam -- world )
     nip >r mouse-button r> mouse-coordinate rot window ;
 
 : handle-wm-buttondown ( hWnd uMsg wParam lParam -- )
+    >r pick SetCapture drop r>
     prepare-mouse send-button-down ;
 
 : handle-wm-buttonup ( hWnd uMsg wParam lParam -- )
+    ReleaseCapture drop
     prepare-mouse send-button-up ;
 
 : handle-wm-mousemove ( hWnd uMsg wParam lParam -- )
-    2nip mouse-coordinate swap window move-hand ;
+    2nip mouse-coordinate swap window move-hand fire-motion ;
 
 : handle-wm-mousewheel ( hWnd uMsg wParam lParam -- )
     mouse-coordinate >r mouse-wheel nip r> rot window send-wheel ;
+
+: handle-wm-cancelmode ( hWnd uMsg wParam lParam -- )
+    #! message sent if windows needs application to stop dragging
+    3drop drop ReleaseCapture drop ;
+
+: 4dup ( a b c d -- a b c d a b c d )
+    >r >r 2dup r> r> 2swap >r >r 2dup r> r> 2swap ;
 
 ! return 0 if you handle the message, else just let DefWindowProc return its val
 : ui-wndproc ( hWnd uMsg wParam lParam -- lresult )
@@ -181,10 +190,11 @@ SYMBOL: hWnd
         [
         pick
         ! "Message: " write dup get-windows-message-name write
-            ! " " write dup unparse print
+            ! " " write dup unparse print flush
             {
                 { [ dup WM_DESTROY = ]    [ drop handle-wm-destroy 0 ] }
-                { [ dup WM_PAINT = ]      [ drop handle-wm-paint 0 ] }
+                { [ dup WM_PAINT = ]
+                      [ drop 4dup handle-wm-paint DefWindowProc ] }
                 { [ dup WM_SIZE = ]      [ drop handle-wm-size 0 ] }
 
                 ! Keyboard events
@@ -207,21 +217,27 @@ SYMBOL: hWnd
                 { [ dup WM_RBUTTONUP = ] [ drop handle-wm-buttonup 0 ] }
                 { [ dup WM_MOUSEMOVE = ] [ drop handle-wm-mousemove 0 ] }
                 { [ dup WM_MOUSEWHEEL = ] [ drop handle-wm-mousewheel 0 ] }
+                { [ dup WM_CANCELMODE = ] [ drop handle-wm-cancelmode 0 ] }
 
                 { [ t ] [ drop DefWindowProc ] }
             } cond
         ] [ error. 0 ] recover
+        ! "finished handling message" print .s flush
      ] alien-callback ;
 
-: event-loop ( -- )
-    ! "MSG'D" print flush
+: do-events ( -- )
     msg-obj get f 0 0 PM_REMOVE PeekMessage 
     zero? not [
         msg-obj get MSG-message WM_QUIT = [
             msg-obj get [ TranslateMessage drop ] keep DispatchMessage drop
         ] unless
-    ] when
-    ui-step windows get empty? [ event-loop ] unless ;
+    ] when ;
+
+: event-loop ( -- )
+    ! "MSG'D" print flush
+    windows get empty? [
+        [ do-events ui-step ] ui-try event-loop
+    ] unless ;
 
 : register-wndclassex ( classname wndproc -- )
     "WNDCLASSEX" <c-object>
@@ -238,8 +254,7 @@ SYMBOL: hWnd
 
 : create-window ( width height -- hwnd )
     make-adjusted-RECT
-    >r class-name get <malloc-string>
-    "The Title" <malloc-string> r>
+    >r class-name get <malloc-string> f r>
     >r >r >r ex-style r> r>
         WS_CLIPSIBLINGS WS_CLIPCHILDREN bitor style bitor
         0 0 r>
@@ -275,7 +290,6 @@ SYMBOL: hWnd
     dup setup-pixel-format
     dup get-rc ;
 
-
 IN: gadgets
 
 : open-window* ( world -- ) ! new
@@ -293,7 +307,7 @@ IN: gadgets
 
 ! Move window to front
 : raise-window ( world -- )
-    world-handle  win-hWnd SetFocus drop ;
+    world-handle win-hWnd SetFocus drop ReleaseCapture drop ;
 
 : set-title ( string world -- )
     world-handle win-hWnd
@@ -316,7 +330,4 @@ IN: shells
             event-loop
         ] with-freetype
     ] [ cleanup-win32-ui ] cleanup ;
-
-IN: kernel
-: default-shell "ui" ;
 

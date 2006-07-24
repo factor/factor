@@ -18,14 +18,16 @@ parser sequences sequences-internals words ;
     ] when
 
     "compile" get [
+        windows? [
+            "/library/ui/windows/load.factor" run-resource
+        ] when
         "native-io" get [
             unix? [
                 "/library/io/unix/load.factor" run-resource
             ] when
-        ] when
-
-        windows? [
-            "/library/io/windows/load.factor" run-resource
+            windows? [
+                "/library/io/windows/load.factor" run-resource
+            ] when
         ] when
 
         parse-command-line
@@ -52,10 +54,6 @@ parser sequences sequences-internals words ;
 
         "x11" get [
             "/library/ui/x11/load.factor" run-resource
-        ] when
-
-        windows? [
-            "/library/ui/windows/load.factor" run-resource
         ] when
     ] when
 

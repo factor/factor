@@ -17,12 +17,8 @@ USING: alien compiler kernel namespaces parser sequences words ;
     "io-internals"
     "stream"
     "server"
+    "io-last"
 } [ "/library/io/windows/" swap ".factor" append3 run-resource ] each
-    
-! Not for .83
-! "native-io" get [
-    ! "/library/bootstrap/win32-io.factor" run-resource
-! ] when
 
 IN: kernel
 : default-shell "ui" ;

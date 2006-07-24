@@ -778,7 +778,7 @@ FUNCTION: UINT EnumClipboardFormats ( UINT format ) ;
 ! FUNCTION: GetAppCompatFlags
 ! FUNCTION: GetAppCompatFlags2
 ! FUNCTION: GetAsyncKeyState
-! FUNCTION: GetCapture
+FUNCTION: HWND GetCapture ( ) ;
 ! FUNCTION: GetCaretBlinkTime
 ! FUNCTION: GetCaretPos
 FUNCTION: BOOL GetClassInfoA ( HINSTANCE hInst, LPCTSTR lpszClass, LPWNDCLASS lpwcx ) ;
@@ -1181,7 +1181,7 @@ FUNCTION: ATOM RegisterClassExW ( WNDCLASSEX* lpwcx ) ;
 ! FUNCTION: RegisterUserApiHook
 ! FUNCTION: RegisterWindowMessageA
 ! FUNCTION: RegisterWindowMessageW
-! FUNCTION: ReleaseCapture
+FUNCTION: BOOL ReleaseCapture ( ) ;
 FUNCTION: int ReleaseDC ( HWND hWnd, HDC hDC ) ;
 ! FUNCTION: RemoveMenu
 ! FUNCTION: RemovePropA
@@ -1209,7 +1209,7 @@ FUNCTION: LRESULT SendMessageW ( HWND hWnd, UINT msg, WPARAM wParam, LPARAM lPar
 ! FUNCTION: SendNotifyMessageA
 ! FUNCTION: SendNotifyMessageW
 ! FUNCTION: SetActiveWindow
-! FUNCTION: SetCapture
+FUNCTION: HWND SetCapture ( HWND hWnd ) ;
 ! FUNCTION: SetCaretBlinkTime
 ! FUNCTION: SetCaretPos
 

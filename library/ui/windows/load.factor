@@ -24,4 +24,4 @@ USING: alien compiler kernel namespaces parser sequences words ;
 } [ "/library/ui/windows/" swap ".factor" append3 run-resource ] each
     
 IN: kernel
-: default-shell "ui" ;
+: default-shell "tty" ;
