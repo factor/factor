@@ -34,7 +34,7 @@ opengl sequences ;
 
 : modifiers
     {
-        { S+ HEX: 10000 }
+        { S+ HEX: 20000 }
         { C+ HEX: 40000 }
         { A+ HEX: 80000 }
         { M+ HEX: 100000 }
