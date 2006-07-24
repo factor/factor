@@ -160,6 +160,6 @@ HELP: copy-into "( n dest src -- )"
 { $errors "An error is thrown if " { $snippet "to" } " is not resizable, and not large enough to hold the copied elements." } ;
 
 HELP: >sequence "( seq pred quot -- )"
-{ $values { "seq" "a sequence" } { "pred" "a quotation with stack effect " { $snippet "( seq -- ? )" } }{ "quot" "a quotation with stack effect " { $snippet "( n -- newseq )" } } { "newseq" "a freshly-allocated sequence" } }
+{ $values { "seq" "a sequence" } { "pred" "a quotation with stack effect " { $snippet "( seq -- ? )" } } { "quot" "a quotation with stack effect " { $snippet "( n -- newseq )" } } { "newseq" "a freshly-allocated sequence" } }
 { $description "If " { $snippet "pred" } " answers a true value given " { $snippet "seq" } ", clones " { $snippet "seq" } ". Otherwise, calls " { $snippet "quot" } " with the length of " { $snippet "seq" } ", creating a new sequence, and copies the contents of " { $snippet "seq" } " into the new sequence." }
 { $notes "This word is used to implement words which convert one type of sequence into another, for example " { $link >array } "." } ;
