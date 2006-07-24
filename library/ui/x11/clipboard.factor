@@ -35,7 +35,8 @@ C: x-clipboard ( atom -- clipboard )
     ] if ;
 
 : own-selection ( prop win -- )
-    dpy get -rot CurrentTime XSetSelectionOwner drop ;
+    dpy get -rot CurrentTime XSetSelectionOwner drop
+    flush-dpy ;
 
 : clipboard-for-atom ( atom -- clipboard )
     {
@@ -72,16 +73,18 @@ C: x-clipboard ( atom -- clipboard )
 : send-notify ( evt prop -- )
     "XSelectionEvent" <c-object>
     SelectionNotify over set-XSelectionEvent-type
-    [ set-XSelectionRequestEvent-property ] keep
+    [ set-XSelectionEvent-property ] keep
+    over XSelectionRequestEvent-display   over set-XSelectionEvent-display
     over XSelectionRequestEvent-requestor over set-XSelectionEvent-requestor
     over XSelectionRequestEvent-selection over set-XSelectionEvent-selection
     over XSelectionRequestEvent-target    over set-XSelectionEvent-target
     over XSelectionRequestEvent-time      over set-XSelectionEvent-time
     >r dpy get swap XSelectionRequestEvent-requestor 0 0 r>
-    XSendEvent drop ;
+    XSendEvent drop
+    flush-dpy ;
 
 : send-notify-success ( evt -- )
-    dup XSelectionEvent-property send-notify ;
+    dup XSelectionRequestEvent-property send-notify ;
 
 : send-notify-failure ( evt -- )
     0 send-notify ;
