@@ -72,27 +72,31 @@ SYMBOL: class-name
 : ctrl? ( -- ? ) left-ctrl? right-ctrl? or ;
 : alt? ( -- ? ) left-alt? right-alt? or ;
 : caps-lock? ( -- ? ) VK_CAPITAL GetKeyState zero? not ;
+: lower-case? ( -- ? ) shift? caps-lock? and caps-lock? not shift? not and or ;
 
 : key-modifiers ( -- list )
     [
         shift? [ S+ , ] when
         ctrl? [ C+ , ] when
         alt? [ A+ , ] when
-    ] { } make dup empty? f swap ? ;
+    ] { } make [ empty? not ] keep f ? ;
 
-: wm-char-exclude-keys
+: exclude-keys
     H{
-        { 8 "BACKSPACE" }
-        { 9 "TAB" }
-        { 13 "RETURN" }
+        ! { 8 "BACKSPACE" }
+        ! { 9 "TAB" }
+        { 16 "SHIFT" }
+        { 17 "CTRL" }
+        { 18 "ALT" }
+        { 20 "CAPS-LOCK" }
         { 27 "ESCAPE" }
     } ;
 
-: exclude-key? ( n -- bool ) wm-char-exclude-keys hash* nip ;
+: exclude-key? ( n -- bool ) exclude-keys hash* nip ;
 : handle-key? ( n -- bool ) wm-keydown-codes hash* nip ;
  
 : keystroke>gesture ( n -- <key-down> )
-    dup wm-keydown-codes hash* [ nip ] [ drop ch>string ] if
+    dup wm-keydown-codes hash* [ nip ] [ drop ch>string lower-case? [ >lower ] when ] if
     key-modifiers swap ;
 
 SYMBOL: lParam
@@ -105,28 +109,18 @@ SYMBOL: hWnd
 
 : handle-wm-keydown ( hWnd uMsg wParam lParam -- )
     lParam set wParam set uMsg set hWnd set
-    wParam get handle-key? [
+    wParam get exclude-key? [
         wParam get keystroke>gesture <key-down>
         hWnd get get-focus handle-gesture [
-            wParam get ch>string hWnd get get-focus user-input
+            wParam get ch>string lower-case? [ >lower ] when
+            hWnd get get-focus user-input
         ] when
-    ] when ;
+    ] unless ;
 
 : handle-wm-keyup ( hWnd uMsg wParam lParam -- )
     lParam set wParam set uMsg set hWnd set
     wParam get keystroke>gesture <key-up> hWnd get get-focus handle-gesture
     drop ;
-    
-: handle-wm-char ( hWnd uMsg wParam lParam -- int )
-    lParam set wParam set uMsg set hWnd set
-    wParam get exclude-key? [
-        wParam get ch>string hWnd get window world-focus
-        2dup >r unit r> handle-gesture [
-            user-input
-        ] [
-            2drop
-        ] if
-    ] unless ;
 
 : cleanup-window ( handle -- )
     [ win-hRC wglDeleteContext win32-error=0 ] keep
@@ -202,8 +196,6 @@ SYMBOL: hWnd
                     [ drop handle-wm-keydown 0 ] }
                 { [ dup WM_KEYUP = over WM_SYSKEYUP = or ]
                     [ drop handle-wm-keyup 0 ] }
-                { [ dup WM_CHAR = over WM_SYSCHAR = or ]
-                    [ drop handle-wm-char 0 ] }
 
                 { [ dup WM_SETFOCUS = ] [ drop handle-wm-set-focus 0 ] }
                 { [ dup WM_KILLFOCUS = ] [ drop handle-wm-kill-focus 0 ] }

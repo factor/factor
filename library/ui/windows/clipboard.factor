@@ -1,7 +1,7 @@
 ! Copyright (C) 2006 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel win32-api math namespaces io prettyprint errors sequences alien
-    libc ;
+    libc gadgets ;
 IN: win32
 
 : (enum-clipboard) ( n -- )
@@ -39,7 +39,11 @@ IN: win32
 
     CloseClipboard drop ;
 
-! TODO
-! M: win-clipboard paste-clipboard ( gadget clipboard -- )
-    ! >r find-world world-handle win-hWnd r> clipboard-contents paste ;
+TUPLE: pasteboard ;
+M: pasteboard clipboard-contents ( pb -- str ) drop paste ;
+M: pasteboard set-clipboard-contents ( str pb -- ) drop copy ;
 
+: init-clipboard ( -- )
+    <pasteboard> clipboard set-global ;
+
+! Notes: SetClipboardViewer, ChangeClipboardChaifn
