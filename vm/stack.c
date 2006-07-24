@@ -267,7 +267,7 @@ void primitive_callstack(void)
 {
 	maybe_gc(0);
 	
-	CELL depth = (cs - cs_bot + CELLS) / CELLS;
+	CELL depth = (cs - cs_bot + CELLS) / CELLS - 3;
 	F_VECTOR *v = vector(depth);
 	F_ARRAY *a = untag_array_fast(v->array);
 	CELL i;
