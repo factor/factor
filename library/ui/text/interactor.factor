@@ -8,7 +8,7 @@ TUPLE: interactor output continuation ;
 
 C: interactor ( output -- gadget )
     [ set-interactor-output ] keep
-    f <field> over set-gadget-delegate
+    f f <field> over set-gadget-delegate
     dup dup set-control-self ;
 
 : interactor-eval ( string gadget -- )

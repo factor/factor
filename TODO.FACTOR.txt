@@ -6,7 +6,8 @@
   - scroll to caret
   - clicking input doesn't resize editor gadget
   - better listener multi-line expression handling
-  - C+p/C+n with empty history bombs
+  - C+p/C+n with loc out of range
+  - don't add empties to the editor history
 
 - httpd search tools
 - remaining HTML issues need fixing
@@ -106,6 +107,11 @@
 - [ [ dup call ] dup call ] infer hangs
 - the invalid recursion form case needs to be fixed, for inlines too
 - code gc
+
++ something like masterscope:
+
+- does word A call word B (indirectly)?
+- which variables are read, written in a quotation
 
 + misc:
 

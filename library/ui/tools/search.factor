@@ -13,7 +13,7 @@ TUPLE: search-gadget input ;
 
 C: search-gadget ( quot -- )
     >r f <model> dup r> {
-        { [ <field> ] set-search-gadget-input f @top }
+        { [ f <field> ] set-search-gadget-input f @top }
         { [ swap <search-pane> <scroller> ] f f @center }
     } make-frame* ;
 
