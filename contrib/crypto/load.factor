@@ -22,4 +22,15 @@ PROVIDE: crypto {
 ! Public key
     "rsa.factor"
 
+} {
+    "test/common.factor"
+    "test/md5.factor"
+    "test/sha1.factor"
+    "test/base64.factor"
+    "test/miller-rabin.factor"
+    "test/crc32.factor"
+    "test/rsa.factor"
+    "test/barrett.factor"
+    "test/montgomery.factor"
+    "test/blum-blum-shub.factor"
 } ;

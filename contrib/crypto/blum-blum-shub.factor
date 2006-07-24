@@ -14,8 +14,7 @@ IN: crypto
     generate-bbs-primes * [ find-relative-prime ] keep <bbs> ;
 
 IN: crypto-internals
-SYMBOL: blum-blum-shub 256 make-bbs global [ blum-blum-shub set ] bind
-IN: crypto
+SYMBOL: blum-blum-shub 256 make-bbs blum-blum-shub set-global
 
 : next-bbs-bit ( bbs -- bit )
     #! x = x^2 mod n, return low bit of calculated x
@@ -26,5 +25,10 @@ SYMBOL: temp-bbs
 : (bbs-bits) ( numbits bbs -- n )
     temp-bbs set [ [ temp-bbs get next-bbs-bit ] swap make-bits ] with-scope ;
 
+IN: crypto
 : random-bbs-bits* ( numbits bbs -- n ) (bbs-bits) ;
 : random-bbs-bits ( numbits -- n ) blum-blum-shub get (bbs-bits) ;
+: random-int ( n -- n )
+    #! Cryptographically secure random number using Blum-Blum-Shub 256
+    [ log2 1+ random-bbs-bits ] keep mod ;
+

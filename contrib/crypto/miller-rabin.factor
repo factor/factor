@@ -50,8 +50,9 @@ SYMBOL: trials
 
 IN: crypto
 
-: miller-rabin* ( n trials -- bool )
-    #! Probailistic primality test for n > 2, with trials as a parameter
+: miller-rabin* ( n num-trials -- bool )
+    #! Probailistic primality test for n > 2, with num-trials as a parameter
+    over 2 > [ "miller-rabin error: must call with n > 2" throw ] unless
     [ init-miller-rabin (miller-rabin) ] with-scope ;
 
 : miller-rabin ( n -- bool )
@@ -70,7 +71,11 @@ IN: crypto
     large-random-bits next-miller-rabin-prime ;
 
 : random-miller-rabin-prime==3(mod4) ( numbits -- p )
-    dup random-miller-rabin-prime dup 4 mod 3 = [ drop random-miller-rabin-prime==3(mod4) ] [ nip ] if ;
+    dup random-miller-rabin-prime dup 4 mod 3 = [
+        drop random-miller-rabin-prime==3(mod4)
+    ] [
+        nip
+    ] if ;
 
 : (find-relative-prime) ( m g -- p )
     2dup gcd nip 1 > [ 2 + (find-relative-prime) ] [ nip ] if ;
