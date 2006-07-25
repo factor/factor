@@ -63,8 +63,14 @@ M: model set-model ( value model -- )
 : set-model* ( value model -- )
     2dup model-value = [ 2drop ] [ set-model ] if ;
 
+: ((change-model)) ( model quot -- newvalue model )
+    over >r >r model-value r> call r> ; inline
+
 : change-model ( model quot -- )
-    over >r >r model-value r> call r> set-model ; inline
+    ((change-model)) set-model ; inline
+
+: (change-model) ( model quot -- )
+    ((change-model)) set-model-value ; inline
 
 : delegate>model ( obj -- )
     f <model> swap set-delegate ;
@@ -127,8 +133,11 @@ C: history ( value -- history )
     V{ } clone over set-history-back
     V{ } clone over set-history-forward ;
 
-: (add-history) ( history vector -- )
-    swap model-value dup [ swap push ] [ 2drop ] if ;
+G: (add-history) ( history vector -- )
+    1 standard-combination ;
+
+M: history (add-history) ( history vector -- )
+    swap model-value [ 2drop ] [ swap push ] if ;
 
 : go-back/forward ( history to from -- )
     dup empty?
@@ -141,6 +150,8 @@ C: history ( value -- history )
 : go-forward ( history -- )
     dup history-back over history-forward go-back/forward ;
 
-: add-history ( history -- )
+GENERIC: add-history ( history -- )
+
+M: history add-history ( history -- )
     0 over history-forward set-length
     dup history-back (add-history) ;

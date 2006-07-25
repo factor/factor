@@ -58,7 +58,11 @@ sequences ;
     3dup next-elt >r prev-elt r>
     r> editor-select ;
 
+: select-all ( editor -- ) T{ doc-elt } select-elt ;
+
 editor H{
+    { T{ key-down f f "RETURN" } [ "\n" swap user-input ] }
+    { T{ key-down f { S+ } "RETURN" } [ "\n" swap user-input ] }
     { T{ button-down } [ editor-mouse-down ] }
     { T{ drag } [ editor-mouse-drag ] }
     { T{ gain-focus } [ focus-editor ] }

@@ -1,8 +1,8 @@
 ! Copyright (C) 2006 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 IN: gadgets-text
-USING: gadgets gadgets-controls gadgets-panes io kernel
-namespaces prettyprint styles threads ;
+USING: gadgets gadgets-controls gadgets-panes hashtables help io
+kernel namespaces prettyprint styles threads ;
 
 TUPLE: interactor output continuation ;
 
@@ -27,14 +27,15 @@ SYMBOL: structured-input
 
 : print-input ( string interactor -- )
     interactor-output [
-        dup [
-            <input> presented set
-            bold font-style set
-        ] make-hash format terpri
+        H{ { font-style bold } } [
+            dup <input> presented associate
+            [ write ] with-nesting terpri
+        ] with-style
     ] with-stream* ;
 
 : interactor-commit ( gadget -- )
     dup field-commit
+    over control-model clear-doc
     swap 2dup print-input interactor-eval ;
 
 interactor H{

@@ -11,16 +11,22 @@ font color caret-color selection-color
 caret mark
 focused? ;
 
-: init-editor-models ( editor -- )
-    dup control-self over editor-caret add-connection
-    dup control-self swap editor-mark add-connection ;
+TUPLE: loc-monitor editor ;
+
+M: loc-monitor model-changed ( obj -- )
+    loc-monitor-editor control-self relayout-1 ;
+
+: <loc> ( editor -- loc )
+    <loc-monitor> { 0 0 } <model> [ add-connection ] keep ;
+
+: init-editor-locs ( editor -- )
+    dup <loc> over set-editor-caret
+    dup <loc> swap set-editor-mark ;
 
 C: editor ( document -- editor )
     dup <document> delegate>control
     dup dup set-control-self
-    { 0 0 } <model> over set-editor-caret
-    { 0 0 } <model> over set-editor-mark
-    dup init-editor-models
+    dup init-editor-locs
     dup editor-theme ;
 
 : activate-editor-model ( editor model -- )
@@ -40,14 +46,16 @@ M: editor ungraft* ( editor -- )
     dup control-self swap control-model remove-connection ;
 
 M: editor model-changed ( editor -- )
-    #! Document changed
-    control-self relayout ;
+    control-self dup control-model
+    over editor-caret [ over validate-loc ] (change-model)
+    over editor-mark [ over validate-loc ] (change-model)
+    drop relayout ;
 
 : editor-caret* editor-caret model-value ;
 
 : editor-mark* editor-mark model-value ;
 
-: change-caret ( editor quot -- )
+: change-caret ( editor quot -- | quot: caret doc -- caret )
     over >r >r dup editor-caret* swap control-model r> call r>
     [ control-model validate-loc ] keep
     editor-caret set-model ; inline

@@ -1,7 +1,7 @@
 ! Copyright (C) 2006 Slava Pestov
 ! See http://factorcode.org/license.txt for BSD license.
 IN: gadgets-text
-USING: gadgets gadgets-controls generic kernel models ;
+USING: gadgets gadgets-controls generic kernel models sequences ;
 
 TUPLE: field model quot ;
 
@@ -19,7 +19,8 @@ C: field ( model quot -- field )
     [ editor-text ] keep
     dup field-model [ dupd set-model ] when*
     dup field-quot [ dupd call ] when*
-    control-model dup add-history clear-doc ;
+    dup control-model add-history
+    select-all ;
 
 field H{
     { T{ key-down f { C+ } "p" } [ field-prev ] }

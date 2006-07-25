@@ -127,3 +127,14 @@ C: document ( -- document )
 
 : clear-doc ( document -- )
     "" swap set-doc-text ;
+
+M: document (add-history) ( document vector -- )
+    >r model-value dup { "" } sequence=
+    [ r> 2drop ] [ r> push-new ] if ;
+
+M: document add-history ( document -- )
+    #! Add the new entry at the end of the history, and avoid
+    #! duplicates.
+    dup history-back dup
+    pick history-forward <reversed> nappend
+    (add-history) ;

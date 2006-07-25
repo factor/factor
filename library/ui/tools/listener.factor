@@ -31,34 +31,26 @@ TUPLE: listener-gadget input output stack ;
     >r <pane-control> <scroller> r> f <tile> ;
 
 : <stack-tile> ( model title -- gadget )
-    [ [ 32 margin set stack. ] with-scope ] swap <pane-tile> ;
+    [ stack. ] swap <pane-tile> ;
 
-: <listener-input> ( listener -- gadget )
-    listener-gadget-input <scroller> "Input" f <tile> ;
+: <listener-input> ( -- gadget )
+    gadget get listener-gadget-output <interactor> ;
 
-: <stack-display> ( listener -- gadget )
-    listener-gadget-stack "Stack" <stack-tile> ;
-
-: <listener-bar> ( listener -- gadget )
-    dup {
-        { [ <listener-input> ] f f 2/3 }
-        { [ <stack-display> ] f f 1/3 }
-    } { 1 0 } make-track ;
+: <stack-display> ( -- gadget )
+    gadget get listener-gadget-stack "Stack" <stack-tile> ;
 
 : init-listener ( listener -- )
-    f <model> over set-listener-gadget-stack
-    <scrolling-pane> over set-listener-gadget-output
-    dup listener-gadget-output <interactor>
-    swap set-listener-gadget-input ;
+    f <model> swap set-listener-gadget-stack ;
 
 C: listener-gadget ( -- gadget )
     dup init-listener {
-        { [ gadget get listener-gadget-output <scroller> ] f f 5/6 }
-        { [ gadget get <listener-bar> ] f f 1/6 }
+        { [ <scrolling-pane> ] set-listener-gadget-output [ <scroller> ] 4/6 }
+        { [ <stack-display> ] f f 1/6 }
+        { [ <listener-input> ] set-listener-gadget-input [ <scroller> ] 1/6 }
     } { 0 1 } make-track* dup start-listener ;
 
 M: listener-gadget pref-dim*
-    delegate pref-dim* { 700 500 } vmax ;
+    delegate pref-dim* { 500 600 } vmax ;
 
 M: listener-gadget focusable-child* ( listener -- gadget )
     listener-gadget-input ;
