@@ -118,16 +118,18 @@ C: sprite ( loc dim dim2 -- )
 
 : gl-translate ( { x y } -- ) first2 0.0 glTranslated ;
 
+: draw-sprite ( sprite -- )
+    dup sprite-loc gl-translate
+    GL_TEXTURE_2D over sprite-texture glBindTexture
+    init-texture
+    dup sprite-dim2 gl-fill-rect
+    dup sprite-dim { 1 0 } v*
+    swap sprite-loc v- gl-translate
+    GL_TEXTURE_2D 0 glBindTexture ;
+
 : make-sprite-dlist ( sprite -- id )
     GL_MODELVIEW [
-        GL_COMPILE [
-            dup sprite-loc gl-translate
-            GL_TEXTURE_2D over sprite-texture glBindTexture
-            init-texture
-            dup sprite-dim2 gl-fill-rect
-            dup sprite-dim { 1 0 0 } v*
-            swap sprite-loc v- gl-translate
-        ] make-dlist
+        GL_COMPILE [ draw-sprite ] make-dlist
     ] do-matrix ;
 
 : init-sprite ( texture sprite -- )
