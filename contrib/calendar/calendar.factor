@@ -44,18 +44,15 @@ SYMBOL: gmt-offset
     #! length of average month in days
     30.41666666666667 ;
 
-IN: kernel
-M: tuple <=> ( tuple tuple -- n )
-    [ tuple>array 2 over length rot <slice> >array ] 2apply <=> ;
-
-IN: calendar
+: compare-timestamps ( tuple tuple -- n )
+    [ tuple>array 2 swap tail ] 2apply <=> ;
 
 DEFER: >gmt
 DEFER: +dt
 DEFER: seconds
 : make-timestamp ( year month day hour minute second gmt-offset -- <timestamp> )
     <timestamp> [ 0 seconds +dt ] keep
-    [ <=> zero? [ "invalid timestamp" throw ] unless ] keep ;
+    [ = [ "invalid timestamp" throw ] unless ] keep ;
 
 SYMBOL: a
 SYMBOL: b
@@ -145,29 +142,29 @@ M: integer +year ( timestamp n -- timestamp )
     over timestamp-year + swap [ set-timestamp-year ] keep
     adjust-leap-year ;
 M: real +year ( timestamp n -- timestamp )
-    >float float>whole-part rot swap 365.2425 * +day swap +year ;
+    float>whole-part rot swap 365.2425 * +day swap +year ;
 
 M: integer +month ( timestamp n -- timestamp )
     over timestamp-month + 12 /mod-wrap
     dup 0 = [ drop 12 >r 1- r> ] when pick set-timestamp-month +year ;
 M: real +month ( timestamp n -- timestamp )
-    >float float>whole-part rot swap average-month * +day swap +month ;
+    float>whole-part rot swap average-month * +day swap +month ;
 
 M: integer +day ( timestamp n -- timestamp )
     swap [ date julian-day-number + julian-day-number>timestamp ] keep
     swap >r time r> [ set-time ] keep ;
 M: real +day ( timestamp n -- timestamp )
-    >float float>whole-part rot swap 24 * +hour swap +day ;
+    float>whole-part rot swap 24 * +hour swap +day ;
 
 M: integer +hour ( timestamp n -- timestamp )
     over timestamp-hour + 24 /mod-wrap pick set-timestamp-hour +day ;
 M: real +hour ( timestamp n -- timestamp )
-    >float float>whole-part rot swap 60 * +minute swap +hour ;
+    float>whole-part rot swap 60 * +minute swap +hour ;
 
 M: integer +minute ( timestamp n -- timestamp )
     over timestamp-minute + 60 /mod-wrap pick set-timestamp-minute +hour ;
 M: real +minute ( timestamp n -- timestamp )
-    >float float>whole-part rot swap 60 * +second swap +minute ; 
+    float>whole-part rot swap 60 * +second swap +minute ; 
 
 M: number +second ( timestamp n -- timestamp )
     over timestamp-second + 60 /mod-wrap >r >bignum r>
@@ -183,14 +180,14 @@ M: number +second ( timestamp n -- timestamp )
     dt-year +year
     swap timestamp-gmt-offset over set-timestamp-gmt-offset ;
 
-: dt>vec ( dt -- vec ) tuple>array 2 8 rot <slice> ;
+: dt>vec ( dt -- vec ) tuple>array 2 swap tail ;
 : vec>dt ( vec -- dt ) { dt f } swap append >tuple ;
 : +dts ( dt dt -- dt ) [ dt>vec ] 2apply v+ vec>dt ;
-: timestamp>vec ( dt -- vec ) tuple>array 2 8 rot <slice> ;
+: timestamp>vec ( dt -- vec ) tuple>array 2 swap tail ;
 
 : dt>years ( dt -- x )
     #! Uses average month/year length since dt loses calendar data
-    dt>vec [ 1 12 365.2425 8765.82 525949.2 31556952.0 ] [ / ] 2map sum ;
+    dt>vec { 1 12 365.2425 8765.82 525949.2 31556952.0 } [ / ] 2map sum ;
 : dt>months ( dt -- x ) dt>years 12 * ;
 : dt>days ( dt -- x ) dt>years 365.2425 * ;
 : dt>hours ( dt -- x ) dt>years 8765.82 * ;
@@ -246,7 +243,7 @@ M: number +second ( timestamp n -- timestamp )
         [ timestamp-year leap-year? ] keep
         [ date 3array ] keep timestamp-year 3 1 3array <=> 0 >= and 1 0 ?
     ] keep 
-    0 swap [ timestamp-month day-counts <slice> sum + ] keep
+    [ timestamp-month day-counts head-slice sum + ] keep
     timestamp-day + ;
 
 : print-day ( n -- )
@@ -280,4 +277,3 @@ M: number +second ( timestamp n -- timestamp )
         dup timestamp-minute unparse 2 CHAR: 0 pad-left write ":" write
         dup timestamp-second >fixnum unparse 2 CHAR: 0 pad-left write " GMT" write
     ] string-out ;
-

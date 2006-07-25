@@ -1,7 +1,6 @@
 + 0.83:
 
 - windows port from erg
-- why aren't some cocoa words compiled?
 - editor:
   - scroll to caret
   - clicking input doesn't resize editor gadget
