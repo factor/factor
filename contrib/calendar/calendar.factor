@@ -48,19 +48,28 @@ SYMBOL: m
 : julian-day-number ( year month day -- n )
     #! Returns a composite date number
     #! Not valid before year -4800
-    14 pick - 12 /i a set
-    pick 4800 + a get - y set
-    over 12 a get * + 3 - m set
-    2nip 153 m get * 2 + 5 /i + 365 y get * +
-    y get 4 /i + y get 100 /i - y get 400 /i + 32045 - ;
+    [
+        14 pick - 12 /i a set
+        pick 4800 + a get - y set
+        over 12 a get * + 3 - m set
+        2nip 153 m get * 2 + 5 /i + 365 y get * +
+        y get 4 /i + y get 100 /i - y get 400 /i + 32045 -
+    ] with-scope ;
 
 : julian-day-number>date ( n -- year month day )
     #! Inverse of julian-day-number
-    32044 + a set 4 a get * 3 + 146097 /i b set a get 146097 b
-    get * 4 /i - c set 4 c get * 3 + 1461 /i d set c get 1461 d
-    get * 4 /i - e set 5 e get * 2 + 153 /i m set 100 b get * d
-    get + 4800 - m get 10 /i + m get 3 + 12 m get 10 /i * - e
-    get 153 m get * 2 + 5 /i - 1+ ;
+    [
+        32044 + a set
+        4 a get * 3 + 146097 /i b set
+        a get 146097 b get * 4 /i - c set
+        4 c get * 3 + 1461 /i d set
+        c get 1461 d get * 4 /i - e set
+        5 e get * 2 + 153 /i m set
+        100 b get * d get + 4800 -
+        m get 10 /i + m get 3 +
+        12 m get 10 /i * -
+        e get 153 m get * 2 + 5 /i - 1+
+    ] with-scope ;
 
 : set-date ( year month day timestamp -- )
     [ set-timestamp-day ] keep
@@ -109,11 +118,7 @@ GENERIC: +second ( timestamp x -- timestamp )
     [ floor >bignum ] keep dupd swap - ;
 
 : leap-year? ( year -- ? )
-    [ 100 mod zero? ] keep over [
-        400 mod zero? and
-    ] [
-        nip 4 mod zero?
-    ] if ;
+    dup 100 mod zero? 400 4 ? mod zero? ;
 
 : adjust-leap-year ( timestamp -- timestamp )
     dup date 29 = swap 2 = and swap leap-year? not and [
