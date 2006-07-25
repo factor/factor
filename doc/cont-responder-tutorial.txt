@@ -14,20 +14,18 @@ things work.
 
 Getting Started
 ===============
-To get started you will first need to use the 'cont-responder'
-vocabulary:
+To get started you will first need to load the 'httpd' module and use
+the 'cont-responder' vocabulary:
 
+  "httpd" require
   USE: cont-responder
 
 The responders that you will be writing will require an instance of
 the httpd server to be running. It will be run in a background thread
-to enable the interactive development of the applications. The
-following is a simple function to start the server on port 8888:
+to enable the interactive development of the applications:
 
   USE: httpd
-  USE: threads
-  : start-httpd [ 8888 httpd ] in-thread  ;
-  start-httpd
+  [ 8888 httpd ] in-thread  
 
 Responders
 ==========
@@ -167,7 +165,7 @@ formatted correctly.
           <table "1" =border table>
             <tr> 
               <td> "Total Data Memory" write </td>
-              <td> room unparse write </td>
+              <td> room drop unparse write </td>
             </tr>
             <tr> 
               <td> "Free Data Memory" write </td>
@@ -212,7 +210,7 @@ The HTML output can be refactored into different words. For example:
     [
       <html>
         <head> <title> "Memory Statistics 2" write </title> </head>
-        <body> room memory-stats-table 2drop </body>
+        <body> room drop memory-stats-table 2drop </body>
       </html>
     ] show-final ;
 
@@ -299,7 +297,7 @@ this into a seperate word:
           <p> <a =href a> "Press to continue" write </a> </p>
         ] [
           drop 
-        ] ifte
+        ] if
       </body>
     </html>   
   ] show 3drop ;
@@ -351,7 +349,7 @@ is the boolean value 'f'.
 
 To process input from the user just put a form in the HTML with a
 method of 'POST' and an action set to the URL passed in to the page
-generation quotation. The show call will then return a namespace
+generation quotation. The show call will then return a hashtable
 containing this data. Here is a simple example:
 
   : accept-users-name ( -- name )
@@ -370,9 +368,8 @@ containing this data. Here is a simple example:
           </form>
         </body>
       </html>
-    ] show [
-      "username" get
-    ] bind ;
+    ] show 
+    "username" swap hash ;
 
   : post-example1 ( -- )
     [
@@ -387,10 +384,9 @@ containing this data. Here is a simple example:
   "post-example1" [ post-example1 ] install-cont-responder
     
 The 'accept-users-name' word displays an HTML form allowing input of
-the name. When that form is submitted the namespace containing the
-data is returned by 'show'. We bind to it and retrieve the 'username'
-field. The name used here should be the same name used when creating
-the field in the HTML.
+the name. When that form is submitted the hashtable containing the
+data is returned by 'show'. The name used here should be the same name 
+used when creating the field in the HTML.
 
 'post-example1' then does something a bit tricky. Instead of first
 calling 'accept-users-name' to push the name on the stack and then
