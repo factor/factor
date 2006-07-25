@@ -21,7 +21,6 @@ HELP: in-edges "( vertex graph -- seq )"
 { $values { "vertex" "an object" } { "graph" "a hashtable mapping vertices to sequences of edges" } { "seq" "a sequence of vertices" } }
 { $description "Outputs a sequence of vertices incident to an edge entering the given vertex." } ;
 
-HELP: closure "( vertex graph -- seq )"
-{ $values { "vertex" "an object" } { "graph" "a hashtable mapping vertices to sequences of edges" } { "seq" "a sequence of vertices" } }
-{ $description "Outputs a sequence of vertices which can reach " { $snippet "vertex" } " by some path terminating at " { $snippet "vertex" } "." }
-{ $notes "This is the transitive closure of the " { $link in-edges } " operation." } ; 
+HELP: closure "( vertex quot -- seq )"
+{ $values { "vertex" "an object" } { "quot" "a a quotation with stack effect " { $snippet "( vertex -- seq )" } } { "seq" "a sequence of vertices" } }
+{ $description "Outputs a sequence of all vertices reachable from " { $snippet "vertex" } " via edges given by the quotation. This sequence always includes " { $snippet "vertex" } "." } ; 

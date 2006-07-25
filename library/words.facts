@@ -96,11 +96,6 @@ HELP: usage "( word -- seq )"
 { $notes "The sequence will include the word itself if it is recursive." }
 { $see-also usage } ;
 
-HELP: usages "( word -- seq )"
-{ $values { "word" "a word" } { "seq" "a sequence of words" } }
-{ $description "Outputs a sequence of words that call the given word through some chain of callers." }
-{ $notes "This word computes the transitive closure of the result of " { $link usage } ". The sequence will include the word itself if it is recursive." } ;
-
 HELP: unxref-word* "( word -- )"
 { $values { "word" "a word" } }
 { $contract "Updates the word to cope with a callee being redefined." }

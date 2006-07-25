@@ -27,22 +27,19 @@ USING: hashtables kernel namespaces sequences ;
 : in-edges ( vertex graph -- seq )
     ?hash dup [ hash-keys ] when ;
 
-: closure, ( value key -- old )
-    building get [ hash swap ] 2keep set-hash ;
+SYMBOL: previous
 
-: (closure) ( key hash -- )
-    tuck ?hash dup [
-        [
-            drop dup dup closure,
-            [ 2drop ] [ swap (closure) ] if
-        ] hash-each-with
-    ] [
+: (closure) ( obj quot -- )
+    over previous get hash-member? [
         2drop
-    ] if ;
+    ] [
+        over dup previous get set-hash
+        [ call ] keep swap [ swap (closure) ] each-with
+    ] if ; inline
 
-: closure ( vertex graph -- seq )
+: closure ( obj quot -- seq | quot: obj -- seq )
     [
-        H{ } clone building set
+        H{ } clone previous set
         (closure)
-        building get hash-keys
-    ] with-scope ;
+        previous get hash-keys
+    ] with-scope ; inline

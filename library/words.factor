@@ -70,14 +70,12 @@ SYMBOL: crossref
 
 : usage ( word -- seq ) crossref get in-edges ;
 
-: usages ( word -- deps ) crossref get closure ;
-
 GENERIC: unxref-word* ( word -- )
 
 M: word unxref-word* drop ;
 
 : unxref-word ( word -- )
-    dup unxref-word* dup usages [ unxref-word* ] each
+    dup [ usage ] closure [ unxref-word* ] each
     [ uses ] crossref get remove-vertex ;
 
 : define ( word parameter primitive -- )

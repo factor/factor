@@ -108,7 +108,6 @@ ARTICLE: "word-crossref" "Cross-referencing"
 { $subsection uses }
 "As well as all words calling a given word:"
 { $subsection usage }
-{ $subsection usages }
 "In most cases the cross-reference database is maintained automatically, but if you do something unusual you might need to update it manually."
 { $subsection xref-words } ;
 
