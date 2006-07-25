@@ -258,6 +258,24 @@ M: ratio xyz
 
 [ 1234 infer ] unit-test-fails
 
+! Doug Coleman discovered this one while working on the
+! calendar library
+GENERIC: A
+GENERIC: B
+GENERIC: C
+
+M: integer A drop ;
+M: float A dup C A ;
+
+M: integer B C ;
+M: float B dup B B ;
+
+M: integer C A ;
+M: float C dup B C ;
+
+[ { 1 0 } ] [ [ A ] infer ] unit-test
+[ { 1 0 } ] [ [ B ] infer ] unit-test
+
 ! This form should not have a stack effect
 ! : bad-bin 5 [ 5 bad-bin bad-bin 5 ] [ 2drop ] if ;
 ! [ [ bad-bin ] infer ] unit-test-fails

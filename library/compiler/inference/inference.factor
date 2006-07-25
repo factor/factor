@@ -25,12 +25,7 @@ M: inference-error error. ( error -- )
     inference-error-rstate describe ;
 
 M: object value-literal ( value -- )
-    {
-        "A literal value was expected where a computed value was found.\n"
-        "This means the word you are inferring applies 'call' or 'execute'\n"
-        "to a value that is not known at compile time.\n"
-        "See the handbook for details."
-    } concat inference-error ;
+    "A literal value was expected where a computed value was found" inference-error ;
 
 ! Word properties that affect inference:
 ! - infer-effect -- must be set. controls number of inputs

@@ -134,20 +134,17 @@ M: compound apply-word ( word -- )
     ] recover ;
 
 : apply-default ( word -- )
-    dup "no-effect" word-prop [
-        no-effect
-    ] [
-        dup "infer-effect" word-prop [
-            over "infer" word-prop [
-                swap first length ensure-values call drop
-            ] [
-                dupd consume/produce
-                "terminates" word-prop [ terminate ] when
-            ] if*
+    dup "no-effect" word-prop [ no-effect ] when
+    dup "infer-effect" word-prop [
+        over "infer" word-prop [
+            swap first length ensure-values call drop
         ] [
-            apply-word
+            dupd consume/produce
+            "terminates" word-prop [ terminate ] when
         ] if*
-    ] if ;
+    ] [
+        apply-word
+    ] if* ;
 
 M: word apply-object ( word -- )
     apply-default ;
@@ -168,11 +165,7 @@ M: symbol apply-object ( word -- )
     ] if ;
 
 : no-base-case ( word -- )
-    {
-        "The base case of a recursive word could not be inferred.\n"
-        "This means the word calls itself in every control flow path.\n"
-        "See the documentation for details."
-    } concat inference-error ;
+    "Cannot infer base case" inference-error ;
 
 : notify-base-case ( -- )
     base-case-continuation get
