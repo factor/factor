@@ -5,7 +5,7 @@ HELP: usage. "( word -- )"
 { $values { "word" "a word" } }
 { $description "Prints an outliner listing all callers of a word. This may include the word itself, if it is recursive." }
 { $examples { $code "\\ reverse usage." } }
-{ $see-also usage usages } ;
+{ $see-also usage } ;
 
 HELP: apropos "( substr -- )"
 { $values { "substr" "a string" } }

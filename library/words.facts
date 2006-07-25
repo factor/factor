@@ -83,7 +83,7 @@ HELP: uses "( word -- seq )"
 
 HELP: crossref f
 { $description "Variable. A graph whose vertices are words and edges are usages. See " { $link "graphs" } "." }
-{ $see-also usages xref-words } ;
+{ $see-also usage xref-words } ;
 
 HELP: xref-word "( word -- )"
 { $values { "word" "a word" } }

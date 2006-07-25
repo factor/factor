@@ -106,11 +106,7 @@
 - [ [ dup call ] dup call ] infer hangs
 - the invalid recursion form case needs to be fixed, for inlines too
 - code gc
-
-+ something like masterscope:
-
-- does word A call word B (indirectly)?
-- which variables are read, written in a quotation
+- infer which variables are read, written in a quotation
 
 + misc:
 
