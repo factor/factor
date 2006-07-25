@@ -118,7 +118,7 @@ C: item ( quot data data-quot expire? id -- item )
           ] when*
           item-quot call 
           exit-continuation get continue 
-        ] with-exit-continuation
+        ] with-exit-continuation drop
     ] [
         "404 Callback not available" httpd-error
     ] if* ;

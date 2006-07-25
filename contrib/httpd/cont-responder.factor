@@ -5,6 +5,11 @@ USING: http httpd math namespaces io strings kernel html hashtables
        parser generic sequences callback-responder ;
 IN: cont-responder
 
+#! Used inside the session state of responders to indicate whether the
+#! next request should use the post-refresh-get pattern. It is set to
+#! true after each request.
+SYMBOL: post-refresh-get?
+
 : >callable ( quot|interp|f -- interp )
     dup continuation? [        
         [ continue ] curry
@@ -27,9 +32,9 @@ IN: cont-responder
 
 SYMBOL: current-show
 
-: store-callback-cc ( -- )
-  #! Store the current continuation in the variable 'callback-cc' 
-  #! so it can be returned to later by callbacks. Note that it
+: store-current-show ( -- )
+  #! Store the current continuation in the variable 'current-show' 
+  #! so it can be returned to later by href callbacks. Note that it
   #! recalls itself when the continuation is called to ensure that
   #! it resets its value back to the most recent show call.
   [  ( 0 -- )
@@ -40,14 +45,30 @@ SYMBOL: current-show
     nip
     restore-request
     call
-    store-callback-cc
+    store-current-show
   ] callcc0 restore-request ;
+
+: redirect-to-here ( -- )
+  #! Force a redirect to the client browser so that the browser
+  #! goes to the current point in the code. This forces an URL
+  #! change on the browser so that refreshing that URL will
+  #! immediately run from this code point. This prevents the 
+  #! "this request will issue a POST" warning from the browser
+  #! and prevents re-running the previous POST logic. This is
+  #! known as the 'post-refresh-get' pattern.
+  post-refresh-get? get [
+    [ 
+      >callable t register-callback forward-to-url
+    ] callcc1 drop restore-request
+  ] [
+    t post-refresh-get? set
+  ] if ;
 
 : (show) ( quot -- hashtable )   
     #! See comments for show. The difference is the 
     #! quotation MUST set the content-type using 'serving-html'
     #! or similar.
-    store-callback-cc
+    store-current-show redirect-to-here
     [ 
         >callable t register-callback swap with-scope 
         exit-continuation get  continue
@@ -69,7 +90,7 @@ SYMBOL: current-show
     #! See comments for show-final. The difference is the 
     #! quotation MUST set the content-type using 'serving-html'
     #! or similar.
-    store-callback-cc
+    store-current-show redirect-to-here
     with-scope exit-continuation get continue ;
 
 : show-final ( quot -- namespace )
@@ -91,9 +112,9 @@ SYMBOL: root-callback
     #! The requests for actual continuation are processed by the
     #! 'callback-responder'.
     [         
-        [ <request> request set root-callback get call ] with-scope
+        [ f post-refresh-get? set <request> request set root-callback get call ] with-scope
         exit-continuation get continue
-    ] with-exit-continuation  ;
+    ] with-exit-continuation  drop ;
 
 : quot-url ( quot -- url )
     current-show get [ continue-with ] curry curry t register-callback ;
@@ -116,7 +137,7 @@ SYMBOL: root-callback
         [ cont-get/post-responder ] "get" set 
         [ cont-get/post-responder ] "post" set 
         swap "responder" set
-        root-callback set 
+        root-callback set        
     ] make-responder ;
 
 : simple-page ( title quot -- )
