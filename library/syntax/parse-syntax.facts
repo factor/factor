@@ -229,7 +229,7 @@ HELP: C: "class definition... ;"
 { $values { "class" "a class word" } { "definition" "a constructor definition" } }
 { $description "Define a constructor word for a tuple class. The constructor definition receives a new instance of the class on the stack, with all slots initially set to " { $link f } "."
 $terpri
-"Constructors are named after the tuple class surrounded in angle brackets: " { $snippet "<" } " and " { $snippet ">" } "."  }
+"Constructors are named after the tuple class surrounded in angle brackets: " { $snippet "<" } " and " { $snippet ">" } ". Constructor words are defined in the same vocabulary as the tuple class, and the current value of the " { $link in } " variable has no effect."  }
 { $contract "The definition must only have one output, the new tuple itself." }
 { $notes "Each tuple class defines a default constructor that reads slot values from the stack. This parsing word redefines the default constructor." }
 { $see-also define-constructor } ;
