@@ -60,6 +60,11 @@ math math-internals namespaces parser sequences test vectors ;
 
 : infinite-loop infinite-loop ;
 
+[ [ infinite-loop ] infer ] unit-test-fails
+
+: no-base-case-1 dup [ no-base-case-1 ] [ no-base-case-1 ] if ;
+[ [ no-base-case-1 ] infer ] unit-test-fails
+
 : simple-recursion-1
     dup [ simple-recursion-1 ] [ ] if ;
 
@@ -280,8 +285,6 @@ M: float C dup B C ;
 ! : bad-bin 5 [ 5 bad-bin bad-bin 5 ] [ 2drop ] if ;
 ! [ [ bad-bin ] infer ] unit-test-fails
 
-! [ [ infinite-loop ] infer ] unit-test-fails
-
 ! : bad-recursion-1
 !     dup [ drop bad-recursion-1 5 ] [ ] if ;
 ! 
@@ -290,6 +293,3 @@ M: float C dup B C ;
 ! This hangs
 
 ! [ ] [ [ [ dup call ] dup call ] infer ] unit-test-fails
-
-! : no-base-case-1 dup [ no-base-case-1 ] [ no-base-case-1 ] if ;
-! [ [ no-base-case-1 ] infer ] unit-test-fails

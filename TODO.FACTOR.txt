@@ -37,7 +37,7 @@
   - only redraw visible lines
   - more efficient multi-line inserts
 - finish gui stepper
-- windows are not updated while resizing
+- cocoa: windows are not updated while resizing
 - graphical module manager tool
 - add some handy services:
   - base conversion
@@ -66,6 +66,8 @@
 
 - 'see' should show tuple constructors
 - forgetting a class should remove its methods from all generic words
+  - offer to remove generic words which are not called and have no
+    methods
 - forgetting a tuple class should forget the constructor
 - seeing a tuple class should show the constructor
 - C types should be words
@@ -90,6 +92,8 @@
 
 + compiler/ffi:
 
+- instead of decompiling words, add them to a 'recompile' set; compiler
+  treats words in the recompile set as if they were not compiled
 - mac intel: struct returns from objc methods
 - see if alien calls can be made faster
 - faster sequence= for UI
