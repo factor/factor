@@ -1,4 +1,4 @@
-USING: generic help kernel math modules words ;
+USING: generic help kernel math modules parser words ;
 
 HELP: parsing ""
 { $description "Declares the most recently defined word as a parsing word." }
