@@ -189,6 +189,7 @@ M: number +second ( timestamp n -- timestamp )
 : timestamp>vec ( dt -- vec ) tuple>array 2 8 rot <slice> ;
 
 : dt>years ( dt -- x )
+    #! Uses average month/year length since dt loses calendar data
     dt>vec [ 1 12 365.2425 8765.82 525949.2 31556952.0 ] [ / ] 2map sum ;
 : dt>months ( dt -- x ) dt>years 12 * ;
 : dt>days ( dt -- x ) dt>years 365.2425 * ;
@@ -210,7 +211,8 @@ M: number +second ( timestamp n -- timestamp )
     #! GMT time, right now
     1970 1 1 0 0 0 0 <timestamp> millis 1000 /f seconds +dt ; 
 
-: timestamp- ( timestamp timestamp -- dt ) [ >gmt timestamp>vec ] 2apply v- ;
+: timestamp- ( timestamp timestamp -- dt )
+    [ >gmt timestamp>vec ] 2apply v- vec>dt ;
 
 : now ( -- timestamp ) gmt >local-time ;
 : before ( dt -- -dt ) dt>vec [ neg ] map vec>dt ;
