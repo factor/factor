@@ -143,14 +143,14 @@ SYMBOL: sym-test
 
 [ { 1 1 } ] [ [ terminator-branch ] infer ] unit-test
 
-! : recursive-terminator
-!     dup [
-!         recursive-terminator
-!     ] [
-!         not-a-number
-!     ] if ;
-! 
-! [ { 1 0 } ] [ [ recursive-terminator ] infer ] unit-test
+: recursive-terminator
+    dup [
+        recursive-terminator
+    ] [
+        "Hi" throw
+    ] if ;
+
+[ { 1 0 } ] [ [ recursive-terminator ] infer ] unit-test
 
 GENERIC: potential-hang
 M: fixnum potential-hang dup [ potential-hang ] when ;
@@ -208,10 +208,10 @@ DEFER: blah4
 [ [ [ 1 ] [ ] bad-combinator ] infer ] unit-test-fails
 
 ! Regression
-! DEFER: do-crap
-! : more-crap dup [ drop ] [ dup do-crap call ] if ;
-! : do-crap dup [ do-crap ] [ more-crap ] if ;
-! [ [ do-crap ] infer ] unit-test-fails
+DEFER: do-crap
+: more-crap dup [ drop ] [ dup do-crap call ] if ;
+: do-crap dup [ do-crap ] [ more-crap ] if ;
+[ [ do-crap ] infer ] unit-test-fails
 
 ! Regression
 : too-deep dup [ drop ] [ 2dup too-deep too-deep * ] if ; inline
@@ -260,12 +260,30 @@ DEFER: C
 [ { 1 0 } ] [ [ C ] infer ] unit-test
 
 ! I found this bug by thinking hard about the previous one
-! DEFER: Y
-! : X dup [ swap Y ] [ ] if ;
-! : Y X ;
+DEFER: Y
+: X dup [ swap Y ] [ ] if ;
+: Y X ;
 
 [ { 2 2 } ] [ [ X ] infer ] unit-test
 [ { 2 2 } ] [ [ Y ] infer ] unit-test
+
+[ 1234 infer ] unit-test-fails
+
+! This hangs
+
+[ [ [ dup call ] dup call ] infer ] unit-test-fails
+
+! This form should not have a stack effect
+
+: bad-recursion-1
+    dup [ drop bad-recursion-1 5 ] [ ] if ;
+
+[ [ bad-recursion-1 ] infer ] unit-test-fails
+
+: bad-bin 5 [ 5 bad-bin bad-bin 5 ] [ 2drop ] if ;
+[ [ bad-bin ] infer ] unit-test-fails
+
+! Test some random library words
 
 [ { 1 1 } ] [ [ unit ] infer ] unit-test
 
@@ -302,18 +320,3 @@ DEFER: C
 [ { 1 1 } ] [ [ reverse ] infer ] unit-test
 [ { 2 1 } ] [ [ member? ] infer ] unit-test
 [ { 2 1 } ] [ [ remove ] infer ] unit-test
-
-[ 1234 infer ] unit-test-fails
-
-! This form should not have a stack effect
-! : bad-bin 5 [ 5 bad-bin bad-bin 5 ] [ 2drop ] if ;
-! [ [ bad-bin ] infer ] unit-test-fails
-
-! : bad-recursion-1
-!     dup [ drop bad-recursion-1 5 ] [ ] if ;
-! 
-! [ [ bad-recursion-1 ] infer ] unit-test-fails
-
-! This hangs
-
-! [ ] [ [ [ dup call ] dup call ] infer ] unit-test-fails
