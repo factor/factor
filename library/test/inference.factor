@@ -208,10 +208,10 @@ DEFER: blah4
 [ [ [ 1 ] [ ] bad-combinator ] infer ] unit-test-fails
 
 ! Regression
-DEFER: do-crap
-: more-crap dup [ drop ] [ dup do-crap call ] if ;
-: do-crap dup [ do-crap ] [ more-crap ] if ;
-[ [ do-crap ] infer ] unit-test-fails
+! DEFER: do-crap
+! : more-crap dup [ drop ] [ dup do-crap call ] if ;
+! : do-crap dup [ do-crap ] [ more-crap ] if ;
+! [ [ do-crap ] infer ] unit-test-fails
 
 ! Regression
 : too-deep dup [ drop ] [ 2dup too-deep too-deep * ] if ; inline
@@ -224,6 +224,48 @@ M: ratio xyz
     [ >fraction ] 2apply swapd >r 2array swap r> 2array swap ;
 
 [ t ] [ [ [ xyz ] infer ] catch inference-error? ] unit-test
+
+! Doug Coleman discovered this one while working on the
+! calendar library
+DEFER: A
+DEFER: B
+DEFER: C
+
+: A
+    dup {
+        [ drop ]
+        [ A ]
+        [ \ A no-method ]
+        [ dup C A ]
+    } dispatch ;
+
+: B
+    dup {
+        [ C ]
+        [ B ]
+        [ \ B no-method ]
+        [ dup B B ]
+    } dispatch ;
+
+: C
+    dup {
+        [ A ]
+        [ C ]
+        [ \ C no-method ]
+        [ dup B C ]
+    } dispatch ;
+
+[ { 1 0 } ] [ [ A ] infer ] unit-test
+[ { 1 0 } ] [ [ B ] infer ] unit-test
+[ { 1 0 } ] [ [ C ] infer ] unit-test
+
+! I found this bug by thinking hard about the previous one
+DEFER: Y
+: X dup [ swap Y ] [ ] if ;
+: Y X ;
+
+[ { 2 2 } ] [ [ X ] infer ] unit-test
+[ { 2 2 } ] [ [ Y ] infer ] unit-test
 
 [ { 1 1 } ] [ [ unit ] infer ] unit-test
 
@@ -262,24 +304,6 @@ M: ratio xyz
 [ { 2 1 } ] [ [ remove ] infer ] unit-test
 
 [ 1234 infer ] unit-test-fails
-
-! Doug Coleman discovered this one while working on the
-! calendar library
-GENERIC: A
-GENERIC: B
-GENERIC: C
-
-M: integer A drop ;
-M: float A dup C A ;
-
-M: integer B C ;
-M: float B dup B B ;
-
-M: integer C A ;
-M: float C dup B C ;
-
-[ { 1 0 } ] [ [ A ] infer ] unit-test
-[ { 1 0 } ] [ [ B ] infer ] unit-test
 
 ! This form should not have a stack effect
 ! : bad-bin 5 [ 5 bad-bin bad-bin 5 ] [ 2drop ] if ;

@@ -105,7 +105,7 @@ M: #call-label collect-recursion* ( label node -- )
     #! control flow by throwing an exception or restoring a
     #! continuation.
     [
-        dup inferring-base-case set
+        dup [ inferring-base-case on ] when
         recursive-state get init-inference
         over >r inline-block nip
         [ terminated? get effect ] bind r>
@@ -118,7 +118,7 @@ M: object apply-word ( word -- )
     no-effect ;
 
 : save-effect ( word terminates effect -- )
-    inferring-base-case get [
+    over [
         3drop
     ] [
         >r dupd "terminates" set-word-prop r>
@@ -163,13 +163,6 @@ M: symbol apply-object ( word -- )
         drop dup t infer-compound swap
         [ 2drop ] [ "base-case" set-word-prop ] if
     ] if ;
-
-: no-base-case ( word -- )
-    "Cannot infer base case" inference-error ;
-
-: notify-base-case ( -- )
-    base-case-continuation get
-    [ t swap continue-with ] [ no-base-case ] if* ;
 
 : recursive-word ( word rstate -- )
     #! Handle a recursive call, by either applying a previously

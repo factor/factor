@@ -87,11 +87,20 @@ namespaces parser prettyprint sequences strings vectors words ;
             dup value-literal infer-quot
             terminated? get [ #values node, ] unless
             f
-        ] callcc1 [ terminate ] when drop
-    ] make-hash ;
+        ] callcc1 nip
+    ] make-hash swap [ drop f ] when ;
+
+: no-base-case ( -- )
+    "Cannot infer base case" inference-error ;
+
+: notify-base-case ( -- )
+    base-case-continuation get
+    [ t swap continue-with ] [ no-base-case ] if* ;
 
 : (infer-branches) ( branchlist -- list )
-    [ infer-branch ] map dup unify-effects unify-dataflow ;
+    [ infer-branch ] map [ ] subset
+    dup empty? [ notify-base-case ] when
+    dup unify-effects unify-dataflow ;
 
 : infer-branches ( branches node -- )
     #! Recursive stack effect inference is done here. If one of
