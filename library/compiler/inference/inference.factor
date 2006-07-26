@@ -5,9 +5,6 @@ USING: arrays errors generic inspector interpreter io kernel
 math namespaces parser prettyprint sequences strings
 vectors words ;
 
-! This variable takes a boolean value.
-SYMBOL: inferring-base-case
-
 ! Called when a recursive call during base case inference is
 ! found. Either tries to infer another branch, or gives up.
 SYMBOL: base-case-continuation
@@ -104,7 +101,6 @@ M: quotation infer-quot ( quot -- )
 
 : with-infer ( quot -- )
     [
-        inferring-base-case off
         base-case-continuation off
         { } recursive-state set
         f init-inference

@@ -105,7 +105,6 @@ M: #call-label collect-recursion* ( label node -- )
     #! control flow by throwing an exception or restoring a
     #! continuation.
     [
-        dup [ inferring-base-case on ] when
         recursive-state get init-inference
         over >r inline-block nip
         [ terminated? get effect ] bind r>
