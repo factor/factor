@@ -20,7 +20,7 @@ C: incremental ( pack -- incremental )
     dup delegate pref-dim over set-incremental-cursor ;
 
 M: incremental pref-dim* ( incremental -- dim )
-    dup gadget-relayout? [
+    dup gadget-state [
         dup delegate pref-dim over set-incremental-cursor
     ] when incremental-cursor ;
 

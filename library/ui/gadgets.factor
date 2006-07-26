@@ -35,10 +35,17 @@ M: array rect-dim drop { 0 0 } ;
 : intersects? ( rect/point rect -- ? )
     (rect-intersect) [v-] { 0 0 } = ;
 
+! gadget-pref-dim is a cached value; call pref-dim instead
+! gadget-children is a vector
+! gadget-orientation is { 1 0 } or { 0 1 }
+! gadget-state is f, relayout or relayout-1
+! gadget-root? relayout requests do not propogate higher
+! gadget-grafted? are we part of a live world's gadget hierarchy
+! gadget-interior, gadget-boundary: see paint.factor
 TUPLE: gadget
-    pref-dim parent children orientation
-    visible? relayout? root? clipped? grafted?
-    interior boundary ;
+pref-dim parent children orientation state
+visible? root? clipped? grafted?
+interior boundary ;
 
 M: gadget = eq? ;
 

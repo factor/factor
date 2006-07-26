@@ -4,7 +4,7 @@ USING: errors generic hashtables kernel math
 namespaces queues sequences ;
 IN: gadgets
 
-: invalidate ( gadget -- ) t swap set-gadget-relayout? ;
+: invalidate ( gadget state -- ) swap set-gadget-state ;
 
 : forget-pref-dim ( gadget -- ) f swap set-gadget-pref-dim ;
 
@@ -14,8 +14,8 @@ IN: gadgets
 
 DEFER: relayout
 
-: invalidate* ( gadget -- )
-    dup invalidate
+: invalidate* ( gadget state -- )
+    dupd invalidate
     dup forget-pref-dim
     dup gadget-root?
     [ add-invalid ] [ gadget-parent [ relayout ] when* ] if ;
@@ -24,16 +24,16 @@ DEFER: relayout
     #! Relayout and redraw a gadget and its parent before the
     #! next iteration of the event loop. Should be used when the
     #! gadget's size has potentially changed. See relayout-1.
-    dup gadget-relayout?
-    [ drop ] [ invalidate* ] if ;
+    dup gadget-state \ relayout eq?
+    [ drop ] [ \ relayout invalidate* ] if ;
 
 : relayout-1 ( gadget -- )
     #! Relayout and redraw a gadget before th next iteration of
     #! the event loop. Should be used if the gadget should be
     #! repainted, or if its internal layout changed, but its
     #! preferred size did not change.
-    dup gadget-relayout?
-    [ drop ] [ dup invalidate add-invalid ] if ;
+    dup gadget-state
+    [ drop ] [ dup \ relayout-1 invalidate add-invalid ] if ;
 
 : show-gadget t over set-gadget-visible? relayout-1 ;
 
@@ -77,8 +77,8 @@ DEFER: layout
     #! Position the children of the gadget inside the gadget.
     #! Note that nothing is done if the gadget does not need to
     #! be laid out.
-    dup gadget-relayout? [
-        f over set-gadget-relayout?
+    dup gadget-state [
+        f over set-gadget-state
         dup layout* dup layout-children
     ] when drop ;
 
