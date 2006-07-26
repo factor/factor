@@ -117,12 +117,7 @@ M: object apply-word ( word -- )
     no-effect ;
 
 : save-effect ( word terminates effect -- )
-    over [
-        3drop
-    ] [
-        >r dupd "terminates" set-word-prop r>
-        "infer-effect" set-word-prop
-    ] if ;
+    swap [ 2drop ] [ "infer-effect" set-word-prop ] if ;
 
 M: compound apply-word ( word -- )
     #! Infer a compound word's stack effect.
@@ -138,8 +133,7 @@ M: compound apply-word ( word -- )
         over "infer" word-prop [
             swap first length ensure-values call drop
         ] [
-            dupd consume/produce
-            "terminates" word-prop [ terminate ] when
+            consume/produce
         ] if*
     ] [
         apply-word

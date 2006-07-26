@@ -91,7 +91,7 @@ M: alien-invoke stack-reserve*
 M: compound unxref-word*
     dup "infer" word-prop [
         dup
-        { "infer-effect" "base-case" "no-effect" "terminates" }
+        { "infer-effect" "base-case" "no-effect" }
         reset-props
         dup word-def \ alien-invoke swap member?
         [ dup update-xt ] unless

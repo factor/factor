@@ -260,9 +260,9 @@ DEFER: C
 [ { 1 0 } ] [ [ C ] infer ] unit-test
 
 ! I found this bug by thinking hard about the previous one
-DEFER: Y
-: X dup [ swap Y ] [ ] if ;
-: Y X ;
+! DEFER: Y
+! : X dup [ swap Y ] [ ] if ;
+! : Y X ;
 
 [ { 2 2 } ] [ [ X ] infer ] unit-test
 [ { 2 2 } ] [ [ Y ] infer ] unit-test

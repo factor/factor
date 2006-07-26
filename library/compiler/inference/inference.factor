@@ -27,7 +27,7 @@ M: object value-literal ( value -- )
 ! Word properties that affect inference:
 ! - infer-effect -- must be set. controls number of inputs
 ! expected, and number of outputs produced.
-! - infer - quotation with custom inference behavior; if uses
+! - infer - quotation with custom inference behavior; 'if' uses
 ! this. Word is passed on the stack.
 
 ! Vector of results we had to add to the datastack. Ie, the

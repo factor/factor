@@ -75,6 +75,19 @@ namespaces parser prettyprint sequences strings vectors words ;
     dataflow-graph off
     current-node off ;
 
+: no-base-case ( -- )
+    "Cannot infer base case" inference-error ;
+
+: recursive-branch ( hash ? -- obj )
+    #! If the branch made an unresolved recursive call, and we
+    #! are inferring the base case, ignore the branch (the base
+    #! case being the stack effect of the branches not making
+    #! recursive calls). Otherwise, raise an error.
+    [
+        base-case-continuation get
+        [ drop f ] [ no-base-case ] if
+    ] when ;
+
 : infer-branch ( value -- namespace )
     #! Return a namespace with inferencer variables:
     #! meta-d, meta-c, d-in. They are set to f if
@@ -88,10 +101,7 @@ namespaces parser prettyprint sequences strings vectors words ;
             terminated? get [ #values node, ] unless
             f
         ] callcc1 nip
-    ] make-hash swap [ drop f ] when ;
-
-: no-base-case ( -- )
-    "Cannot infer base case" inference-error ;
+    ] make-hash swap recursive-branch ;
 
 : notify-base-case ( -- )
     base-case-continuation get

@@ -5,7 +5,6 @@
   - scroll to caret
   - better listener multi-line expression handling
   - history doesn't work in a good way if you ^K the input
-- inference bug
 
 - httpd search tools
 - remaining HTML issues need fixing
@@ -95,11 +94,13 @@
 - T{ link f "foo" "bar" } see
 - T{ link f "foo" "bar" } jedit
 - T{ link f "foo" "bar" } reload
+- generic 'define ( asset def -- )'
 - file out
 - make 'forget' generic
 
 + compiler/ffi:
 
+- nasty inference regressions
 - instead of decompiling words, add them to a 'recompile' set; compiler
   treats words in the recompile set as if they were not compiled
 - mac intel: struct returns from objc methods
