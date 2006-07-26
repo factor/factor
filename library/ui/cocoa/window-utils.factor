@@ -43,6 +43,9 @@ USING: arrays gadgets kernel math objc sequences ;
     -> contentRectForFrameRect:styleMask: ;
 
 "NSObject" "FactorWindowDelegate" {
+    ! Doesn't work on Intel since we don't support struct
+    ! returns yet
+
     ! {
     !     "windowWillUseStandardFrame:defaultFrame:" "NSRect"
     !     { "id" "SEL" "id" "NSRect" }

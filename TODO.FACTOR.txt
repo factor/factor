@@ -3,8 +3,8 @@
 - windows port from erg
 - editor:
   - scroll to caret
-  - clicking input doesn't resize editor gadget
   - better listener multi-line expression handling
+  - history doesn't work in a good way if you ^K the input
 - inference bug
 
 - httpd search tools
@@ -21,6 +21,13 @@
 
 + ui:
 
+- shortcuts:
+  - find a listener
+  - find a browser
+  - find a help window
+  - they'll either focus such a window, or if the current window is of
+    that type, cycle
+- thumb min size
 - support x11's large selections, if needed
 - own-selection violates ICCCM
 - one-column table doesn't need borders...?
@@ -36,6 +43,7 @@
   - search and replace
   - only redraw visible lines
   - more efficient multi-line inserts
+  - editor should support stream output protocol
 - finish gui stepper
 - cocoa: windows are not updated while resizing
 - graphical module manager tool
