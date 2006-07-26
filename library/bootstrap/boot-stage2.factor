@@ -21,6 +21,7 @@ parser sequences sequences-internals words ;
         windows? [
             "/library/ui/windows/load.factor" run-resource
         ] when
+
         "native-io" get [
             unix? [
                 "/library/io/unix/load.factor" run-resource

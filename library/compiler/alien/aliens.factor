@@ -37,9 +37,5 @@ global [ "libraries" nest drop ] bind
         [ "abi" set "name" set ] make-hash swap set
     ] bind ;
 
-: add-simple-library ( name file -- ) 
-    windows? ".dll" ".so" ? append
-    windows? "stdcall" "cdecl" ? add-library ;
-
 : library-abi ( library -- abi )
     library "abi" swap ?hash [ "cdecl" ] unless* ;

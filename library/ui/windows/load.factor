@@ -2,13 +2,13 @@ IN: scratchpad
 USING: alien compiler kernel namespaces parser sequences words ;
 
 {
-    { "gdi32" "gdi32" }
-    { "user32" "user32" }
-    { "kernel32" "kernel32" }
-    { "winsock" "ws2_32" }
-    { "mswsock" "mswsock" }
-} [ first2 add-simple-library ] each
-"libc"     "msvcrt.dll"   "cdecl"   add-library
+    { "gdi32"    "gdi32.dll"    "stdcall" }
+    { "user32"   "user32.dll"   "stdcall" }
+    { "kernel32" "kernel32.dll" "stdcall" }
+    { "winsock"  "ws2_32.dll"   "stdcall" }
+    { "mswsock"  "mswsock.dll"  "stdcall" }
+    { "libc"     "msvcrt.dll"   "cdecl"   }
+} [ first3 add-library ] each
 
 { 
     "windows-messages"
