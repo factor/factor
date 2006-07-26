@@ -158,17 +158,14 @@ TUPLE: process node links pid mailbox ;
   #! that process terminates.
   localnode swap unit gensym unparse make-mailbox <process> ;
 
-#! The 'self-process' variable holds the currently executing process.
-SYMBOL: self-process
-
 : self ( -- process )
   #! Returns the contents of the 'self-process' variables which
   #! is the process object for the current process.
-  self-process get ;
+  \ self get-global ;
 
 : init-main-process ( -- )
-  #! Setup the main process.
-  make-process self-process set ;
+  #! Setup the main process.  
+  make-process \ self set-global ;
 
 init-main-process
 
@@ -176,7 +173,7 @@ init-main-process
   #! Calls the quotation with 'self' set
   #! to the given process.
   [
-    self-process set
+    \ self set-global 
   ] make-hash
   swap bind ;
 
@@ -375,7 +372,7 @@ SYMBOL: quit-cc
   #! and jumping back into it from a spawn and keeping the 'self'
   #! variable correct. It's a workaround until I can find out how to
   #! stop 'self' from being clobbered back to its old value.
-  [ ] callcc1 dup process? [ self-process set f ] when ;
+  [ ] callcc1 dup process? [ \ self set-global f ] when ;
   
 : call-server-cc ( server-cc -- )
   #! Calls the server continuation passing the current 'self'
