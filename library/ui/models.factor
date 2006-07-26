@@ -137,7 +137,7 @@ G: (add-history) ( history vector -- )
     1 standard-combination ;
 
 M: history (add-history) ( history vector -- )
-    swap model-value dup [ 2drop ] [ swap push ] if ;
+    swap model-value dup [ swap push ] [ 2drop ] if ;
 
 : go-back/forward ( history to from -- )
     dup empty?
