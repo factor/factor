@@ -285,24 +285,7 @@ run-boids ;
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 USING: gadgets-frames gadgets-labels gadgets-theme gadgets-grids
-       gadgets-editors gadgets-buttons ;
-
-TUPLE: field label editor quot ;
-
-VAR: field
-
-C: field ( label-text editor-text quot -- <field> )
-[ field ]
-[ field> set-field-quot
-  <editor> field> set-field-editor
-  <label> field> set-field-label
-  field> field-label field> field-editor 2array make-shelf
-  field> set-gadget-delegate
-  field> ]
-let ;
-
-M: field gadget-gestures
-drop H{ { T{ key-down f f "RETURN" } [ dup field-quot call ] } } ;
+       gadgets-text gadgets-buttons ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
@@ -314,12 +297,13 @@ VARS: ns frame ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-: number-symbol-field ( label init symbol -- <field> )
-1array >quotation [ set ] append
-[ field-editor editor-text string>number ]
-swap append
-ns> swap [bind]
-<field> ;
+: number-field-quot ( symbol -- quot )
+1array >quotation [ set ] append [ editor-text string>number ] swap append ;
+
+: number-field ( label symbol init -- gadget )
+swap number-field-quot ns> swap [bind] f swap <field> tuck set-editor-text
+swap <label> swap
+2array make-shelf ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
@@ -339,26 +323,26 @@ ns> [ init-slate
 ] bind
 
 "Weight" <label> dup title-theme 1array
-"Alignment:  " "1" alignment-weight  number-symbol-field
-"Cohesion:   " "1" cohesion-weight   number-symbol-field
-"Separation: " "1" separation-weight number-symbol-field
+"Alignment:  " alignment-weight "1" number-field
+"Cohesion:   " cohesion-weight  "1" number-field
+"Separation: " alignment-weight "1" number-field
 3array append
 
 "Radius" <label> dup title-theme 1array
-"Alignment:  " "50" alignment-radius  number-symbol-field
-"Cohesion:   " "75" cohesion-radius   number-symbol-field
-"Separation: " "25" separation-radius number-symbol-field
+"Alignment:  " alignment-radius  "50" number-field
+"Cohesion:   " cohesion-radius   "75" number-field
+"Separation: " separation-radius "25" number-field
 3array append
 
 "View angle" <label> dup title-theme 1array
-"Alignment:  " "180" alignment-view-angle  number-symbol-field
-"Cohesion:   " "180" cohesion-view-angle   number-symbol-field
-"Separation: " "180" separation-view-angle number-symbol-field
+"Alignment:  " alignment-view-angle  "180" number-field
+"Cohesion:   " cohesion-view-angle   "180" number-field
+"Separation: " separation-view-angle "180" number-field
 3array append
 
 "" <label> dup title-theme 1array
 
-"Time slice: " "10" time-slice number-symbol-field 1array
+"Time slice: " time-slice "10" number-field 1array
 
 "Stop" ns> [ t stop? set ] [bind] <bevel-button>
 "Start" ns> [ f stop? set [ run-boids ] in-thread ] [bind] <bevel-button>
