@@ -3,11 +3,10 @@
 IN: gadgets-text
 USING: gadgets gadgets-controls generic kernel models sequences ;
 
-TUPLE: field model quot ;
+TUPLE: field model ;
 
 C: field ( model quot -- field )
     <editor> over set-delegate
-    [ set-field-quot ] keep
     [ set-field-model ] keep
     dup dup set-control-self ;
 
@@ -17,9 +16,8 @@ C: field ( model quot -- field )
 
 : field-commit ( field -- string )
     [ editor-text ] keep
-    dup field-model [ dupd set-model ] when*
-    dup field-quot [ dupd call ] when*
-    dup control-model add-history
+    [ field-model [ dupd set-model ] when* ] keep
+    [ control-model add-history ] keep
     select-all ;
 
 field H{
