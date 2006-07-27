@@ -161,7 +161,7 @@ TUPLE: process node links pid mailbox ;
 : self ( -- process )
   #! Returns the contents of the 'self-process' variables which
   #! is the process object for the current process.
-  \ self get-global ;
+  \ self get  ;
 
 : init-main-process ( -- )
   #! Setup the main process.  
@@ -173,7 +173,7 @@ init-main-process
   #! Calls the quotation with 'self' set
   #! to the given process.
   [
-    \ self set-global 
+    \ self set 
   ] make-hash
   swap bind ;
 
