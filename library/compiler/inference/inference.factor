@@ -1,5 +1,5 @@
-! Copyright (C) 2004, 2005 Slava Pestov.
-! See http://factor.sf.net/license.txt for BSD license.
+! Copyright (C) 2004, 2006 Slava Pestov.
+! See http://factorcode.org/license.txt for BSD license.
 IN: inference
 USING: arrays errors generic inspector interpreter io kernel
 math namespaces parser prettyprint sequences strings
@@ -30,7 +30,7 @@ M: object value-literal ( value -- )
 ! - infer - quotation with custom inference behavior; 'if' uses
 ! this. Word is passed on the stack.
 
-! Vector of results we had to add to the datastack. Ie, the
+! Number of values we had to add to the datastack. Ie, the
 ! inputs.
 SYMBOL: d-in
 
@@ -40,13 +40,13 @@ SYMBOL: d-in
 
 : value-vector ( n -- vector ) [ drop <computed> ] map >vector ;
 
+: add-inputs ( n stack -- n stack )
+    tuck length - dup 0 >
+    [ dup value-vector [ rot nappend ] keep ]
+    [ drop 0 swap ] if ;
+
 : ensure-values ( n -- )
-    meta-d get length 2dup > [
-        - dup d-in [ + ] change
-        value-vector meta-d [ dupd nappend ] change 
-    ] [
-        2drop
-    ] if ;
+    meta-d [ add-inputs ] change d-in [ + ] change ;
 
 : effect ( -- { in# out# } )
     #! After inference is finished, collect information.

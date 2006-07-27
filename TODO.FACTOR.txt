@@ -1,5 +1,8 @@
 + 0.83:
 
+- nasty inference regressions
+- [ [ dup call ] dup call ] infer hangs
+- the invalid recursion form case needs to be fixed, for inlines too
 - windows port from erg
 - editor:
   - scroll to caret
@@ -100,7 +103,6 @@
 
 + compiler/ffi:
 
-- nasty inference regressions
 - instead of decompiling words, add them to a 'recompile' set; compiler
   treats words in the recompile set as if they were not compiled
 - mac intel: struct returns from objc methods
@@ -115,8 +117,6 @@
 - intrinsic fixnum>float float>fixnum
 - remove literal table
 - C functions returning structs by value
-- [ [ dup call ] dup call ] infer hangs
-- the invalid recursion form case needs to be fixed, for inlines too
 - code gc
 - infer which variables are read, written in a quotation
 

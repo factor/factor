@@ -1,17 +1,14 @@
-! Copyright (C) 2004, 2005 Slava Pestov.
-! See http://factor.sf.net/license.txt for BSD license.
+! Copyright (C) 2004, 2006 Slava Pestov.
+! See http://factorcode.org/license.txt for BSD license.
 IN: inference
 USING: arrays errors generic hashtables interpreter kernel math
 namespaces parser prettyprint sequences strings vectors words ;
 
-: add-inputs ( n stack -- stack )
-    tuck length - dup 0 >
-    [ value-vector dup rot nappend ] [ drop ] if ;
-
 : unify-lengths ( seq -- seq )
     #! Pad all vectors to the same length. If one vector is
     #! shorter, pad it with unknown results at the bottom.
-    dup 0 [ length max ] reduce swap [ add-inputs ] map-with ;
+    dup 0 [ length max ] reduce
+    swap [ add-inputs nip ] map-with ;
 
 : unify-values ( seq -- value )
     #! If all values in list are equal, return the value.
@@ -34,9 +31,8 @@ namespaces parser prettyprint sequences strings vectors words ;
     0 [ [ max ] when* ] reduce ;
 
 : unbalanced-branches ( in out -- )
-    { "Unbalanced branches:" } -rot [
-        swap unparse " " rot length unparse append3
-    ] 2map append "\n" join inference-error ;
+    [ swap unparse " " rot length unparse append3 ] 2map
+    "Unbalanced branches:" add* "\n" join inference-error ;
 
 : unify-effect ( in out -- in out )
     #! In is a sequence of integers; out is a sequence of stacks.
@@ -52,7 +48,7 @@ namespaces parser prettyprint sequences strings vectors words ;
     ] map-with ;
 
 : datastack-effect ( seq -- )
-    dup d-in active-variable
+    d-in over [ hash ] map-with
     swap meta-d active-variable
     unify-effect meta-d set d-in set ;
 
@@ -66,7 +62,7 @@ namespaces parser prettyprint sequences strings vectors words ;
     [ terminated? swap hash ] all? terminated? set ;
 
 : unify-dataflow ( effects -- nodes )
-    [ [ dataflow-graph get ] bind ] map ;
+    [ dataflow-graph swap hash ] map ;
 
 : copy-inference ( -- )
     meta-r [ clone ] change
