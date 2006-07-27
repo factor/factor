@@ -344,9 +344,9 @@ ns> [ init-slate
 
 "Time slice: " time-slice "10" number-field 1array
 
-"Stop" ns> [ t stop? set ] [bind] <bevel-button>
-"Start" ns> [ f stop? set [ run-boids ] in-thread ] [bind] <bevel-button>
-"Reset" ns> [ 50 random-boids boids set ] [bind] <bevel-button>
+"Stop" ns> [ drop t stop? set ] [bind] <bevel-button>
+"Start" ns> [ drop f stop? set [ run-boids ] in-thread ] [bind] <bevel-button>
+"Reset" ns> [ drop 50 random-boids boids set ] [bind] <bevel-button>
 3array
 
 append append append append append
