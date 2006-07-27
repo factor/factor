@@ -8,6 +8,7 @@
   - scroll to caret
   - better listener multi-line expression handling
   - history doesn't work in a good way if you ^K the input
+  - history: move caret to end
 
 - httpd search tools
 - remaining HTML issues need fixing

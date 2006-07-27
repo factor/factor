@@ -116,13 +116,13 @@ M: object apply-word ( word -- )
     #! A primitive with an unknown stack effect.
     no-effect ;
 
-: save-effect ( word terminates effect -- )
-    swap [ 2drop ] [ "infer-effect" set-word-prop ] if ;
+: save-effect ( word terminates effect prop -- )
+    rot [ 3drop ] [ set-word-prop ] if ;
 
 M: compound apply-word ( word -- )
     #! Infer a compound word's stack effect.
     [
-        dup f infer-compound save-effect
+        dup f infer-compound "infer-effect" save-effect
     ] [
         swap t "no-effect" set-word-prop rethrow
     ] recover ;
@@ -153,8 +153,7 @@ M: symbol apply-object ( word -- )
     over "inline" word-prop [
         inline-base-case
     ] [
-        drop dup t infer-compound swap
-        [ 2drop ] [ "base-case" set-word-prop ] if
+        drop dup t infer-compound "base-case" save-effect
     ] if ;
 
 : recursive-word ( word rstate -- )
