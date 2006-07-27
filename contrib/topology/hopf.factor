@@ -25,13 +25,14 @@ IN: hopf
 
 ! Differentiate using d
 
+: ?set-hash ( value key hash/f -- hash )
+    [ [ set-hash ] keep ] [ associate ] if* ;
+
 SYMBOL: degrees
 
-H{ } clone degrees set
+: deg= degrees [ ?set-hash ] change ;
 
-: deg= degrees get set-hash ;
-
-: deg degrees get hash ;
+: deg degrees get ?hash ;
 
 : h. ( vec -- )
     hash>alist [ first2 >r concat r> 2array ] map (l.) ;
@@ -67,13 +68,16 @@ H{ } clone degrees set
 : duplicates? ( seq -- ? )
     dup prune [ length ] 2apply > ;
 
-: odd* ( n terms1 terms2 -- n terms )
-    append dup duplicates? [
+: (odd*) ( n terms -- n terms )
+    dup duplicates? [
         2drop 0 { }
     ] [
         dup permutation inversions -1^ rot *
         swap natural-sort
     ] if ;
+
+: odd* ( n terms1 terms2 -- n terms )
+    append (odd*) ;
 
 : even* ( terms1 terms2 -- terms )
     append natural-sort ;
@@ -96,11 +100,10 @@ H{ } clone degrees set
 
 SYMBOL: boundaries
 
-H{ } clone boundaries set
+: d= ( value basis -- )
+    boundaries [ ?set-hash ] change ;
 
-: d= ( value basis -- ) boundaries get set-hash ;
-
-: ((d)) ( basis -- value ) boundaries get hash ;
+: ((d)) ( basis -- value ) boundaries get ?hash ;
 
 : dx.y ( x y -- vec ) >r ((d)) r> h* ;
 
@@ -133,6 +136,8 @@ DEFER: (d)
         3dup nth-bit? [ nth ] [ 2drop f ] if
     ] map [ ] subset 2nip ;
 
+SYMBOL: generators
+
 : basis ( generators -- seq )
     [
         dup length 1+ [ drop V{ } clone ] map \ basis set
@@ -142,4 +147,4 @@ DEFER: (d)
         \ basis get [ [ { } 2array ] map ] map
     ] with-scope ;
 
-: H* ( generators -- seq ) basis ker/im-d (H*) ;
+: H* ( -- seq ) generators get basis ker/im-d (H*) ;
