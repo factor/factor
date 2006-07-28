@@ -62,11 +62,11 @@ opengl sequences ;
     dup -> modifierFlags modifiers modifier swap key-code ;
 
 : send-key-event ( view event quot -- ? )
-    >r event>gesture r> call swap window world-focus
+    >r event>gesture r> call swap window-focus
     handle-gesture ; inline
 
 : send-user-input ( view event -- )
-    -> characters CF>string swap window world-focus user-input ;
+    -> characters CF>string swap window-focus user-input ;
 
 : send-key-down-event ( view event -- )
     2dup [ <key-down> ] send-key-event
@@ -93,7 +93,18 @@ opengl sequences ;
     "NSViewFrameDidChangeNotification" <NSString>
     r> add-observer ;
 
+: string-or-nil? ( NSString -- ? )
+    [ dup CF>string NSStringPboardType = ] [ t ] if* ;
+
+: valid-service? ( gadget send-type return-type -- ? )
+    over string-or-nil? over string-or-nil? and [
+        drop [ swap gadget-selection? ] [ 2drop t ] if
+    ] [
+        3drop f
+    ] if ;
+
 "NSOpenGLView" "FactorView" {
+    ! Events
     { "acceptsFirstMouse:" "bool" { "id" "SEL" "id" }
         [ 3drop 1 ]
     }
@@ -176,6 +187,35 @@ opengl sequences ;
 
     { "selectAll:" "id" { "id" "SEL" "id" }
         [ [ nip T{ select-all-action } send-action$ ] ui-try ]
+    }
+
+    ! Services
+    { "validRequestorForSendType:returnType:" "id" { "id" "SEL" "id" "id" }
+        [
+            ! We return either self or nil
+            >r >r over window-focus r> r>
+            valid-service? [ drop ] [ 2drop f ] if
+        ]
+    }
+
+    { "writeSelectionToPasteboard:types:" "bool" { "id" "SEL" "id" "id" }
+        CF>string-array NSStringPboardType swap member? [
+            >r drop window-focus gadget-selection dup [
+                r> set-pasteboard-string t
+            ] [
+                r> 2drop f
+            ] if
+        ] [
+            3drop f
+        ] if
+    }
+
+    { "readSelectionFromPasteboard:" "bool" { "id" "SEL" "id" }
+        pasteboard-string dup [
+            >r drop window-focus r> swap user-input t
+        ] [
+            3drop f
+        ] if
     }
 
     { "updateFactorGadgetSize:" "void" { "id" "SEL" "id" }

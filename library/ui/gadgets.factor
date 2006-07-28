@@ -108,3 +108,12 @@ M: gadget gadget-help drop f ;
 GENERIC: gadget-title ( gadget -- string )
 
 M: gadget gadget-title drop "Factor" <model> ;
+
+! Selection protocol
+GENERIC: gadget-selection? ( gadget -- ? )
+
+M: gadget gadget-selection? drop f ;
+
+GENERIC: gadget-selection ( gadget -- string/f )
+
+M: gadget gadget-selection drop f ;

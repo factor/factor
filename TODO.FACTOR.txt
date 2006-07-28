@@ -39,7 +39,6 @@
   - offer to remove generic words which are not called and have no
     methods
 - forgetting a tuple class should forget the constructor
-- seeing a tuple class should show the constructor
 - see by itself only shows the G: def
 - { class generic } see supports forms:
   { f generic } to show all methods

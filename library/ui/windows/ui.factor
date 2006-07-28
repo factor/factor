@@ -112,26 +112,24 @@ SYMBOL: wParam
 SYMBOL: uMsg
 SYMBOL: hWnd
 
-: get-focus ( hWnd -- gadget )
-    window world-focus ;
-
 : handle-wm-keydown ( hWnd uMsg wParam lParam -- )
     lParam set wParam set uMsg set hWnd set
     wParam get exclude-key-wm-keydown? [
         wParam get keystroke>gesture <key-down>
-        hWnd get get-focus handle-gesture drop 
+        hWnd get window-focus handle-gesture drop 
     ] unless ;
 
 : handle-wm-char ( hWnd uMsg wParam lParam -- )
     lParam set wParam set uMsg set hWnd set
     wParam get exclude-key-wm-char? ctrl? or [
         wParam get ch>string
-        hWnd get get-focus user-input
+        hWnd get window-focus user-input
     ] unless ;
 
 : handle-wm-keyup ( hWnd uMsg wParam lParam -- )
     lParam set wParam set uMsg set hWnd set
-    wParam get keystroke>gesture <key-up> hWnd get get-focus handle-gesture
+    wParam get keystroke>gesture <key-up>
+    hWnd get window-focus handle-gesture
     drop ;
 
 : cleanup-window ( handle -- )

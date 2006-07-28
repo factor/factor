@@ -11,6 +11,8 @@ SYMBOL: windows
 
 : window ( handle -- world ) windows get-global assoc ;
 
+: window-focus ( handle -- gadget ) window world-focus ;
+
 : register-window ( world handle -- )
     swap 2array windows get-global push ;
 
