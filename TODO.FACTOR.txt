@@ -9,6 +9,7 @@
 
 + ui:
 
+- "benchmark/help" runs out of memory
 - shortcuts:
   - find a listener
   - find a browser
