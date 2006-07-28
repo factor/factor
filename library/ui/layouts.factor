@@ -12,7 +12,11 @@ DEFER: relayout-1
 
 : invalid ( -- queue ) \ invalid get-global ;
 
-: add-invalid ( gadget -- ) invalid enque ;
+: add-invalid ( gadget -- )
+    #! When unit testing gadgets without the UI running, the
+    #! invalid queue is not initialized and we simply ignore
+    #! invalidation requests.
+    invalid [ enque ] [ drop ] if* ;
 
 DEFER: relayout
 

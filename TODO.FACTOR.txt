@@ -7,7 +7,6 @@
 - gdb triggers 'mutliple i/o ops on port' error
 - "localhost" 50 <client> won't fail
 - factorcode httpd crashed: bad file descriptor
-- gadgets/fields unit test fails if UI not running
 - one-column table doesn't need borders...?
 - editor:
   - scroll to caret
