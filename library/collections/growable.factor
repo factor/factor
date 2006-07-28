@@ -15,6 +15,11 @@ GENERIC: set-fill
 : expand ( len seq -- )
     [ underlying resize ] keep set-underlying ; inline
 
+: contract ( len seq -- )
+    dup length pick - [
+        [ swap >r + 0 swap r> set-nth-unsafe ] 3keep
+    ] repeat 2drop ;
+
 : new-size ( n -- n ) 1+ 3 * ; inline
 
 : ensure ( n seq -- )
@@ -35,8 +40,10 @@ TUPLE: bounds-error index seq ;
     2dup bounds-check? [ bounds-error ] unless ; inline
 
 : grow-length ( len seq -- )
-    growable-check 2dup capacity > [ 2dup expand ] when set-fill
-    ; inline
+    growable-check
+    2dup length < [ 2dup contract ] when
+    2dup capacity > [ 2dup expand ] when
+    set-fill ; inline
 
 : clone-growable ( obj -- obj )
     (clone) dup underlying clone over set-underlying ; inline

@@ -10,7 +10,6 @@
 - gadgets/fields unit test fails if UI not running
 - "benchmark/help" runs out of memory
 - one-column table doesn't need borders...?
-- make-frame should compile
 - editor:
   - scroll to caret
   - better listener multi-line expression handling
@@ -38,7 +37,6 @@
 - constant branch folding
 - type inference at branch merge points
 - remove literal table
-- 'see' should show tuple constructors
 - forgetting a class should remove its methods from all generic words
   - offer to remove generic words which are not called and have no
     methods
@@ -60,6 +58,7 @@
 
 + ui:
 
+- add-gadget, model-changed, set-model should compile
 - shortcuts:
   - find a listener
   - find a browser
@@ -119,6 +118,7 @@
 
 + misc:
 
+- make a word to do '0 swap set-length'
 - slice: if sequence or seq start is changed, abstraction violation
 - hashed generic method dispatch
 - fix this:

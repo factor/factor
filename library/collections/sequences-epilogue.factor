@@ -89,12 +89,10 @@ M: object like drop ;
 : peek ( sequence -- element ) dup length 1- swap nth ;
 
 : pop* ( sequence -- )
-    [ length 1- ] keep
-    [ 0 -rot set-nth ] 2keep
-    set-length ;
+    dup length 1- swap set-length ;
 
 : pop ( sequence -- element )
-    dup peek swap pop* ;
+    dup length 1- swap [ nth ] 2keep set-length ;
 
 : all-equal? ( seq -- ? ) [ = ] monotonic? ;
 

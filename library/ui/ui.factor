@@ -4,7 +4,7 @@ IN: gadgets
 USING: arrays errors gadgets gadgets-frames gadgets-grids
 gadgets-labels gadgets-panes gadgets-theme gadgets-viewports
 generic hashtables io kernel math models namespaces prettyprint
-queues sequences threads ;
+queues sequences test threads ;
 
 ! Assoc mapping aliens to gadgets
 SYMBOL: windows
@@ -44,13 +44,15 @@ SYMBOL: windows
     V{ } clone windows set-global ;
 
 : ui-step ( -- )
-    do-timers
-    [ layout-queued ] make-hash hash-values [
-        dup update-hand
-        dup world-handle [ dup draw-world ] when
-        drop
-    ] each
-    10 sleep ;
+    [
+        do-timers
+        [ layout-queued ] make-hash hash-values [
+            dup update-hand
+            dup world-handle [ dup draw-world ] when
+            drop
+        ] each
+        10 sleep
+    ] assert-depth ;
 
 : <status-bar> ( -- gadget ) "" <label> dup highlight-theme ;
 
