@@ -49,14 +49,14 @@ SYMBOL: class-name
         { 27 "ESCAPE" }
         { 33 "PAGE_UP" }
         { 34 "PAGE_DOWN" }
-        { 35 "END" }
-        { 36 "HOME" }
+        ! { 35 "END" }
+        ! { 36 "HOME" }
         { 37 "LEFT" }
         { 38 "UP" }
         { 39 "RIGHT" }
         { 40 "DOWN" }
         { 45 "INSERT" }
-        { 46 "DELETE" }
+        ! { 46 "DELETE" }
     } ;
 
 : key-state-down?
@@ -81,10 +81,8 @@ SYMBOL: class-name
         alt? [ A+ , ] when
     ] { } make [ empty? not ] keep f ? ;
 
-: exclude-keys
+: exclude-keys-wm-keydown
     H{
-        ! { 8 "BACKSPACE" }
-        ! { 9 "TAB" }
         { 16 "SHIFT" }
         { 17 "CTRL" }
         { 18 "ALT" }
@@ -92,11 +90,21 @@ SYMBOL: class-name
         { 27 "ESCAPE" }
     } ;
 
-: exclude-key? ( n -- bool ) exclude-keys hash* nip ;
+: exclude-keys-wm-char
+    ! Values are ignored
+    H{
+        { 8 "BACKSPACE" }
+        { 9 "TAB" }
+        { 13 "RETURN" }
+    } ;
+
+: exclude-key-wm-keydown? ( n -- bool ) exclude-keys-wm-keydown hash* nip ;
+: exclude-key-wm-char? ( n -- bool ) exclude-keys-wm-char hash* nip ;
 : handle-key? ( n -- bool ) wm-keydown-codes hash* nip ;
  
 : keystroke>gesture ( n -- <key-down> )
-    dup wm-keydown-codes hash* [ nip ] [ drop ch>string lower-case? [ >lower ] when ] if
+    dup wm-keydown-codes hash*
+    [ nip ] [ drop ch>string lower-case? [ >lower ] when ] if
     key-modifiers swap ;
 
 SYMBOL: lParam
@@ -109,12 +117,16 @@ SYMBOL: hWnd
 
 : handle-wm-keydown ( hWnd uMsg wParam lParam -- )
     lParam set wParam set uMsg set hWnd set
-    wParam get exclude-key? [
+    wParam get exclude-key-wm-keydown? [
         wParam get keystroke>gesture <key-down>
-        hWnd get get-focus handle-gesture [
-            wParam get ch>string lower-case? [ >lower ] when
-            hWnd get get-focus user-input
-        ] when
+        hWnd get get-focus handle-gesture drop 
+    ] unless ;
+
+: handle-wm-char ( hWnd uMsg wParam lParam -- )
+    lParam set wParam set uMsg set hWnd set
+    wParam get exclude-key-wm-char? ctrl? or [
+        wParam get ch>string
+        hWnd get get-focus user-input
     ] unless ;
 
 : handle-wm-keyup ( hWnd uMsg wParam lParam -- )
@@ -194,6 +206,8 @@ SYMBOL: hWnd
                 ! Keyboard events
                 { [ dup WM_KEYDOWN = over WM_SYSKEYDOWN = or ]
                     [ drop handle-wm-keydown 0 ] }
+                { [ dup WM_CHAR = over WM_SYSCHAR = or ]
+                    [ drop handle-wm-char 0 ] }
                 { [ dup WM_KEYUP = over WM_SYSKEYUP = or ]
                     [ drop handle-wm-keyup 0 ] }
 
@@ -323,3 +337,6 @@ IN: shells
         ] with-freetype
     ] [ cleanup-win32-ui ] cleanup ;
 
+IN: io-internals
+! Temporary, until native io returns
+: io-multiplex ( ms -- ) 0 SleepEx drop ;

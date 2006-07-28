@@ -58,4 +58,6 @@ FUNCTION: LPVOID GlobalLock ( HGLOBAL hMem ) ;
 ! FUNCTION: char* GlobalLock ( HGLOBAL hMem ) ;
 FUNCTION: BOOL GlobalUnlock ( HGLOBAL hMem ) ;
 
+FUNCTION: DWORD SleepEx ( DWORD dwMilliSeconds, BOOL bAlertable ) ;
+
 
