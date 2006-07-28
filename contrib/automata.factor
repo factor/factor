@@ -85,7 +85,7 @@ dup last 1array swap dup first 1array append append ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-: center-i ( -- i ) window-width dup 2 / >fixnum ;
+: center-i ( -- i ) window-width 2 / >fixnum ;
 
 : center-line ( -- line ) center-i window-width [ = [ 1 ] [ 0 ] if ] map-with ;
 
@@ -164,6 +164,8 @@ VARS: ns field frame ;
 f ns> [ editor-text string>number set-rule start-center ] [bind] <field>
 >field ;
 
+: read-rule-field ( -- ) field> editor-text string>number set-rule ;
+
 : set-field-rule ( n -- ) number>string field> set-editor-text ;
 
 : automata-window ( -- )
@@ -172,9 +174,9 @@ f ns> [ editor-text string>number set-rule start-center ] [bind] <field>
 ns> [ init-rule init-slate init-field ] bind
 ns> [ field> ] bind 1array
 ns>
-{ { "Center"   [ start-center ] }
-  { "Random"   [ start-random ] }
-  { "Continue" [ run-rule ] } }
+{ { "Center"   [ drop read-rule-field start-center ] }
+  { "Random"   [ drop read-rule-field start-random ] }
+  { "Continue" [ drop read-rule-field run-rule ] } }
 [ first2 <bevel-button> tuck bind-button ]
 map-with append make-pile 1 over set-pack-fill
 frame> @left grid-add
