@@ -14,8 +14,8 @@ sequences ;
     dup editor-caret click-loc ;
 
 : editor-copy ( editor clipboard -- )
-    over editor-selection? [
-        >r [ editor-selection ] keep r> copy-clipboard
+    over gadget-selection? [
+        >r [ gadget-selection ] keep r> copy-clipboard
     ] [
         2drop
     ] if ;
@@ -24,7 +24,7 @@ sequences ;
     dupd editor-copy remove-editor-selection ;
 
 : delete/backspace ( elt editor quot -- | quot: caret editor -- from to )
-    over editor-selection? [
+    over gadget-selection? [
         drop nip remove-editor-selection
     ] [
         over >r >r dup editor-caret* swap control-model

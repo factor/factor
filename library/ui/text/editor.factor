@@ -186,10 +186,10 @@ M: editor draw-gadget* ( gadget -- )
 M: editor pref-dim* ( editor -- dim )
     dup editor-width swap editor-height 2array ;
 
-: editor-selection? ( editor -- ? )
+M: editor gadget-selection? ( editor -- ? )
     selection-start/end = not ;
 
-: editor-selection ( editor -- str )
+M: editor gadget-selection ( editor -- str )
     [ selection-start/end ] keep control-model doc-range ;
 
 : remove-editor-selection ( editor -- )
