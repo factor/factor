@@ -148,9 +148,6 @@ M: object error. ( error -- ) . ;
         dup length [ restart. ] 2each
     ] if ;
 
-DEFER: :error
-DEFER: :cc
-
 : debug-help ( -- )
     terpri
     "Debugger commands:" print
@@ -158,8 +155,6 @@ DEFER: :cc
     ":s  data stack at exception time" [ :s ] (debug-help)
     ":r  retain stack at exception time" [ :r ] (debug-help)
     ":c  call stack at exception time" [ :c ] (debug-help)
-    ":error starts the inspector with the error" [ :error ] (debug-help)
-    ":cc starts the inspector with the error continuation" [ :cc ] (debug-help)
     ":get ( var -- value ) accesses variables at time of error" print
     flush ;
 

@@ -35,8 +35,8 @@ HELP: map-with "( obj seq quot -- newseq )"
 { $values { "obj" "an object" } { "seq" "a sequence" } { "quot" "a quotation with stack effect " { $snippet "( obj elt -- new )" } } }
 { $description "Variant of " { $link map } " which pushes a retained object on each invocation of the quotation." } ;
 
-HELP: change-nth "( seq i quot -- )"
-{ $values { "seq" "a mutable sequence" } { "i" "a non-negative integer" } { "quot" "a quotation with stack effect " { $snippet "( elt -- newelt )" } } }
+HELP: change-nth "( i seq quot -- )"
+{ $values { "i" "a non-negative integer" } { "seq" "a mutable sequence" } { "quot" "a quotation with stack effect " { $snippet "( elt -- newelt )" } } }
 { $description "Applies the quotation to the " { $snippet "i" } "th element of the sequence, storing the result back into the sequence." }
 { $errors "Throws an error if the sequence is immutable, if the index is out of bounds, or the sequence cannot hold elements of the type output by " { $snippet "quot" } "." }
 { $side-effects "seq" } ;

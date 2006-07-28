@@ -71,10 +71,10 @@ C: document ( -- document )
     ] if r> peek length + 2array ;
 
 : prepend-first ( str seq -- seq )
-    0 [ append ] change-nth ;
+    0 swap [ append ] change-nth ;
 
 : append-last ( str seq -- seq )
-    dup length 1- [ swap append ] change-nth ;
+    [ length 1- ] keep [ swap append ] change-nth ;
 
 : loc-col/str ( loc document -- col str )
     >r first2 swap r> nth ;

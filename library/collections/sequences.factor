@@ -26,9 +26,6 @@ GENERIC: like ( seq seq -- seq )
 : bounds-check? ( n seq -- ? )
     over 0 >= [ length < ] [ 2drop f ] if ; inline
 
-: ?nth ( n seq/f -- elt/f )
-    2dup bounds-check? [ nth ] [ 2drop f ] if ;
-
 IN: sequences-internals
 
 GENERIC: resize ( n seq -- seq )
@@ -61,3 +58,8 @@ M: integer nth-unsafe drop ;
 : exchange-unsafe ( n n seq -- )
     [ tuck nth-unsafe >r nth-unsafe r> ] 3keep tuck
     >r >r set-nth-unsafe r> r> set-nth-unsafe ; inline
+
+IN: sequences
+
+: ?nth ( n seq/f -- elt/f )
+    2dup bounds-check? [ nth-unsafe ] [ 2drop f ] if ;

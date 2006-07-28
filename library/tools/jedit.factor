@@ -8,7 +8,7 @@ parser prettyprint sequences strings words ;
 ! edit files and position the cursor on a specific line number.
 
 : jedit-server-info ( -- port auth )
-    "~" get "/.jedit/server" append <file-reader> [
+    "~" get "/.jedit/server" path+ <file-reader> [
         readln drop
         readln string>number
         readln string>number
@@ -90,4 +90,4 @@ IN: shells
     "telnetd-port" get string>number telnetd ;
 
 ! This is a string since we string>number it above.
-global [ "9999" "telnetd-port" set ] bind
+"9999" "telnetd-port" set-global

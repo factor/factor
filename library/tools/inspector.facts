@@ -28,9 +28,3 @@ HELP: go "( n -- )"
 
 HELP: up "( -- )"
 { $description "Returns to the previously-inspected object." } ;
-
-HELP: :error "( -- )"
-{ $description "Opens an inspector with the most recently thrown error." } ;
-
-HELP: :cc "( -- )"
-{ $description "Opens an inspector with the continuation reified at the time of the most recently thrown error." } ;

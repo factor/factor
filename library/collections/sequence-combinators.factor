@@ -9,8 +9,8 @@ vectors ;
         [ rot >r [ swap call ] keep r> set-array-nth ] 3keep
     ] repeat drop ; inline
 
-: (map) ( quot seq i -- quot seq value )
-    pick pick >r >r swap nth-unsafe swap call r> r> rot ; inline
+: (map) ( seq quot i -- quot seq value )
+    -rot [ >r nth-unsafe r> call ] 2keep rot ; inline
 
 : (2each) ( quot seq seq i -- quot seq seq i )
     [ 2nth-unsafe rot dup slip ] 3keep ; inline
@@ -30,13 +30,6 @@ vectors ;
         t <array> f 0 pick set-nth-unsafe
     ] if ;
 
-: select ( seq quot quot -- seq )
-    pick >r >r V{ } clone rot [
-        -rot [
-            >r over >r call [ r> r> push ] [ r> r> 2drop ] if
-        ] 2keep
-    ] r> call r> like nip ; inline
-
 IN: sequences
 
 : each ( seq quot -- | quot: elt -- )
@@ -51,22 +44,21 @@ IN: sequences
     swapd each ; inline
 
 : map ( seq quot -- seq | quot: elt -- elt )
-    swap [ dup length [ (map) ] collect ] keep like 2nip ;
+    over >r over length [ (map) ] collect r> like 2nip ;
     inline
 
 : map-with ( obj list quot -- list | quot: obj elt -- elt )
     swap [ with rot ] map 2nip ; inline
 
-: accumulate ( list identity quot -- values | quot: x y -- z )
+: accumulate ( seq identity quot -- values | quot: x y -- z )
     rot [ pick >r swap call r> ] map-with nip ; inline
 
-: change-nth ( seq i quot -- )
-    pick pick >r >r >r swap nth
-    r> call r> r> swap set-nth ; inline
+: change-nth ( i seq quot -- )
+    -rot [ nth swap call ] 2keep set-nth ; inline
 
 : inject ( seq quot -- | quot: elt -- elt )
     over length
-    [ [ swap change-nth ] 3keep ] repeat 2drop ;
+    [ [ -rot change-nth ] 3keep ] repeat 2drop ;
     inline
 
 : inject-with ( obj seq quot -- | quot: obj elt -- elt )
@@ -141,7 +133,11 @@ IN: sequences
     swap [ with rot ] all? 2nip ; inline
 
 : subset ( seq quot -- seq | quot: elt -- ? )
-    [ each ] select ; inline
+    over >r over length <vector> rot [
+        -rot [
+            >r over >r call [ r> r> push ] [ r> r> 2drop ] if
+        ] 2keep
+    ] each r> like nip ; inline
 
 : subset-with ( obj seq quot -- seq | quot: obj elt -- ? )
     swap [ with rot ] subset 2nip ; inline
@@ -178,5 +174,5 @@ IN: sequences
     pick rot call [
         drop clone
     ] [
-        over >r >r length r> call dup 0 swap r> copy-into
+        over >r >r length r> call 0 over r> copy-into
     ] if ; inline

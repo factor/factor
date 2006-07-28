@@ -48,7 +48,7 @@ strings vectors ;
     tuck >r >r head-slice r> r> tail-slice swapd append3 ;
 
 : remove-nth ( n seq -- seq )
-    [ head-slice ] 2keep >r 1+ r> tail-slice append ;
+    f -rot dupd replace-slice ;
 
 : (cut) ( n seq -- before after )
     [ head ] 2keep tail-slice ;

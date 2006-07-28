@@ -3,8 +3,8 @@ CC = gcc
 BINARY = f
 IMAGE = factor.image
 BUNDLE = Factor.app
-DISK_IMAGE_DIR = Factor-0.83
-DISK_IMAGE = Factor-0.83.dmg
+DISK_IMAGE_DIR = Factor-0.84
+DISK_IMAGE = Factor-0.84.dmg
 
 ifdef DEBUG
 	CFLAGS = -g

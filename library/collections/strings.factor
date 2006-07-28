@@ -17,7 +17,7 @@ M: string hashcode
         dup rehash-string string-hashcode
     ] ?if ;
 
-M: string nth bounds-check char-slot ;
+M: string nth bounds-check nth-unsafe ;
 
 M: string nth-unsafe >r >fixnum r> char-slot ;
 
@@ -45,8 +45,6 @@ PREDICATE: integer control   "\0\e\r\n\t\u0008\u007f" member? ;
 : >upper ( str -- str ) [ ch>upper ] map ;
 
 : quotable? ( ch -- ? )
-    #! In a string literal, can this character be used without
-    #! escaping?
     dup printable? swap "\"\\" member? not and ; foldable
 
 : padding ( string count char -- string )

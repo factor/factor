@@ -8,6 +8,8 @@ USE: test
 USE: sequences
 USE: vectors
 
+[ CHAR: b ] [ 1 >bignum "abc" nth ] unit-test
+
 [ ] [ 10 [ [ -1000000 <sbuf> ] catch drop ] times ] unit-test
 
 [ "abc" ] [ [ "a" "b" "c" ] [ [ % ] each ] "" make ] unit-test

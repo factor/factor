@@ -59,7 +59,7 @@ M: track pref-dim* ( track -- dim )
 
 : set-nth-0 ( n seq -- old ) 2dup nth >r 0 -rot set-nth r> ;
 
-: +nth ( delta n seq -- ) swap [ + ] change-nth ;
+: +nth ( delta n seq -- ) [ + ] change-nth ;
 
 : clamp-nth ( i j sizes -- ) [ set-nth-0 swap ] keep +nth ;
 

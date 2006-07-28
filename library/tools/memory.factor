@@ -20,7 +20,12 @@ strings styles vectors words ;
 : total, ( n str -- )
     [ , number>string , "" , "" , ] { } make , ;
 
-: room-table ( -- table )
+: simple-table ( table -- )
+    H{ { table-gap { 10 0 } } }
+    [ dup string? [ write ] [ pprint ] if ]
+    tabular-output ;
+
+: room. ( -- )
     room [
         { "" "Total" "Used" "Free" } ,
         0 [
@@ -30,11 +35,7 @@ strings styles vectors words ;
         "Semi-space" total,
         "Cards" total,
         "Code space" total/used/free,
-    ] [ ] make ;
-
-: room. ( -- )
-    room-table H{ { table-gap { 10 0 0 } } }
-    [ write ] tabular-output ;
+    ] { } make simple-table ;
 
 ! Some words for iterating through the heap.
 
@@ -70,7 +71,4 @@ strings styles vectors words ;
             ( hash hash key -- )
             [ dup , dup pick hash , pick hash , ] { } make ,
         ] each 2drop
-    ] { } make
-    H{ { table-gap { 10 0 0 } } }
-    [ dup string? [ write ] [ pprint ] if ]
-    tabular-output ;
+    ] { } make simple-table ;

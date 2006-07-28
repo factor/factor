@@ -50,7 +50,7 @@ M: object like drop ;
 : (delete) ( elt store scan seq -- )
     2dup length < [
         3dup move
-        >r pick over r> dup >r nth = r> swap
+        [ nth pick = ] 2keep rot
         [ >r >r 1+ r> r> ] unless >r 1+ r> (delete)
     ] when ;
 
@@ -100,10 +100,11 @@ M: object like drop ;
 
 : all-eq? ( seq -- ? ) [ eq? ] monotonic? ;
 
+: (mismatch) ( seq1 seq2 n -- i )
+    [ >r 2dup r> 2nth-unsafe = not ] find drop 2nip ; inline
+
 : mismatch ( seq1 seq2 -- i )
-    2dup min-length
-    [ >r 2dup r> 2nth-unsafe = not ] find
-    swap >r 3drop r> ;
+    2dup min-length (mismatch) ;
 
 : flip ( seq -- seq )
     dup empty? [
@@ -127,11 +128,8 @@ M: object like drop ;
 : last/first ( seq -- pair ) dup peek swap first 2array ;
 
 : sequence= ( seq seq -- ? )
-    2dup [ length ] 2apply number= [
-        dup length [ >r 2dup r> 2nth-unsafe = ] all? 2nip
-    ] [
-        2drop f
-    ] if ;
+    2dup [ length ] 2apply tuck number=
+    [ (mismatch) -1 number= ] [ 3drop f ] if ;
 
 UNION: sequence array string sbuf vector quotation ;
 

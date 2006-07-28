@@ -9,6 +9,7 @@
 
 + ui:
 
+- gadgets/fields unit test fails if UI not running
 - "benchmark/help" runs out of memory
 - shortcuts:
   - find a listener
@@ -113,7 +114,7 @@
 
 + misc:
 
-- consider: swap tail --> tail, swap head --> head
+- consider: swap tail --> tail, swap head --> head, swap group --> group
 - mach_signal: fault address reporting is not reliable
 - slice: if sequence or seq start is changed, abstraction violation
 - hashed generic method dispatch
