@@ -94,8 +94,6 @@ macosx.app:
 	rm -rf $(BUNDLE)/Contents/Resources/
 	mkdir -p $(BUNDLE)/Contents/Resources/fonts/
 
-	ln -s $(BUNDLE)/Contents/Frameworks/libfreetype.dylib $(BUNDLE)/Contents/Frameworks/libfreetype.6,dylib
-
 	chmod +x cp_dir
 	find doc library contrib examples fonts \( -name '*.factor' \
 		-o -name '*.facts' \
@@ -113,7 +111,7 @@ macosx.app:
 		-id @executable_path/../Frameworks/libfreetype.6.dylib \
 		Factor.app/Contents/Frameworks/libfreetype.6.dylib
 	install_name_tool \
-		-change /usr/local/lib/libfreetype.6.dylib \
+		-change /usr/X11R6/lib/libfreetype.6.dylib \
 		@executable_path/../Frameworks/libfreetype.6.dylib \
 		Factor.app/Contents/MacOS/Factor
 
