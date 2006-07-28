@@ -94,6 +94,8 @@ macosx.app:
 	rm -rf $(BUNDLE)/Contents/Resources/
 	mkdir -p $(BUNDLE)/Contents/Resources/fonts/
 
+	ln -s $(BUNDLE)/Contents/Frameworks/libfreetype.dylib $(BUNDLE)/Contents/Frameworks/libfreetype.6,dylib
+
 	chmod +x cp_dir
 	find doc library contrib examples fonts \( -name '*.factor' \
 		-o -name '*.facts' \
