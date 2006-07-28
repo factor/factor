@@ -5,7 +5,7 @@ USING: gadgets gadgets-controls generic kernel models sequences ;
 
 TUPLE: field model ;
 
-C: field ( model quot -- field )
+C: field ( model -- field )
     <editor> over set-delegate
     [ set-field-model ] keep
     dup dup set-control-self ;

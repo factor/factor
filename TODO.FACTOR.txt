@@ -1,27 +1,73 @@
-+ io:
++ 0.84:
 
+- windows native i/o
+- fix contribs: parser-combinators, boids, automata, space-invaders
 - unix i/o: problems with passing f to syscalls
-- factorcode httpd started using 99% CPU, but still received connections;
-  closing read-fds solved it
 - sometimes darcs get fails with the httpd
 - gdb triggers 'mutliple i/o ops on port' error
 - "localhost" 50 <client> won't fail
+- factorcode httpd crashed: bad file descriptor
+- gadgets/fields unit test fails if UI not running
+- "benchmark/help" runs out of memory
+- one-column table doesn't need borders...?
+- make-frame should compile
+- editor:
+  - scroll to caret
+  - better listener multi-line expression handling
+  - history doesn't work in a good way if you ^K the input
+  - history: move caret to end
+- finish gui stepper
+- graphical module manager tool
+- make factor a services client
+- services do not launch if factor not running
+- integrated error documentation
+- roundoff is still not quite right with tracks
+- 'show' doesn't work if invoked from a listener on an object which is
+  itself inspected in the listener
+- fix top level window positioning
+- prettyprinter's highlighting of non-leaves doesn't really work
+- nasty inference regressions
+- [ [ dup call ] dup call ] infer hangs
+- the invalid recursion form case needs to be fixed, for inlines too
+- instead of decompiling words, add them to a 'recompile' set; compiler
+  treats words in the recompile set as if they were not compiled
+- consider: swap tail --> tail, swap head --> head, swap group --> group
+- mach_signal: fault address reporting is not reliable
+- see if alien calls can be made faster
+- faster sequence= for UI
+- constant branch folding
+- type inference at branch merge points
+- remove literal table
+- 'see' should show tuple constructors
+- forgetting a class should remove its methods from all generic words
+  - offer to remove generic words which are not called and have no
+    methods
+- forgetting a tuple class should forget the constructor
+- seeing a tuple class should show the constructor
+- see by itself only shows the G: def
+- { class generic } see supports forms:
+  { f generic } to show all methods
+  { class f } to show all methods
+- methods: remember their file/line
+- { class generic } jedit, reload DTRT
+- T{ link f "foo" "bar" } see
+- T{ link f "foo" "bar" } jedit
+- T{ link f "foo" "bar" } reload
+- generic 'define ( asset def -- )'
+- make 'forget' generic
+
+========================================================================
 
 + ui:
 
-- gadgets/fields unit test fails if UI not running
-- "benchmark/help" runs out of memory
 - shortcuts:
   - find a listener
   - find a browser
   - find a help window
   - they'll either focus such a window, or if the current window is of
     that type, cycle
-- thumb min size
 - support x11's large selections, if needed
 - own-selection violates ICCCM
-- one-column table doesn't need borders...?
-- make-frame should compile
 - editor:
   - undo and redo
   - transpose char/word/line
@@ -31,28 +77,14 @@
   - only redraw visible lines
   - more efficient multi-line inserts
   - editor should support stream output protocol
-  - scroll to caret
-  - better listener multi-line expression handling
-  - history doesn't work in a good way if you ^K the input
-  - history: move caret to end
-- finish gui stepper
 - cocoa: windows are not updated while resizing
-- graphical module manager tool
 - add some handy services:
   - base conversion
   - search help for selection
-- make factor a services client
-- services do not launch if factor not running
 - grid slows down with 2000 lines
-- integrated error documentation
-- roundoff is still not quite right with tracks
-- 'show' doesn't work if invoked from a listener on an object which is
-  itself inspected in the listener
 - ui uses too much cpu time idling
 - see if its possible to only repaint dirty regions
 - x11 title bars are funny
-- fix top level window positioning
-- prettyprinter's highlighting of non-leaves doesn't really work
 - rollover is not updated on window focus changes
 - x11 input methods
 - cocoa:
@@ -63,59 +95,30 @@
 
 + module system:
 
-- 'see' should show tuple constructors
-- forgetting a class should remove its methods from all generic words
-  - offer to remove generic words which are not called and have no
-    methods
-- forgetting a tuple class should forget the constructor
-- seeing a tuple class should show the constructor
 - C types should be words
   - TYPEDEF: float { ... } { ... } ;   ==> \ float T{ c-type ... } "c-type" swp
   - TYPEDEF: float FTFloat ;  ==> \ float \ FTFloat "c-type" swp
   - make typedef aliasing explicit
 - seeing a C struct word should show its def
-- see by itself only shows the G: def
-- { class generic } see supports forms:
-  { f generic } to show all methods
-  { class f } to show all methods
 - modularize core
 - TUPLE: module files tests articles article main ;
-- methods: remember their file/line
-- { class generic } jedit, reload DTRT
 - requesting a list of assets loaded from a specific file
-- T{ link f "foo" "bar" } see
-- T{ link f "foo" "bar" } jedit
-- T{ link f "foo" "bar" } reload
-- generic 'define ( asset def -- )'
 - file out
-- make 'forget' generic
 
 + compiler/ffi:
 
-- nasty inference regressions
-- [ [ dup call ] dup call ] infer hangs
-- the invalid recursion form case needs to be fixed, for inlines too
-- instead of decompiling words, add them to a 'recompile' set; compiler
-  treats words in the recompile set as if they were not compiled
 - mac intel: struct returns from objc methods
-- see if alien calls can be made faster
-- faster sequence= for UI
 - fix compiled gc check
   - there was a performance hit, investigate
   - float boxing and overflow checks need a gc check too
-- constant branch folding
-- type inference at branch merge points
 - float= doesn't consider nans equal
 - intrinsic fixnum>float float>fixnum
-- remove literal table
 - C functions returning structs by value
 - code gc
 - infer which variables are read, written in a quotation
 
 + misc:
 
-- consider: swap tail --> tail, swap head --> head, swap group --> group
-- mach_signal: fault address reporting is not reliable
 - slice: if sequence or seq start is changed, abstraction violation
 - hashed generic method dispatch
 - fix this:
