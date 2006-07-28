@@ -52,6 +52,8 @@ SYMBOL: d-in
     #! After inference is finished, collect information.
     d-in get meta-d get length 2array ;
 
+! Does this control flow path throw an exception, therefore its
+! stack height is irrelevant and the branch will always unify?
 SYMBOL: terminated?
 
 : init-inference ( recursive-state -- )
@@ -85,7 +87,7 @@ M: f infer-quot ( f -- ) drop ;
 M: quotation infer-quot ( quot -- )
     #! Recursive calls to this word are made for nested
     #! quotations.
-    [ terminated? get [ drop f ] [ apply-object t ] if ] all? drop ;
+    [ apply-object terminated? get not ] all? drop ;
 
 : infer-quot-value ( rstate quot -- )
     recursive-state get >r swap recursive-state set

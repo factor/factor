@@ -11,6 +11,7 @@ ARTICLE: "changes" "Changes in the latest release"
 }
 { $subtopic "UI"
     { $list
+        "Multi-line text editor gadget replaces single-line editor gadget and adds support for selection, copy and paste, and more advanced text editing."
         "New apropos tool."
         "New word browser tool."
         { "New " { $link track } " gadget replaces the old " { $snippet "splitter" } "; it behaves similarly but supports more than two children." }
@@ -53,6 +54,7 @@ ARTICLE: "changes" "Changes in the latest release"
 { $subtopic "Contributed libraries"
     { $list
         { "There is a new mechanism for loading contributed libraries that correctly handles dependencies; see " { $link "modules" } "." }
+        { "Time and date library added in " { $snippet "contrib/calendar/" } ". (Doug Coleman)" }
         "Factory window manager updates (Eduardo Cavazos)"
         { "New " { $snippet "slate" } " gadget for easier graphical output for simulations and demos. (Eduardo Cavazos)" }
         "Automata and boids demos. (Eduardo Cavazos)"

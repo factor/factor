@@ -35,7 +35,8 @@ namespaces parser prettyprint sequences strings vectors words ;
     "Unbalanced branches:" add* "\n" join inference-error ;
 
 : unify-effect ( in out -- in out )
-    #! In is a sequence of integers; out is a sequence of stacks.
+    #! in is a sequence of integers, out is a sequence of
+    #! stacks.
     2dup balanced? [
         unify-stacks >r unify-in-d r>
     ] [
@@ -86,7 +87,7 @@ namespaces parser prettyprint sequences strings vectors words ;
 
 : infer-branch ( value -- namespace )
     #! Return a namespace with inferencer variables:
-    #! meta-d, meta-c, d-in. They are set to f if
+    #! meta-d, meta-r, d-in. They are set to f if
     #! terminate was called.
     [
         [

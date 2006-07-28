@@ -116,6 +116,8 @@ M: condition error. delegate error. ;
 
 M: tuple error. ( error -- ) describe ;
 
+M: string error. ( error -- ) print ;
+
 M: object error. ( error -- ) . ;
 
 : :s ( -- ) error-continuation get continuation-data stack. ;

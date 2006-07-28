@@ -208,10 +208,18 @@ DEFER: blah4
 [ [ [ 1 ] [ ] bad-combinator ] infer ] unit-test-fails
 
 ! Regression
+
+! This order of branches works
 DEFER: do-crap
 : more-crap dup [ drop ] [ dup do-crap call ] if ;
-: do-crap dup [ do-crap ] [ more-crap ] if ;
+: do-crap dup [ more-crap ] [ do-crap ] if ;
 [ [ do-crap ] infer ] unit-test-fails
+
+! This one does not
+DEFER: do-crap*
+: more-crap* dup [ drop ] [ dup do-crap* call ] if ;
+: do-crap* dup [ do-crap* ] [ more-crap* ] if ;
+[ [ do-crap* ] infer ] unit-test-fails
 
 ! Regression
 : too-deep dup [ drop ] [ 2dup too-deep too-deep * ] if ; inline
@@ -267,10 +275,16 @@ DEFER: Y
 [ { 2 2 } ] [ [ X ] infer ] unit-test
 [ { 2 2 } ] [ [ Y ] infer ] unit-test
 
+! Similar
+DEFER: bar
+: foo dup [ 2drop f f bar ] [ ] if ;
+: bar [ 2 2 + ] t foo drop call drop ;
+
+[ [ foo ] infer ] unit-test-fails
+
 [ 1234 infer ] unit-test-fails
 
-! This hangs
-
+! This used to hang
 [ [ [ dup call ] dup call ] infer ] unit-test-fails
 
 ! This form should not have a stack effect

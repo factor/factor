@@ -1,18 +1,3 @@
-+ 0.83:
-
-- nasty inference regressions
-- [ [ dup call ] dup call ] infer hangs
-- the invalid recursion form case needs to be fixed, for inlines too
-- windows port from erg
-- editor:
-  - scroll to caret
-  - better listener multi-line expression handling
-  - history doesn't work in a good way if you ^K the input
-  - history: move caret to end
-
-- httpd search tools
-- remaining HTML issues need fixing
-
 + io:
 
 - unix i/o: problems with passing f to syscalls
@@ -34,9 +19,6 @@
 - support x11's large selections, if needed
 - own-selection violates ICCCM
 - one-column table doesn't need borders...?
-[2:45pm] tathi: Factor's text display is a bit odd sometimes, until you mouse over (or click, if there's no "live" text)
-[2:48pm] tathi: it appears to be using the font metrics from the sprite tuple, but re-using the texture from the previous letter
-[2:59pm] tathi: hmm...and it looks like it's only be happening the first time you use a given character (from a given font face)
 - make-frame should compile
 - editor:
   - undo and redo
@@ -47,6 +29,10 @@
   - only redraw visible lines
   - more efficient multi-line inserts
   - editor should support stream output protocol
+  - scroll to caret
+  - better listener multi-line expression handling
+  - history doesn't work in a good way if you ^K the input
+  - history: move caret to end
 - finish gui stepper
 - cocoa: windows are not updated while resizing
 - graphical module manager tool
@@ -104,6 +90,9 @@
 
 + compiler/ffi:
 
+- nasty inference regressions
+- [ [ dup call ] dup call ] infer hangs
+- the invalid recursion form case needs to be fixed, for inlines too
 - instead of decompiling words, add them to a 'recompile' set; compiler
   treats words in the recompile set as if they were not compiled
 - mac intel: struct returns from objc methods
@@ -135,3 +124,5 @@
 
 - code walker & exceptions -- test and debug problems
 - break: perhaps use current stdio to run break listener
+- httpd search tools
+- remaining HTML issues need fixing

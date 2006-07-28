@@ -2,29 +2,32 @@ IN: temporary
 USING: compiler hashtables io kernel math math namespaces
 sequences strings vectors words words ;
 
-! Instead of a variable, we define an inline word which pushes
-! the hash on the stack, for performance.
-DEFER: trans-hash
+DEFER: trans-map
+
+: add-translation \ trans-map get set-nth ;
 
 [
-    26 [ CHAR: A + dup set ] each
-    26 [ CHAR: a + dup set ] each
+    256 0 <string> \ trans-map set
+    26 [ CHAR: A + dup add-translation ] each
+    26 [ dup CHAR: A + swap CHAR: a + add-translation ] each
 
     "TGCAAKYRMBDHV"
     "ACGTUMRYKVHDB"
     2dup
-    [ set ] 2each
-    [ ch>lower set ] 2each
-] make-hash
+    [ add-translation ] 2each
+    [ ch>lower add-translation ] 2each
+    
+    \ trans-map get
+] with-scope
 
-\ trans-hash swap unit define-compound
-\ trans-hash t "inline" set-word-prop
+\ trans-map swap unit define-compound
+\ trans-map t "inline" set-word-prop
 
 : translate-seq ( seq -- sbuf )
     [
-        2000000 <sbuf> building set
+        30000000 <sbuf> building set
         <reversed> [ <reversed> % ] each
-        building get dup [ trans-hash hash ] inject
+        building get dup [ trans-map nth ] inject
     ] with-scope ;
 
 SYMBOL: out
