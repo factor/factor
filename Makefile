@@ -116,7 +116,7 @@ macosx.app:
 		Factor.app/Contents/MacOS/Factor
 
 macosx.dmg:
-	rm $(DISK_IMAGE)
+	rm -f $(DISK_IMAGE)
 	rm -rf $(DISK_IMAGE_DIR)
 	mkdir $(DISK_IMAGE_DIR)
 	cp -R $(BUNDLE) $(DISK_IMAGE_DIR)/$(BUNDLE)
