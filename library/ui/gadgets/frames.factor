@@ -38,7 +38,7 @@ M: frame layout* ( frame -- dim )
     ] with-grid ;
 
 : make-frame ( specs -- gadget )
-    <frame> [ swap build-grid ] keep ;
+    <frame> [ swap build-grid ] keep ; inline
 
 : make-frame* ( gadget specs -- gadget )
-    over [ delegate>frame build-grid ] keep ;
+    over [ delegate>frame build-grid ] keep ; inline

@@ -124,7 +124,7 @@ M: compose model-changed ( compose -- )
     swap delegate set-model ;
 
 M: compose set-model ( value compose -- )
-    model-dependencies [ set-model ] 2map ;
+    model-dependencies [ set-model ] 2each ;
 
 TUPLE: history back forward ;
 

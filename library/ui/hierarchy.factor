@@ -1,8 +1,8 @@
 ! Copyright (C) 2005, 2006 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 IN: gadgets
-USING: generic hashtables kernel math namespaces sequences
-vectors words ;
+USING: generic hashtables inference kernel math namespaces
+sequences vectors words ;
 
 GENERIC: graft* ( gadget -- )
 
@@ -61,15 +61,25 @@ M: gadget ungraft* drop ;
     #! Add all gadgets in a sequence to a parent gadget.
     swap [ over (add-gadget) ] each relayout ;
 
-: add-spec ( { quot setter post loc } quot -- )
-    [
-        over first %
-        over second [ [ dup gadget get ] % , ] when*
-        over third %
-        [ gadget get ] %
-        swap fourth ,
-        %
-    ] [ ] make call ;
+: add-spec ( quot { quot setter post loc } -- )
+    dup first %
+    dup second [ [ dup gadget get ] % , ] when*
+    dup third %
+    [ gadget get ] %
+    fourth ,
+    % ;
+
+: (build-spec) ( quot spec -- quot )
+    [ [ add-spec ] each-with ] [ ] make ;
+
+: build-spec ( spec quot -- )
+    swap (build-spec) call ;
+
+\ build-spec { 2 0 } "infer-effect" set-word-prop
+
+\ build-spec [
+    pop-literal pop-literal nip (build-spec) infer-quot-value
+] "infer" set-word-prop
 
 : (parents) ( gadget -- )
     [ dup , gadget-parent (parents) ] when* ;

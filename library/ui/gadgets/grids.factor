@@ -72,4 +72,4 @@ M: grid layout* ( frame -- dim )
     #! Specs is an array of quadruples { quot post setter loc }.
     #! The setter has stack effect ( new gadget -- ),
     #! the loc is @center, @top, etc.
-    swap [ [ [ grid-add ] add-spec ] each ] with-gadget ;
+    swap [ [ grid-add ] build-spec ] with-gadget ; inline
