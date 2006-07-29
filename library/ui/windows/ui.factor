@@ -49,14 +49,14 @@ SYMBOL: class-name
         { 27 "ESCAPE" }
         { 33 "PAGE_UP" }
         { 34 "PAGE_DOWN" }
-        ! { 35 "END" }
-        ! { 36 "HOME" }
+        { 35 "END" }
+        { 36 "HOME" }
         { 37 "LEFT" }
         { 38 "UP" }
         { 39 "RIGHT" }
         { 40 "DOWN" }
         { 45 "INSERT" }
-        ! { 46 "DELETE" }
+        { 46 "DELETE" }
     } ;
 
 : key-state-down?
@@ -138,19 +138,19 @@ SYMBOL: hWnd
     [ win-hRC wglDeleteContext win32-error=0 ] keep
     [ win-hWnd ] keep win-hDC ReleaseDC win32-error=0 ;
 
-: handle-wm-destroy ( hWnd uMsg wParam lParam -- )
+: handle-wm-close ( hWnd uMsg wParam lParam -- )
     3drop
     window [ world-handle ] keep
-    [ close-world ] keep
-    [ drop win-hWnd unregister-window ] 2keep
-    drop cleanup-window
-    0 PostQuitMessage ;
+    close-world
+    dup win-hWnd unregister-window
+    dup cleanup-window
+    win-hWnd DestroyWindow win32-error=0 ;
 
 : handle-wm-set-focus ( hWnd uMsg wParam lParam -- )
-    3drop window focus-world ;
+    3drop window [ focus-world ] when* ;
 
 : handle-wm-kill-focus ( hWnd uMsg wParam lParam -- )
-    3drop window unfocus-world ;
+    3drop window [ unfocus-world ] when* ;
 
 : mouse-button ( uMsg -- n )
     {
@@ -198,7 +198,7 @@ SYMBOL: hWnd
         ! "Message: " write dup get-windows-message-name write
             ! " " write dup unparse print flush
             {
-                { [ dup WM_DESTROY = ]    [ drop handle-wm-destroy 0 ] }
+                { [ dup WM_CLOSE = ]    [ drop handle-wm-close 0 ] }
                 { [ dup WM_PAINT = ]
                       [ drop 4dup handle-wm-paint DefWindowProc ] }
                 { [ dup WM_SIZE = ]      [ drop handle-wm-size 0 ] }
@@ -324,7 +324,7 @@ IN: shells
     [
         [
             init-timers
-            ! init-clipboard
+            init-clipboard
             init-win32-ui
             restore-windows? [
                 restore-windows
