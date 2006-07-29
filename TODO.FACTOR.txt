@@ -15,7 +15,6 @@
   - history: move caret to end
 - finish gui stepper
 - graphical module manager tool
-- make factor a services client
 - services do not launch if factor not running
 - integrated error documentation
 - roundoff is still not quite right with tracks

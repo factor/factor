@@ -94,11 +94,11 @@ opengl sequences ;
     r> add-observer ;
 
 : string-or-nil? ( NSString -- ? )
-    [ dup CF>string NSStringPboardType = ] [ t ] if* ;
+    [ CF>string NSStringPboardType = ] [ t ] if* ;
 
 : valid-service? ( gadget send-type return-type -- ? )
     over string-or-nil? over string-or-nil? and [
-        drop [ swap gadget-selection? ] [ 2drop t ] if
+        drop [ gadget-selection? ] [ drop t ] if
     ] [
         3drop f
     ] if ;
@@ -199,23 +199,27 @@ opengl sequences ;
     }
 
     { "writeSelectionToPasteboard:types:" "bool" { "id" "SEL" "id" "id" }
-        CF>string-array NSStringPboardType swap member? [
-            >r drop window-focus gadget-selection dup [
-                r> set-pasteboard-string t
+        [
+            CF>string-array NSStringPboardType swap member? [
+                >r drop window-focus gadget-selection dup [
+                    r> set-pasteboard-string t
+                ] [
+                    r> 2drop f
+                ] if
             ] [
-                r> 2drop f
+                3drop f
             ] if
-        ] [
-            3drop f
-        ] if
+        ]
     }
 
     { "readSelectionFromPasteboard:" "bool" { "id" "SEL" "id" }
-        pasteboard-string dup [
-            >r drop window-focus r> swap user-input t
-        ] [
-            3drop f
-        ] if
+        [
+            pasteboard-string dup [
+                >r drop window-focus r> swap user-input t
+            ] [
+                3drop f
+            ] if
+        ]
     }
 
     { "updateFactorGadgetSize:" "void" { "id" "SEL" "id" }
