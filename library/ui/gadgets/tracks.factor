@@ -42,7 +42,7 @@ M: track layout* ( track -- )
 M: track pref-dim* ( track -- dim )
     [
         dup gadget-children
-        2 swap group [ first ] map pref-dims
+        2 group [ first ] map pref-dims
         dup rot track-sizes track-pref-dims >r max-dim r>
     ] keep gadget-orientation set-axis ;
 

@@ -41,16 +41,6 @@ HELP: peek "( seq -- elt )"
 { $description "Outputs the last element of the sequence." }
 { $errors "Throws an error if the sequence is empty." } ;
 
-HELP: head "( n seq -- headseq )"
-{ $values { "n" "a non-negative integer" } { "seq" "a sequence" } { "headseq" "a new sequence" } }
-{ $description "Outputs a new sequence consisting of the first " { $snippet "n" } " elements of the input sequence." }
-{ $errors "Throws an error if the index is out of bounds." } ;
-
-HELP: tail "( n seq -- tailseq )"
-{ $values { "n" "a non-negative integer" } { "seq" "a sequence" } { "tailseq" "a new sequence" } }
-{ $description "Outputs a new sequence consisting of the input sequence with the first n items removed." }
-{ $errors "Throws an error if the index is out of bounds." } ;
-
 HELP: resize "( n seq -- newseq )"
 { $values { "n" "a non-negative integer" } { "seq" "a sequence" } { "newseq" "a new sequence" } }
 { $description "Creates a new sequence of the same type as " { $snippet "seq" } " with " { $snippet "n" } " elements, and copies the contents of " { $snippet "seq" } " into the new sequence. If " { $snippet "n" } " exceeds the length of " { $snippet "seq" } ", the remaining elements are filled with a default value; " { $link f } " for arrays and 0 for strings." }

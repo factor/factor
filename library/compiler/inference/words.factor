@@ -76,7 +76,7 @@ M: #call-label collect-recursion* ( label node -- )
     #! and which don't (loop indices, etc). The latter cannot
     #! be folded.
     collect-recursion meta-d get add unify-stacks
-    meta-d [ length swap tail* ] change ;
+    meta-d [ length tail* ] change ;
 
 : splice-node ( node -- )
     #! Labels which do not call themselves are just spliced into

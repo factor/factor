@@ -207,7 +207,7 @@ M: #push generate-node ( #push -- )
     2dup length <= [
         cut-phantom
     ] [
-        [ phantom-locs ] keep [ length swap head-slice* ] keep
+        [ phantom-locs ] keep [ length head-slice* ] keep
         [ append 0 ] keep set-length
     ] if ;
 

@@ -95,6 +95,6 @@ DEFER: describe
     ] with-scope ;
 
 : callstack. ( seq -- seq )
-    3 swap group <reversed> [ first2 1- callframe. ] each ;
+    3 group <reversed> [ first2 1- callframe. ] each ;
 
 : .c callstack callstack. ;

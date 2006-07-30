@@ -34,10 +34,10 @@ M: node = eq? ;
 : meta-d-node meta-d get clone in-node ;
 
 : d-tail ( n -- list )
-    dup zero? [ drop f ] [ meta-d get tail* ] if ;
+    dup zero? [ drop f ] [ meta-d get swap tail* ] if ;
 
 : r-tail ( n -- list )
-    dup zero? [ drop f ] [ meta-r get tail* ] if ;
+    dup zero? [ drop f ] [ meta-r get swap tail* ] if ;
 
 : node-child node-children first ;
 
@@ -266,5 +266,5 @@ DEFER: (map-nodes)
 
 : subst-values ( new old node -- )
     #! Mutates nodes.
-    1 node-stack get head-slice* swap add
+    node-stack get 1 head-slice* swap add
     [ >r 2dup r> node-successor (subst-values) ] each 2drop ;

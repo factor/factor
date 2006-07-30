@@ -155,10 +155,10 @@ M: gb set-nth-unsafe ( elt n seq -- ) gb@ set-nth-unsafe ;
     [ gb-gap-end + ] keep set-gb-gap-end ;
 
 : after-gap ( gb -- gb )
-    dup gb-gap-end swap delegate tail ;
+    dup delegate swap gb-gap-end tail ;
 
 : before-gap ( gb -- gb )
-    dup gb-gap-start swap head ;
+    dup gb-gap-start head ;
 
 : copy-after-gap ( array gb -- )
     #! copy everything after the gap in 'gb' into the end of 'array',

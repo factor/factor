@@ -10,4 +10,4 @@ USING: arrays help kernel parser sequences syntax words ;
     ] f ; parsing
 
 : !ARTICLE:
-    [ >array [ first2 2 ] keep tail add-article ] f ; parsing
+    [ >array [ first2 ] keep 2 tail add-article ] f ; parsing

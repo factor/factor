@@ -78,7 +78,7 @@ USING: kernel math parser sequences ;
 : r ( str oldsuffix newsuffix -- str )
     pick consonant-seq 0 > [ nip ] [ drop ] if append ;
 
-: butlast ( seq -- seq ) 1 swap head-slice* ;
+: butlast ( seq -- seq ) 1 head-slice* ;
 
 ! step1a and step1b get rid of plurals and -ed or -ing. e.g.
 !

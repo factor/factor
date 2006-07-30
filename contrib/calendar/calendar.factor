@@ -32,7 +32,7 @@ SYMBOL: gmt-offset
     #! length of average month in days
     30.41666666666667 ;
 
-: time>array ( dt -- vec ) tuple>array 2 swap tail ;
+: time>array ( dt -- vec ) tuple>array 2 tail ;
 
 : compare-timestamps ( tuple tuple -- n )
     [ time>array ] 2apply <=> ;
@@ -242,7 +242,7 @@ M: number +second ( timestamp n -- timestamp )
         [ date 3array ] keep timestamp-year 3 1 3array <=>
         0 >= and 1 0 ?
     ] keep 
-    [ timestamp-month day-counts head-slice sum + ] keep
+    [ timestamp-month day-counts swap head-slice sum + ] keep
     timestamp-day + ;
 
 : print-day ( n -- )

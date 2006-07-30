@@ -17,7 +17,7 @@ IN: hexdump
     #! Write hexdump to a string
     [
         dup length .header
-        16 swap group dup length [ .line ] 2each
+        16 group dup length [ .line ] 2each
     ] string-out ;
 
 : .hexdump ( str -- )

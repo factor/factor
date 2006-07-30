@@ -221,7 +221,7 @@ M: complex ' ( c -- tagged )
     [ 0 [ swap 16 shift + ] reduce emit ] each ;
 
 : pack-string ( string -- seq )
-    dup length 1+ char align CHAR: \0 pad-right char swap group ;
+    dup length 1+ char align CHAR: \0 pad-right char group ;
 
 : emit-string ( string -- ptr )
     string-type object-tag [

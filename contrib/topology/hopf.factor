@@ -62,7 +62,7 @@ SYMBOL: degrees
 
 : inversions ( seq -- n )
     0 swap dup length [
-        swap [ nth ] 2keep >r 1+ r> tail-slice (inversions) +
+        swap [ nth ] 2keep swap 1+ tail-slice (inversions) +
     ] each-with ;
 
 : duplicates? ( seq -- ? )

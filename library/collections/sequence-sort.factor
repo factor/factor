@@ -50,8 +50,8 @@ C: sorter ( seq start end -- sorter )
     ] if 2drop ; inline
 
 : partition ( -1/1 seq -- seq )
-    dup midpoint@ swap rot 1 <
-    [ head-slice ] [ tail-slice ] if ; inline
+    dup midpoint@ rot 1 < [ head-slice ] [ tail-slice ] if ;
+    inline
 
 : (binsearch) ( elt quot seq -- i )
     dup length 1 <= [

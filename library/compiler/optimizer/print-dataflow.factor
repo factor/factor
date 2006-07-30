@@ -34,7 +34,7 @@ M: comment pprint* ( ann -- )
         " --" %
         " " over node-out-d values%
         " r: " swap node-out-r values%
-    ] "" make 1 swap tail ;
+    ] "" make 1 tail ;
 
 M: #shuffle node>quot ( ? node -- )
     >r drop t r> dup effect-str "#shuffle: " swap append comment, ;

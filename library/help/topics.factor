@@ -42,7 +42,7 @@ GENERIC: elements* ( elt-type element -- )
     [
         [
             swap elements [
-                1 swap tail [ dup set ] each
+                1 tail [ dup set ] each
             ] each
         ] each-with
     ] make-hash hash-keys ;
@@ -62,7 +62,7 @@ DEFER: $subsection
     [ drop ] [ [ (where) ] each ] if ;
 
 : where ( article -- seq )
-    [ (where) ] { } make 1 swap tail prune ;
+    [ (where) ] { } make 1 tail prune ;
 
 : xref-article ( article -- )
     [ children ] parent-graph get add-vertex ;

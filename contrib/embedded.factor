@@ -27,12 +27,12 @@ USING: sequences kernel parser math namespaces io ;
     "<%" over start dup -1 = [
 	drop "" swap
     ] [
-	swap 2dup head >r tail r>
+	2dup head >r tail r>
     ] if ;
 
 : get-embedded ( "<%code%>blah" -- "blah" "code" )
     ! regexps where art thou?
-    "%>" over 2 start* 2dup swap 2 -rot subseq >r 2 + swap tail r> ;
+    "%>" over 2 start* 2dup swap 2 -rot subseq >r 2 + tail r> ;
 
 : get-first-chunk ( string -- string )
     dup "<%" head? [

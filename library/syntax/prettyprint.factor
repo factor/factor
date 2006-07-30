@@ -203,7 +203,7 @@ M: real pprint* ( obj -- ) number>string text ;
 : do-string-limit ( string -- string )
     string-limit get [
         dup length margin get > [
-            margin get 3 - swap head "..." append
+            margin get 3 - head "..." append
         ] when
     ] when ;
 
@@ -242,7 +242,7 @@ M: dll pprint* ( obj -- str ) dll-path "DLL\" " pprint-string ;
 
 : length-limit? ( seq -- seq ? )
     length-limit get dup
-    [ swap 2dup length < [ head t ] [ nip f ] if ]
+    [ over length over > [ head t ] [ drop f ] if ]
     [ drop f ] if ;
 
 : pprint-element ( object -- )
@@ -282,7 +282,7 @@ M: tuple pprint* ( tuple -- )
     [
         \ T{ pprint*
         tuple>array dup first pprint*
-        <block 1 swap tail-slice pprint-elements
+        <block 1 tail-slice pprint-elements
         \ } pprint*
     ] check-recursion ;
 

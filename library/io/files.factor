@@ -21,7 +21,7 @@ strings styles ;
 
 : parent-dir ( path -- path )
     CHAR: / over last-index CHAR: \\ pick last-index max
-    dup -1 = [ 2drop "." ] [ swap head ] if ;
+    dup -1 = [ 2drop "." ] [ head ] if ;
 
 : resource-path ( path -- path )
     image parent-dir swap path+ ;

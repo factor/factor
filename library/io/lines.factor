@@ -13,10 +13,10 @@ C: line-reader ( stream -- line ) [ set-delegate ] keep ;
 : (readln) ( ? line -- ? )
     #! The flag is set after the first character is read.
     dup delegate stream-read1 dup [
-        >r >r drop t r> r> dup CHAR: \r = [
+        >r >r drop t r> r> dup CHAR: \r number= [
             drop t swap set-line-reader-cr
         ] [
-            dup CHAR: \n = [
+            dup CHAR: \n number= [
                 drop dup cr> [ (readln) ] [ drop ] if
             ] [
                 , (readln)
@@ -35,7 +35,7 @@ M: line-reader stream-read ( count line -- string )
         over empty? [
             drop
         ] [
-            >r 1 swap tail r> stream-read1 [ add ] when*
+            >r 1 tail r> stream-read1 [ add ] when*
         ] if
     ] [
         drop

@@ -45,7 +45,7 @@ TUPLE: no-method object generic ;
         3dup >r 1+ r> nth first class< [
             >r 1+ r> (simplify-alist)
         ] [
-            [ nth second ] 2keep >r 1+ r> tail rot drop
+            [ nth second ] 2keep swap 1+ tail rot drop
         ] if
     ] if ;
 

@@ -52,8 +52,8 @@ TUPLE: mapping tuple table fields one-to-one one-to-many   ;
   #! Given a tuple class return a list of the fields
   #! within that tuple. Ignores the delegate field.
   [ word-name length 1+ ] keep
-  "slots" word-prop 1 swap tail [ ( name-len { slot getter setter } )
-    [ 1 swap nth word-name tail sanitize dup ":" swap append ] keep    
+  "slots" word-prop 1 tail [ ( name-len { slot getter setter } )
+    [ 1 swap nth word-name swap tail sanitize dup ":" swap append ] keep    
     0 swap nth
     "text"
     <db-field>

@@ -5,7 +5,7 @@ IN: lindenmayer
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-: make-matrix >r { } make r> swap group ;
+: make-matrix >r { } make r> group ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
@@ -129,15 +129,14 @@ SYMBOL: rules
 { { [ dup "" = ] [ drop [ ] ] }
   { [ dup length* 1 = ] [ f cons ] }
   { [ dup 1 swap nth CHAR: ( = ]
-    [ dup CHAR: ) swap index 1 +	! str i
-      swap				! i str
-      2dup head				! i str head
+    [ dup CHAR: ) swap index 1 +
+      2dup head				! str i head
       -rot tail				! head tail
       segment cons ] }
-  { [ t ] [ 1 over head swap 1 swap tail segment cons ] } }
+  { [ t ] [ dup 1 head swap 1 tail segment cons ] } }
 cond ;
 
-: lookup ( str -- str ) 1 over head rules get hash dup [ nip ] [ drop ] if ;
+: lookup ( str -- str ) dup 1 head rules get hash dup [ nip ] [ drop ] if ;
 
 : rewrite ( str -- str ) segment [ lookup ] map concat ;
 
@@ -145,11 +144,11 @@ cond ;
 ! Lindenmayer string interpretation
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-: last ( seq -- [ last-item ] ) dup length* 1 - swap tail ;
+: last ( seq -- [ last-item ] ) dup length* 1- tail ;
 
 SYMBOL: command-table
 
-: segment-command ( seg -- command ) 1 swap head ;
+: segment-command ( seg -- command ) 1 head ;
 
 : segment-parameter ( seg -- parameter )
 dup length* 1 - 2 swap rot subseq parse call ;

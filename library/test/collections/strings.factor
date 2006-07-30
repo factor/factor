@@ -26,13 +26,13 @@ USE: vectors
 [ -1 ] [ "amigo" "hola" start ] unit-test
 [ -1 ] [ "holaa" "hola" start ] unit-test
 
-[ "Beginning" ] [ 9 "Beginning and end" head ] unit-test
+[ "Beginning" ] [ "Beginning and end" 9 head ] unit-test
 
 [ f ] [ CHAR: I "team" member? ] unit-test
 [ t ] [ "ea" "team" subseq? ] unit-test
 [ f ] [ "actore" "Factor" subseq? ] unit-test
 
-[ "end" ] [ 14 "Beginning and end" tail ] unit-test
+[ "end" ] [ "Beginning and end" 14 tail ] unit-test
 
 [ "hello" "world" ] [ "hello world" " " split1 ] unit-test
 [ "goodbye" f ] [ "goodbye" " " split1 ] unit-test
@@ -80,7 +80,7 @@ unit-test
 
 [ f ] [ [ 0 10 "hello" subseq ] catch not ] unit-test
 
-[ { "hell" "o wo" "rld" } ] [ 4 "hello world" group ] unit-test
+[ { "hell" "o wo" "rld" } ] [ "hello world" 4 group ] unit-test
 
 [ 4 ] [
     0 "There are Four Upper Case characters"

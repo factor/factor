@@ -81,7 +81,7 @@ DEFER: described-menu
 
 : described-menu ( { title items* } -- menu )
     [ first <NSMenu> ] keep
-    1 swap tail [ and-described-item ] each ;
+    1 tail [ and-described-item ] each ;
 
 : and-described-submenu ( menu { title items* } -- menu )
     described-menu dupd add-submenu ;

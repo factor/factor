@@ -1,22 +1,22 @@
 USING: help sequences ;
 
-HELP: head-slice "( n seq -- slice )"
-{ $values { "n" "a non-negative integer" } { "seq" "a sequence" } { "slice" "a slice" } }
+HELP: head-slice "( seq n -- slice )"
+{ $values { "seq" "a sequence" } { "n" "a non-negative integer" } { "slice" "a slice" } }
 { $description "Outputs a virtual sequence sharing storage with the first " { $snippet "n" } " elements of the input sequence." }
 { $errors "Throws an error if the index is out of bounds." } ;
 
-HELP: tail-slice "( n seq -- slice )"
-{ $values { "n" "a non-negative integer" } { "seq" "a sequence" } { "slice" "a slice" } }
+HELP: tail-slice "( seq n -- slice )"
+{ $values { "seq" "a sequence" } { "n" "a non-negative integer" } { "slice" "a slice" } }
 { $description "Outputs a virtual sequence sharing storage with all elements up to the " { $snippet "n" } "th index of the input sequence." }
 { $errors "Throws an error if the index is out of bounds." } ;
 
-HELP: head-slice* "( n seq -- slice )"
-{ $values { "n" "a non-negative integer" } { "seq" "a sequence" } { "slice" "a slice" } }
+HELP: head-slice* "( seq n -- slice )"
+{ $values { "seq" "a sequence" } { "n" "a non-negative integer" } { "slice" "a slice" } }
 { $description "Outputs a virtual sequence sharing storage with all elements of " { $snippet "seq" } " until the " { $snippet "n" } "th element from the end. In other words, it outputs a sequence of the first " { $snippet "l-n" } " elements of the input sequence, where " { $snippet "l" } " is its length." }
 { $errors "Throws an error if the index is out of bounds." } ;
 
-HELP: tail-slice* "( n seq -- slice )"
-{ $values { "n" "a non-negative integer" } { "seq" "a sequence" } { "slice" "a slice" } }
+HELP: tail-slice* "( seq n -- slice )"
+{ $values { "seq" "a sequence" } { "n" "a non-negative integer" } { "slice" "a slice" } }
 { $description "Outputs a virtual sequence sharing storage with the last " { $snippet "n" } " elements of the input sequence." }
 { $errors "Throws an error if the index is out of bounds." } ;
 
@@ -25,13 +25,23 @@ HELP: subseq "( m n seq -- subseq )"
 { $description "Outputs a new sequence consisting of all elements starting from and including " { $snippet "m" } ", and up to but not including " { $snippet "n" } "." }
 { $errors "Throws an error if " { $snippet "m" } " or " { $snippet "n" } " is out of bounds." } ;
 
-HELP: head* "( n seq -- headseq )"
-{ $values { "n" "a non-negative integer" } { "seq" "a sequence" } { "headseq" "a new sequence" } }
+HELP: head "( seq n -- headseq )"
+{ $values { "seq" "a sequence" } { "n" "a non-negative integer" } { "headseq" "a new sequence" } }
+{ $description "Outputs a new sequence consisting of the first " { $snippet "n" } " elements of the input sequence." }
+{ $errors "Throws an error if the index is out of bounds." } ;
+
+HELP: tail "( seq n -- tailseq )"
+{ $values { "seq" "a sequence" } { "n" "a non-negative integer" } { "tailseq" "a new sequence" } }
+{ $description "Outputs a new sequence consisting of the input sequence with the first n items removed." }
+{ $errors "Throws an error if the index is out of bounds." } ;
+
+HELP: head* "( seq n -- headseq )"
+{ $values { "seq" "a sequence" } { "n" "a non-negative integer" } { "headseq" "a new sequence" } }
 { $description "Outputs a new sequence consisting of all elements of " { $snippet "seq" } " until the " { $snippet "n" } "th element from the end. In other words, it outputs a sequence of the first " { $snippet "l-n" } " elements of the input sequence, where " { $snippet "l" } " is its length." }
 { $errors "Throws an error if the index is out of bounds." } ;
 
-HELP: tail* "( n seq -- tailseq )"
-{ $values { "n" "a non-negative integer" } { "seq" "a sequence" } { "tailseq" "a new sequence" } }
+HELP: tail* "( seq n -- tailseq )"
+{ $values { "seq" "a sequence" } { "n" "a non-negative integer" } { "tailseq" "a new sequence" } }
 { $description "Outputs a new sequence consisting of the last " { $snippet "n" } " elements of the input sequence." }
 { $errors "Throws an error if the index is out of bounds." } ;
 
@@ -77,8 +87,8 @@ HELP: cut* "( n seq -- before after )"
 { $values { "n" "a non-negative integer" } { "seq" "a sequence" } { "before" "a sequence" } { "after" "a sequence" } }
 { $description "Outputs a pair of sequences, where " { $snippet "after" } " consists of the last " { $snippet "n" } " elements of " { $snippet "seq" } ", while " { $snippet "before" } " holds the remaining elements. Both output sequences have the same type as " { $snippet "seq" } "." } ;
 
-HELP: group "( n seq -- groups )"
-{ $values { "n" "a non-negative integer" } { "seq" "a sequence" } { "groups" "a sequence of sequences" } }
+HELP: group "( seq n -- groups )"
+{ $values { "seq" "a sequence" } { "n" "a non-negative integer" } { "groups" "a sequence of sequences" } }
 { $description "Splits the sequence into groups of " { $snippet "n" } " elements and collects the groups into a new array." }
 { $notes "If the sequence length is not a multiple of " { $snippet "n" } ", the final subsequence in the list will be shorter than " { $snippet "n" } " elements." } ;
 

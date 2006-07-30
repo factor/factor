@@ -104,7 +104,7 @@ M: editor model-changed ( editor -- )
     f over set-editor-focused? relayout-1 ;
 
 : (offset>x) ( font col# str -- x )
-    head-slice string-width ;
+    swap head-slice string-width ;
 
 : offset>x ( col# line# editor -- x )
     [ editor-line ] keep editor-font* -rot (offset>x) ;

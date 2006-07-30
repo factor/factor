@@ -11,7 +11,7 @@ SYMBOL: matrix
 : nth-row ( row# -- seq ) matrix get nth ;
 
 : nth-col ( col# ignore-rows -- seq )
-    matrix get tail-slice [ nth ] map-with ;
+    matrix get swap tail-slice [ nth ] map-with ;
 
 : change-row ( row# quot -- | quot: seq -- seq )
     matrix get -rot change-nth ; inline

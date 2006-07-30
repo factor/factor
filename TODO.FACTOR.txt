@@ -27,7 +27,6 @@
 - the invalid recursion form case needs to be fixed, for inlines too
 - instead of decompiling words, add them to a 'recompile' set; compiler
   treats words in the recompile set as if they were not compiled
-- consider: swap tail --> tail, swap head --> head, swap group --> group
 - mach_signal: fault address reporting is not reliable
 - see if alien calls can be made faster
 - faster sequence= for UI

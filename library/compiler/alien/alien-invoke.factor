@@ -74,7 +74,7 @@ M: alien-invoke stack-reserve*
     alien-invoke-parameters stack-space ;
 
 : parse-arglist ( return seq -- types stack-effect )
-    2 swap group unpair
+    2 group unpair
     rot dup "void" = [ drop { } ] [ 1array ] if 2array
     effect>string ;
 

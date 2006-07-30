@@ -76,8 +76,8 @@ C: document ( -- document )
 : append-last ( str seq -- seq )
     [ length 1- ] keep [ swap append ] change-nth ;
 
-: loc-col/str ( loc document -- col str )
-    >r first2 swap r> nth ;
+: loc-col/str ( loc document -- str col )
+    >r first2 swap r> nth swap ;
 
 : prepare-insert ( newinput startloc endloc lines -- newinput )
     tuck loc-col/str tail-slice >r loc-col/str head-slice r>
