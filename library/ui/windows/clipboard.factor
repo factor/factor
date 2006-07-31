@@ -4,6 +4,9 @@ USING: kernel win32-api math namespaces io prettyprint errors sequences alien
     libc gadgets ;
 IN: win32
 
+: crlf>lf CHAR: \r swap remove ;
+: lf>crlf [ [ dup CHAR: \n = [ CHAR: \r , ] when , ] each ] "" make ;
+
 : (enum-clipboard) ( n -- )
     EnumClipboardFormats win32-error dup 0 > [ dup , (enum-clipboard) ] when ;
 
@@ -13,16 +16,19 @@ IN: win32
 : paste ( -- str )
     f OpenClipboard drop
     CF_TEXT IsClipboardFormatAvailable 0 = [
-            "no text in clipboard" print
+            ! nothing to paste
+            ""
         ] [
-            ! "text found" print
             CF_TEXT GetClipboardData
             dup GlobalLock swap
             GlobalUnlock drop
+            alien>char-string
     ] if
-    CloseClipboard drop alien>char-string ;
+    CloseClipboard drop
+    crlf>lf ;
 
 : copy ( str -- )
+    lf>crlf
     f OpenClipboard drop
     EmptyClipboard drop
     GMEM_MOVEABLE over length 1+ GlobalAlloc dup 0 = [
@@ -30,13 +36,12 @@ IN: win32
     ] when
 
     dup GlobalLock
-    rot dup length memcpy
+    rot [ string>char-alien ] keep length memcpy
     dup GlobalUnlock drop
     CF_TEXT swap SetClipboardData 0 = [
         win32-error
         "SetClipboardData failed" throw
     ] when
-
     CloseClipboard drop ;
 
 TUPLE: pasteboard ;

@@ -203,11 +203,11 @@ SYMBOL: hWnd
 
                 ! Keyboard events
                 { [ dup WM_KEYDOWN = over WM_SYSKEYDOWN = or ]
-                    [ drop handle-wm-keydown 0 ] }
+                    [ drop 4dup handle-wm-keydown DefWindowProc ] }
                 { [ dup WM_CHAR = over WM_SYSCHAR = or ]
-                    [ drop handle-wm-char 0 ] }
+                    [ drop 4dup handle-wm-char DefWindowProc ] }
                 { [ dup WM_KEYUP = over WM_SYSKEYUP = or ]
-                    [ drop handle-wm-keyup 0 ] }
+                    [ drop 4dup handle-wm-keyup DefWindowProc ] }
 
                 { [ dup WM_SETFOCUS = ] [ drop handle-wm-set-focus 0 ] }
                 { [ dup WM_KILLFOCUS = ] [ drop handle-wm-kill-focus 0 ] }
@@ -238,7 +238,6 @@ SYMBOL: hWnd
     ] when ;
 
 : event-loop ( -- )
-    ! "MSG'D" print flush
     windows get empty? [
         [ do-events ui-step ] ui-try event-loop
     ] unless ;
