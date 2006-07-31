@@ -79,7 +79,7 @@ parser prettyprint sequences strings words ;
 
 ! The telnet server is for the jEdit plugin.
 : telnetd ( port -- )
-    \ telnetd [ print-banner listener ] with-server ;
+    \ telnetd [ tty ] with-server ;
 
 : search ( name vocabs -- word )
     dupd [ lookup ] find-with nip lookup ;

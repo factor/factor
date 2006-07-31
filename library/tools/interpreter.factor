@@ -32,24 +32,41 @@ SYMBOL: callframe-end
 : meta-callframe ( -- seq )
     { callframe callframe-scan callframe-end } [ get ] map ;
 
+: (meta-call) ( quot -- )
+    dup callframe set
+    length callframe-end set
+    0 callframe-scan set ;
+
 ! Callframe.
 : up ( -- )
     pop-c callframe-end set
     pop-c callframe-scan set
     pop-c callframe set ;
 
-: done? ( -- ? ) callframe-scan get callframe-end get >= ;
+: done-cf? ( -- ? ) callframe-scan get callframe-end get >= ;
 
-: next ( -- obj )
-    done? [
-        up next
-    ] [
-        callframe-scan get callframe get nth callframe-scan inc
-    ] if ;
+: done? ( -- ? ) done-cf? meta-c get empty? and ;
+
+: (next)
+    callframe-scan get callframe get nth callframe-scan inc ;
+
+: next ( quot -- obj )
+    {
+        { [ done? ] [ drop f (meta-call) ] }
+        { [ done-cf? ] [ drop up ] }
+        { [ t ] [ >r (next) r> call ] }
+    } cond ; inline
 
 : meta-interp ( -- interp )
     meta-d get meta-r get meta-c get
     meta-name get meta-catch get <continuation> ;
+
+: init-meta-interp ( -- )
+    V{ } clone meta-catch set
+    V{ } clone meta-name set
+    V{ } clone meta-c set
+    V{ } clone meta-r set
+    V{ } clone meta-d set ;
 
 : set-meta-interp ( interp -- )
     >continuation<
@@ -60,18 +77,15 @@ SYMBOL: callframe-end
     meta-d set ;
 
 : save-callframe ( -- )
-    callframe get push-c
-    callframe-scan get push-c
-    callframe-end get push-c ;
-
-: (meta-call) ( quot -- )
-    dup callframe set
-    length callframe-end set
-    0 callframe-scan set ;
+    done-cf? [
+        callframe get push-c
+        callframe-scan get push-c
+        callframe-end get push-c
+    ] unless ;
 
 : meta-call ( quot -- )
     #! Note we do tail call optimization here.
-    done? [ save-callframe ] unless (meta-call) ;
+    save-callframe (meta-call) ;
 
 : host-word ( word -- )
     [
@@ -113,3 +127,7 @@ M: object do ( object -- ) do-1 ;
 \ execute [ pop-d do ] "meta-word" set-word-prop
 \ if [ pop-d pop-d pop-d [ nip ] [ drop ] if meta-call ] "meta-word" set-word-prop
 \ dispatch [ pop-d pop-d swap nth meta-call ] "meta-word" set-word-prop
+
+: step ( -- ) [ do-1 ] next ;
+
+: into ( -- ) [ do ] next ;

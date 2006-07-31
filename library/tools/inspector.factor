@@ -37,8 +37,7 @@ SYMBOL: inspector-stack
         "inspector " listener-prompt set
         V{ } clone inspector-stack set
         (inspect)
-        listener
-    ] with-scope ;
+    ] listener ;
 
 : inspect ( obj -- )
     #! Start an inspector if its not already running.

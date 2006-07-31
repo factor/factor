@@ -38,10 +38,11 @@ SYMBOL: datastack-hook
 : (listener) ( -- )
     quit-flag get [ quit-flag off ] [ listen (listener) ] if ;
 
-: listener ( -- )
+: listener ( quot -- )
     [
         use [ clone ] change
         [ datastack ] datastack-hook set
+        call
         (listener)
     ] with-scope ;
 
@@ -51,4 +52,4 @@ SYMBOL: datastack-hook
 
 IN: shells
 
-: tty print-banner listener ;
+: tty [ print-banner ] listener ;

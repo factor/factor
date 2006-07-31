@@ -120,7 +120,8 @@ HELP: advance "( section -- )"
 { $values { "section" "a section" } }
 { $description "Emits a space unless the section is the first section on the line." } ;
 
-HELP: <block "( -- )"
+HELP: <block "( style -- )"
+{ $values { "style" "a style" } }
 { $description "Begins a nested block." }
 $prettyprinting-note ;
 
