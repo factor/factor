@@ -99,16 +99,6 @@ SYMBOL: callframe-end
 
 : host-word ( word -- ) unit host-quot ;
 
-: end-quot ( -- )
-    callframe-scan get callframe get (host-quot) [ ] (meta-call) ;
-
-: end ( -- )
-    save-callframe
-    meta-c [ V{ [ stop ] 0 1 } swap append ] change
-    meta-interp schedule-thread yield
-    V{ } clone meta-c set
-    [ ] (meta-call) ;
-
 GENERIC: do-1 ( object -- )
 
 M: word do-1 ( word -- )
@@ -144,4 +134,14 @@ M: object do ( object -- ) do-1 ;
 
 : step ( -- ) [ do-1 ] next ;
 
-: into ( -- ) [ do ] next ;
+: step-in ( -- ) [ do ] next ;
+
+: step-out ( -- )
+    callframe-scan get callframe get (host-quot) [ ] (meta-call) ;
+
+: step-all ( -- )
+    save-callframe
+    meta-c [ V{ [ stop ] 0 1 } swap append ] change
+    meta-interp schedule-thread yield
+    V{ } clone meta-c set
+    [ ] (meta-call) ;

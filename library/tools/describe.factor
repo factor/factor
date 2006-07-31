@@ -93,7 +93,8 @@ DEFER: describe
     [
         hilite-index set dup hilite-quotation set
         1 nesting-limit set
-        .
+        pprint
+        terpri
     ] with-scope ;
 
 : callstack. ( seq -- seq )

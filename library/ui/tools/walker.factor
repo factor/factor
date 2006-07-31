@@ -46,9 +46,9 @@ TUPLE: walker-gadget track ds rs cs quot ;
 : <walker-toolbar> ( -- gadget )
     {
         { "Step" step }
-        { "Step in" into }
-        { "Step out" end-quot }
-        { "Step all" end }
+        { "Step in" step-in }
+        { "Step out" step-out }
+        { "Continue" step-all }
     } [
         [
             first2 [ walker-command ] curry <bevel-button> ,
