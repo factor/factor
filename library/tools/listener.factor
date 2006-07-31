@@ -1,5 +1,5 @@
-! Copyright (C) 2003, 2005 Slava Pestov.
-! See http://factor.sf.net/license.txt for BSD license.
+! Copyright (C) 2003, 2006 Slava Pestov.
+! See http://factorcode.org/license.txt for BSD license.
 IN: listener
 USING: errors hashtables io kernel math memory namespaces
 parser sequences strings styles vectors words ;
@@ -31,8 +31,8 @@ SYMBOL: eval-hook
     ] with-parser in set ;
 
 : listen ( -- )
-    listener-hook get call
     listener-prompt get write flush [
+        listener-hook get call
         read-multiline [ eval-hook get call ] [ drop bye ] if
     ] try ;
 

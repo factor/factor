@@ -90,9 +90,6 @@ M: walker-gadget pref-dim*
 M: walker-gadget focusable-child* ( listener -- gadget )
     walker-gadget-input ;
 
-: walker-namestack ( walker -- ns )
-    [ global , walker-stream stdio associate , ] V{ } make ;
-
 : walker-continuation ( -- continuation )
     <empty-continuation>
     catchstack over set-continuation-catch
