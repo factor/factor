@@ -1,5 +1,10 @@
 + 0.84:
 
++ remaining walker tasks:
+- <input> handled by walker itself
+- ^W in interactor
+- ^I in interactor
+
 - windows native i/o
 - fix contribs: parser-combinators, boids, automata, space-invaders
 - unix i/o: problems with passing f to syscalls

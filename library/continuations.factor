@@ -18,6 +18,10 @@ USING: namespaces sequences ;
 
 TUPLE: continuation data retain call name catch ;
 
+: <empty-continuation> ( -- continuation )
+    V{ } clone V{ } clone V{ } clone V{ } clone V{ } clone
+    <continuation> ;
+
 : continuation ( -- interp )
     datastack retainstack callstack namestack catchstack
     <continuation> ; inline

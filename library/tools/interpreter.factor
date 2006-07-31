@@ -1,8 +1,8 @@
 ! Copyright (C) 2004, 2006 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 IN: interpreter
-USING: errors generic io kernel kernel-internals math namespaces
-prettyprint sequences strings threads vectors words ;
+USING: arrays errors generic io kernel kernel-internals math
+namespaces prettyprint sequences strings threads vectors words ;
 
 ! A Factor interpreter written in Factor. It can transfer the
 ! continuation to and from the primary interpreter. Used by
@@ -87,15 +87,39 @@ SYMBOL: callframe-end
     #! Note we do tail call optimization here.
     save-callframe (meta-call) ;
 
-: (host-quot) ( n quot -- )
-    [
-        [ \ continuation , , \ continue-with , ] [ ] make
-        append
-        dup push-c swap push-c length push-c
-        meta-interp continue
-    ] callcc1 set-meta-interp 2drop ;
+: <callframe> ( quot -- seq )
+    0 over length 3array ;
 
-: host-quot ( quot -- ) 0 swap (host-quot) ;
+: quot>cont ( quot -- continuation )
+    <callframe> >vector
+    <empty-continuation>
+    [ set-continuation-call ] keep ;
+
+: catch-harness ( continuation -- quot )
+    [ [ c> 2array ] % , \ continue-with , ] [ ] make ;
+
+: host-harness ( quot continuation -- )
+    tuck [
+        catch-harness , \ >c ,
+        %
+        [ c> drop continuation ] %
+        ,
+        \ continue-with ,
+    ] [ ] make ;
+
+: restore-harness ( obj -- )
+    dup array? [
+        init-meta-interp [ ] (meta-call)
+        [ first2 continue-with ] in-thread drop
+    ] [
+        set-meta-interp
+    ] if ;
+
+: host-quot ( quot -- )
+    [
+        host-harness <callframe> meta-c get swap nappend
+        meta-interp continue
+    ] callcc1 restore-harness drop ;
 
 : host-word ( word -- ) unit host-quot ;
 
@@ -137,7 +161,8 @@ M: object do ( object -- ) do-1 ;
 : step-in ( -- ) [ do ] next ;
 
 : step-out ( -- )
-    callframe-scan get callframe get (host-quot) [ ] (meta-call) ;
+    callframe get callframe-scan get tail
+    host-quot [ ] (meta-call) ;
 
 : step-all ( -- )
     save-callframe

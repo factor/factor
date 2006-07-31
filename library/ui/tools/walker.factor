@@ -1,7 +1,7 @@
 ! Copyright (C) 2006 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 IN: gadgets-walker
-USING: arrays gadgets gadgets-buttons gadgets-frames
+USING: arrays errors gadgets gadgets-buttons gadgets-frames
 gadgets-listener gadgets-panes gadgets-scrolling gadgets-text
 gadgets-tiles gadgets-tracks generic hashtables inspector
 interpreter io kernel kernel-internals listener math models
@@ -94,10 +94,9 @@ M: walker-gadget focusable-child* ( listener -- gadget )
     [ global , walker-stream stdio associate , ] V{ } make ;
 
 : walker-continuation ( -- continuation )
-    continuation
-    V{ } clone over set-continuation-data
-    V{ } clone over set-continuation-retain
-    V{ } clone over set-continuation-call ;
+    <empty-continuation>
+    catchstack over set-continuation-catch
+    namestack over set-continuation-name ;
 
 : init-walker ( walker -- )
     H{ } clone over set-walker-gadget-ns

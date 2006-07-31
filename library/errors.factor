@@ -13,7 +13,11 @@ USING: kernel ;
     [ >c call f c> drop f ] callcc1 nip ; inline
 
 : rethrow ( error -- )
-    catchstack* empty? [ die ] [ c> continue-with ] if ;
+    catchstack* empty? [
+        die
+    ] [
+        c> dup quotation? [ call ] [ continue-with ] if
+    ] if ;
 
 : cleanup ( try cleanup -- | try: -- | cleanup: -- )
     [ >c >r call c> drop r> call ]
