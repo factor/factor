@@ -131,7 +131,7 @@ void primitive_cwd(void)
 void primitive_cd(void)
 {
 	maybe_gc(0);
-	chdir(pop_char_string());
+	chdir(unbox_char_string());
 }
 
 BOUNDED_BLOCK *alloc_bounded_block(CELL size)

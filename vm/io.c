@@ -35,8 +35,8 @@ void primitive_fopen(void)
 	char *path, *mode;
 	FILE* file;
 	maybe_gc(0);
-	mode = pop_char_string();
-	path = pop_char_string();
+	mode = unbox_char_string();
+	path = unbox_char_string();
 	file = fopen(path,mode);
 	if(file == NULL)
 		io_error();

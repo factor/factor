@@ -110,7 +110,6 @@ void char_string_to_memory(F_STRING *s, char *string);
 void primitive_char_string_to_memory(void);
 F_ARRAY *string_to_char_alien(F_STRING *s, bool check);
 char* to_char_string(F_STRING *s, bool check);
-char *pop_char_string(void);
 DLLEXPORT char *unbox_char_string(void);
 void primitive_string_to_char_alien(void);
 
@@ -118,7 +117,6 @@ void u16_string_to_memory(F_STRING *s, u16 *string);
 void primitive_u16_string_to_memory(void);
 F_ARRAY *string_to_u16_alien(F_STRING *s, bool check);
 u16* to_u16_string(F_STRING *s, bool check);
-u16 *pop_u16_string(void);
 DLLEXPORT u16 *unbox_u16_string(void);
 void primitive_string_to_u16_alien(void);
 

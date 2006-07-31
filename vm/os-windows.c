@@ -163,7 +163,7 @@ void primitive_cwd(void)
 void primitive_cd(void)
 {
 	maybe_gc(0);
-	SetCurrentDirectory(pop_char_string());
+	SetCurrentDirectory(unbox_char_string());
 }
 
 BOUNDED_BLOCK *alloc_bounded_block(CELL size)

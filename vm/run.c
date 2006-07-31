@@ -170,7 +170,7 @@ void primitive_os_env(void)
 
 	maybe_gc(0);
 
-	name = pop_char_string();
+	name = unbox_char_string();
 	value = getenv(name);
 	if(value == NULL)
 		dpush(F);

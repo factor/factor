@@ -356,16 +356,9 @@ F_ARRAY *allot_c_string(CELL capacity, CELL size)
 		else \
 			return (type*)(string_to_##type##_alien(s,check) + 1); \
 	} \
-	type *pop_##type##_string(void) \
-	{ \
-		return to_##type##_string(untag_string(dpop()),true); \
-	} \
 	type *unbox_##type##_string(void) \
 	{ \
-		if(type_of(dpeek()) == STRING_TYPE) \
-			return pop_##type##_string(); \
-		else \
-			return unbox_alien(); \
+		return to_##type##_string(untag_string(dpop()),true); \
 	} \
 	void primitive_string_to_##type##_alien(void) \
 	{ \
