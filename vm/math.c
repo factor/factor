@@ -491,18 +491,6 @@ void primitive_from_fraction(void)
 	dpush(RETAG(ratio,RATIO_TYPE));
 }
 
-void fixup_ratio(F_RATIO* ratio)
-{
-	data_fixup(&ratio->numerator);
-	data_fixup(&ratio->denominator);
-}
-
-void collect_ratio(F_RATIO* ratio)
-{
-	copy_handle(&ratio->numerator);
-	copy_handle(&ratio->denominator);
-}
-
 /* Floats */
 
 double to_float(CELL tagged)
@@ -763,16 +751,4 @@ void primitive_from_rect(void)
 	complex->real = real;
 	complex->imaginary = imaginary;
 	dpush(RETAG(complex,COMPLEX_TYPE));
-}
-
-void fixup_complex(F_COMPLEX* complex)
-{
-	data_fixup(&complex->real);
-	data_fixup(&complex->imaginary);
-}
-
-void collect_complex(F_COMPLEX* complex)
-{
-	copy_handle(&complex->real);
-	copy_handle(&complex->imaginary);
 }

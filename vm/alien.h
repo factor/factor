@@ -12,7 +12,6 @@ void primitive_alien_address(void);
 void* alien_offset(CELL object);
 
 void fixup_alien(ALIEN* d);
-void collect_alien(ALIEN* d);
 
 DLLEXPORT void *unbox_alien(void);
 DLLEXPORT void box_alien(CELL ptr);
@@ -55,6 +54,3 @@ INLINE DLL *untag_dll(CELL tagged)
 void primitive_dlopen(void);
 void primitive_dlsym(void);
 void primitive_dlclose(void);
-
-void fixup_dll(DLL* dll);
-void collect_dll(DLL* dll);

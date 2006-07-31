@@ -10,9 +10,7 @@ void *safe_malloc(size_t size)
 
 CELL object_size(CELL tagged)
 {
-	if(tagged == F)
-		return 0;
-	else if(TAG(tagged) == FIXNUM_TYPE)
+	if(tagged == F || TAG(tagged) == FIXNUM_TYPE)
 		return 0;
 	else
 		return untagged_object_size(UNTAG(tagged));
@@ -20,57 +18,70 @@ CELL object_size(CELL tagged)
 
 CELL untagged_object_size(CELL pointer)
 {
-	CELL size;
+	return align8(unaligned_object_size(pointer));
+}
 
+CELL unaligned_object_size(CELL pointer)
+{
 	switch(untag_header(get(pointer)))
 	{
 	case WORD_TYPE:
-		size = sizeof(F_WORD);
-		break;
+		return sizeof(F_WORD);
 	case ARRAY_TYPE:
 	case TUPLE_TYPE:
 	case BIGNUM_TYPE:
 	case BYTE_ARRAY_TYPE:
 	case QUOTATION_TYPE:
-		size = array_size(array_capacity((F_ARRAY*)(pointer)));
-		break;
+		return array_size(array_capacity((F_ARRAY*)(pointer)));
 	case HASHTABLE_TYPE:
-		size = sizeof(F_HASHTABLE);
-		break;
+		return sizeof(F_HASHTABLE);
 	case VECTOR_TYPE:
-		size = sizeof(F_VECTOR);
-		break;
+		return sizeof(F_VECTOR);
 	case STRING_TYPE:
-		size = string_size(string_capacity((F_STRING*)(pointer)));
-		break;
+		return string_size(string_capacity((F_STRING*)(pointer)));
 	case SBUF_TYPE:
-		size = sizeof(F_SBUF);
-		break;
+		return sizeof(F_SBUF);
 	case RATIO_TYPE:
-		size = sizeof(F_RATIO);
-		break;
+		return sizeof(F_RATIO);
 	case FLOAT_TYPE:
-		size = sizeof(F_FLOAT);
-		break;
+		return sizeof(F_FLOAT);
 	case COMPLEX_TYPE:
-		size = sizeof(F_COMPLEX);
-		break;
+		return sizeof(F_COMPLEX);
 	case DLL_TYPE:
-		size = sizeof(DLL);
-		break;
+		return sizeof(DLL);
 	case ALIEN_TYPE:
-		size = sizeof(ALIEN);
-		break;
+		return sizeof(ALIEN);
 	case WRAPPER_TYPE:
-		size = sizeof(F_WRAPPER);
-		break;
+		return sizeof(F_WRAPPER);
 	default:
 		critical_error("Cannot determine untagged_object_size",pointer);
-		size = -1;/* can't happen */
-		break;
+		return -1; /* can't happen */
 	}
+}
 
-	return align8(size);
+/* The number of cells from the start of the object which should be scanned by
+the GC. Some types have a binary payload at the end (string, word, DLL) which
+we ignore. */
+CELL binary_payload_start(CELL pointer)
+{
+	switch(untag_header(get(pointer)))
+	{
+	/* these objects do not refer to other objects at all */
+	case STRING_TYPE:
+	case FLOAT_TYPE:
+	case BYTE_ARRAY_TYPE:
+	case BIGNUM_TYPE:
+		return 0;
+	/* these objects have some binary data at the end */
+	case WORD_TYPE:
+		return sizeof(F_WORD) - CELLS;
+	case ALIEN_TYPE:
+	case DLL_TYPE:
+		return CELLS * 2;
+	/* everything else consists entirely of pointers */
+	default:
+		return unaligned_object_size(pointer);
+	}
 }
 
 void primitive_type(void)
@@ -455,40 +466,15 @@ CELL copy_object(CELL pointer)
 
 INLINE void collect_object(CELL scan)
 {
-	switch(untag_header(get(scan)))
+	CELL payload_start = binary_payload_start(scan);
+	CELL end = scan + payload_start;
+
+	scan += CELLS;
+
+	while(scan < end)
 	{
-	case RATIO_TYPE:
-		collect_ratio((F_RATIO*)scan);
-		break;
-	case COMPLEX_TYPE:
-		collect_complex((F_COMPLEX*)scan);
-		break;
-	case WORD_TYPE:
-		collect_word((F_WORD*)scan);
-		break;
-	case ARRAY_TYPE:
-	case TUPLE_TYPE:
-	case QUOTATION_TYPE:
-		collect_array((F_ARRAY*)scan);
-		break;
-	case HASHTABLE_TYPE:
-		collect_hashtable((F_HASHTABLE*)scan);
-		break;
-	case VECTOR_TYPE:
-		collect_vector((F_VECTOR*)scan);
-		break;
-	case SBUF_TYPE:
-		collect_sbuf((F_SBUF*)scan);
-		break;
-	case DLL_TYPE:
-		collect_dll((DLL*)scan);
-		break;
-	case ALIEN_TYPE:
-		collect_alien((ALIEN*)scan);
-		break;
-	case WRAPPER_TYPE:
-		collect_wrapper((F_WRAPPER*)scan);
-		break;
+		copy_handle((CELL*)scan);
+		scan += CELLS;
 	}
 }
 

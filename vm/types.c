@@ -149,22 +149,6 @@ void primitive_tuple_to_array(void)
 	drepl(tuple);
 }
 
-/* image loading */
-void fixup_array(F_ARRAY* array)
-{
-	int i = 0; CELL capacity = array_capacity(array);
-	for(i = 0; i < capacity; i++)
-		data_fixup((void*)AREF(array,i));
-}
-
-/* GC */
-void collect_array(F_ARRAY* array)
-{
-	int i = 0; CELL capacity = array_capacity(array);
-	for(i = 0; i < capacity; i++)
-		copy_handle((void*)AREF(array,i));
-}
-
 F_VECTOR* vector(F_FIXNUM capacity)
 {
 	F_VECTOR* vector = allot_object(VECTOR_TYPE,sizeof(F_VECTOR));
@@ -190,16 +174,6 @@ void primitive_array_to_vector(void)
 	vector->top = array->capacity;
 	vector->array = tag_object(array);
 	drepl(tag_object(vector));
-}
-
-void fixup_vector(F_VECTOR* vector)
-{
-	data_fixup(&vector->array);
-}
-
-void collect_vector(F_VECTOR* vector)
-{
-	copy_handle(&vector->array);
 }
 
 /* untagged */
@@ -439,16 +413,6 @@ void primitive_sbuf(void)
 	drepl(tag_object(sbuf(size)));
 }
 
-void fixup_sbuf(F_SBUF* sbuf)
-{
-	data_fixup(&sbuf->string);
-}
-
-void collect_sbuf(F_SBUF* sbuf)
-{
-	copy_handle(&sbuf->string);
-}
-
 void primitive_hashtable(void)
 {
 	F_HASHTABLE* hash;
@@ -458,20 +422,6 @@ void primitive_hashtable(void)
 	hash->deleted = F;
 	hash->array = F;
 	dpush(tag_object(hash));
-}
-
-void fixup_hashtable(F_HASHTABLE* hashtable)
-{
-	data_fixup(&hashtable->count);
-	data_fixup(&hashtable->deleted);
-	data_fixup(&hashtable->array);
-}
-
-void collect_hashtable(F_HASHTABLE* hashtable)
-{
-	copy_handle(&hashtable->count);
-	copy_handle(&hashtable->deleted);
-	copy_handle(&hashtable->array);
 }
 
 /* When a word is executed we jump to the value of the xt field. However this
@@ -516,8 +466,6 @@ void primitive_word_compiledp(void)
 
 void fixup_word(F_WORD* word)
 {
-	data_fixup(&word->primitive);
-
 	/* If this is a compiled word, relocate the code pointer. Otherwise,
 	reset it based on the primitive number of the word. */
 	if(word->xt >= code_relocation_base
@@ -526,19 +474,6 @@ void fixup_word(F_WORD* word)
 		code_fixup(&word->xt);
 	else
 		update_xt(word);
-
-	data_fixup(&word->name);
-	data_fixup(&word->vocabulary);
-	data_fixup(&word->def);
-	data_fixup(&word->props);
-}
-
-void collect_word(F_WORD* word)
-{
-	copy_handle(&word->name);
-	copy_handle(&word->vocabulary);
-	copy_handle(&word->def);
-	copy_handle(&word->props);
 }
 
 void primitive_wrapper(void)
@@ -550,14 +485,4 @@ void primitive_wrapper(void)
 	wrapper = allot_object(WRAPPER_TYPE,sizeof(F_WRAPPER));
 	wrapper->object = dpeek();
 	drepl(tag_wrapper(wrapper));
-}
-
-void fixup_wrapper(F_WRAPPER *wrapper)
-{
-	data_fixup(&wrapper->object);
-}
-
-void collect_wrapper(F_WRAPPER *wrapper)
-{
-	copy_handle(&wrapper->object);
 }

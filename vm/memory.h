@@ -82,7 +82,9 @@ INLINE void type_check(CELL type, CELL tagged)
 }
 
 CELL untagged_object_size(CELL pointer);
+CELL unaligned_object_size(CELL pointer);
 CELL object_size(CELL pointer);
+CELL binary_payload_start(CELL pointer);
 void primitive_room(void);
 void primitive_type(void);
 void primitive_tag(void);

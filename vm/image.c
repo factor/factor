@@ -142,42 +142,31 @@ void primitive_save_image(void)
 
 void relocate_object(CELL relocating)
 {
+	CELL scan = relocating;
+	CELL payload_start = binary_payload_start(scan);
+	CELL end = scan + payload_start;
+
+	scan += CELLS;
+
+	while(scan < end)
+	{
+		data_fixup((CELL*)scan);
+		scan += CELLS;
+	}
+
 	switch(untag_header(get(relocating)))
 	{
-	case RATIO_TYPE:
-		fixup_ratio((F_RATIO*)relocating);
-		break;
-	case COMPLEX_TYPE:
-		fixup_complex((F_COMPLEX*)relocating);
-		break;
 	case WORD_TYPE:
 		fixup_word((F_WORD*)relocating);
-		break;
-	case ARRAY_TYPE:
-	case TUPLE_TYPE:
-	case QUOTATION_TYPE:
-		fixup_array((F_ARRAY*)relocating);
-		break;
-	case HASHTABLE_TYPE:
-		fixup_hashtable((F_HASHTABLE*)relocating);
-		break;
-	case VECTOR_TYPE:
-		fixup_vector((F_VECTOR*)relocating);
 		break;
 	case STRING_TYPE:
 		rehash_string((F_STRING*)relocating);
 		break;
-	case SBUF_TYPE:
-		fixup_sbuf((F_SBUF*)relocating);
-		break;
 	case DLL_TYPE:
-		fixup_dll((DLL*)relocating);
+		ffi_dlopen((DLL*)relocating,false);
 		break;
 	case ALIEN_TYPE:
 		fixup_alien((ALIEN*)relocating);
-		break;
-	case WRAPPER_TYPE:
-		fixup_wrapper((F_WRAPPER*)relocating);
 		break;
 	}
 }

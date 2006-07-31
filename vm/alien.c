@@ -95,14 +95,7 @@ void primitive_alien_address(void)
 /* image loading */
 void fixup_alien(ALIEN *d)
 {
-	data_fixup(&d->alien);
 	d->expired = true;
-}
-
-/* GC */
-void collect_alien(ALIEN *d)
-{
-	copy_handle(&d->alien);
 }
 
 /* define words to read/write numericals values at an alien address */
@@ -196,15 +189,4 @@ void primitive_dlsym(void)
 void primitive_dlclose(void)
 {
 	ffi_dlclose(untag_dll(dpop()));
-}
-
-void fixup_dll(DLL* dll)
-{
-	data_fixup(&dll->path);
-	ffi_dlopen(dll,false);
-}
-
-void collect_dll(DLL* dll)
-{
-	copy_handle(&dll->path);
 }

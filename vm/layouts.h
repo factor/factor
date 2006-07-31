@@ -152,8 +152,11 @@ typedef struct {
 
 typedef struct {
 	CELL header;
+	/* tagged */
 	CELL alien;
+	/* untagged */
 	CELL displacement;
+	/* untagged */
 	bool expired;
 } ALIEN;
 

@@ -24,7 +24,7 @@ INLINE F_ARRAY* untag_byte_array_fast(CELL tagged)
 
 INLINE CELL array_size(CELL size)
 {
-	return align8(sizeof(F_ARRAY) + size * CELLS);
+	return sizeof(F_ARRAY) + size * CELLS;
 }
 
 F_ARRAY *allot_array(CELL type, F_FIXNUM capacity);
@@ -52,9 +52,6 @@ INLINE CELL array_capacity(F_ARRAY* array)
 	return untag_fixnum_fast(array->capacity);
 }
 
-void fixup_array(F_ARRAY* array);
-void collect_array(F_ARRAY* array);
-
 INLINE F_VECTOR* untag_vector(CELL tagged)
 {
 	type_check(VECTOR_TYPE,tagged);
@@ -65,8 +62,6 @@ F_VECTOR* vector(F_FIXNUM capacity);
 
 void primitive_vector(void);
 void primitive_array_to_vector(void);
-void fixup_vector(F_VECTOR* vector);
-void collect_vector(F_VECTOR* vector);
 
 #define SREF(string,index) ((CELL)string + sizeof(F_STRING) + index * CHARS)
 
@@ -88,7 +83,7 @@ INLINE CELL string_capacity(F_STRING* str)
 
 INLINE CELL string_size(CELL size)
 {
-	return align8(sizeof(F_STRING) + (size + 1) * CHARS);
+	return sizeof(F_STRING) + (size + 1) * CHARS;
 }
 
 F_STRING* allot_string(F_FIXNUM capacity);
@@ -144,12 +139,8 @@ void primitive_set_char_slot(void);
 
 F_SBUF* sbuf(F_FIXNUM capacity);
 void primitive_sbuf(void);
-void fixup_sbuf(F_SBUF* sbuf);
-void collect_sbuf(F_SBUF* sbuf);
 
 void primitive_hashtable(void);
-void fixup_hashtable(F_HASHTABLE* hashtable);
-void collect_hashtable(F_HASHTABLE* hashtable);
 
 typedef void (*XT)(F_WORD *word);
 
@@ -174,7 +165,6 @@ void primitive_word(void);
 void primitive_update_xt(void);
 void primitive_word_compiledp(void);
 void fixup_word(F_WORD* word);
-void collect_word(F_WORD* word);
 
 INLINE F_WRAPPER *untag_wrapper_fast(CELL tagged)
 {
@@ -187,5 +177,3 @@ INLINE CELL tag_wrapper(F_WRAPPER *wrapper)
 }
 
 void primitive_wrapper(void);
-void fixup_wrapper(F_WRAPPER *wrapper);
-void collect_wrapper(F_WRAPPER *wrapper);

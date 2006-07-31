@@ -49,6 +49,8 @@
 
 + ui:
 
+- the UI listener has a shitty design. perhaps it should not call out
+  to the real listener.
 - remaining walker tasks:
   - <input> handled by walker itself
   - ^W in interactor
