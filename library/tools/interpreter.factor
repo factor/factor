@@ -90,11 +90,6 @@ SYMBOL: callframe-end
 : <callframe> ( quot -- seq )
     0 over length 3array ;
 
-: quot>cont ( quot -- continuation )
-    <callframe> >vector
-    <empty-continuation>
-    [ set-continuation-call ] keep ;
-
 : catch-harness ( continuation -- quot )
     [ [ c> 2array ] % , \ continue-with , ] [ ] make ;
 
