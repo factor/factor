@@ -19,7 +19,7 @@ sequences strings styles words ;
 
 : in. ( word -- )
     word-vocabulary [
-        <block \ IN: pprint-word write-vocab block;
+        H{ } <block \ IN: pprint-word write-vocab block;
     ] when* ;
 
 : (synopsis) ( word -- )
@@ -64,7 +64,9 @@ M: word (see) drop ;
 : pprint-; \ ; pprint-word ;
 
 : see-body ( quot word -- )
-    <block swap pprint-elements pprint-; declarations. block; ;
+    H{ } <block
+    swap pprint-elements pprint-; declarations.
+    block; ;
 
 M: compound (see)
     dup word-def swap see-body ;
@@ -72,7 +74,7 @@ M: compound (see)
 : method. ( word class method -- )
     \ M: pprint-word
     >r pprint-word pprint-word r>
-    <block pprint-elements pprint-; block; ;
+    H{ } <block pprint-elements pprint-; block; ;
 
 M: generic (see)
     dup dup "combination" word-prop swap see-body
@@ -102,7 +104,7 @@ M: predicate class.
     \ PREDICATE: pprint-word
     dup superclass pprint-word
     dup pprint-word
-    <block
+    H{ } <block
     "definition" word-prop pprint-elements
     pprint-; block; ;
 

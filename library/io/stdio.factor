@@ -27,7 +27,8 @@ SYMBOL: stdio
     swap stdio get with-stream-table ;
 
 : with-style ( style quot -- )
-    swap stdio get with-stream-style ;
+    swap dup hash-empty?
+    [ drop call ] [ stdio get with-stream-style ] if ;
 
 : print ( string -- ) stdio get stream-print ;
 

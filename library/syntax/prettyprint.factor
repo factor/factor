@@ -38,12 +38,13 @@ global [
 
 GENERIC: pprint-section*
 
-TUPLE: section start end nl-after? indent ;
+TUPLE: section start end nl-after? indent style ;
 
-C: section ( length -- section )
+C: section ( style length -- section )
     >r position [ dup rot + dup ] change r>
     [ set-section-end ] keep
     [ set-section-start ] keep
+    [ set-section-style ] keep
     0 over set-section-indent ;
 
 : line-limit? ( -- ? )
@@ -61,20 +62,19 @@ C: section ( length -- section )
         terpri do-indent
     ] if ;
 
-TUPLE: text string style ;
+TUPLE: text string ;
 
 C: text ( string style -- section )
-    pick length 1+ <section> over set-delegate
-    [ set-text-style ] keep
+    [ >r over length 1+ <section> r> set-delegate ] keep
     [ set-text-string ] keep ;
 
 M: text pprint-section*
-    dup text-string swap text-style format ;
+    dup text-string swap section-style format ;
 
 TUPLE: block sections ;
 
-C: block ( -- block )
-    0 <section> over set-delegate
+C: block ( style -- block )
+    [ >r 0 <section> r> set-delegate ] keep
     V{ } clone over set-block-sections
     t over set-section-nl-after?
     tab-size get over set-section-indent ;
@@ -115,12 +115,12 @@ C: block ( -- block )
     ] if ;
 
 : pprint-section ( section -- )
-    dup section-fits?
-    [ pprint-section* ] [ inset-section ] if ;
+    dup section-fits? [ pprint-section* ] [ inset-section ] if ;
 
 TUPLE: newline ;
 
-C: newline ( -- section ) 0 <section> over set-delegate ;
+C: newline ( -- section )
+    H{ } 0 <section> over set-delegate ;
 
 M: newline pprint-section* ( newline -- )
     section-start fresh-line ;
@@ -134,12 +134,18 @@ M: newline pprint-section* ( newline -- )
         section-start last-newline get = [ bl ] unless
     ] if ;
 
+: <style section-style stdio [ <nested-style-stream> ] change ;
+
+: style> stdio [ delegate ] change ;
+
 M: block pprint-section* ( block -- )
+    dup <style
     f swap block-sections [
         over [ dup advance ] when pprint-section drop t
-    ] each drop ;
+    ] each drop
+    style> ;
 
-: <block ( -- ) <block> pprinter-stack get push ;
+: <block ( style -- ) <block> pprinter-stack get push ;
 
 : end-block ( block -- ) position get swap set-section-end ;
 
@@ -162,10 +168,6 @@ GENERIC: pprint* ( obj -- )
 
 : word-style ( word -- style )
     [
-        hilite-next? get [
-            { 0.9 0.9 0.9 1 } background set
-            highlight on
-        ] when
         dup presented set
         parsing? [ bold font-style set ] when
     ] make-hash ;
@@ -218,7 +220,7 @@ M: sbuf pprint* ( str -- str ) "SBUF\" " pprint-string ;
 M: word pprint* ( word -- )
     dup "pprint-close" word-prop [ block> ] when
     dup pprint-word
-    "pprint-open" word-prop [ <block ] when ;
+    "pprint-open" word-prop [ H{ } <block ] when ;
 
 M: f pprint* drop \ f pprint-word ;
 
@@ -249,9 +251,14 @@ M: dll pprint* ( obj -- str ) dll-path "DLL\" " pprint-string ;
     dup parsing? [ \ POSTPONE: pprint-word ] when pprint* ;
 
 : pprint-hilite ( object n -- )
-    hilite-index get = hilite-next? set
-    pprint-element
-    hilite-next? off ;
+    hilite-index get = [
+        H{
+            { background { 0.9 0.9 0.9 1 } }
+            { highlight t }
+        } <block pprint-element block>
+    ] [
+        pprint-element
+    ] if ;
 
 : pprint-elements ( seq -- )
     length-limit? >r dup hilite-quotation get eq? [
@@ -282,7 +289,7 @@ M: tuple pprint* ( tuple -- )
     [
         \ T{ pprint*
         tuple>array dup first pprint*
-        <block 1 tail-slice pprint-elements
+        H{ } <block 1 tail-slice pprint-elements
         \ } pprint*
     ] check-recursion ;
 
@@ -303,7 +310,7 @@ M: wrapper pprint* ( wrapper -- )
 : with-pprint ( quot -- )
     [
         V{ } clone recursion-check set
-        <block> f ?push pprinter-stack set
+        H{ } <block> f ?push pprinter-stack set
         call end-blocks do-pprint
     ] with-scope ; inline
 

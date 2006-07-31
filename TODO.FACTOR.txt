@@ -14,6 +14,7 @@
   - history doesn't work in a good way if you ^K the input
   - history: move caret to end
 - finish gui stepper
+  - <input> handled by walker itself
 - graphical module manager tool
 - services do not launch if factor not running
 - integrated error documentation
@@ -21,7 +22,6 @@
 - 'show' doesn't work if invoked from a listener on an object which is
   itself inspected in the listener
 - fix top level window positioning
-- prettyprinter's highlighting of non-leaves doesn't really work
 - nasty inference regressions
 - [ [ dup call ] dup call ] infer hangs
 - the invalid recursion form case needs to be fixed, for inlines too
