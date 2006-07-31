@@ -146,8 +146,6 @@ ARTICLE: "timing" "Timing code"
 ARTICLE: "annotations" "Word annotations"
 "The word annotation feature modifies word definitions to add debugging code. You can restore the old definition by calling " { $link reload } " on the word in question."
 { $subsection watch }
-{ $subsection break }
-{ $subsection break-on }
 { $subsection profile }
 "All of the above words are implemented using a single combinator which applies a quotation to a word definition to yield a new definition:"
 { $subsection annotate } ;

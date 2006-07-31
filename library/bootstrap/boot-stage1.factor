@@ -94,10 +94,11 @@ sequences vectors words ;
         "/library/syntax/see.factor"
         "/library/syntax/parser.factor"
 
-        "/library/tools/interpreter.factor"
         "/library/tools/describe.factor"
         "/library/tools/debugger.factor"
         
+        "/library/threads.factor"
+
         "/library/help/stylesheet.factor"
         "/library/help/topics.factor"
         "/library/help/markup.factor"
@@ -115,7 +116,7 @@ sequences vectors words ;
         
         "/library/test/test.factor"
 
-        "/library/threads.factor"
+        "/library/tools/interpreter.factor"
         
         "/library/io/server.factor"
         "/library/tools/jedit.factor"
@@ -206,6 +207,7 @@ sequences vectors words ;
         "/library/ui/ui.factor"
         "/library/ui/gadgets/presentations.factor"
         "/library/ui/tools/listener.factor"
+        "/library/ui/tools/walker.factor"
         "/library/ui/tools/search.factor"
         "/library/ui/tools/browser.factor"
         "/library/ui/tools/help.factor"
