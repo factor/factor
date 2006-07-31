@@ -15,22 +15,22 @@ M: interactor graft* ( interactor -- )
     f over set-interactor-busy? delegate graft* ;
 
 : interactor-eval ( string interactor -- )
-    t over set-interactor-busy?
-    interactor-continuation schedule-thread-with ;
+    dup interactor-busy? [
+        2drop
+    ] [
+        t over set-interactor-busy?
+        interactor-continuation schedule-thread-with
+    ] if ;
 
 SYMBOL: structured-input
 
 : interactor-call ( quot gadget -- )
-    dup interactor-busy? [
-        2drop
-    ] [
-        dup interactor-output [
-            "Command: " write over short.
-        ] with-stream*
-        >r structured-input set-global
-        "\"structured-input\" \"gadgets-text\" lookup get-global call"
-        r> interactor-eval
-    ] if ;
+    dup interactor-output [
+        "Command: " write over short.
+    ] with-stream*
+    >r structured-input set-global
+    "\"structured-input\" \"gadgets-text\" lookup get-global call"
+    r> interactor-eval ;
 
 : print-input ( string interactor -- )
     interactor-output [
