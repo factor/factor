@@ -95,7 +95,7 @@ global [
         "inspector" "io" "jedit" "kernel" "listener" "math"
         "memory" "modules" "namespaces" "parser" "prettyprint"
         "sequences" "shells" "strings" "styles" "test"
-        "threads" "vectors" "walker" "words"
+        "threads" "vectors" "words"
     } set-use
     "scratchpad" set-in
 ] bind

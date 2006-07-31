@@ -111,7 +111,6 @@ sequences vectors words ;
         "/library/tools/memory.factor"
         "/library/tools/listener.factor"
         "/library/tools/inspector.factor"
-        "/library/tools/walker.factor"
         "/library/tools/word-tools.factor"
         
         "/library/test/test.factor"
@@ -295,7 +294,6 @@ sequences vectors words ;
         "/library/tools/inspector.facts"
         "/library/tools/listener.facts"
         "/library/tools/memory.facts"
-        "/library/tools/walker.facts"
 
         "/doc/handbook/alien.facts"
         "/doc/handbook/changes.facts"

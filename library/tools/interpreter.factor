@@ -1,8 +1,8 @@
 ! Copyright (C) 2004, 2006 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 IN: interpreter
-USING: errors generic io kernel kernel-internals math
-namespaces prettyprint sequences strings vectors words ;
+USING: errors generic io kernel kernel-internals math namespaces
+prettyprint sequences strings threads vectors words ;
 
 ! A Factor interpreter written in Factor. It can transfer the
 ! continuation to and from the primary interpreter. Used by
@@ -52,7 +52,7 @@ SYMBOL: callframe-end
 
 : next ( quot -- obj )
     {
-        { [ done? ] [ drop f (meta-call) ] }
+        { [ done? ] [ drop [ ] (meta-call) ] }
         { [ done-cf? ] [ drop up ] }
         { [ t ] [ >r (next) r> call ] }
     } cond ; inline
@@ -87,13 +87,27 @@ SYMBOL: callframe-end
     #! Note we do tail call optimization here.
     save-callframe (meta-call) ;
 
-: host-word ( word -- )
+: (host-quot) ( n quot -- )
     [
-        [
-            swap , \ continuation , , \ continue-with ,
-        ] [ ] make dup push-c 0 push-c length push-c
+        [ \ continuation , , \ continue-with , ] [ ] make
+        append
+        dup push-c swap push-c length push-c
         meta-interp continue
     ] callcc1 set-meta-interp drop ;
+
+: host-quot ( quot -- ) 0 swap (host-quot) ;
+
+: host-word ( word -- ) unit host-quot ;
+
+: end-quot ( -- )
+    callframe-scan get callframe get (host-quot) [ ] (meta-call) ;
+
+: end ( -- )
+    save-callframe
+    meta-c [ V{ [ stop ] 0 1 } swap append ] change
+    meta-interp schedule-thread yield
+    V{ } clone meta-c set
+    [ ] (meta-call) ;
 
 GENERIC: do-1 ( object -- )
 

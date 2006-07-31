@@ -1,5 +1,5 @@
 USING: errors help image inspector io kernel listener memory
-modules parser prettyprint sequences test walker words ;
+modules parser prettyprint sequences test words ;
 
 ARTICLE: "tools" "Development tools"
 "This section covers words which are used during development, and not usually invoked directly by user code."
@@ -9,7 +9,6 @@ $terpri
 { $subsection "debugger" }
 { $subsection "word-introspection" }
 { $subsection "inspector" }
-{ $subsection "walker" }
 { $subsection "annotations" }
 "Working on a project:"
 { $subsection "sources" }
@@ -122,26 +121,6 @@ ARTICLE: "word-introspection" "Word introspection"
 { $subsection words }
 "Display callers of a given word:"
 { $subsection usage. } ;
-
-ARTICLE: "walker" "The single stepper"
-"The single stepper evaluates a quotation a word at a time, offering the ability to look at stacks at any stage."
-$terpri
-"Single stepping is inititated by passing a quotation to a combinator:"
-{ $subsection walk }
-"The single stepper spawns a nested listener. You can exit the nested listener using " { $link bye } "; this resumes execution of the quotation."
-$terpri
-"The following words advance the single stepper; the latter recursively descends into compound definitions:"
-{ $subsection step }
-{ $subsection into }
-"At any point you can look at stacks and variables in the single stepper execution context:"
-{ $subsection &s }
-{ $subsection &r }
-{ $subsection &c }
-{ $subsection &get }
-"You can annotate a word with a breakpoint, so that the single stepper is started every time the word is called. See " { $link "annotations" } "."
-$terpri
-"An example to try out in the single stepper:"
-{ $code "[ { 3 1 2 } reverse first3 * swap - ] walk" } ;
 
 ARTICLE: "unit-test" "Unit testing code"
 "A unit test is a piece of code which starts with known input values, then compares the output of a word with an expected output, where the expected output is defined by the word's contract."

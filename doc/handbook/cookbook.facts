@@ -27,10 +27,6 @@ $terpri
     "! And by the way, comments look like this"
     "( Or like this )"
 }
-{ $curious
-    "You can step through the execution of the above code interactively by clicking below:"
-    { $code "[ 10 sq 5 - . ] walk" }
-}
 { $references
     { "Factor's syntax can be extended, the parser can be called reflectively, and the " { $link . } " word is in fact a general facility for turning almost any object into a form which can be parsed back in again. If this interests you, consult the following sections:" }
     "syntax"

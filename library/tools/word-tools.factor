@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 IN: words
 USING: help inspector io kernel math namespaces prettyprint
-sequences strings walker ;
+sequences strings ;
 
 : word-outliner ( word quot -- )
     swap natural-sort [
@@ -31,13 +31,6 @@ sequences strings walker ;
     ] [ ] make ;
 
 : watch ( word -- ) [ (watch) ] annotate ;
-
-: break ( word -- ) [ nip [ walk ] curry ] annotate ;
-
-: break-on ( word test -- | test: -- ? )
-    swap [
-        nip [ swap % dup [ walk ] curry , , \ if , ] [ ] make
-    ] annotate ;
 
 : profile ( word -- )
     [ swap [ global [ inc ] bind ] curry swap append ] annotate ;

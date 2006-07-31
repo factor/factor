@@ -91,7 +91,9 @@ DEFER: describe
 
 : callframe. ( seq pos -- )
     [
-        hilite-index set dup hilite-quotation set .
+        hilite-index set dup hilite-quotation set
+        1 nesting-limit set
+        .
     ] with-scope ;
 
 : callstack. ( seq -- seq )

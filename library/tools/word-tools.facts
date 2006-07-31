@@ -20,14 +20,6 @@ HELP: watch "( word -- )"
 { $values { "word" "a word" } }
 { $description "Changes a word definition so that a message together with the stack contents is output before and after the word runs." } ;
 
-HELP: break "( word -- )"
-{ $values { "word" "a word" } }
-{ $description "Changes a word definition so that it runs in the single stepper. See " { $link "walker" } "." } ;
-
-HELP: break-on "( word quot -- )"
-{ $values { "word" "a word" } { "quot" "a quotation with stack effect " { $snippet "( -- ? )" } } }
-{ $description "Changes a word definition so that the quotation runs first, and if it outputs a true value, the word runs in the single stepper. See " { $link "walker" } "." } ;
-
 HELP: profile "( word -- )"
 { $values { "word" "a word" } }
 { $description "Changes a word definition so the variable named by the word in the global namespace is incremented every time the word is executed." } ;

@@ -2,7 +2,7 @@
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: jedit
 USING: arrays errors io kernel listener math namespaces
-parser prettyprint sequences strings words ;
+parser prettyprint sequences strings words shells ;
 
 ! Some words to send requests to a running jEdit instance to
 ! edit files and position the cursor on a specific line number.
