@@ -93,7 +93,7 @@ SYMBOL: callframe-end
         append
         dup push-c swap push-c length push-c
         meta-interp continue
-    ] callcc1 set-meta-interp drop ;
+    ] callcc1 set-meta-interp 2drop ;
 
 : host-quot ( quot -- ) 0 swap (host-quot) ;
 

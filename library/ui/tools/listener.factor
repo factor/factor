@@ -11,8 +11,7 @@ words ;
 TUPLE: listener-gadget input output stack ;
 
 : ui-listener-hook ( listener -- )
-    >r datastack-hook get call r>
-    listener-gadget-stack set-model ;
+    >r datastack r> listener-gadget-stack set-model ;
 
 : listener-stream ( listener -- stream )
     dup listener-gadget-input swap listener-gadget-output

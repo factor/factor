@@ -10,12 +10,6 @@ HELP: quit-flag f
 HELP: listener-hook f
 { $description "Variable holding a quotation called by the listener before reading each line of input. The UI sets this variable to a quotation which updates the stack display in a listener gadget." } ;
 
-HELP: datastack-hook f
-{ $description "Variable holding a quotation called by the UI to produce the elements of the data stack display. Initially, this quotation simply calls " { $link datastack } ", however the single-stepper overrides it to show the stepper data stack instead." } ;
-
-HELP: bye "( -- )"
-{ $description "Terminates the innermost listener loop, returning to its caller." } ;
-
 HELP: (read-multiline) "( quot depth -- newquot ? )"
 { $values { "quot" "the quotation being parsed" } { "depth" "the initial parsing stack depth" } { "newquot" "the quotation being parsed, after another line of input" } { "?" "a flag indicating end of input" } }
 { $description "Internal word used to read multiline expressions." } ;

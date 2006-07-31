@@ -8,7 +8,7 @@ SYMBOL: listener-prompt
 SYMBOL: quit-flag
 
 SYMBOL: listener-hook
-SYMBOL: datastack-hook
+SYMBOL: eval-hook
 
 "ok " listener-prompt set-global
 
@@ -32,8 +32,9 @@ SYMBOL: datastack-hook
 
 : listen ( -- )
     listener-hook get call
-    listener-prompt get write flush
-    [ read-multiline [ call ] [ bye ] if ] try ;
+    listener-prompt get write flush [
+        read-multiline [ eval-hook get call ] [ drop bye ] if
+    ] try ;
 
 : (listener) ( -- )
     quit-flag get [ quit-flag off ] [ listen (listener) ] if ;
@@ -41,7 +42,7 @@ SYMBOL: datastack-hook
 : listener ( quot -- )
     [
         use [ clone ] change
-        [ datastack ] datastack-hook set
+        [ call ] eval-hook set
         call
         (listener)
     ] with-scope ;

@@ -1,10 +1,11 @@
 ! Copyright (C) 2006 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 IN: gadgets-walker
-USING: gadgets gadgets-buttons gadgets-frames gadgets-listener
-gadgets-panes gadgets-scrolling gadgets-text gadgets-tiles
-gadgets-tracks generic inspector interpreter io kernel listener
-math models namespaces sequences shells threads ;
+USING: arrays gadgets gadgets-buttons gadgets-frames
+gadgets-listener gadgets-panes gadgets-scrolling gadgets-text
+gadgets-tiles gadgets-tracks generic hashtables inspector
+interpreter io kernel kernel-internals listener math models
+namespaces sequences shells threads vectors ;
 
 TUPLE: stack-track ;
 
@@ -31,7 +32,7 @@ C: walker-track ( cs rs ds quot -- gadget )
         { [ <walker-input> ] set-walker-track-input [ <scroller> ] 1/6 }
     } { 0 1 } make-track* ;
 
-TUPLE: walker-gadget track ds rs cs quot ;
+TUPLE: walker-gadget track ds rs cs quot ns ;
 
 : find-walker-gadget [ walker-gadget? ] find-parent ;
 
@@ -39,9 +40,18 @@ TUPLE: walker-gadget track ds rs cs quot ;
 
 : walker-gadget-input walker-gadget-track walker-track-input ;
 
+: update-stacks ( walker -- )
+    meta-d get over walker-gadget-ds set-model
+    meta-r get over walker-gadget-rs set-model
+    meta-c get over walker-gadget-cs set-model
+    meta-callframe swap walker-gadget-quot set-model ;
+
+: with-walker ( walker quot -- )
+    swap dup walker-gadget-ns
+    [ slip update-stacks ] bind ; inline
+
 : walker-command ( button word -- )
-    unit swap find-walker-gadget walker-gadget-input
-    interactor-call ;
+    >r find-walker-gadget r> unit with-walker ;
 
 : <walker-toolbar> ( -- gadget )
     {
@@ -67,12 +77,6 @@ TUPLE: walker-gadget track ds rs cs quot ;
     gadget get walker-gadget-ds
     gadget get walker-gadget-quot ;
 
-: walker-listener-hook ( walker -- )
-    meta-d get over walker-gadget-ds set-model
-    meta-r get over walker-gadget-rs set-model
-    meta-c get over walker-gadget-cs set-model
-    meta-callframe swap walker-gadget-quot set-model ;
-
 : walker-stream ( walker -- stream )
     dup walker-gadget-input swap walker-gadget-pane
     <duplex-stream> ;
@@ -86,35 +90,48 @@ M: walker-gadget pref-dim*
 M: walker-gadget focusable-child* ( listener -- gadget )
     walker-gadget-input ;
 
-: init-walker ( -- )
-    [ walker-listener-hook ] curry listener-hook set
-    "walk " listener-prompt set
+: walker-namestack ( walker -- ns )
+    [ global , walker-stream stdio associate , ] V{ } make ;
+
+: walker-continuation ( -- continuation )
     continuation
-    V{ } clone over set-continuation-call
     V{ } clone over set-continuation-data
-    set-meta-interp
-    [ ] (meta-call) ;
+    V{ } clone over set-continuation-retain
+    V{ } clone over set-continuation-call ;
+
+: init-walker ( walker -- )
+    H{ } clone over set-walker-gadget-ns
+    walker-continuation swap [
+        set-meta-interp
+        [ ] (meta-call)
+    ] with-walker ;
+
+: walker-call ( quot walker -- )
+    [ host-quot ] with-walker ;
+
+: (walk) ( quot walker -- )
+    [ meta-call ] with-walker ;
+
+: walker-listener ( walker -- )
+    [
+        dup init-walker
+        dup [ walker-call ] curry eval-hook set
+    ] listener ;
 
 : walker-thread ( walker -- )
     [
         init-namespaces
-        dup walker-stream [
-            [ init-walker clear ] listener
-        ] with-stream*
+        dup walker-stream [ walker-listener ] with-stream*
     ] in-thread drop ;
 
 C: walker-gadget ( -- gadget )
     dup init-walker-models {
         { [ <walker-toolbar> ] f f @top }
         { [ walker-models <walker-track> ] set-walker-gadget-track f @center }
-    } make-frame* dup walker-thread ;
-
-: (walk) ( quot walker -- )
-    >r [ meta-call ] curry r>
-    walker-gadget-input interactor-call ;
+    } make-frame*
+    dup walker-thread ;
 
 : walker-tool
     [ walker-gadget? ] [ <walker-gadget> ] [ (walk) ] ;
 
-: walk ( quot -- )
-    walker-tool call-tool ;
+: walk ( quot -- ) walker-tool call-tool ;

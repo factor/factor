@@ -13,8 +13,6 @@
   - better listener multi-line expression handling
   - history doesn't work in a good way if you ^K the input
   - history: move caret to end
-- finish gui stepper
-  - <input> handled by walker itself
 - graphical module manager tool
 - services do not launch if factor not running
 - integrated error documentation
@@ -122,7 +120,5 @@
 [ 1 2 3 4 5 6 7 8 9 10 10 10 10 10 10 10 10 10 10 11 11 11 113 
 ]
 
-- code walker & exceptions -- test and debug problems
-- break: perhaps use current stdio to run break listener
 - httpd search tools
 - remaining HTML issues need fixing
