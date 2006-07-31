@@ -1,10 +1,5 @@
 + 0.84:
 
-+ remaining walker tasks:
-- <input> handled by walker itself
-- ^W in interactor
-- ^I in interactor
-
 - windows native i/o
 - fix contribs: parser-combinators, boids, automata, space-invaders
 - unix i/o: problems with passing f to syscalls
@@ -22,8 +17,6 @@
 - services do not launch if factor not running
 - integrated error documentation
 - roundoff is still not quite right with tracks
-- 'show' doesn't work if invoked from a listener on an object which is
-  itself inspected in the listener
 - fix top level window positioning
 - nasty inference regressions
 - [ [ dup call ] dup call ] infer hangs
@@ -56,6 +49,12 @@
 
 + ui:
 
+- remaining walker tasks:
+  - <input> handled by walker itself
+  - ^W in interactor
+  - ^I in interactor
+  - error handling is still screwy
+  - continuation handling is also screwy
 - add-gadget, model-changed, set-model should compile
 - shortcuts:
   - find a listener

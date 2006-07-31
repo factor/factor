@@ -62,8 +62,15 @@ M: listener-gadget gadget-title drop "Listener" <model> ;
     listener-gadget-input over quotation?
     [ interactor-call ] [ set-editor-text ] if ;
 
+: listener-available? ( gadget -- ? )
+    dup listener-gadget? [
+        listener-gadget-input interactor-busy? not
+    ] [
+        drop f
+    ] if ;
+
 : listener-tool
-    [ listener-gadget? ]
+    [ listener-available? ]
     [ <listener-gadget> ]
     [ call-listener ] ;
 

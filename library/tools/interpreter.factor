@@ -105,7 +105,7 @@ SYMBOL: callframe-end
 : restore-harness ( obj -- )
     dup array? [
         init-meta-interp [ ] (meta-call)
-        [ first2 continue-with ] in-thread drop
+        first2 schedule-thread-with
     ] [
         set-meta-interp
     ] if ;
