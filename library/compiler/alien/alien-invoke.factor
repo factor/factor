@@ -19,9 +19,6 @@ C: alien-invoke make-node ;
 
 TUPLE: alien-invoke-error library symbol ;
 
-M: alien-invoke-error summary ( error -- )
-    drop "Words calling ``alien-invoke'' cannot run in the interpreter. Compile the caller word and try again." ;
-
 : alien-invoke ( ... return library function parameters -- ... )
     pick pick <alien-invoke-error> throw ;
 

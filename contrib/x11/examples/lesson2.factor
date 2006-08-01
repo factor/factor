@@ -58,7 +58,7 @@ SYMBOL: height
     CWBorderPixel CWColormap bitor CWEventMask bitor swap ;
 
 : make-display ( display-num -- display )
-    XOpenDisplay dup dpy set ;
+    dup [ <c-string> ] when XOpenDisplay dup dpy set ;
 
 : make-screen ( display -- screen )
     XDefaultScreen dup screen set ;

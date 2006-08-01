@@ -22,6 +22,7 @@ SYMBOL: root
     [ "Cannot connect to X server - check $DISPLAY" throw ] unless* ;
 
 : initialize-x ( display-string -- )
+    dup [ string>char-alien ] when
     XOpenDisplay check-display dpy set-global
     dpy get XDefaultScreen scr set-global
     dpy get scr get XRootWindow root set-global ;

@@ -62,7 +62,7 @@ TYPEDEF: void* Atom**
 ! 2 - Display Functions
 !
 
-FUNCTION: Display* XOpenDisplay ( char* display_name ) ;
+FUNCTION: Display* XOpenDisplay ( void* display_name ) ;
 
 ! 2.2 Obtaining Information about the Display, Image Formats, or Screens
 
@@ -1175,7 +1175,7 @@ FUNCTION: KeySym XLookupKeysym ( XKeyEvent* key_event, int index ) ;
 
 FUNCTION: int XLookupString (
 	XKeyEvent* event_struct,
-	char* buffer_return,
+	void* buffer_return,
 	int bytes_buffer,
 	KeySym* keysym_return,
 	XComposeStatus* status_in_out ) ;

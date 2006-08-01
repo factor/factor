@@ -1,5 +1,4 @@
-USING: namespaces kernel words compiler math arrays strings alien sequences io
-prettyprint x11 rectangle ;
+USING: alien namespaces kernel words compiler math arrays strings alien sequences io prettyprint x11 rectangle ;
 
 IN: x 
 
@@ -500,7 +499,7 @@ nip ;
 [ swap gcontext set call ] with-scope ; inline
 
 : initialize-x ( display-string -- )
-  XOpenDisplay dpy set
+  dup [ string>char-alien ] when XOpenDisplay dpy set
   dpy get XDefaultScreen scr set
   dpy get scr get XRootWindow root set
   dpy get scr get XBlackPixel black-pixel set
@@ -589,7 +588,7 @@ dpy get win get "XWindowAttributes" <c-object> XGetWindowAttributes 0 = not ;
 swap >array [ swap char-nth ] map-with >string ;
 
 : lookup-string ( event -- string )
-10 "char" <c-array> dup >r 10 0 <alien> 0 <alien> XLookupString r>
+10 "char" <c-array> dup >r 10 f f XLookupString r>
 char-array>string ;
 
 : send-client-message ( atom x -- )
