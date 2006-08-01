@@ -29,13 +29,19 @@ SYMBOL: restarts
 : :get error-continuation get continuation-name hash-stack ;
 : :res restarts get nth first3 continue-with ;
 
+: (:help-multi)
+    "This error has multiple delegates:" print help-outliner ;
+
+: (:help-none)
+    drop "No help for this error. " print ;
+
 : :help ( -- )
     error get delegates [ error-help ] map [ ] subset
-    dup empty? [
-        "No help for this error. " print
-    ] [
-        [ help ] each
-    ] if ;
+    {
+        { [ dup empty? ] [ (:help-none) ] }
+        { [ dup length 1 = ] [ first help ] }
+        { [ t ] [ (:help-multi) ] }
+    } cond ;
 
 : (debug-help) ( string quot -- )
     <input> write-object terpri ;

@@ -136,6 +136,9 @@ M: slice-error error.
     "Cannot create slice because " write
     slice-error-reason append print ;
 
+M: no-word summary
+    drop "Word not found in current vocabulary search path" ;
+
 : parse-dump ( error -- )
     "Parsing " write
     dup parse-error-file [ "<interactive>" ] unless* write

@@ -35,6 +35,12 @@ HELP: string-mode f
     "Since no parsing words are invoked in string mode, there is a special case that ends it; if the token " { $snippet ";" } " is read, string mode is switched off and the " { $link POSTPONE: ; } " parsing word is called."
 } ;
 
+HELP: no-word "( name -- )"
+{ $values { "name" "a string" } }
+{ $description "Throws a " { $link no-word } " error." }
+{ $error-description "Thrown if the parser encounters a token which does not name a word in the current vocabulary search path. If any words with this name exist in vocabularies not part of the search path, a number of restarts will offer to add those vocabularies to the search path and use the chosen word." }
+{ $notes "Apart from a missing " { $link POSTPONE: USE: } ", this error can also indicate an ordering issue. In Factor, words must be defined before they can be called." } ;
+
 HELP: scan-word "( -- obj )"
 { $values { "obj" "a word or a number" } }
 { $description "Reads the next token from the line currently being parsed. First tries to look up the word in the dictionary, and if the lookup fails, attempts to convert the token to a number." }

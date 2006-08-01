@@ -87,7 +87,7 @@ M: tuple = ( obj tuple -- ? )
     [ 2drop t ] [ over tuple? [ tuple= ] [ 2drop f ] if ] if ;
 
 : (delegates) ( obj -- )
-    [ dup , delegate (delegates) ] when* ;
+    [ dup delegate (delegates) , ] when* ;
 
 : delegates ( obj -- seq )
     [ (delegates) ] { } make ;

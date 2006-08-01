@@ -31,18 +31,17 @@ SYMBOL: string-mode
         [ "Use the word " swap synopsis append ] keep 2array
     ] map ;
 
-: word-not-found ( str -- word )
-    "No word named "
-    over
-    " found in current vocabulary search path" append3
-    swap do-what-i-mean condition ;
+TUPLE: no-word name ;
+
+: no-word ( str -- word )
+    dup <no-word> swap do-what-i-mean condition ;
 
 : scan-word ( -- obj )
     scan dup [
         dup ";" = not string-mode get and [
             dup use get hash-stack [ ] [
                 dup string>number [ ] [
-                    word-not-found dup word-vocabulary use+
+                    no-word dup word-vocabulary use+
                 ] ?if
             ] ?if
         ] unless

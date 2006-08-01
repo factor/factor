@@ -5,7 +5,7 @@ USING: generic hashtables kernel math models namespaces queues
 sequences words ;
 
 : gestures ( gadget -- seq )
-    delegates [ "gestures" word-prop ] map [ ] subset ;
+    delegates [ class "gestures" word-prop ] map [ ] subset ;
 
 : set-gestures ( class hash -- ) "gestures" set-word-prop ;
 
