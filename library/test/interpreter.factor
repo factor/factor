@@ -2,9 +2,7 @@ IN: temporary
 USING: errors interpreter io kernel math math-internals
 namespaces prettyprint sequences test ;
 
-: done-all? ( -- ? ) done? meta-c get empty? and ;
-
-: run ( -- ) done-all? [ next do run ] unless ;
+: run ( -- ) done? [ step-in run ] unless ;
 
 : init-interpreter ( -- )
     V{ } clone meta-d set

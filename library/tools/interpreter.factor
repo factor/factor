@@ -50,7 +50,7 @@ SYMBOL: callframe-end
 : (next)
     callframe-scan get callframe get nth callframe-scan inc ;
 
-: next ( quot -- obj )
+: next ( quot -- )
     {
         { [ done? ] [ drop [ ] (meta-call) ] }
         { [ done-cf? ] [ drop up ] }
