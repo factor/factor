@@ -8,30 +8,32 @@ words ;
 GENERIC: sheet ( obj -- sheet )
 
 : slot-sheet ( obj -- sheet )
-    dup class "slots" word-prop
-    dup [ third ] map -rot
-    [ first slot ] map-with
-    2array ;
+    dup class "slots" word-prop [
+        dup third -rot first slot 2array
+    ] map-with ;
 
 M: object sheet ( obj -- sheet ) slot-sheet ;
+
+M: tuple sheet ( tuple -- sheet )
+    dup slot-sheet swap delegate [ 1 tail ] unless ;
 
 M: sequence summary
     [ dup length # " element " % class word-name % ] "" make ;
 
-M: quotation sheet 1array ;
+: sequence-sheet [ 1array ] map ;
 
-M: vector sheet 1array ;
-
-M: array sheet 1array ;
+M: quotation sheet sequence-sheet ;
+M: vector sheet sequence-sheet ;
+M: array sheet sequence-sheet ;
 
 M: hashtable summary
     "a hashtable storing " swap hash-size number>string
     " keys" append3 ;
 
-M: hashtable sheet hash>alist flip ;
+M: hashtable sheet hash>alist ;
 
 : sheet. ( sheet -- )
-    flip dup empty? [
+    dup empty? [
         drop
     ] [
         dup first length 1 =
