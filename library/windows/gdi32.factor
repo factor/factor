@@ -329,7 +329,7 @@ FUNCTION: int ChoosePixelFormat ( HDC hDC, PFD* ppfd ) ;
 ! FUNCTION: GdiSetAttrs
 ! FUNCTION: GdiSetBatchLimit
 ! FUNCTION: GdiSetLastError
-FUNCTION: BOOL GdiSetPixelFormat ( HDC hDC, int iPixelFormat, PFD* ppfd ) ;
+! FUNCTION: GdiSetPixelFormat
 ! FUNCTION: GdiSetServerAttr
 ! FUNCTION: GdiStartDocEMF
 ! FUNCTION: GdiStartPageEMF
@@ -566,7 +566,7 @@ FUNCTION: HGDIOBJ GetStockObject ( int fnObject ) ;
 ! FUNCTION: SetMiterLimit
 ! FUNCTION: SetPaletteEntries
 ! FUNCTION: SetPixel
-! FUNCTION: SetPixelFormat
+FUNCTION: BOOL SetPixelFormat ( HDC hDC, int iPixelFormat, PFD* ppfd ) ;
 ! FUNCTION: SetPixelV
 ! FUNCTION: SetPolyFillMode
 ! FUNCTION: SetRectRgn

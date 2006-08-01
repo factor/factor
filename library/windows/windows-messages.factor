@@ -4,12 +4,16 @@ USING: hashtables kernel math namespaces parser prettyprint words ;
 IN: win32-api-messages
 
 SYMBOL: windows-messages
-H{ } clone windows-messaage set-global
 
 USE: inspector
 
+: maybe-create-windows-messages
+    windows-messages get hashtable? 
+    [ H{ } clone global [ windows-messages set ] bind ] unless ;
+
 : add-windows-message ( -- )
-    word [ unparse ] keep execute windows-messages get set-hash ; parsing
+    word [ unparse ] keep execute maybe-create-windows-messages
+    windows-messages get set-hash ; parsing
 
 : get-windows-message-name ( n -- name )
     windows-messages get hash* [ drop "unknown message" ] unless ;

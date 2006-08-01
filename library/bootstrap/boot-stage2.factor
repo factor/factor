@@ -19,6 +19,7 @@ parser sequences sequences-internals words ;
 
     "compile" get [
         windows? [
+            "/library/windows/load.factor" run-resource
             "/library/ui/windows/load.factor" run-resource
         ] when
 
