@@ -49,11 +49,9 @@ IN: generic
 
 PREDICATE: word tuple-class "tuple-size" word-prop ;
 
-TUPLE: tuple-class-error class ;
-: tuple-class-error ( class -- ) <tuple-class-error> throw ;
-
-: check-tuple-class ( class -- class )
-    dup tuple-class? [ tuple-class-error ] unless ;
+TUPLE: check-tuple class ;
+: check-tuple ( class -- class )
+    dup tuple-class? [ <check-tuple> throw ] unless ;
 
 : define-constructor ( word class def -- )
     pick reset-generic

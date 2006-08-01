@@ -13,16 +13,19 @@ SYMBOL: line-number
 SYMBOL: line-text
 SYMBOL: column
 
+TUPLE: check-vocab name ;
 : check-vocab ( name -- vocab )
     dup vocab [ ] [
-        "No such vocabulary: " swap >string append throw
+        <check-vocab>
+        { { "Continue" f } } condition
     ] ?if ;
 
-: use+ ( string -- ) check-vocab use get push ;
+: use+ ( string -- ) check-vocab [ use get push ] when* ;
 
 : add-use ( seq -- ) [ use+ ] each ;
 
-: set-use ( seq -- ) [ check-vocab ] map >vector use set ;
+: set-use ( seq -- )
+    [ check-vocab ] map [ ] subset >vector use set ;
 
 : set-in ( name -- ) dup ensure-vocab dup in set use+ ;
 

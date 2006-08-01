@@ -101,13 +101,11 @@ M: generic definer drop \ G: ;
 : make-generic ( word -- )
     dup dup "combination" word-prop call define-compound ;
 
-: check-method ( class generic -- )
-    dup generic? [
-        dup word-name " is not a generic word" append throw
-    ] unless
-    over "class" word-prop [
-        over word-name " is not a class" append throw
-    ] unless 2drop ;
+TUPLE: check-method class generic ;
+
+: check-method ( class generic -- class generic )
+    dup generic? [ <check-method> throw ] unless
+    over class? [ <check-method> throw ] unless ;
 
 : ?make-generic ( word -- )
     bootstrapping? get
@@ -118,7 +116,7 @@ M: generic definer drop \ G: ;
     inline
 
 : define-method ( definition class generic -- )
-    >r bootstrap-word r> 2dup check-method
+    >r bootstrap-word r> check-method
     [ set-hash ] with-methods ;
 
 : forget-method ( class generic -- )

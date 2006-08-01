@@ -7,7 +7,8 @@ HELP: math-upgrade "( class1 class2 -- quot )"
 
 HELP: no-math-method "( left right generic -- )"
 { $values { "left" "an object" } { "right" "an object" } { "generic" "a generic word" } }
-{ $description } ;
+{ $description "Throws a " { $link no-math-method } " error." }
+{ $error-description "Thrown by generic words using the " { $link math-combination } " method combination if there is no suitable method defined for the two inputs." } ;
 
 HELP: math-method "( word class1 class2 -- quot )"
 { $values { "word" "a generic word" } { "class1" "a class word" } { "class2" "a class word" } { "quot" "a quotation" } }

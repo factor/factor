@@ -1,5 +1,18 @@
 IN: inference
-USING: help ;
+USING: help kernel ;
+
+HELP: inference-error "( msg -- )"
+{ $values { "msg" "an object" } }
+{ $description "Throws an " { $link inference-error } "." }
+{ $error-description
+    "Thrown by " { $link infer } " when the stack effect of a quotation cannot be inferred. There are several possible reasons that this can occur:"
+    { $list
+        { "The quotation applies " { $link call } " or " { $link if } " to quotation values which are not literals; thus the potential stack effect is arbitrary" }
+        "The quotation involves conditionals where the branches have incompatible stack effects"
+        "The quotation calls a recursive word with no base case"
+    }
+    "Words without a static stack effect cannot be compiled, but will still run in the interpreter."
+} ;
 
 HELP: infer "( quot -- effect )"
 { $values { "quot" "a quotation" } { "effect" "a pair of integers" } }

@@ -1,5 +1,20 @@
 USING: help sequences ;
 
+HELP: slice-error "( str -- )"
+{ $values { "str" "a reason" } }
+{ $description "Throws a " { $link slice-error } "." }
+{ $error-description "Thrown by " { $link <slice> } " if one of the following invalid conditions holds:"
+    { $list
+        "The start index is negative"
+        "The end index is greater than the length of the sequence"
+        "The start index is greater than the end index"
+    }
+} ;
+
+HELP: slice f
+{ $class-description "A virtual sequence which presents a subrange of the elements of an underlying sequence." }
+{ $see-also <slice> subseq } ;
+
 HELP: <slice> "( m n seq -- slice )"
 { $values { "m" "a non-negative integer" } { "n" "a non-negative integer" } { "seq" "a sequence" } { "slice" "a slice" } }
 { $description "Outputs a new virtual sequence sharing storage with the subrange of elements in " { $snippet "seq" } " with indices starting from and including " { $snippet "m" } ", and up to but not including " { $snippet "n" } "." }

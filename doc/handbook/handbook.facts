@@ -39,14 +39,55 @@ ARTICLE: "handbook" "Factor documentation"
 { $heading "Index" }
 { $subsection "article-index" }
 { $subsection "primitive-index" }
+{ $subsection "error-index" }
 { $subsection "type-index" }
-{ $subsection "class-index" } ;
+{ $subsection "class-index" };
 
 ARTICLE: "article-index" "Article index"
 { $outliner [ articles get hash-keys ] } ;
 
 ARTICLE: "primitive-index" "Primitive index"
 { $outliner [ all-words [ primitive? ] subset ] } ;
+
+ARTICLE: "error-index" "Type index"
+{ $subsection /0                         }
+{ $subsection alien-callback-error       }
+{ $subsection alien-invoke-error         }
+{ $subsection assert                     }
+{ $subsection bad-escape                 }
+{ $subsection bounds-error               }
+{ $subsection c-stream-error             }
+{ $subsection c-string-error.            }
+{ $subsection callstack-overflow.        }
+{ $subsection check-create               }
+{ $subsection check-method               }
+{ $subsection check-ptr                  }
+{ $subsection check-vocab                }
+{ $subsection condition                  }
+{ $subsection datastack-overflow.        }
+{ $subsection datastack-underflow.       }
+{ $subsection duplex-closed              }
+{ $subsection empty-queue                }
+{ $subsection expired-error.             }
+{ $subsection ffi-error.                 }
+{ $subsection heap-scan-error.           }
+{ $subsection inference-error            }
+{ $subsection io-error.                  }
+{ $subsection negative-array-size-error. }
+{ $subsection no-article                 }
+{ $subsection no-cond                    }
+{ $subsection no-math-method             }
+{ $subsection no-method                  }
+{ $subsection parse-error                }
+{ $subsection retainstack-overflow.      }
+{ $subsection retainstack-underflow.     }
+{ $subsection signal-error.              }
+{ $subsection slice-error                }
+{ $subsection tuple-class-error          }
+{ $subsection type-check-error.          }
+{ $subsection undefined-symbol-error.    }
+{ $subsection undefined-word-error.      }
+{ $subsection user-interrupt.            } ;
 
 ARTICLE: "type-index" "Type index"
 { $outliner [ builtins get [ ] subset ] } ;

@@ -1,11 +1,13 @@
 IN: alien
 USING: help ;
 
+HELP: alien-invoke-error "( -- )"
+{ $error-description "Thrown when " { $link alien-invoke } " is called in the interpreter.  Words using " { $link alien-invoke } " must be compiled first, and all four inputs to " { $link alien-invoke } " must be literals." } ;
+
 HELP: alien-invoke "( ... return library function parameters -- ... )"
 { $values { "return" "a C return type" } { "library" "a logical library name" } { "function" "a C function name" } { "parameters" "a sequence of C parameter types" } }
-{ $description "Calls a C library function with the given name. Input parameters are taken from the data stack, and the return value is pushed on the data stack after the function returns. A return type of " { $snippet "\"void\"" } " indicates that no value is to be expected."
-$terpri
-"This word only runs when it is called from within a " { $emphasis "compiled" } " word, with all four parameters as literal inputs." }
+{ $description "Calls a C library function with the given name. Input parameters are taken from the data stack, and the return value is pushed on the data stack after the function returns. A return type of " { $snippet "\"void\"" } " indicates that no value is to be expected." }
+{ $errors "Throws an " { $link alien-invoke-error } " if the word calling " { $link alien-invoke } " is not compiled." }
 { $see-also alien-callback } ;
 
 HELP: define-c-word "( return library function parameters -- )"

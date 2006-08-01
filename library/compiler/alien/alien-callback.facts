@@ -1,12 +1,13 @@
 IN: alien
 USING: errors help ;
 
+HELP: alien-callback-error "( -- )"
+{ $error-description "Thrown when " { $link alien-callback } " is called in the interpreter.  Words using " { $link alien-callback } " must be compiled first, and all three inputs to " { $link alien-callback } " must be literals." } ;
+
 HELP: alien-callback "( return parameters quot -- alien )"
 { $values { "return" "a C return type" } { "parameters" "a sequence of C parameter types" } { "quot" "a quotation" } { "alien" "an alien address" } }
 { $description
     "Defines a callback from C to Factor which accepts the given set of parameters from the C caller, pushes them on the data stack, calls the quotation, and passes a return value back to the C caller. A return type of " { $snippet "\"void\"" } " indicates that no value is to be returned."
-    $terpri
-    "This word only runs when it is called from within a " { $emphasis "compiled" } " word, with all three parameters as literal inputs."
     $terpri
     "When a compiled reference to this word is called, it pushes the callback's alien address on the data stack. This address can be passed to any C function expecting a C function pointer with the correct signature. The callback is actually generated when the word calling " { $link alien-callback } " is compiled."
     $terpri
@@ -19,4 +20,5 @@ HELP: alien-callback "( return parameters quot -- alien )"
         "    \"int\" { \"int\" \"int\" } [ - ] alien-callback ;"
     }
 }
+{ $errors "Throws an " { $link alien-callback-error } " if the word calling " { $link alien-callback } " is not compiled." }
 { $see-also alien-invoke } ;

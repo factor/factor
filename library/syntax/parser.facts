@@ -41,6 +41,9 @@ HELP: scan-word "( -- obj )"
 { $errors "Throws an error if the token does not name a word, and does not parse as a number." }
 $parsing-note ;
 
+HELP: bad-escape "( -- )"
+{ $error-description "This error is thrown if the parser encounters an invalid escape code following a backslash (" { $snippet "\\" } ") in a string literal. See " { $link "escape" } " for a list of valid escape codes." } ;
+
 HELP: escape "( escape -- ch )"
 { $values { "escape" "a single-character escape" } { "ch" "a character" } }
 { $description "Converts from a single-character escape code and the corresponding character." }

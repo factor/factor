@@ -29,7 +29,8 @@ HELP: memcpy "( dst src size -- newalien )"
 
 HELP: check-ptr "( c-ptr -- checked )"
 { $values { "c-ptr" "an alien address, byte array, or " { $link f } } { "checked" "an alien address or byte array with non-zero address" } }
-{ $description "Throws an error if the input is " { $link f } ". Otherwise the object remains on the data stack." } ;
+{ $description "Throws an error if the input is " { $link f } ". Otherwise the object remains on the data stack. This word should be used to check the return values of " { $link malloc } " and " { $link realloc } " before use." }
+{ $error-description "Thrown by " { $link malloc } " and " { $link realloc } " to indicate a memory allocation failure." } ;
 
 HELP: free "( ptr -- )"
 { $values { "ptr" "an alien address" } }

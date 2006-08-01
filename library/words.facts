@@ -223,6 +223,11 @@ HELP: reveal "( word -- )"
 { $description "Adds a newly-created word to the dictionary. Usually this word does not need to be called directly." }
 { $see-also create } ;
 
+HELP: check-create "( name vocab -- name vocab )"
+{ $values { "name" "a string" } { "vocab" "a string" } }
+{ $description "Throws a " { $link check-create } " error if " { $snippet "name" } " or " { $snippet "vocab" } " is not a string." }
+{ $error-description "Thrown if " { $link create } " is called with invalid parameters." } ;
+
 HELP: create "( name vocab -- word )"
 { $values { "name" "a string" } { "vocab" "a string" } { "word" "a word" } }
 { $description "Creates a new word. Creates the vocabulary first if it does not already exist. If the vocabulary exists and already contains a word with the requested name, outputs the existing word." } ;

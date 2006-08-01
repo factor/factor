@@ -33,7 +33,8 @@ $terpri
 
 HELP: bounds-error "( n seq -- )"
 { $values { "n" "a positive integer" } { "seq" "a sequence" } }
-{ $description "Throws an error signalling an out-of-bounds access, where " { $snippet "n" } " is the index and " { $snippet "seq" } " is the sequence." } ;
+{ $description "Throws a " { $link bounds-error } "." }
+{ $error-description "Thrown by " { $link nth } ", " { $link set-nth } " and " { $link set-length } " if the given index lies beyond the bounds of the sequence." } ;
 
 HELP: bounds-check "( n seq -- n seq )"
 { $values { "n" "a positive integer" } { "seq" "a sequence" } }

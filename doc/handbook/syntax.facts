@@ -50,7 +50,7 @@ $terpri
 "Here is an example demonstrating the vocabulary search path. If you can understand this example, then you have grasped vocabularies."
 { $code
     "IN: foe"
-    "USE: sequences"
+    "USING: sequences io ;"
     ""
     ": append"
     "    #! Prints a message, then calls sequences::append."

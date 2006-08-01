@@ -1,6 +1,12 @@
 IN: test
 USING: help kernel ;
 
+HELP: assert "( got expect -- )"
+{ $values { "got" "the obtained value" } { "expect" "the expected value" } }
+{ $description "Throws an " { $link assert } " error." }
+{ $error-description "Thrown when a unit test or other assertion fails." }
+{ $see-also unit-test unit-test-fails assert-depth } ;
+
 HELP: benchmark "( quot -- gctime runtime )"
 { $values { "quot" "a quotation" } { "gctime" "an integer denoting milliseconds" } { "runtime" "an integer denoting milliseconds" } }
 { $description "Runs a quotation, measuring the total wall clock time and the total time spent in the garbage collector." }

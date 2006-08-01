@@ -178,7 +178,7 @@ HELP: BIN: "integer"
 
 HELP: GENERIC: "word"
 { $values { "word" "a new word to define" } }
-{ $description "Defines a new generic word in the current vocabulary. Initially, it contains no methods, and thus will throw an error when called." }
+{ $description "Defines a new generic word in the current vocabulary. Initially, it contains no methods, and thus will throw a " { $link no-method } " error when called." }
 { $notes
     "A " { $link "method-combination" } " facility exists for customizing method dispatch behavior."
     $terpri

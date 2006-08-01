@@ -131,6 +131,8 @@ M: bounds-error summary drop "Sequence index out of bounds" ;
 
 M: condition error. delegate error. ;
 
+M: condition error-help drop f ;
+
 M: tuple error. ( error -- ) describe ;
 
 M: string error. ( error -- ) print ;

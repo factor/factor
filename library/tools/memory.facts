@@ -36,7 +36,7 @@ $terpri
 
 HELP: next-object "( -- obj )"
 { $description "Outputs the object at the heap scan pointer, and then advances the heap scan pointer. If the end of the heap has been reached, outputs " { $link f } ". This is unambiguous since the " { $link f } " object is tagged immediate and not actually stored in the heap." }
-{ $errors "Throws an error if called outside a " { $link begin-scan } "/" { $link end-scan } " pair." }
+{ $errors "Throws a " { $link heap-scan-error. } " if called outside a " { $link begin-scan } "/" { $link end-scan } " pair." }
 { $notes "This is a low-level facility and can be dangerous. Use the " { $link each-object } " combinator instead." } ;
 
 HELP: end-scan "( -- )"

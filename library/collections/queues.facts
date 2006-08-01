@@ -1,6 +1,9 @@
 IN: queues
 USING: help ;
 
+HELP: queue f
+{ $class-description "A simple first-in-first-out queue. See " { $link "queues" } "." } ;
+
 HELP: <queue> "( -- queue )"
 { $values { "queue" "a new queue" } }
 { $description "Makes a new queue with no elements." } ;
@@ -11,8 +14,13 @@ HELP: queue-empty? "( queue -- ? )"
 
 HELP: deque "( queue -- elt )"
 { $values { "queue" "a queue" } { "elt" "an object" } }
-{ $description "Removes an element from the front of the queue." } ;
+{ $description "Removes an element from the front of the queue." }
+{ $errors "Throws an " { $link empty-queue } " error if the queue has no entries." } ;
 
 HELP: enque "( elt queue -- )"
 { $values { "elt" "an object" } { "queue" "a queue" } }
 { $description "Adds an element to the back of the queue." } ;
+
+HELP: empty-queue "( -- )"
+{ $description "Throws an " { $link empty-queue } " error." }
+{ $error-description "Thrown by " { $link deque } " if the queue has no entries." } ;

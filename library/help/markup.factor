@@ -90,10 +90,16 @@ M: word print-element { } swap execute ;
     "\n" join dup <input> [ write ] ($code) ;
 
 : $description ( content -- )
-    "Description" $heading print-element ;
+    "Word description" $heading print-element ;
+
+: $class-description ( content -- )
+    "Class description" $heading print-element ;
+
+: $error-description ( content -- )
+    "Error description" $heading print-element ;
 
 : $contract ( content -- )
-    "Contract" $heading print-element ;
+    "Generic word contract" $heading print-element ;
 
 : $examples ( content -- )
     "Examples" $heading print-element ;

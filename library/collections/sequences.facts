@@ -7,13 +7,13 @@ HELP: length "( seq -- n )"
 HELP: set-length "( n seq -- )"
 { $values { "n" "a non-negative integer" } { "seq" "a resizable sequence" } }
 { $description "Resizes the sequence. Not all sequences are resizable." }
-{ $errors "Throws an error if the new length is negative, or if the sequence is not resizable." }
+{ $errors "Throws a " { $link bounds-error } " if the new length is negative, or if the sequence is not resizable." }
 { $side-effects "seq" } ;
 
 HELP: nth "( n seq -- elt )"
 { $values { "n" "a non-negative integer" } { "seq" "a sequence" } { "elt" "the element at the " { $snippet "n" } "th index" } }
 { $contract "Outputs the " { $snippet "n" } "th element of the sequence. Elements are numbered from zero, so the last element has an index one less than the length of the sequence. All sequences support this operation." }
-{ $errors "Throws an error if the index is negative, or greater than or equal to the length of the sequence." } ;
+{ $errors "Throws a " { $link bounds-error } " if the index is negative, or greater than or equal to the length of the sequence." } ;
 
 HELP: set-nth "( elt n seq -- )"
 { $values { "elt" "an object" } { "n" "a non-negative integer" } { "seq" "a mutable sequence" } }
@@ -95,6 +95,6 @@ HELP: set-nth-unsafe "( elt n seq -- )"
 { $values { "elt" "an object" } { "n" "an integer" } { "seq" "a sequence" } }
 { $contract "Unsafe variant of " { $link set-nth } " that does not perform bounds checks." } ;
 
-HELP: exchange "( m n seq -- )"
+HELP: exchange-unsafe "( m n seq -- )"
 { $values { "m" "a non-negative integer" } { "n" "a non-negative integer" } { "seq" "a mutable sequence" } }
 { $description "Unsafe variant of " { $link exchange } " that does not perform bounds checks." } ;

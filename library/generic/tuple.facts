@@ -45,6 +45,11 @@ HELP: define-constructor "( word class def -- )"
 { $description "Define a constructor word for a tuple class. The constructor definition receives a new instance of the class on the stack, with all slots initially set to " { $link f } "." }
 { $see-also POSTPONE: C: } ;
 
+HELP: check-tuple "( class -- )"
+{ $values { "word" "a word" } }
+{ $description "Throws an error if " { $snippet "word" } " is not a tuple class word." }
+{ $error-description "Thrown if " { $link define-constructor } " or " { $link POSTPONE: C: } " is called with a word which does not name a tuple class. Only tuple classes can have user-defined constructors." } ;
+
 HELP: default-constructor "( class -- )"
 { $values { "class" "a tuple class word" } }
 { $description "Defines the default constructor for a tuple class. The default constructor fills slot values in from the stack." }

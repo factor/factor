@@ -202,9 +202,8 @@ HELP: cond "( assoc -- )"
     "The following two phrases are equivalent:"
     { $code "{ { [ X ] [ Y ] } { [ Z ] [ T ] } } cond" }
     { $code "X [ Y ] [ Z [ T ] [ no-cond ] if ] if" }
-    "Note that the base case is " { $link no-cond } " which throws an error."
 }
-{ $errors "Throws an error if the first quotation in every pair yields " { $link f } "." }
+{ $errors "Throws a " { $link no-cond } " error if none of the test quotations yield a true value." }
 { $examples
     { $example
         "{"
@@ -214,6 +213,10 @@ HELP: cond "( assoc -- )"
         "} cond"
     }
 } ;
+
+HELP: no-cond "( -- )"
+{ $description "Throws a " { $link no-cond } " error." }
+{ $error-description "Thrown by " { $link cond } " if none of the test quotations yield a true value. Most uses of " { $link cond } " include a default case where the test quotation is " { $snippet "[ t ]" } "; such a " { $link cond } " form will never throw this error. If you wish to assert that certain conditions are true, and fail otherwise, you can use " { $link cond } " without a default case." } ;
 
 HELP: unix? "( -- ? )"
 { $values { "?" "a boolean" } }

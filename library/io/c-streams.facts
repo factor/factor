@@ -68,3 +68,6 @@ HELP: fgetc "( alien -- ch )"
 { $values { "alien" "a C FILE* handle" } { "ch" "a character" } }
 { $description "Reads a single character from a C FILE* handle." } 
 { $errors "Throws an error if the input operation failed." } ;
+
+HELP: c-stream-error "( -- )"
+{ $error-description "This error is thrown when C stream I/O is in use and one of the TCP/IP networking words is called. C stream I/O will be in use if either the " { $snippet "-no-native-io" } " switch is passed to bootstrap (see " { $link "bootstrap-cli-args" } ") or if Factor does not have a native I/O implementation for your operating system." } ;

@@ -10,7 +10,8 @@ HELP: parse-lines "( lines -- quot )"
 
 HELP: parse-error "( msg -- )"
 { $values { "msg" "an object" } }
-{ $description "Throws a parse error encapsulating a message along with current parser state, including the file being parsed, line number, and column number." } ;
+{ $description "Throws a " { $link parse-error } "." }
+{ $error-description "Thrown when the parser encounters invalid input. A parse error wraps an underlying error and holds the file being parsed, line number, and column number." } ;
 
 HELP: with-parser "( quot -- )"
 { $values { "quot" "a quotation" } }

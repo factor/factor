@@ -12,9 +12,11 @@ SYMBOL: articles
 
 TUPLE: article title content ;
 
+TUPLE: no-article name ;
+: no-article ( name -- ) <no-article> throw ;
+
 : article ( name -- article )
-    dup articles get hash
-    [ ] [ "No such article: " swap unparse append throw ] ?if ;
+    dup articles get hash [ ] [ no-article ] ?if ;
 
 : (add-article) ( name title element -- )
     <article> swap articles get set-hash ;

@@ -34,7 +34,7 @@ IN: math-internals
     dup 1 number= [ drop ] [ (fraction>) ] if ; inline
 
 TUPLE: /0 ;
-: /0 ( x y -- ) </0> throw ;
+: /0 ( -- ) </0> throw ;
 
 M: integer / ( x y -- x/y )
     dup zero? [

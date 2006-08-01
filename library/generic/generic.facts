@@ -90,9 +90,10 @@ HELP: make-generic "( word -- )"
 { $description "Regenerates the definition of a generic word by applying the method combination to the set of defined methods." }
 $low-level-note ;
 
-HELP: check-method "( class generic -- )"
+HELP: check-method "( class generic -- class generic )"
 { $values { "class" "a class word" } { "generic" "a generic word" } }
-{ $description "Asserts that " { $snippet "class" } " is a class word and " { $snippet "generic" } " is a generic word, throwing an error if the assertion fails." } ;
+{ $description "Asserts that " { $snippet "class" } " is a class word and " { $snippet "generic" } " is a generic word, throwing a " { $link check-method } " error if the assertion fails." }
+{ $error-description "Thrown if " { $link POSTPONE: M: } " or " { $link define-method } " is given an invalid class or generic word." } ;
 
 HELP: ?make-generic "( word -- )"
 { $values { "word" "a generic word" } }

@@ -114,7 +114,9 @@ ARTICLE: "c-types-strings" "C string types"
 }
 "Passing an instance of " { $link c-ptr } " to a C function expecting a C string will simply pass in the address of the " { $link c-ptr } "."
 $terpri
-"Passing a Factor string to a C function expecting a C string allocates a byte array in the Factor heap; the string is then converted to the requested format and a raw pointer is passed to the function. The function must not retain such pointers after it returns, since byte arrays in the Factor heap can be moved by the garbage collector. To allocate a string which will not move, use " { $link <malloc-string> } " and then " { $link free } "."
+"Passing a Factor string to a C function expecting a C string allocates a byte array in the Factor heap; the string is then converted to the requested format and a raw pointer is passed to the function. If the conversion fails, for example if the string contains null bytes or characters with values higher than 255, a " { $link c-string-error. } " is thrown."
+$terpri
+"C functions must not retain such pointers to heap-allocated strings after returning, since byte arrays in the Factor heap can be moved by the garbage collector. To allocate a string which will not move, use " { $link <malloc-string> } " and then " { $link free } "."
 $terpri
 "A couple of words can be used to read and write " { $snippet "char*" } " and " { $snippet "ushort*" } " strings from arbitrary addresses:"
 { $subsection alien>char-string }

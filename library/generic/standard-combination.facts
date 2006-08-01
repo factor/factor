@@ -2,7 +2,8 @@ USING: generic help sequences ;
 
 HELP: no-method "( object generic -- )"
 { $values { "object" "an object" } { "generic" "a generic word" } }
-{ $description "Throws an error indicating that " { $snippet "object" } " does not respond to the " { $snippet "generic" } " word." } ;
+{ $description "Throws a " { $link no-method } " error." }
+{ $error-description "Thrown by the " { $snippet "generic" } " word to indicate it does not have a method for the class of " { $snippet "object" } "." } ;
 
 HELP: standard-combination "( word dispatch# -- quot )"
 { $values { "word" "a generic word" } { "dispatch#" "a dispatch position" } { "quot" "a new quotation" } }
