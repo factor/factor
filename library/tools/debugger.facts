@@ -27,6 +27,9 @@ HELP: :get "( variable -- value )"
 { $values { "variable" "an object" } { "value" "the value, or f" } }
 { $description "Looks up the value of a variable at the time of the most recent error." } ;
 
+HELP: :help "( -- )"
+{ $description "Displays documentation for the most recent error." } ;
+
 HELP: :res "( n -- )"
 { $values { "n" "a non-negative integer" } }
 { $description "Continues executing the " { $snippet "n" } "th restart." } ;
@@ -34,6 +37,11 @@ HELP: :res "( n -- )"
 HELP: error. "( error -- )"
 { $values { "error" "an error" } }
 { $contract "Print an error to the default stream." } ;
+
+HELP: error-help "( error -- topic )"
+{ $values { "error" "an error" } { "topic" "an article name or word" } }
+{ $contract "Outputs a help article which explains the error." }
+{ $see-also :help } ;
 
 HELP: print-error "( error -- )"
 { $values { "error" "an error" } }

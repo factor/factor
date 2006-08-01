@@ -13,7 +13,6 @@
   - history: move caret to end
 - graphical module manager tool
 - services do not launch if factor not running
-- integrated error documentation
 - roundoff is still not quite right with tracks
 - fix top level window positioning
 - nasty inference regressions

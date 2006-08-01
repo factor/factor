@@ -83,6 +83,8 @@ ARTICLE: "debugger" "The debugger"
 { $subsection :r }
 { $subsection :c }
 { $subsection :get }
+"You can get a more detailed explanation as most types of errors are documented:"
+{ $subsection :help }
 "If the error is recoverable, a list of restarts is also printed, and a numbered restart can be invoked:"
 { $subsection :res }
 "You can read more about error handling in " { $link "errors" } "." ;

@@ -42,6 +42,7 @@ USING: styles ;
 
 : subsection-style
     H{
+        { font "sans-serif" }
         { font-size 14 }
         { font-style bold }
     } ;

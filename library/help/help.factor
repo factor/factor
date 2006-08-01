@@ -52,7 +52,9 @@ M: word article-content
     ] ($block) ;
 
 : help-outliner ( seq  -- | quot: obj -- )
-    sort-articles [ ($subsection) terpri ] each ;
+    subsection-style [
+        sort-articles [ ($subsection) terpri ] each
+    ] with-style ;
 
 : $outliner ( content -- )
-    subsection-style [ first call help-outliner ] with-style ;
+    first call help-outliner ;
