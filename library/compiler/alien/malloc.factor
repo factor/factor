@@ -10,7 +10,8 @@ FUNCTION: void free ( void* ptr ) ;
 FUNCTION: void* realloc ( void* ptr, ulong size ) ;
 FUNCTION: void memcpy ( void* dst, void* src, ulong size ) ;
 
-: check-ptr [ "Out of memory" throw ] unless* ;
+TUPLE: check-ptr ;
+: check-ptr [ <check-ptr> throw ] unless* ;
 
 : with-malloc ( size quot -- | quot: alien -- )
     swap 1 calloc check-ptr [ swap call ] keep free ; inline

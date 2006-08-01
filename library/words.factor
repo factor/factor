@@ -139,12 +139,13 @@ SYMBOL: bootstrapping?
         dup word-name over word-vocabulary nest set-hash
     ] bind ;
 
-: check-create ( name vocab -- )
-    string? [ "Vocabulary name is not a string" throw ] unless
-    string? [ "Word name is not a string" throw ] unless ;
+TUPLE: check-create name vocab ;
+: check-create ( name vocab -- name vocab )
+    dup string? [ <check-create> throw ] unless
+    over string? [ <check-create> throw ] unless ;
 
 : create ( name vocab -- word )
-    2dup check-create 2dup lookup dup
+    check-create 2dup lookup dup
     [ 2nip ] [ drop <word> dup reveal ] if ;
 
 : constructor-word ( string vocab -- word )

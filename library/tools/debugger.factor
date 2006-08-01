@@ -1,9 +1,16 @@
 ! Copyright (C) 2004, 2006 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: arrays generic hashtables inspector io kernel
+USING: arrays generic hashtables help inspector io kernel
 kernel-internals math namespaces parser prettyprint sequences
 sequences-internals strings styles vectors words ;
 IN: errors
+
+GENERIC: error. ( error -- )
+GENERIC: error-help ( error -- topic )
+
+M: object error-help ( error -- topic ) drop f ;
+
+M: tuple error-help ( error -- topic ) class ;
 
 SYMBOL: error
 SYMBOL: error-continuation
@@ -56,30 +63,40 @@ SYMBOL: restarts
 DEFER: objc-error. ( alien -- )
 
 PREDICATE: array kernel-error ( obj -- ? )
-    dup first kernel-error eq? swap second 0 18 between? and ;
+    dup first \ kernel-error eq? swap second 0 18 between? and ;
 
-M: kernel-error error. ( error -- )
+: datastack-underflow. "Data" stack-underflow. ;
+: datastack-overflow. "Data" stack-overflow. ;
+: retainstack-underflow. "Retain" stack-underflow. ;
+: retainstack-overflow. "Retain" stack-overflow. ;
+: callstack-underflow. "Call" stack-underflow. ;
+: callstack-overflow. "Call" stack-overflow. ;
+
+: kernel-error ( error -- word )
     #! Kernel errors are indexed by integers.
-    dup second {
-        [ expired-error. ]
-        [ io-error. ]
-        [ undefined-word-error. ]
-        [ type-check-error. ]
-        [ signal-error. ]
-        [ negative-array-size-error. ]
-        [ c-string-error. ]
-        [ ffi-error. ]
-        [ heap-scan-error. ]
-        [ undefined-symbol-error. ]
-        [ user-interrupt. ]
-        [ "Data" stack-underflow. ]
-        [ "Data" stack-overflow. ]
-        [ "Retain" stack-underflow. ]
-        [ "Retain" stack-overflow. ]
-        [ "Call" stack-underflow. ]
-        [ "Call" stack-overflow. ]
-        [ objc-error. ]
-    } dispatch ;
+    second {
+        expired-error.
+        io-error.
+        undefined-word-error.
+        type-check-error.
+        signal-error.
+        negative-array-size-error.
+        c-string-error.
+        ffi-error.
+        heap-scan-error.
+        undefined-symbol-error.
+        user-interrupt.
+        datastack-underflow.
+        datastack-overflow.
+        retainstack-underflow.
+        retainstack-overflow.
+        callstack-underflow.
+        callstack-overflow.
+    } nth ;
+
+M: kernel-error error. ( error -- ) dup kernel-error execute ;
+
+M: kernel-error error-help ( error -- topic ) kernel-error ;
 
 M: no-method summary
     drop "No suitable method" ;
@@ -131,6 +148,14 @@ M: object error. ( error -- ) . ;
 
 : :res ( n -- ) restarts get nth first3 continue-with ;
 
+: :help ( -- )
+    error get delegates [ error-help ] map [ ] subset
+    dup empty? [
+        "No help for this error. " print
+    ] [
+        [ help ] each
+    ] if ;
+
 : (debug-help) ( string quot -- )
     <input> write-object terpri ;
 
@@ -152,10 +177,11 @@ M: object error. ( error -- ) . ;
     terpri
     "Debugger commands:" print
     terpri
-    ":s  data stack at exception time" [ :s ] (debug-help)
-    ":r  retain stack at exception time" [ :r ] (debug-help)
-    ":c  call stack at exception time" [ :c ] (debug-help)
-    ":get ( var -- value ) accesses variables at time of error" print
+    ":help - documentation for this error" [ :help ] (debug-help)
+    ":s    - data stack at exception time" [ :s ] (debug-help)
+    ":r    - retain stack at exception time" [ :r ] (debug-help)
+    ":c    - call stack at exception time" [ :c ] (debug-help)
+    ":get  ( var -- value ) accesses variables at time of error" print
     flush ;
 
 : print-error ( error -- )
@@ -181,4 +207,4 @@ M: object error. ( error -- ) . ;
     V{ } clone set-catchstack
     ( kernel calls on error )
     [ error-handler ] 5 setenv
-    kernel-error 12 setenv ;
+    \ kernel-error 12 setenv ;

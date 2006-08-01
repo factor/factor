@@ -4,13 +4,8 @@ IN: gadgets
 USING: generic hashtables kernel math models namespaces queues
 sequences words ;
 
-: (gestures) ( gadget -- )
-    [
-        dup delegate (gestures)
-        class "gestures" word-prop [ , ] when*
-    ] when* ;
-
-: gestures ( gadget -- seq ) [ (gestures) ] { } make ;
+: gestures ( gadget -- seq )
+    delegates [ "gestures" word-prop ] map [ ] subset ;
 
 : set-gestures ( class hash -- ) "gestures" set-word-prop ;
 

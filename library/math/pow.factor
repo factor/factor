@@ -49,7 +49,7 @@ M: integer (^) ( z w -- z^w )
 
 : log2 ( n -- b )
     {
-        { [ dup 0 <= ] [ "Input must be positive" throw ] }
+        { [ dup 0 <= ] [ "log2 expects positive inputs" throw ] }
         { [ dup 1 = ] [ drop 0 ] }
         { [ t ] [ -1 shift log2 1+ ] }
     } cond ; foldable

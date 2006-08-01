@@ -33,9 +33,12 @@ C: queue ( -- queue ) ;
         dup queue-head entry-next swap set-queue-head
     ] if ;
 
+TUPLE: empty-queue ;
+: empty-queue <empty-queue> throw ;
+
 : deque ( queue -- obj )
     dup queue-empty? [
-        "Empty queue" throw
+        empty-queue
     ] [
         dup queue-head entry-obj >r (deque) r>
     ] if ;

@@ -57,6 +57,9 @@ SYMBOL: string-mode
 
 : (parse) ( str -- ) line-text set 0 column set parse-loop ;
 
+TUPLE: bad-escape ;
+: bad-escape ( -- ) <bad-escape> throw ;
+
 ! Parsing word utilities
 : escape ( ch -- esc )
     H{
@@ -69,7 +72,7 @@ SYMBOL: string-mode
         { CHAR: 0  CHAR: \0 }
         { CHAR: \\ CHAR: \\ }
         { CHAR: \" CHAR: \" }
-    } hash [ "Bad escape" throw ] unless* ;
+    } hash [ bad-escape ] unless* ;
 
 : next-escape ( n str -- n ch )
     2dup nth CHAR: u =

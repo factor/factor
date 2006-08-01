@@ -12,9 +12,9 @@ C: duplex-stream ( in out -- stream )
     [ set-duplex-stream-out ] keep
     [ set-duplex-stream-in ] keep ;
 
+TUPLE: check-closed ;
 : check-closed ( duplex -- )
-    duplex-stream-closed?
-    [ "Duplex stream closed" throw ] when ;
+    duplex-stream-closed? [ <check-closed> throw ] when ;
 
 : duplex-stream-in+ ( duplex -- stream )
     dup check-closed duplex-stream-in ;

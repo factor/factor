@@ -33,11 +33,12 @@ IN: math-internals
 : fraction> ( a b -- a/b )
     dup 1 number= [ drop ] [ (fraction>) ] if ; inline
 
-: division-by-zero ( x y -- ) "Division by zero" throw ;
+TUPLE: /0 ;
+: /0 ( x y -- ) </0> throw ;
 
 M: integer / ( x y -- x/y )
     dup zero? [
-        division-by-zero
+        /0
     ] [
         dup 0 < [ [ neg ] 2apply ] when
         2dup gcd nip tuck /i >r /i r> fraction>

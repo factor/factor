@@ -31,10 +31,13 @@ TUPLE: slice seq from to ;
 : collapse-slice ( from to slice -- from to seq )
     dup slice-from swap slice-seq >r tuck + >r + r> r> ;
 
+TUPLE: slice-error reason ;
+: slice-error ( str -- ) <slice-error> throw ;
+
 : check-slice ( from to seq -- )
-    pick 0 < [ "Slice begins before 0" throw ] when
-    length over < [ "Slice longer than sequence" throw ] when
-    > [ "Slice start is after slice end" throw ] when ;
+    pick 0 < [ "start < 0" slice-error ] when
+    length over < [ "end > sequence" slice-error ] when
+    > [ "start > end" slice-error ] when ;
 
 C: slice ( from to seq -- seq )
     #! A slice of a slice collapses.

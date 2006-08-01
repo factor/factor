@@ -46,8 +46,8 @@ IN: io
 
 TUPLE: client-stream host port ;
 
-: c-stream-error
-    "C-streams I/O does not support this feature" throw ;
+TUPLE: c-stream-error ;
+: c-stream-error <c-stream-error> throw ;
 
 : <client> c-stream-error ;
 : <server> c-stream-error ;

@@ -49,12 +49,15 @@ IN: generic
 
 PREDICATE: word tuple-class "tuple-size" word-prop ;
 
-: check-tuple-class ( class -- )
-    tuple-class? [ "Not a tuple class" throw ] unless ;
+TUPLE: tuple-class-error class ;
+: tuple-class-error ( class -- ) <tuple-class-error> throw ;
+
+: check-tuple-class ( class -- class )
+    dup tuple-class? [ tuple-class-error ] unless ;
 
 : define-constructor ( word class def -- )
     pick reset-generic
-    swap dup check-tuple-class [
+    swap check-tuple-class [
         dup literalize ,
         "tuple-size" word-prop ,
         \ <tuple> , %
@@ -85,13 +88,14 @@ M: tuple = ( obj tuple -- ? )
     2dup eq?
     [ 2drop t ] [ over tuple? [ tuple= ] [ 2drop f ] if ] if ;
 
+: (delegates) ( obj -- )
+    [ dup , delegate (delegates) ] when* ;
+
+: delegates ( obj -- seq )
+    [ (delegates) ] { } make ;
+
 : is? ( obj pred -- ? | pred: obj -- ? )
-    over [
-        2dup >r >r call
-        [ r> r> 2drop t ] [ r> delegate r> is? ] if
-    ] [
-        2drop f 
-    ] if ; inline
+    >r delegates r> contains? ; inline
 
 : >tuple ( seq -- tuple )
     >vector dup first "tuple-size" word-prop over set-length

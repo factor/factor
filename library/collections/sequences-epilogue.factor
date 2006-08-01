@@ -149,7 +149,8 @@ M: object <=>
 
 : depth ( -- n ) datastack length ;
 
-: no-cond "cond fall-through" throw ;
+TUPLE: no-cond ;
+: no-cond <no-cond> throw ;
 
 : cond ( conditions -- )
     [ first call ] find nip dup [ second call ] [ no-cond ] if ;

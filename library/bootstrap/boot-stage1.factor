@@ -96,9 +96,6 @@ sequences vectors words ;
 
         "/library/tools/summary.factor"
         "/library/tools/describe.factor"
-        "/library/tools/debugger.factor"
-        
-        "/library/threads.factor"
 
         "/library/help/stylesheet.factor"
         "/library/help/topics.factor"
@@ -107,6 +104,10 @@ sequences vectors words ;
         "/library/help/porter-stemmer.factor"
         "/library/help/search.factor"
         "/library/help/syntax.factor"
+
+        "/library/tools/debugger.factor"
+        
+        "/library/threads.factor"
 
         "/library/syntax/parse-stream.factor"
 
