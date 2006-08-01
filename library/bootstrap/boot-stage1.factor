@@ -159,6 +159,8 @@ sequences vectors words ;
 
         "/library/cli.factor"
         "/library/modules.factor"
+
+        "/library/tools/errors.factor"
         
         "/library/bootstrap/init.factor"
         "/library/bootstrap/image.factor"

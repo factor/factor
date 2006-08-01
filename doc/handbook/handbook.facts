@@ -51,7 +51,7 @@ ARTICLE: "article-index" "Article index"
 ARTICLE: "primitive-index" "Primitive index"
 { $outliner [ all-words [ primitive? ] subset ] } ;
 
-ARTICLE: "error-index" "Type index"
+ARTICLE: "error-index" "Error index"
 { $subsection /0                         }
 { $subsection alien-callback-error       }
 { $subsection alien-invoke-error         }

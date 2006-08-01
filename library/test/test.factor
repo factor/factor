@@ -6,7 +6,6 @@ memory namespaces parser prettyprint sequences strings words
 vectors ;
 
 TUPLE: assert got expect ;
-M: assert summary drop "Assertion failed" ;
 : assert ( got expect -- ) <assert> throw ;
 
 : assert= ( a b -- ) 2dup = [ 2drop ] [ assert ] if ;

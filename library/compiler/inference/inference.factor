@@ -15,12 +15,6 @@ TUPLE: inference-error message rstate data-stack call-stack ;
     recursive-state get meta-d get meta-r get
     <inference-error> throw ;
 
-M: inference-error error. ( error -- )
-    "Inference error:" print
-    dup inference-error-message print
-    "Recursive state:" print
-    inference-error-rstate describe ;
-
 M: object value-literal ( value -- )
     "A literal value was expected where a computed value was found" inference-error ;
 

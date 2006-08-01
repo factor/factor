@@ -55,7 +55,7 @@ TUPLE: check-tuple class ;
 
 : define-constructor ( word class def -- )
     pick reset-generic
-    swap check-tuple-class [
+    swap check-tuple [
         dup literalize ,
         "tuple-size" word-prop ,
         \ <tuple> , %
