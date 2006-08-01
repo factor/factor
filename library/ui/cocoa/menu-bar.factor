@@ -10,10 +10,10 @@ IN: cocoa
 GENERIC: to-target-and-action ( spec -- target action )
 
 M: f to-target-and-action f swap ;
-M: string to-target-and-action sel_registerName f ;
+M: string to-target-and-action f ;
 M: word to-target-and-action unit to-target-and-action ;
 M: quotation to-target-and-action
-    <FactorCallback> "perform:" sel_registerName swap ;
+    <FactorCallback> "perform:" swap ;
 
 : <NSMenu> ( title -- )
     NSMenu -> alloc

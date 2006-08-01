@@ -2,7 +2,6 @@
 
 - windows native i/o
 - fix contribs: parser-combinators, boids, automata, space-invaders
-- unix i/o: problems with passing f to syscalls
 - sometimes darcs get fails with the httpd
 - gdb triggers 'mutliple i/o ops on port' error
 - "localhost" 50 <client> won't fail
