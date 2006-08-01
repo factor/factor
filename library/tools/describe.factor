@@ -5,30 +5,7 @@ USING: arrays generic hashtables io kernel kernel-internals
 math namespaces prettyprint sequences strings styles vectors
 words ;
 
-GENERIC: summary ( object -- string )
-
-: sign-string ( n -- string )
-    0 > "a positive " "a negative " ? ;
-
-M: integer summary
-    dup zero? [
-        "a " "zero "
-    ] [
-        dup sign-string over 2 mod zero? "even " "odd " ?
-    ] if rot class word-name append3 ;
-
-M: real summary
-    dup sign-string swap class word-name append ;
-
-M: complex summary
-    "a complex number in the "
-    swap quadrant { "first" "second" "fourth" "third" } nth
-    " quadrant" append3 ;
-
 GENERIC: sheet ( obj -- sheet )
-
-M: object summary
-    "an instance of the " swap class word-name " class" append3 ;
 
 : slot-sheet ( obj -- sheet )
     dup class "slots" word-prop
@@ -52,29 +29,6 @@ M: hashtable summary
     " keys" append3 ;
 
 M: hashtable sheet hash>alist flip ;
-
-M: word summary ( word -- )
-    dup word-vocabulary [
-        dup interned?
-        "a word in the " "a word orphaned from the " ?
-        swap word-vocabulary " vocabulary" append3
-    ] [
-        drop "a uniquely generated symbol"
-    ] if ;
-
-M: input summary ( input -- )
-    "Input: " swap input-string
-    dup string? [ unparse-short ] unless append ;
-
-M: vocab-link summary ( vocab-link -- )
-    [
-        vocab-link-name dup %
-        " vocabulary (" %
-        words length #
-        " words)" %
-    ] "" make ;
-
-DEFER: describe
 
 : sheet. ( sheet -- )
     flip dup empty? [

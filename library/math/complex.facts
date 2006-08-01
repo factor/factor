@@ -49,10 +49,6 @@ HELP: polar> "( abs arg -- z )"
 { $values { "z" "a complex number" } { "abs" "a non-negative real number" } { "arg" "a real number" } }
 { $description "Converts an absolute value and argument (polar form) to a complex number." } ;
 
-HELP: quadrant "( z -- n )"
-{ $values { "z" "a complex number" } { "n" "0, 1, 2, or 3" } }
-{ $description "If the imaginary axis runs from bottom to top and the real axis runs from left to right, the quadrants of the complex plane run anti-clockwise starting from the positive real axis:" { $code "1|0" "---" "2|3" } } ;
-
 HELP: 2>rect "( x y -- xr xi yr yi )"
 { $values { "x" "a complex number" } { "y" "a complex number" } { "xr" "real part of " { $snippet "x" } } { "xi" "imaginary part of " { $snippet "x" } } { "yr" "real part of " { $snippet "y" } } { "yi" "imaginary part of " { $snippet "y" } } }
 { $description "Extracts real and imaginary components of two numbers at once." } ;

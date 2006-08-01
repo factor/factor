@@ -1,5 +1,5 @@
-! Copyright (C) 2004, 2005 Slava Pestov.
-! See http://factor.sf.net/license.txt for BSD license.
+! Copyright (C) 2006 Slava Pestov.
+! See http://factorcode.org/license.txt for BSD license.
 IN: math-internals
 USING: errors generic kernel kernel-internals math ;
 
@@ -34,8 +34,6 @@ M: number = ( n n -- ? ) number= ;
 : cis ( theta -- cis ) dup fcos swap fsin rect> ; inline
 
 : polar> ( abs arg -- z ) cis * ; inline
-
-: quadrant ( z -- n ) >rect >r 0 >= 0 1 ? r> 0 >= 0 3 ? bitxor ;
 
 M: complex absq >rect [ sq ] 2apply + ;
 

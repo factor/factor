@@ -1,10 +1,6 @@
 IN: inspector
 USING: help io kernel prettyprint words ;
 
-HELP: summary "( object -- string )"
-{ $values { "object" "an object" } { "string" "a string" } }
-{ $contract "Outputs a brief description of the object." } ;
-
 HELP: sheet "( object -- sheet )"
 { $values { "object" "an object" } { "sheet" "a sequence of sequences" } }
 { $contract "Outputs a representation of the object for the " { $link describe } " word, which is a table where each row corresponds to an object slot, and consists of a number of columns, presumably including the slot name and value." } ;

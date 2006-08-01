@@ -94,6 +94,7 @@ sequences vectors words ;
         "/library/syntax/see.factor"
         "/library/syntax/parser.factor"
 
+        "/library/tools/summary.factor"
         "/library/tools/describe.factor"
         "/library/tools/debugger.factor"
         
@@ -292,6 +293,7 @@ sequences vectors words ;
         "/library/test/test.facts"
         "/library/tools/word-tools.facts"
         "/library/tools/debugger.facts"
+        "/library/tools/summary.facts"
         "/library/tools/describe.facts"
         "/library/tools/inspector.facts"
         "/library/tools/listener.facts"
