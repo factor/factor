@@ -77,10 +77,14 @@ M: vocab-link summary ( vocab-link -- )
 DEFER: describe
 
 : sheet. ( sheet -- )
-    flip
-    H{ { table-gap { 10 0 } } }
-    [ dup unparse-short swap write-object ]
-    tabular-output ;
+    flip dup empty? [
+        drop
+    ] [
+        dup first length 1 =
+        { 0 0 } { 10 0 } ? table-gap associate
+        [ dup unparse-short swap write-object ]
+        tabular-output
+    ] if ;
 
 : describe ( object -- ) dup summary print sheet sheet. ;
 

@@ -6,7 +6,6 @@
 - gdb triggers 'mutliple i/o ops on port' error
 - "localhost" 50 <client> won't fail
 - factorcode httpd crashed: bad file descriptor
-- one-column table doesn't need borders...?
 - editor:
   - scroll to caret
   - better listener multi-line expression handling
