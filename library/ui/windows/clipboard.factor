@@ -7,7 +7,7 @@ IN: win32
 : crlf>lf CHAR: \r swap remove ;
 : lf>crlf [ [ dup CHAR: \n = [ CHAR: \r , ] when , ] each ] "" make ;
 
-: (enum-clipboard) ( n -- )
+: (enum-clipboard) ( n -- n )
     EnumClipboardFormats win32-error dup 0 > [ dup , (enum-clipboard) ] when ;
 
 : enum-clipboard ( -- seq )

@@ -25,9 +25,11 @@ LIBRARY: kernel32
 ! ) ;
 
 
+! FUNCTION: HMODULE GetModuleHandleA ( LPCTSTR lpModulename ) ;
+! FUNCTION: HMODULE GetModuleHandleW ( LPCWSTR lpModulename ) ;
 
-FUNCTION: HMODULE GetModuleHandleA ( char* lpModulename ) ;
-FUNCTION: HMODULE GetModuleHandleW ( char* lpModulename ) ;
+FUNCTION: HMODULE GetModuleHandleA ( void* lpModulename ) ;
+FUNCTION: HMODULE GetModuleHandleW ( void* lpModulename ) ;
 
 : GetModuleHandle \ GetModuleHandleW \ GetModuleHandleA unicode-exec ;
 

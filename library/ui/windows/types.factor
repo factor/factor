@@ -177,7 +177,8 @@ TYPEDEF: LONG_PTR            LPARAM
 TYPEDEF: BOOL*               LPBOOL
 TYPEDEF: BYTE*               LPBYTE
 TYPEDEF: DWORD*              LPCOLORREF
-TYPEDEF: CHAR*               LPCSTR
+! TYPEDEF: CHAR*               LPCSTR
+TYPEDEF: VOID*               LPCSTR
 TYPEDEF: WCHAR*              LPCWSTR
 TYPEDEF: WCHAR*              LPWSTR
 unicode? [

@@ -13,7 +13,7 @@ IN: io-internals
 : io-multiplex ( timeout -- )
     #! FIXME: needs to work given a timeout
     dup -1 = [ drop INFINITE ] when cancel-timedout wait-for-io 
-    swap [ schedule-thread ] [ drop ] if* ;
+    swap [ schedule-thread-with ] [ drop ] if* ;
 
 : init-io ( -- )
     win32-init-stdio ;
