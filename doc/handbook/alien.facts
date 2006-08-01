@@ -1,4 +1,5 @@
-USING: alien arrays help libc math ;
+IN: alien
+USING: arrays errors help libc math ;
 
 ARTICLE: "alien" "C library interface"
 "Factor can directly call C functions in native libraries. It is also possible to compile callbacks which run Factor code, and pass them to native libraries as function pointers."

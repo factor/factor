@@ -1,5 +1,7 @@
-USING: generic hashtables help inspector modules namespaces
-parser prettyprint sequences words ;
+USING: alien errors generic hashtables help inference inspector
+io-internals io libc math-internals modules namespaces parser
+prettyprint queues sequences sequences-internals test words 
+kernel generic ;
 
 ARTICLE: "handbook" "Factor documentation"
 { $subsection "changes" }
@@ -41,7 +43,7 @@ ARTICLE: "handbook" "Factor documentation"
 { $subsection "primitive-index" }
 { $subsection "error-index" }
 { $subsection "type-index" }
-{ $subsection "class-index" };
+{ $subsection "class-index" } ;
 
 ARTICLE: "article-index" "Article index"
 { $outliner [ articles get hash-keys ] } ;
@@ -59,14 +61,15 @@ ARTICLE: "error-index" "Type index"
 { $subsection c-stream-error             }
 { $subsection c-string-error.            }
 { $subsection callstack-overflow.        }
+{ $subsection check-closed               }
 { $subsection check-create               }
 { $subsection check-method               }
 { $subsection check-ptr                  }
+{ $subsection check-tuple                }
 { $subsection check-vocab                }
 { $subsection condition                  }
 { $subsection datastack-overflow.        }
 { $subsection datastack-underflow.       }
-{ $subsection duplex-closed              }
 { $subsection empty-queue                }
 { $subsection expired-error.             }
 { $subsection ffi-error.                 }
@@ -83,7 +86,6 @@ ARTICLE: "error-index" "Type index"
 { $subsection retainstack-underflow.     }
 { $subsection signal-error.              }
 { $subsection slice-error                }
-{ $subsection tuple-class-error          }
 { $subsection type-check-error.          }
 { $subsection undefined-symbol-error.    }
 { $subsection undefined-word-error.      }

@@ -14,7 +14,7 @@ HELP: in f
 HELP: check-vocab "( name -- vocab )"
 { $values { "name" "a string" } { "vocab" "a hashtable or " { $link f } } }
 { $description "Outputs a named vocabulary. If the vocabulary does not exist, throws a restartable " { $link check-vocab } " error. If the user invokes the restart, this word outputs " { $link f } "." }
-{ $error-description "Thrown by " { $link POSTPONE: USE: } " and " { $link POSTPONE: USING: } " when a given vocabulary does not exist. Vocabularies must be created by " { $link POSTPONE: IN: } " before being used." }
+{ $error-description "Thrown by " { $link POSTPONE: USE: } " and " { $link POSTPONE: USING: } " when a given vocabulary does not exist. Vocabularies must be created by " { $link POSTPONE: IN: } " before being used." } ;
 
 HELP: use+ "( vocab -- )"
 { $values { "vocab" "a string" } }

@@ -1,5 +1,5 @@
 IN: memory
-USING: help test ;
+USING: errors help test ;
 
 HELP: address "( obj -- n )"
 { $values { "obj" "an object" } { "n" "a memory address" } }
