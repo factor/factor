@@ -2,14 +2,6 @@ IN: errors
 USING: alien arrays generic help inference kernel math memory
 strings vectors ;
 
-HELP: error f
-{ $description "Global variable holding most recently thrown error." }
-{ $notes "Only updated by " { $link throw } ", not " { $link rethrow } "." } ;
-
-HELP: error-continuation f
-{ $description "Global variable holding current continuation of most recently thrown error." }
-{ $notes "Only updated by " { $link throw } ", not " { $link rethrow } "." } ;
-
 HELP: restarts f
 { $description "Global variable holding the set of possible restarts for the most recently thrown error." }
 { $notes "Only updated by " { $link throw } ", not " { $link rethrow } "." } ;

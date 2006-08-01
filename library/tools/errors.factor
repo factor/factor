@@ -134,7 +134,7 @@ M: no-cond summary
 
 M: slice-error error.
     "Cannot create slice because " write
-    slice-error-reason append print ;
+    slice-error-reason print ;
 
 M: no-word summary
     drop "Word not found in current vocabulary search path" ;

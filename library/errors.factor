@@ -9,6 +9,9 @@ USING: generic namespaces sequences ;
 IN: errors
 USING: kernel ;
 
+SYMBOL: error
+SYMBOL: error-continuation
+
 : catch ( try -- error | try: -- )
     [ >c call f c> drop f ] callcc1 nip ; inline
 

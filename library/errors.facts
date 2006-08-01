@@ -1,5 +1,13 @@
 USING: errors help kernel kernel-internals ;
 
+HELP: error f
+{ $description "Global variable holding most recently thrown error." }
+{ $notes "Only updated by " { $link throw } ", not " { $link rethrow } "." } ;
+
+HELP: error-continuation f
+{ $description "Global variable holding current continuation of most recently thrown error." }
+{ $notes "Only updated by " { $link throw } ", not " { $link rethrow } "." } ;
+
 HELP: >c "( continuation -- )"
 { $values { "continuation" "a continuation" } }
 { $description "Pushes an exception handler continuation on the catch stack. The continuation must have been reified by " { $link callcc1 } "." } ;

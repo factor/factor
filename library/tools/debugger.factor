@@ -19,8 +19,6 @@ M: tuple error-help ( error -- topic ) class ;
 
 M: string error. ( error -- ) print ;
 
-SYMBOL: error
-SYMBOL: error-continuation
 SYMBOL: restarts
 
 : :s error-continuation get continuation-data stack. ;
@@ -68,7 +66,7 @@ SYMBOL: restarts
     ":s    - data stack at exception time" [ :s ] (debug-help)
     ":r    - retain stack at exception time" [ :r ] (debug-help)
     ":c    - call stack at exception time" [ :c ] (debug-help)
-    ":get  ( var -- value ) accesses variables at time of error" print
+    ":get  ( var -- value ) accesses variables at time of the error" print
     flush ;
 
 : print-error ( error -- )
