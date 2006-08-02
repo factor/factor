@@ -1,15 +1,15 @@
 This is a simple space invaders emulator. The goal is to produce an
 emulator, disassembler and assembler for the 8080 processor.
 
-Running 'load.factor' will load all necessary files to run the game.
+It is integrated into the Factor module system, the following will
+load all necessary files and run it:
 
-If you are in the factor root directory, and have the ROM as a file
-'invaders.rom' in that same directory, the following starts the GUI:
+  "space-invaders" require
+  USE: space-invaders
+  run
 
-  "contrib/space-invaders/load.factor" run-file
-  compile-all
-  USE: space-invaders  
-  run 
+For this to work it needs a ROM file called 'invaders.rom' in the
+factor root directory.
 
 'Backspace' inserts a coin, '1' is the one player button and '2' is
 the two play button. The left and right arrow keys move and the up
@@ -33,20 +33,13 @@ input/output ports.
 
 Current Issues:
 
-1) The Factor GUI doesn't seperate key events into 'up' and 'down'
-events. Space Invaders requires this so we fake the up event. This
-causes a delay when pressing keys which makes the game hard to play.
+1) The Escape key does not close the GUI. It does stop the CPU
+   emulation process though.
 
-2) The Escape key does not close the GUI. It does stop the CPU
-emulation process though.
+2) Closing the GUI using the 'X' does not stop the CPU emulation
+   process. 
 
-3) Closing the GUI using the 'X' does not stop the CPU emulation
-process. This needs to be stopped by sending "stop" to the process
-returned from 'run':
-  USE: concurency
-  "stop" swap send
-
-4) The best way of closing the window is by pressing Escape and then
+3) The best way of closing the window is by pressing Escape and then
    'X' on the window.
 
 For more information, contact the author, Chris Double, at
