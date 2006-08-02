@@ -1,0 +1,24 @@
+IN: generic
+USING: help ;
+
+HELP: check-method "( class generic -- class generic )"
+{ $values { "class" "a class word" } { "generic" "a generic word" } }
+{ $description "Asserts that " { $snippet "class" } " is a class word and " { $snippet "generic" } " is a generic word, throwing a " { $link check-method } " error if the assertion fails." }
+{ $error-description "Thrown if " { $link POSTPONE: M: } " or " { $link define-method } " is given an invalid class or generic word." } ;
+
+HELP: with-methods "( word quot -- )"
+{ $values { "word" "a generic word" } { "quot" "a quotation with stack effect " { $snippet "( methods -- )" } } }
+{ $description "Applies a quotation to the generic word's methods hashtable, and regenerates the generic word's definition when the quotation returns." }
+$low-level-note ;
+
+HELP: define-method "( quot class generic -- )"
+{ $values { "quot" "a quotation" } { "class" "a class word" } { "generic" "a generic word" } }
+{ $description "Defines a method on " { $snippet "generic" } " associating " { $snippet "class" } " with " { $snippet "quot" } "." } ;
+
+HELP: forget-method "( class generic -- )"
+{ $values { "class" "a class word" } { "generic" "a generic word" } }
+{ $description "Removes the method definition for " { $snippet "class" } " from " { $snippet "generic" } "." } ;
+
+HELP: implementors "( class -- seq )"
+{ $values { "class" "a class word" } { "seq" "a sequence of generic words" } }
+{ $description "Finds all generic words in the dictionary implementing methods for this class." } ;

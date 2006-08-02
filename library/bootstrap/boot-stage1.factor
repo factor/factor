@@ -82,7 +82,9 @@ sequences vectors words ;
 
         "/library/syntax/early-parser.factor"
 
+        "/library/generic/classes.factor"
         "/library/generic/generic.factor"
+        "/library/generic/methods.factor"
         "/library/generic/standard-combination.factor"
         "/library/generic/slots.factor"
         "/library/generic/math-combination.factor"
@@ -253,7 +255,9 @@ sequences vectors words ;
         "/library/compiler/inference/inference.facts"
         "/library/compiler/compiler.facts"
         "/library/generic/early-generic.facts"
+        "/library/generic/classes.facts"
         "/library/generic/generic.facts"
+        "/library/generic/methods.facts"
         "/library/generic/math-combination.facts"
         "/library/generic/slots.facts"
         "/library/generic/standard-combination.facts"

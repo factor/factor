@@ -1,7 +1,6 @@
 + 0.84:
 
-- windows native i/o
-- fix contribs: parser-combinators, boids, automata, space-invaders
+- fix contribs: boids, automata, space-invaders
 - sometimes darcs get fails with the httpd
 - gdb triggers 'mutliple i/o ops on port' error
 - "localhost" 50 <client> won't fail
@@ -30,10 +29,6 @@
   - offer to remove generic words which are not called and have no
     methods
 - forgetting a tuple class should forget the constructor
-- see by itself only shows the G: def
-- { class generic } see supports forms:
-  { f generic } to show all methods
-  { class f } to show all methods
 - methods: remember their file/line
 - { class generic } jedit, reload DTRT
 - T{ link f "foo" "bar" } see
@@ -46,6 +41,7 @@
 
 + ui:
 
+- we have trouble drawing rectangles
 - the UI listener has a shitty design. perhaps it should not call out
   to the real listener.
 - remaining walker tasks:
