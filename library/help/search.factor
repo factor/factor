@@ -1,8 +1,8 @@
 ! Copyright (C) 2006 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 IN: help
-USING: arrays graphs hashtables help io kernel math namespaces
-porter-stemmer prettyprint sequences strings words ;
+USING: arrays definitions graphs hashtables help io kernel math
+namespaces porter-stemmer prettyprint sequences strings words ;
 
 ! Right now this code is specific to the help. It will be
 ! generalized to an abstract full text search engine later.
