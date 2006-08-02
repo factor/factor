@@ -20,143 +20,18 @@
 ! WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
 ! OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
 ! ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-USING: lazy kernel sequences strings lists math io ;
+USING: lazy-lists kernel sequences strings math io ;
 IN: parser-combinators
 
-GENERIC: phead
-
-M: string phead ( object -- head )
-  #! Polymorphic head. Return the head item of the object. 
-  #! For a string this is the first character.
-  0 swap nth ;
-
-M: list phead ( object -- head )
-  #! Polymorphic head. Return the head item of the object. 
-  #! For a list this is the car.
-  car ;
-
-M: cons phead ( object -- head )
-  #! Polymorphic head. Return the head item of the object. 
-  #! For a list this is the car.
-  car ;
-
-GENERIC: ptail
-
-M: string ptail ( object -- tail )
-  #! Polymorphic tail. Return the tail of the object.
-  #! For a string this is everything but the first character.
-  1 swap tail ;
-
-M: list ptail ( object -- tail )
-  #! Polymorphic tail. Return the tail of the object.
-  #! For a list this is the cdr.
-  cdr ;
-
-M: cons ptail ( object -- tail )
-  #! Polymorphic tail. Return the tail of the object.
-  #! For a list this is the cdr.
-  cdr ;
-
-: pfirst ( object -- first )
-  #! Polymorphic first. The first item in a collection.
-  phead ;
-
-GENERIC: psecond
-
-M: string psecond ( object -- second )
-  #! Polymorphic second
-  1 swap nth ;
-
-M: list psecond ( object -- second )
-  #! Polymorphic second
-  cdr car ;
-
-: ph:t ( object -- head tail )
+: h:t ( object -- head tail )
   #! Return the head and tail of the object.
-  dup phead swap ptail ;
-
-GENERIC: pempty?
-
-M: string pempty? ( object -- bool )
-  #! Return true if the collection is empty.
-  length 0 = ;
-
-M: list pempty? ( object -- bool )
-  #! Return true if the collection is empty.
-  not ;
-
-: string-take ( n string -- string )
-  #! Return a string with the first 'n' characters
-  #! of the original string.
-  dup length pick < [
-    2drop ""
-  ] [
-    head
-  ] if ;
-
-: (list-take) ( n list accum -- list )
-  >r >r 1 - dup 0 < [ 
-    drop r> drop r> reverse 
-  ] [ 
-    r> uncons swap r> cons (list-take) 
-  ] if ;
-
-: list-take ( n list -- list )
-  #! Return a list with the first 'n' characters
-  #! of the original list.
-  [ ] (list-take) ;
-
-GENERIC: ptake
-
-M: string ptake ( n object -- object )
-  #! Polymorphic take.
-  #! Return a collection of the first 'n' 
-  #! characters from the original collection.
-  string-take ;
-
-M: list ptake ( n object -- object )
-  #! Polymorphic take.
-  #! Return a collection of the first 'n' 
-  #! characters from the original collection.
-  list-take ;
-
-: string-drop ( n string -- string )
-  #! Return a string with the first 'n' characters
-  #! of the original string removed.
-  dup length pick < [
-    2drop "" 
-  ] [
-    tail 
-  ] if ;
-
-: list-drop ( n list -- list )
-  #! Return a list with the first 'n' items
-  #! of the original list removed.
-  >r 1 - dup 0 < [ 
-    drop r>
-  ] [
-    r> cdr list-drop
-  ] if ;
-
-GENERIC: pdrop
-
-M: string pdrop ( n object -- object )
-  #! Polymorphic drop.
-  #! Return a collection the same as 'object'
-  #! but with the first n items removed. 
-  string-drop ;
-
-M: list pdrop ( n object -- object )
-  #! Polymorphic drop.
-  #! Return a collection the same as 'object'
-  #! but with the first n items removed. 
-  list-drop ;
+  dup first swap 1 tail ;
 
 : token-parser ( inp sequence -- llist )
   #! A parser that parses a specific sequence of
   #! characters.
-  2dup length swap ptake over = [
-    swap over length swap pdrop swons unit delay lunit
+  2dup length head over = [
+    swap over length tail swons unit delay lunit
   ] [
     2drop lnil
   ] if ;
@@ -169,11 +44,11 @@ M: list pdrop ( n object -- object )
   #! A parser that succeeds if the predicate,
   #! when passed the first character in the input, returns
   #! true.
-  over pempty? [
+  over empty? [
     2drop lnil
   ] [        
-    over phead swap call [
-      ph:t swons unit delay lunit
+    over first swap call [
+      h:t swons unit delay lunit
     ] [
       drop lnil
     ] if
@@ -192,8 +67,8 @@ M: list pdrop ( n object -- object )
   #! successfully parsed character on the stack. The result
   #! of that call is returned as the result portion of the
   #! successfull parse lazy list.
-  -rot over phead swap call [ ( quot inp -- )
-    ph:t >r swap call r> swons unit delay lunit
+  -rot over first swap call [ ( quot inp -- )
+    h:t >r swap call r> swons unit delay lunit
   ] [
     2drop lnil
   ] if ;
@@ -278,7 +153,7 @@ M: list pdrop ( n object -- object )
 : string-ltrim ( string -- string )
   #! Return a new string without any leading whitespace
   #! from the original string.
-  dup phead blank? [ ptail string-ltrim ] when ;
+  dup first blank? [ 1 tail string-ltrim ] when ;
 
 : sp-parser ( input parser -- result )
   #! Skip all leading whitespace from the input then call
@@ -295,7 +170,7 @@ M: list pdrop ( n object -- object )
   #! from the results anything where the remaining
   #! input to be parsed is not empty. So ensures a 
   #! fully parsed input string.
-  call [ car pempty? ] lsubset ;
+  call [ car empty? ] lsubset ;
 
 : just ( parser -- parser )
   #! Return an instance of the just-parser.
@@ -337,7 +212,7 @@ M: list pdrop ( n object -- object )
 
 : <&-parser ( input parser1 parser2 -- result )
   #! Same as <&> except discard the results of the second parser.
-  <&> [ phead ] <@ call ;
+  <&> [ first ] <@ call ;
 
 : <& ( parser1 parser2 -- parser )
   #! Same as <&> except discard the results of the second parser.
@@ -345,7 +220,7 @@ M: list pdrop ( n object -- object )
 
 : &>-parser ( input parser1 parser2 -- result )
   #! Same as <&> except discard the results of the first parser.
-  <&> [ ptail ] <@ call ;
+  <&> [ 1 tail ] <@ call ;
 
 : &> ( parser1 parser2 -- parser )
   #! Same as <&> except discard the results of the first parser.
