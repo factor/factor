@@ -136,13 +136,6 @@ TUPLE: left-up-msg ;
 TUPLE: right-down-msg ;
 TUPLE: right-up-msg ;
 
-: coin-key-pressed ( process -- )
-  #! Workaround lack of up event from gui.
-  <coin-down-msg> over send [ 10 sleep <coin-up-msg> swap send ] spawn drop  ;
-
-: player1-key-pressed ( process -- )
-  #! Workaround lack of up event from gui.
-  <player1-down-msg> over send [ 10 sleep <player1-up-msg> swap send ] spawn drop ;
 
 : player2-key-pressed ( process -- )
   #! Workaround lack of up event from gui.
@@ -161,16 +154,21 @@ TUPLE: right-up-msg ;
   <right-down-msg> over send [ 10 sleep <right-up-msg> swap send ] spawn drop ;
 
 : set-key-actions ( gadget -- )
-!  H{
-!    { [ "ESCAPE" ] [ invaders-gadget-process "stop" swap send ] }
-!    { [ "BACKSPACE" ] [ invaders-gadget-process coin-key-pressed ] }
-!    { [ "1" ] [ invaders-gadget-process player1-key-pressed ] }
-!    { [ "2" ] [ invaders-gadget-process player2-key-pressed ] }
-!    { [ "UP" ] [ invaders-gadget-process fire-key-pressed ] }
-!    { [ "LEFT" ] [ invaders-gadget-process left-key-pressed ] }
-!    { [ "RIGHT" ] [ invaders-gadget-process right-key-pressed ] }
-!  } set-gestures 
-  drop ;
+  class H{
+    { T{ key-down f f "ESCAPE" } [ invaders-gadget-process "stop" swap send ] }
+    { T{ key-down f f "BACKSPACE" } [ invaders-gadget-process <coin-down-msg> swap send ] }
+    { T{ key-up f f "BACKSPACE" } [ invaders-gadget-process <coin-up-msg> swap send ] }
+    { T{ key-down f f "1" } [ invaders-gadget-process <player1-down-msg> swap send ] }
+    { T{ key-up f f "1" } [ invaders-gadget-process <player1-up-msg> swap send ] }
+    { T{ key-down f f "2" } [ invaders-gadget-process <player2-down-msg> swap send ] }
+    { T{ key-up f f "2" } [ invaders-gadget-process <player2-up-msg> swap send ] }
+    { T{ key-down f f "UP" } [ invaders-gadget-process <fire-down-msg> swap send ] }
+    { T{ key-up f f "UP" } [ invaders-gadget-process <fire-up-msg> swap send ] }
+    { T{ key-down f f "LEFT" } [ invaders-gadget-process <left-down-msg> swap send ] }
+    { T{ key-up f f "LEFT" } [ invaders-gadget-process <left-up-msg> swap send ] }
+    { T{ key-down f f "RIGHT" } [ invaders-gadget-process <right-down-msg> swap send ] }
+    { T{ key-up f f "RIGHT" } [ invaders-gadget-process <right-up-msg> swap send ] }
+  } set-gestures ;
 
 C: invaders-gadget ( gadget -- )
   dup delegate>gadget 
