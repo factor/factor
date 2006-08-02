@@ -326,3 +326,9 @@ M: right-up-msg handle-invaders-message ( gadget message -- quit? )
   dup "Space Invaders" open-titled-window 
   dup [ millis swap invaders-process ] curry spawn 
   swap dupd set-invaders-gadget-process ;
+
+: runx ( -- process )  
+  <space-invaders> "invaders.rom" over load-rom
+  <invaders-gadget> [ set-invaders-gadget-cpu ] keep   
+  dup "Space Invaders" open-titled-window 
+  dup "a" set invaders-gadget-cpu 1000 [ dup gui-frame "a" get relayout-1 ] times drop ;

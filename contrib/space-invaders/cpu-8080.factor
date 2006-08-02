@@ -1077,14 +1077,14 @@ SYMBOL: $4
   8-bit-registers sp <&>
   "," token <& 
   8-bit-registers <&>
-  just [ >2array< swap >2array< swap >r append r> curry ] <@ ;  
+  just [ >2array< swap >2array< swap >r swap append r> curry ] <@ ;  
 
 : ADC-R,(RR)-instruction ( -- parser )
   "ADC-R,(RR)" "ADC" complex-instruction
   8-bit-registers sp <&>
   "," token <& 
   16-bit-registers indirect <&>
-  just [ >2array< swap >2array< swap >r append r> curry ] <@ ;  
+  just [ >2array< swap >2array< swap >r swap append r> curry ] <@ ;  
 
 : SBC-R,N-instruction ( -- parser )
   "SBC-R,N" "SBC" complex-instruction
@@ -1097,14 +1097,14 @@ SYMBOL: $4
   8-bit-registers sp <&>
   "," token <& 
   8-bit-registers <&>
-  just [ >2array< swap >2array< swap >r append r> curry  ] <@ ;  
+  just [ >2array< swap >2array< swap >r swap append r> curry  ] <@ ;  
 
 : SBC-R,(RR)-instruction ( -- parser )
   "SBC-R,(RR)" "SBC" complex-instruction
   8-bit-registers sp <&>
   "," token <& 
   16-bit-registers indirect  <&>
-  just [ >2array< swap >2array< swap >r append r> curry  ] <@ ;  
+  just [ >2array< swap >2array< swap >r swap append r> curry  ] <@ ;  
 
 : SUB-R-instruction ( -- parser )
   "SUB-R" "SUB" complex-instruction
@@ -1132,21 +1132,21 @@ SYMBOL: $4
   8-bit-registers sp <&>
   "," token <& 
   8-bit-registers <&>
-  just [ >2array< swap >2array< swap >r append r> curry ] <@ ;  
+  just [ >2array< swap >2array< swap >r swap append r> curry ] <@ ;  
 
 : ADD-RR,RR-instruction ( -- parser )
   "ADD-RR,RR" "ADD" complex-instruction
   16-bit-registers sp <&>
   "," token <& 
   16-bit-registers <&>
-  just [ >2array< swap >2array< swap >r append r> curry ] <@ ;  
+  just [ >2array< swap >2array< swap >r swap append r> curry ] <@ ;  
 
 : ADD-R,(RR)-instruction ( -- parser )
   "ADD-R,(RR)" "ADD" complex-instruction
   8-bit-registers sp <&>
   "," token <& 
   16-bit-registers indirect <&>
-  just [ >2array< swap >2array< swap >r append r> curry ] <@ ;  
+  just [ >2array< swap >2array< swap >r swap append r> curry ] <@ ;  
   
 : LD-RR,NN-instruction
   #! LD BC,nn
@@ -1174,28 +1174,28 @@ SYMBOL: $4
   16-bit-registers indirect sp <&> 
   "," token <&
   8-bit-registers <&>
-  just [ >2array< swap >2array< swap >r append r> curry ] <@ ;  
+  just [ >2array< swap >2array< swap >r swap append r> curry ] <@ ;  
 
 : LD-R,R-instruction
   "LD-R,R" "LD" complex-instruction
   8-bit-registers sp <&> 
   "," token <&
   8-bit-registers <&>
-  just [ >2array< swap >2array< swap >r append r> curry ] <@ ;  
+  just [ >2array< swap >2array< swap >r swap append r> curry ] <@ ;  
 
 : LD-RR,RR-instruction
   "LD-RR,RR" "LD" complex-instruction
   16-bit-registers sp <&> 
   "," token <&
   16-bit-registers <&>
-  just [ >2array< swap >2array< swap >r append r> curry ] <@ ;  
+  just [ >2array< swap >2array< swap >r swap append r> curry ] <@ ;  
 
 : LD-R,(RR)-instruction
   "LD-R,(RR)" "LD" complex-instruction
   8-bit-registers sp <&> 
   "," token <&
   16-bit-registers indirect <&>
-  just [ >2array< swap >2array< swap >r append r> curry ] <@ ;  
+  just [ >2array< swap >2array< swap >r swap append r> curry ] <@ ;  
 
 : LD-(NN),RR-instruction
   "LD-(NN),RR" "LD" complex-instruction
@@ -1244,14 +1244,14 @@ SYMBOL: $4
   16-bit-registers indirect sp <&> 
   "," token <&
   16-bit-registers <&>
-  just [ >2array< swap >2array< swap >r append r> curry ] <@ ;  
+  just [ >2array< swap >2array< swap >r swap append r> curry ] <@ ;  
 
 : EX-RR,RR-instruction
   "EX-RR,RR" "EX" complex-instruction
   16-bit-registers sp <&> 
   "," token <&
   16-bit-registers <&>
-  just [ >2array< swap >2array< swap >r append r> curry ] <@ ;  
+  just [ >2array< swap >2array< swap >r swap append r> curry ] <@ ;  
 
 : 8080-generator-parser
   NOP-instruction 
