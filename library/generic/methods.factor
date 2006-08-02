@@ -1,7 +1,8 @@
 ! Copyright (C) 2006 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 IN: generic
-USING: words hashtables sequences arrays errors kernel ;
+USING: arrays definitions errors hashtables help kernel
+sequences words ;
 
 PREDICATE: array method-spec
     dup length 2 = [
@@ -42,8 +43,18 @@ TUPLE: check-method class generic ;
     >r bootstrap-word r> check-method
     [ set-hash ] with-methods ;
 
-: forget-method ( class generic -- )
-    [ remove-hash ] with-methods ;
-
 : implementors ( class -- list )
     [ "methods" word-prop ?hash* nip ] word-subset-with ;
+
+M: method-spec where
+    dup first2 "methods" word-prop hash method-loc
+    [ ] [ second where ] ?if ;
+
+M: generic subdefs
+    dup order [ swap 2array ] map-with ;
+
+M: class subdefs
+    dup implementors [ 2array ] map-with ;
+
+M: method-spec forget
+    first2 [ remove-hash ] with-methods ;

@@ -15,10 +15,6 @@ HELP: define-method "( quot class generic -- )"
 { $values { "quot" "a quotation" } { "class" "a class word" } { "generic" "a generic word" } }
 { $description "Defines a method on " { $snippet "generic" } " associating " { $snippet "class" } " with " { $snippet "quot" } "." } ;
 
-HELP: forget-method "( class generic -- )"
-{ $values { "class" "a class word" } { "generic" "a generic word" } }
-{ $description "Removes the method definition for " { $snippet "class" } " from " { $snippet "generic" } "." } ;
-
 HELP: implementors "( class -- seq )"
 { $values { "class" "a class word" } { "seq" "a sequence of generic words" } }
 { $description "Finds all generic words in the dictionary implementing methods for this class." } ;

@@ -52,3 +52,5 @@ M: condition compute-restarts
     [ delegate compute-restarts ] keep
     [ condition-cc ] keep
     condition-restarts [ swap add ] map-with append ;
+
+DEFER: try

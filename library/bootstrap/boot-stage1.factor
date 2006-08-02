@@ -63,6 +63,7 @@ sequences vectors words ;
         "/library/math/vectors.factor"
         "/library/math/parse-numbers.factor"
 
+        "/library/definitions.factor"
         "/library/words.factor"
         "/library/continuations.factor"
         "/library/errors.factor"
@@ -93,10 +94,10 @@ sequences vectors words ;
         "/library/compiler/alien/aliens.factor"
         
         "/library/syntax/prettyprint.factor"
-        "/library/syntax/synopsis.factor"
-        "/library/syntax/see.factor"
         "/library/syntax/parser.factor"
+        "/library/syntax/parse-stream.factor"
 
+        "/library/tools/definitions.factor"
         "/library/tools/summary.factor"
         "/library/tools/describe.factor"
 
@@ -111,8 +112,6 @@ sequences vectors words ;
         "/library/tools/debugger.factor"
         
         "/library/threads.factor"
-
-        "/library/syntax/parse-stream.factor"
 
         "/library/tools/memory.factor"
         "/library/tools/listener.factor"
@@ -297,9 +296,8 @@ sequences vectors words ;
         "/library/syntax/parser.facts"
         "/library/syntax/parse-syntax.facts"
         "/library/syntax/prettyprint.facts"
-        "/library/syntax/synopsis.facts"
-        "/library/syntax/see.facts"
         "/library/test/test.facts"
+        "/library/tools/definitions.facts"
         "/library/tools/word-tools.facts"
         "/library/tools/debugger.facts"
         "/library/tools/summary.facts"

@@ -1,5 +1,5 @@
 IN: help
-USING: io prettyprint ;
+USING: definitions io prettyprint ;
 
 HELP: $title "( topic -- )"
 { $values { "topic" "a help article name or a word" } }

@@ -1,0 +1,21 @@
+IN: definitions
+USING: help ;
+
+HELP: reload "( word -- )"
+{ $values { "word" "a word" } }
+{ $description "Reloads the source file containing the most recent redefinition of the word." }
+{ $errors "Throws an error if the word was not defined in a file, or if an error occurs while running the file." } ;
+
+HELP: in. "( word -- )"
+{ $values { "word" "a word" } }
+{ $description "Prettyprints a " { $snippet "IN:" } " declaration for the word." }
+$prettyprinting-note ;
+
+HELP: (synopsis) "( defspec -- )"
+{ $values { "defspec" "a definition specifier" } }
+{ $contract "Prettyprints the prologue of a definition." }
+$prettyprinting-note ;
+
+HELP: comment. "( string -- )"
+{ $description "Prettyprints some text with the comment style." }
+$prettyprinting-note ;

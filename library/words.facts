@@ -1,4 +1,5 @@
-USING: help inspector kernel kernel-internals parser words ;
+IN: words
+USING: definitions help inspector kernel kernel-internals parser ;
 
 HELP: execute "( word -- )"
 { $values { "word" "a word" } }
@@ -237,10 +238,10 @@ HELP: constructor-word "( name vocab -- word )"
 { $description "Creates a new word, surrounding " { $snippet "name" } " in angle brackets." }
 { $examples { $example "\"salmon\" \"scratchpad\" constructor-word ." "<salmon>" } } ;
 
-HELP: forget "( word -- )"
+HELP: forget-word "( word -- )"
 { $values { "word" "a word" } }
 { $description "Removes a word from its vocabulary. The word becomes uninterned." }
-{ $see-also POSTPONE: FORGET: forget-vocab } ;
+{ $see-also POSTPONE: FORGET: forget-vocab forget } ;
 
 HELP: forget-vocab "( vocab -- )"
 { $values { "vocab" "a string" } }
@@ -262,3 +263,7 @@ HELP: bootstrap-word "( word -- target )"
 HELP: update-xt "( word -- )"
 { $values { "word" "a word" } }
 { $description "Updates a word's execution token based on the value of the " { $link word-primitive } " slot. If the word was compiled, this will lose the compiled definition and make it run in the interpreter." } ;
+
+HELP: stack-effect "( word -- str )"
+{ $values { "word" "a word" } { "str" "a string" } }
+{ $description "Outputs the stack effect of a word, as a stack picture string. The stack effect is taken from either online help, or a cached inferred effect." } ;

@@ -1,7 +1,7 @@
 ! Copyright (C) 2006 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 IN: gadgets-browser
-USING: arrays gadgets gadgets-books gadgets-borders
+USING: arrays definitions gadgets gadgets-books gadgets-borders
 gadgets-buttons gadgets-frames gadgets-labels gadgets-panes
 gadgets-presentations gadgets-scrolling gadgets-search
 gadgets-theme gadgets-tiles gadgets-tracks generic hashtables

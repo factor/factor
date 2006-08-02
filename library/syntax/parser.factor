@@ -1,8 +1,8 @@
 ! Copyright (C) 2005, 2006 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 IN: parser
-USING: arrays errors generic hashtables kernel math namespaces
-prettyprint sequences strings vectors words ;
+USING: arrays definitions errors generic hashtables kernel math
+namespaces prettyprint sequences strings vectors words ;
 
 : skip ( i seq quot -- n | quot: elt -- ? )
     over >r find* drop dup -1 =
@@ -92,7 +92,7 @@ TUPLE: bad-escape ;
 
 global [
     {
-        "scratchpad" "syntax" "arrays" "compiler"
+        "scratchpad" "syntax" "arrays" "compiler" "definitions"
         "errors" "generic" "hashtables" "help" "inference"
         "inspector" "io" "jedit" "kernel" "listener" "math"
         "memory" "modules" "namespaces" "parser" "prettyprint"

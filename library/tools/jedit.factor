@@ -1,8 +1,8 @@
 ! Copyright (C) 2004, 2006 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 IN: jedit
-USING: arrays errors io kernel listener math namespaces
-parser prettyprint sequences strings words shells ;
+USING: arrays definitions errors io kernel listener math
+namespaces parser prettyprint sequences strings words shells ;
 
 ! Some words to send requests to a running jEdit instance to
 ! edit files and position the cursor on a specific line number.

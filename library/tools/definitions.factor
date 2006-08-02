@@ -1,8 +1,40 @@
-! Copyright (C) 2003, 2006 Slava Pestov.
+! Copyright (C) 2006 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-IN: prettyprint
+IN: definitions
 USING: arrays generic hashtables io kernel math namespaces
-sequences strings styles words ;
+parser prettyprint sequences styles words ;
+
+: ?resource-path ( path -- path )
+    "resource:/" ?head [ resource-path ] when ;
+
+: reload ( defspec -- )
+    where first [ ?resource-path run-file ] when* ;
+
+GENERIC: (synopsis) ( spec -- )
+
+: write-vocab ( vocab -- )
+    dup <vocab-link> presented associate styled-text ;
+
+: in. ( word -- )
+    word-vocabulary [
+        H{ } <block \ IN: pprint-word write-vocab block;
+    ] when* ;
+
+M: word (synopsis)
+    dup in. dup definer pprint-word pprint-word ;
+
+M: method-spec (synopsis)
+    \ M: pprint-word [ pprint-word ] each ;
+
+: comment. ( comment -- )
+    [ H{ { font-style italic } } [ text ] with-style ] when* ;
+
+: synopsis ( word -- string )
+    [
+        0 margin set [
+            dup (synopsis) stack-effect comment.
+        ] with-pprint
+    ] string-out ;
 
 GENERIC: definition ( spec -- quot ? )
 
@@ -13,8 +45,6 @@ M: compound definition word-def t ;
 M: generic definition "combination" word-prop t ;
 
 M: method-spec definition first2 method t ;
-
-GENERIC: see ( spec -- )
 
 GENERIC: declarations. ( obj -- )
 
@@ -46,19 +76,6 @@ M: word declarations.
 
 M: method-spec see (see) ;
 
-GENERIC: see-methods* ( word -- seq )
-
-M: generic see-methods*
-    dup order [ swap 2array ] map-with ;
-
-M: class see-methods*
-    dup implementors [ 2array ] map-with ;
-
-M: word see-methods* drop f ;
-
-: see-methods ( word -- )
-    see-methods* [ see ] each ;
-
 GENERIC: see-class* ( word -- )
 
 M: union see-class*
@@ -88,4 +105,4 @@ M: word see-class* drop ;
         [ see-class* newline ] [ drop ] if
     ] with-pprint ;
 
-M: word see dup (see) dup see-class see-methods ;
+M: word see dup (see) dup see-class see-subdefs ;

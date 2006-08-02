@@ -1,5 +1,6 @@
-USING: errors help image inspector io kernel listener memory
-modules parser prettyprint sequences test words ;
+USING: definitions errors help image inspector io kernel
+listener memory modules parser prettyprint sequences test
+words ;
 
 ARTICLE: "tools" "Development tools"
 "This section covers words which are used during development, and not usually invoked directly by user code."

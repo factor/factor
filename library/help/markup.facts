@@ -1,5 +1,6 @@
 IN: help
-USING: arrays inspector io math prettyprint sequences ;
+USING: arrays definitions inspector io math prettyprint
+sequences ;
 
 HELP: simple-element f
 { $description "Class of simple elements, which are just arrays of elements." } ;

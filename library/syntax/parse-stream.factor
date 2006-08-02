@@ -1,5 +1,5 @@
-! Copyright (C) 2004, 2005 Slava Pestov.
-! See http://factor.sf.net/license.txt for BSD license.
+! Copyright (C) 2004, 2006 Slava Pestov.
+! See http://factorcode.org/license.txt for BSD license.
 IN: parser
 USING: errors generic hashtables io kernel math namespaces
 sequences words ;
@@ -40,17 +40,3 @@ sequences words ;
     [ <resource-reader> "resource:" ] keep append parse-stream ;
 
 : run-resource ( file -- ) parse-resource call ;
-
-GENERIC: where ( spec -- loc )
-
-M: word where "loc" word-prop ;
-
-M: method-spec where
-    dup first2 "methods" word-prop hash method-loc
-    [ ] [ second where ] ?if ;
-
-: ?resource-path ( path -- path )
-    "resource:/" ?head [ resource-path ] when ;
-
-: reload ( spec -- )
-    where first [ ?resource-path run-file ] when* ;

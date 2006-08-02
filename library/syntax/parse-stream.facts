@@ -56,8 +56,3 @@ HELP: run-resource "( path -- )"
 { $values { "path" "a resource name string" } }
 { $description "Parses and runs a library resource." }
 { $errors "Throws an I/O error if there was an error reading the resource. Throws a parse error if the input is malformed." } ;
-
-HELP: reload "( word -- )"
-{ $values { "word" "a word" } }
-{ $description "Reloads the source file containing the most recent redefinition of the word." }
-{ $errors "Throws an error if the word was not defined in a file, or if an error occurs while running the file." } ;

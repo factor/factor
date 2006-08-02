@@ -1,0 +1,19 @@
+IN: definitions
+USING: help words ;
+
+HELP: see "( defspec -- )"
+{ $values { "defspec" "a definition specifier" } }
+{ $description "Prettyprints a definition." } ;
+
+HELP: where "( defspec -- loc )"
+{ $values { "defspec" "a definition specifier" } { "loc" "an array holding a file name string and line number indexed from 1" } }
+{ $description "Outputs the location of a definition. If the location is not known, will output " { $snippet "{ f f }" } " or " { $link f } "." } ;
+
+HELP: forget "( defspec -- )"
+{ $values { "defspec" "a definition specifier" } }
+{ $description "Forgets about a definition. For example, if it is a word, it will be removed from its vocabulary." } ;
+
+HELP: synopsis "( defspec -- str )"
+{ $values { "defspec" "a definition specifier" } { "str" "a string" } }
+{ $contract "Outputs a short string describing the definition in Factor pseudo-code." }
+{ $examples { $example "\\ append synopsis print" "IN: sequences : append ( seq1 seq2 -- seq )" } } ;

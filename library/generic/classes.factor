@@ -1,9 +1,9 @@
 ! Copyright (C) 2004, 2006 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 IN: generic
-USING: arrays errors hashtables kernel kernel-internals
-namespaces parser sequences strings words vectors math
-math-internals ;
+USING: arrays definitions errors hashtables kernel
+kernel-internals namespaces parser sequences strings words
+vectors math ;
 
 PREDICATE: word class "class" word-prop ;
 
@@ -111,16 +111,10 @@ SYMBOL: class<cache
         tuck [ class< ] all-with? [ peek ] [ drop f ] if
     ] if ;
 
-: class-forget-hook ( class flattened -- )
-    [ typemap get remove-hash ] curry
-    "forget-hook" set-word-prop ;
-
 : define-class ( class -- )
     dup t "class" set-word-prop
     dup H{ } clone "class<" set-word-prop
-    dup flatten-class
-    2dup class-forget-hook
-    typemap get set-hash ;
+    dup flatten-class typemap get set-hash ;
 
 ! Predicate classes for generalized predicate dispatch.
 : define-predicate-class ( class predicate definition -- )
@@ -145,3 +139,7 @@ PREDICATE: word predicate "definition" word-prop ;
     union-predicate define-predicate ;
 
 PREDICATE: word union members ;
+
+! Definition protocol
+M: class forget
+    dup flatten-class typemap get remove-hash forget-word ;

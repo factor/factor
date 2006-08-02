@@ -1,6 +1,6 @@
 + 0.84:
 
-- fix contribs: boids, automata, space-invaders
+- fix contribs: boids, automata
 - sometimes darcs get fails with the httpd
 - gdb triggers 'mutliple i/o ops on port' error
 - "localhost" 50 <client> won't fail
@@ -33,7 +33,6 @@
 - T{ link f "foo" "bar" } jedit
 - T{ link f "foo" "bar" } reload
 - generic 'define ( asset def -- )'
-- make 'forget' generic
 
 ========================================================================
 
@@ -84,6 +83,7 @@
 
 + module system:
 
+- track individual method usages
 - C types should be words
   - TYPEDEF: float { ... } { ... } ;   ==> \ float T{ c-type ... } "c-type" swp
   - TYPEDEF: float FTFloat ;  ==> \ float \ FTFloat "c-type" swp

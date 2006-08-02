@@ -1,7 +1,8 @@
 ! Copyright (C) 2005, 2006 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: arrays generic hashtables inspector io kernel namespaces
-parser prettyprint sequences strings styles vectors words ;
+USING: arrays definitions generic hashtables inspector io kernel
+namespaces parser prettyprint sequences strings styles vectors
+words ;
 IN: help
 
 ! Simple markup language.

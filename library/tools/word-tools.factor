@@ -1,8 +1,8 @@
 ! Copyright (C) 2005, 2006 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 IN: words
-USING: help inspector io kernel math namespaces prettyprint
-sequences strings ;
+USING: definitions help inspector io kernel math namespaces
+prettyprint sequences strings ;
 
 : word-outliner ( word quot -- )
     swap natural-sort [

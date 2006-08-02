@@ -4,8 +4,9 @@ IN: help
 DEFER: remove-word-help
 
 IN: words
-USING: arrays errors graphs hashtables kernel kernel-internals
-math namespaces sequences strings vectors ;
+USING: arrays definitions errors generic graphs hashtables
+kernel kernel-internals math namespaces sequences strings
+vectors ;
 
 M: word <=>
     [ dup word-name swap word-vocabulary 2array ] 2apply <=> ;
@@ -151,13 +152,6 @@ TUPLE: check-create name vocab ;
 : constructor-word ( string vocab -- word )
     >r "<" swap ">" append3 r> create ;
 
-: forget ( word -- )
-    dup unxref-word
-    dup remove-word-help
-    dup "forget-hook" word-prop call
-    crossref get [ dupd remove-hash ] when*
-    dup word-name swap word-vocabulary vocab remove-hash ;
-
 : forget-vocab ( vocab -- )
     words [ forget ] each ;
 
@@ -168,3 +162,38 @@ TUPLE: check-create name vocab ;
             drop "!syntax" >r "!" swap append r>
         ] when lookup
     ] when ;
+
+: stack-picture ( seq -- string )
+    [ [ % CHAR: \s , ] each ] "" make ;
+
+: effect>string ( effect -- string )
+    [
+        "( " %
+        dup first stack-picture %
+        "-- " %
+        second stack-picture %
+        ")" %
+    ] "" make ;
+
+: stack-effect ( word -- string )
+    dup "stack-effect" word-prop [ ] [
+        "infer-effect" word-prop dup [
+            [
+                dup integer? [ object <array> ] when
+                [ word-name ] map
+            ] map effect>string
+        ] when
+    ] ?if ;
+
+! Definition protocol
+M: word where "loc" word-prop ;
+
+M: word subdefs drop f ;
+
+: forget-word ( word -- )
+    dup unxref-word
+    dup remove-word-help
+    crossref get [ dupd remove-hash ] when*
+    dup word-name swap word-vocabulary vocab remove-hash ;
+
+M: word forget forget-word ;

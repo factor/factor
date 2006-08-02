@@ -1,4 +1,4 @@
-USING: help kernel parser words ;
+USING: definitions help kernel parser words ;
 
 ARTICLE: "words" "Words"
 "Words are the fundamental unit of code in Factor, analogous to functions or procedures in other languages. Words are also objects, and this concept forms the basis for Factor's meta-programming facilities. A word consists of several parts:"
