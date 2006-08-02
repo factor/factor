@@ -12,7 +12,7 @@ M: compound definition word-def t ;
 
 M: generic definition "combination" word-prop t ;
 
-M: method-spec definition first2 "methods" word-prop hash t ;
+M: method-spec definition first2 method t ;
 
 GENERIC: see ( spec -- )
 
@@ -53,6 +53,8 @@ M: generic see-methods*
 
 M: class see-methods*
     dup implementors [ 2array ] map-with ;
+
+M: word see-methods* drop f ;
 
 : see-methods ( word -- )
     see-methods* [ see ] each ;

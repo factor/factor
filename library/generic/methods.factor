@@ -3,6 +3,9 @@
 IN: generic
 USING: words hashtables sequences arrays errors kernel ;
 
+: method ( class generic -- quot )
+    "methods" word-prop hash ;
+
 : methods ( generic -- alist )
     "methods" word-prop hash>alist
     [ [ first ] 2apply class-compare ] sort ;

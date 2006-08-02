@@ -76,9 +76,6 @@ TUPLE: no-method object generic ;
 : big-generic ( dispatch# word n dispatcher -- def )
     [ >r pick picker % r> , <vtable> , \ dispatch , ] [ ] make ;
 
-: generic-tags ( word -- seq )
-    "methods" word-prop hash-keys [ types ] map concat prune ;
-
 : tag-generic? ( word -- ? )
     #! If all the types we dispatch upon can be identified
     #! based on tag alone, we change the dispatcher primitive

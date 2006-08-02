@@ -67,11 +67,8 @@ words ;
 
 : will-inline-method ( node -- quot/t )
     #! t indicates failure
-    dup inlining-class dup [
-        swap node-param "methods" word-prop hash
-    ] [
-        2drop t
-    ] if ;
+    dup inlining-class dup
+    [ swap node-param method ] [ 2drop t ] if ;
 
 : inline-standard-method ( node -- node )
     dup will-inline-method (inline-method) ;

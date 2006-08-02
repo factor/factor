@@ -1,7 +1,7 @@
 ! Copyright (C) 2006 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 IN: generic
-USING: words kernel sequences namespaces ;
+USING: words kernel sequences namespaces hashtables ;
 
 PREDICATE: compound generic ( word -- ? )
     "combination" word-prop ;
@@ -28,3 +28,6 @@ M: generic definer drop \ G: ;
     bootstrap-combination
     dupd "combination" set-word-prop
     dup init-methods ?make-generic ;
+
+: generic-tags ( word -- seq )
+    "methods" word-prop hash-keys [ types ] map concat prune ;
