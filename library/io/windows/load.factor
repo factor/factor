@@ -2,7 +2,6 @@ IN: scratchpad
 USING: alien compiler kernel namespaces parser sequences words ;
 
 { 
-    "io"
     "errors"
     "winsock"
     "io-internals"

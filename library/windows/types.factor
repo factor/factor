@@ -52,9 +52,9 @@ TYPEDEF: long*               LPLONG
 TYPEDEF: long                LONG_PTR
 TYPEDEF: long*               PLONG_PTR
 
-TYPEDEF: uint                ULONG
-TYPEDEF: ulong               ULONG_PTR
-TYPEDEF: ulong*              PULONG_PTR
+TYPEDEF: int                 ULONG
+TYPEDEF: void*               ULONG_PTR
+TYPEDEF: void*               PULONG_PTR
 
 TYPEDEF: void                VOID
 TYPEDEF: void*               PVOID
@@ -62,74 +62,34 @@ TYPEDEF: void*               LPVOID
 TYPEDEF: void*               LPCVOID
 
 TYPEDEF: float               FLOAT
-! The following is commented out for two reasons.
-! 1) all of the code in both branches will be run because TYPEDEF: is a 
-!    parsing word
-! 2) we are waiting on gcc to be ported to win64/msys
-! 3) the TYPEDEF:s are probably wrong.
+TYPEDEF: short       HALF_PTR
+TYPEDEF: ushort      UHALF_PTR
+TYPEDEF: int         INT_PTR
+TYPEDEF: uint        UINT_PTR
 
-! win64? [
-    ! ! TODO: check these!
-        ! TYPEDEF: INT32       HALF_PTR
-        ! TYPEDEF: UINT32      UHALF_PTR
-        ! TYPEDEF: long        INT_PTR
-        ! TYPEDEF: ulong       UINT_PTR
- 
-        ! TYPEDEF: longlong    LONG_PTR ! 64bit
-        ! TYPEDEF: ulonglong   ULONG_PTR ! 64bit
- 
-        ! TYPEDEF: int         INT32
-        ! TYPEDEF: uint        UINT32
-        ! TYPEDEF: uint        DWORD32
-        ! TYPEDEF: uint        ULONG32
-        ! TYPEDEF: ulong       ULONG64
-        ! TYPEDEF: int*        POINTER_32
-        ! TYPEDEF: long*       POINTER_64
-        ! TYPEDEF: longlong    INT64
-        ! TYPEDEF: ulonglong   UINT64
-        ! TYPEDEF: longlong    LONGLONG ! 64bit
-        ! TYPEDEF: ulonglong   ULONGLONG
-        ! TYPEDEF: longlong    LONG64
-        ! TYPEDEF: ulonglong   DWORD64
-    ! ] [
-! Correct for win32
-        TYPEDEF: short       HALF_PTR
-        TYPEDEF: ushort      UHALF_PTR
-        TYPEDEF: int         INT_PTR
-        TYPEDEF: uint        UINT_PTR
+TYPEDEF: int         LONG_PTR
+TYPEDEF: ulong       ULONG_PTR
 
-        TYPEDEF: int         LONG_PTR
-        TYPEDEF: ulong       ULONG_PTR
+TYPEDEF: int         INT32
+TYPEDEF: uint        UINT32
+TYPEDEF: uint        DWORD32
+TYPEDEF: ulong       ULONG32
+TYPEDEF: ulonglong   ULONG64
+TYPEDEF: long*       POINTER_32
+TYPEDEF: longlong*   POINTER_64
+TYPEDEF: longlong    INT64
+TYPEDEF: ulonglong   UINT64
+TYPEDEF: longlong    LONGLONG
+TYPEDEF: ulonglong   ULONGLONG
+TYPEDEF: longlong    LONG64
+TYPEDEF: ulonglong   DWORD64
 
-        TYPEDEF: int         INT32
-        TYPEDEF: uint        UINT32
-        TYPEDEF: uint        DWORD32
-        TYPEDEF: ulong       ULONG32
-        TYPEDEF: ulonglong   ULONG64
-        TYPEDEF: long*       POINTER_32
-        TYPEDEF: longlong*   POINTER_64
-        TYPEDEF: longlong    INT64
-        TYPEDEF: ulonglong   UINT64
-        TYPEDEF: longlong    LONGLONG
-        TYPEDEF: ulonglong   ULONGLONG
-        TYPEDEF: longlong    LONG64
-        TYPEDEF: ulonglong   DWORD64
-! ] if
+TYPEDEF: uchar       TBYTE
+TYPEDEF: char        TCHAR
 
-! unicode? [
-        ! TYPEDEF: WCHAR       TBYTE
-        ! TYPEDEF: WCHAR       TCHAR
-    ! ] [
-        TYPEDEF: uchar       TBYTE
-        TYPEDEF: char        TCHAR
-! ] if
-
-! Below down is based on the above definitions
-! There should be no 32/64bit issues
 
 TYPEDEF: WORD                ATOM
 TYPEDEF: BYTE                BOOLEAN
-! TYPEDEF: __stdcall           CALLBACK
 TYPEDEF: DWORD               COLORREF
 TYPEDEF: ULONGLONG           DWORDLONG
 TYPEDEF: ULONG_PTR           DWORD_PTR
@@ -181,17 +141,16 @@ TYPEDEF: DWORD*              LPCOLORREF
 TYPEDEF: VOID*               LPCSTR
 TYPEDEF: WCHAR*              LPCWSTR
 TYPEDEF: WCHAR*              LPWSTR
-unicode? [
-        TYPEDEF: LPCWSTR     LPCTSTR
-        TYPEDEF: LPWSTR      LPTSTR
-        TYPEDEF: LPCWSTR     PCTSTR
-        TYPEDEF: LPWSTR      PTSTR
-    ] [
-        TYPEDEF: LPCSTR      LPCTSTR
-        TYPEDEF: LPSTR       LPTSTR
-        TYPEDEF: LPCSTR      PCTSTR
-        TYPEDEF: LPSTR       PTSTR
-] if
+
+TYPEDEF: LPCWSTR     LPCTSTR
+TYPEDEF: LPWSTR      LPTSTR
+TYPEDEF: LPCWSTR     PCTSTR
+TYPEDEF: LPWSTR      PTSTR
+TYPEDEF: LPCSTR      LPCTSTR
+TYPEDEF: LPSTR       LPTSTR
+TYPEDEF: LPCSTR      PCTSTR
+TYPEDEF: LPSTR       PTSTR
+
 TYPEDEF: DWORD*              LPDWORD
 TYPEDEF: HANDLE*             LPHANDLE
 TYPEDEF: CHAR*               LPSTR
@@ -249,11 +208,7 @@ TYPEDEF: HANDLE              SERVICE_STATUS_HANDLE
 TYPEDEF: ULONG_PTR           SIZE_T
 TYPEDEF: LONG_PTR            SSIZE_T
 TYPEDEF: LONGLONG            USN
-! TYPEDEF: __stdcall           WINAPI
 TYPEDEF: UINT_PTR            WPARAM
-
-
-
 
 TYPEDEF: RECT* LPRECT
 TYPEDEF: void* PWNDCLASS

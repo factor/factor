@@ -48,7 +48,7 @@ LIBRARY: kernel32
 ! FUNCTION: CallNamedPipeA
 ! FUNCTION: CallNamedPipeW
 ! FUNCTION: CancelDeviceWakeupRequest
-! FUNCTION: CancelIo
+FUNCTION: BOOL CancelIo ( HANDLE h ) ;
 ! FUNCTION: CancelTimerQueueTimer
 ! FUNCTION: CancelWaitableTimer
 ! FUNCTION: ChangeTimerQueueTimer
@@ -58,7 +58,7 @@ LIBRARY: kernel32
 ! FUNCTION: ClearCommBreak
 ! FUNCTION: ClearCommError
 ! FUNCTION: CloseConsoleHandle
-! FUNCTION: CloseHandle
+FUNCTION: BOOL CloseHandle ( HANDLE h ) ;
 ! FUNCTION: CloseProfileUserMapping
 ! FUNCTION: CmdBatNotification
 ! FUNCTION: CommConfigDialogA
@@ -88,13 +88,18 @@ LIBRARY: kernel32
 ! FUNCTION: CreateEventW
 ! FUNCTION: CreateFiber
 ! FUNCTION: CreateFiberEx
-! FUNCTION: CreateFileA
+
+FUNCTION: HANDLE CreateFileA ( char* lpFileName, DWORD dwDesiredAccess, DWORD dwShareMode, LPSECURITY_ATTRIBUTES lpSecurityAttribures, DWORD dwCreationDisposition, DWORD dwFlagsAndAttributes, HANDLE hTemplateFile ) ;
+
+FUNCTION: HANDLE CreateFileW ( char* lpFileName, DWORD dwDesiredAccess, DWORD dwShareMode, LPSECURITY_ATTRIBUTES lpSecurityAttribures, DWORD dwCreationDisposition, DWORD dwFlagsAndAttributes, HANDLE hTemplateFile ) ;
+: CreateFile \ CreateFileW \ CreateFileA unicode-exec ;
+
 ! FUNCTION: CreateFileMappingA
 ! FUNCTION: CreateFileMappingW
-! FUNCTION: CreateFileW
 ! FUNCTION: CreateHardLinkA
 ! FUNCTION: CreateHardLinkW
-! FUNCTION: CreateIoCompletionPort
+! FUNCTION: HANDLE CreateIoCompletionPort ( HANDLE hFileHandle, HANDLE hExistingCompletionPort, ULONG_PTR uCompletionKey, DWORD dwNumberofConcurrentThreads ) ;
+FUNCTION: HANDLE CreateIoCompletionPort ( HANDLE hFileHandle, HANDLE hExistingCompletionPort, void* uCompletionKey, DWORD dwNumberofConcurrentThreads ) ;
 ! FUNCTION: CreateJobObjectA
 ! FUNCTION: CreateJobObjectW
 ! FUNCTION: CreateJobSet
@@ -311,8 +316,9 @@ LIBRARY: kernel32
 ! FUNCTION: GetConsoleProcessList
 ! FUNCTION: GetConsoleScreenBufferInfo
 ! FUNCTION: GetConsoleSelectionInfo
-! FUNCTION: GetConsoleTitleA
-! FUNCTION: GetConsoleTitleW
+FUNCTION: DWORD GetConsoleTitleA ( LPTSTR lpConsoleTitle, DWORD nSize ) ;
+FUNCTION: DWORD GetConsoleTitleW ( LPWSTR lpConsoleTitle, DWORD nSize ) ;
+: GetConsoleTitle \ GetConsoleTitleW \ GetConsoleTitleA unicode-exec ;
 ! FUNCTION: GetConsoleWindow
 ! FUNCTION: GetCPFileNameFromRegistry
 ! FUNCTION: GetCPInfo
@@ -356,7 +362,7 @@ LIBRARY: kernel32
 ! FUNCTION: GetFileAttributesExW
 ! FUNCTION: GetFileAttributesW
 ! FUNCTION: GetFileInformationByHandle
-! FUNCTION: GetFileSize
+FUNCTION: DWORD GetFileSize ( HANDLE hFile, LPDWORD lpFileSizeHigh ) ;
 ! FUNCTION: GetFileSizeEx
 ! FUNCTION: GetFileTime
 ! FUNCTION: GetFileType
@@ -384,9 +390,7 @@ FUNCTION: DWORD GetLastError ( ) ;
 ! FUNCTION: GetModuleFileNameW
 FUNCTION: HMODULE GetModuleHandleA ( LPCTSTR lpModuleName ) ;
 FUNCTION: HMODULE GetModuleHandleW ( LPCWSTR lpModuleName ) ;
-
 : GetModuleHandle \ GetModuleHandleW \ GetModuleHandleA unicode-exec ;
-
 ! FUNCTION: GetModuleHandleExA
 ! FUNCTION: GetModuleHandleExW
 ! FUNCTION: GetNamedPipeHandleStateA
@@ -437,12 +441,12 @@ FUNCTION: HMODULE GetModuleHandleW ( LPCWSTR lpModuleName ) ;
 ! FUNCTION: GetProfileSectionW
 ! FUNCTION: GetProfileStringA
 ! FUNCTION: GetProfileStringW
-! FUNCTION: GetQueuedCompletionStatus
+FUNCTION: BOOL GetQueuedCompletionStatus ( HANDLE hCompletionPort, LPDWORD lpNumberOfBytes, void* lpCompletionKey, LPOVERLAPPED lpOverlapped, DWORD dwMilliseconds ) ;
 ! FUNCTION: GetShortPathNameA
 ! FUNCTION: GetShortPathNameW
 ! FUNCTION: GetStartupInfoA
 ! FUNCTION: GetStartupInfoW
-! FUNCTION: GetStdHandle
+FUNCTION: HANDLE GetStdHandle ( DWORD nStdHandle ) ;
 ! FUNCTION: GetStringTypeA
 ! FUNCTION: GetStringTypeExA
 ! FUNCTION: GetStringTypeExW
@@ -705,7 +709,8 @@ FUNCTION: BOOL GlobalUnlock ( HGLOBAL hMem ) ;
 ! FUNCTION: ReadConsoleOutputW
 ! FUNCTION: ReadConsoleW
 ! FUNCTION: ReadDirectoryChangesW
-! FUNCTION: ReadFile
+FUNCTION: BOOL ReadFile ( HANDLE hFile, int lpBuffer, DWORD nNumberOfBytesToRead, void* lpNumberOfBytesRead, LPOVERLAPPED lpOverlapped ) ;
+! FUNCTION: BOOL ReadFile ( HANDLE hFile, LPCVOID lpBuffer, DWORD nNumberOfBytesToRead, LPDWORD lpNumberOfBytesRead, LPOVERLAPPED lpOverlapped ) ;
 ! FUNCTION: ReadFileEx
 ! FUNCTION: ReadFileScatter
 ! FUNCTION: ReadProcessMemory
@@ -783,9 +788,10 @@ FUNCTION: BOOL GlobalUnlock ( HGLOBAL hMem ) ;
 ! FUNCTION: SetConsoleOutputCP
 ! FUNCTION: SetConsolePalette
 ! FUNCTION: SetConsoleScreenBufferSize
-! FUNCTION: SetConsoleTextAttribute
-! FUNCTION: SetConsoleTitleA
-! FUNCTION: SetConsoleTitleW
+FUNCTION: BOOL SetConsoleTextAttribute ( HANDLE hConsoleOutput, WORD wAttributes ) ;
+FUNCTION: BOOL SetConsoleTitleA ( LPCTSTR lpConsoleTitle ) ;
+FUNCTION: BOOL SetConsoleTitleW ( LPCWSTR lpConsoleTitle ) ;
+: SetConsoleTitle \ SetConsoleTitleW \ SetConsoleTitleA unicode-exec ;
 ! FUNCTION: SetConsoleWindowInfo
 ! FUNCTION: SetCPGlobal
 ! FUNCTION: SetCriticalSectionSpinCount
@@ -936,7 +942,7 @@ FUNCTION: DWORD SleepEx ( DWORD dwMilliSeconds, BOOL bAlertable ) ;
 ! FUNCTION: WriteConsoleOutputCharacterW
 ! FUNCTION: WriteConsoleOutputW
 ! FUNCTION: WriteConsoleW
-! FUNCTION: WriteFile
+FUNCTION: BOOL WriteFile ( HANDLE hFile, int lpBuffer, DWORD nNumberOfBytesToWrite, void* lpNumberOfBytesWritten, LPOVERLAPPED lpOverlapped ) ;
 ! FUNCTION: WriteFileEx
 ! FUNCTION: WriteFileGather
 ! FUNCTION: WritePrivateProfileSectionA
