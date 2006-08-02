@@ -47,7 +47,7 @@ IN: generic
     2dup delegate-slots swap append "slots" set-word-prop
     define-slots ;
 
-PREDICATE: word tuple-class "tuple-size" word-prop ;
+PREDICATE: class tuple-class "tuple-size" word-prop ;
 
 TUPLE: check-tuple class ;
 : check-tuple ( class -- class )
@@ -62,8 +62,8 @@ TUPLE: check-tuple class ;
     ] [ ] make define-compound ;
 
 : default-constructor ( tuple -- )
-    [ create-constructor ] keep
-    dup "slots" word-prop unclip drop <reversed>
+    dup create-constructor 2dup "constructor" set-word-prop
+    swap dup "slots" word-prop unclip drop <reversed>
     [ [ tuck ] swap peek add ] map concat >quotation
     define-constructor ;
 
@@ -98,3 +98,7 @@ M: tuple = ( obj tuple -- ? )
 : >tuple ( seq -- tuple )
     >vector dup first "tuple-size" word-prop over set-length
     >array array>tuple ;
+
+! Definition protocol
+M: tuple-class forget
+    dup "constructor" word-prop forget forget-class ;

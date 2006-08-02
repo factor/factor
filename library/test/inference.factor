@@ -1,6 +1,7 @@
 IN: temporary
 USING: arrays errors generic inference kernel kernel-internals
-math math-internals namespaces parser sequences test vectors ;
+math math-internals namespaces parser sequences strings test
+vectors ;
 
 [ f ] [ f [ [ ] map-nodes ] with-node-iterator ] unit-test
 
@@ -206,6 +207,13 @@ DEFER: blah4
     ] if ; inline
 
 [ [ [ 1 ] [ ] bad-combinator ] infer ] unit-test-fails
+
+! Regression
+: bad-input#
+    dup string? [ 2array throw ] unless
+    over string? [ 2array throw ] unless ;
+
+[ { 2 2 } ] [ [ bad-input# ] infer ] unit-test
 
 ! Regression
 

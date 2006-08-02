@@ -1,7 +1,7 @@
 ! Copyright (C) 2006 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 IN: definitions
-USING: sequences ;
+USING: kernel sequences ;
 
 GENERIC: see ( defspec -- )
 

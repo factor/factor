@@ -30,7 +30,7 @@ USING: styles ;
         { border-width 5 }
     } ;
 
-: where-style
+: doc-path-style
     H{ { font-size 10 } } ;
 
 : heading-style

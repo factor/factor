@@ -4,10 +4,15 @@ IN: !syntax
 USING: arrays help kernel parser sequences syntax words ;
 
 : !HELP:
-    scan-word bootstrap-word dup [
+    scan-word bootstrap-word
+    dup dup location "help-loc" set-word-prop
+    [
         >array unclip swap >r "stack-effect" set-word-prop r>
         set-word-help
     ] f ; parsing
 
 : !ARTICLE:
-    [ >array [ first2 ] keep 2 tail add-article ] f ; parsing
+    [
+        >array [ first2 ] keep 2 tail location <article>
+        add-article
+    ] f ; parsing

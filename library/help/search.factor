@@ -67,9 +67,9 @@ SYMBOL: term-index
         dup articles get remove-hash
     ] when drop ;
 
-: add-article ( name title element -- )
-    pick remove-article
-    pick >r (add-article) r>
+: add-article ( name article -- )
+    over remove-article
+    over >r swap articles get set-hash r>
     dup xref-article index-article ;
 
 : remove-word-help ( word -- )
@@ -85,3 +85,8 @@ SYMBOL: term-index
 
 : search-help. ( phrase -- )
     search-help [ first ] map help-outliner ;
+
+! Definition protocol
+M: link forget link-name remove-article ;
+
+M: word-link forget f "help" set-word-prop ;

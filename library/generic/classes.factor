@@ -124,7 +124,7 @@ SYMBOL: class<cache
     [ \ dup , % , [ drop f ] , \ if , ] [ ] make
     define-predicate ;
 
-PREDICATE: word predicate "definition" word-prop ;
+PREDICATE: class predicate "definition" word-prop ;
 
 ! Union classes for dispatch on multiple classes.
 : union-predicate ( members -- list )
@@ -138,8 +138,11 @@ PREDICATE: word predicate "definition" word-prop ;
     3dup nip set-members pick define-class
     union-predicate define-predicate ;
 
-PREDICATE: word union members ;
+PREDICATE: class union members ;
 
 ! Definition protocol
-M: class forget
+: forget-class ( class -- )
+    dup "predicate" word-prop [ forget ] each
     dup flatten-class typemap get remove-hash forget-word ;
+
+M: class forget forget-class ;

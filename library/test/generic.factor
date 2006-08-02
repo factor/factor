@@ -1,5 +1,6 @@
-USING: alien arrays generic hashtables io kernel math namespaces
-parser prettyprint sequences strings test vectors words ;
+USING: alien arrays definitions generic hashtables io kernel
+math namespaces parser prettyprint sequences strings test
+vectors words ;
 IN: temporary
 
 GENERIC: class-of

@@ -50,6 +50,8 @@ M: method-spec where
     dup first2 "methods" word-prop hash method-loc
     [ ] [ second where ] ?if ;
 
+M: method-spec subdefs drop f ;
+
 M: generic subdefs
     dup order [ swap 2array ] map-with ;
 

@@ -1,11 +1,11 @@
 IN: temporary
-USING: help kernel sequences test words ;
+USING: definitions help kernel sequences test words ;
 
 ! Test help cross-referencing
 
-{ "test" "b" } "Test B" { "Hello world." } add-article
+{ "test" "b" } "Test B" { "Hello world." } f <article> add-article
 
-{ "test" "a" } "Test A" { { $subsection { "test" "b" } } } add-article
+{ "test" "a" } "Test A" { { $subsection { "test" "b" } } } f <article> add-article
 
 { "test" "a" } remove-article
 
@@ -13,7 +13,7 @@ USING: help kernel sequences test words ;
 
 SYMBOL: foo
 
-{ "test" "a" } "Test A" { { $subsection foo } } add-article
+{ "test" "a" } "Test A" { { $subsection foo } } f <article> add-article
 
 foo { $description "Fie foe fee" } set-word-help
 

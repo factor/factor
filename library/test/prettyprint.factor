@@ -1,4 +1,4 @@
-USING: alien io kernel math prettyprint sequences
+USING: alien io definitions kernel math prettyprint sequences
 test words inference namespaces vectors ;
 IN: temporary
 

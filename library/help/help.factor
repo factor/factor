@@ -21,7 +21,7 @@ M: word article-content
 : $title ( article -- )
     title-style [
         title-style [
-            dup [ 1array $link ] ($block) $where
+            dup [ 1array $link ] ($block) $doc-path
         ] with-nesting
     ] with-style terpri ;
 

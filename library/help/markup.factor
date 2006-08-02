@@ -123,10 +123,6 @@ M: word print-element { } swap execute ;
     ] ($heading) ;
 
 ! Some links
-M: link article-title link-name article-title ;
-M: link article-content link-name article-content ;
-M: link summary "Link: " swap link-name unparse append ;
-
 GENERIC: >link ( obj -- obj )
 
 M: word >link ;
@@ -156,12 +152,12 @@ M: object >link <link> ;
 : $see-also ( content -- )
     "See also" $heading $links ;
 
-: $where ( article -- )
-    where dup empty? [
+: $doc-path ( article -- )
+    doc-path dup empty? [
         drop
     ] [
         [
-            where-style [
+            doc-path-style [
                 "Parent topics: " write $links
             ] with-style
         ] ($block)

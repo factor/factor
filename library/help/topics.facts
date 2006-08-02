@@ -25,11 +25,6 @@ HELP: article-content "( topic -- element )"
 { $values { "topic" "an article name or a word" } { "element" "a markup element" } }
 { $description "Outputs the content of a specific help article." } ;
 
-HELP: (add-article) "( name title element -- )"
-{ $values { "name" "an object" } { "title" "a string" } { "element" "a markup element" } }
-{ $description "Adds a help article to the " { $link articles } " hashtable." }
-{ $notes "This word is used to implement " { $link POSTPONE: ARTICLE: } "." } ;
-
 HELP: all-articles "( -- seq )"
 { $values { "seq" "a sequence" } }
 { $description "Outputs a sequence of all help article names, and all words with documentation." } ;
@@ -55,11 +50,11 @@ HELP: parents "( topic -- seq )"
 { $values { "topic" "an article name or a word" } { "seq" "a new sequence" } }
 { $description "Outputs a sequence of all help articles which contain " { $snippet "topic" } " as a subsection." } ;
 
-HELP: where "( topic -- seq )"
+HELP: doc-path "( topic -- seq )"
 { $values { "topic" "an article name or a word" } { "seq" "a new sequence" } }
 { $description "Outputs a sequence of all help articles which contain " { $snippet "topic" } " as a subsection, traversing all the way up to the root." }
 { $examples
-    { $example "\"sequences\" where ." "{ \"collections\" \"handbook\" }" }
+    { $example "\"sequences\" doc-path ." "{ \"collections\" \"handbook\" }" }
 } ;
 
 HELP: xref-article "( topic -- )"
