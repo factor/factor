@@ -1,8 +1,8 @@
 ! Copyright (C) 2004, 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: parser
-USING: errors generic io kernel math namespaces sequences
-words ;
+USING: errors generic hashtables io kernel math namespaces
+sequences words ;
 
 : file-vocabs ( -- )
     "scratchpad" set-in { "syntax" "scratchpad" } set-use ;
@@ -41,8 +41,16 @@ words ;
 
 : run-resource ( file -- ) parse-resource call ;
 
-: word-file ( word -- file )
-    "file" word-prop dup
-    [ "resource:/" ?head [ resource-path ] when ] when ;
+GENERIC: where ( spec -- loc )
 
-: reload ( word -- ) word-file run-file ;
+M: word where "loc" word-prop ;
+
+M: method-spec where
+    dup first2 "methods" word-prop hash method-loc
+    [ ] [ second where ] ?if ;
+
+: ?resource-path ( path -- path )
+    "resource:/" ?head [ resource-path ] when ;
+
+: reload ( spec -- )
+    where first [ ?resource-path run-file ] when* ;

@@ -3,12 +3,27 @@
 IN: generic
 USING: words hashtables sequences arrays errors kernel ;
 
+PREDICATE: array method-spec
+    dup length 2 = [
+        first2 generic? >r class? r> and
+    ] [
+        drop f
+    ] if ;
+
+TUPLE: method def loc ;
+
+M: f method-def ;
+M: f method-loc ;
+M: quotation method-def ;
+M: quotation method-loc drop f ;
+
 : method ( class generic -- quot )
-    "methods" word-prop hash ;
+    "methods" word-prop hash method-def ;
 
 : methods ( generic -- alist )
     "methods" word-prop hash>alist
-    [ [ first ] 2apply class-compare ] sort ;
+    [ [ first ] 2apply class-compare ] sort
+    [ first2 method-def 2array ] map ;
 
 : order ( generic -- list )
     "methods" word-prop hash-keys [ class-compare ] sort ;
@@ -23,7 +38,7 @@ TUPLE: check-method class generic ;
     swap [ "methods" word-prop swap call ] keep ?make-generic ;
     inline
 
-: define-method ( definition class generic -- )
+: define-method ( method class generic -- )
     >r bootstrap-word r> check-method
     [ set-hash ] with-methods ;
 

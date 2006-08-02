@@ -32,10 +32,10 @@ TUPLE: check-vocab name ;
 : parsing? ( word -- ? )
     dup word? [ "parsing" word-prop ] [ drop f ] if ;
 
+: location ( -- loc ) file get line-number get 2array ;
+
 : save-location ( word -- )
-    dup set-word
-    dup line-number get "line" set-word-prop
-    file get "file" set-word-prop ;
+    dup set-word location "loc" set-word-prop ;
 
 : create-in in get create dup save-location ;
 

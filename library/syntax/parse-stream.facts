@@ -57,10 +57,6 @@ HELP: run-resource "( path -- )"
 { $description "Parses and runs a library resource." }
 { $errors "Throws an I/O error if there was an error reading the resource. Throws a parse error if the input is malformed." } ;
 
-HELP: word-file "( word -- file )"
-{ $values { "word" "a word" } { "file" "a path name string" } }
-{ $description "Outputs the file name containing the most recent redefinition of the word, or " { $link f } " if the word was not defined in a file." } ;
-
 HELP: reload "( word -- )"
 { $values { "word" "a word" } }
 { $description "Reloads the source file containing the most recent redefinition of the word." }

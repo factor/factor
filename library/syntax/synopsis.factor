@@ -4,13 +4,6 @@ IN: prettyprint
 USING: arrays generic hashtables io kernel math namespaces
 sequences styles words ;
 
-PREDICATE: array method-spec
-    dup length 2 = [
-        first2 generic? >r class? r> and
-    ] [
-        drop f
-    ] if ;
-
 GENERIC: (synopsis) ( spec -- )
 
 : write-vocab ( vocab -- )

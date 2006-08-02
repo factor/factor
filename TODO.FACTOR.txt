@@ -29,8 +29,6 @@
   - offer to remove generic words which are not called and have no
     methods
 - forgetting a tuple class should forget the constructor
-- methods: remember their file/line
-- { class generic } jedit, reload DTRT
 - T{ link f "foo" "bar" } see
 - T{ link f "foo" "bar" } jedit
 - T{ link f "foo" "bar" } reload

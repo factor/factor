@@ -1,5 +1,5 @@
-! Copyright (C) 2004, 2005 Slava Pestov.
-! See http://factor.sf.net/license.txt for BSD license.
+! Copyright (C) 2004, 2006 Slava Pestov.
+! See http://factorcode.org/license.txt for BSD license.
 IN: jedit
 USING: arrays errors io kernel listener math namespaces
 parser prettyprint sequences strings words shells ;
@@ -36,9 +36,9 @@ parser prettyprint sequences strings words shells ;
 : jedit-file ( file -- )
     1array make-jedit-request send-jedit-request ;
 
-: jedit ( word -- )
+: jedit ( spec -- )
     #! Note that line numbers here start from 1
-    dup word-file swap "line" word-prop jedit-line/file ;
+    where first2 >r ?resource-path r> jedit-line/file ;
 
 ! Wire protocol for jEdit to evaluate Factor code.
 ! Packets are of the form:
