@@ -21,7 +21,7 @@
 ! OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
 ! ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 USING: alien cpu-8080 errors generic io kernel kernel-internals
-lists math namespaces sequences styles threads gadgets gadgets-layouts opengl arrays 
+math namespaces sequences styles threads gadgets gadgets opengl arrays 
 concurrency ;
 IN: space-invaders
 
@@ -161,21 +161,22 @@ TUPLE: right-up-msg ;
   <right-down-msg> over send [ 10 sleep <right-up-msg> swap send ] spawn drop ;
 
 : set-key-actions ( gadget -- )
-  H{
-    { [ "ESCAPE" ] [ invaders-gadget-process "stop" swap send ] }
-    { [ "BACKSPACE" ] [ invaders-gadget-process coin-key-pressed ] }
-    { [ "1" ] [ invaders-gadget-process player1-key-pressed ] }
-    { [ "2" ] [ invaders-gadget-process player2-key-pressed ] }
-    { [ "UP" ] [ invaders-gadget-process fire-key-pressed ] }
-    { [ "LEFT" ] [ invaders-gadget-process left-key-pressed ] }
-    { [ "RIGHT" ] [ invaders-gadget-process right-key-pressed ] }
-  } add-actions ;
+!  H{
+!    { [ "ESCAPE" ] [ invaders-gadget-process "stop" swap send ] }
+!    { [ "BACKSPACE" ] [ invaders-gadget-process coin-key-pressed ] }
+!    { [ "1" ] [ invaders-gadget-process player1-key-pressed ] }
+!    { [ "2" ] [ invaders-gadget-process player2-key-pressed ] }
+!    { [ "UP" ] [ invaders-gadget-process fire-key-pressed ] }
+!    { [ "LEFT" ] [ invaders-gadget-process left-key-pressed ] }
+!    { [ "RIGHT" ] [ invaders-gadget-process right-key-pressed ] }
+!  } set-gestures 
+  drop ;
 
 C: invaders-gadget ( gadget -- )
   dup delegate>gadget 
   dup set-key-actions ;
 
-M: invaders-gadget pref-dim* drop { 224 256 0 0 } ;
+M: invaders-gadget pref-dim* drop { 224 256 0 } ;
 
 M: invaders-gadget draw-gadget* ( gadget -- )
   0 0 glRasterPos2i
@@ -322,6 +323,6 @@ M: right-up-msg handle-invaders-message ( gadget message -- quit? )
 : run ( -- process )  
   <space-invaders> "invaders.rom" over load-rom
   <invaders-gadget> [ set-invaders-gadget-cpu ] keep   
-  dup "Space Invaders" open-window 
-  dup [ millis swap invaders-process ] cons spawn 
+  dup "Space Invaders" open-titled-window 
+  dup [ millis swap invaders-process ] curry spawn 
   swap dupd set-invaders-gadget-process ;

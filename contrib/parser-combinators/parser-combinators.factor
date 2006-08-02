@@ -20,23 +20,27 @@
 ! WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
 ! OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
 ! ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-USING: lazy-lists kernel sequences strings math io arrays ;
+USING: lazy-lists kernel sequences strings math io arrays errors ;
 IN: parser-combinators
 
 TUPLE: parse-result parsed unparsed ;
 
 : h:t ( object -- head tail )
   #! Return the head and tail of the object.
-  dup first swap 1 tail ;
+  dup empty? [ dup first swap 1 tail ] unless ;
 
 : token-parser ( inp sequence -- llist )
   #! A parser that parses a specific sequence of
   #! characters.
-  2dup length head over = [
-    swap over length tail <parse-result> lunit
+  [
+    2dup length head over = [
+      swap over length tail <parse-result> lunit
+    ] [
+      2drop nil
+    ] if 
   ] [
-    2drop nil
-  ] if ;
+    3drop nil
+  ] recover ;
 
 : token ( string -- parser )
   #! Return a token parser that parses the given string.
