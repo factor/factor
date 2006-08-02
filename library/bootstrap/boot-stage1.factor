@@ -93,6 +93,7 @@ sequences vectors words ;
         "/library/compiler/alien/aliens.factor"
         
         "/library/syntax/prettyprint.factor"
+        "/library/syntax/synopsis.factor"
         "/library/syntax/see.factor"
         "/library/syntax/parser.factor"
 
@@ -296,6 +297,7 @@ sequences vectors words ;
         "/library/syntax/parser.facts"
         "/library/syntax/parse-syntax.facts"
         "/library/syntax/prettyprint.facts"
+        "/library/syntax/synopsis.facts"
         "/library/syntax/see.facts"
         "/library/test/test.facts"
         "/library/tools/word-tools.facts"

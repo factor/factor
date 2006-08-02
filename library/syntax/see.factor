@@ -4,103 +4,67 @@ IN: prettyprint
 USING: arrays generic hashtables io kernel math namespaces
 sequences strings styles words ;
 
+GENERIC: definition ( spec -- quot ? )
+
+M: word definition drop f f ;
+
+M: compound definition word-def t ;
+
+M: generic definition "combination" word-prop t ;
+
+M: method-spec definition first2 "methods" word-prop hash t ;
+
+GENERIC: see ( spec -- )
+
+GENERIC: declarations. ( obj -- )
+
+M: object declarations. drop ;
+
 : declaration. ( word prop -- )
     tuck word-name word-prop [ pprint-word ] [ drop ] if ;
 
-: declarations. ( word -- )
+M: word declarations.
     {
         POSTPONE: parsing
         POSTPONE: inline
         POSTPONE: foldable
     } [ declaration. ] each-with ;
 
-: write-vocab ( vocab -- )
-    dup <vocab-link> presented associate styled-text ;
-
-: in. ( word -- )
-    word-vocabulary [
-        H{ } <block \ IN: pprint-word write-vocab block;
-    ] when* ;
-
-: (synopsis) ( word -- )
-    dup in. dup definer pprint-word pprint-word ;
-
-: comment. ( comment -- )
-    [ H{ { font-style italic } } [ text ] with-style ] when* ;
-
-: stack-picture ( seq -- string )
-    [ [ % CHAR: \s , ] each ] "" make ;
-
-: effect>string ( effect -- string )
-    [
-        "( " %
-        dup first stack-picture %
-        "-- " %
-        second stack-picture %
-        ")" %
-    ] "" make ;
-
-: stack-effect ( word -- string )
-    dup "stack-effect" word-prop [ ] [
-        "infer-effect" word-prop dup [
-            [
-                dup integer? [ object <array> ] when
-                [ word-name ] map
-            ] map effect>string
-        ] when
-    ] ?if ;
-
-: synopsis ( word -- string )
-    [
-        0 margin set [
-            dup (synopsis) stack-effect comment.
-        ] with-pprint
-    ] string-out ;
-
-GENERIC: (see) ( word -- )
-
-M: word (see) drop ;
-
 : pprint-; \ ; pprint-word ;
 
-: see-body ( quot word -- )
-    H{ } <block
-    swap pprint-elements pprint-; declarations.
-    block; ;
+: (see) ( spec -- )
+    [
+        dup (synopsis)
+        dup definition [
+            H{ } <block
+            pprint-elements pprint-; declarations.
+            block;
+        ] [
+            2drop
+        ] if newline
+    ] with-pprint ;
 
-M: compound (see)
-    dup word-def swap see-body ;
+M: method-spec see (see) ;
 
-: method. ( word class method -- )
-    \ M: pprint-word
-    >r pprint-word pprint-word r>
-    H{ } <block pprint-elements pprint-; block; ;
+GENERIC: see-methods* ( word -- seq )
 
-M: generic (see)
-    dup dup "combination" word-prop swap see-body
-    dup methods [ newline first2 method. ] each-with ;
+M: generic see-methods*
+    dup order [ swap 2array ] map-with ;
 
-GENERIC: class. ( word -- )
+M: class see-methods*
+    dup implementors [ 2array ] map-with ;
 
-: methods. ( class -- )
-    #! List all methods implemented for this class.
-    dup class? [
-        dup implementors [
-            newline
-            tuck dupd "methods" word-prop hash method.
-        ] each-with
-    ] [
-        drop
-    ] if ;
+: see-methods ( word -- )
+    see-methods* [ see ] each ;
 
-M: union class.
-    newline
+GENERIC: see-class* ( word -- )
+
+M: union see-class*
     \ UNION: pprint-word
     dup pprint-word
     members pprint-elements pprint-; ;
 
-M: predicate class.
-    newline
+M: predicate see-class*
     \ PREDICATE: pprint-word
     dup superclass pprint-word
     dup pprint-word
@@ -108,20 +72,18 @@ M: predicate class.
     "definition" word-prop pprint-elements
     pprint-; block; ;
 
-M: tuple-class class.
-    newline
+M: tuple-class see-class*
     \ TUPLE: pprint-word
     dup pprint-word
     "slot-names" word-prop [ text ] each
     pprint-; ;
 
-M: word class. drop ;
+M: word see-class* drop ;
 
-: see ( word -- )
+: see-class ( word -- )
     [
-        dup (synopsis)
-        dup (see)
-        dup class.
-        methods.
-        newline
+        dup class?
+        [ see-class* newline ] [ drop ] if
     ] with-pprint ;
+
+M: word see dup (see) dup see-class see-methods ;
