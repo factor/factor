@@ -1,6 +1,6 @@
 IN: vim
-REQUIRES: process ;
-USING: io kernel parser prettyprint process sequences ;
+USING: definitions io kernel parser prettyprint process
+sequences ;
 
 : file-modified stat fourth ;
 
@@ -10,5 +10,5 @@ USING: io kernel parser prettyprint process sequences ;
 : vim ( spec -- )
     #! Edit the file in vim.  Rerun the file if the timestamp is changed.
     dup where first2 >r ?resource-path [ file-modified ] keep r>
-    [ vim-line/file ] 2keep drop file-modified = [ drop ] [ reload ] if ;
+    dupd vim-line/file file-modified = [ drop ] [ reload ] if ;
 
