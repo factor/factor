@@ -5,12 +5,12 @@ IN: units
 : seq-intersect ( seq1 seq2 -- seq1/\seq2 )
     [ swap member? ] subset-with ;
 
-TUPLE: dimensioned val top bot ;
+TUPLE: dimensioned value top bot ;
 C: dimensioned 
     [ set-dimensioned-bot ] keep
     [ set-dimensioned-top ] keep
     over number? [ "dimensioned must be a number" throw ] unless
-    [ set-dimensioned-val ] keep ;
+    [ set-dimensioned-value ] keep ;
 
 : remove-one ( obj seq -- seq )
     [ index ] keep over -1 = [
@@ -39,8 +39,8 @@ C: dimensioned
 : 2reduce-units ( d d -- )
     >r dup reduce-units r> dup reduce-units ;
 
-: 2val ( d d -- )
-    [ dimensioned-val ] 2apply ;
+: 2value ( d d -- )
+    [ dimensioned-value ] 2apply ;
 
 : =units?
     >r dimensions 2array r> dimensions 2array = ;
@@ -51,41 +51,41 @@ C: dimensioned
         "d+: dimensions must be the same" throw
     ] unless
     dup dimensions
-    >r >r 2val + r> r> <dimensioned> ;
+    >r >r 2value + r> r> <dimensioned> ;
 
 : d- ( d d -- )
     2dup =units? [
         "d-: dimensions must be the same" throw
     ] unless
     dup dimensions
-    >r >r 2val - r> r> <dimensioned> ;
+    >r >r 2value - r> r> <dimensioned> ;
 
 : add-dimensions ( d d -- d )
     >r dimensions r> dimensions >r swap >r append r> r> append 0 -rot <dimensioned> ;
 
 : (d*)
-    >r add-dimensions r> over set-dimensioned-val dup reduce-units ;
+    >r add-dimensions r> over set-dimensioned-value dup reduce-units ;
 
 : d* ( d d -- )
-    2dup 2val * (d*) ;
+    2dup 2value * (d*) ;
 
 : swap-dimensions ( d -- d )
     dup dimensions rot [ set-dimensioned-top ] keep [ set-dimensioned-bot ] keep ;
 
 : d/ ( d d -- )
-    swap-dimensions 2dup 2val / (d*) ;
+    swap-dimensions 2dup 2value / (d*) ;
 
 : d-inv ( d -- d )
-    swap-dimensions dup dimensioned-val 1 swap / over set-dimensioned-val ;
+    swap-dimensions dup dimensioned-value 1 swap / over set-dimensioned-value ;
 
 : d-product ( v -- d ) 1 { } { } <dimensioned> [ d* ] reduce ;
 
 ! does not compile
 ! Example: 4 m { km } { } convert
-: convert ( d top bot -- val )
+: convert ( d top bot -- value )
     >r [ [ 1 swap execute , ] each ] { } make d-product r>
     [ [ 1 swap execute d-inv , ] each ] { } make d-product
     d*
     2dup =units? [ "cannot make that conversion" throw ] unless
-    2val / ;
+    [ 2value / ] keep [ set-dimensioned-value ] keep ;
 
