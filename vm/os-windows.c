@@ -218,9 +218,48 @@ void seh_call(void (*func)(), exception_handler_t *handler)
 	asm("mov %0, %%fs:0" : "=r" (record.next_handler));
 }
 
-static long exception_handler(void *rec, void *frame, void *ctx, void *dispatch)
+static long getpagesize (void) {
+    static long g_pagesize = 0;
+    if (! g_pagesize) {
+        SYSTEM_INFO system_info;
+        GetSystemInfo (&system_info);
+        g_pagesize = system_info.dwPageSize;
+    }
+    return g_pagesize;
+}
+
+/* this function tests if a given faulting location is in a poison page. The
+page address is taken from area + round_up_to_page_size(area_size) + 
+ pagesize*offset */
+static bool in_page(void *fault, void *i_area, CELL area_size, int offset)
 {
-	signal_error(SIGSEGV);
+    const int pagesize = getpagesize();
+    intptr_t area = (intptr_t) i_area;
+    area += pagesize * ((area_size + (pagesize - 1)) / pagesize);
+    area += offset * pagesize;
+
+    const int page = area / pagesize;
+    const int fault_page = (intptr_t)fault / pagesize;
+    return page == fault_page;
+}
+
+//static long exception_handler(void *rec, void *frame, void *ctx, void *dispatch)
+static long exception_handler(PEXCEPTION_RECORD rec, void *frame, void *ctx, void *dispatch)
+{
+    if(in_page((void*)rec->ExceptionInformation[1], (void *) ds_bot, 0, -1))
+        general_error(ERROR_DS_UNDERFLOW,F,F,false);
+    else if(in_page((void*)rec->ExceptionInformation[1], (void *) ds_bot, ds_size, 0))
+        general_error(ERROR_DS_OVERFLOW,F,F,false);
+    else if(in_page((void*)rec->ExceptionInformation[1], (void *) rs_bot, 0, -1))
+        general_error(ERROR_RS_UNDERFLOW,F,F,false);
+    else if(in_page((void*)rec->ExceptionInformation[1], (void *) rs_bot, rs_size, 0))
+        general_error(ERROR_RS_OVERFLOW,F,F,false);
+    else if(in_page((void*)rec->ExceptionInformation[1], (void *) cs_bot, 0, -1))
+        general_error(ERROR_CS_UNDERFLOW,F,F,false);
+    else if(in_page((void*)rec->ExceptionInformation[1], (void *) cs_bot, cs_size, 0))
+        general_error(ERROR_CS_OVERFLOW,F,F,false);
+    else
+        signal_error(SIGSEGV);
 }
 
 void platform_run(void)
