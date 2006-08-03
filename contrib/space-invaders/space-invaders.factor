@@ -314,7 +314,13 @@ M: space-invaders update-video ( value addr cpu -- )
     invaders-process 
   ] unless ;
 
+M: invaders-gadget graft* ( gadget -- )
+ [ f swap set-invaders-gadget-quit? ] keep
+ [ millis swap invaders-process ] spawn 2drop ;
+
+M: invaders-gadget ungraft* ( gadget -- )
+ t swap set-invaders-gadget-quit? ;
+
 : run ( -- gadget )  
   <space-invaders> "invaders.rom" over load-rom <invaders-gadget> 
-  [ "Space Invaders" open-titled-window ] keep
-  [ millis swap invaders-process ] spawn drop ;
+  [ "Space Invaders" open-titled-window ] keep ;
