@@ -13,9 +13,6 @@ focused? ;
 
 TUPLE: loc-monitor editor ;
 
-M: loc-monitor model-changed ( obj -- )
-    loc-monitor-editor control-self relayout-1 ;
-
 : <loc> ( editor -- loc )
     <loc-monitor> { 0 0 } <model> [ add-connection ] keep ;
 
@@ -111,25 +108,33 @@ M: editor model-changed ( editor -- )
 
 : loc>x ( loc editor -- x ) >r first2 swap r> offset>x ;
 
-: (draw-caret) ( loc editor -- )
+: line>y ( lines# editor -- y )
+    line-height * ;
+
+: caret-loc ( editor -- loc )
+    [ editor-caret* ] keep 2dup loc>x
+    rot first rot line>y 2array ;
+
+: caret-dim ( editor -- dim )
+    line-height 0 swap 2array ;
+
+: caret-rect ( editor -- dim )
+    dup caret-loc swap caret-dim <rect> ;
+
+M: loc-monitor model-changed ( obj -- )
+    loc-monitor-editor ( dup caret-rect swap scroll>rect ) control-self relayout-1 ;
+
+: draw-caret ( -- )
+    editor get
     dup editor-caret-color gl-color
-    [ loc>x ] keep line-height dupd 2array >r 0 2array r>
-    gl-line ;
+    caret-rect rect-extent gl-line ;
 
-: draw-caret ( n editor -- )
-    {
-        { [ dup editor-focused? not ] [ ] }
-        { [ 2dup editor-caret* first = not ] [ ] }
-        { [ t ] [ dup editor-caret* over (draw-caret) ] }
-    } cond 2drop ;
+: translate-lines ( n editor -- )
+    line-height * 0.0 swap 0.0 glTranslated ;
 
-: translate-lines ( n -- )
-    editor get line-height * 0.0 swap 0.0 glTranslated ;
-
-: draw-line ( str n -- )
-    editor get draw-caret
-    editor get editor-color gl-color
-    >r editor get editor-font r> draw-string ;
+: draw-line ( editor str -- )
+    over editor-color gl-color
+    >r editor-font r> draw-string ;
 
 : with-editor ( editor quot -- )
     [
@@ -138,8 +143,8 @@ M: editor model-changed ( editor -- )
 
 : draw-lines ( editor -- )
     GL_MODELVIEW [
-        editor get editor-lines dup length
-        [ draw-line 1 translate-lines ] 2each
+        editor get dup editor-lines
+        [ over >r draw-line 1 r> translate-lines ] each-with
     ] do-matrix ;
 
 : selection-start/end ( editor -- start end )
@@ -157,7 +162,7 @@ M: editor model-changed ( editor -- )
     (draw-selection) ;
 
 : translate>selection-start ( start -- )
-    first translate-lines ;
+    first editor get translate-lines ;
 
 : draw-selection ( -- )
     GL_MODELVIEW [
@@ -171,10 +176,7 @@ M: editor model-changed ( editor -- )
     ] do-matrix ;
 
 M: editor draw-gadget* ( gadget -- )
-    [ draw-selection draw-lines ] with-editor ;
-
-: line>y ( lines# editor -- y )
-    line-height * ;
+    [ draw-caret draw-selection draw-lines ] with-editor ;
 
 : editor-height ( editor -- n )
     [ editor-lines length ] keep line>y ;
