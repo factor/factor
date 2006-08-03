@@ -34,7 +34,8 @@ SYMBOL: class-name
 : handle-wm-paint ( hWnd uMsg wParam lParam -- )
     #! wParam and lParam are unused
     #! only paint if width/height both > 0
-    3drop window dup rect-dim first2 [ 0 > ] 2apply and [ draw-world ] when ;
+    3drop window dup rect-dim first2 [ 0 > ] 2apply and
+    [ draw-world ] [ drop ] if ;
 
 : handle-wm-size ( hWnd uMsg wParam lParam -- )
     [ lo-word ] keep hi-word make-RECT get-RECT-dimensions 2array
