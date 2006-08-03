@@ -29,6 +29,7 @@ void primitive_cd(void);
 INLINE void init_signals(void) {}
 INLINE void early_init(void) {}
 const char *default_image_path(void);
+long getpagesize (void);
 
 s64 current_millis(void);
 

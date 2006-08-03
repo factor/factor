@@ -218,7 +218,7 @@ void seh_call(void (*func)(), exception_handler_t *handler)
 	asm("mov %0, %%fs:0" : "=r" (record.next_handler));
 }
 
-static long getpagesize (void) {
+long getpagesize (void) {
 	static long g_pagesize = 0;
 	if (! g_pagesize) {
 		SYSTEM_INFO system_info;
@@ -228,15 +228,14 @@ static long getpagesize (void) {
 	return g_pagesize;
 }
 
-//static long exception_handler(void *rec, void *frame, void *ctx, void *dispatch)
-static long exception_handler(PEXCEPTION_RECORD rec, void *frame, void *ctx, void *dispatch)
+static void exception_handler(PEXCEPTION_RECORD rec, void *frame, void *ctx, void *dispatch)
 {
 	memory_protection_error((void*)rec->ExceptionInformation[1],SIGSEGV);
 }
 
 void platform_run(void)
 {
-	seh_call(run_toplevel, exception_handler);
+	seh_call(run_toplevel, (exception_handler_t*) exception_handler);
 }
 
 const char *default_image_path(void)
