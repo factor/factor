@@ -66,22 +66,31 @@ C: scroller ( gadget -- scroller )
         [ rect-extent v+ ] 2apply v-
     ] keep dup scroller-origin rot v+ scroll ;
 
-: scroll>rect ( rect gadget -- )
+: (scroll>rect) ( rect scroller -- )
     #! First ensure top left is visible, then bottom right.
-    find-scroller
-    over rect-loc over scroll>point
-    swap rect-extent swap scroll>point ;
+    >r rect-extent r> tuck
+    >r >r scroll>point r> r> scroll>point ;
+
+: scroll>rect ( rect gadget -- )
+    find-scroller dup [ set-scroller-follows ] [ 2drop ] if ;
 
 : scroll>bottom ( gadget -- )
-    find-scroller [ t swap set-scroller-follows ] when* ;
+    t swap scroll>rect ;
+
+: (scroll>bottom) ( scroller -- )
+    dup scroller-viewport viewport-dim { 0 1 } v* scroll ;
 
 : update-scroller ( scroller -- )
-    dup dup scroller-follows [
-        f over set-scroller-follows
-        scroller-viewport viewport-dim { 0 1 } v*
+    dup scroller-follows dup [
+        f pick set-scroller-follows
+        dup t eq? [
+            drop (scroll>bottom)
+        ] [
+            swap (scroll>rect)
+        ] if
     ] [
-        scroller-origin
-    ] if scroll ;
+        drop dup scroller-origin scroll
+    ] if ;
 
 M: scroller layout* ( scroller -- )
     dup delegate layout*
