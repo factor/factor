@@ -230,9 +230,7 @@ long getpagesize (void) {
 
 static void exception_handler(PEXCEPTION_RECORD rec, void *frame, void *ctx, void *dispatch)
 {
-	memory_protection_error(
-		rec->NumberParameters >= 2 ? (void*)rec->ExceptionInformation[1] : 0,
-		SIGSEGV);
+	memory_protection_error((void*)rec->ExceptionInformation[1], SIGSEGV);
 }
 
 void platform_run(void)
