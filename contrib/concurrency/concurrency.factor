@@ -423,22 +423,16 @@ C: promise ( -- <promise> )
 ! ******************************
 ! Experimental code below
 ! ******************************
-SYMBOL: lazy-quot
+: (lazy) ( v -- )
+  receive over reply (lazy) ;
 
 : lazy ( quot -- lazy )
   #! Spawn a process that immediately blocks and return it. 
   #! When '?lazy' is called on the returned process, call the quotation
   #! and return the result. The quotation must have stack effect ( -- X ).
-  [
-    [
-      lazy-quot set      
-      [
-        [ tagged-message? [ [ drop t ] [ get call ] send-reply ] ]
-      ] recv
-    ] with-scope
-  ] curry spawn ;
+  [ receive >r call r> over reply (lazy) ] spawn nip ;
 
 : ?lazy ( lazy -- result )
   #! Given a process spawned using 'lazy', evaluate it and return the result.
-  lazy-quot swap send-synchronous ;
+  f swap send-synchronous ;
 
