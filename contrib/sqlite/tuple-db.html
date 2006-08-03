@@ -45,25 +45,17 @@ a bit in the near future. Its most notable omission is it cannot currently
 handle relationships between tuples. This feature is currently being
 worked on.</p>
 <h1>Loading</h1>
-<p>The Factor image must have been bootstrapped with the
-sqlite shared library name provided. This can be done with the
-following command:</p>
-<pre class="code">
-./f boot.image.le32 -libraries:sqlite:name=libsqlite3.so
-</pre>
 <p>The quickest way to get up and running with this library is to
-change to the 'sqlite' directory and run Factor. Then execute the
-following commands:</p>
+load it as a module:</p>
 <pre class="code">
-"sqlite.factor" run-file
-"tuple-db.factor" run-file
+"sqlite" require
 USE: sqlite
 USE: tuple-db
 </pre>
 <p>Some simple tests can be run to check that everything is working
 ok:</p>
 <pre class="code">
-"tuple-db-tests.factor" run-file
+"sqlite" test-module
 </pre>
 <h1>Basic Usage</h1>
 <p>This library can be used for storing simple Factor tuples in a
