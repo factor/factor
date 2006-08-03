@@ -36,11 +36,7 @@ Current Issues:
 1) The Escape key does not close the GUI. It does stop the CPU
    emulation process though.
 
-2) Closing the GUI using the 'X' does not stop the CPU emulation
-   process. 
-
-3) The best way of closing the window is by pressing Escape and then
-   'X' on the window.
+2) The best way of stopping if to just close the GUI window.
 
 For more information, contact the author, Chris Double, at
 chris.double@double.co.nz or from my weblog
