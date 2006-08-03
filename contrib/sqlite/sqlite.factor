@@ -37,6 +37,7 @@ USE: namespaces
 USE: sequences
 USE: compiler
 
+"sqlite" windows? [ "sqlite3.dll" ] [ "libsqlite3.so" ] if "cdecl" add-library
 BEGIN-STRUCT: sqlite3
 END-STRUCT
 

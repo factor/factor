@@ -30,29 +30,29 @@ TUPLE: testdata one two ;
 testdata default-mapping set-mapping
 
 SYMBOL: db
-"test.db" sqlite-open db set
+"contrib/sqlite/test.db" sqlite-open db set-global
 
-db get testdata create-tuple-table
+db get-global testdata create-tuple-table
 
-[ "two" f ] [
-  db get "one" "two" <testdata> insert-tuple
-  db get "one" f <testdata> find-tuples 
+[ "two" [ ] ] [
+  db get-global "one" "two" <testdata> insert-tuple
+  db get-global "one" f <testdata> find-tuples 
   first [ testdata-two ] keep
-  db get swap delete-tuple    
-  db get "one" f <testdata> find-tuples 
+  db get-global swap delete-tuple    
+  db get-global "one" f <testdata> find-tuples 
 ] unit-test
 
 [ "junk" ] [
-  db get "one" "two" <testdata> insert-tuple
-  db get "one" f <testdata> find-tuples 
+  db get-global "one" "two" <testdata> insert-tuple
+  db get-global "one" f <testdata> find-tuples 
   first  
   "junk" over set-testdata-two
-  db get swap update-tuple
-  db get "one" f <testdata> find-tuples 
+  db get-global swap update-tuple
+  db get-global "one" f <testdata> find-tuples 
   first [ testdata-two ] keep
-  db get swap delete-tuple      
+  db get-global swap delete-tuple      
 ] unit-test
 
-db get testdata drop-tuple-table
+db get-global testdata drop-tuple-table
 
-db get sqlite-close
+db get-global sqlite-close
