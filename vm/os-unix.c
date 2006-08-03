@@ -172,37 +172,9 @@ void dealloc_bounded_block(BOUNDED_BLOCK *block)
 	free(block);
 }
 
-/* this function tests if a given faulting location is in a poison page. The
-page address is taken from area + round_up_to_page_size(area_size) + 
- pagesize*offset */
-static bool in_page(void *fault, void *i_area, CELL area_size, int offset)
-{
-	const int pagesize = getpagesize();
-	intptr_t area = (intptr_t) i_area;
-	area += pagesize * ((area_size + (pagesize - 1)) / pagesize);
-	area += offset * pagesize;
-
-	const int page = area / pagesize;
-	const int fault_page = (intptr_t)fault / pagesize;
-	return page == fault_page;
-}
-
 void signal_handler(int signal, siginfo_t* siginfo, void* uap)
 {
-	if(in_page(siginfo->si_addr, (void *) ds_bot, 0, -1))
-		general_error(ERROR_DS_UNDERFLOW,F,F,false);
-	else if(in_page(siginfo->si_addr, (void *) ds_bot, ds_size, 0))
-		general_error(ERROR_DS_OVERFLOW,F,F,false);
-	else if(in_page(siginfo->si_addr, (void *) rs_bot, 0, -1))
-		general_error(ERROR_RS_UNDERFLOW,F,F,false);
-	else if(in_page(siginfo->si_addr, (void *) rs_bot, rs_size, 0))
-		general_error(ERROR_RS_OVERFLOW,F,F,false);
-	else if(in_page(siginfo->si_addr, (void *) cs_bot, 0, -1))
-		general_error(ERROR_CS_UNDERFLOW,F,F,false);
-	else if(in_page(siginfo->si_addr, (void *) cs_bot, cs_size, 0))
-		general_error(ERROR_CS_OVERFLOW,F,F,false);
-	else
-		signal_error(signal);
+	memory_protection_error(siginfo->si_addr, signal);
 }
 
 static void sigaction_safe(int signum, const struct sigaction *act, struct sigaction *oldact)

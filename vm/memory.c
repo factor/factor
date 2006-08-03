@@ -1,5 +1,20 @@
 #include "factor.h"
 
+/* this function tests if a given faulting location is in a poison page. The
+page address is taken from area + round_up_to_page_size(area_size) + 
+ pagesize*offset */
+bool in_page(void *fault, void *i_area, CELL area_size, int offset)
+{
+	const int pagesize = getpagesize();
+	intptr_t area = (intptr_t) i_area;
+	area += pagesize * ((area_size + (pagesize - 1)) / pagesize);
+	area += offset * pagesize;
+
+	const int page = area / pagesize;
+	const int fault_page = (intptr_t)fault / pagesize;
+	return page == fault_page;
+}
+
 void *safe_malloc(size_t size)
 {
 	void *ptr = malloc(size);

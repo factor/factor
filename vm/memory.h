@@ -1,3 +1,5 @@
+bool in_page(void *fault, void *i_area, CELL area_size, int offset);
+
 void *safe_malloc(size_t size);
 
 typedef struct {

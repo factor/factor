@@ -245,6 +245,24 @@ void general_error(F_ERRORTYPE error, CELL arg1, CELL arg2, bool keep_stacks)
 		tag_fixnum(error),arg1,arg2),keep_stacks);
 }
 
+void memory_protection_error(void *addr, int signal)
+{
+	if(in_page(addr, (void *) ds_bot, 0, -1))
+		general_error(ERROR_DS_UNDERFLOW,F,F,false);
+	else if(in_page(addr, (void *) ds_bot, ds_size, 0))
+		general_error(ERROR_DS_OVERFLOW,F,F,false);
+	else if(in_page(addr, (void *) rs_bot, 0, -1))
+		general_error(ERROR_RS_UNDERFLOW,F,F,false);
+	else if(in_page(addr, (void *) rs_bot, rs_size, 0))
+		general_error(ERROR_RS_OVERFLOW,F,F,false);
+	else if(in_page(addr, (void *) cs_bot, 0, -1))
+		general_error(ERROR_CS_UNDERFLOW,F,F,false);
+	else if(in_page(addr, (void *) cs_bot, cs_size, 0))
+		general_error(ERROR_CS_OVERFLOW,F,F,false);
+	else
+		signal_error(signal);
+}
+
 /* It is not safe to access 'ds' from a signal handler, so we just not
 touch it */
 void signal_error(int signal)

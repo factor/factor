@@ -168,35 +168,35 @@ void primitive_cd(void)
 
 BOUNDED_BLOCK *alloc_bounded_block(CELL size)
 {
-    SYSTEM_INFO si;
-    char *mem;
-    DWORD ignore;
+	SYSTEM_INFO si;
+	char *mem;
+	DWORD ignore;
 
-    GetSystemInfo(&si);
-    if((mem = (char *)VirtualAlloc(NULL, si.dwPageSize*2 + size, MEM_COMMIT, PAGE_EXECUTE_READWRITE)) == 0)
-        fatal_error("VirtualAlloc() failed in alloc_bounded_block()",0);
+	GetSystemInfo(&si);
+	if((mem = (char *)VirtualAlloc(NULL, si.dwPageSize*2 + size, MEM_COMMIT, PAGE_EXECUTE_READWRITE)) == 0)
+		fatal_error("VirtualAlloc() failed in alloc_bounded_block()",0);
 
-    if (!VirtualProtect(mem, si.dwPageSize, PAGE_NOACCESS, &ignore))
-        fatal_error("Cannot allocate low guard page", (CELL)mem);
+	if (!VirtualProtect(mem, si.dwPageSize, PAGE_NOACCESS, &ignore))
+		fatal_error("Cannot allocate low guard page", (CELL)mem);
 
-    if (!VirtualProtect(mem+size+si.dwPageSize, si.dwPageSize, PAGE_NOACCESS, &ignore))
-        fatal_error("Cannot allocate high guard page", (CELL)mem);
+	if (!VirtualProtect(mem+size+si.dwPageSize, si.dwPageSize, PAGE_NOACCESS, &ignore))
+		fatal_error("Cannot allocate high guard page", (CELL)mem);
 
-    BOUNDED_BLOCK *block = safe_malloc(sizeof(BOUNDED_BLOCK));
+	BOUNDED_BLOCK *block = safe_malloc(sizeof(BOUNDED_BLOCK));
 
-    block->start = (int)mem + si.dwPageSize;
-    block->size = size;
+	block->start = (int)mem + si.dwPageSize;
+	block->size = size;
 
-    return block;
+	return block;
 }
 
 void dealloc_bounded_block(BOUNDED_BLOCK *block)
 {
-    SYSTEM_INFO si;
-    GetSystemInfo(&si);
-    if(!VirtualFree((void*)(block->start - si.dwPageSize), 0, MEM_RELEASE))
-        fatal_error("VirtualFree() failed",0);
-    free(block);
+	SYSTEM_INFO si;
+	GetSystemInfo(&si);
+	if(!VirtualFree((void*)(block->start - si.dwPageSize), 0, MEM_RELEASE))
+		fatal_error("VirtualFree() failed",0);
+	free(block);
 }
 
 /* SEH support. Proceed with caution. */
@@ -219,47 +219,19 @@ void seh_call(void (*func)(), exception_handler_t *handler)
 }
 
 static long getpagesize (void) {
-    static long g_pagesize = 0;
-    if (! g_pagesize) {
-        SYSTEM_INFO system_info;
-        GetSystemInfo (&system_info);
-        g_pagesize = system_info.dwPageSize;
-    }
-    return g_pagesize;
-}
-
-/* this function tests if a given faulting location is in a poison page. The
-page address is taken from area + round_up_to_page_size(area_size) + 
- pagesize*offset */
-static bool in_page(void *fault, void *i_area, CELL area_size, int offset)
-{
-    const int pagesize = getpagesize();
-    intptr_t area = (intptr_t) i_area;
-    area += pagesize * ((area_size + (pagesize - 1)) / pagesize);
-    area += offset * pagesize;
-
-    const int page = area / pagesize;
-    const int fault_page = (intptr_t)fault / pagesize;
-    return page == fault_page;
+	static long g_pagesize = 0;
+	if (! g_pagesize) {
+		SYSTEM_INFO system_info;
+		GetSystemInfo (&system_info);
+		g_pagesize = system_info.dwPageSize;
+	}
+	return g_pagesize;
 }
 
 //static long exception_handler(void *rec, void *frame, void *ctx, void *dispatch)
 static long exception_handler(PEXCEPTION_RECORD rec, void *frame, void *ctx, void *dispatch)
 {
-    if(in_page((void*)rec->ExceptionInformation[1], (void *) ds_bot, 0, -1))
-        general_error(ERROR_DS_UNDERFLOW,F,F,false);
-    else if(in_page((void*)rec->ExceptionInformation[1], (void *) ds_bot, ds_size, 0))
-        general_error(ERROR_DS_OVERFLOW,F,F,false);
-    else if(in_page((void*)rec->ExceptionInformation[1], (void *) rs_bot, 0, -1))
-        general_error(ERROR_RS_UNDERFLOW,F,F,false);
-    else if(in_page((void*)rec->ExceptionInformation[1], (void *) rs_bot, rs_size, 0))
-        general_error(ERROR_RS_OVERFLOW,F,F,false);
-    else if(in_page((void*)rec->ExceptionInformation[1], (void *) cs_bot, 0, -1))
-        general_error(ERROR_CS_UNDERFLOW,F,F,false);
-    else if(in_page((void*)rec->ExceptionInformation[1], (void *) cs_bot, cs_size, 0))
-        general_error(ERROR_CS_OVERFLOW,F,F,false);
-    else
-        signal_error(SIGSEGV);
+	memory_protection_error((void*)rec->ExceptionInformation[1],SIGSEGV);
 }
 
 void platform_run(void)
