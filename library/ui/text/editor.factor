@@ -129,9 +129,11 @@ M: loc-monitor model-changed ( obj -- )
     control-self relayout ;
 
 : draw-caret ( -- )
-    editor get
-    dup editor-caret-color gl-color
-    caret-rect rect-extent gl-line ;
+    editor get editor-focused? [
+        editor get
+        dup editor-caret-color gl-color
+        caret-rect rect-extent gl-line
+    ] when ;
 
 : translate-lines ( n editor -- )
     line-height * 0.0 swap 0.0 glTranslated ;
