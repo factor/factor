@@ -121,9 +121,12 @@ M: editor model-changed ( editor -- )
 : caret-rect ( editor -- dim )
     dup caret-loc swap caret-dim <rect> ;
 
+: scroll>caret ( editor -- )
+    dup caret-rect swap scroll>rect ;
+
 M: loc-monitor model-changed ( obj -- )
-    loc-monitor-editor dup caret-rect over scroll>rect
-    control-self relayout-1 ;
+    loc-monitor-editor dup scroll>caret
+    control-self relayout ;
 
 : draw-caret ( -- )
     editor get

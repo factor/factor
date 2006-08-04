@@ -270,7 +270,7 @@ sequences strings vectors words prettyprint ;
 
 \ getenv [ [ fixnum ] [ object ] ] "infer-effect" set-word-prop
 \ setenv [ [ object fixnum ] [ ] ] "infer-effect" set-word-prop
-\ stat [ [ string ] [ array ] ] "infer-effect" set-word-prop
+\ stat [ [ string ] [ object ] ] "infer-effect" set-word-prop
 \ (directory) [ [ string ] [ array ] ] "infer-effect" set-word-prop
 \ gc [ [ integer ] [ ] ] "infer-effect" set-word-prop
 \ gc-time [ [ ] [ integer ] ] "infer-effect" set-word-prop
