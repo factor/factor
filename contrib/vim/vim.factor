@@ -1,5 +1,5 @@
 IN: vim
-USING: definitions embedded io kernel parser prettyprint process sequences ;
+USING: embedded io kernel parser prettyprint process sequences ;
 
 : file-modified stat fourth ;
 
