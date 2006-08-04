@@ -41,7 +41,7 @@ DEFER: http-get
         drop "Location" swap hash nip http-get
     ] when ;
 
-: http-get ( url -- code headers stream )
+: http-get ( url -- code headers string )
     #! Opens a stream for reading from an HTTP URL.
     parse-url over parse-host <client> [
         get-request read-response stdio get contents
@@ -49,7 +49,7 @@ DEFER: http-get
 
 : download ( url file -- )
     #! Downloads the contents of a URL to a file.
-    >r http-get 2nip r> <file-writer> stream-copy ;
+    >r http-get 2nip r> <file-writer> [ write ] with-stream ;
 
 : post-request ( content-type content host resource -- )
     #! Note: It is up to the caller to url encode the content if
@@ -63,7 +63,5 @@ DEFER: http-get
 : http-post ( content-type content url -- code headers string )
     #! Make a POST request. The content is URL encoded for you.
     parse-url over parse-host <client> [
-        [
-            post-request flush read-response stdio get contents
-        ] with-stream
-    ] keep ;
+        post-request flush read-response stdio get contents
+    ] with-stream ;
