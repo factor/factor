@@ -177,7 +177,8 @@ M: loc-monitor model-changed ( obj -- )
         selection-start/end
         over translate>selection-start
         2dup [
-            >r 2dup r> draw-selected-line 1 translate-lines
+            >r 2dup r> draw-selected-line
+            1 editor get translate-lines
         ] each-line 2drop
     ] do-matrix ;
 
