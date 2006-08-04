@@ -8,7 +8,6 @@
 - editor:
   - better listener multi-line expression handling
   - history doesn't work in a good way if you ^K the input
-  - history: move caret to end
 - graphical module manager tool
 - services do not launch if factor not running
 - roundoff is still not quite right with tracks

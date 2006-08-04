@@ -60,6 +60,10 @@ sequences ;
 
 : select-all ( editor -- ) T{ doc-elt } select-elt ;
 
+: editor-doc-start ( editor -- ) T{ doc-elt } editor-prev ;
+
+: editor-doc-end ( editor -- ) T{ doc-elt } editor-next ;
+
 editor H{
     { T{ key-down f f "RETURN" } [ "\n" swap user-input ] }
     { T{ key-down f { S+ } "RETURN" } [ "\n" swap user-input ] }
@@ -92,8 +96,8 @@ editor H{
     { T{ key-down f f "END" } [ T{ one-line-elt } editor-next ] }
     { T{ key-down f { S+ } "HOME" } [ T{ one-line-elt } editor-select-prev ] }
     { T{ key-down f { S+ } "END" } [ T{ one-line-elt } editor-select-next ] }
-    { T{ key-down f { C+ } "HOME" } [ T{ doc-elt } editor-prev ] }
-    { T{ key-down f { C+ } "END" } [ T{ doc-elt } editor-next ] }
+    { T{ key-down f { C+ } "HOME" } [ editor-doc-start ] }
+    { T{ key-down f { C+ } "END" } [ editor-doc-end ] }
     { T{ key-down f { C+ S+ } "HOME" } [ T{ doc-elt } editor-select-prev ] }
     { T{ key-down f { C+ S+ } "END" } [ T{ doc-elt } editor-select-next ] }
     { T{ key-down f f "DELETE" } [ T{ char-elt } editor-delete ] }

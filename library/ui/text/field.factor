@@ -10,9 +10,9 @@ C: field ( model -- field )
     [ set-field-model ] keep
     dup dup set-control-self ;
 
-: field-prev control-model go-back ;
+: field-prev dup control-model go-back editor-doc-end ;
 
-: field-next control-model go-forward ;
+: field-next dup control-model go-forward editor-doc-end ;
 
 : field-commit ( field -- string )
     [ editor-text ] keep
