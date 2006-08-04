@@ -57,20 +57,12 @@ C: scroller ( gadget -- scroller )
     dupd over scroller-y update-slider
     position-viewport ;
 
-: include-point ( point rect -- rect )
-    rect-extent >r over r> vmax >r vmin r> <extent-rect> ;
-
-: scroll>point ( point scroller -- )
-    [
-        scroller-viewport
-        [ include-point ] keep
-        [ rect-extent v+ ] 2apply v-
-    ] keep dup scroller-origin rot v+ scroll ;
-
 : (scroll>rect) ( rect scroller -- )
-    #! First ensure top left is visible, then bottom right.
-    [ >r rect-extent r> scroller-origin swap >r v- r> ] keep
-    tuck >r >r scroll>point r> r> scroll>point ;
+    [ scroller-origin vneg offset-rect viewport-rect ] keep
+    [
+        scroller-viewport 2rect-extent
+        >r >r v- { 0 0 } vmin r> r> v- { 0 0 } vmax v+
+    ] keep dup scroller-origin rot v+ scroll ;
 
 : scroll>rect ( rect gadget -- )
     find-scroller dup [ set-scroller-follows ] [ 2drop ] if ;

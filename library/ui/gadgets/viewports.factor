@@ -12,7 +12,7 @@ TUPLE: viewport ;
 
 C: viewport ( content -- viewport )
     dup delegate>gadget
-    [ >r 2 <border> r> add-gadget ] keep
+    [ >r 3 <border> r> add-gadget ] keep
     t over set-gadget-clipped? ;
 
 M: viewport layout* ( viewport -- )
@@ -23,3 +23,5 @@ M: viewport focusable-child* ( viewport -- gadget )
     gadget-child ;
 
 M: viewport pref-dim* ( viewport -- dim ) viewport-dim ;
+
+: viewport-rect ( rect -- rect ) { 3 3 } offset-rect ;

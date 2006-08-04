@@ -6,7 +6,6 @@
 - "localhost" 50 <client> won't fail
 - factorcode httpd crashed: bad file descriptor
 - editor:
-  - scroll to caret
   - better listener multi-line expression handling
   - history doesn't work in a good way if you ^K the input
   - history: move caret to end

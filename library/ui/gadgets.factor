@@ -23,8 +23,11 @@ M: array rect-dim drop { 0 0 } ;
 
 : <extent-rect> ( loc ext -- rect ) dupd swap [v-] <rect> ;
 
+: offset-rect ( rect loc -- rect )
+    over rect-loc v+ swap rect-dim <rect> ;
+
 : >absolute ( rect -- rect )
-    rect-bounds >r origin get v+ r> <rect> ;
+    origin get offset-rect ;
 
 : (rect-intersect) ( rect rect -- array array )
     2rect-extent vmin >r vmax r> ;
