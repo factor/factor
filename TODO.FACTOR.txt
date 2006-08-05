@@ -1,5 +1,7 @@
 + 0.84:
 
+= bug fixes:
+
 - fix contribs: boids, automata
 - sometimes darcs get fails with the httpd
 - gdb triggers 'mutliple i/o ops on port' error
@@ -8,16 +10,18 @@
 - editor:
   - better listener multi-line expression handling
   - history doesn't work in a good way if you ^K the input
-- graphical module manager tool
 - services do not launch if factor not running
 - roundoff is still not quite right with tracks
 - fix top level window positioning
 - nasty inference regressions
 - [ [ dup call ] dup call ] infer hangs
 - the invalid recursion form case needs to be fixed, for inlines too
+
+= features:
+
+- graphical module manager tool
 - instead of decompiling words, add them to a 'recompile' set; compiler
   treats words in the recompile set as if they were not compiled
-- mach_signal: fault address reporting is not reliable
 - see if alien calls can be made faster
 - faster sequence= for UI
 - constant branch folding
@@ -29,6 +33,7 @@
 
 + ui:
 
+- better doc for accumulate, link from tree
 - we have trouble drawing rectangles
 - the UI listener has a shitty design. perhaps it should not call out
   to the real listener.

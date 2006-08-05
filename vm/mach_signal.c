@@ -22,11 +22,11 @@ static mach_port_t our_exception_port;
 /* Communication area for the exception state and thread state.  */
 static SIGSEGV_THREAD_STATE_TYPE save_thread_state;
 
-/* A handler that is called in the faulting thread.  It terminates the thread.  */
+/* A handler that is called in the faulting thread. */
 static void
-terminating_handler ()
+terminating_handler (void *fault_addr)
 {
-  raise (SIGSEGV);
+  memory_protection_error(fault_addr,SIGSEGV);
   abort ();
 }
 
@@ -72,6 +72,7 @@ catch_exception_raise (mach_port_t exception_port,
   save_thread_state = thread_state;
 
   SIGSEGV_PROGRAM_COUNTER (thread_state) = (unsigned long) terminating_handler;
+  pass_arg0(&thread_state,SIGSEGV_EXC_STATE_FAULT(exc_state));
   SIGSEGV_STACK_POINTER (thread_state) = fix_stack_ptr(sp);
 
   /* See http://web.mit.edu/darwin/src/modules/xnu/osfmk/man/thread_set_state.html.  */
