@@ -29,11 +29,6 @@ threads unix-internals ;
         err_no EINPROGRESS = [ dup close (io-error) ] unless
     ] when ; inline
 
-: client-socket ( host port -- fd )
-    client-sockaddr [
-        swap "sockaddr-in" c-size connect
-    ] with-socket-fd ;
-
 : server-sockaddr ( port -- sockaddr )
     init-sockaddr  INADDR_ANY htonl over set-sockaddr-in-addr ;
 
@@ -47,16 +42,35 @@ threads unix-internals ;
         dup 0 >= [ drop 1 listen ] [ ( fd n - n) nip ] if
     ] with-socket-fd ;
 
+TUPLE: connect-task ;
+
+C: connect-task ( port -- task )
+    [ >r <io-task> r> set-delegate ] keep ;
+
+M: connect-task do-io-task ( task -- )
+    io-task-port dup port-handle 0 0 write
+    0 < [ defer-error ] [ drop t ] if ;
+
+M: connect-task task-container drop write-tasks get-global ;
+
+: client-socket ( host port -- fd )
+    client-sockaddr [
+        swap "sockaddr-in" c-size connect
+    ] with-socket-fd ;
+
+: wait-to-connect ( port -- )
+    [ swap <connect-task> add-io-task stop ] callcc0 drop ;
+
 IN: io
+
+: <client> ( host port -- stream )
+    client-socket dup <fd-stream>
+    dup duplex-stream-out dup wait-to-connect pending-error ;
 
 C: client-stream ( host port fd -- stream )
     [ >r dup <fd-stream> r> set-delegate ] keep
     [ set-client-stream-port ] keep
     [ set-client-stream-host ] keep ;
-
-: <client> ( host port -- stream )
-    #! Connect to a port number on a TCP/IP host.
-    client-socket dup <fd-stream> ;
 
 TUPLE: server client ;
 

@@ -55,13 +55,8 @@ SYMBOL: closed
 
 TUPLE: port handle error timeout cutoff type sbuf eof? ;
 
-: check-port ( port expected -- )
-    >r port-type r> 2dup eq? [
-        [
-            "Cannot perform " % word-name %
-            " on " % word-name % " port" %
-        ] "" make throw
-    ] unless 2drop ;
+PREDICATE: port input-port port-type input eq? ;
+PREDICATE: port output-port port-type output eq? ;
 
 C: port ( handle buffer -- port )
     [ set-delegate ] keep
@@ -77,7 +72,7 @@ C: port ( handle buffer -- port )
 M: port set-timeout ( timeout port -- )
     [ set-port-timeout ] keep touch-port ;
 
-: buffered-port 8192 <buffer> <port> ;
+: buffered-port 32768 <buffer> <port> ;
 
 : >port< dup port-handle swap delegate ;
 
@@ -220,13 +215,11 @@ M: read-task task-container drop read-tasks get-global ;
         [ -rot <read-task> add-io-task stop ] callcc0
     ] unless pending-error drop ;
 
-M: port stream-read ( count stream -- string )
-    dup input check-port
+M: input-port stream-read ( count stream -- string )
     [ wait-to-read ] keep dup port-eof?
     [ drop f ] [ port-sbuf >string ] if ;
 
-M: port stream-read1 ( stream -- char/f )
-    dup input check-port
+M: input-port stream-read1 ( stream -- char/f )
     1 over wait-to-read dup port-eof?
     [ drop f ] [ port-sbuf first ] if ;
 
@@ -274,17 +267,16 @@ M: write-task task-container drop write-tasks get-global ;
 : port-flush ( port -- )
     [ swap <write-task> add-write-io-task stop ] callcc0 drop ;
 
-M: port stream-flush ( stream -- )
-    dup output check-port port-flush ;
+M: output-port stream-flush ( stream -- )
+    dup port-flush pending-error ;
 
 : wait-to-write ( len port -- )
-    tuck can-write? [ dup stream-flush ] unless pending-error ;
+    tuck can-write? [ drop ] [ stream-flush ] if ;
 
-M: port stream-write1 ( char writer -- )
-    dup output check-port 1 over wait-to-write ch>buffer ;
+M: output-port stream-write1 ( char writer -- )
+    1 over wait-to-write ch>buffer ;
 
-M: port stream-write ( string writer -- )
-    dup output check-port
+M: output-port stream-write ( string writer -- )
     over length over wait-to-write >buffer ;
 
 M: port stream-close ( stream -- )

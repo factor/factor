@@ -5,7 +5,6 @@
 - fix contribs: boids, automata
 - sometimes darcs get fails with the httpd
 - gdb triggers 'mutliple i/o ops on port' error
-- "localhost" 50 <client> won't fail
 - factorcode httpd crashed: bad file descriptor
 - editor:
   - better listener multi-line expression handling
