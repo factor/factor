@@ -167,7 +167,7 @@ GENERIC: task-container ( task -- vector )
 
 : refill ( port -- ? )
     #! Return f if there is a recoverable error
-    dup buffer-length zero? [
+    dup buffer-empty? [
         dup (refill)  dup 0 >= [
             swap n>buffer t
         ] [
@@ -176,6 +176,30 @@ GENERIC: task-container ( task -- vector )
     ] [
         drop t
     ] if ;
+
+! Reading a single character
+TUPLE: read1-task ;
+
+C: read1-task ( port -- task )
+    [ >r <io-task> r> set-delegate ] keep ;
+
+M: read1-task do-io-task ( task -- ? )
+    io-task-port dup refill [
+        [
+            dup buffer-empty?
+            [ t over set-port-eof? ] when
+        ] when drop
+    ] keep ;
+
+M: read1-task task-container drop read-tasks get-global ;
+
+: wait-to-read1 ( port -- )
+    dup buffer-empty? [
+        [ swap <read1-task> add-io-task stop ] callcc0
+    ] when pending-error ;
+
+M: input-port stream-read1 ( stream -- char/f )
+    dup wait-to-read1 dup port-eof? [ drop f ] [ buffer-pop ] if ;
 
 ! Reading character counts
 : read-step ( count reader -- ? )
@@ -187,7 +211,7 @@ GENERIC: task-container ( task -- vector )
     ] if ;
 
 : can-read-count? ( count reader -- ? )
-    dup pending-error 0 over port-sbuf set-length read-step ;
+    0 over port-sbuf set-length read-step ;
 
 TUPLE: read-task count ;
 
@@ -219,10 +243,6 @@ M: input-port stream-read ( count stream -- string )
     [ wait-to-read ] keep dup port-eof?
     [ drop f ] [ port-sbuf >string ] if ;
 
-M: input-port stream-read1 ( stream -- char/f )
-    1 over wait-to-read dup port-eof?
-    [ drop f ] [ port-sbuf first ] if ;
-
 ! Writers
 
 : open-write ( path -- fd )
@@ -242,7 +262,6 @@ M: input-port stream-read1 ( stream -- char/f )
 : can-write? ( len writer -- ? )
     #! If the buffer is empty and the string is too long,
     #! extend the buffer.
-    dup pending-error
     dup buffer-empty? [
         2drop t
     ] [
