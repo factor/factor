@@ -91,9 +91,9 @@ HELP: lookup-union "( classes -- class )"
 { $values { "classes" "a hashtable where keys are classes and values equal keys" } { "class" "a class word" } }
 { $description "Outputs a class that is the union of the given classes. If no precise match is found, outputs " { $link object } ", even if the given set is not an exhaustive cover all classes." } ;
 
-HELP: types* "( class -- classes )"
-{ $values { "class" "a class word" } { "classes" "a hashtable where keys are classes and values equal keys" } }
-{ $description "Outputs a sequence of builtin classes whose instances can possibly be instances of the given class." } ;
+HELP: class-or "( class1 class2 -- class )"
+{ $values { "class1" "a class word" } { "class2" "a class word" } { "class" "a class word" } }
+{ $description "Outputs a class whose instances are instances of either one of the two input classes. If the union is non-empty but no class with those members is defined, outputs " { $link object } "." } ;
 
 HELP: class-and "( class1 class2 -- class )"
 { $values { "class1" "a class word" } { "class2" "a class word" } { "class" "a class word" } }

@@ -1,6 +1,5 @@
 + 0.84:
 
-- EOF kills a port
 - mach_signal not working, right now
 - fix contribs: boids, automata
 - sometimes darcs get fails with the httpd
@@ -20,7 +19,6 @@
   treats words in the recompile set as if they were not compiled
 - see if alien calls can be made faster
 - faster sequence= for UI
-- type inference at branch merge points
 - remove literal table
 - generic 'define ( asset def -- )'
 
@@ -99,6 +97,7 @@
 
 + misc:
 
+- EOF kills a port
 - make a word to do '0 swap set-length'
 - slice: if sequence or seq start is changed, abstraction violation
 - hashed generic method dispatch

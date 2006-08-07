@@ -79,13 +79,20 @@ M: #return optimize-node* ( node -- node/t )
     set-node-successor ;
 
 ! Constant branch folding
-: node-value-literal? ( node value -- ? )
+: node-literal? ( node value -- ? )
     dup value?
     [ 2drop t ] [ swap node-literals ?hash* nip ] if ;
 
-: node-value-literal ( node value -- obj )
+: node-literal ( node value -- obj )
     dup value?
     [ nip value-literal ] [ swap node-literals ?hash ] if ;
+
+: node-class ( node value -- class )
+    dup value? [
+        nip value-literal class
+    ] [
+        swap node-classes ?hash [ object ] unless*
+    ] if ;
 
 : fold-branch ( node branch# -- node )
     over drop-inputs >r
@@ -93,17 +100,25 @@ M: #return optimize-node* ( node -- node/t )
     [ subst-node ] keep r> [ set-node-successor ] keep ;
 
 ! #if
-M: #if optimize-node* ( node -- node/t )
-    dup dup node-in-d first 2dup node-value-literal? [
-        node-value-literal 0 1 ? fold-branch
+: known-boolean-value? ( node value -- value ? )
+    2dup node-literal? [
+        node-literal t
     ] [
-        3drop t
+        node-class {
+            { [ dup general-t class< ] [ drop t t ] }
+            { [ dup \ f class< ] [ drop f t ] }
+            { [ t ] [ drop f f ] }
+        } cond
     ] if ;
+
+M: #if optimize-node* ( node -- node/t )
+    dup dup node-in-d first known-boolean-value?
+    [ 0 1 ? fold-branch ] [ 2drop t ] if ;
 
 ! #dispatch
 M: #dispatch optimize-node* ( node -- node/t )
-    dup dup node-in-d first 2dup node-value-literal? [
-        node-value-literal fold-branch
+    dup dup node-in-d first 2dup node-literal? [
+        node-literal fold-branch
     ] [
         3drop t
     ] if ;

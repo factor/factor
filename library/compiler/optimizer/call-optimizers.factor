@@ -17,7 +17,7 @@ math math-internals sequences words ;
 
 : partial-eval? ( #call -- ? )
     dup node-param "foldable" word-prop [
-        dup node-in-d [ node-value-literal? ] all-with?
+        dup node-in-d [ node-literal? ] all-with?
     ] [
         drop f
     ] if ;

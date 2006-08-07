@@ -91,8 +91,18 @@ SYMBOL: class<cache
 
 : types* ( class -- hash ) types [ type>class dup ] map>hash ;
 
+: (class-or) ( class class -- class )
+    [ flatten-class ] 2apply hash-union lookup-union ;
+
+: class-or ( class class -- class )
+    {
+        { [ 2dup class< ] [ nip ] }
+        { [ 2dup swap class< ] [ drop ] }
+        { [ t ] [ (class-or) ] }
+    } cond ;
+
 : (class-and) ( class class -- class )
-    [ types* ] 2apply hash-intersect lookup-union ;
+    [ flatten-class ] 2apply hash-intersect lookup-union ;
 
 : class-and ( class class -- class )
     {

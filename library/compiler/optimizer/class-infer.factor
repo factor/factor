@@ -5,12 +5,8 @@ USING: arrays generic hashtables inference kernel
 kernel-internals math namespaces sequences words ;
 
 ! Infer possible classes of values in a dataflow IR.
-
-: node-class ( value node -- class )
-    node-classes ?hash [ object ] unless* ;
-
 : node-class# ( node n -- class )
-    swap [ node-in-d <reversed> ?nth ] keep node-class ;
+    over node-in-d <reversed> ?nth node-class ;
 
 ! Variables used by the class inferencer
 
@@ -158,11 +154,30 @@ DEFER: (infer-classes)
         ] with-scope
     ] 2each ;
 
+: merge-value-class ( # nodes -- class )
+    [ tuck node-in-d ?nth node-class ] map-with
+    null [ class-or ] reduce ;
+
+: annotate-merge ( nodes values -- )
+    dup length
+    [ pick merge-value-class swap set-value-class* ] 2each
+    drop ;
+
+: merge-children ( node -- )
+    dup node-successor dup #merge? [
+        node-out-d
+        >r node-children [ last-node ] map r>
+        annotate-merge
+    ] [
+        2drop
+    ] if ;
+
 : (infer-classes) ( node -- )
     [
         dup infer-classes*
         dup annotate-node
         dup infer-children
+        dup merge-children
         node-successor (infer-classes)
     ] when* ;
 

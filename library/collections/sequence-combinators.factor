@@ -163,7 +163,7 @@ IN: sequences
 
 : copy-into-check ( start to from -- start to from )
     pick over length + pick 2dup length >
-    [ set-length ] [ 2drop ] if ;
+    [ set-length ] [ 2drop ] if ; inline
 
 : copy-into ( start to from -- )
     copy-into-check dup length
