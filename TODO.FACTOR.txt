@@ -1,6 +1,5 @@
 + 0.84:
 
-- mach_signal not working, right now
 - fix contribs: boids, automata
 - sometimes darcs get fails with the httpd
 - gdb triggers 'mutliple i/o ops on port' error
@@ -20,12 +19,12 @@
 - see if alien calls can be made faster
 - faster sequence= for UI
 - remove literal table
-- generic 'define ( asset def -- )'
 
 ========================================================================
 
 + ui:
 
+- doc front page: document stack effect notation
 - better doc for accumulate, link from tree
 - we have trouble drawing rectangles
 - the UI listener has a shitty design. perhaps it should not call out
@@ -72,6 +71,7 @@
 
 + module system:
 
+- generic 'define ( asset def -- )'
 - track individual method usages
 - C types should be words
   - TYPEDEF: float { ... } { ... } ;   ==> \ float T{ c-type ... } "c-type" swp

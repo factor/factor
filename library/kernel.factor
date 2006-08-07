@@ -10,8 +10,11 @@ USING: generic kernel-internals math math-internals ;
 GENERIC: hashcode ( obj -- n )
 M: object hashcode drop 0 ;
 
-GENERIC: = ( obj obj -- ? )
-M: object = eq? ;
+GENERIC: equal? ( obj obj -- ? )
+M: object equal? eq? ;
+
+: = ( obj obj -- ? )
+    2dup eq? [ 2drop t ] [ equal? ] if ; inline
 
 GENERIC: <=> ( obj1 obj2 -- n )
 

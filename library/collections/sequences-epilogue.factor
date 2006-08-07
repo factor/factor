@@ -127,16 +127,21 @@ M: object like drop ;
 
 : sequence= ( seq seq -- ? )
     2dup [ length ] 2apply tuck number=
-    [ (mismatch) -1 number= ] [ 3drop f ] if ;
+    [ (mismatch) -1 number= ] [ 3drop f ] if ; inline
+
+M: array equal? ( obj seq -- ? )
+    over array? [ sequence= ] [ 2drop f ] if ;
+
+M: quotation equal? ( obj seq -- ? )
+    over quotation? [ sequence= ] [ 2drop f ] if ;
+
+M: sbuf equal? ( obj seq -- ? )
+    over sbuf? [ sequence= ] [ 2drop f ] if ;
+
+M: vector equal? ( obj seq -- ? )
+    over vector? [ sequence= ] [ 2drop f ] if ;
 
 UNION: sequence array string sbuf vector quotation ;
-
-M: sequence = ( obj seq -- ? )
-    2dup eq? [
-        2drop t
-    ] [
-        over type over type eq? [ sequence= ] [ 2drop f ] if
-    ] if ;
 
 M: sequence hashcode ( hash -- n )
     dup empty? [ drop 0 ] [ first hashcode ] if ;

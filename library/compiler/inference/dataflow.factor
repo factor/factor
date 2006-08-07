@@ -12,7 +12,7 @@ TUPLE: node param shuffle
        classes literals history
        successor children ;
 
-M: node = eq? ;
+M: node equal? eq? ;
 
 : make-node ( param in-d out-d in-r out-r node -- node )
     [ >r swapd <shuffle> f f f f f <node> r> set-delegate ] keep ;

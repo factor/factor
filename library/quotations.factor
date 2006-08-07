@@ -4,7 +4,7 @@ IN: kernel
 USING: arrays generic kernel-internals math namespaces sequences
 sequences-internals words ;
 
-M: wrapper =
+M: wrapper equal?
     over wrapper? [ [ wrapped ] 2apply = ] [ 2drop f ] if ;
 
 M: quotation clone (clone) ;

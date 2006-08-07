@@ -13,7 +13,7 @@ UNION: number real complex ;
 M: real real ;
 M: real imaginary drop 0 ;
 
-M: number = ( n n -- ? ) number= ;
+M: number equal? ( n n -- ? ) number= ;
 
 : rect> ( xr xi -- x )
     over real? over real? and [

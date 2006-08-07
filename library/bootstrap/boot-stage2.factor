@@ -39,6 +39,8 @@ parser sequences sequences-internals words ;
         [
             \ number= compile
             \ + compile
+            \ nth compile
+            \ set-nth compile
             \ = compile
             { "kernel" "sequences" "assembler" } compile-vocabs
 

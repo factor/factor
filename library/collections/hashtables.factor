@@ -231,9 +231,8 @@ M: hashtable clone ( hash -- hash )
 : hashtable= ( hash hash -- ? )
     2dup subhash? >r swap subhash? r> and ;
 
-M: hashtable = ( obj hash -- ? )
+M: hashtable equal? ( obj hash -- ? )
     {
-        { [ 2dup eq? ] [ 2drop t ] }
         { [ over hashtable? not ] [ 2drop f ] }
         { [ 2dup [ hash-size ] 2apply number= not ] [ 2drop f ] }
         { [ t ] [ hashtable= ] }

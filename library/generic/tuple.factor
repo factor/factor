@@ -80,11 +80,10 @@ TUPLE: check-tuple class ;
 M: tuple clone ( tuple -- tuple )
     (clone) dup delegate clone over set-delegate ;
 
-M: tuple hashcode ( tuple -- n ) class hashcode ;
+M: tuple hashcode ( tuple -- n ) 2 slot hashcode ;
 
-M: tuple = ( obj tuple -- ? )
-    2dup eq?
-    [ 2drop t ] [ over tuple? [ tuple= ] [ 2drop f ] if ] if ;
+M: tuple equal? ( obj tuple -- ? )
+    over tuple? [ tuple= ] [ 2drop f ] if ;
 
 : (delegates) ( obj -- )
     [ dup delegate (delegates) , ] when* ;

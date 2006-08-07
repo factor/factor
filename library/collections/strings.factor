@@ -4,7 +4,7 @@ IN: strings
 USING: generic kernel kernel-internals math sequences
 sequences-internals ;
 
-M: string = ( obj str -- ? )
+M: string equal? ( obj str -- ? )
     over string? [
         over hashcode over hashcode number=
         [ sequence= ] [ 2drop f ] if

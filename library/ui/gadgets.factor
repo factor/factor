@@ -50,7 +50,7 @@ pref-dim parent children orientation state
 visible? root? clipped? grafted?
 interior boundary ;
 
-M: gadget = eq? ;
+M: gadget equal? eq? ;
 
 : gadget-child gadget-children first ;
 

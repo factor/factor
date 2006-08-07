@@ -17,7 +17,7 @@ C: value ( obj -- value )
 
 M: value hashcode value-uid ;
 
-M: value = eq? ;
+M: value equal? eq? ;
 
 M: integer value-uid ;
 

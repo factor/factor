@@ -25,7 +25,7 @@ SYMBOL: open-fonts
 ! sprites is a vector.
 TUPLE: font ascent descent height handle widths ;
 
-M: font = eq? ;
+M: font equal? eq? ;
 
 : close-font ( font -- ) font-handle FT_Done_Face ;
 
