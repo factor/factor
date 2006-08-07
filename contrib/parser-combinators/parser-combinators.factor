@@ -20,7 +20,7 @@
 ! WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
 ! OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
 ! ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-USING: lazy-lists kernel sequences strings math io arrays errors ;
+USING: lazy-lists kernel sequences strings math io arrays errors namespaces ;
 IN: parser-combinators
 
 TUPLE: parse-result parsed unparsed ;
@@ -232,17 +232,25 @@ TUPLE: parse-result parsed unparsed ;
 
 : <:&>-parser ( input parser1 parser2 -- result )
   #! Same as <&> except flatten the result.
-  <&> [ flatten ] <@ call ;
+  <&> [ dup second swap first [ % , ] { } make ] <@ call ;
 
 : <:&> ( parser1 parser2 -- parser )
   #! Same as <&> except flatten the result.
   [ <:&>-parser ] curry curry ;
 
+: <&:>-parser ( input parser1 parser2 -- result )
+  #! Same as <&> except flatten the result.
+  <&> [ dup second swap first [ , % ] { } make ] <@ call ;
+
+: <&:> ( parser1 parser2 -- parser )
+  #! Same as <&> except flatten the result.
+  [ <&:>-parser ] curry curry ;
+
 DEFER: <*>
 
 : (<*>) ( parser -- parser )
   #! Non-delayed implementation of <*>
-  dup <*> <:&> [ ] succeed <|> ;
+  dup <*> <&:> [ ] succeed <|> ;
   
 : <*> ( parser -- parser )
   #! Return a parser that accepts zero or more occurences of the original
@@ -251,7 +259,7 @@ DEFER: <*>
 
 : (<+>) ( parser -- parser )
   #! Non-delayed implementation of <+>
-  dup <*> <:&> ;
+  dup <*> <&:> ;
   
 : <+> ( parser -- parser )
   #! Return a parser that accepts one or more occurences of the original
