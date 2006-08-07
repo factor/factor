@@ -72,3 +72,12 @@ M: sequence json-print ( array -- string )
 
 M: object json-print ( object -- string )
   CHAR: { write1 slots slots>fields "," join write CHAR: } write1 ;
+
+: hash-map ( hashtable quot -- array )
+  >r hash>alist r> [ dup first swap second ] swap append map ;
+
+M: hashtable json-print ( hashtable -- string )
+  CHAR: { write1 
+  [ [ swap jsvar-encode >json % CHAR: : , >json % ] "" make ] hash-map "," join write 
+  CHAR: } write1 ;
+  
