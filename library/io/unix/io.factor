@@ -199,7 +199,8 @@ M: read1-task task-container drop read-tasks get-global ;
     ] when pending-error ;
 
 M: input-port stream-read1 ( stream -- char/f )
-    dup wait-to-read1 dup port-eof? [ drop f ] [ buffer-pop ] if ;
+    dup wait-to-read1
+    dup port-eof? [ drop f ] [ buffer-pop ] if ;
 
 ! Reading character counts
 : read-step ( count reader -- ? )

@@ -72,8 +72,8 @@ catch_exception_raise (mach_port_t exception_port,
   save_thread_state = thread_state;
 
   SIGSEGV_PROGRAM_COUNTER (thread_state) = (unsigned long) terminating_handler;
-  pass_arg0(&thread_state,SIGSEGV_EXC_STATE_FAULT(exc_state));
   SIGSEGV_STACK_POINTER (thread_state) = fix_stack_ptr(sp);
+  pass_arg0(&thread_state,SIGSEGV_EXC_STATE_FAULT(exc_state));
 
   /* See http://web.mit.edu/darwin/src/modules/xnu/osfmk/man/thread_set_state.html.  */
   if (thread_set_state (thread, SIGSEGV_THREAD_STATE_FLAVOR,
