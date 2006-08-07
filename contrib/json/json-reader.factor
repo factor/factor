@@ -21,35 +21,45 @@
 ! OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
 ! ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 !
-USING: kernel namespaces sequences strings math parser-combinators ;
+USING: kernel namespaces sequences strings math hashtables parser-combinators ;
 IN: json
 
 ! Grammar for JSON from RFC 4627
 USE: inspector
 
 : [<&>] ( quot - quot )
-  { } make unclip [ <:&> ] reduce ;
+  { } make unclip [ <&> ] reduce ;
 
 : [<|>] ( quot - quot )
   { } make unclip [ <|> ] reduce ;
 
+: 'ws' ( -- parser )
+  " " token 
+  "\n" token <|>
+  "\r" token <|>
+  "\t" token <|> 
+  "" token <|> ;
+
+: spaced ( parser -- parser )
+  'ws' swap &> 'ws' <& ;
+
 : 'begin-array' ( -- parser )
-  "[" token ;
+  "[" token spaced ;
 
 : 'begin-object' ( -- parser )
-  "{" token ;
+  "{" token spaced ;
 
 : 'end-array' ( -- parser )
-  "]" token ;
+  "]" token spaced ;
 
 : 'end-object' ( -- parser )
-  "}" token ;
+  "}" token spaced ;
 
 : 'name-separator' ( -- parser )
-  ":" token ;
+  ":" token spaced ;
 
 : 'value-separator' ( -- parser )
-  "," token ;
+  "," token spaced ;
 
 : 'false' ( -- parser )
   "false" token ;
@@ -73,13 +83,17 @@ DEFER: 'value'
 : 'member' ( -- parser )
   'string'
   'name-separator' <&  
-  [ 'value' call ] <:&> ;
+  [ 'value' call ] <&> ;
+
+: object>hashtable ( object -- hashtable )
+  #! Convert json object to hashtable
+  H{ } clone dup rot [ dup second swap first rot set-hash ] each-with ;
 
 : 'object' ( -- parser )
   'begin-object' 
   'member' &>
-  'value-separator' 'member' &> <*> <:&>
-  'end-object' <& ;
+  'value-separator' 'member' &> <*> <&:>
+  'end-object' <& [ object>hashtable ] <@ ;
 
 : 'array' ( -- parser )
   'begin-array' 
@@ -111,8 +125,6 @@ DEFER: 'value'
 : 'digit0-9' ( -- parser )
   [ digit? ] satisfy [ digit> ] <@ ;
 
-USE: inspector
-
 : sequence>number ( seq -- num ) 
   #! { 1 2 3 } => 123
   0 [ swap 10 * + ] reduce ;
@@ -124,21 +136,30 @@ USE: inspector
 : 'e' ( -- parser )
   "e" token "E" token <|> ;
 
+: sign-number ( { minus? num } -- number )
+  #! Convert the json number value to a factor number
+  dup second swap first [ -1 * ] when ;
+
 : 'exp' ( -- parser )
-  [
-    'e' ,
-    'minus' 'plus' <|> <?> ,
-    'digit0-9' <+> ,
-  ] [<&>] ;
+    'e' 
+    'minus' 'plus' <|> <?> &>
+    'digit0-9' <+> [ sequence>number ] <@ <&> [ sign-number ] <@ ;
+
+: sequence>frac ( seq -- num ) 
+  #! { 1 2 3 } => 0.123
+  reverse 0 [ swap 10 / + ] reduce 10 / >float ;
 
 : 'frac' ( -- parser )
-  'decimal-point' 'digit0-9' <+> <&> ;
+  'decimal-point' 'digit0-9' <+> &> [ sequence>frac ] <@ ;
+
+: raise-to-power ( { num exp } -- num )
+  #! Multiply 'num' by 10^exp
+  dup second dup [ 10 swap first ^ swap first * ] [ drop first ] if ;
 
 : 'number' ( -- parser )
-  'minus' <?> 
-  'int' <&>
-  'frac' <?> <:&>
-  'exp' <?> <:&> ;
+  'minus' <?>
+  [ 'int' , 'frac' 0 succeed <|> , ] [<&>] [ sum ] <@ 
+  'exp' <?> <&> [ raise-to-power ] <@ <&> [ sign-number ] <@ ;
 
 : 'value' ( -- parser )
   [
@@ -150,3 +171,7 @@ USE: inspector
     'array' ,
     'number' ,
   ] [<|>] ;
+
+: json> ( string -- object )
+  #! Parse a json formatted string to a factor object
+  'value' some call ;

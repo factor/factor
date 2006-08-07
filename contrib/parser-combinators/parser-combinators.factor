@@ -268,7 +268,7 @@ DEFER: <*>
 
 : (<?>) ( parser -- parser )
   #! Non-delayed implementation of <?>
-  [ unit ] <@ [ ] succeed <|> ;
+  [ unit ] <@ f succeed <|> ;
   
 : <?> ( parser -- parser )
   #! Return a parser that optionally uses the parser
