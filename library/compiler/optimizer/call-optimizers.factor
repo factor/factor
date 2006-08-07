@@ -23,7 +23,7 @@ math math-internals sequences words ;
     ] if ;
 
 : literal-in-d ( #call -- inputs )
-    dup node-in-d [ node-value-literal ] map-with ;
+    dup node-in-d [ node-literal ] map-with ;
 
 : partial-eval ( #call -- node )
     dup literal-in-d over node-param

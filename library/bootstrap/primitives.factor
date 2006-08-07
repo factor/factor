@@ -372,7 +372,7 @@ num-types f <array> builtins set
         f
     } {
         2
-        fixnum
+        object
         { "string-hashcode" "kernel-internals" }
         { "set-string-hashcode" "kernel-internals" }
     }

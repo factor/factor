@@ -268,3 +268,18 @@ DEFER: (map-nodes)
     #! Mutates nodes.
     node-stack get 1 head-slice* swap add
     [ >r 2dup r> node-successor (subst-values) ] each 2drop ;
+
+: node-literal? ( node value -- ? )
+    dup value?
+    [ 2drop t ] [ swap node-literals ?hash* nip ] if ;
+
+: node-literal ( node value -- obj )
+    dup value?
+    [ nip value-literal ] [ swap node-literals ?hash ] if ;
+
+: node-class ( node value -- class )
+    dup value? [
+        nip value-literal class
+    ] [
+        swap node-classes ?hash [ object ] unless*
+    ] if ;

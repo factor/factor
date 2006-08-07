@@ -57,11 +57,14 @@ parser sequences sequences-internals words ;
         "x11" get [
             "/library/ui/x11/load.factor" run-resource
         ] when
-    ] when
+        
+        ! We only do this if we are compiled, otherwise it takes
+        ! too long.
 
-    "Building online help search index..." print flush
-    H{ } clone parent-graph set-global xref-help
-    H{ } clone term-index set-global index-help
+        "Building online help search index..." print flush
+        H{ } clone parent-graph set-global xref-help
+        H{ } clone term-index set-global index-help
+    ] when
 
     [
         boot
@@ -86,6 +89,6 @@ parser sequences sequences-internals words ;
     "Now, you can run ./f factor.image" print flush
 
     "factor.image" resource-path save-image
-] [ print-error listener ] recover
+] [ print-error :c ] recover
 
 0 exit

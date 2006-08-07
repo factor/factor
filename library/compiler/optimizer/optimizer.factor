@@ -79,21 +79,6 @@ M: #return optimize-node* ( node -- node/t )
     set-node-successor ;
 
 ! Constant branch folding
-: node-literal? ( node value -- ? )
-    dup value?
-    [ 2drop t ] [ swap node-literals ?hash* nip ] if ;
-
-: node-literal ( node value -- obj )
-    dup value?
-    [ nip value-literal ] [ swap node-literals ?hash ] if ;
-
-: node-class ( node value -- class )
-    dup value? [
-        nip value-literal class
-    ] [
-        swap node-classes ?hash [ object ] unless*
-    ] if ;
-
 : fold-branch ( node branch# -- node )
     over drop-inputs >r
     >r dup node-successor r> rot node-children nth

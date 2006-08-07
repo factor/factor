@@ -85,6 +85,7 @@
 
 + compiler/ffi:
 
+- we need to optimize  [ dup array? [ array? ] [ array? ] if ]
 - mac intel: struct returns from objc methods
 - fix compiled gc check
   - there was a performance hit, investigate

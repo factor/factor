@@ -92,7 +92,7 @@ SYMBOL: class<cache
 : types* ( class -- hash ) types [ type>class dup ] map>hash ;
 
 : (class-or) ( class class -- class )
-    [ flatten-class ] 2apply hash-union lookup-union ;
+    [ types* ] 2apply hash-union lookup-union ;
 
 : class-or ( class class -- class )
     {
@@ -102,7 +102,7 @@ SYMBOL: class<cache
     } cond ;
 
 : (class-and) ( class class -- class )
-    [ flatten-class ] 2apply hash-intersect lookup-union ;
+    [ types* ] 2apply hash-intersect lookup-union ;
 
 : class-and ( class class -- class )
     {

@@ -7,7 +7,15 @@ math namespaces sequences words ;
 ! Math combination for generic dyadic upgrading arithmetic.
 
 : math-class? ( object -- ? )
-    dup word? [ number bootstrap-word class< ] [ drop f ] if ;
+    dup word? [
+        dup null bootstrap-word eq? [
+            drop f
+        ] [
+            number bootstrap-word class<
+        ] if
+    ] [
+        drop f
+    ] if ;
 
 : math-class-compare ( class class -- n )
     [

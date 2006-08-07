@@ -19,7 +19,8 @@ words ;
 : dispatch# ( #call -- n )
     node-param "combination" word-prop first ;
 
-: dispatching-class ( node -- seq ) dup dispatch# node-class# ;
+: dispatching-class ( node -- class )
+    dup dispatch# node-class# ;
 
 : already-inlined? ( node -- ? )
     #! Was this node inlined from definition of 'word'?
