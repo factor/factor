@@ -231,3 +231,16 @@ GENERIC: void-generic
 : test-2 5 test-1 ; compiled
 
 [ f ] [ f test-2 ] unit-test
+
+: branch-fold-regression-0
+    t [ ] [ 1+ branch-fold-regression-0 ] if ; inline
+
+: branch-fold-regression-1
+    10 branch-fold-regression-0 ; compiled
+
+[ 10 ] [ branch-fold-regression-1 ] unit-test
+
+! another regression
+: bar "hey" ; foldable
+: foo bar "hey" = ; inline
+[ 1 ] [ [ foo [ 1 ] [ 2 ] if ] compile-1 ] unit-test

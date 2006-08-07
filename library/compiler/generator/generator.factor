@@ -22,13 +22,15 @@ DEFER: #terminal?
 
 PREDICATE: #merge #terminal-merge node-successor #terminal? ;
 
+PREDICATE: #values #terminal-values node-successor #terminal? ;
+
 PREDICATE: #call #terminal-call
     dup node-successor #if?
     over node-successor node-successor #terminal? and
     swap if-intrinsic and ;
 
 UNION: #terminal
-    POSTPONE: f #return #values #terminal-merge ;
+    POSTPONE: f #return #terminal-values #terminal-merge ;
 
 : tail-call? ( -- ? )
     node-stack get [

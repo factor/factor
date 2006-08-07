@@ -5,39 +5,6 @@ USING: arrays generic hashtables inference kernel
 kernel-internals math namespaces prettyprint sequences
 words ;
 
-! Some utilities for splicing in dataflow IR subtrees
-: post-inline ( #return/#values #call/#merge -- )
-    [
-        >r node-in-d r> node-out-d 2array unify-lengths first2
-    ] keep subst-values ;
-
-: ?hash-union ( hash/f hash -- hash )
-    over [ hash-union ] [ nip ] if ;
-
-: add-node-literals ( hash node -- )
-    [ node-literals ?hash-union ] keep set-node-literals ;
-
-: add-node-classes ( hash node -- )
-    [ node-classes ?hash-union ] keep set-node-classes ;
-
-: (subst-classes) ( literals classes node -- )
-    dup [
-        3dup [ add-node-classes ] keep add-node-literals
-        node-successor (subst-classes)
-    ] [
-        3drop
-    ] if ;
-
-: subst-classes ( #return/#values #call/#merge -- )
-    >r dup node-literals swap node-classes r> (subst-classes) ;
-
-: subst-node ( old new -- )
-    #! The last node of 'new' becomes 'old', then values are
-    #! substituted. A subsequent optimizer phase kills the
-    #! last node of 'new' and the first node of 'old'.
-    last-node 2dup swap 2dup post-inline subst-classes
-    set-node-successor ;
-
 : (inline-method) ( #call quot -- node )
     dup t eq? [
         2drop t

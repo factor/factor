@@ -1,5 +1,7 @@
 + 0.84:
 
+- EOF kills a port
+- mach_signal not working, right now
 - fix contribs: boids, automata
 - sometimes darcs get fails with the httpd
 - gdb triggers 'mutliple i/o ops on port' error
@@ -18,7 +20,6 @@
   treats words in the recompile set as if they were not compiled
 - see if alien calls can be made faster
 - faster sequence= for UI
-- constant branch folding
 - type inference at branch merge points
 - remove literal table
 - generic 'define ( asset def -- )'

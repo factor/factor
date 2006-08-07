@@ -17,19 +17,13 @@ math math-internals sequences words ;
 
 : partial-eval? ( #call -- ? )
     dup node-param "foldable" word-prop [
-        dup node-in-d [
-            dup value?
-            [ 2drop t ] [ swap node-literals ?hash* nip ] if
-        ] all-with?
+        dup node-in-d [ node-value-literal? ] all-with?
     ] [
         drop f
     ] if ;
 
 : literal-in-d ( #call -- inputs )
-    dup node-in-d [
-        dup value?
-        [ nip value-literal ] [ swap node-literals ?hash ] if
-    ] map-with ;
+    dup node-in-d [ node-value-literal ] map-with ;
 
 : partial-eval ( #call -- node )
     dup literal-in-d over node-param
