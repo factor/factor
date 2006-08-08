@@ -272,5 +272,5 @@ M: number +second ( timestamp n -- timestamp )
         dup timestamp-year unparse write bl
         dup timestamp-hour unparse 2 CHAR: 0 pad-left write ":" write
         dup timestamp-minute unparse 2 CHAR: 0 pad-left write ":" write
-        dup timestamp-second >fixnum unparse 2 CHAR: 0 pad-left write " GMT" write
+        timestamp-second >fixnum unparse 2 CHAR: 0 pad-left write " GMT" write
     ] string-out ;
