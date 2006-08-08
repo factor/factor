@@ -94,7 +94,6 @@ void primitive_slot(void);
 void primitive_set_slot(void);
 void primitive_integer_slot(void);
 void primitive_set_integer_slot(void);
-void primitive_address(void);
 void primitive_size(void);
 CELL clone(CELL obj);
 void primitive_clone(void);

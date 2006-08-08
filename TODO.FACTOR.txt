@@ -17,7 +17,6 @@
 - instead of decompiling words, add them to a 'recompile' set; compiler
   treats words in the recompile set as if they were not compiled
 - see if alien calls can be made faster
-- faster sequence= for UI
 - remove literal table
 
 ========================================================================

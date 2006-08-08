@@ -289,13 +289,7 @@ sequences strings vectors words prettyprint ;
 \ cwd [ [ ] [ string ] ] "infer-effect" set-word-prop
 \ cd [ [ string ] [ ] ] "infer-effect" set-word-prop
 
-\ compiled-offset [ [ ] [ integer ] ] "infer-effect" set-word-prop
-
-\ set-compiled-offset [ [ integer ] [ ] ] "infer-effect" set-word-prop
-
-\ add-literal [ [ object ] [ integer ] ] "infer-effect" set-word-prop
-
-\ address [ [ object ] [ integer ] ] "infer-effect" set-word-prop
+\ add-compiled-block [ [ vector integer vector vector ] [ integer ] ] "infer-effect" set-word-prop
 
 \ dlopen [ [ string ] [ dll ] ] "infer-effect" set-word-prop
 \ dlsym [ [ string object ] [ integer ] ] "infer-effect" set-word-prop
@@ -401,7 +395,7 @@ sequences strings vectors words prettyprint ;
 
 \ array>vector [ [ array ] [ vector ] ] "infer-effect" set-word-prop
 
-\ flush-icache [ [ ] [ ] ] "infer-effect" set-word-prop
+\ finalize-compile [ [ ] [ ] ] "infer-effect" set-word-prop
 
 \ <string> [ [ integer integer ] [ string ] ] "infer-effect" set-word-prop
 

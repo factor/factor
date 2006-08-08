@@ -90,7 +90,7 @@ M: immediate load-literal ( literal vreg -- )
     v>operand swap v>operand MOV ;
 
 : load-indirect ( literal reg -- )
-    swap add-literal [] MOV rel-absolute-cell rel-address ;
+    0 [] MOV rel-absolute-cell rel-literal ;
 
 M: object load-literal ( literal vreg -- )
     v>operand load-indirect ;
@@ -116,7 +116,8 @@ M: object load-literal ( literal vreg -- )
     ! Add to jump table base. We use a temporary register since
     ! on AMD64 we have to load a 64-bit immediate. On x86, this
     ! is redundant.
-    "scratch" operand HEX: ffffffff MOV "end" get absolute-cell
+    "scratch" operand HEX: ffffffff MOV
+    "end" get rel-absolute-cell rel-word
     "n" operand "scratch" operand ADD
     ! Jump to jump table entry
     "n" operand [] JMP

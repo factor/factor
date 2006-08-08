@@ -1,5 +1,5 @@
-! Copyright (C) 2004, 2005 Slava Pestov.
-! See http://factor.sf.net/license.txt for BSD license.
+! Copyright (C) 2004, 2006 Slava Pestov.
+! See http://factorcode.org/license.txt for BSD license.
 IN: math
 USING: errors generic kernel kernel-internals sequences
 sequences-internals ;
@@ -27,6 +27,14 @@ UNION: integer fixnum bignum ;
     ] if ;
 
 : next-power-of-2 ( n -- n ) 2 swap (next-power-of-2) ;
+
+: d>w/w ( d -- w w )
+    dup HEX: ffffffff bitand
+    swap -32 shift HEX: ffffffff bitand ;
+
+: w>h/h ( w -- h h )
+    dup HEX: ffff bitand
+    swap -16 shift HEX: ffff bitand ;
 
 IN: math-internals
 

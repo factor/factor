@@ -4,6 +4,8 @@ IN: compiler
 USING: alien assembler generic kernel kernel-internals math
 memory namespaces sequences words ;
 
+: code-format cell ; inline
+
 ! PowerPC register assignments
 ! r3-r10 integer vregs
 ! f0-f13 float vregs
@@ -32,9 +34,7 @@ M: immediate load-literal ( literal vreg -- )
     [ v>operand ] 2apply LOAD ;
 
 M: object load-literal ( literal vreg -- )
-    v>operand swap
-    add-literal over
-    LOAD32 rel-2/2 rel-address
+    v>operand [ 0 LOAD32 rel-absolute-2/2 rel-literal ] keep
     dup 0 LWZ ;
 
 : stack-increment \ stack-reserve get 32 max stack@ 16 align ;
@@ -56,7 +56,7 @@ M: object load-literal ( literal vreg -- )
 
 : word-addr ( word -- )
     #! Load a word address into r3.
-    dup word-xt 3 LOAD32  rel-2/2 rel-word ;
+    0 3 LOAD32 rel-absolute-2/2 rel-word ;
 
 : %call ( label -- )
     #! Far C call for primitives, near C call for compiled defs.
@@ -71,23 +71,22 @@ M: object load-literal ( literal vreg -- )
     %epilogue dup postpone-word %jump-label ;
 
 : %jump-t ( label -- )
-    0 "flag" operand f address CMPI BNE ;
+    0 "flag" operand object-tag CMPI BNE ;
 
 : %dispatch ( -- )
     "n" operand dup 1 SRAWI
     ! The value 24 is a magic number. It is the length of the
     ! instruction sequence that follows to be generated.
-    compiled-offset 24 + "scratch" operand LOAD32
-    rel-2/2 rel-address
+    0 "scratch" operand LOAD32 rel-absolute-2/2 rel-here
     "n" operand dup "scratch" operand ADD
-    "n" operand dup 0 LWZ
+    "n" operand dup 24 LWZ
     "n" operand MTLR
     BLR ;
 
 : %return ( -- ) %epilogue BLR ;
 
 : compile-dlsym ( symbol dll register -- )
-    >r 2dup dlsym r> LOAD32 rel-2/2 rel-dlsym ;
+    0 swap LOAD32 rel-absolute-2/2 rel-dlsym ;
 
 M: int-regs (%peek) ( vreg loc -- )
     drop >r v>operand r> loc>operand LWZ ;

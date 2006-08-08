@@ -2,6 +2,9 @@ IN: compiler
 USING: arrays generic kernel kernel-internals math memory
 namespaces sequences ;
 
+! Does the assembler emit bytes or cells?
+DEFER: code-format ( -- byte# )
+
 ! A scratch register for computations
 TUPLE: vreg n ;
 
@@ -130,4 +133,4 @@ M: float-regs inc-reg-class
 GENERIC: v>operand
 M: integer v>operand tag-bits shift ;
 M: vreg v>operand dup vreg-n swap vregs nth ;
-M: f v>operand address ;
+M: f v>operand drop object-tag ;

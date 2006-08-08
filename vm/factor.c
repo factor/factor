@@ -2,8 +2,7 @@
 
 void init_factor(const char* image,
 	CELL ds_size, CELL rs_size, CELL cs_size,
-	CELL gen_count, CELL young_size, CELL aging_size,
-	CELL code_size, CELL literal_size)
+	CELL gen_count, CELL young_size, CELL aging_size, CELL code_size)
 {
 	init_ffi();
 	init_arena(gen_count,young_size,aging_size);
@@ -13,7 +12,7 @@ void init_factor(const char* image,
 	callframe = F;
 	callframe_scan = callframe_end = 0;
 	thrown_error = F;
-	load_image(image,literal_size);
+	load_image(image);
 	call(userenv[BOOT_ENV]);
 	init_c_io();
 	init_signals();
@@ -48,7 +47,6 @@ int main(int argc, char** argv)
 	CELL young_size = 2 * CELLS;
 	CELL aging_size = 4 * CELLS;
 	CELL code_size = CELLS;
-	CELL literal_size = 128;
 	F_ARRAY *args;
 	CELL arg_count;
 	CELL i;
@@ -83,8 +81,7 @@ int main(int argc, char** argv)
 		generations,
 		young_size * 1024 * 1024,
 		aging_size * 1024 * 1024,
-		code_size * 1024 * 1024,
-		literal_size * 1024);
+		code_size * 1024 * 1024);
 
 	arg_count = (image_given ? 2 : 1);
 	args = array(ARRAY_TYPE,argc,F);

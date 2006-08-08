@@ -54,11 +54,11 @@ USE: optimizer
 [ t ] [ [ [ 1 ] [ 2 ] ] [ [ 1 ] [ 2 ] if ] kill-set= ] unit-test
 
 
-: literal-kill-test-1 4 compiled-offset 2 cells - ; compiled
+: literal-kill-test-1 4 cell 2 cells - ; compiled
 
 [ 4 ] [ literal-kill-test-1 drop ] unit-test
 
-: literal-kill-test-2 3 compiled-offset 2 cells - ; compiled
+: literal-kill-test-2 3 cell 2 cells - ; compiled
 
 [ 3 ] [ literal-kill-test-2 drop ] unit-test
 

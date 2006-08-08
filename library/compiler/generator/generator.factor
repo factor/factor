@@ -37,38 +37,22 @@ UNION: #terminal
         dup #terminal-call? swap node-successor #terminal? or
     ] all? ;
 
-: generate-code ( word node quot -- length | quot: node -- )
-    compiled-offset >r
-    compile-aligned
-    rot save-xt
-    over stack-reserve %prologue
-    call
-    compile-aligned
-    compiled-offset r> - ;
+: generate-code ( node quot -- | quot: node -- )
+    over stack-reserve %prologue call ; inline
 
-: generate-reloc ( -- length )
-    relocation-table get
-    dup [ assemble-cell ] each
-    length cells ;
-
-SYMBOL: previous-offset
-
-: begin-generating ( -- code-len-fixup reloc-len-fixup )
-    compiled-offset previous-offset set
+: init-generator ( -- )
     V{ } clone relocation-table set
-    init-templates begin-assembly swap ;
+    V{ } clone literal-table set ;
 
 : generate-1 ( word node quot -- | quot: node -- )
-    #! If generation fails, reset compiled offset.
     [
-        begin-generating >r >r
-            generate-code
-            generate-reloc
-        r> set-compiled-cell
-        r> set-compiled-cell
-    ] [
-        previous-offset get set-compiled-offset rethrow
-    ] recover ;
+        init-generator
+        init-templates
+        generate-code
+        relocation-table get
+        literal-table get
+    ] V{ } make
+    code-format 2swap add-compiled-block swap save-xt ;
 
 SYMBOL: generate-queue
 
@@ -170,7 +154,7 @@ M: #call-label generate-node ( node -- next )
     node-param generate-call ;
 
 ! #dispatch
-: target-label ( label -- ) 0 assemble-cell absolute-cell ;
+: target-label ( label -- ) 0 , rel-absolute-cell rel-word ;
 
 : dispatch-head ( node -- label/node )
     #! Output the jump table insn and return a list of

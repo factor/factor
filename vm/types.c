@@ -461,7 +461,8 @@ void fixup_word(F_WORD* word)
 {
 	/* If this is a compiled word, relocate the code pointer. Otherwise,
 	reset it based on the primitive number of the word. */
-	if(word->xt >= code_relocation_base
+	if(code_relocation_base != 0
+		&& word->xt >= code_relocation_base
 		&& word->xt < code_relocation_base
 		- compiling.base + compiling.limit)
 		code_fixup(&word->xt);

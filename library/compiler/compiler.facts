@@ -40,3 +40,8 @@ HELP: compile-1 "( quot -- )"
 { $values { "quot" "a quotation" } }
 { $description "Compiles and runs a quotation." }
 { $errors "Throws an error if the stack effect of the quotation cannot be inferred." } ;
+
+IN: assembler
+
+HELP: finalize-compile "( -- )"
+{ $description "Flushes the CPUs instruction cache on PowerPC, and does nothing on other architectures. PowerPC CPUs do not automatically invalidate the cache when memory contents change, so the compiler must do this explicitly." } ;

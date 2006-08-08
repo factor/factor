@@ -18,7 +18,7 @@ IN: image
 ( Constants )
 
 : image-magic HEX: 0f0e0d0c ; inline
-: image-version 0 ; inline
+: image-version 2 ; inline
 
 : char bootstrap-cell 2 /i ; inline
 
@@ -36,16 +36,18 @@ IN: image
 : tuple-type      17 ; inline
 : byte-array-type 18 ; inline
 
-: base 1024 ; inline
+: data-base 1024 ; inline
 
-: boot-quot-offset 3 ; inline
-: global-offset    4 ; inline
-: t-offset         5 ; inline
-: 0-offset         6 ; inline
-: 1-offset         7 ; inline
-: -1-offset        8 ; inline
-: heap-size-offset 9 ; inline
-: header-size      10 ; inline
+: boot-quot-offset      3 ; inline
+: global-offset         4 ; inline
+: t-offset              5 ; inline
+: 0-offset              6 ; inline
+: 1-offset              7 ; inline
+: -1-offset             8 ; inline
+: data-heap-size-offset 9 ; inline
+: code-heap-size-offset 10 ; inline
+
+: header-size 12 ; inline
 
 ! The image being constructed; a vector of word-size integers
 SYMBOL: image
@@ -61,9 +63,6 @@ SYMBOL: architecture
 
 : emit ( cell -- ) image get push ;
 
-: d>w/w ( d -- w w )
-    dup HEX: ffffffff bitand swap -32 shift HEX: ffffffff bitand ;
-
 : emit-64 ( cell -- )
     bootstrap-cell 8 = [
         emit
@@ -76,7 +75,7 @@ SYMBOL: architecture
 : fixup ( value offset -- ) image get set-nth ;
 
 : here ( -- size ) 
-    image get length header-size - bootstrap-cells base + ;
+    image get length header-size - bootstrap-cells data-base + ;
 
 : here-as ( tag -- pointer ) here swap bitor ;
 
@@ -93,14 +92,16 @@ SYMBOL: architecture
 : header ( -- )
     image-magic emit
     image-version emit
-    ( relocation base at end of header ) base emit
+    ( relocation base at end of header ) data-base emit
     ( bootstrap quotation set later ) 0 emit
     ( global namespace set later ) 0 emit
     ( pointer to t object ) 0 emit
     ( pointer to bignum 0 ) 0 emit
     ( pointer to bignum 1 ) 0 emit
     ( pointer to bignum -1 ) 0 emit
-    ( size of heap set later ) 0 emit ;
+    ( size of data heap set later ) 0 emit
+    ( size of code heap is 0 ) 0 emit
+    ( reloc base of code heap is 0 ) 0 emit ;
 
 GENERIC: ' ( obj -- ptr )
 #! Write an object to the image.
@@ -309,7 +310,7 @@ M: hashtable ' ( hashtable -- pointer )
     boot,
     "Performing some word fixups..." print flush
     fixup-words
-    heap-size heap-size-offset fixup
+    heap-size data-heap-size-offset fixup
     "Image length: " write image get length .
     "Object cache size: " write objects get hash-size .
     \ word global remove-hash ;

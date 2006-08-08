@@ -149,10 +149,7 @@ call
     { "tag" "kernel-internals"              }
     { "cwd" "io"                            }
     { "cd" "io"                             }
-    { "compiled-offset" "assembler"         }
-    { "set-compiled-offset" "assembler"     }
-    { "add-literal" "assembler"             }
-    { "address" "memory"                    }
+    { "add-compiled-block" "assembler"      }
     { "dlopen" "alien"                      }
     { "dlsym" "alien"                       }
     { "dlclose" "alien"                     }
@@ -206,7 +203,7 @@ call
     { "end-scan" "memory"                   }
     { "size" "memory"                       }
     { "die" "kernel"                        }
-    { "flush-icache" "assembler"            }
+    { "finalize-compile" "assembler"        }
     { "fopen"  "io-internals"               }
     { "fgetc" "io-internals"                }
     { "fwrite" "io-internals"               }

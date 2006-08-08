@@ -277,49 +277,95 @@ void type_error(CELL type, CELL tagged)
 
 void init_compiler(CELL size)
 {
-	compiling.base = compiling.here = (CELL)(alloc_bounded_block(size)->start);
+	compiling.base = compiling.here
+		= (CELL)(alloc_bounded_block(size)->start);
 	if(compiling.base == 0)
 		fatal_error("Cannot allocate code heap",size);
 	compiling.limit = compiling.base + size;
 	last_flush = compiling.base;
 }
 
-void primitive_compiled_offset(void)
-{
-	box_unsigned_cell(compiling.here);
-}
-
-void primitive_set_compiled_offset(void)
-{
-	CELL offset = unbox_unsigned_cell();
-	compiling.here = offset;
-	if(compiling.here >= compiling.limit)
-	{
-		fprintf(stderr,"Code space exhausted\n");
-		factorbug();
-	}
-}
-
-void primitive_add_literal(void)
-{
-	CELL object = dpeek();
-	CELL offset = literal_top;
-	put(literal_top,object);
-	literal_top += CELLS;
-	if(literal_top >= literal_max)
-		critical_error("Too many compiled literals",literal_top);
-	drepl(tag_cell(offset));
-}
-
-void primitive_flush_icache(void)
-{
-	flush_icache((void*)last_flush,compiling.here - last_flush);
-	last_flush = compiling.here;
-}
-
 void collect_literals(void)
 {
-	CELL i;
+	/* CELL i;
 	for(i = compiling.base; i < literal_top; i += CELLS)
-		copy_handle((CELL*)i);
+		copy_handle((CELL*)i); */
+}
+
+void deposit_vector(F_VECTOR *vector, CELL format)
+{
+	CELL count = untag_fixnum_fast(vector->top);
+	F_ARRAY *array = untag_array_fast(vector->array);
+	CELL i;
+
+	if(format == 1)
+	{
+		for(i = 0; i < count; i++)
+			cput(compiling.here + i,to_fixnum(get(AREF(array,i))));
+	}
+	else if(format == CELLS)
+	{
+		CELL dest = compiling.here;
+
+		for(i = 0; i < count; i++)
+		{
+			put(dest,to_fixnum(get(AREF(array,i))));
+			dest += CELLS;
+		}
+	}
+	else
+		fatal_error("Bad format param to deposit_vector()",format);
+	
+	compiling.here += count * format;
+}
+
+void add_compiled_block(F_VECTOR *code, CELL code_format,
+	F_VECTOR *reloc, F_VECTOR *literals)
+{
+	CELL start = compiling.here;
+	CELL code_length = untag_fixnum_fast(code->top) * code_format;
+	CELL reloc_length = untag_fixnum_fast(reloc->top) * CELLS;
+	CELL literal_length = untag_fixnum_fast(literals->top) * CELLS;
+
+	/* compiled header */
+	F_COMPILED header;
+	header.header = COMPILED_HEADER;
+	header.code_length = align8(code_length);
+	header.reloc_length = reloc_length;
+	header.literal_length = literal_length;
+	memcpy((void*)compiling.here,&header,sizeof(F_COMPILED));
+	compiling.here += sizeof(F_COMPILED);
+	
+	/* code */
+	deposit_vector(code,code_format);
+	compiling.here = align8(compiling.here);
+
+	/* relocation info */
+	deposit_vector(reloc,CELLS);
+
+	/* literals */
+	deposit_vector(literals,CELLS);
+
+	/* push the XT of the new word on the stack */
+	box_unsigned_cell(start + sizeof(F_COMPILED));
+}
+
+void primitive_add_compiled_block(void)
+{
+	F_VECTOR *literals = untag_vector(dpop());
+	F_VECTOR *rel = untag_vector(dpop());
+	CELL code_format = to_cell(dpop());
+	F_VECTOR *code = untag_vector(dpop());
+	
+	add_compiled_block(code,code_format,rel,literals);
+}
+
+void primitive_finalize_compile(void)
+{
+	flush_icache((void*)last_flush,compiling.here - last_flush);
+
+	while(last_flush < compiling.here)
+		last_flush = relocate_code_next(last_flush);
+
+	last_flush = compiling.here;
 }

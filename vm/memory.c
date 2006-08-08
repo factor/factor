@@ -140,11 +140,6 @@ void primitive_set_integer_slot(void)
 	put(SLOT(obj,slot),value);
 }
 
-void primitive_address(void)
-{
-	drepl(tag_bignum(s48_cell_to_bignum(dpeek())));
-}
-
 void primitive_size(void)
 {
 	drepl(tag_fixnum(object_size(dpeek())));

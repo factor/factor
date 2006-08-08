@@ -13,11 +13,10 @@ void init_objects(HEADER *h)
 	bignum_neg_one = h->bignum_neg_one;
 }
 
-void load_image(const char* filename, int literal_table)
+void load_image(const char* filename)
 {
 	FILE* file;
 	HEADER h;
-	HEADER_2 ext_h;
 
 	file = fopen(filename,"rb");
 	if(file == NULL)
@@ -29,54 +28,39 @@ void load_image(const char* filename, int literal_table)
 
 	printf("Loading %s...",filename);
 
-	/* read header */
-	{
-		/* read it in native byte order */
-		fread(&h,sizeof(HEADER)/sizeof(CELL),sizeof(CELL),file);
+	/* read it in native byte order */
+	fread(&h,sizeof(HEADER)/sizeof(CELL),sizeof(CELL),file);
 
-		if(h.magic != IMAGE_MAGIC)
-			fatal_error("Bad magic number",h.magic);
+	if(h.magic != IMAGE_MAGIC)
+		fatal_error("Bad magic number",h.magic);
 
-		if(h.version == IMAGE_VERSION)
-			fread(&ext_h,sizeof(HEADER_2)/sizeof(CELL),sizeof(CELL),file);
-		else if(h.version == IMAGE_VERSION_0)
-		{
-			ext_h.size = literal_table;
-			ext_h.literal_top = 0;
-			ext_h.literal_max = literal_table;
-			ext_h.relocation_base = compiling.base;
-		}
-		else
-			fatal_error("Bad version number",h.version);
-	}
+	if(h.version != IMAGE_VERSION)
+		fatal_error("Bad version number",h.version);
 
 	/* read data heap */
 	{
-		CELL size = h.size / CELLS;
-		allot(h.size);
+		CELL size = h.data_size / CELLS;
+		allot(h.data_size);
 
 		if(size != fread((void*)tenured.base,sizeof(CELL),size,file))
-			fatal_error("Wrong data heap length",h.size);
+			fatal_error("Wrong data heap length",h.data_size);
 
-		tenured.here = tenured.base + h.size;
-		data_relocation_base = h.relocation_base;
+		tenured.here = tenured.base + h.data_size;
+		data_relocation_base = h.data_relocation_base;
 	}
 
 	/* read code heap */
 	{
-		CELL size = ext_h.size;
+		CELL size = h.code_size;
 		if(size + compiling.base >= compiling.limit)
-			fatal_error("Code heap too large",ext_h.size);
+			fatal_error("Code heap too large",h.code_size);
 
 		if(h.version == IMAGE_VERSION
 			&& size != fread((void*)compiling.base,1,size,file))
-			fatal_error("Wrong code heap length",ext_h.size);
+			fatal_error("Wrong code heap length",h.code_size);
 
-		compiling.here = compiling.base + ext_h.size;
-		literal_top = compiling.base + ext_h.literal_top;
-		literal_max = compiling.base + ext_h.literal_max;
-		compiling.here = compiling.base + ext_h.size;
-		code_relocation_base = ext_h.relocation_base;
+		compiling.here = compiling.base + h.code_size;
+		code_relocation_base = h.code_relocation_base;
 	}
 
 	fclose(file);
@@ -97,7 +81,6 @@ bool save_image(const char* filename)
 {
 	FILE* file;
 	HEADER h;
-	HEADER_2 ext_h;
 
 	fprintf(stderr,"Saving %s...\n",filename);
 
@@ -107,24 +90,20 @@ bool save_image(const char* filename)
 
 	h.magic = IMAGE_MAGIC;
 	h.version = IMAGE_VERSION;
-	h.relocation_base = tenured.base;
+	h.data_relocation_base = tenured.base;
 	h.boot = userenv[BOOT_ENV];
-	h.size = tenured.here - tenured.base;
+	h.data_size = tenured.here - tenured.base;
 	h.global = userenv[GLOBAL_ENV];
 	h.t = T;
 	h.bignum_zero = bignum_zero;
 	h.bignum_pos_one = bignum_pos_one;
 	h.bignum_neg_one = bignum_neg_one;
+	h.code_size = compiling.here - compiling.base;
+	h.code_relocation_base = compiling.base;
 	fwrite(&h,sizeof(HEADER),1,file);
 
-	ext_h.size = compiling.here - compiling.base;
-	ext_h.literal_top = literal_top - compiling.base;
-	ext_h.literal_max = literal_max - compiling.base;
-	ext_h.relocation_base = compiling.base;
-	fwrite(&ext_h,sizeof(HEADER_2),1,file);
-
-	fwrite((void*)tenured.base,h.size,1,file);
-	fwrite((void*)compiling.base,ext_h.size,1,file);
+	fwrite((void*)tenured.base,h.data_size,1,file);
+	fwrite((void*)compiling.base,h.code_size,1,file);
 
 	fclose(file);
 
@@ -189,13 +168,6 @@ void relocate_data()
 		allot_barrier(relocating);
 		relocate_object(relocating);
 	}
-
-	for(relocating = compiling.base;
-		relocating < literal_top;
-		relocating += CELLS)
-	{
-		data_fixup((CELL*)relocating);
-	}
 }
 
 void undefined_symbol(void)
@@ -203,10 +175,17 @@ void undefined_symbol(void)
 	general_error(ERROR_UNDEFINED_SYMBOL,F,F,true);
 }
 
-CELL get_rel_symbol(F_REL* rel)
+#define LITERAL_REF(literal_start,num) ((literal_start) + CELLS * (num))
+
+INLINE CELL get_literal(CELL literal_start, CELL num)
+{
+	return get(LITERAL_REF(literal_start,num));
+}
+
+CELL get_rel_symbol(F_REL *rel, CELL literal_start)
 {
 	CELL arg = REL_ARGUMENT(rel);
-	F_ARRAY *pair = untag_array(get(compiling.base + arg * CELLS));
+	F_ARRAY *pair = untag_array(get_literal(literal_start,arg));
 	F_STRING *symbol = untag_string(get(AREF(pair,0)));
 	CELL library = get(AREF(pair,1));
 	DLL *dll = (library == F ? NULL : untag_dll(library));
@@ -223,99 +202,141 @@ CELL get_rel_symbol(F_REL* rel)
 	return sym;
 }
 
-INLINE CELL compute_code_rel(F_REL *rel, CELL original)
+CELL get_rel_word(F_REL *rel, CELL literal_start)
+{
+	CELL arg = REL_ARGUMENT(rel);
+	F_WORD *word = untag_word(get_literal(literal_start,arg));
+	return (CELL)word->xt;
+}
+
+INLINE CELL compute_code_rel(F_REL *rel, CELL original,
+	CELL offset, CELL literal_start)
 {
 	switch(REL_TYPE(rel))
 	{
-	case F_PRIMITIVE:
+	case RT_PRIMITIVE:
 		return primitive_to_xt(REL_ARGUMENT(rel));
-	case F_DLSYM:
-		return get_rel_symbol(rel);
-	case F_ABSOLUTE:
-		return original + (compiling.base - code_relocation_base);
-	case F_CARDS:
+	case RT_DLSYM:
+		return get_rel_symbol(rel,literal_start);
+	case RT_HERE:
+		return offset;
+	case RT_CARDS:
 		return cards_offset;
+	case RT_LITERAL:
+		return LITERAL_REF(literal_start,REL_ARGUMENT(rel));
+	case RT_WORD:
+		return get_rel_word(rel,literal_start);
 	default:
 		critical_error("Unsupported rel type",rel->type);
 		return -1;
 	}
 }
 
-INLINE CELL relocate_code_next(CELL relocating)
+INLINE void relocate_code_step(F_REL *rel, CELL code_start, CELL literal_start)
+{
+	CELL original;
+	CELL new_value;
+	CELL offset = rel->offset + code_start;
+
+	switch(REL_CLASS(rel))
+	{
+	case REL_ABSOLUTE_CELL:
+		original = get(offset);
+		break;
+	case REL_ABSOLUTE:
+		original = *(u32*)offset;
+		break;
+	case REL_RELATIVE:
+		original = *(u32*)offset - (offset + sizeof(u32));
+		break;
+	case REL_ABSOLUTE_2_2:
+		original = reloc_get_2_2(offset);
+		break;
+	case REL_RELATIVE_2_2:
+		original = reloc_get_2_2(offset) - (offset + sizeof(u32));
+		break;
+	case REL_RELATIVE_2:
+		original = *(u32*)offset;
+		original &= REL_RELATIVE_2_MASK;
+		break;
+	case REL_RELATIVE_3:
+		original = *(u32*)offset;
+		original &= REL_RELATIVE_3_MASK;
+		break;
+	default:
+		critical_error("Unsupported rel class",REL_CLASS(rel));
+		return;
+	}
+
+	/* to_c_string can fill up the heap */
+	maybe_gc(0);
+	new_value = compute_code_rel(rel,original,offset,literal_start);
+
+	switch(REL_CLASS(rel))
+	{
+	case REL_ABSOLUTE_CELL:
+		put(offset,new_value);
+		break;
+	case REL_ABSOLUTE:
+		*(u32*)offset = new_value;
+		break;
+	case REL_RELATIVE:
+		*(u32*)offset = new_value - (offset + sizeof(u32));
+		break;
+	case REL_ABSOLUTE_2_2:
+		reloc_set_2_2(offset,new_value);
+		break;
+	case REL_RELATIVE_2_2:
+		reloc_set_2_2(offset,new_value - (offset + sizeof(u32)));
+		break;
+	case REL_RELATIVE_2:
+		original = *(u32*)offset;
+		original &= ~REL_RELATIVE_2_MASK;
+		*(u32*)offset = (original | new_value);
+		break;
+	case REL_RELATIVE_3:
+		original = *(u32*)offset;
+		original &= ~REL_RELATIVE_3_MASK;
+		*(u32*)offset = (original | new_value);
+		break;
+	default:
+		critical_error("Unsupported rel class",REL_CLASS(rel));
+		return;
+	}
+}
+
+CELL relocate_code_next(CELL relocating)
 {
 	F_COMPILED* compiled = (F_COMPILED*)relocating;
-
-	F_REL* rel = (F_REL*)(
-		relocating + sizeof(F_COMPILED)
-		+ compiled->code_length);
-
-	F_REL* rel_end = (F_REL*)(
-		relocating + sizeof(F_COMPILED)
-		+ compiled->code_length
-		+ compiled->reloc_length);
 
 	if(compiled->header != COMPILED_HEADER)
 		critical_error("Wrong compiled header",relocating);
 
+	CELL code_start = relocating + sizeof(F_COMPILED);
+	CELL reloc_start = code_start + compiled->code_length;
+	CELL literal_start = reloc_start + compiled->reloc_length;
+
+	F_REL *rel = (F_REL *)reloc_start;
+	F_REL *rel_end = (F_REL *)literal_start;
+
+	/* apply relocations */
 	while(rel < rel_end)
-	{
-		CELL original;
-		CELL new_value;
+		relocate_code_step(rel++,code_start,literal_start);
+	
+	CELL *scan = (CELL*)literal_start;
+	CELL *literal_end = (CELL*)(literal_start + compiled->literal_length);
 
-		code_fixup(&rel->offset);
-		
-		switch(REL_CLASS(rel))
-		{
-		case REL_ABSOLUTE_CELL:
-			original = get(rel->offset);
-			break;
-		case REL_ABSOLUTE:
-			original = *(u32*)rel->offset;
-			break;
-		case REL_RELATIVE:
-			original = *(u32*)rel->offset - (rel->offset + sizeof(u32));
-			break;
-		case REL_2_2:
-			original = reloc_get_2_2(rel->offset);
-			break;
-		default:
-			critical_error("Unsupported rel class",REL_CLASS(rel));
-			return -1;
-		}
+	/* relocate literal table data */
+	while(scan < literal_end)
+		data_fixup(scan++);
 
-		/* to_c_string can fill up the heap */
-		maybe_gc(0);
-		new_value = compute_code_rel(rel,original);
-
-		switch(REL_CLASS(rel))
-		{
-		case REL_ABSOLUTE_CELL:
-			put(rel->offset,new_value);
-			break;
-		case REL_ABSOLUTE:
-			*(u32*)rel->offset = new_value;
-			break;
-		case REL_RELATIVE:
-			*(u32*)rel->offset = new_value - (rel->offset + CELLS);
-			break;
-		case REL_2_2:
-			reloc_set_2_2(rel->offset,new_value);
-			break;
-		default:
-			critical_error("Unsupported rel class",REL_CLASS(rel));
-			return -1;
-		}
-
-		rel++;
-	}
-
-	return (CELL)rel_end;
+	return (CELL)literal_end;
 }
 
 void relocate_code()
 {
 	/* start relocating from the end of the space reserved for literals */
-	CELL relocating = literal_max;
+	CELL relocating = compiling.base;
 	while(relocating < compiling.here)
 		relocating = relocate_code_next(relocating);
 }

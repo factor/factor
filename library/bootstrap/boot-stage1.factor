@@ -142,7 +142,6 @@ sequences vectors words ;
         "/library/compiler/optimizer/print-dataflow.factor"
 
         "/library/compiler/generator/architecture.factor"
-        "/library/compiler/generator/assembler.factor"
         "/library/compiler/generator/templates.factor"
         "/library/compiler/generator/xt.factor"
         "/library/compiler/generator/generator.factor"
@@ -251,7 +250,6 @@ sequences vectors words ;
         "/library/compiler/alien/malloc.facts"
         "/library/compiler/alien/structs.facts"
         "/library/compiler/alien/syntax.facts"
-        "/library/compiler/generator/assembler.facts"
         "/library/compiler/inference/inference.facts"
         "/library/compiler/compiler.facts"
         "/library/generic/early-generic.facts"

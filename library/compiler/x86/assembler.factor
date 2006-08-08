@@ -1,6 +1,6 @@
 ! Copyright (C) 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
-USING: arrays compiler errors generic kernel kernel-internals
+USING: arrays compiler errors generic io kernel kernel-internals
 math namespaces parser sequences words ;
 IN: assembler
 
@@ -9,6 +9,9 @@ IN: assembler
 ! In 32-bit mode, { 1234 } is absolute indirect addressing.
 ! In 64-bit mode, { 1234 } is RIP-relative.
 ! Beware!
+
+: 4, 4 >le % ; inline
+: cell, cell >le % ; inline
 
 #! Extended AMD64 registers (R8-R15) return true.
 GENERIC: extended? ( op -- ? )
@@ -183,9 +186,9 @@ M: indirect displacement indirect-displacement ;
 M: register displacement drop f ;
 
 : addressing ( reg# indirect -- )
-    [ mod-r/m assemble-1 ] keep
-    [ sib [ assemble-1 ] when* ] keep
-    displacement [ assemble-4 ] when* ;
+    [ mod-r/m , ] keep
+    [ sib [ , ] when* ] keep
+    displacement [ 4, ] when* ;
 
 ( Utilities                                                    )
 UNION: operand register indirect ;
@@ -217,10 +220,10 @@ UNION: operand register indirect ;
     #! Compile an AMD64 REX prefix.
     pick pick rex.w? BIN: 01001000 BIN: 01000000 ?
     swap lhs-prefix swap rhs-prefix
-    dup BIN: 01000000 = [ drop ] [ assemble-1 ] if ;
+    dup BIN: 01000000 = [ drop ] [ , ] if ;
 
 : 16-prefix ( reg r/m -- )
-    [ register-16? ] 2apply or [ HEX: 66 assemble-1 ] when ;
+    [ register-16? ] 2apply or [ HEX: 66 , ] when ;
 
 : prefix ( reg r/m rex.w -- ) pick pick 16-prefix rex-prefix ;
 
@@ -229,15 +232,15 @@ UNION: operand register indirect ;
 : short-operand ( reg rex.w n -- )
     #! Some instructions encode their single operand as part of
     #! the opcode.
-    >r dupd prefix-1 reg-code r> + assemble-1 ;
+    >r dupd prefix-1 reg-code r> + , ;
 
 : 1-operand ( op reg rex.w opcode -- )
     #! The 'reg' is not really a register, but a value for the
     #! 'reg' field of the mod-r/m byte.
-    >r >r over r> prefix-1 r> assemble-1 swap addressing ;
+    >r >r over r> prefix-1 r> , swap addressing ;
 
 : immediate-1 ( imm dst reg rex.w opcode -- )
-    1-operand assemble-1 ;
+    1-operand , ;
 
 : immediate-1/4 ( imm dst reg rex.w opcode -- )
     #! If imm is a byte, compile the opcode and the byte.
@@ -247,26 +250,22 @@ UNION: operand register indirect ;
     >r >r pick byte? [
         r> r> BIN: 10 bitor immediate-1
     ] [
-        r> r> 1-operand assemble-4
+        r> r> 1-operand 4,
     ] if ;
 
 : 2-operand ( dst src op -- )
     #! Sets the opcode's direction bit. It is set if the
     #! destination is a direct register operand.
     pick register? [ BIN: 10 bitor swapd ] when
-    >r 2dup t prefix r> assemble-1 reg-code swap addressing ;
-
-: from ( addr -- addr )
-    #! Relative to after next 32-bit immediate.
-    compiled-offset - 4 - ;
+    >r 2dup t prefix r> , reg-code swap addressing ;
 
 PREDICATE: word callable register? not ;
 
 ( Moving stuff                                                 )
 GENERIC: PUSH ( op -- )
 M: register PUSH f HEX: 50 short-operand ;
-M: integer PUSH HEX: 68 assemble-1 assemble-4 ;
-M: callable PUSH 0 PUSH absolute-4 ;
+M: integer PUSH HEX: 68 , 4, ;
+M: callable PUSH 0 PUSH rel-absolute rel-word ;
 M: operand PUSH BIN: 110 f HEX: ff 1-operand ;
 
 GENERIC: POP ( op -- )
@@ -275,30 +274,30 @@ M: operand POP BIN: 000 f HEX: 8f 1-operand ;
 
 ! MOV where the src is immediate.
 GENERIC: (MOV-I) ( src dst -- )
-M: register (MOV-I) t HEX: b8 short-operand assemble-cell ;
-M: operand (MOV-I) BIN: 000 t HEX: c7 1-operand assemble-4 ;
+M: register (MOV-I) t HEX: b8 short-operand cell, ;
+M: operand (MOV-I) BIN: 000 t HEX: c7 1-operand 4, ;
 
 GENERIC: MOV ( dst src -- )
 M: integer MOV swap (MOV-I) ;
-M: callable MOV 0 rot (MOV-I) absolute-cell ;
+M: callable MOV 0 rot (MOV-I) rel-absolute-cell rel-word ;
 M: operand MOV HEX: 89 2-operand ;
 
 ( Control flow                                                 )
 GENERIC: JMP ( op -- )
-M: integer JMP HEX: e9 assemble-1 from assemble-4 ;
-M: callable JMP 0 JMP relative-4 ;
+! M: integer JMP HEX: e9 , from 4, ;
+M: callable JMP 0 JMP rel-relative rel-word ;
 M: operand JMP BIN: 100 t HEX: ff 1-operand ;
 
 GENERIC: CALL ( op -- )
-M: integer CALL HEX: e8 assemble-1 from assemble-4 ;
-M: callable CALL 0 CALL relative-4 ;
+! M: integer CALL HEX: e8 , from 4, ;
+M: callable CALL 0 CALL rel-relative rel-word ;
 M: operand CALL BIN: 010 t HEX: ff 1-operand ;
 
 G: JUMPcc ( addr opcode -- ) 1 standard-combination ;
-M: integer JUMPcc ( addr opcode -- )
-    swap HEX: 0f assemble-1  swap assemble-1  from assemble-4 ;
+! M: integer JUMPcc ( addr opcode -- )
+!     swap HEX: 0f ,  swap ,  from assemble-4 ;
 M: callable JUMPcc ( addr opcode -- )
-    swap >r 0 swap JUMPcc r> relative-4 ;
+    swap >r 0 swap JUMPcc r> rel-relative rel-word ;
 
 : JO  HEX: 80 JUMPcc ;
 : JNO HEX: 81 JUMPcc ;
@@ -317,7 +316,7 @@ M: callable JUMPcc ( addr opcode -- )
 : JLE HEX: 8e JUMPcc ;
 : JG  HEX: 8f JUMPcc ;
 
-: RET ( -- ) HEX: c3 assemble-1 ;
+: RET ( -- ) HEX: c3 , ;
 
 ( Arithmetic                                                   )
 
@@ -363,8 +362,8 @@ M: operand CMP OCT: 071 2-operand ;
 GENERIC: IMUL2 ( dst src -- )
 M: integer IMUL2 swap dup reg-code t HEX: 69 immediate-1/4 ;
 
-: CDQ HEX: 99 assemble-1 ;
-: CQO HEX: 48 assemble-1 CDQ ;
+: CDQ HEX: 99 , ;
+: CQO HEX: 48 , CDQ ;
 
 : ROL ( dst n -- ) swap BIN: 000 t HEX: c1 immediate-1 ;
 : ROR ( dst n -- ) swap BIN: 001 t HEX: c1 immediate-1 ;
@@ -387,9 +386,9 @@ M: integer IMUL2 swap dup reg-code t HEX: 69 immediate-1/4 ;
 : 2-operand-sse ( dst src op1 op2 -- )
     #! We swap the operands here to make everything consistent
     #! with the integer instructions.
-    swap assemble-1 pick register-128? [ swapd ] [ 1 bitor ] if
-    >r 2dup t prefix HEX: 0f assemble-1 r>
-    assemble-1 reg-code swap addressing ;
+    swap , pick register-128? [ swapd ] [ 1 bitor ] if
+    >r 2dup t prefix HEX: 0f , r>
+    , reg-code swap addressing ;
 
 : MOVSS ( dest src -- ) HEX: f3 HEX: 10 2-operand-sse ;
 : MOVSD ( dest src -- ) HEX: f2 HEX: 10 2-operand-sse ;

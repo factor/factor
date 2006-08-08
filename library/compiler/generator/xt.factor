@@ -18,152 +18,58 @@ sequences strings vectors words ;
 ! hastable.
 SYMBOL: compiled-xts
 
-: save-xt ( word -- )
-    compiled-offset swap compiled-xts get set-hash ;
+: save-xt ( xt word -- ) compiled-xts get set-hash ;
 
 : commit-xts ( -- )
-    #! We must flush the instruction cache on PowerPC.
-    flush-icache
     compiled-xts get [ swap set-word-xt ] hash-each ;
 
 : compiled-xt ( word -- xt )
     dup compiled-xts get hash [ ] [ word-xt ] ?if ;
 
-! deferred-xts is a vector of objects responding to the fixup
-! generic.
-SYMBOL: deferred-xts
+SYMBOL: literal-table
 
-: deferred-xt deferred-xts get push ;
+: add-literal ( obj -- n )
+    dup literal-table get [ eq? ] find-with drop dup -1 > [
+        nip
+    ] [
+        drop literal-table get dup length >r push r>
+    ] if ;
 
-! To support saving compiled code to disk, generator words
-! append relocation instructions to this vector.
 SYMBOL: relocation-table
 
 : rel, ( n -- ) relocation-table get push ;
 
-: cell-just-compiled compiled-offset cell - ;
-
-: 4-just-compiled compiled-offset 4 - ;
-
 : rel-absolute-cell 0 ;
 : rel-absolute 1 ;
 : rel-relative 2 ;
-: rel-2/2 3 ;
+: rel-absolute-2/2 3 ;
+: rel-relative-2/2 4 ;
+: rel-relative-2 5 ;
+: rel-relative-3 6 ;
+
+: compiled ( -- n ) building get length code-format * ;
 
 : rel-type, ( arg class type -- )
     #! Write a relocation instruction for the runtime image
     #! loader.
     over >r >r >r 16 shift r> 8 shift bitor r> bitor rel,
-    compiled-offset r> rel-absolute-cell = cell 4 ? - rel, ;
+    compiled r> rel-absolute-cell = cell 4 ? - rel, ;
 
 : rel-dlsym ( name dll class -- )
-    >r 2array add-literal compiled-base - cell / r>
-    1 rel-type, ;
+   >r 2array add-literal r> 1 rel-type, ;
 
-: rel-address ( class -- )
-    #! Relocate address just compiled.
+: rel-here ( class -- )
     dup rel-relative = [ drop ] [ 0 swap 2 rel-type, ] if ;
 
 : rel-word ( word class -- )
-    over primitive? [
-        >r word-primitive r> 0 rel-type,
-    ] [
-        rel-address drop
-    ] if ;
+    over primitive?
+    [ >r word-primitive r> 0 ] [ >r add-literal r> 5 ] if
+    rel-type, ;
 
 : rel-cards ( class -- ) 0 swap 3 rel-type, ;
 
-! This is for fixing up forward references
-GENERIC: resolve ( fixup -- addr )
-
-TUPLE: absolute word ;
-
-M: absolute resolve absolute-word compiled-xt ;
-
-TUPLE: relative word to ;
-
-M: relative resolve
-    [ relative-word compiled-xt ] keep relative-to - ;
-
-GENERIC: fixup ( addr fixup -- )
-
-TUPLE: fixup-cell at ;
-
-C: fixup-cell ( resolver at -- fixup )
-    [ set-fixup-cell-at ] keep [ set-delegate ] keep ;
-
-M: fixup-cell fixup ( addr fixup -- )
-    fixup-cell-at set-compiled-cell ;
-
-TUPLE: fixup-4 at ;
-
-C: fixup-4 ( resolver at -- fixup )
-    [ set-fixup-4-at ] keep [ set-delegate ] keep ;
-
-M: fixup-4 fixup ( addr fixup -- )
-    fixup-4-at set-compiled-4 ;
-
-TUPLE: fixup-bitfield at mask ;
-
-C: fixup-bitfield ( resolver at mask -- fixup )
-    [ set-fixup-bitfield-mask ] keep
-    [ set-fixup-bitfield-at ] keep
-    [ set-delegate ] keep ;
-
-: <fixup-3> ( resolver at -- )
-    #! Only for PowerPC branch instructions.
-    BIN: 11111111111111111111111100 <fixup-bitfield> ;
-
-: <fixup-2> ( resolver at -- )
-    #! Only for PowerPC conditional branch instructions.
-    BIN: 1111111111111100 <fixup-bitfield> ;
-
-: or-compiled ( n off -- )
-    [ compiled-cell bitor ] keep set-compiled-cell ;
-
-M: fixup-bitfield fixup ( addr fixup -- )
-    [ fixup-bitfield-mask bitand ] keep
-    fixup-bitfield-at or-compiled ;
-
-TUPLE: fixup-2/2 at ;
-
-C: fixup-2/2 ( resolver at -- fixup )
-    [ set-fixup-2/2-at ] keep [ set-delegate ] keep ;
-
-M: fixup-2/2 fixup ( addr fixup -- )
-    fixup-2/2-at >r w>h/h r> tuck 4 - or-compiled or-compiled ;
-
-: relative-4 ( word -- )
-    dup rel-relative rel-word
-    compiled-offset <relative>
-    4-just-compiled <fixup-4> deferred-xt ;
-
-: relative-3 ( word -- )
-    #! Labels only -- no image relocation information saved
-    4-just-compiled <relative>
-    4-just-compiled <fixup-3> deferred-xt ;
-
-: relative-2 ( word -- )
-    #! Labels only -- no image relocation information saved
-    4-just-compiled <relative>
-    4-just-compiled <fixup-2> deferred-xt ;
-
-: relative-2/2 ( word -- )
-    #! Labels only -- no image relocation information saved
-    compiled-offset <relative>
-    4-just-compiled <fixup-2/2> deferred-xt ;
-
-: absolute-4 ( word -- )
-    dup rel-absolute rel-word
-    <absolute> 4-just-compiled <fixup-4> deferred-xt ;
-
-: absolute-2/2 ( word -- )
-    dup rel-2/2 rel-word
-    <absolute> cell-just-compiled <fixup-2/2> deferred-xt ;
-
-: absolute-cell ( word -- )
-    dup rel-absolute-cell rel-word
-    <absolute> cell-just-compiled <fixup-cell> deferred-xt ;
+: rel-literal ( literal class -- )
+    >r add-literal r> 4 rel-type, ;
 
 ! When a word is encountered that has not been previously
 ! compiled, it is pushed onto this vector. Compilation stops
@@ -178,16 +84,12 @@ SYMBOL: compile-words
     over compile-words get member? or
     swap compiled-xts get hash or ;
 
-: fixup-xts ( -- )
-    deferred-xts get [ dup resolve swap fixup ] each ;
-
 : with-compiler ( quot -- )
     [
-        V{ } clone deferred-xts set
         H{ } clone compiled-xts set
         V{ } clone compile-words set
         call
-        fixup-xts
+        finalize-compile
         commit-xts
     ] with-scope ;
 

@@ -1,7 +1,8 @@
-! Copyright (C) 2005 Slava Pestov.
-! See http://factor.sf.net/license.txt for BSD license.
+! Copyright (C) 2005, 2006 Slava Pestov.
+! See http://factorcode.org/license.txt for BSD license.
 IN: assembler
-USING: compiler errors generic kernel math memory words ;
+USING: compiler errors generic kernel math memory namespaces
+words ;
 
 ! See the Motorola or IBM documentation for details. The opcode
 ! names are standard, and the operand order is the same as in
@@ -14,7 +15,7 @@ USING: compiler errors generic kernel math memory words ;
 !
 ! 14 15 10 STW
 
-: insn ( operand opcode -- ) 26 shift bitor assemble-cell ;
+: insn ( operand opcode -- ) 26 shift bitor , ;
 
 : a-form ( d a b c xo rc -- n )
     >r 1 shift >r 6 shift >r 11 shift >r 16 shift >r 21 shift
@@ -160,13 +161,13 @@ USING: compiler errors generic kernel math memory words ;
 
 G: (B) ( dest aa lk -- ) 2 standard-combination ;
 M: integer (B) i-form 18 insn ;
-M: word (B) 0 -rot (B) relative-3 ;
+M: word (B) 0 -rot (B) rel-relative-3 rel-word ;
 
 : B 0 0 (B) ; : BL 0 1 (B) ;
 
 GENERIC: BC
 M: integer BC 0 0 b-form 16 insn ;
-M: word BC >r 0 BC r> relative-2 ;
+M: word BC >r 0 BC r> rel-relative-2 rel-word ;
 
 : BLT 12 0 rot BC ;  : BGE 4 0 rot BC ;
 : BGT 12 1 rot BC ;  : BLE 4 1 rot BC ;
