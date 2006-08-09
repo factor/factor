@@ -22,7 +22,6 @@ void init_factor(const char* image,
 	userenv[CARD_OFF_ENV] = tag_cell(cards_offset);
 	userenv[IMAGE_ENV] = tag_object(from_char_string(image));
 	userenv[CELL_SIZE_ENV] = tag_fixnum(sizeof(CELL));
-	userenv[COMPILED_BASE_ENV] = tag_cell(compiling.base);
 }
 
 INLINE bool factor_arg(const char* str, const char* arg, CELL* value)

@@ -179,6 +179,9 @@ void undefined_symbol(void)
 
 INLINE CELL get_literal(CELL literal_start, CELL num)
 {
+	if(!literal_start)
+		critical_error("Only RT_LABEL relocations can appear in the label-relocation-table",0);
+
 	return get(LITERAL_REF(literal_start,num));
 }
 
@@ -209,9 +212,13 @@ CELL get_rel_word(F_REL *rel, CELL literal_start)
 	return (CELL)word->xt;
 }
 
-INLINE CELL compute_code_rel(F_REL *rel, CELL original,
-	CELL offset, CELL literal_start)
+INLINE CELL compute_code_rel(F_REL *rel,
+	CELL code_start, CELL literal_start,
+	F_VECTOR *labels)
 {
+	CELL offset = rel->offset + code_start;
+	F_ARRAY *array = untag_array_fast(labels->array);
+
 	switch(REL_TYPE(rel))
 	{
 	case RT_PRIMITIVE:
@@ -226,13 +233,20 @@ INLINE CELL compute_code_rel(F_REL *rel, CELL original,
 		return LITERAL_REF(literal_start,REL_ARGUMENT(rel));
 	case RT_WORD:
 		return get_rel_word(rel,literal_start);
+	case RT_LABEL:
+		if(labels == NULL)
+			critical_error("RT_LABEL can only appear in label-relocation-table",0);
+
+		return to_fixnum(get(AREF(array,REL_ARGUMENT(rel))))
+			+ code_start;
 	default:
 		critical_error("Unsupported rel type",rel->type);
 		return -1;
 	}
 }
 
-INLINE void relocate_code_step(F_REL *rel, CELL code_start, CELL literal_start)
+void relocate_code_step(F_REL *rel, CELL code_start, CELL literal_start,
+	F_VECTOR *labels)
 {
 	CELL original;
 	CELL new_value;
@@ -270,7 +284,7 @@ INLINE void relocate_code_step(F_REL *rel, CELL code_start, CELL literal_start)
 
 	/* to_c_string can fill up the heap */
 	maybe_gc(0);
-	new_value = compute_code_rel(rel,original,offset,literal_start);
+	new_value = compute_code_rel(rel,code_start,literal_start,labels);
 
 	switch(REL_CLASS(rel))
 	{
@@ -321,7 +335,7 @@ CELL relocate_code_next(CELL relocating)
 
 	/* apply relocations */
 	while(rel < rel_end)
-		relocate_code_step(rel++,code_start,literal_start);
+		relocate_code_step(rel++,code_start,literal_start,NULL);
 	
 	CELL *scan = (CELL*)literal_start;
 	CELL *literal_end = (CELL*)(literal_start + compiled->literal_length);

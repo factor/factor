@@ -29,7 +29,6 @@ CELL callframe_end;
 #define GEN_ENV           15 /* set to gen_count */
 #define IMAGE_ENV         16 /* image name */
 #define CELL_SIZE_ENV     17 /* sizeof(CELL) */
-#define COMPILED_BASE_ENV 18 /* base of code heap */
 
 /* TAGGED user environment data; see getenv/setenv prims */
 DLLEXPORT CELL userenv[USER_ENV];

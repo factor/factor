@@ -129,14 +129,14 @@ math-internals namespaces sequences words ;
 
 : simple-overflow ( word -- )
     >r
-    <label> "end" set
+    "end" define-label
     "end" get BNO
     { "x" "y" } [ operand ] map prune [ dup untag-fixnum ] each
     3 "y" operand "x" operand r> execute
     "s48_long_to_bignum" f %alien-invoke
     ! An untagged pointer to the bignum is now in r3; tag it
     3 "r" operand bignum-tag ORI
-    "end" get save-xt ; inline
+    "end" get resolve-label ; inline
 
 \ fixnum+ [
     finalize-contents
@@ -164,7 +164,7 @@ math-internals namespaces sequences words ;
 
 \ fixnum* [
     finalize-contents
-    <label> "end" set
+    "end" define-label
     "r" operand "x" operand untag-fixnum
     0 MTXER
     12 "y" operand "r" operand MULLWO.
@@ -178,7 +178,7 @@ math-internals namespaces sequences words ;
     "s48_bignum_arithmetic_shift" f %alien-invoke
     ! An untagged pointer to the bignum is now in r3; tag it
     3 12 bignum-tag ORI
-    "end" get save-xt
+    "end" get resolve-label
     "s" operand 12 MR
 ] H{
     { +input { { f "x" } { f "y" } } }
@@ -192,8 +192,8 @@ math-internals namespaces sequences words ;
     #! through to the end, and the result is in "x" operand.
     #! Otherwise it jumps to the "no-overflow" label and the
     #! result is in "r" operand.
-    <label> "end" set
-    <label> "no-overflow" set
+    "end" define-label
+    "no-overflow" define-label
     "r" operand "x" operand "y" operand DIVW
     ! if the result is greater than the most positive fixnum,
     ! which can only ever happen if we do
@@ -209,9 +209,9 @@ math-internals namespaces sequences words ;
     finalize-contents
     generate-fixnum/i
     "end" get B
-    "no-overflow" get save-xt
+    "no-overflow" get resolve-label
     "r" operand "x" operand tag-fixnum
-    "end" get save-xt
+    "end" get resolve-label
 ] H{
     { +input { { f "x" } { f "y" } } }
     { +scratch { { f "r" } { f "s" } } }
@@ -224,10 +224,10 @@ math-internals namespaces sequences words ;
     generate-fixnum/i
     0 "s" operand LI
     "end" get B
-    "no-overflow" get save-xt
+    "no-overflow" get resolve-label
     generate-fixnum-mod
     "r" operand "x" operand tag-fixnum
-    "end" get save-xt
+    "end" get resolve-label
 ] H{
     { +input { { f "x" } { f "y" } } }
     { +scratch { { f "r" } { f "s" } } }
@@ -276,8 +276,8 @@ math-internals namespaces sequences words ;
 } define-intrinsic
 
 \ type [
-    <label> "f" set
-    <label> "end" set
+    "f" define-label
+    "end" define-label
     ! Get the tag
     "obj" operand "y" operand tag-mask ANDI
     ! Tag the tag
@@ -294,10 +294,10 @@ math-internals namespaces sequences words ;
     "x" operand "obj" operand object-tag neg LWZ
     "x" operand dup untag
     "end" get B
-    "f" get save-xt
+    "f" get resolve-label
     ! The pointer is equal to 3. Load F_TYPE (9).
     f type tag-bits shift "x" operand LI
-    "end" get save-xt
+    "end" get resolve-label
 ] H{
     { +input { { f "obj" } } }
     { +scratch { { f "x" } { f "y" } } }

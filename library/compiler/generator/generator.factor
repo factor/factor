@@ -42,17 +42,23 @@ UNION: #terminal
 
 : init-generator ( -- )
     V{ } clone relocation-table set
-    V{ } clone literal-table set ;
+    V{ } clone literal-table set
+    V{ } clone label-table set
+    V{ } clone label-relocation-table set ;
 
 : generate-1 ( word node quot -- | quot: node -- )
-    [
+    #! Generate the code, then dump five vectors to pass to
+    #! add-compiled-block.
+    pick f save-xt [
         init-generator
         init-templates
         generate-code
         relocation-table get
         literal-table get
+        label-table get
+        label-relocation-table get
     ] V{ } make
-    code-format 2swap add-compiled-block swap save-xt ;
+    code-format add-compiled-block save-xt ;
 
 SYMBOL: generate-queue
 
@@ -90,9 +96,6 @@ M: node generate-node ( node -- next ) drop iterate-next ;
     tail-call? [ %jump f ] [ %call iterate-next ] if ;
 
 M: #label generate-node ( node -- next )
-    #! We remap the IR node's label to a new label object here,
-    #! to avoid problems with two IR #label nodes having the
-    #! same label in different lexical scopes.
     dup node-param dup generate-call >r
     swap node-child generate-word r> ;
 
@@ -103,8 +106,8 @@ M: #label generate-node ( node -- next )
 : generate-if ( node label -- next )
     <label> [
         >r >r node-children first2 generate-nodes
-        r> r> end-false-branch save-xt generate-nodes
-    ] keep save-xt iterate-next ;
+        r> r> end-false-branch resolve-label generate-nodes
+    ] keep resolve-label iterate-next ;
 
 M: #if generate-node ( node -- next )
     [
@@ -125,12 +128,12 @@ M: #if generate-node ( node -- next )
     [with-template] "if-intrinsic" set-word-prop ;
 
 : if>boolean-intrinsic ( label -- )
-    <label> "end" set
+    "end" define-label
     f 0 <int-vreg> load-literal
     "end" get %jump-label
-    save-xt
+    resolve-label
     t 0 <int-vreg> load-literal
-    "end" get save-xt
+    "end" get resolve-label
     0 <int-vreg> phantom-d get phantom-push
     compute-free-vregs ;
 
@@ -154,7 +157,7 @@ M: #call-label generate-node ( node -- next )
     node-param generate-call ;
 
 ! #dispatch
-: target-label ( label -- ) 0 , rel-absolute-cell rel-word ;
+: target-label ( label -- ) 0 , rel-absolute-cell rel-label ;
 
 : dispatch-head ( node -- label/node )
     #! Output the jump table insn and return a list of
@@ -167,9 +170,9 @@ M: #call-label generate-node ( node -- next )
 
 : dispatch-body ( label/node -- )
     <label> swap [
-        first2 save-xt generate-nodes end-basic-block
+        first2 resolve-label generate-nodes end-basic-block
         dup %jump-label
-    ] each save-xt ;
+    ] each resolve-label ;
 
 M: #dispatch generate-node ( node -- next )
     #! The parameter is a list of nodes, each one is a branch to
@@ -220,9 +223,10 @@ M: #shuffle generate-node ( #shuffle -- )
 ! #return
 M: #return generate-node drop end-basic-block %return f ;
 
-! These constants must match native/card.h
+! These constants must match vm/memory.h
 : card-bits 7 ;
 : card-mark HEX: 80 ;
 
+! These constants must match vm/layouts.h
 : float-offset 8 float-tag - ;
 : string-offset 3 cells object-tag - ;

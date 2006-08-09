@@ -319,19 +319,35 @@ void deposit_vector(F_VECTOR *vector, CELL format)
 	compiling.here += count * format;
 }
 
-void add_compiled_block(F_VECTOR *code, CELL code_format,
-	F_VECTOR *reloc, F_VECTOR *literals)
+void fixup_labels(F_VECTOR *label_rel, CELL code_start, CELL literal_start,
+	F_VECTOR *labels)
+{
+	F_ARRAY *array = untag_array_fast(labels->array);
+	CELL length = untag_fixnum_fast(label_rel->top);
+	CELL i;
+	
+	for(i = 0; i < length; i += 2)
+	{
+		F_REL rel;
+		rel.type = to_cell(get(AREF(array,i)));
+		rel.offset = to_cell(get(AREF(array,i + 1)));
+		relocate_code_step(&rel,code_start,literal_start,labels);
+	}
+}
+
+void add_compiled_block(CELL code_format, F_VECTOR *code, F_VECTOR *label_rel,
+	F_VECTOR *labels, F_VECTOR *literals, F_VECTOR *rel)
 {
 	CELL start = compiling.here;
 	CELL code_length = untag_fixnum_fast(code->top) * code_format;
-	CELL reloc_length = untag_fixnum_fast(reloc->top) * CELLS;
+	CELL rel_length = untag_fixnum_fast(rel->top) * CELLS;
 	CELL literal_length = untag_fixnum_fast(literals->top) * CELLS;
 
 	/* compiled header */
 	F_COMPILED header;
 	header.header = COMPILED_HEADER;
 	header.code_length = align8(code_length);
-	header.reloc_length = reloc_length;
+	header.reloc_length = rel_length;
 	header.literal_length = literal_length;
 	memcpy((void*)compiling.here,&header,sizeof(F_COMPILED));
 	compiling.here += sizeof(F_COMPILED);
@@ -340,11 +356,14 @@ void add_compiled_block(F_VECTOR *code, CELL code_format,
 	deposit_vector(code,code_format);
 	compiling.here = align8(compiling.here);
 
-	/* relocation info */
-	deposit_vector(reloc,CELLS);
+	/* relation info */
+	deposit_vector(rel,CELLS);
 
 	/* literals */
 	deposit_vector(literals,CELLS);
+
+	/* labels */
+	fixup_labels(label_rel,start + sizeof(F_COMPILED),0,labels);
 
 	/* push the XT of the new word on the stack */
 	box_unsigned_cell(start + sizeof(F_COMPILED));
@@ -352,12 +371,14 @@ void add_compiled_block(F_VECTOR *code, CELL code_format,
 
 void primitive_add_compiled_block(void)
 {
-	F_VECTOR *literals = untag_vector(dpop());
-	F_VECTOR *rel = untag_vector(dpop());
 	CELL code_format = to_cell(dpop());
 	F_VECTOR *code = untag_vector(dpop());
-	
-	add_compiled_block(code,code_format,rel,literals);
+	F_VECTOR *label_rel = untag_vector(dpop());
+	F_VECTOR *labels = untag_vector(dpop());
+	F_VECTOR *literals = untag_vector(dpop());
+	F_VECTOR *rel = untag_vector(dpop());
+
+	add_compiled_block(code_format,code,label_rel,labels,literals,rel);
 }
 
 void primitive_finalize_compile(void)

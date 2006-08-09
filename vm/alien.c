@@ -46,13 +46,6 @@ void *unbox_alien(void)
 	return alien_offset(dpop());
 }
 
-/* pop ( alien n ) from datastack, return alien's address plus n */
-INLINE void *alien_pointer(void)
-{
-	F_FIXNUM offset = unbox_signed_cell();
-	return unbox_alien() + offset;
-}
-
 /* make an alien */
 ALIEN *make_alien(CELL delegate, CELL displacement)
 {
@@ -98,7 +91,14 @@ void fixup_alien(ALIEN *d)
 	d->expired = true;
 }
 
-/* define words to read/write numericals values at an alien address */
+/* pop ( alien n ) from datastack, return alien's address plus n */
+INLINE void *alien_pointer(void)
+{
+	F_FIXNUM offset = unbox_signed_cell();
+	return unbox_alien() + offset;
+}
+
+/* define words to read/write values at an alien address */
 #define DEF_ALIEN_SLOT(name,type,boxer) \
 void primitive_alien_##name (void) \
 { \
@@ -139,7 +139,7 @@ void box_value_struct(void *src, CELL size)
 }
 
 /* for FFI calls returning an 8-byte struct. This only
-happends on Intel Mac OS X */
+happens on Intel Mac OS X */
 void box_value_pair(CELL x, CELL y)
 {
 	F_ARRAY *array = byte_array(8);

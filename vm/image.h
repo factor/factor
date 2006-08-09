@@ -53,7 +53,9 @@ typedef enum {
 	/* an indirect literal from the word's literal table */
 	RT_LITERAL,
 	/* a word */
-	RT_WORD
+	RT_WORD,
+	/* a local label */
+	RT_LABEL
 } F_RELTYPE;
 
 #define REL_ABSOLUTE_CELL 0
@@ -88,6 +90,8 @@ INLINE void code_fixup(CELL *cell)
 
 void relocate_data();
 
+void relocate_code_step(F_REL *rel, CELL code_start, CELL literal_start,
+	F_VECTOR *labels);
 CELL relocate_code_next(CELL relocating);
 void relocate_code();
 

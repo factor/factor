@@ -162,12 +162,14 @@ words ;
 G: (B) ( dest aa lk -- ) 2 standard-combination ;
 M: integer (B) i-form 18 insn ;
 M: word (B) 0 -rot (B) rel-relative-3 rel-word ;
+M: label (B) 0 -rot (B) rel-relative-3 rel-label ;
 
 : B 0 0 (B) ; : BL 0 1 (B) ;
 
 GENERIC: BC
 M: integer BC 0 0 b-form 16 insn ;
 M: word BC >r 0 BC r> rel-relative-2 rel-word ;
+M: label BC >r 0 BC r> rel-relative-2 rel-label ;
 
 : BLT 12 0 rot BC ;  : BGE 4 0 rot BC ;
 : BGT 12 1 rot BC ;  : BLE 4 1 rot BC ;
