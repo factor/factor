@@ -237,7 +237,7 @@ INLINE CELL compute_code_rel(F_REL *rel,
 		if(labels == NULL)
 			critical_error("RT_LABEL can only appear in label-relocation-table",0);
 
-		return to_fixnum(get(AREF(array,REL_ARGUMENT(rel))))
+		return to_cell(get(AREF(array,REL_ARGUMENT(rel))))
 			+ code_start;
 	default:
 		critical_error("Unsupported rel type",rel->type);
@@ -249,69 +249,41 @@ void relocate_code_step(F_REL *rel, CELL code_start, CELL literal_start,
 	F_VECTOR *labels)
 {
 	CELL original;
-	CELL new_value;
+	CELL absolute_value;
+	CELL relative_value;
 	CELL offset = rel->offset + code_start;
-
-	switch(REL_CLASS(rel))
-	{
-	case REL_ABSOLUTE_CELL:
-		original = get(offset);
-		break;
-	case REL_ABSOLUTE:
-		original = *(u32*)offset;
-		break;
-	case REL_RELATIVE:
-		original = *(u32*)offset - (offset + sizeof(u32));
-		break;
-	case REL_ABSOLUTE_2_2:
-		original = reloc_get_2_2(offset);
-		break;
-	case REL_RELATIVE_2_2:
-		original = reloc_get_2_2(offset) - (offset + sizeof(u32));
-		break;
-	case REL_RELATIVE_2:
-		original = *(u32*)offset;
-		original &= REL_RELATIVE_2_MASK;
-		break;
-	case REL_RELATIVE_3:
-		original = *(u32*)offset;
-		original &= REL_RELATIVE_3_MASK;
-		break;
-	default:
-		critical_error("Unsupported rel class",REL_CLASS(rel));
-		return;
-	}
 
 	/* to_c_string can fill up the heap */
 	maybe_gc(0);
-	new_value = compute_code_rel(rel,code_start,literal_start,labels);
+	absolute_value = compute_code_rel(rel,code_start,literal_start,labels);
+	relative_value = absolute_value - offset;
 
 	switch(REL_CLASS(rel))
 	{
 	case REL_ABSOLUTE_CELL:
-		put(offset,new_value);
+		put(offset,absolute_value);
 		break;
 	case REL_ABSOLUTE:
-		*(u32*)offset = new_value;
+		*(u32*)offset = absolute_value;
 		break;
 	case REL_RELATIVE:
-		*(u32*)offset = new_value - (offset + sizeof(u32));
+		*(u32*)offset = relative_value - sizeof(u32);
 		break;
 	case REL_ABSOLUTE_2_2:
-		reloc_set_2_2(offset,new_value);
+		reloc_set_2_2(offset,absolute_value);
 		break;
 	case REL_RELATIVE_2_2:
-		reloc_set_2_2(offset,new_value - (offset + sizeof(u32)));
+		reloc_set_2_2(offset,relative_value);
 		break;
 	case REL_RELATIVE_2:
 		original = *(u32*)offset;
 		original &= ~REL_RELATIVE_2_MASK;
-		*(u32*)offset = (original | new_value);
+		*(u32*)offset = (original | relative_value);
 		break;
 	case REL_RELATIVE_3:
 		original = *(u32*)offset;
 		original &= ~REL_RELATIVE_3_MASK;
-		*(u32*)offset = (original | new_value);
+		*(u32*)offset = (original | relative_value);
 		break;
 	default:
 		critical_error("Unsupported rel class",REL_CLASS(rel));

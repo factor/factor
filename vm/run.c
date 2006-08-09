@@ -322,7 +322,7 @@ void deposit_vector(F_VECTOR *vector, CELL format)
 void fixup_labels(F_VECTOR *label_rel, CELL code_start, CELL literal_start,
 	F_VECTOR *labels)
 {
-	F_ARRAY *array = untag_array_fast(labels->array);
+	F_ARRAY *array = untag_array_fast(label_rel->array);
 	CELL length = untag_fixnum_fast(label_rel->top);
 	CELL i;
 	

@@ -5,27 +5,27 @@ USING: arrays assembler errors generic hashtables kernel
 kernel-internals math namespaces prettyprint queues
 sequences strings vectors words ;
 
-: compiled ( -- n ) building get length code-format * ;
+: compiled-offset ( -- n ) building get length code-format * ;
 
 TUPLE: label # offset ;
 
 SYMBOL: label-table
 
 : push-label ( label -- )
-    label-table get 2dup memq?
-    [ 2drop ] [ dup length pick set-label-# push ] if ;
+    label-table get dup length pick set-label-# push ;
 
-C: label ( -- label ) ;
+C: label ( -- label )
+    compiled-offset over set-label-offset dup push-label ;
 
 : define-label ( name -- ) <label> swap set ;
 
 : resolve-label ( label -- )
-    compiled swap set-label-offset ;
+    compiled-offset swap set-label-offset ;
 
 SYMBOL: compiled-xts
 
-: save-xt ( word -- )
-    compiled swap compiled-xts get set-hash ;
+: save-xt ( word xt -- )
+    swap compiled-xts get set-hash ;
 
 : commit-xts ( -- )
     compiled-xts get [ swap set-word-xt ] hash-each ;
@@ -54,13 +54,13 @@ SYMBOL: label-relocation-table
     #! Write a relocation instruction for the runtime image
     #! loader.
     over >r >r >r 16 shift r> 8 shift bitor r> bitor
-    compiled r> rel-absolute-cell = cell 4 ? - 2array ;
+    compiled-offset r> rel-absolute-cell = cell 4 ? - 2array ;
 
 : rel, ( arg class type -- )
-    (rel) relocation-table get nappend ;
+    (rel) relocation-table get swap nappend ;
 
 : label, ( arg class type -- )
-    (rel) label-relocation-table get nappend ;
+    (rel) label-relocation-table get swap nappend ;
 
 : rel-dlsym ( name dll class -- )
    >r 2array add-literal r> 1 rel, ;
@@ -79,7 +79,7 @@ SYMBOL: label-relocation-table
     >r add-literal r> 4 rel, ;
 
 : rel-label ( label class -- )
-    >r dup push-label label-# r> 5 label, ;
+    >r label-# r> 6 label, ;
 
 ! When a word is encountered that has not been previously
 ! compiled, it is pushed onto this vector. Compilation stops

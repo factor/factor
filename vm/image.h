@@ -66,8 +66,8 @@ typedef enum {
 #define REL_RELATIVE_2 5
 #define REL_RELATIVE_3 6
 
-#define REL_RELATIVE_2_MASK 0x3fffffc
-#define REL_RELATIVE_3_MASK 0xfffc
+#define REL_RELATIVE_2_MASK 0xfffc
+#define REL_RELATIVE_3_MASK 0x3fffffc
 
 /* the rel type is built like a cell to avoid endian-specific code in
 the compiler */
@@ -94,13 +94,6 @@ void relocate_code_step(F_REL *rel, CELL code_start, CELL literal_start,
 	F_VECTOR *labels);
 CELL relocate_code_next(CELL relocating);
 void relocate_code();
-
-/* on PowerPC, return the 32-bit literal being loaded at the code at the
-given address */
-INLINE CELL reloc_get_2_2(CELL cell)
-{
-	return ((get(cell - CELLS) & 0xffff) << 16) | (get(cell) & 0xffff);
-}
 
 INLINE void reloc_set_2_2(CELL cell, CELL value)
 {

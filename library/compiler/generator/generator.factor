@@ -55,7 +55,7 @@ UNION: #terminal
         generate-code
         relocation-table get
         literal-table get
-        label-table get
+        label-table get [ label-offset ] map
         label-relocation-table get
     ] V{ } make
     code-format add-compiled-block save-xt ;
