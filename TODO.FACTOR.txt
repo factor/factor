@@ -29,11 +29,13 @@
 - the UI listener has a shitty design. perhaps it should not call out
   to the real listener.
 - remaining walker tasks:
+  - integrate walker with listener
   - <input> handled by walker itself
   - ^W in interactor
   - ^I in interactor
   - error handling is still screwy
   - continuation handling is also screwy
+  - keyboard commands
 - add-gadget, model-changed, set-model should compile
 - shortcuts:
   - find a listener
@@ -53,9 +55,6 @@
   - more efficient multi-line inserts
   - editor should support stream output protocol
 - cocoa: windows are not updated while resizing
-- add some handy services:
-  - base conversion
-  - search help for selection
 - grid slows down with 2000 lines
 - ui uses too much cpu time idling
 - see if its possible to only repaint dirty regions
@@ -67,6 +66,7 @@
   - polish OS X menu bar code
 - variable width word wrap
 - slider needs to be modelized
+- structure editor
 
 + module system:
 
@@ -79,11 +79,16 @@
 - seeing a C struct word should show its def
 - modularize core
 - TUPLE: module files tests articles article main ;
-- requesting a list of assets loaded from a specific file
 - file out
+- track module files and modification times, and a list of assets loaded
+  from that file
+- 'changes' word, asks if files changed on disk from loaded modules
+  should be reloaded -- do this in the right order
 
 + compiler/ffi:
 
+- UI dataflow visualizer
+- ppc64 backend
 - we need to optimize  [ dup array? [ array? ] [ array? ] if ]
 - mac intel: struct returns from objc methods
 - fix compiled gc check
@@ -94,11 +99,15 @@
 - C functions returning structs by value
 - code gc
 - infer which variables are read, written in a quotation
+- compiled continuations
+- compiled call traces
 
 + misc:
 
+- faster I/O
+- buffer-ptr should be an alien
+- faster Unix stream-read#
 - EOF kills a port
-- make a word to do '0 swap set-length'
 - slice: if sequence or seq start is changed, abstraction violation
 - hashed generic method dispatch
 - fix this:

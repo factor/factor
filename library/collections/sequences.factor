@@ -12,6 +12,8 @@ GENERIC: like ( seq seq -- seq )
 
 : empty? ( seq -- ? ) length zero? ; inline
 
+: delete-all ( seq -- ) 0 swap set-length ;
+
 : first 0 swap nth ; inline
 : second 1 swap nth ; inline
 : third 2 swap nth ; inline

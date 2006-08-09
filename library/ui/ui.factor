@@ -131,8 +131,7 @@ C: titled-gadget ( gadget title -- )
     reset-world ;
 
 : restore-windows ( -- )
-    windows get [ second ] map
-    0 windows get set-length
+    windows get [ [ second ] map ] keep delete-all
     [ dup reset-world open-window* ] each
     forget-rollover ;
 

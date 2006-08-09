@@ -106,9 +106,7 @@ SYMBOL: phantom-r
     over loc? over not or [ 2drop ] [ %replace ] if ;
 
 : vregs>stack ( phantom -- )
-    [
-        dup phantom-locs* [ vreg>stack ] 2each 0
-    ] keep set-length ;
+    [ dup phantom-locs* [ vreg>stack ] 2each ] keep delete-all ;
 
 : (live-locs) ( seq -- seq )
     dup phantom-locs* [ 2array ] 2map

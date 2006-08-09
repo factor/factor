@@ -153,5 +153,5 @@ M: history (add-history) ( history vector -- )
 GENERIC: add-history ( history -- )
 
 M: history add-history ( history -- )
-    0 over history-forward set-length
+    dup history-forward delete-all
     dup history-back (add-history) ;

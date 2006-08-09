@@ -197,7 +197,7 @@ M: #push generate-node ( #push -- )
         cut-phantom
     ] [
         [ phantom-locs ] keep [ length head-slice* ] keep
-        [ append 0 ] keep set-length
+        [ append ] keep delete-all
     ] if ;
 
 : phantom-shuffle-inputs ( shuffle -- locs locs )

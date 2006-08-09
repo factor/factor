@@ -212,7 +212,7 @@ M: input-port stream-read1 ( stream -- char/f )
     ] if ;
 
 : can-read-count? ( count reader -- ? )
-    0 over port-sbuf set-length read-step ;
+    dup port-sbuf delete-all read-step ;
 
 TUPLE: read-task count ;
 

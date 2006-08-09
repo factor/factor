@@ -39,11 +39,9 @@ SYMBOL: out
     translate-seq dup length 59 + 60 /i
     [ seg out get stream-print ] each-with ;
 
-: clear-seq ( seq -- ) 0 swap set-length ;
-
 : do-line ( seq line -- seq )
     dup first ">;" memq? [
-        over show-seq out get stream-print dup clear-seq
+        over show-seq out get stream-print dup delete-all
     ] [
         over push
     ] if ;
