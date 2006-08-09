@@ -35,8 +35,3 @@ USING: kernel sequences errors namespaces math ;
     ] [
         2dup - nip [ factorial ] keep rot pick >r factorial-part r> /
     ] if ;
-
-: binomial ( n k -- nCk )
-    #! same as nCk
-    nCk ;
-
