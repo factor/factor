@@ -18,6 +18,6 @@ INLINE unsigned long fix_stack_ptr(unsigned long sp)
 
 INLINE void pass_arg0(SIGSEGV_THREAD_STATE_TYPE *thr_state, CELL arg)
 {
-	*SIGSEGV_STACK_POINTER(thr_state) = arg;
+	put(SIGSEGV_STACK_POINTER(thr_state),arg);
 	SIGSEGV_STACK_POINTER(thr_state) -= CELLS;
 }
