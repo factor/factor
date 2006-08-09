@@ -27,6 +27,7 @@ endif
 OBJS = $(PLAF_OBJS) \
 	vm/alien.o \
 	vm/bignum.o \
+	vm/compiler.o \
 	vm/debug.o \
 	vm/factor.o \
 	vm/ffi_test.o \

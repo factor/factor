@@ -97,22 +97,3 @@ void signal_error(int signal);
 void type_error(CELL type, CELL tagged);
 void primitive_throw(void);
 void primitive_die(void);
-
-/* The compiled code heap is structured into blocks. */
-typedef struct
-{
-	CELL header; /* = COMPILED_HEADER */
-	CELL code_length; /* # bytes */
-	CELL reloc_length; /* # bytes, see relocate.h */
-	CELL literal_length; /* # bytes, see relocate.h */
-} F_COMPILED;
-
-#define COMPILED_HEADER 0x01c3babe
-
-void init_compiler(CELL size);
-void collect_literals(void);
-void primitive_add_compiled_block(void);
-
-CELL last_flush;
-
-void primitive_finalize_compile(void);

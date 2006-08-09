@@ -41,46 +41,6 @@ INLINE void data_fixup(CELL *cell)
 		*cell += (tenured.base - data_relocation_base);
 }
 
-typedef enum {
-	/* arg is a primitive number */
-	RT_PRIMITIVE,
-	/* arg is a literal table index, holding an array pair (symbol/dll) */
-	RT_DLSYM,
-	/* store current address here */
-	RT_HERE,
-	/* store the offset of the card table from the data heap base */
-	RT_CARDS,
-	/* an indirect literal from the word's literal table */
-	RT_LITERAL,
-	/* a word */
-	RT_WORD,
-	/* a local label */
-	RT_LABEL
-} F_RELTYPE;
-
-#define REL_ABSOLUTE_CELL 0
-#define REL_ABSOLUTE 1
-#define REL_RELATIVE 2
-#define REL_ABSOLUTE_2_2 3
-#define REL_RELATIVE_2_2 4
-#define REL_RELATIVE_2 5
-#define REL_RELATIVE_3 6
-
-#define REL_RELATIVE_2_MASK 0xfffc
-#define REL_RELATIVE_3_MASK 0x3fffffc
-
-/* the rel type is built like a cell to avoid endian-specific code in
-the compiler */
-#define REL_TYPE(r) ((r)->type & 0x000000ff)
-#define REL_CLASS(r) (((r)->type & 0x0000ff00) >> 8)
-#define REL_ARGUMENT(r) (((r)->type & 0xffff0000) >> 16)
-
-/* code relocation consists of a table of entries for each fixup */
-typedef struct {
-	CELL type;
-	CELL offset;
-} F_REL;
-
 CELL code_relocation_base;
 
 INLINE void code_fixup(CELL *cell)
@@ -89,14 +49,4 @@ INLINE void code_fixup(CELL *cell)
 }
 
 void relocate_data();
-
-void relocate_code_step(F_REL *rel, CELL code_start, CELL literal_start,
-	F_VECTOR *labels);
-CELL relocate_code_next(CELL relocating);
 void relocate_code();
-
-INLINE void reloc_set_2_2(CELL cell, CELL value)
-{
-	put(cell - CELLS,((get(cell - CELLS) & ~0xffff) | ((value >> 16) & 0xffff)));
-	put(cell,((get(cell) & ~0xffff) | (value & 0xffff)));
-}
