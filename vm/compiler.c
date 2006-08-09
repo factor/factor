@@ -62,7 +62,7 @@ INLINE CELL compute_code_rel(F_REL *rel,
 	CELL code_start, CELL literal_start,
 	F_VECTOR *labels)
 {
-	CELL offset = rel->offset + code_start;
+	CELL offset = code_start + rel->offset;
 	F_ARRAY *array;
 
 	switch(REL_TYPE(rel))
@@ -277,6 +277,16 @@ void primitive_add_compiled_block(void)
 
 void primitive_finalize_compile(void)
 {
+	F_ARRAY *array = untag_array(dpop());
+	CELL count = untag_fixnum_fast(array->capacity);
+	CELL i;
+	for(i = 0; i < count; i++)
+	{
+		F_ARRAY *pair = untag_array(get(AREF(array,i)));
+		F_WORD *word = untag_word(get(AREF(pair,0)));
+		word->xt = to_cell(get(AREF(pair,1)));
+	}
+	
 	flush_icache((void*)last_flush,compiling.here - last_flush);
 	iterate_code_heap(last_flush,compiling.here,finalize_code_block);
 	last_flush = compiling.here;

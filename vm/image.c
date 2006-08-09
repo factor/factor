@@ -59,7 +59,7 @@ void load_image(const char* filename)
 			&& size != fread((void*)compiling.base,1,size,file))
 			fatal_error("Wrong code heap length",h.code_size);
 
-		compiling.here = compiling.base + h.code_size;
+		last_flush = compiling.here = compiling.base + h.code_size;
 		code_relocation_base = h.code_relocation_base;
 	}
 

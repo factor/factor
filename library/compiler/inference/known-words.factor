@@ -395,7 +395,7 @@ sequences strings vectors words prettyprint ;
 
 \ array>vector [ [ array ] [ vector ] ] "infer-effect" set-word-prop
 
-\ finalize-compile [ [ ] [ ] ] "infer-effect" set-word-prop
+\ finalize-compile [ [ array ] [ ] ] "infer-effect" set-word-prop
 
 \ <string> [ [ integer integer ] [ string ] ] "infer-effect" set-word-prop
 

@@ -241,6 +241,6 @@ GENERIC: void-generic
 [ 10 ] [ branch-fold-regression-1 ] unit-test
 
 ! another regression
-: bar "hey" ; foldable
-: foo bar "hey" = ; inline
-[ 1 ] [ [ foo [ 1 ] [ 2 ] if ] compile-1 ] unit-test
+: constant-branch-fold-0 "hey" ; foldable
+: constant-branch-fold-1 constant-branch-fold-0 "hey" = ; inline
+[ 1 ] [ [ constant-branch-fold-1 [ 1 ] [ 2 ] if ] compile-1 ] unit-test

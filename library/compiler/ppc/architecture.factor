@@ -34,7 +34,8 @@ M: immediate load-literal ( literal vreg -- )
     [ v>operand ] 2apply LOAD ;
 
 M: object load-literal ( literal vreg -- )
-    v>operand [ 0 LOAD32 rel-absolute-2/2 rel-literal ] keep
+    v>operand
+    [ 0 swap LOAD32 rel-absolute-2/2 rel-literal ] keep
     dup 0 LWZ ;
 
 : stack-increment \ stack-reserve get 32 max stack@ 16 align ;
@@ -74,12 +75,12 @@ M: object load-literal ( literal vreg -- )
     0 "flag" operand object-tag CMPI BNE ;
 
 : %dispatch ( -- )
+    #! The value 20 is a magic number. It is the length of the
+    #! instruction sequence that follows
     "n" operand dup 1 SRAWI
-    ! The value 24 is a magic number. It is the length of the
-    ! instruction sequence that follows to be generated.
     0 "scratch" operand LOAD32 rel-absolute-2/2 rel-here
     "n" operand dup "scratch" operand ADD
-    "n" operand dup 24 LWZ
+    "n" operand dup 20 LWZ
     "n" operand MTLR
     BLR ;
 

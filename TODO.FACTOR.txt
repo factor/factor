@@ -104,6 +104,8 @@
 
 + misc:
 
+- growable data heap
+- incremental GC
 - UDP
 - faster I/O
 - buffer-ptr should be an alien

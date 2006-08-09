@@ -27,9 +27,6 @@ SYMBOL: compiled-xts
 : save-xt ( word xt -- )
     swap compiled-xts get set-hash ;
 
-: commit-xts ( -- )
-    compiled-xts get [ swap set-word-xt ] hash-each ;
-
 SYMBOL: literal-table
 
 : add-literal ( obj -- n )
@@ -98,8 +95,7 @@ SYMBOL: compile-words
         H{ } clone compiled-xts set
         V{ } clone compile-words set
         call
-        finalize-compile
-        commit-xts
+        compiled-xts get hash>alist finalize-compile
     ] with-scope ;
 
 : postpone-word ( word -- )
