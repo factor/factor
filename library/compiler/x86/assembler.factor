@@ -266,6 +266,7 @@ GENERIC: PUSH ( op -- )
 M: register PUSH f HEX: 50 short-operand ;
 M: integer PUSH HEX: 68 , 4, ;
 M: callable PUSH 0 PUSH rel-absolute rel-word ;
+M: label PUSH 0 PUSH rel-absolute rel-label ;
 M: operand PUSH BIN: 110 f HEX: ff 1-operand ;
 
 GENERIC: POP ( op -- )
@@ -280,24 +281,26 @@ M: operand (MOV-I) BIN: 000 t HEX: c7 1-operand 4, ;
 GENERIC: MOV ( dst src -- )
 M: integer MOV swap (MOV-I) ;
 M: callable MOV 0 rot (MOV-I) rel-absolute-cell rel-word ;
+M: label MOV 0 rot (MOV-I) rel-absolute-cell rel-label ;
 M: operand MOV HEX: 89 2-operand ;
 
 ( Control flow                                                 )
 GENERIC: JMP ( op -- )
-! M: integer JMP HEX: e9 , from 4, ;
-M: callable JMP 0 JMP rel-relative rel-word ;
+: (JMP) HEX: e9 , 0 4, rel-relative ;
+M: callable JMP (JMP) rel-word ;
+M: label JMP (JMP) rel-label ;
 M: operand JMP BIN: 100 t HEX: ff 1-operand ;
 
 GENERIC: CALL ( op -- )
-! M: integer CALL HEX: e8 , from 4, ;
-M: callable CALL 0 CALL rel-relative rel-word ;
+: (CALL) HEX: e8 , 0 4, rel-relative ;
+M: callable CALL (CALL) rel-word ;
+M: label CALL (CALL) rel-label ;
 M: operand CALL BIN: 010 t HEX: ff 1-operand ;
 
 G: JUMPcc ( addr opcode -- ) 1 standard-combination ;
-! M: integer JUMPcc ( addr opcode -- )
-!     swap HEX: 0f ,  swap ,  from assemble-4 ;
-M: callable JUMPcc ( addr opcode -- )
-    swap >r 0 swap JUMPcc r> rel-relative rel-word ;
+: (JUMPcc) HEX: 0f , , 0 4, rel-relative ;
+M: callable JUMPcc ( addr opcode -- ) (JUMPcc) rel-word ;
+M: label JUMPcc ( addr opcode -- ) (JUMPcc) rel-label ;
 
 : JO  HEX: 80 JUMPcc ;
 : JNO HEX: 81 JUMPcc ;

@@ -4,6 +4,8 @@ USING: alien arrays assembler generic kernel kernel-internals
 math memory namespaces sequences words ;
 IN: compiler
 
+: code-format 1 ; inline
+
 ! x86 register assignments
 ! EAX, ECX, EDX integer vregs
 ! XMM0 - XMM7 float vregs
@@ -106,6 +108,9 @@ M: object load-literal ( literal vreg -- )
 
 : %jump-t ( label -- ) "flag" operand f v>operand CMP JNE ;
 
+: compile-aligned ( -- )
+    compiled-offset [ 8 align ] keep - 0 <array> % ;
+
 : %dispatch ( -- )
     #! Compile a piece of code that jumps to an offset in a
     #! jump table indexed by the fixnum at the top of the stack.
@@ -125,6 +130,8 @@ M: object load-literal ( literal vreg -- )
     compile-aligned
     ! Fix up jump table pointer
     "end" get resolve-label ;
+
+: %target ( label -- ) 0 cell, rel-absolute-cell rel-label ;
 
 : %return ( -- ) %epilogue RET ;
 

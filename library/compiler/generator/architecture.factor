@@ -57,6 +57,9 @@ DEFER: %jump-t ( label vreg -- )
 ! Jump table of addresses (one cell each) is right after this
 DEFER: %dispatch ( vreg -- )
 
+! Jump table entry
+DEFER: %target ( label -- )
+
 ! Return to caller
 DEFER: %return ( -- )
 

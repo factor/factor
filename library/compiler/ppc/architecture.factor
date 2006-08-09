@@ -84,6 +84,8 @@ M: object load-literal ( literal vreg -- )
     "n" operand MTLR
     BLR ;
 
+: %target ( label -- ) 0 , rel-absolute-cell rel-label ;
+
 : %return ( -- ) %epilogue BLR ;
 
 : compile-dlsym ( symbol dll register -- )

@@ -166,7 +166,7 @@ M: #call-label generate-node ( node -- next )
         { +input { { f "n" } } }
         { +scratch { { f "scratch" } } }
     } with-template
-    node-children [ <label> dup target-label 2array ] map ;
+    node-children [ <label> dup %target 2array ] map ;
 
 : dispatch-body ( label/node -- )
     <label> swap [
