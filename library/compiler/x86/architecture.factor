@@ -26,8 +26,7 @@ IN: compiler
 M: ds-loc v>operand ds-loc-n ds-reg reg-stack ;
 M: cs-loc v>operand cs-loc-n cs-reg reg-stack ;
 
-: %alien-invoke ( symbol dll -- )
-    2dup dlsym CALL rel-relative rel-dlsym ;
+: %alien-invoke ( symbol dll -- ) (CALL) rel-dlsym ;
 
 : with-aligned-stack ( n quot -- )
     #! On Linux, there is no requirement to align stack frames,
@@ -122,7 +121,7 @@ M: object load-literal ( literal vreg -- )
     ! on AMD64 we have to load a 64-bit immediate. On x86, this
     ! is redundant.
     "scratch" operand HEX: ffffffff MOV
-    "end" get rel-absolute-cell rel-word
+    "end" get rel-absolute-cell rel-label
     "n" operand "scratch" operand ADD
     ! Jump to jump table entry
     "n" operand [] JMP
