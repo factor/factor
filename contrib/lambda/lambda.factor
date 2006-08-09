@@ -41,7 +41,7 @@ C: linterp ( names-hash )
     H{ } clone <linterp> ;
 
 : (lint) ( linterp -- linterp )
-     lint-read [ drop ] [ lint-eval lint-print lint ] if ;
+     lint-read [ drop ] [ lint-eval lint-print (lint) ] if ;
 
 : lint ( -- linterp )
     lint-boot (lint) ;
