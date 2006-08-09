@@ -98,10 +98,16 @@ INLINE void reloc_set_2_2(CELL cell, CELL value)
 	put(cell,((get(cell) & ~0xffff) | (value & 0xffff)));
 }
 
+INLINE void reloc_set_masked(CELL cell, CELL value, CELL mask)
+{
+	u32 original = *(u32*)cell;
+	original &= ~mask;
+	*(u32*)cell = (original | (value & mask));
+}
+
 void apply_relocation(F_REL *rel, CELL code_start, CELL literal_start,
 	F_VECTOR *labels)
 {
-	CELL original;
 	CELL absolute_value;
 	CELL relative_value;
 	CELL offset = rel->offset + code_start;
@@ -129,14 +135,10 @@ void apply_relocation(F_REL *rel, CELL code_start, CELL literal_start,
 		reloc_set_2_2(offset,relative_value);
 		break;
 	case REL_RELATIVE_2:
-		original = *(u32*)offset;
-		original &= ~REL_RELATIVE_2_MASK;
-		*(u32*)offset = (original | relative_value);
+		reloc_set_masked(offset,relative_value,REL_RELATIVE_2_MASK);
 		break;
 	case REL_RELATIVE_3:
-		original = *(u32*)offset;
-		original &= ~REL_RELATIVE_3_MASK;
-		*(u32*)offset = (original | relative_value);
+		reloc_set_masked(offset,relative_value,REL_RELATIVE_3_MASK);
 		break;
 	default:
 		critical_error("Unsupported rel class",REL_CLASS(rel));
@@ -179,7 +181,7 @@ void init_compiler(CELL size)
 	last_flush = compiling.base;
 }
 
-void deposit_vector(F_VECTOR *vector, CELL format)
+void deposit_integers(F_VECTOR *vector, CELL format)
 {
 	CELL count = untag_fixnum_fast(vector->top);
 	F_ARRAY *array = untag_array_fast(vector->array);
@@ -202,8 +204,12 @@ void deposit_vector(F_VECTOR *vector, CELL format)
 	}
 	else
 		fatal_error("Bad format param to deposit_vector()",format);
-	
-	compiling.here += count * format;
+}
+
+void deposit_objects(F_VECTOR *vector, CELL literal_length)
+{
+	F_ARRAY *array = untag_array_fast(vector->array);
+	memcpy((void*)compiling.here,array + 1,literal_length);
 }
 
 void fixup_labels(F_VECTOR *label_rel, CELL code_start, CELL literal_start,
@@ -226,27 +232,29 @@ void add_compiled_block(CELL code_format, F_VECTOR *code, F_VECTOR *label_rel,
 	F_VECTOR *labels, F_VECTOR *literals, F_VECTOR *rel)
 {
 	CELL start = compiling.here;
-	CELL code_length = untag_fixnum_fast(code->top) * code_format;
+	CELL code_length = align8(untag_fixnum_fast(code->top) * code_format);
 	CELL rel_length = untag_fixnum_fast(rel->top) * CELLS;
 	CELL literal_length = untag_fixnum_fast(literals->top) * CELLS;
 
 	/* compiled header */
 	F_COMPILED header;
-	header.code_length = align8(code_length);
+	header.code_length = code_length;
 	header.reloc_length = rel_length;
 	header.literal_length = literal_length;
 	memcpy((void*)compiling.here,&header,sizeof(F_COMPILED));
 	compiling.here += sizeof(F_COMPILED);
 	
 	/* code */
-	deposit_vector(code,code_format);
-	compiling.here = align8(compiling.here);
+	deposit_integers(code,code_format);
+	compiling.here += code_length;
 
 	/* relation info */
-	deposit_vector(rel,CELLS);
+	deposit_integers(rel,CELLS);
+	compiling.here += rel_length;
 
 	/* literals */
-	deposit_vector(literals,CELLS);
+	deposit_objects(literals,literal_length);
+	compiling.here += literal_length;
 
 	/* labels */
 	fixup_labels(label_rel,start + sizeof(F_COMPILED),0,labels);

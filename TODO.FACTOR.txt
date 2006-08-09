@@ -104,6 +104,7 @@
 
 + misc:
 
+- UDP
 - faster I/O
 - buffer-ptr should be an alien
 - faster Unix stream-read#
