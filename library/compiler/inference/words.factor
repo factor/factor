@@ -29,28 +29,21 @@ IN: inference
 
 TUPLE: rstate label base-case? ;
 
-: nest-node ( -- dataflow current )
-    dataflow-graph get  dataflow-graph off
-    current-node get    current-node off ;
+: nest-node ( -- ) #entry node, ;
 
-: unnest-node ( new-node dataflow current -- new-node )
-    >r >r dataflow-graph get 1array over set-node-children
-    r> dataflow-graph set
-    r> current-node set ;
+: unnest-node ( new-node -- new-node )
+    dup node-param #return node,
+    dataflow-graph get 1array over set-node-children ;
 
-: with-recursive-state ( word label base-case quot -- )
-    >r <rstate> 2array recursive-state [ swap add ] change r>
-    nest-node 2slip unnest-node ; inline
+: add-recursive-state ( word label base-case -- )
+    <rstate> 2array recursive-state [ swap add ] change ;
 
 : inline-block ( word base-case -- node-block variables )
     [
-        copy-inference
-        >r gensym 2dup r> [
-            dup #label >r
-            #entry node,
-            swap word-def infer-quot
-            #return node, r>
-        ] with-recursive-state
+        copy-inference nest-node
+        >r gensym 2dup r> add-recursive-state
+        #label >r word-def infer-quot r>
+        unnest-node
     ] make-hash ;
 
 : apply-infer ( hash -- )
@@ -62,7 +55,7 @@ GENERIC: collect-recursion* ( label node -- )
 M: node collect-recursion* ( label node -- ) 2drop ;
 
 M: #call-label collect-recursion* ( label node -- )
-    tuck node-param = [ node-in-d , ] [ drop ] if ;
+    tuck node-param eq? [ node-in-d , ] [ drop ] if ;
 
 : collect-recursion ( #label -- seq )
     #! Collect the input stacks of all #call-label nodes that
