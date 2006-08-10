@@ -45,9 +45,8 @@ M: float-regs fastcall-regs vregs ;
 : prepare-division CQO ; inline
 
 : load-indirect ( vreg literal -- )
-    #! We use RIP-relative addressing. The '3' is a hardcoded
-    #! instruction length.
-    swap add-literal from 3 - [] MOV ;
+    over 0 MOV add-literal rel-absolute-cell rel-literal
+    dup [] MOV ;
 
 : stack-increment \ stack-reserve get 16 align 8 + ;
 
