@@ -5,10 +5,6 @@ USING: arrays assembler errors generic hashtables kernel
 kernel-internals math namespaces prettyprint queues
 sequences strings vectors words ;
 
-SYMBOL: recompile-words
-
-H{ } clone recompile-words set-global
-
 DEFER: (compile)
 
 : compiled-offset ( -- n ) building get length code-format * ;
@@ -25,7 +21,7 @@ C: label ( -- label ) ;
 SYMBOL: compiled-xts
 
 : save-xt ( word xt -- )
-    over recompile-words get remove-hash
+    over changed-words get remove-hash
     swap compiled-xts get set-hash ;
 
 SYMBOL: literal-table
@@ -86,7 +82,7 @@ SYMBOL: label-table
 : compiling? ( word -- ? )
     #! A word that is compiling or already compiled will not be
     #! added to the list of words to be compiled.
-    dup compiled? over recompile-words get hash-member? not and
+    dup compiled? over changed-words get hash-member? not and
     swap compiled-xts get hash-member? or ;
 
 : with-compiler ( quot -- )

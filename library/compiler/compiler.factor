@@ -34,14 +34,14 @@ namespaces optimizer prettyprint sequences test threads words ;
 
 : recompile ( -- )
     [
-        recompile-words get hash-keys [ try-compile ] each
-        recompile-words get clear-hash
+        changed-words get hash-keys [ try-compile ] each
+        changed-words get clear-hash
     ] with-class<cache ;
 
 M: compound unxref-word*
     dup "infer" word-prop [
         drop
     ] [
-        dup dup recompile-words get set-hash
+        dup dup changed-words get set-hash
         { "infer-effect" "base-case" "no-effect" } reset-props
     ] if ;

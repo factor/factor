@@ -14,8 +14,11 @@
 - [ [ dup call ] dup call ] infer hangs
 - the invalid recursion form case needs to be fixed, for inlines too
 - graphical module manager tool
-- instead of decompiling words, add them to a 'recompile' set; compiler
-  treats words in the recompile set as if they were not compiled
+- forget should remove words from the recompile set
+  - unit test this
+- define should add words to the recompile set if they're interned
+  - unit test this
+- make sure the changed-words thing works with bootstrap too
 - see if alien calls can be made faster
 
 ========================================================================

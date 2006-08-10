@@ -8,6 +8,11 @@ USING: arrays definitions errors generic graphs hashtables
 kernel kernel-internals math namespaces sequences strings
 vectors ;
 
+! Used by the compiler
+SYMBOL: changed-words
+
+H{ } clone changed-words set-global
+
 M: word <=>
     [ dup word-name swap word-vocabulary 2array ] 2apply <=> ;
 
@@ -190,6 +195,7 @@ M: word subdefs drop f ;
 : forget-word ( word -- )
     dup unxref-word
     dup remove-word-help
+    dup changed-words remove-hash
     crossref get [ dupd remove-hash ] when*
     dup word-name swap word-vocabulary vocab remove-hash ;
 
