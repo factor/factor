@@ -10,23 +10,15 @@ USING: kernel io strings sequences namespaces math parser ;
 : update-old-new ( old new -- )
     [ get >r get r> ] 2keep >r >r w+ dup r> set r> set ; inline
     
-! calculate pad length.  leave 8 bytes for length after padding
-: zero-pad-length ( length -- pad-length )
-    dup 56 < 55 119 ? swap - ; ! one less for first byte of padding 0x80
+: calculate-pad-length ( length -- pad-length )
+    dup 56 < 55 119 ? swap - ;
 
 ! pad 0x80 then 00 til 8 bytes left, then 64bit length in bits
-: pad-string-md5 ( string  -- padded-string )
-    [
+: preprocess-plaintext ( string big-endian? -- padded-string )
+    swap [
         dup % HEX: 80 ,
-        dup length HEX: 3f bitand zero-pad-length 0 <string> %
-        dup length 3 shift 8 >le %
-    ] "" make nip ;
-
-: pad-string-sha1 ( string  -- padded-string )
-    [
-        dup % HEX: 80 ,
-        dup length HEX: 3f bitand zero-pad-length 0 <string> %
-        dup length 3 shift 8 >be %
+        dup length HEX: 3f bitand calculate-pad-length 0 <string> %
+        dup length 3 shift 8 >r rot r> swap [ >be ] [ >le ] if %
     ] "" make nip ;
 
 : num-blocks ( length -- num ) -6 shift ;
