@@ -115,6 +115,7 @@ M: object load-literal ( literal vreg -- )
     #! jump table indexed by the fixnum at the top of the stack.
     #! The jump table must immediately follow this macro.
     ! Untag and multiply to get a jump table offset
+    "end" define-label
     "n" operand fixnum>slot@
     ! Add to jump table base. We use a temporary register since
     ! on AMD64 we have to load a 64-bit immediate. On x86, this
