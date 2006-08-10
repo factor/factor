@@ -15,30 +15,32 @@ namespaces parser prettyprint sequences strings vectors words ;
     #! Otherwise, unify.
     dup all-eq? [ first ] [ drop <computed> ] if ;
 
-: unify-stacks ( seq -- stack )
-    #! Replace differing literals in stacks with unknown
-    #! results.
-    [ ] subset dup empty?
-    [ drop f ] [ unify-lengths flip [ unify-values ] map ] if ;
+: unify-stacks ( seq -- stack ) flip [ unify-values ] map ;
 
 : balanced? ( in out -- ? )
     [ dup [ length - ] [ 2drop f ] if ] 2map
     [ ] subset all-equal? ;
 
-: unify-in-d ( seq -- n )
-    #! Input is a sequence of positive integers or f.
-    #! Output is the maximum or 0.
-    0 [ [ max ] when* ] reduce ;
+: supremum ( seq -- n ) -1./0. [ max ] reduce ;
 
 : unbalanced-branches ( in out -- )
     [ swap unparse " " rot length unparse append3 ] 2map
     "Unbalanced branches:" add* "\n" join inference-error ;
 
+: unify-inputs ( max-d-in meta-d -- meta-d )
+    dup [
+        [ >r - r> length + ] keep add-inputs nip
+    ] [
+        2nip
+    ] if ;
+
 : unify-effect ( in out -- in out )
     #! in is a sequence of integers, out is a sequence of
     #! stacks.
     2dup balanced? [
-        unify-stacks >r unify-in-d r>
+        over supremum -rot
+        [ >r dupd r> unify-inputs ] 2map
+        [ ] subset unify-stacks
     ] [
         unbalanced-branches
     ] if ;

@@ -75,7 +75,7 @@ M: #call-label collect-recursion* ( label node -- )
     #! which literals survive the recursion (eg, quotations)
     #! and which don't (loop indices, etc). The latter cannot
     #! be folded.
-    collect-recursion meta-d get add unify-stacks
+    collect-recursion meta-d get add unify-lengths unify-stacks
     meta-d [ length tail* ] change ;
 
 : splice-node ( node -- )
