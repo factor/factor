@@ -34,7 +34,7 @@ H{ } clone modules set-global
 : (require) ( name -- )
     dup module [ drop ] [ load-module ] if ;
 
-: require ( name -- ) (require) compile-all ;
+: require ( name -- ) (require) recompile ;
 
 : run-resources ( seq -- )
     bootstrapping? get

@@ -84,12 +84,3 @@ M: alien-invoke stack-reserve*
 : define-c-word ( return library function parameters -- )
     [ "()" subseq? not ] subset >r pick r> parse-arglist
     (define-c-word) ;
-
-M: compound unxref-word*
-    dup "infer" word-prop [
-        dup
-        { "infer-effect" "base-case" "no-effect" }
-        reset-props
-        dup word-def \ alien-invoke swap member?
-        [ dup update-xt ] unless
-    ] unless drop ;
