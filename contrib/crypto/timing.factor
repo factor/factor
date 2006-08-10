@@ -1,6 +1,6 @@
 IN: timing
-USING: kernel threads ;
+USING: kernel math threads ;
 
-: with-timed ( quot n -- )
+: with-timing ( n quot -- )
     #! force the quotation to execute in, at minimum, n milliseconds
-    millis rot call millis swap - - sleep ;
+    millis >r call millis r> - - sleep ;
