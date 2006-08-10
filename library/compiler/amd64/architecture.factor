@@ -33,8 +33,7 @@ M: float-regs fastcall-regs vregs ;
     R11 [ swap MOV ] keep ; inline
 
 : compile-c-call ( symbol dll -- )
-    2dup dlsym address-operand
-    >r rel-absolute-cell rel-dlsym r> CALL ;
+    0 address-operand >r rel-absolute-cell rel-dlsym r> CALL ;
 
 : compile-c-call* ( symbol dll args -- )
     T{ int-regs } fastcall-regs
@@ -44,9 +43,8 @@ M: float-regs fastcall-regs vregs ;
 
 : prepare-division CQO ; inline
 
-: load-indirect ( vreg literal -- )
-    over 0 MOV add-literal rel-absolute-cell rel-literal
-    dup [] MOV ;
+: load-indirect ( literal vreg -- )
+    dup 0 MOV >r rel-absolute-cell rel-literal r> dup [] MOV ;
 
 : stack-increment \ stack-reserve get 16 align 8 + ;
 
