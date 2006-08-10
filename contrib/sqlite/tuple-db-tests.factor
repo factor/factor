@@ -22,7 +22,7 @@
 ! ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 !
 IN: tuple-db
-USING: io kernel kernel-internals sequences namespaces
+USING: io kernel sequences namespaces
 hashtables sqlite errors math words generic test ;
 
 TUPLE: testdata one two ;

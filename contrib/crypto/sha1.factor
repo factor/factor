@@ -1,5 +1,5 @@
 USING: kernel io strings sequences namespaces math parser
-vectors hashtables kernel-internals math-contrib crypto ;
+vectors hashtables math-contrib crypto ;
 IN: crypto-internals
 
 ! Implemented according to RFC 3174.
