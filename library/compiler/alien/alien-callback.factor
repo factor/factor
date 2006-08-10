@@ -53,7 +53,7 @@ TUPLE: alien-callback-error ;
         %alien-callback
         unbox-return
         %return
-    ] generate-block ;
+    ] generate-1 ;
 
 M: alien-callback generate-node ( node -- )
     end-basic-block compile-gc generate-callback iterate-next ;

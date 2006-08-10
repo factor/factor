@@ -2,8 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 IN: compiler
 USING: arrays assembler errors generic hashtables inference
-kernel kernel-internals math namespaces queues sequences
-words ;
+kernel kernel-internals math namespaces sequences words ;
 
 GENERIC: stack-reserve*
 
@@ -58,33 +57,14 @@ UNION: #terminal
         literal-table get
     ] V{ } make
     code-format add-compiled-block save-xt ;
-
-SYMBOL: generate-queue
-
-: generate-loop ( -- )
-    generate-queue get dup queue-empty? [
-        drop
-    ] [
-        deque first3 generate-1 generate-loop
-    ] if ;
-
-: generate-block ( word node quot -- | quot: node -- )
-    3array generate-queue get enque ;
-
+! 
 GENERIC: generate-node ( node -- )
 
 : generate-nodes ( node -- )
     [ node@ generate-node ] iterate-nodes end-basic-block ;
 
-: generate-word ( node -- )
-    [ [ generate-nodes ] with-node-iterator ]
-    generate-block ;
-
 : generate ( word node -- )
-    [
-        <queue> generate-queue set
-        generate-word generate-loop 
-    ] with-scope ;
+    [ [ generate-nodes ] with-node-iterator ] generate-1 ;
 
 ! node
 M: node generate-node ( node -- next ) drop iterate-next ;
@@ -96,7 +76,7 @@ M: node generate-node ( node -- next ) drop iterate-next ;
 
 M: #label generate-node ( node -- next )
     dup node-param dup generate-call >r
-    swap node-child generate-word r> ;
+    swap node-child generate r> ;
 
 ! #if
 : end-false-branch ( label -- )
