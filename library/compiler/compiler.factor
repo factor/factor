@@ -5,19 +5,15 @@ USING: errors hashtables inference io kernel math namespaces
 optimizer prettyprint sequences test threads words ;
 
 : (compile) ( word -- )
-    dup specialized-def dataflow optimize generate ;
-
-: inform-compile ( word -- ) "Compiling " write . flush ;
-
-: compile-postponed ( -- )
-    compile-words get dup empty? [
-        drop
+    dup compiling? not over compound? and [
+        "Compiling " write dup . flush
+        dup specialized-def dataflow optimize generate
     ] [
-        pop dup inform-compile (compile) compile-postponed
+        drop
     ] if ;
 
 : compile ( word -- )
-    [ postpone-word compile-postponed ] with-compiler ;
+    [ (compile) ] with-compiler ;
 
 : compiled ( -- ) "compile" get [ word compile ] when ; parsing
 
@@ -30,8 +26,6 @@ optimizer prettyprint sequences test threads words ;
     [ try-compile ] each ;
 
 : compile-all ( -- ) vocabs compile-vocabs ;
-
-: recompile ( word -- ) dup update-xt compile ;
 
 : compile-quot ( quot -- word )
     define-temp "compile" get [ dup compile ] when ;

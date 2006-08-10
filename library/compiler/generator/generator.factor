@@ -42,8 +42,7 @@ UNION: #terminal
 : init-generator ( -- )
     V{ } clone relocation-table set
     V{ } clone literal-table set
-    V{ } clone label-table set
-    V{ } clone label-relocation-table set ;
+    V{ } clone label-table set ;
 
 : generate-1 ( word node quot -- | quot: node -- )
     #! Generate the code, then dump three vectors to pass to

@@ -5,16 +5,13 @@ USING: arrays assembler errors generic hashtables kernel
 kernel-internals math namespaces prettyprint queues
 sequences strings vectors words ;
 
+DEFER: (compile)
+
 : compiled-offset ( -- n ) building get length code-format * ;
 
-TUPLE: label # offset ;
+TUPLE: label offset ;
 
-SYMBOL: label-table
-
-: push-label ( label -- )
-    label-table get dup length pick set-label-# push ;
-
-C: label ( -- label ) dup push-label ;
+C: label ( -- label ) ;
 
 : define-label ( name -- ) <label> swap set ;
 
@@ -36,7 +33,7 @@ SYMBOL: literal-table
     ] if ;
 
 SYMBOL: relocation-table
-SYMBOL: label-relocation-table
+SYMBOL: label-table
 
 : rel-absolute-cell 0 ;
 : rel-absolute 1 ;
@@ -73,34 +70,22 @@ SYMBOL: label-relocation-table
     >r add-literal r> 4 rel, ;
 
 : rel-label ( label class -- )
-    compiled-offset 3array label-relocation-table get push ;
+    compiled-offset 3array label-table get push ;
 
 : generate-labels ( -- )
-    label-relocation-table get [
+    label-table get [
         first3 >r >r label-offset r> 6 r> (rel)
         relocation-table get swap nappend
     ] each ;
 
-! When a word is encountered that has not been previously
-! compiled, it is pushed onto this vector. Compilation stops
-! when the vector is empty.
-SYMBOL: compile-words
-
 : compiling? ( word -- ? )
     #! A word that is compiling or already compiled will not be
     #! added to the list of words to be compiled.
-    dup compiled?
-    over compile-words get member? or
-    swap compiled-xts get hash-member? or ;
+    dup compiled? swap compiled-xts get hash-member? or ;
 
 : with-compiler ( quot -- )
     [
         H{ } clone compiled-xts set
-        V{ } clone compile-words set
         call
         compiled-xts get hash>alist finalize-compile
     ] with-scope ;
-
-: postpone-word ( word -- )
-    dup compiling? not over compound? and
-    [ dup compile-words get push ] when drop ;

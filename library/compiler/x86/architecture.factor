@@ -97,7 +97,7 @@ M: object load-literal ( literal vreg -- )
     v>operand load-indirect ;
 
 : (%call) ( label -- label )
-    dup postpone-word dup primitive? [ address-operand ] when ;
+    dup (compile) dup primitive? [ address-operand ] when ;
 
 : %call ( label -- ) (%call) CALL ;
 

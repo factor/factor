@@ -27,10 +27,6 @@ HELP: compile-vocabs "( seq -- )"
 HELP: compile-all "( -- )"
 { $description "Compile all words in the dictionary which have not already been compiled. Compile errors are logged to the default stream." } ;
 
-HELP: recompile "( word -- )"
-{ $values { "word" "a word" } }
-{ $description "Compiles a word, discarding a previous compiled definition first." } ;
-
 HELP: compile-quot "( quot -- word )"
 { $values { "quot" "a quotation" } { "word" "a new, uninterned word" } }
 { $description "Creates a new uninterned word having the given quotation as its definition, and compiles it. The returned word can be passed to " { $link execute } "." }

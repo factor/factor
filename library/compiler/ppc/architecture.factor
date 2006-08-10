@@ -61,7 +61,7 @@ M: object load-literal ( literal vreg -- )
 
 : %call ( label -- )
     #! Far C call for primitives, near C call for compiled defs.
-    dup postpone-word
+    dup (compile)
     dup primitive? [ word-addr  3 MTLR  BLRL ] [ BL ] if ;
 
 : %jump-label ( label -- )
@@ -69,7 +69,7 @@ M: object load-literal ( literal vreg -- )
     dup primitive? [ word-addr  3 MTCTR  BCTR ] [ B ] if ;
 
 : %jump ( label -- )
-    %epilogue dup postpone-word %jump-label ;
+    %epilogue dup (compile) %jump-label ;
 
 : %jump-t ( label -- )
     0 "flag" operand object-tag CMPI BNE ;

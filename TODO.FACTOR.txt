@@ -1,6 +1,5 @@
 + 0.84:
 
-- fix amd64 backend
 - fix contribs: boids, automata
 - sometimes darcs get fails with the httpd
 - gdb triggers 'mutliple i/o ops on port' error
@@ -67,6 +66,7 @@
 - variable width word wrap
 - slider needs to be modelized
 - structure editor
+- listener tab completion
 
 + module system:
 
@@ -87,6 +87,7 @@
 
 + compiler/ffi:
 
+- more compact relocation info
 - UI dataflow visualizer
 - ppc64 backend
 - we need to optimize  [ dup array? [ array? ] [ array? ] if ]
