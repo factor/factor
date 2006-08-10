@@ -114,7 +114,6 @@ M: object load-literal ( literal vreg -- )
     #! Compile a piece of code that jumps to an offset in a
     #! jump table indexed by the fixnum at the top of the stack.
     #! The jump table must immediately follow this macro.
-    "end" define-label
     ! Untag and multiply to get a jump table offset
     "n" operand fixnum>slot@
     ! Add to jump table base. We use a temporary register since

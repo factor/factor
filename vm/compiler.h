@@ -51,9 +51,6 @@ typedef struct {
 	CELL offset;
 } F_REL;
 
-void apply_relocation(F_REL *rel, CELL code_start, CELL literal_start,
-	F_VECTOR *labels);
-
 void finalize_code_block(F_COMPILED *relocating, CELL code_start,
 	CELL reloc_start, CELL literal_start, CELL literal_end);
 

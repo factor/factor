@@ -47,16 +47,15 @@ UNION: #terminal
     V{ } clone label-relocation-table set ;
 
 : generate-1 ( word node quot -- | quot: node -- )
-    #! Generate the code, then dump five vectors to pass to
+    #! Generate the code, then dump three vectors to pass to
     #! add-compiled-block.
     pick f save-xt [
         init-generator
         init-templates
         generate-code
+        generate-labels
         relocation-table get
         literal-table get
-        label-table get [ label-offset ] map
-        label-relocation-table get
     ] V{ } make
     code-format add-compiled-block save-xt ;
 
@@ -157,8 +156,6 @@ M: #call-label generate-node ( node -- next )
     node-param generate-call ;
 
 ! #dispatch
-: target-label ( label -- ) 0 , rel-absolute-cell rel-label ;
-
 : dispatch-head ( node -- label/node )
     #! Output the jump table insn and return a list of
     #! label/branch pairs.

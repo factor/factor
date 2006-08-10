@@ -14,8 +14,7 @@ SYMBOL: label-table
 : push-label ( label -- )
     label-table get dup length pick set-label-# push ;
 
-C: label ( -- label )
-    compiled-offset over set-label-offset dup push-label ;
+C: label ( -- label ) dup push-label ;
 
 : define-label ( name -- ) <label> swap set ;
 
@@ -47,17 +46,15 @@ SYMBOL: label-relocation-table
 : rel-relative-2 5 ;
 : rel-relative-3 6 ;
 
-: (rel) ( arg class type -- { m n } )
+: (rel) ( arg class type offset -- { type offset } )
     #! Write a relocation instruction for the runtime image
     #! loader.
-    over >r >r >r 16 shift r> 8 shift bitor r> bitor
-    compiled-offset r> rel-absolute-cell = cell 4 ? - 2array ;
+    pick rel-absolute-cell = cell 4 ? -
+    >r >r >r 16 shift r> 8 shift bitor r> bitor r>
+    2array ;
 
 : rel, ( arg class type -- )
-    (rel) relocation-table get swap nappend ;
-
-: label, ( arg class type -- )
-    (rel) label-relocation-table get swap nappend ;
+    compiled-offset (rel) relocation-table get swap nappend ;
 
 : rel-dlsym ( name dll class -- )
    >r 2array add-literal r> 1 rel, ;
@@ -76,7 +73,13 @@ SYMBOL: label-relocation-table
     >r add-literal r> 4 rel, ;
 
 : rel-label ( label class -- )
-    >r label-# r> 6 label, ;
+    compiled-offset 3array label-relocation-table get push ;
+
+: generate-labels ( -- )
+    label-relocation-table get [
+        first3 >r >r label-offset r> 6 r> (rel)
+        relocation-table get swap nappend
+    ] each ;
 
 ! When a word is encountered that has not been previously
 ! compiled, it is pushed onto this vector. Compilation stops

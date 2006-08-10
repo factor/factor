@@ -289,7 +289,7 @@ sequences strings vectors words prettyprint ;
 \ cwd [ [ ] [ string ] ] "infer-effect" set-word-prop
 \ cd [ [ string ] [ ] ] "infer-effect" set-word-prop
 
-\ add-compiled-block [ [ vector vector vector vector integer ] [ integer ] ] "infer-effect" set-word-prop
+\ add-compiled-block [ [ vector vector vector integer ] [ integer ] ] "infer-effect" set-word-prop
 
 \ dlopen [ [ string ] [ dll ] ] "infer-effect" set-word-prop
 \ dlsym [ [ string object ] [ integer ] ] "infer-effect" set-word-prop

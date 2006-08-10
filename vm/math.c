@@ -203,7 +203,7 @@ void primitive_fixnum_not(void)
 #define INT_DEFBOX(name,type) \
 void name (type integer)                                                       \
 {                                                                              \
-	dpush(tag_integer(integer));                                           \
+	dpush(tag_fixnum(integer));                                            \
 }
 
 #define INT_DEFUNBOX(name,type) \

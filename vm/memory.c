@@ -129,14 +129,14 @@ void primitive_integer_slot(void)
 {
 	F_FIXNUM slot = untag_fixnum_fast(dpop());
 	CELL obj = UNTAG(dpop());
-	dpush(tag_integer(get(SLOT(obj,slot))));
+	dpush(tag_cell(get(SLOT(obj,slot))));
 }
 
 void primitive_set_integer_slot(void)
 {
 	F_FIXNUM slot = untag_fixnum_fast(dpop());
 	CELL obj = UNTAG(dpop());
-	F_FIXNUM value = to_fixnum(dpop());
+	F_FIXNUM value = to_cell(dpop());
 	put(SLOT(obj,slot),value);
 }
 

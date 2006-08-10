@@ -26,9 +26,6 @@ void undefined_symbol(void)
 
 INLINE CELL get_literal(CELL literal_start, CELL num)
 {
-	if(!literal_start)
-		critical_error("Only RT_LABEL relocations can appear in the label-relocation-table",0);
-
 	return get(LITERAL_REF(literal_start,num));
 }
 
@@ -59,11 +56,9 @@ CELL get_rel_word(F_REL *rel, CELL literal_start)
 }
 
 INLINE CELL compute_code_rel(F_REL *rel,
-	CELL code_start, CELL literal_start,
-	F_VECTOR *labels)
+	CELL code_start, CELL literal_start)
 {
 	CELL offset = code_start + rel->offset;
-	F_ARRAY *array;
 
 	switch(REL_TYPE(rel))
 	{
@@ -80,12 +75,7 @@ INLINE CELL compute_code_rel(F_REL *rel,
 	case RT_WORD:
 		return get_rel_word(rel,literal_start);
 	case RT_LABEL:
-		if(labels == NULL)
-			critical_error("RT_LABEL can only appear in label-relocation-table",0);
-
-		array = untag_array_fast(labels->array);
-		return to_cell(get(AREF(array,REL_ARGUMENT(rel))))
-			+ code_start;
+		return code_start + REL_ARGUMENT(rel);
 	default:
 		critical_error("Unsupported rel type",rel->type);
 		return -1;
@@ -105,8 +95,7 @@ INLINE void reloc_set_masked(CELL cell, CELL value, CELL mask)
 	*(u32*)cell = (original | (value & mask));
 }
 
-void apply_relocation(F_REL *rel, CELL code_start, CELL literal_start,
-	F_VECTOR *labels)
+void apply_relocation(F_REL *rel, CELL code_start, CELL literal_start)
 {
 	CELL absolute_value;
 	CELL relative_value;
@@ -114,7 +103,7 @@ void apply_relocation(F_REL *rel, CELL code_start, CELL literal_start,
 
 	/* to_c_string can fill up the heap */
 	maybe_gc(0);
-	absolute_value = compute_code_rel(rel,code_start,literal_start,labels);
+	absolute_value = compute_code_rel(rel,code_start,literal_start);
 	relative_value = absolute_value - offset;
 
 	switch(REL_CLASS(rel))
@@ -154,7 +143,7 @@ void finalize_code_block(F_COMPILED *relocating, CELL code_start,
 
 	/* apply relocations */
 	while(rel < rel_end)
-		apply_relocation(rel++,code_start,literal_start,NULL);
+		apply_relocation(rel++,code_start,literal_start);
 }
 
 void collect_literals_step(F_COMPILED *relocating, CELL code_start,
@@ -212,24 +201,8 @@ void deposit_objects(F_VECTOR *vector, CELL literal_length)
 	memcpy((void*)compiling.here,array + 1,literal_length);
 }
 
-void fixup_labels(F_VECTOR *label_rel, CELL code_start, CELL literal_start,
-	F_VECTOR *labels)
-{
-	F_ARRAY *array = untag_array_fast(label_rel->array);
-	CELL length = untag_fixnum_fast(label_rel->top);
-	CELL i;
-	
-	for(i = 0; i < length; i += 2)
-	{
-		F_REL rel;
-		rel.type = to_cell(get(AREF(array,i)));
-		rel.offset = to_cell(get(AREF(array,i + 1)));
-		apply_relocation(&rel,code_start,literal_start,labels);
-	}
-}
-
-void add_compiled_block(CELL code_format, F_VECTOR *code, F_VECTOR *label_rel,
-	F_VECTOR *labels, F_VECTOR *literals, F_VECTOR *rel)
+void add_compiled_block(CELL code_format, F_VECTOR *code,
+	F_VECTOR *literals, F_VECTOR *rel)
 {
 	CELL start = compiling.here;
 	CELL code_length = align8(untag_fixnum_fast(code->top) * code_format);
@@ -256,9 +229,6 @@ void add_compiled_block(CELL code_format, F_VECTOR *code, F_VECTOR *label_rel,
 	deposit_objects(literals,literal_length);
 	compiling.here += literal_length;
 
-	/* labels */
-	fixup_labels(label_rel,start + sizeof(F_COMPILED),0,labels);
-
 	/* push the XT of the new word on the stack */
 	box_unsigned_cell(start + sizeof(F_COMPILED));
 }
@@ -267,12 +237,10 @@ void primitive_add_compiled_block(void)
 {
 	CELL code_format = to_cell(dpop());
 	F_VECTOR *code = untag_vector(dpop());
-	F_VECTOR *label_rel = untag_vector(dpop());
-	F_VECTOR *labels = untag_vector(dpop());
 	F_VECTOR *literals = untag_vector(dpop());
 	F_VECTOR *rel = untag_vector(dpop());
 
-	add_compiled_block(code_format,code,label_rel,labels,literals,rel);
+	add_compiled_block(code_format,code,literals,rel);
 }
 
 void primitive_finalize_compile(void)
