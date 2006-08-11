@@ -11,10 +11,6 @@ HELP: compile "( word -- )"
 { $description "Compiles a word together with any uncompiled dependencies. Does nothing if the word is already compiled." }
 { $errors "If compilation fails, this word can throw an error. In particular, if the word's stack effect cannot be inferred, this word will throw an error. The related " { $link try-compile } " word logs errors and returns rather than throwing." } ;
 
-HELP: compiled f
-{ $description "Compiles the most recently defined word." }
-{ $see-also word } ;
-
 HELP: try-compile "( word -- )"
 { $values { "word" "a word" } }
 { $description "Compiles a word together with any uncompiled dependencies. Does nothing if the word is already compiled." }
@@ -39,5 +35,6 @@ HELP: compile-1 "( quot -- )"
 
 IN: assembler
 
-HELP: finalize-compile "( -- )"
+HELP: finalize-compile "( xts -- )"
+{ $values { "xts" "an array of pairs mapping words to XTs" } }
 { $description "Flushes the CPUs instruction cache on PowerPC, and does nothing on other architectures. PowerPC CPUs do not automatically invalidate the cache when memory contents change, so the compiler must do this explicitly." } ;
