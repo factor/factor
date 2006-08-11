@@ -14,6 +14,6 @@ USE: test
         ] [
             dupd 1- ack >r 1- r> ack
         ] if
-    ] if ; compiled
+    ] if ;
 
 [ 4093 ] [ 3 9 ack ] unit-test

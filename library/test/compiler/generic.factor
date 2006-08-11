@@ -15,8 +15,6 @@ M: f single-combination-test nip ;
 M: array single-combination-test drop ;
 M: integer single-combination-test drop ;
 
-\ single-combination-test compile
-
 [ 2 3 ] [ 2 3 t single-combination-test ] unit-test
 [ 2 3 ] [ 2 3 4 single-combination-test ] unit-test
 [ 2 f ] [ 2 3 f single-combination-test ] unit-test
@@ -33,19 +31,6 @@ GENERIC: single-combination-test-2
 M: object single-combination-test-2 single-combination-test-3 ;
 M: f single-combination-test-2 single-combination-test-4 ;
 
-\ single-combination-test-2 compile
-
 [ 3 ] [ t single-combination-test-2 ] unit-test
 [ 3 ] [ 3 single-combination-test-2 ] unit-test
 [ f ] [ f single-combination-test-2 ] unit-test
-
-! GENERIC: broken-generic
-
-! M: fixnum broken-generic 1array broken-generic ;
-! M: array broken-generic first neg ;
-
-! : broken-partial-eval 5 broken-generic ;
-
-! \ broken-partial-eval compile
-
-! [ -5 ] [ broken-partial-eval ] unit-test

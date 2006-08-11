@@ -17,7 +17,6 @@ USE: words
         1 fixnum-fast dup fast-fixnum-fib
         swap 1 fixnum-fast fast-fixnum-fib fixnum+fast
     ] if ;
-    compiled
 
 [ 9227465 ] [ 34 fast-fixnum-fib ] unit-test
 
@@ -27,15 +26,11 @@ USE: words
     ] [
         1 fixnum- dup fixnum-fib swap 1 fixnum- fixnum-fib fixnum+
     ] if ;
-    compiled
 
 [ 9227465 ] [ 34 fixnum-fib ] unit-test
 
 : fib ( n -- nth fibonacci number )
     dup 1 <= [ drop 1 ] [ dup 1 - fib swap 2 - fib + ] if ;
-
-\ fib { fixnum } "specializer" set-word-prop
-\ fib compile
 
 [ 9227465 ] [ 34 fib ] unit-test
 
@@ -51,7 +46,7 @@ TUPLE: box i ;
         box-i 1- <box>
         tuple-fib
         swap box-i swap box-i + <box>
-    ] if ; compiled
+    ] if ;
 
 [ T{ box f 9227465 } ] [ T{ box f 34 } tuple-fib ] unit-test
 
@@ -66,6 +61,6 @@ SYMBOL: n
             n get 2 - namespace-fib
             +
         ] if
-    ] with-scope ; compiled
+    ] with-scope ;
 
 [ 1346269 ] [ 30 namespace-fib ] unit-test

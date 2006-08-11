@@ -18,6 +18,6 @@ sequences strings test ;
                 hash-bench-step
             ] each-with
         ] 2keep
-    ] each 2drop ; compiled
+    ] each 2drop ;
 
 [ ] [ [ string? ] instances hashtable-benchmark ] unit-test

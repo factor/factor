@@ -56,5 +56,3 @@ SYMBOL: out
             500000 <vector> (reverse-complement)
         ] with-stream
     ] with-stream ;
-
-{ translate-seq seg clear-seq } [ compile ] each

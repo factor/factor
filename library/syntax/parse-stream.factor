@@ -20,8 +20,14 @@ sequences words ;
 
 : eval ( "X" -- X ) parse call ;
 
+SYMBOL: parse-hook
+
 : parse-stream ( stream name -- quot )
-    [ file set file-vocabs lines parse-lines ] with-scope ;
+    [
+        file set file-vocabs
+        lines parse-lines
+        parse-hook get call
+    ] with-scope ;
 
 : parsing-file ( file -- ) "Loading " write print flush ;
 
@@ -29,6 +35,9 @@ sequences words ;
     dup parsing-file [ <file-reader> ] keep parse-stream ;
 
 : run-file ( file -- ) parse-file call ;
+
+: no-parse-hook ( quot -- )
+    [ parse-hook off call ] with-scope ; inline
 
 : try-run-file ( file -- ) [ [ run-file ] keep ] try drop ;
 
@@ -39,4 +48,5 @@ sequences words ;
     dup parsing-file
     [ <resource-reader> "resource:" ] keep append parse-stream ;
 
-: run-resource ( file -- ) parse-resource call ;
+: run-resource ( file -- )
+    parse-resource call ;

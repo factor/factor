@@ -454,7 +454,10 @@ void primitive_update_xt(void)
 void primitive_word_compiledp(void)
 {
 	F_WORD* word = untag_word(dpop());
-	box_boolean(word->xt != (CELL)docol && word->xt != (CELL)dosym);
+	if(to_fixnum(word->primitive) != 1)
+		box_boolean(false);
+	else
+		box_boolean(word->xt != (CELL)docol);
 }
 
 void fixup_word(F_WORD* word)

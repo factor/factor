@@ -24,7 +24,8 @@ strings styles ;
     dup -1 = [ 2drop "." ] [ head ] if ;
 
 : resource-path ( path -- path )
-    image parent-dir swap path+ ;
+    \ resource-path get [ image parent-dir ] unless*
+    swap path+ ;
 
 : <resource-reader> ( path -- stream )
     resource-path <file-reader> ;

@@ -10,9 +10,9 @@ USING: compiler kernel math namespaces sequences strings test ;
         string-step
     ] [
         2drop
-    ] if ; compiled
+    ] if ;
 
 : string-benchmark ( n -- )
-    "abcdef" 10 [ 2dup string-step ] times 2drop ; compiled
+    "abcdef" 10 [ 2dup string-step ] times 2drop ;
 
 [ ] [ 400000 string-benchmark ] unit-test

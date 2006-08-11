@@ -193,13 +193,13 @@ void primitive_millis(void)
 
 void fatal_error(char* msg, CELL tagged)
 {
-	fprintf(stderr,"Fatal error: %s %ld\n",msg,tagged);
+	fprintf(stderr,"Fatal error: %s %lx\n",msg,tagged);
 	exit(1);
 }
 
 void critical_error(char* msg, CELL tagged)
 {
-	fprintf(stderr,"Critical error: %s %ld\n",msg,tagged);
+	fprintf(stderr,"Critical error: %s %lx\n",msg,tagged);
 	factorbug();
 }
 

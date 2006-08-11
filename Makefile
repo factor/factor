@@ -128,7 +128,9 @@ f: $(OBJS)
 	$(CC) $(LIBS) $(CFLAGS) -o $@$(PLAF_SUFFIX) $(OBJS)
 
 clean:
-	rm -f $(OBJS) $(UNIX_OBJS) $(WINDOWS_OBJS) $(MACOSX_OBJS)
+	rm -f vm/*.o
+
+clean.app:
 	rm -rf $(BUNDLE)/Contents/Resources/
 	rm -f $(BUNDLE)/Contents/MacOS/Factor
 

@@ -24,6 +24,7 @@ H{ } clone articles set
 parent-graph off
 term-index off
 crossref off
+changed-words off
 
 ! Call the quotation parsed from primitive-types.factor
 call

@@ -37,8 +37,10 @@ H{ } clone modules set-global
 : require ( name -- ) (require) recompile ;
 
 : run-resources ( seq -- )
-    bootstrapping? get
-    [ parse-resource % ] [ run-resource ] ? each ;
+    [
+        bootstrapping? get
+        [ parse-resource % ] [ run-resource ] ? each
+    ] no-parse-hook ;
 
 : provide ( name files tests -- )
     <module> dup module-files run-resources

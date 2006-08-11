@@ -52,7 +52,9 @@ CELL get_rel_word(F_REL *rel, CELL literal_start)
 {
 	CELL arg = REL_ARGUMENT(rel);
 	F_WORD *word = untag_word(get_literal(literal_start,arg));
-	return (CELL)word->xt;
+	if(word->xt < compiling.base || word->xt >= compiling.limit)
+		critical_error("Bad XT",tag_word(word));
+	return word->xt;
 }
 
 INLINE CELL compute_code_rel(F_REL *rel,
@@ -77,7 +79,7 @@ INLINE CELL compute_code_rel(F_REL *rel,
 	case RT_LABEL:
 		return code_start + REL_ARGUMENT(rel);
 	default:
-		critical_error("Unsupported rel type",rel->type);
+		critical_error("Bad rel type",rel->type);
 		return -1;
 	}
 }
@@ -130,7 +132,7 @@ void apply_relocation(F_REL *rel, CELL code_start, CELL literal_start)
 		reloc_set_masked(offset,relative_value,REL_RELATIVE_3_MASK);
 		break;
 	default:
-		critical_error("Unsupported rel class",REL_CLASS(rel));
+		critical_error("Bad rel class",REL_CLASS(rel));
 		return;
 	}
 }
@@ -192,7 +194,7 @@ void deposit_integers(F_VECTOR *vector, CELL format)
 		}
 	}
 	else
-		fatal_error("Bad format param to deposit_vector()",format);
+		critical_error("Bad format param to deposit_vector()",format);
 }
 
 void deposit_objects(F_VECTOR *vector, CELL literal_length)

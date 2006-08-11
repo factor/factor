@@ -11,7 +11,11 @@ vectors ;
 ! Used by the compiler
 SYMBOL: changed-words
 
-H{ } clone changed-words set-global
+: changed-word ( word -- )
+    dup changed-words get [ set-hash ] [ 2drop ] if* ;
+
+: unchanged-word ( word -- )
+    changed-words get [ remove-hash ] [ drop ] if* ;
 
 M: word <=>
     [ dup word-name swap word-vocabulary 2array ] 2apply <=> ;
@@ -76,15 +80,25 @@ SYMBOL: crossref
 
 : usage ( word -- seq ) crossref get in-edges ;
 
-GENERIC: unxref-word* ( word -- )
+: reset-props ( word seq -- ) [ remove-word-prop ] each-with ;
 
-M: word unxref-word* drop ;
+: unxref-word* ( word -- )
+    {
+        { [ dup compound? not ] [ drop ] }
+        { [ dup "infer" word-prop ] [ drop ] }
+        { [ t ] [
+            dup changed-word
+            { "infer-effect" "base-case" "no-effect" }
+            reset-props
+        ] }
+    } cond ;
 
 : unxref-word ( word -- )
     dup [ usage ] closure [ unxref-word* ] each
     [ uses ] crossref get remove-vertex ;
 
 : define ( word parameter primitive -- )
+    pick changed-word
     pick unxref-word
     pick set-word-primitive
     over set-word-def
@@ -97,8 +111,6 @@ M: word unxref-word* drop ;
     dup undefined? [ define-symbol ] [ drop ] if ;
 
 : define-compound ( word def -- ) 1 define ;
-
-: reset-props ( word seq -- ) [ remove-word-prop ] each-with ;
 
 : reset-word ( word -- )
     { "parsing" "inline" "foldable" "predicating" } reset-props ;
@@ -195,7 +207,7 @@ M: word subdefs drop f ;
 : forget-word ( word -- )
     dup unxref-word
     dup remove-word-help
-    dup changed-words remove-hash
+    dup unchanged-word
     crossref get [ dupd remove-hash ] when*
     dup word-name swap word-vocabulary vocab remove-hash ;
 

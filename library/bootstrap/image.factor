@@ -292,7 +292,7 @@ M: hashtable ' ( hashtable -- pointer )
     [
         {
             vocabularies typemap builtins c-types crossref
-            articles parent-graph term-index
+            articles parent-graph term-index changed-words
         } [ dup get swap bootstrap-word set ] each
     ] make-hash '
     global-offset fixup ;
@@ -341,6 +341,7 @@ M: hashtable ' ( hashtable -- pointer )
 
 : make-image ( architecture -- )
     [
+        parse-hook off
         prepare-image
         begin-image
         "/library/bootstrap/boot-stage1.factor" run-resource

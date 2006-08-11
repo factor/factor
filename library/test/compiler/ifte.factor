@@ -7,23 +7,23 @@ USE: kernel
 USE: words
 USE: math-internals
 
-: dummy-if-1 t [ ] [ ] if ; compiled
+: dummy-if-1 t [ ] [ ] if ;
 
 [ ] [ dummy-if-1 ] unit-test
 
-: dummy-if-2 f [ ] [ ] if ; compiled
+: dummy-if-2 f [ ] [ ] if ;
 
 [ ] [ dummy-if-2 ] unit-test
 
-: dummy-if-3 t [ 1 ] [ 2 ] if ; compiled
+: dummy-if-3 t [ 1 ] [ 2 ] if ;
 
 [ 1 ] [ dummy-if-3 ] unit-test
 
-: dummy-if-4 f [ 1 ] [ 2 ] if ; compiled
+: dummy-if-4 f [ 1 ] [ 2 ] if ;
 
 [ 2 ] [ dummy-if-4 ] unit-test
 
-: dummy-if-5 0 dup 1 fixnum<= [ drop 1 ] [ ] if ; compiled
+: dummy-if-5 0 dup 1 fixnum<= [ drop 1 ] [ ] if ;
 
 [ 1 ] [ dummy-if-5 ] unit-test
 
@@ -41,57 +41,57 @@ USE: math-internals
         C{ 3 2 }
     ] [
         dead-code-rec
-    ] if ; compiled
+    ] if ;
 
 [ C{ 3 2 } ] [ dead-code-rec ] unit-test
 
-: one-rec [ f one-rec ] [ "hi" ] if ; compiled
+: one-rec [ f one-rec ] [ "hi" ] if ;
 
 [ "hi" ] [ t one-rec ] unit-test
 
 : after-if-test
-    t [ ] [ ] if 5 ; compiled
+    t [ ] [ ] if 5 ;
 
 [ 5 ] [ after-if-test ] unit-test
 
 DEFER: countdown-b
 
 : countdown-a ( n -- ) dup 0 eq? [ drop ] [ 1 fixnum- countdown-b ] if ;
-: countdown-b ( n -- ) dup 0 eq? [ drop ] [ 1 fixnum- countdown-a ] if ; compiled
+: countdown-b ( n -- ) dup 0 eq? [ drop ] [ 1 fixnum- countdown-a ] if ;
 
 [ ] [ 10 countdown-b ] unit-test
 
-: dummy-when-1 t [ ] when ; compiled
+: dummy-when-1 t [ ] when ;
 
 [ ] [ dummy-when-1 ] unit-test
 
-: dummy-when-2 f [ ] when ; compiled
+: dummy-when-2 f [ ] when ;
 
 [ ] [ dummy-when-2 ] unit-test
 
-: dummy-when-3 dup [ dup fixnum* ] when ; compiled
+: dummy-when-3 dup [ dup fixnum* ] when ;
 
 [ 16 ] [ 4 dummy-when-3 ] unit-test
 [ f ] [ f dummy-when-3 ] unit-test
 
-: dummy-when-4 dup [ dup dup fixnum* fixnum* ] when swap ; compiled
+: dummy-when-4 dup [ dup dup fixnum* fixnum* ] when swap ;
 
 [ 64 f ] [ f 4 dummy-when-4 ] unit-test
 [ f t ] [ t f dummy-when-4 ] unit-test
 
-: dummy-when-5 f [ dup fixnum* ] when ; compiled
+: dummy-when-5 f [ dup fixnum* ] when ;
 
 [ f ] [ f dummy-when-5 ] unit-test
 
-: dummy-unless-1 t [ ] unless ; compiled
+: dummy-unless-1 t [ ] unless ;
 
 [ ] [ dummy-unless-1 ] unit-test
 
-: dummy-unless-2 f [ ] unless ; compiled
+: dummy-unless-2 f [ ] unless ;
 
 [ ] [ dummy-unless-2 ] unit-test
 
-: dummy-unless-3 dup [ drop 3 ] unless ; compiled
+: dummy-unless-3 dup [ drop 3 ] unless ;
 
 [ 3 ] [ f dummy-unless-3 ] unit-test
 [ 4 ] [ 4 dummy-unless-3 ] unit-test

@@ -2,7 +2,8 @@
 ! See http://factorcode.org/license.txt for BSD license.
 IN: compiler
 USING: errors generic hashtables inference io kernel math
-namespaces optimizer prettyprint sequences test threads words ;
+namespaces optimizer parser prettyprint sequences test threads
+words ;
 
 : (compile) ( word -- )
     dup compiling? not over compound? and [
@@ -14,8 +15,6 @@ namespaces optimizer prettyprint sequences test threads words ;
 
 : compile ( word -- )
     [ (compile) ] with-compiler ;
-
-: compiled ( -- ) "compile" get [ word compile ] when ; parsing
 
 : try-compile ( word -- )
     [ compile ] [ error. update-xt ] recover ;
@@ -33,15 +32,11 @@ namespaces optimizer prettyprint sequences test threads words ;
 : compile-1 ( quot -- ) compile-quot execute ;
 
 : recompile ( -- )
-    [
-        changed-words get hash-keys [ try-compile ] each
-        changed-words get clear-hash
-    ] with-class<cache ;
+    #! If we are recompiling a lot of words, we can save time
+    #! with the class<cache.
+    changed-words get [
+        dup hash-keys [ [ try-compile ] each clear-hash ]
+        over length 20 > [ with-class<cache ] [ call ] if
+    ] when* ;
 
-M: compound unxref-word*
-    dup "infer" word-prop [
-        drop
-    ] [
-        dup dup changed-words get set-hash
-        { "infer-effect" "base-case" "no-effect" } reset-props
-    ] if ;
+[ recompile ] parse-hook set

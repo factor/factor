@@ -80,10 +80,12 @@ SYMBOL: label-table
     ] each ;
 
 : compiling? ( word -- ? )
-    #! A word that is compiling or already compiled will not be
-    #! added to the list of words to be compiled.
-    dup compiled? over changed-words get hash-member? not and
-    swap compiled-xts get hash-member? or ;
+    {
+        { [ dup compiled-xts get hash-member? ] [ drop t ] }
+        { [ dup changed-words get hash-member? ] [ drop f ] }
+        { [ dup compiled? ] [ drop t ] }
+        { [ t ] [ drop f ] }
+    } cond ;
 
 : with-compiler ( quot -- )
     [
