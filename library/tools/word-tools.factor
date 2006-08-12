@@ -88,7 +88,7 @@ math namespaces prettyprint sequences strings styles ;
 
 : completions ( str -- seq )
     all-words [ completion ] map-with [ first zero? not ] subset
-    [ [ first ] 2apply - ] sort dup length 20 min tail* ;
+    [ [ first ] 2apply swap - ] sort dup length 20 min head ;
 
 : fuzzy. ( fuzzy full -- )
     dup length [
