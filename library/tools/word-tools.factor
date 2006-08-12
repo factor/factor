@@ -99,6 +99,8 @@ math namespaces prettyprint sequences strings styles ;
 : apropos ( str -- )
     completions [
         first3 dup presented associate [
-            word-name fuzzy. drop
+            dup word-vocabulary write bl word-name fuzzy.
+            " (score: " swap >fixnum number>string ")" append3
+            write
         ] with-nesting terpri
     ] each ;
