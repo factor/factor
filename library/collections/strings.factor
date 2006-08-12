@@ -1,5 +1,5 @@
-! Copyright (C) 2003, 2005 Slava Pestov.
-! See http://factor.sf.net/license.txt for BSD license.
+! Copyright (C) 2003, 2006 Slava Pestov.
+! See http://factorcode.org/license.txt for BSD license.
 IN: strings
 USING: generic kernel kernel-internals math sequences
 sequences-internals ;
@@ -38,6 +38,9 @@ PREDICATE: integer LETTER    CHAR: A CHAR: Z between? ;
 PREDICATE: integer digit     CHAR: 0 CHAR: 9 between? ;
 PREDICATE: integer printable CHAR: \s CHAR: ~ between? ;
 PREDICATE: integer control   "\0\e\r\n\t\u0008\u007f" member? ;
+
+UNION: Letter letter LETTER ;
+UNION: alpha Letter digit ;
 
 : ch>lower ( n -- n ) dup LETTER? [ HEX: 20 + ] when ;
 : ch>upper ( n -- n ) dup letter? [ HEX: 20 - ] when ;

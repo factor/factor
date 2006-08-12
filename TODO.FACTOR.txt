@@ -22,6 +22,7 @@
 
 + ui:
 
+- fix ui listener delay
 - doc front page: document stack effect notation
 - better doc for accumulate, link from tree
 - we have trouble drawing rectangles
