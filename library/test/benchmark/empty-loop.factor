@@ -3,7 +3,6 @@ USING: compiler kernel math math-internals sequences test ;
 
 : empty-loop-0 ( n -- )
     dup 0 fixnum< [ drop ] [ 1 fixnum-fast empty-loop-0 ] if ;
-    
 
 : empty-loop-1 ( n -- )
     [ ] times ; 

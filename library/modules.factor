@@ -28,8 +28,10 @@ H{ } clone modules set-global
 : module modules get hash ;
 
 : load-module ( name -- )
-    "Loading module " write dup write "..." print
-    [ dup module-def run-resource ] assert-depth drop ;
+    [
+        "Loading module " write dup write "..." print
+        [ dup module-def run-resource ] assert-depth drop
+    ] no-parse-hook ;
 
 : (require) ( name -- )
     dup module [ drop ] [ load-module ] if ;

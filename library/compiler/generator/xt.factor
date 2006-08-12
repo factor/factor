@@ -83,8 +83,7 @@ SYMBOL: label-table
     {
         { [ dup compiled-xts get hash-member? ] [ drop t ] }
         { [ dup changed-words get hash-member? ] [ drop f ] }
-        { [ dup compiled? ] [ drop t ] }
-        { [ t ] [ drop f ] }
+        { [ t ] [ compiled? ] }
     } cond ;
 
 : with-compiler ( quot -- )
