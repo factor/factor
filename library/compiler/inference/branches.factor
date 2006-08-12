@@ -21,8 +21,6 @@ namespaces parser prettyprint sequences strings vectors words ;
     [ dup [ length - ] [ 2drop f ] if ] 2map
     [ ] subset all-equal? ;
 
-: supremum ( seq -- n ) -1./0. [ max ] reduce ;
-
 : unbalanced-branches ( in out -- )
     [ swap unparse " " rot length unparse append3 ] 2map
     "Unbalanced branches:" add* "\n" join inference-error ;

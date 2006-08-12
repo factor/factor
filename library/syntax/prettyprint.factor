@@ -250,12 +250,15 @@ M: dll pprint* ( obj -- str ) dll-path "DLL\" " pprint-string ;
 : pprint-element ( object -- )
     dup parsing? [ \ POSTPONE: pprint-word ] when pprint* ;
 
+: hilite-style ( -- hash )
+    H{
+        { background { 0.9 0.9 0.9 1 } }
+        { highlight t }
+    } ;
+
 : pprint-hilite ( object n -- )
     hilite-index get = [
-        H{
-            { background { 0.9 0.9 0.9 1 } }
-            { highlight t }
-        } <block pprint-element block>
+        hilite-style <block pprint-element block>
     ] [
         pprint-element
     ] if ;
