@@ -20,7 +20,7 @@
 ! WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
 ! OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
 ! ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-USING: alien cpu-8080 errors generic io kernel
+USING: alien cpu-8080 errors generic io kernel kernel-internals
 math namespaces sequences styles threads gadgets gadgets opengl arrays 
 concurrency ;
 IN: space-invaders

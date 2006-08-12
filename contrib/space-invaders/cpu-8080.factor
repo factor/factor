@@ -20,8 +20,9 @@
 ! WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
 ! OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
 ! ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-USING: kernel math sequences errors vectors prettyprint io namespaces arrays
-       words parser hashtables lazy-lists parser-combinators  strings ;
+USING: kernel math sequences errors vectors prettyprint io
+namespaces arrays words parser hashtables lazy-lists
+kernel-internals parser-combinators strings ;
 IN: cpu-8080
 
 TUPLE: cpu b c d e f h l a pc sp halted? last-interrupt cycles ram ;
