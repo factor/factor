@@ -159,11 +159,6 @@ HELP: define-temp "( quot -- word )"
     { $code "[ 2 2 + . ] define-temp execute" }
 } ;
 
-HELP: completions "( string words -- seq )"
-{ $values { "string" "a string" } { "words" "a sequence of words" } { "seq" "a sequence of words" } }
-{ $description "Outputs a sequence of words whose name contains " { $snippet "string" } "." }
-{ $examples "This word is used to implement " { $link apropos } "." } ;
-
 HELP: definer "( word -- definer )"
 { $values { "word" "a word" } { "definer" "a word" } }
 { $description "Outputs the parsing word that defines the given word." }

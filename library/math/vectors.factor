@@ -28,3 +28,6 @@ USING: arrays generic kernel sequences ;
 
 : sum ( seq -- n ) 0 [ + ] reduce ;
 : product ( seq -- n ) 1 [ * ] reduce ;
+
+: infimum ( seq -- n ) 1./0. [ min ] reduce ;
+: supremum ( seq -- n ) -1./0. [ max ] reduce ;

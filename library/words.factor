@@ -109,9 +109,6 @@ M: word unxref-word* drop ;
 : define-temp ( quot -- word )
     gensym [ swap define-compound ] keep ;
 
-: completions ( substring words -- seq )
-    [ word-name subseq? ] subset-with ;
-
 SYMBOL: bootstrapping?
 
 : word ( -- word ) \ word get-global ;
