@@ -16,5 +16,6 @@ IN: io-internals
     swap [ schedule-thread-with ] [ drop ] if* ;
 
 : init-io ( -- )
-    win32-init-stdio ;
+    win32-init-stdio 
+    init-winsock ;
 

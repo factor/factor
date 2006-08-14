@@ -7,23 +7,25 @@ USING: alien errors generic kernel kernel-internals math namespaces
 
 TUPLE: win32-server this ;
 TUPLE: win32-client-stream host port ;
-SYMBOL: winsock
 SYMBOL: socket
 
-: maybe-init-winsock ( -- )
-    winsock get [
-        HEX: 0202 <wsadata> WSAStartup drop winsock on
-    ] unless ;
+: (handle-socket-error)
+    WSAGetLastError [ ERROR_IO_PENDING ERROR_SUCCESS ] member?
+    [ WSAGetLastError error_message throw ] unless ;
 
-: handle-socket-error ( -- )
-    WSAGetLastError [
-      ERROR_IO_PENDING ERROR_SUCCESS
-    ] member? [
-      WSAGetLastError win32-error-message throw 
-    ] unless ;
+: handle-socket-error!=0/f ( int -- )
+    [ 0 f ] member? [ (handle-socket-error) ] unless ;
+
+: handle-socket-error=0/f ( int -- )
+    [ 0 f ] member? [ (handle-socket-error) ] when ;
+
+: init-winsock ( -- )
+    HEX: 0202 <wsadata> WSAStartup handle-socket-error!=0/f ;
+
 
 : new-socket ( -- socket )
-    AF_INET SOCK_STREAM 0 f f WSA_FLAG_OVERLAPPED WSASocket ;
+    AF_INET SOCK_STREAM 0 f f WSA_FLAG_OVERLAPPED
+    WSASocket dup INVALID_SOCKET = [ (handle-socket-error) ] when ;
 
 : setup-sockaddr ( port -- sockaddr )
     "sockaddr-in" <c-object> swap
@@ -32,12 +34,10 @@ SYMBOL: socket
     AF_INET over set-sockaddr-in-family ;
 
 : bind-socket ( port socket -- )
-    swap setup-sockaddr "sockaddr-in" c-size wsa-bind zero? [
-        handle-socket-error
-    ] unless ;
+    swap setup-sockaddr "sockaddr-in" c-size wsa-bind handle-socket-error!=0/f ;
 
 : listen-socket ( socket -- )
-    20 wsa-listen zero? [ handle-socket-error ] unless ;
+    20 wsa-listen handle-socket-error!=0/f ;
 
 : sockaddr> ( sockaddr -- port host )
     dup sockaddr-in-port ntohs swap sockaddr-in-addr inet-ntoa ;
@@ -59,7 +59,7 @@ M: win32-client-stream client-stream-port win32-client-stream-port ;
 
 C: win32-server ( port -- server )
     swap [ 
-        maybe-init-winsock new-socket swap over bind-socket dup listen-socket 
+        new-socket swap over bind-socket dup listen-socket 
         dup add-completion
         socket set
         dup stream set
@@ -78,7 +78,7 @@ M: win32-server expire ( -- )
 
 : client-sockaddr ( host port -- sockaddr )
     setup-sockaddr [
-        >r gethostbyname handle-socket-error hostent-addr
+        >r gethostbyname dup handle-socket-error=0/f hostent-addr
         r> set-sockaddr-in-addr
     ] keep ;
 
@@ -90,14 +90,14 @@ IN: io
             stream get alloc-io-callback init-overlapped
             >r >r >r socket get r> r> 
             buffer-ptr <alien> 0 32 32 f r> AcceptEx
-            [ handle-socket-error ] unless stop
+            handle-socket-error!=0/f stop
         ] callcc1 pending-error drop
         swap dup add-completion <win32-stream> <line-reader> 
         dupd <win32-client-stream> swap buffer-free
     ] bind ;
 
 : <client> ( host port -- stream )
-    maybe-init-winsock client-sockaddr new-socket
-    [ swap "sockaddr-in" c-size connect drop handle-socket-error ] keep 
+    client-sockaddr new-socket
+    [ swap "sockaddr-in" c-size connect handle-socket-error!=0/f ] keep 
     dup add-completion <win32-stream> <line-reader> ;
 
