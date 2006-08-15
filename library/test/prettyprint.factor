@@ -41,8 +41,6 @@ unit-test
 
 [ "IN: temporary : bar 2 + ;\n" ] [ [ \ bar see ] string-out ] unit-test
 
-: baz dup ;
-
 [ "( a b -- c d )" ] [
     { { "a" "b" } { "c" "d" } } effect>string
 ] unit-test
@@ -58,10 +56,6 @@ unit-test
 [ "( -- )" ] [
     { { } { } } effect>string
 ] unit-test
-
-[ ] [ [ baz ] infer drop ] unit-test
-[ "IN: temporary : baz dup ;\n" ]
-[ [ \ baz see ] string-out ] unit-test
 
 [ ] [ \ fixnum see ] unit-test
 

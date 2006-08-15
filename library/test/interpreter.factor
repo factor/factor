@@ -14,6 +14,14 @@ namespaces prettyprint sequences test ;
 : test-interpreter
     init-interpreter (meta-call) run meta-d get ;
 
+[ V{ } ] [
+    [ ] test-interpreter
+] unit-test
+
+[ V{ 1 } ] [
+    [ 1 ] test-interpreter
+] unit-test
+
 [ V{ 1 2 3 } ] [
     [ 1 2 3 ] test-interpreter
 ] unit-test

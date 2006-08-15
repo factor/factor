@@ -58,15 +58,12 @@ math namespaces prettyprint sequences strings styles ;
         dup first 0 rot (runs)
     ] { } make ;
 
-: prev >r 1- r> nth ;
-: next >r 1+ r> nth ;
-
 : score-1 ( i full -- n )
     {
         { [ over zero? ] [ 2drop 10 ] }
         { [ 2dup length 1- = ] [ 2drop 4 ] }
-        { [ 2dup prev Letter? not ] [ 2drop 10 ] }
-        { [ 2dup next Letter? not ] [ 2drop 4 ] }
+        { [ 2dup >r 1- r> nth Letter? not ] [ 2drop 10 ] }
+        { [ 2dup >r 1+ r> nth Letter? not ] [ 2drop 4 ] }
         { [ t ] [ 2drop 1 ] }
     } cond ;
 

@@ -120,17 +120,17 @@ unit-test
 
 [ -1 ] [ [ - ] { 1 2 3 4 } seq-sorter 1 compare ] unit-test
 
-[ 1 ] [ [ - ] { -5 4 -3 5 } seq-sorter sort-up sorter-start nip ] unit-test
+[ 1 ] [ [ - ] { -5 4 -3 5 } seq-sorter 2dup sort-up sorter-start nip ] unit-test
 
-[ 3 ] [ [ - ] { -5 4 -3 -6 5 } seq-sorter sort-down sorter-end nip ] unit-test
+[ 3 ] [ [ - ] { -5 4 -3 -6 5 } seq-sorter 2dup sort-down sorter-end nip ] unit-test
 
 [ { 1 2 3 4 5 6 7 8 9 } ] [
-    [ - ] { 9 8 7 6 5 4 3 2 1 } clone seq-sorter sort-step
+    [ - ] { 9 8 7 6 5 4 3 2 1 } clone seq-sorter 2dup sort-step
     sorter-seq >array nip
 ] unit-test
 
 [ { 1 2 3 4 5 6 7 8 9 } ] [
-    [ - ] { 1 2 3 4 5 6 7 8 9 } clone seq-sorter sort-step
+    [ - ] { 1 2 3 4 5 6 7 8 9 } clone seq-sorter 2dup sort-step
     sorter-seq >array nip
 ] unit-test
 

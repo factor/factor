@@ -3,7 +3,6 @@
 - declaration to do:
   - move effect class to words vocab
   - stack-effect word in words needs to be fixed
-  - forget declared effects when redefining words
   - test what is done in the case of an invalid declaration on an inline
     recursive
   - see should show declared effects
@@ -13,8 +12,6 @@
   - load cocoa before 'recompile' call
   - document inference errors
   - maybe we can remove |
-  - natural-sort does not compile
-  - fix unit test failures
 - RT_WORD should refer to XTs not word objects.
 - fix contribs: boids, automata
 - sometimes darcs get fails with the httpd
@@ -26,9 +23,7 @@
 - services do not launch if factor not running
 - roundoff is still not quite right with tracks
 - fix top level window positioning
-- nasty inference regressions
 - [ [ dup call ] dup call ] infer hangs
-- the invalid recursion form case needs to be fixed, for inlines too
 - graphical module manager tool
 - see if alien calls can be made faster
 - doc front page: document stack effect notation

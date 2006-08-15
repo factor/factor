@@ -116,7 +116,10 @@ SYMBOL: crossref
 : define-compound ( word def -- ) 1 define ;
 
 : reset-word ( word -- )
-    { "parsing" "inline" "foldable" "predicating" } reset-props ;
+    {
+        "parsing" "inline" "foldable"
+        "predicating" "declared-effect"
+    } reset-props ;
 
 : reset-generic ( word -- )
     dup reset-word { "methods" "combination" } reset-props ;

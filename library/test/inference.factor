@@ -166,9 +166,9 @@ M: real iterate drop ;
 
 [ { 1 0 } ] [ [ iterate ] infer ] unit-test
 
-DEFER: agent ( a b -- c d )
-: smith 1+ agent ; inline
-: agent dup 0 = [ [ swap call ] 2keep smith ] when ; inline
+DEFER: agent
+: smith ( a b -- c d ) 1+ agent ; inline
+: agent ( a b -- c d ) dup 0 = [ [ swap call ] 2keep smith ] when ; inline
 [ { 0 2 } ]
 [ [ [ drop ] 0 agent ] infer ] unit-test
 
