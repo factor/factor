@@ -30,7 +30,7 @@ math math-internals sequences words parser ;
     [ with-datastack ] catch
     [ 3drop t ] [ inline-literals ] if ;
 
-: call>no-op ( not -- )
+: call>no-op ( not -- node/f )
     #! Note: cloning the vectors, since subst-values will modify
     #! them.
     [ node-in-d clone ] keep

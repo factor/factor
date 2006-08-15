@@ -249,7 +249,7 @@ M: hashtable hashcode
 : ?hash ( key hash/f -- value/f )
     dup [ hash ] [ 2drop f ] if ;
 
-: ?hash* ( key hash/f -- value/f )
+: ?hash* ( key hash/f -- value/f ? )
     dup [ hash* ] [ 2drop f f ] if ;
 
 IN: hashtables-internals

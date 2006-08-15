@@ -64,7 +64,7 @@ M: object zero? drop f ;
 
 : repeat 0 -rot (repeat) ; inline
 
-: times ( n quot -- | quot: -- )
+: times ( n quot -- ) | quot ( -- )
     swap [ >r dup slip r> ] repeat drop ; inline
 
 GENERIC: number>string ( n -- str ) foldable

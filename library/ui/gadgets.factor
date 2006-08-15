@@ -76,8 +76,7 @@ M: gadget children-on nip gadget-children ;
 : pick-up-list ( rect/point gadget -- gadget/f )
     dupd children-on <reversed> [ inside? ] find-with nip ;
 
-: translate ( rect/point -- new-origin )
-    rect-loc origin [ v+ ] change ;
+: translate ( rect/point -- ) rect-loc origin [ v+ ] change ;
 
 : pick-up ( rect/point gadget -- gadget )
     [

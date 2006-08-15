@@ -15,7 +15,7 @@ namespaces parser prettyprint sequences sequences-internals
 strings vectors words ;
 IN: image
 
-( Constants )
+! Constants
 
 : image-magic HEX: 0f0e0d0c ; inline
 : image-version 2 ; inline
@@ -87,26 +87,26 @@ SYMBOL: architecture
 : emit-object ( header tag quot -- addr )
     swap here-as >r swap tag-header emit call align-here r> ;
 
-( Image header )
+! Image header
 
 : header ( -- )
     image-magic emit
     image-version emit
-    ( relocation base at end of header ) data-base emit
-    ( bootstrap quotation set later ) 0 emit
-    ( global namespace set later ) 0 emit
-    ( pointer to t object ) 0 emit
-    ( pointer to bignum 0 ) 0 emit
-    ( pointer to bignum 1 ) 0 emit
-    ( pointer to bignum -1 ) 0 emit
-    ( size of data heap set later ) 0 emit
-    ( size of code heap is 0 ) 0 emit
-    ( reloc base of code heap is 0 ) 0 emit ;
+     data-base emit ! relocation base at end of header
+     0 emit ! bootstrap quotation set later
+     0 emit ! global namespace set later
+     0 emit ! pointer to t object
+     0 emit ! pointer to bignum 0
+     0 emit ! pointer to bignum 1
+     0 emit ! pointer to bignum -1
+     0 emit ! size of data heap set later
+     0 emit ! size of code heap is 0
+     0 emit ; ! reloc base of code heap is 0
 
 GENERIC: ' ( obj -- ptr )
 #! Write an object to the image.
 
-( Bignums )
+! Bignums
 
 : bignum-bits bootstrap-cell-bits 2 - ;
 
@@ -133,7 +133,7 @@ M: bignum '
     #! This can only emit 0, -1 and 1.
     bignum-tag bignum-tag [ emit-bignum ] emit-object ;
 
-( Fixnums )
+! Fixnums
 
 M: fixnum '
     #! When generating a 32-bit image on a 64-bit system,
@@ -141,14 +141,14 @@ M: fixnum '
     dup most-negative-fixnum most-positive-fixnum between?
     [ fixnum-tag tag-address ] [ >bignum ' ] if ;
 
-( Floats )
+! Floats
 
 M: float '
     float-tag float-tag [
         align-here double>bits emit-64
     ] emit-object ;
 
-( Special objects )
+! Special objects
 
 ! Padded with fixnums for 8-byte alignment
 
@@ -162,13 +162,13 @@ M: f '
 :  1,  1 >bignum '  1-offset fixup ;
 : -1, -1 >bignum ' -1-offset fixup ;
 
-( Beginning of the image )
+! Beginning of the image
 ! The image begins with the header, then T,
 ! and the bignums 0, 1, and -1.
 
 : begin-image ( -- ) header t, 0, 1, -1, ;
 
-( Words )
+! Words
 
 : emit-word ( word -- )
     [
@@ -199,12 +199,12 @@ M: f '
 
 M: word ' ;
 
-( Wrappers )
+! Wrappers
 
 M: wrapper '
     wrapped ' wrapper-tag wrapper-tag [ emit ] emit-object ;
 
-( Ratios and complexes )
+! Ratios and complexes
 
 : emit-pair
     [ [ emit ] 2apply ] emit-object ;
@@ -215,7 +215,7 @@ M: ratio '
 M: complex '
     >rect [ ' ] 2apply complex-tag complex-tag emit-pair ;
 
-( Strings )
+! Strings
 
 : emit-chars ( seq -- )
     big-endian get [ [ <reversed> ] map ] unless
@@ -236,7 +236,7 @@ M: string '
     #! to the image
     objects get [ emit-string ] cache ;
 
-( Arrays and vectors )
+! Arrays and vectors
 
 : emit-array ( list type -- pointer )
     >r [ ' ] map r> object-tag [
@@ -273,7 +273,7 @@ M: sbuf '
         emit ( array ptr )
     ] emit-object ;
 
-( Hashes )
+! Hashes
 
 M: hashtable '
     [ hash-array ' ] keep
@@ -283,7 +283,7 @@ M: hashtable '
         emit ( array ptr )
     ] emit-object ;
 
-( End of the image )
+! End of the image
 
 : words, ( -- )
     all-words [ emit-word ] each ;
@@ -315,7 +315,7 @@ M: hashtable '
     "Object cache size: " write objects get hash-size .
     \ word global remove-hash ;
 
-( Image output )
+! Image output
 
 : (write-image) ( image -- )
     bootstrap-cell swap big-endian get [

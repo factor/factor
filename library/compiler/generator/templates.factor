@@ -37,7 +37,7 @@ C: phantom-stack ( -- stack )
     0 over set-phantom-stack-height
     V{ } clone over set-delegate ;
 
-GENERIC: finalize-height ( n stack -- )
+GENERIC: finalize-height ( stack -- )
 
 GENERIC: <loc> ( n stack -- loc )
 
@@ -240,7 +240,7 @@ SYMBOL: +clobber
 : requested-vregs ( template -- int# float# )
     dup length swap [ float eq? ] subset length [ - ] keep ;
 
-: (requests-class?) ( class template -- )
+: (requests-class?) ( class template -- ? )
     [ second reg-spec>class eq? ] contains-with? ;
 
 : requests-class? ( class -- ? )

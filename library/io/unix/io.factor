@@ -91,7 +91,7 @@ M: port set-timeout
 ! Associates a port with a list of continuations waiting on the
 ! port to finish I/O
 TUPLE: io-task port callbacks ;
-C: io-task ( port -- )
+C: io-task ( port -- task )
     [ set-io-task-port ] keep
     V{ } clone over set-io-task-callbacks ;
 
@@ -132,7 +132,7 @@ GENERIC: task-container ( task -- vector )
         ] if
     ] hash-each-with ;
 
-: init-fdset ( fdset tasks -- )
+: init-fdset ( fdset tasks -- fdset )
     >r dup dup FD_SETSIZE clear-bits r>
     [ drop t swap rot set-bit-nth ] hash-each-with ;
 
@@ -204,7 +204,7 @@ M: input-port stream-read1
 
 ! Reading character counts
 : read-step ( count reader -- ? )
-    dup port-sbuf -rot >r over length - ( remaining) r>
+    dup port-sbuf -rot >r over length - r>
     2dup buffer-length <= [
         buffer> nappend t
     ] [

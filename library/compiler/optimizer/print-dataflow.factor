@@ -5,7 +5,7 @@ math namespaces prettyprint sequences styles vectors words ;
 ! A simple tool for turning dataflow IR into quotations, for
 ! debugging purposes.
 
-GENERIC: node>quot ( node -- )
+GENERIC: node>quot ( ? node -- )
 
 TUPLE: comment node text ;
 

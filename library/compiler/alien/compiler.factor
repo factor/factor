@@ -22,7 +22,7 @@ kernel-internals math namespaces sequences words ;
 : fastcall-param ( reg-class -- n reg-class )
     [ dup class get swap inc-reg-class ] keep ;
 
-: alloc-parameter ( parameter -- n reg reg-class )
+: alloc-parameter ( parameter -- reg reg-class )
     #! Allocate a register and stack frame location.
     #! n is a stack location, and the value of the class
     #! variable is a register number.

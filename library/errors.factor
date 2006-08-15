@@ -42,7 +42,7 @@ C: condition ( error restarts cc -- condition )
 : condition ( error restarts -- restart )
     [ <condition> throw ] callcc1 2nip ;
 
-GENERIC: compute-restarts
+GENERIC: compute-restarts ( error -- seq )
 
 M: object compute-restarts drop { } ;
 

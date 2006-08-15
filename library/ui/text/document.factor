@@ -53,7 +53,7 @@ C: document ( -- document )
     tuck >r >r document get -rot start-on-line r> r>
     document get -rot end-on-line ;
 
-: (doc-range) ( startloc endloc line# -- str )
+: (doc-range) ( startloc endloc line# -- )
     [ start/end-on-line ] keep document get doc-line <slice> , ;
 
 : doc-range ( startloc endloc document -- str )
@@ -70,10 +70,10 @@ C: document ( -- document )
         first swap length 1- + 0
     ] if r> peek length + 2array ;
 
-: prepend-first ( str seq -- seq )
+: prepend-first ( str seq -- )
     0 swap [ append ] change-nth ;
 
-: append-last ( str seq -- seq )
+: append-last ( str seq -- )
     [ length 1- ] keep [ swap append ] change-nth ;
 
 : loc-col/str ( loc document -- str col )

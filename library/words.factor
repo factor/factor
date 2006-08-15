@@ -49,10 +49,10 @@ M: symbol definer drop \ SYMBOL: ;
     [ rot word-props set-hash ]
     [ nip remove-word-prop ] if ;
 
-GENERIC: word-xt
+GENERIC: word-xt ( word -- xt )
 M: word word-xt 7 integer-slot ;
 
-GENERIC: set-word-xt
+GENERIC: set-word-xt ( xt word -- )
 M: word set-word-xt 7 set-integer-slot ;
 
 SYMBOL: vocabularies

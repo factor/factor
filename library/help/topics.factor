@@ -5,7 +5,7 @@ USING: arrays definitions errors generic graphs hashtables
 inspector io kernel namespaces prettyprint sequences words ;
 
 ! Markup
-GENERIC: print-element
+GENERIC: print-element ( element -- )
 
 ! Help articles
 SYMBOL: articles

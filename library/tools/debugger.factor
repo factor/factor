@@ -90,6 +90,6 @@ SYMBOL: restarts
 
 : init-error-handler ( -- )
     V{ } clone set-catchstack
-    ( kernel calls on error )
+    ! kernel calls on error
     [ error-handler ] 5 setenv
     \ kernel-error 12 setenv ;

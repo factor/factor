@@ -25,7 +25,7 @@ M: float-regs vregs drop { 0 1 2 3 4 5 6 7 8 9 10 11 12 13 } ;
 : stack@ macosx? 24 8 ? + ;
 : lr@ macosx? 8 4 ? + ;
 
-GENERIC: loc>operand
+GENERIC: loc>operand ( loc -- reg n )
 
 M: ds-loc loc>operand ds-loc-n cells neg 14 swap ;
 M: cs-loc loc>operand cs-loc-n cells neg 15 swap ;

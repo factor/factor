@@ -138,7 +138,7 @@ USING: kernel math parser sequences ;
         }
     } cond ;
 
-: step1b ( str -- str ? )
+: step1b ( str -- str )
     {
         { [ "eed" ?tail ] [ -eed ] }
         {

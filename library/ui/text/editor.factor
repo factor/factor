@@ -20,7 +20,7 @@ TUPLE: loc-monitor editor ;
     dup <loc> over set-editor-caret
     dup <loc> swap set-editor-mark ;
 
-C: editor ( document -- editor )
+C: editor ( -- editor )
     dup <document> delegate>control
     dup dup set-control-self
     dup init-editor-locs

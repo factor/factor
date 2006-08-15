@@ -87,12 +87,12 @@ C: font ( handle -- font )
     [ set-font-handle ] keep dup init-font
     V{ } clone over set-font-widths ;
 
-: open-font ( { font style ptsize } -- font )
+: open-font ( fontspec -- font )
     #! Open a font and set the point size of the font.
     first3 >r open-face dup 0 r> 6 shift
     dpi dpi FT_Set_Char_Size freetype-error <font> ;
 
-: lookup-font ( { font style ptsize } -- font )
+: lookup-font ( fontspec -- font )
     #! Cache open fonts.
     open-fonts get [ open-font ] cache ;
 

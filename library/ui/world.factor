@@ -65,7 +65,7 @@ M: world model-changed
 : focused-ancestors ( world -- seq )
     world-focus parents <reversed> ;
 
-: font-sprites ( font world -- { open-font sprites } )
+: font-sprites ( font world -- pair )
     world-fonts [ lookup-font V{ } clone 2array ] cache ;
 
 : draw-string ( font string -- )

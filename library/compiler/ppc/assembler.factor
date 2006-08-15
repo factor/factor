@@ -166,7 +166,7 @@ M: label (B) 0 -rot (B) rel-relative-3 rel-label ;
 
 : B 0 0 (B) ; : BL 0 1 (B) ;
 
-GENERIC: BC
+GENERIC: BC ( a b c -- )
 M: integer BC 0 0 b-form 16 insn ;
 M: word BC >r 0 BC r> rel-relative-2 rel-word ;
 M: label BC >r 0 BC r> rel-relative-2 rel-label ;

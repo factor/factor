@@ -92,7 +92,7 @@ TUPLE: bad-escape ;
 
 SYMBOL: effect-stack
 
-: (parse-effect)
+: (parse-effect) ( -- )
     scan [
         dup ")" = [ drop ] [ , (parse-effect) ] if
     ] [

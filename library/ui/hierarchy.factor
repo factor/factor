@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 IN: gadgets
 USING: generic hashtables inference kernel math namespaces
-sequences vectors words ;
+sequences vectors words parser ;
 
 GENERIC: graft* ( gadget -- )
 
@@ -61,7 +61,7 @@ M: gadget ungraft* drop ;
     #! Add all gadgets in a sequence to a parent gadget.
     swap [ over (add-gadget) ] each relayout ;
 
-: add-spec ( quot { quot setter post loc } -- )
+: add-spec ( quot spec -- )
     dup first %
     dup second [ [ dup gadget get ] % , ] when*
     dup third %
@@ -75,7 +75,7 @@ M: gadget ungraft* drop ;
 : build-spec ( spec quot -- )
     swap (build-spec) call ;
 
-\ build-spec { 2 0 } "infer-effect" set-word-prop
+\ build-spec 2 0 <effect> "infer-effect" set-word-prop
 
 \ build-spec [
     pop-literal pop-literal nip (build-spec) infer-quot-value

@@ -9,7 +9,7 @@ gadgets-viewports generic kernel math namespaces sequences ;
 ! down on the next relayout.
 TUPLE: scroller viewport x y follows ;
 
-: scroller-origin ( scroller -- { x y } )
+: scroller-origin ( scroller -- point )
     dup scroller-x slider-value
     swap scroller-y slider-value
     2array ;

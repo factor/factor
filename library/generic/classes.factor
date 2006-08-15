@@ -3,7 +3,7 @@
 IN: generic
 USING: arrays definitions errors hashtables kernel
 kernel-internals namespaces parser sequences strings words
-vectors math ;
+vectors math parser ;
 
 PREDICATE: word class "class" word-prop ;
 
@@ -17,8 +17,11 @@ SYMBOL: builtins
 : predicate-word ( word -- word )
     word-name "?" append create-in ;
 
+: predicate-effect 1 1 <effect> ;
+
 : define-predicate ( class predicate quot -- )
     over [
+        over predicate-effect "declared-effect" set-word-prop
         dupd define-compound
         2dup unit "predicate" set-word-prop
         swap "predicating" set-word-prop

@@ -13,7 +13,7 @@ C: label ( text -- label )
     [ set-label-text ] keep
     dup label-theme ;
 
-: label-size ( gadget text -- dim )
+: label-size ( gadget -- dim )
     dup label-font lookup-font dup font-height >r
     swap label-text string-width r> 2array ;
 

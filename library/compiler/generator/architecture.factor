@@ -133,7 +133,7 @@ M: float-regs inc-reg-class
     dup (inc-reg-class)
     macosx? [ reg-size 4 / int-regs +@ ] [ drop ] if ;
 
-GENERIC: v>operand
+GENERIC: v>operand ( obj -- operand )
 M: integer v>operand tag-bits shift ;
 M: vreg v>operand dup vreg-n swap vregs nth ;
 M: f v>operand drop object-tag ;

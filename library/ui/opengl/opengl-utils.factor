@@ -81,7 +81,7 @@ sequences ;
 ! A sprite is a texture and a display list.
 TUPLE: sprite dlist texture loc dim dim2 ;
 
-C: sprite ( loc dim dim2 -- )
+C: sprite ( loc dim dim2 -- sprite )
     [ set-sprite-dim2 ] keep
     [ set-sprite-dim ] keep
     [ set-sprite-loc ] keep ;
@@ -116,7 +116,7 @@ C: sprite ( loc dim dim2 -- )
     GL_TEXTURE_2D GL_TEXTURE_WRAP_S GL_CLAMP glTexParameterf
     GL_TEXTURE_2D GL_TEXTURE_WRAP_T GL_CLAMP glTexParameterf ;
 
-: gl-translate ( { x y } -- ) first2 0.0 glTranslated ;
+: gl-translate ( point -- ) first2 0.0 glTranslated ;
 
 : draw-sprite ( sprite -- )
     dup sprite-loc gl-translate

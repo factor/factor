@@ -205,7 +205,7 @@ DEFER: blah4
         [ swap slip ] keep swap bad-combinator
     ] if ; inline
 
-! [ [ [ 1 ] [ ] bad-combinator ] infer ] unit-test-fails
+[ [ [ 1 ] [ ] bad-combinator ] infer ] unit-test-fails
 
 ! Regression
 : bad-input#

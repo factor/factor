@@ -5,10 +5,6 @@ USING: arrays errors generic inspector interpreter io kernel
 math namespaces parser prettyprint sequences strings
 vectors words ;
 
-! Called when a recursive call during base case inference is
-! found. Either tries to infer another branch, or gives up.
-SYMBOL: base-case-continuation
-
 TUPLE: inference-error message rstate data-stack call-stack ;
 
 : inference-error ( msg -- * )
@@ -81,7 +77,7 @@ M: wrapper apply-object wrapped apply-literal ;
     #! Ignore this branch's stack effect.
     terminated? on #terminate node, ;
 
-GENERIC: infer-quot
+GENERIC: infer-quot ( quot -- )
 
 M: f infer-quot drop ;
 
@@ -105,14 +101,13 @@ M: quotation infer-quot
 : with-infer ( quot -- )
     [
         [
-            base-case-continuation off
             { } recursive-state set
             V{ } clone recorded set
             f init-inference
             call
             check-return
         ] [
-            recorded get dup . [ f "infer-effect" set-word-prop ] each
+            recorded get [ f "infer-effect" set-word-prop ] each
             rethrow
         ] recover
     ] with-scope ;

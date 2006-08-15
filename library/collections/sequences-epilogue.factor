@@ -47,7 +47,7 @@ M: object like drop ;
     pick pick number=
     [ 3drop ] [ [ nth swap ] keep set-nth ] if ; inline
 
-: (delete) ( elt store scan seq -- )
+: (delete) ( elt store scan seq -- elt store scan seq )
     2dup length < [
         3dup move
         [ nth pick = ] 2keep rot

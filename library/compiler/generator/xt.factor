@@ -43,7 +43,7 @@ SYMBOL: label-table
 : rel-relative-2 5 ;
 : rel-relative-3 6 ;
 
-: (rel) ( arg class type offset -- { type offset } )
+: (rel) ( arg class type offset -- pair )
     #! Write a relocation instruction for the runtime image
     #! loader.
     pick rel-absolute-cell = cell 4 ? -

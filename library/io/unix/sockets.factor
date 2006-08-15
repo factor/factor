@@ -32,14 +32,14 @@ threads unix-internals ;
 : server-sockaddr ( port -- sockaddr )
     init-sockaddr  INADDR_ANY htonl over set-sockaddr-in-addr ;
 
-: sockopt ( fd level opt value -- )
+: sockopt ( fd level opt -- )
     1 <int> "int" c-size setsockopt io-error ;
 
 : server-socket ( port -- fd )
     server-sockaddr [
         dup SOL_SOCKET SO_REUSEADDR sockopt
         swap dupd "sockaddr-in" c-size bind
-        dup 0 >= [ drop 1 listen ] [ ( fd n - n) nip ] if
+        dup 0 >= [ drop 1 listen ] [ nip ] if
     ] with-socket-fd ;
 
 TUPLE: connect-task ;
