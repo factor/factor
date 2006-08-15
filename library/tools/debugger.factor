@@ -11,13 +11,13 @@ PREDICATE: array kernel-error ( obj -- ? )
 GENERIC: error. ( error -- )
 GENERIC: error-help ( error -- topic )
 
-M: object error. ( error -- ) . ;
-M: object error-help ( error -- topic ) drop f ;
+M: object error. . ;
+M: object error-help drop f ;
 
-M: tuple error. ( error -- ) describe ;
-M: tuple error-help ( error -- topic ) class ;
+M: tuple error. describe ;
+M: tuple error-help class ;
 
-M: string error. ( error -- ) print ;
+M: string error. print ;
 
 SYMBOL: restarts
 

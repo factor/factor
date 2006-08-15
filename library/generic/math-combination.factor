@@ -41,8 +41,8 @@ math namespaces sequences words ;
 
 TUPLE: no-math-method left right generic ;
 
-: no-math-method ( left right generic -- )
-    3dup <no-math-method> throw ;
+: no-math-method ( left right generic -- * )
+    <no-math-method> throw ;
 
 : applicable-method ( generic class -- quot )
     over method [ ] [ [ no-math-method ] curry ] ?if ;

@@ -9,7 +9,7 @@ GENERIC: node>quot ( node -- )
 
 TUPLE: comment node text ;
 
-M: comment pprint* ( ann -- )
+M: comment pprint*
     "( " over comment-text " )" append3
     swap comment-node presented associate
     styled-text ;
@@ -36,10 +36,10 @@ M: comment pprint* ( ann -- )
         " r: " swap node-out-r values%
     ] "" make 1 tail ;
 
-M: #shuffle node>quot ( ? node -- )
+M: #shuffle node>quot
     >r drop t r> dup effect-str "#shuffle: " swap append comment, ;
 
-M: #push node>quot ( ? node -- ) nip >#push< % ;
+M: #push node>quot nip >#push< % ;
 
 DEFER: dataflow>quot
 
@@ -47,26 +47,26 @@ DEFER: dataflow>quot
     dup node-param dup
     [ , dup effect-str comment, ] [ 3drop ] if ;
 
-M: #call node>quot ( ? node -- ) #call>quot ;
+M: #call node>quot #call>quot ;
 
-M: #call-label node>quot ( ? node -- ) #call>quot ;
+M: #call-label node>quot #call>quot ;
 
-M: #label node>quot ( ? node -- )
+M: #label node>quot
     [ "#label: " over node-param word-name append comment, ] 2keep
     node-child swap dataflow>quot , \ call ,  ;
 
-M: #if node>quot ( ? node -- )
+M: #if node>quot
     [ "#if" comment, ] 2keep
     node-children [ swap dataflow>quot ] map-with % \ if , ;
 
-M: #dispatch node>quot ( ? node -- )
+M: #dispatch node>quot
     [ "#dispatch" comment, ] 2keep
     node-children [ swap dataflow>quot ] map-with , \ dispatch , ;
 
-M: #return node>quot ( ? node -- )
+M: #return node>quot
     dup node-param unparse "#return " swap append comment, ;
 
-M: object node>quot ( ? node -- ) dup class word-name comment, ;
+M: object node>quot dup class word-name comment, ;
 
 : (dataflow>quot) ( ? node -- )
     dup [

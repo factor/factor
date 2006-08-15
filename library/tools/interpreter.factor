@@ -120,23 +120,23 @@ SYMBOL: callframe-end
 
 GENERIC: do-1 ( object -- )
 
-M: word do-1 ( word -- )
+M: word do-1
     dup "meta-word" word-prop [ call ] [ host-word ] ?if ;
 
-M: wrapper do-1 ( wrapper -- ) wrapped push-d ;
+M: wrapper do-1 wrapped push-d ;
 
-M: object do-1 ( object -- ) push-d ;
+M: object do-1 push-d ;
 
 GENERIC: do ( obj -- )
 
-M: word do ( word -- )
+M: word do
     dup "meta-word" word-prop [
         call
     ] [
         dup compound? [ word-def meta-call ] [ host-word ] if
     ] ?if ;
 
-M: object do ( object -- ) do-1 ;
+M: object do do-1 ;
 
 ! The interpreter loses object identity of the name and catch
 ! stacks -- they are copied after each step -- so we execute

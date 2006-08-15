@@ -30,10 +30,10 @@ GENERIC: loc>operand
 M: ds-loc loc>operand ds-loc-n cells neg 14 swap ;
 M: cs-loc loc>operand cs-loc-n cells neg 15 swap ;
 
-M: immediate load-literal ( literal vreg -- )
+M: immediate load-literal
     [ v>operand ] 2apply LOAD ;
 
-M: object load-literal ( literal vreg -- )
+M: object load-literal
     v>operand
     [ 0 swap LOAD32 rel-absolute-2/2 rel-literal ] keep
     dup 0 LWZ ;
@@ -91,14 +91,14 @@ M: object load-literal ( literal vreg -- )
 : compile-dlsym ( symbol dll register -- )
     0 swap LOAD32 rel-absolute-2/2 rel-dlsym ;
 
-M: int-regs (%peek) ( vreg loc -- )
+M: int-regs (%peek)
     drop >r v>operand r> loc>operand LWZ ;
 
-M: float-regs (%peek) ( vreg loc -- )
+M: float-regs (%peek)
     drop fp-scratch v>operand swap loc>operand LWZ
     fp-scratch [ v>operand ] 2apply float-offset LFD ;
 
-M: int-regs (%replace) ( vreg loc -- )
+M: int-regs (%replace)
     drop >r v>operand r> loc>operand STW ;
 
 : %move-int>int ( dst src -- )
@@ -124,7 +124,7 @@ M: int-regs (%replace) ( vreg loc -- )
         r> call 12 12 \ size get call ADDI
     ] bind save-allot-ptr ; inline
 
-M: float-regs (%replace) ( vreg loc reg-class -- )
+M: float-regs (%replace)
     drop swap
     [ v>operand 12 8 STFD ]
     [ 11 swap loc>operand STW ] H{

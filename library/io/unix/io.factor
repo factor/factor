@@ -35,7 +35,7 @@ SYMBOL: write-tasks
 ! Some general stuff
 : file-mode OCT: 0600 ;
 
-: (io-error) err_no strerror throw ;
+: (io-error) ( -- * ) err_no strerror throw ;
 
 : check-null ( n -- ) zero? [ (io-error) ] when ;
 
@@ -69,7 +69,7 @@ C: port ( handle buffer -- port )
     dup port-timeout dup zero?
     [ 2drop ] [ millis + swap set-port-cutoff ] if ;
 
-M: port set-timeout ( timeout port -- )
+M: port set-timeout
     [ set-port-timeout ] keep touch-port ;
 
 : buffered-port 32768 <buffer> <port> ;
@@ -183,7 +183,7 @@ TUPLE: read1-task ;
 C: read1-task ( port -- task )
     [ >r <io-task> r> set-delegate ] keep ;
 
-M: read1-task do-io-task ( task -- ? )
+M: read1-task do-io-task
     io-task-port dup refill [
         [
             dup buffer-empty?
@@ -198,7 +198,7 @@ M: read1-task task-container drop read-tasks get-global ;
         [ swap <read1-task> add-io-task stop ] callcc0
     ] when pending-error ;
 
-M: input-port stream-read1 ( stream -- char/f )
+M: input-port stream-read1
     dup wait-to-read1
     dup port-eof? [ drop f ] [ buffer-pop ] if ;
 
@@ -222,7 +222,7 @@ C: read-task ( count port -- task )
 
 : >read-task< dup read-task-count swap io-task-port ;
 
-M: read-task do-io-task ( task -- ? )
+M: read-task do-io-task
     >read-task< dup refill [
         dup buffer-empty? [
             reader-eof drop t
@@ -240,7 +240,7 @@ M: read-task task-container drop read-tasks get-global ;
         [ -rot <read-task> add-io-task stop ] callcc0
     ] unless pending-error drop ;
 
-M: input-port stream-read ( count stream -- string )
+M: input-port stream-read
     [ wait-to-read ] keep dup port-eof?
     [ drop f ] [ port-sbuf >string ] if ;
 
@@ -287,19 +287,19 @@ M: write-task task-container drop write-tasks get-global ;
 : port-flush ( port -- )
     [ swap <write-task> add-write-io-task stop ] callcc0 drop ;
 
-M: output-port stream-flush ( stream -- )
+M: output-port stream-flush
     dup port-flush pending-error ;
 
 : wait-to-write ( len port -- )
     tuck can-write? [ drop ] [ stream-flush ] if ;
 
-M: output-port stream-write1 ( char writer -- )
+M: output-port stream-write1
     1 over wait-to-write ch>buffer ;
 
-M: output-port stream-write ( string writer -- )
+M: output-port stream-write
     over length over wait-to-write >buffer ;
 
-M: port stream-close ( stream -- )
+M: port stream-close
     dup port-type closed eq? [
         dup port-type >r closed over set-port-type r>
         output eq? [ dup port-flush ] when dup port-handle close

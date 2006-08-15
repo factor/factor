@@ -140,7 +140,7 @@ C: indirect ( base index scale displacement -- indirect )
 
 GENERIC: sib-present?
 
-M: indirect sib-present? ( indirect -- ? )
+M: indirect sib-present?
     dup indirect-base { ESP RSP } memq?
     over indirect-index rot indirect-scale or or ;
 
@@ -148,11 +148,11 @@ M: register sib-present? drop f ;
 
 GENERIC: r/m
 
-M: indirect r/m ( indirect -- r/m )
+M: indirect r/m
     dup sib-present?
     [ drop ESP reg-code ] [ indirect-base* ] if ;
 
-M: register r/m ( reg -- r/m ) reg-code ;
+M: register r/m reg-code ;
 
 : byte? -128 127 between? ;
 
@@ -299,8 +299,8 @@ M: operand CALL BIN: 010 t HEX: ff 1-operand ;
 
 G: JUMPcc ( addr opcode -- ) 1 standard-combination ;
 : (JUMPcc) HEX: 0f , , 0 4, rel-relative ;
-M: callable JUMPcc ( addr opcode -- ) (JUMPcc) rel-word ;
-M: label JUMPcc ( addr opcode -- ) (JUMPcc) rel-label ;
+M: callable JUMPcc (JUMPcc) rel-word ;
+M: label JUMPcc (JUMPcc) rel-label ;
 
 : JO  HEX: 80 JUMPcc ;
 : JNO HEX: 81 JUMPcc ;

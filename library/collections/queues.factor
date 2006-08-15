@@ -34,7 +34,7 @@ C: queue ( -- queue ) ;
     ] if ;
 
 TUPLE: empty-queue ;
-: empty-queue <empty-queue> throw ;
+: empty-queue ( -- * ) <empty-queue> throw ;
 
 : deque ( queue -- obj )
     dup queue-empty? [

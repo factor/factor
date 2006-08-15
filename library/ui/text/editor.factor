@@ -32,17 +32,17 @@ C: editor ( document -- editor )
 : deactivate-editor-model ( editor model -- )
     dup deactivate-model swap control-model remove-loc ;
 
-M: editor graft* ( editor -- )
+M: editor graft*
     dup dup editor-caret activate-editor-model
     dup dup editor-mark activate-editor-model
     dup control-self swap control-model add-connection ;
 
-M: editor ungraft* ( editor -- )
+M: editor ungraft*
     dup dup editor-caret deactivate-editor-model
     dup dup editor-mark deactivate-editor-model
     dup control-self swap control-model remove-connection ;
 
-M: editor model-changed ( editor -- )
+M: editor model-changed
     control-self dup control-model
     over editor-caret [ over validate-loc ] (change-model)
     over editor-mark [ over validate-loc ] (change-model)
@@ -124,7 +124,7 @@ M: editor model-changed ( editor -- )
 : scroll>caret ( editor -- )
     dup caret-rect swap scroll>rect ;
 
-M: loc-monitor model-changed ( obj -- )
+M: loc-monitor model-changed
     loc-monitor-editor dup scroll>caret
     control-self relayout ;
 
@@ -182,7 +182,7 @@ M: loc-monitor model-changed ( obj -- )
         ] each-line 2drop
     ] do-matrix ;
 
-M: editor draw-gadget* ( gadget -- )
+M: editor draw-gadget*
     [ draw-caret draw-selection draw-lines ] with-editor ;
 
 : editor-height ( editor -- n )
@@ -192,20 +192,20 @@ M: editor draw-gadget* ( gadget -- )
     0 swap dup editor-font* swap editor-lines
     [ string-width max ] each-with ;
 
-M: editor pref-dim* ( editor -- dim )
+M: editor pref-dim*
     dup editor-width swap editor-height 2array ;
 
-M: editor gadget-selection? ( editor -- ? )
+M: editor gadget-selection?
     selection-start/end = not ;
 
-M: editor gadget-selection ( editor -- str )
+M: editor gadget-selection
     [ selection-start/end ] keep control-model doc-range ;
 
 : remove-editor-selection ( editor -- )
     [ selection-start/end ] keep control-model
     remove-doc-range ;
 
-M: editor user-input* ( str editor -- ? )
+M: editor user-input*
     [ selection-start/end ] keep control-model set-doc-range t ;
 
 : editor-text ( editor -- str )

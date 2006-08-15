@@ -56,7 +56,7 @@ GENERIC: model-changed ( observer -- )
 
 GENERIC: set-model ( value model -- )
 
-M: model set-model ( value model -- )
+M: model set-model
     [ set-model-value ] keep
     model-connections [ model-changed ] each ;
 
@@ -84,7 +84,7 @@ C: filter ( model quot -- filter )
     [ add-dependency ] keep
     dup model-changed ;
 
-M: filter model-changed ( filter -- )
+M: filter model-changed
     dup filter-model model-value over filter-quot call
     swap set-model ;
 
@@ -97,7 +97,7 @@ C: validator ( model quot -- filter )
     [ add-dependency ] keep
     dup model-changed ;
 
-M: validator model-changed ( validator -- )
+M: validator model-changed
     dup validator-model model-value dup
     pick validator-quot call [
         swap delegate set-model
@@ -105,7 +105,7 @@ M: validator model-changed ( validator -- )
         2drop
     ] if ;
 
-M: validator set-model ( value validator -- )
+M: validator set-model
     2dup validator-quot call [
         validator-model set-model
     ] [
@@ -119,11 +119,11 @@ C: compose ( models -- compose )
     [ set-model-dependencies ] keep
     dup model-changed ;
 
-M: compose model-changed ( compose -- )
+M: compose model-changed
     dup model-dependencies [ model-value ] map
     swap delegate set-model ;
 
-M: compose set-model ( value compose -- )
+M: compose set-model
     model-dependencies [ set-model ] 2each ;
 
 TUPLE: history back forward ;
@@ -136,7 +136,7 @@ C: history ( value -- history )
 G: (add-history) ( history vector -- )
     1 standard-combination ;
 
-M: history (add-history) ( history vector -- )
+M: history (add-history)
     swap model-value dup [ swap push ] [ 2drop ] if ;
 
 : go-back/forward ( history to from -- )
@@ -152,6 +152,6 @@ M: history (add-history) ( history vector -- )
 
 GENERIC: add-history ( history -- )
 
-M: history add-history ( history -- )
+M: history add-history
     dup history-forward delete-all
     dup history-back (add-history) ;

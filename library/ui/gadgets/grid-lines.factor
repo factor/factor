@@ -20,7 +20,7 @@ SYMBOL: grid-dim
     swap grid-positions grid get rect-dim { 1 0 } v- add
     [ grid-line-from/to gl-line ] each-with ;
 
-M: grid-lines draw-boundary ( gadget paint -- )
+M: grid-lines draw-boundary
     #! Clean this up later.
     GL_MODELVIEW [
         grid-lines-color gl-color [

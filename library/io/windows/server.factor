@@ -65,13 +65,13 @@ C: win32-server ( port -- server )
         dup stream set
     ] make-hash over set-win32-server-this ;
 
-M: win32-server stream-close ( server -- )
+M: win32-server stream-close
     win32-server-this [ socket get CloseHandle drop ] bind ;
 
-M: win32-server set-timeout ( timeout server -- )
+M: win32-server set-timeout
     win32-server-this [ timeout set ] bind ;
 
-M: win32-server expire ( -- )
+M: win32-server expire
     win32-server-this [
         timeout get [ millis cutoff get > [ socket get CancelIo ] when ] when
     ] bind ;

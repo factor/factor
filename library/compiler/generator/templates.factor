@@ -87,7 +87,7 @@ M: phantom-callstack finalize-height
 
 GENERIC: cut-phantom ( n phantom -- seq )
 
-M: phantom-stack cut-phantom ( n phantom -- seq )
+M: phantom-stack cut-phantom
     [ delegate cut* swap ] keep set-delegate ;
 
 SYMBOL: phantom-d

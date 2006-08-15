@@ -32,7 +32,7 @@ C: frame ( -- frame )
 : fill-center ( horiz vert dim -- )
     tuck (fill-center) (fill-center) ;
 
-M: frame layout* ( frame -- dim )
+M: frame layout*
     dup [
         [ rot rect-dim fill-center ] 2keep grid-layout
     ] with-grid ;

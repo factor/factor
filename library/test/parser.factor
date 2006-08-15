@@ -1,9 +1,5 @@
+USING: arrays errors math parser test kernel generic words ;
 IN: temporary
-USE: parser
-USE: test
-USE: kernel
-USE: generic
-USE: words
 
 [ 1 CHAR: a ]
 [ 0 "abcd" next-char ] unit-test
@@ -43,10 +39,6 @@ unit-test
 [ "! This is a comment, people." parse call ]
 unit-test
 
-[ ]
-[ "( This is a comment, people. )" parse call ]
-unit-test
-
 ! Test escapes
 
 [ [ " " ] ]
@@ -63,3 +55,34 @@ unit-test
 [ [ "Hello" ] ] [ "#! This calls until-eol.\n\"Hello\"" parse ] unit-test 
 
 [ word ] [ \ f class ] unit-test
+
+! Test stack effect parsing
+
+: foo ( a b -- c ) + ;
+
+[ T{ effect f { "a" "b" } { "c" } H{ } f } ]
+[ \ foo "declared-effect" word-prop ] unit-test
+
+: bar ( a quot -- b ) | quot ( u -- v ) call ;
+
+[
+    T{ effect f
+        { "a" "quot" }
+        { "b" }
+        H{ { "quot" T{ effect f { "u" } { "v" } H{ } } } }
+        f
+    }
+]
+[ \ bar "declared-effect" word-prop ] unit-test
+
+[ t ] [ 1 1 <effect> 2 2 <effect> effect<= ] unit-test
+[ f ] [ 1 0 <effect> 2 2 <effect> effect<= ] unit-test
+[ t ] [ 2 2 <effect> 2 2 <effect> effect<= ] unit-test
+[ f ] [ 3 3 <effect> 2 2 <effect> effect<= ] unit-test
+[ f ] [ 2 3 <effect> 2 2 <effect> effect<= ] unit-test
+
+: baz ( a b -- * ) 2array throw ;
+
+[ t ]
+[ \ baz "declared-effect" word-prop effect-terminated? ]
+unit-test

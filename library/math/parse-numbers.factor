@@ -6,7 +6,7 @@ strings ;
 
 DEFER: base>
 
-: string>ratio ( "a/b" radix -- a/b )
+: string>ratio ( str radix -- a/b )
     >r "/" split1 r> tuck base> >r base> r>
     2dup and [ / ] [ 2drop f ] if ;
 
@@ -51,7 +51,7 @@ M: object digit> drop f ;
 
 G: >base ( num radix -- string ) 1 standard-combination ;
 
-M: integer >base ( num radix -- string )
+M: integer >base
     [
         over 0 < [
             swap neg swap integer, CHAR: - ,
@@ -60,7 +60,7 @@ M: integer >base ( num radix -- string )
         ] if
     ] "" make reverse ;
 
-M: ratio >base ( num radix -- string )
+M: ratio >base
     [
         over numerator over >base %
         CHAR: / ,
@@ -70,7 +70,7 @@ M: ratio >base ( num radix -- string )
 : fix-float
     CHAR: . over member? [ ".0" append ] unless ;
 
-M: float >base ( num radix -- string )
+M: float >base
     drop {
         { [ dup 1.0/0.0 = ] [ drop "1.0/0.0" ] }
         { [ dup -1.0/0.0 = ] [ drop "-1.0/0.0" ] }

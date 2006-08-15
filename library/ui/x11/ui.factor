@@ -9,7 +9,7 @@ namespaces opengl sequences strings ;
 ! The window is an X11 window ID, and the context is a
 ! GLX context pointer.
 
-M: world expose-event ( event world -- ) nip relayout ;
+M: world expose-event nip relayout ;
 
 : configured-loc ( event -- dim )
     dup XConfigureEvent-x swap XConfigureEvent-y 2array ;
@@ -17,7 +17,7 @@ M: world expose-event ( event world -- ) nip relayout ;
 : configured-dim ( event -- dim )
     dup XConfigureEvent-width swap XConfigureEvent-height 2array ;
 
-M: world configure-event ( event world -- )
+M: world configure-event
     over configured-loc over set-world-loc
     swap configured-dim swap set-gadget-dim ;
 
@@ -26,20 +26,20 @@ M: world configure-event ( event world -- )
     over XButtonEvent-x
     rot XButtonEvent-y 2array ;
 
-M: world button-down-event ( event world -- )
+M: world button-down-event
     >r button&loc r> send-button-down ;
 
-M: world button-up-event ( event world -- )
+M: world button-up-event
     >r button&loc r> send-button-up ;
 
-M: world wheel-event ( event world -- )
+M: world wheel-event
     >r button&loc >r 4 = r> r> send-wheel ;
 
-M: world enter-event ( event world -- ) motion-event ;
+M: world enter-event motion-event ;
 
-M: world leave-event ( event world -- ) 2drop forget-rollover ;
+M: world leave-event 2drop forget-rollover ;
 
-M: world motion-event ( event world -- )
+M: world motion-event
     >r dup XMotionEvent-x swap XMotionEvent-y 2array r>
     move-hand fire-motion ;
 
@@ -86,7 +86,7 @@ M: world motion-event ( event world -- )
     >r dup XKeyEvent-state modifiers modifier swap key-code
     r> [ drop f ] if* ; inline
 
-M: world key-down-event ( event world -- )
+M: world key-down-event
     world-focus over [ <key-down> ] event>gesture [
         over handle-gesture
         [ swap lookup-string nip swap user-input ] [ 2drop ] if
@@ -94,15 +94,15 @@ M: world key-down-event ( event world -- )
         2drop
     ] if* ;
 
-M: world key-up-event ( event world -- )
+M: world key-up-event
     world-focus swap [ <key-up> ] event>gesture dup
     [ swap handle-gesture drop ] [ 2drop ] if ;
 
-M: world focus-in-event ( event world -- ) nip focus-world ;
+M: world focus-in-event nip focus-world ;
 
-M: world focus-out-event ( event world -- ) nip unfocus-world ;
+M: world focus-out-event nip unfocus-world ;
 
-M: world selection-notify-event ( event world -- )
+M: world selection-notify-event
     [ world-handle first selection-from-event ] keep
     world-focus user-input ;
 
@@ -110,7 +110,7 @@ M: world selection-notify-event ( event world -- )
     { "STRING" "UTF8_STRING" "TEXT" }
     [ x-atom = ] contains-with? ;
 
-M: world selection-request-event ( event world -- )
+M: world selection-request-event
     drop dup XSelectionRequestEvent-target {
         { [ dup supported-type? ] [ drop dup set-selection-prop send-notify-success ] }
         { [ dup "TARGETS" x-atom = ] [ drop dup set-targets-prop send-notify-success ] }
@@ -123,7 +123,7 @@ M: world selection-request-event ( event world -- )
     swap XClientMessageEvent-data0 "WM_DELETE_WINDOW" x-atom =
     and ;
 
-M: world client-event ( event world -- )
+M: world client-event
     swap close-box? [
         dup world-handle
         >r close-world

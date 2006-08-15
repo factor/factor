@@ -21,8 +21,7 @@ C: label ( -- label ) ;
 SYMBOL: compiled-xts
 
 : save-xt ( word xt -- )
-    over changed-words get remove-hash
-    swap compiled-xts get set-hash ;
+    swap dup unchanged-word compiled-xts get set-hash ;
 
 SYMBOL: literal-table
 
@@ -82,7 +81,7 @@ SYMBOL: label-table
 : compiling? ( word -- ? )
     {
         { [ dup compiled-xts get hash-member? ] [ drop t ] }
-        { [ dup changed-words get hash-member? ] [ drop f ] }
+        { [ dup word-changed? ] [ drop f ] }
         { [ t ] [ compiled? ] }
     } cond ;
 

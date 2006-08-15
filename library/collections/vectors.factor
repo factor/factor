@@ -4,17 +4,17 @@ IN: vectors
 USING: arrays errors generic kernel kernel-internals math
 math-internals sequences sequences-internals words ;
 
-M: vector set-length ( len vec -- )
+M: vector set-length
     grow-length ;
 
-M: vector nth-unsafe ( n vec -- obj ) underlying nth-unsafe ;
+M: vector nth-unsafe underlying nth-unsafe ;
 
-M: vector nth ( n vec -- obj ) bounds-check nth-unsafe ;
+M: vector nth bounds-check nth-unsafe ;
 
-M: vector set-nth-unsafe ( obj n vec -- )
+M: vector set-nth-unsafe
     underlying set-nth-unsafe ;
 
-M: vector set-nth ( obj n vec -- )
+M: vector set-nth
     growable-check 2dup ensure set-nth-unsafe ;
 
 : >vector ( seq -- vector )
@@ -22,7 +22,7 @@ M: vector set-nth ( obj n vec -- )
 
 M: object thaw drop V{ } clone ;
 
-M: vector clone ( vector -- vector ) clone-growable ;
+M: vector clone clone-growable ;
 
 M: vector like
     drop dup vector? [

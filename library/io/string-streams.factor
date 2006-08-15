@@ -26,7 +26,7 @@ M: sbuf stream-flush drop ;
     swap dup length <reversed>
     [ zero? rot [ call ] keep swap ] 2map nip ; inline
 
-M: plain-writer with-stream-table ( grid quot style stream -- )
+M: plain-writer with-stream-table
     [
         drop swap
         [ [ swap string-out ] map-with ] map-with
@@ -36,10 +36,10 @@ M: plain-writer with-stream-table ( grid quot style stream -- )
     ] with-stream* ;
 
 ! Reversed string buffers support the stream input protocol.
-M: sbuf stream-read1 ( sbuf -- char/f )
+M: sbuf stream-read1
     dup empty? [ drop f ] [ pop ] if ;
 
-M: sbuf stream-read ( count sbuf -- string )
+M: sbuf stream-read
     dup empty? [
         2drop f
     ] [

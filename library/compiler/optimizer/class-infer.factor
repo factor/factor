@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 IN: optimizer
 USING: arrays generic hashtables inference kernel
-kernel-internals math namespaces sequences words ;
+kernel-internals math namespaces sequences words parser ;
 
 ! Infer possible classes of values in a dataflow IR.
 : node-class# ( node n -- class )
@@ -21,7 +21,7 @@ SYMBOL: ties
 
 GENERIC: apply-tie ( tie -- )
 
-M: f apply-tie ( f -- ) drop ;
+M: f apply-tie drop ;
 
 TUPLE: class-tie value class ;
 
@@ -29,7 +29,7 @@ TUPLE: class-tie value class ;
     2dup swap <class-tie> ties get hash [ apply-tie ] when*
     value-classes get set-hash ;
 
-M: class-tie apply-tie ( tie -- )
+M: class-tie apply-tie
     dup class-tie-class swap class-tie-value
     set-value-class* ;
 
@@ -40,18 +40,18 @@ TUPLE: literal-tie value literal ;
     2dup swap <literal-tie> ties get hash [ apply-tie ] when*
     value-literals get set-hash ;
 
-M: literal-tie apply-tie ( tie -- )
+M: literal-tie apply-tie
     dup literal-tie-literal swap literal-tie-value
     set-value-literal* ;
 
 GENERIC: infer-classes* ( node -- )
 
-M: node infer-classes* ( node -- ) drop ;
+M: node infer-classes* drop ;
 
 ! For conditionals, a map of child node # --> possibility
 GENERIC: child-ties ( node -- seq )
 
-M: node child-ties ( node -- seq )
+M: node child-ties
     node-children length f <array> ;
 
 : value-class* ( value -- class )
@@ -119,27 +119,27 @@ M: node child-ties ( node -- seq )
     dup node-param "output-classes" word-prop [
         call
     ] [
-        node-param "infer-effect" word-prop second
-        dup integer? [ drop f ] when
+        node-param "infer-effect" word-prop effect-out
+        dup [ word? ] all? [ drop f ] unless
     ] if* ;
 
-M: #call infer-classes* ( node -- )
+M: #call infer-classes*
     dup create-ties dup output-classes
     [ swap node-out-d intersect-classes ] [ drop ] if* ;
 
-M: #push infer-classes* ( node -- )
+M: #push infer-classes*
     node-out-d
     [ [ value-literal ] keep set-value-literal* ] each ;
 
-M: #if child-ties ( node -- seq )
+M: #if child-ties
     node-in-d first dup general-t <class-tie>
     swap f <literal-tie> 2array ;
 
-M: #dispatch child-ties ( node -- seq )
+M: #dispatch child-ties
     dup node-in-d first
     swap node-children length [ <literal-tie> ] map-with ;
 
-M: #declare infer-classes* ( node -- )
+M: #declare infer-classes*
     dup node-param swap node-in-d [ set-value-class* ] 2each ;
 
 DEFER: (infer-classes)

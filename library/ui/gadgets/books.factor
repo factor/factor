@@ -20,9 +20,9 @@ C: book ( pages -- book )
 : <book-control> ( model pages -- book )
     <book> [ show-page ] <control> ;
 
-M: book pref-dim* ( book -- dim ) book-page pref-dim ;
+M: book pref-dim* book-page pref-dim ;
 
-M: book layout* ( book -- )
+M: book layout*
     dup rect-dim swap book-page set-layout-dim ;
 
 : make-book ( model obj quots -- assoc )

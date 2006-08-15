@@ -4,13 +4,13 @@ IN: sequences
 USING: arrays errors generic kernel kernel-internals math
 sequences-internals strings vectors words ;
 
-: first2 ( { x y } -- x y )
+: first2 ( seq -- x y )
     1 swap bounds-check nip first2-unsafe ;
 
-: first3 ( { x y z } -- x y z )
+: first3 ( seq -- x y z )
     2 swap bounds-check nip first3-unsafe ;
 
-: first4 ( { x y z w } -- x y z w )
+: first4 ( seq -- x y z w )
     3 swap bounds-check nip first4-unsafe ;
 
 M: object like drop ;
@@ -129,21 +129,21 @@ M: object like drop ;
     2dup [ length ] 2apply tuck number=
     [ (mismatch) -1 number= ] [ 3drop f ] if ; inline
 
-M: array equal? ( obj seq -- ? )
+M: array equal?
     over array? [ sequence= ] [ 2drop f ] if ;
 
-M: quotation equal? ( obj seq -- ? )
+M: quotation equal?
     over quotation? [ sequence= ] [ 2drop f ] if ;
 
-M: sbuf equal? ( obj seq -- ? )
+M: sbuf equal?
     over sbuf? [ sequence= ] [ 2drop f ] if ;
 
-M: vector equal? ( obj seq -- ? )
+M: vector equal?
     over vector? [ sequence= ] [ 2drop f ] if ;
 
 UNION: sequence array string sbuf vector quotation ;
 
-M: sequence hashcode ( hash -- n )
+M: sequence hashcode
     dup empty? [ drop 0 ] [ first hashcode ] if ;
 
 IN: kernel
@@ -155,7 +155,7 @@ M: object <=>
 : depth ( -- n ) datastack length ;
 
 TUPLE: no-cond ;
-: no-cond <no-cond> throw ;
+: no-cond ( -- * ) <no-cond> throw ;
 
 : cond ( conditions -- )
     [ first call ] find nip dup [ second call ] [ no-cond ] if ;

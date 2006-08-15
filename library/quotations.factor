@@ -22,7 +22,7 @@ M: quotation like drop dup quotation? [ >quotation ] unless ;
 : make-dip ( quot n -- quot )
     dup \ >r <array> -rot \ r> <array> append3 >quotation ;
 
-: unit ( a -- [ a ] ) 1array >quotation ;
+: unit ( a -- quot ) 1array >quotation ;
 
 GENERIC: literalize ( obj -- obj )
 M: object literalize ;

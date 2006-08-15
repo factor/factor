@@ -141,16 +141,16 @@ C: pack ( vector -- pack )
     [ >r [ max-dim ] keep r> pack-gap swap gap-dims ] keep
     gadget-orientation set-axis ;
 
-M: pack pref-dim* ( pack -- dim )
+M: pack pref-dim*
     [ gadget-children pref-dims ] keep pack-pref-dim ;
 
-M: pack layout* ( pack -- )
+M: pack layout*
     dup gadget-children pref-dims packed-layout ;
 
 : fast-children-on ( dim axis gadgets -- i )
     swapd [ rect-loc v- over v. ] binsearch nip ;
 
-M: pack children-on ( rect pack -- list )
+M: pack children-on
     dup gadget-orientation swap gadget-children [
         3dup
         >r >r dup rect-loc swap rect-dim v+ origin get v- r> r> fast-children-on 1+

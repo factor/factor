@@ -18,7 +18,7 @@ M: control graft*
 M: control ungraft*
     dup control-self swap control-model remove-connection ;
 
-M: control model-changed ( gadget -- )
+M: control model-changed
     [ control-model model-value ] keep
     [ dup control-self swap control-quot call ] keep
     control-self relayout ;

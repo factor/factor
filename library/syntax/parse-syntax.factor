@@ -11,12 +11,6 @@ USING: alien arrays compiler definitions errors generic
 hashtables kernel math modules namespaces parser sequences
 strings vectors words ;
 
-: !(
-    CHAR: ) column [
-        line-text get index* dup -1 =
-        [ "Unterminated (" throw ] when 1+
-    ] change ; parsing
-
 : !! line-text get length column set ; parsing
 : !#! POSTPONE: ! ; parsing
 : !IN: scan set-in ; parsing
@@ -83,3 +77,15 @@ DEFER: !PRIMITIVE: parsing
 : !REQUIRES:
     string-mode on
     [ string-mode off [ (require) ] each ] f ; parsing
+
+: !(
+    word parse-effect dup 1array >vector effect-stack set
+    "declared-effect" set-word-prop ; parsing
+
+: !|
+    scan scan-word \ ( eq? [
+        parse-effect dup effect-stack get push
+        swap add-declaration
+    ] [
+        "Expected (" throw
+    ] if ; parsing

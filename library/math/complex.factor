@@ -13,7 +13,7 @@ UNION: number real complex ;
 M: real real ;
 M: real imaginary drop 0 ;
 
-M: number equal? ( n n -- ? ) number= ;
+M: number equal? number= ;
 
 : rect> ( xr xi -- x )
     over real? over real? and [
@@ -42,7 +42,7 @@ IN: math-internals
 : 2>rect ( x y -- xr yr xi yi )
     [ [ real ] 2apply ] 2keep [ imaginary ] 2apply ; inline
 
-M: complex number= ( x y -- ? )
+M: complex number=
     2>rect number= [ number= ] [ 2drop f ] if ;
 
 : *re ( x y -- xr*yr xi*ri ) 2>rect * >r * r> ; inline
@@ -50,16 +50,16 @@ M: complex number= ( x y -- ? )
 
 M: complex + 2>rect + >r + r> (rect>) ;
 M: complex - 2>rect - >r - r> (rect>) ;
-M: complex * ( x y -- x*y ) 2dup *re - -rot *im + (rect>) ;
+M: complex * 2dup *re - -rot *im + (rect>) ;
 
 : complex/ ( x y -- r i m )
     #! r = xr*yr+xi*yi, i = xi*yr-xr*yi, m = yr*yr+yi*yi
     dup absq >r 2dup *re + -rot *im - r> ; inline
 
-M: complex / ( x y -- x/y ) complex/ tuck / >r / r> (rect>) ;
-M: complex /f ( x y -- x/y ) complex/ tuck /f >r /f r> (rect>) ;
+M: complex / complex/ tuck / >r / r> (rect>) ;
+M: complex /f complex/ tuck /f >r /f r> (rect>) ;
 
-M: complex abs ( z -- |z| ) absq fsqrt ;
+M: complex abs absq fsqrt ;
 
-M: complex hashcode ( n -- n )
+M: complex hashcode
     >rect >fixnum swap >fixnum bitxor ;

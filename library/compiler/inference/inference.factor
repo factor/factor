@@ -11,11 +11,11 @@ SYMBOL: base-case-continuation
 
 TUPLE: inference-error message rstate data-stack call-stack ;
 
-: inference-error ( msg -- )
+: inference-error ( msg -- * )
     recursive-state get meta-d get meta-r get
     <inference-error> throw ;
 
-M: object value-literal ( value -- )
+M: object value-literal
     "A literal value was expected where a computed value was found" inference-error ;
 
 ! Word properties that affect inference:
@@ -42,13 +42,20 @@ SYMBOL: d-in
 : ensure-values ( n -- )
     meta-d [ add-inputs ] change d-in [ + ] change ;
 
-: effect ( -- { in# out# } )
+: short-effect ( -- { in# out# } )
     #! After inference is finished, collect information.
     d-in get meta-d get length 2array ;
 
 ! Does this control flow path throw an exception, therefore its
 ! stack height is irrelevant and the branch will always unify?
 SYMBOL: terminated?
+
+: current-effect ( -- effect )
+    #! After inference is finished, collect information.
+    d-in get meta-d get length <effect>
+    terminated? get over set-effect-terminated? ;
+
+SYMBOL: recorded
 
 : init-inference ( recursive-state -- )
     terminated? off
@@ -76,9 +83,9 @@ M: wrapper apply-object wrapped apply-literal ;
 
 GENERIC: infer-quot
 
-M: f infer-quot ( f -- ) drop ;
+M: f infer-quot drop ;
 
-M: quotation infer-quot ( quot -- )
+M: quotation infer-quot
     #! Recursive calls to this word are made for nested
     #! quotations.
     [ apply-object terminated? get not ] all? drop ;
@@ -97,16 +104,22 @@ M: quotation infer-quot ( quot -- )
 
 : with-infer ( quot -- )
     [
-        base-case-continuation off
-        { } recursive-state set
-        f init-inference
-        call
-        check-return
+        [
+            base-case-continuation off
+            { } recursive-state set
+            V{ } clone recorded set
+            f init-inference
+            call
+            check-return
+        ] [
+            recorded get dup . [ f "infer-effect" set-word-prop ] each
+            rethrow
+        ] recover
     ] with-scope ;
 
 : infer ( quot -- effect )
     #! Stack effect of a quotation.
-    [ infer-quot effect ] with-infer ;
+    [ infer-quot short-effect ] with-infer ;
 
 : (dataflow) ( quot -- dataflow )
     infer-quot f #return node, dataflow-graph get ;

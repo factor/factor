@@ -34,16 +34,16 @@ GENERIC: live-values* ( node -- seq )
     dup live-values over literals hash-diff swap kill-node ;
 
 ! Generic nodes
-M: node literals* ( node -- ) drop { } ;
+M: node literals* drop { } ;
 
-M: node live-values* ( node -- seq )
+M: node live-values*
     node-in-d [ value? ] subset ;
 
 ! #push
-M: #push literals* ( node -- seq ) node-out-d ;
+M: #push literals* node-out-d ;
 
 ! #return
-M: #return live-values* ( node -- seq )
+M: #return live-values*
     #! Values returned by local labels can be killed.
     dup node-param [ drop { } ] [ delegate live-values* ] if ;
 
@@ -51,7 +51,7 @@ M: #return live-values* ( node -- seq )
 UNION: #killable
     #push #shuffle #call-label #merge #values #entry ;
 
-M: #killable live-values* ( node -- seq ) drop { } ;
+M: #killable live-values* drop { } ;
 
 : purge-invariants ( stacks -- seq )
     #! Output a sequence of values which are not present in the
@@ -59,14 +59,14 @@ M: #killable live-values* ( node -- seq ) drop { } ;
     unify-lengths flip [ all-eq? not ] subset concat ;
 
 ! #label
-M: #label live-values* ( node -- seq )
+M: #label live-values*
     dup node-child node-in-d over node-in-d 2array
     swap collect-recursion append purge-invariants ;
 
 ! branching
 UNION: #branch #if #dispatch ;
 
-M: #branch live-values* ( node -- )
+M: #branch live-values*
     #! This assumes that the last element of each branch is a
     #! #return node.
     dup delegate live-values* >r

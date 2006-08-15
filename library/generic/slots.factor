@@ -9,21 +9,29 @@ parser sequences strings words ;
     over define-generic -rot define-method ;
 
 : define-slot-word ( class slot word quot -- )
-    over [
-        rot >fixnum add* define-typecheck
+    rot >fixnum add* define-typecheck ;
+
+: reader-effect 1 1 <effect> ; inline
+
+: define-reader ( class slot decl reader -- )
+    dup [
+        dup reader-effect "declared-effect" set-word-prop
+        [ slot ] rot dup object eq?
+        [ drop ] [ 1array [ declare ] swap add* append ] if
+        define-slot-word
     ] [
         2drop 2drop
     ] if ;
 
-: define-reader ( class slot decl reader -- )
-    [ slot ] rot dup object eq? [
-        drop
-    ] [
-        1array [ declare ] swap add* append
-    ] if define-slot-word ;
+: writer-effect 2 0 <effect> ; inline
 
 : define-writer ( class slot writer -- )
-    [ set-slot ] define-slot-word ;
+    dup [
+        dup writer-effect "declared-effect" set-word-prop
+        [ set-slot ] define-slot-word
+    ] [
+        3drop
+    ] if ;
 
 : define-slot ( class slot decl reader writer -- )
     >r >r >r 2dup r> r> define-reader r> define-writer ;

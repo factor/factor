@@ -31,7 +31,7 @@ GENERIC: set-fill
 
 TUPLE: bounds-error index seq ;
 
-: bounds-error <bounds-error> throw ;
+: bounds-error ( n seq -- * ) <bounds-error> throw ;
 
 : growable-check ( n seq -- n seq )
     over 0 < [ bounds-error ] when ; inline

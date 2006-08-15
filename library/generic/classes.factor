@@ -123,7 +123,6 @@ SYMBOL: class<cache
 
 : define-class ( class -- )
     dup t "class" set-word-prop
-    dup H{ } clone "class<" set-word-prop
     dup flatten-class typemap get set-hash ;
 
 ! Predicate classes for generalized predicate dispatch.

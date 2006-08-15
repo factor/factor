@@ -57,7 +57,7 @@ TUPLE: no-word name ;
 : (parse) ( str -- ) line-text set 0 column set parse-loop ;
 
 TUPLE: bad-escape ;
-: bad-escape ( -- ) <bad-escape> throw ;
+: bad-escape ( -- * ) <bad-escape> throw ;
 
 ! Parsing word utilities
 : escape ( ch -- esc )
@@ -89,6 +89,24 @@ TUPLE: bad-escape ;
 : parse-string ( -- str )
     column
     [ [ line-text get (parse-string) ] "" make swap ] change ;
+
+SYMBOL: effect-stack
+
+: (parse-effect)
+    scan [
+        dup ")" = [ drop ] [ , (parse-effect) ] if
+    ] [
+        "Unexpected EOL" throw
+    ] if* ;
+
+: parse-effect ( -- effect )
+    [ (parse-effect) column get ] { } make swap column set
+    { "--" } split1 <effect> ;
+
+: add-declaration ( effect name -- )
+    effect-stack get [
+        2dup effect-in member? >r dupd effect-out member? r> or
+    ] find nip effect-declarations set-hash ;
 
 global [
     {

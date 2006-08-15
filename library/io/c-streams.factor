@@ -11,19 +11,19 @@ USING: errors kernel kernel-internals namespaces io strings ;
 
 TUPLE: c-stream in out ;
 
-M: c-stream stream-write1 ( char stream -- )
+M: c-stream stream-write1
     >r ch>string r> stream-write ;
 
-M: c-stream stream-write ( str stream -- )
+M: c-stream stream-write
     c-stream-out fwrite ;
 
-M: c-stream stream-read1 ( stream -- char/f )
+M: c-stream stream-read1
     c-stream-in dup [ fgetc ] when ;
 
-M: c-stream stream-flush ( stream -- )
+M: c-stream stream-flush
     c-stream-out [ fflush ] when* ;
 
-M: c-stream stream-close ( stream -- )
+M: c-stream stream-close
     dup c-stream-in [ fclose ] when*
     c-stream-out [ fclose ] when* ;
 
@@ -47,7 +47,7 @@ IN: io
 TUPLE: client-stream host port ;
 
 TUPLE: c-stream-error ;
-: c-stream-error <c-stream-error> throw ;
+: c-stream-error ( -- * ) <c-stream-error> throw ;
 
 : <client> c-stream-error ;
 : <server> c-stream-error ;

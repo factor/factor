@@ -18,7 +18,7 @@ C: object-button ( gadget object -- button )
         r> set-gadget-delegate
     ] keep ;
 
-M: object-button gadget-help ( button -- string )
+M: object-button gadget-help
     object-button-object dup word? [ synopsis ] [ summary ] if ;
 
 ! Character styles
@@ -107,26 +107,26 @@ M: object-button gadget-help ( button -- string )
         [ pick pick >r >r -rot styled-pane r> r> rot ] map
     ] map styled-grid nip ;
 
-M: pane with-stream-table ( grid quot style pane -- )
+M: pane with-stream-table
     >r rot <pane-grid> r> print-gadget ;
 
-M: pane with-nested-stream ( quot style stream -- )
+M: pane with-nested-stream
     >r styled-pane r> write-gadget ;
 
 ! Stream utilities
-M: pack stream-close ( stream -- ) drop ;
+M: pack stream-close drop ;
 
-M: paragraph stream-close ( stream -- ) drop ;
+M: paragraph stream-close drop ;
 
 : gadget-write ( string gadget -- )
     over empty? [ 2drop ] [ >r <label> r> add-gadget ] if ;
 
-M: pack stream-write ( string stream -- ) gadget-write ;
+M: pack stream-write gadget-write ;
 
 : gadget-bl ( style stream -- )
     >r " " <presentation> <word-break-gadget> r> add-gadget ;
 
-M: paragraph stream-write ( string stream -- )
+M: paragraph stream-write
     swap " " split
     [ over gadget-write ] [ H{ } over gadget-bl ] interleave
     drop ;
@@ -134,9 +134,9 @@ M: paragraph stream-write ( string stream -- )
 : gadget-write1 ( char gadget -- )
     >r ch>string r> stream-write ;
 
-M: pack stream-write1 ( char stream -- ) gadget-write1 ;
+M: pack stream-write1 gadget-write1 ;
 
-M: paragraph stream-write1 ( char stream -- )
+M: paragraph stream-write1
     over CHAR: \s =
     [ H{ } swap gadget-bl drop ] [ gadget-write1 ] if ;
 
@@ -144,10 +144,10 @@ M: paragraph stream-write1 ( char stream -- )
     pick empty?
     [ 3drop ] [ >r swap <presentation> r> add-gadget ] if ;
 
-M: pack stream-format ( string style stream -- )
+M: pack stream-format
     gadget-format ;
 
-M: paragraph stream-format ( string style stream -- )
+M: paragraph stream-format
     presented pick hash [
         gadget-format
     ] [

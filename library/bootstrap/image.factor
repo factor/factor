@@ -129,13 +129,13 @@ GENERIC: ' ( obj -- ptr )
     dup length 1+ emit-fixnum
     swap emit emit-seq ;
 
-M: bignum ' ( bignum -- tagged )
+M: bignum '
     #! This can only emit 0, -1 and 1.
     bignum-tag bignum-tag [ emit-bignum ] emit-object ;
 
 ( Fixnums )
 
-M: fixnum ' ( n -- tagged )
+M: fixnum '
     #! When generating a 32-bit image on a 64-bit system,
     #! some fixnums should be bignums.
     dup most-negative-fixnum most-positive-fixnum between?
@@ -143,7 +143,7 @@ M: fixnum ' ( n -- tagged )
 
 ( Floats )
 
-M: float ' ( float -- tagged )
+M: float '
     float-tag float-tag [
         align-here double>bits emit-64
     ] emit-object ;
@@ -154,7 +154,7 @@ M: float ' ( float -- tagged )
 
 : t, t t-offset fixup ;
 
-M: f ' ( obj -- ptr )
+M: f '
     #! f is #define F RETAG(0,OBJECT_TYPE)
     drop object-tag ;
 
@@ -183,7 +183,7 @@ M: f ' ( obj -- ptr )
     word-tag word-tag [ emit-seq ] emit-object
     swap objects get set-hash ;
 
-: word-error ( word msg -- )
+: word-error ( word msg -- * )
     [ % dup word-vocabulary % " " % word-name % ] "" make throw ;
 
 : transfer-word ( word -- word )
@@ -197,11 +197,11 @@ M: f ' ( obj -- ptr )
 : fixup-words ( -- )
     image get [ dup word? [ fixup-word ] when ] inject ;
 
-M: word ' ( word -- pointer ) ;
+M: word ' ;
 
 ( Wrappers )
 
-M: wrapper ' ( wrapper -- pointer )
+M: wrapper '
     wrapped ' wrapper-tag wrapper-tag [ emit ] emit-object ;
 
 ( Ratios and complexes )
@@ -209,10 +209,10 @@ M: wrapper ' ( wrapper -- pointer )
 : emit-pair
     [ [ emit ] 2apply ] emit-object ;
 
-M: ratio ' ( c -- tagged )
+M: ratio '
     >fraction [ ' ] 2apply ratio-tag ratio-tag emit-pair ;
 
-M: complex ' ( c -- tagged )
+M: complex '
     >rect [ ' ] 2apply complex-tag complex-tag emit-pair ;
 
 ( Strings )
@@ -231,7 +231,7 @@ M: complex ' ( c -- tagged )
         pack-string emit-chars
     ] emit-object ;
 
-M: string ' ( string -- pointer )
+M: string '
     #! We pool strings so that each string is only written once
     #! to the image
     objects get [ emit-string ] cache ;
@@ -249,24 +249,24 @@ M: string ' ( string -- pointer )
     dup first transfer-word 0 pick set-nth
     >tuple ;
 
-M: tuple ' ( tuple -- pointer )
+M: tuple '
     transfer-tuple
     objects get [ tuple>array tuple-type emit-array ] cache ;
 
-M: array ' ( array -- pointer )
+M: array '
     array-type emit-array ;
 
-M: quotation ' ( array -- pointer )
+M: quotation '
     quotation-type emit-array ;
 
-M: vector ' ( vector -- pointer )
+M: vector '
     dup underlying ' swap length
     vector-type object-tag [
         emit-fixnum ( length )
         emit ( array ptr )
     ] emit-object ;
 
-M: sbuf ' ( sbuf -- pointer )
+M: sbuf '
     dup underlying ' swap length
     sbuf-type object-tag [
         emit-fixnum ( length )
@@ -275,7 +275,7 @@ M: sbuf ' ( sbuf -- pointer )
 
 ( Hashes )
 
-M: hashtable ' ( hashtable -- pointer )
+M: hashtable '
     [ hash-array ' ] keep
     hashtable-type object-tag [
         dup hash-count emit-fixnum

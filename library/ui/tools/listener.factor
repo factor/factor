@@ -51,7 +51,7 @@ C: listener-gadget ( -- gadget )
 M: listener-gadget pref-dim*
     delegate pref-dim* { 500 600 } vmax ;
 
-M: listener-gadget focusable-child* ( listener -- gadget )
+M: listener-gadget focusable-child*
     listener-gadget-input ;
 
 M: listener-gadget gadget-title drop "Listener" <model> ;
@@ -81,8 +81,8 @@ M: listener-gadget gadget-title drop "Listener" <model> ;
         [ [ run-file ] each ] curry listener-tool call-tool
     ] if ;
 
-M: input show ( input -- )
+M: input show
     input-string listener-tool call-tool ;
 
-M: object show ( object -- )
+M: object show
     [ inspect ] curry listener-tool call-tool ;

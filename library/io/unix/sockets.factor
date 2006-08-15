@@ -47,7 +47,7 @@ TUPLE: connect-task ;
 C: connect-task ( port -- task )
     [ >r <io-task> r> set-delegate ] keep ;
 
-M: connect-task do-io-task ( task -- )
+M: connect-task do-io-task
     io-task-port dup port-handle 0 0 write
     0 < [ defer-error ] [ drop t ] if ;
 
@@ -104,7 +104,7 @@ C: accept-task ( port -- task )
         swap sockaddr-in-port ntohs
     ] keep <client-stream> swap set-server-client ;
 
-M: accept-task do-io-task ( task -- ? )
+M: accept-task do-io-task
     io-task-port "sockaddr-in" <c-object>
     over port-handle over "sockaddr-in" c-size <int> accept
     dup 0 >= [

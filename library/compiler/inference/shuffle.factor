@@ -51,7 +51,7 @@ TUPLE: shuffle in-d in-r out-d out-r ;
     #! the shuffle.
     [ split-shuffle ] keep shuffle* join-shuffle ;
 
-M: shuffle clone ( shuffle -- shuffle )
+M: shuffle clone
     [ shuffle-in-d clone ] keep
     [ shuffle-in-r clone ] keep
     [ shuffle-out-d clone ] keep

@@ -4,8 +4,8 @@ IN: kernel-internals
 USING: vectors sequences ;
 
 : namestack* ( -- ns ) 3 getenv { vector } declare ; inline
-: >n ( namespace -- n:namespace ) namestack* push ;
-: n> ( n:namespace -- namespace ) namestack* pop ;
+: >n ( namespace -- ) namestack* push ;
+: n> ( -- namespace ) namestack* pop ;
 
 IN: namespaces
 USING: arrays hashtables kernel kernel-internals math strings
@@ -14,7 +14,7 @@ words ;
 : namestack ( -- ns ) namestack* clone ; inline
 : set-namestack ( ns -- ) >vector 3 setenv ; inline
 : namespace ( -- namespace ) namestack* peek ;
-: ndrop ( n:namespace -- ) namestack* pop* ;
+: ndrop ( -- ) namestack* pop* ;
 : global ( -- g ) 4 getenv { hashtable } declare ; inline
 : get ( variable -- value ) namestack* hash-stack ;
 : set ( value variable -- ) namespace set-hash ; inline

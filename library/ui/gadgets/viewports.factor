@@ -15,13 +15,13 @@ C: viewport ( content -- viewport )
     [ >r 3 <border> r> add-gadget ] keep
     t over set-gadget-clipped? ;
 
-M: viewport layout* ( viewport -- )
+M: viewport layout*
     dup gadget-child dup pref-dim rot rect-dim vmax
     swap set-layout-dim ;
 
-M: viewport focusable-child* ( viewport -- gadget )
+M: viewport focusable-child*
     gadget-child ;
 
-M: viewport pref-dim* ( viewport -- dim ) viewport-dim ;
+M: viewport pref-dim* viewport-dim ;
 
 : viewport-rect ( rect -- rect ) { 3 3 } offset-rect ;

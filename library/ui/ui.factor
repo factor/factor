@@ -153,7 +153,7 @@ C: world-error ( error world -- error )
     [ set-world-error-world ] keep
     [ set-delegate ] keep ;
 
-M: world-error error. ( world-error -- )
+M: world-error error.
     "An error occurred while drawing the world " write
     dup world-error-world pprint-short "." print
     "This world has been deactivated to prevent cascading errors." print

@@ -80,14 +80,14 @@ DEFER: objc-error. ( alien -- )
         callstack-overflow.
     } nth ;
 
-M: kernel-error error. ( error -- ) dup kernel-error execute ;
+M: kernel-error error. dup kernel-error execute ;
 
-M: kernel-error error-help ( error -- topic ) kernel-error ;
+M: kernel-error error-help kernel-error ;
 
 M: no-method summary
     drop "No suitable method" ;
 
-M: no-method error. ( error -- )
+M: no-method error.
     "Generic word " write
     dup no-method-generic pprint
     " does not define a method for the " write
@@ -150,7 +150,7 @@ M: no-word summary
     parse-error-col [ 0 ] unless*
     CHAR: \s <string> write "^" print ;
 
-M: parse-error error. ( error -- )
+M: parse-error error.
     dup parse-dump  delegate error. ;
 
 M: bounds-error summary drop "Sequence index out of bounds" ;
@@ -159,15 +159,15 @@ M: condition error. delegate error. ;
 
 M: condition error-help drop f ;
 
-M: alien-callback-error summary ( error -- )
+M: alien-callback-error summary
     drop "Words calling ``alien-callback'' cannot run in the interpreter. Compile the caller word and try again." ;
 
-M: alien-invoke-error summary ( error -- )
+M: alien-invoke-error summary
     drop "Words calling ``alien-invoke'' cannot run in the interpreter. Compile the caller word and try again." ;
 
 M: assert summary drop "Assertion failed" ;
 
-M: inference-error error. ( error -- )
+M: inference-error error.
     "Inference error:" print
     dup inference-error-message print
     "Recursive state:" print

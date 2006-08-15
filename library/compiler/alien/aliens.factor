@@ -8,7 +8,7 @@ sequences ;
 
 UNION: c-ptr byte-array alien ;
 
-M: alien equal? ( obj obj -- ? )
+M: alien equal?
     over alien? [
         2dup [ expired? ] 2apply 2dup or [
             2swap 2drop

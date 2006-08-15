@@ -45,8 +45,8 @@ IN: win32
     CloseClipboard drop ;
 
 TUPLE: pasteboard ;
-M: pasteboard clipboard-contents ( pb -- str ) drop paste ;
-M: pasteboard set-clipboard-contents ( str pb -- ) drop copy ;
+M: pasteboard clipboard-contents drop paste ;
+M: pasteboard set-clipboard-contents drop copy ;
 
 : init-clipboard ( -- )
     <pasteboard> clipboard set-global ;

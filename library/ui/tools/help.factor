@@ -47,4 +47,4 @@ M: help-gadget pref-dim*
     [ <help-gadget> ]
     [ show-help ] ;
 
-M: link show ( link -- ) help-tool call-tool ;
+M: link show help-tool call-tool ;

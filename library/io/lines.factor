@@ -26,11 +26,11 @@ C: line-reader ( stream -- line ) [ set-delegate ] keep ;
         2drop
     ] if ;
 
-M: line-reader stream-readln ( line -- string )
+M: line-reader stream-readln
     [ f swap (readln) ] "" make
     dup empty? [ f ? ] [ nip ] if ;
 
-M: line-reader stream-read ( count line -- string )
+M: line-reader stream-read
     [ delegate stream-read ] keep dup cr> [
         over empty? [
             drop

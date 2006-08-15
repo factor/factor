@@ -14,13 +14,13 @@ UNION: real rational float ;
 M: real abs dup 0 < [ neg ] when ;
 M: real absq sq ;
 
-M: real hashcode ( n -- n ) >fixnum ;
+M: real hashcode >fixnum ;
 M: real <=> - ;
 
 : fp-nan? ( float -- ? )
     double>bits -51 shift BIN: 111111111111 [ bitand ] keep = ;
 
-M: float zero? ( float -- ? )
+M: float zero?
     dup 0.0 float= swap -0.0 float= or ;
 
 M: float < float< ;

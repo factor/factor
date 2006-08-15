@@ -12,7 +12,7 @@ IN: generic
 
 TUPLE: no-method object generic ;
 
-: no-method ( object generic -- ) <no-method> throw ;
+: no-method ( object generic -- * ) <no-method> throw ;
 
 : error-method ( dispatch# word -- method )
     >r picker r> [ no-method ] curry append ;

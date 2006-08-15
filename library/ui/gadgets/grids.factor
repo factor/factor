@@ -39,7 +39,7 @@ C: grid ( children -- grid )
 : (pair-up) ( horiz vert -- dim )
     >r first r> second 2array ;
 
-M: grid pref-dim* ( grid -- dim )
+M: grid pref-dim*
     [
         [ gap [ v+ gap v+ ] reduce ] 2apply (pair-up)
     ] with-grid ;
@@ -65,7 +65,7 @@ M: grid pref-dim* ( grid -- dim )
 : grid-layout ( horiz vert -- )
     2dup position-grid resize-grid ;
 
-M: grid layout* ( frame -- dim )
+M: grid layout*
     [ grid-layout ] with-grid ;
 
 : build-grid ( grid specs -- )

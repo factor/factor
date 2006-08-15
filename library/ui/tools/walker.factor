@@ -87,7 +87,7 @@ M: walker-gadget gadget-title
 M: walker-gadget pref-dim*
     delegate pref-dim* { 600 600 } vmax ;
 
-M: walker-gadget focusable-child* ( listener -- gadget )
+M: walker-gadget focusable-child*
     walker-gadget-input ;
 
 : walker-continuation ( -- continuation )

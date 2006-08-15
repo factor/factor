@@ -50,3 +50,22 @@ C: parse-error ( error -- error )
     column get over set-parse-error-col
     line-text get over set-parse-error-text
     [ set-delegate ] keep ;
+
+TUPLE: effect in out declarations terminated? ;
+
+C: effect
+    [
+        over { "*" } sequence=
+        [ nip t swap set-effect-terminated? ]
+        [ set-effect-out ] if
+    ] keep
+    [ set-effect-in ] keep
+    H{ } clone over set-effect-declarations ;
+
+: effect-height ( effect -- n )
+    dup effect-out length swap effect-in length - ;
+
+: effect<= ( eff1 eff2 -- ? )
+    2dup [ effect-terminated? ] 2apply = >r
+    2dup [ effect-in length ] 2apply <= >r
+    [ effect-height ] 2apply number= r> and r> and ;

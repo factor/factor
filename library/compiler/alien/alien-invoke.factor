@@ -4,7 +4,7 @@ IN: alien
 USING: arrays assembler compiler compiler
 errors generic hashtables inference inspector
 io kernel kernel-internals math namespaces parser
-prettyprint sequences strings words ;
+prettyprint sequences strings words parser ;
 
 TUPLE: alien-invoke library function return parameters ;
 C: alien-invoke make-node ;
@@ -22,7 +22,7 @@ TUPLE: alien-invoke-error library symbol ;
 : alien-invoke ( ... return library function parameters -- ... )
     pick pick <alien-invoke-error> throw ;
 
-\ alien-invoke [ [ string object string object ] [ ] ]
+\ alien-invoke [ string object string object ] [ ] <effect>
 "infer-effect" set-word-prop
 
 \ alien-invoke [
@@ -60,7 +60,7 @@ TUPLE: alien-invoke-error library symbol ;
         alien-invoke-parameters stack-space %cleanup
     ] if ;
 
-M: alien-invoke generate-node ( node -- )
+M: alien-invoke generate-node
     end-basic-block compile-gc
     dup alien-invoke-parameters objects>registers
     dup alien-invoke-dlsym %alien-invoke

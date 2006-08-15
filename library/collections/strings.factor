@@ -4,7 +4,7 @@ IN: strings
 USING: generic kernel kernel-internals math sequences
 sequences-internals ;
 
-M: string equal? ( obj str -- ? )
+M: string equal?
     over string? [
         over hashcode over hashcode number=
         [ sequence= ] [ 2drop f ] if
@@ -66,5 +66,5 @@ UNION: alpha Letter digit ;
 
 M: string thaw drop SBUF" " clone ;
 
-M: string like ( seq sbuf -- string )
+M: string like
     drop dup string? [ >string ] unless ;

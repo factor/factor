@@ -67,8 +67,7 @@ M: gadget user-input* 2drop t ;
 
 GENERIC: children-on ( rect/point gadget -- list )
 
-M: gadget children-on ( rect/point gadget -- list )
-    nip gadget-children ;
+M: gadget children-on nip gadget-children ;
 
 : inside? ( bounds gadget -- ? )
     dup gadget-visible?

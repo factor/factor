@@ -8,7 +8,7 @@ gadgets-theme generic io kernel math opengl sequences styles ;
 ! Vertical line.
 TUPLE: guide color ;
 
-M: guide draw-interior ( gadget interior -- )
+M: guide draw-interior
     guide-color gl-color
     rect-dim dup { 0.5 0 0 } v* swap { 0.5 1 0 } v* gl-line ;
 

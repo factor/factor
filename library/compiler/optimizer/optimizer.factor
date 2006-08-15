@@ -31,18 +31,18 @@ GENERIC: optimize-node* ( node -- node/t )
 ! Generic nodes
 M: f optimize-node* drop t ;
 
-M: node optimize-node* ( node -- t ) drop t ;
+M: node optimize-node* drop t ;
 
 ! #shuffle
-M: #shuffle optimize-node*  ( node -- node/t )
+M: #shuffle optimize-node* 
     [ node-values empty? ] prune-if ;
 
 ! #push
-M: #push optimize-node*  ( node -- node/t )
+M: #push optimize-node* 
     [ node-out-d empty? ] prune-if ;
 
 ! #return
-M: #return optimize-node* ( node -- node/t )
+M: #return optimize-node*
     node-successor [ node-successor ] [ t ] if* ;
 
 ! Some utilities for splicing in dataflow IR subtrees
@@ -96,12 +96,12 @@ M: #return optimize-node* ( node -- node/t )
         } cond
     ] if ;
 
-M: #if optimize-node* ( node -- node/t )
+M: #if optimize-node*
     dup dup node-in-d first known-boolean-value?
     [ 0 1 ? fold-branch ] [ 2drop t ] if ;
 
 ! #dispatch
-M: #dispatch optimize-node* ( node -- node/t )
+M: #dispatch optimize-node*
     dup dup node-in-d first 2dup node-literal? [
         node-literal fold-branch
     ] [

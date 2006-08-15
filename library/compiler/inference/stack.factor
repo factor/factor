@@ -1,6 +1,6 @@
 IN: inference
 USING: arrays generic interpreter kernel math namespaces
-sequences words ;
+sequences words parser ;
 
 : infer-shuffle-inputs ( shuffle node -- )
     >r dup shuffle-in-d length swap shuffle-in-r length r>
@@ -22,8 +22,7 @@ sequences words ;
     node, ;
 
 : shuffle>effect ( shuffle -- effect )
-    dup shuffle-in-d [ drop object ] map
-    swap shuffle-out-d [ drop object ] map 2array ;
+    dup shuffle-in-d swap shuffle-out-d <effect> ;
 
 : define-shuffle ( word shuffle -- )
     [ shuffle>effect "infer-effect" set-word-prop ] 2keep

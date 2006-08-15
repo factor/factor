@@ -10,7 +10,7 @@ TUPLE: word-break-gadget ;
 C: word-break-gadget ( gadget -- gadget )
     [ set-delegate ] keep ;
 
-M: word-break-gadget draw-gadget* ( gadget -- ) drop ;
+M: word-break-gadget draw-gadget* drop ;
 
 ! A gadget that arranges its children in a word-wrap style.
 TUPLE: paragraph margin ;
@@ -61,8 +61,8 @@ SYMBOL: margin
         [ wrap-step ] each-child-with wrap-dim
     ] with-scope ; inline
 
-M: paragraph pref-dim* ( paragraph -- dim )
+M: paragraph pref-dim*
     [ 2drop ] do-wrap ;
 
-M: paragraph layout* ( paragraph -- )
+M: paragraph layout*
     [ swap dup prefer set-rect-loc ] do-wrap drop ;

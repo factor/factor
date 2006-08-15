@@ -24,6 +24,6 @@ USING: alien errors io-internals kernel math parser sequences words ;
 
 FUNCTION: char* error_message ( DWORD id ) ;
 
-: win32-throw-error ( -- )
+: win32-throw-error ( -- * )
     GetLastError error_message throw ;
 

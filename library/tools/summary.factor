@@ -9,7 +9,7 @@ GENERIC: summary ( object -- string )
 M: object summary
     "an instance of the " swap class word-name " class" append3 ;
 
-M: word summary ( word -- )
+M: word summary
     dup word-vocabulary [
         dup interned?
         "a word in the " "a word orphaned from the " ?
@@ -18,11 +18,11 @@ M: word summary ( word -- )
         drop "a uniquely generated symbol"
     ] if ;
 
-M: input summary ( input -- )
+M: input summary
     "Input: " swap input-string
     dup string? [ unparse-short ] unless append ;
 
-M: vocab-link summary ( vocab-link -- )
+M: vocab-link summary
     [
         vocab-link-name dup %
         " vocabulary (" %

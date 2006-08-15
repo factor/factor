@@ -11,6 +11,9 @@ vectors ;
 ! Used by the compiler
 SYMBOL: changed-words
 
+: word-changed? ( word -- ? )
+    changed-words get [ hash-member? ] [ drop f ] if* ;
+
 : changed-word ( word -- )
     dup changed-words get [ set-hash ] [ 2drop ] if* ;
 
@@ -47,10 +50,10 @@ M: symbol definer drop \ SYMBOL: ;
     [ nip remove-word-prop ] if ;
 
 GENERIC: word-xt
-M: word word-xt ( w -- xt ) 7 integer-slot ;
+M: word word-xt 7 integer-slot ;
 
 GENERIC: set-word-xt
-M: word set-word-xt ( xt w -- ) 7 set-integer-slot ;
+M: word set-word-xt 7 set-integer-slot ;
 
 SYMBOL: vocabularies
 

@@ -116,7 +116,7 @@ C: elevator ( vector -- elevator )
 : layout-thumb ( slider -- )
     dup layout-thumb-loc layout-thumb-dim ;
 
-M: elevator layout* ( elevator -- )
+M: elevator layout*
     find-slider layout-thumb ;
 
 : slide-by-line ( -1/1 slider -- ) >r 32 * r> slide-by ;

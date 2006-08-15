@@ -70,7 +70,7 @@ C: repeat-button ( gadget quot -- button )
     #! the mouse is held down.
     [ >r <bevel-button> r> set-gadget-delegate ] keep ;
 
-M: repeat-button tick ( ms object -- ) nip button-clicked ;
+M: repeat-button tick nip button-clicked ;
 
 TUPLE: button-paint plain rollover pressed selected ;
 
@@ -82,10 +82,10 @@ TUPLE: button-paint plain rollover pressed selected ;
         { [ t ] [ button-paint-plain ] }
     } cond ;
 
-M: button-paint draw-interior ( button paint -- )
+M: button-paint draw-interior
     button-paint draw-interior ;
 
-M: button-paint draw-boundary ( button paint -- )
+M: button-paint draw-boundary
     button-paint draw-boundary ;
 
 : <radio-control> ( model value gadget -- gadget )

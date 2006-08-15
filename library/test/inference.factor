@@ -1,7 +1,7 @@
-IN: temporary
 USING: arrays errors generic inference kernel kernel-internals
 math math-internals namespaces parser sequences strings test
-vectors ;
+vectors words ;
+IN: temporary
 
 [ f ] [ f [ [ ] map-nodes ] with-node-iterator ] unit-test
 
@@ -66,22 +66,22 @@ vectors ;
 : no-base-case-1 dup [ no-base-case-1 ] [ no-base-case-1 ] if ;
 [ [ no-base-case-1 ] infer ] unit-test-fails
 
-: simple-recursion-1
+: simple-recursion-1 ( obj -- obj )
     dup [ simple-recursion-1 ] [ ] if ;
 
 [ { 1 1 } ] [ [ simple-recursion-1 ] infer ] unit-test
 
-: simple-recursion-2
+: simple-recursion-2 ( obj -- obj )
     dup [ ] [ simple-recursion-2 ] if ;
 
 [ { 1 1 } ] [ [ simple-recursion-2 ] infer ] unit-test
 
-: bad-recursion-2
+: bad-recursion-2 ( obj -- obj )
     dup [ dup first swap second bad-recursion-2 ] [ ] if ;
 
 [ [ bad-recursion-2 ] infer ] unit-test-fails
 
-: funny-recursion
+: funny-recursion ( obj -- obj )
     dup [ funny-recursion 1 ] [ 2 ] if drop ;
 
 [ { 1 1 } ] [ [ funny-recursion ] infer ] unit-test
@@ -122,7 +122,7 @@ DEFER: foe
 
 [ { 0 0 } ] [ [ nested-when ] infer ] unit-test
 
-: nested-when* ( -- )
+: nested-when* ( obj -- )
     [
         [
             drop
@@ -144,7 +144,7 @@ SYMBOL: sym-test
 
 [ { 1 1 } ] [ [ terminator-branch ] infer ] unit-test
 
-: recursive-terminator
+: recursive-terminator ( obj -- )
     dup [
         recursive-terminator
     ] [
@@ -153,49 +153,48 @@ SYMBOL: sym-test
 
 [ { 1 0 } ] [ [ recursive-terminator ] infer ] unit-test
 
-GENERIC: potential-hang
+GENERIC: potential-hang ( obj -- obj )
 M: fixnum potential-hang dup [ potential-hang ] when ;
 
 [ ] [ [ 5 potential-hang ] infer drop ] unit-test
 
 TUPLE: funny-cons car cdr ;
-GENERIC: iterate
+GENERIC: iterate ( obj -- )
 M: funny-cons iterate funny-cons-cdr iterate ;
 M: f iterate drop ;
 M: real iterate drop ;
 
 [ { 1 0 } ] [ [ iterate ] infer ] unit-test
 
-DEFER: agent
+DEFER: agent ( a b -- c d )
 : smith 1+ agent ; inline
 : agent dup 0 = [ [ swap call ] 2keep smith ] when ; inline
 [ { 0 2 } ]
 [ [ [ drop ] 0 agent ] infer ] unit-test
 
-: no-base-case-2 no-base-case-2 ;
-[ [ no-base-case-2 ] infer ] unit-test-fails
-
 ! Regression
-: cat dup [ throw ] [ throw ] if ;
-: dog dup [ cat ] [ 3drop ] if ;
+: cat ( obj -- * ) dup [ throw ] [ throw ] if ;
+: dog ( a b c -- ) dup [ cat ] [ 3drop ] if ;
 [ { 3 0 } ] [ [ dog ] infer ] unit-test
 
 ! Regression
 DEFER: monkey
-: friend dup [ friend ] [ monkey ] if ;
-: monkey dup [ 3drop ] [ friend ] if ;
+: friend ( a b c -- ) dup [ friend ] [ monkey ] if ;
+: monkey ( a b c -- ) dup [ 3drop ] [ friend ] if ;
 [ { 3 0 } ] [ [ friend ] infer ] unit-test
 
 ! Regression -- same as above but we infer the second word first
 DEFER: blah2
-: blah dup [ blah ] [ blah2 ] if ;
-: blah2 dup [ blah ] [ 3drop ] if ;
+: blah ( a b c -- ) dup [ blah ] [ blah2 ] if ;
+: blah2 ( a b c -- ) dup [ blah ] [ 3drop ] if ;
 [ { 3 0 } ] [ [ blah2 ] infer ] unit-test
 
 ! Regression
 DEFER: blah4
-: blah3 dup [ blah3 ] [ dup [ blah4 ] [ blah3 ] if ] if ;
-: blah4 dup [ blah4 ] [ dup [ 3drop ] [ blah3 ] if ] if ;
+: blah3 ( a b c -- )
+    dup [ blah3 ] [ dup [ blah4 ] [ blah3 ] if ] if ;
+: blah4 ( a b c -- )
+    dup [ blah4 ] [ dup [ 3drop ] [ blah3 ] if ] if ;
 [ { 3 0 } ] [ [ blah4 ] infer ] unit-test
 
 ! Regression
@@ -206,7 +205,7 @@ DEFER: blah4
         [ swap slip ] keep swap bad-combinator
     ] if ; inline
 
-[ [ [ 1 ] [ ] bad-combinator ] infer ] unit-test-fails
+! [ [ [ 1 ] [ ] bad-combinator ] infer ] unit-test-fails
 
 ! Regression
 : bad-input#
@@ -219,18 +218,19 @@ DEFER: blah4
 
 ! This order of branches works
 DEFER: do-crap
-: more-crap dup [ drop ] [ dup do-crap call ] if ;
-: do-crap dup [ more-crap ] [ do-crap ] if ;
+: more-crap ( obj -- ) dup [ drop ] [ dup do-crap call ] if ;
+: do-crap ( obj -- ) dup [ more-crap ] [ do-crap ] if ;
 [ [ do-crap ] infer ] unit-test-fails
 
 ! This one does not
 DEFER: do-crap*
-: more-crap* dup [ drop ] [ dup do-crap* call ] if ;
-: do-crap* dup [ do-crap* ] [ more-crap* ] if ;
+: more-crap* ( obj -- ) dup [ drop ] [ dup do-crap* call ] if ;
+: do-crap* ( obj -- ) dup [ do-crap* ] [ more-crap* ] if ;
 [ [ do-crap* ] infer ] unit-test-fails
 
 ! Regression
-: too-deep dup [ drop ] [ 2dup too-deep too-deep * ] if ; inline
+: too-deep ( a b -- c )
+    dup [ drop ] [ 2dup too-deep too-deep * ] if ; inline
 [ { 2 1 } ] [ [ too-deep ] infer ] unit-test
 
 ! Error reporting is wrong
@@ -247,7 +247,7 @@ DEFER: A
 DEFER: B
 DEFER: C
 
-: A
+: A ( a -- )
     dup {
         [ drop ]
         [ A ]
@@ -255,7 +255,7 @@ DEFER: C
         [ dup C A ]
     } dispatch ;
 
-: B
+: B ( b -- )
     dup {
         [ C ]
         [ B ]
@@ -263,7 +263,7 @@ DEFER: C
         [ dup B B ]
     } dispatch ;
 
-: C
+: C ( c -- )
     dup {
         [ A ]
         [ C ]
@@ -277,16 +277,26 @@ DEFER: C
 
 ! I found this bug by thinking hard about the previous one
 DEFER: Y
-: X dup [ swap Y ] [ ] if ;
-: Y X ;
+: X ( a b -- c d ) dup [ swap Y ] [ ] if ;
+: Y ( a b -- c d ) X ;
 
 [ { 2 2 } ] [ [ X ] infer ] unit-test
 [ { 2 2 } ] [ [ Y ] infer ] unit-test
 
+! This one comes from UI code
+DEFER: #1
+: #2 ( a b -- ) dup [ call ] [ 2drop ] if ; inline
+: #3 ( a -- ) [ #1 ] #2 ;
+: #4 ( a -- ) dup [ drop ] [ dup #4 dup #3 call ] if ;
+: #1 ( a -- ) dup [ dup #4 dup #3 ] [ ] if drop ;
+
+[ \ #4 word-def infer ] unit-test-fails
+[ [ #1 ] infer ] unit-test-fails
+
 ! Similar
 DEFER: bar
-: foo dup [ 2drop f f bar ] [ ] if ;
-: bar [ 2 2 + ] t foo drop call drop ;
+: foo ( a b -- c d ) dup [ 2drop f f bar ] [ ] if ;
+: bar ( a b -- ) [ 2 2 + ] t foo drop call drop ;
 
 [ [ foo ] infer ] unit-test-fails
 
@@ -297,12 +307,12 @@ DEFER: bar
 
 ! This form should not have a stack effect
 
-: bad-recursion-1
+: bad-recursion-1 ( a -- b )
     dup [ drop bad-recursion-1 5 ] [ ] if ;
 
 [ [ bad-recursion-1 ] infer ] unit-test-fails
 
-: bad-bin 5 [ 5 bad-bin bad-bin 5 ] [ 2drop ] if ;
+: bad-bin ( a b -- ) 5 [ 5 bad-bin bad-bin 5 ] [ 2drop ] if ;
 [ [ bad-bin ] infer ] unit-test-fails
 
 ! Test some random library words

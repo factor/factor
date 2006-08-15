@@ -87,13 +87,13 @@ M: float-regs store-return-reg load/store-float-return FSTP ;
 
 : prepare-division CDQ ; inline
 
-M: immediate load-literal ( literal vreg -- )
+M: immediate load-literal
     v>operand swap v>operand MOV ;
 
 : load-indirect ( literal reg -- )
     0 [] MOV rel-absolute-cell rel-literal ;
 
-M: object load-literal ( literal vreg -- )
+M: object load-literal
     v>operand load-indirect ;
 
 : (%call) ( label -- label )
@@ -150,6 +150,6 @@ M: int-regs (%replace) drop swap %move-int>int ;
 
 : %inc-r ( n -- ) cs-reg (%inc) ;
 
-M: object %stack>freg ( n reg reg-class -- ) 3drop ;
+M: object %stack>freg 3drop ;
 
-M: object %freg>stack ( n reg reg-class -- ) 3drop ;
+M: object %freg>stack 3drop ;

@@ -40,13 +40,13 @@ C: world ( gadget -- world )
 
 : find-world [ world? ] find-parent ;
 
-M: world pref-dim* ( world -- dim )
+M: world pref-dim*
     delegate pref-dim* { 1024 768 } vmin ;
 
 : activate-world-model ( world model -- )
     [ add-connection ] keep activate-model ;
 
-M: world graft* ( world -- )
+M: world graft*
     dup dup world-title activate-world-model
     dup dup world-status activate-world-model
     model-changed ;
@@ -54,12 +54,12 @@ M: world graft* ( world -- )
 : deactivate-world-model ( world model -- )
     [ remove-connection ] keep deactivate-model ;
 
-M: world ungraft* ( world -- )
+M: world ungraft*
     dup
     dup world-title deactivate-world-model
     dup world-status deactivate-world-model ;
 
-M: world model-changed ( world -- )
+M: world model-changed
     dup world-title model-value swap set-title ;
 
 : focused-ancestors ( world -- seq )

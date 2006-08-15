@@ -25,7 +25,7 @@ SYMBOL: clip
 
 GENERIC: draw-gadget* ( gadget -- )
 
-M: gadget draw-gadget* ( gadget -- ) drop ;
+M: gadget draw-gadget* drop ;
 
 GENERIC: draw-interior ( gadget interior -- )
 
@@ -94,7 +94,7 @@ M: solid draw-boundary
 ! Gradient pen
 TUPLE: gradient colors ;
 
-M: gradient draw-interior ( gadget gradient -- )
+M: gradient draw-interior
     over gadget-orientation swap gradient-colors rot rect-dim
     gl-gradient ;
 
@@ -104,10 +104,10 @@ TUPLE: polygon color points ;
 : draw-polygon ( polygon quot -- )
     >r dup polygon-color gl-color polygon-points r> each ; inline
 
-M: polygon draw-boundary ( gadget polygon -- )
+M: polygon draw-boundary
     [ gl-poly ] draw-polygon drop ;
 
-M: polygon draw-interior ( gadget polygon -- )
+M: polygon draw-interior
     [ gl-fill-poly ] draw-polygon drop ;
 
 : arrow-up    { { { 3 0 } { 6 6 } { 0 6 } } } ;

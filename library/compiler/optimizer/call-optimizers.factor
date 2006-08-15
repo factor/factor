@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 IN: optimizer
 USING: arrays errors generic hashtables inference kernel
-math math-internals sequences words ;
+math math-internals sequences words parser ;
 
 ! A system for associating dataflow optimizers with words.
 
@@ -58,7 +58,8 @@ math math-internals sequences words ;
 
 : useless-coerce? ( node -- )
     dup 0 node-class#
-    swap node-param "infer-effect" word-prop second first eq? ;
+    swap node-param "infer-effect" word-prop effect-out first
+    eq? ;
 
 { >fixnum >bignum >float } [
     {
@@ -171,7 +172,7 @@ SYMBOL: @
     { { @ @ } [ 2drop t ] }
 } define-identities
 
-M: #call optimize-node* ( node -- node/t )
+M: #call optimize-node*
     {
         { [ dup partial-eval? ] [ partial-eval ] }
         { [ dup find-identity nip ] [ apply-identities ] }

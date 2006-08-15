@@ -85,10 +85,10 @@ C: scroller ( gadget -- scroller )
         dup scroller-origin scroll
     ] if ;
 
-M: scroller layout* ( scroller -- )
+M: scroller layout*
     dup delegate layout*
     dup layout-children
     update-scroller ;
 
-M: scroller focusable-child* ( scroller -- viewport )
+M: scroller focusable-child*
     scroller-viewport ;

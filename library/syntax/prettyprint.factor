@@ -122,7 +122,7 @@ TUPLE: newline ;
 C: newline ( -- section )
     H{ } 0 <section> over set-delegate ;
 
-M: newline pprint-section* ( newline -- )
+M: newline pprint-section*
     section-start fresh-line ;
 
 : newline ( -- ) <newline> add-section ;
@@ -138,7 +138,7 @@ M: newline pprint-section* ( newline -- )
 
 : style> stdio [ delegate ] change ;
 
-M: block pprint-section* ( block -- )
+M: block pprint-section*
     dup <style
     f swap block-sections [
         over [ dup advance ] when pprint-section drop t
@@ -175,11 +175,11 @@ GENERIC: pprint* ( obj -- )
 : pprint-word ( obj -- )
     dup word-name swap word-style styled-text ;
 
-M: object pprint* ( obj -- )
+M: object pprint*
     "( unprintable object: " swap class word-name " )" append3
     text ;
 
-M: real pprint* ( obj -- ) number>string text ;
+M: real pprint* number>string text ;
 
 : ch>ascii-escape ( ch -- esc )
     H{
@@ -213,18 +213,18 @@ M: real pprint* ( obj -- ) number>string text ;
     [ % [ unparse-ch ] each CHAR: " , ] "" make
     do-string-limit text ;
 
-M: string pprint* ( str -- str ) "\"" pprint-string ;
+M: string pprint* "\"" pprint-string ;
 
-M: sbuf pprint* ( str -- str ) "SBUF\" " pprint-string ;
+M: sbuf pprint* "SBUF\" " pprint-string ;
 
-M: word pprint* ( word -- )
+M: word pprint*
     dup "pprint-close" word-prop [ block> ] when
     dup pprint-word
     "pprint-open" word-prop [ H{ } <block ] when ;
 
 M: f pprint* drop \ f pprint-word ;
 
-M: dll pprint* ( obj -- str ) dll-path "DLL\" " pprint-string ;
+M: dll pprint* dll-path "DLL\" " pprint-string ;
 
 : nesting-limit? ( -- ? )
     nesting-limit get dup [ pprinter-stack get length < ] when ;
@@ -273,22 +273,22 @@ M: dll pprint* ( obj -- str ) dll-path "DLL\" " pprint-string ;
 : pprint-sequence ( seq start end -- )
     swap pprint* swap pprint-elements pprint* ;
 
-M: complex pprint* ( num -- )
+M: complex pprint*
     >rect 2array \ C{ \ } pprint-sequence ;
 
-M: quotation pprint* ( list -- )
+M: quotation pprint*
     [ \ [ \ ] pprint-sequence ] check-recursion ;
 
-M: array pprint* ( vector -- )
+M: array pprint*
     [ \ { \ } pprint-sequence ] check-recursion ;
 
-M: vector pprint* ( vector -- )
+M: vector pprint*
     [ \ V{ \ } pprint-sequence ] check-recursion ;
 
-M: hashtable pprint* ( hashtable -- )
+M: hashtable pprint*
     [ hash>alist \ H{ \ } pprint-sequence ] check-recursion ;
 
-M: tuple pprint* ( tuple -- )
+M: tuple pprint*
     [
         \ T{ pprint*
         tuple>array dup first pprint*
@@ -296,14 +296,14 @@ M: tuple pprint* ( tuple -- )
         \ } pprint*
     ] check-recursion ;
 
-M: alien pprint* ( alien -- )
+M: alien pprint*
     dup expired? [
         drop "( alien expired )"
     ] [
         \ ALIEN: pprint-word alien-address number>string
     ] if text ;
 
-M: wrapper pprint* ( wrapper -- )
+M: wrapper pprint*
     dup wrapped word? [
         \ \ pprint-word wrapped pprint-word
     ] [

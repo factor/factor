@@ -32,14 +32,14 @@ C: track ( orientation -- track )
     [ [ over n*v , ] [ divider-size , ] interleave ] { } make
     nip ;
 
-M: track layout* ( track -- )
+M: track layout*
     dup track-layout packed-layout ;
 
 : track-pref-dims ( dims sizes -- dims )
     [ [ dup zero? [ nip ] [ v/n ] if ] 2map max-dim ] keep
     divider-sizes v+ [ >fixnum ] map ;
 
-M: track pref-dim* ( track -- dim )
+M: track pref-dim*
     [
         dup gadget-children
         2 group [ first ] map pref-dims

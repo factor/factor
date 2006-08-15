@@ -13,7 +13,7 @@ SYMBOL: articles
 TUPLE: article title content loc ;
 
 TUPLE: no-article name ;
-: no-article ( name -- ) <no-article> throw ;
+: no-article ( name -- * ) <no-article> throw ;
 
 : article ( name -- article )
     dup articles get hash [ ] [ no-article ] ?if ;

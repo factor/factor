@@ -27,7 +27,7 @@ GENERIC: (^) ( z w -- z^w ) foldable
 : ^theta ( w abs arg -- theta )
     >r >r >rect r> flog * swap r> * + ; inline
 
-M: number (^) ( z w -- z^w )
+M: number (^)
     swap >polar 3dup ^theta >r ^mag r> polar> ;
 
 : ^n ( z w -- z^w )
@@ -37,7 +37,7 @@ M: number (^) ( z w -- z^w )
         { [ t ] [ over sq over 2 /i ^n -rot 2 mod ^n * ] }
     } cond ; inline
 
-M: integer (^) ( z w -- z^w )
+M: integer (^)
     dup 0 < [ neg ^n recip ] [ ^n ] if ;
 
 : power-of-2? ( n -- ? )

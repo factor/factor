@@ -28,9 +28,9 @@ M: node equal? eq? ;
 : set-node-out-r node-shuffle set-shuffle-out-r ;
 
 : empty-node f { } { } { } { } ;
-: param-node ( label) { } { } { } { } ;
-: in-node ( inputs) >r f r> { } { } { } ;
-: out-node ( outputs) >r f { } r> { } { } ;
+: param-node { } { } { } { } ;
+: in-node >r f r> { } { } { } ;
+: out-node >r f { } r> { } { } ;
 : meta-d-node meta-d get clone in-node ;
 
 : d-tail ( n -- list )

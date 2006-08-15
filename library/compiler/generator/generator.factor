@@ -66,14 +66,14 @@ GENERIC: generate-node ( node -- )
     [ [ generate-nodes ] with-node-iterator ] generate-1 ;
 
 ! node
-M: node generate-node ( node -- next ) drop iterate-next ;
+M: node generate-node drop iterate-next ;
 
 ! #label
 : generate-call ( label -- next )
     end-basic-block
     tail-call? [ %jump f ] [ %call iterate-next ] if ;
 
-M: #label generate-node ( node -- next )
+M: #label generate-node
     dup node-param dup generate-call >r
     swap node-child generate r> ;
 
@@ -87,7 +87,7 @@ M: #label generate-node ( node -- next )
         r> r> end-false-branch resolve-label generate-nodes
     ] keep resolve-label iterate-next ;
 
-M: #if generate-node ( node -- next )
+M: #if generate-node
     [
         end-basic-block
         <label> dup %jump-t
@@ -123,7 +123,7 @@ M: #if generate-node ( node -- next )
         drop r> if>boolean-intrinsic iterate-next
     ] if ;
 
-M: #call generate-node ( node -- next )
+M: #call generate-node
     {
         { [ dup if-intrinsic ] [ do-if-intrinsic ] }
         { [ dup intrinsic ] [ intrinsic call iterate-next ] }
@@ -131,7 +131,7 @@ M: #call generate-node ( node -- next )
     } cond ;
 
 ! #call-label
-M: #call-label generate-node ( node -- next )
+M: #call-label generate-node
     node-param generate-call ;
 
 ! #dispatch
@@ -150,7 +150,7 @@ M: #call-label generate-node ( node -- next )
         dup %jump-label
     ] each resolve-label ;
 
-M: #dispatch generate-node ( node -- next )
+M: #dispatch generate-node
     #! The parameter is a list of nodes, each one is a branch to
     #! take in case the top of stack has that type.
     dispatch-head dispatch-body iterate-next ;
@@ -164,7 +164,7 @@ UNION: immediate fixnum POSTPONE: f ;
     [ f spec>vreg [ load-literal ] keep ] map
     phantom-d get phantom-append ;
 
-M: #push generate-node ( #push -- )
+M: #push generate-node
     generate-push iterate-next ;
 
 ! #shuffle
@@ -193,7 +193,7 @@ M: #push generate-node ( #push -- )
     [ shuffle* ] keep adjust-shuffle
     (template-outputs) ;
 
-M: #shuffle generate-node ( #shuffle -- )
+M: #shuffle generate-node
     node-shuffle phantom-shuffle iterate-next ;
 
 ! #return

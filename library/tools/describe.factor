@@ -12,9 +12,9 @@ GENERIC: sheet ( obj -- sheet )
         dup third -rot first slot 2array
     ] map-with ;
 
-M: object sheet ( obj -- sheet ) slot-sheet ;
+M: object sheet slot-sheet ;
 
-M: tuple sheet ( tuple -- sheet )
+M: tuple sheet
     dup slot-sheet swap delegate [ 1 tail ] unless ;
 
 M: sequence summary

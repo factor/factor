@@ -77,12 +77,12 @@ TUPLE: check-tuple class ;
     dup r> tuple-slots
     default-constructor ;
 
-M: tuple clone ( tuple -- tuple )
+M: tuple clone
     (clone) dup delegate clone over set-delegate ;
 
-M: tuple hashcode ( tuple -- n ) 2 slot hashcode ;
+M: tuple hashcode 2 slot hashcode ;
 
-M: tuple equal? ( obj tuple -- ? )
+M: tuple equal?
     over tuple? [ tuple= ] [ 2drop f ] if ;
 
 : (delegates) ( obj -- )

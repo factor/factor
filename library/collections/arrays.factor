@@ -21,12 +21,12 @@ M: byte-array clone (clone) ;
 M: byte-array length array-capacity ;
 M: byte-array resize resize-array ;
 
-: 1array ( x -- { x } ) 1 swap <array> ;
+: 1array ( x -- array ) 1 swap <array> ;
 
-: 2array ( x y -- { x y } )
+: 2array ( x y -- array )
     2 swap <array> [ 0 swap set-array-nth ] keep ;
 
-: 3array ( x y z -- { x y z } )
+: 3array ( x y z -- array )
     3 swap <array>
     [ 1 swap set-array-nth ] keep
     [ 0 swap set-array-nth ] keep ;

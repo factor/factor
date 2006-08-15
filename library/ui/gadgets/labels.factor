@@ -17,13 +17,13 @@ C: label ( text -- label )
     dup label-font lookup-font dup font-height >r
     swap label-text string-width r> 2array ;
 
-M: label pref-dim* ( label -- dim ) label-size ;
+M: label pref-dim* label-size ;
 
 : draw-label ( label -- )
     dup label-color gl-color
     dup label-font swap label-text draw-string ;
 
-M: label draw-gadget* ( label -- ) draw-label ;
+M: label draw-gadget* draw-label ;
 
 : <label-control> ( model -- gadget )
     "" <label> [ set-label-text ] <control> ;

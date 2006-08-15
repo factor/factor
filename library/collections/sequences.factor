@@ -6,7 +6,7 @@ USING: errors generic kernel math math-internals strings vectors ;
 GENERIC: length ( sequence -- n )
 GENERIC: set-length ( n sequence -- )
 GENERIC: nth ( n sequence -- obj )
-GENERIC: set-nth ( value n sequence -- obj )
+GENERIC: set-nth ( value n sequence -- )
 GENERIC: thaw ( seq -- mutable-seq )
 GENERIC: like ( seq seq -- seq )
 
@@ -33,8 +33,8 @@ IN: sequences-internals
 GENERIC: resize ( n seq -- seq )
 
 ! Unsafe sequence protocol for inner loops
-GENERIC: nth-unsafe
-GENERIC: set-nth-unsafe
+GENERIC: nth-unsafe ( n sequence -- elt )
+GENERIC: set-nth-unsafe ( elt n sequence -- )
 
 M: object nth-unsafe nth ;
 M: object set-nth-unsafe set-nth ;

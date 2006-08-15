@@ -18,16 +18,16 @@ IN: inference
     #! Add a node to the dataflow graph that consumes and
     #! produces a number of values.
     swap #call
-    over first length over consume-values
-    swap second length over produce-values
-    node, ;
+    over effect-in length over consume-values
+    over effect-out length over produce-values
+    node, effect-terminated? [ terminate ] when ;
 
 : no-effect ( word -- )
     "Stack effect inference of the word " swap word-name
     " was already attempted, and failed" append3
     inference-error ;
 
-TUPLE: rstate label base-case? ;
+TUPLE: rstate label count ;
 
 : nest-node ( -- ) #entry node, ;
 
@@ -35,10 +35,10 @@ TUPLE: rstate label base-case? ;
     dup node-param #return node,
     dataflow-graph get 1array over set-node-children ;
 
-: add-recursive-state ( word label base-case -- )
+: add-recursive-state ( word label count -- )
     <rstate> 2array recursive-state [ swap add ] change ;
 
-: inline-block ( word base-case -- node-block variables )
+: inline-block ( word count -- node-block variables )
     [
         copy-inference nest-node
         >r gensym 2dup r> add-recursive-state
@@ -52,9 +52,9 @@ TUPLE: rstate label base-case? ;
 
 GENERIC: collect-recursion* ( label node -- )
 
-M: node collect-recursion* ( label node -- ) 2drop ;
+M: node collect-recursion* 2drop ;
 
-M: #call-label collect-recursion* ( label node -- )
+M: #call-label collect-recursion*
     tuck node-param eq? [ node-in-d , ] [ drop ] if ;
 
 : collect-recursion ( #label -- seq )
@@ -84,15 +84,15 @@ M: #call-label collect-recursion* ( label node -- )
     #! closure under recursive value substitution.
     #! If the block does not call itself, there is no point in
     #! having the block node in the IR. Just add its contents.
-    dup f inline-block over recursive-label? [
+    dup 0 inline-block over recursive-label? [
         meta-d get >r
-        drop join-values f inline-block apply-infer
+        drop join-values 0 inline-block apply-infer
         r> over set-node-in-d node,
     ] [
         apply-infer node-child node-successor splice-node drop
     ] if ;
 
-: infer-compound ( word base-case -- terminates? effect )
+: infer-compound ( word count -- effect )
     #! Infer a word's stack effect in a separate inferencer
     #! instance. Outputs a true boolean if the word terminates
     #! control flow by throwing an exception or restoring a
@@ -100,22 +100,29 @@ M: #call-label collect-recursion* ( label node -- )
     [
         recursive-state get init-inference
         over >r inline-block nip
-        [ terminated? get effect ] bind r>
-    ] with-scope over consume/produce over [ terminate ] when ;
+        [ current-effect ] bind r>
+    ] with-scope over consume/produce ;
 
 GENERIC: apply-word
 
-M: object apply-word ( word -- )
+M: object apply-word
     #! A primitive with an unknown stack effect.
     no-effect ;
 
-: save-effect ( word terminates effect prop -- )
-    rot [ 3drop ] [ set-word-prop ] if ;
+TUPLE: effect-error word effect ;
 
-M: compound apply-word ( word -- )
+: effect-error ( -- * ) <effect-error> throw ;
+
+: check-effect ( word effect -- )
+    over recorded get push
+    dup pick "declared-effect" word-prop dup
+    [ effect<= [ effect-error ] unless ] [ 2drop ] if
+    "infer-effect" set-word-prop ;
+
+M: compound apply-word
     #! Infer a compound word's stack effect.
     [
-        dup f infer-compound "infer-effect" save-effect
+        dup 0 infer-compound check-effect
     ] [
         swap t "no-effect" set-word-prop rethrow
     ] recover ;
@@ -124,7 +131,7 @@ M: compound apply-word ( word -- )
     dup "no-effect" word-prop [ no-effect ] when
     dup "infer-effect" word-prop [
         over "infer" word-prop [
-            swap first length ensure-values call drop
+            swap effect-in length ensure-values call drop
         ] [
             consume/produce
         ] if*
@@ -132,46 +139,28 @@ M: compound apply-word ( word -- )
         apply-word
     ] if* ;
 
-M: word apply-object ( word -- )
-    apply-default ;
+M: word apply-object apply-default ;
 
-M: symbol apply-object ( word -- )
-    apply-literal ;
+M: symbol apply-object apply-literal ;
 
-: inline-base-case ( word label -- )
-    meta-d get clone >r over t inline-block apply-infer drop
-    [ #call-label ] [ #call ] ?if r> over set-node-in-d node, ;
+: declared-effect ( word -- effect )
+    dup "declared-effect" word-prop [ ] [
+        "The recursive word " swap word-name
+        " does not declare a stack effect" append3
+        inference-error
+    ] ?if ;
 
-: base-case ( word label -- )
-    over "inline" word-prop [
-        inline-base-case
-    ] [
-        drop dup t infer-compound "base-case" save-effect
-    ] if ;
-
-: recursive-word ( word rstate -- )
+: recursive-effect ( word -- effect )
     #! Handle a recursive call, by either applying a previously
     #! inferred base case, or raising an error. If the recursive
     #! call is to a local block, emit a label call node.
-    over "infer-effect" word-prop [
-        nip consume/produce
-    ] [
-        over "base-case" word-prop [
-            nip consume/produce
-        ] [
-            dup rstate-base-case? [
-                notify-base-case
-            ] [
-                rstate-label base-case
-            ] if
-        ] if*
-    ] if* ;
+    dup "infer-effect" word-prop [ ] [ declared-effect ] if ;
 
-M: compound apply-object ( word -- )
+M: compound apply-object
     #! Apply the word's stack effect to the inferencer state.
     dup recursive-state get <reversed> assoc [
-        recursive-word
+        dup recursive-effect consume/produce
     ] [
         dup "inline" word-prop
         [ inline-closure ] [ apply-default ] if
-    ] if* ;
+    ] if ;

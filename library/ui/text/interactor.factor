@@ -11,7 +11,7 @@ C: interactor ( output -- gadget )
     f <field> over set-gadget-delegate
     dup dup set-control-self ;
 
-M: interactor graft* ( interactor -- )
+M: interactor graft*
     f over set-interactor-busy? delegate graft* ;
 
 : interactor-eval ( string interactor -- )
@@ -55,6 +55,6 @@ interactor H{
     { T{ key-down f { C+ } "d" } [ f swap interactor-eval ] }
 } set-gestures
 
-M: interactor stream-readln ( interactor -- line )
+M: interactor stream-readln
     f over set-interactor-busy?
     [ over set-interactor-continuation stop ] callcc1 nip ;
