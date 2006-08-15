@@ -58,7 +58,6 @@ FUNCTION: void callback_test_1 void* callback ;
    
 
 FUNCTION: void callback_test_2 void* callback int x int y ;
-compiled
 
 [ 3/4 ] [
     [

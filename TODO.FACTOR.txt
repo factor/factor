@@ -1,5 +1,20 @@
 + 0.84:
 
+- declaration to do:
+  - move effect class to words vocab
+  - stack-effect word in words needs to be fixed
+  - forget declared effects when redefining words
+  - test what is done in the case of an invalid declaration on an inline
+    recursive
+  - see should show declared effects
+  - get rid of the string "stack-effect" prop
+  - HELP: should not specify stack effect
+  - bootstrap speedup with compiling recursives
+  - load cocoa before 'recompile' call
+  - document inference errors
+  - maybe we can remove |
+  - natural-sort does not compile
+  - fix unit test failures
 - RT_WORD should refer to XTs not word objects.
 - fix contribs: boids, automata
 - sometimes darcs get fails with the httpd

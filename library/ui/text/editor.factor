@@ -147,7 +147,7 @@ M: loc-monitor model-changed
         swap dup control-model document set editor set call
     ] with-scope ; inline
 
-: draw-lines ( editor -- )
+: draw-lines ( -- )
     GL_MODELVIEW [
         editor get dup editor-lines
         [ over >r draw-line 1 r> translate-lines ] each-with

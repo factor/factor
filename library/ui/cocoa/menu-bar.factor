@@ -15,7 +15,7 @@ M: word to-target-and-action unit to-target-and-action ;
 M: quotation to-target-and-action
     <FactorCallback> "perform:" swap ;
 
-: <NSMenu> ( title -- )
+: <NSMenu> ( title -- menu )
     NSMenu -> alloc
     swap <NSString> -> initWithTitle:
     -> autorelease ;

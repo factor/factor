@@ -33,7 +33,7 @@ IN: inference
     r> over #call-label? [ over set-node-in-d ] [ drop ] if
     node, effect-terminated? [ terminate ] when ;
 
-: no-effect ( word -- )
+: no-effect ( word -- * )
     "Stack effect inference of the word " swap word-name
     " was already attempted, and failed" append3
     inference-error ;

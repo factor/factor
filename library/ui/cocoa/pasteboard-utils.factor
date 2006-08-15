@@ -6,7 +6,7 @@ sequences ;
 
 : NSStringPboardType "NSStringPboardType" ;
 
-: pasteboard-string? ( type id -- seq )
+: pasteboard-string? ( id -- ? )
     NSStringPboardType swap -> types CF>string-array member? ;
 
 : pasteboard-string ( id -- str )

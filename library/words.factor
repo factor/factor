@@ -193,14 +193,7 @@ TUPLE: check-create name vocab ;
     ] "" make ;
 
 : stack-effect ( word -- string )
-    dup "stack-effect" word-prop [ ] [
-        "infer-effect" word-prop dup [
-            [
-                dup integer? [ object <array> ] when
-                [ word-name ] map
-            ] map effect>string
-        ] when
-    ] ?if ;
+    "stack-effect" word-prop ;
 
 ! Definition protocol
 M: word where "loc" word-prop ;

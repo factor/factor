@@ -352,3 +352,4 @@ DEFER: bar
 [ { 1 1 } ] [ [ reverse ] infer ] unit-test
 [ { 2 1 } ] [ [ member? ] infer ] unit-test
 [ { 2 1 } ] [ [ remove ] infer ] unit-test
+[ { 1 1 } ] [ [ natural-sort ] infer ] unit-test

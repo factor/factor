@@ -93,7 +93,7 @@ USE: optimizer
 
 [ 4 ] [ 2 2 literal-kill-test-7 ] unit-test
 
-: literal-kill-test-8
+: literal-kill-test-8 ( a b -- )
     dup [ >r dup slip r> literal-kill-test-8 ] [ 2drop ] if ; inline
 
 [ t ] [
