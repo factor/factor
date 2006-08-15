@@ -18,7 +18,7 @@ GENERIC: extended? ( op -- ? )
 
 M: object extended? drop f ;
 
-( Register operands -- eg, ECX                                 )
+! Register operands -- eg, ECX
 : define-register ( symbol num size -- )
     >r dupd "register" set-word-prop r>
     "register-size" set-word-prop ;
@@ -87,7 +87,7 @@ PREDICATE: register register-128 "register-size" word-prop 128 = ;
 
 M: register extended? "register" word-prop 7 > ;
 
-( Addressing modes                                             )
+! Addressing modes
 TUPLE: indirect base index scale displacement ;
 
 M: indirect extended? indirect-base extended? ;
@@ -190,7 +190,7 @@ M: register displacement drop f ;
     [ sib [ , ] when* ] keep
     displacement [ 4, ] when* ;
 
-( Utilities                                                    )
+! Utilities
 UNION: operand register indirect ;
 
 : operand-64? ( operand -- ? )
@@ -261,7 +261,7 @@ UNION: operand register indirect ;
 
 PREDICATE: word callable register? not ;
 
-( Moving stuff                                                 )
+! Moving stuff
 GENERIC: PUSH ( op -- )
 M: register PUSH f HEX: 50 short-operand ;
 M: integer PUSH HEX: 68 , 4, ;
@@ -284,7 +284,7 @@ M: callable MOV 0 rot (MOV-I) rel-absolute-cell rel-word ;
 M: label MOV 0 rot (MOV-I) rel-absolute-cell rel-label ;
 M: operand MOV HEX: 89 2-operand ;
 
-( Control flow                                                 )
+! Control flow
 GENERIC: JMP ( op -- )
 : (JMP) HEX: e9 , 0 4, rel-relative ;
 M: callable JMP (JMP) rel-word ;
@@ -321,7 +321,7 @@ M: label JUMPcc (JUMPcc) rel-label ;
 
 : RET ( -- ) HEX: c3 , ;
 
-( Arithmetic                                                   )
+! Arithmetic
 
 GENERIC: ADD ( dst src -- )
 M: integer ADD swap BIN: 000 t HEX: 81 immediate-1/4 ;
@@ -376,7 +376,7 @@ M: integer IMUL2 swap dup reg-code t HEX: 69 immediate-1/4 ;
 : SHR ( dst n -- ) swap BIN: 101 t HEX: c1 immediate-1 ;
 : SAR ( dst n -- ) swap BIN: 111 t HEX: c1 immediate-1 ;
 
-( x87 Floating Point Unit )
+! x87 Floating Point Unit
 
 : FSTPS ( operand -- ) BIN: 011 f HEX: d9 1-operand ;
 : FSTPL ( operand -- ) BIN: 011 f HEX: dd 1-operand ;
@@ -384,7 +384,7 @@ M: integer IMUL2 swap dup reg-code t HEX: 69 immediate-1/4 ;
 : FLDS ( operand -- ) BIN: 000 f HEX: d9 1-operand ;
 : FLDL ( operand -- ) BIN: 000 f HEX: dd 1-operand ;
 
-( SSE multimedia instructions )
+! SSE multimedia instructions
 
 : 2-operand-sse ( dst src op1 op2 -- )
     #! We swap the operands here to make everything consistent
