@@ -53,7 +53,7 @@ CELL get_rel_word(F_REL *rel, CELL literal_start)
 	CELL arg = REL_ARGUMENT(rel);
 	F_WORD *word = untag_word(get_literal(literal_start,arg));
 	if(word->xt < compiling.base || word->xt >= compiling.limit)
-		fprintf(stderr,"Bad XT %x",tag_word(word));
+		critical_error("Bad XT",tag_word(word));
 	return word->xt;
 }
 
