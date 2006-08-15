@@ -61,7 +61,7 @@ kernel-internals math namespaces sequences words ;
 : box-parameter ( stack# type -- node )
     c-type [ "reg-class" get "boxer" get call ] bind ;
 
-: if-void ( type true false -- | false: type -- )
+: if-void ( type true false -- )
     pick "void" = [ drop nip call ] [ nip call ] if ; inline
 
 : compile-gc ; ! "simple_gc" f %alien-invoke , ;

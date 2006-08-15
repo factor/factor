@@ -13,5 +13,5 @@ FUNCTION: void memcpy ( void* dst, void* src, ulong size ) ;
 TUPLE: check-ptr ;
 : check-ptr [ <check-ptr> throw ] unless* ;
 
-: with-malloc ( size quot -- | quot: alien -- )
+: with-malloc ( size quot -- )
     swap 1 calloc check-ptr [ swap call ] keep free ; inline

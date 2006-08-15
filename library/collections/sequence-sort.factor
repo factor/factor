@@ -81,19 +81,19 @@ C: sorter ( seq start end -- sorter )
 
 IN: sequences
 
-: nsort ( seq quot -- | quot: elt elt -- -1/0/1 )
+: nsort ( seq quot -- )
     swap dup length 1 <=
     [ 2drop ] [ 0 over length 1- (nsort) ] if ; inline
 
-: sort ( seq quot -- seq | quot: elt elt -- -1/0/1 )
+: sort ( seq quot -- seq )
     swap [ swap nsort ] immutable ; inline
 
 : natural-sort ( seq -- seq ) [ <=> ] sort ;
 
-: binsearch ( elt seq quot -- i | quot: elt elt -- -1/0/1 )
+: binsearch ( elt seq quot -- i )
     swap dup empty?
     [ 3drop -1 ] [ flatten-slice (binsearch) ] if ; inline
 
-: binsearch* ( elt seq quot -- elt | quot: elt elt -- -1/0/1 )
+: binsearch* ( elt seq quot -- elt )
     over >r binsearch dup -1 = [ r> 2drop f ] [ r> nth ] if ;
     inline

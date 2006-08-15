@@ -66,7 +66,7 @@ M: object like drop ;
 
 : >resizable ( seq -- seq ) [ thaw dup ] keep nappend ;
 
-: immutable ( seq quot -- seq | quot: seq -- )
+: immutable ( seq quot -- seq )
     swap [ >resizable [ swap call ] keep ] keep like ; inline
 
 : append ( s1 s2 -- s1+s2 )

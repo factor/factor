@@ -65,6 +65,7 @@ sequences vectors words ;
 
         "/library/definitions.factor"
         "/library/words.factor"
+        "/library/effects.factor"
         "/library/continuations.factor"
         "/library/errors.factor"
         

@@ -97,11 +97,11 @@ strings vectors ;
 
 : split-next, V{ } clone , ;
 
-: (split) ( separator elt -- | separator: elt -- ? )
+: (split) ( separator elt -- )
     [ swap call ] keep swap
     [ drop split-next, ] [ split, ] if ; inline
 
-: split* ( seq separator -- split | separator: elt -- ? )
+: split* ( seq separator -- split )
     over >r
     [ split-next, swap [ (split) ] each-with ]
     { } make r> swap [ swap like ] map-with ; inline

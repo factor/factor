@@ -24,7 +24,7 @@ threads unix-internals ;
 : socket-fd ( -- socket )
     PF_INET SOCK_STREAM 0 socket dup io-error dup init-handle ;
 
-: with-socket-fd ( quot -- fd | quot: socket -- n )
+: with-socket-fd ( quot -- fd )
     socket-fd [ swap call ] keep  swap 0 < [
         err_no EINPROGRESS = [ dup close (io-error) ] unless
     ] when ; inline

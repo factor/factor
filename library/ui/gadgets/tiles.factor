@@ -8,7 +8,7 @@ TUPLE: tile gadget ;
 
 : find-tile [ tile? ] find-parent ;
 
-: <close-button> ( quot -- gadget | quot: tile -- )
+: <close-button> ( quot -- gadget )
     { 0.0 0.0 0.0 1.0 } close-box <polygon-gadget>
     [ find-tile ] rot append <bevel-button> ;
 
@@ -18,7 +18,7 @@ TUPLE: tile gadget ;
         { [ <label> ]        f f @center }
     } make-frame ;
 
-: <title> ( title quot -- gadget | quot: tile -- )
+: <title> ( title quot -- gadget )
     [ <closable-title> ] [ <label> ] if* dup title-theme ;
 
 C: tile ( gadget title quot -- gadget )

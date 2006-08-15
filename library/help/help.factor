@@ -51,7 +51,7 @@ M: word article-content
         subsection-style [ first ($subsection) ] with-style
     ] ($block) ;
 
-: help-outliner ( seq  -- | quot: obj -- )
+: help-outliner ( seq  -- )
     subsection-style [
         sort-articles [ ($subsection) terpri ] each
     ] with-style ;

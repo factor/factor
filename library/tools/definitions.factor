@@ -20,21 +20,20 @@ GENERIC: (synopsis) ( spec -- )
         H{ } <block \ IN: pprint-word write-vocab block;
     ] when* ;
 
+: comment. ( comment -- )
+    [ H{ { font-style italic } } styled-text ] when* ;
+
 M: word (synopsis)
-    dup in. dup definer pprint-word pprint-word ;
+    dup in.
+    dup definer pprint-word
+    dup pprint-word
+    stack-effect comment. ;
 
 M: method-spec (synopsis)
     \ M: pprint-word [ pprint-word ] each ;
 
-: comment. ( comment -- )
-    [ H{ { font-style italic } } [ text ] with-style ] when* ;
-
 : synopsis ( word -- string )
-    [
-        0 margin set [
-            dup (synopsis) stack-effect comment.
-        ] with-pprint
-    ] string-out ;
+    [ 0 margin set [ (synopsis) ] with-pprint ] string-out ;
 
 GENERIC: definition ( spec -- quot ? )
 

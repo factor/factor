@@ -5,13 +5,13 @@ USING: hashtables kernel namespaces sequences ;
 
 : if-graph over [ bind ] [ 2drop 2drop ] if ; inline
 
-: (add-vertex) ( vertex edges -- | edges: vertex -- seq )
+: (add-vertex) ( vertex edges -- )
     dupd call [ dupd nest set-hash ] each-with ; inline
 
-: add-vertex ( vertex edges graph -- | edges: vertex -- seq )
+: add-vertex ( vertex edges graph -- )
     [ (add-vertex) ] if-graph ; inline
 
-: build-graph ( seq edges graph -- | edges: vertex -- seq )
+: build-graph ( seq edges graph -- )
     [
         namespace clear-hash
         swap [ swap (add-vertex) ] each-with
@@ -37,7 +37,7 @@ SYMBOL: previous
         [ call ] keep swap [ swap (closure) ] each-with
     ] if ; inline
 
-: closure ( obj quot -- seq | quot: obj -- seq )
+: closure ( obj quot -- seq )
     [
         H{ } clone previous set
         (closure)

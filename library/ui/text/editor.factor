@@ -52,7 +52,7 @@ M: editor model-changed
 
 : editor-mark* editor-mark model-value ;
 
-: change-caret ( editor quot -- | quot: caret doc -- caret )
+: change-caret ( editor quot -- )
     over >r >r dup editor-caret* swap control-model r> call r>
     [ control-model validate-loc ] keep
     editor-caret set-model ; inline

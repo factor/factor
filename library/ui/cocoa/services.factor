@@ -18,7 +18,7 @@ parser prettyprint styles ;
         nip pasteboard-error
     ] if ;
 
-: do-service ( pboard error quot -- | quot: str -- str/f )
+: do-service ( pboard error quot -- )
     pick >r >r
     ?pasteboard-string dup [ r> call ] [ r> 2drop f ] if
     dup [ r> set-pasteboard-string ] [ r> 2drop ] if ;

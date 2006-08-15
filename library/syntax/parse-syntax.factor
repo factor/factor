@@ -79,13 +79,4 @@ DEFER: !PRIMITIVE: parsing
     [ string-mode off [ (require) ] each ] f ; parsing
 
 : !(
-    word parse-effect dup 1array >vector effect-stack set
-    "declared-effect" set-word-prop ; parsing
-
-: !|
-    scan scan-word \ ( eq? [
-        parse-effect dup effect-stack get push
-        swap add-declaration
-    ] [
-        "Expected (" throw
-    ] if ; parsing
+    word parse-effect "declared-effect" set-word-prop ; parsing

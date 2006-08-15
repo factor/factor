@@ -187,7 +187,6 @@ M: f '
     [ % dup word-vocabulary % " " % word-name % ] "" make throw ;
 
 : transfer-word ( word -- word )
-    #! This is a hack. See doc/bootstrap.txt.
     dup target-word [ ] [ "Missing DEFER: " word-error ] ?if ;
 
 : fixup-word ( word -- offset )

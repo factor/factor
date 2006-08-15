@@ -13,7 +13,7 @@ math namespaces prettyprint sequences strings styles ;
 : usage. ( word -- )
     usage [ usage. ] word-outliner ;
 
-: annotate ( word quot -- | quot: word def -- def )
+: annotate ( word quot -- )
     over >r >r dup word-def r> call r> swap define-compound ;
     inline
 

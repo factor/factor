@@ -4,7 +4,7 @@ IN: sequences-internals
 USING: arrays generic kernel kernel-internals math sequences
 vectors ;
 
-: collect ( n quot -- array ) | quot ( n -- value )
+: collect ( n quot -- array )
     >r [ f <array> ] keep r> swap [
         [ rot >r [ swap call ] keep r> set-array-nth ] 3keep
     ] repeat drop ; inline
@@ -32,36 +32,36 @@ vectors ;
 
 IN: sequences
 
-: each ( seq quot -- ) | quot ( elt -- )
+: each ( seq quot -- )
     swap dup length [
         [ swap nth-unsafe swap call ] 3keep
     ] repeat 2drop ; inline
 
-: each-with ( obj seq quot -- ) | quot (  obj elt -- )
+: each-with ( obj seq quot -- )
     swap [ with ] each 2drop ; inline
 
-: reduce ( seq identity quot -- value ) | quot ( x y -- z )
+: reduce ( seq identity quot -- value )
     swapd each ; inline
 
-: map ( seq quot -- seq ) | quot ( elt -- elt )
+: map ( seq quot -- seq )
     over >r over length [ (map) ] collect r> like 2nip ;
     inline
 
-: map-with ( obj list quot -- list ) | quot ( obj elt -- elt )
+: map-with ( obj list quot -- list )
     swap [ with rot ] map 2nip ; inline
 
-: accumulate ( seq identity quot -- values ) | quot ( x y -- z )
+: accumulate ( seq identity quot -- values )
     rot [ pick >r swap call r> ] map-with nip ; inline
 
 : change-nth ( i seq quot -- )
     -rot [ nth swap call ] 2keep set-nth ; inline
 
-: inject ( seq quot -- ) | quot ( elt -- elt )
+: inject ( seq quot -- )
     over length
     [ [ -rot change-nth ] 3keep ] repeat 2drop ;
     inline
 
-: inject-with ( obj seq quot -- ) | quot ( obj elt -- elt )
+: inject-with ( obj seq quot -- )
     swap [ with rot ] inject 2drop ; inline
 
 : min-length ( seq seq -- n )
@@ -73,7 +73,7 @@ IN: sequences
 : 2each ( seq seq quot -- )
     -rot 2dup min-length [ (2each) ] repeat 3drop ; inline
 
-: 2reduce ( seq seq identity quot -- value ) | quot ( e x y -- z )
+: 2reduce ( seq seq identity quot -- value )
     >r -rot r> 2each ; inline
 
 : 2map ( seq seq quot -- seq )
@@ -93,13 +93,13 @@ IN: sequences
         ] if
     ] if-bounds ; inline
 
-: find-with* ( obj i seq quot -- i elt ) | quot ( elt -- ? )
+: find-with* ( obj i seq quot -- i elt )
     -rot [ with rot ] find* 2swap 2drop ; inline
 
-: find ( seq quot -- i elt ) | quot ( elt -- ? )
+: find ( seq quot -- i elt )
     0 -rot find* ; inline
 
-: find-with ( obj seq quot -- i elt ) | quot ( elt -- ? )
+: find-with ( obj seq quot -- i elt )
     swap [ with rot ] find 2swap 2drop ; inline
 
 : find-last* ( i seq quot -- i elt )
@@ -111,13 +111,13 @@ IN: sequences
         ] if
     ] if-bounds ; inline
 
-: find-last-with* ( obj i seq quot -- i elt ) | quot ( elt -- ? )
+: find-last-with* ( obj i seq quot -- i elt )
     -rot [ with rot ] find-last* 2swap 2drop ; inline
 
 : find-last ( seq quot -- i elt )
     >r [ length 1- ] keep r> find-last* ; inline
 
-: find-last-with ( obj seq quot -- i elt ) | quot ( elt -- ? )
+: find-last-with ( obj seq quot -- i elt )
     swap [ with rot ] find-last 2swap 2drop ; inline
 
 : contains? ( seq quot -- ? )
@@ -129,20 +129,20 @@ IN: sequences
 : all? ( seq quot -- ? )
     swap [ swap call not ] contains-with? not ; inline
 
-: all-with? ( obj seq quot -- ? ) | quot ( elt -- ? )
+: all-with? ( obj seq quot -- ? )
     swap [ with rot ] all? 2nip ; inline
 
-: subset ( seq quot -- seq ) | quot ( elt -- ? )
+: subset ( seq quot -- seq )
     over >r over length <vector> rot [
         -rot [
             >r over >r call [ r> r> push ] [ r> r> 2drop ] if
         ] 2keep
     ] each r> like nip ; inline
 
-: subset-with ( obj seq quot -- seq ) | quot ( obj elt -- ? )
+: subset-with ( obj seq quot -- seq )
     swap [ with rot ] subset 2nip ; inline
 
-: monotonic? ( seq quot -- ? ) | quot ( elt elt -- ? )
+: monotonic? ( seq quot -- ? )
     swap dup length 1- [
         pick pick >r >r (monotonic) r> r> rot
     ] all? 2nip ; inline
@@ -154,7 +154,7 @@ IN: sequences
         if
     ] 2each 2drop ; inline
 
-: cache-nth ( i seq quot -- elt ) | quot ( i -- elt )
+: cache-nth ( i seq quot -- elt )
     pick pick ?nth dup [
         >r 3drop r>
     ] [

@@ -60,20 +60,8 @@ unit-test
 
 : foo ( a b -- c ) + ;
 
-[ T{ effect f { "a" "b" } { "c" } H{ } f } ]
+[ T{ effect f { "a" "b" } { "c" } f } ]
 [ \ foo "declared-effect" word-prop ] unit-test
-
-: bar ( a quot -- b ) | quot ( u -- v ) call ;
-
-[
-    T{ effect f
-        { "a" "quot" }
-        { "b" }
-        H{ { "quot" T{ effect f { "u" } { "v" } H{ } } } }
-        f
-    }
-]
-[ \ bar "declared-effect" word-prop ] unit-test
 
 [ t ] [ 1 1 <effect> 2 2 <effect> effect<= ] unit-test
 [ f ] [ 1 0 <effect> 2 2 <effect> effect<= ] unit-test

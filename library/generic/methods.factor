@@ -35,7 +35,7 @@ TUPLE: check-method class generic ;
     dup generic? [ <check-method> throw ] unless
     over class? [ <check-method> throw ] unless ;
 
-: with-methods ( word quot -- | quot: methods -- )
+: with-methods ( word quot -- )
     swap [ "methods" word-prop swap call ] keep ?make-generic ;
     inline
 

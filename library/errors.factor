@@ -12,7 +12,7 @@ USING: kernel ;
 SYMBOL: error
 SYMBOL: error-continuation
 
-: catch ( try -- error | try: -- )
+: catch ( try -- error )
     [ >c call f c> drop f ] callcc1 nip ; inline
 
 : rethrow ( error -- )
@@ -23,12 +23,12 @@ SYMBOL: error-continuation
         c> dup quotation? [ call ] [ continue-with ] if
     ] if ;
 
-: cleanup ( try cleanup -- | try: -- | cleanup: -- )
+: cleanup ( try cleanup -- )
     [ >c >r call c> drop r> call ]
     [ drop (continue-with) >r nip call r> rethrow ] ifcc ;
     inline
 
-: recover ( try recovery -- | try: -- | recovery: error -- )
+: recover ( try recovery -- )
     [ >c drop call c> drop ]
     [ drop (continue-with) rot drop swap call ] ifcc ; inline
 

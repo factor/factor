@@ -6,9 +6,9 @@ IN: sequences-internals
 USING: errors kernel kernel-internals math math-internals
 sequences ;
 
-GENERIC: underlying
-GENERIC: set-underlying
-GENERIC: set-fill
+GENERIC: underlying ( seq -- underlying )
+GENERIC: set-underlying ( underlying seq -- )
+GENERIC: set-fill ( n seq -- )
 
 : capacity ( seq -- n ) underlying length ; inline
 

@@ -36,7 +36,7 @@ UNION: #terminal
         dup #terminal-call? swap node-successor #terminal? or
     ] all? ;
 
-: generate-code ( node quot -- | quot: node -- )
+: generate-code ( node quot -- )
     over stack-reserve %prologue call ; inline
 
 : init-generator ( -- )
@@ -44,7 +44,7 @@ UNION: #terminal
     V{ } clone literal-table set
     V{ } clone label-table set ;
 
-: generate-1 ( word node quot -- ) | quot ( node -- )
+: generate-1 ( word node quot -- )
     #! Generate the code, then dump three vectors to pass to
     #! add-compiled-block.
     pick f save-xt [
@@ -99,10 +99,10 @@ M: #if generate-node
 : [with-template] ( quot template -- quot )
     2array >quotation [ with-template ] append ;
 
-: define-intrinsic ( word quot template -- ) | quot ( -- )
+: define-intrinsic ( word quot template -- )
     [with-template] "intrinsic" set-word-prop ;
 
-: define-if-intrinsic ( word quot template -- ) | quot ( label -- )
+: define-if-intrinsic ( word quot template -- )
     [with-template] "if-intrinsic" set-word-prop ;
 
 : if>boolean-intrinsic ( label -- )

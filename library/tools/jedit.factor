@@ -68,11 +68,11 @@ namespaces parser prettyprint sequences strings words shells ;
             dup definer ,
             dup word-vocabulary ,
             dup word-name ,
-            "stack-effect" word-prop ,
+            stack-effect ,
         ] [ ] make
     ] when ;
 
-: completions ( str pred -- list | pred: str word -- ? )
+: completions ( str pred -- seq )
     #! Make a list of completions. Each element of the list is
     #! a vocabulary/name/stack-effect triplet list.
     word-subset-with [ jedit-lookup ] map ;

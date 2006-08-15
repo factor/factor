@@ -70,16 +70,15 @@ M: alien-invoke generate-node
 M: alien-invoke stack-reserve*
     alien-invoke-parameters stack-space ;
 
-: parse-arglist ( return seq -- types stack-effect )
+: parse-arglist ( return seq -- types effect )
     2 group unpair
-    rot dup "void" = [ drop { } ] [ 1array ] if 2array
-    effect>string ;
+    rot dup "void" = [ drop { } ] [ 1array ] if <effect> ;
 
 : (define-c-word) ( type lib func types stack-effect -- )
     >r over create-in dup reset-generic >r 
     [ alien-invoke ] curry curry curry curry
     r> swap define-compound word r>
-    "stack-effect" set-word-prop ;
+    "declared-effect" set-word-prop ;
 
 : define-c-word ( return library function parameters -- )
     [ "()" subseq? not ] subset >r pick r> parse-arglist

@@ -23,7 +23,7 @@ sequences ;
 : editor-cut ( editor clipboard -- )
     dupd editor-copy remove-editor-selection ;
 
-: delete/backspace ( elt editor quot -- | quot: caret editor -- from to )
+: delete/backspace ( elt editor quot -- )
     over gadget-selection? [
         drop nip remove-editor-selection
     ] [

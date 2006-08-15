@@ -30,7 +30,7 @@ TUPLE: tombstone ;
 : key@ ( key hash -- n )
     hash-array 2dup hash@ (key@) ; inline
 
-: if-key ( key hash true false -- ) | true ( index key hash -- )
+: if-key ( key hash true false -- )
     >r >r [ key@ ] 2keep pick -1 > r> r> if ; inline
 
 : <hash-array> ( n -- array )
@@ -77,7 +77,7 @@ TUPLE: tombstone ;
     [ hash-array 2dup array-nth ] keep
     swap change-size set-nth-pair ; inline
 
-: (each-pair) ( quot array i -- ) | quot ( k v -- )
+: (each-pair) ( quot array i -- )
     over array-capacity over eq? [
         3drop
     ] [
@@ -87,10 +87,10 @@ TUPLE: tombstone ;
         ] 3keep 2 fixnum+fast (each-pair)
     ] if ; inline
 
-: each-pair ( array quot -- ) | quot ( k v -- )
+: each-pair ( array quot -- )
     swap 0 (each-pair) ; inline
 
-: (all-pairs?) ( quot array i -- ? ) | quot ( k v -- ? )
+: (all-pairs?) ( quot array i -- ? )
     over array-capacity over eq? [
         3drop t
     ] [
@@ -105,7 +105,7 @@ TUPLE: tombstone ;
         ] if
     ] if ; inline
 
-: all-pairs? ( array quot -- ? ) | quot ( k v -- ? )
+: all-pairs? ( array quot -- ? )
     swap 0 (all-pairs?) ; inline
 
 : hash>seq ( i hash -- seq )
@@ -188,17 +188,17 @@ IN: hashtables
     [ length <hashtable> ] keep
     [ first2 swap pick (set-hash) ] each ;
 
-: hash-each ( hash quot -- ) | quot ( k v -- )
+: hash-each ( hash quot -- )
     >r hash-array r> each-pair ; inline
 
-: hash-each-with ( obj hash quot -- ) | quot ( obj k v -- )
+: hash-each-with ( obj hash quot -- )
     swap [ 2swap [ >r -rot r> call ] 2keep ] hash-each 2drop ;
     inline
 
-: hash-all? ( hash quot -- ) | quot ( k v -- ? )
+: hash-all? ( hash quot -- )
     >r hash-array r> all-pairs? ; inline
 
-: hash-all-with? ( obj hash quot -- ) | quot ( obj k v -- ? )
+: hash-all-with? ( obj hash quot -- )
     swap
     [ 2swap [ >r -rot r> call ] 2keep rot ] hash-all? 2nip ;
     inline
@@ -208,7 +208,7 @@ IN: hashtables
         >r swap hash* [ r> = ] [ r> 2drop f ] if
     ] hash-all-with? ;
 
-: hash-subset ( hash quot -- hash ) | quot ( k v -- ? )
+: hash-subset ( hash quot -- hash )
     over hash-size <hashtable> rot [
         2swap [
             >r pick pick >r >r call [
@@ -219,7 +219,7 @@ IN: hashtables
         ] 2keep
     ] hash-each nip ; inline
 
-: hash-subset-with ( obj hash quot -- hash ) | quot ( obj pair -- ?  )
+: hash-subset-with ( obj hash quot -- hash )
     swap
     [ 2swap [ >r -rot r> call ] 2keep rot ] hash-subset 2nip ;
     inline
@@ -292,14 +292,14 @@ IN: hashtables
 : remove-all ( hash seq -- seq )
     [ swap hash-member? not ] subset-with ;
 
-: cache ( key hash quot -- value ) | quot ( key -- value )
+: cache ( key hash quot -- value )
     pick pick hash [
         >r 3drop r>
     ] [
         pick rot >r >r call dup r> r> set-hash
     ] if* ; inline
 
-: map>hash ( seq quot -- hash ) | quot ( key -- key value )
+: map>hash ( seq quot -- hash )
     over length <hashtable> rot
     [ -rot [ >r call swap r> set-hash ] 2keep ] each nip ;
     inline

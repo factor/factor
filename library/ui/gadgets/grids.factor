@@ -31,7 +31,7 @@ C: grid ( children -- grid )
     pref-dim-grid
     dup flip [ max-dim ] map swap [ max-dim ] map ;
 
-: with-grid ( grid quot -- | quot: horiz vert -- )
+: with-grid ( grid quot -- )
     [ >r grid set compute-grid r> call ] with-scope ; inline
 
 : gap grid get grid-gap ;

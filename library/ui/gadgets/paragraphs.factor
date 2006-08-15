@@ -42,7 +42,7 @@ SYMBOL: margin
     dup line-height [ max ] change
     y get + max-y [ max ] change ;
 
-: wrap-step ( quot child -- | quot: pos child -- )
+: wrap-step ( quot child -- )
     dup pref-dim [
         over word-break-gadget? [
             dup first overrun? [ wrap-line ] when
@@ -55,7 +55,7 @@ SYMBOL: margin
     paragraph-margin margin set
     0 { x max-x y max-y line-height } [ set ] each-with ;
 
-: do-wrap ( paragraph quot -- dim | quot: pos child -- )
+: do-wrap ( paragraph quot -- dim )
     [
         swap dup init-wrap
         [ wrap-step ] each-child-with wrap-dim

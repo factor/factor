@@ -4,7 +4,7 @@ IN: optimizer
 USING: arrays generic hashtables inference kernel math
 namespaces sequences words ;
 
-: node-union ( node quot -- hash | quot: node -- )
+: node-union ( node quot -- hash )
     [
         swap [ swap call [ dup set ] each ] each-node-with
     ] make-hash ; inline

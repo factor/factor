@@ -91,7 +91,7 @@ M: tuple equal?
 : delegates ( obj -- seq )
     [ (delegates) ] { } make ;
 
-: is? ( obj pred -- ? | pred: obj -- ? )
+: is? ( obj pred -- ? )
     >r delegates r> contains? ; inline
 
 : >tuple ( seq -- tuple )

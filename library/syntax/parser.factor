@@ -4,7 +4,7 @@ IN: parser
 USING: arrays definitions errors generic hashtables kernel math
 namespaces prettyprint sequences strings vectors words ;
 
-: skip ( i seq quot -- n | quot: elt -- ? )
+: skip ( i seq quot -- n )
     over >r find* drop dup -1 =
     [ drop r> length ] [ r> drop ] if ; inline
 
@@ -90,8 +90,6 @@ TUPLE: bad-escape ;
     column
     [ [ line-text get (parse-string) ] "" make swap ] change ;
 
-SYMBOL: effect-stack
-
 : (parse-effect) ( -- )
     scan [
         dup ")" = [ drop ] [ , (parse-effect) ] if
@@ -102,11 +100,6 @@ SYMBOL: effect-stack
 : parse-effect ( -- effect )
     [ (parse-effect) column get ] { } make swap column set
     { "--" } split1 <effect> ;
-
-: add-declaration ( effect name -- )
-    effect-stack get [
-        2dup effect-in member? >r dupd effect-out member? r> or
-    ] find nip effect-declarations set-hash ;
 
 global [
     {

@@ -22,7 +22,7 @@ M: sbuf stream-flush drop ;
         [ swap CHAR: \s pad-right ] map-with
     ] unless ;
 
-: map-last ( seq quot -- seq | quot: elt last? )
+: map-last ( seq quot -- seq )
     swap dup length <reversed>
     [ zero? rot [ call ] keep swap ] 2map nip ; inline
 

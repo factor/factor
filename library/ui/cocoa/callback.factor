@@ -27,6 +27,6 @@ reset-callbacks
     }
 } { } define-objc-class
 
-: <FactorCallback> ( quot -- id | quot: id -- )
+: <FactorCallback> ( quot -- id )
     FactorCallback -> alloc -> init
     [ callbacks get set-hash ] keep ;

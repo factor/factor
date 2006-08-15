@@ -144,7 +144,7 @@ SYMBOL: current-node
 : #drop ( n -- #shuffle )
     d-tail in-node <#shuffle> ;
 
-: each-node ( node quot -- ) | quot ( node -- )
+: each-node ( node quot -- )
     over [
         [ call ] 2keep swap
         [ node-children [ swap each-node ] each-with ] 2keep
@@ -153,10 +153,10 @@ SYMBOL: current-node
         2drop
     ] if ; inline
 
-: each-node-with ( obj node quot -- ) | quot ( obj node -- )
+: each-node-with ( obj node quot -- )
     swap [ with ] each-node 2drop ; inline
 
-: all-nodes? ( node quot -- ? ) | quot ( node -- ? )
+: all-nodes? ( node quot -- ? )
     over [
         [ call ] 2keep rot [
             [
@@ -173,7 +173,7 @@ SYMBOL: current-node
         2drop t
     ] if ; inline
 
-: all-nodes-with? ( obj node quot -- ? ) | quot ( obj node -- ? )
+: all-nodes-with? ( obj node quot -- ? )
     swap [ with rot ] all-nodes? 2nip ; inline
 
 : remember-node ( word node -- )
@@ -237,20 +237,20 @@ DEFER: (map-nodes)
         drop
     ] if* ; inline
 
-: (map-nodes) ( prev quot -- ) | quot ( node -- node )
+: (map-nodes) ( prev quot -- )
     node@
     [ [ map-node ] keep map-next ]
     [ drop f swap ?set-node-successor ] if ; inline
 
-: map-first ( node quot -- node ) | quot ( node -- node )
+: map-first ( node quot -- node )
     call node> drop dup >node ; inline
 
-: map-nodes ( node quot -- node ) | quot ( node -- node )
+: map-nodes ( node quot -- node )
     over [
         over >node [ map-first ] keep map-next node>
     ] when drop ; inline
 
-: map-children ( quot -- ) | quot ( node -- node )
+: map-children ( quot -- )
     node@ [ node-children [ swap map-nodes ] map-with ] keep
     set-node-children ; inline
 

@@ -39,7 +39,8 @@ unit-test
 
 : bar ( x -- y ) 2 + ;
 
-[ "IN: temporary : bar 2 + ;\n" ] [ [ \ bar see ] string-out ] unit-test
+[ "IN: temporary : bar ( x -- y ) 2 + ;\n" ]
+[ [ \ bar see ] string-out ] unit-test
 
 [ "( a b -- c d )" ] [
     { { "a" "b" } { "c" "d" } } effect>string

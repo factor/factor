@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 IN: generic
 USING: arrays definitions errors hashtables kernel
-kernel-internals namespaces parser sequences strings words
+kernel-internals namespaces sequences strings words
 vectors math parser ;
 
 PREDICATE: word class "class" word-prop ;

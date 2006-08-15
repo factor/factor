@@ -142,14 +142,14 @@ SYMBOL: bootstrapping?
 
 : ensure-vocab ( name -- ) vocabularies get [ nest drop ] bind ;
 
-: words ( vocab -- list ) vocab dup [ hash-values ] when ;
+: words ( vocab -- seq ) vocab dup [ hash-values ] when ;
 
-: all-words ( -- list ) vocabs [ words ] map concat ;
+: all-words ( -- seq ) vocabs [ words ] map concat ;
 
-: word-subset ( pred -- list )
+: word-subset ( pred -- seq )
     all-words swap subset ; inline
 
-: word-subset-with ( obj pred -- list | pred: obj word -- ? )
+: word-subset-with ( obj pred -- seq )
     all-words swap subset-with ; inline
 
 : xref-words ( -- )
@@ -182,21 +182,6 @@ TUPLE: check-create name vocab ;
             drop "!syntax" >r "!" swap append r>
         ] when lookup
     ] when ;
-
-: stack-picture ( seq -- string )
-    [ [ % CHAR: \s , ] each ] "" make ;
-
-: effect>string ( effect -- string )
-    [
-        "( " %
-        dup first stack-picture %
-        "-- " %
-        second stack-picture %
-        ")" %
-    ] "" make ;
-
-: stack-effect ( word -- string )
-    "stack-effect" word-prop ;
 
 ! Definition protocol
 M: word where "loc" word-prop ;
