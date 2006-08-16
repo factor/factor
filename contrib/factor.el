@@ -1,7 +1,85 @@
+
+(defgroup factor nil
+  "Factor mode"
+  :group 'languages)
+
+(defvar factor-mode-syntax-table nil
+  "Syntax table used while in Factor mode.")
+
+(if factor-mode-syntax-table
+    ()
+  (let ((i 0))
+    (setq factor-mode-syntax-table (make-syntax-table))
+
+    ;; Default is atom-constituent
+    (while (< i 256)
+      (modify-syntax-entry i "_   ")
+      (setq i (1+ i)))
+
+    ;; Word components.
+    (setq i ?0)
+    (while (<= i ?9)
+      (modify-syntax-entry i "w   ")
+      (setq i (1+ i)))
+    (setq i ?A)
+    (while (<= i ?Z)
+      (modify-syntax-entry i "w   ")
+      (setq i (1+ i)))
+    (setq i ?a)
+    (while (<= i ?z)
+      (modify-syntax-entry i "w   ")
+      (setq i (1+ i)))
+
+    ;; Whitespace
+    (modify-syntax-entry ?\t " ")
+    (modify-syntax-entry ?\n ">")
+    (modify-syntax-entry ?\f " ")
+    (modify-syntax-entry ?\r " ")
+    (modify-syntax-entry ?  " ")
+
+    (modify-syntax-entry ?\[ "(]  ")
+    (modify-syntax-entry ?\] ")[  ")
+    (modify-syntax-entry ?{ "(}  ")
+    (modify-syntax-entry ?} "){  ")
+
+    (modify-syntax-entry ?\( "()")
+    (modify-syntax-entry ?\) ")(")
+    (modify-syntax-entry ?\" "\"    ")))
+    
+(defcustom factor-mode-hook nil
+  "Hook run when entering Factor mode."
+  :type 'hook
+  :group 'factor)
+
+(defconst factor-font-lock-keywords
+  '(("#!.*$" . font-lock-comment-face)
+    ("!.*$" . font-lock-comment-face)
+    ("( .* )" . font-lock-comment-face)
+    "IN:" "USING:" "TUPLE:" "^C:" "^M:" "USE:" "REQUIRE:" "PROVIDE:"
+    "GENERIC:" "SYMBOL:" "PREDICATE:"))
+
+(defun factor-mode ()
+  "A mode for editing programs written in the Factor programming language."
+  (interactive)
+  (kill-all-local-variables)
+  (setq major-mode 'factor-mode)
+  (setq mode-name "Factor")
+  (make-local-variable 'comment-start)
+  (setq comment-start "! ")
+  (make-local-variable 'font-lock-defaults)
+  (setq font-lock-defaults
+	'(factor-font-lock-keywords nil nil nil nil))
+  (set-syntax-table factor-mode-syntax-table)
+  (run-hooks 'factor-mode-hooks))
+
+(add-to-list 'auto-mode-alist '("\\.factor\\'" . factor-mode))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
 (require 'comint)
 
 (define-derived-mode factor-listener-mode comint-mode "Factor listener"
-  (setq comint-prompt-regexp "^  "))
+  (setq comint-prompt-regexp "ok "))
 
 (defvar factor-binary "/scratch/factor-darcs/repos/Factor/f")
 (defvar factor-image "/scratch/factor-darcs/repos/Factor/factor.image")
@@ -69,13 +147,3 @@
      1))))
 
 (fset 'factor-comment-line "\C-a! ")
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-;; mode
-
-;; syntax table
-
-;; (push '("\\.factor\\'" . factor-mode) auto-mode-alist)
-
-;; synopsis of word at point
