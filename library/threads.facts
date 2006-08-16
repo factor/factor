@@ -1,35 +1,46 @@
 USING: help threads ;
 
-HELP: run-queue "( -- queue )"
+HELP: run-queue
 { $values { "queue" "a queue" } }
 { $description "Outputs the runnable thread queue." } ;
 
-HELP: schedule-thread "( continuation -- )"
-{ $values { "continuation" "a continuation" } }
+HELP: schedule-thread
+{ $values { "continuation" "a continuation reified by " { $link callcc0 } } }
 { $description "Adds a runnable thread to the end of the run queue." } ;
 
-HELP: sleep-queue "( -- vector )"
+HELP: schedule-thread-with
+{ $values { "obj" "an object" } { "continuation" "a continuation reified by " { $link callcc1 } } }
+{ $description "Adds a runnable thread to the end of the run queue. When the thread runs the object is passed to the continuation using " { $link continue-with } "." } ;
+
+HELP: sleep-queue
 { $values { "vector" "a vector" } }
 { $description "Outputs the sleeping thread queue. This is not actually a queue, but a vector of cons cells, where each cons cell consists of a wakeup time and a continuation." } ;
 
-HELP: sleep-queue* "( -- vector )"
+HELP: sleep-queue*
 { $values { "vector" "a vector" } }
 { $description "Outputs the sleeping thread queue, sorted by wakeup time." } ;
 
-HELP: sleep-time "( vector -- ms )"
+HELP: sleep-time
 { $values { "vector" "a sorted sleep queue" } { "ms" "a non-negative integer" } }
 { $description "Outputs the time until the next sleeping thread is scheduled to wake up, or -1 if there are no sleeping threads. The input must be a sorted sleep queue output by " { $link sleep-queue* } "." } ;
 
-HELP: stop "( -- )"
+HELP: stop
 { $description "Stops the current thread." } ;
 
-HELP: yield "( -- )"
+HELP: yield
 { $description "Adds the current thread to the end of the run queue, and switches to the next runnable thread." } ;
 
-HELP: sleep "( ms -- )"
+HELP: sleep
 { $values { "ms" "a non-negative integer" } }
 { $description "Suspends the current thread for " { $snippet "ms" } " milliseconds. It will not get woken up before this time period elapses, but since the multitasker is co-operative, the precise wakeup time is dependent on when other threads yield." } ;
 
-HELP: in-thread "( quot -- )"
+HELP: in-thread
 { $values { "quot" "a quotation" } }
 { $description "Spawns a new thread. The new thread begins running immediately. If an unhandled error occurs in the thread, the error is logged to the default stream in the dynamic extent of the caller of this word." } ;
+
+HELP: idle-thread
+{ $description "Runs the idle thread, which services I/O requests and relinquishes control to the operating system until the next Factor thread has to wake up again." }
+{ $notes "This word should never be called directly. The idle thread is always running." } ;
+
+HELP: init-threads
+{ $description "Called during startup to initialize the threading system. This word should never be called directly." } ;

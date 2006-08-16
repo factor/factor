@@ -12,7 +12,7 @@ USING: kernel ;
 SYMBOL: error
 SYMBOL: error-continuation
 
-: catch ( try -- error )
+: catch ( try -- error/f )
     [ >c call f c> drop f ] callcc1 nip ; inline
 
 : rethrow ( error -- )

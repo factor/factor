@@ -14,8 +14,9 @@ ARTICLE: "conventions" "Conventions"
     { { { $snippet "seq" } } "a sequence" }
     { { { $snippet "str" } } "a string" }
     { { { $snippet "x" } ", " { $snippet "y" } ", " { $snippet "z" } } "a number" }
-    { { { $snippet "{ " { $emphasis "a b c" } " }" } } "an array with specific length and elements" }
+    { { $snippet "*" } "when this symbol appears by itself in the list of outputs, it means the word unconditionally throws an error" }
 }
+"The compiler verifies stack effect comments to ensure the correct number of inputs and outputs is listed. See " { $link "compiler" } "."
 { $heading "Word naming conventions" }
 "These conventions are not hard and fast, but are usually a good first step in understanding a word's behavior:"
 { $table
@@ -35,4 +36,4 @@ ARTICLE: "conventions" "Conventions"
 { $heading "Vocabulary naming conventions" }
 "A vocabulary name ending in " { $snippet "-internals" } " contains words which are either implementation detail, unsafe, or both. For example, the " { $snippet "sequence-internals" } " vocabulary contains words which access sequence elements without bounds checking (" { $link "sequences-unsafe" } ")."
 $terpri
-"You should should avoid using internal words from the Factor library unless absolutely necessary. In your own code, place words in internal vocabularies if you do not want other people to use them unless they have a good reason." ;
+"You should should avoid using internal words from the Factor library unless absolutely necessary. Similarly, your own code can place words in internal vocabularies if you do not want other people to use them unless they have a good reason." ;

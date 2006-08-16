@@ -5,7 +5,7 @@ USING: generic kernel-internals math math-internals ;
 
 : 2swap ( x y z t -- z t x y ) rot >r rot r> ; inline
 
-: clear V{ } set-datastack ;
+: clear ( -- ) V{ } set-datastack ;
 
 GENERIC: hashcode ( obj -- n )
 M: object hashcode drop 0 ;
@@ -13,70 +13,81 @@ M: object hashcode drop 0 ;
 GENERIC: equal? ( obj obj -- ? )
 M: object equal? eq? ;
 
-: = ( obj obj -- ? )
+: = ( obj1 obj2 -- ? )
     2dup eq? [ 2drop t ] [ equal? ] if ; inline
 
 GENERIC: <=> ( obj1 obj2 -- n )
 
-GENERIC: clone ( obj -- obj )
+GENERIC: clone ( obj -- cloned )
 M: object clone ;
 
 : set-boot ( quot -- ) 8 setenv ;
 
-: ? ( cond t f -- t/f ) rot [ drop ] [ nip ] if ; inline
+: ? ( cond true false -- true/false )
+    rot [ drop ] [ nip ] if ; inline
 
-: cpu ( -- arch ) 7 getenv ; foldable
+: cpu ( -- cpu ) 7 getenv ; foldable
 : os ( -- os ) 11 getenv ; foldable
 : windows? ( -- ? ) os "windows" = ; inline
-: macosx? os "macosx" = ; inline
+: macosx? ( -- ? ) os "macosx" = ; inline
 
-: slip >r call r> ; inline
+: slip ( quot x -- x ) >r call r> ; inline
 
-: 2slip >r >r call r> r> ; inline
+: 2slip ( quot x y -- x y ) >r >r call r> r> ; inline
 
-: keep over >r call r> ; inline
+: keep ( x quot -- x ) over >r call r> ; inline
 
-: 2keep over >r pick >r call r> r> ; inline
+: 2keep ( x y quot -- x y ) over >r pick >r call r> r> ; inline
 
-: 3keep >r 3dup r> swap >r swap >r swap >r call r> r> r> ;
-inline
+: 3keep ( x y z quot -- x y z )
+    >r 3dup r> swap >r swap >r swap >r call r> r> r> ;
+    inline
 
-: 2apply tuck 2slip call ; inline
+: 2apply ( x y quot -- ) tuck 2slip call ; inline
 
-: if* pick [ drop call ] [ 2nip call ] if ; inline
+: if* ( cond true false -- )
+    pick [ drop call ] [ 2nip call ] if ; inline
 
-: ?if >r >r [ nip r> r> drop call ] [ r> drop r> call ] if* ;
-inline
+: ?if ( default cond true false -- )
+    >r >r [ nip r> r> drop call ] [ r> drop r> call ] if* ;
+    inline
 
-: unless [ ] swap if ; inline
+: unless ( cond false -- ) [ ] swap if ; inline
 
-: unless* over [ drop ] [ nip call ] if ; inline
+: unless* ( cond false -- )
+    over [ drop ] [ nip call ] if ; inline
 
-: when [ ] if ; inline
+: when ( cond true -- ) [ ] if ; inline
 
-: when* dupd [ drop ] if ; inline
+: when* ( cond true -- ) dupd [ drop ] if ; inline
 
-: >boolean t f ? ; inline
-: and ( a b -- a&b ) f ? ; inline
-: or ( a b -- a|b ) t swap ? ; inline
-: xor ( a b -- a^b ) [ not ] when ; inline
+: >boolean ( obj -- ? ) t f ? ; inline
+: and ( obj1 obj2 -- ? ) f ? ; inline
+: or ( obj1 obj2 -- ? ) t swap ? ; inline
+: xor ( obj1 obj2 -- ? ) [ not ] when ; inline
 
 : with ( obj quot elt -- obj quot )
     pick pick >r >r swap call r> r> ; inline
 
-: keep-datastack datastack slip set-datastack drop ; inline
+: keep-datastack ( quot -- )
+    datastack slip set-datastack drop ; inline
 
 IN: kernel-internals
 
 ! These words are unsafe. Don't use them.
-: declare ( types -- ) drop ;
+: declare ( spec -- ) drop ;
 
-: array-capacity 1 slot { fixnum } declare ; inline
-: array-nth swap 2 fixnum+fast slot ; inline
-: set-array-nth swap 2 fixnum+fast set-slot ; inline
+: array-capacity ( array -- n )
+    1 slot { fixnum } declare ; inline
+
+: array-nth ( n array -- elt )
+    swap 2 fixnum+fast slot ; inline
+
+: set-array-nth ( elt n array -- )
+    swap 2 fixnum+fast set-slot ; inline
 
 ! Some runtime implementation details
-: num-types 19 ; inline
+: num-types ( -- n ) 19 ; inline
 : tag-mask BIN: 111 ; inline
 : num-tags 8 ; inline
 : tag-bits 3 ; inline
@@ -90,12 +101,12 @@ IN: kernel-internals
 : complex-tag BIN: 110 ; inline
 : wrapper-tag BIN: 111 ; inline
 
-: cell 17 getenv ; foldable
+: cell ( -- n ) 17 getenv ; foldable
 
 IN: kernel
 
-: win32? windows? cell 4 = and ; inline
-: win64? windows? cell 8 = and ; inline
+: win32? ( -- ? ) windows? cell 4 = and ; inline
+: win64? ( -- ? ) windows? cell 8 = and ; inline
 
 IN: memory
 

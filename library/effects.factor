@@ -42,7 +42,7 @@ C: effect
         ")" %
     ] "" make ;
 
-: stack-effect ( word -- string )
+: stack-effect ( word -- effect/f )
     dup "declared-effect" word-prop [
         effect>string
     ] [

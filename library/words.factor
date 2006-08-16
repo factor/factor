@@ -23,7 +23,7 @@ SYMBOL: changed-words
 M: word <=>
     [ dup word-name swap word-vocabulary 2array ] 2apply <=> ;
 
-GENERIC: definer ( word -- word )
+GENERIC: definer ( word -- definer )
 
 PREDICATE: word undefined ( obj -- ? ) word-primitive 0 = ;
 M: undefined definer drop \ DEFER: ;
@@ -66,7 +66,7 @@ SYMBOL: vocabularies
 
 : interned? ( word -- ? ) dup target-word eq? ;
 
-: uses ( word -- uses )
+: uses ( word -- seq )
     word-def flatten
     [ word? ] subset
     [ global [ interned? ] bind ] subset
@@ -100,7 +100,7 @@ SYMBOL: crossref
     dup [ usage ] closure [ unxref-word* ] each
     [ uses ] crossref get remove-vertex ;
 
-: define ( word parameter primitive -- )
+: define ( word def primitive -- )
     pick changed-word
     pick unxref-word
     pick set-word-primitive
@@ -146,10 +146,10 @@ SYMBOL: bootstrapping?
 
 : all-words ( -- seq ) vocabs [ words ] map concat ;
 
-: word-subset ( pred -- seq )
+: word-subset ( quot -- seq )
     all-words swap subset ; inline
 
-: word-subset-with ( obj pred -- seq )
+: word-subset-with ( obj quot -- seq )
     all-words swap subset-with ; inline
 
 : xref-words ( -- )
@@ -169,7 +169,7 @@ TUPLE: check-create name vocab ;
     check-create 2dup lookup dup
     [ 2nip ] [ drop <word> dup reveal ] if ;
 
-: constructor-word ( string vocab -- word )
+: constructor-word ( name vocab -- word )
     >r "<" swap ">" append3 r> create ;
 
 : forget-vocab ( vocab -- )

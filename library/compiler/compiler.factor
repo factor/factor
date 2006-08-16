@@ -24,7 +24,8 @@ words ;
     dup [ f "no-effect" set-word-prop ] each
     [ try-compile ] each ;
 
-: compile-all ( -- ) vocabs compile-vocabs ;
+: compile-all ( -- )
+    [ vocabs compile-vocabs ] with-class<cache ;
 
 : compile-quot ( quot -- word )
     define-temp "compile" get [ dup compile ] when ;

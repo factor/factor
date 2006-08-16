@@ -9,10 +9,10 @@ TUPLE: tombstone ;
 : ((empty)) T{ tombstone f } ; inline
 : ((tombstone)) T{ tombstone t } ; inline
 
-: hash@ ( key keys -- n )
+: hash@ ( key array -- i )
     >r hashcode r> array-capacity 2 /i rem 2 * >fixnum ; inline
 
-: probe ( keys i -- hash i )
+: probe ( array i -- array i )
     2 fixnum+fast over array-capacity fixnum-mod ; inline
 
 : (key@) ( key keys i -- n )
@@ -27,7 +27,7 @@ TUPLE: tombstone ;
         ] if
     ] if ; inline
 
-: key@ ( key hash -- n )
+: key@ ( key hash -- i )
     hash-array 2dup hash@ (key@) ; inline
 
 : if-key ( key hash true false -- )
@@ -54,7 +54,7 @@ TUPLE: tombstone ;
         ] if
     ] if ; inline
 
-: new-key@ ( key hash -- n )
+: new-key@ ( key hash -- i )
     hash-array 2dup hash@ (new-key@) ; inline
 
 : nth-pair ( n seq -- key value )
@@ -63,10 +63,10 @@ TUPLE: tombstone ;
 : set-nth-pair ( value key n seq -- )
     [ set-array-nth ] 2keep >r 1+ r> set-array-nth ; inline
 
-: hash-count+
+: hash-count+ ( hash -- )
     dup hash-count 1+ swap set-hash-count ; inline
 
-: hash-deleted+
+: hash-deleted+ ( hash -- )
     dup hash-deleted 1+ swap set-hash-deleted ; inline
 
 : change-size ( hash old -- )
@@ -115,7 +115,7 @@ TUPLE: tombstone ;
 
 IN: hashtables
 
-: <hashtable> ( capacity -- hashtable )
+: <hashtable> ( n -- hash )
     (hashtable) [ reset-hash ] keep ;
 
 : hash* ( key hash -- value ? )
@@ -128,12 +128,12 @@ IN: hashtables
 : hash-member? ( key hash -- ? )
     [ 3drop t ] [ 3drop f ] if-key ;
 
-: ?hash* ( key hash -- value/f ? )
+: ?hash* ( key hash/f -- value/f ? )
     dup [ hash* ] [ 2drop f f ] if ;
 
 : hash ( key hash -- value ) hash* drop ; inline
 
-: ?hash ( key hash -- value )
+: ?hash ( key hash/f -- value )
     dup [ hash ] [ 2drop f ] if ;
 
 : clear-hash ( hash -- )
@@ -148,7 +148,7 @@ IN: hashtables
         3drop
     ] if-key ;
 
-: remove-hash* ( key hash -- oldvalue )
+: remove-hash* ( key hash -- old )
     [ hash ] 2keep remove-hash ;
 
 : ?remove-hash ( key hash -- )
@@ -174,14 +174,14 @@ IN: hashtables
 : hash+ ( n key hash -- )
     [ hash [ 0 ] unless* + ] 2keep set-hash ;
 
-: associate ( value key -- hashtable )
+: associate ( value key -- hash )
     2 <hashtable> [ set-hash ] keep ;
 
 : hash-keys ( hash -- keys ) 0 swap hash>seq ;
 
-: hash-values ( hash -- keys ) 1 swap hash>seq ;
+: hash-values ( hash -- values ) 1 swap hash>seq ;
 
-: hash>alist ( hash -- assoc )
+: hash>alist ( hash -- alist )
     dup hash-keys swap hash-values 2array flip ;
 
 : alist>hash ( alist -- hash )
@@ -195,7 +195,7 @@ IN: hashtables
     swap [ 2swap [ >r -rot r> call ] 2keep ] hash-each 2drop ;
     inline
 
-: hash-all? ( hash quot -- )
+: hash-all? ( hash quot -- ? )
     >r hash-array r> all-pairs? ; inline
 
 : hash-all-with? ( obj hash quot -- )
@@ -203,12 +203,12 @@ IN: hashtables
     [ 2swap [ >r -rot r> call ] 2keep rot ] hash-all? 2nip ;
     inline
 
-: subhash? ( h1 h2 -- ? )
+: subhash? ( hash1 hash2 -- ? )
     swap [
         >r swap hash* [ r> = ] [ r> 2drop f ] if
     ] hash-all-with? ;
 
-: hash-subset ( hash quot -- hash )
+: hash-subset ( hash quot -- subhash )
     over hash-size <hashtable> rot [
         2swap [
             >r pick pick >r >r call [
@@ -219,7 +219,7 @@ IN: hashtables
         ] 2keep
     ] hash-each nip ; inline
 
-: hash-subset-with ( obj hash quot -- hash )
+: hash-subset-with ( obj hash quot -- subhash )
     swap
     [ 2swap [ >r -rot r> call ] 2keep rot ] hash-subset 2nip ;
     inline
@@ -274,22 +274,19 @@ IN: hashtables
 : hash-stack ( key seq -- value )
     dup length 1- swap (hash-stack) ;
 
-: hash-intersect ( hash1 hash2 -- hash1/\hash2 )
+: hash-intersect ( hash1 hash2 -- intersection )
     [ drop swap hash ] hash-subset-with ;
 
-: hash-diff ( hash1 hash2 -- hash2-hash1 )
+: hash-diff ( hash1 hash2 -- difference )
     [ drop swap hash not ] hash-subset-with ;
 
 : hash-update ( hash1 hash2 -- )
     [ swap rot set-hash ] hash-each-with ;
 
-: hash-concat ( seq -- hash )
-    H{ } clone swap [ dupd hash-update ] each ;
-
-: hash-union ( hash1 hash2 -- hash1\/hash2 )
+: hash-union ( hash1 hash2 -- union )
     >r clone dup r> hash-update ;
 
-: remove-all ( hash seq -- seq )
+: remove-all ( hash seq -- subseq )
     [ swap hash-member? not ] subset-with ;
 
 : cache ( key hash quot -- value )

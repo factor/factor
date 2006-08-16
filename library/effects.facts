@@ -1,0 +1,23 @@
+IN: words
+
+HELP: effect
+{ $class-description "An object representing a stack effect. Holds a sequence of inputs, a sequence of outputs and a flag indicating if an error is thrown unconditionally." } ;
+
+HELP: effect-height
+{ $values { "effect" "a stack effect" } { "n" "an integer" } }
+{ $description "Outputs the number of items added to the data stack by the stack effect. This will be negative if the stack effect only removes objects from the stack." } ;
+
+HELP: effect<=
+{ $values { "eff1" "a stack effect" } { "eff2" "a stack effect" } { "?" "a boolean" } }
+{ $description "Tests if " { $snippet "eff1" } " can be used anywhere " { $snippet "eff2" } " can. What this means is that both stack effects change the stack height by the same amount, the first takes a smaller or equal number of inputs as the second, and either both or neither one terminate execution by throwing an error." } ;
+
+HELP: effect>string
+{ $values { "effect" "a stack effect" } { "string" "a string" } }
+{ $description "Turns a stack effect object into a string mnemonic." }
+{ $examples
+    { $example "1 2 <effect> effect>string print" "( object object -- object )" }
+} ;
+
+HELP: stack-effect
+{ $values { "word" "a word" } { "effect/f" "a stack effect" } }
+{ $description "Outputs the stack effect of a word; either a stack effect declared with " { $link POSTPONE: ( } ", or a stack effect inferred with " { $link infer } "." } ;

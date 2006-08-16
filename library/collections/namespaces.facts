@@ -1,31 +1,31 @@
 IN: namespaces
 USING: help kernel kernel-internals sequences words ;
 
-HELP: get "( variable -- value )"
+HELP: get
 { $values { "variable" "a variable, by convention a symbol" } { "value" "the value, or " { $link f } } }
 { $description "Searches the namestack for a namespace containing the variable, and outputs the associated value. If no such namespace is found, outputs " { $link f } "." } ;
 
-HELP: set "( value variable -- )"
+HELP: set
 { $values { "value" "the new value" } { "variable" "a variable, by convention a symbol" } }
 { $description "Assigns a value to the variable in the namespace at the top of the namestack." }
 { $side-effects "variable" } ;
 
-HELP: off "( variable -- )"
+HELP: off
 { $values { "variable" "a variable, by convention a symbol" } }
 { $description "Assigns a value of " { $link f } " to the variable." }
 { $side-effects "variable" } ;
 
-HELP: on "( variable -- ) "
+HELP: on
 { $values { "variable" "a variable, by convention a symbol" } }
 { $description "Assigns a value of " { $link t } " to the variable." }
 { $side-effects "variable" } ;
 
-HELP: change "( variable quot -- )"
+HELP: change
 { $values { "variable" "a variable, by convention a symbol" } { "quot" "a quotation with stack effect " { $snippet "( old -- new )" } } }
 { $description "Applies the quotation to the old value of the variable, and assigns the resulting value to the variable." }
 { $side-effects "variable" } ;
 
-HELP: +@ "( n variable -- )"
+HELP: +@
 { $values { "n" "a number" } { "variable" "a variable, by convention a symbol" } }
 { $description "Adds " { $snippet "n" } " to the value of the variable. A variable value of " { $link f } " is interpreted as being zero." }
 { $side-effects "variable" }
@@ -33,57 +33,57 @@ HELP: +@ "( n variable -- )"
     { $example "SYMBOL: foo\n1 foo +@\n10 foo +@\nfoo get ." "11" }
 } ;
 
-HELP: inc "( variable -- )"
+HELP: inc
 { $values { "variable" "a variable, by convention a symbol" } }
 { $description "Increments the value of the variable by 1. A variable value of " { $link f } " is interpreted as being zero." }
 { $side-effects "variable" } ;
 
-HELP: dec "( variable -- )"
+HELP: dec
 { $values { "variable" "a variable, by convention a symbol" } }
 { $description "Decrements the value of the variable by 1. A variable value of " { $link f } " is interpreted as being zero." }
 { $side-effects "variable" } ;
 
-HELP: counter "( variable -- n )"
+HELP: counter
 { $values { "variable" "a variable, by convention a symbol" } }
 { $description "Increments the value of the variable by 1, and returns its new value." }
 { $notes "This word is useful for generating (somewhat) unique identifiers. For example, the " { $link gensym } " word uses it." }
 { $side-effects "variable" } ;
 
-HELP: with-scope "( quot -- )"
+HELP: with-scope
 { $values { "quot" "a quotation" } }
 { $description "Calls the quotation in a new namespace. Any variables set by the quotation are discarded when it returns." } ;
 
-HELP: make-hash "( quot -- hash )"
+HELP: make-hash
 { $values { "quot" "a quotation" } { "hash" "a new hashtable" } }
 { $description "Calls the quotation in a new namespace, and outputs this namespace when the quotation returns. Useful for quickly building hashtables." } ;
 
-HELP: bind "( ns quot -- )"
+HELP: bind
 { $values { "ns" "a hashtable" } { "quot" "a quotation" } }
 { $description "Calls the quotation in the dynamic scope of " { $snippet "ns" } ". When variables are looked up by the quotation, " { $snippet "ns" } " is checked first, and setting variables in the quotation stores them in " { $snippet "ns" } "." } ;
 
-HELP: namespace "( -- ns )"
+HELP: namespace
 { $values { "ns" "a hashtable" } }
 { $description "Outputs the current namespace. Calls to " { $link set } " modify this namespace." } ;
 
-HELP: global "( -- ns )"
+HELP: global
 { $values { "ns" "a hashtable" } }
 { $description "Outputs the global namespace. The global namespace is always checked last when looking up variable values." } ;
 
-HELP: set-global "( value variable -- )"
+HELP: set-global
 { $values { "value" "the new value" } { "variable" "a variable, by convention a symbol" } }
 { $description "Assigns a value to the variable in the global namespace." }
 { $side-effects "variable" } ;
 
-HELP: nest "( variable -- namespace )"
+HELP: nest
 { $values { "variable" "a variable, by convention a symbol" } { "namespace" "a hashtable" } }
 { $description "If the variable is not set in the current namespace, sets it to a new hashtable, and outputs this hashtable. Otherwise, outputs the existing value (which should probably be a hashtable)." }
 { $side-effects "variable" } ;
 
-HELP: namestack* "( -- namestack )"
+HELP: namestack*
 { $values { "namestack" "a vector" } }
 { $description "Outputs the current namestack." } ;
 
-HELP: namestack "( -- namestack )"
+HELP: namestack
 { $values { "namestack" "a vector" } }
 { $description "Outputs a copy of the current namestack." } ;
 
@@ -91,45 +91,45 @@ HELP: set-namestack "( namestack -- )"
 { $values { "namestack" "a vector" } }
 { $description "Replaces the namestack with a copy of the given vector." } ;
 
-HELP: >n "( ns -- )"
-{ $values { "ns" "a hashtable" } }
+HELP: >n
+{ $values { "namespace" "a hashtable" } }
 { $description "Pushes a namespace on the namestack." } ;
 
-HELP: n> "( -- ns )"
-{ $values { "ns" "a hashtable" } }
+HELP: n>
+{ $values { "namespace" "a hashtable" } }
 { $description "Pops a namespace from the namestack." } ;
 
-HELP: make "( quot exemplar -- seq )"
+HELP: make
 { $values { "quot" "a quotation" } { "exemplar" "a sequence" } }
 { $description "Calls the quotation in a new " { $emphasis "dynamic scope" } ". The quotation and any words it calls can execute the " { $link , } " and " { $link % } " words to accumulate elements. When the quotation returns, all accumulated elements are collected into a sequence with the same type as " { $snippet "exemplar" } "." }
 { $examples { $example "[ 1 , 2 , 3 , ] { } make ." "{ 1 2 3 }" } } ;
 
-HELP: , "( elt -- )"
+HELP: ,
 { $values { "elt" "an object" } }
 { $description "Adds an element to the end of the sequence being constructed by " { $link make } "." } ;
 
-HELP: % "( seq -- )"
+HELP: %
 { $values { "seq" "a sequence" } }
 { $description "Appends a sequence to the end of the sequence being constructed by " { $link make } "." } ;
 
-HELP: # "( n -- )"
+HELP: #
 { $values { "n" "a real number" } }
 { $description "Appends the string representation of a real number to the end of the sequence being constructed by " { $link make } "." } ;
 
-HELP: init-namespaces "( -- )"
+HELP: init-namespaces
 { $description "Resets the name stack to its initial state, holding a single copy of the global namespace. This word is called during startup and is rarely useful, except in certain situations such as the example below." }
 { $examples
     "You can use this word to spawn a new thread which does not inherit the parent thread's name stack:"
     { $code "[ init-namestack do-some-work ] in-thread" }
 } ;
 
-HELP: concat "( seq -- newseq )"
+HELP: concat
 { $values { "seq" "a sequence" } { "newseq" "a sequence" } }
 { $description "Concatenates a sequence of sequences together into one sequence. The resulting sequence is of the same class as the first element of " { $snippet "seq" } "." }
 { $errors "Throws an error if one of the sequences in " { $snippet "seq" } " contains elements not permitted in sequences of the same class as the first element of " { $snippet "seq" } "." }
 { $see-also join } ;
 
-HELP: join "( seq glue -- newseq )"
+HELP: join
 { $values { "seq" "a sequence" } { "glue" "a sequence" } { "newseq" "a sequence" } }
 { $description "Concatenates a sequence of sequences together into one sequence, placing a copy of " { $snippet "glue" } " between each pair of sequences. The resulting sequence is of the same class as " { $snippet "glue" } "." }
 { $errors "Throws an error if one of the sequences in " { $snippet "seq" } " contains elements not permitted in sequences of the same class as " { $snippet "glue" } "." }

@@ -1,15 +1,15 @@
 IN: strings
 USING: arrays help kernel vectors ;
 
-HELP: sbuf f
+HELP: sbuf
 { $description "The class of resizable character strings. See " { $link "syntax-sbufs" } " for syntax and " { $link "sbufs" } " for general information." } ;
 
-HELP: <sbuf> "( n -- sbuf )"
+HELP: <sbuf> ( n -- sbuf )
 { $values { "n" "a positive integer specifying initial capacity" } { "sbuf" "a new string buffer" } }
 { $description "Creates a new string buffer that can hold " { $snippet "n" } " characters before resizing." }
 { $see-also <array> <quotation> <string> <vector> } ;
 
-HELP: >sbuf "( seq -- sbuf )"
+HELP: >sbuf
 { $values { "seq" "a sequence of non-negative integers" } { "sbuf" "a string buffer" } }
 { $description "Outputs a freshly-allocated string buffer with the same elements as a given sequence." }
 { $errors "Throws an error if the sequence contains elements other than real numbers." } ;

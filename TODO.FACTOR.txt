@@ -1,13 +1,15 @@
 + 0.84:
 
-- declaration to do:
-  - test what is done in the case of an invalid declaration on an inline
-    recursive
+- doc mashup:
   - HELP: should not specify stack effect
-  - bootstrap speedup with compiling recursives
-  - load cocoa before 'recompile' call
+  - figure out what to do for parsing words
   - document inference errors
   - update docs for declared effects
+  - better doc for accumulate, link from tree
+
+- declaration to do:
+  - bootstrap speedup with compiling recursives
+  - load cocoa before 'recompile' call
 - RT_WORD should refer to XTs not word objects.
 - fix contribs: boids, automata
 - sometimes darcs get fails with the httpd
@@ -22,8 +24,6 @@
 - [ [ dup call ] dup call ] infer hangs
 - graphical module manager tool
 - see if alien calls can be made faster
-- doc front page: document stack effect notation
-- better doc for accumulate, link from tree
 
 + 0.85:
 
@@ -105,6 +105,8 @@
 
 + compiler/ffi:
 
+- test what is done in the case of an invalid declaration on an inline
+  recursive
 - ppc64 backend
 - we need to optimize  [ dup array? [ array? ] [ array? ] if ]
 - mac intel: struct returns from objc methods

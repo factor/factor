@@ -7,9 +7,11 @@ ARTICLE: "handbook" "Factor documentation"
 { $subsection "changes" }
 { $heading "Survival guide" }
 { $list
-    { "Load source files using " { $link run-file } ":"
+    { "The basic unit of code, corresponding to a \"function\" in other languages, is called a " { $emphasis "word" } " in Factor." }
+    { "Word take inputs from the stack, and leave output values on the stack. This is documented in a " { $emphasis "stack effect comment" } ", for example " { $snippet "( x y -- z )" } " denotes that a word takes two inputs, with " { $snippet "y" } " at the top of the stack, and returns one output. See " { $link "conventions" } " for details." }
+    { "You can load source files with " { $link run-file } ":"
     { $code "\"examples/lcd.factor\" run-file" } }
-    { { "Load modules from " { $snippet "contrib/" } " using " { $link require } ":" }
+    { { "You can load " { $snippet "contrib/" } " modules with " { $link require } ":" }
     { $code "\"httpd\" require" } }
     { { $link .s } " prints the contents of the stack." }
     { { $link . } " prints the object at the top of the stack." }

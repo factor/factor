@@ -220,6 +220,7 @@ sequences vectors words ;
         "/library/ui/tools/launchpad.factor"
 
         "/library/continuations.facts"
+        "/library/effects.facts"
         "/library/errors.facts"
         "/library/kernel.facts"
         "/library/modules.facts"
@@ -309,6 +310,7 @@ sequences vectors words ;
         "/doc/handbook/changes.facts"
         "/doc/handbook/cli.facts"
         "/doc/handbook/collections.facts"
+        "/doc/handbook/compiler.facts"
         "/doc/handbook/conventions.facts"
         "/doc/handbook/cookbook.facts"
         "/doc/handbook/dataflow.facts"

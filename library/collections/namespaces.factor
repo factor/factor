@@ -3,7 +3,8 @@
 IN: kernel-internals
 USING: vectors sequences ;
 
-: namestack* ( -- ns ) 3 getenv { vector } declare ; inline
+: namestack* ( -- namestack )
+    3 getenv { vector } declare ; inline
 : >n ( namespace -- ) namestack* push ;
 : n> ( -- namespace ) namestack* pop ;
 
@@ -11,33 +12,33 @@ IN: namespaces
 USING: arrays hashtables kernel kernel-internals math strings
 words ;
 
-: namestack ( -- ns ) namestack* clone ; inline
-: set-namestack ( ns -- ) >vector 3 setenv ; inline
+: namestack ( -- namestack ) namestack* clone ; inline
+: set-namestack ( namestack -- ) >vector 3 setenv ; inline
 : namespace ( -- namespace ) namestack* peek ;
 : ndrop ( -- ) namestack* pop* ;
 : global ( -- g ) 4 getenv { hashtable } declare ; inline
 : get ( variable -- value ) namestack* hash-stack ;
 : set ( value variable -- ) namespace set-hash ; inline
-: on ( var -- ) t swap set ; inline
-: off ( var -- ) f swap set ; inline
-: get-global ( var -- value ) global hash ; inline
-: set-global ( value var -- ) global set-hash ; inline
+: on ( variable -- ) t swap set ; inline
+: off ( variable -- ) f swap set ; inline
+: get-global ( variable -- value ) global hash ; inline
+: set-global ( value variable -- ) global set-hash ; inline
 
-: nest ( variable -- hash )
+: nest ( variable -- namespace )
     dup namespace hash [ ] [ >r H{ } clone dup r> set ] ?if ;
 
-: change ( var quot -- quot: old -- new )
+: change ( variable quot -- )
     >r dup get r> rot slip set ; inline
 
-: +@ ( n var -- ) [ [ 0 ] unless* + ] change ;
+: +@ ( n variable -- ) [ [ 0 ] unless* + ] change ;
 
-: inc ( var -- ) 1 swap +@ ; inline
+: inc ( variable -- ) 1 swap +@ ; inline
 
-: dec ( var -- ) -1 swap +@ ; inline
+: dec ( variable -- ) -1 swap +@ ; inline
 
-: bind ( namespace quot -- ) swap >n call ndrop ; inline
+: bind ( ns quot -- ) swap >n call ndrop ; inline
 
-: counter ( var -- n ) global [ dup inc get ] bind ;
+: counter ( variable -- n ) global [ dup inc get ] bind ;
 
 : make-hash ( quot -- hash ) H{ } clone >n call n> ; inline
 
@@ -46,12 +47,12 @@ words ;
 ! Building sequences
 SYMBOL: building
 
-: make ( quot proto -- )
+: make ( quot exemplar -- seq )
     [
         dup thaw building set >r call building get r> like
     ] with-scope ; inline
 
-: , ( obj -- ) building get push ;
+: , ( elt -- ) building get push ;
 
 : % ( seq -- ) building get swap nappend ;
 
@@ -61,8 +62,8 @@ SYMBOL: building
 
 IN: sequences
 
-: concat ( seq -- seq )
+: concat ( seq -- newseq )
     dup empty? [ [ [ % ] each ] over first make ] unless ;
 
-: join ( seq glue -- seq )
+: join ( seq glue -- newseq )
     [ swap [ % ] [ dup % ] interleave drop ] over make ;

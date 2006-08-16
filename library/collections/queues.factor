@@ -19,7 +19,7 @@ C: queue ( -- queue ) ;
 : (enque) ( entry queue -- )
     [ set-queue-head ] 2keep set-queue-tail ;
 
-: enque ( obj queue -- )
+: enque ( elt queue -- )
     >r <entry> r> dup queue-empty? [
         (enque)
     ] [
@@ -36,7 +36,7 @@ C: queue ( -- queue ) ;
 TUPLE: empty-queue ;
 : empty-queue ( -- * ) <empty-queue> throw ;
 
-: deque ( queue -- obj )
+: deque ( queue -- elt )
     dup queue-empty? [
         empty-queue
     ] [

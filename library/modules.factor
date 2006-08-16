@@ -9,7 +9,7 @@ TUPLE: module name files tests ;
 : module-path ( name -- path )
     "/contrib/" swap append ;
 
-: module-paths ( name seq -- seq )
+: module-paths ( name seq -- newseq )
     >r module-path r> [ "/" swap append3 ] map-with ;
 
 C: module ( name files tests -- module )

@@ -141,10 +141,10 @@ HELP: SBUF" "string... \""
 { $description "Reads from the input string until the next occurrence of " { $link POSTPONE: " } ", converts the string to a string buffer, and appends it to the parse tree." }
 { $examples { $example "SBUF\" Hello world\" >string print" "Hello world" } } ;
 
-HELP: ( "comment... )"
-{ $values { "comment" "characters" } }
-{ $description "Discards all input until the next occurrence of " { $snippet ")" } "." }
-{ $notes "Conventionally used to denote a stack effect comment." }
+HELP: ( "inputs -- outputs )"
+{ $values { "inputs" "a list of tokens" } { "outputs" "a list of tokens" } }
+{ $description "Declares the stack effect of the most recently defined word, storing a new " { $link effect } " instance in the " { $snippet "\"declared-effect\"" } " word property." }
+{ $notes "Recursive words must have a declared stack effect to compile. See " { $link "compiler" } " for details." }
 { $see-also POSTPONE: ! POSTPONE: #! } ;
 
 HELP: ! "comment..."

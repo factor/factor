@@ -40,17 +40,17 @@ IN: sequences
 : each-with ( obj seq quot -- )
     swap [ with ] each 2drop ; inline
 
-: reduce ( seq identity quot -- value )
+: reduce ( seq identity quot -- result )
     swapd each ; inline
 
-: map ( seq quot -- seq )
+: map ( seq quot -- newseq )
     over >r over length [ (map) ] collect r> like 2nip ;
     inline
 
-: map-with ( obj list quot -- list )
+: map-with ( obj list quot -- newseq )
     swap [ with rot ] map 2nip ; inline
 
-: accumulate ( seq identity quot -- values )
+: accumulate ( seq identity quot -- newseq )
     rot [ pick >r swap call r> ] map-with nip ; inline
 
 : change-nth ( i seq quot -- )
@@ -64,19 +64,19 @@ IN: sequences
 : inject-with ( obj seq quot -- )
     swap [ with rot ] inject 2drop ; inline
 
-: min-length ( seq seq -- n )
+: min-length ( seq1 seq2 -- n )
     [ length ] 2apply min ;
 
-: max-length ( seq seq -- n )
+: max-length ( seq1 seq2 -- n )
     [ length ] 2apply max ;
 
-: 2each ( seq seq quot -- )
+: 2each ( seq1 seq2 quot -- )
     -rot 2dup min-length [ (2each) ] repeat 3drop ; inline
 
-: 2reduce ( seq seq identity quot -- value )
+: 2reduce ( seq seq identity quot -- result )
     >r -rot r> 2each ; inline
 
-: 2map ( seq seq quot -- seq )
+: 2map ( seq1 seq2 quot -- newseq )
     -rot
     [ 2dup min-length [ (2map) ] collect ] keep like
     >r 3drop r> ; inline
@@ -84,7 +84,7 @@ IN: sequences
 : if-bounds ( i seq quot -- )
     >r pick pick bounds-check? r> [ 3drop -1 f ] if ; inline
 
-: find* ( i seq quot -- i elt )
+: find* ( n seq quot -- i elt )
     [
         3dup >r >r >r >r nth-unsafe r> call [
             r> dup r> nth-unsafe r> drop
@@ -93,7 +93,7 @@ IN: sequences
         ] if
     ] if-bounds ; inline
 
-: find-with* ( obj i seq quot -- i elt )
+: find-with* ( obj n seq quot -- i elt )
     -rot [ with rot ] find* 2swap 2drop ; inline
 
 : find ( seq quot -- i elt )
@@ -102,7 +102,7 @@ IN: sequences
 : find-with ( obj seq quot -- i elt )
     swap [ with rot ] find 2swap 2drop ; inline
 
-: find-last* ( i seq quot -- i elt )
+: find-last* ( n seq quot -- i elt )
     [
         3dup >r >r >r >r nth-unsafe r> call [
             r> dup r> nth-unsafe r> drop
@@ -111,7 +111,7 @@ IN: sequences
         ] if
     ] if-bounds ; inline
 
-: find-last-with* ( obj i seq quot -- i elt )
+: find-last-with* ( obj n seq quot -- i elt )
     -rot [ with rot ] find-last* 2swap 2drop ; inline
 
 : find-last ( seq quot -- i elt )
@@ -132,14 +132,14 @@ IN: sequences
 : all-with? ( obj seq quot -- ? )
     swap [ with rot ] all? 2nip ; inline
 
-: subset ( seq quot -- seq )
+: subset ( seq quot -- subseq )
     over >r over length <vector> rot [
         -rot [
             >r over >r call [ r> r> push ] [ r> r> 2drop ] if
         ] 2keep
     ] each r> like nip ; inline
 
-: subset-with ( obj seq quot -- seq )
+: subset-with ( obj seq quot -- subseq )
     swap [ with rot ] subset 2nip ; inline
 
 : monotonic? ( seq quot -- ? )
@@ -161,11 +161,11 @@ IN: sequences
         drop swap >r over >r call dup r> r> set-nth
     ] if ; inline
 
-: copy-into-check ( start to from -- start to from )
+: copy-into-check ( n dest src -- n dest src )
     pick over length + pick 2dup length >
     [ set-length ] [ 2drop ] if ; inline
 
-: copy-into ( start to from -- )
+: copy-into ( n dest src -- )
     copy-into-check dup length
     [ >r pick r> + pick set-nth-unsafe ] 2each 2drop ;
     inline

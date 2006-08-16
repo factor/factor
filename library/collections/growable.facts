@@ -1,49 +1,49 @@
 IN: sequences-internals
 USING: help kernel sequences ;
 
-HELP: set-fill "( n seq -- )"
+HELP: set-fill
 { $values { "n" "a new fill pointer" } { "seq" "a growable sequence" } }
 { $contract "Sets the fill pointer (number of occupied elements in the underlying storage) of a growable sequence." }
 { $side-effects "seq" }
 { $warning "This word is in the " { $vocab-link "sequences-internals" } " vocabulary because it is not safe. Changing the fill pointer to a negative value, or a value higher than the underlying sequence length can lead to memory corruption. User code should use " { $link set-length } " instead." } ;
 
-HELP: underlying "( seq -- underlying )"
+HELP: underlying
 { $values { "seq" "a growable sequence" } { "underlying" "the underlying sequence" } }
 { $contract "Outputs the underlying storage of a growable sequence." } ;
 
-HELP: set-underlying "( underlying seq -- )"
+HELP: set-underlying
 { $values { "underlying" "a growable sequence" } { "seq" "a vector, string buffer or hashtable" } }
 { $contract "Modifies the underlying storage of a growable sequence." }
 { $warning "This word is in the " { $vocab-link "sequences-internals" } " vocabulary because it is not safe. Setting an underlying sequence shorter than the fill pointer can lead to memory corruption." } ;
 
-HELP: capacity "( seq -- n )"
+HELP: capacity
 { $values { "seq" "a vector or string buffer" } { "n" "the capacity of the sequence" } }
-{ $description "Pushes the number of elements the sequence can hold without growing." } ;
+{ $description "Outputs the number of elements the sequence can hold without growing." } ;
 
-HELP: new-size "( old -- new )"
+HELP: new-size
 { $values { "old" "a positive integer" } { "new" "a positive integer" } }
 { $description "Computes the new size of a growable sequence." } ;
 
-HELP: ensure "( n seq -- )"
+HELP: ensure
 { $values { "n" "a positive integer" } { "seq" "a growable sequence" } }
 { $description "If " { $snippet "n" } " is less than the length of the sequence, does nothing. Otherwise, if " { $snippet "n" } " also exceeds the capacity of the underlying storage, the underlying storage is grown, and the fill pointer is reset. Finally, if " { $snippet "n" } " is greater than or equal to the length but less than the capacity of the underlying storage, the fill pointer is moved and nothing else is done."
 $terpri
 "This word is used in the implementation of the " { $link set-nth } " generic for sequences supporting the growable sequence protocol (see " { $link "sequences-growable" } ")."
 } ;
 
-HELP: bounds-error "( n seq -- )"
+HELP: bounds-error
 { $values { "n" "a positive integer" } { "seq" "a sequence" } }
 { $description "Throws a " { $link bounds-error } "." }
 { $error-description "Thrown by " { $link nth } ", " { $link set-nth } " and " { $link set-length } " if the given index lies beyond the bounds of the sequence." } ;
 
-HELP: bounds-check "( n seq -- n seq )"
+HELP: bounds-check
 { $values { "n" "a positive integer" } { "seq" "a sequence" } }
 { $description "Throws an error if " { $snippet "n" } " is negative or if it is greater than or equal to the length of " { $snippet "seq" } ". Otherwise the two inputs remain on the stack." } ;
 
-HELP: grow-length "( n seq -- )"
+HELP: grow-length
 { $values { "n" "a positive integer" } { "seq" "a sequence" } }
 { $description "An implementation of the " { $link set-length } " generic for sequences supporting the growable sequence protocol (see " { $link "sequences-growable" } ")." } ;
 
-HELP: clone-growable "( seq -- seq )"
-{ $values { "seq" "a sequence" } { "seq" "a fresh sequence" } }
+HELP: clone-growable
+{ $values { "seq" "a sequence" } { "newseq" "a fresh sequence" } }
 { $description "An implementation of the " { $link clone } " generic for sequences supporting the growable sequence protocol (see " { $link "sequences-growable" } ")." } ;

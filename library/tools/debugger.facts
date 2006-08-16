@@ -2,6 +2,10 @@ IN: errors
 USING: alien arrays generic help inference kernel math memory
 strings vectors ;
 
+HELP: error.
+{ $values { "error" "an object" } }
+{ $contract "Prints an error in human-readable form." } ;
+
 HELP: restarts f
 { $description "Global variable holding the set of possible restarts for the most recently thrown error." }
 { $notes "Only updated by " { $link throw } ", not " { $link rethrow } "." } ;

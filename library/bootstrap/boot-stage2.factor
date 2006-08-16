@@ -50,9 +50,6 @@ parser sequences sequences-internals words ;
                 compile-all
             ] with-class<cache
     
-            "Initializing native I/O..." print flush
-            "native-io" get [ init-io ] when
-    
             "cocoa" get [
                 "/library/compiler/alien/objc/load.factor" run-resource
                 "/library/ui/cocoa/load.factor" run-resource
@@ -65,9 +62,11 @@ parser sequences sequences-internals words ;
             "Recompiling just in case..." print flush
             recompile
     
-            ! We only do this if we are compiled, otherwise it takes
-            ! too long.
+            "Initializing native I/O..." print flush
+            "native-io" get [ init-io ] when
     
+            ! We only do this if we are compiled, otherwise it
+            ! takes too long.
             "Building online help search index..." print flush
             H{ } clone parent-graph set-global xref-help
             H{ } clone term-index set-global index-help

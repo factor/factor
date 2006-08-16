@@ -43,7 +43,7 @@ SYMBOL: !t
 : !SYMBOL: CREATE dup reset-generic define-symbol ; parsing
 
 DEFER: !PRIMITIVE: parsing
-: !DEFER: CREATE reset-generic ; parsing
+: !DEFER: CREATE drop ; parsing
 : !: CREATE dup reset-generic [ define-compound ] f ; parsing
 : !GENERIC: CREATE dup reset-word define-generic ; parsing
 : !G: CREATE dup reset-word [ define-generic* ] f ; parsing
