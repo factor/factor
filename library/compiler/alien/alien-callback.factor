@@ -9,7 +9,7 @@ C: alien-callback make-node ;
 
 TUPLE: alien-callback-error ;
 
-: alien-callback ( return parameters quot -- address )
+: alien-callback ( return parameters quot -- alien )
     <alien-callback-error> throw ;
 
 : callback-bottom ( node -- )

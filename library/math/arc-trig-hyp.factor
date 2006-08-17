@@ -3,16 +3,32 @@
 IN: math
 USING: kernel math math-internals ;
 
-: acosh dup sq 1- sqrt + log ; inline
-: asech recip acosh ; inline
-: asinh dup sq 1+ sqrt + log ; inline
-: acosech recip asinh ; inline
-: atanh dup 1+ swap 1- neg / log 2 / ; inline
-: acoth recip atanh ; inline
-: [-1,1]? ( x -- ? ) dup complex? [ drop f ] [ abs 1 <= ] if ; inline
-: asin dup [-1,1]? [ fasin ] [ i * asinh -i * ] if ; inline
-: acos dup [-1,1]? [ facos ] [ asin pi 2 / swap - ] if ; inline
-: atan dup [-1,1]? [ fatan ] [ i * atanh i * ] if ; inline
-: asec recip acos ; inline
-: acosec recip asin ; inline
-: acot recip atan ; inline
+: acosh ( x -- y ) dup sq 1- sqrt + log ; inline
+
+: asech ( x -- y ) recip acosh ; inline
+
+: asinh ( x -- y ) dup sq 1+ sqrt + log ; inline
+
+: acosech ( x -- y ) recip asinh ; inline
+
+: atanh ( x -- y ) dup 1+ swap 1- neg / log 2 / ; inline
+
+: acoth ( x -- y ) recip atanh ; inline
+
+: [-1,1]? ( x -- ? )
+    dup complex? [ drop f ] [ abs 1 <= ] if ; inline
+
+: asin ( x -- y )
+    dup [-1,1]? [ fasin ] [ i * asinh -i * ] if ; inline
+
+: acos ( x -- y )
+    dup [-1,1]? [ facos ] [ asin pi 2 / swap - ] if ; inline
+
+: atan ( x -- y )
+    dup [-1,1]? [ fatan ] [ i * atanh i * ] if ; inline
+
+: asec ( x -- y ) recip acos ; inline
+
+: acosec ( x -- y ) recip asin ; inline
+
+: acot ( x -- y ) recip atan ; inline

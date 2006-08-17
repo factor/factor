@@ -19,7 +19,7 @@ words ;
 : try-compile ( word -- )
     [ compile ] [ error. update-xt ] recover ;
 
-: compile-vocabs ( vocabs -- )
+: compile-vocabs ( seq -- )
     [ words ] map concat
     dup [ f "no-effect" set-word-prop ] each
     [ try-compile ] each ;

@@ -83,7 +83,7 @@ HELP: uses
 { $see-also uses } ;
 
 HELP: crossref
-{ $description "Variable. A graph whose vertices are words and edges are usages. See " { $link "graphs" } "." }
+{ $var-description "A graph whose vertices are words and edges are usages. See " { $link "graphs" } "." }
 { $see-also usage xref-words } ;
 
 HELP: xref-word
@@ -168,10 +168,10 @@ HELP: definer
 } ;
 
 HELP: bootstrapping?
-{ $description "Variable. Set by the library while bootstrap is in progress. Some parsing words need to behave differently during bootstrap." } ;
+{ $var-description "Set by the library while bootstrap is in progress. Some parsing words need to behave differently during bootstrap." } ;
 
 HELP: vocabularies
-{ $description "Variable. Holds a hashtable mapping vocabulary names to vocabularies." } ;
+{ $var-description "Holds a hashtable mapping vocabulary names to vocabularies." } ;
 
 HELP: word
 { $values { "word" "a word" } }

@@ -1,122 +1,131 @@
 IN: alien
 USING: help libc ;
 
-HELP: c-type "( name -- type )"
+HELP: <c-type> "( -- type )"
+{ $values { "type" "a hashtable" } }
+{ $description "Creates a prototypical C type. User code should use higher-level facilities to define C types; see " { $link "c-types" } "." } ;
+
+HELP: no-c-type
+{ $values { "type" "a string" } }
+{ $description "Throws a " { $link no-c-type } " error." }
+{ $error-description "Thrown by " { $link c-type } " if a given string does not name a C type. When thrown during compile time, indicates a typo in an " { $link alien-invoke } " or " { $link alien-callback } " form." } ;
+
+HELP: c-type
 { $values { "name" "a string" } { "type" "a hashtable" } }
 { $description "Looks up a C type by name." }
-{ $errors "Throws an error if the type does not exist." } ;
+{ $errors "Throws a " { $link no-c-type } " error if the type does not exist." } ;
 
-HELP: c-size "( name -- size )"
+HELP: c-size
 { $values { "name" "a string" } { "size" "an integer" } }
 { $description "Outputs the number of bytes taken up by this C type." }
 { $examples
     "On a 32-bit system, you will get the following output:"
     { $example "USE: alien\n\"void*\" c-size ." "4" }
 }
-{ $errors "Throws an error if the type does not exist." } ;
+{ $errors "Throws a " { $link no-c-type } " error if the type does not exist." } ;
 
-HELP: c-align "( name -- n )"
-{ $values { "name" "a string" } { "n" "an integer" } }
+HELP: c-align
+{ $values { "name" "a string" } { "align" "an integer" } }
 { $description "Outputs alignment at which values of this C type are padded in C structures." }
-{ $errors "Throws an error if the type does not exist." } ;
+{ $errors "Throws a " { $link no-c-type } " error if the type does not exist." } ;
 
-HELP: c-getter "( name -- quot )"
+HELP: c-getter
 { $values { "name" "a string" } { "quot" "a quotation with stack effect " { $snippet "( c-ptr n -- obj )" } } }
 { $description "Outputs a quotation which reads values of this C type from a C structure." }
-{ $errors "Throws an error if the type does not exist." } ;
+{ $errors "Throws a " { $link no-c-type } " error if the type does not exist." } ;
 
-HELP: c-setter "( name -- quot )"
+HELP: c-setter
 { $values { "name" "a string" } { "quot" "a quotation with stack effect " { $snippet "( obj c-ptr n -- )" } } }
 { $description "Outputs a quotation which writes values of this C type to a C structure." }
 { $errors "Throws an error if the type does not exist." } ;
 
-HELP: <c-array> "( n type -- array )"
+HELP: <c-array>
 { $values { "n" "a non-negative integer" } { "type" "a string" } { "array" "a byte array" } }
 { $description "Creates a byte array large enough to hold " { $snippet "n" } " values of a C type." }
 { $errors "Throws an error if the type does not exist or the requested size is negative." } 
 { $see-also <malloc-array> } ;
 
-HELP: <c-object> "( type -- array )"
+HELP: <c-object>
 { $values { "type" "a string" } { "array" "a byte array" } }
 { $description "Creates a byte array suitable for holding a value with the given C type." }
 { $errors "Throws an error if the type does not exist." }
 { $see-also <malloc-object> } ;
 
-HELP: string>char-alien "( string -- array )"
+HELP: string>char-alien ( string -- array )
 { $values { "string" "a string" } { "array" "a byte array" } }
 { $description "Copies the string to a new byte array, converting it to 8-bit ASCII and adding a trailing null byte." }
 { $errors "Throws an error if the string contains null characters, or characters beyond the 8-bit range." } 
 { $see-also alien>char-string <malloc-string> } ;
 
-HELP: alien>char-string "( c-ptr -- string )"
+HELP: alien>char-string ( c-ptr -- string )
 { $values { "c-ptr" "an alien, byte array or " { $link f } } { "string" "a string" } }
 { $description "Reads a null-terminated 8-bit C string from the specified address." }
 { $see-also string>char-alien } ;
 
-HELP: string>u16-alien "( string -- array )"
+HELP: string>u16-alien ( string -- array )
 { $values { "string" "a string" } { "array" "a byte array" } }
 { $description "Copies the string to a new byte array in UTF16 format with a trailing null byte." }
 { $errors "Throws an error if the string contains null characters." }
 { $see-also alien>u16-string } ;
 
-HELP: alien>u16-string "( c-ptr -- string )"
+HELP: alien>u16-string ( c-ptr -- string )
 { $values { "c-ptr" "an alien, byte array or " { $link f } } { "string" "a string" } }
 { $description "Reads a null-terminated UTF16 string from the specified address." }
 { $see-also string>u16-alien } ;
 
-HELP: <malloc-array> "( n type -- alien )"
+HELP: <malloc-array>
 { $values { "n" "a non-negative integer" } { "type" "a string" } { "alien" "an alien address" } }
 { $description "Allocates an unmanaged memory block large enough to hold " { $snippet "n" } " values of a C type." }
 { $warning "Don't forget to deallocate the memory with a call to " { $link free } "." }
 { $errors "Throws an error if the type does not exist, if the requested size is negative, or if memory allocation fails." }
 { $see-also <c-array> } ;
 
-HELP: <malloc-object> "( type -- alien )"
+HELP: <malloc-object>
 { $values { "type" "a string" } { "alien" "an alien address" } }
 { $description "Allocates an unmanaged memory block large enough to hold a value of a C type." }
 { $warning "Don't forget to deallocate the memory with a call to " { $link free } "." }
 { $errors "Throws an error if the type does not exist or if memory allocation fails." } 
 { $see-also <c-object> } ;
 
-HELP: <malloc-string> "( string -- alien )"
+HELP: <malloc-string>
 { $values { "string" "a string" } { "alien" "an alien address" } }
 { $description "Copies a string to an unmanaged memory block large enough to hold a copy of the string in 8-bit ASCII encoding, with a trailing null byte." }
 { $warning "Don't forget to deallocate the memory with a call to " { $link free } "." }
 { $errors "Throws an error if memory allocation fails." }
 { $see-also string>char-alien } ;
 
-HELP: (typedef) "( old new -- )"
+HELP: (typedef)
 { $values { "old" "a string" } { "new" "a string" } }
 { $description "Alises the C type " { $snippet "old" } " under the name " { $snippet "new" } "." }
 { $notes "You should use the higher-level " { $link POSTPONE: TYPEDEF: } " word instead." }
 { $see-also typedef POSTPONE: TYPEDEF: }  ;
 
-HELP: define-pointer "( type -- )"
+HELP: define-pointer
 { $values { "type" "a string" } }
 { $description "Aliases the C type " { $snippet "type*" } " to " { $snippet "void*" } "." }
 { $notes "This is an internal word called when defining C types, there is no need to call it on your own." } ;
 
-HELP: define-deref "( name vocab -- )"
+HELP: define-deref
 { $values { "name" "a word name" } { "vocab" "a vocabulary name" } }
 { $description "Defines a word " { $snippet "*name" } " with stack effect " { $snippet "( c-ptr -- value )" } " for reading a value with C type " { $snippet "name" } " stored at an alien pointer." }
 { $notes "This is an internal word called when defining C types, there is no need to call it on your own." } ;
 
-HELP: define-nth "( name vocab -- )"
+HELP: define-nth
 { $values { "name" "a word name" } { "vocab" "a vocabulary name" } }
 { $description "Defines a word " { $snippet { $emphasis "name" } "-nth" } " with stack effect " { $snippet "( n c-ptr -- value )" } " for reading the value with C type " { $snippet "name" } " stored at an alien pointer, displaced by a multiple of the C type's size." }
 { $notes "This is an internal word called when defining C types, there is no need to call it on your own." } ;
 
-HELP: define-set-nth "( name vocab -- )"
+HELP: define-set-nth
 { $values { "name" "a word name" } { "vocab" "a vocabulary name" } }
 { $description "Defines a word " { $snippet "set-" { $emphasis "name" } "-nth" } " with stack effect " { $snippet "( value n c-ptr -- )" } " for writing the value with C type " { $snippet "name" } " to an alien pointer, displaced by a multiple of the C type's size." }
 { $notes "This is an internal word called when defining C types, there is no need to call it on your own." } ;
 
-HELP: define-out "( name vocab -- )"
+HELP: define-out
 { $values { "name" "a word name" } { "vocab" "a vocabulary name" } }
 { $description "Defines a word " { $snippet "<" { $emphasis "name" } ">" } " with stack effect " { $snippet "( value -- array )" } ". This word allocates a byte array large enough to hold a value with C type " { $snippet "name" } ", and writes the value at the top of the stack to the array." }
 { $notes "This is an internal word called when defining C types, there is no need to call it on your own." } ;
 
-HELP: typedef "( old new -- )"
+HELP: typedef
 { $values { "old" "a string" } { "new" "a string" } }
 { $description "Alises the C types " { $snippet "old" } " and " { $snippet "old*" } " under the names " { $snippet "new" } " and " { $snippet "new*" } ", respectively." }
 { $notes "You should use the higher-level " { $link POSTPONE: TYPEDEF: } " word instead." }

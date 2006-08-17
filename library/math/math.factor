@@ -11,39 +11,39 @@ G: <= ( x y -- ? ) math-combination ; foldable
 G: >  ( x y -- ? ) math-combination ; foldable
 G: >= ( x y -- ? ) math-combination ; foldable
 
-G: +   ( x y -- x+y ) math-combination ; foldable
-G: -   ( x y -- x-y ) math-combination ; foldable
-G: *   ( x y -- x*y ) math-combination ; foldable
-G: /   ( x y -- x/y ) math-combination ; foldable
-G: /i  ( x y -- x/y ) math-combination ; foldable
-G: /f  ( x y -- x/y ) math-combination ; foldable
-G: mod ( x y -- x%y ) math-combination ; foldable
+G: +   ( x y -- z ) math-combination ; foldable
+G: -   ( x y -- z ) math-combination ; foldable
+G: *   ( x y -- z ) math-combination ; foldable
+G: /   ( x y -- z ) math-combination ; foldable
+G: /i  ( x y -- z ) math-combination ; foldable
+G: /f  ( x y -- z ) math-combination ; foldable
+G: mod ( x y -- z ) math-combination ; foldable
 
-G: /mod ( x y -- x/y x%y ) math-combination ; foldable
+G: /mod ( x y -- z w ) math-combination ; foldable
 
 G: bitand ( x y -- z ) math-combination ; foldable
 G: bitor  ( x y -- z ) math-combination ; foldable
 G: bitxor ( x y -- z ) math-combination ; foldable
 G: shift  ( x n -- y ) math-combination ; foldable
 
-GENERIC: bitnot ( n -- n ) foldable
+GENERIC: bitnot ( x -- y ) foldable
 
-GENERIC: abs ( z -- |z| ) foldable
-GENERIC: absq ( n -- |n|^2 ) foldable
+GENERIC: abs ( x -- y ) foldable
+GENERIC: absq ( x -- y ) foldable
 
 GENERIC: zero? ( x -- ? ) foldable
 M: object zero? drop f ;
 
-: 1+ 1 + ; foldable
-: 1- 1 - ; foldable
-: sq dup * ; foldable
-: neg 0 swap - ; foldable
-: recip 1 swap / ; foldable
+: 1+ ( x -- y ) 1 + ; foldable
+: 1- ( x -- y ) 1 - ; foldable
+: sq ( x -- y ) dup * ; foldable
+: neg ( x -- -x ) 0 swap - ; foldable
+: recip ( x -- y ) 1 swap / ; foldable
 : max ( x y -- z ) [ > ] 2keep ? ; foldable
 : min ( x y -- z ) [ < ] 2keep ? ; foldable
-: between? ( x min max -- ? ) pick >= >r >= r> and ; foldable
+: between? ( x y z -- ? ) pick >= >r >= r> and ; foldable
 : rem ( x y -- z ) tuck mod over + swap mod ; foldable
-: sgn ( m -- n ) dup 0 < -1 0 ? swap 0 > 1 0 ? bitor ; foldable
+: sgn ( x -- n ) dup 0 < -1 0 ? swap 0 > 1 0 ? bitor ; foldable
 : align ( m w -- n ) 1- [ + ] keep bitnot bitand ; inline
 : truncate ( x -- y ) dup 1 mod - ; foldable
 

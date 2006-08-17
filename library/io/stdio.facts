@@ -1,88 +1,95 @@
 USING: help io ;
 
-HELP: stdio f
-{ $description "Variable. Holds a stream, used for various implicit stream operations. Rebound using " { $link with-stream } " and " { $link with-stream* } "." } ;
+HELP: stdio
+{ $var-description "Holds a stream, used for various implicit stream operations. Rebound using " { $link with-stream } " and " { $link with-stream* } "." } ;
 
-HELP: close "( -- )"
+HELP: close
 { $contract "Closes the " { $link stdio } " stream." } 
 $io-error ;
 
-HELP: readln "( -- str/f )"
+HELP: readln
 { $values { "str/f" "a string or " { $link f } } }
 { $contract "Reads a line of input from the " { $link stdio } " stream. Outputs " { $link f } " on stream exhaustion." }
 $io-error ;
 
-HELP: read1 "( -- ch/f )"
+HELP: read1
 { $values { "ch/f" "a character or " { $link f } } }
 { $contract "Reads a character of input from the " { $link stdio } " stream. Outputs " { $link f } " on stream exhaustion." }
 $io-error ;
 
-HELP: read "( n -- str/f )"
+HELP: read
 { $values { "str/f" "a string or " { $link f } } }
 { $contract "Reads " { $snippet "n" } " characters of input from the " { $link stdio } " stream. Outputs a truncated string or " { $link f } " on stream exhaustion." }
 $io-error ;
 
-HELP: write1 "( ch -- )"
+HELP: write1
 { $values { "ch" "a character" } }
 { $contract "Writes a character of output to the " { $link stdio } " stream. If the stream does buffering, output may not be performed immediately; use " { $link flush } " to force output." }
 $io-error ;
 
-HELP: write1 "( ch -- )"
-{ $values { "ch" "a character" } }
-{ $contract "Writes a character of output to the " { $link stdio } " stream. If the stream does buffering, output may not be performed immediately; use " { $link flush } " to force output." }
-$io-error ;
-
-HELP: write "( str -- )"
+HELP: write
 { $values { "str" "a string" } }
 { $contract "Writes a string of output to the " { $link stdio } " stream. If the stream does buffering, output may not be performed immediately; use " { $link flush } " to force output." }
 $io-error ;
 
-HELP: flush "(  -- )"
+HELP: flush
 { $contract "Waits for any pending output to the " { $link stdio } " stream to complete." }
 $io-error ;
 
-HELP: terpri "( -- )"
+HELP: terpri
 { $contract "Writes a line terminator to the " { $link stdio } " stream. If the stream does buffering, output may not be performed immediately; use " { $link flush } " to force output." }
 $io-error ;
 
-HELP: format "( str style -- )"
+HELP: format
 { $values { "str" "a string" } { "style" "a hashtable" } }
 { $contract "Writes formatted text to the " { $link stdio } " stream. If the stream does buffering, output may not be performed immediately; use " { $link flush } " to force output." }
 { $notes "Details are in the documentation for " { $link stream-format } "." }
 $io-error ;
 
-HELP: with-nesting "( style quot -- )"
+HELP: with-nesting
 { $values { "style" "a hashtable" } { "quot" "a quotation" } }
 { $contract "Calls the quotation in a new dynamic scope with the " { $link stdio } " stream rebound to a nested paragraph stream, with formatting information applied." }
 { $notes "Details are in the documentation for " { $link stream-format } "." }
 $io-error ;
 
-HELP: print "( style -- )"
-{ $values { "style" "a hashtable" } }
+HELP: tabular-output
+{ $values { "grid" "a sequence of equal-length sequences" } { "style" "a hashtable" } { "quot" "a quotation" } }
+{ $description "Calls the quotation with each element of the grid in turn, each time in a new dynamic scope with " { $link stdio } " rebound to a new stream. The results are laid out in a tabular fashion on the " { $link stdio } " stream." }
+{ $notes "Details are in the documentation for " { $link with-stream-table } "." }
+$io-error ;
+
+HELP: with-style
+{ $values { "style" "a hashtable" } { "quot" "a quotation" } }
+{ $description "Calls the quotation in a new dynamic scope where calls to " { $link write } ", " { $link format } " and other stream output words automatically inherit style settings from " { $snippet "style" } "." }
+{ $notes "Details are in the documentation for " { $link with-stream-style } "." }
+$io-error ;
+
+HELP: print
+{ $values { "string" "a string" } }
 { $description "Writes a newline-terminated string to the " { $link stdio } " stream." }
 $io-error ;
 
-HELP: with-stream "( stream quot -- )"
+HELP: with-stream
 { $values { "stream" "an input or output stream" } { "quot" "a quotation" } }
 { $description "Calls the quotation in a new dynamic scope, with the " { $link stdio } " variable rebound to  " { $snippet "stream" } ". The stream is closed if the quotation returns or throws an error." } 
 { $see-also with-stream* } ;
 
-HELP: with-stream* "( stream quot -- )"
+HELP: with-stream*
 { $values { "stream" "an input or output stream" } { "quot" "a quotation" } }
 { $description "Calls the quotation in a new dynamic scope, with the " { $link stdio } " variable rebound to  " { $snippet "stream" } "." }
 { $notes "This word differs from " { $link with-stream } " in that if an error is thrown while the quotation is executing, the stream is " { $emphasis "not" } " closed." }
 { $see-also with-stream } ;
 
-HELP: bl "( -- )"
+HELP: bl
 { $description "Outputs a space character (" { $snippet "\" \"" } ")." }
 $io-error ;
 
-HELP: write-object "( str obj -- )"
+HELP: write-object
 { $values { "str" "a string" } { "obj" "an object" } }
 { $description "Writes a string to the " { $link stdio } " stream, associating it with the object. If formatted output is supported, the string will become a clickable presentation of the object, otherwise this word behaves like a call to " { $link write } "." }
 $io-error ;
 
-HELP: write-outliner "( str obj content -- )"
+HELP: write-outliner
 { $values { "str" "a string" } { "obj" "an object" } { "content" "a quotation" } }
 { $description "Writes an outliner to the " { $link stdio } " stream. The outliner's caption is a the string " { $snippet "str" } " with an associated presentation of " { $snippet "obj" } ". Expanding the outliner calls " { $snippet "content" } " in a new dynamic scope with " { $link stdio } " rebound to the body of the outliner. If the stream does not support formatted output, this simply writes " { $snippet "str" } " and ignores everything else." }
 $io-error ;

@@ -31,6 +31,6 @@ M: vector like
 
 IN: kernel
 
-: with-datastack ( stack word -- stack )
+: with-datastack ( stack word -- newstack )
     datastack >r >r >vector set-datastack r> execute
     datastack r> [ push ] keep set-datastack 2nip ;

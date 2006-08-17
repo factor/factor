@@ -1,57 +1,57 @@
 IN: memory
 USING: errors help test ;
 
-HELP: gc "( n -- )"
+HELP: gc ( n -- )
 { $values { "n" "a positive integer" } }
 { $description "Collects all generations up to and including the " { $snippet "n" } "th generation. The nursery where new objects are allocated is generation 0, and tenured space is generation " { $snippet "g-1" } " where " { $snippet "g" } " is the value output by " { $link generations } "." } ;
 
-HELP: gc-time "( -- n )"
+HELP: gc-time ( -- n )
 { $values { "n" "a timestamp in milliseconds" } }
 { $description "Outputs the total time spent in garbage collection during this Factor session." }
 { $examples "This word is used by " { $link time } " to measure the time spent in garbage collection during the execution of a quotation." } ;
 
-HELP: room "( -- code-free code-total cards semi generations )"
+HELP: room ( -- code-free code-total cards semi generations )
 { $values { "code-free" "bytes free in the code heap" } { "code-total" "total bytes in the code heap" } { "cards" "number of bytes reserved for card marking" } { "semi" "number of bytes reserved for tenured semi-space" } { "generations" "array of free/total bytes pairs" } }
 { $description "Queries the runtime for memory usage information. To see this in a human-readable form, call " { $link room. } " instead." } ;
 
-HELP: size "( obj -- n )"
+HELP: size ( obj -- n )
 { $values { "obj" "an object" } { "n" "a size in bytes" } }
 { $description "Outputs the size of the object in memory, in bytes. Tagged immediate objects such as fixnums and " { $link f } " will yield a size of 0." } ;
 
-HELP: full-gc "( -- )"
+HELP: full-gc
 { $description "Performs a full garbage collection." } ;
 
-HELP: room. "( -- )"
+HELP: room.
 { $description "Prints an overview of memory usage broken down by generation and zone." } ;
 
-HELP: begin-scan "( -- )"
+HELP: begin-scan ( -- )
 { $description "Moves all objects to tenured space, disables the garbage collector, and resets the heap scan pointer to point at the first object in the heap. The " { $link next-object } " word can then be called to advance the heap scan pointer and return successive objects."
 $terpri
 "This word must always be paired with a call to " { $link end-scan } "." }
 { $notes "This is a low-level facility and can be dangerous. Use the " { $link each-object } " combinator instead." } ;
 
-HELP: next-object "( -- obj )"
+HELP: next-object ( -- obj )
 { $description "Outputs the object at the heap scan pointer, and then advances the heap scan pointer. If the end of the heap has been reached, outputs " { $link f } ". This is unambiguous since the " { $link f } " object is tagged immediate and not actually stored in the heap." }
 { $errors "Throws a " { $link heap-scan-error. } " if called outside a " { $link begin-scan } "/" { $link end-scan } " pair." }
 { $notes "This is a low-level facility and can be dangerous. Use the " { $link each-object } " combinator instead." } ;
 
-HELP: end-scan "( -- )"
+HELP: end-scan ( -- )
 { $description "Finishes a heap iteration by re-enabling the garbage collector. This word must always be paired with a call to " { $link begin-scan } "." }
 { $notes "This is a low-level facility and can be dangerous. Use the " { $link each-object } " combinator instead." } ;
 
-HELP: each-object "( quot -- )"
+HELP: each-object
 { $values { "quot" "a quotation with stack effect " { $snippet "( obj -- )" } } }
 { $description "Applies a quotation to each object in the heap. The garbage collector is switched off while this combinator runs, so the given quotation must not allocate too much memory." }
 { $notes "This word is the low-level facility used to implement the " { $link instances } " and " { $link heap-stats. } " words." } ;
 
-HELP: instances "( quot -- seq )"
+HELP: instances
 { $values { "quot" "a quotation with stack effect " { $snippet "( obj -- ? )" } } { "seq" "a fresh sequence" } }
 { $description "Outputs a sequence of all objects in the heap which satisfy the quotation." }
 { $notes "This word relies on " { $link each-object } ", so in particular the garbage collector is switched off while it runs and the given quotation must not allocate too much memory." } ;
 
-HELP: heap-stats "( -- counts sizes )"
+HELP: heap-stats
 { $values { "counts" "a hashtable mapping class words to integers" } { "sizes" "a hashtable mapping class words to integers" } }
 { $description "Outputs a pair of hashtables, holding class instance counts and instance memory usage, respectively." } ;
 
-HELP: heap-stats. "( -- )"
+HELP: heap-stats.
 { $description "For each class, prints the number of instances and total memory consumed by those instances." } ;

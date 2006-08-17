@@ -37,6 +37,8 @@ SYMBOL: table
     span last-element set
     call ; inline
 
+GENERIC: print-element ( element -- )
+
 M: simple-element print-element [ print-element ] each ;
 M: string print-element [ write ] ($span) ;
 M: array print-element unclip execute ;
@@ -75,7 +77,7 @@ M: word print-element { } swap execute ;
 : ($heading)
     last-element get [ terpri ] when ($block) ; inline
 
-: $heading
+: $heading ( element -- )
     [ heading-style print-element* ] ($heading) ;
 
 : ($code) ( presentation quot -- )
@@ -87,34 +89,37 @@ M: word print-element { } swap execute ;
         ] with-style
     ] ($block) ; inline
 
-: $code ( content -- )
+: $code ( element -- )
     "\n" join dup <input> [ write ] ($code) ;
 
-: $description ( content -- )
+: $description ( element -- )
     "Word description" $heading print-element ;
 
-: $class-description ( content -- )
+: $class-description ( element -- )
     "Class description" $heading print-element ;
 
-: $error-description ( content -- )
+: $error-description ( element -- )
     "Error description" $heading print-element ;
 
-: $contract ( content -- )
+: $var-description ( element -- )
+    "Variable description" $heading print-element ;
+
+: $contract ( element -- )
     "Generic word contract" $heading print-element ;
 
-: $examples ( content -- )
+: $examples ( element -- )
     "Examples" $heading print-element ;
 
-: $example ( content -- )
+: $example ( element -- )
     1 swap cut* swap "\n" join dup <input> [
         input-style format terpri print-element
     ] ($code) ;
 
-: $markup-example ( content -- )
+: $markup-example ( element -- )
     first dup unparse " print-element" append 1array $code
     print-element ;
 
-: $warning ( content -- )
+: $warning ( element -- )
     [
         warning-style [
             last-element off
@@ -129,27 +134,27 @@ M: word >link ;
 M: link >link ;
 M: object >link <link> ;
 
-: $link ( article -- )
+: $link ( element -- )
     first link-style [
         dup article-title swap >link write-object
     ] with-style ;
 
-: $vocab-link ( content -- )
+: $vocab-link ( element -- )
     first link-style [
         dup <vocab-link> write-object
     ] with-style ;
 
-: $vocabulary ( content -- )
+: $vocabulary ( element -- )
     [ word-vocabulary ] map
     [ "Vocabulary" $heading terpri $vocab-link ] when* ;
 
 : textual-list ( seq quot -- )
     [ ", " print-element ] interleave ; inline
 
-: $links ( content -- )
+: $links ( topics -- )
     [ [ 1array $link ] textual-list ] ($span) ;
 
-: $see-also ( content -- )
+: $see-also ( topics -- )
     "See also" $heading $links ;
 
 : $doc-path ( article -- )
@@ -170,17 +175,17 @@ M: object >link <link> ;
         ] with-style
     ] ($block) table last-element set ;
 
-: $list ( content -- )
+: $list ( element -- )
     [  "-" swap 2array ] map list-style $grid ;
 
-: $table ( content -- )
+: $table ( element -- )
     table-style $grid ;
 
-: $values ( content -- )
+: $values ( element -- )
     "Arguments and values" $heading
     [ unclip \ $snippet swap 2array swap 2array ] map $table ;
 
-: $predicate ( content -- )
+: $predicate ( element -- )
     { { "object" "an object" } } $values
     [
         "Tests if the object is an instance of the " ,
@@ -188,14 +193,14 @@ M: object >link <link> ;
         " class." ,
     ] { } make $description ;
 
-: $errors ( content -- )
+: $errors ( element -- )
     "Errors" $heading print-element ;
 
-: $side-effects ( content -- )
+: $side-effects ( element -- )
     "Side effects" $heading "Modifies " print-element
     [ $snippet ] textual-list ;
 
-: $notes ( content -- )
+: $notes ( element -- )
     "Notes" $heading print-element ;
 
 : ($see) ( word -- )
@@ -205,19 +210,19 @@ M: object >link <link> ;
         ] with-style
     ] ($block) ;
 
-: $see ( content -- ) first ($see) ;
+: $see ( element -- ) first ($see) ;
 
-: $definition ( content -- )
+: $definition ( word -- )
     "Definition" $heading ($see) ;
 
-: $curious ( content -- )
+: $curious ( element -- )
     "For the curious..." $heading print-element ;
 
-: $references ( content -- )
+: $references ( element -- )
     "References" $heading
     unclip print-element [ \ $link swap 2array ] map $list ;
 
-: $shuffle ( content -- )
+: $shuffle ( element -- )
     drop
     "Shuffle word. Re-arranges the stack according to the stack effect pattern." $description ;
 

@@ -4,36 +4,36 @@ IN: sequences
 USING: arrays errors generic kernel kernel-internals math
 sequences-internals strings vectors words ;
 
-: first2 ( seq -- x y )
+: first2 ( seq -- first second )
     1 swap bounds-check nip first2-unsafe ;
 
-: first3 ( seq -- x y z )
+: first3 ( seq -- first second third )
     2 swap bounds-check nip first3-unsafe ;
 
-: first4 ( seq -- x y z w )
+: first4 ( seq -- first second third fourth )
     3 swap bounds-check nip first4-unsafe ;
 
 M: object like drop ;
 
-: index   ( obj seq -- n )
+: index ( obj seq -- n )
     [ = ] find-with drop ;
 
-: index*  ( obj i seq -- n )
+: index* ( obj i seq -- n )
     [ = ] find-with* drop ;
 
-: last-index   ( obj seq -- n )
+: last-index ( obj seq -- n )
     [ = ] find-last-with drop ;
 
-: last-index*  ( obj i seq -- n )
+: last-index* ( obj i seq -- n )
     [ = ] find-last-with* drop ;
 
 : member? ( obj seq -- ? )
     [ = ] contains-with? ;
 
-: memq?   ( obj seq -- ? )
+: memq? ( obj seq -- ? )
     [ eq? ] contains-with? ;
 
-: remove  ( obj list -- list )
+: remove ( obj list -- list )
     [ = not ] subset-with ;
 
 : (subst) ( newseq oldseq elt -- new/elt )
@@ -43,7 +43,7 @@ M: object like drop ;
 : subst ( newseq oldseq seq -- )
     [ >r 2dup r> (subst) ] inject 2drop ;
 
-: move ( to from seq -- )
+: move ( m n seq -- )
     pick pick number=
     [ 3drop ] [ [ nth swap ] keep set-nth ] if ; inline
 
@@ -58,41 +58,39 @@ M: object like drop ;
 
 : push-new ( elt seq -- ) [ delete ] 2keep push ;
 
-: prune ( seq -- seq )
+: prune ( seq -- newseq )
     [ V{ } clone swap [ over push-new ] each ] keep like ;
 
-: nappend ( to from -- )
+: nappend ( dest src -- )
     >r [ length ] keep r> copy-into ; inline
 
-: >resizable ( seq -- seq ) [ thaw dup ] keep nappend ;
+: >resizable ( seq -- newseq ) [ thaw dup ] keep nappend ;
 
-: immutable ( seq quot -- seq )
+: immutable ( seq quot -- newseq )
     swap [ >resizable [ swap call ] keep ] keep like ; inline
 
-: append ( s1 s2 -- s1+s2 )
+: append ( seq1 seq2 -- newseq )
     swap [ swap nappend ] immutable ;
 
-: add ( seq elt -- seq )
+: add ( seq elt -- newseq )
     swap [ push ] immutable ;
 
-: add* ( seq elt -- seq )
+: add* ( seq elt -- newseq )
     over >r
     over thaw [ push ] keep [ swap nappend ] keep
     r> like ;
 
-: diff ( seq1 seq2 -- seq2-seq1 )
+: diff ( seq1 seq2 -- newseq )
     [ swap member? not ] subset-with ;
 
-: append3 ( s1 s2 s3 -- s1+s2+s3 )
+: append3 ( seq1 seq2 seq3 -- newseq )
     rot [ [ rot nappend ] keep swap nappend ] immutable ;
 
-: peek ( sequence -- element ) dup length 1- swap nth ;
+: peek ( seq -- elt ) dup length 1- swap nth ;
 
-: pop* ( sequence -- )
-    dup length 1- swap set-length ;
+: pop* ( seq -- ) dup length 1- swap set-length ;
 
-: pop ( sequence -- element )
-    dup length 1- swap [ nth ] 2keep set-length ;
+: pop ( seq -- ) dup length 1- swap [ nth ] 2keep set-length ;
 
 : all-equal? ( seq -- ? ) [ = ] monotonic? ;
 
@@ -104,16 +102,16 @@ M: object like drop ;
 : mismatch ( seq1 seq2 -- i )
     2dup min-length (mismatch) ;
 
-: flip ( seq -- seq )
+: flip ( matrix -- newmatrix )
     dup empty? [
         dup first [ length ] keep like
         [ swap [ nth ] map-with ] map-with
     ] unless ;
 
-: unpair ( seq -- firsts seconds )
+: unpair ( assoc -- keys values )
     flip dup empty? [ drop { } { } ] [ first2 ] if ;
 
-: exchange ( n n seq -- )
+: exchange ( m n seq -- )
     pick over bounds-check 2drop 2dup bounds-check 2drop
     exchange-unsafe ;
 
@@ -125,7 +123,7 @@ M: object like drop ;
 
 : last/first ( seq -- pair ) dup peek swap first 2array ;
 
-: sequence= ( seq seq -- ? )
+: sequence= ( seq1 seq2 -- ? )
     2dup [ length ] 2apply tuck number=
     [ (mismatch) -1 number= ] [ 3drop f ] if ; inline
 
@@ -157,7 +155,8 @@ M: object <=>
 TUPLE: no-cond ;
 : no-cond ( -- * ) <no-cond> throw ;
 
-: cond ( conditions -- )
+: cond ( assoc -- )
     [ first call ] find nip dup [ second call ] [ no-cond ] if ;
 
-: unix? os { "freebsd" "linux" "macosx" "solaris" } member? ;
+: unix? ( -- ? )
+    os { "freebsd" "linux" "macosx" "solaris" } member? ;

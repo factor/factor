@@ -2,65 +2,61 @@ IN: errors
 USING: alien arrays generic help inference kernel math memory
 strings vectors ;
 
-HELP: error.
-{ $values { "error" "an object" } }
-{ $contract "Prints an error in human-readable form." } ;
-
-HELP: restarts f
-{ $description "Global variable holding the set of possible restarts for the most recently thrown error." }
+HELP: restarts
+{ $var-description "Global variable holding the set of possible restarts for the most recently thrown error." }
 { $notes "Only updated by " { $link throw } ", not " { $link rethrow } "." } ;
 
-HELP: :s "( -- )"
+HELP: :s
 { $description "Prints the data stack at the time of the most recent error. Used for interactive debugging." } ;
 
-HELP: :r "( -- )"
+HELP: :r
 { $description "Prints the retain stack at the time of the most recent error. Used for interactive debugging." } ;
 
-HELP: :c "( -- )"
+HELP: :c
 { $description "Prints the call stack at the time of the most recent error. Used for interactive debugging." } ;
 
-HELP: :get "( variable -- value )"
+HELP: :get
 { $values { "variable" "an object" } { "value" "the value, or f" } }
 { $description "Looks up the value of a variable at the time of the most recent error." } ;
 
-HELP: :help "( -- )"
+HELP: :help
 { $description "Displays documentation for the most recent error." } ;
 
-HELP: :res "( n -- )"
+HELP: :res
 { $values { "n" "a non-negative integer" } }
 { $description "Continues executing the " { $snippet "n" } "th restart." } ;
 
-HELP: error. "( error -- )"
+HELP: error.
 { $values { "error" "an error" } }
 { $contract "Print an error to the default stream." } ;
 
-HELP: error-help "( error -- topic )"
+HELP: error-help
 { $values { "error" "an error" } { "topic" "an article name or word" } }
 { $contract "Outputs a help article which explains the error." }
 { $see-also :help } ;
 
-HELP: print-error "( error -- )"
+HELP: print-error
 { $values { "error" "an error" } }
 { $description "Print an error to the default stream. This word gets called by the listener and other tools which report caught errors to the user. You can define methods on this generic word for custom error reporting." } ;
 
-HELP: try "( quot -- )"
+HELP: try
 { $values { "quot" "a quotation" } }
 { $description "Calls the quotation. If it throws an error, logs the error to the default stream and restores the datastack." } ;
 
-HELP: expired-error. f
+HELP: expired-error.
 { $error-description "Thrown by " { $link alien-address } " and " { $link alien-invoke } " if an " { $link alien } " object passed in as a parameter has expired. Alien objects expire if they are saved an image which is subsequently loaded; this prevents a certain class of programming errors, usually attempts to use uninitialized objects, since holding a C address is meaningless between sessions." }
 { $notes "You can check if an alien object has expired by calling " { $link expired? } "." } ;
 
-HELP: io-error. f
+HELP: io-error.
 { $error-description "Thrown by the C streams I/O primitives if an I/O error occurs." } ;
 
-HELP: undefined-word-error. f
+HELP: undefined-word-error.
 { $error-description "Thrown if an attempt is made to call a word which was defined by " { $link POSTPONE: DEFER: } "." } ;
 
-HELP: type-check-error. f
+HELP: type-check-error.
 { $error-description "Thrown by various primitives if one of the inputs does not have the expected type. Generic words throw " { $link no-method } " and " { $link no-math-method } " errors in such cases instead." } ;
 
-HELP: signal-error. f
+HELP: signal-error.
 { $error-description
     "Thrown by the runtime when a Unix signal is received. While signal numbers are system-specific, the following are relatively standard:"
     { $list
@@ -71,40 +67,40 @@ HELP: signal-error. f
     "The Windows equivalent of a signal 11 is a SEH fault. When one occurs, the runtime throws a singal error, even though it does not correspond to a Unix signal."
 } ;
 
-HELP: negative-array-size-error. f
+HELP: negative-array-size-error.
 { $error-description "Thrown by " { $link <array> } ", " { $link <string> } ", " { $link <vector> } " and " { $link <sbuf> } " if a negative capacity is specified." } ;
 
-HELP: c-string-error. f
+HELP: c-string-error.
 { $error-description "Thrown by " { $link alien-invoke } " and various primitives if a string containing null bytes, or characters with values higher than 255 is passed in where a C string is expected.See " { $link "c-types-strings" } "." } ;
 
-HELP: ffi-error. f
+HELP: ffi-error.
 { $error-description "Thrown by " { $link dlopen } " and " { $link dlsym } " if a problem occurs while loading a native library or looking up a symbol. See " { $link "alien" } "." } ;
 
-HELP: heap-scan-error. f
+HELP: heap-scan-error.
 { $error-description "Thrown if " { $link next-object } " is called outside of a " { $link begin-scan } "/" { $link end-scan } " pair." } ;
 
-HELP: undefined-symbol-error. f
+HELP: undefined-symbol-error.
 { $error-description "Thrown if a previously-compiled " { $link alien-invoke } " call refers to a native library symbol which no longer exists." } ;
 
-HELP: user-interrupt. f
+HELP: user-interrupt.
 { $error-description "Thrown by the " { $snippet "t" } " command in the FEP." } ;
 
-HELP: datastack-underflow. f
+HELP: datastack-underflow.
 { $error-description "Thrown by the runtime if an attempt is made to pop elements from an empty data stack." }
 { $notes "You can use the " { $link infer } " tool to statically check stack effects of quotations." } ;
 
-HELP: datastack-overflow. f
+HELP: datastack-overflow.
 { $error-description "Thrown by the runtime if an attempt is made to push elements on a full data stack." }
 { $notes "This error usually indicates a run-away recursion, however if you legitimately need a data stack larger than the default, see " { $link "runtime-cli-args" } "." } ;
 
-HELP: retainstack-underflow. f
+HELP: retainstack-underflow.
 { $error-description "Thrown by the runtime if " { $link r> } " is called while the retain stack is empty." }
 { $notes "You can use the " { $link infer } " tool to statically check stack effects of quotations." } ;
 
-HELP: retainstack-overflow. f
+HELP: retainstack-overflow.
 { $error-description "Thrown by the runtime if " { $link >r } " is called when the retain stack is full." }
 { $notes "This error usually indicates a run-away recursion, however if you legitimately need a retain stack larger than the default, see " { $link "runtime-cli-args" } "." } ;
 
-HELP: callstack-overflow. f
+HELP: callstack-overflow.
 { $error-description "Thrown by the runtime if the call stack is full." }
 { $notes "This error usually indicates a run-away recursion, however if you legitimately need a call stack larger than the default, see " { $link "runtime-cli-args" } "." } ;

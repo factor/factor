@@ -64,11 +64,12 @@ ARTICLE: "stdio" "The default stream"
 { $subsection with-stream* } ;
 
 ARTICLE: "styles" "Formatted output"
-"The " { $link stream-format } " and " { $link with-nested-stream } " words take a hashtable of style attributes. The former acts on character styles, and the latter acts on paragraph styles. Output stream implementations are free to ignore style information."
+"The " { $link stream-format } ", " { $link with-nested-stream } " and " { $link with-stream-table } " words take a hashtable of style attributes. Output stream implementations are free to ignore style information."
 $terpri
 "Style hashtables are keyed by symbols from the " { $vocab-link "styles" } " vocabulary."
 { $subsection "character-styles" }
 { $subsection "paragraph-styles" }
+{ $subsection "table-styles" }
 { $subsection "presentations" } ;
 
 ARTICLE: "character-styles" "Character styles"
@@ -88,6 +89,11 @@ ARTICLE: "paragraph-styles" "Paragraph styles"
 { $subsection wrap-margin }
 { $subsection outline }
 { $subsection presented } ;
+
+ARTICLE: "table-styles" "Table styles"
+"Table styles for " { $link with-stream-table } ":"
+{ $subsection table-gap }
+{ $subsection table-border } ;
 
 ARTICLE: "presentations" "Presentations and outliners"
 "The " { $link presented } " and " { $link outline } " styles can be used to build sophisticated user interfaces in the Factor UI. Instead of setting them directly, two utility words should be used:"

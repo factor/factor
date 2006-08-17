@@ -4,9 +4,6 @@ IN: help
 USING: arrays definitions errors generic graphs hashtables
 inspector io kernel namespaces prettyprint sequences words ;
 
-! Markup
-GENERIC: print-element ( element -- )
-
 ! Help articles
 SYMBOL: articles
 
@@ -54,23 +51,23 @@ SYMBOL: parent-graph
 
 DEFER: $subsection
 
-: children ( article -- seq )
+: children ( topic -- seq )
     article-content { $subsection } collect-elements ;
 
-: parents ( article -- seq )
+: parents ( topic -- seq )
     dup link? [ link-name ] when parent-graph get in-edges ;
 
-: (doc-path) ( article -- )
+: (doc-path) ( topic -- )
     dup , parents [ word? not ] subset dup empty?
     [ drop ] [ [ (doc-path) ] each ] if ;
 
-: doc-path ( article -- seq )
+: doc-path ( topic -- seq )
     [ (doc-path) ] { } make 1 tail prune ;
 
-: xref-article ( article -- )
+: xref-article ( topic -- )
     [ children ] parent-graph get add-vertex ;
 
-: unxref-article ( article -- )
+: unxref-article ( topic -- )
     [ children ] parent-graph get remove-vertex ;
 
 : xref-help ( -- )

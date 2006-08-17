@@ -1,6 +1,7 @@
 + 0.84:
 
 - doc mashup:
+  - document: equals? parse-hook no-parse-hook
   - HELP: should not specify stack effect
   - figure out what to do for parsing words
   - document inference errors

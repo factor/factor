@@ -1,32 +1,32 @@
 IN: listener
 USING: help kernel ;
 
-HELP: listener-prompt f
-{ $description "Variable holding a string printed before each line of input read by the listener." } ;
+HELP: listener-prompt
+{ $var-description "Variable holding a string printed before each line of input read by the listener." } ;
 
-HELP: quit-flag f
-{ $description "Variable set to true by " { $link bye } " word; it forces the next iteration of the " { $link (listener) } " loop to end." } ;
+HELP: quit-flag
+{ $var-description "Variable set to true by " { $link bye } " word; it forces the next iteration of the " { $link (listener) } " loop to end." } ;
 
-HELP: listener-hook f
-{ $description "Variable holding a quotation called by the listener before reading each line of input. The UI sets this variable to a quotation which updates the stack display in a listener gadget." } ;
+HELP: listener-hook
+{ $var-description "Variable holding a quotation called by the listener before reading each line of input. The UI sets this variable to a quotation which updates the stack display in a listener gadget." } ;
 
-HELP: (read-multiline) "( quot depth -- newquot ? )"
+HELP: (read-multiline)
 { $values { "quot" "the quotation being parsed" } { "depth" "the initial parsing stack depth" } { "newquot" "the quotation being parsed, after another line of input" } { "?" "a flag indicating end of input" } }
 { $description "Internal word used to read multiline expressions." } ;
 
-HELP: read-multiline "( -- quot ? )"
+HELP: read-multiline
 { $values { "quot" "a parsed quotation" } { "?" "a flag indicating end of file" } }
 { $description "Reads a Factor expression from the default stream, possibly spanning more than line. Additional lines of input are read while the parser stack height is greater than one. Since structural parsing words push partial quotations on the stack, this will keep on reading input until all delimited parsing words are terminated." } ;
 
-HELP: listen "( -- )"
+HELP: listen
 { $description "Prompts for an expression on the default stream and evaluates it. On end of file, " { $link quit-flag } " is set to terminate the listener loop." }
 { $errors "If the expression input by the user throws an error, the error is printed to the default stream and the word returns normally." } ;
 
-HELP: (listener) "( -- )"
+HELP: (listener)
 { $description "Prompts for expressions on the default stream and evaluates them until end of file is reached. This is an internal word; call " { $link listener } " instead." } ;
 
-HELP: listener "( -- )"
+HELP: listener
 { $description "Starts a listener prompting for expressions on the default stream." } ;
 
-HELP: print-banner "( -- )"
+HELP: print-banner
 { $description "Print Factor version, operating system, and CPU architecture." } ;

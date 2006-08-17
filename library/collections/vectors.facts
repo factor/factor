@@ -1,25 +1,25 @@
 IN: vectors
 USING: arrays help kernel strings ;
 
-HELP: vector f
+HELP: vector
 { $description "The class of resizable vectors. See " { $link "syntax-vectors" } " for syntax and " { $link "vectors" } " for general information." } ;
 
-HELP: <vector> "( n -- vector )"
+HELP: <vector> ( n -- vector )
 { $values { "n" "a positive integer specifying initial capacity" } { "vector" "a new vector" } }
 { $description "Creates a new vector that can hold " { $snippet "n" } " elements before resizing." }
 { $see-also <array> <string> <sbuf> } ;
 
-HELP: >vector "( seq -- vector )"
+HELP: >vector
 { $values { "seq" "a sequence" } { "vector" "a new vector" } }
 { $description "Outputs a freshly-allocated vector with the same elements as a given sequence." } ;
 
-HELP: array>vector "( array -- vector )"
+HELP: array>vector ( array -- vector )
 { $values { "array" "an array" } { "vector" "a new vector" } }
 { $description "Creates a new vector using the array for underlying storage. The vector's initial length is the same as that of the array."
 $terpri
 "This word can be marginally more efficient than " { $link >vector } ", but the sharing of storage can lead to unexpected results." } ;
 
-HELP: with-datastack "( stack word -- newstack )"
+HELP: with-datastack
 { $values { "stack" "a sequence" } { "word" "a word" } { "newstack" "a sequence" } }
 { $description "Executes " { $snippet "word" } " with the given data stack contents, and outputs the new data stack after the word returns. Does not affect the data stack in surrounding code, other than consuming the two inputs and pushing the output." }
 { $examples

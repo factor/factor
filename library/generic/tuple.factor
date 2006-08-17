@@ -7,7 +7,7 @@ sequences-internals strings vectors words ;
 
 IN: kernel-internals
 
-: tuple= ( tuple tuple -- ? )
+: tuple= ( tuple1 tuple2 -- ? )
     2dup [ array-capacity ] 2apply number= [
         dup array-capacity
         [ 2dup swap array-nth >r pick array-nth r> = ] all? 2nip
@@ -20,7 +20,7 @@ IN: generic
 : class ( object -- class )
     dup tuple? [ 2 slot ] [ type type>class ] if ; inline
 
-: tuple-predicate ( word -- )
+: tuple-predicate ( class -- )
     dup predicate-word [
         [ dup tuple? ] %
         [ [ 2 slot ] % over literalize , \ eq? , ] [ ] make ,
@@ -30,7 +30,7 @@ IN: generic
 : forget-tuple ( class -- )
     dup forget "predicate" word-prop first [ forget ] when* ;
 
-: check-shape ( word slots -- )
+: check-shape ( class slots -- )
     >r in get lookup dup [
         dup "tuple-size" word-prop r> length 2 + =
         [ drop ] [ forget-tuple ] if
@@ -40,7 +40,7 @@ IN: generic
 
 : delegate-slots { { 3 object delegate set-delegate } } ;
 
-: tuple-slots ( tuple slots -- )
+: tuple-slots ( class slots -- )
     2dup "slot-names" set-word-prop
     2dup length 2 + "tuple-size" set-word-prop
     dupd 4 simple-slots
@@ -61,13 +61,13 @@ TUPLE: check-tuple class ;
         \ <tuple> , %
     ] [ ] make define-compound ;
 
-: default-constructor ( tuple -- )
+: default-constructor ( class -- )
     dup create-constructor 2dup "constructor" set-word-prop
     swap dup "slots" word-prop unclip drop <reversed>
     [ [ tuck ] swap peek add ] map concat >quotation
     define-constructor ;
 
-: define-tuple ( tuple slots -- )
+: define-tuple ( class slots -- )
     2dup check-shape
     >r create-in
     dup intern-symbol
@@ -91,7 +91,7 @@ M: tuple equal?
 : delegates ( obj -- seq )
     [ (delegates) ] { } make ;
 
-: is? ( obj pred -- ? )
+: is? ( obj quot -- ? )
     >r delegates r> contains? ; inline
 
 : >tuple ( seq -- tuple )

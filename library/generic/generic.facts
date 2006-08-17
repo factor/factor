@@ -1,19 +1,25 @@
 IN: generic
 USING: help ;
 
-HELP: methods "( word -- alist )"
-{ $values { "word" "a generic word" } { "alist" "a sequence of pairs" } }
-{ $description "Outputs a sequence of pairs, where the first element of each pair is a class and the second element is the corresponding method quotation." } ;
+HELP: generic
+{ $class-description "The class of generic words." }
+{ $see-also "generic" POSTPONE: GENERIC: POSTPONE: G: } ;
 
-HELP: order "( word -- classes )"
-{ $values { "word" "a generic word" } { "classes" "a sequence of classes" } }
-{ $description "Outputs a sequence of classes for which methods have been defined on this generic word. The sequence is sorted in method dispatch order." } ;
-
-HELP: generic f
-{ $description "The class of generic words." }
-{ $see-also POSTPONE: GENERIC: POSTPONE: G: } ;
-
-HELP: make-generic "( word -- )"
+HELP: make-generic
 { $values { "word" "a generic word" } }
 { $description "Regenerates the definition of a generic word by applying the method combination to the set of defined methods." }
 $low-level-note ;
+
+HELP: ?make-generic
+{ $values { "word" "a generic word" } }
+{ $description "Regenerates the definition of a generic word, unless bootstrap is in progress, in which case nothing is done. This avoids regenerating generic words multiple times during bootstrap as methods are defined. Instead, all generic words are built once at the end of the process, resulting in a performance improvement." }
+$low-level-note ;
+
+HELP: init-methods
+{ $values { "word" "a word" } }
+{ $description "Prepare to define a generic word." } ;
+
+HELP: define-generic*
+{ $values { "word" "a word" } { "combination" "a quotation with stack effect " { $snippet "( word -- quot )" } } }
+{ $description "Defines a generic word with the specified method combination. If the word is already a generic word, existing methods are retained." }
+{ $see-also POSTPONE: G: define-generic } ;

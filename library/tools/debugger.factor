@@ -21,11 +21,20 @@ M: string error. print ;
 
 SYMBOL: restarts
 
-: :s error-continuation get continuation-data stack. ;
-: :r error-continuation get continuation-retain stack. ;
-: :c error-continuation get continuation-call callstack. ;
-: :get error-continuation get continuation-name hash-stack ;
-: :res restarts get nth first3 continue-with ;
+: :s ( -- )
+    error-continuation get continuation-data stack. ;
+
+: :r ( -- )
+    error-continuation get continuation-retain stack. ;
+
+: :c ( -- )
+    error-continuation get continuation-call callstack. ;
+
+: :get ( variable -- value )
+    error-continuation get continuation-name hash-stack ;
+
+: :res ( n -- )
+    restarts get nth first3 continue-with ;
 
 : (:help-multi)
     "This error has multiple delegates:" print help-outliner ;

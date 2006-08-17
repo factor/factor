@@ -220,6 +220,7 @@ sequences vectors words ;
         "/library/ui/tools/launchpad.factor"
 
         "/library/continuations.facts"
+        "/library/definitions.facts"
         "/library/effects.facts"
         "/library/errors.facts"
         "/library/kernel.facts"
@@ -264,6 +265,7 @@ sequences vectors words ;
         "/library/generic/tuple.facts"
         "/library/help/help.facts"
         "/library/help/markup.facts"
+        "/library/help/porter-stemmer.facts"
         "/library/help/search.facts"
         "/library/help/syntax.facts"
         "/library/help/topics.facts"
@@ -273,6 +275,7 @@ sequences vectors words ;
         "/library/io/duplex-stream.facts"
         "/library/io/files.facts"
         "/library/io/lines.facts"
+        "/library/io/nested-style.facts"
         "/library/io/plain-stream.facts"
         "/library/io/server.facts"
         "/library/io/stdio.facts"

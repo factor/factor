@@ -49,6 +49,6 @@ TUPLE: client-stream host port ;
 TUPLE: c-stream-error ;
 : c-stream-error ( -- * ) <c-stream-error> throw ;
 
-: <client> c-stream-error ;
-: <server> c-stream-error ;
-: accept c-stream-error ;
+: <client> ( host port -- stream ) c-stream-error ;
+: <server> ( port -- server ) c-stream-error ;
+: accept ( server -- stream ) c-stream-error ;

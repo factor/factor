@@ -21,7 +21,7 @@ M: alien equal?
 
 global [ "libraries" nest drop ] bind
 
-: library ( name -- object ) "libraries" get hash ;
+: library ( name -- library ) "libraries" get hash ;
 
 : load-library ( name -- dll )
     library dup [
@@ -32,7 +32,7 @@ global [ "libraries" nest drop ] bind
         ] bind
     ] when ;
 
-: add-library ( library name abi -- )
+: add-library ( name path abi -- )
     "libraries" get [
         [ "abi" set "name" set ] make-hash swap set
     ] bind ;

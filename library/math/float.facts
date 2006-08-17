@@ -1,74 +1,74 @@
 USING: help math math-internals ;
 
-HELP: float f
-{ $description "The class of double-precision floating point numbers." } ;
+HELP: float
+{ $class-description "The class of double-precision floating point numbers." } ;
 
-HELP: >float "( x -- y )"
+HELP: >float ( x -- y )
 { $values { "x" "a real number" } { "y" "a float" } }
 { $description "Converts a real to a float. This is the identity on floats, and performs a floating point division on rationals." } ;
 
-HELP: bits>double "( n -- x )"
+HELP: bits>double ( n -- x )
 { $values { "n" "a 64-bit integer representing an 754 double-precision float" } { "x" "a float" } }
 { $description "Creates a " { $link float } " object from a binary representation. This word is usually used to reconstruct floats read from streams." }
 { $see-also bits>float double>bits float>bits } ;
 
-HELP: bits>float "( n -- x )"
+HELP: bits>float ( n -- x )
 { $values { "n" "a 32-bit integer representing an 754 single-precision float" } { "x" "a float" } }
 { $description "Creates a " { $link float } " object from a binary representation. This word is usually used to reconstruct floats read from streams." }
 { $see-also bits>double double>bits float>bits } ;
 
-HELP: double>bits "( x -- n )"
+HELP: double>bits ( x -- n )
 { $values { "x" "a float" } { "n" "a 64-bit integer representing an 754 double-precision float" } }
 { $description "Creates a " { $link float } " object from a binary representation. This word is usually used to reconstruct floats read from streams." }
 { $see-also bits>double bits>float float>bits } ;
 
-HELP: float>bits "( x -- n )"
+HELP: float>bits ( x -- n )
 { $values { "x" "a float" } { "n" "a 32-bit integer representing an 754 single-precision float" } }
 { $description "Creates a " { $link float } " object from a binary representation. This word is usually used to reconstruct floats read from streams." }
 { $see-also bits>double bits>float double>bits } ;
 
 ! Unsafe primitives
-HELP: float+ "( x y -- z )"
+HELP: float+ ( x y -- z )
 { $values { "x" "a float" } { "y" "a float" } { "z" "a float" } }
 { $description "Primitive version of " { $link + } "." }
 { $warning "This word does not perform type checking, and passing objects of the wrong type can crash the runtime. User code should call the generic word " { $link + } " instead." } ;
 
-HELP: float- "( x y -- z )"
+HELP: float- ( x y -- z )
 { $values { "x" "a float" } { "y" "a float" } { "z" "a float" } }
 { $description "Primitive version of " { $link - } "." }
 { $warning "This word does not perform type checking, and passing objects of the wrong type can crash the runtime. User code should call the generic word " { $link - } " instead." } ;
 
-HELP: float* "( x y -- z )"
+HELP: float* ( x y -- z )
 { $values { "x" "a float" } { "y" "a float" } { "z" "a float" } }
 { $description "Primitive version of " { $link * } "." }
 { $warning "This word does not perform type checking, and passing objects of the wrong type can crash the runtime. User code should call the generic word " { $link * } " instead." } ;
 
-HELP: float-mod "( x y -- z )"
+HELP: float-mod ( x y -- z )
 { $values { "x" "a float" } { "y" "a float" } { "z" "a float" } }
 { $description "Primitive version of " { $link mod } "." }
 { $warning "This word does not perform type checking, and passing objects of the wrong type can crash the runtime. User code should call the generic word " { $link mod } " instead." } ;
 
-HELP: float/f "( x y -- z )"
+HELP: float/f ( x y -- z )
 { $values { "x" "a float" } { "y" "a float" } { "z" "a float" } }
 { $description "Primitive version of " { $link /f } "." }
 { $warning "This word does not perform type checking, and passing objects of the wrong type can crash the runtime. User code should call the generic word " { $link /f } " instead." } ;
 
-HELP: float< "( x y -- ? )"
+HELP: float< ( x y -- ? )
 { $values { "x" "a float" } { "y" "a float" } { "?" "a boolean" } }
 { $description "Primitive version of " { $link < } "." }
 { $warning "This word does not perform type checking, and passing objects of the wrong type can crash the runtime. User code should call the generic word " { $link < } " instead." } ;
 
-HELP: float<= "( x y -- ? )"
+HELP: float<= ( x y -- ? )
 { $values { "x" "a float" } { "y" "a float" } { "?" "a boolean" } }
 { $description "Primitive version of " { $link <= } "." }
 { $warning "This word does not perform type checking, and passing objects of the wrong type can crash the runtime. User code should call the generic word " { $link <= } " instead." } ;
 
-HELP: float> "( x y -- ? )"
+HELP: float> ( x y -- ? )
 { $values { "x" "a float" } { "y" "a float" } { "?" "a boolean" } }
 { $description "Primitive version of " { $link > } "." }
 { $warning "This word does not perform type checking, and passing objects of the wrong type can crash the runtime. User code should call the generic word " { $link > } " instead." } ;
 
-HELP: float>= "( x y -- ? )"
+HELP: float>= ( x y -- ? )
 { $values { "x" "a float" } { "y" "a float" } { "?" "a boolean" } }
 { $description "Primitive version of " { $link >= } "." }
 { $warning "This word does not perform type checking, and passing objects of the wrong type can crash the runtime. User code should call the generic word " { $link >= } " instead." } ;

@@ -1,28 +1,25 @@
 USING: generic help math ;
 
-HELP: math-upgrade "( class1 class2 -- quot )"
+HELP: math-upgrade
 { $values { "class1" "a class word" } { "class2" "a class word" } { "quot" "a quotation with stack effect " { $snippet "( n n -- n n )" } } }
 { $description "Outputs a quotation for upgrading numberical types. It takes two numbers on the stack, an instance of " { $snippet "class1" } ", and an instance of " { $snippet "class2" } ", and converts the one with the lower priority to the higher priority type." }
 { $examples { $example "fixnum bignum math-upgrade ." "[ >r >bignum r> ]" } } ;
 
-HELP: no-math-method "( left right generic -- )"
+HELP: no-math-method
 { $values { "left" "an object" } { "right" "an object" } { "generic" "a generic word" } }
 { $description "Throws a " { $link no-math-method } " error." }
 { $error-description "Thrown by generic words using the " { $link math-combination } " method combination if there is no suitable method defined for the two inputs." } ;
 
-HELP: math-method "( word class1 class2 -- quot )"
+HELP: math-method
 { $values { "word" "a generic word" } { "class1" "a class word" } { "class2" "a class word" } { "quot" "a quotation" } }
 { $description "Generates a definition for " { $snippet "word" } " when the two inputs are instances of " { $snippet "class1" } " and " { $snippet "class2" } ", respectively." }
 { $examples { $example "\\ + fixnum float math-method ." "[ >r >float r> float+ ]" } } ;
 
-HELP: math-class? "( object -- ? )"
+HELP: math-class
 { $values { "object" "an object" } { "?" "a boolean" } }
-{ $description
-    "Tests if the object is a numerical class word. The numerical classes are precisely the following:"
-    { $list { $link fixnum } { $link bignum } { $link ratio } { $link float } { $link complex } }
-} ;
+{ $class-description "The class of subtypes of " { $link number } " which are not " { $link null } "." } ;
 
-HELP: math-combination "( word -- quot )"
+HELP: math-combination
 { $values { "word" "a generic word" } { "quot" "a quotation" } }
 { $description "Generates a double-dispatching word definition. Only methods defined on numerical classes and " { $link object } " take effect in the math combination. Methods defined on numerical classes are guaranteed to have their two inputs upgraded to the highest priority type of the two."
 $terpri
@@ -39,5 +36,6 @@ $terpri
 }
 "The math combination performs numerical upgrading as described in " { $link "number-protocol" } "." } ;
 
-HELP: 2generic f
-{ $description "The class of generic words with the math combination." } ;
+HELP: 2generic
+{ $class-description "The class of generic words using " { $link math-combination } "." }
+{ $see-also POSTPONE: G: } ;

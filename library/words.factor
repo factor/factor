@@ -175,7 +175,7 @@ TUPLE: check-create name vocab ;
 : forget-vocab ( vocab -- )
     words [ forget ] each ;
 
-: bootstrap-word ( word -- word )
+: bootstrap-word ( word -- target )
     bootstrapping? get [
         dup word-name swap word-vocabulary
         dup "syntax" = [

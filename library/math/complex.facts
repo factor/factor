@@ -1,59 +1,59 @@
 USING: help math math-internals ;
 
-HELP: complex f
-{ $description "The class of complex numbers with non-zero imaginary part." } ;
+HELP: complex
+{ $class-description "The class of complex numbers with non-zero imaginary part." } ;
 
-HELP: real "( z -- x )"
+HELP: real ( z -- x )
 { $values { "z" "a complex number" } { "x" "a real number" } }
 { $description "Outputs the real part of a complex number. This acts as the identity on real numbers." }
 { $notes "This word also acts as the class word for the class of real numbers, which is a disjoint union of rationals and floats." } ;
 
-HELP: imaginary "( z -- y )"
+HELP: imaginary ( z -- y )
 { $values { "z" "a complex number" } { "y" "a real number" } }
 { $description "Outputs the imaginary part of a complex number. This outputs zero for real numbers." } ;
 
-HELP: (rect>) "( x y -- z )"
+HELP: (rect>)
 { $values { "x" "a real number" } { "y" "a real number" } { "z" "a complex number" } }
 { $description "Creates a complex number from real and imaginary components." }
 { $warning "This word does not check that the arguments are real numbers, which can have undefined consequences. Use the " { $link rect> } " word instead." } ;
 
-HELP: number f
-{ $description "The class of numbers." } ;
+HELP: number
+{ $class-description "The class of numbers." } ;
 
-HELP: rect> "( x y -- z )"
+HELP: rect>
 { $values { "x" "a real number" } { "y" "a real number" } { "z" "a complex number" } }
 { $description "Creates a complex number from real and imaginary components." } ;
 
-HELP: >rect "( z -- x y )"
+HELP: >rect
 { $values { "z" "a complex number" } { "x" "a real number" } { "y" "a real number" } }
 { $description "Extracts the real and imaginary components of a complex number." } ;
 
-HELP: conjugate "( z -- z* )"
+HELP: conjugate
 { $values { "z" "a complex number" } { "z*" "a complex number" } }
 { $description "Computes the complex conjugate by flipping the sign of the imaginary part of " { $snippet "z" } "." } ;
 
-HELP: arg "( z -- arg )"
+HELP: arg
 { $values { "z" "a complex number" } { "arg" "a number in the interval " { $snippet "(-pi,pi]" } } }
 { $description "Computes the complex argument." } ;
 
-HELP: >polar "( z -- abs arg )"
+HELP: >polar
 { $values { "z" "a complex number" } { "abs" "a non-negative real number" } { "arg" "a number in the interval " { $snippet "(-pi,pi]" } } }
 { $description "Creates a complex number from an absolute value and argument (polar form)." } ;
 
-HELP: cis "( arg --- z )"
+HELP: cis
 { $values { "arg" "a real number" } { "z" "a complex number on the unit circle" } }
 { $description "Computes a point on the unit circle using Euler's formula for " { $snippet "exp(arg*i)" } "." }
 { $see-also exp } ;
 
-HELP: polar> "( abs arg -- z )"
+HELP: polar>
 { $values { "z" "a complex number" } { "abs" "a non-negative real number" } { "arg" "a real number" } }
 { $description "Converts an absolute value and argument (polar form) to a complex number." } ;
 
-HELP: 2>rect "( x y -- xr xi yr yi )"
+HELP: 2>rect
 { $values { "x" "a complex number" } { "y" "a complex number" } { "xr" "real part of " { $snippet "x" } } { "xi" "imaginary part of " { $snippet "x" } } { "yr" "real part of " { $snippet "y" } } { "yi" "imaginary part of " { $snippet "y" } } }
 { $description "Extracts real and imaginary components of two numbers at once." } ;
 
-HELP: complex/ "( x y -- r i m )"
+HELP: complex/
 { $values { "x" "a complex number" } { "y" "a complex number" } { "r" "a real number" } { "i" "a real number" } { "m" "a real number" } }
 { $description
     "Complex division kernel. If we use the notation from " { $link 2>rect } ", this word computes:"
@@ -64,6 +64,6 @@ HELP: complex/ "( x y -- r i m )"
     }
 } ;
 
-HELP: <complex> "( x y -- z )"
+HELP: <complex> ( x y -- z )
 { $values { "x" "a real number" } { "y" "a real number" } { "z" "a complex number" } }
 { $description "Low-level complex number constructor. User code should call " { $link rect> } " instead." } ;

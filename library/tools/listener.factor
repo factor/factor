@@ -14,7 +14,7 @@ SYMBOL: eval-hook
 
 : bye ( -- ) quit-flag on ;
 
-: (read-multiline) ( quot depth -- quot ? )
+: (read-multiline) ( quot depth -- newquot ? )
     >r readln dup [
         (parse) depth r> dup >r <= [
             ( we're done ) r> drop t

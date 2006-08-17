@@ -1,21 +1,21 @@
 USING: help sequences sequences-internals ;
 
-HELP: length "( seq -- n )"
+HELP: length
 { $values { "seq" "a sequence" } { "n" "a non-negative integer" } }
 { $contract "Outputs the length of the sequence. All sequences support this operation." } ;
 
-HELP: set-length "( n seq -- )"
+HELP: set-length
 { $values { "n" "a non-negative integer" } { "seq" "a resizable sequence" } }
-{ $description "Resizes the sequence. Not all sequences are resizable." }
+{ $contract "Resizes the sequence. Not all sequences are resizable." }
 { $errors "Throws a " { $link bounds-error } " if the new length is negative, or if the sequence is not resizable." }
 { $side-effects "seq" } ;
 
-HELP: nth "( n seq -- elt )"
+HELP: nth
 { $values { "n" "a non-negative integer" } { "seq" "a sequence" } { "elt" "the element at the " { $snippet "n" } "th index" } }
 { $contract "Outputs the " { $snippet "n" } "th element of the sequence. Elements are numbered from zero, so the last element has an index one less than the length of the sequence. All sequences support this operation." }
 { $errors "Throws a " { $link bounds-error } " if the index is negative, or greater than or equal to the length of the sequence." } ;
 
-HELP: set-nth "( elt n seq -- )"
+HELP: set-nth
 { $values { "elt" "an object" } { "n" "a non-negative integer" } { "seq" "a mutable sequence" } }
 { $contract "Sets the " { $snippet "n" } "th element of the sequence. Storing beyond the end of a resizable sequence such as a vector or string buffer grows the sequence." }
 { $errors "Throws an error if the index is negative, or if the sequence is not resizable and the index is greater than or equal to the length of the sequence."
@@ -23,78 +23,91 @@ $terpri
 "Throws an error if the sequence cannot hold elements of the given type." }
 { $side-effects "seq" } ;
 
-HELP: thaw "( seq -- resizable-seq )"
+HELP: thaw
 { $values { "seq" "a sequence" } { "resizable-seq" "a resizable mutable sequence" } }
 { $contract "Outputs an empty, resizable mutable sequence that can hold the elements of " { $snippet "seq" } "." }
 { $examples "The default implementation returns a new vector, but given a string, it returns a string buffer, since string buffers are more efficient in terms of memory usage." } ;
 
-HELP: like "( seq prototype -- newseq )"
+HELP: like
 { $values { "seq" "a sequence" } { "prototype" "a sequence" } { "newseq" "a sequence" } }
 { $contract "Outputs a sequence with the same elements as the input sequence, but " { $emphasis "like" } " the template sequence, in the sense that it either has the same class as the template sequence, or if the template sequence is a virtual sequence, the same class as the template sequence's underlying sequence. The default implementation does nothing." } ;
 
-HELP: empty? "( seq -- ? )"
+HELP: empty?
 { $values { "seq" "a sequence" } { "?" "a boolean" } }
 { $description "Tests if the sequence has zero length." } ;
 
-HELP: peek "( seq -- elt )"
-{ $values { "seq" "a sequence" } { "elt" "an object" } }
-{ $description "Outputs the last element of the sequence." }
-{ $errors "Throws an error if the sequence is empty." } ;
+HELP: delete-all
+{ $values { "seq" "a resizable sequence" } }
+{ $description "Resizes the sequence to zero length, removing all elements. Not all sequences are resizable." }
+{ $errors "Throws a " { $link bounds-error } " if the new length is negative, or if the sequence is not resizable." }
+{ $side-effects "seq" } ;
 
-HELP: resize "( n seq -- newseq )"
+HELP: resize
 { $values { "n" "a non-negative integer" } { "seq" "a sequence" } { "newseq" "a new sequence" } }
 { $description "Creates a new sequence of the same type as " { $snippet "seq" } " with " { $snippet "n" } " elements, and copies the contents of " { $snippet "seq" } " into the new sequence. If " { $snippet "n" } " exceeds the length of " { $snippet "seq" } ", the remaining elements are filled with a default value; " { $link f } " for arrays and 0 for strings." }
 { $notes "This generic word is only implemented for strings and arrays." } ;
 
-HELP: first "( seq -- first )"
+HELP: first
 { $values { "seq" "a sequence" } { "first" "the first element of the sequence" } }
 { $description "Outputs the first element of the sequence." }
 { $errors "Throws an error if the sequence is empty." } ;
 
-HELP: second "( seq -- second )"
+HELP: second
 { $values { "seq" "a sequence" } { "second" "the second element of the sequence" } }
 { $description "Outputs the second element of the sequence." }
 { $errors "Throws an error if the sequence contains less than two elements." } ;
 
-HELP: third "( seq -- third )"
+HELP: third
 { $values { "seq" "a sequence" } { "third" "the third element of the sequence" } }
 { $description "Outputs the third element of the sequence." }
 { $errors "Throws an error if the sequence contains less than three elements." } ;
 
-HELP: fourth "( seq -- fourth )"
+HELP: fourth
 { $values { "seq" "a sequence" } { "fourth" "the fourth element of the sequence" } }
 { $description "Outputs the fourth element of the sequence." }
 { $errors "Throws an error if the sequence contains less than four elements." } ;
 
-HELP: push "( elt seq -- )"
+HELP: push
 { $values { "elt" "an object" } { "seq" "a resizable mutable sequence" } }
 { $description "Adds an element at the end of the sequence. The sequence length is adjusted accordingly." }
 { $errors "Throws an error if " { $snippet "seq" } " is not resizable, or if the type of " { $snippet "elt" } " is not permitted in " { $snippet "seq" } "." }
 { $side-effects "seq" }
 { $see-also pop push-new } ;
 
-HELP: ?push "( elt seq/f -- seq )"
+HELP: ?push
 { $values { "elt" "an object" } { "seq/f" "a resizable mutable sequence, or " { $link f } } { "seq" "a resizable mutable sequence" } }
 { $description "If the given sequence is " { $link f } ", creates and outputs a new one-element vector holding " { $snippet "elt" } ". Otherwise, pushes " { $snippet "elt" } " onto the given sequence." }
 { $errors "Throws an error if " { $snippet "seq" } " is not resizable, or if the type of " { $snippet "elt" } " is not permitted in " { $snippet "seq" } "." }
 { $side-effects "seq" } ;
 
-HELP: bounds-check? "( n seq -- ? )"
+HELP: bounds-check?
 { $values { "n" "an integer" } { "seq" "a sequence" } { "?" "a boolean" } }
 { $description "Tests if the index is within the bounds of the sequence." } ;
 
-HELP: ?nth "( n seq/f -- elt )"
-{ $values { "n" "an integer" } { "seq" "a sequence" } { "elt" "an object" } }
+HELP: ?nth
+{ $values { "n" "an integer" } { "seq" "a sequence" } { "elt/f" "an object or " { $link f } } }
 { $description "A forgiving version of " { $link nth } ". If the index is out of bounds, or if the sequence is " { $link f } ", simply outputs " { $link f } "." } ;
 
-HELP: nth-unsafe "( n seq -- elt )"
+HELP: nth-unsafe
 { $values { "n" "an integer" } { "seq" "a sequence" } { "elt" "an object" } }
 { $contract "Unsafe variant of " { $link nth } " that does not perform bounds checks." } ;
 
-HELP: set-nth-unsafe "( elt n seq -- )"
+HELP: set-nth-unsafe
 { $values { "elt" "an object" } { "n" "an integer" } { "seq" "a sequence" } }
 { $contract "Unsafe variant of " { $link set-nth } " that does not perform bounds checks." } ;
 
 HELP: exchange-unsafe "( m n seq -- )"
 { $values { "m" "a non-negative integer" } { "n" "a non-negative integer" } { "seq" "a mutable sequence" } }
 { $description "Unsafe variant of " { $link exchange } " that does not perform bounds checks." } ;
+
+HELP: first2-unsafe
+{ $values { "seq" "a sequence" } { "first" "the first element" } { "second" "the second element" } }
+{ $contract "Unsafe variant of " { $link first2 } " that does not perform bounds checks." } ;
+
+HELP: first3-unsafe
+{ $values { "seq" "a sequence" } { "first" "the first element" } { "second" "the second element" } { "third" "the third element" } }
+{ $contract "Unsafe variant of " { $link first3 } " that does not perform bounds checks." } ;
+
+HELP: first4-unsafe
+{ $values { "seq" "a sequence" } { "first" "the first element" } { "second" "the second element" } { "third" "the third element" } { "fourth" "the fourth element" } }
+{ $contract "Unsafe variant of " { $link first4 } " that does not perform bounds checks." } ;

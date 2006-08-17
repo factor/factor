@@ -1,11 +1,11 @@
 USING: generic help sequences ;
 
-HELP: no-method "( object generic -- )"
+HELP: no-method
 { $values { "object" "an object" } { "generic" "a generic word" } }
 { $description "Throws a " { $link no-method } " error." }
 { $error-description "Thrown by the " { $snippet "generic" } " word to indicate it does not have a method for the class of " { $snippet "object" } "." } ;
 
-HELP: standard-combination "( word dispatch# -- quot )"
+HELP: standard-combination
 { $values { "word" "a generic word" } { "dispatch#" "a dispatch position" } { "quot" "a new quotation" } }
 { $description
     "Performs standard method combination."
@@ -24,7 +24,7 @@ HELP: standard-combination "( word dispatch# -- quot )"
 { $examples "Most generic words in the standard library use this method combination with a dispatch position of 0. A handful of combinators such as " { $link each } " dispatch on position 1, since position 0 (the top of the stack) is a quotation." }
 { $see-also POSTPONE: GENERIC: define-generic POSTPONE: G: define-generic* } ;
 
-HELP: define-generic "( word -- )"
+HELP: define-generic
 { $values { "word" "a word" } }
 { $description "Defines a generic word with the " { $link standard-combination } " method combination, and a dispatch position of 0." }
 { $see-also POSTPONE: GENERIC: define-generic* } ;

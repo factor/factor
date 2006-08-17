@@ -1,16 +1,16 @@
-USING: help io ;
+USING: help io styles ;
 
-HELP: cwd "( -- path )"
+HELP: cwd ( -- path )
 { $values { "path" "a path name string" } }
 { $description "Outputs the current working directory of the Factor process." }
 { $see-also cd } ;
 
-HELP: cd "( path -- )"
+HELP: cd ( path -- )
 { $values { "path" "a path name string" } }
 { $description "Changes the current working directory of the Factor process." }
 { $see-also cwd } ;
 
-HELP: stat "( path -- array/f )"
+HELP: stat ( path -- array/f )
 { $values { "path" "a path name string" } { "array/f" "a four-element array or " { $link f } } }
 { $description
     "If the file does not exist, outputs " { $link f } ". Otherwise, outputs a four-element array:"
@@ -22,11 +22,11 @@ HELP: stat "( path -- array/f )"
     }
 } ;
 
-HELP: path+ "( str1 str2 -- str )"
+HELP: path+
 { $values { "str1" "a string" } { "str2" "a string" } { "str" "a string" } }
 { $description "Concatenates two path names." } ;
 
-HELP: exists? "( path -- ? )"
+HELP: exists?
 { $values { "path" "a string" } { "?" "a boolean" } }
 { $description "Tests if the file named by " { $snippet "path" } " exists." } ;
 
@@ -34,22 +34,30 @@ HELP: directory? "( path -- ? )"
 { $values { "path" "a string" } { "?" "a boolean" } }
 { $description "Tests if " { $snippet "path" } " names a directory." } ;
 
-HELP: directory "( path -- seq )"
+HELP: directory
 { $values { "path" "a string" } { "seq" "a sequence of file name strings" } }
 { $description "Outputs a sorted sequence of file names stored in the directory named by " { $snippet "path" } "." } ;
 
-HELP: file-length "( path -- n )"
+HELP: file-length
 { $values { "path" "a string" } { "n" "a non-negative integer or " { $link f } } }
 { $description "Outputs the length of the file in bytes, or " { $link f } " if it does not exist." } ;
 
-HELP: resource-path "( resource -- path )"
-{ $values { "resource" "a string" } { "path" "a string" } }
-{ $description "Resolve a path relative to the Factor source code location." } ;
+HELP: parent-dir
+{ $values { "path" "a string" } { "parent" "a string" } }
+{ $description "Strips the last component off a path name." }
+{ $examples { $example "\"/etc/passwd\" parent-dir print" "/etc" } } ;
 
-HELP: <resource-reader> "( resource -- stream )"
+HELP: resource-path
+{ $values { "resource" "a string" } { "path" "a string" } }
+{ $description "Resolve a path relative to the Factor source code location. This first checks if the " { $link resource-path } " variable is set to a path, and if not, uses the parent directory of the current image." } ;
+
+HELP: <resource-reader>
 { $values { "resource" "a string" } { "stream" "an input stream" } }
 { $description "Opens a file relative to the Factor source code location." } ;
 
-HELP: directory. "( path -- )"
+HELP: pathname
+{ $class-description "Class of path name presentations. Instances can be used as the value associated to the " { $link presented } " key in the style hashtable passed to " { $link stream-format } " to output a clickable path name." } ;
+
+HELP: directory.
 { $values { "path" "a string" } }
 { $description "Prints a directory listing to the " { $link stdio } " stream. If the stream supports it, subdirectories are shown as expandable outliners." } ;

@@ -5,9 +5,9 @@ USING: arrays generic hashtables io kernel kernel-internals
 math namespaces prettyprint sequences strings styles vectors
 words ;
 
-GENERIC: sheet ( obj -- sheet )
+GENERIC: sheet ( object -- sheet )
 
-: slot-sheet ( obj -- sheet )
+: slot-sheet ( object -- sheet )
     dup class "slots" word-prop [
         dup third -rot first slot 2array
     ] map-with ;
@@ -44,10 +44,10 @@ M: hashtable sheet hash>alist ;
 
 : describe ( object -- ) dup summary print sheet sheet. ;
 
-: stack. ( seq -- seq ) <reversed> >array sheet sheet. ;
+: stack. ( seq -- ) <reversed> >array sheet sheet. ;
 
-: .s datastack stack. ;
-: .r retainstack stack. ;
+: .s ( -- ) datastack stack. ;
+: .r ( -- ) retainstack stack. ;
 
 : callframe. ( seq pos -- )
     [
@@ -57,7 +57,7 @@ M: hashtable sheet hash>alist ;
         terpri
     ] with-scope ;
 
-: callstack. ( seq -- seq )
+: callstack. ( seq -- )
     3 group <reversed> [ first2 1- callframe. ] each ;
 
-: .c callstack callstack. ;
+: .c ( -- ) callstack callstack. ;

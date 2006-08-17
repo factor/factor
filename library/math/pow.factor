@@ -3,17 +3,17 @@
 IN: math
 USING: errors kernel math math-internals ;
 
-: exp >rect swap fexp swap polar> ; inline
-: log >polar swap flog swap rect> ; inline
+: exp ( x -- y ) >rect swap fexp swap polar> ; inline
+: log ( x -- y ) >polar swap flog swap rect> ; inline
 
-GENERIC: sqrt ( n -- n ) foldable
+GENERIC: sqrt ( x -- y ) foldable
 
 M: complex sqrt >polar swap fsqrt swap 2 / polar> ;
 M: real sqrt dup 0 < [ neg fsqrt 0 swap rect> ] [ fsqrt ] if ;
 
-GENERIC: (^) ( z w -- z^w ) foldable
+GENERIC: (^) ( x y -- z ) foldable
 
-: ^ ( z w -- z^w )
+: ^ ( x y -- z )
     over zero? [
         dup zero?
         [ 2drop 0.0/0.0 ] [ 0 < [ drop 1.0/0.0 ] when ] if

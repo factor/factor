@@ -7,7 +7,7 @@ namespaces porter-stemmer prettyprint sequences strings words ;
 ! Right now this code is specific to the help. It will be
 ! generalized to an abstract full text search engine later.
 
-: ignored-word? ( str -- ? )
+: ignored-word? ( string -- ? )
     { "the" "of" "is" "to" "an" "and" "if" "in" "with" "this" "not" "are" "for" "by" "can" "be" "or" "from" "it" "does" "as" } member? ;
 
 : tokenize ( string -- seq )
@@ -17,12 +17,12 @@ namespaces porter-stemmer prettyprint sequences strings words ;
         dup ignored-word? over length 1 = or swap empty? or not
     ] subset ;
 
-: index-text ( article string -- )
+: index-text ( topic string -- )
     tokenize [ 1 -rot nest hash+ ] each-with ;
 
 SYMBOL: term-index
 
-: index-article ( article -- )
+: index-article ( topic -- )
     term-index get [
         [ dup [ help ] string-out index-text ] bind
     ] [
@@ -36,7 +36,7 @@ SYMBOL: term-index
         drop
     ] if* ;
 
-: discard-irrelevant ( results -- results )
+: discard-irrelevant ( results -- newresults )
     #! Discard results in the low 33%
     dup 0 [ second max ] reduce
     swap [ first2 rot / 2array ] map-with

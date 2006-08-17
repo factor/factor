@@ -1,6 +1,6 @@
 IN: inspector
 USING: help ;
 
-HELP: summary "( object -- string )"
+HELP: summary
 { $values { "object" "an object" } { "string" "a string" } }
 { $contract "Outputs a brief description of the object." } ;

@@ -10,7 +10,7 @@ parser prettyprint sequences styles words ;
 : reload ( defspec -- )
     where first [ ?resource-path run-file ] when* ;
 
-GENERIC: (synopsis) ( spec -- )
+GENERIC: (synopsis) ( defspec -- )
 
 : write-vocab ( vocab -- )
     dup <vocab-link> presented associate styled-text ;
@@ -20,7 +20,7 @@ GENERIC: (synopsis) ( spec -- )
         H{ } <block \ IN: pprint-word write-vocab block;
     ] when* ;
 
-: comment. ( comment -- )
+: comment. ( string -- )
     [ H{ { font-style italic } } styled-text ] when* ;
 
 M: word (synopsis)
@@ -32,7 +32,7 @@ M: word (synopsis)
 M: method-spec (synopsis)
     \ M: pprint-word [ pprint-word ] each ;
 
-: synopsis ( word -- string )
+: synopsis ( defspec -- str )
     [ 0 margin set [ (synopsis) ] with-pprint ] string-out ;
 
 GENERIC: definition ( spec -- quot ? )
@@ -43,7 +43,7 @@ M: compound definition word-def t ;
 
 M: generic definition "combination" word-prop t ;
 
-M: method-spec definition first2 method t ;
+M: method-spec definition first2 method method-def t ;
 
 GENERIC: declarations. ( obj -- )
 

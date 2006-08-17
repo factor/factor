@@ -10,7 +10,7 @@ USING: compiler namespaces kernel win32-io-internals win32-stream win32-api
 
 IN: io-internals
 
-: io-multiplex ( timeout -- )
+: io-multiplex ( ms -- )
     #! FIXME: needs to work given a timeout
     dup -1 = [ drop INFINITE ] when cancel-timedout wait-for-io 
     swap [ schedule-thread-with ] [ drop ] if* ;

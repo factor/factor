@@ -9,43 +9,43 @@ IN: help
     } $notes ;
 
 HELP: position f
-{ $description "Variable. The prettyprinter's current character position." } ;
+{ $var-description "The prettyprinter's current character position." } ;
 
 HELP: last-newline f
-{ $description "Variable. The character position of the last newline output by the prettyprinter." } ;
+{ $var-description "The character position of the last newline output by the prettyprinter." } ;
 
 HELP: recursion-check f
-{ $description "Variable. The current nesting of collections being output by the prettyprinter, used to detect circularity and prevent infinite recursion." } ;
+{ $var-description "The current nesting of collections being output by the prettyprinter, used to detect circularity and prevent infinite recursion." } ;
 
 HELP: line-count f
-{ $description "Variable. The number of lines output by the prettyprinter so far, used for line limiting (see " { $link line-limit } ")." } ;
+{ $var-description "The number of lines output by the prettyprinter so far, used for line limiting (see " { $link line-limit } ")." } ;
 
 HELP: end-printing f
-{ $description "Variable. A continuation captured by " { $link do-pprint } " that breaks out of the printer." } ;
+{ $var-description "A continuation captured by " { $link do-pprint } " that breaks out of the printer." } ;
 
 HELP: indent f
-{ $description "Variable. The prettyprinter's current indent level." } ;
+{ $var-description "The prettyprinter's current indent level." } ;
 
 HELP: pprinter-stack f
-{ $description "Variable. A stack of " { $link block } " objects currently being constructed by the prettyprinter." } ;
+{ $var-description "A stack of " { $link block } " objects currently being constructed by the prettyprinter." } ;
 
 HELP: tab-size f
-{ $description "Variable. Prettyprinter tab size. Indent nesting is always a multiple of the tab size. The default is 4." } ;
+{ $var-description "Prettyprinter tab size. Indent nesting is always a multiple of the tab size. The default is 4." } ;
 
 HELP: margin f
-{ $description "Variable. The maximum line length, in characters. Lines longer than the margin are wrapped. The default is 64." } ;
+{ $var-description "The maximum line length, in characters. Lines longer than the margin are wrapped. The default is 64." } ;
 
 HELP: nesting-limit f
-{ $description "Variable. The maximum nesting level. Structures that nest further than this will simply print as a pound sign (#). The default is " { $link f } ", denoting unlimited nesting depth." } ;
+{ $var-description "The maximum nesting level. Structures that nest further than this will simply print as a pound sign (#). The default is " { $link f } ", denoting unlimited nesting depth." } ;
 
 HELP: length-limit f
-{ $description "Variable. The maximum printed sequence length. Sequences longer than this are truncated, and \"...\" is output in place of remaining elements. The default is " { $link f } ", denoting unlimited sequence length." } ;
+{ $var-description "The maximum printed sequence length. Sequences longer than this are truncated, and \"...\" is output in place of remaining elements. The default is " { $link f } ", denoting unlimited sequence length." } ;
 
 HELP: line-limit f
-{ $description "Variable. The maximum number of lines output by the prettyprinter before output is truncated with \"...\". The default is " { $link f } ", denoting unlimited line count." } ;
+{ $var-description "The maximum number of lines output by the prettyprinter before output is truncated with \"...\". The default is " { $link f } ", denoting unlimited line count." } ;
 
 HELP: string-limit f
-{ $description "Variable. Toggles whenever printed strings are truncated to the margin." } ;
+{ $var-description "Toggles whenever printed strings are truncated to the margin." } ;
 
 HELP: pprint-section* "( section -- )"
 { $values { "section" "a section" } }

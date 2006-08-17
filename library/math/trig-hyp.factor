@@ -3,35 +3,35 @@
 IN: math
 USING: kernel math math-internals ;
 
-: cos ( z -- cos )
+: cos ( x -- y )
     >rect 2dup
     fcosh swap fcos * -rot
     fsinh swap fsin neg * rect> ; inline
 
-: sec cos recip ; inline
+: sec ( x -- y ) cos recip ; inline
 
-: cosh ( z -- cosh )
+: cosh ( x -- y )
     >rect 2dup
     fcos swap fcosh * -rot
     fsin swap fsinh * rect> ; inline
 
-: sech cosh recip ; inline
+: sech ( x -- y ) cosh recip ; inline
 
-: sin ( z -- sin )
+: sin ( x -- y )
     >rect 2dup
     fcosh swap fsin * -rot
     fsinh swap fcos * rect> ; inline
 
-: cosec sin recip ; inline
+: cosec ( x -- y ) sin recip ; inline
 
-: sinh ( z -- sinh )
+: sinh ( x -- y )
     >rect 2dup
     fcos swap fsinh * -rot
     fsin swap fcosh * rect> ; inline
 
-: cosech sinh recip ; inline
+: cosech ( x -- y ) sinh recip ; inline
 
-: tan dup sin swap cos / ; inline
-: tanh dup sinh swap cosh / ; inline
-: cot dup cos swap sin / ; inline
-: coth dup cosh swap sinh / ; inline
+: tan ( x -- y ) dup sin swap cos / ; inline
+: tanh ( x -- y ) dup sinh swap cosh / ; inline
+: cot ( x -- y ) dup cos swap sin / ; inline
+: coth ( x -- y ) dup cosh swap sinh / ; inline

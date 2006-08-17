@@ -5,16 +5,16 @@ USING: arrays definitions errors hashtables kernel
 kernel-internals namespaces sequences strings words
 vectors math parser ;
 
-PREDICATE: word class "class" word-prop ;
+PREDICATE: word class ( obj -- ? ) "class" word-prop ;
 
-: classes ( -- list ) [ class? ] word-subset ;
+: classes ( -- seq ) [ class? ] word-subset ;
 
 SYMBOL: typemap
 SYMBOL: builtins
 
-: type>class ( n -- symbol ) builtins get nth ;
+: type>class ( n -- class ) builtins get nth ;
 
-: predicate-word ( word -- word )
+: predicate-word ( word -- predicate )
     word-name "?" append create-in ;
 
 : predicate-effect 1 1 <effect> ;
@@ -29,14 +29,14 @@ SYMBOL: builtins
         3drop
     ] if ;
 
-: superclass "superclass" word-prop ;
+: superclass ( class -- super ) "superclass" word-prop ;
 
 : members "members" word-prop ;
 
 : (flatten-class) ( class -- )
     dup members [ [ (flatten-class) ] each ] [ dup set ] ?if ;
 
-: flatten-class ( class -- classes )
+: flatten-class ( class -- seq )
     [ (flatten-class) ] make-hash ;
 
 : (types) ( class -- )
@@ -45,7 +45,7 @@ SYMBOL: builtins
         [ (types) ] [ "type" word-prop dup set ] ?if
     ] hash-each ;
 
-: types ( class -- types )
+: types ( class -- seq )
     [ (types) ] make-hash hash-keys natural-sort ;
 
 DEFER: (class<)
@@ -60,7 +60,7 @@ DEFER: (class<)
 : class-empty? ( class -- ? )
     members dup [ empty? ] when ;
 
-: (class<) ( cls1 cls2 -- ? )
+: (class<) ( class1 class2 -- ? )
     {
         { [ 2dup eq? ] [ 2drop t ] }
         { [ over class-empty? ] [ 2drop t ] }
@@ -71,7 +71,7 @@ DEFER: (class<)
 
 SYMBOL: class<cache
 
-: class< ( cls1 cls2 -- ? )
+: class< ( class1 class2 -- ? )
     class<cache get [ hash hash-member? ] [ (class<) ] if* ;
 
 : smaller-classes ( class seq -- )
@@ -86,18 +86,19 @@ SYMBOL: class<cache
     [ make-class<cache class<cache set call ] with-scope ;
     inline
 
-: class-compare ( cls1 cls2 -- -1/0/1 )
+: class-compare ( class1 class2 -- n )
     2dup eq? [ 2drop 0 ] [ class< 1 -1 ? ] if ;
 
-: lookup-union ( class-set -- class )
+: lookup-union ( classes -- class )
     typemap get hash [ object ] unless* ;
 
-: types* ( class -- hash ) types [ type>class dup ] map>hash ;
+: types* ( class -- classes )
+    types [ type>class dup ] map>hash ;
 
 : (class-or) ( class class -- class )
     [ types* ] 2apply hash-union lookup-union ;
 
-: class-or ( class class -- class )
+: class-or ( class1 class2 -- class )
     {
         { [ 2dup class< ] [ nip ] }
         { [ 2dup swap class< ] [ drop ] }
@@ -107,14 +108,14 @@ SYMBOL: class<cache
 : (class-and) ( class class -- class )
     [ types* ] 2apply hash-intersect lookup-union ;
 
-: class-and ( class class -- class )
+: class-and ( class1 class2 -- class )
     {
         { [ 2dup class< ] [ drop ] }
         { [ 2dup swap class< ] [ nip ] }
         { [ t ] [ (class-and) ] }
     } cond ;
 
-: classes-intersect? ( class class -- ? )
+: classes-intersect? ( class1 class2 -- ? )
     class-and class-empty? not ;
 
 : min-class ( class seq -- class/f )
@@ -139,7 +140,7 @@ SYMBOL: class<cache
 PREDICATE: class predicate "definition" word-prop ;
 
 ! Union classes for dispatch on multiple classes.
-: union-predicate ( members -- list )
+: union-predicate ( seq -- quot )
     [ dup ] swap [ "predicate" word-prop append ] map-with
     [ [ drop t ] 2array ] map [ drop f ] swap alist>quot ;
 

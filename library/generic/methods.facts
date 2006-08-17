@@ -1,20 +1,43 @@
 IN: generic
 USING: help ;
 
-HELP: check-method "( class generic -- class generic )"
+HELP: method-spec
+{ $class-description "The class of method specifiers, which are two-element arrays consisting of a class word followed by a generic word." }
+{ $examples { $code "{ fixnum + }" "{ editor draw-gadget* }" } } ;
+
+HELP: method
+{ $values { "class" "a class word" } { "generic" "a generic word" } { "method" "an instance of " { $link method } } }
+{ $description "Looks up a method definition." }
+{ $class-description "Instances of this class are methods. A method consists of a quotation together with a source location where it was defined." }
+{ $see-also method-def method-loc define-method POSTPONE: M: } ;
+
+HELP: <method> ( def loc -- method )
+{ $values { "def" "a quotation" } { "loc" "a file/line pair or " { $link f } } { "method" "a new method definition" } }
+{ $description "Creates a new  "{ $link method } " instance." } ;
+
+HELP: methods
+{ $values { "word" "a generic word" } { "assoc" "a sequence of pairs" } }
+{ $description "Outputs a sequence of pairs, where the first element of each pair is a class and the second element is the corresponding method quotation." } ;
+
+HELP: order
+{ $values { "word" "a generic word" } { "seq" "a sequence of classes" } }
+{ $description "Outputs a sequence of classes for which methods have been defined on this generic word. The sequence is sorted in method dispatch order." } ;
+
+HELP: check-method
 { $values { "class" "a class word" } { "generic" "a generic word" } }
 { $description "Asserts that " { $snippet "class" } " is a class word and " { $snippet "generic" } " is a generic word, throwing a " { $link check-method } " error if the assertion fails." }
 { $error-description "Thrown if " { $link POSTPONE: M: } " or " { $link define-method } " is given an invalid class or generic word." } ;
 
-HELP: with-methods "( word quot -- )"
+HELP: with-methods
 { $values { "word" "a generic word" } { "quot" "a quotation with stack effect " { $snippet "( methods -- )" } } }
 { $description "Applies a quotation to the generic word's methods hashtable, and regenerates the generic word's definition when the quotation returns." }
 $low-level-note ;
 
-HELP: define-method "( quot class generic -- )"
-{ $values { "quot" "a quotation" } { "class" "a class word" } { "generic" "a generic word" } }
-{ $description "Defines a method on " { $snippet "generic" } " associating " { $snippet "class" } " with " { $snippet "quot" } "." } ;
+HELP: define-method
+{ $values { "method" "an instance of " { $link method } } { "class" "a class word" } { "generic" "a generic word" } }
+{ $description "Defines a method. This is the runtime equivalent of " { $link POSTPONE: M: } "." }
+{ $see-also <method> } ;
 
-HELP: implementors "( class -- seq )"
+HELP: implementors
 { $values { "class" "a class word" } { "seq" "a sequence of generic words" } }
 { $description "Finds all generic words in the dictionary implementing methods for this class." } ;

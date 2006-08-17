@@ -30,17 +30,17 @@ M: object digit> drop f ;
 : string>integer ( string radix -- n )
     swap "-" ?head >r (string>integer) dup r> and [ neg ] when ;
 
-: base> ( string radix -- n )
+: base> ( str radix -- n/f )
     {
         { [ CHAR: / pick member? ] [ string>ratio ] }
         { [ CHAR: . pick member? ] [ drop string>float ] }
         { [ t ] [ string>integer ] }
     } cond ;
 
-: string>number ( string -- num ) 10 base> ;
-: bin> ( string -- num ) 2 base> ;
-: oct> ( string -- num ) 8 base> ;
-: hex> ( string -- num ) 16 base> ;
+: string>number ( str -- n ) 10 base> ;
+: bin> ( str -- n ) 2 base> ;
+: oct> ( str -- n ) 8 base> ;
+: hex> ( str -- n ) 16 base> ;
 
 : >digit ( n -- ch )
     dup 10 < [ CHAR: 0 + ] [ 10 - CHAR: a + ] if ;
@@ -49,7 +49,7 @@ M: object digit> drop f ;
     dup >r /mod >digit , dup 0 >
     [ r> integer, ] [ r> 2drop ] if ;
 
-G: >base ( num radix -- string ) 1 standard-combination ;
+G: >base ( n radix -- str ) 1 standard-combination ;
 
 M: integer >base
     [
@@ -78,7 +78,7 @@ M: float >base
         { [ t ] [ float>string fix-float ] }
     } cond ;
 
-: number>string ( num -- string ) 10 >base ;
+: number>string ( n -- str ) 10 >base ;
 : >bin ( num -- string ) 2 >base ;
 : >oct ( num -- string ) 8 >base ;
 : >hex ( num -- string ) 16 >base ;

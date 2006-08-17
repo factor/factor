@@ -16,9 +16,9 @@ sequences words ;
         >quotation
     ] with-parser ;
 
-: parse ( str -- code ) <string-reader> lines parse-lines ;
+: parse ( str -- quot ) <string-reader> lines parse-lines ;
 
-: eval ( "X" -- X ) parse call ;
+: eval ( str -- ) parse call ;
 
 SYMBOL: parse-hook
 

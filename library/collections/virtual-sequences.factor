@@ -6,7 +6,8 @@ USING: errors generic kernel math sequences-internals vectors ;
 ! A reversal of an underlying sequence.
 TUPLE: reversed seq ;
 
-: reversed@ reversed-seq [ length swap - 1- ] keep ; inline
+: reversed@ ( m reversed -- n seq )
+    reversed-seq [ length swap - 1- ] keep ; inline
 
 M: reversed length reversed-seq length ;
 
@@ -23,7 +24,7 @@ M: reversed like reversed-seq like ;
 
 M: reversed thaw reversed-seq thaw ;
 
-: reverse ( seq -- seq ) [ <reversed> ] keep like ;
+: reverse ( seq -- newseq ) [ <reversed> ] keep like ;
 
 ! A slice of another sequence.
 TUPLE: slice seq from to ;
@@ -39,7 +40,7 @@ TUPLE: slice-error reason ;
     length over < [ "end > sequence" slice-error ] when
     > [ "start > end" slice-error ] when ;
 
-C: slice ( from to seq -- seq )
+C: slice ( m n seq -- slice )
     #! A slice of a slice collapses.
     >r dup slice? [ collapse-slice ] when r>
     >r 3dup check-slice r>
@@ -50,7 +51,7 @@ C: slice ( from to seq -- seq )
 M: slice length
     dup slice-to swap slice-from - ;
 
-: slice@ ( n slice -- n seq )
+: slice@ ( m slice -- n seq )
     [ slice-from + ] keep slice-seq ; inline
 
 M: slice nth slice@ nth ;

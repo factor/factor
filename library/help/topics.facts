@@ -1,71 +1,67 @@
 IN: help
 USING: io ;
 
-HELP: print-element "( element -- )"
-{ $values { "element" "a markup element" } }
-{ $description "Prints a markup element to the " { $link stdio } " stream." } ;
+HELP: articles
+{ $var-description "Hashtable mapping article names to " { $link article } " instances." } ;
 
-HELP: articles f
-{ $description "Variable. Hashtable mapping article names to " { $link article } " instances." } ;
-
-HELP: no-article "( name -- )"
+HELP: no-article
 { $values { "name" "an article name" } }
 { $description "Throws a " { $link no-article } " error." }
 { $error-description "Thrown by " { $link help } " if the given help topic does not exist, or if the help topic being dispayed links to a help topic which does not exist." } ;
 
-HELP: article "( name -- article )"
+HELP: article
 { $values { "name" "an article name" } { "article" "an " { $link article } " object" } }
 { $description "Outputs a named " { $link article } " object." } ;
 
-HELP: article-title "( topic -- string )"
+HELP: article-title ( topic -- string )
 { $values { "topic" "an article name or a word" } { "string" "a string" } }
 { $description "Outputs the title of a specific help article." } ;
 
-HELP: article-content "( topic -- element )"
+HELP: article-content ( topic -- element )
 { $values { "topic" "an article name or a word" } { "element" "a markup element" } }
 { $description "Outputs the content of a specific help article." } ;
 
-HELP: all-articles "( -- seq )"
+HELP: all-articles
 { $values { "seq" "a sequence" } }
 { $description "Outputs a sequence of all help article names, and all words with documentation." } ;
 
-HELP: elements "( elt-type element -- seq )"
+HELP: elements
 { $values { "elt-type" "a word" } { "element" "a markup element" } { "seq" "a new sequence" } }
 { $description "Outputs a sequence of all elements of type " { $snippet "elt-type" } " found by traversing " { $snippet "element" } "." } ;
 
-HELP: collect-elements "( element seq -- )"
+HELP: collect-elements
 { $values { "element" "a markup element" } { "seq" "a sequence of words" } { "elements" "a new sequence" } }
 { $description "Collects the arguments of all sub-elements of " { $snippet "element" } " whose markup element type occurs in " { $snippet "seq" } "." }
 { $notes "Used to implement " { $link children } "." } ;
 
-HELP: parent-graph f
-{ $description "Variable. A graph whose vertices are help articles and edges are subsections. See " { $link "graphs" } "." }
+HELP: parent-graph
+{ $var-description "A graph whose vertices are help articles and edges are subsections. See " { $link "graphs" } "." }
 { $see-also children parents xref-help } ;
 
-HELP: children "( topic -- seq )"
+HELP: children
 { $values { "topic" "an article name or a word" } { "seq" "a new sequence" } }
 { $description "Outputs a sequence of all subsections of " { $snippet "topic" } "." } ;
 
-HELP: parents "( topic -- seq )"
+HELP: parents
 { $values { "topic" "an article name or a word" } { "seq" "a new sequence" } }
 { $description "Outputs a sequence of all help articles which contain " { $snippet "topic" } " as a subsection." } ;
 
-HELP: doc-path "( topic -- seq )"
+HELP: doc-path
 { $values { "topic" "an article name or a word" } { "seq" "a new sequence" } }
 { $description "Outputs a sequence of all help articles which contain " { $snippet "topic" } " as a subsection, traversing all the way up to the root." }
 { $examples
     { $example "\"sequences\" doc-path ." "{ \"collections\" \"handbook\" }" }
 } ;
 
-HELP: xref-article "( topic -- )"
+HELP: xref-article
 { $values { "topic" "an article name or a word" } }
 { $description "Adds an article to the " { $link parent-graph } " graph." }
 $low-level-note ;
 
-HELP: unxref-article "( topic -- )"
+HELP: unxref-article
 { $values { "topic" "an article name or a word" } }
 { $description "Removes an article to the " { $link parent-graph } " graph." }
 $low-level-note ;
 
-HELP: xref-help "( -- )"
+HELP: xref-help
 { $description "Update the " { $link parent-graph } ". Usually this is done automatically." } ;

@@ -13,7 +13,8 @@ C: duplex-stream ( in out -- stream )
     [ set-duplex-stream-in ] keep ;
 
 TUPLE: check-closed ;
-: check-closed ( duplex -- )
+
+: check-closed ( stream -- )
     duplex-stream-closed? [ <check-closed> throw ] when ;
 
 : duplex-stream-in+ ( duplex -- stream )

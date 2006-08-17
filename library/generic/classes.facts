@@ -1,34 +1,37 @@
 USING: generic help kernel kernel-internals ;
 
-HELP: typemap f
+HELP: classes
+{ $values { "seq" "a sequence of class words" } }
+{ $description "Finds all class words in the dictionary." } ;
+
+HELP: typemap
 { $description "Global variable. Hashtable mapping unions to class words." }
 { $see-also class-and } ;
 
-HELP: builtins f
+HELP: builtins
 { $description "Global variable. Vector mapping type numbers to builtin class words." } ;
 
-HELP: object f
+HELP: object
 { $description
     "The class of all objects. If a generic word defines a method specializing on this class, the method is used as a fallback, if no other applicable method is found. For instance:"
     { $code "GENERIC: enclose" "M: number enclose 1array ;" "M: object enclose ;" }
 } ;
 
-HELP: null f
+HELP: null
 { $description
     "The canonical empty class with no instances."
 } ;
 
-
-HELP: type>class "( n -- class )"
+HELP: type>class
 { $values { "n" "a non-negative integer" } { "class" "a class word" } }
 { $description "Outputs a builtin class whose instances are precisely those of a builtin type." }
 { $notes "The parameter " { $snippet "n" } " must be between 0 and the return value of " { $link num-types } "." } ;
 
-HELP: predicate-word "( word -- predicate )"
+HELP: predicate-word
 { $values { "word" "a word" } { "predicate" "a predicate word" } }
 { $description "Suffixes \"?\" to the name of " { $snippet "word" } " and creates a word with that name in the current vocabulary." } ;
 
-HELP: define-predicate "( class predicate quot -- )"
+HELP: define-predicate
 { $values { "class" "a class word" } { "predicate" "a predicate word" } { "quot" "a quotation" } }
 { $description
     "Defines a predicate word. This is identical to a compound definition associating " { $snippet "quot" } " with " { $snippet "predicate" } " with the added perk that two word properties are set:"
@@ -40,7 +43,7 @@ HELP: define-predicate "( class predicate quot -- )"
 }
 $low-level-note ;
 
-HELP: superclass "( class -- super )"
+HELP: superclass
 { $values { "class" "a class word" } { "super" "a class word" } }
 { $description "Outputs the superclass of a class. All instances of this class are also instances of the superclass." }
 { $notes "If " { $link class< } " yields that one class is a subtype of another, it does not imply that a superclass relation is involved. The superclass relation is a technical implementation detail of predicate classes (see " { $link POSTPONE: PREDICATE: } ").." } ;
@@ -49,95 +52,88 @@ HELP: members "( class -- seq )"
 { $values { "class" "a class word" } { "seq" "a sequence of union members, or " { $link f } } }
 { $description "If " { $snippet "class" } " is a union class, outputs a sequence of members, otherwise outputs " { $link f } "." } ;
 
-HELP: flatten-class "( class -- seq )"
+HELP: flatten-class
 { $values { "class" "a class word" } { "seq" "a sequence of classes" } }
 { $description "Outputs a sequence of classes whose union is the given class. Unless the given class is a union class, the output is just a singleton sequence consisting of the given class." } ;
 
-HELP: types "( class -- seq )"
+HELP: types
 { $values { "class" "a class word" } { "seq" "a sequence of integers" } }
 { $description "Outputs a sequence of builtin type numbers whose instances can possibly be instances of the given class." } ;
 
-HELP: class-empty? "( class -- ? )"
+HELP: class-empty?
 { $values { "class" "a class" } }
 { $description "Tests if a class is a union class with no members." }
 { $examples { $example "null class-empty? ." "t" } } ;
 
-HELP: class< "( class1 class2 -- ? )"
+HELP: class<
 { $values { "class1" "a class" } { "class2" "a class" } { "?" "a boolean" } }
 { $description "Tests if all instances of " { $snippet "class1" } " are also instances of " { $snippet "class2" } "." }
 { $notes "Classes are partially ordered. This means that if " { $snippet "class1 <= class2" } " and " { $snippet "class2 <= class1" } ", then " { $snippet "class1 = class2" } ". Also, if " { $snippet "class1 <= class2" } " and " { $snippet "class2 <= class3" } ", then " { $snippet "class1 <= class3" } "." } ;
 
-HELP: class-compare "( class1 class2 -- n )"
+HELP: make-class<cache
+{ $values { "hash" "a hashtable" } }
+{ $description "Constructs a hashtable mapping classes to hashtables of classes which are smaller than them under " { $link class< } "." }
+{ $notes "This word should not be called directly. Instead, use " { $link with-class<cache } "." } ;
+
+HELP: with-class<cache
+{ $values { "quot" "a quotation" } }
+{ $description "Calls the quotation in a new dynamic scope where the " { $link class<cache } " variable is bound to a hashtable output by " { $link make-class<cache } ". When this variable is bound, " { $link class< } " can be performed much more quickly than usual." }
+{ $notes "Calls to compile large numbers of words can be wrapped in this combinator to reduce compile time." } ;
+
+HELP: class-compare
 { $values { "class1" "a class" } { "class2" "a class" } { "n" "an integer" } }
 { $description "Compares two classes, with the sign of the result indicating their sort order." }
 { $notes "This word is used to sort sequences of classes." }
 { $see-also methods order } ;
 
-HELP: ?make-generic "( word -- )"
-{ $values { "word" "a generic word" } }
-{ $description "Regenerates the definition of a generic word, unless bootstrap is in progress, in which case nothing is done. This avoids regenerating generic words multiple times during bootstrap as methods are defined. Instead, all generic words are built once at the end of the process, resulting in a performance improvement." }
-$low-level-note ;
+HELP: lookup-union
+{ $values { "classes" "a hashtable mapping class words to themselves" } { "class" "a class word" } }
+{ $description "Given a set of classes represented as a hashtable with equal keys and values, looks up a previously-defined union class having those members. If no union is defined, outputs " { $link object } "." }
+{ $see-also "unions" class-and class-or } ;
 
-HELP: init-methods "( word -- )"
-{ $values { "word" "a word" } }
-{ $description "Prepare to define a generic word." } ;
-
-HELP: define-generic* "( word combination -- )"
-{ $values { "word" "a word" } { "combination" "a quotation with stack effect " { $snippet "( word -- quot )" } } }
-{ $description "Defines a generic word with the specified method combination. If the word is already a generic word, existing methods are retained." }
-{ $see-also POSTPONE: G: define-generic } ;
-
-HELP: lookup-union "( classes -- class )"
-{ $values { "classes" "a hashtable where keys are classes and values equal keys" } { "class" "a class word" } }
-{ $description "Outputs a class that is the union of the given classes. If no precise match is found, outputs " { $link object } ", even if the given set is not an exhaustive cover all classes." } ;
-
-HELP: types* "( class -- classes )"
-{ $values { "class" "a class word" } { "classes" "a hashtable where keys are classes and values equal keys" } }
+HELP: types*
+{ $values { "class" "a class word" } { "classes" "a hashtable mapping class words to themselves" } }
 { $description "Outputs a sequence of builtin classes whose instances can possibly be instances of the given class." } ;
 
-HELP: class-or "( class1 class2 -- class )"
+HELP: class-or
 { $values { "class1" "a class word" } { "class2" "a class word" } { "class" "a class word" } }
 { $description "Outputs a class whose instances are instances of either one of the two input classes. If the union is non-empty but no class with those members is defined, outputs " { $link object } "." } ;
 
-HELP: class-and "( class1 class2 -- class )"
+HELP: class-and
 { $values { "class1" "a class word" } { "class2" "a class word" } { "class" "a class word" } }
 { $description "Outputs a class whose instances are instances of both input classes. If the intersection is non-empty but no class with those members is defined, outputs " { $link object } ". If the intersection is empty, outputs " { $link null } "." } ;
 
-HELP: classes-intersect? "( class1 class2 -- ? )"
+HELP: classes-intersect?
 { $values { "class1" "a class word" } { "class2" "a class word" } { "?" "a boolean" } }
 { $description "Tests if two classes have a non-empty intersection." } ;
 
-HELP: min-class "( class seq -- class/f )"
+HELP: min-class
 { $values { "class" "a class word" } { "seq" "a sequence of class words" } { "class/f" "a class word or " { $link f } } }
 { $description "If all classes in " { $snippet "seq" } " that intersect " { $snippet "class" } " are subtypes of " { $snippet "class" } ", outputs the last such element of " { $snippet "seq" } ". If any conditions fail to hold, outputs " { $link f } "." } ;
 
-HELP: define-class "( class -- )"
+HELP: define-class
 { $values { "class" "a class word" } }
 { $description "Sets a property indicating this is a class word, and registers the class in the global union lookup map." }
 $low-level-note ;
-
-HELP: classes "( -- seq )"
-{ $values { "seq" "a sequence of class words" } }
-{ $description "Finds all class words in the dictionary." } ;
 
 HELP: define-predicate-class "( class predicate definition -- )"
 { $values { "class" "a class word" } { "predicate" "a predicate word" } { "definition" "a quotation with stack effect " { $snippet "( superclass -- ? )" } } }
 { $description "Defines a predicate class. The superclass of " { $snippet "class" } " must already be set." }
 { $see-also POSTPONE: PREDICATE: } ;
 
-HELP: predicate f
-{ $description "The class of predicate class words." }
-{ $see-also POSTPONE: PREDICATE: } ;
+HELP: predicate
+{ $class-description "The class of predicate class words." }
+{ $see-also "predicates" POSTPONE: PREDICATE: } ;
 
-HELP: union-predicate "( seq -- quot )"
+HELP: union-predicate
 { $values { "seq" "a sequence of class words" } { "quot" "a quotation with stack effect " { $snippet "( object -- ? )" } } }
 { $description "Outputs a quotation for testing of an object is an instance of one of the given classes." } ;
 
-HELP: define-union "( class predicate members -- )"
+HELP: define-union
 { $values { "class" "a class word" } { "predicate" "a predicate word" } { "members" "a sequence of class words" } }
 { $description "Defines a union class with specified members." }
 { $see-also POSTPONE: UNION: } ;
 
-HELP: union f
-{ $description "The class of union class words." } 
-{ $see-also POSTPONE: UNION: } ;
+HELP: union
+{ $class-description "The class of union class words." } 
+{ $see-also "unions" POSTPONE: UNION: } ;

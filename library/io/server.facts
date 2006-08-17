@@ -1,40 +1,40 @@
 USING: help io ;
 
-HELP: log-stream f
-{ $description "Variable. Holds an output stream for logging messages." }
+HELP: log-stream
+{ $var-description "Holds an output stream for logging messages." }
 { $see-also log-error log-client with-log-file with-logging } ;
 
-HELP: log-message "( str -- )"
+HELP: log-message
 { $values { "str" "a string" } }
 { $description "Logs a message to the log stream. If " { $link log-stream } " is not set, logs to the " { $link stdio } " stream." }
 { $see-also log-error log-client } ;
 
-HELP: log-error "( str -- )"
+HELP: log-error
 { $values { "str" "a string" } }
 { $description "Logs an error message." }
 { $see-also log-message log-client } ;
 
-HELP: log-client "( client -- )"
+HELP: log-client
 { $values { "client" "a client socket stream" } }
 { $description "Logs an incoming client connection." }
 { $see-also log-message log-error } ;
 
-HELP: with-log-file "( path quot -- )"
+HELP: with-log-file
 { $values { "path" "a string" } { "quot" "a quotation" } }
 { $description "Calls the quotation in a new dynamic scope where the " { $link log-stream } " is set to a file output stream writing to " { $snippet "path" } "." } ;
 
-HELP: with-logging "( quot -- )"
+HELP: with-logging
 { $values { "quot" "a quotation" } }
 { $description "Calls the quotation in a new dynamic scope where the " { $link log-stream } " is set to the " { $link stdio } " stream " { $emphasis "at this point in time" } "." } ;
 
-HELP: with-client "( quot client -- )"
+HELP: with-client
 { $values { "quot" "a quotation" } { "client" "a client socket stream" } }
 { $description "Logs a client connection and spawns a new thread that calls the quotation, with the " { $link stdio } " stream set to the client stream. If the quotation throws an error, the client connection is closed, and the error is printed to the " { $link stdio } " stream at the time the thread was spawned." } ;
 
-HELP: server-stream f
-{ $description "Variable. Current server socket, set by " { $link with-server } "." } ;
+HELP: server-stream
+{ $var-description "Current server socket, set by " { $link with-server } "." } ;
 
-HELP: with-server "( port ident quot -- )"
+HELP: with-server
 { $values { "port" "an integer from 0 to 65535" } { "ident" "a symbol" } { "quot" "a quotation" } }
 { $description "Starts a TCP/IP server. The quotation is called in a new thread for each client connection, with the client connection being the " { $link stdio } " stream. Client connections are logged to the " { $link stdio } " stream at the time the server was started."
 $terpri

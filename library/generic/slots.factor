@@ -5,13 +5,13 @@ IN: generic
 USING: arrays kernel kernel-internals math namespaces
 parser sequences strings words ;
 
-: define-typecheck ( class generic def -- )
+: define-typecheck ( class generic quot -- )
     over define-generic -rot define-method ;
 
 : define-slot-word ( class slot word quot -- )
     rot >fixnum add* define-typecheck ;
 
-: reader-effect 1 1 <effect> ; inline
+: reader-effect ( -- effect ) 1 1 <effect> ; inline
 
 : define-reader ( class slot decl reader -- )
     dup [
@@ -23,7 +23,7 @@ parser sequences strings words ;
         2drop 2drop
     ] if ;
 
-: writer-effect 2 0 <effect> ; inline
+: writer-effect ( -- effect ) 2 0 <effect> ; inline
 
 : define-writer ( class slot writer -- )
     dup [

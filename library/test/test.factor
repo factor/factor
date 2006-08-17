@@ -17,7 +17,7 @@ TUPLE: assert got expect ;
 : benchmark ( quot -- gctime runtime )
     millis >r gc-time >r call gc-time r> - millis r> - ;
 
-: time ( code -- )
+: time ( quot -- )
     benchmark
     [ # " ms run / " % # " ms GC time" % ] "" make print flush ;
 

@@ -1,74 +1,90 @@
 USING: help math ;
 
-HELP: vneg "( u -- v )"
+HELP: vneg
 { $values { "u" "a sequence of numbers" } { "v" "a sequence of numbers" } }
 { $description "Negates each element of " { $snippet "u" } "." } ;
 
-HELP: n*v "( n u -- v )"
+HELP: n*v
 { $values { "n" "a number" } { "u" "a sequence of numbers" } { "v" "a sequence of numbers" } }
 { $description "Multiplies each element of " { $snippet "u" } " by " { $snippet "n" } "." } ;
 
-HELP: v*n "( n u -- v )"
+HELP: v*n
 { $values { "n" "a number" } { "u" "a sequence of numbers" } { "v" "a sequence of numbers" } }
 { $description "Multiplies each element of " { $snippet "u" } " by " { $snippet "n" } "." } ;
 
-HELP: n/v "( n u -- v )"
+HELP: n/v
 { $values { "n" "a number" } { "u" "a sequence of numbers" } { "v" "a sequence of numbers" } }
 { $description "Divides " { $snippet "n" } " by each element of " { $snippet "u" } "." } ;
 
-HELP: v/n "( n u -- v )"
-{ $values { "n" "a number" } { "u" "a sequence of numbers" } { "v" "a sequence of numbers" } }
+HELP: v/n
+{ $values { "u" "a sequence of numbers" } { "n" "a number" } { "v" "a sequence of numbers" } }
 { $description "Divides each element of " { $snippet "u" } " by " { $snippet "n" } "." } ;
 
-HELP: v+ "( u v -- w )"
+HELP: v+
 { $values { "u" "a sequence of numbers" } { "v" "a sequence of numbers" } { "w" "a sequence of numbers" } }
 { $description "Adds " { $snippet "u" } " and " { $snippet "v" } " component-wise." } ;
 
-HELP: v- "( u v -- w )"
+HELP: v-
 { $values { "u" "a sequence of numbers" } { "v" "a sequence of numbers" } { "w" "a sequence of numbers" } }
 { $description "Subtracts " { $snippet "v" } " from " { $snippet "u" } " component-wise." } ;
 
-HELP: v* "( u v -- w )"
+HELP: v*
 { $values { "u" "a sequence of numbers" } { "v" "a sequence of numbers" } { "w" "a sequence of numbers" } }
 { $description "Multiplies " { $snippet "u" } " and " { $snippet "v" } " component-wise." } ;
 
-HELP: v/ "( u v -- w )"
+HELP: v/
 { $values { "u" "a sequence of numbers" } { "v" "a sequence of numbers" } { "w" "a sequence of numbers" } }
 { $description "Divides " { $snippet "u" } " by " { $snippet "v" } " component-wise." }
 { $errors "Throws an error if an integer division by zero occurs." } ;
 
-HELP: vmax "( u v -- w )"
+HELP: vmax
 { $values { "u" "a sequence of real numbers" } { "v" "a sequence of real numbers" } { "w" "a sequence of real numbers" } }
 { $description "Creates a sequence where each element is the maximum of the corresponding elements from " { $snippet "u" } " andd " { $snippet "v" } "." }
 { $examples { $example "{ 1 2 5 } { -7 6 3 } vmax ." "{ 1 6 5 }" } } ;
 
-HELP: vmin "( u v -- w )"
+HELP: vmin
 { $values { "u" "a sequence of real numbers" } { "v" "a sequence of real numbers" } { "w" "a sequence of real numbers" } }
 { $description "Creates a sequence where each element is the minimum of the corresponding elements from " { $snippet "u" } " andd " { $snippet "v" } "." }
 { $examples { $example "{ 1 2 5 } { -7 6 3 } vmin ." "{ -7 2 3 }" } } ;
 
-HELP: v. "( u v -- y )"
-{ $values { "u" "a sequence of real numbers" } { "v" "a sequence of real numbers" } { "y" "a real number" } }
+HELP: v.
+{ $values { "u" "a sequence of real numbers" } { "v" "a sequence of real numbers" } { "x" "a real number" } }
 { $description "Computes the real-valued dot product." }
 { $notes
     "This word can also take complex number sequences as input, however mathematically it will compute the wrong result. The complex-valued dot product is defined differently:"
     { $snippet "0 [ conjugate * + ] 2reduce" }
 } ;
 
-HELP: norm-sq "( v -- y )"
-{ $values { "v" "a sequence of numbers" } { "y" "a non-negative real number" } }
+HELP: norm-sq
+{ $values { "v" "a sequence of numbers" } { "x" "a non-negative real number" } }
 { $description "Computes the squared length of a mathematical vector." } ;
 
-HELP: norm "( v -- y )"
-{ $values { "v" "a sequence of numbers" } { "y" "a non-negative real number" } }
+HELP: norm
+{ $values { "v" "a sequence of numbers" } { "x" "a non-negative real number" } }
 { $description "Computes the length of a mathematical vector." } ;
 
-HELP: normalize "( v -- v )"
+HELP: normalize "( u -- v )"
 { $values { "u" "a sequence of numbers" } { "v" "a sequence of numbers" } }
 { $description "Computes a mathematical vector with the same direction but length 1." }
 { $errors "Throws an error if " { $snippet "v" } " has zero length." } ;
 
-HELP: set-axis "( u v axis -- w )"
+HELP: set-axis
 { $values { "u" "a sequence of numbers" } { "v" "a sequence of numbers" } { "w" "a sequence of numbers" } }
 { $description "Using " { $snippet "w" } " as a template, creates a new sequence containing corresponding elements from " { $snippet "x" } " in place of 0, and corresponding elements from " { $snippet "y" } " in place of 1." }
 { $examples { $example "{ 1 2 3 } { 4 5 6 } { 0 1 0 } set-axis ." "{ 1 5 3 }" } } ;
+
+HELP: sum
+{ $values { "seq" "a sequence of numbers" } { "n" "a number" } }
+{ $description "Outputs the sum of all elements of " { $snippet "seq" } ". Outputs zero given an empty sequence." } ;
+
+HELP: product
+{ $values { "seq" "a sequence of numbers" } { "n" "a number" } }
+{ $description "Outputs the product of all elements of " { $snippet "seq" } ". Outputs one given an empty sequence." } ;
+
+HELP: infimum
+{ $values { "seq" "a sequence of real numbers" } { "n" "a number" } }
+{ $description "Outputs the least element of " { $snippet "seq" } ". Outputs positive infinity given an empty sequence." } ;
+
+HELP: supremum
+{ $values { "seq" "a sequence of real numbers" } { "n" "a number" } }
+{ $description "Outputs the greatest element of " { $snippet "seq" } ". Outputs negative infinity given an empty sequence." } ;

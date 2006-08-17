@@ -1,6 +1,6 @@
-USING: generic help ;
+USING: generic help kernel-internals parser ;
 
-HELP: define-typecheck "( class generic quot -- )"
+HELP: define-typecheck
 { $values { "class" "a class word" } { "generic" "a generic word" } { "quot" "a quotation" } }
 { $description
     "Defines a generic word with the " { $link standard-combination } " using dispatch position 0, and having one method on " { $snippet "class" } "."
@@ -14,12 +14,31 @@ HELP: define-typecheck "( class generic quot -- )"
 }
 { $notes "This word is used internally to wrap low-level code that does not do type-checking in safe user-visible words." } ;
 
-HELP: define-slot-word "( class slot word quot -- )"
-{ $values { "class" "a class word" } { "slot" "a non-negative integer" } { "word" "a new word" } { "quot" "a quotation" } }
+HELP: define-slot-word
+{ $values { "class" "a class word" } { "slot" "a positive integer" } { "word" "a new word" } { "quot" "a quotation" } }
 { $description "Defines " { $snippet "word" } " to be a simple type-checking generic word that receives the slot number on the stack as a fixnum." }
 $low-level-note ;
 
-HELP: define-slots "( class spec -- )"
+HELP: reader-effect
+{ $values { "effect" "an instance of " { $link effect } } }
+{ $description "The stack effect of slot reader words is " { $snippet "( obj -- value )" } "." } ;
+
+HELP: define-reader
+{ $values { "class" "a class word" } { "slot" "a positive integer" } { "decl" "a class word or " { $link f } } { "reader" "a word" } }
+{ $description "Defines a generic word " { $snippet "reader" } " to read a slot from instances of " { $snippet "class" } ". If " { $snippet "decl" } " is not " { $link f } ", then " { $link declare } " is applied to the slot value to declare that the value is an instance of a specific class." }
+$low-level-note ;
+
+HELP: define-writer
+{ $values { "class" "a class word" } { "slot" "a positive integer" } { "writer" "a word" } }
+{ $description "Defines a generic word " { $snippet "writer" } " to write a new value to a slot in instances of " { $snippet "class" } "." }
+$low-level-note ;
+
+HELP: define-slot
+{ $values { "class" "a class word" } { "slot" "a positive integer" } { "decl" "a class word or " { $link f } } { "reader" "a word" } { "writer" "a word" } }
+{ $description "Defines a pair of generic words, " { $snippet "reader" } " and " { $snippet "writer" } " for reading and writing a slot value in instances of " { $snippet "class" } "." }
+$low-level-note ;
+
+HELP: define-slots
 { $values { "class" "a class word" } { "spec" "a sequence of triples" } }
 { $description
     "Defines a set of slot accessor/mutator words."
@@ -34,6 +53,7 @@ HELP: define-slots "( class spec -- )"
 }
 $low-level-note ;
 
-HELP: simple-slots "( class slots base -- spec )"
+HELP: simple-slots
 { $values { "class" "a class word" } { "slots" "a sequence of strings" } { "base" "a slot number" } }
-{ $description "Constructs a slot specification for " { $link define-slots } " where each slot is named by an element of " { $snippet "slots" } " prefixed by the name of the class. Slots are numbered consecutively starting from " { $snippet "base" } ". Reader and writer words are defined in the current vocabulary, with the reader word having the same name as the slot, and the writer word name prefixed by " { $snippet "\"set-\"" } "." } ;
+{ $description "Constructs a slot specification for " { $link define-slots } " where each slot is named by an element of " { $snippet "slots" } " prefixed by the name of the class. Slots are numbered consecutively starting from " { $snippet "base" } ". Reader and writer words are defined in the current vocabulary, with the reader word having the same name as the slot, and the writer word name prefixed by " { $snippet "\"set-\"" } "." }
+{ $notes "This word is used by " { $link define-tuple } " and " { $link POSTPONE: TUPLE: } "." } ;

@@ -26,13 +26,13 @@ UNION: integer fixnum bignum ;
         >r 1 shift r> (next-power-of-2)
     ] if ;
 
-: next-power-of-2 ( n -- n ) 2 swap (next-power-of-2) ;
+: next-power-of-2 ( m -- n ) 2 swap (next-power-of-2) ;
 
-: d>w/w ( d -- w w )
+: d>w/w ( d -- w1 w2 )
     dup HEX: ffffffff bitand
     swap -32 shift HEX: ffffffff bitand ;
 
-: w>h/h ( w -- h h )
+: w>h/h ( w -- h1 h2 )
     dup HEX: ffff bitand
     swap -16 shift HEX: ffff bitand ;
 

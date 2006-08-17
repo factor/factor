@@ -85,15 +85,15 @@ IN: sequences
     swap dup length 1 <=
     [ 2drop ] [ 0 over length 1- (nsort) ] if ; inline
 
-: sort ( seq quot -- seq )
+: sort ( seq quot -- sortedseq )
     swap [ swap nsort ] immutable ; inline
 
-: natural-sort ( seq -- seq ) [ <=> ] sort ;
+: natural-sort ( seq -- sortedseq ) [ <=> ] sort ;
 
 : binsearch ( elt seq quot -- i )
     swap dup empty?
     [ 3drop -1 ] [ flatten-slice (binsearch) ] if ; inline
 
-: binsearch* ( elt seq quot -- elt )
+: binsearch* ( elt seq quot -- result )
     over >r binsearch dup -1 = [ r> 2drop f ] [ r> nth ] if ;
     inline

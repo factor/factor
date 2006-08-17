@@ -20,7 +20,7 @@ HELP: module-def
 { $notes "This file is loaded by " { $link require } ", and should contain the necessary " { $link POSTPONE: REQUIRES: } " and " { $link POSTPONE: PROVIDE: } " declarations for the module." } ;
 
 HELP: modules
-{ $description "Variable. Hashtable mapping loaded module names to " { $link module } " instances." }
+{ $var-description "Hashtable mapping loaded module names to " { $link module } " instances." }
 { $see-also require load-module } ;
 
 HELP: load-module

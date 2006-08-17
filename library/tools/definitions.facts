@@ -1,21 +1,34 @@
 IN: definitions
 USING: help ;
 
-HELP: reload "( word -- )"
-{ $values { "word" "a word" } }
-{ $description "Reloads the source file containing the most recent redefinition of the word." }
-{ $errors "Throws an error if the word was not defined in a file, or if an error occurs while running the file." } ;
+HELP: ?resource-path
+{ $values { "path" "a string" } { "newpath" "a string" } }
+{ $description "If the path is prefixed with " { $snippet "\"resource:\"" } ", prepends the resource path." }
+{ $see-also resource-path } ;
 
-HELP: in. "( word -- )"
+HELP: reload
+{ $values { "defspec" "a definition specifier" } }
+{ $description "Reloads the source file containing the definition." }
+{ $examples
+    "To reload a word definition:"
+    { $code "\ foo reload" }
+    "A method definition:"
+    { $code "{ editor draw-gadget* } reload" }
+    "A help article:"
+    { $code "\"handbook\" <link> reload" }
+} ;
+
+HELP: in.
 { $values { "word" "a word" } }
 { $description "Prettyprints a " { $snippet "IN:" } " declaration for the word." }
 $prettyprinting-note ;
 
-HELP: (synopsis) "( defspec -- )"
+HELP: (synopsis)
 { $values { "defspec" "a definition specifier" } }
 { $contract "Prettyprints the prologue of a definition." }
 $prettyprinting-note ;
 
-HELP: comment. "( string -- )"
+HELP: comment.
+{ $values { "string" "a string" } }
 { $description "Prettyprints some text with the comment style." }
 $prettyprinting-note ;

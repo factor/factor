@@ -32,39 +32,36 @@ M: string clone (clone) ;
 M: string resize resize-string ;
 
 ! Characters
-PREDICATE: integer blank     " \t\n\r" member? ;
-PREDICATE: integer letter    CHAR: a CHAR: z between? ;
-PREDICATE: integer LETTER    CHAR: A CHAR: Z between? ;
-PREDICATE: integer digit     CHAR: 0 CHAR: 9 between? ;
+PREDICATE: integer blank " \t\n\r" member? ;
+PREDICATE: integer letter CHAR: a CHAR: z between? ;
+PREDICATE: integer LETTER CHAR: A CHAR: Z between? ;
+PREDICATE: integer digit CHAR: 0 CHAR: 9 between? ;
 PREDICATE: integer printable CHAR: \s CHAR: ~ between? ;
-PREDICATE: integer control   "\0\e\r\n\t\u0008\u007f" member? ;
+PREDICATE: integer control "\0\e\r\n\t\u0008\u007f" member? ;
+PREDICATE: printable quotable "\"\\" member? not ;
 
 UNION: Letter letter LETTER ;
 UNION: alpha Letter digit ;
 
-: ch>lower ( n -- n ) dup LETTER? [ HEX: 20 + ] when ;
-: ch>upper ( n -- n ) dup letter? [ HEX: 20 - ] when ;
-: >lower ( str -- str ) [ ch>lower ] map ;
-: >upper ( str -- str ) [ ch>upper ] map ;
+: ch>lower ( ch -- lower ) dup LETTER? [ HEX: 20 + ] when ;
+: ch>upper ( ch -- lower ) dup letter? [ HEX: 20 - ] when ;
+: >lower ( str -- lower ) [ ch>lower ] map ;
+: >upper ( str -- upper ) [ ch>upper ] map ;
 
-: quotable? ( ch -- ? )
-    dup printable? swap "\"\\" member? not and ; foldable
-
-: padding ( string count char -- string )
+: padding ( str n ch -- padstr )
     >r swap length [-] r> <string> ;
 
-: pad-left ( string count char -- string )
+: pad-left ( str n ch -- padded )
     pick >r padding r> append ;
 
-: pad-right ( string count char -- string )
+: pad-right ( str n ch -- padded )
     pick >r padding r> swap append ;
 
 : ch>string ( ch -- str ) 1 swap <string> ;
 
-: >string ( seq -- array )
+: >string ( seq -- str )
     [ string? ] [ 0 <string> ] >sequence ; inline
 
 M: string thaw drop SBUF" " clone ;
 
-M: string like
-    drop dup string? [ >string ] unless ;
+M: string like drop dup string? [ >string ] unless ;

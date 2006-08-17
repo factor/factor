@@ -1,35 +1,36 @@
 IN: inspector
 USING: help io kernel prettyprint words ;
 
-HELP: sheet "( object -- sheet )"
+HELP: sheet
 { $values { "object" "an object" } { "sheet" "a sequence of sequences" } }
 { $contract "Outputs a representation of the object for the " { $link describe } " word, which is a table where each row corresponds to an object slot, and consists of a number of columns, presumably including the slot name and value." } ;
 
-HELP: slot-sheet "( object -- sheet )"
+HELP: slot-sheet
 { $values { "object" "an object" } { "sheet" "a sequence of sequences" } }
 { $description "Outputs a table of object slot names and values. This is used by the default implementation of " { $link sheet } "." } ;
 
-HELP: describe "( object -- )"
+HELP: describe
 { $values { "object" "an object" } }
-{ $description "Print a tabular overview of the object, featuring expanding outliners of the default stream supports them (for example, in the Factor UI)."
+{ $description "Print a tabular overview of the object."
+$terpri
 "For sequences and hashtables, this outputs the entries of the collection. For all other object types, slot names and values are shown." }
 { $notes "Slot values are converted to strings using " { $link unparse-short } "." }
 { $examples { $code "global describe" } } ;
 
-HELP: stack. "( seq -- )"
+HELP: stack.
 { $values { "seq" "a sequence" } }
 { $description "Prints an outliner listing elements of a sequence in reverse order. Elements are coverted to strings using " { $link unparse-short } "." }
 { $notes "This word is used in the implementation of " { $link .s } " and " { $link .r } "." } ;
 
-HELP: callstack. "( seq -- )"
+HELP: callstack.
 { $values { "seq" "a sequence" } }
 { $description "Displays a sequence output by " { $link callstack } " in a nice way, by highlighting the current execution point in every call frame." } ;
 
-HELP: .c "( -- )"
+HELP: .c
 { $description "Displays the contents of the call stack, with the top of the stack printed first." } ;
 
-HELP: .r "( -- )"
+HELP: .r
 { $description "Displays the contents of the retain stack, with the top of the stack printed first." } ;
 
-HELP: .s "( -- )"
+HELP: .s
 { $description "Displays the contents of the data stack, with the top of the stack printed first." } ;

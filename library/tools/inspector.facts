@@ -1,30 +1,30 @@
 IN: inspector
 USING: errors help ;
 
-HELP: inspector-slots f
-{ $description "If the inspector is running, this variable holds slot values for the object being inspected." }
+HELP: inspector-slots
+{ $var-description "If the inspector is running, this variable holds slot values for the object being inspected." }
 { $see-also go } ;
 
-HELP: inspector-stack f
-{ $description "If the inspector is running, this variable holds previously-inspected objects." }
+HELP: inspector-stack
+{ $var-description "If the inspector is running, this variable holds previously-inspected objects." }
 { $see-also go up } ;
 
-HELP: inspecting "( -- obj )"
+HELP: inspecting
 { $description "If the inspector is running, outputs the object currently being inspected." } ;
 
-HELP: inspector "( obj -- )"
+HELP: inspector
 { $values { "obj" "an object" } }
 { $description "Starts a new inspector and prints a brief help message. If an inspector is already running, this starts a nested inspector. An alternative word that reuses the current inspector instance is " { $link inspect } "." }
 { $see-also go up inspecting } ;
 
-HELP: inspect "( obj -- )"
+HELP: inspect
 { $values { "obj" "an object" } }
 { $description "If an inspector is already running, displays the slots of the object in the current inspector. If an inspector is not running, starts a new inspector." }
 { $see-also go up inspecting } ;
 
-HELP: go "( n -- )"
+HELP: go
 { $values { "n" "a non-negative integer" } }
 { $description "Inspects the " { $snippet "n" } "th slot of the current object. Use " { $link up } " to return." } ;
 
-HELP: up "( -- )"
+HELP: up
 { $description "Returns to the previously-inspected object." } ;

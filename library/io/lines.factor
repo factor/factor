@@ -6,7 +6,7 @@ vectors ;
 
 TUPLE: line-reader cr ;
 
-C: line-reader ( stream -- line ) [ set-delegate ] keep ;
+C: line-reader ( stream -- new-stream ) [ set-delegate ] keep ;
 
 : cr> dup line-reader-cr f rot set-line-reader-cr ;
 
@@ -41,6 +41,6 @@ M: line-reader stream-read
         drop
     ] if ;
 
-: (lines) ( seq -- seq ) readln [ , (lines) ] when* ;
+: (lines) ( -- ) readln [ , (lines) ] when* ;
 
 : lines ( stream -- seq ) [ [ (lines) ] { } make ] with-stream ;

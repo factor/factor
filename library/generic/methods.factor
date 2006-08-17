@@ -18,15 +18,15 @@ M: f method-loc ;
 M: quotation method-def ;
 M: quotation method-loc drop f ;
 
-: method ( class generic -- quot )
-    "methods" word-prop hash method-def ;
+: method ( class generic -- method/f )
+    "methods" word-prop hash ;
 
-: methods ( generic -- alist )
+: methods ( generic -- assoc )
     "methods" word-prop hash>alist
     [ [ first ] 2apply class-compare ] sort
     [ first2 method-def 2array ] map ;
 
-: order ( generic -- list )
+: order ( generic -- seq )
     "methods" word-prop hash-keys [ class-compare ] sort ;
 
 TUPLE: check-method class generic ;
@@ -43,12 +43,11 @@ TUPLE: check-method class generic ;
     >r bootstrap-word r> check-method
     [ set-hash ] with-methods ;
 
-: implementors ( class -- list )
+: implementors ( class -- seq )
     [ "methods" word-prop ?hash* nip ] word-subset-with ;
 
 M: method-spec where
-    dup first2 "methods" word-prop hash method-loc
-    [ ] [ second where ] ?if ;
+    dup first2 method method-loc [ ] [ second where ] ?if ;
 
 M: method-spec subdefs drop f ;
 

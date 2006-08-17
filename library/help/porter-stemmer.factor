@@ -1,15 +1,3 @@
-! The Porter Stemming Algorithm, hand translated to Factor from
-! Common Lisp by Slava Pestov.
-
-! The Common Lisp version was hand translated from ANSI C by
-! Steven M. Haflich smh@franz.com.
-
-! The original ANSI C was written by Martin Porter.
-
-! References:
-!   http://www.tartarus.org/~martin/PorterStemmer
-!   Porter, 1980, An algorithm for suffix stripping, Program,
-!   Vol. 14, no. 3, pp 130-137.
 IN: porter-stemmer
 USING: kernel math parser sequences ;
 
@@ -80,27 +68,7 @@ USING: kernel math parser sequences ;
 
 : butlast ( seq -- seq ) 1 head-slice* ;
 
-! step1a and step1b get rid of plurals and -ed or -ing. e.g.
-!
-!     caresses  ->  caress
-!     ponies    ->  poni
-!     ties      ->  ti
-!     caress    ->  caress
-!     cats      ->  cat
-!
-!     feed      ->  feed
-!     agreed    ->  agree
-!     disabled  ->  disable
-!
-!     matting   ->  mat
-!     mating    ->  mate
-!     meeting   ->  meet
-!     milling   ->  mill
-!     messing   ->  mess
-!
-!     meetings  ->  meet
-
-: step1a ( str -- str )
+: step1a ( str -- newstr )
     dup peek CHAR: s = [
         {
             { [ "sses" ?tail ] [ "ss" append ] }
@@ -138,7 +106,7 @@ USING: kernel math parser sequences ;
         }
     } cond ;
 
-: step1b ( str -- str )
+: step1b ( str -- newstr )
     {
         { [ "eed" ?tail ] [ -eed ] }
         {
@@ -153,17 +121,12 @@ USING: kernel math parser sequences ;
         { [ t ] [ ] }
     } cond ;
 
-: step1c ( str -- str )
-    #! step1c turns terminal y to i when there is another vowel
-    #! in the stem.
+: step1c ( str -- newstr )
     dup butlast stem-vowel? [
         "y" ?tail [ "i" append ] when
     ] when ;
 
-: step2 ( str -- str )
-    #! step2 maps double suffices to single ones. so -ization
-    #! ( = -ize plus-ation) maps to -ize etc. note that the
-    #! string before the suffix must give consonant-seq > 0.
+: step2 ( str -- newstr )
     {
         { [ "ational" ?tail ] [ "ational" "ate"  r ] }
         { [ "tional"  ?tail ] [ "tional"  "tion" r ] }
@@ -189,9 +152,7 @@ USING: kernel math parser sequences ;
         { [ t ] [ ] }
     } cond ;
 
-: step3 ( str -- str )
-    #! step3 deals with -ic-, -full, -ness etc. similar
-    #! jstrategy to step2.
+: step3 ( str -- newstr )
     {
         { [ "icate" ?tail ] [ "icate" "ic" r ] }
         { [ "ative" ?tail ] [ "ative" ""   r ] }
@@ -203,14 +164,14 @@ USING: kernel math parser sequences ;
         { [ t ] [ ] }
     } cond ;
 
-: -ion ( str -- str )
+: -ion ( str -- newstr )
     dup empty? [
         drop "ion"
     ] [
         dup "st" last-is? [ "ion" append ] unless
     ] if ;
 
-: step4 ( str -- str )
+: step4 ( str -- newstr )
     dup {
         { [ "al"    ?tail ] [ ] }
         { [ "ance"  ?tail ] [ ] }
@@ -239,14 +200,12 @@ USING: kernel math parser sequences ;
     [ 2drop t ]
     [ 1 = [ butlast cvc? not ] [ drop f ] if ] if ;
 
-: remove-e ( str -- str )
-    #! removes a final -e if consonant-seq > 1
+: remove-e ( str -- newstr )
     dup peek CHAR: e = [
         dup remove-e? [ butlast ] when
     ] when ;
 
-: ll->l ( str -- str )
-    #! changes -ll to -l if consonant-seq > 1.
+: ll->l ( str -- newstr )
     {
         { [ dup peek CHAR: l = not ] [ ] }
         { [ dup length 1- over double-consonant? not ] [ ] }
@@ -254,9 +213,9 @@ USING: kernel math parser sequences ;
         { [ t ] [ ] }
     } cond ;
 
-: step5 ( str -- str ) remove-e ll->l ;
+: step5 ( str -- newstr ) remove-e ll->l ;
 
-: stem ( str -- str )
+: stem ( str -- newstr )
     dup length 2 <= [
         step1a step1b step1c step2 step3 step4 step5 "" like
     ] unless ;

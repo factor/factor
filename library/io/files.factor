@@ -6,28 +6,28 @@ strings styles ;
 
 ! Words for accessing filesystem meta-data.
 
-: path+ ( path path -- path )
+: path+ ( str1 str2 -- str )
     over "/" tail? [ append ] [ "/" swap append3 ] if ;
 
-: exists? ( file -- ? ) stat >boolean ;
+: exists? ( path -- ? ) stat >boolean ;
 
-: directory? ( file -- ? ) stat first ;
+: directory? ( path -- ? ) stat first ;
 
-: directory ( dir -- list )
+: directory ( path -- seq )
     (directory)
     [ { "." ".." } member? not ] subset natural-sort ;
 
-: file-length ( file -- length ) stat third ;
+: file-length ( path -- n ) stat third ;
 
-: parent-dir ( path -- path )
+: parent-dir ( path -- parent )
     CHAR: / over last-index CHAR: \\ pick last-index max
     dup -1 = [ 2drop "." ] [ head ] if ;
 
-: resource-path ( path -- path )
+: resource-path ( resource -- path )
     \ resource-path get [ image parent-dir ] unless*
     swap path+ ;
 
-: <resource-reader> ( path -- stream )
+: <resource-reader> ( resource -- stream )
     resource-path <file-reader> ;
 
 TUPLE: pathname string ;
@@ -45,5 +45,5 @@ DEFER: directory.
     tuck path+
     dup directory? [ (directory.) ] [ (file.) terpri ] if ;
 
-: directory. ( dir -- )
+: directory. ( path -- )
     dup directory [ file. ] each-with ;

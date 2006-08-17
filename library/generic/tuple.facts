@@ -1,12 +1,12 @@
 USING: generic help kernel kernel-internals ;
 
-HELP: tuple= "( tuple1 tuple2 -- ? )"
+HELP: tuple=
 { $values { "tuple1" "a tuple" } { "tuple2" "a tuple" } }
 { $description "Low-level tuple equality test. User code should use " { $link = } " instead." }
 { $warning "This word is in the " { $vocab-link "kernel-internals" } " vocabulary because it does not do any type checking. Passing values which are not tuples can result in memory corruption." } ;
 
-HELP: tuple f
-{ $description "The class of tuples. This class is further partitioned into disjoint subclasses; each tuple shape defined by " { $link POSTPONE: TUPLE: } " is a new class."
+HELP: tuple
+{ $class-description "The class of tuples. This class is further partitioned into disjoint subclasses; each tuple shape defined by " { $link POSTPONE: TUPLE: } " is a new class."
 $terpri
 "Tuple classes have additional word properties:"
 { $list
@@ -14,74 +14,78 @@ $terpri
     { { $snippet "\"tuple-size\"" } " - the number of slots" }
 } } ;
 
-HELP: class "( object -- class )"
+HELP: class
 { $values { "object" "an object" } { "class" "a class word" } }
 { $description "Outputs an object's canonical class. While an object may be an instance of more than one class, the canonical class is either its built-in class, or if the object is a tuple, its tuple class." }
 { $examples { $example "1.0 class ." "float" } { $example "TUPLE: point x y z ;\nT{ point f 1 2 3 } class ." "point" } } ;
 
-HELP: tuple-predicate "( class -- )"
+HELP: tuple-predicate
 { $values { "class" "a tuple class word" } }
 { $description "Defines a predicate word that tests if the top of the stack is an instance of " { $snippet "class" } ". This will only work if " { $snippet "class" } " is a tuple class." }
 $low-level-note ;
 
-HELP: check-shape "( class slots -- )"
+HELP: check-shape
 { $values { "class" "a tuple class word" } { "slots" "a sequence of strings" } }
 { $description "If the new slot list does not have the same length as the current slot list for " { $snippet "class" } ", removes the class word from the dictionary. This allows a new class to be defined, and instances of the old class and the new class can co-exist, with new instances having a different number of slots. This prevents memory corruption if old accessors are called on new instances, or vice versa."
 $terpri
 "If " { $snippet "class" } " is not a tuple class word, or if no slots are being added or removed, this word does nothing. In this case, it is safe to redefine the class, and have the same set of accessor words operate on old and new instances." }
 $low-level-note ;
 
-HELP: tuple-slots "( class slots -- )"
+HELP: tuple-slots
 { $values { "class" "a tuple class word" } { "slots" "a sequence of strings" } }
 { $description "Defines slot accessor and mutator words for the tuple." }
 $low-level-note ;
 
-HELP: tuple-class f
-{ $description "The class of tuple class words." }
+HELP: tuple-class
+{ $class-description "The class of tuple class words." }
 { $examples { $example "TUPLE: name title first last ;\nname tuple-class? ." "t" } } ;
 
-HELP: define-constructor "( word class def -- )"
+HELP: define-constructor
 { $values { "word" "a constructor word" } { "class" "a tuple class word" } { "def" "a quotation" } }
 { $description "Define a constructor word for a tuple class. The constructor definition receives a new instance of the class on the stack, with all slots initially set to " { $link f } "." }
 { $see-also POSTPONE: C: } ;
 
-HELP: check-tuple "( class -- )"
-{ $values { "word" "a word" } }
-{ $description "Throws an error if " { $snippet "word" } " is not a tuple class word." }
+HELP: check-tuple
+{ $values { "class" "a class" } }
+{ $description "Throws a " { $link check-tuple } " error if " { $snippet "word" } " is not a tuple class word." }
 { $error-description "Thrown if " { $link define-constructor } " or " { $link POSTPONE: C: } " is called with a word which does not name a tuple class. Only tuple classes can have user-defined constructors." } ;
 
-HELP: default-constructor "( class -- )"
+HELP: default-constructor
 { $values { "class" "a tuple class word" } }
 { $description "Defines the default constructor for a tuple class. The default constructor fills slot values in from the stack." }
 { $examples { $example "TUPLE: account type balance ;\n\"savings\" 100 <account> ." "T{ account f \"savings\" 100 }" } } ;
 
-HELP: define-tuple "( class slots -- )"
+HELP: define-tuple
 { $values { "class" "a new word" } { "slots" "a sequence of strings" } }
 { $description "Defines a tuple class with slots named by " { $snippet "slots" } "." }
 { $see-also POSTPONE: TUPLE: } ;
 
-HELP: is? "( obj quot -- ? )"
+HELP: delegates
+{ $values { "obj" "an object" } { "seq" "a sequence" } }
+{ $description "Outputs the delegation chain of an object. The last element of " { $snippet "seq" } " is " { $snippet "obj" } " itself. If " { $snippet "obj" } " is " { $link f } ", an empty sequence is output." } ;
+
+HELP: is?
 { $values { "obj" "an object" } { "quot" "a quotation with stack effect " { $snippet "( obj -- ? )" } } { "?" "a boolean" } }
 { $description "Tests if the object or one of its delegates satisfies the predicate quotation."
 $terpri
 "Class membership test predicates only test if an object is a direct instance of that class. Sometimes, you need to check delegates, since this gives a clearer picture of what operations the object supports." } ;
 
-HELP: >tuple "( seq -- tuple )"
+HELP: >tuple
 { $values { "seq" "a sequence" } { "tuple" "a new tuple" } }
 { $description "Creates a tuple with slot values taken from a sequence. The first element of the sequence must be a tuple class word, the second a delegate, and the remainder the declared slots."
 $terpri
 "If the sequence has too many elements, they are ignored, and if it has too few, the remaining slots in the tuple are set to " { $link f } "." }
 { $errors "Throws an error if the first element of the sequence is not a tuple class word." } ;
 
-HELP: tuple>array "( tuple -- array )"
+HELP: tuple>array ( tuple -- array )
 { $values { "tuple" "a tuple" } { "array" "a new array" } }
 { $description "Outputs an array having the tuple's slots as elements. The first element is the tuple class word and the second is the delegate; the remainder are declared slots." } ;
 
-HELP: array>tuple "( array -- tuple )"
+HELP: array>tuple ( array -- tuple )
 { $values { "array" "a array" } { "tuple" "a new tuple" } }
 { $description "Outputs a tuple having the same slot values as the array." }
 { $warning "This word is in the " { $vocab-link "kernel-internals" } " vocabulary since it is unsafe. Creating a tuple with the wrong shape can cause crashes or memory corruption. User code should construct tuples using generated tuple constructors instead; see " { $link "tuples" } "." } ;
 
-HELP: <tuple> "( class n -- tuple )"
+HELP: <tuple> ( class n -- tuple )
 { $values { "class" "a class word" } { "n" "a non-negative integer" } { "tuple" "a new tuple" } }
 { $description "Low-level tuple constructor. User code should never call this directly, and instead use the constructor word which is defined for each tuple. See " { $link "tuples" } "." } ;

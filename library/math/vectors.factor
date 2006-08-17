@@ -3,27 +3,27 @@
 IN: math
 USING: arrays generic kernel sequences ;
 
-: vneg ( v -- v ) [ neg ] map ;
+: vneg ( u -- v ) [ neg ] map ;
 
-: n*v ( n v -- v ) [ * ] map-with ;
-: v*n ( v n -- v ) swap n*v ;
-: n/v ( n v -- v ) [ / ] map-with ;
-: v/n ( v n -- v ) swap [ swap / ] map-with ;
+: n*v ( n u -- v ) [ * ] map-with ;
+: v*n ( n u -- v ) swap n*v ;
+: n/v ( n u -- v ) [ / ] map-with ;
+: v/n ( u n -- v ) swap [ swap / ] map-with ;
 
-: v+   ( v v -- v ) [ + ] 2map ;
-: v-   ( v v -- v ) [ - ] 2map ;
-: [v-] ( v v -- v ) [ [-] ] 2map ;
-: v*   ( v v -- v ) [ * ] 2map ;
-: v/   ( v v -- v ) [ / ] 2map ;
-: vmax ( v v -- v ) [ max ] 2map ;
-: vmin ( v v -- v ) [ min ] 2map ;
+: v+   ( u v -- w ) [ + ] 2map ;
+: v-   ( u v -- w ) [ - ] 2map ;
+: [v-] ( u v -- w ) [ [-] ] 2map ;
+: v*   ( u v -- w ) [ * ] 2map ;
+: v/   ( u v -- w ) [ / ] 2map ;
+: vmax ( u v -- w ) [ max ] 2map ;
+: vmin ( u v -- w ) [ min ] 2map ;
 
 : v. ( v v -- x ) 0 [ * + ] 2reduce ;
-: norm-sq ( v -- n ) 0 [ absq + ] reduce ;
-: norm ( vec -- n ) norm-sq sqrt ;
-: normalize ( vec -- uvec ) dup norm v/n ;
+: norm-sq ( v -- x ) 0 [ absq + ] reduce ;
+: norm ( vec -- x ) norm-sq sqrt ;
+: normalize ( u -- v ) dup norm v/n ;
 
-: set-axis ( x y axis -- v )
+: set-axis ( u v axis -- w )
     dup length [ >r zero? pick pick ? r> swap nth ] 2map 2nip ;
 
 : sum ( seq -- n ) 0 [ + ] reduce ;

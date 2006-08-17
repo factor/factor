@@ -1,40 +1,39 @@
 IN: compiler
 USING: assembler help words ;
 
-HELP: compiled? "( word -- ? )"
+HELP: compiled? ( word -- ? )
 { $values { "word" "a word" } }
-{ $description "Tests if a word is compiled." }
-{ $notes "Primitives are considered as compiled words." } ;
+{ $description "Tests if a word is compiled." } ;
 
-HELP: compile "( word -- )"
+HELP: compile
 { $values { "word" "a word" } }
 { $description "Compiles a word together with any uncompiled dependencies. Does nothing if the word is already compiled." }
 { $errors "If compilation fails, this word can throw an error. In particular, if the word's stack effect cannot be inferred, this word will throw an error. The related " { $link try-compile } " word logs errors and returns rather than throwing." } ;
 
-HELP: try-compile "( word -- )"
+HELP: try-compile
 { $values { "word" "a word" } }
 { $description "Compiles a word together with any uncompiled dependencies. Does nothing if the word is already compiled." }
 { $errors "If compilation fails, this word logs the error to the default stream and returns normally." } ;
 
-HELP: compile-vocabs "( seq -- )"
+HELP: compile-vocabs
 { $values { "seq" "a sequence of strings" } }
 { $description "Compiles all words in the vocabularies named by elements of a sequence, skipping compiled words. Compile errors are logged to the default stream." } ;
 
-HELP: compile-all "( -- )"
+HELP: compile-all
 { $description "Compile all words in the dictionary which have not already been compiled. Compile errors are logged to the default stream." } ;
 
-HELP: compile-quot "( quot -- word )"
+HELP: compile-quot
 { $values { "quot" "a quotation" } { "word" "a new, uninterned word" } }
 { $description "Creates a new uninterned word having the given quotation as its definition, and compiles it. The returned word can be passed to " { $link execute } "." }
 { $errors "Throws an error if the stack effect of the quotation cannot be inferred." } ;
 
-HELP: compile-1 "( quot -- )"
+HELP: compile-1
 { $values { "quot" "a quotation" } }
 { $description "Compiles and runs a quotation." }
 { $errors "Throws an error if the stack effect of the quotation cannot be inferred." } ;
 
 IN: assembler
 
-HELP: finalize-compile "( xts -- )"
+HELP: finalize-compile ( xts -- )
 { $values { "xts" "an array of pairs mapping words to XTs" } }
-{ $description "Flushes the CPUs instruction cache on PowerPC, and does nothing on other architectures. PowerPC CPUs do not automatically invalidate the cache when memory contents change, so the compiler must do this explicitly." } ;
+{ $description "Performs relocation, atomically changes the XT of all given words, and on PowerPC, flushes the CPU instruction cache." } ;

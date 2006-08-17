@@ -3,7 +3,7 @@
 IN: math-internals
 USING: errors generic kernel kernel-internals math ;
 
-: (rect>) ( xr xi -- x )
+: (rect>) ( x y -- z )
     dup zero? [ drop ] [ <complex> ] if ; inline
 
 IN: math
@@ -15,14 +15,14 @@ M: real imaginary drop 0 ;
 
 M: number equal? number= ;
 
-: rect> ( xr xi -- x )
+: rect> ( x y -- z )
     over real? over real? and [
         (rect>)
     ] [
         "Complex number must have real components" throw
     ] if ; inline
 
-: >rect ( x -- xr xi ) dup real swap imaginary ; inline
+: >rect ( z -- x y ) dup real swap imaginary ; inline
 
 : conjugate ( z -- z* ) >rect neg rect> ; inline
 
@@ -31,7 +31,7 @@ M: number equal? number= ;
 : >polar ( z -- abs arg )
     dup abs swap >rect swap fatan2 ; inline
 
-: cis ( theta -- cis ) dup fcos swap fsin rect> ; inline
+: cis ( arg --- z ) dup fcos swap fsin rect> ; inline
 
 : polar> ( abs arg -- z ) cis * ; inline
 

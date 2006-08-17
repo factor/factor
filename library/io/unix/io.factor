@@ -146,7 +146,7 @@ GENERIC: task-container ( task -- vector )
     read-fdset/tasks init-fdset
     write-fdset/tasks init-fdset f ;
 
-: io-multiplex ( timeout -- )
+: io-multiplex ( ms -- )
     >r FD_SETSIZE init-fdsets r> make-timeval select io-error
     read-fdset/tasks handle-fdset
     write-fdset/tasks handle-fdset ;

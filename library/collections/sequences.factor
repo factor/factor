@@ -3,24 +3,23 @@
 IN: sequences
 USING: errors generic kernel math math-internals strings vectors ;
 
-GENERIC: length ( sequence -- n )
-GENERIC: set-length ( n sequence -- )
-GENERIC: nth ( n sequence -- obj )
-GENERIC: set-nth ( value n sequence -- )
-GENERIC: thaw ( seq -- mutable-seq )
-GENERIC: like ( seq seq -- seq )
+GENERIC: length ( seq -- n )
+GENERIC: set-length ( n seq -- )
+GENERIC: nth ( n seq -- elt )
+GENERIC: set-nth ( elt n seq -- )
+GENERIC: thaw ( seq -- resizable-seq )
+GENERIC: like ( seq prototype -- newseq )
 
 : empty? ( seq -- ? ) length zero? ; inline
 
 : delete-all ( seq -- ) 0 swap set-length ;
 
-: first 0 swap nth ; inline
-: second 1 swap nth ; inline
-: third 2 swap nth ; inline
-: fourth 3 swap nth ; inline
+: first ( seq -- first ) 0 swap nth ; inline
+: second ( seq -- second ) 1 swap nth ; inline
+: third ( seq -- third ) 2 swap nth ; inline
+: fourth  ( seq -- fourth ) 3 swap nth ; inline
 
-: push ( element sequence -- )
-    dup length swap set-nth ;
+: push ( elt seq -- ) dup length swap set-nth ;
 
 : ?push ( elt seq/f -- seq )
     [ 1 <vector> ] unless* [ push ] keep ;
@@ -30,11 +29,11 @@ GENERIC: like ( seq seq -- seq )
 
 IN: sequences-internals
 
-GENERIC: resize ( n seq -- seq )
+GENERIC: resize ( n seq -- newseq )
 
 ! Unsafe sequence protocol for inner loops
-GENERIC: nth-unsafe ( n sequence -- elt )
-GENERIC: set-nth-unsafe ( elt n sequence -- )
+GENERIC: nth-unsafe ( n seq -- elt )
+GENERIC: set-nth-unsafe ( elt n seq -- )
 
 M: object nth-unsafe nth ;
 M: object set-nth-unsafe set-nth ;
@@ -53,9 +52,14 @@ M: integer length ;
 M: integer nth drop ;
 M: integer nth-unsafe drop ;
 
-: first2-unsafe [ 0 swap nth-unsafe ] keep 1 swap nth-unsafe ; inline
-: first3-unsafe [ first2-unsafe ] keep 2 swap nth-unsafe ; inline
-: first4-unsafe [ first3-unsafe ] keep 3 swap nth-unsafe ; inline
+: first2-unsafe
+    [ 0 swap nth-unsafe ] keep 1 swap nth-unsafe ; inline
+
+: first3-unsafe
+    [ first2-unsafe ] keep 2 swap nth-unsafe ; inline
+
+: first4-unsafe
+    [ first3-unsafe ] keep 3 swap nth-unsafe ; inline
 
 : exchange-unsafe ( n n seq -- )
     [ tuck nth-unsafe >r nth-unsafe r> ] 3keep tuck

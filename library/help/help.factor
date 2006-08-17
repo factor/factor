@@ -18,7 +18,7 @@ M: word article-content
         ] ?if
     ] { } make ;
 
-: $title ( article -- )
+: $title ( topic -- )
     title-style [
         title-style [
             dup [ 1array $link ] ($block) $doc-path
@@ -34,7 +34,7 @@ M: word article-content
 
 : handbook ( -- ) "handbook" help ;
 
-: $subtopic ( object -- )
+: $subtopic ( element -- )
     [
         subtopic-style [
             unclip f rot [ print-content ] curry write-outliner
@@ -46,7 +46,7 @@ M: word article-content
     dup [ (help) ] curry
     write-outliner ;
 
-: $subsection ( object -- )
+: $subsection ( element -- )
     [
         subsection-style [ first ($subsection) ] with-style
     ] ($block) ;
@@ -56,5 +56,5 @@ M: word article-content
         sort-articles [ ($subsection) terpri ] each
     ] with-style ;
 
-: $outliner ( content -- )
+: $outliner ( element -- )
     first call help-outliner ;

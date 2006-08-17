@@ -1,12 +1,12 @@
 USING: help ;
 
-HELP: HELP: "word stack-effect content..."
-{ $values { "word" "a word" } { "stack-effect" "a stack effect or syntax string" } { "content" "markup elements" } }
+HELP: HELP: "word content..."
+{ $values { "word" "a word" } { "content" "markup elements" } }
 { $description "Defines documentation for a word." }
 { $examples
     { $code
         ": foo 2 + ;"
-        "HELP: foo \"( m -- n )\""
+        "HELP: foo
         "{ $values { \"m\" \"an integer\" } { \"n\" \"an integer\" } }"
         "{ $description \"Increments a value by 2.\" } ;"
         "\ foo help"

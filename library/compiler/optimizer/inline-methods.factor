@@ -36,7 +36,7 @@ words ;
 : will-inline-method ( node -- quot/t )
     #! t indicates failure
     dup inlining-class dup
-    [ swap node-param method ] [ 2drop t ] if ;
+    [ swap node-param method method-def ] [ 2drop t ] if ;
 
 : inline-standard-method ( node -- node )
     dup will-inline-method (inline-method) ;

@@ -1,6 +1,22 @@
 USING: help sequences ;
 
-HELP: slice-error "( str -- )"
+HELP: reversed
+{ $class-description "A virtual sequence which presents a reversed view of an underlying sequence." }
+{ $see-also <reversed> reverse } ;
+
+HELP: reversed@
+{ $values { "m" "a non-negative integer" } { "reversed" "an instance of " { $link reversed } } { "n" "a non-negative integer" } { "seq" "a sequence" } }
+{ $description "Indexes into a reversed sequence. Helper word used to implement " { $link "sequence-protocol" } " methods for the " { $link reversed } " class." } ;
+
+HELP: reverse
+{ $values { "seq" "a sequence" } { "newseq" "a new sequence" } }
+{ $description "Outputs a new sequence having the same elements as " { $snippet "seq" } " but in reverse order." } ;
+
+HELP: <reversed> ( seq -- reversed )
+{ $values { "seq" "a sequence" } { "reversed" "a new sequence" } }
+{ $description "Creates an instance of the " { $link reversed } " virtual sequence." } ;
+
+HELP: slice-error
 { $values { "str" "a reason" } }
 { $description "Throws a " { $link slice-error } "." }
 { $error-description "Thrown by " { $link <slice> } " if one of the following invalid conditions holds:"
@@ -11,19 +27,15 @@ HELP: slice-error "( str -- )"
     }
 } ;
 
-HELP: slice f
+HELP: slice
 { $class-description "A virtual sequence which presents a subrange of the elements of an underlying sequence." }
 { $see-also <slice> subseq } ;
 
-HELP: <slice> "( m n seq -- slice )"
+HELP: <slice>
 { $values { "m" "a non-negative integer" } { "n" "a non-negative integer" } { "seq" "a sequence" } { "slice" "a slice" } }
 { $description "Outputs a new virtual sequence sharing storage with the subrange of elements in " { $snippet "seq" } " with indices starting from and including " { $snippet "m" } ", and up to but not including " { $snippet "n" } "." }
 { $errors "Throws an error if " { $snippet "m" } " or " { $snippet "n" } " is out of bounds." } ;
 
-HELP: reverse "( seq -- reversed )"
-{ $values { "seq" "a sequence" } { "reversed" "a sequence" } }
-{ $description "Outputs a new sequence having the same elements as " { $snippet "seq" } " but in reverse order." } ;
-
-HELP: <reversed> "( seq -- reversed )"
-{ $values { "seq" "a sequence" } { "reversed" "a sequence" } }
-{ $description "Outputs a virtual sequence sharing storage with " { $snippet "seq" } " but with reverse element order." } ;
+HELP: slice@
+{ $values { "m" "a non-negative integer" } { "slice" "an instance of " { $link slice } } { "n" "a non-negative integer" } { "seq" "a sequence" } }
+{ $description "Indexes into a slice. Helper word used to implement " { $link "sequence-protocol" } " methods for the " { $link reversed } " class." } ;
