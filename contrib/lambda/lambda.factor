@@ -1,47 +1,33 @@
 #! An interpreter for lambda expressions, by Matthew Willis
 REQUIRES: lazy-lists ;
-USING: lazy-lists io strings hashtables sequences kernel ;
+USING: lazy-lists io strings hashtables sequences namespaces kernel ;
 IN: lambda
 
-#! every expression has a canonical representation of this form
-: bound-variables-list ( -- lazy-list ) 65 lfrom [ ch>string ] lmap ;
+: bound-vars ( -- lazy-list ) 65 lfrom [ ch>string ] lmap ;
 
-TUPLE: linterp names reps ;
-: (lint>string) ( linterp expr -- linterp )
-    bound-variables-list swap expr>string over dupd linterp-reps hash 
-    ", " join ":" append swap append "=> " swap append ;
+: lambda>string ( expr -- string )
+    bound-vars swap expr>string ;
 
-: update-names ( names-hash name expr -- names-hash )
-    swap rot [ set-hash ] keep ;
+: matching-names ( names string -- string )
+    #! this inefficiently finds all names matching the
+    #! canonical representation of string
+    [ \ evaluate , \ lambda>string , , \ = , \ nip , ] [ ] make 
+    hash-subset hash-keys ", " join "=> " swap append ": " append ;
 
-C: linterp ( names-hash )
-    #! take a names hash, and generate the reverse lookup hash from it.
-    #! TODO: make this really ugly code cleaner
-    2dup set-linterp-names swap H{ } clone [ swap hash>alist
-    [ [ first ] keep second bound-variables-list swap expr>string rot
-    [ hash ] 2keep rot dup not [ drop rot { } swap add -rot ] 
-    [ >r rot r> swap add -rot ] if set-hash ] each-with ] keep
-    swap [ set-linterp-reps ] keep ;
+: lambda-print ( names expr -- names )
+    lambda>string [ matching-names ] 2keep rot swap append print flush ;
 
-: lint-read ( -- input )
-    readln [ "." = ] keep swap ;
+: lambda-eval ( names input -- names expr )
+    lambda-parse [ first ] keep second 
+    pick swap replace-names 
+    [ swap rot set-hash ] 3keep evaluate nip ;
 
-: lint-eval ( linterp input -- linterp name expr )
-    lambda-parse [ first ] keep second pick linterp-names swap replace-names
-    evaluate ;
+: lambda-boot ( -- names )
+    #! load the core lambda library
+    H{ } clone ;
 
-: lint>string ( linterp name expr -- linterp  )
-    rot linterp-names -rot [ update-names ] keep [ <linterp> ] dip
-    (lint>string) ;
+: (lambda) ( names -- names )
+     readln dup "." = [ drop ] [ lambda-eval lambda-print (lambda) ] if ;
 
-: lint-print ( linterp name expr -- linterp )
-    lint>string print flush ;
-
-: lint-boot ( -- initial-names )
-    H{ } clone <linterp> ;
-
-: (lint) ( linterp -- linterp )
-     lint-read [ drop ] [ lint-eval lint-print (lint) ] if ;
-
-: lint ( -- linterp )
-    lint-boot (lint) ;
+: lambda ( -- names )
+    lambda-boot (lambda) ;
