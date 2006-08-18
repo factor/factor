@@ -5,10 +5,17 @@ USING: errors generic hashtables inference io kernel math
 namespaces optimizer parser prettyprint sequences test threads
 words ;
 
+: word-dataflow ( word -- dataflow )
+    [
+        dup dup add-recursive-state
+        dup specialized-def (dataflow)
+        swap current-effect check-effect
+    ] with-infer ;
+
 : (compile) ( word -- )
     dup compiling? not over compound? and [
         "Compiling " write dup . flush
-        dup specialized-def dataflow optimize generate
+        dup word-dataflow optimize generate
     ] [
         drop
     ] if ;

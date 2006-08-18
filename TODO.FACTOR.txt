@@ -12,7 +12,6 @@
 - roundoff is still not quite right with tracks
 - fix top level window positioning
 - fix contribs: boids, automata
-- graphical module manager tool
 - see if alien calls can be made faster
 - sometimes darcs get fails with the httpd
 - gdb triggers 'mutliple i/o ops on port' error
@@ -52,6 +51,7 @@
 
 + ui:
 
+- graphical module manager tool
 - figure out what goes in the .app and what doesn't
 - should be possible to drop an image file on the .app to run it
 - the UI listener has a shitty design. perhaps it should not call out
@@ -98,6 +98,8 @@
 
 + compiler/ffi:
 
+- compiler tests are not as reliable now because of try-compile usage
+  - we can just do [ t ] [ \ foo compiled? ] unit-test
 - [ [ dup call ] dup call ] infer hangs
 - callstack overflow when compiling mutually recursive inline words
 - test what is done in the case of an invalid declaration on an inline
@@ -119,8 +121,6 @@
 
 + misc:
 
-- compiler tests are not as reliable now because of try-compile usage
-  - we can just do [ t ] [ \ foo compiled? ] unit-test
 - growable data heap
 - incremental GC
 - UDP

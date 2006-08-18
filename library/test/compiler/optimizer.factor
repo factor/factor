@@ -135,7 +135,7 @@ USE: optimizer
     [ class-compare ] sort min-class
 ] unit-test
 
-GENERIC: xyz
+GENERIC: xyz ( obj -- obj )
 M: array xyz xyz ;
 
 [ ] [ \ xyz compile ] unit-test
@@ -220,7 +220,7 @@ TUPLE: pred-test ;
 [ 0 ] [ 10 double-label-2 ] unit-test
 
 ! regression
-GENERIC: void-generic
+GENERIC: void-generic ( obj -- * )
 : breakage "hi" void-generic ;
 [ ] [ \ breakage compile ] unit-test
 [ breakage ] unit-test-fails

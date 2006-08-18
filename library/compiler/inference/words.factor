@@ -158,7 +158,7 @@ M: symbol apply-object apply-literal ;
     #! Handle a recursive call, by either applying a previously
     #! inferred base case, or raising an error. If the recursive
     #! call is to a local block, emit a label call node.
-    dup "infer-effect" word-prop [ ] [ declared-effect ] if ;
+    dup "infer-effect" word-prop [ ] [ declared-effect ] ?if ;
 
 M: compound apply-object
     #! Apply the word's stack effect to the inferencer state.
