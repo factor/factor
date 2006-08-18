@@ -7,6 +7,7 @@ words ;
 
 : word-dataflow ( word -- dataflow )
     [
+        dup ?no-effect
         dup dup add-recursive-state
         dup specialized-def (dataflow)
         swap current-effect check-effect

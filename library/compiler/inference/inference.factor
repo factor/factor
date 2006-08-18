@@ -98,6 +98,11 @@ M: quotation infer-quot
         inference-error
     ] unless ;
 
+: undo-infer ( -- )
+    recorded get
+    [ "infer" word-prop not ] subset
+    [ f "infer-effect" set-word-prop ] each ;
+
 : with-infer ( quot -- )
     [
         [
@@ -107,7 +112,7 @@ M: quotation infer-quot
             call
             check-return
         ] [
-            recorded get [ f "infer-effect" set-word-prop ] each
+            undo-infer
             rethrow
         ] recover
     ] with-scope ;

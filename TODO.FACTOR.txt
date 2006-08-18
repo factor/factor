@@ -4,7 +4,6 @@
 - document inference errors
 - update docs for declared effects
 - better doc for accumulate, link from tree
-- bootstrap speedup with compiling recursives
 - RT_WORD should refer to XTs not word objects.
 - better listener multi-line expression handling
 - history doesn't work in a good way if you ^K the input

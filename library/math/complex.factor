@@ -31,7 +31,7 @@ M: number equal? number= ;
 : >polar ( z -- abs arg )
     dup abs swap >rect swap fatan2 ; inline
 
-: cis ( arg --- z ) dup fcos swap fsin rect> ; inline
+: cis ( arg -- z ) dup fcos swap fsin rect> ; inline
 
 : polar> ( abs arg -- z ) cis * ; inline
 

@@ -118,10 +118,14 @@ TUPLE: effect-error word effect ;
 : effect-error ( word effect -- * ) <effect-error> throw ;
 
 : check-effect ( word effect -- )
-    over recorded get push
-    dup pick "declared-effect" word-prop dup
-    [ effect<= [ effect-error ] unless ] [ 2drop ] if
-    "infer-effect" set-word-prop ;
+    over "infer" word-prop [
+        2drop
+    ] [
+        over recorded get push
+        dup pick "declared-effect" word-prop dup
+        [ effect<= [ effect-error ] unless ] [ 2drop ] if
+        "infer-effect" set-word-prop
+    ] if ;
 
 M: compound apply-word
     #! Infer a compound word's stack effect.
@@ -131,8 +135,11 @@ M: compound apply-word
         swap t "no-effect" set-word-prop rethrow
     ] recover ;
 
+: ?no-effect ( word -- )
+    dup "no-effect" word-prop [ no-effect ] [ drop ] if ;
+
 : apply-default ( word -- )
-    dup "no-effect" word-prop [ no-effect ] when
+    dup ?no-effect
     dup "infer-effect" word-prop [
         over "infer" word-prop [
             swap effect-in length ensure-values call drop
