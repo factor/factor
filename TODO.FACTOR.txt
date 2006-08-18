@@ -1,26 +1,23 @@
 + 0.84:
 
-- doc mashup:
-  - document: parse-hook no-parse-hook
-  - document inference errors
-  - update docs for declared effects
-  - better doc for accumulate, link from tree
-
+- document: parse-hook no-parse-hook
+- document inference errors
+- update docs for declared effects
+- better doc for accumulate, link from tree
 - bootstrap speedup with compiling recursives
 - RT_WORD should refer to XTs not word objects.
-- fix contribs: boids, automata
-- sometimes darcs get fails with the httpd
-- gdb triggers 'mutliple i/o ops on port' error
-- factorcode httpd crashed: bad file descriptor
-- editor:
-  - better listener multi-line expression handling
-  - history doesn't work in a good way if you ^K the input
+- better listener multi-line expression handling
+- history doesn't work in a good way if you ^K the input
 - services do not launch if factor not running
 - roundoff is still not quite right with tracks
 - fix top level window positioning
+- fix contribs: boids, automata
 - [ [ dup call ] dup call ] infer hangs
 - graphical module manager tool
 - see if alien calls can be made faster
+- sometimes darcs get fails with the httpd
+- gdb triggers 'mutliple i/o ops on port' error
+- factorcode httpd crashed: bad file descriptor
 
 + 0.85:
 
@@ -105,6 +102,7 @@
 - test what is done in the case of an invalid declaration on an inline
   recursive
 - ppc64 backend
+- arm backend
 - we need to optimize  [ dup array? [ array? ] [ array? ] if ]
 - mac intel: struct returns from objc methods
 - fix compiled gc check

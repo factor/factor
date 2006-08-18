@@ -13,7 +13,7 @@ USING: errors kernel sequences math sequences-internals namespaces arrays ;
     gcd 1 = [ "Non-trivial divisor found" throw ] unless ;
     foldable
 
-: each-bit ( n quot -- | quot: 0/1 -- )
+: each-bit ( n quot -- )
     over zero? pick -1 number= or [
         2drop
     ] [
@@ -91,8 +91,8 @@ M: frange length ( frange -- n )
 : frange-range ( frange -- range )
     [ frange-step ] keep frange-length 1- * ;
 
-M: frange nth ( n frange -- obj ) [ frange-step * ] keep frange-from + ;
-M: frange nth-unsafe ( n frange -- obj ) nth ;
+M: frange nth ( n frange -- obj )
+    [ frange-step * ] keep frange-from + ;
 
 : nseq-swap ( a b seq -- seq )
     #! swap indices a,b in seq
