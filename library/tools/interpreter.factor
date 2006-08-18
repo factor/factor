@@ -93,7 +93,7 @@ SYMBOL: callframe-end
 : catch-harness ( continuation -- quot )
     [ [ c> 2array ] % , \ continue-with , ] [ ] make ;
 
-: host-harness ( quot continuation -- )
+: host-harness ( quot continuation -- quot )
     tuck [
         catch-harness , \ >c ,
         %

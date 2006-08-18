@@ -38,8 +38,7 @@ SYMBOL: d-in
 : ensure-values ( n -- )
     meta-d [ add-inputs ] change d-in [ + ] change ;
 
-: short-effect ( -- { in# out# } )
-    #! After inference is finished, collect information.
+: short-effect ( -- pair )
     d-in get meta-d get length 2array ;
 
 ! Does this control flow path throw an exception, therefore its
@@ -47,7 +46,6 @@ SYMBOL: d-in
 SYMBOL: terminated?
 
 : current-effect ( -- effect )
-    #! After inference is finished, collect information.
     d-in get meta-d get length <effect>
     terminated? get over set-effect-terminated? ;
 

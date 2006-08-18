@@ -219,7 +219,7 @@ H{
         2drop
     ] if* ;
 
-: register-objc-methods ( class -- seq )
+: register-objc-methods ( class -- )
     f <void*> (register-objc-methods) ;
 
 : class-exists? ( string -- class ) objc_getClass >boolean ;

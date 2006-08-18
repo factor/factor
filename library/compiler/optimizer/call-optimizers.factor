@@ -56,7 +56,7 @@ math math-internals sequences words parser ;
     { [ dup disjoint-eq? ] [ [ f ] inline-literals ] }
 } define-optimizers
 
-: useless-coerce? ( node -- )
+: useless-coerce? ( node -- ? )
     dup 0 node-class#
     swap node-param "infer-effect" word-prop effect-out first
     eq? ;

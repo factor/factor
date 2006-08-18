@@ -22,7 +22,7 @@ IN: image
 
 : char bootstrap-cell 2 /i ; inline
 
-: untag ( cell tag -- ) tag-mask bitnot bitand ; inline
+: untag ( cell -- cell ) tag-mask bitnot bitand ; inline
 : tag ( cell -- tag ) tag-mask bitand ; inline
 
 : array-type      8  ; inline

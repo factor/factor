@@ -51,12 +51,12 @@ DEFER: !PRIMITIVE: parsing
     scan-word scan-word
     [ location <method> -rot define-method ] f ; parsing
 
-: !UNION: ( -- class predicate definition )
+: !UNION:
     CREATE dup intern-symbol dup predicate-word
     [ dupd unit "predicate" set-word-prop ] keep
     [ define-union ] f ; parsing
 
-: !PREDICATE: ( -- class predicate definition )
+: !PREDICATE:
     scan-word CREATE dup intern-symbol
     dup rot "superclass" set-word-prop dup predicate-word
     [ define-predicate-class ] f ; parsing

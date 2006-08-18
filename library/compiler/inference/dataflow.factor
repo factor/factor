@@ -80,11 +80,11 @@ C: #return make-node ;
 
 TUPLE: #if ;
 C: #if make-node ;
-: #if ( in -- node ) peek-d 1array in-node <#if> ;
+: #if ( -- node ) peek-d 1array in-node <#if> ;
 
 TUPLE: #dispatch ;
 C: #dispatch make-node ;
-: #dispatch ( in -- node ) peek-d 1array in-node <#dispatch> ;
+: #dispatch ( -- node ) peek-d 1array in-node <#dispatch> ;
 
 TUPLE: #merge ;
 C: #merge make-node ;

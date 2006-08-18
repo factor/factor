@@ -4,7 +4,7 @@ IN: opengl
 USING: alien errors io kernel math namespaces opengl
 sequences ;
 
-: gl-color ( { r g b a } -- ) first4 glColor4d ; inline
+: gl-color ( colorspec -- ) first4 glColor4d ; inline
 
 : gl-error ( -- )
     glGetError dup zero? [
