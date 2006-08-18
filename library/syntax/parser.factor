@@ -101,7 +101,7 @@ TUPLE: bad-escape ;
     [ (parse-effect) column get ] { } make swap column set
     { "--" } split1 <effect> ;
 
-: parse-base ( base -- ) scan swap base> parsed ;
+: parse-base ( parsed base -- parsed ) scan swap base> parsed ;
 
 global [
     {

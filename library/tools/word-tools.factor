@@ -77,7 +77,8 @@ math namespaces prettyprint sequences strings styles ;
         2drop 0
     ] if ;
 
-: completion ( str word -- { score indices word } )
+: completion ( str word -- triple )
+    #! triple is { score indices word }
     [
         word-name [ swap fuzzy ] keep swap [ score ] keep
     ] keep
