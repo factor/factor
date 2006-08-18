@@ -50,8 +50,8 @@ IN: sequences
 : map-with ( obj list quot -- newseq )
     swap [ with rot ] map 2nip ; inline
 
-: accumulate ( seq identity quot -- newseq )
-    rot [ pick >r swap call r> ] map-with nip ; inline
+: accumulate ( seq identity quot -- final newseq )
+    rot [ pick >r swap call r> ] map-with ; inline
 
 : change-nth ( i seq quot -- )
     -rot [ nth swap call ] 2keep set-nth ; inline

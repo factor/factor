@@ -8,7 +8,7 @@ kernel-internals math namespaces sequences words ;
 
 : parameter-sizes ( types -- offsets )
     #! Compute stack frame locations.
-    0 [ parameter-size + ] accumulate ;
+    0 [ parameter-size + ] accumulate nip ;
 
 : stack-space ( parameters -- n )
     0 [ parameter-size + ] reduce ;

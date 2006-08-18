@@ -76,7 +76,7 @@ M: editor model-changed
 : run-char-widths ( str editor -- wlist )
     #! List of x co-ordinates of each character.
     editor-font* swap >array [ char-width ] map-with
-    dup 0 [ + ] accumulate swap 2 v/n v+ ;
+    dup 0 [ + ] accumulate nip swap 2 v/n v+ ;
 
 : x>offset ( x line# editor -- col# )
     [ editor-line ] keep

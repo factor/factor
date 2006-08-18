@@ -66,6 +66,7 @@ ARTICLE: "sequences-iteration" "Iteration and collection"
 "Iteration combinators:"
 { $subsection each }
 { $subsection reduce }
+{ $subsection accumulate }
 { $subsection interleave }
 { $subsection 2each }
 { $subsection 2reduce }

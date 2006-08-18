@@ -53,7 +53,7 @@ M: grid pref-dim*
     [ swap [ swap (pair-up) ] map-with ] map-with ;
 
 : grid-positions ( dims -- locs )
-    gap [ v+ gap v+ ] accumulate ;
+    gap [ v+ gap v+ ] accumulate nip ;
 
 : position-grid ( horiz vert -- )
     [ grid-positions ] 2apply

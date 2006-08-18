@@ -21,10 +21,10 @@ HELP: reduce
 } ;
 
 HELP: accumulate
-{ $values { "seq" "a sequence" } { "quot" "a quotation with stack effect " { $snippet "( prev elt -- next )" } } }
-{ $description "Combines successive elements of the sequence using a binary operation, and outputs a sequence of intermediate results. On the first iteration, the two inputs to the quotation are " { $snippet "identity" } ", and the first element of the sequence. On successive iterations, the first input is the result of the previous iteration, and the second input is the corresponding element of the sequence." }
+{ $values { "seq" "a sequence" } { "quot" "a quotation with stack effect " { $snippet "( prev elt -- next )" } } { "final" "the final result" } { "newseq" "a new sequence" } }
+{ $description "Combines successive elements of the sequence using a binary operation, and outputs a sequence of intermediate results together with the final result. On the first iteration, the two inputs to the quotation are " { $snippet "identity" } ", and the first element of the sequence. On successive iterations, the first input is the result of the previous iteration, and the second input is the corresponding element of the sequence. Given the empty sequence, outputs a one-element sequence consisting of " { $snippet "identity" } "." }
 { $examples
-    { $example "{ 2 2 2 2 2 } 0 [ + ] accumulate ." "{ 0 2 4 6 8 }" }
+    { $example "{ 2 2 2 2 2 } 0 [ + ] accumulate . ." "{ 0 2 4 6 8 } 10" }
 } ;
 
 HELP: map
