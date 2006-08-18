@@ -4,9 +4,9 @@ IN: crypto
 : make-bits ( quot numbits -- n | quot: -- 0/1 )
     0 -rot [ drop dup call rot 1 shift bitor swap ] each drop ;
 
+DEFER: random-bits
 : add-bit ( bit integer -- integer ) 1 shift bitor ;
 : append-bits ( inta intb nbits -- int ) swapd shift bitor ;
-: random-bits ( n -- int ) random-int 2 swap ^ random-int ;
 : large-random-bits ( n -- int )
     #! random number with high bit and low bit enabled (odd)
     2 swap ^ [ random-int ] keep -1 shift 1 bitor bitor ;

@@ -1,5 +1,4 @@
 IN: math-contrib
-
 USING: kernel sequences errors namespaces math vectors errors prettyprint io inspector ;
 
 : setup-range ( from to -- frange )

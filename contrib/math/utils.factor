@@ -58,14 +58,9 @@ USING: errors kernel sequences math sequences-internals namespaces arrays ;
     #! find the absolute values of the min and max of a seq in one pass
     minmax 2dup [ abs ] 2apply > [ swap ] when ;
 
-SYMBOL: almost=-precision .000001 almost=-precision set
+SYMBOL: almost=-precision .0001 almost=-precision set-global
 : almost= ( a b -- bool )
-    2dup - abs almost=-precision get < [
-            2drop t
-        ] [
-            2array absminmax dup almost=-precision get * >r - abs r>
-            dup 0 < [ >= ] [ <= ] if
-    ] if ;
+    - abs almost=-precision get < ;
 
 TUPLE: frange from step length ;
 
