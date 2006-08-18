@@ -3,20 +3,6 @@ namespaces sequences ;
 
 ARTICLE: "conventions" "Conventions"
 "Various conventions are used throughout the Factor documentation and source code."
-{ $heading "Stack effect conventions" }
-"A stack effect comment lists word inputs and outputs, separated by " { $snippet "--" } ". Stack elements are ordered so that the top of the stack is on the right side. Each value can be named by a data type or description. The following are some examples of value names:"
-{ $table
-    { { { $snippet "?" } } "a boolean" }
-    { { { $snippet "elt" } } "an object which is an element of a sequence" }
-    { { { $snippet "m" } ", " { $snippet "n" } } "an integer" }
-    { { { $snippet "obj" } } "an object" }
-    { { { $snippet "quot" } } "a quotation" }
-    { { { $snippet "seq" } } "a sequence" }
-    { { { $snippet "str" } } "a string" }
-    { { { $snippet "x" } ", " { $snippet "y" } ", " { $snippet "z" } } "a number" }
-    { { $snippet "*" } "when this symbol appears by itself in the list of outputs, it means the word unconditionally throws an error" }
-}
-"The compiler verifies stack effect comments to ensure the correct number of inputs and outputs is listed. See " { $link "compiler" } "."
 { $heading "Word naming conventions" }
 "These conventions are not hard and fast, but are usually a good first step in understanding a word's behavior:"
 { $table

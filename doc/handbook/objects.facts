@@ -25,8 +25,11 @@ $terpri
 "In the overwhelming majority of cases, your interaction with the generic word system centers on two parsing words:"
 { $subsection POSTPONE: GENERIC: }
 { $subsection POSTPONE: M: }
+"Generic words must declare their stack effect in order to compile. See " { $link "effect-declaration" } "."
+$terpri
 "Since classes are not linearly ordered, method ordering is an issue to keep in mind."
 { $subsection "method-order" }
+"Generic word dispatch can be customized:"
 { $subsection "method-combination" } ;
 
 ARTICLE: "method-order" "Method ordering"

@@ -11,7 +11,7 @@ HELP: inference-error
     { $list
         { $link no-effect }
         { $link literal-expected }
-        { $link check-return }
+        { $link check-retain }
         { $link unbalanced-branches-error }
         { $link effect-error }
         { $link recursive-declare-error }
@@ -28,7 +28,7 @@ HELP: d-in
 HELP: terminated?
 { $var-description "During inference, a flag set to " { $link t } " if the current control flow path unconditionally throws an error." } ;
 
-HELP: check-return
+HELP: check-retain
 { $error-description "Thrown if inference notices a quotation leaving behind elements on the retain stack." }
 { $notes "Usually this error indicates a coding mistake; check that usages of " { $link >r } " and " { $link r> } " are balanced in this case. Writing code which intentionally does this is considered bad style." } ;
 

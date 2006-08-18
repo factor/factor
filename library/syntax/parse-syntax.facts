@@ -10,7 +10,7 @@ HELP: inline
 { $description
     "Declares the most recently defined word as an inline word."
     $terpri
-    "The compiler copies the definitions of inline words directly into the word being compiled. Combinators must be inlined in order to compile. For any other word, inlining is merely an optimization. Inlining does not affect the execution of the word in the interpreter."
+    "Combinators must be inlined in order to compile - see " { $link "inference-combinators" } ". For any other word, inlining is merely an optimization. Inlining does not affect the execution of the word in the interpreter."
 } ;
 
 HELP: foldable
@@ -172,20 +172,19 @@ HELP: (
 { $syntax "( inputs -- outputs )" }
 { $values { "inputs" "a list of tokens" } { "outputs" "a list of tokens" } }
 { $description "Declares the stack effect of the most recently defined word, storing a new " { $link effect } " instance in the " { $snippet "\"declared-effect\"" } " word property." }
-{ $notes "Recursive words must have a declared stack effect to compile. See " { $link "compiler" } " for details." }
-{ $see-also POSTPONE: ! POSTPONE: #! } ;
+{ $notes "Recursive words must have a declared stack effect to compile. See " { $link "effect-declaration" } " for details." } ;
 
 HELP: !
 { $syntax "! comment..." }
 { $values { "comment" "characters" } }
 { $description "Discards all input until the end of the line." }
-{ $see-also POSTPONE: ( POSTPONE: #! } ;
+{ $see-also POSTPONE: #! } ;
 
 HELP: #!
 { $syntax "#! comment..." }
 { $values { "comment" "characters" } }
 { $description "Discards all input until the end of the line." }
-{ $see-also POSTPONE: ( POSTPONE: ! } ;
+{ $see-also POSTPONE: ! } ;
 
 HELP: HEX:
 { $syntax "HEX: integer" }

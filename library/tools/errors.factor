@@ -183,7 +183,7 @@ M: unbalanced-branches-error error.
 M: literal-expected summary
     drop "Literal value expected" ;
 
-M: check-return summary
+M: check-retain summary
     drop
     "Quotation leaves elements behind on retain stack" ;
 

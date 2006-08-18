@@ -325,6 +325,7 @@ sequences vectors words ;
         "/doc/handbook/handbook.facts"
         "/doc/handbook/hashtables.facts"
         "/doc/handbook/help.facts"
+        "/doc/handbook/inference.facts"
         "/doc/handbook/math.facts"
         "/doc/handbook/objects.facts"
         "/doc/handbook/parser.facts"

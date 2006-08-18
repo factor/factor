@@ -78,9 +78,6 @@ $terpri
 } ;
 
 ARTICLE: "syntax-comments" "Comments"
-"Stack effect comments:"
-{ $subsection POSTPONE: ( }
-"End of line comments:"
 { $subsection POSTPONE: ! }
 { $subsection POSTPONE: #! } ;
 
