@@ -11,7 +11,6 @@
 
 - declaration to do:
   - bootstrap speedup with compiling recursives
-  - load cocoa before 'recompile' call
 - RT_WORD should refer to XTs not word objects.
 - fix contribs: boids, automata
 - sometimes darcs get fails with the httpd
