@@ -22,7 +22,7 @@ $terpri
 "Outputs " { $link f } " if memory allocation failed, so calls to this word should be followed by a call to " { $link check-ptr } "." }
 { $warning "Don't forget to deallocate the memory with a call to " { $link free } "." } ;
 
-HELP: memcpy ( dst src size -- newalien )
+HELP: memcpy ( dst src size -- )
 { $values { "dst" "an alien address" } { "src" "an alien address" } { "size" "a non-negative integer" } }
 { $description "Copies " { $snippet "size" } " bytes from " { $snippet "src" } " to " { $snippet "dst" } "." }
 { $warning "As per the BSD C library documentation, the behavior is undefined if the source and destination overlap." } ;
