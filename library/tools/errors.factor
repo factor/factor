@@ -174,16 +174,16 @@ M: inference-error error.
 
 M: inference-error error-help drop f ;
 
-M: unbalanced-branches error.
+M: unbalanced-branches-error error.
     "Unbalanced branches:" print
-    dup unbalanced-branches-out
-    swap unbalanced-branches-in
+    dup unbalanced-branches-error-out
+    swap unbalanced-branches-error-in
     [ pprint bl pprint ] 2map ;
 
 M: literal-expected summary
     drop "Literal value expected" ;
 
-M: retain-leave-error summary
+M: check-return summary
     drop
     "Quotation leaves elements behind on retain stack" ;
 

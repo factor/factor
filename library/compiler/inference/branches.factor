@@ -37,7 +37,7 @@ TUPLE: unbalanced-branches-error in out ;
         [ >r dupd r> unify-inputs ] 2map
         [ ] subset unify-stacks
     ] [
-        unbalanced-branches
+        unbalanced-branches-error
     ] if ;
 
 : active-variable ( seq symbol -- seq )
