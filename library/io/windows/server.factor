@@ -59,7 +59,7 @@ M: win32-client-stream client-stream-port win32-client-stream-port ;
 
 C: win32-server ( port -- server )
     swap [ 
-        new-socket swap over bind-socket dup listen-socket 
+        new-socket tuck bind-socket dup listen-socket 
         dup add-completion
         socket set
         dup stream set

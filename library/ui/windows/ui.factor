@@ -190,7 +190,7 @@ SYMBOL: hWnd
     >r >r 2dup r> r> 2swap >r >r 2dup r> r> 2swap ;
 
 ! return 0 if you handle the message, else just let DefWindowProc return its val
-: ui-wndproc ( hWnd uMsg wParam lParam -- lresult )
+: ui-wndproc ( -- object )
     "uint" { "void*" "uint" "long" "long" } [
         [
         pick
