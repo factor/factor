@@ -1,4 +1,4 @@
-USING: help io jedit parser ;
+USING: compiler help io jedit parser ;
 
 HELP: file-vocabs
 { $description "Installs the initial the vocabulary search path for parsing a file." } ;
@@ -21,6 +21,14 @@ HELP: eval
 { $values { "str" "a string" } }
 { $description "Parses Factor source code from a string, and calls the resulting quotation. The current vocabulary search path is used." }
 { $errors "Throws an error if the input is malformed, or if the quotation throws an error." } ;
+
+HELP: parse-hook
+{ $var-description "A quotation called by " { $link parse-stream } " after parsing the input stream. The default value calls " { $link recompile } " to recompile any changed definitions." }
+{ $see-also no-parse-hook } ;
+
+HELP: no-parse-hook
+{ $values { "quot" "a quotation" } }
+{ $description "Runs the quotation in a new dynamic scope where " { $link parse-hook } " is set to " { $link f } ". This disables the default behavior of recompiling changed definitions after a source file is loaded." } ;
 
 HELP: parse-stream
 { $values { "stream" "an input stream" } { "name" "a file name for error reporting" } { "quot" "a new quotation" } }

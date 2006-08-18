@@ -309,6 +309,8 @@ DEFER: bar
 : bad-bin ( a b -- ) 5 [ 5 bad-bin bad-bin 5 ] [ 2drop ] if ;
 [ [ bad-bin ] infer ] unit-test-fails
 
+[ t ] [ [ [ r> ] infer ] catch inference-error? ] unit-test
+
 ! Test some random library words
 
 [ { 1 1 } ] [ [ unit ] infer ] unit-test

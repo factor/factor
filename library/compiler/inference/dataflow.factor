@@ -4,10 +4,6 @@ IN: inference
 USING: arrays generic hashtables interpreter kernel math
 namespaces parser sequences words ;
 
-! The dataflow IR is the first of the two intermediate
-! representations used by Factor. It annotates concatenative
-! code with stack flow information and types.
-
 TUPLE: node param shuffle
        classes literals history
        successor children ;
@@ -33,10 +29,10 @@ M: node equal? eq? ;
 : out-node >r f { } r> { } { } ;
 : meta-d-node meta-d get clone in-node ;
 
-: d-tail ( n -- list )
+: d-tail ( n -- seq )
     dup zero? [ drop f ] [ meta-d get swap tail* ] if ;
 
-: r-tail ( n -- list )
+: r-tail ( n -- seq )
     dup zero? [ drop f ] [ meta-r get swap tail* ] if ;
 
 : node-child node-children first ;
@@ -74,8 +70,6 @@ C: #values make-node ;
 TUPLE: #return ;
 C: #return make-node ;
 : #return ( label -- node )
-    #! The parameter is the label we are returning from, or if
-    #! f, this is a top-level return.
     meta-d-node <#return> [ set-node-param ] keep ;
 
 TUPLE: #if ;
@@ -108,16 +102,13 @@ C: #declare make-node ;
     >r r-tail r> set-node-out-r
     >r d-tail r> set-node-out-d ;
 
-! Variable holding dataflow graph being built.
 SYMBOL: dataflow-graph
-! The most recently added node.
 SYMBOL: current-node
 
 : node, ( node -- )
     dataflow-graph get [
         dup current-node [ set-node-successor ] change
     ] [
-        ! first node
         dup dataflow-graph set  current-node set
     ] if ;
 
@@ -177,8 +168,6 @@ SYMBOL: current-node
     swap [ with rot ] all-nodes? 2nip ; inline
 
 : remember-node ( word node -- )
-    #! Annotate each node with the fact it was inlined from
-    #! 'word'.
     [
         dup #call?
         [ [ node-history ?push ] keep set-node-history ]
@@ -265,7 +254,6 @@ DEFER: (map-nodes)
     ] each-node 2drop ;
 
 : subst-values ( new old node -- )
-    #! Mutates nodes.
     node-stack get 1 head-slice* swap add
     [ >r 2dup r> node-successor (subst-values) ] each 2drop ;
 

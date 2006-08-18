@@ -168,7 +168,38 @@ M: alien-invoke-error summary
 M: assert summary drop "Assertion failed" ;
 
 M: inference-error error.
-    "Inference error:" print
-    dup inference-error-message print
-    "Recursive state:" print
-    inference-error-rstate describe ;
+    dup inference-error-message error.
+    "Nesting: " write
+    inference-error-rstate [ first ] map . ;
+
+M: inference-error error-help drop f ;
+
+M: unbalanced-branches error.
+    "Unbalanced branches:" print
+    dup unbalanced-branches-out
+    swap unbalanced-branches-in
+    [ pprint bl pprint ] 2map ;
+
+M: literal-expected summary
+    drop "Literal value expected" ;
+
+M: retain-leave-error summary
+    drop
+    "Quotation leaves elements behind on retain stack" ;
+
+M: no-effect error.
+    "The word " write
+    no-effect-word pprint
+    " does not have a stack effect" print ;
+
+M: recursive-declare-error error.
+    "The recursive word " write
+    recursive-declare-error-word pprint
+    " must declare a stack effect" print ;
+
+M: effect-error error.
+    "Stack effects of the word " write
+    dup effect-error-word pprint
+    " do not match." print
+    "Declared: " write dup effect-error-word stack-effect .
+    "Inferred: " write effect-error-effect . ;

@@ -1,20 +1,49 @@
 IN: inference
-USING: help kernel ;
+USING: compiler help kernel sequences ;
 
 HELP: inference-error
 { $values { "msg" "an object" } }
 { $description "Throws an " { $link inference-error } "." }
 { $error-description
-    "Thrown by " { $link infer } " when the stack effect of a quotation cannot be inferred. There are several possible reasons that this can occur:"
+    "Thrown by " { $link infer } ", " { $link dataflow } " and " { $link compile } " when the stack effect of a quotation cannot be inferred."
+    $terpri
+    "This error always delegates to one of the following classes of errors, which indicate the specific issue preventing a stack effect from being inferred:"
     { $list
-        { "The quotation applies " { $link call } " or " { $link if } " to quotation values which are not literals; thus the potential stack effect is arbitrary" }
-        "The quotation involves conditionals where the branches have incompatible stack effects"
-        "The quotation calls a recursive word with no base case"
+        { $link no-effect }
+        { $link literal-expected }
+        { $link check-return }
+        { $link unbalanced-branches-error }
+        { $link effect-error }
+        { $link recursive-declare-error }
     }
-    "Words without a static stack effect cannot be compiled, but will still run in the interpreter."
 } ;
+
+HELP: literal-expected
+{ $error-description "Thrown when inference encounters a " { $link call } " or " { $link if } " being applied to a value which is not known to be a literal. Such a form can have an arbitrary stack effect, and does not compile." }
+{ $notes "This error will be thrown when compiling any combinator, such as " { $link each } ". However, words calling combinators can compile of the combinator is declared " { $link inline } " and the quotation being passed in is a literal." } ;
+
+HELP: d-in
+{ $var-description "During inference, holds the number of inputs which the quotation has been inferred to require so far." } ;
+
+HELP: terminated?
+{ $var-description "During inference, a flag set to " { $link t } " if the current control flow path unconditionally throws an error." } ;
+
+HELP: check-return
+{ $error-description "Thrown if inference notices a quotation leaving behind elements on the retain stack." }
+{ $notes "Usually this error indicates a coding mistake; check that usages of " { $link >r } " and " { $link r> } " are balanced in this case. Writing code which intentionally does this is considered bad style." } ;
 
 HELP: infer
 { $values { "quot" "a quotation" } { "effect" "a pair of integers" } }
-{ $description "Attempts to infer the quotation's stack effect, outputting a pair holding the correct of data stack inputs and outputs for the quotation." }
-{ $errors "Throws an error if stack effect inference fails." } ;
+{ $description "Attempts to infer the quotation's stack effect, and outputs a pair holding the correct of data stack inputs and outputs for the quotation." }
+{ $errors "Throws an " { $link inference-error } " if stack effect inference fails." } ;
+
+HELP: dataflow
+{ $values { "quot" "a quotation" } { "dataflow" "a dataflow node" } }
+{ $description "Attempts to construct a dataflow graph showing stack flow in the quotation." }
+{ $notes "This is the first stage of the compiler." }
+{ $errors "Throws an " { $link inference-error } " if stack effect inference fails." } ;
+
+HELP: dataflow-with
+{ $values { "quot" "a quotation" } { "stack" "a vector" } { "dataflow" "a dataflow node" } }
+{ $description "Attempts to construct a dataflow graph showing stack flow in the quotation, starting with an initial data stack of values." }
+{ $errors "Throws an " { $link inference-error } " if stack effect inference fails." } ;

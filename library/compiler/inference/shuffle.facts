@@ -1,0 +1,10 @@
+IN: inference
+USING: help ;
+
+HELP: recursive-state
+{ $var-description "During inference, holds an association list mapping words to labels." } ;
+
+HELP: shuffle
+{ $values { "d" "a sequence" } { "r" "a sequence" } { "shuffle" "an instance of " { $link shuffle } } { "newd" "a new sequence" } { "newr" "a new sequence" } }
+{ $description "Applies a stack shuffle pattern to a pair of stacks." }
+{ $errors "Throws an error if the input stacks contain insufficient elements." } ;

@@ -78,7 +78,6 @@ $terpri
 "The first declaration specifies the time when a word runs. It affects both interpreted and compiled definitions."
 { $subsection POSTPONE: parsing }
 "The remaining declarations only affect compiled definitions. They do not change evaluation semantics of a word, but instead declare that the word follows a certain contract, and thus may be compiled differently."
-$terpri
 { $warning "If a generic word is declared " { $link POSTPONE: foldable } ", all methods must satisfy the contract, otherwise unpredicable behavior will occur." }
 { $subsection POSTPONE: inline }
 { $subsection POSTPONE: foldable } ;

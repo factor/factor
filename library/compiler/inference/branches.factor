@@ -4,15 +4,11 @@ IN: inference
 USING: arrays errors generic hashtables interpreter kernel math
 namespaces parser prettyprint sequences strings vectors words ;
 
-: unify-lengths ( seq -- seq )
-    #! Pad all vectors to the same length. If one vector is
-    #! shorter, pad it with unknown results at the bottom.
+: unify-lengths ( seq -- newseq )
     dup [ length ] map supremum
     swap [ add-inputs nip ] map-with ;
 
 : unify-values ( seq -- value )
-    #! If all values in list are equal, return the value.
-    #! Otherwise, unify.
     dup all-eq? [ first ] [ drop <computed> ] if ;
 
 : unify-stacks ( seq -- stack ) flip [ unify-values ] map ;
@@ -21,9 +17,10 @@ namespaces parser prettyprint sequences strings vectors words ;
     [ dup [ length - ] [ 2drop f ] if ] 2map
     [ ] subset all-equal? ;
 
-: unbalanced-branches ( in out -- )
-    [ swap unparse " " rot length unparse append3 ] 2map
-    "Unbalanced branches:" add* "\n" join inference-error ;
+TUPLE: unbalanced-branches-error in out ;
+
+: unbalanced-branches-error ( in out -- * )
+    <unbalanced-branches-error> inference-error ;
 
 : unify-inputs ( max-d-in d-in meta-d -- meta-d )
     dup [
@@ -32,7 +29,7 @@ namespaces parser prettyprint sequences strings vectors words ;
         2nip
     ] if ;
 
-: unify-effect ( in out -- in out )
+: unify-effect ( in out -- newin newout )
     #! in is a sequence of integers, out is a sequence of
     #! stacks.
     2dup balanced? [
@@ -84,8 +81,5 @@ namespaces parser prettyprint sequences strings vectors words ;
     [ infer-branch ] map dup unify-effects unify-dataflow ;
 
 : infer-branches ( branches node -- )
-    #! Recursive stack effect inference is done here. If one of
-    #! the branches has an undecidable stack effect, we set the
-    #! base case to this stack effect and try again.
     [ >r (infer-branches) r> set-node-children ] keep
     node, #merge node, ;

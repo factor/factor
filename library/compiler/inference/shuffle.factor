@@ -3,7 +3,6 @@
 IN: inference
 USING: hashtables kernel math namespaces sequences ;
 
-! Recursive state. An alist, mapping words to labels.
 SYMBOL: recursive-state
 
 : <computed> \ <computed> counter ;
@@ -46,9 +45,7 @@ TUPLE: shuffle in-d in-r out-d out-r ;
 : join-shuffle ( d' r' d r -- d r )
     swapd append >r append r> ;
 
-: shuffle ( d r shuffle -- d r )
-    #! d and r lengths must be at least the required length for
-    #! the shuffle.
+: shuffle ( d r shuffle -- newd newr )
     [ split-shuffle ] keep shuffle* join-shuffle ;
 
 M: shuffle clone

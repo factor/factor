@@ -1,7 +1,5 @@
 + 0.84:
 
-- document: parse-hook no-parse-hook
-- document inference errors
 - update docs for declared effects
 - better doc for accumulate, link from tree
 - RT_WORD should refer to XTs not word objects.
@@ -97,6 +95,8 @@
 
 + compiler/ffi:
 
+- [ r> ] infer should throw an inference error
+- better way of dealing with compiler errors
 - compiler tests are not as reliable now because of try-compile usage
   - we can just do [ t ] [ \ foo compiled? ] unit-test
 - [ [ dup call ] dup call ] infer hangs
