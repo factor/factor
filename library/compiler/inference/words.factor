@@ -162,9 +162,16 @@ M: symbol apply-object apply-literal ;
 
 M: compound apply-object
     #! Apply the word's stack effect to the inferencer state.
-    dup recursing? [
-        dup recursive-effect consume/produce
+    dup "inline" word-prop [
+        dup recursive-state get peek first eq? [
+            dup recursive-effect consume/produce
+        ] [
+            inline-closure
+        ] if
     ] [
-        dup "inline" word-prop
-        [ inline-closure ] [ apply-default ] if
+        dup recursing? [
+            dup recursive-effect consume/produce
+        ] [
+            apply-default
+        ] if
     ] if ;
