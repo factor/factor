@@ -68,7 +68,7 @@ namespaces parser prettyprint sequences strings words shells ;
             dup definer ,
             dup word-vocabulary ,
             dup word-name ,
-            stack-effect ,
+            stack-effect effect>string ,
         ] [ ] make
     ] when ;
 

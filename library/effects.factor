@@ -43,12 +43,6 @@ C: effect
     ] "" make ;
 
 : stack-effect ( word -- effect/f )
-    dup "declared-effect" word-prop [
-        effect>string
-    ] [
-        dup "infer-effect" word-prop [
-            effect>string
-        ] [
-            drop f
-        ] ?if
+    dup "infer-effect" word-prop [ ] [
+        dup "declared-effect" word-prop [ ] [ drop f ] ?if
     ] ?if ;

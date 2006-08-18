@@ -9,7 +9,8 @@ M: word article-title
         word-name
     ] [
         dup word-name
-        swap stack-effect [ " " swap append3 ] when*
+        swap stack-effect
+        [ effect>string " " swap append3 ] when*
     ] if ;
 
 M: word article-content

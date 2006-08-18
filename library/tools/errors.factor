@@ -201,5 +201,6 @@ M: effect-error error.
     "Stack effects of the word " write
     dup effect-error-word pprint
     " do not match." print
-    "Declared: " write dup effect-error-word stack-effect .
-    "Inferred: " write effect-error-effect . ;
+    "Declared: " write
+    dup effect-error-word stack-effect effect>string .
+    "Inferred: " write effect-error-effect effect>string . ;

@@ -141,7 +141,7 @@ M: symbol apply-object apply-literal ;
 TUPLE: recursive-declare-error word ;
 
 : recursive-effect ( word -- effect )
-    stack-effect
+    dup stack-effect
     [ ] [ <recursive-declare-error> inference-error ] ?if ;
 
 M: compound apply-object

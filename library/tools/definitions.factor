@@ -27,7 +27,7 @@ M: word (synopsis)
     dup in.
     dup definer pprint-word
     dup pprint-word
-    stack-effect comment. ;
+    stack-effect [ effect>string comment. ] when* ;
 
 M: method-spec (synopsis)
     \ M: pprint-word [ pprint-word ] each ;

@@ -92,7 +92,7 @@ M: word-link where link-name "help-loc" word-prop ;
 M: word-link (synopsis)
     \ HELP: pprint-word
     link-name dup pprint-word
-    stack-effect comment. ;
+    stack-effect effect>string comment. ;
 
 M: word-link definition
     link-name "help" word-prop t ;
