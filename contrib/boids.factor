@@ -8,10 +8,11 @@
 ! results, increase the size of the window (larger than 400x400 is
 ! good). Then press the "Reset" button to start the demo over.
 
-REQUIRES: math slate vars ;
+REQUIRES: math slate vars action-field ;
 
 USING: generic threads namespaces math kernel sequences arrays gadgets
-       math-contrib slate vars ;
+       gadgets-labels gadgets-theme gadgets-text gadgets-buttons gadgets-frames
+       gadgets-grids math-contrib slate vars action-field ;
 
 IN: boids
 
@@ -281,91 +282,74 @@ f stop? set
 run-boids ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-! Boids ui
-! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-
-USING: gadgets-frames gadgets-labels gadgets-theme gadgets-grids
-       gadgets-text gadgets-buttons ;
-
-! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-
-: [bind] ( ns quot -- quot ) \ bind 3array >quotation ;
-
+! boids-window
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 VARS: ns frame ;
 
-! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+: control-panel-label ( string -- array ) <label> dup title-theme ;
 
-: number-field-quot ( symbol -- quot )
-1array >quotation [ set ] append [ editor-text string>number ] swap append ;
-
-: number-field ( label symbol init -- gadget )
-swap number-field-quot ns> swap [bind] f swap <field> tuck set-editor-text
-swap <label> swap
+: control-panel-field ( label variable init -- shelf )
+rot <label> -rot
+swap number-field ns> over bind-action-field tuck set-editor-text
 2array make-shelf ;
+
+: control-panel-button ( string quot -- button ) ns> swap [bind] <bevel-button> ;
+
+: control-panel ( -- pile )
+{ [ "Weight" control-panel-label ]
+  [ "Alignment:  " alignment-weight "1" control-panel-field ]
+  [ "Cohesion:   " cohesion-weight  "1" control-panel-field ]
+  [ "Separation: " alignment-weight "1" control-panel-field ]
+  [ "Radius" control-panel-label ]
+  [ "Alignment:  " alignment-radius "1" control-panel-field ]
+  [ "Cohesion:   " cohesion-radius  "1" control-panel-field ]
+  [ "Separation: " alignment-radius "1" control-panel-field ]
+  [ "View Angle" control-panel-label ]
+  [ "Alignment:  " alignment-view-angle "1" control-panel-field ]
+  [ "Cohesion:   " cohesion-view-angle  "1" control-panel-field ]
+  [ "Separation: " alignment-view-angle "1" control-panel-field ]
+  [ "" control-panel-label ]
+  [ "Time slice: " time-slice "10" control-panel-field ]
+  [ "Stop"  [ drop t stop? set ]                         control-panel-button ]
+  [ "Start" [ drop f stop? set [ run-boids ] in-thread ] control-panel-button ]
+  [ "Reset" [ drop 50 random-boids boids set ]           control-panel-button ]
+} [ call ] map make-pile 1 over set-pack-fill ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 : init-slate ( -- ) <slate> t over set-gadget-clipped? self set ;
 
-: boids-window ( -- )
+: boids-init ( -- )
+init-slate
+init-variables
+10 >time-slice
+100 capacity set
+{ 100 100 } >world-size
+50 random-boids >boids
+stop? off ;
+
+: boids-frame ( -- frame )
 <frame> >frame
 [ ] make-hash >ns
-
-ns> [ init-slate
-      init-variables
-      10 time-slice set
-      100 capacity set
-      { 100 100 } world-size set
-      50 random-boids boids set
-      f stop? set
-] bind
-
-"Weight" <label> dup title-theme 1array
-"Alignment:  " alignment-weight "1" number-field
-"Cohesion:   " cohesion-weight  "1" number-field
-"Separation: " alignment-weight "1" number-field
-3array append
-
-"Radius" <label> dup title-theme 1array
-"Alignment:  " alignment-radius  "50" number-field
-"Cohesion:   " cohesion-radius   "75" number-field
-"Separation: " separation-radius "25" number-field
-3array append
-
-"View angle" <label> dup title-theme 1array
-"Alignment:  " alignment-view-angle  "180" number-field
-"Cohesion:   " cohesion-view-angle   "180" number-field
-"Separation: " separation-view-angle "180" number-field
-3array append
-
-"" <label> dup title-theme 1array
-
-"Time slice: " time-slice "10" number-field 1array
-
-"Stop" ns> [ drop t stop? set ] [bind] <bevel-button>
-"Start" ns> [ drop f stop? set [ run-boids ] in-thread ] [bind] <bevel-button>
-"Reset" ns> [ drop 50 random-boids boids set ] [bind] <bevel-button>
-3array
-
-append append append append append
-make-pile 1 over set-pack-fill frame> @left grid-add
-
+ns> [ boids-init ] bind
+control-panel frame> @left grid-add
 ns> [ self get ] bind frame> @center grid-add
-frame> "Boids" open-titled-window
-ns> [ 1000 sleep [ run-boids ] in-thread ] bind
-;
+frame> ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-! Comments from others:
+
+TUPLE: boids-gadget ;
+
+C: boids-gadget ( -- boids-gadget ) boids-frame over set-gadget-delegate ;
+
+M: boids-gadget pref-dim* { 400 300 } ;
+
+: boids-window ( -- )
+<boids-gadget> "Boids" open-titled-window
+ns> [ 1000 sleep [ run-boids ] in-thread ] bind ;
+
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-
-! slava foo get blah foo set ==> foo [ blah ] change
-! slava dup >r blah r> ==> [ blah ] keep
-
-! : execute-with ( item [ word word ... ] -- results ... )
-!   [ over >r execute r> ] each drop ;
 
 PROVIDE: boids ;
 
