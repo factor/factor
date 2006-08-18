@@ -61,7 +61,7 @@ SYMBOL: vocabularies
 
 : lookup ( name vocab -- word ) vocab ?hash ;
 
-: target-word ( word -- word )
+: target-word ( word -- target )
     dup word-name swap word-vocabulary lookup ;
 
 : interned? ( word -- ? ) dup target-word eq? ;

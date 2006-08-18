@@ -1,4 +1,4 @@
-USING: help ;
+USING: help porter-stemmer ;
 
 ARTICLE: "help" "The help system"
 "The help system maintains documentation written in a simple markup language, along with cross-referencing and search. Documentation can either exist as free-standing " { $emphasis "articles" } " or be associated with words."

@@ -16,10 +16,9 @@ strings vectors words ;
 : !IN: scan set-in ; parsing
 : !USE: scan use+ ; parsing
 : !USING: string-mode on [ string-mode off add-use ] f ; parsing
-: !(BASE) scan swap base> parsed ;
-: !HEX: 16 (BASE) ; parsing
-: !OCT: 8 (BASE) ; parsing
-: !BIN: 2 (BASE) ; parsing
+: !HEX: 16 parse-base ; parsing
+: !OCT: 8 parse-base ; parsing
+: !BIN: 2 parse-base ; parsing
 SYMBOL: !t
 : !f f parsed ; parsing
 : !CHAR: 0 scan next-char nip parsed ; parsing

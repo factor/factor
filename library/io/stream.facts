@@ -54,7 +54,7 @@ $terpri
 "The " { $snippet "style" } " hashtable holds character style information. See " { $link "character-styles" } "." }
 $io-error ;
 
-HELP: with-nested-stream "( quot style stream -- )"
+HELP: with-nested-stream
 { $values { "quot" "a quotation" } { "style" "a hashtable" } { "stream" "an output stream" } }
 { $contract "Calls the quotation in a new dynamic scope with the " { $link stdio } " stream rebound to a nested paragraph stream, with formatting information applied."
 $terpri

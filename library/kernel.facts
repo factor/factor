@@ -1,5 +1,5 @@
 IN: kernel
-USING: generic help kernel math memory namespaces sequences ;
+USING: generic help kernel math memory namespaces sequences kernel-internals ;
 
 HELP: eq? ( obj1 obj2 -- ? )
 { $values { "obj1" "an object" } { "obj2" "an object" } }
@@ -53,10 +53,6 @@ HELP: set-callstack ( cs -- )
 { $values { "cs" "a vector" } }
 { $description "Replaces the call stack contents with a copy of a vector. The end of the vector becomes the top of the stack. The current quotation continues executing. The new callstack takes effect when the current quotation returns, resulting in a callframe being popped." } ;
 
-HELP: (clone) ( obj -- newobj )
-{ $values { "obj" "an object" } { "newobj" "a shallow copy" } }
-{ $description "Outputs a byte-by-byte copy of the given object. User code should call " { $link clone } " instead." } ;
-
 HELP: clear
 { $description "Clears the data stack." } ;
 
@@ -72,22 +68,26 @@ HELP: hashcode
 
 HELP: =
 { $values { "obj1" "an object" } { "obj2" "an object" } { "?" "a boolean" } }
+{ $description
+    "Tests if two objects are equal. If " { $snippet "obj1" } " and " { $snippet "obj2" } " point to the same object, outputs " { $link t } ". Otherwise, calls the " { $link equal? } " generic word."
+} ;
+
+HELP: equal?
+{ $values { "obj1" "an object" } { "obj2" "an object" } { "?" "a boolean" } }
 { $contract
-    "Tests if two objects are equal. If two objects are equal, they should the same printed representation, although the converse is not always true."
+    "Tests if two objects are equal."
     $terpri
-    "Two objects being " { $link = } " is an equivalence relation, which means,"
+    "Method definitions should ensure that this is an equality relation:"
     { $list
         { $snippet "a = a" }
         { { $snippet "a = b" } " implies " { $snippet "b = a" } }
         { { $snippet "a = b" } " and " { $snippet "b = c" } " implies " { $snippet "a = c" } }
     }
-    "The precise contract is as follows:"
-    { $list
-        { "if no more specific method is defined, " { $link = } " calls " { $link eq? } }
-        { "two numbers are equal if they have the same numerical value after being upgraded to the highest type of the two (see " { $link "number-protocol" } ")" }
-        "two sequences are equal if they have the same type and elements"
-        "two tuples are equal if their classes and slot values are equal"
-    }
+    "While user code can define methods for this generic word, it should not call it directly, since it is slightly less efficient than " { $link = } " in the case the two references point to the same object."
+}
+{ $examples
+    "The most common reason for defining a method for this generic word to ensure that instances of a specific tuple class are only ever equal to themselves, overriding the default implementation which checks slot values for equality."
+    { $code "TUPLE: foo ;" "M: foo equal? eq? ;" }
 } ;
 
 HELP: <=>
@@ -307,6 +307,10 @@ HELP: save
 { $description "Saves a snapshot of the heap to the current image file." } ;
 
 IN: kernel-internals
+
+HELP: (clone) ( obj -- newobj )
+{ $values { "obj" "an object" } { "newobj" "a shallow copy" } }
+{ $description "Outputs a byte-by-byte copy of the given object. User code should call " { $link clone } " instead." } ;
 
 HELP: declare
 { $values { "spec" "an array of class words" } }

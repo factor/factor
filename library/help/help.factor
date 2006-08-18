@@ -1,10 +1,16 @@
 ! Copyright (C) 2005, 2006 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 IN: help
-USING: arrays io kernel namespaces prettyprint sequences words ;
+USING: arrays io kernel namespaces parser prettyprint sequences
+words ;
 
 M: word article-title
-    dup word-name swap stack-effect [ " " swap append3 ] when* ;
+    dup parsing? [
+        word-name
+    ] [
+        dup word-name
+        swap stack-effect [ " " swap append3 ] when*
+    ] if ;
 
 M: word article-content
     [
@@ -51,7 +57,7 @@ M: word article-content
         subsection-style [ first ($subsection) ] with-style
     ] ($block) ;
 
-: help-outliner ( seq  -- )
+: help-outliner ( seq quot -- )
     subsection-style [
         sort-articles [ ($subsection) terpri ] each
     ] with-style ;

@@ -63,7 +63,7 @@ HELP: norm
 { $values { "v" "a sequence of numbers" } { "x" "a non-negative real number" } }
 { $description "Computes the length of a mathematical vector." } ;
 
-HELP: normalize "( u -- v )"
+HELP: normalize
 { $values { "u" "a sequence of numbers" } { "v" "a sequence of numbers" } }
 { $description "Computes a mathematical vector with the same direction but length 1." }
 { $errors "Throws an error if " { $snippet "v" } " has zero length." } ;

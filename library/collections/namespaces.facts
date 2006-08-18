@@ -87,7 +87,7 @@ HELP: namestack
 { $values { "namestack" "a vector" } }
 { $description "Outputs a copy of the current namestack." } ;
 
-HELP: set-namestack "( namestack -- )"
+HELP: set-namestack
 { $values { "namestack" "a vector" } }
 { $description "Replaces the namestack with a copy of the given vector." } ;
 

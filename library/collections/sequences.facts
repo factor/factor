@@ -96,7 +96,7 @@ HELP: set-nth-unsafe
 { $values { "elt" "an object" } { "n" "an integer" } { "seq" "a sequence" } }
 { $contract "Unsafe variant of " { $link set-nth } " that does not perform bounds checks." } ;
 
-HELP: exchange-unsafe "( m n seq -- )"
+HELP: exchange-unsafe
 { $values { "m" "a non-negative integer" } { "n" "a non-negative integer" } { "seq" "a mutable sequence" } }
 { $description "Unsafe variant of " { $link exchange } " that does not perform bounds checks." } ;
 

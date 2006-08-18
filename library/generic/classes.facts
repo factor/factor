@@ -48,7 +48,7 @@ HELP: superclass
 { $description "Outputs the superclass of a class. All instances of this class are also instances of the superclass." }
 { $notes "If " { $link class< } " yields that one class is a subtype of another, it does not imply that a superclass relation is involved. The superclass relation is a technical implementation detail of predicate classes (see " { $link POSTPONE: PREDICATE: } ").." } ;
 
-HELP: members "( class -- seq )"
+HELP: members
 { $values { "class" "a class word" } { "seq" "a sequence of union members, or " { $link f } } }
 { $description "If " { $snippet "class" } " is a union class, outputs a sequence of members, otherwise outputs " { $link f } "." } ;
 
@@ -116,7 +116,7 @@ HELP: define-class
 { $description "Sets a property indicating this is a class word, and registers the class in the global union lookup map." }
 $low-level-note ;
 
-HELP: define-predicate-class "( class predicate definition -- )"
+HELP: define-predicate-class
 { $values { "class" "a class word" } { "predicate" "a predicate word" } { "definition" "a quotation with stack effect " { $snippet "( superclass -- ? )" } } }
 { $description "Defines a predicate class. The superclass of " { $snippet "class" } " must already be set." }
 { $see-also POSTPONE: PREDICATE: } ;

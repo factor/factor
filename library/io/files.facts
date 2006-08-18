@@ -30,7 +30,7 @@ HELP: exists?
 { $values { "path" "a string" } { "?" "a boolean" } }
 { $description "Tests if the file named by " { $snippet "path" } " exists." } ;
 
-HELP: directory? "( path -- ? )"
+HELP: directory?
 { $values { "path" "a string" } { "?" "a boolean" } }
 { $description "Tests if " { $snippet "path" } " names a directory." } ;
 
@@ -56,7 +56,7 @@ HELP: <resource-reader>
 { $description "Opens a file relative to the Factor source code location." } ;
 
 HELP: pathname
-{ $class-description "Class of path name presentations. Instances can be used as the value associated to the " { $link presented } " key in the style hashtable passed to " { $link stream-format } " to output a clickable path name." } ;
+{ $class-description "Class of path name presentations. Instances can be used passed to " { $link write-object } " to output a clickable path name." } ;
 
 HELP: directory.
 { $values { "path" "a string" } }

@@ -92,6 +92,8 @@ M: word print-element { } swap execute ;
 : $code ( element -- )
     "\n" join dup <input> [ write ] ($code) ;
 
+: $syntax ( element -- ) "Syntax" $heading $code ;
+
 : $description ( element -- )
     "Word description" $heading print-element ;
 
@@ -182,7 +184,7 @@ M: object >link <link> ;
     table-style $grid ;
 
 : $values ( element -- )
-    "Arguments and values" $heading
+    "Inputs and outputs" $heading
     [ unclip \ $snippet swap 2array swap 2array ] map $table ;
 
 : $predicate ( element -- )

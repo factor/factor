@@ -1,7 +1,7 @@
 IN: alien
 USING: help libc ;
 
-HELP: <c-type> "( -- type )"
+HELP: <c-type>
 { $values { "type" "a hashtable" } }
 { $description "Creates a prototypical C type. User code should use higher-level facilities to define C types; see " { $link "c-types" } "." } ;
 

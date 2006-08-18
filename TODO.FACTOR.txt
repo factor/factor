@@ -1,9 +1,10 @@
 + 0.84:
 
+- crash: 1/2 sleep
+- crash: .2 read
+
 - doc mashup:
-  - document: equals? parse-hook no-parse-hook
-  - HELP: should not specify stack effect
-  - figure out what to do for parsing words
+  - document: parse-hook no-parse-hook
   - document inference errors
   - update docs for declared effects
   - better doc for accumulate, link from tree

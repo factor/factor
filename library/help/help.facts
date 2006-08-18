@@ -51,6 +51,6 @@ HELP: $outliner
 { $values { "element" "a markup element containing one quotation with stack effect " { $snippet "( quot -- )" } } }
 { $description "Calls the quotation to generate a sequence of help topics, and outputs an outliner for each one. Expanding a help topic shows the article body." } ;
 
-HELP: help-outliner "( seq quot -- )"
+HELP: help-outliner
 { $values { "seq" "a sequence of help article names and words" } { "quot" "a quotation with stack effect " { $snippet "( topic -- )" } } }
 { $description "Writes an outliner of help topics to the " { $link stdio } " stream. Expanding a help topic calls " { $snippet "quot" } " with the topic on the data stack." } ;

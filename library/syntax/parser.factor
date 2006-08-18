@@ -11,7 +11,7 @@ namespaces prettyprint sequences strings vectors words ;
 : skip-blank ( -- )
     column [ line-text get [ blank? not ] skip ] change ;
 
-: skip-word ( n line -- n )
+: skip-word ( m line -- n )
     2dup nth CHAR: " = [ drop 1+ ] [ [ blank? ] skip ] if ;
 
 : (scan) ( n line -- start end )
@@ -33,7 +33,7 @@ SYMBOL: string-mode
 
 TUPLE: no-word name ;
 
-: no-word ( str -- word )
+: no-word ( name -- word )
     dup <no-word> swap do-what-i-mean condition ;
 
 : scan-word ( -- obj )
@@ -60,7 +60,7 @@ TUPLE: bad-escape ;
 : bad-escape ( -- * ) <bad-escape> throw ;
 
 ! Parsing word utilities
-: escape ( ch -- esc )
+: escape ( escape -- ch )
     H{
         { CHAR: e  CHAR: \e }
         { CHAR: n  CHAR: \n }
@@ -100,6 +100,8 @@ TUPLE: bad-escape ;
 : parse-effect ( -- effect )
     [ (parse-effect) column get ] { } make swap column set
     { "--" } split1 <effect> ;
+
+: parse-base ( base -- ) scan swap base> parsed ;
 
 global [
     {

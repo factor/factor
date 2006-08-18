@@ -1,4 +1,4 @@
-USING: generic help kernel-internals parser ;
+USING: generic help kernel-internals parser words ;
 
 HELP: define-typecheck
 { $values { "class" "a class word" } { "generic" "a generic word" } { "quot" "a quotation" } }

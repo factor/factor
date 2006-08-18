@@ -39,7 +39,8 @@ TUPLE: no-math-method left right generic ;
     <no-math-method> throw ;
 
 : applicable-method ( generic class -- quot )
-    over method [ ] [ [ no-math-method ] curry ] ?if ;
+    over method method-def
+    [ ] [ [ no-math-method ] curry ] ?if ;
 
 : object-method ( generic -- quot )
     object bootstrap-word applicable-method ;

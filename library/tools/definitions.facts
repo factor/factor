@@ -1,5 +1,5 @@
 IN: definitions
-USING: help ;
+USING: help io ;
 
 HELP: ?resource-path
 { $values { "path" "a string" } { "newpath" "a string" } }

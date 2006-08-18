@@ -1,4 +1,5 @@
 IN: words
+USING: help inference ;
 
 HELP: effect
 { $class-description "An object representing a stack effect. Holds a sequence of inputs, a sequence of outputs and a flag indicating if an error is thrown unconditionally." } ;

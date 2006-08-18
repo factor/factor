@@ -47,7 +47,7 @@ HELP: step3
 
 HELP: step5
 { $values { "str" "a string" } { "newstr" "a new string" } }
-{ $description "Removes a final -e and changes a final -ll to -l if " { $link consanant-seq } " is greater than 1," } ;
+{ $description "Removes a final -e and changes a final -ll to -l if " { $link consonant-seq } " is greater than 1," } ;
 
 HELP: stem
 { $values { "str" "a string" } { "newstr" "a new string" } }

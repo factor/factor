@@ -243,7 +243,7 @@ HELP: forget-vocab
 { $description "Removes a vocabulary. All words in the vocabulary become uninterned." }
 { $see-also forget } ;
 
-HELP: target-word "( word -- target )"
+HELP: target-word
 { $values { "word" "a word" } { "target" "a word" } }
 { $description "Looks up a word with the same name and vocabulary as the given word. Used during bootstrap to transfer host words to the target dictionary." } ;
 
