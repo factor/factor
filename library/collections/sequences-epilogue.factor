@@ -90,7 +90,8 @@ M: object like drop ;
 
 : pop* ( seq -- ) dup length 1- swap set-length ;
 
-: pop ( seq -- ) dup length 1- swap [ nth ] 2keep set-length ;
+: pop ( seq -- elt )
+    dup length 1- swap [ nth ] 2keep set-length ;
 
 : all-equal? ( seq -- ? ) [ = ] monotonic? ;
 

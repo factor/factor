@@ -21,15 +21,15 @@ HELP: step1b
 { $examples
     { $table
         { "Input:" "Output:" }
-        { "feed" } { "feed" }
-        { "agreed" } { "agree" }
-        { "disabled" } { "disable" }
-        { "matting" } { "mat" }
-        { "mating" } { "mate" }
-        { "meeting" } { "meet" }
-        { "milling" } { "mill" }
-        { "messing" } { "mess" }
-        { "meetings" } { "meet" }
+        { "feed"  "feed" }
+        { "agreed"  "agree" }
+        { "disabled"  "disable" }
+        { "matting"  "mat" }
+        { "mating"  "mate" }
+        { "meeting"  "meet" }
+        { "milling"  "mill" }
+        { "messing"  "mess" }
+        { "meetings"  "meet" }
     }
 } ;
 

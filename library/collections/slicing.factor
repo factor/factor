@@ -34,7 +34,7 @@ strings vectors ;
 : ?head ( seq begin -- newseq ? )
     2dup head? [ length tail t ] [ drop f ] if ;
 
-: tail? ( seq end -- newseq ? )
+: tail? ( seq end -- ? )
     2dup [ length ] 2apply < [
         2drop f
     ] [

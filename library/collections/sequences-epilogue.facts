@@ -151,7 +151,7 @@ HELP: pop*
 { $see-also peek pop } ;
 
 HELP: pop
-{ $values { "seq" "a resizable mutable sequence" } }
+{ $values { "seq" "a resizable mutable sequence" } { "elt" "an object" } }
 { $description "Outputs the last element after removing it and shortening the sequence." }
 { $side-effects "seq" }
 { $errors "Throws an error if the sequence is empty." }
