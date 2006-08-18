@@ -1,3 +1,24 @@
+;; Eduardo Cavazos - wayo.cavazos@gmail.com
+
+;; Add these lines to your .emacs file:
+
+;; (load-file "/scratch/repos/Factor/contrib/factor.el")
+;; (setq factor-binary "/scratch/repos/Factor/f")
+;; (setq factor-image "/scratch/repos/Factor/factor.image")
+
+;; Of course, you'll have to edit the directory paths for your system
+;; accordingly.
+
+;; That's all you have to do to "install" factor.el on your
+;; system. Whenever you edit a factor file, Emacs will know to switch
+;; to Factor mode.
+
+;; M-x factor-listener === Start a new factor listener inside Emacs
+;; M-x factor-listener-restart === Restart a factor listener whose
+;;                                 session has ended.
+
+;; BUG: A double quote character on a commented line will break the
+;; syntax highlighting for that line.
 
 (defgroup factor nil
   "Factor mode"
