@@ -241,6 +241,7 @@ M: read-task task-container drop read-tasks get-global ;
     ] unless pending-error drop ;
 
 M: input-port stream-read
+    >r 0 max >fixnum r>
     [ wait-to-read ] keep dup port-eof?
     [ drop f ] [ port-sbuf >string ] if ;
 

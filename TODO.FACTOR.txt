@@ -1,16 +1,12 @@
 + 0.84:
 
-- crash: 1/2 sleep
-- crash: .2 read
-
 - doc mashup:
   - document: parse-hook no-parse-hook
   - document inference errors
   - update docs for declared effects
   - better doc for accumulate, link from tree
 
-- declaration to do:
-  - bootstrap speedup with compiling recursives
+- bootstrap speedup with compiling recursives
 - RT_WORD should refer to XTs not word objects.
 - fix contribs: boids, automata
 - sometimes darcs get fails with the httpd

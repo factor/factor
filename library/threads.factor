@@ -29,7 +29,8 @@ namespaces queues sequences vectors ;
 : yield ( -- ) [ schedule-thread stop ] callcc0 ;
 
 : sleep ( ms -- )
-    millis + [ 2array sleep-queue push stop ] callcc0 drop ;
+    >fixnum millis +
+    [ 2array sleep-queue push stop ] callcc0 drop ;
 
 : in-thread ( quot -- )
     [

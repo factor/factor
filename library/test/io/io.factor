@@ -44,8 +44,6 @@ USING: io kernel math parser strings test ;
 ! Make sure we use correct to_c_string form when writing
 [ ] [ "\0" write ] unit-test
 
-[ -1 read ] unit-test-fails
-
 [ "" ] [ 0 read ] unit-test
 
 ! [ ] [ "123" write 9000 CHAR: x <string> write flush ] unit-test
@@ -62,3 +60,8 @@ unit-test
 unit-test
 
 [ ] [ 10000 f set-timeout ] unit-test
+
+[ "" ] [
+    "/library/test/io/binary.txt" <resource-reader>
+    [ 0.2 read ] with-stream
+] unit-test
