@@ -11,6 +11,7 @@
 - sometimes darcs get fails with the httpd
 - gdb triggers 'mutliple i/o ops on port' error
 - factorcode httpd crashed: bad file descriptor
+- signal 4 on datastack underflow on mac intel??
 
 + 0.85:
 

@@ -11,10 +11,10 @@ SYMBOL: matrix
 : nth-row ( row# -- seq ) matrix get nth ;
 
 : nth-col ( col# ignore-rows -- seq )
-    matrix get swap tail-slice [ nth ] map-with ;
+    matrix get tail-slice [ nth ] map-with ;
 
 : change-row ( row# quot -- | quot: seq -- seq )
-    matrix get -rot change-nth ; inline
+    matrix get swap change-nth ; inline
 
 : exchange-rows ( row# row# -- ) matrix get exchange ;
 

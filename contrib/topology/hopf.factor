@@ -32,27 +32,30 @@ SYMBOL: degrees
 
 : deg= degrees [ ?set-hash ] change ;
 
-: deg degrees get ?hash ;
+: deg degrees get ?hash [ 1 ] unless* ;
 
 : h. ( vec -- )
     hash>alist [ first2 >r concat r> 2array ] map (l.) ;
 
-: <basis-elt> ( generators -- { odd even } )
+: <basis-elt> ( generators -- pair )
+    #! Pair is { odd even }
     V{ } clone V{ } clone
     rot [
         3dup deg odd? [ drop ] [ nip ] if push
     ] each [ >array ] 2apply 2array ;
 
+: [0] { { } { } } ;
+
 : >h ( obj -- vec )
     {
         { [ dup not ] [ drop 0 >h ] }
-        { [ dup number? ] [ { { } { } } associate ] }
+        { [ dup number? ] [ [0] associate ] }
         { [ dup array? ] [ <basis-elt> 1 swap associate ] }
         { [ dup hashtable? ] [ ] }
         { [ t ] [ 1array >h ] }
     } cond ;
 
-: co1 ( vec -- n ) { { } { } } swap hash [ 0 ] unless* ;
+: co1 ( vec -- n ) [0] swap hash [ 0 ] unless* ;
 
 : permutation ( seq -- perm )
     dup natural-sort [ swap index ] map-with ;
@@ -109,17 +112,17 @@ SYMBOL: boundaries
 
 DEFER: (d)
 
-: x.dy ( x y -- vec ) [ (d) h* ] keep [ deg ] map sum -1^ h* ;
+: x.dy ( x y -- vec ) >r [ deg -1^ ] keep r> (d) h* h* ;
 
 : (d) ( product -- value )
-    #! d(x.y)=dx.y + (-1)^deg y x.dy
+    #! d(x.y)=dx.y + (-1)^deg x x.dy
     dup empty?
     [ drop H{ } ] [ unclip swap [ x.dy ] 2keep dx.y l+ ] if ;
 
 : d ( x -- dx )
     >h [ concat (d) ] linear-op ;
 
-: d-matrix ( n sim -- matrix )
+: d-matrix ( n seq -- matrix )
     [ ?nth ] 2keep >r 1+ r> ?nth [ concat (d) ] op-matrix ;
 
 : ker/im-d ( sim -- seq )
@@ -132,7 +135,6 @@ DEFER: (d)
 
 : nth-basis-elt ( generators n -- elt )
     over length [
-        ( generators n bit# -- )
         3dup nth-bit? [ nth ] [ 2drop f ] if
     ] map [ ] subset 2nip ;
 

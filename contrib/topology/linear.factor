@@ -66,10 +66,8 @@ namespaces parser prettyprint sequences words ;
 
 : rot-seq 1 swap cut swap append ;
 
-: (H) ( sim -- ) flip first2 rot-seq v- ;
+: (H) ( sim -- seq ) flip first2 rot-seq v- ;
 
 : -rot-seq 1 swap cut* swap append ;
 
-: (H*) ( sim -- ) flip first2 -rot-seq v- ;
-
-: -rot-seq 1 swap cut* swap append ;
+: (H*) ( sim -- seq ) flip first2 -rot-seq v- ;
