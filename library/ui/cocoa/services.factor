@@ -7,7 +7,7 @@ IN: cocoa
 USING: alien gadgets-presentations io kernel namespaces objc
 parser prettyprint styles ;
 
-: pasteboard-error ( error str -- f )
+: pasteboard-error ( error -- f )
     "Pasteboard does not hold a string" <NSString>
     0 swap rot set-void*-nth f ;
 

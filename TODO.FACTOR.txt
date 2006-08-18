@@ -12,7 +12,6 @@
 - roundoff is still not quite right with tracks
 - fix top level window positioning
 - fix contribs: boids, automata
-- [ [ dup call ] dup call ] infer hangs
 - graphical module manager tool
 - see if alien calls can be made faster
 - sometimes darcs get fails with the httpd
@@ -99,6 +98,8 @@
 
 + compiler/ffi:
 
+- [ [ dup call ] dup call ] infer hangs
+- callstack overflow when compiling mutually recursive inline words
 - test what is done in the case of an invalid declaration on an inline
   recursive
 - ppc64 backend
