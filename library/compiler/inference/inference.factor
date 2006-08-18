@@ -5,7 +5,11 @@ USING: arrays errors generic inspector interpreter io kernel
 math namespaces parser prettyprint sequences strings
 vectors words ;
 
-TUPLE: inference-error message rstate ;
+TUPLE: inference-error rstate ;
+
+C: inference-error ( msg rstate -- error )
+    [ set-inference-error-rstate ] keep
+    [ set-delegate ] keep ;
 
 : inference-error ( msg -- * )
     recursive-state get <inference-error> throw ;

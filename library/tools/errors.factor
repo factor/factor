@@ -168,7 +168,7 @@ M: alien-invoke-error summary
 M: assert summary drop "Assertion failed" ;
 
 M: inference-error error.
-    dup inference-error-message error.
+    dup delegate error.
     "Nesting: " write
     inference-error-rstate [ first ] map . ;
 
@@ -178,7 +178,7 @@ M: unbalanced-branches-error error.
     "Unbalanced branches:" print
     dup unbalanced-branches-error-out
     swap unbalanced-branches-error-in
-    [ pprint bl pprint ] 2map ;
+    [ pprint bl length . ] 2each ;
 
 M: literal-expected summary
     drop "Literal value expected" ;
