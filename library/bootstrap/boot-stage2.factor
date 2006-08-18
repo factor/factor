@@ -5,8 +5,8 @@ kernel-internals listener math memory namespaces optimizer
 parser sequences sequences-internals words ;
 
 [
-    ! Wrap everything in a catch which starts a listener so you can
-    ! see what went wrong, instead of dealing with a fep
+    ! Wrap everything in a catch which starts a listener so you
+    ! can see what went wrong, instead of dealing with a fep
     [
         "Cross-referencing..." print flush
         H{ } clone changed-words set-global
@@ -20,11 +20,28 @@ parser sequences sequences-internals words ;
         ] when
     
         "compile" get [
+            \ number= compile
+            \ + compile
+            \ nth compile
+            \ set-nth compile
+            \ = compile
+
+            ! Load UI backend
+            "cocoa" get [
+                "/library/compiler/alien/objc/load.factor" run-resource
+                "/library/ui/cocoa/load.factor" run-resource
+            ] when
+
+            "x11" get [
+                "/library/ui/x11/load.factor" run-resource
+            ] when
+
             windows? [
                 "/library/windows/load.factor" run-resource
                 "/library/ui/windows/load.factor" run-resource
             ] when
-    
+
+            ! Load native I/O code
             "native-io" get [
                 unix? [
                     "/library/io/unix/load.factor" run-resource
@@ -36,35 +53,11 @@ parser sequences sequences-internals words ;
     
             parse-command-line
     
-            "Compiling base..." print flush
-    
-            [
-                \ number= compile
-                \ + compile
-                \ nth compile
-                \ set-nth compile
-                \ = compile
-                { "kernel" "sequences" "assembler" } compile-vocabs
-    
-                "Compiling system..." print flush
-                compile-all
-            ] with-class<cache
-    
-            "cocoa" get [
-                "/library/compiler/alien/objc/load.factor" run-resource
-                "/library/ui/cocoa/load.factor" run-resource
-            ] when
-    
-            "x11" get [
-                "/library/ui/x11/load.factor" run-resource
-            ] when
-            
-            "Recompiling just in case..." print flush
-            recompile
+            compile-all
     
             "Initializing native I/O..." print flush
             "native-io" get [ init-io ] when
-    
+            
             ! We only do this if we are compiled, otherwise it
             ! takes too long.
             "Building online help search index..." print flush

@@ -24,8 +24,7 @@ words ;
     dup [ f "no-effect" set-word-prop ] each
     [ try-compile ] each ;
 
-: compile-all ( -- )
-    [ vocabs compile-vocabs ] with-class<cache ;
+: compile-all ( -- ) vocabs compile-vocabs ;
 
 : compile-quot ( quot -- word )
     define-temp "compile" get [ dup compile ] when ;
@@ -33,11 +32,8 @@ words ;
 : compile-1 ( quot -- ) compile-quot execute ;
 
 : recompile ( -- )
-    #! If we are recompiling a lot of words, we can save time
-    #! with the class<cache.
     changed-words get [
-        dup hash-keys [ [ try-compile ] each clear-hash ]
-        over length 20 > [ with-class<cache ] [ call ] if
+        dup hash-keys [ try-compile ] each clear-hash
     ] when* ;
 
 [ recompile ] parse-hook set

@@ -70,16 +70,6 @@ HELP: class<
 { $description "Tests if all instances of " { $snippet "class1" } " are also instances of " { $snippet "class2" } "." }
 { $notes "Classes are partially ordered. This means that if " { $snippet "class1 <= class2" } " and " { $snippet "class2 <= class1" } ", then " { $snippet "class1 = class2" } ". Also, if " { $snippet "class1 <= class2" } " and " { $snippet "class2 <= class3" } ", then " { $snippet "class1 <= class3" } "." } ;
 
-HELP: make-class<cache
-{ $values { "hash" "a hashtable" } }
-{ $description "Constructs a hashtable mapping classes to hashtables of classes which are smaller than them under " { $link class< } "." }
-{ $notes "This word should not be called directly. Instead, use " { $link with-class<cache } "." } ;
-
-HELP: with-class<cache
-{ $values { "quot" "a quotation" } }
-{ $description "Calls the quotation in a new dynamic scope where the " { $link class<cache } " variable is bound to a hashtable output by " { $link make-class<cache } ". When this variable is bound, " { $link class< } " can be performed much more quickly than usual." }
-{ $notes "Calls to compile large numbers of words can be wrapped in this combinator to reduce compile time." } ;
-
 HELP: class-compare
 { $values { "class1" "a class" } { "class2" "a class" } { "n" "an integer" } }
 { $description "Compares two classes, with the sign of the result indicating their sort order." }

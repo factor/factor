@@ -56,33 +56,28 @@ M: very-funny gooey sq ;
 
 [ 1/4 ] [ 1/2 gooey ] unit-test
 
-: class<tests
-    [ object ] [ object object class-and ] unit-test
-    [ fixnum ] [ fixnum object class-and ] unit-test
-    [ fixnum ] [ object fixnum class-and ] unit-test
-    [ fixnum ] [ fixnum fixnum class-and ] unit-test
-    [ fixnum ] [ fixnum integer class-and ] unit-test
-    [ fixnum ] [ integer fixnum class-and ] unit-test
-    [ null ] [ vector fixnum class-and ] unit-test
-    [ number ] [ number object class-and ] unit-test
-    [ number ] [ object number class-and ] unit-test
-    
-    [ t ] [ \ fixnum \ integer class< ] unit-test
-    [ t ] [ \ fixnum \ fixnum class< ] unit-test
-    [ f ] [ \ integer \ fixnum class< ] unit-test
-    [ t ] [ \ integer \ object class< ] unit-test
-    [ f ] [ \ integer \ null class< ] unit-test
-    [ t ] [ \ null \ object class< ] unit-test
-    
-    [ t ] [ \ generic \ compound class< ] unit-test
-    [ f ] [ \ compound \ generic class< ] unit-test
-    
-    [ f ] [ \ reversed \ slice class< ] unit-test
-    [ f ] [ \ slice \ reversed class< ] unit-test ;
+[ object ] [ object object class-and ] unit-test
+[ fixnum ] [ fixnum object class-and ] unit-test
+[ fixnum ] [ object fixnum class-and ] unit-test
+[ fixnum ] [ fixnum fixnum class-and ] unit-test
+[ fixnum ] [ fixnum integer class-and ] unit-test
+[ fixnum ] [ integer fixnum class-and ] unit-test
+[ null ] [ vector fixnum class-and ] unit-test
+[ number ] [ number object class-and ] unit-test
+[ number ] [ object number class-and ] unit-test
 
-class<tests
+[ t ] [ \ fixnum \ integer class< ] unit-test
+[ t ] [ \ fixnum \ fixnum class< ] unit-test
+[ f ] [ \ integer \ fixnum class< ] unit-test
+[ t ] [ \ integer \ object class< ] unit-test
+[ f ] [ \ integer \ null class< ] unit-test
+[ t ] [ \ null \ object class< ] unit-test
 
-[ class<tests ] with-class<cache
+[ t ] [ \ generic \ compound class< ] unit-test
+[ f ] [ \ compound \ generic class< ] unit-test
+
+[ f ] [ \ reversed \ slice class< ] unit-test
+[ f ] [ \ slice \ reversed class< ] unit-test
 
 PREDICATE: word no-docs "documentation" word-prop not ;
 
@@ -182,3 +177,9 @@ TUPLE: delegating ;
 [ [ >float ] ] [ \ float \ integer math-upgrade ] unit-test
 [ number ] [ \ number \ float math-class-max ] unit-test
 [ float ] [ \ real \ float math-class-max ] unit-test
+
+TUPLE: forget-class-test ;
+[ t ] [ forget-class-test tuple class<map get hash hash-member? ] unit-test
+[ ] [ forget-class-test forget ] unit-test
+[ f ] [ forget-class-test class<map get hash-member? ] unit-test
+[ f ] [ forget-class-test tuple class<map get hash hash-member? ] unit-test

@@ -1,5 +1,5 @@
-USING: alien io definitions kernel math prettyprint sequences
-test words inference namespaces vectors ;
+USING: alien definitions inference io kernel math namespaces
+parser prettyprint sequences test vectors words ;
 IN: temporary
 
 [ "4" ] [ 4 unparse ] unit-test
@@ -43,19 +43,19 @@ unit-test
 [ [ \ bar see ] string-out ] unit-test
 
 [ "( a b -- c d )" ] [
-    { { "a" "b" } { "c" "d" } } effect>string
+    { "a" "b" } { "c" "d" } <effect> effect>string
 ] unit-test
 
 [ "( -- c d )" ] [
-    { { } { "c" "d" } } effect>string
+    { } { "c" "d" } <effect> effect>string
 ] unit-test
 
 [ "( a b -- )" ] [
-    { { "a" "b" } { } } effect>string
+    { "a" "b" } { } <effect> effect>string
 ] unit-test
 
 [ "( -- )" ] [
-    { { } { } } effect>string
+    { } { } <effect> effect>string
 ] unit-test
 
 [ ] [ \ fixnum see ] unit-test

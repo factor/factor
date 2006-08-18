@@ -2,8 +2,8 @@ USING: compiler definitions generic hashtables inference math
 namespaces parser test words ;
 IN: temporary
 
-DEFER: foo
-DEFER: bar
+DEFER: foo \ foo reset-generic
+DEFER: bar \ bar reset-generic
 
 [   ] [ \ foo [ 1 2 ] define-compound     ] unit-test
 [ { 0 2 } ] [ [ foo ] infer ] unit-test

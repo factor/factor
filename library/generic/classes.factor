@@ -7,10 +7,11 @@ vectors math parser ;
 
 PREDICATE: word class ( obj -- ? ) "class" word-prop ;
 
-: classes ( -- seq ) [ class? ] word-subset ;
-
 SYMBOL: typemap
+SYMBOL: class<map
 SYMBOL: builtins
+
+: classes ( -- seq ) class<map get hash-keys ;
 
 : type>class ( n -- class ) builtins get nth ;
 
@@ -31,7 +32,7 @@ SYMBOL: builtins
 
 : superclass ( class -- super ) "superclass" word-prop ;
 
-: members "members" word-prop ;
+: members ( class -- seq ) "members" word-prop ;
 
 : (flatten-class) ( class -- )
     dup members [ [ (flatten-class) ] each ] [ dup set ] ?if ;
@@ -69,22 +70,8 @@ DEFER: (class<)
         { [ t ] [ union-class< ] }
     } cond ;
 
-SYMBOL: class<cache
-
 : class< ( class1 class2 -- ? )
-    class<cache get [ hash hash-member? ] [ (class<) ] if* ;
-
-: smaller-classes ( class seq -- )
-    [ swap (class<) ] subset-with ;
-
-: make-class<cache ( -- hash )
-    classes dup [
-        2dup swap smaller-classes [ dup ] map>hash
-    ] map>hash nip ;
-
-: with-class<cache ( quot -- )
-    [ make-class<cache class<cache set call ] with-scope ;
-    inline
+    class<map get hash hash-member? ;
 
 : class-compare ( class1 class2 -- n )
     2dup eq? [ 2drop 0 ] [ class< 1 -1 ? ] if ;
@@ -125,9 +112,24 @@ SYMBOL: class<cache
         tuck [ class< ] all-with? [ peek ] [ drop f ] if
     ] if ;
 
+: smaller-classes ( class -- seq )
+    classes [ swap (class<) ] subset-with ;
+
+: smaller-classes+ ( class -- )
+    [ smaller-classes [ dup ] map>hash ] keep
+    class<map get set-hash ;
+
+: bigger-classes ( class -- seq )
+    classes [ (class<) ] subset-with ;
+
+: bigger-classes+ ( class -- )
+    dup bigger-classes
+    [ dupd class<map get hash set-hash ] each-with ;
+
 : define-class ( class -- )
     dup t "class" set-word-prop
-    dup flatten-class typemap get set-hash ;
+    dup dup flatten-class typemap get set-hash
+    dup smaller-classes+ bigger-classes+ ;
 
 ! Predicate classes for generalized predicate dispatch.
 : define-predicate-class ( class predicate definition -- )
@@ -154,8 +156,15 @@ PREDICATE: class predicate "definition" word-prop ;
 PREDICATE: class union members ;
 
 ! Definition protocol
+: smaller-classes- ( class -- )
+    class<map get remove-hash ;
+
+: bigger-classes- ( class -- )
+    classes [ class<map get hash remove-hash ] each-with ;
+
 : forget-class ( class -- )
     dup "predicate" word-prop [ forget ] each
-    dup flatten-class typemap get remove-hash forget-word ;
+    dup dup flatten-class typemap get remove-hash forget-word
+    dup smaller-classes- bigger-classes- ;
 
 M: class forget forget-class ;
