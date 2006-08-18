@@ -163,13 +163,13 @@ HELP: bignum/i ( x y -- z )
 { $description "Primitive version of " { $link /i } "." }
 { $warning "This word does not perform type checking, and passing objects of the wrong type can crash the runtime. User code should call the generic word " { $link /i } " instead." } ;
 
-HELP: bignum-mod ( x y -- z w )
-{ $values { "x" "a bignum" } { "y" "a bignum" } { "z" "a bignum" } { "w" "a bignum" } }
+HELP: bignum-mod ( x y -- z )
+{ $values { "x" "a bignum" } { "y" "a bignum" } { "z" "a bignum" } }
 { $description "Primitive version of " { $link mod } "." }
 { $warning "This word does not perform type checking, and passing objects of the wrong type can crash the runtime. User code should call the generic word " { $link mod } " instead." } ;
 
-HELP: bignum/mod ( x y -- z )
-{ $values { "x" "a bignum" } { "y" "a bignum" } { "z" "a bignum" } }
+HELP: bignum/mod ( x y -- z w )
+{ $values { "x" "a bignum" } { "y" "a bignum" } { "z" "a bignum" } { "w" "a bignum" } }
 { $description "Primitive version of " { $link /mod } "." }
 { $warning "This word does not perform type checking, and passing objects of the wrong type can crash the runtime. User code should call the generic word " { $link /mod } " instead." } ;
 

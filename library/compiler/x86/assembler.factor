@@ -138,7 +138,7 @@ C: indirect ( base index scale displacement -- indirect )
 
 : indirect-scale* indirect-scale [ 0 ] unless* ;
 
-GENERIC: sib-present?
+GENERIC: sib-present? ( op -- ? )
 
 M: indirect sib-present?
     dup indirect-base { ESP RSP } memq?
@@ -156,7 +156,7 @@ M: register r/m reg-code ;
 
 : byte? -128 127 between? ;
 
-GENERIC: modifier
+GENERIC: modifier ( op -- n )
 
 M: indirect modifier
     dup indirect-base [
@@ -179,7 +179,7 @@ M: register modifier drop BIN: 11 ;
         drop f
     ] if ;
 
-GENERIC: displacement
+GENERIC: displacement ( op -- n )
 
 M: indirect displacement indirect-displacement ;
 

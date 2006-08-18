@@ -13,5 +13,3 @@ USING: kernel parser words compiler sequences ;
     "/library/ui/x11/clipboard.factor"
     "/library/ui/x11/ui.factor"
 } [ run-resource ] each
-
-{ "x11" } compile-vocabs
