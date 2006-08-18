@@ -7,7 +7,6 @@
 - services do not launch if factor not running
 - roundoff is still not quite right with tracks
 - fix top level window positioning
-- fix contribs: boids, automata
 - see if alien calls can be made faster
 - sometimes darcs get fails with the httpd
 - gdb triggers 'mutliple i/o ops on port' error

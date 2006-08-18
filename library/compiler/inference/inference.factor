@@ -78,11 +78,11 @@ M: quotation infer-quot
     recursive-state get >r swap recursive-state set
     infer-quot r> recursive-state set ;
 
-TUPLE: check-return ;
+TUPLE: check-retain ;
 
-: check-return ( -- )
+: check-retain ( -- )
     meta-r get empty? [
-        <check-return> inference-error
+        <check-retain> inference-error
     ] unless ;
 
 : undo-infer ( -- )
@@ -97,7 +97,7 @@ TUPLE: check-return ;
             V{ } clone recorded set
             f init-inference
             call
-            check-return
+            check-retain
         ] [
             undo-infer
             rethrow
