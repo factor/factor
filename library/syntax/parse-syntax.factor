@@ -47,6 +47,7 @@ DEFER: !PRIMITIVE: parsing
 : !GENERIC: CREATE dup reset-word define-generic ; parsing
 : !G: CREATE dup reset-word [ define-generic* ] f ; parsing
 : !M:
+    f set-word
     scan-word scan-word
     [ location <method> -rot define-method ] f ; parsing
 
@@ -78,4 +79,8 @@ DEFER: !PRIMITIVE: parsing
     [ string-mode off [ (require) ] each ] f ; parsing
 
 : !(
-    word parse-effect "declared-effect" set-word-prop ; parsing
+    parse-effect word [
+        swap "declared-effect" set-word-prop
+    ] [
+        drop
+    ] if* ; parsing
