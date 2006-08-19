@@ -1,8 +1,6 @@
 + 0.84:
 
-- update docs for declared effects
 - RT_WORD should refer to XTs not word objects.
-- better listener multi-line expression handling
 - history doesn't work in a good way if you ^K the input
 - services do not launch if factor not running
 - roundoff is still not quite right with tracks

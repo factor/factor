@@ -311,6 +311,7 @@ sequences vectors words ;
         "/library/tools/summary.facts"
         "/library/tools/describe.facts"
         "/library/tools/inspector.facts"
+        "/library/tools/jedit.facts"
         "/library/tools/listener.facts"
         "/library/tools/memory.facts"
 

@@ -32,9 +32,9 @@ unit-test
 
 [ "SBUF\" hello world\"" ] [ SBUF" hello world" unparse ] unit-test
 
-: foo dup * ; inline
+: foo ( a -- b ) dup * ; inline
 
-[ "IN: temporary : foo dup * ; inline\n" ]
+[ "IN: temporary : foo ( a -- b ) dup * ; inline\n" ]
 [ [ \ foo see ] string-out ] unit-test
 
 : bar ( x -- y ) 2 + ;

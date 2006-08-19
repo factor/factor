@@ -43,8 +43,6 @@ C: quuux-tuple-2
 ! Make sure we handle changing shapes!
 
 [
-    100
-] [
     FORGET: point
     FORGET: point?
     FORGET: point-x
@@ -57,7 +55,7 @@ C: quuux-tuple-2
     "IN: temporary TUPLE: point x y z ;" eval
     
     point-x
-] unit-test
+] unit-test-fails
 
 TUPLE: predicate-test ;
 : predicate-test drop f ;

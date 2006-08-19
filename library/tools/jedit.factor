@@ -36,8 +36,7 @@ namespaces parser prettyprint sequences strings words shells ;
 : jedit-file ( file -- )
     1array make-jedit-request send-jedit-request ;
 
-: jedit ( spec -- )
-    #! Note that line numbers here start from 1
+: jedit ( defspec -- )
     where first2 >r ?resource-path r> jedit-line/file ;
 
 ! Wire protocol for jEdit to evaluate Factor code.

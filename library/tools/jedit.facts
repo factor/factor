@@ -1,0 +1,7 @@
+IN: jedit
+USING: help ;
+
+HELP: jedit
+{ $values { "defspec" "a definition specifier" } }
+{ $description "Opens the source file and line number containing the given definition in a running jEdit instance." }
+{ $errors "Throws an error if the " { $snippet "~/.jedit/server" } " file does not exist. jEdit must be running and the edit server feature must be enabled for this word to work." } ;

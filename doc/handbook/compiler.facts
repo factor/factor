@@ -1,3 +1,25 @@
+USING: help compiler parser ;
+
 ARTICLE: "compiler" "The compiler"
-"Foo bar"
-;
+"The Factor compiler transforms word definitions to native machine code and performs a variety of optimizations."
+$terpri
+"Only words for which a stack effect can be inferred will compile. All other words run in the interpreter. See " { $link "inference" } "."
+{ $subsection "compiler-usage" }
+{ $subsection "recompile" } ;
+
+ARTICLE: "compiler-usage" "Compiler usage"
+"The main entry point to the compiler is a single word taking a word as input:"
+{ $subsection compile }
+"The above word throws an error if the word did not compile. Another variant does not:"
+{ $subsection try-compile }
+"The compiler can also compile a single quotation:"
+{ $subsection compile-quot }
+{ $subsection compile-1 } ;
+
+ARTICLE: "recompile" "Automatic recompilation"
+"Factor's compiler performs " { $emphasis "early binding" } "; if a compiled word " { $snippet "A" } " calls another compiled word " { $snippet "B" } " and " { $snippet "B" } " is subsequently redefined, the compiled definition of " { $snippet "A" } " will still refer to the earlier compiled definition of " { $snippet "B" } "."
+$terpri
+"When a word is redefined, you can recompile all affected words automatically:"
+{ $subsection recompile }
+"Normally loading a source file or a module also calls " { $link recompile } ". This can be disabled by wrapping file loading in a combinator:"
+{ $subsection no-parse-hook } ;

@@ -2,9 +2,10 @@
 ! See http://factorcode.org/license.txt for BSD license.
 IN: gadgets-text
 USING: gadgets gadgets-controls gadgets-panes generic hashtables
-help io kernel namespaces prettyprint styles threads ;
+help io kernel namespaces prettyprint styles threads sequences
+vectors ;
 
-TUPLE: interactor output continuation busy? ;
+TUPLE: interactor output continuation queue busy? ;
 
 C: interactor ( output -- gadget )
     [ set-interactor-output ] keep
@@ -19,7 +20,9 @@ M: interactor graft*
         2drop
     ] [
         t over set-interactor-busy?
-        interactor-continuation schedule-thread-with
+        swap "\n" split <reversed> >vector
+        over set-interactor-queue
+        interactor-continuation schedule-thread
     ] if ;
 
 SYMBOL: structured-input
@@ -56,5 +59,7 @@ interactor H{
 } set-gestures
 
 M: interactor stream-readln
-    f over set-interactor-busy?
-    [ over set-interactor-continuation stop ] callcc1 nip ;
+    dup interactor-queue empty? [
+        f over set-interactor-busy?
+        [ over set-interactor-continuation stop ] callcc0
+    ] when interactor-queue pop ;

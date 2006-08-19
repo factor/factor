@@ -65,3 +65,6 @@ $low-level-note ;
 
 HELP: xref-help
 { $description "Update the " { $link parent-graph } ". Usually this is done automatically." } ;
+
+HELP: link
+{ $class-description "Class of help article presentations. Instances can be passed to " { $link write-object } " to output a clickable hyperlink. Also, instances of this class are valid definition specifiers; see " { $link "definitions" } "." } ;

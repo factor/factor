@@ -163,6 +163,7 @@ PREDICATE: class union members ;
     classes [ class<map get hash remove-hash ] each-with ;
 
 : forget-class ( class -- )
+    dup subdefs [ forget ] each
     dup "predicate" word-prop [ forget ] each
     dup dup flatten-class typemap get remove-hash forget-word
     dup smaller-classes- bigger-classes- ;
