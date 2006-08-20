@@ -60,8 +60,8 @@ DEFER: <expr>
     <name> [ <variable-node> ] <@ <|> ;
 
 : <line>
-    ":" token <name> &> <expr> sp <&> "OK" succeed <expr> <&> 
-    <|> ;
+    ":" token <name> &> <expr> sp <&> f succeed <expr> <&> 
+    <|> "." token <name> &> f succeed <&> <|> ;
 
 : lambda-parse
     #! debug word to parse this <expr> and print the result
