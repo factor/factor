@@ -8,7 +8,7 @@ IN: laplacian
     1 swap associate boundaries set d ;
 
 : (i) ( x y -- i_y[x] )
-    [ [ ((i)) ] each ] with-scope ;
+    [ <reversed> [ ((i)) ] each ] with-scope ;
 
 : i ( x y -- i_y[x] )
     #! Adjoint of left multiplication by y
