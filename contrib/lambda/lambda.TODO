@@ -1,8 +1,6 @@
 Lambda TODO
 -----------
-Change definition syntax from :<NAME> <EXPR> to <NAME>:<EXPR>
 Documentation
 Unit tests
 More graceful parse error handling
 Factor out tree traversing into its own lib
-Core library

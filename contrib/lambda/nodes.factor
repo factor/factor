@@ -1,7 +1,7 @@
 #! A lambda expression manipulator, by Matthew Willis
 REQUIRES: lazy-lists ;
 USING: lazy-lists strings arrays hashtables 
-sequences namespaces words kernel ;
+sequences namespaces words parser kernel ;
 
 IN: kernel
 : dip swap slip ; inline
@@ -11,6 +11,7 @@ IN: lambda
 TUPLE: lambda-node expr original canonical ;
 TUPLE: apply-node func arg ;
 TUPLE: variable-node var ;
+TUPLE: alien-node word ;
 
 DEFER: substitute
 C: lambda-node ( var expr implicit-empty-lambda-node -- lambda-node )
@@ -41,6 +42,8 @@ M: apply-node (traverse) ( data-array word apply-node -- node )
 
 M: variable-node (traverse) ( data-array word variable-node -- node )
     (pre) (post) ;
+
+M: alien-node (traverse) ( data-array word alien-node -- node ) nip nip ;
 
 : traverse ( node data-array {pre,post} -- node )
     rot (traverse) ;
@@ -103,6 +106,12 @@ M: variable-node (substitute) ( data-array variable-node -- node )
 : eta-reduce ( lambda-node -- expr ) 
     lambda-node-expr apply-node-func ;
 
+DEFER: evaluate
+: alien-reduce ( apply-node -- expr )
+    #! execute the factor word in the alien-node
+    dup apply-node-arg evaluate 
+    swap apply-node-func alien-node-word "lambda" lookup execute ;
+
 GENERIC: evaluate
 M: lambda-node evaluate ( lambda-node -- node ) 
     #! eta-reduction
@@ -119,14 +128,20 @@ M: lambda-node evaluate ( lambda-node -- node )
 M: apply-node evaluate ( apply-node -- node )
     #! beta-reduction
     #! TODO: fix the weird recursion here
-    dup apply-node-func lambda-node?
-    [ beta-reduce evaluate ] 
+    dup apply-node-func alien-node?
+    [ alien-reduce evaluate ]
     [
-        dup apply-node-func evaluate swap [ set-apply-node-func ] keep
-        dup apply-node-func lambda-node? [ evaluate ] when
+        dup apply-node-func lambda-node?
+        [ beta-reduce evaluate ] 
+        [
+            dup apply-node-func evaluate swap [ set-apply-node-func ] keep
+            dup apply-node-func lambda-node? [ evaluate ] when
+        ] if
     ] if ;
 
 M: variable-node evaluate ( variable-node -- node ) ;
+
+M: alien-node evaluate ( alien-node -- node ) ;
 
 GENERIC: (replace-names)
 DEFER: replace-names 
@@ -157,3 +172,6 @@ M: apply-node expr>string ( available-vars apply-node -- string )
 
 M: variable-node expr>string ( available-vars variable-node -- string ) 
     nip variable-node-var dup string? [ lambda-node-canonical ] unless ;
+
+M: alien-node expr>string ( available-vars alien-node -- string )
+    nip [ "[" , alien-node-word , "]" , ] { } make concat ;

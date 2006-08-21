@@ -55,9 +55,14 @@ DEFER: <expr>
     "(" token <expr> sp &> <expr> sp <&> ")" token sp <& 
     [ [ first ] keep second <apply-node> ] <@ ;
 
+: <alien>
+    #! parses [<FACTOR-WORD>], the alien invocation
+    #! an alien factor word must be all capital letters and numerals
+    "[" token <name> sp &> "]" token sp <& [ <alien-node> ] <@ ;
+
 : <expr>
     [ <id> call ] [ <lambda> call ] [ <apply> call ] <|> <|>
-    <name> [ <variable-node> ] <@ <|> ;
+    <name> [ <variable-node> ] <@ <|> <alien> <|> ;
 
 : <line>
     ":" token <name> &> <expr> sp <&> f succeed <expr> <&> 

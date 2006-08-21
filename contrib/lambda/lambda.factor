@@ -29,7 +29,8 @@ IN: lambda
 
 : lambda-boot ( -- names )
     #! load the core lambda library
-    H{ } clone ;
+    H{ } clone dup lambda-core 
+    [ lambda-parse lambda-eval lambda-print drop ] each-with ;
 
 : (lambda) ( names -- names )
     readln dup "." = [ drop ] [
