@@ -44,7 +44,7 @@ IN: lambda
         ":ALIENNUM (num.((num [ALIENSUCC]) ALIEN0))"
         ":HELLOCONS ((CONS H) ((CONS E) ((CONS Y) nil)))"
         ":HELLO ((PRINTCONS 3) HELLOCONS)"
-        "(([HELLO] nil) ([INFO] nil)"
+        "(([HELLO] nil) ([INFO] nil))"
     } append ;
 
 : print-return ( -- node )
