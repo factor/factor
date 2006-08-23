@@ -1,7 +1,6 @@
 + 0.84:
 
 - RT_WORD should refer to XTs not word objects.
-- history doesn't work in a good way if you ^K the input
 - services do not launch if factor not running
 - roundoff is still not quite right with tracks
 - fix top level window positioning

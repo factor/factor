@@ -35,13 +35,8 @@ SYMBOL: structured-input
     "\"structured-input\" \"gadgets-text\" lookup get-global call"
     r> interactor-eval ;
 
-: print-input ( string interactor -- )
-    interactor-output [
-        H{ { font-style bold } } [
-            dup <input> presented associate
-            [ write ] with-nesting terpri
-        ] with-style
-    ] with-stream* ;
+: interactor-input. ( string interactor -- )
+    interactor-output [ dup print-input ] with-stream* ;
 
 : interactor-commit ( interactor -- )
     dup interactor-busy? [
@@ -49,11 +44,18 @@ SYMBOL: structured-input
     ] [
         dup field-commit
         over control-model clear-doc
-        swap 2dup print-input interactor-eval
+        swap 2dup interactor-input. interactor-eval
     ] if ;
+
+: interactor-history. ( interactor -- )
+    dup interactor-output [
+        "History:" print
+        field-history [ dup print-input ] each
+    ] with-stream* ;
 
 interactor H{
     { T{ key-down f f "RETURN" } [ interactor-commit ] }
+    { T{ key-down f { C+ } "h" } [ interactor-history. ] }
     { T{ key-down f { C+ } "b" } [ interactor-output pane-clear ] }
     { T{ key-down f { C+ } "d" } [ f swap interactor-eval ] }
 } set-gestures

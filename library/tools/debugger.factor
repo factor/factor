@@ -50,12 +50,9 @@ SYMBOL: restarts
         { [ t ] [ (:help-multi) ] }
     } cond ;
 
-: (debug-help) ( string quot -- )
-    <input> write-object terpri ;
-
 : restart. ( restart n -- )
     [ [ # " :res  " % first % ] "" make ] keep
-    [ :res ] curry (debug-help) ;
+    [ :res ] curry print-input ;
 
 : restarts. ( -- )
     restarts get dup empty? [
@@ -71,10 +68,10 @@ SYMBOL: restarts
     terpri
     "Debugger commands:" print
     terpri
-    ":help - documentation for this error" [ :help ] (debug-help)
-    ":s    - data stack at exception time" [ :s ] (debug-help)
-    ":r    - retain stack at exception time" [ :r ] (debug-help)
-    ":c    - call stack at exception time" [ :c ] (debug-help)
+    ":help - documentation for this error" [ :help ] print-input
+    ":s    - data stack at exception time" [ :s ] print-input
+    ":r    - retain stack at exception time" [ :r ] print-input
+    ":c    - call stack at exception time" [ :c ] print-input
     ":get  ( var -- value ) accesses variables at time of the error" print
     flush ;
 

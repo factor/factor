@@ -133,10 +133,7 @@ C: history ( value -- history )
     V{ } clone over set-history-back
     V{ } clone over set-history-forward ;
 
-G: (add-history) ( history vector -- )
-    1 standard-combination ;
-
-M: history (add-history)
+: (add-history)
     swap model-value dup [ swap push ] [ 2drop ] if ;
 
 : go-back/forward ( history to from -- )
@@ -150,8 +147,6 @@ M: history (add-history)
 : go-forward ( history -- )
     dup history-back over history-forward go-back/forward ;
 
-GENERIC: add-history ( history -- )
-
-M: history add-history
+: add-history
     dup history-forward delete-all
     dup history-back (add-history) ;

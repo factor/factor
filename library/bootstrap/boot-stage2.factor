@@ -72,6 +72,9 @@ parser sequences sequences-internals words ;
             0 exit
         ] set-boot
     
+        f error set-global
+        f error-continuation set-global
+
         [ compiled? ] word-subset length
         number>string write " compiled words" print
     

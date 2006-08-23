@@ -17,7 +17,7 @@ strings test ;
 TUPLE: document locs ;
 
 C: document ( -- document )
-    V{ "" } clone <history> over set-delegate
+    V{ "" } clone <model> over set-delegate
     V{ } clone over set-document-locs ;
 
 : add-loc document-locs push ;
@@ -127,14 +127,3 @@ C: document ( -- document )
 
 : clear-doc ( document -- )
     "" swap set-doc-text ;
-
-M: document (add-history)
-    >r model-value dup { "" } sequence=
-    [ r> 2drop ] [ r> push-new ] if ;
-
-M: document add-history
-    #! Add the new entry at the end of the history, and avoid
-    #! duplicates.
-    dup history-back dup
-    pick history-forward <reversed> nappend
-    (add-history) ;
