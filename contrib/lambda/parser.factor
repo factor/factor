@@ -6,8 +6,6 @@
 #! <expr> ::= (<expr> <expr>)
 #! <line> ::= <expr>
 #! <line> ::= <name> : <expr>
-
-REQUIRES: parser-combinators ;
 USING: parser-combinators strings sequences kernel ;
 
 IN: lambda
@@ -69,5 +67,4 @@ DEFER: <expr>
     <|> "." token <name> &> f succeed <&> <|> ;
 
 : lambda-parse
-    #! debug word to parse this <expr> and print the result
     <line> some call ;

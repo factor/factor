@@ -1,3 +1,4 @@
+REQUIRES: lazy-lists parser-combinators ;
 PROVIDE: lambda {
     "nodes.factor"
     "parser.factor"

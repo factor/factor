@@ -1,12 +1,10 @@
 #! A lambda expression manipulator, by Matthew Willis
-REQUIRES: lazy-lists ;
 USING: lazy-lists strings arrays hashtables 
 sequences namespaces words parser kernel ;
 
-IN: kernel
-: dip swap slip ; inline
-
 IN: lambda
+
+: dip swap slip ; inline
 
 TUPLE: lambda-node expr original canonical ;
 TUPLE: apply-node func arg ;
@@ -29,18 +27,18 @@ GENERIC: (traverse)
     swap second execute ;
     
 #! Traverses the tree while executing pre and post order words
-M: lambda-node (traverse) ( data-array word lambda-node -- node )
+M: lambda-node (traverse) ( data-array words lambda-node -- node )
     (pre)
     [ [ lambda-node-expr (traverse) ] keep set-lambda-node-expr ] 3keep 
     (post) ; 
 
-M: apply-node (traverse) ( data-array word apply-node -- node )
+M: apply-node (traverse) ( data-array words apply-node -- node )
     (pre)
     [ [ apply-node-func (traverse) ] keep set-apply-node-func ] 3keep
     [ [ apply-node-arg (traverse) ] keep set-apply-node-arg ] 3keep
     (post) ;
 
-M: variable-node (traverse) ( data-array word variable-node -- node )
+M: variable-node (traverse) ( data-array words variable-node -- node )
     (pre) (post) ;
 
 M: alien-node (traverse) ( data-array word alien-node -- node ) nip nip ;
@@ -48,13 +46,11 @@ M: alien-node (traverse) ( data-array word alien-node -- node ) nip nip ;
 : traverse ( node data-array {pre,post} -- node )
     rot (traverse) ;
 
-: traverse-nop ( data-array node -- node ) nip ;
-
 : pre-order ( node data-array word -- node )
-    { traverse-nop } curry traverse ;
+    { nip } curry traverse ;
     
 : post-order ( node data-array word -- node )
-    { traverse-nop } swap add traverse ;
+    { nip } swap add traverse ;
 
 GENERIC: (clone-pre)
 M: lambda-node (clone-pre) ( data lambda-node -- node )
@@ -71,9 +67,9 @@ M: lambda-node (clone-post) ( data lambda-node -- node )
     nip [ dup <variable-node> -rot lambda-node-expr substitute  ] keep 
     [ set-lambda-node-expr ] keep ;
     
-M: apply-node (clone-post) ( data apply-node -- node ) traverse-nop ;
+M: apply-node (clone-post) ( data apply-node -- node ) nip ;
 
-M: variable-node (clone-post) ( data variable-node -- node ) traverse-nop ;
+M: variable-node (clone-post) ( data variable-node -- node ) nip ;
 
 : clone-node ( node -- clone )
     f { (clone-pre) (clone-post) } traverse ;

@@ -4,3 +4,8 @@ Documentation
 Unit tests
 More graceful parse error handling
 Factor out tree traversing into its own lib
+
+Core
+----
+ISNIL
+READCHAR

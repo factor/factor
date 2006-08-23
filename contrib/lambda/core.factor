@@ -15,18 +15,21 @@ IN: lambda
     
     0 lfrom 26 swap ltake list>array
     [
-        [ ":" , dup 65 + ch>string , " " , number>string , ] { } make concat
+        [ ":" , 65 + dup ch>string , " " , number>string , ] { } make concat
     ] map append
     
     {
         ":LF 10"
         ":FALSE (t.(f.f))"
         ":TRUE (t.(f.t))"
+        ":AND (p.(q.((p q) FALSE)))"
+        ":OR (p.(q.((p TRUE) q)))"
         ":ISZERO (num.((num (pred. FALSE)) TRUE))"
         ":ADD (num.(other.((num SUCC) other)))"
         ":MULT (num.(other.((num (ADD other)) 0)))"
         ":PRED (n.(f.(x.(((n (g.(h.(h(g f))))) (u. x)) (u.u)))))"
         ":SUBFROM (num.(other.((num PRED) other)))"
+        ":EQUAL (num.(other.((AND (ISZERO ((SUBFROM num) other))) (ISZERO ((SUBFROM other) num)))))"
         ":FACT (fact.(num.(((ISZERO num) 1) ((MULT num) (fact (PRED num))))))"
         ":YCOMBINATOR (func.((y. (func (y y)))(y. (func (y y)))))"
         ":FACTORIAL (YCOMBINATOR FACT)"
@@ -36,13 +39,12 @@ IN: lambda
         ":PCONS (pcons.(num.(cons.(((ISZERO num) (PRINTSPECIAL LF)) ((PRINTCHAR (CAR cons)) ((pcons (PRED num)) (CDR cons)))))))"
         ":PRINTCONS (YCOMBINATOR PCONS)"
         ":NUMTOCHAR (num. ((ADD 48) num))"
-        ":ALPHATOCHAR (num. ((ADD 65) num))"
-        ":PRINTNUM (num.([PRINTCHAR] (ALIENNUM (NUMTOCHAR num))))"
-        ":PRINTCHAR (char.([PRINTCHAR] (ALIENNUM (ALPHATOCHAR char))))"
+        ":PRINTNUM (num.(PRINTCHAR (NUMTOCHAR num)))"
+        ":PRINTCHAR (char.([PRINTCHAR] (ALIENNUM char)))"
         ":PRINTSPECIAL (special.([PRINTCHAR] (ALIENNUM special)))"
         ":ALIEN0 alienbaseonenum"
         ":ALIENNUM (num.((num [ALIENSUCC]) ALIEN0))"
-        ":HELLOCONS ((CONS H) ((CONS E) ((CONS Y) nil)))"
+        ":HELLOCONS ((CONS H) ((CONS E) ((CONS Y) ((CONS 0) nil))))"
         ":HELLO ((PRINTCONS 3) HELLOCONS)"
         "(([HELLO] nil) ([INFO] nil))"
     } append ;
@@ -59,7 +61,18 @@ IN: lambda
 : ALIENSUCC ( node -- node )
     variable-node-var "a" append <variable-node> ;
 
+: ALIENPRED ( node -- node )
+    variable-node-var dup length 1 - swap remove-nth <variable-node> ;
+
+: ALIENISZERO ( node -- node )
+    ;
+
 : PRINTCHAR ( node -- node )
     #! takes a base one num and prints its char equivalent
     variable-node-var length "alienbaseonenum" length - ch>string print-return ;
+
+: READCHAR ( node -- node )
+    #! reads one character of input and stores it as a base one num
+    "alienbaseonenum" read1 [ "a" append ] times <variable-node> ;
+
     
