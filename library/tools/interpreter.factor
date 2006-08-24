@@ -167,9 +167,7 @@ SYMBOL: meta-history
 : step-all ( -- )
     save-interp
     save-callframe
-    [ stop ] <callframe> meta-c append
-    meta-interp get [ set-continuation-call ] keep
-    schedule-thread yield
+    meta-interp get schedule-thread yield
     meta-c delete-all
     [ ] (meta-call) ;
 

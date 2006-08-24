@@ -183,7 +183,7 @@ M: loc-monitor model-changed
     ] do-matrix ;
 
 M: editor draw-gadget*
-    [ draw-caret draw-selection draw-lines ] with-editor ;
+    [ draw-selection draw-lines draw-caret ] with-editor ;
 
 : editor-height ( editor -- n )
     [ editor-lines length ] keep line>y ;
