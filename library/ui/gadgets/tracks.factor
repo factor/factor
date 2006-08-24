@@ -33,7 +33,7 @@ C: track ( orientation -- track )
     nip ;
 
 M: track layout*
-    dup track-layout packed-layout ;
+    dup track-layout pack-layout ;
 
 : track-pref-dims ( dims sizes -- dims )
     [ [ dup zero? [ nip ] [ v/n ] if ] 2map max-dim ] keep

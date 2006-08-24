@@ -41,7 +41,7 @@ C: world ( gadget -- world )
 : find-world [ world? ] find-parent ;
 
 M: world pref-dim*
-    delegate pref-dim* { 1024 768 } vmin ;
+    delegate pref-dim* [ >fixnum ] map { 1024 768 } vmin ;
 
 : activate-world-model ( world model -- )
     [ add-connection ] keep activate-model ;

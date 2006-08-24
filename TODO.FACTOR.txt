@@ -44,6 +44,9 @@
 
 + ui:
 
+- list of key bindings
+- presentation types
+- present/accept
 - graphical module manager tool
 - figure out what goes in the .app and what doesn't
 - should be possible to drop an image file on the .app to run it
