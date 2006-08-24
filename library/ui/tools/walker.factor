@@ -45,15 +45,13 @@ namespaces sequences shells threads vectors ;
 
 TUPLE: walker-gadget model quot ns ;
 
-: find-walker-gadget [ walker-gadget? ] find-parent ;
-
 : update-stacks ( walker -- )
     meta-interp get over walker-gadget-model set-model
     meta-callframe swap walker-gadget-quot set-model ;
 
 : with-walker ( gadget quot -- )
-    swap find-walker-gadget
-    dup walker-gadget-ns [ slip update-stacks ] bind ; inline
+    swap dup walker-gadget-ns
+    [ slip update-stacks ] bind ; inline
 
 : walker-step [ step ] with-walker ;
 : walker-step-in [ step-in ] with-walker ;
@@ -61,14 +59,13 @@ TUPLE: walker-gadget model quot ns ;
 : walker-step-all [ step-all ] with-walker ;
 : walker-step-back [ step-back ] with-walker ;
 
-: <walker-toolbar> ( -- gadget )
-    [
-        "Step" [ walker-step ] <bevel-button> ,
-        "Step in" [ walker-step-in ] <bevel-button> ,
-        "Step out" [ walker-step-out ] <bevel-button> ,
-        "Continue" [ walker-step-all ] <bevel-button> ,
-        "Step back" [ walker-step-back ] <bevel-button> ,
-    ] make-toolbar ;
+walker-gadget {
+    { f "Step" T{ key-down f f "s" } [ walker-step ] }
+    { f "Step in" T{ key-down f f "i" } [ walker-step-in ] }
+    { f "Step out" T{ key-down f f "o" } [ walker-step-out ] }
+    { f "Step back" T{ key-down f f "b" } [ walker-step-back ] }
+    { f "Continue" T{ key-down f f "c" } [ walker-step-all ] }
+} define-commands
 
 : init-walker-models ( walker -- )
     f <model> over set-walker-gadget-model
@@ -93,17 +90,9 @@ M: walker-gadget pref-dim*
 
 C: walker-gadget ( -- gadget )
     dup init-walker-models {
-        { [ <walker-toolbar> ] f f @top }
+        { [ gadget get <toolbar> ] f f @top }
         { [ walker-models <walker-track> ] f f @center }
     } make-frame* ;
-
-\ walker-gadget H{
-    { T{ key-down f f "s" } [ walker-step ] }
-    { T{ key-down f f "i" } [ walker-step-in ] }
-    { T{ key-down f f "o" } [ walker-step-out ] }
-    { T{ key-down f f "a" } [ walker-step-all ] }
-    { T{ key-down f f "b" } [ walker-step-back ] }
-} set-gestures
 
 : walk ( quot -- )
     continuation dup continuation-data pop*

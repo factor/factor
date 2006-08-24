@@ -137,17 +137,10 @@ C: browser-tracks ( browser -- browser-track )
     browser-tabs dup length [ swap first 2array ] 2map
     <radio-box> ;
 
-: <browser-toolbar> ( browser -- toolbar )
-    [
-        <browser-tabs> ,
-        <spacing> ,
-        "Apropos" [ drop apropos-window ] <bevel-button> ,
-    ] make-toolbar ;
-
 C: browser ( -- browser )
     0 <model> over set-browser-page
     dup dup {
-        { [ <browser-toolbar> ] f f @top }
+        { [ <browser-tabs> ] f f @top }
         { [ <browser-tracks> ] set-browser-track f @center }
     } make-frame* ;
 

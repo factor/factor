@@ -187,10 +187,3 @@ V{ } clone hand-buttons set-global
 
 : send-action ( world gesture -- )
     swap world-focus handle-gesture drop ;
-
-world H{
-    { T{ key-down f { C+ } "x" } [ T{ cut-action } send-action ] }
-    { T{ key-down f { C+ } "c" } [ T{ copy-action } send-action ] }
-    { T{ key-down f { C+ } "v" } [ T{ paste-action } send-action ] }
-    { T{ key-down f { C+ } "a" } [ T{ select-all-action } send-action ] }
-} set-gestures

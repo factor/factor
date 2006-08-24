@@ -86,6 +86,7 @@ SYMBOL: failures
         "gadgets/document"
         "gadgets/rectangles"
         "gadgets/fields"
+        "gadgets/commands"
         "generic"
         "help/porter-stemmer"
         "help/topics"

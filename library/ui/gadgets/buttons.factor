@@ -52,6 +52,11 @@ C: button ( gadget quot -- button )
 : <bevel-button> ( gadget quot -- button )
     <button> dup bevel-button-theme ;
 
+: <command-button> ( command -- button )
+    dup command-string
+    swap [ invoke-command ] curry
+    <bevel-button> ;
+
 : repeat-button-down ( button -- )
     dup 100 add-timer button-clicked ;
 

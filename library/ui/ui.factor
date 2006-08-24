@@ -138,8 +138,8 @@ C: titled-gadget ( gadget title -- )
 : restore-windows? ( -- ? )
     windows get [ empty? not ] [ f ] if* ;
 
-: make-toolbar ( quot -- gadget )
-    { } make make-shelf dup highlight-theme ; inline
+: <toolbar> ( gadget -- toolbar )
+    commands [ <command-button> ] map make-shelf ;
 
 : error-window ( error -- )
     [ print-error ] make-pane "Error" open-titled-window ;

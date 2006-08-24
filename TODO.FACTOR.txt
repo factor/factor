@@ -1,5 +1,17 @@
 + 0.84:
 
+new browser:
+- show currently selected vocab & words
+- scroll to existing won't work
+- initial scroll dim is wrong
+- show callers
+
+listener:
+- show IN:
+
+- commands
+- list of key bindings
+
 - RT_WORD should refer to XTs not word objects.
 - services do not launch if factor not running
 - roundoff is still not quite right with tracks
@@ -34,6 +46,7 @@
 
 + ui:
 
+- closing walker should continue; clicking continue should close walker
 - continuation handling in walker is screwy
 - graphical module manager tool
 - figure out what goes in the .app and what doesn't
@@ -75,7 +88,6 @@
   - TYPEDEF: float FTFloat ;  ==> \ float \ FTFloat "c-type" swp
   - make typedef aliasing explicit
 - seeing a C struct word should show its def
-- TUPLE: module files tests articles article main ;
 - file out
 
 + compiler/ffi:
@@ -105,6 +117,7 @@
 
 + misc:
 
+- move jedit word to contrib
 - growable data heap
 - incremental GC
 - UDP
