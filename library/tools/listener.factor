@@ -54,3 +54,14 @@ SYMBOL: eval-hook
 IN: shells
 
 : tty [ print-banner ] listener ;
+
+IN: listener
+
+: telnetd ( port -- ) \ telnetd [ tty ] with-server ;
+
+IN: shells
+
+: telnet "telnetd-port" get string>number telnetd ;
+
+! This is a string since we string>number it above.
+"9999" "telnetd-port" set-global

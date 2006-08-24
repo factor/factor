@@ -4,9 +4,6 @@ IN: jedit
 USING: arrays definitions errors io kernel listener math
 namespaces parser prettyprint sequences strings words shells ;
 
-! Some words to send requests to a running jEdit instance to
-! edit files and position the cursor on a specific line number.
-
 : jedit-server-info ( -- port auth )
     "~" get "/.jedit/server" path+ <file-reader> [
         readln drop
@@ -38,55 +35,3 @@ namespaces parser prettyprint sequences strings words shells ;
 
 : jedit ( defspec -- )
     where first2 >r ?resource-path r> jedit-line/file ;
-
-! Wire protocol for jEdit to evaluate Factor code.
-! Packets are of the form:
-!
-! 4 bytes length
-! <n> bytes data
-!
-! jEdit sends a packet with code to eval, it receives the output
-! captured with string-out.
-
-: write-len ( seq -- ) length 4 >be write ;
-
-: write-packet ( string -- ) dup write-len write flush ;
-
-: read-packet ( -- string ) 4 read be> read ;
-
-: wire-server ( -- )
-    #! Repeatedly read jEdit requests and execute them. Return
-    #! on EOF.
-    read-packet [ eval>string write-packet wire-server ] when* ;
-
-: jedit-lookup ( word -- list )
-    #! A utility word called by the Factor plugin to get some
-    #! required word info.
-    dup [
-        [
-            dup definer ,
-            dup word-vocabulary ,
-            dup word-name ,
-            stack-effect dup [ effect>string ] when ,
-        ] [ ] make
-    ] when ;
-
-: completions ( str pred -- seq )
-    #! Make a list of completions. Each element of the list is
-    #! a vocabulary/name/stack-effect triplet list.
-    word-subset-with [ jedit-lookup ] map ;
-
-! The telnet server is for the jEdit plugin.
-: telnetd ( port -- )
-    \ telnetd [ tty ] with-server ;
-
-: search ( name vocabs -- word )
-    dupd [ lookup ] find-with nip lookup ;
-
-IN: shells
-
-: telnet
-    "telnetd-port" get string>number telnetd ;
-
-! This is a string since we string>number it above.
-"9999" "telnetd-port" set-global
