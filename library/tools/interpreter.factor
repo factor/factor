@@ -2,11 +2,10 @@
 ! See http://factorcode.org/license.txt for BSD license.
 IN: interpreter
 USING: arrays errors generic io kernel kernel-internals math
-namespaces prettyprint sequences strings threads vectors words ;
+namespaces prettyprint sequences strings threads vectors words
+hashtables ;
 
-! A Factor interpreter written in Factor. It can transfer the
-! continuation to and from the primary interpreter. Used by
-! compiler for partial evaluation, also by the walker.
+! Metacircular interpreter for single-stepping
 
 SYMBOL: meta-interp
 
@@ -74,7 +73,7 @@ SYMBOL: callframe-end
     save-callframe (meta-call) ;
 
 : <callframe> ( quot -- seq )
-    0 over length 3array ;
+    0 over length 3array >vector ;
 
 : catch-harness ( continuation -- quot )
     [ [ c> 2array ] % , \ continue-with , ] [ ] make ;
@@ -138,17 +137,45 @@ M: object do do-1 ;
 \ if [ pop-d pop-d pop-d [ nip ] [ drop ] if meta-call ] "meta-word" set-word-prop
 \ dispatch [ pop-d pop-d swap nth meta-call ] "meta-word" set-word-prop
 
-: step ( -- ) [ do-1 ] next ;
+! Time travel
+SYMBOL: meta-history
 
-: step-in ( -- ) [ do ] next ;
+: save-interp ( -- )
+    meta-history get [
+        [
+            callframe [ ] change
+            callframe-scan [ ] change
+            callframe-end [ ] change
+            meta-interp [ clone ] change
+        ] make-hash swap push
+    ] when* ;
+
+: restore-interp ( ns -- )
+    { callframe callframe-scan callframe-end }
+    [ dup pick hash swap set ] each
+    meta-interp swap hash clone meta-interp set ;
+
+: step ( -- ) save-interp [ do-1 ] next ;
+
+: step-in ( -- ) save-interp [ do ] next ;
 
 : step-out ( -- )
+    save-interp
     callframe get callframe-scan get tail
     host-quot [ ] (meta-call) ;
 
 : step-all ( -- )
+    save-interp
     save-callframe
-    meta-c [ V{ [ stop ] 0 1 } swap append ] change
-    meta-interp get schedule-thread yield
-    V{ } clone meta-c set
+    [ stop ] <callframe> meta-c append
+    meta-interp get [ set-continuation-call ] keep
+    schedule-thread yield
+    meta-c delete-all
     [ ] (meta-call) ;
+
+: step-back ( -- )
+    meta-history get dup empty? [
+        drop
+    ] [
+        pop restore-interp
+    ] if ;

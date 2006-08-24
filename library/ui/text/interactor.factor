@@ -62,7 +62,6 @@ SYMBOL: structured-input
 
 : interactor-history. ( interactor -- )
     dup interactor-output [
-        "History:" print
         interactor-history [ dup print-input ] each
     ] with-stream* ;
 
@@ -79,8 +78,8 @@ SYMBOL: structured-input
 
 interactor H{
     { T{ key-down f f "RETURN" } [ interactor-commit ] }
+    { T{ key-down f { A+ } "c" } [ dup [ interactor-output pane-clear ] curry swap interactor-call ] }
     { T{ key-down f { C+ } "h" } [ dup [ interactor-history. ] curry swap interactor-call ] }
-    { T{ key-down f { C+ } "b" } [ dup [ interactor-output pane-clear ] curry swap interactor-call ] }
     { T{ key-down f { C+ } "d" } [ f swap interactor-eval ] }
     { T{ key-down f { C+ } "i" } [ "infer ." quot-action ] }
     { T{ key-down f { C+ } "w" } [ "walk" quot-action ] }

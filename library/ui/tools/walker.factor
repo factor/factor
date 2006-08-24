@@ -46,23 +46,24 @@ TUPLE: walker-gadget track ds rs cs quot ns ;
     meta-c over walker-gadget-cs set-model
     meta-callframe swap walker-gadget-quot set-model ;
 
-: with-walker ( walker quot -- )
-    swap dup walker-gadget-ns
+: with-walker ( gadget quot -- )
+    swap find-walker-gadget
+    dup walker-gadget-ns
     [ slip update-stacks ] bind ; inline
 
-: walker-command ( button word -- )
-    >r find-walker-gadget r> unit with-walker ;
+: walker-step [ step ] with-walker ;
+: walker-step-in [ step-in ] with-walker ;
+: walker-step-out [ step-out ] with-walker ;
+: walker-step-all [ step-all ] with-walker ;
+: walker-step-back [ step-back ] with-walker ;
 
 : <walker-toolbar> ( -- gadget )
-    {
-        { "Step" step }
-        { "Step in" step-in }
-        { "Step out" step-out }
-        { "Continue" step-all }
-    } [
-        [
-            first2 [ walker-command ] curry <bevel-button> ,
-        ] each
+    [
+        "Step" [ walker-step ] <bevel-button> , 
+        "Step in" [ walker-step-in ] <bevel-button> , 
+        "Step out" [ walker-step-out ] <bevel-button> , 
+        "Continue" [ walker-step-all ] <bevel-button> , 
+        "Step back" [ walker-step-back ] <bevel-button> , 
     ] make-toolbar ;
 
 : init-walker-models ( walker -- )
@@ -98,6 +99,7 @@ M: walker-gadget focusable-child*
 : init-walker ( walker -- )
     H{ } clone over set-walker-gadget-ns
     walker-continuation swap [
+        V{ } clone meta-history set
         meta-interp set
         [ ] (meta-call)
     ] with-walker ;
@@ -128,10 +130,11 @@ C: walker-gadget ( -- gadget )
     dup walker-thread ;
 
 \ walker-gadget H{
-    { T{ key-down f { C+ } "s" } [ \ step walker-command ] }
-    { T{ key-down f { C+ } "n" } [ \ step-in walker-command ] }
-    { T{ key-down f { C+ } "o" } [ \ step-out walker-command ] }
-    { T{ key-down f { C+ } "l" } [ \ step-all walker-command ] }
+    { T{ key-down f { C+ } "s" } [ walker-step ] }
+    { T{ key-down f { C+ } "n" } [ walker-step-in ] }
+    { T{ key-down f { C+ } "o" } [ walker-step-out ] }
+    { T{ key-down f { C+ } "r" } [ walker-step-all ] }
+    { T{ key-down f { C+ } "b" } [ walker-step-back ] }
 } set-gestures
 
 : walker-tool

@@ -53,3 +53,10 @@ TUPLE: continuation data retain call name catch ;
 
 : continue-with ( obj continuation -- )
     swap 9 setenv continue ; inline
+
+M: continuation clone
+    [ continuation-data clone ] keep
+    [ continuation-retain clone ] keep
+    [ continuation-call clone ] keep
+    [ continuation-name clone ] keep
+    continuation-catch clone <continuation> ;
