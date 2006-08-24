@@ -113,6 +113,7 @@ sequences vectors words ;
         "/library/tools/debugger.factor"
         
         "/library/threads.factor"
+        "/library/io/server.factor"
 
         "/library/tools/memory.factor"
         "/library/tools/listener.factor"
@@ -123,7 +124,6 @@ sequences vectors words ;
 
         "/library/tools/interpreter.factor"
         
-        "/library/io/server.factor"
         "/library/tools/jedit.factor"
 
         "/library/compiler/inference/shuffle.factor"
