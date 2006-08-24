@@ -1,6 +1,6 @@
 IN: inference
 USING: arrays alien assembler errors generic hashtables
-hashtables-internals interpreter io io-internals kernel
+hashtables-internals io io-internals kernel
 kernel-internals math math-internals memory parser
 sequences strings vectors words prettyprint ;
 

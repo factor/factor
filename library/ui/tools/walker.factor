@@ -41,9 +41,9 @@ TUPLE: walker-gadget track ds rs cs quot ns ;
 : walker-gadget-input walker-gadget-track walker-track-input ;
 
 : update-stacks ( walker -- )
-    meta-d get over walker-gadget-ds set-model
-    meta-r get over walker-gadget-rs set-model
-    meta-c get over walker-gadget-cs set-model
+    meta-d over walker-gadget-ds set-model
+    meta-r over walker-gadget-rs set-model
+    meta-c over walker-gadget-cs set-model
     meta-callframe swap walker-gadget-quot set-model ;
 
 : with-walker ( walker quot -- )
@@ -98,7 +98,7 @@ M: walker-gadget focusable-child*
 : init-walker ( walker -- )
     H{ } clone over set-walker-gadget-ns
     walker-continuation swap [
-        set-meta-interp
+        meta-interp set
         [ ] (meta-call)
     ] with-walker ;
 

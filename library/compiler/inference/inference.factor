@@ -1,7 +1,7 @@
 ! Copyright (C) 2004, 2006 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 IN: inference
-USING: arrays errors generic inspector interpreter io kernel
+USING: arrays errors generic inspector io kernel
 math namespaces parser prettyprint sequences strings
 vectors words ;
 
@@ -18,8 +18,6 @@ TUPLE: literal-expected ;
 
 M: object value-literal
     <literal-expected> inference-error ;
-
-SYMBOL: d-in
 
 : pop-literal ( -- rstate obj )
     1 #drop node,

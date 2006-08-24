@@ -1,8 +1,20 @@
 ! Copyright (C) 2004, 2006 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 IN: inference
-USING: arrays generic hashtables interpreter kernel math
+USING: arrays generic hashtables kernel math
 namespaces parser sequences words ;
+
+SYMBOL: d-in
+SYMBOL: meta-d
+SYMBOL: meta-r
+
+: push-d meta-d get push ;
+: pop-d meta-d get pop ;
+: peek-d meta-d get peek ;
+
+: push-r meta-r get push ;
+: pop-r meta-r get pop ;
+: peek-r meta-r get peek ;
 
 TUPLE: node param shuffle
        classes literals history

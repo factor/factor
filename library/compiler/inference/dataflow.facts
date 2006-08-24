@@ -14,3 +14,6 @@ HELP: current-node
 HELP: remember-node
 { $values { "word" "a word" } { "node" "a dataflow node" } }
 { $description "Annotates all nodes starting from " { $snippet "node" } " with the fact that they were inlined from " { $snippet "word" } ". This prevents infinite loops when the optimizer inlines words." } ;
+
+HELP: d-in
+{ $var-description "During inference, holds the number of inputs which the quotation has been inferred to require so far." } ;

@@ -1,5 +1,5 @@
 IN: inference
-USING: arrays generic interpreter kernel math namespaces
+USING: arrays generic kernel math namespaces
 sequences words parser ;
 
 : infer-shuffle-inputs ( shuffle node -- )

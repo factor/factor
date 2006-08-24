@@ -8,21 +8,23 @@ namespaces prettyprint sequences strings threads vectors words ;
 ! continuation to and from the primary interpreter. Used by
 ! compiler for partial evaluation, also by the walker.
 
+SYMBOL: meta-interp
+
 ! Meta-stacks;
-SYMBOL: meta-d
-: push-d meta-d get push ;
-: pop-d meta-d get pop ;
-: peek-d meta-d get peek ;
-SYMBOL: meta-r
-: push-r meta-r get push ;
-: pop-r meta-r get pop ;
-: peek-r meta-r get peek ;
-SYMBOL: meta-c
-: push-c meta-c get push ;
-: pop-c meta-c get pop ;
-: peek-c meta-c get peek ;
-SYMBOL: meta-name
-SYMBOL: meta-catch
+: meta-d meta-interp get continuation-data ;
+: push-d meta-d push ;
+: pop-d meta-d pop ;
+: peek-d meta-d peek ;
+
+: meta-r meta-interp get continuation-retain ;
+: push-r meta-r push ;
+: pop-r meta-r pop ;
+: peek-r meta-r peek ;
+
+: meta-c meta-interp get continuation-call ;
+: push-c meta-c push ;
+: pop-c meta-c pop ;
+: peek-c meta-c peek ;
 
 ! Call frame
 SYMBOL: callframe
@@ -45,7 +47,7 @@ SYMBOL: callframe-end
 
 : done-cf? ( -- ? ) callframe-scan get callframe-end get >= ;
 
-: done? ( -- ? ) done-cf? meta-c get empty? and ;
+: done? ( -- ? ) done-cf? meta-c empty? and ;
 
 : (next)
     callframe-scan get callframe get nth callframe-scan inc ;
@@ -57,24 +59,8 @@ SYMBOL: callframe-end
         { [ t ] [ >r (next) r> call ] }
     } cond ; inline
 
-: meta-interp ( -- interp )
-    meta-d get meta-r get meta-c get
-    meta-name get meta-catch get <continuation> ;
-
 : init-meta-interp ( -- )
-    V{ } clone meta-catch set
-    V{ } clone meta-name set
-    V{ } clone meta-c set
-    V{ } clone meta-r set
-    V{ } clone meta-d set ;
-
-: set-meta-interp ( interp -- )
-    >continuation<
-    meta-catch set
-    meta-name set
-    meta-c set
-    meta-r set
-    meta-d set ;
+    <empty-continuation> meta-interp set ;
 
 : save-callframe ( -- )
     done-cf? [
@@ -103,17 +89,18 @@ SYMBOL: callframe-end
     ] [ ] make ;
 
 : restore-harness ( obj -- )
+    #! Error handler
     dup array? [
         init-meta-interp [ ] (meta-call)
         first2 schedule-thread-with
     ] [
-        set-meta-interp
+        meta-interp set
     ] if ;
 
 : host-quot ( quot -- )
     [
-        host-harness <callframe> meta-c get swap nappend
-        meta-interp continue
+        host-harness <callframe> meta-c swap nappend
+        meta-interp get continue
     ] callcc1 restore-harness drop ;
 
 : host-word ( word -- ) unit host-quot ;
@@ -162,6 +149,6 @@ M: object do do-1 ;
 : step-all ( -- )
     save-callframe
     meta-c [ V{ [ stop ] 0 1 } swap append ] change
-    meta-interp schedule-thread yield
+    meta-interp get schedule-thread yield
     V{ } clone meta-c set
     [ ] (meta-call) ;

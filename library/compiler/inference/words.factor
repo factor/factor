@@ -1,6 +1,6 @@
 ! Copyright (C) 2004, 2006 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: arrays errors generic hashtables interpreter kernel
+USING: arrays errors generic hashtables kernel
 math math-internals namespaces parser prettyprint sequences
 strings vectors words ;
 IN: inference
