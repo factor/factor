@@ -3,17 +3,15 @@
 IN: gadgets-text
 USING: gadgets gadgets-controls generic kernel models sequences ;
 
-TUPLE: field model history ;
+TUPLE: field model ;
 
 C: field ( model -- field )
     <editor> over set-delegate
-    V{ } clone over set-field-history
     [ set-field-model ] keep
     dup dup set-control-self ;
 
 : field-commit ( field -- string )
     [ editor-text ] keep
-    [ field-history push-new ] 2keep
     [ field-model [ dupd set-model ] when* ] keep
     select-all ;
 

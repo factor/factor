@@ -84,8 +84,8 @@ math namespaces prettyprint sequences strings styles ;
     ] keep
     3array ;
 
-: completions ( str -- seq )
-    all-words [ completion ] map-with [ first zero? not ] subset
+: completions ( str words -- seq )
+    [ completion ] map-with [ first zero? not ] subset
     [ [ first ] 2apply swap - ] sort dup length 20 min head ;
 
 : fuzzy. ( fuzzy full -- )
@@ -94,7 +94,7 @@ math namespaces prettyprint sequences strings styles ;
         [ hilite-style >r ch>string r> format ] [ write1 ] if 
     ] 2each drop ;
 
-: apropos ( str -- )
+: (apropos) ( str words -- )
     completions [
         first3 dup presented associate [
             dup word-vocabulary write bl word-name fuzzy.
@@ -102,3 +102,5 @@ math namespaces prettyprint sequences strings styles ;
             write
         ] with-nesting terpri
     ] each ;
+
+: apropos ( str -- ) all-words (apropos) ;

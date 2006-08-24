@@ -14,20 +14,11 @@
 
 - fix ui listener delay
 - we have trouble drawing rectangles
-- remaining walker tasks:
-  - integrate walker with listener
-  - <input> handled by walker itself
-  - ^W in interactor
-  - ^I in interactor
-  - error handling is still screwy
-  - continuation handling is also screwy
-  - keyboard commands
 - editor:
   - only redraw visible lines
   - more efficient multi-line inserts
   - editor should support stream output protocol
 - slider needs to be modelized
-- listener tab completion
 - track individual method usages
 - modularize core
 - track module files and modification times, and a list of assets loaded
@@ -43,14 +34,9 @@
 
 + ui:
 
-- list of key bindings
-- presentation types
-- present/accept
 - graphical module manager tool
 - figure out what goes in the .app and what doesn't
 - should be possible to drop an image file on the .app to run it
-- the UI listener has a shitty design. perhaps it should not call out
-  to the real listener.
 - add-gadget, model-changed, set-model should compile
 - shortcuts:
   - find a listener

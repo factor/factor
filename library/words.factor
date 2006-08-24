@@ -183,6 +183,9 @@ TUPLE: check-create name vocab ;
         ] when lookup
     ] when ;
 
+: words-named ( str -- seq )
+    all-words [ word-name = ] subset-with ;
+
 ! Definition protocol
 M: word where "loc" word-prop ;
 

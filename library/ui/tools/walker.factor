@@ -127,6 +127,13 @@ C: walker-gadget ( -- gadget )
     } make-frame*
     dup walker-thread ;
 
+\ walker-gadget H{
+    { T{ key-down f { C+ } "s" } [ \ step walker-command ] }
+    { T{ key-down f { C+ } "n" } [ \ step-in walker-command ] }
+    { T{ key-down f { C+ } "o" } [ \ step-out walker-command ] }
+    { T{ key-down f { C+ } "l" } [ \ step-all walker-command ] }
+} set-gestures
+
 : walker-tool
     [ walker-gadget? ] [ <walker-gadget> ] [ (walk) ] ;
 
