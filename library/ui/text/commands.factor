@@ -64,46 +64,46 @@ sequences ;
 
 : editor-doc-end ( editor -- ) T{ doc-elt } editor-next ;
 
-editor H{
-    { T{ key-down f f "RETURN" } [ "\n" swap user-input ] }
-    { T{ key-down f { S+ } "RETURN" } [ "\n" swap user-input ] }
-    { T{ button-down } [ editor-mouse-down ] }
-    { T{ drag } [ editor-mouse-drag ] }
-    { T{ gain-focus } [ focus-editor ] }
-    { T{ lose-focus } [ unfocus-editor ] }
-    { T{ paste-action } [ clipboard get paste-clipboard ] }
-    { T{ button-up f 2 } [ selection get paste-clipboard ] }
-    { T{ copy-action } [ clipboard get editor-copy ] }
-    { T{ button-up } [ selection get editor-copy ] }
-    { T{ cut-action } [ clipboard get editor-cut ] }
-    { T{ delete-action } [ remove-editor-selection ] }
-    { T{ select-all-action } [ T{ doc-elt } select-elt ] }
-    { T{ key-down f { C+ } "l" } [ T{ one-line-elt } select-elt ] }
-    { T{ key-down f { C+ } "w" } [ T{ word-elt } select-elt ] }
-    { T{ key-down f f "LEFT" } [ T{ char-elt } editor-prev ] }
-    { T{ key-down f f "RIGHT" } [ T{ char-elt } editor-next ] }
-    { T{ key-down f f "UP" } [ T{ line-elt } editor-prev ] }
-    { T{ key-down f f "DOWN" } [ T{ line-elt } editor-next ] }
-    { T{ key-down f { S+ } "LEFT" } [ T{ char-elt } editor-select-prev ] }
-    { T{ key-down f { S+ } "RIGHT" } [ T{ char-elt } editor-select-next ] }
-    { T{ key-down f { S+ } "UP" } [ T{ line-elt } editor-select-prev ] }
-    { T{ key-down f { S+ } "DOWN" } [ T{ line-elt } editor-select-next ] }
-    { T{ key-down f { C+ } "LEFT" } [ T{ word-elt } editor-prev ] }
-    { T{ key-down f { C+ } "RIGHT" } [ T{ word-elt } editor-next ] }
-    { T{ key-down f { S+ C+ } "LEFT" } [ T{ word-elt } editor-select-prev ] }
-    { T{ key-down f { S+ C+ } "RIGHT" } [ T{ word-elt } editor-select-next ] }
-    { T{ key-down f f "HOME" } [ T{ one-line-elt } editor-prev ] }
-    { T{ key-down f f "END" } [ T{ one-line-elt } editor-next ] }
-    { T{ key-down f { S+ } "HOME" } [ T{ one-line-elt } editor-select-prev ] }
-    { T{ key-down f { S+ } "END" } [ T{ one-line-elt } editor-select-next ] }
-    { T{ key-down f { C+ } "HOME" } [ editor-doc-start ] }
-    { T{ key-down f { C+ } "END" } [ editor-doc-end ] }
-    { T{ key-down f { C+ S+ } "HOME" } [ T{ doc-elt } editor-select-prev ] }
-    { T{ key-down f { C+ S+ } "END" } [ T{ doc-elt } editor-select-next ] }
-    { T{ key-down f f "DELETE" } [ T{ char-elt } editor-delete ] }
-    { T{ key-down f f "BACKSPACE" } [ T{ char-elt } editor-backspace ] }
-    { T{ key-down f { C+ } "DELETE" } [ T{ word-elt } editor-delete ] }
-    { T{ key-down f { C+ } "BACKSPACE" } [ T{ word-elt } editor-backspace ] }
-    { T{ key-down f { A+ } "DELETE" } [ T{ one-line-elt } editor-delete ] }
-    { T{ key-down f { A+ } "BACKSPACE" } [ T{ one-line-elt } editor-backspace ] }
-} set-gestures
+editor {
+    { f "Insert newline" T{ key-down f f "RETURN" } [ "\n" swap user-input ] }
+    { f "Insert newline" T{ key-down f { S+ } "RETURN" } [ "\n" swap user-input ] }
+    { f "Position caret" T{ button-down } [ editor-mouse-down ] }
+    { f "Start selection" T{ drag } [ editor-mouse-drag ] }
+    { f "Focus editor" T{ gain-focus } [ focus-editor ] }
+    { f "Unfocus editor" T{ lose-focus } [ unfocus-editor ] }
+    { f "Paste" T{ paste-action } [ clipboard get paste-clipboard ] }
+    { f "Paste selection" T{ button-up f 2 } [ selection get paste-clipboard ] }
+    { f "Copy" T{ copy-action } [ clipboard get editor-copy ] }
+    { f "Copy selection" T{ button-up } [ selection get editor-copy ] }
+    { f "Cut" T{ cut-action } [ clipboard get editor-cut ] }
+    { f "Clear" T{ delete-action } [ remove-editor-selection ] }
+    { f "Select all" T{ select-all-action } [ T{ doc-elt } select-elt ] }
+    { f "Select line" T{ key-down f { C+ } "l" } [ T{ one-line-elt } select-elt ] }
+    { f "Select word" T{ key-down f { C+ } "w" } [ T{ word-elt } select-elt ] }
+    { f "Previous character" T{ key-down f f "LEFT" } [ T{ char-elt } editor-prev ] }
+    { f "Next character" T{ key-down f f "RIGHT" } [ T{ char-elt } editor-next ] }
+    { f "Previous line" T{ key-down f f "UP" } [ T{ line-elt } editor-prev ] }
+    { f "Next line" T{ key-down f f "DOWN" } [ T{ line-elt } editor-next ] }
+    { f "Select previous character" T{ key-down f { S+ } "LEFT" } [ T{ char-elt } editor-select-prev ] }
+    { f "Select next character" T{ key-down f { S+ } "RIGHT" } [ T{ char-elt } editor-select-next ] }
+    { f "Select previous line" T{ key-down f { S+ } "UP" } [ T{ line-elt } editor-select-prev ] }
+    { f "Select next line" T{ key-down f { S+ } "DOWN" } [ T{ line-elt } editor-select-next ] }
+    { f "Previous word" T{ key-down f { C+ } "LEFT" } [ T{ word-elt } editor-prev ] }
+    { f "Next word" T{ key-down f { C+ } "RIGHT" } [ T{ word-elt } editor-next ] }
+    { f "Select previous line" T{ key-down f { S+ C+ } "LEFT" } [ T{ word-elt } editor-select-prev ] }
+    { f "Select next line" T{ key-down f { S+ C+ } "RIGHT" } [ T{ word-elt } editor-select-next ] }
+    { f "Start of line" T{ key-down f f "HOME" } [ T{ one-line-elt } editor-prev ] }
+    { f "End of line" T{ key-down f f "END" } [ T{ one-line-elt } editor-next ] }
+    { f "Select to start of line" T{ key-down f { S+ } "HOME" } [ T{ one-line-elt } editor-select-prev ] }
+    { f "Select to end of line" T{ key-down f { S+ } "END" } [ T{ one-line-elt } editor-select-next ] }
+    { f "Start of document" T{ key-down f { C+ } "HOME" } [ editor-doc-start ] }
+    { f "End of document" T{ key-down f { C+ } "END" } [ editor-doc-end ] }
+    { f "Select start of document" T{ key-down f { C+ S+ } "HOME" } [ T{ doc-elt } editor-select-prev ] }
+    { f "Select end of document" T{ key-down f { C+ S+ } "END" } [ T{ doc-elt } editor-select-next ] }
+    { f "Delete next character" T{ key-down f f "DELETE" } [ T{ char-elt } editor-delete ] }
+    { f "Delete previous character" T{ key-down f f "BACKSPACE" } [ T{ char-elt } editor-backspace ] }
+    { f "Delete previous word" T{ key-down f { C+ } "DELETE" } [ T{ word-elt } editor-delete ] }
+    { f "Delete next word" T{ key-down f { C+ } "BACKSPACE" } [ T{ word-elt } editor-backspace ] }
+    { f "Delete to start of line" T{ key-down f { A+ } "DELETE" } [ T{ one-line-elt } editor-delete ] }
+    { f "Delete to end of line" T{ key-down f { A+ } "BACKSPACE" } [ T{ one-line-elt } editor-backspace ] }
+} define-commands

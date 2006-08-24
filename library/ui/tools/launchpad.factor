@@ -3,7 +3,7 @@
 IN: gadgets
 USING: gadgets-presentations memory io gadgets-panes
 gadgets-scrolling namespaces help kernel gadgets-listener
-gadgets-browser ;
+gadgets-browser gadgets-search ;
 
 : handbook-window ( -- )
     T{ link f "handbook" } show ;

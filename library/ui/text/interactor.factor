@@ -76,20 +76,20 @@ SYMBOL: structured-input
 : use-word ( str -- )
     words-named [ word-vocabulary dup print use+ ] each ;
 
-interactor H{
-    { T{ key-down f f "RETURN" } [ interactor-commit ] }
-    { T{ key-down f { A+ } "c" } [ dup [ interactor-output pane-clear ] curry swap interactor-call ] }
-    { T{ key-down f { C+ } "h" } [ dup [ interactor-history. ] curry swap interactor-call ] }
-    { T{ key-down f { C+ } "d" } [ f swap interactor-eval ] }
-    { T{ key-down f { C+ } "i" } [ "infer ." quot-action ] }
-    { T{ key-down f { C+ } "w" } [ "walk" quot-action ] }
-    { T{ key-down f { A+ } "s" } [ [ search see ] word-action ] }
-    { T{ key-down f { A+ } "j" } [ [ search jedit ] word-action ] }
-    { T{ key-down f { A+ } "r" } [ [ search reload ] word-action ] }
-    { T{ key-down f { A+ } "a" } [ [ apropos ] word-action ] }
-    { T{ key-down f { A+ } "u" } [ [ use-word ] word-action ] }
-    { T{ key-down f f "TAB" } [ [ usable-words (apropos) ] word-action ] }
-} set-gestures
+interactor {
+    { f "Evaluate input" T{ key-down f f "RETURN" } [ interactor-commit ] }
+    { f "Clear output" T{ key-down f { A+ } "c" } [ dup [ interactor-output pane-clear ] curry swap interactor-call ] }
+    { f "History" T{ key-down f { C+ } "h" } [ dup [ interactor-history. ] curry swap interactor-call ] }
+    { f "Send EOF" T{ key-down f { C+ } "d" } [ f swap interactor-eval ] }
+    { f "Infer input" T{ key-down f { C+ } "i" } [ "infer ." quot-action ] }
+    { f "Single step input" T{ key-down f { C+ } "w" } [ "walk" quot-action ] }
+    { f "See at caret" T{ key-down f { A+ } "s" } [ [ search see ] word-action ] }
+    { f "jEdit at caret" T{ key-down f { A+ } "j" } [ [ search jedit ] word-action ] }
+    { f "Reload at caret" T{ key-down f { A+ } "r" } [ [ search reload ] word-action ] }
+    { f "Apropos at caret (all)" T{ key-down f { A+ } "a" } [ [ apropos ] word-action ] }
+    { f "Use word at caret" T{ key-down f { A+ } "u" } [ [ use-word ] word-action ] }
+    { f "Apropos at caret (used)" T{ key-down f f "TAB" } [ [ usable-words (apropos) ] word-action ] }
+} define-commands
 
 M: interactor stream-readln
     dup interactor-queue empty? [

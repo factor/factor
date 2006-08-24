@@ -46,7 +46,16 @@ M: object gesture>string drop f ;
     "gestures" set-word-prop ;
 
 : commands ( gadget -- seq )
-    delegates [ class "commands" word-prop ] map concat ;
+    [
+        parents [
+            delegates [ class "commands" word-prop % ] each
+        ] each
+    ] V{ } make ;
+
+: commands. ( gadget -- )
+    commands [
+        [ command-string ] keep write-object terpri
+    ] each ;
 
 world {
     { f "Cut" T{ key-down f { C+ } "x" } [ T{ cut-action } send-action ] }
