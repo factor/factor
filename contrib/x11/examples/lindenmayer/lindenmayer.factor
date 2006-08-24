@@ -1,5 +1,5 @@
 USING: kernel alien namespaces arrays vectors math opengl math-contrib
-lists parser sequences hashtables strings ;
+       parser sequences hashtables strings ;
 
 IN: lindenmayer 
 
@@ -127,13 +127,13 @@ SYMBOL: rules
 
 : segment ( str -- seq )
 { { [ dup "" = ] [ drop [ ] ] }
-  { [ dup length* 1 = ] [ f cons ] }
-  { [ dup 1 swap nth CHAR: ( = ]
-    [ dup CHAR: ) swap index 1 +
+  { [ dup length* 1 = ] [ unit ] }
+  { [ 1 over nth CHAR: ( = ]
+    [ CHAR: ) over index 1 +		! str i
       2dup head				! str i head
       -rot tail				! head tail
-      segment cons ] }
-  { [ t ] [ dup 1 head swap 1 tail segment cons ] } }
+      segment swap add* ] }
+  { [ t ] [ dup 1 head swap 1 tail segment swap add* ] } }
 cond ;
 
 : lookup ( str -- str ) dup 1 head rules get hash dup [ nip ] [ drop ] if ;
