@@ -1,7 +1,7 @@
 ! Copyright (C) 2005, 2006 Eduardo Cavazos and Slava Pestov
 ! See http://factorcode.org/license.txt for BSD license.
 IN: x11
-USING: arrays errors freetype gadgets gadgets-launchpad
+USING: arrays errors freetype gadgets
 gadgets-listener hashtables kernel kernel-internals math
 namespaces opengl sequences strings ;
 
@@ -174,7 +174,6 @@ IN: shells
                 restore-windows
             ] [
                 init-ui
-                launchpad-window
                 listener-window
             ] if
             event-loop
