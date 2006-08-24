@@ -40,7 +40,8 @@ void load_image(const char* filename)
 	/* read data heap */
 	{
 		CELL size = h.data_size / CELLS;
-		allot(h.data_size);
+		if(size + tenured.base >= tenured.limit)
+			fatal_error("Data heap too large",h.code_size);
 
 		if(size != fread((void*)tenured.base,sizeof(CELL),size,file))
 			fatal_error("Wrong data heap length",h.data_size);

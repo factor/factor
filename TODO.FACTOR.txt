@@ -36,7 +36,6 @@
   should be reloaded -- do this in the right order
 - more compact relocation info
 - UI dataflow visualizer
-- loading the image should not exhaust nursery space
 - problem if major gc happens during relocation
   - in fact relocation should not cons at all
 

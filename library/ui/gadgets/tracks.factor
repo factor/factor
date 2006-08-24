@@ -116,8 +116,6 @@ C: divider ( -- divider )
     dup add-divider [ add-gadget ] keep
     dup track-sizes track-add-size swap set-track-sizes ;
 
-: nth-gadget gadget-children nth ;
-
 : track-remove@ ( n track -- )
     #! Remove the divider if this is not the last child.
     2dup nth-gadget unparent

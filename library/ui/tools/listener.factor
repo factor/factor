@@ -48,6 +48,9 @@ C: listener-gadget ( -- gadget )
         { [ <listener-input> ] set-listener-gadget-input [ <scroller> ] 1/6 }
     } { 0 1 } make-track* dup start-listener ;
 
+M: listener-gadget pref-dim*
+    delegate pref-dim* { 500 600 } vmax ;
+
 M: listener-gadget focusable-child*
     listener-gadget-input ;
 

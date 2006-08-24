@@ -54,6 +54,8 @@ M: gadget equal? eq? ;
 
 : gadget-child gadget-children first ;
 
+: nth-gadget gadget-children nth ;
+
 C: gadget ( -- gadget )
     { 0 0 } dup <rect> over set-delegate
     { 0 1 } over set-gadget-orientation
