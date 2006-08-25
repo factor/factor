@@ -1,1 +1,1 @@
-PROVIDES: "jedit" { "jedit.factor" "jedit.facts" } { } ;
+PROVIDE: jedit { "jedit.factor" "jedit.facts" } { } ;

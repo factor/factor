@@ -1,14 +1,26 @@
 ! Copyright (C) 2006 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 IN: definitions
-USING: arrays generic hashtables io kernel math namespaces
-parser prettyprint sequences styles words ;
+USING: arrays errors generic hashtables io kernel math
+namespaces parser prettyprint sequences styles words ;
 
 : ?resource-path ( path -- path )
     "resource:/" ?head [ resource-path ] when ;
 
+: where ( defspec -- loc )
+    where* first2 >r ?resource-path r> 2array ;
+
 : reload ( defspec -- )
-    where first [ ?resource-path run-file ] when* ;
+    where first [ run-file ] when* ;
+
+TUPLE: no-edit-hook ;
+
+SYMBOL: edit-hook
+
+: edit-location ( file line -- )
+    edit-hook get [ call ] [ <no-edit-hook> throw ] if* ;
+
+: edit ( defspec -- ) where first2 edit-location ;
 
 GENERIC: (synopsis) ( defspec -- )
 

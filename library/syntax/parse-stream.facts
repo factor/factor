@@ -1,4 +1,4 @@
-USING: compiler help io jedit parser ;
+USING: compiler help io parser definitions ;
 
 HELP: file-vocabs
 { $description "Installs the initial the vocabulary search path for parsing a file." } ;
@@ -45,14 +45,14 @@ HELP: run-file
 { $description "Parses the Factor source code stored in a file and runs it. The initial vocabulary search path is used." }
 { $errors "Throws an error if loading the file fails, there input is malformed, or if a runtime error occurs while calling the parsed quotation." }  ;
 
-HELP: try-run-file
+HELP: ?run-file
 { $values { "file" "a path name string" } }
-{ $description "Forgiving variant of " { $link run-file } " which logs errors to the default stream without re-throwing them." }  ;
+{ $description "Forgiving variant of " { $link run-file } " which does nothing if the file does not exist, and logs errors to the default stream without re-throwing them." }  ;
 
 HELP: parse-resource
 { $values { "path" "a resource name string" } { "quot" "a new quotation" } }
 { $description "Parses a library resource." }
-{ $notes "the source file name given to the parser is special for resources and begins with " { $snippet "resource:" } ". This allows words that operate on source files, like " { $link jedit } ", to use a different resource path at run time than was used at parse time." }
+{ $notes "the source file name given to the parser is special for resources and begins with " { $snippet "resource:" } ". This allows words that operate on source files, like " { $link edit } ", to use a different resource path at run time than was used at parse time." }
 { $errors "Throws an I/O error if there was an error reading the resource. Throws a parse error if the input is malformed." } ;
 
 HELP: run-resource

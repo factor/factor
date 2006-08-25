@@ -1,8 +1,8 @@
 ! Copyright (C) 2004, 2006 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: arrays generic hashtables help inspector io kernel
-kernel-internals math namespaces parser prettyprint sequences
-sequences-internals strings styles vectors words ;
+USING: arrays definitions generic hashtables help inspector io
+kernel kernel-internals math namespaces parser prettyprint
+sequences sequences-internals strings styles vectors words ;
 IN: errors
 
 PREDICATE: array kernel-error ( obj -- ? )
@@ -35,6 +35,10 @@ SYMBOL: restarts
 
 : :res ( n -- )
     restarts get nth first3 continue-with ;
+
+: :edit ( -- )
+    error get dup parse-error-file swap parse-error-line
+    edit-location ;
 
 : (:help-multi)
     "This error has multiple delegates:" print help-outliner ;
@@ -72,6 +76,11 @@ SYMBOL: restarts
     ":s    - data stack at exception time" [ :s ] print-input
     ":r    - retain stack at exception time" [ :r ] print-input
     ":c    - call stack at exception time" [ :c ] print-input
+
+    error get [ parse-error? ] is? [
+        ":edit - jump to source location" [ :edit ] print-input
+    ] when
+
     ":get  ( var -- value ) accesses variables at time of the error" print
     flush ;
 

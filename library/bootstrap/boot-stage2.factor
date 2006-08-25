@@ -1,8 +1,8 @@
 ! Copyright (C) 2004, 2006 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: compiler errors generic help io io-internals kernel
-kernel-internals listener math memory namespaces optimizer
-parser sequences sequences-internals words ;
+USING: command-line compiler errors generic help io io-internals
+kernel kernel-internals listener math memory namespaces
+optimizer parser sequences sequences-internals words ;
 
 [
     ! Wrap everything in a catch which starts a listener so you
@@ -64,34 +64,36 @@ parser sequences sequences-internals words ;
             H{ } clone parent-graph set-global xref-help
             H{ } clone term-index set-global index-help
         ] when
-    
-        [
-            boot
-            run-user-init
-            "shell" get "shells" lookup execute
-            0 exit
-        ] set-boot
-    
-        f error set-global
-        f error-continuation set-global
+    ] no-parse-hook
 
-        [ compiled? ] word-subset length
-        number>string write " compiled words" print
-    
-        [ symbol? ] word-subset length
-        number>string write " symbol words" print
-    
-        all-words length
-        number>string write " words total" print
-    
-        "Total bootstrap GC time: " write gc-time
-        number>string write " ms" print
-    
-        "Bootstrapping is complete." print
-        "Now, you can run ./f factor.image" print flush
-    
-        "factor.image" resource-path save-image
-    ] [ print-error :c ] recover
-] no-parse-hook
+    run-bootstrap-init
+
+    [
+        boot
+        run-user-init
+        "shell" get "shells" lookup execute
+        0 exit
+    ] set-boot
+
+    f error set-global
+    f error-continuation set-global
+
+    [ compiled? ] word-subset length
+    number>string write " compiled words" print
+
+    [ symbol? ] word-subset length
+    number>string write " symbol words" print
+
+    all-words length
+    number>string write " words total" print
+
+    "Total bootstrap GC time: " write gc-time
+    number>string write " ms" print
+
+    "Bootstrapping is complete." print
+    "Now, you can run ./f factor.image" print flush
+
+    "factor.image" resource-path save-image
+] [ print-error :c ] recover
 
 0 exit

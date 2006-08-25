@@ -1,6 +1,6 @@
 USING: definitions errors help image inspector io kernel
 listener memory modules parser prettyprint sequences test
-words jedit shells ;
+words shells ;
 
 ARTICLE: "tools" "Development tools"
 "This section covers words which are used during development, and not usually invoked directly by user code."
@@ -136,7 +136,7 @@ $terpri
 { $subsection where }
 { $subsection subdefs }
 "Editing definitions:"
-{ $subsection jedit }
+{ $subsection edit }
 { $subsection reload }
 "Removing definitions:"
 { $subsection forget } ;

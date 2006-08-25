@@ -1,11 +1,11 @@
 ! Copyright (C) 2006 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 IN: definitions
-USING: kernel sequences ;
+USING: kernel sequences namespaces errors ;
 
 GENERIC: see ( defspec -- )
 
-GENERIC: where ( defspec -- loc )
+GENERIC: where* ( defspec -- loc )
 
 GENERIC: subdefs ( defspec -- seq )
 
@@ -14,10 +14,3 @@ GENERIC: subdefs ( defspec -- seq )
 GENERIC: forget ( defspec -- )
 
 GENERIC: synopsis ( defspec -- str )
-
-TUPLE: no-edit-hook ;
-
-SYMBOL: edit-hook
-
-: edit ( defspec -- )
-    edit-hook get [ call ] [ <no-edit-hook> throw ] if* ;

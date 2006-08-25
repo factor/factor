@@ -39,7 +39,8 @@ SYMBOL: parse-hook
 : no-parse-hook ( quot -- )
     [ parse-hook off call ] with-scope ; inline
 
-: try-run-file ( file -- ) [ [ run-file ] keep ] try drop ;
+: ?run-file ( file -- )
+    dup exists? [ [ [ run-file ] keep ] try ] when drop ;
 
 : eval>string ( str -- str )
     [ [ [ eval ] keep ] try drop ] string-out ;

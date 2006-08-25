@@ -26,7 +26,7 @@ namespaces parser prettyprint sequences strings words shells ;
         write
     ] with-stream ;
 
-: jedit-line/file ( file line -- )
+: jedit-location ( file line -- )
     number>string "+line:" swap append 2array
     make-jedit-request send-jedit-request ;
 
@@ -34,6 +34,6 @@ namespaces parser prettyprint sequences strings words shells ;
     1array make-jedit-request send-jedit-request ;
 
 : jedit ( defspec -- )
-    where first2 >r ?resource-path r> jedit-line/file ;
+    where first2 jedit-location ;
 
-[ jedit ] edit-hook set-global
+[ jedit-location ] edit-hook set-global

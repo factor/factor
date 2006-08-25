@@ -74,7 +74,7 @@ DEFER: $subsection
     all-articles [ children ] parent-graph get build-graph ;
 
 ! Definition protocol
-M: link where link-name article article-loc ;
+M: link where* link-name article article-loc ;
 
 M: link (synopsis)
     \ ARTICLE: pprint-word
@@ -87,7 +87,7 @@ M: link see (see) ;
 
 PREDICATE: link word-link link-name word? ;
 
-M: word-link where link-name "help-loc" word-prop ;
+M: word-link where* link-name "help-loc" word-prop ;
 
 M: word-link (synopsis)
     \ HELP: pprint-word
