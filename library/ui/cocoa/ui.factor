@@ -83,6 +83,6 @@ IN: shells
         ] with-cocoa
     ] with-freetype ;
 
-IN: kernel
+IN: command-line
 
 : default-shell running.app? "ui" "tty" ? ;

@@ -180,6 +180,6 @@ IN: shells
         ] with-x
     ] with-freetype ;
 
-IN: kernel
+IN: command-line
 
 : default-shell "DISPLAY" os-env empty? "tty" "ui" ? ;
