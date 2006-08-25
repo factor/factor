@@ -3,7 +3,7 @@
 IN: gadgets-browser
 USING: arrays definitions gadgets gadgets-books gadgets-borders
 gadgets-buttons gadgets-frames gadgets-labels gadgets-panes
-gadgets-presentations gadgets-scrolling gadgets-search
+gadgets-scrolling gadgets-search
 gadgets-theme gadgets-tiles gadgets-tracks generic hashtables
 help inspector kernel math models namespaces prettyprint
 sequences styles words ;
@@ -157,6 +157,5 @@ M: browser gadget-title drop "Browser" <model> ;
 
 : browser-tool [ browser? ] [ <browser> ] [ browse ] ;
 
-M: word show browser-tool call-tool ;
-
-M: vocab-link show browser-tool call-tool ;
+[ word? ] 1 "Browse" [ browser-tool call-tool ] define-operation
+[ vocab-link? ] 1 "Browse" [ browser-tool call-tool ] define-operation

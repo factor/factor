@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 IN: gadgets-listener
 USING: arrays gadgets gadgets-frames gadgets-labels
-gadgets-panes gadgets-presentations gadgets-scrolling
+gadgets-panes gadgets-scrolling
 gadgets-text gadgets-theme gadgets-tiles gadgets-tracks generic
 hashtables inspector io jedit kernel listener math models
 namespaces parser prettyprint sequences shells styles threads
@@ -81,8 +81,6 @@ M: listener-gadget gadget-title drop "Listener" <model> ;
         [ [ run-file ] each ] curry listener-tool call-tool
     ] if ;
 
-M: input show
-    input-string listener-tool call-tool ;
-
-M: object show
-    [ inspect ] curry listener-tool call-tool ;
+[ drop t ] 1 "Inspect" [ [ inspect ] curry listener-tool call-tool ] define-operation
+[ drop t ] 3 "Inspect" [ [ inspect ] curry listener-tool call-tool ] define-operation
+[ input? ] 1 "Replace input" [ input-string listener-tool call-tool ] define-operation

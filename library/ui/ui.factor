@@ -139,7 +139,8 @@ C: titled-gadget ( gadget title -- )
     windows get [ empty? not ] [ f ] if* ;
 
 : <toolbar> ( gadget -- toolbar )
-    commands [ <command-button> ] map make-shelf ;
+    commands [ <command-button> ] map make-shelf
+    dup highlight-theme ;
 
 : error-window ( error -- )
     [ print-error ] make-pane "Error" open-titled-window ;

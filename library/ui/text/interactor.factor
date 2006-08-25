@@ -67,7 +67,7 @@ SYMBOL: structured-input
 
 : word-action ( interactor word -- )
     over gadget-selection?
-    [ over T{ word-elt } editor-select-prev ] unless
+    [ over T{ word-elt } select-elt ] unless
     over gadget-selection add* swap interactor-call ;
 
 : usable-words ( -- seq )

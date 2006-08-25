@@ -5,13 +5,9 @@ new browser:
 - scroll to existing won't work
 - initial scroll dim is wrong
 - show callers
-
 listener:
 - show IN:
-
-- commands
 - list of key bindings
-
 - RT_WORD should refer to XTs not word objects.
 - services do not launch if factor not running
 - roundoff is still not quite right with tracks

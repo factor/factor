@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 IN: gadgets-help
 USING: gadgets gadgets-borders gadgets-buttons gadgets-frames
-gadgets-panes gadgets-presentations gadgets-search
+gadgets-panes gadgets-search
 gadgets-scrolling help kernel models namespaces sequences ;
 
 TUPLE: help-gadget history ;
@@ -36,4 +36,4 @@ M: help-gadget pref-dim* drop { 500 600 } ;
 
 : help-tool [ help-gadget? ] [ <help-gadget> ] [ show-help ] ;
 
-M: link show help-tool call-tool ;
+[ link? ] 1 "Browse" [ help-tool call-tool ] define-operation

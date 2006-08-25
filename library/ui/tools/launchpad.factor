@@ -1,19 +1,19 @@
 ! Copyright (C) 2006 Slava Pestov
 ! See http://factorcode.org/license.txt for BSD license.
 IN: gadgets
-USING: gadgets-presentations memory io gadgets-panes
+USING: memory io gadgets-panes
 gadgets-scrolling namespaces help kernel gadgets-listener
-gadgets-browser gadgets-search ;
+gadgets-browser gadgets-search gadgets-help inspector ;
 
 : handbook-window ( -- )
-    T{ link f "handbook" } show ;
+    T{ link f "handbook" } help-tool call-tool ;
 
 : memory-window ( -- )
     [ heap-stats. terpri room. ] make-pane <scroller>
     "Memory" open-titled-window ;
 
 : globals-window ( -- )
-    global show ;
+    [ global inspect ] listener-tool call-tool ;
 
 ! world {
 !     { f "Listener" f [ drop listener-window ] }

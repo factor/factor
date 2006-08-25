@@ -9,17 +9,22 @@ kernel prettyprint sequences strings styles words ;
 ! Clickable objects
 TUPLE: object-button object ;
 
-GENERIC: show ( object -- )
-
 C: object-button ( gadget object -- button )
     [ set-object-button-object ] keep
-    [
-        >r [ object-button-object show ] <roll-button>
-        r> set-gadget-delegate
-    ] keep ;
+    [ >r f <roll-button> r> set-gadget-delegate ] keep ;
 
 M: object-button gadget-help
     object-button-object dup word? [ synopsis ] [ summary ] if ;
+
+: invoke-object-button ( gadget button# -- )
+    >r object-button-object dup r> object-operation
+    [ invoke-command ] [ drop ] if* ;
+
+object-button H{
+    { T{ button-down f 1 } [ 1 invoke-object-button ] }
+    { T{ button-down f 2 } [ 2 invoke-object-button ] }
+    { T{ button-down f 3 } [ 3 invoke-object-button ] }
+} set-gestures
 
 ! Character styles
 
