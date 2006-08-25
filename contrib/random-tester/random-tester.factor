@@ -14,7 +14,7 @@ IN: random-tester
         1+ 1- >bignum >digit >fixnum abs absq arg 
         bitnot bits>double bits>float ceiling cis conjugate cos cosec cosech
         cosh cot coth denominator double>bits exp float>bits floor imaginary
-        log neg numerator quadrant real sec ! next-power-of-2
+        log neg numerator real sec ! next-power-of-2
         sech sgn sin sinh sq sqrt tan tanh truncate 
     } ;
 
@@ -39,7 +39,7 @@ IN: random-tester
         1+ 1- >bignum >digit >fixnum abs absq arg 
         bitnot bits>double bits>float ceiling cis conjugate cos cosec cosech
         cosh cot coth denominator double>bits exp float>bits floor imaginary
-        log neg next-power-of-2 numerator quadrant real sec
+        log neg next-power-of-2 numerator real sec
         sech sgn sin sinh sq sqrt tan tanh truncate 
     } ;
 
@@ -48,7 +48,7 @@ IN: random-tester
         1+ 1- >bignum >digit >fixnum abs absq arg ceiling
         cis conjugate cos cosec cosech
         cosh cot coth double>bits exp float>bits floor imaginary
-        log neg next-power-of-2 quadrant real sec
+        log neg next-power-of-2 real sec
         sech sgn sin sinh sq sqrt tan tanh truncate 
     } ;
 
@@ -57,14 +57,14 @@ IN: random-tester
         1+ 1- >bignum >digit >fixnum abs absq arg 
         ceiling cis conjugate cos cosec cosech
         cosh cot coth double>bits exp float>bits floor imaginary
-        log neg quadrant real sec ! next-power-of-2
+        log neg real sec ! next-power-of-2
         sech sgn sin sinh sq sqrt tan tanh truncate
     } ;
 
 : 1-complex>x
     {
         1+ 1- abs absq arg conjugate cos cosec cosech
-        cosh cot coth exp imaginary log neg quadrant real
+        cosh cot coth exp imaginary log neg real
         sec sech sin sinh sq sqrt tan tanh 
     } ;
 
@@ -86,7 +86,7 @@ IN: random-tester
         1+ 1- >bignum >digit >fixnum abs absq 
         bitnot ceiling conjugate 
         denominator double>bits float>bits floor imaginary
-        neg next-power-of-2 numerator quadrant
+        neg next-power-of-2 numerator
         real sgn sq truncate 
     } ;
 
@@ -104,7 +104,7 @@ IN: random-tester
         1+ 1- abs absq arg 
         conjugate cosec cosech
         cosh cot coth exp 
-        log neg quadrant 
+        log neg 
         sech sin sinh sq sqrt tanh 
     } ;
 

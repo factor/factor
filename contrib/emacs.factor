@@ -1,6 +1,7 @@
 REQUIRES: process ;
 
-USING: definitions kernel parser words sequences math process ;
+USING: definitions kernel parser words sequences math process
+namespaces ;
 
 IN: emacs
 

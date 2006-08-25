@@ -7,6 +7,7 @@ Modules can be loaded from the listener:
 
 Credits:
 
+- action-field -- Extended field gadget for UI (Eduardo Cavazos)
 - automata -- Graphics demo for the UI (Eduardo Cavazos)
 - boids -- Graphics demo for the UI (Eduardo Cavazos)
 - cairo -- cairo bindings (Sampo Vuori)
@@ -15,10 +16,15 @@ Credits:
 - coroutines -- coroutines (Chris Double)
 - crypto -- Various cryptographic algorithms (Doug Coleman)
 - dlists -- double-linked-lists (Mackenzie Straight)
+- emacs -- emacs integration (Eduardo Cavazos)
+- embedded -- simple template processor (Alex Chapman)
 - factory -- X11 window manager (Eduardo Cavazos)
 - gap-buffer -- Efficient text editor buffer (Alex Chapman)
 - hexdump -- Hexdump routine (Doug Coleman)
 - httpd -- Web framework (HTTP server, client, XML parser, HTML generation...) (Slava Pestov, Chris Double, Daniel Ehrenberg)
+- jedit -- jEdit editor integration (Slava Pestov)
+- json -- JSON reader and writer (Chris Double)
+- lambda -- Lambda calculus interpreter (Matthew Willis)
 - lazy-lists -- Lazy evaluation lists (Chris Double, Matthew Willis)
 - math -- extended math library (Doug Coleman, Slava Pestov)
 - parser-combinators -- Haskell-style parser combinators (Chris Double)
@@ -29,4 +35,8 @@ Credits:
 - space-invaders -- Intel 8080-based Space Invaders arcade machine emulator (Chris Double)
 - splay-trees -- Splay trees (Mackenzie Straight)
 - sqlite -- SQLite binding (Chris Double)
+- topology -- Computational algebraic topology (Slava Pestov)
+- units -- Unit conversion (Doug Coleman)
+- vars -- Alternative syntax for variables (Eduardo Cavazos)
+- vim -- VIM integration (Alex Chapman)
 - x11 -- X Window System client library (Eduardo Cavazos)

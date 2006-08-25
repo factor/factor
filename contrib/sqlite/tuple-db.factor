@@ -148,7 +148,7 @@ M: mapping delete-sql ( mapping -- string )
   ] "" make ;
 
 GENERIC: update-sql
-M: mapping update-sql ( mapping -- string)
+M: mapping update-sql ( mapping -- string )
   #! Return the SQL used to update the tuple
   [
     "update " % dup mapping-table %
