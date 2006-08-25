@@ -33,14 +33,9 @@ M: object gesture>string drop f ;
     dup command-class rot [ class over eq? ] find-parent nip
     swap command-quot call ;
 
-: add-command ( class command -- )
-    over "commands" word-prop
-    [ command-name over command-name = not ] subset
-    swap add "commands" set-word-prop ;
-
 : define-commands ( class specs -- )
     [ dupd first4 <command> ] map
-    2dup [ add-command ] each-with
+    2dup "commands" set-word-prop
     [ command-gesture ] subset
     [ dup command-gesture swap command-quot ] map>hash
     "gestures" set-word-prop ;
@@ -51,11 +46,6 @@ M: object gesture>string drop f ;
             delegates [ class "commands" word-prop % ] each
         ] each
     ] V{ } make ;
-
-: commands. ( gadget -- )
-    commands [
-        [ command-string ] keep write-object terpri
-    ] each ;
 
 world {
     { f "Cut" T{ key-down f { C+ } "x" } [ T{ cut-action } send-action ] }
