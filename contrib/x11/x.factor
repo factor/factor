@@ -415,7 +415,7 @@ dpy get "XEvent" <c-object> dup >r XNextEvent drop r> ;
 SYMBOL: error-handler-quot
 
 : error-handler-callback ( -- xt ) "void" { "Display*" "XErrorEvent*" }
-[ error-handler-quot get call ] alien-callback ; compiled
+[ error-handler-quot get call ] alien-callback ; 
 
 : set-error-handler ( quot -- )
 error-handler-quot set error-handler-callback XSetErrorHandler drop ;
