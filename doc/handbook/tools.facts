@@ -1,6 +1,6 @@
 USING: definitions errors help image inspector io kernel
 listener memory modules parser prettyprint sequences test
-words jedit ;
+words jedit shells ;
 
 ARTICLE: "tools" "Development tools"
 "This section covers words which are used during development, and not usually invoked directly by user code."
@@ -36,10 +36,9 @@ $terpri
 "Note that calls to " { $link .s } " can also be included inside words as a debugging aid, however a more convenient way to achieve this is to use the annotation facility. See " { $link "annotations" } "."
 $terpri
 "You can start a nested listener or exit a listener using the following words:"
-{ $subsection listener }
+{ $subsection tty }
 { $subsection bye }
 "The following variables can be rebound inside a nested scope to customize the behavior of a listener; this can be done to create a development tool with a custom interaction loop:"
-{ $subsection listener-prompt }
 { $subsection listener-hook }
 "Finally, the multi-line expression reading word can be used independently of the rest of the listener:"
 { $subsection read-multiline } ;

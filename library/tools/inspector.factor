@@ -19,27 +19,21 @@ SYMBOL: inspector-stack
     dup summary print
     sheet sheet-numbers sheet. ;
 
-: inspector-help ( -- )
-    terpri
-    "Object inspector." print
-    terpri
-    "inspecting ( -- obj ) push current object" print
-    "go ( n -- ) inspect nth slot" print
-    "up -- return to previous object" print
-    "bye -- exit inspector" print ;
-
-: inspector ( obj -- )
-    [
-        inspector-help
-        terpri
-        "inspector " listener-prompt set
-        V{ } clone inspector-stack set
-        (inspect)
-    ] listener ;
-
-: inspect ( obj -- )
-    inspector-stack get [ (inspect) ] [ inspector ] if ;
-
 : go ( n -- ) 1- inspector-slots get nth (inspect) ;
 
 : up ( -- ) inspector-stack get dup pop* pop (inspect) ;
+
+: inspector-help ( -- )
+    "Object inspector." print
+    terpri
+    "up -- return to previous object" [ up ] print-input
+    "inspecting ( -- obj ) push current object" [ inspecting ] print-input
+    "go ( n -- ) inspect nth slot" print ;
+
+: inspector ( obj -- )
+    inspector-help
+    V{ } clone inspector-stack set
+    (inspect) ;
+
+: inspect ( obj -- )
+    inspector-stack get [ (inspect) ] [ inspector ] if ;

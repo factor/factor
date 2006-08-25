@@ -4,13 +4,8 @@ IN: listener
 USING: errors hashtables io kernel math memory namespaces
 parser sequences strings styles vectors words ;
 
-SYMBOL: listener-prompt
 SYMBOL: quit-flag
-
 SYMBOL: listener-hook
-SYMBOL: eval-hook
-
-"ok " listener-prompt set-global
 
 : bye ( -- ) quit-flag on ;
 
@@ -31,21 +26,13 @@ SYMBOL: eval-hook
     ] with-parser in set ;
 
 : listen ( -- )
-    listener-prompt get write flush [
+    in get write "> " write flush [
         listener-hook get call
-        read-multiline [ eval-hook get call ] [ drop bye ] if
+        read-multiline [ call ] [ drop bye ] if
     ] try ;
 
-: (listener) ( -- )
-    quit-flag get [ quit-flag off ] [ listen (listener) ] if ;
-
-: listener ( quot -- )
-    [
-        use [ clone ] change
-        [ call ] eval-hook set
-        call
-        (listener)
-    ] with-scope ;
+: listener ( -- )
+    quit-flag get [ quit-flag off ] [ listen listener ] if ;
 
 : print-banner ( -- )
     "Factor " write version write
@@ -53,7 +40,12 @@ SYMBOL: eval-hook
 
 IN: shells
 
-: tty [ print-banner ] listener ;
+: tty ( -- )
+    [
+        use [ clone ] change
+        print-banner
+        listener
+    ] with-scope ;
 
 IN: listener
 

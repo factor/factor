@@ -5,8 +5,8 @@ new browser:
 - scroll to existing won't work
 - initial scroll dim is wrong
 - show callers
-listener:
-- show IN:
+
+- alternative way to invoke 2/3 buttons on one-button mice using modifiers
 - list of key bindings
 - RT_WORD should refer to XTs not word objects.
 - services do not launch if factor not running

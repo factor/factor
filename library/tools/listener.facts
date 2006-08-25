@@ -1,11 +1,8 @@
 IN: listener
-USING: help kernel ;
-
-HELP: listener-prompt
-{ $var-description "Variable holding a string printed before each line of input read by the listener." } ;
+USING: help kernel shells ;
 
 HELP: quit-flag
-{ $var-description "Variable set to true by " { $link bye } " word; it forces the next iteration of the " { $link (listener) } " loop to end." } ;
+{ $var-description "Variable set to true by " { $link bye } " word; it forces the next iteration of the " { $link listener } " loop to end." } ;
 
 HELP: listener-hook
 { $var-description "Variable holding a quotation called by the listener before reading each line of input. The UI sets this variable to a quotation which updates the stack display in a listener gadget." } ;
@@ -22,11 +19,11 @@ HELP: listen
 { $description "Prompts for an expression on the default stream and evaluates it. On end of file, " { $link quit-flag } " is set to terminate the listener loop." }
 { $errors "If the expression input by the user throws an error, the error is printed to the default stream and the word returns normally." } ;
 
-HELP: (listener)
-{ $description "Prompts for expressions on the default stream and evaluates them until end of file is reached. This is an internal word; call " { $link listener } " instead." } ;
-
-HELP: listener
-{ $description "Starts a listener prompting for expressions on the default stream." } ;
-
 HELP: print-banner
 { $description "Print Factor version, operating system, and CPU architecture." } ;
+
+HELP: listener
+{ $description "Prompts for expressions on the default stream and evaluates them until end of file is reached. This is an internal word; call " { $link tty } " instead." } ;
+
+HELP: tty
+{ $description "Starts a listener prompting for expressions on the default stream." } ;
