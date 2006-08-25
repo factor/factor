@@ -12,6 +12,8 @@ sequences ;
     dup where first2 >r ?resource-path [ file-modified ] keep r>
     dupd vim-line/file file-modified = [ drop ] [ reload ] if ;
 
+[ vim ] edit-hook set-global
+
 : vim-syntax
     #! Generate a new factor.vim file for syntax highlighting
     "contrib/vim/factor.vim.fgen" "factor.vim" embedded-convert ;

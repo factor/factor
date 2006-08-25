@@ -1,8 +1,8 @@
 ! Copyright (C) 2006 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 IN: gadgets
-USING: arrays kernel gadgets sequences strings math words
-generic namespaces hashtables jedit help ;
+USING: arrays definitions kernel gadgets sequences strings math
+words generic namespaces hashtables help ;
 
 TUPLE: command class group name gesture quot ;
 
@@ -68,5 +68,5 @@ global [
     [ second = ] subset-with
     dup empty? [ drop f ] [ peek third ] if ;
 
-[ word? ] 2 "jEdit" [ jedit ] define-operation
-[ link? ] 2 "jEdit" [ jedit ] define-operation
+[ word? ] 2 "Edit" [ edit ] define-operation
+[ link? ] 2 "Edit" [ edit ] define-operation

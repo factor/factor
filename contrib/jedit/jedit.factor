@@ -35,3 +35,5 @@ namespaces parser prettyprint sequences strings words shells ;
 
 : jedit ( defspec -- )
     where first2 >r ?resource-path r> jedit-line/file ;
+
+[ jedit ] edit-hook set-global

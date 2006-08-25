@@ -14,3 +14,10 @@ GENERIC: subdefs ( defspec -- seq )
 GENERIC: forget ( defspec -- )
 
 GENERIC: synopsis ( defspec -- str )
+
+TUPLE: no-edit-hook ;
+
+SYMBOL: edit-hook
+
+: edit ( defspec -- )
+    edit-hook get [ call ] [ <no-edit-hook> throw ] if* ;

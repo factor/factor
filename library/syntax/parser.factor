@@ -108,7 +108,7 @@ global [
     {
         "scratchpad" "syntax" "arrays" "compiler" "definitions"
         "errors" "generic" "hashtables" "help" "inference"
-        "inspector" "io" "jedit" "kernel" "listener" "math"
+        "inspector" "io" "kernel" "listener" "math"
         "memory" "modules" "namespaces" "parser" "prettyprint"
         "sequences" "shells" "strings" "styles" "test"
         "threads" "vectors" "words"

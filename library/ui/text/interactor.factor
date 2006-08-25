@@ -1,9 +1,9 @@
 ! Copyright (C) 2006 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 IN: gadgets-text
-USING: gadgets gadgets-controls gadgets-panes generic hashtables
-help io kernel namespaces prettyprint styles threads sequences
-vectors jedit definitions parser words ;
+USING: definitions gadgets gadgets-controls gadgets-panes
+generic hashtables help io kernel namespaces prettyprint styles
+threads sequences vectors definitions parser words ;
 
 TUPLE: interactor history output continuation queue busy? ;
 
@@ -84,7 +84,7 @@ interactor {
     { f "Infer input" T{ key-down f { C+ } "i" } [ "infer ." quot-action ] }
     { f "Single step input" T{ key-down f { C+ } "w" } [ "walk" quot-action ] }
     { f "See at caret" T{ key-down f { A+ } "s" } [ [ search see ] word-action ] }
-    { f "jEdit at caret" T{ key-down f { A+ } "j" } [ [ search jedit ] word-action ] }
+    { f "Edit at caret" T{ key-down f { A+ } "e" } [ [ search edit ] word-action ] }
     { f "Reload at caret" T{ key-down f { A+ } "r" } [ [ search reload ] word-action ] }
     { f "Apropos at caret (all)" T{ key-down f { A+ } "a" } [ [ apropos ] word-action ] }
     { f "Use word at caret" T{ key-down f { A+ } "u" } [ [ use-word ] word-action ] }

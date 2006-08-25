@@ -124,8 +124,6 @@ sequences vectors words ;
 
         "/library/tools/interpreter.factor"
         
-        "/library/tools/jedit.factor"
-
         "/library/compiler/inference/shuffle.factor"
         "/library/compiler/inference/dataflow.factor"
         "/library/compiler/inference/inference.factor"
@@ -312,7 +310,6 @@ sequences vectors words ;
         "/library/tools/summary.facts"
         "/library/tools/describe.facts"
         "/library/tools/inspector.facts"
-        "/library/tools/jedit.facts"
         "/library/tools/listener.facts"
         "/library/tools/memory.facts"
 
