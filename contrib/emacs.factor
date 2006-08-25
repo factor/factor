@@ -1,7 +1,6 @@
-
 REQUIRES: process ;
 
-USING: kernel parser words sequences math process ;
+USING: definitions kernel parser words sequences math process ;
 
 IN: emacs
 
@@ -9,6 +8,8 @@ IN: emacs
 number>string "emacsclient --no-wait +" swap append " " rot append3 system ;
 
 : emacs ( word -- )
-dup word-file swap "line" word-prop emacsclient ;
+where first2 emacsclient ;
+
+[ emacsclient ] edit-hook set
 
 PROVIDE: emacs ;
