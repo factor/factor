@@ -23,7 +23,8 @@ help-gadget {
     gadget get help-gadget-history [ help ] <pane-control> ;
 
 C: help-gadget ( -- gadget )
-    f <history> over set-help-gadget-history {
+    T{ link f "handbook" } <history>
+    over set-help-gadget-history {
         { [ gadget get <toolbar> ] f f @top }
         { [ <help-pane> <scroller> ] f f @center }
     } make-frame* ;

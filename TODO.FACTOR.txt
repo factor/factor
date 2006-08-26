@@ -1,6 +1,5 @@
 + 0.84:
 
-- default font should not be monospaced
 - new browser:
   - show currently selected vocab & words
   - scroll to existing won't work

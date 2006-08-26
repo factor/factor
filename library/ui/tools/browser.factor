@@ -1,6 +1,6 @@
 ! Copyright (C) 2006 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-IN: new-browser
+IN: gadgets-browser
 USING: arrays sequences kernel gadgets-panes definitions
 prettyprint gadgets-tiles gadgets-theme gadgets-borders gadgets
 generic gadgets-scrolling math io words models styles
@@ -88,6 +88,5 @@ M: browser gadget-title drop "Browser" <model> ;
 
 : browser-tool [ browser? ] [ <browser> ] [ browse ] ;
 
-M: word show browser-tool call-tool ;
-
-M: vocab-link show browser-tool call-tool ;
+\ word 1 "Browse" [ browser-tool call-tool ] define-operation
+vocab-link 1 "Browse" [ browser-tool call-tool ] define-operation

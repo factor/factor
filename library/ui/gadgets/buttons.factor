@@ -93,4 +93,5 @@ M: button-paint draw-boundary
     swap [ swap >r = r> set-button-selected? ] curry <control> ;
 
 : <radio-box> ( model assoc -- gadget )
-    [ first2 <radio-control> ] map-with make-shelf ;
+    [ first2 <radio-control> ] map-with
+    make-shelf dup highlight-theme ;
