@@ -20,8 +20,8 @@ C: presentation ( button object commands -- button )
     dup object-operations <presentation> ;
 
 : <command-presentation> ( target command -- button )
-    dup command-name f <bevel-button> -rot
-    dup object-operations 1 tail swap add* <presentation> ;
+    dup command-name f <bevel-button> { f f } add*
+    <presentation> ;
 
 : invoke-presentation ( gadget button# -- )
     1- over presentation-commands nth [

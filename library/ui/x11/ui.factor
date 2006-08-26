@@ -55,6 +55,7 @@ M: world motion-event
         { HEX: FF08 "BACKSPACE" }
         { HEX: FF09 "TAB"       }
         { HEX: FF0D "RETURN"    }
+        { HEX: FF8D "ENTER"     }
         { HEX: FF1B "ESCAPE"    }
         { HEX: FFFF "DELETE"    }
         { HEX: FF50 "HOME"      }
@@ -66,6 +67,15 @@ M: world motion-event
         { HEX: FF56 "PAGE_DOWN" }
         { HEX: FF57 "END"       }
         { HEX: FF58 "BEGIN"     }
+        { HEX: FFBE "F1"        }
+        { HEX: FFBF "F2"        }
+        { HEX: FFC0 "F3"        }
+        { HEX: FFC1 "F4"        }
+        { HEX: FFC2 "F5"        }
+        { HEX: FFC3 "F6"        }
+        { HEX: FFC4 "F7"        }
+        { HEX: FFC5 "F8"        }
+        { HEX: FFC6 "F9"        }
     } ;
 
 : ignored-key? ( keycode -- ? )

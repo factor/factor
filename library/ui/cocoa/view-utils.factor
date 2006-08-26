@@ -42,16 +42,28 @@ opengl sequences ;
 
 : key-codes
     H{
+        { 71 "CLEAR" }
         { 36 "RETURN" }
+        { 76 "ENTER" }
+        { 53 "ESCAPE" }
         { 48 "TAB" }
         { 51 "BACKSPACE" }
         { 115 "HOME" }
         { 117 "DELETE" }
         { 119 "END" }
+        { 122 "F1" }
+        { 120 "F2" }
+        { 99 "F3" }
+        { 118 "F4" }
+        { 96 "F5" }
+        { 97 "F6" }
+        { 98 "F8" }
         { 123 "LEFT" }
         { 124 "RIGHT" }
         { 125 "DOWN" }
         { 126 "UP" }
+        { 116 "PAGE_UP" }
+        { 121 "PAGE_DOWN" }
     } ;
 
 : key-code ( event -- string )

@@ -166,7 +166,7 @@ C: titled-gadget ( gadget title -- )
     [ commands. ] "Commands" pane-window ;
 
 gadget {
-    { f "Keyboard help" T{ key-down f { C+ } "1" } [ commands-window ] }
+    { f "Keyboard help" T{ key-down f f "F1" } [ commands-window ] }
 } define-commands
 
 : error-window ( error -- )

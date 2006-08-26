@@ -73,9 +73,6 @@ SYMBOL: structured-input
 : usable-words ( -- seq )
     use get [ hash-values natural-sort ] map concat prune ;
 
-: use-word ( str -- )
-    words-named [ word-vocabulary dup print use+ ] each ;
-
 interactor {
     { f "Evaluate" T{ key-down f f "RETURN" } [ interactor-commit ] }
     { f "History" T{ key-down f { C+ } "h" } [ dup [ interactor-history. ] curry swap interactor-call ] }
@@ -84,11 +81,10 @@ interactor {
     { f "Single step" T{ key-down f { C+ } "w" } [ "walk" quot-action ] }
     { f "See" T{ key-down f { A+ } "s" } [ [ search see ] word-action ] }
     { f "Help" T{ key-down f { A+ } "h" } [ [ search help ] word-action ] }
-    { f "Callers" T{ key-down f { A+ } "l" } [ [ search usage. ] word-action ] }
+    { f "Callers" T{ key-down f { A+ } "u" } [ [ search usage. ] word-action ] }
     { f "Edit" T{ key-down f { A+ } "e" } [ [ search edit ] word-action ] }
     { f "Reload" T{ key-down f { A+ } "r" } [ [ search reload ] word-action ] }
     { f "Apropos (all)" T{ key-down f { A+ } "a" } [ [ apropos ] word-action ] }
-    { f "Use word" T{ key-down f { A+ } "u" } [ [ use-word ] word-action ] }
     { f "Apropos (used)" T{ key-down f f "TAB" } [ [ usable-words (apropos) ] word-action ] }
 } define-commands
 

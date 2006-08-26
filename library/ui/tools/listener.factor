@@ -85,7 +85,7 @@ M: listener-gadget gadget-title drop "Listener" <model> ;
     [ global inspect ] listener-tool call-tool ;
 
 listener-gadget {
-    { f "Clear" T{ key-down f { A+ } "c" } [ dup [ listener-gadget-output pane-clear ] curry listener-tool call-tool ] }
+    { f "Clear" T{ key-down f f "CLEAR" } [ dup [ listener-gadget-output pane-clear ] curry listener-tool call-tool ] }
 } define-commands
 
 object 1 "Inspect" [ [ inspect ] curry listener-tool call-tool ] define-operation
