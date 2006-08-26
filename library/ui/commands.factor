@@ -35,9 +35,13 @@ M: object gesture>string drop f ;
 : commands ( gadget -- seq )
     delegates [ class "commands" word-prop ] map concat ;
 
-: all-commands ( gadget -- seq )
-    parents [ commands ] map concat prune
-    [ [ command-name ] 2apply <=> ] sort ;
+: all-commands ( gadget -- assoc )
+    [
+        parents [
+            dup commands [ set ] each-with
+        ] each
+    ] make-hash
+    hash>alist [ [ first command-name ] 2apply <=> ] sort ;
 
 world {
     { f "Cut" T{ key-down f { C+ } "x" } [ T{ cut-action } send-action ] }

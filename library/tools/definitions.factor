@@ -20,7 +20,12 @@ SYMBOL: edit-hook
 : edit-location ( file line -- )
     edit-hook get [ call ] [ <no-edit-hook> throw ] if* ;
 
-: edit ( defspec -- ) where first2 edit-location ;
+: edit ( defspec -- )
+    where [
+        first2 edit-location
+    ] [
+        "Not from a source file" throw
+    ] if ;
 
 GENERIC: synopsis ( defspec -- )
 

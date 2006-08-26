@@ -3,9 +3,9 @@
 IN: gadgets-presentations
 USING: arrays definitions gadgets gadgets-borders
 gadgets-buttons gadgets-grids gadgets-labels gadgets-outliner
-gadgets-panes gadgets-paragraphs generic hashtables inspector io
-kernel prettyprint sequences strings styles words help math
-models ;
+gadgets-panes gadgets-paragraphs gadgets-theme generic
+hashtables inspector io kernel prettyprint sequences strings
+styles words help math models namespaces ;
 
 ! Clickable objects
 TUPLE: presentation object commands ;
@@ -49,25 +49,21 @@ presentation H{
     [ [ presentation-object summary ] [ "" ] if* ]
     <filter> <label-control> ;
 
-: <presentation-mouse-help> ( model -- help )
+: presentation-mouse-help ( presentation -- string )
     [
-        [
-            presentation-commands
-            dup length [ 2array ] 2map
-            [ first ] subset
-            [
-                first2 swap command-name
-                >r number>string " " r>
-                append3
-            ] map " " join
-        ] [
-            ""
-        ] if*
-    ] <filter> <label-control> ;
+        presentation-commands
+        dup length [ 2array ] 2map [ first ] subset
+        [ first2 "Button " % 1+ # ": " % command-name % ]
+        [ "  " % ] interleave
+    ] "" make ;
+
+: <presentation-mouse-help> ( model -- help )
+    [ [ presentation-mouse-help ] [ "" ] if* ]
+    <filter> <label-control> dup reverse-video-theme ;
 
 : <presentation-help> ( model -- gadget )
-    dup <presentation-summary> swap <presentation-mouse-help>
-    2array make-pile ;
+    dup <presentation-mouse-help> swap <presentation-summary>
+    2array make-pile 1 over set-pack-fill ;
 
 ! Character styles
 

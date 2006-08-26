@@ -1,6 +1,7 @@
 + 0.84:
 
-- click button in commands list doesn't unhighlight it
+- default font should not be monospaced
+- better looking status bar
 - new browser:
   - show currently selected vocab & words
   - scroll to existing won't work

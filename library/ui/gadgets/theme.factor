@@ -86,7 +86,8 @@ USING: arrays gadgets kernel sequences styles ;
         { 0.5 0.5 0.5 1.0 }
     } } swap set-gadget-interior ;
 
-: reverse-video-theme ( gadget -- )
+: reverse-video-theme ( label -- )
+    { 1.0 1.0 1.0 1.0 } over set-label-color
     solid-black swap set-gadget-interior ;
 
 : label-theme ( gadget -- )

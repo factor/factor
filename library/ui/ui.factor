@@ -144,7 +144,7 @@ C: titled-gadget ( gadget title -- )
 
 : $gadget ( element -- ) first gadget. ;
 
-: command-description ( command -- element )
+: command-description ( target command -- element )
     [ <command-presentation> \ $gadget swap 2array ] keep
     command-gesture gesture>string 2array ;
 
@@ -155,8 +155,8 @@ C: titled-gadget ( gadget title -- )
 : commands. ( gadget -- )
     dup gadget-info
     dup all-commands
-    [ command-gesture key-down? ] subset
-    [ command-description ] map-with
+    [ first command-gesture key-down? ] subset
+    [ first2 swap command-description ] map
     { "Command" "Gesture" } add* $table ;
 
 : pane-window ( quot title -- )
