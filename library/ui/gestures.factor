@@ -143,9 +143,6 @@ V{ } clone hand-buttons set-global
 : hand-click-rel ( gadget -- loc )
     hand-click-loc get-global relative-loc ;
 
-: relevant-help ( seq -- help )
-    [ gadget-help ] map [ ] find nip ;
-
 : under-hand ( -- seq )
     #! A sequence whose first element is the world and last is
     #! the current gadget, with all parents in between.

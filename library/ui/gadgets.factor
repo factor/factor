@@ -99,11 +99,6 @@ M: gadget children-on nip gadget-children ;
 : set-gadget-delegate ( delegate gadget -- )
     dup pick [ set-gadget-parent ] each-child-with set-delegate ;
 
-! Pointer help protocol
-GENERIC: gadget-help
-
-M: gadget gadget-help drop f ;
-
 : with-gadget ( gadget quot -- )
     [ swap gadget set call ] with-scope ; inline
 

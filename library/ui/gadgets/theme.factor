@@ -92,6 +92,10 @@ USING: arrays gadgets kernel sequences styles ;
 
 : label-theme ( gadget -- )
     { 0.0 0.0 0.0 1.0 } over set-label-color
+    { "sans-serif" plain 12 } swap set-label-font ;
+
+: text-theme ( gadget -- )
+    { 0.0 0.0 0.0 1.0 } over set-label-color
     { "monospace" plain 12 } swap set-label-font ;
 
 : editor-theme ( editor -- )

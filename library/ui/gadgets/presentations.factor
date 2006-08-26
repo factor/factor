@@ -163,7 +163,11 @@ M: pack stream-close drop ;
 M: paragraph stream-close drop ;
 
 : gadget-write ( string gadget -- )
-    over empty? [ 2drop ] [ >r <label> r> add-gadget ] if ;
+    over empty? [
+        2drop
+    ] [
+        >r <label> dup text-theme r> add-gadget
+    ] if ;
 
 M: pack stream-write gadget-write ;
 
