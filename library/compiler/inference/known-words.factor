@@ -224,42 +224,6 @@ t over set-effect-terminated?
 \ float>= { float float } { object } <effect> "infer-effect" set-word-prop
 \ float>= t "foldable" set-word-prop
 
-\ facos { real } { float } <effect> "infer-effect" set-word-prop
-\ facos t "foldable" set-word-prop
-
-\ fasin { real } { float } <effect> "infer-effect" set-word-prop
-\ fasin t "foldable" set-word-prop
-
-\ fatan { real } { float } <effect> "infer-effect" set-word-prop
-\ fatan t "foldable" set-word-prop
-
-\ fatan2 { real real } { float } <effect> "infer-effect" set-word-prop
-\ fatan2 t "foldable" set-word-prop
-
-\ fcos { real } { float } <effect> "infer-effect" set-word-prop
-\ fcos t "foldable" set-word-prop
-
-\ fexp { real } { float } <effect> "infer-effect" set-word-prop
-\ fexp t "foldable" set-word-prop
-
-\ fcosh { real } { float } <effect> "infer-effect" set-word-prop
-\ fcosh t "foldable" set-word-prop
-
-\ flog { real } { float } <effect> "infer-effect" set-word-prop
-\ flog t "foldable" set-word-prop
-
-\ fpow { real real } { float } <effect> "infer-effect" set-word-prop
-\ fpow t "foldable" set-word-prop
-
-\ fsin { real } { float } <effect> "infer-effect" set-word-prop
-\ fsin t "foldable" set-word-prop
-
-\ fsinh { real } { float } <effect> "infer-effect" set-word-prop
-\ fsinh t "foldable" set-word-prop
-
-\ fsqrt { real } { float } <effect> "infer-effect" set-word-prop
-\ fsqrt t "foldable" set-word-prop
-
 \ (word) { object object } { word } <effect> "infer-effect" set-word-prop
 
 \ update-xt { word } { } <effect> "infer-effect" set-word-prop

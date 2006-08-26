@@ -33,6 +33,7 @@ sequences vectors words ;
         "/library/math/math.factor"
         "/library/math/integer.factor"
         "/library/math/ratio.factor"
+        "/library/math/libm.factor"
         "/library/math/float.factor"
         "/library/math/complex.factor"
 

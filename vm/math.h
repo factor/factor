@@ -157,19 +157,6 @@ void primitive_float_lesseq(void);
 void primitive_float_greater(void);
 void primitive_float_greatereq(void);
 
-void primitive_facos(void);
-void primitive_fasin(void);
-void primitive_fatan(void);
-void primitive_fatan2(void);
-void primitive_fcos(void);
-void primitive_fexp(void);
-void primitive_fcosh(void);
-void primitive_flog(void);
-void primitive_fpow(void);
-void primitive_fsin(void);
-void primitive_fsinh(void);
-void primitive_fsqrt(void);
-
 void primitive_float_bits(void);
 void primitive_bits_float(void);
 void primitive_double_bits(void);

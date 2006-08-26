@@ -96,18 +96,6 @@ call
     { "float<=" "math-internals"            }
     { "float>" "math-internals"             }
     { "float>=" "math-internals"            }
-    { "facos" "math-internals"              }
-    { "fasin" "math-internals"              }
-    { "fatan" "math-internals"              }
-    { "fatan2" "math-internals"             }
-    { "fcos" "math-internals"               }
-    { "fexp" "math-internals"               }
-    { "fcosh" "math-internals"              }
-    { "flog" "math-internals"               }
-    { "fpow" "math-internals"               }
-    { "fsin" "math-internals"               }
-    { "fsinh" "math-internals"              }
-    { "fsqrt" "math-internals"              }
     { "(word)" "kernel-internals"           }
     { "update-xt" "words"                   }
     { "compiled?" "words"                   }
