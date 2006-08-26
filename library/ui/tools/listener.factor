@@ -6,7 +6,7 @@ gadgets-panes gadgets-scrolling
 gadgets-text gadgets-theme gadgets-tiles gadgets-tracks generic
 hashtables inspector io kernel listener math models
 namespaces parser prettyprint sequences shells styles threads
-words ;
+words memory ;
 
 TUPLE: listener-gadget input output stack ;
 
@@ -48,15 +48,10 @@ C: listener-gadget ( -- gadget )
         { [ <listener-input> ] set-listener-gadget-input [ <scroller> ] 1/6 }
     } { 0 1 } make-track* dup start-listener ;
 
-M: listener-gadget pref-dim*
-    delegate pref-dim* { 500 600 } vmax ;
-
 M: listener-gadget focusable-child*
     listener-gadget-input ;
 
 M: listener-gadget gadget-title drop "Listener" <model> ;
-
-: listener-window ( -- ) <listener-gadget> open-window ;
 
 : call-listener ( quot/string listener -- )
     listener-gadget-input over quotation?
@@ -81,11 +76,10 @@ M: listener-gadget gadget-title drop "Listener" <model> ;
         [ [ run-file ] each ] curry listener-tool call-tool
     ] if ;
 
-: globals-window ( -- )
-    [ global inspect ] listener-tool call-tool ;
-
 listener-gadget {
     { f "Clear" T{ key-down f f "CLEAR" } [ dup [ listener-gadget-output pane-clear ] curry listener-tool call-tool ] }
+    { f "Globals" f [ [ global inspect ] listener-tool call-tool ] }
+    { f "Memory" f [ [ heap-stats. room. ] listener-tool call-tool ] }
 } define-commands
 
 object 1 "Inspect" [ [ inspect ] curry listener-tool call-tool ] define-operation

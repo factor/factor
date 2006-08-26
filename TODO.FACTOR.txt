@@ -4,12 +4,10 @@
   space
 - workspace:
   - tool help
-  - maybe open-window should take a world
-  - book: request focus on selected gadget
-  - each workspace page has a toolbar
   - selecting walker when no quotation is being walked throws an error
   - replacement for call-tool functionality
   - status bar showing number of words needing a recompile
+  - default size is wrong
 - new browser:
   - show currently selected vocab & words
   - scroll to existing won't work

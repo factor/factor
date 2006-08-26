@@ -25,7 +25,6 @@ help-gadget {
 C: help-gadget ( -- gadget )
     T{ link f "handbook" } <history>
     over set-help-gadget-history {
-        { [ gadget get <toolbar> ] f f @top }
         { [ <help-pane> <scroller> ] f f @center }
     } make-frame* ;
 
@@ -33,11 +32,6 @@ M: help-gadget gadget-title
     help-gadget-history
     [ "Help - " swap article-title append ] <filter> ;
 
-M: help-gadget pref-dim* drop { 500 600 } ;
-
 : help-tool [ help-gadget? ] [ <help-gadget> ] [ show-help ] ;
-
-: handbook-window ( -- )
-    T{ link f "handbook" } help-tool call-tool ;
 
 link 1 "Browse" [ help-tool call-tool ] define-operation

@@ -4,8 +4,8 @@ IN: objc-classes
 DEFER: FactorApplicationDelegate
 
 IN: cocoa
-USING: arrays gadgets gadgets-listener hashtables kernel memory
-namespaces objc sequences errors freetype ;
+USING: arrays gadgets gadgets-listener gadgets-workspace
+hashtables kernel memory namespaces objc sequences errors freetype ;
 
 : finder-run-files ( alien -- )
     #! We filter out the image name since that might be there on
@@ -76,7 +76,7 @@ IN: shells
                 restore-windows
             ] [
                 init-ui
-                listener-window
+                workspace-window
             ] if
             finish-launching
             event-loop

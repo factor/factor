@@ -23,9 +23,11 @@ C: grid ( children -- grid )
 : grid-remove ( grid i j -- )
     >r >r >r f r> r> r> grid-add ;
 
+: ?pref-dim ( gadget/f -- dim )
+    [ pref-dim ] [ { 0 0 } ] if* ;
+
 : pref-dim-grid ( -- dims )
-    grid get grid-children
-    [ [ [ pref-dim ] [ { 0 0 } ] if* ] map ] map ;
+    grid get grid-children [ [ ?pref-dim ] map ] map ;
 
 : compute-grid ( -- horiz vert )
     pref-dim-grid

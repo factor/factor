@@ -1,8 +1,8 @@
 ! Copyright (C) 2005, 2006 Kevin Reid.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: cocoa compiler gadgets gadgets-browser gadgets-help
-gadgets-listener gadgets-search kernel memory objc objc-classes
-sequences strings words io ;
+USING: cocoa compiler gadgets gadgets-workspace gadgets-help
+gadgets-listener kernel memory objc objc-classes sequences
+strings words io help ;
 IN: cocoa
 
 ! -------------------------------------------------------------------------
@@ -91,9 +91,6 @@ DEFER: described-menu
 : menu-run-file ( -- )
     open-panel [ listener-run-files ] when* ;
 
-: memory-window ( -- )
-    [ heap-stats. terpri room. ] "Memory" pane-window ;
-
 : default-main-menu 
     {
         "<top>"
@@ -113,14 +110,8 @@ DEFER: described-menu
         } [ NSApp over -> setAppleMenu: ] }
         { {
             "File"
-            { "New Listener" listener-window "n" }
-            { "New Browser" browser-window "b" }
-            { "Apropos" apropos-window "r" }
-            { }
+            { "New Workspace" workspace-window "n" }
             { "Run..." menu-run-file "o" }
-            { }
-            { "Globals" globals-window "" }
-            { "Memory" memory-window "" }
             { }
             { "Save Image" save "s" }
         } }
@@ -147,7 +138,6 @@ DEFER: described-menu
         } [ NSApp over -> setWindowsMenu: ] }
         { {
             "Help"
-            { "Factor Documentation" handbook-window "?" }
-            { "Search" search-help-window "" }
+            { "Factor Documentation" [ "handbook" <link> help-tool call-tool ] "?" }
         } }
     } described-menu set-main-menu ;

@@ -3,8 +3,20 @@
 IN: gadgets-workspace
 USING: arrays gadgets gadgets-listener gadgets-buttons
 gadgets-walker gadgets-help gadgets-walker sequences
-gadgets-browser gadgets-books gadgets-frames kernel models
-namespaces ;
+gadgets-browser gadgets-books gadgets-frames gadgets-controls
+gadgets-grids gadgets-presentations kernel models namespaces ;
+
+TUPLE: tool ;
+
+C: tool ( gadget -- tool )
+    {
+        { [ dup <toolbar> ] f f @top }
+        { [ ] f f @center }
+    } make-frame* ;
+
+M: tool gadget-title gadget-child gadget-title ;
+
+M: tool focusable-child* gadget-child ;
 
 TUPLE: workspace model ;
 
@@ -16,17 +28,22 @@ TUPLE: workspace model ;
         { "Documentation" help-gadget [ <help-gadget> ] }
     } ;
 
-: <workspace-book> ( workspace -- book )
-    workspace-model
-    workspace-tabs [ third ] map <book-control> ;
+: <workspace> ( -- book )
+    workspace-tabs [ third [ <tool> ] append ] map <book> ;
 
-: <workspace-tabs> ( workspace -- tabs )
-    workspace-model
+: <workspace-tabs> ( book -- tabs )
+    control-model
     workspace-tabs dup length [ swap first 2array ] 2map
     <radio-box> ;
 
-C: workspace
-    0 <model> over set-workspace-model {
-        { [ gadget get <workspace-tabs> ] f f @top }
-        { [ gadget get <workspace-book> ] f f @center }
-    } make-frame* ;
+: init-status ( world -- )
+    dup world-status <presentation-help> swap @bottom grid-add ;
+
+: init-tabs ( workspace world -- )
+    swap <workspace-tabs> swap @top grid-add ;
+
+: workspace-window ( -- )
+    <workspace> dup <world>
+    [ init-status ] keep
+    [ init-tabs ] keep
+    open-window ;

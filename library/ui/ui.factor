@@ -69,24 +69,19 @@ C: titled-gadget ( gadget title -- )
     [ set-titled-gadget-title ] keep
     { { f f f @center } } make-frame* ;
 
-: init-status ( world -- )
-    dup world-status <presentation-help> swap @bottom grid-add ;
-
-: open-window ( gadget -- )
-    <world> dup init-status
+: open-window ( world -- )
     dup pref-dim over set-gadget-dim
-    dup open-window*
-    draw-world ;
+    dup open-window* draw-world ;
 
 : open-titled-window ( gadget title -- )
-    <model> <titled-gadget> open-window ;
+    <model> <titled-gadget> <world> open-window ;
 
 : find-window ( quot -- world )
     windows get [ second ] map
     [ world-gadget swap call ] find-last-with nip ; inline
 
 : open-tool ( arg cons setter -- )
-    >r call dup open-window r> call ; inline
+    >r call dup <world> open-window r> call ; inline
 
 : call-tool ( arg pred cons setter -- )
     rot find-window [

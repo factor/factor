@@ -73,8 +73,6 @@ C: browser ( -- gadget )
 
 M: browser gadget-title drop "Browser" <model> ;
 
-: browser-window ( -- ) <browser> open-window ;
-
 : show-word ( word browser -- )
     over word-vocabulary over show-vocab
     browser-definitions show-definition ;

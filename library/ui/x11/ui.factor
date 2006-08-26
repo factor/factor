@@ -184,7 +184,7 @@ IN: shells
                 restore-windows
             ] [
                 init-ui
-                listener-window
+                workspace-window
             ] if
             event-loop
         ] with-x

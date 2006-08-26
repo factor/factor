@@ -128,7 +128,8 @@ V{ } clone hand-buttons set-global
     focus-receiver r> focus-gestures ;
 
 : request-focus ( gadget -- )
-    dup focusable-child swap find-world request-focus* ;
+    dup focusable-child swap find-world
+    [ request-focus* ] [ drop ] if* ;
 
 : modifier ( mod modifiers -- seq )
     [ second swap bitand 0 > ] subset-with

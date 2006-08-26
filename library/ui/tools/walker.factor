@@ -33,16 +33,6 @@ namespaces sequences shells threads vectors ;
 : <quotation-display> ( quot -- gadget )
     [ [ first2 callframe. ] when* ] <pane-control> <scroller> ;
 
-: <walker-track> ( model quot -- gadget )
-    {
-        { [ <quotation-display> ] f f 1/6 }
-        { [ dup <callstack-display> ] f f 1/6 }
-        { [ dup <datastack-display> ] f f 1/6 }
-        { [ dup <retainstack-display> ] f f 1/6 }
-        { [ dup <namestack-display> ] f f 1/6 }
-        { [ <catchstack-display> ] f f 1/6 }
-    } { 0 1 } make-track ;
-
 TUPLE: walker-gadget model quot ns ;
 
 : update-stacks ( walker -- )
@@ -67,19 +57,12 @@ walker-gadget {
     { f "Continue" T{ key-down f f "c" } [ walker-step-all ] }
 } define-commands
 
-: init-walker-models ( walker -- )
-    f <model> over set-walker-gadget-model
-    f <model> swap set-walker-gadget-quot ;
-
-: walker-models ( -- model quot )
-    gadget get walker-gadget-model
-    gadget get walker-gadget-quot ;
+: init-walker-models ( walker -- model quot )
+    f <model> over set-walker-gadget-quot
+    f <model> swap set-walker-gadget-model ;
 
 M: walker-gadget gadget-title
     drop "Single stepper" <model> ;
-
-M: walker-gadget pref-dim*
-    delegate pref-dim { 500 600 } vmax ;
 
 : (walk) ( quot continuation walker -- )
     H{ } clone over set-walker-gadget-ns [
@@ -88,12 +71,19 @@ M: walker-gadget pref-dim*
         (meta-call)
     ] with-walker ;
 
+: walker-gadget-quot$ gadget get walker-gadget-quot ;
+: walker-gadget-model$ gadget get walker-gadget-model ;
+
 C: walker-gadget ( -- gadget )
     dup init-walker-models {
-        { [ gadget get <toolbar> ] f f @top }
-        { [ walker-models <walker-track> ] f f @center }
-    } make-frame* ;
+        { [ walker-gadget-quot$ <quotation-display> ] f f 1/6 }
+        { [ walker-gadget-model$ <callstack-display> ] f f 1/6 }
+        { [ walker-gadget-model$ <datastack-display> ] f f 1/6 }
+        { [ walker-gadget-model$ <retainstack-display> ] f f 1/6 }
+        { [ walker-gadget-model$ <namestack-display> ] f f 1/6 }
+        { [ walker-gadget-model$ <catchstack-display> ] f f 1/6 }
+    } { 0 1 } make-track* ;
 
 : walk ( quot -- )
     continuation dup continuation-data pop*
-    <walker-gadget> [ (walk) ] keep open-window stop ;
+    <walker-gadget> [ (walk) ] keep <world> open-window stop ;
