@@ -37,7 +37,9 @@ SYMBOL: restarts
     restarts get nth first3 continue-with ;
 
 : :edit ( -- )
-    error get dup parse-error-file swap parse-error-line
+    error get
+    dup parse-error-file ?resource-path
+    swap parse-error-line
     edit-location ;
 
 : (:help-multi)

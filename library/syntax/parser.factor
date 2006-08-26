@@ -28,7 +28,7 @@ SYMBOL: string-mode
 
 : do-what-i-mean ( string -- restarts )
     words-named natural-sort [
-        [ "Use the word " swap synopsis append ] keep 2array
+        [ "Use the word " swap summary append ] keep 2array
     ] map ;
 
 TUPLE: no-word name ;

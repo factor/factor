@@ -4,7 +4,8 @@ IN: gadgets-presentations
 USING: arrays definitions gadgets gadgets-borders
 gadgets-buttons gadgets-grids gadgets-labels gadgets-outliner
 gadgets-panes gadgets-paragraphs generic hashtables inspector io
-kernel prettyprint sequences strings styles words help math ;
+kernel prettyprint sequences strings styles words help math
+models ;
 
 ! Clickable objects
 TUPLE: presentation object commands ;
@@ -13,9 +14,6 @@ C: presentation ( button object commands -- button )
     [ set-presentation-commands ] keep
     [ set-presentation-object ] keep
     [ set-gadget-delegate ] keep ;
-
-M: presentation gadget-help
-    presentation-object dup word? [ synopsis ] [ summary ] if ;
 
 : <object-presentation> ( gadget object -- button )
     >r f <roll-button> r>
@@ -32,11 +30,44 @@ M: presentation gadget-help
         drop
     ] if* ;
 
+: show-mouse-help ( presentation -- )
+    dup find-world [ world-status set-model ] [ drop ] if* ;
+
+: hide-mouse-help ( presentation -- )
+    find-world [ world-status f swap set-model ] when* ;
+
 presentation H{
-    { T{ button-up f 1 } [ 1 invoke-presentation ] }
-    { T{ button-up f 2 } [ 2 invoke-presentation ] }
-    { T{ button-up f 3 } [ 3 invoke-presentation ] }
+    { T{ button-up f 1 } [ [ 1 invoke-presentation ] if-clicked ] }
+    { T{ button-up f 2 } [ [ 2 invoke-presentation ] if-clicked ] }
+    { T{ button-up f 3 } [ [ 3 invoke-presentation ] if-clicked ] }
+    { T{ mouse-leave } [ dup hide-mouse-help button-update ] }
+    { T{ mouse-enter } [ dup show-mouse-help button-update ] }
 } set-gestures
+
+! Presentation help bar
+: <presentation-summary> ( model -- )
+    [ [ presentation-object summary ] [ "" ] if* ]
+    <filter> <label-control> ;
+
+: <presentation-mouse-help> ( model -- help )
+    [
+        [
+            presentation-commands
+            dup length [ 2array ] 2map
+            [ first ] subset
+            [
+                first2 swap command-name
+                >r number>string " " r>
+                append3
+            ] map " " join
+        ] [
+            ""
+        ] if*
+    ] <filter> <label-control> ;
+
+: <presentation-help> ( model -- gadget )
+    dup <presentation-summary> swap <presentation-mouse-help>
+    2array make-pile ;
 
 ! Character styles
 

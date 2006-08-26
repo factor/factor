@@ -56,7 +56,7 @@ namespaces prettyprint sequences words xml ;
 
 : browser-title ( -- str )
     current-word
-    [ synopsis ] [ "IN: " current-vocab append ] if* ;
+    [ summary ] [ "IN: " current-vocab append ] if* ;
 
 : browser-responder ( -- )
     #! Display a Smalltalk like browser for exploring words.

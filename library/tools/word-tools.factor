@@ -6,7 +6,7 @@ math namespaces prettyprint sequences strings styles ;
 
 : word-outliner ( word quot -- )
     swap natural-sort [
-        dup rot curry >r [ synopsis ] keep r>
+        dup rot curry >r [ summary ] keep r>
         write-outliner terpri
     ] each-with ;
 

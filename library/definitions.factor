@@ -12,5 +12,3 @@ GENERIC: subdefs ( defspec -- seq )
 : see-subdefs ( word -- ) subdefs [ see ] each ;
 
 GENERIC: forget ( defspec -- )
-
-GENERIC: synopsis ( defspec -- str )

@@ -76,7 +76,7 @@ DEFER: $subsection
 ! Definition protocol
 M: link where* link-name article article-loc ;
 
-M: link (synopsis)
+M: link synopsis
     \ ARTICLE: pprint-word
     dup link-name pprint*
     article-title pprint* ;
@@ -89,7 +89,7 @@ PREDICATE: link word-link link-name word? ;
 
 M: word-link where* link-name "help-loc" word-prop ;
 
-M: word-link (synopsis)
+M: word-link synopsis
     \ HELP: pprint-word
     link-name dup pprint-word
     stack-effect effect>string comment. ;

@@ -22,7 +22,7 @@ SYMBOL: edit-hook
 
 : edit ( defspec -- ) where first2 edit-location ;
 
-GENERIC: (synopsis) ( defspec -- )
+GENERIC: synopsis ( defspec -- )
 
 : write-vocab ( vocab -- )
     dup <vocab-link> presented associate styled-text ;
@@ -35,17 +35,17 @@ GENERIC: (synopsis) ( defspec -- )
 : comment. ( string -- )
     [ H{ { font-style italic } } styled-text ] when* ;
 
-M: word (synopsis)
+M: word synopsis
     dup in.
     dup definer pprint-word
     dup pprint-word
     stack-effect [ effect>string comment. ] when* ;
 
-M: method-spec (synopsis)
+M: method-spec synopsis
     \ M: pprint-word [ pprint-word ] each ;
 
-: synopsis ( defspec -- str )
-    [ 0 margin set [ (synopsis) ] with-pprint ] string-out ;
+M: word summary ( defspec -- str )
+    [ 0 margin set [ synopsis ] with-pprint ] string-out ;
 
 GENERIC: definition ( spec -- quot ? )
 
@@ -75,7 +75,7 @@ M: word declarations.
 
 : (see) ( spec -- )
     [
-        dup (synopsis)
+        dup synopsis
         dup definition [
             H{ } <block
             pprint-elements pprint-; declarations.

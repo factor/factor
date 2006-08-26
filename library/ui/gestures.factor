@@ -146,15 +146,6 @@ V{ } clone hand-buttons set-global
 : relevant-help ( seq -- help )
     [ gadget-help ] map [ ] find nip ;
 
-: show-message ( string/f world -- )
-    #! Show a message in the status bar.
-    world-status set-model* ;
-
-: update-help ( -- )
-    #! Update mouse-over help message.
-    hand-gadget get-global parents [ relevant-help ] keep
-    dup empty? [ 2drop ] [ peek show-message ] if ;
-
 : under-hand ( -- seq )
     #! A sequence whose first element is the world and last is
     #! the current gadget, with all parents in between.
@@ -163,7 +154,7 @@ V{ } clone hand-buttons set-global
 : move-hand ( loc world -- )
     under-hand >r over hand-loc set-global
     pick-up hand-gadget set-global
-    under-hand r> hand-gestures update-help ;
+    under-hand r> hand-gestures ;
 
 : update-clicked ( loc world -- )
     move-hand

@@ -1,4 +1,4 @@
-IN: inspector
+IN: prettyprint
 USING: help ;
 
 HELP: summary

@@ -95,11 +95,11 @@ sequences vectors words ;
         "/library/compiler/alien/aliens.factor"
         
         "/library/syntax/prettyprint.factor"
+        "/library/tools/summary.factor"
         "/library/syntax/parser.factor"
         "/library/syntax/parse-stream.factor"
 
         "/library/tools/definitions.factor"
-        "/library/tools/summary.factor"
         "/library/tools/describe.factor"
 
         "/library/help/stylesheet.factor"

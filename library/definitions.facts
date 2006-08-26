@@ -12,8 +12,3 @@ HELP: where
 HELP: forget
 { $values { "defspec" "a definition specifier" } }
 { $description "Forgets about a definition. For example, if it is a word, it will be removed from its vocabulary." } ;
-
-HELP: synopsis
-{ $values { "defspec" "a definition specifier" } { "str" "a string" } }
-{ $contract "Outputs a short string describing the definition in Factor pseudo-code." }
-{ $examples { $example "\\ append synopsis print" "IN: sequences : append ( seq1 seq2 -- seq )" } } ;

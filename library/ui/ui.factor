@@ -70,8 +70,7 @@ C: titled-gadget ( gadget title -- )
     { { f f f @center } } make-frame* ;
 
 : init-status ( world -- )
-    dup world-status <label-control> dup highlight-theme
-    swap @bottom grid-add ;
+    dup world-status <presentation-help> swap @bottom grid-add ;
 
 : open-window ( gadget -- )
     <world> dup init-status

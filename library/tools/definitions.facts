@@ -1,5 +1,5 @@
 IN: definitions
-USING: help io ;
+USING: help io prettyprint ;
 
 HELP: ?resource-path
 { $values { "path" "a string" } { "newpath" "a string" } }
@@ -23,10 +23,11 @@ HELP: in.
 { $description "Prettyprints a " { $snippet "IN:" } " declaration for the word." }
 $prettyprinting-note ;
 
-HELP: (synopsis)
+HELP: synopsis
 { $values { "defspec" "a definition specifier" } }
 { $contract "Prettyprints the prologue of a definition." }
-$prettyprinting-note ;
+$prettyprinting-note
+{ $see-also summary } ;
 
 HELP: comment.
 { $values { "string" "a string" } }
