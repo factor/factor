@@ -13,7 +13,9 @@ namespaces parser prettyprint sequences strings words shells ;
 
 : make-jedit-request ( files params -- code )
     [
-        "EditServer.handleClient(false,false,false,null," write
+        "EditServer.handleClient(false,false,false," write
+        cwd pprint
+        "," write
         "new String[] {" write
         [ pprint "," write ] each
         "null});\n" write
