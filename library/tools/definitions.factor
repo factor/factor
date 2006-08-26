@@ -25,7 +25,7 @@ SYMBOL: edit-hook
         first2 edit-location
     ] [
         "Not from a source file" throw
-    ] if ;
+    ] if* ;
 
 GENERIC: synopsis ( defspec -- )
 

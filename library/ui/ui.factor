@@ -150,7 +150,7 @@ C: titled-gadget ( gadget title -- )
 
 : gadget-info ( gadget -- )
     "Gadget: " write
-    [ unparse-short ] keep write-object terpri ;
+    [ class word-name ] keep write-object terpri ;
 
 : commands. ( gadget -- )
     dup gadget-info
@@ -163,8 +163,7 @@ C: titled-gadget ( gadget title -- )
     >r make-pane <scroller> r> open-titled-window ;
 
 : commands-window ( gadget -- )
-    [ commands. ]
-    "Commands" pane-window ;
+    [ commands. ] "Commands" pane-window ;
 
 gadget {
     { f "Keyboard help" T{ key-down f { C+ } "1" } [ commands-window ] }
