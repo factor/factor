@@ -27,7 +27,10 @@ TUPLE: check-vocab name ;
 : set-use ( seq -- )
     [ check-vocab ] map [ ] subset >vector use set ;
 
-: set-in ( name -- ) dup ensure-vocab dup in set use+ ;
+: set-in ( name -- )
+    dup string?
+    [ "Vocabulary name must be a string" throw ] unless
+    dup ensure-vocab dup in set use+ ;
 
 : parsing? ( obj -- ? )
     dup word? [ "parsing" word-prop ] [ drop f ] if ;
