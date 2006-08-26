@@ -217,7 +217,7 @@ sequences vectors words ;
         "/library/ui/tools/search.factor"
         "/library/ui/tools/browser.factor"
         "/library/ui/tools/help.factor"
-        "/library/ui/tools/launchpad.factor"
+        "/library/ui/tools/workspace.factor"
 
         "/library/continuations.facts"
         "/library/definitions.facts"

@@ -6,9 +6,13 @@ kernel sequences ;
 
 TUPLE: book page pages ;
 
+: get-page ( n book -- page )
+    #! page gadgets are instantiated lazily.
+    book-pages [ dup quotation? [ call ] when dup ] change-nth ;
+
 : show-page ( n book -- )
     dup book-page unparent
-    [ book-pages nth ] keep
+    [ get-page ] keep
     [ set-book-page ] 2keep
     add-gadget ;
 
@@ -24,6 +28,3 @@ M: book pref-dim* book-page pref-dim ;
 
 M: book layout*
     dup rect-dim swap book-page set-layout-dim ;
-
-: make-book ( model obj quots -- assoc )
-    [ make-pane <scroller> ] map-with <book-control> ;

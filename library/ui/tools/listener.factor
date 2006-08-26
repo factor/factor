@@ -81,6 +81,9 @@ M: listener-gadget gadget-title drop "Listener" <model> ;
         [ [ run-file ] each ] curry listener-tool call-tool
     ] if ;
 
+: globals-window ( -- )
+    [ global inspect ] listener-tool call-tool ;
+
 listener-gadget {
     { f "Clear" T{ key-down f { A+ } "c" } [ dup [ listener-gadget-output pane-clear ] curry listener-tool call-tool ] }
 } define-commands

@@ -36,4 +36,7 @@ M: help-gadget pref-dim* drop { 500 600 } ;
 
 : help-tool [ help-gadget? ] [ <help-gadget> ] [ show-help ] ;
 
+: handbook-window ( -- )
+    T{ link f "handbook" } help-tool call-tool ;
+
 link 1 "Browse" [ help-tool call-tool ] define-operation

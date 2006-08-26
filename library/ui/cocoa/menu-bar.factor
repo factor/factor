@@ -91,6 +91,9 @@ DEFER: described-menu
 : menu-run-file ( -- )
     open-panel [ listener-run-files ] when* ;
 
+: memory-window ( -- )
+    [ heap-stats. terpri room. ] "Memory" pane-window ;
+
 : default-main-menu 
     {
         "<top>"
