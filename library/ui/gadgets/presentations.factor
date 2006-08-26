@@ -20,7 +20,7 @@ C: presentation ( button object commands -- button )
     dup object-operations <presentation> ;
 
 : <command-presentation> ( target command -- button )
-    dup command-name f <bevel-button> { f f } add*
+    dup command-name f <bevel-button> -rot { f f } swap add*
     <presentation> ;
 
 : invoke-presentation ( gadget button# -- )
@@ -58,8 +58,13 @@ presentation H{
     ] "" make ;
 
 : <presentation-mouse-help> ( model -- help )
-    [ [ presentation-mouse-help ] [ "" ] if* ]
-    <filter> <label-control> dup reverse-video-theme ;
+    [
+        [
+            presentation-mouse-help
+        ] [
+            "Press F1 for keyboard help"
+        ] if*
+    ] <filter> <label-control> dup reverse-video-theme ;
 
 : <presentation-help> ( model -- gadget )
     dup <presentation-mouse-help> swap <presentation-summary>
