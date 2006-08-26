@@ -1,5 +1,14 @@
 + 0.84:
 
+- support function keys
+- write "foo| " and put caret at | then select word element: selects
+  space
+- workspace:
+  - maybe open-window should take a world
+  - book: request focus on selected gadget
+  - each workspace page has a toolbar
+  - selecting walker when no quotation is being walked throws an error
+  - replacement for call-tool functionality
 - new browser:
   - show currently selected vocab & words
   - scroll to existing won't work

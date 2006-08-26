@@ -3,4 +3,6 @@ USING: help io ;
 
 HELP: make-image
 { $values { "architecture" "a string" } }
-{ $description "Creates a bootstrap image from sources, where " { $snippet "architecture" } " is one of " { $snippet "x86" } ", " { $snippet "ppc" } " or " { $snippet "amd64" } ". The new image file is written to the current working directory (see " { $link cwd } ") and is named " { $snippet "boot.image." { $emphasis "architecture" } } "." } ;
+{ $description "Creates a bootstrap image from sources, where " { $snippet "architecture" } " is one of the following:"
+{ $code "amd64" "pentium4" "ppc" "x86" }
+"The new image file is written to the " { $link resource-path } " and is named " { $snippet "boot.image." { $emphasis "architecture" } } "." } ;

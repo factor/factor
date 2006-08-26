@@ -8,7 +8,7 @@ namespaces parser prettyprint sequences styles words ;
     "resource:/" ?head [ resource-path ] when ;
 
 : where ( defspec -- loc )
-    where* first2 >r ?resource-path r> 2array ;
+    where* dup [ first2 >r ?resource-path r> 2array ] when ;
 
 : reload ( defspec -- )
     where first [ run-file ] when* ;

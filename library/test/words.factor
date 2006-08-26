@@ -1,6 +1,6 @@
 IN: temporary
 USING: arrays errors generic hashtables kernel math namespaces
-sequences test words ;
+sequences test words definitions parser ;
 
 [ 4 ] [
     "poo" "scratchpad" create [ 2 2 + ] define-compound
@@ -112,7 +112,11 @@ M: array freakish ;
 DEFER: x
 [ t ] [ [ x ] catch third \ x eq? ] unit-test
 
-! This has to be the last test in the file.
-: test-last ( -- ) ;
+[ ] [ "no-loc" "temporary" create drop ] unit-test
+[ f ] [ "no-loc" "temporary" lookup where ] unit-test
 
+[ ] [ "IN: temporary : no-loc-2 ;" eval ] unit-test
+[ f ] [ "no-loc-2" "temporary" lookup where ] unit-test
+
+[ ] [ "IN: temporary : test-last ( -- ) ;" eval ] unit-test
 [ "test-last" ] [ word word-name ] unit-test

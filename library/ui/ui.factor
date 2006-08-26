@@ -154,7 +154,7 @@ C: titled-gadget ( gadget title -- )
 
 : commands. ( gadget -- )
     dup gadget-info
-    dup all-commands
+    all-commands
     [ first command-gesture key-down? ] subset
     [ first2 swap command-description ] map
     { "Command" "Gesture" } add* $table ;

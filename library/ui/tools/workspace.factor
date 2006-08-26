@@ -3,7 +3,8 @@
 IN: gadgets-workspace
 USING: arrays gadgets gadgets-listener gadgets-buttons
 gadgets-walker gadgets-help gadgets-walker sequences
-gadgets-books gadgets-frames kernel models namespaces ;
+gadgets-browser gadgets-books gadgets-frames kernel models
+namespaces ;
 
 TUPLE: workspace model ;
 
