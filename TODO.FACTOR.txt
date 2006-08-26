@@ -1,25 +1,24 @@
 + 0.84:
 
-new browser:
-- show currently selected vocab & words
-- scroll to existing won't work
-- initial scroll dim is wrong
-- show callers
-
+- click button in commands list doesn't unhighlight it
+- new browser:
+  - show currently selected vocab & words
+  - scroll to existing won't work
+  - initial scroll dim is wrong
+  - show callers
+- location saved for articles is the location of the ; not the ARTICLE:
 - alternative way to invoke 2/3 buttons on one-button mice using modifiers
-- list of key bindings
 - RT_WORD should refer to XTs not word objects.
-- services do not launch if factor not running
 - roundoff is still not quite right with tracks
 - fix top level window positioning
-- see if alien calls can be made faster
-- sometimes darcs get fails with the httpd
-- gdb triggers 'mutliple i/o ops on port' error
-- factorcode httpd crashed: bad file descriptor
 - signal 4 on datastack underflow on mac intel??
 
-+ 0.85:
+========================================================================
 
++ ui:
+
+- UI dataflow visualizer
+- services do not launch if factor not running
 - fix ui listener delay
 - we have trouble drawing rectangles
 - editor:
@@ -27,21 +26,6 @@ new browser:
   - more efficient multi-line inserts
   - editor should support stream output protocol
 - slider needs to be modelized
-- track individual method usages
-- modularize core
-- track module files and modification times, and a list of assets loaded
-  from that file
-- 'changes' word, asks if files changed on disk from loaded modules
-  should be reloaded -- do this in the right order
-- more compact relocation info
-- UI dataflow visualizer
-- problem if major gc happens during relocation
-  - in fact relocation should not cons at all
-
-========================================================================
-
-+ ui:
-
 - closing walker should continue; clicking continue should close walker
 - continuation handling in walker is screwy
 - graphical module manager tool
@@ -85,9 +69,19 @@ new browser:
   - make typedef aliasing explicit
 - seeing a C struct word should show its def
 - file out
+- track individual method usages
+- modularize core
+- track module files and modification times, and a list of assets loaded
+  from that file
+- 'changes' word, asks if files changed on disk from loaded modules
+  should be reloaded -- do this in the right order
 
 + compiler/ffi:
 
+- more compact relocation info
+- problem if major gc happens during relocation
+  - in fact relocation should not cons at all
+- see if alien calls can be made faster
 - [ r> ] infer should throw an inference error
 - better way of dealing with compiler errors
 - compiler tests are not as reliable now because of try-compile usage
@@ -113,7 +107,9 @@ new browser:
 
 + misc:
 
-- move jedit word to contrib
+- sometimes darcs get fails with the httpd
+- gdb triggers 'mutliple i/o ops on port' error
+- factorcode httpd crashed: bad file descriptor
 - growable data heap
 - incremental GC
 - UDP

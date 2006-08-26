@@ -157,5 +157,5 @@ M: browser gadget-title drop "Browser" <model> ;
 
 : browser-tool [ browser? ] [ <browser> ] [ browse ] ;
 
-[ word? ] 1 "Browse" [ browser-tool call-tool ] define-operation
-[ vocab-link? ] 1 "Browse" [ browser-tool call-tool ] define-operation
+\ word 1 "Browse" [ browser-tool call-tool ] define-operation
+vocab-link 1 "Browse" [ browser-tool call-tool ] define-operation

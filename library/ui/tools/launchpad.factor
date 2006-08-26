@@ -9,8 +9,7 @@ gadgets-browser gadgets-search gadgets-help inspector ;
     T{ link f "handbook" } help-tool call-tool ;
 
 : memory-window ( -- )
-    [ heap-stats. terpri room. ] make-pane <scroller>
-    "Memory" open-titled-window ;
+    [ heap-stats. terpri room. ] "Memory" pane-window ;
 
 : globals-window ( -- )
     [ global inspect ] listener-tool call-tool ;

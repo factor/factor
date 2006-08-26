@@ -25,8 +25,11 @@ SYMBOL: listener-hook
         f depth (read-multiline) >r >quotation r> in get
     ] with-parser in set ;
 
+: prompt. ( -- )
+    in get H{ { background { 1 0.7 0.7 1 } } } format bl flush ;
+
 : listen ( -- )
-    in get write "> " write flush [
+    prompt. [
         listener-hook get call
         read-multiline [ call ] [ drop bye ] if
     ] try ;

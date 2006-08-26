@@ -77,18 +77,19 @@ SYMBOL: structured-input
     words-named [ word-vocabulary dup print use+ ] each ;
 
 interactor {
-    { f "Evaluate input" T{ key-down f f "RETURN" } [ interactor-commit ] }
-    { f "Clear output" T{ key-down f { A+ } "c" } [ dup [ interactor-output pane-clear ] curry swap interactor-call ] }
+    { f "Evaluate" T{ key-down f f "RETURN" } [ interactor-commit ] }
     { f "History" T{ key-down f { C+ } "h" } [ dup [ interactor-history. ] curry swap interactor-call ] }
     { f "Send EOF" T{ key-down f { C+ } "d" } [ f swap interactor-eval ] }
-    { f "Infer input" T{ key-down f { C+ } "i" } [ "infer ." quot-action ] }
-    { f "Single step input" T{ key-down f { C+ } "w" } [ "walk" quot-action ] }
-    { f "See at caret" T{ key-down f { A+ } "s" } [ [ search see ] word-action ] }
-    { f "Edit at caret" T{ key-down f { A+ } "e" } [ [ search edit ] word-action ] }
-    { f "Reload at caret" T{ key-down f { A+ } "r" } [ [ search reload ] word-action ] }
-    { f "Apropos at caret (all)" T{ key-down f { A+ } "a" } [ [ apropos ] word-action ] }
-    { f "Use word at caret" T{ key-down f { A+ } "u" } [ [ use-word ] word-action ] }
-    { f "Apropos at caret (used)" T{ key-down f f "TAB" } [ [ usable-words (apropos) ] word-action ] }
+    { f "Stack effect" T{ key-down f { C+ } "i" } [ "infer ." quot-action ] }
+    { f "Single step" T{ key-down f { C+ } "w" } [ "walk" quot-action ] }
+    { f "See" T{ key-down f { A+ } "s" } [ [ search see ] word-action ] }
+    { f "Help" T{ key-down f { A+ } "h" } [ [ search help ] word-action ] }
+    { f "Callers" T{ key-down f { A+ } "l" } [ [ search usage. ] word-action ] }
+    { f "Edit" T{ key-down f { A+ } "e" } [ [ search edit ] word-action ] }
+    { f "Reload" T{ key-down f { A+ } "r" } [ [ search reload ] word-action ] }
+    { f "Apropos (all)" T{ key-down f { A+ } "a" } [ [ apropos ] word-action ] }
+    { f "Use word" T{ key-down f { A+ } "u" } [ [ use-word ] word-action ] }
+    { f "Apropos (used)" T{ key-down f f "TAB" } [ [ usable-words (apropos) ] word-action ] }
 } define-commands
 
 M: interactor stream-readln

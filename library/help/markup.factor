@@ -43,6 +43,7 @@ M: simple-element print-element [ print-element ] each ;
 M: string print-element [ write ] ($span) ;
 M: array print-element unclip execute ;
 M: word print-element { } swap execute ;
+M: f print-element drop ;
 
 : print-element* ( element style -- )
     [ print-element ] with-style ;

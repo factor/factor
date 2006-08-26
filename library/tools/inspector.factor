@@ -25,10 +25,10 @@ SYMBOL: inspector-stack
 
 : inspector-help ( -- )
     "Object inspector." print
-    terpri
     "up -- return to previous object" [ up ] print-input
     "inspecting ( -- obj ) push current object" [ inspecting ] print-input
-    "go ( n -- ) inspect nth slot" print ;
+    "go ( n -- ) inspect nth slot" print
+    terpri ;
 
 : inspector ( obj -- )
     inspector-help

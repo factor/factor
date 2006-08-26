@@ -81,6 +81,10 @@ M: listener-gadget gadget-title drop "Listener" <model> ;
         [ [ run-file ] each ] curry listener-tool call-tool
     ] if ;
 
-[ drop t ] 1 "Inspect" [ [ inspect ] curry listener-tool call-tool ] define-operation
-[ drop t ] 3 "Inspect" [ [ inspect ] curry listener-tool call-tool ] define-operation
-[ input? ] 1 "Replace input" [ input-string listener-tool call-tool ] define-operation
+listener-gadget {
+    { f "Clear" T{ key-down f { A+ } "c" } [ dup [ listener-gadget-output pane-clear ] curry listener-tool call-tool ] }
+} define-commands
+
+object 1 "Inspect" [ [ inspect ] curry listener-tool call-tool ] define-operation
+object 3 "Inspect" [ [ inspect ] curry listener-tool call-tool ] define-operation
+input 1 "Input" [ input-string listener-tool call-tool ] define-operation

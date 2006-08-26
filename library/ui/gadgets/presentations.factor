@@ -4,26 +4,38 @@ IN: gadgets-presentations
 USING: arrays definitions gadgets gadgets-borders
 gadgets-buttons gadgets-grids gadgets-labels gadgets-outliner
 gadgets-panes gadgets-paragraphs generic hashtables inspector io
-kernel prettyprint sequences strings styles words ;
+kernel prettyprint sequences strings styles words help math ;
 
 ! Clickable objects
-TUPLE: object-button object ;
+TUPLE: presentation object commands ;
 
-C: object-button ( gadget object -- button )
-    [ set-object-button-object ] keep
-    [ >r f <roll-button> r> set-gadget-delegate ] keep ;
+C: presentation ( button object commands -- button )
+    [ set-presentation-commands ] keep
+    [ set-presentation-object ] keep
+    [ set-gadget-delegate ] keep ;
 
-M: object-button gadget-help
-    object-button-object dup word? [ synopsis ] [ summary ] if ;
+M: presentation gadget-help
+    presentation-object dup word? [ synopsis ] [ summary ] if ;
 
-: invoke-object-button ( gadget button# -- )
-    >r object-button-object dup r> object-operation
-    [ invoke-command ] [ drop ] if* ;
+: <object-presentation> ( gadget object -- button )
+    >r f <roll-button> r>
+    dup object-operations <presentation> ;
 
-object-button H{
-    { T{ button-down f 1 } [ 1 invoke-object-button ] }
-    { T{ button-down f 2 } [ 2 invoke-object-button ] }
-    { T{ button-down f 3 } [ 3 invoke-object-button ] }
+: <command-presentation> ( target command -- button )
+    dup command-name f <bevel-button> -rot
+    dup object-operations 1 tail swap add* <presentation> ;
+
+: invoke-presentation ( gadget button# -- )
+    1- over presentation-commands nth [
+        >r presentation-object r> command-quot call
+    ] [
+        drop
+    ] if* ;
+
+presentation H{
+    { T{ button-up f 1 } [ 1 invoke-presentation ] }
+    { T{ button-up f 2 } [ 2 invoke-presentation ] }
+    { T{ button-up f 3 } [ 3 invoke-presentation ] }
 } set-gestures
 
 ! Character styles
@@ -45,15 +57,15 @@ object-button H{
 : apply-font-style ( style gadget -- style gadget )
     over specified-font over set-label-font ;
 
-: apply-browser-style ( style gadget -- style gadget )
-    presented [ <object-button> ] apply-style ;
+: apply-presentation-style ( style gadget -- style gadget )
+    presented [ <object-presentation> ] apply-style ;
 
-: <presentation> ( style text -- gadget )
+: <styled-label> ( style text -- gadget )
     <label>
     apply-foreground-style
     apply-background-style
     apply-font-style
-    apply-browser-style
+    apply-presentation-style
     nip ;
 
 ! Paragraph styles
@@ -85,7 +97,7 @@ object-button H{
     apply-border-width-style
     apply-border-color-style
     apply-page-color-style
-    apply-browser-style
+    apply-presentation-style
     apply-outliner-style
     nip ;
 
@@ -129,7 +141,7 @@ M: paragraph stream-close drop ;
 M: pack stream-write gadget-write ;
 
 : gadget-bl ( style stream -- )
-    >r " " <presentation> <word-break-gadget> r> add-gadget ;
+    >r " " <styled-label> <word-break-gadget> r> add-gadget ;
 
 M: paragraph stream-write
     swap " " split
@@ -147,7 +159,7 @@ M: paragraph stream-write1
 
 : gadget-format ( string style stream -- )
     pick empty?
-    [ 3drop ] [ >r swap <presentation> r> add-gadget ] if ;
+    [ 3drop ] [ >r swap <styled-label> r> add-gadget ] if ;
 
 M: pack stream-format
     gadget-format ;

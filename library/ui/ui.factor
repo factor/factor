@@ -2,9 +2,10 @@
 ! See http://factorcode.org/license.txt for BSD license.
 IN: gadgets
 USING: arrays errors gadgets gadgets-buttons gadgets-frames
-gadgets-grids gadgets-labels gadgets-panes gadgets-theme
-gadgets-viewports generic hashtables io kernel math models
-namespaces prettyprint queues sequences test threads ;
+gadgets-grids gadgets-labels gadgets-panes gadgets-presentations
+gadgets-scrolling gadgets-theme gadgets-viewports generic
+hashtables io kernel math models namespaces prettyprint queues
+sequences test threads help sequences words ;
 
 ! Assoc mapping aliens to gadgets
 SYMBOL: windows
@@ -139,11 +140,39 @@ C: titled-gadget ( gadget title -- )
     windows get [ empty? not ] [ f ] if* ;
 
 : <toolbar> ( gadget -- toolbar )
-    commands [ <command-button> ] map make-shelf
+    dup commands [ <command-presentation> ] map-with make-shelf
     dup highlight-theme ;
 
+: $gadget ( element -- ) first gadget. ;
+
+: command-description ( command -- element )
+    [ <command-presentation> \ $gadget swap 2array ] keep
+    command-gesture gesture>string 2array ;
+
+: gadget-info ( gadget -- )
+    "Gadget: " write
+    [ unparse-short ] keep write-object terpri ;
+
+: commands. ( gadget -- )
+    dup gadget-info
+    dup all-commands
+    [ command-gesture key-down? ] subset
+    [ command-description ] map-with
+    { "Command" "Gesture" } add* $table ;
+
+: pane-window ( quot title -- )
+    >r make-pane <scroller> r> open-titled-window ;
+
+: commands-window ( gadget -- )
+    [ commands. ]
+    "Commands" pane-window ;
+
+gadget {
+    { f "Keyboard help" T{ key-down f { C+ } "1" } [ commands-window ] }
+} define-commands
+
 : error-window ( error -- )
-    [ print-error ] make-pane "Error" open-titled-window ;
+    [ print-error ] "Error" pane-window ;
 
 : ui-try ( quot -- )
     [ error-window ] recover ;
