@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 IN: inspect-responder
 USING: callback-responder generic hashtables help html httpd
-inspector kernel namespaces sequences ;
+inspector kernel namespaces prettyprint sequences ;
 
 ! Mini object inspector
 : http-inspect ( obj -- )
