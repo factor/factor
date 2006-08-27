@@ -80,18 +80,6 @@ C: titled-gadget ( gadget title -- )
     windows get [ second ] map
     [ world-gadget swap call ] find-last-with nip ; inline
 
-: open-tool ( arg cons setter -- )
-    >r call dup <world> open-window r> call ; inline
-
-: call-tool ( arg pred cons setter -- )
-    rot find-window [
-        rot drop
-        dup raise-window
-        world-gadget swap call
-    ] [
-        open-tool
-    ] if* ; inline
-
 : start-world ( world -- )
     dup graft
     dup relayout

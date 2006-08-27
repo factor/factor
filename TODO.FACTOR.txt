@@ -6,7 +6,6 @@
   - tool help
   - selecting walker when no quotation is being walked throws an error
   - replacement for call-tool functionality
-  - status bar showing number of words needing a recompile
   - default size is wrong
 - new browser:
   - show currently selected vocab & words
@@ -19,11 +18,13 @@
 - roundoff is still not quite right with tracks
 - fix top level window positioning
 - signal 4 on datastack underflow on mac intel??
+- new section in cookbook: philosophy
 
 ========================================================================
 
 + ui:
 
+- status bar showing number of words needing a recompile
 - UI dataflow visualizer
 - services do not launch if factor not running
 - fix ui listener delay

@@ -329,6 +329,7 @@ IN: shells
             ] [
                 init-ui
                 workspace-window
+                drop
             ] if
             event-loop
         ] with-freetype

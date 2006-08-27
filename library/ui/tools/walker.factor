@@ -83,7 +83,3 @@ C: walker-gadget ( -- gadget )
         { [ walker-gadget-model$ <namestack-display> ] f f 1/6 }
         { [ walker-gadget-model$ <catchstack-display> ] f f 1/6 }
     } { 0 1 } make-track* ;
-
-: walk ( quot -- )
-    continuation dup continuation-data pop*
-    <walker-gadget> [ (walk) ] keep <world> open-window stop ;

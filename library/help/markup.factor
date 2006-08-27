@@ -131,11 +131,7 @@ M: f print-element drop ;
     ] ($heading) ;
 
 ! Some links
-GENERIC: >link ( obj -- obj )
-
-M: word >link ;
-M: link >link ;
-M: object >link <link> ;
+: >link ( obj -- obj ) dup link? [ <link> ] unless ;
 
 : $link ( element -- )
     first link-style [

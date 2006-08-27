@@ -63,12 +63,3 @@ SYMBOL: operations
 
 : object-operations ( object -- seq )
     3 [ 1+ object-operation ] map-with ;
-
-global [
-    operations get [
-        V{ } clone operations set
-        
-        \ word 2 "Edit" [ edit ] define-operation
-        link 2 "Edit" [ edit ] define-operation
-    ] unless
-] bind

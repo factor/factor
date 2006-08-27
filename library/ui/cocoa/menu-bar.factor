@@ -110,7 +110,7 @@ DEFER: described-menu
         } [ NSApp over -> setAppleMenu: ] }
         { {
             "File"
-            { "New Workspace" workspace-window "n" }
+            { "New Workspace" [ workspace-window drop ] "n" }
             { "Run..." menu-run-file "o" }
             { }
             { "Save Image" save "s" }
@@ -138,6 +138,6 @@ DEFER: described-menu
         } [ NSApp over -> setWindowsMenu: ] }
         { {
             "Help"
-            { "Factor Documentation" [ "handbook" <link> help-tool call-tool ] "?" }
+            { "Factor Documentation" [ "handbook" <link> help-gadget call-tool ] "?" }
         } }
     } described-menu set-main-menu ;

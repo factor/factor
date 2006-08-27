@@ -68,23 +68,11 @@ C: browser ( -- gadget )
         { [ <definitions> ] set-browser-definitions [ <scroller> ] 3/4 }
     } { 0 1 } make-track* ;
 
+M: browser gadget-title drop "Browser" <model> ;
+
 : show-vocab ( vocab browser -- )
     browser-navigator navigator-vocab set-model ;
-
-M: browser gadget-title drop "Browser" <model> ;
 
 : show-word ( word browser -- )
     over word-vocabulary over show-vocab
     browser-definitions show-definition ;
-
-: browse ( obj browser -- )
-    over vocab-link? [
-        >r vocab-link-name r> show-vocab
-    ] [
-        show-word
-    ] if ;
-
-: browser-tool [ browser? ] [ <browser> ] [ browse ] ;
-
-\ word 1 "Browse" [ browser-tool call-tool ] define-operation
-vocab-link 1 "Browse" [ browser-tool call-tool ] define-operation

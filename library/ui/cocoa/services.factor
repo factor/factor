@@ -5,7 +5,7 @@ DEFER: FactorServiceProvider
 
 IN: cocoa
 USING: alien io kernel namespaces objc
-parser prettyprint styles gadgets-listener ;
+parser prettyprint styles gadgets-listener gadgets-workspace ;
 
 : pasteboard-error ( error -- f )
     "Pasteboard does not hold a string" <NSString>
@@ -29,7 +29,7 @@ parser prettyprint styles gadgets-listener ;
         { "id" "SEL" "id" "id" "void*" }
         [
             nip
-            [ <input> listener-tool call-listener f ]
+            [ <input> listener-gadget call-tool f ]
             do-service
             2drop
         ]

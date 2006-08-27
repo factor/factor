@@ -77,6 +77,7 @@ IN: shells
             ] [
                 init-ui
                 workspace-window
+                drop
             ] if
             finish-launching
             event-loop

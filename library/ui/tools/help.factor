@@ -2,8 +2,8 @@
 ! See http://factorcode.org/license.txt for BSD license.
 IN: gadgets-help
 USING: gadgets gadgets-borders gadgets-buttons gadgets-frames
-gadgets-panes gadgets-search
-gadgets-scrolling help kernel models namespaces sequences ;
+gadgets-panes gadgets-search gadgets-scrolling help kernel
+models namespaces sequences ;
 
 TUPLE: help-gadget history ;
 
@@ -31,7 +31,3 @@ C: help-gadget ( -- gadget )
 M: help-gadget gadget-title
     help-gadget-history
     [ "Help - " swap article-title append ] <filter> ;
-
-: help-tool [ help-gadget? ] [ <help-gadget> ] [ show-help ] ;
-
-link 1 "Browse" [ help-tool call-tool ] define-operation

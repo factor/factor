@@ -53,10 +53,6 @@ M: listener-gadget focusable-child*
 
 M: listener-gadget gadget-title drop "Listener" <model> ;
 
-: call-listener ( quot/string listener -- )
-    listener-gadget-input over quotation?
-    [ interactor-call ] [ set-editor-text ] if ;
-
 : listener-available? ( gadget -- ? )
     dup listener-gadget? [
         listener-gadget-input interactor-busy? not
@@ -64,24 +60,5 @@ M: listener-gadget gadget-title drop "Listener" <model> ;
         drop f
     ] if ;
 
-: listener-tool
-    [ listener-available? ]
-    [ <listener-gadget> ]
-    [ call-listener ] ;
-
-: listener-run-files ( seq -- )
-    dup empty? [
-        drop
-    ] [
-        [ [ run-file ] each ] curry listener-tool call-tool
-    ] if ;
-
-listener-gadget {
-    { f "Clear" T{ key-down f f "CLEAR" } [ dup [ listener-gadget-output pane-clear ] curry listener-tool call-tool ] }
-    { f "Globals" f [ [ global inspect ] listener-tool call-tool ] }
-    { f "Memory" f [ [ heap-stats. room. ] listener-tool call-tool ] }
-} define-commands
-
-object 1 "Inspect" [ [ inspect ] curry listener-tool call-tool ] define-operation
-object 3 "Inspect" [ [ inspect ] curry listener-tool call-tool ] define-operation
-input 1 "Input" [ input-string listener-tool call-tool ] define-operation
+: clear-listener ( listener -- )
+    listener-gadget-output pane-clear ;
