@@ -12,11 +12,16 @@ namespaces parser prettyprint sequences words ;
 : canonicalize
     [ nip zero? not ] hash-subset ;
 
+SYMBOL: terms
+
+: with-terms ( quot -- hash )
+    [ H{ } clone terms set call terms get ] with-scope ; inline
+
 : (l+) ( x -- )
-    [ swap +@ ] hash-each ;
+    terms get [ [ swap +@ ] hash-each ] bind ;
 
 : l+ ( x y -- x+y )
-    [ (l+) (l+) ] make-hash canonicalize ;
+    [ (l+) (l+) ] with-terms canonicalize ;
 
 : l* ( vec n -- vec )
     dup zero? [
@@ -47,11 +52,11 @@ namespaces parser prettyprint sequences words ;
 : l. ( vec -- ) hash>alist (l.) ;
 
 : linear-op ( vec quot -- vec )
-    [
+	[
         swap [
             >r swap call r> l* (l+)
         ] hash-each-with
-    ] make-hash canonicalize ; inline
+    ] with-terms canonicalize ; inline
 
 : -1^ odd? -1 1 ? ;
 
@@ -59,10 +64,7 @@ namespaces parser prettyprint sequences words ;
     swap call swap [ swap hash [ 0 ] unless* ] map-with ; inline
 
 : op-matrix ( domain range quot -- matrix )
-    rot [
-        ( domain quot basis-elt )
-        >r 2dup r> (op-matrix)
-    ] map 2nip ; inline
+    rot [ >r 2dup r> (op-matrix) ] map 2nip ; inline
 
 : rot-seq 1 swap cut swap append ;
 

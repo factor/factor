@@ -64,8 +64,7 @@ SYMBOL: matrix
 
 : (row-reduce) ( -- )
     0 cols rows min [
-        over pivot-row dup
-        [ over do-row 1+ ] [ drop ] if
+        over pivot-row [ over do-row 1+ ] when*
     ] each drop ;
 
 : row-reduce ( matrix -- matrix' )

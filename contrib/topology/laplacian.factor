@@ -16,9 +16,8 @@ IN: laplacian
 
 SYMBOL: top-class
 
-SYMBOL: dimension
-
 : set-generators ( seq -- )
+    natural-sort
     dup generators set
     1 [ h* ] reduce top-class set ;
 
@@ -49,7 +48,5 @@ SYMBOL: dimension
 : L-matrix ( basis -- matrix )
     dup [ concat L ] op-matrix ;
 
-: harmonics ( basis -- seq )
-    dup L-matrix row-reduce
-    [ 0 >h [ >r concat r> h* l+ ] 2reduce ] map-with
-    [ hash-empty? not ] subset ;
+: cohomology ( -- seq )
+    generators get basis [ L-matrix null/rank drop ] map ;
