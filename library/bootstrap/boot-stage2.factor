@@ -20,6 +20,10 @@ optimizer parser sequences sequences-internals words ;
         ] when
     
         "compile" get [
+            windows? [
+                "/library/windows/dlls.factor" run-resource
+            ] when
+
             \ number= compile
             \ + compile
             \ nth compile

@@ -1,7 +1,7 @@
 ! Copyright (C) 2005, 2006 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: alien arrays errors freetype gadgets
-       gadgets-listener hashtables io kernel math namespaces prettyprint
+USING: alien arrays errors freetype gadgets gadgets-listener
+       gadgets-workspace hashtables io kernel math namespaces prettyprint
        sequences strings vectors words win32-api win32-api-messages ;
 USING: inspector threads memory ;
 IN: win32
@@ -58,6 +58,18 @@ SYMBOL: class-name
         { 40 "DOWN" }
         { 45 "INSERT" }
         { 46 "DELETE" }
+        { 112 "F1" }
+        { 113 "F2" }
+        { 114 "F3" }
+        { 115 "F4" }
+        { 116 "F5" }
+        { 117 "F6" }
+        { 118 "F7" }
+        { 119 "F8" }
+        { 120 "F9" }
+        { 121 "F10" }
+        { 122 "F11" }
+        { 123 "F12" }
     } ;
 
 : key-state-down?
@@ -122,7 +134,7 @@ SYMBOL: hWnd
 
 : handle-wm-char ( hWnd uMsg wParam lParam -- )
     lParam set wParam set uMsg set hWnd set
-    wParam get exclude-key-wm-char? ctrl? or [
+    wParam get exclude-key-wm-char? ctrl? or alt? or [
         wParam get ch>string
         hWnd get window-focus user-input
     ] unless ;
@@ -336,5 +348,6 @@ IN: shells
     ] [ cleanup-win32-ui ] cleanup ;
 
 IN: io-internals
-! Temporary, until native io returns
+! Allows use of the ui without native i/o.
+! Overwritten when native i/o is loaded.
 : io-multiplex ( ms -- ) 0 SleepEx drop ;
