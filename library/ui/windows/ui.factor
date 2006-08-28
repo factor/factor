@@ -163,22 +163,23 @@ SYMBOL: hWnd
 : handle-wm-kill-focus ( hWnd uMsg wParam lParam -- )
     3drop window [ unfocus-world ] when* ;
 
-: mouse-button ( uMsg -- n )
-    {
-        { [ dup WM_LBUTTONDOWN = ] [ drop 1 ] }
-        { [ dup WM_LBUTTONUP = ] [ drop 1 ] }
-        { [ dup WM_MBUTTONDOWN = ] [ drop 2 ] }
-        { [ dup WM_MBUTTONUP = ] [ drop 2 ] }
-        { [ dup WM_RBUTTONDOWN = ] [ drop 3 ] }
-        { [ dup WM_RBUTTONUP = ] [ drop 3 ] }
-        { [ t ] [ "bad button" throw ] }
-    } cond ;
-
 : mouse-coordinate ( lParam -- seq ) [ lo-word ] keep hi-word 2array ;
 : mouse-wheel ( lParam -- n ) hi-word 0 > ;
 
-: prepare-mouse ( hWnd uMsg wParam lParam -- world )
-    nip >r mouse-button r> mouse-coordinate rot window ;
+: mouse-event>gesture ( uMsg -- button )
+    key-modifiers swap
+    {
+        { [ dup WM_LBUTTONDOWN = ] [ drop 1 <button-down> ] }
+        { [ dup WM_LBUTTONUP = ] [ drop 1 <button-up> ] }
+        { [ dup WM_MBUTTONDOWN = ] [ drop 2 <button-down> ] }
+        { [ dup WM_MBUTTONUP = ] [ drop 2 <button-up> ] }
+        { [ dup WM_RBUTTONDOWN = ] [ drop 3 <button-down> ] }
+        { [ dup WM_RBUTTONUP = ] [ drop 3 <button-up> ] }
+        { [ t ] [ "bad button" throw ] }
+    } cond ;
+
+: prepare-mouse ( hWnd uMsg wParam lParam -- button coordinate world )
+    nip >r mouse-event>gesture r> mouse-coordinate rot window ;
 
 : handle-wm-buttondown ( hWnd uMsg wParam lParam -- )
     >r pick SetCapture drop r>
