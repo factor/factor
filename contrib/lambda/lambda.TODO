@@ -5,6 +5,10 @@ Unit tests
 More graceful parse error handling
 Factor out tree traversing into its own lib
 
+Redesign
+--------
+Why doesn't PRED work?
+
 Core
 ----
 ISNIL

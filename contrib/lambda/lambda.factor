@@ -1,41 +1,28 @@
 #! An interpreter for lambda expressions, by Matthew Willis
-REQUIRES: lazy-lists ;
-USING: lazy-lists io strings hashtables sequences namespaces kernel ;
+USING: io strings hashtables sequences namespaces kernel ;
 IN: lambda
 
-: bound-vars ( -- lazy-list ) 65 lfrom [ ch>string ] lmap ;
-
-: canonical-string ( expr -- string )
-    #! pretty print in canonical form, for use with reverse lookups
-    bound-vars swap expr>string ;
-
-: original-string ( expr -- string )
-    #! pretty print with vars named as inputed
-    nil swap expr>string ;
-
-: lambda-print ( names expr/name -- names )
-    dup string? [ over dupd hash original-string " " swap 
+: lambda-print ( name/expr -- )
+    dup string? 
+    [   dup lambda-names get hash expr>string " " swap 
         append append "DEF " swap append 
-    ] [ original-string "=> " swap append 
+    ] [ expr>string "=> " swap append 
     ] if print flush ;
 
-: lambda-eval ( names parse-result -- names name/expr )
+: lambda-define ( parse-result -- name/expr )
     #! Make sure not to evaluate definitions.
-    first2 over [ 
-        swap rot [ set-hash ] 2keep swap
-    ] [
-        pick swap replace-names swap drop evaluate
-    ] if ;
+    first2 over [ over lambda-names get set-hash ] [ nip ] if ;
 
-: lambda-boot ( -- names )
+: lambda-eval ( name/expr -- name/expr )
+    dup string? [ normalize ] unless ;
+
+: lambda-boot ( -- )
     #! load the core lambda library
-    H{ } clone dup lambda-core 
-    [ lambda-parse lambda-eval lambda-print drop ] each-with ;
-
-: (lambda) ( names -- names )
+    H{ } clone lambda-names set lambda-core
+    [ lambda-parse lambda-define lambda-eval lambda-print ] each ;
+ 
+: lambda ( -- )
+    lambda-names get [ lambda-boot ] unless
     readln dup "." = [ drop ] [
-        lambda-parse lambda-eval lambda-print (lambda)
+        lambda-parse lambda-define lambda-eval lambda-print lambda
     ] if ;
-
-: lambda ( -- names )
-    lambda-boot (lambda) ;

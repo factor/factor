@@ -59,20 +59,20 @@ IN: lambda
     drop "Type HELLO and wait 10 seconds to see me flex my io muscles.\n" print-return ;
 
 : ALIENSUCC ( node -- node )
-    variable-node-var "a" append <variable-node> ;
+    var-node-name "a" append <var-node> ;
 
 : ALIENPRED ( node -- node )
-    variable-node-var dup length 1 - swap remove-nth <variable-node> ;
+    var-node-name dup length 1 - swap remove-nth <var-node> ;
 
 : ALIENISZERO ( node -- node )
     ;
 
 : PRINTCHAR ( node -- node )
     #! takes a base one num and prints its char equivalent
-    variable-node-var length "alienbaseonenum" length - ch>string print-return ;
+    var-node-name length "alienbaseonenum" length - ch>string print-return ;
 
 : READCHAR ( node -- node )
     #! reads one character of input and stores it as a base one num
-    "alienbaseonenum" read1 [ "a" append ] times <variable-node> ;
+    "alienbaseonenum" read1 [ "a" append ] times <var-node> ;
 
     

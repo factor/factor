@@ -6,168 +6,127 @@ IN: lambda
 
 : dip swap slip ; inline
 
-TUPLE: lambda-node expr original canonical ;
+SYMBOL: lambda-names
+TUPLE: lambda-node self expr name ;
 TUPLE: apply-node func arg ;
-TUPLE: variable-node var ;
+TUPLE: var-node name ; #! var is either a var, name, or pointer to a lambda-node
+TUPLE: beta-node expr lambdas ; #! a namespace node
 TUPLE: alien-node word ;
 
-DEFER: substitute
-C: lambda-node ( var expr implicit-empty-lambda-node -- lambda-node )
-    #! store the expr, replacing every occurence of var with
-    #! a pointer to this lambda-node
-    [ <variable-node> -rot substitute ] 3keep nip swapd
-    [ set-lambda-node-expr ] keep 
-    [ set-lambda-node-original ] keep ;
+M: lambda-node equal? eq? ;
 
-GENERIC: (traverse)
-: (pre) ( data-array pre-post node -- data-array pre-post new-node )
-    [ swap first execute ] 3keep drop rot ;
+GENERIC: bind-var
+M: lambda-node bind-var ( binding lambda -- ) 
+    lambda-node-expr bind-var ; 
 
-: (post) ( data-array pre-post node -- new-node )
-    swap second execute ;
-    
-#! Traverses the tree while executing pre and post order words
-M: lambda-node (traverse) ( data-array words lambda-node -- node )
-    (pre)
-    [ [ lambda-node-expr (traverse) ] keep set-lambda-node-expr ] 3keep 
-    (post) ; 
+M: apply-node bind-var ( binding apply -- )
+    [ apply-node-func bind-var ] 2keep apply-node-arg bind-var ;
 
-M: apply-node (traverse) ( data-array words apply-node -- node )
-    (pre)
-    [ [ apply-node-func (traverse) ] keep set-apply-node-func ] 3keep
-    [ [ apply-node-arg (traverse) ] keep set-apply-node-arg ] 3keep
-    (post) ;
+M: var-node bind-var ( binding var-node -- )
+    2dup var-node-name swap lambda-node-name = 
+    [ set-var-node-name ] [ 2drop ] if ;
 
-M: variable-node (traverse) ( data-array words variable-node -- node )
-    (pre) (post) ;
+M: alien-node bind-var ( binding alien -- ) 2drop ;
 
-M: alien-node (traverse) ( data-array word alien-node -- node ) nip nip ;
+C: lambda-node ( expr var lambda -- lambda )
+    swapd [ set-lambda-node-name ] keep
+    [ set-lambda-node-expr ] 2keep
+    dup [ set-lambda-node-self ] keep
+    [ swap bind-var ] keep ;
 
-: traverse ( node data-array {pre,post} -- node )
-    rot (traverse) ;
-
-: pre-order ( node data-array word -- node )
-    { nip } curry traverse ;
-    
-: post-order ( node data-array word -- node )
-    { nip } swap add traverse ;
-
-GENERIC: (clone-pre)
-M: lambda-node (clone-pre) ( data lambda-node -- node )
-    #! leave a copy of the original lambda node on the stack
-    #! for later substitution
-    nip dup clone ; 
-
-M: apply-node (clone-pre) ( data apply-node -- node ) nip clone ;
-
-M: variable-node (clone-pre) ( data variable-node -- node ) nip clone ;
-
-GENERIC: (clone-post)
-M: lambda-node (clone-post) ( data lambda-node -- node )
-    nip [ dup <variable-node> -rot lambda-node-expr substitute  ] keep 
+GENERIC: beta-push
+#! push the beta further down the syntax tree
+#!  this is how lambda achieves lazy beta reduction and efficient cloning.
+#!  everything outside of the beta must have been cloned.
+M: lambda-node beta-push ( beta lambda -- lambda )
+    clone dup lambda-node-expr pick set-beta-node-expr
     [ set-lambda-node-expr ] keep ;
-    
-M: apply-node (clone-post) ( data apply-node -- node ) nip ;
 
-M: variable-node (clone-post) ( data variable-node -- node ) nip ;
+M: apply-node beta-push ( beta apply -- apply )
+    #! push the beta into each branch, cloning the beta
+    swap dup clone 
+    pick apply-node-func swap [ set-beta-node-expr ] keep swap
+    rot apply-node-arg swap [ set-beta-node-expr ] keep
+    <apply-node> ;
 
-: clone-node ( node -- clone )
-    f { (clone-pre) (clone-post) } traverse ;
+M: var-node beta-push ( beta var -- expr )
+    #! substitute the variable with the appropriate entry from the
+    #! beta namespace
+    tuck var-node-name swap beta-node-lambdas hash dup
+    [ nip ] [ drop ] if ;
 
-GENERIC: variable-eq?
-M: string variable-eq? ( var string -- bool ) = ;
+M: beta-node beta-push ( beta inner-beta -- beta )
+    #! combines the namespaces of two betas
+    dup beta-node-lambdas rot beta-node-lambdas hash-union
+    swap [ set-beta-node-lambdas ] keep ;
 
-M: lambda-node variable-eq? ( var lambda-node-pointer -- bool ) eq? ;
+M: alien-node beta-push ( beta alien -- alien ) nip ;
 
-GENERIC: (substitute)
-M: lambda-node (substitute) ( data-array lambda-node -- node ) nip ;
-
-M: apply-node (substitute) ( data-array apply-node -- node ) nip ;
-    
-M: variable-node (substitute) ( data-array variable-node -- node )
-    #! ( variable-node == var ) ? expr | variable-node
-    #! this could use multiple dispatch!
-    [ first2 ] dip ( expr var variable-node -- )
-    [ variable-node-var variable-eq? ] keep swap ( expr variable-node cond )
-    [ swap ] unless drop ;  
-
-: substitute ( expr var node -- node )
-    -rot 2array \ (substitute) post-order ;
-
-: beta-reduce ( apply-node -- expr )
-    #! "pass" expr to the lambda-node, returning a reduced expression
-    dup apply-node-arg swap apply-node-func 
-    clone-node dup lambda-node-expr substitute ;
-
-: eta-reduce ( lambda-node -- expr ) 
-    lambda-node-expr apply-node-func ;
+: beta-reduce ( apply -- beta )
+    #! construct a beta-node which carries the namespace of the lambda
+    dup apply-node-arg swap apply-node-func dup lambda-node-expr -rot
+    lambda-node-self H{ } clone [ set-hash ] keep <beta-node> ;
 
 DEFER: evaluate
-: alien-reduce ( apply-node -- expr )
-    #! execute the factor word in the alien-node
-    dup apply-node-arg evaluate 
-    swap apply-node-func alien-node-word "lambda" lookup execute ;
+: left-reduce ( apply -- apply/f )
+    #! we are at an application node -- evaluate the function
+    dup apply-node-func evaluate dup
+    [ swap [ set-apply-node-func ] keep ]
+    [ nip ] if ;
 
-GENERIC: evaluate
-M: lambda-node evaluate ( lambda-node -- node ) 
-    #! eta-reduction
-    dup lambda-node-expr apply-node? [ 
-        dup lambda-node-expr apply-node-arg 
-        variable-node? [
-            dup dup lambda-node-expr apply-node-arg variable-node-var 
-            eq? [ 
-                eta-reduce evaluate 
-            ] when
-        ] when
-    ] when ;
-
-M: apply-node evaluate ( apply-node -- node )
-    #! beta-reduction
-    #! TODO: fix the weird recursion here
-    dup apply-node-func alien-node?
-    [ alien-reduce evaluate ]
-    [
-        dup apply-node-func lambda-node?
-        [ beta-reduce evaluate ] 
-        [
-            dup apply-node-func evaluate swap [ set-apply-node-func ] keep
-            dup apply-node-func lambda-node? [ evaluate ] when
-        ] if
+: alien-reduce ( apply -- node/f )
+    #! we have come to an alien application, which requires us to
+    #! fully normalize the argument before proceeding
+    dup apply-node-arg evaluate dup
+    [ swap [ set-apply-node-arg ] keep ]
+    [ #! right side is normalized, we are ready to do the alien application
+        drop dup apply-node-arg swap apply-node-func
+        alien-node-word "lambda" lookup execute
     ] if ;
 
-M: variable-node evaluate ( variable-node -- node ) ;
+GENERIC: evaluate
+#! There are 
+#!   beta-reduction, beta-pushing, and name replacing.
+: normalize ( expr -- expr )
+    dup evaluate [ nip normalize ] when* ;
+    
+M: lambda-node evaluate ( lambda -- node/f ) drop f ;
 
-M: alien-node evaluate ( alien-node -- node ) ;
+M: apply-node evaluate ( apply -- node )
+    dup apply-node-func lambda-node?
+    [ beta-reduce ] 
+    [ 
+        dup apply-node-func alien-node?
+        [ alien-reduce ]
+        [ left-reduce ] if
+    ] if ;
 
-GENERIC: (replace-names)
-DEFER: replace-names 
-M: lambda-node (replace-names) ( names-hash l-node -- node ) nip ;
+M: var-node evaluate ( var -- node/f ) 
+    var-node-name lambda-names get hash ;
 
-M: apply-node (replace-names) ( names-hash a-node -- node ) nip ;
+M: beta-node evaluate ( beta -- node/f ) 
+    dup beta-node-expr beta-push ;
 
-M: variable-node (replace-names) ( names-hash v-node -- node )
-    [ variable-node-var swap hash ] 2keep pick not 
-    [ 2nip ] [ drop swap clone-node replace-names ] if ;
-
-: replace-names ( names-hash node -- node )
-    swap \ (replace-names) post-order ;
-
-: set-temp-label ( available-vars lambda-node -- available-vars label lambda-node )
-    over nil? 
-    [ [ lambda-node-original ] keep [ set-lambda-node-canonical ] 2keep ]
-    [ [ uncons swap ] dip [ set-lambda-node-canonical ] 2keep ] if ;
+M: alien-node evaluate ( alien -- node/f ) drop f ;
 
 GENERIC: expr>string
-M: lambda-node expr>string ( available-vars lambda-node -- string )
-    set-temp-label swapd lambda-node-expr expr>string swap 
-    [ "(" , , ". " , , ")" , ] { } make concat ;
+M: lambda-node expr>string ( lambda-node -- string )
+    [ 
+        dup "(" , lambda-node-name , ". " , 
+        lambda-node-expr expr>string , ")" , 
+    ] { } make concat ;
 
-M: apply-node expr>string ( available-vars apply-node -- string ) 
-    [ apply-node-arg expr>string ] 2keep apply-node-func expr>string
-    [ "(" , , " " , , ")" , ] { } make concat ;
+M: apply-node expr>string ( apply-node -- string ) 
+    [ 
+        dup "(" , apply-node-func expr>string , " " , 
+        apply-node-arg expr>string , ")" , 
+    ] { } make concat ;
 
-M: variable-node expr>string ( available-vars variable-node -- string ) 
-    nip variable-node-var dup string? [ lambda-node-canonical ] unless ;
+M: var-node expr>string ( variable-node -- string ) 
+    var-node-name dup string? [ lambda-node-name ] unless ;
 
-M: alien-node expr>string ( available-vars alien-node -- string )
-    nip [ "[" , alien-node-word , "]" , ] { } make concat ;
+M: alien-node expr>string ( alien-node -- string )
+    [ "[" , alien-node-word , "]" , ] { } make concat ;
+
+M: beta-node expr>string ( beta -- string )
+    [ "beta<" , beta-node-expr expr>string , ">" , ] { } make concat ;

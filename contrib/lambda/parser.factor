@@ -33,7 +33,7 @@ IN: lambda
 : <id>
     #! parses an identifier (string for now)
     #! TODO: do we need to enter it into a symbol table?
-    <letter> <alphanumeric> <*> <&:> [ concat <variable-node> ] <@ ;
+    <letter> <alphanumeric> <*> <&:> [ concat <var-node> ] <@ ;
 
 : <name>
     #! parses a name, which is used in replacement
@@ -46,7 +46,7 @@ DEFER: <expr>
     #! lambda expression.
     "(" token <id> sp &> "." token sp <& 
     <expr> sp <&> ")" token sp <&
-    [ [ first variable-node-var ] keep second <lambda-node> ] <@ ;
+    [ [ first var-node-name ] keep second <lambda-node> ] <@ ;
 
 : <apply>
     #! parses (<expr> <expr>), the function application
@@ -60,7 +60,7 @@ DEFER: <expr>
 
 : <expr>
     [ <id> call ] [ <lambda> call ] [ <apply> call ] <|> <|>
-    <name> [ <variable-node> ] <@ <|> <alien> <|> ;
+    <name> [ <var-node> ] <@ <|> <alien> <|> ;
 
 : <line>
     ":" token <name> &> <expr> sp <&> f succeed <expr> <&> 
