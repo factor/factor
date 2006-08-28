@@ -2,11 +2,10 @@
 ! See http://factorcode.org/license.txt for BSD license.
 IN: gadgets-listener
 USING: arrays gadgets gadgets-frames gadgets-labels
-gadgets-panes gadgets-scrolling
-gadgets-text gadgets-theme gadgets-tiles gadgets-tracks generic
-hashtables inspector io kernel listener math models
-namespaces parser prettyprint sequences shells styles threads
-words memory ;
+gadgets-panes gadgets-scrolling gadgets-text gadgets-theme
+gadgets-tiles gadgets-tracks generic hashtables inspector io
+kernel listener math models namespaces parser prettyprint
+sequences shells styles threads words memory ;
 
 TUPLE: listener-gadget input output stack ;
 
@@ -60,5 +59,5 @@ M: listener-gadget gadget-title drop "Listener" <model> ;
         drop f
     ] if ;
 
-: clear-listener ( listener -- )
-    listener-gadget-output pane-clear ;
+: clear-listener ( -- )
+    stdio get duplex-stream-out pane-clear ;

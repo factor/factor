@@ -1,7 +1,7 @@
 ! Copyright (C) 2006 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 IN: gadgets-text
-USING: definitions gadgets gadgets-controls gadgets-panes
+USING: arrays definitions gadgets gadgets-controls gadgets-panes
 generic hashtables help io kernel namespaces prettyprint styles
 threads sequences vectors definitions parser words ;
 
@@ -60,33 +60,48 @@ SYMBOL: structured-input
         swap interactor-eval
     ] if ;
 
-: interactor-history. ( interactor -- )
-    dup interactor-output [
-        interactor-history [ dup print-input ] each
+: interactor-history. ( -- )
+    stdio get dup duplex-stream-out [
+        duplex-stream-in interactor-history
+        [ dup print-input ] each
     ] with-stream* ;
 
-: word-action ( interactor word -- )
+: token-action ( interactor quot -- )
     over gadget-selection?
     [ over T{ word-elt } select-elt ] unless
     over gadget-selection add* swap interactor-call ;
 
+: word-action ( interactor quot -- )
+    search token-action ;
+
 : usable-words ( -- seq )
     use get [ hash-values natural-sort ] map concat prune ;
 
-interactor {
-    { f "Evaluate" T{ key-down f f "RETURN" } [ interactor-commit ] }
-    { f "History" T{ key-down f { C+ } "h" } [ dup [ interactor-history. ] curry swap interactor-call ] }
-    { f "Send EOF" T{ key-down f { C+ } "d" } [ f swap interactor-eval ] }
-    { f "Stack effect" T{ key-down f { C+ A+ } "i" } [ "infer ." quot-action ] }
-    { f "Single step" T{ key-down f { C+ A+ } "w" } [ "walk" quot-action ] }
-    { f "See" T{ key-down f { A+ } "s" } [ [ search see ] word-action ] }
-    { f "Help" T{ key-down f { A+ } "h" } [ [ search help ] word-action ] }
-    { f "Callers" T{ key-down f { A+ } "u" } [ [ search usage. ] word-action ] }
-    { f "Edit" T{ key-down f { A+ } "e" } [ [ search edit ] word-action ] }
-    { f "Reload" T{ key-down f { A+ } "r" } [ [ search reload ] word-action ] }
-    { f "Apropos (all)" T{ key-down f { A+ } "a" } [ [ apropos ] word-action ] }
-    { f "Apropos (used)" T{ key-down f f "TAB" } [ [ usable-words (apropos) ] word-action ] }
-} define-commands
+interactor [
+    { f "Evaluate" T{ key-down f f "RETURN" } [ interactor-commit ] } ,
+    { f "History" T{ key-down f { C+ } "h" } [ [ interactor-history. ] swap interactor-call ] } ,
+    { f "Send EOF" T{ key-down f { C+ } "d" } [ f swap interactor-eval ] } ,
+
+    {
+        { f "Stack effect" T{ key-down f { C+ A+ } "i" } "infer ." }
+        { f "Single step" T{ key-down f { C+ A+ } "w" } "walk" }
+        { f "Single step" T{ key-down f { C+ A+ } "t" } "time" }
+    } [ first4 [ quot-action ] curry 4array ] map %
+
+    {
+        { f "See" T{ key-down f { A+ } "s" } [ see ] }
+        { f "Help" T{ key-down f { A+ } "h" } [ help ] }
+        { f "Callers" T{ key-down f { A+ } "u" } [ usage. ] }
+        { f "Edit" T{ key-down f { A+ } "e" } [ edit ] }
+        { f "Reload" T{ key-down f { A+ } "r" } [ reload ] }
+        { f "Reload" T{ key-down f { A+ } "w" } [ watch ] }
+    } [ first4 [ word-action ] curry 4array ] map %
+
+    {
+        { f "Apropos (all)" T{ key-down f { A+ } "a" } [ apropos ] }
+        { f "Apropos (used)" T{ key-down f f "TAB" } [ usable-words (apropos) ] }
+    } [ first4 [ token-action ] curry 4array ] map %
+] { } make define-commands
 
 M: interactor stream-readln
     dup interactor-queue empty? [

@@ -82,12 +82,17 @@ workspace {
     { f "Walker" T{ key-down f f "F3" } [ walker-gadget select-tool ] }
     { f "Dictionary" T{ key-down f f "F4" } [ browser select-tool ] }
     { f "Documentation" T{ key-down f f "F5" } [ help-gadget select-tool ] }
+    { f "New workspace" T{ key-down f { C+ } "n" } [ workspace-window drop ] }
 } define-commands
 
 V{ } clone operations set-global
 
-\ word 2 "Edit" [ edit ] define-operation
-link 2 "Edit" [ edit ] define-operation
+: define-operation ( pred button# name tool quot -- )
+    [ % , \ call-tool , ] [ ] make <operation> 3array
+    operations get push-new ;
+
+\ word 2 "Edit" [ [ edit ] curry ] listener-gadget define-operation
+link 2 "Edit" [ [ edit ] curry ] listener-gadget define-operation
 
 ! Listener tool
 M: listener-gadget call-tool* ( quot/string listener -- )
@@ -102,14 +107,16 @@ M: listener-gadget call-tool* ( quot/string listener -- )
     ] if ;
 
 listener-gadget {
-    { f "Clear" T{ key-down f f "CLEAR" } [ dup [ clear-listener ] curry listener-gadget call-tool ] }
-    { f "Globals" f [ [ global inspect ] listener-gadget call-tool ] }
-    { f "Memory" f [ [ heap-stats. room. ] listener-gadget call-tool ] }
-} define-commands
+    { f "Clear" T{ key-down f f "CLEAR" } [ clear-listener ] }
+    { f "Globals" f [ global inspect ] }
+    { f "Memory" f [ heap-stats. room. ] }
+}
+[ first4 [ listener-gadget call-tool ] curry 4array ] map
+define-commands
 
-object 1 "Inspect" [ [ inspect ] curry listener-gadget call-tool ] define-operation
-object 3 "Inspect" [ [ inspect ] curry listener-gadget call-tool ] define-operation
-input 1 "Input" [ input-string listener-gadget call-tool ] define-operation
+object 1 "Inspect" [ [ inspect ] curry ] listener-gadget define-operation
+object 3 "Inspect" [ [ inspect ] curry ] listener-gadget define-operation
+input 1 "Input" [ input-string ] listener-gadget define-operation
 
 ! Browser tool
 M: browser call-tool*
@@ -119,13 +126,13 @@ M: browser call-tool*
         show-word
     ] if ;
 
-\ word 1 "Browse" [ browser call-tool ] define-operation
-vocab-link 1 "Browse" [ browser call-tool ] define-operation
+\ word 1 "Browse" [ ] browser define-operation
+vocab-link 1 "Browse" [ ] browser define-operation
 
 ! Help tool
 M: help-gadget call-tool* show-help ;
 
-link 1 "Follow link" [ help-gadget call-tool ] define-operation
+link 1 "Follow link" [ ] help-gadget define-operation
 
 ! Walker tool
 M: walker-gadget call-tool* ( arg tool -- )

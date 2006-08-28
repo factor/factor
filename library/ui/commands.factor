@@ -71,9 +71,6 @@ world H{
 
 SYMBOL: operations
 
-: define-operation ( pred button# name quot -- )
-    >r >r f r> f r> <command> 3array operations get push-new ;
-
 : object-operation ( obj button# -- command )
     swap operations get
     [ >r class r> first class< ] subset-with
@@ -82,3 +79,6 @@ SYMBOL: operations
 
 : object-operations ( object -- seq )
     3 [ 1+ object-operation ] map-with ;
+
+: <operation> ( name quot -- command )
+    >r >r f r> f r> <command> ;

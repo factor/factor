@@ -30,3 +30,9 @@ M: byte-array resize resize-array ;
     3 swap <array>
     [ 1 swap set-array-nth ] keep
     [ 0 swap set-array-nth ] keep ;
+
+: 4array ( x y z t -- array )
+    4 swap <array>
+    [ 2 swap set-array-nth ] keep
+    [ 1 swap set-array-nth ] keep
+    [ 0 swap set-array-nth ] keep ;

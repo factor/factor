@@ -14,8 +14,6 @@
 - signal 4 on datastack underflow on mac intel??
 - new section in cookbook: philosophy
 - help gadget should not re-render every time it is grafted
-- clean up interactor and listener commands -- there is a lot of
-  duplication
 - keyboard help persists after clicking on a link
 - apropos and help search
 
@@ -49,12 +47,6 @@
 - fonts/ should go inside the .app -- we need multi-tier resource-path
 - should be possible to drop an image file on the .app to run it
 - add-gadget, model-changed, set-model should compile
-- shortcuts:
-  - find a listener
-  - find a browser
-  - find a help window
-  - they'll either focus such a window, or if the current window is of
-    that type, cycle
 - support x11's large selections, if needed
 - own-selection violates ICCCM
 - cocoa: windows are not updated while resizing
