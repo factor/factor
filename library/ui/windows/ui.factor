@@ -175,7 +175,7 @@ SYMBOL: hWnd
     } cond ;
 
 : mouse-coordinate ( lParam -- seq ) [ lo-word ] keep hi-word 2array ;
-: mouse-wheel ( lParam -- n ) hi-word 0 > 1 -1 ? ;
+: mouse-wheel ( lParam -- n ) hi-word 0 > ;
 
 : prepare-mouse ( hWnd uMsg wParam lParam -- world )
     nip >r mouse-button r> mouse-coordinate rot window ;
