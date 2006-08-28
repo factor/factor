@@ -43,16 +43,19 @@ TUPLE: walker-gadget model quot ns ;
     swap dup walker-gadget-ns
     [ slip update-stacks ] bind ; inline
 
+: walker-command ( gadget quot -- )
+    over walker-gadget-ns [ with-walker ] [ 2drop ] if ; inline
+
 : reset-walker ( walker -- )
     f over set-walker-gadget-ns
     f over walker-gadget-model set-model
-    f swap walker-gadget-quot set-model ;
+    f over walker-gadget-quot set-model ;
 
-: walker-step [ step ] with-walker ;
-: walker-step-in [ step-in ] with-walker ;
-: walker-step-out [ step-out ] with-walker ;
-: walker-step-back [ step-back ] with-walker ;
-: walker-step-all dup [ step-all ] with-walker reset-walker ;
+: walker-step [ step ] walker-command ;
+: walker-step-in [ step-in ] walker-command ;
+: walker-step-out [ step-out ] walker-command ;
+: walker-step-back [ step-back ] walker-command ;
+: walker-step-all dup [ step-all ] walker-command reset-walker ;
 
 walker-gadget {
     { f "Step" T{ key-down f f "s" } [ walker-step ] }
