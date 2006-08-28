@@ -46,7 +46,7 @@
 - slider needs to be modelized
 - continuation handling in walker is screwy
 - graphical module manager tool
-- figure out what goes in the .app and what doesn't
+- fonts/ should go inside the .app -- we need multi-tier resource-path
 - should be possible to drop an image file on the .app to run it
 - add-gadget, model-changed, set-model should compile
 - shortcuts:

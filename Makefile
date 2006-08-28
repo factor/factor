@@ -92,22 +92,6 @@ windows:
 macosx.app:
 	cp $(BINARY) $(BUNDLE)/Contents/MacOS/Factor
 
-	rm -rf $(BUNDLE)/Contents/Resources/
-	mkdir -p $(BUNDLE)/Contents/Resources/fonts/
-
-	chmod +x cp_dir
-	find doc library contrib examples fonts \( -name '*.factor' \
-		-o -name '*.facts' \
-		-o -name '*.txt' \
-		-o -name '*.html' \
-		-o -name '*.ttf' \
-		-o -name '*.js' \) \
-		-exec ./cp_dir {} $(BUNDLE)/Contents/Resources/{} \;
-
-	cp version.factor $(BUNDLE)/Contents/Resources/
-
-	cp $(IMAGE) $(BUNDLE)/Contents/Resources/factor.image
-
 	install_name_tool \
 		-id @executable_path/../Frameworks/libfreetype.6.dylib \
 		Factor.app/Contents/Frameworks/libfreetype.6.dylib

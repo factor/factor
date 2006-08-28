@@ -62,6 +62,12 @@ IN: gadgets
 : flush-gl-context ( handle -- )
     first -> openGLContext -> flushBuffer ;
 
+: running.app? ( -- ? )
+    #! Test if we're running Factor.app.
+    "Factor.app"
+    NSBundle -> mainBundle -> bundlePath CF>string
+    subseq? ;
+
 IN: shells
 
 : ui
