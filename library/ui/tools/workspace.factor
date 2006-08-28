@@ -5,7 +5,7 @@ gadgets-walker gadgets-help gadgets-walker sequences
 gadgets-browser gadgets-books gadgets-frames gadgets-controls
 gadgets-grids gadgets-presentations kernel models namespaces
 styles words help parser inspector memory generic threads
-gadgets-text definitions ;
+gadgets-text definitions inference test prettyprint ;
 IN: gadgets-workspace
 
 GENERIC: call-tool* ( arg tool -- )
@@ -106,13 +106,27 @@ M: listener-gadget call-tool* ( quot/string listener -- )
         [ [ run-file ] each ] curry listener-gadget call-tool
     ] if ;
 
-listener-gadget {
-    { f "Clear" T{ key-down f f "CLEAR" } [ clear-listener ] }
-    { f "Globals" f [ global inspect ] }
-    { f "Memory" f [ heap-stats. room. ] }
-}
-[ first4 [ listener-gadget call-tool ] curry 4array ] map
-define-commands
+: quot-action ( listener quot -- )
+    swap listener-gadget-input
+    [ dup field-commit , \ parse , swap % ] [ ] make
+    swap interactor-call ;
+
+listener-gadget [
+    {
+        { f "Stack effect" T{ key-down f { C+ A+ } "i" } [ infer . ] }
+        { f "Single step" T{ key-down f { C+ A+ } "w" } [ walk ] }
+        { f "Time execution" T{ key-down f { C+ A+ } "t" } [ time ] }
+    } [ first4 [ quot-action ] curry 4array ] map %
+
+    {
+        { f "Clear output" T{ key-down f f "CLEAR" } [ clear-listener ] }
+        { f "Clear stack" T{ key-down f { C+ } "CLEAR" } [ clear ] }
+        { f "Globals" f [ global inspect ] }
+        { f "Memory" f [ heap-stats. room. ] }
+    } [
+        first4 [ listener-gadget call-tool ] curry 4array
+    ] map %
+] [ ] make define-commands
 
 object 1 "Inspect" listener-gadget [ [ inspect ] curry ] define-operation
 object 3 "Inspect" listener-gadget [ [ inspect ] curry ] define-operation

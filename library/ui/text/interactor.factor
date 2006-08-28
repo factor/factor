@@ -52,14 +52,6 @@ SYMBOL: structured-input
         [ field-commit ] keep interactor-eval
     ] if ;
 
-: quot-action ( interactor word -- )
-    over interactor-busy? [
-        2drop
-    ] [
-        [ "[ " % over field-commit % " ] " % % ] "" make
-        swap interactor-eval
-    ] if ;
-
 : interactor-history. ( -- )
     stdio get dup duplex-stream-out [
         duplex-stream-in interactor-history
@@ -83,18 +75,12 @@ interactor [
     { f "Send EOF" T{ key-down f { C+ } "d" } [ f swap interactor-eval ] } ,
 
     {
-        { f "Stack effect" T{ key-down f { C+ A+ } "i" } "infer ." }
-        { f "Single step" T{ key-down f { C+ A+ } "w" } "walk" }
-        { f "Single step" T{ key-down f { C+ A+ } "t" } "time" }
-    } [ first4 [ quot-action ] curry 4array ] map %
-
-    {
         { f "See" T{ key-down f { A+ } "s" } [ see ] }
         { f "Help" T{ key-down f { A+ } "h" } [ help ] }
         { f "Callers" T{ key-down f { A+ } "u" } [ usage. ] }
         { f "Edit" T{ key-down f { A+ } "e" } [ edit ] }
         { f "Reload" T{ key-down f { A+ } "r" } [ reload ] }
-        { f "Reload" T{ key-down f { A+ } "w" } [ watch ] }
+        { f "Watch" T{ key-down f { A+ } "w" } [ watch ] }
     } [ first4 [ word-action ] curry 4array ] map %
 
     {
