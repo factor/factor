@@ -91,8 +91,8 @@ V{ } clone operations set-global
     [ % , \ call-tool , ] [ ] make <operation> 3array
     operations get push-new ;
 
-\ word 2 "Edit" [ [ edit ] curry ] listener-gadget define-operation
-link 2 "Edit" [ [ edit ] curry ] listener-gadget define-operation
+\ word 2 "Edit" listener-gadget [ [ edit ] curry ] define-operation
+link 2 "Edit" listener-gadget [ [ edit ] curry ] define-operation
 
 ! Listener tool
 M: listener-gadget call-tool* ( quot/string listener -- )
@@ -114,9 +114,9 @@ listener-gadget {
 [ first4 [ listener-gadget call-tool ] curry 4array ] map
 define-commands
 
-object 1 "Inspect" [ [ inspect ] curry ] listener-gadget define-operation
-object 3 "Inspect" [ [ inspect ] curry ] listener-gadget define-operation
-input 1 "Input" [ input-string ] listener-gadget define-operation
+object 1 "Inspect" listener-gadget [ [ inspect ] curry ] define-operation
+object 3 "Inspect" listener-gadget [ [ inspect ] curry ] define-operation
+input 1 "Input" listener-gadget [ input-string ] define-operation
 
 ! Browser tool
 M: browser call-tool*
@@ -126,13 +126,13 @@ M: browser call-tool*
         show-word
     ] if ;
 
-\ word 1 "Browse" [ ] browser define-operation
-vocab-link 1 "Browse" [ ] browser define-operation
+\ word 1 "Browse" browser [ ] define-operation
+vocab-link 1 "Browse" browser [ ] define-operation
 
 ! Help tool
 M: help-gadget call-tool* show-help ;
 
-link 1 "Follow link" [ ] help-gadget define-operation
+link 1 "Follow link" help-gadget [ ] define-operation
 
 ! Walker tool
 M: walker-gadget call-tool* ( arg tool -- )

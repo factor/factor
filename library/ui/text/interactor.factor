@@ -72,7 +72,7 @@ SYMBOL: structured-input
     over gadget-selection add* swap interactor-call ;
 
 : word-action ( interactor quot -- )
-    search token-action ;
+    \ search add* token-action ;
 
 : usable-words ( -- seq )
     use get [ hash-values natural-sort ] map concat prune ;

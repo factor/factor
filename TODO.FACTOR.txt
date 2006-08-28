@@ -14,13 +14,13 @@
 - signal 4 on datastack underflow on mac intel??
 - new section in cookbook: philosophy
 - help gadget should not re-render every time it is grafted
-- keyboard help persists after clicking on a link
 - apropos and help search
 
 ========================================================================
 
 + ui:
 
+- keyboard help persists after clicking on a link
 - grouping commands into categories
 - tool help
 - merge keyboard help with help in some way
