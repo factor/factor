@@ -28,6 +28,7 @@
 
 + ui:
 
+- x11.app has a problem with A+ keys
 - status bar showing number of words needing a recompile
 - UI dataflow visualizer
 - services do not launch if factor not running
@@ -37,7 +38,6 @@
   - only redraw visible lines
   - more efficient multi-line inserts
   - editor should support stream output protocol
-  - s+click
   - double/triple click
   - autoscroll
   - undo and redo

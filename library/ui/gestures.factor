@@ -129,7 +129,7 @@ V{ } clone hand-buttons set-global
 
 : modifier ( mod modifiers -- seq )
     [ second swap bitand 0 > ] subset-with
-    [ first ] map f like ;
+    [ first ] map prune f like ;
 
 : drag-loc ( -- loc )
     hand-loc get-global hand-click-loc get-global v- ;

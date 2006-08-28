@@ -4,10 +4,12 @@ IN: gadgets-text
 USING: gadgets gadgets-controls kernel models namespaces
 sequences ;
 
-: editor-mouse-down ( editor -- )
+: editor-extend-selection ( editor -- )
     dup request-focus
-    dup
-    dup editor-caret click-loc
+    dup editor-caret click-loc ;
+
+: editor-mouse-down ( editor -- )
+    dup editor-extend-selection
     dup editor-mark click-loc ;
 
 : editor-mouse-drag ( editor -- )
@@ -68,6 +70,7 @@ editor {
     { f "Insert newline" T{ key-down f f "RETURN" } [ "\n" swap user-input ] }
     { f "Insert newline" T{ key-down f { S+ } "RETURN" } [ "\n" swap user-input ] }
     { f "Position caret" T{ button-down } [ editor-mouse-down ] }
+    { f "Extend selection" T{ button-down f { S+ } } [ editor-extend-selection ] }
     { f "Start selection" T{ drag } [ editor-mouse-drag ] }
     { f "Focus editor" T{ gain-focus } [ focus-editor ] }
     { f "Unfocus editor" T{ lose-focus } [ unfocus-editor ] }

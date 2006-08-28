@@ -26,6 +26,7 @@ M: world configure-event
         { S+ HEX: 1 }
         { C+ HEX: 4 }
         { A+ HEX: 8 }
+        { A+ HEX: 10 }
     } ;
     
 : key-codes
@@ -90,7 +91,7 @@ M: world key-up-event
     world-focus swap key-event>gesture dup [
         <key-up> dup [ swap handle-gesture drop ] [ 2drop ] if
     ] [
-        2drop
+        3drop
     ] if ;
 
 : mouse-event-loc ( event -- loc )
