@@ -1,7 +1,5 @@
 + 0.84:
 
-- write "foo| " and put caret at | then select word element: selects
-  space
 - new browser:
   - show currently selected vocab & words
   - scroll to existing won't work
@@ -10,16 +8,17 @@
   - some way to go back/forth between code and docs
 - RT_WORD should refer to XTs not word objects.
 - roundoff is still not quite right with tracks
-- fix top level window positioning
 - signal 4 on datastack underflow on mac intel??
 - new section in cookbook: philosophy
 - help gadget should not re-render every time it is grafted
 - apropos and help search
+- alien-indirect
 
 ========================================================================
 
 + ui:
 
+- fix top level window positioning
 - keyboard help persists after clicking on a link
 - grouping commands into categories
 - tool help
@@ -41,6 +40,8 @@
   - transpose char/word/line
   - page up/down
   - search and replace
+  - write "foo| " and put caret at | then select word element: selects
+    space
 - slider needs to be modelized
 - continuation handling in walker is screwy
 - graphical module manager tool

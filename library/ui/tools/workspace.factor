@@ -5,7 +5,7 @@ gadgets-walker gadgets-help gadgets-walker sequences
 gadgets-browser gadgets-books gadgets-frames gadgets-controls
 gadgets-grids gadgets-presentations kernel models namespaces
 styles words help parser inspector memory generic threads
-gadgets-text definitions inference test prettyprint ;
+gadgets-text definitions inference test prettyprint math ;
 IN: gadgets-workspace
 
 GENERIC: call-tool* ( arg tool -- )
@@ -40,7 +40,7 @@ C: workspace ( -- workspace )
     over set-gadget-delegate
     dup dup set-control-self ;
 
-M: workspace pref-dim* drop { 500 600 } ;
+M: workspace pref-dim* delegate pref-dim* { 550 650 } vmax ;
 
 : <workspace-tabs> ( book -- tabs )
     control-model
@@ -93,6 +93,14 @@ V{ } clone operations set-global
 
 \ word 2 "Edit" listener-gadget [ [ edit ] curry ] define-operation
 link 2 "Edit" listener-gadget [ [ edit ] curry ] define-operation
+
+! Walker tool
+M: walker-gadget call-tool* ( arg tool -- )
+    >r first2 r> (walk) ;
+
+: walk ( quot -- )
+    continuation dup continuation-data pop* 2array
+    walker-gadget call-tool stop ;
 
 ! Listener tool
 M: listener-gadget call-tool* ( quot/string listener -- )
@@ -147,11 +155,3 @@ vocab-link 1 "Browse" browser [ ] define-operation
 M: help-gadget call-tool* show-help ;
 
 link 1 "Follow link" help-gadget [ ] define-operation
-
-! Walker tool
-M: walker-gadget call-tool* ( arg tool -- )
-    >r first2 r> (walk) ;
-
-: walk ( quot -- )
-    continuation dup continuation-data pop* 2array
-    walker-gadget call-tool stop ;

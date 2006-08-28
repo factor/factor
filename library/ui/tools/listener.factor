@@ -3,7 +3,7 @@
 IN: gadgets-listener
 USING: arrays gadgets gadgets-frames gadgets-labels
 gadgets-panes gadgets-scrolling gadgets-text gadgets-theme
-gadgets-tiles gadgets-tracks generic hashtables inspector io
+gadgets-tracks generic hashtables inspector io
 kernel listener math models namespaces parser prettyprint
 sequences shells styles threads words memory ;
 
@@ -25,11 +25,14 @@ TUPLE: listener-gadget input output stack ;
     [ >r clear r> init-namespaces listener-thread ] in-thread
     drop ;
 
-: <pane-tile> ( model quot title -- gadget )
-    >r <pane-control> <scroller> r> f <tile> ;
+: <titled-pane> ( model quot title -- gadget )
+    {
+        { [ <label> dup reverse-video-theme ] f f @top }
+        { [ <pane-control> <scroller> ] f f @center }
+    } make-frame* ;
 
 : <stack-tile> ( model title -- gadget )
-    [ stack. ] swap <pane-tile> ;
+    [ stack. ] swap <titled-pane> ;
 
 : <listener-input> ( -- gadget )
     gadget get listener-gadget-output <interactor> ;

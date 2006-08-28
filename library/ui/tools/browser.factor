@@ -1,10 +1,11 @@
 ! Copyright (C) 2006 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-IN: gadgets-browser
 USING: arrays sequences kernel gadgets-panes definitions
-prettyprint gadgets-tiles gadgets-theme gadgets-borders gadgets
+prettyprint gadgets-theme gadgets-borders gadgets
 generic gadgets-scrolling math io words models styles
-namespaces gadgets-tracks gadgets-presentations ;
+namespaces gadgets-tracks gadgets-presentations gadgets-grids
+gadgets-frames help gadgets-buttons ;
+IN: gadgets-browser
 
 TUPLE: definitions showing ;
 
@@ -18,22 +19,48 @@ TUPLE: definitions showing ;
     over find-definitions definitions-showing delete
     unparent ;
 
-: <definition-gadget> ( definition -- gadget )
-    dup [ see ] make-pane <default-border>
-    over unparse rot [ close-definition ] curry <tile>
-    dup faint-boundary ;
-
 C: definitions ( -- gadget )
     <pile> over set-delegate
-    { 5 5 } over set-pack-gap
+    { 2 2 } over set-pack-gap
     V{ } clone over set-definitions-showing ;
+
+TUPLE: tile definition gadget ;
+
+: find-tile [ tile? ] find-parent ;
+
+: close-tile ( tile -- )
+    dup tile-definition over find-definitions
+    definitions-showing delete
+    unparent ;
+
+: <tile-toolbar> ( -- gadget )
+    {
+        { "Close" [ close-tile ] }
+        { "Help" [ tile-definition help ] }
+        { "Callers" [ tile-definition usage. ] }
+        { "Edit" [ tile-definition edit ] }
+        { "Reload" [ tile-definition reload ] }
+        { "Watch" [ tile-definition watch ] }
+    } [ first2 \ find-tile add* <bevel-button> ] map
+    make-shelf ;
+
+: tile-theme ( gadget -- )
+    { 5 5 } over set-grid-gap faint-boundary ;
+
+C: tile ( definition -- gadget )
+    [ set-tile-definition ] 2keep
+    {
+        { [ <tile-toolbar> ] f f @top }
+        { [ [ see ] make-pane ] f f @center }
+    } make-frame*
+    dup tile-theme ;
 
 : show-definition ( definition definitions -- )
     2dup definition-index dup 0 >= [
         over nth-gadget swap scroll>rect drop
     ] [
         drop 2dup definitions-showing push
-        swap <definition-gadget> over add-gadget
+        swap <tile> over add-gadget
         scroll>bottom
     ] if ;
 

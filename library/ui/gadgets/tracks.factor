@@ -100,7 +100,7 @@ divider H{
 } set-gestures
 
 C: divider ( -- divider )
-    dup delegate>gadget dup highlight-theme ;
+    dup delegate>gadget ;
 
 : normalize-sizes ( sizes -- sizes )
     dup sum swap [ swap / ] map-with ;

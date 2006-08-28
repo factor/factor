@@ -57,8 +57,6 @@ SYMBOL: windows
         10 sleep
     ] assert-depth ;
 
-: <status-bar> ( -- gadget ) "" <label> dup highlight-theme ;
-
 TUPLE: titled-gadget title ;
 
 M: titled-gadget gadget-title titled-gadget-title ;
@@ -122,8 +120,8 @@ C: titled-gadget ( gadget title -- )
     windows get [ empty? not ] [ f ] if* ;
 
 : <toolbar> ( gadget -- toolbar )
-    dup commands [ <command-presentation> ] map-with make-shelf
-    dup highlight-theme ;
+    dup commands [ <command-presentation> ] map-with
+    make-shelf ;
 
 : $gadget ( element -- ) first gadget. ;
 

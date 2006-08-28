@@ -103,13 +103,3 @@ USING: arrays gadgets kernel sequences styles ;
     { 1.0 0.0 0.0 1.0 } over set-editor-caret-color
     { 0.8 0.8 1.0 1.0 } over set-editor-selection-color
     { "monospace" plain 12 } swap set-editor-font ;
-
-: highlight-theme ( gadget -- )
-    T{ solid f { 0.8 0.8 0.8 1.0 } } swap set-gadget-interior ;
-
-: title-theme ( gadget -- )
-    { 1 0 } over set-gadget-orientation
-    T{ gradient f {
-        { 1.0 0.8 0.7 1.0 }
-        { 1.0 0.9 0.6 1.0 }
-    } } swap set-gadget-interior ;

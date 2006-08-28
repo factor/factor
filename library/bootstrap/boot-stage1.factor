@@ -194,7 +194,6 @@ sequences vectors words ;
         "/library/ui/gadgets/labels.factor"
         "/library/ui/gadgets/borders.factor"
         "/library/ui/gadgets/buttons.factor"
-        "/library/ui/gadgets/tiles.factor"
         "/library/ui/gadgets/sliders.factor"
         "/library/ui/gadgets/viewports.factor"
         "/library/ui/gadgets/scrolling.factor"

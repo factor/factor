@@ -3,35 +3,33 @@
 IN: gadgets-walker
 USING: arrays errors gadgets gadgets-buttons gadgets-frames
 gadgets-listener gadgets-panes gadgets-scrolling gadgets-text
-gadgets-tiles gadgets-tracks generic hashtables inspector
+gadgets-tracks generic hashtables inspector
 interpreter io kernel kernel-internals listener math models
 namespaces sequences shells threads vectors ;
 
-: <scrolling-tile> ( model quot title -- gadget )
-    >r <pane-control> <scroller> r> f <tile> ;
-
 : <callstack-display> ( model -- )
     [ [ continuation-call callstack. ] when* ]
-    "Call stack" <scrolling-tile> ;
+    "Call stack" <titled-pane> ;
 
 : <datastack-display> ( model -- )
     [ [ continuation-data stack. ] when* ]
-    "Data stack" <scrolling-tile> ;
+    "Data stack" <titled-pane> ;
 
 : <retainstack-display> ( model -- )
     [ [ continuation-retain stack. ] when* ]
-    "Retain stack" <scrolling-tile> ;
+    "Retain stack" <titled-pane> ;
 
 : <namestack-display> ( model -- )
     [ [ continuation-name stack. ] when* ]
-    "Name stack" <scrolling-tile> ;
+    "Name stack" <titled-pane> ;
 
 : <catchstack-display> ( model -- )
     [ [ continuation-catch stack. ] when* ]
-    "Catch stack" <scrolling-tile> ;
+    "Catch stack" <titled-pane> ;
 
 : <quotation-display> ( quot -- gadget )
-    [ [ first2 callframe. ] when* ] <pane-control> <scroller> ;
+    [ [ first2 callframe. ] when* ]
+    "Current quotation" <titled-pane> ;
 
 TUPLE: walker-gadget model quot ns ;
 
