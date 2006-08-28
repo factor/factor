@@ -63,6 +63,8 @@ M: workspace pref-dim* drop { 500 600 } ;
     >r workspace-tabs [ second eq? ] find-with drop r>
     [ get-page ] 2keep control-model set-model ;
 
+: select-tool ( workspace class -- ) swap show-tool drop ;
+
 : find-workspace ( -- workspace )
     [ workspace? ] find-window
     [ world-gadget ] [ workspace-window find-workspace ] if* ;
@@ -76,6 +78,10 @@ M: workspace pref-dim* drop { 500 600 } ;
 
 workspace {
     { f "Keyboard help" T{ key-down f f "F1" } [ commands-window ] }
+    { f "Listener" T{ key-down f f "F2" } [ listener-gadget select-tool ] }
+    { f "Walker" T{ key-down f f "F3" } [ walker-gadget select-tool ] }
+    { f "Dictionary" T{ key-down f f "F4" } [ browser select-tool ] }
+    { f "Documentation" T{ key-down f f "F5" } [ help-gadget select-tool ] }
 } define-commands
 
 V{ } clone operations set-global

@@ -165,11 +165,7 @@ SYMBOL: meta-history
     host-quot [ ] (meta-call) ;
 
 : step-all ( -- )
-    save-interp
-    save-callframe
-    meta-interp get schedule-thread yield
-    meta-c delete-all
-    [ ] (meta-call) ;
+    save-callframe meta-interp get schedule-thread ;
 
 : step-back ( -- )
     meta-history get dup empty? [

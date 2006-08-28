@@ -4,14 +4,12 @@
   space
 - workspace:
   - tool help
-  - selecting walker when no quotation is being walked throws an error
 - new browser:
   - show currently selected vocab & words
   - scroll to existing won't work
   - initial scroll dim is wrong
   - show callers
   - some way to go back/forth between code and docs
-- alternative way to invoke 2/3 buttons on one-button mice using modifiers
 - RT_WORD should refer to XTs not word objects.
 - roundoff is still not quite right with tracks
 - fix top level window positioning
@@ -23,12 +21,12 @@
 - keyboard help persists after clicking on a link
 - grouping commands into categories
 - apropos and help search
-- commands to switch tools
 
 ========================================================================
 
 + ui:
 
+- keyboard help: hide commands whose gestures are shadowed
 - x11.app has a problem with A+ keys
 - status bar showing number of words needing a recompile
 - UI dataflow visualizer
@@ -46,7 +44,6 @@
   - page up/down
   - search and replace
 - slider needs to be modelized
-- closing walker should continue; clicking continue should close walker
 - continuation handling in walker is screwy
 - graphical module manager tool
 - figure out what goes in the .app and what doesn't

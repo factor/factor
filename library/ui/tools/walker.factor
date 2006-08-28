@@ -11,23 +11,23 @@ namespaces sequences shells threads vectors ;
     >r <pane-control> <scroller> r> f <tile> ;
 
 : <callstack-display> ( model -- )
-    [ continuation-call callstack. ]
+    [ [ continuation-call callstack. ] when* ]
     "Call stack" <scrolling-tile> ;
 
 : <datastack-display> ( model -- )
-    [ continuation-data stack. ]
+    [ [ continuation-data stack. ] when* ]
     "Data stack" <scrolling-tile> ;
 
 : <retainstack-display> ( model -- )
-    [ continuation-retain stack. ]
+    [ [ continuation-retain stack. ] when* ]
     "Retain stack" <scrolling-tile> ;
 
 : <namestack-display> ( model -- )
-    [ continuation-name stack. ]
+    [ [ continuation-name stack. ] when* ]
     "Name stack" <scrolling-tile> ;
 
 : <catchstack-display> ( model -- )
-    [ continuation-catch stack. ]
+    [ [ continuation-catch stack. ] when* ]
     "Catch stack" <scrolling-tile> ;
 
 : <quotation-display> ( quot -- gadget )
@@ -43,11 +43,16 @@ TUPLE: walker-gadget model quot ns ;
     swap dup walker-gadget-ns
     [ slip update-stacks ] bind ; inline
 
+: reset-walker ( walker -- )
+    f over set-walker-gadget-ns
+    f over walker-gadget-model set-model
+    f swap walker-gadget-quot set-model ;
+
 : walker-step [ step ] with-walker ;
 : walker-step-in [ step-in ] with-walker ;
 : walker-step-out [ step-out ] with-walker ;
-: walker-step-all [ step-all ] with-walker ;
 : walker-step-back [ step-back ] with-walker ;
+: walker-step-all dup [ step-all ] with-walker reset-walker ;
 
 walker-gadget {
     { f "Step" T{ key-down f f "s" } [ walker-step ] }
