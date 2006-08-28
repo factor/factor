@@ -77,8 +77,8 @@ interactor {
     { f "Evaluate" T{ key-down f f "RETURN" } [ interactor-commit ] }
     { f "History" T{ key-down f { C+ } "h" } [ dup [ interactor-history. ] curry swap interactor-call ] }
     { f "Send EOF" T{ key-down f { C+ } "d" } [ f swap interactor-eval ] }
-    { f "Stack effect" T{ key-down f { C+ } "i" } [ "infer ." quot-action ] }
-    { f "Single step" T{ key-down f { C+ } "w" } [ "walk" quot-action ] }
+    { f "Stack effect" T{ key-down f { C+ A+ } "i" } [ "infer ." quot-action ] }
+    { f "Single step" T{ key-down f { C+ A+ } "w" } [ "walk" quot-action ] }
     { f "See" T{ key-down f { A+ } "s" } [ [ search see ] word-action ] }
     { f "Help" T{ key-down f { A+ } "h" } [ [ search help ] word-action ] }
     { f "Callers" T{ key-down f { A+ } "u" } [ [ search usage. ] word-action ] }

@@ -14,7 +14,7 @@ M: book model-changed ( book -- )
     [ control-model model-value ] keep
     [ gadget-child unparent ] keep
     [ get-page ] keep
-    [ add-gadget ] keep
+    [ control-self add-gadget ] keep
     request-focus ;
 
 C: book ( pages -- book )
