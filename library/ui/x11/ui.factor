@@ -21,28 +21,6 @@ M: world configure-event
     over configured-loc over set-world-loc
     swap configured-dim swap set-gadget-dim ;
 
-: button&loc ( event -- button# loc )
-    dup XButtonEvent-button
-    over XButtonEvent-x
-    rot XButtonEvent-y 2array ;
-
-M: world button-down-event
-    >r button&loc r> send-button-down ;
-
-M: world button-up-event
-    >r button&loc r> send-button-up ;
-
-M: world wheel-event
-    >r button&loc >r 4 = r> r> send-wheel ;
-
-M: world enter-event motion-event ;
-
-M: world leave-event 2drop forget-rollover ;
-
-M: world motion-event
-    >r dup XMotionEvent-x swap XMotionEvent-y 2array r>
-    move-hand fire-motion ;
-
 : modifiers
     {
         { S+ HEX: 1 }
@@ -92,12 +70,16 @@ M: world motion-event
         dup key-codes hash [ ] [ ch>string ] ?if
     ] if ;
 
-: event>gesture ( event quot -- gesture )
-    >r dup XKeyEvent-state modifiers modifier swap key-code
-    r> [ drop f ] if* ; inline
+: event-modifiers XKeyEvent-state modifiers modifier ;
+
+: key-event>gesture ( event -- modifiers gesture )
+    dup event-modifiers swap key-code ;
+
+: key-down-event>gesture ( event -- gesture )
+    key-event>gesture [ <key-down> ] [ drop f ] if* ;
 
 M: world key-down-event
-    world-focus over [ <key-down> ] event>gesture [
+    world-focus over key-down-event>gesture [
         over handle-gesture
         [ swap lookup-string nip swap user-input ] [ 2drop ] if
     ] [
@@ -105,8 +87,38 @@ M: world key-down-event
     ] if* ;
 
 M: world key-up-event
-    world-focus swap [ <key-up> ] event>gesture dup
-    [ swap handle-gesture drop ] [ 2drop ] if ;
+    world-focus swap key-event>gesture dup [
+        <key-up> dup [ swap handle-gesture drop ] [ 2drop ] if
+    ] [
+        2drop
+    ] if ;
+
+: mouse-event-loc ( event -- loc )
+    dup XButtonEvent-x swap XButtonEvent-y 2array ;
+
+: mouse-event>gesture ( event -- modifiers button loc )
+    dup event-modifiers over XButtonEvent-button
+    rot mouse-event-loc ;
+
+M: world button-down-event
+    >r mouse-event>gesture >r <button-down> r> r>
+    send-button-down ;
+
+M: world button-up-event
+    >r mouse-event>gesture >r <button-up> r> r>
+    send-button-up ;
+
+M: world wheel-event
+    >r dup XButtonEvent-button 4 = swap mouse-event-loc r>
+    send-wheel ;
+
+M: world enter-event motion-event ;
+
+M: world leave-event 2drop forget-rollover ;
+
+M: world motion-event
+    >r dup XMotionEvent-x swap XMotionEvent-y 2array r>
+    move-hand fire-motion ;
 
 M: world focus-in-event nip focus-world ;
 
