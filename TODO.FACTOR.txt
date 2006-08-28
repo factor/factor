@@ -11,7 +11,6 @@
   - initial scroll dim is wrong
   - show callers
   - some way to go back/forth between code and docs
-- location saved for articles is the location of the ; not the ARTICLE:
 - alternative way to invoke 2/3 buttons on one-button mice using modifiers
 - RT_WORD should refer to XTs not word objects.
 - roundoff is still not quite right with tracks
@@ -23,6 +22,8 @@
   duplication
 - keyboard help persists after clicking on a link
 - grouping commands into categories
+- apropos and help search
+- commands to switch tools
 
 ========================================================================
 

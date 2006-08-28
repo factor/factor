@@ -9,7 +9,9 @@ USING: arrays help kernel parser sequences syntax words ;
     [ >array set-word-help ] f ; parsing
 
 : !ARTICLE:
+    location
     [
-        >array [ first2 ] keep 2 tail location <article>
+        swap >r >array [ first2 ] keep 2 tail r> <article>
         add-article
-    ] f ; parsing
+    ]
+    f ; parsing

@@ -24,12 +24,12 @@ M: button-up gesture>string
         button-up-# [ " " % # ] when*
     ] "" make ;
 
-M: button-down gesture>string
+M: button-up gesture>string
     [
         dup button-down-mods modifiers>string %
-    ] "" make
-    "Mouse Down" swap button-down-#
-    [ " " swap number>string append3 ] when* ;
+        "Mouse Up" %
+        button-down-# [ " " % # ] when*
+    ] "" make ;
 
 M: object gesture>string drop f ;
 

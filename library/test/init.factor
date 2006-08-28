@@ -3,6 +3,7 @@ USE: namespaces
 USE: test
 USE: kernel
 USE: hashtables
+USE: command-line
 
 [
     [ f ] [ "-no-user-init" cli-arg ] unit-test
