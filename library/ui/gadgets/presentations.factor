@@ -37,9 +37,9 @@ C: presentation ( button object commands -- button )
     find-world [ world-status f swap set-model ] when* ;
 
 presentation H{
-    { T{ button-up f 1 } [ [ 1 invoke-presentation ] if-clicked ] }
-    { T{ button-up f 2 } [ [ 2 invoke-presentation ] if-clicked ] }
-    { T{ button-up f 3 } [ [ 3 invoke-presentation ] if-clicked ] }
+    { T{ button-up f f 1 } [ [ 1 invoke-presentation ] if-clicked ] }
+    { T{ button-up f f 2 } [ [ 2 invoke-presentation ] if-clicked ] }
+    { T{ button-up f f 3 } [ [ 3 invoke-presentation ] if-clicked ] }
     { T{ mouse-leave } [ dup hide-mouse-help button-update ] }
     { T{ mouse-enter } [ dup show-mouse-help button-update ] }
 } set-gestures

@@ -145,13 +145,6 @@ C: titled-gadget ( gadget title -- )
 : pane-window ( quot title -- )
     >r make-pane <scroller> r> open-titled-window ;
 
-: commands-window ( gadget -- )
-    [ commands. ] "Commands" pane-window ;
-
-gadget {
-    { f "Keyboard help" T{ key-down f f "F1" } [ commands-window ] }
-} define-commands
-
 : error-window ( error -- )
     [ print-error ] "Error" pane-window ;
 

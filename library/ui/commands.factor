@@ -10,15 +10,24 @@ M: command equal? eq? ;
 
 GENERIC: gesture>string ( gesture -- string )
 
+: modifiers>string ( modifiers -- string )
+    [ word-name ] map concat >string ;
+
 M: key-down gesture>string
-    dup key-down-mods [ word-name ] map concat >string
+    dup key-down-mods modifiers>string
     swap key-down-sym append ;
 
 M: button-up gesture>string
-    "Mouse Up" swap button-up-#
-    [ " " swap number>string append3 ] when* ;
+    [
+        dup button-up-mods modifiers>string %
+        "Mouse Up" %
+        button-up-# [ " " % # ] when*
+    ] "" make ;
 
 M: button-down gesture>string
+    [
+        dup button-down-mods modifiers>string %
+    ] "" make
     "Mouse Down" swap button-down-#
     [ " " swap number>string append3 ] when* ;
 
@@ -43,12 +52,22 @@ M: object gesture>string drop f ;
     ] make-hash
     hash>alist [ [ first command-name ] 2apply <=> ] sort ;
 
-world {
-    { f "Cut" T{ key-down f { C+ } "x" } [ T{ cut-action } send-action ] }
-    { f "Copy" T{ key-down f { C+ } "c" } [ T{ copy-action } send-action ] }
-    { f "Paste" T{ key-down f { C+ } "v" } [ T{ paste-action } send-action ] }
-    { f "Select all" T{ key-down f { C+ } "a" } [ T{ select-all-action } send-action ] }
-} define-commands
+: resend-button-down ( gesture world -- )
+    hand-loc get-global swap send-button-down ;
+
+: resend-button-up  ( gesture world -- )
+    hand-loc get-global swap send-button-up ;
+
+world H{
+    { T{ key-down f { C+ } "x" } [ T{ cut-action } send-action ] }
+    { T{ key-down f { C+ } "c" } [ T{ copy-action } send-action ] }
+    { T{ key-down f { C+ } "v" } [ T{ paste-action } send-action ] }
+    { T{ key-down f { C+ } "a" } [ T{ select-all-action } send-action ] }
+    { T{ button-down f { C+ } 1 } [ T{ button-down f f 3 } swap resend-button-down ] }
+    { T{ button-down f { A+ } 1 } [ T{ button-down f f 2 } swap resend-button-down ] }
+    { T{ button-up f { C+ } 1 } [ T{ button-up f f 3 } swap resend-button-up ] }
+    { T{ button-up f { A+ } 1 } [ T{ button-up f f 2 } swap resend-button-up ] }
+} set-gestures
 
 SYMBOL: operations
 

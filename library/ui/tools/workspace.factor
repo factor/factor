@@ -1,12 +1,12 @@
 ! Copyright (C) 2006 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-IN: gadgets-workspace
 USING: arrays gadgets gadgets-listener gadgets-buttons
 gadgets-walker gadgets-help gadgets-walker sequences
 gadgets-browser gadgets-books gadgets-frames gadgets-controls
 gadgets-grids gadgets-presentations kernel models namespaces
 styles words help parser inspector memory generic threads
 gadgets-text definitions ;
+IN: gadgets-workspace
 
 GENERIC: call-tool* ( arg tool -- )
 
@@ -69,6 +69,14 @@ M: workspace pref-dim* drop { 500 600 } ;
 
 : call-tool ( arg class -- )
     find-workspace show-tool call-tool* ;
+
+: commands-window ( workspace -- )
+    dup find-world world-focus [ ] [ gadget-child ] ?if
+    [ commands. ] "Commands" pane-window ;
+
+workspace {
+    { f "Keyboard help" T{ key-down f f "F1" } [ commands-window ] }
+} define-commands
 
 V{ } clone operations set-global
 

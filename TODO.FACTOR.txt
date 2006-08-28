@@ -5,13 +5,12 @@
 - workspace:
   - tool help
   - selecting walker when no quotation is being walked throws an error
-  - replacement for call-tool functionality
-  - default size is wrong
 - new browser:
   - show currently selected vocab & words
   - scroll to existing won't work
   - initial scroll dim is wrong
   - show callers
+  - some way to go back/forth between code and docs
 - location saved for articles is the location of the ; not the ARTICLE:
 - alternative way to invoke 2/3 buttons on one-button mice using modifiers
 - RT_WORD should refer to XTs not word objects.
@@ -19,6 +18,11 @@
 - fix top level window positioning
 - signal 4 on datastack underflow on mac intel??
 - new section in cookbook: philosophy
+- help gadget should not re-render every time it is grafted
+- clean up interactor and listener commands -- there is a lot of
+  duplication
+- keyboard help persists after clicking on a link
+- grouping commands into categories
 
 ========================================================================
 
@@ -33,6 +37,13 @@
   - only redraw visible lines
   - more efficient multi-line inserts
   - editor should support stream output protocol
+  - s+click
+  - double/triple click
+  - autoscroll
+  - undo and redo
+  - transpose char/word/line
+  - page up/down
+  - search and replace
 - slider needs to be modelized
 - closing walker should continue; clicking continue should close walker
 - continuation handling in walker is screwy
@@ -48,12 +59,6 @@
     that type, cycle
 - support x11's large selections, if needed
 - own-selection violates ICCCM
-- editor:
-  - undo and redo
-  - transpose char/word/line
-  - autoscroll
-  - page up/down
-  - search and replace
 - cocoa: windows are not updated while resizing
 - grid slows down with 2000 lines
 - ui uses too much cpu time idling

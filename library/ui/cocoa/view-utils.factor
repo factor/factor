@@ -29,9 +29,6 @@ opengl sequences ;
     #! Cocoa -> Factor UI button mapping
     -> buttonNumber H{ { 0 1 } { 2 2 } { 1 3 } } hash ;
 
-: button&loc ( view event -- button# loc )
-    dup button -rot mouse-location ;
-
 : modifiers
     {
         { S+ HEX: 20000 }
@@ -70,11 +67,14 @@ opengl sequences ;
     dup -> keyCode key-codes hash
     [ ] [ -> charactersIgnoringModifiers CF>string ] ?if ;
 
-: event>gesture ( event -- modifiers keycode )
-    dup -> modifierFlags modifiers modifier swap key-code ;
+: event-modifiers ( event -- modifiers )
+    -> modifierFlags modifiers modifier ;
+
+: key-event>gesture ( event -- modifiers keycode )
+    dup event-modifiers swap key-code ;
 
 : send-key-event ( view event quot -- ? )
-    >r event>gesture r> call swap window-focus
+    >r key-event>gesture r> call swap window-focus
     handle-gesture ; inline
 
 : send-user-input ( view event -- )
@@ -87,11 +87,16 @@ opengl sequences ;
 : send-key-up-event ( view event -- )
     [ <key-up> ] send-key-event drop ;
 
+: mouse-event>gesture ( event -- modifiers button )
+    dup event-modifiers swap button ;
+
 : send-button-down$ ( view event -- )
-    over >r button&loc r> window send-button-down ;
+    [ mouse-event>gesture <button-down> ] 2keep
+    mouse-location rot window send-button-down ;
 
 : send-button-up$ ( view event -- )
-    over >r button&loc r> window send-button-up ;
+    [ mouse-event>gesture <button-up> ] 2keep
+    mouse-location rot window send-button-up ;
 
 : send-wheel$ ( view event -- )
     [ -> deltaY 0 > ] 2keep mouse-location

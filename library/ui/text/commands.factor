@@ -72,7 +72,7 @@ editor {
     { f "Focus editor" T{ gain-focus } [ focus-editor ] }
     { f "Unfocus editor" T{ lose-focus } [ unfocus-editor ] }
     { f "Paste" T{ paste-action } [ clipboard get paste-clipboard ] }
-    { f "Paste selection" T{ button-up f 2 } [ selection get paste-clipboard ] }
+    { f "Paste selection" T{ button-up f f 2 } [ selection get paste-clipboard ] }
     { f "Copy" T{ copy-action } [ clipboard get editor-copy ] }
     { f "Copy selection" T{ button-up } [ selection get editor-copy ] }
     { f "Cut" T{ cut-action } [ clipboard get editor-cut ] }
