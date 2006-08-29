@@ -98,7 +98,7 @@ END-STRUCT
 : sqlite3_open ( filename sqlite3-indirect -- result )
   "int" "sqlite" "sqlite3_open" [ "char*" "sqlite3-indirect*" ] alien-invoke ; 
 
-: sqlite3_close ( db -- )
+: sqlite3_close ( db -- result )
   "int" "sqlite" "sqlite3_close" [ "sqlite3*" ] alien-invoke ; 
 
 : sqlite3_prepare ( db sql sql-len sqlite3-stmt-indirect tail -- result )
@@ -113,7 +113,7 @@ END-STRUCT
 : sqlite3_step ( stmt -- result )
   "int" "sqlite" "sqlite3_step" [ "sqlite3-stmt*" ] alien-invoke ; 
 
-: sqlite3_last_insert_rowid ( stmt index int -- result )
+: sqlite3_last_insert_rowid ( stmt -- result )
   "int" "sqlite" "sqlite3_last_insert_rowid" [ "sqlite3*" ] alien-invoke ; 
 
 : sqlite3_bind_blob ( stmt index pointer len destructor -- result )
@@ -249,12 +249,14 @@ END-STRUCT
 ! [ 2dup 2slip ]
 ! [ ] linrec ; 
 
+DEFER: (sqlite-map)
+
 : (sqlite-map) ( statement quot seq -- )    
   pick sqlite3_step step-complete? [ 
     2nip
   ] [
     >r 2dup call r> curry (sqlite-map)
-  ] if ;
+  ] if ; 
 
-: sqlite-map ( statement quot -- )
+: sqlite-map ( statement quot -- seq )
   [ ] (sqlite-map) ;
