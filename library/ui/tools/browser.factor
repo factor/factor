@@ -44,16 +44,14 @@ TUPLE: tile definition gadget ;
     } [ first2 \ find-tile add* <bevel-button> ] map
     make-shelf ;
 
-: tile-theme ( gadget -- )
-    { 5 5 } over set-grid-gap faint-boundary ;
+: <tile-content> ( definition -- gadget )
+    [ see ] make-pane <tile-toolbar> 2array
+    make-pile { 5 5 } over set-pack-gap
+    <default-border> dup faint-boundary ;
 
 C: tile ( definition -- gadget )
     [ set-tile-definition ] 2keep
-    {
-        { [ <tile-toolbar> ] f f @top }
-        { [ [ see ] make-pane ] f f @center }
-    } make-frame*
-    dup tile-theme ;
+    [ >r <tile-content> r> set-gadget-delegate ] keep ;
 
 : show-definition ( definition definitions -- )
     2dup definition-index dup 0 >= [

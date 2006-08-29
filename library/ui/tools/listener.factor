@@ -25,20 +25,21 @@ TUPLE: listener-gadget input output stack ;
     [ >r clear r> init-namespaces listener-thread ] in-thread
     drop ;
 
-: <titled-pane> ( model quot title -- gadget )
+: <labelled-gadget> ( gadget title -- gadget )
     {
         { [ <label> dup reverse-video-theme ] f f @top }
-        { [ <pane-control> <scroller> ] f f @center }
-    } make-frame* ;
+        { [ ] f f @center }
+    } make-frame ;
 
-: <stack-tile> ( model title -- gadget )
-    [ stack. ] swap <titled-pane> ;
+: <labelled-pane> ( model quot title -- gadget )
+    >r <pane-control> <scroller> r> <labelled-gadget> ;
 
 : <listener-input> ( -- gadget )
     gadget get listener-gadget-output <interactor> ;
 
 : <stack-display> ( -- gadget )
-    gadget get listener-gadget-stack "Stack" <stack-tile> ;
+    gadget get listener-gadget-stack
+    [ stack. ] "Stack" <labelled-pane> ;
 
 : init-listener ( listener -- )
     f <model> swap set-listener-gadget-stack ;
@@ -47,7 +48,7 @@ C: listener-gadget ( -- gadget )
     dup init-listener {
         { [ <scrolling-pane> ] set-listener-gadget-output [ <scroller> ] 4/6 }
         { [ <stack-display> ] f f 1/6 }
-        { [ <listener-input> ] set-listener-gadget-input [ <scroller> ] 1/6 }
+        { [ <listener-input> ] set-listener-gadget-input [ <scroller> "Input" <labelled-gadget> ] 1/6 }
     } { 0 1 } make-track* dup start-listener ;
 
 M: listener-gadget focusable-child*

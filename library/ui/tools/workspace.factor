@@ -40,7 +40,7 @@ C: workspace ( -- workspace )
     over set-gadget-delegate
     dup dup set-control-self ;
 
-M: workspace pref-dim* delegate pref-dim* { 550 650 } vmax ;
+M: workspace pref-dim* delegate pref-dim* { 500 650 } vmax ;
 
 : <workspace-tabs> ( book -- tabs )
     control-model

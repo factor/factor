@@ -4,8 +4,6 @@
   - show currently selected vocab & words
   - scroll to existing won't work
   - initial scroll dim is wrong
-  - show callers
-  - some way to go back/forth between code and docs
 - RT_WORD should refer to XTs not word objects.
 - roundoff is still not quite right with tracks
 - signal 4 on datastack underflow on mac intel??
@@ -13,6 +11,7 @@
 - help gadget should not re-render every time it is grafted
 - apropos and help search
 - alien-indirect
+- operations + tile commands + listener word commands = new abstraction
 
 ========================================================================
 

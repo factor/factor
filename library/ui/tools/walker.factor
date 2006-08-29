@@ -9,27 +9,27 @@ namespaces sequences shells threads vectors ;
 
 : <callstack-display> ( model -- )
     [ [ continuation-call callstack. ] when* ]
-    "Call stack" <titled-pane> ;
+    "Call stack" <labelled-pane> ;
 
 : <datastack-display> ( model -- )
     [ [ continuation-data stack. ] when* ]
-    "Data stack" <titled-pane> ;
+    "Data stack" <labelled-pane> ;
 
 : <retainstack-display> ( model -- )
     [ [ continuation-retain stack. ] when* ]
-    "Retain stack" <titled-pane> ;
+    "Retain stack" <labelled-pane> ;
 
 : <namestack-display> ( model -- )
     [ [ continuation-name stack. ] when* ]
-    "Name stack" <titled-pane> ;
+    "Name stack" <labelled-pane> ;
 
 : <catchstack-display> ( model -- )
     [ [ continuation-catch stack. ] when* ]
-    "Catch stack" <titled-pane> ;
+    "Catch stack" <labelled-pane> ;
 
 : <quotation-display> ( quot -- gadget )
     [ [ first2 callframe. ] when* ]
-    "Current quotation" <titled-pane> ;
+    "Current quotation" <labelled-pane> ;
 
 TUPLE: walker-gadget model quot ns ;
 
