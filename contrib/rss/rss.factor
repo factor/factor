@@ -1,6 +1,5 @@
 ! Copyright (C) 2006 Chris Double.
 ! See http://factorcode.org/license.txt for BSD license.
-REQUIRES: httpd ;
 IN: rss
 USING: kernel http-client sequences namespaces math errors io ;
 
@@ -10,8 +9,8 @@ USING: kernel http-client sequences namespaces math errors io ;
     drop % 2drop
   ] [ 
     dup    ( str1 str2 string n n-1 )
-    pick head % ( str1 str2 string n )
-    >r pick length r> + swap tail ( str1 str2 tail )
+    pick swap head % ( str1 str2 string n )
+    >r pick length r> + tail ( str1 str2 tail )
     over % (replace)     
   ] if ;
   
@@ -106,6 +105,3 @@ TUPLE: rss-entry title link description pub-date ;
   ] [
     2drop "Error retrieving rss file" throw
   ] if ;
-
-
-PROVIDE: rss ;
