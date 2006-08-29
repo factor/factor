@@ -1,25 +1,5 @@
 ! Copyright (C) 2005 Chris Double.
-! 
-! Redistribution and use in source and binary forms, with or without
-! modification, are permitted provided that the following conditions are met:
-! 
-! 1. Redistributions of source code must retain the above copyright notice,
-!    this list of conditions and the following disclaimer.
-! 
-! 2. Redistributions in binary form must reproduce the above copyright notice,
-!    this list of conditions and the following disclaimer in the documentation
-!    and/or other materials provided with the distribution.
-! 
-! THIS SOFTWARE IS PROVIDED ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES,
-! INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND
-! FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
-! DEVELOPERS AND CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
-! SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
-! PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS;
-! OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
-! WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
-! OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
-! ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+! See http://factorcode.org/license.txt for BSD license.
 !
 ! An interface to the sqlite database. Tested against sqlite v3.0.8.
 ! Remeber to pass the following to factor:
@@ -188,7 +168,7 @@ END-STRUCT
   "char*-indirect" <c-object> sqlite3_prepare sqlite-check-result
   r> sqlite3-stmt-indirect-pointer ;
 
-: sqlite-bind-text ( statement col text -- )
+: sqlite-bind-text ( statement index text -- )
   #! Bind the text to the parameterized value in the statement.  
   dup length SQLITE_TRANSIENT sqlite3_bind_text sqlite-check-result ;
 
@@ -214,7 +194,7 @@ END-STRUCT
   #! columns in each row of the result set of that statement.
   sqlite3_column_count ;
 
-: column-text ( statement column -- string )
+: column-text ( statement index -- string )
   #! Return the value of the given column, indexed
   #! from zero, as a string.
   sqlite3_column_text ;
