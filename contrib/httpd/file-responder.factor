@@ -1,20 +1,22 @@
 ! Copyright (C) 2004, 2006 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 IN: file-responder
-USING: embedded errors html httpd io kernel math namespaces parser
+USING: calendar embedded errors html httpd io kernel math namespaces parser
 sequences strings ;
 
 : serving-path ( filename -- filename )
     [ "" ] unless* "doc-root" get swap append ;
 
-: file-response ( mime-type length -- )
+: file-response ( filename mime-type length -- )
     [
         number>string "Content-Length" set
         "Content-Type" set
+        stat fourth unix>gmt timestamp>http-string "Last-Modified" set
+        now timestamp>http-string "Date" set
     ] make-hash "200 OK" response terpri ;
 
 : serve-static ( filename mime-type -- )
-    over file-length file-response  "method" get "head" = [
+    dupd pick file-length file-response "method" get "head" = [
         drop
     ] [
         <file-reader> stdio get stream-copy
