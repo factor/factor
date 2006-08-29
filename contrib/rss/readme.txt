@@ -14,14 +14,9 @@ somewhere:
 Replacing "libsqlite3.so" with the path to the sqlite shared library
 or DLL. I put this in my ~/.factor-rc.
 
-Before running the RSS reader web application you need to create the
-history database in the same directory as the 'f' executable. Create
-it with:
-
-  sqlite3 history.db
-  > create table rss (url text, title text, link text, primary key (url));
-  > create table entries (url text, link text, title text, description text, pubdate text, primary key(url, link));
-  > [eof]
+The RSS reader web application creates a database file called
+'rss-reader.db' in the same directory as the Factor executable when
+first started. This database contains all the feed information.
 
 To load the web application use:
 

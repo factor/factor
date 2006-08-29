@@ -9,20 +9,36 @@
 !   > [eof]
 !
 IN: rss
-USING: kernel html cont-responder namespaces sequences io hashtables sqlite errors ;
+USING: kernel html cont-responder namespaces sequences io hashtables sqlite errors tuple-db ;
    
-SYMBOL: feeds
+TUPLE: reader-feed url title link ;
+TUPLE: reader-entry url link title description pubdate ;
 
-: init-feeds ( -- )
-  V{ } clone feeds set-global ;
+reader-feed default-mapping set-mapping
+reader-entry default-mapping set-mapping
+
+SYMBOL: db
+
+: init-db ( -- )
+  db get-global [ sqlite-close ] when*
+  "rss-reader.db" exists? [
+    "rss-reader.db" sqlite-open db set-global
+  ] [
+    "rss-reader.db" sqlite-open dup db set-global
+    dup reader-feed create-tuple-table
+    reader-entry create-tuple-table
+  ] if ;
 
 : add-feed ( url -- )
-  feeds get push ;
+  "" "" <reader-feed> db get swap insert-tuple ;
 
 : remove-feed ( url -- )
-  feeds get remove feeds set-global ;
+  f f <reader-feed> db get swap find-tuples [ db get swap delete-tuple ] each ;
 
-: get-feed ( -- url )
+: all-urls ( -- urls )
+  f f f <reader-feed> db get swap find-tuples [ reader-feed-url ] map ;
+
+: ask-for-url ( -- url )
   [
     <html>
       <head> <title> "Enter a Feed URL" write </title> </head>
@@ -36,27 +52,18 @@ SYMBOL: feeds
     </html>
   ] show "url" swap hash ;
 
-: get-entries ( url -- )
-  "history.db" sqlite-open  ( db )
-  "select * from entries where url='" rot append "'" append dupd sqlite-prepare ( db stmt )
-  [ [ [ 2 column-text ] keep 
-      [ 1 column-text ] keep 
-      [ 3 column-text ] keep 
-      4 column-text <rss-entry>
-    ] sqlite-map 
-  ] keep
-  sqlite-finalize
-  swap sqlite-close ;  
+: get-entries ( url -- entries )
+  f f f f <reader-entry> db get swap find-tuples ;
   
-: view-entries ( url -- )
+: display-entries ( url -- )
   [
     <html> 
       <head> <title> "View entries for " write over write </title> </head>
       <body>
         swap get-entries [
-         <h2> dup rss-entry-title write </h2>
+         <h2> dup reader-entry-title write </h2>
          <p>
-           rss-entry-description write
+           reader-entry-description write
          </p>        
         ] each        
         <p> <a =href a> "Back" write </a> </p>
@@ -64,54 +71,28 @@ SYMBOL: feeds
     </html>
   ] show 2drop ;
 
-: rss-delete-statement ( url -- string )
-  [
-    "delete from rss where url='" % % "';" % ] "" make ;
+: rss>reader-feed ( url rss -- reader-feed )
+  [ rss-title ] keep rss-link <reader-feed> ;   
 
-: rss-insert-statement ( url rss -- string )
-  [
-    "insert into rss values('" % swap % "','" %
-    [ rss-title "'" "''" rot replace % "','" % ] keep
-    rss-link % "');" %   
-  ] "" make ;
+: rss-entry>reader-entry ( url entry -- reader-entry )
+  [ rss-entry-link ] keep
+  [ rss-entry-title ] keep
+  [ rss-entry-description ] keep
+  rss-entry-pub-date 
+  <reader-entry> ;
 
-: entry-delete-statement ( url entry -- string )
-  [    
-    "delete from entries where url='" % swap % "' and link='" %
-    rss-entry-link "'" "''" rot replace % "';" % 
-  ] "" make ;
-
-: entry-insert-statement ( url entry -- string )
-  [    
-    "insert into entries values('" % swap % "','" %
-    [ rss-entry-link "'" "''" rot replace % "','" % ] keep
-    [ rss-entry-title "'" "''" rot replace % "','" % ] keep
-    [ rss-entry-description "'" "''" rot replace % "','" % ] keep
-    rss-entry-pub-date "'" "''" rot replace % "');" %   
-  ] "" make ;
-  
-: do-update ( string -- )
-  "history.db" sqlite-open  ( db )
-  dup rot sqlite-prepare [ [ drop ] sqlite-each ] keep
-  sqlite-finalize
-  sqlite-close ;
-
-: update-feed-database ( url rss -- )
-  over rss-delete-statement do-update
-  2dup rss-insert-statement do-update ( url rss - )
-  rss-entries [ ( url entry )
-    2dup entry-delete-statement do-update
-    entry-insert-statement do-update
+: update-feed-database ( url -- )
+  dup remove-feed
+  dup rss-get 
+  2dup rss>reader-feed db get swap save-tuple
+  rss-entries [
+    dupd rss-entry>reader-entry
+    dup >r reader-entry-link f f f <reader-entry> db get swap find-tuples [ db get swap delete-tuple ] each r>
+    db get swap save-tuple
   ] each-with ;
 
 : update-feeds ( seq -- )
-  [
-    [
-      dup rss-get
-    ] catch [
-      update-feed-database
-    ] unless 
-  ] each 
+  [ update-feed-database ] each
   [
     <html>
       <head> <title> "Feeds Updated" write </title> </head>
@@ -129,22 +110,19 @@ SYMBOL: feeds
       <body>
 	<p>
           <table "1" =border table>
-            feeds get [
+            all-urls [
               <tr> 
                 <td> dup write </td>
                 <td> dup [ remove-feed ] curry "Remove" swap quot-href </td>
-                <td> [ view-entries ] curry "Database" swap quot-href </td>
+                <td> [ display-entries ] curry "Database" swap quot-href </td>
               </tr>
             ] each
           </table>
         </p>
-        <p> "Add Feed" [ get-feed add-feed ] quot-href </p>
-        <p> "Update Feeds" [ feeds get update-feeds ] quot-href </p>
+        <p> "Add Feed" [ ask-for-url add-feed ] quot-href </p>
+        <p> "Update Feeds" [ all-urls update-feeds ] quot-href </p>
       </body>
     </html>
   ] show-final ;
 
-init-feeds
-
-
-"maintain-feeds" [ maintain-feeds ] install-cont-responder
+"maintain-feeds" [ init-db maintain-feeds ] install-cont-responder
