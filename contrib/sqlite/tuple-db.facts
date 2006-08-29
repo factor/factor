@@ -2,55 +2,6 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: help sqlite tuple-db ;
 
-HELP: default-mapping 
-{ $values { "class" "symbol for the tuple class" } 
-          { "mapping" "a mapping object" } 
-}
-{ $description "Given a tuple class, create a default mappings object. This is used to associate field names in the tuple with SQL statement field names, etc." } 
-{ $see-also { "sqlite" "tuple-db" } set-mapping } ;
-
-HELP: set-mapping 
-{ $values { "mapping" "a mapping object" } 
-}
-{ $description "Store a database mapping so that the tuple-db system knows how to store instances of the tuple in the database." } 
-{ $see-also { "sqlite" "tuple-db" } default-mapping } ;
-
-HELP: create-tuple-table
-{ $values { "db" "a database object" } { "class" "symbol for the tuple class" }
-}
-{ $description "Create the database table to store intances of the given tuple." } 
-{ $see-also { "sqlite" "tuple-db" } default-mapping get-mapping } ;
-
-HELP: insert-tuple
-{ $values { "db" "a database object" } { "tuple" "an instance of a tuple" }
-}
-{ $description "Insert the tuple instance into the database. It is assumed that this tuple does not currently exist in the database." } 
-{ $see-also { "sqlite" "tuple-db" } insert-tuple update-tuple find-tuples delete-tuple save-tuple } ;
-
-HELP: find-tuples
-{ $values { "db" "a database object" } { "tuple" "an instance of a tuple" }
-}
-{ $description "Return a sequence of all tuples in the database that match the tuple provided as a template. All fields in the tuple must match the entries in the database, except for those set to 'f'." } 
-{ $see-also { "sqlite" "tuple-db" } insert-tuple update-tuple find-tuples delete-tuple save-tuple } ;
-
-HELP: update-tuple
-{ $values { "db" "a database object" } { "tuple" "an instance of a tuple" }
-}
-{ $description "Update the database record for this tuple instance. The tuple must have previously been obtained from the database, or inserted into it. It must have a delegate of 'persistent' with the key field set (which is done by the find and insert operations)." } 
-{ $see-also { "sqlite" "tuple-db" } insert-tuple update-tuple find-tuples delete-tuple save-tuple } ;
-
-HELP: save-tuple
-{ $values { "db" "a database object" } { "tuple" "an instance of a tuple" }
-}
-{ $description "Insert or Update the tuple instance depending on whether it has a persistent delegate." } 
-{ $see-also { "sqlite" "tuple-db" } insert-tuple update-tuple find-tuples delete-tuple save-tuple } ;
-
-HELP: delete-tuple
-{ $values { "db" "a database object" } { "tuple" "an instance of a tuple" }
-}
-{ $description "Delete this tuple instance from the database. The tuple must have previously been obtained from the database, or inserted into it. It must have a delegate of 'persistent' with the key field set (which is done by the find and insert operations)." } 
-{ $see-also { "sqlite" "tuple-db" } insert-tuple update-tuple find-tuples delete-tuple save-tuple } ;
-
 ARTICLE: { "sqlite" "tuple-db-loading" } "Loading"
 "The quickest way to get up and running with this library is to load it as a module:"
 { $code "\"sqlite\" require\nUSE: sqlite\nUSE: tuple-db\n" } 
@@ -128,3 +79,51 @@ $terpri
 { $subsection { "sqlite" "tuple-db-closing" } } 
 ;
 
+HELP: default-mapping 
+{ $values { "class" "symbol for the tuple class" } 
+          { "mapping" "a mapping object" } 
+}
+{ $description "Given a tuple class, create a default mappings object. This is used to associate field names in the tuple with SQL statement field names, etc." } 
+{ $see-also { "sqlite" "tuple-db" } set-mapping } ;
+
+HELP: set-mapping 
+{ $values { "mapping" "a mapping object" } 
+}
+{ $description "Store a database mapping so that the tuple-db system knows how to store instances of the tuple in the database." } 
+{ $see-also { "sqlite" "tuple-db" } default-mapping } ;
+
+HELP: create-tuple-table
+{ $values { "db" "a database object" } { "class" "symbol for the tuple class" }
+}
+{ $description "Create the database table to store intances of the given tuple." } 
+{ $see-also { "sqlite" "tuple-db" } default-mapping get-mapping } ;
+
+HELP: insert-tuple
+{ $values { "db" "a database object" } { "tuple" "an instance of a tuple" }
+}
+{ $description "Insert the tuple instance into the database. It is assumed that this tuple does not currently exist in the database." } 
+{ $see-also { "sqlite" "tuple-db" } insert-tuple update-tuple find-tuples delete-tuple save-tuple } ;
+
+HELP: find-tuples
+{ $values { "db" "a database object" } { "tuple" "an instance of a tuple" }
+}
+{ $description "Return a sequence of all tuples in the database that match the tuple provided as a template. All fields in the tuple must match the entries in the database, except for those set to 'f'." } 
+{ $see-also { "sqlite" "tuple-db" } insert-tuple update-tuple find-tuples delete-tuple save-tuple } ;
+
+HELP: update-tuple
+{ $values { "db" "a database object" } { "tuple" "an instance of a tuple" }
+}
+{ $description "Update the database record for this tuple instance. The tuple must have previously been obtained from the database, or inserted into it. It must have a delegate of 'persistent' with the key field set (which is done by the find and insert operations)." } 
+{ $see-also { "sqlite" "tuple-db" } insert-tuple update-tuple find-tuples delete-tuple save-tuple } ;
+
+HELP: save-tuple
+{ $values { "db" "a database object" } { "tuple" "an instance of a tuple" }
+}
+{ $description "Insert or Update the tuple instance depending on whether it has a persistent delegate." } 
+{ $see-also { "sqlite" "tuple-db" } insert-tuple update-tuple find-tuples delete-tuple save-tuple } ;
+
+HELP: delete-tuple
+{ $values { "db" "a database object" } { "tuple" "an instance of a tuple" }
+}
+{ $description "Delete this tuple instance from the database. The tuple must have previously been obtained from the database, or inserted into it. It must have a delegate of 'persistent' with the key field set (which is done by the find and insert operations)." } 
+{ $see-also { "sqlite" "tuple-db" } insert-tuple update-tuple find-tuples delete-tuple save-tuple } ;
