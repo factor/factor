@@ -1,3 +1,5 @@
+! Copyright (C) 2006 Chris Double.
+! See http://factorcode.org/license.txt for BSD license.
 REQUIRES: httpd ;
 IN: rss
 USING: kernel http-client sequences namespaces math errors io ;
