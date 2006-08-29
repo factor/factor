@@ -200,9 +200,15 @@ M: number +second ( timestamp n -- timestamp )
 : >gmt ( timestamp -- timestamp )
     0 convert-timezone ;
 
+: unix-1970
+    1970 1 1 0 0 0 0 <timestamp> ;
+
+: unix>gmt ( n -- timestamp )
+    unix-1970 swap seconds +dt ; 
+
 : gmt ( -- timestamp )
     #! GMT time, right now
-    1970 1 1 0 0 0 0 <timestamp> millis 1000 /f seconds +dt ; 
+    unix-1970 millis 1000 /f seconds +dt ; 
 
 : timestamp- ( timestamp timestamp -- dt )
     [ >gmt time>array ] 2apply v- array>dt ;
