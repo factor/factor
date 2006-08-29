@@ -11,7 +11,7 @@ sequences strings ;
     [
         number>string "Content-Length" set
         "Content-Type" set
-        stat fourth unix>gmt timestamp>http-string "Last-Modified" set
+        stat [ fourth unix>gmt timestamp>http-string "Last-Modified" set ] when*
         now timestamp>http-string "Date" set
     ] make-hash "200 OK" response terpri ;
 
