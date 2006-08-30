@@ -88,6 +88,9 @@ M: array (serialize)
 M: vector (serialize)
 	"v" (serialize-seq) ;
 
+M: quotation (serialize)
+	"q" (serialize-seq) ;
+
 M: hashtable (serialize)
 	dup object-id [
 	  "o" write (serialize) 2drop
@@ -101,6 +104,10 @@ M: word (serialize)
 	"w" write
 	dup word-name (serialize)
 	word-vocabulary (serialize) ;
+
+M: wrapper (serialize)
+	"W" write
+	wrapped (serialize) ;
 
 DEFER: (deserialize)
 
@@ -125,6 +132,9 @@ DEFER: (deserialize)
 : deserialize-word
 	(deserialize) dup (deserialize) lookup dup [ nip ] [ "Unknown word" throw ] if ;
 
+: deserialize-wrapper
+	(deserialize) <wrapper> ;
+
 : deserialize-array ( -- array )
   (deserialize)     
   [ 
@@ -139,6 +149,14 @@ DEFER: (deserialize)
     (deserialize) 
     [ (deserialize) , ] repeat 
   ] V{ } make 
+  [ swap serialized get set-nth ] keep ;
+
+: deserialize-quotation ( -- array )
+  (deserialize)     
+  [ 
+    (deserialize) 
+    [ (deserialize) , ] repeat 
+  ] [ ] make 
   [ swap serialized get set-nth ] keep ;
 
 : deserialize-hashtable ( -- array )
@@ -157,9 +175,11 @@ DEFER: (deserialize)
 	   { "c" deserialize-complex }
 	   { "b" deserialize-bignum }
 	   { "w" deserialize-word }
+	   { "W" deserialize-wrapper }
 	   { "n" deserialize-false }
 	   { "a" deserialize-array }
 	   { "v" deserialize-vector }
+	   { "q" deserialize-quotation }
 	   { "h" deserialize-hashtable }
 	   { "o" deserialize-unknown }
 	 }
