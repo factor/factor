@@ -24,15 +24,15 @@ SYMBOL: serialized
 USE: prettyprint 
 
 ! Serialize object
-GENERIC: (serialize)  ( obj -- )
+GENERIC: serialize  ( obj -- )
 
 : serialize-shared ( obj quot -- )
-  >r dup object-id [ "o" write (serialize) drop ] r> if* ; inline
+  >r dup object-id [ "o" write serialize drop ] r> if* ; inline
 
-M: f (serialize) ( obj -- )
+M: f serialize ( obj -- )
   drop "n" write ;
 
-M: fixnum (serialize) ( obj -- )
+M: fixnum serialize ( obj -- )
   ! Factor may use 64 bit fixnums on such systems
   "f" write
   4 >be write ;
@@ -40,85 +40,85 @@ M: fixnum (serialize) ( obj -- )
 : bytes-needed ( bignum -- int )
   log2 8 + 8 / floor ;
 
-M: bignum (serialize) ( obj -- )
+M: bignum serialize ( obj -- )
   "b" write
-  dup bytes-needed (serialize)
+  dup bytes-needed serialize
   dup bytes-needed >be write ;
 
-M: float (serialize) ( obj -- )
+M: float serialize ( obj -- )
   "F" write
-  float>bits (serialize) ;
+  float>bits serialize ;
 
-M: complex (serialize) ( obj -- )
+M: complex serialize ( obj -- )
   [
     "c" write
-    dup add-object (serialize)
-    dup real (serialize)
-    imaginary (serialize) 
+    dup add-object serialize
+    dup real serialize
+    imaginary serialize 
   ] serialize-shared ;
 
-M: ratio (serialize) ( obj -- )
+M: ratio serialize ( obj -- )
   "r" write
-  dup numerator (serialize)
-  denominator (serialize) ;
+  dup numerator serialize
+  denominator serialize ;
 
-M: string (serialize) ( obj -- )
+M: string serialize ( obj -- )
   [
     "s" write
-    dup add-object (serialize)
-    dup length (serialize)
+    dup add-object serialize
+    dup length serialize
     write 
   ] serialize-shared ;
 
-M: object (serialize) ( obj -- )
+M: object serialize ( obj -- )
   class word-name "Don't know to serialize a " swap append throw ;
 
-M: sbuf (serialize) ( obj -- )
+M: sbuf serialize ( obj -- )
   "S" write 
-  dup length (serialize)
-  [ (serialize) ] each ;
+  dup length serialize
+  [ serialize ] each ;
 
-: (serialize-seq) ( seq code -- )
+: serialize-seq ( seq code -- )
   swap [ 
     over write
-    dup add-object (serialize)
-    dup length (serialize)
-    [ (serialize) ] each
+    dup add-object serialize
+    dup length serialize
+    [ serialize ] each
   ] serialize-shared drop ;
 
-M: tuple (serialize) ( obj -- )
+M: tuple serialize ( obj -- )
   [
     "t" write 
-    dup add-object (serialize)
-    tuple>array (serialize) 
+    dup add-object serialize
+    tuple>array serialize 
   ] serialize-shared ;
 
-M: array (serialize) ( obj -- )
-  "a" (serialize-seq) ;
+M: array serialize ( obj -- )
+  "a" serialize-seq ;
 
-M: vector (serialize) ( obj -- )
-  "v" (serialize-seq) ;
+M: vector serialize ( obj -- )
+  "v" serialize-seq ;
 
-M: quotation (serialize) ( obj -- )
-  "q" (serialize-seq) ;
+M: quotation serialize ( obj -- )
+  "q" serialize-seq ;
 
-M: hashtable (serialize) ( obj -- )
+M: hashtable serialize ( obj -- )
   [
     "h" write
-    dup add-object (serialize)
-    hash>alist (serialize)
+    dup add-object serialize
+    hash>alist serialize
   ] serialize-shared ;
 
-M: word (serialize) ( obj -- )
+M: word serialize ( obj -- )
   "w" write
-  dup word-name (serialize)
-  word-vocabulary (serialize) ;
+  dup word-name serialize
+  word-vocabulary serialize ;
 
-M: wrapper (serialize) ( obj -- )
+M: wrapper serialize ( obj -- )
   "W" write
-  wrapped (serialize) ;
+  wrapped serialize ;
 
-DEFER: (deserialize) ( -- obj )
+DEFER: deserialize ( -- obj )
 
 : intern-object ( id obj -- )
   swap serialized get set-nth ;
@@ -130,59 +130,62 @@ DEFER: (deserialize) ( -- obj )
   4 read be> ;
 
 : deserialize-string ( -- string )
-  (deserialize) (deserialize) read [ intern-object ] keep ;
+  deserialize deserialize read [ intern-object ] keep ;
 
 : deserialize-ratio ( -- ratio )
-  (deserialize) (deserialize) / ;
+  deserialize deserialize / ;
 
 : deserialize-complex ( -- complex )
-  (deserialize) (deserialize) (deserialize) rect> [ intern-object ] keep ;
+  deserialize deserialize deserialize rect> [ intern-object ] keep ;
 
 : deserialize-bignum ( -- bignum )
-  (deserialize) read be> ;
+  deserialize read be> ;
+
+: deserialize-float ( -- float )
+  deserialize bits>float ;
 
 : deserialize-word ( -- word )
-  (deserialize) dup (deserialize) lookup dup [ nip ] [ "Unknown word" throw ] if ;
+  deserialize dup deserialize lookup dup [ nip ] [ "Unknown word" throw ] if ;
 
 : deserialize-wrapper ( -- wrapper )
-  (deserialize) <wrapper> ;
+  deserialize <wrapper> ;
 
 : deserialize-array ( -- array )
-  (deserialize)     
+  deserialize     
   [ 
-    (deserialize) 
-    [ (deserialize) , ] repeat 
+    deserialize 
+    [ deserialize , ] repeat 
   ] { } make 
   [ intern-object ] keep ;
 
 : deserialize-vector ( -- array )
-  (deserialize)     
+  deserialize     
   [ 
-    (deserialize) 
-    [ (deserialize) , ] repeat 
+    deserialize 
+    [ deserialize , ] repeat 
   ] V{ } make 
   [ intern-object ] keep ;
 
 : deserialize-quotation ( -- array )
-  (deserialize)     
+  deserialize     
   [ 
-    (deserialize) 
-    [ (deserialize) , ] repeat 
+    deserialize 
+    [ deserialize , ] repeat 
   ] [ ] make 
   [ intern-object ] keep ;
 
 : deserialize-hashtable ( -- array )
-  (deserialize) 
-  (deserialize) alist>hash    
+  deserialize 
+  deserialize alist>hash    
   [ intern-object ] keep ;
 
 : deserialize-tuple ( -- array )
-  (deserialize) 
-  (deserialize) array>tuple
+  deserialize 
+  deserialize array>tuple
   [ intern-object ] keep ;
 
 : deserialize-unknown ( -- object )
-  (deserialize) serialized get nth ;
+  deserialize serialized get nth ;
 
 : deserialize ( -- object )
   read1 ch>string dup
@@ -191,6 +194,7 @@ DEFER: (deserialize) ( -- obj )
      { "r" deserialize-ratio }
      { "c" deserialize-complex }
      { "b" deserialize-bignum }
+     { "F" deserialize-float }
      { "w" deserialize-word }
      { "W" deserialize-wrapper }
      { "n" deserialize-false }
@@ -206,16 +210,3 @@ DEFER: (deserialize) ( -- obj )
 : with-serialized ( quot -- )
   [ V{ } serialized set call ] with-scope ; inline 
 
-: serialize ( obj -- )
-  [
-    V{ } serialized set
-    (serialize) 
-  ] with-scope ;
-
-: deserialize ( -- obj )
-  [
-    V{ } serialized set
-    (deserialize)
-  ] with-scope ;
-
-PROVIDE: serialize ;
