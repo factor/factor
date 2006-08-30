@@ -1,5 +1,11 @@
-! Copyright (C) 2006 Chris Double.
+! Copyright (C) 2006 Adam Langley and Chris Double.
+! Adam Langley was the original author of this work.
+!
+! Chris Double modified it to fix bugs and get it working
+! correctly under the latest versions of Factor.
+!
 ! See http://factorcode.org/license.txt for BSD license.
+!
 IN: serialize
 USING: kernel  math hashtables namespaces io strings sequences generic words errors arrays vectors ;
 
@@ -21,119 +27,119 @@ USE: prettyprint
 GENERIC: (serialize)  ( obj -- )
 
 M: f (serialize) ( obj -- )
-	drop "n" write ;
+  drop "n" write ;
 
 M: fixnum (serialize) ( obj -- )
-	! Factor may use 64 bit fixnums on such systems
-	"f" write
-	4 >be write ;
+  ! Factor may use 64 bit fixnums on such systems
+  "f" write
+  4 >be write ;
 
 : bytes-needed ( bignum -- int )
-	log2 8 + 8 / floor ;
+  log2 8 + 8 / floor ;
 
 M: bignum (serialize) ( obj -- )
-	"b" write
-	dup bytes-needed (serialize)
-	dup bytes-needed >be write ;
+  "b" write
+  dup bytes-needed (serialize)
+  dup bytes-needed >be write ;
 
 M: float (serialize) ( obj -- )
-	"F" write
-	float>bits (serialize) ;
+  "F" write
+  float>bits (serialize) ;
 
 M: complex (serialize) ( obj -- )
-	"c" write
-	dup real (serialize)
-	imaginary (serialize) ;
+  "c" write
+  dup real (serialize)
+  imaginary (serialize) ;
 
 M: ratio (serialize) ( obj -- )
-	"r" write
-	dup numerator (serialize)
-	denominator (serialize) ;
+  "r" write
+  dup numerator (serialize)
+  denominator (serialize) ;
 
 M: string (serialize) ( obj -- )
-	"s" write
-	dup length (serialize)
-	write ;
+  "s" write
+  dup length (serialize)
+  write ;
 
 M: object (serialize) ( obj -- )
-	class word-name "Don't know to serialize a " swap append throw ;
+  class word-name "Don't know to serialize a " swap append throw ;
 
 M: sbuf (serialize) ( obj -- )
-	"S" write 
-	dup length (serialize)
-	[ (serialize) ] each ;
+  "S" write 
+  dup length (serialize)
+  [ (serialize) ] each ;
 
 : (serialize-seq) ( seq code -- )
-	over object-id [
-          "o" write (serialize) 2drop
-        ] [ 
-	  write
-	  dup add-object (serialize)
-	  dup length (serialize)
-	  [ (serialize) ] each
-        ] if* ;
+  over object-id [
+    "o" write (serialize) 2drop
+  ] [ 
+    write
+    dup add-object (serialize)
+    dup length (serialize)
+    [ (serialize) ] each
+  ] if* ;
 
-M: tuple (serialize)
-	dup object-id [
-	  "o" write (serialize) 2drop
-        ] [
-	  "t" write 
-	  dup add-object (serialize)
-	  tuple>array (serialize) 
-	] if* ;
+M: tuple (serialize) ( obj -- )
+  dup object-id [
+    "o" write (serialize) 2drop
+  ] [
+    "t" write 
+    dup add-object (serialize)
+    tuple>array (serialize) 
+  ] if* ;
 
-M: array (serialize)
-	"a" (serialize-seq) ;
+M: array (serialize) ( obj -- )
+  "a" (serialize-seq) ;
 
-M: vector (serialize)
-	"v" (serialize-seq) ;
+M: vector (serialize) ( obj -- )
+  "v" (serialize-seq) ;
 
-M: quotation (serialize)
-	"q" (serialize-seq) ;
+M: quotation (serialize) ( obj -- )
+  "q" (serialize-seq) ;
 
-M: hashtable (serialize)
-	dup object-id [
-	  "o" write (serialize) 2drop
-        ] [
-	  "h" write
-	  dup add-object (serialize)
-	  hash>alist (serialize)
-	] if* ;
+M: hashtable (serialize) ( obj -- )
+  dup object-id [
+    "o" write (serialize) 2drop
+  ] [
+    "h" write
+    dup add-object (serialize)
+    hash>alist (serialize)
+  ] if* ;
 
-M: word (serialize)
-	"w" write
-	dup word-name (serialize)
-	word-vocabulary (serialize) ;
+M: word (serialize) ( obj -- )
+  "w" write
+  dup word-name (serialize)
+  word-vocabulary (serialize) ;
 
-M: wrapper (serialize)
-	"W" write
-	wrapped (serialize) ;
+M: wrapper (serialize) ( obj -- )
+  "W" write
+  wrapped (serialize) ;
 
-DEFER: (deserialize)
+DEFER: (deserialize) ( -- obj )
 
 : deserialize-false ( -- f )
-	f ;
+  f ;
 
-: deserialize-fixnum
-	4 read be> ;
+: deserialize-fixnum ( -- fixnum )
+  4 read be> ;
 
-: deserialize-string
-	(deserialize) read ;
+: deserialize-string ( -- string )
+  (deserialize) read ;
 
-: deserialize-ratio
-	(deserialize) (deserialize) / ;
+: deserialize-ratio ( -- ratio )
+  (deserialize) (deserialize) / ;
 
-: deserialize-complex
-	(deserialize) (deserialize) rect> ;
+: deserialize-complex ( -- complex )
+  (deserialize) (deserialize) rect> ;
 
-: deserialize-bignum
-	(deserialize) read be> ;
+: deserialize-bignum ( -- bignum )
+  (deserialize) read be> ;
 
-: deserialize-word
-	(deserialize) dup (deserialize) lookup dup [ nip ] [ "Unknown word" throw ] if ;
+: deserialize-word ( -- word )
+  (deserialize) dup (deserialize) lookup dup [ nip ] [ "Unknown word" throw ] if ;
 
-: deserialize-wrapper
-	(deserialize) <wrapper> ;
+: deserialize-wrapper ( -- wrapper )
+  (deserialize) <wrapper> ;
 
 : deserialize-array ( -- array )
   (deserialize)     
@@ -167,23 +173,23 @@ DEFER: (deserialize)
 : deserialize-unknown ( -- object )
   (deserialize) serialized get nth ;
 
-: (deserialize)
-	read1 ch>string dup
-	H{ { "f" deserialize-fixnum }
-           { "s" deserialize-string }
-	   { "r" deserialize-ratio }
-	   { "c" deserialize-complex }
-	   { "b" deserialize-bignum }
-	   { "w" deserialize-word }
-	   { "W" deserialize-wrapper }
-	   { "n" deserialize-false }
-	   { "a" deserialize-array }
-	   { "v" deserialize-vector }
-	   { "q" deserialize-quotation }
-	   { "h" deserialize-hashtable }
-	   { "o" deserialize-unknown }
-	 }
-	hash dup [ "Unknown typecode" throw ] unless nip execute ;
+: (deserialize) ( -- object )
+  read1 ch>string dup
+  H{ { "f" deserialize-fixnum }
+     { "s" deserialize-string }
+     { "r" deserialize-ratio }
+     { "c" deserialize-complex }
+     { "b" deserialize-bignum }
+     { "w" deserialize-word }
+     { "W" deserialize-wrapper }
+     { "n" deserialize-false }
+     { "a" deserialize-array }
+     { "v" deserialize-vector }
+     { "q" deserialize-quotation }
+     { "h" deserialize-hashtable }
+     { "o" deserialize-unknown }
+  }
+  hash dup [ "Unknown typecode" throw ] unless nip execute ;
 
 : serialize ( obj -- )
   [
