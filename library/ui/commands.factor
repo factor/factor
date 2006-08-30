@@ -1,5 +1,8 @@
 ! Copyright (C) 2006 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
+IN: gadgets-workspace
+DEFER: call-tool
+
 USING: arrays definitions kernel gadgets sequences strings math
 words generic namespaces hashtables help ;
 IN: gadgets
@@ -7,6 +10,11 @@ IN: gadgets
 TUPLE: command group name gesture quot ;
 
 M: command equal? eq? ;
+
+GENERIC: invoke-command ( target command -- )
+
+M: command invoke-command ( target command -- )
+    command-quot call ;
 
 GENERIC: gesture>string ( gesture -- string )
 
@@ -24,7 +32,7 @@ M: button-up gesture>string
         button-up-# [ " " % # ] when*
     ] "" make ;
 
-M: button-up gesture>string
+M: button-down gesture>string
     [
         dup button-down-mods modifiers>string %
         "Mouse Up" %
@@ -33,13 +41,21 @@ M: button-up gesture>string
 
 M: object gesture>string drop f ;
 
-: define-commands ( class specs -- )
-    #! Specs is an array of { group name gesture quot }
-    [ first4 <command> ] map
-    2dup "commands" set-word-prop
+: command-gestures ( commands -- hash )
     [ command-gesture ] subset
-    [ dup command-gesture swap command-quot ] map>hash
-    "gestures" set-word-prop ;
+    [ dup command-gesture swap [ invoke-command ] curry ]
+    map>hash ;
+
+: define-commands* ( class specs -- )
+    2dup "commands" set-word-prop
+    command-gestures "gestures" set-word-prop ;
+
+: <commands> ( specs -- commands )
+    #! Specs is an array of { group name gesture quot }
+    [ first4 <command> ] map ;
+
+: define-commands ( class specs -- )
+    <commands> define-commands* ;
 
 : commands ( gadget -- seq )
     delegates [ class "commands" word-prop ] map concat ;
@@ -69,16 +85,42 @@ world H{
     { T{ button-up f { A+ } 1 } [ T{ button-up f f 2 } swap resend-button-up ] }
 } set-gestures
 
+SYMBOL: +name+
+SYMBOL: +button+
+SYMBOL: +group+
+SYMBOL: +tool+
+SYMBOL: +quot+
+SYMBOL: +gesture+
+
+TUPLE: operation class tags gesture filter tool ;
+
+C: operation ( class hash -- operation )
+    swap [
+        f +name+ get +gesture+ get +quot+ get <command>
+        over set-delegate
+        +button+ get +group+ get 2array over set-operation-tags
+        +tool+ get over set-operation-tool
+    ] bind
+    [ set-operation-class ] keep ;
+
+: modify-operations ( quot operations -- operations )
+    [ clone [ set-operation-filter ] keep ] map-with ;
+
+M: operation invoke-command ( target operation -- )
+    [ dup command-quot over operation-filter call ] keep
+    operation-tool [ call-tool ] [ call ] if* ;
+
 SYMBOL: operations
 
-: object-operation ( obj button# -- command )
-    swap operations get
-    [ >r class r> first class< ] subset-with
-    [ second = ] subset-with
-    dup empty? [ drop f ] [ peek third ] if ;
+: class-operations ( class -- operations )
+    operations get [ operation-class class< ] subset-with ;
 
-: object-operations ( object -- seq )
-    3 [ 1+ object-operation ] map-with ;
+: tagged-operations ( class tag -- commands )
+    swap class-operations
+    [ operation-tags member? ] subset-with ;
 
-: <operation> ( name quot -- command )
-    >r >r f r> f r> <command> ;
+: mouse-operation ( class button# -- command )
+    tagged-operations dup empty? [ drop f ] [ peek ] if ;
+
+: mouse-operations ( class -- seq )
+    3 [ 1+ mouse-operation ] map-with ;

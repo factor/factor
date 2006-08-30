@@ -29,7 +29,8 @@ M: object literalize ;
 M: word literalize <wrapper> ;
 M: wrapper literalize <wrapper> ;
 
-: curry ( obj quot -- newquot ) swap literalize add* ;
+: curry ( obj quot -- newquot )
+    [ swap literalize , % ] [ ] make ;
 
 : alist>quot ( default assoc -- quot )
     [ [ first2 swap % , , \ if , ] [ ] make ] each ;

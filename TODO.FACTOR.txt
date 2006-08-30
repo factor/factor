@@ -1,5 +1,7 @@
 + 0.84:
 
+- browser: clicking a word in the list twice does not work
+- interactor commands: don't invoke if interactor is busy
 - new browser:
   - show currently selected vocab & words
   - scroll to existing won't work
@@ -11,7 +13,8 @@
 - help gadget should not re-render every time it is grafted
 - apropos and help search
 - alien-indirect
-- operations + tile commands + listener word commands = new abstraction
+- help browser: jump to definition
+- 3 f curry ==> a vector!
 
 ========================================================================
 
@@ -81,6 +84,7 @@
 
 + compiler/ffi:
 
+- handle code heap exhaustion with a critical error
 - more compact relocation info
 - problem if major gc happens during relocation
   - in fact relocation should not cons at all

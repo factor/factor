@@ -1,6 +1,6 @@
 IN: scratchpad
 USING: kernel kernel-internals math memory namespaces sequences
-test ;
+test quotations ;
 
 [ 0 ] [ f size ] unit-test
 [ t ] [ [ \ = \ = ] all-equal? ] unit-test
@@ -10,3 +10,7 @@ test ;
 
 [ t ] [ cell integer? ] unit-test
 [ t ] [ bootstrap-cell integer? ] unit-test
+
+[ [ 3 ] ] [ 3 f curry ] unit-test
+[ [ \ + ] ] [ \ + f curry ] unit-test
+[ [ \ + = ] ] [ \ + [ = ] curry ] unit-test

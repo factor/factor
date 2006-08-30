@@ -63,5 +63,5 @@ M: listener-gadget gadget-title drop "Listener" <model> ;
         drop f
     ] if ;
 
-: clear-listener ( -- )
+: clear-output ( -- )
     stdio get duplex-stream-out pane-clear ;

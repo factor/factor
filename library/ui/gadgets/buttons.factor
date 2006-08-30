@@ -38,6 +38,7 @@ button H{
 GENERIC: >label ( obj -- gadget )
 M: string >label <label> ;
 M: object >label ;
+M: f >label drop <gadget> ;
 
 C: button ( gadget quot -- button )
     rot >label <default-border> over set-gadget-delegate

@@ -7,6 +7,8 @@ namespaces gadgets-tracks gadgets-presentations gadgets-grids
 gadgets-frames help gadgets-buttons ;
 IN: gadgets-browser
 
+TUPLE: browser navigator definitions ;
+
 TUPLE: definitions showing ;
 
 : find-definitions ( gadget -- definitions )
@@ -33,25 +35,17 @@ TUPLE: tile definition gadget ;
     definitions-showing delete
     unparent ;
 
-: <tile-toolbar> ( -- gadget )
-    {
-        { "Close" [ close-tile ] }
-        { "Help" [ tile-definition help ] }
-        { "Callers" [ tile-definition usage. ] }
-        { "Edit" [ tile-definition edit ] }
-        { "Reload" [ tile-definition reload ] }
-        { "Watch" [ tile-definition watch ] }
-    } [ first2 \ find-tile add* <bevel-button> ] map
-    make-shelf ;
+: tile-action ( target quot -- target quot )
+    >r tile-definition r> ;
 
-: <tile-content> ( definition -- gadget )
-    [ see ] make-pane <tile-toolbar> 2array
+: <tile-content> ( definition toolbar -- gadget )
+    >r [ see ] make-pane r> 2array
     make-pile { 5 5 } over set-pack-gap
     <default-border> dup faint-boundary ;
 
 C: tile ( definition -- gadget )
-    [ set-tile-definition ] 2keep
-    [ >r <tile-content> r> set-gadget-delegate ] keep ;
+    2dup <toolbar> <tile-content> over set-gadget-delegate
+    [ set-tile-definition ] keep ;
 
 : show-definition ( definition definitions -- )
     2dup definition-index dup 0 >= [
@@ -84,8 +78,6 @@ C: navigator ( -- gadget )
         { [ <vocab-list> ] f [ <scroller> ] 1/2 }
         { [ <word-list> ] f [ <scroller> ] 1/2 }
     } { 1 0 } make-track* ;
-
-TUPLE: browser navigator definitions ;
 
 C: browser ( -- gadget )
     {

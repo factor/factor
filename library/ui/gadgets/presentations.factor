@@ -17,7 +17,7 @@ C: presentation ( button object commands -- button )
 
 : <object-presentation> ( gadget object -- button )
     >r f <roll-button> r>
-    dup object-operations <presentation> ;
+    dup class mouse-operations <presentation> ;
 
 : <command-presentation> ( target command -- button )
     dup command-name f <bevel-button> -rot { f f } swap add*
@@ -25,7 +25,7 @@ C: presentation ( button object commands -- button )
 
 : invoke-presentation ( gadget button# -- )
     1- over presentation-commands nth [
-        >r presentation-object r> command-quot call
+        >r presentation-object r> invoke-command
     ] [
         drop
     ] if* ;
