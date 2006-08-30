@@ -1,0 +1,21 @@
+! Copyright (C) 2006 Chris Double.
+! See http://factorcode.org/license.txt for BSD license.
+USING: help serialize ;
+
+HELP: serialize 
+{ $values { "obj" "object to serialize" } 
+}
+{ $description "Serializes the object to the current output stream. Object references within the structure being serialized are maintained." } 
+{ $examples 
+    { $example "[ { 1 2 } dup  serialize serialize ] string-out\n[ deserialize deserialize ] string-in eq?\n => t" }
+}
+{ $see-also deserialize } ;
+
+HELP: deserialize 
+{ $values { "obj" "deserialized object" } 
+}
+{ $description "Deserializes an object by reading from the current input stream. Object references within the structure that was originally serialized are maintained." } 
+{ $examples 
+    { $example "[ { 1 2 } dup  serialize serialize ] string-out\n[ deserialize deserialize ] string-in eq?\n => t" }
+}
+{ $see-also serialize } ;
