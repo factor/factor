@@ -13,5 +13,5 @@ SYMBOLS: x y z ;
 [ t ] [ y star z x h* = ] unit-test
 [ t ] [ z star x y h* = ] unit-test
 
-[ 1 ] [ x x <,>* ] unit-test
+[ -1 ] [ x x <,>* ] unit-test
 [ 0 ] [ x y <,>* ] unit-test

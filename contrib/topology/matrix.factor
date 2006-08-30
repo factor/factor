@@ -62,13 +62,16 @@ SYMBOL: matrix
 : pivot-row ( col# row# -- n )
     [ dupd nth-row nth zero? not ] find-row 2nip ;
 
-: (row-reduce) ( -- )
-    0 cols rows min [
-        over pivot-row [ over do-row 1+ ] when*
-    ] each drop ;
+: (row-reduce) ( col# row# -- )
+    over cols < over rows < and [
+        2dup pivot-row [ over do-row 1+ ] when* >r 1+ r>
+        (row-reduce)
+    ] [
+        2drop
+    ] if ;
 
 : row-reduce ( matrix -- matrix' )
-    [ (row-reduce) ] with-matrix ;
+    [ 0 0 (row-reduce) ] with-matrix ;
 
 : null/rank ( matrix -- null rank )
     row-reduce [ [ [ zero? ] all? ] subset ] keep
