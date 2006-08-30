@@ -7,7 +7,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 !
 IN: serialize
-USING: kernel  math hashtables namespaces io strings sequences generic words errors arrays vectors ;
+USING: kernel kernel-internals math hashtables namespaces io strings sequences generic words errors arrays vectors ;
 
 ! Variable holding a sequence of objects already serialized
 SYMBOL: serialized
@@ -25,6 +25,9 @@ USE: prettyprint
 
 ! Serialize object
 GENERIC: (serialize)  ( obj -- )
+
+: serialize-shared ( obj quot -- )
+  >r dup object-id [ "o" write (serialize) drop ] r> if* ; inline
 
 M: f (serialize) ( obj -- )
   drop "n" write ;
@@ -47,9 +50,12 @@ M: float (serialize) ( obj -- )
   float>bits (serialize) ;
 
 M: complex (serialize) ( obj -- )
-  "c" write
-  dup real (serialize)
-  imaginary (serialize) ;
+  [
+    "c" write
+    dup add-object (serialize)
+    dup real (serialize)
+    imaginary (serialize) 
+  ] serialize-shared ;
 
 M: ratio (serialize) ( obj -- )
   "r" write
@@ -57,9 +63,12 @@ M: ratio (serialize) ( obj -- )
   denominator (serialize) ;
 
 M: string (serialize) ( obj -- )
-  "s" write
-  dup length (serialize)
-  write ;
+  [
+    "s" write
+    dup add-object (serialize)
+    dup length (serialize)
+    write 
+  ] serialize-shared ;
 
 M: object (serialize) ( obj -- )
   class word-name "Don't know to serialize a " swap append throw ;
@@ -70,23 +79,19 @@ M: sbuf (serialize) ( obj -- )
   [ (serialize) ] each ;
 
 : (serialize-seq) ( seq code -- )
-  over object-id [
-    "o" write (serialize) 2drop
-  ] [ 
-    write
+  swap [ 
+    over write
     dup add-object (serialize)
     dup length (serialize)
     [ (serialize) ] each
-  ] if* ;
+  ] serialize-shared drop ;
 
 M: tuple (serialize) ( obj -- )
-  dup object-id [
-    "o" write (serialize) 2drop
-  ] [
+  [
     "t" write 
     dup add-object (serialize)
     tuple>array (serialize) 
-  ] if* ;
+  ] serialize-shared ;
 
 M: array (serialize) ( obj -- )
   "a" (serialize-seq) ;
@@ -98,13 +103,11 @@ M: quotation (serialize) ( obj -- )
   "q" (serialize-seq) ;
 
 M: hashtable (serialize) ( obj -- )
-  dup object-id [
-    "o" write (serialize) 2drop
-  ] [
+  [
     "h" write
     dup add-object (serialize)
     hash>alist (serialize)
-  ] if* ;
+  ] serialize-shared ;
 
 M: word (serialize) ( obj -- )
   "w" write
@@ -117,6 +120,9 @@ M: wrapper (serialize) ( obj -- )
 
 DEFER: (deserialize) ( -- obj )
 
+: intern-object ( id obj -- )
+  swap serialized get set-nth ;
+
 : deserialize-false ( -- f )
   f ;
 
@@ -124,13 +130,13 @@ DEFER: (deserialize) ( -- obj )
   4 read be> ;
 
 : deserialize-string ( -- string )
-  (deserialize) read ;
+  (deserialize) (deserialize) read [ intern-object ] keep ;
 
 : deserialize-ratio ( -- ratio )
   (deserialize) (deserialize) / ;
 
 : deserialize-complex ( -- complex )
-  (deserialize) (deserialize) rect> ;
+  (deserialize) (deserialize) (deserialize) rect> [ intern-object ] keep ;
 
 : deserialize-bignum ( -- bignum )
   (deserialize) read be> ;
@@ -147,7 +153,7 @@ DEFER: (deserialize) ( -- obj )
     (deserialize) 
     [ (deserialize) , ] repeat 
   ] { } make 
-  [ swap serialized get set-nth ] keep ;
+  [ intern-object ] keep ;
 
 : deserialize-vector ( -- array )
   (deserialize)     
@@ -155,7 +161,7 @@ DEFER: (deserialize) ( -- obj )
     (deserialize) 
     [ (deserialize) , ] repeat 
   ] V{ } make 
-  [ swap serialized get set-nth ] keep ;
+  [ intern-object ] keep ;
 
 : deserialize-quotation ( -- array )
   (deserialize)     
@@ -163,17 +169,22 @@ DEFER: (deserialize) ( -- obj )
     (deserialize) 
     [ (deserialize) , ] repeat 
   ] [ ] make 
-  [ swap serialized get set-nth ] keep ;
+  [ intern-object ] keep ;
 
 : deserialize-hashtable ( -- array )
   (deserialize) 
   (deserialize) alist>hash    
-  [ swap serialized get set-nth ] keep ;
+  [ intern-object ] keep ;
+
+: deserialize-tuple ( -- array )
+  (deserialize) 
+  (deserialize) array>tuple
+  [ intern-object ] keep ;
 
 : deserialize-unknown ( -- object )
   (deserialize) serialized get nth ;
 
-: (deserialize) ( -- object )
+: deserialize ( -- object )
   read1 ch>string dup
   H{ { "f" deserialize-fixnum }
      { "s" deserialize-string }
@@ -187,9 +198,13 @@ DEFER: (deserialize) ( -- obj )
      { "v" deserialize-vector }
      { "q" deserialize-quotation }
      { "h" deserialize-hashtable }
+     { "t" deserialize-tuple }
      { "o" deserialize-unknown }
   }
   hash dup [ "Unknown typecode" throw ] unless nip execute ;
+
+: with-serialized ( quot -- )
+  [ V{ } serialized set call ] with-scope ; inline 
 
 : serialize ( obj -- )
   [
