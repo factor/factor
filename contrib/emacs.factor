@@ -11,6 +11,6 @@ number>string "emacsclient --no-wait +" swap append " " rot append3 system ;
 : emacs ( word -- )
 where first2 emacsclient ;
 
-[ emacsclient ] edit-hook set
+[ emacsclient ] edit-hook set-global
 
 PROVIDE: emacs ;
