@@ -188,7 +188,6 @@ DEFER: register-process
 DEFER: unregister-process
 
 : (spawn) ( quot -- process )
-  #! Start a process which runs the given quotation.
   [ in-thread ] make-process [ with-process ] over slip ;
 
 : spawn ( quot -- process )
@@ -231,12 +230,15 @@ M: process send ( message process -- )
   #! Rethrow the error to the linked process
   self process-links [ over <linked-exception> swap send ] each drop ;
 
+: (spawn-link) ( quot -- process )
+  [ in-thread ] self make-linked-process [ with-process ] over slip ;
+
 : spawn-link ( quot -- process )
   #! Same as spawn but if the quotation throws an error that
   #! is uncaught, that error gets propogated to the process
   #! performing the spawn-link.
   [ catch [ rethrow-linked ] when* ] curry
-  [ in-thread ] self make-linked-process [ with-process ] over slip ;
+  [ self dup process-pid swap register-process call self process-pid unregister-process ] curry (spawn-link) ;
 
 #! A common operation is to send a message to a process containing
 #! the sending process so the receiver can send a reply back. A 'tag'
