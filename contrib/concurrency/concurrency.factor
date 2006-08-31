@@ -490,7 +490,7 @@ PREDICATE: tagged-message (get-msg) ( obj -- ? )
 [ H{ } clone process-registry ] (spawn) \ process-registry set-global
 
 : handle-node-client ( stream -- )
-  [ [ deserialize ] with-serialized ] with-stream dup . first2 get-process send ;
+  [ [ deserialize ] with-serialized ] with-stream first2 get-process send ;
 
 : (node-server) ( server -- )
   dup accept handle-node-client (node-server) ;
