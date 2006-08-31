@@ -501,9 +501,9 @@ PREDICATE: tagged-message (get-msg) ( obj -- ? )
 : send-to-node ( msg pid  host port -- )
   <client> [ 2array [ serialize ] with-serialized ] with-stream ;
 
-: start-node ( port -- )
+: start-node ( hostname port -- )
   [ node-server ] in-thread
-  "localhost" swap <node> \ localnode set-global ;
+  <node> \ localnode set-global ;
 
 M: remote-process send ( message process -- )
   #! Send the message via the inter-node protocol
@@ -518,11 +518,9 @@ M: process serialize ( obj -- )
 : (test-node1) 
   receive "ack" reply (test-node1) ;
 
-: test-node1 
-  9000 start-node
+: test-node1 ( -- )
   [ (test-node1) ] spawn
   "test1" swap register-process ;
 
-: test-node2
-  localnode [ 9001 start-node ] unless 
-  [ "abcd" "localhost" 9000 <node> "test1" <remote-process> send-synchronous . ] spawn ;
+: test-node2 ( hostname port -- )
+  [ <node> "test1" <remote-process> "message" swap send-synchronous . ] spawn 2drop ;
