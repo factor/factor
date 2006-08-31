@@ -12,7 +12,7 @@ Credits:
 - boids -- Graphics demo for the UI (Eduardo Cavazos)
 - cairo -- cairo bindings (Sampo Vuori)
 - calendar -- timestamp/calendar with timezones (Doug Coleman)
-- concurrency -- Erlang/Termite-style concurrency (Chris Double)
+- concurrency -- Erlang/Termite-style distibuted concurrency (Chris Double)
 - coroutines -- coroutines (Chris Double)
 - crypto -- Various cryptographic algorithms (Doug Coleman)
 - dlists -- double-linked-lists (Mackenzie Straight)
@@ -31,7 +31,8 @@ Credits:
 - postgresql -- PostgreSQL binding (Doug Coleman)
 - process -- Run external programs (Slava Pestov)
 - random-tester -- Random compiler tester (Doug Coleman)
-- rss -- Code to retrieve and parse an RSS2 file
+- rss -- Code to retrieve and parse an RSS2 file (Chris Double)
+- serialize -- Binary object serialization (Chris Double)
 - slate -- Graphics canvas for the UI (Eduardo Cavazos)
 - space-invaders -- Intel 8080-based Space Invaders arcade machine emulator (Chris Double)
 - splay-trees -- Splay trees (Mackenzie Straight)
