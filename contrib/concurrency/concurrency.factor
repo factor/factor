@@ -136,15 +136,22 @@ TUPLE: mailbox threads data ;
 
 #! Processes run on nodes identified by a hostname and port.
 TUPLE: node hostname port ;
- 
-: localnode ( -- node )
-  #! Return the default node on the localhost
-  "localhost" 9000 <node> ;
 
+: localnode ( -- node )
+  #! Return the current node 
+  \ localnode get ;
+
+: start-node ( host port -- )
+  <node> \ localnode set-global ;
+     
 #! Processes run in nodes. Each process has a mailbox that is
 #! used for receiving messages sent to that process.
 TUPLE: process node links pid mailbox ;
 
+: local-process? ( process -- boolean )
+  #! Is the process running on the local node
+  process-node [ localnode = ] [ t ] if* ;
+  
 : make-process ( -- process )
   #! Return a process set to run on the local node. A process is 
   #! similar to a thread but can send and receive messages to and
@@ -189,10 +196,14 @@ TUPLE: linked-exception error ;
   #! ( -- ).
   >r self process-mailbox r> while-mailbox-empty ; inline
 
+: remote-send ( message process -- )
+  #! Send the message via the inter-node protocol
+  "remote-send not implemented" throw ;
+
 : send ( message process -- )
   #! Send the message to the process by placing it in the
-  #! processes mailbox. 
-  process-mailbox mailbox-put ;
+  #! processes mailbox.   
+  dup local-process? [ process-mailbox mailbox-put ] [ remote-send ] if ;
 
 : receive ( -- message )
   #! Return a message from the current processes mailbox.
