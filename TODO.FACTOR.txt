@@ -3,9 +3,7 @@
 - RT_WORD should refer to XTs not word objects.
 - signal 4 on datastack underflow on mac intel??
 - help gadget should not re-render every time it is grafted
-- help browser: jump to definition command when looking at a word
 - alien-indirect
-- fix modified operations
 - command categorization in keyboard help window
 
 ========================================================================

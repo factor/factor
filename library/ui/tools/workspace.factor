@@ -232,7 +232,7 @@ M: operation invoke-command ( target operation -- )
 } define-operation
 
 [ word-link? ] H{
-    { +button+ 2 }
+    { +button+ 3 }
     { +name+ "Definition" }
     { +quot+ [ link-name browser call-tool ] }
 } define-operation
