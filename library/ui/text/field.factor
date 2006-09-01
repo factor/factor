@@ -1,14 +1,16 @@
 ! Copyright (C) 2006 Slava Pestov
 ! See http://factorcode.org/license.txt for BSD license.
 IN: gadgets-text
-USING: gadgets gadgets-controls generic kernel models sequences ;
+USING: gadgets gadgets-controls generic kernel models sequences
+gadgets-theme ;
 
 TUPLE: field model ;
 
 C: field ( model -- field )
     <editor> over set-delegate
     [ set-field-model ] keep
-    dup dup set-control-self ;
+    dup dup set-control-self
+    dup faint-boundary ;
 
 : field-commit ( field -- string )
     [ editor-text ] keep

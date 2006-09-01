@@ -3,7 +3,7 @@
 IN: gadgets-help
 USING: gadgets gadgets-borders gadgets-buttons gadgets-frames
 gadgets-panes gadgets-search gadgets-scrolling help kernel
-models namespaces sequences ;
+models namespaces sequences gadgets-tracks ;
 
 TUPLE: help-gadget history ;
 
@@ -19,11 +19,15 @@ help-gadget {
     { f "Home" T{ key-down f f "h" } [ go-home ] }
 } define-commands
 
-: <help-pane> ( -- gadget )
+: <help-pane> ( history -- gadget )
     gadget get help-gadget-history [ help ] <pane-control> ;
 
-C: help-gadget ( -- gadget )
+: init-history ( help-gadget -- )
     T{ link f "handbook" } <history>
-    over set-help-gadget-history {
-        { [ <help-pane> <scroller> ] f f @center }
-    } make-frame* ;
+    swap set-help-gadget-history ;
+
+C: help-gadget ( -- gadget )
+    dup init-history {
+        { [ <help-pane> ] f f 4/5 }
+        { [ [ search-help. ] <search-gadget> ] f f 1/5 }
+    } { 1 0 } make-track* ;
