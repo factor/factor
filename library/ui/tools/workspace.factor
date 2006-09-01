@@ -135,26 +135,38 @@ V{ } clone operations set-global
 : define-operation ( class props -- )
     <operation> operations get push-new ;
 
-: operation-quot ( operation -- quot )
-    dup command-quot swap operation-tool
-    [ \ call-tool 2array append >quotation ] when* ;
-
 M: operation invoke-command ( target operation -- )
-    operation-quot call ;
+    dup command-quot swap operation-listener?
+    [ curry listener-gadget call-tool ] [ call ] if ;
+
+: modify-operation ( quot operation -- operation )
+    clone
+    [ command-quot append ] keep
+    [ set-command-quot ] keep ;
+
+: modify-operations ( quot operations -- operations )
+    [ modify-operation ] map-with ;
+
+: modify-listener-operation ( quot operation -- operation )
+    clone t over set-operation-listener?
+    modify-operation ;
+
+: modify-listener-operations ( quot operations -- operations )
+    [ modify-listener-operation ] map-with ;
 
 ! Objects
 object H{
-    { +button+ 3 }
+    { +button+ 1 }
     { +name+ "Inspect" }
-    { +tool+ listener-gadget }
     { +quot+ [ inspect ] }
+    { +listener+ t }
 } define-operation
 
 ! Input
 input H{
     { +button+ 1 }
     { +name+ "Input" }
-    { +tool+ listener-gadget }
+    { +quot+ [ listener-gadget call-tool ] }
 } define-operation
 
 ! Words
@@ -162,7 +174,7 @@ input H{
     { +button+ 1 }
     { +name+ "Browse" }
     { +gesture+ T{ key-down f { A+ } "b" } }
-    { +tool+ browser }
+    { +quot+ [ browser call-tool ] }
 } define-operation
 
 \ word H{
@@ -173,43 +185,44 @@ input H{
 } define-operation
 
 \ word H{
+    { +button+ 3 }
     { +name+ "Documentation" }
     { +gesture+ T{ key-down f { A+ } "h" } }
-    { +tool+ help-gadget }
+    { +quot+ [ help-gadget call-tool ] }
 } define-operation
 
 \ word H{
     { +name+ "Usage" }
-    { +tool+ listener-gadget }
     { +gesture+ T{ key-down f { A+ } "u" } }
     { +quot+ [ usage. ] }
+    { +listener+ t }
 } define-operation
 
 \ word H{
     { +name+ "Reload" }
-    { +tool+ listener-gadget }
     { +gesture+ T{ key-down f { A+ } "r" } }
     { +quot+ [ reload ] }
+    { +listener+ t }
 } define-operation
 
 \ word H{
     { +name+ "Watch" }
-    { +tool+ listener-gadget }
-    { +quot+ [ reload ] }
+    { +quot+ [ watch ] }
+    { +listener+ t }
 } define-operation
 
 ! Vocabularies
 vocab-link H{
     { +button+ 1 }
     { +name+ "Browse" }
-    { +tool+ browser }
+    { +quot+ [ browser call-tool ] }
 } define-operation
 
 ! Link
 link H{
     { +button+ 1 }
     { +name+ "Follow" }
-    { +tool+ help-gadget }
+    { +quot+ [ help-gadget call-tool ] }
 } define-operation
 
 link H{
@@ -221,9 +234,9 @@ link H{
 ! Strings
 string H{
     { +name+ "Apropos (all)" }
-    { +tool+ listener-gadget }
     { +gesture+ T{ key-down f { A+ } "a" } }
     { +quot+ [ apropos ] }
+    { +listener+ t }
 } define-operation
 
 : usable-words ( -- seq )
@@ -233,41 +246,39 @@ string H{
 
 string H{
     { +name+ "Apropos (used)" }
-    { +tool+ listener-gadget }
     { +gesture+ T{ key-down f f "TAB" } }
     { +quot+ [ usable-words (apropos) ] }
+    { +listener+ t }
 } define-operation
 
 ! Quotations
 quotation H{
     { +name+ "Infer" }
-    { +tool+ listener-gadget }
     { +gesture+ T{ key-down f { C+ A+ } "i" } }
     { +quot+ [ infer . ] }
+    { +listener+ t }
 } define-operation
 
 quotation H{
     { +name+ "Walk" }
-    { +tool+ listener-gadget }
     { +gesture+ T{ key-down f { C+ A+ } "w" } }
     { +quot+ [ walk ] }
+    { +listener+ t }
 } define-operation
 
 quotation H{
     { +name+ "Time" }
-    { +tool+ listener-gadget }
     { +gesture+ T{ key-down f { C+ A+ } "t" } }
     { +quot+ [ time ] }
+    { +listener+ t }
 } define-operation
 
 ! Define commands in terms of operations
-: modify-operations ( quot operations -- operations )
-    [ nip ] map-with ;
 
 ! Tile commands
 tile
-[ tile-action ] \ word class-operations modify-operations
-[ operation-tool browser eq? not ] subset
+[ tile-definition ] \ word class-operations modify-operations
+[ command-name "Browse" = not ] subset
 T{ command f f "Close" f [ close-tile ] } add*
 define-commands*
 
@@ -277,14 +288,11 @@ define-commands*
     [ dup T{ word-elt } select-elt ] unless
     gadget-selection ;
 
-: token-action ( quot -- quot )
-    \ selected-word add* ;
-
-: word-action ( quot -- quot )
-    [ selected-word search ] swap append ;
+: word-action ( target -- quot )
+    selected-word search ;
 
 : quot-action ( quot -- quot )
-    [ field-commit parse ] swap append ;
+    field-commit parse ;
 
 interactor [
     {
@@ -292,9 +300,9 @@ interactor [
         { f "Send EOF" T{ key-down f { C+ } "d" } [ f swap interactor-eval ] }
     } <commands> %
 
-    [ word-action ] \ word class-operations modify-operations %
-    [ token-action ] string class-operations modify-operations %
-    [ quot-action ] quotation class-operations modify-operations %
+    [ word-action ] \ word class-operations modify-listener-operations %
+    [ selected-word ] string class-operations modify-listener-operations %
+    [ quot-action ] quotation class-operations modify-listener-operations %
 
     {
         { f "History" T{ key-down f { C+ } "h" } [ [ interactor-history. ] swap interactor-call ] }

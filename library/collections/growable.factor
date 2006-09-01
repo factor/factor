@@ -45,5 +45,5 @@ TUPLE: bounds-error index seq ;
     2dup capacity > [ 2dup expand ] when
     set-fill ; inline
 
-: clone-growable ( seq -- newseq )
+: clone-resizable ( seq -- newseq )
     (clone) dup underlying clone over set-underlying ; inline

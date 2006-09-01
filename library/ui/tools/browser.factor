@@ -38,9 +38,6 @@ TUPLE: tile definition gadget ;
     definitions-showing delete
     unparent ;
 
-: tile-action ( target quot -- target quot )
-    >r tile-definition r> ;
-
 : <tile-content> ( definition toolbar -- gadget )
     >r [ see ] make-pane r> 2array
     make-pile { 5 5 } over set-pack-gap

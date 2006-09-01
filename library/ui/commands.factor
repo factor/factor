@@ -85,11 +85,11 @@ world H{
 SYMBOL: +name+
 SYMBOL: +button+
 SYMBOL: +group+
-SYMBOL: +tool+
 SYMBOL: +quot+
+SYMBOL: +listener+
 SYMBOL: +gesture+
 
-TUPLE: operation class tags gesture tool ;
+TUPLE: operation class tags gesture listener? ;
 
 : (operation) ( -- command )
     f +name+ get +gesture+ get +quot+ get <command> ;
@@ -100,7 +100,7 @@ C: operation ( class hash -- operation )
     swap [
         (operation) over set-delegate
         (tags) over set-operation-tags
-        +tool+ get over set-operation-tool
+        +listener+ get over set-operation-listener?
     ] bind
     [ set-operation-class ] keep ;
 

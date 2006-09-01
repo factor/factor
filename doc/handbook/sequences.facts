@@ -23,7 +23,7 @@ $terpri
 { $subsection "sequences-assoc" }
 "Some implementation details which your code should probably not care about:"
 { $subsection "sequences-unsafe" }
-{ $subsection "sequences-growable" }
+{ $subsection "sequences-resizable" }
 { $see-also "namespaces-make" } ;
 
 ARTICLE: "sequence-implementations" "Sequence implementations"
@@ -182,7 +182,7 @@ ARTICLE: "sequence-protocol" "Sequence protocol"
 { $subsection thaw } ;
 
 ARTICLE: "arrays" "Arrays"
-"An array is a fixed-size mutable sequence whose elements are stored in a contiguous range of memory. The literal syntax is covered in " { $link "syntax-arrays" } ". Sometimes you need a growable array -- this is called a vector, and vectors are documented in " { $link "vectors" } "."
+"An array is a fixed-size mutable sequence whose elements are stored in a contiguous range of memory. The literal syntax is covered in " { $link "syntax-arrays" } ". Sometimes you need a resizable array -- this is called a vector, and vectors are documented in " { $link "vectors" } "."
 $terpri
 "Array words are in the " { $vocab-link "arrays" } " vocabulary. Unsafe implementation words are in the " { $vocab-link "kernel-internals" } " vocabulary."
 $terpri
@@ -266,10 +266,10 @@ $terpri
 $terpri
 "Indeed, iteration combinators are the primary use-case for these words; if the iteration index is already guarded by a loop test which ensures it is within bounds, then additional bounds checks are redundant. For example, see the implementation of " { $link each } "." ;
 
-ARTICLE: "sequences-growable" "Growable sequence protocol"
-"Growable sequences are implementing by having a wrapper object hold a reference to an underlying sequence, together with a fill pointer indicating how many elements of the underlying sequence are occupied. When the fill pointer exceeds the underlying sequence capacity, the underlying sequence grows."
+ARTICLE: "sequences-resizable" "Resizable sequence implementation"
+"Resizable sequences are implementing by having a wrapper object hold a reference to an underlying sequence, together with a fill pointer indicating how many elements of the underlying sequence are occupied. When the fill pointer exceeds the underlying sequence capacity, the underlying sequence grows."
 $terpri
-"There is a growable sequence protocol:"
+"There is a resizable sequence protocol:"
 { $subsection underlying }
 { $subsection set-underlying }
 { $subsection set-fill }
@@ -277,7 +277,7 @@ $terpri
 { $subsection capacity }
 { $subsection ensure }
 { $subsection grow-length }
-{ $subsection clone-growable }
+{ $subsection clone-resizable }
 "This protocol and the above words are unsafe; they do not perform bounds checks for performance reasons, and thus a mistake can lead to memory corruption due to an underlying sequence being shorter than the fill pointer."
 $terpri
-"Vectors and string buffers are implemented using the growable sequence facility (and they perform full bounds-checks and thus are safe)." ;
+"Vectors and string buffers are implemented using the resizable sequence facility (and they perform full bounds-checks and thus are safe)." ;

@@ -22,7 +22,7 @@ M: vector set-nth
 
 M: object thaw drop V{ } clone ;
 
-M: vector clone clone-growable ;
+M: vector clone clone-resizable ;
 
 M: vector like
     drop dup vector? [

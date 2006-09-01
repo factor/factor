@@ -89,7 +89,7 @@ HELP: prune
 { $description "Outputs a new sequence with each distinct element of " { $snippet "seq" } " appearing only once. Elements are compared for equality using " { $link = } " and elements are ordered according to their position in " { $snippet "seq" } "." } ;
 
 HELP: nappend
-{ $values { "n" "an index in " { $snippet "dest" } } { "dest" "a resizable mutable sequence" } { "src" "a sequence" } }
+{ $values { "dest" "a resizable mutable sequence" } { "src" "a sequence" } }
 { $description "Appends " { $snippet "src" } " to the end of " { $snippet "dest" } "." }
 { $side-effects "dest" }
 { $errors "Throws an error if " { $snippet "src" } " contains elements not permitted in " { $snippet "dest" } "." } ;
