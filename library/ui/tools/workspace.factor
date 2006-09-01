@@ -135,6 +135,13 @@ V{ } clone operations set-global
 : define-operation ( class props -- )
     <operation> operations get push-new ;
 
+: operation-quot ( operation -- quot )
+    dup command-quot swap operation-tool
+    [ \ call-tool 2array append >quotation ] when* ;
+
+M: operation invoke-command ( target operation -- )
+    operation-quot call ;
+
 ! Objects
 object H{
     { +button+ 3 }
@@ -161,7 +168,6 @@ input H{
 \ word H{
     { +button+ 2 }
     { +name+ "Edit" }
-    { +tool+ listener-gadget }
     { +gesture+ T{ key-down f { A+ } "e" } }
     { +quot+ [ edit ] }
 } define-operation
@@ -209,7 +215,6 @@ link H{
 link H{
     { +button+ 2 }
     { +name+ "Edit" }
-    { +tool+ listener-gadget }
     { +quot+ [ edit ] }
 } define-operation
 
@@ -238,7 +243,7 @@ quotation H{
     { +name+ "Infer" }
     { +tool+ listener-gadget }
     { +gesture+ T{ key-down f { C+ A+ } "i" } }
-    { +quot+ [ infer ] }
+    { +quot+ [ infer . ] }
 } define-operation
 
 quotation H{
@@ -256,6 +261,8 @@ quotation H{
 } define-operation
 
 ! Define commands in terms of operations
+: modify-operations ( quot operations -- operations )
+    [ nip ] map-with ;
 
 ! Tile commands
 tile

@@ -1,8 +1,5 @@
 ! Copyright (C) 2006 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-IN: gadgets-workspace
-DEFER: call-tool
-
 USING: arrays definitions kernel gadgets sequences strings math
 words generic namespaces hashtables help ;
 IN: gadgets
@@ -92,23 +89,20 @@ SYMBOL: +tool+
 SYMBOL: +quot+
 SYMBOL: +gesture+
 
-TUPLE: operation class tags gesture filter tool ;
+TUPLE: operation class tags gesture tool ;
+
+: (operation) ( -- command )
+    f +name+ get +gesture+ get +quot+ get <command> ;
+
+: (tags) ( -- seq ) +button+ get +group+ get 2array ;
 
 C: operation ( class hash -- operation )
     swap [
-        f +name+ get +gesture+ get +quot+ get <command>
-        over set-delegate
-        +button+ get +group+ get 2array over set-operation-tags
+        (operation) over set-delegate
+        (tags) over set-operation-tags
         +tool+ get over set-operation-tool
     ] bind
     [ set-operation-class ] keep ;
-
-: modify-operations ( quot operations -- operations )
-    [ clone [ set-operation-filter ] keep ] map-with ;
-
-M: operation invoke-command ( target operation -- )
-    [ dup command-quot over operation-filter call ] keep
-    operation-tool [ call-tool ] [ call ] if* ;
 
 SYMBOL: operations
 
