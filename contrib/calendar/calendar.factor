@@ -6,10 +6,10 @@ TUPLE: timestamp year month day hour minute second gmt-offset ;
 TUPLE: dt year month day hour minute second ;
 
 SYMBOL: gmt-offset
-7 gmt-offset set-global
+-6 gmt-offset set-global  ! central time
 
-FUNCTION: time_t time ( time_t* tloc ) ;
-FUNCTION: tm* localtime ( time_t* clock ) ;
+LIBRARY: libc
+FUNCTION: time_t time ( time_t* t ) ;
 
 : month-names
     {
