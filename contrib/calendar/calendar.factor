@@ -8,6 +8,9 @@ TUPLE: dt year month day hour minute second ;
 SYMBOL: gmt-offset
 7 gmt-offset set-global
 
+FUNCTION: time_t time ( time_t* tloc ) ;
+FUNCTION: tm* localtime ( time_t* clock ) ;
+
 : month-names
     {
         "Not a month" "January" "February" "March" "April" "May" "June"
@@ -81,12 +84,12 @@ SYMBOL: m
     [ set-timestamp-minute ] keep
     set-timestamp-hour ;
 
-: date ( timestamp -- year month day )
+: >date< ( timestamp -- year month day )
     [ timestamp-year ] keep
     [ timestamp-month ] keep
     timestamp-day ;
 
-: time ( timestamp -- hour minute second )
+: >time< ( timestamp -- hour minute second )
     [ timestamp-hour ] keep
     [ timestamp-minute ] keep
     timestamp-second ;
@@ -121,7 +124,7 @@ GENERIC: +second ( timestamp x -- timestamp )
     dup 100 mod zero? 400 4 ? mod zero? ;
 
 : adjust-leap-year ( timestamp -- timestamp )
-    dup date 29 = swap 2 = and swap leap-year? not and [
+    dup >date< 29 = swap 2 = and swap leap-year? not and [
         dup >r timestamp-year 3 1 r> [ set-date ] keep
     ] when ;
 
@@ -140,8 +143,8 @@ M: real +month ( timestamp n -- timestamp )
 
 M: integer +day ( timestamp n -- timestamp )
     swap [
-        date julian-day-number + julian-day-number>timestamp
-    ] keep swap >r time r> [ set-time ] keep ;
+        >date< julian-day-number + julian-day-number>timestamp
+    ] keep swap >r >time< r> [ set-time ] keep ;
 M: real +day ( timestamp n -- timestamp )
     float>whole-part rot swap 24 * +hour swap +day ;
 
@@ -245,7 +248,7 @@ M: number +second ( timestamp n -- timestamp )
 : day-of-year ( timestamp -- n )
     [
         [ timestamp-year leap-year? ] keep
-        [ date 3array ] keep timestamp-year 3 1 3array <=>
+        [ >date< 3array ] keep timestamp-year 3 1 3array <=>
         0 >= and 1 0 ?
     ] keep 
     [ timestamp-month day-counts swap head-slice sum + ] keep
