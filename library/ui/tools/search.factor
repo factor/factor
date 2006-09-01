@@ -25,13 +25,3 @@ C: search-gadget ( quot -- )
     } make-frame* ;
 
 M: search-gadget focusable-child* search-gadget-input ;
-
-M: search-gadget pref-dim* drop { 400 500 } ;
-
-: apropos-window
-    [ apropos ] <search-gadget>
-    "Apropos" open-titled-window ;
-
-: search-help-window
-    [ search-help. ] <search-gadget>
-    "Search help" open-titled-window ;

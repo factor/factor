@@ -29,5 +29,7 @@ help-gadget {
 C: help-gadget ( -- gadget )
     dup init-history {
         { [ <help-pane> ] f f 4/5 }
-        { [ [ search-help. ] <search-gadget> ] f f 1/5 }
+        { [ [ search-help. ] <search-gadget> ] set-help-gadget-search f 1/5 }
     } { 1 0 } make-track* ;
+
+M: help-gadget focusable-child* help-gadget-search ;

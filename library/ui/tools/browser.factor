@@ -7,7 +7,7 @@ namespaces gadgets-tracks gadgets-presentations gadgets-grids
 gadgets-frames help gadgets-buttons gadgets-search ;
 IN: gadgets-browser
 
-TUPLE: browser navigator definitions ;
+TUPLE: browser navigator definitions search ;
 
 TUPLE: definitions showing ;
 
@@ -86,8 +86,10 @@ C: browser ( -- gadget )
     {
         { [ <navigator> ] set-browser-navigator f 1/5 }
         { [ <definitions> ] set-browser-definitions [ <scroller> ] 3/5 }
-        { [ [ apropos ] <search-gadget> ] f f 1/5 }
+        { [ [ apropos ] <search-gadget> ] set-browser-search f 1/5 }
     } { 0 1 } make-track* ;
+
+M: browser focusable-child* browser-search ;
 
 : show-vocab ( vocab browser -- )
     browser-navigator navigator-vocab set-model* ;
