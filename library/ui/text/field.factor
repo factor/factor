@@ -9,8 +9,7 @@ TUPLE: field model ;
 C: field ( model -- field )
     <editor> over set-delegate
     [ set-field-model ] keep
-    dup dup set-control-self
-    dup faint-boundary ;
+    dup dup set-control-self ;
 
 : field-commit ( field -- string )
     [ editor-text ] keep

@@ -5,7 +5,7 @@ USING: gadgets gadgets-borders gadgets-buttons gadgets-frames
 gadgets-panes gadgets-search gadgets-scrolling help kernel
 models namespaces sequences gadgets-tracks ;
 
-TUPLE: help-gadget history ;
+TUPLE: help-gadget history search ;
 
 : show-help ( link help -- )
     dup help-gadget-history add-history
@@ -14,9 +14,9 @@ TUPLE: help-gadget history ;
 : go-home ( help -- ) "handbook" swap show-help ;
 
 help-gadget {
-    { f "Back" T{ key-down f f "b" } [ help-gadget-history go-back ] }
-    { f "Forward" T{ key-down f f "f" } [ help-gadget-history go-forward ] }
-    { f "Home" T{ key-down f f "h" } [ go-home ] }
+    { f "Back" T{ key-down f { C+ } "b" } [ help-gadget-history go-back ] }
+    { f "Forward" T{ key-down f { C+ } "f" } [ help-gadget-history go-forward ] }
+    { f "Home" T{ key-down f { C+ } "h" } [ go-home ] }
 } define-commands
 
 : <help-pane> ( history -- gadget )
@@ -28,8 +28,8 @@ help-gadget {
 
 C: help-gadget ( -- gadget )
     dup init-history {
-        { [ <help-pane> ] f f 4/5 }
+        { [ <help-pane> ] f [ <scroller> ] 4/5 }
         { [ [ search-help. ] <search-gadget> ] set-help-gadget-search f 1/5 }
-    } { 1 0 } make-track* ;
+    } { 0 1 } make-track* ;
 
 M: help-gadget focusable-child* help-gadget-search ;

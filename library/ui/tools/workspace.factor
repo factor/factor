@@ -57,7 +57,7 @@ M: workspace pref-dim* delegate pref-dim* { 550 650 } vmax ;
     open-window ;
 
 : show-tool ( class workspace -- tool )
-    [ book-pages [ class eq? ] find-with swap ] keep
+    [ book-pages [ tool-gadget class eq? ] find-with swap ] keep
     control-model set-model* ;
 
 : find-workspace ( -- workspace )

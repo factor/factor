@@ -6,6 +6,7 @@
 - help browser: jump to definition command when looking at a word
 - alien-indirect
 - fix modified operations
+- command categorization in keyboard help window
 
 ========================================================================
 
