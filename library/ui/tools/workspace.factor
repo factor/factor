@@ -155,7 +155,7 @@ M: operation invoke-command ( target operation -- )
     [ modify-listener-operation ] map-with ;
 
 ! Objects
-object H{
+[ drop t ] H{
     { +button+ 1 }
     { +name+ "Inspect" }
     { +quot+ [ inspect ] }
@@ -163,76 +163,82 @@ object H{
 } define-operation
 
 ! Input
-input H{
+[ input? ] H{
     { +button+ 1 }
     { +name+ "Input" }
     { +quot+ [ listener-gadget call-tool ] }
 } define-operation
 
 ! Words
-\ word H{
+[ word? ] H{
     { +button+ 1 }
     { +name+ "Browse" }
     { +gesture+ T{ key-down f { A+ } "b" } }
     { +quot+ [ browser call-tool ] }
 } define-operation
 
-\ word H{
+[ word? ] H{
     { +button+ 2 }
     { +name+ "Edit" }
     { +gesture+ T{ key-down f { A+ } "e" } }
     { +quot+ [ edit ] }
 } define-operation
 
-\ word H{
+[ word? ] H{
     { +button+ 3 }
     { +name+ "Documentation" }
     { +gesture+ T{ key-down f { A+ } "h" } }
     { +quot+ [ help-gadget call-tool ] }
 } define-operation
 
-\ word H{
+[ word? ] H{
     { +name+ "Usage" }
     { +gesture+ T{ key-down f { A+ } "u" } }
     { +quot+ [ usage. ] }
     { +listener+ t }
 } define-operation
 
-\ word H{
+[ word? ] H{
     { +name+ "Reload" }
     { +gesture+ T{ key-down f { A+ } "r" } }
     { +quot+ [ reload ] }
     { +listener+ t }
 } define-operation
 
-\ word H{
+[ word? ] H{
     { +name+ "Watch" }
     { +quot+ [ watch ] }
     { +listener+ t }
 } define-operation
 
 ! Vocabularies
-vocab-link H{
+[ vocab-link? ] H{
     { +button+ 1 }
     { +name+ "Browse" }
     { +quot+ [ browser call-tool ] }
 } define-operation
 
 ! Link
-link H{
+[ link? ] H{
     { +button+ 1 }
     { +name+ "Follow" }
     { +quot+ [ help-gadget call-tool ] }
 } define-operation
 
-link H{
+[ link? ] H{
     { +button+ 2 }
     { +name+ "Edit" }
     { +quot+ [ edit ] }
 } define-operation
 
+[ word-link? ] H{
+    { +button+ 2 }
+    { +name+ "Definition" }
+    { +quot+ [ link-name browser call-tool ] }
+} define-operation
+
 ! Strings
-string H{
+[ string? ] H{
     { +name+ "Apropos (all)" }
     { +gesture+ T{ key-down f { A+ } "a" } }
     { +quot+ [ apropos ] }
@@ -244,7 +250,7 @@ string H{
         use get [ hash-values [ dup set ] each ] each
     ] make-hash hash-values natural-sort ;
 
-string H{
+[ string? ] H{
     { +name+ "Apropos (used)" }
     { +gesture+ T{ key-down f f "TAB" } }
     { +quot+ [ usable-words (apropos) ] }
@@ -252,21 +258,21 @@ string H{
 } define-operation
 
 ! Quotations
-quotation H{
+[ quotation? ] H{
     { +name+ "Infer" }
     { +gesture+ T{ key-down f { C+ A+ } "i" } }
     { +quot+ [ infer . ] }
     { +listener+ t }
 } define-operation
 
-quotation H{
+[ quotation? ] H{
     { +name+ "Walk" }
     { +gesture+ T{ key-down f { C+ A+ } "w" } }
     { +quot+ [ walk ] }
     { +listener+ t }
 } define-operation
 
-quotation H{
+[ quotation? ] H{
     { +name+ "Time" }
     { +gesture+ T{ key-down f { C+ A+ } "t" } }
     { +quot+ [ time ] }

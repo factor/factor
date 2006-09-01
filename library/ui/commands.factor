@@ -89,32 +89,36 @@ SYMBOL: +quot+
 SYMBOL: +listener+
 SYMBOL: +gesture+
 
-TUPLE: operation class tags gesture listener? ;
+TUPLE: operation predicate tags gesture listener? ;
 
 : (operation) ( -- command )
     f +name+ get +gesture+ get +quot+ get <command> ;
 
 : (tags) ( -- seq ) +button+ get +group+ get 2array ;
 
-C: operation ( class hash -- operation )
+C: operation ( predicate hash -- operation )
     swap [
         (operation) over set-delegate
         (tags) over set-operation-tags
         +listener+ get over set-operation-listener?
     ] bind
-    [ set-operation-class ] keep ;
+    [ set-operation-predicate ] keep ;
 
 SYMBOL: operations
 
-: class-operations ( class -- operations )
-    operations get [ operation-class class< ] subset-with ;
+: object-operations ( obj -- operations )
+    operations get [ operation-predicate call ] subset-with ;
 
-: tagged-operations ( class tag -- commands )
-    swap class-operations
+: class-operations ( class -- operations )
+    "predicate" word-prop
+    operations get [ operation-predicate = ] subset-with ;
+
+: tagged-operations ( obj tag -- commands )
+    swap object-operations
     [ operation-tags member? ] subset-with ;
 
-: mouse-operation ( class button# -- command )
+: mouse-operation ( obj button# -- command )
     tagged-operations dup empty? [ drop f ] [ peek ] if ;
 
-: mouse-operations ( class -- seq )
+: mouse-operations ( obj -- seq )
     3 [ 1+ mouse-operation ] map-with ;
