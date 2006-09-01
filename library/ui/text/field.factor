@@ -17,6 +17,9 @@ C: field ( model -- field )
     select-all ;
 
 field {
-    { f "Clear input" T{ key-down f { C+ } "k" } [ control-model clear-doc ] }
-    { f "Accept input" T{ key-down f f "RETURN" } [ field-commit drop ] }
+    {
+        "Editing"
+        { "Clear input" T{ key-down f { C+ } "k" } [ control-model clear-doc ] }
+        { "Accept input" T{ key-down f f "RETURN" } [ field-commit drop ] }
+    }
 } define-commands

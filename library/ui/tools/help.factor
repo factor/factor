@@ -14,9 +14,12 @@ TUPLE: help-gadget history search ;
 : go-home ( help -- ) "handbook" swap show-help ;
 
 help-gadget {
-    { f "Back" T{ key-down f { C+ } "b" } [ help-gadget-history go-back ] }
-    { f "Forward" T{ key-down f { C+ } "f" } [ help-gadget-history go-forward ] }
-    { f "Home" T{ key-down f { C+ } "h" } [ go-home ] }
+    {
+        "Help"
+        { "Back" T{ key-down f { C+ } "b" } [ help-gadget-history go-back ] }
+        { "Forward" T{ key-down f { C+ } "f" } [ help-gadget-history go-forward ] }
+        { "Home" T{ key-down f { C+ } "h" } [ go-home ] }
+    }
 } define-commands
 
 : <help-pane> ( history -- gadget )

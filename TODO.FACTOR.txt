@@ -4,19 +4,18 @@
 - signal 4 on datastack underflow on mac intel??
 - help gadget should not re-render every time it is grafted
 - alien-indirect
-- command categorization in keyboard help window
 
 ========================================================================
 
 + ui:
 
+- perhaps commands window should sort by gesture
 - new section in cookbook: philosophy
 - interactor commands: don't invoke if interactor is busy
 - browser: show currently selected vocab & words
 - roundoff is still not quite right with tracks
 - fix top level window positioning
-- keyboard help persists after clicking on a link
-- grouping commands into categories
+- status help persists after clicking on a link
 - tool help
 - merge keyboard help with help in some way
 - keyboard help: hide commands whose gestures are shadowed

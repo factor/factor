@@ -133,12 +133,23 @@ C: titled-gadget ( gadget title -- )
     "Gadget: " write
     [ class word-name ] keep write-object terpri ;
 
-: commands. ( gadget -- )
-    dup gadget-info
-    all-commands
-    [ first command-gesture key-down? ] subset
+: command-table. ( commands group -- )
+    $heading
     [ first2 swap command-description ] map
     { "Command" "Gesture" } add* $table ;
+
+: push-hash ( elt key hash -- )
+    [ hash ?push ] 2keep set-hash ;
+
+: group-commands ( commands -- seq )
+    H{ } clone swap
+    [ dup first command-group pick push-hash ] each
+    hash>alist [ [ first ] 2apply <=> ] sort ;
+
+: commands. ( gadget -- )
+    dup gadget-info terpri
+    all-commands [ first command-gesture key-down? ] subset
+    group-commands [ first2 swap command-table. ] each ;
 
 : pane-window ( quot title -- )
     >r make-pane <scroller> r> open-titled-window ;

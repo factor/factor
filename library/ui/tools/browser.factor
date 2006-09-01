@@ -99,5 +99,8 @@ M: browser focusable-child* browser-search ;
     browser-definitions close-definitions ;
 
 browser {
-    { f "Clear" T{ key-down f f "CLEAR" } [ clear-browser ] }
+    {
+        "Browser"
+        { "Clear" T{ key-down f f "CLEAR" } [ clear-browser ] }
+    }
 } define-commands

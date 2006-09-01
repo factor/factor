@@ -56,11 +56,14 @@ TUPLE: walker-gadget model quot ns ;
 : walker-step-all dup [ step-all ] walker-command reset-walker ;
 
 walker-gadget {
-    { f "Step" T{ key-down f f "s" } [ walker-step ] }
-    { f "Step in" T{ key-down f f "i" } [ walker-step-in ] }
-    { f "Step out" T{ key-down f f "o" } [ walker-step-out ] }
-    { f "Step back" T{ key-down f f "b" } [ walker-step-back ] }
-    { f "Continue" T{ key-down f f "c" } [ walker-step-all ] }
+    {
+        "Walker"
+        { "Step" T{ key-down f f "s" } [ walker-step ] }
+        { "Step in" T{ key-down f f "i" } [ walker-step-in ] }
+        { "Step out" T{ key-down f f "o" } [ walker-step-out ] }
+        { "Step back" T{ key-down f f "b" } [ walker-step-back ] }
+        { "Continue" T{ key-down f f "c" } [ walker-step-all ] }
+    }
 } define-commands
 
 : init-walker-models ( walker -- model quot )

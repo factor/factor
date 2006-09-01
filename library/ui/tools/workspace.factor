@@ -76,15 +76,21 @@ M: workspace pref-dim* delegate pref-dim* { 550 650 } vmax ;
 : tool-window ( class -- ) workspace-window show-tool drop ;
 
 workspace {
-    { f "Keyboard help" T{ key-down f f "F1" } [ commands-window ] }
-    { f "Listener" T{ key-down f f "F2" } [ listener-gadget select-tool ] }
-    { f "Definitions" T{ key-down f f "F3" } [ browser select-tool ] }
-    { f "Documentation" T{ key-down f f "F4" } [ help-gadget select-tool ] }
-    { f "Walker" T{ key-down f f "F5" } [ walker-gadget select-tool ] }
+    {
+        "Tools"
+        { "Keyboard help" T{ key-down f f "F1" } [ commands-window ] }
+        { "Listener" T{ key-down f f "F2" } [ listener-gadget select-tool ] }
+        { "Definitions" T{ key-down f f "F3" } [ browser select-tool ] }
+        { "Documentation" T{ key-down f f "F4" } [ help-gadget select-tool ] }
+        { "Walker" T{ key-down f f "F5" } [ walker-gadget select-tool ] }
+    }
 
-    { f "New listener" T{ key-down f { S+ } "F2" } [ listener-gadget tool-window drop ] }
-    { f "New definitions" T{ key-down f { S+ } "F3" } [ browser tool-window drop ] }
-    { f "New documentation" T{ key-down f { S+ } "F4" } [ help-gadget tool-window drop ] }
+    {
+        "Tools in new window"
+        { "New listener" T{ key-down f { S+ } "F2" } [ listener-gadget tool-window drop ] }
+        { "New definitions" T{ key-down f { S+ } "F3" } [ browser tool-window drop ] }
+        { "New documentation" T{ key-down f { S+ } "F4" } [ help-gadget tool-window drop ] }
+    }
 } define-commands
 
 ! Walker tool
@@ -172,6 +178,7 @@ M: operation invoke-command ( target operation -- )
 ! Words
 [ word? ] H{
     { +button+ 1 }
+    { +group+ "Words" }
     { +name+ "Browse" }
     { +gesture+ T{ key-down f { A+ } "b" } }
     { +quot+ [ browser call-tool ] }
@@ -179,6 +186,7 @@ M: operation invoke-command ( target operation -- )
 
 [ word? ] H{
     { +button+ 2 }
+    { +group+ "Words" }
     { +name+ "Edit" }
     { +gesture+ T{ key-down f { A+ } "e" } }
     { +quot+ [ edit ] }
@@ -186,12 +194,14 @@ M: operation invoke-command ( target operation -- )
 
 [ word? ] H{
     { +button+ 3 }
+    { +group+ "Words" }
     { +name+ "Documentation" }
     { +gesture+ T{ key-down f { A+ } "h" } }
     { +quot+ [ help-gadget call-tool ] }
 } define-operation
 
 [ word? ] H{
+    { +group+ "Words" }
     { +name+ "Usage" }
     { +gesture+ T{ key-down f { A+ } "u" } }
     { +quot+ [ usage. ] }
@@ -199,6 +209,7 @@ M: operation invoke-command ( target operation -- )
 } define-operation
 
 [ word? ] H{
+    { +group+ "Words" }
     { +name+ "Reload" }
     { +gesture+ T{ key-down f { A+ } "r" } }
     { +quot+ [ reload ] }
@@ -206,6 +217,7 @@ M: operation invoke-command ( target operation -- )
 } define-operation
 
 [ word? ] H{
+    { +group+ "Words" }
     { +name+ "Watch" }
     { +quot+ [ watch ] }
     { +listener+ t }
@@ -239,6 +251,7 @@ M: operation invoke-command ( target operation -- )
 
 ! Strings
 [ string? ] H{
+    { +group+ "Words" }
     { +name+ "Apropos (all)" }
     { +gesture+ T{ key-down f { A+ } "a" } }
     { +quot+ [ apropos ] }
@@ -251,6 +264,7 @@ M: operation invoke-command ( target operation -- )
     ] make-hash hash-values natural-sort ;
 
 [ string? ] H{
+    { +group+ "Words" }
     { +name+ "Apropos (used)" }
     { +gesture+ T{ key-down f f "TAB" } }
     { +quot+ [ usable-words (apropos) ] }
@@ -259,6 +273,7 @@ M: operation invoke-command ( target operation -- )
 
 ! Quotations
 [ quotation? ] H{
+    { +group+ "Quotations" }
     { +name+ "Infer" }
     { +gesture+ T{ key-down f { C+ A+ } "i" } }
     { +quot+ [ infer . ] }
@@ -266,6 +281,7 @@ M: operation invoke-command ( target operation -- )
 } define-operation
 
 [ quotation? ] H{
+    { +group+ "Quotations" }
     { +name+ "Walk" }
     { +gesture+ T{ key-down f { C+ A+ } "w" } }
     { +quot+ [ walk ] }
@@ -273,6 +289,7 @@ M: operation invoke-command ( target operation -- )
 } define-operation
 
 [ quotation? ] H{
+    { +group+ "Quotations" }
     { +name+ "Time" }
     { +gesture+ T{ key-down f { C+ A+ } "t" } }
     { +quot+ [ time ] }
@@ -302,8 +319,9 @@ define-commands*
 
 interactor [
     {
-        { f "Evaluate" T{ key-down f f "RETURN" } [ interactor-commit ] }
-        { f "Send EOF" T{ key-down f { C+ } "d" } [ f swap interactor-eval ] }
+        "Listener"
+        { "Evaluate" T{ key-down f f "RETURN" } [ interactor-commit ] }
+        { "Send EOF" T{ key-down f { C+ } "d" } [ f swap interactor-eval ] }
     } <commands> %
 
     [ word-action ] \ word class-operations modify-listener-operations %
@@ -311,8 +329,9 @@ interactor [
     [ quot-action ] quotation class-operations modify-listener-operations %
 
     {
-        { f "History" T{ key-down f { C+ } "h" } [ [ interactor-history. ] swap interactor-call ] }
-        { f "Clear output" T{ key-down f f "CLEAR" } [ [ clear-output ] swap interactor-call ] }
-        { f "Clear stack" T{ key-down f { C+ } "CLEAR" } [ [ clear ] swap interactor-call ] }
+        "Listener"
+        { "History" T{ key-down f { C+ } "h" } [ [ interactor-history. ] swap interactor-call ] }
+        { "Clear output" T{ key-down f f "CLEAR" } [ [ clear-output ] swap interactor-call ] }
+        { "Clear stack" T{ key-down f { C+ } "CLEAR" } [ [ clear ] swap interactor-call ] }
     } <commands> %
 ] { } make define-commands*

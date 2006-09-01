@@ -48,11 +48,11 @@ M: object gesture>string drop f ;
     command-gestures "gestures" set-word-prop ;
 
 : <commands> ( specs -- commands )
-    #! Specs is an array of { group name gesture quot }
-    [ first4 <command> ] map ;
+    #! Specs is an array of { group { name gesture quot }* }
+    unclip swap [ first3 <command> ] map-with ;
 
 : define-commands ( class specs -- )
-    <commands> define-commands* ;
+    [ <commands> ] map concat define-commands* ;
 
 : commands ( gadget -- seq )
     delegates [ class "commands" word-prop ] map concat ;
@@ -89,17 +89,15 @@ SYMBOL: +quot+
 SYMBOL: +listener+
 SYMBOL: +gesture+
 
-TUPLE: operation predicate tags gesture listener? ;
+TUPLE: operation predicate button gesture listener? ;
 
 : (operation) ( -- command )
-    f +name+ get +gesture+ get +quot+ get <command> ;
-
-: (tags) ( -- seq ) +button+ get +group+ get 2array ;
+    +group+ get +name+ get +gesture+ get +quot+ get <command> ;
 
 C: operation ( predicate hash -- operation )
     swap [
         (operation) over set-delegate
-        (tags) over set-operation-tags
+        +button+ get over set-operation-button
         +listener+ get over set-operation-listener?
     ] bind
     [ set-operation-predicate ] keep ;
@@ -113,12 +111,10 @@ SYMBOL: operations
     "predicate" word-prop
     operations get [ operation-predicate = ] subset-with ;
 
-: tagged-operations ( obj tag -- commands )
-    swap object-operations
-    [ operation-tags member? ] subset-with ;
-
 : mouse-operation ( obj button# -- command )
-    tagged-operations dup empty? [ drop f ] [ peek ] if ;
+    swap object-operations
+    [ operation-button = ] subset-with
+    dup empty? [ drop f ] [ peek ] if ;
 
 : mouse-operations ( obj -- seq )
     3 [ 1+ mouse-operation ] map-with ;
