@@ -55,10 +55,10 @@ M: editor model-changed
 : change-caret ( editor quot -- )
     over >r >r dup editor-caret* swap control-model r> call r>
     [ control-model validate-loc ] keep
-    editor-caret set-model ; inline
+    editor-caret set-model* ; inline
 
 : mark>caret ( editor -- )
-    dup editor-caret* swap editor-mark set-model ;
+    dup editor-caret* swap editor-mark set-model* ;
 
 : change-caret&mark ( editor quot -- )
     over >r change-caret r> mark>caret ; inline
@@ -92,7 +92,7 @@ M: editor model-changed
     ] keep swap 2array ;
 
 : click-loc ( editor model -- )
-    >r [ hand-rel ] keep point>loc r> set-model ;
+    >r [ hand-rel ] keep point>loc r> set-model* ;
 
 : focus-editor ( editor -- )
     t over set-editor-focused? relayout-1 ;
@@ -125,8 +125,7 @@ M: editor model-changed
     dup caret-rect swap scroll>rect ;
 
 M: loc-monitor model-changed
-    loc-monitor-editor dup scroll>caret
-    control-self relayout ;
+    loc-monitor-editor control-self scroll>caret ;
 
 : draw-caret ( -- )
     editor get editor-focused? [

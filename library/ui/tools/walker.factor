@@ -67,9 +67,6 @@ walker-gadget {
     f <model> over set-walker-gadget-quot
     f <model> swap set-walker-gadget-model ;
 
-M: walker-gadget gadget-title
-    drop "Single stepper" <model> ;
-
 : (walk) ( quot continuation walker -- )
     H{ } clone over set-walker-gadget-ns [
         V{ } clone meta-history set

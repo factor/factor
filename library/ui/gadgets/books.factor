@@ -6,9 +6,7 @@ kernel sequences models ;
 
 TUPLE: book pages ;
 
-: get-page ( n book -- page )
-    #! page gadgets are instantiated lazily.
-    book-pages [ dup quotation? [ call ] when dup ] change-nth ;
+: get-page ( n book -- page ) book-pages nth ;
 
 M: book model-changed ( book -- )
     [ control-model model-value ] keep
@@ -27,7 +25,5 @@ M: book pref-dim* gadget-child pref-dim ;
 
 M: book layout*
     dup rect-dim swap gadget-child set-layout-dim ;
-
-M: book gadget-title gadget-child gadget-title ;
 
 M: book focusable-child* gadget-child ;

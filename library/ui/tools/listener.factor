@@ -54,8 +54,6 @@ C: listener-gadget ( -- gadget )
 M: listener-gadget focusable-child*
     listener-gadget-input ;
 
-M: listener-gadget gadget-title drop "Listener" <model> ;
-
 : listener-available? ( gadget -- ? )
     dup listener-gadget? [
         listener-gadget-input interactor-busy? not

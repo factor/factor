@@ -90,7 +90,7 @@ M: button-paint draw-boundary
     button-paint draw-boundary ;
 
 : <radio-control> ( model value gadget -- gadget )
-    over [ swap control-model set-model ] curry <bevel-button>
+    over [ swap control-model set-model* ] curry <bevel-button>
     swap [ swap >r = r> set-button-selected? ] curry <control> ;
 
 : <radio-box> ( model assoc -- gadget )

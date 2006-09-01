@@ -27,7 +27,3 @@ C: help-gadget ( -- gadget )
     over set-help-gadget-history {
         { [ <help-pane> <scroller> ] f f @center }
     } make-frame* ;
-
-M: help-gadget gadget-title
-    help-gadget-history
-    [ "Help - " swap article-title append ] <filter> ;

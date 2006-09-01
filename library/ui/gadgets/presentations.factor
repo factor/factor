@@ -31,10 +31,10 @@ C: presentation ( button object commands -- button )
     ] if* ;
 
 : show-mouse-help ( presentation -- )
-    dup find-world [ world-status set-model ] [ drop ] if* ;
+    dup find-world [ world-status set-model* ] [ drop ] if* ;
 
 : hide-mouse-help ( presentation -- )
-    find-world [ world-status f swap set-model ] when* ;
+    find-world [ world-status f swap set-model* ] when* ;
 
 presentation H{
     { T{ button-up f f 1 } [ [ 1 invoke-presentation ] if-clicked ] }
@@ -138,10 +138,10 @@ presentation H{
     >r <pane> dup r> swap <styled-paragraph>
     >r swap with-pane r> ; inline
 
-: apply-table-gap-style ( grid style -- grid style )
+: apply-table-gap-style ( style grid -- style grid )
     table-gap [ over set-grid-gap ] apply-style ;
 
-: apply-table-border-style ( grid style -- grid style )
+: apply-table-border-style ( style grid -- style grid )
     table-border [ <grid-lines> over set-gadget-boundary ]
     apply-style ;
 

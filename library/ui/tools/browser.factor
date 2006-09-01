@@ -21,6 +21,9 @@ TUPLE: definitions showing ;
     over find-definitions definitions-showing delete
     unparent ;
 
+: close-definitions ( definitions -- )
+    dup clear-gadget definitions-showing delete-all ;
+
 C: definitions ( -- gadget )
     <pile> over set-delegate
     { 2 2 } over set-pack-gap
@@ -85,11 +88,16 @@ C: browser ( -- gadget )
         { [ <definitions> ] set-browser-definitions [ <scroller> ] 3/4 }
     } { 0 1 } make-track* ;
 
-M: browser gadget-title drop "Browser" <model> ;
-
 : show-vocab ( vocab browser -- )
-    browser-navigator navigator-vocab set-model ;
+    browser-navigator navigator-vocab set-model* ;
 
 : show-word ( word browser -- )
     over word-vocabulary over show-vocab
     browser-definitions show-definition ;
+
+: clear-browser ( browser -- )
+    browser-definitions close-definitions ;
+
+browser {
+    { f "Clear" T{ key-down f f "CLEAR" } [ clear-browser ] }
+} define-commands

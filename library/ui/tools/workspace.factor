@@ -19,8 +19,6 @@ C: tool ( gadget -- tool )
         { [ ] set-tool-gadget f @center }
     } make-frame* ;
 
-M: tool gadget-title tool-gadget gadget-title ;
-
 M: tool focusable-child* tool-gadget ;
 
 M: tool call-tool* tool-gadget call-tool* ;
@@ -29,19 +27,17 @@ TUPLE: workspace ;
 
 : workspace-tabs
     {
-        { "Listener" listener-gadget [ <listener-gadget> ] }
-        { "Walker" walker-gadget [ <walker-gadget> ] }
-        { "Definitions" browser [ <browser> ] } 
-        { "Documentation" help-gadget [ <help-gadget> ] }
+        { "Listener" <listener-gadget> }
+        { "Definitions" <browser> } 
+        { "Documentation" <help-gadget> }
+        { "Walker" <walker-gadget> }
     } ;
 
 C: workspace ( -- workspace )
-    workspace-tabs
-    [ third [ <tool> ] append ] map <book>
-    over set-gadget-delegate
-    dup dup set-control-self ;
+    workspace-tabs [ second execute <tool> ] map <book>
+    over set-gadget-delegate dup dup set-control-self ;
 
-M: workspace pref-dim* delegate pref-dim* { 500 650 } vmax ;
+M: workspace pref-dim* delegate pref-dim* { 550 650 } vmax ;
 
 : <workspace-tabs> ( book -- tabs )
     control-model
@@ -61,10 +57,8 @@ M: workspace pref-dim* delegate pref-dim* { 500 650 } vmax ;
     open-window ;
 
 : show-tool ( class workspace -- tool )
-    >r workspace-tabs [ second eq? ] find-with drop r>
-    [ get-page ] 2keep control-model set-model ;
-
-: select-tool ( workspace class -- ) swap show-tool drop ;
+    [ book-pages [ class eq? ] find-with swap ] keep
+    control-model set-model* ;
 
 : find-workspace ( -- workspace )
     [ workspace? ] find-window
@@ -77,13 +71,20 @@ M: workspace pref-dim* delegate pref-dim* { 500 650 } vmax ;
     dup find-world world-focus [ ] [ gadget-child ] ?if
     [ commands. ] "Commands" pane-window ;
 
+: select-tool ( workspace class -- ) swap show-tool drop ;
+
+: tool-window ( class -- ) workspace-window show-tool drop ;
+
 workspace {
     { f "Keyboard help" T{ key-down f f "F1" } [ commands-window ] }
     { f "Listener" T{ key-down f f "F2" } [ listener-gadget select-tool ] }
-    { f "Walker" T{ key-down f f "F3" } [ walker-gadget select-tool ] }
-    { f "Dictionary" T{ key-down f f "F4" } [ browser select-tool ] }
-    { f "Documentation" T{ key-down f f "F5" } [ help-gadget select-tool ] }
-    { f "New workspace" T{ key-down f { C+ } "n" } [ workspace-window drop ] }
+    { f "Definitions" T{ key-down f f "F3" } [ browser select-tool ] }
+    { f "Documentation" T{ key-down f f "F4" } [ help-gadget select-tool ] }
+    { f "Walker" T{ key-down f f "F5" } [ walker-gadget select-tool ] }
+
+    { f "New listener" T{ key-down f { S+ } "F2" } [ listener-gadget tool-window drop ] }
+    { f "New definitions" T{ key-down f { S+ } "F3" } [ browser tool-window drop ] }
+    { f "New documentation" T{ key-down f { S+ } "F4" } [ help-gadget tool-window drop ] }
 } define-commands
 
 ! Walker tool
@@ -258,7 +259,7 @@ quotation H{
 
 ! Tile commands
 tile
-[ tile-definition ] \ word class-operations modify-operations
+[ tile-action ] \ word class-operations modify-operations
 [ operation-tool browser eq? not ] subset
 T{ command f f "Close" f [ close-tile ] } add*
 define-commands*
@@ -266,16 +267,17 @@ define-commands*
 ! Interactor commands
 : selected-word ( editor -- string )
     dup gadget-selection?
-    [ dup T{ word-elt } select-elt ] unless ;
+    [ dup T{ word-elt } select-elt ] unless
+    gadget-selection ;
 
-: token-action ( target quot -- target quot )
-    >r selected-word r> ;
+: token-action ( quot -- quot )
+    \ selected-word add* ;
 
-: word-action ( target quot -- target quot )
-    \ search add* token-action ;
+: word-action ( quot -- quot )
+    [ selected-word search ] swap append ;
 
-: quot-action ( target quot -- target quot )
-    >r field-commit r> \ parse add* ;
+: quot-action ( quot -- quot )
+    [ field-commit parse ] swap append ;
 
 interactor [
     {
@@ -290,6 +292,6 @@ interactor [
     {
         { f "History" T{ key-down f { C+ } "h" } [ [ interactor-history. ] swap interactor-call ] }
         { f "Clear output" T{ key-down f f "CLEAR" } [ [ clear-output ] swap interactor-call ] }
-        { f "Clear stack" T{ key-down f { C+ } "CLEAR" } [ [ clear ] interactor-call ] }
+        { f "Clear stack" T{ key-down f { C+ } "CLEAR" } [ [ clear ] swap interactor-call ] }
     } <commands> %
 ] { } make define-commands*

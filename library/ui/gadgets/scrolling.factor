@@ -65,7 +65,8 @@ C: scroller ( gadget -- scroller )
     ] keep dup scroller-origin rot v+ scroll ;
 
 : scroll>rect ( rect gadget -- )
-    find-scroller dup [ set-scroller-follows ] [ 2drop ] if ;
+    find-scroller dup [ [ set-scroller-follows ] 2keep ] when
+    relayout drop ;
 
 : scroll>bottom ( gadget -- )
     t swap scroll>rect ;

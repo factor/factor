@@ -1,25 +1,20 @@
 + 0.84:
 
-- browser: clicking a word in the list twice does not work
-- interactor commands: don't invoke if interactor is busy
-- new browser:
-  - show currently selected vocab & words
-  - scroll to existing won't work
-  - initial scroll dim is wrong
 - RT_WORD should refer to XTs not word objects.
-- roundoff is still not quite right with tracks
 - signal 4 on datastack underflow on mac intel??
-- new section in cookbook: philosophy
 - help gadget should not re-render every time it is grafted
 - apropos and help search
+- help browser: jump to definition command when looking at a word
 - alien-indirect
-- help browser: jump to definition
-- 3 f curry ==> a vector!
 
 ========================================================================
 
 + ui:
 
+- new section in cookbook: philosophy
+- interactor commands: don't invoke if interactor is busy
+- browser: show currently selected vocab & words
+- roundoff is still not quite right with tracks
 - fix top level window positioning
 - keyboard help persists after clicking on a link
 - grouping commands into categories
