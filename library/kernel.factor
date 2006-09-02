@@ -28,8 +28,8 @@ M: object clone ;
 
 : cpu ( -- cpu ) 7 getenv ; foldable
 : os ( -- os ) 11 getenv ; foldable
-: windows? ( -- ? ) os "windows" = ; inline
-: macosx? ( -- ? ) os "macosx" = ; inline
+: windows? ( -- ? ) os "windows" = ; foldable
+: macosx? ( -- ? ) os "macosx" = ; foldable
 
 : slip ( quot x -- x ) >r call r> ; inline
 
@@ -105,8 +105,8 @@ IN: kernel-internals
 
 IN: kernel
 
-: win32? ( -- ? ) windows? cell 4 = and ; inline
-: win64? ( -- ? ) windows? cell 8 = and ; inline
+: win32? ( -- ? ) windows? cell 4 = and ; foldable
+: win64? ( -- ? ) windows? cell 8 = and ; foldable
 
 IN: memory
 
