@@ -244,3 +244,8 @@ GENERIC: void-generic ( obj -- * )
 : constant-branch-fold-0 "hey" ; foldable
 : constant-branch-fold-1 constant-branch-fold-0 "hey" = ; inline
 [ 1 ] [ [ constant-branch-fold-1 [ 1 ] [ 2 ] if ] compile-1 ] unit-test
+
+! another regression
+: foo f ;
+: bar foo 4 4 = and ;
+[ f ] [ bar ] unit-test

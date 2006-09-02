@@ -17,12 +17,15 @@ GENERIC: optimize-node* ( node -- node/t )
         keep-optimizing [ optimizer-changed on ] when
     ] map-nodes ;
 
-: optimize ( node -- node )
+: optimize-1 ( node -- node ? )
     dup kill-values dup infer-classes [
         optimizer-changed off
         optimize-node
         optimizer-changed get
-    ] with-node-iterator [ optimize ] when ;
+    ] with-node-iterator ;
+
+: optimize ( node -- node )
+    optimize-1 [ optimize ] when ;
 
 : prune-if ( node quot -- successor/t )
     over >r call [ r> node-successor ] [ r> drop t ] if ;
@@ -90,6 +93,7 @@ M: #return optimize-node*
         node-literal t
     ] [
         node-class {
+            { [ dup null class< ] [ drop f f ] }
             { [ dup general-t class< ] [ drop t t ] }
             { [ dup \ f class< ] [ drop f t ] }
             { [ t ] [ drop f f ] }
