@@ -2,40 +2,15 @@ IN: sequences
 USING: arrays help kernel kernel-internals sequences-internals
 strings vectors words ;
 
-ARTICLE: "sequences" "Sequences"
-"A sequence is a linearly-ordered finite collection of elements."
-$terpri
-"Sequence utility words can operate on any object whose class implements the sequence protocol."
-{ $subsection "sequence-protocol" }
-"There are a number of implementations of sequences in the core library, and you can write new implementations yourself."
-{ $subsection "sequence-implementations" }
-"Much of the power of sequences lies in the polymorphic utility words that allow computations to be expressed as bulk operations without loops, recursion or micro-management of elements."
-{ $subsection "sequences-utilities" }
-{ $subsection "sequences-iteration" }
-{ $subsection "sequences-tests" }
-{ $subsection "sequences-adding" }
-{ $subsection "sequences-indices" }
-{ $subsection "sequences-sets" }
-{ $subsection "sequences-slicing" }
-{ $subsection "sequences-sorting" }
-{ $subsection "sequences-stacks" }
-{ $subsection "sequences-comparing" }
-{ $subsection "sequences-assoc" }
-"Some implementation details which your code should probably not care about:"
-{ $subsection "sequences-unsafe" }
-{ $subsection "sequences-resizable" }
-{ $see-also "namespaces-make" } ;
-
 ARTICLE: "sequence-implementations" "Sequence implementations"
-"There are two main categories of sequences. Concrete sequences are backed by actual storage:"
+"There are two basic types of sequences. Instances of the following two types have fixed length:"
 { $subsection "arrays" }
-{ $subsection "vectors" }
 { $subsection "strings" }
+"Instances of the following are resizable:"
+{ $subsection "vectors" }
 { $subsection "sbufs" }
+"Quotations are special sequences which hold code:"
 { $subsection "quotations" }
-"Virtual sequences wrap an underlying sequence to present an alternative view of its elements:"
-{ $subsection <slice> }
-{ $subsection <reversed> }
 "Integers support the sequence protocol:"
 { $subsection "sequences-integers" }
 "The " { $link f } " object also supports the sequence protocol. It responds with a length of zero, and instead of throwing an out of bounds error, outputs " { $link f } " when an element is accessed. This can simplify code that would like a dummy sequence behaving as if it has arbitrary length." ;
@@ -49,8 +24,9 @@ $terpri
 { $example "{ \"a\" \"b\" \"c\" } dup length [\n    \"Index: \" write . \"Element: \" write .\n] 2each" "Index: 0\nElement: \"a\"\nIndex: 1\nElement: \"b\"\nIndex: 2\nElement: \"c\"" }
 "Combinators that produce new sequences, such as " { $link map } ", will output an array if the input is an integer." ;
 
-ARTICLE: "sequences-utilities" "Basic utilities"
-"Some utilities for accessing various common indices:"
+ARTICLE: "sequences-access" "Accessing sequence elements"
+{ $subsection nth }
+{ $subsection ?nth }
 { $subsection first }
 { $subsection second }
 { $subsection third }
@@ -58,91 +34,138 @@ ARTICLE: "sequences-utilities" "Basic utilities"
 { $subsection first2 }
 { $subsection first3 }
 { $subsection first4 }
-"A forgiving wrapper for " { $link nth } ":"
-{ $subsection ?nth }
-{ $subsection bounds-check? } ;
+{ $subsection peek }
+{ $subsection last/first } ;
 
-ARTICLE: "sequences-iteration" "Iteration and collection"
-"Iteration combinators:"
+ARTICLE: "sequences-combinators" "Sequence combinators"
+"Iteration:"
 { $subsection each }
+{ $subsection each-with }
 { $subsection reduce }
-{ $subsection accumulate }
 { $subsection interleave }
 { $subsection 2each }
 { $subsection 2reduce }
-"Collection combinators:"
+"Mapping:"
 { $subsection map }
+{ $subsection map-with }
+{ $subsection accumulate }
 { $subsection 2map }
-"A combinator that modifies elements in-place:"
-{ $subsection inject } ;
+"Filtering:"
+{ $subsection subset }
+{ $subsection subset-with } ;
 
 ARTICLE: "sequences-tests" "Testing sequences"
+"Testing for an empty sequence:"
 { $subsection empty? }
+"Testing indices:"
+{ $subsection bounds-check? }
+"Testing if a sequence contains an object:"
 { $subsection member? }
 { $subsection memq? }
+"Testing if a sequence contains a subsequence:"
 { $subsection head? }
 { $subsection tail? }
 { $subsection subseq? }
+"Testing if a sequence contains elements satisfying a predicate:"
 { $subsection contains? }
+{ $subsection contains-with? }
 { $subsection all? }
+{ $subsection all-with? }
+"Testing how elements are related:"
 { $subsection monotonic? }
 { $subsection all-eq? }
 { $subsection all-equal? } ;
 
-ARTICLE: "sequences-slicing" "Slicing and splitting"
-"The first set of words are concerned with taking subsequences of a sequence. Each of the below words comes in dual pairs; the first of the pair outputs a new copied sequence, the second outputs a virtual sequence sharing structure with the underlying sequence."
-{ $subsection subseq }
-{ $subsection <slice> }
-{ $subsection head }
-{ $subsection head-slice }
-{ $subsection tail }
-{ $subsection tail-slice }
-{ $subsection head* }
-{ $subsection head-slice* }
-{ $subsection tail* }
-{ $subsection tail-slice* }
-"Finally, some words for splitting sequences."
-{ $subsection ?head }
-{ $subsection ?tail }
-{ $subsection group }
-{ $subsection split1 }
-{ $subsection split }
-{ $subsection unclip } ;
-
-ARTICLE: "sequences-indices" "Order-sensitive operations"
-"Searching for the index of an element and or beginning of a subsequence:"
+ARTICLE: "sequences-search" "Searching sequences"
+"Finding the index of an element:"
 { $subsection index }
 { $subsection index* }
+{ $subsection last-index }
+{ $subsection last-index* }
+"Finding the start of a subsequence:"
 { $subsection start }
 { $subsection start* }
-"Two combinators the above are based on:"
+"Finding the index of an element satisfying a predicate:"
 { $subsection find }
 { $subsection find* }
-"Memoization:"
-{ $subsection cache-nth } ;
+{ $subsection find-with }
+{ $subsection find-with* }
+{ $subsection find-last }
+{ $subsection find-last-with }
+{ $subsection find-last* }
+{ $subsection find-last-with* } ;
 
-ARTICLE: "sequences-adding" "Adding and appending"
-"New sequences can be constructed by adding elements to existing sequences."
-{ $subsection add }
+ARTICLE: "sequences-join-split" "Joining and splitting sequences"
+"Forming new sequences from existing sequences:"
 { $subsection append }
 { $subsection append3 }
 { $subsection concat }
 { $subsection join }
-"Mutable sequences can have elements added in-place."
-{ $subsection push }
-{ $subsection nappend }
-"Subsequences can be replaced:"
 { $subsection replace-slice }
-{ $subsection copy-into } ;
+"Slicing sequences:"
+{ $subsection subseq }
+{ $subsection head }
+{ $subsection tail }
+{ $subsection head* }
+{ $subsection tail* }
+"Variants of the above which output a virtual sequence sharing storage with the input sequence:"
+{ $subsection <slice> }
+{ $subsection head-slice }
+{ $subsection tail-slice }
+{ $subsection head-slice* }
+{ $subsection tail-slice* }
+"Splitting sequences at specific indices:"
+{ $subsection cut }
+{ $subsection cut* }
+{ $subsection unclip }
+"Splitting sequences at occurrences of subsequences:"
+{ $subsection ?head }
+{ $subsection ?tail }
+{ $subsection split1 }
+{ $subsection split }
+{ $subsection drop-prefix } ;
 
-ARTICLE: "sequences-sets" "Order-insensitive operations"
-"New sequences can be constructed by removing elements from an existing sequence:"
+ARTICLE: "sequences-add-remove" "Adding and removing sequence elements"
+"Adding elements:"
+{ $subsection add }
+{ $subsection add* }
+"Removing elements:"
 { $subsection remove }
+{ $subsection remove-nth }
 { $subsection diff }
-"Mutable sequences can have elements removed in-place:"
+{ $subsection prune } ;
+
+ARTICLE: "sequences-reshape" "Reshaping sequences"
+{ $subsection reverse }
+{ $subsection <reversed> }
+{ $subsection group }
+{ $subsection flatten }
+{ $subsection flip }
+{ $subsection subst } ;
+
+ARTICLE: "sequences-destructive" "Destructive operations"
+"These words modify their input, instead of creating a new sequence."
+$terpri
+"In-place variant of " { $link add } ":"
+{ $subsection push }
+"In-place variant of " { $link append } ":"
+{ $subsection nappend }
+"In-place variant of " { $link remove } ":"
 { $subsection delete }
-"A combinator for filtering on arbitrary predicates:"
-{ $subsection subset } ;
+"In-place variant of " { $link map } ":"
+{ $subsection inject }
+{ $subsection inject-with }
+"Changing elements:"
+{ $subsection set-nth }
+{ $subsection change-nth }
+{ $subsection cache-nth }
+"Other destructive words:"
+{ $subsection exchange }
+{ $subsection push-new }
+{ $subsection pop }
+{ $subsection pop* }
+{ $subsection delete-all }
+{ $subsection copy-into } ;
 
 ARTICLE: "sequences-stacks" "Stack operations"
 "The classical stack operations, modifying a sequence in place:"
@@ -195,6 +218,7 @@ $terpri
 { $subsection 1array }
 { $subsection 2array }
 { $subsection 3array }
+{ $subsection 4array }
 "Arrays can be accessed without bounds checks in a pointer unsafe way."
 { $subsection array-nth }
 { $subsection set-array-nth } ;
@@ -252,7 +276,10 @@ ARTICLE: "sequences-sorting" "Sorting and binary search"
 "Sorting elements in a new sequence:"
 { $subsection sort }
 "Using the default comparator:"
-{ $subsection natural-sort } ;
+{ $subsection natural-sort }
+"Binary search:"
+{ $subsection binsearch }
+{ $subsection binsearch* } ;
 
 ARTICLE: "sequences-unsafe" "Unsafe sequence operations"
 "The unsafe sequence protocol bypasses bounds checks for increased performance:"
@@ -281,3 +308,29 @@ $terpri
 "This protocol and the above words are unsafe; they do not perform bounds checks for performance reasons, and thus a mistake can lead to memory corruption due to an underlying sequence being shorter than the fill pointer."
 $terpri
 "Vectors and string buffers are implemented using the resizable sequence facility (and they perform full bounds-checks and thus are safe)." ;
+
+ARTICLE: "sequences" "Sequences"
+"A sequence is a linearly-ordered finite collection of elements."
+$terpri
+"Sequence utility words can operate on any object whose class implements the sequence protocol."
+{ $subsection "sequence-protocol" }
+"There are a number of implementations of sequences in the core library, and you can write new implementations yourself."
+{ $subsection "sequence-implementations" }
+"Much of the power of sequences lies in the polymorphic utility words that allow computations to be expressed as bulk operations without loops, recursion or micro-management of elements."
+{ $subsection "sequences-access" }
+{ $subsection "sequences-combinators" }
+{ $subsection "sequences-tests" }
+{ $subsection "sequences-search" }
+{ $subsection "sequences-add-remove" }
+{ $subsection "sequences-join-split" }
+{ $subsection "sequences-reshape" }
+{ $subsection "sequences-comparing" }
+{ $subsection "sequences-sorting" }
+{ $subsection "sequences-destructive" }
+"Sequences are also used to implement other data structures:"
+{ $subsection "sequences-stacks" }
+{ $subsection "sequences-assoc" }
+"Some implementation details which your code should probably not care about:"
+{ $subsection "sequences-unsafe" }
+{ $subsection "sequences-resizable" }
+{ $see-also "namespaces-make" } ;

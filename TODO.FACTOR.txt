@@ -1,12 +1,14 @@
 + 0.84:
 
-- win32? . ==> t on intel mac??
 - signal 4 on datastack underflow on mac intel??
 
 ========================================================================
 
 + 0.85:
 
+- why is a 'null' type inferred for the output of foo in
+  : foo f ;
+  : bar foo 4 4 = and ;
 - faster I/O
 - buffer-ptr should be an alien
 - faster Unix stream-read#

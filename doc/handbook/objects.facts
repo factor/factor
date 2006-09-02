@@ -143,7 +143,7 @@ ARTICLE: "class-operations" "Class operations"
 
 ARTICLE: "tuples" "Tuples"
 "Tuples are user-defined classes composed of named slots. All tuples have the same type, however distinct classes of tuples are defined."
-$terpri
+{ $code "TUPLE: person name address phone ;" }
 "A parsing word defines tuple classes."
 { $subsection POSTPONE: TUPLE: }
 { $subsection "tuple-constructors" }
@@ -160,13 +160,23 @@ $terpri
 { $subsection POSTPONE: C: } ;
 
 ARTICLE: "tuple-delegation" "Delegation"
-"Each tuple can have an optional delegate tuple. Most generic words called on the tuple that do not have a method for the tuple's class will be passed on to the delegate."
-$terpri
-"More precisely, any generic word using " { $link standard-combination } " delegates, and this includes all generic words defined via the " { $link POSTPONE: GENERIC: } " parsing word."
+"If a generic word having the " { $link standard-combination } " method combination is called on a tuple for which it does not have an applicable method, the method call is forwarded to the tuple's " { $emphasis "delegate" } ". If no delegate is set, a " { $link no-method } " error is thrown."
+{ $subsection delegate }
+{ $subsection set-delegate }
+"A tuple's delegate should either be another tuple, or " { $link f } ", indicating no delegate is set. Delegation from a tuple to an object of some other type is not fully supported and should be used with caution."
 $terpri
 "Factor uses delegation in place of implementation inheritance, but it is not a direct substitute; in particular, the semantics differ in that a delegated method call receives the delegate on the stack, not the original object."
-{ $warning "Delegation to objects that are not tuples is not fully supported. Generic words support delegation to arbitrary types, as do slot accessors which are built from generic words. However, type-specific primitives do not." }
-{ $subsection delegate } 
-{ $subsection set-delegate }
-"There is a combinator to recursively apply a predicate to a delegate chain:"
-{ $subsection is? } ;
+$terpri
+"A pair of words examine delegation chains:"
+{ $subsection delegates }
+{ $subsection is? }
+"An example:"
+{ $example
+    "TUPLE: ellipse center radius ;"
+    "TUPLE: colored color ;"
+    "{ 0 0 } 10 <ellipse> \"my-ellipse\" set"
+    "{ 1 0 0 } <colored> \"my-shape\" set"
+    "\"my-ellipse\" get \"my-shape\" get set-delegate"
+    "\"my-shape\" get dup colored-color swap ellipse-center .s"
+    "{ 0 0 }\n{ 1 0 0 }"
+} ;
