@@ -1,12 +1,13 @@
 + 0.84:
 
-- RT_WORD should refer to XTs not word objects.
+- win32? . ==> t on intel mac??
 - signal 4 on datastack underflow on mac intel??
 
 ========================================================================
 
 + ui:
 
+- x11: scroll up/down wiggles caret
 - perhaps commands window should sort by gesture
 - new section in cookbook: philosophy
 - interactor commands: don't invoke if interactor is busy

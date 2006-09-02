@@ -4,10 +4,12 @@ typedef struct
 	CELL code_length; /* # bytes */
 	CELL reloc_length; /* # bytes */
 	CELL literal_length; /* # bytes */
+	CELL words_length; /* # bytes */
+	CELL finalized; /* has finalize_code_block() been called on this yet? */
 } F_COMPILED;
 
 typedef void (*CODE_HEAP_ITERATOR)(F_COMPILED *compiled, CELL code_start,
-	CELL reloc_start, CELL literal_start, CELL literal_end);
+	CELL reloc_start, CELL literal_start, CELL words_start);
 
 void iterate_code_heap(CELL start, CELL end, CODE_HEAP_ITERATOR iter);
 
@@ -22,8 +24,8 @@ typedef enum {
 	RT_CARDS,
 	/* an indirect literal from the word's literal table */
 	RT_LITERAL,
-	/* a word */
-	RT_WORD,
+	/* a compiled word reference */
+	RT_XT,
 	/* a local label */
 	RT_LABEL
 } F_RELTYPE;
@@ -52,7 +54,7 @@ typedef struct {
 } F_REL;
 
 void finalize_code_block(F_COMPILED *relocating, CELL code_start,
-	CELL reloc_start, CELL literal_start, CELL literal_end);
+	CELL reloc_start, CELL literal_start, CELL words_start);
 
 void collect_literals(void);
 

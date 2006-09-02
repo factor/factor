@@ -23,14 +23,20 @@ SYMBOL: compiled-xts
 : save-xt ( word xt -- )
     swap dup unchanged-word compiled-xts get set-hash ;
 
+: push-new* ( obj table -- n )
+    2dup [ eq? ] find-with drop dup -1 > [
+        2nip
+    ] [
+        drop dup length >r push r>
+    ] if ;
+
 SYMBOL: literal-table
 
-: add-literal ( obj -- n )
-    dup literal-table get [ eq? ] find-with drop dup -1 > [
-        nip
-    ] [
-        drop literal-table get dup length >r push r>
-    ] if ;
+: add-literal ( obj -- n ) literal-table get push-new* ;
+
+SYMBOL: word-table
+
+: add-word ( word -- n ) word-table get push-new* ;
 
 SYMBOL: relocation-table
 SYMBOL: label-table
@@ -61,7 +67,7 @@ SYMBOL: label-table
 
 : rel-word ( word class -- )
     over primitive?
-    [ >r word-primitive r> 0 ] [ >r add-literal r> 5 ] if
+    [ >r word-primitive r> 0 ] [ >r add-word r> 5 ] if
     rel, ;
 
 : rel-cards ( class -- ) 0 swap 3 rel, ;

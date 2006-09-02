@@ -11,14 +11,14 @@ optimizer parser sequences sequences-internals words ;
         "Cross-referencing..." print flush
         H{ } clone changed-words set-global
         H{ } clone crossref set-global xref-words
-    
+
         cpu "x86" = [
             macosx?
             "/library/compiler/x86/alien-macosx.factor"
             "/library/compiler/x86/alien.factor"
             ? run-resource
         ] when
-    
+
         "compile" get [
             windows? [
                 "/library/windows/dlls.factor" run-resource
@@ -54,14 +54,14 @@ optimizer parser sequences sequences-internals words ;
                     "/library/io/windows/load.factor" run-resource
                 ] when
             ] when
-    
+
             parse-command-line
-    
+
             compile-all
-    
+
             "Initializing native I/O..." print flush
             "native-io" get [ init-io ] when
-            
+
             ! We only do this if we are compiled, otherwise it
             ! takes too long.
             "Building online help search index..." print flush

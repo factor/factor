@@ -4,6 +4,7 @@
 #import "Foundation/NSBundle.h"
 #import "Foundation/NSException.h"
 #import "Foundation/NSString.h"
+#import "Foundation/NSPathUtilities.h"
 
 static CELL error;
 

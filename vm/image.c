@@ -172,16 +172,26 @@ void relocate_data()
 }
 
 void relocate_code_block(F_COMPILED *relocating, CELL code_start,
-	CELL reloc_start, CELL literal_start, CELL literal_end)
+	CELL reloc_start, CELL literal_start, CELL words_start)
 {
 	/* relocate literal table data */
 	CELL scan;
+	CELL literal_end = literal_start + relocating->literal_length;
+	CELL words_end = words_start + relocating->words_length;
 
 	for(scan = literal_start; scan < literal_end; scan += CELLS)
 		data_fixup((CELL*)scan);
 
+	for(scan = words_start; scan < words_end; scan += CELLS)
+	{
+		if(relocating->finalized)
+			code_fixup((CELL*)scan);
+		else
+			data_fixup((CELL*)scan);
+	}
+
 	finalize_code_block(relocating,code_start,reloc_start,
-		literal_start,literal_end);
+		literal_start,words_start);
 }
 
 void relocate_code()
