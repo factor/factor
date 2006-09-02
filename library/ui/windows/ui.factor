@@ -239,7 +239,7 @@ SYMBOL: hWnd
 
                 { [ t ] [ drop DefWindowProc ] }
             } cond
-        ] [ error. 0 ] recover
+        ] ui-try
         ! "finished handling message" print .s flush
      ] alien-callback ;
 
