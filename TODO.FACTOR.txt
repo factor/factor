@@ -5,28 +5,61 @@
 
 ========================================================================
 
++ 0.85:
+
+- faster I/O
+- buffer-ptr should be an alien
+- faster Unix stream-read#
+- EOF kills a port
+- fix this:
+  [ 1 2 3 4 5 6 7 8 9 10 10 10 10 10 10 10 10 10 10 11 11 11 113 ] .
+[ 1 2 3 4 5 6 7 8 9 10 10 10 10 10 10 10 10 10 10 11 11 11 113 
+]
+- prettier printing of hashtable literals, alists, cond, ...
+- alien-indirect
+- handle code heap exhaustion with a critical error
+- more compact relocation info
+- problem if major gc happens during relocation
+  - in fact relocation should not cons at all
+- we need to optimize  [ dup array? [ array? ] [ array? ] if ]
+- better way of dealing with compiler errors
+- track individual method usages
+- modularize core
+- track module files and modification times, and a list of assets loaded
+  from that file
+- 'changes' word, asks if files changed on disk from loaded modules
+  should be reloaded -- do this in the right order
+- variable width word wrap
+- add-gadget, model-changed, set-model should compile
+- graphical module manager tool
+- continuation handling in walker is screwy
+- don't allow stepping inside >c etc
+- editor:
+  - only redraw visible lines
+  - more efficient multi-line inserts
+  - write "foo| " and put caret at | then select word element: selects
+    space
+- we have trouble drawing rectangles
+- UI dataflow visualizer
+- status help persists after clicking on a link
+- tool help
+- new section in cookbook: philosophy
+- interactor commands: don't invoke if interactor is busy
+- browser: show currently selected vocab & words
+
 + ui:
 
 - x11: scroll up/down wiggles caret
 - perhaps commands window should sort by gesture
-- new section in cookbook: philosophy
-- interactor commands: don't invoke if interactor is busy
-- browser: show currently selected vocab & words
 - roundoff is still not quite right with tracks
 - fix top level window positioning
-- status help persists after clicking on a link
-- tool help
 - merge keyboard help with help in some way
 - keyboard help: hide commands whose gestures are shadowed
 - x11.app has a problem with A+ keys
 - status bar showing number of words needing a recompile
-- UI dataflow visualizer
 - services do not launch if factor not running
 - fix ui listener delay
-- we have trouble drawing rectangles
 - editor:
-  - only redraw visible lines
-  - more efficient multi-line inserts
   - editor should support stream output protocol
   - double/triple click
   - autoscroll
@@ -34,14 +67,9 @@
   - transpose char/word/line
   - page up/down
   - search and replace
-  - write "foo| " and put caret at | then select word element: selects
-    space
 - slider needs to be modelized
-- continuation handling in walker is screwy
-- graphical module manager tool
 - fonts/ should go inside the .app -- we need multi-tier resource-path
 - should be possible to drop an image file on the .app to run it
-- add-gadget, model-changed, set-model should compile
 - support x11's large selections, if needed
 - own-selection violates ICCCM
 - cocoa: windows are not updated while resizing
@@ -54,7 +82,6 @@
 - cocoa:
   - horizontal wheel scrolling
   - polish OS X menu bar code
-- variable width word wrap
 - structure editor
 - loading space invaders slows the UI down
 
@@ -67,23 +94,11 @@
   - make typedef aliasing explicit
 - seeing a C struct word should show its def
 - file out
-- track individual method usages
-- modularize core
-- track module files and modification times, and a list of assets loaded
-  from that file
-- 'changes' word, asks if files changed on disk from loaded modules
-  should be reloaded -- do this in the right order
 
 + compiler/ffi:
 
-- alien-indirect
-- handle code heap exhaustion with a critical error
-- more compact relocation info
-- problem if major gc happens during relocation
-  - in fact relocation should not cons at all
 - see if alien calls can be made faster
 - [ r> ] infer should throw an inference error
-- better way of dealing with compiler errors
 - compiler tests are not as reliable now because of try-compile usage
   - we can just do [ t ] [ \ foo compiled? ] unit-test
 - [ [ dup call ] dup call ] infer hangs
@@ -92,7 +107,6 @@
   recursive
 - ppc64 backend
 - arm backend
-- we need to optimize  [ dup array? [ array? ] [ array? ] if ]
 - mac intel: struct returns from objc methods
 - fix compiled gc check
   - there was a performance hit, investigate
@@ -113,18 +127,7 @@
 - growable data heap
 - incremental GC
 - UDP
-- faster I/O
-- buffer-ptr should be an alien
-- faster Unix stream-read#
-- EOF kills a port
 - slice: if sequence or seq start is changed, abstraction violation
 - hashed generic method dispatch
-- fix this:
-
-  [ 1 2 3 4 5 6 7 8 9 10 10 10 10 10 10 10 10 10 10 11 11 11 113 ] .
-[ 1 2 3 4 5 6 7 8 9 10 10 10 10 10 10 10 10 10 10 11 11 11 113 
-]
-
-- prettier printing of hashtable literals, alists, cond, ...
 - httpd search tools
 - remaining HTML issues need fixing

@@ -198,7 +198,7 @@ void deposit_integers(F_VECTOR *vector, CELL format)
 	if(format == 1)
 	{
 		for(i = 0; i < count; i++)
-			cput(CREF(compiling.here,i),to_fixnum(get(AREF(array,i))));
+			cput(compiling.here + i,to_fixnum(get(AREF(array,i))));
 	}
 	else if(format == CELLS)
 	{
