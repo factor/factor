@@ -26,7 +26,6 @@ M: world configure-event
         { S+ HEX: 1 }
         { C+ HEX: 4 }
         { A+ HEX: 8 }
-        { A+ HEX: 10 }
     } ;
     
 : key-codes

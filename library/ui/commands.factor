@@ -32,7 +32,7 @@ M: button-up gesture>string
 M: button-down gesture>string
     [
         dup button-down-mods modifiers>string %
-        "Mouse Up" %
+        "Mouse Down" %
         button-down-# [ " " % # ] when*
     ] "" make ;
 
