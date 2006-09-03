@@ -47,7 +47,7 @@ USING: kernel http-client sequences namespaces math errors io ;
   [ find-start-tag ] 2keep find-end-tag 2dup and ;
 
 : (child-tags) ( list tag seq -- list )
-  2dup between-tags-index ! list tag seq start end bool )
+  2dup between-tags-index ! list tag seq start end bool
   [
     dup 1 + >r ! list tag seq start end r: end
     pick subseq ! list tag seq item r: end

@@ -284,7 +284,7 @@ M: mapping select-sql ( tuple mapping -- select )
   #! those set to 'f'. 
   dup class get-mapping dupd select-sql ! db tuple sql
   swapd sqlite-prepare swap ! statement tuple
-  2dup bind-for-select ! statement tuple ) 
+  2dup bind-for-select ! statement tuple
   [
     over [ ! tuple statement
       over restore-tuple ,
