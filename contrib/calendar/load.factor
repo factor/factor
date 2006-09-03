@@ -1,13 +1,8 @@
-USING: kernel modules namespaces sequences ;
+USING: arrays kernel modules sequences ;
 
 "calendar"
-[
-    {
-        { [ unix? ] [ "os-unix.factor" , ] }
-        { [ win32? ] [ "os-win32.factor" , ] }
-    } cond
-    "calendar.factor" ,
-] { } make
+
+unix? "os-unix.factor" "os-win32.factor" ? "calendar.factor" 2array
 { "test/calendar.factor" }
 provide
 
