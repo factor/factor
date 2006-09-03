@@ -4,13 +4,13 @@ IN: rss
 USING: kernel http-client sequences namespaces math errors io ;
 
 : (replace) ( str1 str2 string -- )
-  pick over ( str1 str2 string str1 string )
-  start dup -1 = [ ( str1 str2 string n )
+  pick over ! str1 str2 string str1 string
+  start dup -1 = [ ! str1 str2 string n
     drop % 2drop
   ] [ 
-    dup    ( str1 str2 string n n-1 )
-    pick swap head % ( str1 str2 string n )
-    >r pick length r> + tail ( str1 str2 tail )
+    dup    ! str1 str2 string n n-1
+    pick swap head % ! str1 str2 string n )
+    >r pick length r> + tail ! str1 str2 tail
     over % (replace)     
   ] if ;
   
@@ -21,7 +21,7 @@ USING: kernel http-client sequences namespaces math errors io ;
 : find-start-tag ( tag seq -- n )
   #! Find the start XML tag in the sequence. Return f if not found.
   #! If found return the index of the start of the contents of that tag.
-  dup rot "<" swap append swap start dup 0 >= [ ( seq index )
+  dup rot "<" swap append swap start dup 0 >= [ ! seq index
     ">" -rot start* dup 0 >= [ 1 + ] [ drop f ] if
   ] [
     drop f
@@ -47,11 +47,11 @@ USING: kernel http-client sequences namespaces math errors io ;
   [ find-start-tag ] 2keep find-end-tag 2dup and ;
 
 : (child-tags) ( list tag seq -- list )
-  2dup between-tags-index ( list tag seq start end bool )
+  2dup between-tags-index ! list tag seq start end bool )
   [
-    dup 1 + >r ( list tag seq start end r: end )
-    pick subseq ( list tag seq item r: end )
-    -rot >r >r over push r> r> r> ( list tag seq end )
+    dup 1 + >r ! list tag seq start end r: end
+    pick subseq ! list tag seq item r: end
+    -rot >r >r over push r> r> r> ! list tag seq end
     over length rot subseq  (child-tags) 
   ] [
     drop drop drop drop drop 

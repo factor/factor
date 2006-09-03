@@ -305,7 +305,7 @@ TUPLE: tagged-message data from tag ;
   #! 'send-synchronous' call. It will send 'message' back to the process
   #! that originally sent the tagged message, and will have the same tag
   #! as that in 'tagged-message'.
-  swap >tagged-message< rot drop  ( message from tag )
+  swap >tagged-message< rot drop  ! message from tag
   swap >r >r self r> <tagged-message> r> send ;
 
 : forever ( quot -- )
@@ -353,11 +353,11 @@ SYMBOL: quit-cc
   #! The result of that call will be sent back to the 
   #! messages original caller with the same tag as the 
   #! original message.
-  >r >r >tagged-message< rot ( from tag data r: quot pred )
-  dup r> call [   ( from tag data r: quot )
-    r> call       ( from tag result )
-    self          ( from tag result self )
-    rot           ( from self tag result )
+  >r >r >tagged-message< rot ! from tag data r: quot pred )
+  dup r> call [   ! from tag data r: quot
+    r> call       ! from tag result
+    self          ! from tag result self
+    rot           ! from self tag result
     <tagged-message> swap send
   ] [
     r> drop 3drop
@@ -366,12 +366,12 @@ SYMBOL: quit-cc
 : maybe-send-reply ( message pred quot -- )
   #! Same as !result but if false is returned from
   #! quot then nothing is sent back to the caller.
-  >r >r >tagged-message< rot ( from tag data r: quot pred )
-  dup r> call [   ( from tag data r: quot )
-    r> call       ( from tag result )
+  >r >r >tagged-message< rot ! from tag data r: quot pred )
+  dup r> call [   ! from tag data r: quot
+    r> call       ! from tag result
     [
-      self          ( from tag result self )
-      rot           ( from self tag result )
+      self          ! from tag result self
+      rot           ! from self tag result
       <tagged-message> swap send
     ] [
       2drop

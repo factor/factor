@@ -47,7 +47,7 @@ TUPLE: space-invaders port1 port2i port2o port3o port4lo port4hi port5o bitmap ;
 
 : set-bitmap-pixel ( color point array -- )
   #! 'color' is a {r g b}. Point is {x y}.
-  [ bitmap-index ] dip ( color index array )
+  [ bitmap-index ] dip ! color index array
   [ [ first ] dipd set-uchar-nth ] 3keep
   [ [ second ] dipd [ 1 + ] dip set-uchar-nth ] 3keep
   [ third ] dipd [ 2 + ] dip set-uchar-nth ;
@@ -153,7 +153,7 @@ M: space-invaders reset ( cpu -- )
   0 swap set-space-invaders-port5o ;
 
 : gui-step ( cpu -- )
-  [ read-instruction ] keep ( n cpu )
+  [ read-instruction ] keep ! n cpu
   over get-cycles over inc-cycles
   [ swap instructions dispatch ] keep  
   [ cpu-pc HEX: FFFF bitand ] keep 
@@ -162,7 +162,7 @@ M: space-invaders reset ( cpu -- )
 : gui-frame/2 ( cpu -- )
   [ gui-step ] keep
   [ cpu-cycles ] keep
-  over 16667 < [ ( cycles cpu )
+  over 16667 < [ ! cycles cpu
     nip gui-frame/2
   ] [
     [ >r 16667 - r> set-cpu-cycles ] keep
@@ -251,15 +251,15 @@ M: invaders-gadget draw-gadget* ( gadget -- )
 
 : addr>xy ( addr -- point )
   #! Convert video RAM address to base X Y value. point is a {x y}.
-  HEX: 2400 - ( n )
-  dup HEX: 1f bitand 8 * 255 swap - ( n y )
+  HEX: 2400 - ! n
+  dup HEX: 1f bitand 8 * 255 swap - ! n y
   swap -5 shift swap 2array ;
 
 : plot-bitmap-pixel ( bitmap point color -- )
   #! point is a {x y}. color is a {r g b}.
   swap rot set-bitmap-pixel ;
 
-: within ( n a b - bool )
+: within ( n a b -- bool )
   #! n >= a and n <= b
   rot tuck swap <= >r swap >= r> and ;
 
@@ -301,7 +301,8 @@ M: space-invaders update-video ( value addr cpu -- )
 
 : sync-frame ( millis -- millis )
   #! Sleep until the time for the next frame arrives.
-  1000 60 / >fixnum + millis - dup 0 > [ sleep ] [ drop ] if millis ;
+  1000 60 / >fixnum + millis - dup 0 >
+  [ sleep ] [ drop yield ] if millis ;
 
 : invaders-process ( millis gadget -- )
   #! Run a space invaders gadget inside a 

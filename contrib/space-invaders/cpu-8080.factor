@@ -262,7 +262,7 @@ M: cpu write-port ( value port cpu -- )
 
 : add-byte ( lhs rhs cpu -- result )
   #! Add rhs to lhs
-  >r 2dup + r> ( lhs rhs result cpu )
+  >r 2dup + r> ! lhs rhs result cpu
   [ update-flags ] 2keep 
   [ update-half-carry-flag ] 2keep
   drop HEX: FF bitand ;
@@ -273,7 +273,7 @@ M: cpu write-port ( value port cpu -- )
 
 : add-byte-with-carry ( lhs rhs cpu -- result )
   #! Add rhs to lhs plus carry.
-  >r 2dup + r> ( lhs rhs result cpu )
+  >r 2dup + r> ! lhs rhs result cpu
   [ add-carry ] keep
   [ update-flags ] 2keep 
   [ update-half-carry-flag ] 2keep
@@ -301,7 +301,7 @@ M: cpu write-port ( value port cpu -- )
 : inc-byte ( byte cpu -- result )
   #! Increment byte by one. Note that carry flag is not affected
   #! by this operation.
-  >r 1 2dup + r> ( lhs rhs result cpu )
+  >r 1 2dup + r> ! lhs rhs result cpu
   [ update-flags-no-carry ] 2keep 
   [ update-half-carry-flag ] 2keep
   drop HEX: FF bitand ;
@@ -309,7 +309,7 @@ M: cpu write-port ( value port cpu -- )
 : dec-byte ( byte cpu -- result )
   #! Decrement byte by one. Note that carry flag is not affected
   #! by this operation.
-  >r 1 2dup - r> ( lhs rhs result cpu )
+  >r 1 2dup - r> ! lhs rhs result cpu
   [ update-flags-no-carry ] 2keep 
   [ update-half-carry-flag ] 2keep
   drop HEX: FF bitand ;
@@ -336,7 +336,7 @@ M: cpu write-port ( value port cpu -- )
 : and-byte ( lhs rhs cpu -- result )
   #! Logically and rhs to lhs. The carry flag is cleared and
   #! the half carry is set to the ORing of bits 3 of the operands.
-  [ drop bit3or ] 3keep ( bit3or lhs rhs cpu )
+  [ drop bit3or ] 3keep ! bit3or lhs rhs cpu
   >r bitand r> [ update-flags ] 2keep 
   [ carry-flag clear-flag ] keep
   rot 0 = [ half-carry-flag set-flag ] [ half-carry-flag clear-flag ] if
@@ -364,8 +364,8 @@ M: cpu write-port ( value port cpu -- )
 
 : save-pc ( cpu -- )
   #! Save the value of the PC on the stack.
-  [ cpu-pc ] keep ( pc cpu )
-  [ cpu-sp ] keep ( pc sp cpu )
+  [ cpu-pc ] keep ! pc cpu
+  [ cpu-sp ] keep ! pc sp cpu
   write-word ;
 
 : push-pc ( cpu -- )
@@ -469,7 +469,7 @@ C: cpu ( cpu -- cpu )
   [ reset ] keep ;
 
 : (load-rom) ( n ram -- )
-  read1 [ ( n ram ch )
+  read1 [ ! n ram ch
     -rot [ set-nth ] 2keep >r 1 + r> (load-rom)
   ] [
     2drop
@@ -494,7 +494,7 @@ C: cpu ( cpu -- cpu )
 : read-instruction ( cpu -- word )
   #! Read the next instruction from the cpu's program 
   #! counter, and increment the program counter.
-  [ cpu-pc ] keep ( pc cpu )
+  [ cpu-pc ] keep ! pc cpu
   [ over 1 + swap set-cpu-pc ] keep
   read-byte ;
 
@@ -523,7 +523,7 @@ C: cpu ( cpu -- cpu )
 
 : step ( cpu -- )
   #! Run a single 8080 instruction
-  [ read-instruction ] keep ( n cpu )
+  [ read-instruction ] keep ! n cpu
   over get-cycles over inc-cycles
   [ swap instructions dispatch ] keep
   [ cpu-pc HEX: FFFF bitand ] keep 
@@ -619,11 +619,11 @@ SYMBOL: $4
   #! Copy the tree, replacing each occurence of 
   #! $1, $2, etc with the relevant item from the 
   #! given index.
-  dup quotation? over [ ] = not and [ ( vector tree )
-    dup first swap 1 tail ( vector car cdr )
-    >r dupd replace-patterns ( vector v R: cdr )
+  dup quotation? over [ ] = not and [ ! vector tree
+    dup first swap 1 tail ! vector car cdr
+    >r dupd replace-patterns ! vector v R: cdr
     swap r> replace-patterns >r unit r> append
-  ] [ ( vector value )
+  ] [ ! vector value
     dup $1 = [ drop 0 over nth  ] when 
     dup $2 = [ drop 1 over nth  ] when 
     dup $3 = [ drop 2 over nth  ] when 
@@ -636,19 +636,19 @@ SYMBOL: $4
 
 : (emulate-RST) ( n cpu -- )
   #! RST nn
-  [ cpu-sp 2 - dup ] keep ( sp sp cpu )
-  [ set-cpu-sp ] keep ( sp cpu )
-  [ cpu-pc ] keep ( sp pc cpu )
-  swapd [ write-word ] keep ( cpu )
+  [ cpu-sp 2 - dup ] keep ! sp sp cpu
+  [ set-cpu-sp ] keep ! sp cpu
+  [ cpu-pc ] keep ! sp pc cpu
+  swapd [ write-word ] keep ! cpu
   >r 8 * r> set-cpu-pc ;
 
 : (emulate-CALL) ( cpu -- )
   #! 205 - CALL nn
-  [ next-word HEX: FFFF bitand ] keep ( addr cpu )
-  [ cpu-sp 2 - dup ] keep ( addr sp sp cpu )
-  [ set-cpu-sp ] keep ( addr sp cpu )
-  [ cpu-pc ] keep ( addr sp pc cpu )
-  swapd [ write-word ] keep ( addr cpu )
+  [ next-word HEX: FFFF bitand ] keep ! addr cpu
+  [ cpu-sp 2 - dup ] keep ! addr sp sp cpu
+  [ set-cpu-sp ] keep ! addr sp cpu
+  [ cpu-pc ] keep ! addr sp pc cpu
+  swapd [ write-word ] keep ! addr cpu
   set-cpu-pc ;
 
 : (emulate-RLCA) ( cpu -- )
@@ -1603,7 +1603,7 @@ INSTRUCTION: CP   n       ; opcode FE cycles 07
 INSTRUCTION: RST  38H     ; opcode FF cycles 11 
 
 : each-8bit ( n quot -- )
-  8 [ ( n quot bit )
+  8 [ ! n quot bit
    pick over -1 * shift 1 bitand pick call 
   ] repeat 2drop ;
 
@@ -1615,7 +1615,7 @@ INSTRUCTION: RST  38H     ; opcode FF cycles 11
     "1" print
     224 [ ( cpu h -- h )
       32 [ ( cpu h w -- w )
-        over 32 * over +  HEX: 2400 + ( cpu h w addr )
+        over 32 * over +  HEX: 2400 + ! cpu h w addr
         >r pick r> swap cpu-ram nth [
           0 = [
             " 0 0 0" write

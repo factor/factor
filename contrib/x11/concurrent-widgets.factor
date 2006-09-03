@@ -287,7 +287,7 @@ swap XConfigureEvent-position swap set-pwindow-last-position ;
 : call-move-action ( event obj -- ? )
 swap XConfigureEvent-position swap dup pwindow-move-action call ;
 
-: maybe-handle-move ( event obj )
+: maybe-handle-move ! event obj
 2dup position-changed?
 [ 2dup update-last-position call-move-action ] [ 2drop ] if ;
 

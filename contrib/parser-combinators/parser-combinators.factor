@@ -73,7 +73,7 @@ TUPLE: parse-result parsed unparsed ;
   #! successfully parsed character on the stack. The result
   #! of that call is returned as the result portion of the
   #! successfull parse lazy list.
-  -rot over first swap call [ ( quot inp -- )
+  -rot over first swap call [
     h:t >r swap call r> <parse-result> lunit
   ] [
     2drop nil
@@ -115,7 +115,7 @@ TUPLE: parse-result parsed unparsed ;
 : <&>-do-parser3 ( <parse-result> x -- result )
   #! Called by <&>-do-parser2 on each result of the
   #! parse from parser2. 
-  >r dup parse-result-unparsed swap parse-result-parsed r> ( x1 xs2 x )
+  >r dup parse-result-unparsed swap parse-result-parsed r>
   swap 2array  swap <parse-result> ;
 
 : <&>-do-parser2 ( <parse-result> parser2 -- result )
@@ -125,8 +125,8 @@ TUPLE: parse-result parsed unparsed ;
   #! input. This word will parser2 on the remaining input
   #! returning a new cons cell containing the combined
   #! parse result.
-  >r dup parse-result-parsed swap parse-result-unparsed r> ( x xs parser2 )
-  call swap    ( llist x )
+  >r dup parse-result-parsed swap parse-result-unparsed r>
+  call swap
   [ <&>-do-parser3 ] curry lmap ;
 
 : <&>-parser ( input parser1 parser2 -- llist )
@@ -134,7 +134,7 @@ TUPLE: parse-result parsed unparsed ;
   #! two parsers. First parser1 is applied to the
   #! input then parser2 is applied to the rest of
   #! the input strings from the first parser. 
-  >r call r>   ( <parse-result> p2 -- result )
+  >r call r>
   [ <&>-do-parser2 ] curry lmap lappend* ;
 
 : <&> ( parser1 parser2 -- parser )
@@ -193,9 +193,9 @@ TUPLE: parse-result parsed unparsed ;
   #! The result of that quotation then becomes the new parse result.
   #! This allows modification of parse tree results (like
   #! converting strings to integers, etc).
-  -rot call dup nil? [ ( quot nil -- )
+  -rot call dup nil? [
     nip
-  ] [ ( quot result -- )
+  ] [
     [ (<@-parser-replace) ] rot swap curry lmap
   ] if ;
 

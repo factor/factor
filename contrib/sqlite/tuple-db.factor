@@ -163,8 +163,8 @@ M: mapping select-sql ( tuple mapping -- select )
   #! will select based on only the filled in fields of the tuple (ie. all non-f).
   [
     "select ROWID,* from " % dup mapping-table %
-    mapping-fields [ ( tuple field )
-      swap over db-field-slot slot ( field value )
+    mapping-fields [ ! tuple field
+      swap over db-field-slot slot ! field value
       [
         [ dup db-field-name % "=" % db-field-bind-name % ] "" make        
       ] [
@@ -195,19 +195,19 @@ M: mapping select-sql ( tuple mapping -- select )
 : bind-for-insert ( statement tuple -- )
   #! Bind the fields in the tuple to the fields in the 
   #! prepared insert statement.
-  dup class get-mapping mapping-fields [ ( statement tuple field )
-    [ db-field-slot slot ] keep ( statement value field )
-    db-field-bind-name swap ( statement name value )
+  dup class get-mapping mapping-fields [ ! statement tuple field
+    [ db-field-slot slot ] keep ! statement value field
+    db-field-bind-name swap ! statement name value
     >r dupd r> sqlite-bind-text-by-name     
   ] each-with drop ;  
 
 : bind-for-select ( statement tuple -- )
   #! Bind the fields in the tuple to the fields in the 
   #! prepared select statement.
-  dup class get-mapping mapping-fields [ ( statement tuple field )
-    [ db-field-slot slot ] keep ( statement value field )
+  dup class get-mapping mapping-fields [ ! statement tuple field
+    [ db-field-slot slot ] keep ! statement value field
     over [
-      db-field-bind-name swap ( statement name value )
+      db-field-bind-name swap ! statement name value
       >r dupd r> sqlite-bind-text-by-name     
     ] [ 
       2drop 
@@ -229,9 +229,9 @@ M: mapping select-sql ( tuple mapping -- select )
   #! Insert this tuple instance into the database. Note that
   #! it inserts only this instance, and not any one-to-one or
   #! one-to-many fields.
-  dup class get-mapping insert-sql ( db tuple sql )
-  swapd sqlite-prepare swap ( statement tuple )
-  dupd bind-for-insert ( statement )
+  dup class get-mapping insert-sql ! db tuple sql
+  swapd sqlite-prepare swap ! statement tuple
+  dupd bind-for-insert ! statement
   dup [ drop ] sqlite-each
   sqlite-finalize ;
   
@@ -244,9 +244,9 @@ M: mapping select-sql ( tuple mapping -- select )
 : update-tuple ( db tuple -- )
   #! Update this tuple instance in the database. The tuple should have
   #! a delegate of 'persistent' with the key field set.
-  dup class get-mapping update-sql ( db tuple sql )
-  swapd sqlite-prepare swap ( statement tuple )
-  dupd bind-for-update ( statement )
+  dup class get-mapping update-sql ! db tuple sql
+  swapd sqlite-prepare swap ! statement tuple
+  dupd bind-for-update ! statement
   dup [ drop ] sqlite-each
   sqlite-finalize ;
 
@@ -258,9 +258,9 @@ M: mapping select-sql ( tuple mapping -- select )
 : delete-tuple ( db tuple -- )
   #! Delete this tuple instance from the database. The tuple should have
   #! a delegate of 'persistent' with the key field set.
-  dup class get-mapping delete-sql ( db tuple sql )
-  swapd sqlite-prepare swap ( statement tuple )
-  dupd bind-for-delete ( statement )
+  dup class get-mapping delete-sql ! db tuple sql
+  swapd sqlite-prepare swap ! statement tuple
+  dupd bind-for-delete ! statement
   dup [ drop ] sqlite-each
   sqlite-finalize ;
 
@@ -269,12 +269,12 @@ M: mapping select-sql ( tuple mapping -- select )
   #! return the clone with fields set to the values from the
   #! database.
   clone dup class get-mapping mapping-fields 1 swap 
-  [ ( statement tuple index field )
-    over 1+ >r ( statement tuple index field r: index+1 )
-    db-field-slot >r ( statement tuple index r: index+1 slot )
-    pick swap column-text ( statement tuple value r: index+1 slot )
-    over r> set-slot r> ( statement tuple index+1 )    
-  ] each ( statement tuple index )
+  [ ! statement tuple index field )
+    over 1+ >r ! statement tuple index field r: index+1
+    db-field-slot >r ! statement tuple index r: index+1 slot
+    pick swap column-text ! statement tuple value r: index+1 slot
+    over r> set-slot r> ! statement tuple index+1
+  ] each ! statement tuple index
   drop make-persistent swap 0 column-text swap [ set-persistent-key ] keep ; 
 
 : find-tuples ( db tuple -- seq )
@@ -282,14 +282,14 @@ M: mapping select-sql ( tuple mapping -- select )
   #! match the tuple provided as a template. All fields in the
   #! tuple must match the entries in the database, except for 
   #! those set to 'f'. 
-  dup class get-mapping dupd select-sql ( db tuple sql )
-  swapd sqlite-prepare swap ( statement tuple )
-  2dup bind-for-select ( statement tuple ) 
+  dup class get-mapping dupd select-sql ! db tuple sql
+  swapd sqlite-prepare swap ! statement tuple
+  2dup bind-for-select ! statement tuple ) 
   [
-    over [ ( tuple statement )
+    over [ ! tuple statement
       over restore-tuple ,
     ] sqlite-each 
-  ] [ ] make nip ( statement tuple accum )
+  ] [ ] make nip ! statement tuple accum
   swap sqlite-finalize ;
   
  
