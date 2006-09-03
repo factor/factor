@@ -1,15 +1,9 @@
+IN: calendar
 USING: arrays errors generic hashtables io kernel math
 namespaces sequences strings prettyprint inspector ;
-IN: calendar
 
 TUPLE: timestamp year month day hour minute second gmt-offset ;
 TUPLE: dt year month day hour minute second ;
-
-SYMBOL: gmt-offset
--6 gmt-offset set-global  ! central time
-
-LIBRARY: libc
-FUNCTION: time_t time ( time_t* t ) ;
 
 : month-names
     {
@@ -198,7 +192,7 @@ M: number +second ( timestamp n -- timestamp )
     over set-timestamp-gmt-offset ;
 
 : >local-time ( timestamp -- timestamp )
-    gmt-offset get convert-timezone ;
+    gmt-offset convert-timezone ;
 
 : >gmt ( timestamp -- timestamp )
     0 convert-timezone ;
@@ -283,3 +277,4 @@ M: number +second ( timestamp n -- timestamp )
         dup timestamp-minute unparse 2 CHAR: 0 pad-left write ":" write
         timestamp-second >fixnum unparse 2 CHAR: 0 pad-left write " GMT" write
     ] string-out ;
+
