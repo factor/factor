@@ -400,7 +400,7 @@ M: cpu write-port ( value port cpu -- )
 : interrupt ( number cpu -- )
   #! Perform a hardware interrupt
 !  "***Interrupt: " write over 16 >base print 
-  dup cpu-f interrupt-flag bitand 0 = not [ ( number cpu -- )
+  dup cpu-f interrupt-flag bitand 0 = not [
     dup push-pc
     set-cpu-pc
   ] [
@@ -510,7 +510,7 @@ C: cpu ( cpu -- cpu )
 : process-interrupts ( cpu -- )
   #! Process any hardware interrupts
   [ cpu-cycles ] keep 
-  over 16667 < [ ( cycles cpu -- )
+  over 16667 < [
     2drop
   ] [ 
     [ >r 16667 - r> set-cpu-cycles ] keep
@@ -1347,11 +1347,11 @@ SYMBOL: last-opcode
 
 : INSTRUCTION: string-mode on [ string-mode off parse-instructions ] f ; parsing
 
-: cycles ( n -- )
+: cycles ( -- )
   #! Set the number of cycles for the last instruction that was defined. 
   scan string>number last-opcode global hash instruction-cycles set-nth ; parsing
 
-: opcode ( n -- )
+: opcode ( -- )
   #! Set the opcode number for the last instruction that was defined.
   last-instruction global hash unit scan 16 base> ( [word] opcode -- )
   dup last-opcode global set-hash instructions set-nth ; parsing
