@@ -1,5 +1,6 @@
 + 0.85:
 
+- pane output in UI should use less memory
 - signal 4 on datastack underflow on mac intel??
 - why is a 'null' type inferred for the output of foo in
   : foo f ;

@@ -43,8 +43,8 @@ int main(int argc, char** argv)
 	CELL rs_size = 128;
 	CELL cs_size = 128;
 	CELL generations = 2;
-	CELL young_size = 2 * CELLS;
-	CELL aging_size = 4 * CELLS;
+	CELL young_size = 4 * CELLS;
+	CELL aging_size = 8 * CELLS;
 	CELL code_size = CELLS;
 	F_ARRAY *args;
 	CELL arg_count;
