@@ -1,23 +1,25 @@
 ! Copyright (C) 2004, 2005 Mackenzie Straight.
 
 IN: win32-stream
-USING: alien generic io-internals kernel
+USING: alien generic hashtables io-internals kernel
 kernel-internals math namespaces prettyprint sequences
 io strings threads win32-api win32-io-internals ;
 
-TUPLE: win32-stream this ; ! FIXME: rewrite using tuples
-GENERIC: win32-stream-handle
-GENERIC: do-write
-! TUPLE: win32-stream handle in-buffer out-buffer fileptr file-size stream timeout cutoff ;
+TUPLE: win32-stream handle in-buffer out-buffer fileptr file-size timeout cutoff this ;
+SYMBOL: stream
+
 
 SYMBOL: handle
 SYMBOL: in-buffer
 SYMBOL: out-buffer
 SYMBOL: fileptr
 SYMBOL: file-size
-SYMBOL: stream
 SYMBOL: timeout
 SYMBOL: cutoff
+
+
+GENERIC: win32-stream-handle
+GENERIC: do-write
 
 : pending-error ( len/status -- len/status )
     dup [ win32-throw-error ] unless ;
@@ -98,6 +100,7 @@ M: string do-write
     1 in-buffer get buffer-first-n ;
 
 M: win32-stream stream-write
+    
     win32-stream-this [ do-write ] bind ;
 
 M: win32-stream stream-write1
@@ -145,8 +148,9 @@ M: win32-stream expire
 M: win32-stream with-nested-stream
     win32-stream-this [ drop stream get swap with-stream* ] bind ;
 
-C: win32-stream ( handle -- stream )
-    swap [
+SYMBOL: the-hash
+: make-win32-stream ( handle -- stream )
+    [
         dup f GetFileSize dup -1 = not [
             file-size set
         ] [ drop f file-size set ] if
@@ -154,14 +158,19 @@ C: win32-stream ( handle -- stream )
         4096 <buffer> in-buffer set 
         4096 <buffer> out-buffer set
         0 fileptr set 
-        dup stream set
-    ] make-hash over set-win32-stream-this ;
-
-! TUPLE: win32-stream handle in-buffer out-buffer fileptr file-size stream timeout cutoff ;
+    ] make-hash
+    the-hash set
+    handle the-hash get hash
+    in-buffer the-hash get hash
+    out-buffer the-hash get hash
+    fileptr the-hash get hash
+    file-size the-hash get hash
+    f 0 the-hash get
+    <win32-stream> dup stream set ;
 
 : <win32-file-reader> ( path -- stream )
-    t f win32-open-file <win32-stream> <line-reader> ;
+    t f win32-open-file make-win32-stream <line-reader> ;
 
 : <win32-file-writer> ( path -- stream )
-    f t win32-open-file <win32-stream> ;
+    f t win32-open-file make-win32-stream ;
 

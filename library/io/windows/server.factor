@@ -92,12 +92,12 @@ IN: io
             buffer-ptr <alien> 0 32 32 f r> AcceptEx
             handle-socket-error!=0/f stop
         ] callcc1 pending-error drop
-        swap dup add-completion <win32-stream> <line-reader> 
+        swap dup add-completion make-win32-stream <line-reader> 
         dupd <win32-client-stream> swap buffer-free
     ] bind ;
 
 : <client> ( host port -- stream )
     client-sockaddr new-socket
     [ swap "sockaddr-in" c-size connect handle-socket-error!=0/f ] keep 
-    dup add-completion <win32-stream> <line-reader> ;
+    dup add-completion make-win32-stream <line-reader> ;
 
