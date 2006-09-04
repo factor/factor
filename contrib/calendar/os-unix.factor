@@ -25,6 +25,9 @@ BEGIN-STRUCT: t
     FIELD: long tv_usec
 END-STRUCT
 
+: get-time
+    f time <uint> localtime ;
+
 : timezone-name
     get-time tm-zone ;
 
