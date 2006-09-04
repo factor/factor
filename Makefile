@@ -3,8 +3,9 @@ CC = gcc
 BINARY = f
 IMAGE = factor.image
 BUNDLE = Factor.app
-DISK_IMAGE_DIR = Factor-0.84
-DISK_IMAGE = Factor-0.84.dmg
+VERSION = 0.84
+DISK_IMAGE_DIR = Factor-$(VERSION)
+DISK_IMAGE = Factor-$(VERSION).dmg
 
 ifdef DEBUG
 	CFLAGS = -g
@@ -104,7 +105,20 @@ macosx.dmg:
 	rm -f $(DISK_IMAGE)
 	rm -rf $(DISK_IMAGE_DIR)
 	mkdir $(DISK_IMAGE_DIR)
-	cp -R $(BUNDLE) $(DISK_IMAGE_DIR)/$(BUNDLE)
+	mkdir -p $(DISK_IMAGE_DIR)/Factor/
+	cp -R $(BUNDLE) $(DISK_IMAGE_DIR)/Factor/$(BUNDLE)
+	chmod +x cp_dir
+	cp factor.image $(DISK_IMAGE_DIR)/Factor/
+	find doc library contrib examples fonts \( -name '*.factor' \
+		-o -name '*.facts' \
+		-o -name '*.txt' \
+		-o -name '*.html' \
+		-o -name '*.ttf' \
+		-o -name '*.el' \
+		-o -name '*.vim' \
+		-o -name '*.fgen' \
+		-o -name '*.js' \) \
+		-exec ./cp_dir {} $(DISK_IMAGE_DIR)/Factor/{} \;
 	hdiutil create -srcfolder "$(DISK_IMAGE_DIR)" -fs HFS+ \
 		-volname "$(DISK_IMAGE_DIR)" "$(DISK_IMAGE)"
 
