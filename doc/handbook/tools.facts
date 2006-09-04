@@ -99,7 +99,7 @@ ARTICLE: "inspector" "The inspector"
 { $subsection go }
 { $subsection up }
 { $subsection bye }
-"An one-time inspector-like display can be shown without starting the inspector:"
+"A one-time inspector-like display can be shown without starting the inspector:"
 { $subsection describe }
 "Word for getting very brief descriptions of words and general objects:"
 { $subsection synopsis }
