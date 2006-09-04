@@ -1353,7 +1353,7 @@ SYMBOL: last-opcode
 
 : opcode ( -- )
   #! Set the opcode number for the last instruction that was defined.
-  last-instruction global hash unit scan 16 base> ( [word] opcode -- )
+  last-instruction global hash unit scan 16 base>
   dup last-opcode global set-hash instructions set-nth ; parsing
 
 INSTRUCTION: NOP          ; opcode 00 cycles 04 
@@ -1613,8 +1613,8 @@ INSTRUCTION: RST  38H     ; opcode FF cycles 11
     "P3" print
     "256 224" print
     "1" print
-    224 [ ( cpu h -- h )
-      32 [ ( cpu h w -- w )
+    224 [
+      32 [
         over 32 * over +  HEX: 2400 + ! cpu h w addr
         >r pick r> swap cpu-ram nth [
           0 = [
