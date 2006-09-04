@@ -214,7 +214,7 @@ M: html-stream stream-terpri [ <br/> ] with-stream* ;
 : html-document ( title quot -- )
     xhtml-preamble
     swap chars>entities
-    <html>
+    <html " xmlns=\"http://www.w3.org/1999/xhtml\" xml:lang=\"en\" lang=\"en\"" write html>
         <head>
             <title> write </title>
             default-css
