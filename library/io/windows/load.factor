@@ -1,10 +1,11 @@
-REQUIRES: library/windows library/io/buffer ;
+IN: scratchpad
+USING: alien compiler kernel namespaces parser sequences words ;
 
-PROVIDE: library/io/windows {
-    "errors.factor"
-    "winsock.factor"
-    "io-internals.factor"
-    "stream.factor"
-    "server.factor"
-    "io-last.factor"
-} ;
+{ 
+    "errors"
+    "winsock"
+    "io-internals"
+    "stream"
+    "server"
+    "io-last"
+} [ "/library/io/windows/" swap ".factor" append3 run-resource ] each

@@ -1,4 +1,4 @@
-! Copyright (C) 2004 Mackenzie Straight.
+! Copyright (C) 2006 Mackenzie Straight, Doug Coleman.
 
 IN: win32-api
 USING: alien errors io-internals kernel math parser sequences words ;

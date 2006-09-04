@@ -1,4 +1,4 @@
-! Copyright (C) 2004, 2005 Mackenzie Straight.
+! Copyright (C) 2004, 2005 Mackenzie Straight, Doug Coleman.
 
 IN: win32-stream
 USING: alien errors generic kernel kernel-internals math namespaces
