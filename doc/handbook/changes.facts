@@ -1,6 +1,74 @@
-USING: errors gadgets-tracks generic hashtables help io kernel math memory sequences words ;
+USING: errors gadgets-tracks generic hashtables help io kernel
+math memory sequences words compiler parser modules definitions
+;
 
 ARTICLE: "changes" "Changes in the latest release"
+{ $heading "Factor 0.84" }
+{ $subtopic "Core"
+    { $list
+        { "Incompatible change: the argument order for the following words has changed:"
+            { $list
+                { $link head }
+                { $link head* }
+                { $link head-slice }
+                { $link head-slice* }
+                { $link tail }
+                { $link tail* }
+                { $link tail-slice }
+                { $link tail-slice* }
+                { $link group }
+            }
+        }
+        "Native I/O on Windows is now supported again. This means non-blocking I/O, network sockets, HTTPD and so on work again (Doug Coleman)."
+        { "Stack effect declarations are now read by the parser. This means that " { $snippet "( foo bar )" } " is not a comment anymore, but syntax. See " { $link "effect-declaration" } "." }
+        { "Redefining words no longer decompiles words that call them; now you must call " { $link recompile } " manually. This word is automatically called after loading a file with " { $link run-file } " or a module with " { $link require } ". See " { $link "recompile" } " for details." }
+        { "Words such as " { $link see } ", " { $link reload } ", and " { $link edit } " can now take method and help article specifiers in addition to words. See " { $link "definitions" } " for details." }
+    }
+}
+{ $subtopic "UI"
+    { $list
+        "New code walker runs in UI, supports backward time travel and replaces terminal-based walker."
+        "New single-window interface -- the listener, browser, documentation and walker have been merged into a single window. Use F2, F3, F4, F5 to switch between tools. Multiple windows can still be opened with S+F2, S+F3, S+F4."
+        "The input gadget in the listener now supports a variety of shortcuts for getting information about the word at the caret. Explore the keyboard help for details."
+        "Pressing F1 now lists keyboard shortcuts for the currently focused gadget."
+        "The UI now sends modifier keys along with mouse button up/down gestures."
+        "For users with a one-button mouse, control-clicking is now sent as a right click, and alt-clicking is sent as a middle-click."
+        "On Mac OS X, the UI can now act as a system services client. That is, you can select some text in the listener's input gadget, invoke a service, and see the result appear."
+    }
+}
+{ $subtopic "Tools"
+    { $list
+        { "The " { $snippet "jedit" } " word has been replaced with a general " { $link edit } " word. You must now load one of the following modules for external editor support:"
+            { $list
+                { $snippet "emacs" }
+                { $snippet "jedit" }
+                { $snippet "vim" }
+            }
+        }
+        { "New " { $link :edit } " word opens your editor at the location of the most recent syntax error." }
+        { "New " { $link :help } " word displays documentation explaining the most recent error." }
+        { "The " { $link apropos } " word now performs fuzzy matching and ranks results according to edit distance." }
+    }
+}
+{ $subtopic "Contributed libraries"
+    { $list
+        { { $snippet "automata" } ": updated (Eduardo Cavazos)." }
+        { { $snippet "boids" } ": updated (Eduardo Cavazos)." }
+        { { $snippet "calendar" } ": updated (Doug Coleman)." }
+        { { $snippet "concurrency" } ": supports distributed message passing over sockets between nodes (Chris Double)." }
+        { { $snippet "emacs" } ": new module, adds a hook for the " { $link edit } " word that invokes Emacs (Eduardo Cavazos)." }
+        { { $snippet "httpd" } ": supports client cache control headers (Chris Double)." }
+        { { $snippet "json" } ": new module reads and writes JSON objects (Chris Double)." }
+        { { $snippet "lambda" } ": new module, lambda calculus interpreter (Matthew Willis)." }
+        { { $snippet "lazy-lists" } ": updated (Matthew Willis)." }
+        { { $snippet "parser-combinators" } ": updated (Chris Double)." }
+        { { $snippet "rss" } ": new module reads RSS2 feeds (Chris Double)." }
+        { { $snippet "serialize" } ": revived and updated (Chris Double)." }
+        { { $snippet "sqlite" } ": updated (Chris Double)." }
+        { { $snippet "tuple-db" } ": updated (Chris Double)." }
+        { { $snippet "vim" } ": new module, adds a hook for the " { $link edit } " word that invokes VIM (Doug Coleman)." }
+    }
+}
 { $heading "Factor 0.83" }
 { $subtopic "First class quotations"
     { $list

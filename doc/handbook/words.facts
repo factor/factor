@@ -81,7 +81,8 @@ $terpri
 "The remaining declarations only affect compiled definitions. They do not change evaluation semantics of a word, but instead declare that the word follows a certain contract, and thus may be compiled differently."
 { $warning "If a generic word is declared " { $link POSTPONE: foldable } ", all methods must satisfy the contract, otherwise unpredicable behavior will occur." }
 { $subsection POSTPONE: inline }
-{ $subsection POSTPONE: foldable } ;
+{ $subsection POSTPONE: foldable }
+"Stack effect declarations are documented in " { $link "effect-declaration" } "." ;
 
 ARTICLE: "word-props" "Word properties"
 "Each word has a hashtable of properties."
