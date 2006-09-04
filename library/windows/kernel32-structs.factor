@@ -33,6 +33,14 @@ BEGIN-STRUCT: TIME_ZONE_INFORMATION
     FIELD: int a5
     FIELD: int a6
     FIELD: int a7
+    FIELD: int a8
+    FIELD: int a9
+    FIELD: int a10
+    FIELD: int a11
+    FIELD: int a12
+    FIELD: int a13
+    FIELD: int a14
+    FIELD: int a15
     FIELD: SYSTEMTIME StandardDate
     FIELD: LONG StandardBias
     ! FIELD: WCHAR[32] DaylightName
@@ -44,6 +52,14 @@ BEGIN-STRUCT: TIME_ZONE_INFORMATION
     FIELD: int b5
     FIELD: int b6
     FIELD: int b7
+    FIELD: int b8
+    FIELD: int b9
+    FIELD: int b10
+    FIELD: int b11
+    FIELD: int b12
+    FIELD: int b13
+    FIELD: int b14
+    FIELD: int b15
     FIELD: SYSTEMTIME DaylightDate
     FIELD: LONG DaylightBias
 END-STRUCT
