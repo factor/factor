@@ -287,7 +287,8 @@ run-boids ;
 
 VARS: ns frame ;
 
-: control-panel-label ( string -- array ) <label> dup title-theme ;
+: control-panel-label ( string -- array )
+<label> dup reverse-video-theme ;
 
 : control-panel-field ( label variable init -- shelf )
 rot <label> -rot
