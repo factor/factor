@@ -364,8 +364,8 @@ FUNCTION: DWORD GetConsoleTitleW ( LPWSTR lpConsoleTitle, DWORD nSize ) ;
 ! FUNCTION: GetFileInformationByHandle
 FUNCTION: DWORD GetFileSize ( HANDLE hFile, LPDWORD lpFileSizeHigh ) ;
 ! FUNCTION: GetFileSizeEx
-! FUNCTION: GetFileTime
-! FUNCTION: GetFileType
+FUNCTION: BOOL GetFileTime ( HANDLE hFile, LPFILETIME lpCreationTime, LPFILETIME lpLastAccessTime, LPFILETIME lpLastWriteTime ) ;
+FUNCTION: DWORD GetFileType ( HANDLE hFile ) ;
 ! FUNCTION: GetFirmwareEnvironmentVariableA
 ! FUNCTION: GetFirmwareEnvironmentVariableW
 ! FUNCTION: GetFullPathNameA
@@ -459,7 +459,7 @@ FUNCTION: HANDLE GetStdHandle ( DWORD nStdHandle ) ;
 ! FUNCTION: GetSystemInfo
 ! FUNCTION: GetSystemPowerStatus
 ! FUNCTION: GetSystemRegistryQuota
-! FUNCTION: GetSystemTime
+FUNCTION: void GetSystemTime ( LPSYSTEMTIME lpSystemTime ) ;
 ! FUNCTION: GetSystemTimeAdjustment
 ! FUNCTION: GetSystemTimeAsFileTime
 ! FUNCTION: GetSystemTimes
@@ -484,7 +484,7 @@ FUNCTION: HANDLE GetStdHandle ( DWORD nStdHandle ) ;
 ! FUNCTION: GetTickCount
 ! FUNCTION: GetTimeFormatA
 ! FUNCTION: GetTimeFormatW
-! FUNCTION: GetTimeZoneInformation
+FUNCTION: DWORD GetTimeZoneInformation ( LPTIME_ZONE_INFORMATION lpTimeZoneInformation ) ;
 ! FUNCTION: GetUserDefaultLangID
 ! FUNCTION: GetUserDefaultLCID
 ! FUNCTION: GetUserDefaultUILanguage
@@ -814,7 +814,7 @@ FUNCTION: BOOL SetConsoleTitleW ( LPCWSTR lpConsoleTitle ) ;
 ! FUNCTION: SetFilePointerEx
 ! FUNCTION: SetFileShortNameA
 ! FUNCTION: SetFileShortNameW
-! FUNCTION: SetFileTime
+FUNCTION: BOOL SetFileTime ( HANDLE hFile, FILETIME* lpCreationTime, FILETIME* lpLastAccessTime, FILETIME* lpLastWriteTime ) ;
 ! FUNCTION: SetFileValidData
 ! FUNCTION: SetFirmwareEnvironmentVariableA
 ! FUNCTION: SetFirmwareEnvironmentVariableW
@@ -871,7 +871,7 @@ FUNCTION: DWORD SleepEx ( DWORD dwMilliSeconds, BOOL bAlertable ) ;
 ! FUNCTION: SuspendThread
 ! FUNCTION: SwitchToFiber
 ! FUNCTION: SwitchToThread
-! FUNCTION: SystemTimeToFileTime
+FUNCTION: BOOL SystemTimeToFileTime ( SYSTEMTIME* lpSystemTime, LPFILETIME lpFileTime ) ;
 ! FUNCTION: SystemTimeToTzSpecificLocalTime
 ! FUNCTION: TerminateJobObject
 ! FUNCTION: TerminateProcess

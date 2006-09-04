@@ -1074,21 +1074,18 @@ FUNCTION: int MessageBoxExW (
                 UINT uType,
                 WORD wLanguageId ) ;
 
-FUNCTION: int MessageBoxIndirectA (
-                 MSGBOXPARAMSA* params ) ;
-
-FUNCTION: int MessageBoxIndirectW (
-                 MSGBOXPARAMSW* params ) ;
+! FUNCTION: int MessageBoxIndirectA ( MSGBOXPARAMSA* params ) ;
+! FUNCTION: int MessageBoxIndirectW ( MSGBOXPARAMSW* params ) ;
 
 
-: MessageBox ( -- )
+: MessageBox
     \ MessageBoxW \ MessageBoxA unicode-exec ;
 
-: MessageBoxEx ( -- )
+: MessageBoxEx
     \ MessageBoxExW \ MessageBoxExA unicode-exec ;
 
-: MessageBoxIndirect ( -- )
-    \ MessageBoxIndirectW \ MessageBoxIndirectA unicode-exec ;
+! : MessageBoxIndirect
+    ! \ MessageBoxIndirectW \ MessageBoxIndirectA unicode-exec ;
 
 ! FUNCTION: MessageBoxTimeoutA ! dllexported, not in header
 ! FUNCTION: MessageBoxTimeoutW ! dllexported, not in header

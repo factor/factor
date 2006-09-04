@@ -253,14 +253,14 @@ BEGIN-STRUCT: RECT
     FIELD: LONG bottom
 END-STRUCT
 
-BEGIN-STRUCT: PAINTSTRUCT
-    FIELD: HDC  hdc
-    FIELD: BOOL fErase
-    FIELD: RECT rcPaint
-    FIELD: BOOL fRestore
-    FIELD: BOOL fIncUpdate
-    FIELD: BYTE rgbReserved[32]
-END-STRUCT
+! BEGIN-STRUCT: PAINTSTRUCT
+    ! FIELD: HDC  hdc
+    ! FIELD: BOOL fErase
+    ! FIELD: RECT rcPaint
+    ! FIELD: BOOL fRestore
+    ! FIELD: BOOL fIncUpdate
+    ! FIELD: BYTE[32] rgbReserved
+! END-STRUCT
 
 TYPEDEF: PAINTSTRUCT* LPPAINTSTRUCT
 

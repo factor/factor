@@ -42,3 +42,16 @@ USING: alien kernel errors ;
 : INVALID_FILE_SIZE HEX: FFFFFFFF ;
 
 : INFINITE HEX: FFFFFFFF ;
+
+! From C:\cygwin\usr\include\w32api\winbase.h
+: FILE_TYPE_UNKNOWN 0 ;
+: FILE_TYPE_DISK 1 ;
+: FILE_TYPE_CHAR 2 ;
+: FILE_TYPE_PIPE 3 ;
+: FILE_TYPE_REMOTE HEX: 8000 ;
+
+: TIME_ZONE_ID_UNKNOWN 0 ; inline
+: TIME_ZONE_ID_STANDARD 1 ; inline
+: TIME_ZONE_ID_DAYLIGHT 2 ; inline
+: TIME_ZONE_ID_INVALID HEX: FFFFFFFF ; inline
+
