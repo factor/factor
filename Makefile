@@ -108,7 +108,8 @@ macosx.dmg:
 	mkdir -p $(DISK_IMAGE_DIR)/Factor/
 	cp -R $(BUNDLE) $(DISK_IMAGE_DIR)/Factor/$(BUNDLE)
 	chmod +x cp_dir
-	cp factor.image $(DISK_IMAGE_DIR)/Factor/
+	cp factor.image license.txt README.txt TODO.FACTOR.txt version.factor \
+		$(DISK_IMAGE_DIR)/Factor/
 	find doc library contrib examples fonts \( -name '*.factor' \
 		-o -name '*.facts' \
 		-o -name '*.txt' \
