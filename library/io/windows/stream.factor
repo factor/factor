@@ -22,29 +22,47 @@ SYMBOL: cutoff
 : pending-error ( len/status -- len/status )
     dup [ win32-throw-error ] unless ;
 
-: init-overlapped ( overlapped -- overlapped )
+: init-overlapped2 ( overlapped -- overlapped )
     0 over set-overlapped-ext-internal
     0 over set-overlapped-ext-internal-high
     fileptr get dup 0 ? over set-overlapped-ext-offset
     0 over set-overlapped-ext-offset-high
     f over set-overlapped-ext-event ;
 
-: update-file-pointer ( whence -- )
+: init-overlapped ( fileptr overlapped -- overlapped )
+    0 over set-overlapped-ext-internal
+    0 over set-overlapped-ext-internal-high
+    >r dup 0 ? r> [ set-overlapped-ext-offset ] keep
+    0 over set-overlapped-ext-offset-high
+    f over set-overlapped-ext-event ;
+
+: update-file-pointer2 ( whence -- )
     file-size get [ fileptr [ + ] change ] [ drop ] if ;
 
-: update-timeout ( -- )
+: update-file-pointer ( whence stream -- )
+    dup win32-stream-file-size [
+        [ win32-stream-fileptr + ] keep set-win32-stream-fileptr
+    ] [
+        2drop
+    ] if ;
+
+: update-timeout ( stream -- )
+    dup win32-stream-timeout
+    [ millis + swap set-win32-stream-cutoff ] [ drop ] if* ;
+
+: update-timeout2 ( stream -- )
     timeout get [ millis + cutoff set ] when* ;
 
 ! Read
 : fill-input ( -- )
-    update-timeout [
-        stream get alloc-io-callback init-overlapped >r
+    update-timeout2 [
+        stream get alloc-io-callback init-overlapped2 >r
         handle get in-buffer get [ buffer@ ] keep 
         buffer-capacity file-size get [ fileptr get - min ] when*
         f r>
         ReadFile [ handle-io-error ] unless stop
     ] callcc1 pending-error
-    dup in-buffer get n>buffer update-file-pointer ;
+    dup in-buffer get n>buffer update-file-pointer2 ;
 
 : consume-input ( count buffer -- str ) 
     dup buffer-length zero? [ fill-input ] when
@@ -70,42 +88,50 @@ SYMBOL: cutoff
     ] if ;
 
 ! Write
-: flush-output ( -- ) 
-    update-timeout [
-        stream get alloc-io-callback init-overlapped >r
-        handle get out-buffer get [ buffer@ ] keep buffer-length
+USE: errors
+: flush-output ( stream -- ) 
+    dup update-timeout 
+    dup unit
+    [
+        [ alloc-io-callback ] keep
+        win32-stream-fileptr swap init-overlapped >r
+    ] append
+    over win32-stream-handle unit append
+    over win32-stream-out-buffer unit append
+    [ 
+        [ buffer@ ] keep buffer-length
         f r> WriteFile [ handle-io-error ] unless stop
-    ] callcc1 pending-error
-    dup update-file-pointer
-    out-buffer get [ buffer-consume ] keep 
-    buffer-length 0 > [ flush-output ] when ;
+    ] append
+    callcc1 pending-error
+    dup pick update-file-pointer
+    over win32-stream-out-buffer [ buffer-consume ] keep 
+    buffer-length 0 > [ flush-output ] [ drop ] if ;
 
-: maybe-flush-output ( buffer -- )
-    buffer-length 0 > [ flush-output ] when ;
+: maybe-flush-output ( stream -- )
+    dup win32-stream-out-buffer buffer-length 0 > [ flush-output ] [ drop ] if ;
 
-GENERIC: do-write
-M: integer do-write ( buffer integer -- )
-    over buffer-capacity zero? [ flush-output ] when
-    ch>string swap >buffer ;
+G: do-write 1 standard-combination ;
+M: integer do-write ( integer stream -- )
+    dup win32-stream-out-buffer buffer-capacity zero?
+    [ dup flush-output ] when
+    >r ch>string r> win32-stream-out-buffer >buffer ;
 
-M: string do-write ( buffer string -- )
-    dup length pick 2dup buffer-capacity <= [
-        2drop swap >buffer
+M: string do-write ( string stream -- )
+    over length over win32-stream-out-buffer 2dup buffer-capacity <= [
+        2drop win32-stream-out-buffer >buffer
     ] [
         2dup buffer-size > [
             extend-buffer 
         ] [
-            2drop flush-output
+            2drop dup flush-output
         ] if do-write
     ] if ;
 
 M: win32-stream stream-close ( stream -- )
-    win32-stream-this [
-        out-buffer get maybe-flush-output
-        handle get CloseHandle drop 
-        in-buffer get buffer-free 
-        out-buffer get buffer-free
-    ] bind ;
+    dup maybe-flush-output
+    dup win32-stream-handle CloseHandle 0 = [ win32-throw-error ] when
+    dup win32-stream-in-buffer buffer-free
+    win32-stream-out-buffer buffer-free ;
 
 M: win32-stream stream-read1 ( stream -- ch/f )
     win32-stream-this [
@@ -119,19 +145,11 @@ M: win32-stream stream-read ( n stream -- str/f )
     win32-stream-this [ dup <sbuf> swap in-buffer get do-read-count ] bind ;
 
 
-M: win32-stream stream-flush ( stream -- )
-    win32-stream-this [ out-buffer get maybe-flush-output ] bind ;
+M: win32-stream stream-flush ( stream -- ) maybe-flush-output ;
+M: win32-stream stream-write1 ( ch stream -- ) >r >fixnum r> do-write ;
+M: win32-stream stream-write ( str stream -- ) do-write ;
 
-M: win32-stream stream-write1 ( ch stream -- )
-    win32-stream-this [ >r out-buffer get r> >fixnum do-write ] bind ;
-
-M: win32-stream stream-write ( str stream -- )
-    win32-stream-this [ >r out-buffer get r> do-write ] bind ;
-
-
-M: win32-stream set-timeout ( n stream -- )
-    win32-stream-this [ timeout set ] bind ;
-
+M: win32-stream set-timeout ( n stream -- ) set-win32-stream-timeout ;
 M: win32-stream expire ( stream -- )
     win32-stream-this [
         timeout get [ millis cutoff get > [ handle get CancelIo ] when ] when
@@ -162,3 +180,7 @@ M: win32-stream expire ( stream -- )
 : <win32-file-writer> ( path -- stream )
     f t win32-open-file make-win32-stream <plain-writer> ;
 
+IN: scratchpad
+: gg
+    "omgomg.txt" <file-writer> [ "zomg" write ] with-stream ;
+ 
