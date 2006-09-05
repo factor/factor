@@ -6,8 +6,10 @@ kernel-internals math namespaces prettyprint sequences
 io strings threads win32-api win32-io-internals ;
 
 TUPLE: win32-stream handle in-buffer out-buffer fileptr file-size timeout cutoff this ;
-SYMBOL: stream
 
+! remove these symbols
+SYMBOL: the-hash
+SYMBOL: stream
 
 SYMBOL: handle
 SYMBOL: in-buffer
@@ -18,7 +20,7 @@ SYMBOL: timeout
 SYMBOL: cutoff
 
 
-GENERIC: win32-stream-handle
+
 GENERIC: do-write
 
 : pending-error ( len/status -- len/status )
@@ -48,6 +50,7 @@ GENERIC: do-write
     out-buffer get [ buffer-consume ] keep 
     buffer-length 0 > [ flush-output ] when ;
 
+! : maybe-flush-output ( buffer -- )
 : maybe-flush-output ( -- )
     out-buffer get buffer-length 0 > [ flush-output ] when ;
 
@@ -96,59 +99,71 @@ M: string do-write
         ] if
     ] if ;
 
-: peek-input ( -- str )
-    1 in-buffer get buffer-first-n ;
 
-M: win32-stream stream-write
-    
-    win32-stream-this [ do-write ] bind ;
 
-M: win32-stream stream-write1
+
+
+
+! : peek-input ( -- str ) 1 in-buffer get buffer-first-n ;
+
+: synch-win32-stream ( win32-stream -- )
+    win32-stream-this the-hash set
+    ;
+
+
+
+
+
+
+
+M: win32-stream stream-write ( str stream -- )
+    win32-stream-this [ do-write ] bind
+    ;
+
+M: win32-stream stream-write1 ( ch stream -- )
     win32-stream-this [ >fixnum do-write ] bind ;
 
-M: win32-stream stream-read
+M: win32-stream stream-read ( n stream -- str/f )
     win32-stream-this [ dup <sbuf> swap do-read-count ] bind ;
 
-M: win32-stream stream-read1
+M: win32-stream stream-read1 ( stream -- ch/f )
     win32-stream-this [
         1 consume-input dup length zero? [ drop f ] when first 
     ] bind ;
 
-M: win32-stream stream-readln
+M: win32-stream stream-readln ( stream -- str )
     win32-stream-this [ readln ] bind ;
+    ! win32-stream-in-buffer readln ;
 
-M: win32-stream stream-terpri
+M: win32-stream stream-terpri ( stream -- )
     win32-stream-this [ CHAR: \n do-write ] bind ;
 
-M: win32-stream stream-flush
+M: win32-stream stream-flush ( stream -- )
     win32-stream-this [ maybe-flush-output ] bind ;
 
-M: win32-stream stream-close
+M: win32-stream stream-close ( stream -- )
     win32-stream-this [
         maybe-flush-output
         handle get CloseHandle drop 
         in-buffer get buffer-free 
         out-buffer get buffer-free
-    ] bind ;
+    ] bind
+    ;
 
-M: win32-stream stream-format
+M: win32-stream stream-format ( str style stream -- )
     win32-stream-this [ drop do-write ] bind ;
 
-M: win32-stream win32-stream-handle
-    win32-stream-this [ handle get ] bind ;
-
-M: win32-stream set-timeout
+M: win32-stream set-timeout ( n stream -- )
     win32-stream-this [ timeout set ] bind ;
 
-M: win32-stream expire
+M: win32-stream expire ! not a generic
     win32-stream-this [
         timeout get [ millis cutoff get > [ handle get CancelIo ] when ] when
     ] bind ;
 
-M: win32-stream with-nested-stream
+M: win32-stream with-nested-stream ( quot style stream -- )
     win32-stream-this [ drop stream get swap with-stream* ] bind ;
 
-SYMBOL: the-hash
 : make-win32-stream ( handle -- stream )
     [
         dup f GetFileSize dup -1 = not [

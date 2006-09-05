@@ -1,4 +1,4 @@
-! Copyright (C) 2004, 2005 Mackenzie Straight, Doug Coleman.
+! Copyright (C) 2006 Mackenzie Straight, Doug Coleman.
 
 IN: win32-stream
 USING: alien errors generic kernel kernel-internals math namespaces
@@ -36,8 +36,11 @@ SYMBOL: socket
 : bind-socket ( port socket -- )
     swap setup-sockaddr "sockaddr-in" c-size wsa-bind handle-socket-error!=0/f ;
 
+SYMBOL: listen-backlog
+20 listen-backlog set-global
+
 : listen-socket ( socket -- )
-    20 wsa-listen handle-socket-error!=0/f ;
+    listen-backlog get wsa-listen handle-socket-error!=0/f ;
 
 : sockaddr> ( sockaddr -- port host )
     dup sockaddr-in-port ntohs swap sockaddr-in-addr inet-ntoa ;
