@@ -198,9 +198,15 @@ M: read1-task task-container drop read-tasks get-global ;
         [ swap <read1-task> add-io-task stop ] callcc0
     ] when pending-error ;
 
+: unless-eof ( port quot -- value )
+    over port-eof? [
+        f rot set-port-eof? drop f
+    ] [
+        call
+    ] if ; inline
+
 M: input-port stream-read1
-    dup wait-to-read1
-    dup port-eof? [ drop f ] [ buffer-pop ] if ;
+    dup wait-to-read1 [ buffer-pop ] unless-eof ;
 
 ! Reading character counts
 : read-step ( count reader -- ? )
@@ -242,8 +248,8 @@ M: read-task task-container drop read-tasks get-global ;
 
 M: input-port stream-read
     >r 0 max >fixnum r>
-    [ wait-to-read ] keep dup port-eof?
-    [ drop f ] [ port-sbuf >string ] if ;
+    [ wait-to-read ] keep
+    [ port-sbuf >string ] unless-eof ;
 
 ! Writers
 

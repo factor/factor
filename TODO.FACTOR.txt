@@ -10,7 +10,6 @@
 - faster I/O
 - buffer-ptr should be an alien
 - faster Unix stream-read#
-- EOF kills a port
 - fix this:
   [ 1 2 3 4 5 6 7 8 9 10 10 10 10 10 10 10 10 10 10 11 11 11 113 ] .
 [ 1 2 3 4 5 6 7 8 9 10 10 10 10 10 10 10 10 10 10 11 11 11 113 
