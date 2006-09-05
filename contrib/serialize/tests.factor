@@ -14,6 +14,16 @@ IN: temporary
   [ [ deserialize ] with-serialized ] string-in
 ] unit-test
 
+[ 0  ] [
+  [ [ 0 serialize ] with-serialized ] string-out
+  [ [ deserialize ] with-serialized ] string-in
+] unit-test
+
+[ -50  ] [
+  [ [ -50 serialize ] with-serialized ] string-out
+  [ [ deserialize ] with-serialized ] string-in
+] unit-test
+
 [ 20  ] [
   [ [ 20 serialize ] with-serialized ] string-out
   [ [ deserialize ] with-serialized ] string-in
@@ -24,8 +34,18 @@ IN: temporary
   [ [ deserialize ] with-serialized ] string-in 5 5 5 ^ ^ =
 ] unit-test
 
+[ t  ] [
+  [ [ 5 5 5 ^ ^ neg serialize ] with-serialized ] string-out
+  [ [ deserialize ] with-serialized ] string-in 5 5 5 ^ ^ neg =
+] unit-test
+
 [ 5.25  ] [
   [ [ 5.25 serialize ] with-serialized ] string-out
+  [ [ deserialize ] with-serialized ] string-in
+] unit-test
+
+[ -5.25  ] [
+  [ [ -5.25 serialize ] with-serialized ] string-out
   [ [ deserialize ] with-serialized ] string-in
 ] unit-test
 
