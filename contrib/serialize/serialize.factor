@@ -7,7 +7,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 !
 IN: serialize
-USING: kernel kernel-internals math hashtables namespaces io strings sequences generic words errors arrays vectors ;
+USING: kernel kernel-internals math hashtables namespaces io strings sequences generic words errors arrays vectors alien ;
 
 ! Variable holding a sequence of objects already serialized
 SYMBOL: serialized
@@ -117,6 +117,16 @@ M: wrapper serialize ( obj -- )
   "W" write
   wrapped serialize ;
 
+M: byte-array serialize ( obj -- )
+  [
+    "A" write
+    dup add-object serialize
+    dup length cells dup serialize
+    [
+      2dup alien-unsigned-1 serialize
+    ] repeat    
+  ] serialize-shared drop ;
+
 DEFER: deserialize ( -- obj )
 
 : intern-object ( id obj -- )
@@ -186,6 +196,14 @@ DEFER: deserialize ( -- obj )
   deserialize array>tuple
   [ intern-object ] keep ;
 
+: deserialize-byte-array ( -- byte-array )
+  deserialize 
+  deserialize dup <byte-array> swap 
+  [
+    deserialize pick pick set-alien-unsigned-1
+  ] repeat
+  [ intern-object ] keep ;
+
 : deserialize-unknown ( -- object )
   deserialize serialized get nth ;
 
@@ -206,6 +224,7 @@ DEFER: deserialize ( -- obj )
      { "h" deserialize-hashtable }
      { "T" deserialize-tuple }
      { "z" deserialize-zero }
+     { "A" deserialize-byte-array }
      { "o" deserialize-unknown }
   }
   hash dup [ "Unknown typecode" throw ] unless nip execute ;
