@@ -1,6 +1,6 @@
 ! Simple IRC bot written in Factor.
 
-! Load the HTTP server first (contrib/httpd/load.factor).
+REQUIRES: httpd ;
 
 USING: errors generic hashtables help html http io kernel math
 memory namespaces parser prettyprint sequences strings threads
@@ -87,8 +87,7 @@ M: ping handle-irc ( line -- )
 IN: factorbot-commands
 
 : see ( text -- )
-    all-words [ word-name = ] subset-with
-    dup empty? [
+    dup words-named dup empty? [
         drop
         not-found
     ] [

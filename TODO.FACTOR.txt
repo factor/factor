@@ -1,6 +1,5 @@
 + 0.85:
 
-- factorbot is broken
 - ENTER key on keypad should do something
 - pane output in UI should use less memory
 - signal 4 on datastack underflow on mac intel??
