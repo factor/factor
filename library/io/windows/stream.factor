@@ -89,16 +89,15 @@ M: integer do-write ( buffer integer -- )
     ch>string swap >buffer ;
 
 M: string do-write ( buffer string -- )
-    dup length pick buffer-capacity <= [
-        swap >buffer
+    dup length pick 2dup buffer-capacity <= [
+        2drop swap >buffer
     ] [
-        dup length pick buffer-size > [
-            dup length pick extend-buffer 
+        2dup buffer-size > [
+            extend-buffer 
         ] [
-            flush-output
+            2drop flush-output
         ] if do-write
     ] if ;
-
 
 M: win32-stream stream-close ( stream -- )
     win32-stream-this [
@@ -107,7 +106,6 @@ M: win32-stream stream-close ( stream -- )
         in-buffer get buffer-free 
         out-buffer get buffer-free
     ] bind ;
-
 
 M: win32-stream stream-read1 ( stream -- ch/f )
     win32-stream-this [
@@ -134,7 +132,7 @@ M: win32-stream stream-write ( str stream -- )
 M: win32-stream set-timeout ( n stream -- )
     win32-stream-this [ timeout set ] bind ;
 
-M: win32-stream expire ! not a generic
+M: win32-stream expire ( stream -- )
     win32-stream-this [
         timeout get [ millis cutoff get > [ handle get CancelIo ] when ] when
     ] bind ;
