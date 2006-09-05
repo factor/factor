@@ -1,4 +1,4 @@
-! Copyright (C) 2004, 2005 Mackenzie Straight.
+! Copyright (C) 2004, 2006 Mackenzie Straight, Doug Coleman.
 
 IN: win32-stream
 USING: alien generic hashtables io-internals kernel
@@ -35,7 +35,6 @@ SYMBOL: cutoff
 : update-timeout ( -- )
     timeout get [ millis + cutoff set ] when* ;
 
-
 ! Read
 : fill-input ( -- )
     update-timeout [
@@ -45,7 +44,6 @@ SYMBOL: cutoff
         f r>
         ReadFile [ handle-io-error ] unless stop
     ] callcc1 pending-error
-
     dup in-buffer get n>buffer update-file-pointer ;
 
 : consume-input ( count buffer -- str ) 
@@ -71,10 +69,7 @@ SYMBOL: cutoff
         ] if
     ] if ;
 
-
-
 ! Write
-
 : flush-output ( -- ) 
     update-timeout [
         stream get alloc-io-callback init-overlapped >r
@@ -85,45 +80,34 @@ SYMBOL: cutoff
     out-buffer get [ buffer-consume ] keep 
     buffer-length 0 > [ flush-output ] when ;
 
-! : maybe-flush-output ( buffer -- )
-: maybe-flush-output ( -- )
-    out-buffer get buffer-length 0 > [ flush-output ] when ;
+: maybe-flush-output ( buffer -- )
+    buffer-length 0 > [ flush-output ] when ;
 
 GENERIC: do-write
-M: integer do-write ( integer -- )
-    out-buffer get [ buffer-capacity zero? [ flush-output ] when ] keep
-    >r ch>string r> >buffer ;
+M: integer do-write ( buffer integer -- )
+    over buffer-capacity zero? [ flush-output ] when
+    ch>string swap >buffer ;
 
-M: string do-write ( string -- )
-    dup length out-buffer get buffer-capacity <= [
-        out-buffer get >buffer
+M: string do-write ( buffer string -- )
+    dup length pick buffer-capacity <= [
+        swap >buffer
     ] [
-        dup length out-buffer get buffer-size > [
-            dup length out-buffer get extend-buffer do-write
-        ] [ flush-output do-write ] if
+        dup length pick buffer-size > [
+            dup length pick extend-buffer 
+        ] [
+            flush-output
+        ] if do-write
     ] if ;
-
-
-
-
-
-
-
-
-! : peek-input ( -- str ) 1 in-buffer get buffer-first-n ;
-
-: synch-win32-stream ( win32-stream -- )
-    win32-stream-this the-hash set
-    ;
 
 
 M: win32-stream stream-close ( stream -- )
     win32-stream-this [
-        maybe-flush-output
+        out-buffer get maybe-flush-output
         handle get CloseHandle drop 
         in-buffer get buffer-free 
         out-buffer get buffer-free
     ] bind ;
+
 
 M: win32-stream stream-read1 ( stream -- ch/f )
     win32-stream-this [
@@ -138,16 +122,13 @@ M: win32-stream stream-read ( n stream -- str/f )
 
 
 M: win32-stream stream-flush ( stream -- )
-    win32-stream-this [ maybe-flush-output ] bind ;
+    win32-stream-this [ out-buffer get maybe-flush-output ] bind ;
 
 M: win32-stream stream-write1 ( ch stream -- )
-    win32-stream-this [ >fixnum do-write ] bind ;
+    win32-stream-this [ >r out-buffer get r> >fixnum do-write ] bind ;
 
 M: win32-stream stream-write ( str stream -- )
-    win32-stream-this [ do-write ] bind ;
-
-
-
+    win32-stream-this [ >r out-buffer get r> do-write ] bind ;
 
 
 M: win32-stream set-timeout ( n stream -- )
