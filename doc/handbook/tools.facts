@@ -1,4 +1,4 @@
-USING: definitions errors help image inspector io kernel
+USING: definitions errors help image tools io kernel
 listener memory modules parser prettyprint sequences test
 words shells ;
 

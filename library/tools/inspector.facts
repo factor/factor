@@ -1,4 +1,4 @@
-IN: inspector
+IN: tools
 USING: errors help ;
 
 HELP: inspector-slots

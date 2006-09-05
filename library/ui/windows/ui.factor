@@ -3,7 +3,7 @@
 USING: alien arrays errors freetype gadgets gadgets-listener
        gadgets-workspace hashtables io kernel math namespaces prettyprint
        sequences strings vectors words win32-api win32-api-messages ;
-USING: inspector threads memory ;
+USING: tools threads memory ;
 IN: win32
 
 ! world-handle is a <win>

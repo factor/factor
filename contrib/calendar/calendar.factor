@@ -1,6 +1,6 @@
 IN: calendar
 USING: arrays errors generic hashtables io kernel math
-namespaces sequences strings prettyprint inspector ;
+namespaces sequences strings prettyprint tools ;
 
 TUPLE: timestamp year month day hour minute second gmt-offset ;
 TUPLE: dt year month day hour minute second ;

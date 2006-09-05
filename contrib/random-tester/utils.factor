@@ -1,5 +1,5 @@
 USING: kernel math sequences namespaces errors hashtables words
-arrays parser compiler syntax io optimizer inference inspector
+arrays parser compiler syntax io optimizer inference tools
 prettyprint ;
 IN: random-tester
 

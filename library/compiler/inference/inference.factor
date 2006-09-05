@@ -1,7 +1,7 @@
 ! Copyright (C) 2004, 2006 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 IN: inference
-USING: arrays errors generic inspector io kernel
+USING: arrays errors generic io kernel
 math namespaces parser prettyprint sequences strings
 vectors words ;
 

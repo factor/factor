@@ -1,7 +1,7 @@
 ! Copyright (C) 2006 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 IN: alien
-USING: compiler errors generic hashtables inference inspector
+USING: compiler errors generic hashtables inference
 kernel namespaces sequences strings words parser ;
 
 TUPLE: alien-callback return parameters quot xt ;

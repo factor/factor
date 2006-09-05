@@ -1,8 +1,8 @@
 ! Copyright (C) 2005, 2006 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-IN: words
-USING: arrays definitions hashtables help inspector io kernel
-math namespaces prettyprint sequences strings styles ;
+IN: tools
+USING: arrays definitions hashtables help tools io kernel
+math namespaces prettyprint sequences strings styles words ;
 
 : word-outliner ( word quot -- )
     swap natural-sort [

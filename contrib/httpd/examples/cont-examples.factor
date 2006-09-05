@@ -33,7 +33,7 @@ USE: strings
 USE: math
 USE: namespaces
 USE: prettyprint
-USE: inspector
+USE: tools
 USE: sequences
 
 : display-page ( title -- ) 

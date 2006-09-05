@@ -1,6 +1,6 @@
 ! Copyright (C) 2004, 2006 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: callback-responder generic hashtables help http inspector
+USING: callback-responder generic hashtables help http tools
 io kernel math namespaces prototype-js sequences strings styles
 words xml ;
 IN: html

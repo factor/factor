@@ -4,9 +4,9 @@ USING: arrays gadgets gadgets-listener gadgets-buttons
 gadgets-walker gadgets-help gadgets-walker sequences
 gadgets-browser gadgets-books gadgets-frames gadgets-controls
 gadgets-grids gadgets-presentations kernel models namespaces
-styles words help parser inspector memory generic threads
+styles words help parser tools memory generic threads
 gadgets-text definitions inference test prettyprint math strings
-hashtables ;
+hashtables tools ;
 IN: gadgets-workspace
 
 GENERIC: call-tool* ( arg tool -- )
@@ -97,9 +97,13 @@ workspace {
 M: walker-gadget call-tool* ( arg tool -- )
     >r first2 r> (walk) ;
 
+IN: tools
+
 : walk ( quot -- )
     continuation dup continuation-data pop* 2array
     walker-gadget call-tool stop ;
+
+IN: gadgets-workspace
 
 ! Listener tool
 G: call-listener ( quot/string listener -- )

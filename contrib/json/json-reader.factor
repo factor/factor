@@ -25,7 +25,7 @@ USING: kernel namespaces sequences strings math hashtables parser-combinators ;
 IN: json
 
 ! Grammar for JSON from RFC 4627
-USE: inspector
+USE: tools
 
 : [<&>] ( quot - quot )
   { } make unclip [ <&> ] reduce ;

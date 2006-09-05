@@ -1,5 +1,5 @@
 IN: hashtables
-USING: hashtables-internals help inspector kernel prettyprint ;
+USING: hashtables-internals help tools kernel prettyprint ;
 
 HELP: hashtable
 { $description "The class of hashtables. See " { $link "syntax-hashtables" } " for syntax and " { $link "hashtables" } " for general information." } ;

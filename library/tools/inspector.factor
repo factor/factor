@@ -1,6 +1,6 @@
 ! Copyright (C) 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
-IN: inspector
+IN: tools
 USING: arrays generic io kernel listener math memory namespaces
 prettyprint sequences words ;
 

@@ -3,7 +3,7 @@
 IN: gadgets-search
 USING: arrays gadgets gadgets-frames gadgets-labels
 gadgets-panes gadgets-scrolling gadgets-text gadgets-theme
-generic help inspector kernel models sequences words
+generic help tools kernel models sequences words
 gadgets-borders ;
 
 TUPLE: search-gadget input ;

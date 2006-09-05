@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 IN: help
 USING: arrays definitions errors generic graphs hashtables
-inspector io kernel namespaces prettyprint sequences words ;
+io kernel namespaces prettyprint sequences words ;
 
 ! Help articles
 SYMBOL: articles

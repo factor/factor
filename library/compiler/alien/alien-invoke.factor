@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 IN: alien
 USING: arrays assembler compiler compiler
-errors generic hashtables inference inspector
+errors generic hashtables inference
 io kernel kernel-internals math namespaces parser
 prettyprint sequences strings words parser ;
 

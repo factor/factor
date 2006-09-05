@@ -1,7 +1,7 @@
 ! Copyright (C) 2003, 2006 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 IN: test
-USING: arrays errors hashtables inspector io kernel math
+USING: arrays errors hashtables tools io kernel math
 memory namespaces parser prettyprint sequences strings words
 vectors ;
 

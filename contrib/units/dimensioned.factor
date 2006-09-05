@@ -1,4 +1,4 @@
-USING: arrays errors inspector io kernel math namespaces
+USING: arrays errors tools io kernel math namespaces
 prettyprint sequences vectors words ;
 IN: units
 

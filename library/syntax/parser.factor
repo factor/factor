@@ -108,10 +108,10 @@ global [
     {
         "scratchpad" "syntax" "arrays" "compiler" "definitions"
         "errors" "generic" "hashtables" "help" "inference"
-        "inspector" "io" "kernel" "listener" "math"
+        "io" "kernel" "listener" "math"
         "memory" "modules" "namespaces" "parser" "prettyprint"
         "sequences" "shells" "strings" "styles" "test"
-        "threads" "vectors" "words"
+        "threads" "tools" "vectors" "words"
     } set-use
     "scratchpad" set-in
 ] bind

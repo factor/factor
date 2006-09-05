@@ -1,5 +1,5 @@
-IN: words
-USING: help ;
+IN: tools
+USING: help words ;
 
 HELP: usage.
 { $values { "word" "a word" } }

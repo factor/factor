@@ -1,6 +1,6 @@
 ! Copyright (C) 2004, 2006 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: arrays definitions generic hashtables help inspector io
+USING: arrays definitions generic hashtables help tools io
 kernel kernel-internals math namespaces parser prettyprint
 sequences sequences-internals strings styles vectors words ;
 IN: errors

@@ -3,7 +3,7 @@
 IN: gadgets-walker
 USING: arrays errors gadgets gadgets-buttons gadgets-frames
 gadgets-listener gadgets-panes gadgets-scrolling gadgets-text
-gadgets-tracks generic hashtables inspector
+gadgets-tracks generic hashtables tools
 interpreter io kernel kernel-internals listener math models
 namespaces sequences shells threads vectors ;
 

@@ -1,4 +1,4 @@
-IN: inspector
+IN: tools
 USING: help io kernel prettyprint words ;
 
 HELP: sheet

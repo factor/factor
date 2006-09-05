@@ -1,5 +1,5 @@
 IN: math-contrib
-USING: kernel sequences errors namespaces math vectors errors prettyprint io inspector ;
+USING: kernel sequences errors namespaces math vectors errors prettyprint io tools ;
 
 : setup-range ( from to -- frange )
     step-size get swap <frange> ;

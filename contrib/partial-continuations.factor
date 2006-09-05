@@ -28,7 +28,8 @@
 ! http://www.bluishcoder.co.nz/2006/03/factor-partial-continuation-updates.html
 !
 IN: continuations
-USING: kernel io math prettyprint inspector lists arrays sequences namespaces ;
+USING: kernel io math prettyprint tools lists arrays sequences
+namespaces ;
 
 : breset ( quot -- )
   #! Marks the boundary of the partial continuation.

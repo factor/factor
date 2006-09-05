@@ -1,7 +1,7 @@
 ! Copyright (C) 2006 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 IN: errors
-USING: alien generic help inference inspector io kernel libc
+USING: alien generic help inference tools io kernel libc
 math math-internals parser prettyprint queues sequences
 sequences-internals strings test words ;
 

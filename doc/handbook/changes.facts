@@ -1,6 +1,6 @@
 USING: errors gadgets-tracks generic hashtables help io kernel
 math memory sequences words compiler parser modules definitions
-;
+tools ;
 
 ARTICLE: "changes" "Changes in the latest release"
 { $heading "Factor 0.84" }

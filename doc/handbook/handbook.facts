@@ -1,4 +1,4 @@
-USING: alien errors generic hashtables help inference inspector
+USING: alien errors generic hashtables help inference tools
 io-internals io libc math-internals modules namespaces parser
 prettyprint queues sequences sequences-internals test words 
 kernel generic ;

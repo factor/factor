@@ -3,7 +3,7 @@
 IN: gadgets-listener
 USING: arrays gadgets gadgets-frames gadgets-labels
 gadgets-panes gadgets-scrolling gadgets-text gadgets-theme
-gadgets-tracks generic hashtables inspector io
+gadgets-tracks generic hashtables tools io
 kernel listener math models namespaces parser prettyprint
 sequences shells styles threads words memory ;
 

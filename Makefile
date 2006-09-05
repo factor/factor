@@ -118,6 +118,7 @@ macosx.dmg:
 		-o -name '*.el' \
 		-o -name '*.vim' \
 		-o -name '*.fgen' \
+		-o -name '*.tex' \
 		-o -name '*.js' \) \
 		-exec ./cp_dir {} $(DISK_IMAGE_DIR)/Factor/{} \;
 	hdiutil create -srcfolder "$(DISK_IMAGE_DIR)" -fs HFS+ \
