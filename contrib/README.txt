@@ -26,6 +26,7 @@ Credits:
 - json -- JSON reader and writer (Chris Double)
 - lambda -- Lambda calculus interpreter (Matthew Willis)
 - lazy-lists -- Lazy evaluation lists (Chris Double, Matthew Willis)
+- match -- pattern matching (Chris Double)
 - math -- extended math library (Doug Coleman, Slava Pestov)
 - parser-combinators -- Haskell-style parser combinators (Chris Double)
 - postgresql -- PostgreSQL binding (Doug Coleman)
