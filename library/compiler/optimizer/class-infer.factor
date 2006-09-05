@@ -155,7 +155,8 @@ DEFER: (infer-classes)
     ] 2each ;
 
 : merge-value-class ( # nodes -- class )
-    [ swap node-class# ] map-with null [ class-or ] reduce ;
+    [ swap node-class# ] map-with
+    null [ class-or ] reduce ;
 
 : annotate-merge ( nodes values -- )
     dup length
@@ -164,9 +165,13 @@ DEFER: (infer-classes)
 
 : merge-children ( node -- )
     dup node-successor dup #merge? [
-        node-out-d <reversed>
-        >r node-children [ last-node ] map r>
-        annotate-merge
+        over node-children empty? [
+            2drop
+        ] [
+            node-out-d <reversed>
+            >r node-children [ last-node ] map r>
+            annotate-merge
+        ] if
     ] [
         2drop
     ] if ;

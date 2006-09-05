@@ -1,11 +1,7 @@
 + 0.85:
 
-- ENTER key on keypad should do something
 - pane output in UI should use less memory
 - signal 4 on datastack underflow on mac intel??
-- why is a 'null' type inferred for the output of foo in
-  : foo f ;
-  : bar foo 4 4 = and ;
 - faster I/O
 - buffer-ptr should be an alien
 - faster Unix stream-read#

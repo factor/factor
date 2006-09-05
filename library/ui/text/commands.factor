@@ -71,6 +71,7 @@ editor {
         "Editing"
         { "Insert newline" T{ key-down f f "RETURN" } [ "\n" swap user-input ] }
         { "Insert newline" T{ key-down f { S+ } "RETURN" } [ "\n" swap user-input ] }
+        { "Insert newline" T{ key-down f "ENTER" } [ "\n" swap user-input ] }
         { "Delete next character" T{ key-down f f "DELETE" } [ T{ char-elt } editor-delete ] }
         { "Delete previous character" T{ key-down f f "BACKSPACE" } [ T{ char-elt } editor-backspace ] }
         { "Delete previous word" T{ key-down f { C+ } "DELETE" } [ T{ word-elt } editor-delete ] }
