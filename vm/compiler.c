@@ -225,6 +225,12 @@ CELL add_compiled_block(CELL code_format, F_VECTOR *code,
 	CELL literal_length = untag_fixnum_fast(literals->top) * CELLS;
 	CELL words_length = untag_fixnum_fast(words->top) * CELLS;
 
+	CELL total_length = sizeof(F_COMPILED) + code_length + rel_length
+		+ literal_length + words_length;
+
+	if(compiling.here + total_length >= compiling.limit)
+		critical_error("Code heap exhausted",compiling.limit);
+
 	/* compiled header */
 	F_COMPILED header;
 	header.code_length = code_length;
