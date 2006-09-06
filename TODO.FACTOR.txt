@@ -19,7 +19,6 @@
 - we need to optimize  [ dup array? [ array? ] [ array? ] if ]
 - better way of dealing with compiler errors
 - track individual method usages
-- modularize core
 - track module files and modification times, and a list of assets loaded
   from that file
 - 'changes' word, asks if files changed on disk from loaded modules

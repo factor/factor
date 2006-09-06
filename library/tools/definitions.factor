@@ -5,7 +5,7 @@ USING: arrays errors generic hashtables io kernel math
 namespaces parser prettyprint sequences styles words ;
 
 : ?resource-path ( path -- path )
-    "resource:/" ?head [ resource-path ] when ;
+    "resource:" ?head [ resource-path ] when ;
 
 : where ( defspec -- loc )
     where* dup [ first2 >r ?resource-path r> 2array ] when ;

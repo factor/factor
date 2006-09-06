@@ -55,7 +55,7 @@ PROVIDE: library/compiler {
     "test/bail-out.factor"
     "test/intrinsics.factor"
     "test/float.factor"
-    "test/identities" 
+    "test/identities.factor"
     "test/optimizer.factor"
     "test/alien.factor"
     "test/callbacks.factor"

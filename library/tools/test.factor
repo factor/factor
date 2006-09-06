@@ -44,7 +44,7 @@ SYMBOL: failures
 : test-handler ( name quot -- ? )
     catch [ dup error. 2array failure f ] [ t ] if* ;
 
-: test ( path -- ? )
+: run-test ( path -- ? )
     [
         "=====> " write dup write "..." print flush
         [

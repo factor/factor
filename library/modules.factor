@@ -49,10 +49,11 @@ SYMBOL: modules
     [ module-files run-resources ] keep
     dup module-name modules get set-hash ;
 
-: test ( name -- ) module module-tests run-tests ;
+: test-module ( name -- ) module module-tests run-tests ;
 
-: tests ( -- )
-    modules hash-keys [ module-tests ] map concat run-tests ;
+: test-modules ( -- )
+    modules get hash-values
+    [ module-tests ] map concat run-tests ;
 
 : modules. ( -- )
     modules get hash-keys natural-sort [ print ] each ;

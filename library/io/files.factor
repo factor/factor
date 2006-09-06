@@ -19,6 +19,8 @@ strings styles ;
 
 : file-length ( path -- n ) stat third ;
 
+: file-modified ( path -- n ) stat fourth ;
+
 : parent-dir ( path -- parent )
     CHAR: / over last-index CHAR: \\ pick last-index max
     dup -1 = [ 2drop "." ] [ head ] if ;

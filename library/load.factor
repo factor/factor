@@ -95,8 +95,7 @@ PROVIDE: library {
     "tools/listener.factor"
     "tools/inspector.factor"
     "tools/word-tools.factor"
-    
-    "test/test.factor"
+    "tools/test.factor"
 
     "tools/interpreter.factor"
 
@@ -179,7 +178,6 @@ PROVIDE: library {
     "syntax/parser.facts"
     "syntax/parse-syntax.facts"
     "syntax/prettyprint.facts"
-    "test/test.facts"
     "tools/definitions.facts"
     "tools/word-tools.facts"
     "tools/debugger.facts"
@@ -188,6 +186,7 @@ PROVIDE: library {
     "tools/inspector.facts"
     "tools/listener.facts"
     "tools/memory.facts"
+    "tools/test.facts"
 }
 ! Test files
 {
@@ -231,5 +230,5 @@ PROVIDE: library {
     "test/stream.factor"
     "test/threads.factor"
     "test/tuple.factor"
-    "test/words"
+    "test/words.factor"
 } ;

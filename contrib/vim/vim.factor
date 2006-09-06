@@ -2,8 +2,6 @@ IN: vim
 USING: definitions embedded io kernel parser prettyprint process
 sequences namespaces ;
 
-: file-modified stat fourth ;
-
 : vim-location ( file line -- )
     >r [ file-modified ] keep r>
     [ "vim \"" % over % "\" +" % # ] "" make system drop
