@@ -8,7 +8,8 @@
 ! results, increase the size of the window (larger than 400x400 is
 ! good). Then press the "Reset" button to start the demo over.
 
-REQUIRES: math slate vars action-field ;
+REQUIRES: contrib/math contrib/slate contrib/vars
+contrib/action-field ;
 
 USING: generic threads namespaces math kernel sequences arrays gadgets
        gadgets-labels gadgets-theme gadgets-text gadgets-buttons gadgets-frames
@@ -352,5 +353,5 @@ ns> [ 1000 sleep [ run-boids ] in-thread ] bind ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-PROVIDE: boids ;
+PROVIDE: contrib/boids ;
 

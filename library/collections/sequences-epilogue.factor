@@ -33,7 +33,7 @@ M: object like drop ;
 : memq? ( obj seq -- ? )
     [ eq? ] contains-with? ;
 
-: remove ( obj list -- list )
+: remove ( obj seq -- newseq )
     [ = not ] subset-with ;
 
 : (subst) ( newseq oldseq elt -- new/elt )

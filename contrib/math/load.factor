@@ -1,4 +1,4 @@
-PROVIDE: math { 
+PROVIDE: contrib/math { 
     "utils.factor"
     "combinatorics.factor"
     "analysis.factor"

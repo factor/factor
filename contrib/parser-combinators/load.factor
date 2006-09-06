@@ -1,5 +1,5 @@
-REQUIRES: lazy-lists ;
-PROVIDE: parser-combinators { 
+REQUIRES: contrib/lazy-lists ;
+PROVIDE: contrib/parser-combinators { 
     "parser-combinators.factor"
 } {
     "tests.factor"

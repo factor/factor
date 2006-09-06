@@ -1,7 +1,7 @@
 ! Copyright (C) 2004, 2006 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: command-line compiler errors generic help io io-internals
-kernel kernel-internals listener math memory namespaces
+kernel kernel-internals listener math memory modules namespaces
 optimizer parser sequences sequences-internals words ;
 
 [
@@ -32,26 +32,24 @@ optimizer parser sequences sequences-internals words ;
 
             ! Load UI backend
             "cocoa" get [
-                "/library/compiler/alien/objc/load.factor" run-resource
-                "/library/ui/cocoa/load.factor" run-resource
+                "library/ui/cocoa" (require)
             ] when
 
             "x11" get [
-                "/library/ui/x11/load.factor" run-resource
+                "library/ui/x11" (require)
             ] when
 
             windows? [
-                "/library/windows/load.factor" run-resource
-                "/library/ui/windows/load.factor" run-resource
+                "library/ui/windows" (require)
             ] when
 
             ! Load native I/O code
             "native-io" get [
                 unix? [
-                    "/library/io/unix/load.factor" run-resource
+                    "library/io/unix" (require)
                 ] when
                 windows? [
-                    "/library/io/windows/load.factor" run-resource
+                    "library/io/windows" (require)
                 ] when
             ] when
 

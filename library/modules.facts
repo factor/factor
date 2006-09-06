@@ -1,10 +1,6 @@
 IN: modules
 USING: help io ;
 
-HELP: module-path
-{ $values { "name" "a module name string" } { "path" "a path name string" } }
-{ $description "Outputs the location of the module named " { $snippet "name" } "." } ;
-
 HELP: module-paths
 { $values { "name" "a module name string" } { "seq" "a sequence of strings" } { "newseq" "a new sequence of path name strings" } }
 { $description "Prepend the location of the module named " { $snippet "name" } " to every file name in " { $snippet "seq" } "." } ;

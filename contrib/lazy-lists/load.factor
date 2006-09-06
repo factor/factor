@@ -1,4 +1,4 @@
-PROVIDE: lazy-lists { 
+PROVIDE: contrib/lazy-lists { 
     "lists.factor"
     "examples.factor"
 } {

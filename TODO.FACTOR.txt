@@ -1,5 +1,6 @@
 + 0.85:
 
+- \ <buffer> help --> shows infer-effect
 - pane output in UI should use less memory
 - signal 4 on datastack underflow on mac intel??
 - faster I/O

@@ -21,8 +21,8 @@
 ! OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
 ! ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 !
-REQUIRES: parser-combinators ;
-PROVIDE: json { 
+REQUIRES: contrib/parser-combinators ;
+PROVIDE: contrib/json { 
     "json-reader.factor"
     "json-writer.factor"
     "json.facts"

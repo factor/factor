@@ -10,4 +10,4 @@ FUNCTION: void* popen ( char* command, char* type ) ;
 
 : !" parse-string system drop ; parsing
 
-PROVIDE: process ;
+PROVIDE: contrib/process ;

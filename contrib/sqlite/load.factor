@@ -1,4 +1,4 @@
-PROVIDE: sqlite { 
+PROVIDE: contrib/sqlite { 
 	"sqlite.factor" 
 	"sqlite.facts"
 	"tuple-db.factor" 

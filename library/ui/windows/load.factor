@@ -1,10 +1,9 @@
-IN: scratchpad
-USING: alien kernel namespaces parser sequences words ;
+REQUIRES: library/windows ;
 
-{
-    "clipboard"
-    "ui"
- } [ "/library/ui/windows/" swap ".factor" append3 run-resource ] each
+PROVIDE: library/ui/windows {
+    "clipboard.factor"
+    "ui.factor"
+} ;
 
 IN: command-line
 : default-shell "tty" ;

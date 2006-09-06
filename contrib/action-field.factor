@@ -45,4 +45,4 @@ tuck action-field-quot [bind] swap set-action-field-quot ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-PROVIDE: action-field ;
+PROVIDE: contrib/action-field ;

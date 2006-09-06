@@ -1,12 +1,17 @@
 USING: kernel modules words ;
 
-REQUIRES: automata boids cairo calendar concurrency coroutines
-crypto dlists emacs embedded gap-buffer hexdump httpd jedit
-json lambda lazy-lists math parser-combinators postgresql
-process random-tester rss serialize slate space-invaders
-splay-trees sqlite topology units vars vim ;
+REQUIRES: contrib/automata contrib/boids contrib/cairo
+contrib/calendar contrib/concurrency contrib/coroutines
+contrib/crypto contrib/dlists contrib/emacs contrib/embedded
+contrib/gap-buffer contrib/hexdump contrib/httpd contrib/jedit
+contrib/json contrib/lambda contrib/lazy-lists contrib/math
+contrib/parser-combinators contrib/postgresql contrib/process
+contrib/random-tester contrib/rss contrib/serialize
+contrib/slate contrib/space-invaders contrib/splay-trees
+contrib/sqlite contrib/topology contrib/units contrib/vars
+contrib/vim ;
 
 "x11" vocab [
-    "factory" require
-    "x11" require
+    "contrib/factory" require
+    "contrib/x11" require
 ] when

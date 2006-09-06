@@ -1,8 +1,9 @@
 USING: io ;
 
-REQUIRES: calendar embedded http xml ;
+REQUIRES: contrib/calendar contrib/embedded contrib/http
+contrib/xml ;
 
-PROVIDE: httpd { 
+PROVIDE: contrib/httpd { 
     "mime.factor"
     "xml.factor"
     "http-common.factor"

@@ -1,3 +1,4 @@
-REQUIRES: process concurrency x11 vars ;
+REQUIRES: contrib/process contrib/concurrency contrib/x11
+contrib/vars ;
 
-PROVIDE: factory { "factory.factor" } ;
+PROVIDE: contrib/factory { "factory.factor" } ;

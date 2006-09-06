@@ -1,6 +1,6 @@
-REQUIRES: math ;
+REQUIRES: contrib/math ;
 
-PROVIDE: crypto {
+PROVIDE: contrib/crypto {
 
     "common.factor"
     "timing.factor"

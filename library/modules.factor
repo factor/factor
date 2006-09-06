@@ -2,15 +2,12 @@
 ! See http://factorcode.org/license.txt for BSD license.
 IN: modules
 USING: compiler hashtables io kernel namespaces parser sequences
-test words ;
+test words strings arrays ;
 
 TUPLE: module name files tests ;
 
-: module-path ( name -- path )
-    "/contrib/" swap append ;
-
 : module-paths ( name seq -- newseq )
-    >r module-path r> [ "/" swap append3 ] map-with ;
+    [ "/" swap append3 ] map-with ;
 
 C: module ( name files tests -- module )
     [ >r >r over r> module-paths r> set-module-tests ] keep
@@ -18,7 +15,7 @@ C: module ( name files tests -- module )
     [ set-module-name ] keep ;
 
 : module-def ( name -- path )
-    module-path dup ".factor" append dup resource-path exists?
+    dup ".factor" append dup resource-path exists?
     [ nip ] [ drop "/load.factor" append ] if ;
 
 SYMBOL: modules
@@ -38,14 +35,24 @@ H{ } clone modules set-global
 
 : require ( name -- ) (require) recompile ;
 
+: contrib ( name -- ) "contrib/" swap append require ;
+
+: example ( name -- ) "examples/" swap append require ;
+
 : run-resources ( seq -- )
     [
         bootstrapping? get
         [ parse-resource % ] [ run-resource ] ? each
     ] no-parse-hook ;
 
+: process-files ( seq -- newseq )
+    [ dup string? [ [ t ] 2array ] when ] map
+    [ second call ] subset
+    [ first ] map ;
+
 : provide ( name files tests -- )
-    <module> dup module-files run-resources
+    [ process-files ] 2apply <module>
+    [ module-files run-resources ] keep
     dup module-name modules get set-hash ;
 
 : test-module ( name -- ) module module-tests run-resources ;

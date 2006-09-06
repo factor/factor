@@ -80,4 +80,4 @@ GL_LINES glBegin first2 glVertex2f first2 glVertex2f glEnd ;
 
 : reset-slate ( -- ) [ ] set-action reset-dlist ;
 
-PROVIDE: slate ;
+PROVIDE: contrib/slate ;

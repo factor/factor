@@ -1,13 +1,13 @@
-USING: io kernel parser sequences ;
+USE: kernel
 
-"/library/io/unix/types.factor" run-resource
-"/library/io/unix/syscalls-" os ".factor" append3 run-resource
-
-[
-    "/library/io/unix/syscalls.factor"
-    "/library/io/unix/io.factor"
-    "/library/io/unix/sockets.factor"
-    "/library/io/unix/files.factor"
-] [
-    run-resource 
-] each
+PROVIDE: library/io/unix {
+    "types.factor"
+    { "syscalls-freebsd.factor" [ os "freebsd" = ] }
+    { "syscalls-linux.factor" [ os "linux" = ] }
+    { "syscalls-macosx.factor" [ os "macosx" = ] }
+    { "syscalls-solaris.factor" [ os "solaris" = ] }
+    "syscalls.factor"
+    "io.factor"
+    "sockets.factor"
+    "files.factor"
+} ;

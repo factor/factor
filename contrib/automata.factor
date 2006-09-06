@@ -4,7 +4,7 @@
 !     USE: automata
 !     automata-window
 
-REQUIRES: math slate vars ;
+REQUIRES: contrib/math contrib/slate contrib/vars ;
 
 USING: parser kernel hashtables namespaces sequences math io
 math-contrib threads strings arrays prettyprint
@@ -188,4 +188,4 @@ ns> [ interesting random-item dup set-field-rule set-rule start-center ] bind ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-PROVIDE: automata ;
+PROVIDE: contrib/automata ;

@@ -1,4 +1,4 @@
-REQUIRES: process ;
+REQUIRES: contrib/process ;
 
 USING: definitions kernel parser words sequences math process
 namespaces ;
@@ -13,4 +13,4 @@ where first2 emacsclient ;
 
 [ emacsclient ] edit-hook set-global
 
-PROVIDE: emacs ;
+PROVIDE: contrib/emacs ;

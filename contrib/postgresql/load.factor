@@ -1,5 +1,3 @@
-USING: alien ;
-
-PROVIDE: postgresql
+PROVIDE: contrib/postgresql
 { "libpq.factor" "postgresql.factor" }
 { "postgresql-test" } ;

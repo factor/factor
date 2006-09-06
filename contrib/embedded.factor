@@ -68,4 +68,4 @@ USING: sequences kernel parser math namespaces io ;
 : embedded-convert ( infile outfile -- )
     <file-writer> [ run-embedded-file ] with-stream ;
 
-PROVIDE: embedded ;
+PROVIDE: contrib/embedded ;

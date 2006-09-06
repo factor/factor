@@ -114,4 +114,4 @@ USING: namespaces words ;
 all-words [ dup word-name "foo" get set-splay ] each
 all-words [ word-name "foo" get get-splay drop ] each
 
-PROVIDE: splay-trees ;
+PROVIDE: contrib/splay-trees ;

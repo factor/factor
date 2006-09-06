@@ -1,14 +1,11 @@
-IN: scratchpad
-USING: alien compiler kernel namespaces parser sequences words ;
-
-{ 
-    "errors"
-    "winsock"
-    "io-internals"
-    "stream"
-    "server"
-    "io-last"
-} [ "/library/io/windows/" swap ".factor" append3 run-resource ] each
+PROVIDE: library/io/windows {
+    "errors.factor"
+    "winsock.factor"
+    "io-internals.factor"
+    "stream.factor"
+    "server.factor"
+    "io-last.factor"
+} ;
 
 IN: command-line
 : default-shell "ui" ;
