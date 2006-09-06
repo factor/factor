@@ -26,7 +26,6 @@
 - add-gadget, model-changed, set-model should compile
 - graphical module manager tool
 - continuation handling in walker is screwy
-- don't allow stepping inside >c etc
 - editor:
   - only redraw visible lines
   - more efficient multi-line inserts
@@ -36,8 +35,6 @@
 - UI dataflow visualizer
 - status help persists after clicking on a link
 - tool help
-- new section in cookbook: philosophy
-- interactor commands: don't invoke if interactor is busy
 - browser: show currently selected vocab & words
 
 + ui:

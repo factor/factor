@@ -24,6 +24,7 @@ ARTICLE: "handbook" "Factor documentation"
 { $subsection "cookbook-vocabs" }
 { $subsection "cookbook-sources" }
 { $subsection "cookbook-io" }
+{ $subsection "cookbook-philosophy" }
 { $heading "Language reference" }
 { $subsection "conventions" }
 { $subsection "syntax" }

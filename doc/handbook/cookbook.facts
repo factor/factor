@@ -210,3 +210,18 @@ ARTICLE: "cookbook-io" "I/O cookbook"
     "number-strings"
     "streams"
 } ;
+
+ARTICLE: "cookbook-philosophy" "Factor philosophy"
+"Factor is a high-level language with automatic memory management, runtime type checking, and strong typing. Factor code should be as simple as possible, but not simpler. If you are coming to Factor from another programming language, one of your first observations might me related to the amount of code you " { $emphasis "don't" } " have to write."
+$terpri
+"One of Factor's goals is to implement as much of itself as possible in Factor, including the compiler and as much as possible of the runtime. One consequence is that Factor does not prevent you from shooting yourself in the foot; if you need to, you can drop down and manually allocate memory, perform pointer arithmetic, write inline assembly code, and do much worse. Usually there is no reason to, but the need can arise, for example when interfacing with C libraries."
+$terpri
+"If you try to write Factor word definitions which are longer than a couple of lines, you will find it hard to keep track of the stack contents. Well-written Factor code is " { $emphasis "factored" } " into short definitions, where each definition is easy to test interactively, and has a clear purpose. Well-chosen word names are critical, and having a thesaurus on hand really helps."
+$terpri
+"If you run into problems with stack shuffling, take a deep breath and a step back, and reconsider the problem. A much simpler solution is waiting right around the corner, a natural solution which requires far less stack shuffling and far less code. As a last resort, if no simple solution exists, consider defining a domain-specific language."
+$terpri
+"Every time you define a word which simply manipulates sequences, hashtables or objects in an abstract way which is not related to your program domain, check the library to see if you can reuse an existing definition and save yourself some debugging time."
+$terpri
+"In addition to writing short definitions and testing them interactively, a great habit to get into is writing unit tests. Factor provides good support for unit testing; see " { $link "unit-test" } "."
+$terpri
+"The Factor core consists of the development environment together with a minimal library to host it. Additional functionality which other languages integrate is often a separate module in Factor; see " { $link "modules" } "." ;

@@ -57,9 +57,9 @@ $terpri
 ARTICLE: "modules" "Modules and contributed libraries"
 "The Factor distribution includes a selection of contributed libraries in the " { $snippet "contrib/" } " directory, which are managed by a simple module system."
 $terpri
-"To load " { $snippet "contrib/aim/" } " for instance, you simply issue the following command in the listener:"
-{ $code "\"aim\" require" }
-"The " { $link require } " word will load all dependencies and source files of the " { $snippet "aim" } " module."
+"To load " { $snippet "contrib/concurrency/" } " for instance, you simply issue the following command in the listener:"
+{ $code "\"concurrency\" require" }
+"The " { $link require } " word will load all dependencies and source files of the " { $snippet "concurrency" } " module."
 { $subsection require }
 { $subsection (require) }
 "To define a new module named " { $snippet "frob" } ", create one of the following two files:"
