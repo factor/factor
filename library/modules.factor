@@ -2,9 +2,29 @@
 ! See http://factorcode.org/license.txt for BSD license.
 IN: modules
 USING: hashtables io kernel namespaces parser sequences
-test words strings arrays ;
+test words strings arrays math ;
 
-TUPLE: module name files tests ;
+SYMBOL: modules
+
+TUPLE: module name files tests modified ;
+
+: module-def ( name -- path )
+    dup ".factor" append dup resource-path exists?
+    [ nip ] [ drop "/load.factor" append ] if ;
+
+: record-def-modified ( module hash -- )
+    >r module-name module-def [ file-modified ] keep r>
+    set-hash ;
+
+: record-modified ( module -- )
+    dup module-files
+    [ dup resource-path file-modified ] map>hash
+    2dup record-def-modified
+    swap set-module-modified ;
+
+: modified? ( file module -- ? )
+    dupd module-modified hash
+    swap resource-path file-modified number= not ;
 
 : module-paths ( name seq -- newseq )
     [ "/" swap append3 ] map-with ;
@@ -14,12 +34,6 @@ C: module ( name files tests -- module )
     [ >r dupd module-paths r> set-module-files ] keep
     [ set-module-name ] keep ;
 
-: module-def ( name -- path )
-    dup ".factor" append dup resource-path exists?
-    [ nip ] [ drop "/load.factor" append ] if ;
-
-SYMBOL: modules
-
 : module modules get hash ;
 
 : load-module ( name -- )
@@ -28,10 +42,8 @@ SYMBOL: modules
         [ dup module-def run-resource ] assert-depth drop
     ] no-parse-hook ;
 
-: (require) ( name -- )
-    dup module [ drop ] [ load-module ] if ;
-
-: require ( name -- ) (require) parse-hook get call ;
+: require ( name -- )
+    dup module [ drop ] [ load-module ] if do-parse-hook ;
 
 : run-resources ( seq -- )
     [
@@ -45,7 +57,7 @@ SYMBOL: modules
     [ first ] map ;
 
 : provide ( name files tests -- )
-    [ process-files ] 2apply <module>
+    [ process-files ] 2apply <module> dup record-modified
     [ module-files run-resources ] keep
     dup module-name modules get set-hash ;
 
@@ -57,3 +69,16 @@ SYMBOL: modules
 
 : modules. ( -- )
     modules get hash-keys natural-sort [ print ] each ;
+
+: reload-module ( module -- )
+    dup module-name module-def over modified? [
+        module-name load-module
+    ] [
+        dup dup module-files [ swap modified? ] subset-with
+        run-resources
+        record-modified
+    ] if ;
+
+: reload-modules ( -- )
+    modules get hash-values [ reload-module ] each
+    do-parse-hook ;

@@ -22,11 +22,13 @@ namespaces sequences words ;
 
 SYMBOL: parse-hook
 
+: do-parse-hook ( -- ) parse-hook get call ;
+
 : parse-stream ( stream name -- quot )
     [
         file set file-vocabs
         lines parse-lines
-        parse-hook get call
+        do-parse-hook
     ] with-scope ;
 
 : parsing-file ( file -- ) "Loading " write print flush ;

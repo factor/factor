@@ -13,12 +13,12 @@ prettyprint sequences vectors words ;
 [
     \ boot ,
 
-    "library" (require)
-    "library/compiler" (require)
-    "library/io/buffer" (require)
-    "library/ui" (require)
-    "library/compiler/" architecture get append (require)
-    "doc/handbook" (require)
+    "library" require
+    "library/compiler" require
+    "library/io/buffer" require
+    "library/ui" require
+    "library/compiler/" architecture get append require
+    "doc/handbook" require
 
     [ "/library/bootstrap/boot-stage2.factor" run-resource ] %
 ] [ ] make

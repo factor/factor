@@ -1,12 +1,12 @@
 ! Copyright (C) 2006 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: arrays gadgets gadgets-listener gadgets-buttons
+USING: arrays compiler gadgets gadgets-listener gadgets-buttons
 gadgets-walker gadgets-help gadgets-walker sequences
 gadgets-browser gadgets-books gadgets-frames gadgets-controls
 gadgets-grids gadgets-presentations kernel models namespaces
 styles words help parser tools memory generic threads
 gadgets-text definitions inference test prettyprint math strings
-hashtables tools ;
+hashtables tools modules ;
 IN: gadgets-workspace
 
 GENERIC: call-tool* ( arg tool -- )
@@ -90,6 +90,12 @@ workspace {
         { "New listener" T{ key-down f { S+ } "F2" } [ listener-gadget tool-window drop ] }
         { "New definitions" T{ key-down f { S+ } "F3" } [ browser tool-window drop ] }
         { "New documentation" T{ key-down f { S+ } "F4" } [ help-gadget tool-window drop ] }
+    }
+    
+    {
+        "Workflow"
+        { "Recompile changed words" T{ key-down f f "F6" } [ drop [ recompile ] listener-gadget call-tool ] }
+        { "Reload changed sources" T{ key-down f f "F7" } [ drop [ reload-modules ] listener-gadget call-tool ] }
     }
 } define-commands
 

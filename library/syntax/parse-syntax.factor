@@ -76,8 +76,10 @@ DEFER: !PRIMITIVE: parsing
     scan [ { { } { } } append first2 provide ] f ; parsing
 
 : !REQUIRES:
-    string-mode on
-    [ string-mode off [ (require) ] each ] f ; parsing
+    string-mode on [
+        string-mode off
+        [ [ require ] each ] no-parse-hook
+    ] f ; parsing
 
 : !(
     parse-effect word [

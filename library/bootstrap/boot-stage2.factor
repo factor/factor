@@ -32,24 +32,24 @@ optimizer parser sequences sequences-internals words ;
 
             ! Load UI backend
             "cocoa" get [
-                "library/ui/cocoa" (require)
+                "library/ui/cocoa" require
             ] when
 
             "x11" get [
-                "library/ui/x11" (require)
+                "library/ui/x11" require
             ] when
 
             windows? [
-                "library/ui/windows" (require)
+                "library/ui/windows" require
             ] when
 
             ! Load native I/O code
             "native-io" get [
                 unix? [
-                    "library/io/unix" (require)
+                    "library/io/unix" require
                 ] when
                 windows? [
-                    "library/io/windows" (require)
+                    "library/io/windows" require
                 ] when
             ] when
 
