@@ -1,25 +1,5 @@
 ! Copyright (C) 2005 Chris Double. All Rights Reserved.
-! 
-! Redistribution and use in source and binary forms, with or without
-! modification, are permitted provided that the following conditions are met:
-! 
-! 1. Redistributions of source code must retain the above copyright notice,
-!    this list of conditions and the following disclaimer.
-! 
-! 2. Redistributions in binary form must reproduce the above copyright notice,
-!    this list of conditions and the following disclaimer in the documentation
-!    and/or other materials provided with the distribution.
-! 
-! THIS SOFTWARE IS PROVIDED ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES,
-! INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND
-! FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
-! DEVELOPERS AND CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
-! SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
-! PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS;
-! OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
-! WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
-! OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
-! ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+! See http://factorcode.org/license.txt for BSD license.
 !
 ! Concurrency library for Factor based on Erlang/Termite style
 ! concurrency.
@@ -70,30 +50,17 @@ USE:  prettyprint
 TUPLE: mailbox threads data ;
 
 : make-mailbox ( -- mailbox )
-  #! A mailbox is an object that can be used for safe thread
-  #! communication. Items can be put in the mailbox and retrieved in a
-  #! FIFO order. If the mailbox is empty when a get operation is 
-  #! performed then the thread will block until another thread places 
-  #! something in the mailbox. If multiple threads are waiting on the 
-  #! same mailbox, only one of the waiting threads will be unblocked 
-  #! to process the get operation.
   0 <vector> <dlist> <mailbox> ;
 
 : mailbox-empty? ( mailbox -- bool )
-  #! Return true if the mailbox is empty
   mailbox-data dlist-empty? ;
 
 : mailbox-put ( obj mailbox -- )
-  #! Put the object into the mailbox. Any threads that have
-  #! a blocking get on the mailbox are resumed.
   [ mailbox-data dlist-push-end ] keep 
   [ mailbox-threads ] keep 0 <vector> swap set-mailbox-threads
   [ schedule-thread ] each yield ;
 
-: (mailbox-block-unless-pred) ( pred mailbox -- pred mailbox )  
-  #! Block the thread if there are not items in the mailbox
-  #! that return true when the predicate is called with the item
-  #! on the stack. The predicate must have stack effect ( X -- bool ).
+: (mailbox-block-unless-pred) ( pred mailbox -- pred2 mailbox2 )  
   dup mailbox-data pick swap dlist-pred? [
     [
       swap mailbox-threads push stop      
@@ -101,8 +68,7 @@ TUPLE: mailbox threads data ;
     (mailbox-block-unless-pred)
   ] unless ;
 
-: (mailbox-block-if-empty) ( mailbox -- mailbox )  
-  #! Block the thread if the mailbox is empty
+: (mailbox-block-if-empty) ( mailbox -- mailbox2 )  
   dup mailbox-empty? [
     [
       swap mailbox-threads push stop      
@@ -111,15 +77,10 @@ TUPLE: mailbox threads data ;
   ] when ;
   
 : mailbox-get ( mailbox -- obj )
-  #! Get the first item put into the mailbox. If it is
-  #! empty the thread blocks until an item is put into it.
-  #! The thread then resumes, leaving the item on the stack.
   (mailbox-block-if-empty)
   mailbox-data dlist-pop-front ;
 
 : while-mailbox-empty ( mailbox quot -- )
-  #! Run the quotation until there is an item in the mailbox.
-  #! Quotation should have stack effect ( -- ).
   over mailbox-empty? [
     dup >r swap >r call r> r> while-mailbox-empty
   ] [
@@ -127,12 +88,7 @@ TUPLE: mailbox threads data ;
   ] if ; inline
 
 : mailbox-get? ( pred mailbox -- obj )
-  #! Get the first item in the mailbox which satisfies the predicate.
-  #! 'pred' will be called with each item on the stack. When pred returns
-  #! true that item will be returned. If nothing in the mailbox 
-  #! satisfies the predicate then the thread will block until something does.
-  (mailbox-block-unless-pred)
-  mailbox-data dlist-pop? ;
+  (mailbox-block-unless-pred) mailbox-data dlist-pop? ;
 
 #! Processes run on nodes identified by a hostname and port.
 TUPLE: node hostname port ;

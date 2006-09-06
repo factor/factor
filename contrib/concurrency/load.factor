@@ -1,5 +1,5 @@
-REQUIRES: contrib/dlists contrib/serialize contrib/match ;
+REQUIRES: dlists serialize match ;
 
-PROVIDE: contrib/concurrency
+PROVIDE: concurrency
 { "concurrency.factor" }
 { "concurrency-examples.factor" "concurrency-tests.factor" } ;
