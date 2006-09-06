@@ -42,4 +42,10 @@ PROVIDE: library/ui {
     "tools/browser.factor"
     "tools/help.factor"
     "tools/workspace.factor"
+} {
+    "test/models.factor"
+    "test/document.factor"
+    "test/rectangles.factor"
+    "test/fields.factor"
+    "test/commands.factor"
 } ;

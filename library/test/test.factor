@@ -6,6 +6,7 @@ memory namespaces parser prettyprint sequences strings words
 vectors ;
 
 TUPLE: assert got expect ;
+
 : assert ( got expect -- * ) <assert> throw ;
 
 : assert= ( a b -- ) 2dup = [ 2drop ] [ assert ] if ;
@@ -43,13 +44,10 @@ SYMBOL: failures
 : test-handler ( name quot -- ? )
     catch [ dup error. 2array failure f ] [ t ] if* ;
 
-: test-path ( name -- path )
-    "/library/test/" swap ".factor" append3 ;
-
-: test ( name -- ? )
+: test ( path -- ? )
     [
         "=====> " write dup write "..." print flush
-        test-path [
+        [
             [ [ run-resource ] with-scope ] keep
         ] assert-depth drop
     ] test-handler ;
@@ -64,85 +62,5 @@ SYMBOL: failures
     "Tests failed:" print
     failures get [ first2 swap write ": " write error. ] each ;
 
-: run-tests ( list -- )
-    prepare-tests [ test ] subset terpri passed. failed. ;
-
-: tests
-    {
-        "alien"
-        "annotate"
-        "binary"
-        "collections/hashtables"
-        "collections/namespaces"
-        "collections/queues"
-        "collections/sbuf"
-        "collections/sequences"
-        "collections/strings"
-        "collections/vectors"
-        "combinators"
-        "continuations"
-        "errors"
-        "gadgets/models"
-        "gadgets/document"
-        "gadgets/rectangles"
-        "gadgets/fields"
-        "gadgets/commands"
-        "generic"
-        "help/porter-stemmer"
-        "help/topics"
-        "inference"
-        "init"
-        "inspector"
-        "interpreter"
-        "io/io"
-        "io/nested-style"
-        "kernel"
-        "math/bitops"
-        "math/complex"
-        "math/float"
-        "math/integer"
-        "math/irrational"
-        "math/math-combinators"
-        "math/random"
-        "math/rational"
-        "memory"
-        "parse-number"
-        "parser"
-        "parsing-word"
-        "prettyprint"
-        "random"
-        "redefine"
-        "stream"
-        "threads"
-        "tuple"
-        "words"
-    }
-    macosx? [ "cocoa" add ] when
-    run-tests ;
-
-: benchmarks
-    {
-        "benchmark/empty-loop" "benchmark/fac"
-        "benchmark/fib" "benchmark/sort"
-        "benchmark/continuations" "benchmark/ack"
-        "benchmark/hashtables" "benchmark/strings"
-        "benchmark/vectors" "benchmark/prettyprint"
-        "benchmark/iteration"
-    } run-tests ;
-
-: compiler-tests
-    {
-        "io/buffer"
-        "compiler/simple"
-        "compiler/templates"
-        "compiler/stack"
-        "compiler/ifte"
-        "compiler/generic"
-        "compiler/bail-out"
-        "compiler/intrinsics"
-        "compiler/float"
-        "compiler/identities" 
-        "compiler/optimizer"
-        "compiler/alien"
-        "compiler/callbacks"
-    } run-tests ;
+: run-tests ( seq -- )
+    prepare-tests [ run-test ] subset terpri passed. failed. ;

@@ -45,5 +45,18 @@ PROVIDE: library/compiler {
     "inference/stack.facts"
     "inference/words.facts"
     "compiler.facts"
-
+} {
+    "test/alien-objects.factor"
+    "test/simple.factor"
+    "test/templates.factor"
+    "test/stack.factor"
+    "test/ifte.factor"
+    "test/generic.factor"
+    "test/bail-out.factor"
+    "test/intrinsics.factor"
+    "test/float.factor"
+    "test/identities" 
+    "test/optimizer.factor"
+    "test/alien.factor"
+    "test/callbacks.factor"
 } ;

@@ -15,6 +15,8 @@ PROVIDE: library/ui/cocoa {
     "menu-bar.factor"
     "services.factor"
     "ui.factor"
+} {
+    "test/cocoa.factor"
 } ;
 
 "Compiling Cocoa bindings..." print

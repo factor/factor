@@ -35,8 +35,4 @@ vocabularies get [
 "!syntax" vocabularies get remove-hash
 
 "Building generic words..." print flush
-
 all-words [ generic? ] subset [ make-generic ] each
-
-FORGET: if-arch
-FORGET: parse-resource*
