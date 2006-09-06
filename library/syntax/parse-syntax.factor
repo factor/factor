@@ -7,7 +7,7 @@
 ! !syntax vocab to syntax, and removes the ! prefix from each
 ! word name.
 IN: !syntax
-USING: alien arrays compiler definitions errors generic
+USING: alien arrays definitions errors generic
 hashtables kernel math modules namespaces parser sequences
 strings vectors words ;
 

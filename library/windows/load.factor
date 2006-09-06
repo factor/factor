@@ -14,6 +14,3 @@ PROVIDE: library/windows {
     "opengl32.factor"
     "utils.factor"
 } ;
-
-IN: command-line
-: default-shell "tty" ;

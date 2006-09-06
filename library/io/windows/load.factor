@@ -1,3 +1,5 @@
+REQUIRES: library/windows library/io/buffer ;
+
 PROVIDE: library/io/windows {
     "errors.factor"
     "winsock.factor"
@@ -6,6 +8,3 @@ PROVIDE: library/io/windows {
     "server.factor"
     "io-last.factor"
 } ;
-
-IN: command-line
-: default-shell "ui" ;

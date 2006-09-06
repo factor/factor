@@ -1,7 +1,7 @@
 ! Copyright (C) 2006 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 IN: modules
-USING: compiler hashtables io kernel namespaces parser sequences
+USING: hashtables io kernel namespaces parser sequences
 test words strings arrays ;
 
 TUPLE: module name files tests ;
@@ -31,7 +31,7 @@ SYMBOL: modules
 : (require) ( name -- )
     dup module [ drop ] [ load-module ] if ;
 
-: require ( name -- ) (require) recompile ;
+: require ( name -- ) (require) parse-hook get call ;
 
 : run-resources ( seq -- )
     [

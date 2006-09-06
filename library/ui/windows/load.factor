@@ -6,4 +6,4 @@ PROVIDE: library/ui/windows {
 } ;
 
 IN: command-line
-: default-shell "tty" ;
+: default-shell "ui" ;

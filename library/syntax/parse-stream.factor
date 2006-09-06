@@ -1,8 +1,8 @@
 ! Copyright (C) 2004, 2006 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 IN: parser
-USING: errors generic hashtables io kernel math namespaces
-sequences words ;
+USING: arrays errors generic hashtables io kernel math
+namespaces sequences words ;
 
 : file-vocabs ( -- )
     "scratchpad" set-in { "syntax" "scratchpad" } set-use ;
@@ -31,8 +31,15 @@ SYMBOL: parse-hook
 
 : parsing-file ( file -- ) "Loading " write print flush ;
 
-: parse-file ( file -- quot )
-    dup parsing-file [ <file-reader> ] keep parse-stream ;
+: parse-file-restarts ( file -- restarts )
+    "Load " swap " again" append3 t 2array 1array ;
+
+: (parse-file) ( file ident -- quot )
+    [ dup parsing-file >r <file-reader> r> parse-stream ]
+    [ pick parse-file-restarts condition drop (parse-file) ]
+    recover ;
+
+: parse-file ( file -- quot ) dup (parse-file) ;
 
 : run-file ( file -- ) parse-file call ;
 
@@ -46,8 +53,7 @@ SYMBOL: parse-hook
     [ [ [ eval ] keep ] try drop ] string-out ;
 
 : parse-resource ( path -- quot )
-    dup parsing-file
-    [ <resource-reader> "resource:" ] keep append parse-stream ;
+    [ resource-path "resource:" ] keep append (parse-file) ;
 
 : run-resource ( file -- )
     parse-resource call ;

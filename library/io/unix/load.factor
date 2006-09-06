@@ -1,5 +1,7 @@
 USE: kernel
 
+REQUIRES: library/io/buffer ;
+
 PROVIDE: library/io/unix {
     "types.factor"
     { "syscalls-freebsd.factor" [ os "freebsd" = ] }

@@ -1,9 +1,9 @@
 ! Copyright (C) 2006 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 IN: errors
-USING: alien generic help inference tools io kernel libc
-math math-internals parser prettyprint queues sequences
-sequences-internals strings test words ;
+USING: generic help tools io kernel math math-internals parser
+prettyprint queues sequences sequences-internals strings test
+words ;
 
 : expired-error. ( obj -- )
     "Object did not survive image save/load: " write third . ;
@@ -114,9 +114,6 @@ M: check-closed summary
 M: check-method summary
     drop "Invalid parameters for define-method" ;
 
-M: check-ptr summary
-    drop "Memory allocation failed" ;
-
 M: check-tuple summary
     drop "Invalid class for define-constructor" ;
 
@@ -159,48 +156,4 @@ M: condition error. delegate error. ;
 
 M: condition error-help drop f ;
 
-M: alien-callback-error summary
-    drop "Words calling ``alien-callback'' cannot run in the interpreter. Compile the caller word and try again." ;
-
-M: alien-invoke-error summary
-    drop "Words calling ``alien-invoke'' cannot run in the interpreter. Compile the caller word and try again." ;
-
 M: assert summary drop "Assertion failed" ;
-
-M: inference-error error.
-    dup delegate error.
-    "Nesting: " write
-    inference-error-rstate [ first ] map . ;
-
-M: inference-error error-help drop f ;
-
-M: unbalanced-branches-error error.
-    "Unbalanced branches:" print
-    dup unbalanced-branches-error-out
-    swap unbalanced-branches-error-in
-    [ pprint bl length . ] 2each ;
-
-M: literal-expected summary
-    drop "Literal value expected" ;
-
-M: check-retain summary
-    drop
-    "Quotation leaves elements behind on retain stack" ;
-
-M: no-effect error.
-    "The word " write
-    no-effect-word pprint
-    " does not have a stack effect" print ;
-
-M: recursive-declare-error error.
-    "The recursive word " write
-    recursive-declare-error-word pprint
-    " must declare a stack effect" print ;
-
-M: effect-error error.
-    "Stack effects of the word " write
-    dup effect-error-word pprint
-    " do not match." print
-    "Declared: " write
-    dup effect-error-word stack-effect effect>string .
-    "Inferred: " write effect-error-effect effect>string . ;

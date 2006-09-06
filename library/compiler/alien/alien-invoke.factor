@@ -1,10 +1,9 @@
 ! Copyright (C) 2004, 2006 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 IN: alien
-USING: arrays assembler compiler compiler
-errors generic hashtables inference
-io kernel kernel-internals math namespaces parser
-prettyprint sequences strings words parser ;
+USING: arrays assembler compiler errors generic hashtables
+inference io kernel kernel-internals math namespaces parser
+prettyprint sequences strings words ;
 
 TUPLE: alien-invoke library function return parameters ;
 C: alien-invoke make-node ;
@@ -18,6 +17,9 @@ C: alien-invoke make-node ;
     load-library ;
 
 TUPLE: alien-invoke-error library symbol ;
+
+M: alien-invoke-error summary
+    drop "Words calling ``alien-invoke'' cannot run in the interpreter. Compile the caller word and try again." ;
 
 : alien-invoke ( ... return library function parameters -- ... )
     pick pick <alien-invoke-error> throw ;

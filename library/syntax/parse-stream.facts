@@ -1,4 +1,4 @@
-USING: compiler help io parser definitions ;
+USING: help io parser definitions ;
 
 HELP: file-vocabs
 { $description "Installs the initial the vocabulary search path for parsing a file." } ;
@@ -23,7 +23,7 @@ HELP: eval
 { $errors "Throws an error if the input is malformed, or if the quotation throws an error." } ;
 
 HELP: parse-hook
-{ $var-description "A quotation called by " { $link parse-stream } " after parsing the input stream. The default value calls " { $link recompile } " to recompile any changed definitions." }
+{ $var-description "A quotation called by " { $link parse-stream } " after parsing the input stream. The default value recompiles new word definitions; see " { $link "recompile" } " for details." }
 { $see-also no-parse-hook } ;
 
 HELP: no-parse-hook
