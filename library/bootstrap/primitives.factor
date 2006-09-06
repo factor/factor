@@ -2,8 +2,8 @@
 ! See http://factorcode.org/license.txt for BSD license.
 IN: image
 USING: alien arrays generic hashtables help io kernel
-kernel-internals math namespaces parser sequences strings
-vectors words ;
+kernel-internals math modules namespaces parser sequences
+strings vectors words ;
 
 ! Some very tricky code creating a bootstrap embryo in the
 ! host image.
@@ -18,6 +18,7 @@ H{ } clone c-types set
 
 H{ } clone vocabularies set
 H{ } clone class<map set
+H{ } clone modules set
 
 vocabularies get [ "syntax" set ] bind
 

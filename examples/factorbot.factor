@@ -1,6 +1,6 @@
 ! Simple IRC bot written in Factor.
 
-REQUIRES: httpd ;
+REQUIRES: contrib/httpd ;
 
 USING: errors generic hashtables help html http io kernel math
 memory namespaces parser prettyprint sequences strings threads
@@ -110,3 +110,5 @@ IN: factorbot-commands
 
 : quit ( text -- )
     drop speaker get "slava" = [ disconnect ] when ;
+
+PROVIDE: examples/factorbot ;

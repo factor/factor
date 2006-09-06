@@ -59,3 +59,5 @@ SYMBOL: costs
         second [ word-name ] keep [ help ] write-outliner
         terpri
     ] each ;
+
+PROVIDE: examples/levenshtein ;

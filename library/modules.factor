@@ -20,8 +20,6 @@ C: module ( name files tests -- module )
 
 SYMBOL: modules
 
-H{ } clone modules set-global
-
 : module modules get hash ;
 
 : load-module ( name -- )
@@ -34,10 +32,6 @@ H{ } clone modules set-global
     dup module [ drop ] [ load-module ] if ;
 
 : require ( name -- ) (require) recompile ;
-
-: contrib ( name -- ) "contrib/" swap append require ;
-
-: example ( name -- ) "examples/" swap append require ;
 
 : run-resources ( seq -- )
     [
@@ -58,3 +52,6 @@ H{ } clone modules set-global
 : test-module ( name -- ) module module-tests run-resources ;
 
 : test-modules ( -- ) modules hash-keys [ test-module ] each ;
+
+: modules. ( -- )
+    modules get hash-keys natural-sort [ print ] each ;

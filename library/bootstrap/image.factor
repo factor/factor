@@ -292,7 +292,7 @@ M: hashtable '
         {
             vocabularies typemap builtins c-types crossref
             articles parent-graph term-index changed-words
-            class<map
+            modules class<map
         } [ dup get swap bootstrap-word set ] each
     ] make-hash '
     global-offset fixup ;
