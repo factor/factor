@@ -1,5 +1,7 @@
 ! Copyright (C) 2005 Slava Pestov.
-! See http://factor.sf.net/license.txt for BSD license.
+! See http://factorcode.org/license.txt for BSD license.
+REQUIRE: http ;
+
 IN: http-client
 USING: errors hashtables http kernel math namespaces parser
 sequences io strings ;

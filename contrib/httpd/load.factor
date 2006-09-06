@@ -1,6 +1,6 @@
 USING: io ;
 
-REQUIRES: calendar embedded ;
+REQUIRES: calendar embedded http ;
 
 PROVIDE: httpd { 
     "mime.factor"
