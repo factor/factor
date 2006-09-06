@@ -66,7 +66,8 @@ DEFER: !PRIMITIVE: parsing
     parsing
 
 : !C:
-    scan-word [ create-constructor ] keep
+    scan-word
+    [ create-constructor dup reset-generic dup set-word ] keep
     [ define-constructor ] f ; parsing
 
 : !FORGET: scan use get hash-stack [ forget ] when* ; parsing

@@ -126,3 +126,8 @@ TUPLE: yo-momma ;
 [ f ] [ \ yo-momma interned? ] unit-test
 [ f ] [ \ yo-momma? interned? ] unit-test
 [ f ] [ \ <yo-momma> interned? ] unit-test
+
+! Test if C: sets last word correctly
+[ ] [ "IN: temporary TUPLE: C:-test ; C: C:-test ( -- x ) ;" eval ] unit-test
+[ "<C:-test>" ] [ word word-name ] unit-test
+[ "( -- x )" ] [ "<C:-test>" "temporary" lookup stack-effect effect>string ] unit-test
