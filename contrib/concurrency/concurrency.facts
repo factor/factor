@@ -59,3 +59,74 @@ HELP: mailbox-get?
 }
 { $description "Get the first item in the mailbox which satisfies the predicate. 'pred' will be called repeatedly for each item in the mailbox. When 'pred' returns true that item will be returned. If nothing in the mailbox satisfies the predicate then the thread will block until something does. 'pred' must have stack effect " { $snippet "( X -- bool }" } "." } 
 { $see-also make-mailbox mailbox-empty? mailbox-put mailbox-get while-mailbox-empty } ;
+
+HELP: <node> 
+{ $values { "hostname" "the hostname of the node as a string" } 
+          { "port" "the integer port number of the node" } 
+          { "node" "the constructed node object" } 
+}
+{ $description "Processes run on nodes. Each node has a hostname and a port." } 
+{ $see-also localnode } ;
+
+HELP: localnode
+{ $values { "node" "a node object" } 
+}
+{ $description "Return the node the process is currently running on." } 
+{ $see-also <node> } ;
+
+HELP: <process>
+{ $values { "links" "an array of processes" } 
+          { "pid" "the process id" } 
+          { "mailbox" "a mailbox object" } 
+}
+{ $description "Constructs a process object. A process is a lightweight thread with a mailbox that can be used to communicate with other processes. Each process has a unique process id." } 
+{ $see-also <remote-process> spawn send receive } ;
+
+HELP: <remote-process>
+{ $values { "node" "a node object" } 
+          { "pid" "a process id" } 
+          { "remote-process" "the constructed remote-process object" } 
+}
+{ $description "Constructs a proxy to a process running on another node. It can be used to send messages to the process it is acting as a proxy for." } 
+{ $see-also <node> <process> spawn send } ;
+
+HELP: self
+{ $values { "process" "a process object" } 
+}
+{ $description "Returns the currently running process object." } 
+{ $see-also <process> <remote-process> send receive receive-if } ;
+
+HELP: send
+{ $values { "message" "an object" } 
+          { "process" "a process object" } 
+}
+{ $description "Send the message to the process by placing it in the processes mailbox. This is an asynchronous operation and will return immediately. The receving process will act on the message the next time it retrieves that item from its mailbox (usually using the " { $link receive } " word. The message can be any Factor object. For destinations that are instances of remote-process the message must be a serializable Factor type." } 
+{ $see-also <process> <remote-process> receive receive-if } ;
+
+HELP: receive
+{ $values { "message" "an object" } 
+}
+{ $description "Return a message from the current processes mailbox. If the box is empty, suspend the process until another process places an item in the mailbox (usually via the " { $link send } " word." } 
+{ $see-also send receive-if } ;
+
+HELP: receive-if
+{ $values { "pred" "a predicate with stack effect " { $snippet "( X -- bool )" } }  
+          { "message" "an object" } 
+}
+{ $description "Return the first message from the current processes mailbox that satisfies the predicate. To satisfy the predicate, 'pred' is called  with the item on the stack and the predicate should leave a boolean indicating whether it was satisfied or not. The predicate must have stack effect " { $snippet "( X -- bool )" } ". If nothing in the mailbox satisfies the predicate then the process will block until something does." } 
+{ $see-also send receive } ;
+
+HELP: spawn
+{ $values { "quot" "a predicate with stack effect " { $snippet "( -- )" } }  
+          { "process" "a process object" } 
+}
+{ $description "Start a process which runs the given quotation." } 
+{ $see-also send receive receive-if self spawn-link } ;
+
+HELP: spawn-link
+{ $values { "quot" "a predicate with stack effect " { $snippet "( -- )" } }  
+          { "process" "a process object" } 
+}
+{ $description "Start a process which runs the given quotation. If that quotation throws an error which is not caught then the error will get propogated to the process that spawned it. This can be used to set up 'supervisor' processes that restart child processes that crash due to uncaught errors." } 
+{ $see-also spawn } ;
+

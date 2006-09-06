@@ -90,15 +90,11 @@ TUPLE: mailbox threads data ;
 : mailbox-get? ( pred mailbox -- obj )
   (mailbox-block-unless-pred) mailbox-data dlist-pop? ;
 
-#! Processes run on nodes identified by a hostname and port.
 TUPLE: node hostname port ;
 
 : localnode ( -- node )
-  #! Return the current node 
   \ localnode get ;
     
-#! Processes run in nodes. Each process has a mailbox that is
-#! used for receiving messages sent to that process.
 TUPLE: process links pid mailbox ;
 TUPLE: remote-process node pid ;
 
@@ -122,8 +118,6 @@ GENERIC: send ( message process -- )
   unit random-64 make-mailbox <process> ;
 
 : self ( -- process )
-  #! Returns the contents of the 'self-process' variables which
-  #! is the process object for the current process.
   \ self get  ;
 
 : init-main-process ( -- )
@@ -147,7 +141,6 @@ DEFER: unregister-process
   [ in-thread ] make-process [ with-process ] over slip ;
 
 : spawn ( quot -- process )
-  #! Start a process which runs the given quotation.
   [ self dup process-pid swap register-process call self process-pid unregister-process ] curry (spawn) ;
 
 TUPLE: linked-exception error ;
@@ -159,25 +152,14 @@ TUPLE: linked-exception error ;
   >r self process-mailbox r> while-mailbox-empty ; inline
 
 M: process send ( message process -- )
-  #! Send the message to the process by placing it in the
-  #! processes mailbox.   
   process-mailbox mailbox-put ;
 
 : receive ( -- message )
-  #! Return a message from the current processes mailbox.
-  #! If the box is empty, suspend the process until something
-  #! is placed in the box.
   self process-mailbox mailbox-get dup linked-exception? [
     linked-exception-error throw
   ] when ;
 
 : receive-if ( pred -- message )
-  #! Return the first message frmo the current processes mailbox
-  #! that satisfies the predicate. To satisfy the predicate, 'pred' 
-  #! is called  with the item on the stack and the predicate should leave
-  #! a boolean indicating whether it was satisfied or not. The predicate
-  #! must have stack effect ( X -- bool ). If nothing in the mailbox 
-  #! satisfies the predicate then the process will block until something does.
   self process-mailbox mailbox-get? dup linked-exception? [
     linked-exception-error throw
   ] when ; 
@@ -190,9 +172,6 @@ M: process send ( message process -- )
   [ in-thread ] self make-linked-process [ with-process ] over slip ;
 
 : spawn-link ( quot -- process )
-  #! Same as spawn but if the quotation throws an error that
-  #! is uncaught, that error gets propogated to the process
-  #! performing the spawn-link.
   [ catch [ rethrow-linked ] when* ] curry
   [ self dup process-pid swap register-process call self process-pid unregister-process ] curry (spawn-link) ;
 
