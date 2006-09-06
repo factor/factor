@@ -7,6 +7,8 @@ io strings threads win32-api win32-io-internals ;
 
 TUPLE: win32-stream handle in-buffer out-buffer fileptr file-size timeout cutoff ;
 
+: win32-buffer-size 16384 ; inline
+
 : pending-error ( len/status -- len/status )
     dup [ win32-throw-error ] unless ;
 
@@ -32,7 +34,6 @@ TUPLE: win32-stream handle in-buffer out-buffer fileptr file-size timeout cutoff
     dup length zero? [ drop f ] [ >string ] if ;
 
 ! Read
-USE: errors
 : fill-input ( stream -- )
     dup update-timeout
     dup unit
@@ -68,7 +69,8 @@ USE: errors
     ] [
         pick dupd consume-input
         dup empty? [
-            2drop >string-or-f nip
+            2drop >string-or-f nip dup f =
+            [ "Stream closed" throw ] when ! XXX: what do we do here?
         ] [
             swapd over >r nappend r>
             [ length - ] keep swap do-read-count
@@ -132,22 +134,20 @@ M: win32-stream stream-write ( str stream -- ) do-write ;
 M: win32-stream set-timeout ( n stream -- ) set-win32-stream-timeout ;
 
 M: win32-stream expire ( stream -- )
-    dup win32-stream-timeout
-    [
-        millis over win32-stream-cutoff >
-        [ win32-stream-handle CancelIo ] [ drop ] if
+    dup win32-stream-timeout millis pick win32-stream-cutoff > and [
+        win32-stream-handle CancelIo [ win32-throw-error ] unless
     ] [
         drop
     ] if ;
 
 C: win32-stream ( handle -- stream )
     [ set-win32-stream-handle ] keep
-    4096 <buffer> swap [ set-win32-stream-in-buffer ] keep
-    4096 <buffer> swap [ set-win32-stream-out-buffer ] keep
+    win32-buffer-size <buffer> swap [ set-win32-stream-in-buffer ] keep
+    win32-buffer-size <buffer> swap [ set-win32-stream-out-buffer ] keep
     0 swap [ set-win32-stream-fileptr ] keep
     dup win32-stream-handle f GetFileSize dup -1 = [ drop f ] when
         swap [ set-win32-stream-file-size ] keep
-    0 swap [ set-win32-stream-timeout ] keep
+    f swap [ set-win32-stream-timeout ] keep
     0 swap [ set-win32-stream-cutoff ] keep ;
 
 : <win32-file-reader> ( path -- stream )

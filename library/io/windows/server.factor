@@ -6,7 +6,7 @@ USING: alien errors generic kernel kernel-internals math namespaces
        win32-io-internals io-internals ;
 
 TUPLE: win32-server this ;
-TUPLE: win32-client-stream host port ;
+TUPLE: win32-client-stream host port this ;
 SYMBOL: socket
 SYMBOL: stream
 SYMBOL: timeout
@@ -39,11 +39,10 @@ SYMBOL: cutoff
 : bind-socket ( port socket -- )
     swap setup-sockaddr "sockaddr-in" c-size wsa-bind handle-socket-error!=0/f ;
 
-SYMBOL: listen-backlog
-20 listen-backlog set-global
+: listen-backlog 20 ; inline
 
 : listen-socket ( socket -- )
-    listen-backlog get wsa-listen handle-socket-error!=0/f ;
+    listen-backlog wsa-listen handle-socket-error!=0/f ;
 
 : sockaddr> ( sockaddr -- port host )
     dup sockaddr-in-port ntohs swap sockaddr-in-addr inet-ntoa ;
