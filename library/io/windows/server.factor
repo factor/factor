@@ -8,6 +8,9 @@ USING: alien errors generic kernel kernel-internals math namespaces
 TUPLE: win32-server this ;
 TUPLE: win32-client-stream host port ;
 SYMBOL: socket
+SYMBOL: stream
+SYMBOL: timeout
+SYMBOL: cutoff
 
 : (handle-socket-error)
     WSAGetLastError [ ERROR_IO_PENDING ERROR_SUCCESS ] member?
@@ -95,12 +98,12 @@ IN: io
             buffer-ptr <alien> 0 32 32 f r> AcceptEx
             handle-socket-error!=0/f stop
         ] callcc1 pending-error drop
-        swap dup add-completion make-win32-stream <line-reader> 
+        swap dup add-completion <win32-stream> <line-reader> 
         dupd <win32-client-stream> swap buffer-free
     ] bind ;
 
 : <client> ( host port -- stream )
     client-sockaddr new-socket
     [ swap "sockaddr-in" c-size connect handle-socket-error!=0/f ] keep 
-    dup add-completion make-win32-stream <line-reader> ;
+    dup add-completion <win32-stream> <line-reader> ;
 
