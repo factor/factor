@@ -19,7 +19,6 @@
 - better way of dealing with compiler errors
 - track individual method usages
 - track a list of assets loaded from each module's file
-- do reload-modules in the right order
 - variable width word wrap
 - add-gadget, model-changed, set-model should compile
 - graphical module manager tool
