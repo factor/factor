@@ -196,6 +196,16 @@ HELP: last/first
 { $values { "seq" "a sequence" } { "pair" "a two-element array" } }
 { $description "Creates an array holding the first and last element of the sequence." } ;
 
+HELP: pad-left
+{ $values { "seq" "a sequence" } { "n" "a non-negative integer" } { "elt" "an object"} { "padded" "a new sequence" } }
+{ $description "Outputs a new sequence consisting of " { $snippet "seq" } " padded on the left with enough repetitions of " { $snippet "elt" } " to have the result be of length " { $snippet "n" } "." }
+{ $examples { $example "{ \"ab\" \"quux\" } [ 5 CHAR: - pad-left print ] each" "---ab\n-quux" } } ;
+
+HELP: pad-right
+{ $values { "seq" "a sequence" } { "n" "a non-negative integer" } { "elt" "an object"} { "padded" "a new sequence" } }
+{ $description "Outputs a new sequence consisting of " { $snippet "seq" } " padded on the right with enough repetitions of " { $snippet "elt" } " to have the result be of length " { $snippet "n" } "." }
+{ $examples { $example "{ \"ab\" \"quux\" } [ 5 CHAR: - pad-right print ] each" "ab---\nquux-" } } ;
+
 HELP: sequence=
 { $values { "seq1" "a sequence" } { "seq2" "a sequence" } { "?" "a boolean" } }
 { $description "Tests if the two sequences have the same length and elements. This is weaker than " { $link = } ", since it does not ensure that the sequences are instances of the same class." } ;

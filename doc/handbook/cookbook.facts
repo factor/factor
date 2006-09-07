@@ -36,7 +36,7 @@ $terpri
 
 ARTICLE: "cookbook-colon-defs" "Shuffle word and definition cookbook"
 "The " { $link dup } " word makes a copy of the value at the top of the stack:"
-{ $example "5 dup ." "25" }
+{ $example "5 dup * ." "25" }
 "The " { $link sq } " word is actually defined as follows:"
 { $code ": sq dup * ;" }
 "(You could have looked this up yourself by clicking on the " { $link sq } " word itself.)"

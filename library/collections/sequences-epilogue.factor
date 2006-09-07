@@ -124,6 +124,15 @@ M: object like drop ;
 
 : last/first ( seq -- pair ) dup peek swap first 2array ;
 
+: padding ( seq n elt -- newseq )
+    >r swap length [-] r> <array> ;
+
+: pad-left ( seq n elt -- padded )
+    pick >r pick >r padding r> append r> like ;
+
+: pad-right ( seq n elt -- padded )
+    pick >r padding r> swap append ;
+
 : sequence= ( seq1 seq2 -- ? )
     2dup [ length ] 2apply tuck number=
     [ (mismatch) -1 number= ] [ 3drop f ] if ; inline

@@ -48,15 +48,6 @@ UNION: alpha Letter digit ;
 : >lower ( str -- lower ) [ ch>lower ] map ;
 : >upper ( str -- upper ) [ ch>upper ] map ;
 
-: padding ( str n ch -- padstr )
-    >r swap length [-] r> <string> ;
-
-: pad-left ( str n ch -- padded )
-    pick >r padding r> append ;
-
-: pad-right ( str n ch -- padded )
-    pick >r padding r> swap append ;
-
 : ch>string ( ch -- str ) 1 swap <string> ;
 
 : >string ( seq -- str )
