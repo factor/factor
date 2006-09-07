@@ -13,7 +13,7 @@ CELL callframe_end;
 #define USER_ENV 32
 
 #define CARD_OFF_ENV      1 /* for compiling set-slot */
-/* 2 is unused */         
+#define NLX_VECTOR_ENV    2 /* non-local exit hook */
 #define NAMESTACK_ENV     3 /* used by library only */
 #define GLOBAL_ENV        4
 #define BREAK_ENV         5

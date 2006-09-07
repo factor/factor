@@ -39,14 +39,25 @@ TUPLE: continuation data retain call name catch ;
 
 : callcc0 ( quot -- ) [ drop ] ifcc ; inline
 
+DEFER: continue-with
+
+: set-walker-hook 2 setenv ; inline
+
+: get-walker-hook 2 getenv f set-walker-hook ; inline
+
+: end-walk continuation get-walker-hook continue-with ;
+
 : continue ( continuation -- )
-    >continuation<
-    set-catchstack
-    set-namestack
-    set-callstack
-    set-retainstack
-    set-datastack ;
-    inline
+    get-walker-hook [
+        continue-with
+    ] [
+        >continuation<
+        set-catchstack
+        set-namestack
+        set-callstack
+        set-retainstack
+        set-datastack
+    ] if* ; inline
 
 : callcc1 ( quot -- obj )
     [ drop (continue-with) ] ifcc ; inline

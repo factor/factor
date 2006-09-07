@@ -73,34 +73,19 @@ SYMBOL: callframe-end
     save-callframe (meta-call) ;
 
 : <callframe> ( quot -- seq )
-    0 over length 3array >vector ;
-
-: catch-harness ( continuation -- quot )
-    [ [ c> 2array ] % , \ continue-with , ] [ ] make ;
-
-: host-harness ( quot continuation -- quot )
-    tuck [
-        catch-harness , \ >c ,
-        %
-        [ c> drop continuation ] %
-        ,
-        \ continue-with ,
-    ] [ ] make ;
+    \ end-walk add >quotation 0 over length 3array >vector ;
 
 : restore-harness ( obj -- )
-    #! Error handler
-    dup array? [
-        init-meta-interp [ ] (meta-call)
-        first2 schedule-thread-with
-    ] [
-        meta-interp set
-    ] if ;
+    {
+        { [ dup continuation? ] [ ] }
+        { [ dup array? ] [ first2 >r push-d r> ] }
+        { [ dup not ] [ drop <empty-continuation> ] }
+    } cond meta-interp set ;
 
 : host-quot ( quot -- )
-    [
-        host-harness <callframe> meta-c swap nappend
-        meta-interp get continue
-    ] callcc1 restore-harness drop ;
+    <callframe> meta-c swap nappend
+    [ set-walker-hook meta-interp get continue ] callcc1
+    restore-harness ;
 
 : host-word ( word -- ) unit host-quot ;
 
@@ -127,10 +112,8 @@ M: object do do-1 ;
 ! The interpreter loses object identity of the name and catch
 ! stacks -- they are copied after each step -- so we execute
 ! these atomically and don't allow stepping into these words
-\ >n [ \ >n host-word ] "meta-word" set-word-prop
-\ n> [ \ n> host-word ] "meta-word" set-word-prop
-\ >c [ \ >c host-word ] "meta-word" set-word-prop
-\ c> [ \ c> host-word ] "meta-word" set-word-prop
+{ >n n> >c c> rethrow continue continue-with }
+[ dup [ host-word ] curry "meta-word" set-word-prop ] each
 
 \ call [ pop-d meta-call ] "meta-word" set-word-prop
 \ execute [ pop-d do ] "meta-word" set-word-prop

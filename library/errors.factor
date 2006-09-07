@@ -1,7 +1,7 @@
 ! Copyright (C) 2004, 2006 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 IN: kernel-internals
-USING: generic namespaces sequences ;
+USING: arrays generic namespaces sequences ;
 
 : >c ( continuation -- ) catchstack* push ;
 : c> ( -- continuation ) catchstack* pop ;
@@ -20,7 +20,8 @@ SYMBOL: error-continuation
         die
     ] [
         dup error set-global
-        c> dup quotation? [ call ] [ continue-with ] if
+        get-walker-hook [ >r c> 2array r> ] [ c> ] if*
+        continue-with
     ] if ;
 
 : cleanup ( try cleanup -- )
