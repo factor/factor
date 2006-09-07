@@ -19,14 +19,6 @@ namespaces sequences shells threads vectors ;
     [ [ continuation-retain stack. ] when* ]
     "Retain stack" <labelled-pane> ;
 
-: <namestack-display> ( model -- )
-    [ [ continuation-name stack. ] when* ]
-    "Name stack" <labelled-pane> ;
-
-: <catchstack-display> ( model -- )
-    [ [ continuation-catch stack. ] when* ]
-    "Catch stack" <labelled-pane> ;
-
 : <quotation-display> ( quot -- gadget )
     [ [ first2 callframe. ] when* ]
     "Current quotation" <labelled-pane> ;
@@ -53,18 +45,6 @@ TUPLE: walker-gadget model quot ns ;
 : walker-step-in [ step-in ] walker-command ;
 : walker-step-out [ step-out ] walker-command ;
 : walker-step-back [ step-back ] walker-command ;
-: walker-step-all dup [ step-all ] walker-command reset-walker ;
-
-walker-gadget {
-    {
-        "Walker"
-        { "Step" T{ key-down f f "s" } [ walker-step ] }
-        { "Step in" T{ key-down f f "i" } [ walker-step-in ] }
-        { "Step out" T{ key-down f f "o" } [ walker-step-out ] }
-        { "Step back" T{ key-down f f "b" } [ walker-step-back ] }
-        { "Continue" T{ key-down f f "c" } [ walker-step-all ] }
-    }
-} define-commands
 
 : init-walker-models ( walker -- model quot )
     f <model> over set-walker-gadget-quot
@@ -83,9 +63,7 @@ walker-gadget {
 C: walker-gadget ( -- gadget )
     dup init-walker-models {
         { [ walker-gadget-quot$ <quotation-display> ] f f 1/6 }
-        { [ walker-gadget-model$ <callstack-display> ] f f 1/6 }
-        { [ walker-gadget-model$ <datastack-display> ] f f 1/6 }
-        { [ walker-gadget-model$ <retainstack-display> ] f f 1/6 }
-        { [ walker-gadget-model$ <namestack-display> ] f f 1/6 }
-        { [ walker-gadget-model$ <catchstack-display> ] f f 1/6 }
+        { [ walker-gadget-model$ <callstack-display> ] f f 5/18 }
+        { [ walker-gadget-model$ <datastack-display> ] f f 5/18 }
+        { [ walker-gadget-model$ <retainstack-display> ] f f 5/18 }
     } { 0 1 } make-track* ;

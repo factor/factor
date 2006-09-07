@@ -196,6 +196,10 @@ HELP: last/first
 { $values { "seq" "a sequence" } { "pair" "a two-element array" } }
 { $description "Creates an array holding the first and last element of the sequence." } ;
 
+HELP: padding
+{ $values { "seq" "a sequence" } { "n" "a non-negative integer" } { "elt" "an object"} { "padded" "a new sequence" } }
+{ $description "Outputs a new string sequence of " { $snippet "elt" } " repeated, that when appended to " { $snippet "seq" } ", yields a sequence of length " { $snippet "n" } ". If the length of { " { $snippet "seq" } " is greater than " { $snippet "n" } ", this word outputs an empty sequence." } ;
+
 HELP: pad-left
 { $values { "seq" "a sequence" } { "n" "a non-negative integer" } { "elt" "an object"} { "padded" "a new sequence" } }
 { $description "Outputs a new sequence consisting of " { $snippet "seq" } " padded on the left with enough repetitions of " { $snippet "elt" } " to have the result be of length " { $snippet "n" } "." }

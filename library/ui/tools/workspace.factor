@@ -6,7 +6,7 @@ gadgets-browser gadgets-books gadgets-frames gadgets-controls
 gadgets-grids gadgets-presentations kernel models namespaces
 styles words help parser tools memory generic threads
 gadgets-text definitions inference test prettyprint math strings
-hashtables tools modules ;
+hashtables tools modules interpreter ;
 IN: gadgets-workspace
 
 GENERIC: call-tool* ( arg tool -- )
@@ -102,6 +102,28 @@ workspace {
 ! Walker tool
 M: walker-gadget call-tool* ( arg tool -- )
     >r first2 r> (walk) ;
+
+IN: gadgets-walker
+
+: walker-inspect ( walker -- )
+    walker-gadget-ns [ meta-interp get ] bind
+    [ inspect ] curry listener-gadget call-tool ;
+
+: walker-step-all ( walker -- )
+    dup [ step-all ] walker-command reset-walker
+    find-workspace listener-gadget select-tool ;
+
+walker-gadget {
+    {
+        "Walker"
+        { "Step" T{ key-down f f "s" } [ walker-step ] }
+        { "Step in" T{ key-down f f "i" } [ walker-step-in ] }
+        { "Step out" T{ key-down f f "o" } [ walker-step-out ] }
+        { "Step back" T{ key-down f f "b" } [ walker-step-back ] }
+        { "Continue" T{ key-down f f "c" } [ walker-step-all ] }
+        { "Inspect" T{ key-down f f "n" } [ walker-inspect ] }
+    }
+} define-commands
 
 IN: tools
 

@@ -62,10 +62,6 @@ HELP: >upper
 { $values { "str" "a string" } { "upper" "a string" } }
 { $description "Converts a string to uppercase." } ;
 
-HELP: padding
-{ $values { "str" "a string" } { "n" "a non-negative integer" } { "ch" "a character"} { "padstr" "a new string" } }
-{ $description "Outputs a new string consisting of " { $snippet "ch" } " repeated, that when appended to " { $snippet "str" } ", yields a string of length " { $snippet "n" } ". If the length of { " { $snippet "str" } " is greater than " { $snippet "n" } ", this word outputs the empty string." } ;
-
 HELP: ch>string
 { $values { "ch" "a character"} { "str" "a new string" } }
 { $description "Outputs a string of one character." } ;
