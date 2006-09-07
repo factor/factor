@@ -6,8 +6,6 @@ USING: vectors ;
 : catchstack* ( -- catchstack )
     6 getenv { vector } declare ; inline
 
-: (continue-with) 9 getenv ;
-
 IN: errors
 USING: kernel kernel-internals ;
 
@@ -15,7 +13,7 @@ USING: kernel kernel-internals ;
 : set-catchstack ( catchstack -- ) >vector 6 setenv ; inline
 
 IN: kernel
-USING: namespaces sequences ;
+USING: arrays namespaces sequences ;
 
 TUPLE: continuation data retain call name catch ;
 
@@ -47,23 +45,29 @@ DEFER: continue-with
 
 : end-walk continuation get-walker-hook continue-with ;
 
+: (continue) ( continuation -- )
+    >continuation<
+    set-catchstack
+    set-namestack
+    set-callstack
+    set-retainstack
+    set-datastack ; inline
+
+: (continue-with) ( obj continuation -- )
+    swap 9 setenv (continue) ; inline
+
 : continue ( continuation -- )
-    get-walker-hook [
-        continue-with
-    ] [
-        >continuation<
-        set-catchstack
-        set-namestack
-        set-callstack
-        set-retainstack
-        set-datastack
-    ] if* ; inline
+    get-walker-hook [ (continue-with) ] [ (continue) ] if* ;
+    inline
+
+: from-callcc1 9 getenv ;
 
 : callcc1 ( quot -- obj )
-    [ drop (continue-with) ] ifcc ; inline
+    [ drop from-callcc1 ] ifcc ; inline
 
 : continue-with ( obj continuation -- )
-    swap 9 setenv continue ; inline
+    get-walker-hook [ >r 2array r> ] when* (continue-with) ;
+    inline
 
 M: continuation clone
     [ continuation-data clone ] keep

@@ -26,12 +26,12 @@ SYMBOL: error-continuation
 
 : cleanup ( try cleanup -- )
     [ >c >r call c> drop r> call ]
-    [ drop (continue-with) >r nip call r> rethrow ] ifcc ;
+    [ drop from-callcc1 >r nip call r> rethrow ] ifcc ;
     inline
 
 : recover ( try recovery -- )
     [ >c drop call c> drop ]
-    [ drop (continue-with) rot drop swap call ] ifcc ; inline
+    [ drop from-callcc1 rot drop swap call ] ifcc ; inline
 
 TUPLE: condition restarts cc ;
 

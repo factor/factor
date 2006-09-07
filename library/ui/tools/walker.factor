@@ -63,7 +63,7 @@ TUPLE: walker-gadget model quot ns ;
 C: walker-gadget ( -- gadget )
     dup init-walker-models {
         { [ walker-gadget-quot$ <quotation-display> ] f f 1/6 }
-        { [ walker-gadget-model$ <callstack-display> ] f f 5/18 }
-        { [ walker-gadget-model$ <datastack-display> ] f f 5/18 }
-        { [ walker-gadget-model$ <retainstack-display> ] f f 5/18 }
+        { [ walker-gadget-model$ <datastack-display> ] f f 1/4 }
+        { [ walker-gadget-model$ <retainstack-display> ] f f 1/4 }
+        { [ walker-gadget-model$ <callstack-display> ] f f 1/3 }
     } { 0 1 } make-track* ;

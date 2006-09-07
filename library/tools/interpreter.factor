@@ -84,7 +84,7 @@ SYMBOL: callframe-end
 
 : host-quot ( quot -- )
     <callframe> meta-c swap nappend
-    [ set-walker-hook meta-interp get continue ] callcc1
+    [ set-walker-hook meta-interp get (continue) ] callcc1
     restore-harness ;
 
 : host-word ( word -- ) unit host-quot ;
