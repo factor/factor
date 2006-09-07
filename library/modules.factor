@@ -24,7 +24,7 @@ TUPLE: module name files tests modified ;
 
 : modified? ( file module -- ? )
     dupd module-modified hash
-    swap resource-path file-modified number= not ;
+    swap resource-path file-modified < ;
 
 : prefix-paths ( name seq -- newseq )
     [ "/" swap append3 ] map-with ;
@@ -87,3 +87,5 @@ C: module ( name files tests -- module )
 
 : reload-modules ( -- )
     all-modules [ reload-module ] each do-parse-hook ;
+
+: reset-modified ( -- ) all-modules [ record-modified ] each ;

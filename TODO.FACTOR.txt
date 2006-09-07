@@ -1,5 +1,6 @@
 + 0.85:
 
+- when to call reset-modified
 - C+S+END doesn't work
 - pane output in UI should use less memory
 - signal 4 on datastack underflow on mac intel??
