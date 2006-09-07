@@ -4,7 +4,6 @@ USING: kernel io strings sequences namespaces math parser ;
 : w+ ( int -- int ) + HEX: ffffffff bitand ; inline
 : nth-int ( string n -- int ) 2 shift dup 4 + rot <slice> le> ; inline
 : nth-int-be ( string n -- int ) 2 shift dup 4 + rot <slice> be> ; inline
-: float-sin ( int -- int ) sin abs 4294967296 * >bignum ; inline
 : update ( num var -- ) [ w+ ] change ; inline
 
 : update-old-new ( old new -- )
@@ -13,8 +12,8 @@ USING: kernel io strings sequences namespaces math parser ;
 : calculate-pad-length ( length -- pad-length )
     dup 56 < 55 119 ? swap - ;
 
-! pad 0x80 then 00 til 8 bytes left, then 64bit length in bits
 : preprocess-plaintext ( string big-endian? -- padded-string )
+    #! pad 0x80 then 00 til 8 bytes left, then 64bit length in bits
     >r >sbuf r> over [
         HEX: 80 ,
         dup length HEX: 3f bitand calculate-pad-length 0 <string> %
