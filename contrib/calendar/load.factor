@@ -1,8 +1,8 @@
-USING: arrays kernel modules sequences ;
+USE: kernel
 
-"calendar"
-
-unix? "os-unix.factor" "os-win32.factor" ? "calendar.factor" 2array
-{ "test/calendar.factor" }
-provide
+PROVIDE: contrib/calendar {
+    { "os-unix.factor" [ unix? ] }
+    { "os-win32.factor" [ windows? ] }
+    "calendar.factor"
+} { "test/calendar.factor" } ;
 
