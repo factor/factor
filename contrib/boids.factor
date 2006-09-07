@@ -296,7 +296,7 @@ rot <label> -rot
 swap number-field ns> over bind-action-field tuck set-editor-text
 2array make-shelf ;
 
-: control-panel-button ( string quot -- button ) ns> swap [bind] <bevel-button> ;
+: control-panel-button ( str quot -- button ) ns> swap [bind] <bevel-button> ;
 
 : control-panel ( -- pile )
 { [ "Weight" control-panel-label ]
