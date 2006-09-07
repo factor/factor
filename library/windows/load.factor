@@ -11,6 +11,7 @@ PROVIDE: library/windows {
     "user32-structs.factor"
     "user32-types.factor"
     "user32.factor"
+    "winsock.factor"
     "opengl32.factor"
     "utils.factor"
 } ;

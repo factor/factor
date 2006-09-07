@@ -69,8 +69,7 @@ TUPLE: win32-stream handle in-buffer out-buffer fileptr file-size timeout cutoff
     ] [
         pick dupd consume-input
         dup empty? [
-            2drop >string-or-f nip dup f =
-            [ "Stream closed" throw ] when ! XXX: what do we do here?
+            2drop >string-or-f nip
         ] [
             swapd over >r nappend r>
             [ length - ] keep swap do-read-count
