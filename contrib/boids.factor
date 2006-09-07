@@ -13,7 +13,7 @@ contrib/action-field ;
 
 USING: generic threads namespaces math kernel sequences arrays gadgets
        gadgets-labels gadgets-theme gadgets-text gadgets-buttons gadgets-frames
-       gadgets-grids math-contrib slate vars action-field ;
+       gadgets-grids math-contrib slate slate-2d slate-misc vars action-field ;
 
 IN: boids
 
