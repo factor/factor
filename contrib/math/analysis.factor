@@ -17,7 +17,7 @@ USING: kernel sequences errors namespaces math ;
     } ; inline
 
 : gamma-z ( x n -- seq )
-    [ [ over + 1.0 swap / , ] each ] { } make 1.0 0 pick set-nth nip ;
+    [ + recip ] map-with 1.0 0 pick set-nth ;
 
 : (gamma-lanczos6) ( x -- log[gamma[x+1]] )
     #! log(gamma(x+1)
@@ -55,7 +55,7 @@ IN: math-contrib
             dup abs gammaln-lanczos6 swap dup 0 > [ drop ] [ gamma-neg ] if
     ] if ;
 
-: nth-root ( n x -- )
+: nth-root ( n x -- y )
     over 0 = [ "0th root is undefined" throw ] when >r recip r> swap ^ ;
 
 ! Forth Scientific Library Algorithm #1

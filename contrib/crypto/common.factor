@@ -22,7 +22,9 @@ USING: kernel io strings sequences namespaces math parser ;
 
 : shift-mod ( n s w -- n ) >r shift r> 1 swap shift 1 - bitand ; inline
 
+
 IN: crypto
+
 : bitroll ( n s w -- n )
      #! Roll n by s bits to the left, wrapping around after
      #! w bits.
@@ -31,4 +33,5 @@ IN: crypto
      [ shift-mod ] 3keep
      [ - ] keep shift-mod bitor ; inline
 
-: hex-string ( str -- str ) [ [ >hex 2 48 pad-left % ] each ] "" make ;
+: hex-string ( str -- str )
+    [ [ >hex 2 48 pad-left % ] each ] "" make ;

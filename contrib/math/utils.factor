@@ -4,6 +4,15 @@ USING: errors kernel sequences math sequences-internals namespaces arrays ;
 : deg>rad pi * 180 / ; inline
 : rad>deg 180 * pi / ; inline
 
+: (count-end) ( elt count seq -- elt count seq )
+    2dup length < [
+        3dup [ length swap - 1- ] keep nth = [ >r 1+ r> (count-end) ] when
+    ] when ;
+
+: count-end ( elt seq -- n )
+    #! count the number of elem at the end of the seq
+    0 swap (count-end) drop nip ;
+
 : lcm ( a b -- c )
     #! Smallest integer such that c/a and c/b are both integers.
     2dup gcd nip >r * r> /i ; foldable
@@ -42,9 +51,6 @@ USING: errors kernel sequences math sequences-internals namespaces arrays ;
 : c. ( v v -- x )
     #! Complex inner product.
     0 [ ** + ] 2reduce ;
-
-: sum ( v -- n ) 0 [ + ] reduce ;
-: product ( v -- n ) 1 [ * ] reduce ;
 
 : proj ( u v -- w )
     #! Orthogonal projection of u onto v.
@@ -89,13 +95,8 @@ M: frange length ( frange -- n )
 M: frange nth ( n frange -- obj )
     [ frange-step * ] keep frange-from + ;
 
-: nseq-swap ( a b seq -- seq )
-    #! swap indices a,b in seq
-    3dup [ nth ] keep swapd [ nth ] keep
-    >r >r rot r> r> swapd set-nth -rot set-nth ;
-
 ! : pivot ( left right index seq -- )
-    ! [ nth ] keep [ nseq-swap ] 3keep ;
+    ! [ nth ] keep [ exchange ] 3keep ;
 
 SYMBOL: step-size .01 step-size set  ! base on arguments
 : (limit) ( count diff quot -- x quot )
@@ -109,20 +110,16 @@ SYMBOL: step-size .01 step-size set  ! base on arguments
 
 ! take elements n at a time and apply the quotation, forming a new seq
 : group-map ( seq n quot -- seq )
-    pick length pick /
-    [ [ >r pick pick r> -rot pick over * [ + ] keep swap rot <slice> pick call
-    , ] repeat ] { } make 2nip nip ;
+    >r group r> map ;
 
 : nths ( start n seq -- seq )
     -rot pick length <frange-no-endpt> [ over nth ] map nip ;
 
 ! take a set of every nth element and apply the quotation, forming a new seq
 ! { 1 2 3 4 5 6 } 3 [ sum ] skip-map ->  { 1 4 } { 2 5 } { 3 6 } -> { 5 7 9 }
-: skip-map ( seq n quot -- seq )
-    pick length pick /mod 
-    0 = [ "seq length must be a multiple of n" throw ] unless
-    1 <= [ "seq must be 2n or longer" throw ] when 
-    over [ [ dup >r >r pick pick r> rot swapd nths over call , r> ] repeat ] { } make 2nip nip ;
+! : skip-map ( seq n quot -- seq )
+    ! >r 
 
-: nth-rand ( seq -- elem ) [ length random-int ] keep nth ;
+: nth-rand ( seq -- elem )
+    [ length random-int ] keep nth ;
 

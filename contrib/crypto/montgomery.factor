@@ -6,9 +6,8 @@ IN: crypto
     #! a' = a * nextpowerof2(a) mod n
     >r dup next-power-of-2 * r> mod ;
 
-: montgomery* ( a b -- a*b )
-    "todo" throw
-    ;
+! : montgomery* ( a b -- a*b )
+    ! "todo" throw ;
 
 : montgomery-r^2 ( n -- a )
     #! ans = r^2 mod n, where r = nextpowerof2(n)

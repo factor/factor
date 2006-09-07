@@ -1,14 +1,6 @@
-USING: kernel math sequences namespaces io strings hashtables ;
+USING: kernel math math-contrib sequences namespaces io strings hashtables ;
 IN: crypto-internals
 
-: (count-end) ( elt count seq -- elt count seq )
-    2dup length < [
-        3dup [ length swap - 1- ] keep nth = [ >r 1+ r> (count-end) ] when
-    ] when ;
-
-: count-end ( elt seq -- n )
-    #! count the number of elem at the end of the seq
-    0 swap (count-end) drop nip ;
 
 : ch>base64 ( ch -- ch )
     "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/" nth ;
