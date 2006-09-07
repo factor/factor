@@ -22,22 +22,12 @@ SYMBOL: old-d
     old-c c update-old-new
     old-d d update-old-new ;
 
-: get-md5-debug ( -- str )
-    [ [ a b c d ] [ get 4 >be % ] each ] "" make ;
-
-: get-md5 ( -- str )
-    [ [ a b c d ] [ get 4 >le % ] each ] "" make ;
-
-: get-old-md5-debug ( -- str )
-    [ [ old-a old-b old-c old-d ] [ get 4 >be % ] each ] "" make ;
-
-
 ! Let [abcd k s i] denote the operation
 ! a = b + ((a + F(b,c,d) + X[k] + T[i]) <<< s)
 
-: 2to4 dup second get over third get pick fourth get ;
+: 1to4 dup second get over third get pick fourth get ;
 
-: (F) ( vars func -- vars result ) >r 2to4 r> call ; inline
+: (F) ( vars func -- vars result ) >r 1to4 r> call ; inline
 
 : (ABCD) ( s i x vars result -- )
     #! bits to shift, input to float-sin, x, func
@@ -148,17 +138,18 @@ SYMBOL: old-d
     S41 61 pick 4 nth-int  [ I ] ABCD
     S42 62 pick 11 nth-int [ I ] DABC
     S43 63 pick 2 nth-int  [ I ] CDAB
-    S44 64 pick 9 nth-int  [ I ] BCDA
+    S44 64 rot 9 nth-int  [ I ] BCDA
+    update-md ;
 
-    update-md
-    drop ;
+: get-md5 ( -- str )
+    [ [ a b c d ] [ get 4 >le % ] each ] "" make ;
 
 IN: crypto
+
 : string>md5 ( string -- md5 )
     [
         initialize-md5 f preprocess-plaintext
-        dup length num-blocks [ 2dup get-block process-md5-block ] repeat
-        drop get-md5
+        64 group [ process-md5-block ] each get-md5
     ] with-scope ;
 
 : string>md5str ( string -- str ) string>md5 hex-string ;

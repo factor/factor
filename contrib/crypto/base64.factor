@@ -10,7 +10,6 @@ IN: crypto-internals
     #! count the number of elem at the end of the seq
     0 swap (count-end) drop nip ;
 
-
 : ch>base64 ( ch -- ch )
     "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/" nth ;
 
@@ -27,7 +26,7 @@ IN: crypto-internals
     be> 4 [ 3 swap - -6 * shift HEX: 3f bitand ch>base64 ] map-with ;
 
 : decode4 ( str -- str )
-    [ base64>ch ] map 0 4 [ pick nth swap 6 shift bitor ] each nip 3 >be ;
+    [ base64>ch ] map 0 [ swap 6 shift bitor ] reduce 3 >be ;
 
 : >base64-rem ( str -- str )
     [ 3 0 pad-right encode3 ] keep length 1+ head 4 CHAR: = pad-right ;
@@ -36,9 +35,10 @@ IN: crypto
 : >base64 ( str -- str )
     #! cut string into two pieces, convert 3 bytes at a time
     #! pad string with = when not enough bits
-    dup length dup 3 mod - swap cut swap
+    [ length dup 3 mod - ] keep cut swap
     [
-        3 group [ encode3 % ] each dup empty? [ drop ] [ >base64-rem % ] if
+        3 group [ encode3 % ] each
+        dup empty? [ drop ] [ >base64-rem % ] if
     ] "" make ;
 
 : base64> ( str -- str )

@@ -17,8 +17,9 @@ SYMBOL: E
 SYMBOL: w
 SYMBOL: K
 
-: reset-w ( -- )
-    80 <vector> w set ;
+: reset-w ( -- ) 80 <vector> w set ; inline
+: get-wth ( n -- wth ) w get nth ; inline
+: shift-wth ( n -- x ) get-wth 1 32 bitroll ; inline
 
 : initialize-sha1 ( -- )
     HEX: 67452301 dup h0 set A set
@@ -26,19 +27,12 @@ SYMBOL: K
     HEX: 98badcfe dup h2 set C set
     HEX: 10325476 dup h3 set D set
     HEX: c3d2e1f0 dup h4 set E set
-    reset-w
     [
         20 [ HEX: 5a827999 , ] times
         20 [ HEX: 6ed9eba1 , ] times
         20 [ HEX: 8f1bbcdc , ] times
         20 [ HEX: ca62c1d6 , ] times
     ] { } make K set ;
-
-: get-wth ( n -- wth )
-    w get nth ;
-
-: shift-wth ( n -- )
-    get-wth 1 32 bitroll ;
 
 ! W(t) = S^1(W(t-3) XOR W(t-8) XOR W(t-14) XOR W(t-16))
 : sha1-W ( t -- W_t )
@@ -51,22 +45,8 @@ SYMBOL: K
 ! f(t;B,C,D) = B XOR C XOR D                        (20 <= t <= 39)
 ! f(t;B,C,D) = (B AND C) OR (B AND D) OR (C AND D)  (40 <= t <= 59)
 ! f(t;B,C,D) = B XOR C XOR D                        (60 <= t <= 79)
-
-! use this syntax eventually
-! JUMP-TABLE: f 4 ( maximum )
-! H{
-    ! { 0 [ >r over bitnot r> bitand >r bitand r> bitor ] }
-    ! { 1 [ bitxor bitxor ] }
-    ! { 2 [ 2dup bitand >r pick bitand >r bitand r> r> bitor bitor ] }
-    ! { 3 [ bitxor bitxor ] }
-! } f-table set
-
-! J: 0 f >r over bitnot r> bitand >r bitand r> bitor ;
-! J: 1 f bitxor bitxor ;
-! J: 2 f 2dup bitand >r pick bitand >r bitand r> r> bitor bitor ;
-! J: 3 f bitxor bitxor ;
-
 : sha1-f ( B C D t -- f_tbcd )
+    #! Maybe use dispatch
     20 /i
     {   
         { [ dup 0 = ] [ drop >r over bitnot r> bitand >r bitand r> bitor ] }
@@ -75,14 +55,10 @@ SYMBOL: K
         { [ dup 3 = ] [ drop bitxor bitxor ] }
     } cond ;
 
-: make-w ( -- )
-    ! compute w, steps a-b of RFC 3174, section 6.1
-    80 [ dup 16 < [
-            [ nth-int-be w get push ] 2keep
-        ] [
-            dup sha1-W w get push
-        ] if 
-    ] repeat ;
+: make-w ( str -- )
+    #! compute w, steps a-b of RFC 3174, section 6.1
+    16 [ nth-int-be w get push ] each-with
+    16 80 dup <slice> [ sha1-W w get push ] each ;
 
 : init-letters ( -- )
     ! step c of RFC 3174, section 6.1
@@ -92,26 +68,27 @@ SYMBOL: K
     h3 get D set
     h4 get E set ;
 
-: inner-loop ( -- )
+: inner-loop ( n -- temp )
     ! TEMP = S^5(A) + f(t;B,C,D) + E + W(t) + K(t);
     [
         [ B get C get D get ] keep sha1-f ,
         dup get-wth ,
-        dup K get nth ,
+        K get nth ,
         A get 5 32 bitroll ,
         E get ,
     ] { } make sum 4294967295 bitand ; inline
 
-: set-vars ( -- )
+: set-vars ( temp -- )
     ! E = D;  D = C;  C = S^30(B);  B = A; A = TEMP;
     D get E set
     C get D set
     B get 30 32 bitroll C set
-    A get B set ;
+    A get B set
+    A set ;
 
 : calculate-letters ( -- )
     ! step d of RFC 3174, section 6.1
-    80 [ inner-loop >r set-vars r> A set ] repeat ;
+    80 [ inner-loop set-vars ] each ;
 
 : update-hs ( -- )
     ! step e of RFC 3174, section 6.1
@@ -121,20 +98,19 @@ SYMBOL: K
     D h3 update-old-new
     E h4 update-old-new ;
 
-: process-sha1-block ( block -- )
-    make-w init-letters calculate-letters update-hs drop ;
+: process-sha1-block ( str -- )
+    make-w init-letters calculate-letters update-hs ;
 
 : get-sha1 ( -- str )
     [ [ h0 h1 h2 h3 h4 ] [ get 4 >be % ] each ] "" make ;
 
 IN: crypto
-: string>sha1 ( string -- sha1 )
+: string>sha1 ( str -- sha1 )
     [
         initialize-sha1 t preprocess-plaintext
-        dup length num-blocks [ reset-w 2dup get-block process-sha1-block ] repeat
-        drop get-sha1
+        64 group [ reset-w process-sha1-block ] each get-sha1
     ] with-scope ;
 
-: string>sha1str ( string -- sha1str ) string>sha1 hex-string ;
+: string>sha1str ( str -- sha1str ) string>sha1 hex-string ;
 : stream>sha1 ( stream -- sha1 ) contents string>sha1 ;
 : file>sha1 ( file -- sha1 ) <file-reader> stream>sha1 ;

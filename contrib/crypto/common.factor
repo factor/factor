@@ -15,14 +15,12 @@ USING: kernel io strings sequences namespaces math parser ;
 
 ! pad 0x80 then 00 til 8 bytes left, then 64bit length in bits
 : preprocess-plaintext ( string big-endian? -- padded-string )
-    swap [
-        dup % HEX: 80 ,
+    >r >sbuf r> over [
+        HEX: 80 ,
         dup length HEX: 3f bitand calculate-pad-length 0 <string> %
-        dup length 3 shift 8 >r rot r> swap [ >be ] [ >le ] if %
-    ] "" make nip ;
+        length 3 shift 8 rot [ >be ] [ >le ] if %
+    ] "" make dupd nappend ;
 
-: num-blocks ( length -- num ) -6 shift ;
-: get-block ( string num -- string ) 6 shift dup 64 + rot <slice> ;
 : shift-mod ( n s w -- n ) >r shift r> 1 swap shift 1 - bitand ; inline
 
 IN: crypto
