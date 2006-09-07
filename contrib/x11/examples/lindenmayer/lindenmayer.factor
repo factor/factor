@@ -1,3 +1,7 @@
+! Eduardo Cavazos - wayo.cavazos@gmail.com
+
+REQUIRES: math ;
+
 USING: kernel alien namespaces arrays vectors math opengl math-contrib
        parser sequences hashtables strings ;
 
@@ -29,12 +33,12 @@ IN: lindenmayer
 SYMBOL: position
 SYMBOL: orientation
 
-: rotate-U ( angle -- ) RU orientation get swap m. orientation set-global ;
-: rotate-L ( angle -- ) RL orientation get swap m. orientation set-global ;
-: rotate-H ( angle -- ) RH orientation get swap m. orientation set-global ;
+: rotate-U ( angle -- ) RU orientation get swap m. orientation set ;
+: rotate-L ( angle -- ) RL orientation get swap m. orientation set ;
+: rotate-H ( angle -- ) RH orientation get swap m. orientation set ;
 
 : step ( length -- )
->r position get orientation get 0 0 r> 3array m.v v+ position set-global ;
+>r position get orientation get 0 0 r> 3array m.v v+ position set ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
@@ -48,8 +52,7 @@ SYMBOL: orientation
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-: reset ( -- )
-{ 0 0 0 } position set-global 3 identity-matrix orientation set-global ;
+: reset ( -- ) { 0 0 0 } position set 3 identity-matrix orientation set ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
@@ -74,6 +77,14 @@ GL_LINES glBegin record-vertex step record-vertex glEnd ;
 0 over nth over 1 swap nth v- swap
 1 over nth swap 2 swap nth v- cross ;
 
+! Test and replace with:
+! 
+! : v0-v1 ( { v0 v1 v2 } -- vec ) first2 v- ;
+! 
+! : v1-v2 ( { v0 v1 v2 } -- vec ) first3 v- nip ;
+! 
+! : polygon-normal ( { v0 v1 v2 } -- normal ) dup v0-v1 swap v1-v2 cross ;
+
 ! : polygon ( vertices -- )
 ! GL_POLYGON glBegin dup polygon-normal first3 glNormal3f
 ! [ first3 glVertex3f ] each glEnd ;
@@ -89,13 +100,18 @@ if ;
 
 SYMBOL: vertices
 
-V{ } vertices set-global
+! V{ } vertices set-global
 
-: start-polygon ( -- ) 0 <vector> vertices set-global ;
+: start-polygon ( -- ) 0 <vector> vertices set ;
 
 : finish-polygon ( -- ) vertices get polygon ;
 
 : polygon-vertex ( -- ) position get vertices get push ;
+
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+! : setup-variables ( -- )
+! V{ } vertices set ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
@@ -183,7 +199,9 @@ DEFER: set-color-index
 
 TUPLE: state position orientation angle length thickness color-index ;
 
-SYMBOL: states V{ } states set-global
+! SYMBOL: states V{ } states set-global
+
+SYMBOL: states
 
 : save-state ( -- )
 position get orientation get angle get length get thickness get
@@ -192,32 +210,33 @@ states get push ;
 
 : restore-state ( -- )
 states get pop
-dup state-position    position set-global
-dup state-orientation orientation set-global
-dup state-length      length set-global
-dup state-angle       angle set-global
+dup state-position    position set
+dup state-orientation orientation set
+dup state-length      length set
+dup state-angle       angle set
 dup state-color-index set-color-index
 dup state-thickness   set-thickness
 drop ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-: scale-length ( m -- ) length get * length set-global ;
+: scale-length ( m -- ) length get * length set ;
 
-: scale-angle ( m -- ) angle get * angle set-global ;
+: scale-angle ( m -- ) angle get * angle set ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 SYMBOL: color-table
 
-{ { 0 0 0 } ! black
-  { 0.5 0.5 0.5 } ! grey
-  { 1 0 0 } ! red
-  { 1 1 0 } ! yellow
-  { 0 1 0 } ! green
-  { 0.250 0.878 0.815 } ! turquoise
-  { 0 0 1 } ! blue
-  { 0.627 0.125 0.941 } ! purple
+: setup-color-table ( -- )
+{ { 0    0    0 }    ! black
+  { 0.5  0.5  0.5 }  ! grey
+  { 1    0    0 }    ! red
+  { 1    1    0 }    ! yellow
+  { 0    1    0 }    ! green
+  { 0.25 0.88 0.82 } ! turquoise
+  { 0    0    1 }    ! blue
+  { 0.63 0.13 0.94 } ! purple
   { 0.00 0.50 0.00 } ! dark green
   { 0.00 0.82 0.82 } ! dark turquoise
   { 0.00 0.00 0.50 } ! dark blue
@@ -225,8 +244,8 @@ SYMBOL: color-table
   { 0.50 0.00 0.00 } ! dark red
   { 0.25 0.25 0.25 } ! dark grey
   { 0.75 0.75 0.75 } ! medium grey
-  { 1 1 1 } ! white
-} color-table set-global
+  { 1    1    1 }    ! white
+} color-table set ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
@@ -245,14 +264,14 @@ USE: lindenmayer
 GL_FRONT_AND_BACK GL_AMBIENT_AND_DIFFUSE rot glMaterialfv ;
 
 : set-color-index ( i -- )
-dup color-index set-global color-table get nth dup
+dup color-index set color-table get nth dup
 first3 glColor3f first3 material-color ;
 
 : inc-color-index ( -- ) color-index get 1 + set-color-index ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-: set-thickness ( i -- ) dup thickness set-global glLineWidth ;
+: set-thickness ( i -- ) dup thickness set glLineWidth ;
 
 : scale-thickness ( m -- ) thickness get * 0.5 max set-thickness ;
 
@@ -264,10 +283,14 @@ first3 glColor3f first3 material-color ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
+: setup-variables ( -- )
+V{ } vertices set   V{ } states set   setup-color-table ;
+
 : lparser-dialect ( -- )
 
-1 length set-global   45 angle set-global   1 thickness set-global
-2 set-color-index
+setup-variables
+
+1 length set   45 angle set   1 thickness set   2 set-color-index
 
 H{ { "+" [ angle get     rotate-y ] }
    { "-" [ angle get    -rotate-y ] }
@@ -292,7 +315,7 @@ H{ { "+" [ angle get     rotate-y ] }
    { "{" [ start-polygon ] }
    { "}" [ finish-polygon ] }
 
-   { "/" [ 1.1 scale-length ] } ! " command in lparser
+   { "/" [ 1.1 scale-length ] } ! double quote command in lparser
    { "'" [ 0.9 scale-length ] }
    { ";" [ 1.1 scale-angle ] }
    { ":" [ 0.9 scale-angle ] }
@@ -301,7 +324,7 @@ H{ { "+" [ angle get     rotate-y ] }
 
    { "c" [ color-index get 1 + color-table get length* mod set-color-index ] }
 
-} command-table set-global ;
+} command-table set ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 ! Examples
@@ -312,7 +335,7 @@ SYMBOL: result
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-: koch ( -- ) lparser-dialect   90 angle set-global
+: koch ( -- ) lparser-dialect   90 angle set
 
 H{ { "K" "[[a|b] '(0.41)f'(2.439) |<(60) [a|b]]" }
    { "k" "[ c'(0.5) K]" }
@@ -320,9 +343,9 @@ H{ { "K" "[[a|b] '(0.41)f'(2.439) |<(60) [a|b]]" }
    { "b" "e" }
    { "e" "[^ '(.2887)f'(3.4758) &(180)      +z{.-(120)f-(120)f}]" }
    { "d" "[^ '(.2887)f'(3.4758) &(109.5111) +zk{.-(120)f-(120)f}]" }
-} rules set-global
+} rules set
 
-"K" axiom set-global ;
+"K" axiom set ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
@@ -501,3 +524,26 @@ H{ { "C" "LBW" }
    { "b" "Fl!+Fl+;'b" }
    { "l" "[-cc{--z++z++z--|--z++z++z}]" }
 } rules set-global ;
+
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+! These should be moved into a separate file. They are used to pretty
+! print matricies and vectors.
+
+USING: styles prettyprint io ;
+
+: decimal-places ( n d -- n )
+10 swap ^ tuck * >fixnum swap /f ;
+
+! : .mat ( matrix -- ) [ [ 2 decimal-places ] map ] map . ;
+
+: .mat ( matrix -- )
+H{ { table-gap 4 } { table-border 4 } }
+[ 2 decimal-places pprint ]
+tabular-output ;
+
+: .vec ( vector -- ) [ 2 decimal-places ] map . ;
+
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+PROVIDE: lindenmayer ;
