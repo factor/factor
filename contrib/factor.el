@@ -108,7 +108,7 @@
 (defun factor-server ()
   (interactive)
   (make-comint "factor-server" factor-binary nil factor-image "-shell=tty")
-  (comint-send-string "*factor-server*" "USE: jedit telnet\n"))
+  (comint-send-string "*factor-server*" "USE: shells telnet\n"))
 
 ;; (defun factor-listener ()
 ;;   (interactive)
@@ -136,8 +136,8 @@
   (make-comint-in-buffer
    "factor-listener" (current-buffer) '("localhost" . 9999)))
 
-(defun load-factor-file (file-name)
-  (interactive "fLoad Factor file: ")
+(defun factor-run-file (file-name)
+  (interactive "fRun Factor file: ")
   (comint-send-string nil (format "\"%s\" run-file\n" file-name)))
 
 (defun factor-update-stack-buffer (&optional string)
