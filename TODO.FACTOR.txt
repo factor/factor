@@ -1,7 +1,5 @@
 + 0.85:
 
-- when to call reset-modified
-- C+S+END doesn't work
 - pane output in UI should use less memory
 - signal 4 on datastack underflow on mac intel??
 - faster I/O
@@ -34,6 +32,7 @@
 - status help persists after clicking on a link
 - tool help
 - browser: show currently selected vocab & words
+- doc sweep
 
 + ui:
 

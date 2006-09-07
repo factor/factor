@@ -122,7 +122,7 @@ editor {
         { "Select next line" T{ key-down f { S+ C+ } "RIGHT" } [ T{ word-elt } editor-select-next ] }
         { "Select to start of line" T{ key-down f { S+ } "HOME" } [ T{ one-line-elt } editor-select-prev ] }
         { "Select to end of line" T{ key-down f { S+ } "END" } [ T{ one-line-elt } editor-select-next ] }
-        { "Select start of document" T{ key-down f { C+ S+ } "HOME" } [ T{ doc-elt } editor-select-prev ] }
-        { "Select end of document" T{ key-down f { C+ S+ } "END" } [ T{ doc-elt } editor-select-next ] }
+        { "Select start of document" T{ key-down f { S+ C+ } "HOME" } [ T{ doc-elt } editor-select-prev ] }
+        { "Select end of document" T{ key-down f { S+ C+ } "END" } [ T{ doc-elt } editor-select-next ] }
     }
 } define-commands
