@@ -28,7 +28,7 @@ SYMBOL: windows
 
 : update-hand ( gadget -- )
     find-world [
-        dup hand-gadget get-global find-world eq?
+        dup hand-world get-global eq?
         [ hand-loc get-global swap move-hand ] [ drop ] if
     ] when* ;
 

@@ -64,6 +64,7 @@ TUPLE: key-up mods sym ;
 ! are in the co-ordinate system of the world which contains
 ! the gadget in question.
 SYMBOL: hand-gadget
+SYMBOL: hand-world
 SYMBOL: hand-loc
 { 0 0 } hand-loc set-global
 
@@ -146,6 +147,7 @@ V{ } clone hand-buttons set-global
     hand-gadget get-global parents <reversed> ;
 
 : move-hand ( loc world -- )
+    dup hand-world set-global
     under-hand >r over hand-loc set-global
     pick-up hand-gadget set-global
     under-hand r> hand-gestures ;

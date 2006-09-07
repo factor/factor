@@ -29,7 +29,6 @@
     space
 - we have trouble drawing rectangles
 - UI dataflow visualizer
-- status help persists after clicking on a link
 - tool help
 - browser: show currently selected vocab & words
 - doc sweep

@@ -36,6 +36,9 @@ C: presentation ( button object commands -- button )
 : hide-mouse-help ( presentation -- )
     find-world [ world-status f swap set-model* ] when* ;
 
+M: presentation ungraft* ( presentation -- )
+    dup hide-mouse-help delegate ungraft* ;
+
 presentation H{
     { T{ button-up f f 1 } [ [ 1 invoke-presentation ] if-clicked ] }
     { T{ button-up f f 2 } [ [ 2 invoke-presentation ] if-clicked ] }
