@@ -3,12 +3,13 @@ library, but is useful enough to ship with the Factor distribution.
 
 Modules can be loaded from the listener:
 
-  "modulename" require
+  "contrib/modulename" require
 
-Credits:
+Available libraries:
 
 - action-field -- Extended field gadget for UI (Eduardo Cavazos)
 - automata -- Graphics demo for the UI (Eduardo Cavazos)
+- benchmarks -- Various performance benchmarks (Slava Pestov)
 - boids -- Graphics demo for the UI (Eduardo Cavazos)
 - cairo -- cairo bindings (Sampo Vuori)
 - calendar -- timestamp/calendar with timezones (Doug Coleman)
@@ -21,7 +22,9 @@ Credits:
 - factory -- X11 window manager (Eduardo Cavazos)
 - gap-buffer -- Efficient text editor buffer (Alex Chapman)
 - hexdump -- Hexdump routine (Doug Coleman)
-- httpd -- Web framework (HTTP server, client, XML parser, HTML generation...) (Slava Pestov, Chris Double, Daniel Ehrenberg)
+- http -- Code shared by HTTP server and client (Slava Pestov)
+- httpd -- HTTP server (Slava Pestov, Chris Double)
+- http-client -- HTTP client (Slava Pestov)
 - jedit -- jEdit editor integration (Slava Pestov)
 - json -- JSON reader and writer (Chris Double)
 - lambda -- Lambda calculus interpreter (Matthew Willis)
@@ -43,3 +46,4 @@ Credits:
 - vars -- Alternative syntax for variables (Eduardo Cavazos)
 - vim -- VIM integration (Alex Chapman)
 - x11 -- X Window System client library (Eduardo Cavazos)
+- xml -- XML parser (Daniel Ehrenberg)

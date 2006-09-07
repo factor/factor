@@ -5,8 +5,6 @@ contrib/xml ;
 
 PROVIDE: contrib/httpd { 
     "mime.factor"
-    "xml.factor"
-    "http-common.factor"
     "html-tags.factor"
     "responder.factor"
     "httpd.factor"
@@ -19,7 +17,6 @@ PROVIDE: contrib/httpd {
     "inspect-responder.factor"
     "browser-responder.factor"
     "default-responders.factor"
-    "http-client.factor"
 } {
     "test/html.factor"
     "test/http-client.factor"
