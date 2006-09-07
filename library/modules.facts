@@ -1,7 +1,7 @@
 IN: modules
 USING: help io ;
 
-HELP: module-paths
+HELP: prefix-paths
 { $values { "name" "a module name string" } { "seq" "a sequence of strings" } { "newseq" "a new sequence of path name strings" } }
 { $description "Prepend the location of the module named " { $snippet "name" } " to every file name in " { $snippet "seq" } "." } ;
 
@@ -22,18 +22,14 @@ HELP: modules
 HELP: load-module
 { $values { "name" "a module name string" } }
 { $description "Runs the module definition file given by " { $link module-def } ", which loads the module's dependencies and source files." }
-{ $notes "Unless you want to explicitly reload the sources of a module (for example, after making changes), you should use " { $link (require) } " or " { $link require } " instead." } ;
-
-HELP: (require)
-{ $values { "name" "a module name string" } }
-{ $description "Ensures that a module has been loaded, along with all its dependencies."
-$terpri
-"If this module is already listed in the " { $link modules } " hashtable, this word does nothing. Otherwise, it calls " { $link load-module } "." }
-{ $notes "Module definitions should use the " { $link POSTPONE: REQUIRES: } " parsing word instead. In the listener, the " { $link require } " word might be more useful since it recompiles new words after loading the module." } ;
+{ $notes "Calling this word directly is rarely necessary. Usually, " { $link require } " is used to load modules and " { $link reload-modules } " is used to reload changed files." } ;
 
 HELP: require
 { $values { "name" "a module name string" } }
-{ $description "Ensures that a module has been loaded, along with all its dependencies, and recompiles all new words. This word is only for interactive use in the listener; to avoid recompiling words multiple times, any user code which needs to load modules should call " { $link (require) } " instead." } ;
+{ $description "Ensures that a module has been loaded, along with all its dependencies, and compiles all new words."
+$terpri
+"If this module is already listed in the " { $link modules } " hashtable, this word does nothing. Otherwise, it calls " { $link load-module } "." }
+{ $notes "Module definitions should use the " { $link POSTPONE: REQUIRES: } " parsing word instead. In the listener, the " { $link require } " word might be more useful since it recompiles new words after loading the module." } ;
 
 HELP: run-resources
 { $values { "seq" "a sequence of strings" } }

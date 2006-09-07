@@ -18,7 +18,7 @@ H{ } clone c-types set
 
 H{ } clone vocabularies set
 H{ } clone class<map set
-H{ } clone modules set
+V{ } clone modules set
 
 vocabularies get [ "syntax" set ] bind
 

@@ -26,15 +26,15 @@ TUPLE: module name files tests modified ;
     dupd module-modified hash
     swap resource-path file-modified number= not ;
 
-: module-paths ( name seq -- newseq )
+: prefix-paths ( name seq -- newseq )
     [ "/" swap append3 ] map-with ;
 
 C: module ( name files tests -- module )
-    [ >r >r over r> module-paths r> set-module-tests ] keep
-    [ >r dupd module-paths r> set-module-files ] keep
+    [ >r >r over r> prefix-paths r> set-module-tests ] keep
+    [ >r dupd prefix-paths r> set-module-files ] keep
     [ set-module-name ] keep ;
 
-: module modules get hash ;
+: module modules get assoc ;
 
 : load-module ( name -- )
     [
@@ -56,19 +56,25 @@ C: module ( name files tests -- module )
     [ second call ] subset
     [ first ] map ;
 
+: add-module ( module -- )
+    dup module-name swap 2array modules get push ;
+
 : provide ( name files tests -- )
     [ process-files ] 2apply <module> dup record-modified
     [ module-files run-resources ] keep
-    dup module-name modules get set-hash ;
+    add-module ;
 
 : test-module ( name -- ) module module-tests run-tests ;
 
+: all-modules ( -- seq ) modules get [ second ] map ;
+
+: all-module-names ( -- seq ) modules get [ first ] map ;
+
 : test-modules ( -- )
-    modules get hash-values
-    [ module-tests ] map concat run-tests ;
+    all-modules [ module-tests ] map concat run-tests ;
 
 : modules. ( -- )
-    modules get hash-keys natural-sort [ print ] each ;
+    all-module-names natural-sort [ print ] each ;
 
 : reload-module ( module -- )
     dup module-name module-def over modified? [
@@ -80,5 +86,4 @@ C: module ( name files tests -- module )
     ] if ;
 
 : reload-modules ( -- )
-    modules get hash-values [ reload-module ] each
-    do-parse-hook ;
+    all-modules [ reload-module ] each do-parse-hook ;
