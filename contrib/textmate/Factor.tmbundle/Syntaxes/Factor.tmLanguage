@@ -5,6 +5,7 @@
 	<key>fileTypes</key>
 	<array>
 		<string>factor</string>
+		<string>facts</string>
 	</array>
 	<key>foldingStartMarker</key>
 	<string>^\s*(M|C)?:|#(V|H|C)\{</string>
@@ -70,7 +71,7 @@
 		</dict>
 		<dict>
 			<key>match</key>
-			<string>\bCHAR:\s+[^\s]\s+</string>
+			<string>\bCHAR:\s+[^\s]+\s</string>
 			<key>name</key>
 			<string>constant.character.factor</string>
 		</dict>
@@ -128,6 +129,12 @@
 			<string>\s+\)</string>
 			<key>name</key>
 			<string>comment.parens.factor</string>
+		</dict>
+		<dict>
+			<key>match</key>
+			<string>\b[A-Z]+:\s+[^\s]+(\s|$)</string>
+			<key>name</key>
+			<string>meta.postpone.factor</string>
 		</dict>
 	</array>
 	<key>repository</key>
