@@ -125,11 +125,15 @@ walker-gadget {
     }
 } define-commands
 
+: call-walker ( quot continuation -- )
+    2array walker-gadget call-tool stop ;
+
+[ f swap call-walker ] break-hook set-global
+
 IN: tools
 
 : walk ( quot -- )
-    continuation dup continuation-data pop* 2array
-    walker-gadget call-tool stop ;
+    continuation dup continuation-data pop* call-walker ;
 
 IN: gadgets-workspace
 

@@ -1,5 +1,6 @@
 + 0.85:
 
+- [ continue ] callcc0 1 2 3 -- fails in walker
 - pane output in UI should use less memory
 - signal 4 on datastack underflow on mac intel??
 - faster I/O
@@ -21,7 +22,6 @@
 - variable width word wrap
 - add-gadget, model-changed, set-model should compile
 - graphical module manager tool
-- continuation handling in walker is screwy
 - editor:
   - only redraw visible lines
   - more efficient multi-line inserts
@@ -35,6 +35,9 @@
 
 + ui:
 
+- invoking interactor commands when interactor is busy -- still fucked
+  because of grafting and ungrafting
+- set-model set-model* and control-changed: its a hack, clean it up
 - x11: scroll up/down wiggles caret
 - perhaps commands window should sort by gesture
 - roundoff is still not quite right with tracks

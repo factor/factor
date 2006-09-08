@@ -16,22 +16,17 @@ SYMBOL: error-continuation
     [ >c call f c> drop f ] callcc1 nip ; inline
 
 : rethrow ( error -- )
-    catchstack* empty? [
-        die
-    ] [
-        dup error set-global
-        get-walker-hook [ >r c> 2array r> ] [ c> ] if*
-        continue-with
-    ] if ;
+    catchstack* empty?
+    [ die ] [ dup error set-global c> continue-with ] if ;
 
 : cleanup ( try cleanup -- )
     [ >c >r call c> drop r> call ]
-    [ drop from-callcc1 >r nip call r> rethrow ] ifcc ;
+    [ >r nip call r> rethrow ] ifcc ;
     inline
 
 : recover ( try recovery -- )
     [ >c drop call c> drop ]
-    [ drop from-callcc1 rot drop swap call ] ifcc ; inline
+    [ rot drop swap call ] ifcc ; inline
 
 TUPLE: condition restarts cc ;
 

@@ -17,10 +17,6 @@ USING: arrays namespaces sequences ;
 
 TUPLE: continuation data retain call name catch ;
 
-: <empty-continuation> ( -- continuation )
-    V{ } clone V{ } clone V{ } clone V{ } clone V{ } clone
-    <continuation> ;
-
 : continuation ( -- continuation )
     datastack retainstack callstack namestack catchstack
     <continuation> ; inline
@@ -33,17 +29,17 @@ TUPLE: continuation data retain call name catch ;
     continuation-catch ; inline
 
 : ifcc ( terminator balance -- )
-    [ f f continuation 2nip dup ] call 2swap if ; inline
+    >r >r f [ continuation nip t ] call r> r> if ; inline
 
-: callcc0 ( quot -- ) [ drop ] ifcc ; inline
+: callcc0 ( quot -- ) [ ] ifcc ; inline
+
+: callcc1 ( quot -- obj ) [ ] ifcc ; inline
 
 DEFER: continue-with
 
 : set-walker-hook 2 setenv ; inline
 
 : get-walker-hook 2 getenv f set-walker-hook ; inline
-
-: end-walk continuation get-walker-hook continue-with ;
 
 : (continue) ( continuation -- )
     >continuation<
@@ -54,16 +50,20 @@ DEFER: continue-with
     set-datastack ; inline
 
 : (continue-with) ( obj continuation -- )
-    swap 9 setenv (continue) ; inline
+    #! There's no good way to avoid this code duplication!
+    swap 9 setenv
+    >continuation<
+    set-catchstack
+    set-namestack
+    set-callstack
+    set-retainstack
+    set-datastack
+    9 getenv swap ; inline
 
 : continue ( continuation -- )
-    get-walker-hook [ (continue-with) ] [ (continue) ] if* ;
+    get-walker-hook
+    [ >r 1array r> (continue-with) ] [ (continue) ] if* ;
     inline
-
-: from-callcc1 9 getenv ;
-
-: callcc1 ( quot -- obj )
-    [ drop from-callcc1 ] ifcc ; inline
 
 : continue-with ( obj continuation -- )
     get-walker-hook [ >r 2array r> ] when* (continue-with) ;

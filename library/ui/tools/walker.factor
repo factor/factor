@@ -34,24 +34,23 @@ TUPLE: walker-gadget model quot ns ;
     [ slip update-stacks ] bind ; inline
 
 : walker-command ( gadget quot -- )
-    over walker-gadget-ns [ with-walker ] [ 2drop ] if ; inline
+    meta-interp pick walker-gadget-ns hash
+    [ with-walker ] [ 2drop ] if ; inline
 
 : reset-walker ( walker -- )
-    f over set-walker-gadget-ns
-    f over walker-gadget-model set-model
-    f over walker-gadget-quot set-model ;
+    H{ } clone swap set-walker-gadget-ns ;
 
 : walker-step [ step ] walker-command ;
 : walker-step-in [ step-in ] walker-command ;
 : walker-step-out [ step-out ] walker-command ;
 : walker-step-back [ step-back ] walker-command ;
 
-: init-walker-models ( walker -- model quot )
+: init-walker-models ( walker -- )
     f <model> over set-walker-gadget-quot
     f <model> swap set-walker-gadget-model ;
 
 : (walk) ( quot continuation walker -- )
-    H{ } clone over set-walker-gadget-ns [
+    dup reset-walker [
         V{ } clone meta-history set
         meta-interp set
         (meta-call)

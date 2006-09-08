@@ -1,9 +1,9 @@
 ! Copyright (C) 2004, 2006 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-IN: interpreter
 USING: arrays errors generic io kernel kernel-internals math
 namespaces prettyprint sequences strings threads vectors words
 hashtables ;
+IN: interpreter
 
 ! Metacircular interpreter for single-stepping
 
@@ -29,6 +29,9 @@ SYMBOL: meta-interp
 SYMBOL: callframe
 SYMBOL: callframe-scan
 SYMBOL: callframe-end
+
+! Hook
+SYMBOL: break-hook
 
 : meta-callframe ( -- seq )
     { callframe callframe-scan callframe-end } [ get ] map ;
@@ -58,29 +61,45 @@ SYMBOL: callframe-end
         { [ t ] [ >r (next) r> call ] }
     } cond ; inline
 
-: init-meta-interp ( -- )
-    <empty-continuation> meta-interp set ;
+: reset-interpreter ( -- )
+    meta-interp off f (meta-call) ;
+
+: (save-callframe) ( -- )
+    callframe get push-c
+    callframe-scan get push-c
+    callframe-end get push-c ;
 
 : save-callframe ( -- )
-    done-cf? [
-        callframe get push-c
-        callframe-scan get push-c
-        callframe-end get push-c
-    ] unless ;
+    done-cf? [ (save-callframe) ] unless ;
 
 : meta-call ( quot -- )
     #! Note we do tail call optimization here.
     save-callframe (meta-call) ;
 
+: break ( -- )
+    continuation get-walker-hook
+    [ continue-with ] [ break-hook get call ] if* ;
+
 : <callframe> ( quot -- seq )
-    \ end-walk add >quotation 0 over length 3array >vector ;
+    \ break add >quotation 0 over length 3array >vector ;
+
+: restore-normally meta-interp set ;
+
+: restore-transfer
+    first meta-interp set f (meta-call) ;
+
+: restore-transfer-with
+    first2 meta-interp set push-d
+    meta-d [ length 1- dup 1- ] keep exchange
+    [ ] (meta-call) ;
 
 : restore-harness ( obj -- )
     {
-        { [ dup continuation? ] [ ] }
-        { [ dup array? ] [ first2 >r push-d r> ] }
-        { [ dup not ] [ drop <empty-continuation> ] }
-    } cond meta-interp set ;
+        { [ dup continuation? ] [ restore-normally ] }
+        { [ dup length 0 = ] [ drop reset-interpreter ] }
+        { [ dup length 1 = ] [ restore-transfer ] }
+        { [ dup length 2 = ] [ restore-transfer-with ] }
+    } cond ;
 
 : host-quot ( quot -- )
     <callframe> meta-c swap nappend
@@ -112,7 +131,8 @@ M: object do do-1 ;
 ! The interpreter loses object identity of the name and catch
 ! stacks -- they are copied after each step -- so we execute
 ! these atomically and don't allow stepping into these words
-{ >n n> >c c> rethrow continue continue-with }
+{ >n n> >c c> rethrow continue continue-with continuation
+(continue) (continue-with) }
 [ dup [ host-word ] curry "meta-word" set-word-prop ] each
 
 \ call [ pop-d meta-call ] "meta-word" set-word-prop

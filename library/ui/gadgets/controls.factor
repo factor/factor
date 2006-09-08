@@ -25,7 +25,7 @@ M: control ungraft*
     dup control-self swap control-model remove-connection ;
 
 M: control model-changed
-    dup control-changed? [
+    ( dup control-changed? ) t [
         dup control-retain
         [ control-model model-value ] keep
         [ dup control-self swap control-quot call ] keep
