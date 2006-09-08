@@ -1,0 +1,1 @@
+PROVIDE: contrib/textmate { "textmate.factor" } { } ;
