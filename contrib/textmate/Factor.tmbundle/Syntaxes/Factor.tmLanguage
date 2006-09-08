@@ -58,9 +58,33 @@
 		</dict>
 		<dict>
 			<key>match</key>
-			<string>\b(f|t)\b</string>
+			<string>(if|when|unless)\*?</string>
+			<key>name</key>
+			<string>keyword.control.flow.factor</string>
+		</dict>
+		<dict>
+			<key>match</key>
+			<string>\s+(f|t)\s+</string>
 			<key>name</key>
 			<string>constant.language.factor</string>
+		</dict>
+		<dict>
+			<key>match</key>
+			<string>\b(BIN:|HEX:|OCT:)?\s+-?\d+\s+</string>
+			<key>name</key>
+			<string>constant.numeric.integer.factor</string>
+		</dict>
+		<dict>
+			<key>match</key>
+			<string>\b-?+\d+\.\d+(E(\+|-)\d+)?\s+</string>
+			<key>name</key>
+			<string>constant.numeric.float.factor</string>
+		</dict>
+		<dict>
+			<key>match</key>
+			<string>\b-?\d+/-?\d+\s+</string>
+			<key>name</key>
+			<string>constant.numeric.rational.factor</string>
 		</dict>
 		<dict>
 			<key>begin</key>
@@ -69,6 +93,12 @@
 			<string>"</string>
 			<key>name</key>
 			<string>string.quoted.double.factor</string>
+		</dict>
+		<dict>
+			<key>match</key>
+			<string>inline</string>
+			<key>name</key>
+			<string>storage.modifier.factor</string>
 		</dict>
 		<dict>
 			<key>begin</key>
