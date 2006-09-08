@@ -58,15 +58,21 @@
 		</dict>
 		<dict>
 			<key>match</key>
-			<string>(if|when|unless)\*?</string>
+			<string>\b(if|when|unless)\*?\s+</string>
 			<key>name</key>
 			<string>keyword.control.flow.factor</string>
 		</dict>
 		<dict>
 			<key>match</key>
-			<string>\s+(f|t)\s+</string>
+			<string>\b(f|t)\s+</string>
 			<key>name</key>
 			<string>constant.language.factor</string>
+		</dict>
+		<dict>
+			<key>match</key>
+			<string>\bCHAR:\s+[^\s]\s+</string>
+			<key>name</key>
+			<string>constant.character.factor</string>
 		</dict>
 		<dict>
 			<key>match</key>
@@ -93,6 +99,13 @@
 			<string>"</string>
 			<key>name</key>
 			<string>string.quoted.double.factor</string>
+			<key>patterns</key>
+			<array>
+				<dict>
+					<key>include</key>
+					<string>#escaped_characters</string>
+				</dict>
+			</array>
 		</dict>
 		<dict>
 			<key>match</key>
@@ -117,6 +130,27 @@
 			<string>comment.parens.factor</string>
 		</dict>
 	</array>
+	<key>repository</key>
+	<dict>
+		<key>escaped_characters</key>
+		<dict>
+			<key>patterns</key>
+			<array>
+				<dict>
+					<key>match</key>
+					<string>\\(\\|[abefnprtv'"?]|[0-3]\d{,2}|[4-7]\d?|x[a-fA-F0-9]{,2})</string>
+					<key>name</key>
+					<string>constant.character.escape.factor</string>
+				</dict>
+				<dict>
+					<key>match</key>
+					<string>\\.</string>
+					<key>name</key>
+					<string>invalid.illegal.unknown-escape.factor</string>
+				</dict>
+			</array>
+		</dict>
+	</dict>
 	<key>scopeName</key>
 	<string>source.factor</string>
 	<key>uuid</key>
