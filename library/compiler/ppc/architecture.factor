@@ -195,8 +195,15 @@ M: stack-params %freg>stack
 : %alien-callback ( quot -- )
     0 <int-vreg> load-literal "run_callback" f %alien-invoke ;
 
+: %prepare-alien-indirect ( -- )
+    "unbox_alien" f %alien-invoke
+    "alien_temp" f 12 compile-dlsym
+    3 12 0 STW ;
+
 : %alien-indirect ( -- )
-    "unbox_alien" f %alien-invoke  3 MTLR BLRL ;
+    "alien_temp" f 12 compile-dlsym
+    12 12 0 LWZ
+    12 MTLR BLRL ;
 
 : save-return 0 swap [ return-reg ] keep %freg>stack ;
 : load-return 0 swap [ return-reg ] keep %stack>freg ;

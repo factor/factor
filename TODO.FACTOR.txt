@@ -32,6 +32,8 @@
 - doc sweep
 - tool help
 - perhaps commands window should sort by gesture
+- merge keyboard help with help in some way
+- keyboard help: hide commands whose gestures are shadowed
 
 + ui:
 
@@ -41,8 +43,6 @@
 - x11: scroll up/down wiggles caret
 - roundoff is still not quite right with tracks
 - fix top level window positioning
-- merge keyboard help with help in some way
-- keyboard help: hide commands whose gestures are shadowed
 - x11.app has a problem with A+ keys
 - status bar showing number of words needing a recompile
 - services do not launch if factor not running

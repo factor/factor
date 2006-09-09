@@ -1,6 +1,6 @@
 IN: temporary
-USING: alien compiler errors inference io kernel kernel-internals
-math memory namespaces test threads ;
+USING: alien compiler errors inference io kernel
+kernel-internals math memory namespaces test threads ;
 
 : callback-1 "void" { } [ ] alien-callback ;
 
@@ -8,7 +8,7 @@ math memory namespaces test threads ;
 
 [ t ] [ callback-1 alien? ] unit-test
 
-FUNCTION: void callback_test_1 void* callback ;
+: callback_test_1 "void" { } "cdecl" alien-indirect ;
 
 [ ] [ callback-1 callback_test_1 ] unit-test
 
@@ -57,11 +57,12 @@ FUNCTION: void callback_test_1 void* callback ;
     "void" { "int" "int" } [ / "x" set ] alien-callback ;
    
 
-FUNCTION: void callback_test_2 void* callback int x int y ;
+: callback_test_2
+    "void" { "int" "int" } "cdecl" alien-indirect ;
 
 [ 3/4 ] [
     [
-        "x" off callback-8 3 4 callback_test_2 "x" get
+        "x" off 3 4 callback-8 callback_test_2 "x" get
     ] with-scope
 ] unit-test
 
@@ -69,29 +70,30 @@ FUNCTION: void callback_test_2 void* callback int x int y ;
     "void" { "int" "double" "int" }
     [ + * "x" set ] alien-callback ;
 
-FUNCTION: void callback_test_3 void* callback int x double y int z ;
+: callback_test_3
+    "void" { "int" "double" "int" } "cdecl" alien-indirect ;
 
 [ 27.0 ] [
     [
-        "x" off callback-9 3 4 5 callback_test_3 "x" get
+        "x" off 3 4 5 callback-9 callback_test_3 "x" get
     ] with-scope
 ] unit-test
 
 : callback-11 "int" { } [ 1234 ] alien-callback ;
 
-FUNCTION: int callback_test_5 void* callback ;
+: callback_test_5 "int" { } "cdecl" alien-indirect ;
 
 [ 1234 ] [ callback-11 callback_test_5 ] unit-test
 
 : callback-12 "float" { } [ pi ] alien-callback ;
 
-FUNCTION: float callback_test_6 void* callback ;
+: callback_test_6 "float" { } "cdecl" alien-indirect ;
 
 [ t ] [ callback-12 callback_test_6 pi - 0.00001 <= ] unit-test
 
 : callback-13 "double" { } [ pi ] alien-callback ;
 
-FUNCTION: double callback_test_7 void* callback ;
+: callback_test_7 "double" { } "cdecl" alien-indirect ;
 
 [ t ] [ callback-13 callback_test_7 pi = ] unit-test
 
@@ -100,11 +102,15 @@ FUNCTION: double callback_test_7 void* callback ;
     { "int" "int" "int" "int" "int" "int" "int" "int" "int" "int" }
     [ datastack "stack" set ] alien-callback ;
 
-FUNCTION: void callback_test_4 void* callback int a1 int a2 int a3 int a4 int a5 int a6 int a7 int a8 int a9 int a10 ;
+: callback_test_4
+    "void"
+    { "int" "int" "int" "int" "int" "int" "int" "int" "int" "int" }
+    "cdecl"
+    alien-indirect ;
 
 [ V{ 1 2 3 4 5 6 7 8 9 10 } ] [
     [
-        callback-10 1 2 3 4 5 6 7 8 9 10 callback_test_4
+        1 2 3 4 5 6 7 8 9 10 callback-10 callback_test_4
         "stack" get
     ] with-scope
 ] unit-test
@@ -122,6 +128,6 @@ END-STRUCT
     { "foo" }
     [ dup foo-x swap foo-y / ] alien-callback ;
 
-FUNCTION: int callback_test_8 void* callback foo x ;
+: callback_test_8 "int" { "foo" } "cdecl" alien-indirect ;
 
-[ 5 ] [ callback-14 10 2 make-foo callback_test_8 ] unit-test
+[ 5 ] [ 10 2 make-foo callback-14 callback_test_8 ] unit-test

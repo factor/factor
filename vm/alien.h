@@ -1,3 +1,5 @@
+DLLEXPORT CELL alien_temp;
+
 INLINE ALIEN* untag_alien_fast(CELL tagged)
 {
 	return (ALIEN*)UNTAG(tagged);

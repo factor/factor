@@ -49,7 +49,8 @@ M: alien-invoke-error summary
     #! code for moving these parameters to register on
     #! architectures where parameters are passed in registers
     #! (PowerPC, AMD64).
-    dup unbox-parameters "save_stacks" f %alien-invoke
+    dup unbox-parameters
+    "save_stacks" f %alien-invoke
     \ %stack>freg move-parameters ;
 
 : box-return ( ctype -- )

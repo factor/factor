@@ -33,10 +33,9 @@ M: alien-indirect-error summary
         alien-indirect-parameters stack-space %cleanup
     ] if ;
 
-: %shuffle "shuffle" word-prop phantom-shuffle end-basic-block ;
-
 M: alien-indirect generate-node
     end-basic-block compile-gc
+    %prepare-alien-indirect
     dup alien-indirect-parameters objects>registers
     %alien-indirect
     dup generate-indirect-cleanup
