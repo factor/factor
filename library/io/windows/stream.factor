@@ -4,13 +4,11 @@ IN: win32-stream
 USING: alien errors generic hashtables io-internals kernel
 kernel-internals math namespaces prettyprint sequences
 io strings threads win32-api win32-io-internals ;
-USE: interpreter
 
 TUPLE: win32-stream handle timeout cutoff fileptr file-size ;
 TUPLE: win32-stream-reader in ;
 TUPLE: win32-stream-writer out ;
 TUPLE: win32-duplex-stream ;
-SYMBOL: stream
 
 : win32-buffer-size 16384 ; inline
 
@@ -45,7 +43,7 @@ SYMBOL: stream
         over win32-stream-reader-in
         [ buffer@ ] keep buffer-capacity
         >r pick r> swap dup win32-stream-file-size
-        [ swap win32-stream-fileptr - min ] when*
+        [ swap win32-stream-fileptr - min ] [ drop ] if*
         f r> ReadFile zero? [ handle-io-error ] when stop
     ] callcc1 [ over win32-stream-reader-in n>buffer ] keep
     swap update-file-pointer ;

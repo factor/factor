@@ -70,7 +70,6 @@ M: win32-client-stream client-stream-port ( win32-client-stream -- port )
 
 IN: io 
 
-USE: interpreter
 SYMBOL: serv
 : accept ( server -- client )
     [

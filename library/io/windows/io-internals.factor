@@ -16,7 +16,6 @@ TUPLE: io-callback overlapped quotation stream ;
         997
     ] member? ;
 
-USE: prettyprint
 : handle-io-error ( -- )
     GetLastError expected-error? [ win32-throw-error ] unless ;
 
