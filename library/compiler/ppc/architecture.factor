@@ -195,6 +195,9 @@ M: stack-params %freg>stack
 : %alien-callback ( quot -- )
     0 <int-vreg> load-literal "run_callback" f %alien-invoke ;
 
+: %alien-indirect ( -- )
+    "unbox_alien" f %alien-invoke  3 MTLR BLRL ;
+
 : save-return 0 swap [ return-reg ] keep %freg>stack ;
 : load-return 0 swap [ return-reg ] keep %stack>freg ;
 

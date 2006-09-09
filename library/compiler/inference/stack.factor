@@ -25,6 +25,7 @@ sequences words parser ;
     dup shuffle-in-d swap shuffle-out-d <effect> ;
 
 : define-shuffle ( word shuffle -- )
+    [ "shuffle" set-word-prop ] 2keep
     [ shuffle>effect "infer-effect" set-word-prop ] 2keep
     [ , \ infer-shuffle , ] [ ] make "infer" set-word-prop ;
 

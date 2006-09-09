@@ -55,4 +55,7 @@ kernel-internals math memory namespaces words ;
     ! Restore return register
     pop-return-reg ;
 
+: %alien-indirect ( -- )
+    "unbox_alien" f %alien-invoke  EAX CALL ;
+
 : %cleanup ( n -- ) dup zero? [ drop ] [ ESP swap ADD ] if ;

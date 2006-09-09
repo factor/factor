@@ -48,6 +48,9 @@ M: stack-params %freg>stack
 : %alien-invoke ( symbol dll -- )
     reset-sse compile-c-call ;
 
+: %alien-indirect ( -- )
+    "unbox_alien" f %alien-invoke  RAX CALL ;
+
 : %alien-callback ( quot -- )
     RDI load-indirect "run_callback" f compile-c-call ;
 

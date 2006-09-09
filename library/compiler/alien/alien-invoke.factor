@@ -52,10 +52,10 @@ M: alien-invoke-error summary
     dup unbox-parameters "save_stacks" f %alien-invoke
     \ %stack>freg move-parameters ;
 
-: box-return ( node -- )
-    alien-invoke-return [ ] [ f swap box-parameter ] if-void ;
+: box-return ( ctype -- )
+    [ ] [ f swap box-parameter ] if-void ;
 
-: generate-cleanup ( node -- )
+: generate-invoke-cleanup ( node -- )
     dup alien-invoke-library library-abi "stdcall" = [
         drop
     ] [
@@ -66,7 +66,8 @@ M: alien-invoke generate-node
     end-basic-block compile-gc
     dup alien-invoke-parameters objects>registers
     dup alien-invoke-dlsym %alien-invoke
-    dup generate-cleanup box-return
+    dup generate-invoke-cleanup
+    alien-invoke-return box-return
     iterate-next ;
 
 M: alien-invoke stack-reserve*

@@ -112,6 +112,8 @@ DEFER: %alien-callback ( quot -- )
 
 DEFER: %callback-value ( reg-class func -- )
 
+DEFER: %alien-indirect ( -- )
+
 M: stack-params fastcall-regs drop 0 ;
 
 GENERIC: reg-size ( register-class -- n )

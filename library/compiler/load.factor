@@ -29,6 +29,7 @@ PROVIDE: library/compiler {
     "alien/compiler.factor"
     "alien/alien-invoke.factor"
     "alien/alien-callback.factor"
+    "alien/alien-indirect.factor"
     "alien/syntax.factor"
 
     "alien/alien-callback.facts"

@@ -73,3 +73,15 @@ FUNCTION: foo ffi_test_14 int x int y ;
 cpu "x86" = macosx? and [
     [ 11 6 ] [ 11 6 ffi_test_14 dup foo-x swap foo-y ] unit-test
 ] when
+
+: indirect-test-1
+    "int" { } "cdecl" alien-indirect ;
+
+[ 3 ] [ "ffi_test_1" f dlsym <alien> indirect-test-1 ] unit-test
+
+: indirect-test-2
+    "int" { "int" "int" } "cdecl" alien-indirect ;
+
+[ 5 ]
+[ 2 3 "ffi_test_2" f dlsym <alien> indirect-test-2 ]
+unit-test

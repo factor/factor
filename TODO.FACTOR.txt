@@ -17,7 +17,6 @@
 - we need to optimize  [ dup array? [ array? ] [ array? ] if ]
 - better way of dealing with compiler errors
 - track individual method usages
-- track a list of assets loaded from each module's file
 - variable width word wrap
 - add-gadget, model-changed, set-model should compile
 - graphical module manager tool
@@ -28,9 +27,11 @@
     space
 - we have trouble drawing rectangles
 - UI dataflow visualizer
-- tool help
 - browser: show currently selected vocab & words
+
 - doc sweep
+- tool help
+- perhaps commands window should sort by gesture
 
 + ui:
 
@@ -38,7 +39,6 @@
   because of grafting and ungrafting
 - set-model set-model* and control-changed: its a hack, clean it up
 - x11: scroll up/down wiggles caret
-- perhaps commands window should sort by gesture
 - roundoff is still not quite right with tracks
 - fix top level window positioning
 - merge keyboard help with help in some way
@@ -71,10 +71,11 @@
   - horizontal wheel scrolling
   - polish OS X menu bar code
 - structure editor
-- loading space invaders slows the UI down
 
 + module system:
 
+- convention for main entry point of a module
+- track a list of assets loaded from each module's file
 - generic 'define ( asset def -- )'
 - C types should be words
   - TYPEDEF: float { ... } { ... } ;   ==> \ float T{ c-type ... } "c-type" swp
@@ -85,6 +86,7 @@
 
 + compiler/ffi:
 
+- stdcall callbacks
 - see if alien calls can be made faster
 - [ r> ] infer should throw an inference error
 - compiler tests are not as reliable now because of try-compile usage
