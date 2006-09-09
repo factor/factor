@@ -3,8 +3,7 @@
 USING: test match namespaces arrays ;
 IN: temporary
 
-SYMBOL: ?a
-SYMBOL: ?b
+MATCH-VARS: ?a ?b ;
 
 [ H{ { ?a 1 } { ?b 2 } } ] [
  { ?a ?b } { 1 2 } match
@@ -13,7 +12,7 @@ SYMBOL: ?b
 [ { 1 2 } ] [ 
   { 1 2 } 
   {
-    { { ?a ?b } [ ?a get ?b get 2array ] }
+    { { ?a ?b } [ ?a ?b 2array ] }
   } match-cond
 ] unit-test
 
