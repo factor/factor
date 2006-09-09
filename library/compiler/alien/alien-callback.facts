@@ -21,4 +21,4 @@ HELP: alien-callback
     }
 }
 { $errors "Throws an " { $link alien-callback-error } " if the word calling " { $link alien-callback } " is not compiled." }
-{ $see-also alien-invoke } ;
+{ $see-also alien-invoke alien-indirect } ;

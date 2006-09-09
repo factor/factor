@@ -30,6 +30,8 @@ ARTICLE: "alien-invoke" "Calling C from Factor"
 $terpri
 "The above parsing words create word definitions which call a lower-level word; you can use it directly, too:"
 { $subsection alien-invoke }
+"Sometimes it is necessary to invoke a C function pointer, rather than a named C function:"
+{ $subsection alien-indirect }
 "There are some details concerning the conversion of Factor objects to C values, and vice versa. See " { $link "c-types" } "." ;
 
 ARTICLE: "alien-callback" "Calling Factor from C"

@@ -30,10 +30,11 @@ M: cs-loc v>operand cs-loc-n cs-reg reg-stack ;
 
 : alien-temp ( quot -- )
     0 [] swap call "alien_temp" f rel-absolute rel-dlsym ;
+    inline
 
 : %prepare-alien-indirect ( -- )
     "unbox_alien" f %alien-invoke
-    [ EAX MOV ] alien-temp ;
+    [ T{ int-regs } return-reg MOV ] alien-temp ;
 
 : %alien-indirect ( -- )
     [ CALL ] alien-temp ;

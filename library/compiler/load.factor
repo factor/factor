@@ -33,6 +33,7 @@ PROVIDE: library/compiler {
     "alien/syntax.factor"
 
     "alien/alien-callback.facts"
+    "alien/alien-indirect.facts"
     "alien/alien-invoke.facts"
     "alien/aliens.facts"
     "alien/c-types.facts"
