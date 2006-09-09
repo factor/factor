@@ -4,9 +4,9 @@ USING: help sqlite tuple-db ;
 
 ARTICLE: { "sqlite" "tuple-db-loading" } "Loading"
 "The quickest way to get up and running with this library is to load it as a module:"
-{ $code "\"sqlite\" require\nUSE: sqlite\nUSE: tuple-db\n" } 
+{ $code "\"contrib/sqlite\" require\nUSE: sqlite\nUSE: tuple-db\n" } 
 "Some simple tests can be run to check that everything is working ok:"
-{ $code "\"sqlite\" test-module" } ;
+{ $code "\"contrib/sqlite\" test-module" } ;
 
 ARTICLE: { "sqlite" "tuple-db-usage" } "Basic Usage"
 "This library can be used for storing simple Factor tuples in a sqlite database. In its current form the tuples must not contain references to other tuples and should not have a delegate set."
