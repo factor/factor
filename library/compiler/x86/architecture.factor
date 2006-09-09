@@ -28,6 +28,16 @@ M: cs-loc v>operand cs-loc-n cs-reg reg-stack ;
 
 : %alien-invoke ( symbol dll -- ) (CALL) rel-dlsym ;
 
+: alien-temp ( quot -- )
+    0 [] swap call "alien_temp" f rel-absolute rel-dlsym ;
+
+: %prepare-alien-indirect ( -- )
+    "unbox_alien" f %alien-invoke
+    [ EAX MOV ] alien-temp ;
+
+: %alien-indirect ( -- )
+    [ CALL ] alien-temp ;
+
 : with-aligned-stack ( n quot -- )
     #! On Linux, there is no requirement to align stack frames,
     #! so this is mostly a no-op.

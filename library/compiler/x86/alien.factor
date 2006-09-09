@@ -39,16 +39,6 @@ kernel-internals math memory namespaces words ;
     f %alien-invoke
     drop-return-reg ;
 
-: alien-temp ( quot -- )
-    0 [] swap call "alien_temp" f rel-absolute rel-dlsym ;
-
-: %prepare-alien-indirect ( -- )
-    "unbox_alien" f %alien-invoke
-    [ EAX MOV ] alien-temp ;
-
-: %alien-indirect ( -- )
-    [ CALL ] alien-temp ;
-
 : %alien-callback ( quot -- )
     0 <int-vreg> load-literal
     EAX PUSH
