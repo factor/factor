@@ -9,7 +9,7 @@ HELP: match
 { $examples 
     { $example "MATCH-VARS: ?a ?b ;\n{ ?a { 2 ?b } 5 } { 1 { 2 3 } _ } match\n => H{ { ?a 1 } { ?b 3 } }" }
 }
-{ $see-also match-cond  } ;
+{ $see-also match-cond POSTPONE: MATCH-VARS: } ;
 
 HELP: match-cond
 { $values { "seq" "A sequence" } { "assoc" "A sequence of quotation pairs" } }
@@ -17,7 +17,7 @@ HELP: match-cond
 { $examples 
     { $example "MATCH-VARS: ?value ;\n{ increment ?value } {\n  { { increment ?value } [ ?value do-something ] }\n  { { decrement ?value } [ ?value do-something-else ] }\n  { _ [ no-match-found ] }\n} match-cond" }
 }
-{ $see-also match } ;
+{ $see-also match POSTPONE: MATCH-VARS: } ;
 
 
 HELP: MATCH-VARS:
