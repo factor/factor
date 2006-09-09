@@ -84,5 +84,3 @@ C: buffer ( n -- buffer )
 
 : buffer-pop ( buffer -- ch )
     [ buffer-peek  1 ] keep buffer-consume ;
-
-PROVIDE: library/io/buffer ;

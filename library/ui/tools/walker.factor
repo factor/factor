@@ -38,7 +38,8 @@ TUPLE: walker-gadget model quot ns ;
     [ with-walker ] [ 2drop ] if ; inline
 
 : reset-walker ( walker -- )
-    H{ } clone swap set-walker-gadget-ns ;
+    dup H{ } clone swap set-walker-gadget-ns
+    update-stacks ;
 
 : walker-step [ step ] walker-command ;
 : walker-step-in [ step-in ] walker-command ;
@@ -48,13 +49,6 @@ TUPLE: walker-gadget model quot ns ;
 : init-walker-models ( walker -- )
     f <model> over set-walker-gadget-quot
     f <model> swap set-walker-gadget-model ;
-
-: (walk) ( quot continuation walker -- )
-    dup reset-walker [
-        V{ } clone meta-history set
-        meta-interp set
-        (meta-call)
-    ] with-walker ;
 
 : walker-gadget-quot$ gadget get walker-gadget-quot ;
 : walker-gadget-model$ gadget get walker-gadget-model ;

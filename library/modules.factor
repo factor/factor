@@ -59,7 +59,11 @@ C: module ( name files tests -- module )
 : add-module ( module -- )
     dup module-name swap 2array modules get push ;
 
+: remove-module ( name -- )
+    module [ modules get delete ] when* ;
+
 : provide ( name files tests -- )
+    pick remove-module
     [ process-files ] 2apply <module> dup record-modified
     [ module-files run-resources ] keep
     add-module ;

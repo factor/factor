@@ -2,6 +2,10 @@ IN: temporary
 USING: errors interpreter io kernel math math-internals
 namespaces prettyprint sequences test ;
 
+[ V{ [ "Hello world" print readln break + ] 1 5 } ]
+[ 3 [ "Hello world" print readln + ] 1 <breakpoint> ]
+unit-test
+
 : run ( -- ) done? [ step-in run ] unless ;
 
 : init-interpreter ( -- )
@@ -96,3 +100,9 @@ namespaces prettyprint sequences test ;
 [ V{ "4\n" } ] [
     [ [ 2 2 + number>string print ] string-out ] test-interpreter
 ] unit-test
+
+[ V{ 6 } ]
+[ [ [ 3 throw ] catch 2 * ] test-interpreter ] unit-test
+
+[ V{ 6 } ]
+[ [ [ 3 swap continue-with ] callcc1 2 * ] test-interpreter ] unit-test

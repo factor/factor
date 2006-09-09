@@ -100,10 +100,13 @@ workspace {
 } define-commands
 
 ! Walker tool
-M: walker-gadget call-tool* ( arg tool -- )
-    >r first2 r> (walk) ;
-
 IN: gadgets-walker
+
+M: walker-gadget call-tool* ( continuation walker -- )
+    dup reset-walker [
+        V{ } clone meta-history set
+        restore-normally
+    ] with-walker ;
 
 : walker-inspect ( walker -- )
     walker-gadget-ns [ meta-interp get ] bind
@@ -125,15 +128,11 @@ walker-gadget {
     }
 } define-commands
 
-: call-walker ( quot continuation -- )
-    2array walker-gadget call-tool stop ;
-
-[ f swap call-walker ] break-hook set-global
+[ walker-gadget call-tool stop ] break-hook set-global
 
 IN: tools
 
-: walk ( quot -- )
-    continuation dup continuation-data pop* call-walker ;
+: walk ( quot -- ) [ break ] swap append call ;
 
 IN: gadgets-workspace
 

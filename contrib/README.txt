@@ -41,6 +41,7 @@ Available libraries:
 - space-invaders -- Intel 8080-based Space Invaders arcade machine emulator (Chris Double)
 - splay-trees -- Splay trees (Mackenzie Straight)
 - sqlite -- SQLite binding (Chris Double)
+- textmate -- TextMate integration (Benjamin Pollack)
 - topology -- Computational algebraic topology (Slava Pestov)
 - units -- Unit conversion (Doug Coleman)
 - vars -- Alternative syntax for variables (Eduardo Cavazos)

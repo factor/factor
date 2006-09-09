@@ -33,7 +33,7 @@ TUPLE: continuation data retain call name catch ;
 
 : callcc0 ( quot -- ) [ ] ifcc ; inline
 
-: callcc1 ( quot -- obj ) [ ] ifcc ; inline
+: callcc1 ( quot -- obj ) callcc0 ; inline
 
 DEFER: continue-with
 
@@ -61,8 +61,7 @@ DEFER: continue-with
     9 getenv swap ; inline
 
 : continue ( continuation -- )
-    get-walker-hook
-    [ >r 1array r> (continue-with) ] [ (continue) ] if* ;
+    get-walker-hook [ (continue-with) ] [ (continue) ] if* ;
     inline
 
 : continue-with ( obj continuation -- )

@@ -6,7 +6,6 @@ hashtables ;
 IN: interpreter
 
 ! Metacircular interpreter for single-stepping
-
 SYMBOL: meta-interp
 
 ! Meta-stacks;
@@ -42,24 +41,22 @@ SYMBOL: break-hook
     0 callframe-scan set ;
 
 ! Callframe.
+
+: break ( -- )
+    continuation get-walker-hook
+    [ continue-with ] [ break-hook get call ] if* ;
+
+: remove-breaks \ break swap remove ;
+
 : up ( -- )
-    pop-c callframe-end set
-    pop-c callframe-scan set
-    pop-c callframe set ;
+    pop-c drop
+    pop-c pop-c cut [ remove-breaks ] 2apply
+    >r dup length callframe-scan set r> append
+    dup length callframe-end set callframe set ;
 
 : done-cf? ( -- ? ) callframe-scan get callframe-end get >= ;
 
 : done? ( -- ? ) done-cf? meta-c empty? and ;
-
-: (next)
-    callframe-scan get callframe get nth callframe-scan inc ;
-
-: next ( quot -- )
-    {
-        { [ done? ] [ drop [ ] (meta-call) ] }
-        { [ done-cf? ] [ drop up ] }
-        { [ t ] [ >r (next) r> call ] }
-    } cond ; inline
 
 : reset-interpreter ( -- )
     meta-interp off f (meta-call) ;
@@ -76,67 +73,43 @@ SYMBOL: break-hook
     #! Note we do tail call optimization here.
     save-callframe (meta-call) ;
 
-: break ( -- )
-    continuation get-walker-hook
-    [ continue-with ] [ break-hook get call ] if* ;
+: restore-normally
+    meta-interp set
+    meta-c empty? [ f (meta-call) ] [ up ] if ;
 
-: <callframe> ( quot -- seq )
-    \ break add >quotation 0 over length 3array >vector ;
-
-: restore-normally meta-interp set ;
-
-: restore-transfer
-    first meta-interp set f (meta-call) ;
-
-: restore-transfer-with
-    first2 meta-interp set push-d
-    meta-d [ length 1- dup 1- ] keep exchange
-    [ ] (meta-call) ;
+: restore-with
+    first2 restore-normally push-d
+    meta-d [ length 1- dup 1- ] keep exchange ;
 
 : restore-harness ( obj -- )
     {
         { [ dup continuation? ] [ restore-normally ] }
-        { [ dup length 0 = ] [ drop reset-interpreter ] }
-        { [ dup length 1 = ] [ restore-transfer ] }
-        { [ dup length 2 = ] [ restore-transfer-with ] }
+        { [ dup not ] [ drop reset-interpreter ] }
+        { [ dup length 2 = ] [ restore-with ] }
     } cond ;
 
-: host-quot ( quot -- )
-    <callframe> meta-c swap nappend
+: <callframe> ( quot scan -- seq )
+    >r >quotation r> over length 3array >vector ;
+
+: <breakpoint> ( break quot scan -- callframe )
+    >r cut [ break ] swap append3 r> <callframe> ;
+
+: step-to ( n -- )
+    >r meta-c r>
+    callframe get callframe-scan get <breakpoint>
+    nappend
     [ set-walker-hook meta-interp get (continue) ] callcc1
     restore-harness ;
-
-: host-word ( word -- ) unit host-quot ;
-
-GENERIC: do-1 ( object -- )
-
-M: word do-1
-    dup "meta-word" word-prop [ call ] [ host-word ] ?if ;
-
-M: wrapper do-1 wrapped push-d ;
-
-M: object do-1 push-d ;
-
-GENERIC: do ( obj -- )
-
-M: word do
-    dup "meta-word" word-prop [
-        call
-    ] [
-        dup compound? [ word-def meta-call ] [ host-word ] if
-    ] ?if ;
-
-M: object do do-1 ;
 
 ! The interpreter loses object identity of the name and catch
 ! stacks -- they are copied after each step -- so we execute
 ! these atomically and don't allow stepping into these words
 { >n n> >c c> rethrow continue continue-with continuation
 (continue) (continue-with) }
-[ dup [ host-word ] curry "meta-word" set-word-prop ] each
+[ t "no-meta-word" set-word-prop ] each
 
 \ call [ pop-d meta-call ] "meta-word" set-word-prop
-\ execute [ pop-d do ] "meta-word" set-word-prop
+\ execute [ pop-d unit meta-call ] "meta-word" set-word-prop
 \ if [ pop-d pop-d pop-d [ nip ] [ drop ] if meta-call ] "meta-word" set-word-prop
 \ dispatch [ pop-d pop-d swap nth meta-call ] "meta-word" set-word-prop
 
@@ -158,21 +131,48 @@ SYMBOL: meta-history
     [ dup pick hash swap set ] each
     meta-interp swap hash clone meta-interp set ;
 
-: step ( -- ) save-interp [ do-1 ] next ;
+: advance ( -- ) callframe-scan inc ;
 
-: step-in ( -- ) save-interp [ do ] next ;
+: (next) callframe-scan get callframe get nth ;
+
+: next ( quot -- )
+    save-interp {
+        { [ done? ] [ drop [ ] (meta-call) ] }
+        { [ done-cf? ] [ drop up ] }
+        { [ >r (next) r> call ] [ ] }
+        { [ t ] [ callframe-scan get 1+ step-to ] }
+    } cond ; inline
+
+GENERIC: (step) ( obj -- ? )
+
+M: wrapper (step) advance wrapped push-d t ;
+
+M: object (step) advance push-d t ;
+
+M: word (step) drop f ;
+
+: step ( -- ) [ (step) ] next ;
+
+: (step-in) ( word -- ? )
+    dup "meta-word" word-prop [
+        advance call t
+    ] [
+        dup "no-meta-word" word-prop not over compound? and [
+            advance word-def meta-call t
+        ] [
+            drop f
+        ] if
+    ] ?if ;
+
+: step-in ( -- )
+    [ dup word? [ (step-in) ] [ (step) ] if ] next ;
 
 : step-out ( -- )
-    save-interp
-    callframe get callframe-scan get tail
-    host-quot [ ] (meta-call) ;
+    save-interp callframe-end get step-to ;
 
 : step-all ( -- )
     save-callframe meta-interp get schedule-thread ;
 
 : step-back ( -- )
-    meta-history get dup empty? [
-        drop
-    ] [
-        pop restore-interp
-    ] if ;
+    meta-history get dup empty?
+    [ drop ] [ pop restore-interp ] if ;
