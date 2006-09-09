@@ -2,8 +2,8 @@ This library is a simple RSS2 parser and RSS reader web
 application. To run the web application you'll need to make sure you
 have the sqlite library working. This can be tested with
 
-  "sqlite" require
-  "sqlite" test-module
+  "contrib/sqlite" require
+  "contrib/sqlite" test-module
 
 Remember that to use "sqlite" you need to have done the following
 somewhere:
@@ -20,7 +20,7 @@ first started. This database contains all the feed information.
 
 To load the web application use:
 
-  "rss" require
+  "contrib/rss" require
 
 Fire up the web server and navigate to the URL:
 
