@@ -1,4 +1,4 @@
-! Copyright (C) 2004, 2006 Mackenzie Straight, Doug Coleman.
+! Copyright (C) 2006 Mackenzie Straight, Doug Coleman.
 
 IN: win32-stream
 USING: alien errors generic hashtables io-internals kernel
