@@ -1,4 +1,4 @@
-! Copyright (C) 2003, 2004 Mackenzie Straight.
+! Copyright (C) 2006 Mackenzie Straight, Doug Coleman.
 
 IN: io
 USING: compiler namespaces kernel win32-io-internals win32-stream win32-api
@@ -6,12 +6,12 @@ USING: compiler namespaces kernel win32-io-internals win32-stream win32-api
 
 : <file-reader> <win32-file-reader> ;
 : <file-writer> <win32-file-writer> ;
-: <server> <win32-server> ;
+: <server> make-win32-server ;
 
 IN: io-internals
 
 : io-multiplex ( ms -- )
-    #! FIXME: needs to work given a timeout
+    #! FIXME: needs to work given a timeout (???)
     dup -1 = [ drop INFINITE ] when cancel-timedout wait-for-io 
     swap [ schedule-thread-with ] [ drop ] if* ;
 
