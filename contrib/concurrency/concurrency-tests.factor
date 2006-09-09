@@ -1,8 +1,8 @@
 ! Copyright (C) 2005 Chris Double. All Rights Reserved.
 ! See http://factorcode.org/license.txt for BSD license.
 !
-USING: kernel concurrency concurrency-examples threads vectors 
-       sequences namespaces test errors dlists strings math words match ;
+USING: kernel concurrency threads vectors arrays sequences namespaces 
+test errors dlists strings math words match ;
 IN: temporary
 
 [ "junk" ] [ 
@@ -94,10 +94,6 @@ IN: temporary
   mailbox-get
 ] unit-test
 
-[ f ] [ 1 2 gensym <tagged-message> gensym tag-match? ] unit-test
-[ f ] [ "junk" gensym tag-match? ] unit-test
-[ t ] [ 1 2 gensym <tagged-message> dup tagged-message-tag tag-match? ] unit-test
-
 [ "test" ] [
   [ self ] "test" with-process
 ] unit-test
@@ -105,11 +101,9 @@ IN: temporary
 
 [ "received" ] [ 
   [
-    receive dup tagged-message? [
-      "received" reply    
-    ] [
-      drop f
-    ] if
+    receive { 
+      { { ?from ?tag _ } [ ?tag "received" 2array ?from send ] } 
+    } match-cond
   ] spawn
   "sent" swap send-synchronous
 ] unit-test
@@ -123,19 +117,7 @@ IN: temporary
   receive
 ] unit-test
 
-[ "pong" "Pong server shutdown commenced" ] [
-  pong-server3 "ping" over send-synchronous
-  swap "shutdown" swap send-synchronous
-] unit-test
 
-[ t 60 120 ] [
-  fragile-rpc-server
-  T{ rpc-command f "product" [ 4 5 6 ] } over send-synchronous >r
-  T{ rpc-command f "add" [ 10 20 30  ] } over send-synchronous >r
-  T{ rpc-command f "shutdown" [      ] } swap send-synchronous 
-  r> r>    
-] unit-test
- 
 [ "crash" ] [
   [
     [
@@ -159,18 +141,16 @@ IN: temporary
   50 swap fulfill
 ] unit-test  
 
-SYMBOL: ?value
-SYMBOL: ?from
-SYMBOL: ?tag
+MATCH-VARS: ?value ;
 SYMBOL: increment
 SYMBOL: decrement
 SYMBOL: value
 
 : counter ( value -- )
   receive {
-    { { increment ?value } [ ?value get + counter ] }
-    { { decrement ?value } [ ?value get - counter ] }
-    { { value ?from }      [ dup ?from get send counter ] }
+    { { increment ?value } [ ?value + counter ] }
+    { { decrement ?value } [ ?value - counter ] }
+    { { value ?from }      [ dup ?from send counter ] }
   } match-cond ;
 
 [ -5 ] [

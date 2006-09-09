@@ -7,6 +7,5 @@ PROVIDE: contrib/concurrency {
   "concurrency.factor" 
   "concurrency.facts"
 } { 
-  "concurrency-examples.factor" 
   "concurrency-tests.factor" 
 } ;
