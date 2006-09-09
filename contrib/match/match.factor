@@ -3,9 +3,19 @@
 !
 ! Based on pattern matching code from Paul Graham's book 'On Lisp'.
 IN: match
-USING: kernel words sequences namespaces hashtables ;
+USING: kernel words sequences namespaces hashtables parser ;
 
 SYMBOL: _
+USE: prettyprint
+
+: define-match-var ( name -- )
+  create-in [ dup <wrapper> , \ get , ] [ ] make define-compound ;
+
+: define-match-vars ( seq -- )
+  [ define-match-var ] each ;
+
+: MATCH-VARS: ! vars ...
+  string-mode on [ string-mode off define-match-vars ] f ; parsing
 
 : match-var? ( symbol -- bool )
   dup word? [
@@ -34,5 +44,3 @@ SYMBOL: result
   [
     [ first over match dup result set ] find 2nip dup [ result get [ second call ] bind ] [ no-cond ] if 
   ] with-scope ;
-
-
