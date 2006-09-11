@@ -284,8 +284,8 @@ void primitive_finalize_compile(void)
 		F_WORD *word = untag_word(get(AREF(pair,0)));
 		word->xt = to_cell(get(AREF(pair,1)));
 	}
-	
-	flush_icache((void*)last_flush,compiling.here - last_flush);
+
 	iterate_code_heap(last_flush,compiling.here,finalize_code_block);
+	flush_icache((void*)last_flush,compiling.here - last_flush);
 	last_flush = compiling.here;
 }

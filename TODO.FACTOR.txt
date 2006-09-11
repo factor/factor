@@ -1,5 +1,6 @@
 + 0.85:
 
+- "runtime-cli-args" help  layout bug
 - pane output in UI should use less memory
 - signal 4 on datastack underflow on mac intel??
 - faster I/O
@@ -10,7 +11,6 @@
 [ 1 2 3 4 5 6 7 8 9 10 10 10 10 10 10 10 10 10 10 11 11 11 113 
 ]
 - prettier printing of hashtable literals, alists, cond, ...
-- alien-indirect
 - more compact relocation info
 - problem if major gc happens during relocation
   - in fact relocation should not cons at all
@@ -34,9 +34,11 @@
 - perhaps commands window should sort by gesture
 - merge keyboard help with help in some way
 - keyboard help: hide commands whose gestures are shadowed
+- division by zero may not raise an error -- document this
 
 + ui:
 
+- page scrolling should be timer-based too
 - invoking interactor commands when interactor is busy -- still fucked
   because of grafting and ungrafting
 - set-model set-model* and control-changed: its a hack, clean it up
@@ -74,6 +76,7 @@
 
 + module system:
 
+- F7: friendlier error if file deleted
 - convention for main entry point of a module
 - track a list of assets loaded from each module's file
 - generic 'define ( asset def -- )'
@@ -111,6 +114,7 @@
 
 + misc:
 
+- swap nappend ==> nappend
 - sometimes darcs get fails with the httpd
 - gdb triggers 'mutliple i/o ops on port' error
 - factorcode httpd crashed: bad file descriptor
@@ -119,5 +123,9 @@
 - UDP
 - slice: if sequence or seq start is changed, abstraction violation
 - hashed generic method dispatch
+
++ httpd:
+
+- help responder has no way to access { "foo" "bar" }
 - httpd search tools
 - remaining HTML issues need fixing
