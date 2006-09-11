@@ -108,6 +108,17 @@ SYMBOL: capacity
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
+: gl-light-fv ( light pname params -- )
+>float-array [ glLightfv ] curry3 add-dlist ;
+
+: gl-light-model-fv ( pname params -- )
+>float-array [ glLightModelfv ] curry2 add-dlist ;
+
+: gl-material-fv ( face pname params -- )
+>float-array [ glMaterialfv ] curry3 add-dlist ;
+
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
 : glu-look-at ( position focus up -- )
 [ glLoadIdentity ] add-dlist
 >r >r first3 r> first3 r> first3 [ gluLookAt ] curry9 add-dlist ;
