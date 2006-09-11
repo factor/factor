@@ -1,9 +1,9 @@
 ! Copyright (C) 2006 Mackenzie Straight, Doug Coleman.
 
-IN: win32-stream
+IN: win32-server
 USING: alien errors generic kernel kernel-internals math namespaces
        prettyprint sequences io strings threads win32-api
-       win32-io-internals io-internals ;
+       win32-io-internals io-internals win32-stream ;
 
 TUPLE: win32-client-stream host port ;
 
@@ -67,27 +67,4 @@ M: win32-client-stream client-stream-port ( win32-client-stream -- port )
         >r gethostbyname dup handle-socket-error=0/f hostent-addr
         r> set-sockaddr-in-addr
     ] keep ;
-
-IN: io 
-
-SYMBOL: serv
-: accept ( server -- client )
-    [
-        duplex-stream-in
-        serv set
-        serv get update-timeout new-socket 64 <buffer>
-        [
-            serv get alloc-io-callback f swap init-overlapped
-            >r >r >r serv get win32-stream-handle r> r> 
-            buffer-ptr <alien> 0 32 32 f r> AcceptEx
-            handle-socket-error!=0/f stop
-        ] callcc1 drop
-        swap dup add-completion <win32-stream> <win32-duplex-stream>
-        dupd <win32-client-stream> swap buffer-free
-    ] with-scope ;
-
-: <client> ( host port -- stream )
-    client-sockaddr new-socket
-    [ swap "sockaddr-in" c-size connect handle-socket-error!=0/f ] keep 
-    dup add-completion <win32-stream> <win32-duplex-stream> ;
 

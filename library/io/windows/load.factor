@@ -5,5 +5,5 @@ PROVIDE: library/io/windows {
     "io-internals.factor"
     "stream.factor"
     "server.factor"
-    "io-last.factor"
+    "io.factor"
 } ;

@@ -64,8 +64,7 @@ TUPLE: win32-duplex-stream ;
         dup empty? [
             2drop >string-or-f nip
         ] [
-            swapd over >r nappend r>
-            [ length - ] keep swap do-read-count
+            rot >r [ length - ] keep r> [ swap nappend ] keep swap do-read-count
         ] if
     ] if ;
 
@@ -112,8 +111,7 @@ M: win32-stream-reader stream-read1 ( stream -- ch/f )
     >r 1 r> consume-input >string-or-f first ;
 
 M: win32-stream-reader stream-read ( n stream -- str/f )
-    >r [ <sbuf> ] keep r> -rot do-read-count ;
-
+    swap >r win32-buffer-size <sbuf> r> do-read-count ;
 
 M: win32-stream-writer stream-close ( stream -- )
     dup maybe-flush-output
