@@ -1,4 +1,4 @@
-
+USING: kernel math sequences ;
 IN: sequences-contrib
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
@@ -16,3 +16,5 @@ IN: sequences-contrib
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 : last ( seq -- elt ) dup length 1- swap nth ;
+
+PROVIDE: contrib/sequences ;
