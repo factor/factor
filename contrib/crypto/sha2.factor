@@ -120,6 +120,7 @@ SYMBOL: >word
 : string>sha2 ( string -- string )
     t preprocess-plaintext
     block-size get group [ process-chunk ] each
+    4 H get seq>string ;
 
 IN: sha2
 : string>sha-256 ( string -- string )
@@ -130,7 +131,6 @@ IN: sha2
         64 block-size set
         \ >32-bit >word set
         string>sha2
-        4 H get seq>string
     ] with-scope ;
 
 : string>sha-256-string ( string -- hexstring )
