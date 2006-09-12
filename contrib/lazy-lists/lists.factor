@@ -39,33 +39,34 @@ C: promise ( quot -- promise ) [ set-promise-quot ] keep ;
         t over set-promise-forced?
     ] unless
     promise-value ;
-  
+
+! Both 'car' and 'cdr' are promises  
 TUPLE: cons car cdr ;
 
 : nil ( -- list )
     #! The nil lazy list.
-    T{ promise f [ { } ] t { } } ;
+    { } ;
 
 : nil? ( list -- bool )
     #! Is the given lazy cons the nil value
-    force { } = ;
+    { } = ;
 
 : car ( list -- car )
     #! Return the value of the head of the lazy list. 
-    force cons-car ;
+    cons-car force ;
 
 : cdr ( list -- cdr )
     #! Return the rest of the lazy list.
     #! This is itself a lazy list.
-    force cons-cdr ;
+    cons-cdr force ;
 
 : cons ( car cdr -- list )
-    #! Given a car and cdr, both lazy values, return a lazy cons.
-    [ swap , , \ <cons> , ] [ ] make <promise> ;
+    #! Given a car and cdr, both quotations, return a cons.
+    >r <promise> r> <promise> <cons> ;
 
 : lunit ( obj -- list )
     #! Given a value produce a lazy list containing that value.
-    nil cons ;
+    unit [ nil ] cons ;
 
 : lnth ( n list -- value )
     #! Return the nth item in a lazy list
@@ -73,44 +74,28 @@ TUPLE: cons car cdr ;
 
 : uncons ( cons -- car cdr )
     #! Return the car and cdr of the lazy list
-    force dup cons-car swap cons-cdr ;
+    dup car swap cdr ;
     
-: force-promise ( list-quot -- list )
-    #! Promises to force list-quot, which should be
-    #! a quot that produces a list.
-    #! This allows caching of the resultant list value.
-    [ call \ force , ] [ ] make <promise> ; inline
-
-DEFER: lmap
-: (lmap) ( list quot -- list )
-	over nil? [ drop ] 
-	[
-  	    swap 2dup
-  	    cdr swap lmap >r
-        car swap call r> 
-  	    cons
-	] if ;
+: 2curry ( a b quot -- quot )
+  curry curry ;
 
 : lmap ( list quot -- list )
     #! Return a lazy list containing the collected result of calling
     #! quot on the original lazy list.
-    [ swap , , \ (lmap) ,  ] force-promise ;
-
-DEFER: ltake
-: (ltake) ( n list -- list )
-    over 0 = [ 2drop nil ] 
-	[ dup nil? [ nip ] 
-		[
-            swap  ( list n -- list )
-            1 - >r uncons r> swap ltake 
-            cons
-  	    ] if 
-	] if ;
+    over nil? [ 
+      drop
+    ] [
+      2dup [ >r cdr r> lmap ] 2curry >r [ >r car r> call ] 2curry r> cons 
+    ] if ;
 
 : ltake ( n list -- list )
     #! Return a lazy list containing the first n items from
     #! the original lazy list.
-    [ swap , , \ (ltake) , ] force-promise ;
+    over zero? [
+      2drop nil 
+    ] [
+      2dup [ >r 1- r> cdr ltake ] 2curry >r [ nip car ] 2curry r> cons 
+    ] if ;
 
 DEFER: lsubset
 : (lsubset) ( list pred -- list )
@@ -121,10 +106,29 @@ DEFER: lsubset
 		[ drop r> (lsubset) ] if
 	] if ;
 	
+: lsubset-car ( array pred -- value )
+  2dup >r first car dup r> call [
+    2nip 
+  ] [
+    drop >r dup first cdr 0 pick set-nth r> lsubset-car
+  ] if ;
+
+! cons needs to be lazy so lsubset can lazilly detect nil!
+! It needs to skip all 'f' entries on initial call.
 : lsubset ( list pred -- list )
     #! Return a lazy list containing the elements in llist 
     #! satisfying pred	
-	[ swap , , \ (lsubset) , ] force-promise ;
+    over nil? [    
+      drop
+    ] [ 
+      >r 1array r> 2dup [ >r first cdr r> lsubset ] 2curry >r [ lsubset-car ] 2curry r> cons  
+    ] if ;
+
+: t1 
+  [ 1 ] [ [ 2 ] [ [ 3 ] [ nil ] cons ] cons ] cons ;
+
+: t2
+  [ 2 ] [ [ 3 ] [ [ 4 ] [ nil ] cons ] cons ] cons ;
 
 : (list>backwards-vector) ( list -- vector )
     dup nil? [ drop V{ } clone ]
