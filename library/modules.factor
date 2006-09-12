@@ -61,7 +61,8 @@ C: module ( name files tests -- module )
     dup module-name swap 2array modules get push ;
 
 : remove-module ( name -- )
-    module [ modules get delete ] when* ;
+    modules get [ first = ] find-with nip
+    [ modules get delete ] when* ;
 
 : provide ( name files tests -- )
     pick remove-module
