@@ -25,7 +25,7 @@ words ;
     [ (compile) ] with-compiler ;
 
 : try-compile ( word -- )
-    [ compile ] [ error. update-xt ] recover ;
+    [ compile ] [ error. flush update-xt ] recover ;
 
 : compile-vocabs ( seq -- )
     [ words ] map concat

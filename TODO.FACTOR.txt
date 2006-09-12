@@ -1,5 +1,10 @@
 + 0.85:
 
+- UI dataflow visualizer:
+  - spacing is weird
+  - clickable nodes
+  - better-looking nodes that center their content
+  - workspace tool
 - "runtime-cli-args" help  layout bug
 - pane output in UI should use less memory
 - signal 4 on datastack underflow on mac intel??
@@ -26,7 +31,6 @@
   - write "foo| " and put caret at | then select word element: selects
     space
 - we have trouble drawing rectangles
-- UI dataflow visualizer
 - browser: show currently selected vocab & words
 
 - doc sweep

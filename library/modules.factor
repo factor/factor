@@ -13,8 +13,9 @@ TUPLE: module name files tests modified ;
     [ nip ] [ drop "/load.factor" append ] if ;
 
 : record-def-modified ( module hash -- )
-    >r module-name module-def [ file-modified ] keep r>
-    set-hash ;
+    >r module-name module-def
+    [ resource-path file-modified ] keep
+    r> set-hash ;
 
 : record-modified ( module -- )
     dup module-files

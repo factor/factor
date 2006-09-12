@@ -39,7 +39,7 @@ M: node equal? eq? ;
 : param-node { } { } { } { } ;
 : in-node >r f r> { } { } { } ;
 : out-node >r f { } r> { } { } ;
-: meta-d-node meta-d get clone in-node ;
+: meta-d-node f meta-d get clone dup { } { } ;
 
 : d-tail ( n -- seq )
     dup zero? [ drop f ] [ meta-d get swap tail* ] if ;
