@@ -14,18 +14,15 @@ C: border ( child gap -- border )
 : <default-border> ( child -- border ) 5 <border> ;
 
 : layout-border-loc ( border -- )
-    dup border-size swap gadget-child set-rect-loc ;
-
-: layout-border-dim ( border -- )
-    dup rect-dim over border-size 2 v*n v-
-    swap gadget-child set-layout-dim ;
+    dup rect-dim swap gadget-child
+    [ pref-dim v- 2 v/n ] keep set-rect-loc ;
 
 M: border pref-dim*
     [ border-size 2 v*n ] keep
     gadget-child pref-dim v+ ;
 
 M: border layout*
-    dup layout-border-loc layout-border-dim ;
+    dup layout-border-loc gadget-child prefer ;
 
 : <spacing> ( -- gadget )
     <gadget> { 10 10 } over set-layout-dim ;

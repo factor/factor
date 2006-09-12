@@ -2,10 +2,12 @@
 
 - UI dataflow visualizer:
   - spacing is weird
-  - clickable nodes
-  - better-looking nodes that center their content
+  - clickable child nodes
   - workspace tool
-- "runtime-cli-args" help  layout bug
+  - #declare needs an output
+  - #label, #if mess up height
+  - [ >r + dup r> ] foo  broken
+  - why does + look funny?
 - pane output in UI should use less memory
 - signal 4 on datastack underflow on mac intel??
 - faster I/O
