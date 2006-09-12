@@ -15,10 +15,7 @@ C: viewport ( content -- viewport )
     [ >r 3 <border> r> add-gadget ] keep
     t over set-gadget-clipped? ;
 
-M: viewport layout*
-    gadget-child prefer ;
-    ! dup gadget-child dup pref-dim rot rect-dim vmax
-    ! swap set-layout-dim ;
+M: viewport layout* gadget-child prefer ;
 
 M: viewport focusable-child*
     gadget-child ;
