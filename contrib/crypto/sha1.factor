@@ -19,7 +19,7 @@ SYMBOL: K
 
 : reset-w ( -- ) 80 <vector> w set ; inline
 : get-wth ( n -- wth ) w get nth ; inline
-: shift-wth ( n -- x ) get-wth 1 32 bitroll ; inline
+: shift-wth ( n -- x ) get-wth 1 bitroll-32 ; inline
 
 : initialize-sha1 ( -- )
     HEX: 67452301 dup h0 set A set
@@ -39,7 +39,7 @@ SYMBOL: K
      dup 3 - get-wth
      over 8 - get-wth bitxor
      over 14 - get-wth bitxor
-     swap 16 - get-wth bitxor 1 32 bitroll ;
+     swap 16 - get-wth bitxor 1 bitroll-32 ;
 
 ! f(t;B,C,D) = (B AND C) OR ((NOT B) AND D)         ( 0 <= t <= 19)
 ! f(t;B,C,D) = B XOR C XOR D                        (20 <= t <= 39)
@@ -74,7 +74,7 @@ SYMBOL: K
         [ B get C get D get ] keep sha1-f ,
         dup get-wth ,
         K get nth ,
-        A get 5 32 bitroll ,
+        A get 5 bitroll-32 ,
         E get ,
     ] { } make sum 4294967295 bitand ; inline
 
@@ -82,7 +82,7 @@ SYMBOL: K
     ! E = D;  D = C;  C = S^30(B);  B = A; A = TEMP;
     D get E set
     C get D set
-    B get 30 32 bitroll C set
+    B get 30 bitroll-32 C set
     A get B set
     A set ;
 

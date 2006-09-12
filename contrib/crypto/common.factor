@@ -1,7 +1,12 @@
 IN: crypto-internals
 USING: kernel io strings sequences namespaces math parser ;
 
-: w+ ( int -- int ) + HEX: ffffffff bitand ; inline
+IN: crypto
+: >32-bit ( n -- n ) HEX: ffffffff bitand ; inline
+: >64-bit ( n -- n ) HEX: ffffffffffffffff bitand ; inline
+
+IN: crypto-internals
+: w+ ( int -- int ) + >32-bit ; inline
 : nth-int ( string n -- int ) 2 shift dup 4 + rot <slice> le> ; inline
 : nth-int-be ( string n -- int ) 2 shift dup 4 + rot <slice> be> ; inline
 : update ( num var -- ) [ w+ ] change ; inline
@@ -25,7 +30,7 @@ USING: kernel io strings sequences namespaces math parser ;
 
 IN: crypto
 
-: bitroll ( n s w -- n )
+: bitroll ( n s w -- n' )
      #! Roll n by s bits to the left, wrapping around after
      #! w bits.
      [ 1 - bitand ] keep
@@ -33,5 +38,13 @@ IN: crypto
      [ shift-mod ] 3keep
      [ - ] keep shift-mod bitor ; inline
 
-: hex-string ( str -- str )
-    [ [ >hex 2 48 pad-left % ] each ] "" make ;
+: bitroll-32 ( n s -- n' ) 32 bitroll ;
+: bitroll-64 ( n s -- n' ) 64 bitroll ;
+: hex-string ( str -- str ) [ [ >hex 2 48 pad-left % ] each ] "" make ;
+: slice3 ( n seq -- a b c ) >r dup 3 + r> <slice> first3 ;
+
+: 4dup ( a b c d -- a b c d a b c d )
+    >r >r 2dup r> r> 2swap >r >r 2dup r> r> 2swap ;
+
+: 4keep ( w x y z quot -- w x y z )
+    >r 4dup r> swap >r swap >r swap >r swap >r call r> r> r> r> ; inline

@@ -38,7 +38,7 @@ SYMBOL: md5-sin-table
 : (ABCD) ( s i x vars result -- )
     #! bits to shift, input to float-sin, x, func
     swap >r w+ swap md5-sin-table get nth w+ r> dup first >r swap r> update
-    dup first get rot 32 bitroll over second get w+ swap first set ;
+    dup first get rot bitroll-32 over second get w+ swap first set ;
 
 : ABCD { a b c d } swap (F) (ABCD) ; inline
 : BCDA { b c d a } swap (F) (ABCD) ; inline
