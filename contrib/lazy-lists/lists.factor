@@ -7,8 +7,9 @@ USING: kernel sequences math vectors arrays namespaces generic ;
 IN: lazy-lists
 
 TUPLE: cons car cdr ;
-GENERIC: car ( cons -- car )
-GENERIC: cdr ( cons -- cdr )
+GENERIC: car  ( cons -- car )
+GENERIC: cdr  ( cons -- cdr )
+GENERIC: nil? ( cons -- bool )
 
 C: cons ( car cdr -- list ) 
     [ set-cons-cdr ] keep 
@@ -17,14 +18,11 @@ C: cons ( car cdr -- list )
 M: cons car ( cons -- car )
     cons-car ;    
 
-M: cons cdr ( cons -- cdr )
-    cons-cdr ;
+: nil ( -- cons )
+  T{ cons f f f } ;
 
-: nil ( -- list )
-    { } ;
-
-: nil? ( list -- bool )
-    { } = ;
+M: cons nil? ( cons -- bool )
+    nil eq? ;
 
 : cons ( car cdr -- list )
     <cons> ;
@@ -60,6 +58,9 @@ M: promise car ( promise -- car )
 M: promise cdr ( promise -- cdr )
   force cdr force ;
 
+M: promise nil? ( cons -- bool )
+  force nil? ;
+
 DEFER: lunit 
 DEFER: lnth 
 TUPLE: list ;
@@ -88,7 +89,7 @@ TUPLE: lazy-map cons quot ;
 : lmap ( list quot -- list )
     #! Return a lazy list containing the collected result of calling
     #! quot on the original lazy list.
-    over nil? [ drop ] [ <lazy-map> ] if ;
+    over nil? [ 2drop nil ] [ <lazy-map> ] if ;
 
 M: lazy-map car ( lazy-map -- car )
   [ lazy-map-cons car ] keep
@@ -112,32 +113,44 @@ M: lazy-take cdr ( lazy-take -- cdr )
   [ lazy-take-n 1- ] keep
   lazy-take-cons cdr ltake ;
 
-DEFER: lsubset
-: (lsubset) ( list pred -- list )
-	>r dup nil? [ r> drop ] 
-	[
-		uncons swap dup r> dup >r call 
-		[ swap r> lsubset cons ] 
-		[ drop r> (lsubset) ] if
-	] if ;
-	
-: lsubset-car ( array pred -- value )
-  2dup >r first car dup r> call [
-    2nip 
+TUPLE: lazy-subset cons quot ;
+
+: lsubset ( list quot -- list )
+    over nil? [ 2drop nil ] [ <lazy-subset> ] if ;
+
+: car-subset?  ( lazy-subset -- )
+  [ lazy-subset-cons car ] keep
+  lazy-subset-quot call ;
+
+: skip ( lazy-subset -- )
+  [ lazy-subset-cons cdr ] keep
+  set-lazy-subset-cons ;
+
+M: lazy-subset car ( lazy-subset -- car )
+  dup car-subset? [
+    lazy-subset-cons car
   ] [
-    drop >r dup first cdr 0 pick set-nth r> lsubset-car
+    dup skip car
   ] if ;
 
-! cons needs to be lazy so lsubset can lazilly detect nil!
-! It needs to skip all 'f' entries on initial call.
-: lsubset ( list pred -- list )
-    #! Return a lazy list containing the elements in llist 
-    #! satisfying pred	
-    over nil? [    
-      drop
-    ] [ 
-      >r 1array r> 2dup [ >r first cdr r> lsubset ] 2curry >r [ lsubset-car ] 2curry r> cons  
-    ] if ;
+M: lazy-subset cdr ( lazy-subset -- cdr )
+  dup car-subset? [
+    [ lazy-subset-cons cdr ] keep
+    lazy-subset-quot lsubset
+  ] [
+    dup skip cdr
+  ] if ;
+
+M: lazy-subset nil? ( lazy-subset -- bool )
+  dup lazy-subset-cons nil? [
+    drop t
+  ] [
+    dup car-subset? [
+      drop f
+    ] [
+      dup skip nil?
+    ] if 
+  ] if ;
 
 : t1 
   [ 1 ] [ [ 2 ] [ [ 3 ] [ nil ] cons ] cons ] cons ;
