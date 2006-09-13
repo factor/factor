@@ -7,7 +7,9 @@ sequences strings vectors words prettyprint ;
 \ declare [
     pop-literal nip
     dup length ensure-values
-    dup #declare [ >r length d-tail r> set-node-in-d ] keep
+    dup length d-tail
+    swap #declare
+    [ 2dup set-node-in-d set-node-out-d ] keep
     node,
 ] "infer" set-word-prop
 \ declare { object } { } <effect> "infer-effect" set-word-prop

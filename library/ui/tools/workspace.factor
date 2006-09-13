@@ -5,8 +5,9 @@ gadgets-walker gadgets-help gadgets-walker sequences
 gadgets-browser gadgets-books gadgets-frames gadgets-controls
 gadgets-grids gadgets-presentations kernel models namespaces
 styles words help parser tools memory generic threads
-gadgets-text definitions inference test prettyprint math strings
-hashtables tools modules interpreter ;
+gadgets-text gadgets-dataflow definitions inference test
+prettyprint math strings hashtables tools modules interpreter
+optimizer inference ;
 IN: gadgets-workspace
 
 GENERIC: call-tool* ( arg tool -- )
@@ -31,6 +32,7 @@ TUPLE: workspace ;
         { "Definitions" <browser> } 
         { "Documentation" <help-gadget> }
         { "Walker" <walker-gadget> }
+        { "Dataflow" <dataflow-gadget> }
     } ;
 
 C: workspace ( -- workspace )
@@ -83,6 +85,7 @@ workspace {
         { "Definitions" T{ key-down f f "F3" } [ browser select-tool ] }
         { "Documentation" T{ key-down f f "F4" } [ help-gadget select-tool ] }
         { "Walker" T{ key-down f f "F5" } [ walker-gadget select-tool ] }
+        { "Dataflow" T{ key-down f f "F6" } [ walker-gadget select-tool ] }
     }
 
     {
@@ -94,8 +97,8 @@ workspace {
     
     {
         "Workflow"
-        { "Recompile changed words" T{ key-down f f "F6" } [ drop [ recompile ] listener-gadget call-tool ] }
         { "Reload changed sources" T{ key-down f f "F7" } [ drop [ reload-modules ] listener-gadget call-tool ] }
+        { "Recompile changed words" T{ key-down f f "F8" } [ drop [ recompile ] listener-gadget call-tool ] }
     }
 } define-commands
 
@@ -130,9 +133,17 @@ walker-gadget {
 
 [ walker-gadget call-tool stop ] break-hook set-global
 
+! Dataflow tool
+M: dataflow-gadget call-tool* ( node dataflow -- )
+    dup dataflow-gadget-history add-history
+    dataflow-gadget-history set-model ;
+
 IN: tools
 
 : walk ( quot -- ) [ break ] swap append call ;
+
+: show-dataflow ( quot -- )
+    dataflow optimize dataflow-gadget call-tool ;
 
 IN: gadgets-workspace
 
@@ -317,6 +328,14 @@ M: operation invoke-command ( target operation -- )
 
 [ quotation? ] H{
     { +group+ "Quotations" }
+    { +name+ "Dataflow" }
+    { +gesture+ T{ key-down f { C+ A+ } "d" } }
+    { +quot+ [ show-dataflow ] }
+    { +listener+ t }
+} define-operation
+
+[ quotation? ] H{
+    { +group+ "Quotations" }
     { +name+ "Walk" }
     { +gesture+ T{ key-down f { C+ A+ } "w" } }
     { +quot+ [ walk ] }
@@ -329,6 +348,13 @@ M: operation invoke-command ( target operation -- )
     { +gesture+ T{ key-down f { C+ A+ } "t" } }
     { +quot+ [ time ] }
     { +listener+ t }
+} define-operation
+
+! Dataflow nodes
+[ node? ] H{
+    { +group+ "Nodes" }
+    { +name+ "Display" }
+    { +quot+ [ dataflow-gadget call-tool ] }
 } define-operation
 
 ! Define commands in terms of operations

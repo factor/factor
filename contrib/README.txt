@@ -21,6 +21,8 @@ Available libraries:
 - emacs -- emacs integration (Eduardo Cavazos)
 - embedded -- simple template processor (Alex Chapman)
 - factory -- X11 window manager (Eduardo Cavazos)
+- furnace -- Web framework (Slava Pestov)
+- furnace-pastebin -- demo app for Furnace (Slava Pestov)
 - gap-buffer -- Efficient text editor buffer (Alex Chapman)
 - hexdump -- Hexdump routine (Doug Coleman)
 - http -- Code shared by HTTP server and client (Slava Pestov)

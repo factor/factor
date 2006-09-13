@@ -2,9 +2,6 @@
 
 - UI dataflow visualizer:
   - spacing is weird
-  - clickable child nodes
-  - workspace tool
-  - #declare needs an output
   - #label, #if mess up height
   - [ >r + dup r> ] foo  broken
   - why does + look funny?
@@ -33,7 +30,7 @@
   - write "foo| " and put caret at | then select word element: selects
     space
 - we have trouble drawing rectangles
-- browser: show currently selected vocab & words
+- ui browser: show currently selected vocab & words
 
 - doc sweep
 - tool help

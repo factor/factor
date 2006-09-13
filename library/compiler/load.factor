@@ -14,7 +14,6 @@ PROVIDE: library/compiler {
     "optimizer/optimizer.factor"
     "optimizer/inline-methods.factor"
     "optimizer/call-optimizers.factor"
-    "optimizer/print-dataflow.factor"
 
     "generator/architecture.factor"
     "generator/templates.factor"
