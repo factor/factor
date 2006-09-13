@@ -1,7 +1,7 @@
 ! Copyright (C) 2006 Chris Double.
 ! See http://factorcode.org/license.txt for BSD license.
 
-USING: help lazy-lists ;
+USING: help lazy-lists sequences ;
 
 HELP: <promise> 
 { $values { "quot" "a quotation with stack effect ( -- X )" } { "promise" "a promise object" } }
@@ -14,46 +14,116 @@ HELP: force
 { $see-also <promise> } ;
 
 HELP: <cons> 
-{ $values { "car" "A promise for the head of the lazy list" } { "cdr" "A promise for the tail of the lazy list" } { "cons" "a cons object" } }
-{ $description "Constructs a lazy cons cell. The car and cdr are promises that, when forced, provide the non-lazy values." }
-{ $see-also car cdr nil } ;
+{ $values { "car" "the head of the lazy list" } { "cdr" "the tail of the lazy list" } { "cons" "a cons object" } }
+{ $description "Constructs a cons cell." }
+{ $see-also cons car cdr nil nil? } ;
 
 HELP: car
 { $values { "cons" "a cons object" } { "car" "the first item in the list" } }
-{ $description "Returns the first item in the list. This causes the item to be evaluated." } 
-{ $see-also <cons> car cdr } ;
+{ $description "Returns the first item in the list." } 
+{ $see-also cons cdr nil nil? } ;
 
 HELP: cdr
 { $values { "cons" "a cons object" } { "cdr" "a cons object" } }
 { $description "Returns the tail of the list." } 
-{ $see-also <cons> car cdr } ;
-
-HELP: cons
-{ $values { "car" "a quotation with stack effect ( -- X )" } { "cdr" "a quotation with stack effect ( -- cons )" } { "cons" "the resulting cons object" } }
-{ $description "Constructs a cons object for a lazy list from two quotations. The 'car' quotation should return the head of the list, and the 'cons' quotation the tail when called." } 
-{ $see-also <cons> car cdr } ;
+{ $see-also cons car nil nil? } ;
 
 HELP: nil 
-{ $values { "array" "An empty array" } }
-{ $description "Returns a representation of an empty lazy list" } 
-{ $see-also <cons> car cdr nil? } ;
+{ $values { "cons" "An empty cons" } }
+{ $description "Returns a representation of an empty list" } 
+{ $see-also cons car cdr nil? } ;
 
 HELP: nil? 
 { $values { "cons" "a cons object" } }
-{ $description "Return true if the cons object is the nil list." } 
-{ $see-also nil } ;
+{ $description "Return true if the cons object is the nil cons." } 
+{ $see-also cons car cdr nil  } ;
 
-HELP: <list>
-{ $values { "car" "the car of the list" } { "cdr" "a <cons> object for the cdr of the list" } { "list" "a lazy list" } }
-{ $description "Constructs a lazy list where the car is already forced and the cdr is an already forced list." } 
-{ $see-also car cdr } ;
+HELP: cons 
+{ $values { "car" "the head of the lazy list" } { "cdr" "the tail of the lazy list" } { "cons" "a cons object" } }
+{ $description "Constructs a cons cell." }
+{ $see-also car cdr nil nil? } ;
 
 HELP: 1list
-{ $values { "obj" "an object" } { "list" "a list" } }
+{ $values { "obj" "an object" } { "cons" "a cons object" } }
 { $description "Create a list with 1 element." } 
-{ $see-also <list> 2list } ;
+{ $see-also 2list } ;
 
 HELP: 2list
-{ $values { "a" "an object" } { "b" "an object" } { "list" "a list" } }
+{ $values { "a" "an object" } { "b" "an object" } { "cons" "a cons object" } }
 { $description "Create a list with 2 elements." } 
-{ $see-also <list> 1list } ;
+{ $see-also 1list } ;
+
+HELP: lazy-cons
+{ $values { "car" "a quotation with stack effect ( -- X )" } { "cdr" "a quotation with stack effect ( -- cons )" } { "cons" "the resulting cons object" } }
+{ $description "Constructs a cons object for a lazy list from two quotations. The 'car' quotation should return the head of the list, and the 'cons' quotation the tail when called. When " { $link cons } " or " { $link cdr } " are called on the lazy-cons object then the appropriate quotation is called." } 
+{ $see-also cons car cdr nil nil? } ;
+
+HELP: 1lazy-list
+{ $values { "a" "a quotation with stack effect ( -- X )" } { "lazy-cons" "a lazy-cons object" } }
+{ $description "Create a lazy list with 1 element. The element is the result of calling the quotation. The quotation is only called when the list element is requested." } 
+{ $see-also 2lazy-list 3lazy-list } ;
+
+HELP: 2lazy-list
+{ $values { "a" "a quotation with stack effect ( -- X )" } { "b" "a quotation with stack effect ( -- X )" } { "lazy-cons" "a lazy-cons object" } }
+{ $description "Create a lazy list with 2 elements. The elements are the result of calling the quotations. The quotations are only called when the list elements are requested." } 
+{ $see-also 1lazy-list 3lazy-list } ;
+
+HELP: 3lazy-list
+{ $values { "a" "a quotation with stack effect ( -- X )" } { "b" "a quotation with stack effect ( -- X )" } { "c" "a quotation with stack effect ( -- X )" } { "lazy-cons" "a lazy-cons object" } }
+{ $description "Create a lazy list with 3 elements. The elements are the result of calling the quotations. The quotations are only called when the list elements are requested." } 
+{ $see-also 1lazy-list 2lazy-list } ;
+
+HELP: lnth
+{ $values { "n" "an integer index" } { "list" "a cons object" } { "elt" "the element at the nth index" } }
+{ $description "Outputs the nth element of the list." } 
+{ $see-also cons car cdr } ;
+
+HELP: uncons
+{ $values { "cons" "a cons object" } { "car" "the head of the list" } { "cdr" "the tail of the list" } }
+{ $description "Put the head and tail of the list on the stack." } 
+{ $see-also cons car cdr } ;
+
+HELP: leach
+{ $values { "list" "a cons object" } { "quot" "a quotation with stack effect ( -- )" } }
+{ $description "Call the quotation for each item in the list." } 
+{ $see-also lmap ltake lsubset lappend lfrom lfrom-by } ;
+
+HELP: lmap
+{ $values { "list" "a cons object" } { "quot" "a quotation with stack effect ( -- X )" } { "result" "resulting cons object" } }
+{ $description "Perform a similar functionality to that of the " { $link map } " word, but in a lazy manner. No evaluation of the list elements occurs initially but a " { $link <lazy-map> } " object is returned which conforms to the list protocol. Calling " { $link car } ", " { $link cdr } " or " { $link nil? } " on this will evaluate elements as required." } 
+{ $see-also leach ltake lsubset lappend lfrom lfrom-by } ;
+
+HELP: ltake
+{ $values { "n" "a non negative integer" } { "list" "a cons object" } { "result" "resulting cons object" } }
+{ $description "Outputs a lazy list containing the first n items in the list. This is done a lazy manner. No evaluation of the list elements occurs initially but a " { $link <lazy-take> } " object is returned which conforms to the list protocol. Calling " { $link car } ", " { $link cdr } " or " { $link nil? } " on this will evaluate elements as required." } 
+{ $see-also leach lmap lsubset lappend lfrom lfrom-by } ;
+
+HELP: lsubset
+{ $values { "list" "a cons object" } { "quot" "a quotation with stack effect ( -- X )" } { "result" "resulting cons object" } }
+{ $description "Perform a similar functionality to that of the " { $link subset } " word, but in a lazy manner. No evaluation of the list elements occurs initially but a " { $link <lazy-subset> } " object is returned which conforms to the list protocol. Calling " { $link car } ", " { $link cdr } " or " { $link nil? } " on this will evaluate elements as required." } 
+{ $see-also leach lmap ltake lappend lfrom lfrom-by } ;
+
+HELP: list>vector
+{ $values { "list" "a cons object" } { "vector" "the list converted to a vector" } }
+{ $description "Convert a list to a vector. If the list is a lazy infinite list then this will enter an infinite loop." } 
+{ $see-also list>array } ;
+
+HELP: list>array
+{ $values { "list" "a cons object" } { "array" "the list converted to an array" } }
+{ $description "Convert a list to an array. If the list is a lazy infinite list then this will enter an infinite loop." } 
+{ $see-also list>vector } ;
+
+HELP: lappend
+{ $values { "list1" "a cons object" } { "list2" "a cons object" } { "result" "a lazy list of list2 appended to list1" } }
+{ $description "Perform a similar functionality to that of the " { $link append } " word, but in a lazy manner. No evaluation of the list elements occurs initially but a " { $link <lazy-append> } " object is returned which conforms to the list protocol. Calling " { $link car } ", " { $link cdr } " or " { $link nil? } " on this will evaluate elements as required. Successive calls to " { $link cdr } " will iterate through list1, followed by list2." } 
+{ $see-also leach lmap ltake lsubset lfrom lfrom-by } ;
+
+HELP: lfrom-by
+{ $values { "n" "an integer" } { "quot" "a quotation with stack effect ( -- int )" } { "result" "a lazy list of integers" } }
+{ $description "Return an infinite lazy list of values starting from n, with each successive value being the result of applying quot to n." } 
+{ $see-also leach lmap ltake lsubset lfrom } ;
+
+HELP: lfrom
+{ $values { "n" "an integer" } { "result" "a lazy list of integers" } }
+{ $description "Return an infinite lazy list of incrementing integers starting from n." } 
+{ $see-also leach lmap ltake lsubset lfrom-by } ;

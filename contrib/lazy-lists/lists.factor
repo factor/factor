@@ -2,36 +2,10 @@
 ! See http://factorcode.org/license.txt for BSD license.
 !
 ! Updated by Matthew Willis, July 2006
+! Updated by Chris Double, September 2006
 
 USING: kernel sequences math vectors arrays namespaces generic ;
 IN: lazy-lists
-
-TUPLE: cons car cdr ;
-GENERIC: car  ( cons -- car )
-GENERIC: cdr  ( cons -- cdr )
-GENERIC: nil? ( cons -- bool )
-
-C: cons ( car cdr -- list ) 
-    [ set-cons-cdr ] keep 
-    [ set-cons-car ] keep ;
-
-M: cons car ( cons -- car )
-    cons-car ;    
-
-: nil ( -- cons )
-  T{ cons f f f } ;
-
-M: cons nil? ( cons -- bool )
-    nil eq? ;
-
-: cons ( car cdr -- list )
-    <cons> ;
-
-: 1list ( obj -- cons )
-    nil <cons> ;
-
-: 2list ( obj obj -- cons )
-    nil <cons> <cons> ;
 
 TUPLE: promise quot forced? value ;
 
@@ -46,6 +20,36 @@ C: promise ( quot -- promise ) [ set-promise-quot ] keep ;
         t over set-promise-forced?
     ] unless
     promise-value ;
+
+TUPLE: cons car cdr ;
+GENERIC: car  ( cons -- car )
+GENERIC: cdr  ( cons -- cdr )
+GENERIC: nil? ( cons -- bool )
+
+C: cons ( car cdr -- list ) 
+    [ set-cons-cdr ] keep 
+    [ set-cons-car ] keep ;
+
+M: cons car ( cons -- car )
+    cons-car ;    
+
+M: cons cdr ( cons -- cdr )
+    cons-cdr ;    
+
+: nil ( -- cons )
+  T{ cons f f f } ;
+
+M: cons nil? ( cons -- bool )
+    nil eq? ;
+
+: cons ( car cdr -- list )
+    <cons> ;
+
+: 1list ( obj -- cons )
+    nil <cons> ;
+
+: 2list ( a b -- cons )
+    nil <cons> <cons> ;
 
 ! Both 'car' and 'cdr' are promises  
 : lazy-cons ( car cdr -- promise ) 
@@ -80,15 +84,20 @@ TUPLE: list ;
 : uncons ( cons -- car cdr )
     #! Return the car and cdr of the lazy list
     dup car swap cdr ;
-    
+
+: leach ( list quot -- )
+  swap dup nil? [ 
+    2drop 
+  ] [
+    uncons swap pick call swap leach
+  ] if ;
+
 : 2curry ( a b quot -- quot )
   curry curry ;
 
 TUPLE: lazy-map cons quot ;
 
-: lmap ( list quot -- list )
-    #! Return a lazy list containing the collected result of calling
-    #! quot on the original lazy list.
+: lmap ( list quot -- result )
     over nil? [ 2drop nil ] [ <lazy-map> ] if ;
 
 M: lazy-map car ( lazy-map -- car )
@@ -99,11 +108,12 @@ M: lazy-map cdr ( lazy-map -- cdr )
   [ lazy-map-cons cdr ] keep
   lazy-map-quot lmap ;
 
+M: lazy-map nil? ( lazy-map -- bool )
+  lazy-map-cons nil? ;
+
 TUPLE: lazy-take n cons ;
 
-: ltake ( n list -- list )
-    #! Return a lazy list containing the first n items from
-    #! the original lazy list.
+: ltake ( n list -- result )
     over zero? [ 2drop nil ] [ <lazy-take> ] if ;
      
 M: lazy-take car ( lazy-take -- car )
@@ -112,6 +122,9 @@ M: lazy-take car ( lazy-take -- car )
 M: lazy-take cdr ( lazy-take -- cdr )
   [ lazy-take-n 1- ] keep
   lazy-take-cons cdr ltake ;
+
+M: lazy-take nil? ( lazy-take -- bool )
+  lazy-take-n zero? ;
 
 TUPLE: lazy-subset cons quot ;
 
@@ -152,90 +165,50 @@ M: lazy-subset nil? ( lazy-subset -- bool )
     ] if 
   ] if ;
 
-: t1 
-  [ 1 ] [ [ 2 ] [ [ 3 ] [ nil ] cons ] cons ] cons ;
-
-: t2
-  [ 2 ] [ [ 3 ] [ [ 4 ] [ nil ] cons ] cons ] cons ;
-
-: (list>backwards-vector) ( list -- vector )
-    dup nil? [ drop V{ } clone ]
-	[ uncons (list>backwards-vector) swap over push ] if ;
-	
 : list>vector ( list -- vector )
-    #! Convert a lazy list to a vector. This will cause
-    #! an infinite loop if the lazy list is an infinite list.
-    (list>backwards-vector) reverse ;
+  [ [ , ] leach ] V{ } make ;
 
 : list>array ( list -- array )
-    list>vector >array ;
+  [ [ , ] leach ] { } make ;
 
-DEFER: backwards-vector>list
-: (backwards-vector>list) ( vector -- list )
-    dup empty? [ drop nil ]
-	[ dup pop swap backwards-vector>list cons ] if ;
+TUPLE: lazy-append list1 list2 ;
 
-DEFER: force-promise
+: lappend ( list1 list2 -- result )
+  {
+    { [ over nil? over nil? and ] [ 2drop nil ] }
+    { [ over nil? ] [ nip ] }
+    { [ dup nil? ] [ drop ] }
+    { [ t ] [ <lazy-append> ] }
+  } cond ;
 
-: backwards-vector>list ( vector -- list )
-    [ , \ (backwards-vector>list) , ] force-promise ;
-    
-: array>list ( array -- list )
-    #! Convert a list to a lazy list.
-    reverse >vector backwards-vector>list ;
+M: lazy-append car ( lazy-append -- car )
+  lazy-append-list1 car ;
 
-DEFER: lappend*
-: (lappend*) ( lists -- list )
-	dup nil? [ 
-		uncons >r dup nil? [ drop r> (lappend*) ]
-		[ uncons r> cons lappend* cons ] if
-	] unless ;
+M: lazy-append cdr ( lazy-append -- cdr )
+  [ lazy-append-list1 cdr  ] keep
+  lazy-append-list2 lappend ;
 
-: lappend* ( llists -- list )
-    #! Given a lazy list of lazy lists, concatenate them 
-    #! together in a lazy fashion. The actual appending is 
-    #! done lazily on iteration rather than immediately
-    #! so it works very fast no matter how large the lists.
-	[ , \ (lappend*) , ] force-promise ;
+M: lazy-append nil? ( lazy-append -- bool )
+  dup lazy-append-list1 nil? [
+    drop t 
+  ] [
+    lazy-append-list2 nil? 
+  ] if ;
 
-: lappend ( list1 list2 -- llist )
-    #! Concatenate two lazy lists such that they appear to be one big
-    #! lazy list.
-    lunit cons lappend* ;
+TUPLE: lazy-from-by n quot ;
 
-: leach ( list quot -- )
-    #! Call the quotation on each item in the lazy list. 
-    #! Warning: If the list is infinite then this will
-    #! never return. 
-	swap dup nil? [ 2drop ] [
-		uncons swap pick call swap leach
-	] if ;
-
-DEFER: lapply	
-: (lapply) ( list quot -- list )
-	over nil? [ drop ] [ 
-		swap dup car >r uncons pick call swap lapply
-		r> swap cons 
-	] if ;
-	
-: lapply ( list quot -- list )
-    #! Returns a lazy list which is
-	#! (cons (car list)
-	#!		   (lapply (quot (car list) (cdr list)) quot))
-	#! This allows for complicated list functions
-    [ swap , , \ (lapply) , ] force-promise ;
-
-DEFER: lfrom-by
-: (lfrom-by) ( n quot -- list )
-	2dup call swap lfrom-by cons ;
-	
 : lfrom-by ( n quot -- list )
-    #! Return a lazy list of values starting from n, with
-    #! each successive value being the result of applying quot to
-    #! n.
-    [ swap , , \ (lfrom-by) , ] force-promise ;
+  <lazy-from-by> ;
     
 : lfrom ( n -- list )
-	#! Return a lazy list of increasing numbers starting
-	#! from the initial value 'n'.
-	[ 1 + ] lfrom-by ;
+  [ 1 + ] lfrom-by ;
+
+M: lazy-from-by car ( lazy-from-by -- car )
+  lazy-from-by-n ;
+
+M: lazy-from-by cdr ( lazy-from-by -- cdr )
+  [ lazy-from-by-n ] keep
+  lazy-from-by-quot dup >r call r> lfrom-by ;
+
+M: lazy-from-by nil? ( lazy-from-by -- bool )
+  drop f ;
