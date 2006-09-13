@@ -1,30 +1,39 @@
-! Updated by Matthew Willis, July 2006
-!
 ! Copyright (C) 2004 Chris Double.
-! 
-! Redistribution and use in source and binary forms, with or without
-! modification, are permitted provided that the following conditions are met:
-! 
-! 1. Redistributions of source code must retain the above copyright notice,
-!    this list of conditions and the following disclaimer.
-! 
-! 2. Redistributions in binary form must reproduce the above copyright notice,
-!    this list of conditions and the following disclaimer in the documentation
-!    and/or other materials provided with the distribution.
-! 
-! THIS SOFTWARE IS PROVIDED ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES,
-! INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND
-! FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
-! DEVELOPERS AND CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
-! SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
-! PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS;
-! OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
-! WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
-! OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
-! ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+! See http://factorcode.org/license.txt for BSD license.
+!
+! Updated by Matthew Willis, July 2006
 
-USING: kernel sequences math vectors arrays namespaces ;
+USING: kernel sequences math vectors arrays namespaces generic ;
 IN: lazy-lists
+
+TUPLE: cons car cdr ;
+GENERIC: car ( cons -- car )
+GENERIC: cdr ( cons -- cdr )
+
+C: cons ( car cdr -- list ) 
+    [ set-cons-cdr ] keep 
+    [ set-cons-car ] keep ;
+
+M: cons car ( cons -- car )
+    cons-car ;    
+
+M: cons cdr ( cons -- cdr )
+    cons-cdr ;
+
+: nil ( -- list )
+    { } ;
+
+: nil? ( list -- bool )
+    { } = ;
+
+: cons ( car cdr -- list )
+    <cons> ;
+
+: 1list ( obj -- cons )
+    nil <cons> ;
+
+: 2list ( obj obj -- cons )
+    nil <cons> <cons> ;
 
 TUPLE: promise quot forced? value ;
 
@@ -41,36 +50,31 @@ C: promise ( quot -- promise ) [ set-promise-quot ] keep ;
     promise-value ;
 
 ! Both 'car' and 'cdr' are promises  
-TUPLE: cons car cdr ;
+: lazy-cons ( car cdr -- promise ) 
+    >r <promise> r> <promise> <cons> 
+    T{ promise f f t f } clone [ set-promise-value ] keep ;
 
-: nil ( -- list )
-    #! The nil lazy list.
-    { } ;
+M: promise car ( promise -- car )
+  force car force ;
 
-: nil? ( list -- bool )
-    #! Is the given lazy cons the nil value
-    { } = ;
+M: promise cdr ( promise -- cdr )
+  force cdr force ;
 
-: car ( list -- car )
-    #! Return the value of the head of the lazy list. 
-    cons-car force ;
+DEFER: lunit 
+DEFER: lnth 
+TUPLE: list ;
 
-: cdr ( list -- cdr )
-    #! Return the rest of the lazy list.
-    #! This is itself a lazy list.
-    cons-cdr force ;
+: 1lazy-list ( a -- lazy-cons )
+  [ nil ] lazy-cons ;
 
-: cons ( car cdr -- list )
-    #! Given a car and cdr, both quotations, return a cons.
-    >r <promise> r> <promise> <cons> ;
+: 2lazy-list ( a b -- lazy-cons )
+  1lazy-list unit lazy-cons ;
 
-: lunit ( obj -- list )
-    #! Given a value produce a lazy list containing that value.
-    unit [ nil ] cons ;
+: 3lazy-list ( a b c -- lazy-cons )
+  2lazy-list unit lazy-cons ;
 
-: lnth ( n list -- value )
-    #! Return the nth item in a lazy list
-    swap [ cdr ] times car ;
+: lnth ( n list -- elt ) 
+  swap [ cdr ] times car ;
 
 : uncons ( cons -- car cdr )
     #! Return the car and cdr of the lazy list
@@ -79,23 +83,34 @@ TUPLE: cons car cdr ;
 : 2curry ( a b quot -- quot )
   curry curry ;
 
+TUPLE: lazy-map cons quot ;
+
 : lmap ( list quot -- list )
     #! Return a lazy list containing the collected result of calling
     #! quot on the original lazy list.
-    over nil? [ 
-      drop
-    ] [
-      2dup [ >r cdr r> lmap ] 2curry >r [ >r car r> call ] 2curry r> cons 
-    ] if ;
+    over nil? [ drop ] [ <lazy-map> ] if ;
+
+M: lazy-map car ( lazy-map -- car )
+  [ lazy-map-cons car ] keep
+  lazy-map-quot call ;
+
+M: lazy-map cdr ( lazy-map -- cdr )
+  [ lazy-map-cons cdr ] keep
+  lazy-map-quot lmap ;
+
+TUPLE: lazy-take n cons ;
 
 : ltake ( n list -- list )
     #! Return a lazy list containing the first n items from
     #! the original lazy list.
-    over zero? [
-      2drop nil 
-    ] [
-      2dup [ >r 1- r> cdr ltake ] 2curry >r [ nip car ] 2curry r> cons 
-    ] if ;
+    over zero? [ 2drop nil ] [ <lazy-take> ] if ;
+     
+M: lazy-take car ( lazy-take -- car )
+  lazy-take-cons car ;
+
+M: lazy-take cdr ( lazy-take -- cdr )
+  [ lazy-take-n 1- ] keep
+  lazy-take-cons cdr ltake ;
 
 DEFER: lsubset
 : (lsubset) ( list pred -- list )
@@ -146,6 +161,8 @@ DEFER: backwards-vector>list
 : (backwards-vector>list) ( vector -- list )
     dup empty? [ drop nil ]
 	[ dup pop swap backwards-vector>list cons ] if ;
+
+DEFER: force-promise
 
 : backwards-vector>list ( vector -- list )
     [ , \ (backwards-vector>list) , ] force-promise ;
