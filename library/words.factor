@@ -155,10 +155,11 @@ SYMBOL: bootstrapping?
 : xref-words ( -- )
     all-words [ uses ] crossref get build-graph ;
 
+: create-vocab ( name -- vocab )
+    vocabularies get [ nest ] bind ;
+
 : reveal ( word -- )
-    vocabularies get [
-        dup word-name over word-vocabulary nest set-hash
-    ] bind ;
+    dup word-name over word-vocabulary create-vocab set-hash ;
 
 TUPLE: check-create name vocab ;
 : check-create ( name vocab -- name vocab )

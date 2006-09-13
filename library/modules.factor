@@ -25,7 +25,7 @@ TUPLE: module name files tests modified ;
 
 : modified? ( file module -- ? )
     dupd module-modified hash
-    swap resource-path file-modified < ;
+    swap resource-path file-modified [ < ] [ drop f ] if* ;
 
 : prefix-paths ( name seq -- newseq )
     [ "/" swap append3 ] map-with ;

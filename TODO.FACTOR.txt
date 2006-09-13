@@ -44,6 +44,7 @@
 
 + ui:
 
+- better help result ranking
 - page scrolling should be timer-based too
 - invoking interactor commands when interactor is busy -- still fucked
   because of grafting and ungrafting
