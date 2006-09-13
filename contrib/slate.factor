@@ -1,9 +1,9 @@
 ! Copyright (C) 2006 Eduardo Cavazos.
 
-REQUIRES: contrib/math ;
+REQUIRES: contrib/math contrib/alien ;
 
-USING: kernel namespaces math sequences vectors arrays opengl
-       math-contrib gadgets ;
+USING: alien-contrib kernel namespaces math sequences vectors
+       arrays opengl math-contrib gadgets ;
 
 IN: slate
 
