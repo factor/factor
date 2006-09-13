@@ -27,7 +27,7 @@ USING: lazy-lists math kernel sequences test ;
 IN: lazy-examples
 
 : naturals 0 lfrom ;
-: positves 1 lfrom ;
+: positives 1 lfrom ;
 : evens 0 [ 2 + ] lfrom-by ;
 : odds 1 lfrom [ 2 mod 1 = ] lsubset ;
 : powers-of-2 1 [ 2 * ] lfrom-by ;
@@ -41,8 +41,9 @@ IN: lazy-examples
 
 : filter-multiples ( n list - list )
     #! Given a lazy list of numbers, filter multiples of n
-	swap [ divisible-by? not ] curry lsubset ;
+    swap [ divisible-by? not ] curry lsubset ;
 
-: primes 2 lfrom [ filter-multiples ] lapply ;
+: primes ( -- list )
+    2 lfrom [ filter-multiples ] lapply ;
 
 : first-ten-primes 10 primes ltake list>array ;
