@@ -1,0 +1,9 @@
+<% USING: namespaces io furnace ; %>
+
+<html>
+
+<head><title><% "title" get write %></title></head>
+
+<body><% "root" get render-component %></body>
+
+</html>

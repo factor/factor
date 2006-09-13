@@ -55,6 +55,7 @@ USING: sequences kernel parser math namespaces io ;
 
 : with-embedded-file ( filename quot -- )
     [
+        file-vocabs
         over file set ! so that reload works properly
         >r <file-reader> contents r> call
     ] with-scope ;

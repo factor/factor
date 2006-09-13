@@ -1,0 +1,9 @@
+<% USING: namespaces io ; %>
+
+<table>
+<tr><th>Summary:</th><td><% "summary" get write %></td></tr>
+<tr><th>Paste by:</th><td><% "author" get write %></td></tr>
+<tr><th>Created:</th><td><% "date" get write %></td></tr>
+</table>
+
+<pre><% "contents" get write %></pre>

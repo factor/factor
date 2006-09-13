@@ -1,0 +1,22 @@
+<form method="POST" action="/responder/pastebin/submit-paste">
+
+<table>
+
+<tr>
+<th>Summary:</th>
+<td><input type="TEXT" name="summary" value="" /></td>
+</tr>
+
+<tr>
+<th>Your name:</th>
+<td><input type="TEXT" name="author" value="" /></td>
+</tr>
+
+<tr>
+<th valign="top">Contents:</th>
+<td><textarea rows="24" cols="60" name="contents"></textarea></td>
+</tr>
+</table>
+
+<input type="SUBMIT" value="Submit paste" />
+</form>
