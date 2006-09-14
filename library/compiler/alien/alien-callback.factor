@@ -22,12 +22,11 @@ M: alien-callback-error summary
 "infer-effect" set-word-prop
 
 \ alien-callback [
-    empty-node <alien-callback>
+    empty-node <alien-callback> dup node,
     pop-literal nip over set-alien-callback-quot
     pop-literal nip over set-alien-callback-parameters
     pop-literal nip over set-alien-callback-return
     gensym over set-alien-callback-xt
-    dup node,
     callback-bottom
 ] "infer" set-word-prop
 

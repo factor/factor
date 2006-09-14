@@ -28,14 +28,13 @@ M: alien-invoke-error summary
 "infer-effect" set-word-prop
 
 \ alien-invoke [
-    empty-node <alien-invoke>
+    empty-node <alien-invoke> dup node,
     pop-literal nip over set-alien-invoke-parameters
     pop-literal nip over set-alien-invoke-function
     pop-literal nip over set-alien-invoke-library
     pop-literal nip over set-alien-invoke-return
     dup alien-invoke-dlsym dlsym drop
-    dup alien-invoke-stack
-    node,
+    alien-invoke-stack
 ] "infer" set-word-prop
 
 : unbox-parameter ( stack# type -- )

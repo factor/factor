@@ -56,7 +56,9 @@ SYMBOL: recorded
 GENERIC: apply-object
 
 : apply-literal ( obj -- )
-    <value> push-d #push node, ;
+    #push dup node,
+    swap <value> push-d
+    1 d-tail swap set-node-out-d ;
 
 M: object apply-object apply-literal ;
 

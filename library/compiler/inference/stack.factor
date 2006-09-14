@@ -15,11 +15,10 @@ sequences words parser ;
     node-outputs ;
 
 : infer-shuffle ( shuffle -- )
-    #shuffle
+    #shuffle dup node,
     2dup infer-shuffle-inputs
     over shuffle-stacks
-    tuck infer-shuffle-outputs
-    node, ;
+    infer-shuffle-outputs ;
 
 : shuffle>effect ( shuffle -- effect )
     dup shuffle-in-d swap shuffle-out-d <effect> ;

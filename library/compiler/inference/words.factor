@@ -25,11 +25,11 @@ IN: inference
 
 : consume/produce ( word effect -- )
     meta-d get clone >r
-    swap make-call-node
+    swap make-call-node dup node,
     over effect-in length over consume-values
     over effect-out length over produce-values
-    r> over #call-label? [ over set-node-in-d ] [ drop ] if
-    node, effect-terminated? [ terminate ] when ;
+    r> over #call-label? [ swap set-node-in-d ] [ 2drop ] if
+    effect-terminated? [ terminate ] when ;
 
 TUPLE: no-effect word ;
 

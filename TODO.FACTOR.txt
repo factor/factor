@@ -1,5 +1,12 @@
 + 0.85:
 
+- words:
+  - S+left: reload
+  - S+right: inspect
+
+- links:
+  - same deal
+
 - UI dataflow visualizer:
   - spacing is weird
   - #label, #if mess up height

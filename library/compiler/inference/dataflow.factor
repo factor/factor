@@ -17,13 +17,25 @@ SYMBOL: meta-r
 : peek-r meta-r get peek ;
 
 TUPLE: node param shuffle
-       classes literals history
-       successor children ;
+d-height r-height
+classes literals history
+successor children ;
 
 M: node equal? eq? ;
 
+: d-height ( -- n ) meta-d get length d-in get - ; inline
+
+: r-height ( -- n ) meta-r get length ;
+
+: record-height ( node -- )
+    d-height over set-node-d-height
+    r-height swap set-node-r-height ;
+
 : make-node ( param in-d out-d in-r out-r node -- node )
-    [ >r swapd <shuffle> f f f f f <node> r> set-delegate ] keep ;
+    [
+        >r swapd <shuffle> f f f f f f f <node> r>
+        set-delegate
+    ] keep ;
 
 : node-in-d  node-shuffle shuffle-in-d  ;
 : node-in-r  node-shuffle shuffle-in-r  ;
@@ -68,7 +80,7 @@ C: #call-label make-node ;
 
 TUPLE: #push ;
 C: #push make-node ;
-: #push ( -- node ) peek-d 1array out-node <#push> ;
+: #push ( -- node ) empty-node <#push> ;
 : >#push< ( node -- seq ) node-out-d [ value-literal ] map ;
 
 TUPLE: #shuffle ;
@@ -118,6 +130,7 @@ SYMBOL: dataflow-graph
 SYMBOL: current-node
 
 : node, ( node -- )
+    dup record-height
     dataflow-graph get [
         dup current-node [ set-node-successor ] change
     ] [
