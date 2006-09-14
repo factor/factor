@@ -34,7 +34,7 @@ TUPLE: parse-result parsed unparsed ;
   #! characters.
   [
     2dup length head over = [
-      swap over length tail <parse-result> lunit
+      swap over length tail <parse-result> 1list
     ] [
       2drop nil
     ] if 
@@ -54,7 +54,7 @@ TUPLE: parse-result parsed unparsed ;
     2drop nil
   ] [        
     over first swap call [
-      h:t <parse-result> lunit
+      h:t <parse-result> 1list
     ] [
       drop nil
     ] if
@@ -74,7 +74,7 @@ TUPLE: parse-result parsed unparsed ;
   #! of that call is returned as the result portion of the
   #! successfull parse lazy list.
   -rot over first swap call [
-    h:t >r swap call r> <parse-result> lunit
+    h:t >r swap call r> <parse-result> 1list
   ] [
     2drop nil
   ] if ;
@@ -88,7 +88,7 @@ TUPLE: parse-result parsed unparsed ;
   #! does not consume any input and always returns
   #! an empty list as the parse tree with the
   #! unmodified input.
-  "" swap <parse-result> lunit ;
+  "" swap <parse-result> 1list ;
 
 : epsilon ( -- parser )
   #! Return an epsilon parser
@@ -97,7 +97,7 @@ TUPLE: parse-result parsed unparsed ;
 : succeed-parser ( input result -- llist )
   #! A parser that always returns 'result' as a
   #! successful parse with no input consumed.
-  swap <parse-result> lunit ;
+  swap <parse-result> 1list ;
 
 : succeed ( result -- parser )
   #! Return a succeed parser.
@@ -135,7 +135,7 @@ TUPLE: parse-result parsed unparsed ;
   #! input then parser2 is applied to the rest of
   #! the input strings from the first parser. 
   >r call r>
-  [ <&>-do-parser2 ] curry lmap lappend* ;
+  [ <&>-do-parser2 ] curry lmap list>array nil [ lappend ] reduce ;
 
 : <&> ( parser1 parser2 -- parser )
   #! Sequentially combine two parsers, returning a parser
