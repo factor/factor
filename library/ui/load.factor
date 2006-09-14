@@ -36,6 +36,7 @@ PROVIDE: library/ui {
     "text/interactor.factor"
     "gadgets/presentations.factor"
     "ui.factor"
+    "tools/tools.factor"
     "tools/listener.factor"
     "tools/walker.factor"
     "tools/search.factor"
@@ -43,6 +44,7 @@ PROVIDE: library/ui {
     "tools/help.factor"
     "tools/dataflow.factor"
     "tools/workspace.factor"
+    "tools/operations.factor"
 } {
     "test/models.factor"
     "test/document.factor"

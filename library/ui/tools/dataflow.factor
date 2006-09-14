@@ -5,7 +5,7 @@ USING: namespaces arrays sequences io inference math kernel
 generic prettyprint words gadgets opengl gadgets-panes
 gadgets-labels gadgets-theme gadgets-presentations
 gadgets-buttons gadgets-borders gadgets-scrolling
-gadgets-frames optimizer models ;
+gadgets-frames gadgets-workspace optimizer models ;
 
 : shuffle-in dup shuffle-in-d swap shuffle-in-r append ;
 
@@ -111,35 +111,30 @@ M: object node>gadget
     { 5 5 } over set-pack-gap
     swap <node-gadget> dup faint-boundary ;
 
+: (compute-heights) ( node -- )
+    [
+        [ node-d-height ] keep
+        [ node-r-height ] keep
+        [ 3array , ] keep
+        node-successor (compute-heights)
+    ] when* ;
+
 : node-in-d# node-in-d length ;
 : node-out-d# node-out-d length ;
 
 : node-in-r# node-in-r length ;
 : node-out-r# node-out-r length ;
 
-SYMBOL: d-height
-SYMBOL: r-height
-
-: (compute-heights) ( node -- )
-    [
-        dup node-in-d# d-height [ swap - ] change
-        dup node-in-r# r-height [ swap - ] change
-        d-height get r-height get pick 3array ,
-        dup node-out-d# d-height [ + ] change
-        dup node-out-r# r-height [ + ] change
-        node-successor (compute-heights)
-    ] when* ;
-
 : normalize-d-height ( seq -- seq )
-    [ [ first ] map infimum ] keep
+    [ [ dup first swap third node-in-d# - ] map infimum ] keep
     [ first3 >r >r swap - r> r> 3array ] map-with ;
 
 : normalize-r-height ( seq -- seq )
-    [ [ second ] map infimum ] keep
+    [ [ dup second swap third node-in-r# - ] map infimum ] keep
     [ first3 >r rot - r> 3array ] map-with ;
 
 : compute-heights ( nodes -- pairs )
-    [ 0 d-height set 0 r-height set (compute-heights) ] { } make
+    [ (compute-heights) ] { } make
     normalize-d-height normalize-r-height ;
 
 : node-r-skew-1 ( node -- n )
@@ -149,17 +144,18 @@ SYMBOL: r-height
     dup node-in-d# over node-out-r# [-] swap node-out-d# [-] ;
 
 SYMBOL: prev-node 
+
 : node-r-skew ( node -- n )
     node-r-skew-1 prev-node get [ node-r-skew-2 - ] when* ;
 
 : print-node ( d-height r-height node -- )
     [
         [
-            pick over node-in-d# + 0 <height-gadget> ,
+            pick 0 <height-gadget> ,
             2dup node-in-r# + over node-r-skew <height-gadget> ,
         ] { } make make-pile ,
         [
-            rot 0 <height-gadget> ,
+            rot over node-in-d# - 0 <height-gadget> ,
             node>gadget ,
             0 <height-gadget> ,
         ] { } make make-pile 1 over set-pack-fill ,
@@ -190,3 +186,12 @@ C: dataflow-gadget ( -- gadget )
     f <history> over set-dataflow-gadget-history {
         { [ <dataflow-pane> ] f [ <scroller> ] @center }
     } make-frame* ;
+
+M: dataflow-gadget call-tool* ( node dataflow -- )
+    dup dataflow-gadget-history add-history
+    dataflow-gadget-history set-model ;
+
+IN: tools
+
+: show-dataflow ( quot -- )
+    dataflow optimize dataflow-gadget call-tool ;

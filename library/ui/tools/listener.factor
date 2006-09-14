@@ -3,9 +3,9 @@
 IN: gadgets-listener
 USING: arrays gadgets gadgets-frames gadgets-labels
 gadgets-panes gadgets-scrolling gadgets-text gadgets-theme
-gadgets-tracks generic hashtables tools io
+gadgets-tracks gadgets-workspace generic hashtables tools io
 kernel listener math models namespaces parser prettyprint
-sequences shells styles threads words memory ;
+sequences shells strings styles threads words memory ;
 
 TUPLE: listener-gadget input output stack ;
 
@@ -63,3 +63,25 @@ M: listener-gadget focusable-child*
 
 : clear-output ( -- )
     stdio get duplex-stream-out pane-clear ;
+
+G: call-listener ( quot/string listener -- )
+    1 standard-combination ;
+
+M: quotation call-listener
+    listener-gadget-input interactor-call ;
+
+M: string call-listener
+    listener-gadget-input set-editor-text ;
+
+M: input call-listener
+    >r input-string r> call-listener ;
+
+M: listener-gadget call-tool* ( quot/string listener -- )
+    call-listener ;
+
+: listener-run-files ( seq -- )
+    dup empty? [
+        drop
+    ] [
+        [ [ run-file ] each ] curry listener-gadget call-tool
+    ] if ;

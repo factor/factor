@@ -4,7 +4,8 @@ USING: arrays sequences kernel gadgets-panes definitions
 prettyprint gadgets-theme gadgets-borders gadgets
 generic gadgets-scrolling math io words models styles
 namespaces gadgets-tracks gadgets-presentations gadgets-grids
-gadgets-frames help gadgets-buttons gadgets-search tools ;
+gadgets-workspace gadgets-frames help gadgets-buttons
+gadgets-search tools ;
 IN: gadgets-browser
 
 TUPLE: browser navigator definitions search ;
@@ -104,3 +105,10 @@ browser {
         { "Clear" T{ key-down f f "CLEAR" } [ clear-browser ] }
     }
 } define-commands
+
+M: browser call-tool*
+    over vocab-link? [
+        >r vocab-link-name r> show-vocab
+    ] [
+        show-word
+    ] if ;

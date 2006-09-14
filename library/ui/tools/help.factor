@@ -3,7 +3,7 @@
 IN: gadgets-help
 USING: gadgets gadgets-borders gadgets-buttons gadgets-frames
 gadgets-panes gadgets-search gadgets-scrolling help kernel
-models namespaces sequences gadgets-tracks ;
+models namespaces sequences gadgets-tracks gadgets-workspace ;
 
 TUPLE: help-gadget history search ;
 
@@ -36,3 +36,5 @@ C: help-gadget ( -- gadget )
     } { 0 1 } make-track* ;
 
 M: help-gadget focusable-child* help-gadget-search ;
+
+M: help-gadget call-tool* show-help ;
