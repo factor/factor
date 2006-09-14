@@ -43,7 +43,7 @@ IN: lazy-examples
     #! Given a lazy list of numbers, filter multiples of n
     swap [ divisible-by? not ] curry lsubset ;
 
-: primes ( -- list )
-    2 lfrom [ filter-multiples ] lapply ;
+! : primes ( -- list )
+!    2 lfrom [ filter-multiples ] lapply ;
 
-: first-ten-primes 10 primes ltake list>array ;
+! : first-ten-primes 10 primes ltake list>array ;
