@@ -111,6 +111,15 @@ USING: alien compiler kernel kernel-internals math namespaces ;
 ] "char*" (define-primitive-type)
 
 [
+    [ swap <displaced-alien> alien>char-string ] "getter" set
+    [ swap <displaced-alien> swap set-alien-unsigned-1 ] "setter" set
+    1 "width" set
+    1 "align" set
+    "box_char_array" "boxer-function" set
+    "unbox_char_array" "unboxer-function" set
+] "char[]" (define-primitive-type)
+
+[
     [ alien-unsigned-cell <alien> alien>u16-string ] "getter" set
     [ >r >r alien-address r> r> set-alien-unsigned-cell ] "setter" set
     4 "width" set
