@@ -1,9 +1,9 @@
 ! Copyright (C) 2006 Eduardo Cavazos.
 
-REQUIRES: contrib/math contrib/alien ;
+REQUIRES: contrib/math ;
 
-USING: alien-contrib kernel namespaces math sequences vectors
-       arrays opengl math-contrib gadgets ;
+USING: kernel namespaces math sequences vectors arrays opengl
+       math-contrib gadgets ;
 
 IN: slate
 
@@ -53,6 +53,8 @@ SYMBOL: capacity
 : curry3 ( a b c quot -- quot ) 3 [ curry ] times ;
 
 : curry4 ( a b c d quot -- quot ) 4 [ curry ] times ;
+
+: curry5 ( a b c d e quot -- quot ) 5 [ curry ] times ;
 
 : curry6 ( a b c d e f quot -- quot ) 6 [ curry ] times ;
 
@@ -108,6 +110,18 @@ SYMBOL: capacity
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
+: gl-enable ( cap -- ) [ glEnable ] curry add-dlist ;
+
+: gl-disable ( cap -- ) [ glDisable ] curry add-dlist ;
+
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+: gl-call-list ( list -- ) [ glCallList ] curry add-dlist ;
+
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+: gl-shade-model ( mode -- ) [ glShadeModel ] curry add-dlist ;
+
 : gl-light-fv ( light pname params -- )
 >float-array [ glLightfv ] curry3 add-dlist ;
 
@@ -155,12 +169,25 @@ SYMBOL: capacity
 100 [ 100 / 360 * deg>rad dup cos swap sin 0 3array ] map draw-polygon ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+! Slate GLU commands
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+: glu-new-quadric ( -- ) [ gluNewQuadric ] add-dlist ;
+
+: glu-disk ( qobj innner outer slices loops -- ) [ gluDisk ] curry5 add-dlist ;
+
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 ! Slate 2d utilities
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 IN: slate-2d
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+VAR: qobj
+
+: slate-window ( -- )
+new-slate "Slate" open-titled-window gluNewQuadric >qobj ;
 
 : init-2d ( left right bottom top -- )
 GL_PROJECTION gl-matrix-mode gl-load-identity -1 1 gl-ortho
@@ -172,6 +199,8 @@ GL_MODELVIEW gl-matrix-mode gl-load-identity ;
 
 : draw-line-strip ( seq -- )
 GL_LINE_STRIP gl-begin [ gl-vertex2 ] each gl-end ;
+
+: draw-circle ( -- ) qobj> 0 1 100 5 glu-disk ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
