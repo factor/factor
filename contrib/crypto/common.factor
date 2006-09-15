@@ -25,6 +25,17 @@ IN: crypto-internals
         length 3 shift 8 rot [ >be ] [ >le ] if %
     ] "" make dupd nappend ;
 
+SYMBOL: bytes-read
+SYMBOL: big-endian?
+
+: pad-last-block ( str big-endian? length -- str )
+    [
+        rot %
+        HEX: 80 ,
+        dup HEX: 3f bitand calculate-pad-length 0 <string> %
+        3 shift 8 rot [ >be ] [ >le ] if %
+    ] "" make 64 group ;
+
 : shift-mod ( n s w -- n ) >r shift r> 1 swap shift 1 - bitand ; inline
 
 

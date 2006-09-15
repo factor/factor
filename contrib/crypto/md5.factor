@@ -17,6 +17,7 @@ SYMBOL: md5-sin-table
 65 [ calculate-sin ] map md5-sin-table set-global
 
 : initialize-md5 ( -- )
+    0 bytes-read set
     HEX: 67452301 dup a set old-a set
     HEX: efcdab89 dup b set old-b set
     HEX: 98badcfe dup c set old-c set
@@ -150,15 +151,19 @@ SYMBOL: md5-sin-table
 : get-md5 ( -- str )
     [ [ a b c d ] [ get 4 >le % ] each ] "" make ;
 
+: (stream>md5) ( -- )
+    64 read dup length dup bytes-read [ + ] change 64 = [
+        process-md5-block (stream>md5)
+    ] [
+        f bytes-read get pad-last-block [ process-md5-block ] each
+    ] if ;
+
 IN: crypto
 
-: string>md5 ( string -- md5 )
-    [
-        initialize-md5 f preprocess-plaintext
-        64 group [ process-md5-block ] each get-md5
-    ] with-scope ;
+: stream>md5 ( stream -- md5 )
+    [ [ initialize-md5 (stream>md5) get-md5 ] with-stream ] with-scope ;
 
+: string>md5 ( string -- md5 ) <string-reader> stream>md5 ;
 : string>md5str ( string -- str ) string>md5 hex-string ;
-: stream>md5 ( stream -- md5 ) contents string>md5 ;
 : file>md5 ( file -- md5 ) <file-reader> stream>md5 ;
 

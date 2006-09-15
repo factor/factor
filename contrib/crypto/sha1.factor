@@ -17,11 +17,11 @@ SYMBOL: E
 SYMBOL: w
 SYMBOL: K
 
-: reset-w ( -- ) 80 <vector> w set ; inline
 : get-wth ( n -- wth ) w get nth ; inline
 : shift-wth ( n -- x ) get-wth 1 bitroll-32 ; inline
 
 : initialize-sha1 ( -- )
+    0 bytes-read set
     HEX: 67452301 dup h0 set A set
     HEX: efcdab89 dup h1 set B set
     HEX: 98badcfe dup h2 set C set
@@ -99,18 +99,24 @@ SYMBOL: K
     E h4 update-old-new ;
 
 : process-sha1-block ( str -- )
-    make-w init-letters calculate-letters update-hs ;
+    80 <vector> w set make-w init-letters calculate-letters update-hs ;
 
 : get-sha1 ( -- str )
     [ [ h0 h1 h2 h3 h4 ] [ get 4 >be % ] each ] "" make ;
 
-IN: crypto
-: string>sha1 ( str -- sha1 )
-    [
-        initialize-sha1 t preprocess-plaintext
-        64 group [ reset-w process-sha1-block ] each get-sha1
-    ] with-scope ;
+: (stream>sha1) ( -- )
+    64 read dup length dup bytes-read [ + ] change 64 = [
+        process-sha1-block (stream>sha1)
+    ] [
+        t bytes-read get pad-last-block [ process-sha1-block ] each
+    ] if ;
 
-: string>sha1str ( str -- sha1str ) string>sha1 hex-string ;
-: stream>sha1 ( stream -- sha1 ) contents string>sha1 ;
+IN: crypto
+
+: stream>sha1 ( stream -- sha1 )
+    [ [ initialize-sha1 (stream>sha1) get-sha1 ] with-stream ] with-scope ;
+
+: string>sha1 ( string -- sha1 ) <string-reader> stream>sha1 ;
+: string>sha1str ( string -- str ) string>sha1 hex-string ;
 : file>sha1 ( file -- sha1 ) <file-reader> stream>sha1 ;
+
