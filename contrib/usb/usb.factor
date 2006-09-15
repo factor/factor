@@ -1,82 +1,10 @@
 ! Copyright (C) 2006 Chris Double.
 ! See http://factorcode.org/license.txt for BSD license.
 !
-! TODO: Windows path = 260
-!       fpathconf under linux?
-!
 IN: usb
-USING: kernel alien io math namespaces sequences parser ;
-
-"usb" windows? [ "libusb.dll" ] [ "libusb.so" ] if "cdecl" add-library
-
-: define-packed-field ( offset type name -- offset )
-    >r parse-c-decl 
-    >r 1 r> 
-    >r swapd align r> r> 
-    "struct-name" get swap "-" swap append3
-    3dup define-getter 3dup define-setter
-    drop c-size rot * + ;
-
-: PACKED-FIELD: ( offset -- offset )
-  scan scan define-packed-field ; parsing
+USING: kernel alien io math ;
 
 LIBRARY: usb
-
-BEGIN-STRUCT: usb_bus
-  FIELD: void*      next
-  FIELD: void*      prev	
-  FIELD: char[4097] dirname
-  FIELD: void*      devices
-  FIELD: uint       location
-  FIELD: void*      root_dev
-END-STRUCT
-
-! __attribute__ ((packed))
-BEGIN-STRUCT: usb_device_descriptor
-  PACKED-FIELD: uchar bLength
-  PACKED-FIELD: uchar bDescriptorType
-  PACKED-FIELD: ushort bcdUSB
-  PACKED-FIELD: uchar  bDeviceClass
-  PACKED-FIELD: uchar  bDeviceSubClass
-  PACKED-FIELD: uchar  bDeviceProtocol
-  PACKED-FIELD: uchar  bMaxPacketSize0
-  PACKED-FIELD: ushort idVendor
-  PACKED-FIELD: ushort idProduct
-  PACKED-FIELD: ushort bcdDevice;
-  PACKED-FIELD: uchar  iManufacturer
-  PACKED-FIELD: uchar  iProduct
-  PACKED-FIELD: uchar  iSerialNumber
-  PACKED-FIELD: uchar  bNumConfigurations
-END-STRUCT
-
-BEGIN-STRUCT: usb_config_descriptor
-  PACKED-FIELD: uchar  bLength ! __attribute__ ((packed))
-  PACKED-FIELD: uchar  bDescriptorType ! __attribute__ ((packed))
-  PACKED-FIELD: ushort wTotalLength ! __attribute__ ((packed))
-  PACKED-FIELD: uchar  bNumInterfaces !  __attribute__ ((packed))
-  PACKED-FIELD: uchar  bConfigurationValue ! __attribute__ ((packed))
-  PACKED-FIELD: uchar  iConfiguration ! __attribute__ ((packed))
-  PACKED-FIELD: uchar  bmAttributes ! __attribute__ ((packed))
-  PACKED-FIELD: uchar  MaxPower ! __attribute__ ((packed))
-
-  FIELD: void*  interface
-
-  FIELD: uchar* extra
-  FIELD: int extralen
-END-STRUCT
-
-BEGIN-STRUCT: usb_device
-  FIELD: void* next
-  FIELD: void* prev
-  FIELD: char[4097] filename
-  FIELD: usb_bus* bus
-  FIELD: usb_device_descriptor descriptor
-  FIELD: usb_config_descriptor* config
-  FIELD: void* dev
-  FIELD: uchar devnum
-  FIELD: uchar num_children
-  FIELD: void* children
-END-STRUCT
 
 TYPEDEF: void* usb_dev_handle*
 
