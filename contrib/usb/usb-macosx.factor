@@ -4,7 +4,7 @@
 IN: usb
 USING: kernel alien ;
 
-"usb" "libusb.dll" "cdecl" add-library
+"usb" "/opt/local/lib/libusb.dylib" "cdecl" add-library
 
 LIBRARY: usb
 
