@@ -162,7 +162,7 @@
    (first
     (comint-redirect-results-list-from-process 
      (get-buffer-process "*factor-listener*")
-     (format "\\ %s synopsis print" (thing-at-point 'symbol))
+     (format "\\ %s summary print" (thing-at-point 'symbol))
      ;; "[ ]*\\(.*\\)\n"
      "\\(.*\\)\n"
      1))))

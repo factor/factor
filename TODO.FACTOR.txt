@@ -48,6 +48,7 @@
 
 + ui:
 
+- draw-world: bail out if world is 0x0
 - better help result ranking
 - page scrolling should be timer-based too
 - invoking interactor commands when interactor is busy -- still fucked
