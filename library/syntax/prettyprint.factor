@@ -327,7 +327,7 @@ M: wrapper pprint*
 
 : unparse ( obj -- str ) [ pprint ] string-out ;
 
-: pprint-short ( obj -- str )
+: pprint-short ( obj -- )
     H{
        { line-limit 1 }
        { length-limit 15 }
