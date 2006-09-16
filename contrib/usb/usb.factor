@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 !
 IN: usb
-USING: kernel alien io math ;
+USING: kernel alien io math arrays sequences ;
 
 LIBRARY: usb
 
@@ -38,27 +38,51 @@ FUNCTION: int usb_find_devices ( ) ;
 FUNCTION: usb_device* usb_device ( usb_dev_handle* dev ) ;
 FUNCTION: usb_bus* usb_get_busses ( ) ;
 
+: bus-each ( usb_bus quot -- ) 
+  [ call ] 2keep >r usb_bus-next r> over [ bus-each ] [ 2drop ] if ;
 
-: t1 ( -- string )
-  usb_find_busses drop usb_find_devices drop usb_get_busses usb_bus-dirname ;
+: device-each ( usb_device quot -- )
+  [ call ] 2keep >r usb_device-next r> over [ device-each ] [ 2drop ] if ;
 
-: ((t2)) ( device -- )
-  terpri
-  [
-    "  " write
-    dup usb_device-filename write 
-    " - " write dup usb_device-descriptor usb_device_descriptor-bLength number>string write 
-    " - " write dup usb_device-descriptor usb_device_descriptor-idVendor >hex write 
-    " - " write usb_device-descriptor usb_device_descriptor-idProduct >hex write 
-  ] when* ;
+: vendor-id-matches? ( id usb_device -- bool )
+  usb_device-descriptor usb_device_descriptor-idVendor = ;
 
-: (t2) ( bus -- )
-  [
+: product-id-matches? ( id usb_device  -- bool )
+  usb_device-descriptor usb_device_descriptor-idProduct = ;
+
+: is-device? ( vendor-id product-id usb_device -- bool )
+  tuck product-id-matches? >r vendor-id-matches? r> and ;
+
+: find-devices ( vendor-id product-id -- seq )
+  2array
+  V{ } clone
+  usb_get_busses [
+    usb_bus-devices [
+      pick first2 pick is-device? [
+        over push
+      ] [
+        drop
+      ] if
+    ] device-each
+  ] bus-each nip ;
+
+: init ( -- )
+  #! Initialize libusb and find devices and busses
+  usb_init usb_find_busses drop usb_find_devices drop ;
+	
+: display-devices ( -- )
+  #! Example function to list all usb devices on system
+  usb_get_busses [
     dup usb_bus-dirname write " - " write 
-    dup usb_bus-devices ((t2))
+    usb_bus-devices [
+      terpri "  " write
+      dup usb_device-filename write 
+      " - " write 
+      dup usb_device-descriptor usb_device_descriptor-bLength number>string write 
+      " - " write 
+      dup usb_device-descriptor usb_device_descriptor-idVendor >hex write 
+      " - " write 
+      usb_device-descriptor usb_device_descriptor-idProduct >hex write
+    ] device-each
     terpri
-    usb_bus-next (t2) 
-  ] when* ;
-
-: t2 ( -- )
-  usb_get_busses (t2) ;
+  ] bus-each ;

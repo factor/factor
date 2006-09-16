@@ -8,5 +8,6 @@ PROVIDE: contrib/usb {
 	{ "usb-win32.factor" [ win32? ] }
 	{ "usb-macosx.factor" [ macosx? ] }
 	"usb.factor" 
+	"usb.facts" 
 } { 
 } ;
