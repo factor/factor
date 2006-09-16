@@ -52,10 +52,11 @@ M: method-spec where*
 M: method-spec subdefs drop f ;
 
 M: generic subdefs
-    dup order [ swap 2array ] map-with ;
+    dup "methods" word-prop hash-keys natural-sort
+    [ swap 2array ] map-with ;
 
 M: class subdefs
-    dup implementors [ 2array ] map-with ;
+    dup implementors natural-sort [ 2array ] map-with ;
 
 M: method-spec forget
     first2 [ remove-hash ] with-methods ;

@@ -41,12 +41,9 @@ DEFER: relayout
     dup gadget-state
     [ drop ] [ dup invalidate add-invalid ] if ;
 
-: show-gadget t over set-gadget-visible? relayout-1 ;
+: show-gadget t swap set-gadget-visible? ;
 
-: hide-gadget f over set-gadget-visible? relayout-1 ;
-
-: toggle-visible ( gadget -- )
-    dup gadget-visible? [ hide-gadget ] [ show-gadget ] if ;
+: hide-gadget f swap set-gadget-visible? ;
 
 : (set-rect-dim) ( dim gadget quot -- )
     >r 2dup rect-dim =

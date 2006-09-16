@@ -13,8 +13,9 @@ TUPLE: workspace ;
 TUPLE: tool gadget ;
 
 : show-tool ( class workspace -- tool )
-    [ book-pages [ tool-gadget class eq? ] find-with swap ] keep
-    control-model set-model* ;
+    [
+        gadget-children [ tool-gadget class eq? ] find-with swap
+    ] keep control-model set-model* ;
 
 : select-tool ( workspace class -- ) swap show-tool drop ;
 
