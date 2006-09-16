@@ -1,7 +1,7 @@
 ! Copyright (C) 2005, 2006 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 IN: inference
-USING: hashtables kernel math namespaces sequences ;
+USING: hashtables kernel math namespaces sequences words ;
 
 SYMBOL: recursive-state
 

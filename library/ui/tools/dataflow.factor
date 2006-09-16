@@ -104,7 +104,7 @@ M: #push node>gadget
 
 : default-node-content ( node -- gadget )
     dup node-children <child-nodes>
-    swap class word-name <mono-label> add* make-pile
+    swap class word-name <label> add* make-pile
     { 5 5 } over set-pack-gap ;
 
 M: object node>gadget
@@ -118,6 +118,8 @@ M: full-height-node node>gadget
 ! Constructing the graphical representation; first we compute
 ! stack heights
 SYMBOL: d-height
+
+DEFER: (compute-heights)
 
 : compute-child-heights ( node -- )
     node-children dup empty? [

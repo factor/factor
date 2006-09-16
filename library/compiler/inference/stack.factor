@@ -1,6 +1,6 @@
 IN: inference
 USING: arrays generic kernel math namespaces
-sequences words parser ;
+sequences words parser words ;
 
 : infer-shuffle-inputs ( shuffle node -- )
     >r effect-in length 0 r> node-inputs ;
