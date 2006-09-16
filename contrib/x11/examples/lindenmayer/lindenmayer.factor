@@ -1,9 +1,9 @@
 ! Eduardo Cavazos - wayo.cavazos@gmail.com
 
-REQUIRES: math ;
+REQUIRES: contrib/math contrib/vars contrib/slate ;
 
 USING: kernel alien namespaces arrays vectors math opengl math-contrib
-       parser sequences hashtables strings ;
+       parser sequences hashtables strings vars slate ;
 
 IN: lindenmayer 
 
@@ -42,7 +42,9 @@ SYMBOL: orientation
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-: record-vertex ( -- ) position get first3 glVertex3f ;
+! : record-vertex ( -- ) position get first3 glVertex3f ;
+
+: record-vertex ( -- ) position get gl-vertex ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
@@ -62,8 +64,15 @@ USE: sequences : length* length ; USE: lindenmayer
 
 DEFER: polygon-vertex
 
+! : draw-forward ( length -- )
+! GL_LINES glBegin record-vertex step record-vertex glEnd ;
+
 : draw-forward ( length -- )
-GL_LINES glBegin record-vertex step record-vertex glEnd ;
+GL_LINES gl-begin
+record-vertex
+step
+record-vertex
+gl-end ;
 
 : move-forward ( length -- ) step polygon-vertex ;
 
@@ -89,12 +98,20 @@ GL_LINES glBegin record-vertex step record-vertex glEnd ;
 ! GL_POLYGON glBegin dup polygon-normal first3 glNormal3f
 ! [ first3 glVertex3f ] each glEnd ;
 
-: polygon ( vertices -- )
-dup length* 3 >=
-[ GL_POLYGON glBegin dup polygon-normal first3 glNormal3f
-  [ first3 glVertex3f ] each glEnd ]
-[ drop ]
-if ;
+! : polygon ( vertices -- )
+! dup length* 3 >=
+! [ GL_POLYGON glBegin dup polygon-normal first3 glNormal3f
+!   [ first3 glVertex3f ] each glEnd ]
+! [ drop ]
+! if ;
+
+: (polygon) ( vertices -- )
+GL_POLYGON gl-begin
+dup polygon-normal gl-normal
+[ gl-vertex ] each
+gl-end ;
+
+: polygon ( vertices -- ) dup length* 3 >= [ (polygon) ] [ drop ] if ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
@@ -160,6 +177,8 @@ cond ;
 ! Lindenmayer string interpretation
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
+! peek is the same as last
+
 : last ( seq -- [ last-item ] ) dup length* 1- tail ;
 
 SYMBOL: command-table
@@ -190,7 +209,7 @@ dup length* 1 =
 SYMBOL: angle
 SYMBOL: length
 SYMBOL: thickness
-SYMBOL: color-index
+VAR: color-index
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
@@ -226,7 +245,26 @@ drop ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-SYMBOL: color-table
+VAR: color-table
+
+! : setup-color-table ( -- )
+! { { 0    0    0 }    ! black
+!   { 0.5  0.5  0.5 }  ! grey
+!   { 1    0    0 }    ! red
+!   { 1    1    0 }    ! yellow
+!   { 0    1    0 }    ! green
+!   { 0.25 0.88 0.82 } ! turquoise
+!   { 0    0    1 }    ! blue
+!   { 0.63 0.13 0.94 } ! purple
+!   { 0.00 0.50 0.00 } ! dark green
+!   { 0.00 0.82 0.82 } ! dark turquoise
+!   { 0.00 0.00 0.50 } ! dark blue
+!   { 0.58 0.00 0.82 } ! dark purple
+!   { 0.50 0.00 0.00 } ! dark red
+!   { 0.25 0.25 0.25 } ! dark grey
+!   { 0.75 0.75 0.75 } ! medium grey
+!   { 1    1    1 }    ! white
+! } color-table set ;
 
 : setup-color-table ( -- )
 { { 0    0    0 }    ! black
@@ -245,9 +283,11 @@ SYMBOL: color-table
   { 0.25 0.25 0.25 } ! dark grey
   { 0.75 0.75 0.75 } ! medium grey
   { 1    1    1 }    ! white
-} color-table set ;
+} [ 1 set-color-alpha ] map color-table set ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+! Use the one in contrib/alien
 
 USE: sequences
 
@@ -259,19 +299,27 @@ USE: lindenmayer
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-: material-color ( r g b -- )
-3array 1.0 add >float-array
-GL_FRONT_AND_BACK GL_AMBIENT_AND_DIFFUSE rot glMaterialfv ;
+! : material-color ( r g b -- )
+! 3array 1.0 add >float-array
+! GL_FRONT_AND_BACK GL_AMBIENT_AND_DIFFUSE rot glMaterialfv ;
+
+! : set-color-index ( i -- )
+! dup color-index set color-table get nth dup
+! first3 glColor3f first3 material-color ;
+
+: material-color ( color -- )
+GL_FRONT_AND_BACK GL_AMBIENT_AND_DIFFUSE rot gl-material-fv ;
 
 : set-color-index ( i -- )
-dup color-index set color-table get nth dup
-first3 glColor3f first3 material-color ;
+dup >color-index color-table> nth dup gl-color material-color ;
 
 : inc-color-index ( -- ) color-index get 1 + set-color-index ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-: set-thickness ( i -- ) dup thickness set glLineWidth ;
+! : set-thickness ( i -- ) dup thickness set glLineWidth ;
+
+: set-thickness ( i -- ) dup thickness set gl-line-width ;
 
 : scale-thickness ( m -- ) thickness get * 0.5 max set-thickness ;
 
@@ -284,7 +332,7 @@ first3 glColor3f first3 material-color ;
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 : setup-variables ( -- )
-V{ } vertices set   V{ } states set   setup-color-table ;
+V{ } clone vertices set   V{ } clone states set   setup-color-table ;
 
 : lparser-dialect ( -- )
 
@@ -349,22 +397,22 @@ H{ { "K" "[[a|b] '(0.41)f'(2.439) |<(60) [a|b]]" }
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-: spiral-0 ( -- ) lparser-dialect  10 angle set-global  5 thickness set-global
+: spiral-0 ( -- ) lparser-dialect  10 angle set  5 thickness set
 
-"[P]|[P]" axiom set-global
+"[P]|[P]" axiom set
 
 H{ { "P" "[A]>>>>>>>>>[cB]>>>>>>>>>[ccC]>>>>>>>>>[cccD]" }
    { "A" "F+;'A" }
    { "B" "F!+F+;'B" }
    { "C" "F!^+F^+;'C" }
    { "D" "F!>^+F>^+;'D" }
-} rules set-global ;
+} rules set ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-: tree-5 ( -- ) lparser-dialect   5 angle set-global   1 thickness set-global
+: tree-5 ( -- ) lparser-dialect   5 angle set   1 thickness set
 
-"c(4)FFS" axiom set-global
+"c(4)FFS" axiom set
 
 H{ { "S" "FFR>(60)R>(60)R>(60)R>(60)R>(60)R>(30)S" }
    { "R" "[Ba]" }
@@ -378,24 +426,24 @@ H{ { "S" "FFR>(60)R>(60)R>(60)R>(60)R>(60)R>(30)S" }
    { "y" "b" }
 
    { "F" "'(1.25)F'(.8)" }
-} rules set-global ;
+} rules set ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-: abop-1 ( -- ) lparser-dialect   45 angle set-global   5 set-thickness
+: abop-1 ( -- ) lparser-dialect   45 angle set   5 set-thickness
 
 H{ { "A" "F[&'(.8)!BL]>(137)'!(.9)A" }
    { "B" "F[-'(.8)!(.9)$CL]'!(.9)C" }
    { "C" "F[+'(.8)!(.9)$BL]'!(.9)B" }
 
    { "L" "~c(8){+(30)f-(120)f-(120)f}" }
-} rules set-global
+} rules set
 
-"c(12)FFAL" axiom set-global ;
+"c(12)FFAL" axiom set ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-: abop-2 ( -- ) lparser-dialect   30 angle set-global   5 thickness set-global
+: abop-2 ( -- ) lparser-dialect   30 angle set   5 thickness set
 
 H{ { "A" "F[&'(.7)!BL]>(137)[&'(.6)!BL]>(137)'(.9)!(.9)A" }
    { "B" "F[-'(.7)!(.9)$CL]'(.9)!(.9)C" }
@@ -403,24 +451,24 @@ H{ { "A" "F[&'(.7)!BL]>(137)[&'(.6)!BL]>(137)'(.9)!(.9)A" }
 
    { "L" "~c(8){+(45)f(.1)-(45)f(.1)-(45)f(.1)+(45)|+(45)f(.1)-(45)f(.1)-(45)f(.1)}" }
 
-} rules set-global
+} rules set
 
-"c(12)FAL" axiom set-global ;
+"c(12)FAL" axiom set ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-: abop-3 ( -- ) lparser-dialect   30 angle set-global   5 thickness set-global
+: abop-3 ( -- ) lparser-dialect   30 angle set   5 thickness set
 
 H{ { "A" "!(.9)t(.4)FB>(94)B>(132)B" }
    { "B" "[&t(.4)F$A]" }
    { "F" "'(1.25)F'(.8)" }
-} rules set-global
+} rules set
 
-"c(12)FA" axiom set-global ;
+"c(12)FA" axiom set ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-: abop-4 ( -- ) lparser-dialect   18 angle set-global 5 thickness set-global
+: abop-4 ( -- ) lparser-dialect   18 angle set 5 thickness set
 
 H{ { "N" "FII[&(60)rY]>(90)[&(45)'(0.8)rA]>(90)[&(60)rY]>(90)[&(45)'(0.8)rD]!FIK" }
    { "Y" "[c(4){++l.--l.--l.++|++l.--l.--l.}]" }
@@ -451,13 +499,13 @@ H{ { "N" "FII[&(60)rY]>(90)[&(45)'(0.8)rA]>(90)[&(60)rY]>(90)[&(45)'(0.8)rD]!FIK
 
    { "o" "$t(-0.03)" }
    { "r" "~(30)" }
-} rules set-global
+} rules set
 
-"c(12)&(20)N" axiom set-global ;
+"c(12)&(20)N" axiom set ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-: abop-5 ( -- ) lparser-dialect   5 angle set-global   5 thickness set-global
+: abop-5 ( -- ) lparser-dialect   5 angle set   5 thickness set
 
 H{ { "a" "F[+(45)l][-(45)l]^;ca" }
 
@@ -469,16 +517,16 @@ H{ { "a" "F[+(45)l][-(45)l]^;ca" }
    { "x" "a" }
 
    { "F" "'(1.17)F'(.855)" }
-} rules set-global
+} rules set
 
-"&(90)+(90)a" axiom set-global ;
+"&(90)+(90)a" axiom set ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-: abop-6 ( -- ) lparser-dialect   5 angle set-global   5 thickness set-global
+: abop-6 ( -- ) lparser-dialect   5 angle set   5 thickness set
 
 "&(90)+(90)FFF[-(120)'(.6)x][-(60)'(.8)x][+(120)'(.6)x][+(60)'(.8)x]x"
-axiom set-global
+axiom set
 
 H{ { "a" "F[cdx][cex]F!(.9)a" }
    { "x" "a" }
@@ -487,13 +535,13 @@ H{ { "a" "F[cdx][cex]F!(.9)a" }
    { "e" "-e" }
 
    { "F" "'(1.25)F'(.8)" }
-} rules set-global ;
+} rules set ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-: airhorse ( -- ) lparser-dialect 10 angle set-global 5 thickness set-global
+: airhorse ( -- ) lparser-dialect 10 angle set 5 thickness set
 
-"C" axiom set-global
+"C" axiom set
 
 H{ { "C" "LBW" }
 
@@ -523,7 +571,7 @@ H{ { "C" "LBW" }
    { "W" "[%[!!cb][<<<!!cb][>>>!!cb]]" }
    { "b" "Fl!+Fl+;'b" }
    { "l" "[-cc{--z++z++z--|--z++z++z}]" }
-} rules set-global ;
+} rules set ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
