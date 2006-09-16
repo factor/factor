@@ -13,10 +13,8 @@
 - problem if major gc happens during relocation
   - in fact relocation should not cons at all
 - better way of dealing with compiler errors
-- track individual method usages
 - variable width word wrap
 - add-gadget, model-changed, set-model should compile
-- set-model set-model* and control-changed: its a hack, clean it up
 - graphical module manager tool
 - editor:
   - more efficient multi-line inserts
@@ -33,6 +31,7 @@
 
 + ui:
 
+- figure out if we need both set-model and set-model*
 - help tool: edit, reload buttons
 - words:
   - S+left: reload

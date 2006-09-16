@@ -2,16 +2,29 @@
 ! See http://factorcode.org/license.txt for BSD license.
 IN: tools
 USING: arrays definitions hashtables help tools io kernel
-math namespaces prettyprint sequences strings styles words ;
+math namespaces prettyprint sequences strings styles words
+generic ;
 
-: word-outliner ( word quot -- )
-    swap natural-sort [
-        dup rot curry >r [ summary ] keep r>
+: word-outliner ( seq -- )
+    natural-sort [
+        [ synopsis ] keep dup [ see ] curry
         write-outliner terpri
-    ] each-with ;
+    ] each ;
+
+: method-usage ( word generic -- methods )
+    tuck methods
+    [ second flatten memq? ] subset-with
+    [ first ] map
+    [ swap 2array ] map-with ;
 
 : usage. ( word -- )
-    usage [ usage. ] word-outliner ;
+    dup usage dup
+    [ generic? not ] subset
+    "Words calling " write pick pprint ":" print
+    word-outliner
+    "Methods calling " write over pprint ":" print
+    [ generic? ] subset
+    [ method-usage word-outliner ] each-with ;
 
 : annotate ( word quot -- )
     over >r >r dup word-def r> call r> swap define-compound ;
