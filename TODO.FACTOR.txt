@@ -1,15 +1,7 @@
 + 0.85:
 
-- words:
-  - S+left: reload
-  - S+right: inspect
-
-- links:
-  - same deal
-
 - pane output in UI should use less memory
 - signal 4 on datastack underflow on mac intel??
-- faster I/O
 - buffer-ptr should be an alien
 - fix this:
   [ 1 2 3 4 5 6 7 8 9 10 10 10 10 10 10 10 10 10 10 11 11 11 113 ] .
@@ -19,7 +11,6 @@
 - more compact relocation info
 - problem if major gc happens during relocation
   - in fact relocation should not cons at all
-- we need to optimize  [ dup array? [ array? ] [ array? ] if ]
 - better way of dealing with compiler errors
 - track individual method usages
 - variable width word wrap
@@ -42,6 +33,11 @@
 
 + ui:
 
+- words:
+  - S+left: reload
+  - S+right: inspect
+- links:
+  - same deal
 - if i do 10000 [ . ] each and then clear, the listener window is slow
 - dataflow UI needs various improvements:
   full-height nodes should really be full height

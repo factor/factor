@@ -43,10 +43,12 @@ math math-internals sequences words parser ;
     call>no-op dup
     dup node-children reverse swap set-node-children ;
 
+! An if following a not flips the two branches
 \ not {
     { [ dup node-successor #if? ] [ flip-branches ] }
 } define-optimizers
 
+! eq? on objects of disjoint types is always f
 : disjoint-eq? ( node -- ? )
     dup node-classes swap node-in-d
     [ swap ?hash ] map-with
@@ -61,11 +63,23 @@ math math-internals sequences words parser ;
     swap node-param "infer-effect" word-prop effect-out first
     eq? ;
 
+! >fixnum on a fixnum, etc is a no-op
 { >fixnum >bignum >float } [
     {
         { [ dup useless-coerce? ] [ call>no-op ] }
     } define-optimizers
 ] each
+
+! type applied to an object of a known type can be folded
+: known-type? ( node -- ? )
+    0 node-class# types length 1 number= ;
+
+: fold-known-type ( node -- node )
+    dup 0 node-class# types first 1array inline-literals ;
+
+\ type [
+    { [ dup known-type? ] [ fold-known-type ] }
+] define-optimizers
 
 ! Arithmetic identities
 SYMBOL: @
