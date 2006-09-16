@@ -11,7 +11,6 @@
 - signal 4 on datastack underflow on mac intel??
 - faster I/O
 - buffer-ptr should be an alien
-- faster Unix stream-read#
 - fix this:
   [ 1 2 3 4 5 6 7 8 9 10 10 10 10 10 10 10 10 10 10 11 11 11 113 ] .
 [ 1 2 3 4 5 6 7 8 9 10 10 10 10 10 10 10 10 10 10 11 11 11 113 
@@ -83,11 +82,11 @@
   - horizontal wheel scrolling
   - polish OS X menu bar code
 - structure editor
-
+- mouse over for input: 
 + module system:
 
-- F7: friendlier error if file deleted
 - convention for main entry point of a module
+- convention for main help article of a module
 - track a list of assets loaded from each module's file
 - generic 'define ( asset def -- )'
 - C types should be words

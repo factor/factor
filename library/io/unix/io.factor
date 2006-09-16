@@ -3,7 +3,7 @@
 IN: io-internals
 USING: alien arrays errors generic hashtables io kernel
 kernel-internals math parser sequences strings threads
-unix-internals vectors words ;
+unix-internals vectors words sequences-internals ;
 
 ! We want namespaces::bind to shadow the bind system call from
 ! unix-internals
@@ -53,7 +53,7 @@ SYMBOL: input
 SYMBOL: output
 SYMBOL: closed
 
-TUPLE: port handle error timeout cutoff type sbuf eof? ;
+TUPLE: port handle error timeout cutoff type eof? ;
 
 PREDICATE: port input-port port-type input eq? ;
 PREDICATE: port output-port port-type output eq? ;
@@ -62,8 +62,7 @@ C: port ( handle buffer -- port )
     [ set-delegate ] keep
     [ >r dup init-handle r> set-port-handle ] keep
     [ 0 swap set-port-timeout ] keep
-    [ 0 swap set-port-cutoff ] keep
-    80 <sbuf> over set-port-sbuf ;
+    [ 0 swap set-port-cutoff ] keep ;
 
 : touch-port ( port -- )
     dup port-timeout dup zero?
@@ -160,7 +159,7 @@ GENERIC: task-container ( task -- vector )
     O_RDONLY file-mode open dup io-error ;
 
 : reader-eof ( reader -- )
-    dup port-sbuf empty? [ t swap set-port-eof? ] [ drop ] if ;
+    dup buffer-empty? [ t over set-port-eof? ] when drop ;
 
 : (refill) ( port -- n )
     >port< dup buffer-end swap buffer-capacity read ;
@@ -184,12 +183,8 @@ C: read1-task ( port -- task )
     [ >r <io-task> r> set-delegate ] keep ;
 
 M: read1-task do-io-task
-    io-task-port dup refill [
-        [
-            dup buffer-empty?
-            [ t over set-port-eof? ] when
-        ] when drop
-    ] keep ;
+    io-task-port dup refill
+    [ [ reader-eof ] [ drop ] if ] keep ;
 
 M: read1-task task-container drop read-tasks get-global ;
 
@@ -209,17 +204,6 @@ M: input-port stream-read1
     dup wait-to-read1 [ buffer-pop ] unless-eof ;
 
 ! Reading character counts
-: read-step ( count reader -- ? )
-    dup port-sbuf -rot >r over length - r>
-    2dup buffer-length <= [
-        buffer> nappend t
-    ] [
-        buffer>> nip nappend f
-    ] if ;
-
-: can-read-count? ( count reader -- ? )
-    dup port-sbuf delete-all read-step ;
-
 TUPLE: read-task count ;
 
 C: read-task ( count port -- task )
@@ -229,27 +213,48 @@ C: read-task ( count port -- task )
 : >read-task< dup read-task-count swap io-task-port ;
 
 M: read-task do-io-task
-    >read-task< dup refill [
-        dup buffer-empty? [
-            reader-eof drop t
-        ] [
-            read-step
-        ] if
-    ] [
-        2drop f
-    ] if ;
+    io-task-port dup refill [ reader-eof t ] [ drop f ] if ;
 
 M: read-task task-container drop read-tasks get-global ;
 
 : wait-to-read ( count port -- )
-    2dup can-read-count? [
+    2dup buffer-length > [
         [ -rot <read-task> add-io-task stop ] callcc0
-    ] unless pending-error drop ;
+    ] when pending-error drop ;
+
+: stream-read-part ( count port -- string )
+    >r 0 max >fixnum r>
+    [ wait-to-read ] 2keep
+    [ dupd buffer> ] unless-eof nip ;
+
+: stream-read-loop ( count port sbuf -- )
+    pick over length - dup 0 > [
+        pick stream-read-part dup [
+            dupd nappend stream-read-loop
+        ] [
+            2drop 2drop
+        ] if
+    ] [
+        2drop 2drop
+    ] if ;
+
+: fast>string ( sbuf -- string )
+    dup length over underlying length number=
+    [ underlying ] [ >string ] if ; inline
 
 M: input-port stream-read
-    >r 0 max >fixnum r>
-    [ wait-to-read ] keep
-    [ port-sbuf >string ] unless-eof ;
+    2dup stream-read-part dup [
+        pick over length > [
+            pick <sbuf>
+            [ swap nappend ] keep
+            [ stream-read-loop ] keep
+            fast>string
+        ] [
+            2nip
+        ] if
+    ] [
+        2nip
+    ] if ;
 
 ! Writers
 
