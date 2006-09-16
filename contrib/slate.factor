@@ -5,7 +5,6 @@ REQUIRES: contrib/math contrib/alien contrib/vars ;
 USING: kernel namespaces math sequences vectors arrays opengl gadgets
        math-contrib alien-contrib vars ;
 
-
 IN: slate
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
@@ -89,6 +88,10 @@ SYMBOL: capacity
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
+: gl-normal ( vec -- ) first3 [ glNormal3f ] curry3 add-dlist ;
+
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
 : gl-begin ( mode -- ) [ glBegin ] curry add-dlist ;
 
 : gl-end ( -- ) [ glEnd ] add-dlist ;
@@ -131,6 +134,8 @@ SYMBOL: capacity
 
 : gl-material-fv ( face pname params -- )
 >float-array [ glMaterialfv ] curry3 add-dlist ;
+
+: gl-line-width ( width -- ) [ glLineWidth ] curry add-dlist ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
