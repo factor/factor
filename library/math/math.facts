@@ -68,7 +68,7 @@ HELP: /
         "Division of ratios and complex numbers proceeds using the relevant mathematical rules."
     }
 }
-{ $errors "Throws an error if both inputs are integers, and the denominator is 0." } ;
+{ $see-also "division-by-zero" } ;
 
 HELP: /i
 { $values { "x" "a real number" } { "y" "a real number" } { "z" "a real number" } }
@@ -81,7 +81,7 @@ HELP: /i
         "Integer division of ratios and complex numbers proceeds using the relevant mathematical rules."
     }
 }
-{ $errors "Throws an error if both inputs are integers, and the denominator is 0." } ;
+{ $see-also "division-by-zero" } ;
 
 HELP: /f
 { $values { "x" "a real number" } { "y" "a real number" } { "z" "a real number" } }
@@ -94,7 +94,7 @@ HELP: /f
         "Integer division of ratios and complex numbers proceeds using the relevant mathematical rules."
     }
 }
-{ $errors "Throws an error if both inputs are integers, and the denominator is 0." } ;
+{ $see-also "division-by-zero" } ;
 
 HELP: mod
 { $values { "x" "an integer" } { "y" "an integer" } { "z" "an integer" } }
@@ -105,8 +105,7 @@ HELP: mod
         "Modulus of bignums always yields a bignum."            
     }
 }
-{ $errors "Throws an error if the denominator is 0." }
-{ $see-also rem } ;
+{ $see-also "division-by-zero" rem } ;
 
 HELP: /mod
 { $values { "x" "an integer" } { "y" "an integer" } { "z" "an integer" } { "w" "an integer" } }
@@ -117,7 +116,7 @@ HELP: /mod
         "The quotient and remainder of two bignums is always a bignum."            
     }
 }
-{ $errors "Throws an error if the denominator is 0." } ;
+{ $see-also "division-by-zero" } ;
 
 HELP: bitand
 { $values { "x" "an integer" } { "y" "an integer" } { "z" "an integer" } }
@@ -225,8 +224,7 @@ HELP: rem
         "Modulus of bignums always yields a bignum."            
     }
 }
-{ $errors "Throws an error if the denominator is 0." }
-{ $see-also mod } ;
+{ $see-also "division-by-zero" mod } ;
 
 HELP: sgn
 { $values { "x" "a real number" } { "n" "-1, 0 or 1" } }

@@ -17,6 +17,13 @@ ARTICLE: "number-types" "Types of numbers"
 { $subsection "floats" }
 { $subsection "complex-numbers" } ;
 
+ARTICLE: "division-by-zero" "Division by zero"
+"Floating point division never raises an error if the denominator is zero. This means that if at least one of the two inputs to " { $link / } ", " { $link /f } " or " { $link mod } " is a float, the result will be a floating point infinity or not a number value."
+$terpri
+"The behavior of integer division is hardware specific. On x86 processors, " { $link /i } " and " { $link mod } " raise an error if both inputs are integers and the denominator is zero. On PowerPC, integer division by zero yields a result of zero."
+$terpri
+"On the other hand, the " { $link / } " word, when given integer arguments, implements a much more expensive division algorithm which always yields an exact rational answer, and this word always tests for division by zero explicitly." ;
+
 ARTICLE: "number-protocol" "Number protocol"
 "Math operations obey certain numerical upgrade rules. If one of the inputs is a bignum and the other is a fixnum, the latter is first coerced to a bignum; if one of the inputs is a float, the other is coerced to a float."
 $terpri
@@ -29,7 +36,7 @@ $terpri
 { $subsection * }
 { $subsection / }
 "Non-commutative operations take operands from the stack in the natural order; " { $snippet "6 2 /" } " divides 6 by 2."
-$terpri
+{ $subsection "division-by-zero" }
 "Real numbers (but not complex numbers) can be ordered:"
 { $subsection < }
 { $subsection <= }
