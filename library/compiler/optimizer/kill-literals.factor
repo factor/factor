@@ -1,5 +1,5 @@
-! Copyright (C) 2004, 2005 Slava Pestov.
-! See http://factor.sf.net/license.txt for BSD license.
+! Copyright (C) 2004, 2006 Slava Pestov.
+! See http://factorcode.org/license.txt for BSD license.
 IN: optimizer
 USING: arrays generic hashtables inference kernel math
 namespaces sequences words ;
@@ -49,7 +49,7 @@ M: #return live-values*
 
 ! nodes that don't use their values directly
 UNION: #killable
-    #push #shuffle #call-label #merge #values #entry ;
+    #push #shuffle #>r #r> #call-label #merge #values #entry ;
 
 M: #killable live-values* drop { } ;
 

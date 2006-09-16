@@ -206,9 +206,6 @@ SYMBOL: phantom-r
 : phantom-append ( seq stack -- )
     over length over adjust-phantom swap nappend ;
 
-: (template-outputs) ( seq stack -- )
-    phantoms swapd phantom-append phantom-append ;
-
 SYMBOL: +input
 SYMBOL: +output
 SYMBOL: +scratch
@@ -273,7 +270,7 @@ SYMBOL: +clobber
     alloc-scratch ;
 
 : template-outputs ( -- )
-    +output get [ get ] map { } (template-outputs) ;
+    +output get [ get ] map phantom-d get phantom-append ;
 
 : with-template ( quot spec -- )
     fix-spec [ template-inputs call template-outputs ] bind

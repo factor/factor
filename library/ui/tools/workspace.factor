@@ -63,7 +63,7 @@ workspace {
         { "Definitions" T{ key-down f f "F3" } [ browser select-tool ] }
         { "Documentation" T{ key-down f f "F4" } [ help-gadget select-tool ] }
         { "Walker" T{ key-down f f "F5" } [ walker-gadget select-tool ] }
-        { "Dataflow" T{ key-down f f "F6" } [ walker-gadget select-tool ] }
+        { "Dataflow" T{ key-down f f "F6" } [ dataflow-gadget select-tool ] }
     }
 
     {

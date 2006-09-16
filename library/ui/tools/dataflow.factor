@@ -7,10 +7,9 @@ gadgets-labels gadgets-theme gadgets-presentations
 gadgets-buttons gadgets-borders gadgets-scrolling
 gadgets-frames gadgets-workspace optimizer models ;
 
-: shuffle-in dup shuffle-in-d swap shuffle-in-r append ;
+GENERIC: node>gadget ( height node -- gadget )
 
-: shuffle-out dup shuffle-out-d swap shuffle-out-r append ;
-
+! Representation of shuffle nodes
 TUPLE: shuffle-gadget value ;
 
 : literal-theme ( shuffle -- )
@@ -24,14 +23,17 @@ C: shuffle-gadget ( node -- gadget )
     dup delegate>gadget ;
 
 : shuffled-offsets ( shuffle -- seq )
-    dup shuffle-in swap shuffle-out [ swap index ] map-with ;
+    dup shuffle-in swap shuffle-out
+    [ swap index ] map-with ;
 
-: shuffled-endpoints ( w seq seq -- seq )
-    [ [ 30 * 15 + ] 2apply >r dupd 2array 0 r> 2array 2array ]
-    2map nip ;
+: shuffled-endpoints ( w h seq seq -- seq )
+    [ [ 30 * 15 + ] map ] 2apply
+    >r over r> [ - ] map-with >r [ - ] map-with r>
+    [ 0 swap 2array ] map >r [ 2array ] map-with r>
+    [ 2array ] 2map ;
 
 : draw-shuffle ( gadget seq seq -- )
-    >r >r rect-dim first r> r> shuffled-endpoints
+    >r >r rect-dim first2 r> r> shuffled-endpoints
     [ first2 gl-line ] each ;
 
 M: shuffle-gadget draw-gadget*
@@ -40,62 +42,60 @@ M: shuffle-gadget draw-gadget*
     shuffled-offsets [ length ] keep
     draw-shuffle ;
 
-: shuffle-dim ( shuffle -- node )
+: node-dim ( n -- dim ) 30 * 10 swap 2array ;
+
+: shuffle-dim ( shuffle -- dim )
     dup shuffle-in length swap shuffle-out length max
-    30 * 10 swap 2array ;
+    node-dim ;
 
 M: shuffle-gadget pref-dim*
-    dup delegate pref-dim
-    swap shuffle-gadget-value shuffle-dim
-    vmax ;
+    shuffle-gadget-value shuffle-dim ;
 
-TUPLE: height-gadget value skew ;
+M: #shuffle node>gadget nip node-shuffle <shuffle-gadget> ;
 
-C: height-gadget ( value skew -- gadget )
-    [ set-height-gadget-skew ] keep
+! Stack height underneath a node
+TUPLE: height-gadget value ;
+
+C: height-gadget ( value -- gadget )
     [ set-height-gadget-value ] keep
     dup delegate>gadget ;
 
 M: height-gadget pref-dim*
-    dup height-gadget-value swap height-gadget-skew abs +
-    30 * 10 swap 2array ;
-
-: height-offsets ( value skew -- seq seq )
-    [ abs swap [ [ + ] map-with ] keep ] keep
-    0 < [ swap ] when ;
+    height-gadget-value node-dim ;
 
 M: height-gadget draw-gadget*
     { 0 0 0 1 } gl-color
-    dup height-gadget-value over height-gadget-skew
-    height-offsets draw-shuffle ;
+    dup height-gadget-value dup draw-shuffle ;
 
-TUPLE: node-gadget value ;
+! Calls and pushes
+TUPLE: node-gadget value height ;
 
-C: node-gadget ( gadget node -- gadget )
+C: node-gadget ( gadget node height -- gadget )
+    [ set-node-gadget-height ] keep
     [ set-node-gadget-value ] keep
-    swap <default-border> over set-gadget-delegate ;
+    swap <default-border> over set-gadget-delegate
+    dup faint-boundary ;
 
 M: node-gadget pref-dim*
     dup delegate pref-dim
-    swap node-gadget-value node-shuffle shuffle-dim
-    vmax ;
-
-GENERIC: node>gadget ( node -- gadget )
+    swap dup node-gadget-height [
+        node-dim
+    ] [
+        node-gadget-value node-shuffle shuffle-dim
+    ] ?if vmax ;
 
 M: #call node>gadget
+    nip
     [ node-param word-name <label> ] keep
-    [ <node-gadget> ] keep node-param <object-presentation>
+    [ f <node-gadget> ] keep node-param <object-presentation>
     dup word-theme ;
 
 M: #push node>gadget
-    [
+    nip [
         >#push< [ literalize unparse ] map " " join <label>
-    ] keep <node-gadget> dup literal-theme ;
+    ] keep f <node-gadget> dup literal-theme ;
 
-M: #shuffle node>gadget node-shuffle <shuffle-gadget> ;
-
-DEFER: dataflow.
-
+! #if #dispatch #label
 : <child-nodes> ( seq -- seq )
     [ length ] keep
     [
@@ -103,70 +103,69 @@ DEFER: dataflow.
         <object-presentation>
     ] 2map ;
 
+: default-node-content ( node -- gadget )
+    dup node-children <child-nodes>
+    swap class word-name <mono-label> add* make-pile
+    { 5 5 } over set-pack-gap ;
+
 M: object node>gadget
-    [
-        dup class word-name <label> ,
-        dup node-children <child-nodes> %
-    ] { } make make-pile
-    { 5 5 } over set-pack-gap
-    swap <node-gadget> dup faint-boundary ;
+    nip dup default-node-content swap f <node-gadget> ;
+
+UNION: full-height-node #if #dispatch #label ;
+
+M: full-height-node node>gadget
+    dup default-node-content swap rot <node-gadget> ;
+
+! Constructing the graphical representation; first we compute
+! stack heights
+SYMBOL: d-height
+
+: compute-child-heights ( node -- )
+    node-children dup empty? [
+        drop
+    ] [
+        [
+            [ (compute-heights) d-height get ] { } make drop
+        ] map supremum d-height set
+    ] if ;
 
 : (compute-heights) ( node -- )
     [
-        [ node-d-height ] keep
-        [ node-r-height ] keep
-        [ 3array , ] keep
+        d-height get over 2array ,
+        dup compute-child-heights
+        dup node-out-d length over node-in-d length -
+        d-height [ + ] change
         node-successor (compute-heights)
     ] when* ;
 
-: node-in-d# node-in-d length ;
-: node-out-d# node-out-d length ;
-
-: node-in-r# node-in-r length ;
-: node-out-r# node-out-r length ;
-
-: normalize-d-height ( seq -- seq )
-    [ [ dup first swap third node-in-d# - ] map infimum ] keep
-    [ first3 >r >r swap - r> r> 3array ] map-with ;
-
-: normalize-r-height ( seq -- seq )
-    [ [ dup second swap third node-in-r# - ] map infimum ] keep
-    [ first3 >r rot - r> 3array ] map-with ;
+: normalize-height ( seq -- seq )
+    [
+        [ dup first swap second node-in-d length - ] map infimum
+    ] keep
+    [ first2 >r swap - r> 2array ] map-with ;
 
 : compute-heights ( nodes -- pairs )
-    [ (compute-heights) ] { } make
-    normalize-d-height normalize-r-height ;
+    [ 0 d-height set (compute-heights) ] { } make
+    normalize-height ;
 
-: node-r-skew-1 ( node -- n )
-    dup node-out-d# over node-in-r# [-] swap node-in-d# [-] ;
-
-: node-r-skew-2 ( node -- n )
-    dup node-in-d# over node-out-r# [-] swap node-out-d# [-] ;
-
-SYMBOL: prev-node 
-
-: node-r-skew ( node -- n )
-    node-r-skew-1 prev-node get [ node-r-skew-2 - ] when* ;
-
-: print-node ( d-height r-height node -- )
-    [
-        [
-            pick 0 <height-gadget> ,
-            2dup node-in-r# + over node-r-skew <height-gadget> ,
-        ] { } make make-pile ,
-        [
-            rot over node-in-d# - 0 <height-gadget> ,
-            node>gadget ,
-            0 <height-gadget> ,
-        ] { } make make-pile 1 over set-pack-fill ,
-    ] keep prev-node set ;
+! Then we create gadgets for every node
+: print-node ( d-height node -- )
+    dup full-height-node? [
+        node>gadget
+    ] [
+        [ node-in-d length - <height-gadget> ] 2keep
+        node>gadget swap 2array
+        make-pile 1 over set-pack-fill
+    ] if , ;
 
 : <dataflow-graph> ( node -- gadget )
-    prev-node off
-    compute-heights
-    [ [ first3 print-node ] each ] { } make
-    make-shelf ;
+    compute-heights [
+        dup empty? [ dup first first <height-gadget> , ] unless
+        [ first2 print-node ] each
+    ] { } make
+    make-shelf 1 over set-pack-align ;
 
+! The UI tool
 TUPLE: dataflow-gadget history search ;
 
 dataflow-gadget {

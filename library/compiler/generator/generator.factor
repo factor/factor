@@ -178,25 +178,35 @@ M: #push generate-node
         [ append ] keep delete-all
     ] if ;
 
-: phantom-shuffle-inputs ( shuffle -- locs locs )
-    dup shuffle-in-d length phantom-d get phantom-shuffle-input
-    swap shuffle-in-r length phantom-r get phantom-shuffle-input ;
-
 : adjust-shuffle ( shuffle -- )
-    dup shuffle-in-d length neg phantom-d get adjust-phantom
-    shuffle-in-r length neg phantom-r get adjust-phantom ;
-
-: shuffle-vregs# ( shuffle -- n )
-    dup shuffle-in-d swap shuffle-in-r additional-vregs ;
+    shuffle-in length neg phantom-d get adjust-phantom ;
 
 : phantom-shuffle ( shuffle -- )
-    dup shuffle-vregs# 0 ensure-vregs
-    [ phantom-shuffle-inputs ] keep
+    dup shuffle-in 0 additional-vregs 0 ensure-vregs
+    [
+        shuffle-in length phantom-d get phantom-shuffle-input
+    ] keep
     [ shuffle* ] keep adjust-shuffle
-    (template-outputs) ;
+    phantom-d get phantom-append ;
 
 M: #shuffle generate-node
     node-shuffle phantom-shuffle iterate-next ;
+
+M: #>r generate-node
+    drop
+    1 0 additional-vregs 0 ensure-vregs
+    1 phantom-d get phantom-shuffle-input
+    -1 phantom-d get adjust-phantom
+    phantom-r get phantom-append
+    iterate-next ;
+
+M: #r> generate-node
+    drop
+    0 1 additional-vregs 0 ensure-vregs
+    1 phantom-r get phantom-shuffle-input
+    -1 phantom-r get adjust-phantom
+    phantom-d get phantom-append
+    iterate-next ;
 
 ! #return
 M: #return generate-node drop end-basic-block %return f ;

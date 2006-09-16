@@ -7,11 +7,6 @@
 - links:
   - same deal
 
-- UI dataflow visualizer:
-  - spacing is weird
-  - #label, #if mess up height
-  - [ >r + dup r> ] foo  broken
-  - why does + look funny?
 - pane output in UI should use less memory
 - signal 4 on datastack underflow on mac intel??
 - faster I/O
@@ -45,6 +40,7 @@
 - merge keyboard help with help in some way
 - keyboard help: hide commands whose gestures are shadowed
 - division by zero may not raise an error -- document this
+- the editor should fill up the interior of the scroller completely
 
 + ui:
 

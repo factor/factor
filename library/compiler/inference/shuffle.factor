@@ -22,35 +22,22 @@ M: integer value-uid ;
 
 M: integer value-recursion drop f ;
 
-TUPLE: shuffle in-d in-r out-d out-r ;
+TUPLE: shuffle in out ;
 
-: load-shuffle ( d r shuffle -- )
-    tuck shuffle-in-r [ set ] 2each shuffle-in-d [ set ] 2each ;
+: split-shuffle ( stack shuffle -- stack1 stack2 )
+    shuffle-in length swap cut* ;
 
-: shuffled-values ( values -- values )
-    [ [ namespace hash dup ] keep ? ] map ;
+: load-shuffle ( stack shuffle -- )
+    shuffle-in [ set ] 2each ;
 
-: store-shuffle ( shuffle -- d r )
-    dup shuffle-out-d shuffled-values
-    swap shuffle-out-r shuffled-values ;
+: shuffled-values ( shuffle -- values )
+    shuffle-out [ get ] map ;
 
-: shuffle* ( d r shuffle -- d r )
-    [ [ load-shuffle ] keep store-shuffle ] with-scope ;
+: shuffle* ( stack shuffle -- stack )
+    [ [ load-shuffle ] keep shuffled-values ] with-scope ;
 
-: split-shuffle ( d r shuffle -- d' r' d r )
-    tuck shuffle-in-r length swap cut*
-    >r >r shuffle-in-d length swap cut*
-    r> swap r> ;
-
-: join-shuffle ( d' r' d r -- d r )
-    swapd append >r append r> ;
-
-: shuffle ( d r shuffle -- newd newr )
-    [ split-shuffle ] keep shuffle* join-shuffle ;
+: shuffle ( stack shuffle -- stack )
+    [ split-shuffle ] keep shuffle* append ;
 
 M: shuffle clone
-    [ shuffle-in-d clone ] keep
-    [ shuffle-in-r clone ] keep
-    [ shuffle-out-d clone ] keep
-    shuffle-out-r clone
-    <shuffle> ;
+    [ shuffle-in clone ] keep shuffle-out clone <shuffle> ;
