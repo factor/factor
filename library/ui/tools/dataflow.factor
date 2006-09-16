@@ -5,9 +5,11 @@ USING: namespaces arrays sequences io inference math kernel
 generic prettyprint words gadgets opengl gadgets-panes
 gadgets-labels gadgets-theme gadgets-presentations
 gadgets-buttons gadgets-borders gadgets-scrolling
-gadgets-frames gadgets-workspace optimizer models ;
+gadgets-frames gadgets-workspace optimizer models help ;
 
-GENERIC: node>gadget ( height node -- gadget )
+GENERIC: node>gadget* ( height node -- gadget )
+
+GENERIC: node-presents ( node -- object )
 
 ! Representation of shuffle nodes
 TUPLE: shuffle-gadget value ;
@@ -50,7 +52,9 @@ M: shuffle-gadget draw-gadget*
 M: shuffle-gadget pref-dim*
     shuffle-gadget-value shuffle-dim ;
 
-M: #shuffle node>gadget nip node-shuffle <shuffle-gadget> ;
+M: #shuffle node>gadget* nip node-shuffle <shuffle-gadget> ;
+
+M: #shuffle node-presents drop f ;
 
 ! Stack height underneath a node
 TUPLE: height-gadget value ;
@@ -83,18 +87,21 @@ M: node-gadget pref-dim*
         node-gadget-value node-shuffle shuffle-dim
     ] ?if vmax ;
 
-M: #call node>gadget
+M: #call node>gadget*
     nip
     [ node-param word-name <label> ] keep
-    [ f <node-gadget> ] keep node-param <object-presentation>
-    dup word-theme ;
+    f <node-gadget> dup word-theme ;
 
-M: #push node>gadget
+M: #call node-presents node-param ;
+
+M: #push node>gadget*
     nip [
         >#push< [ literalize unparse ] map " " join <label>
     ] keep f <node-gadget> dup literal-theme ;
 
-! #if #dispatch #label
+M: #push node-presents >#push< first ;
+
+! #if #dispatch #label etc
 : <child-nodes> ( seq -- seq )
     [ length ] keep
     [
@@ -102,17 +109,25 @@ M: #push node>gadget
         <object-presentation>
     ] 2map ;
 
+: <node-presentation> ( node -- gadget )
+    class [ word-name <label> ] keep <link>
+    <object-presentation> ;
+
 : default-node-content ( node -- gadget )
     dup node-children <child-nodes>
     swap class word-name <label> add* make-pile
     { 5 5 } over set-pack-gap ;
 
-M: object node>gadget
+M: object node>gadget*
     nip dup default-node-content swap f <node-gadget> ;
 
-UNION: full-height-node #if #dispatch #label ;
+M: object node-presents
+    class <link> ;
 
-M: full-height-node node>gadget
+UNION: full-height-node #if #dispatch #label #merge #return
+#values #entry ;
+
+M: full-height-node node>gadget*
     dup default-node-content swap rot <node-gadget> ;
 
 ! Constructing the graphical representation; first we compute
@@ -150,6 +165,10 @@ DEFER: (compute-heights)
     normalize-height ;
 
 ! Then we create gadgets for every node
+: node>gadget ( height node -- gadget )
+    [ node>gadget* ] keep node-presents
+    [ <object-presentation> ] when* ;
+
 : print-node ( d-height node -- )
     dup full-height-node? [
         node>gadget

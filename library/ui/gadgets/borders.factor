@@ -2,7 +2,7 @@
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: gadgets-borders
 USING: arrays errors gadgets gadgets-theme generic hashtables
-kernel math namespaces vectors ;
+kernel math namespaces vectors sequences ;
 
 TUPLE: border size ;
 
@@ -15,7 +15,7 @@ C: border ( child gap -- border )
 
 : layout-border-loc ( border -- )
     dup rect-dim swap gadget-child
-    [ pref-dim v- 2 v/n ] keep set-rect-loc ;
+    [ pref-dim v- 2 v/n [ >fixnum ] map ] keep set-rect-loc ;
 
 M: border pref-dim*
     [ border-size 2 v*n ] keep

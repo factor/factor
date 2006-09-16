@@ -179,7 +179,8 @@ M: operation invoke-command ( target operation -- )
 [ word? ] H{
     { +group+ "Words" }
     { +name+ "Word dataflow" }
-    { +quot+ [ word-def dataflow-gadget call-tool ] }
+    { +gesture+ T{ key-down f { A+ } "d" } }
+    { +quot+ [ word-def show-dataflow ] }
 } define-operation
 
 [ [ node? ] is? ] H{

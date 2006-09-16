@@ -44,6 +44,8 @@
 
 + ui:
 
+- dataflow UI needs various improvements:
+  full-height nodes should really be full height
 - draw-world: bail out if world is 0x0
 - better help result ranking
 - page scrolling should be timer-based too
