@@ -59,4 +59,4 @@ C: pastebin ( -- pastebin )
 
 \ submit-paste [ paste-list ] define-redirect
 
-"pastebin" "paste-list" "contrib/pastebin" web-app
+"pastebin" "paste-list" "contrib/furnace-pastebin" web-app
