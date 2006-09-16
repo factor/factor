@@ -134,22 +134,41 @@ M: loc-monitor model-changed
         caret-rect rect-extent gl-line
     ] when ;
 
-: translate-lines ( n editor -- )
-    line-height * 0.0 swap 0.0 glTranslated ;
+: translate-lines ( n -- )
+    editor get line-height * 0.0 swap 0.0 glTranslated ;
 
 : draw-line ( editor str -- )
     over editor-color gl-color
     >r editor-font r> draw-string ;
 
+: first-visible-line ( editor -- n )
+    clip get rect-loc second origin get second -
+    swap y>line ;
+
+: last-visible-line ( editor -- n )
+    clip get rect-extent nip second origin get second -
+    swap y>line 1+ ;
+
 : with-editor ( editor quot -- )
     [
-        swap dup control-model document set editor set call
+        swap
+        dup first-visible-line \ first-visible-line set
+        dup last-visible-line \ last-visible-line set
+        dup control-model document set
+        editor set
+        call
     ] with-scope ; inline
+
+: visible-lines ( editor -- seq )
+    \ first-visible-line get
+    \ last-visible-line get
+    rot editor-lines <slice> ;
 
 : draw-lines ( -- )
     GL_MODELVIEW [
-        editor get dup editor-lines
-        [ over >r draw-line 1 r> translate-lines ] each-with
+        \ first-visible-line get translate-lines
+        editor get dup visible-lines
+        [ draw-line 1 translate-lines ] each-with
     ] do-matrix ;
 
 : selection-start/end ( editor -- start end )
@@ -166,18 +185,15 @@ M: loc-monitor model-changed
     editor get offset>x
     (draw-selection) ;
 
-: translate>selection-start ( start -- )
-    first editor get translate-lines ;
-
 : draw-selection ( -- )
     GL_MODELVIEW [
         editor get
         dup editor-selection-color gl-color
         selection-start/end
-        over translate>selection-start
+        over first translate-lines
         2dup [
             >r 2dup r> draw-selected-line
-            1 editor get translate-lines
+            1 translate-lines
         ] each-line 2drop
     ] do-matrix ;
 
