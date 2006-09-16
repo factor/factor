@@ -16,8 +16,8 @@ FUNCTION: int usb_get_string_simple ( usb_dev_handle* dev, int index, char* buf,
 FUNCTION: int usb_get_descriptor_by_endpoint ( usb_dev_handle* udev, int ep, uchar type, uchar index, void* buf, int size ) ;
 FUNCTION: int usb_get_descriptor ( usb_dev_handle* udev, uchar type, uchar index, void* buf, int size ) ;
 
-FUNCTION: int usb_bulk_write ( usb_dev_handle* dev, int ep, char* bytes, int size, int timeout ) ;
-FUNCTION: int usb_bulk_read ( usb_dev_handle* dev, int ep, char* bytes, int size, int timeout ) ;
+FUNCTION: int usb_bulk_write ( usb_dev_handle* dev, int ep, void* bytes, int size, int timeout ) ;
+FUNCTION: int usb_bulk_read ( usb_dev_handle* dev, int ep, void* bytes, int size, int timeout ) ;
 FUNCTION: int usb_interrupt_write ( usb_dev_handle* dev, int ep, char* bytes, int size, int timeout ) ;
 FUNCTION: int usb_interrupt_read ( usb_dev_handle* dev, int ep, char* bytes, int size, int timeout ) ;
 FUNCTION: int usb_control_msg ( usb_dev_handle* dev, int requesttype, int request, int value, int index, char* bytes, int size, int timeout ) ;
