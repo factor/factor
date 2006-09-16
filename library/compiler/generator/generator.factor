@@ -179,12 +179,12 @@ M: #push generate-node
     ] if ;
 
 : adjust-shuffle ( shuffle -- )
-    shuffle-in length neg phantom-d get adjust-phantom ;
+    effect-in length neg phantom-d get adjust-phantom ;
 
 : phantom-shuffle ( shuffle -- )
-    dup shuffle-in 0 additional-vregs 0 ensure-vregs
+    dup effect-in 0 additional-vregs 0 ensure-vregs
     [
-        shuffle-in length phantom-d get phantom-shuffle-input
+        effect-in length phantom-d get phantom-shuffle-input
     ] keep
     [ shuffle* ] keep adjust-shuffle
     phantom-d get phantom-append ;

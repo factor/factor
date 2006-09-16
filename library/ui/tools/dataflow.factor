@@ -23,8 +23,7 @@ C: shuffle-gadget ( node -- gadget )
     dup delegate>gadget ;
 
 : shuffled-offsets ( shuffle -- seq )
-    dup shuffle-in swap shuffle-out
-    [ swap index ] map-with ;
+    dup effect-in swap effect-out [ swap index ] map-with ;
 
 : shuffled-endpoints ( w h seq seq -- seq )
     [ [ 30 * 15 + ] map ] 2apply
@@ -45,7 +44,7 @@ M: shuffle-gadget draw-gadget*
 : node-dim ( n -- dim ) 30 * 10 swap 2array ;
 
 : shuffle-dim ( shuffle -- dim )
-    dup shuffle-in length swap shuffle-out length max
+    dup effect-in length swap effect-out length max
     node-dim ;
 
 M: shuffle-gadget pref-dim*

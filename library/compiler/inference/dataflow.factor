@@ -24,7 +24,7 @@ successor children ;
 M: node equal? eq? ;
 
 : node-shuffle ( node -- shuffle )
-    dup node-in-d swap node-out-d <shuffle> ;
+    dup node-in-d swap node-out-d <effect> ;
 
 : make-node ( param in-d out-d in-r out-r node -- node )
     [ >r f f f f f <node> r> set-delegate ] keep ;
