@@ -76,6 +76,8 @@ SYMBOL: capacity
 
 : gl-ortho ( left right bottom top near far -- ) [ glOrtho ] curry6 add-dlist ;
 
+: gl-frustum ( left right bottom top near far -- ) [ glFrustum ] curry6 add-dlist ;
+
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 : gl-vertex2 ( vec -- ) first2 [ glVertex2f ] curry2 add-dlist ;
@@ -164,6 +166,8 @@ SYMBOL: capacity
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 : draw-line ( a b --- ) GL_LINES gl-begin gl-vertex gl-vertex gl-end ;
+
+: draw-lines ( seq -- ) GL_LINES gl-begin [ gl-vertex ] each gl-end ;
 
 : draw-line-strip ( seq -- ) GL_LINE_STRIP gl-begin [ gl-vertex ] each gl-end ;
 
