@@ -32,3 +32,33 @@ M: lazy-contents cdr ( lazy-contents -- cdr )
 
 M: lazy-contents nil? ( lazy-contents -- bool )
   car not ;
+
+TUPLE: lazy-lines stream car cdr ;
+
+: llines ( stream -- result )
+  f f <lazy-lines> ;
+
+M: lazy-lines car ( lazy-lines -- car )
+  dup lazy-lines-car dup [
+    nip  
+  ] [ 
+    drop dup lazy-lines-stream stream-readln
+    swap dupd set-lazy-lines-car
+  ] if ;
+
+M: lazy-lines cdr ( lazy-lines -- cdr )
+  dup lazy-lines-cdr dup [
+    nip
+  ] [
+    drop dup
+    [ lazy-lines-stream ] keep
+    car [
+      llines [ swap set-lazy-lines-cdr ] keep
+    ] [
+      2drop nil
+    ] if 
+  ] if ;
+
+M: lazy-lines nil? ( lazy-lines -- bool )
+  car not ;
+
