@@ -4,14 +4,6 @@
 ! Updated by Matthew Willis, July 2006
 ! Updated by Chris Double, September 2006
 !
-! TODO: 
-!   lazy-map and lazy-subset don't memoize the computed car.
-!   demonstrated by the following fib definition:
-!   : fib ( n -- ) dup 2 < [ drop 1 ] [ dup 1 - "fibs" get nth swap 2 - "fibs" get nth + ] if ;
-!   naturals [ fib ] lmap "fibs" set
-!   25 fib . 25 fib .
-!   The second call should be faster than the first.
-!    
 USING: kernel sequences math vectors arrays namespaces generic ;
 IN: lazy-lists
 
@@ -103,10 +95,45 @@ TUPLE: list ;
 : 2curry ( a b quot -- quot )
   curry curry ;
 
+TUPLE: memoized-cons original car cdr nil? ;
+
+: not-memoized ( -- obj )
+  { } ;
+
+: not-memoized? ( obj -- bool )
+  not-memoized eq? ;
+
+C: memoized-cons ( cons -- memoized-cons )
+  [ set-memoized-cons-original ] keep
+  not-memoized over set-memoized-cons-car 
+  not-memoized over set-memoized-cons-cdr 
+  not-memoized over set-memoized-cons-nil? ;
+
+M: memoized-cons car ( memoized-cons -- car )
+  dup memoized-cons-car not-memoized? [
+    dup memoized-cons-original car [ swap set-memoized-cons-car ] keep
+  ] [
+    memoized-cons-car
+  ] if ;
+
+M: memoized-cons cdr ( memoized-cons -- cdr )
+  dup memoized-cons-cdr not-memoized? [
+    dup memoized-cons-original cdr [ swap set-memoized-cons-cdr ] keep
+  ] [
+    memoized-cons-cdr
+  ] if ;
+
+M: memoized-cons nil? ( memoized-cons -- bool )
+  dup memoized-cons-nil? not-memoized? [
+    dup memoized-cons-original nil? [ swap set-memoized-cons-nil? ] keep
+  ] [
+    memoized-cons-nil?
+  ] if ;
+
 TUPLE: lazy-map cons quot ;
 
 : lmap ( list quot -- result )
-    over nil? [ 2drop nil ] [ <lazy-map> ] if ;
+    over nil? [ 2drop nil ] [ <lazy-map> <memoized-cons> ] if ;
 
 M: lazy-map car ( lazy-map -- car )
   [ lazy-map-cons car ] keep
@@ -137,7 +164,7 @@ M: lazy-take nil? ( lazy-take -- bool )
 TUPLE: lazy-subset cons quot ;
 
 : lsubset ( list quot -- list )
-    over nil? [ 2drop nil ] [ <lazy-subset> ] if ;
+    over nil? [ 2drop nil ] [ <lazy-subset> <memoized-cons> ] if ;
 
 : car-subset?  ( lazy-subset -- )
   [ lazy-subset-cons car ] keep

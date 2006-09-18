@@ -73,6 +73,11 @@ HELP: 3lazy-list
 { $description "Create a lazy list with 3 elements. The elements are the result of calling the quotations. The quotations are only called when the list elements are requested." } 
 { $see-also 1lazy-list 2lazy-list } ;
 
+HELP: <memoized-cons>
+{ $values { "cons" "a cons object" } { "cons" "the resulting memoized-cons object" } }
+{ $description "Constructs a cons object that wraps an existing cons object. Requests for the car, cdr and nil? will be remembered after the first call, and the previous result returned on subsequent calls." } 
+{ $see-also cons car cdr nil nil? } ;
+
 HELP: lnth
 { $values { "n" "an integer index" } { "list" "a cons object" } { "elt" "the element at the nth index" } }
 { $description "Outputs the nth element of the list." } 
