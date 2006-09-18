@@ -139,6 +139,8 @@ SYMBOL: capacity
 
 : gl-line-width ( width -- ) [ glLineWidth ] curry add-dlist ;
 
+: gl-polygon-mode ( face mode -- ) [ glPolygonMode ] curry2 add-dlist ;
+
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 : glu-look-at ( position focus up -- )
