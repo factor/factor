@@ -4,61 +4,35 @@
 USING: kernel lazy-lists io ;
 IN: lazy-lists
 
-TUPLE: lazy-contents stream car cdr ;
+TUPLE: lazy-io stream car cdr quot ;
 
 : lcontents ( stream -- result )
-  f f <lazy-contents> ;
-
-M: lazy-contents car ( lazy-contents -- car )
-  dup lazy-contents-car dup [
-    nip  
-  ] [ 
-    drop dup lazy-contents-stream stream-read1 
-    swap dupd set-lazy-contents-car
-  ] if ;
-
-M: lazy-contents cdr ( lazy-contents -- cdr )
-  dup lazy-contents-cdr dup [
-    nip
-  ] [
-    drop dup
-    [ lazy-contents-stream ] keep
-    car [
-      lcontents [ swap set-lazy-contents-cdr ] keep
-    ] [
-      2drop nil
-    ] if 
-  ] if ;
-
-M: lazy-contents nil? ( lazy-contents -- bool )
-  car not ;
-
-TUPLE: lazy-lines stream car cdr ;
+  f f [ stream-read1 ] <lazy-io> ;
 
 : llines ( stream -- result )
-  f f <lazy-lines> ;
+  f f [ stream-readln ] <lazy-io> ;
 
-M: lazy-lines car ( lazy-lines -- car )
-  dup lazy-lines-car dup [
+M: lazy-io car ( lazy-io -- car )
+  dup lazy-io-car dup [
     nip  
   ] [ 
-    drop dup lazy-lines-stream stream-readln
-    swap dupd set-lazy-lines-car
+    drop dup lazy-io-stream over lazy-io-quot call 
+    swap dupd set-lazy-io-car
   ] if ;
 
-M: lazy-lines cdr ( lazy-lines -- cdr )
-  dup lazy-lines-cdr dup [
+M: lazy-io cdr ( lazy-io -- cdr )
+  dup lazy-io-cdr dup [
     nip
   ] [
     drop dup
-    [ lazy-lines-stream ] keep
+    [ lazy-io-stream ] keep
+    [ lazy-io-quot ] keep
     car [
-      llines [ swap set-lazy-lines-cdr ] keep
+      >r f f r> <lazy-io> [ swap set-lazy-io-cdr ] keep
     ] [
-      2drop nil
+      3drop nil
     ] if 
   ] if ;
 
-M: lazy-lines nil? ( lazy-lines -- bool )
+M: lazy-io nil? ( lazy-io -- bool )
   car not ;
-
