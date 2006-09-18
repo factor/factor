@@ -115,6 +115,8 @@ gl-end ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
+! Maybe use an array instead of a vector
+
 SYMBOL: vertices
 
 ! V{ } vertices set-global
@@ -155,6 +157,8 @@ SYMBOL: vertices
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 ! Lindenmayer string rewriting
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+! Maybe use an array instead of a quot in the work of segment
 
 SYMBOL: rules
 
@@ -333,6 +337,11 @@ dup >color-index color-table> nth dup gl-color material-color ;
 
 : setup-variables ( -- )
 V{ } clone vertices set   V{ } clone states set   setup-color-table ;
+
+! The call to setup-variables in lparser-dialect should probably go
+! somewhere else. The variables that setup-variables sets up are
+! related to interpretation of lsystem strings as opposed to the
+! lsystem itself.
 
 : lparser-dialect ( -- )
 
@@ -595,3 +604,7 @@ tabular-output ;
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 PROVIDE: lindenmayer ;
+
+! USING: slate lindenmayer ;
+
+! new-slate drop reset
