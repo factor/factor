@@ -42,6 +42,7 @@ Available libraries:
 - sequences -- Non-core sequence words (Eduardo Cavazos)
 - serialize -- Binary object serialization (Chris Double)
 - slate -- Graphics canvas for the UI (Eduardo Cavazos)
+- slate-examples -- Examples of how to use slate (Eduardo Cavazos)
 - space-invaders -- Intel 8080-based Space Invaders arcade machine emulator (Chris Double)
 - splay-trees -- Splay trees (Mackenzie Straight)
 - sqlite -- SQLite binding (Chris Double)
