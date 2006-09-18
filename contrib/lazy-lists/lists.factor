@@ -3,7 +3,15 @@
 !
 ! Updated by Matthew Willis, July 2006
 ! Updated by Chris Double, September 2006
-
+!
+! TODO: 
+!   lazy-map and lazy-subset don't memoize the computed car.
+!   demonstrated by the following fib definition:
+!   : fib ( n -- ) dup 2 < [ drop 1 ] [ dup 1 - "fibs" get nth swap 2 - "fibs" get nth + ] if ;
+!   naturals [ fib ] lmap "fibs" set
+!   25 fib . 25 fib .
+!   The second call should be faster than the first.
+!    
 USING: kernel sequences math vectors arrays namespaces generic ;
 IN: lazy-lists
 
