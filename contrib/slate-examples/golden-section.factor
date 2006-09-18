@@ -1,6 +1,5 @@
-
+REQUIRES: contrib/slate ;
 USING: kernel math arrays sequences namespaces opengl slate slate-2d ;
-
 IN: golden-section
 
 ! Usage:

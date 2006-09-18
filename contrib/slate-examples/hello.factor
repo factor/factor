@@ -1,4 +1,5 @@
-
+REQUIRES: contrib/slate ;
+USING: opengl slate ;
 IN: redbook-hello
 
 : go ( -- )
