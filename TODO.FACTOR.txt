@@ -1,6 +1,17 @@
 + 0.85:
 
+- listener toolbar is too wide
 - font corruption now that books don't add/remove their children
+- doc sweep
+- tool help button in every tool's toolbar
+- keyboard help: hide commands whose gestures are shadowed
+- the editor should fill up the interior of the scroller completely
+- words:
+  - S+left: reload
+  - S+right: inspect
+- links:
+  - same deal
+
 - pane output in UI should use less memory
 - signal 4 on datastack underflow on mac intel??
 - buffer-ptr should be an alien
@@ -22,25 +33,15 @@
     space
 - we have trouble drawing rectangles
 - ui browser: show currently selected vocab & words
-- the editor should fill up the interior of the scroller completely
-- doc sweep
-- tool help
-- keyboard help: hide commands whose gestures are shadowed
-- how do we refer to command shortcuts in the docs?
 
 + ui:
 
+- how do we refer to command shortcuts in the docs?
+- page up/down: each tool has a distinglished scroller
 - reliably clonable gadgets
 - figure out if we need both set-model and set-model*
-- help tool: edit, reload buttons
-- words:
-  - S+left: reload
-  - S+right: inspect
-- links:
-  - same deal
 - if i do 10000 [ . ] each and then clear, the listener window is slow
-- dataflow UI needs various improvements:
-  full-height nodes should really be full height
+- full-height nodes should really be full height
 - draw-world: bail out if world is 0x0
 - better help result ranking
 - page scrolling should be timer-based too

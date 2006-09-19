@@ -174,3 +174,20 @@ V{ } clone hand-buttons set-global
 
 : send-action ( world gesture -- )
     swap world-focus handle-gesture drop ;
+
+: resend-button-down ( gesture world -- )
+    hand-loc get-global swap send-button-down ;
+
+: resend-button-up  ( gesture world -- )
+    hand-loc get-global swap send-button-up ;
+
+world H{
+    { T{ key-down f { C+ } "x" } [ T{ cut-action } send-action ] }
+    { T{ key-down f { C+ } "c" } [ T{ copy-action } send-action ] }
+    { T{ key-down f { C+ } "v" } [ T{ paste-action } send-action ] }
+    { T{ key-down f { C+ } "a" } [ T{ select-all-action } send-action ] }
+    { T{ button-down f { C+ } 1 } [ T{ button-down f f 3 } swap resend-button-down ] }
+    { T{ button-down f { A+ } 1 } [ T{ button-down f f 2 } swap resend-button-down ] }
+    { T{ button-up f { C+ } 1 } [ T{ button-up f f 3 } swap resend-button-up ] }
+    { T{ button-up f { A+ } 1 } [ T{ button-up f f 2 } swap resend-button-up ] }
+} set-gestures
