@@ -77,7 +77,7 @@ M: walker-gadget call-tool* ( continuation walker -- )
 
 walker-gadget {
     {
-        "Walker"
+        "Walker commands"
         { "Step" T{ key-down f f "s" } [ walker-step ] }
         { "Step in" T{ key-down f f "i" } [ walker-step-in ] }
         { "Step out" T{ key-down f f "o" } [ walker-step-out ] }

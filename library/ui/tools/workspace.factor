@@ -5,7 +5,7 @@ USING: arrays compiler gadgets gadgets-books gadgets-browser
 gadgets-buttons gadgets-controls gadgets-dataflow gadgets-frames
 gadgets-grids gadgets-help gadgets-listener
 gadgets-presentations gadgets-walker gadgets-workspace generic
-kernel math modules scratchpad sequences syntax words ;
+kernel math modules scratchpad sequences syntax words io ;
 
 C: tool ( gadget -- tool )
     {
@@ -49,15 +49,28 @@ M: workspace pref-dim* delegate pref-dim* { 550 650 } vmax ;
     [ init-tabs ] keep
     open-window ;
 
+: gadget-info. ( gadget -- )
+    "Gadget: " write
+    [ class word-name ] keep write-object terpri ;
+
+: keyboard-help ( gadget -- )
+    parents [
+        dup all-commands dup empty? [
+            2drop
+        ] [
+            swap gadget-info. commands.
+        ] if
+    ] each ;
+
 : commands-window ( workspace -- )
     dup find-world world-focus [ ] [ gadget-child ] ?if
-    [ commands. ] "Commands" pane-window ;
+    [ keyboard-help ] "Commands" pane-window ;
 
 : tool-window ( class -- ) workspace-window show-tool drop ;
 
 workspace {
     {
-        "Tools"
+        "Tool switching commands"
         { "Keyboard help" T{ key-down f f "F1" } [ commands-window ] }
         { "Listener" T{ key-down f f "F2" } [ listener-gadget select-tool ] }
         { "Definitions" T{ key-down f f "F3" } [ browser select-tool ] }
@@ -67,14 +80,14 @@ workspace {
     }
 
     {
-        "Tools in new window"
+        "Tool window commands"
         { "New listener" T{ key-down f { S+ } "F2" } [ listener-gadget tool-window drop ] }
         { "New definitions" T{ key-down f { S+ } "F3" } [ browser tool-window drop ] }
         { "New documentation" T{ key-down f { S+ } "F4" } [ help-gadget tool-window drop ] }
     }
     
     {
-        "Workflow"
+        "Workflow commands"
         { "Reload changed sources" T{ key-down f f "F7" } [ drop [ reload-modules ] listener-gadget call-tool ] }
         { "Recompile changed words" T{ key-down f f "F8" } [ drop [ recompile ] listener-gadget call-tool ] }
     }

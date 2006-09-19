@@ -54,16 +54,10 @@ M: object gesture>string drop f ;
 : define-commands ( class specs -- )
     [ <commands> ] map concat define-commands* ;
 
-: commands ( gadget -- seq )
-    delegates [ class "commands" word-prop ] map concat ;
+: commands ( class -- seq ) "commands" word-prop ;
 
-: all-commands ( gadget -- assoc )
-    [
-        parents [
-            dup commands [ set ] each-with
-        ] each
-    ] make-hash
-    hash>alist [ [ first command-name ] 2apply <=> ] sort ;
+: all-commands ( gadget -- seq )
+    delegates [ class commands ] map concat ;
 
 : resend-button-down ( gesture world -- )
     hand-loc get-global swap send-button-down ;

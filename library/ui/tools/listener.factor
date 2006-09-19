@@ -61,9 +61,6 @@ M: listener-gadget focusable-child*
         drop f
     ] if ;
 
-: clear-output ( -- )
-    stdio get duplex-stream-out pane-clear ;
-
 G: call-listener ( quot/string listener -- )
     1 standard-combination ;
 
@@ -85,3 +82,23 @@ M: listener-gadget call-tool* ( quot/string listener -- )
     ] [
         [ [ run-file ] each ] curry listener-gadget call-tool
     ] if ;
+
+: listener-eof ( listener -- )
+    listener-gadget-input f swap interactor-eval ;
+
+: (listener-history) ( listener -- )
+    dup listener-gadget-output [
+        listener-gadget-input interactor-history
+        [ dup print-input ] each
+    ] with-stream* ;
+
+: listener-history ( listener -- )
+    [ [ (listener-history) ] curry ] keep
+    call-listener ;
+
+: clear-listener-output ( listener -- )
+    [ listener-gadget-output [ pane-clear ] curry ] keep
+    call-listener ;
+
+: clear-listener-stack ( listener -- )
+    [ clear ] swap call-listener ;

@@ -1,0 +1,43 @@
+USING: gadgets gadgets-listener gadgets-browser gadgets-help
+gadgets-walker gadgets-dataflow gadgets-workspace help
+gadgets-panes gadgets-text listener ;
+
+ARTICLE: "ui-listener" "UI listener"
+"The graphical listener is based around the terminal listener (" { $link "listener" } ") and adds an input history and clickable output presentations (" { $link "styles" } ")."
+$terpri
+"Listeners are instances of " { $link listener-gadget } ". The listener consists of an output area (instance of " { $link pane } "), an input area (instance of " { $link interactor } "), and a stack display kept up to date using a " { $link listener-hook } "."
+$terpri
+"The word commands appearing in the below list operate on the token at the caret position in the input area. The quotation commands operate on the entire contents of the input area. The walker and dataflow tools are invoked using these commands."
+{ $commands listener-gadget }
+;
+
+ARTICLE: "ui-browser" "UI definition browser"
+"Definition browsers are instances of " { $link browser } "."
+{ $commands browser }
+;
+
+ARTICLE: "ui-help" "UI documentation browser"
+"Documentation browsers are instances of " { $link help-gadget } "."
+{ $commands help-gadget }
+;
+
+ARTICLE: "ui-walker" "UI walker"
+"Walkers are instances of " { $link walker-gadget } "."
+{ $commands walker-gadget }
+;
+
+ARTICLE: "ui-dataflow" "UI dataflow tool"
+"Dataflow viewers are instances of " { $link dataflow-gadget } "."
+{ $commands dataflow-gadget }
+;
+
+ARTICLE: "ui-tools" "Development tools in the UI"
+"UI development tools are integrated into a single-window " { $emphasis "workspace" } ". Multiple workspaces can be open at once, and keyboard commands are provided for switching between tools."
+$terpri
+"Workspaces are instances of " { $link workspace-window } "."
+{ $commands workspace }
+{ $subsection "ui-listener" }
+{ $subsection "ui-browser" }
+{ $subsection "ui-help" }
+{ $subsection "ui-walker" }
+{ $subsection "ui-dataflow" } ;

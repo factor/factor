@@ -18,7 +18,7 @@ C: field ( model -- field )
 
 field {
     {
-        "Editing"
+        "Editing commands"
         { "Clear input" T{ key-down f { C+ } "k" } [ control-model clear-doc ] }
         { "Accept input" T{ key-down f f "RETURN" } [ field-commit drop ] }
     }

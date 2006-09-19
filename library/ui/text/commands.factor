@@ -68,7 +68,7 @@ sequences ;
 
 editor {
     {
-        "Editing"
+        "Editing commands"
         { "Insert newline" T{ key-down f f "RETURN" } [ "\n" swap user-input ] }
         { "Insert newline" T{ key-down f { S+ } "RETURN" } [ "\n" swap user-input ] }
         { "Insert newline" T{ key-down f f "ENTER" } [ "\n" swap user-input ] }
@@ -81,7 +81,7 @@ editor {
     }
     
     {
-        "Clipboard"
+        "Clipboard commands"
         { "Paste" T{ paste-action } [ clipboard get paste-clipboard ] }
         { "Paste selection" T{ button-up f f 2 } [ selection get paste-clipboard ] }
         { "Copy" T{ copy-action } [ clipboard get editor-copy ] }
@@ -90,7 +90,7 @@ editor {
     }
 
     {
-        "Moving caret"
+        "Caret motion commands"
         { "Position caret" T{ button-down } [ editor-mouse-down ] }
         { "Previous character" T{ key-down f f "LEFT" } [ T{ char-elt } editor-prev ] }
         { "Next character" T{ key-down f f "RIGHT" } [ T{ char-elt } editor-next ] }
@@ -105,7 +105,7 @@ editor {
     }
     
     {
-        "Selecting text"
+        "Text selection commands"
         { "Extend selection" T{ button-down f { S+ } } [ editor-extend-selection ] }
         { "Start selection" T{ drag } [ editor-mouse-drag ] }
         { "Focus editor" T{ gain-focus } [ focus-editor ] }

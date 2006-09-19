@@ -20,4 +20,5 @@ PROVIDE: doc/handbook {
     "syntax.facts"
     "tools.facts"
     "words.facts"
+    "ui/tools.facts"
 } ;

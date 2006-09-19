@@ -190,7 +190,7 @@ TUPLE: dataflow-gadget history search ;
 
 dataflow-gadget {
     {
-        "Dataflow"
+        "Dataflow commands"
         { "Back" T{ key-down f { C+ } "b" } [ dataflow-gadget-history go-back ] }
         { "Forward" T{ key-down f { C+ } "f" } [ dataflow-gadget-history go-forward ] }
     }

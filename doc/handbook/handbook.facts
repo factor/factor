@@ -43,6 +43,8 @@ ARTICLE: "handbook" "Factor documentation"
 { $subsection "help" }
 { $subsection "inference" }
 { $subsection "compiler" }
+{ $heading "Graphical user interface" }
+{ $subsection "ui-tools" }
 { $heading "Index" }
 { $subsection "article-index" }
 { $subsection "primitive-index" }

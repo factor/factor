@@ -5,7 +5,7 @@ USING: definitions gadgets gadgets-browser gadgets-dataflow
 gadgets-help gadgets-listener gadgets-text gadgets-workspace
 hashtables help inference kernel namespaces parser prettyprint
 scratchpad sequences strings styles syntax test tools words
-generic ;
+generic models ;
 
 V{ } clone operations set-global
 
@@ -49,7 +49,7 @@ M: operation invoke-command ( target operation -- )
 ! Words
 [ word? ] H{
     { +button+ 1 }
-    { +group+ "Words" }
+    { +group+ "Word commands" }
     { +name+ "Browse" }
     { +gesture+ T{ key-down f { A+ } "b" } }
     { +quot+ [ browser call-tool ] }
@@ -57,7 +57,7 @@ M: operation invoke-command ( target operation -- )
 
 [ word? ] H{
     { +button+ 2 }
-    { +group+ "Words" }
+    { +group+ "Word commands" }
     { +name+ "Edit" }
     { +gesture+ T{ key-down f { A+ } "e" } }
     { +quot+ [ edit ] }
@@ -65,14 +65,14 @@ M: operation invoke-command ( target operation -- )
 
 [ word? ] H{
     { +button+ 3 }
-    { +group+ "Words" }
+    { +group+ "Word commands" }
     { +name+ "Documentation" }
     { +gesture+ T{ key-down f { A+ } "h" } }
     { +quot+ [ help-gadget call-tool ] }
 } define-operation
 
 [ word? ] H{
-    { +group+ "Words" }
+    { +group+ "Word commands" }
     { +name+ "Usage" }
     { +gesture+ T{ key-down f { A+ } "u" } }
     { +quot+ [ usage. ] }
@@ -80,7 +80,7 @@ M: operation invoke-command ( target operation -- )
 } define-operation
 
 [ word? ] H{
-    { +group+ "Words" }
+    { +group+ "Word commands" }
     { +name+ "Reload" }
     { +gesture+ T{ key-down f { A+ } "r" } }
     { +quot+ [ reload ] }
@@ -88,7 +88,7 @@ M: operation invoke-command ( target operation -- )
 } define-operation
 
 [ word? ] H{
-    { +group+ "Words" }
+    { +group+ "Word commands" }
     { +name+ "Watch" }
     { +quot+ [ watch ] }
     { +listener+ t }
@@ -122,7 +122,7 @@ M: operation invoke-command ( target operation -- )
 
 ! Strings
 [ string? ] H{
-    { +group+ "Words" }
+    { +group+ "Word commands" }
     { +name+ "Apropos (all)" }
     { +gesture+ T{ key-down f { A+ } "a" } }
     { +quot+ [ apropos ] }
@@ -135,7 +135,7 @@ M: operation invoke-command ( target operation -- )
     ] make-hash hash-values natural-sort ;
 
 [ string? ] H{
-    { +group+ "Words" }
+    { +group+ "Word commands" }
     { +name+ "Apropos (used)" }
     { +gesture+ T{ key-down f f "TAB" } }
     { +quot+ [ usable-words (apropos) ] }
@@ -144,7 +144,7 @@ M: operation invoke-command ( target operation -- )
 
 ! Quotations
 [ quotation? ] H{
-    { +group+ "Quotations" }
+    { +group+ "Quotation commands" }
     { +name+ "Infer" }
     { +gesture+ T{ key-down f { C+ A+ } "i" } }
     { +quot+ [ infer . ] }
@@ -152,7 +152,7 @@ M: operation invoke-command ( target operation -- )
 } define-operation
 
 [ quotation? ] H{
-    { +group+ "Quotations" }
+    { +group+ "Quotation commands" }
     { +name+ "Dataflow" }
     { +gesture+ T{ key-down f { C+ A+ } "d" } }
     { +quot+ [ show-dataflow ] }
@@ -160,7 +160,7 @@ M: operation invoke-command ( target operation -- )
 } define-operation
 
 [ quotation? ] H{
-    { +group+ "Quotations" }
+    { +group+ "Quotation commands" }
     { +name+ "Walk" }
     { +gesture+ T{ key-down f { C+ A+ } "w" } }
     { +quot+ [ walk ] }
@@ -168,7 +168,7 @@ M: operation invoke-command ( target operation -- )
 } define-operation
 
 [ quotation? ] H{
-    { +group+ "Quotations" }
+    { +group+ "Quotation commands" }
     { +name+ "Time" }
     { +gesture+ T{ key-down f { C+ A+ } "t" } }
     { +quot+ [ time ] }
@@ -177,7 +177,7 @@ M: operation invoke-command ( target operation -- )
 
 ! Dataflow nodes
 [ word? ] H{
-    { +group+ "Words" }
+    { +group+ "Word commands" }
     { +name+ "Word dataflow" }
     { +gesture+ T{ key-down f { A+ } "d" } }
     { +quot+ [ word-def show-dataflow ] }
@@ -185,7 +185,6 @@ M: operation invoke-command ( target operation -- )
 
 [ [ node? ] is? ] H{
     { +button+ 1 }
-    { +group+ "Nodes" }
     { +name+ "Quotation dataflow" }
     { +quot+ [ dataflow-gadget call-tool ] }
 } define-operation
@@ -200,32 +199,44 @@ T{ command f f "Close" f [ close-tile ] } add*
 define-commands*
 
 ! Interactor commands
+
+! Listener commands
 : selected-word ( editor -- string )
     dup gadget-selection?
     [ dup T{ word-elt } select-elt ] unless
     gadget-selection ;
 
+: listener-selected-word ( listener -- string )
+    listener-gadget-input selected-word ;
+
 : word-action ( target -- quot )
-    selected-word search ;
+    listener-selected-word search ;
 
 : quot-action ( quot -- quot )
-    field-commit parse ;
+    listener-gadget-input field-commit parse ;
 
-interactor [
+listener-gadget [
     {
-        "Listener"
-        { "Evaluate" T{ key-down f f "RETURN" } [ interactor-commit ] }
-        { "Send EOF" T{ key-down f { C+ } "d" } [ f swap interactor-eval ] }
+        "Listener commands"
+        { "Send EOF" T{ key-down f { C+ } "d" } [ listener-eof ] }
+        { "History" T{ key-down f { C+ } "h" } [ listener-history ] }
+        { "Clear output" T{ key-down f f "CLEAR" } [ clear-listener-output ] }
+        { "Clear stack" T{ key-down f { C+ } "CLEAR" } [ clear-listener-stack ] }
     } <commands> %
 
     [ word-action ] \ word class-operations modify-listener-operations %
-    [ selected-word ] string class-operations modify-listener-operations %
+    [ listener-selected-word ] string class-operations modify-listener-operations %
     [ quot-action ] quotation class-operations modify-listener-operations %
+] { } make define-commands*
 
+help-gadget [
     {
-        "Listener"
-        { "History" T{ key-down f { C+ } "h" } [ [ interactor-history. ] swap interactor-call ] }
-        { "Clear output" T{ key-down f f "CLEAR" } [ [ clear-output ] swap interactor-call ] }
-        { "Clear stack" T{ key-down f { C+ } "CLEAR" } [ [ clear ] swap interactor-call ] }
-    } <commands> %
+        "Help commands"
+        { "Back" T{ key-down f { C+ } "b" } [ help-gadget-history go-back ] }
+        { "Forward" T{ key-down f { C+ } "f" } [ help-gadget-history go-forward ] }
+        { "Home" T{ key-down f { C+ } "h" } [ go-home ] }
+    }
+    
+    [ help-gadget-history model-value ] link class-operations modify-listener-operations
+    [ command-name "Follow" = not ] subset %
 ] { } make define-commands*

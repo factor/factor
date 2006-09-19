@@ -120,22 +120,17 @@ C: titled-gadget ( gadget title -- )
     windows get [ empty? not ] [ f ] if* ;
 
 : <toolbar> ( gadget -- toolbar )
-    dup commands [ <command-presentation> ] map-with
+    dup all-commands
+    [ <command-presentation> ] map-with
     make-shelf ;
 
-: $gadget ( element -- ) first gadget. ;
-
-: command-description ( target command -- element )
-    [ <command-presentation> \ $gadget swap 2array ] keep
-    command-gesture gesture>string 2array ;
-
-: gadget-info ( gadget -- )
-    "Gadget: " write
-    [ class word-name ] keep write-object terpri ;
+: command-description ( command -- element )
+    dup command-name swap command-gesture gesture>string
+    2array ;
 
 : command-table. ( commands group -- )
     $heading
-    [ first2 swap command-description ] map
+    [ command-description ] map
     { "Command" "Gesture" } add* $table ;
 
 : push-hash ( elt key hash -- )
@@ -143,13 +138,15 @@ C: titled-gadget ( gadget title -- )
 
 : group-commands ( commands -- seq )
     H{ } clone swap
-    [ dup first command-group pick push-hash ] each
+    [ dup command-group pick push-hash ] each
     hash>alist [ [ first ] 2apply <=> ] sort ;
 
-: commands. ( gadget -- )
-    dup gadget-info terpri
-    all-commands [ first command-gesture key-down? ] subset
+: commands. ( seq -- )
+    [ command-gesture key-down? ] subset
     group-commands [ first2 swap command-table. ] each ;
+
+: $commands ( elt -- )
+    dup array? [ first ] when commands commands. ;
 
 : pane-window ( quot title -- )
     >r make-pane <scroller> r> open-titled-window ;

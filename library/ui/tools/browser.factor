@@ -101,7 +101,7 @@ M: browser focusable-child* browser-search ;
 
 browser {
     {
-        "Browser"
+        "Browser commands"
         { "Clear" T{ key-down f f "CLEAR" } [ clear-browser ] }
     }
 } define-commands

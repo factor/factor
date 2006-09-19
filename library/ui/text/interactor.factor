@@ -52,14 +52,15 @@ SYMBOL: structured-input
         [ field-commit ] keep interactor-eval
     ] if ;
 
-: interactor-history. ( -- )
-    stdio get dup duplex-stream-out [
-        duplex-stream-in interactor-history
-        [ dup print-input ] each
-    ] with-stream* ;
-
 M: interactor stream-readln
     dup interactor-queue empty? [
         f over set-interactor-busy?
         [ over set-interactor-continuation stop ] callcc0
     ] when interactor-queue pop ;
+
+interactor {
+    {
+        "Editing commands"
+        { "Evaluate" T{ key-down f f "RETURN" } [ interactor-commit ] }
+    }
+} define-commands

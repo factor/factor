@@ -25,12 +25,11 @@
 - the editor should fill up the interior of the scroller completely
 - doc sweep
 - tool help
-- perhaps commands window should sort by gesture
-- merge keyboard help with help in some way
 - keyboard help: hide commands whose gestures are shadowed
 
 + ui:
 
+- reliably clonable gadgets
 - figure out if we need both set-model and set-model*
 - help tool: edit, reload buttons
 - words:
