@@ -48,6 +48,7 @@ Available libraries:
 - sqlite -- SQLite binding (Chris Double)
 - textmate -- TextMate integration (Benjamin Pollack)
 - topology -- Computational algebraic topology (Slava Pestov)
+- usb -- Wrapper for libusb (Chris Double)
 - units -- Unit conversion (Doug Coleman)
 - vars -- Alternative syntax for variables (Eduardo Cavazos)
 - vim -- VIM integration (Alex Chapman)
