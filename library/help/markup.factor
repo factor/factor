@@ -70,6 +70,8 @@ M: f print-element drop ;
 
 : $emphasis [ emphasis-style print-element* ] ($span) ;
 
+: $strong [ strong-style print-element* ] ($span) ;
+
 : $url [ url-style print-element* ] ($span) ;
 
 : $terpri terpri terpri drop ;

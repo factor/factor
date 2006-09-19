@@ -29,3 +29,6 @@ C: help-gadget ( -- gadget )
 M: help-gadget focusable-child* help-gadget-search ;
 
 M: help-gadget call-tool* show-help ;
+
+: help-action ( help-gadget -- link )
+    help-gadget-history model-value <link> ;

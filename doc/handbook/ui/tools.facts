@@ -22,11 +22,21 @@ ARTICLE: "ui-help" "UI documentation browser"
 ;
 
 ARTICLE: "ui-walker" "UI walker"
+"The walker single-steps through quotations. To use the walker, enter a piece of code in the listener's input area and press " { $snippet "C+A+w" } "."
+$terpri
+"The walker can travel backwards through time, and restore stacks. This does not undo side effects and therefore can only be used reliably on referentially transparent code."
+$terpri
 "Walkers are instances of " { $link walker-gadget } "."
 { $commands walker-gadget }
 ;
 
 ARTICLE: "ui-dataflow" "UI dataflow tool"
+"The dataflow viewer displays the stack effect of a quotation in a graphical way. To use it, enter a piece of code in the listener's input area and press " { $snippet "C+A+d" } ", or click the " { $strong "Dataflow" } " button in a definition tile shown by the UI browser."
+$terpri
+"Only quotations and words for which a stack effect can be inferred can be viewed. See " { $link "inference" } "."
+$terpri
+"The dataflow viewer displays the dataflow intermediate representation output by the compiler's optimizer. Therefore inlining and various other optimizations will have already been performed, and the visual representation may not resemble your original code in many ways. An upside of this arrangement is that the dataflow viewer can be used to predict how fast the code will run, because you will see which layers of generic dispatch have been optimized out at compile time."
+$terpri
 "Dataflow viewers are instances of " { $link dataflow-gadget } "."
 { $commands dataflow-gadget }
 ;

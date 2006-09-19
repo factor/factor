@@ -26,6 +26,7 @@
 - doc sweep
 - tool help
 - keyboard help: hide commands whose gestures are shadowed
+- how do we refer to command shortcuts in the docs?
 
 + ui:
 

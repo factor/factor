@@ -1,6 +1,7 @@
-IN: optimizer
+IN: print-dataflow
 USING: generic hashtables inference io kernel kernel-internals
-math namespaces prettyprint sequences styles vectors words ;
+math namespaces prettyprint sequences styles vectors words
+test optimizer ;
 
 ! A simple tool for turning dataflow IR into quotations, for
 ! debugging purposes.
@@ -82,3 +83,11 @@ M: object node>quot dup class word-name comment, ;
     #! Print dataflow IR for a quotation. Flag indicates if
     #! annotations should be printed or not.
     >r dataflow optimize r> dataflow>quot . ;
+
+[ ] [ [ 2 ] t dataflow. ] unit-test
+[ ] [ [ 3 + ] t dataflow. ] unit-test
+[ ] [ [ drop ] t dataflow. ] unit-test
+[ ] [ [ [ sq ] [ abs ] if ] t dataflow. ] unit-test
+[ ] [ [ { [ sq ] [ abs ] } dispatch ] t dataflow. ] unit-test
+[ ] [ \ unify-values word-def t dataflow. ] unit-test
+[ ] [ [ 0 0 / ] t dataflow. ] unit-test

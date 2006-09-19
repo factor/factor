@@ -114,6 +114,11 @@ M: operation invoke-command ( target operation -- )
     { +quot+ [ edit ] }
 } define-operation
 
+[ link? ] H{
+    { +name+ "Reload" }
+    { +quot+ [ reload ] }
+} define-operation
+
 [ word-link? ] H{
     { +button+ 3 }
     { +name+ "Definition" }
@@ -178,7 +183,7 @@ M: operation invoke-command ( target operation -- )
 ! Dataflow nodes
 [ word? ] H{
     { +group+ "Word commands" }
-    { +name+ "Word dataflow" }
+    { +name+ "Dataflow" }
     { +gesture+ T{ key-down f { A+ } "d" } }
     { +quot+ [ word-def show-dataflow ] }
 } define-operation
@@ -235,8 +240,8 @@ help-gadget [
         { "Back" T{ key-down f { C+ } "b" } [ help-gadget-history go-back ] }
         { "Forward" T{ key-down f { C+ } "f" } [ help-gadget-history go-forward ] }
         { "Home" T{ key-down f { C+ } "h" } [ go-home ] }
-    }
+    } <commands> %
     
-    [ help-gadget-history model-value ] link class-operations modify-listener-operations
+    [ help-action ] link class-operations modify-listener-operations
     [ command-name "Follow" = not ] subset %
 ] { } make define-commands*
