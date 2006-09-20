@@ -133,7 +133,7 @@ SYMBOL: html
 [
     "h1" "h2" "h3" "h4" "h5" "h6" "h7" "h8" "h9"    
     "ol" "li" "form" "a" "p" "html" "head" "body" "title"
-    "b" "i" "ul" "table" "tr" "td" "th" "pre" "textarea"
+    "b" "i" "ul" "table" "tbody" "tr" "td" "th" "pre" "textarea"
     "script" "div" "span" "select" "option" "style"
 ] [ define-closed-html-word ] each
 
