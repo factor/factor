@@ -225,7 +225,7 @@ HELP: hash-diff
 HELP: hash-update
 { $values { "hash1" "a hashtable" } { "hash2" "a hashtable" } }
 { $description "Adds all key/value pairs from " { $snippet "hash2" } " to " { $snippet "hash1" } "." }
-{ $side-effects "hash" } ;
+{ $side-effects "hash1" } ;
 
 HELP: hash-union
 { $values { "hash1" "a hashtable" } { "hash2" "a hashtable" } { "union" "a new hashtable" } }

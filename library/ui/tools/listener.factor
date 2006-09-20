@@ -76,6 +76,12 @@ M: input call-listener
 M: listener-gadget call-tool* ( quot/string listener -- )
     call-listener ;
 
+M: listener-gadget tool-scroller
+    listener-gadget-output find-scroller ;
+
+M: listener-gadget tool-help
+    drop "ui-listener" ;
+
 : listener-run-files ( seq -- )
     dup empty? [
         drop
@@ -102,3 +108,11 @@ M: listener-gadget call-tool* ( quot/string listener -- )
 
 : clear-listener-stack ( listener -- )
     [ clear ] swap call-listener ;
+
+listener-gadget "Listener commands" {
+    { "Restart" T{ key-down f { C+ } "r" } [ start-listener ] }
+    { "Send EOF" T{ key-down f { C+ } "d" } [ listener-eof ] }
+    { "History" T{ key-down f { C+ } "h" } [ listener-history ] }
+    { "Clear output" T{ key-down f f "CLEAR" } [ clear-listener-output ] }
+    { "Clear stack" T{ key-down f { C+ } "CLEAR" } [ clear-listener-stack ] }
+} define-commands

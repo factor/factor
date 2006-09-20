@@ -119,8 +119,8 @@ C: titled-gadget ( gadget title -- )
 : restore-windows? ( -- ? )
     windows get [ empty? not ] [ f ] if* ;
 
-: <toolbar> ( gadget -- toolbar )
-    dup all-commands
+: <toolbar> ( target classes -- toolbar )
+    [ commands ] map categorize-commands hash-values concat
     [ <command-presentation> ] map-with
     make-shelf ;
 
@@ -130,20 +130,14 @@ C: titled-gadget ( gadget title -- )
 
 : command-table. ( commands group -- )
     $heading
-    [ command-description ] map
-    { "Command" "Gesture" } add* $table ;
-
-: push-hash ( elt key hash -- )
-    [ hash ?push ] 2keep set-hash ;
-
-: group-commands ( commands -- seq )
-    H{ } clone swap
-    [ dup command-group pick push-hash ] each
-    hash>alist [ [ first ] 2apply <=> ] sort ;
-
-: commands. ( seq -- )
     [ command-gesture key-down? ] subset
-    group-commands [ first2 swap command-table. ] each ;
+    [ command-description ] map
+    { "Command" "Shortcut" } add* $table ;
+
+: commands. ( hash -- )
+    hash>alist
+    [ [ first ] 2apply <=> ] sort
+    [ first2 swap command-table. ] each ;
 
 : $commands ( elt -- )
     dup array? [ first ] when commands commands. ;

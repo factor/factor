@@ -58,9 +58,6 @@ M: interactor stream-readln
         [ over set-interactor-continuation stop ] callcc0
     ] when interactor-queue pop ;
 
-interactor {
-    {
-        "Editing commands"
-        { "Evaluate" T{ key-down f f "RETURN" } [ interactor-commit ] }
-    }
+interactor "Interactor commands" {
+    { "Evaluate" T{ key-down f f "RETURN" } [ interactor-commit ] }
 } define-commands

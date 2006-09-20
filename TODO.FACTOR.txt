@@ -1,16 +1,10 @@
 + 0.85:
 
-- listener toolbar is too wide
+- hide empty command groups in $commands
+- slot accessors should record their loc
 - font corruption now that books don't add/remove their children
 - doc sweep
-- tool help button in every tool's toolbar
-- keyboard help: hide commands whose gestures are shadowed
 - the editor should fill up the interior of the scroller completely
-- words:
-  - S+left: reload
-  - S+right: inspect
-- links:
-  - same deal
 
 - pane output in UI should use less memory
 - signal 4 on datastack underflow on mac intel??
@@ -36,8 +30,8 @@
 
 + ui:
 
+- auto-update browser and help when sources reload
 - how do we refer to command shortcuts in the docs?
-- page up/down: each tool has a distinglished scroller
 - reliably clonable gadgets
 - figure out if we need both set-model and set-model*
 - if i do 10000 [ . ] each and then clear, the listener window is slow

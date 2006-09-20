@@ -8,6 +8,14 @@ DEFER: workspace-window
 
 GENERIC: call-tool* ( arg tool -- )
 
+GENERIC: tool-scroller ( tool -- scroller )
+
+M: gadget tool-scroller drop f ;
+
+GENERIC: tool-help ( tool -- topic )
+
+M: gadget tool-help drop f ;
+
 TUPLE: workspace ;
 
 TUPLE: tool gadget ;

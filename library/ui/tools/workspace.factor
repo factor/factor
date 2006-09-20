@@ -1,21 +1,38 @@
 ! Copyright (C) 2006 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 IN: gadgets-workspace
-USING: arrays compiler gadgets gadgets-books gadgets-browser
-gadgets-buttons gadgets-controls gadgets-dataflow gadgets-frames
-gadgets-grids gadgets-help gadgets-listener
-gadgets-presentations gadgets-walker gadgets-workspace generic
-kernel math modules scratchpad sequences syntax words io ;
+USING: help arrays compiler gadgets gadgets-books
+gadgets-browser gadgets-buttons gadgets-controls
+gadgets-dataflow gadgets-frames gadgets-grids gadgets-help
+gadgets-listener gadgets-presentations gadgets-walker
+gadgets-workspace generic kernel math modules scratchpad
+sequences syntax words io namespaces hashtables
+gadgets-scrolling gadgets-panes ;
 
 C: tool ( gadget -- tool )
     {
-        { [ dup <toolbar> ] f f @top }
+        { [ dup dup class tool 2array <toolbar> ] f f @top }
         { [ ] set-tool-gadget f @center }
     } make-frame* ;
 
 M: tool focusable-child* tool-gadget ;
 
 M: tool call-tool* tool-gadget call-tool* ;
+
+M: tool tool-scroller tool-gadget tool-scroller ;
+
+M: tool tool-help tool-gadget tool-help ;
+
+: help-window ( topic -- )
+    [ [ help ] make-pane <scroller> ] keep
+    article-title open-titled-window ;
+
+: tool-help-window ( tool -- )
+    tool-help [ help-window ] when* ;
+
+tool "Tool commands" {
+    { "Tool help" T{ key-down f f "F1" } [ tool-help-window ] }
+} define-commands
 
 : workspace-tabs
     {
@@ -49,46 +66,34 @@ M: workspace pref-dim* delegate pref-dim* { 550 650 } vmax ;
     [ init-tabs ] keep
     open-window ;
 
-: gadget-info. ( gadget -- )
-    "Gadget: " write
-    [ class word-name ] keep write-object terpri ;
-
-: keyboard-help ( gadget -- )
-    parents [
-        dup all-commands dup empty? [
-            2drop
-        ] [
-            swap gadget-info. commands.
-        ] if
-    ] each ;
-
-: commands-window ( workspace -- )
-    dup find-world world-focus [ ] [ gadget-child ] ?if
-    [ keyboard-help ] "Commands" pane-window ;
-
 : tool-window ( class -- ) workspace-window show-tool drop ;
 
-workspace {
-    {
-        "Tool switching commands"
-        { "Keyboard help" T{ key-down f f "F1" } [ commands-window ] }
-        { "Listener" T{ key-down f f "F2" } [ listener-gadget select-tool ] }
-        { "Definitions" T{ key-down f f "F3" } [ browser select-tool ] }
-        { "Documentation" T{ key-down f f "F4" } [ help-gadget select-tool ] }
-        { "Walker" T{ key-down f f "F5" } [ walker-gadget select-tool ] }
-        { "Dataflow" T{ key-down f f "F6" } [ dataflow-gadget select-tool ] }
-    }
+: tool-scroll-up ( workspace -- )
+    current-page tool-scroller [ scroll-up-page ] when* ;
 
-    {
-        "Tool window commands"
-        { "New listener" T{ key-down f { S+ } "F2" } [ listener-gadget tool-window drop ] }
-        { "New definitions" T{ key-down f { S+ } "F3" } [ browser tool-window drop ] }
-        { "New documentation" T{ key-down f { S+ } "F4" } [ help-gadget tool-window drop ] }
-    }
-    
-    {
-        "Workflow commands"
-        { "Reload changed sources" T{ key-down f f "F7" } [ drop [ reload-modules ] listener-gadget call-tool ] }
-        { "Recompile changed words" T{ key-down f f "F8" } [ drop [ recompile ] listener-gadget call-tool ] }
-    }
+: tool-scroll-down ( workspace -- )
+    current-page tool-scroller [ scroll-down-page ] when* ;
+
+workspace "Scrolling primary pane" {
+    { "Scroll up" T{ key-down f { C+ } "PAGE_UP" } [ tool-scroll-up ] }
+    { "Scroll down" T{ key-down f { C+ } "PAGE_DOWN" } [ tool-scroll-down ] }
+} define-commands
+
+workspace "Tool switching commands" {
+    { "Listener" T{ key-down f f "F2" } [ listener-gadget select-tool ] }
+    { "Definitions" T{ key-down f f "F3" } [ browser select-tool ] }
+    { "Documentation" T{ key-down f f "F4" } [ help-gadget select-tool ] }
+    { "Walker" T{ key-down f f "F5" } [ walker-gadget select-tool ] }
+    { "Dataflow" T{ key-down f f "F6" } [ dataflow-gadget select-tool ] }
+} define-commands
+
+workspace "Tool window commands" {
+    { "New listener" T{ key-down f { S+ } "F2" } [ listener-gadget tool-window drop ] }
+    { "New definitions" T{ key-down f { S+ } "F3" } [ browser tool-window drop ] }
+    { "New documentation" T{ key-down f { S+ } "F4" } [ help-gadget tool-window drop ] }
+} define-commands
+
+workspace "Workflow commands" {
+    { "Reload changed sources" T{ key-down f f "F7" } [ drop [ reload-modules ] listener-gadget call-tool ] }
+    { "Recompile changed words" T{ key-down f f "F8" } [ drop [ recompile ] listener-gadget call-tool ] }
 } define-commands

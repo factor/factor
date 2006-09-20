@@ -16,10 +16,7 @@ C: field ( model -- field )
     [ field-model [ dupd set-model ] when* ] keep
     select-all ;
 
-field {
-    {
-        "Editing commands"
-        { "Clear input" T{ key-down f { C+ } "k" } [ control-model clear-doc ] }
-        { "Accept input" T{ key-down f f "RETURN" } [ field-commit drop ] }
-    }
+field "Field commands" {
+    { "Clear input" T{ key-down f { C+ } "k" } [ control-model clear-doc ] }
+    { "Accept input" T{ key-down f f "RETURN" } [ field-commit drop ] }
 } define-commands

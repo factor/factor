@@ -45,8 +45,13 @@ TUPLE: tile definition gadget ;
     <default-border> dup faint-boundary ;
 
 C: tile ( definition -- gadget )
-    2dup <toolbar> <tile-content> over set-gadget-delegate
+    2dup { tile } <toolbar>
+    <tile-content> over set-gadget-delegate
     [ set-tile-definition ] keep ;
+
+tile "Tile commands" {
+    { "Close" f [ close-tile ] }
+} define-commands
 
 : show-definition ( definition definitions -- )
     2dup definition-index dup 0 >= [
@@ -99,11 +104,8 @@ M: browser focusable-child* browser-search ;
 : clear-browser ( browser -- )
     browser-definitions close-definitions ;
 
-browser {
-    {
-        "Browser commands"
-        { "Clear" T{ key-down f f "CLEAR" } [ clear-browser ] }
-    }
+browser "Browser commands" {
+    { "Clear" T{ key-down f f "CLEAR" } [ clear-browser ] }
 } define-commands
 
 M: browser call-tool*
@@ -112,3 +114,7 @@ M: browser call-tool*
     ] [
         show-word
     ] if ;
+
+M: browser tool-scroller browser-definitions find-scroller ;
+
+M: browser tool-help drop "ui-browser" ;

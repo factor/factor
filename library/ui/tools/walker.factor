@@ -67,6 +67,8 @@ M: walker-gadget call-tool* ( continuation walker -- )
         restore-normally
     ] with-walker ;
 
+M: walker-gadget tool-help drop "ui-walker" ;
+
 : walker-inspect ( walker -- )
     walker-gadget-ns [ meta-interp get ] bind
     [ inspect ] curry listener-gadget call-tool ;
@@ -75,16 +77,13 @@ M: walker-gadget call-tool* ( continuation walker -- )
     dup [ step-all ] walker-command reset-walker
     find-workspace listener-gadget select-tool ;
 
-walker-gadget {
-    {
-        "Walker commands"
-        { "Step" T{ key-down f f "s" } [ walker-step ] }
-        { "Step in" T{ key-down f f "i" } [ walker-step-in ] }
-        { "Step out" T{ key-down f f "o" } [ walker-step-out ] }
-        { "Step back" T{ key-down f f "b" } [ walker-step-back ] }
-        { "Continue" T{ key-down f f "c" } [ walker-step-all ] }
-        { "Inspect" T{ key-down f f "n" } [ walker-inspect ] }
-    }
+walker-gadget "Walker commands" {
+    { "Step" T{ key-down f f "s" } [ walker-step ] }
+    { "Step in" T{ key-down f f "i" } [ walker-step-in ] }
+    { "Step out" T{ key-down f f "o" } [ walker-step-out ] }
+    { "Step back" T{ key-down f f "b" } [ walker-step-back ] }
+    { "Continue" T{ key-down f f "c" } [ walker-step-all ] }
+    { "Inspect" T{ key-down f f "n" } [ walker-inspect ] }
 } define-commands
 
 [ walker-gadget call-tool stop ] break-hook set-global

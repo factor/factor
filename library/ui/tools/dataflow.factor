@@ -188,12 +188,9 @@ DEFER: (compute-heights)
 ! The UI tool
 TUPLE: dataflow-gadget history search ;
 
-dataflow-gadget {
-    {
-        "Dataflow commands"
-        { "Back" T{ key-down f { C+ } "b" } [ dataflow-gadget-history go-back ] }
-        { "Forward" T{ key-down f { C+ } "f" } [ dataflow-gadget-history go-forward ] }
-    }
+dataflow-gadget "History commands" {
+    { "Back" T{ key-down f { C+ } "b" } [ dataflow-gadget-history go-back ] }
+    { "Forward" T{ key-down f { C+ } "f" } [ dataflow-gadget-history go-forward ] }
 } define-commands
 
 : <dataflow-pane> ( history -- gadget )
@@ -209,6 +206,8 @@ C: dataflow-gadget ( -- gadget )
 M: dataflow-gadget call-tool* ( node dataflow -- )
     dup dataflow-gadget-history add-history
     dataflow-gadget-history set-model ;
+
+M: dataflow-gadget tool-help drop "ui-dataflow" ;
 
 IN: tools
 
