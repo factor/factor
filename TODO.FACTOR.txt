@@ -1,11 +1,8 @@
 + 0.85:
 
-- hide empty command groups in $commands
-- slot accessors should record their loc
 - font corruption now that books don't add/remove their children
 - doc sweep
 - the editor should fill up the interior of the scroller completely
-
 - pane output in UI should use less memory
 - signal 4 on datastack underflow on mac intel??
 - buffer-ptr should be an alien
@@ -30,6 +27,8 @@
 
 + ui:
 
+- hide empty command groups in $commands
+- ui quick start doc
 - auto-update browser and help when sources reload
 - how do we refer to command shortcuts in the docs?
 - reliably clonable gadgets
@@ -112,6 +111,7 @@
 
 + misc:
 
+- slot accessors should record their loc
 - swap nappend ==> nappend
 - sometimes darcs get fails with the httpd
 - gdb triggers 'mutliple i/o ops on port' error

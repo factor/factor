@@ -120,7 +120,7 @@ C: titled-gadget ( gadget title -- )
     windows get [ empty? not ] [ f ] if* ;
 
 : <toolbar> ( target classes -- toolbar )
-    [ commands ] map categorize-commands hash-values concat
+    [ [ commands hash-values [ % ] each ] each ] { } make
     [ <command-presentation> ] map-with
     make-shelf ;
 
