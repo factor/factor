@@ -46,6 +46,14 @@ M: operation invoke-command ( target operation -- )
     { +listener+ t }
 } define-operation
 
+! Commands
+[ [ command? ] is? ] H{
+    { +mouse+ T{ button-up f { S+ } 3 } }
+    { +name+ "Inspect" }
+    { +quot+ [ inspect ] }
+    { +listener+ t }
+} define-operation
+
 ! Input
 [ input? ] H{
     { +mouse+ T{ button-up f f 1 } }

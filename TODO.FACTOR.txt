@@ -1,10 +1,11 @@
 + 0.85:
 
-- font corruption now that books don't add/remove their children
+- :edit should apply to the innermost error
 - doc sweep
 - the editor should fill up the interior of the scroller completely
 - pane output in UI should use less memory
 - signal 4 on datastack underflow on mac intel??
+- test alien-indirect
 - buffer-ptr should be an alien
 - fix this:
   [ 1 2 3 4 5 6 7 8 9 10 10 10 10 10 10 10 10 10 10 11 11 11 113 ] .
@@ -15,18 +16,29 @@
 - problem if major gc happens during relocation
   - in fact relocation should not cons at all
 - better way of dealing with compiler errors
+  - messages tool
+    - sort into warnings and errors
+    - quick way to navigate to offending word
 - variable width word wrap
+  - 
 - add-gadget, model-changed, set-model should compile
 - graphical module manager tool
+  - list of modules -- loaded, not loaded
+  - each module has a list of files
+  - files can be reloaded and edited
+  - modules can be (re)loaded
+  - keyboard navigation
 - editor:
   - more efficient multi-line inserts
   - write "foo| " and put caret at | then select word element: selects
     space
 - we have trouble drawing rectangles
 - ui browser: show currently selected vocab & words
+  - keyboard-navigatable list gadget of some kind
 
 + ui:
 
+- tuple= in dataflow view
 - hide empty command groups in $commands
 - ui quick start doc
 - auto-update browser and help when sources reload
@@ -53,6 +65,7 @@
   - transpose char/word/line
   - page up/down
   - search and replace
+  - drag scroll
 - slider needs to be modelized
 - fonts/ should go inside the .app -- we need multi-tier resource-path
 - should be possible to drop an image file on the .app to run it

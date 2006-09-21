@@ -21,15 +21,20 @@ C: presentation ( button object command -- button )
 : <command-presentation> ( target command -- button )
     dup command-name f <bevel-button> -rot <presentation> ;
 
-: presentation-command* ( presentation gesture -- cmd )
+: presentation-command* ( presentation gesture -- obj cmd )
     over presentation-command [
-        T{ button-up f f 1 } = swap presentation-command f ?
+        dup T{ button-up f f 1 } = [
+            drop
+            dup presentation-object swap presentation-command
+        ] [
+            >r presentation-command dup r> mouse-operation
+        ] if
     ] [
-        >r presentation-object r> mouse-operation
+        >r presentation-object dup r> mouse-operation
     ] if ;
 
 : invoke-presentation ( gadget modifiers button# -- )
-    <button-up> >r [ presentation-object ] keep r>
+    <button-up>
     presentation-command* dup [ invoke-command ] [ 2drop ] if ;
 
 : show-mouse-help ( presentation -- )
@@ -65,7 +70,7 @@ presentation H{
 : <gesture-help> ( model gesture -- gadget )
     [
         over [
-            tuck presentation-command* dup [
+            tuck presentation-command* nip dup [
                 >r gesture>string ": " r> command-name append3
             ] [
                 2drop ""

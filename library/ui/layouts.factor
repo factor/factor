@@ -6,7 +6,8 @@ IN: gadgets
 
 DEFER: relayout-1
 
-: invalidate ( gadget -- ) \ relayout-1 swap set-gadget-state ;
+: invalidate ( gadget -- )
+    \ relayout-1 swap set-gadget-state ;
 
 : forget-pref-dim ( gadget -- ) f swap set-gadget-pref-dim ;
 
@@ -34,7 +35,7 @@ DEFER: relayout
     [ drop ] [ invalidate* ] if ;
 
 : relayout-1 ( gadget -- )
-    #! Relayout and redraw a gadget before th next iteration of
+    #! Relayout and redraw a gadget before the next iteration of
     #! the event loop. Should be used if the gadget should be
     #! repainted, or if its internal layout changed, but its
     #! preferred size did not change.
@@ -59,9 +60,13 @@ DEFER: relayout
 
 GENERIC: pref-dim* ( gadget -- dim )
 
+: ?set-gadget-pref-dim ( dim gadget -- )
+    dup gadget-state [ 2drop ] [ set-gadget-pref-dim ] if ;
+
 : pref-dim ( gadget -- dim )
+    #! Do not cache the pref-dim if it is potentially invalid.
     dup gadget-pref-dim [ ] [
-        dup pref-dim* dup rot set-gadget-pref-dim
+        [ pref-dim* dup ] keep ?set-gadget-pref-dim
     ] ?if ;
 
 M: gadget pref-dim* rect-dim ;
