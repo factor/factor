@@ -247,3 +247,19 @@ M: lazy-from-by cdr ( lazy-from-by -- cdr )
 
 M: lazy-from-by nil? ( lazy-from-by -- bool )
   drop f ;
+  
+TUPLE: lazy-zip list1 list2 ;
+
+: lzip ( list1 list2 -- lazy-zip )
+    over nil? over nil? or 
+    [ 2drop nil ] [ <lazy-zip> ] if ;
+
+M: lazy-zip car ( lazy-zip -- car )
+    [ lazy-zip-list1 car ] keep lazy-zip-list2 car 2array ;
+   
+M: lazy-zip cdr ( lazy-zip -- cdr )
+    [ lazy-zip-list1 cdr ] keep lazy-zip-list2 cdr lzip ;
+
+M: lazy-zip nil? ( lazy-zip -- bool )
+    drop f ;
+    
