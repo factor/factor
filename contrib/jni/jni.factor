@@ -1,7 +1,7 @@
 ! Copyright (C) 2006 Chris Double.
 ! See http://factorcode.org/license.txt for BSD license.
 IN: jni
-USING: kernel alien arrays sequences ;
+USING: kernel alien arrays sequences namespaces ;
 
 LIBRARY: jvm
 
@@ -347,3 +347,31 @@ FUNCTION: jint JNI_CreateJavaVM ( void** pvm, void** penv, void* args ) ;
 
 : get-method-id ( class name sig jnienv -- int )
   dup >r >r 3array r> swap first3 r> JNIEnv-functions JNINativeInterface-GetMethodID (get-method-id) ;
+
+: (new-string) 
+  "void*" { "JNINativeInterface*" "char*" "int" } "cdecl" alien-indirect ;
+
+: new-string ( str jnienv -- str )
+  dup >r >r dup length 2array r> swap first2 r> JNIEnv-functions JNINativeInterface-NewString (new-string) ;
+
+: (call1) 
+  "void" { "JNINativeInterface*" "void*" "void*" "int" } "cdecl" alien-indirect ;
+
+: call1 ( obj method-id jstr jnienv -- )
+  dup >r >r 3array r> swap first3 r> JNIEnv-functions JNINativeInterface-CallObjectMethod (call1) ;
+
+: test0 ( -- )
+  jni2 drop nip "env" set ;
+
+: test1 ( -- system )
+  "java/lang/System" "env" get find-class ;
+
+: test2 ( system -- system.out )
+  dup "out" "Ljava/io/PrintStream;" "env" get get-static-field-id 
+  "env" get get-static-object-field ;
+
+: test3 ( int system.out -- )
+  "java/io/PrintStream" "env" get find-class ! jstr out class
+  "println" "(I)V" "env" get get-method-id ! jstr out id
+  rot "env" get call1 ;
+  
