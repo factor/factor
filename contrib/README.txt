@@ -29,6 +29,7 @@ Available libraries:
 - httpd -- HTTP server (Slava Pestov, Chris Double)
 - http-client -- HTTP client (Slava Pestov)
 - jedit -- jEdit editor integration (Slava Pestov)
+- jni -- Java Native Interface Wrapper (Chris Double)
 - json -- JSON reader and writer (Chris Double)
 - lambda -- Lambda calculus interpreter (Matthew Willis)
 - lazy-lists -- Lazy evaluation lists (Chris Double, Matthew Willis)
