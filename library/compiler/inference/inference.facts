@@ -11,7 +11,8 @@ HELP: inference-error
     { $list
         { $link no-effect }
         { $link literal-expected }
-        { $link check-retain }
+        { $link too-many->r }
+        { $link too-many-r> }
         { $link unbalanced-branches-error }
         { $link effect-error }
         { $link recursive-declare-error }
@@ -25,9 +26,13 @@ HELP: literal-expected
 HELP: terminated?
 { $var-description "During inference, a flag set to " { $link t } " if the current control flow path unconditionally throws an error." } ;
 
-HELP: check-retain
-{ $error-description "Thrown if inference notices a quotation leaving behind elements on the retain stack." }
-{ $notes "Usually this error indicates a coding mistake; check that usages of " { $link >r } " and " { $link r> } " are balanced in this case. Writing code which intentionally does this is considered bad style." } ;
+HELP: too-many->r
+{ $error-description "Thrown if inference notices a quotation pushing elements on the retain stack without popping them at the end." }
+{ $notes "See " { $link "shuffle-words" } " for retain stack usage conventions." } ;
+
+HELP: too-many-r>
+{ $error-description "Thrown if inference notices a quotation popping elements from the return stack it did not place there." }
+{ $notes "See " { $link "shuffle-words" } " for retain stack usage conventions." } ;
 
 HELP: infer
 { $values { "quot" "a quotation" } { "effect" "a pair of integers" } }

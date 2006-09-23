@@ -223,7 +223,6 @@ M: read-task task-container drop read-tasks get-global ;
     ] when pending-error drop ;
 
 : stream-read-part ( count port -- string )
-    >r 0 max >fixnum r>
     [ wait-to-read ] 2keep
     [ dupd buffer> ] unless-eof nip ;
 
@@ -243,6 +242,7 @@ M: read-task task-container drop read-tasks get-global ;
     [ underlying ] [ >string ] if ; inline
 
 M: input-port stream-read
+    >r 0 max >fixnum r>
     2dup stream-read-part dup [
         pick over length > [
             pick <sbuf>

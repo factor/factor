@@ -17,9 +17,13 @@ M: unbalanced-branches-error error.
 M: literal-expected summary
     drop "Literal value expected" ;
 
-M: check-retain summary
+M: too-many->r summary
     drop
-    "Quotation leaves elements behind on retain stack" ;
+    "Quotation pushes elements on retain stack without popping them" ;
+
+M: too-many-r> summary
+    drop
+    "Quotation pops retain stack elements which it did not push" ;
 
 M: no-effect error.
     "The word " write

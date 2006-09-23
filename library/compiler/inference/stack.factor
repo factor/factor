@@ -50,6 +50,7 @@ sequences words parser words ;
 \ >r { object } { } <effect> "infer-effect" set-word-prop
 
 \ r> [
+    check-r>
     #r> dup node,
     0 1 pick node-inputs
     pop-r push-d

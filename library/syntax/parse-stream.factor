@@ -8,7 +8,12 @@ namespaces sequences words ;
     "scratchpad" set-in { "syntax" "scratchpad" } set-use ;
 
 : with-parser ( quot -- )
-    [ [ <parse-error> rethrow ] recover ] with-scope ;
+    [
+        [
+            dup [ parse-error? ] is? [ <parse-error> ] unless
+            rethrow
+        ] recover
+    ] with-scope ;
 
 : parse-lines ( lines -- quot )
     [

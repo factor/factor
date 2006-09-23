@@ -122,7 +122,9 @@ M: editor model-changed
     dup caret-loc swap caret-dim <rect> ;
 
 : scroll>caret ( editor -- )
-    dup caret-rect swap scroll>rect ;
+    dup gadget-grafted? [
+        dup caret-rect over scroll>rect
+    ] when drop ;
 
 M: loc-monitor model-changed
     loc-monitor-editor control-self scroll>caret ;

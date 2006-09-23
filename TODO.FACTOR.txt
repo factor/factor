@@ -1,6 +1,5 @@
 + 0.85:
 
-- :edit should apply to the innermost error
 - doc sweep
 - the editor should fill up the interior of the scroller completely
 - pane output in UI should use less memory
@@ -50,7 +49,6 @@
 - roundoff is still not quite right with tracks
 - fix top level window positioning
 - x11.app has a problem with A+ keys
-- status bar showing number of words needing a recompile
 - services do not launch if factor not running
 - fix ui listener delay
 - editor:
@@ -97,7 +95,6 @@
 
 - stdcall callbacks
 - see if alien calls can be made faster
-- [ r> ] infer should throw an inference error
 - compiler tests are not as reliable now because of try-compile usage
   - we can just do [ t ] [ \ foo compiled? ] unit-test
 - [ [ dup call ] dup call ] infer hangs
