@@ -1,7 +1,7 @@
 ! Copyright (C) 2005, 2006 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 IN: gadgets-listener
-USING: arrays gadgets gadgets-frames gadgets-labels
+USING: compiler arrays gadgets gadgets-frames gadgets-labels
 gadgets-panes gadgets-scrolling gadgets-text gadgets-theme
 gadgets-tracks gadgets-workspace generic hashtables tools io
 kernel listener math models namespaces parser prettyprint
@@ -16,24 +16,6 @@ TUPLE: listener-gadget input output stack ;
     dup listener-gadget-input swap listener-gadget-output
     <duplex-stream> ;
 
-: listener-thread ( listener -- )
-    dup listener-stream [
-        [ ui-listener-hook ] curry listener-hook set tty
-    ] with-stream* ;
-
-: start-listener ( listener -- )
-    [ >r clear r> init-namespaces listener-thread ] in-thread
-    drop ;
-
-: <labelled-gadget> ( gadget title -- gadget )
-    {
-        { [ <label> dup reverse-video-theme ] f f @top }
-        { [ ] f f @center }
-    } make-frame ;
-
-: <labelled-pane> ( model quot title -- gadget )
-    >r <pane-control> <scroller> r> <labelled-gadget> ;
-
 : <listener-input> ( -- gadget )
     gadget get listener-gadget-output <interactor> ;
 
@@ -44,12 +26,23 @@ TUPLE: listener-gadget input output stack ;
 : init-listener ( listener -- )
     f <model> swap set-listener-gadget-stack ;
 
+: listener-thread ( listener -- )
+    dup listener-stream [
+        [ ui-listener-hook ] curry listener-hook set
+        find-messages batch-errors set
+        tty
+    ] with-stream* ;
+
+: start-listener ( listener -- )
+    [ >r clear r> init-namespaces listener-thread ] in-thread
+    drop ;
+
 C: listener-gadget ( -- gadget )
     dup init-listener {
         { [ <scrolling-pane> ] set-listener-gadget-output [ <scroller> ] 4/6 }
         { [ <stack-display> ] f f 1/6 }
         { [ <listener-input> ] set-listener-gadget-input [ <scroller> "Input" <labelled-gadget> ] 1/6 }
-    } { 0 1 } make-track* dup start-listener ;
+    } { 0 1 } make-track* ;
 
 M: listener-gadget focusable-child*
     listener-gadget-input ;

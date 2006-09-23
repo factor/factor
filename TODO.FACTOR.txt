@@ -15,12 +15,8 @@
 - more compact relocation info
 - problem if major gc happens during relocation
   - in fact relocation should not cons at all
-- better way of dealing with compiler errors
-  - messages tool
-    - sort into warnings and errors
-    - quick way to navigate to offending word
 - variable width word wrap
-  - 
+  - needs layout tricks
 - add-gadget, model-changed, set-model should compile
 - graphical module manager tool
   - list of modules -- loaded, not loaded

@@ -5,19 +5,23 @@ USING: arrays errors generic io kernel
 math namespaces parser prettyprint sequences strings
 vectors words ;
 
-TUPLE: inference-error rstate ;
+TUPLE: inference-error rstate major? ;
 
-C: inference-error ( msg rstate -- error )
+C: inference-error ( msg rstate important? -- error )
+    [ set-inference-error-major? ] keep
     [ set-inference-error-rstate ] keep
     [ set-delegate ] keep ;
 
 : inference-error ( msg -- * )
-    recursive-state get <inference-error> throw ;
+    recursive-state get t <inference-error> throw ;
+
+: inference-warning ( msg -- * )
+    recursive-state get f <inference-error> throw ;
 
 TUPLE: literal-expected ;
 
 M: object value-literal
-    <literal-expected> inference-error ;
+    <literal-expected> inference-warning ;
 
 : pop-literal ( -- rstate obj )
     1 #drop node,

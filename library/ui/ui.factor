@@ -142,6 +142,15 @@ C: titled-gadget ( gadget title -- )
 : $commands ( elt -- )
     dup array? [ first ] when commands commands. ;
 
+: <labelled-gadget> ( gadget title -- gadget )
+    {
+        { [ <label> dup reverse-video-theme ] f f @top }
+        { [ ] f f @center }
+    } make-frame ;
+
+: <labelled-pane> ( model quot title -- gadget )
+    >r <pane-control> <scroller> r> <labelled-gadget> ;
+
 : pane-window ( quot title -- )
     >r make-pane <scroller> r> open-titled-window ;
 

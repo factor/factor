@@ -1,8 +1,12 @@
 ! Copyright (C) 2006 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
+IN: gadgets-messages
+DEFER: messages
+
 IN: gadgets-workspace
 USING: gadgets gadgets-books gadgets-controls gadgets-workspace
-generic kernel models scratchpad sequences syntax ;
+generic kernel models scratchpad sequences syntax
+gadgets-messages ;
 
 DEFER: workspace-window
 
@@ -20,10 +24,11 @@ TUPLE: workspace ;
 
 TUPLE: tool gadget ;
 
+: find-tool ( class workspace -- index tool )
+    gadget-children [ tool-gadget class eq? ] find-with ;
+
 : show-tool ( class workspace -- tool )
-    [
-        gadget-children [ tool-gadget class eq? ] find-with swap
-    ] keep control-model set-model* ;
+    [ find-tool swap ] keep control-model set-model* ;
 
 : select-tool ( workspace class -- ) swap show-tool drop ;
 
@@ -33,3 +38,8 @@ TUPLE: tool gadget ;
 
 : call-tool ( arg class -- )
     find-workspace show-tool call-tool* ;
+
+: get-tool ( class -- gadget )
+    find-workspace find-tool nip tool-gadget ;
+
+: find-messages ( -- gadget ) messages get-tool ;

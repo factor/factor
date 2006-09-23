@@ -5,6 +5,24 @@ USING: errors generic hashtables inference io kernel math
 namespaces optimizer parser prettyprint sequences test threads
 words ;
 
+SYMBOL: batch-errors
+
+GENERIC: batch-begins ( batch-errors -- )
+
+M: f batch-begins drop ;
+
+GENERIC: compile-begins ( word batch-errors -- )
+
+M: f compile-begins drop "Compiling " write . flush ;
+
+GENERIC: compile-error ( error batch-errors -- )
+
+M: f compile-error drop error. flush ;
+
+GENERIC: batch-ends ( batch-errors -- )
+
+M: f batch-ends drop ;
+
 : word-dataflow ( word -- dataflow )
     [
         dup ?no-effect
@@ -15,7 +33,7 @@ words ;
 
 : (compile) ( word -- )
     dup compiling? not over compound? and [
-        "Compiling " write dup . flush
+        dup batch-errors get compile-begins
         dup word-dataflow optimize generate
     ] [
         drop
@@ -25,12 +43,21 @@ words ;
     [ (compile) ] with-compiler ;
 
 : try-compile ( word -- )
-    [ compile ] [ error. flush update-xt ] recover ;
+    [
+        compile
+    ] [
+        batch-errors get compile-error update-xt
+    ] recover ;
+
+: compile-batch ( seq -- )
+    batch-errors get batch-begins
+    dup
+    [ f "no-effect" set-word-prop ] each
+    [ try-compile ] each
+    batch-errors get batch-ends ;
 
 : compile-vocabs ( seq -- )
-    [ words ] map concat
-    dup [ f "no-effect" set-word-prop ] each
-    [ try-compile ] each ;
+    [ words ] map concat compile-batch ;
 
 : compile-all ( -- )
     vocabs compile-vocabs changed-words get clear-hash ;
@@ -42,7 +69,7 @@ words ;
 
 : recompile ( -- )
     changed-words get [
-        dup hash-keys [ try-compile ] each clear-hash
+        dup hash-keys compile-batch clear-hash
     ] when* ;
 
 [ recompile ] parse-hook set

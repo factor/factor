@@ -34,7 +34,7 @@ IN: inference
 TUPLE: no-effect word ;
 
 : no-effect ( word -- * )
-    <no-effect> inference-error ;
+    <no-effect> inference-warning ;
 
 : nest-node ( -- ) #entry node, ;
 

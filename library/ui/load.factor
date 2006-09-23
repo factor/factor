@@ -37,6 +37,7 @@ PROVIDE: library/ui {
     "gadgets/presentations.factor"
     "ui.factor"
     "tools/tools.factor"
+    "tools/messages.factor"
     "tools/listener.factor"
     "tools/walker.factor"
     "tools/search.factor"

@@ -2,9 +2,9 @@ IN: inference
 USING: kernel generic errors sequences prettyprint io words ;
 
 M: inference-error error.
-    dup delegate error.
-    "Nesting: " write
-    inference-error-rstate [ first ] map . ;
+    dup inference-error-rstate [ first ] map
+    dup empty? [ "Word: " write dup peek . ] unless
+    swap delegate error. "Nesting: " write . ;
 
 M: inference-error error-help drop f ;
 

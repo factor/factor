@@ -7,7 +7,7 @@ gadgets-dataflow gadgets-frames gadgets-grids gadgets-help
 gadgets-listener gadgets-presentations gadgets-walker
 gadgets-workspace generic kernel math modules scratchpad
 sequences syntax words io namespaces hashtables
-gadgets-scrolling gadgets-panes ;
+gadgets-scrolling gadgets-panes gadgets-messages ;
 
 C: tool ( gadget -- tool )
     {
@@ -37,6 +37,7 @@ tool "Tool commands" {
 : workspace-tabs
     {
         { "Listener" <listener-gadget> }
+        { "Messages" <messages> }
         { "Definitions" <browser> } 
         { "Documentation" <help-gadget> }
         { "Walker" <walker-gadget> }
@@ -64,7 +65,8 @@ M: workspace pref-dim* delegate pref-dim* { 550 650 } vmax ;
     <workspace> dup <world>
     [ init-status ] keep
     [ init-tabs ] keep
-    open-window ;
+    open-window
+    listener-gadget get-tool start-listener ;
 
 : tool-window ( class -- ) workspace-window show-tool drop ;
 
@@ -81,10 +83,11 @@ workspace "Scrolling primary pane" {
 
 workspace "Tool switching commands" {
     { "Listener" T{ key-down f f "F2" } [ listener-gadget select-tool ] }
-    { "Definitions" T{ key-down f f "F3" } [ browser select-tool ] }
-    { "Documentation" T{ key-down f f "F4" } [ help-gadget select-tool ] }
-    { "Walker" T{ key-down f f "F5" } [ walker-gadget select-tool ] }
-    { "Dataflow" T{ key-down f f "F6" } [ dataflow-gadget select-tool ] }
+    { "Messages" T{ key-down f f "F3" } [ listener-gadget select-tool ] }
+    { "Definitions" T{ key-down f f "F4" } [ browser select-tool ] }
+    { "Documentation" T{ key-down f f "F5" } [ help-gadget select-tool ] }
+    { "Walker" T{ key-down f f "F6" } [ walker-gadget select-tool ] }
+    { "Dataflow" T{ key-down f f "F7" } [ dataflow-gadget select-tool ] }
 } define-commands
 
 workspace "Tool window commands" {
@@ -94,6 +97,6 @@ workspace "Tool window commands" {
 } define-commands
 
 workspace "Workflow commands" {
-    { "Reload changed sources" T{ key-down f f "F7" } [ drop [ reload-modules ] listener-gadget call-tool ] }
-    { "Recompile changed words" T{ key-down f f "F8" } [ drop [ recompile ] listener-gadget call-tool ] }
+    { "Reload changed sources" T{ key-down f f "F8" } [ drop [ reload-modules ] listener-gadget call-tool ] }
+    { "Recompile changed words" T{ key-down f { S+ } "F8" } [ drop [ recompile ] listener-gadget call-tool ] }
 } define-commands
