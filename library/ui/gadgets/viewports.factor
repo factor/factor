@@ -8,7 +8,7 @@ TUPLE: viewport ;
 
 : find-viewport [ viewport? ] find-parent ;
 
-: viewport-dim gadget-child pref-dim ;
+: viewport-dim ( viewport -- dim ) gadget-child pref-dim ;
 
 C: viewport ( content -- viewport )
     dup delegate>gadget

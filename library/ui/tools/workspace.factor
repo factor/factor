@@ -83,7 +83,7 @@ workspace "Scrolling primary pane" {
 
 workspace "Tool switching commands" {
     { "Listener" T{ key-down f f "F2" } [ listener-gadget select-tool ] }
-    { "Messages" T{ key-down f f "F3" } [ listener-gadget select-tool ] }
+    { "Messages" T{ key-down f f "F3" } [ messages select-tool ] }
     { "Definitions" T{ key-down f f "F4" } [ browser select-tool ] }
     { "Documentation" T{ key-down f f "F5" } [ help-gadget select-tool ] }
     { "Walker" T{ key-down f f "F6" } [ walker-gadget select-tool ] }
