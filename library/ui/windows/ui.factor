@@ -42,7 +42,7 @@ SYMBOL: class-name
     2nip
     dup { 0 0 } = [ 2drop ] [ swap window set-gadget-dim ] if ;
 
-: wm-keydown-codes ( n -- key )
+: wm-keydown-codes ( -- key )
     H{
         { 8 "BACKSPACE" }
         { 9 "TAB" }
@@ -256,7 +256,7 @@ SYMBOL: hWnd
         [ do-events ui-step ] ui-try event-loop
     ] unless ;
 
-: register-wndclassex ( classname wndproc -- )
+: register-wndclassex ( classname wndproc -- class )
     "WNDCLASSEX" <c-object>
     "WNDCLASSEX" c-size over set-WNDCLASSEX-cbSize
     CS_HREDRAW CS_VREDRAW bitor CS_OWNDC bitor over set-WNDCLASSEX-style

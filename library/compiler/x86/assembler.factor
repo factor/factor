@@ -146,7 +146,7 @@ M: indirect sib-present?
 
 M: register sib-present? drop f ;
 
-GENERIC: r/m
+GENERIC: r/m ( operand -- n )
 
 M: indirect r/m
     dup sib-present?

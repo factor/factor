@@ -10,7 +10,7 @@ SYMBOL: io-queue
 TUPLE: io-queue free-list callbacks ;
 TUPLE: io-callback overlapped quotation stream ;
 
-: expected-error? ( -- bool )
+: expected-error? ( obj -- bool )
     [ 
         ERROR_IO_PENDING ERROR_HANDLE_EOF ERROR_SUCCESS WAIT_TIMEOUT 
         997
