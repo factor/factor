@@ -1,19 +1,12 @@
 + 0.85:
 
-- doc sweep
-- the editor should fill up the interior of the scroller completely
-- pane output in UI should use less memory
 - signal 4 on datastack underflow on mac intel??
 - test alien-indirect
-- buffer-ptr should be an alien
-- fix this:
-  [ 1 2 3 4 5 6 7 8 9 10 10 10 10 10 10 10 10 10 10 11 11 11 113 ] .
-[ 1 2 3 4 5 6 7 8 9 10 10 10 10 10 10 10 10 10 10 11 11 11 113 
-]
-- prettier printing of hashtable literals, alists, cond, ...
-- more compact relocation info
-- problem if major gc happens during relocation
-  - in fact relocation should not cons at all
+
++ ui:
+
+- the editor should fill up the interior of the scroller completely
+- pane output in UI should use less memory
 - variable width word wrap
   - needs layout tricks
 - add-gadget, model-changed, set-model should compile
@@ -27,12 +20,8 @@
   - more efficient multi-line inserts
   - write "foo| " and put caret at | then select word element: selects
     space
-- we have trouble drawing rectangles
 - ui browser: show currently selected vocab & words
   - keyboard-navigatable list gadget of some kind
-
-+ ui:
-
 - tuple= in dataflow view
 - hide empty command groups in $commands
 - ui quick start doc
@@ -93,6 +82,9 @@
 
 + compiler/ffi:
 
+- more compact relocation info
+- problem if major gc happens during relocation
+  - in fact relocation should not cons at all
 - stdcall callbacks
 - see if alien calls can be made faster
 - compiler tests are not as reliable now because of try-compile usage
@@ -117,7 +109,12 @@
 
 + misc:
 
-- slot accessors should record their loc
+- fix this:
+  [ 1 2 3 4 5 6 7 8 9 10 10 10 10 10 10 10 10 10 10 11 11 11 113 ] .
+[ 1 2 3 4 5 6 7 8 9 10 10 10 10 10 10 10 10 10 10 11 11 11 113 
+]
+- prettier printing of hashtable literals, alists, cond, ...
+- buffer-ptr should be an alien
 - swap nappend ==> nappend
 - sometimes darcs get fails with the httpd
 - gdb triggers 'mutliple i/o ops on port' error

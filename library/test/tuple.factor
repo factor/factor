@@ -133,3 +133,9 @@ TUPLE: yo-momma ;
 [ ] [ "IN: temporary TUPLE: C:-test ; C: C:-test ( -- x ) ;" eval ] unit-test
 [ "<C:-test>" ] [ word word-name ] unit-test
 [ "( -- x )" ] [ "<C:-test>" "temporary" lookup stack-effect effect>string ] unit-test
+
+TUPLE: loc-recording ;
+
+[ f ] [ \ loc-recording where not ] unit-test
+[ f ] [ \ <loc-recording> where not ] unit-test
+[ f ] [ \ loc-recording? where not ] unit-test

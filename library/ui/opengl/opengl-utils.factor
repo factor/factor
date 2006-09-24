@@ -43,10 +43,12 @@ sequences ;
 
 : gl-rect ( dim -- )
     #! Draws a two-dimensional box.
+    GL_FRONT_AND_BACK GL_LINE glPolygonMode
     GL_MODELVIEW [
         0.5 0.5 0.0 glTranslated { 1 1 } v-
-        GL_LINE_STRIP [ dup four-sides top-left ] do-state
-    ] do-matrix ;
+        GL_QUADS [ dup four-sides top-left ] do-state
+    ] do-matrix
+    GL_FRONT_AND_BACK GL_FILL glPolygonMode ;
 
 : (gl-poly) [ [ gl-vertex ] each ] do-state ;
 
