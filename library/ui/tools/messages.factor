@@ -16,14 +16,19 @@ M: messages batch-begins
 M: messages compile-begins
     2drop ;
 
+: messages-errors+
+    dup messages-errors# 1+ swap set-messages-errors# ;
+
+: messages-warnings+
+    dup messages-warnings# 1+ swap set-messages-warnings# ;
+
 M: messages compile-error
-    over inference-error-major? [
-        dup messages-errors# 1+ over set-messages-errors#
-        messages-errors
-    ] [
-        dup messages-warnings# 1+ over set-messages-warnings#
-        messages-warnings
-    ] if [ error. ] with-stream ;
+    over inference-error?
+    [ over inference-error-major? ]
+    [ t ] if
+    [ dup messages-errors+ messages-errors ]
+    [ dup messages-warnings+ messages-warnings ] if
+    [ error. ] with-stream ;
 
 : <messages-button> ( -- gadget )
     "Compiler messages"
