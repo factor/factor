@@ -53,15 +53,16 @@ void load_image(const char* filename)
 	/* read code heap */
 	{
 		CELL size = h.code_size;
-		if(size + compiling.base >= compiling.limit)
+		if(size + compiling.base > compiling.limit)
 			fatal_error("Code heap too large",h.code_size);
 
 		if(h.version == IMAGE_VERSION
 			&& size != fread((void*)compiling.base,1,size,file))
 			fatal_error("Wrong code heap length",h.code_size);
 
-		last_flush = compiling.here = compiling.base + h.code_size;
 		code_relocation_base = h.code_relocation_base;
+
+		build_free_list(&compiling,0);
 	}
 
 	fclose(file);
@@ -99,7 +100,7 @@ bool save_image(const char* filename)
 	h.bignum_zero = bignum_zero;
 	h.bignum_pos_one = bignum_pos_one;
 	h.bignum_neg_one = bignum_neg_one;
-	h.code_size = compiling.here - compiling.base;
+	h.code_size = compiling.limit - compiling.base;
 	h.code_relocation_base = compiling.base;
 	fwrite(&h,sizeof(HEADER),1,file);
 
@@ -171,7 +172,7 @@ void relocate_data()
 	}
 }
 
-void relocate_code_block(F_COMPILED *relocating, CELL code_start,
+void fixup_code_block(F_COMPILED *relocating, CELL code_start,
 	CELL reloc_start, CELL literal_start, CELL words_start)
 {
 	/* relocate literal table data */
@@ -190,11 +191,11 @@ void relocate_code_block(F_COMPILED *relocating, CELL code_start,
 			data_fixup((CELL*)scan);
 	}
 
-	finalize_code_block(relocating,code_start,reloc_start,
+	relocate_code_block(relocating,code_start,reloc_start,
 		literal_start,words_start);
 }
 
 void relocate_code()
 {
-	iterate_code_heap(compiling.base,compiling.here,relocate_code_block);
+	iterate_code_heap(fixup_code_block);
 }

@@ -204,9 +204,6 @@ ZONE *newspace;
 /* spare semi-space; rotates with tenured. */
 ZONE prior;
 
-/* compiled code */
-ZONE compiling;
-
 INLINE bool in_zone(ZONE* z, CELL pointer)
 {
 	return pointer >= z->base && pointer < z->limit;

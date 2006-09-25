@@ -163,7 +163,7 @@ void primitive_room(void)
 {
 	F_ARRAY *a = array(ARRAY_TYPE,gen_count,F);
 	int gen;
-	box_unsigned_cell(compiling.limit - compiling.here);
+	box_unsigned_cell(0);
 	box_unsigned_cell(compiling.limit - compiling.base);
 	box_unsigned_cell(cards_end - cards);
 	box_unsigned_cell(prior.limit - prior.base);

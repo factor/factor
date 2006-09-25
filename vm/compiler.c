@@ -1,22 +1,31 @@
 #include "factor.h"
 
-void iterate_code_heap(CELL start, CELL end, CODE_HEAP_ITERATOR iter)
+void init_compiler(CELL size)
 {
-	while(start < end)
+	new_heap(&compiling,size);
+}
+
+void iterate_code_heap(CODE_HEAP_ITERATOR iter)
+{
+	F_BLOCK *scan = (F_BLOCK *)compiling.base;
+
+	while(scan)
 	{
-		F_COMPILED *compiled = (F_COMPILED *)start;
+		if(scan->status != B_FREE)
+		{
+			F_COMPILED *compiled = (F_COMPILED *)(scan + 1);
 
-		CELL code_start = start + sizeof(F_COMPILED);
-		CELL reloc_start = code_start + compiled->code_length;
-		CELL literal_start = reloc_start + compiled->reloc_length;
-		CELL words_start = literal_start + compiled->literal_length;
-		CELL words_end = words_start + compiled->words_length;
+			CELL code_start = (CELL)(compiled + 1);
+			CELL reloc_start = code_start + compiled->code_length;
+			CELL literal_start = reloc_start + compiled->reloc_length;
+			CELL words_start = literal_start + compiled->literal_length;
 
-		iter(compiled,
-			code_start,reloc_start,
-			literal_start,words_start);
+			iter(compiled,
+				code_start,reloc_start,
+				literal_start,words_start);
+		}
 
-		start = words_end;
+		scan = scan->next;
 	}
 }
 
@@ -131,39 +140,44 @@ void apply_relocation(F_REL *rel,
 	}
 }
 
-void finalize_code_block(F_COMPILED *relocating, CELL code_start,
+void relocate_code_block(F_COMPILED *relocating, CELL code_start,
 	CELL reloc_start, CELL literal_start, CELL words_start)
 {
-	CELL words_end = words_start + relocating->words_length;
-
 	F_REL *rel = (F_REL *)reloc_start;
 	F_REL *rel_end = (F_REL *)literal_start;
-
-	if(!relocating->finalized)
-	{
-		/* first time (ie, we just compiled, and are not simply loading
-		an image from disk). figure out word XTs. */
-		CELL scan;
-		
-		for(scan = words_start; scan < words_end; scan += CELLS)
-			put(scan,untag_word(get(scan))->xt);
-
-		relocating->finalized = true;
-	}
 
 	/* apply relocations */
 	while(rel < rel_end)
 		apply_relocation(rel++,code_start,literal_start,words_start);
 }
 
+void finalize_code_block(F_COMPILED *relocating, CELL code_start,
+	CELL reloc_start, CELL literal_start, CELL words_start)
+{
+	CELL words_end = words_start + relocating->words_length;
+
+	if(!relocating->finalized)
+	{
+		CELL scan;
+
+		for(scan = words_start; scan < words_end; scan += CELLS)
+			put(scan,untag_word(get(scan))->xt);
+
+		relocating->finalized = true;
+
+		relocate_code_block(relocating,code_start,reloc_start,
+			literal_start,words_start);
+	}
+}
+
 void collect_literals_step(F_COMPILED *relocating, CELL code_start,
 	CELL reloc_start, CELL literal_start, CELL words_start)
 {
 	CELL scan;
-	
+
 	CELL literal_end = literal_start + relocating->literal_length;
 	CELL words_end = words_start + relocating->words_length;
-	
+
 	for(scan = literal_start; scan < literal_end; scan += CELLS)
 		copy_handle((CELL*)scan);
 
@@ -176,20 +190,10 @@ void collect_literals_step(F_COMPILED *relocating, CELL code_start,
 
 void collect_literals(void)
 {
-	iterate_code_heap(compiling.base,compiling.here,collect_literals_step);
+	iterate_code_heap(collect_literals_step);
 }
 
-void init_compiler(CELL size)
-{
-	compiling.base = compiling.here
-		= (CELL)(alloc_bounded_block(size)->start);
-	if(compiling.base == 0)
-		fatal_error("Cannot allocate code heap",size);
-	compiling.limit = compiling.base + size;
-	last_flush = compiling.base;
-}
-
-void deposit_integers(F_VECTOR *vector, CELL format)
+void deposit_integers(CELL here, F_VECTOR *vector, CELL format)
 {
 	CELL count = untag_fixnum_fast(vector->top);
 	F_ARRAY *array = untag_array_fast(vector->array);
@@ -198,38 +202,36 @@ void deposit_integers(F_VECTOR *vector, CELL format)
 	if(format == 1)
 	{
 		for(i = 0; i < count; i++)
-			cput(compiling.here + i,to_fixnum(get(AREF(array,i))));
+			cput(here + i,to_fixnum(get(AREF(array,i))));
 	}
 	else if(format == CELLS)
 	{
 		for(i = 0; i < count; i++)
-			put(CREF(compiling.here,i),to_fixnum(get(AREF(array,i))));
+			put(CREF(here,i),to_fixnum(get(AREF(array,i))));
 	}
 	else
 		critical_error("Bad format param to deposit_vector()",format);
 }
 
-void deposit_objects(F_VECTOR *vector, CELL literal_length)
+void deposit_objects(CELL here, F_VECTOR *vector, CELL literal_length)
 {
 	F_ARRAY *array = untag_array_fast(vector->array);
-	memcpy((void*)compiling.here,array + 1,literal_length);
+	memcpy((void*)here,array + 1,literal_length);
 }
 
 CELL add_compiled_block(CELL code_format, F_VECTOR *code,
 	F_VECTOR *literals, F_VECTOR *words, F_VECTOR *rel)
 {
-	CELL start = compiling.here;
-
 	CELL code_length = align8(untag_fixnum_fast(code->top) * code_format);
 	CELL rel_length = untag_fixnum_fast(rel->top) * CELLS;
 	CELL literal_length = untag_fixnum_fast(literals->top) * CELLS;
 	CELL words_length = untag_fixnum_fast(words->top) * CELLS;
 
-	CELL total_length = sizeof(F_COMPILED) + code_length + rel_length
+	CELL total_length = code_length + rel_length
 		+ literal_length + words_length;
 
-	if(compiling.here + total_length >= compiling.limit)
-		critical_error("Code heap exhausted",compiling.limit);
+	CELL start = heap_allot(&compiling,total_length);
+	CELL here = start;
 
 	/* compiled header */
 	F_COMPILED header;
@@ -239,24 +241,24 @@ CELL add_compiled_block(CELL code_format, F_VECTOR *code,
 	header.words_length = words_length;
 	header.finalized = false;
 
-	memcpy((void*)compiling.here,&header,sizeof(F_COMPILED));
-	compiling.here += sizeof(F_COMPILED);
-	
+	memcpy((void*)here,&header,sizeof(F_COMPILED));
+	here += sizeof(F_COMPILED);
+
 	/* code */
-	deposit_integers(code,code_format);
-	compiling.here += code_length;
+	deposit_integers(here,code,code_format);
+	here += code_length;
 
 	/* relation info */
-	deposit_integers(rel,CELLS);
-	compiling.here += rel_length;
+	deposit_integers(here,rel,CELLS);
+	here += rel_length;
 
 	/* literals */
-	deposit_objects(literals,literal_length);
-	compiling.here += literal_length;
+	deposit_objects(here,literals,literal_length);
+	here += literal_length;
 
 	/* words */
-	deposit_objects(words,words_length);
-	compiling.here += words_length;
+	deposit_objects(here,words,words_length);
+	here += words_length;
 
 	return start + sizeof(F_COMPILED);
 }
@@ -285,7 +287,6 @@ void primitive_finalize_compile(void)
 		word->xt = to_cell(get(AREF(pair,1)));
 	}
 
-	iterate_code_heap(last_flush,compiling.here,finalize_code_block);
-	flush_icache((void*)last_flush,compiling.here - last_flush);
-	last_flush = compiling.here;
+	iterate_code_heap(finalize_code_block);
+	flush_icache(compiling.base,compiling.limit - compiling.base);
 }
