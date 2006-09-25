@@ -11,6 +11,7 @@ TUPLE: win hWnd hDC hRC world ;
 
 SYMBOL: msg-obj
 SYMBOL: class-name
+SYMBOL: track-mouse-state
 
 : random-class-name "Factor" 100000000 random-int unparse append ;
 
@@ -190,7 +191,16 @@ SYMBOL: hWnd
     prepare-mouse send-button-up ;
 
 : handle-wm-mousemove ( hWnd uMsg wParam lParam -- )
-    2nip mouse-coordinate swap window move-hand fire-motion ;
+    2nip
+    track-mouse-state get [
+        over "TRACKMOUSEEVENT" <c-object> [ set-TRACKMOUSEEVENT-hwndTrack ] keep
+        "TRACKMOUSEEVENT" c-size over set-TRACKMOUSEEVENT-cbSize
+        TME_LEAVE over set-TRACKMOUSEEVENT-dwFlags
+        0 over set-TRACKMOUSEEVENT-dwHoverTime
+        TrackMouseEvent drop
+        track-mouse-state on
+    ] unless
+    mouse-coordinate swap window move-hand fire-motion ;
 
 : handle-wm-mousewheel ( hWnd uMsg wParam lParam -- )
     mouse-coordinate >r mouse-wheel nip r> rot window send-wheel ;
@@ -198,6 +208,10 @@ SYMBOL: hWnd
 : handle-wm-cancelmode ( hWnd uMsg wParam lParam -- )
     #! message sent if windows needs application to stop dragging
     3drop drop ReleaseCapture drop ;
+
+: handle-wm-mouseleave ( hWnd uMsg wParam lParam -- )
+    #! message sent if mouse leaves main application 
+    3drop drop forget-rollover track-mouse-state off ;
 
 : 4dup ( a b c d -- a b c d a b c d )
     >r >r 2dup r> r> 2swap >r >r 2dup r> r> 2swap ;
@@ -236,6 +250,7 @@ SYMBOL: hWnd
                 { [ dup WM_MOUSEMOVE = ] [ drop handle-wm-mousemove 0 ] }
                 { [ dup WM_MOUSEWHEEL = ] [ drop handle-wm-mousewheel 0 ] }
                 { [ dup WM_CANCELMODE = ] [ drop handle-wm-cancelmode 0 ] }
+                { [ dup WM_MOUSELEAVE = ] [ drop handle-wm-mouseleave 0 ] }
 
                 { [ t ] [ drop DefWindowProc ] }
             } cond

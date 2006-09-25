@@ -1309,7 +1309,7 @@ FUNCTION: BOOL ShowWindow ( HWND hWnd, int nCmdShow ) ;
 ! FUNCTION: ToAsciiEx
 ! FUNCTION: ToUnicode
 ! FUNCTION: ToUnicodeEx
-! FUNCTION: TrackMouseEvent
+FUNCTION: BOOL TrackMouseEvent ( LPTRACKMOUSEEVENT lpEventTrack ) ;
 ! FUNCTION: TrackPopupMenu
 ! FUNCTION: TrackPopupMenuEx
 ! FUNCTION: TranslateAccelerator
