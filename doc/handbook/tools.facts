@@ -10,6 +10,7 @@ $terpri
 "Interactive development:"
 { $subsection "listener" }
 { $subsection "debugger" }
+{ $subsection "definitions" }
 { $subsection "word-introspection" }
 { $subsection "inspector" }
 { $subsection "annotations" }

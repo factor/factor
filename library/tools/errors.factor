@@ -3,7 +3,7 @@
 IN: errors
 USING: generic help tools io kernel math math-internals parser
 prettyprint queues sequences sequences-internals strings test
-words ;
+words definitions ;
 
 : expired-error. ( obj -- )
     "Object did not survive image save/load: " write third . ;
@@ -157,3 +157,5 @@ M: condition error. delegate error. ;
 M: condition error-help drop f ;
 
 M: assert summary drop "Assertion failed" ;
+
+M: no-edit-hook summary drop "No edit hook is set" ;
