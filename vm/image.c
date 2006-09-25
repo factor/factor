@@ -62,7 +62,7 @@ void load_image(const char* filename)
 
 		code_relocation_base = h.code_relocation_base;
 
-		build_free_list(&compiling,0);
+		build_free_list(&compiling,size);
 	}
 
 	fclose(file);

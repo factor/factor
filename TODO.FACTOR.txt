@@ -2,6 +2,10 @@
 
 - signal 4 on datastack underflow on mac intel??
 - test alien-indirect
+- code GC:
+  - get code heap load/save working
+  - get room. working
+  - compact the heap on save
 
 + ui:
 
@@ -31,7 +35,6 @@
 - figure out if we need both set-model and set-model*
 - if i do 10000 [ . ] each and then clear, the listener window is slow
 - full-height nodes should really be full height
-- draw-world: bail out if world is 0x0
 - better help result ranking
 - page scrolling should be timer-based too
 - x11: scroll up/down wiggles caret
@@ -102,7 +105,6 @@
 - float= doesn't consider nans equal
 - intrinsic fixnum>float float>fixnum
 - C functions returning structs by value
-- code gc
 - infer which variables are read, written in a quotation
 - compiled continuations
 - compiled call traces

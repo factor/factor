@@ -9,11 +9,6 @@ void new_heap(HEAP *heap, CELL size)
 	heap->free_list = NULL;
 }
 
-INLINE CELL block_size(F_BLOCK *block)
-{
-	return (CELL)block->next - (CELL)block - sizeof(F_BLOCK);
-}
-
 INLINE void update_free_list(HEAP *heap, F_BLOCK *prev, F_BLOCK *next_free)
 {
 	if(prev)
@@ -31,7 +26,7 @@ void build_free_list(HEAP *heap, CELL size)
 	F_BLOCK *scan = (F_BLOCK *)heap->base;
 	F_BLOCK *end = (F_BLOCK *)(heap->base + size);
 
-	while(scan < end)
+	while(scan && scan < end)
 	{
 		if(scan->status == B_FREE)
 		{
@@ -39,18 +34,24 @@ void build_free_list(HEAP *heap, CELL size)
 			prev = scan;
 		}
 
-		scan = scan->next;
+		scan = next_block(heap,scan);
 	}
 
 	if((CELL)(end + 1) <= heap->limit)
 	{
 		end->status = B_FREE;
 		end->next_free = NULL;
-		end->next = NULL;
-		update_free_list(heap,prev,end);
+		end->size = heap->limit - (CELL)end;
 	}
 	else
-		update_free_list(heap,prev,NULL);
+	{
+		end = NULL;
+
+		if(prev)
+			prev->size = heap->limit - (CELL)prev;
+	}
+
+	update_free_list(heap,prev,end);
 }
 
 CELL heap_allot(HEAP *heap, CELL size)
@@ -60,35 +61,42 @@ CELL heap_allot(HEAP *heap, CELL size)
 
 	while(scan)
 	{
-		if(block_size(scan) >= size)
+		CELL this_size = scan->size - sizeof(F_BLOCK);
+
+		if(this_size < size)
 		{
-			/* we found a candidate block */
-			F_BLOCK *next_free;
-
-			if(block_size(scan) <= size + sizeof(F_BLOCK))
-			{
-				/* too small to be split */
-				next_free = scan->next_free;
-			}
-			else
-			{
-				/* split the block in two */
-				F_BLOCK *split = (F_BLOCK *)((CELL)scan + size);
-				split->status = B_FREE;
-				split->next_free = scan->next_free;
-				next_free = split;
-			}
-
-			/* update the free list */
-			update_free_list(heap,prev,next_free);
-
-			/* this is our new block */
-			scan->status = B_ALLOCATED;
-			return (CELL)(scan + 1);
+			prev = scan;
+			scan = scan->next_free;
+			continue;
 		}
 
-		prev = scan;
-		scan = scan->next_free;
+		/* we found a candidate block */
+		F_BLOCK *next_free;
+
+		if(this_size - size <= sizeof(F_BLOCK))
+		{
+			/* too small to be split */
+			next_free = scan->next_free;
+		}
+		else
+		{
+			/* split the block in two */
+			CELL new_size = size + sizeof(F_BLOCK);
+			F_BLOCK *split = (F_BLOCK *)((CELL)scan + new_size);
+			split->status = B_FREE;
+			split->size = scan->size - new_size;
+			split->next_free = scan->next_free;
+			scan->size = new_size;
+			next_free = split;
+		}
+
+		/* update the free list */
+		update_free_list(heap,prev,next_free);
+
+		/* this is our new block */
+		scan->status = B_ALLOCATED;
+
+		return (CELL)(scan + 1);
 	}
 
 	if(heap->base == 0)
@@ -108,8 +116,8 @@ void free_unmarked(HEAP *heap)
 		if(scan->status == B_ALLOCATED)
 		{
 			/* merge blocks? */
-			if(prev->next == scan)
-				prev->next = scan->next;
+			if(next_block(heap,prev) == scan)
+				prev->size += scan->size;
 			else
 			{
 				scan->status = B_FREE;
@@ -118,19 +126,9 @@ void free_unmarked(HEAP *heap)
 			}
 		}
 
-		scan = scan->next;
+		scan = next_block(heap,scan);
 	}
 
 	if(prev)
 		prev->next_free = NULL;
-}
-
-void iterate_heap(HEAP *heap, HEAP_ITERATOR iter)
-{
-	F_BLOCK *scan = (F_BLOCK *)heap->base;
-	while(scan)
-	{
-		iter((CELL)(scan + 1),scan->status);
-		scan = scan->next;
-	}
 }

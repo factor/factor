@@ -25,7 +25,7 @@ void iterate_code_heap(CODE_HEAP_ITERATOR iter)
 				literal_start,words_start);
 		}
 
-		scan = scan->next;
+		scan = next_block(&compiling,scan);
 	}
 }
 
@@ -227,7 +227,7 @@ CELL add_compiled_block(CELL code_format, F_VECTOR *code,
 	CELL literal_length = untag_fixnum_fast(literals->top) * CELLS;
 	CELL words_length = untag_fixnum_fast(words->top) * CELLS;
 
-	CELL total_length = code_length + rel_length
+	CELL total_length = sizeof(F_COMPILED) + code_length + rel_length
 		+ literal_length + words_length;
 
 	CELL start = heap_allot(&compiling,total_length);
