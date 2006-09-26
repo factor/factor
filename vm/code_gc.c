@@ -232,3 +232,8 @@ void primitive_code_room(void)
 	box_unsigned_cell(heap_free_space(&compiling));
 	box_unsigned_cell(compiling.limit - compiling.base);
 }
+
+void primitive_code_gc(void)
+{
+	garbage_collection(TENURED,true);
+}

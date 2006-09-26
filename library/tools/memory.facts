@@ -1,7 +1,7 @@
 IN: memory
 USING: errors help test ;
 
-HELP: gc ( n -- )
+HELP: data-gc ( n -- )
 { $values { "n" "a positive integer" } }
 { $description "Collects all generations up to and including the " { $snippet "n" } "th generation. The nursery where new objects are allocated is generation 0, and tenured space is generation " { $snippet "g-1" } " where " { $snippet "g" } " is the value output by " { $link generations } "." } ;
 

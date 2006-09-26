@@ -50,16 +50,6 @@ typedef struct
 typedef void (*CODE_HEAP_ITERATOR)(F_COMPILED *compiled, CELL code_start,
 	CELL reloc_start, CELL literal_start, CELL words_start, CELL words_end);
 
-void init_code_heap(CELL size);
-
-void iterate_code_heap(CODE_HEAP_ITERATOR iter);
-
-void collect_literals(void);
-
-void mark_and_sweep(CELL xt);
-
-void primitive_code_room(void);
-
 INLINE void iterate_code_heap_step(F_COMPILED *compiled, CODE_HEAP_ITERATOR iter)
 {
 	CELL code_start = (CELL)(compiled + 1);
@@ -80,3 +70,10 @@ INLINE F_COMPILED *xt_to_compiled(CELL xt)
 {
 	return (F_COMPILED *)(xt - sizeof(F_COMPILED));
 }
+
+void init_code_heap(CELL size);
+void iterate_code_heap(CODE_HEAP_ITERATOR iter);
+void collect_literals(void);
+void mark_and_sweep(CELL xt);
+void primitive_code_room(void);
+void primitive_code_gc(void);

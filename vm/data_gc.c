@@ -446,10 +446,11 @@ void reset_generations(CELL from, CELL to)
 	clear_cards(from,to);
 }
 
-void begin_gc(CELL gen)
+void begin_gc(CELL gen, bool code_gc)
 {
 	collecting_gen = gen;
 	collecting_gen_start = generations[gen].base;
+	collecting_code = code_gc;
 
 	if(gen == TENURED)
 	{
@@ -471,9 +472,9 @@ void begin_gc(CELL gen)
 	}
 }
 
-void end_gc(CELL gen)
+void end_gc()
 {
-	if(gen == TENURED)
+	if(collecting_gen == TENURED)
 	{
 		/* we did a full collection; no more
 		old-to-new pointers remain since everything
@@ -483,7 +484,8 @@ void end_gc(CELL gen)
 		now empty */
 		reset_generations(NURSERY,TENURED - 1);
 
-		fprintf(stderr,"*** Data GC (%ld minor, %ld cards)\n",
+		fprintf(stderr,"*** %s GC (%ld minor, %ld cards)\n",
+			collecting_code ? "Code and data" : "Data",
 			minor_collections,cards_scanned);
 		minor_collections = 0;
 		cards_scanned = 0;
@@ -494,12 +496,19 @@ void end_gc(CELL gen)
 		next-oldest generation no longer has any
 		pointers into the younger generation (the
 		younger generation is empty!) */
-		unmark_cards(gen + 1,gen + 1);
+		unmark_cards(collecting_gen + 1,collecting_gen + 1);
 		/* all generations up to and including the one
 		collected are now empty */
-		reset_generations(NURSERY,gen);
+		reset_generations(NURSERY,collecting_gen);
 		
 		minor_collections++;
+	}
+	
+	if(collecting_code)
+	{
+		/* now that all reachable code blocks have been marked,
+		deallocate the rest */
+		free_unmarked(&compiling);
 	}
 }
 
@@ -524,7 +533,7 @@ void garbage_collection(CELL gen, bool code_gc)
 			gen++;
 	}
 
-	begin_gc(gen);
+	begin_gc(gen,code_gc);
 
 	/* initialize chase pointer */
 	scan = newspace->here;
@@ -535,26 +544,30 @@ void garbage_collection(CELL gen, bool code_gc)
 	/* collect objects referenced from older generations */
 	collect_cards(gen);
 
-	/* collect literal objects referenced from compiled code */
-	collect_literals();
-	
+	if(!code_gc)
+	{
+		/* if we are doing code GC, then we will copy over literals
+		from any code block which gets marked as live. if we are not
+		doing code GC, just consider all literals as roots. */
+		collect_literals();
+	}
+
 	while(scan < newspace->here)
 		scan = collect_next(scan);
 
-	end_gc(gen);
+	end_gc();
 
 	gc_time += (current_millis() - start);
 }
 
-void primitive_gc(void)
+void primitive_data_gc(void)
 {
-	bool code_gc = unbox_boolean();
 	CELL gen = to_fixnum(dpop());
-	if(gen <= NURSERY || code_gc)
+	if(gen <= NURSERY)
 		gen = NURSERY;
 	else if(gen >= TENURED)
 		gen = TENURED;
-	garbage_collection(gen,code_gc);
+	garbage_collection(gen,false);
 }
 
 /* WARNING: only call this from a context where all local variables

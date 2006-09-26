@@ -142,6 +142,7 @@ CELL cards_scanned;
 /* only meaningful during a GC */
 CELL collecting_gen;
 CELL collecting_gen_start;
+bool collecting_code;
 
 /* test if the pointer is in generation being collected, or a younger one.
 init_data_heap() arranges things so that the older generations are first,
@@ -209,7 +210,7 @@ INLINE void* allot_object(CELL type, CELL length)
 void update_cards_offset(void);
 CELL collect_next(CELL scan);
 void garbage_collection(CELL gen, bool code_gc);
-void primitive_gc(void);
+void primitive_data_gc(void);
 void maybe_gc(CELL size);
 DLLEXPORT void simple_gc(void);
 void primitive_gc_time(void);

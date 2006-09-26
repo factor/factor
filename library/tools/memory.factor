@@ -5,7 +5,7 @@ USING: arrays errors generic hashtables io kernel
 kernel-internals math namespaces parser prettyprint sequences
 strings styles vectors words ;
 
-: full-gc ( -- ) generations 1- f gc ;
+: full-gc ( -- ) generations 1- data-gc ;
 
 ! Printing an overview of heap usage.
 

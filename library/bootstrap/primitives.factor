@@ -123,7 +123,8 @@ call
     { "setenv" "kernel-internals"           }
     { "stat" "io"                           }
     { "(directory)" "io"                    }
-    { "gc" "memory"                         }
+    { "data-gc" "memory"                    }
+    { "code-gc" "memory"                    }
     { "gc-time" "memory"                    }
     { "save-image" "memory"                 }
     { "datastack" "kernel"                  }

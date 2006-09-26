@@ -235,7 +235,12 @@ t over set-effect-terminated?
 \ setenv { object fixnum } { } <effect> "infer-effect" set-word-prop
 \ stat { string } { object } <effect> "infer-effect" set-word-prop
 \ (directory) { string } { array } <effect> "infer-effect" set-word-prop
-\ gc { integer object } { } <effect> "infer-effect" set-word-prop
+\ data-gc { integer } { } <effect> "infer-effect" set-word-prop
+
+! code-gc does not declare a stack effect since it might be
+! called from a compiled word which becomes unreachable during
+! the course of its execution, resulting in a crash
+
 \ gc-time { } { integer } <effect> "infer-effect" set-word-prop
 \ save-image { string } { } <effect> "infer-effect" set-word-prop
 \ exit { integer } { } <effect> "infer-effect" set-word-prop
