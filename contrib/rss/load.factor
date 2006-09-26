@@ -1,4 +1,4 @@
-REQUIRES: contrib/http-client contrib/sqlite ;
+REQUIRES: contrib/http-client contrib/httpd contrib/sqlite ;
 PROVIDE: contrib/rss {
 	"rss.factor"
 	"rss-reader.factor"
