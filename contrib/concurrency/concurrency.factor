@@ -81,6 +81,17 @@ TUPLE: mailbox threads data ;
   (mailbox-block-if-empty)
   mailbox-data dlist-pop-front ;
 
+: (mailbox-get-all) ( mailbox -- )
+  dup mailbox-empty? [
+    drop
+  ] [
+    dup mailbox-data dlist-pop-front , (mailbox-get-all)
+  ] if ;
+
+: mailbox-get-all ( mailbox -- array )
+  (mailbox-block-if-empty)
+  [ (mailbox-get-all) ] { } make ;
+  
 : while-mailbox-empty ( mailbox quot -- )
   over mailbox-empty? [
     dup >r swap >r call r> r> while-mailbox-empty

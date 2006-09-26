@@ -6,21 +6,21 @@ HELP: make-mailbox
 { $values { "mailbox" "a mailbox object" } 
 }
 { $description "A mailbox is an object that can be used for safe thread communication. Items can be put in the mailbox and retrieved in a FIFO order. If the mailbox is empty when a get operation is performed then the thread will block until another thread places something in the mailbox. If multiple threads are waiting on the same mailbox, only one of the waiting threads will be unblocked to process the get operation." } 
-{ $see-also mailbox-empty? mailbox-put mailbox-get while-mailbox-empty mailbox-get? } ;
+{ $see-also mailbox-empty? mailbox-put mailbox-get mailbox-get-all while-mailbox-empty mailbox-get? } ;
 
 HELP: mailbox-empty?
 { $values { "mailbox" "a mailbox object" } 
           { "bool" "a boolean value" }
 }
 { $description "Return true if the mailbox is empty." } 
-{ $see-also make-mailbox mailbox-put mailbox-get while-mailbox-empty mailbox-get? } ;
+{ $see-also make-mailbox mailbox-put mailbox-get mailbox-get-all while-mailbox-empty mailbox-get? } ;
 
 HELP: mailbox-put
 { $values { "obj" "an object" } 
           { "mailbox" "a mailbox object" } 
 }
 { $description "Put the object into the mailbox. Any threads that have a blocking get on the mailbox are resumed. Only one of those threads will successfully get the object, the rest will immediately block waiting for the next item in the mailbox." } 
-{ $see-also make-mailbox mailbox-empty? mailbox-get while-mailbox-empty mailbox-get? } ;
+{ $see-also make-mailbox mailbox-empty? mailbox-get mailbox-get-all while-mailbox-empty mailbox-get? } ;
 
 HELP: (mailbox-block-unless-pred)
 { $values { "pred" "a quotation with stack effect " { $snippet "( X -- bool )" } } 
@@ -29,28 +29,35 @@ HELP: (mailbox-block-unless-pred)
 	  { "mailbox2" "same object as 'mailbox'" }
 }
 { $description "Block the thread if there are no items in the mailbox that return true when the predicate is called with the item on the stack. The predicate must have stack effect " { $snippet "( X -- bool )" } "." } 
-{ $see-also make-mailbox mailbox-empty? mailbox-put mailbox-get while-mailbox-empty mailbox-get? } ;
+{ $see-also make-mailbox mailbox-empty? mailbox-put mailbox-get mailbox-get-all while-mailbox-empty mailbox-get? } ;
 
 HELP: (mailbox-block-if-empty)
 { $values { "mailbox" "a mailbox object" } 
 	  { "mailbox2" "same object as 'mailbox'" }
 }
 { $description "Block the thread if the mailbox is empty." } 
-{ $see-also make-mailbox mailbox-empty? mailbox-put mailbox-get while-mailbox-empty mailbox-get? } ;
+{ $see-also make-mailbox mailbox-empty? mailbox-put mailbox-get mailbox-get-all while-mailbox-empty mailbox-get? } ;
 
 HELP: mailbox-get
 { $values { "mailbox" "a mailbox object" } 
 	  { "object" "an object" }
 }
 { $description "Get the first item put into the mailbox. If it is empty the thread blocks until an item is put into it. The thread then resumes, leaving the item on the stack." } 
-{ $see-also make-mailbox mailbox-empty? mailbox-put while-mailbox-empty mailbox-get? } ;
+{ $see-also make-mailbox mailbox-empty? mailbox-put while-mailbox-empty mailbox-get-all mailbox-get? } ;
+
+HELP: mailbox-get-all
+{ $values { "mailbox" "a mailbox object" } 
+	  { "array" "an array" }
+}
+{ $description "Blocks the thread if the mailbox is empty, otherwise removes all objects in the mailbox and returns an array containing the objects." } 
+{ $see-also make-mailbox mailbox-empty? mailbox-put while-mailbox-empty mailbox-get-all mailbox-get? } ;
 
 HELP: while-mailbox-empty
 { $values { "mailbox" "a mailbox object" } 
 	  { "quot" "a quotation with stack effect " { $snippet "( -- )" } }
 }
 { $description "Repeatedly call the quotation while there are no items in the mailbox. Quotation should have stack effect " { $snippet "( -- )" } "." } 
-{ $see-also make-mailbox mailbox-empty? mailbox-put mailbox-get mailbox-get? } ;
+{ $see-also make-mailbox mailbox-empty? mailbox-put mailbox-get mailbox-get-all mailbox-get? } ;
 
 HELP: mailbox-get?
 { $values { "pred" "a quotation with stack effect " { $snippet "( X -- bool )" } }
@@ -58,7 +65,7 @@ HELP: mailbox-get?
 	  { "obj" "an object" }
 }
 { $description "Get the first item in the mailbox which satisfies the predicate. 'pred' will be called repeatedly for each item in the mailbox. When 'pred' returns true that item will be returned. If nothing in the mailbox satisfies the predicate then the thread will block until something does. 'pred' must have stack effect " { $snippet "( X -- bool }" } "." } 
-{ $see-also make-mailbox mailbox-empty? mailbox-put mailbox-get while-mailbox-empty } ;
+{ $see-also make-mailbox mailbox-empty? mailbox-put mailbox-get mailbox-get-all while-mailbox-empty } ;
 
 HELP: <node> 
 { $values { "hostname" "the hostname of the node as a string" } 
