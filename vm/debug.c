@@ -94,7 +94,7 @@ void dump_cell(CELL cell)
 			fprintf(stderr," -- F");
 		else if(cell < TYPE_COUNT<<TAG_BITS)
 			fprintf(stderr," -- header: %ld",cell>>TAG_BITS);
-		else if(cell >= heap_start && cell < heap_end)
+		else if(cell >= data_heap_start && cell < data_heap_end)
 		{
 			CELL header = get(UNTAG(cell));
 			CELL type = header>>TAG_BITS;

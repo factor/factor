@@ -147,3 +147,12 @@ CELL heap_free_space(HEAP *heap)
 
 	return size;
 }
+
+CELL heap_size(HEAP *heap)
+{
+	CELL start = heap->base;
+	F_BLOCK *scan = (F_BLOCK *)start;
+	while(next_block(heap,scan))
+		scan = next_block(heap,scan);
+	return (CELL)scan - (CELL)start;
+}

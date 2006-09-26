@@ -293,7 +293,7 @@ we need to save its contents and re-initialize it when entering a callback,
 and restore its contents when leaving the callback. see stack.c */
 void update_cards_offset(void)
 {
-	cards_offset = (CELL)cards - (heap_start >> CARD_BITS);
+	cards_offset = (CELL)cards - (data_heap_start >> CARD_BITS);
 }
 
 /* input parameters must be 8 byte aligned */
@@ -316,14 +316,14 @@ void init_arena(CELL gens, CELL young_size, CELL aging_size)
 	gen_count = gens;
 	generations = safe_malloc(sizeof(ZONE) * gen_count);
 
-	heap_start = (CELL)(alloc_bounded_block(total_size)->start);
-	heap_end = heap_start + total_size;
+	data_heap_start = (CELL)(alloc_bounded_block(total_size)->start);
+	data_heap_end = data_heap_start + total_size;
 
 	cards = safe_malloc(cards_size);
 	cards_end = cards + cards_size;
 	update_cards_offset();
 
-	alloter = heap_start;
+	alloter = data_heap_start;
 
 	alloter = init_zone(&tenured,aging_size,alloter);
 	alloter = init_zone(&prior,aging_size,alloter);
@@ -333,7 +333,7 @@ void init_arena(CELL gens, CELL young_size, CELL aging_size)
 
 	clear_cards(NURSERY,TENURED);
 
-	if(alloter != heap_start + total_size)
+	if(alloter != data_heap_start + total_size)
 		fatal_error("Oops",alloter);
 
 	heap_scan = false;

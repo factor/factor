@@ -23,6 +23,7 @@ void build_free_list(HEAP *heap, CELL size);
 CELL heap_allot(HEAP *heap, CELL size);
 void free_unmarked(HEAP *heap);
 CELL heap_free_space(HEAP *heap);
+CELL heap_size(HEAP *heap);
 
 INLINE F_BLOCK *next_block(HEAP *heap, F_BLOCK *block)
 {

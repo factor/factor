@@ -101,8 +101,8 @@ void primitive_begin_scan(void);
 void primitive_next_object(void);
 void primitive_end_scan(void);
 
-CELL heap_start;
-CELL heap_end;
+CELL data_heap_start;
+CELL data_heap_end;
 
 /* card marking write barrier. a card is a byte storing a mark flag,
 and the offset (in cells) of the first object in the card.
