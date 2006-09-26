@@ -133,6 +133,8 @@ void free_unmarked(HEAP *heap)
 				prev = scan;
 			}
 		}
+		else if(scan->status == B_MARKED)
+			scan->status = B_ALLOCATED;
 
 		scan = next_block(heap,scan);
 	}
