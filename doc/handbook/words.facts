@@ -128,5 +128,4 @@ $terpri
 { $subsection set-word-def }
 "A lower-level facility for inspecting the machine code address of a word:"
 { $subsection word-xt }
-{ $subsection set-word-xt }
 { $subsection update-xt } ;

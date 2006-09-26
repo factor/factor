@@ -52,9 +52,6 @@ M: symbol definer drop \ SYMBOL: ;
 GENERIC: word-xt ( word -- xt )
 M: word word-xt 7 integer-slot ;
 
-GENERIC: set-word-xt ( xt word -- )
-M: word set-word-xt 7 set-integer-slot ;
-
 SYMBOL: vocabularies
 
 : vocab ( name -- vocab ) vocabularies get hash ;

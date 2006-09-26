@@ -70,12 +70,6 @@ HELP: word-xt
 { $values { "word" "a word" } { "xt" "an execution token integer" } }
 { $description "Outputs the machine code address of the word's definition." } ;
 
-HELP: set-word-xt
-{ $values { "xt" "an execution token integer" } { "word" "a word" } }
-{ $description "Sets the machine code address of the word's definition." }
-{ $warning "This word is unsafe. Specifying an invalid address can corrupt memory and crash the runtime." }
-{ $notes "This word is used by the compiler." } ;
-
 HELP: uses
 { $values { "word" "a word" } { "seq" "a sequence of words" } }
 { $description "Outputs a sequence of words directory called by the given word." }
