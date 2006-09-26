@@ -290,3 +290,9 @@ void primitive_finalize_compile(void)
 	iterate_code_heap(finalize_code_block);
 	flush_icache(compiling.base,compiling.limit - compiling.base);
 }
+
+void primitive_code_room(void)
+{
+	box_unsigned_cell(heap_free_space(&compiling));
+	box_unsigned_cell(compiling.limit - compiling.base);
+}

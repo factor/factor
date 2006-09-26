@@ -10,9 +10,15 @@ HELP: gc-time ( -- n )
 { $description "Outputs the total time spent in garbage collection during this Factor session." }
 { $examples "This word is used by " { $link time } " to measure the time spent in garbage collection during the execution of a quotation." } ;
 
-HELP: room ( -- code-free code-total cards semi generations )
-{ $values { "code-free" "bytes free in the code heap" } { "code-total" "total bytes in the code heap" } { "cards" "number of bytes reserved for card marking" } { "semi" "number of bytes reserved for tenured semi-space" } { "generations" "array of free/total bytes pairs" } }
-{ $description "Queries the runtime for memory usage information. To see this in a human-readable form, call " { $link room. } " instead." } ;
+HELP: data-room ( -- cards semi generations )
+{ $values { "cards" "number of bytes reserved for card marking" } { "semi" "number of bytes reserved for tenured semi-space" } { "generations" "array of free/total bytes pairs" } }
+{ $description "Queries the runtime for memory usage information. Use " { $link room. } " for a pretty memory usage display." }
+{ $see-also code-room } ;
+
+HELP: code-room ( -- code-free code-total )
+{ $values { "code-free" "bytes free in the code heap" } { "code-total" "total bytes in the code heap" } }
+{ $description "Queries the runtime for memory usage information. Use " { $link room. } " for a pretty memory usage display." }
+{ $see-also data-room } ;
 
 HELP: size ( obj -- n )
 { $values { "obj" "an object" } { "n" "a size in bytes" } }

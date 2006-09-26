@@ -239,7 +239,8 @@ t over set-effect-terminated?
 \ gc-time { } { integer } <effect> "infer-effect" set-word-prop
 \ save-image { string } { } <effect> "infer-effect" set-word-prop
 \ exit { integer } { } <effect> "infer-effect" set-word-prop
-\ room { } { integer integer integer integer array } <effect> "infer-effect" set-word-prop
+\ data-room { } { integer integer array } <effect> "infer-effect" set-word-prop
+\ code-room { } { integer integer } <effect> "infer-effect" set-word-prop
 \ os-env { string } { object } <effect> "infer-effect" set-word-prop
 \ millis { } { integer } <effect> "infer-effect" set-word-prop
 

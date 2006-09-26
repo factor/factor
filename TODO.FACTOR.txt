@@ -3,9 +3,8 @@
 - signal 4 on datastack underflow on mac intel??
 - test alien-indirect
 - code GC:
-  - get code heap load/save working
-  - get room. working
-  - compact the heap on save
+  - discard the free block at the end of the code heap on save
+  - minor GC takes too long now
 
 + ui:
 

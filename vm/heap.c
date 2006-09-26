@@ -132,3 +132,18 @@ void free_unmarked(HEAP *heap)
 	if(prev)
 		prev->next_free = NULL;
 }
+
+CELL heap_free_space(HEAP *heap)
+{
+	CELL size = 0;
+	F_BLOCK *scan = (F_BLOCK *)heap->base;
+
+	while(scan)
+	{
+		if(scan->status == B_FREE)
+			size += scan->size;
+		scan = next_block(heap,scan);
+	}
+
+	return size;
+}

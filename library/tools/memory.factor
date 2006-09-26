@@ -26,15 +26,15 @@ strings styles vectors words ;
     tabular-output ;
 
 : room. ( -- )
-    room [
+    [
         { "" "Total" "Used" "Free" } ,
-        0 [
+        data-room 0 [
             "Generation " pick number>string append
             >r first2 r> total/used/free, 1+
         ] reduce drop
         "Semi-space" total,
         "Cards" total,
-        "Code space" total/used/free,
+        code-room "Code space" total/used/free,
     ] { } make simple-table ;
 
 ! Some words for iterating through the heap.

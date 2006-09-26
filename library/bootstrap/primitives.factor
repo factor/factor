@@ -133,7 +133,8 @@ call
     { "set-retainstack" "kernel"            }
     { "set-callstack" "kernel"              }
     { "exit" "kernel"                       }
-    { "room" "memory"                       }
+    { "data-room" "memory"                  }
+    { "code-room" "memory"                  }
     { "os-env" "kernel"                     }
     { "millis" "kernel"                     }
     { "type" "kernel"                       }
