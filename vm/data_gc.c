@@ -74,6 +74,11 @@ CELL unaligned_object_size(CELL pointer)
 	}
 }
 
+void primitive_size(void)
+{
+	drepl(tag_fixnum(object_size(dpeek())));
+}
+
 /* The number of cells from the start of the object which should be scanned by
 the GC. Some types have a binary payload at the end (string, word, DLL) which
 we ignore. */
@@ -99,66 +104,6 @@ CELL binary_payload_start(CELL pointer)
 	}
 }
 
-void primitive_type(void)
-{
-	drepl(tag_fixnum(type_of(dpeek())));
-}
-
-void primitive_tag(void)
-{
-	drepl(tag_fixnum(TAG(dpeek())));
-}
-
-void primitive_slot(void)
-{
-	F_FIXNUM slot = untag_fixnum_fast(dpop());
-	CELL obj = UNTAG(dpop());
-	dpush(get(SLOT(obj,slot)));
-}
-
-void primitive_set_slot(void)
-{
-	F_FIXNUM slot = untag_fixnum_fast(dpop());
-	CELL obj = UNTAG(dpop());
-	CELL value = dpop();
-	put(SLOT(obj,slot),value);
-	write_barrier(obj);
-}
-
-void primitive_integer_slot(void)
-{
-	F_FIXNUM slot = untag_fixnum_fast(dpop());
-	CELL obj = UNTAG(dpop());
-	dpush(tag_cell(get(SLOT(obj,slot))));
-}
-
-void primitive_set_integer_slot(void)
-{
-	F_FIXNUM slot = untag_fixnum_fast(dpop());
-	CELL obj = UNTAG(dpop());
-	F_FIXNUM value = to_cell(dpop());
-	put(SLOT(obj,slot),value);
-}
-
-void primitive_size(void)
-{
-	drepl(tag_fixnum(object_size(dpeek())));
-}
-
-CELL clone(CELL obj)
-{
-	CELL size = object_size(obj);
-	CELL tag = TAG(obj);
-	void *new_obj = allot(size);
-	return RETAG(memcpy(new_obj,(void*)UNTAG(obj),size),tag);
-}
-
-void primitive_clone(void)
-{
-	maybe_gc(0);
-	drepl(clone(dpeek()));
-}
-
 void primitive_data_room(void)
 {
 	F_ARRAY *a = array(ARRAY_TYPE,gen_count,F);
@@ -177,7 +122,7 @@ void primitive_data_room(void)
 /* Disables GC and activates next-object ( -- obj ) primitive */
 void primitive_begin_scan(void)
 {
-	garbage_collection(TENURED);
+	garbage_collection(TENURED,false);
 	heap_scan_ptr = tenured.base;
 	heap_scan = true;
 }
@@ -297,7 +242,7 @@ void update_cards_offset(void)
 }
 
 /* input parameters must be 8 byte aligned */
-/* the heap layout is important:
+/* the data heap layout is important:
 - two semispaces: tenured and prior
 - younger generations follow
 there are two reasons for this:
@@ -305,7 +250,7 @@ there are two reasons for this:
 - the nursery grows into the guard page, so allot() does not have to
 check for out of memory, whereas allot_zone() (used by the GC) longjmp()s
 back to collecting a higher generation */
-void init_arena(CELL gens, CELL young_size, CELL aging_size)
+void init_data_heap(CELL gens, CELL young_size, CELL aging_size)
 {
 	int i;
 	CELL alloter;
@@ -538,7 +483,7 @@ void end_gc(CELL gen)
 		now empty */
 		reset_generations(NURSERY,TENURED - 1);
 
-		fprintf(stderr,"*** Major GC (%ld minor, %ld cards)\n",
+		fprintf(stderr,"*** Data GC (%ld minor, %ld cards)\n",
 			minor_collections,cards_scanned);
 		minor_collections = 0;
 		cards_scanned = 0;
@@ -559,7 +504,7 @@ void end_gc(CELL gen)
 }
 
 /* collect gen and all younger generations */
-void garbage_collection(CELL gen)
+void garbage_collection(CELL gen, bool code_gc)
 {
 	s64 start = current_millis();
 	CELL scan;
@@ -603,12 +548,13 @@ void garbage_collection(CELL gen)
 
 void primitive_gc(void)
 {
+	bool code_gc = unbox_boolean();
 	CELL gen = to_fixnum(dpop());
-	if(gen <= NURSERY)
+	if(gen <= NURSERY || code_gc)
 		gen = NURSERY;
 	else if(gen >= TENURED)
 		gen = TENURED;
-	garbage_collection(gen);
+	garbage_collection(gen,code_gc);
 }
 
 /* WARNING: only call this from a context where all local variables
@@ -626,7 +572,7 @@ void maybe_gc(CELL size)
 			gen++;
 		}
 
-		garbage_collection(gen);
+		garbage_collection(gen,false);
 	}
 }
 

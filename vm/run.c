@@ -191,6 +191,61 @@ void primitive_millis(void)
 	dpush(tag_bignum(s48_long_long_to_bignum(current_millis())));
 }
 
+void primitive_type(void)
+{
+	drepl(tag_fixnum(type_of(dpeek())));
+}
+
+void primitive_tag(void)
+{
+	drepl(tag_fixnum(TAG(dpeek())));
+}
+
+void primitive_slot(void)
+{
+	F_FIXNUM slot = untag_fixnum_fast(dpop());
+	CELL obj = UNTAG(dpop());
+	dpush(get(SLOT(obj,slot)));
+}
+
+void primitive_set_slot(void)
+{
+	F_FIXNUM slot = untag_fixnum_fast(dpop());
+	CELL obj = UNTAG(dpop());
+	CELL value = dpop();
+	put(SLOT(obj,slot),value);
+	write_barrier(obj);
+}
+
+void primitive_integer_slot(void)
+{
+	F_FIXNUM slot = untag_fixnum_fast(dpop());
+	CELL obj = UNTAG(dpop());
+	dpush(tag_cell(get(SLOT(obj,slot))));
+}
+
+void primitive_set_integer_slot(void)
+{
+	F_FIXNUM slot = untag_fixnum_fast(dpop());
+	CELL obj = UNTAG(dpop());
+	F_FIXNUM value = to_cell(dpop());
+	put(SLOT(obj,slot),value);
+}
+
+CELL clone(CELL obj)
+{
+	CELL size = object_size(obj);
+	CELL tag = TAG(obj);
+	void *new_obj = allot(size);
+	return RETAG(memcpy(new_obj,(void*)UNTAG(obj),size),tag);
+}
+
+void primitive_clone(void)
+{
+	maybe_gc(0);
+	drepl(clone(dpeek()));
+}
+
 void fatal_error(char* msg, CELL tagged)
 {
 	fprintf(stderr,"Fatal error: %s %lx\n",msg,tagged);

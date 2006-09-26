@@ -1,32 +1,5 @@
 #include "factor.h"
 
-void init_compiler(CELL size)
-{
-	new_heap(&compiling,size);
-}
-
-INLINE void iterate_code_heap_step(F_COMPILED *compiled, CODE_HEAP_ITERATOR iter)
-{
-	CELL code_start = (CELL)(compiled + 1);
-	CELL reloc_start = code_start + compiled->code_length;
-	CELL literal_start = reloc_start + compiled->reloc_length;
-	CELL words_start = literal_start + compiled->literal_length;
-
-	iter(compiled,code_start,reloc_start,literal_start,words_start);
-}
-
-void iterate_code_heap(CODE_HEAP_ITERATOR iter)
-{
-	F_BLOCK *scan = (F_BLOCK *)compiling.base;
-
-	while(scan)
-	{
-		if(scan->status != B_FREE)
-			iterate_code_heap_step((F_COMPILED *)(scan + 1),iter);
-		scan = next_block(&compiling,scan);
-	}
-}
-
 void undefined_symbol(void)
 {
 	general_error(ERROR_UNDEFINED_SYMBOL,F,F,true);
@@ -139,7 +112,7 @@ void apply_relocation(F_REL *rel,
 }
 
 void relocate_code_block(F_COMPILED *relocating, CELL code_start,
-	CELL reloc_start, CELL literal_start, CELL words_start)
+	CELL reloc_start, CELL literal_start, CELL words_start, CELL words_end)
 {
 	F_REL *rel = (F_REL *)reloc_start;
 	F_REL *rel_end = (F_REL *)literal_start;
@@ -150,10 +123,8 @@ void relocate_code_block(F_COMPILED *relocating, CELL code_start,
 }
 
 void finalize_code_block(F_COMPILED *relocating, CELL code_start,
-	CELL reloc_start, CELL literal_start, CELL words_start)
+	CELL reloc_start, CELL literal_start, CELL words_start, CELL words_end)
 {
-	CELL words_end = words_start + relocating->words_length;
-
 	CELL scan;
 
 	for(scan = words_start; scan < words_end; scan += CELLS)
@@ -162,32 +133,9 @@ void finalize_code_block(F_COMPILED *relocating, CELL code_start,
 	relocating->finalized = true;
 
 	relocate_code_block(relocating,code_start,reloc_start,
-		literal_start,words_start);
+		literal_start,words_start,words_end);
 
 	flush_icache(code_start,reloc_start - code_start);
-}
-
-void collect_literals_step(F_COMPILED *relocating, CELL code_start,
-	CELL reloc_start, CELL literal_start, CELL words_start)
-{
-	CELL scan;
-
-	CELL literal_end = literal_start + relocating->literal_length;
-	CELL words_end = words_start + relocating->words_length;
-
-	for(scan = literal_start; scan < literal_end; scan += CELLS)
-		copy_handle((CELL*)scan);
-
-	for(scan = words_start; scan < words_end; scan += CELLS)
-	{
-		if(!relocating->finalized)
-			copy_handle((CELL*)scan);
-	}
-}
-
-void collect_literals(void)
-{
-	iterate_code_heap(collect_literals_step);
 }
 
 void deposit_integers(CELL here, F_VECTOR *vector, CELL format)
@@ -291,12 +239,6 @@ void primitive_finalize_compile(void)
 	{
 		F_ARRAY *pair = untag_array(get(AREF(array,i)));
 		CELL xt = to_cell(get(AREF(pair,1)));
-		iterate_code_heap_step((F_COMPILED*)xt - 1,finalize_code_block);
+		iterate_code_heap_step(xt_to_compiled(xt),finalize_code_block);
 	}
-}
-
-void primitive_code_room(void)
-{
-	box_unsigned_cell(heap_free_space(&compiling));
-	box_unsigned_cell(compiling.limit - compiling.base);
 }

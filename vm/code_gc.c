@@ -1,5 +1,8 @@
 #include "factor.h"
 
+/* This malloc-style heap code is reasonably generic. Maybe in the future, it
+will be used for the data heap too, if we ever get incremental
+mark/sweep/compact GC. */
 void new_heap(HEAP *heap, CELL size)
 {
 	heap->base = (CELL)(alloc_bounded_block(size)->start);
@@ -7,6 +10,11 @@ void new_heap(HEAP *heap, CELL size)
 		fatal_error("Cannot allocate code heap",size);
 	heap->limit = heap->base + size;
 	heap->free_list = NULL;
+}
+
+void init_code_heap(CELL size)
+{
+	new_heap(&compiling,size);
 }
 
 INLINE void update_free_list(HEAP *heap, F_BLOCK *prev, F_BLOCK *next_free)
@@ -155,4 +163,72 @@ CELL heap_size(HEAP *heap)
 	while(next_block(heap,scan))
 		scan = next_block(heap,scan);
 	return (CELL)scan - (CELL)start;
+}
+
+void iterate_code_heap(CODE_HEAP_ITERATOR iter)
+{
+	F_BLOCK *scan = (F_BLOCK *)compiling.base;
+
+	while(scan)
+	{
+		if(scan->status != B_FREE)
+			iterate_code_heap_step((F_COMPILED *)(scan + 1),iter);
+		scan = next_block(&compiling,scan);
+	}
+}
+
+void collect_literals_step(F_COMPILED *relocating, CELL code_start,
+	CELL reloc_start, CELL literal_start, CELL words_start, CELL words_end)
+{
+	CELL scan;
+
+	CELL literal_end = literal_start + relocating->literal_length;
+
+	for(scan = literal_start; scan < literal_end; scan += CELLS)
+		copy_handle((CELL*)scan);
+
+	if(!relocating->finalized)
+	{
+		for(scan = words_start; scan < words_end; scan += CELLS)
+			copy_handle((CELL*)scan);
+	}
+}
+
+void collect_literals(void)
+{
+	iterate_code_heap(collect_literals_step);
+}
+
+void mark_sweep_step(F_COMPILED *compiled, CELL code_start,
+	CELL reloc_start, CELL literal_start, CELL words_start, CELL words_end)
+{
+	CELL scan;
+
+	if(compiled->finalized)
+	{
+		for(scan = words_start; scan < words_end; scan += CELLS)
+			mark_and_sweep(get(scan));
+	}
+}
+
+void mark_and_sweep(CELL xt)
+{
+	F_BLOCK *block = xt_to_block(xt);
+
+	if(block->status == B_MARKED)
+		return;
+	else if(block->status == B_FREE)
+		critical_error("Marking a free block",(CELL)block);
+
+	block->status = B_MARKED;
+
+	F_COMPILED *compiled = xt_to_compiled(xt);
+	iterate_code_heap_step(compiled,collect_literals_step);
+	iterate_code_heap_step(compiled,mark_sweep_step);
+}
+
+void primitive_code_room(void)
+{
+	box_unsigned_cell(heap_free_space(&compiling));
+	box_unsigned_cell(compiling.limit - compiling.base);
 }

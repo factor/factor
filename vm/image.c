@@ -116,7 +116,7 @@ void primitive_save_image(void)
 {
 	F_STRING* filename;
 	/* do a full GC to push everything into tenured space */
-	garbage_collection(TENURED);
+	garbage_collection(TENURED,false);
 	filename = untag_string(dpop());
 	save_image(to_char_string(filename,true));
 }
@@ -173,12 +173,11 @@ void relocate_data()
 }
 
 void fixup_code_block(F_COMPILED *relocating, CELL code_start,
-	CELL reloc_start, CELL literal_start, CELL words_start)
+	CELL reloc_start, CELL literal_start, CELL words_start, CELL words_end)
 {
 	/* relocate literal table data */
 	CELL scan;
 	CELL literal_end = literal_start + relocating->literal_length;
-	CELL words_end = words_start + relocating->words_length;
 
 	for(scan = literal_start; scan < literal_end; scan += CELLS)
 		data_fixup((CELL*)scan);
@@ -192,7 +191,7 @@ void fixup_code_block(F_COMPILED *relocating, CELL code_start,
 	}
 
 	relocate_code_block(relocating,code_start,reloc_start,
-		literal_start,words_start);
+		literal_start,words_start,words_end);
 }
 
 void relocate_code()

@@ -5,8 +5,8 @@ void init_factor(const char* image,
 	CELL gen_count, CELL young_size, CELL aging_size, CELL code_size)
 {
 	init_ffi();
-	init_arena(gen_count,young_size,aging_size);
-	init_compiler(code_size);
+	init_data_heap(gen_count,young_size,aging_size);
+	init_code_heap(code_size);
 	init_stacks(ds_size,rs_size,cs_size);
 	/* callframe must be valid in case load_image() does GC */
 	callframe = F;

@@ -3,7 +3,6 @@
 - signal 4 on datastack underflow on mac intel??
 - test alien-indirect
 - code GC:
-  - discard the free block at the end of the code heap on save
   - minor GC takes too long now, card mark
 
 + ui:

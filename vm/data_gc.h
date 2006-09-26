@@ -12,91 +12,12 @@ size must be a multiple of the page size */
 BOUNDED_BLOCK *alloc_bounded_block(CELL size);
 void dealloc_bounded_block(BOUNDED_BLOCK *block);
 
-/* macros for reading/writing memory, useful when working around
-C's type system */
-INLINE CELL get(CELL where)
-{
-	return *((CELL*)where);
-}
-
-INLINE void put(CELL where, CELL what)
-{
-	*((CELL*)where) = what;
-}
-
-INLINE u16 cget(CELL where)
-{
-	return *((u16*)where);
-}
-
-INLINE void cput(CELL where, u16 what)
-{
-	*((u16*)where) = what;
-}
-
-INLINE CELL align8(CELL a)
-{
-	return (a + 7) & ~7;
-}
-
-/* Canonical T object. It's just a word */
-CELL T;
-
-#define SLOT(obj,slot) ((obj) + (slot) * CELLS)
-
-INLINE CELL tag_header(CELL cell)
-{
-	return RETAG(cell << TAG_BITS,OBJECT_TYPE);
-}
-
-INLINE CELL untag_header(CELL cell)
-{
-	/* if((cell & TAG_MASK) != OBJECT_TYPE)
-		critical_error("Corrupt object header",cell); */
-
-	return cell >> TAG_BITS;
-}
-
-INLINE CELL tag_object(void* cell)
-{
-	return RETAG(cell,OBJECT_TYPE);
-}
-
-INLINE CELL object_type(CELL tagged)
-{
-	return untag_header(get(UNTAG(tagged)));
-}
-
-INLINE CELL type_of(CELL tagged)
-{
-	if(tagged == F)
-		return F_TYPE;
-	else if(TAG(tagged) == FIXNUM_TYPE)
-		return FIXNUM_TYPE;
-	else
-		return object_type(tagged);
-}
-
-INLINE void type_check(CELL type, CELL tagged)
-{
-	if(type_of(tagged) != type)
-		type_error(type,tagged);
-}
-
 CELL untagged_object_size(CELL pointer);
 CELL unaligned_object_size(CELL pointer);
 CELL object_size(CELL pointer);
 CELL binary_payload_start(CELL pointer);
 void primitive_data_room(void);
-void primitive_type(void);
-void primitive_tag(void);
-void primitive_slot(void);
-void primitive_set_slot(void);
-void primitive_integer_slot(void);
-void primitive_set_integer_slot(void);
 void primitive_size(void);
-CELL clone(CELL obj);
-void primitive_clone(void);
 void primitive_begin_scan(void);
 void primitive_next_object(void);
 void primitive_end_scan(void);
@@ -211,7 +132,7 @@ INLINE bool in_zone(ZONE* z, CELL pointer)
 
 CELL init_zone(ZONE *z, CELL size, CELL base);
 
-void init_arena(CELL gen_count, CELL young_size, CELL aging_size);
+void init_data_heap(CELL gen_count, CELL young_size, CELL aging_size);
 
 /* statistics */
 s64 gc_time;
@@ -223,7 +144,7 @@ CELL collecting_gen;
 CELL collecting_gen_start;
 
 /* test if the pointer is in generation being collected, or a younger one.
-init_arena() arranges things so that the older generations are first,
+init_data_heap() arranges things so that the older generations are first,
 so we have to check that the pointer occurs after the beginning of
 the requested generation. */
 #define COLLECTING_GEN(ptr) (collecting_gen_start <= ptr)
@@ -287,7 +208,7 @@ INLINE void* allot_object(CELL type, CELL length)
 
 void update_cards_offset(void);
 CELL collect_next(CELL scan);
-void garbage_collection(CELL gen);
+void garbage_collection(CELL gen, bool code_gc);
 void primitive_gc(void);
 void maybe_gc(CELL size);
 DLLEXPORT void simple_gc(void);

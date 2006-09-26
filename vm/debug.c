@@ -223,12 +223,6 @@ void factorbug(void)
 		}
 		else if(strcmp(cmd,"g") == 0)
 			dump_generations();
-		else if(strcmp(cmd,"c") == 0)
-		{
-			CELL gen;
-			scanf("%lu",&gen);
-			garbage_collection(gen);
-		}
 		else if(strcmp(cmd,"card") == 0)
 		{
 			CELL addr;

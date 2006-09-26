@@ -33,6 +33,71 @@ CELL callframe_end;
 /* TAGGED user environment data; see getenv/setenv prims */
 DLLEXPORT CELL userenv[USER_ENV];
 
+/* macros for reading/writing memory, useful when working around
+C's type system */
+INLINE CELL get(CELL where)
+{
+	return *((CELL*)where);
+}
+
+INLINE void put(CELL where, CELL what)
+{
+	*((CELL*)where) = what;
+}
+
+INLINE u16 cget(CELL where)
+{
+	return *((u16*)where);
+}
+
+INLINE void cput(CELL where, u16 what)
+{
+	*((u16*)where) = what;
+}
+
+INLINE CELL align8(CELL a)
+{
+	return (a + 7) & ~7;
+}
+
+/* Canonical T object. It's just a word */
+CELL T;
+
+#define SLOT(obj,slot) ((obj) + (slot) * CELLS)
+
+INLINE CELL tag_header(CELL cell)
+{
+	return RETAG(cell << TAG_BITS,OBJECT_TYPE);
+}
+
+INLINE CELL untag_header(CELL cell)
+{
+	/* if((cell & TAG_MASK) != OBJECT_TYPE)
+		critical_error("Corrupt object header",cell); */
+
+	return cell >> TAG_BITS;
+}
+
+INLINE CELL tag_object(void* cell)
+{
+	return RETAG(cell,OBJECT_TYPE);
+}
+
+INLINE CELL object_type(CELL tagged)
+{
+	return untag_header(get(UNTAG(tagged)));
+}
+
+INLINE CELL type_of(CELL tagged)
+{
+	if(tagged == F)
+		return F_TYPE;
+	else if(TAG(tagged) == FIXNUM_TYPE)
+		return FIXNUM_TYPE;
+	else
+		return object_type(tagged);
+}
+
 void call(CELL quot);
 
 void handle_error();
@@ -53,6 +118,14 @@ void primitive_exit(void);
 void primitive_os_env(void);
 void primitive_eq(void);
 void primitive_millis(void);
+void primitive_type(void);
+void primitive_tag(void);
+void primitive_slot(void);
+void primitive_set_slot(void);
+void primitive_integer_slot(void);
+void primitive_set_integer_slot(void);
+CELL clone(CELL obj);
+void primitive_clone(void);
 
 /* Runtime errors */
 typedef enum
@@ -97,3 +170,9 @@ void signal_error(int signal);
 void type_error(CELL type, CELL tagged);
 void primitive_throw(void);
 void primitive_die(void);
+
+INLINE void type_check(CELL type, CELL tagged)
+{
+	if(type_of(tagged) != type)
+		type_error(type,tagged);
+}

@@ -235,7 +235,7 @@ t over set-effect-terminated?
 \ setenv { object fixnum } { } <effect> "infer-effect" set-word-prop
 \ stat { string } { object } <effect> "infer-effect" set-word-prop
 \ (directory) { string } { array } <effect> "infer-effect" set-word-prop
-\ gc { integer } { } <effect> "infer-effect" set-word-prop
+\ gc { integer object } { } <effect> "infer-effect" set-word-prop
 \ gc-time { } { integer } <effect> "infer-effect" set-word-prop
 \ save-image { string } { } <effect> "infer-effect" set-word-prop
 \ exit { integer } { } <effect> "infer-effect" set-word-prop

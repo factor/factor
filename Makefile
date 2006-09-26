@@ -32,11 +32,11 @@ OBJS = $(PLAF_OBJS) \
 	vm/debug.o \
 	vm/factor.o \
 	vm/ffi_test.o \
-	vm/heap.o \
 	vm/image.o \
 	vm/io.o \
 	vm/math.o \
-	vm/memory.o \
+	vm/data_gc.o \
+	vm/code_gc.o \
 	vm/primitives.o \
 	vm/run.o \
 	vm/stack.o \
