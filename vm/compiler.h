@@ -58,8 +58,6 @@ typedef struct {
 
 void relocate_code_block(F_COMPILED *relocating, CELL code_start,
 	CELL reloc_start, CELL literal_start, CELL words_start);
-void finalize_code_block(F_COMPILED *relocating, CELL code_start,
-	CELL reloc_start, CELL literal_start, CELL words_start);
 void collect_literals(void);
 void init_compiler(CELL size);
 void primitive_add_compiled_block(void);

@@ -5,6 +5,16 @@ void init_compiler(CELL size)
 	new_heap(&compiling,size);
 }
 
+INLINE void iterate_code_heap_step(F_COMPILED *compiled, CODE_HEAP_ITERATOR iter)
+{
+	CELL code_start = (CELL)(compiled + 1);
+	CELL reloc_start = code_start + compiled->code_length;
+	CELL literal_start = reloc_start + compiled->reloc_length;
+	CELL words_start = literal_start + compiled->literal_length;
+
+	iter(compiled,code_start,reloc_start,literal_start,words_start);
+}
+
 void iterate_code_heap(CODE_HEAP_ITERATOR iter)
 {
 	F_BLOCK *scan = (F_BLOCK *)compiling.base;
@@ -12,19 +22,7 @@ void iterate_code_heap(CODE_HEAP_ITERATOR iter)
 	while(scan)
 	{
 		if(scan->status != B_FREE)
-		{
-			F_COMPILED *compiled = (F_COMPILED *)(scan + 1);
-
-			CELL code_start = (CELL)(compiled + 1);
-			CELL reloc_start = code_start + compiled->code_length;
-			CELL literal_start = reloc_start + compiled->reloc_length;
-			CELL words_start = literal_start + compiled->literal_length;
-
-			iter(compiled,
-				code_start,reloc_start,
-				literal_start,words_start);
-		}
-
+			iterate_code_heap_step((F_COMPILED *)(scan + 1),iter);
 		scan = next_block(&compiling,scan);
 	}
 }
@@ -156,18 +154,17 @@ void finalize_code_block(F_COMPILED *relocating, CELL code_start,
 {
 	CELL words_end = words_start + relocating->words_length;
 
-	if(!relocating->finalized)
-	{
-		CELL scan;
+	CELL scan;
 
-		for(scan = words_start; scan < words_end; scan += CELLS)
-			put(scan,untag_word(get(scan))->xt);
+	for(scan = words_start; scan < words_end; scan += CELLS)
+		put(scan,untag_word(get(scan))->xt);
 
-		relocating->finalized = true;
+	relocating->finalized = true;
 
-		relocate_code_block(relocating,code_start,reloc_start,
-			literal_start,words_start);
-	}
+	relocate_code_block(relocating,code_start,reloc_start,
+		literal_start,words_start);
+
+	flush_icache(code_start,reloc_start - code_start);
 }
 
 void collect_literals_step(F_COMPILED *relocating, CELL code_start,
@@ -278,6 +275,8 @@ void primitive_add_compiled_block(void)
 void primitive_finalize_compile(void)
 {
 	F_ARRAY *array = untag_array(dpop());
+
+	/* set word XT's */
 	CELL count = untag_fixnum_fast(array->capacity);
 	CELL i;
 	for(i = 0; i < count; i++)
@@ -287,8 +286,13 @@ void primitive_finalize_compile(void)
 		word->xt = to_cell(get(AREF(pair,1)));
 	}
 
-	iterate_code_heap(finalize_code_block);
-	flush_icache(compiling.base,compiling.limit - compiling.base);
+	/* perform relocation */
+	for(i = 0; i < count; i++)
+	{
+		F_ARRAY *pair = untag_array(get(AREF(array,i)));
+		CELL xt = to_cell(get(AREF(pair,1)));
+		iterate_code_heap_step((F_COMPILED*)xt - 1,finalize_code_block);
+	}
 }
 
 void primitive_code_room(void)
