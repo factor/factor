@@ -50,7 +50,7 @@ M: symbol definer drop \ SYMBOL: ;
     [ nip remove-word-prop ] if ;
 
 GENERIC: word-xt ( word -- xt )
-M: word word-xt 7 integer-slot ;
+M: word word-xt 8 integer-slot ;
 
 SYMBOL: vocabularies
 
