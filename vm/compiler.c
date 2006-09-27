@@ -232,6 +232,7 @@ void primitive_finalize_compile(void)
 		F_ARRAY *pair = untag_array(get(AREF(array,i)));
 		F_WORD *word = untag_word(get(AREF(pair,0)));
 		word->xt = to_cell(get(AREF(pair,1)));
+		word->compiledp = T;
 	}
 
 	/* perform relocation */

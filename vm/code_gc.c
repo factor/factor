@@ -67,6 +67,8 @@ CELL heap_allot(HEAP *heap, CELL size)
 	F_BLOCK *prev = NULL;
 	F_BLOCK *scan = heap->free_list;
 
+	size = align8(size);
+
 	while(scan)
 	{
 		CELL this_size = scan->size - sizeof(F_BLOCK);
@@ -209,20 +211,20 @@ void mark_sweep_step(F_COMPILED *compiled, CELL code_start,
 	if(compiled->finalized)
 	{
 		for(scan = words_start; scan < words_end; scan += CELLS)
-			mark_and_sweep(get(scan));
+			recursive_mark(get(scan));
 	}
 }
 
-void mark_and_sweep(CELL xt)
+void recursive_mark(CELL xt)
 {
 	F_BLOCK *block = xt_to_block(xt);
 
 	if(block->status == B_MARKED)
 		return;
-	else if(block->status == B_FREE)
-		critical_error("Marking a free block",(CELL)block);
-
-	block->status = B_MARKED;
+	else if(block->status == B_ALLOCATED)
+		block->status = B_MARKED;
+	else
+		critical_error("Marking the wrong block",(CELL)block);
 
 	F_COMPILED *compiled = xt_to_compiled(xt);
 	iterate_code_heap_step(compiled,collect_literals_step);

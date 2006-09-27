@@ -79,31 +79,6 @@ void primitive_size(void)
 	drepl(tag_fixnum(object_size(dpeek())));
 }
 
-/* The number of cells from the start of the object which should be scanned by
-the GC. Some types have a binary payload at the end (string, word, DLL) which
-we ignore. */
-CELL binary_payload_start(CELL pointer)
-{
-	switch(untag_header(get(pointer)))
-	{
-	/* these objects do not refer to other objects at all */
-	case STRING_TYPE:
-	case FLOAT_TYPE:
-	case BYTE_ARRAY_TYPE:
-	case BIGNUM_TYPE:
-		return 0;
-	/* these objects have some binary data at the end */
-	case WORD_TYPE:
-		return sizeof(F_WORD) - CELLS;
-	case ALIEN_TYPE:
-	case DLL_TYPE:
-		return CELLS * 2;
-	/* everything else consists entirely of pointers */
-	default:
-		return unaligned_object_size(pointer);
-	}
-}
-
 void primitive_data_room(void)
 {
 	F_ARRAY *a = array(ARRAY_TYPE,gen_count,F);
@@ -417,8 +392,37 @@ CELL copy_object(CELL pointer)
 		return RETAG(copy_object_impl(pointer),tag);
 }
 
-INLINE void collect_object(CELL scan)
+/* The number of cells from the start of the object which should be scanned by
+the GC. Some types have a binary payload at the end (string, word, DLL) which
+we ignore. */
+CELL binary_payload_start(CELL pointer)
 {
+	switch(untag_header(get(pointer)))
+	{
+	/* these objects do not refer to other objects at all */
+	case STRING_TYPE:
+	case FLOAT_TYPE:
+	case BYTE_ARRAY_TYPE:
+	case BIGNUM_TYPE:
+		return 0;
+	/* these objects have some binary data at the end */
+	case WORD_TYPE:
+		return sizeof(F_WORD) - CELLS;
+	case ALIEN_TYPE:
+	case DLL_TYPE:
+		return CELLS * 2;
+	/* everything else consists entirely of pointers */
+	default:
+		return unaligned_object_size(pointer);
+	}
+}
+
+/* Every object has a regular representation in the runtime, which makes GC
+much simpler. Every slot of the object until binary_payload_start is a pointer
+to some other object. */
+INLINE void collect_object(CELL start)
+{
+	CELL scan = start;
 	CELL payload_start = binary_payload_start(scan);
 	CELL end = scan + payload_start;
 
@@ -428,6 +432,16 @@ INLINE void collect_object(CELL scan)
 	{
 		copy_handle((CELL*)scan);
 		scan += CELLS;
+	}
+
+	/* It is odd to put this hook here, but this is the only special case
+	made for any type of object by the GC. If code GC is being performed,
+	compiled code blocks referenced by this word must be marked. */
+	if(collecting_code && object_type(start) == WORD_TYPE)
+	{
+		F_WORD *word = (F_WORD *)start;
+		if(word->compiledp != F)
+			recursive_mark(word->xt);
 	}
 }
 
@@ -487,6 +501,7 @@ void end_gc()
 		fprintf(stderr,"*** %s GC (%ld minor, %ld cards)\n",
 			collecting_code ? "Code and data" : "Data",
 			minor_collections,cards_scanned);
+		fflush(stderr);
 		minor_collections = 0;
 		cards_scanned = 0;
 	}

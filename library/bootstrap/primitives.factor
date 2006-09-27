@@ -99,7 +99,6 @@ call
     { "float>=" "math-internals"            }
     { "(word)" "kernel-internals"           }
     { "update-xt" "words"                   }
-    { "compiled?" "words"                   }
     { "drop" "kernel"                       }
     { "2drop" "kernel"                      }
     { "3drop" "kernel"                      }
@@ -283,6 +282,12 @@ num-types f <array> builtins set
         object
         { "word-props" "words" }
         { "set-word-props" "words" }
+    }
+    {
+        7
+        object
+        { "compiled?" "words" }
+        f
     }
 } define-builtin
 

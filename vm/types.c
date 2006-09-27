@@ -417,11 +417,9 @@ void primitive_hashtable(void)
 	dpush(tag_object(hash));
 }
 
-/* When a word is executed we jump to the value of the xt field. However this
-   value is an unportable function pointer, so in the image we store a primitive
-   number that indexes a list of xts. */
 void update_xt(F_WORD* word)
 {
+	word->compiledp = F;
 	word->xt = primitive_to_xt(to_fixnum(word->primitive));
 }
 
@@ -442,6 +440,7 @@ void primitive_word(void)
 	word->primitive = tag_fixnum(0);
 	word->def = F;
 	word->props = F;
+	word->compiledp = F;
 	word->xt = (CELL)undefined;
 	dpush(tag_word(word));
 }
@@ -451,23 +450,11 @@ void primitive_update_xt(void)
 	update_xt(untag_word(dpop()));
 }
 
-void primitive_word_compiledp(void)
-{
-	F_WORD* word = untag_word(dpop());
-	if(to_fixnum(word->primitive) != 1)
-		box_boolean(false);
-	else
-		box_boolean(word->xt != (CELL)docol);
-}
-
 void fixup_word(F_WORD* word)
 {
 	/* If this is a compiled word, relocate the code pointer. Otherwise,
 	reset it based on the primitive number of the word. */
-	if(code_relocation_base != 0
-		&& word->xt >= code_relocation_base
-		&& word->xt < code_relocation_base
-		- compiling.base + compiling.limit)
+	if(word->compiledp != F)
 		code_fixup(&word->xt);
 	else
 		update_xt(word);

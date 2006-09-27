@@ -11,10 +11,6 @@
   - files can be reloaded and edited
   - modules can be (re)loaded
   - keyboard navigation
-- editor:
-  - more efficient multi-line inserts
-  - write "foo| " and put caret at | then select word element: selects
-    space
 - ui browser: show currently selected vocab & words
   - keyboard-navigatable list gadget of some kind
 - tuple= in dataflow view
@@ -22,7 +18,6 @@
 - ui quick start doc
 - auto-update browser and help when sources reload
 - how do we refer to command shortcuts in the docs?
-- reliably clonable gadgets
 - figure out if we need both set-model and set-model*
 - if i do 10000 [ . ] each and then clear, the listener window is slow
 - full-height nodes should really be full height
@@ -38,11 +33,11 @@
   - editor should support stream output protocol
   - double/triple click
   - autoscroll
-  - undo and redo
   - transpose char/word/line
-  - page up/down
-  - search and replace
   - drag scroll
+  - more efficient multi-line inserts
+  - write "foo| " and put caret at | then select word element: selects
+    space
 - slider needs to be modelized
 - fonts/ should go inside the .app -- we need multi-tier resource-path
 - should be possible to drop an image file on the .app to run it
@@ -50,7 +45,6 @@
 - own-selection violates ICCCM
 - cocoa: windows are not updated while resizing
 - grid slows down with 2000 lines
-- ui uses too much cpu time idling
 - see if its possible to only repaint dirty regions
 - x11 title bars are funny
 - rollover is not updated on window focus changes
@@ -102,6 +96,7 @@
 
 + misc:
 
+- symbol redef is an xref false positive
 - signal 4 on datastack underflow on mac intel??
 - fix alien-callback/SEH bug on win32
 - minor GC takes too long now, we should card mark code heap

@@ -172,6 +172,7 @@ M: f '
         dup word-primitive ' ,
         dup word-def ' ,
         dup word-props ' ,
+        f ' ,
         0 ,
     ] { } make
     word-tag word-tag [ emit-seq ] emit-object

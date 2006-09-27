@@ -68,7 +68,6 @@ void* primitives[] = {
 	primitive_float_greatereq,
 	primitive_word,
 	primitive_update_xt,
-	primitive_word_compiledp,
 	primitive_drop,
 	primitive_2drop,
 	primitive_3drop,

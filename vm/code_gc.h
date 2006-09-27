@@ -74,6 +74,6 @@ INLINE F_COMPILED *xt_to_compiled(CELL xt)
 void init_code_heap(CELL size);
 void iterate_code_heap(CODE_HEAP_ITERATOR iter);
 void collect_literals(void);
-void mark_and_sweep(CELL xt);
+void recursive_mark(CELL xt);
 void primitive_code_room(void);
 void primitive_code_gc(void);
