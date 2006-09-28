@@ -165,7 +165,7 @@ void factorbug(void)
 	fprintf(stderr,"g                -- dump generations\n");
 	fprintf(stderr,"card <addr>      -- print card containing address\n");
 	fprintf(stderr,"addr <card>      -- print address containing card\n");
-	fprintf(stderr,"c <gen>          -- force garbage collection\n");
+	fprintf(stderr,"code             -- code heap dump\n");
 	
 	for(;;)
 	{
@@ -243,6 +243,8 @@ void factorbug(void)
 			exit(1);
 		else if(strcmp(cmd,"im") == 0)
 			save_image("fep.image");
+		else if(strcmp(cmd,"code") == 0)
+			dump_heap(&compiling);
 		else
 			fprintf(stderr,"unknown command\n");
 	}

@@ -77,3 +77,4 @@ void collect_literals(void);
 void recursive_mark(CELL xt);
 void primitive_code_room(void);
 void primitive_code_gc(void);
+void dump_heap(HEAP *heap);

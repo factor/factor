@@ -126,7 +126,7 @@ void free_unmarked(HEAP *heap)
 		if(scan->status == B_ALLOCATED)
 		{
 			/* merge blocks? */
-			if(next_block(heap,prev) == scan)
+			if(prev && next_block(heap,prev) == scan)
 				prev->size += scan->size;
 			else
 			{
@@ -240,4 +240,33 @@ void primitive_code_room(void)
 void primitive_code_gc(void)
 {
 	garbage_collection(TENURED,true);
+}
+
+void dump_heap(HEAP *heap)
+{
+	F_BLOCK *scan = (F_BLOCK *)heap->base;
+
+	while(scan)
+	{
+		char *status;
+		switch(scan->status)
+		{
+		case B_FREE:
+			status = "free";
+			break;
+		case B_ALLOCATED:
+			status = "allocated";
+			break;
+		case B_MARKED:
+			status = "marked";
+			break;
+		default:
+			status = "invalid";
+			break;
+		}
+
+		fprintf(stderr,"%lx %s\n",(CELL)scan,status);
+
+		scan = next_block(heap,scan);
+	}
 }
