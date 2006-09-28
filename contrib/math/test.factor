@@ -47,15 +47,15 @@ USING: kernel math test sequences math-contrib ;
 [ 1 ] [ 2 0 nCk ] unit-test
 [ 1 ] [ 2 0 nPk ] unit-test
 [ t ] [ -9000000000000000000000000000000000000000000 gamma 1/0. = ] unit-test
-[ t ] [ -1.5 gamma 2.36327 almost= ] unit-test
+[ t ] [ -1.5 gamma 2.363271801207344 almost= ] unit-test
 [ t ] [ -1 gamma 1/0. = ] unit-test
-[ t ] [ -0.5 gamma -3.5449 almost= ] unit-test
+[ t ] [ -0.5 gamma -3.544907701811 almost= ] unit-test
 [ t ] [ 0 gamma 1/0. = ] unit-test
 [ t ] [ .5 gamma 1.7724538 almost= ] unit-test
 [ t ] [ 1 gamma 1 almost= ] unit-test
 [ t ] [ 2 gamma 1 almost= ] unit-test
 [ t ] [ 3 gamma 2 almost= ] unit-test
-[ t ] [ 11 gamma 3628800 almost= ] unit-test
+[ t ] [ 11 gamma 3628800.000015679 almost= ] unit-test
 [ t ] [ 90000000000000000000000000000000000000000000 gamma 1/0. = ] unit-test
 ! some fun identities
 [ t ] [ 2/3 gamma 2 pi * 3 sqrt 1/3 gamma * / almost= ] unit-test
@@ -71,7 +71,7 @@ USING: kernel math test sequences math-contrib ;
 [ t ] [ 1 gammaln 0 almost= ] unit-test
 [ t ] [ 2 gammaln 0 almost= ] unit-test
 [ t ] [ 3 gammaln 0.693147180 almost= ] unit-test
-[ t ] [ 11 gammaln 15.1044 almost= ] unit-test
+[ t ] [ 11 gammaln 15.1044125 almost= ] unit-test
 [ t ] [ 9000000000000000000000000000000000000000000 gammaln 8.811521863477754e+44 almost= ] unit-test
 
 [ 1 ] [ qi norm ] unit-test

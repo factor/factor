@@ -64,7 +64,7 @@ USING: errors kernel sequences math sequences-internals namespaces arrays ;
     #! find the absolute values of the min and max of a seq in one pass
     minmax 2dup [ abs ] 2apply > [ swap ] when ;
 
-SYMBOL: almost=-precision .0001 almost=-precision set-global
+SYMBOL: almost=-precision .000001 almost=-precision set-global
 : almost= ( a b -- bool )
     - abs almost=-precision get < ;
 
