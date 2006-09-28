@@ -73,6 +73,9 @@ CELL heap_allot(HEAP *heap, CELL size)
 	{
 		CELL this_size = scan->size - sizeof(F_BLOCK);
 
+		if(scan->status != B_FREE)
+			critical_error("Invalid block in free list",(CELL)scan);
+
 		if(this_size < size)
 		{
 			prev = scan;
@@ -109,13 +112,11 @@ CELL heap_allot(HEAP *heap, CELL size)
 		return (CELL)(scan + 1);
 	}
 
-	if(heap->base == 0)
-		critical_error("Code heap is full",size);
-
 	return 0; /* can't happen */
 }
 
-/* free blocks which are allocated and not marked */
+/* After code GC, all referenced code blocks have status set to B_MARKED, so any
+which are allocated and not marked can be reclaimed. */
 void free_unmarked(HEAP *heap)
 {
 	F_BLOCK *prev = NULL;
@@ -123,26 +124,31 @@ void free_unmarked(HEAP *heap)
 
 	while(scan)
 	{
-		if(scan->status == B_ALLOCATED)
+		switch(scan->status)
 		{
-			/* merge blocks? */
-			if(prev && next_block(heap,prev) == scan)
+		case B_ALLOCATED:
+			if(prev && prev->status == B_FREE)
 				prev->size += scan->size;
 			else
 			{
 				scan->status = B_FREE;
-				update_free_list(heap,prev,scan);
 				prev = scan;
 			}
-		}
-		else if(scan->status == B_MARKED)
+			break;
+		case B_FREE:
+			if(prev && prev->status == B_FREE)
+				prev->size += scan->size;
+			break;
+		case B_MARKED:
 			scan->status = B_ALLOCATED;
+			prev = scan;
+			break;
+		}
 
 		scan = next_block(heap,scan);
 	}
 
-	if(prev)
-		prev->next_free = NULL;
+	build_free_list(heap,heap->limit - heap->base);
 }
 
 CELL heap_free_space(HEAP *heap)
