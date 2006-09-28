@@ -108,18 +108,5 @@ SYMBOL: step-size .01 step-size set  ! base on arguments
 : limit ( quot -- x )
     .1 step-size set [ call ] keep step-size [ 2 / ] change 0 -rot (limit) 2drop ;
 
-! take elements n at a time and apply the quotation, forming a new seq
-: group-map ( seq n quot -- seq )
-    >r group r> map ;
-
-: nths ( start n seq -- seq )
-    -rot pick length <frange-no-endpt> [ over nth ] map nip ;
-
-! take a set of every nth element and apply the quotation, forming a new seq
-! { 1 2 3 4 5 6 } 3 [ sum ] skip-map ->  { 1 4 } { 2 5 } { 3 6 } -> { 5 7 9 }
-! : skip-map ( seq n quot -- seq )
-    ! >r 
-
-: nth-rand ( seq -- elem )
-    [ length random-int ] keep nth ;
+: nth-rand ( seq -- elem ) [ length random-int ] keep nth ;
 

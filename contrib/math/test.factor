@@ -22,15 +22,17 @@ USING: kernel math test sequences math-contrib ;
 [ V{ 1 0 1 } V{ 0 0 0 } ] [ { 1 1 1 1 } { 1 1 } p/mod ] unit-test
 [ V{ 1 0 1 } V{ 0 0 0 } ] [ { 1 1 1 1 } { 1 1 0 0 0 0 0 0 } p/mod ] unit-test
 [ V{ 1 0 1 } V{ 0 0 0 } ] [ { 1 1 1 1 0 0 0 0 } { 1 1 0 0 } p/mod ] unit-test
-! [ { 5.0 } { 0.0 } ] [ { 10.0 } { 2.0 } p/mod ] unit-test
-! [ { 15/16 } { 0 } ] [ { 3/4 } { 4/5 } p/mod ] unit-test
+[ V{ 5.0 } V{ 0.0 } ] [ { 10.0 } { 2.0 } p/mod ] unit-test
+[ V{ 15/16 } V{ 0 } ] [ { 3/4 } { 4/5 } p/mod ] unit-test
 [ t ] [ { 0 1 } { 0 1 0 } p= ] unit-test
 [ f ] [ { 0 0 1 } { 0 1 0 } p= ] unit-test
 [ t ] [ { 1 1 1 } { 1 1 1 } p= ] unit-test
-[ V{ 0 0 } V{ 1 1 } ] [ { 1 1 1 1 } { 1 1 } pgcd ] unit-test
+[ { 0 0 } { 1 1 } ] [ { 1 1 1 1 } { 1 1 } pgcd ] unit-test
 
 [ t ] [ 10 3 nPk 10 factorial 7 factorial / = ] unit-test
 [ t ] [ 10 3 nCk 10 factorial 3 factorial 7 factorial * / = ] unit-test
+[ { 3 7 9 0 5 2 6 8 1 4 } ] [ { 3 8 5 0 9 4 6 1 7 2 } inverse-permutation ] unit-test
+[ { } ] [ { } inverse-permutation ] unit-test
 [ 1 ] [ 0 factorial ] unit-test
 [ 1 ] [ 1 factorial ] unit-test
 [ 2 ] [ 2 factorial ] unit-test

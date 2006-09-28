@@ -37,7 +37,7 @@ USING: kernel sequences errors namespaces math ;
 
 IN: math-contrib
 
-: gamma ( x -- gamma[x] )
+: gamma ( x -- y )
     #! gamma(x) = integral 0..inf [ t^(x-1) exp(-t) ] dt
     #! gamma(n+1) = n! for n > 0
     dup Z:(-inf,0]? [
