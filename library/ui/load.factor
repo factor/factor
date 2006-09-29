@@ -47,10 +47,12 @@ PROVIDE: library/ui {
     "tools/workspace.factor"
     "tools/operations.factor"
 } {
+    "test/gadgets.factor"
     "test/models.factor"
     "test/document.factor"
     "test/rectangles.factor"
     "test/fields.factor"
     "test/commands.factor"
     "test/panes.factor"
+    "test/editors.factor"
 } ;

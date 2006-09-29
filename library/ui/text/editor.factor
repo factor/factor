@@ -230,3 +230,10 @@ M: editor user-input*
 
 : set-editor-text ( str editor -- )
     control-model set-doc-text ;
+
+! Editors support the stream output protocol
+M: editor stream-write1 >r ch>string r> stream-write ;
+
+M: editor stream-write control-self user-input ;
+
+M: editor stream-close drop ;
