@@ -11,7 +11,6 @@
 - page scrolling should be timer-based too
 - x11: scroll up/down wiggles caret
 - slider needs to be modelized
-- mouse over for input w/ multiple lines looks stupid
 - more compact relocation info
 - hashed generic method dispatch
 
