@@ -89,13 +89,15 @@ C: thumb ( vector -- thumb )
     over screen>slider over slider-value - sgn
     swap slide-by-page ;
 
-elevator H{ { T{ button-down } [ elevator-click ] } }
-set-gestures
+elevator H{
+    { T{ button-down } [ [ elevator-click ] start-timer-gadget ] }
+    { T{ button-up } [ stop-timer-gadget ] }
+} set-gestures
 
 C: elevator ( vector -- elevator )
-    dup delegate>gadget
-    dup elevator-theme
-    [ set-gadget-orientation ] keep ;
+    <gadget> <timer-gadget> over set-gadget-delegate
+    [ set-gadget-orientation ] keep
+    dup elevator-theme ;
 
 : (layout-thumb) ( slider n -- n thumb )
     over gadget-orientation n*v swap slider-thumb ;

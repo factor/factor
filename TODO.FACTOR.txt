@@ -8,7 +8,6 @@
 - the editor should fill up the interior of the scroller completely
 - hide empty command groups in $commands
 - ui quick start doc
-- page scrolling should be timer-based too
 - x11: scroll up/down wiggles caret
 - slider needs to be modelized
 - more compact relocation info

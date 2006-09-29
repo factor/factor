@@ -97,7 +97,8 @@ M: gadget children-on nip gadget-children ;
     >r gadget-children r> each-with ; inline
 
 : set-gadget-delegate ( delegate gadget -- )
-    dup pick [ set-gadget-parent ] each-child-with set-delegate ;
+    over [ dup pick [ set-gadget-parent ] each-child-with ] when
+    set-delegate ;
 
 : with-gadget ( gadget quot -- )
     [ swap gadget set call ] with-scope ; inline
@@ -126,9 +127,10 @@ C: timer-gadget ( gadget -- gadget )
 M: timer-gadget tick nip timer-gadget-quot call ;
 
 : start-timer-gadget ( gadget quot -- )
+    2dup call
     over >r curry r>
     [ set-timer-gadget-quot ] keep
-    100 add-timer ;
+    100 add-timer ; inline
 
 : stop-timer-gadget ( gadget -- )
     dup remove-timer f swap set-timer-gadget-quot ;

@@ -63,7 +63,7 @@ TUPLE: repeat-button ;
 
 repeat-button H{
     { T{ button-down } [ [ button-clicked ] start-timer-gadget ] }
-    { T{ button-up } [ stop-timer-gadget ] }
+    { T{ button-up } [ dup stop-timer-gadget button-update ] }
 } set-gestures
 
 C: repeat-button ( gadget quot -- button )

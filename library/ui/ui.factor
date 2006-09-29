@@ -172,7 +172,7 @@ M: world-error error.
     "This world has been deactivated to prevent cascading errors." print
     delegate error. ;
 
-: draw-world? ( world -- )
+: draw-world? ( world -- ? )
     #! We don't draw deactivated worlds, or those with 0 size.
     #! On Windows, the latter case results in GL errors.
     dup world-active? swap rect-dim [ zero? not ] all? and ;
