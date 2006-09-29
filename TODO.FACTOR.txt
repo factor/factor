@@ -6,7 +6,6 @@
 [ 1 2 3 4 5 6 7 8 9 10 10 10 10 10 10 10 10 10 10 11 11 11 113 
 ]
 - prettier printing of hashtable literals, alists, cond, ...
-- the editor should fill up the interior of the scroller completely
 - ui quick start doc
 - x11: scroll up/down wiggles caret
 - slider needs to be modelized
@@ -15,6 +14,7 @@
 
 + ui:
 
+- [ ] write in the UI breaks stuff
 - some way of intercepting all gestures
 - pane output in UI should use less memory
 - variable width word wrap
@@ -64,6 +64,8 @@
 
 + module system:
 
+- reloading source files manually should update their mod time in the
+  module system
 - convention for main entry point of a module
 - convention for main help article of a module
 - track a list of assets loaded from each module's file

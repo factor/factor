@@ -52,7 +52,7 @@ C: scroller ( gadget -- scroller )
     r> set-slider ;
 
 : position-viewport ( scroller -- )
-    dup scroller-origin vneg
+    dup scroller-origin vneg viewport-gap v+
     swap scroller-viewport gadget-child
     set-rect-loc ;
 
@@ -62,7 +62,10 @@ C: scroller ( gadget -- scroller )
     position-viewport ;
 
 : (scroll>rect) ( rect scroller -- )
-    [ scroller-origin vneg offset-rect viewport-rect ] keep
+    [
+        scroller-origin vneg offset-rect
+        viewport-gap offset-rect
+    ] keep
     [
         scroller-viewport 2rect-extent
         >r >r v- { 0 0 } vmin r> r> v- { 0 0 } vmax v+
@@ -75,8 +78,7 @@ C: scroller ( gadget -- scroller )
         2drop
     ] if ;
 
-: scroll>bottom ( gadget -- )
-    t swap scroll>rect ;
+: scroll>bottom ( gadget -- ) t swap scroll>rect ;
 
 : (scroll>bottom) ( scroller -- )
     dup scroller-viewport viewport-dim { 0 1 } v* scroll ;

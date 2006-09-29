@@ -87,10 +87,10 @@ C: thumb ( vector -- thumb )
     dup hand-click-rel >r find-slider r>
     over gadget-orientation v.
     over screen>slider over slider-value - sgn
-    swap slide-by-page ;
+    [ swap slide-by-page ] curry start-timer-gadget ;
 
 elevator H{
-    { T{ button-down } [ [ elevator-click ] start-timer-gadget ] }
+    { T{ button-down } [ elevator-click ] }
     { T{ button-up } [ stop-timer-gadget ] }
 } set-gestures
 
