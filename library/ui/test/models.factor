@@ -74,28 +74,3 @@ f <history> "history" set
 [ 9 ] [ "y" get model-value ] unit-test
 [ ] [ "y" get deactivate-model ] unit-test
 [ f ] [ "z" get "x" get model-connections memq? ] unit-test
-
-! Test validators
-3 <model> "x" set
-"x" get [ odd? ] <validator> "y" set
-"y" get activate-model
-
-[ 3 ] [ "y" get model-value ] unit-test
-
-4 "x" get set-model
-
-[ 3 ] [ "y" get model-value ] unit-test
-
-5 "x" get set-model
-
-[ 5 ] [ "y" get model-value ] unit-test
-
-6 "y" get set-model
-
-[ 5 ] [ "x" get model-value ] unit-test
-[ 5 ] [ "y" get model-value ] unit-test
-
-7 "y" get set-model
-
-[ 7 ] [ "x" get model-value ] unit-test
-[ 7 ] [ "y" get model-value ] unit-test

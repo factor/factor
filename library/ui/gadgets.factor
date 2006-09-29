@@ -115,3 +115,20 @@ M: gadget gadget-selection? drop f ;
 GENERIC: gadget-selection ( gadget -- string/f )
 
 M: gadget gadget-selection drop f ;
+
+! Re-firing gestures while mouse held down, etc. Used by
+! slider gadgets
+TUPLE: timer-gadget quot ;
+
+C: timer-gadget ( gadget -- gadget )
+    [ set-gadget-delegate ] keep ;
+
+M: timer-gadget tick nip timer-gadget-quot call ;
+
+: start-timer-gadget ( gadget quot -- )
+    over >r curry r>
+    [ set-timer-gadget-quot ] keep
+    100 add-timer ;
+
+: stop-timer-gadget ( gadget -- )
+    dup remove-timer f swap set-timer-gadget-quot ;

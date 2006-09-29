@@ -62,16 +62,16 @@ C: button ( gadget quot -- button )
 TUPLE: repeat-button ;
 
 repeat-button H{
-    { T{ button-down } [ repeat-button-down ] }
-    { T{ button-up } [ repeat-button-up ] }
+    { T{ button-down } [ [ button-clicked ] start-timer-gadget ] }
+    { T{ button-up } [ stop-timer-gadget ] }
 } set-gestures
 
 C: repeat-button ( gadget quot -- button )
     #! Button that calls the quotation every 100ms as long as
     #! the mouse is held down.
-    [ >r <bevel-button> r> set-gadget-delegate ] keep ;
-
-M: repeat-button tick nip button-clicked ;
+    [
+        >r <bevel-button> <timer-gadget> r> set-gadget-delegate
+    ] keep ;
 
 TUPLE: button-paint plain rollover pressed selected ;
 
