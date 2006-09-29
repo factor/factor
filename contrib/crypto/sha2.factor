@@ -71,10 +71,10 @@ SYMBOL: >word
     ] each-with ;
 
 : ch ( x y z -- x' )
-    pick bitnot bitand >r bitand r> bitxor ;
+    [ bitxor bitand ] keep bitxor ;
 
 : maj ( x y z -- x' )
-    >r [ bitand ] 2keep r> [ rot bitand ] keep rot bitand bitxor bitxor ;
+    >r [ bitand ] 2keep bitor r> bitand bitor ;
 
 : S0-256 ( x -- x' )
     [ -2 bitroll-32 ] keep
