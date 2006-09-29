@@ -116,7 +116,7 @@ M: editor model-changed
     rot first rot line>y 2array ;
 
 : caret-dim ( editor -- dim )
-    line-height 0 swap 2array ;
+    line-height 1 swap 2array ;
 
 : caret-rect ( editor -- dim )
     dup caret-loc swap caret-dim <rect> ;
