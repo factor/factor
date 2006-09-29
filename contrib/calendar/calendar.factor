@@ -264,17 +264,25 @@ M: number +second ( timestamp n -- timestamp )
 : print-year ( year -- )
     12 [ 1+ print-month terpri ] each-with ;
 
-: timestamp>http-string ( timestamp -- string )
+: (timestamp>string) ( timestamp -- )
+    dup day-of-week day-abbreviations3 nth write ", " write
+    dup timestamp-day unparse write bl
+    dup timestamp-month months-abbreviations nth write bl
+    dup timestamp-year unparse write bl
+    dup timestamp-hour unparse 2 CHAR: 0 pad-left write ":" write
+    dup timestamp-minute unparse 2 CHAR: 0 pad-left write ":" write
+    timestamp-second >fixnum unparse 2 CHAR: 0 pad-left write ;
+
+: timestamp>string ( timestamp -- str )
+    [
+        (timestamp>string)
+    ] string-out ;
+
+: timestamp>http-string ( timestamp -- str )
     #! http timestamp format
     #! Example: Tue, 15 Nov 1994 08:12:31 GMT
-    >gmt
-    [
-        dup day-of-week day-abbreviations3 nth write ", " write
-        dup timestamp-day unparse write bl
-        dup timestamp-month months-abbreviations nth write bl
-        dup timestamp-year unparse write bl
-        dup timestamp-hour unparse 2 CHAR: 0 pad-left write ":" write
-        dup timestamp-minute unparse 2 CHAR: 0 pad-left write ":" write
-        timestamp-second >fixnum unparse 2 CHAR: 0 pad-left write " GMT" write
+    >gmt [
+        (timestamp>string)
+        " GMT" write
     ] string-out ;
 
