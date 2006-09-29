@@ -6,7 +6,6 @@
 ]
 - prettier printing of hashtable literals, alists, cond, ...
 - the editor should fill up the interior of the scroller completely
-- hide empty command groups in $commands
 - ui quick start doc
 - x11: scroll up/down wiggles caret
 - slider needs to be modelized
@@ -103,7 +102,6 @@
 
 + misc:
 
-- symbol redef is an xref false positive
 - signal 4 on datastack underflow on mac intel??
 - fix alien-callback/SEH bug on win32
 - minor GC takes too long now, we should card mark code heap

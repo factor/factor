@@ -105,7 +105,8 @@ SYMBOL: crossref
     dup update-xt
     xref-word ;
 
-: define-symbol ( word -- ) dup 2 define ;
+: define-symbol ( word -- )
+    dup symbol? [ drop ] [ dup 2 define ] if ;
 
 : intern-symbol ( word -- )
     dup undefined? [ define-symbol ] [ drop ] if ;
