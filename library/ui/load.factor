@@ -52,4 +52,5 @@ PROVIDE: library/ui {
     "test/rectangles.factor"
     "test/fields.factor"
     "test/commands.factor"
+    "test/panes.factor"
 } ;

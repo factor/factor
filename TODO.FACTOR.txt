@@ -1,6 +1,23 @@
+- auto-invoke code gc
+- cocoa: support real redefinition
+- fix this:
+  [ 1 2 3 4 5 6 7 8 9 10 10 10 10 10 10 10 10 10 10 11 11 11 113 ] .
+[ 1 2 3 4 5 6 7 8 9 10 10 10 10 10 10 10 10 10 10 11 11 11 113 
+]
+- prettier printing of hashtable literals, alists, cond, ...
+- the editor should fill up the interior of the scroller completely
+- hide empty command groups in $commands
+- ui quick start doc
+- page scrolling should be timer-based too
+- x11: scroll up/down wiggles caret
+- slider needs to be modelized
+- mouse over for input w/ multiple lines looks stupid
+- more compact relocation info
+- hashed generic method dispatch
+
 + ui:
 
-- the editor should fill up the interior of the scroller completely
+- some way of intercepting all gestures
 - pane output in UI should use less memory
 - variable width word wrap
   - needs layout tricks
@@ -14,16 +31,11 @@
 - ui browser: show currently selected vocab & words
   - keyboard-navigatable list gadget of some kind
 - tuple= in dataflow view
-- hide empty command groups in $commands
-- ui quick start doc
 - auto-update browser and help when sources reload
 - how do we refer to command shortcuts in the docs?
 - figure out if we need both set-model and set-model*
-- if i do 10000 [ . ] each and then clear, the listener window is slow
 - full-height nodes should really be full height
 - better help result ranking
-- page scrolling should be timer-based too
-- x11: scroll up/down wiggles caret
 - roundoff is still not quite right with tracks
 - fix top level window positioning
 - x11.app has a problem with A+ keys
@@ -38,7 +50,6 @@
   - more efficient multi-line inserts
   - write "foo| " and put caret at | then select word element: selects
     space
-- slider needs to be modelized
 - fonts/ should go inside the .app -- we need multi-tier resource-path
 - should be possible to drop an image file on the .app to run it
 - support x11's large selections, if needed
@@ -53,7 +64,6 @@
   - horizontal wheel scrolling
   - polish OS X menu bar code
 - structure editor
-- mouse over for input w/ multiple lines looks stupid
 
 + module system:
 
@@ -70,7 +80,6 @@
 
 + compiler/ffi:
 
-- more compact relocation info
 - problem if major gc happens during relocation
   - in fact relocation should not cons at all
 - stdcall callbacks
@@ -100,11 +109,6 @@
 - signal 4 on datastack underflow on mac intel??
 - fix alien-callback/SEH bug on win32
 - minor GC takes too long now, we should card mark code heap
-- fix this:
-  [ 1 2 3 4 5 6 7 8 9 10 10 10 10 10 10 10 10 10 10 11 11 11 113 ] .
-[ 1 2 3 4 5 6 7 8 9 10 10 10 10 10 10 10 10 10 10 11 11 11 113 
-]
-- prettier printing of hashtable literals, alists, cond, ...
 - buffer-ptr should be an alien
 - swap nappend ==> nappend
 - sometimes darcs get fails with the httpd
@@ -114,7 +118,6 @@
 - incremental GC
 - UDP
 - slice: if sequence or seq start is changed, abstraction violation
-- hashed generic method dispatch
 
 + httpd:
 

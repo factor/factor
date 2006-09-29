@@ -64,7 +64,7 @@ M: pane stream-flush drop ;
     dup pane-scrolls? [ scroll>bottom ] [ drop ] if ;
 
 M: pane stream-terpri
-    dup pane-current prepare-print
+    dup pane-current dup unparent prepare-print
     over pane-output add-incremental
     dup prepare-line
     scroll-pane ;
