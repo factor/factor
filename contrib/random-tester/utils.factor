@@ -9,10 +9,5 @@ IN: random-tester
 : random-hash-entry ( hash -- key value )
     hash>alist nth-rand first2 ;
 
-! ARRAYS
-: 4array ( a b c d -- seq ) 2array >r 2array r> append ;
-
-: coin-flip ( -- bool ) 2 random-int 1 = ;
-
-! UNCOMPILABLES
-: do-one ( seq -- ) nth-rand call ;
+: coin-flip ( -- bool ) 2 random-int zero? ;
+: do-one ( seq -- ) nth-rand call ; inline

@@ -8,8 +8,7 @@ IN: random-tester
 
 
 ! Math vocabulary words
-: 1-x>y ( -- seq )
-    #! Words that take one argument
+: 1-x>y
     {
         1+ 1- >bignum >digit >fixnum abs absq arg 
         bitnot bits>double bits>float ceiling cis conjugate cos cosec cosech
@@ -19,22 +18,15 @@ IN: random-tester
     } ;
 
 : 1-x>y-throws
-    #! Words that take one argument and possibly throw an error
     {
         recip log2
         asec asech acot acoth acosec acosech acos acosh asin asinh atan atanh
     } ;
 
-: 2-x>y ( -- seq )
-    #! Words that take two arguments
-    { * + - /f max min polar> bitand bitor bitxor align } ;
-
-: 2-x>y-throws ( -- seq )
-    #! Words that take two arguments and possibly throw an error
-    { / /i mod rem } ;
+: 2-x>y ( -- seq ) { * + - /f max min polar> bitand bitor bitxor align } ;
+: 2-x>y-throws ( -- seq ) { / /i mod rem } ;
 
 : 1-integer>x
-    #! Words that take an integer and output a type (not necessarily integer)
     {
         1+ 1- >bignum >digit >fixnum abs absq arg 
         bitnot bits>double bits>float ceiling cis conjugate cos cosec cosech
@@ -52,7 +44,7 @@ IN: random-tester
         sech sgn sin sinh sq sqrt tan tanh truncate 
     } ;
 
-: 1-float>x ( float -- x )
+: 1-float>x ( -- seq )
     {
         1+ 1- >bignum >digit >fixnum abs absq arg 
         ceiling cis conjugate cos cosec cosech
@@ -81,13 +73,10 @@ IN: random-tester
     } ;
 
 : 1-integer>integer
-    #! Subset of 1-integer>x
     {
-        1+ 1- >bignum >digit >fixnum abs absq 
-        bitnot ceiling conjugate 
+        1+ 1- >bignum >digit >fixnum abs absq bitnot ceiling conjugate 
         denominator double>bits float>bits floor imaginary
-        neg next-power-of-2 numerator
-        real sgn sq truncate 
+        neg next-power-of-2 numerator real sgn sq truncate 
     } ;
 
 : 1-ratio>ratio
@@ -101,29 +90,19 @@ IN: random-tester
 
 : 1-complex>complex
     {
-        1+ 1- abs absq arg 
-        conjugate cosec cosech
-        cosh cot coth exp 
-        log neg 
-        sech sin sinh sq sqrt tanh 
+        1+ 1- abs absq arg conjugate cosec cosech cosh cot coth exp log
+        neg sech sin sinh sq sqrt tanh 
     } ;
 
-: 2-integer>x ( n n -- x )
-    { * + - /f max min polar> bitand bitor bitxor align } ;
-: 2-ratio>x ( r r -- x )
-    { * + - /f max min polar> } ;
-: 2-float>x ( f f -- x )
-    { float+ float- float* float/f + - * /f max min polar> } ;
-: 2-complex>x ( c c -- x ) { * + - /f } ;
+: 2-integer>x { * + - /f max min polar> bitand bitor bitxor align } ;
+: 2-ratio>x { * + - /f max min polar> } ;
+: 2-float>x { float+ float- float* float/f + - * /f max min polar> } ;
+: 2-complex>x { * + - /f } ;
 
-: 2-integer>integer ( n n -- n )
-    { * + - max min bitand bitor bitxor align } ;
-: 2-ratio>ratio ( r r -- r )
-    { * + - max min } ;
-: 2-float>float ( f f -- f ) 
-    { float* float+ float- float/f max min /f + - } ;
-: 2-complex>complex ( c c -- c )
-    { * + - /f } ;
+: 2-integer>integer { * + - max min bitand bitor bitxor align } ;
+: 2-ratio>ratio { * + - max min } ;
+: 2-float>float { float* float+ float- float/f max min /f + - } ;
+: 2-complex>complex { * + - /f } ;
 
 
 
@@ -214,9 +193,9 @@ SYMBOL: second-arg
     random-complex random-1-complex>x-quot 1-interpreted-vs-compiled-check ;
 
 
-: random-1-float>float-quot ( -- ) 1-float>float nth-rand unit ;
-: random-2-float>float-quot ( -- ) 2-float>float nth-rand unit ;
-: nrandom-2-float>float-quot ( -- )
+: random-1-float>float-quot ( -- obj ) 1-float>float nth-rand unit ;
+: random-2-float>float-quot ( -- obj ) 2-float>float nth-rand unit ;
+: nrandom-2-float>float-quot ( -- obj )
     [
         5
         [
@@ -241,12 +220,12 @@ SYMBOL: second-arg
 : test-1-integer>x-runtime ( -- )
     random-integer random-1-integer>x-quot 1-runtime-check ;
 
-: random-1-integer>x-throws-quot ( -- ) 1-integer>x-throws nth-rand unit ;
-: random-1-ratio>x-throws-quot ( -- ) 1-ratio>x-throws nth-rand unit ;
-: test-1-integer>x-throws ( -- )
+: random-1-integer>x-throws-quot ( -- obj ) 1-integer>x-throws nth-rand unit ;
+: random-1-ratio>x-throws-quot ( -- obj ) 1-ratio>x-throws nth-rand unit ;
+: test-1-integer>x-throws ( -- obj )
     random-integer random-1-integer>x-throws-quot
     1-interpreted-vs-compiled-check-catch ;
-: test-1-ratio>x-throws ( -- )
+: test-1-ratio>x-throws ( -- obj )
     random-ratio random-1-ratio>x-throws-quot
     1-interpreted-vs-compiled-check-catch ;
 
@@ -310,6 +289,7 @@ SYMBOL: second-arg
     10 [ many-word-test "a100" parse first compile ] times ;
 
 : random-test
+    "----" print
     {
         test-1-integer>x
         test-1-ratio>x
@@ -327,5 +307,6 @@ SYMBOL: second-arg
         test-1-float?-when
         test-1-complex?-when
         full-gc
-    } nth-rand execute ;
+        code-gc
+    } nth-rand dup . execute terpri ;
 
