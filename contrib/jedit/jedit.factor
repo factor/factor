@@ -5,7 +5,7 @@ USING: arrays definitions errors io kernel listener math
 namespaces parser prettyprint sequences strings words shells ;
 
 : jedit-server-info ( -- port auth )
-    "~" get "/.jedit/server" path+ <file-reader> [
+    home "/.jedit/server" path+ <file-reader> [
         readln drop
         readln string>number
         readln string>number

@@ -49,3 +49,6 @@ DEFER: directory.
 
 : directory. ( path -- )
     dup directory [ file. ] each-with ;
+
+: home ( -- dir )
+    windows? "USERPROFILE" "HOME" ? os-env [ "." ] unless* ;
