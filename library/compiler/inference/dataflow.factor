@@ -96,7 +96,7 @@ C: #dispatch make-node ;
 
 TUPLE: #merge ;
 C: #merge make-node ;
-: #merge ( -- node ) meta-d get clone out-node <#merge> ;
+: #merge ( -- node ) meta-d-node <#merge> ;
 
 TUPLE: #terminate ;
 C: #terminate make-node ;

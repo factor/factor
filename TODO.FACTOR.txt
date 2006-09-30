@@ -1,19 +1,13 @@
 - auto-invoke code gc
-- code gc sig11
-- cocoa: support real redefinition
-- fix this:
-  [ 1 2 3 4 5 6 7 8 9 10 10 10 10 10 10 10 10 10 10 11 11 11 113 ] .
-[ 1 2 3 4 5 6 7 8 9 10 10 10 10 10 10 10 10 10 10 11 11 11 113 
-]
-- prettier printing of hashtable literals, alists, cond, ...
-- ui quick start doc
-- x11: scroll up/down wiggles caret
-- slider needs to be modelized
-- more compact relocation info
-- hashed generic method dispatch
+- signal 4 on datastack underflow on mac intel??
+- fix alien-callback/SEH bug on win32
 
 + ui:
 
+- nested presentation mouse over is not right
+- ui quick start doc
+- x11: scroll up/down wiggles caret
+- slider needs to be modelized
 - [ ] write in the UI breaks stuff
 - some way of intercepting all gestures
 - pane output in UI should use less memory
@@ -28,7 +22,6 @@
   - keyboard navigation
 - ui browser: show currently selected vocab & words
   - keyboard-navigatable list gadget of some kind
-- tuple= in dataflow view
 - auto-update browser and help when sources reload
 - how do we refer to command shortcuts in the docs?
 - figure out if we need both set-model and set-model*
@@ -43,7 +36,6 @@
   - double/triple click
   - autoscroll
   - transpose char/word/line
-  - drag scroll
   - more efficient multi-line inserts
   - write "foo| " and put caret at | then select word element: selects
     space
@@ -77,6 +69,8 @@
 
 + compiler/ffi:
 
+- more compact relocation info
+- cocoa: support real redefinition
 - problem if major gc happens during relocation
   - in fact relocation should not cons at all
 - stdcall callbacks
@@ -102,8 +96,12 @@
 
 + misc:
 
-- signal 4 on datastack underflow on mac intel??
-- fix alien-callback/SEH bug on win32
+- hashed generic method dispatch
+- fix this:
+  [ 1 2 3 4 5 6 7 8 9 10 10 10 10 10 10 10 10 10 10 11 11 11 113 ] .
+[ 1 2 3 4 5 6 7 8 9 10 10 10 10 10 10 10 10 10 10 11 11 11 113 
+]
+- prettier printing of hashtable literals, alists, cond, ...
 - minor GC takes too long now, we should card mark code heap
 - buffer-ptr should be an alien
 - swap nappend ==> nappend

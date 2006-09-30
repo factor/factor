@@ -148,9 +148,9 @@ DEFER: (compute-heights)
 : (compute-heights) ( node -- )
     [
         d-height get over 2array ,
-        dup compute-child-heights
         dup node-out-d length over node-in-d length -
         d-height [ + ] change
+        dup compute-child-heights
         node-successor (compute-heights)
     ] when* ;
 

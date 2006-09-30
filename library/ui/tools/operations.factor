@@ -105,6 +105,12 @@ M: operation invoke-command ( target operation -- )
     { +listener+ t }
 } define-operation
 
+[ word? ] H{
+    { +name+ "Word dataflow" }
+    { +keyboard+ T{ key-down f { A+ } "d" } }
+    { +quot+ [ word-def show-dataflow ] }
+} define-operation
+
 ! Vocabularies
 [ vocab-link? ] H{
     { +mouse+ T{ button-up f f 1 } }
@@ -166,7 +172,7 @@ M: operation invoke-command ( target operation -- )
 } define-operation
 
 [ quotation? ] H{
-    { +name+ "Dataflow" }
+    { +name+ "Quotation dataflow" }
     { +keyboard+ T{ key-down f { C+ A+ } "d" } }
     { +quot+ [ show-dataflow ] }
     { +listener+ t }
@@ -187,16 +193,18 @@ M: operation invoke-command ( target operation -- )
 } define-operation
 
 ! Dataflow nodes
-[ word? ] H{
-    { +name+ "Dataflow" }
-    { +keyboard+ T{ key-down f { A+ } "d" } }
-    { +quot+ [ word-def show-dataflow ] }
-} define-operation
 
 [ [ node? ] is? ] H{
     { +mouse+ T{ button-up f f 1 } }
-    { +name+ "Quotation dataflow" }
+    { +name+ "Show dataflow" }
     { +quot+ [ dataflow-gadget call-tool ] }
+} define-operation
+
+[ [ node? ] is? ] H{
+    { +mouse+ T{ button-up f { S+ } 3 } }
+    { +name+ "Inspect" }
+    { +quot+ [ inspect ] }
+    { +listener+ t }
 } define-operation
 
 ! Define commands in terms of operations
