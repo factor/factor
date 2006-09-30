@@ -54,5 +54,5 @@ PROVIDE: library/ui {
     "test/fields.factor"
     "test/commands.factor"
     "test/panes.factor"
-    "test/editors.factor"
+    "test/editor.factor"
 } ;
