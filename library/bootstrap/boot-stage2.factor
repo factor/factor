@@ -14,14 +14,14 @@ optimizer parser sequences sequences-internals words ;
 
         cpu "x86" = [
             macosx?
-            "/library/compiler/x86/alien-macosx.factor"
-            "/library/compiler/x86/alien.factor"
-            ? run-resource
+            "resource:/library/compiler/x86/alien-macosx.factor"
+            "resource:/library/compiler/x86/alien.factor"
+            ? run-file
         ] when
 
         "compile" get [
             windows? [
-                "/library/windows/dlls.factor" run-resource
+                "resource:/library/windows/dlls.factor" run-file
             ] when
 
             \ number= compile

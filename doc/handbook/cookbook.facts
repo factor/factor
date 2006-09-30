@@ -172,8 +172,6 @@ $terpri
 ARTICLE: "cookbook-sources" "Source file cookbook"
 "By convention, code  is stored in files with the " { $snippet ".factor" } " filename extension. You can load source files using " { $link run-file } ":"
 { $code "\"hello.factor\" run-file" }
-"You can load source files from the Factor source code directory using " { $link run-resource } ":"
-{ $code "\"/examples/lcd.factor\" run-resource" }
 { $references
     { }
     "sources"

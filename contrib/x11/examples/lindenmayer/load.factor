@@ -1,5 +1,6 @@
-USING: parser words compiler sequences ;
+USING: parser modules ;
 
-"contrib/x11/examples/lindenmayer/lindenmayer.factor" run-resource
-"contrib/x11/examples/lindenmayer/viewer.factor" run-resource
-"lindenmayer" words [ try-compile ] each
+{
+    "resource:contrib/x11/examples/lindenmayer/lindenmayer.factor"
+    "resource:contrib/x11/examples/lindenmayer/viewer.factor"
+} run-files

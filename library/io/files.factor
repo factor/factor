@@ -29,8 +29,8 @@ strings styles ;
     \ resource-path get [ image parent-dir ] unless*
     swap path+ ;
 
-: <resource-reader> ( resource -- stream )
-    resource-path <file-reader> ;
+: ?resource-path ( path -- path )
+    "resource:" ?head [ resource-path ] when ;
 
 TUPLE: pathname string ;
 

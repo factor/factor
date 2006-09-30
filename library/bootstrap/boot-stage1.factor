@@ -7,7 +7,7 @@ prettyprint sequences vectors words ;
 
 "Bootstrap stage 1..." print flush
 
-"/library/bootstrap/primitives.factor" run-resource
+"resource:/library/bootstrap/primitives.factor" run-file
 
 ! The [ ] make form creates a boot quotation
 [
@@ -20,7 +20,10 @@ prettyprint sequences vectors words ;
     "library/compiler/" architecture get append require
     "doc/handbook" require
 
-    [ "/library/bootstrap/boot-stage2.factor" run-resource ] %
+    [
+        "resource:/library/bootstrap/boot-stage2.factor"
+        run-file
+    ] %
 ] [ ] make
 
 vocabularies get [

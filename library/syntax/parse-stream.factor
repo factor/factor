@@ -4,6 +4,33 @@ IN: parser
 USING: arrays errors generic hashtables io kernel math
 namespaces sequences words ;
 
+SYMBOL: source-files
+
+TUPLE: source-file path modified definitions ;
+
+: source-file-modified* ( source-file -- n )
+    source-file-path ?resource-path
+    file-modified [ 0 ] unless* ;
+
+: record-modified ( file -- )
+    dup source-file-modified* swap set-source-file-modified ;
+
+: reset-modified ( -- )
+    source-files get hash-values [ record-modified ] each ;
+
+C: source-file ( path -- source-file )
+    [ set-source-file-path ] keep
+    V{ } clone over set-source-file-definitions
+    dup record-modified ;
+
+: source-modified? ( file -- ? )
+    source-files get hash [
+        dup source-file-modified swap source-file-modified*
+        [ < ] [ drop f ] if*
+    ] [
+        t
+    ] if* ;
+
 : file-vocabs ( -- )
     "scratchpad" set-in { "syntax" "scratchpad" } set-use ;
 
@@ -36,17 +63,22 @@ SYMBOL: parse-hook
         do-parse-hook
     ] with-scope ;
 
-: parsing-file ( file -- ) "Loading " write print flush ;
+: parsing-file ( file -- )
+    "Loading " write print flush ;
+
+: record-file ( file -- )
+    [ <source-file> ] keep source-files get set-hash ;
 
 : parse-file-restarts ( file -- restarts )
     "Load " swap " again" append3 t 2array 1array ;
 
-: (parse-file) ( file ident -- quot )
-    [ dup parsing-file >r <file-reader> r> parse-stream ]
-    [ pick parse-file-restarts condition drop (parse-file) ]
-    recover ;
-
-: parse-file ( file -- quot ) dup (parse-file) ;
+: parse-file ( file -- quot )
+    [
+        dup parsing-file dup record-file
+        [ ?resource-path <file-reader> ] keep parse-stream
+    ] [
+        over parse-file-restarts condition drop parse-file
+    ] recover ;
 
 : run-file ( file -- ) parse-file call ;
 
@@ -58,9 +90,3 @@ SYMBOL: parse-hook
 
 : eval>string ( str -- str )
     [ [ [ eval ] keep ] try drop ] string-out ;
-
-: parse-resource ( path -- quot )
-    [ resource-path "resource:" ] keep append (parse-file) ;
-
-: run-resource ( file -- )
-    parse-resource call ;

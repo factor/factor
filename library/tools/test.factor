@@ -48,7 +48,7 @@ SYMBOL: failures
     [
         "=====> " write dup write "..." print flush
         [
-            [ [ run-resource ] with-scope ] keep
+            [ [ run-file ] with-scope ] keep
         ] assert-depth drop
     ] test-handler ;
 

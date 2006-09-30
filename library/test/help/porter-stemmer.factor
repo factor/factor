@@ -55,9 +55,11 @@ USING: arrays io kernel porter-stemmer sequences test ;
 [ "hell" ] [ "hell" step5 "" like ] unit-test
 [ "mate" ] [ "mate" step5 "" like ] unit-test
 
+: resource-lines resource-path <file-reader> lines ;
+
 [ { } ] [
-    "/library/test/help/voc.txt" <resource-reader> lines 
+    "/library/test/help/voc.txt" resource-lines
     [ stem ] map
-    "/library/test/help/output.txt" <resource-reader> lines
+    "/library/test/help/output.txt" resource-lines
     [ 2array ] 2map [ first2 = not ] subset
 ] unit-test

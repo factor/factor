@@ -48,14 +48,3 @@ HELP: run-file
 HELP: ?run-file
 { $values { "file" "a path name string" } }
 { $description "Forgiving variant of " { $link run-file } " which does nothing if the file does not exist, and logs errors to the default stream without re-throwing them." }  ;
-
-HELP: parse-resource
-{ $values { "path" "a resource name string" } { "quot" "a new quotation" } }
-{ $description "Parses a library resource." }
-{ $notes "the source file name given to the parser is special for resources and begins with " { $snippet "resource:" } ". This allows words that operate on source files, like " { $link edit } ", to use a different resource path at run time than was used at parse time." }
-{ $errors "Throws an I/O error if there was an error reading the resource. Throws a parse error if the input is malformed." } ;
-
-HELP: run-resource
-{ $values { "path" "a resource name string" } }
-{ $description "Parses and runs a library resource." }
-{ $errors "Throws an I/O error if there was an error reading the resource. Throws a parse error if the input is malformed." } ;

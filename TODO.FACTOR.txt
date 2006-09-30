@@ -64,8 +64,6 @@
 
 + module system:
 
-- reloading source files manually should update their mod time in the
-  module system
 - convention for main entry point of a module
 - convention for main help article of a module
 - track a list of assets loaded from each module's file

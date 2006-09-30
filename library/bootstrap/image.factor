@@ -287,7 +287,7 @@ M: hashtable '
         {
             vocabularies typemap builtins c-types crossref
             articles parent-graph term-index changed-words
-            modules class<map
+            modules class<map source-files
         } [ dup get swap bootstrap-word set ] each
     ] make-hash '
     global-offset fixup ;
@@ -327,8 +327,9 @@ M: hashtable '
     <file-writer> [ (write-image) ] with-stream ;
 
 : prepare-profile ( arch -- )
-    "/library/bootstrap/profile-" swap ".factor" append3
-    run-resource ;
+    "resource:/library/bootstrap/profile-"
+    swap ".factor" append3
+    run-file ;
 
 : prepare-image ( arch -- )
     bootstrapping? on dup architecture set prepare-profile
@@ -339,7 +340,7 @@ M: hashtable '
         parse-hook off
         prepare-image
         begin-image
-        "/library/bootstrap/boot-stage1.factor" run-resource
+        "resource:/library/bootstrap/boot-stage1.factor" run-file
         end-image
         image get image-name write-image
     ] with-scope ;

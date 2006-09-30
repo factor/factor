@@ -31,9 +31,9 @@ $terpri
 "If this module is already listed in the " { $link modules } " hashtable, this word does nothing. Otherwise, it calls " { $link load-module } "." }
 { $notes "Module definitions should use the " { $link POSTPONE: REQUIRES: } " parsing word instead. In the listener, the " { $link require } " word might be more useful since it recompiles new words after loading the module." } ;
 
-HELP: run-resources
+HELP: run-files
 { $values { "seq" "a sequence of strings" } }
-{ $description "Load a collection of source files identified by resource paths (see " { $link resource-path } ")."
+{ $description "Load a collection of source files."
 $terpri
 "If bootstrapping, this word appends the top-level forms to the currently constructing quotation instead." } ;
 

@@ -47,8 +47,6 @@ $terpri
 ARTICLE: "sources" "Source files"
 "The simplest way to distribute a piece of Factor code is in the form of a source file. Source files can be loaded in the listener:"
 { $subsection run-file }
-"Another way to load a source file is to provide a path relative to the Factor installation directory:"
-{ $subsection run-resource }
 "Factor tracks which source files definitions were loaded from; see " { $link "definitions" } "."
 $terpri
 "Details on the Factor source parser itself can be found in " { $link "parser" } "."

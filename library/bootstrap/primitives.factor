@@ -11,11 +11,13 @@ strings vectors words ;
 "Creating primitives and basic runtime structures..." print flush
 
 H{ } clone c-types set
-"/library/compiler/alien/primitive-types.factor" parse-resource
+
+"resource:/library/compiler/alien/primitive-types.factor" parse-file
 
 ! Bring up a bare cross-compiling vocabulary.
 "syntax" vocab
 
+H{ } clone source-files set
 H{ } clone vocabularies set
 H{ } clone class<map set
 V{ } clone modules set
