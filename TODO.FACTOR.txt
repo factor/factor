@@ -1,9 +1,9 @@
 - auto-invoke code gc
-- signal 4 on datastack underflow on mac intel??
 - fix alien-callback/SEH bug on win32
 
 + ui:
 
+- the mouse button overload sucks, use popup menus instead
 - nested presentation mouse over is not right
 - ui quick start doc
 - x11: scroll up/down wiggles caret

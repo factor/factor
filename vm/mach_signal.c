@@ -19,9 +19,6 @@ see http://www.caddr.com/macho/archives/sbcl-devel/2005-3/4764.html */
 /* The exception port on which our thread listens.  */
 static mach_port_t our_exception_port;
 
-/* Communication area for the exception state and thread state.  */
-static SIGSEGV_THREAD_STATE_TYPE save_thread_state;
-
 /* A handler that is called in the faulting thread. */
 static void
 terminating_handler (void *fault_addr)
@@ -68,8 +65,6 @@ catch_exception_raise (mach_port_t exception_port,
     }
 
   sp = (unsigned long) (SIGSEGV_STACK_POINTER (thread_state));
-
-  save_thread_state = thread_state;
 
   SIGSEGV_PROGRAM_COUNTER (thread_state) = (unsigned long) terminating_handler;
   SIGSEGV_STACK_POINTER (thread_state) = fix_stack_ptr(sp);
