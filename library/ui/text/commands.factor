@@ -1,8 +1,7 @@
 ! Copyright (C) 2006 Slava Pestov
 ! See http://factorcode.org/license.txt for BSD license.
 IN: gadgets-text
-USING: gadgets gadgets-controls kernel models namespaces
-sequences ;
+USING: gadgets kernel models namespaces sequences ;
 
 : editor-extend-selection ( editor -- )
     dup request-focus

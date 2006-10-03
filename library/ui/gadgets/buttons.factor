@@ -1,7 +1,7 @@
-! Copyright (C) 2005 Slava Pestov.
-! See http://factor.sf.net/license.txt for BSD license.
+! Copyright (C) 2005, 2006 Slava Pestov.
+! See http://factorcode.org/license.txt for BSD license.
 IN: gadgets-buttons
-USING: gadgets gadgets-borders gadgets-controls gadgets-labels
+USING: gadgets gadgets-borders gadgets-labels
 gadgets-theme generic io kernel math models namespaces sequences
 strings styles threads words ;
 

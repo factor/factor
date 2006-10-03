@@ -1,7 +1,7 @@
 ! Copyright (C) 2006 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 IN: gadgets-text
-USING: arrays definitions gadgets gadgets-controls gadgets-panes
+USING: arrays definitions gadgets gadgets-panes
 generic hashtables help io kernel namespaces prettyprint styles
 threads sequences vectors definitions parser words strings ;
 

@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 IN: gadgets-text
 USING: arrays errors freetype gadgets gadgets-borders
-gadgets-buttons gadgets-controls gadgets-frames gadgets-labels
+gadgets-buttons gadgets-frames gadgets-labels
 gadgets-scrolling gadgets-theme io kernel math models namespaces
 opengl sequences strings styles ;
 
@@ -21,8 +21,7 @@ TUPLE: loc-monitor editor ;
     dup <loc> swap set-editor-mark ;
 
 C: editor ( -- editor )
-    dup <document> delegate>control
-    dup dup set-control-self
+    dup <document> <gadget> delegate>control
     dup init-editor-locs
     dup editor-theme ;
 
@@ -63,10 +62,7 @@ M: editor model-changed
 : change-caret&mark ( editor quot -- )
     over >r change-caret r> mark>caret ; inline
 
-: editor-lines ( editor -- seq )
-    control-model model-value ;
-
-: editor-line ( n editor -- str ) editor-lines nth ;
+: editor-line ( n editor -- str ) control-value nth ;
 
 : editor-font* ( editor -- font ) editor-font lookup-font ;
 
@@ -164,7 +160,7 @@ M: loc-monitor model-changed
 : visible-lines ( editor -- seq )
     \ first-visible-line get
     \ last-visible-line get
-    rot editor-lines <slice> ;
+    rot control-value <slice> ;
 
 : draw-lines ( -- )
     GL_MODELVIEW [
@@ -203,10 +199,10 @@ M: editor draw-gadget*
     [ draw-selection draw-lines draw-caret ] with-editor ;
 
 : editor-height ( editor -- n )
-    [ editor-lines length ] keep line>y ;
+    [ control-value length ] keep line>y ;
 
 : editor-width ( editor -- n )
-    0 swap dup editor-font* swap editor-lines
+    0 swap dup editor-font* swap control-value
     [ string-width max ] each-with ;
 
 M: editor pref-dim*

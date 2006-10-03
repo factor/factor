@@ -1,7 +1,7 @@
 ! Copyright (C) 2005, 2006 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 IN: gadgets-panes
-USING: gadgets gadgets-buttons gadgets-controls gadgets-labels
+USING: gadgets gadgets-buttons gadgets-labels
 gadgets-scrolling gadgets-theme generic hashtables io kernel
 namespaces sequences ;
 

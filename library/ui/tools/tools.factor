@@ -4,7 +4,7 @@ IN: gadgets-messages
 DEFER: messages
 
 IN: gadgets-workspace
-USING: gadgets gadgets-books gadgets-controls gadgets-workspace
+USING: gadgets gadgets-books gadgets-workspace
 generic kernel models scratchpad sequences syntax
 gadgets-messages ;
 

@@ -1,7 +1,7 @@
 ! Copyright (C) 2005, 2006 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 IN: gadgets-labels
-USING: arrays freetype gadgets gadgets-controls gadgets-theme
+USING: arrays freetype gadgets gadgets-theme
 generic hashtables io kernel math namespaces opengl sequences
 styles ;
 

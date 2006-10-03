@@ -1,8 +1,7 @@
 ! Copyright (C) 2006 Slava Pestov
 ! See http://factorcode.org/license.txt for BSD license.
 IN: gadgets-text
-USING: gadgets gadgets-controls generic kernel models sequences
-gadgets-theme ;
+USING: gadgets generic kernel models sequences gadgets-theme ;
 
 TUPLE: field model ;
 
