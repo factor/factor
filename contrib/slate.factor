@@ -25,9 +25,13 @@ M: slate draw-gadget* ( <slate> -- ) dup self set slate-action call ;
 
 : set-action ( quot -- ) self get set-slate-action ;
 
+: action> get-action ;
+
+: >action set-action ;
+
 : flush-slate ( -- ) self get relayout-1 ;
 
-SYMBOL: dlist
+VAR: dlist
 
 SYMBOL: capacity
 
@@ -63,6 +67,8 @@ SYMBOL: capacity
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 : gl-clear-color ( vec -- ) first4 [ glClearColor ] curry4 add-dlist ;
+
+: gl-get-floatv ( pname params -- ) [ glGetFloatv ] curry2 add-dlist ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
@@ -113,6 +119,8 @@ SYMBOL: capacity
 : gl-scale ( vec -- ) first3 [ glScalef ] curry3 add-dlist ;
 
 : gl-translate ( vec -- ) first3 [ glTranslatef ] curry3 add-dlist ;
+
+: gl-load-matrix ( byte-array -- ) [ glLoadMatrixf ] curry add-dlist ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
