@@ -289,22 +289,22 @@ H{ { "K" "[[a|b] '(0.41)f'(2.439) |<(60) [a|b]]" }
 
 : spiral-0 ( -- ) lparser-dialect   [ 10 >angle 5 >thickness ] >model-values
 
-"[P]|[P]" axiom set
+"[P]|[P]" >axiom
 
 H{ { "P" "[A]>>>>>>>>>[cB]>>>>>>>>>[ccC]>>>>>>>>>[cccD]" }
    { "A" "F+;'A" }
    { "B" "F!+F+;'B" }
    { "C" "F!^+F^+;'C" }
    { "D" "F!>^+F>^+;'D" }
-} rules set
+} >rules
 
 axiom> >result ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-: tree-5 ( -- ) lparser-dialect   5 angle set   1 thickness set
+: tree-5 ( -- ) lparser-dialect   [ 5 >angle   1 >thickness ] >model-values
 
-"c(4)FFS" axiom set
+"c(4)FFS" >result
 
 H{ { "S" "FFR>(60)R>(60)R>(60)R>(60)R>(60)R>(30)S" }
    { "R" "[Ba]" }
@@ -318,24 +318,24 @@ H{ { "S" "FFR>(60)R>(60)R>(60)R>(60)R>(60)R>(30)S" }
    { "y" "b" }
 
    { "F" "'(1.25)F'(.8)" }
-} rules set ;
+} >rules ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-: abop-1 ( -- ) lparser-dialect   45 angle set   5 set-thickness
+: abop-1 ( -- ) lparser-dialect   [ 45 >angle   5 >thickness ] >model-values
 
 H{ { "A" "F[&'(.8)!BL]>(137)'!(.9)A" }
    { "B" "F[-'(.8)!(.9)$CL]'!(.9)C" }
    { "C" "F[+'(.8)!(.9)$BL]'!(.9)B" }
 
    { "L" "~c(8){+(30)f-(120)f-(120)f}" }
-} rules set
+} >rules
 
-"c(12)FFAL" axiom set ;
+"c(12)FFAL" >result ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-: abop-2 ( -- ) lparser-dialect   30 angle set   5 thickness set
+: abop-2 ( -- ) lparser-dialect   [ 30 >angle   5 >thickness ] >model-values
 
 H{ { "A" "F[&'(.7)!BL]>(137)[&'(.6)!BL]>(137)'(.9)!(.9)A" }
    { "B" "F[-'(.7)!(.9)$CL]'(.9)!(.9)C" }
@@ -343,24 +343,24 @@ H{ { "A" "F[&'(.7)!BL]>(137)[&'(.6)!BL]>(137)'(.9)!(.9)A" }
 
    { "L" "~c(8){+(45)f(.1)-(45)f(.1)-(45)f(.1)+(45)|+(45)f(.1)-(45)f(.1)-(45)f(.1)}" }
 
-} rules set
+} >rules
 
-"c(12)FAL" axiom set ;
+"c(12)FAL" >result ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-: abop-3 ( -- ) lparser-dialect   30 angle set   5 thickness set
+: abop-3 ( -- ) lparser-dialect   [ 30 >angle   5 >thickness ] >model-values
 
 H{ { "A" "!(.9)t(.4)FB>(94)B>(132)B" }
    { "B" "[&t(.4)F$A]" }
    { "F" "'(1.25)F'(.8)" }
-} rules set
+} >rules
 
-"c(12)FA" axiom set ;
+"c(12)FA" >result ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-: abop-4 ( -- ) lparser-dialect   18 angle set 5 thickness set
+: abop-4 ( -- ) lparser-dialect   [ 18 >angle   5 >thickness ] >model-values
 
 H{ { "N" "FII[&(60)rY]>(90)[&(45)'(0.8)rA]>(90)[&(60)rY]>(90)[&(45)'(0.8)rD]!FIK" }
    { "Y" "[c(4){++l.--l.--l.++|++l.--l.--l.}]" }
@@ -391,13 +391,13 @@ H{ { "N" "FII[&(60)rY]>(90)[&(45)'(0.8)rA]>(90)[&(60)rY]>(90)[&(45)'(0.8)rD]!FIK
 
    { "o" "$t(-0.03)" }
    { "r" "~(30)" }
-} rules set
+} >rules
 
-"c(12)&(20)N" axiom set ;
+"c(12)&(20)N" >result ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-: abop-5 ( -- ) lparser-dialect   5 angle set   5 thickness set
+: abop-5 ( -- ) lparser-dialect   [ 5 >angle   5 >thickness ] >model-values
 
 H{ { "a" "F[+(45)l][-(45)l]^;ca" }
 
@@ -409,16 +409,15 @@ H{ { "a" "F[+(45)l][-(45)l]^;ca" }
    { "x" "a" }
 
    { "F" "'(1.17)F'(.855)" }
-} rules set
+} >rules
 
-"&(90)+(90)a" axiom set ;
+"&(90)+(90)a" >result ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-: abop-6 ( -- ) lparser-dialect   5 angle set   5 thickness set
+: abop-6 ( -- ) lparser-dialect   [ 5 >angle   5 >thickness ] >model-values
 
-"&(90)+(90)FFF[-(120)'(.6)x][-(60)'(.8)x][+(120)'(.6)x][+(60)'(.8)x]x"
-axiom set
+"&(90)+(90)FFF[-(120)'(.6)x][-(60)'(.8)x][+(120)'(.6)x][+(60)'(.8)x]x" >result
 
 H{ { "a" "F[cdx][cex]F!(.9)a" }
    { "x" "a" }
@@ -427,13 +426,13 @@ H{ { "a" "F[cdx][cex]F!(.9)a" }
    { "e" "-e" }
 
    { "F" "'(1.25)F'(.8)" }
-} rules set ;
+} >rules ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-: airhorse ( -- ) lparser-dialect 10 angle set 5 thickness set
+: airhorse ( -- ) lparser-dialect [ 10 >angle 5 >thickness ] >model-values
 
-"C" axiom set
+"C" >result
 
 H{ { "C" "LBW" }
 
@@ -463,7 +462,7 @@ H{ { "C" "LBW" }
    { "W" "[%[!!cb][<<<!!cb][>>>!!cb]]" }
    { "b" "Fl!+Fl+;'b" }
    { "l" "[-cc{--z++z++z--|--z++z++z}]" }
-} rules set ;
+} >rules ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
@@ -576,12 +575,3 @@ tabular-output ;
 PROVIDE: lindenmayer ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-
-! reset-turtle
-! koch
-! [
-! model> GL_COMPILE glNewList
-! result> interpret
-! glEndList
-! ] >action
-! slate> relayout-1
