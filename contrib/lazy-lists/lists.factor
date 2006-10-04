@@ -263,3 +263,6 @@ M: lazy-zip cdr ( lazy-zip -- cdr )
 M: lazy-zip nil? ( lazy-zip -- bool )
     drop f ;
     
+: seq>list ( seq -- list )
+  reverse nil [ swap cons ] reduce ;
+
