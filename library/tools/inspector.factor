@@ -12,7 +12,7 @@ SYMBOL: inspector-slots
 
 SYMBOL: inspector-stack
 
-: inspecting ( -- obj ) inspector-stack get peek ;
+: me ( -- obj ) inspector-stack get peek ;
 
 : (inspect) ( obj -- )
     dup inspector-stack get push
@@ -25,8 +25,8 @@ SYMBOL: inspector-stack
 
 : inspector-help ( -- )
     "Object inspector." print
-    "up -- return to previous object" [ up ] print-input
-    "inspecting ( -- obj ) push current object" [ inspecting ] print-input
+    "up -- return to previous object" [ up ] print-quot
+    "me ( -- obj ) push this object" [ me ] print-quot
     "go ( n -- ) inspect nth slot" print
     terpri ;
 

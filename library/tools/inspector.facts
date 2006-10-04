@@ -9,18 +9,18 @@ HELP: inspector-stack
 { $var-description "If the inspector is running, this variable holds previously-inspected objects." }
 { $see-also go up } ;
 
-HELP: inspecting
+HELP: me
 { $description "If the inspector is running, outputs the object currently being inspected." } ;
 
 HELP: inspector
 { $values { "obj" "an object" } }
 { $description "Starts a new inspector and prints a brief help message. If an inspector is already running, this starts a nested inspector. An alternative word that reuses the current inspector instance is " { $link inspect } "." }
-{ $see-also go up inspecting } ;
+{ $see-also go up me } ;
 
 HELP: inspect
 { $values { "obj" "an object" } }
 { $description "If an inspector is already running, displays the slots of the object in the current inspector. If an inspector is not running, starts a new inspector." }
-{ $see-also go up inspecting } ;
+{ $see-also go up me } ;
 
 HELP: go
 { $values { "n" "a non-negative integer" } }

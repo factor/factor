@@ -97,6 +97,6 @@ workspace "Tool window commands" {
 } define-commands
 
 workspace "Workflow commands" {
-    { "Reload changed sources" T{ key-down f f "F8" } [ drop [ reload-modules ] listener-gadget call-tool ] }
-    { "Recompile changed words" T{ key-down f { S+ } "F8" } [ drop [ recompile ] listener-gadget call-tool ] }
+    { "Reload changed sources" T{ key-down f f "F8" } [ drop [ reload-modules ] call-listener ] }
+    { "Recompile changed words" T{ key-down f { S+ } "F8" } [ drop [ recompile ] call-listener ] }
 } define-commands

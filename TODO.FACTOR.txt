@@ -1,8 +1,10 @@
+- print-quot -- present commands directly
 - auto-invoke code gc
 - fix alien-callback/SEH bug on win32
 
 + ui:
 
+- control delegating to a pane is wrong
 - the mouse button overload sucks, use popup menus instead
 - nested presentation mouse over is not right
 - ui quick start doc

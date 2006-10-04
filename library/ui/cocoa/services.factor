@@ -29,7 +29,7 @@ parser prettyprint styles gadgets-listener gadgets-workspace ;
         { "id" "SEL" "id" "id" "void*" }
         [
             nip
-            [ <input> listener-gadget call-tool f ]
+            [ call-listener f ]
             do-service
             2drop
         ]

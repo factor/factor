@@ -47,27 +47,8 @@ C: listener-gadget ( -- gadget )
 M: listener-gadget focusable-child*
     listener-gadget-input ;
 
-: listener-available? ( gadget -- ? )
-    dup listener-gadget? [
-        listener-gadget-input interactor-busy? not
-    ] [
-        drop f
-    ] if ;
-
-G: call-listener ( quot/string listener -- )
-    1 standard-combination ;
-
-M: quotation call-listener
-    listener-gadget-input interactor-call ;
-
-M: string call-listener
-    listener-gadget-input set-editor-text ;
-
-M: input call-listener
-    >r input-string r> call-listener ;
-
-M: listener-gadget call-tool* ( quot/string listener -- )
-    call-listener ;
+M: listener-gadget call-tool* ( input listener -- )
+    >r input-string r> listener-gadget-input set-editor-text ;
 
 M: listener-gadget tool-scroller
     listener-gadget-output find-scroller ;
@@ -75,11 +56,17 @@ M: listener-gadget tool-scroller
 M: listener-gadget tool-help
     drop "ui-listener" ;
 
+: find-listener ( -- listener )
+    listener-gadget find-workspace show-tool tool-gadget ;
+
+: call-listener ( quot -- )
+    find-listener listener-gadget-input interactor-call ;
+
 : listener-run-files ( seq -- )
     dup empty? [
         drop
     ] [
-        [ [ run-file ] each ] curry listener-gadget call-tool
+        [ [ run-file ] each ] curry call-listener
     ] if ;
 
 : listener-eof ( listener -- )

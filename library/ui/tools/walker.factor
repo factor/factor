@@ -71,7 +71,7 @@ M: walker-gadget tool-help drop "ui-walker" ;
 
 : walker-inspect ( walker -- )
     walker-gadget-ns [ meta-interp get ] bind
-    [ inspect ] curry listener-gadget call-tool ;
+    [ inspect ] curry call-listener ;
 
 : walker-step-all ( walker -- )
     dup [ step-all ] walker-command reset-walker

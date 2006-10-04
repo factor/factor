@@ -58,7 +58,7 @@ SYMBOL: restarts
 
 : restart. ( restart n -- )
     [ [ # " :res  " % first % ] "" make ] keep
-    [ :res ] curry print-input ;
+    [ :res ] curry print-quot ;
 
 : restarts. ( -- )
     restarts get dup empty? [
@@ -74,13 +74,13 @@ SYMBOL: restarts
     terpri
     "Debugger commands:" print
     terpri
-    ":help - documentation for this error" [ :help ] print-input
-    ":s    - data stack at exception time" [ :s ] print-input
-    ":r    - retain stack at exception time" [ :r ] print-input
-    ":c    - call stack at exception time" [ :c ] print-input
+    ":help - documentation for this error" [ :help ] print-quot
+    ":s    - data stack at exception time" [ :s ] print-quot
+    ":r    - retain stack at exception time" [ :r ] print-quot
+    ":c    - call stack at exception time" [ :c ] print-quot
 
     error get [ parse-error? ] is? [
-        ":edit - jump to source location" [ :edit ] print-input
+        ":edit - jump to source location" [ :edit ] print-quot
     ] when
 
     ":get  ( var -- value ) accesses variables at time of the error" print

@@ -14,7 +14,7 @@ V{ } clone operations set-global
 
 M: operation invoke-command ( target operation -- )
     dup command-quot swap operation-listener?
-    [ curry listener-gadget call-tool ] [ call ] if ;
+    [ curry call-listener ] [ call ] if ;
 
 : modify-operation ( quot operation -- operation )
     clone

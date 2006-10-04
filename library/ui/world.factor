@@ -43,21 +43,15 @@ C: world ( gadget -- world )
 M: world pref-dim*
     delegate pref-dim* [ >fixnum ] map { 1024 768 } vmin ;
 
-: activate-world-model ( world model -- )
-    [ add-connection ] keep activate-model ;
-
 M: world graft*
-    dup dup world-title activate-world-model
-    dup dup world-status activate-world-model
+    dup dup world-title add-connection
+    dup dup world-status add-connection
     model-changed ;
-
-: deactivate-world-model ( world model -- )
-    [ remove-connection ] keep deactivate-model ;
 
 M: world ungraft*
     dup
-    dup world-title deactivate-world-model
-    dup world-status deactivate-world-model ;
+    dup world-title remove-connection
+    dup world-status remove-connection ;
 
 M: world model-changed
     dup world-title model-value swap set-title ;
