@@ -1,7 +1,7 @@
 USING: kernel alien sequences ;
 IN: alien-contrib
 
-: copy-seq-to-float-array ( seq byte-array -- )
+: copy-seq-to-float-array ( seq byte-array -- byte-array )
 swap dup length [ pick set-float-nth ] 2each ;
 
 : >float-array ( seq -- byte-array )
