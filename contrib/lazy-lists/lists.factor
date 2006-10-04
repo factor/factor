@@ -284,3 +284,8 @@ M: lazy-zip nil? ( lazy-zip -- bool )
 : seq>list ( seq -- list )
   reverse nil [ swap cons ] reduce ;
 
+: lconcat ( list -- result )
+  list>array nil [ lappend ] reduce ;
+
+: lcartesian-product ( list1 list2 -- result ) 
+  swap [ swap [ 2array ] lmap-with ] lmap-with lconcat ;

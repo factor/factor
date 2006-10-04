@@ -89,24 +89,29 @@ HELP: uncons
 { $see-also cons car cdr } ;
 
 HELP: leach
-{ $values { "list" "a cons object" } { "quot" "a quotation with stack effect ( -- )" } }
+{ $values { "list" "a cons object" } { "quot" "a quotation with stack effect ( obj -- )" } }
 { $description "Call the quotation for each item in the list." } 
-{ $see-also lmap ltake lsubset lappend lfrom lfrom-by } ;
+{ $see-also lmap lmap-with ltake lsubset lappend lfrom lfrom-by lconcat lcartesian-product } ;
 
 HELP: lmap
-{ $values { "list" "a cons object" } { "quot" "a quotation with stack effect ( -- X )" } { "result" "resulting cons object" } }
+{ $values { "list" "a cons object" } { "quot" "a quotation with stack effect ( obj -- X )" } { "result" "resulting cons object" } }
 { $description "Perform a similar functionality to that of the " { $link map } " word, but in a lazy manner. No evaluation of the list elements occurs initially but a " { $link <lazy-map> } " object is returned which conforms to the list protocol. Calling " { $link car } ", " { $link cdr } " or " { $link nil? } " on this will evaluate elements as required." } 
-{ $see-also leach ltake lsubset lappend lfrom lfrom-by } ;
+{ $see-also leach ltake lsubset lappend lmap-with  lfrom lfrom-by lconcat lcartesian-product } ;
+
+HELP: lmap-with
+{ $values { "value" "an object" } { "list" "a cons object" } { "quot" "a quotation with stack effect ( obj elt -- X )" } { "result" "resulting cons object" } }
+{ $description "Variant of " { $link lmap } " which pushes a retained object on each invocation of the quotation." } 
+{ $see-also leach ltake lsubset lappend lmap lfrom lfrom-by lconcat lcartesian-product } ;
 
 HELP: ltake
 { $values { "n" "a non negative integer" } { "list" "a cons object" } { "result" "resulting cons object" } }
 { $description "Outputs a lazy list containing the first n items in the list. This is done a lazy manner. No evaluation of the list elements occurs initially but a " { $link <lazy-take> } " object is returned which conforms to the list protocol. Calling " { $link car } ", " { $link cdr } " or " { $link nil? } " on this will evaluate elements as required." } 
-{ $see-also leach lmap lsubset lappend lfrom lfrom-by } ;
+{ $see-also leach lmap lmap-with lsubset lappend lfrom lfrom-by lconcat lcartesian-product } ;
 
 HELP: lsubset
 { $values { "list" "a cons object" } { "quot" "a quotation with stack effect ( -- X )" } { "result" "resulting cons object" } }
 { $description "Perform a similar functionality to that of the " { $link subset } " word, but in a lazy manner. No evaluation of the list elements occurs initially but a " { $link <lazy-subset> } " object is returned which conforms to the list protocol. Calling " { $link car } ", " { $link cdr } " or " { $link nil? } " on this will evaluate elements as required." } 
-{ $see-also leach lmap ltake lappend lfrom lfrom-by } ;
+{ $see-also leach lmap lmap-with ltake lappend lfrom lfrom-by lconcat lcartesian-product } ;
 
 HELP: list>vector
 { $values { "list" "a cons object" } { "vector" "the list converted to a vector" } }
@@ -121,19 +126,29 @@ HELP: list>array
 HELP: lappend
 { $values { "list1" "a cons object" } { "list2" "a cons object" } { "result" "a lazy list of list2 appended to list1" } }
 { $description "Perform a similar functionality to that of the " { $link append } " word, but in a lazy manner. No evaluation of the list elements occurs initially but a " { $link <lazy-append> } " object is returned which conforms to the list protocol. Calling " { $link car } ", " { $link cdr } " or " { $link nil? } " on this will evaluate elements as required. Successive calls to " { $link cdr } " will iterate through list1, followed by list2." } 
-{ $see-also leach lmap ltake lsubset lfrom lfrom-by } ;
+{ $see-also leach lmap lmap-with ltake lsubset lfrom lfrom-by lconcat lcartesian-product } ;
 
 HELP: lfrom-by
 { $values { "n" "an integer" } { "quot" "a quotation with stack effect ( -- int )" } { "result" "a lazy list of integers" } }
 { $description "Return an infinite lazy list of values starting from n, with each successive value being the result of applying quot to n." } 
-{ $see-also leach lmap ltake lsubset lfrom } ;
+{ $see-also leach lmap lmap-with ltake lsubset lfrom lconcat lcartesian-product } ;
 
 HELP: lfrom
 { $values { "n" "an integer" } { "result" "a lazy list of integers" } }
 { $description "Return an infinite lazy list of incrementing integers starting from n." } 
-{ $see-also leach lmap ltake lsubset lfrom-by } ;
+{ $see-also leach lmap lmap-with ltake lsubset lfrom-by lconcat lcartesian-product } ;
 
 HELP: seq>list
 { $values { "seq" "a sequence" } { "list" "a list" } }
 { $description "Convert the sequence into a list." } 
 { $see-also cons } ;
+
+HELP: lconcat
+{ $values { "list" "a list of lists" } { "result" "a list" } }
+{ $description "Concatenates a list of lists together into one list." } 
+{ $see-also leach lmap lmap-with ltake lsubset lcartesian-product lfrom-by } ;
+
+HELP: lcartesian-product
+{ $values { "list1" "a list" } { "list2" "a list" } { "result" "list of cartesian products" } }
+{ $description "Given two lists, return a list containing the cartesian product of those lists." } 
+{ $see-also leach lmap lmap-with lconcat ltake lsubset lfrom-by } ;
