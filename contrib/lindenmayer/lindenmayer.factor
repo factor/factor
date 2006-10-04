@@ -320,6 +320,13 @@ H{ { "S" "FFR>(60)R>(60)R>(60)R>(60)R>(60)R>(30)S" }
    { "F" "'(1.25)F'(.8)" }
 } >rules ;
 
+: tree-5-scene ( -- )
+tree-5
+9 iterations
+build-model
+[ reset-turtle 90 pitch-down -70 step-turtle 50 strafe-up ] camera> with-turtle
+.slate ;
+
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 : abop-1 ( -- ) lparser-dialect   [ 45 >angle   5 >thickness ] >model-values
