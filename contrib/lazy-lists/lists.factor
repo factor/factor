@@ -290,13 +290,6 @@ M: lazy-zip nil? ( lazy-zip -- bool )
 : lcartesian-product ( list1 list2 -- result ) 
   swap [ swap [ 2array ] lmap-with ] lmap-with lconcat ;
 
-: (lcartesian-product*) ( car cdr -- result )
-  dup nil? [ 
-    drop
-  ] [
-    car lcartesian-product 
-  ] if ;
-
 : lcartesian-product* ( lists -- result )
   dup nil? [
     drop nil
