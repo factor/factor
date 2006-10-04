@@ -2,14 +2,16 @@
 ! See http://factorcode.org/license.txt for BSD license.
 IN: gadgets-listener
 USING: compiler arrays gadgets gadgets-frames gadgets-labels
-gadgets-panes gadgets-scrolling gadgets-text gadgets-theme
-gadgets-tracks gadgets-workspace generic hashtables tools io
-kernel listener math models namespaces parser prettyprint
-sequences shells strings styles threads words memory ;
+gadgets-panes gadgets-scrolling gadgets-text gadgets-lists
+gadgets-theme gadgets-tracks gadgets-workspace generic
+hashtables tools io kernel listener math models namespaces
+parser prettyprint sequences shells strings styles threads words
+memory ;
 
-TUPLE: listener-gadget input output stack ;
+TUPLE: listener-gadget input output stack minibuffer use ;
 
 : ui-listener-hook ( listener -- )
+    use get over set-listener-gadget-use
     >r datastack r> listener-gadget-stack set-model ;
 
 : listener-stream ( listener -- stream )
@@ -72,16 +74,6 @@ M: listener-gadget tool-help
 : listener-eof ( listener -- )
     listener-gadget-input f swap interactor-eval ;
 
-: (listener-history) ( listener -- )
-    dup listener-gadget-output [
-        listener-gadget-input interactor-history
-        [ dup print-input ] each
-    ] with-stream* ;
-
-: listener-history ( listener -- )
-    [ [ (listener-history) ] curry ] keep
-    call-listener ;
-
 : clear-listener-output ( listener -- )
     [ listener-gadget-output [ pane-clear ] curry ] keep
     call-listener ;
@@ -89,10 +81,79 @@ M: listener-gadget tool-help
 : clear-listener-stack ( listener -- )
     [ clear ] swap call-listener ;
 
+: hide-minibuffer ( listener -- )
+    dup listener-gadget-minibuffer dup
+    [ over track-remove ] [ drop ] if
+    dup listener-gadget-input request-focus
+    f swap set-listener-gadget-minibuffer ;
+
+: show-minibuffer ( gadget listener -- )
+    [ hide-minibuffer ] keep
+    [ set-listener-gadget-minibuffer ] 2keep
+    dupd track-add request-focus ;
+
+: show-list ( seq presenter action listener -- )
+    >r >r >r <model> r> r> <list> <scroller> r>
+    show-minibuffer ;
+
+: show-history ( listener -- )
+    [
+        listener-gadget-input interactor-history <reversed>
+        [ [ dup print-input ] make-pane ]
+        [
+            find-listener
+            [ listener-gadget-input set-editor-text ] keep
+            hide-minibuffer
+        ]
+    ] keep show-list ;
+
+: insert-completion ( completion -- )
+    find-listener [
+        >r peek word-name r> listener-gadget-input user-input
+    ] keep hide-minibuffer ;
+
+: show-completions ( listener words -- )
+    over listener-gadget-input selected-word swap completions
+    over
+    >r [ [ completion. ] make-pane ] [ insert-completion ] r>
+    show-list ;
+
+: used-words ( listener -- seq )
+    listener-gadget-use
+    [ [ hash-values [ dup set ] each ] each ] make-hash
+    hash-values natural-sort ;
+
 listener-gadget "Listener commands" {
     { "Restart" T{ key-down f { C+ } "r" } [ start-listener ] }
     { "Send EOF" T{ key-down f { C+ } "d" } [ listener-eof ] }
-    { "History" T{ key-down f { C+ } "h" } [ listener-history ] }
-    { "Clear output" T{ key-down f f "CLEAR" } [ clear-listener-output ] }
-    { "Clear stack" T{ key-down f { C+ } "CLEAR" } [ clear-listener-stack ] }
+    {
+        "History"
+        T{ key-down f "UP" }
+        [ show-history ]
+    }
+    {
+        "Clear output"
+        T{ key-down f f "CLEAR" }
+        [ clear-listener-output ]
+    }
+    {
+        "Clear stack"
+        T{ key-down f { C+ } "CLEAR" }
+        [ clear-listener-stack ]
+    }
+    {
+        "Complete word (used vocabs)"
+        T{ key-down f f "TAB" }
+        [ dup used-words show-completions ]
+    }
+    {
+        "Complete word (all vocabs)"
+        T{ key-down f f "TAB" }
+        [ all-words show-completions ]
+    }
+    {
+        "Hide minibuffer"
+        T{ key-down f f "ESCAPE" }
+        [ hide-minibuffer ]
+    }
 } define-commands

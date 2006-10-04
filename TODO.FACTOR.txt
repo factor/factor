@@ -1,17 +1,20 @@
-- print-quot -- present commands directly
 - auto-invoke code gc
 - fix alien-callback/SEH bug on win32
-
-+ ui:
-
+- list mouse gestures
+- search gadget should use list
+- maybe simplify list into displaying list a sequence of strings
 - control delegating to a pane is wrong
 - the mouse button overload sucks, use popup menus instead
 - nested presentation mouse over is not right
 - ui quick start doc
 - x11: scroll up/down wiggles caret
 - slider needs to be modelized
-- [ ] write in the UI breaks stuff
 - some way of intercepting all gestures
+- better help result ranking
+
++ ui:
+
+- [ ] write in the UI breaks stuff
 - pane output in UI should use less memory
 - variable width word wrap
   - needs layout tricks
@@ -23,12 +26,9 @@
   - modules can be (re)loaded
   - keyboard navigation
 - ui browser: show currently selected vocab & words
-  - keyboard-navigatable list gadget of some kind
 - auto-update browser and help when sources reload
 - how do we refer to command shortcuts in the docs?
 - figure out if we need both set-model and set-model*
-- full-height nodes should really be full height
-- better help result ranking
 - roundoff is still not quite right with tracks
 - fix top level window positioning
 - x11.app has a problem with A+ keys

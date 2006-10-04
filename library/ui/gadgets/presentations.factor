@@ -1,5 +1,8 @@
 ! Copyright (C) 2005, 2006 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
+IN: gadgets-listener
+DEFER: call-listener
+
 IN: gadgets-presentations
 USING: arrays definitions gadgets gadgets-borders
 gadgets-buttons gadgets-grids gadgets-labels gadgets-outliner
@@ -94,6 +97,9 @@ presentation H{
         <presentation-mouse-help> ,
     ] { } make make-pile 1 over set-pack-fill ;
 
+: <listener-button> ( gadget quot -- button )
+    [ call-listener ] curry <roll-button> ;
+
 ! Character styles
 
 : apply-style ( style gadget key quot -- style gadget )
@@ -116,12 +122,16 @@ presentation H{
 : apply-presentation-style ( style gadget -- style gadget )
     presented [ <object-presentation> ] apply-style ;
 
+: apply-quotation-style ( style gadget -- style gadget )
+    quotation [ <listener-button> ] apply-style ;
+
 : <styled-label> ( style text -- gadget )
     <label>
     apply-foreground-style
     apply-background-style
     apply-font-style
     apply-presentation-style
+    apply-quotation-style
     nip ;
 
 ! Paragraph styles
@@ -154,6 +164,7 @@ presentation H{
     apply-border-color-style
     apply-page-color-style
     apply-presentation-style
+    apply-quotation-style
     apply-outliner-style
     nip ;
 

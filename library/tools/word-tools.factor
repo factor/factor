@@ -94,8 +94,7 @@ generic ;
     #! triple is { score indices word }
     [
         word-name [ swap fuzzy ] keep swap [ score ] keep
-    ] keep
-    3array ;
+    ] keep 3array ;
 
 : completions ( str words -- seq )
     [ completion ] map-with [ first zero? not ] subset
@@ -107,13 +106,14 @@ generic ;
         [ hilite-style >r ch>string r> format ] [ write1 ] if 
     ] 2each drop ;
 
+: completion. ( completions -- )
+    first3 dup presented associate [
+        dup word-vocabulary write bl word-name fuzzy.
+        " (score: " swap >fixnum number>string ")" append3
+        write
+    ] with-nesting ;
+
 : (apropos) ( str words -- )
-    completions [
-        first3 dup presented associate [
-            dup word-vocabulary write bl word-name fuzzy.
-            " (score: " swap >fixnum number>string ")" append3
-            write
-        ] with-nesting terpri
-    ] each ;
+    completions [ completion. terpri ] each ;
 
 : apropos ( str -- ) all-words (apropos) ;

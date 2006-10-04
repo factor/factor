@@ -65,6 +65,11 @@ USING: gadgets kernel models namespaces sequences ;
 
 : editor-doc-end ( editor -- ) T{ doc-elt } editor-next ;
 
+: selected-word ( editor -- string )
+    dup gadget-selection?
+    [ dup T{ word-elt } select-elt ] unless
+    gadget-selection ;
+
 editor "Editing commands" {
     { "Insert newline" T{ key-down f f "RETURN" } [ "\n" swap user-input ] }
     { "Insert newline" T{ key-down f { S+ } "RETURN" } [ "\n" swap user-input ] }

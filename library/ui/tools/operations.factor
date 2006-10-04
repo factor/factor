@@ -143,26 +143,6 @@ M: operation invoke-command ( target operation -- )
     { +quot+ [ link-name browser call-tool ] }
 } define-operation
 
-! Strings
-[ string? ] H{
-    { +name+ "Apropos (all)" }
-    { +keyboard+ T{ key-down f { A+ } "a" } }
-    { +quot+ [ apropos ] }
-    { +listener+ t }
-} define-operation
-
-: usable-words ( -- seq )
-    [
-        use get [ hash-values [ dup set ] each ] each
-    ] make-hash hash-values natural-sort ;
-
-[ string? ] H{
-    { +name+ "Apropos (used)" }
-    { +keyboard+ T{ key-down f f "TAB" } }
-    { +quot+ [ usable-words (apropos) ] }
-    { +listener+ t }
-} define-operation
-
 ! Quotations
 [ quotation? ] H{
     { +name+ "Infer" }
@@ -216,13 +196,6 @@ tile "Word commands"
 define-commands
 
 ! Interactor commands
-
-! Listener commands
-: selected-word ( editor -- string )
-    dup gadget-selection?
-    [ dup T{ word-elt } select-elt ] unless
-    gadget-selection ;
-
 : word-action ( target -- quot )
     selected-word search ;
 
@@ -234,16 +207,12 @@ interactor "Word commands"
 [ word-action ] modify-listener-operations
 define-commands
 
-interactor "Word search commands"
-string class-operations
-[ selected-word ] modify-listener-operations
-define-commands
-
 interactor "Quotation commands"
 quotation class-operations
 [ quot-action ] modify-listener-operations
 define-commands
 
+! Help commands
 help-gadget "Link commands"
 link class-operations [ help-action ] modify-operations
 [ command-name "Follow" = not ] subset
