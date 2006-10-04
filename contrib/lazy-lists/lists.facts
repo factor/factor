@@ -132,3 +132,8 @@ HELP: lfrom
 { $values { "n" "an integer" } { "result" "a lazy list of integers" } }
 { $description "Return an infinite lazy list of incrementing integers starting from n." } 
 { $see-also leach lmap ltake lsubset lfrom-by } ;
+
+HELP: seq>list
+{ $values { "seq" "a sequence" } { "list" "a list" } }
+{ $description "Convert the sequence into a list." } 
+{ $see-also cons } ;
