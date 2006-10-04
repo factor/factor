@@ -77,7 +77,8 @@
     ("!.*$" . font-lock-comment-face)
     ("( .* )" . font-lock-comment-face)
     "IN:" "USING:" "TUPLE:" "^C:" "^M:" "USE:" "REQUIRE:" "PROVIDE:"
-    "GENERIC:" "SYMBOL:" "PREDICATE:"))
+    "REQUIRES:"
+    "GENERIC:" "SYMBOL:" "PREDICATE:" "VAR:"))
 
 (defun factor-mode ()
   "A mode for editing programs written in the Factor programming language."
