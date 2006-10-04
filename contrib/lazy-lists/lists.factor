@@ -146,6 +146,24 @@ M: lazy-map cdr ( lazy-map -- cdr )
 M: lazy-map nil? ( lazy-map -- bool )
   lazy-map-cons nil? ;
 
+TUPLE: lazy-map-with value cons quot ;
+
+: lmap-with ( value list quot -- result )
+  over nil? [ 3drop nil ] [ <lazy-map-with> <memoized-cons> ] if ;
+
+M: lazy-map-with car ( lazy-map-with -- car )
+  [ lazy-map-with-value ] keep
+  [ lazy-map-with-cons car ] keep
+  lazy-map-with-quot call ;
+
+M: lazy-map-with cdr ( lazy-map-with -- cdr )
+  [ lazy-map-with-value ] keep
+  [ lazy-map-with-cons cdr ] keep
+  lazy-map-with-quot lmap-with ;
+
+M: lazy-map-with nil? ( lazy-map-with -- bool )
+  lazy-map-with-cons nil? ;
+
 TUPLE: lazy-take n cons ;
 
 : ltake ( n list -- result )
