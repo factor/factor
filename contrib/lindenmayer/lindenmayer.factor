@@ -1,6 +1,12 @@
 ! Eduardo Cavazos - wayo.cavazos@gmail.com
 
-REQUIRES: contrib/math contrib/vars ;
+REQUIRES: contrib/math
+          contrib/vars
+          contrib/slate/slate
+          contrib/lindenmayer/opengl
+          contrib/lindenmayer/turtle
+          contrib/lindenmayer/camera
+          contrib/lindenmayer/camera-slate ;
 
 USING: kernel alien namespaces arrays vectors math opengl sequences threads
        hashtables strings gadgets
