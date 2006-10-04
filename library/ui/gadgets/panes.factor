@@ -41,9 +41,41 @@ C: pane ( -- pane )
     [ pick pick pane-current stream-format ]
     [ dup stream-terpri ] interleave 2drop ;
 
+! Panes are streams.
+
+: scroll-pane ( pane -- )
+    dup pane-scrolls? [ scroll>bottom ] [ drop ] if ;
+
+TUPLE: pane-stream pane ;
+
+: do-pane-stream ( pane-stream quot -- )
+    >r pane-stream-pane r> over slip scroll-pane ; inline
+
+M: pane-stream stream-terpri
+    [
+        dup pane-current dup unparent prepare-print
+        over pane-output add-incremental
+        prepare-line
+    ] do-pane-stream ;
+
+M: pane-stream stream-write1
+    [ pane-current stream-write1 ] do-pane-stream ;
+
+M: pane-stream stream-write
+    [ swap "\n" split pane-write ] do-pane-stream ;
+
+M: pane-stream stream-format
+    [ rot "\n" split pane-format ] do-pane-stream ;
+
+M: pane-stream stream-close drop ;
+
+M: pane stream-flush drop ;
+
+M: pane-stream with-stream-style (with-stream-style) ;
+
 GENERIC: write-gadget ( gadget stream -- )
 
-M: pane write-gadget
+M: pane-stream write-gadget
     #! Print a gadget to the given pane.
     pane-current add-gadget ;
 
@@ -57,40 +89,15 @@ M: duplex-stream write-gadget
     #! Print a gadget to the current pane.
     stdio get print-gadget ;
 
-! Panes are streams.
-M: pane stream-flush drop ;
-
-: scroll-pane ( pane -- )
-    dup pane-scrolls? [ scroll>bottom ] [ drop ] if ;
-
-M: pane stream-terpri
-    dup pane-current dup unparent prepare-print
-    over pane-output add-incremental
-    dup prepare-line
-    scroll-pane ;
-
-M: pane stream-write1
-    [ pane-current stream-write1 ] keep scroll-pane ;
-
-M: pane stream-write
-    [ swap "\n" split pane-write ] keep scroll-pane ;
-
-M: pane stream-format
-    [ rot "\n" split pane-format ] keep scroll-pane ;
-
-M: pane stream-close drop ;
-
-M: pane with-stream-style
-    (with-stream-style) ;
-
 : ?terpri
-    dup pane-current gadget-children empty?
+    dup pane-stream-pane pane-current gadget-children empty?
     [ dup stream-terpri ] unless drop ;
 
 : with-pane ( pane quot -- )
     #! Clear the pane and run the quotation in a scope with
     #! stdio set to the pane.
-    over pane-clear over >r with-stream* r> ?terpri ; inline
+    over pane-clear >r <pane-stream> r>
+    over >r with-stream r> ?terpri ; inline
 
 : make-pane ( quot -- pane )
     #! Execute the quotation with output to an output-only pane.

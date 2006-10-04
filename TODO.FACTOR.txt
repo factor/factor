@@ -3,7 +3,6 @@
 - list mouse gestures
 - search gadget should use list
 - maybe simplify list into displaying list a sequence of strings
-- control delegating to a pane is wrong
 - the mouse button overload sucks, use popup menus instead
 - nested presentation mouse over is not right
 - ui quick start doc
@@ -11,6 +10,8 @@
 - slider needs to be modelized
 - some way of intercepting all gestures
 - better help result ranking
+- track add/remove weirdness
+- minibuffer should show a title
 
 + ui:
 

@@ -15,11 +15,13 @@ TUPLE: listener-gadget input output stack minibuffer use ;
     >r datastack r> listener-gadget-stack set-model ;
 
 : listener-stream ( listener -- stream )
-    dup listener-gadget-input swap listener-gadget-output
+    dup listener-gadget-input
+    swap listener-gadget-output <pane-stream>
     <duplex-stream> ;
 
 : <listener-input> ( -- gadget )
-    gadget get listener-gadget-output <interactor> ;
+    gadget get listener-gadget-output
+    <pane-stream> <interactor> ;
 
 : <stack-display> ( -- gadget )
     gadget get listener-gadget-stack
