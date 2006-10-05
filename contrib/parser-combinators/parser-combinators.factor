@@ -1,25 +1,6 @@
 ! Copyright (C) 2004 Chris Double.
-! 
-! Redistribution and use in source and binary forms, with or without
-! modification, are permitted provided that the following conditions are met:
-! 
-! 1. Redistributions of source code must retain the above copyright notice,
-!    this list of conditions and the following disclaimer.
-! 
-! 2. Redistributions in binary form must reproduce the above copyright notice,
-!    this list of conditions and the following disclaimer in the documentation
-!    and/or other materials provided with the distribution.
-! 
-! THIS SOFTWARE IS PROVIDED ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES,
-! INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND
-! FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
-! DEVELOPERS AND CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
-! SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
-! PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS;
-! OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
-! WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
-! OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
-! ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+! See http://factorcode.org/license.txt for BSD license.
+!
 USING: lazy-lists kernel sequences strings math io arrays errors namespaces ;
 IN: parser-combinators
 
@@ -112,30 +93,19 @@ TUPLE: parse-result parsed unparsed ;
   #! Return a fail-parser.
   [ fail-parser ] ;
 
-: <&>-do-parser3 ( <parse-result> x -- result )
-  #! Called by <&>-do-parser2 on each result of the
-  #! parse from parser2. 
-  >r dup parse-result-unparsed swap parse-result-parsed r>
-  swap 2array  swap <parse-result> ;
-
-: <&>-do-parser2 ( <parse-result> parser2 -- result )
-  #! Called by the <&>-parser on each result of the
-  #! successfull parse of parser1. It's input is the
-  #! cons containing the data parsed and the remaining
-  #! input. This word will parser2 on the remaining input
-  #! returning a new cons cell containing the combined
-  #! parse result.
-  >r dup parse-result-parsed swap parse-result-unparsed r>
-  call swap
-  [ <&>-do-parser3 ] curry lmap ;
-
-: <&>-parser ( input parser1 parser2 -- llist )
+: <&>-parser ( input parser1 parser2 -- parser )
   #! Parse 'input' by sequentially combining the
   #! two parsers. First parser1 is applied to the
   #! input then parser2 is applied to the rest of
   #! the input strings from the first parser. 
-  >r call r>
-  [ <&>-do-parser2 ] curry lmap list>array nil [ lappend ] reduce ;
+  >r call r> swap [
+    dup parse-result-unparsed rot call 
+    [
+      >r parse-result-parsed r>
+      [ parse-result-parsed 2array ] keep
+      parse-result-unparsed <parse-result>
+    ] lmap-with
+  ] lmap-with lconcat ;  
 
 : <&> ( parser1 parser2 -- parser )
   #! Sequentially combine two parsers, returning a parser
