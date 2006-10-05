@@ -104,7 +104,7 @@ M: browser focusable-child* browser-search ;
 : clear-browser ( browser -- )
     browser-definitions close-definitions ;
 
-browser "Browser commands" {
+browser "Toolbar" {
     { "Clear" T{ key-down f f "CLEAR" } [ clear-browser ] }
 } define-commands
 

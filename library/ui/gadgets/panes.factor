@@ -25,6 +25,13 @@ C: pane ( -- pane )
     <pile> <incremental> over add-output
     dup prepare-line ;
 
+! Panes are streams.
+
+: scroll-pane ( pane -- )
+    dup pane-scrolls? [ scroll>bottom ] [ drop ] if ;
+
+TUPLE: pane-stream pane ;
+
 : prepare-print ( current -- gadget )
     #! Optimization: if line has 1 child, add the child.
     dup gadget-children {
@@ -33,30 +40,24 @@ C: pane ( -- pane )
         { [ t ] [ drop ] }
     } cond ;
 
+: pane-terpri ( pane -- )
+    dup pane-current dup unparent prepare-print
+    over pane-output add-incremental
+    prepare-line ;
+
 : pane-write ( pane seq -- )
     [ over pane-current stream-write ]
-    [ dup stream-terpri ] interleave drop ;
+    [ dup pane-terpri ] interleave drop ;
 
 : pane-format ( style pane seq -- )
     [ pick pick pane-current stream-format ]
-    [ dup stream-terpri ] interleave 2drop ;
-
-! Panes are streams.
-
-: scroll-pane ( pane -- )
-    dup pane-scrolls? [ scroll>bottom ] [ drop ] if ;
-
-TUPLE: pane-stream pane ;
+    [ dup pane-terpri ] interleave 2drop ;
 
 : do-pane-stream ( pane-stream quot -- )
     >r pane-stream-pane r> over slip scroll-pane ; inline
 
 M: pane-stream stream-terpri
-    [
-        dup pane-current dup unparent prepare-print
-        over pane-output add-incremental
-        prepare-line
-    ] do-pane-stream ;
+    [ pane-terpri ] do-pane-stream ;
 
 M: pane-stream stream-write1
     [ pane-current stream-write1 ] do-pane-stream ;

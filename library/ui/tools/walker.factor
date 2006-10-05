@@ -77,7 +77,7 @@ M: walker-gadget tool-help drop "ui-walker" ;
     dup [ step-all ] walker-command reset-walker
     find-workspace listener-gadget select-tool ;
 
-walker-gadget "Walker commands" {
+walker-gadget "Toolbar" {
     { "Step" T{ key-down f f "s" } [ walker-step ] }
     { "Step in" T{ key-down f f "i" } [ walker-step-in ] }
     { "Step out" T{ key-down f f "o" } [ walker-step-out ] }

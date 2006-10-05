@@ -135,9 +135,8 @@ M: listener-gadget tool-help
     [ [ hash-values [ dup set ] each ] each ] make-hash
     hash-values natural-sort ;
 
-listener-gadget "Listener commands" {
+listener-gadget "Toolbar" {
     { "Restart" T{ key-down f { C+ } "r" } [ start-listener ] }
-    { "Send EOF" T{ key-down f { C+ } "d" } [ listener-eof ] }
     {
         "History"
         T{ key-down f { C+ } "h" }
@@ -153,6 +152,10 @@ listener-gadget "Listener commands" {
         T{ key-down f { C+ } "CLEAR" }
         [ clear-listener-stack ]
     }
+    { "Send EOF" T{ key-down f { C+ } "d" } [ listener-eof ] }
+} define-commands
+
+listener-gadget "Listener commands" {
     {
         "Complete word (used vocabs)"
         T{ key-down f f "TAB" }

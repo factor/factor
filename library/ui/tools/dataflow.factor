@@ -188,7 +188,7 @@ DEFER: (compute-heights)
 ! The UI tool
 TUPLE: dataflow-gadget history search ;
 
-dataflow-gadget "History commands" {
+dataflow-gadget "Toolbar" {
     { "Back" T{ key-down f { C+ } "b" } [ dataflow-gadget-history go-back ] }
     { "Forward" T{ key-down f { C+ } "f" } [ dataflow-gadget-history go-forward ] }
 } define-commands

@@ -211,9 +211,3 @@ interactor "Quotation commands"
 quotation class-operations
 [ quot-action ] modify-listener-operations
 define-commands
-
-! Help commands
-help-gadget "Link commands"
-link class-operations [ help-action ] modify-operations
-[ command-name "Follow" = not ] subset
-define-commands

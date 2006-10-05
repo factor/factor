@@ -10,7 +10,6 @@
 - slider needs to be modelized
 - some way of intercepting all gestures
 - better help result ranking
-- track add/remove weirdness
 - minibuffer should show a title
 
 + ui:

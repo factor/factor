@@ -120,7 +120,7 @@ C: titled-gadget ( gadget title -- )
     windows get [ empty? not ] [ f ] if* ;
 
 : <toolbar> ( target classes -- toolbar )
-    [ [ commands hash-values [ % ] each ] each ] { } make
+    [ commands "Toolbar" swap hash ] map concat
     [ <command-presentation> ] map-with
     make-shelf ;
 

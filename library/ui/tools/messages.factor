@@ -2,7 +2,8 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: compiler kernel gadgets-tracks gadgets-scrolling
 gadgets-workspace gadgets-panes gadgets-presentations
-gadgets-buttons inference errors io math gadgets namespaces ;
+gadgets-buttons inference errors io math gadgets namespaces
+generic ;
 IN: gadgets-messages
 
 TUPLE: messages counter errors errors# warnings warnings# ;
@@ -22,13 +23,13 @@ M: messages compile-begins
 : messages-warnings+
     dup messages-warnings# 1+ swap set-messages-warnings# ;
 
+M: object inference-error-major? drop t ;
+
 M: messages compile-error
-    over inference-error?
-    [ over inference-error-major? ]
-    [ t ] if
+    over inference-error-major?
     [ dup messages-errors+ messages-errors ]
     [ dup messages-warnings+ messages-warnings ] if
-    [ error. ] with-stream ;
+    <pane-stream> [ error. ] with-stream ;
 
 : <messages-button> ( -- gadget )
     "Compiler messages"
