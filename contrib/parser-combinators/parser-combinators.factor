@@ -176,21 +176,13 @@ TUPLE: parse-result parsed unparsed ;
   #! Creates a 'some-parser'.
   [ some-parser ] curry ;
 
-: <&-parser ( input parser1 parser2 -- result )
-  #! Same as <&> except discard the results of the second parser.
-  <&> [ first ] <@ call ;
-
 : <& ( parser1 parser2 -- parser )
   #! Same as <&> except discard the results of the second parser.
-  [ <&-parser ] curry curry ;
-
-: &>-parser ( input parser1 parser2 -- result )
-  #! Same as <&> except discard the results of the first parser.
-  <&> [ second ] <@ call ;
+  <&> [ first ] <@ ;
 
 : &> ( parser1 parser2 -- parser )
   #! Same as <&> except discard the results of the first parser.
-  [ &>-parser ] curry curry ;
+  <&> [ second ] <@ ;
 
 : <:&>-parser ( input parser1 parser2 -- result )
   #! Same as <&> except flatten the result.
