@@ -16,14 +16,6 @@ M: operation invoke-command ( target operation -- )
     dup command-quot swap operation-listener?
     [ curry call-listener ] [ call ] if ;
 
-: modify-operation ( quot operation -- operation )
-    clone
-    [ command-quot append ] keep
-    [ set-command-quot ] keep ;
-
-: modify-operations ( operations quot -- operations )
-    swap [ modify-operation ] map-with ;
-
 : modify-listener-operation ( quot operation -- operation )
     clone t over set-operation-listener?
     modify-operation ;

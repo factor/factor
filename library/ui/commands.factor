@@ -92,3 +92,11 @@ SYMBOL: operations
     swap object-operations
     [ operation-mouse = ] subset-with
     dup empty? [ drop f ] [ peek ] if ;
+
+: modify-operation ( quot operation -- operation )
+    clone
+    [ command-quot append ] keep
+    [ set-command-quot ] keep ;
+
+: modify-operations ( operations quot -- operations )
+    swap [ modify-operation ] map-with ;
