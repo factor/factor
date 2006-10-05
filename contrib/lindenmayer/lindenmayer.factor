@@ -259,8 +259,6 @@ H{ { "+" [ angle get     turn-left ] }
 } command-table set ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-! Examples
-! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 VAR: axiom
 VAR: result
@@ -271,6 +269,95 @@ VAR: result
 
 : iterations ( n -- ) [ iterate ] times ;
 
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+VAR: model
+
+: init-model ( -- ) 1 glGenLists >model ;
+
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+: display ( -- )
+
+black gl-clear-color
+
+GL_FLAT glShadeModel
+
+GL_PROJECTION glMatrixMode
+glLoadIdentity
+-1 1 -1 1 1.5 200 glFrustum
+
+GL_MODELVIEW glMatrixMode
+
+glLoadIdentity
+
+[ do-look-at ] camera> with-turtle
+
+GL_COLOR_BUFFER_BIT glClear
+
+GL_FRONT_AND_BACK GL_LINE glPolygonMode
+
+white gl-color
+GL_LINES glBegin { 0 0 0 } gl-vertex { 0 0 1 } gl-vertex glEnd
+
+color-index> set-color-index
+
+model> glCallList ;
+
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+: init-turtle ( -- ) <turtle> >turtle ;
+
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+: init-camera ( -- ) <turtle> >camera ;
+
+: reset-camera ( -- ) [
+reset-turtle
+45 turn-left
+45 pitch-up
+5 step-turtle
+180 turn-left
+] camera> with-turtle ;
+
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+: init-slate ( -- )
+<camera-slate> >slate
+namespace slate> set-slate-ns
+slate> "L-system" open-titled-window
+[ display ] >action ;
+
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+: init ( -- )
+init-turtle
+init-turtle-stack
+init-camera reset-camera
+init-model
+
+2 >color-index
+init-color-table
+
+init-slate ;
+
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+: result>model ( -- )
+[ model> GL_COMPILE glNewList result> interpret glEndList ] >action .slate ;
+
+: build-model ( -- )
+reset-state-stack
+reset-vertices
+reset-turtle
+default-values> call
+model-values> call
+result>model
+3000 sleep
+[ display ] >action .slate ;
+
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+! Examples
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 : koch ( -- ) lparser-dialect   [ 90 >angle ] >model-values
@@ -470,93 +557,6 @@ H{ { "C" "LBW" }
    { "b" "Fl!+Fl+;'b" }
    { "l" "[-cc{--z++z++z--|--z++z++z}]" }
 } >rules ;
-
-! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-
-VAR: model
-
-: init-model ( -- ) 1 glGenLists >model ;
-
-! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-
-: display ( -- )
-
-black gl-clear-color
-
-GL_FLAT glShadeModel
-
-GL_PROJECTION glMatrixMode
-glLoadIdentity
--1 1 -1 1 1.5 200 glFrustum
-
-GL_MODELVIEW glMatrixMode
-
-glLoadIdentity
-
-[ do-look-at ] camera> with-turtle
-
-GL_COLOR_BUFFER_BIT glClear
-
-GL_FRONT_AND_BACK GL_LINE glPolygonMode
-
-white gl-color
-GL_LINES glBegin { 0 0 0 } gl-vertex { 0 0 1 } gl-vertex glEnd
-
-color-index> set-color-index
-
-model> glCallList ;
-
-! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-
-: init-turtle ( -- ) <turtle> >turtle ;
-
-! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-
-: init-camera ( -- ) <turtle> >camera ;
-
-: reset-camera ( -- ) [
-reset-turtle
-45 turn-left
-45 pitch-up
-5 step-turtle
-180 turn-left
-] camera> with-turtle ;
-
-! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-
-: init-slate ( -- )
-<camera-slate> >slate
-namespace slate> set-slate-ns
-slate> "L-system" open-titled-window
-[ display ] >action ;
-
-! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-
-: init ( -- )
-init-turtle
-init-turtle-stack
-init-camera reset-camera
-init-model
-
-2 >color-index
-init-color-table
-
-init-slate ;
-
-! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-
-: result>model ( -- )
-[ model> GL_COMPILE glNewList result> interpret glEndList ] >action .slate ;
-
-: build-model ( -- )
-reset-state-stack
-reset-vertices
-reset-turtle
-default-values> call
-model-values> call
-result>model
-3000 sleep
-[ display ] >action .slate ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
