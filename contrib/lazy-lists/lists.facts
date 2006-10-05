@@ -157,3 +157,13 @@ HELP: lcartesian-product*
 { $values { "list" "a list of lists" } { "result" "list of cartesian products" } }
 { $description "Given a list of lists, return a list containing the cartesian product of those lists." } 
 { $see-also leach lmap lmap-with lconcat ltake lsubset lfrom-by lcartesian-product } ;
+
+HELP: lcomp2
+{ $values { "list1" "a list" } { "list2" "a list" } { "quot" "a quotation with stack effect ( A B -- C )" } { "list" "the resulting list" } }
+{ $description "List comprehension for the case where there are two input lists. The cartesian product of the two lists is generated and 'quot' called with each element from the cartesian product on the stack, the result of which is returned in the final 'list'." } 
+{ $see-also leach lmap lmap-with lconcat ltake lsubset lfrom-by lcartesian-product lcomp3 } ;
+
+HELP: lcomp3
+{ $values { "list1" "a list" } { "list2" "a list" } { "list3" "a list" } { "quot" "a quotation with stack effect ( A B C -- D )" } { "list" "the resulting list" } }
+{ $description "List comprehension for the case where there are three input lists. The cartesian product of the lists are generated and 'quot' called with each element from the cartesian product on the stack, the result of which is returned in the final 'list'." } 
+{ $see-also leach lmap lmap-with lconcat ltake lsubset lfrom-by lcartesian-product lcomp2 } ;

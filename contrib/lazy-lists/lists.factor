@@ -51,6 +51,9 @@ M: cons nil? ( cons -- bool )
 : 2list ( a b -- cons )
     nil <cons> <cons> ;
 
+: 3list ( a b c -- cons )
+    nil <cons> <cons> <cons> ;
+
 ! Both 'car' and 'cdr' are promises  
 : lazy-cons ( car cdr -- promise ) 
     >r <promise> r> <promise> <cons> 
@@ -298,3 +301,9 @@ M: lazy-zip nil? ( lazy-zip -- bool )
       swap [ swap [ add ] lmap-with ] lmap-with lconcat     
     ] reduce    
   ] if ;
+
+: lcomp2 ( list1 list2 quot -- list )
+  >r lcartesian-product r> swap [ swap >r first2 r> call ] lmap-with  ;
+
+: lcomp3 ( list1 list2 list3 quot -- list )
+  >r 3array seq>list lcartesian-product* r> swap [ swap >r first3 r> call ] lmap-with  ;
