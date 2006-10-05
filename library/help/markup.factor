@@ -135,10 +135,13 @@ M: f print-element drop ;
 ! Some links
 : >link ( obj -- obj ) dup link? [ <link> ] unless ;
 
-: $link ( element -- )
-    first link-style [
+: ($link) ( article -- )
+    link-style [
         dup article-title swap >link write-object
     ] with-style ;
+
+: $link ( element -- )
+    first ($link) ;
 
 : $vocab-link ( element -- )
     first link-style [

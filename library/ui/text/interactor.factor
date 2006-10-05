@@ -60,4 +60,5 @@ M: interactor stream-readln
 
 interactor "Interactor commands" {
     { "Evaluate" T{ key-down f f "RETURN" } [ interactor-commit ] }
+    { "Clear input" T{ key-down f { C+ } "k" } [ control-model clear-doc ] }
 } define-commands

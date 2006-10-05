@@ -1,7 +1,6 @@
 - auto-invoke code gc
 - fix alien-callback/SEH bug on win32
 - list mouse gestures
-- search gadget should use list
 - maybe simplify list into displaying list a sequence of strings
 - the mouse button overload sucks, use popup menus instead
 - nested presentation mouse over is not right
@@ -12,10 +11,8 @@
 - better help result ranking
 - minibuffer should show a title
 - browser: toolbar is missing
-- new search gadget:
-  - field does not move caret properly
-  - use it instead of the old search gadget
-  - listener: 'edit a file' feature
+- listener: 'edit a file' feature
+- viewport sizing issue
 
 + ui:
 

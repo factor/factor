@@ -22,8 +22,18 @@ TUPLE: help-gadget pane history search ;
 
 C: help-gadget ( -- gadget )
     dup init-history {
-        { [ <help-pane> ] set-help-gadget-pane [ <scroller> ] 4/5 }
-        { [ [ search-help. ] <search-gadget> ] set-help-gadget-search f 1/5 }
+        {
+            [ <help-pane> ]
+            set-help-gadget-pane
+            [ <scroller> ]
+            4/5
+        }
+        {
+            [ "" [ help-gadget call-tool ] <help-search> ]
+            set-help-gadget-search
+            f
+            1/5
+        }
     } { 0 1 } make-track* ;
 
 M: help-gadget focusable-child* help-gadget-search ;

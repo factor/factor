@@ -128,7 +128,7 @@ M: listener-gadget tool-help
 
 : insert-completion ( completion -- )
     find-listener [
-        >r peek word-name r> listener-gadget-input user-input
+        >r word-name r> listener-gadget-input user-input
     ] keep hide-minibuffer ;
 
 listener-gadget "Toolbar" {

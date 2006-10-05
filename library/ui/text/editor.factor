@@ -123,7 +123,8 @@ M: editor model-changed
     ] when drop ;
 
 M: loc-monitor model-changed
-    loc-monitor-editor control-self scroll>caret ;
+    loc-monitor-editor control-self
+    dup relayout-1 scroll>caret ;
 
 : draw-caret ( -- )
     editor get editor-focused? [

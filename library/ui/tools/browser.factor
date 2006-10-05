@@ -45,7 +45,7 @@ TUPLE: tile definition gadget ;
     <default-border> dup faint-boundary ;
 
 C: tile ( definition -- gadget )
-    2dup { tile } <toolbar>
+    2dup { tile } "Word commands" <toolbar>
     <tile-content> over set-gadget-delegate
     [ set-tile-definition ] keep ;
 
@@ -87,9 +87,24 @@ C: navigator ( -- gadget )
 
 C: browser ( -- gadget )
     {
-        { [ <navigator> ] set-browser-navigator f 1/5 }
-        { [ <definitions> ] set-browser-definitions [ <scroller> ] 3/5 }
-        { [ [ apropos ] <search-gadget> ] set-browser-search f 1/5 }
+        {
+            [ <navigator> ]
+            set-browser-navigator
+            f
+            1/5
+        }
+        {
+            [ <definitions> ]
+            set-browser-definitions
+            [ <scroller> ]
+            3/5
+        }
+        {
+            [ "" [ browser call-tool ] <word-search> ]
+            set-browser-search
+            f
+            1/5
+        }
     } { 0 1 } make-track* ;
 
 M: browser focusable-child* browser-search ;

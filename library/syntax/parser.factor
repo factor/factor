@@ -107,7 +107,7 @@ TUPLE: bad-escape ;
 global [
     {
         "scratchpad" "syntax" "arrays" "compiler" "definitions"
-        "errors" "generic" "hashtables" "help" "inference"
+        "errors" "generic" "hashtables" "inference"
         "io" "kernel" "listener" "math"
         "memory" "modules" "namespaces" "parser" "prettyprint"
         "sequences" "shells" "strings" "styles" "test"

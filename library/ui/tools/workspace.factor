@@ -11,8 +11,18 @@ gadgets-scrolling gadgets-panes gadgets-messages ;
 
 C: tool ( gadget -- tool )
     {
-        { [ dup dup class tool 2array <toolbar> ] f f @top }
-        { [ ] set-tool-gadget f @center }
+        {
+            [ dup dup class tool 2array "Toolbar" <toolbar> ]
+            f
+            f
+            @top
+        }
+        {
+            f
+            set-tool-gadget
+            f
+            @center
+        }
     } make-frame* ;
 
 M: tool focusable-child* tool-gadget ;
