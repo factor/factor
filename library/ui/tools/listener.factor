@@ -73,8 +73,11 @@ M: listener-gadget tool-help
 : find-listener ( -- listener )
     listener-gadget find-workspace show-tool tool-gadget ;
 
+: (call-listener) ( quot listener -- )
+    listener-gadget-input interactor-call ;
+
 : call-listener ( quot -- )
-    find-listener listener-gadget-input interactor-call ;
+    find-listener (call-listener) ;
 
 : listener-run-files ( seq -- )
     dup empty? [
@@ -88,10 +91,10 @@ M: listener-gadget tool-help
 
 : clear-listener-output ( listener -- )
     [ listener-gadget-output [ pane-clear ] curry ] keep
-    call-listener ;
+    (call-listener) ;
 
 : clear-listener-stack ( listener -- )
-    [ clear ] swap call-listener ;
+    [ clear ] swap (call-listener) ;
 
 : hide-minibuffer ( listener -- )
     dup listener-gadget-minibuffer dup
