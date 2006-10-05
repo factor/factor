@@ -302,8 +302,8 @@ M: lazy-zip nil? ( lazy-zip -- bool )
     ] reduce    
   ] if ;
 
-: lcomp2 ( list1 list2 quot -- list )
-  >r lcartesian-product r> swap [ swap >r first2 r> call ] lmap-with  ;
+: lcomp ( list quot -- result )
+  >r lcartesian-product* r> lmap ;
 
-: lcomp3 ( list1 list2 list3 quot -- list )
-  >r 3array seq>list lcartesian-product* r> swap [ swap >r first3 r> call ] lmap-with  ;
+: lcomp* ( list guards quot -- result )
+  >r >r lcartesian-product* r> [ lsubset ] each r> lmap ;
