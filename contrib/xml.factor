@@ -67,7 +67,8 @@ M: xml-string-error error.
     char "\n\r" member? [ 0 column set line ] [ column ] if
     inc ;
 
-: skip-until ( quot -- | quot: char -- ? )
+: skip-until ( quot -- )
+    #! quot: ( char -- ? )
     more? [
         char swap [ call ] keep swap [ drop ] [
              incr-spot skip-until
@@ -152,7 +153,8 @@ M: xml-string-error error.
 
 !   -- Parsing tags
 
-: in-range-seq? ( number { { min max } ... } -- ? )
+: in-range-seq? ( number seq -- ? )
+    #! seq: { { min max } { min max }* }
     [ first2 between? ] contains-with? ;
 
 : name-start-char? ( ch -- ? )

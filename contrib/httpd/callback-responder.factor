@@ -71,7 +71,7 @@ reset-callback-table
 #! Tuple for holding data related to a callback.
 TUPLE: item quot expire? request id  time-added ;
 
-C: item ( quot data data-quot expire? id -- item )
+C: item ( quot expire? request id -- item )
     millis over set-item-time-added
     [ set-item-id ] keep
     [ set-item-request ] keep

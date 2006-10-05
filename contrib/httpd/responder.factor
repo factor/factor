@@ -104,20 +104,17 @@ SYMBOL: responders
     ] make-hash add-responder ;
 
 : make-responder ( quot -- responder )
+    #! quot has stack effect ( url -- )
     [
-        ( url -- )
         [
             drop "GET method not implemented" httpd-error
         ] "get" set
-        ( url -- )
         [
             drop "POST method not implemented" httpd-error
         ] "post" set
-        ( url -- )
         [
             drop "HEAD method not implemented" httpd-error
         ] "head" set
-        ( url -- )
         [
             drop bad-request
         ] "bad" set

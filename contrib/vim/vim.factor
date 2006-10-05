@@ -1,6 +1,6 @@
 IN: vim
-USING: definitions embedded io kernel parser prettyprint process
-sequences namespaces ;
+USING: definitions embedded io kernel namespaces parser prettyprint process
+sequences ;
 
 : vim-location ( file line -- )
     >r [ file-modified ] keep r>

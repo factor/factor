@@ -55,7 +55,7 @@ SYMBOL: html
 
 : write-html H{ { html t } } format ;
 
-: html-word ( name def -- )
+: html-word ( name def -- word )
     #! Define 'word creating' word to allow
     #! dynamically creating words.
     >r "html" create dup r> define-compound ;
