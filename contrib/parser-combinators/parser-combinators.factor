@@ -4,48 +4,50 @@
 USING: lazy-lists kernel sequences strings math io arrays errors namespaces ;
 IN: parser-combinators
 
+! Parser combinator protocol
+GENERIC: (parse) ( input parser -- list )
+
+: parse ( input parser -- promise )
+  [ (parse) ] curry curry <promise> ;
+
 TUPLE: parse-result parsed unparsed ;
+
+: ?head-slice ( seq begin -- newseq ? )
+  2dup head? [ length tail-slice t ] [ drop f ] if ;
+
+: unclip-slice ( seq -- rest first )
+  dup 1 tail-slice swap first ;
 
 : h:t ( object -- head tail )
   #! Return the head and tail of the object.
   dup empty? [ dup first swap 1 tail ] unless ;
 
-: token-parser ( inp sequence -- llist )
-  #! A parser that parses a specific sequence of
-  #! characters.
-  [
-    2dup length head over = [
-      swap over length tail <parse-result> 1list
-    ] [
-      2drop nil
-    ] if 
-  ] [
-    3drop nil
-  ] recover ;
+TUPLE: token-parser string ;
 
 : token ( string -- parser )
-  #! Return a token parser that parses the given string.
-  [ token-parser ] curry ;
+  <token-parser> ;
 
-: satisfy-parser ( inp pred -- llist )
+M: token-parser (parse) ( input parser -- list )
+  token-parser-string swap over ?head-slice [
+    <parse-result> 1list    
+  ] [
+    2drop nil
+  ] if ;
+
+TUPLE: satisfy-parser quot ;
+
+: satisfy ( quot -- parser )
+  <satisfy-parser> ;
+
+M: satisfy-parser (parse) ( input parser -- list )
   #! A parser that succeeds if the predicate,
   #! when passed the first character in the input, returns
   #! true.
-  over empty? [
+  satisfy-parser-quot >r unclip-slice dup r> call [
+    swap <parse-result> 1list
+  ] [
     2drop nil
-  ] [        
-    over first swap call [
-      h:t <parse-result> 1list
-    ] [
-      drop nil
-    ] if
   ] if ;
-  
-: satisfy ( p -- parser )
-  #! Return a parser that succeeds if the predicate 'p',
-  #! when passed the first character in the input, returns
-  #! true.
-  [ satisfy-parser ] curry ;
 
 : satisfy2-parser ( inp pred quot -- llist )
   #! A parser that succeeds if the predicate,
