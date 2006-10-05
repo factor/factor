@@ -4,7 +4,7 @@
 ! Updated by Matthew Willis, July 2006
 ! Updated by Chris Double, September 2006
 !
-USING: kernel sequences math vectors arrays namespaces generic ;
+USING: kernel sequences math vectors arrays namespaces generic errors ;
 IN: lazy-lists
 
 TUPLE: promise quot forced? value ;
@@ -22,9 +22,13 @@ C: promise ( quot -- promise ) [ set-promise-quot ] keep ;
     promise-value ;
 
 TUPLE: cons car cdr ;
-GENERIC: car  ( cons -- car )
-GENERIC: cdr  ( cons -- cdr )
-GENERIC: nil? ( cons -- bool )
+GENERIC: car   ( cons -- car )
+GENERIC: cdr   ( cons -- cdr )
+GENERIC: nil?  ( cons -- bool )
+GENERIC: list? ( object -- bool )
+
+M: object list? ( object -- bool )
+  drop f ;
 
 C: cons ( car cdr -- list ) 
     [ set-cons-cdr ] keep 
@@ -41,6 +45,9 @@ M: cons cdr ( cons -- cdr )
 
 M: cons nil? ( cons -- bool )
     nil eq? ;
+
+M: cons list? ( object -- bool )
+  drop t ;
 
 : cons ( car cdr -- list )
     <cons> ;
@@ -67,6 +74,9 @@ M: promise cdr ( promise -- cdr )
 
 M: promise nil? ( cons -- bool )
   force nil? ;
+
+M: promise list? ( object -- bool )
+  drop t ;
 
 DEFER: lunit 
 DEFER: lnth 
@@ -133,6 +143,9 @@ M: memoized-cons nil? ( memoized-cons -- bool )
     memoized-cons-nil?
   ] if ;
 
+M: memoized-cons list? ( object -- bool )
+  drop t ;
+
 TUPLE: lazy-map cons quot ;
 
 : lmap ( list quot -- result )
@@ -148,6 +161,9 @@ M: lazy-map cdr ( lazy-map -- cdr )
 
 M: lazy-map nil? ( lazy-map -- bool )
   lazy-map-cons nil? ;
+
+M: lazy-map list? ( object -- bool )
+  drop t ;
 
 TUPLE: lazy-map-with value cons quot ;
 
@@ -167,6 +183,9 @@ M: lazy-map-with cdr ( lazy-map-with -- cdr )
 M: lazy-map-with nil? ( lazy-map-with -- bool )
   lazy-map-with-cons nil? ;
 
+M: lazy-map-with list? ( object -- bool )
+  drop t ;
+
 TUPLE: lazy-take n cons ;
 
 : ltake ( n list -- result )
@@ -181,6 +200,9 @@ M: lazy-take cdr ( lazy-take -- cdr )
 
 M: lazy-take nil? ( lazy-take -- bool )
   lazy-take-n zero? ;
+
+M: lazy-take list? ( object -- bool )
+  drop t ;
 
 TUPLE: lazy-subset cons quot ;
 
@@ -221,6 +243,9 @@ M: lazy-subset nil? ( lazy-subset -- bool )
     ] if 
   ] if ;
 
+M: lazy-subset list? ( object -- bool )
+  drop t ;
+
 : list>vector ( list -- vector )
   [ [ , ] leach ] V{ } make ;
 
@@ -251,6 +276,9 @@ M: lazy-append nil? ( lazy-append -- bool )
     lazy-append-list2 nil? 
   ] if ;
 
+M: lazy-append list? ( object -- bool )
+  drop t ;
+
 TUPLE: lazy-from-by n quot ;
 
 : lfrom-by ( n quot -- list )
@@ -269,6 +297,9 @@ M: lazy-from-by cdr ( lazy-from-by -- cdr )
 M: lazy-from-by nil? ( lazy-from-by -- bool )
   drop f ;
   
+M: lazy-from-by list? ( object -- bool )
+  drop t ;
+
 TUPLE: lazy-zip list1 list2 ;
 
 : lzip ( list1 list2 -- lazy-zip )
@@ -283,9 +314,39 @@ M: lazy-zip cdr ( lazy-zip -- cdr )
 
 M: lazy-zip nil? ( lazy-zip -- bool )
     drop f ;
-    
-: seq>list ( seq -- list )
-  reverse nil [ swap cons ] reduce ;
+
+M: lazy-zip list? ( object -- bool )
+  drop t ;
+
+TUPLE: sequence-cons index seq ;
+
+: seq>list ( index seq -- list )
+  2dup length >= [
+    2drop nil
+  ] [
+    <sequence-cons>
+  ] if ;
+
+M: sequence-cons car ( sequence-cons -- car )
+  [ sequence-cons-index ] keep
+  sequence-cons-seq nth ;
+  
+M: sequence-cons cdr ( sequence-cons -- cdr )
+  [ sequence-cons-index 1+ ] keep
+  sequence-cons-seq seq>list ;
+
+M: sequence-cons nil? ( sequence-cons -- bool )
+    drop f ;      
+
+M: sequence-cons list? ( object -- bool )
+  drop t ;
+
+: >list ( object -- list )
+  {
+    { [ dup sequence? ] [ 0 swap seq>list ] }
+    { [ dup list?     ] [ ] }
+    { [ t ] [ "Could not convert object to a list" throw ] }
+  } cond ;
 
 : lconcat ( list -- result )
   list>array nil [ lappend ] reduce ;

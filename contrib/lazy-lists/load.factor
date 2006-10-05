@@ -9,5 +9,4 @@ PROVIDE: contrib/lazy-lists {
     "examples.factor"
 } {
     "test/lists.factor"
-    "test/examples.factor"
 } ;

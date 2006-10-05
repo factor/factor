@@ -16,27 +16,32 @@ HELP: force
 HELP: <cons> 
 { $values { "car" "the head of the lazy list" } { "cdr" "the tail of the lazy list" } { "cons" "a cons object" } }
 { $description "Constructs a cons cell." }
-{ $see-also cons car cdr nil nil? } ;
+{ $see-also cons car cdr nil nil? list? } ;
 
 HELP: car
 { $values { "cons" "a cons object" } { "car" "the first item in the list" } }
 { $description "Returns the first item in the list." } 
-{ $see-also cons cdr nil nil? } ;
+{ $see-also cons cdr nil nil? list? } ;
 
 HELP: cdr
 { $values { "cons" "a cons object" } { "cdr" "a cons object" } }
 { $description "Returns the tail of the list." } 
-{ $see-also cons car nil nil? } ;
+{ $see-also cons car nil nil? list? } ;
 
 HELP: nil 
 { $values { "cons" "An empty cons" } }
 { $description "Returns a representation of an empty list" } 
-{ $see-also cons car cdr nil? } ;
+{ $see-also cons car cdr nil? list? } ;
 
 HELP: nil? 
 { $values { "cons" "a cons object" } }
 { $description "Return true if the cons object is the nil cons." } 
-{ $see-also cons car cdr nil  } ;
+{ $see-also cons car cdr nil list? } ;
+
+HELP: list? 
+{ $values { "object" "an object" } }
+{ $description "Returns true if the object conforms to the list protocol." } 
+{ $see-also cons car cdr nil } ;
 
 HELP: cons 
 { $values { "car" "the head of the lazy list" } { "cdr" "the tail of the lazy list" } { "cons" "a cons object" } }
@@ -46,12 +51,17 @@ HELP: cons
 HELP: 1list
 { $values { "obj" "an object" } { "cons" "a cons object" } }
 { $description "Create a list with 1 element." } 
-{ $see-also 2list } ;
+{ $see-also 2list 3list } ;
 
 HELP: 2list
 { $values { "a" "an object" } { "b" "an object" } { "cons" "a cons object" } }
 { $description "Create a list with 2 elements." } 
-{ $see-also 1list } ;
+{ $see-also 1list 3list } ;
+
+HELP: 3list
+{ $values { "a" "an object" } { "b" "an object" } { "c" "an object" } { "cons" "a cons object" } }
+{ $description "Create a list with 3 elements." } 
+{ $see-also 1list 2list } ;
 
 HELP: lazy-cons
 { $values { "car" "a quotation with stack effect ( -- X )" } { "cdr" "a quotation with stack effect ( -- cons )" } { "cons" "the resulting cons object" } }
@@ -139,9 +149,14 @@ HELP: lfrom
 { $see-also leach lmap lmap-with ltake lsubset lfrom-by lconcat lcartesian-product lcartesian-product* lcomp lcomp* } ;
 
 HELP: seq>list
-{ $values { "seq" "a sequence" } { "list" "a list" } }
-{ $description "Convert the sequence into a list." } 
-{ $see-also cons } ;
+{ $values { "index" "an integer 0 or greater" } { "seq" "a sequence" } { "list" "a list" } }
+{ $description "Convert the sequence into a list, starting from the 'index' offset into the sequence." } 
+{ $see-also >list } ;
+
+HELP: >list
+{ $values { "object" "an object" } { "list" "a list" } }
+{ $description "Convert the object into a list. Existing lists are passed through intact, sequences are converted using " { $link seq>list } " and other objects cause an error to be thrown." } 
+{ $see-also seq>list } ;
 
 HELP: lconcat
 { $values { "list" "a list of lists" } { "result" "a list" } }
