@@ -7,6 +7,12 @@
 USING: kernel sequences math vectors arrays namespaces generic errors ;
 IN: lazy-lists
 
+! Lazy List Protocol
+GENERIC: car   ( cons -- car )
+GENERIC: cdr   ( cons -- cdr )
+GENERIC: nil?  ( cons -- bool )
+GENERIC: list? ( object -- bool )
+
 TUPLE: promise quot forced? value ;
 
 C: promise ( quot -- promise ) [ set-promise-quot ] keep ;
@@ -21,11 +27,19 @@ C: promise ( quot -- promise ) [ set-promise-quot ] keep ;
     ] unless
     promise-value ;
 
+M: promise car ( promise -- car )
+  force car ;
+
+M: promise cdr ( promise -- cdr )
+  force cdr ;
+
+M: promise nil? ( cons -- bool )
+  force nil? ;
+
+M: promise list? ( object -- bool )
+  drop t ;
+
 TUPLE: cons car cdr ;
-GENERIC: car   ( cons -- car )
-GENERIC: cdr   ( cons -- cdr )
-GENERIC: nil?  ( cons -- bool )
-GENERIC: list? ( object -- bool )
 
 M: object list? ( object -- bool )
   drop f ;
@@ -62,20 +76,22 @@ M: cons list? ( object -- bool )
     nil <cons> <cons> <cons> ;
 
 ! Both 'car' and 'cdr' are promises  
+TUPLE: lazy-cons car cdr ;
+
 : lazy-cons ( car cdr -- promise ) 
-    >r <promise> r> <promise> <cons> 
+    >r <promise> r> <promise> <lazy-cons> 
     T{ promise f f t f } clone [ set-promise-value ] keep ;
 
-M: promise car ( promise -- car )
-  force car force ;
+M: lazy-cons car ( lazy-cons -- car )
+    lazy-cons-car force ;    
 
-M: promise cdr ( promise -- cdr )
-  force cdr force ;
+M: lazy-cons cdr ( lazy-cons -- cdr )
+    lazy-cons-cdr force ;    
 
-M: promise nil? ( cons -- bool )
-  force nil? ;
+M: lazy-cons nil? ( lazy-cons -- bool )
+    nil eq? ;
 
-M: promise list? ( object -- bool )
+M: lazy-cons list? ( object -- bool )
   drop t ;
 
 DEFER: lunit 
