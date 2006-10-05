@@ -191,10 +191,10 @@ presentation H{
         [ pick pick >r >r -rot styled-pane r> r> rot ] map
     ] map styled-grid nip ;
 
-M: pane with-stream-table
+M: pane-stream with-stream-table
     >r rot <pane-grid> r> print-gadget ;
 
-M: pane with-nested-stream
+M: pane-stream with-nested-stream
     >r styled-pane r> write-gadget ;
 
 ! Stream utilities

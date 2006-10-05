@@ -43,9 +43,19 @@ TUPLE: listener-gadget input output stack minibuffer use ;
 
 C: listener-gadget ( -- gadget )
     dup init-listener {
-        { [ <scrolling-pane> ] set-listener-gadget-output [ <scroller> ] 4/6 }
+        {
+            [ <scrolling-pane> ]
+            set-listener-gadget-output
+            [ <scroller> ]
+            4/6
+        }
         { [ <stack-display> ] f f 1/6 }
-        { [ <listener-input> ] set-listener-gadget-input [ <scroller> "Input" <labelled-gadget> ] 1/6 }
+        {
+            [ <listener-input> ]
+            set-listener-gadget-input
+            [ <scroller> "Input" <labelled-gadget> ]
+            1/6
+        }
     } { 0 1 } make-track* ;
 
 M: listener-gadget focusable-child*
@@ -130,7 +140,7 @@ listener-gadget "Listener commands" {
     { "Send EOF" T{ key-down f { C+ } "d" } [ listener-eof ] }
     {
         "History"
-        T{ key-down f "UP" }
+        T{ key-down f { C+ } "h" }
         [ show-history ]
     }
     {

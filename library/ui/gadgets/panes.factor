@@ -69,7 +69,7 @@ M: pane-stream stream-format
 
 M: pane-stream stream-close drop ;
 
-M: pane stream-flush drop ;
+M: pane-stream stream-flush drop ;
 
 M: pane-stream with-stream-style (with-stream-style) ;
 
@@ -77,7 +77,7 @@ GENERIC: write-gadget ( gadget stream -- )
 
 M: pane-stream write-gadget
     #! Print a gadget to the given pane.
-    pane-current add-gadget ;
+    pane-stream-pane pane-current add-gadget ;
 
 M: duplex-stream write-gadget
     duplex-stream-out write-gadget ;
