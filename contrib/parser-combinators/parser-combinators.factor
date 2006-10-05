@@ -98,7 +98,7 @@ TUPLE: parse-result parsed unparsed ;
   #! two parsers. First parser1 is applied to the
   #! input then parser2 is applied to the rest of
   #! the input strings from the first parser. 
-  >r call r> swap [
+  -rot call [
     dup parse-result-unparsed rot call 
     [
       >r parse-result-parsed r>
@@ -150,24 +150,16 @@ TUPLE: parse-result parsed unparsed ;
   #! Return an instance of the just-parser.
   [ just-parser ] curry ;
 
-: (<@-parser-replace) ( [[ inp result ]] quot -- [[ inp new-result ]] )
-  #! Perform the result replacement step of <@-parser. 
-  #! Given a successfull parse result, calls the quotation
-  #! with the result portion on the stack. The result of
-  #! that call is then used as the new result.
-  swap dup parse-result-unparsed swap parse-result-parsed rot call swap <parse-result> ;
-
 : <@-parser ( input parser quot -- result )
   #! Calls the parser on the input. For each successfull
   #! parse the quot is call with the parse result on the stack.
   #! The result of that quotation then becomes the new parse result.
   #! This allows modification of parse tree results (like
   #! converting strings to integers, etc).
-  -rot call dup nil? [
-    nip
-  ] [
-    [ (<@-parser-replace) ] rot swap curry lmap
-  ] if ;
+  -rot call [ 
+    [ parse-result-parsed swap call ] keep
+    parse-result-unparsed <parse-result>
+  ] lmap-with ;
 
 : <@ ( parser quot -- parser )
   #! Return an <@-parser.
