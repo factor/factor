@@ -97,8 +97,12 @@ generic ;
     ] keep 3array ;
 
 : completions ( str words -- seq )
-    [ completion ] map-with [ first zero? not ] subset
-    [ [ first ] 2apply swap - ] sort dup length 20 min head ;
+    over empty? [
+        2drop f
+    ] [
+        [ completion ] map-with [ first zero? not ] subset
+        [ [ first ] 2apply swap - ] sort dup length 20 min head
+    ] if ;
 
 : fuzzy. ( fuzzy full -- )
     dup length [

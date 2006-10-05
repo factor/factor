@@ -231,4 +231,5 @@ PROVIDE: library {
     "test/threads.factor"
     "test/tuple.factor"
     "test/words.factor"
+    "test/tools.factor"
 } ;

@@ -3,10 +3,10 @@
 IN: gadgets-listener
 USING: compiler arrays gadgets gadgets-frames gadgets-labels
 gadgets-panes gadgets-scrolling gadgets-text gadgets-lists
-gadgets-theme gadgets-tracks gadgets-workspace generic
-hashtables tools io kernel listener math models namespaces
-parser prettyprint sequences shells strings styles threads words
-memory ;
+gadgets-search gadgets-theme gadgets-tracks gadgets-workspace
+generic hashtables tools io kernel listener math models
+namespaces parser prettyprint sequences shells strings styles
+threads words ;
 
 TUPLE: listener-gadget input output stack minibuffer use ;
 
@@ -107,6 +107,10 @@ M: listener-gadget tool-help
     [ set-listener-gadget-minibuffer ] 2keep
     dupd track-add request-focus ;
 
+: show-word-search ( listener action -- )
+    >r dup listener-gadget-input selected-word r> <word-search>
+    swap show-minibuffer ;
+
 : show-list ( seq presenter action listener -- )
     >r >r >r <model> r> r> <list> <scroller> r>
     show-minibuffer ;
@@ -126,17 +130,6 @@ M: listener-gadget tool-help
     find-listener [
         >r peek word-name r> listener-gadget-input user-input
     ] keep hide-minibuffer ;
-
-: show-completions ( listener words -- )
-    over listener-gadget-input selected-word swap completions
-    over
-    >r [ [ completion. ] make-pane ] [ insert-completion ] r>
-    show-list ;
-
-: used-words ( listener -- seq )
-    listener-gadget-use
-    [ [ hash-values [ dup set ] each ] each ] make-hash
-    hash-values natural-sort ;
 
 listener-gadget "Toolbar" {
     { "Restart" T{ key-down f { C+ } "r" } [ start-listener ] }
@@ -160,14 +153,9 @@ listener-gadget "Toolbar" {
 
 listener-gadget "Listener commands" {
     {
-        "Complete word (used vocabs)"
+        "Complete word"
         T{ key-down f f "TAB" }
-        [ dup used-words show-completions ]
-    }
-    {
-        "Complete word (all vocabs)"
-        T{ key-down f f "TAB" }
-        [ all-words show-completions ]
+        [ [ insert-completion ] show-word-search ]
     }
     {
         "Hide minibuffer"

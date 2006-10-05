@@ -16,10 +16,14 @@ C: list ( model presenter action -- gadget )
     0 over set-list-index
     dup list-theme ;
 
+: bound-index ( list -- )
+    dup list-index over control-value length 1- max 0 min
+    swap set-list-index ;
+
 M: list model-changed
     dup clear-gadget
-    dup control-value over list-presenter map
-    swap add-gadgets ;
+    dup control-value over list-presenter map over add-gadgets
+    bound-index ;
 
 : selected-rect ( list -- rect )
     dup list-index swap gadget-children 2dup bounds-check?
@@ -62,7 +66,7 @@ M: list focusable-child* drop t ;
 : call-action ( list -- )
     dup list-value swap list-action call ;
 
-\ list H{
+list H{
     { T{ button-down } [ request-focus ] }
     { T{ key-down f f "UP" } [ select-prev ] }
     { T{ key-down f f "DOWN" } [ select-next ] }

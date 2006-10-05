@@ -11,6 +11,11 @@
 - some way of intercepting all gestures
 - better help result ranking
 - minibuffer should show a title
+- browser: toolbar is missing
+- new search gadget:
+  - field does not move caret properly
+  - use it instead of the old search gadget
+  - listener: 'edit a file' feature
 
 + ui:
 
