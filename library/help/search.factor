@@ -2,7 +2,8 @@
 ! See http://factorcode.org/license.txt for BSD license.
 IN: help
 USING: arrays definitions graphs hashtables help io kernel math
-namespaces porter-stemmer prettyprint sequences strings words ;
+namespaces porter-stemmer prettyprint sequences strings words 
+completion ;
 
 ! Right now this code is specific to the help. It will be
 ! generalized to an abstract full text search engine later.
@@ -45,6 +46,9 @@ SYMBOL: term-index
 : search-help ( phrase -- assoc )
     tokenize [ term-index get hash ] map [ ] subset
     count-occurrences hash>alist rank-completions ;
+
+: search-help. ( phrase -- ) 
+    search-help [ first ] map help-outliner ;
 
 : index-help ( -- )
     term-index get [

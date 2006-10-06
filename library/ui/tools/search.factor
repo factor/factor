@@ -5,7 +5,7 @@ USING: arrays gadgets gadgets-frames gadgets-labels
 gadgets-panes gadgets-scrolling gadgets-text gadgets-theme
 generic help tools kernel models sequences words
 gadgets-borders gadgets-lists namespaces parser hashtables io
-completion ;
+completion styles ;
 
 TUPLE: live-search field list model producer action presenter ;
 
@@ -34,8 +34,8 @@ search-field H{
 
 : <search-list>
     <search-model>
-    gadget get live-search-presenter
-    gadget get live-search-action
+    gadget get live-search-presenter [ make-pane ] curry
+    gadget get live-search-action \ first add*
     <list> ;
 
 C: live-search ( string action producer presenter -- gadget )
@@ -60,24 +60,28 @@ C: live-search ( string action producer presenter -- gadget )
 M: live-search focusable-child* live-search-field ;
 
 : <word-search> ( string action -- gadget )
-    \ first add*
     all-words
     [ word-completions ] curry
-    [ [ word-completion. ] make-pane ]
+    [ word-completion. ]
     <live-search> ;
 
 : <help-search> ( string action -- gadget )
-    \ first add*
     [ search-help ]
-    [ [ first ($link) ] make-pane ]
+    [ first ($link) ]
     <live-search> ;
 
-: file-completion. ( pair -- )
-    first2 over completion>string swap <pathname> write-object ;
+: string-completion. ( pair quot -- )
+    >r first2 over completion>string swap r> write-object ;
+    inline
 
 : <source-files-search> ( string action -- gadget )
-    \ first add*
     source-files get hash-keys natural-sort
     [ string-completions ] curry
-    [ [ file-completion. ] make-pane ]
+    [ [ <pathname> ] string-completion. ]
+    <live-search> ;
+
+: <vocabs-search> ( string action -- gadget )
+    vocabs
+    [ string-completions ] curry
+    [ [ <vocab-link> ] string-completion. ]
     <live-search> ;

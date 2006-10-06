@@ -23,10 +23,6 @@ $terpri
 "The " { $link search-help } " word searches the term index and the " { $link index-help } " word updates it." }
 { $see-also help } ;
 
-HELP: discard-irrelevant
-{ $values { "results" "a sequence" } { "newresults" "a new sequence" } }
-{ $description "Discard search results which rank in the lower 33% compared to the top scoring result, since they are most likely irrelevant." } ;
-
 HELP: count-occurrences
 { $values { "seq" "a sequence of hashtables" } { "hash" "a hashtable" } }
 { $description "Collates all keys from the hashtables in " { $snippet "seq" } " and sums their values, which must be numbers." } ;
@@ -36,7 +32,7 @@ HELP: search-help
 { $description "Performs a full-text search in the term index for help topics relating to " { $snippet "phrase" } ". The result is an association list of topic names paired with scores, sorted by decreasing score." } ;
 
 HELP: index-help
-{ $description "Updates the full-text search term index for use by " { $link search-help } "." } ;
+{ $description "Updates the full-text search term index for use by " { $link search-help. } " and " { $link search-help } "." } ;
 
 HELP: search-help.
 { $values { "phrase" "a string" } }

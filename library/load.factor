@@ -77,6 +77,7 @@ PROVIDE: library {
 
     "tools/definitions.factor"
     "tools/describe.factor"
+    "tools/completion.factor"
 
     "help/stylesheet.factor"
     "help/topics.factor"
@@ -94,7 +95,6 @@ PROVIDE: library {
     "tools/memory.factor"
     "tools/listener.factor"
     "tools/inspector.factor"
-    "tools/completion.factor"
     "tools/word-tools.factor"
     "tools/test.factor"
 

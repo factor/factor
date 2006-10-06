@@ -123,6 +123,18 @@ M: operation invoke-command ( target operation -- )
     { +quot+ [ browser call-tool ] }
 } define-operation
 
+[ vocab-link? ] H{
+    { +mouse+ T{ button-up f f 2 } }
+    { +name+ "Enter in" }
+    { +quot+ [ [ in set ] curry call-listener ] }
+} define-operation
+
+[ vocab-link? ] H{
+    { +mouse+ T{ button-up f f 3 } }
+    { +name+ "Use" }
+    { +quot+ [ [ use+ ] curry call-listener ] }
+} define-operation
+
 ! Link
 [ link? ] H{
     { +mouse+ T{ button-up f f 1 } }

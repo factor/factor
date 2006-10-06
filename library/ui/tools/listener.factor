@@ -114,6 +114,10 @@ M: listener-gadget tool-help
 : show-source-files-search ( listener action -- )
     "" swap <source-files-search> swap show-minibuffer ;
 
+: show-vocabs-search ( listener action -- )
+    >r dup listener-gadget-input selected-word r>
+    <vocabs-search> swap show-minibuffer ;
+
 : show-list ( seq presenter action listener -- )
     >r >r >r <model> r> r> <list> <scroller> r>
     show-minibuffer ;
@@ -166,6 +170,17 @@ listener-gadget "Listener commands" {
         [
             [ find-listener hide-minibuffer edit-file ]
             show-source-files-search
+        ]
+    }
+    {
+        "Use vocabulary"
+        T{ key-down f { C+ } "u" }
+        [
+            [
+                find-listener hide-minibuffer
+                [ use+ ] curry call-listener
+            ]
+            show-vocabs-search
         ]
     }
     {
