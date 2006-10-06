@@ -4,15 +4,6 @@ USING: errors kernel sequences math sequences-internals namespaces arrays ;
 : deg>rad pi * 180 / ; inline
 : rad>deg 180 * pi / ; inline
 
-: (count-end) ( elt count seq -- elt count seq )
-    2dup length < [
-        3dup [ length swap - 1- ] keep nth = [ >r 1+ r> (count-end) ] when
-    ] when ;
-
-: count-end ( elt seq -- n )
-    #! count the number of elem at the end of the seq
-    0 swap (count-end) drop nip ;
-
 : lcm ( a b -- c )
     #! Smallest integer such that c/a and c/b are both integers.
     2dup gcd nip >r * r> /i ; foldable

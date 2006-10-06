@@ -1,5 +1,6 @@
 IN: polynomials-internals
-USING: arrays kernel sequences vectors math math-internals namespaces arrays ;
+USING: arrays kernel sequences vectors math math-internals namespaces arrays
+    sequences-contrib ;
 
 ! Polynomials are vectors with the highest powers on the right:
 ! { 1 1 0 1 } -> 1 + x + x^3
@@ -15,10 +16,7 @@ USING: arrays kernel sequences vectors math math-internals namespaces arrays ;
 IN: math-contrib
 : p= ( p p -- ? ) pextend = ;
 
-: ptrim ( p -- p )
-    dup length 1 > [
-        0 over count-end >r dup length r> - dup zero? [ drop ] [ head ] if
-    ] when ;
+: ptrim ( p -- p ) [ zero? ] rtrim* ;
 
 : 2ptrim ( p p -- p p ) [ ptrim ] 2apply ;
 : p+ ( p p -- p ) pextend v+ ;
@@ -41,7 +39,7 @@ IN: math-contrib
 IN: polynomials-internals
 
 : pop-front ( seq -- seq )
-    1 tail ;
+    1 tail-slice ;
 
 : /-last ( seq seq -- a )
     #! divide the last two numbers in the sequences
