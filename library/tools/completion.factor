@@ -1,6 +1,6 @@
 ! Copyright (C) 2005, 2006 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-IN: tools
+IN: completion
 USING: kernel arrays sequences math namespaces strings io ;
 
 ! Simple fuzzy search.
@@ -48,14 +48,15 @@ USING: kernel arrays sequences math namespaces strings io ;
         2drop 0
     ] if ;
 
-: rank-completions ( seq -- seq )
-    [ first zero? not ] subset
-    [ [ first ] 2apply swap - ] sort
-    dup length 20 min head ;
+: rank-completions ( results -- newresults )
+    #! Discard results in the low 33%
+    [ [ second ] 2apply swap - ] sort
+    [ 0 [ second max ] reduce ] keep
+    [ second swap > ] subset-with ;
 
 : completion ( str quot obj -- pair )
-    #! pair is { score obj }
-    [ swap call dup rot fuzzy score ] keep 2array ; inline
+    #! pair is { obj score }
+    [ swap call dup rot fuzzy score ] keep swap 2array ; inline
 
 : completions ( str candidates quot -- seq )
     pick empty? [
@@ -64,9 +65,8 @@ USING: kernel arrays sequences math namespaces strings io ;
         [ >r 2dup r> completion ] map 2nip rank-completions
     ] if ; inline
 
-: completion. ( score str obj -- )
-    >r [ % " (score: " % >fixnum # ")" % ] "" make r>
-    write-object terpri ; inline
+: completion>string ( score str -- )
+    [ % " (score: " % >fixnum # ")" % ] "" make ;
 
 : string-completions ( str strs -- seq )
     f swap completions ;

@@ -36,12 +36,6 @@ SYMBOL: term-index
         drop
     ] if* ;
 
-: discard-irrelevant ( results -- newresults )
-    #! Discard results in the low 33%
-    dup 0 [ second max ] reduce
-    swap [ first2 rot / 2array ] map-with
-    [ second 1/3 > ] subset ;
-
 : count-occurrences ( seq -- hash )
     [
         dup [ [ drop off ] hash-each ] each
@@ -50,9 +44,7 @@ SYMBOL: term-index
 
 : search-help ( phrase -- assoc )
     tokenize [ term-index get hash ] map [ ] subset
-    count-occurrences hash>alist
-    [ first2 2array ] map
-    [ [ second ] 2apply swap - ] sort discard-irrelevant ;
+    count-occurrences hash>alist rank-completions ;
 
 : index-help ( -- )
     term-index get [
@@ -82,9 +74,6 @@ SYMBOL: term-index
     over remove-word-help
     over >r "help" set-word-prop r>
     dup xref-article index-article ;
-
-: search-help. ( phrase -- )
-    search-help [ first ] map help-outliner ;
 
 ! Definition protocol
 M: link forget link-name remove-article ;

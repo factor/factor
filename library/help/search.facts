@@ -36,7 +36,7 @@ HELP: search-help
 { $description "Performs a full-text search in the term index for help topics relating to " { $snippet "phrase" } ". The result is an association list of topic names paired with scores, sorted by decreasing score." } ;
 
 HELP: index-help
-{ $description "Updates the full-text search term index for use by " { $link search-help } " and " { $link search-help. } "." } ;
+{ $description "Updates the full-text search term index for use by " { $link search-help } "." } ;
 
 HELP: search-help.
 { $values { "phrase" "a string" } }

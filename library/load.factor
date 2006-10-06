@@ -94,7 +94,7 @@ PROVIDE: library {
     "tools/memory.factor"
     "tools/listener.factor"
     "tools/inspector.factor"
-    "tools/fuzzy.factor"
+    "tools/completion.factor"
     "tools/word-tools.factor"
     "tools/test.factor"
 
@@ -206,6 +206,7 @@ PROVIDE: library {
     "test/generic.factor"
     "test/help/porter-stemmer.factor"
     "test/help/topics.factor"
+    "test/help/search.factor"
     "test/inference.factor"
     "test/init.factor"
     "test/inspector.factor"

@@ -54,5 +54,6 @@ PROVIDE: library/ui {
     "test/commands.factor"
     "test/panes.factor"
     "test/editor.factor"
+    "test/search.factor"
     "test/tracks.factor"
 } ;

@@ -12,6 +12,11 @@
 - minibuffer should show a title
 - clean up listener's minibuffer-related code
 - help search looks funny
+- vocab completer
+- vocab operations:
+  - browse
+  - insert IN:   -- or just 'become in'
+  - insert USE:  -- 'use'
 
 + ui:
 

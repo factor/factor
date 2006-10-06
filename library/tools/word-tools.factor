@@ -3,7 +3,7 @@
 IN: tools
 USING: arrays definitions hashtables help tools io kernel
 math namespaces prettyprint sequences strings styles words
-generic ;
+generic completion ;
 
 : word-outliner ( seq -- )
     natural-sort [
@@ -48,10 +48,11 @@ generic ;
     ] annotate ;
 
 : word-completion. ( pair -- )
-    first2 [ summary ] keep completion. ;
+    first2 over summary completion>string swap write-object ;
 
 : word-completions ( str words -- seq )
     [ word-name ] swap completions ;
 
 : apropos ( str -- )
-    all-words word-completions [ word-completion. ] each ;
+    all-words word-completions
+    [ word-completion. terpri ] each ;
