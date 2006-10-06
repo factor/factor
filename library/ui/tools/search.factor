@@ -68,7 +68,7 @@ M: live-search focusable-child* live-search-field ;
 : <help-search> ( string action -- gadget )
     \ first add*
     [ search-help ]
-    [ [ second ($link) ] make-pane ]
+    [ [ first ($link) ] make-pane ]
     <live-search> ;
 
 : file-completion. ( pair -- )
