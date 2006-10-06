@@ -4,7 +4,7 @@ IN: gadgets-search
 USING: arrays gadgets gadgets-frames gadgets-labels
 gadgets-panes gadgets-scrolling gadgets-text gadgets-theme
 generic help tools kernel models sequences words
-gadgets-borders gadgets-lists namespaces ;
+gadgets-borders gadgets-lists namespaces parser hashtables io ;
 
 TUPLE: live-search field list model producer action presenter ;
 
@@ -17,7 +17,8 @@ TUPLE: search-field ;
 C: search-field ( string -- gadget )
     <editor> over set-gadget-delegate
     dup dup set-control-self
-    [ set-editor-text ] keep ;
+    [ set-editor-text ] keep
+    [ select-all ] keep ;
 
 search-field H{
     { T{ key-down f f "UP" } [ find-search-list select-prev ] }
@@ -58,14 +59,24 @@ C: live-search ( string action producer presenter -- gadget )
 M: live-search focusable-child* live-search-field ;
 
 : <word-search> ( string action -- gadget )
-    \ third add*
+    \ second add*
     all-words
-    [ completions ] curry
-    [ [ completion. ] make-pane ]
+    [ word-completions ] curry
+    [ [ word-completion. ] make-pane ]
     <live-search> ;
 
 : <help-search> ( string action -- gadget )
     \ first add*
     [ search-help ]
-    [ [ ($link) ] make-pane ]
+    [ [ second ($link) ] make-pane ]
+    <live-search> ;
+
+: file-completion. ( pair -- )
+    first2 dup <pathname> completion. ;
+
+: <source-files-search> ( string action -- gadget )
+    \ second add*
+    source-files get hash-keys natural-sort
+    [ string-completions ] curry
+    [ [ file-completion. ] make-pane ]
     <live-search> ;

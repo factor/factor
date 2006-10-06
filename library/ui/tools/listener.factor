@@ -6,7 +6,7 @@ gadgets-panes gadgets-scrolling gadgets-text gadgets-lists
 gadgets-search gadgets-theme gadgets-tracks gadgets-workspace
 generic hashtables tools io kernel listener math models
 namespaces parser prettyprint sequences shells strings styles
-threads words ;
+threads words definitions ;
 
 TUPLE: listener-gadget input output stack minibuffer use ;
 
@@ -108,8 +108,11 @@ M: listener-gadget tool-help
     dupd track-add request-focus ;
 
 : show-word-search ( listener action -- )
-    >r dup listener-gadget-input selected-word r> <word-search>
-    swap show-minibuffer ;
+    >r dup listener-gadget-input selected-word r>
+    <word-search> swap show-minibuffer ;
+
+: show-source-files-search ( listener action -- )
+    "" swap <source-files-search> swap show-minibuffer ;
 
 : show-list ( seq presenter action listener -- )
     >r >r >r <model> r> r> <list> <scroller> r>
@@ -156,6 +159,14 @@ listener-gadget "Listener commands" {
         "Complete word"
         T{ key-down f f "TAB" }
         [ [ insert-completion ] show-word-search ]
+    }
+    {
+        "Edit file"
+        T{ key-down f { C+ } "e" }
+        [
+            [ find-listener hide-minibuffer edit-file ]
+            show-source-files-search
+        ]
     }
     {
         "Hide minibuffer"

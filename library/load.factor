@@ -94,6 +94,7 @@ PROVIDE: library {
     "tools/memory.factor"
     "tools/listener.factor"
     "tools/inspector.factor"
+    "tools/fuzzy.factor"
     "tools/word-tools.factor"
     "tools/test.factor"
 

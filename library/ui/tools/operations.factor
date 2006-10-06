@@ -5,7 +5,7 @@ USING: definitions gadgets gadgets-browser gadgets-dataflow
 gadgets-help gadgets-listener gadgets-text gadgets-workspace
 hashtables help inference kernel namespaces parser prettyprint
 scratchpad sequences strings styles syntax test tools words
-generic models ;
+generic models io ;
 
 V{ } clone operations set-global
 
@@ -50,6 +50,19 @@ M: operation invoke-command ( target operation -- )
 [ input? ] H{
     { +mouse+ T{ button-up f f 1 } }
     { +name+ "Input" }
+    { +quot+ [ listener-gadget call-tool ] }
+} define-operation
+
+! Pathnames
+[ pathname? ] H{
+    { +mouse+ T{ button-up f f 1 } }
+    { +name+ "Edit" }
+    { +quot+ [ edit-file ] }
+} define-operation
+
+[ pathname? ] H{
+    { +mouse+ T{ button-up f f 2 } }
+    { +name+ "Run file" }
     { +quot+ [ listener-gadget call-tool ] }
 } define-operation
 
@@ -192,7 +205,7 @@ define-commands
     selected-word search ;
 
 : quot-action ( interactor -- quot )
-    field-commit parse ;
+    dup editor-text swap select-all parse ;
 
 interactor "Word commands"
 \ word class-operations

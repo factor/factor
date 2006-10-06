@@ -10,9 +10,7 @@
 - some way of intercepting all gestures
 - better help result ranking
 - minibuffer should show a title
-- browser: toolbar is missing
-- listener: 'edit a file' feature
-- viewport sizing issue
+- clean up listener's minibuffer-related code
 
 + ui:
 
@@ -24,7 +22,6 @@
 - graphical module manager tool
   - list of modules -- loaded, not loaded
   - each module has a list of files
-  - files can be reloaded and edited
   - modules can be (re)loaded
   - keyboard navigation
 - ui browser: show currently selected vocab & words

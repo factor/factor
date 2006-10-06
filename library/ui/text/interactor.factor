@@ -9,7 +9,7 @@ TUPLE: interactor history output continuation queue busy? ;
 
 C: interactor ( output -- gadget )
     [ set-interactor-output ] keep
-    f <field> over set-gadget-delegate
+    <editor> over set-gadget-delegate
     V{ } clone over set-interactor-history
     dup dup set-control-self ;
 
@@ -49,7 +49,7 @@ SYMBOL: structured-input
     dup interactor-busy? [
         drop
     ] [
-        [ field-commit ] keep interactor-eval
+        [ editor-text ] keep interactor-eval
     ] if ;
 
 M: interactor stream-readln

@@ -17,6 +17,8 @@ SYMBOL: edit-hook
 : edit-location ( file line -- )
     edit-hook get [ call ] [ <no-edit-hook> throw ] if* ;
 
+: edit-file ( file -- ) ?resource-path 0 edit-location ;
+
 : edit ( defspec -- )
     where [
         first2 edit-location
