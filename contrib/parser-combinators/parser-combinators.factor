@@ -178,21 +178,13 @@ M: some-parser (parse) ( input parser -- result )
   #! Same as <&> except discard the results of the first parser.
   <&> [ second ] <@ ;
 
-: <:&>-parser ( input parser1 parser2 -- result )
+: <:&> ( parser1 parser2 -- result )
   #! Same as <&> except flatten the result.
-  <&> [ dup second swap first [ % , ] { } make ] <@ call ;
+  <&> [ dup second swap first [ % , ] { } make ] <@ ;
 
-: <:&> ( parser1 parser2 -- parser )
+: <&:> ( parser1 parser2 -- result )
   #! Same as <&> except flatten the result.
-  [ <:&>-parser ] curry curry ;
-
-: <&:>-parser ( input parser1 parser2 -- result )
-  #! Same as <&> except flatten the result.
-  <&> [ dup second swap first [ , % ] { } make ] <@ call ;
-
-: <&:> ( parser1 parser2 -- parser )
-  #! Same as <&> except flatten the result.
-  [ <&:>-parser ] curry curry ;
+  <&> [ dup second swap first [ , % ] { } make ] <@ ;
 
 DEFER: <*>
 
