@@ -11,7 +11,7 @@ M: promise (parse) ( input parser -- list )
   force (parse) ;
 
 : parse ( input parser -- promise )
-  [ (parse) ] curry curry <promise> ;
+  [ (parse) ] promise-with2 ;
 
 TUPLE: parse-result parsed unparsed ;
 
@@ -190,7 +190,7 @@ M: some-parser (parse) ( input parser -- result )
   <&> [ dup second swap first [ , % ] { } make ] <@ ;
 
 : <*> ( parser -- parser )
-  [ dup <*> <&:> { } succeed <|> ] curry <promise> ;
+  [ dup <*> <&:> { } succeed <|> ] promise-with ;
 
 : (<+>) ( parser -- parser )
   #! Non-delayed implementation of <+>
