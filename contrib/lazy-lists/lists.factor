@@ -281,9 +281,7 @@ TUPLE: lazy-append list1 list2 ;
 
 : lappend ( list1 list2 -- result )
   {
-    { [ over nil? over nil? and ] [ 2drop nil ] }
     { [ over nil? ] [ nip ] }
-    { [ dup nil? ] [ drop ] }
     { [ t ] [ <lazy-append> ] }
   } cond ;
 
@@ -296,9 +294,9 @@ M: lazy-append cdr ( lazy-append -- cdr )
 
 M: lazy-append nil? ( lazy-append -- bool )
   dup lazy-append-list1 nil? [
-    drop t 
+    lazy-append-list2 nil?     
   ] [
-    lazy-append-list2 nil? 
+    drop f
   ] if ;
 
 M: lazy-append list? ( object -- bool )
