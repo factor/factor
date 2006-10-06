@@ -27,7 +27,6 @@ SYMBOL: track-mouse-state
 : make-adjusted-RECT ( width height -- RECT )
     make-RECT dup adjust-RECT ;
 
-
 : get-RECT-dimensions ( RECT -- width height )
     [ RECT-right ] keep [ RECT-left - ] keep
     [ RECT-bottom ] keep RECT-top - ;
@@ -101,7 +100,6 @@ SYMBOL: track-mouse-state
         { 17 "CTRL" }
         { 18 "ALT" }
         { 20 "CAPS-LOCK" }
-        { 27 "ESCAPE" }
     } ;
 
 : exclude-keys-wm-char
@@ -110,13 +108,13 @@ SYMBOL: track-mouse-state
         { 8 "BACKSPACE" }
         { 9 "TAB" }
         { 13 "RETURN" }
+        { 27 "ESCAPE" }
     } ;
 
 : exclude-key-wm-keydown? ( n -- bool ) exclude-keys-wm-keydown hash* nip ;
 : exclude-key-wm-char? ( n -- bool ) exclude-keys-wm-char hash* nip ;
-: handle-key? ( n -- bool ) wm-keydown-codes hash* nip ;
  
-: keystroke>gesture ( n -- <key-down> )
+: keystroke>gesture ( n -- sym mods )
     dup wm-keydown-codes hash*
     [ nip ] [ drop ch>string lower-case? [ >lower ] when ] if
     key-modifiers swap ;
