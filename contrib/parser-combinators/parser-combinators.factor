@@ -49,59 +49,50 @@ M: satisfy-parser (parse) ( input parser -- list )
     2drop nil
   ] if ;
 
-: satisfy2-parser ( inp pred quot -- llist )
-  #! A parser that succeeds if the predicate,
-  #! when passed the first character in the input, returns
-  #! true. On success the quotation is called with the
-  #! successfully parsed character on the stack. The result
-  #! of that call is returned as the result portion of the
-  #! successfull parse lazy list.
-  -rot over first swap call [
-    h:t >r swap call r> <parse-result> 1list
-  ] [
-    2drop nil
-  ] if ;
+TUPLE: epsilon-parser ;
 
-  : satisfy2 ( pred quot -- parser )
-  #! Return a satisfy2-parser.
-  [ satisfy2-parser ] curry curry ;
+: epsilon ( -- list )
+  <epsilon-parser> ;
 
-: epsilon-parser ( input -- llist )
+M: epsilon-parser (parse) ( input parser -- list )
   #! A parser that parses the empty string. It
   #! does not consume any input and always returns
   #! an empty list as the parse tree with the
   #! unmodified input.
-  "" swap <parse-result> 1list ;
+  drop "" swap <parse-result> 1list ;
 
-: epsilon ( -- parser )
-  #! Return an epsilon parser
-  [ epsilon-parser ] ;
-
-: succeed-parser ( input result -- llist )
-  #! A parser that always returns 'result' as a
-  #! successful parse with no input consumed.
-  swap <parse-result> 1list ;
+TUPLE: succeed-parser result ;
 
 : succeed ( result -- parser )
-  #! Return a succeed parser.
-  [ succeed-parser ] curry ;
+  <succeed-parser> ;
 
-: fail-parser ( input -- llist )
-  #! A parser that always fails and returns
-  #! an empty list of successes.
-  drop nil ;
+M: succeed-parser (parse) ( input parser -- list )
+  #! A parser that always returns 'result' as a
+  #! successful parse with no input consumed.  
+  succeed-parser-result swap <parse-result> 1list ;
+
+TUPLE: fail-parser ;
 
 : fail ( -- parser )
-  #! Return a fail-parser.
-  [ fail-parser ] ;
+  <fail-parser> ;
 
-: <&>-parser ( input parser1 parser2 -- parser )
+M: fail-parser (parse) ( input parser -- list )
+  #! A parser that always fails and returns
+  #! an empty list of successes.
+  2drop nil ;
+
+TUPLE: and-parser p1 p2 ;
+
+: <&> ( parser1 parser2 -- parser )
+  <and-parser> ;
+
+M: and-parser (parse) ( input parser -- list )
   #! Parse 'input' by sequentially combining the
   #! two parsers. First parser1 is applied to the
   #! input then parser2 is applied to the rest of
   #! the input strings from the first parser. 
-  -rot call [
-    dup parse-result-unparsed rot call 
+  [ and-parser-p1 ] keep and-parser-p2 -rot parse [
+    dup parse-result-unparsed rot parse
     [
       >r parse-result-parsed r>
       [ parse-result-parsed 2array ] keep
@@ -109,22 +100,16 @@ M: satisfy-parser (parse) ( input parser -- list )
     ] lmap-with
   ] lmap-with lconcat ;  
 
-: <&> ( parser1 parser2 -- parser )
-  #! Sequentially combine two parsers, returning a parser
-  #! that first calls p1, then p2 all remaining results from
-  #! p1. 
-  [ <&>-parser ] curry curry ;
+TUPLE: or-parser p1 p2 ;
 
-: <|>-parser ( input parser1 parser2 -- result )
+: <|> ( parser1 parser2 -- parser )
+  <or-parser> ;
+
+M: or-parser (parse) ( input parser1 -- list )
   #! Return the combined list resulting from the parses
   #! of parser1 and parser2 being applied to the same
   #! input. This implements the choice parsing operator.
-  >r dupd call swap r> call lappend ;
-
-: <|> ( p1 p2 -- parser )
-  #! Choice operator for parsers. Return a parser that does
-  #! p1 or p2 depending on which will succeed.
-  [ <|>-parser ] curry curry ;
+  [ or-parser-p1 ] keep or-parser-p2 >r dupd parse swap r> parse lappend ;
 
 : string-ltrim ( string -- string )
   #! Return a new string without any leading whitespace
