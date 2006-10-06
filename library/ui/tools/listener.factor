@@ -8,10 +8,9 @@ generic hashtables tools io kernel listener math models
 namespaces parser prettyprint sequences shells strings styles
 threads words definitions ;
 
-TUPLE: listener-gadget input output stack minibuffer use ;
+TUPLE: listener-gadget input output stack minibuffer ;
 
 : ui-listener-hook ( listener -- )
-    use get over set-listener-gadget-use
     >r datastack r> listener-gadget-stack set-model ;
 
 : listener-stream ( listener -- stream )

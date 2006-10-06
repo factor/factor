@@ -7,7 +7,7 @@ generic help tools kernel models sequences words
 gadgets-borders gadgets-lists namespaces parser hashtables io
 completion styles ;
 
-TUPLE: live-search field list model producer action presenter ;
+TUPLE: live-search field list producer action presenter ;
 
 : find-live-search [ live-search? ] find-parent ;
 
@@ -71,7 +71,7 @@ M: live-search focusable-child* live-search-field ;
     <live-search> ;
 
 : string-completion. ( pair quot -- )
-    >r first2 over completion>string swap r> write-object ;
+    >r first2 over completion>string swap r> call write-object ;
     inline
 
 : <source-files-search> ( string action -- gadget )

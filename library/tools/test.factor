@@ -60,7 +60,7 @@ SYMBOL: failures
 
 : failed.
     "Tests failed:" print
-    failures get [ first2 swap write ": " write error. ] each ;
+    failures get [ first2 swap path. ": " write error. ] each ;
 
 : run-tests ( seq -- )
     prepare-tests [ run-test ] subset terpri passed. failed. ;

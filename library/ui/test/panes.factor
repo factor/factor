@@ -12,7 +12,7 @@ sequences io test prettyprint ;
 
     #children "num-children" set
     
-    "pane" get [ 10000 [ . ] each ] with-stream*
+    "pane" get <pane-stream> [ 10000 [ . ] each ] with-stream*
     
     [ t ] [ #children "num-children" get = ] unit-test
 ] maybe-with-freetype

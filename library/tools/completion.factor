@@ -51,8 +51,8 @@ USING: kernel arrays sequences math namespaces strings io ;
 : rank-completions ( results -- newresults )
     #! Discard results in the low 33%
     [ [ second ] 2apply swap - ] sort
-    [ 0 [ second max ] reduce ] keep
-    [ second swap > ] subset-with ;
+    [ 0 [ second max ] reduce 3 / ] keep
+    [ second < ] subset-with ;
 
 : completion ( str quot obj -- pair )
     #! pair is { obj score }
@@ -65,7 +65,7 @@ USING: kernel arrays sequences math namespaces strings io ;
         [ >r 2dup r> completion ] map 2nip rank-completions
     ] if ; inline
 
-: completion>string ( score str -- )
+: completion>string ( score str -- newstr )
     [ % " (score: " % >fixnum # ")" % ] "" make ;
 
 : string-completions ( str strs -- seq )

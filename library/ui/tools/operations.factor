@@ -57,13 +57,13 @@ M: operation invoke-command ( target operation -- )
 [ pathname? ] H{
     { +mouse+ T{ button-up f f 1 } }
     { +name+ "Edit" }
-    { +quot+ [ edit-file ] }
+    { +quot+ [ pathname-string edit-file ] }
 } define-operation
 
 [ pathname? ] H{
     { +mouse+ T{ button-up f f 2 } }
     { +name+ "Run file" }
-    { +quot+ [ listener-gadget call-tool ] }
+    { +quot+ [ pathname-string [ run-file ] curry call-listener ] }
 } define-operation
 
 ! Words
@@ -126,13 +126,13 @@ M: operation invoke-command ( target operation -- )
 [ vocab-link? ] H{
     { +mouse+ T{ button-up f f 2 } }
     { +name+ "Enter in" }
-    { +quot+ [ [ in set ] curry call-listener ] }
+    { +quot+ [ vocab-link-name [ set-in ] curry call-listener ] }
 } define-operation
 
 [ vocab-link? ] H{
     { +mouse+ T{ button-up f f 3 } }
     { +name+ "Use" }
-    { +quot+ [ [ use+ ] curry call-listener ] }
+    { +quot+ [ vocab-link-name [ use+ ] curry call-listener ] }
 } define-operation
 
 ! Link

@@ -37,6 +37,8 @@ TUPLE: pathname string ;
 : (file.) ( name path -- )
     <pathname> write-object ;
 
+: path. ( path -- ) dup (file.) ;
+
 DEFER: directory.
 
 : (directory.) ( name path -- )
