@@ -7,6 +7,9 @@ IN: parser-combinators
 ! Parser combinator protocol
 GENERIC: (parse) ( input parser -- list )
 
+M: promise (parse) ( input parser -- list )
+  force (parse) ;
+
 : parse ( input parser -- promise )
   [ (parse) ] curry curry <promise> ;
 
@@ -186,16 +189,8 @@ M: some-parser (parse) ( input parser -- result )
   #! Same as <&> except flatten the result.
   <&> [ dup second swap first [ , % ] { } make ] <@ ;
 
-DEFER: <*>
-
-: (<*>) ( parser -- parser )
-  #! Non-delayed implementation of <*>
-  dup <*> <&:> [ ] succeed <|> ;
-  
 : <*> ( parser -- parser )
-  #! Return a parser that accepts zero or more occurences of the original
-  #! parser.
-  [  (<*>) call ] curry ;
+  [ dup <*> <&:> { } succeed <|> ] curry <promise> ;
 
 : (<+>) ( parser -- parser )
   #! Non-delayed implementation of <+>
