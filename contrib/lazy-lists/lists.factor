@@ -17,6 +17,15 @@ TUPLE: promise quot forced? value ;
 
 C: promise ( quot -- promise ) [ set-promise-quot ] keep ;
 
+: promise ( quot -- promise ) 
+  <promise> ;
+
+: promise-with ( value quot -- promise )
+  curry <promise> ;
+
+: promise-with2 ( value1 value2 quot -- promise )
+  curry curry <promise> ;
+
 : force ( promise -- value )
     #! Force the given promise leaving the value of calling the
     #! promises quotation on the stack. Re-forcing the promise
@@ -79,7 +88,7 @@ M: cons list? ( object -- bool )
 TUPLE: lazy-cons car cdr ;
 
 : lazy-cons ( car cdr -- promise ) 
-    >r <promise> r> <promise> <lazy-cons> 
+    >r promise r> promise <lazy-cons> 
     T{ promise f f t f } clone [ set-promise-value ] keep ;
 
 M: lazy-cons car ( lazy-cons -- car )
