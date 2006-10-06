@@ -41,7 +41,7 @@ M: no-entity error.
     "Entity does not exist: &" write no-entity-thing write ";" print ;
 
 TUPLE: xml-string-error string ;
-C: xml-string-error ( -- xml-string-error )
+C: xml-string-error ( string -- xml-string-error )
     [ set-xml-string-error-string ] keep
     [ <xml-error> swap set-delegate ] keep ;
 
