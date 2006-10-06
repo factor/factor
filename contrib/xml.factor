@@ -223,7 +223,7 @@ TUPLE: directive text ;
         "Attribute lacks quote" <xml-string-error> throw
     ] if ;
 
-: parse-prop ( -- name value )
+: parse-prop ( -- seq )
     parse-name pass-blank CHAR: = expect pass-blank
     parse-prop-value 2array ;
 

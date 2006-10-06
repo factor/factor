@@ -53,7 +53,8 @@ USE: sequences
 
 SYMBOL: html
 
-: write-html H{ { html t } } format ;
+: write-html ( str -- )
+    H{ { html t } } format ;
 
 : html-word ( name def -- word )
     #! Define 'word creating' word to allow
