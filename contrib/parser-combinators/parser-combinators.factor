@@ -199,7 +199,7 @@ M: some-parser (parse) ( input parser -- result )
 : <+> ( parser -- parser )
   #! Return a parser that accepts one or more occurences of the original
   #! parser.
-  [  (<+>) call ] curry ;
+  dup <*> <&:> ;
 
 : (<?>) ( parser -- parser )
   #! Non-delayed implementation of <?>
