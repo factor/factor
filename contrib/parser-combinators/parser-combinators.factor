@@ -140,31 +140,35 @@ M: just-parser (parse) ( input parser -- result )
   #! fully parsed input string.
   just-parser-p1 parse [ parse-result-unparsed empty? ] lsubset ;
 
-: <@-parser ( input parser quot -- result )
+TUPLE: apply-parser p1 quot ;
+
+: <@ ( parser quot -- parser )
+  <apply-parser> ;
+
+M: apply-parser (parse) ( input parser -- result )
   #! Calls the parser on the input. For each successfull
   #! parse the quot is call with the parse result on the stack.
   #! The result of that quotation then becomes the new parse result.
   #! This allows modification of parse tree results (like
   #! converting strings to integers, etc).
-  -rot call [ 
+  [ apply-parser-p1 ] keep apply-parser-quot 
+  -rot parse [ 
     [ parse-result-parsed swap call ] keep
     parse-result-unparsed <parse-result>
   ] lmap-with ;
 
-: <@ ( parser quot -- parser )
-  #! Return an <@-parser.
-  [ <@-parser ] curry curry ;
+TUPLE: some-parser p1 ;
 
-: some-parser ( input parser -- result )
+: some ( p1 -- parser )
+  <some-parser> ;
+
+M: some-parser (parse) ( input parser -- result )
   #! Calls the parser on the input, guarantees
   #! the parse is complete (the remaining input is empty),
   #! picks the first solution and only returns the parse
   #! tree since the remaining input is empty.
-  just call car parse-result-parsed ;
+  some-parser-p1 just parse car parse-result-parsed ;
 
-: some ( parser -- deterministic-parser )
-  #! Creates a 'some-parser'.
-  [ some-parser ] curry ;
 
 : <& ( parser1 parser2 -- parser )
   #! Same as <&> except discard the results of the second parser.
