@@ -114,28 +114,31 @@ M: or-parser (parse) ( input parser1 -- list )
 : string-ltrim ( string -- string )
   #! Return a new string without any leading whitespace
   #! from the original string.
-  dup first blank? [ 1 tail string-ltrim ] when ;
+  dup first blank? [ 1 tail-slice string-ltrim ] when ;
 
-: sp-parser ( input parser -- result )
-  #! Skip all leading whitespace from the input then call
-  #! the parser on the remaining input.
-  >r string-ltrim r> call ;
+TUPLE: sp-parser p1 ;
 
-: sp ( parser -- parser )
+: sp ( p1 -- parser )
   #! Return a parser that first skips all whitespace before
   #! calling the original parser.
-  [ sp-parser ] curry ;
+  <sp-parser> ;
 
-: just-parser ( input parser -- result )
+M: sp-parser (parse) ( input parser -- list )
+  #! Skip all leading whitespace from the input then call
+  #! the parser on the remaining input.
+  >r string-ltrim r> sp-parser-p1 parse ;
+
+TUPLE: just-parser p1 ;
+
+: just ( p1 -- parser )
+  <just-parser> ;
+
+M: just-parser (parse) ( input parser -- result )
   #! Calls the given parser on the input removes
   #! from the results anything where the remaining
   #! input to be parsed is not empty. So ensures a 
   #! fully parsed input string.
-  call [ parse-result-unparsed empty? ] lsubset ;
-
-: just ( parser -- parser )
-  #! Return an instance of the just-parser.
-  [ just-parser ] curry ;
+  just-parser-p1 parse [ parse-result-unparsed empty? ] lsubset ;
 
 : <@-parser ( input parser quot -- result )
   #! Calls the parser on the input. For each successfull
