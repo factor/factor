@@ -1,4 +1,4 @@
-USING: kernel math sequences ;
+USING: kernel math sequences strings ;
 IN: sequences-contrib
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
@@ -15,6 +15,17 @@ IN: sequences-contrib
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-: last ( seq -- elt ) dup length 1- swap nth ;
+: last ( seq -- elt ) [ length 1- ] keep nth ;
+
+: rtrim* ( seq quot -- newseq )
+    2dup >r last r> call [ >r dup length 1- head-slice r> rtrim* ] [ drop ] if ;
+: rtrim ( seq -- newseq ) [ blank? ] rtrim* ;
+
+: ltrim* ( seq quot -- newseq )
+    2dup >r first r> call [ >r 1 tail-slice r> ltrim* ] [ drop ] if ;
+: ltrim ( seq -- newseq ) [ blank? ] ltrim* ;
+
+: trim* ( seq quot -- newseq ) [ ltrim* ] keep rtrim* ;
+: trim ( seq -- newseq ) [ blank? ] trim* ;
 
 PROVIDE: contrib/sequences ;
