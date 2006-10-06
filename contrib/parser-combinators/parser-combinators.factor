@@ -192,20 +192,12 @@ M: some-parser (parse) ( input parser -- result )
 : <*> ( parser -- parser )
   [ dup <*> <&:> { } succeed <|> ] promise-with ;
 
-: (<+>) ( parser -- parser )
-  #! Non-delayed implementation of <+>
-  dup <*> <&:> ;
-  
 : <+> ( parser -- parser )
   #! Return a parser that accepts one or more occurences of the original
   #! parser.
   dup <*> <&:> ;
 
-: (<?>) ( parser -- parser )
-  #! Non-delayed implementation of <?>
-  [ unit ] <@ f succeed <|> ;
-  
 : <?> ( parser -- parser )
   #! Return a parser that optionally uses the parser
   #! if that parser would be successfull.
-  [  (<?>) call ] curry ;
+  [ 1array ] <@ f succeed <|> ;
