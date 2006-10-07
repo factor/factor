@@ -108,14 +108,18 @@ M: listener-gadget tool-help
 
 : show-word-search ( listener action -- )
     >r dup listener-gadget-input selected-word r>
-    <word-search> swap show-minibuffer ;
+    <word-search> "Word search" <labelled-gadget>
+    swap show-minibuffer ;
 
 : show-source-files-search ( listener action -- )
-    "" swap <source-files-search> swap show-minibuffer ;
+    "" swap <source-files-search>
+    "Source file search" <labelled-gadget>
+    swap show-minibuffer ;
 
 : show-vocabs-search ( listener action -- )
     >r dup listener-gadget-input selected-word r>
-    <vocabs-search> swap show-minibuffer ;
+    <vocabs-search> "Vocabulary search" <labelled-gadget>
+    swap show-minibuffer ;
 
 : show-list ( seq presenter action listener -- )
     >r >r >r <model> r> r> <list> <scroller> r>

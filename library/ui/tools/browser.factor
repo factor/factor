@@ -98,7 +98,7 @@ C: browser ( -- gadget )
         {
             [ "" [ browser call-tool ] <word-search> ]
             set-browser-search
-            f
+            [ "Word search" <labelled-gadget> ]
             1/5
         }
     } { 0 1 } make-track* ;

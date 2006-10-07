@@ -31,7 +31,7 @@ C: help-gadget ( -- gadget )
         {
             [ "" [ help-gadget call-tool ] <help-search> ]
             set-help-gadget-search
-            f
+            [ "Help search" <labelled-gadget> ]
             1/5
         }
     } { 0 1 } make-track* ;

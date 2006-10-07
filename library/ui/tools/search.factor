@@ -19,7 +19,7 @@ C: search-field ( string -- gadget )
     <editor> over set-gadget-delegate
     dup dup set-control-self
     [ set-editor-text ] keep
-    [ select-all ] keep ;
+    [ editor-doc-end ] keep ;
 
 search-field H{
     { T{ key-down f f "UP" } [ find-search-list select-prev ] }
@@ -63,12 +63,12 @@ M: live-search focusable-child* live-search-field ;
     all-words
     [ word-completions ] curry
     [ word-completion. ]
-    <live-search> "Word search" <labelled-gadget> ;
+    <live-search> ;
 
 : <help-search> ( string action -- gadget )
     [ search-help ]
     [ first ($link) ]
-    <live-search> "Help search" <labelled-gadget> ;
+    <live-search> ;
 
 : string-completion. ( pair quot -- )
     >r first2 over completion>string swap r> call write-object ;
@@ -78,10 +78,10 @@ M: live-search focusable-child* live-search-field ;
     source-files get hash-keys natural-sort
     [ string-completions ] curry
     [ [ <pathname> ] string-completion. ]
-    <live-search> "Source file search" <labelled-gadget> ;
+    <live-search> ;
 
 : <vocabs-search> ( string action -- gadget )
     vocabs
     [ string-completions ] curry
     [ [ <vocab-link> ] string-completion. ]
-    <live-search> "Vocabulary search" <labelled-gadget> ;
+    <live-search> ;

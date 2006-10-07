@@ -13,7 +13,8 @@
 - help search looks funny
 - menus should not require mouse to be held
 - tab completion: add a USE: if necessary
-- reloading buttons.factor fails
+- completion is not ideal: eg, search for "buttons"
+- live search: timer delay would be nice
 
 + ui:
 
