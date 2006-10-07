@@ -4,6 +4,7 @@
 - maybe simplify list into displaying list a sequence of strings
 - nested presentation mouse over is not right
 - ui quick start doc
+- document the UI workspace entirely!
 - x11: scroll up/down wiggles caret
 - slider needs to be modelized
 - some way of intercepting all gestures
@@ -12,6 +13,7 @@
 - help search looks funny
 - menus should not require mouse to be held
 - tab completion: add a USE: if necessary
+- reloading buttons.factor fails
 
 + ui:
 

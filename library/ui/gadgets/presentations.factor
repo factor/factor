@@ -51,8 +51,8 @@ M: presentation ungraft* ( presentation -- )
 presentation H{
     { T{ button-up } [ [ invoke-presentation ] if-clicked ] }
     { T{ button-down f f 3 } [ [ operations-menu ] if-clicked ] }
-    { T{ mouse-leave } [ global [ dup short. flush ] bind  dup hide-mouse-help button-update ] }
-    { T{ mouse-enter } [ global [ dup short. flush ] bind  dup show-mouse-help button-update ] }
+    { T{ mouse-leave } [ dup hide-mouse-help button-update ] }
+    { T{ mouse-enter } [ dup show-mouse-help button-update ] }
 } set-gestures
 
 ! Presentation help bar
