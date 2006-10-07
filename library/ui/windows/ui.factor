@@ -177,15 +177,18 @@ SYMBOL: hWnd
         { [ t ] [ "bad button" throw ] }
     } cond ;
 
+: capture-mouse? ( umsg -- ? )
+    { WM_LBUTTONDOWN WM_RBUTTONDOWN } member? ;
+
 : prepare-mouse ( hWnd uMsg wParam lParam -- button coordinate world )
     nip >r mouse-event>gesture r> mouse-coordinate rot window ;
 
 : handle-wm-buttondown ( hWnd uMsg wParam lParam -- )
-    >r pick SetCapture drop r>
+    >r over capture-mouse? [ pick SetCapture drop ] when r>
     prepare-mouse send-button-down ;
 
 : handle-wm-buttonup ( hWnd uMsg wParam lParam -- )
-    ReleaseCapture drop
+    pick capture-mouse? [ ReleaseCapture drop ] when
     prepare-mouse send-button-up ;
 
 : handle-wm-mousemove ( hWnd uMsg wParam lParam -- )
