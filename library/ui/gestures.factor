@@ -146,15 +146,18 @@ V{ } clone hand-buttons set-global
     #! the current gadget, with all parents in between.
     hand-gadget get-global parents <reversed> ;
 
+: update-clicked ( -- )
+    hand-gadget get-global hand-clicked set-global
+    hand-loc get-global hand-click-loc set-global ;
+
+SYMBOL: menu-mode?
+
 : move-hand ( loc world -- )
     dup hand-world set-global
     under-hand >r over hand-loc set-global
     pick-up hand-gadget set-global
+    menu-mode? get-global [ update-clicked ] when
     under-hand r> hand-gestures ;
-
-: update-clicked ( -- )
-    hand-gadget get-global hand-clicked set-global
-    hand-loc get-global hand-click-loc set-global ;
 
 : send-button-down ( gesture loc world -- )
     move-hand

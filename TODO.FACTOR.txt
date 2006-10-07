@@ -2,16 +2,16 @@
 - fix alien-callback/SEH bug on win32
 - list mouse gestures
 - maybe simplify list into displaying list a sequence of strings
-- the mouse button overload sucks, use popup menus instead
 - nested presentation mouse over is not right
 - ui quick start doc
 - x11: scroll up/down wiggles caret
 - slider needs to be modelized
 - some way of intercepting all gestures
 - better help result ranking
-- minibuffer should show a title
 - clean up listener's minibuffer-related code
 - help search looks funny
+- menus should not require mouse to be held
+- tab completion: add a USE: if necessary
 
 + ui:
 

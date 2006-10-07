@@ -54,19 +54,13 @@ M: object gesture>string drop f ;
     swap pick commands set-hash
     dup commands>gestures "gestures" set-word-prop ;
 
-: categorize-commands ( seq -- hash )
-    dup
-    [ hash-keys ] map concat prune
-    [ dup pick [ hash ] map-with concat ] map>hash
-    nip ;
-
 SYMBOL: +name+
 SYMBOL: +quot+
 SYMBOL: +listener+
 SYMBOL: +keyboard+
-SYMBOL: +mouse+
+SYMBOL: +default+
 
-TUPLE: operation predicate mouse listener? ;
+TUPLE: operation predicate listener? default? ;
 
 : (command) ( -- command )
     +name+ get +keyboard+ get +quot+ get <command> ;
@@ -74,7 +68,7 @@ TUPLE: operation predicate mouse listener? ;
 C: operation ( predicate hash -- operation )
     swap [
         (command) over set-delegate
-        +mouse+ get over set-operation-mouse
+        +default+ get over set-operation-default?
         +listener+ get over set-operation-listener?
     ] bind
     [ set-operation-predicate ] keep ;
@@ -88,10 +82,8 @@ SYMBOL: operations
     "predicate" word-prop
     operations get [ operation-predicate = ] subset-with ;
 
-: mouse-operation ( obj gesture -- command )
-    swap object-operations
-    [ operation-mouse = ] subset-with
-    dup empty? [ drop f ] [ peek ] if ;
+: default-operation ( obj -- command )
+    object-operations [ operation-default? ] find-last nip ;
 
 : modify-operation ( quot operation -- operation )
     clone

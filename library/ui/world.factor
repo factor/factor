@@ -16,7 +16,7 @@ kernel math models namespaces opengl sequences ;
 !   UI code assumes that everything starts at { 0 0 }.
 TUPLE: world
 active?
-gadget
+gadget glass
 title status
 focus focused?
 fonts handle
@@ -66,3 +66,18 @@ M: world model-changed
     >r world get font-sprites first2 r> (draw-string) ;
 
 M: world gadget-title world-gadget gadget-title ;
+
+M: world layout*
+    dup delegate layout*
+    dup world-glass [
+        >r dup rect-dim r> set-layout-dim
+    ] when* drop ;
+
+: hide-glass ( world -- )
+    dup world-glass [ unparent ] when*
+    f swap set-world-glass ;
+
+: show-glass ( gadget world -- )
+    [ hide-glass ] keep
+    [ add-gadget ] 2keep
+    set-world-glass ;

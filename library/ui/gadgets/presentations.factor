@@ -6,8 +6,8 @@ DEFER: call-listener
 IN: gadgets-presentations
 USING: arrays definitions gadgets gadgets-borders
 gadgets-buttons gadgets-grids gadgets-labels gadgets-outliner
-gadgets-panes gadgets-paragraphs gadgets-theme generic
-hashtables tools io kernel prettyprint sequences strings
+gadgets-panes gadgets-paragraphs gadgets-theme
+generic hashtables tools io kernel prettyprint sequences strings
 styles words help math models namespaces ;
 
 ! Clickable objects
@@ -24,21 +24,20 @@ C: presentation ( button object command -- button )
 : <command-presentation> ( target command -- button )
     dup command-name f <bevel-button> -rot <presentation> ;
 
-: presentation-command* ( presentation gesture -- obj cmd )
-    over presentation-command [
-        dup T{ button-up f f 1 } = [
-            drop
-            dup presentation-object swap presentation-command
-        ] [
-            >r presentation-command dup r> mouse-operation
-        ] if
-    ] [
-        >r presentation-object dup r> mouse-operation
-    ] if ;
+: <commands-menu> ( target commands -- gadget )
+    [ hand-clicked get find-world hide-glass ] modify-operations
+    [ <command-presentation> ] map-with
+    make-pile 1 over set-pack-fill ;
 
-: invoke-presentation ( gadget modifiers button# -- )
-    <button-up>
-    presentation-command* dup [ invoke-command ] [ 2drop ] if ;
+: operations-menu ( presentation -- gadget )
+    dup presentation-object
+    dup object-operations <commands-menu>
+    swap show-menu ;
+
+: invoke-presentation ( presentation -- )
+    dup presentation-object swap presentation-command
+    [ dup default-operation ] unless*
+    invoke-command ;
 
 : show-mouse-help ( presentation -- )
     dup find-world [ world-status set-model* ] [ drop ] if* ;
@@ -50,52 +49,16 @@ M: presentation ungraft* ( presentation -- )
     dup hide-mouse-help delegate ungraft* ;
 
 presentation H{
-    { T{ button-up f f 1 } [ [ f 1 invoke-presentation ] if-clicked ] }
-    { T{ button-up f f 2 } [ [ f 2 invoke-presentation ] if-clicked ] }
-    { T{ button-up f f 3 } [ [ f 3 invoke-presentation ] if-clicked ] }
-    { T{ button-up f { S+ } 1 } [ [ { S+ } 1 invoke-presentation ] if-clicked ] }
-    { T{ button-up f { S+ } 2 } [ [ { S+ } 2 invoke-presentation ] if-clicked ] }
-    { T{ button-up f { S+ } 3 } [ [ { S+ } 3 invoke-presentation ] if-clicked ] }
-    { T{ mouse-leave } [ dup hide-mouse-help button-update ] }
-    { T{ mouse-enter } [ dup show-mouse-help button-update ] }
+    { T{ button-up } [ [ invoke-presentation ] if-clicked ] }
+    { T{ button-down f f 3 } [ [ operations-menu ] if-clicked ] }
+    { T{ mouse-leave } [ global [ dup short. flush ] bind  dup hide-mouse-help button-update ] }
+    { T{ mouse-enter } [ global [ dup short. flush ] bind  dup show-mouse-help button-update ] }
 } set-gestures
 
 ! Presentation help bar
-: <presentation-summary> ( model -- )
-    [
-        [
-            presentation-object summary
-        ] [
-            "Mouse over a presentation for help."
-        ] if*
-    ] <filter> <label-control> dup reverse-video-theme ;
-
-: <gesture-help> ( model gesture -- gadget )
-    [
-        over [
-            tuck presentation-command* nip dup [
-                >r gesture>string ": " r> command-name append3
-            ] [
-                2drop ""
-            ] if
-        ] [
-            2drop ""
-        ] if
-    ] curry <filter> <label-control> ;
-
-: <presentation-mouse-help> ( model -- help )
-    { f { S+ } } [
-        3 [
-            1+ >r 2dup r> <button-up> <gesture-help>
-        ] map nip
-    ] map nip <grid>
-    { 10 0 } over set-grid-gap ;
-
 : <presentation-help> ( model -- gadget )
-    [
-        dup <presentation-summary> ,
-        <presentation-mouse-help> ,
-    ] { } make make-pile 1 over set-pack-fill ;
+    [ [ presentation-object summary ] [ "" ] if* ] <filter>
+    <label-control> dup reverse-video-theme ;
 
 : <listener-button> ( gadget quot -- button )
     [ call-listener ] curry <roll-button> ;

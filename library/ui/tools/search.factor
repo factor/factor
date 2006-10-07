@@ -63,12 +63,12 @@ M: live-search focusable-child* live-search-field ;
     all-words
     [ word-completions ] curry
     [ word-completion. ]
-    <live-search> ;
+    <live-search> "Word search" <labelled-gadget> ;
 
 : <help-search> ( string action -- gadget )
     [ search-help ]
     [ first ($link) ]
-    <live-search> ;
+    <live-search> "Help search" <labelled-gadget> ;
 
 : string-completion. ( pair quot -- )
     >r first2 over completion>string swap r> call write-object ;
@@ -78,10 +78,10 @@ M: live-search focusable-child* live-search-field ;
     source-files get hash-keys natural-sort
     [ string-completions ] curry
     [ [ <pathname> ] string-completion. ]
-    <live-search> ;
+    <live-search> "Source file search" <labelled-gadget> ;
 
 : <vocabs-search> ( string action -- gadget )
     vocabs
     [ string-completions ] curry
     [ [ <vocab-link> ] string-completion. ]
-    <live-search> ;
+    <live-search> "Vocabulary search" <labelled-gadget> ;

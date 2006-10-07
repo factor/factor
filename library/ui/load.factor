@@ -29,6 +29,7 @@ PROVIDE: library/ui {
     "gadgets/books.factor"
     "gadgets/outliner.factor"
     "gadgets/lists.factor"
+    "gadgets/menus.factor"
     "text/document.factor"
     "text/elements.factor"
     "text/editor.factor"

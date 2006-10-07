@@ -25,71 +25,58 @@ M: operation invoke-command ( target operation -- )
 
 ! Objects
 [ drop t ] H{
-    { +mouse+ T{ button-up f f 1 } }
+    { +default+ t }
     { +name+ "Inspect" }
     { +quot+ [ inspect ] }
     { +listener+ t }
 } define-operation
 
 [ drop t ] H{
-    { +mouse+ T{ button-up f { S+ } 1 } }
     { +name+ "Push" }
     { +quot+ [ ] }
     { +listener+ t }
 } define-operation
 
-! Commands
-[ [ command? ] is? ] H{
-    { +mouse+ T{ button-up f { S+ } 3 } }
-    { +name+ "Inspect" }
-    { +quot+ [ inspect ] }
-    { +listener+ t }
-} define-operation
-
 ! Input
 [ input? ] H{
-    { +mouse+ T{ button-up f f 1 } }
+    { +default+ t }
     { +name+ "Input" }
     { +quot+ [ listener-gadget call-tool ] }
 } define-operation
 
 ! Pathnames
 [ pathname? ] H{
-    { +mouse+ T{ button-up f f 1 } }
+    { +default+ t }
     { +name+ "Edit" }
     { +quot+ [ pathname-string edit-file ] }
 } define-operation
 
 [ pathname? ] H{
-    { +mouse+ T{ button-up f f 2 } }
     { +name+ "Run file" }
     { +quot+ [ pathname-string [ run-file ] curry call-listener ] }
 } define-operation
 
 ! Words
 [ word? ] H{
-    { +mouse+ T{ button-up f f 1 } }
+    { +default+ t }
     { +name+ "Browse" }
     { +keyboard+ T{ key-down f { A+ } "b" } }
     { +quot+ [ browser call-tool ] }
 } define-operation
 
 [ word? ] H{
-    { +mouse+ T{ button-up f f 2 } }
     { +name+ "Edit" }
     { +keyboard+ T{ key-down f { A+ } "e" } }
     { +quot+ [ edit ] }
 } define-operation
 
 [ word? ] H{
-    { +mouse+ T{ button-up f f 3 } }
     { +name+ "Documentation" }
     { +keyboard+ T{ key-down f { A+ } "h" } }
     { +quot+ [ help-gadget call-tool ] }
 } define-operation
 
 [ word? ] H{
-    { +mouse+ T{ button-up f { S+ } 3 } }
     { +name+ "Usage" }
     { +keyboard+ T{ key-down f { A+ } "u" } }
     { +quot+ [ usage. ] }
@@ -97,7 +84,6 @@ M: operation invoke-command ( target operation -- )
 } define-operation
 
 [ word? ] H{
-    { +mouse+ T{ button-up f { S+ } 2 } }
     { +name+ "Reload" }
     { +keyboard+ T{ key-down f { A+ } "r" } }
     { +quot+ [ reload ] }
@@ -118,44 +104,39 @@ M: operation invoke-command ( target operation -- )
 
 ! Vocabularies
 [ vocab-link? ] H{
-    { +mouse+ T{ button-up f f 1 } }
+    { +default+ t }
     { +name+ "Browse" }
     { +quot+ [ browser call-tool ] }
 } define-operation
 
 [ vocab-link? ] H{
-    { +mouse+ T{ button-up f f 2 } }
     { +name+ "Enter in" }
     { +quot+ [ vocab-link-name [ set-in ] curry call-listener ] }
 } define-operation
 
 [ vocab-link? ] H{
-    { +mouse+ T{ button-up f f 3 } }
     { +name+ "Use" }
     { +quot+ [ vocab-link-name [ use+ ] curry call-listener ] }
 } define-operation
 
 ! Link
 [ link? ] H{
-    { +mouse+ T{ button-up f f 1 } }
+    { +default+ t }
     { +name+ "Follow" }
     { +quot+ [ help-gadget call-tool ] }
 } define-operation
 
 [ link? ] H{
-    { +mouse+ T{ button-up f f 2 } }
     { +name+ "Edit" }
     { +quot+ [ edit ] }
 } define-operation
 
 [ link? ] H{
-    { +mouse+ T{ button-up f { S+ } 2 } }
     { +name+ "Reload" }
     { +quot+ [ reload ] }
 } define-operation
 
 [ word-link? ] H{
-    { +mouse+ T{ button-up f f 3 } }
     { +name+ "Definition" }
     { +quot+ [ link-name browser call-tool ] }
 } define-operation
@@ -192,13 +173,12 @@ M: operation invoke-command ( target operation -- )
 ! Dataflow nodes
 
 [ [ node? ] is? ] H{
-    { +mouse+ T{ button-up f f 1 } }
+    { +default+ t }
     { +name+ "Show dataflow" }
     { +quot+ [ dataflow-gadget call-tool ] }
 } define-operation
 
 [ [ node? ] is? ] H{
-    { +mouse+ T{ button-up f { S+ } 3 } }
     { +name+ "Inspect" }
     { +quot+ [ inspect ] }
     { +listener+ t }

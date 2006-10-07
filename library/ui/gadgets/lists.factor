@@ -41,7 +41,10 @@ M: list focusable-child* drop t ;
     dup list-index swap control-value ?nth ;
 
 : scroll>selected ( list -- )
-    dup selected-rect swap scroll>rect ;
+    #! We change the rectangle's width to zero to avoid
+    #! scrolling right.
+    [ selected-rect rect-bounds { 0 1 } v* <rect> ] keep
+    scroll>rect ;
 
 : list-empty? ( list -- ? ) control-value empty? ;
 

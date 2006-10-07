@@ -142,11 +142,15 @@ C: titled-gadget ( gadget title -- )
 : $commands ( elt -- )
     dup array? [ first ] when commands commands. ;
 
-: <labelled-gadget> ( gadget title -- gadget )
+TUPLE: labelled-gadget content ;
+
+C: labelled-gadget ( gadget title -- gadget )
     {
         { [ <label> dup reverse-video-theme ] f f @top }
-        { [ ] f f @center }
-    } make-frame ;
+        { f set-labelled-gadget-content f @center }
+    } make-frame* ;
+
+M: labelled-gadget focusable-child* labelled-gadget-content ;
 
 : <labelled-pane> ( model quot title -- gadget )
     >r <pane-control> <scroller> r> <labelled-gadget> ;
