@@ -4,6 +4,8 @@
 PROVIDE: contrib/lazy-lists { 
     "lists.factor"
     "lists.facts"
+    "lazy.factor"
+    "lazy.facts"
     "lazy-io.factor"
     "lazy-io.facts"
     "examples.factor"
