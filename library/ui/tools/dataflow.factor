@@ -186,7 +186,7 @@ DEFER: (compute-heights)
     make-shelf 1 over set-pack-align ;
 
 ! The UI tool
-TUPLE: dataflow-gadget history search ;
+TUPLE: dataflow-gadget history ;
 
 dataflow-gadget "Toolbar" {
     { "Back" T{ key-down f { C+ } "b" } [ dataflow-gadget-history go-back ] }

@@ -38,17 +38,15 @@ M: list draw-gadget*
 M: list focusable-child* drop t ;
 
 : list-value ( list -- object )
-    dup control-value empty? [
-        drop f
-    ] [
-        dup list-index swap control-value nth
-    ] if ;
+    dup list-index swap control-value ?nth ;
 
 : scroll>selected ( list -- )
     dup selected-rect swap scroll>rect ;
 
+: list-empty? ( list -- ? ) control-value empty? ;
+
 : select-index ( n list -- )
-    dup control-value empty? [
+    dup list-empty? [
         2drop
     ] [
         [ control-value length rem ] keep
@@ -64,7 +62,9 @@ M: list focusable-child* drop t ;
     dup list-index 1+ swap select-index ;
 
 : call-action ( list -- )
-    dup list-value swap list-action call ;
+    dup list-empty? [
+        dup list-value over list-action call
+    ] unless drop ;
 
 list H{
     { T{ button-down } [ request-focus ] }

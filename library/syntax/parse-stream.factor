@@ -64,7 +64,7 @@ SYMBOL: parse-hook
     ] with-scope ;
 
 : parsing-file ( file -- )
-    "Loading " write path. terpri flush ;
+    "Loading " write write-pathname terpri flush ;
 
 : record-file ( file -- )
     [ <source-file> ] keep source-files get set-hash ;

@@ -83,11 +83,16 @@ C: thumb ( vector -- thumb )
 : slide-by-page ( -1/1 gadget -- )
     [ slider-page * ] keep slide-by ;
 
-: elevator-click ( elevator -- )
-    dup hand-click-rel >r find-slider r>
+: page-direction ( elevator -- -1/1 )
+    dup find-slider swap hand-click-rel
     over gadget-orientation v.
-    over screen>slider over slider-value - sgn
-    [ swap slide-by-page ] curry start-timer-gadget ;
+    over screen>slider
+    swap slider-value - sgn ;
+
+: elevator-click ( elevator -- )
+    dup page-direction
+    [ swap find-slider slide-by-page ] curry
+    start-timer-gadget ;
 
 elevator H{
     { T{ button-down } [ elevator-click ] }

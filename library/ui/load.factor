@@ -50,10 +50,12 @@ PROVIDE: library/ui {
     "test/gadgets.factor"
     "test/models.factor"
     "test/document.factor"
+    "test/lists.factor"
     "test/rectangles.factor"
     "test/commands.factor"
     "test/panes.factor"
     "test/editor.factor"
     "test/search.factor"
+    "test/sliders.factor"
     "test/tracks.factor"
 } ;

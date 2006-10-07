@@ -138,7 +138,9 @@ M: no-word summary
 
 : parse-dump ( error -- )
     "Parsing " write
-    dup parse-error-file [ "<interactive>" ] unless* write
+    dup parse-error-file
+    [ "<interactive>" ] unless*
+    write-pathname
     ":" write
     dup parse-error-line [ 1 ] unless* number>string print
     
