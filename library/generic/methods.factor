@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 IN: generic
 USING: arrays definitions errors hashtables help kernel
-sequences words ;
+sequences words namespaces ;
 
 PREDICATE: array method-spec
     dup length 2 = [
@@ -56,7 +56,10 @@ M: generic subdefs
     [ swap 2array ] map-with ;
 
 M: class subdefs
-    dup implementors natural-sort [ 2array ] map-with ;
+    [
+        dup "constructor" word-prop [ , ] when*
+        dup implementors natural-sort [ 2array , ] each-with
+    ] { } make ;
 
 M: method-spec forget
     first2 [ remove-hash ] with-methods ;

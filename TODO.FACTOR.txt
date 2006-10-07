@@ -12,7 +12,6 @@
 - minibuffer should show a title
 - clean up listener's minibuffer-related code
 - help search looks funny
-- parse errors: clickable pathnames
 
 + ui:
 

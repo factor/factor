@@ -12,7 +12,7 @@ gadgets-scrolling gadgets-panes gadgets-messages ;
 C: tool ( gadget -- tool )
     {
         {
-            [ dup dup class tool 2array "Toolbar" <toolbar> ]
+            [ dup dup class tool 2array <toolbar> ]
             f
             f
             @top

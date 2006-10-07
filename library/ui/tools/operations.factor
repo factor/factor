@@ -207,9 +207,10 @@ M: operation invoke-command ( target operation -- )
 ! Define commands in terms of operations
 
 ! Tile commands
-tile "Word commands"
+tile "Toolbar"
 \ word class-operations [ tile-definition ] modify-operations
 [ command-name "Browse" = not ] subset
+{ "Close" f [ close-tile ] } add*
 define-commands
 
 ! Interactor commands

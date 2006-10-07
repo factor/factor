@@ -45,13 +45,9 @@ TUPLE: tile definition gadget ;
     <default-border> dup faint-boundary ;
 
 C: tile ( definition -- gadget )
-    2dup { tile } "Word commands" <toolbar>
+    2dup { tile } <toolbar>
     <tile-content> over set-gadget-delegate
     [ set-tile-definition ] keep ;
-
-tile "Tile commands" {
-    { "Close" f [ close-tile ] }
-} define-commands
 
 : show-definition ( definition definitions -- )
     2dup definition-index dup 0 >= [

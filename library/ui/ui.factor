@@ -119,9 +119,8 @@ C: titled-gadget ( gadget title -- )
 : restore-windows? ( -- ? )
     windows get [ empty? not ] [ f ] if* ;
 
-: <toolbar> ( target classes group -- toolbar )
-    swap
-    [ commands hash ] map-with concat
+: <toolbar> ( target classes -- toolbar )
+    [ commands "Toolbar" swap hash ] map concat
     [ <command-presentation> ] map-with
     make-shelf ;
 
