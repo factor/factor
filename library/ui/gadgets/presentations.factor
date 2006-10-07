@@ -30,9 +30,13 @@ C: presentation ( button object command -- button )
     make-pile 1 over set-pack-fill ;
 
 : operations-menu ( presentation -- gadget )
-    dup presentation-object
-    dup object-operations <commands-menu>
-    swap show-menu ;
+    dup presentation-command [
+        drop
+    ] [
+        dup presentation-object
+        dup object-operations <commands-menu>
+        swap show-menu
+    ] if ;
 
 : invoke-presentation ( presentation -- )
     dup presentation-object swap presentation-command
