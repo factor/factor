@@ -9,7 +9,6 @@
 - slider needs to be modelized
 - some way of intercepting all gestures
 - better help result ranking
-- clean up listener's minibuffer-related code
 - help search looks funny
 - menus should not require mouse to be held
 - tab completion: add a USE: if necessary

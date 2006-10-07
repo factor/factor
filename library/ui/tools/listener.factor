@@ -106,40 +106,42 @@ M: listener-gadget tool-help
     [ set-listener-gadget-minibuffer ] 2keep
     dupd track-add request-focus ;
 
+: minibuffer-action ( quot -- quot )
+    [ find-listener hide-minibuffer ] swap append ;
+
 : show-word-search ( listener action -- )
+    minibuffer-action
     >r dup listener-gadget-input selected-word r>
     <word-search> "Word search" <labelled-gadget>
     swap show-minibuffer ;
 
 : show-source-files-search ( listener action -- )
+    minibuffer-action
     "" swap <source-files-search>
     "Source file search" <labelled-gadget>
     swap show-minibuffer ;
 
 : show-vocabs-search ( listener action -- )
+    minibuffer-action
     >r dup listener-gadget-input selected-word r>
     <vocabs-search> "Vocabulary search" <labelled-gadget>
     swap show-minibuffer ;
 
 : show-list ( seq presenter action listener -- )
-    >r >r >r <model> r> r> <list> <scroller> r>
-    show-minibuffer ;
+    >r minibuffer-action <list> <scroller> r> show-minibuffer ;
+
+: listener-history ( listener -- seq )
+    listener-gadget-input interactor-history <reversed> ;
 
 : show-history ( listener -- )
     [
-        listener-gadget-input interactor-history <reversed>
+        listener-gadget-input <model>
         [ [ dup print-input ] make-pane ]
-        [
-            find-listener
-            [ listener-gadget-input set-editor-text ] keep
-            hide-minibuffer
-        ]
+        [ listener-gadget-input set-editor-text ]
     ] keep show-list ;
 
 : insert-completion ( completion -- )
-    find-listener [
-        >r word-name r> listener-gadget-input user-input
-    ] keep hide-minibuffer ;
+    word-name find-listener listener-gadget-input user-input ;
 
 listener-gadget "Toolbar" {
     { "Restart" T{ key-down f { C+ } "r" } [ start-listener ] }
@@ -170,21 +172,12 @@ listener-gadget "Listener commands" {
     {
         "Edit file"
         T{ key-down f { C+ } "e" }
-        [
-            [ find-listener hide-minibuffer edit-file ]
-            show-source-files-search
-        ]
+        [ [ edit-file ] show-source-files-search ]
     }
     {
         "Use vocabulary"
         T{ key-down f { C+ } "u" }
-        [
-            [
-                find-listener hide-minibuffer
-                [ use+ ] curry call-listener
-            ]
-            show-vocabs-search
-        ]
+        [ [ [ use+ ] curry call-listener ] show-vocabs-search ]
     }
     {
         "Hide minibuffer"
