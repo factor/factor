@@ -35,10 +35,14 @@ M: satisfy-parser (parse) ( input parser -- list )
   #! A parser that succeeds if the predicate,
   #! when passed the first character in the input, returns
   #! true.
-  satisfy-parser-quot >r unclip-slice dup r> call [
-    swap <parse-result> 1list
-  ] [
+  over empty? [
     2drop nil
+  ] [
+    satisfy-parser-quot >r unclip-slice dup r> call [
+      swap <parse-result> 1list
+    ] [
+      2drop nil
+    ] if 
   ] if ;
 
 TUPLE: epsilon-parser ;
