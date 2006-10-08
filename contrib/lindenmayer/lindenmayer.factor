@@ -86,9 +86,6 @@ SYMBOL: command-table
 
 : segment-command ( seg -- command ) 1 head ;
 
-! : segment-parameter ( seg -- parameter )
-! dup length 1 - 2 swap rot subseq parse call ;
-
 : segment-parameter ( seg -- parameter )
 dup length 1 - 2 swap rot subseq string>number ;
 
@@ -342,22 +339,27 @@ H{ { "K" "[[a|b] '(0.41)f'(2.439) |<(60) [a|b]]" }
    { "d" "[^ '(.2887)f'(3.4758) &(109.5111) +zk{.-(120)f-(120)f}]" }
 } >rules
 
-"K" >axiom   axiom> >result ;
+"K" >result ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 : spiral-0 ( -- ) lparser-dialect   [ 10 >angle 5 >thickness ] >model-values
 
-"[P]|[P]" >axiom
+"[P]|[P]" >result
 
 H{ { "P" "[A]>>>>>>>>>[cB]>>>>>>>>>[ccC]>>>>>>>>>[cccD]" }
    { "A" "F+;'A" }
    { "B" "F!+F+;'B" }
    { "C" "F!^+F^+;'C" }
    { "D" "F!>^+F>^+;'D" }
-} >rules
+} >rules ;
 
-axiom> >result ;
+: spiral-0-scene ( -- )
+spiral-0
+22 iterations
+build-model
+[ reset-turtle 90 turn-left 16 step-turtle 180 turn-left ]
+camera> with-turtle .slate ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
@@ -399,6 +401,14 @@ H{ { "A" "F[&'(.8)!BL]>(137)'!(.9)A" }
 
 "c(12)FFAL" >result ;
 
+: abop-1-scene ( -- )
+abop-1
+8 iterations
+build-model
+[ reset-turtle
+  90 pitch-up 7 step-turtle 90 pitch-down 4 step-turtle 90 pitch-down ]
+camera> with-turtle .slate ;
+
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 : abop-2 ( -- ) lparser-dialect   [ 30 >angle   5 >thickness ] >model-values
@@ -413,6 +423,13 @@ H{ { "A" "F[&'(.7)!BL]>(137)[&'(.6)!BL]>(137)'(.9)!(.9)A" }
 
 "c(12)FAL" >result ;
 
+: abop-2-scene ( -- )
+abop-2
+7 iterations
+build-model
+[ reset-turtle { 0 4 4 } >position 90 pitch-down ]
+camera> with-turtle .slate ;
+
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 : abop-3 ( -- ) lparser-dialect   [ 30 >angle   5 >thickness ] >model-values
@@ -423,6 +440,11 @@ H{ { "A" "!(.9)t(.4)FB>(94)B>(132)B" }
 } >rules
 
 "c(12)FA" >result ;
+
+: abop-3-scene ( -- )
+abop-3 11 iterations build-model
+[ reset-turtle { 0 47 29 } >position 90 pitch-down ] camera> with-turtle
+.slate ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
@@ -460,6 +482,14 @@ H{ { "N" "FII[&(60)rY]>(90)[&(45)'(0.8)rA]>(90)[&(60)rY]>(90)[&(45)'(0.8)rD]!FIK
 } >rules
 
 "c(12)&(20)N" >result ;
+
+: abop-4-scene ( -- )
+abop-4 21 iterations build-model
+[ reset-turtle
+  { 53 25 36 } >position
+  { { 0.57 -0.14 -0.80 } { -0.81 -0.18 -0.54 } { -0.07 0.97 -0.22 } }
+  >orientation
+] camera> with-turtle .slate ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
