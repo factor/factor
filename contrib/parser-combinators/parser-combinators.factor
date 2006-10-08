@@ -1,7 +1,7 @@
 ! Copyright (C) 2004 Chris Double.
 ! See http://factorcode.org/license.txt for BSD license.
 !
-USING: lazy-lists kernel sequences strings math io arrays errors namespaces ;
+USING: lazy-lists kernel sequences sequences-contrib strings math io arrays errors namespaces ;
 IN: parser-combinators
 
 ! Parser combinator protocol
@@ -10,24 +10,13 @@ GENERIC: (parse) ( input parser -- list )
 M: promise (parse) ( input parser -- list )
   force (parse) ;
 
-: parse ( input parser -- promise )
-  [ (parse) ] promise-with2 ;
+LAZY: parse ( input parser -- promise )
+  (parse) ;
 
 TUPLE: parse-result parsed unparsed ;
-
-: ?head-slice ( seq begin -- newseq ? )
-  2dup head? [ length tail-slice t ] [ drop f ] if ;
-
-: unclip-slice ( seq -- rest first )
-  dup 1 tail-slice swap first ;
-
-: h:t ( object -- head tail )
-  #! Return the head and tail of the object.
-  dup empty? [ dup first swap 1 tail ] unless ;
-
 TUPLE: token-parser string ;
 
-: token ( string -- parser )
+LAZY: token ( string -- parser )
   <token-parser> ;
 
 M: token-parser (parse) ( input parser -- list )
@@ -39,7 +28,7 @@ M: token-parser (parse) ( input parser -- list )
 
 TUPLE: satisfy-parser quot ;
 
-: satisfy ( quot -- parser )
+LAZY: satisfy ( quot -- parser )
   <satisfy-parser> ;
 
 M: satisfy-parser (parse) ( input parser -- list )
@@ -54,7 +43,7 @@ M: satisfy-parser (parse) ( input parser -- list )
 
 TUPLE: epsilon-parser ;
 
-: epsilon ( -- list )
+LAZY: epsilon ( -- parser )
   <epsilon-parser> ;
 
 M: epsilon-parser (parse) ( input parser -- list )
@@ -66,7 +55,7 @@ M: epsilon-parser (parse) ( input parser -- list )
 
 TUPLE: succeed-parser result ;
 
-: succeed ( result -- parser )
+LAZY: succeed ( result -- parser )
   <succeed-parser> ;
 
 M: succeed-parser (parse) ( input parser -- list )
@@ -76,7 +65,7 @@ M: succeed-parser (parse) ( input parser -- list )
 
 TUPLE: fail-parser ;
 
-: fail ( -- parser )
+LAZY: fail ( -- parser )
   <fail-parser> ;
 
 M: fail-parser (parse) ( input parser -- list )
@@ -86,7 +75,7 @@ M: fail-parser (parse) ( input parser -- list )
 
 TUPLE: and-parser p1 p2 ;
 
-: <&> ( parser1 parser2 -- parser )
+LAZY: <&> ( parser1 parser2 -- parser )
   <and-parser> ;
 
 M: and-parser (parse) ( input parser -- list )
@@ -105,7 +94,7 @@ M: and-parser (parse) ( input parser -- list )
 
 TUPLE: or-parser p1 p2 ;
 
-: <|> ( parser1 parser2 -- parser )
+LAZY: <|> ( parser1 parser2 -- parser )
   <or-parser> ;
 
 M: or-parser (parse) ( input parser1 -- list )
@@ -114,14 +103,14 @@ M: or-parser (parse) ( input parser1 -- list )
   #! input. This implements the choice parsing operator.
   [ or-parser-p1 ] keep or-parser-p2 >r dupd parse swap r> parse lappend ;
 
-: string-ltrim ( string -- string )
+: ltrim-slice ( string -- string )
   #! Return a new string without any leading whitespace
   #! from the original string.
-  dup first blank? [ 1 tail-slice string-ltrim ] when ;
+  dup first blank? [ 1 tail-slice ltrim-slice ] when ;
 
 TUPLE: sp-parser p1 ;
 
-: sp ( p1 -- parser )
+LAZY: sp ( p1 -- parser )
   #! Return a parser that first skips all whitespace before
   #! calling the original parser.
   <sp-parser> ;
@@ -129,11 +118,11 @@ TUPLE: sp-parser p1 ;
 M: sp-parser (parse) ( input parser -- list )
   #! Skip all leading whitespace from the input then call
   #! the parser on the remaining input.
-  >r string-ltrim r> sp-parser-p1 parse ;
+  >r ltrim-slice r> sp-parser-p1 parse ;
 
 TUPLE: just-parser p1 ;
 
-: just ( p1 -- parser )
+LAZY: just ( p1 -- parser )
   <just-parser> ;
 
 M: just-parser (parse) ( input parser -- result )
@@ -145,7 +134,7 @@ M: just-parser (parse) ( input parser -- result )
 
 TUPLE: apply-parser p1 quot ;
 
-: <@ ( parser quot -- parser )
+LAZY: <@ ( parser quot -- parser )
   <apply-parser> ;
 
 M: apply-parser (parse) ( input parser -- result )
@@ -162,7 +151,7 @@ M: apply-parser (parse) ( input parser -- result )
 
 TUPLE: some-parser p1 ;
 
-: some ( p1 -- parser )
+LAZY: some ( p1 -- parser )
   <some-parser> ;
 
 M: some-parser (parse) ( input parser -- result )
@@ -173,31 +162,31 @@ M: some-parser (parse) ( input parser -- result )
   some-parser-p1 just parse car parse-result-parsed ;
 
 
-: <& ( parser1 parser2 -- parser )
+LAZY: <& ( parser1 parser2 -- parser )
   #! Same as <&> except discard the results of the second parser.
   <&> [ first ] <@ ;
 
-: &> ( parser1 parser2 -- parser )
+LAZY: &> ( parser1 parser2 -- parser )
   #! Same as <&> except discard the results of the first parser.
   <&> [ second ] <@ ;
 
-: <:&> ( parser1 parser2 -- result )
+LAZY: <:&> ( parser1 parser2 -- result )
   #! Same as <&> except flatten the result.
   <&> [ dup second swap first [ % , ] { } make ] <@ ;
 
-: <&:> ( parser1 parser2 -- result )
+LAZY: <&:> ( parser1 parser2 -- result )
   #! Same as <&> except flatten the result.
   <&> [ dup second swap first [ , % ] { } make ] <@ ;
 
-: <*> ( parser -- parser )
-  [ dup <*> <&:> { } succeed <|> ] promise-with ;
+LAZY: <*> ( parser -- parser )
+  dup <*> <&:> { } succeed <|> ;
 
-: <+> ( parser -- parser )
+LAZY: <+> ( parser -- parser )
   #! Return a parser that accepts one or more occurences of the original
   #! parser.
   dup <*> <&:> ;
 
-: <?> ( parser -- parser )
+LAZY: <?> ( parser -- parser )
   #! Return a parser that optionally uses the parser
   #! if that parser would be successfull.
   [ 1array ] <@ f succeed <|> ;

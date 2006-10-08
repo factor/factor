@@ -1,4 +1,4 @@
-REQUIRES: contrib/lazy-lists ;
+REQUIRES: contrib/lazy-lists contrib/sequences ;
 PROVIDE: contrib/parser-combinators { 
     "parser-combinators.factor"
 } {
