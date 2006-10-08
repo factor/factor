@@ -1,5 +1,5 @@
 
-USING: kernel namespaces generic gadgets vars slate turtle turtle-camera ;
+USING: kernel namespaces generic math gadgets vars slate turtle turtle-camera ;
 
 IN: camera-slate
 
@@ -39,4 +39,36 @@ camera-slate H{
     [ slate-ns [ [ 1 strafe-up ] camera> with-turtle .slate ] bind ] }
   { T{ key-down f { A+ } "DOWN" }
     [ slate-ns [ [ 1 strafe-down ] camera> with-turtle .slate ] bind ] }
+
+  { T{ key-down f f "1" }
+    [ slate-ns
+      [
+        [ position> norm reset-turtle 90 turn-left step-turtle 180 turn-left ]
+        camera> with-turtle .slate
+      ] bind
+    ] }
+  { T{ key-down f f "2" }
+    [ slate-ns
+      [
+        [ position> norm reset-turtle 90 pitch-up step-turtle 180 pitch-down ]
+        camera> with-turtle .slate
+      ] bind
+    ] }
+  { T{ key-down f f "3" }
+    [ slate-ns
+      [
+        [ position> norm reset-turtle step-turtle 180 turn-left ]
+        camera> with-turtle .slate
+      ] bind
+    ] }
+
+{ T{ key-down f f "4" }
+    [ slate-ns
+      [
+        [ position> norm
+          reset-turtle 45 turn-left 45 pitch-up step-turtle 180 turn-left ]
+        camera> with-turtle .slate
+      ] bind
+    ] }
+
 } set-gestures
