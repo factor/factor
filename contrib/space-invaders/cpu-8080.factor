@@ -1332,7 +1332,7 @@ SYMBOL: $4
   #! Given an instruction string, return the emulation quotation for
   #! it. This will later be expanded to produce the disassembly and
   #! assembly quotations.
-  8080-generator-parser some call call ;
+  8080-generator-parser some parse force call ;
 
 SYMBOL: last-instruction
 SYMBOL: last-opcode
