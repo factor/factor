@@ -21,7 +21,7 @@
 ! OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
 ! ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 !
-USING: kernel namespaces sequences strings math hashtables parser-combinators ;
+USING: kernel namespaces sequences strings math hashtables parser-combinators lazy-lists ;
 IN: json
 
 ! Grammar for JSON from RFC 4627
@@ -33,87 +33,87 @@ USE: tools
 : [<|>] ( quot - quot )
   { } make unclip [ <|> ] reduce ;
 
-: 'ws' ( -- parser )
+LAZY: 'ws' ( -- parser )
   " " token 
   "\n" token <|>
   "\r" token <|>
   "\t" token <|> 
   "" token <|> ;
 
-: spaced ( parser -- parser )
+LAZY: spaced ( parser -- parser )
   'ws' swap &> 'ws' <& ;
 
-: 'begin-array' ( -- parser )
+LAZY: 'begin-array' ( -- parser )
   "[" token spaced ;
 
-: 'begin-object' ( -- parser )
+LAZY: 'begin-object' ( -- parser )
   "{" token spaced ;
 
-: 'end-array' ( -- parser )
+LAZY: 'end-array' ( -- parser )
   "]" token spaced ;
 
-: 'end-object' ( -- parser )
+LAZY: 'end-object' ( -- parser )
   "}" token spaced ;
 
-: 'name-separator' ( -- parser )
+LAZY: 'name-separator' ( -- parser )
   ":" token spaced ;
 
-: 'value-separator' ( -- parser )
+LAZY: 'value-separator' ( -- parser )
   "," token spaced ;
 
-: 'false' ( -- parser )
+LAZY: 'false' ( -- parser )
   "false" token ;
 
-: 'null' ( -- parser )
+LAZY: 'null' ( -- parser )
   "null" token ;
 
-: 'true' ( -- parser )
+LAZY: 'true' ( -- parser )
   "true" token ;
 
-: 'quot' ( -- parser )
+LAZY: 'quot' ( -- parser )
   "\"" token ;
 
-: 'string' ( -- parser )
+LAZY: 'string' ( -- parser )
   'quot' 
   [ quotable? ] satisfy <+> &> 
   'quot' <& [ >string ] <@  ;
 
 DEFER: 'value'
 
-: 'member' ( -- parser )
+LAZY: 'member' ( -- parser )
   'string'
   'name-separator' <&  
-  [ 'value' call ] <&> ;
+  'value' <&> ;
 
 : object>hashtable ( object -- hashtable )
   #! Convert json object to hashtable
   H{ } clone dup rot [ dup second swap first rot set-hash ] each-with ;
 
-: 'object' ( -- parser )
+LAZY: 'object' ( -- parser )
   'begin-object' 
   'member' &>
   'value-separator' 'member' &> <*> <&:>
   'end-object' <& [ object>hashtable ] <@ ;
 
-: 'array' ( -- parser )
+LAZY: 'array' ( -- parser )
   'begin-array' 
-  [ 'value' call ] &>
-  'value-separator' [ 'value' call ] &> <*> <&:> 
+  'value' &>
+  'value-separator' 'value' &> <*> <&:> 
   'end-array' <&  ;
   
-: 'minus' ( -- parser )
+LAZY: 'minus' ( -- parser )
   "-" token ;
 
-: 'plus' ( -- parser )
+LAZY: 'plus' ( -- parser )
   "+" token ;
 
-: 'zero' ( -- parser )
+LAZY: 'zero' ( -- parser )
   "0" token [ drop 0 ] <@ ;
 
-: 'decimal-point' ( -- parser )
+LAZY: 'decimal-point' ( -- parser )
   "." token ;
 
-: 'digit1-9' ( -- parser )
+LAZY: 'digit1-9' ( -- parser )
   [ 
     dup integer? [ 
       CHAR: 1 CHAR: 9 between? 
@@ -122,25 +122,25 @@ DEFER: 'value'
     ] if 
   ] satisfy [ digit> ] <@ ;
 
-: 'digit0-9' ( -- parser )
+LAZY: 'digit0-9' ( -- parser )
   [ digit? ] satisfy [ digit> ] <@ ;
 
 : sequence>number ( seq -- num ) 
   #! { 1 2 3 } => 123
   0 [ swap 10 * + ] reduce ;
 
-: 'int' ( -- parser )
+LAZY: 'int' ( -- parser )
   'zero' 
   'digit1-9' 'digit0-9' <*> <&:> [ sequence>number ] <@ <|>  ;
 
-: 'e' ( -- parser )
+LAZY: 'e' ( -- parser )
   "e" token "E" token <|> ;
 
 : sign-number ( { minus? num } -- number )
   #! Convert the json number value to a factor number
   dup second swap first [ -1 * ] when ;
 
-: 'exp' ( -- parser )
+LAZY: 'exp' ( -- parser )
     'e' 
     'minus' 'plus' <|> <?> &>
     'digit0-9' <+> [ sequence>number ] <@ <&> [ sign-number ] <@ ;
@@ -149,19 +149,19 @@ DEFER: 'value'
   #! { 1 2 3 } => 0.123
   reverse 0 [ swap 10 / + ] reduce 10 / >float ;
 
-: 'frac' ( -- parser )
+LAZY: 'frac' ( -- parser )
   'decimal-point' 'digit0-9' <+> &> [ sequence>frac ] <@ ;
 
 : raise-to-power ( { num exp } -- num )
   #! Multiply 'num' by 10^exp
   dup second dup [ 10 swap first ^ swap first * ] [ drop first ] if ;
 
-: 'number' ( -- parser )
+LAZY: 'number' ( -- parser )
   'minus' <?>
   [ 'int' , 'frac' 0 succeed <|> , ] [<&>] [ sum ] <@ 
   'exp' <?> <&> [ raise-to-power ] <@ <&> [ sign-number ] <@ ;
 
-: 'value' ( -- parser )
+LAZY: 'value' ( -- parser )
   [
     'false' ,
     'null' ,
@@ -174,4 +174,4 @@ DEFER: 'value'
 
 : json> ( string -- object )
   #! Parse a json formatted string to a factor object
-  'value' some call ;
+  'value' some parse force ;
