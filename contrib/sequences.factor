@@ -39,4 +39,13 @@ IN: sequences-contrib
 : trim* ( seq quot -- newseq ) [ (ltrim*) ] keep rtrim* ;
 : trim ( seq -- newseq ) [ blank? ] trim* ;
 
+: ?head-slice ( seq begin -- newseq ? )
+  2dup head? [ length tail-slice t ] [ drop f ] if ;
+
+: ?tail-slice ( seq end -- newseq ? )
+  2dup tail? [ length head-slice* t ] [ drop f ] if ;
+
+: unclip-slice ( seq -- rest first )
+  dup 1 tail-slice swap first ;
+
 PROVIDE: contrib/sequences ;
