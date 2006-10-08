@@ -34,17 +34,7 @@ GL_LINES glBegin record-vertex step-turtle record-vertex glEnd ;
 
 ! (v0 - v1) x (v1 - v2)
 
-: polygon-normal ( {_v0_v1_v2_} -- normal )
-0 over nth over 1 swap nth v- swap
-1 over nth swap 2 swap nth v- cross ;
-
-! Test and replace with:
-! 
-! : v0-v1 ( { v0 v1 v2 } -- vec ) first2 v- ;
-! 
-! : v1-v2 ( { v0 v1 v2 } -- vec ) first3 v- nip ;
-! 
-! : polygon-normal ( { v0 v1 v2 } -- normal ) dup v0-v1 swap v1-v2 cross ;
+: polygon-normal ( {_v0_v1_v2_} -- normal ) first3 dupd v- -rot v- swap cross ;
 
 : (polygon) ( vertices -- )
 GL_POLYGON glBegin dup polygon-normal gl-normal [ gl-vertex ] each glEnd ;
