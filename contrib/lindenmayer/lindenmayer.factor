@@ -16,24 +16,6 @@ USING: kernel alien namespaces arrays vectors math opengl sequences threads
 IN: lindenmayer 
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-! roll-until-horizontal
-! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-
-: V ( -- V ) { 0 1 0 } ;
-
-: X ( -- 3array ) orientation> [ first  ] map ;
-: Y ( -- 3array ) orientation> [ second ] map ;
-: Z ( -- 3array ) orientation> [ third  ] map ;
-
-: set-X ( seq -- ) orientation> [ 0 swap set-nth ] 2each ;
-: set-Y ( seq -- ) orientation> [ 1 swap set-nth ] 2each ;
-: set-Z ( seq -- ) orientation> [ 2 swap set-nth ] 2each ;
-
-: roll-until-horizontal ( -- )
-V Z cross normalize set-X
-Z X cross normalize set-Y ;
-
-! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 : record-vertex ( -- ) position> gl-vertex ;
 
