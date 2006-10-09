@@ -1,37 +1,29 @@
 - auto-invoke code gc
 - fix alien-callback/SEH bug on win32
-- maybe simplify list into displaying list a sequence of strings
 - x11: scroll up/down wiggles caret
-- slider needs to be modelized
-- some way of intercepting all gestures
-- better help result ranking
-- help search looks funny
-- menus should not require mouse to be held
 - tab completion: add a USE: if necessary
-- completion is not ideal: eg, search for "buttons"
-- live search: timer delay would be nice
+- cocoa: horizontal wheel scrolling
+- rollover is not updated on window focus changes
+- cocoa: windows are not updated while resizing
 
 + ui:
 
-- [ ] write in the UI breaks stuff
-- pane output in UI should use less memory
+- command presentation shouldn't really be a presentation at all
+- completion is not ideal: eg, search for "buttons"
+- live search: timer delay would be nice
+- some way of intercepting all gestures
+- slider needs to be modelized
+- better help result ranking
+- help search looks funny
+- menus should not require mouse to be held
 - variable width word wrap
-  - needs layout tricks
-- add-gadget, model-changed, set-model should compile
 - graphical module manager tool
-  - list of modules -- loaded, not loaded
-  - each module has a list of files
-  - modules can be (re)loaded
-  - keyboard navigation
 - ui browser: show currently selected vocab & words
 - auto-update browser and help when sources reload
 - how do we refer to command shortcuts in the docs?
-- figure out if we need both set-model and set-model*
 - roundoff is still not quite right with tracks
 - fix top level window positioning
-- x11.app has a problem with A+ keys
 - services do not launch if factor not running
-- fix ui listener delay
 - editor:
   - double/triple click
   - autoscroll
@@ -39,19 +31,9 @@
   - more efficient multi-line inserts
   - write "foo| " and put caret at | then select word element: selects
     space
-- fonts/ should go inside the .app -- we need multi-tier resource-path
-- should be possible to drop an image file on the .app to run it
-- support x11's large selections, if needed
-- own-selection violates ICCCM
-- cocoa: windows are not updated while resizing
 - grid slows down with 2000 lines
 - see if its possible to only repaint dirty regions
-- x11 title bars are funny
-- rollover is not updated on window focus changes
-- x11 input methods
-- cocoa:
-  - horizontal wheel scrolling
-  - polish OS X menu bar code
+- polish OS X menu bar code
 - structure editor
 
 + module system:
@@ -59,7 +41,6 @@
 - convention for main entry point of a module
 - convention for main help article of a module
 - track a list of assets loaded from each module's file
-- generic 'define ( asset def -- )'
 - C types should be words
   - TYPEDEF: float { ... } { ... } ;   ==> \ float T{ c-type ... } "c-type" swp
   - TYPEDEF: float FTFloat ;  ==> \ float \ FTFloat "c-type" swp
@@ -71,12 +52,8 @@
 
 - more compact relocation info
 - cocoa: support real redefinition
-- problem if major gc happens during relocation
-  - in fact relocation should not cons at all
+- relocation should not cons at all
 - stdcall callbacks
-- see if alien calls can be made faster
-- compiler tests are not as reliable now because of try-compile usage
-  - we can just do [ t ] [ \ foo compiled? ] unit-test
 - [ [ dup call ] dup call ] infer hangs
 - callstack overflow when compiling mutually recursive inline words
 - test what is done in the case of an invalid declaration on an inline
@@ -105,9 +82,7 @@
 - minor GC takes too long now, we should card mark code heap
 - buffer-ptr should be an alien
 - swap nappend ==> nappend
-- sometimes darcs get fails with the httpd
 - gdb triggers 'mutliple i/o ops on port' error
-- factorcode httpd crashed: bad file descriptor
 - growable data heap
 - incremental GC
 - UDP

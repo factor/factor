@@ -100,8 +100,10 @@ opengl sequences ;
     mouse-location rot window send-button-up ;
 
 : send-wheel$ ( view event -- )
-    [ -> deltaY 0 > ] 2keep mouse-location
-    rot window send-wheel ;
+    over >r
+    dup -> deltaX sgn neg over -> deltaY sgn neg 2array -rot
+    mouse-location
+    r> window send-wheel ;
 
 : send-action$ ( view event gesture -- junk )
     >r drop window r> send-action f ;

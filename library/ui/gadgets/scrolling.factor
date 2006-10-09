@@ -16,17 +16,21 @@ TUPLE: scroller viewport x y follows ;
 
 : find-scroller [ scroller? ] find-parent ;
 
-: scroll-up-line scroller-y -1 swap slide-by-line ;
-
-: scroll-down-line scroller-y 1 swap slide-by-line ;
-
 : scroll-up-page scroller-y -1 swap slide-by-page ;
 
 : scroll-down-page scroller-y 1 swap slide-by-page ;
 
+: scroll-up-line scroller-y -1 swap slide-by-line ;
+
+: scroll-down-line scroller-y 1 swap slide-by-line ;
+
+: do-mouse-scroll ( scroller -- )
+    scroll-direction get-global first2
+    pick scroller-y slide-by-line
+    swap scroller-x slide-by-line ;
+
 scroller H{
-    { T{ wheel-up } [ scroll-up-line ] }
-    { T{ wheel-down } [ scroll-down-line ] }
+    { T{ mouse-scroll } [ do-mouse-scroll ] }
     { T{ slider-changed } [ relayout-1 ] }
 } set-gestures
 

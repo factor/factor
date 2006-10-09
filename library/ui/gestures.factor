@@ -27,8 +27,7 @@ TUPLE: motion ;
 TUPLE: drag # ;
 TUPLE: button-up mods # ;
 TUPLE: button-down mods # ;
-TUPLE: wheel-up ;
-TUPLE: wheel-down ;
+TUPLE: mouse-scroll ;
 TUPLE: mouse-enter ;
 TUPLE: mouse-leave ;
 TUPLE: lose-focus ;
@@ -73,6 +72,9 @@ SYMBOL: hand-click-loc
 
 SYMBOL: hand-buttons
 V{ } clone hand-buttons set-global
+
+SYMBOL: scroll-direction
+{ 0 0 } scroll-direction set-global
 
 : button-gesture ( gesture -- )
     hand-clicked get-global 2dup handle-gesture [
@@ -170,10 +172,11 @@ SYMBOL: menu-mode?
     dup button-up-# hand-buttons get-global delete
     button-gesture ;
 
-: send-wheel ( up/down loc world -- )
+: send-wheel ( direction loc world -- )
     move-hand
-    T{ wheel-up } T{ wheel-down } ?
-    hand-gadget get-global handle-gesture drop ;
+    scroll-direction set-global
+    T{ mouse-scroll } hand-gadget get-global handle-gesture
+    drop ;
 
 : send-action ( world gesture -- )
     swap world-focus handle-gesture drop ;
