@@ -12,6 +12,7 @@ IN: sqlite
 USING: alien compiler errors libsqlite kernel namespaces sequences strings ;
 
 TUPLE: sqlite-error n message ;
+SYMBOL: db
 
 ! High level sqlite routines
 : sqlite-check-result ( result -- )
@@ -117,3 +118,10 @@ DEFER: (sqlite-map)
 
 : sqlite-map ( statement quot -- seq )
   [ ] (sqlite-map) ;
+
+: with-sqlite ( path quot -- )
+    [
+        >r sqlite-open db set r>
+        [ db get sqlite-close ] cleanup
+    ] with-scope ;
+
