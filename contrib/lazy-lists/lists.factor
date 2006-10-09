@@ -371,8 +371,39 @@ M: sequence-cons list? ( object -- bool )
     { [ t ] [ "Could not convert object to a list" throw ] }
   } cond ;
 
-: lconcat ( list -- result )
-  list>array nil [ lappend ] reduce ;
+TUPLE: lazy-concat car cdr ;
+
+DEFER: lconcat
+
+: (lconcat) ( car cdr -- list )
+  over nil? [
+    nip lconcat 
+  ] [
+    <lazy-concat>    
+  ] if ;
+  
+: lconcat ( list -- list )
+  dup nil? [
+    drop nil
+  ] [
+    uncons (lconcat)
+  ] if ;
+
+M: lazy-concat car ( lazy-concat -- car )
+  lazy-concat-car car ;
+
+M: lazy-concat cdr ( lazy-concat -- cdr )
+  [ lazy-concat-car cdr ] keep lazy-concat-cdr (lconcat) ;
+
+M: lazy-concat nil? ( lazy-concat -- bool )
+  dup lazy-concat-car nil? [
+    lazy-concat-cdr nil?
+  ] [
+    drop f
+  ] if ;
+
+M: lazy-concat list? ( object -- bool )
+  drop t ;
 
 : lcartesian-product ( list1 list2 -- result ) 
   swap [ swap [ 2array ] lmap-with ] lmap-with lconcat ;
