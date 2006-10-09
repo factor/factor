@@ -17,7 +17,7 @@ IN: sequences-contrib
 
 : (rtrim*) ( seq quot -- newseq )
     over length 0 > [
-        2dup >r last r> call
+        2dup >r peek r> call
         [ >r dup length 1- head-slice r> (rtrim*) ] [ drop ] if
     ] [
         drop
