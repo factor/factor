@@ -1,8 +1,43 @@
 USING: errors gadgets-tracks generic hashtables help io kernel
 math memory sequences words compiler parser modules definitions
-tools ;
+tools alien ;
 
 ARTICLE: "changes" "Changes in the latest release"
+{ $heading "Factor 0.85" }
+{ $subtopic "Core"
+    { $list
+        { "Implemented garbage collection for the compiled code heap using a mark and sweep algorithm. The code GC kicks in automatically when the code heap is full, and can also be invoked manually with " { $link code-gc } "." }
+        { "The " { $link usage. } " word now lists individual method usages" }
+        { "New " { $link alien-indirect } " word allows invoking function pointers" }
+        { "Pressing " { $snippet "F8" } " or invoking " { $link reload-modules } " reloads changed source files from loaded modules. Use " { $link reset-modified } " to reset modification times" }
+        { "The module system is used to organize the core library now, and modules from " { $snippet "contrib/" } " must now have their names prefixed with " { $snippet "contrib/" } " when being passed to " { $link require } ", " { $link POSTPONE: REQUIRES: } " and " { $link POSTPONE: PROVIDE: } }
+    }
+}
+{ $subtopic "UI"
+    { $list
+        "Right-clicking on a presentation now shows a popup menu of operations"
+        { "Pressing " { $snippet "C+e" } " in the UI listener displays a file name completion popup; selecting a file and pressing " { $snippet "RETURN" } " opens it in the default editor using " { $link edit-file } }
+        { "Pressing " { $snippet "TAB" } " or " { $snippet "C+u" } " in the UI listener displays a word or vocabulary name completion popup, respectively. Selecting a word inserts its name in the input area, selecting a vocabulary adds it to the search path." }
+        { "New dataflow visualizer tool. Enter a piece of code in the listener, and press " { $snippet "C+A+d" } }
+        "The single stepper tool now properly handles code which uses continuations and exceptions"
+        { "Various fixes for the Windows UI backend (Doug Coleman)" }
+    }
+}
+{ $subtopic "Contributed libraries"
+    { $list
+        { "Updated " { $snippet "contrib/sqlite" } " (Doug Coleman)" }
+        { "Updated " { $snippet "contrib/lazy-lists" } " (Chris Double)" }
+        { "Updated " { $snippet "contrib/parser-combinators" } " (Chris Double)" }
+        { "Updated " { $snippet "contrib/process" } " (Doug Coleman)" }
+        { "Updated " { $snippet "contrib/calendar" } " (Doug Coleman)" }
+        { "Updated " { $snippet "contrib/slate" } " (Eduardo Cavazos)" }
+        { "New module " { $snippet "contrib/lindenmayer" } " - Lindenmayer L-system visualization (Eduardo Cavazos)" }
+        { "New module " { $snippet "contrib/jni" } " - Java interface (Chris Double)" }
+        { "New module " { $snippet "contrib/usb" } " - USB interface (Chris Double)" }
+        { "New module " { $snippet "contrib/match" } " - Pattern matching (Chris Double)" }
+        { "New module " { $snippet "contrib/textmate" } " - TextMate editor integration (Benjamin Pollack)" }
+    }
+}
 { $heading "Factor 0.84" }
 { $subtopic "Core"
     { $list
