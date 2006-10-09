@@ -46,13 +46,3 @@ M: help-gadget tool-help drop "ui-help" ;
 
 : help-action ( help-gadget -- link )
     help-gadget-history model-value >link ;
-
-help-gadget "Toolbar" {
-    { "Back" T{ key-down f { C+ } "b" } [ help-gadget-history go-back ] }
-    { "Forward" T{ key-down f { C+ } "f" } [ help-gadget-history go-forward ] }
-    { "Home" T{ key-down f { C+ } "h" } [ go-home ] }
-}
-link class-operations [ help-action ] modify-operations
-[ command-name "Follow" = not ] subset
-append
-define-commands

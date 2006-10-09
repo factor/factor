@@ -6,7 +6,7 @@ gadgets-panes gadgets-scrolling gadgets-text gadgets-lists
 gadgets-search gadgets-theme gadgets-tracks gadgets-workspace
 generic hashtables tools io kernel listener math models
 namespaces parser prettyprint sequences shells strings styles
-threads words definitions ;
+threads words definitions help ;
 
 TUPLE: listener-gadget input output stack minibuffer ;
 
@@ -29,10 +29,16 @@ TUPLE: listener-gadget input output stack minibuffer ;
 : init-listener ( listener -- )
     f <model> swap set-listener-gadget-stack ;
 
+: welcome. ( -- )
+    "If this is your first time with Factor, please read " print
+    "ui-tools" ($link) ", and especially " write
+    "ui-listener" ($link) "." print terpri ;
+
 : listener-thread ( listener -- )
     dup listener-stream [
         [ ui-listener-hook ] curry listener-hook set
         find-messages batch-errors set
+        welcome.
         tty
     ] with-stream* ;
 
@@ -163,7 +169,7 @@ listener-gadget "Toolbar" {
     { "Send EOF" T{ key-down f { C+ } "d" } [ listener-eof ] }
 } define-commands
 
-listener-gadget "Listener commands" {
+listener-gadget "Completion commands" {
     {
         "Complete word"
         T{ key-down f f "TAB" }

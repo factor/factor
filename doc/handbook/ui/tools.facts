@@ -1,11 +1,29 @@
 USING: gadgets gadgets-listener gadgets-browser gadgets-help
-gadgets-walker gadgets-dataflow gadgets-workspace help
-gadgets-panes gadgets-text listener ;
+gadgets-presentations gadgets-walker gadgets-dataflow
+gadgets-workspace help gadgets-panes gadgets-text listener
+definitions prettyprint io parser ;
+
+ARTICLE: "ui-presentations" "Presentations in the UI"
+"A " { $emphasis "presentation" } " is a graphical view of an object which is directly linked to the object in some way. The help article links you see in the documentation browser are presentations; and if you " { $link see } " a word in the UI listener, all words in the definition will themselves be presentations."
+$terpri
+"When you move the mouse over a presentation, it is highlighted with a rectangular border and a short summary of the object being presented is shown in the status bar (the summary is produced using the " { $link summary } " word)."
+$terpri
+"Clicking a presentation with the left mouse button invokes a default operation, which usually views the object in some way. For example, clicking a presentation of a word jumps to the word definition in the " { $link "ui-browser" } "."
+$terpri
+"Clicking and holding the right mouse button on a presentation displays a popup menu listing available operations."
+$terpri
+"Presentation gadgets can be constructed directly using the " { $link <object-presentation> } " word, and they can also be written to " { $link pane } " gadgets using the " { $link write-object } " word." ;
 
 ARTICLE: "ui-listener" "UI listener"
-"The graphical listener is based around the terminal listener (" { $link "listener" } ") and adds an input history and clickable output presentations (" { $link "styles" } ")."
+"The graphical listener is based around the terminal listener (" { $link "listener" } ") and adds the following features:"
+{ $list
+    "Input history"
+    "Completion"
+    { "Clickable presentations (see " { $link "ui-presentations" } ")" }
+}
+"The below completion commands display a gadget at the bottom of the listener, known as the mini-buffer. Typing more text narrows down the list of available items. The " { $snippet "UP" } " and " { $snippet "DOWN" } " arrow keys shift the selection between listed items, and the " { $snippet "RETURN" } " key invokes a default operation for the selected item."
 { $commands listener-gadget }
-"The word commands appearing in the below list operate on the token at the caret position in the input area. The quotation commands operate on the entire contents of the input area. The walker and dataflow tools are invoked using these commands."
+"The below word commands operate on the token at the caret position in the input area. The quotation commands operate on the entire contents of the input area."
 { $commands interactor }
 "Listeners are instances of " { $link listener-gadget } ". The listener consists of an output area (instance of " { $link pane } "), an input area (instance of " { $link interactor } "), and a stack display kept up to date using a " { $link listener-hook } "." ;
 
@@ -34,12 +52,38 @@ $terpri
 { $commands dataflow-gadget }
 "Dataflow viewers are instances of " { $link dataflow-gadget } "." ;
 
-ARTICLE: "ui-tools" "Development tools in the UI"
-"UI development tools are integrated into a single-window " { $emphasis "workspace" } ". Multiple workspaces can be open at once, and keyboard commands are provided for switching between tools."
+ARTICLE: "ui-cocoa" "Functionality specific to Mac OS X"
+"On Mac OS X, the Factor UI offers additional features which integrate with this operating system."
+$terpri
+"First, a standard Mac-style menu bar is provided, which offers the bare minimum of what you would expect from a Mac OS X application."
+$terpri
+"Dropping a source file onto the Factor icon in the dock runs the source file in the listener."
+$terpri
+"If you install " { $strong "Factor.app" } " in your " { $strong "Applications" } " folder, then other applications will be able to call Factor via the System Services feature. For example, you can select some text in " { $strong "TextEdit.app" } ", then invoke the " { $strong "TextEdit->Services->Factor->Evaluate Selection" } " menu item, which will replace the selected text with the result of evaluating it in Factor."
+
+;
+
+ARTICLE: "ui-tools" "UI development tools"
+"The Factor development environment can seem rather different from what you are used to, however it is very simple and powerful."
+$terpri
+"To take full advantage of the UI, you should be using a supported text editor, and load the correct editor integration module. See " { $link edit } "."
+$terpri
+"The following is an example of a typical session with the UI which should give you a taste of its power:"
+{ $list
+    { "You decide to refactor some code, and move a few words from a source file you have already loaded, into a new source file." }
+    { "You press " { $snippet "C+e" } " in the listener, which displays a gadget where you can type part of a loaded file's name, and then press " { $snippet "RETURN" } " when the correct completion is highlighted. This opens the file in your editor." } 
+    { "You refactor your words, move them to a new source file, and load the new file using " { $link run-file } "." }
+    { "Interactively testing the new code reveals a problem with one particular code snippet, so you enter it in the listener's input area, and press " { $snippet "C+A+w" } " to invoke the single stepper." }
+    { "Single stepping through the code makes the problem obvious, so you right-click on a presentation of the broken word in the stepper, and choose " { $strong "Edit" } " from the resulting popup menu." }
+    { "After fixing the problem in the source editor, you right click on the word in the stepper and invoke " { $strong "Reload" } "." }
+}
+"All development tools are integrated into a single-window " { $emphasis "workspace" } ". Multiple workspaces can be open at once, and keyboard commands are provided for switching between tools."
 { $commands workspace }
 "Workspaces are instances of " { $link workspace-window } "."
+{ $subsection "ui-presentations" }
 { $subsection "ui-listener" }
 { $subsection "ui-browser" }
 { $subsection "ui-help" }
 { $subsection "ui-walker" }
-{ $subsection "ui-dataflow" } ;
+{ $subsection "ui-dataflow" }
+{ $subsection "ui-cocoa" } ;

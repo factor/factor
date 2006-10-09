@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 IN: gadgets-lists
 USING: gadgets gadgets-scrolling kernel sequences models opengl
-math ;
+math namespaces ;
 
 TUPLE: list index presenter action color ;
 
@@ -69,8 +69,18 @@ M: list focusable-child* drop t ;
         dup list-value over list-action call
     ] unless drop ;
 
+: click-list ( list -- )
+    hand-gadget get [ gadget-parent list? ] find-parent
+    dup [
+        over gadget-children index dup -1 =
+        [ 2drop ] [ swap select-index ] if
+    ] [
+        2drop
+    ] if ;
+
 list H{
-    { T{ button-down } [ request-focus ] }
+    { T{ button-down } [ dup request-focus click-list ] }
+    { T{ drag } [ click-list ] }
     { T{ key-down f f "UP" } [ select-prev ] }
     { T{ key-down f f "DOWN" } [ select-next ] }
     { T{ key-down f f "RETURN" } [ call-action ] }
