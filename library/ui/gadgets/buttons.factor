@@ -53,12 +53,6 @@ C: button ( gadget quot -- button )
 : <bevel-button> ( gadget quot -- button )
     <button> dup bevel-button-theme ;
 
-: repeat-button-down ( button -- )
-    dup 100 add-timer button-clicked ;
-
-: repeat-button-up ( button -- )
-    dup button-update remove-timer ;
-
 TUPLE: repeat-button ;
 
 repeat-button H{

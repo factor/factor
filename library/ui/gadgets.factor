@@ -124,13 +124,13 @@ TUPLE: timer-gadget quot ;
 C: timer-gadget ( gadget -- gadget )
     [ set-gadget-delegate ] keep ;
 
-M: timer-gadget tick nip timer-gadget-quot call ;
+M: timer-gadget tick timer-gadget-quot call ;
 
 : start-timer-gadget ( gadget quot -- )
     2dup call
     over >r curry r>
     [ set-timer-gadget-quot ] keep
-    100 add-timer ; inline
+    100 200 add-timer ; inline
 
 : stop-timer-gadget ( gadget -- )
     dup remove-timer f swap set-timer-gadget-quot ;
