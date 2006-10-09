@@ -422,3 +422,21 @@ M: lazy-concat list? ( object -- bool )
 
 : lcomp* ( list guards quot -- result )
   >r >r lcartesian-product* r> [ lsubset ] each r> lmap ;
+
+DEFER: lmerge
+
+: (lmerge) ( list1 list2 -- result )
+  over [ car ] curry -rot 
+  [ 
+    dup [ car ] curry -rot
+    [
+      >r cdr r> cdr lmerge
+    ] curry curry lazy-cons       
+  ] curry curry lazy-cons ;
+
+: lmerge ( list1 list2 -- result ) 
+  {
+    { [ over nil? ] [ nip   ] }
+    { [ dup nil?  ]  [ drop ] }
+    { [ t         ]  [ (lmerge) ] }
+  } cond ;
