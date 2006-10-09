@@ -9,148 +9,25 @@
 ! executing SQL calls and obtaining results.
 !
 IN: sqlite
-USE: kernel
-USE: alien
-USE: errors
-USE: strings
-USE: namespaces
-USE: sequences
-USE: compiler
+USING: alien compiler errors libsqlite kernel namespaces sequences strings ;
 
-"sqlite" windows? [ "sqlite3.dll" ] [ "libsqlite3.so" ] if "cdecl" add-library
-BEGIN-STRUCT: sqlite3
-END-STRUCT
-
-BEGIN-STRUCT: sqlite3-indirect
-  FIELD: sqlite3* pointer
-END-STRUCT
-
-BEGIN-STRUCT: sqlite3-stmt
-END-STRUCT
-
-BEGIN-STRUCT: sqlite3-stmt-indirect
-  FIELD: sqlite3-stmt* pointer
-END-STRUCT
-
-BEGIN-STRUCT: char*-indirect
-  FIELD: char* pointer
-END-STRUCT
-
-! Return values from sqlite functions
-: SQLITE_OK           0   ; ! Successful result
-: SQLITE_ERROR        1   ; ! SQL error or missing database
-: SQLITE_INTERNAL     2   ; ! An internal logic error in SQLite 
-: SQLITE_PERM         3   ; ! Access permission denied 
-: SQLITE_ABORT        4   ; ! Callback routine requested an abort 
-: SQLITE_BUSY         5   ; ! The database file is locked 
-: SQLITE_LOCKED       6   ; ! A table in the database is locked 
-: SQLITE_NOMEM        7   ; ! A malloc() failed 
-: SQLITE_READONLY     8   ; ! Attempt to write a readonly database 
-: SQLITE_INTERRUPT    9   ; ! Operation terminated by sqlite_interrupt() 
-: SQLITE_IOERR       10   ; ! Some kind of disk I/O error occurred 
-: SQLITE_CORRUPT     11   ; ! The database disk image is malformed 
-: SQLITE_NOTFOUND    12   ; ! (Internal Only) Table or record not found 
-: SQLITE_FULL        13   ; ! Insertion failed because database is full 
-: SQLITE_CANTOPEN    14   ; ! Unable to open the database file 
-: SQLITE_PROTOCOL    15   ; ! Database lock protocol error 
-: SQLITE_EMPTY       16   ; ! (Internal Only) Database table is empty 
-: SQLITE_SCHEMA      17   ; ! The database schema changed 
-: SQLITE_TOOBIG      18   ; ! Too much data for one row of a table 
-: SQLITE_CONSTRAINT  19   ; ! Abort due to contraint violation 
-: SQLITE_MISMATCH    20   ; ! Data type mismatch 
-: SQLITE_MISUSE      21   ; ! Library used incorrectly 
-: SQLITE_NOLFS       22   ; ! Uses OS features not supported on host 
-: SQLITE_AUTH        23   ; ! Authorization denied 
-: SQLITE_ROW         100  ; ! sqlite_step() has another row ready 
-: SQLITE_DONE        101  ; ! sqlite_step() has finished executing 
-
-! Return values from the sqlite3_column_type function
-: SQLITE_INTEGER     1 ;
-: SQLITE_FLOAT       2 ;
-: SQLITE_TEXT        3 ;
-: SQLITE_BLOB        4 ;
-: SQLITE_NULL        5 ;
-
-! Values for the 'destructor' parameter of the 'bind' routines. 
-: SQLITE_STATIC      0  ;
-: SQLITE_TRANSIENT   -1 ;
-
-: sqlite3_open ( filename sqlite3-indirect -- result )
-  "int" "sqlite" "sqlite3_open" [ "char*" "sqlite3-indirect*" ] alien-invoke ; 
-
-: sqlite3_close ( db -- result )
-  "int" "sqlite" "sqlite3_close" [ "sqlite3*" ] alien-invoke ; 
-
-: sqlite3_prepare ( db sql sql-len sqlite3-stmt-indirect tail -- result )
-  "int" "sqlite" "sqlite3_prepare" [ "sqlite3*" "char*" "int" "sqlite3-stmt-indirect*" "char*-indirect*" ] alien-invoke ; 
-
-: sqlite3_finalize ( stmt -- result ) 
-  "int" "sqlite" "sqlite3_finalize" [ "sqlite3-stmt*" ] alien-invoke ; 
-
-: sqlite3_reset ( stmt -- result )
-  "int" "sqlite" "sqlite3_reset" [ "sqlite3-stmt*" ] alien-invoke ; 
-
-: sqlite3_step ( stmt -- result )
-  "int" "sqlite" "sqlite3_step" [ "sqlite3-stmt*" ] alien-invoke ; 
-
-: sqlite3_last_insert_rowid ( stmt -- result )
-  "int" "sqlite" "sqlite3_last_insert_rowid" [ "sqlite3*" ] alien-invoke ; 
-
-: sqlite3_bind_blob ( stmt index pointer len destructor -- result )
-  "int" "sqlite" "sqlite3_bind_blob" [ "sqlite3-stmt*" "int" "void*" "int" "int" ] alien-invoke ; 
-
-: sqlite3_bind_int ( stmt index int -- result )
-  "int" "sqlite" "sqlite3_bind_int" [ "sqlite3-stmt*" "int" "int" ] alien-invoke ; 
-
-: sqlite3_bind_null ( stmt index  -- result )
-  "int" "sqlite" "sqlite3_bind_null" [ "sqlite3-stmt*" "int" ] alien-invoke ; 
-
-: sqlite3_bind_text ( stmt index text len destructor -- result )
-  "int" "sqlite" "sqlite3_bind_text" [ "sqlite3-stmt*" "int" "char*" "int" "int" ] alien-invoke ; 
-
-: sqlite3_bind_parameter_index ( stmt name -- result )
-  "int" "sqlite" "sqlite3_bind_parameter_index" [ "sqlite3-stmt*" "char*" ] alien-invoke ; 
-
-: sqlite3_column_count ( stmt -- count )
-  "int" "sqlite" "sqlite3_column_count" [ "sqlite3-stmt*" ] alien-invoke ; 
-
-: sqlite3_column_blob ( stmt col -- void* )
-  "void*" "sqlite" "sqlite3_column_blob" [ "sqlite3-stmt*" "int" ] alien-invoke ; 
-
-: sqlite3_column_bytes ( stmt col -- int )
-  "int" "sqlite" "sqlite3_column_bytes" [ "sqlite3-stmt*" "int" ] alien-invoke ; 
-
-: sqlite3_column_decltype ( stmt col -- string )
-  "char*" "sqlite" "sqlite3_column_decltype" [ "sqlite3-stmt*" "int" ] alien-invoke ; 
-
-: sqlite3_column_int ( stmt col -- int )
-  "int" "sqlite" "sqlite3_column_int" [ "sqlite3-stmt*" "int" ] alien-invoke ; 
-
-: sqlite3_column_name ( stmt col -- string )
-  "char*" "sqlite" "sqlite3_column_name" [ "sqlite3-stmt*" "int" ] alien-invoke ; 
-
-: sqlite3_column_text ( stmt col -- string )
-  "char*" "sqlite" "sqlite3_column_text" [ "sqlite3-stmt*" "int" ] alien-invoke ; 
-
-: sqlite3_column_type ( stmt col -- int )
-  "int" "sqlite" "sqlite3_column_type" [ "sqlite3-stmt*" "int" ] alien-invoke ; 
+TUPLE: sqlite-error n message ;
 
 ! High level sqlite routines
 : sqlite-check-result ( result -- )
   #! Check the result from a sqlite call is ok. If it is
-  #! return, otherwise throw an error. TODO: Throw the actual
-  #! error text message.
+  #! return, otherwise throw an error.
   dup SQLITE_OK = [
     drop 
   ] [
-    "sqlite returned an error. See datastack for the error value." throw
+    dup sqlite-error-messages nth <sqlite-error> throw
   ] if ;
 
 : sqlite-open ( filename -- db )
   #! Open the database referenced by the filename and return
   #! a handle to that database. An error is thrown if the database
   #! failed to open.
-  "sqlite3-indirect" <c-object> tuck sqlite3_open sqlite-check-result sqlite3-indirect-pointer ;
+  "void*" <c-object> [ sqlite3_open sqlite-check-result ] keep *void* ;
 
 : sqlite-close ( db -- )
   #! Close the given database
@@ -164,9 +41,9 @@ END-STRUCT
   #! Prepare a SQL statement. Returns the statement which
   #! can have values bound to parameters or simply executed.
   #! TODO: Support multiple statements in the SQL string.
-  dup length "sqlite3-stmt-indirect" <c-object> dup >r 
-  "char*-indirect" <c-object> sqlite3_prepare sqlite-check-result
-  r> sqlite3-stmt-indirect-pointer ;
+  dup length "void*" <c-object> "void*" <c-object>
+  [ sqlite3_prepare sqlite-check-result ] 2keep
+  drop *void* ;
 
 : sqlite-bind-text ( statement index text -- )
   #! Bind the text to the parameterized value in the statement.  
