@@ -162,8 +162,8 @@ SYMBOL: hWnd
 : handle-wm-kill-focus ( hWnd uMsg wParam lParam -- )
     3drop window [ unfocus-world ] when* ;
 
-: mouse-coordinate ( lParam -- seq ) [ lo-word ] keep hi-word 2array ;
-: mouse-wheel ( lParam -- n ) hi-word 0 > ;
+: mouse-lparam ( lParam -- seq ) [ lo-word ] keep hi-word 2array ;
+: mouse-wheel ( lParam -- n ) mouse-lparam [ sgn neg ] map ;
 
 : mouse-event>gesture ( uMsg -- button )
     key-modifiers swap
@@ -181,7 +181,7 @@ SYMBOL: hWnd
     { WM_LBUTTONDOWN WM_RBUTTONDOWN } member? ;
 
 : prepare-mouse ( hWnd uMsg wParam lParam -- button coordinate world )
-    nip >r mouse-event>gesture r> mouse-coordinate rot window ;
+    nip >r mouse-event>gesture r> mouse-lparam rot window ;
 
 : handle-wm-buttondown ( hWnd uMsg wParam lParam -- )
     >r over capture-mouse? [ pick SetCapture drop ] when r>
@@ -201,10 +201,10 @@ SYMBOL: hWnd
         TrackMouseEvent drop
         track-mouse-state on
     ] unless
-    mouse-coordinate swap window move-hand fire-motion ;
+    mouse-lparam swap window move-hand fire-motion ;
 
 : handle-wm-mousewheel ( hWnd uMsg wParam lParam -- )
-    mouse-coordinate >r mouse-wheel nip r> rot window send-wheel ;
+    mouse-lparam >r mouse-wheel nip r> rot window send-wheel ;
 
 : handle-wm-cancelmode ( hWnd uMsg wParam lParam -- )
     #! message sent if windows needs application to stop dragging
