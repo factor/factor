@@ -15,8 +15,6 @@ IN: sequences-contrib
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-: last ( seq -- elt ) [ length 1- ] keep nth ;
-
 : (rtrim*) ( seq quot -- newseq )
     over length 0 > [
         2dup >r last r> call
