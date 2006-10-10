@@ -4,7 +4,6 @@
 
 + ui:
 
-- command presentation shouldn't really be a presentation at all
 - completion is not ideal: eg, search for "buttons"
 - live search: timer delay would be nice
 - some way of intercepting all gestures

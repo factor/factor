@@ -11,36 +11,10 @@ generic hashtables tools io kernel prettyprint sequences strings
 styles words help math models namespaces ;
 
 ! Clickable objects
-TUPLE: presentation object command ;
-
-C: presentation ( button object command -- button )
-    [ set-presentation-command ] keep
-    [ set-presentation-object ] keep
-    [ set-gadget-delegate ] keep ;
-
-: <object-presentation> ( gadget object -- button )
-    >r f <roll-button> r> f <presentation> ;
-
-: <command-presentation> ( target command -- button )
-    dup command-name f <bevel-button> -rot <presentation> ;
-
-: <commands-menu> ( target commands -- gadget )
-    [ hand-clicked get find-world hide-glass ] modify-operations
-    [ <command-presentation> ] map-with
-    make-pile 1 over set-pack-fill ;
-
-: operations-menu ( presentation -- gadget )
-    dup presentation-command [
-        drop
-    ] [
-        dup presentation-object
-        dup object-operations <commands-menu>
-        swap show-menu
-    ] if ;
+TUPLE: presentation object ;
 
 : invoke-presentation ( presentation -- )
-    dup presentation-object swap presentation-command
-    [ dup default-operation ] unless*
+    dup presentation-object dup default-operation
     invoke-command ;
 
 : show-mouse-help ( presentation -- )
@@ -52,17 +26,37 @@ C: presentation ( button object command -- button )
 M: presentation ungraft* ( presentation -- )
     dup hide-mouse-help delegate ungraft* ;
 
+C: presentation ( gadget object -- button )
+    [ set-presentation-object ] keep
+    swap [ invoke-presentation ] <roll-button>
+    over set-gadget-delegate ;
+
+: <command-button> ( target command -- button )
+    dup command-name -rot
+    [ invoke-command drop ] curry curry
+    <bevel-button> ;
+
+: <commands-menu> ( target commands -- gadget )
+    [ hand-clicked get find-world hide-glass ] modify-operations
+    [ <command-button> ] map-with
+    make-pile 1 over set-pack-fill ;
+
+: operations-menu ( presentation -- gadget )
+    dup presentation-object
+    dup object-operations <commands-menu>
+    swap show-menu ;
+
 presentation H{
-    { T{ button-up } [ [ invoke-presentation ] if-clicked ] }
-    { T{ button-down f f 3 } [ [ operations-menu ] if-clicked ] }
+    { T{ button-down f f 3 } [ operations-menu ] }
     { T{ mouse-leave } [ dup hide-mouse-help button-update ] }
     { T{ motion } [ dup show-mouse-help button-update ] }
 } set-gestures
 
 ! Presentation help bar
 : <presentation-help> ( model -- gadget )
-    [ [ presentation-object summary ] [ "" ] if* ] <filter>
-    <label-control> dup reverse-video-theme ;
+    [
+        [ presentation-object summary ] [ "" ] if*
+    ] <filter> <label-control> dup reverse-video-theme ;
 
 : <listener-button> ( gadget quot -- button )
     [ call-listener ] curry <roll-button> ;
@@ -87,7 +81,7 @@ presentation H{
     over specified-font over set-label-font ;
 
 : apply-presentation-style ( style gadget -- style gadget )
-    presented [ <object-presentation> ] apply-style ;
+    presented [ <presentation> ] apply-style ;
 
 : apply-quotation-style ( style gadget -- style gadget )
     quotation [ <listener-button> ] apply-style ;

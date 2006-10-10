@@ -12,7 +12,7 @@ $terpri
 $terpri
 "Clicking and holding the right mouse button on a presentation displays a popup menu listing available operations."
 $terpri
-"Presentation gadgets can be constructed directly using the " { $link <object-presentation> } " word, and they can also be written to " { $link pane } " gadgets using the " { $link write-object } " word." ;
+"Presentation gadgets can be constructed directly using the " { $link <presentation> } " word, and they can also be written to " { $link pane } " gadgets using the " { $link write-object } " word." ;
 
 ARTICLE: "ui-listener" "UI listener"
 "The graphical listener is based around the terminal listener (" { $link "listener" } ") and adds the following features:"

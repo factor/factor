@@ -22,6 +22,8 @@ focus focused?
 fonts handle
 loc ;
 
+SYMBOL: menu-mode?
+
 : free-fonts ( world -- )
     dup world-handle select-gl-context
     world-fonts hash-values [ second free-sprites ] each ;

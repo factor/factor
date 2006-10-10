@@ -152,8 +152,6 @@ SYMBOL: scroll-direction
     hand-gadget get-global hand-clicked set-global
     hand-loc get-global hand-click-loc set-global ;
 
-SYMBOL: menu-mode?
-
 : move-hand ( loc world -- )
     dup hand-world set-global
     under-hand >r over hand-loc set-global

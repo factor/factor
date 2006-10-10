@@ -49,6 +49,7 @@ PROVIDE: library/ui {
     "tools/operations.factor"
     "text/editor.facts"
 } {
+    "test/editor.factor"
     "test/gadgets.factor"
     "test/models.factor"
     "test/document.factor"
@@ -57,7 +58,7 @@ PROVIDE: library/ui {
     "test/rectangles.factor"
     "test/commands.factor"
     "test/panes.factor"
-    "test/editor.factor"
+    "test/presentations.factor"
     "test/search.factor"
     "test/sliders.factor"
     "test/tracks.factor"

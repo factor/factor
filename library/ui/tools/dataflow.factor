@@ -106,12 +106,12 @@ M: #push node-presents >#push< first ;
     [ length ] keep
     [
         >r number>string "Child " swap append <label> r>
-        <object-presentation>
+        <presentation>
     ] 2map ;
 
 : <node-presentation> ( node -- gadget )
     class [ word-name <label> ] keep <link>
-    <object-presentation> ;
+    <presentation> ;
 
 : default-node-content ( node -- gadget )
     dup node-children <child-nodes>
@@ -167,7 +167,7 @@ DEFER: (compute-heights)
 ! Then we create gadgets for every node
 : node>gadget ( height node -- gadget )
     [ node>gadget* ] keep node-presents
-    [ <object-presentation> ] when* ;
+    [ <presentation> ] when* ;
 
 : print-node ( d-height node -- )
     dup full-height-node? [

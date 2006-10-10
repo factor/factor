@@ -121,7 +121,7 @@ C: titled-gadget ( gadget title -- )
 
 : <toolbar> ( target classes -- toolbar )
     [ commands "toolbar" swap hash ] map concat
-    [ <command-presentation> ] map-with
+    [ <command-button> ] map-with
     make-shelf ;
 
 : command-description ( command -- element )
