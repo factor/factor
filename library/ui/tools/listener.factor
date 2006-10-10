@@ -149,8 +149,14 @@ M: listener-gadget tool-help
 : show-history ( listener -- )
     [ <history-gadget> ] keep show-minibuffer ;
 
+: completion-string ( word listener -- string )
+    >r dup word-name swap word-vocabulary dup vocab r>
+    listener-gadget-use memq?
+    [ drop ] [ [ "USE: " % % " " % % ] "" make ] if ;
+
 : insert-completion ( completion -- )
-    word-name find-listener listener-gadget-input user-input ;
+    find-listener [ completion-string ] keep
+    listener-gadget-input user-input ;
 
 listener-gadget "toolbar" {
     { "Restart" T{ key-down f { C+ } "r" } [ start-listener ] }

@@ -52,6 +52,7 @@ PROVIDE: library/ui {
     "test/gadgets.factor"
     "test/models.factor"
     "test/document.factor"
+    "test/listener.factor"
     "test/lists.factor"
     "test/rectangles.factor"
     "test/commands.factor"

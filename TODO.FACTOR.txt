@@ -1,8 +1,6 @@
 - auto-invoke code gc
 - fix alien-callback/SEH bug on win32
 - x11: scroll up/down wiggles caret
-- tab completion: add a USE: if necessary
-- cocoa: windows are not updated while resizing
 
 + ui:
 
