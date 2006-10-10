@@ -133,18 +133,20 @@ M: listener-gadget tool-help
     <vocabs-search> "Vocabulary search" <labelled-gadget>
     swap show-minibuffer ;
 
-: show-list ( seq presenter action listener -- )
-    >r minibuffer-action <list> <scroller> r> show-minibuffer ;
-
 : listener-history ( listener -- seq )
     listener-gadget-input interactor-history <reversed> ;
 
+: history-action ( string -- )
+    find-listener listener-gadget-input set-editor-text ;
+
+: <history-gadget> ( listener -- gadget )
+    listener-history <model>
+    [ [ dup print-input ] make-pane ]
+    [ history-action ] minibuffer-action
+    <list> <scroller> "History" <labelled-gadget> ;
+
 : show-history ( listener -- )
-    [
-        listener-gadget-input <model>
-        [ [ dup print-input ] make-pane ]
-        [ listener-gadget-input set-editor-text ]
-    ] keep show-list ;
+    [ <history-gadget> ] keep show-minibuffer ;
 
 : insert-completion ( completion -- )
     word-name find-listener listener-gadget-input user-input ;
