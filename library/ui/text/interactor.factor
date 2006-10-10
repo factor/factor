@@ -3,7 +3,8 @@
 IN: gadgets-text
 USING: arrays definitions gadgets gadgets-panes
 generic hashtables help io kernel namespaces prettyprint styles
-threads sequences vectors definitions parser words strings ;
+threads sequences vectors definitions parser words strings
+math ;
 
 TUPLE: interactor history output continuation queue busy? ;
 

@@ -14,8 +14,7 @@ styles words help math models namespaces ;
 TUPLE: presentation object ;
 
 : invoke-presentation ( presentation -- )
-    dup presentation-object dup default-operation
-    invoke-command ;
+    presentation-object dup default-operation invoke-command ;
 
 : show-mouse-help ( presentation -- )
     dup find-world [ world-status set-model* ] [ drop ] if* ;

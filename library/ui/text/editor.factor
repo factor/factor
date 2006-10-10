@@ -112,14 +112,12 @@ M: editor model-changed
     rot first rot line>y 2array ;
 
 : caret-dim ( editor -- dim )
-    line-height 1 swap 2array ;
-
-: caret-rect ( editor -- dim )
-    dup caret-loc swap caret-dim <rect> ;
+    line-height 0 swap 2array ;
 
 : scroll>caret ( editor -- )
     dup gadget-grafted? [
-        dup caret-rect over scroll>rect
+        dup caret-loc over caret-dim { 1 0 } v+ <rect>
+        over scroll>rect
     ] when drop ;
 
 M: loc-monitor model-changed
@@ -130,7 +128,7 @@ M: loc-monitor model-changed
     editor get editor-focused? [
         editor get
         dup editor-caret-color gl-color
-        caret-rect rect-extent gl-line
+        dup caret-loc swap caret-dim over v+ gl-line
     ] when ;
 
 : translate-lines ( n -- )
