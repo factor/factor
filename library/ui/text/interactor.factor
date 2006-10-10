@@ -58,6 +58,10 @@ M: interactor stream-readln
         [ over set-interactor-continuation stop ] callcc0
     ] when interactor-queue pop ;
 
+M: interactor stream-read
+    swap dup zero?
+    [ 2drop "" ] [ >r stream-readln r> head ] if ;
+
 interactor "interactor" {
     { "Evaluate" T{ key-down f f "RETURN" } [ interactor-commit ] }
     { "Clear input" T{ key-down f { C+ } "k" } [ control-model clear-doc ] }
