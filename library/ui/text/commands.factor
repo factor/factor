@@ -70,7 +70,7 @@ USING: gadgets kernel models namespaces sequences ;
     [ dup T{ word-elt } select-elt ] unless
     gadget-selection ;
 
-editor "Editing commands" {
+editor "editing" {
     { "Insert newline" T{ key-down f f "RETURN" } [ "\n" swap user-input ] }
     { "Insert newline" T{ key-down f { S+ } "RETURN" } [ "\n" swap user-input ] }
     { "Insert newline" T{ key-down f f "ENTER" } [ "\n" swap user-input ] }
@@ -82,7 +82,7 @@ editor "Editing commands" {
     { "Delete to end of line" T{ key-down f { A+ } "BACKSPACE" } [ T{ one-line-elt } editor-backspace ] }
 } define-commands
 
-editor "Clipboard commands" {
+editor "clipboard" {
     { "Paste" T{ paste-action } [ clipboard get paste-clipboard ] }
     { "Paste selection" T{ button-up f f 2 } [ selection get paste-clipboard ] }
     { "Copy" T{ copy-action } [ clipboard get editor-copy ] }
@@ -90,7 +90,7 @@ editor "Clipboard commands" {
     { "Cut" T{ cut-action } [ clipboard get editor-cut ] }
 } define-commands
 
-editor "Caret motion commands" {
+editor "caret" {
     { "Position caret" T{ button-down } [ editor-mouse-down ] }
     { "Previous character" T{ key-down f f "LEFT" } [ T{ char-elt } editor-prev ] }
     { "Next character" T{ key-down f f "RIGHT" } [ T{ char-elt } editor-next ] }
@@ -104,7 +104,7 @@ editor "Caret motion commands" {
     { "End of document" T{ key-down f { C+ } "END" } [ editor-doc-end ] }
 } define-commands
     
-editor "Text selection commands" {
+editor "selection" {
     { "Extend selection" T{ button-down f { S+ } } [ editor-extend-selection ] }
     { "Start selection" T{ drag } [ editor-mouse-drag ] }
     { "Focus editor" T{ gain-focus } [ focus-editor ] }

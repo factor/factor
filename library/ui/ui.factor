@@ -120,7 +120,7 @@ C: titled-gadget ( gadget title -- )
     windows get [ empty? not ] [ f ] if* ;
 
 : <toolbar> ( target classes -- toolbar )
-    [ commands "Toolbar" swap hash ] map concat
+    [ commands "toolbar" swap hash ] map concat
     [ <command-presentation> ] map-with
     make-shelf ;
 
@@ -128,19 +128,14 @@ C: titled-gadget ( gadget title -- )
     dup command-name swap command-gesture gesture>string
     2array ;
 
-: command-table. ( commands group -- )
-    $heading
+: commands. ( commands -- )
     [ command-gesture key-down? ] subset
     [ command-description ] map
-    { "Command" "Shortcut" } add* $table ;
-
-: commands. ( hash -- )
-    hash>alist
-    [ [ first ] 2apply <=> ] sort
-    [ first2 swap command-table. ] each ;
+    { { $strong "Command" } { $strong "Shortcut" } } add*
+    $table ;
 
 : $commands ( elt -- )
-    dup array? [ first ] when commands commands. ;
+    first2 swap commands hash commands. ;
 
 TUPLE: labelled-gadget content ;
 

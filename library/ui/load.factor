@@ -47,6 +47,7 @@ PROVIDE: library/ui {
     "tools/dataflow.factor"
     "tools/workspace.factor"
     "tools/operations.factor"
+    "text/editor.facts"
 } {
     "test/gadgets.factor"
     "test/models.factor"

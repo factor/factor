@@ -187,7 +187,7 @@ M: operation invoke-command ( target operation -- )
 ! Define commands in terms of operations
 
 ! Tile commands
-tile "Toolbar"
+tile "toolbar"
 \ word class-operations [ tile-definition ] modify-operations
 [ command-name "Browse" = not ] subset
 { "Close" f [ close-tile ] } add*
@@ -200,17 +200,17 @@ define-commands
 : quot-action ( interactor -- quot )
     dup editor-text swap select-all parse ;
 
-interactor "Word commands"
+interactor "words"
 \ word class-operations
 [ word-action ] modify-listener-operations
 define-commands
 
-interactor "Quotation commands"
+interactor "quotations"
 quotation class-operations
 [ quot-action ] modify-listener-operations
 define-commands
 
-help-gadget "Toolbar" {
+help-gadget "toolbar" {
     { "Back" T{ key-down f { C+ } "b" } [ help-gadget-history go-back ] }
     { "Forward" T{ key-down f { C+ } "f" } [ help-gadget-history go-forward ] }
     { "Home" T{ key-down f { C+ } "h" } [ go-home ] }

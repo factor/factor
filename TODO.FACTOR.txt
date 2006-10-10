@@ -2,8 +2,6 @@
 - fix alien-callback/SEH bug on win32
 - x11: scroll up/down wiggles caret
 - tab completion: add a USE: if necessary
-- cocoa: horizontal wheel scrolling
-- rollover is not updated on window focus changes
 - cocoa: windows are not updated while resizing
 
 + ui:

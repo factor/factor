@@ -58,7 +58,7 @@ M: interactor stream-readln
         [ over set-interactor-continuation stop ] callcc0
     ] when interactor-queue pop ;
 
-interactor "Interactor commands" {
+interactor "interactor" {
     { "Evaluate" T{ key-down f f "RETURN" } [ interactor-commit ] }
     { "Clear input" T{ key-down f { C+ } "k" } [ control-model clear-doc ] }
 } define-commands

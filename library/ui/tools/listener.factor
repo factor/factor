@@ -8,9 +8,10 @@ generic hashtables tools io kernel listener math models
 namespaces parser prettyprint sequences shells strings styles
 threads words definitions help ;
 
-TUPLE: listener-gadget input output stack minibuffer ;
+TUPLE: listener-gadget input output stack use minibuffer ;
 
 : ui-listener-hook ( listener -- )
+    use get over set-listener-gadget-use
     >r datastack r> listener-gadget-stack set-model ;
 
 : listener-stream ( listener -- stream )
@@ -151,7 +152,7 @@ M: listener-gadget tool-help
 : insert-completion ( completion -- )
     word-name find-listener listener-gadget-input user-input ;
 
-listener-gadget "Toolbar" {
+listener-gadget "toolbar" {
     { "Restart" T{ key-down f { C+ } "r" } [ start-listener ] }
     {
         "History"
@@ -171,7 +172,7 @@ listener-gadget "Toolbar" {
     { "Send EOF" T{ key-down f { C+ } "d" } [ listener-eof ] }
 } define-commands
 
-listener-gadget "Completion commands" {
+listener-gadget "completion" {
     {
         "Complete word"
         T{ key-down f f "TAB" }

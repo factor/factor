@@ -1,7 +1,7 @@
 USING: gadgets gadgets-listener gadgets-browser gadgets-help
 gadgets-presentations gadgets-walker gadgets-dataflow
 gadgets-workspace help gadgets-panes gadgets-text listener
-definitions prettyprint io parser ;
+definitions prettyprint io parser modules compiler ;
 
 ARTICLE: "ui-presentations" "Presentations in the UI"
 "A " { $emphasis "presentation" } " is a graphical view of an object which is directly linked to the object in some way. The help article links you see in the documentation browser are presentations; and if you " { $link see } " a word in the UI listener, all words in the definition will themselves be presentations."
@@ -21,26 +21,38 @@ ARTICLE: "ui-listener" "UI listener"
     "Completion"
     { "Clickable presentations (see " { $link "ui-presentations" } ")" }
 }
-"The below completion commands display a gadget at the bottom of the listener, known as the mini-buffer. Typing more text narrows down the list of available items. The " { $snippet "UP" } " and " { $snippet "DOWN" } " arrow keys shift the selection between listed items, and the " { $snippet "RETURN" } " key invokes a default operation for the selected item."
-{ $commands listener-gadget }
-"The below word commands operate on the token at the caret position in the input area. The quotation commands operate on the entire contents of the input area."
-{ $commands interactor }
+{ $heading "Listener commands" }
+{ $commands listener-gadget "toolbar" }
+{ $heading "Interactor commands" }
+{ $commands interactor "interactor" }
+{ $heading "Completion" }
+"Completion commands display a gadget at the bottom of the listener, known as the mini-buffer. Typing more text narrows down the list of available items. The " { $snippet "UP" } " and " { $snippet "DOWN" } " arrow keys shift the selection between listed items, and the " { $snippet "RETURN" } " key invokes a default operation for the selected item."
+{ $commands listener-gadget "completion" }
+{ $heading "Word commands" }
+"These commands operate on the token at the caret position in the input area."
+{ $commands interactor "words" }
+{ $heading "Quotation commands" }
+"These commands operate on the entire contents of the input area."
+{ $commands interactor "quotations" }
+{ $heading "Editing commands" }
+"The text editing commands are standard and are documented in the " { $link editor } " class."
+{ $heading "Implementation" }
 "Listeners are instances of " { $link listener-gadget } ". The listener consists of an output area (instance of " { $link pane } "), an input area (instance of " { $link interactor } "), and a stack display kept up to date using a " { $link listener-hook } "." ;
 
 ARTICLE: "ui-browser" "UI definition browser"
-{ $commands browser }
+{ $commands browser "toolbar" }
 "Definition browsers are instances of " { $link browser } "." ;
 
 ARTICLE: "ui-help" "UI documentation browser"
 "The documentation browser is used to display Factor documentation, which is rooted at the " { $link "handbook" } " page."
-{ $commands help-gadget }
+{ $commands help-gadget "toolbar" }
 "Documentation browsers are instances of " { $link help-gadget } "." ;
 
 ARTICLE: "ui-walker" "UI walker"
 "The walker single-steps through quotations. To use the walker, enter a piece of code in the listener's input area and press " { $snippet "C+A+w" } "."
 $terpri
 "The walker can travel backwards through time, and restore stacks. This does not undo side effects and therefore can only be used reliably on referentially transparent code."
-{ $commands walker-gadget }
+{ $commands walker-gadget "toolbar" }
 "Walkers are instances of " { $link walker-gadget } "." ;
 
 ARTICLE: "ui-dataflow" "UI dataflow tool"
@@ -49,7 +61,7 @@ $terpri
 "Only quotations and words for which a stack effect can be inferred can be viewed. See " { $link "inference" } "."
 $terpri
 "The dataflow viewer displays the dataflow intermediate representation output by the compiler's optimizer. Therefore inlining and various other optimizations will have already been performed, and the visual representation may not resemble your original code in many ways. An upside of this arrangement is that the dataflow viewer can be used to predict how fast the code will run, because you will see which layers of generic dispatch have been optimized out at compile time."
-{ $commands dataflow-gadget }
+{ $commands dataflow-gadget "toolbar" }
 "Dataflow viewers are instances of " { $link dataflow-gadget } "." ;
 
 ARTICLE: "ui-cocoa" "Functionality specific to Mac OS X"
@@ -77,9 +89,21 @@ $terpri
     { "Single stepping through the code makes the problem obvious, so you right-click on a presentation of the broken word in the stepper, and choose " { $strong "Edit" } " from the resulting popup menu." }
     { "After fixing the problem in the source editor, you right click on the word in the stepper and invoke " { $strong "Reload" } "." }
 }
-"All development tools are integrated into a single-window " { $emphasis "workspace" } ". Multiple workspaces can be open at once, and keyboard commands are provided for switching between tools."
-{ $commands workspace }
+{ $heading "Switching tools" }
+"All development tools are integrated into a single-window " { $emphasis "workspace" } "."
+{ $commands workspace "tool-switch" }
+{ $heading "Opening new windows" }
+"Multiple workspace windows can be open at once."
+{ $commands workspace "tool-window" }
+{ $heading "Scrolling" }
+"The current tool's scroll pane can be scrolled from the keyboard."
+{ $commands workspace "scrolling" }
+{ $heading "Workflow" }
+"A pair of commands for invoking " { $link reload-modules } " and " { $link recompile } "."
+{ $commands workspace "workflow" }
+{ $heading "Implementation" }
 "Workspaces are instances of " { $link workspace-window } "."
+{ $heading "Tools" }
 { $subsection "ui-presentations" }
 { $subsection "ui-listener" }
 { $subsection "ui-browser" }

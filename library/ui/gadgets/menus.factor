@@ -23,11 +23,8 @@ M: menu-glass layout* gadget-child prefer ;
         hand-loc get-global swap find-world move-hand
     ] if ;
 
-: hide-menu ( -- )
-    find-world hide-glass f menu-mode? set-global ;
-
 \ menu-glass H{
-    { T{ button-up } [ hide-menu ] }
+    { T{ button-up } [ find-world hide-glass ] }
     { T{ drag } [ retarget-drag ] }
 } set-gestures
 

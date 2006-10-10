@@ -40,7 +40,7 @@ M: tool tool-help tool-gadget tool-help ;
 : tool-help-window ( tool -- )
     tool-help [ help-window ] when* ;
 
-tool "Tool commands" {
+tool "toolbar" {
     { "Tool help" T{ key-down f f "F1" } [ tool-help-window ] }
 } define-commands
 
@@ -86,12 +86,12 @@ M: workspace pref-dim* delegate pref-dim* { 550 650 } vmax ;
 : tool-scroll-down ( workspace -- )
     current-page tool-scroller [ scroll-down-page ] when* ;
 
-workspace "Scrolling primary pane" {
+workspace "scrolling" {
     { "Scroll up" T{ key-down f { C+ } "PAGE_UP" } [ tool-scroll-up ] }
     { "Scroll down" T{ key-down f { C+ } "PAGE_DOWN" } [ tool-scroll-down ] }
 } define-commands
 
-workspace "Tool switching commands" {
+workspace "tool-switch" {
     { "Listener" T{ key-down f f "F2" } [ listener-gadget select-tool ] }
     { "Messages" T{ key-down f f "F3" } [ messages select-tool ] }
     { "Definitions" T{ key-down f f "F4" } [ browser select-tool ] }
@@ -100,13 +100,13 @@ workspace "Tool switching commands" {
     { "Dataflow" T{ key-down f f "F7" } [ dataflow-gadget select-tool ] }
 } define-commands
 
-workspace "Tool window commands" {
+workspace "tool-window" {
     { "New listener" T{ key-down f { S+ } "F2" } [ listener-gadget tool-window drop ] }
     { "New definitions" T{ key-down f { S+ } "F3" } [ browser tool-window drop ] }
     { "New documentation" T{ key-down f { S+ } "F4" } [ help-gadget tool-window drop ] }
 } define-commands
 
-workspace "Workflow commands" {
+workspace "workflow" {
     { "Reload changed sources" T{ key-down f f "F8" } [ drop [ reload-modules ] call-listener ] }
     { "Recompile changed words" T{ key-down f { S+ } "F8" } [ drop [ recompile ] call-listener ] }
 } define-commands

@@ -74,6 +74,7 @@ M: world layout*
     ] when* drop ;
 
 : hide-glass ( world -- )
+    f menu-mode? set-global
     dup world-glass [ unparent ] when*
     f swap set-world-glass ;
 

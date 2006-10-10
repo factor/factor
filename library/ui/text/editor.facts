@@ -1,0 +1,13 @@
+IN: gadgets-text
+USING: help gadgets ;
+
+HELP: editor
+{ $class-description "Instances of this class are multi-line text editors which edit an underlying " { $link document } " model."
+$terpri
+"The " { $link interactor } " gadget is built off the " { $link editor } " gadget and is used by the " { $link "ui-listener" } "." }
+{ $heading "General commands" }
+{ $commands editor "editing" }
+{ $heading "Caret motion commands" }
+{ $commands editor "caret" }
+{ $heading "Selection commands" }
+{ $commands editor "selection" } ;
