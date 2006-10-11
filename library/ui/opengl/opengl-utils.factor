@@ -21,33 +21,19 @@ sequences ;
     swap [ glMatrixMode glPushMatrix call ] keep
     glMatrixMode glPopMatrix ; inline
 
-: top-left drop 0 0 glTexCoord2i 0.0 0.0 glVertex2d ; inline
-
-: top-right 1 0 glTexCoord2i first 0.0 glVertex2d ; inline
-
-: bottom-left 0 1 glTexCoord2i second 0.0 swap glVertex2d ; inline
-
 : gl-vertex first2 glVertex2i ; inline
-
-: bottom-right 1 1 glTexCoord2i gl-vertex ; inline
-
-: four-sides ( dim -- )
-    dup top-left dup top-right dup bottom-right bottom-left ;
 
 : gl-line ( a b -- )
     GL_LINES [ gl-vertex gl-vertex ] do-state ;
 
-: gl-fill-rect ( dim -- )
+: gl-fill-rect ( loc dim -- )
     #! Draws a two-dimensional box.
-    GL_QUADS [ four-sides ] do-state ;
+    [ first2 ] 2apply glRectd ;
 
-: gl-rect ( dim -- )
+: gl-rect ( loc dim -- )
     #! Draws a two-dimensional box.
     GL_FRONT_AND_BACK GL_LINE glPolygonMode
-    GL_MODELVIEW [
-        0.5 0.5 0.0 glTranslated { 1 1 } v-
-        GL_QUADS [ dup four-sides top-left ] do-state
-    ] do-matrix
+    gl-fill-rect
     GL_FRONT_AND_BACK GL_FILL glPolygonMode ;
 
 : (gl-poly) [ [ gl-vertex ] each ] do-state ;
@@ -120,11 +106,22 @@ C: sprite ( loc dim dim2 -- sprite )
 
 : gl-translate ( point -- ) first2 0.0 glTranslated ;
 
+: top-left drop 0 0 glTexCoord2i 0.0 0.0 glVertex2d ; inline
+
+: top-right 1 0 glTexCoord2i first 0.0 glVertex2d ; inline
+
+: bottom-left 0 1 glTexCoord2i second 0.0 swap glVertex2d ; inline
+
+: bottom-right 1 1 glTexCoord2i gl-vertex ; inline
+
+: four-sides ( dim -- )
+    dup top-left dup top-right dup bottom-right bottom-left ;
+
 : draw-sprite ( sprite -- )
     dup sprite-loc gl-translate
     GL_TEXTURE_2D over sprite-texture glBindTexture
     init-texture
-    dup sprite-dim2 gl-fill-rect
+    GL_QUADS [ dup sprite-dim2 four-sides ] do-state
     dup sprite-dim { 1 0 } v*
     swap sprite-loc v- gl-translate
     GL_TEXTURE_2D 0 glBindTexture ;
@@ -143,3 +140,6 @@ C: sprite ( loc dim dim2 -- sprite )
     sprite-texture <uint> 1 swap glDeleteTextures ;
 
 : free-sprites ( sprites -- ) [ [ free-sprite ] when* ] each ;
+
+: with-translation ( loc quot -- )
+    GL_MODELVIEW [ >r gl-translate r> call ] do-matrix ; inline

@@ -128,15 +128,19 @@ M: loc-monitor model-changed
     editor get editor-focused? [
         editor get
         dup editor-caret-color gl-color
-        dup caret-loc swap caret-dim over v+ gl-line
+        dup caret-loc origin get v+
+        swap caret-dim over v+ gl-line
     ] when ;
 
+: line-translation ( n -- loc )
+    editor get line-height * 0.0 swap 2array ;
+
 : translate-lines ( n -- )
-    editor get line-height * 0.0 swap 0.0 glTranslated ;
+    line-translation gl-translate ;
 
 : draw-line ( editor str -- )
-    over editor-color gl-color
-    >r editor-font r> draw-string ;
+    >r dup editor-color gl-color editor-font r>
+    { 0 0 } draw-string ;
 
 : first-visible-line ( editor -- n )
     clip get rect-loc second origin get second -
@@ -161,12 +165,15 @@ M: loc-monitor model-changed
     \ last-visible-line get
     rot control-value <slice> ;
 
+: with-editor-translation ( n quot -- )
+    >r line-translation origin get v+ r> with-translation ;
+    inline
+
 : draw-lines ( -- )
-    GL_MODELVIEW [
-        \ first-visible-line get translate-lines
+    \ first-visible-line get [
         editor get dup visible-lines
         [ draw-line 1 translate-lines ] each-with
-    ] do-matrix ;
+    ] with-editor-translation ;
 
 : selection-start/end ( editor -- start end )
     dup editor-mark* swap editor-caret*
@@ -183,16 +190,14 @@ M: loc-monitor model-changed
     (draw-selection) ;
 
 : draw-selection ( -- )
-    GL_MODELVIEW [
-        editor get
-        dup editor-selection-color gl-color
-        selection-start/end
-        over first translate-lines
+    editor get editor-selection-color gl-color
+    editor get selection-start/end
+    over first [
         2dup [
             >r 2dup r> draw-selected-line
             1 translate-lines
         ] each-line 2drop
-    ] do-matrix ;
+    ] with-editor-translation ;
 
 M: editor draw-gadget*
     [ draw-selection draw-lines draw-caret ] with-editor ;

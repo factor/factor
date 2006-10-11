@@ -35,18 +35,15 @@ GENERIC: draw-boundary ( gadget boundary -- )
 
 DEFER: draw-gadget
 
-: with-translation ( loc quot -- )
-    over translate over gl-translate
-    swap slip
-    vneg dup translate gl-translate ; inline
-
 : (draw-gadget) ( gadget -- )
-    dup rect-loc [
-        dup dup gadget-interior draw-interior
+    [
+        dup rect-loc translate
+        ! dup dup gadget-interior draw-interior
         dup draw-gadget*
         dup visible-children [ draw-gadget ] each
-        dup gadget-boundary draw-boundary
-    ] with-translation ;
+        ! dup gadget-boundary draw-boundary
+        drop
+    ] with-scope ;
 
 : change-clip ( gadget -- )
     >absolute clip [ rect-intersect ] change ;
@@ -85,24 +82,29 @@ M: f draw-boundary 2drop ;
 TUPLE: solid color ;
 
 ! Solid pen
-M: solid draw-interior
-    solid-color gl-color rect-dim gl-fill-rect ;
+: (solid) solid-color gl-color rect-dim >r origin get r> ;
 
-M: solid draw-boundary
-    solid-color gl-color rect-dim gl-rect ;
+M: solid draw-interior (solid) gl-fill-rect ;
+
+M: solid draw-boundary (solid) gl-rect ;
 
 ! Gradient pen
 TUPLE: gradient colors ;
 
 M: gradient draw-interior
-    over gadget-orientation swap gradient-colors rot rect-dim
-    gl-gradient ;
+    origin get [
+        over gadget-orientation
+        swap gradient-colors
+        rot rect-dim
+        gl-gradient
+    ] with-translation ;
 
 ! Polygon pen
 TUPLE: polygon color points ;
 
 : draw-polygon ( polygon quot -- )
-    >r dup polygon-color gl-color polygon-points r> each ; inline
+    >r dup polygon-color gl-color polygon-points r> each ;
+    inline
 
 M: polygon draw-boundary
     [ gl-poly ] draw-polygon drop ;

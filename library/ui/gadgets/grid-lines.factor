@@ -22,10 +22,10 @@ SYMBOL: grid-dim
 
 M: grid-lines draw-boundary
     #! Clean this up later.
-    GL_MODELVIEW [
+    origin get [
         grid-lines-color gl-color [
             grid get rect-dim half-gap v- grid-dim set
             { 0 1 } draw-grid-lines
             { 1 0 } draw-grid-lines
         ] with-grid
-    ] do-matrix ;
+    ] with-translation ;

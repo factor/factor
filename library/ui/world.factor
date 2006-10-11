@@ -64,8 +64,8 @@ M: world model-changed
 : font-sprites ( font world -- pair )
     world-fonts [ lookup-font V{ } clone 2array ] cache ;
 
-: draw-string ( font string -- )
-    >r world get font-sprites first2 r> (draw-string) ;
+: draw-string ( font string loc -- )
+    >r >r world get font-sprites first2 r> r> (draw-string) ;
 
 M: world gadget-title world-gadget gadget-title ;
 

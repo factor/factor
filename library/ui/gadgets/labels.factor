@@ -21,7 +21,8 @@ M: label pref-dim* label-size ;
 
 : draw-label ( label -- )
     dup label-color gl-color
-    dup label-font swap label-text draw-string ;
+    dup label-font swap label-text
+    origin get draw-string ;
 
 M: label draw-gadget* draw-label ;
 
