@@ -1,15 +1,7 @@
-! Copyright (C) 2006 Eduardo Cavazos.
+REQUIRES: contrib/vars contrib/slate/slate contrib/lindenmayer/opengl ;
 
-! To run:
-!     USE: automata
-!     automata-window
-
-REQUIRES: contrib/math contrib/slate contrib/vars ;
-
-USING: parser kernel hashtables namespaces sequences math io
-math-contrib threads strings arrays prettyprint
-gadgets gadgets-text gadgets-frames gadgets-buttons gadgets-grids
-vars slate ;
+USING: kernel namespaces hashtables sequences math arrays opengl gadgets
+       vars slate opengl-contrib ;
 
 IN: automata
 
@@ -23,9 +15,9 @@ IN: automata
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-SYMBOL: rule   SYMBOL: rule-number
+VAR: rule   VAR: rule-number
 
-: init-rule ( -- ) 8 <hashtable> rule set ;
+: init-rule ( -- ) 8 <hashtable> >rule ;
 
 : rule-keys ( -- { ... } )
 { { 1 1 1 }
@@ -40,8 +32,7 @@ SYMBOL: rule   SYMBOL: rule-number
 : rule-values ( n -- seq ) >bin 8 CHAR: 0 pad-left string>digits ;
 
 : set-rule ( n -- )
-dup rule-number set
-rule-values rule-keys [ rule get set-hash ] 2each ;
+dup >rule-number rule-values rule-keys [ rule> set-hash ] 2each ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 ! step-capped-line
@@ -60,16 +51,12 @@ rule-values rule-keys [ rule get set-hash ] 2each ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-: last ( seq -- elt ) dup length 1- swap nth ;
-
-! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-
-: pattern>state ( { a b c } -- state ) rule get hash ;
+: pattern>state ( {_a_b_c_} -- state ) rule> hash ;
 
 : cap-line ( line -- 0-line-0 ) { 0 } swap append { 0 } append ;
 
 : wrap-line ( a-line-z -- za-line-za )
-dup last 1array swap dup first 1array append append ;
+dup peek 1array swap dup first 1array append append ;
 
 : step-line ( line -- new-line ) [ >array pattern>state ] map3 ;
 
@@ -78,7 +65,11 @@ dup last 1array swap dup first 1array append append ;
 : step-wrapped-line ( line -- new-line ) wrap-line step-line ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-! Display the rule
+
+: window-width ( -- width ) slate> rect-dim 0 swap nth ;
+
+: window-height ( -- height ) slate> rect-dim 1 swap nth ;
+
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 : random-line ( -- line ) window-width [ drop 2 random-int ] map ;
@@ -90,46 +81,6 @@ dup last 1array swap dup first 1array append append ;
 : center-line ( -- line ) center-i window-width [ = [ 1 ] [ 0 ] if ] map-with ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-! show-line
-! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-
-: show-point ( { x y } p -- ) 1 = [ draw-point ] [ drop ] if ;
-
-: (show-line) ( { x y } line -- ) [ dupd show-point { 1 0 } v+ ] each drop ;
-
-: show-line ( y line -- ) 0 rot 2array swap (show-line) yield ;
-
-! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-! run-rule
-! start-random
-! start-center
-! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-
-VAR: last-line
-
-: estimate-capacity ( -- ) window-width window-height * 2 * capacity set ;
-
-: check-capacity ( -- )
-"capacity: " write capacity get number>string write terpri
-"dlist length: " write dlist get length number>string write terpri ;
-
-: start-slate ( -- )
-estimate-capacity reset-slate
-white set-clear-color black set-color clear-window ;
-
-: finish-slate ( -- ) check-capacity flush-dlist flush-slate ;
-
-: run-line ( line y -- line ) swap tuck show-line step-capped-line ;
-
-: run-lines ( -- ) last-line> window-height [ run-line ] each >last-line ;
-
-: run-rule ( -- ) start-slate run-lines finish-slate ;
-
-: start-random ( -- ) random-line >last-line run-rule ;
-
-: start-center ( -- ) center-line >last-line run-rule ;
-
-! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 : random-item ( seq -- item ) dup length random-int swap nth ;
 
@@ -137,55 +88,45 @@ white set-clear-color black set-color clear-window ;
 { 18 22 26 30 41 45 54 60 73 75 82 86 89 90 97 101 102 105 106 107 109
   110 120 121 122 124 126 129 137 146 147 149 150 151 153 154 161 165 } ;
 
-
 : mild ( -- seq )
 { 6 9 11 57 62 74 118 } ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-! : automata ( -- )
-! <slate> dup self set "Cellular Automata" open-titled-window
-! init-rule interesting random-item set-rule 1000 sleep start-random ;
+VAR: bitmap
 
-! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-! automata-window
-! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+VAR: last-line
 
-: [bind] ( ns quot -- quot ) \ bind 3array >quotation ;
-
-: bind-button ( ns button -- )
-tuck button-quot \ bind 3array >quotation swap set-button-quot ;
-
-VARS: ns field frame ;
-
-: init-slate ( -- ) <slate> t over set-gadget-clipped? self set ;
-
-: init-field ( -- )
-f ns> [ editor-text string>number set-rule start-center ] [bind] <field>
->field ;
-
-: read-rule-field ( -- ) field> editor-text string>number set-rule ;
-
-: set-field-rule ( n -- ) number>string field> set-editor-text ;
-
-: automata-window ( -- )
-<frame> >frame
-[ ] make-hash >ns
-ns> [ init-rule init-slate init-field ] bind
-ns> [ field> ] bind 1array
-ns>
-{ { "Center"   [ drop read-rule-field start-center ] }
-  { "Random"   [ drop read-rule-field start-random ] }
-  { "Continue" [ drop read-rule-field run-rule ] } }
-[ first2 <bevel-button> tuck bind-button ]
-map-with append make-pile 1 over set-pack-fill
-frame> @left grid-add
-ns> [ self get ] bind
-frame> @center grid-add
-frame> "Cellular Automata" open-titled-window
-1000 sleep
-ns> [ interesting random-item dup set-field-rule set-rule start-center ] bind ;
+: run-rule ( -- )
+last-line> window-height [ drop step-capped-line dup ] map >bitmap >last-line ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-PROVIDE: contrib/automata ;
+: start-random ( -- ) random-line >last-line run-rule ;
+
+: start-center ( -- ) center-line >last-line run-rule ;
+
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+: draw-point ( y x value -- ) 1 = [ swap glVertex2i ] [ 2drop ] if ;
+
+: draw-line ( y line -- ) 0 swap [ >r 2dup r> draw-point 1+ ] each 2drop ;
+
+: (draw-bitmap) ( bitmap -- ) 0 swap [ >r dup r> draw-line 1+ ] each drop ;
+
+: draw-bitmap ( bitmap -- ) GL_POINTS glBegin (draw-bitmap) glEnd ;
+
+: display ( -- )
+GL_COLOR_BUFFER_BIT glClear black gl-color bitmap> draw-bitmap ;
+
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+: init-slate ( -- )
+<slate> >slate
+namespace slate> set-slate-ns
+[ display ] >action
+slate> "Automata" open-titled-window ;
+
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+: init ( -- ) init-rule init-slate ;
