@@ -38,11 +38,10 @@ DEFER: draw-gadget
 : (draw-gadget) ( gadget -- )
     [
         dup rect-loc translate
-        ! dup dup gadget-interior draw-interior
+        dup dup gadget-interior draw-interior
         dup draw-gadget*
         dup visible-children [ draw-gadget ] each
-        ! dup gadget-boundary draw-boundary
-        drop
+        dup gadget-boundary draw-boundary
     ] with-scope ;
 
 : change-clip ( gadget -- )
@@ -82,7 +81,8 @@ M: f draw-boundary 2drop ;
 TUPLE: solid color ;
 
 ! Solid pen
-: (solid) solid-color gl-color rect-dim >r origin get r> ;
+: (solid)
+    solid-color gl-color rect-dim >r origin get dup r> v+ ;
 
 M: solid draw-interior (solid) gl-fill-rect ;
 
@@ -103,8 +103,9 @@ M: gradient draw-interior
 TUPLE: polygon color points ;
 
 : draw-polygon ( polygon quot -- )
-    >r dup polygon-color gl-color polygon-points r> each ;
-    inline
+    origin get [
+        >r dup polygon-color gl-color polygon-points r> call
+    ] with-translation ; inline
 
 M: polygon draw-boundary
     [ gl-poly ] draw-polygon drop ;
@@ -112,12 +113,12 @@ M: polygon draw-boundary
 M: polygon draw-interior
     [ gl-fill-poly ] draw-polygon drop ;
 
-: arrow-up    { { { 3 0 } { 6 6 } { 0 6 } } } ;
-: arrow-right { { { 0 0 } { 6 3 } { 0 6 } } } ;
-: arrow-down  { { { 0 0 } { 6 0 } { 3 6 } } } ;
-: arrow-left  { { { 0 3 } { 6 0 } { 6 6 } } } ;
+: arrow-up    { { 3 0 } { 6 6 } { 0 6 } } ;
+: arrow-right { { 0 0 } { 6 3 } { 0 6 } } ;
+: arrow-down  { { 0 0 } { 6 0 } { 3 6 } } ;
+: arrow-left  { { 0 3 } { 6 0 } { 6 6 } } ;
 
 : <polygon-gadget> ( color points -- gadget )
-    dup { 0 0 } [ max-dim vmax ] reduce
+    dup max-dim
     >r <polygon> <gadget> r> over set-rect-dim
     [ set-gadget-interior ] keep ;

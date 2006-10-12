@@ -33,7 +33,7 @@ sequences ;
 : gl-rect ( loc dim -- )
     #! Draws a two-dimensional box.
     GL_FRONT_AND_BACK GL_LINE glPolygonMode
-    gl-fill-rect
+    >r { 0.5 0.5 } v+ r> { 0.5 0.5 } v- gl-fill-rect
     GL_FRONT_AND_BACK GL_FILL glPolygonMode ;
 
 : (gl-poly) [ [ gl-vertex ] each ] do-state ;

@@ -34,8 +34,10 @@ C: shuffle-gadget ( node -- gadget )
     [ 2array ] 2map ;
 
 : draw-shuffle ( gadget seq seq -- )
-    >r >r rect-dim first2 r> r> shuffled-endpoints
-    [ first2 gl-line ] each ;
+    origin get [
+        >r >r rect-dim first2 r> r> shuffled-endpoints
+        [ first2 gl-line ] each
+    ] with-translation ;
 
 M: shuffle-gadget draw-gadget*
     { 0 0 0 1 } gl-color
