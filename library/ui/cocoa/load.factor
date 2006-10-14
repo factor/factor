@@ -12,7 +12,6 @@ PROVIDE: library/ui/cocoa {
     "view-utils.factor"
     "window-utils.factor"
     "dialogs.factor"
-    "menu-bar.factor"
     "services.factor"
     "ui.factor"
 } {

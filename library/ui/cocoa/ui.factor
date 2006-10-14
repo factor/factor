@@ -28,8 +28,7 @@ hashtables kernel memory namespaces objc sequences errors freetype ;
     reset-callbacks
     install-app-delegate
     register-services
-    init-clipboard
-    default-main-menu ;
+    init-clipboard ;
 
 : rect>NSRect
     dup world-loc first2 rot rect-dim first2 <NSRect> ;
