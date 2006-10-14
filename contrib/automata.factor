@@ -98,7 +98,8 @@ VAR: bitmap
 VAR: last-line
 
 : run-rule ( -- )
-last-line> window-height [ drop step-capped-line dup ] map >bitmap >last-line ;
+last-line> window-height [ drop step-capped-line dup ] map >bitmap >last-line
+.slate ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
