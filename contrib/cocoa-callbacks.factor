@@ -3,8 +3,8 @@
 IN: objc-classes
 DEFER: FactorCallback
 
-IN: cocoa
-USING: gadgets hashtables kernel namespaces objc ;
+IN: cocoa-callbacks
+USING: gadgets hashtables kernel namespaces objc cocoa ;
 
 SYMBOL: callbacks
 
@@ -30,3 +30,5 @@ reset-callbacks
 : <FactorCallback> ( quot -- id )
     FactorCallback -> alloc -> init
     [ callbacks get set-hash ] keep ;
+
+PROVIDE: callbacks ;

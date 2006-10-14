@@ -14,6 +14,7 @@ Available libraries:
 - boids -- Graphics demo for the UI (Eduardo Cavazos)
 - cairo -- cairo bindings (Sampo Vuori)
 - calendar -- timestamp/calendar with timezones (Doug Coleman)
+- cocoa-callbacks -- Allows you to use Factor quotations as actions (Slava Pestov)
 - concurrency -- Erlang/Termite-style distibuted concurrency (Chris Double)
 - coroutines -- coroutines (Chris Double)
 - crypto -- Various cryptographic algorithms (Doug Coleman)

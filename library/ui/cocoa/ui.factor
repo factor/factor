@@ -4,8 +4,9 @@ IN: objc-classes
 DEFER: FactorApplicationDelegate
 
 IN: cocoa
-USING: arrays gadgets gadgets-listener gadgets-workspace
-hashtables kernel memory namespaces objc sequences errors freetype ;
+USING: arrays gadgets gadgets-listener gadgets-help
+gadgets-workspace hashtables kernel memory namespaces objc
+sequences errors freetype help ;
 
 : finder-run-files ( alien -- )
     #! We filter out the image name since that might be there on
@@ -14,18 +15,38 @@ hashtables kernel memory namespaces objc sequences errors freetype ;
     NSApp NSApplicationDelegateReplySuccess
     -> replyToOpenOrPrint: ;
 
+: menu-run-files ( -- )
+    open-panel [ listener-run-files ] when* ;
+
 ! Handle Open events from the Finder
 "NSObject" "FactorApplicationDelegate" {
     { "application:openFiles:" "void" { "id" "SEL" "id" "id" }
         [ >r 3drop r> finder-run-files ]
+    }
+
+    { "runFactorFile:" "id" { "id" "SEL" "id" }
+        [ 3drop menu-run-files f ]
+    }
+
+    { "newFactorWorkspace:" "id" { "id" "SEL" "id" }
+        [ 3drop workspace-window f ]
+    }
+
+    { "showFactorHelp:" "id" { "id" "SEL" "id" }
+        [ 3drop "handbook" <link> help-gadget call-tool f ]
     }
 } define-objc-class
 
 : install-app-delegate ( -- )
     NSApp FactorApplicationDelegate install-delegate ;
 
+: load-nib ( -- )
+    NSBundle
+    "Factor.nib" <NSString> NSApp -> loadNibNamed:owner:
+    drop ;
+
 : init-cocoa ( -- )
-    reset-callbacks
+    load-nib
     install-app-delegate
     register-services
     init-clipboard ;

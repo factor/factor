@@ -89,7 +89,7 @@ M: listener-gadget tool-help
     dup empty? [
         drop
     ] [
-        [ [ run-file ] each ] curry call-listener
+        [ run-files ] curry call-listener
     ] if ;
 
 : listener-eof ( listener -- )

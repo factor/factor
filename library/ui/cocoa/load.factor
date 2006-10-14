@@ -6,7 +6,6 @@ PROVIDE: library/ui/cocoa {
     "core-foundation.factor"
     "types.factor"
     "init-cocoa.factor"
-    "callback.factor"
     "application-utils.factor"
     "pasteboard-utils.factor"
     "view-utils.factor"

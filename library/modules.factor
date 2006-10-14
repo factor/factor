@@ -35,12 +35,6 @@ C: module ( name files tests -- module )
 : require ( name -- )
     dup module [ drop ] [ load-module ] if do-parse-hook ;
 
-: run-files ( seq -- )
-    [
-        bootstrapping? get
-        [ parse-file % ] [ run-file ] ? each
-    ] no-parse-hook ;
-
 : process-files ( seq -- newseq )
     [ dup string? [ [ t ] 2array ] when ] map
     [ second call ] subset
