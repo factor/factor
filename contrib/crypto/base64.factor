@@ -1,7 +1,6 @@
 USING: kernel math math-contrib sequences namespaces io strings hashtables ;
 IN: crypto-internals
 
-
 : ch>base64 ( ch -- ch )
     "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/" nth ;
 
@@ -36,6 +35,6 @@ IN: crypto
 : base64> ( str -- str )
     #! input length must be a mulitple of 4
     [
-        [ 4 group [ decode4 % ] each ] keep CHAR: = swap count-end
+        [ 4 group [ decode4 % ] each ] keep [ CHAR: = = not ] count-end 
     ] SBUF" " make swap [ dup pop* ] times >string ;
 
