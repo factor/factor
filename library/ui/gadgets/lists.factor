@@ -30,10 +30,10 @@ M: list model-changed
     [ nth ] [ 2drop f ] if ;
 
 M: list draw-gadget*
-    dup list-color gl-color
-    selected-rect [
-        rect-bounds >r origin get v+ r> gl-fill-rect
-    ] when* ;
+    origin get [
+        dup list-color gl-color
+        selected-rect [ rect-extent gl-fill-rect ] when*
+    ] with-translation ;
 
 M: list focusable-child* drop t ;
 

@@ -4,7 +4,6 @@
 - help responder has no way to access { "foo" "bar" }
 - httpd search tools
 - polish OS X menu bar code
-- list selection broken
 
 + ui:
 
