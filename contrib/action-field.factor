@@ -1,7 +1,23 @@
-
-USING: kernel models namespaces math sequences arrays hashtables gadgets
-       gadgets-text gadgets-buttons ;
+USING: kernel models namespaces math sequences arrays hashtables
+gadgets gadgets-text gadgets-buttons generic ;
 IN: action-field
+
+TUPLE: field model ;
+
+C: field ( model -- field )
+<editor> over set-delegate
+[ set-field-model ] keep
+dup dup set-control-self ;
+
+: field-commit ( field -- string )
+[ editor-text ] keep
+[ field-model [ dupd set-model ] when* ] keep
+select-all ;
+
+field "Field commands" {
+    { "Clear input" T{ key-down f { C+ } "k" } [ control-model clear-doc ] }
+    { "Accept input" T{ key-down f f "RETURN" } [ field-commit drop ] }
+} define-commands
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 

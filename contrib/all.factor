@@ -4,7 +4,7 @@ REQUIRES: contrib/action-field contrib/alien contrib/automata
 contrib/benchmarks contrib/boids contrib/cairo contrib/calendar
 contrib/concurrency contrib/coroutines contrib/crypto
 contrib/dlists contrib/emacs contrib/embedded contrib/furnace
-contrib/furance-pastebin contrib/gap-buffer contrib/hexdump
+contrib/furnace-pastebin contrib/gap-buffer contrib/hexdump
 contrib/http contrib/httpd contrib/http-client contrib/jedit
 contrib/jni contrib/json contrib/lambda contrib/lazy-lists
 contrib/lindenmayer contrib/match contrib/math

@@ -5,7 +5,7 @@ IN: circular
 ! element in the underlying sequence.
 TUPLE: circular start ;
 
-C: circular ( seq circular -- circular )
+C: circular ( seq -- circular )
     0 over set-circular-start [ set-delegate ] keep ;
 
 : circular@ ( n circular -- n seq )
