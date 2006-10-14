@@ -10,7 +10,8 @@ implementation. It is not an introduction to the language itself.
 - Compiling Factor
 - Building Factor
 - Running Factor on Unix with X11
-- Running Factor on Mac OS X
+- Running Factor on Mac OS X - Cocoa UI
+- Running Factor on Mac OS X - X11 UI
 - Running Factor on Windows
 - Source organization
 - Community
@@ -119,10 +120,11 @@ the following two commands:
   
 The latter keeps the terminal listener running.
 
-* Running Factor on Mac OS X
+* Running Factor on Mac OS X - Cocoa UI
 
-On Mac OS X, a Cocoa UI is available in addition to the terminal
-listener.
+On Mac OS X 10.4 and later, a Cocoa UI is available in addition to the
+terminal listener. If you are using Mac OS X 10.3, you can only run the
+X11 UI, as documented in the next section.
 
 The 'f' executable runs the terminal listener:
 
@@ -138,6 +140,22 @@ this point), and the library source into a self-contained Factor.app.
 
 Factor.app runs the UI when double-clicked and can be transported
 between PowerPC Macs.
+
+* Running Factor on Mac OS X - X11 UI
+
+The X11 UI is available on Mac OS X, however its use is not recommended
+since it does not integrate with the host OS. However, if you are
+running Mac OS X 10.3, it is your only choice.
+
+When compiling Factor, pass the X11=1 parameter:
+
+  make macosx-ppc X11=1
+
+Then bootstrap with the following pair of switches:
+
+  ./f boot.image.ppc -no-cocoa -x11
+
+Now if $DISPLAY is set, running ./f will start the UI.
 
 * Running Factor on Windows
 

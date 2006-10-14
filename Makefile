@@ -15,12 +15,6 @@ else
 	STRIP = strip
 endif
 
-ifdef NO_UI
-	X11_UI_LIBS =
-else
-	X11_UI_LIBS = -lfreetype -lGL -lGLU -L/usr/X11R6/lib -lX11
-endif
-
 ifdef CONFIG
 	include $(CONFIG)
 endif
@@ -56,6 +50,10 @@ default:
 	@echo ""
 	@echo "On Unix, pass NO_UI=1 if you don't want to link with the"
 	@echo "X11 and OpenGL libraries."
+	@echo ""
+	@echo "On Mac OS X, pass X11=1 if you want to link with the"
+	@echo "X11 library instead of Cocoa. You will also need to bootstrap"
+	@echo "Factor with the -no-cocoa -x11 switches."
 	@echo
 	@echo "Also, you might want to set the SITE_CFLAGS environment"
 	@echo "variable to enable some CPU-specific optimizations; this"

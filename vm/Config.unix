@@ -1,1 +1,7 @@
 PLAF_OBJS = vm/os-unix.o
+
+ifdef NO_UI
+	X11_UI_LIBS =
+else
+	X11_UI_LIBS = -lfreetype -lGL -lGLU -L/usr/X11R6/lib -lX11
+endif

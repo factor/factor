@@ -1,3 +1,8 @@
 include vm/Config.unix
 PLAF_OBJS += vm/os-macosx.o vm/mach_signal.o
-LIBS= -lm -framework Cocoa -framework OpenGL -framework AppKit -L/usr/X11R6/lib -lfreetype
+
+ifdef X11
+	LIBS = -lm -framework Foundation $(X11_UI_LIBS)
+else
+	LIBS = -lm -framework Cocoa -framework OpenGL -framework AppKit -L/usr/X11R6/lib -lfreetype
+endif
