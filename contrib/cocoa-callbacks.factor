@@ -31,4 +31,4 @@ reset-callbacks
     FactorCallback -> alloc -> init
     [ callbacks get set-hash ] keep ;
 
-PROVIDE: callbacks ;
+PROVIDE: contrib/cocoa-callbacks ;
