@@ -31,7 +31,9 @@ M: list model-changed
 
 M: list draw-gadget*
     dup list-color gl-color
-    selected-rect [ rect-bounds gl-fill-rect ] when* ;
+    selected-rect [
+        rect-bounds >r origin get v+ r> gl-fill-rect
+    ] when* ;
 
 M: list focusable-child* drop t ;
 

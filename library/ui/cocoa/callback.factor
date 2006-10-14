@@ -25,7 +25,7 @@ reset-callbacks
             SUPER-> dealloc
         ]
     }
-} { } define-objc-class
+} define-objc-class
 
 : <FactorCallback> ( quot -- id )
     FactorCallback -> alloc -> init

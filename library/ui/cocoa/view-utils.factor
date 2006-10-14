@@ -272,7 +272,7 @@ opengl sequences ;
             SUPER-> dealloc
         ]
     }
-} { } define-objc-class
+} define-objc-class
 
 : <FactorView> ( world -- view )
     FactorView over rect-dim <GLView> [ register-window ] keep ;

@@ -1,11 +1,14 @@
 - auto-invoke code gc
 - fix alien-callback/SEH bug on win32
-- x11: scroll up/down wiggles caret
+- live search: timer delay would be nice
+- help responder has no way to access { "foo" "bar" }
+- httpd search tools
+- polish OS X menu bar code
+- list selection broken
 
 + ui:
 
 - completion is not ideal: eg, search for "buttons"
-- live search: timer delay would be nice
 - some way of intercepting all gestures
 - slider needs to be modelized
 - better help result ranking
@@ -28,7 +31,6 @@
     space
 - grid slows down with 2000 lines
 - see if its possible to only repaint dirty regions
-- polish OS X menu bar code
 - structure editor
 
 + module system:
@@ -46,7 +48,6 @@
 + compiler/ffi:
 
 - more compact relocation info
-- cocoa: support real redefinition
 - relocation should not cons at all
 - stdcall callbacks
 - [ [ dup call ] dup call ] infer hangs
@@ -85,6 +86,4 @@
 
 + httpd:
 
-- help responder has no way to access { "foo" "bar" }
-- httpd search tools
 - remaining HTML issues need fixing

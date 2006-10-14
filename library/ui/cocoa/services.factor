@@ -39,7 +39,7 @@ parser prettyprint styles gadgets-listener gadgets-workspace ;
         { "id" "SEL" "id" "id" "void*" }
         [ nip [ eval>string ] do-service 2drop ]
     }
-} { } define-objc-class
+} define-objc-class
 
 : register-services ( -- )
     NSApp

@@ -19,7 +19,7 @@ hashtables kernel memory namespaces objc sequences errors freetype ;
     { "application:openFiles:" "void" { "id" "SEL" "id" "id" }
         [ >r 3drop r> finder-run-files ]
     }
-} { } define-objc-class
+} define-objc-class
 
 : install-app-delegate ( -- )
     NSApp FactorApplicationDelegate install-delegate ;
