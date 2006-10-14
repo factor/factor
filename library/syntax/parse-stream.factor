@@ -82,14 +82,14 @@ SYMBOL: parse-hook
 
 : run-file ( file -- ) parse-file call ;
 
+: no-parse-hook ( quot -- )
+    [ parse-hook off call ] with-scope ; inline
+
 : run-files ( seq -- )
     [
         bootstrapping? get
         [ parse-file % ] [ run-file ] ? each
     ] no-parse-hook ;
-
-: no-parse-hook ( quot -- )
-    [ parse-hook off call ] with-scope ; inline
 
 : ?run-file ( file -- )
     dup exists? [ [ [ run-file ] keep ] try ] when drop ;

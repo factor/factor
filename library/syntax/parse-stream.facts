@@ -30,6 +30,12 @@ HELP: no-parse-hook
 { $values { "quot" "a quotation" } }
 { $description "Runs the quotation in a new dynamic scope where " { $link parse-hook } " is set to " { $link f } ". This disables the default behavior of recompiling changed definitions after a source file is loaded." } ;
 
+HELP: run-files
+{ $values { "seq" "a sequence of strings" } }
+{ $description "Load a collection of source files."
+$terpri
+"If bootstrapping, this word appends the top-level forms to the currently constructing quotation instead." } ;
+
 HELP: parse-stream
 { $values { "stream" "an input stream" } { "name" "a file name for error reporting" } { "quot" "a new quotation" } }
 { $description "Parses Factor source code read from the stream. The initial vocabulary search path is used." }
