@@ -18,18 +18,29 @@ sequences errors freetype help ;
 : menu-run-files ( -- )
     open-panel [ listener-run-files ] when* ;
 
+: menu-save-image ( -- )
+    image save-panel [ save-image ] when* ;
+
 ! Handle Open events from the Finder
 "NSObject" "FactorApplicationDelegate" {
     { "application:openFiles:" "void" { "id" "SEL" "id" "id" }
         [ >r 3drop r> finder-run-files ]
     }
 
+    { "newFactorWorkspace:" "id" { "id" "SEL" "id" }
+        [ 3drop workspace-window f ]
+    }
+
     { "runFactorFile:" "id" { "id" "SEL" "id" }
         [ 3drop menu-run-files f ]
     }
 
-    { "newFactorWorkspace:" "id" { "id" "SEL" "id" }
-        [ 3drop workspace-window f ]
+    { "saveFactorImage:" "id" { "id" "SEL" "id" }
+        [ 3drop save f ]
+    }
+
+    { "saveFactorImageAs:" "id" { "id" "SEL" "id" }
+        [ 3drop menu-save-image f ]
     }
 
     { "showFactorHelp:" "id" { "id" "SEL" "id" }
