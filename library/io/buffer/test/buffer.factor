@@ -2,11 +2,6 @@ IN: temporary
 USING: alien io-internals kernel kernel-internals libc
 sequences test ;
 
-: buffer-append ( buffer buffer -- )
-    #! Append first buffer to second buffer.
-    2dup buffer-end <alien> over buffer-ptr <alien>
-    rot buffer-fill memcpy >r buffer-fill r> n>buffer ;
-
 : buffer-set ( string buffer -- )
     2dup buffer-ptr string>memory
     >r length r> buffer-reset ;
@@ -48,11 +43,4 @@ sequences test ;
 [ CHAR: e ] [
     "hello" string>buffer
     1 over buffer-consume [ buffer-pop ] keep buffer-free
-] unit-test
-
-[ "Hello world" ] [
-    " world" string>buffer
-    "Hello" string>buffer
-    2dup buffer-append
-    [ buffer-contents ] keep buffer-free swap buffer-free
 ] unit-test
