@@ -450,6 +450,12 @@ void primitive_update_xt(void)
 	update_xt(untag_word(dpop()));
 }
 
+void primitive_word_xt(void)
+{
+	F_WORD *word = untag_word(dpeek());
+	drepl(tag_cell(word->xt));
+}
+
 void fixup_word(F_WORD* word)
 {
 	/* If this is a compiled word, relocate the code pointer. Otherwise,

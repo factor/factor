@@ -1,8 +1,8 @@
 - auto-invoke code gc
-- fix alien-callback/SEH bug on win32
 - live search: timer delay would be nice
 - help responder has no way to access { "foo" "bar" }
 - httpd search tools
+- code-gc instability with callbacks
 
 + ui:
 

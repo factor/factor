@@ -356,16 +356,6 @@ HELP: setenv ( obj n -- )
 { $values { "n" "a non-negative integer" } { "obj" "an object" } }
 { $description "Writes an object to the Factor runtime's environment table. User code never has to write to the environment table directly; instead, use one of the callers of this word." } ;
 
-HELP: integer-slot ( obj m -- n )
-{ $values { "obj" "an object" } { "m" "a non-negative fixnum" } { "n" "an integer" } }
-{ $description "Reads the untagged integer stored at the " { $snippet "n" } "th slot of " { $snippet "obj" } "." }
-{ $warning "This word is in the " { $vocab-link "kernel-internals" } " vocabulary because it does not perform type or bounds checks, and slot numbers are implementation detail." } ;
-
-HELP: set-integer-slot ( m obj n -- )
-{ $values { "n" "an integer" }  { "obj" "an object" } { "m" "a non-negative fixnum" } }
-{ $description "Writes an untagged integer to the " { $snippet "n" } "th slot of " { $snippet "obj" } "." }
-{ $warning "This word is in the " { $vocab-link "kernel-internals" } " vocabulary because it does not perform type or bounds checks, and slot numbers are implementation detail." } ;
-
 HELP: slot ( obj m -- value )
 { $values { "obj" "an object" } { "m" "a non-negative fixnum" } { "value" "an object" } }
 { $description "Reads the object stored at the " { $snippet "n" } "th slot of " { $snippet "obj" } "." }

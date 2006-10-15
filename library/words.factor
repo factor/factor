@@ -49,9 +49,6 @@ M: symbol definer drop \ SYMBOL: ;
     [ rot word-props set-hash ]
     [ nip remove-word-prop ] if ;
 
-GENERIC: word-xt ( word -- xt )
-M: word word-xt 8 integer-slot ;
-
 SYMBOL: vocabularies
 
 : vocab ( name -- vocab ) vocabularies get hash ;

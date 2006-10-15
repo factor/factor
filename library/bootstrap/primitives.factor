@@ -101,6 +101,7 @@ call
     { "float>=" "math-internals"            }
     { "(word)" "kernel-internals"           }
     { "update-xt" "words"                   }
+    { "word-xt" "words"                     }
     { "drop" "kernel"                       }
     { "2drop" "kernel"                      }
     { "3drop" "kernel"                      }
@@ -183,8 +184,6 @@ call
     { "alien-address" "alien"               }
     { "slot" "kernel-internals"             }
     { "set-slot" "kernel-internals"         }
-    { "integer-slot" "kernel-internals"     }
-    { "set-integer-slot" "kernel-internals" }
     { "char-slot" "kernel-internals"        }
     { "set-char-slot" "kernel-internals"    }
     { "resize-array" "arrays"               }

@@ -161,6 +161,7 @@ INLINE CELL tag_word(F_WORD *word)
 void update_xt(F_WORD* word);
 void primitive_word(void);
 void primitive_update_xt(void);
+void primitive_word_xt(void);
 void fixup_word(F_WORD* word);
 
 INLINE F_WRAPPER *untag_wrapper_fast(CELL tagged)

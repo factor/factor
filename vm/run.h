@@ -123,8 +123,6 @@ void primitive_type(void);
 void primitive_tag(void);
 void primitive_slot(void);
 void primitive_set_slot(void);
-void primitive_integer_slot(void);
-void primitive_set_integer_slot(void);
 CELL clone(CELL obj);
 void primitive_clone(void);
 

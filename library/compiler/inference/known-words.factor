@@ -229,7 +229,8 @@ t over set-effect-terminated?
 \ (word) { object object } { word } <effect> "infer-effect" set-word-prop
 
 \ update-xt { word } { } <effect> "infer-effect" set-word-prop
-\ compiled? { word } { object } <effect> "infer-effect" set-word-prop
+
+\ word-xt { word } { integer } <effect> "infer-effect" set-word-prop
 
 \ getenv { fixnum } { object } <effect> "infer-effect" set-word-prop
 \ setenv { object fixnum } { } <effect> "infer-effect" set-word-prop
@@ -322,10 +323,6 @@ t over set-effect-terminated?
 \ slot { object fixnum } { object } <effect> "infer-effect" set-word-prop
 
 \ set-slot { object object fixnum } { } <effect> "infer-effect" set-word-prop
-
-\ integer-slot { object fixnum } { integer } <effect> "infer-effect" set-word-prop
-
-\ set-integer-slot { integer object fixnum } { } <effect> "infer-effect" set-word-prop
 
 \ char-slot { fixnum object } { fixnum } <effect> "infer-effect" set-word-prop
 
