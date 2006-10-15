@@ -92,9 +92,9 @@ int main(int argc, char** argv)
 
 	userenv[ARGS_ENV] = tag_object(args);
 
-	platform_run();
+	run_toplevel();
 
-	critical_error("run() returned due to empty callstack",0);
+	critical_error("run_toplevel() returned due to empty callstack",0);
 
 	return 0;
 }

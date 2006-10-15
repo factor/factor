@@ -1,8 +1,13 @@
 #include "factor.h"
 
-void platform_run(void)
+void run(void)
 {
-	run_toplevel();
+	interpreter();
+}
+
+void run_toplevel(void)
+{
+	run();
 }
 
 const char *default_image_path(void)

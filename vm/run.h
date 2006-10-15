@@ -101,10 +101,11 @@ INLINE CELL type_of(CELL tagged)
 void call(CELL quot);
 
 void handle_error();
+void interpreter_loop(void);
+void interpreter(void);
+DLLEXPORT void run_callback(CELL quot);
 void run(void);
 void run_toplevel(void);
-DLLEXPORT void run_callback(CELL quot);
-void platform_run(void);
 void undefined(F_WORD *word);
 void docol(F_WORD *word);
 void dosym(F_WORD *word);

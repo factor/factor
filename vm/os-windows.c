@@ -242,7 +242,12 @@ static long exception_handler(PEXCEPTION_RECORD rec, void *frame, void *ctx, voi
 	return -1; /* unreachable */
 }
 
-void platform_run(void)
+void run(void)
 {
-	seh_call(run_toplevel, exception_handler);
+	interpreter();
+}
+
+void run_toplevel(void)
+{
+	seh_call(run, exception_handler);
 }

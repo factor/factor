@@ -34,7 +34,7 @@ void call(CELL quot)
 	set_callframe(quot);
 }
 
-/* Called from platform_run() */
+/* Called from interpreter() */
 void handle_error(void)
 {
 	if(throwing)
@@ -55,7 +55,7 @@ void handle_error(void)
 	}
 }
 
-void run(void)
+void interpreter_loop(void)
 {
 	CELL next;
 
@@ -91,18 +91,18 @@ void run(void)
 	}
 }
 
-void run_toplevel(void)
+void interpreter(void)
 {
 	SETJMP(stack_chain->toplevel);
 	handle_error();
-	run();
+	interpreter_loop();
 }
 
 /* Called by compiled callbacks after nest_stacks() and boxing registers */
 void run_callback(CELL quot)
 {
 	call(quot);
-	platform_run();
+	run();
 }
 
 /* XT of deferred words */
@@ -280,7 +280,7 @@ void throw_error(CELL error, bool keep_stacks)
 	thrown_ds = ds;
 	thrown_rs = rs;
 
-	/* Return to run() method */
+	/* Return to interpreter() function */
 	LONGJMP(stack_chain->toplevel,1);
 }
 
