@@ -108,8 +108,10 @@ SYMBOL: scroll-direction
     #! After we restore the UI, send mouse leave events to all
     #! gadgets that were under the mouse at the time of the
     #! save, since the mouse is in a different location now.
-    f hand-gadget [ get-global ] 2keep set-global
-    parents hand-gestures ;
+    f hand-world set-global
+    hand-gadget get-global >r
+    f hand-gadget set-global
+    f r> parents hand-gestures ;
 
 : focus-gestures ( new old -- )
     drop-prefix <reversed>
