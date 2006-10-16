@@ -208,17 +208,85 @@ CELL add_compiled_block(CELL code_format, F_VECTOR *code,
 	return start + sizeof(F_COMPILED);
 }
 
+#define FROB \
+	CELL code_format = to_cell(get(ds)); \
+	F_VECTOR *code = untag_vector(get(ds - CELLS)); \
+	F_VECTOR *words = untag_vector(get(ds - CELLS * 2)); \
+	F_VECTOR *literals = untag_vector(get(ds - CELLS * 3)); \
+	F_VECTOR *rel = untag_vector(get(ds - CELLS * 4)); \
+	CELL code_length = align8(untag_fixnum_fast(code->top) * code_format); \
+	CELL rel_length = untag_fixnum_fast(rel->top) * CELLS; \
+	CELL literal_length = untag_fixnum_fast(literals->top) * CELLS; \
+	CELL words_length = untag_fixnum_fast(words->top) * CELLS;
+
 void primitive_add_compiled_block(void)
 {
-	CELL code_format = to_cell(dpop());
-	F_VECTOR *code = untag_vector(dpop());
-	F_VECTOR *words = untag_vector(dpop());
-	F_VECTOR *literals = untag_vector(dpop());
-	F_VECTOR *rel = untag_vector(dpop());
+	CELL start;
+
+	{
+		/* read parameters from stack, leaving them on the stack */
+		FROB
+
+		/* try allocating a new code block */
+		CELL total_length = sizeof(F_COMPILED) + code_length
+			+ rel_length + literal_length + words_length;
+
+		start = heap_allot(&compiling,total_length);
+
+		/* if allocation failed, do a code GC */
+		if(start == 0)
+		{
+			garbage_collection(TENURED,true);
+			start = heap_allot(&compiling,total_length);
+
+			/* insufficient room even after code GC, give up */
+			if(start == 0)
+				critical_error("code heap exhausted",0);
+		}
+	}
+
+	/* we have to read the parameters again, since we may have called
+	code GC in which case the data heap semi-spaces will have switched */
+	FROB
+
+	/* now we can pop the parameters from the stack */
+	ds -= CELLS * 5;
+
+	/* begin depositing the code block's contents */
+	CELL here = start;
+
+	/* compiled header */
+	F_COMPILED header;
+	header.code_length = code_length;
+	header.reloc_length = rel_length;
+	header.literal_length = literal_length;
+	header.words_length = words_length;
+	header.finalized = false;
+
+	memcpy((void*)here,&header,sizeof(F_COMPILED));
+	here += sizeof(F_COMPILED);
+
+	/* code */
+	deposit_integers(here,code,code_format);
+	here += code_length;
+
+	/* relation info */
+	deposit_integers(here,rel,CELLS);
+	here += rel_length;
+
+	/* literals */
+	deposit_objects(here,literals,literal_length);
+	here += literal_length;
+
+	/* words */
+	deposit_objects(here,words,words_length);
+	here += words_length;
 
 	/* push the XT of the new word on the stack */
-	box_unsigned_cell(add_compiled_block(code_format,code,literals,words,rel));
+	box_unsigned_cell(start + sizeof(F_COMPILED));
 }
+
+#undef FROB
 
 void primitive_finalize_compile(void)
 {

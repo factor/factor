@@ -1,8 +1,7 @@
-- auto-invoke code gc
 - live search: timer delay would be nice
 - help responder has no way to access { "foo" "bar" }
 - httpd search tools
-- code-gc instability with callbacks
+- lock callbacks
 
 + ui:
 
