@@ -1,7 +1,9 @@
+! Copyright (C) 2006 Slava Pestov
+! See http://factorcode.org/license.txt for BSD license.
 IN: furnace
 USING: embedded generic arrays namespaces prettyprint io
 sequences words kernel httpd html errors hashtables http
-callback-responder ;
+callback-responder vectors strings ;
 
 SYMBOL: default-action
 
@@ -38,12 +40,14 @@ PREDICATE: word action "action" word-prop ;
         word-name %
     ] "" make swap build-url ;
 
-: action-call? ( args obj -- ? )
-    action? >r [ word? not ] all? r> and ;
+: action-call? ( quot -- ? )
+    >vector dup pop action? >r [ word? not ] all? r> and ;
+
+: unclip* dup 1 head* swap peek ;
 
 : quot-link ( quot -- url )
-    1 swap cut* peek 2dup action-call? [
-        [ quot>query ] keep action-link
+    dup action-call? [
+        unclip* [ quot>query ] keep action-link
     ] [
         t register-html-callback
     ] if ;
@@ -51,18 +55,25 @@ PREDICATE: word action "action" word-prop ;
 : render-link ( quot name -- )
     <a swap quot-link =href a> write </a> ;
 
+: action-param ( params paramspec -- obj error/f )
+    unclip rot hash swap >quotation apply-validators ;
+
 : query>quot ( params action -- seq )
-    "action-params" word-prop
-    [ dup first rot hash [ ] [ second ] ?if ] map-with ;
+    "action-params" word-prop [ action-param drop ] map-with ;
+
+SYMBOL: request-params
 
 : perform-redirect ( action -- )
-    "action-redirect" word-prop [ quot-link redirect ] when* ;
+    "action-redirect" word-prop
+    [ dup string? [ request-params get hash ] when ] map
+    [ quot-link redirect ] when* ;
 
 : call-action ( params action -- )
+    over request-params set
     [ query>quot ] keep [ add >quotation call ] keep
     perform-redirect ;
 
-: service-request ( url params -- )
+: service-request ( params url -- )
     current-action [
         [ call-action ] [ <pre> print-error </pre> ] recover
     ] [
@@ -77,9 +88,11 @@ PREDICATE: word action "action" word-prop ;
     dup tuple>array 2 tail swap class "slot-names" word-prop
     [ set ] 2each ;
 
+SYMBOL: model
+
 : call-template ( model template -- )
     [
-        >r [ explode-tuple ] when* r>
+        >r [ dup model set explode-tuple ] when* r>
         ".fhtml" append resource-path run-embedded-file
     ] with-scope ;
 

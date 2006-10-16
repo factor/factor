@@ -1,9 +1,26 @@
 IN: temporary
-USING: test namespaces furnace ;
+USING: test namespaces furnace math kernel sequences ;
+
+TUPLE: test-tuple m n ;
+
+[ H{ { "m" 3 } { "n" 2 } } ]
+[
+    [ T{ test-tuple f 3 2 } explode-tuple ] make-hash
+] unit-test
+
+[
+    { 3 }
+] [
+    H{ { "n" "3" } } { { "n" v-number } }
+    [ action-param drop ] map-with
+] unit-test
 
 : foo ;
 
-\ foo { { "foo" "2" } { "bar" f } } define-action
+\ foo { { "foo" "2" v-default } { "bar" v-required } } define-action
+
+[ t ] [ [ 1 2 foo ] action-call? ] unit-test
+[ f ] [ [ 2 + ] action-call? ] unit-test
 
 [
     { "2" "hello" }
@@ -11,9 +28,7 @@ USING: test namespaces furnace ;
     [
         H{
             { "bar" "hello" }
-        } "query" set
-
-        \ foo query>quot
+        } \ foo query>quot
     ] with-scope
 ] unit-test
 

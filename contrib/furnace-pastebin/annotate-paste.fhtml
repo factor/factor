@@ -1,6 +1,12 @@
-<form method="POST" action="/responder/pastebin/submit-paste">
+<% USING: namespaces math io ; %>
+
+<h1>Annotate</h1>
+
+<form method="POST" action="/responder/pastebin/annotate-paste">
 
 <table>
+
+<input type="hidden" name="n" value="<% "n" get number>string write %>" />
 
 <tr>
 <th>Summary:</th>
@@ -13,15 +19,10 @@
 </tr>
 
 <tr>
-<th>Channel:</th>
-<td><input type="TEXT" name="channel" value="" /></td>
-</tr>
-
-<tr>
 <th valign="top">Contents:</th>
 <td><textarea rows="24" cols="60" name="contents"></textarea></td>
 </tr>
 </table>
 
-<input type="SUBMIT" value="Submit paste" />
+<input type="SUBMIT" value="Annotate" />
 </form>
