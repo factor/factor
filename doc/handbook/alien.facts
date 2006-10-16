@@ -1,5 +1,5 @@
 IN: alien
-USING: arrays errors help libc math ;
+USING: arrays errors help libc math words definitions ;
 
 ARTICLE: "alien" "C library interface"
 "Factor can directly call C functions in native libraries. It is also possible to compile callbacks which run Factor code, and pass them to native libraries as function pointers."
@@ -37,7 +37,15 @@ $terpri
 ARTICLE: "alien-callback" "Calling Factor from C"
 "Callbacks can be defined and passed to C code as function pointers; the C code can then invoke the callback and run Factor code:"
 { $subsection alien-callback }
-"There are some details concerning the conversion of Factor objects to C values, and vice versa. See " { $link "c-types" } "." ;
+"There are some details concerning the conversion of Factor objects to C values, and vice versa. See " { $link "c-types" } "."
+{ $subsection "alien-callback-gc" } ;
+
+ARTICLE: "alien-callback-gc" "Callbacks and code GC"
+"A callback consits of two parts; the callback word, which pushes the address of the callback on the stack when executed, and the callback body itself. If the callback word, redefined, removed from the dictionary using " { $link forget } ", or recompiled, C code will potentially still have a reference to the callback body, so the callback body will not be eligible for garbage collection."
+$terpri
+"This is the safest approach however it can lead to code heap leaks if you are constantly reloading code which defines callbacks. If you are " { $emphasis "completely sure" } " that no running C code is holding a reference to any callbacks, you can blow them all away:"
+{ $code "USE: alien callbacks get clear-hash code-gc" }
+"This will reclaim all callback bodies which are otherwise unreachable from the dictionary (that is, their associated callback words have since been redefined, recompiled or forgotten)." ;
 
 ARTICLE: "c-types" "C types"
 "The " { $link POSTPONE: FUNCTION: } ", " { $link alien-invoke } " and " { $link alien-callback } " words convert Factor objects to and from C values."
