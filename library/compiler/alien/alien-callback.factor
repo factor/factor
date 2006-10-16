@@ -4,6 +4,14 @@ IN: alien
 USING: compiler errors generic hashtables inference
 kernel namespaces sequences strings words parser prettyprint ;
 
+! Callbacks are registered in a global hashtable. If you clear
+! this hashtable, they will all be blown away by code GC, beware
+SYMBOL: callbacks
+
+H{ } clone callbacks set-global
+
+: register-callback ( word -- ) dup callbacks get set-hash ;
+
 TUPLE: alien-callback return parameters quot xt ;
 C: alien-callback make-node ;
 
@@ -26,7 +34,7 @@ M: alien-callback-error summary
     pop-literal nip over set-alien-callback-quot
     pop-literal nip over set-alien-callback-parameters
     pop-literal nip over set-alien-callback-return
-    gensym over set-alien-callback-xt
+    gensym dup register-callback over set-alien-callback-xt
     callback-bottom
 ] "infer" set-word-prop
 

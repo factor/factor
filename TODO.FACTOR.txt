@@ -1,7 +1,6 @@
 - live search: timer delay would be nice
 - help responder has no way to access { "foo" "bar" }
 - httpd search tools
-- lock callbacks
 
 + ui:
 
