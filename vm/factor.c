@@ -4,6 +4,7 @@ void init_factor(const char* image,
 	CELL ds_size, CELL rs_size, CELL cs_size,
 	CELL gen_count, CELL young_size, CELL aging_size, CELL code_size)
 {
+	srand(current_millis());
 	init_ffi();
 	init_data_heap(gen_count,young_size,aging_size);
 	init_code_heap(code_size);

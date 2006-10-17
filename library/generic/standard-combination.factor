@@ -52,30 +52,36 @@ TUPLE: no-method object generic ;
 : simplify-alist ( class assoc -- default assoc )
     0 swap (simplify-alist) ;
 
+: default-method ( dispatch# word -- pair )
+    empty-method object bootstrap-word swap 2array ;
+
 : methods* ( dispatch# word -- assoc )
     #! Make a class->method association, together with a
     #! default delegating method at the end.
-    [
-        empty-method object bootstrap-word swap 2array 1array
-    ] keep methods append ;
+    dup methods -rot default-method add* ;
 
-: small-generic ( dispatch# word -- def )
-    dupd methods* object bootstrap-word swap simplify-alist
+: method-alist>quot ( dispatch# word base-class -- quot )
+    bootstrap-word swap simplify-alist
     swapd class-predicates alist>quot ;
 
-: vtable-methods ( dispatch# alist-seq -- alist-seq )
+: small-generic ( dispatch# word -- def )
+    dupd methods* object method-alist>quot ;
+
+: build-type-vtable ( dispatch# alist-seq -- alist-seq )
     dup length [
         type>class
         [ swap simplify-alist ] [ first second [ ] ] if*
         >r over r> class-predicates alist>quot
     ] 2map nip ;
 
-: <vtable> ( dispatch# word n -- vtable )
+: <type-vtable> ( dispatch# word n -- vtable )
     #! n is vtable size; either num-types or num-tags.
-    >r dupd methods* r> sort-methods vtable-methods ;
+    >r dupd methods* r> sort-methods build-type-vtable ;
 
-: big-generic ( dispatch# word n dispatcher -- def )
-    [ >r pick picker % r> , <vtable> , \ dispatch , ] [ ] make ;
+: type-generic ( dispatch# word n dispatcher -- quot )
+    [
+        >r pick picker % r> , <type-vtable> , \ dispatch ,
+    ] [ ] make ;
 
 : tag-generic? ( word -- ? )
     #! If all the types we dispatch upon can be identified
@@ -85,16 +91,35 @@ TUPLE: no-method object generic ;
 
 : small-generic? ( word -- ? ) generic-tags length 3 <= ;
 
+: build-class-vtable ( vtable pair -- )
+    dup first hashcode pick length rem rot nth push ;
+
+: <class-vtable> ( dispatch# word assoc -- table )
+    >r dupd default-method r>
+    [ length 3 + [ drop 1array >vector ] map-with ] keep
+    [ dupd build-class-vtable ] each
+    [ object method-alist>quot ] map-with ;
+
+: class-generic ( dispatch# word -- quot )
+    dup methods dup empty? [
+        drop default-method
+    ] [
+        [
+            pick picker % [ class hashcode ] %
+            <class-vtable> dup length , \ rem , , \ dispatch ,
+        ] [ ] make
+    ] if ;
+
 : standard-combination ( word dispatch# -- quot )
     swap {
-        { [ dup tag-generic? ] [ num-tags \ tag big-generic ] }
+        { [ dup tag-generic? ] [ num-tags \ tag type-generic ] }
         { [ dup small-generic? ] [ small-generic ] }
-        { [ t ] [ num-types \ type big-generic ] }
+        { [ t ] [ class-generic ] }
+        { [ t ] [ num-types \ type type-generic ] }
     } cond ;
 
 : define-generic ( word -- )
     [ 0 standard-combination ] define-generic* ;
 
 PREDICATE: generic standard-generic
-    1 swap "combination" word-prop ?nth
-    \ standard-combination eq? ;
+    "combination" word-prop [ standard-combination ] tail? ;

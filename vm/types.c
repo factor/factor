@@ -434,7 +434,7 @@ void primitive_word(void)
 	vocabulary = dpop();
 	name = dpop();
 	word = allot_object(WORD_TYPE,sizeof(F_WORD));
-	word->hashcode = tag_fixnum((CELL)word); /* initial address */
+	word->hashcode = tag_fixnum(rand());
 	word->name = name;
 	word->vocabulary = vocabulary;
 	word->primitive = tag_fixnum(0);
