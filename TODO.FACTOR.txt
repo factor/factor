@@ -1,6 +1,8 @@
 - live search: timer delay would be nice
 - help responder has no way to access { "foo" "bar" }
 - httpd search tools
+- condition rethrow restarts broken
+- menus broken (right click, left click another word)
 
 + ui:
 

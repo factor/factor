@@ -44,7 +44,7 @@ M: cs-loc v>operand cs-loc-n cs-reg reg-stack ;
     #! so this is mostly a no-op.
     swap slip stack-reg swap ADD ; inline
 
-: compile-c-call* ( symbol dll args -- operands )
+: compile-c-call* ( symbol dll args -- )
     dup length cells [
         <reversed> [ PUSH ] each %alien-invoke
     ] with-aligned-stack ;

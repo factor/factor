@@ -24,6 +24,10 @@ M: alien-invoke-error summary
 : alien-invoke ( ... return library function parameters -- ... )
     pick pick <alien-invoke-error> throw ;
 
+: ensure-dlsym ( node -- )
+    [ alien-invoke-dlsym dlsym drop ]
+    [ inference-warning ] recover ;
+
 \ alien-invoke [ string object string object ] [ ] <effect>
 "infer-effect" set-word-prop
 
@@ -33,7 +37,7 @@ M: alien-invoke-error summary
     pop-literal nip over set-alien-invoke-function
     pop-literal nip over set-alien-invoke-library
     pop-literal nip over set-alien-invoke-return
-    dup alien-invoke-dlsym dlsym drop
+    dup ensure-dlsym
     alien-invoke-stack
 ] "infer" set-word-prop
 

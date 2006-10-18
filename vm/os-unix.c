@@ -22,8 +22,8 @@ void ffi_dlopen(DLL *dll, bool error)
 	{
 		if(error)
 		{
-			general_error(ERROR_FFI,tag_object(
-				from_char_string(dlerror())),F,true);
+			general_error(ERROR_FFI,F,
+				tag_object(from_char_string(dlerror())),true);
 		}
 		else
 			dll->dll = NULL;
@@ -42,8 +42,8 @@ void *ffi_dlsym(DLL *dll, F_STRING *symbol, bool error)
 	{
 		if(error)
 		{
-			general_error(ERROR_FFI,tag_object(
-				from_char_string(dlerror())),F,true);
+			general_error(ERROR_FFI,tag_object(symbol),
+				tag_object(from_char_string(dlerror())),true);
 		}
 
 		return NULL;

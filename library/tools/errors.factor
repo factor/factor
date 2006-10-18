@@ -30,7 +30,9 @@ words definitions ;
     "Cannot convert to C string: " write third . ;
 
 : ffi-error. ( obj -- )
-    "FFI: " write third print ;
+    "FFI: " write
+    dup third [ write ": " write ] when*
+    fourth print ;
 
 : heap-scan-error. ( obj -- )
     "Cannot do next-object outside begin/end-scan" print drop ;
