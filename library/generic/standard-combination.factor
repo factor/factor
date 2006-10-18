@@ -114,7 +114,6 @@ TUPLE: no-method object generic ;
     swap {
         { [ dup tag-generic? ] [ num-tags \ tag type-generic ] }
         { [ dup small-generic? ] [ small-generic ] }
-        { [ t ] [ class-generic ] }
         { [ t ] [ num-types \ type type-generic ] }
     } cond ;
 
