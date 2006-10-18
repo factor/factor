@@ -37,5 +37,6 @@ IN: io-internals
 
 : init-io ( -- )
     win32-init-stdio
-    init-winsock ;
+    init-winsock
+    init-c-io ;
 
