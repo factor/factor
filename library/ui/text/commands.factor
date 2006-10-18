@@ -75,7 +75,9 @@ editor "editing" {
     { "Insert newline" T{ key-down f { S+ } "RETURN" } [ "\n" swap user-input ] }
     { "Insert newline" T{ key-down f f "ENTER" } [ "\n" swap user-input ] }
     { "Delete next character" T{ key-down f f "DELETE" } [ T{ char-elt } editor-delete ] }
+    { "Delete next character" T{ key-down f { S+ } "DELETE" } [ T{ char-elt } editor-delete ] }
     { "Delete previous character" T{ key-down f f "BACKSPACE" } [ T{ char-elt } editor-backspace ] }
+    { "Delete previous character" T{ key-down f { S+ } "BACKSPACE" } [ T{ char-elt } editor-backspace ] }
     { "Delete previous word" T{ key-down f { C+ } "DELETE" } [ T{ word-elt } editor-delete ] }
     { "Delete next word" T{ key-down f { C+ } "BACKSPACE" } [ T{ word-elt } editor-backspace ] }
     { "Delete to start of line" T{ key-down f { A+ } "DELETE" } [ T{ one-line-elt } editor-delete ] }
