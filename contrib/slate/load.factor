@@ -1,0 +1,1 @@
+PROVIDE: contrib/slate { "slate.factor" } ;
