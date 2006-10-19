@@ -5,7 +5,7 @@ USING: calendar embedded errors html httpd io kernel math namespaces parser
 sequences strings hashtables ;
 
 : serving-path ( filename -- filename )
-    [ "" ] unless* "doc-root" get swap append ;
+    [ "" ] unless* "doc-root" get swap path+ ;
 
 : file-http-date ( filename -- string )
   #! Return the date in HTTP Date format (see RFC 2616).
