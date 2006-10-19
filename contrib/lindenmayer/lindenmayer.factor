@@ -2,7 +2,7 @@
 
 REQUIRES: contrib/math
           contrib/vars
-          contrib/slate/slate
+          contrib/slate
           contrib/lindenmayer/opengl
           contrib/lindenmayer/turtle
           contrib/lindenmayer/camera

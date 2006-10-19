@@ -1,4 +1,4 @@
-REQUIRES: contrib/vars contrib/slate/slate contrib/lindenmayer/opengl ;
+REQUIRES: contrib/vars contrib/slate contrib/lindenmayer/opengl ;
 
 USING: kernel namespaces hashtables sequences math arrays opengl gadgets
        vars slate opengl-contrib ;

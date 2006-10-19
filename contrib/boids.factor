@@ -1,7 +1,7 @@
 REQUIRES: contrib/math
           contrib/vars
           contrib/lindenmayer/opengl
-          contrib/slate/slate ;
+          contrib/slate ;
 
 USING: kernel namespaces math sequences arrays threads opengl gadgets
        math-contrib vars opengl-contrib slate ;
