@@ -17,7 +17,7 @@ global [
     ! Javascript source used by ajax libraries
     "resources" [ 
         [
-            "contrib/httpd/resources" resource-path "doc-root" set
+            "contrib/httpd/resources/" resource-path "doc-root" set
             file-responder
         ] with-scope
     ] add-simple-responder
