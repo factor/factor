@@ -1,6 +1,6 @@
 USING: kernel modules words ;
 
-REQUIRES: contrib/action-field contrib/alien contrib/automata
+REQUIRES: contrib/alien contrib/automata
 contrib/benchmarks contrib/boids contrib/cairo contrib/calendar
 contrib/concurrency contrib/coroutines contrib/crypto
 contrib/dlists contrib/emacs contrib/embedded contrib/furnace

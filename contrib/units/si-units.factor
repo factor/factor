@@ -94,7 +94,7 @@ SYMBOL: cd
 : F ( n -- farad ) { s s s s A A } { m m kg } <dimensioned> ;
 : ohm ( n -- ohm ) { m m kg } { s s s A A } <dimensioned> ;
 : S ( n -- siemens ) { s s s A A } { m m kg } <dimensioned> ;
-: Wb ( n - weber ) { m m kg } { s s A } <dimensioned> ;
+: Wb ( n -- weber ) { m m kg } { s s A } <dimensioned> ;
 : T ( n -- tesla ) { kg } { s s A } <dimensioned> ;
 : H ( n -- henry ) { m m kg } { s s A A } <dimensioned> ;
 : deg-C ( n -- Celsius ) 273.15 + { K } { } <dimensioned> ;
