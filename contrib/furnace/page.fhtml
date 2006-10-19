@@ -1,9 +1,0 @@
-<% USING: namespaces io furnace ; %>
-
-<% xhtml-preamble %>
-
-<head><title><% "title" get write %></title></head>
-
-<body><% "root" get render-component %></body>
-
-</html>
