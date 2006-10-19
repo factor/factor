@@ -1,11 +1,12 @@
-<% USING: namespaces furnace:browser words help kernel ; %>
+<% USING: namespaces furnace:browser words help kernel tools sequences io
+html ; %>
 
 <form id="main" action="browse" method="get">
     <table width="100%">
         <tr>
-            <th>Vocabularies</th>
-            <th>Words</th>
-            <th>Documentation</th>
+            <th align="left">Vocabularies</th>
+            <th align="left">Words</th>
+            <th align="left">Documentation</th>
         </tr>
         <tr>
             <td valign="top" style="width: 200px;">
@@ -19,4 +20,14 @@
             </td>
         </tr>
     </table>
+    <h2>Apropos</h2>
+    <input type="field" name="apropos" /><br/>
+    <%
+        "apropos" get dup empty? [
+            drop
+        ] [
+            <b> "Results for " write dup write ":" write </b> <br/>
+            apropos
+        ] if
+    %>
 </form>

@@ -29,14 +29,12 @@ C: pastebin ( -- pastebin )
     pastebin get pastebin-pastes nth ;
 
 : show-paste ( n -- )
-    "Paste"
-    swap get-paste
-    "show-paste" render-page ;
+    get-paste "show-paste" "Paste" render-page ;
 
 \ show-paste { { "n" v-number } } define-action
 
 : new-paste ( -- )
-    "New paste" f "new-paste" render-page ;
+    f "new-paste" "New paste" render-page ;
 
 \ new-paste { } define-action
 
@@ -55,9 +53,7 @@ C: pastebin ( -- pastebin )
         [ show-paste ] "show-paste-quot" set
         [ new-paste ] "new-paste-quot" set
 
-        "Pastebin"
-        pastebin get
-        "paste-list" render-page
+        pastebin get "paste-list" "Pastebin" render-page
     ] with-scope ;
 
 \ paste-list { } define-action

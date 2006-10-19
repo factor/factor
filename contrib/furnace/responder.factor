@@ -98,20 +98,12 @@ SYMBOL: model
         ".fhtml" append resource-path run-embedded-file
     ] with-scope ;
 
-TUPLE: component model template ;
-
-TUPLE: page title root ;
-
-C: page ( title model template -- page )
-    [ >r <component> r> set-page-root ] keep
-    [ set-page-title ] keep ;
-
 : render-template ( model template -- )
     template-path get swap path+ call-template ;
 
-: render-page ( title model template -- )
+: render-page ( model template title -- )
     [
-        rot [
+        [
             render-template
         ] html-document
     ] with-html-stream ;

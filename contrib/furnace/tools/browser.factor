@@ -20,20 +20,19 @@ TUPLE: list current options name ;
     2dup lookup dup
     [ 2nip summary ] [ drop nip "IN: " swap append ] if ;
 
-TUPLE: browser word vocab ;
+TUPLE: browser word vocab apropos ;
 
-: browse ( word vocab -- )
-    2dup browser-title
-    -rot <browser>
-    "browser" render-page ;
+: browse ( word vocab apropos -- )
+    pick pick browser-title >r <browser> "browser" r> render-page ;
 
 \ browse {
     { "word" }
     { "vocab" "kernel" v-default }
+    { "apropos" }
 } define-action
 
 "browser" "browse" "contrib/furnace/tools" web-app
 
 M: word browser-link-href
-    dup word-name swap word-vocabulary \ browse
-    3array >quotation quot-link ;
+    dup word-name swap word-vocabulary f \ browse
+    4array >quotation quot-link ;
