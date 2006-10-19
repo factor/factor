@@ -24,7 +24,7 @@ M: menu-glass layout* gadget-child prefer ;
     ] if ;
 
 \ menu-glass H{
-    { T{ button-up } [ find-world hide-glass ] }
+    { T{ button-up } [ find-world [ hide-glass ] when* ] }
     { T{ drag } [ retarget-drag ] }
 } set-gestures
 

@@ -77,7 +77,8 @@ SYMBOL: parse-hook
         dup parsing-file dup record-file
         [ ?resource-path <file-reader> ] keep parse-stream
     ] [
-        over parse-file-restarts condition drop parse-file
+        over parse-file-restarts <condition> rethrow drop
+        parse-file
     ] recover ;
 
 : run-file ( file -- ) parse-file call ;

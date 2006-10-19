@@ -1,8 +1,12 @@
 - live search: timer delay would be nice
 - help responder has no way to access { "foo" "bar" }
 - httpd search tools
-- condition rethrow restarts broken
-- menus broken (right click, left click another word)
+- hashed generic method dispatch
+- fix this:
+  [ 1 2 3 4 5 6 7 8 9 10 10 10 10 10 10 10 10 10 10 11 11 11 113 ] .
+[ 1 2 3 4 5 6 7 8 9 10 10 10 10 10 10 10 10 10 10 11 11 11 113 
+]
+- prettier printing of hashtable literals, alists, cond, ...
 
 + ui:
 
@@ -67,12 +71,6 @@
 
 + misc:
 
-- hashed generic method dispatch
-- fix this:
-  [ 1 2 3 4 5 6 7 8 9 10 10 10 10 10 10 10 10 10 10 11 11 11 113 ] .
-[ 1 2 3 4 5 6 7 8 9 10 10 10 10 10 10 10 10 10 10 11 11 11 113 
-]
-- prettier printing of hashtable literals, alists, cond, ...
 - minor GC takes too long now, we should card mark code heap
 - buffer-ptr should be an alien
 - swap nappend ==> nappend
