@@ -1,4 +1,4 @@
-REQUIRES: contrib/embedded contrib/process ;
+REQUIRES: contrib/httpd contrib/process ;
 PROVIDE: contrib/vim {
     "vim.factor"
 } ;
