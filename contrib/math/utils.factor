@@ -33,8 +33,8 @@ USING: errors kernel sequences math sequences-internals namespaces arrays ;
         -rot (^mod)
     ] if ; foldable
 
-: powers ( n x -- { 1 x x^2 x^3 ... } )
-    #! Output sequence has n elements.
+: powers ( n x -- seq )
+    #! Output sequence has n elements, { 1 x x^2 x^3 ... }
     <array> 1 [ * ] accumulate ;
 
 : ** ( u v -- u*v' ) conjugate * ; inline

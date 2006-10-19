@@ -10,6 +10,7 @@
 
 + ui:
 
+- menu should stay up if mouse button released
 - completion is not ideal: eg, search for "buttons"
 - some way of intercepting all gestures
 - slider needs to be modelized

@@ -58,7 +58,8 @@ TUPLE: no-method object generic ;
 : methods* ( dispatch# word -- assoc )
     #! Make a class->method association, together with a
     #! default delegating method at the end.
-    dup methods -rot default-method add* ;
+    dup methods -rot empty-method object bootstrap-word
+    swap 2array add* ;
 
 : method-alist>quot ( dispatch# word base-class -- quot )
     bootstrap-word swap simplify-alist
@@ -90,25 +91,6 @@ TUPLE: no-method object generic ;
     generic-tags [ tag-mask < ] all? ;
 
 : small-generic? ( word -- ? ) generic-tags length 3 <= ;
-
-: build-class-vtable ( vtable pair -- )
-    dup first hashcode pick length rem rot nth push ;
-
-: <class-vtable> ( dispatch# word assoc -- table )
-    >r dupd default-method r>
-    [ length 3 + [ drop 1array >vector ] map-with ] keep
-    [ dupd build-class-vtable ] each
-    [ object method-alist>quot ] map-with ;
-
-: class-generic ( dispatch# word -- quot )
-    dup methods dup empty? [
-        drop default-method
-    ] [
-        [
-            pick picker % [ class hashcode ] %
-            <class-vtable> dup length , \ rem , , \ dispatch ,
-        ] [ ] make
-    ] if ;
 
 : standard-combination ( word dispatch# -- quot )
     swap {

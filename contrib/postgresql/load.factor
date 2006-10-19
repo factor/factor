@@ -1,3 +1,3 @@
 PROVIDE: contrib/postgresql
 { "libpq.factor" "postgresql.factor" }
-{ "postgresql-test" } ;
+{ "postgresql-test.factor" } ;
