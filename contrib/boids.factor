@@ -1,19 +1,10 @@
-! Eduardo Cavazos - wayo.cavazos@gmail.com
+REQUIRES: contrib/math
+          contrib/vars
+          contrib/lindenmayer/opengl
+          contrib/slate/slate ;
 
-! To run the demo do:
-! USE: boids
-! boids-window
-!
-! There are currently a few bugs. To work around them and to get better
-! results, increase the size of the window (larger than 400x400 is
-! good). Then press the "Reset" button to start the demo over.
-
-REQUIRES: contrib/math contrib/slate contrib/vars
-contrib/action-field ;
-
-USING: generic threads namespaces math kernel sequences arrays gadgets
-       gadgets-labels gadgets-theme gadgets-text gadgets-buttons gadgets-frames
-       gadgets-grids math-contrib slate slate-2d slate-misc vars action-field ;
+USING: kernel namespaces math sequences arrays threads opengl gadgets
+       math-contrib vars opengl-contrib slate ;
 
 IN: boids
 
@@ -54,7 +45,9 @@ VAR: separation-radius
 
 180 >cohesion-view-angle
 180 >alignment-view-angle
-180 >separation-view-angle ;
+180 >separation-view-angle
+
+10 >time-slice ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 ! random-boid and random-boids
@@ -62,7 +55,7 @@ VAR: separation-radius
 
 : random-range ( a b -- n ) 1 + dupd swap - random-int + ;
 
-: random-pos ( -- pos ) world-size get [ random-int ] map ;
+: random-pos ( -- pos ) world-size> [ random-int ] map ;
 
 : random-vel ( -- vel ) 2 >array [ drop -10 10 random-range ] map ;
 
@@ -80,7 +73,12 @@ VAR: separation-radius
 
 : boid-points ( boid -- point-a point-b ) dup boid-point-a swap boid-point-b ;
 
+: draw-line ( a b -- )
+GL_LINES glBegin first2 glVertex2i first2 glVertex2i glEnd ;
+
 : draw-boid ( boid -- ) boid-points draw-line ;
+
+: draw-boids ( -- ) boids> [ draw-boid ] each ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
@@ -210,9 +208,9 @@ if ;
 ! iterate-boid
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-: world-width ( -- w ) world-size get first ;
+: world-width ( -- w ) world-size> first ;
 
-: world-height ( -- w ) world-size get second ;
+: world-height ( -- w ) world-size> second ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
@@ -252,106 +250,27 @@ dup acceleration time-slice> v*n swap boid-vel v+ normalize ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-! : draw-boids ( -- ) boids get [ draw-boid ] each flush-dpy ;
+: display ( -- ) GL_COLOR_BUFFER_BIT glClear black gl-color draw-boids ;
 
-: draw-boids ( -- )
-reset-slate   white set-clear-color   black set-color   clear-window
-boids get [ draw-boid ] each   flush-dlist flush-slate ;
-
-! : run-boids ( -- ) iterate-boids clear-window draw-boids 1 sleep run-boids ;
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 VAR: stop?
 
-: run-boids ( -- )
-self get rect-dim world-size set
-iterate-boids draw-boids 1 sleep
-stop? get [ ] [ run-boids ] if ;
+: run ( -- )
+slate> rect-dim >world-size
+iterate-boids .slate 1 sleep
+stop? get [ ] [ run ] if ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-: boids-go ( -- )
-init-variables
-0.1 time-slice set
-! 1.0 >min-speed
-! 1.0 >max-speed
-<slate> dup self set open-window
-100 capacity set
-self get rect-dim world-size set
-50 random-boids boids set
-1000 sleep
-f stop? set
-run-boids ;
+: init-slate ( -- )
+<slate> >slate
+namespace slate> set-slate-ns
+[ display ] >action
+slate> "Boids" open-titled-window ;
 
-! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-! boids-window
-! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+: init-boids ( -- ) 50 random-boids >boids ;
 
-VARS: ns frame ;
+: init-world-size ( -- ) { 100 100 } >world-size ;
 
-: control-panel-label ( string -- array )
-<label> dup reverse-video-theme ;
-
-: control-panel-field ( label variable init -- shelf )
-rot <label> -rot
-swap number-field ns> over bind-action-field tuck set-editor-text
-2array make-shelf ;
-
-: control-panel-button ( str quot -- button ) ns> swap [bind] <bevel-button> ;
-
-: control-panel ( -- pile )
-{ [ "Weight" control-panel-label ]
-  [ "Alignment:  " alignment-weight "1" control-panel-field ]
-  [ "Cohesion:   " cohesion-weight  "1" control-panel-field ]
-  [ "Separation: " alignment-weight "1" control-panel-field ]
-  [ "Radius" control-panel-label ]
-  [ "Alignment:  " alignment-radius "1" control-panel-field ]
-  [ "Cohesion:   " cohesion-radius  "1" control-panel-field ]
-  [ "Separation: " alignment-radius "1" control-panel-field ]
-  [ "View Angle" control-panel-label ]
-  [ "Alignment:  " alignment-view-angle "1" control-panel-field ]
-  [ "Cohesion:   " cohesion-view-angle  "1" control-panel-field ]
-  [ "Separation: " alignment-view-angle "1" control-panel-field ]
-  [ "" control-panel-label ]
-  [ "Time slice: " time-slice "10" control-panel-field ]
-  [ "Stop"  [ drop t stop? set ]                         control-panel-button ]
-  [ "Start" [ drop f stop? set [ run-boids ] in-thread ] control-panel-button ]
-  [ "Reset" [ drop 50 random-boids boids set ]           control-panel-button ]
-} [ call ] map make-pile 1 over set-pack-fill ;
-
-! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-
-: init-slate ( -- ) <slate> t over set-gadget-clipped? self set ;
-
-: boids-init ( -- )
-init-slate
-init-variables
-10 >time-slice
-100 capacity set
-{ 100 100 } >world-size
-50 random-boids >boids
-stop? off ;
-
-: boids-frame ( -- frame )
-<frame> >frame
-[ ] make-hash >ns
-ns> [ boids-init ] bind
-control-panel frame> @left grid-add
-ns> [ self get ] bind frame> @center grid-add
-frame> ;
-
-! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-
-TUPLE: boids-gadget ;
-
-C: boids-gadget ( -- boids-gadget ) boids-frame over set-gadget-delegate ;
-
-M: boids-gadget pref-dim* { 400 300 } ;
-
-: boids-window ( -- )
-<boids-gadget> "Boids" open-titled-window
-ns> [ 1000 sleep [ run-boids ] in-thread ] bind ;
-
-! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-
-PROVIDE: contrib/boids ;
-
+: init ( -- ) init-slate init-variables init-world-size init-boids stop? off ;
