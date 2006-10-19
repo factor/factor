@@ -34,6 +34,7 @@ Available libraries:
 - json -- JSON reader and writer (Chris Double)
 - lambda -- Lambda calculus interpreter (Matthew Willis)
 - lazy-lists -- Lazy evaluation lists (Chris Double, Matthew Willis)
+- lindenmayer -- L-systems tool (Eduardo Cavazos)
 - match -- pattern matching (Chris Double)
 - math -- extended math library (Doug Coleman, Slava Pestov)
 - parser-combinators -- Haskell-style parser combinators (Chris Double)
