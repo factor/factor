@@ -64,8 +64,6 @@ C: pastebin ( -- pastebin )
 
 \ submit-paste [ paste-list ] define-redirect
 
-"pastebin" "paste-list" "contrib/furnace-pastebin" web-app
-
 : annotate-paste ( paste# summary author contents -- )
     <annotation> swap get-paste paste-annotations push ;
 
@@ -77,3 +75,5 @@ C: pastebin ( -- pastebin )
 } define-action
 
 \ annotate-paste [ "n" show-paste ] define-redirect
+
+"pastebin" "paste-list" "contrib/furnace-pastebin" web-app

@@ -88,18 +88,6 @@ GENERIC: browser-link-href ( presented -- href )
 
 M: object browser-link-href drop f ;
 
-M: word browser-link-href
-    "/responder/browser/" swap [
-        dup word-vocabulary "vocab" set word-name "word" set
-    ] make-hash build-url ;
-
-M: link browser-link-href
-    link-name [ \ f ] unless* dup word? [
-        browser-link-href
-    ] [
-        "/responder/help/" swap "topic" associate build-url
-    ] if ;
-
 : resolve-file-link ( path -- link )
     #! The file responder needs relative links not absolute
     #! links.
@@ -201,10 +189,10 @@ M: html-stream stream-terpri [ <br/> ] with-stream* ;
 
 : default-css ( -- )
   <style "text/css" =type style>
-    "A:link { text-decoration: none; color: black; }" print
-    "A:visited { text-decoration: none; color: black; }" print
-    "A:active { text-decoration: none; color: black; }" print
-    "A:hover, A:hover { text-decoration: underline; color: black; }" print
+    "a:link { text-decoration: none; color: black; }" print
+    "a:visited { text-decoration: none; color: black; }" print
+    "a:active { text-decoration: none; color: black; }" print
+    "a:hover, A:hover { text-decoration: underline; color: black; }" print
   </style> ;
 
 : xhtml-preamble

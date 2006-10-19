@@ -36,7 +36,9 @@ PREDICATE: word action "action" word-prop ;
 
 : action-link ( query action -- url )
     [
-        "/responder/" % "responder" get % "/" %
+        "/responder/" %
+        dup word-vocabulary "furnace:" ?head drop %
+        "/" %
         word-name %
     ] "" make swap build-url ;
 

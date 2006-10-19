@@ -1,20 +1,23 @@
-! Copyright (C) 2004 Chris Double.
+! Copyright (C) 2004 Chris Double
+! Copyright (C) 2004, 2006 Slava Pestov
 ! See http://factorcode.org/license.txt for BSD license.
-IN: browser-responder
+IN: furnace:browser
 USING: definitions hashtables help html httpd io kernel memory
-namespaces prettyprint sequences words xml ;
+namespaces prettyprint sequences words xml furnace arrays ;
 
 : option ( current text -- )
     #! Output the HTML option tag for the given text. If
     #! it is equal to the current string, make the option selected.
-    <option tuck = [ "yes" =selected ] when option>
-        chars>entities write
+    <option tuck = [ "selected" =selected ] when option>
+        write
     </option> ;
 
 : options ( current seq -- ) [ option ] each-with ;
 
 : list ( current seq name -- )
-    <select =name "width: 200px;" =style "20" =size "document.forms.main.submit()" =onchange select>
+    <select =name "width: 200px;" =style "20" =size
+        "JavaScript:document.getElementById('main').submit();" =onchange
+    select>
         options
     </select> ;
 
@@ -24,18 +27,17 @@ namespaces prettyprint sequences words xml ;
 : current-word ( -- word )
     "word" query-param "vocab" query-param lookup ;
 
-: vocab-list ( -- )
-    current-vocab vocabs "vocab" list ;
+: vocab-list ( vocab -- ) vocabs "vocab" list ;
 
-: word-list ( -- )
-    current-word [ word-name ] [ f ] if*
-    current-vocab vocab hash-keys natural-sort "word" list ;
+: word-list ( word vocab -- )
+    [ lookup [ word-name ] [ f ] if* ] keep
+    vocab hash-keys natural-sort "word" list ;
 
 : word-source ( -- )
     #! Write the source for the given word from the vocab as HTML.
-    current-word [ [ see-help ] with-html-stream ] when* ;
+    current-word [ see-help ] when* ;
 
-: browser-body ( -- )
+: browser-body ( word vocab -- )
     #! Write out the HTML for the body of the main browser page.
     <table "100%" =width table> 
         <tr>
@@ -45,7 +47,7 @@ namespaces prettyprint sequences words xml ;
         </tr>
         <tr>    
             <td "top" =valign "width: 200px;" =style td>
-                vocab-list
+                dup vocab-list
             </td> 
             <td "top" =valign "width: 200px;" =style td>
                 word-list
@@ -54,14 +56,27 @@ namespaces prettyprint sequences words xml ;
         </tr>
     </table> ;
 
-: browser-title ( -- str )
-    current-word
-    [ summary ] [ "IN: " current-vocab append ] if* ;
+: browser-title ( word vocab -- str )
+    2dup lookup dup
+    [ 2nip summary ] [ drop nip "IN: " swap append ] if ;
 
-: browser-responder ( -- )
+: browse ( word vocab -- )
     #! Display a Smalltalk like browser for exploring words.
-    serving-html browser-title [
-        <form "main" =name "" =action "get" =method form>
-            browser-body
-        </form>
+    2dup browser-title [
+        [
+            <form "main" =id "browse" =action "get" =method form>
+                browser-body
+            </form>
+        ] with-html-stream
     ] html-document ;
+
+\ browse {
+    { "word" }
+    { "vocab" "kernel" v-default }
+} define-action
+
+"browser" "browse" "contrib/furnace" web-app
+
+M: word browser-link-href
+    dup word-name swap word-vocabulary \ browse
+    3array >quotation quot-link ;

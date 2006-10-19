@@ -13,9 +13,6 @@ PROVIDE: contrib/httpd {
     "prototype-js.factor"
     "html.factor"
     "file-responder.factor"
-    "help-responder.factor"
-    "inspect-responder.factor"
-    "browser-responder.factor"
     "default-responders.factor"
 } {
     "test/html.factor"
