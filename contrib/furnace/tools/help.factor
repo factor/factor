@@ -15,7 +15,7 @@ USING: furnace help html kernel sequences words strings ;
     { "topic" "handbook" v-default string>topic }
 } define-action
 
-"help" "show-help" "contrib/furnace" web-app
+"help" "show-help" "contrib/furnace/tools" web-app
 
 M: link browser-link-href
     link-name [ \ f ] unless* dup word? [

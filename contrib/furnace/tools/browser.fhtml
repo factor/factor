@@ -1,0 +1,22 @@
+<% USING: namespaces furnace:browser words help kernel ; %>
+
+<form id="main" action="browse" method="get">
+    <table width="100%">
+        <tr>
+            <th>Vocabularies</th>
+            <th>Words</th>
+            <th>Documentation</th>
+        </tr>
+        <tr>
+            <td valign="top" style="width: 200px;">
+                <% "vocab" get vocab-list %>
+            </td>
+            <td valign="top" style="width: 200px;">
+                <% "word" get "vocab" get word-list %>
+            </td>
+            <td valign="top">
+                <% "word" get "vocab" get lookup [ see-help ] when* %>
+            </td>
+        </tr>
+    </table>
+</form>

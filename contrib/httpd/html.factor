@@ -188,21 +188,19 @@ M: html-stream with-stream-table ( grid quot style stream -- )
 M: html-stream stream-terpri [ <br/> ] with-stream* ;
 
 : default-css ( -- )
-  <style "text/css" =type style>
-    "a:link { text-decoration: none; color: black; }" print
-    "a:visited { text-decoration: none; color: black; }" print
-    "a:active { text-decoration: none; color: black; }" print
-    "a:hover, A:hover { text-decoration: underline; color: black; }" print
-  </style> ;
+    <link
+    "stylesheet" =rel "text/css" =type
+    "/responder/resources/stylesheet.css" =href
+    link/> ;
 
 : xhtml-preamble
-    xml-preamble print
-    "<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Strict//EN\" \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd\">" print ;
+    xml-preamble write-html
+    "<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Strict//EN\" \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd\">" write-html ;
 
 : html-document ( title quot -- )
     xhtml-preamble
     swap chars>entities
-    <html " xmlns=\"http://www.w3.org/1999/xhtml\" xml:lang=\"en\" lang=\"en\"" write html>
+    <html " xmlns=\"http://www.w3.org/1999/xhtml\" xml:lang=\"en\" lang=\"en\"" write-html html>
         <head>
             <title> write </title>
             default-css

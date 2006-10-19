@@ -1,5 +1,7 @@
+! Copyright (C) 2005 Alex Chapman.
+! See http://factorcode.org/license.txt for BSD license.
 IN: embedded
-USING: sequences kernel parser math namespaces io ;
+USING: sequences kernel parser math namespaces io html test ;
 
 ! if example.fhtml contains:
 ! <html>
@@ -38,7 +40,7 @@ USING: sequences kernel parser math namespaces io ;
     dup "<%" head? [
 	    get-embedded parse %
     ] [
-	    get-text , \ write ,
+	    get-text , \ write-html ,
     ] if ;
 
 : embedded>factor ( string -- )
@@ -53,20 +55,14 @@ USING: sequences kernel parser math namespaces io ;
 
 : eval-embedded ( string -- ) parse-embedded call ;
 
-: with-embedded-file ( filename quot -- )
-    [
-        file-vocabs
-        over file set ! so that reload works properly
-        >r <file-reader> contents r> call
-    ] with-scope ;
-
-: parse-embedded-file ( filename -- quot )
-    [ parse-embedded ] with-embedded-file ;
-
 : run-embedded-file ( filename -- )
-    [ eval-embedded ] with-embedded-file ;
+    [
+        [
+            file-vocabs
+            dup file set ! so that reload works properly
+            dup <file-reader> contents eval-embedded
+        ] with-scope
+    ] assert-depth drop ;
 
 : embedded-convert ( infile outfile -- )
     <file-writer> [ run-embedded-file ] with-stream ;
-
-PROVIDE: contrib/embedded ;

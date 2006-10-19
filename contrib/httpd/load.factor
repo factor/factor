@@ -1,7 +1,6 @@
 USING: io ;
 
-REQUIRES: contrib/calendar contrib/embedded contrib/http
-contrib/xml ;
+REQUIRES: contrib/calendar contrib/http contrib/xml ;
 
 PROVIDE: contrib/httpd { 
     "mime.factor"
@@ -12,6 +11,7 @@ PROVIDE: contrib/httpd {
     "cont-responder.factor"
     "prototype-js.factor"
     "html.factor"
+    "embedded.factor"
     "file-responder.factor"
     "default-responders.factor"
 } {

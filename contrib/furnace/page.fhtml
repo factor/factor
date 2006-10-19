@@ -1,6 +1,6 @@
 <% USING: namespaces io furnace ; %>
 
-<html>
+<% xhtml-preamble %>
 
 <head><title><% "title" get write %></title></head>
 

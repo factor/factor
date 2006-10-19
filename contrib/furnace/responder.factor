@@ -109,13 +109,12 @@ C: page ( title model template -- page )
 : render-template ( model template -- )
     template-path get swap path+ call-template ;
 
-: render-component
-    dup component-model swap component-template
-    render-template ;
-
 : render-page ( title model template -- )
-    serving-html
-    <page> "contrib/furnace/page" call-template ;
+    [
+        rot [
+            render-template
+        ] html-document
+    ] with-html-stream ;
 
 : web-app ( name default path -- )
     over responder-vocab create-vocab drop
