@@ -16,7 +16,7 @@ USING: arrays kernel sequences vectors math math-internals namespaces arrays
 IN: math-contrib
 : p= ( p p -- ? ) pextend = ;
 
-: ptrim ( p -- p ) [ zero? ] rtrim* ;
+: ptrim ( p -- p ) dup length 1 = [ [ zero? ] rtrim* ] unless ;
 
 : 2ptrim ( p p -- p p ) [ ptrim ] 2apply ;
 : p+ ( p p -- p ) pextend v+ ;
