@@ -10,6 +10,9 @@ USING: furnace help html kernel sequences words strings io ;
         <a "search" =href a> "Search" write </a>
     ] html-document ;
 
+: string>topic ( string -- topic )
+    " " split dup length 1 = [ first ] when ;
+
 \ show-help {
     { "topic" "handbook" v-default string>topic }
 } define-action

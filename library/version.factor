@@ -1,2 +1,2 @@
 IN: kernel
-: version "0.85" ;
+: version "0.86" ;

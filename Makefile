@@ -3,7 +3,7 @@ CC = gcc
 BINARY = f
 IMAGE = factor.image
 BUNDLE = Factor.app
-VERSION = 0.85
+VERSION = 0.86
 DISK_IMAGE_DIR = Factor-$(VERSION)
 DISK_IMAGE = Factor-$(VERSION).dmg
 
