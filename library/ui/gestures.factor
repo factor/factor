@@ -70,6 +70,10 @@ SYMBOL: hand-loc
 SYMBOL: hand-clicked
 SYMBOL: hand-click-loc
 SYMBOL: hand-click#
+SYMBOL: hand-last-button
+SYMBOL: hand-last-time
+0 hand-last-button set-global
+0 hand-last-time set-global
 
 SYMBOL: hand-buttons
 V{ } clone hand-buttons set-global
@@ -145,6 +149,22 @@ SYMBOL: scroll-direction
 
 : hand-click-rel ( gadget -- loc )
     hand-click-loc get-global relative-loc ;
+
+: update-click# ( button -- )
+    hand-last-button get = [
+        global [ hand-click# inc ] bind
+    ] [
+        1 hand-click# set-global
+    ] if ;
+ 
+: button-down ( button timeout -- )
+    millis hand-last-time get - rot < [
+        dup update-click#
+    ] [
+        1 hand-click# set-global
+    ] if
+    hand-last-button set-global
+    millis hand-last-time set-global ;
 
 : under-hand ( -- seq )
     #! A sequence whose first element is the world and last is
