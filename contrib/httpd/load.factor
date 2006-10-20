@@ -21,7 +21,5 @@ PROVIDE: contrib/httpd {
     "test/url-encoding.factor"
 } ;
 
-"To start the HTTP server, issue the following command in the listener:" print
-"  USE: httpd" print
-"  [ 8888 httpd ] in-thread" print
-"Replacing '8888' with whatever port number you desire." print
+USE: httpd
+MAIN: contrib/httpd 8888 httpd ;

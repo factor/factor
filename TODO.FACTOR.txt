@@ -8,6 +8,7 @@
 
 + ui:
 
+- x11 double click
 - menu should stay up if mouse button released
 - completion is not ideal: eg, search for "buttons"
 - some way of intercepting all gestures
@@ -35,7 +36,6 @@
 
 + module system:
 
-- convention for main entry point of a module
 - convention for main help article of a module
 - track a list of assets loaded from each module's file
 - C types should be words

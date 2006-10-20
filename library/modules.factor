@@ -2,11 +2,11 @@
 ! See http://factorcode.org/license.txt for BSD license.
 IN: modules
 USING: hashtables io kernel namespaces parser sequences
-test words strings arrays math ;
+test words strings arrays math help ;
 
 SYMBOL: modules
 
-TUPLE: module name files tests ;
+TUPLE: module name files tests main ;
 
 : module-def ( name -- path )
     "resource:" over ".factor" append3
@@ -74,3 +74,13 @@ C: module ( name files tests -- module )
 
 : reload-modules ( -- )
     all-modules [ reload-module ] each do-parse-hook ;
+
+: run-module ( name -- )
+    dup module module-main [
+        call
+    ] [
+        "The module " write write
+        " does not define an entry point." print
+        "To define one, see the documentation for the " write
+        \ MAIN: ($link) " word." print
+    ] ?if ;

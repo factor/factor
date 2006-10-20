@@ -7,3 +7,6 @@ PROVIDE: contrib/lambda {
 } {
     "test/lambda.factor"
 } ;
+
+USE: lambda
+MAIN: contrib/lambda lambda ;

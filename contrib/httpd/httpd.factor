@@ -1,8 +1,8 @@
-! Copyright (C) 2003, 2005 Slava Pestov.
-! See http://factor.sf.net/license.txt for BSD license.
+! Copyright (C) 2003, 2006 Slava Pestov.
+! See http://factorcode.org/license.txt for BSD license.
 IN: httpd
 USING: errors hashtables kernel namespaces io strings 
-threads http sequences ;
+threads http sequences prettyprint ;
 
 : (url>path) ( uri -- path )
     url-decode "http://" ?head [
@@ -50,6 +50,7 @@ threads http sequences ;
     ] if ;
 
 : httpd ( port -- )
+    "Starting HTTP server on port " write dup . flush
     \ httpd [
         60000 stdio get set-timeout
         readln [ parse-request ] when*

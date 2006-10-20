@@ -81,6 +81,9 @@ DEFER: !PRIMITIVE: parsing
         [ [ require ] each ] no-parse-hook
     ] f ; parsing
 
+: !MAIN:
+    scan [ swap module set-module-main ] f ; parsing
+
 : !(
     parse-effect word [
         swap "declared-effect" set-word-prop
