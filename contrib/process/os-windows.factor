@@ -11,5 +11,5 @@ USING: alien compiler io io-internals kernel math parser generic win32-api ;
     0 (run-process) ;
 
 : run-detached ( string -- )
-    DETACH_PROCESS (run-process) ;
+    DETACHED_PROCESS (run-process) ;
 
