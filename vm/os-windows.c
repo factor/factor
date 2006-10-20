@@ -114,18 +114,19 @@ void primitive_stat(void)
 
 void primitive_read_dir(void)
 {
-	F_STRING *path;
 	HANDLE dir;
 	WIN32_FIND_DATA find_data;
 	F_ARRAY *result;
 	CELL result_count = 0;
+	char path[MAX_PATH + 4];
 
 	maybe_gc(0);
 
 	result = array(ARRAY_TYPE,100,F);
 
-	path = untag_string(dpop());
-	if (INVALID_HANDLE_VALUE != (dir = FindFirstFile(".\\*", &find_data)))
+	sprintf(path, "%s\\*", to_char_string(untag_string(dpop()),true));
+
+	if (INVALID_HANDLE_VALUE != (dir = FindFirstFile(path, &find_data)))
 	{
 		do
 		{
