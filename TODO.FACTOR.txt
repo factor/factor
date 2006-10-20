@@ -5,23 +5,30 @@
 [ 1 2 3 4 5 6 7 8 9 10 10 10 10 10 10 10 10 10 10 11 11 11 113 
 ]
 - prettier printing of hashtable literals, alists, cond, ...
+- x11 double click
+- menu should stay up if mouse button released
+- roundoff is still not quite right with tracks
+- fix compiled gc check
+  - there was a performance hit, investigate
+  - float boxing and overflow checks need a gc check too
+- [ [ dup call ] dup call ] infer hangs
+- grid slows down with 2000 lines
+- convention for main help article of a module
+- growable data heap
+- more compact relocation info
 
 + ui:
 
-- x11 double click
-- menu should stay up if mouse button released
-- completion is not ideal: eg, search for "buttons"
+- completion is not ideal: eg, C+e "buttons"
 - some way of intercepting all gestures
 - slider needs to be modelized
 - better help result ranking
 - help search looks funny
-- menus should not require mouse to be held
 - variable width word wrap
 - graphical module manager tool
 - ui browser: show currently selected vocab & words
 - auto-update browser and help when sources reload
 - how do we refer to command shortcuts in the docs?
-- roundoff is still not quite right with tracks
 - fix top level window positioning
 - services do not launch if factor not running
 - editor:
@@ -30,13 +37,11 @@
   - more efficient multi-line inserts
   - write "foo| " and put caret at | then select word element: selects
     space
-- grid slows down with 2000 lines
 - see if its possible to only repaint dirty regions
 - structure editor
 
 + module system:
 
-- convention for main help article of a module
 - track a list of assets loaded from each module's file
 - C types should be words
   - TYPEDEF: float { ... } { ... } ;   ==> \ float T{ c-type ... } "c-type" swp
@@ -47,19 +52,14 @@
 
 + compiler/ffi:
 
-- more compact relocation info
 - relocation should not cons at all
 - stdcall callbacks
-- [ [ dup call ] dup call ] infer hangs
 - callstack overflow when compiling mutually recursive inline words
 - test what is done in the case of an invalid declaration on an inline
   recursive
 - ppc64 backend
 - arm backend
 - mac intel: struct returns from objc methods
-- fix compiled gc check
-  - there was a performance hit, investigate
-  - float boxing and overflow checks need a gc check too
 - float= doesn't consider nans equal
 - intrinsic fixnum>float float>fixnum
 - C functions returning structs by value
@@ -73,7 +73,6 @@
 - buffer-ptr should be an alien
 - swap nappend ==> nappend
 - gdb triggers 'mutliple i/o ops on port' error
-- growable data heap
 - incremental GC
 - UDP
 - slice: if sequence or seq start is changed, abstraction violation

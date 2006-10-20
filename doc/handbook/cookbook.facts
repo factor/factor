@@ -85,7 +85,7 @@ $terpri
     "    dup 0 < ["
     "        drop \"negative\""
     "    ] ["
-    "        zero? [ \"zero\" ] [ \"negative\" ] if"
+    "        zero? [ \"zero\" ] [ \"positive\" ] if"
     "    ] if print ;"
 }
 "The " { $link if } " word takes a boolean, a true quotation, and a false quotation, and executes one of the two quotations depending on the value of the boolean. In Factor, any object not equal to the special value " { $link f } " is considered true, while " { $link f } " is false."

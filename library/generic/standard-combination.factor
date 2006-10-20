@@ -58,10 +58,9 @@ TUPLE: no-method object generic ;
 : methods* ( dispatch# word -- assoc )
     #! Make a class->method association, together with a
     #! default delegating method at the end.
-    dup methods -rot empty-method object bootstrap-word
-    swap 2array add* ;
+    dup methods -rot default-method add* ;
 
-: method-alist>quot ( dispatch# word base-class -- quot )
+: method-alist>quot ( dispatch# alist base-class -- quot )
     bootstrap-word swap simplify-alist
     swapd class-predicates alist>quot ;
 
