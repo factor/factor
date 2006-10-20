@@ -165,35 +165,17 @@ SYMBOL: hWnd
 : mouse-lparam ( lParam -- seq ) [ lo-word ] keep hi-word 2array ;
 : mouse-wheel ( lParam -- n ) mouse-lparam [ sgn neg ] map ;
 
-SYMBOL: last-button
-SYMBOL: last-time
-0 last-button set-global
-0 last-time set-global
-
-: update-click# ( button -- )
-    last-button get = [
-        global [ hand-click# inc ] bind
-    ] [
-        1 hand-click# set-global
-    ] if ;
-    
-: mouse-click ( button -- )
-    millis last-time get - GetDoubleClickTime < [
-        dup update-click#
-    ] [
-        1 hand-click# set-global
-    ] if
-    last-button set
-    millis last-time set ;
+: win32-button-down ( button -- )
+    GetDoubleClickTime dup button-down <button-down> ;
 
 : mouse-event>gesture ( uMsg -- button )
     key-modifiers swap
     {
-        { [ dup WM_LBUTTONDOWN = ] [ drop 1 dup mouse-click <button-down> ] }
+        { [ dup WM_LBUTTONDOWN = ] [ drop 1 win32-button-down ] }
         { [ dup WM_LBUTTONUP = ] [ drop 1 <button-up> ] }
-        { [ dup WM_MBUTTONDOWN = ] [ drop 2 dup mouse-click <button-down> ] }
+        { [ dup WM_MBUTTONDOWN = ] [ drop 2 win32-button-down ] }
         { [ dup WM_MBUTTONUP = ] [ drop 2 <button-up> ] }
-        { [ dup WM_RBUTTONDOWN = ] [ drop 3 dup mouse-click <button-down> ] }
+        { [ dup WM_RBUTTONDOWN = ] [ drop 3 win32-button-down ] }
         { [ dup WM_RBUTTONUP = ] [ drop 3 <button-up> ] }
         { [ t ] [ "bad button" throw ] }
     } cond ;
