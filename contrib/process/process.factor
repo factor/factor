@@ -1,12 +1,6 @@
 IN: process
 USING: compiler io io-internals kernel parser generic ;
 
-LIBRARY: libc
-FUNCTION: int system ( char* command ) ;
-
-FUNCTION: void* popen ( char* command, char* type ) ;
-FUNCTION: int pclose ( void* file ) ;
-
 TUPLE: process-stream pipe ;
 
 C: process-stream ( command mode -- stream )
@@ -20,4 +14,3 @@ M: process-stream stream-close
 
 : !" parse-string system drop ; parsing
 
-PROVIDE: contrib/process ;
