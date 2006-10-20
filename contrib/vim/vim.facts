@@ -1,0 +1,13 @@
+IN: vim
+USING: definitions help io words ;
+
+ARTICLE: { "vim" "vim" } "Vim support"
+"This module makes the " { $link edit } " word work with Vim.  The "
+{ $link vim-path } " variable contains the name of the vim executable.  The default " { $link vim-path } " is \"vim\".  For Windows, place the following example .factor-boot-rc in the directory returned by " { $link home } ":"
+{ $code
+"USING: modules namespaces ;"
+"REQUIRES: contrib/vim ;"
+"USE: vim"
+"\"d:\\program files\\vim\\vim70\\gvim\" vim-path set-global"
+} ;
+
