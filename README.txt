@@ -79,17 +79,16 @@ Compilation will yield an executable named 'f'.
 
 * Building Factor
 
-The Factor source distribution ships with four boot image files:
+The boot images are no longer included with the Factor distribution
+due to size concerns. Instead, download a boot image from:
 
-  boot.image.x86
-  boot.image.pentium4 -- uses SSE2, only for Pentium 4 and later
-  boot.image.ppc
-  boot.image.amd64
+  http://factorcode.org/images/0.85/
 
 Once you have compiled the Factor runtime, you must bootstrap the Factor
 system using the image that corresponds to your CPU architecture.
 
-The system is bootstrapped with the following command line:
+Once you download the right image, bootstrap the system with the
+following command line:
 
 ./f boot.image.<foo>
 
