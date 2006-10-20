@@ -4,7 +4,6 @@ emulator, disassembler and assembler for the 8080 processor.
 It is integrated into the Factor module system, the following will
 load all necessary files and run it:
 
-  "contrib/space-invaders" require
   "contrib/space-invaders" run-module
 
 For this to work it needs a ROM file called 'invaders.rom' in the

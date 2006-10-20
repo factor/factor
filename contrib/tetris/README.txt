@@ -1,6 +1,5 @@
 This is a simple tetris game. To play, open factor (in GUI mode), and run:
 
-"contrib/tetris" require
 "contrib/tetris" run-module
 
 This should open a new window with a running tetris game. The commands are:

@@ -76,6 +76,7 @@ C: module ( name files tests -- module )
     all-modules [ reload-module ] each do-parse-hook ;
 
 : run-module ( name -- )
+    dup require
     dup module module-main [
         call
     ] [
