@@ -822,7 +822,7 @@ FUNCTION: HDC GetDCEx ( HWND hWnd, HRGN hrgnClip, DWORD flags ) ;
 ! FUNCTION: GetDlgItemInt
 ! FUNCTION: GetDlgItemTextA
 ! FUNCTION: GetDlgItemTextW
-! FUNCTION: GetDoubleClickTime
+FUNCTION: uint GetDoubleClickTime ( ) ;
 FUNCTION: HWND GetFocus ( ) ;
 ! FUNCTION: GetForegroundWindow
 ! FUNCTION: GetGuiResources

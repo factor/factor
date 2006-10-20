@@ -69,6 +69,7 @@ SYMBOL: hand-loc
 
 SYMBOL: hand-clicked
 SYMBOL: hand-click-loc
+SYMBOL: hand-click#
 
 SYMBOL: hand-buttons
 V{ } clone hand-buttons set-global
