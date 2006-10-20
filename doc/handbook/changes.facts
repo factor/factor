@@ -36,6 +36,7 @@ ARTICLE: "changes" "Changes in the latest release"
         { "New module " { $snippet "contrib/usb" } " - USB interface (Chris Double)" }
         { "New module " { $snippet "contrib/match" } " - Pattern matching (Chris Double)" }
         { "New module " { $snippet "contrib/textmate" } " - TextMate editor integration (Benjamin Pollack)" }
+        { "New module " { $snippet "contrib/tetris" } " - TextMate editor integration (Alex Chapman)" }
     }
 }
 { $heading "Factor 0.84" }
