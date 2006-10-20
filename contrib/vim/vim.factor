@@ -2,14 +2,19 @@ IN: vim
 USING: definitions embedded io kernel namespaces parser prettyprint process
 sequences ;
 
+SYMBOL: vim-path
+
+"vim" vim-path set-global
+
+: vim-command ( file line -- string )
+    [ "\"" % vim-path get % "\" \"" % swap % "\" +" % # ] "" make ;
+
 : vim-location ( file line -- )
-    >r [ file-modified ] keep r>
-    [ "vim \"" % over % "\" +" % # ] "" make system drop
-    file-modified = [ drop ] [ run-file ] if ;
+    vim-command run-process ;
 
 : vim ( spec -- )
     #! Edit the file in vim.  Rerun the file if the timestamp is changed.
-    dup where first2 vim-location ;
+    where first2 vim-location ;
 
 [ vim-location ] edit-hook set-global
 
