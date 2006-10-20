@@ -70,3 +70,33 @@ BEGIN-STRUCT: FILETIME
     FIELD: DWORD dwHighDateTime
 END-STRUCT
 
+BEGIN-STRUCT: STARTUPINFO
+    FIELD: DWORD cb
+    FIELD: LPTSTR lpReserved
+    FIELD: LPTSTR lpDesktop
+    FIELD: LPTSTR lpTitle
+    FIELD: DWORD dwX
+    FIELD: DWORD dwY
+    FIELD: DWORD dwXSize
+    FIELD: DWORD dwYSize
+    FIELD: DWORD dwXCountChars
+    FIELD: DWORD dwYCountChars
+    FIELD: DWORD dwFillAttribute
+    FIELD: DWORD dwFlags
+    FIELD: WORD wShowWindow
+    FIELD: WORD cbReserved2
+    FIELD: LPBYTE lpReserved2
+    FIELD: HANDLE hStdInput
+    FIELD: HANDLE hStdOutput
+    FIELD: HANDLE hStdError
+END-STRUCT
+
+TYPEDEF: void* LPSTARTUPINFO
+
+BEGIN-STRUCT: PROCESS_INFORMATION
+    FIELD: HANDLE hProcess
+    FIELD: HANDLE hThread
+    FIELD: DWORD dwProcessId
+    FIELD: DWORD dwThreadId
+END-STRUCT
+

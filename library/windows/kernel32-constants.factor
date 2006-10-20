@@ -55,3 +55,6 @@ USING: alien kernel errors ;
 : TIME_ZONE_ID_DAYLIGHT 2 ; inline
 : TIME_ZONE_ID_INVALID HEX: FFFFFFFF ; inline
 
+
+: CREATE_DEFAULT_ERROR_MODE HEX: 4000000 ; inline
+: DETACHED_PROCESS 8 ; inline

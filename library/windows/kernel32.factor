@@ -118,11 +118,20 @@ FUNCTION: HANDLE CreateIoCompletionPort ( HANDLE hFileHandle, HANDLE hExistingCo
 ! FUNCTION: CreateNamedPipeW
 ! FUNCTION: CreateNlsSecurityDescriptor
 ! FUNCTION: CreatePipe
-! FUNCTION: CreateProcessA
+FUNCTION: BOOL CreateProcessA ( LPCTSTR lpApplicationname,
+                                LPTSTR lpCommandLine,
+                                LPSECURITY_ATTRIBUTES lpProcessAttributes,
+                                LPSECURITY_ATTRIBUTES lpThreadAttributes,
+                                BOOL bInheritHandles,
+                                DWORD dwCreationFlags,
+                                LPVOID lpEnvironment,
+                                LPCTSTR lpCurrentDirectory,
+                                LPSTARTUPINFO lpStartupInfo,
+                                LPPROCESS_INFORMATION lpProcessInformation ) ;
+: CreateProcess CreateProcessA ;
 ! FUNCTION: CreateProcessInternalA
 ! FUNCTION: CreateProcessInternalW
 ! FUNCTION: CreateProcessInternalWSecure
-! FUNCTION: CreateProcessW
 ! FUNCTION: CreateRemoteThread
 ! FUNCTION: CreateSemaphoreA
 ! FUNCTION: CreateSemaphoreW
