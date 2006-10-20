@@ -24,7 +24,6 @@
 - fix top level window positioning
 - services do not launch if factor not running
 - editor:
-  - double/triple click
   - autoscroll
   - transpose char/word/line
   - more efficient multi-line inserts

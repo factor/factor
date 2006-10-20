@@ -1,5 +1,5 @@
 IN: gadgets-text
-USING: arrays kernel math sequences strings ;
+USING: arrays kernel math sequences strings models ;
 
 GENERIC: prev-elt ( loc document elt -- loc )
 GENERIC: next-elt ( loc document elt -- loc )

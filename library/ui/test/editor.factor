@@ -8,3 +8,21 @@ gadgets ;
     "editor" get editor-text [ \ = see ] string-out =
     "editor" get ungraft*
 ] unit-test
+
+[ "foo bar" ] [
+    <editor> "editor" set
+    "editor" get graft*
+    "foo bar" "editor" get set-editor-text
+    "editor" get T{ one-line-elt } select-elt
+    "editor" get gadget-selection
+    "editor" get ungraft*
+] unit-test
+
+[ "baz quux" ] [
+    <editor> "editor" set
+    "editor" get graft*
+    "foo bar\nbaz quux" "editor" get set-editor-text
+    "editor" get T{ one-line-elt } select-elt
+    "editor" get gadget-selection
+    "editor" get ungraft*
+] unit-test

@@ -1,15 +1,11 @@
 ! Copyright (C) 2006 Slava Pestov
 ! See http://factorcode.org/license.txt for BSD license.
 IN: gadgets-text
-USING: gadgets kernel models namespaces sequences ;
+USING: gadgets kernel models namespaces sequences arrays ;
 
 : editor-extend-selection ( editor -- )
     dup request-focus
     dup editor-caret click-loc ;
-
-: editor-mouse-down ( editor -- )
-    dup editor-extend-selection
-    dup editor-mark click-loc ;
 
 : editor-mouse-drag ( editor -- )
     dup editor-caret click-loc ;
@@ -69,6 +65,18 @@ USING: gadgets kernel models namespaces sequences ;
     dup gadget-selection?
     [ dup T{ word-elt } select-elt ] unless
     gadget-selection ;
+
+: position-caret ( editor -- )
+    dup editor-extend-selection
+    dup editor-mark click-loc ;
+
+: editor-mouse-down ( editor -- )
+    hand-click# get {
+        [ ]
+        [ dup position-caret ]
+        [ dup T{ word-elt } select-elt ]
+        [ dup T{ one-line-elt } select-elt ]
+    } ?nth call drop ;
 
 editor "editing" {
     { "Insert newline" T{ key-down f f "RETURN" } [ "\n" swap user-input ] }
