@@ -41,3 +41,7 @@ HELP: test-module
 
 HELP: test-modules
 { $description "Runs unit test files for all loaded modules." } ;
+
+HELP: run-module
+{ $values { "name" "a module name string" } }
+{ $description "Runs the main entry point of the module, first loading the module if necessary using " { $link require } ". Entry points can be defined with the " { $link POSTPONE: MAIN: } " word." } ;

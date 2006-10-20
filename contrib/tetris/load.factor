@@ -11,6 +11,6 @@ PROVIDE: contrib/tetris {
     "test/tetris-piece.factor" "test/tetris-board.factor" "test/tetris.factor"
 } ;
 
-USE: tetris
+USE: tetris-gadget
 
 MAIN: contrib/tetris tetris-window ;
