@@ -1,0 +1,2 @@
+include vm/Config.linux
+LIBPATH = -L/usr/X11R6/lib64 $(LIBPATH)

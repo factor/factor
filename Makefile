@@ -6,6 +6,7 @@ BUNDLE = Factor.app
 VERSION = 0.86
 DISK_IMAGE_DIR = Factor-$(VERSION)
 DISK_IMAGE = Factor-$(VERSION).dmg
+LIBPATH = -L/usr/X11R6/lib
 
 ifdef DEBUG
 	CFLAGS = -g
@@ -75,7 +76,7 @@ macosx-x86: macosx-freetype
 	$(MAKE) $(BINARY) CONFIG=vm/Config.macosx
 
 linux-x86 linux-amd64:
-	$(MAKE) $(BINARY) CONFIG=vm/Config.linux
+	$(MAKE) $(BINARY) CONFIG=vm/Config.linux.amd64
 	$(STRIP) $(BINARY)
 
 linux-ppc:
@@ -124,7 +125,7 @@ macosx.dmg:
 		-volname "$(DISK_IMAGE_DIR)" "$(DISK_IMAGE)"
 
 f: $(OBJS)
-	$(CC) $(LIBS) $(CFLAGS) -o $@$(PLAF_SUFFIX) $(OBJS)
+	$(CC) $(LIBS) $(LIBPATH) $(CFLAGS) -o $@$(PLAF_SUFFIX) $(OBJS)
 
 clean:
 	rm -f vm/*.o
