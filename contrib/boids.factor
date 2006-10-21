@@ -274,3 +274,5 @@ slate> "Boids" open-titled-window ;
 : init-world-size ( -- ) { 100 100 } >world-size ;
 
 : init ( -- ) init-slate init-variables init-world-size init-boids stop? off ;
+
+PROVIDE: contrib/boids ;

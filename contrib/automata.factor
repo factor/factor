@@ -131,3 +131,5 @@ slate> "Automata" open-titled-window ;
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 : init ( -- ) init-rule init-slate ;
+
+PROVIDE: contrib/automata ;

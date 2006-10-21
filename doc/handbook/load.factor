@@ -1,4 +1,5 @@
-PROVIDE: doc/handbook {
+PROVIDE: doc/handbook
+{ +files+ {
     "alien.facts"
     "changes.facts"
     "cli.facts"
@@ -21,4 +22,4 @@ PROVIDE: doc/handbook {
     "tools.facts"
     "words.facts"
     "ui/tools.facts"
-} ;
+} } ;
