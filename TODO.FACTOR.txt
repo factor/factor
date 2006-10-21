@@ -12,7 +12,6 @@
   - float boxing and overflow checks need a gc check too
 - [ [ dup call ] dup call ] infer hangs
 - grid slows down with 2000 lines
-- convention for main help article of a module
 - growable data heap
 - more compact relocation info
 

@@ -6,7 +6,7 @@ test words strings arrays math help ;
 
 SYMBOL: modules
 
-TUPLE: module name files tests main ;
+TUPLE: module name files tests main help ;
 
 : module-def ( name -- path )
     "resource:" over ".factor" append3
@@ -20,7 +20,7 @@ TUPLE: module name files tests main ;
     [ path+ "resource:" swap append ] map-with ;
 
 C: module ( name files tests help -- module )
-    nip ! [ set-module-help ] keep
+    [ set-module-help ] keep
     [ >r >r over r> prefix-paths r> set-module-tests ] keep
     [ >r dupd prefix-paths r> set-module-files ] keep
     [ set-module-name ] keep ;

@@ -49,6 +49,9 @@ ARTICLE: "handbook" "Factor documentation"
 { $subsection "compiler" }
 { $heading "Graphical user interface" }
 { $subsection "ui-tools" }
+{ $heading "Currently-loaded contributed modules" }
+"See " { $link "modules" } " for details."
+{ $outliner [ modules-help ] }
 { $heading "Index" }
 { $subsection "article-index" }
 { $subsection "primitive-index" }
