@@ -10,4 +10,5 @@ PROVIDE: contrib/concurrency
 } }
 { +tests+ { 
   "concurrency-tests.factor" 
-} } ;
+} }
+{ +help+ { "concurrency" "concurrency" } } ;
