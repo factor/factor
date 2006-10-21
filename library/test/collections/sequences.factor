@@ -216,3 +216,10 @@ unit-test
 
 [ V{ 1 2 3 } ]
 [ 3 V{ 1 3 2 } clone [ push-new ] keep ] unit-test
+
+! Columns
+{ { 1 2 3 } { 4 5 6 } { 7 8 9 } } [ clone ] map "seq" set
+
+[ { 1 4 7 } ] [ 0 "seq" get <column> >array ] unit-test
+[ ] [ 1 "seq" get <column> [ sq ] inject ] unit-test
+[ { 4 25 64 } ] [ 1 "seq" get <column> >array ] unit-test

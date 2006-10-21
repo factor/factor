@@ -65,3 +65,22 @@ M: slice set-nth-unsafe slice@ set-nth-unsafe ;
 M: slice like slice-seq like ;
 
 M: slice thaw slice-seq thaw ;
+
+TUPLE: column col seq ;
+
+: column@ ( m section -- n seq )
+    dup column-col -rot column-seq nth ;
+
+M: column length column-seq length ;
+
+M: column nth column@ nth ;
+
+M: column nth-unsafe column@ nth-unsafe ;
+
+M: column set-nth column@ set-nth ;
+
+M: column set-nth-unsafe column@ set-nth-unsafe ;
+
+M: column like column-seq like ;
+
+M: column thaw column-seq thaw ;
