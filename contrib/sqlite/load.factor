@@ -1,9 +1,11 @@
-PROVIDE: contrib/sqlite { 
-	"libsqlite.factor" 
-	"sqlite.factor" 
+PROVIDE: contrib/sqlite
+{ +files+ {
+	"libsqlite.factor"
+	"sqlite.factor"
 	"sqlite.facts"
-	"tuple-db.factor" 
-	"tuple-db.facts" 
-} { 
-	"tuple-db-tests.factor" 
-} ;
+	"tuple-db.factor"
+	"tuple-db.facts"
+} }
+{ +tests+ {
+	"tuple-db-tests.factor"
+} } ;

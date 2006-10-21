@@ -1,4 +1,5 @@
-PROVIDE: library {
+PROVIDE: library
+{ +files+ {
     "version.factor"
 
     "generic/early-generic.factor"
@@ -188,9 +189,8 @@ PROVIDE: library {
     "tools/listener.facts"
     "tools/memory.facts"
     "tools/test.facts"
-}
-! Test files
-{
+} }
+{ +tests+ {
     "test/annotate.factor"
     "test/binary.factor"
     "test/collections/hashtables.factor"
@@ -234,4 +234,4 @@ PROVIDE: library {
     "test/tuple.factor"
     "test/words.factor"
     "test/tools.factor"
-} ;
+} } ;

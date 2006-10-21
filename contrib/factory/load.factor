@@ -1,7 +1,7 @@
 REQUIRES: contrib/process contrib/concurrency contrib/x11
 contrib/vars ;
 
-PROVIDE: contrib/factory { "factory.factor" } ;
+PROVIDE: contrib/factory { +files+ {  "factory.factor" } } ;
 
 USE: factory
 

@@ -19,7 +19,8 @@ TUPLE: module name files tests main ;
 : prefix-paths ( name seq -- newseq )
     [ path+ "resource:" swap append ] map-with ;
 
-C: module ( name files tests -- module )
+C: module ( name files tests help -- module )
+    nip ! [ set-module-help ] keep
     [ >r >r over r> prefix-paths r> set-module-tests ] keep
     [ >r dupd prefix-paths r> set-module-files ] keep
     [ set-module-name ] keep ;
@@ -47,9 +48,12 @@ C: module ( name files tests -- module )
     modules get [ first = ] find-with nip
     [ modules get delete ] when* ;
 
-: provide ( name files tests -- )
-    pick remove-module
-    [ process-files ] 2apply <module>
+: provide ( name hash -- )
+    over remove-module [
+        +files+ get process-files
+        +tests+ get process-files
+        +help+ get
+    ] bind <module>
     [ module-files run-files ] keep
     add-module ;
 

@@ -32,8 +32,8 @@ $terpri
 { $notes "Module definitions should use the " { $link POSTPONE: REQUIRES: } " parsing word instead. In the listener, the " { $link require } " word might be more useful since it recompiles new words after loading the module." } ;
 
 HELP: provide
-{ $values { "name" "a string" } { "files" "a sequence of strings" } { "tests" "a sequence of strings" } }
-{ $description "Registers a module definition and loads its source files. Usually instead of calling this word, module definitions use the parsing word " { $link POSTPONE: PROVIDE: } " instead." } ;
+{ $values { "name" "a string" } { "hash" "a hashtable" } }
+{ $description "Registers a module definition and loads its source files. The possible hashtable are documented in the " { $link POSTPONE: PROVIDE: } " word. Usually instead of calling this word, module definitions use the parsing word " { $link POSTPONE: PROVIDE: } " instead." } ;
 
 HELP: test-module
 { $values { "name" "a module name string" } }

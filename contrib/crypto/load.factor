@@ -1,6 +1,7 @@
 REQUIRES: contrib/math ;
 
-PROVIDE: contrib/crypto {
+PROVIDE: contrib/crypto
+{ +files+ {
 
     "common.factor"
     "timing.factor"
@@ -25,7 +26,8 @@ PROVIDE: contrib/crypto {
 ! Public key
     "rsa.factor"
 
-} {
+} }
+{ +tests+ {
     "test/common.factor"
     "test/md5.factor"
     "test/sha1.factor"
@@ -37,4 +39,4 @@ PROVIDE: contrib/crypto {
     "test/barrett.factor"
     "test/montgomery.factor"
     "test/blum-blum-shub.factor"
-} ;
+} } ;

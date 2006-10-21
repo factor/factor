@@ -1,7 +1,8 @@
 ! Copyright (C) 2005, 2006 Eduardo Cavazos
 ! See http://factorcode.org/license.txt for BSD license.
 
-PROVIDE: library/ui/x11 {
+PROVIDE: library/ui/x11
+{ +files+ { 
     "xlib.factor"
     "glx.factor"
     "constants.factor"
@@ -11,4 +12,4 @@ PROVIDE: library/ui/x11 {
     "windows.factor"
     "clipboard.factor"
     "ui.factor"
-} ;
+} } ;

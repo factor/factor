@@ -1,8 +1,9 @@
 USE: kernel
 
-PROVIDE: contrib/calendar {
+PROVIDE: contrib/calendar
+{ +files+ {
     { "os-unix.factor" [ unix? ] }
     { "os-win32.factor" [ windows? ] }
     "calendar.factor"
-} { "test/calendar.factor" } ;
-
+} }
+{ +tests+ { "test/calendar.factor" } } ;

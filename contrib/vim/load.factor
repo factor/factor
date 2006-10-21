@@ -1,6 +1,2 @@
 REQUIRES: contrib/process ;
-PROVIDE: contrib/vim {
-    "vim.factor"
-    "vim.facts"
-} ;
-
+PROVIDE: contrib/vim { +files+ { "vim.factor" "vim.facts" } } ;

@@ -1,3 +1,4 @@
 REQUIRES: contrib/furnace ;
 
-PROVIDE: contrib/furnace-pastebin { "pastebin.factor" } ;
+PROVIDE: contrib/furnace-pastebin
+{ +files+ {  "pastebin.factor" } } ;

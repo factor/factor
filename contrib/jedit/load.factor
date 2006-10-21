@@ -1,1 +1,2 @@
-PROVIDE: contrib/jedit { "jedit.factor" "jedit.facts" } { } ;
+PROVIDE: contrib/jedit
+{ +files+ { "jedit.factor" "jedit.facts" } } ;

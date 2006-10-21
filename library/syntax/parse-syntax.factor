@@ -73,7 +73,7 @@ DEFER: !PRIMITIVE: parsing
 : !FORGET: scan use get hash-stack [ forget ] when* ; parsing
 
 : !PROVIDE:
-    scan [ { { } { } } append first2 provide ] f ; parsing
+    scan [ alist>hash provide ] f ; parsing
 
 : !REQUIRES:
     string-mode on [
@@ -90,3 +90,7 @@ DEFER: !PRIMITIVE: parsing
     ] [
         drop
     ] if* ; parsing
+
+SYMBOL: !+files+
+SYMBOL: !+tests+
+SYMBOL: !+help+

@@ -1,5 +1,3 @@
-PROVIDE: contrib/hexdump {
-    "hexdump.factor"
-} {
-    "test/hexdump.factor"
-} ;
+PROVIDE: contrib/hexdump
+{ +files+ {  "hexdump.factor" } }
+{ +tests+ {  "test/hexdump.factor" } } ;

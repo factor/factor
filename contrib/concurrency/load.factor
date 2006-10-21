@@ -3,9 +3,11 @@
 !
 REQUIRES: contrib/dlists contrib/serialize contrib/match ;
 
-PROVIDE: contrib/concurrency { 
+PROVIDE: contrib/concurrency
+{ +files+ { 
   "concurrency.factor" 
   "concurrency.facts"
-} { 
+} }
+{ +tests+ { 
   "concurrency-tests.factor" 
-} ;
+} } ;

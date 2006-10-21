@@ -1,4 +1,5 @@
-PROVIDE: library/compiler {
+PROVIDE: library/compiler
+{ +files+ {
     "inference/shuffle.factor"
     "inference/dataflow.factor"
     "inference/inference.factor"
@@ -46,7 +47,8 @@ PROVIDE: library/compiler {
     "inference/stack.facts"
     "inference/words.facts"
     "compiler.facts"
-} {
+} }
+{ +tests+ {
     "test/alien-objects.factor"
     "test/simple.factor"
     "test/templates.factor"
@@ -60,4 +62,4 @@ PROVIDE: library/compiler {
     "test/optimizer.factor"
     "test/alien.factor"
     "test/callbacks.factor"
-} ;
+} } ;

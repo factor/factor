@@ -3,13 +3,21 @@
 
 REQUIRES: contrib/lazy-lists ;
 
-PROVIDE: contrib/tetris {
-    "tetris-colours.factor" "tetromino.factor" "tetris-piece.factor"
-    "tetris-board.factor" "tetris.factor" "tetris-gl.factor"
+PROVIDE: contrib/tetris
+{ +files+ {
+    "tetris-colours.factor"
+    "tetromino.factor"
+    "tetris-piece.factor"
+    "tetris-board.factor"
+    "tetris.factor"
+    "tetris-gl.factor"
     "tetris-gadget.factor"
-} {
-    "test/tetris-piece.factor" "test/tetris-board.factor" "test/tetris.factor"
-} ;
+} }
+{ +tests+ {
+    "test/tetris-piece.factor"
+    "test/tetris-board.factor"
+    "test/tetris.factor"
+} } ;
 
 USE: tetris-gadget
 
