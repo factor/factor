@@ -37,7 +37,7 @@ Available libraries:
 - math -- extended math library (Doug Coleman, Slava Pestov)
 - parser-combinators -- Haskell-style parser combinators (Chris Double)
 - postgresql -- PostgreSQL binding (Doug Coleman)
-- process -- Run external programs (Slava Pestov)
+- process -- Run external programs (Slava Pestov, Doug Coleman)
 - random-tester -- Random compiler tester (Doug Coleman)
 - rss -- Code to retrieve and parse an RSS2 file (Chris Double)
 - sequences -- Non-core sequence words (Eduardo Cavazos)

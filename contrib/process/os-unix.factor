@@ -1,5 +1,6 @@
 IN: process
-USING: compiler io io-internals kernel parser generic ;
+USING: compiler io io-internals kernel parser generic
+sequences ;
 
 LIBRARY: libc
 FUNCTION: int system ( char* command ) ;
@@ -8,6 +9,8 @@ FUNCTION: int pclose ( void* file ) ;
 
 : run-process ( string -- ) system io-error ;
 : run-detached ( string -- ) " &" append run-process ;
+
+! Help me implement the equivalent feature on Windows, please...
 
 TUPLE: process-stream pipe ;
 
