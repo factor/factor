@@ -81,6 +81,9 @@ V{ } clone hand-buttons set-global
 SYMBOL: scroll-direction
 { 0 0 } scroll-direction set-global
 
+SYMBOL: double-click-timeout
+100 double-click-timeout set-global
+
 : button-gesture ( gesture -- )
     hand-clicked get-global 2dup handle-gesture [
         >r generalize-gesture r> handle-gesture drop
@@ -150,30 +153,29 @@ SYMBOL: scroll-direction
 : hand-click-rel ( gadget -- loc )
     hand-click-loc get-global relative-loc ;
 
-: update-click# ( button -- )
-    hand-last-button get = [
-        global [ hand-click# inc ] bind
-    ] [
-        1 hand-click# set-global
-    ] if ;
- 
-: button-down ( button timeout -- )
-    millis hand-last-time get - rot < [
-        dup update-click#
-    ] [
-        1 hand-click# set-global
-    ] if
-    hand-last-button set-global
-    millis hand-last-time set-global ;
+: multi-click? ( button -- ? )
+    millis hand-last-time get - double-click-timeout get <=
+    swap hand-last-button get = and ;
 
+: update-click# ( button -- )
+    global [
+        multi-click? [
+            hand-click# inc
+        ] [
+            1 hand-click# set
+        ] if
+    ] bind ;
+
+: update-clicked ( button -- )
+    hand-last-button set-global
+    hand-gadget get-global hand-clicked set-global
+    hand-loc get-global hand-click-loc set-global
+    millis hand-last-time set-global ;
+ 
 : under-hand ( -- seq )
     #! A sequence whose first element is the world and last is
     #! the current gadget, with all parents in between.
     hand-gadget get-global parents <reversed> ;
-
-: update-clicked ( -- )
-    hand-gadget get-global hand-clicked set-global
-    hand-loc get-global hand-click-loc set-global ;
 
 : move-hand ( loc world -- )
     dup hand-world set-global
@@ -184,8 +186,10 @@ SYMBOL: scroll-direction
 
 : send-button-down ( gesture loc world -- )
     move-hand
-    update-clicked
-    dup button-down-# hand-buttons get-global push
+    dup button-down-#
+    dup update-click#
+    dup update-clicked
+    hand-buttons get-global push
     button-gesture ;
 
 : send-button-up ( gesture loc world -- )

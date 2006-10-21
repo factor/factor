@@ -91,16 +91,11 @@ opengl sequences ;
 : mouse-event>gesture ( event -- modifiers button )
     dup event-modifiers swap button ;
 
-: update-click-count ( event -- )
-    -> clickCount 1 max hand-click# set-global ;
-
 : send-button-down$ ( view event -- )
-    [ update-click-count ] keep
     [ mouse-event>gesture <button-down> ] 2keep
     mouse-location rot window send-button-down ;
 
 : send-button-up$ ( view event -- )
-    [ update-click-count ] keep
     [ mouse-event>gesture <button-up> ] 2keep
     mouse-location rot window send-button-up ;
 

@@ -165,17 +165,14 @@ SYMBOL: hWnd
 : mouse-lparam ( lParam -- seq ) [ lo-word ] keep hi-word 2array ;
 : mouse-wheel ( lParam -- n ) mouse-lparam [ sgn neg ] map ;
 
-: win32-button-down ( button -- )
-    GetDoubleClickTime dup button-down <button-down> ;
-
 : mouse-event>gesture ( uMsg -- button )
     key-modifiers swap
     {
-        { [ dup WM_LBUTTONDOWN = ] [ drop 1 win32-button-down ] }
+        { [ dup WM_LBUTTONDOWN = ] [ drop 1 <button-down> ] }
         { [ dup WM_LBUTTONUP = ] [ drop 1 <button-up> ] }
-        { [ dup WM_MBUTTONDOWN = ] [ drop 2 win32-button-down ] }
+        { [ dup WM_MBUTTONDOWN = ] [ drop 2 <button-down> ] }
         { [ dup WM_MBUTTONUP = ] [ drop 2 <button-up> ] }
-        { [ dup WM_RBUTTONDOWN = ] [ drop 3 win32-button-down ] }
+        { [ dup WM_RBUTTONDOWN = ] [ drop 3 <button-down> ] }
         { [ dup WM_RBUTTONUP = ] [ drop 3 <button-up> ] }
         { [ t ] [ "bad button" throw ] }
     } cond ;
@@ -306,7 +303,8 @@ SYMBOL: hWnd
     "MSG" <c-object> msg-obj set
     random-class-name class-name set
     class-name get <malloc-string> ui-wndproc
-    register-wndclassex win32-error=0 ;
+    register-wndclassex win32-error=0
+    GetDoubleClickTime double-click-timeout set-global ;
 
 : cleanup-win32-ui ( -- )
     class-name get <malloc-string> f UnregisterClass drop ;

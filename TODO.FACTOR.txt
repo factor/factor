@@ -5,7 +5,6 @@
 [ 1 2 3 4 5 6 7 8 9 10 10 10 10 10 10 10 10 10 10 11 11 11 113 
 ]
 - prettier printing of hashtable literals, alists, cond, ...
-- x11 double click
 - menu should stay up if mouse button released
 - roundoff is still not quite right with tracks
 - fix compiled gc check
