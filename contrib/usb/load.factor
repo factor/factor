@@ -10,4 +10,4 @@ PROVIDE: contrib/usb
 	{ "usb-macosx.factor" [ macosx? ] }
 	"usb.factor" 
 	"usb.facts" 
-} ;
+} } ;
