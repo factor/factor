@@ -1,5 +1,9 @@
 REQUIRES: contrib/concurrency ;
 
-PROVIDE: contrib/x11 {
-    "rectangle.factor" "x.factor" "draw-string.factor" "concurrent-widgets.factor" "gl.factor"
-} ;
+PROVIDE: contrib/x11
+{ +files+ {
+    "rectangle.factor"
+    "x.factor"
+    "draw-string.factor"
+    "concurrent-widgets.factor"
+} } ;
