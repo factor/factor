@@ -82,7 +82,7 @@ SYMBOL: scroll-direction
 { 0 0 } scroll-direction set-global
 
 SYMBOL: double-click-timeout
-100 double-click-timeout set-global
+300 double-click-timeout set-global
 
 : button-gesture ( gesture -- )
     hand-clicked get-global 2dup handle-gesture [
