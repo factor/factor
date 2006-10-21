@@ -89,3 +89,6 @@ C: module ( name files tests help -- module )
         "To define one, see the documentation for the " write
         \ MAIN: ($link) " word." print
     ] ?if ;
+
+: modules-help ( -- seq )
+    modules get [ second module-help ] map [ ] subset ;

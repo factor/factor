@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 IN: help
 USING: arrays io kernel namespaces parser prettyprint sequences
-words modules ;
+words ;
 
 M: word article-title
     dup parsing? [
@@ -65,6 +65,3 @@ M: word article-content
 
 : $outliner ( element -- )
     [ first call help-outliner ] ($block) ;
-
-: modules-help ( -- seq )
-    modules get [ second module-help ] map [ ] subset ;
