@@ -98,6 +98,6 @@ IN: win32-io-internals
 
 : win32-init-stdio ( -- )
     INVALID_HANDLE_VALUE f f 1 CreateIoCompletionPort
-    completion-port set 
-    <io-queue> io-queue set ;
+    completion-port set-global
+    <io-queue> io-queue set-global ;
 
