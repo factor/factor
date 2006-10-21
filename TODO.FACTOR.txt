@@ -15,7 +15,6 @@
 - growable data heap
 - more compact relocation info
 - update module system docs
-- cocoa: close item disabled
 
 + ui:
 

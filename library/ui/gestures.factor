@@ -166,8 +166,7 @@ SYMBOL: double-click-timeout
         ] if
     ] bind ;
 
-: update-clicked ( button -- )
-    hand-last-button set-global
+: update-clicked ( -- )
     hand-gadget get-global hand-clicked set-global
     hand-loc get-global hand-click-loc set-global
     millis hand-last-time set-global ;
@@ -188,7 +187,8 @@ SYMBOL: double-click-timeout
     move-hand
     dup button-down-#
     dup update-click#
-    dup update-clicked
+    dup hand-last-button set-global
+    update-clicked
     hand-buttons get-global push
     button-gesture ;
 
