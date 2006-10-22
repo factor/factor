@@ -48,7 +48,7 @@ SYMBOL: term-index
     count-occurrences hash>alist rank-completions ;
 
 : search-help. ( phrase -- ) 
-    search-help [ first ] map help-outliner ;
+    search-help 0 <column> help-outliner ;
 
 : index-help ( -- )
     term-index get [

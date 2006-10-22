@@ -39,7 +39,7 @@ C: module ( name files tests help -- module )
 : process-files ( seq -- newseq )
     [ dup string? [ [ t ] 2array ] when ] map
     [ second call ] subset
-    [ first ] map ;
+    0 <column> >array ;
 
 : add-module ( module -- )
     dup module-name swap 2array modules get push ;
@@ -59,9 +59,9 @@ C: module ( name files tests help -- module )
 
 : test-module ( name -- ) module module-tests run-tests ;
 
-: all-modules ( -- seq ) modules get [ second ] map ;
+: all-modules ( -- seq ) modules get 1 <column> ;
 
-: all-module-names ( -- seq ) modules get [ first ] map ;
+: all-module-names ( -- seq ) modules get 0 <column> ;
 
 : test-modules ( -- )
     all-modules [ module-tests ] map concat run-tests ;
@@ -91,4 +91,4 @@ C: module ( name files tests help -- module )
     ] ?if ;
 
 : modules-help ( -- seq )
-    modules get [ second module-help ] map [ ] subset ;
+    all-modules [ module-help ] map [ ] subset ;

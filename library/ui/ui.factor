@@ -75,7 +75,7 @@ C: titled-gadget ( gadget title -- )
     <model> <titled-gadget> <world> open-window ;
 
 : find-window ( quot -- world )
-    windows get [ second ] map
+    windows get 1 <column>
     [ world-gadget swap call ] find-last-with nip ; inline
 
 : start-world ( world -- )
@@ -112,7 +112,7 @@ C: titled-gadget ( gadget title -- )
     reset-world ;
 
 : restore-windows ( -- )
-    windows get [ [ second ] map ] keep delete-all
+    windows get [ 1 <column> >array ] keep delete-all
     [ dup reset-world open-window* ] each
     forget-rollover ;
 

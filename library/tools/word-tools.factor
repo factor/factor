@@ -14,7 +14,7 @@ generic completion ;
 : method-usage ( word generic -- methods )
     tuck methods
     [ second flatten memq? ] subset-with
-    [ first ] map
+    0 <column>
     [ swap 2array ] map-with ;
 
 : usage. ( word -- )

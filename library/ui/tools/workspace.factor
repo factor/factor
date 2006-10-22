@@ -55,7 +55,7 @@ tool "toolbar" {
     } ;
 
 C: workspace ( -- workspace )
-    workspace-tabs [ second execute <tool> ] map <book>
+    workspace-tabs 1 <column> [ execute <tool> ] map <book>
     over set-gadget-delegate dup dup set-control-self ;
 
 M: workspace pref-dim* delegate pref-dim* { 550 650 } vmax ;

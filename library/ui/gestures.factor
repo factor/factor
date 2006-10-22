@@ -142,7 +142,7 @@ SYMBOL: double-click-timeout
 
 : modifier ( mod modifiers -- seq )
     [ second swap bitand 0 > ] subset-with
-    [ first ] map prune f like ;
+    0 <column> prune f like ;
 
 : drag-loc ( -- loc )
     hand-loc get-global hand-click-loc get-global v- ;

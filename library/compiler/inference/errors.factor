@@ -1,8 +1,11 @@
+! Copyright (C) 2006 Slava Pestov.
+! See http://factorcode.org/license.txt for BSD license.
 IN: inference
-USING: kernel generic errors sequences prettyprint io words ;
+USING: kernel generic errors sequences prettyprint io words
+arrays ;
 
 M: inference-error error.
-    dup inference-error-rstate [ first ] map
+    dup inference-error-rstate 0 <column> >array
     dup empty? [ "Word: " write dup peek . ] unless
     swap delegate error. "Nesting: " write . ;
 

@@ -15,6 +15,7 @@
 - growable data heap
 - more compact relocation info
 - update module system docs
+- flip may fail with >64kb string
 
 + ui:
 

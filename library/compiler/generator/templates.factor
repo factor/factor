@@ -111,7 +111,7 @@ SYMBOL: phantom-r
 : (live-locs) ( seq -- seq )
     dup phantom-locs* [ 2array ] 2map
     [ first2 over loc? >r = not r> and ] subset
-    [ first ] map ;
+    0 <column> ;
 
 : stack>new-vreg ( loc spec -- vreg )
     spec>vreg [ swap %peek ] keep ;
@@ -254,7 +254,7 @@ SYMBOL: +clobber
 
 : guess-vregs ( -- int# float# )
     +input get { } additional-vregs ?fp-scratch +
-    +scratch get [ first ] map requested-vregs >r + r> ;
+    +scratch get 0 <column> requested-vregs >r + r> ;
 
 : alloc-scratch ( -- )
     +scratch get [ first2 >r spec>vreg r> set ] each ;
