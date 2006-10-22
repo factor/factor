@@ -1,14 +1,13 @@
 ! Copyright (C) 2005, 2006 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-IN: gadgets-frames
-USING: arrays gadgets gadgets-grids generic kernel math
-namespaces sequences words ;
+IN: gadgets
+USING: arrays generic kernel math namespaces sequences words ;
 
 ! A frame arranges gadgets in a 3x3 grid, where the center
 ! gadgets gets left-over space.
 TUPLE: frame ;
 
-: <frame-grid> 3 [ drop 3 f <array> ] map ;
+: <frame-grid> 9 [ drop <gadget> ] map 3 group ;
 
 : @center 1 1 ;
 : @left 0 1 ;

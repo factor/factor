@@ -1,8 +1,8 @@
 ! Copyright (C) 2006 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 IN: gadgets
-USING: arrays errors gadgets gadgets-buttons gadgets-frames
-gadgets-grids gadgets-labels gadgets-panes gadgets-presentations
+USING: arrays errors gadgets gadgets-buttons
+gadgets-labels gadgets-panes gadgets-presentations
 gadgets-scrolling gadgets-theme gadgets-viewports generic
 hashtables io kernel math models namespaces prettyprint queues
 sequences test threads help sequences words ;

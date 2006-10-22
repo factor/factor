@@ -2,9 +2,8 @@
 ! See http://factorcode.org/license.txt for BSD license.
 IN: gadgets-text
 USING: arrays errors freetype gadgets gadgets-borders
-gadgets-buttons gadgets-frames gadgets-labels
-gadgets-scrolling gadgets-theme io kernel math models namespaces
-opengl sequences strings styles ;
+gadgets-buttons gadgets-labels gadgets-scrolling gadgets-theme
+io kernel math models namespaces opengl sequences strings styles ;
 
 TUPLE: editor
 font color caret-color selection-color

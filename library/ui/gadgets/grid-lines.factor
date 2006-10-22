@@ -1,7 +1,7 @@
 ! Copyright (C) 2006 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-IN: gadgets-grids
-USING: gadgets kernel math namespaces opengl sequences ;
+IN: gadgets
+USING: kernel math namespaces opengl sequences ;
 
 ! You can set a grid's gadget-boundary to this.
 TUPLE: grid-lines color ;

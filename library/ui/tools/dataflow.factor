@@ -5,7 +5,7 @@ USING: namespaces arrays sequences io inference math kernel
 generic prettyprint words gadgets opengl gadgets-panes
 gadgets-labels gadgets-theme gadgets-presentations
 gadgets-buttons gadgets-borders gadgets-scrolling
-gadgets-frames gadgets-workspace optimizer models help ;
+gadgets-workspace optimizer models help ;
 
 GENERIC: node>gadget* ( height node -- gadget )
 

@@ -1,7 +1,7 @@
 ! Copyright (C) 2005, 2006 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 IN: gadgets
-USING: arrays errors freetype gadgets-frames generic hashtables
+USING: arrays errors freetype gadgets generic hashtables
 kernel math models namespaces opengl sequences ;
 
 : menu-loc ( world menu -- loc )

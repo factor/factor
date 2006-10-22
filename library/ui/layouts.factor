@@ -152,17 +152,19 @@ M: pack pref-dim*
 M: pack layout*
     dup gadget-children pref-dims pack-layout ;
 
-: fast-children-on ( dim axis gadgets -- i )
+: (fast-children-on) ( dim axis gadgets -- i )
     swapd [ rect-loc v- over v. ] binsearch nip ;
 
-M: pack children-on
-    dup gadget-orientation swap gadget-children [
-        3dup
-        >r >r dup rect-loc swap rect-dim v+ origin get v-
-        r> r> fast-children-on 1+
-        >r
-        >r >r rect-loc origin get v-
-        r> r> fast-children-on
-        0 max
-        r>
-    ] keep <slice> ;
+: fast-children-on ( rect axis children -- from to )
+    3dup
+    >r >r dup rect-loc swap rect-dim v+ origin get v-
+    r> r> (fast-children-on) 1+
+    >r
+    >r >r rect-loc origin get v-
+    r> r> (fast-children-on)
+    0 max
+    r> ;
+
+M: pack children-on ( rect gadget -- seq )
+    dup gadget-orientation swap gadget-children
+    [ fast-children-on ] keep <slice> ;

@@ -2,9 +2,8 @@
 ! See http://factorcode.org/license.txt for BSD license.
 IN: gadgets-outliner
 USING: arrays gadgets gadgets-borders gadgets-buttons
-gadgets-frames gadgets-grids gadgets-labels gadgets-panes
-gadgets-theme generic io kernel math opengl sequences styles
-namespaces ;
+gadgets-labels gadgets-panes gadgets-theme generic io kernel
+math opengl sequences styles namespaces ;
 
 ! Vertical line.
 TUPLE: guide color ;
@@ -45,11 +44,12 @@ DEFER: set-outliner-expanded?
     >r not <expand-button> r> @top-left grid-add ;
 
 : setup-center ( expanded? outliner -- )
-    [ swap [ outliner-quot make-pane ] [ drop f ] if ] keep
-    @center grid-add ;
+    [
+        swap [ outliner-quot make-pane ] [ drop <gadget> ] if
+    ] keep @center grid-add ;
 
 : setup-guide ( expanded? outliner -- )
-    >r [ <guide-gadget> ] [ f ] if r> @left grid-add ;
+    >r [ <guide-gadget> ] [ <gadget> ] if r> @left grid-add ;
 
 : set-outliner-expanded? ( expanded? outliner -- )
     #! Call the expander quotation if expanding.

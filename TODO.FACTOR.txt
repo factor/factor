@@ -11,14 +11,17 @@
   - there was a performance hit, investigate
   - float boxing and overflow checks need a gc check too
 - [ [ dup call ] dup call ] infer hangs
-- grid slows down with 2000 lines
 - growable data heap
 - more compact relocation info
-- update module system docs
 - flip may fail with >64kb string
+- documentation:
+  - document columns
+  - update module system docs
 
 + ui:
 
+- grid displays quickly now, but constructing large amounts of gadgets
+  is slow: eg, 10000 [ dup number>string ] map describe
 - completion is not ideal: eg, C+e "buttons"
 - some way of intercepting all gestures
 - slider needs to be modelized

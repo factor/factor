@@ -1,7 +1,7 @@
 ! Copyright (C) 2005, 2006 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 IN: gadgets-listener
-USING: compiler arrays gadgets gadgets-frames gadgets-labels
+USING: compiler arrays gadgets gadgets-labels
 gadgets-panes gadgets-scrolling gadgets-text gadgets-lists
 gadgets-search gadgets-theme gadgets-tracks gadgets-workspace
 generic hashtables tools io kernel listener math models

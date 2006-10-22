@@ -2,8 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 IN: gadgets-workspace
 USING: help arrays compiler gadgets gadgets-books
-gadgets-browser gadgets-buttons
-gadgets-dataflow gadgets-frames gadgets-grids gadgets-help
+gadgets-browser gadgets-buttons gadgets-dataflow gadgets-help
 gadgets-listener gadgets-presentations gadgets-walker
 gadgets-workspace generic kernel math modules scratchpad
 sequences syntax words io namespaces hashtables

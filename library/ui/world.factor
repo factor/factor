@@ -1,7 +1,7 @@
 ! Copyright (C) 2005, 2006 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 IN: gadgets
-USING: arrays errors freetype gadgets-frames generic hashtables
+USING: arrays errors freetype generic hashtables
 kernel math models namespaces opengl sequences ;
 
 ! The world gadget is the top level gadget that all (visible)

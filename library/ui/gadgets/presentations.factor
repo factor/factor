@@ -5,7 +5,7 @@ DEFER: call-listener
 
 IN: gadgets-presentations
 USING: arrays definitions gadgets gadgets-borders
-gadgets-buttons gadgets-grids gadgets-labels gadgets-outliner
+gadgets-buttons gadgets-labels gadgets-outliner
 gadgets-panes gadgets-paragraphs gadgets-theme
 generic hashtables tools io kernel prettyprint sequences strings
 styles words help math models namespaces ;

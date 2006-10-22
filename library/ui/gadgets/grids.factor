@@ -1,7 +1,7 @@
 ! Copyright (C) 2006 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-IN: gadgets-grids
-USING: arrays gadgets kernel math namespaces sequences words ;
+IN: gadgets
+USING: arrays kernel math namespaces sequences words ;
 
 TUPLE: grid children gap ;
 
@@ -17,17 +17,14 @@ C: grid ( children -- grid )
 : grid-child ( grid i j -- gadget ) rot grid-children nth nth ;
 
 : grid-add ( gadget grid i j -- )
-    >r >r over [ over add-gadget ] when* r> r>
+    >r >r 2dup add-gadget r> r>
     3dup grid-child unparent rot grid-children nth set-nth ;
 
 : grid-remove ( grid i j -- )
-    >r >r >r f r> r> r> grid-add ;
-
-: ?pref-dim ( gadget/f -- dim )
-    [ pref-dim ] [ { 0 0 } ] if* ;
+    >r >r >r <gadget> r> r> r> grid-add ;
 
 : pref-dim-grid ( -- dims )
-    grid get grid-children [ [ ?pref-dim ] map ] map ;
+    grid get grid-children [ [ pref-dim ] map ] map ;
 
 : compute-grid ( -- horiz vert )
     pref-dim-grid
@@ -47,9 +44,9 @@ M: grid pref-dim*
     ] with-grid ;
 
 : do-grid ( dims quot -- )
-    swap grid get grid-children [
-        [ dup [ pick call ] [ 2drop ] if ] 2each
-    ] 2each drop ; inline
+    swap grid get grid-children
+    [ [ pick call ] 2each ] 2each
+    drop ; inline
 
 : pair-up ( horiz vert -- dims )
     [ swap [ swap (pair-up) ] map-with ] map-with ;
@@ -75,3 +72,12 @@ M: grid layout*
     #! The setter has stack effect ( new gadget -- ),
     #! the loc is @center, @top, etc.
     swap [ [ grid-add ] build-spec ] with-gadget ; inline
+
+M: grid children-on ( rect gadget -- seq )
+    dup gadget-children empty? [
+        2drop f
+    ] [
+        { 0 1 } swap grid-children
+        [ 0 <column> fast-children-on ] keep
+        <slice> concat
+    ] if ;
