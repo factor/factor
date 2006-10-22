@@ -471,7 +471,7 @@ FUNCTION: HANDLE GetStdHandle ( DWORD nStdHandle ) ;
 ! FUNCTION: GetSystemDefaultUILanguage
 ! FUNCTION: GetSystemDirectoryA
 ! FUNCTION: GetSystemDirectoryW
-! FUNCTION: GetSystemInfo
+FUNCTION: void GetSystemInfo ( LPSYSTEM_INFO lpSystemInfo ) ;
 ! FUNCTION: GetSystemPowerStatus
 ! FUNCTION: GetSystemRegistryQuota
 FUNCTION: void GetSystemTime ( LPSYSTEMTIME lpSystemTime ) ;
@@ -505,9 +505,10 @@ FUNCTION: DWORD GetTimeZoneInformation ( LPTIME_ZONE_INFORMATION lpTimeZoneInfor
 ! FUNCTION: GetUserDefaultUILanguage
 ! FUNCTION: GetUserGeoID
 ! FUNCTION: GetVDMCurrentDirectories
-! FUNCTION: GetVersion
-! FUNCTION: GetVersionExA
-! FUNCTION: GetVersionExW
+FUNCTION: DWORD GetVersion ( ) ;
+FUNCTION: BOOL GetVersionExA ( LPOSVERSIONINFO lpVersionInfo ) ;
+FUNCTION: BOOL GetVersionExW ( LPOSVERSIONINFO lpVersionInfo ) ;
+: GetVersionEx GetVersionExA ;
 ! FUNCTION: GetVolumeInformationA
 ! FUNCTION: GetVolumeInformationW
 ! FUNCTION: GetVolumeNameForVolumeMountPointA
@@ -533,8 +534,8 @@ FUNCTION: HGLOBAL GlobalAlloc ( UINT uFlags, SIZE_T dwBytes ) ;
 ! FUNCTION: GlobalGetAtomNameW
 ! FUNCTION: GlobalHandle
 FUNCTION: LPVOID GlobalLock ( HGLOBAL hMem ) ;
-! FUNCTION: GlobalMemoryStatus
-! FUNCTION: GlobalMemoryStatusEx
+FUNCTION: void GlobalMemoryStatus ( LPMEMORYSTATUS lpBuffer ) ;
+FUNCTION: BOOL GlobalMemoryStatusEx ( LPMEMORYSTATUSEX lpBuffer ) ;
 ! FUNCTION: GlobalReAlloc
 ! FUNCTION: GlobalSize
 ! FUNCTION: GlobalUnfix
@@ -587,7 +588,7 @@ FUNCTION: BOOL GlobalUnlock ( HGLOBAL hMem ) ;
 ! FUNCTION: IsDBCSLeadByteEx
 ! FUNCTION: IsDebuggerPresent
 ! FUNCTION: IsProcessInJob
-! FUNCTION: IsProcessorFeaturePresent
+FUNCTION: BOOL IsProcessorFeaturePresent ( DWORD ProcessorFeature ) ;
 ! FUNCTION: IsSystemResumeAutomatic
 ! FUNCTION: IsValidCodePage
 ! FUNCTION: IsValidLanguageGroup
