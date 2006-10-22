@@ -17,6 +17,7 @@ Available libraries:
 - cocoa-callbacks -- Allows you to use Factor quotations as actions (Slava Pestov)
 - concurrency -- Erlang/Termite-style distibuted concurrency (Chris Double)
 - coroutines -- coroutines (Chris Double)
+- cpuinfo -- Information about your system (Doug Coleman)
 - crypto -- Various cryptographic algorithms (Doug Coleman)
 - dlists -- double-linked-lists (Mackenzie Straight)
 - emacs -- emacs integration (Eduardo Cavazos)
