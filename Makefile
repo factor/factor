@@ -75,7 +75,11 @@ macosx-ppc: macosx-freetype
 macosx-x86: macosx-freetype
 	$(MAKE) $(BINARY) CONFIG=vm/Config.macosx
 
-linux-x86 linux-amd64:
+linux-x86:
+	$(MAKE) $(BINARY) CONFIG=vm/Config.linux
+	$(STRIP) $(BINARY)
+
+linux-amd64:
 	$(MAKE) $(BINARY) CONFIG=vm/Config.linux.amd64
 	$(STRIP) $(BINARY)
 
