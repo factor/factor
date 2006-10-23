@@ -1,8 +1,8 @@
-USING: definitions kernel parser process namespaces ;
+USING: definitions kernel parser process namespaces prettyprint ;
 
 IN: textmate
 
 : textmate-location ( file line -- )
-    [ "mate -a \"" % over % "\" -l " % # ] "" make run-process ;
+    [ "mate -a -l " % # " " % unparse % ] "" make run-process ;
 
 [ textmate-location ] edit-hook set-global
