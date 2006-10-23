@@ -1,6 +1,7 @@
 REQUIRES: contrib/vars contrib/slate contrib/lindenmayer/opengl ;
 
-USING: kernel namespaces hashtables sequences math arrays opengl gadgets
+USING: kernel namespaces hashtables sequences generic math arrays
+       threads opengl gadgets
        vars slate opengl-contrib ;
 
 IN: automata
@@ -91,6 +92,8 @@ dup peek 1array swap dup first 1array append append ;
 : mild ( -- seq )
 { 6 9 11 57 62 74 118 } ;
 
+: set-interesting ( -- ) interesting random-item set-rule ;
+
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 VAR: bitmap
@@ -123,13 +126,45 @@ GL_COLOR_BUFFER_BIT glClear black gl-color bitmap> draw-bitmap ;
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 : init-slate ( -- )
-<slate> >slate
-namespace slate> set-slate-ns
-[ display ] >action
-slate> "Automata" open-titled-window ;
+<slate> >slate   namespace slate> set-slate-ns   [ display ] >action ;
+
+: init ( -- ) init-rule init-slate ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-: init ( -- ) init-rule init-slate ;
+VAR: loop-flag
+
+DEFER: loop
+
+: (loop) ( -- ) run-rule 3000 sleep loop ;
+
+: loop ( -- ) loop-flag> [ (loop) ] [ ] if ;
+
+: start-loop ( -- ) t >loop-flag [ loop ] in-thread ;
+
+: stop-loop ( -- ) f >loop-flag ;
+
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+TUPLE: automata-gadget ;
+
+C: automata-gadget ( -- automata-gadget )
+init
+slate> over set-delegate
+interesting random-item set-rule ;
+
+: automata-window ( -- ) <automata-gadget> "Automata" open-titled-window ;
+
+automata-gadget H{
+    { T{ key-down f f "1" } [ slate-ns [ start-center    ] bind ] }
+    { T{ key-down f f "2" } [ slate-ns [ start-random    ] bind ] }
+    { T{ key-down f f "3" } [ slate-ns [ run-rule        ] bind ] }
+    { T{ key-down f f "5" }
+      [ slate-ns [ set-interesting start-center ] bind ] }
+    { T{ key-down f f "9" } [ slate-ns [ start-loop ] bind ] }
+    { T{ key-down f f "0" } [ slate-ns [ stop-loop ] bind ] }
+} set-gestures
+
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 PROVIDE: contrib/automata ;
