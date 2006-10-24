@@ -29,5 +29,4 @@ M: menu-glass layout* gadget-child prefer ;
 } set-gestures
 
 : show-menu ( gadget owner -- )
-    find-world [ <menu-glass> ] keep [ show-glass ] keep
-    t menu-mode? set-global ;
+    find-world [ <menu-glass> ] keep show-glass ;

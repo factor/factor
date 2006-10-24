@@ -75,6 +75,8 @@ M: world layout*
         >r dup rect-dim r> set-layout-dim
     ] when* drop ;
 
+M: world children-on nip gadget-children ;
+
 : hide-glass ( world -- )
     f menu-mode? set-global
     dup world-glass [ unparent ] when*
@@ -83,4 +85,5 @@ M: world layout*
 : show-glass ( gadget world -- )
     [ hide-glass ] keep
     [ add-gadget ] 2keep
-    set-world-glass ;
+    set-world-glass
+    t menu-mode? set-global ;

@@ -168,8 +168,7 @@ SYMBOL: double-click-timeout
 
 : update-clicked ( -- )
     hand-gadget get-global hand-clicked set-global
-    hand-loc get-global hand-click-loc set-global
-    millis hand-last-time set-global ;
+    hand-loc get-global hand-click-loc set-global ;
  
 : under-hand ( -- seq )
     #! A sequence whose first element is the world and last is
@@ -188,6 +187,7 @@ SYMBOL: double-click-timeout
     dup button-down-#
     dup update-click#
     dup hand-last-button set-global
+    millis hand-last-time set-global
     update-clicked
     hand-buttons get-global push
     button-gesture ;

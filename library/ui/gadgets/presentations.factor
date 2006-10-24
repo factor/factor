@@ -40,7 +40,7 @@ C: presentation ( gadget object -- button )
     [ <command-button> ] map-with
     make-pile 1 over set-pack-fill ;
 
-: operations-menu ( presentation -- gadget )
+: operations-menu ( presentation -- )
     dup presentation-object
     dup object-operations <commands-menu>
     swap show-menu ;
@@ -58,7 +58,7 @@ presentation H{
     ] <filter> <label-control> dup reverse-video-theme ;
 
 : <listener-button> ( gadget quot -- button )
-    [ call-listener ] curry <roll-button> ;
+    [ call-listener drop ] curry <roll-button> ;
 
 ! Character styles
 
