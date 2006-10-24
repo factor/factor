@@ -85,7 +85,8 @@ IN: gadgets
     world-handle second f -> makeKeyAndOrderFront: ;
 
 : raise-window ( world -- )
-    world-handle second dup f -> orderFront: -> makeKeyWindow ;
+    world-handle second dup f -> orderFront: -> makeKeyWindow
+    NSApp 1 -> activateIgnoringOtherApps: ;
 
 : select-gl-context ( handle -- )
     first -> openGLContext -> makeCurrentContext ;
