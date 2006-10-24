@@ -33,8 +33,11 @@ TUPLE: tool gadget ;
 : select-tool ( workspace class -- ) swap show-tool drop ;
 
 : find-workspace ( -- workspace )
-    [ workspace? ] find-window
-    [ world-gadget ] [ workspace-window find-workspace ] if* ;
+    [ workspace? ] find-window [
+        dup raise-window world-gadget
+    ] [
+        workspace-window find-workspace
+    ] if* ;
 
 : call-tool ( arg class -- )
     find-workspace show-tool call-tool* ;

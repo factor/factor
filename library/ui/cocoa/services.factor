@@ -29,7 +29,7 @@ parser prettyprint styles gadgets-listener gadgets-workspace ;
         { "id" "SEL" "id" "id" "void*" }
         [
             nip
-            [ <input> listener-gadget call-tool f ]
+            [ eval-listener f ]
             do-service
             2drop
         ]
@@ -45,3 +45,5 @@ parser prettyprint styles gadgets-listener gadgets-workspace ;
     NSApp
     FactorServiceProvider -> alloc -> init
     -> setServicesProvider: ;
+
+FUNCTION: void NSUpdateDynamicServices ;

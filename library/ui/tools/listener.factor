@@ -85,6 +85,11 @@ M: listener-gadget tool-help
 : call-listener ( quot -- )
     find-listener (call-listener) ;
 
+: eval-listener ( string -- )
+    find-listener
+    listener-gadget-input [ set-editor-text ] keep
+    interactor-commit ;
+
 : listener-run-files ( seq -- )
     dup empty? [
         drop

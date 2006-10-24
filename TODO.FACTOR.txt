@@ -14,7 +14,6 @@
 - growable data heap
 - more compact relocation info
 - flip may fail with >64kb string
-- services broken
 - documentation:
   - document columns
   - update module system docs
@@ -34,7 +33,6 @@
 - auto-update browser and help when sources reload
 - how do we refer to command shortcuts in the docs?
 - fix top level window positioning
-- services do not launch if factor not running
 - editor:
   - autoscroll
   - transpose char/word/line
