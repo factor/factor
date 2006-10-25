@@ -49,8 +49,8 @@ M: stack-params %freg>stack
     reset-sse compile-c-call ;
 
 : alien-temp ( quot -- )
-    0 R11 MOV "alien_temp" f rel-absolute-cell rel-dlsym
-    R11 swap call ; inline
+    R11 0 MOV "alien_temp" f rel-absolute-cell rel-dlsym
+    R11 [] swap call ; inline
 
 : %alien-indirect ( -- )
     reset-sse [ CALL ] alien-temp ;
