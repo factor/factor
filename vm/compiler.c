@@ -144,68 +144,24 @@ void deposit_integers(CELL here, F_VECTOR *vector, CELL format)
 	F_ARRAY *array = untag_array_fast(vector->array);
 	CELL i;
 
-	if(format == 1)
+	for(i = 0; i < count; i++)
 	{
-		for(i = 0; i < count; i++)
-			cput(here + i,to_fixnum(get(AREF(array,i))));
-	}
-	else if(format == CELLS)
-	{
-		for(i = 0; i < count; i++)
+		F_FIXNUM value = to_fixnum(get(AREF(array,i)));
+		if(format == 1)
+			cput(here + i,value);
+		else if(format == sizeof(unsigned int))
+			*(unsigned int *)(here + format * i) = value;
+		else if(format == CELLS)
 			put(CREF(here,i),to_fixnum(get(AREF(array,i))));
+		else
+			critical_error("Bad format in deposit_integers()",format);
 	}
-	else
-		critical_error("Bad format param to deposit_vector()",format);
 }
 
 void deposit_objects(CELL here, F_VECTOR *vector, CELL literal_length)
 {
 	F_ARRAY *array = untag_array_fast(vector->array);
 	memcpy((void*)here,array + 1,literal_length);
-}
-
-CELL add_compiled_block(CELL code_format, F_VECTOR *code,
-	F_VECTOR *literals, F_VECTOR *words, F_VECTOR *rel)
-{
-	CELL code_length = align8(untag_fixnum_fast(code->top) * code_format);
-	CELL rel_length = untag_fixnum_fast(rel->top) * CELLS;
-	CELL literal_length = untag_fixnum_fast(literals->top) * CELLS;
-	CELL words_length = untag_fixnum_fast(words->top) * CELLS;
-
-	CELL total_length = sizeof(F_COMPILED) + code_length + rel_length
-		+ literal_length + words_length;
-
-	CELL start = heap_allot(&compiling,total_length);
-	CELL here = start;
-
-	/* compiled header */
-	F_COMPILED header;
-	header.code_length = code_length;
-	header.reloc_length = rel_length;
-	header.literal_length = literal_length;
-	header.words_length = words_length;
-	header.finalized = false;
-
-	memcpy((void*)here,&header,sizeof(F_COMPILED));
-	here += sizeof(F_COMPILED);
-
-	/* code */
-	deposit_integers(here,code,code_format);
-	here += code_length;
-
-	/* relation info */
-	deposit_integers(here,rel,CELLS);
-	here += rel_length;
-
-	/* literals */
-	deposit_objects(here,literals,literal_length);
-	here += literal_length;
-
-	/* words */
-	deposit_objects(here,words,words_length);
-	here += words_length;
-
-	return start + sizeof(F_COMPILED);
 }
 
 #define FROB \
@@ -215,7 +171,7 @@ CELL add_compiled_block(CELL code_format, F_VECTOR *code,
 	F_VECTOR *literals = untag_vector(get(ds - CELLS * 3)); \
 	F_VECTOR *rel = untag_vector(get(ds - CELLS * 4)); \
 	CELL code_length = align8(untag_fixnum_fast(code->top) * code_format); \
-	CELL rel_length = untag_fixnum_fast(rel->top) * CELLS; \
+	CELL rel_length = untag_fixnum_fast(rel->top) * sizeof(unsigned int); \
 	CELL literal_length = untag_fixnum_fast(literals->top) * CELLS; \
 	CELL words_length = untag_fixnum_fast(words->top) * CELLS;
 
@@ -271,7 +227,7 @@ void primitive_add_compiled_block(void)
 	here += code_length;
 
 	/* relation info */
-	deposit_integers(here,rel,CELLS);
+	deposit_integers(here,rel,sizeof(unsigned int));
 	here += rel_length;
 
 	/* literals */

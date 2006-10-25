@@ -34,8 +34,8 @@ the compiler */
 
 /* code relocation consists of a table of entries for each fixup */
 typedef struct {
-	CELL type;
-	CELL offset;
+	unsigned int type;
+	unsigned int offset;
 } F_REL;
 
 void relocate_code_block(F_COMPILED *relocating, CELL code_start,
