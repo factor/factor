@@ -322,6 +322,6 @@ M: invaders-gadget graft* ( gadget -- )
 M: invaders-gadget ungraft* ( gadget -- )
  t swap set-invaders-gadget-quit? ;
 
-: run ( -- gadget )  
+: run ( -- )  
   <space-invaders> "invaders.rom" over load-rom <invaders-gadget> 
-  [ "Space Invaders" open-titled-window ] keep ;
+  "Space Invaders" open-titled-window ;
