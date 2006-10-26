@@ -63,7 +63,7 @@ USING: gadgets kernel models namespaces sequences arrays ;
 
 : selected-word ( editor -- string )
     dup gadget-selection?
-    [ dup T{ word-elt } select-elt ] unless
+    [ dup T{ one-word-elt } select-elt ] unless
     gadget-selection ;
 
 : position-caret ( editor -- )
@@ -74,7 +74,7 @@ USING: gadgets kernel models namespaces sequences arrays ;
     hand-click# get {
         [ ]
         [ dup position-caret ]
-        [ dup T{ word-elt } select-elt ]
+        [ dup T{ one-word-elt } select-elt ]
         [ dup T{ one-line-elt } select-elt ]
     } ?nth call drop ;
 
@@ -122,7 +122,7 @@ editor "selection" {
     { "Clear" T{ delete-action } [ remove-editor-selection ] }
     { "Select all" T{ select-all-action } [ T{ doc-elt } select-elt ] }
     { "Select line" T{ key-down f { C+ } "l" } [ T{ one-line-elt } select-elt ] }
-    { "Select word" T{ key-down f { C+ } "w" } [ T{ word-elt } select-elt ] }
+    { "Select word" T{ key-down f { C+ } "w" } [ T{ one-word-elt } select-elt ] }
     { "Select previous character" T{ key-down f { S+ } "LEFT" } [ T{ char-elt } editor-select-prev ] }
     { "Select next character" T{ key-down f { S+ } "RIGHT" } [ T{ char-elt } editor-select-next ] }
     { "Select previous line" T{ key-down f { S+ } "UP" } [ T{ line-elt } editor-select-prev ] }

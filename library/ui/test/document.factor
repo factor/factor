@@ -58,3 +58,11 @@ USING: gadgets-text namespaces test ;
     "" { 1 3 } { 2 4 } "doc" get set-doc-range
     "doc" get doc-text
 ] unit-test
+
+<document> "doc" set
+"Hello world" "doc" get set-doc-text
+[ { 0 0 } ] [ { 0 0 } "doc" get T{ one-word-elt } prev-elt ] unit-test
+[ { 0 0 } ] [ { 0 2 } "doc" get T{ one-word-elt } prev-elt ] unit-test
+[ { 0 0 } ] [ { 0 5 } "doc" get T{ one-word-elt } prev-elt ] unit-test
+[ { 0 5 } ] [ { 0 2 } "doc" get T{ one-word-elt } next-elt ] unit-test
+[ { 0 5 } ] [ { 0 5 } "doc" get T{ one-word-elt } next-elt ] unit-test

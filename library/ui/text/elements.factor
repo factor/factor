@@ -26,8 +26,6 @@ M: char-elt prev-elt
 M: char-elt next-elt
     drop [ drop 1 +col ] (next-char) ;
 
-TUPLE: word-elt ;
-
 : (word-elt) ( loc document quot -- loc )
     pick >r
     >r >r first2 swap r> doc-line r> call
@@ -35,34 +33,51 @@ TUPLE: word-elt ;
 
 : ((word-elt)) [ ?nth blank? ] 2keep ;
 
-: (prev-word) ( col str -- col )
-    >r 1- r> ((word-elt))
+: (prev-word) ( ? col str -- col )
     [ blank? xor ] find-last-with* drop 1+ ;
 
-M: word-elt prev-elt
-    drop [ [ (prev-word) ] (word-elt) ] (prev-char) ;
-
-: (next-word) ( col str -- col )
-    ((word-elt))
+: (next-word) ( ? col str -- col )
     [ [ blank? xor ] find-with* drop ] keep
     over -1 = [ nip length ] [ drop ] if ;
 
+TUPLE: one-word-elt ;
+
+M: one-word-elt prev-elt
+    drop
+    [ [ f -rot >r 1- r> (prev-word) ] (word-elt) ] (prev-char) ;
+
+M: one-word-elt next-elt
+    drop
+    [ [ f -rot (next-word) ] (word-elt) ] (next-char) ;
+
+TUPLE: word-elt ;
+
+M: word-elt prev-elt
+    drop
+    [ [ >r 1- r> ((word-elt)) (prev-word) ] (word-elt) ]
+    (prev-char) ;
+
 M: word-elt next-elt
-    drop [ [ (next-word) ] (word-elt) ] (next-char) ;
+    drop
+    [ [ ((word-elt)) (next-word) ] (word-elt) ]
+    (next-char) ;
 
 TUPLE: one-line-elt ;
 
 M: one-line-elt prev-elt
     2drop first 0 2array ;
+
 M: one-line-elt next-elt
     drop >r first dup r> doc-line length 2array ;
 
 TUPLE: line-elt ;
 
 M: line-elt prev-elt 2drop -1 +line ;
+
 M: line-elt next-elt 2drop 1 +line ;
 
 TUPLE: doc-elt ;
 
 M: doc-elt prev-elt 3drop { 0 0 } ;
+
 M: doc-elt next-elt drop nip doc-end ;

@@ -12,8 +12,6 @@
   - float boxing and overflow checks need a gc check too
 - [ [ dup call ] dup call ] infer hangs
 - growable data heap
-- documentation:
-  - update module system docs
 
 + ui:
 
@@ -34,8 +32,6 @@
   - autoscroll
   - transpose char/word/line
   - more efficient multi-line inserts
-  - write "foo| " and put caret at | then select word element: selects
-    space
 - see if its possible to only repaint dirty regions
 - structure editor
 
