@@ -9,7 +9,7 @@ TUPLE: help-gadget pane history search ;
 
 : show-help ( link help -- )
     dup help-gadget-history add-history
-    help-gadget-history set-model ;
+    >r >link r> help-gadget-history set-model ;
 
 : go-home ( help -- ) "handbook" swap show-help ;
 
@@ -17,7 +17,7 @@ TUPLE: help-gadget pane history search ;
     gadget get help-gadget-history [ help ] <pane-control> ;
 
 : init-history ( help-gadget -- )
-    T{ link f "handbook" } <history>
+    "handbook" <history>
     swap set-help-gadget-history ;
 
 C: help-gadget ( -- gadget )

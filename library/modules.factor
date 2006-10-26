@@ -61,13 +61,13 @@ C: module ( name files tests help -- module )
 
 : all-modules ( -- seq ) modules get 1 <column> ;
 
-: all-module-names ( -- seq ) modules get 0 <column> ;
-
 : test-modules ( -- )
     all-modules [ module-tests ] map concat run-tests ;
 
 : modules. ( -- )
-    all-module-names natural-sort [ print ] each ;
+    all-modules
+    [ [ module-name ] 2apply <=> ] sort
+    [ [ module-name ] keep write-object terpri ] each ;
 
 : reload-module ( module -- )
     dup module-name module-def source-modified? [
@@ -82,7 +82,7 @@ C: module ( name files tests help -- module )
 : run-module ( name -- )
     dup require
     dup module module-main [
-        call
+        assert-depth
     ] [
         "The module " write write
         " does not define an entry point." print

@@ -5,7 +5,7 @@ USING: definitions gadgets gadgets-browser gadgets-dataflow
 gadgets-help gadgets-listener gadgets-text gadgets-workspace
 hashtables help inference kernel namespaces parser prettyprint
 scratchpad sequences strings styles syntax test tools words
-generic models io ;
+generic models io modules ;
 
 V{ } clone operations set-global
 
@@ -97,6 +97,13 @@ M: operation invoke-command ( target operation -- )
 } define-operation
 
 [ word? ] H{
+    { +default+ t }
+    { +name+ "Forget" }
+    { +keyboard+ T{ key-down f { A+ } "b" } }
+    { +quot+ [ forget ] }
+} define-operation
+
+[ word? ] H{
     { +name+ "Word dataflow" }
     { +keyboard+ T{ key-down f { A+ } "d" } }
     { +quot+ [ word-def show-dataflow ] }
@@ -117,6 +124,29 @@ M: operation invoke-command ( target operation -- )
 [ vocab-link? ] H{
     { +name+ "Use" }
     { +quot+ [ vocab-link-name [ use+ ] curry call-listener ] }
+} define-operation
+
+[ vocab-link? ] H{
+    { +name+ "Forget" }
+    { +quot+ [ vocab-link-name forget-vocab ] }
+} define-operation
+
+! Module
+[ module? ] H{
+    { +name+ "Run" }
+    { +quot+ [ module-name run-module ] }
+    { +listener+ t }
+} define-operation
+
+[ module? ] H{
+    { +name+ "Documentation" }
+    { +quot+ [ module-help [ help-gadget call-tool ] when* ] }
+} define-operation
+
+[ module? ] H{
+    { +name+ "Reload" }
+    { +quot+ [ reload-module ] }
+    { +listener+ t }
 } define-operation
 
 ! Link

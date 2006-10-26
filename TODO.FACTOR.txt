@@ -1,5 +1,4 @@
 - live search: timer delay would be nice
-- hashed generic method dispatch
 - fix this:
   [ 1 2 3 4 5 6 7 8 9 10 10 10 10 10 10 10 10 10 10 11 11 11 113 ] .
 [ 1 2 3 4 5 6 7 8 9 10 10 10 10 10 10 10 10 10 10 11 11 11 113 
@@ -71,6 +70,7 @@
 - incremental GC
 - UDP
 - slice: if sequence or seq start is changed, abstraction violation
+- hashed generic method dispatch
 
 + httpd:
 
