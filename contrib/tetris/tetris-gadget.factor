@@ -46,5 +46,5 @@ M: tetris-gadget graft* ( gadget -- )
 M: tetris-gadget ungraft* ( gadget -- )
     t swap set-tetris-gadget-quit? ;
 
-: tetris-window ( -- ) <default-tetris> <tetris-gadget> dup "Tetris" open-titled-window ;
+: tetris-window ( -- ) <default-tetris> <tetris-gadget> "Tetris" open-titled-window ;
 
