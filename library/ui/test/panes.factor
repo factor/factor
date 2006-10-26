@@ -1,9 +1,9 @@
 IN: temporary
-USING: gadgets-panes gadgets freetype namespaces kernel
+USING: alien gadgets-panes gadgets freetype namespaces kernel
 sequences io test prettyprint ;
 
 : maybe-with-freetype
-    freetype get [ call ] [ with-freetype ] if ; inline
+    freetype get expired? [ with-freetype ] [ call ] if ; inline
 
 : #children "pane" get gadget-children length ;
 

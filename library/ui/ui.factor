@@ -57,15 +57,15 @@ SYMBOL: windows
         10 sleep
     ] assert-depth ;
 
-TUPLE: titled-gadget title ;
+TUPLE: titled-gadget title child ;
 
 M: titled-gadget gadget-title titled-gadget-title ;
 
-M: titled-gadget focusable-child* gadget-child ;
+M: titled-gadget focusable-child* titled-gadget-child ;
 
 C: titled-gadget ( gadget title -- )
     [ set-titled-gadget-title ] keep
-    { { f f f @center } } make-frame* ;
+    { { f set-titled-gadget-child f @center } } make-frame* ;
 
 : open-window ( world -- )
     dup pref-dim over set-gadget-dim
