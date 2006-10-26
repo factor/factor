@@ -10,7 +10,7 @@ HELP: HELP:
         "HELP: foo"
         "{ $values { \"m\" \"an integer\" } { \"n\" \"an integer\" } }"
         "{ $description \"Increments a value by 2.\" } ;"
-        "\ foo help"
+        "\\ foo help"
     }
 } ;
 

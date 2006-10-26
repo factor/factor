@@ -39,3 +39,24 @@ HELP: <slice>
 HELP: slice@
 { $values { "m" "a non-negative integer" } { "slice" "an instance of " { $link slice } } { "n" "a non-negative integer" } { "seq" "a sequence" } }
 { $description "Indexes into a slice. Helper word used to implement " { $link "sequence-protocol" } " methods for the " { $link reversed } " class." } ;
+
+HELP: column
+{ $class-description "A virtual sequence which presents a fixed column of a matrix represented as a sequence of rows." }
+{ $see-also <column> } ;
+
+HELP: <column>
+{ $values { "seq" "a sequence" } { "n" "a non-negative integer" } }
+{ $description "Outputs a new virtual sequence which presents a fixed column of a matrix represented as a sequence of rows." "The " { $snippet "i" } "th element of a column is the " { $snippet "n" } "th element of the " { $snippet "i" } "th element of" { $snippet "seq" } ". Every element of " { $snippet "seq" } " must be a sequence, and all sequences must have equal length." }
+{ $examples
+    { $example
+        "{ { 1 2 3 } { 4 5 6 } { 7 8 9 } } 0 <column> >array ."
+        "{ 1 4 7 }"
+    }
+}
+{ $notes
+    "In the same sense that " { $link <reversed> } " is a virtual variant of " { $link reverse } ", " { $link <column> } " is a virtual variant of " { $snippet "[ swap nth ] map-with" } "."
+} ;
+
+HELP: column@
+{ $values { "m" "a non-negative integer" } { "column" "an instance of " { $link column } } { "n" "a non-negative integer" } { "seq" "a sequence" } }
+{ $description "Indexes into a column view of a matrix. Helper word used to implement " { $link "sequence-protocol" } " methods for the " { $link column } " class." } ;

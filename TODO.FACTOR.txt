@@ -12,10 +12,7 @@
   - float boxing and overflow checks need a gc check too
 - [ [ dup call ] dup call ] infer hangs
 - growable data heap
-- more compact relocation info
-- flip may fail with >64kb string
 - documentation:
-  - document columns
   - update module system docs
 
 + ui:

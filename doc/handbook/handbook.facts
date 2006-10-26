@@ -44,13 +44,13 @@ ARTICLE: "handbook" "Factor documentation"
 { $heading "Environment reference" }
 { $subsection "cli" }
 { $subsection "tools" }
+{ $subsection "modules" }
 { $subsection "help" }
 { $subsection "inference" }
 { $subsection "compiler" }
 { $heading "Graphical user interface" }
 { $subsection "ui-tools" }
 { $heading "Currently-loaded contributed modules" }
-"See " { $link "modules" } " for details."
 { $outliner [ modules-help ] }
 { $heading "Index" }
 { $subsection "article-index" }

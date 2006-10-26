@@ -173,7 +173,7 @@ ARTICLE: "cookbook-sources" "Source file cookbook"
 "By convention, code  is stored in files with the " { $snippet ".factor" } " filename extension. You can load source files using " { $link run-file } ":"
 { $code "\"hello.factor\" run-file" }
 { $references
-    { }
+    "Programs larger than one source file or programs which depend on other libraries should be loaded via the module system instead. Even more advanced functionality can be implemented by calling the parser and source reader at runtime."
     "sources"
     "modules"
     "parser"

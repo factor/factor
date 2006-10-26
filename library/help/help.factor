@@ -64,4 +64,5 @@ M: word article-content
     ] with-style ;
 
 : $outliner ( element -- )
-    [ first call help-outliner ] ($block) ;
+    first call dup empty?
+    [ drop ] [ [ help-outliner ] ($block) ] if ;

@@ -275,9 +275,30 @@ HELP: REQUIRES:
 { $description "Loads a list of modules by calling " { $link require } " on each one." } ;
 
 HELP: PROVIDE:
-{ $syntax "PROVIDE: name files tests ;" }
-{ $values { "name" "a string" } { "files" "a sequence of strings" } { "tests" "a sequence of strings" } }
-{ $description "Registers a module definition and loads its source files by calling " { $link provide } "." } ;
+{ $syntax "PROVIDE: name pairs... ;" }
+{ $values { "name" "a string" } { "pairs" "a sequence of pairs, with keys described below" } }
+{ $description "Registers a module definition and loads its source files by calling " { $link provide } "."
+$terpri
+"The module name is followed by key/value pairs, where the keys are drawn from the following set:"
+{ $list
+    { { $link +files+ } " - the value is a sequence of source file names" }
+    { { $link +tests+ } " - the value is a sequence of unit test file names" }
+    { { $link +help+ } " - the value is a help topic" }
+}
+"All keys are optional, and path names are relative to the main module directory."
+$terpri
+"Elements of path name lists can optionally be pairs, where the first element is a source file which is conditionally loaded if the quotation in the second element yields a true value." }
+{ $examples
+"An example where the conditional load feature is used to load platform-specific code:"
+{ $code
+"PROVIDE: contrib/calendar"
+"{ +files+ {"
+"    { \"os-unix.factor\" [ unix? ] }"
+"    { \"os-win32.factor\" [ windows? ] }"
+"    \"calendar.factor\""
+"} }"
+"{ +tests+ { \"test/calendar.factor\" } } ;"
+} } ;
 
 HELP: MAIN:
 { $syntax "MAIN: name definition... ;" }

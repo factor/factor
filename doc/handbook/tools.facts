@@ -6,20 +6,14 @@ ARTICLE: "tools" "Development tools"
 "This section covers words which are used during development, and not usually invoked directly by user code."
 $terpri
 "There are two useful development tools which are complex enough that separate sections are devoted to them; see " { $link "inference" } " and " { $link "compiler" } "."
-$terpri
-"Interactive development:"
 { $subsection "listener" }
 { $subsection "debugger" }
 { $subsection "definitions" }
 { $subsection "word-introspection" }
 { $subsection "inspector" }
 { $subsection "annotations" }
-"Working on a project:"
 { $subsection "sources" }
-{ $subsection "modules" }
 { $subsection "images" }
-{ $subsection "unit-test" }
-"Advanced features:"
 { $subsection "memory" }
 { $subsection "timing" } ;
 
@@ -52,50 +46,6 @@ $terpri
 "Details on the Factor source parser itself can be found in " { $link "parser" } "."
 $terpri
 "User-contributed libraries in the " { $snippet "contrib/" } " directory of the Factor distribution should be loaded via the high-level module system instead of the above words (" { $link "modules" } ")." ;
-
-ARTICLE: "modules" "Modules and contributed libraries"
-"The Factor distribution includes a selection of contributed libraries in the " { $snippet "contrib/" } " directory, which are managed by a simple module system."
-$terpri
-"To load " { $snippet "contrib/concurrency" } " for instance, you simply issue the following command in the listener:"
-{ $code "\"contrib/concurrency\" require" }
-"The " { $link require } " word will load all dependencies and source files of the " { $snippet "contrib/concurrency" } " module."
-{ $subsection require }
-"Some modules are simply reusable libraries of code. Other modules are more like applications, and have a main entry point:"
-{ $subsection run-module }
-"To define a new module named " { $snippet "contrib/frob" } ", create one of the following two files:"
-{ $code "contrib/frob.factor" "contrib/frob/load.factor" }
-"The module definition file should first list all required modules:"
-{ $subsection POSTPONE: REQUIRES: }
-"Required modules will be loaded first. Next, the source files and unit tests, if any, have to be registered:"
-{ $subsection POSTPONE: PROVIDE: }
-"It is important that the module path name matches the module name passed to " { $link POSTPONE: PROVIDE: } ", which should be " { $snippet "frob" } " in the above example."
-$terpri
-"Finally, if your module is an application, you can define a main entry point for " { $link run-module } ":"
-{ $subsection POSTPONE: MAIN: }
-"Here is a simple module definition taken from " { $snippet "contrib/tetris/load.factor" } ":"
-{ $code "REQUIRES: contrib/lazy-lists ;"
-""
-"PROVIDE: contrib/tetris {"
-"    \"tetris-colours.factor\""
-"    \"tetromino.factor\""
-"    \"tetris-piece.factor\""
-"    \"tetris-board.factor\""
-"    \"tetris.factor\""
-"    \"tetris-gl.factor\""
-"    \"tetris-gadget.factor\""
-"} {"
-"    \"test/tetris-piece.factor\""
-"    \"test/tetris-board.factor\""
-"    \"test/tetris.factor\""
-"} ;"
-""
-"USE: tetris-gadget"
-""
-"MAIN: contrib/tetris tetris-window ;" }
-"The following words are useful during development of modules:"
-{ $subsection reload-modules }
-{ $subsection load-module }
-{ $subsection test-module } ;
 
 ARTICLE: "debugger" "The debugger"
 "If an expression entered in the listener throws an error, the error is printed to the output stream. A number of words facilitate interactive debugging of the error:"
@@ -154,18 +104,6 @@ $terpri
 { $subsection reload }
 "Removing definitions:"
 { $subsection forget } ;
-
-ARTICLE: "unit-test" "Unit testing code"
-"A unit test is a piece of code which starts with known input values, then compares the output of a word with an expected output, where the expected output is defined by the word's contract."
-$terpri
-"For example, if you were developing a word for computing symbolic derivatives, your unit tests would apply the word to certain input functions, comparing the results against the correct values."
-$terpri
-"If you maintain a complete collection of unit tests and run them frequently, then a failing unit test can allow you to accurately pinpoint a fault in your program. However, just because unit tests pass is not an indication the code is correct. Writing good unit tests is an art form, and encourages a certain approach to programming which results in simpler, more reusable code."
-$terpri
-"The following two words perform unit testing; they are usually placed inside test harness files which you run using " { $link run-file } ":"
-{ $subsection unit-test }
-{ $subsection unit-test-fails }
-{ $subsection assert-depth } ;
 
 ARTICLE: "timing" "Timing code"
 "You can time the execution of a quotation in the listener:"

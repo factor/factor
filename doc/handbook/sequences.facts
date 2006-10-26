@@ -13,6 +13,10 @@ ARTICLE: "sequence-implementations" "Sequence implementations"
 { $subsection "quotations" }
 "Integers support the sequence protocol:"
 { $subsection "sequences-integers" }
+"Virtual sequences wrap an underlying sequence, and changes to the underlying sequence are reflected in the virtual sequence:"
+{ $subsection <reversed> }
+{ $subsection <slice> }
+{ $subsection <column> }
 "The " { $link f } " object also supports the sequence protocol. It responds with a length of zero, and instead of throwing an out of bounds error, outputs " { $link f } " when an element is accessed. This can simplify code that would like a dummy sequence behaving as if it has arbitrary length." ;
 
 ARTICLE: "sequences-integers" "Integer sequences and counted loops"
@@ -141,6 +145,7 @@ ARTICLE: "sequences-reshape" "Reshaping sequences"
 { $subsection group }
 { $subsection flatten }
 { $subsection flip }
+{ $subsection <column> }
 { $subsection subst } ;
 
 ARTICLE: "sequences-destructive" "Destructive operations"
