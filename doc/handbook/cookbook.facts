@@ -220,6 +220,6 @@ $terpri
 $terpri
 "Every time you define a word which simply manipulates sequences, hashtables or objects in an abstract way which is not related to your program domain, check the library to see if you can reuse an existing definition and save yourself some debugging time."
 $terpri
-"In addition to writing short definitions and testing them interactively, a great habit to get into is writing unit tests. Factor provides good support for unit testing; see " { $link "unit-test" } "."
+"In addition to writing short definitions and testing them interactively, a great habit to get into is writing unit tests. Factor provides good support for unit testing; see " { $link "testing-modules" } "."
 $terpri
 "The Factor core consists of the development environment together with a minimal library to host it. Additional functionality which other languages integrate is often a separate module in Factor; see " { $link "modules" } "." ;
