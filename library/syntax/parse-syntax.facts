@@ -303,4 +303,4 @@ $terpri
 HELP: MAIN:
 { $syntax "MAIN: name definition... ;" }
 { $values { "name" "a module name string" } { "definition" "an entry point definition" } }
-{ $description "Registers a module entry point which can be run by passing the module name to " { $link run-module } "." } ;
+{ $description "Registers a module entry point which can be run by passing the module name to " { $link run-module } ". The entry point quotation must not take any inputs from the stack, or leave any values on the stack when returning." } ;
