@@ -212,7 +212,6 @@ PROVIDE: library
     "test/help/porter-stemmer.factor"
     "test/help/topics.factor"
     "test/help/search.factor"
-    "test/inference.factor"
     "test/init.factor"
     "test/inspector.factor"
     "test/interpreter.factor"

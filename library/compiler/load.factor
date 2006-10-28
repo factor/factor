@@ -49,6 +49,7 @@ PROVIDE: library/compiler
     "compiler.facts"
 } }
 { +tests+ {
+    "test/inference.factor"
     "test/alien-objects.factor"
     "test/simple.factor"
     "test/templates.factor"
