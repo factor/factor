@@ -259,8 +259,6 @@ t over set-effect-terminated?
 \ cwd { } { string } <effect> "infer-effect" set-word-prop
 \ cd { string } { } <effect> "infer-effect" set-word-prop
 
-\ add-compiled-block { vector vector vector vector integer } { integer } <effect> "infer-effect" set-word-prop
-
 \ dlopen { string } { dll } <effect> "infer-effect" set-word-prop
 \ dlsym { string object } { integer } <effect> "infer-effect" set-word-prop
 \ dlclose { dll } { } <effect> "infer-effect" set-word-prop
