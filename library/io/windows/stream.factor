@@ -111,7 +111,7 @@ M: win32-stream-reader stream-read1 ( stream -- ch/f )
     >r 1 r> consume-input >string-or-f first ;
 
 M: win32-stream-reader stream-read ( n stream -- str/f )
-    swap >r win32-buffer-size <sbuf> r> do-read-count ;
+    swap >fixnum >r win32-buffer-size <sbuf> r> do-read-count ;
 
 M: win32-stream-writer stream-close ( stream -- )
     dup maybe-flush-output
