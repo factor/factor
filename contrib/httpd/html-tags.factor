@@ -56,53 +56,52 @@ SYMBOL: html
 : write-html ( str -- )
     H{ { html t } } format ;
 
-: html-word ( name def -- word )
+: html-word ( name def -- )
     #! Define 'word creating' word to allow
     #! dynamically creating words.
-    >r "html" create dup r> define-compound ;
+    >r "html" create r> define-compound ;
  
 : <foo> "<" swap ">" append3 ;
 
 : def-for-html-word-<foo> ( name -- )
     #! Return the name and code for the <foo> patterned
     #! word.
-    dup <foo> swap [ <foo> write-html ] curry html-word
-    define-open ;
+    dup <foo> swap [ <foo> write-html ] curry html-word ;
 
 : <foo "<" swap append ;
 
 : def-for-html-word-<foo ( name -- )
     #! Return the name and code for the <foo patterned
     #! word.
-    <foo dup [ write-html ] curry html-word drop ;
+    <foo dup [ write-html ] curry html-word ;
 
 : foo> ">" append ;
 
 : def-for-html-word-foo> ( name -- )
     #! Return the name and code for the foo> patterned
     #! word.
-    foo> [ ">" write-html ] html-word define-open ;
+    foo> [ ">" write-html ] html-word ;
 
 : </foo> [ "</" % % ">" % ] "" make ;
 
 : def-for-html-word-</foo> ( name -- )
     #! Return the name and code for the </foo> patterned
     #! word.    
-    </foo> dup [ write-html ] curry html-word define-close ;
+    </foo> dup [ write-html ] curry html-word ;
 
 : <foo/> [ "<" % % "/>" % ] "" make ;
 
 : def-for-html-word-<foo/> ( name -- )
     #! Return the name and code for the <foo/> patterned
     #! word.
-    dup <foo/> swap [ <foo/> write-html ] curry html-word drop ;
+    dup <foo/> swap [ <foo/> write-html ] curry html-word ;
 
 : foo/> "/>" append ;
 
 : def-for-html-word-foo/> ( name -- )
     #! Return the name and code for the foo/> patterned
     #! word.    
-    foo/> [ "/>" write-html ] html-word define-close ;
+    foo/> [ "/>" write-html ] html-word ;
 
 : define-closed-html-word ( name -- ) 
     #! Given an HTML tag name, define the words for
