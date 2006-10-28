@@ -120,17 +120,15 @@ M: inset section-fits? ( section -- ? )
         section-start last-newline get = [ bl ] unless
     ] if ;
 
-: pprint-block ( block -- )
+M: block short-section ( block -- )
     dup <style
     block-sections unclip pprint-section
     [ dup advance pprint-section ] each
     style> ;
 
-M: inset short-section pprint-block ;
-
 M: inset long-section
     <indent
-    dup section-start fresh-line dup pprint-block
+    dup section-start fresh-line dup short-section
     indent>
     section-end fresh-line ;
 
@@ -149,9 +147,8 @@ M: flow section-fits? ( section -- ? )
         dup section-end swap section-start - text-fits? not
     ] if ;
 
-M: flow short-section pprint-block ;
-
-M: flow long-section dup section-start fresh-line pprint-block ;
+M: flow long-section
+    dup section-start fresh-line short-section ;
 
 : <flow ( style -- ) <flow> (<block) ;
 
@@ -167,8 +164,6 @@ M: narrow section-fits? ( section -- ? )
     ] [
         section-end last-newline get - 2 + text-fits?
     ] if ;
-
-M: narrow short-section pprint-block ;
 
 : narrow-block ( block -- )
     dup <style
@@ -190,11 +185,9 @@ TUPLE: defblock ;
 C: defblock ( style -- block )
     swap <block> over set-delegate ;
 
-M: defblock short-section pprint-block ;
-
 M: defblock long-section
     <indent
-    dup section-start fresh-line pprint-block
+    dup section-start fresh-line short-section
     indent> ;
 
 : <defblock ( style -- ) <defblock> (<block) ;
