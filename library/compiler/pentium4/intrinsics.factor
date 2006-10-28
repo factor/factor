@@ -44,8 +44,8 @@ M: float-regs (%replace)
 ! Floats
 : define-float-op ( word op -- )
     [ [ "x" operand "y" operand ] % , ] [ ] make H{
-        { +input { { float "x" } { float "y" } } }
-        { +output { "x" } }
+        { +input+ { { float "x" } { float "y" } } }
+        { +output+ { "x" } }
     } define-intrinsic ;
 
 {
@@ -61,7 +61,7 @@ M: float-regs (%replace)
     [
         [ end-basic-block "x" operand "y" operand UCOMISD ] % ,
     ] [ ] make H{
-        { +input { { float "x" } { float "y" } } }
+        { +input+ { { float "x" } { float "y" } } }
     } define-if-intrinsic ;
 
 {

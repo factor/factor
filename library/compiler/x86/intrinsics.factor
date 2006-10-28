@@ -9,8 +9,8 @@ IN: compiler
     "in" operand tag-mask AND
     "in" operand tag-bits SHL
 ] H{
-    { +input { { f "in" } } }
-    { +output { "in" } }
+    { +input+ { { f "in" } } }
+    { +output+ { "in" } }
 } define-intrinsic
 
 \ type [
@@ -44,9 +44,9 @@ IN: compiler
     "obj" operand f type tag-bits shift MOV
     "end" get resolve-label
 ] H{
-    { +input { { f "obj" } } }
-    { +scratch { { f "x" } { f "y" } } }
-    { +output { "obj" } }
+    { +input+ { { f "obj" } } }
+    { +scratch+ { { f "x" } { f "y" } } }
+    { +output+ { "obj" } }
 } define-intrinsic
 
 ! Slots
@@ -61,9 +61,9 @@ IN: compiler
     ! load slot value
     "obj" operand dup [] MOV
 ] H{
-    { +input { { f "obj" } { f "n" } } }
-    { +output { "obj" } }
-    { +clobber { "n" } }
+    { +input+ { { f "obj" } { f "n" } } }
+    { +output+ { "obj" } }
+    { +clobber+ { "n" } }
 } define-intrinsic
 
 : card-offset 1 getenv ; inline
@@ -84,8 +84,8 @@ IN: compiler
     "slot" operand [] "val" operand MOV
     generate-write-barrier
 ] H{
-    { +input { { f "val" } { f "obj" } { f "slot" } } }
-    { +clobber { "obj" "slot" } }
+    { +input+ { { f "val" } { f "obj" } { f "slot" } } }
+    { +clobber+ { "obj" "slot" } }
 } define-intrinsic
 
 : char-reg cell 8 = RBX EBX ? ; inline
@@ -101,9 +101,9 @@ IN: compiler
     "obj" operand char-reg MOV
     char-reg POP
 ] H{
-    { +input { { f "n" } { f "obj" } } }
-    { +output { "obj" } }
-    { +clobber { "n" } }
+    { +input+ { { f "n" } { f "obj" } } }
+    { +output+ { "obj" } }
+    { +clobber+ { "n" } }
 } define-intrinsic
 
 \ set-char-slot [
@@ -115,15 +115,15 @@ IN: compiler
     "obj" operand string-offset [+] char-reg-16 MOV
     char-reg POP
 ] H{
-    { +input { { f "val" } { f "slot" } { f "obj" } } }
-    { +clobber { "val" "slot" "obj" } }
+    { +input+ { { f "val" } { f "slot" } { f "obj" } } }
+    { +clobber+ { "val" "slot" "obj" } }
 } define-intrinsic
 
 ! Fixnums
 : define-fixnum-op ( word op -- )
     [ [ "x" operand "y" operand ] % , ] [ ] make H{
-        { +input { { f "x" } { f "y" } } }
-        { +output { "x" } }
+        { +input+ { { f "x" } { f "y" } } }
+        { +output+ { "x" } }
     } define-intrinsic ;
 
 {
@@ -140,8 +140,8 @@ IN: compiler
     "x" operand NOT
     "x" operand tag-mask XOR
 ] H{
-    { +input { { f "x" } } }
-    { +output { "x" } }
+    { +input+ { { f "x" } } }
+    { +output+ { "x" } }
 } define-intrinsic
 
 ! This has specific register requirements. Inputs are in
@@ -150,9 +150,9 @@ IN: compiler
     prepare-division
     "y" operand IDIV
 ] H{
-    { +input { { 0 "x" } { 1 "y" } } }
-    { +scratch { { 2 "out" } } }
-    { +output { "out" } }
+    { +input+ { { 0 "x" } { 1 "y" } } }
+    { +scratch+ { { 2 "out" } } }
+    { +output+ { "out" } }
 } define-intrinsic
 
 : ?MOV ( dst src -- ) 2dup = [ 2drop ] [ MOV ] if ;
@@ -179,10 +179,10 @@ IN: compiler
 
 : simple-overflow-template ( word insn -- )
     [ simple-overflow ] curry H{
-        { +input { { f "x" } { f "y" } } }
-        { +scratch { { f "z" } } }
-        { +output { "z" } }
-        { +clobber { "x" "y" } }
+        { +input+ { { f "x" } { f "y" } } }
+        { +scratch+ { { f "z" } } }
+        { +output+ { "z" } }
+        { +clobber+ { "x" "y" } }
     } define-intrinsic ;
 
 \ fixnum+ \ ADD simple-overflow-template
@@ -204,8 +204,8 @@ IN: compiler
     T{ int-regs } return-reg bignum-tag OR
     "end" get resolve-label
 ] H{
-    { +input { { 0 "x" } { 1 "y" } } }
-    { +output { "x" } }
+    { +input+ { { 0 "x" } { 1 "y" } } }
+    { +output+ { "x" } }
 } define-intrinsic
 
 : generate-fixnum/mod
@@ -238,22 +238,22 @@ IN: compiler
     "end" get resolve-label ;
 
 \ fixnum/i [ generate-fixnum/mod ] H{
-    { +input { { 0 "x" } { 1 "y" } } }
-    { +scratch { { 2 "out" } } }
-    { +output { "x" } }
-    { +clobber { "x" "y" } }
+    { +input+ { { 0 "x" } { 1 "y" } } }
+    { +scratch+ { { 2 "out" } } }
+    { +output+ { "x" } }
+    { +clobber+ { "x" "y" } }
 } define-intrinsic
 
 \ fixnum/mod [ generate-fixnum/mod ] H{
-    { +input { { 0 "x" } { 1 "y" } } }
-    { +scratch { { 2 "out" } } }
-    { +output { "x" "out" } }
-    { +clobber { "x" "y" } }
+    { +input+ { { 0 "x" } { 1 "y" } } }
+    { +scratch+ { { 2 "out" } } }
+    { +output+ { "x" "out" } }
+    { +clobber+ { "x" "y" } }
 } define-intrinsic
 
 : define-fixnum-jump ( word op -- )
     [ end-basic-block "x" operand "y" operand CMP ] swap add
-    H{ { +input { { f "x" } { f "y" } } } } define-if-intrinsic ;
+    H{ { +input+ { { f "x" } { f "y" } } } } define-if-intrinsic ;
 
 {
     { fixnum< JL }
@@ -275,15 +275,15 @@ IN: compiler
 \ getenv [
     %userenv  "n" operand dup [] MOV
 ] H{
-    { +input { { f "n" } } }
-    { +scratch { { f "x" } } }
-    { +output { "n" } }
+    { +input+ { { f "n" } } }
+    { +scratch+ { { f "x" } } }
+    { +output+ { "n" } }
 } define-intrinsic
 
 \ setenv [
     %userenv  "n" operand [] "val" operand MOV
 ] H{
-    { +input { { f "val" } { f "n" } } }
-    { +scratch { { f "x" } } }
-    { +clobber { "n" } }
+    { +input+ { { f "val" } { f "n" } } }
+    { +scratch+ { { f "x" } } }
+    { +clobber+ { "n" } }
 } define-intrinsic

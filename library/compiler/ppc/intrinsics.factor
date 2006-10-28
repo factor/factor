@@ -23,16 +23,16 @@ math-internals namespaces sequences words ;
     "obj" operand dup untag
     cell log2 [ 0 LWZ ] generate-slot
 ] H{
-    { +input { { f "obj" } { f "n" } } }
-    { +output { "obj" } }
+    { +input+ { { f "obj" } { f "n" } } }
+    { +output+ { "obj" } }
 } define-intrinsic
 
 \ char-slot [
     1 [ string-offset LHZ ] generate-slot
     "obj" operand dup tag-fixnum
 ] H{
-    { +input { { f "n" } { f "obj" } } }
-    { +output { "obj" } }
+    { +input+ { { f "n" } { f "obj" } } }
+    { +output+ { "obj" } }
 } define-intrinsic
 
 : generate-set-slot ( size quot -- )
@@ -56,9 +56,9 @@ math-internals namespaces sequences words ;
     "obj" operand dup untag
     cell log2 [ 0 STW ] generate-set-slot generate-write-barrier
 ] H{
-    { +input { { f "val" } { f "obj" } { f "slot" } } }
-    { +scratch { { f "x" } } }
-    { +clobber { "obj" "slot" } }
+    { +input+ { { f "val" } { f "obj" } { f "slot" } } }
+    { +scratch+ { { f "x" } } }
+    { +clobber+ { "obj" "slot" } }
 } define-intrinsic
 
 \ set-char-slot [
@@ -66,15 +66,15 @@ math-internals namespaces sequences words ;
     "val" operand dup untag-fixnum
     1 [ string-offset STH ] generate-set-slot
 ] H{
-    { +input { { f "val" } { f "slot" } { f "obj" } } }
-    { +scratch { { f "x" } } }
-    { +clobber { "val" "slot" "obj" } }
+    { +input+ { { f "val" } { f "slot" } { f "obj" } } }
+    { +scratch+ { { f "x" } } }
+    { +clobber+ { "val" "slot" "obj" } }
 } define-intrinsic
 
 : define-fixnum-op ( word op -- )
     [ [ "x" operand "y" operand "x" operand ] % , ] [ ] make H{
-        { +input { { f "x" } { f "y" } } }
-        { +output { "x" } }
+        { +input+ { { f "x" } { f "y" } } }
+        { +output+ { "x" } }
     } define-intrinsic ;
 
 {
@@ -98,23 +98,23 @@ math-internals namespaces sequences words ;
     "r" operand "x" operand "y" operand DIVW
     generate-fixnum-mod
 ] H{
-    { +input { { f "x" } { f "y" } } }
-    { +scratch { { f "r" } { f "s" } } }
-    { +output { "s" } }
+    { +input+ { { f "x" } { f "y" } } }
+    { +scratch+ { { f "r" } { f "s" } } }
+    { +output+ { "s" } }
 } define-intrinsic
 
 \ fixnum-bitnot [
     "x" operand dup NOT
     "x" operand dup untag
 ] H{
-    { +input { { f "x" } } }
-    { +output { "x" } }
+    { +input+ { { f "x" } } }
+    { +output+ { "x" } }
 } define-intrinsic
 
 : define-fixnum-jump ( word op -- )
     [
         [ end-basic-block "x" operand 0 "y" operand CMP ] % ,
-     ] [ ] make H{ { +input { { f "x" } { f "y" } } } }
+     ] [ ] make H{ { +input+ { { f "x" } { f "y" } } } }
     define-if-intrinsic ;
 
 {
@@ -144,10 +144,10 @@ math-internals namespaces sequences words ;
     "r" operand "y" operand "x" operand ADDO.
     \ ADD simple-overflow
 ] H{
-    { +input { { f "x" } { f "y" } } }
-    { +scratch { { f "r" } } }
-    { +output { "r" } }
-    { +clobber { "x" "y" } }
+    { +input+ { { f "x" } { f "y" } } }
+    { +scratch+ { { f "r" } } }
+    { +output+ { "r" } }
+    { +clobber+ { "x" "y" } }
 } define-intrinsic
 
 \ fixnum- [
@@ -156,10 +156,10 @@ math-internals namespaces sequences words ;
     "r" operand "y" operand "x" operand SUBFO.
     \ SUBF simple-overflow
 ] H{
-    { +input { { f "x" } { f "y" } } }
-    { +scratch { { f "r" } } }
-    { +output { "r" } }
-    { +clobber { "x" "y" } }
+    { +input+ { { f "x" } { f "y" } } }
+    { +scratch+ { { f "r" } } }
+    { +output+ { "r" } }
+    { +clobber+ { "x" "y" } }
 } define-intrinsic
 
 \ fixnum* [
@@ -181,10 +181,10 @@ math-internals namespaces sequences words ;
     "end" get resolve-label
     "s" operand 12 MR
 ] H{
-    { +input { { f "x" } { f "y" } } }
-    { +scratch { { f "r" } { f "s" } } }
-    { +output { "s" } }
-    { +clobber { "x" "y" } }
+    { +input+ { { f "x" } { f "y" } } }
+    { +scratch+ { { f "r" } { f "s" } } }
+    { +output+ { "s" } }
+    { +clobber+ { "x" "y" } }
 } define-intrinsic
 
 : generate-fixnum/i
@@ -213,10 +213,10 @@ math-internals namespaces sequences words ;
     "r" operand "x" operand tag-fixnum
     "end" get resolve-label
 ] H{
-    { +input { { f "x" } { f "y" } } }
-    { +scratch { { f "r" } { f "s" } } }
-    { +output { "x" } }
-    { +clobber { "y" } }
+    { +input+ { { f "x" } { f "y" } } }
+    { +scratch+ { { f "r" } { f "s" } } }
+    { +output+ { "x" } }
+    { +clobber+ { "y" } }
 } define-intrinsic
 
 \ fixnum/mod [
@@ -229,16 +229,16 @@ math-internals namespaces sequences words ;
     "r" operand "x" operand tag-fixnum
     "end" get resolve-label
 ] H{
-    { +input { { f "x" } { f "y" } } }
-    { +scratch { { f "r" } { f "s" } } }
-    { +output { "x" "s" } }
-    { +clobber { "y" } }
+    { +input+ { { f "x" } { f "y" } } }
+    { +scratch+ { { f "r" } { f "s" } } }
+    { +output+ { "x" "s" } }
+    { +clobber+ { "y" } }
 } define-intrinsic
 
 : define-float-op ( word op -- )
     [ [ "x" operand "x" operand "y" operand ] % , ] [ ] make H{
-        { +input { { float "x" } { float "y" } } }
-        { +output { "x" } }
+        { +input+ { { float "x" } { float "y" } } }
+        { +output+ { "x" } }
     } define-intrinsic ;
 
 {
@@ -253,7 +253,7 @@ math-internals namespaces sequences words ;
 : define-float-jump ( word op -- )
     [
         [ end-basic-block "x" operand 0 "y" operand FCMPU ] % ,
-     ] [ ] make H{ { +input { { float "x" } { float "y" } } } }
+     ] [ ] make H{ { +input+ { { float "x" } { float "y" } } } }
     define-if-intrinsic ;
 
 {
@@ -270,9 +270,9 @@ math-internals namespaces sequences words ;
     "in" operand "out" operand tag-mask ANDI
     "out" operand dup tag-fixnum
 ] H{
-    { +input { { f "in" } } }
-    { +scratch { { f "out" } } }
-    { +output { "out" } }
+    { +input+ { { f "in" } } }
+    { +scratch+ { { f "out" } } }
+    { +output+ { "out" } }
 } define-intrinsic
 
 \ type [
@@ -299,9 +299,9 @@ math-internals namespaces sequences words ;
     f type tag-bits shift "x" operand LI
     "end" get resolve-label
 ] H{
-    { +input { { f "obj" } } }
-    { +scratch { { f "x" } { f "y" } } }
-    { +output { "x" } }
+    { +input+ { { f "obj" } } }
+    { +scratch+ { { f "x" } { f "y" } } }
+    { +output+ { "x" } }
 } define-intrinsic
 
 : userenv ( reg -- )
@@ -314,10 +314,10 @@ math-internals namespaces sequences words ;
     "x" operand "n" operand "x" operand ADD
     "x" operand dup 0 LWZ
 ] H{
-    { +input { { f "n" } } }
-    { +scratch { { f "x" } } }
-    { +output { "x" } }
-    { +clobber { "n" } }
+    { +input+ { { f "n" } } }
+    { +scratch+ { { f "x" } } }
+    { +output+ { "x" } }
+    { +clobber+ { "n" } }
 } define-intrinsic
 
 \ setenv [
@@ -326,7 +326,7 @@ math-internals namespaces sequences words ;
     "x" operand "n" operand "x" operand ADD
     "val" operand "x" operand 0 STW
 ] H{
-    { +input { { f "val" } { f "n" } } }
-    { +scratch { { f "x" } } }
-    { +clobber { "n" } }
+    { +input+ { { f "val" } { f "n" } } }
+    { +scratch+ { { f "x" } } }
+    { +clobber+ { "n" } }
 } define-intrinsic

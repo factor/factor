@@ -206,21 +206,21 @@ SYMBOL: phantom-r
 : phantom-append ( seq stack -- )
     over length over adjust-phantom swap nappend ;
 
-SYMBOL: +input
-SYMBOL: +output
-SYMBOL: +scratch
-SYMBOL: +clobber
+SYMBOL: +input+
+SYMBOL: +output+
+SYMBOL: +scratch+
+SYMBOL: +clobber+
 
 : fix-spec ( spec -- spec )
     H{
-        { +input { } }
-        { +output { } }
-        { +scratch { } }
-        { +clobber { } }
+        { +input+ { } }
+        { +output+ { } }
+        { +scratch+ { } }
+        { +clobber+ { } }
     } swap hash-union ;
 
 : output-vregs ( -- seq seq )
-    +output +clobber [ get [ get ] map ] 2apply ;
+    +output+ +clobber+ [ get [ get ] map ] 2apply ;
 
 : outputs-clash? ( -- ? )
     output-vregs append phantoms append
@@ -241,8 +241,8 @@ SYMBOL: +clobber
     [ second reg-spec>class eq? ] contains-with? ;
 
 : requests-class? ( class -- ? )
-    dup +input get (requests-class?) swap
-    +scratch get (requests-class?) or ;
+    dup +input+ get (requests-class?) swap
+    +scratch+ get (requests-class?) or ;
 
 : ?fp-scratch ( -- n )
     T{ float-regs f 8 } requests-class? 1 0 ? ;
@@ -253,11 +253,11 @@ SYMBOL: +clobber
     ] unless* ;
 
 : guess-vregs ( -- int# float# )
-    +input get { } additional-vregs ?fp-scratch +
-    +scratch get 0 <column> requested-vregs >r + r> ;
+    +input+ get { } additional-vregs ?fp-scratch +
+    +scratch+ get 0 <column> requested-vregs >r + r> ;
 
 : alloc-scratch ( -- )
-    +scratch get [ first2 >r spec>vreg r> set ] each ;
+    +scratch+ get [ first2 >r spec>vreg r> set ] each ;
 
 : template-inputs ( -- )
     ! Ensure we have enough to hold any new stack elements we
@@ -265,12 +265,12 @@ SYMBOL: +clobber
     guess-vregs ensure-vregs
     ! Split the template into available (fast) parts and those
     ! that require allocating registers and reading the stack
-    +input get match-template fast-input slow-input
+    +input+ get match-template fast-input slow-input
     ! Finally allocate scratch registers
     alloc-scratch ;
 
 : template-outputs ( -- )
-    +output get [ get ] map phantom-d get phantom-append ;
+    +output+ get [ get ] map phantom-d get phantom-append ;
 
 : with-template ( quot spec -- )
     fix-spec [ template-inputs call template-outputs ] bind
