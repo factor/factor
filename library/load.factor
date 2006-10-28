@@ -71,8 +71,11 @@ PROVIDE: library
     
     "compiler/alien/aliens.factor"
     
-    "syntax/prettyprint.factor"
-    "tools/summary.factor"
+    "prettyprint/core.factor"
+    "prettyprint/sections.factor"
+    "prettyprint/backend.factor"
+    "prettyprint/frontend.factor"
+
     "syntax/parser.factor"
     "syntax/parse-stream.factor"
 
@@ -175,15 +178,17 @@ PROVIDE: library
     "math/ratio.facts"
     "math/trig-hyp.facts"
     "math/vectors.facts"
+    "prettyprint/core.facts"
+    "prettyprint/sections.facts"
+    "prettyprint/backend.facts"
+    "prettyprint/frontend.facts"
     "syntax/early-parser.facts"
     "syntax/parse-stream.facts"
     "syntax/parser.facts"
     "syntax/parse-syntax.facts"
-    "syntax/prettyprint.facts"
     "tools/definitions.facts"
     "tools/word-tools.facts"
     "tools/debugger.facts"
-    "tools/summary.facts"
     "tools/describe.facts"
     "tools/inspector.facts"
     "tools/listener.facts"

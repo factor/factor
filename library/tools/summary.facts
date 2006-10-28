@@ -1,6 +1,0 @@
-IN: prettyprint
-USING: help ;
-
-HELP: summary
-{ $values { "object" "an object" } { "string" "a string" } }
-{ $contract "Outputs a brief description of the object." } ;

@@ -1,4 +1,4 @@
-USING: help io prettyprint ;
+USING: help io prettyprint prettyprint-internals ;
 
 ARTICLE: "prettyprint" "The prettyprinter"
 "One of Factor's key features is the ability to print almost any object as a valid source literal expression. This greatly aids debugging and provides the building blocks for light-weight object serialization facilities."
@@ -56,8 +56,10 @@ $terpri
 "Two types of leaf sections:"
 { $subsection text }
 { $subsection newline }
-"Nesting and denesting is done using three words. There are two words to denest a block; they vary in indentation policy:"
-{ $subsection <block }
+"Nesting and denesting is done using a set words:"
+{ $subsection <inset }
+{ $subsection <flow }
+{ $subsection <narrow }
+{ $subsection <defblock }
 { $subsection block> }
-{ $subsection block; }
 "Recall that since " { $link text } " sections take style hashtables as input, any type of formatted text can be output, including presentations. See " { $link "styles" } " to explore the possibility." ;

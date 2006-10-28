@@ -2,7 +2,8 @@
 ! See http://factorcode.org/license.txt for BSD license.
 IN: definitions
 USING: arrays errors generic hashtables io kernel math
-namespaces parser prettyprint sequences styles words ;
+namespaces parser prettyprint prettyprint-internals sequences
+styles words ;
 
 : where ( defspec -- loc )
     where* dup [ first2 >r ?resource-path r> 2array ] when ;
@@ -33,7 +34,7 @@ GENERIC: synopsis* ( defspec -- )
 
 : in. ( word -- )
     word-vocabulary [
-        H{ } <block \ IN: pprint-word write-vocab block;
+        H{ } clone <flow \ IN: pprint-word write-vocab block>
     ] when* ;
 
 : comment. ( string -- )
@@ -83,9 +84,9 @@ M: word declarations.
     [
         dup synopsis*
         dup definition [
-            H{ } <block
+            H{ } <defblock
             pprint-elements pprint-; declarations.
-            block;
+            block>
         ] [
             2drop
         ] if newline
@@ -104,9 +105,9 @@ M: predicate see-class*
     \ PREDICATE: pprint-word
     dup superclass pprint-word
     dup pprint-word
-    H{ } <block
+    H{ } <defblock
     "definition" word-prop pprint-elements
-    pprint-; block; ;
+    pprint-; block> ;
 
 M: tuple-class see-class*
     \ TUPLE: pprint-word
@@ -117,9 +118,12 @@ M: tuple-class see-class*
 M: word see-class* drop ;
 
 : see-class ( word -- )
-    [
-        dup class?
-        [ see-class* newline ] [ drop ] if
-    ] with-pprint ;
+    dup class? [
+        terpri [ see-class* ] with-pprint terpri
+    ] [
+        drop
+    ] if ;
+
+: see-subdefs ( word -- ) subdefs [ terpri see ] each ;
 
 M: word see dup (see) dup see-class see-subdefs ;
