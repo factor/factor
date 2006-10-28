@@ -16,7 +16,7 @@ HELP: module-def
 { $notes "This file is loaded by " { $link require } ", and should contain the necessary " { $link POSTPONE: REQUIRES: } " and " { $link POSTPONE: PROVIDE: } " declarations for the module." } ;
 
 HELP: modules
-{ $var-description "Association list mapping loaded module names to " { $link module } " instances." }
+{ $var-description "Sequence of " { $link module } " instances." }
 { $see-also require load-module } ;
 
 HELP: load-module

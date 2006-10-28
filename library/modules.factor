@@ -25,7 +25,9 @@ C: module ( name files tests help -- module )
     [ >r dupd prefix-paths r> set-module-files ] keep
     [ set-module-name ] keep ;
 
-: module modules get assoc ;
+M: module <=> [ module-name ] 2apply <=> ;
+
+: module modules get [ module-name = ] find-with nip ;
 
 : load-module ( name -- )
     [
@@ -41,12 +43,8 @@ C: module ( name files tests help -- module )
     [ second call ] subset
     0 <column> >array ;
 
-: add-module ( module -- )
-    dup module-name swap 2array modules get push ;
-
 : remove-module ( name -- )
-    modules get [ first = ] find-with nip
-    [ modules get delete ] when* ;
+    module [ modules get delete ] when* ;
 
 : provide ( name hash -- )
     over remove-module [
@@ -55,18 +53,15 @@ C: module ( name files tests help -- module )
         +help+ get
     ] bind <module>
     [ module-files run-files ] keep
-    add-module ;
+    modules get push ;
 
 : test-module ( name -- ) module module-tests run-tests ;
 
-: all-modules ( -- seq ) modules get 1 <column> ;
-
 : test-modules ( -- )
-    all-modules [ module-tests ] map concat run-tests ;
+    modules get [ module-tests ] map concat run-tests ;
 
 : modules. ( -- )
-    all-modules
-    [ [ module-name ] 2apply <=> ] sort
+    modules get natural-sort
     [ [ module-name ] keep write-object terpri ] each ;
 
 : reload-module ( module -- )
@@ -77,7 +72,7 @@ C: module ( name files tests help -- module )
     ] if ;
 
 : reload-modules ( -- )
-    all-modules [ reload-module ] each do-parse-hook ;
+    modules get [ reload-module ] each do-parse-hook ;
 
 : run-module ( name -- )
     dup require
@@ -91,4 +86,4 @@ C: module ( name files tests help -- module )
     ] ?if ;
 
 : modules-help ( -- seq )
-    all-modules [ module-help ] map [ ] subset ;
+    modules get [ module-help ] map [ ] subset ;
