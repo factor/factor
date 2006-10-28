@@ -6,7 +6,6 @@
   - float boxing and overflow checks need a gc check too
 - [ [ dup call ] dup call ] infer hangs
 - growable data heap
-- erg's frange crash
 
 + ui:
 
@@ -58,6 +57,16 @@
 - compiled continuations
 - compiled call traces
 - amd64 structs-by-value bug
+
++ prettyprinter:
+
+- clean it up
+- if we're printing a block on multiple lines, break at some words like
+  set off on % # , ... and assembler opcodes
+- don't end lines with literals, shuffle words or symbols?
+- see should try to not show ; on a line by itself
+- IN: on its own line if the entire 'see' form doesn't fit
+- don't build entire tree to print first
 
 + misc:
 
