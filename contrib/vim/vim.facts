@@ -9,7 +9,7 @@ $terpri
 "USING: modules namespaces ;"
 "REQUIRES: contrib/vim ;"
 "USE: vim"
-"\"d:\\program files\\vim\\vim70\\gvim\" vim-path set-global"
+"\"c:\\\\program files\\\\vim\\\\vim70\\\\gvim\" vim-path set-global"
 }
 "On Unix, you may omit the last line if " { $snippet "\"vim\"" } " is in your " { $snippet "$PATH" } "."
 $terpri
