@@ -97,7 +97,6 @@ M: operation invoke-command ( target operation -- )
 } define-operation
 
 [ word? ] H{
-    { +default+ t }
     { +name+ "Forget" }
     { +keyboard+ T{ key-down f { A+ } "b" } }
     { +quot+ [ forget ] }
