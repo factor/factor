@@ -304,7 +304,7 @@ void primitive_resize_string(void)
 MEMORY_TO_STRING(char,u8)
 MEMORY_TO_STRING(u16,u16)
 
-void check_string(F_STRING *s, CELL max)
+bool check_string(F_STRING *s, CELL max)
 {
 	CELL capacity = string_capacity(s);
 	CELL i;
@@ -312,8 +312,9 @@ void check_string(F_STRING *s, CELL max)
 	{
 		u16 ch = string_nth(s,i);
 		if(ch == '\0' || ch >= (1 << (max * 8)))
-			general_error(ERROR_C_STRING,tag_object(s),F,true);
+			return false;
 	}
+	return true;
 }
 
 F_ARRAY *allot_c_string(CELL capacity, CELL size)
@@ -339,7 +340,8 @@ F_ARRAY *allot_c_string(CELL capacity, CELL size)
 	{ \
 		CELL capacity = string_capacity(s); \
 		F_ARRAY *_c_str; \
-		if(check) check_string(s,sizeof(type)); \
+		if(check && !check_string(s,sizeof(type))) \
+			general_error(ERROR_C_STRING,tag_object(s),F,true); \
 		_c_str = allot_c_string(capacity,sizeof(type)); \
 		type *c_str = (type*)(_c_str + 1); \
 		type##_string_to_memory(s,c_str); \
@@ -350,7 +352,8 @@ F_ARRAY *allot_c_string(CELL capacity, CELL size)
 	{ \
 		if(sizeof(type) == sizeof(u16)) \
 		{ \
-			if(check) check_string(s,sizeof(type)); \
+			if(check && !check_string(s,sizeof(type))) \
+				general_error(ERROR_C_STRING,tag_object(s),F,true); \
 			return (type*)(s + 1); \
 		} \
 		else \

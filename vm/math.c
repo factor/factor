@@ -533,13 +533,20 @@ void primitive_str_to_float(void)
 	maybe_gc(sizeof(F_FLOAT));
 
 	str = untag_string(dpeek());
-	c_str = to_char_string(str,true);
-	end = c_str;
-	f = strtod(c_str,&end);
-	if(end != c_str + string_capacity(str))
+
+	/* if the string has nulls or chars > 255, its definitely not a float */
+	if(!check_string(str,sizeof(char)))
 		drepl(F);
 	else
-		drepl(tag_float(f));
+	{
+		c_str = to_char_string(str,false);
+		end = c_str;
+		f = strtod(c_str,&end);
+		if(end != c_str + string_capacity(str))
+			drepl(F);
+		else
+			drepl(tag_float(f));
+	}
 }
 
 void primitive_float_to_str(void)

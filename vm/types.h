@@ -94,6 +94,8 @@ void primitive_string(void);
 F_STRING *resize_string(F_STRING *string, F_FIXNUM capacity, u16 fill);
 void primitive_resize_string(void);
 
+bool check_string(F_STRING *s, CELL max);
+
 F_STRING *memory_to_char_string(const char *string, CELL length);
 void primitive_memory_to_char_string(void);
 F_STRING *from_char_string(const char *c_string);
