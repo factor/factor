@@ -93,3 +93,5 @@ struct foo ffi_test_14(int x, int y)
 	r.x = x; r.y = y;
 	return r;
 }
+
+void ffi_test_15(int x) { }

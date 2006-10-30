@@ -1,5 +1,6 @@
 IN: temporary
-USING: alien compiler kernel namespaces namespaces test ;
+USING: alien compiler kernel namespaces namespaces test
+sequences ;
 
 FUNCTION: void ffi_test_0 ;
 [ ] [ ffi_test_0 ] unit-test
@@ -85,3 +86,8 @@ cpu "x86" = macosx? and [
 [ 5 ]
 [ 2 3 "ffi_test_2" f dlsym <alien> indirect-test-2 ]
 unit-test
+
+! Make sure we do a GC if necessary
+FUNCTION: void ffi_test_15 int x ;
+
+[ ] [ 10000000 [ drop 1/3 ffi_test_15 ] each ] unit-test

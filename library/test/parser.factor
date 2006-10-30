@@ -78,3 +78,6 @@ unit-test
 [ [ ] ] [ "IN: temporary : foo ( a b -- c ) + ;" parse ] unit-test
 [ [ ] ] [ "IN: temporary : foo ;" parse ] unit-test
 [ f ] [ \ foo "declared-effect" word-prop ] unit-test
+
+! Funny bug
+[ 2 ] [ "IN: temporary : \0. 2 ; \0." eval ] unit-test

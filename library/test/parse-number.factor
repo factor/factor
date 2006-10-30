@@ -109,6 +109,8 @@ unit-test
 [ f ] [ "fdsf" bin> ] unit-test
 [ 3 ] [ "11" bin> ] unit-test
 
+[ f ] [ "\0." string>number ] unit-test
+
 ! [ t ] [
 !     { "1.0/0.0" "-1.0/0.0" "0.0/0.0" }
 !     [ dup string>number number>string = ] all?
