@@ -2,9 +2,11 @@
 
 ! adapted from libpq-fe.h version 7.4.7
 ! tested on debian linux with postgresql 7.4.7
+! Updated to 8.1
 
 IN: postgresql
 USING: alien ;
+
 
 ! ConnSatusType
 : CONNECTION_OK 					HEX: 0 ; inline
@@ -47,6 +49,7 @@ USING: alien ;
 : PQERRORS_VERBOSE					HEX: 2 ; inline
 
 
+TYPEDEF: int size_t
 TYPEDEF: int ConnStatusType
 TYPEDEF: int ExecStatusType 
 TYPEDEF: int PostgresPollingStatusType
@@ -55,6 +58,7 @@ TYPEDEF: int PGVerbosity
 
 TYPEDEF: void* PGconn*
 TYPEDEF: void* PGresult*
+TYPEDEF: void* PGcancel*
 TYPEDEF: uint Oid
 TYPEDEF: uint* Oid*
 TYPEDEF: char pqbool
@@ -106,6 +110,12 @@ FUNCTION: PostgresPollingStatusType PQresetPoll ( PGconn* conn ) ;
 ! Synchronous (blocking)
 FUNCTION: void PQreset ( PGconn* conn ) ;
 
+! request a cancel structure
+FUNCTION: PGcancel* PQgetCancel ( PGconn* conn ) ;
+
+! free a cancel structure
+FUNCTION: void PQfreeCancel ( PGcancel* cancel ) ;
+
 ! issue a cancel request
 FUNCTION: int	PQrequestCancel ( PGconn* conn ) ;
 
@@ -122,6 +132,7 @@ FUNCTION: PGTransactionStatusType PQtransactionStatus ( PGconn* conn ) ;
 FUNCTION: char* PQparameterStatus ( PGconn* conn,
 				  char* paramName ) ;
 FUNCTION: int	PQprotocolVersion ( PGconn* conn ) ;
+FUNCTION: int	PQServerVersion ( PGconn* conn ) ;
 FUNCTION: char* PQerrorMessage ( PGconn* conn ) ;
 FUNCTION: int	PQsocket ( PGconn* conn ) ;
 FUNCTION: int	PQbackendPID ( PGconn* conn ) ;
@@ -132,6 +143,8 @@ FUNCTION: int	PQsetClientEncoding ( PGconn* conn, char* encoding ) ;
 ! Get the SSL structure associated with a connection
 FUNCTION: SSL* PQgetssl ( PGconn* conn ) ;
 
+! Tell libpq whether it needs to initialize OpenSSL
+FUNCTION: void PQinitSSL ( int do_init ) ;
 
 ! Set verbosity for PQerrorMessage and PQresultErrorMessage
 FUNCTION: PGVerbosity PQsetErrorVerbosity ( PGconn* conn,
@@ -169,6 +182,9 @@ FUNCTION: PGresult* PQexecParams ( PGconn* conn,
 			 int* paramLengths,
 			 int* paramFormats,
 			 int resultFormat ) ;
+FUNCTION: PGresult* PQprepare ( PGconn* conn, char* stmtName,
+        char* query, int nParams,
+        Oid* paramTypes ) ;
 FUNCTION: PGresult* PQexecPrepared ( PGconn* conn,
 			 char* stmtName,
 			 int nParams,
@@ -178,7 +194,7 @@ FUNCTION: PGresult* PQexecPrepared ( PGconn* conn,
 			 int resultFormat ) ;
 
 ! Interface for multiple-result or asynchronous queries
-FUNCTION: int	PQsendQuery ( PGconn* conn, char* query ) ;
+FUNCTION: int PQsendQuery ( PGconn* conn, char* query ) ;
 FUNCTION: int PQsendQueryParams ( PGconn* conn,
 				  char* command,
 				  int nParams,
@@ -187,6 +203,9 @@ FUNCTION: int PQsendQueryParams ( PGconn* conn,
 				  int* paramLengths,
 				  int* paramFormats,
 				  int resultFormat ) ;
+FUNCTION: PGresult* PQsendPrepare ( PGconn* conn, char* stmtName,
+            char* query, int nParams,
+            Oid* paramTypes ) ;
 FUNCTION: int PQsendQueryPrepared ( PGconn* conn,
 				  char* stmtName,
 				  int nParams,
@@ -275,11 +294,18 @@ FUNCTION: void PQfreemem ( void* ptr ) ;
 FUNCTION: PGresult* PQmakeEmptyPGresult ( PGconn* conn, ExecStatusType status ) ;
 
 ! Quoting strings before inclusion in queries.
+FUNCTION: size_t PQescapeStringConn ( PGconn* conn,
+                                    char* to, char* from, size_t length,
+                                    int* error ) ;
+FUNCTION: uchar* PQescapeByteaConn ( PGconn* conn,
+                                    char* from, size_t length,
+                                    size_t* to_length ) ;
+FUNCTION: uchar* PQunescapeBytea ( uchar* strtext,
+                size_t* retbuflen ) ;
+! These forms are deprecated!
 FUNCTION: size_t PQescapeString ( char* to, char* from, size_t length ) ;
 FUNCTION: uchar* PQescapeBytea ( uchar* bintext, size_t binlen,
 			  size_t* bytealen ) ;
-FUNCTION: uchar* PQunescapeBytea ( uchar* strtext,
-				size_t* retbuflen ) ;
 
 ! === in fe-print.c ===
 
@@ -308,6 +334,7 @@ FUNCTION: int	lo_read ( PGconn* conn, int fd, char* buf, size_t len ) ;
 FUNCTION: int	lo_write ( PGconn* conn, int fd, char* buf, size_t len ) ;
 FUNCTION: int	lo_lseek ( PGconn* conn, int fd, int offset, int whence ) ;
 FUNCTION: Oid	lo_creat ( PGconn* conn, int mode ) ;
+FUNCTION: Oid	lo_creat ( PGconn* conn, Oid lobjId ) ;
 FUNCTION: int	lo_tell ( PGconn* conn, int fd ) ;
 FUNCTION: int	lo_unlink ( PGconn* conn, Oid lobjId ) ;
 FUNCTION: Oid	lo_import ( PGconn* conn, char* filename ) ;
@@ -317,6 +344,9 @@ FUNCTION: int	lo_export ( PGconn* conn, Oid lobjId, char* filename ) ;
 
 ! Determine length of multibyte encoded char at *s
 FUNCTION: int	PQmblen ( uchar* s, int encoding ) ;
+
+! Determine display length of multibyte encoded char at *s
+FUNCTION: int	PQdsplen ( uchar* s, int encoding ) ;
 
 ! Get encoding id from environment variable PGCLIENTENCODING
 FUNCTION: int	PQenv2encoding ( ) ;

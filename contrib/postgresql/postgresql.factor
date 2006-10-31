@@ -5,25 +5,23 @@
 
 IN: postgresql
 USING: kernel alien errors io prettyprint sequences namespaces arrays math ;
-SYMBOL: postgres-conn
+
+SYMBOL: db
 SYMBOL: query-res
 
 : connect-postgres ( host port pgopts pgtty db user pass -- conn )
     PQsetdbLogin
-    dup PQstatus 0 = [ "couldn't connect to database" throw ] unless ;
+    dup PQstatus zero? [ "couldn't connect to database" throw ] unless ;
 
 : with-postgres ( host port pgopts pgtty db user pass quot -- )
-    [ >r connect-postgres postgres-conn set r>
-    [ postgres-conn get PQfinish ] cleanup ] with-scope ; inline
+    [ >r connect-postgres db set r>
+    [ db get PQfinish ] cleanup ] with-scope ; inline
 
 : with-postgres-catch ( host port pgopts pgtty db user pass quot -- )
     [ with-postgres ] catch [ "caught: " write print ] when* ;
 
-: test-connection ( host port pgopts pgtty db user pass -- bool )
-    [ [ ] with-postgres ] catch "Error connecting!" "Connected!" ? print ;
-
 : postgres-error ( ret -- ret )
-    dup 0 = [ PQresultErrorMessage throw ] when ;
+    dup zero? [ PQresultErrorMessage throw ] when ;
 
 : (do-query) ( PGconn query -- PGresult* )
     ! For queries that do not return rows, PQexec() returns PGRES_COMMAND_OK
@@ -45,17 +43,19 @@ SYMBOL: query-res
     ] when* drop ;
 
 : do-command ( str -- )
-    unit \ (do-command) add postgres-conn get swap call ;
+    unit \ (do-command) add db get swap call ;
 
-: prepare ( str quot word -- quot )
-    rot unit swap append swap append postgres-conn get swap ;
+: prepare ( str quot word -- conn quot )
+    rot unit swap append swap append db get swap ;
 
 : do-query ( str quot -- )
-    [ (do-query) query-res set ] prepare catch [ rethrow ] [ query-res get PQclear ] if* ;
+    [ (do-query) query-res set ] prepare catch
+    [ rethrow ] [ query-res get PQclear ] if* ;
 
-: result>seq ( -- )
+: result>seq ( -- seq )
     query-res get [ PQnfields ] keep PQntuples
-    [ [ over [ [ 2dup query-res get -rot PQgetvalue , ] repeat ] { } make , ] repeat ] { } make nip ;
+    [ swap [ query-res get -rot PQgetvalue ] map-with ] map-with ;
 
 : print-table ( seq -- )
-    [ [ "\t" append write ] each "\n" write ] each ;
+    [ [ write bl ] each "\n" write ] each ;
+
