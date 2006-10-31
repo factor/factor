@@ -1,12 +1,17 @@
-- fix compiled gc check
-  - there was a performance hit, investigate
-  - float boxing and overflow checks need a gc check too
-- [ [ dup call ] dup call ] infer hangs
++ allot refactoring:
+
+- rethink all string conversions
+- what if retain stack is full
+  - ie, inside retain stack overflow handler, don't cons?
+- os-windows.c error_message &co
+- to_float, to_fixnum, to_bignum: don't cons
+- inline float allocation needs a gc check
+- alien invoke, callback need a gc check
 - relocation should not cons at all
-- docs: mention that 'like' may destroy the underlying sequence
 
 + ui:
 
+- docs: mention that 'like' may destroy the underlying sequence
 - live search: timer delay would be nice
 - menu should stay up if mouse button released
 - roundoff is still not quite right with tracks
@@ -43,6 +48,7 @@
 
 + compiler/ffi:
 
+- [ [ dup call ] dup call ] infer hangs
 - stdcall callbacks
 - callstack overflow when compiling mutually recursive inline words
 - test what is done in the case of an invalid declaration on an inline

@@ -217,6 +217,4 @@ INLINE void* allot_object(CELL type, CELL length)
 void update_cards_offset(void);
 CELL collect_next(CELL scan);
 void primitive_data_gc(void);
-void maybe_gc(CELL size);
-DLLEXPORT void simple_gc(void);
 void primitive_gc_time(void);

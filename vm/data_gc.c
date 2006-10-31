@@ -590,13 +590,7 @@ void primitive_data_gc(void)
 	garbage_collection(gen,false);
 }
 
-void simple_gc(void)
-{
-	maybe_gc(0);
-}
-
 void primitive_gc_time(void)
 {
-	simple_gc();
-	dpush(tag_bignum(s48_long_long_to_bignum(gc_time)));
+	box_unsigned_8(gc_time);
 }
