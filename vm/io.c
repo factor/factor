@@ -26,12 +26,11 @@ void io_error(void)
 
 void primitive_fopen(void)
 {
-	char *path, *mode;
-	FILE* file;
-	maybe_gc(0);
-	mode = unbox_char_string();
-	path = unbox_char_string();
-	file = fopen(path,mode);
+	char *mode = unbox_char_string();
+	REGISTER_C_STRING(mode);
+	char *path = unbox_char_string();
+	UNREGISTER_C_STRING(mode);
+	FILE *file = fopen(path,mode);
 	if(file == NULL)
 		io_error();
 	box_alien((CELL)file);

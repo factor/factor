@@ -115,13 +115,13 @@ F_ARRAY *reallot_array(F_ARRAY* array, F_FIXNUM capacity, CELL fill)
 	if(capacity < to_copy)
 		to_copy = capacity;
 
-	REGISTER_ROOT(tag_object(array));
+	REGISTER_ARRAY(array);
 	REGISTER_ROOT(fill);
 
 	new_array = allot_array_internal(untag_header(array->header),capacity);
 
 	UNREGISTER_ROOT(fill);
-	array = untag_array_fast(rpop());
+	UNREGISTER_ARRAY(array);
 
 	memcpy(new_array + 1,array + 1,to_copy * CELLS);
 	
@@ -221,11 +221,11 @@ F_STRING* reallot_string(F_STRING* string, F_FIXNUM capacity, u16 fill)
 	if(capacity < to_copy)
 		to_copy = capacity;
 
-	REGISTER_ROOT(tag_object(string));
+	REGISTER_STRING(string);
 
-	F_STRING* new_string = allot_string_internal(capacity);
+	F_STRING *new_string = allot_string_internal(capacity);
 
-	string = untag_string_fast(rpop());
+	UNREGISTER_STRING(string);
 
 	memcpy(new_string + 1,string + 1,to_copy * CHARS);
 
@@ -239,7 +239,7 @@ void primitive_resize_string(void)
 {
 	F_STRING* string = untag_string_fast(dpop());
 	F_FIXNUM capacity = unbox_signed_cell();
-	drepl(tag_object(reallot_string(string,capacity,0)));
+	dpush(tag_object(reallot_string(string,capacity,0)));
 }
 
 /* Some ugly macros to prevent a 2x code duplication */
@@ -276,7 +276,6 @@ void primitive_resize_string(void)
 	} \
 	void primitive_alien_to_##type##_string(void) \
 	{ \
-		maybe_gc(0); \
 		drepl(tag_object(from_##type##_string(alien_offset(dpeek())))); \
 	}
 
@@ -345,7 +344,6 @@ F_ARRAY *allot_c_string(CELL capacity, CELL size)
 	void primitive_string_to_##type##_alien(void) \
 	{ \
 		CELL string, t; \
-		maybe_gc(0); \
 		string = dpeek(); \
 		t = type_of(string); \
 		if(t != ALIEN_TYPE && t != BYTE_ARRAY_TYPE && t != F_TYPE) \

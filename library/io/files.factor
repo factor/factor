@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 IN: io
 USING: hashtables kernel math memory namespaces sequences
-strings styles ;
+strings styles arrays ;
 
 ! Words for accessing filesystem meta-data.
 

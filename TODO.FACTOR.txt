@@ -11,6 +11,7 @@
 
 + ui:
 
+- input operation: copy
 - docs: mention that 'like' may destroy the underlying sequence
 - live search: timer delay would be nice
 - menu should stay up if mouse button released
@@ -76,6 +77,7 @@
 
 + misc:
 
+- faster apropos
 - growable data heap
 - minor GC takes too long now, we should card mark code heap
 - buffer-ptr should be an alien

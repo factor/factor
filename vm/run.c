@@ -166,16 +166,12 @@ void primitive_exit(void)
 
 void primitive_os_env(void)
 {
-	char *name, *value;
-
-	maybe_gc(0);
-
-	name = unbox_char_string();
-	value = getenv(name);
+	char *name = unbox_char_string();
+	char *value = getenv(name);
 	if(value == NULL)
 		dpush(F);
 	else
-		box_char_string(getenv(name));
+		box_char_string(value);
 }
 
 void primitive_eq(void)
@@ -187,8 +183,7 @@ void primitive_eq(void)
 
 void primitive_millis(void)
 {
-	maybe_gc(0);
-	dpush(tag_bignum(s48_long_long_to_bignum(current_millis())));
+	box_unsigned_8(current_millis());
 }
 
 void primitive_type(void)
@@ -294,7 +289,8 @@ void memory_protection_error(CELL addr, int signal)
 		general_error(ERROR_CS_UNDERFLOW,F,F,false);
 	else if(in_page(addr, cs_bot, cs_size, 0))
 		general_error(ERROR_CS_OVERFLOW,F,F,false);
-	else
+	else if(in_page(addr, nursery.limit, 0, 0))
+		critical_error("Out of memory",0);
 		signal_error(signal);
 }
 

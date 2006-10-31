@@ -83,24 +83,20 @@ void primitive_stat(void)
 
 void primitive_read_dir(void)
 {
-	F_STRING *path;
-	DIR* dir;
-	F_ARRAY *result;
+	DIR* dir = opendir(unbox_char_string());
 	CELL result_count = 0;
+	F_ARRAY *result = allot_array(ARRAY_TYPE,100,F);
 
-	maybe_gc(0);
-
-	result = allot_array(ARRAY_TYPE,100,F);
-
-	path = untag_string(dpop());
-	dir = opendir(to_char_string(path,true));
 	if(dir != NULL)
 	{
 		struct dirent* file;
 
 		while((file = readdir(dir)) != NULL)
 		{
+			REGISTER_ARRAY(result);
 			CELL name = tag_object(from_char_string(file->d_name));
+			UNREGISTER_ARRAY(result);
+
 			if(result_count == array_capacity(result))
 			{
 				result = reallot_array(result,
@@ -122,7 +118,6 @@ void primitive_read_dir(void)
 void primitive_cwd(void)
 {
 	char wd[MAXPATHLEN];
-	maybe_gc(0);
 	if(getcwd(wd,MAXPATHLEN) == NULL)
 		io_error();
 	box_char_string(wd);
@@ -130,7 +125,6 @@ void primitive_cwd(void)
 
 void primitive_cd(void)
 {
-	maybe_gc(0);
 	chdir(unbox_char_string());
 }
 

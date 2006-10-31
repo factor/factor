@@ -401,7 +401,6 @@ void primitive_bignum_greatereq(void)
 
 void primitive_bignum_not(void)
 {
-	maybe_gc(0);
 	drepl(tag_bignum(s48_bignum_bitwise_not(
 		untag_bignum_fast(dpeek()))));
 }
@@ -512,13 +511,9 @@ void primitive_to_float(void)
 
 void primitive_str_to_float(void)
 {
-	F_STRING* str;
 	char *c_str, *end;
 	double f;
-
-	maybe_gc(sizeof(F_FLOAT));
-
-	str = untag_string(dpeek());
+	F_STRING *str = untag_string(dpeek());
 
 	/* if the string has nulls or chars > 255, its definitely not a float */
 	if(!check_string(str,sizeof(char)))
@@ -538,71 +533,67 @@ void primitive_str_to_float(void)
 void primitive_float_to_str(void)
 {
 	char tmp[33];
-
-	maybe_gc(sizeof(F_FLOAT));
-
-	snprintf(tmp,32,"%.16g",to_float(dpop()));
+	snprintf(tmp,32,"%.16g",unbox_double());
 	tmp[32] = '\0';
 	box_char_string(tmp);
 }
 
-#define GC_AND_POP_FLOATS(x,y) \
+#define POP_FLOATS(x,y) \
 	double x, y; \
-	maybe_gc(sizeof(F_FLOAT)); \
 	y = untag_float_fast(dpop()); \
 	x = untag_float_fast(dpop());
 
 void primitive_float_add(void)
 {
-	GC_AND_POP_FLOATS(x,y);
+	POP_FLOATS(x,y);
 	box_float(x + y);
 }
 
 void primitive_float_subtract(void)
 {
-	GC_AND_POP_FLOATS(x,y);
+	POP_FLOATS(x,y);
 	box_float(x - y);
 }
 
 void primitive_float_multiply(void)
 {
-	GC_AND_POP_FLOATS(x,y);
+	POP_FLOATS(x,y);
 	box_float(x * y);
 }
 
 void primitive_float_divfloat(void)
 {
-	GC_AND_POP_FLOATS(x,y);
+	POP_FLOATS(x,y);
 	box_float(x / y);
 }
 
 void primitive_float_mod(void)
 {
-	GC_AND_POP_FLOATS(x,y);
+	POP_FLOATS(x,y);
 	box_float(fmod(x,y));
 }
 
 void primitive_float_less(void)
 {
-	GC_AND_POP_FLOATS(x,y);
+	POP_FLOATS(x,y);
 	box_boolean(x < y);
 }
 
 void primitive_float_lesseq(void)
 {
-	GC_AND_POP_FLOATS(x,y);
+	POP_FLOATS(x,y);
 	box_boolean(x <= y);
 }
 
 void primitive_float_greater(void)
 {
-	GC_AND_POP_FLOATS(x,y);
+	POP_FLOATS(x,y);
 	box_boolean(x > y);
 }
 
 void primitive_float_greatereq(void)
 {
-	GC_AND_POP_FLOATS(x,y);
+	POP_FLOATS(x,y);
 	box_boolean(x >= y);
 }
 

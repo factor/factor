@@ -180,13 +180,14 @@ void garbage_collection(CELL gen, bool code_gc);
 #define REGISTER_ROOT(obj) rpush(obj)
 #define UNREGISTER_ROOT(obj) obj = rpop()
 
-/* WARNING: only call this from a context where all local variables
-are also reachable via the GC roots, or gc_off is set to true. */
-INLINE void maybe_gc(CELL size)
-{
-	if(nursery.here + size > nursery.limit)
-		garbage_collection(NURSERY,false);
-}
+#define REGISTER_ARRAY(obj) rpush(tag_object(obj))
+#define UNREGISTER_ARRAY(obj) obj = untag_array_fast(rpop())
+
+#define REGISTER_STRING(obj) rpush(tag_object(obj))
+#define UNREGISTER_STRING(obj) obj = untag_string_fast(rpop())
+
+#define REGISTER_C_STRING(obj) rpush(tag_object(((F_ARRAY *)obj) - 1))
+#define UNREGISTER_C_STRING(obj) obj = ((char*)(untag_array_fast(rpop()) + 1))
 
 INLINE void *allot_zone(ZONE *z, CELL a)
 {
@@ -199,7 +200,9 @@ INLINE void *allot_zone(ZONE *z, CELL a)
 
 INLINE void *allot(CELL a)
 {
-	maybe_gc(a);
+	if(nursery.here + a > nursery.limit)
+		garbage_collection(NURSERY,false);
+
 	return allot_zone(&nursery,a);
 }
 

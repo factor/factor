@@ -21,7 +21,7 @@ char *error_message(DWORD id)
 {
 	char *buffer;
 	int index;
-	
+
 	FormatMessage(
 		FORMAT_MESSAGE_ALLOCATE_BUFFER |
 		FORMAT_MESSAGE_FROM_SYSTEM,
@@ -35,7 +35,7 @@ char *error_message(DWORD id)
 	index = strlen(buffer) - 1;
 	while(index >= 0 && isspace(buffer[index]))
 		buffer[index--] = 0;
-	
+
 	return buffer_to_char_string(buffer);
 }
 
@@ -43,7 +43,7 @@ s64 current_millis(void)
 {
 	FILETIME t;
 	GetSystemTimeAsFileTime(&t);
-	return (((s64)t.dwLowDateTime | (s64)t.dwHighDateTime<<32) - EPOCH_OFFSET) 
+	return (((s64)t.dwLowDateTime | (s64)t.dwHighDateTime<<32) - EPOCH_OFFSET)
 		/ 10000;
 }
 
@@ -96,14 +96,14 @@ void primitive_stat(void)
 	if(!GetFileAttributesEx(
 		unbox_char_string(),
 		GetFileExInfoStandard,
-		&st)) 
+		&st))
 	{
 		dpush(F);
 		dpush(F);
 		dpush(F);
 		dpush(F);
-	} 
-	else 
+	}
+	else
 	{
 		box_boolean(st.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY);
 		box_signed_4(0);
@@ -118,32 +118,31 @@ void primitive_read_dir(void)
 {
 	HANDLE dir;
 	WIN32_FIND_DATA find_data;
-	F_ARRAY *result;
 	CELL result_count = 0;
 	char path[MAX_PATH + 4];
 
-	maybe_gc(0);
+	sprintf(path, "%s\\*", unbox_char_string());
 
-	result = array(ARRAY_TYPE,100,F);
+	F_ARRAY *result = allot_array(ARRAY_TYPE,100,F);
 
-	sprintf(path, "%s\\*", to_char_string(untag_string(dpop()),true));
-
-	if (INVALID_HANDLE_VALUE != (dir = FindFirstFile(path, &find_data)))
+	if(INVALID_HANDLE_VALUE != (dir = FindFirstFile(path, &find_data)))
 	{
 		do
 		{
+			REGISTER_ARRAY(result);
 			CELL name = tag_object(from_char_string(
 				find_data.cFileName));
+			UNREGISTER_ARRAY(result);
 
 			if(result_count == array_capacity(result))
 			{
 				result = reallot_array(result,
 					result_count * 2,F);
 			}
-			
+
 			put(AREF(result,result_count),name);
 			result_count++;
-		} 
+		}
 		while (FindNextFile(dir, &find_data));
 		CloseHandle(dir);
 	}
@@ -157,7 +156,6 @@ void primitive_cwd(void)
 {
 	char buf[MAX_PATH];
 
-	maybe_gc(0);
 	if(!GetCurrentDirectory(MAX_PATH, buf))
 		io_error();
 
@@ -166,7 +164,6 @@ void primitive_cwd(void)
 
 void primitive_cd(void)
 {
-	maybe_gc(0);
 	SetCurrentDirectory(unbox_char_string());
 }
 
