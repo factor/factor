@@ -31,7 +31,7 @@ TUPLE: mapping tuple table fields one-to-one one-to-many   ;
   #! Given a tuple class return a list of the fields
   #! within that tuple. Ignores the delegate field.
   [ word-name length 1+ ] keep
-  "slots" word-prop 1 tail [ ( name-len { slot getter setter } )
+  "slots" word-prop 1 tail [
     [ third word-name swap tail sanitize dup ":" swap append ] keep    
     first
     "text"
@@ -91,7 +91,7 @@ C: persistent ( tuple -- persistent )
     swap "" make
   ] map-with "," join ; inline
 
-GENERIC: create-sql
+GENERIC: create-sql ( mapping -- string )
 M: mapping create-sql ( mapping -- string )
   #! Return the SQL used to create a table for storing this type of tuple.
   [
@@ -101,14 +101,14 @@ M: mapping create-sql ( mapping -- string )
     ");" %
   ] "" make ;
 
-GENERIC: drop-sql
+GENERIC: drop-sql ( mapping -- string )
 M: mapping drop-sql ( mapping -- string )
   #! Return the SQL used to drop the table for storing this type of tuple.
   [
     "drop table " % mapping-table % ";" %
   ] "" make ;
 
-GENERIC: insert-sql
+GENERIC: insert-sql ( mapping -- string )
 M: mapping insert-sql ( mapping -- string )
   #! Return the SQL used to insert a tuple into a table
   [
@@ -118,7 +118,7 @@ M: mapping insert-sql ( mapping -- string )
     ");" %
   ] "" make ;
 
-GENERIC: delete-sql
+GENERIC: delete-sql ( mapping -- string )
 M: mapping delete-sql ( mapping -- string )
   #! Return the SQL used to delete a tuple from a table
   [
@@ -126,7 +126,7 @@ M: mapping delete-sql ( mapping -- string )
     " where ROWID=:rowid;" % 
   ] "" make ;
 
-GENERIC: update-sql
+GENERIC: update-sql ( mapping -- string )
 M: mapping update-sql ( mapping -- string )
   #! Return the SQL used to update the tuple
   [
@@ -136,7 +136,7 @@ M: mapping update-sql ( mapping -- string )
     " where ROWID=:rowid;" %
   ] "" make ;
 
-GENERIC: select-sql
+GENERIC: select-sql ( tuple mapping -- select )
 M: mapping select-sql ( tuple mapping -- select )
   #! Return the SQL used to select a series of tuples from the database. It
   #! will select based on only the filled in fields of the tuple (ie. all non-f).
