@@ -303,7 +303,7 @@ FUNCTION: uchar* PQescapeByteaConn ( PGconn* conn,
 FUNCTION: uchar* PQunescapeBytea ( uchar* strtext,
                 size_t* retbuflen ) ;
 ! These forms are deprecated!
-FUNCTION: size_t PQescapeString ( char* to, char* from, size_t length ) ;
+FUNCTION: size_t PQescapeString ( void* to, char* from, size_t length ) ;
 FUNCTION: uchar* PQescapeBytea ( uchar* bintext, size_t binlen,
 			  size_t* bytealen ) ;
 
