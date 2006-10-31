@@ -127,7 +127,7 @@ SYMBOL: html
 
 : define-attribute-word ( name -- )
     dup "=" swap append swap
-    [ write-attr ] curry html-word drop ;
+    [ write-attr ] curry html-word ;
 
 ! Define some closed HTML tags
 [
