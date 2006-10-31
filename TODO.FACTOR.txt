@@ -1,14 +1,15 @@
-- live search: timer delay would be nice
-- menu should stay up if mouse button released
-- roundoff is still not quite right with tracks
 - fix compiled gc check
   - there was a performance hit, investigate
   - float boxing and overflow checks need a gc check too
 - [ [ dup call ] dup call ] infer hangs
-- growable data heap
+- relocation should not cons at all
+- docs: mention that 'like' may destroy the underlying sequence
 
 + ui:
 
+- live search: timer delay would be nice
+- menu should stay up if mouse button released
+- roundoff is still not quite right with tracks
 - grid displays quickly now, but constructing large amounts of gadgets
   is slow: eg, 10000 [ dup number>string ] map describe
 - completion is not ideal: eg, C+e "buttons"
@@ -42,7 +43,6 @@
 
 + compiler/ffi:
 
-- relocation should not cons at all
 - stdcall callbacks
 - callstack overflow when compiling mutually recursive inline words
 - test what is done in the case of an invalid declaration on an inline
@@ -70,6 +70,7 @@
 
 + misc:
 
+- growable data heap
 - minor GC takes too long now, we should card mark code heap
 - buffer-ptr should be an alien
 - swap nappend ==> nappend

@@ -19,17 +19,6 @@ IN: image
 : untag ( cell -- cell ) tag-mask bitnot bitand ; inline
 : tag ( cell -- tag ) tag-mask bitand ; inline
 
-: array-type      8  ; inline
-: hashtable-type  10 ; inline
-: vector-type     11 ; inline
-: string-type     12 ; inline
-: sbuf-type       13 ; inline
-: quotation-type  14 ; inline
-: dll-type        15 ; inline
-: alien-type      16 ; inline
-: tuple-type      17 ; inline
-: byte-array-type 18 ; inline
-
 : data-base 1024 ; inline
 
 : boot-quot-offset      3 ; inline

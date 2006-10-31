@@ -23,7 +23,7 @@ static mach_port_t our_exception_port;
 static void
 terminating_handler (void *fault_addr)
 {
-  memory_protection_error(fault_addr,SIGSEGV);
+  memory_protection_error((CELL)fault_addr,SIGSEGV);
   abort ();
 }
 

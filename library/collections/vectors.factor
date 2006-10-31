@@ -4,8 +4,7 @@ IN: vectors
 USING: arrays errors generic kernel kernel-internals math
 math-internals sequences sequences-internals words ;
 
-M: vector set-length
-    grow-length ;
+M: vector set-length grow-length ;
 
 M: vector nth-unsafe underlying nth-unsafe ;
 

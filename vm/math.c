@@ -101,7 +101,7 @@ void primitive_fixnum_divint(void)
 void primitive_fixnum_divfloat(void)
 {
 	POP_FIXNUMS(x,y)
-	dpush(tag_float((double)x / (double)y));
+	box_double((double)x / (double)y);
 }
 
 void primitive_fixnum_divmod(void)
@@ -266,58 +266,55 @@ F_ARRAY* to_bignum(CELL tagged)
 
 void primitive_to_bignum(void)
 {
-	maybe_gc(0);
 	drepl(tag_bignum(to_bignum(dpeek())));
 }
 
-#define GC_AND_POP_BIGNUMS(x,y) \
-	F_ARRAY *x, *y; \
-	maybe_gc(0); \
-	y = untag_bignum_fast(dpop()); \
-	x = untag_bignum_fast(dpop());
+#define POP_BIGNUMS(x,y) \
+	F_ARRAY *y = untag_bignum_fast(dpop()); \
+	F_ARRAY *x = untag_bignum_fast(dpop());
 
 void primitive_bignum_eq(void)
 {
-	GC_AND_POP_BIGNUMS(x,y);
+	POP_BIGNUMS(x,y);
 	box_boolean(s48_bignum_equal_p(x,y));
 }
 
 void primitive_bignum_add(void)
 {
-	GC_AND_POP_BIGNUMS(x,y);
+	POP_BIGNUMS(x,y);
 	dpush(tag_bignum(s48_bignum_add(x,y)));
 }
 
 void primitive_bignum_subtract(void)
 {
-	GC_AND_POP_BIGNUMS(x,y);
+	POP_BIGNUMS(x,y);
 	dpush(tag_bignum(s48_bignum_subtract(x,y)));
 }
 
 void primitive_bignum_multiply(void)
 {
-	GC_AND_POP_BIGNUMS(x,y);
+	POP_BIGNUMS(x,y);
 	dpush(tag_bignum(s48_bignum_multiply(x,y)));
 }
 
 void primitive_bignum_divint(void)
 {
-	GC_AND_POP_BIGNUMS(x,y);
+	POP_BIGNUMS(x,y);
 	dpush(tag_bignum(s48_bignum_quotient(x,y)));
 }
 
 void primitive_bignum_divfloat(void)
 {
-	GC_AND_POP_BIGNUMS(x,y);
-	dpush(tag_float(
+	POP_BIGNUMS(x,y);
+	box_float(
 		s48_bignum_to_double(x) /
-		s48_bignum_to_double(y)));
+		s48_bignum_to_double(y));
 }
 
 void primitive_bignum_divmod(void)
 {
 	F_ARRAY *q, *r;
-	GC_AND_POP_BIGNUMS(x,y);
+	POP_BIGNUMS(x,y);
 	s48_bignum_divide(x,y,&q,&r);
 	dpush(tag_bignum(q));
 	dpush(tag_bignum(r));
@@ -325,47 +322,44 @@ void primitive_bignum_divmod(void)
 
 void primitive_bignum_mod(void)
 {
-	GC_AND_POP_BIGNUMS(x,y);
+	POP_BIGNUMS(x,y);
 	dpush(tag_bignum(s48_bignum_remainder(x,y)));
 }
 
 void primitive_bignum_and(void)
 {
-	GC_AND_POP_BIGNUMS(x,y);
+	POP_BIGNUMS(x,y);
 	dpush(tag_bignum(s48_bignum_bitwise_and(x,y)));
 }
 
 void primitive_bignum_or(void)
 {
-	GC_AND_POP_BIGNUMS(x,y);
+	POP_BIGNUMS(x,y);
 	dpush(tag_bignum(s48_bignum_bitwise_ior(x,y)));
 }
 
 void primitive_bignum_xor(void)
 {
-	GC_AND_POP_BIGNUMS(x,y);
+	POP_BIGNUMS(x,y);
 	dpush(tag_bignum(s48_bignum_bitwise_xor(x,y)));
 }
 
 void primitive_bignum_shift(void)
 {
-	F_FIXNUM y;
-        F_ARRAY* x;
-	maybe_gc(0);
-	y = to_fixnum(dpop());
-	x = to_bignum(dpop());
+	F_FIXNUM y = untag_fixnum_fast(dpop());
+        F_ARRAY* x = untag_bignum_fast(dpop());
 	dpush(tag_bignum(s48_bignum_arithmetic_shift(x,y)));
 }
 
 void primitive_bignum_less(void)
 {
-	GC_AND_POP_BIGNUMS(x,y);
+	POP_BIGNUMS(x,y);
 	box_boolean(s48_bignum_compare(x,y) == bignum_comparison_less);
 }
 
 void primitive_bignum_lesseq(void)
 {
-	GC_AND_POP_BIGNUMS(x,y);
+	POP_BIGNUMS(x,y);
 	switch(s48_bignum_compare(x,y))
 	{
 	case bignum_comparison_less:
@@ -383,13 +377,13 @@ void primitive_bignum_lesseq(void)
 
 void primitive_bignum_greater(void)
 {
-	GC_AND_POP_BIGNUMS(x,y);
+	POP_BIGNUMS(x,y);
 	box_boolean(s48_bignum_compare(x,y) == bignum_comparison_greater);
 }
 
 void primitive_bignum_greatereq(void)
 {
-	GC_AND_POP_BIGNUMS(x,y);
+	POP_BIGNUMS(x,y);
 	switch(s48_bignum_compare(x,y))
 	{
 	case bignum_comparison_less:
@@ -414,7 +408,7 @@ void primitive_bignum_not(void)
 
 void box_signed_cell(F_FIXNUM integer)
 {
-	dpush(tag_integer(integer));
+	dpush(allot_integer(integer));
 }
 
 F_FIXNUM unbox_signed_cell(void)
@@ -424,7 +418,7 @@ F_FIXNUM unbox_signed_cell(void)
 
 void box_unsigned_cell(CELL cell)
 {
-	dpush(tag_cell(cell));
+	dpush(allot_cell(cell));
 }
 
 F_FIXNUM unbox_unsigned_cell(void)
@@ -478,16 +472,9 @@ u64 unbox_unsigned_8(void)
 library implementation, to avoid breaking invariants. */
 void primitive_from_fraction(void)
 {
-	CELL numerator, denominator;
-	F_RATIO* ratio;
-
-	maybe_gc(0);
-
-	denominator = dpop();
-	numerator = dpop();
-	ratio = allot_object(RATIO_TYPE,sizeof(F_RATIO));
-	ratio->numerator = numerator;
-	ratio->denominator = denominator;
+	F_RATIO* ratio = ratio = allot_object(RATIO_TYPE,sizeof(F_RATIO));
+	ratio->denominator = dpop();
+	ratio->numerator = dpop();
 	dpush(RETAG(ratio,RATIO_TYPE));
 }
 
@@ -520,8 +507,7 @@ double to_float(CELL tagged)
 
 void primitive_to_float(void)
 {
-	maybe_gc(sizeof(F_FLOAT));
-	drepl(tag_float(to_float(dpeek())));
+	drepl(allot_float(to_float(dpeek())));
 }
 
 void primitive_str_to_float(void)
@@ -545,7 +531,7 @@ void primitive_str_to_float(void)
 		if(end != c_str + string_capacity(str))
 			drepl(F);
 		else
-			drepl(tag_float(f));
+			drepl(allot_float(f));
 	}
 }
 
@@ -569,31 +555,31 @@ void primitive_float_to_str(void)
 void primitive_float_add(void)
 {
 	GC_AND_POP_FLOATS(x,y);
-	dpush(tag_float(x + y));
+	box_float(x + y);
 }
 
 void primitive_float_subtract(void)
 {
 	GC_AND_POP_FLOATS(x,y);
-	dpush(tag_float(x - y));
+	box_float(x - y);
 }
 
 void primitive_float_multiply(void)
 {
 	GC_AND_POP_FLOATS(x,y);
-	dpush(tag_float(x * y));
+	box_float(x * y);
 }
 
 void primitive_float_divfloat(void)
 {
 	GC_AND_POP_FLOATS(x,y);
-	dpush(tag_float(x / y));
+	box_float(x / y);
 }
 
 void primitive_float_mod(void)
 {
 	GC_AND_POP_FLOATS(x,y);
-	dpush(tag_float(fmod(x,y)));
+	box_float(fmod(x,y));
 }
 
 void primitive_float_less(void)
@@ -623,21 +609,21 @@ void primitive_float_greatereq(void)
 void primitive_float_bits(void)
 {
 	FLOAT_BITS b;
-	b.x = (float)to_float(dpeek());
-	drepl(tag_cell(b.y));
+	b.x = unbox_float();
+	box_unsigned_4(b.y);
 }
 
 void primitive_bits_float(void)
 {
 	FLOAT_BITS b;
 	b.y = unbox_unsigned_4();
-	dpush(tag_float(b.x));
+	box_float(b.x);
 }
 
 void primitive_double_bits(void)
 {
 	DOUBLE_BITS b;
-	b.x = to_float(dpop());
+	b.x = unbox_double();
 	box_unsigned_8(b.y);
 }
 
@@ -645,13 +631,13 @@ void primitive_bits_double(void)
 {
 	DOUBLE_BITS b;
 	b.y = unbox_unsigned_8();
-	dpush(tag_float(b.x));
+	box_double(b.x);
 }
 
 #define FLO_DEFBOX(name,type) \
 void name (type flo)                                                       \
 {                                                                              \
-	dpush(tag_float(flo));                                               \
+	dpush(allot_float(flo));                                               \
 }
 
 #define FLO_DEFUNBOX(name,type) \
@@ -669,15 +655,8 @@ FLO_DEFUNBOX(unbox_double,double)
 
 void primitive_from_rect(void)
 {
-	CELL real, imaginary;
-	F_COMPLEX* complex;
-
-	maybe_gc(sizeof(F_COMPLEX));
-
-	imaginary = dpop();
-	real = dpop();
-	complex = allot_object(COMPLEX_TYPE,sizeof(F_COMPLEX));
-	complex->real = real;
-	complex->imaginary = imaginary;
+	F_COMPLEX* complex = allot_object(COMPLEX_TYPE,sizeof(F_COMPLEX));
+	complex->imaginary = dpop();
+	complex->real = dpop();
 	dpush(RETAG(complex,COMPLEX_TYPE));
 }

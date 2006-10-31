@@ -27,22 +27,22 @@ INLINE CELL array_size(CELL size)
 	return sizeof(F_ARRAY) + size * CELLS;
 }
 
-F_ARRAY *allot_array(CELL type, F_FIXNUM capacity);
-F_ARRAY *array(CELL type, F_FIXNUM capacity, CELL fill);
-F_ARRAY *byte_array(F_FIXNUM size);
+F_ARRAY *allot_array_internal(CELL type, F_FIXNUM capacity);
+F_ARRAY *allot_array(CELL type, F_FIXNUM capacity, CELL fill);
+F_ARRAY *allot_byte_array(F_FIXNUM size);
 
-CELL make_array_2(CELL v1, CELL v2);
-CELL make_array_4(CELL v1, CELL v2, CELL v3, CELL v4);
+CELL allot_array_2(CELL v1, CELL v2);
+CELL allot_array_4(CELL v1, CELL v2, CELL v3, CELL v4);
 
 void primitive_array(void);
 void primitive_tuple(void);
 void primitive_byte_array(void);
 void primitive_quotation(void);
 
-F_ARRAY *resize_array(F_ARRAY* array, F_FIXNUM capacity, CELL fill);
+F_ARRAY *reallot_array(F_ARRAY* array, F_FIXNUM capacity, CELL fill);
 void primitive_resize_array(void);
-void primitive_array_to_tuple(void);
-void primitive_tuple_to_array(void);
+
+void primitive_become(void);
 
 #define AREF(array,index) ((CELL)(array) + sizeof(F_ARRAY) + (index) * CELLS)
 #define UNAREF(array,ptr) (((CELL)(ptr)-(CELL)(array)-sizeof(F_ARRAY)) / CELLS)
@@ -60,7 +60,6 @@ INLINE F_VECTOR* untag_vector(CELL tagged)
 
 F_VECTOR* vector(F_FIXNUM capacity);
 
-void primitive_vector(void);
 void primitive_array_to_vector(void);
 
 #define SREF(string,index) ((CELL)string + sizeof(F_STRING) + index * CHARS)
@@ -86,12 +85,12 @@ INLINE CELL string_size(CELL size)
 	return sizeof(F_STRING) + (size + 1) * CHARS;
 }
 
-F_STRING* allot_string(F_FIXNUM capacity);
+F_STRING* allot_string_internal(F_FIXNUM capacity);
 void rehash_string(F_STRING* str);
 void primitive_rehash_string(void);
-F_STRING* string(F_FIXNUM capacity, CELL fill);
+F_STRING* allot_string(F_FIXNUM capacity, CELL fill);
 void primitive_string(void);
-F_STRING *resize_string(F_STRING *string, F_FIXNUM capacity, u16 fill);
+F_STRING *reallot_string(F_STRING *string, F_FIXNUM capacity, u16 fill);
 void primitive_resize_string(void);
 
 bool check_string(F_STRING *s, CELL max);
@@ -137,8 +136,7 @@ INLINE void set_string_nth(F_STRING* string, CELL index, u16 value)
 void primitive_char_slot(void);
 void primitive_set_char_slot(void);
 
-F_SBUF* sbuf(F_FIXNUM capacity);
-void primitive_sbuf(void);
+void primitive_string_to_sbuf(void);
 
 void primitive_hashtable(void);
 

@@ -47,13 +47,15 @@ void *unbox_alien(void)
 }
 
 /* make an alien */
-ALIEN *make_alien(CELL delegate, CELL displacement)
+CELL allot_alien(CELL delegate, CELL displacement)
 {
+	REGISTER_ROOT(delegate);
 	ALIEN *alien = allot_object(ALIEN_TYPE,sizeof(ALIEN));
+	UNREGISTER_ROOT(delegate);
 	alien->alien = delegate;
 	alien->displacement = displacement;
 	alien->expired = false;
-	return alien;
+	return tag_object(alien);
 }
 
 /* make an alien and push */
@@ -62,21 +64,18 @@ void box_alien(CELL ptr)
 	if(ptr == 0)
 		dpush(F);
 	else
-		dpush(tag_object(make_alien(F,ptr)));
+		dpush(allot_alien(F,ptr));
 }
 
 /* make an alien pointing at an offset of another alien */
 void primitive_displaced_alien(void)
 {
-	CELL alien;
-	CELL displacement;
-	maybe_gc(sizeof(ALIEN));
-	alien = dpop();
-	displacement = unbox_unsigned_cell();
+	CELL alien = dpop();
+	CELL displacement = unbox_unsigned_cell();
 	if(alien == F && displacement == 0)
 		dpush(F);
 	else
-		dpush(tag_object(make_alien(alien,displacement)));
+		dpush(allot_alien(alien,displacement));
 }
 
 /* address of an object representing a C pointer */
@@ -133,7 +132,7 @@ void unbox_value_struct(void *dest, CELL size)
 /* for FFI callbacks receiving structs by value */
 void box_value_struct(void *src, CELL size)
 {
-	F_ARRAY *array = byte_array(size);
+	F_ARRAY *array = allot_byte_array(size);
 	memcpy(array + 1,src,size);
 	dpush(tag_object(array));
 }
@@ -142,7 +141,7 @@ void box_value_struct(void *src, CELL size)
 happens on Intel Mac OS X */
 void box_value_pair(CELL x, CELL y)
 {
-	F_ARRAY *array = byte_array(8);
+	F_ARRAY *array = allot_byte_array(2 * sizeof(CELL));
 	put(AREF(array,0),x);
 	put(AREF(array,1),y);
 	dpush(tag_object(array));
@@ -150,29 +149,17 @@ void box_value_pair(CELL x, CELL y)
 
 void primitive_dlopen(void)
 {
-	DLL* dll;
-	F_STRING* path;
-
-	maybe_gc(sizeof(DLL));
-
-	path = untag_string(dpop());
-	dll = allot_object(DLL_TYPE,sizeof(DLL));
-	dll->path = tag_object(path);
+	DLL* dll = allot_object(DLL_TYPE,sizeof(DLL));
+	dll->path = dpop();
 	ffi_dlopen(dll,true);
-
 	dpush(tag_object(dll));
 }
 
 void primitive_dlsym(void)
 {
-	CELL dll;
-	F_STRING *sym;
+	CELL dll = dpop();
+	F_STRING *sym = untag_string(dpop());
 	DLL *d;
-
-	maybe_gc(0);
-
-	dll = dpop();
-	sym = untag_string(dpop());
 	
 	if(dll == F)
 		d = NULL;
@@ -183,7 +170,7 @@ void primitive_dlsym(void)
 			general_error(ERROR_EXPIRED,dll,F,true);
 	}
 
-	dpush(tag_cell((CELL)ffi_dlsym(d,sym,true)));
+	box_signed_4((CELL)ffi_dlsym(d,sym,true));
 }
 
 void primitive_dlclose(void)

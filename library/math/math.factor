@@ -24,7 +24,7 @@ G: /mod ( x y -- z w ) math-combination ; foldable
 G: bitand ( x y -- z ) math-combination ; foldable
 G: bitor  ( x y -- z ) math-combination ; foldable
 G: bitxor ( x y -- z ) math-combination ; foldable
-G: shift  ( x n -- y ) math-combination ; foldable
+G: shift  ( x n -- y ) 1 standard-combination ; foldable
 
 GENERIC: bitnot ( x -- y ) foldable
 

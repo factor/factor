@@ -1,4 +1,4 @@
-bool in_page(void *fault, void *i_area, CELL area_size, int offset);
+bool in_page(CELL fault, CELL area, CELL area_size, int offset);
 
 void *safe_malloc(size_t size);
 
@@ -100,8 +100,6 @@ typedef struct {
 	CELL base;
 	/* allocation pointer */
 	CELL here;
-	/* only for nursery: when it gets this full, call GC */
-	CELL alarm;
 	/* end of zone */
 	CELL limit;
 } ZONE;
@@ -175,17 +173,25 @@ references to an object for debugging purposes. */
 CELL heap_scan_ptr;
 
 /* GC is off during heap walking */
-bool heap_scan;
+bool gc_off;
+
+void garbage_collection(CELL gen, bool code_gc);
+
+#define REGISTER_ROOT(obj) rpush(obj)
+#define UNREGISTER_ROOT(obj) obj = rpop()
+
+/* WARNING: only call this from a context where all local variables
+are also reachable via the GC roots, or gc_off is set to true. */
+INLINE void maybe_gc(CELL size)
+{
+	if(nursery.here + size > nursery.limit)
+		garbage_collection(NURSERY,false);
+}
 
 INLINE void *allot_zone(ZONE *z, CELL a)
 {
 	CELL h = z->here;
 	z->here = h + align8(a);
-	if(z->here > z->limit)
-	{
-		fprintf(stderr,"Nursery space exhausted\n");
-		factorbug();
-	}
 
 	allot_barrier(h);
 	return (void*)h;
@@ -193,6 +199,7 @@ INLINE void *allot_zone(ZONE *z, CELL a)
 
 INLINE void *allot(CELL a)
 {
+	maybe_gc(a);
 	return allot_zone(&nursery,a);
 }
 
@@ -209,7 +216,6 @@ INLINE void* allot_object(CELL type, CELL length)
 
 void update_cards_offset(void);
 CELL collect_next(CELL scan);
-void garbage_collection(CELL gen, bool code_gc);
 void primitive_data_gc(void);
 void maybe_gc(CELL size);
 DLLEXPORT void simple_gc(void);

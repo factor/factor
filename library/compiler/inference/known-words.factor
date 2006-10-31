@@ -67,11 +67,9 @@ t over set-effect-terminated?
 "infer-effect" set-word-prop
 
 ! Stack effects for all primitives
-\ <vector> { integer } { vector } <effect> "infer-effect" set-word-prop
-
 \ rehash-string { string } { } <effect> "infer-effect" set-word-prop
 
-\ <sbuf> { integer } { sbuf } <effect> "infer-effect" set-word-prop
+\ string>sbuf { string } { sbuf } <effect> "infer-effect" set-word-prop
 
 \ >fixnum { real } { fixnum } <effect> "infer-effect" set-word-prop
 \ >fixnum t "foldable" set-word-prop
@@ -234,7 +232,7 @@ t over set-effect-terminated?
 
 \ getenv { fixnum } { object } <effect> "infer-effect" set-word-prop
 \ setenv { object fixnum } { } <effect> "infer-effect" set-word-prop
-\ stat { string } { object } <effect> "infer-effect" set-word-prop
+\ stat { string } { object object object object } <effect> "infer-effect" set-word-prop
 \ (directory) { string } { array } <effect> "infer-effect" set-word-prop
 \ data-gc { integer } { } <effect> "infer-effect" set-word-prop
 
@@ -353,9 +351,7 @@ t over set-effect-terminated?
 
 \ (clone) { object } { object } <effect> "infer-effect" set-word-prop
 
-\ array>tuple { array } { tuple } <effect> "infer-effect" set-word-prop
-
-\ tuple>array { tuple } { array } <effect> "infer-effect" set-word-prop
+\ become { object fixnum } { object } <effect> "infer-effect" set-word-prop
 
 \ array>vector { array } { vector } <effect> "infer-effect" set-word-prop
 

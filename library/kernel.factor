@@ -92,6 +92,8 @@ IN: kernel-internals
 : num-tags 8 ; inline
 : tag-bits 3 ; inline
 
+: cell ( -- n ) 17 getenv ; foldable
+
 : fixnum-tag  BIN: 000 ; inline
 : bignum-tag  BIN: 001 ; inline
 : word-tag    BIN: 010 ; inline
@@ -101,7 +103,16 @@ IN: kernel-internals
 : complex-tag BIN: 110 ; inline
 : wrapper-tag BIN: 111 ; inline
 
-: cell ( -- n ) 17 getenv ; foldable
+: array-type      8  ; inline
+: hashtable-type  10 ; inline
+: vector-type     11 ; inline
+: string-type     12 ; inline
+: sbuf-type       13 ; inline
+: quotation-type  14 ; inline
+: dll-type        15 ; inline
+: alien-type      16 ; inline
+: tuple-type      17 ; inline
+: byte-array-type 18 ; inline
 
 IN: kernel
 

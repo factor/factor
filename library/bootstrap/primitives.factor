@@ -41,9 +41,8 @@ call
     { "call" "kernel"                       }
     { "if" "kernel"                         }
     { "dispatch" "kernel-internals"         }
-    { "<vector>" "vectors"                  }
     { "rehash-string" "strings"             }
-    { "<sbuf>" "strings"                    }
+    { "string>sbuf" "strings"               }
     { ">fixnum" "math"                      }
     { ">bignum" "math"                      }
     { ">float" "math"                       }
@@ -205,8 +204,7 @@ call
     { "expired?" "alien"                    }
     { "<wrapper>" "kernel"                  }
     { "(clone)" "kernel-internals"          }
-    { "array>tuple" "kernel-internals"      }
-    { "tuple>array" "generic"               }
+    { "become" "kernel-internals"           }
     { "array>vector" "vectors"              }
     { "<string>" "strings"                  }
     { "<quotation>" "kernel"                }

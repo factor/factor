@@ -123,7 +123,6 @@ void primitive_type(void);
 void primitive_tag(void);
 void primitive_slot(void);
 void primitive_set_slot(void);
-CELL clone(CELL obj);
 void primitive_clone(void);
 
 /* Runtime errors */
@@ -164,7 +163,7 @@ void critical_error(char* msg, CELL tagged);
 void throw_error(CELL error, bool keep_stacks);
 void early_error(CELL error);
 void general_error(F_ERRORTYPE error, CELL arg1, CELL arg2, bool keep_stacks);
-void memory_protection_error(void *addr, int signal);
+void memory_protection_error(CELL addr, int signal);
 void signal_error(int signal);
 void type_error(CELL type, CELL tagged);
 void primitive_throw(void);

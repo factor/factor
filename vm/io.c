@@ -10,18 +10,12 @@ int err_no(void)
 
 /* Simple wrappers for ANSI C I/O functions, used for bootstrapping.
 The Factor library provides platform-specific code for Unix and Windows
-with many more capabilities.
-
-Note that c-streams are pretty limited and broken. Namely,
-there is a limit of 1024 characters per line, and lines containing
-\0 are not read fully.
-
-The native FFI streams in the library don't have this limitation. */
+with many more capabilities. */
 
 void init_c_io(void)
 {
-	userenv[IN_ENV] = tag_object(make_alien(F,(CELL)stdin));
-	userenv[OUT_ENV] = tag_object(make_alien(F,(CELL)stdout));
+	userenv[IN_ENV] = allot_alien(F,(CELL)stdin);
+	userenv[OUT_ENV] = allot_alien(F,(CELL)stdout);
 }
 
 void io_error(void)
@@ -55,11 +49,8 @@ void primitive_fgetc(void)
 
 void primitive_fwrite(void)
 {
-	FILE* file;
-	F_STRING* text;
-	maybe_gc(0);
-	file = (FILE*)unbox_alien();
-	text = untag_string(dpop());
+	FILE* file = (FILE*)unbox_alien();
+	F_STRING* text = untag_string(dpop());
 
 	if(string_capacity(text) == 0)
 		return;

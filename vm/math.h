@@ -76,7 +76,7 @@ void primitive_bignum_greater(void);
 void primitive_bignum_greatereq(void);
 void primitive_bignum_not(void);
 
-INLINE CELL tag_integer(F_FIXNUM x)
+INLINE CELL allot_integer(F_FIXNUM x)
 {
 	if(x < FIXNUM_MIN || x > FIXNUM_MAX)
 		return tag_bignum(s48_fixnum_to_bignum(x));
@@ -84,7 +84,7 @@ INLINE CELL tag_integer(F_FIXNUM x)
 		return tag_fixnum(x);
 }
 
-INLINE CELL tag_cell(CELL x)
+INLINE CELL allot_cell(CELL x)
 {
 	if(x > FIXNUM_MAX)
 		return tag_bignum(s48_cell_to_bignum(x));
@@ -124,21 +124,16 @@ typedef union {
     u32 y;
 } FLOAT_BITS;
 
-INLINE F_FLOAT* make_float(double n)
-{
-	F_FLOAT* flo = allot_object(FLOAT_TYPE,sizeof(F_FLOAT));
-	flo->n = n;
-	return flo;
-}
-
 INLINE double untag_float_fast(CELL tagged)
 {
 	return ((F_FLOAT*)UNTAG(tagged))->n;
 }
 
-INLINE CELL tag_float(double flo)
+INLINE CELL allot_float(double n)
 {
-	return RETAG(make_float(flo),FLOAT_TYPE);
+	F_FLOAT* flo = allot_object(FLOAT_TYPE,sizeof(F_FLOAT));
+	flo->n = n;
+	return RETAG(flo,FLOAT_TYPE);
 }
 
 double to_float(CELL tagged);

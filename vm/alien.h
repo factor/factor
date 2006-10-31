@@ -5,7 +5,7 @@ INLINE ALIEN* untag_alien_fast(CELL tagged)
 	return (ALIEN*)UNTAG(tagged);
 }
 
-ALIEN *make_alien(CELL delegate, CELL displacement);
+CELL allot_alien(CELL delegate, CELL displacement);
 
 void primitive_expired(void);
 void primitive_displaced_alien(void);

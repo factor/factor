@@ -4,7 +4,7 @@
 char *buffer_to_char_string(char *buffer)
 {
 	int capacity = strlen(buffer);
-	F_STRING *_c_str = allot_string(capacity / CHARS + 1);
+	F_STRING *_c_str = allot_c_string(capacity,sizeof(u8)) / CHARS + 1);
 	u8 *c_str = (u8*)(_c_str + 1);
 	strcpy(c_str, buffer);
 	LocalFree(buffer);
@@ -91,24 +91,26 @@ void ffi_dlclose (DLL *dll)
 
 void primitive_stat(void)
 {
-	F_STRING *path;
 	WIN32_FILE_ATTRIBUTE_DATA st;
 
-	maybe_gc(0);
-	path = untag_string(dpop());
-
-	if(!GetFileAttributesEx(to_char_string(path,true), GetFileExInfoStandard, &st)) 
+	if(!GetFileAttributesEx(
+		unbox_char_string(),
+		GetFileExInfoStandard,
+		&st)) 
 	{
+		dpush(F);
+		dpush(F);
+		dpush(F);
 		dpush(F);
 	} 
 	else 
 	{
-		CELL dirp = tag_boolean(st.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY);
-		CELL size = tag_bignum(s48_long_long_to_bignum(
+		box_boolean(st.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY);
+		box_signed_4(0);
+		box_unsigned_8(
 			(s64)st.nFileSizeLow | (s64)st.nFileSizeHigh << 32));
-		CELL mtime = tag_integer((int)
+		box_unsigned_8((int)
 			((*(s64*)&st.ftLastWriteTime - EPOCH_OFFSET) / 10000000));
-		dpush(make_array_4(dirp,tag_fixnum(0),size,mtime));
 	}
 }
 
@@ -135,7 +137,7 @@ void primitive_read_dir(void)
 
 			if(result_count == array_capacity(result))
 			{
-				result = resize_array(result,
+				result = reallot_array(result,
 					result_count * 2,F);
 			}
 			
@@ -146,7 +148,7 @@ void primitive_read_dir(void)
 		CloseHandle(dir);
 	}
 
-	result = resize_array(result,result_count,F);
+	result = reallot_array(result,result_count,F);
 
 	dpush(tag_object(result));
 }
@@ -240,7 +242,7 @@ void seh_call(void (*func)(), exception_handler_t *handler)
 
 static long exception_handler(PEXCEPTION_RECORD rec, void *frame, void *ctx, void *dispatch)
 {
-	memory_protection_error((void*)rec->ExceptionInformation[1], SIGSEGV);
+	memory_protection_error(rec->ExceptionInformation[1], SIGSEGV);
 	return -1; /* unreachable */
 }
 

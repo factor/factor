@@ -20,7 +20,7 @@ void init_factor(const char* image,
 	userenv[CPU_ENV] = tag_object(from_char_string(FACTOR_CPU_STRING));
 	userenv[OS_ENV] = tag_object(from_char_string(FACTOR_OS_STRING));
 	userenv[GEN_ENV] = tag_fixnum(gen_count);
-	userenv[CARD_OFF_ENV] = tag_cell(cards_offset);
+	userenv[CARD_OFF_ENV] = allot_cell(cards_offset);
 	userenv[IMAGE_ENV] = tag_object(from_char_string(image));
 	userenv[CELL_SIZE_ENV] = tag_fixnum(sizeof(CELL));
 }
@@ -84,11 +84,17 @@ int main(int argc, char** argv)
 		code_size * 1024 * 1024);
 
 	arg_count = (image_given ? 2 : 1);
-	args = array(ARRAY_TYPE,argc,F);
-	while(arg_count < argc)
+	
+	for(i = arg_count; i < argc; i++)
+		REGISTER_ROOT(tag_object(from_char_string(argv[i])));
+	
+	args = allot_array(ARRAY_TYPE,argc,F);
+	
+	for(i = argc - 1; i >= arg_count; i--)
 	{
-		put(AREF(args,arg_count),tag_object(from_char_string(argv[arg_count])));
-		arg_count++;
+		CELL arg;
+		UNREGISTER_ROOT(arg);
+		put(AREF(args,i),arg);
 	}
 
 	userenv[ARGS_ENV] = tag_object(args);

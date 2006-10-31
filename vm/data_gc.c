@@ -1,18 +1,12 @@
 #include "factor.h"
 
-/* this function tests if a given faulting location is in a poison page. The
-page address is taken from area + round_up_to_page_size(area_size) + 
- pagesize*offset */
-bool in_page(void *fault, void *i_area, CELL area_size, int offset)
+bool in_page(CELL fault, CELL area, CELL area_size, int offset)
 {
 	const int pagesize = getpagesize();
-	intptr_t area = (intptr_t) i_area;
-	area += pagesize * ((area_size + (pagesize - 1)) / pagesize);
+	area += area_size;
 	area += offset * pagesize;
 
-	const int page = area / pagesize;
-	const int fault_page = (intptr_t)fault / pagesize;
-	return page == fault_page;
+	return fault >= area && fault <= area + pagesize;
 }
 
 void *safe_malloc(size_t size)
@@ -81,16 +75,31 @@ void primitive_size(void)
 
 void primitive_data_room(void)
 {
-	F_ARRAY *a = array(ARRAY_TYPE,gen_count,F);
 	int gen;
+
 	box_unsigned_cell(cards_end - cards);
 	box_unsigned_cell(prior.limit - prior.base);
+	
 	for(gen = 0; gen < gen_count; gen++)
 	{
 		ZONE *z = &generations[gen];
-		put(AREF(a,gen),make_array_2(tag_cell(z->limit - z->here),
-			tag_cell(z->limit - z->base)));
+		CELL used = allot_cell(z->limit - z->here);
+		REGISTER_ROOT(used);
+		CELL total = allot_cell(z->limit - z->base);
+		UNREGISTER_ROOT(used);
+		CELL pair = allot_array_2(used,total);
+		REGISTER_ROOT(pair);
 	}
+
+	F_ARRAY *a = allot_array(ARRAY_TYPE,gen_count,F);
+
+	for(gen = gen_count - 1; gen >= 0; gen--)
+	{
+		CELL pair;
+		UNREGISTER_ROOT(pair);
+		put(AREF(a,gen),pair);
+	}
+
 	dpush(tag_object(a));
 }
 
@@ -99,7 +108,7 @@ void primitive_begin_scan(void)
 {
 	garbage_collection(TENURED,false);
 	heap_scan_ptr = tenured.base;
-	heap_scan = true;
+	gc_off = true;
 }
 
 /* Push object at heap scan cursor and advance; pushes f when done */
@@ -109,7 +118,7 @@ void primitive_next_object(void)
 	CELL obj = heap_scan_ptr;
 	CELL type;
 
-	if(!heap_scan)
+	if(!gc_off)
 		general_error(ERROR_HEAP_SCAN,F,F,true);
 
 	if(heap_scan_ptr >= tenured.here)
@@ -130,7 +139,7 @@ void primitive_next_object(void)
 /* Re-enables GC */
 void primitive_end_scan(void)
 {
-	heap_scan = false;
+	gc_off = false;
 }
 
 /* scan all the objects in the card */
@@ -204,7 +213,6 @@ CELL init_zone(ZONE *z, CELL size, CELL base)
 {
 	z->base = z->here = base;
 	z->limit = z->base + size;
-	z->alarm = z->base + (size * 3) / 4;
 	return z->limit;
 }
 
@@ -221,10 +229,7 @@ void update_cards_offset(void)
 - two semispaces: tenured and prior
 - younger generations follow
 there are two reasons for this:
-- we can easily check if a pointer is in some generation or a younger one
-- the nursery grows into the guard page, so allot() does not have to
-check for out of memory, whereas allot_zone() (used by the GC) longjmp()s
-back to collecting a higher generation */
+- we can easily check if a pointer is in some generation or a younger one */
 void init_data_heap(CELL gens, CELL young_size, CELL aging_size)
 {
 	int i;
@@ -256,7 +261,7 @@ void init_data_heap(CELL gens, CELL young_size, CELL aging_size)
 	if(alloter != data_heap_start + total_size)
 		fatal_error("Oops",alloter);
 
-	heap_scan = false;
+	gc_off = false;
 	gc_time = 0;
 	minor_collections = 0;
 	cards_scanned = 0;
@@ -533,8 +538,8 @@ void garbage_collection(CELL gen, bool code_gc)
 	s64 start = current_millis();
 	CELL scan;
 
-	if(heap_scan)
-		critical_error("GC disabled during heap scan",gen);
+	if(gc_off)
+		critical_error("GC disabled",gen);
 
 	/* we come back here if a generation is full */
 	if(setjmp(gc_jmp))
@@ -577,31 +582,12 @@ void garbage_collection(CELL gen, bool code_gc)
 
 void primitive_data_gc(void)
 {
-	CELL gen = to_fixnum(dpop());
+	F_FIXNUM gen = unbox_signed_cell();
 	if(gen <= NURSERY)
 		gen = NURSERY;
 	else if(gen >= TENURED)
 		gen = TENURED;
 	garbage_collection(gen,false);
-}
-
-/* WARNING: only call this from a context where all local variables
-are also reachable via the GC roots. */
-void maybe_gc(CELL size)
-{
-	if(nursery.here + size > nursery.alarm)
-	{
-		CELL gen = NURSERY;
-		while(gen < TENURED)
-		{
-			ZONE *z = &generations[gen + 1];
-			if(z->here < z->alarm)
-				break;
-			gen++;
-		}
-
-		garbage_collection(gen,false);
-	}
 }
 
 void simple_gc(void)

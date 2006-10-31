@@ -64,20 +64,20 @@ void ffi_dlclose(DLL *dll)
 void primitive_stat(void)
 {
 	struct stat sb;
-	F_STRING* path;
 
-	maybe_gc(0);
-
-	path = untag_string(dpop());
-	if(stat(to_char_string(path,true),&sb) < 0)
+	if(stat(unbox_char_string(),&sb) < 0)
+	{
 		dpush(F);
+		dpush(F);
+		dpush(F);
+		dpush(F);
+	}
 	else
 	{
-		CELL dirp = tag_boolean(S_ISDIR(sb.st_mode));
-		CELL mode = tag_fixnum(sb.st_mode & ~S_IFMT);
-		CELL size = tag_bignum(s48_long_long_to_bignum(sb.st_size));
-		CELL mtime = tag_integer(sb.st_mtime);
-		dpush(make_array_4(dirp,mode,size,mtime));
+		box_boolean(S_ISDIR(sb.st_mode));
+		box_signed_4(sb.st_mode & ~S_IFMT);
+		box_unsigned_8(sb.st_size);
+		box_unsigned_8(sb.st_mtime);
 	}
 }
 
@@ -90,7 +90,7 @@ void primitive_read_dir(void)
 
 	maybe_gc(0);
 
-	result = array(ARRAY_TYPE,100,F);
+	result = allot_array(ARRAY_TYPE,100,F);
 
 	path = untag_string(dpop());
 	dir = opendir(to_char_string(path,true));
@@ -103,7 +103,7 @@ void primitive_read_dir(void)
 			CELL name = tag_object(from_char_string(file->d_name));
 			if(result_count == array_capacity(result))
 			{
-				result = resize_array(result,
+				result = reallot_array(result,
 					result_count * 2,F);
 			}
 			
@@ -114,7 +114,7 @@ void primitive_read_dir(void)
 		closedir(dir);
 	}
 
-	result = resize_array(result,result_count,F);
+	result = reallot_array(result,result_count,F);
 
 	dpush(tag_object(result));
 }
@@ -174,7 +174,7 @@ void dealloc_bounded_block(BOUNDED_BLOCK *block)
 
 void signal_handler(int signal, siginfo_t* siginfo, void* uap)
 {
-	memory_protection_error(siginfo->si_addr, signal);
+	memory_protection_error((CELL)siginfo->si_addr, signal);
 }
 
 static void sigaction_safe(int signum, const struct sigaction *act, struct sigaction *oldact)

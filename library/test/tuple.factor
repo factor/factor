@@ -111,7 +111,7 @@ TUPLE: size-test a b c d ;
 
 [ t ] [
     T{ size-test } array-capacity
-    size-test "tuple-size" word-prop =
+    size-test tuple-size =
 ] unit-test
 
 GENERIC: <yo-momma>

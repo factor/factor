@@ -14,12 +14,12 @@ bool unbox_boolean(void)
 
 /* the array is full of undefined data, and must be correctly filled before the
 next GC. size is in cells */
-F_ARRAY *allot_array(CELL type, F_FIXNUM capacity)
+F_ARRAY *allot_array_internal(CELL type, F_FIXNUM capacity)
 {
 	F_ARRAY *array;
 
 	if(capacity < 0)
-		general_error(ERROR_NEGATIVE_ARRAY_SIZE,tag_integer(capacity),F,true);
+		general_error(ERROR_NEGATIVE_ARRAY_SIZE,allot_integer(capacity),F,true);
 
 	array = allot_object(type,array_size(capacity));
 	array->capacity = tag_fixnum(capacity);
@@ -27,75 +27,78 @@ F_ARRAY *allot_array(CELL type, F_FIXNUM capacity)
 }
 
 /* make a new array with an initial element */
-F_ARRAY *array(CELL type, F_FIXNUM capacity, CELL fill)
+F_ARRAY *allot_array(CELL type, F_FIXNUM capacity, CELL fill)
 {
 	int i;
-	F_ARRAY* array = allot_array(type, capacity);
+	REGISTER_ROOT(fill);
+	F_ARRAY* array = allot_array_internal(type, capacity);
+	UNREGISTER_ROOT(fill);
 	for(i = 0; i < capacity; i++)
 		put(AREF(array,i),fill);
 	return array;
 }
 
 /* size is in bytes this time */
-F_ARRAY *byte_array(F_FIXNUM size)
+F_ARRAY *allot_byte_array(F_FIXNUM size)
 {
 	F_FIXNUM byte_size = (size + sizeof(CELL) - 1) / sizeof(CELL);
-	return array(BYTE_ARRAY_TYPE,byte_size,0);
+	return allot_array(BYTE_ARRAY_TYPE,byte_size,0);
 }
 
 /* push a new array on the stack */
 void primitive_array(void)
 {
-	CELL initial;
-	F_FIXNUM size;
-	maybe_gc(0);
-	initial = dpop();
-	size = to_fixnum(dpop());
-	dpush(tag_object(array(ARRAY_TYPE,size,initial)));
+	CELL initial = dpop();
+	F_FIXNUM size = unbox_signed_cell();
+	dpush(tag_object(allot_array(ARRAY_TYPE,size,initial)));
 }
 
 /* push a new tuple on the stack */
 void primitive_tuple(void)
 {
-	CELL class;
-	F_FIXNUM size;
-	F_ARRAY *tuple;
-	maybe_gc(0);
-	size = to_fixnum(dpop());
-	class = dpop();
-	tuple = array(TUPLE_TYPE,size,F);
-	put(AREF(tuple,0),class);
+	F_FIXNUM size = unbox_signed_cell();
+	F_ARRAY *tuple = allot_array(TUPLE_TYPE,size,F);
+	put(AREF(tuple,0),dpop());
 	dpush(tag_object(tuple));
 }
 
 /* push a new byte on the stack */
 void primitive_byte_array(void)
 {
-	F_FIXNUM size = to_fixnum(dpop());
-	maybe_gc(0);
-	dpush(tag_object(byte_array(size)));
+	F_FIXNUM size = unbox_signed_cell();
+	dpush(tag_object(allot_byte_array(size)));
 }
 
 /* push a new quotation on the stack */
 void primitive_quotation(void)
 {
-	F_FIXNUM size;
-	maybe_gc(0);
-	size = to_fixnum(dpop());
-	dpush(tag_object(array(QUOTATION_TYPE,size,F)));
+	F_FIXNUM size = unbox_signed_cell();
+	dpush(tag_object(allot_array(QUOTATION_TYPE,size,F)));
 }
 
-CELL make_array_2(CELL v1, CELL v2)
+CELL allot_array_2(CELL v1, CELL v2)
 {
-	F_ARRAY *a = array(ARRAY_TYPE,2,F);
+	REGISTER_ROOT(v1);
+	REGISTER_ROOT(v2);
+	F_ARRAY *a = allot_array_internal(ARRAY_TYPE,2);
+	UNREGISTER_ROOT(v2);
+	UNREGISTER_ROOT(v1);
 	put(AREF(a,0),v1);
 	put(AREF(a,1),v2);
 	return tag_object(a);
 }
 
-CELL make_array_4(CELL v1, CELL v2, CELL v3, CELL v4)
+CELL allot_array_4(CELL v1, CELL v2, CELL v3, CELL v4)
 {
-	F_ARRAY *a = array(ARRAY_TYPE,4,F);
+	REGISTER_ROOT(v1);
+	REGISTER_ROOT(v2);
+	REGISTER_ROOT(v3);
+	REGISTER_ROOT(v4);
+	F_ARRAY *a = allot_array_internal(ARRAY_TYPE,4);
+	UNREGISTER_ROOT(v4);
+	UNREGISTER_ROOT(v3);
+	UNREGISTER_ROOT(v2);
+	UNREGISTER_ROOT(v1);
 	put(AREF(a,0),v1);
 	put(AREF(a,1),v2);
 	put(AREF(a,2),v3);
@@ -103,7 +106,7 @@ CELL make_array_4(CELL v1, CELL v2, CELL v3, CELL v4)
 	return tag_object(a);
 }
 
-F_ARRAY* resize_array(F_ARRAY* array, F_FIXNUM capacity, CELL fill)
+F_ARRAY *reallot_array(F_ARRAY* array, F_FIXNUM capacity, CELL fill)
 {
 	int i;
 	F_ARRAY* new_array;
@@ -111,9 +114,15 @@ F_ARRAY* resize_array(F_ARRAY* array, F_FIXNUM capacity, CELL fill)
 	CELL to_copy = array_capacity(array);
 	if(capacity < to_copy)
 		to_copy = capacity;
-	
-	new_array = allot_array(untag_header(array->header),capacity);
-	
+
+	REGISTER_ROOT(tag_object(array));
+	REGISTER_ROOT(fill);
+
+	new_array = allot_array_internal(untag_header(array->header),capacity);
+
+	UNREGISTER_ROOT(fill);
+	array = untag_array_fast(rpop());
+
 	memcpy(new_array + 1,array + 1,to_copy * CELLS);
 	
 	for(i = to_copy; i < capacity; i++)
@@ -124,65 +133,34 @@ F_ARRAY* resize_array(F_ARRAY* array, F_FIXNUM capacity, CELL fill)
 
 void primitive_resize_array(void)
 {
-	F_ARRAY* array;
-	F_FIXNUM capacity = to_fixnum(dpeek2());
-	maybe_gc(array_size(capacity));
-	array = untag_array(dpop());
-	drepl(tag_object(resize_array(array,capacity,F)));
+	F_ARRAY* array = untag_array(dpop());
+	F_FIXNUM capacity = unbox_signed_cell();
+	dpush(tag_object(reallot_array(array,capacity,F)));
 }
 
-void primitive_array_to_tuple(void)
+void primitive_become(void)
 {
-	CELL array = dpeek();
-	type_check(ARRAY_TYPE,array);
-	array = clone(array);
-	put(SLOT(UNTAG(array),0),tag_header(TUPLE_TYPE));
-	drepl(array);
-}
-
-void primitive_tuple_to_array(void)
-{
-	CELL tuple = dpeek();
-	type_check(TUPLE_TYPE,tuple);
-	tuple = clone(tuple);
-	put(SLOT(UNTAG(tuple),0),tag_header(ARRAY_TYPE));
-	drepl(tuple);
-}
-
-F_VECTOR* vector(F_FIXNUM capacity)
-{
-	F_VECTOR* vector = allot_object(VECTOR_TYPE,sizeof(F_VECTOR));
-	vector->top = tag_fixnum(0);
-	vector->array = tag_object(array(ARRAY_TYPE,capacity,F));
-	return vector;
-}
-
-void primitive_vector(void)
-{
-	CELL size = to_fixnum(dpeek());
-	maybe_gc(array_size(size) + sizeof(F_VECTOR));
-	drepl(tag_object(vector(size)));
+	CELL type = unbox_signed_cell();
+	CELL obj = dpeek();
+	put(SLOT(UNTAG(obj),0),tag_header(type));
 }
 
 void primitive_array_to_vector(void)
 {
-	F_ARRAY *array;
-	F_VECTOR *vector;
-	maybe_gc(sizeof(F_VECTOR));
-	array = untag_array(dpeek());
-	vector = allot_object(VECTOR_TYPE,sizeof(F_VECTOR));
+	F_VECTOR *vector = allot_object(VECTOR_TYPE,sizeof(F_VECTOR));
+	F_ARRAY *array = untag_array(dpeek());
 	vector->top = array->capacity;
 	vector->array = tag_object(array);
 	drepl(tag_object(vector));
 }
 
 /* untagged */
-F_STRING* allot_string(F_FIXNUM capacity)
+F_STRING* allot_string_internal(F_FIXNUM capacity)
 {
 	F_STRING* string;
 
 	if(capacity < 0)
-		general_error(ERROR_NEGATIVE_ARRAY_SIZE,tag_integer(capacity),F,true);
+		general_error(ERROR_NEGATIVE_ARRAY_SIZE,allot_integer(capacity),F,true);
 
 	string = allot_object(STRING_TYPE,
 		sizeof(F_STRING) + (capacity + 1) * CHARS);
@@ -213,11 +191,11 @@ void primitive_rehash_string(void)
 }
 
 /* untagged */
-F_STRING *string(F_FIXNUM capacity, CELL fill)
+F_STRING *allot_string(F_FIXNUM capacity, CELL fill)
 {
 	CELL i;
 
-	F_STRING* string = allot_string(capacity);
+	F_STRING* string = allot_string_internal(capacity);
 
 	for(i = 0; i < capacity; i++)
 		cput(SREF(string,i),fill);
@@ -229,13 +207,12 @@ F_STRING *string(F_FIXNUM capacity, CELL fill)
 
 void primitive_string(void)
 {
-	CELL initial = to_cell(dpop());
-	F_FIXNUM length = to_fixnum(dpop());
-	maybe_gc(string_size(length));
-	dpush(tag_object(string(length,initial)));
+	CELL initial = unbox_unsigned_cell();
+	F_FIXNUM length = unbox_signed_cell();
+	dpush(tag_object(allot_string(length,initial)));
 }
 
-F_STRING* resize_string(F_STRING* string, F_FIXNUM capacity, u16 fill)
+F_STRING* reallot_string(F_STRING* string, F_FIXNUM capacity, u16 fill)
 {
 	/* later on, do an optimization: if end of array is here, just grow */
 	CELL i;
@@ -244,7 +221,11 @@ F_STRING* resize_string(F_STRING* string, F_FIXNUM capacity, u16 fill)
 	if(capacity < to_copy)
 		to_copy = capacity;
 
-	F_STRING* new_string = allot_string(capacity);
+	REGISTER_ROOT(tag_object(string));
+
+	F_STRING* new_string = allot_string_internal(capacity);
+
+	string = untag_string_fast(rpop());
 
 	memcpy(new_string + 1,string + 1,to_copy * CHARS);
 
@@ -256,11 +237,9 @@ F_STRING* resize_string(F_STRING* string, F_FIXNUM capacity, u16 fill)
 
 void primitive_resize_string(void)
 {
-	F_STRING* string;
-	CELL capacity = to_fixnum(dpeek2());
-	maybe_gc(string_size(capacity));
-	string = untag_string_fast(dpop());
-	drepl(tag_object(resize_string(string,capacity,0)));
+	F_STRING* string = untag_string_fast(dpop());
+	F_FIXNUM capacity = unbox_signed_cell();
+	drepl(tag_object(reallot_string(string,capacity,0)));
 }
 
 /* Some ugly macros to prevent a 2x code duplication */
@@ -268,7 +247,7 @@ void primitive_resize_string(void)
 #define MEMORY_TO_STRING(type,utype) \
 	F_STRING *memory_to_##type##_string(const type *string, CELL length) \
 	{ \
-		F_STRING* s = allot_string(length); \
+		F_STRING* s = allot_string_internal(length); \
 		CELL i; \
 		for(i = 0; i < length; i++) \
 		{ \
@@ -319,7 +298,7 @@ bool check_string(F_STRING *s, CELL max)
 
 F_ARRAY *allot_c_string(CELL capacity, CELL size)
 {
-	return allot_array(BYTE_ARRAY_TYPE,capacity * size / CELLS + 1);
+	return allot_array_internal(BYTE_ARRAY_TYPE,capacity * size / CELLS + 1);
 }
 
 #define STRING_TO_MEMORY(type) \
@@ -391,29 +370,18 @@ void primitive_set_char_slot(void)
 	set_string_nth(string,index,value);
 }
 
-F_SBUF* sbuf(F_FIXNUM capacity)
+void primitive_string_to_sbuf(void)
 {
-	F_SBUF* sbuf;
-	if(capacity < 0)
-		general_error(ERROR_NEGATIVE_ARRAY_SIZE,tag_integer(capacity),F,true);
-	sbuf = allot_object(SBUF_TYPE,sizeof(F_SBUF));
-	sbuf->top = tag_fixnum(0);
-	sbuf->string = tag_object(string(capacity,'\0'));
-	return sbuf;
-}
-
-void primitive_sbuf(void)
-{
-	CELL size = to_fixnum(dpeek());
-	maybe_gc(sizeof(F_SBUF) + string_size(size));
-	drepl(tag_object(sbuf(size)));
+	F_SBUF *sbuf = allot_object(SBUF_TYPE,sizeof(F_SBUF));
+	F_STRING *string = untag_string(dpeek());
+	sbuf->top = string->length;
+	sbuf->string = tag_object(string);
+	drepl(tag_object(sbuf));
 }
 
 void primitive_hashtable(void)
 {
-	F_HASHTABLE* hash;
-	maybe_gc(0);
-	hash = allot_object(HASHTABLE_TYPE,sizeof(F_HASHTABLE));
+	F_HASHTABLE* hash = allot_object(HASHTABLE_TYPE,sizeof(F_HASHTABLE));
 	hash->count = F;
 	hash->deleted = F;
 	hash->array = F;
@@ -429,22 +397,14 @@ void update_xt(F_WORD* word)
 /* <word> ( name vocabulary -- word ) */
 void primitive_word(void)
 {
-	F_WORD *word;
-	CELL name, vocabulary;
-
-	maybe_gc(sizeof(F_WORD));
-
-	vocabulary = dpop();
-	name = dpop();
-	word = allot_object(WORD_TYPE,sizeof(F_WORD));
+	F_WORD *word = allot_object(WORD_TYPE,sizeof(F_WORD));
 	word->hashcode = tag_fixnum(rand());
-	word->name = name;
-	word->vocabulary = vocabulary;
+	word->vocabulary = dpop();
+	word->name = dpop();
 	word->primitive = tag_fixnum(0);
 	word->def = F;
 	word->props = F;
-	word->compiledp = F;
-	word->xt = (CELL)undefined;
+	update_xt(word);
 	dpush(tag_word(word));
 }
 
@@ -456,7 +416,7 @@ void primitive_update_xt(void)
 void primitive_word_xt(void)
 {
 	F_WORD *word = untag_word(dpeek());
-	drepl(tag_cell(word->xt));
+	drepl(allot_cell(word->xt));
 }
 
 void fixup_word(F_WORD* word)
@@ -471,11 +431,7 @@ void fixup_word(F_WORD* word)
 
 void primitive_wrapper(void)
 {
-	F_WRAPPER *wrapper;
-
-	maybe_gc(sizeof(F_WRAPPER));
-
-	wrapper = allot_object(WRAPPER_TYPE,sizeof(F_WRAPPER));
+	F_WRAPPER *wrapper = allot_object(WRAPPER_TYPE,sizeof(F_WRAPPER));
 	wrapper->object = dpeek();
 	drepl(tag_wrapper(wrapper));
 }

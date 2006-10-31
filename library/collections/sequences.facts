@@ -1,4 +1,10 @@
-USING: help sequences sequences-internals ;
+USING: arrays help sequences sequences-internals vectors
+strings ;
+
+HELP: <vector>
+{ $values { "n" "a positive integer specifying initial capacity" } { "vector" "a new vector" } }
+{ $description "Creates a new vector that can hold " { $snippet "n" } " elements before resizing." }
+{ $see-also <array> <string> <sbuf> } ;
 
 HELP: length
 { $values { "seq" "a sequence" } { "n" "a non-negative integer" } }

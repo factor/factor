@@ -1,7 +1,13 @@
 ! Copyright (C) 2005 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
+IN: vectors
+USING: arrays kernel sequences-internals ;
+
+: <vector> ( n -- vector )
+    f <array> array>vector 0 over set-fill ;
+
 IN: sequences
-USING: errors generic kernel math math-internals strings vectors ;
+USING: errors generic math math-internals strings ;
 
 GENERIC: length ( seq -- n )
 GENERIC: set-length ( n seq -- )

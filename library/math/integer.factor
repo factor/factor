@@ -71,7 +71,7 @@ M: fixnum /mod fixnum/mod ;
 M: fixnum bitand fixnum-bitand ;
 M: fixnum bitor fixnum-bitor ;
 M: fixnum bitxor fixnum-bitxor ;
-M: fixnum shift fixnum-shift ;
+M: fixnum shift >fixnum fixnum-shift ;
 
 M: fixnum bitnot fixnum-bitnot ;
 
@@ -93,7 +93,7 @@ M: bignum /mod bignum/mod ;
 M: bignum bitand bignum-bitand ;
 M: bignum bitor bignum-bitor ;
 M: bignum bitxor bignum-bitxor ;
-M: bignum shift bignum-shift ;
+M: bignum shift >fixnum bignum-shift ;
 
 M: bignum bitnot bignum-bitnot ;
 

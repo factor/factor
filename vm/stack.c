@@ -241,35 +241,29 @@ void primitive_from_r(void)
 	dpush(rpop());
 }
 
-F_VECTOR* stack_to_vector(CELL bottom, CELL top)
+void stack_to_vector(CELL bottom, CELL top)
 {
 	CELL depth = (top - bottom + CELLS) / CELLS;
-	F_VECTOR *v = vector(depth);
-	F_ARRAY *a = untag_array_fast(v->array);
+	F_ARRAY *a = allot_array_internal(ARRAY_TYPE,depth);
 	memcpy(a + 1,(void*)bottom,depth * CELLS);
-	v->top = tag_fixnum(depth);
-	return v;
+	dpush(tag_object(a));
+	primitive_array_to_vector();
 }
 
 void primitive_datastack(void)
 {
-	maybe_gc(0);
-	dpush(tag_object(stack_to_vector(ds_bot,ds)));
+	stack_to_vector(ds_bot,ds);
 }
 
 void primitive_retainstack(void)
 {
-	maybe_gc(0);
-	dpush(tag_object(stack_to_vector(rs_bot,rs)));
+	stack_to_vector(rs_bot,rs);
 }
 
 void primitive_callstack(void)
 {
-	maybe_gc(0);
-	
 	CELL depth = (cs - cs_bot + CELLS) / CELLS - 3;
-	F_VECTOR *v = vector(depth);
-	F_ARRAY *a = untag_array_fast(v->array);
+	F_ARRAY *a = allot_array_internal(ARRAY_TYPE,depth);
 	CELL i;
 	CELL ptr = cs_bot;
 	
@@ -284,8 +278,8 @@ void primitive_callstack(void)
 		put(AREF(a,i + 2),tag_fixnum(end));
 	}
 
-	v->top = tag_fixnum(depth);
-	dpush(tag_object(v));
+	dpush(tag_object(a));
+	primitive_array_to_vector();
 }
 
 /* returns pointer to top of stack */

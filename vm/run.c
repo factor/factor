@@ -161,7 +161,7 @@ void primitive_setenv(void)
 
 void primitive_exit(void)
 {
-	exit(to_fixnum(dpop()));
+	exit(unbox_signed_cell());
 }
 
 void primitive_os_env(void)
@@ -217,18 +217,13 @@ void primitive_set_slot(void)
 	write_barrier(obj);
 }
 
-CELL clone(CELL obj)
-{
-	CELL size = object_size(obj);
-	CELL tag = TAG(obj);
-	void *new_obj = allot(size);
-	return RETAG(memcpy(new_obj,(void*)UNTAG(obj),size),tag);
-}
-
 void primitive_clone(void)
 {
-	maybe_gc(0);
-	drepl(clone(dpeek()));
+	CELL size = object_size(dpeek());
+	void *new_obj = allot(size);
+	CELL tag = TAG(dpeek());
+	memcpy(new_obj,(void*)UNTAG(dpeek()),size);
+	drepl(RETAG(new_obj,tag));
 }
 
 void fatal_error(char* msg, CELL tagged)
@@ -281,23 +276,23 @@ void primitive_die(void)
 
 void general_error(F_ERRORTYPE error, CELL arg1, CELL arg2, bool keep_stacks)
 {
-	throw_error(make_array_4(userenv[ERROR_ENV],
+	throw_error(allot_array_4(userenv[ERROR_ENV],
 		tag_fixnum(error),arg1,arg2),keep_stacks);
 }
 
-void memory_protection_error(void *addr, int signal)
+void memory_protection_error(CELL addr, int signal)
 {
-	if(in_page(addr, (void *) ds_bot, 0, -1))
+	if(in_page(addr, ds_bot, 0, -1))
 		general_error(ERROR_DS_UNDERFLOW,F,F,false);
-	else if(in_page(addr, (void *) ds_bot, ds_size, 0))
+	else if(in_page(addr, ds_bot, ds_size, 0))
 		general_error(ERROR_DS_OVERFLOW,F,F,false);
-	else if(in_page(addr, (void *) rs_bot, 0, -1))
+	else if(in_page(addr, rs_bot, 0, -1))
 		general_error(ERROR_RS_UNDERFLOW,F,F,false);
-	else if(in_page(addr, (void *) rs_bot, rs_size, 0))
+	else if(in_page(addr, rs_bot, rs_size, 0))
 		general_error(ERROR_RS_OVERFLOW,F,F,false);
-	else if(in_page(addr, (void *) cs_bot, 0, -1))
+	else if(in_page(addr, cs_bot, 0, -1))
 		general_error(ERROR_CS_UNDERFLOW,F,F,false);
-	else if(in_page(addr, (void *) cs_bot, cs_size, 0))
+	else if(in_page(addr, cs_bot, cs_size, 0))
 		general_error(ERROR_CS_OVERFLOW,F,F,false);
 	else
 		signal_error(signal);

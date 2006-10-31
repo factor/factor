@@ -9,17 +9,17 @@ strings styles ;
 : path+ ( str1 str2 -- str )
     over "/" tail? [ append ] [ "/" swap append3 ] if ;
 
-: exists? ( path -- ? ) stat >boolean ;
+: exists? ( path -- ? ) stat >r 3drop r> >boolean ;
 
-: directory? ( path -- ? ) stat first ;
+: directory? ( path -- ? ) stat 3drop ;
 
 : directory ( path -- seq )
     (directory)
     [ { "." ".." } member? not ] subset natural-sort ;
 
-: file-length ( path -- n ) stat third ;
+: file-length ( path -- n ) stat 4array third ;
 
-: file-modified ( path -- n ) stat fourth ;
+: file-modified ( path -- n ) stat >r 3drop r> ;
 
 : parent-dir ( path -- parent )
     CHAR: / over last-index CHAR: \\ pick last-index max
