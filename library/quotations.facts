@@ -4,7 +4,7 @@ USING: arrays help strings vectors ;
 HELP: quotation
 { $description "The class of quotations. See " { $link "syntax-quots" } " for syntax and " { $link "quotations" } " for general information." } ;
 
-HELP: <quotation> ( n -- quot )
+HELP: <quotation>
 { $values { "n" "a non-negative integer" } { "quot" "a new quotation" } }
 { $description "Creates a new quotation with the given length and all elements initially set to " { $link f } "." }
 { $see-also <array> <string> <sbuf> <vector> } ;

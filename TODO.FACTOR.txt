@@ -8,6 +8,7 @@
 - inline float allocation needs a gc check
 - alien invoke, callback need a gc check
 - relocation should not cons at all
+- ffi_dlopen, etc
 
 + ui:
 

@@ -19,11 +19,16 @@ F_ARRAY *allot_array_internal(CELL type, F_FIXNUM capacity)
 	F_ARRAY *array;
 
 	if(capacity < 0)
+	{
 		general_error(ERROR_NEGATIVE_ARRAY_SIZE,allot_integer(capacity),F,true);
-
-	array = allot_object(type,array_size(capacity));
-	array->capacity = tag_fixnum(capacity);
-	return array;
+		return NULL;
+	}
+	else
+	{
+		array = allot_object(type,array_size(capacity));
+		array->capacity = tag_fixnum(capacity);
+		return array;
+	}
 }
 
 /* make a new array with an initial element */
@@ -53,27 +58,11 @@ void primitive_array(void)
 	dpush(tag_object(allot_array(ARRAY_TYPE,size,initial)));
 }
 
-/* push a new tuple on the stack */
-void primitive_tuple(void)
-{
-	F_FIXNUM size = unbox_signed_cell();
-	F_ARRAY *tuple = allot_array(TUPLE_TYPE,size,F);
-	put(AREF(tuple,0),dpop());
-	dpush(tag_object(tuple));
-}
-
 /* push a new byte on the stack */
 void primitive_byte_array(void)
 {
 	F_FIXNUM size = unbox_signed_cell();
 	dpush(tag_object(allot_byte_array(size)));
-}
-
-/* push a new quotation on the stack */
-void primitive_quotation(void)
-{
-	F_FIXNUM size = unbox_signed_cell();
-	dpush(tag_object(allot_array(QUOTATION_TYPE,size,F)));
 }
 
 CELL allot_array_2(CELL v1, CELL v2)
@@ -160,18 +149,23 @@ F_STRING* allot_string_internal(F_FIXNUM capacity)
 	F_STRING* string;
 
 	if(capacity < 0)
+	{
 		general_error(ERROR_NEGATIVE_ARRAY_SIZE,allot_integer(capacity),F,true);
-
-	string = allot_object(STRING_TYPE,
-		sizeof(F_STRING) + (capacity + 1) * CHARS);
-	/* strings are null-terminated in memory, even though they also
-	have a length field. The null termination allows us to add
-	the sizeof(F_STRING) to a Factor string to get a C-style
-	UTF16 string for C library calls. */
-	cput(SREF(string,capacity),(u16)'\0');
-	string->length = tag_fixnum(capacity);
-	string->hashcode = F;
-	return string;
+		return NULL;
+	}
+	else
+	{
+		string = allot_object(STRING_TYPE,
+			sizeof(F_STRING) + (capacity + 1) * CHARS);
+		/* strings are null-terminated in memory, even though they also
+		have a length field. The null termination allows us to add
+		the sizeof(F_STRING) to a Factor string to get a C-style
+		UTF16 string for C library calls. */
+		cput(SREF(string,capacity),(u16)'\0');
+		string->length = tag_fixnum(capacity);
+		string->hashcode = F;
+		return string;
+	}
 }
 
 /* call this after constructing a string */

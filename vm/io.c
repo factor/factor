@@ -50,24 +50,21 @@ void primitive_fwrite(void)
 {
 	FILE* file = (FILE*)unbox_alien();
 	F_STRING* text = untag_string(dpop());
+	F_FIXNUM length = untag_fixnum_fast(text->length);
 
 	if(string_capacity(text) == 0)
 		return;
 
-	if(fwrite(to_char_string(text,false),1,
-		untag_fixnum_fast(text->length),
-		file) == 0)
+	if(!fwrite(to_char_string(text,false),1,length,file))
 		io_error();
 }
 
 void primitive_fflush(void)
 {
-	FILE* file = (FILE*)unbox_alien();
-	fflush(file);
+	fflush((FILE*)unbox_alien());
 }
 
 void primitive_fclose(void)
 {
-	FILE* file = (FILE*)unbox_alien();
-	fclose(file);
+	fclose((FILE*)unbox_alien());
 }

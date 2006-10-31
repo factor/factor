@@ -78,10 +78,15 @@ void primitive_displaced_alien(void)
 		dpush(allot_alien(alien,displacement));
 }
 
-/* address of an object representing a C pointer */
+/* address of an object representing a C pointer. Explicitly throw an error
+if the object is a byte array, as a sanity check. */
 void primitive_alien_address(void)
 {
-	box_unsigned_cell((CELL)alien_offset(dpop()));
+	CELL object = dpop();
+	if(type_of(object) == BYTE_ARRAY_TYPE)
+		type_error(ALIEN_TYPE,object);
+	else
+		box_unsigned_cell((CELL)alien_offset(object));
 }
 
 /* image loading */
@@ -170,7 +175,7 @@ void primitive_dlsym(void)
 			general_error(ERROR_EXPIRED,dll,F,true);
 	}
 
-	box_signed_4((CELL)ffi_dlsym(d,sym,true));
+	box_signed_cell((CELL)ffi_dlsym(d,sym,true));
 }
 
 void primitive_dlclose(void)

@@ -22,9 +22,9 @@ $terpri
 { $see-also <alien> alien-address } ;
 
 HELP: alien-address ( c-ptr -- addr )
-{ $values { "c-ptr" "an alien, byte array, or " { $link f } } { "addr" "a non-negative integer" } }
+{ $values { "c-ptr" "an alien or " { $link f } } { "addr" "a non-negative integer" } }
 { $description "Outputs the address of an alien." }
-{ $warning "Taking the address of a byte array is not safe. The byte array can be moved by the garbage collector between the time the address is taken, and when it is accessed. If you need to pass pointers to C functions which will persist across alien calls, you must allocate unmanaged memory instead. See " { $link "malloc" } "." } ;
+{ $note "Taking the address of a " { $link byte-array } " is explicitly prohibited since byte arrays can be moved by the garbage collector between the time the address is taken, and when it is accessed. If you need to pass pointers to C functions which will persist across alien calls, you must allocate unmanaged memory instead. See " { $link "malloc" } "." } ;
 
 HELP: <alien>
 { $values { "address" "a non-negative integer" } { "alien" "a new alien address" } }

@@ -15,6 +15,9 @@ IN: kernel-internals
         2drop f
     ] if ;
 
+: <tuple> ( class n -- tuple )
+    f <array> [ 2 set-slot ] keep tuple-type become ;
+
 IN: generic
 
 : class ( object -- class )

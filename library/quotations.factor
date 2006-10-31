@@ -4,6 +4,8 @@ IN: kernel
 USING: arrays generic kernel-internals math namespaces sequences
 sequences-internals words ;
 
+: <quotation> ( n -- quot ) f <array> quotation-type become ;
+
 M: wrapper equal?
     over wrapper? [ [ wrapped ] 2apply = ] [ 2drop f ] if ;
 

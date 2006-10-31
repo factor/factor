@@ -93,16 +93,16 @@ void primitive_read_dir(void)
 
 		while((file = readdir(dir)) != NULL)
 		{
-			REGISTER_ARRAY(result);
-			CELL name = tag_object(from_char_string(file->d_name));
-			UNREGISTER_ARRAY(result);
-
 			if(result_count == array_capacity(result))
 			{
 				result = reallot_array(result,
 					result_count * 2,F);
 			}
-			
+
+			REGISTER_ARRAY(result);
+			CELL name = tag_object(from_char_string(file->d_name));
+			UNREGISTER_ARRAY(result);
+
 			put(AREF(result,result_count),name);
 			result_count++;
 		}

@@ -10,6 +10,8 @@ USING: alien arrays kernel kernel-internals namespaces test ;
 ! Testing the various bignum accessor
 10 <byte-array> "dump" set
 
+[ "dump" get alien-address ] unit-test-fails
+
 [ 123 ] [
     123 "dump" get 0 set-alien-signed-1
     "dump" get 0 alien-signed-1

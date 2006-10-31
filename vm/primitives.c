@@ -156,7 +156,6 @@ void* primitives[] = {
 	primitive_resize_string,
 	primitive_hashtable,
 	primitive_array,
-	primitive_tuple,
 	primitive_begin_scan,
 	primitive_next_object,
 	primitive_end_scan,
@@ -173,8 +172,7 @@ void* primitives[] = {
 	primitive_clone,
 	primitive_become,
 	primitive_array_to_vector,
-	primitive_string,
-	primitive_quotation
+	primitive_string
 };
 
 CELL primitive_to_xt(CELL primitive)

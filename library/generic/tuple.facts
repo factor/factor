@@ -81,6 +81,6 @@ HELP: tuple>array ( tuple -- array )
 { $values { "tuple" "a tuple" } { "array" "a new array" } }
 { $description "Outputs an array having the tuple's slots as elements. The first element is the tuple class word and the second is the delegate; the remainder are declared slots." } ;
 
-HELP: <tuple> ( class n -- tuple )
+HELP: <tuple>
 { $values { "class" "a class word" } { "n" "a non-negative integer" } { "tuple" "a new tuple" } }
 { $description "Low-level tuple constructor. User code should never call this directly, and instead use the constructor word which is defined for each tuple. See " { $link "tuples" } "." } ;

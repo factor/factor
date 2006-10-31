@@ -330,8 +330,6 @@ t over set-effect-terminated?
 
 \ <array> { integer object } { array } <effect> "infer-effect" set-word-prop
 
-\ <tuple> { integer word } { tuple } <effect> "infer-effect" set-word-prop
-
 \ begin-scan { } { } <effect> "infer-effect" set-word-prop
 \ next-object { } { object } <effect> "infer-effect" set-word-prop
 \ end-scan { } { } <effect> "infer-effect" set-word-prop

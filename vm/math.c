@@ -471,7 +471,7 @@ u64 unbox_unsigned_8(void)
 library implementation, to avoid breaking invariants. */
 void primitive_from_fraction(void)
 {
-	F_RATIO* ratio = ratio = allot_object(RATIO_TYPE,sizeof(F_RATIO));
+	F_RATIO* ratio = allot_object(RATIO_TYPE,sizeof(F_RATIO));
 	ratio->denominator = dpop();
 	ratio->numerator = dpop();
 	dpush(RETAG(ratio,RATIO_TYPE));
