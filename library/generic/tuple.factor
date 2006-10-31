@@ -15,8 +15,6 @@ IN: kernel-internals
         2drop f
     ] if ;
 
-: (>tuple) ( array -- tuple ) (clone) tuple-type become ;
-
 IN: generic
 
 : class ( object -- class )

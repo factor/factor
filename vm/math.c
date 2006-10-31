@@ -306,7 +306,7 @@ void primitive_bignum_divint(void)
 void primitive_bignum_divfloat(void)
 {
 	POP_BIGNUMS(x,y);
-	box_float(
+	box_double(
 		s48_bignum_to_double(x) /
 		s48_bignum_to_double(y));
 }
