@@ -237,10 +237,6 @@ M: read-task task-container drop read-tasks get-global ;
         2drop 2drop
     ] if ;
 
-: fast>string ( sbuf -- string )
-    dup length over underlying length number=
-    [ underlying ] [ >string ] if ; inline
-
 M: input-port stream-read
     >r 0 max >fixnum r>
     2dup stream-read-part dup [
@@ -248,7 +244,7 @@ M: input-port stream-read
             pick <sbuf>
             [ swap nappend ] keep
             [ stream-read-loop ] keep
-            fast>string
+            "" like
         ] [
             2nip
         ] if
