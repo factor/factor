@@ -30,6 +30,10 @@ TUPLE: win32-duplex-stream ;
     dup win32-stream-timeout
     [ millis + swap set-win32-stream-cutoff ] [ drop ] if* ;
 
+: fast>string ( sbuf -- string )
+    dup length over underlying length number=
+    [ underlying ] [ >string ] if ; inline
+
 ! Write
 : flush-output ( stream -- ) 
     dup update-timeout 
