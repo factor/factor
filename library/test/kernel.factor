@@ -14,6 +14,9 @@ test errors ;
 [ ] [ 10000000 [ drop 1/3 >bignum drop ] each ] unit-test
 [ ] [ 10000000 [ drop 1/3 >float drop ] each ] unit-test
 
+! Don't leak extra roots if error is thrown
+[ ] [ 10000 [ [ -1 f <array> ] catch drop ] times ] unit-test
+
 [ t ] [ cell integer? ] unit-test
 [ t ] [ bootstrap-cell integer? ] unit-test
 
