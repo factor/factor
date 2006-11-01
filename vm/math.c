@@ -574,28 +574,28 @@ void primitive_float_greatereq(void)
 
 void primitive_float_bits(void)
 {
-	FLOAT_BITS b;
+	F_FLOAT_BITS b;
 	b.x = unbox_float();
 	box_unsigned_4(b.y);
 }
 
 void primitive_bits_float(void)
 {
-	FLOAT_BITS b;
+	F_FLOAT_BITS b;
 	b.y = unbox_unsigned_4();
 	box_float(b.x);
 }
 
 void primitive_double_bits(void)
 {
-	DOUBLE_BITS b;
+	F_DOUBLE_BITS b;
 	b.x = unbox_double();
 	box_unsigned_8(b.y);
 }
 
 void primitive_bits_double(void)
 {
-	DOUBLE_BITS b;
+	F_DOUBLE_BITS b;
 	b.y = unbox_unsigned_8();
 	box_double(b.x);
 }

@@ -43,7 +43,7 @@ void save_stacks(void)
 /* called on entry into a compiled callback */
 void nest_stacks(void)
 {
-	STACKS *new_stacks = safe_malloc(sizeof(STACKS));
+	F_STACKS *new_stacks = safe_malloc(sizeof(F_STACKS));
 	
 	/* note that these register values are not necessarily valid stack
 	pointers. they are merely saved non-volatile registers, and are
@@ -83,7 +83,7 @@ void nest_stacks(void)
 /* called when leaving a compiled callback */
 void unnest_stacks(void)
 {
-	STACKS *old_stacks = stack_chain;
+	F_STACKS *old_stacks = stack_chain;
 
 	dealloc_bounded_block(stack_chain->data_region);
 	dealloc_bounded_block(stack_chain->retain_region);

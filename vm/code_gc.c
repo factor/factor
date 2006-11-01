@@ -3,7 +3,7 @@
 /* This malloc-style heap code is reasonably generic. Maybe in the future, it
 will be used for the data heap too, if we ever get incremental
 mark/sweep/compact GC. */
-void new_heap(HEAP *heap, CELL size)
+void new_heap(F_HEAP *heap, CELL size)
 {
 	heap->base = (CELL)(alloc_bounded_block(size)->start);
 	if(heap->base == 0)
@@ -17,7 +17,7 @@ void init_code_heap(CELL size)
 	new_heap(&compiling,size);
 }
 
-INLINE void update_free_list(HEAP *heap, F_BLOCK *prev, F_BLOCK *next_free)
+INLINE void update_free_list(F_HEAP *heap, F_BLOCK *prev, F_BLOCK *next_free)
 {
 	if(prev)
 		prev->next_free = next_free;
@@ -28,7 +28,7 @@ INLINE void update_free_list(HEAP *heap, F_BLOCK *prev, F_BLOCK *next_free)
 /* called after reading the code heap from the image file. we must build the
 free list, and add a large free block from compiling.base + size to
 compiling.limit. */
-void build_free_list(HEAP *heap, CELL size)
+void build_free_list(F_HEAP *heap, CELL size)
 {
 	F_BLOCK *prev = NULL;
 	F_BLOCK *scan = (F_BLOCK *)heap->base;
@@ -62,7 +62,7 @@ void build_free_list(HEAP *heap, CELL size)
 	update_free_list(heap,prev,end);
 }
 
-CELL heap_allot(HEAP *heap, CELL size)
+CELL heap_allot(F_HEAP *heap, CELL size)
 {
 	F_BLOCK *prev = NULL;
 	F_BLOCK *scan = heap->free_list;
@@ -117,7 +117,7 @@ CELL heap_allot(HEAP *heap, CELL size)
 
 /* After code GC, all referenced code blocks have status set to B_MARKED, so any
 which are allocated and not marked can be reclaimed. */
-void free_unmarked(HEAP *heap)
+void free_unmarked(F_HEAP *heap)
 {
 	F_BLOCK *prev = NULL;
 	F_BLOCK *scan = (F_BLOCK *)heap->base;
@@ -151,7 +151,7 @@ void free_unmarked(HEAP *heap)
 	build_free_list(heap,heap->limit - heap->base);
 }
 
-CELL heap_free_space(HEAP *heap)
+CELL heap_free_space(F_HEAP *heap)
 {
 	CELL size = 0;
 	F_BLOCK *scan = (F_BLOCK *)heap->base;
@@ -166,7 +166,7 @@ CELL heap_free_space(HEAP *heap)
 	return size;
 }
 
-CELL heap_size(HEAP *heap)
+CELL heap_size(F_HEAP *heap)
 {
 	CELL start = heap->base;
 	F_BLOCK *scan = (F_BLOCK *)start;
@@ -248,7 +248,7 @@ void primitive_code_gc(void)
 	garbage_collection(TENURED,true);
 }
 
-void dump_heap(HEAP *heap)
+void dump_heap(F_HEAP *heap)
 {
 	F_BLOCK *scan = (F_BLOCK *)heap->base;
 

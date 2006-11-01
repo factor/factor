@@ -18,7 +18,7 @@ CELL get_rel_symbol(F_REL *rel, CELL literal_start)
 	F_ARRAY *pair = untag_array(get_literal(literal_start,arg));
 	F_STRING *symbol = untag_string(get(AREF(pair,0)));
 	CELL library = get(AREF(pair,1));
-	DLL *dll = (library == F ? NULL : untag_dll(library));
+	F_DLL *dll = (library == F ? NULL : untag_dll(library));
 
 	if(dll != NULL && !dll->dll)
 		return (CELL)undefined_symbol;

@@ -167,7 +167,7 @@ void primitive_cd(void)
 	SetCurrentDirectory(unbox_char_string());
 }
 
-BOUNDED_BLOCK *alloc_bounded_block(CELL size)
+F_BOUNDED_BLOCK *alloc_bounded_block(CELL size)
 {
 	SYSTEM_INFO si;
 	char *mem;
@@ -183,7 +183,7 @@ BOUNDED_BLOCK *alloc_bounded_block(CELL size)
 	if (!VirtualProtect(mem+size+si.dwPageSize, si.dwPageSize, PAGE_NOACCESS, &ignore))
 		fatal_error("Cannot allocate high guard page", (CELL)mem);
 
-	BOUNDED_BLOCK *block = safe_malloc(sizeof(BOUNDED_BLOCK));
+	F_BOUNDED_BLOCK *block = safe_malloc(sizeof(F_BOUNDED_BLOCK));
 
 	block->start = (int)mem + si.dwPageSize;
 	block->size = size;
@@ -191,7 +191,7 @@ BOUNDED_BLOCK *alloc_bounded_block(CELL size)
 	return block;
 }
 
-void dealloc_bounded_block(BOUNDED_BLOCK *block)
+void dealloc_bounded_block(F_BOUNDED_BLOCK *block)
 {
 	SYSTEM_INFO si;
 	GetSystemInfo(&si);

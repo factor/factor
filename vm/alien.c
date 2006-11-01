@@ -7,7 +7,7 @@ void primitive_expired(void)
 
 	if(type_of(object) == ALIEN_TYPE)
 	{
-		ALIEN *alien = untag_alien_fast(object);
+		F_ALIEN *alien = untag_alien_fast(object);
 		drepl(tag_boolean(alien->expired));
 	}
 	else if(object == F)
@@ -19,7 +19,7 @@ void primitive_expired(void)
 /* gets the address of an object representing a C pointer */
 void *alien_offset(CELL object)
 {
-	ALIEN *alien;
+	F_ALIEN *alien;
 	F_ARRAY *array;
 
 	switch(type_of(object))
@@ -50,7 +50,7 @@ void *unbox_alien(void)
 CELL allot_alien(CELL delegate, CELL displacement)
 {
 	REGISTER_ROOT(delegate);
-	ALIEN *alien = allot_object(ALIEN_TYPE,sizeof(ALIEN));
+	F_ALIEN *alien = allot_object(ALIEN_TYPE,sizeof(F_ALIEN));
 	UNREGISTER_ROOT(delegate);
 	alien->alien = delegate;
 	alien->displacement = displacement;
@@ -90,7 +90,7 @@ void primitive_alien_address(void)
 }
 
 /* image loading */
-void fixup_alien(ALIEN *d)
+void fixup_alien(F_ALIEN *d)
 {
 	d->expired = true;
 }
@@ -154,7 +154,7 @@ void box_value_pair(CELL x, CELL y)
 
 void primitive_dlopen(void)
 {
-	DLL* dll = allot_object(DLL_TYPE,sizeof(DLL));
+	F_DLL* dll = allot_object(DLL_TYPE,sizeof(F_DLL));
 	dll->path = dpop();
 	ffi_dlopen(dll,true);
 	dpush(tag_object(dll));
@@ -164,7 +164,7 @@ void primitive_dlsym(void)
 {
 	CELL dll = dpop();
 	F_STRING *sym = untag_string(dpop());
-	DLL *d;
+	F_DLL *d;
 	
 	if(dll == F)
 		d = NULL;

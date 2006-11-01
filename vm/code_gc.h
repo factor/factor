@@ -16,16 +16,16 @@ typedef struct {
 	CELL base;
 	CELL limit;
 	F_BLOCK *free_list;
-} HEAP;
+} F_HEAP;
 
-void new_heap(HEAP *heap, CELL size);
-void build_free_list(HEAP *heap, CELL size);
-CELL heap_allot(HEAP *heap, CELL size);
-void free_unmarked(HEAP *heap);
-CELL heap_free_space(HEAP *heap);
-CELL heap_size(HEAP *heap);
+void new_heap(F_HEAP *heap, CELL size);
+void build_free_list(F_HEAP *heap, CELL size);
+CELL heap_allot(F_HEAP *heap, CELL size);
+void free_unmarked(F_HEAP *heap);
+CELL heap_free_space(F_HEAP *heap);
+CELL heap_size(F_HEAP *heap);
 
-INLINE F_BLOCK *next_block(HEAP *heap, F_BLOCK *block)
+INLINE F_BLOCK *next_block(F_HEAP *heap, F_BLOCK *block)
 {
 	CELL next = ((CELL)block + block->size);
 	if(next == heap->limit)
@@ -35,7 +35,7 @@ INLINE F_BLOCK *next_block(HEAP *heap, F_BLOCK *block)
 }
 
 /* compiled code */
-HEAP compiling;
+F_HEAP compiling;
 
 /* The compiled code heap is structured into blocks. */
 typedef struct
@@ -77,4 +77,4 @@ void collect_literals(void);
 void recursive_mark(CELL xt);
 void primitive_code_room(void);
 void primitive_code_gc(void);
-void dump_heap(HEAP *heap);
+void dump_heap(F_HEAP *heap);

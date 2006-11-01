@@ -12,9 +12,9 @@
 #define JMP_BUF sigjmp_buf
 
 void init_ffi(void);
-void ffi_dlopen(DLL *dll, bool error);
-void *ffi_dlsym(DLL *dll, F_STRING *symbol, bool error);
-void ffi_dlclose(DLL *dll);
+void ffi_dlopen(F_DLL *dll, bool error);
+void *ffi_dlsym(F_DLL *dll, F_STRING *symbol, bool error);
+void ffi_dlclose(F_DLL *dll);
 
 void unix_init_signals(void);
 void signal_handler(int signal, siginfo_t* siginfo, void* uap);

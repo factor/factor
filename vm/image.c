@@ -1,6 +1,6 @@
 #include "factor.h"
 
-void init_objects(HEADER *h)
+void init_objects(F_HEADER *h)
 {
 	int i;
 	for(i = 0; i < USER_ENV; i++)
@@ -16,7 +16,7 @@ void init_objects(HEADER *h)
 void load_image(const char* filename)
 {
 	FILE* file;
-	HEADER h;
+	F_HEADER h;
 
 	file = fopen(filename,"rb");
 	if(file == NULL)
@@ -29,7 +29,7 @@ void load_image(const char* filename)
 	printf("Loading %s...",filename);
 
 	/* read it in native byte order */
-	fread(&h,sizeof(HEADER)/sizeof(CELL),sizeof(CELL),file);
+	fread(&h,sizeof(F_HEADER)/sizeof(CELL),sizeof(CELL),file);
 
 	if(h.magic != IMAGE_MAGIC)
 		fatal_error("Bad magic number",h.magic);
@@ -82,7 +82,7 @@ void load_image(const char* filename)
 bool save_image(const char* filename)
 {
 	FILE* file;
-	HEADER h;
+	F_HEADER h;
 
 	fprintf(stderr,"Saving %s...\n",filename);
 
@@ -102,7 +102,7 @@ bool save_image(const char* filename)
 	h.bignum_neg_one = bignum_neg_one;
 	h.code_size = heap_size(&compiling);
 	h.code_relocation_base = compiling.base;
-	fwrite(&h,sizeof(HEADER),1,file);
+	fwrite(&h,sizeof(F_HEADER),1,file);
 
 	fwrite((void*)tenured.base,h.data_size,1,file);
 	fwrite((void*)compiling.base,h.code_size,1,file);
@@ -144,10 +144,10 @@ void relocate_object(CELL relocating)
 		rehash_string((F_STRING*)relocating);
 		break;
 	case DLL_TYPE:
-		ffi_dlopen((DLL*)relocating,false);
+		ffi_dlopen((F_DLL*)relocating,false);
 		break;
 	case ALIEN_TYPE:
-		fixup_alien((ALIEN*)relocating);
+		fixup_alien((F_ALIEN*)relocating);
 		break;
 	}
 }

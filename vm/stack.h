@@ -47,25 +47,25 @@ INLINE void rpush(CELL top)
 	put(rs,top);
 }
 
-typedef struct _STACKS {
+typedef struct _F_STACKS {
 	/* current datastack top pointer */
 	CELL data;
 	/* saved contents of ds register on entry to callback */
 	CELL data_save;
 	/* memory region holding current datastack */
-	BOUNDED_BLOCK *data_region;
+	F_BOUNDED_BLOCK *data_region;
 	/* current retain stack top pointer */
 	CELL retain;
 	/* saved contents of rs register on entry to callback */
 	CELL retain_save;
 	/* memory region holding current retain stack */
-	BOUNDED_BLOCK *retain_region;
+	F_BOUNDED_BLOCK *retain_region;
 	/* current callstack top pointer */
 	CELL call;
 	/* saved contents of cs register on entry to callback */
 	CELL call_save;
 	/* memory region holding current callstack */
-	BOUNDED_BLOCK *call_region;
+	F_BOUNDED_BLOCK *call_region;
 	/* saved callframe on entry to callback */
 	CELL callframe;
 	CELL callframe_scan;
@@ -77,10 +77,10 @@ typedef struct _STACKS {
 	/* error handler longjmp buffer */
 	JMP_BUF toplevel;
 
-	struct _STACKS *next;
-} STACKS;
+	struct _F_STACKS *next;
+} F_STACKS;
 
-STACKS *stack_chain;
+F_STACKS *stack_chain;
 
 CELL ds_size, rs_size, cs_size;
 

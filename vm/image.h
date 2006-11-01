@@ -25,9 +25,9 @@ typedef struct {
 	CELL code_size;
 	/* code relocation base */
 	CELL code_relocation_base;
-} HEADER;
+} F_HEADER;
 
-void init_objects(HEADER *h);
+void init_objects(F_HEADER *h);
 void load_image(const char* file);
 bool save_image(const char* file);
 void primitive_save_image(void);

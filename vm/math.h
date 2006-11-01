@@ -129,12 +129,12 @@ void primitive_from_fraction(void);
 typedef union {
     double x;
     u64 y;
-} DOUBLE_BITS;
+} F_DOUBLE_BITS;
 
 typedef union {
     float x;
     u32 y;
-} FLOAT_BITS;
+} F_FLOAT_BITS;
 
 INLINE double untag_float_fast(CELL tagged)
 {

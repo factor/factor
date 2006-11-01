@@ -1,3 +1,6 @@
+/* Set by the -S command line argument */
+bool secure_gc;
+
 bool in_page(CELL fault, CELL area, CELL area_size, int offset);
 
 void *safe_malloc(size_t size);
@@ -5,12 +8,12 @@ void *safe_malloc(size_t size);
 typedef struct {
     CELL start;
     CELL size;
-} BOUNDED_BLOCK;
+} F_BOUNDED_BLOCK;
 
 /* set up guard pages to check for under/overflow.
 size must be a multiple of the page size */
-BOUNDED_BLOCK *alloc_bounded_block(CELL size);
-void dealloc_bounded_block(BOUNDED_BLOCK *block);
+F_BOUNDED_BLOCK *alloc_bounded_block(CELL size);
+void dealloc_bounded_block(F_BOUNDED_BLOCK *block);
 
 CELL untagged_object_size(CELL pointer);
 CELL unaligned_object_size(CELL pointer);
@@ -35,10 +38,10 @@ the offset of the first object is set by the allocator.
 */
 #define CARD_MARK_MASK 0x80
 #define CARD_BASE_MASK 0x7f
-typedef u8 CARD;
+typedef u8 F_CARD;
 
-CARD *cards;
-CARD *cards_end;
+F_CARD *cards;
+F_CARD *cards_end;
 
 /* A card is 16 bytes (128 bits), 5 address bits per card.
 it is important that 7 bits is sufficient to represent every
@@ -47,27 +50,27 @@ offset within the card */
 #define CARD_BITS 7
 #define ADDR_CARD_MASK (CARD_SIZE-1)
 
-INLINE CARD card_marked(CARD c)
+INLINE F_CARD card_marked(F_CARD c)
 {
 	return c & CARD_MARK_MASK;
 }
 
-INLINE void unmark_card(CARD *c)
+INLINE void unmark_card(F_CARD *c)
 {
 	*c &= CARD_BASE_MASK;
 }
 
-INLINE void clear_card(CARD *c)
+INLINE void clear_card(F_CARD *c)
 {
 	*c = CARD_BASE_MASK; /* invalid value */
 }
 
-INLINE u8 card_base(CARD c)
+INLINE u8 card_base(F_CARD c)
 {
 	return c & CARD_BASE_MASK;
 }
 
-#define ADDR_TO_CARD(a) (CARD*)(((CELL)a >> CARD_BITS) + cards_offset)
+#define ADDR_TO_CARD(a) (F_CARD*)(((CELL)a >> CARD_BITS) + cards_offset)
 #define CARD_TO_ADDR(c) (CELL*)(((CELL)c - cards_offset)<<CARD_BITS)
 
 /* this is an inefficient write barrier. compiled definitions use a more
@@ -76,15 +79,15 @@ any time we are potentially storing a pointer from an older generation
 to a younger one */
 INLINE void write_barrier(CELL address)
 {
-	CARD *c = ADDR_TO_CARD(address);
+	F_CARD *c = ADDR_TO_CARD(address);
 	*c |= CARD_MARK_MASK;
 }
 
 /* we need to remember the first object allocated in the card */
 INLINE void allot_barrier(CELL address)
 {
-	CARD *ptr = ADDR_TO_CARD(address);
-	CARD c = *ptr;
+	F_CARD *ptr = ADDR_TO_CARD(address);
+	F_CARD c = *ptr;
 	CELL b = card_base(c);
 	CELL a = (address & ADDR_CARD_MASK);
 	*ptr = (card_marked(c) | ((b < a) ? b : a));
@@ -102,7 +105,7 @@ typedef struct {
 	CELL here;
 	/* end of zone */
 	CELL limit;
-} ZONE;
+} F_ZONE;
 
 /* total number of generations. */
 CELL gen_count;
@@ -112,25 +115,28 @@ CELL gen_count;
 /* the oldest generation */
 #define TENURED (gen_count-1)
 
-DLLEXPORT ZONE *generations;
+DLLEXPORT F_ZONE *generations;
 
 /* used during garbage collection only */
-ZONE *newspace;
+F_ZONE *newspace;
 
 #define tenured generations[TENURED]
 #define nursery generations[NURSERY]
 
 /* spare semi-space; rotates with tenured. */
-ZONE prior;
+F_ZONE prior;
 
-INLINE bool in_zone(ZONE* z, CELL pointer)
+INLINE bool in_zone(F_ZONE *z, CELL pointer)
 {
 	return pointer >= z->base && pointer < z->limit;
 }
 
-CELL init_zone(ZONE *z, CELL size, CELL base);
+CELL init_zone(F_ZONE *z, CELL size, CELL base);
 
-void init_data_heap(CELL gen_count, CELL young_size, CELL aging_size);
+void init_data_heap(CELL gens,
+	CELL young_size,
+	CELL aging_size,
+	bool secure_gc_);
 
 /* statistics */
 s64 gc_time;
@@ -189,7 +195,7 @@ void garbage_collection(CELL gen, bool code_gc);
 #define REGISTER_C_STRING(obj) rpush(tag_object(((F_ARRAY *)obj) - 1))
 #define UNREGISTER_C_STRING(obj) obj = ((char*)(untag_array_fast(rpop()) + 1))
 
-INLINE void *allot_zone(ZONE *z, CELL a)
+INLINE void *allot_zone(F_ZONE *z, CELL a)
 {
 	CELL h = z->here;
 	z->here = h + align8(a);

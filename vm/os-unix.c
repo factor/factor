@@ -14,7 +14,7 @@ void init_ffi(void)
 	null_dll = dlopen(NULL,RTLD_LAZY);
 }
 
-void ffi_dlopen(DLL *dll, bool error)
+void ffi_dlopen(F_DLL *dll, bool error)
 {
 	void *dllptr = dlopen(to_char_string(untag_string(dll->path),true), RTLD_LAZY);
 
@@ -34,7 +34,7 @@ void ffi_dlopen(DLL *dll, bool error)
 	dll->dll = dllptr;
 }
 
-void *ffi_dlsym(DLL *dll, F_STRING *symbol, bool error)
+void *ffi_dlsym(F_DLL *dll, F_STRING *symbol, bool error)
 {
 	void *handle = (dll == NULL ? null_dll : dll->dll);
 	void *sym = dlsym(handle,to_char_string(symbol,true));
@@ -51,7 +51,7 @@ void *ffi_dlsym(DLL *dll, F_STRING *symbol, bool error)
 	return sym;
 }
 
-void ffi_dlclose(DLL *dll)
+void ffi_dlclose(F_DLL *dll)
 {
 	if(dlclose(dll->dll))
 	{
@@ -128,7 +128,7 @@ void primitive_cd(void)
 	chdir(unbox_char_string());
 }
 
-BOUNDED_BLOCK *alloc_bounded_block(CELL size)
+F_BOUNDED_BLOCK *alloc_bounded_block(CELL size)
 {
 	int pagesize = getpagesize();
 
@@ -145,7 +145,7 @@ BOUNDED_BLOCK *alloc_bounded_block(CELL size)
 	if(mprotect(array + pagesize + size,pagesize,PROT_NONE) == -1)
 		fatal_error("Cannot protect high guard page",(CELL)array);
 
-	BOUNDED_BLOCK *retval = safe_malloc(sizeof(BOUNDED_BLOCK));
+	F_BOUNDED_BLOCK *retval = safe_malloc(sizeof(F_BOUNDED_BLOCK));
 	
 	retval->start = (CELL)(array + pagesize);
 	retval->size = size;
@@ -153,7 +153,7 @@ BOUNDED_BLOCK *alloc_bounded_block(CELL size)
 	return retval;
 }
 
-void dealloc_bounded_block(BOUNDED_BLOCK *block)
+void dealloc_bounded_block(F_BOUNDED_BLOCK *block)
 {
 	int pagesize = getpagesize();
 

@@ -1,8 +1,8 @@
 DLLEXPORT CELL alien_temp;
 
-INLINE ALIEN* untag_alien_fast(CELL tagged)
+INLINE F_ALIEN* untag_alien_fast(CELL tagged)
 {
-	return (ALIEN*)UNTAG(tagged);
+	return (F_ALIEN*)UNTAG(tagged);
 }
 
 CELL allot_alien(CELL delegate, CELL displacement);
@@ -13,7 +13,7 @@ void primitive_alien_address(void);
 
 void* alien_offset(CELL object);
 
-void fixup_alien(ALIEN* d);
+void fixup_alien(F_ALIEN* d);
 
 DLLEXPORT void *unbox_alien(void);
 DLLEXPORT void box_alien(CELL ptr);
@@ -47,10 +47,10 @@ DLLEXPORT void unbox_value_struct(void *dest, CELL size);
 DLLEXPORT void box_value_struct(void *src, CELL size);
 DLLEXPORT void box_value_pair(CELL x, CELL y);
 
-INLINE DLL *untag_dll(CELL tagged)
+INLINE F_DLL *untag_dll(CELL tagged)
 {
 	type_check(DLL_TYPE,tagged);
-	return (DLL*)UNTAG(tagged);
+	return (F_DLL*)UNTAG(tagged);
 }
 
 void primitive_dlopen(void);

@@ -118,7 +118,7 @@ void dump_memory(CELL from, CELL to)
 		dump_cell(from);
 }
 
-void dump_generation(ZONE *z)
+void dump_generation(F_ZONE *z)
 {
 	fprintf(stderr,"base=%lx, size=%lx, here=%lx\n",
 		z->base,
