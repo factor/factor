@@ -12,11 +12,14 @@ void new_heap(F_HEAP *heap, CELL size)
 	heap->free_list = NULL;
 }
 
+/* Allocate a code heap during startup */
 void init_code_heap(CELL size)
 {
 	new_heap(&compiling,size);
 }
 
+/* If there is no previous block, next_free becomes the head of the free list,
+else its linked in */
 INLINE void update_free_list(F_HEAP *heap, F_BLOCK *prev, F_BLOCK *next_free)
 {
 	if(prev)
@@ -25,7 +28,7 @@ INLINE void update_free_list(F_HEAP *heap, F_BLOCK *prev, F_BLOCK *next_free)
 		heap->free_list = next_free;
 }
 
-/* called after reading the code heap from the image file. we must build the
+/* Called after reading the code heap from the image file. We must build the
 free list, and add a large free block from compiling.base + size to
 compiling.limit. */
 void build_free_list(F_HEAP *heap, CELL size)
@@ -34,6 +37,7 @@ void build_free_list(F_HEAP *heap, CELL size)
 	F_BLOCK *scan = (F_BLOCK *)heap->base;
 	F_BLOCK *end = (F_BLOCK *)(heap->base + size);
 
+	/* Add all free blocks to the free list */
 	while(scan && scan < end)
 	{
 		if(scan->status == B_FREE)
@@ -45,6 +49,7 @@ void build_free_list(F_HEAP *heap, CELL size)
 		scan = next_block(heap,scan);
 	}
 
+	/* If there is room at the end of the heap, add a free block */
 	if((CELL)(end + 1) <= heap->limit)
 	{
 		end->status = B_FREE;
@@ -62,6 +67,7 @@ void build_free_list(F_HEAP *heap, CELL size)
 	update_free_list(heap,prev,end);
 }
 
+/* Allocate a block of memory from the mark and sweep GC heap */
 CELL heap_allot(F_HEAP *heap, CELL size)
 {
 	F_BLOCK *prev = NULL;
@@ -151,6 +157,7 @@ void free_unmarked(F_HEAP *heap)
 	build_free_list(heap,heap->limit - heap->base);
 }
 
+/* Compute total sum of sizes of free blocks */
 CELL heap_free_space(F_HEAP *heap)
 {
 	CELL size = 0;
@@ -175,6 +182,7 @@ CELL heap_size(F_HEAP *heap)
 	return (CELL)scan - (CELL)start;
 }
 
+/* Apply a function to every code block */
 void iterate_code_heap(CODE_HEAP_ITERATOR iter)
 {
 	F_BLOCK *scan = (F_BLOCK *)compiling.base;
@@ -187,6 +195,7 @@ void iterate_code_heap(CODE_HEAP_ITERATOR iter)
 	}
 }
 
+/* Copy all literals referenced from a code block to newspace */
 void collect_literals_step(F_COMPILED *relocating, CELL code_start,
 	CELL reloc_start, CELL literal_start, CELL words_start, CELL words_end)
 {
@@ -197,6 +206,8 @@ void collect_literals_step(F_COMPILED *relocating, CELL code_start,
 	for(scan = literal_start; scan < literal_end; scan += CELLS)
 		copy_handle((CELL*)scan);
 
+	/* If the block is not finalized, the words area contains pointers to
+	words in the data heap rather than XTs in the code heap */
 	if(!relocating->finalized)
 	{
 		for(scan = words_start; scan < words_end; scan += CELLS)
@@ -204,11 +215,13 @@ void collect_literals_step(F_COMPILED *relocating, CELL code_start,
 	}
 }
 
+/* Copy literals referenced from all code blocks to newspace */
 void collect_literals(void)
 {
 	iterate_code_heap(collect_literals_step);
 }
 
+/* Mark all XTs referenced from a code block */
 void mark_sweep_step(F_COMPILED *compiled, CELL code_start,
 	CELL reloc_start, CELL literal_start, CELL words_start, CELL words_end)
 {
@@ -221,14 +234,18 @@ void mark_sweep_step(F_COMPILED *compiled, CELL code_start,
 	}
 }
 
+/* Mark all XTs and literals referenced from a word XT */
 void recursive_mark(CELL xt)
 {
 	F_BLOCK *block = xt_to_block(xt);
 
+	/* If already marked, do nothing */
 	if(block->status == B_MARKED)
 		return;
+	/* Mark it */
 	else if(block->status == B_ALLOCATED)
 		block->status = B_MARKED;
+	/* We should never be asked to mark a free block */
 	else
 		critical_error("Marking the wrong block",(CELL)block);
 
@@ -237,17 +254,20 @@ void recursive_mark(CELL xt)
 	iterate_code_heap_step(compiled,mark_sweep_step);
 }
 
+/* Push the free space and total size of the code heap */
 void primitive_code_room(void)
 {
 	box_unsigned_cell(heap_free_space(&compiling));
 	box_unsigned_cell(compiling.limit - compiling.base);
 }
 
+/* Perform a code GC */
 void primitive_code_gc(void)
 {
 	garbage_collection(TENURED,true);
 }
 
+/* Dump all code blocks for debugging */
 void dump_heap(F_HEAP *heap)
 {
 	F_BLOCK *scan = (F_BLOCK *)heap->base;

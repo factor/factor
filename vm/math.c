@@ -71,10 +71,8 @@ void primitive_fixnum_subtract_fast(void)
 	dpush(tag_fixnum(x - y));
 }
 
-/**
- * Multiply two integers, and trap overflow.
- * Thanks to David Blaikie (The_Vulture from freenode #java) for the hint.
- */
+/* Multiply two integers, and trap overflow.
+Thanks to David Blaikie (The_Vulture from freenode #java) for the hint. */
 void primitive_fixnum_multiply(void)
 {
 	POP_FIXNUMS(x,y)

@@ -1,5 +1,6 @@
 #include "factor.h"
 
+/* Certain special objects in the image are known to the runtime */
 void init_objects(F_HEADER *h)
 {
 	int i;
@@ -13,6 +14,7 @@ void init_objects(F_HEADER *h)
 	bignum_neg_one = h->bignum_neg_one;
 }
 
+/* Read an image file from disk, only done once during startup */
 void load_image(const char* filename)
 {
 	FILE* file;
@@ -79,6 +81,7 @@ void load_image(const char* filename)
 	fflush(stdout);
 }
 
+/* Save the current image to disk */
 bool save_image(const char* filename)
 {
 	FILE* file;
@@ -121,6 +124,7 @@ void primitive_save_image(void)
 	save_image(to_char_string(filename,true));
 }
 
+/* Initialize an object in a newly-loaded image */
 void relocate_object(CELL relocating)
 {
 	CELL scan = relocating;
@@ -152,6 +156,8 @@ void relocate_object(CELL relocating)
 	}
 }
 
+/* Since the image might have been saved with a different base address than
+where it is loaded, we need to fix up pointers in the image. */
 void relocate_data()
 {
 	CELL relocating;

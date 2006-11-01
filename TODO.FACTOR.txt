@@ -1,13 +1,13 @@
 + allot refactoring:
 
 - rethink all string conversions
-- what if retain stack is full
-  - ie, inside retain stack overflow handler, don't cons?
 - os-windows.c error_message &co
 - inline float allocation needs a gc check
 - alien invoke, callback need a gc check
 - relocation should not cons at all
 - ffi_dlopen, etc
+- throwing an error can fill up the extra_roots stack
+- last-index miscompiles
 
 + ui:
 
@@ -49,6 +49,7 @@
 
 + compiler/ffi:
 
+- we may be able to remove the dlsym primitive
 - [ [ dup call ] dup call ] infer hangs
 - stdcall callbacks
 - callstack overflow when compiling mutually recursive inline words
@@ -77,6 +78,7 @@
 
 + misc:
 
+- don't save big free chunk at the end of the code heap
 - faster apropos
 - growable data heap
 - minor GC takes too long now, we should card mark code heap

@@ -1,5 +1,6 @@
 #include "factor.h"
 
+/* Get things started */
 void init_factor(const char* image,
 	CELL ds_size, CELL rs_size, CELL cs_size,
 	CELL gen_count, CELL young_size, CELL aging_size,

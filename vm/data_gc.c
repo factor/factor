@@ -1,5 +1,7 @@
 #include "factor.h"
 
+/* Test if 'fault' is in the guard page at the top or bottom (depending on
+offset being 0 or -1) of area+area_size */
 bool in_page(CELL fault, CELL area, CELL area_size, int offset)
 {
 	const int pagesize = getpagesize();
@@ -9,6 +11,7 @@ bool in_page(CELL fault, CELL area, CELL area_size, int offset)
 	return fault >= area && fault <= area + pagesize;
 }
 
+/* If memory allocation fails, bail out */
 void *safe_malloc(size_t size)
 {
 	void *ptr = malloc(size);
@@ -17,6 +20,7 @@ void *safe_malloc(size_t size)
 	return ptr;
 }
 
+/* Size of the object pointed to by a tagged pointer */
 CELL object_size(CELL tagged)
 {
 	if(tagged == F || TAG(tagged) == FIXNUM_TYPE)
@@ -25,11 +29,13 @@ CELL object_size(CELL tagged)
 		return untagged_object_size(UNTAG(tagged));
 }
 
+/* Size of the object pointed to by an untagged pointer */
 CELL untagged_object_size(CELL pointer)
 {
 	return align8(unaligned_object_size(pointer));
 }
 
+/* Size of the data area of an object pointed to by an untagged pointer */
 CELL unaligned_object_size(CELL pointer)
 {
 	switch(untag_header(get(pointer)))
@@ -73,6 +79,7 @@ void primitive_size(void)
 	drepl(tag_fixnum(object_size(dpeek())));
 }
 
+/* Push memory usage statistics in data heap */
 void primitive_data_room(void)
 {
 	int gen;
@@ -142,7 +149,7 @@ void primitive_end_scan(void)
 	gc_off = false;
 }
 
-/* scan all the objects in the card */
+/* Scan all the objects in the card */
 INLINE void collect_card(F_CARD *ptr, CELL here)
 {
 	F_CARD c = *ptr;
@@ -164,6 +171,7 @@ INLINE void collect_card(F_CARD *ptr, CELL here)
 	cards_scanned++;
 }
 
+/* Copy all newspace objects referenced from marked cards to the destination */
 INLINE void collect_gen_cards(CELL gen)
 {
 	F_CARD *ptr = ADDR_TO_CARD(generations[gen].base);
@@ -180,6 +188,8 @@ INLINE void collect_gen_cards(CELL gen)
 	}
 }
 
+/* After all old->new forward references have been copied over, we must unmark
+the cards */
 void unmark_cards(CELL from, CELL to)
 {
 	F_CARD *ptr = ADDR_TO_CARD(generations[from].base);
@@ -190,6 +200,8 @@ void unmark_cards(CELL from, CELL to)
 		unmark_card(ptr);
 }
 
+/* Every card stores the offset of the first object in that card, which must be
+cleared when a generation has been cleared */
 void clear_cards(CELL from, CELL to)
 {
 	/* NOTE: reverse order due to heap layout. */
@@ -199,15 +211,14 @@ void clear_cards(CELL from, CELL to)
 		clear_card(ptr);
 }
 
-/* scan cards in all generations older than the one being collected */
+/* Scan cards in all generations older than the one being collected, copying
+old->new references */
 void collect_cards(CELL gen)
 {
 	int i;
 	for(i = gen + 1; i < gen_count; i++)
 		collect_gen_cards(i);
 }
-
-/* Generational copying garbage collector */
 
 CELL init_zone(F_ZONE *z, CELL size, CELL base)
 {
@@ -269,6 +280,11 @@ void init_data_heap(CELL gens,
 	minor_collections = 0;
 	cards_scanned = 0;
 	secure_gc = secure_gc_;
+
+	data_heap_end = data_heap_start + total_size;
+
+	extra_roots_region = alloc_bounded_block(getpagesize());
+	extra_roots = (CELL *)extra_roots_region->start;
 }
 
 void collect_callframe_triple(CELL *callframe,
@@ -281,6 +297,7 @@ void collect_callframe_triple(CELL *callframe,
 	*callframe_end += *callframe;
 }
 
+/* Copy all tagged pointers in a range of memory */
 void collect_stack(F_BOUNDED_BLOCK *region, CELL top)
 {
 	CELL bottom = region->start;
@@ -290,6 +307,7 @@ void collect_stack(F_BOUNDED_BLOCK *region, CELL top)
 		copy_handle((CELL*)ptr);
 }
 
+/* The callstack has a special format */
 void collect_callstack(F_BOUNDED_BLOCK *region, CELL top)
 {
 	CELL bottom = region->start;
@@ -300,6 +318,8 @@ void collect_callstack(F_BOUNDED_BLOCK *region, CELL top)
 			(CELL*)ptr + 1, (CELL*)ptr + 2);
 }
 
+/* Copy roots over at the start of GC, namely various constants, stacks,
+the user environment and extra roots registered with REGISTER_ROOT */
 void collect_roots(void)
 {
 	int i;
@@ -310,6 +330,8 @@ void collect_roots(void)
 	copy_handle(&bignum_pos_one);
 	copy_handle(&bignum_neg_one);
 	collect_callframe_triple(&callframe,&callframe_scan,&callframe_end);
+
+	collect_stack(extra_roots_region,(CELL)extra_roots);
 
 	save_stacks();
 	stacks = stack_chain;
@@ -336,7 +358,7 @@ void collect_roots(void)
 		copy_handle(&userenv[i]);
 }
 
-/* Given a pointer to oldspace, copy it to newspace. */
+/* Given a pointer to oldspace, copy it to newspace */
 INLINE void *copy_untagged_object(void *pointer, CELL size)
 {
 	void *newpointer;
@@ -358,7 +380,7 @@ INLINE CELL copy_object_impl(CELL pointer)
 	return newpointer;
 }
 
-/* follow a chain of forwarding pointers */
+/* Follow a chain of forwarding pointers */
 CELL resolve_forwarding(CELL untagged, CELL tag)
 {
 	CELL header = get(untagged);
@@ -375,12 +397,10 @@ CELL resolve_forwarding(CELL untagged, CELL tag)
 	}
 }
 
-/*
-Given a pointer to a tagged pointer to oldspace, copy it to newspace.
+/* Given a pointer to a tagged pointer to oldspace, copy it to newspace.
 If the object has already been copied, return the forwarding
 pointer address without copying anything; otherwise, install
-a new forwarding pointer.
-*/
+a new forwarding pointer. */
 CELL copy_object(CELL pointer)
 {
 	CELL tag;
@@ -461,6 +481,8 @@ CELL collect_next(CELL scan)
 	return scan + size;
 }
 
+/* After garbage collection, any generations which are now empty need to have
+their allocation pointers and cards reset. */
 void reset_generations(CELL from, CELL to)
 {
 	CELL i;
@@ -476,6 +498,7 @@ void reset_generations(CELL from, CELL to)
 	clear_cards(from,to);
 }
 
+/* Prepare to start copying reachable objects into an unused zone */
 void begin_gc(CELL gen, bool code_gc)
 {
 	collecting_gen = gen;
@@ -531,7 +554,7 @@ void end_gc()
 		/* all generations up to and including the one
 		collected are now empty */
 		reset_generations(NURSERY,collecting_gen);
-		
+
 		minor_collections++;
 	}
 	
@@ -543,7 +566,7 @@ void end_gc()
 	}
 }
 
-/* collect gen and all younger generations */
+/* Collect gen and all younger generations */
 void garbage_collection(CELL gen, bool code_gc)
 {
 	s64 start = current_millis();
@@ -601,6 +624,7 @@ void primitive_data_gc(void)
 	garbage_collection(gen,false);
 }
 
+/* Push total time spent on GC */
 void primitive_gc_time(void)
 {
 	box_unsigned_8(gc_time);

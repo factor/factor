@@ -152,6 +152,7 @@ void box_value_pair(CELL x, CELL y)
 	dpush(tag_object(array));
 }
 
+/* open a native library and push a handle */
 void primitive_dlopen(void)
 {
 	F_DLL* dll = allot_object(DLL_TYPE,sizeof(F_DLL));
@@ -160,6 +161,7 @@ void primitive_dlopen(void)
 	dpush(tag_object(dll));
 }
 
+/* look up a symbol in a native library */
 void primitive_dlsym(void)
 {
 	CELL dll = dpop();
@@ -178,6 +180,7 @@ void primitive_dlsym(void)
 	box_signed_cell((CELL)ffi_dlsym(d,sym,true));
 }
 
+/* close a native library handle */
 void primitive_dlclose(void)
 {
 	ffi_dlclose(untag_dll(dpop()));

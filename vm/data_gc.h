@@ -183,17 +183,33 @@ bool gc_off;
 
 void garbage_collection(CELL gen, bool code_gc);
 
-#define REGISTER_ROOT(obj) rpush(obj)
-#define UNREGISTER_ROOT(obj) obj = rpop()
+/* If a runtime function needs to call another function which potentially
+allocates memory, it must store any local variable references to Factor
+objects on the root stack */
+F_BOUNDED_BLOCK *extra_roots_region;
+CELL *extra_roots;
 
-#define REGISTER_ARRAY(obj) rpush(tag_object(obj))
-#define UNREGISTER_ARRAY(obj) obj = untag_array_fast(rpop())
+INLINE void push_root(CELL tagged)
+{
+	*(extra_roots++) = tagged;
+}
 
-#define REGISTER_STRING(obj) rpush(tag_object(obj))
-#define UNREGISTER_STRING(obj) obj = untag_string_fast(rpop())
+INLINE CELL pop_root(void)
+{
+	return *(--extra_roots);
+}
 
-#define REGISTER_C_STRING(obj) rpush(tag_object(((F_ARRAY *)obj) - 1))
-#define UNREGISTER_C_STRING(obj) obj = ((char*)(untag_array_fast(rpop()) + 1))
+#define REGISTER_ROOT(obj) push_root(obj)
+#define UNREGISTER_ROOT(obj) obj = pop_root()
+
+#define REGISTER_ARRAY(obj) push_root(tag_object(obj))
+#define UNREGISTER_ARRAY(obj) obj = untag_array_fast(pop_root())
+
+#define REGISTER_STRING(obj) push_root(tag_object(obj))
+#define UNREGISTER_STRING(obj) obj = untag_string_fast(pop_root())
+
+#define REGISTER_C_STRING(obj) push_root(tag_object(((F_ARRAY *)obj) - 1))
+#define UNREGISTER_C_STRING(obj) obj = ((char*)(untag_array_fast(pop_root()) + 1))
 
 INLINE void *allot_zone(F_ZONE *z, CELL a)
 {
