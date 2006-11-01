@@ -2,10 +2,10 @@
 
 IN: win32-stream
 USING: alien errors generic hashtables io-internals kernel
-kernel-internals math namespaces prettyprint sequences
-io strings threads win32-api win32-io-internals ;
+kernel-internals math namespaces prettyprint sequences sequences-internals
+io strings threads tools win32-api win32-io-internals ;
 
-TUPLE: win32-stream handle timeout cutoff fileptr file-size ;
+TUPLE: win32-stream handle timeout cutoff fileptr file-size eof? ;
 TUPLE: win32-stream-reader in ;
 TUPLE: win32-stream-writer out ;
 TUPLE: win32-duplex-stream ;
@@ -29,44 +29,6 @@ TUPLE: win32-duplex-stream ;
 : update-timeout ( stream -- )
     dup win32-stream-timeout
     [ millis + swap set-win32-stream-cutoff ] [ drop ] if* ;
-
-: >string-or-f ( sbuf -- str-or-? )
-    dup length zero? [ drop f ] [ >string ] if ;
-
-! Read
-: fill-input ( stream -- )
-    dup update-timeout
-    [
-        over alloc-io-callback
-        over win32-stream-fileptr swap init-overlapped >r
-        dup win32-stream-handle
-        over win32-stream-reader-in
-        [ buffer@ ] keep buffer-capacity
-        >r pick r> swap dup win32-stream-file-size
-        [ swap win32-stream-fileptr - min ] [ drop ] if*
-        f r> ReadFile zero? [ handle-io-error ] when stop
-    ] callcc1 [ over win32-stream-reader-in n>buffer ] keep
-    swap update-file-pointer ;
-
-: consume-input ( count stream -- str ) 
-    dup win32-stream-reader-in buffer-length zero? [ dup fill-input ] when
-    win32-stream-reader-in
-    [ buffer-size min ] keep
-    [ buffer-first-n ] 2keep
-    buffer-consume ;
-
-: do-read-count ( stream sbuf count -- str )
-    #! Keep reading until count is reached or until stream end (f is returned)
-    dup zero? [ 
-        drop >string nip
-    ] [
-        pick dupd consume-input
-        dup empty? [
-            2drop >string-or-f nip
-        ] [
-            rot >r [ length - ] keep r> [ swap nappend ] keep swap do-read-count
-        ] if
-    ] if ;
 
 ! Write
 : flush-output ( stream -- ) 
@@ -102,25 +64,88 @@ M: string do-write ( string stream -- )
         ] if do-write
     ] if ;
 
+! Read
+: (fill-input) ( stream -- )
+    dup update-timeout
+    [
+        over alloc-io-callback
+        over win32-stream-fileptr swap init-overlapped >r
+        dup win32-stream-handle
+        over win32-stream-reader-in
+        [ buffer@ ] keep buffer-capacity
+        >r pick r> swap dup win32-stream-file-size
+        [ swap win32-stream-fileptr - min ] [ drop ] if*
+        f r> ReadFile zero? [ handle-io-error ] when stop
+    ] callcc1 [ over win32-stream-reader-in n>buffer ] keep
+    swap update-file-pointer ;
+
+: fill-input ( count stream -- )
+    tuck win32-stream-reader-in buffer-length > [
+        (fill-input)
+    ] [
+        drop
+    ] if ;
+
+: stream-eof? ( stream -- ? )
+    dup win32-stream-eof? [
+        drop t
+    ] [
+        [
+            dup win32-stream-file-size
+            swap win32-stream-fileptr
+            - zero?
+        ] keep set-win32-stream-eof?
+        f
+    ] if ;
+
+: unless-done ( stream quot -- value )
+    over stream-eof? pick win32-stream-reader-in buffer-empty? and
+    [ 2drop f ] [ call ] if ;
+
+: stream-read-part ( count stream -- string )
+    [ fill-input ] 2keep
+    [ dupd win32-stream-reader-in buffer> ] unless-done nip ;
+
+: stream-read-loop ( count stream sbuf -- )
+    pick over length - dup 0 > [
+        pick stream-read-part dup [
+            dup nappend stream-read-loop
+        ] [
+            2drop 2drop
+        ] if
+    ] [
+        2drop 2drop
+    ] if ;
+
+M: win32-stream-reader stream-read ( n stream -- str/f )
+    >r 0 max >fixnum r>
+    2dup stream-read-part dup [
+        pick over length > [
+            pick <sbuf>
+            [ swap nappend ] keep
+            [ stream-read-loop ] keep
+            fast>string
+        ] [
+            2nip
+        ] if
+    ] [
+        2nip
+    ] if ;
+
+M: win32-stream-reader stream-read1 ( stream -- ch/f )
+    1 over fill-input [ win32-stream-reader-in buffer-pop ] unless-done ;
 
 M: win32-stream-reader stream-close ( stream -- )
     dup win32-stream-reader-in buffer-free
     win32-stream-handle CloseHandle 0 = [ win32-throw-error ] when ;
 
-M: win32-stream-reader stream-read1 ( stream -- ch/f )
-    >r 1 r> consume-input >string-or-f first ;
-
-M: win32-stream-reader stream-read ( n stream -- str/f )
-    swap >fixnum >r win32-buffer-size <sbuf> r> do-read-count ;
-
+M: win32-stream-writer stream-flush ( stream -- ) maybe-flush-output ;
+M: win32-stream-writer stream-write1 ( ch stream -- ) >r >fixnum r> do-write ;
+M: win32-stream-writer stream-write ( str stream -- ) do-write ;
 M: win32-stream-writer stream-close ( stream -- )
     dup maybe-flush-output
     dup win32-stream-writer-out buffer-free
     win32-stream-handle CloseHandle 0 = [ win32-throw-error ] when ;
-
-M: win32-stream-writer stream-flush ( stream -- ) maybe-flush-output ;
-M: win32-stream-writer stream-write1 ( ch stream -- ) >r >fixnum r> do-write ;
-M: win32-stream-writer stream-write ( str stream -- ) do-write ;
 
 M: win32-stream set-timeout ( n stream -- ) set-win32-stream-timeout ;
 
