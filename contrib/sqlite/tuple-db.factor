@@ -15,17 +15,9 @@ TUPLE: db-field name bind-name slot type ;
 ! a tuple are mapped to the fields of a sqlite database. 
 TUPLE: mapping tuple table fields one-to-one one-to-many   ;
 
-: sanitize-conversions ( -- alist )
-  H{
-    { CHAR: - "_" }
-    { CHAR: ? "p" }
-  } ;
-
 : sanitize ( string -- string ) 
-  #! Convert a string so it can be used as a table or field name.
-    [
-        [ dup sanitize-conversions hash [ % ] [ , ] ?if ] each
-    ] "" make ;
+    #! Convert a string so it can be used as a table or field name.
+    "_p" "-?" pick subst ;
 
 : tuple-fields ( class -- seq )
   #! Given a tuple class return a list of the fields
@@ -49,7 +41,6 @@ TUPLE: mapping tuple table fields one-to-one one-to-many   ;
 SYMBOL: mappings
 
 : init-mappings ( -- )
-  #! 
   H{ } mappings set-global ;
 
 : get-mappings ( -- hashtable )
