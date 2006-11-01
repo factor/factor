@@ -63,9 +63,9 @@ M: block section-fits? ( section -- ? )
 : change-indent ( n -- )
     tab-size get * indent [ + ] change ;
 
-: <indent ( block -- ) 1 change-indent ;
+: <indent ( -- ) 1 change-indent ;
 
-: indent> ( block -- ) -1 change-indent ;
+: indent> ( -- ) -1 change-indent ;
 
 ! Text section
 TUPLE: text string ;
