@@ -257,8 +257,8 @@ void recursive_mark(CELL xt)
 /* Push the free space and total size of the code heap */
 void primitive_code_room(void)
 {
-	box_unsigned_cell(heap_free_space(&compiling));
-	box_unsigned_cell(compiling.limit - compiling.base);
+	dpush(tag_fixnum(heap_free_space(&compiling) / 1024));
+	dpush(tag_fixnum((compiling.limit - compiling.base) / 1024);
 }
 
 /* Perform a code GC */

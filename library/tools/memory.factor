@@ -28,7 +28,7 @@ strings styles vectors words ;
 : room. ( -- )
     [
         { "" "Total" "Used" "Free" } ,
-        data-room 0 [
+        data-room 2 group 0 [
             "Generation " pick number>string append
             >r first2 r> total/used/free, 1+
         ] reduce drop

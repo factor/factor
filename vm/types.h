@@ -31,7 +31,6 @@ F_ARRAY *allot_array_internal(CELL type, F_FIXNUM capacity);
 F_ARRAY *allot_array(CELL type, F_FIXNUM capacity, CELL fill);
 F_ARRAY *allot_byte_array(F_FIXNUM size);
 
-CELL allot_array_2(CELL v1, CELL v2);
 CELL allot_array_4(CELL v1, CELL v2, CELL v3, CELL v4);
 
 void primitive_array(void);

@@ -12,8 +12,8 @@ CELL callframe_end;
 
 #define USER_ENV 32
 
-#define CARD_OFF_ENV      1 /* for compiling set-slot */
-#define NLX_VECTOR_ENV    2 /* non-local exit hook */
+#define CELL_SIZE_ENV     1 /* sizeof(CELL) */
+#define NLX_VECTOR_ENV    2 /* non-local exit hook, used by library only */
 #define NAMESTACK_ENV     3 /* used by library only */
 #define GLOBAL_ENV        4
 #define BREAK_ENV         5
@@ -28,7 +28,6 @@ CELL callframe_end;
 #define OUT_ENV           14
 #define GEN_ENV           15 /* set to gen_count */
 #define IMAGE_ENV         16 /* image name */
-#define CELL_SIZE_ENV     17 /* sizeof(CELL) */
 
 /* TAGGED user environment data; see getenv/setenv prims */
 DLLEXPORT CELL userenv[USER_ENV];

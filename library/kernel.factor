@@ -92,7 +92,7 @@ IN: kernel-internals
 : num-tags 8 ; inline
 : tag-bits 3 ; inline
 
-: cell ( -- n ) 17 getenv ; foldable
+: cell ( -- n ) 1 getenv ; foldable
 
 : fixnum-tag  BIN: 000 ; inline
 : bignum-tag  BIN: 001 ; inline

@@ -82,29 +82,17 @@ void primitive_size(void)
 /* Push memory usage statistics in data heap */
 void primitive_data_room(void)
 {
+	F_ARRAY *a = allot_array(ARRAY_TYPE,gen_count * 2,F);
 	int gen;
 
-	box_unsigned_cell(cards_end - cards);
-	box_unsigned_cell(prior.limit - prior.base);
-	
+	dpush(tag_fixnum((cards_end - cards) >> 10));
+	dpush(tag_fixnum((prior.limit - prior.base) >> 10));
+
 	for(gen = 0; gen < gen_count; gen++)
 	{
 		F_ZONE *z = &generations[gen];
-		CELL used = allot_cell(z->limit - z->here);
-		REGISTER_ROOT(used);
-		CELL total = allot_cell(z->limit - z->base);
-		UNREGISTER_ROOT(used);
-		CELL pair = allot_array_2(used,total);
-		REGISTER_ROOT(pair);
-	}
-
-	F_ARRAY *a = allot_array(ARRAY_TYPE,gen_count,F);
-
-	for(gen = gen_count - 1; gen >= 0; gen--)
-	{
-		CELL pair;
-		UNREGISTER_ROOT(pair);
-		put(AREF(a,gen),pair);
+		put(AREF(a,gen * 2),tag_fixnum((z->limit - z->here) >> 10));
+		put(AREF(a,gen * 2 + 1),tag_fixnum((z->limit - z->base) >> 10));
 	}
 
 	dpush(tag_object(a));

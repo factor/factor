@@ -23,7 +23,6 @@ void init_factor(const char* image,
 	userenv[CPU_ENV] = tag_object(from_char_string(FACTOR_CPU_STRING));
 	userenv[OS_ENV] = tag_object(from_char_string(FACTOR_OS_STRING));
 	userenv[GEN_ENV] = tag_fixnum(gen_count);
-	userenv[CARD_OFF_ENV] = allot_cell(cards_offset);
 	userenv[IMAGE_ENV] = tag_object(from_char_string(image));
 	userenv[CELL_SIZE_ENV] = tag_fixnum(sizeof(CELL));
 }

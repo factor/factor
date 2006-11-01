@@ -66,12 +66,10 @@ IN: compiler
     { +clobber+ { "n" } }
 } define-intrinsic
 
-: card-offset 1 getenv ; inline
-
 : generate-write-barrier ( -- )
     #! Mark the card pointed to by vreg.
     "obj" operand card-bits SHR
-    "obj" operand card-offset ADD rel-absolute-cell rel-cards
+    "obj" operand HEX: ffff ADD rel-absolute-cell rel-cards
     "obj" operand [] card-mark OR ;
 
 \ set-slot [
