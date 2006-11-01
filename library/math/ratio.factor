@@ -1,5 +1,5 @@
-! Copyright (C) 2004, 2005 Slava Pestov.
-! See http://factor.sf.net/license.txt for BSD license.
+! Copyright (C) 2004, 2006 Slava Pestov.
+! See http://factorcode.org/license.txt for BSD license.
 IN: math
 USING: generic kernel kernel-internals math math-internals ;
 
@@ -24,6 +24,12 @@ M: ratio number=
 
 : ratio+d ( a/b c/d -- b*d )
     denominator swap denominator * ; inline
+
+M: ratio >integer >fraction /i ;
+M: ratio >float >fraction /f ;
+
+M: ratio >fixnum >integer >fixnum ;
+M: ratio >bignum >integer >bignum ;
 
 M: ratio < scale < ;
 M: ratio <= scale <= ;

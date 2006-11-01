@@ -1,5 +1,5 @@
 IN: alien
-USING: help ;
+USING: arrays help ;
 
 HELP: alien
 { $class-description "The class of alien pointers. See " { $link "syntax-aliens" } " for syntax and " { $link "c-objects" } " for general information." } ;
@@ -24,7 +24,7 @@ $terpri
 HELP: alien-address ( c-ptr -- addr )
 { $values { "c-ptr" "an alien or " { $link f } } { "addr" "a non-negative integer" } }
 { $description "Outputs the address of an alien." }
-{ $note "Taking the address of a " { $link byte-array } " is explicitly prohibited since byte arrays can be moved by the garbage collector between the time the address is taken, and when it is accessed. If you need to pass pointers to C functions which will persist across alien calls, you must allocate unmanaged memory instead. See " { $link "malloc" } "." } ;
+{ $notes "Taking the address of a " { $link byte-array } " is explicitly prohibited since byte arrays can be moved by the garbage collector between the time the address is taken, and when it is accessed. If you need to pass pointers to C functions which will persist across alien calls, you must allocate unmanaged memory instead. See " { $link "malloc" } "." } ;
 
 HELP: <alien>
 { $values { "address" "a non-negative integer" } { "alien" "a new alien address" } }

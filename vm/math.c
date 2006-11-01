@@ -4,41 +4,46 @@
 
 F_FIXNUM to_fixnum(CELL tagged)
 {
-	F_RATIO* r;
-	F_ARRAY* x;
-	F_ARRAY* y;
-	F_FLOAT* f;
-
 	switch(TAG(tagged))
 	{
 	case FIXNUM_TYPE:
 		return untag_fixnum_fast(tagged);
 	case BIGNUM_TYPE:
-		return (F_FIXNUM)s48_bignum_to_fixnum((F_ARRAY*)UNTAG(tagged));
-	case RATIO_TYPE:
-		r = (F_RATIO*)UNTAG(tagged);
-		x = to_bignum(r->numerator);
-		y = to_bignum(r->denominator);
-		return to_fixnum(tag_bignum(s48_bignum_quotient(x,y)));
-	case FLOAT_TYPE:
-		f = (F_FLOAT*)UNTAG(tagged);
-		return (F_FIXNUM)f->n;
+		return bignum_to_fixnum(tagged);
 	default:
 		type_error(FIXNUM_TYPE,tagged);
 		return -1; /* can't happen */
 	}
 }
 
-void primitive_to_fixnum(void)
+CELL to_cell(CELL x)
 {
-	drepl(tag_fixnum(to_fixnum(dpeek())));
+	switch(type_of(x))
+	{
+	case FIXNUM_TYPE:
+		return untag_fixnum_fast(x);
+	case BIGNUM_TYPE:
+		return s48_bignum_to_fixnum(untag_bignum_fast(x));
+	default:
+		type_error(BIGNUM_TYPE,x);
+		return 0;
+	}
+}
+
+void primitive_bignum_to_fixnum(void)
+{
+	drepl(tag_fixnum(bignum_to_fixnum(dpeek())));
+}
+
+void primitive_float_to_fixnum(void)
+{
+	drepl(tag_fixnum(float_to_fixnum(dpeek())));
 }
 
 #define POP_FIXNUMS(x,y) \
-	F_FIXNUM x, y; \
-	y = untag_fixnum_fast(dpop()); \
-	x = untag_fixnum_fast(dpop());
-	
+	F_FIXNUM y = untag_fixnum_fast(dpop()); \
+	F_FIXNUM x = untag_fixnum_fast(dpop());
+
 /* The fixnum arithmetic operations defined in C are relatively slow.
 The Factor compiler has optimized assembly intrinsics for all these
 operations. */
@@ -222,51 +227,14 @@ INT_DEFUNBOX(unbox_unsigned_1, unsigned char)
 INT_DEFUNBOX(unbox_unsigned_2, unsigned short) 
 
 /* Bignums */
-
-CELL to_cell(CELL x)
+void primitive_fixnum_to_bignum(void)
 {
-	switch(type_of(x))
-	{
-	case FIXNUM_TYPE:
-		return untag_fixnum_fast(x);
-	case BIGNUM_TYPE:
-		return s48_bignum_to_fixnum(untag_bignum_fast(x));
-	default:
-		type_error(BIGNUM_TYPE,x);
-		return 0;
-	}
+	drepl(tag_bignum(fixnum_to_bignum(dpeek())));
 }
 
-F_ARRAY* to_bignum(CELL tagged)
+void primitive_float_to_bignum(void)
 {
-	F_RATIO* r;
-	F_ARRAY* x;
-	F_ARRAY* y;
-	F_FLOAT* f;
-
-	switch(type_of(tagged))
-	{
-	case FIXNUM_TYPE:
-		return s48_fixnum_to_bignum(untag_fixnum_fast(tagged));
-	case BIGNUM_TYPE:
-		return (F_ARRAY*)UNTAG(tagged);
-	case RATIO_TYPE:
-		r = (F_RATIO*)UNTAG(tagged);
-		x = to_bignum(r->numerator);
-		y = to_bignum(r->denominator);
-		return s48_bignum_quotient(x,y);
-	case FLOAT_TYPE:
-		f = (F_FLOAT*)UNTAG(tagged);
-		return s48_double_to_bignum(f->n);
-	default:
-		type_error(BIGNUM_TYPE,tagged);
-		return NULL; /* can't happen */
-	}
-}
-
-void primitive_to_bignum(void)
-{
-	drepl(tag_bignum(to_bignum(dpeek())));
+	drepl(tag_bignum(fixnum_to_bignum(dpeek())));
 }
 
 #define POP_BIGNUMS(x,y) \
@@ -427,7 +395,7 @@ F_FIXNUM unbox_unsigned_cell(void)
 
 void box_signed_4(s32 n)
 {
-	dpush(tag_bignum(s48_long_to_bignum(n)));
+	dpush(allot_integer(n));
 }
 
 s32 unbox_signed_4(void)
@@ -437,7 +405,7 @@ s32 unbox_signed_4(void)
 
 void box_unsigned_4(u32 n)
 {
-	dpush(tag_bignum(s48_ulong_to_bignum(n)));
+	dpush(allot_cell(n));
 }
 
 u32 unbox_unsigned_4(void)
@@ -447,22 +415,50 @@ u32 unbox_unsigned_4(void)
 
 void box_signed_8(s64 n)
 {
-	dpush(tag_bignum(s48_long_long_to_bignum(n)));
+	if(n < FIXNUM_MIN || n > FIXNUM_MAX)
+		dpush(tag_bignum(s48_long_long_to_bignum(n)));
+	else
+		dpush(tag_fixnum(n));
 }
 
 s64 unbox_signed_8(void)
 {
-	return s48_bignum_to_long_long(to_bignum(dpop()));
+	CELL obj = dpop();
+
+	switch(type_of(obj))
+	{
+	case FIXNUM_TYPE:
+		return untag_fixnum_fast(obj);
+	case BIGNUM_TYPE:
+		return s48_bignum_to_long_long(untag_array_fast(obj));
+	default:
+		type_error(BIGNUM_TYPE,obj);
+		return -1;
+	}
 }
 
 void box_unsigned_8(u64 n)
 {
-	dpush(tag_bignum(s48_ulong_long_to_bignum(n)));
+	if(n > FIXNUM_MAX)
+		dpush(tag_bignum(s48_ulong_long_to_bignum(n)));
+	else
+		dpush(tag_fixnum(n));
 }
 
 u64 unbox_unsigned_8(void)
 {
-	return s48_bignum_to_ulong_long(to_bignum(dpop()));
+	CELL obj = dpop();
+
+	switch(type_of(obj))
+	{
+	case FIXNUM_TYPE:
+		return untag_fixnum_fast(obj);
+	case BIGNUM_TYPE:
+		return s48_bignum_to_ulong_long(untag_array_fast(obj));
+	default:
+		type_error(BIGNUM_TYPE,obj);
+		return -1;
+	}
 }
 
 /* Ratios */
@@ -478,35 +474,14 @@ void primitive_from_fraction(void)
 }
 
 /* Floats */
-
-double to_float(CELL tagged)
+void primitive_fixnum_to_float(void)
 {
-	F_RATIO* r;
-	double x;
-	double y;
-
-	switch(TAG(tagged))
-	{
-	case FIXNUM_TYPE:
-		return (double)untag_fixnum_fast(tagged);
-	case BIGNUM_TYPE:
-		return s48_bignum_to_double((F_ARRAY*)UNTAG(tagged));
-	case RATIO_TYPE:
-		r = (F_RATIO*)UNTAG(tagged);
-		x = to_float(r->numerator);
-		y = to_float(r->denominator);
-		return x / y;
-	case FLOAT_TYPE:
-		return ((F_FLOAT*)UNTAG(tagged))->n;
-	default:
-		type_error(FLOAT_TYPE,tagged);
-		return 0.0; /* can't happen */
-	}
+	drepl(allot_float(fixnum_to_float(dpeek())));
 }
 
-void primitive_to_float(void)
+void primitive_bignum_to_float(void)
 {
-	drepl(allot_float(to_float(dpeek())));
+	drepl(allot_float(bignum_to_float(dpeek())));
 }
 
 void primitive_str_to_float(void)
@@ -634,7 +609,7 @@ void name (type flo)                                                       \
 #define FLO_DEFUNBOX(name,type) \
 type name(void)                                                                \
 {                                                                              \
-	return to_float(dpop());                                                  \
+	return untag_float(dpop());                                            \
 }
 
 FLO_DEFBOX(box_float,float)

@@ -23,6 +23,10 @@ M: real <=> - ;
 M: float zero?
     dup 0.0 float= swap -0.0 float= or ;
 
+M: float >fixnum float>fixnum ;
+M: float >bignum float>bignum ;
+M: float >float ;
+
 M: float < float< ;
 M: float <= float<= ;
 M: float > float> ;

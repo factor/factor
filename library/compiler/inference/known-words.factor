@@ -71,14 +71,23 @@ t over set-effect-terminated?
 
 \ string>sbuf { string } { sbuf } <effect> "infer-effect" set-word-prop
 
-\ >fixnum { real } { fixnum } <effect> "infer-effect" set-word-prop
-\ >fixnum t "foldable" set-word-prop
+\ bignum>fixnum { bignum } { fixnum } <effect> "infer-effect" set-word-prop
+\ bignum>fixnum t "foldable" set-word-prop
 
-\ >bignum { real } { bignum } <effect> "infer-effect" set-word-prop
-\ >bignum t "foldable" set-word-prop
+\ float>fixnum { float } { fixnum } <effect> "infer-effect" set-word-prop
+\ bignum>fixnum t "foldable" set-word-prop
 
-\ >float { real } { float } <effect> "infer-effect" set-word-prop
-\ >float t "foldable" set-word-prop
+\ fixnum>bignum { fixnum } { bignum } <effect> "infer-effect" set-word-prop
+\ fixnum>bignum t "foldable" set-word-prop
+
+\ float>bignum { float } { bignum } <effect> "infer-effect" set-word-prop
+\ float>bignum t "foldable" set-word-prop
+
+\ fixnum>float { fixnum } { float } <effect> "infer-effect" set-word-prop
+\ fixnum>float t "foldable" set-word-prop
+
+\ bignum>float { bignum } { float } <effect> "infer-effect" set-word-prop
+\ bignum>float t "foldable" set-word-prop
 
 \ (fraction>) { integer integer } { rational } <effect> "infer-effect" set-word-prop
 \ (fraction>) t "foldable" set-word-prop

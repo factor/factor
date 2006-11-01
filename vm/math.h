@@ -11,8 +11,16 @@ INLINE CELL tag_fixnum(F_FIXNUM untagged)
 	return RETAG(untagged << TAG_BITS,FIXNUM_TYPE);
 }
 
+INLINE F_FIXNUM bignum_to_fixnum(CELL tagged)
+{
+	return (F_FIXNUM)s48_bignum_to_fixnum(untag_array_fast(tagged));
+}
+
 F_FIXNUM to_fixnum(CELL tagged);
-void primitive_to_fixnum(void);
+CELL to_cell(CELL tagged);
+
+void primitive_bignum_to_fixnum(void);
+void primitive_float_to_fixnum(void);
 
 void primitive_fixnum_add(void);
 void primitive_fixnum_subtract(void);
@@ -55,9 +63,13 @@ INLINE CELL tag_bignum(F_ARRAY* bignum)
 	return RETAG(bignum,BIGNUM_TYPE);
 }
 
-CELL to_cell(CELL x);
-F_ARRAY* to_bignum(CELL tagged);
-void primitive_to_bignum(void);
+INLINE F_ARRAY *fixnum_to_bignum(CELL tagged)
+{
+	return s48_fixnum_to_bignum(untag_fixnum_fast(tagged));
+}
+
+void primitive_fixnum_to_bignum(void);
+void primitive_float_to_bignum(void);
 void primitive_bignum_eq(void);
 void primitive_bignum_add(void);
 void primitive_bignum_subtract(void);
@@ -129,6 +141,12 @@ INLINE double untag_float_fast(CELL tagged)
 	return ((F_FLOAT*)UNTAG(tagged))->n;
 }
 
+INLINE double untag_float(CELL tagged)
+{
+	type_check(FLOAT_TYPE,tagged);
+	return untag_float_fast(tagged);
+}
+
 INLINE CELL allot_float(double n)
 {
 	F_FLOAT* flo = allot_object(FLOAT_TYPE,sizeof(F_FLOAT));
@@ -136,8 +154,28 @@ INLINE CELL allot_float(double n)
 	return RETAG(flo,FLOAT_TYPE);
 }
 
-double to_float(CELL tagged);
-void primitive_to_float(void);
+INLINE F_FIXNUM float_to_fixnum(CELL tagged)
+{
+	return (F_FIXNUM)untag_float_fast(tagged);
+}
+
+INLINE F_ARRAY *float_to_bignum(CELL tagged)
+{
+	return s48_double_to_bignum(untag_float_fast(tagged));
+}
+
+INLINE double fixnum_to_float(CELL tagged)
+{
+	return (double)untag_fixnum_fast(tagged);
+}
+
+INLINE double bignum_to_float(CELL tagged)
+{
+	return s48_bignum_to_double(untag_array_fast(tagged));
+}
+
+void primitive_fixnum_to_float(void);
+void primitive_bignum_to_float(void);
 void primitive_str_to_float(void);
 void primitive_float_to_str(void);
 void primitive_float_to_bits(void);

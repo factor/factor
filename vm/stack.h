@@ -21,11 +21,6 @@ INLINE CELL dpeek(void)
 	return get(ds);
 }
 
-INLINE CELL dpeek2(void)
-{
-	return get(ds - CELLS);
-}
-
 INLINE CELL cpop(void)
 {
 	CELL value = get(cs);

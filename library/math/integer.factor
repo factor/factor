@@ -52,6 +52,12 @@ M: integer /
         2dup gcd nip tuck /i >r /i r> fraction>
     ] if ;
 
+M: integer >integer ;
+
+M: fixnum >fixnum ;
+M: fixnum >bignum fixnum>bignum ;
+M: fixnum >float fixnum>float ;
+
 M: fixnum number= eq? ;
 
 M: fixnum < fixnum< ;
@@ -74,6 +80,10 @@ M: fixnum bitxor fixnum-bitxor ;
 M: fixnum shift >fixnum fixnum-shift ;
 
 M: fixnum bitnot fixnum-bitnot ;
+
+M: bignum >fixnum bignum>fixnum ;
+M: bignum >bignum ;
+M: bignum >float bignum>float ;
 
 M: bignum number= bignum= ;
 M: bignum < bignum< ;

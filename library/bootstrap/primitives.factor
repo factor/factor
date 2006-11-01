@@ -43,9 +43,12 @@ call
     { "dispatch" "kernel-internals"         }
     { "rehash-string" "strings"             }
     { "string>sbuf" "strings"               }
-    { ">fixnum" "math"                      }
-    { ">bignum" "math"                      }
-    { ">float" "math"                       }
+    { "bignum>fixnum" "math-internals"      }
+    { "float>fixnum" "math-internals"       }
+    { "fixnum>bignum" "math-internals"      }
+    { "float>bignum" "math-internals"       }
+    { "fixnum>float" "math-internals"       }
+    { "bignum>float" "math-internals"       }
     { "(fraction>)" "math-internals"        }
     { "string>float" "math-internals"       }
     { "float>string" "math-internals"       }
@@ -240,11 +243,11 @@ num-types f <array> builtins set
 
 "fixnum?" "math" create t "inline" set-word-prop
 "fixnum" "math" create 0 "fixnum?" "math" create { } define-builtin
-"fixnum" "math" create ">fixnum" "math" lookup unit "coercer" set-word-prop
+"fixnum" "math" create ">fixnum" "math" create unit "coercer" set-word-prop
 
 "bignum?" "math" create t "inline" set-word-prop
 "bignum" "math" create 1 "bignum?" "math" create { } define-builtin
-"bignum" "math" create ">bignum" "math" lookup unit "coercer" set-word-prop
+"bignum" "math" create ">bignum" "math" create unit "coercer" set-word-prop
 
 "word?" "words" create t "inline" set-word-prop
 "word" "words" create 2 "word?" "words" create
@@ -297,7 +300,7 @@ num-types f <array> builtins set
 
 "float?" "math" create t "inline" set-word-prop
 "float" "math" create 5 "float?" "math" create { } define-builtin
-"float" "math" create ">float" "math" lookup unit "coercer" set-word-prop
+"float" "math" create ">float" "math" create unit "coercer" set-word-prop
 
 "complex?" "math" create t "inline" set-word-prop
 "complex" "math" create 6 "complex?" "math" create

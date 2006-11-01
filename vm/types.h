@@ -47,7 +47,7 @@ void primitive_become(void);
 
 INLINE CELL array_capacity(F_ARRAY* array)
 {
-	return untag_fixnum_fast(array->capacity);
+	return array->capacity >> TAG_BITS;
 }
 
 INLINE F_VECTOR* untag_vector(CELL tagged)
@@ -75,7 +75,7 @@ INLINE F_STRING* untag_string(CELL tagged)
 
 INLINE CELL string_capacity(F_STRING* str)
 {
-	return untag_fixnum_fast(str->length);
+	return str->length >> TAG_BITS;
 }
 
 INLINE CELL string_size(CELL size)

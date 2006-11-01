@@ -4,7 +4,6 @@
 - what if retain stack is full
   - ie, inside retain stack overflow handler, don't cons?
 - os-windows.c error_message &co
-- to_float, to_fixnum, to_bignum: don't cons
 - inline float allocation needs a gc check
 - alien invoke, callback need a gc check
 - relocation should not cons at all
