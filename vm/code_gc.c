@@ -258,7 +258,7 @@ void recursive_mark(CELL xt)
 void primitive_code_room(void)
 {
 	dpush(tag_fixnum(heap_free_space(&compiling) / 1024));
-	dpush(tag_fixnum((compiling.limit - compiling.base) / 1024);
+	dpush(tag_fixnum((compiling.limit - compiling.base) / 1024));
 }
 
 /* Perform a code GC */
