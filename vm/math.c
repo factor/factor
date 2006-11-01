@@ -234,7 +234,7 @@ void primitive_fixnum_to_bignum(void)
 
 void primitive_float_to_bignum(void)
 {
-	drepl(tag_bignum(fixnum_to_bignum(dpeek())));
+	drepl(tag_bignum(float_to_bignum(dpeek())));
 }
 
 #define POP_BIGNUMS(x,y) \

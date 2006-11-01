@@ -8,8 +8,10 @@ USING: errors kernel math math-internals ;
 
 GENERIC: sqrt ( x -- y ) foldable
 
-M: complex sqrt >polar swap fsqrt swap 2 / polar> ;
-M: real sqrt dup 0 < [ neg fsqrt 0 swap rect> ] [ fsqrt ] if ;
+M: complex sqrt >polar swap fsqrt swap 2.0 / polar> ;
+
+M: real sqrt
+    >float dup 0.0 < [ neg fsqrt 0.0 swap rect> ] [ fsqrt ] if ;
 
 GENERIC: (^) ( x y -- z ) foldable
 
@@ -22,10 +24,11 @@ GENERIC: (^) ( x y -- z ) foldable
      ] if ; inline
 
 : ^mag ( w abs arg -- magnitude )
-    >r >r >rect swap r> swap fpow r> rot * fexp / ; inline
+    >r >r >float-rect swap r> swap fpow r> rot * fexp /f ;
+    inline
 
 : ^theta ( w abs arg -- theta )
-    >r >r >rect r> flog * swap r> * + ; inline
+    >r >r >float-rect r> flog * swap r> * + ; inline
 
 M: number (^)
     swap >polar 3dup ^theta >r ^mag r> polar> ;

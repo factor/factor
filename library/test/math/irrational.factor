@@ -5,8 +5,8 @@ USE: math-internals
 USE: test
 
 ! Lets get the argument order correct, eh?
-[ 0.0 ] [ 0 1 fatan2 ] unit-test
-[ 0.25 ] [ 2 -2 fpow ] unit-test
+[ 0.0 ] [ 0.0 1.0 fatan2 ] unit-test
+[ 0.25 ] [ 2.0 -2.0 fpow ] unit-test
 
 [ 4.0 ] [ 16 sqrt ] unit-test
 [ C{ 0 4.0 } ] [ -16 sqrt ] unit-test

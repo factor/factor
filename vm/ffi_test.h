@@ -15,5 +15,3 @@ struct rect { float x, y, w, h; };
 DLLEXPORT int ffi_test_12(int a, int b, struct rect c, int d, int e, int f);
 DLLEXPORT int ffi_test_13(int a, int b, int c, int d, int e, int f, int g, int h, int i, int j, int k);
 DLLEXPORT struct foo ffi_test_14(int x, int y);
-DLLEXPORT void ffi_test_15(int x);
-

@@ -75,7 +75,7 @@ kernel-internals math memory namespaces test threads ;
 
 [ 27.0 ] [
     [
-        "x" off 3 4 5 callback-9 callback_test_3 "x" get
+        "x" off 3 4.0 5 callback-9 callback_test_3 "x" get
     ] with-scope
 ] unit-test
 

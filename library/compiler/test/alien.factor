@@ -33,7 +33,7 @@ FUNCTION: int ffi_test_9 int a int b int c int d int e int f int g ;
 [ 28 ] [ 1 2 3 4 5 6 7 ffi_test_9 ] unit-test
 
 FUNCTION: int ffi_test_10 int a int b double c int d float e int f int g int h ;
-[ -34 ] [ 1 2 3 4 5 6 7 8 ffi_test_10 ] unit-test
+[ -34 ] [ 1 2 3.0 4 5.0 6 7 8 ffi_test_10 ] unit-test
 
 BEGIN-STRUCT: foo
     FIELD: int x
@@ -63,7 +63,7 @@ END-STRUCT
 
 FUNCTION: int ffi_test_12 int a int b rect c int d int e int f ;
 
-[ 45 ] [ 1 2 3 4 5 6 <rect> 7 8 9 ffi_test_12 ] unit-test
+[ 45 ] [ 1 2 3.0 4.0 5.0 6.0 <rect> 7 8 9 ffi_test_12 ] unit-test
 
 FUNCTION: int ffi_test_13 int a int b int c int d int e int f int g int h int i int j int k ;
 
@@ -86,8 +86,3 @@ cpu "x86" = macosx? and [
 [ 5 ]
 [ 2 3 "ffi_test_2" f dlsym <alien> indirect-test-2 ]
 unit-test
-
-! Make sure we do a GC if necessary
-FUNCTION: void ffi_test_15 int x ;
-
-[ ] [ 10000000 [ drop 1/3 ffi_test_15 ] each ] unit-test
