@@ -17,11 +17,6 @@ INLINE F_ARRAY* untag_array(CELL tagged)
 	return untag_array_fast(tagged);
 }
 
-INLINE F_ARRAY* untag_byte_array_fast(CELL tagged)
-{
-	return (F_ARRAY*)UNTAG(tagged);
-}
-
 INLINE CELL array_size(CELL size)
 {
 	return sizeof(F_ARRAY) + size * CELLS;

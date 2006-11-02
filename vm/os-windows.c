@@ -49,10 +49,7 @@ s64 current_millis(void)
 
 void ffi_dlopen (DLL *dll, bool error)
 {
-	HMODULE module;
-	char *path = to_char_string(untag_string(dll->path),true);
-
-	module = LoadLibrary(path);
+	HMODULE module = LoadLibrary(alien_offset(dll->path));
 
 	if (!module)
 	{
@@ -66,10 +63,11 @@ void ffi_dlopen (DLL *dll, bool error)
 	dll->dll = module;
 }
 
-void *ffi_dlsym (DLL *dll, F_STRING *symbol, bool error)
+void *ffi_dlsym (DLL *dll, char *symbol, bool error)
 {
-	void *sym = GetProcAddress(dll ? (HMODULE)dll->dll : GetModuleHandle(NULL),
-		to_char_string(symbol,true));
+	void *sym = GetProcAddress(
+		dll ? (HMODULE)dll->dll : GetModuleHandle(NULL),
+		symbol);
 
 	if (!sym)
 	{
@@ -167,7 +165,7 @@ void primitive_cd(void)
 	SetCurrentDirectory(unbox_char_string());
 }
 
-F_BOUNDED_BLOCK *alloc_bounded_block(CELL size)
+F_SEGMENT *alloc_segment(CELL size)
 {
 	SYSTEM_INFO si;
 	char *mem;
@@ -175,7 +173,7 @@ F_BOUNDED_BLOCK *alloc_bounded_block(CELL size)
 
 	GetSystemInfo(&si);
 	if((mem = (char *)VirtualAlloc(NULL, si.dwPageSize*2 + size, MEM_COMMIT, PAGE_EXECUTE_READWRITE)) == 0)
-		fatal_error("VirtualAlloc() failed in alloc_bounded_block()",0);
+		fatal_error("VirtualAlloc() failed in alloc_segment()",0);
 
 	if (!VirtualProtect(mem, si.dwPageSize, PAGE_NOACCESS, &ignore))
 		fatal_error("Cannot allocate low guard page", (CELL)mem);
@@ -183,7 +181,7 @@ F_BOUNDED_BLOCK *alloc_bounded_block(CELL size)
 	if (!VirtualProtect(mem+size+si.dwPageSize, si.dwPageSize, PAGE_NOACCESS, &ignore))
 		fatal_error("Cannot allocate high guard page", (CELL)mem);
 
-	F_BOUNDED_BLOCK *block = safe_malloc(sizeof(F_BOUNDED_BLOCK));
+	F_SEGMENT *block = safe_malloc(sizeof(F_SEGMENT));
 
 	block->start = (int)mem + si.dwPageSize;
 	block->size = size;
@@ -191,7 +189,7 @@ F_BOUNDED_BLOCK *alloc_bounded_block(CELL size)
 	return block;
 }
 
-void dealloc_bounded_block(F_BOUNDED_BLOCK *block)
+void dealloc_segment(F_SEGMENT *block)
 {
 	SYSTEM_INFO si;
 	GetSystemInfo(&si);

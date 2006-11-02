@@ -78,11 +78,11 @@ cpu "x86" = macosx? and [
 : indirect-test-1
     "int" { } "cdecl" alien-indirect ;
 
-[ 3 ] [ "ffi_test_1" f dlsym <alien> indirect-test-1 ] unit-test
+[ 3 ] [ "ffi_test_1" f dlsym indirect-test-1 ] unit-test
 
 : indirect-test-2
     "int" { "int" "int" } "cdecl" alien-indirect ;
 
 [ 5 ]
-[ 2 3 "ffi_test_2" f dlsym <alien> indirect-test-2 ]
+[ 2 3 "ffi_test_2" f dlsym indirect-test-2 ]
 unit-test

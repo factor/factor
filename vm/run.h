@@ -95,6 +95,31 @@ INLINE CELL type_of(CELL tagged)
 		return object_type(tagged);
 }
 
+#define DEFPUSHPOP(prefix,ptr) \
+	INLINE CELL prefix##pop(void) \
+	{ \
+		CELL value = get(ptr); \
+		ptr -= CELLS; \
+		return value; \
+	} \
+	INLINE void prefix##push(CELL tagged) \
+	{ \
+		ptr += CELLS; \
+		put(ptr,tagged); \
+	} \
+	INLINE void prefix##repl(CELL tagged) \
+	{ \
+		put(ptr,tagged); \
+	} \
+	INLINE CELL prefix##peek() \
+	{ \
+		return get(ptr); \
+	}
+
+DEFPUSHPOP(d,ds)
+DEFPUSHPOP(r,rs)
+DEFPUSHPOP(c,cs)
+
 void call(CELL quot);
 
 void handle_error();

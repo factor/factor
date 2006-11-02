@@ -39,6 +39,8 @@ void handle_error(void)
 {
 	if(throwing)
 	{
+		extra_roots = stack_chain->extra_roots;
+
 		if(thrown_keep_stacks)
 		{
 			ds = thrown_ds;

@@ -8,12 +8,12 @@ void *safe_malloc(size_t size);
 typedef struct {
 	CELL start;
 	CELL size;
-} F_BOUNDED_BLOCK;
+} F_SEGMENT;
 
 /* set up guard pages to check for under/overflow.
 size must be a multiple of the page size */
-F_BOUNDED_BLOCK *alloc_bounded_block(CELL size);
-void dealloc_bounded_block(F_BOUNDED_BLOCK *block);
+F_SEGMENT *alloc_segment(CELL size);
+void dealloc_segment(F_SEGMENT *block);
 
 CELL untagged_object_size(CELL pointer);
 CELL unaligned_object_size(CELL pointer);
@@ -194,33 +194,25 @@ void garbage_collection(CELL gen, bool code_gc);
 /* If a runtime function needs to call another function which potentially
 allocates memory, it must store any local variable references to Factor
 objects on the root stack */
-F_BOUNDED_BLOCK *extra_roots_region;
-CELL *extra_roots;
+F_SEGMENT *extra_roots_region;
+CELL extra_roots;
 
-INLINE void push_root(CELL tagged)
-{
-	*(extra_roots++) = tagged;
-}
+DEFPUSHPOP(root_,extra_roots)
 
-INLINE CELL pop_root(void)
-{
-	return *(--extra_roots);
-}
+#define REGISTER_ROOT(obj) root_push(obj)
+#define UNREGISTER_ROOT(obj) obj = root_pop()
 
-#define REGISTER_ROOT(obj) push_root(obj)
-#define UNREGISTER_ROOT(obj) obj = pop_root()
+#define REGISTER_ARRAY(obj) root_push(tag_object(obj))
+#define UNREGISTER_ARRAY(obj) obj = untag_array_fast(root_pop())
 
-#define REGISTER_ARRAY(obj) push_root(tag_object(obj))
-#define UNREGISTER_ARRAY(obj) obj = untag_array_fast(pop_root())
+#define REGISTER_STRING(obj) root_push(tag_object(obj))
+#define UNREGISTER_STRING(obj) obj = untag_string_fast(root_pop())
 
-#define REGISTER_STRING(obj) push_root(tag_object(obj))
-#define UNREGISTER_STRING(obj) obj = untag_string_fast(pop_root())
+#define REGISTER_C_STRING(obj) root_push(tag_object(((F_ARRAY *)obj) - 1))
+#define UNREGISTER_C_STRING(obj) obj = ((char*)(untag_array_fast(root_pop()) + 1))
 
-#define REGISTER_C_STRING(obj) push_root(tag_object(((F_ARRAY *)obj) - 1))
-#define UNREGISTER_C_STRING(obj) obj = ((char*)(untag_array_fast(pop_root()) + 1))
-
-#define REGISTER_BIGNUM(obj) push_root(tag_bignum(obj))
-#define UNREGISTER_BIGNUM(obj) obj = (untag_bignum_fast(pop_root()))
+#define REGISTER_BIGNUM(obj) root_push(tag_bignum(obj))
+#define UNREGISTER_BIGNUM(obj) obj = (untag_bignum_fast(root_pop()))
 
 INLINE void *allot_zone(F_ZONE *z, CELL a)
 {

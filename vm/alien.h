@@ -16,7 +16,7 @@ void* alien_offset(CELL object);
 void fixup_alien(F_ALIEN* d);
 
 DLLEXPORT void *unbox_alien(void);
-DLLEXPORT void box_alien(CELL ptr);
+DLLEXPORT void box_alien(void *ptr);
 
 void primitive_alien_signed_cell(void);
 void primitive_set_alien_signed_cell(void);

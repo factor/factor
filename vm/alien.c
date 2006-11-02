@@ -25,7 +25,7 @@ void *alien_offset(CELL object)
 	switch(type_of(object))
 	{
 	case BYTE_ARRAY_TYPE:
-		array = untag_byte_array_fast(object);
+		array = untag_array_fast(object);
 		return array + 1;
 	case ALIEN_TYPE:
 		alien = untag_alien_fast(object);
@@ -59,12 +59,12 @@ CELL allot_alien(CELL delegate, CELL displacement)
 }
 
 /* make an alien and push */
-void box_alien(CELL ptr)
+void box_alien(void* ptr)
 {
-	if(ptr == 0)
+	if(ptr == NULL)
 		dpush(F);
 	else
-		dpush(allot_alien(F,ptr));
+		dpush(allot_alien(F,(CELL)ptr));
 }
 
 /* make an alien pointing at an offset of another alien */
@@ -155,6 +155,7 @@ void box_value_pair(CELL x, CELL y)
 /* open a native library and push a handle */
 void primitive_dlopen(void)
 {
+	primitive_string_to_char_alien();
 	F_DLL* dll = allot_object(DLL_TYPE,sizeof(F_DLL));
 	dll->path = dpop();
 	ffi_dlopen(dll,true);
@@ -165,9 +166,12 @@ void primitive_dlopen(void)
 void primitive_dlsym(void)
 {
 	CELL dll = dpop();
-	F_STRING *sym = untag_string(dpop());
+	REGISTER_ROOT(dll);
+	char *sym = unbox_char_string();
+	UNREGISTER_ROOT(dll);
+
 	F_DLL *d;
-	
+
 	if(dll == F)
 		d = NULL;
 	else
@@ -177,7 +181,7 @@ void primitive_dlsym(void)
 			general_error(ERROR_EXPIRED,dll,F,true);
 	}
 
-	box_signed_cell((CELL)ffi_dlsym(d,sym,true));
+	box_alien(ffi_dlsym(d,sym,true));
 }
 
 /* close a native library handle */

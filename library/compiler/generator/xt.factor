@@ -1,7 +1,7 @@
 ! Copyright (C) 2004, 2006 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 IN: compiler
-USING: arrays assembler errors generic hashtables kernel
+USING: alien arrays assembler errors generic hashtables kernel
 kernel-internals math namespaces prettyprint queues
 sequences strings vectors words ;
 
@@ -60,7 +60,7 @@ SYMBOL: label-table
     compiled-offset (rel) relocation-table get swap nappend ;
 
 : rel-dlsym ( name dll class -- )
-   >r 2array add-literal r> 1 rel, ;
+   >r >r string>char-alien r> 2array add-literal r> 1 rel, ;
 
 : rel-here ( class -- )
     dup rel-relative = [ drop ] [ 0 swap 2 rel, ] if ;

@@ -33,12 +33,12 @@ void primitive_fopen(void)
 	FILE *file = fopen(path,mode);
 	if(file == NULL)
 		io_error();
-	box_alien((CELL)file);
+	box_alien(file);
 }
 
 void primitive_fgetc(void)
 {
-	FILE* file = (FILE*)unbox_alien();
+	FILE* file = unbox_alien();
 	int c = fgetc(file);
 	if(c == EOF)
 		dpush(F);
@@ -48,7 +48,7 @@ void primitive_fgetc(void)
 
 void primitive_fwrite(void)
 {
-	FILE* file = (FILE*)unbox_alien();
+	FILE* file = unbox_alien();
 	F_STRING* text = untag_string(dpop());
 	F_FIXNUM length = untag_fixnum_fast(text->length);
 
@@ -61,10 +61,10 @@ void primitive_fwrite(void)
 
 void primitive_fflush(void)
 {
-	fflush((FILE*)unbox_alien());
+	fflush(unbox_alien());
 }
 
 void primitive_fclose(void)
 {
-	fclose((FILE*)unbox_alien());
+	fclose(unbox_alien());
 }

@@ -13,7 +13,7 @@
 
 void init_ffi(void);
 void ffi_dlopen(F_DLL *dll, bool error);
-void *ffi_dlsym(F_DLL *dll, F_STRING *symbol, bool error);
+void *ffi_dlsym(F_DLL *dll, char *symbol, bool error);
 void ffi_dlclose(F_DLL *dll);
 
 void unix_init_signals(void);

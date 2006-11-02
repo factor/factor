@@ -1,79 +1,39 @@
-INLINE CELL dpop(void)
-{
-	CELL value = get(ds);
-	ds -= CELLS;
-	return value;
-}
-
-INLINE void drepl(CELL top)
-{
-	put(ds,top);
-}
-
-INLINE void dpush(CELL top)
-{
-	ds += CELLS;
-	put(ds,top);
-}
-
-INLINE CELL dpeek(void)
-{
-	return get(ds);
-}
-
-INLINE CELL cpop(void)
-{
-	CELL value = get(cs);
-	cs -= CELLS;
-	return value;
-}
-
-INLINE void cpush(CELL top)
-{
-	cs += CELLS;
-	put(cs,top);
-}
-
-INLINE CELL rpop(void)
-{
-	CELL value = get(rs);
-	rs -= CELLS;
-	return value;
-}
-
-INLINE void rpush(CELL top)
-{
-	rs += CELLS;
-	put(rs,top);
-}
-
 typedef struct _F_STACKS {
 	/* current datastack top pointer */
 	CELL data;
 	/* saved contents of ds register on entry to callback */
 	CELL data_save;
 	/* memory region holding current datastack */
-	F_BOUNDED_BLOCK *data_region;
+	F_SEGMENT *data_region;
+
 	/* current retain stack top pointer */
 	CELL retain;
 	/* saved contents of rs register on entry to callback */
 	CELL retain_save;
 	/* memory region holding current retain stack */
-	F_BOUNDED_BLOCK *retain_region;
+	F_SEGMENT *retain_region;
+
 	/* current callstack top pointer */
 	CELL call;
 	/* saved contents of cs register on entry to callback */
 	CELL call_save;
 	/* memory region holding current callstack */
-	F_BOUNDED_BLOCK *call_region;
+	F_SEGMENT *call_region;
+
 	/* saved callframe on entry to callback */
 	CELL callframe;
 	CELL callframe_scan;
 	CELL callframe_end;
+
 	/* saved catchstack on entry to callback */
 	CELL catch_save;
+
 	/* saved cards_offset register on entry to callback */
 	CELL cards_offset;
+
+	/* saved extra_roots pointer on entry to callback */
+	CELL extra_roots;
+
 	/* error handler longjmp buffer */
 	JMP_BUF toplevel;
 

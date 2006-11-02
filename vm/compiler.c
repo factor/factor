@@ -19,7 +19,7 @@ CELL get_rel_symbol(F_REL *rel, CELL literal_start)
 {
 	CELL arg = REL_ARGUMENT(rel);
 	F_ARRAY *pair = untag_array(get_literal(literal_start,arg));
-	F_STRING *symbol = untag_string(get(AREF(pair,0)));
+	char *symbol = alien_offset(get(AREF(pair,0)));
 	CELL library = get(AREF(pair,1));
 	F_DLL *dll = (library == F ? NULL : untag_dll(library));
 
@@ -150,12 +150,8 @@ void finalize_code_block(F_COMPILED *relocating, CELL code_start,
 /* Write a sequence of integers to memory, with 'format' bytes per integer */
 void deposit_integers(CELL here, F_VECTOR *vector, CELL format)
 {
-	if(vector->header != tag_header(VECTOR_TYPE))
-		critical_error("FUCKUP 2",0);
 	CELL count = untag_fixnum_fast(vector->top);
 	F_ARRAY *array = untag_array_fast(vector->array);
-	if(array->header != tag_header(ARRAY_TYPE))
-			critical_error("FUCKUP 3",0);
 	CELL i;
 
 	for(i = 0; i < count; i++)
@@ -222,9 +218,6 @@ void primitive_add_compiled_block(void)
 	GC above in which case the data heap semi-spaces will have switched */
 	FROB
 
-	if(code->header != tag_header(VECTOR_TYPE))
-		critical_error("FUCKUP",0);
-
 	/* now we can pop the parameters from the stack */
 	ds -= CELLS * 5;
 
@@ -268,6 +261,7 @@ void primitive_add_compiled_block(void)
 executable */
 void primitive_finalize_compile(void)
 {
+	gc_off = true;
 	F_ARRAY *array = untag_array(dpop());
 
 	/* set word XT's */
@@ -288,4 +282,5 @@ void primitive_finalize_compile(void)
 		CELL xt = to_cell(get(AREF(pair,1)));
 		iterate_code_heap_step(xt_to_compiled(xt),finalize_code_block);
 	}
+	gc_off = false;
 }

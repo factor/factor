@@ -169,7 +169,7 @@ typedef struct {
 
 typedef struct {
 	CELL header;
-	/* tagged string */
+	/* tagged byte array holding a C string */
 	CELL path;
 	/* OS-specific handle */
 	void* dll;

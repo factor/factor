@@ -5,7 +5,7 @@ will be used for the data heap too, if we ever get incremental
 mark/sweep/compact GC. */
 void new_heap(F_HEAP *heap, CELL size)
 {
-	heap->base = (CELL)(alloc_bounded_block(size)->start);
+	heap->base = (CELL)(alloc_segment(size)->start);
 	if(heap->base == 0)
 		fatal_error("Cannot allocate code heap",size);
 	heap->limit = heap->base + size;

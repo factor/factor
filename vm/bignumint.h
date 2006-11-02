@@ -45,19 +45,8 @@ MIT in each case. */
 typedef F_FIXNUM bignum_digit_type;
 typedef F_FIXNUM bignum_length_type;
 
-/* BIGNUM_ALLOCATE allocates a (length + 1)-element array of
-   `bignum_digit_type'; deallocation is the responsibility of the
-   user (in Factor, the garbage collector handles this). */
-#define BIGNUM_ALLOCATE(length_in_digits) \
-	allot_array_internal(BIGNUM_TYPE,length_in_digits + 1)
-
 /* BIGNUM_TO_POINTER casts a bignum object to a digit array pointer. */
 #define BIGNUM_TO_POINTER(bignum) ((CELL*)AREF(bignum,0))
-
-/* BIGNUM_REDUCE_LENGTH allows the memory system to reclaim some
-   space when a bignum's length is reduced from its original value. */
-#define BIGNUM_REDUCE_LENGTH(source, length)            \
-     source = reallot_array(source,length + 1,69)
 
 /* BIGNUM_EXCEPTION is invoked to handle assertion violations. */
 #define BIGNUM_EXCEPTION abort

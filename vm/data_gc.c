@@ -243,7 +243,7 @@ void init_data_heap(CELL gens,
 	gen_count = gens;
 	generations = safe_malloc(sizeof(F_ZONE) * gen_count);
 
-	data_heap_start = (CELL)(alloc_bounded_block(total_size)->start);
+	data_heap_start = (CELL)(alloc_segment(total_size)->start);
 	data_heap_end = data_heap_start + total_size;
 
 	cards = safe_malloc(cards_size);
@@ -271,8 +271,8 @@ void init_data_heap(CELL gens,
 
 	data_heap_end = data_heap_start + total_size;
 
-	extra_roots_region = alloc_bounded_block(getpagesize());
-	extra_roots = (CELL *)extra_roots_region->start;
+	extra_roots_region = alloc_segment(getpagesize());
+	extra_roots = extra_roots_region->start - CELLS;
 }
 
 void collect_callframe_triple(CELL *callframe,
@@ -286,7 +286,7 @@ void collect_callframe_triple(CELL *callframe,
 }
 
 /* Copy all tagged pointers in a range of memory */
-void collect_stack(F_BOUNDED_BLOCK *region, CELL top)
+void collect_stack(F_SEGMENT *region, CELL top)
 {
 	CELL bottom = region->start;
 	CELL ptr;
@@ -296,7 +296,7 @@ void collect_stack(F_BOUNDED_BLOCK *region, CELL top)
 }
 
 /* The callstack has a special format */
-void collect_callstack(F_BOUNDED_BLOCK *region, CELL top)
+void collect_callstack(F_SEGMENT *region, CELL top)
 {
 	CELL bottom = region->start;
 	CELL ptr;
@@ -319,7 +319,7 @@ void collect_roots(void)
 	copy_handle(&bignum_neg_one);
 	collect_callframe_triple(&callframe,&callframe_scan,&callframe_end);
 
-	collect_stack(extra_roots_region,(CELL)(extra_roots - 1));
+	collect_stack(extra_roots_region,extra_roots);
 
 	save_stacks();
 	stacks = stack_chain;

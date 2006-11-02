@@ -118,8 +118,8 @@ bignum_digit_type bignum_destructive_scale_down
 bignum_type bignum_remainder_unsigned_small_denominator
   (bignum_type, bignum_digit_type, int);
 bignum_type bignum_digit_to_bignum(bignum_digit_type, int);
-bignum_type bignum_allocate(bignum_length_type, int);
-bignum_type bignum_allocate_zeroed(bignum_length_type, int);
+bignum_type allot_bignum(bignum_length_type, int);
+bignum_type allot_bignum_zeroed(bignum_length_type, int);
 bignum_type bignum_shorten_length(bignum_type, bignum_length_type);
 bignum_type bignum_trim(bignum_type);
 bignum_type bignum_new_sign(bignum_type, int);

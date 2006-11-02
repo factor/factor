@@ -65,9 +65,11 @@ void nest_stacks(void)
 	new_stacks->callframe_end = callframe_end;
 	new_stacks->catch_save = userenv[CATCHSTACK_ENV];
 
-	new_stacks->data_region = alloc_bounded_block(ds_size);
-	new_stacks->retain_region = alloc_bounded_block(rs_size);
-	new_stacks->call_region = alloc_bounded_block(cs_size);
+	new_stacks->data_region = alloc_segment(ds_size);
+	new_stacks->retain_region = alloc_segment(rs_size);
+	new_stacks->call_region = alloc_segment(cs_size);
+
+	new_stacks->extra_roots = extra_roots;
 
 	new_stacks->next = stack_chain;
 	stack_chain = new_stacks;
@@ -83,24 +85,24 @@ void nest_stacks(void)
 /* called when leaving a compiled callback */
 void unnest_stacks(void)
 {
+	dealloc_segment(stack_chain->data_region);
+	dealloc_segment(stack_chain->retain_region);
+	dealloc_segment(stack_chain->call_region);
+
+	ds = stack_chain->data_save;
+	rs = stack_chain->retain_save;
+	cs = stack_chain->call_save;
+	cards_offset = stack_chain->cards_offset;
+
+	callframe = stack_chain->callframe;
+	callframe_scan = stack_chain->callframe_scan;
+	callframe_end = stack_chain->callframe_end;
+	userenv[CATCHSTACK_ENV] = stack_chain->catch_save;
+
+	extra_roots = stack_chain->extra_roots;
+
 	F_STACKS *old_stacks = stack_chain;
-
-	dealloc_bounded_block(stack_chain->data_region);
-	dealloc_bounded_block(stack_chain->retain_region);
-	dealloc_bounded_block(stack_chain->call_region);
-
-	ds = old_stacks->data_save;
-	rs = old_stacks->retain_save;
-	cs = old_stacks->call_save;
-	cards_offset = old_stacks->cards_offset;
-
-	callframe = old_stacks->callframe;
-	callframe_scan = old_stacks->callframe_scan;
-	callframe_end = old_stacks->callframe_end;
-	userenv[CATCHSTACK_ENV] = old_stacks->catch_save;
-
 	stack_chain = old_stacks->next;
-
 	free(old_stacks);
 }
 

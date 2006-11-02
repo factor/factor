@@ -1,13 +1,8 @@
 + allot refactoring:
 
-- bignum operations
-- rethink all string conversions
 - os-windows.c error_message &co
 - inline float allocation needs a gc check
 - alien invoke, callback need a gc check
-- relocation should not cons at all
-- ffi_dlopen, etc
-- throwing an error can fill up the extra_roots stack
 - last-index miscompiles
 
 + ui:
