@@ -131,9 +131,6 @@ t over set-effect-terminated?
 \ fixnum/i { fixnum fixnum } { integer } <effect> "infer-effect" set-word-prop
 \ fixnum/i t "foldable" set-word-prop
 
-\ fixnum/f { fixnum fixnum } { float } <effect> "infer-effect" set-word-prop
-\ fixnum/f t "foldable" set-word-prop
-
 \ fixnum-mod { fixnum fixnum } { fixnum } <effect> "infer-effect" set-word-prop
 \ fixnum-mod t "foldable" set-word-prop
 
@@ -169,9 +166,6 @@ t over set-effect-terminated?
 
 \ bignum/i { bignum bignum } { bignum } <effect> "infer-effect" set-word-prop
 \ bignum/i t "foldable" set-word-prop
-
-\ bignum/f { bignum bignum } { float } <effect> "infer-effect" set-word-prop
-\ bignum/f t "foldable" set-word-prop
 
 \ bignum-mod { bignum bignum } { bignum } <effect> "infer-effect" set-word-prop
 \ bignum-mod t "foldable" set-word-prop

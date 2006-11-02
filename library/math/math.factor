@@ -21,7 +21,6 @@ G: -   ( x y -- z ) math-combination ; foldable
 G: *   ( x y -- z ) math-combination ; foldable
 G: /   ( x y -- z ) math-combination ; foldable
 G: /i  ( x y -- z ) math-combination ; foldable
-G: /f  ( x y -- z ) math-combination ; foldable
 G: mod ( x y -- z ) math-combination ; foldable
 
 G: /mod ( x y -- z w ) math-combination ; foldable

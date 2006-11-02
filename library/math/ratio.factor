@@ -26,7 +26,6 @@ M: ratio number=
     denominator swap denominator * ; inline
 
 M: ratio >integer >fraction /i ;
-M: ratio >float >fraction /f ;
 
 M: ratio >fixnum >integer >fixnum ;
 M: ratio >bignum >integer >bignum ;
@@ -42,4 +41,3 @@ M: ratio * 2>fraction * >r * r> / ;
 M: ratio / scale / ;
 M: ratio /i scale /i ;
 M: ratio mod 2dup >r >r /i r> r> rot * - ;
-M: ratio /f scale /f ;

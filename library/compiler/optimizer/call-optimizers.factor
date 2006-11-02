@@ -128,7 +128,7 @@ SYMBOL: @
     { { -1 @ } [ nip 0 swap - ]  }
 } define-identities
 
-[ / fixnum/i fixnum/f bignum/i bignum/f float/f ] {
+[ / fixnum/i bignum/i float/f ] {
     { { @ 1 }  [ drop ]          }
     { { @ -1 } [ drop 0 swap - ] }
 } define-identities

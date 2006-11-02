@@ -78,10 +78,11 @@ void primitive_fixnum_multiply(void)
 			box_signed_cell(prod);
 		else
 		{
-			dpush(tag_bignum(
-				s48_bignum_multiply(
-					s48_fixnum_to_bignum(x),
-					s48_fixnum_to_bignum(y))));
+			F_ARRAY *bx = s48_fixnum_to_bignum(x);
+			REGISTER_BIGNUM(bx);
+			F_ARRAY *by = s48_fixnum_to_bignum(y);
+			UNREGISTER_BIGNUM(by);
+			dpush(tag_bignum(s48_bignum_multiply(bx,by)));
 		}
 	}
 }
@@ -90,12 +91,6 @@ void primitive_fixnum_divint(void)
 {
 	POP_FIXNUMS(x,y)
 	box_signed_cell(x / y);
-}
-
-void primitive_fixnum_divfloat(void)
-{
-	POP_FIXNUMS(x,y)
-	box_double((double)x / (double)y);
 }
 
 void primitive_fixnum_divmod(void)
@@ -260,14 +255,6 @@ void primitive_bignum_divint(void)
 	dpush(tag_bignum(s48_bignum_quotient(x,y)));
 }
 
-void primitive_bignum_divfloat(void)
-{
-	POP_BIGNUMS(x,y);
-	box_double(
-		s48_bignum_to_double(x) /
-		s48_bignum_to_double(y));
-}
-
 void primitive_bignum_divmod(void)
 {
 	F_ARRAY *q, *r;
@@ -317,19 +304,7 @@ void primitive_bignum_less(void)
 void primitive_bignum_lesseq(void)
 {
 	POP_BIGNUMS(x,y);
-	switch(s48_bignum_compare(x,y))
-	{
-	case bignum_comparison_less:
-	case bignum_comparison_equal:
-		dpush(T);
-		break;
-	case bignum_comparison_greater:
-		dpush(F);
-		break;
-	default:
-		critical_error("s48_bignum_compare returns bogus value",0);
-		break;
-	}
+	box_boolean(s48_bignum_compare(x,y) != bignum_comparison_greater);
 }
 
 void primitive_bignum_greater(void)
@@ -341,19 +316,7 @@ void primitive_bignum_greater(void)
 void primitive_bignum_greatereq(void)
 {
 	POP_BIGNUMS(x,y);
-	switch(s48_bignum_compare(x,y))
-	{
-	case bignum_comparison_less:
-		dpush(F);
-		break;
-	case bignum_comparison_equal:
-	case bignum_comparison_greater:
-		dpush(T);
-		break;
-	default:
-		critical_error("s48_bignum_compare returns bogus value",0);
-		break;
-	}
+	box_boolean(s48_bignum_compare(x,y) != bignum_comparison_less);
 }
 
 void primitive_bignum_not(void)
@@ -478,6 +441,7 @@ void primitive_str_to_float(void)
 	char *c_str, *end;
 	double f;
 	F_STRING *str = untag_string(dpeek());
+	CELL capacity = string_capacity(str);
 
 	/* if the string has nulls or chars > 255, its definitely not a float */
 	if(!check_string(str,sizeof(char)))
@@ -487,7 +451,7 @@ void primitive_str_to_float(void)
 		c_str = to_char_string(str,false);
 		end = c_str;
 		f = strtod(c_str,&end);
-		if(end != c_str + string_capacity(str))
+		if(end != c_str + capacity)
 			drepl(F);
 		else
 			drepl(allot_float(f));
@@ -503,9 +467,8 @@ void primitive_float_to_str(void)
 }
 
 #define POP_FLOATS(x,y) \
-	double x, y; \
-	y = untag_float_fast(dpop()); \
-	x = untag_float_fast(dpop());
+	double y = untag_float_fast(dpop()); \
+	double x = untag_float_fast(dpop());
 
 void primitive_float_add(void)
 {

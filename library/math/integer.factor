@@ -69,7 +69,6 @@ M: fixnum + fixnum+ ;
 M: fixnum - fixnum- ;
 M: fixnum * fixnum* ;
 M: fixnum /i fixnum/i ;
-M: fixnum /f fixnum/f ;
 M: fixnum mod fixnum-mod ;
 
 M: fixnum /mod fixnum/mod ;
@@ -95,7 +94,6 @@ M: bignum + bignum+ ;
 M: bignum - bignum- ;
 M: bignum * bignum* ;
 M: bignum /i bignum/i ;
-M: bignum /f bignum/f ;
 M: bignum mod bignum-mod ;
 
 M: bignum /mod bignum/mod ;

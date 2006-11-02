@@ -63,7 +63,6 @@ call
     { "fixnum-fast" "math-internals"        }
     { "fixnum*" "math-internals"            }
     { "fixnum/i" "math-internals"           }
-    { "fixnum/f" "math-internals"           }
     { "fixnum-mod" "math-internals"         }
     { "fixnum/mod" "math-internals"         }
     { "fixnum-bitand" "math-internals"      }
@@ -80,7 +79,6 @@ call
     { "bignum-" "math-internals"            }
     { "bignum*" "math-internals"            }
     { "bignum/i" "math-internals"           }
-    { "bignum/f" "math-internals"           }
     { "bignum-mod" "math-internals"         }
     { "bignum/mod" "math-internals"         }
     { "bignum-bitand" "math-internals"      }

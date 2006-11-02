@@ -61,7 +61,6 @@ M: complex * 2dup *re - -rot *im + (rect>) ;
     dup absq >r 2dup *re + -rot *im - r> ; inline
 
 M: complex / complex/ tuck / >r / r> (rect>) ;
-M: complex /f complex/ tuck /f >r /f r> (rect>) ;
 
 M: complex abs absq >float fsqrt ;
 
