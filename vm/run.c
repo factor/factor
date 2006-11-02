@@ -208,8 +208,7 @@ void primitive_set_slot(void)
 	F_FIXNUM slot = untag_fixnum_fast(dpop());
 	CELL obj = UNTAG(dpop());
 	CELL value = dpop();
-	put(SLOT(obj,slot),value);
-	write_barrier(obj);
+	set_slot(obj,slot,value);
 }
 
 void primitive_clone(void)
@@ -290,7 +289,7 @@ void memory_protection_error(CELL addr, int signal)
 	else if(in_page(addr, cs_bot, cs_size, 0))
 		general_error(ERROR_CS_OVERFLOW,F,F,false);
 	else if(in_page(addr, nursery.limit, 0, 0))
-		critical_error("Out of memory",0);
+		critical_error("Out of memory in allot",0);
 		signal_error(signal);
 }
 

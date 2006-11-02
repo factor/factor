@@ -140,7 +140,7 @@ void primitive_read_dir(void)
 				find_data.cFileName));
 			UNREGISTER_ARRAY(result);
 
-			put(AREF(result,result_count),name);
+			set_array_nth(result,result_count,name);
 			result_count++;
 		}
 		while (FindNextFile(dir, &find_data));

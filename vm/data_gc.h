@@ -6,8 +6,8 @@ bool in_page(CELL fault, CELL area, CELL area_size, int offset);
 void *safe_malloc(size_t size);
 
 typedef struct {
-    CELL start;
-    CELL size;
+	CELL start;
+	CELL size;
 } F_BOUNDED_BLOCK;
 
 /* set up guard pages to check for under/overflow.
@@ -81,6 +81,14 @@ INLINE void write_barrier(CELL address)
 {
 	F_CARD *c = ADDR_TO_CARD(address);
 	*c |= CARD_MARK_MASK;
+}
+
+#define SLOT(obj,slot) ((obj) + (slot) * CELLS)
+
+INLINE void set_slot(CELL obj, CELL slot, CELL value)
+{
+	put(SLOT(obj,slot),value);
+	write_barrier(obj);
 }
 
 /* we need to remember the first object allocated in the card */
@@ -211,6 +219,9 @@ INLINE CELL pop_root(void)
 #define REGISTER_C_STRING(obj) push_root(tag_object(((F_ARRAY *)obj) - 1))
 #define UNREGISTER_C_STRING(obj) obj = ((char*)(untag_array_fast(pop_root()) + 1))
 
+#define REGISTER_BIGNUM(obj) push_root(tag_bignum(obj))
+#define UNREGISTER_BIGNUM(obj) obj = (untag_bignum_fast(pop_root()))
+
 INLINE void *allot_zone(F_ZONE *z, CELL a)
 {
 	CELL h = z->here;
@@ -220,11 +231,15 @@ INLINE void *allot_zone(F_ZONE *z, CELL a)
 	return (void*)h;
 }
 
-INLINE void *allot(CELL a)
+INLINE void maybe_gc(CELL a)
 {
 	if(nursery.here + a > nursery.limit)
 		garbage_collection(NURSERY,false);
+}
 
+INLINE void *allot(CELL a)
+{
+	maybe_gc(a);
 	return allot_zone(&nursery,a);
 }
 

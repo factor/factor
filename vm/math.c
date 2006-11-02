@@ -16,18 +16,9 @@ F_FIXNUM to_fixnum(CELL tagged)
 	}
 }
 
-CELL to_cell(CELL x)
+CELL to_cell(CELL tagged)
 {
-	switch(type_of(x))
-	{
-	case FIXNUM_TYPE:
-		return untag_fixnum_fast(x);
-	case BIGNUM_TYPE:
-		return s48_bignum_to_fixnum(untag_bignum_fast(x));
-	default:
-		type_error(BIGNUM_TYPE,x);
-		return 0;
-	}
+	return (CELL)to_fixnum(tagged);
 }
 
 void primitive_bignum_to_fixnum(void)

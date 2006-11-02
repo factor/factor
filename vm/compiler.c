@@ -150,8 +150,12 @@ void finalize_code_block(F_COMPILED *relocating, CELL code_start,
 /* Write a sequence of integers to memory, with 'format' bytes per integer */
 void deposit_integers(CELL here, F_VECTOR *vector, CELL format)
 {
+	if(vector->header != tag_header(VECTOR_TYPE))
+		critical_error("FUCKUP 2",0);
 	CELL count = untag_fixnum_fast(vector->top);
 	F_ARRAY *array = untag_array_fast(vector->array);
+	if(array->header != tag_header(ARRAY_TYPE))
+			critical_error("FUCKUP 3",0);
 	CELL i;
 
 	for(i = 0; i < count; i++)
@@ -162,7 +166,7 @@ void deposit_integers(CELL here, F_VECTOR *vector, CELL format)
 		else if(format == sizeof(unsigned int))
 			*(unsigned int *)(here + format * i) = value;
 		else if(format == CELLS)
-			put(CREF(here,i),to_fixnum(get(AREF(array,i))));
+			put(CREF(here,i),value);
 		else
 			critical_error("Bad format in deposit_integers()",format);
 	}
@@ -193,6 +197,8 @@ void primitive_add_compiled_block(void)
 	{
 		/* Read parameters from stack, leaving them on the stack */
 		FROB
+		if(code->header != tag_header(VECTOR_TYPE))
+			critical_error("FUCKUP 1",0);
 
 		/* Try allocating a new code block */
 		CELL total_length = sizeof(F_COMPILED) + code_length
@@ -208,13 +214,16 @@ void primitive_add_compiled_block(void)
 
 			/* Insufficient room even after code GC, give up */
 			if(start == 0)
-				critical_error("code heap exhausted",0);
+				critical_error("Out of memory in add-compiled-block",0);
 		}
 	}
 
 	/* we have to read the parameters again, since we may have called
 	GC above in which case the data heap semi-spaces will have switched */
 	FROB
+
+	if(code->header != tag_header(VECTOR_TYPE))
+		critical_error("FUCKUP",0);
 
 	/* now we can pop the parameters from the stack */
 	ds -= CELLS * 5;

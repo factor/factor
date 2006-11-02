@@ -1,5 +1,6 @@
 + allot refactoring:
 
+- bignum operations
 - rethink all string conversions
 - os-windows.c error_message &co
 - inline float allocation needs a gc check
@@ -12,6 +13,7 @@
 + ui:
 
 - input operation: copy
+- doc/handbook/alien.facts formatting wrong (erg)
 - docs: mention that 'like' may destroy the underlying sequence
 - live search: timer delay would be nice
 - menu should stay up if mouse button released

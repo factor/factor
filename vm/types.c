@@ -39,7 +39,7 @@ F_ARRAY *allot_array(CELL type, F_FIXNUM capacity, CELL fill)
 	F_ARRAY* array = allot_array_internal(type, capacity);
 	UNREGISTER_ROOT(fill);
 	for(i = 0; i < capacity; i++)
-		put(AREF(array,i),fill);
+		set_array_nth(array,i,fill);
 	return array;
 }
 
@@ -76,10 +76,10 @@ CELL allot_array_4(CELL v1, CELL v2, CELL v3, CELL v4)
 	UNREGISTER_ROOT(v3);
 	UNREGISTER_ROOT(v2);
 	UNREGISTER_ROOT(v1);
-	put(AREF(a,0),v1);
-	put(AREF(a,1),v2);
-	put(AREF(a,2),v3);
-	put(AREF(a,3),v4);
+	set_array_nth(a,0,v1);
+	set_array_nth(a,1,v2);
+	set_array_nth(a,2,v3);
+	set_array_nth(a,3,v4);
 	return tag_object(a);
 }
 
@@ -103,7 +103,7 @@ F_ARRAY *reallot_array(F_ARRAY* array, F_FIXNUM capacity, CELL fill)
 	memcpy(new_array + 1,array + 1,to_copy * CELLS);
 	
 	for(i = to_copy; i < capacity; i++)
-		put(AREF(new_array,i),fill);
+		set_array_nth(new_array,i,fill);
 
 	return new_array;
 }
@@ -302,7 +302,9 @@ F_ARRAY *allot_c_string(CELL capacity, CELL size)
 		F_ARRAY *_c_str; \
 		if(check && !check_string(s,sizeof(type))) \
 			general_error(ERROR_C_STRING,tag_object(s),F,true); \
+		REGISTER_STRING(s); \
 		_c_str = allot_c_string(capacity,sizeof(type)); \
+		UNREGISTER_STRING(s); \
 		type *c_str = (type*)(_c_str + 1); \
 		type##_string_to_memory(s,c_str); \
 		c_str[capacity] = 0; \

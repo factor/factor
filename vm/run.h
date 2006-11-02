@@ -62,8 +62,6 @@ INLINE CELL align8(CELL a)
 /* Canonical T object. It's just a word */
 CELL T;
 
-#define SLOT(obj,slot) ((obj) + (slot) * CELLS)
-
 INLINE CELL tag_header(CELL cell)
 {
 	return RETAG(cell << TAG_BITS,OBJECT_TYPE);

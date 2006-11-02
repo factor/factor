@@ -97,7 +97,7 @@ int main(int argc, char** argv)
 		REGISTER_ARRAY(args);
 		CELL arg = tag_object(from_char_string(argv[i]));
 		UNREGISTER_ARRAY(args);
-		put(AREF(args,i),arg);
+		set_array_nth(args,i,arg);
 	}
 
 	userenv[ARGS_ENV] = tag_object(args);

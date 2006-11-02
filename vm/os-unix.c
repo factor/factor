@@ -103,7 +103,7 @@ void primitive_read_dir(void)
 			CELL name = tag_object(from_char_string(file->d_name));
 			UNREGISTER_ARRAY(result);
 
-			put(AREF(result,result_count),name);
+			set_array_nth(result,result_count,name);
 			result_count++;
 		}
 

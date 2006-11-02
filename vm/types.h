@@ -44,6 +44,12 @@ void primitive_become(void);
 #define AREF(array,index) ((CELL)(array) + sizeof(F_ARRAY) + (index) * CELLS)
 #define UNAREF(array,ptr) (((CELL)(ptr)-(CELL)(array)-sizeof(F_ARRAY)) / CELLS)
 
+INLINE void set_array_nth(F_ARRAY *array, CELL slot, CELL value)
+{
+	put(AREF(array,slot),value);
+	write_barrier((CELL)array);
+}
+
 INLINE CELL array_capacity(F_ARRAY* array)
 {
 	return array->capacity >> TAG_BITS;

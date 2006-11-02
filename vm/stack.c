@@ -273,9 +273,9 @@ void primitive_callstack(void)
 		CELL untagged = UNTAG(quot);
 		CELL position = UNAREF(untagged,get(ptr + CELLS));
 		CELL end = UNAREF(untagged,get(ptr + CELLS * 2));
-		put(AREF(a,i),quot);
-		put(AREF(a,i + 1),tag_fixnum(position));
-		put(AREF(a,i + 2),tag_fixnum(end));
+		set_array_nth(a,i,quot);
+		set_array_nth(a,i + 1,tag_fixnum(position));
+		set_array_nth(a,i + 2,tag_fixnum(end));
 	}
 
 	dpush(tag_object(a));

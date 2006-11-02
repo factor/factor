@@ -91,8 +91,8 @@ void primitive_data_room(void)
 	for(gen = 0; gen < gen_count; gen++)
 	{
 		F_ZONE *z = &generations[gen];
-		put(AREF(a,gen * 2),tag_fixnum((z->limit - z->here) >> 10));
-		put(AREF(a,gen * 2 + 1),tag_fixnum((z->limit - z->base) >> 10));
+		set_array_nth(a,gen * 2,tag_fixnum((z->limit - z->here) >> 10));
+		set_array_nth(a,gen * 2 + 1,tag_fixnum((z->limit - z->base) >> 10));
 	}
 
 	dpush(tag_object(a));
@@ -319,7 +319,7 @@ void collect_roots(void)
 	copy_handle(&bignum_neg_one);
 	collect_callframe_triple(&callframe,&callframe_scan,&callframe_end);
 
-	collect_stack(extra_roots_region,(CELL)extra_roots);
+	collect_stack(extra_roots_region,(CELL)(extra_roots - 1));
 
 	save_stacks();
 	stacks = stack_chain;
@@ -569,7 +569,7 @@ void garbage_collection(CELL gen, bool code_gc)
 		if(gen == TENURED)
 		{
 			/* oops, out of memory */
-			critical_error("Out of memory",0);
+			critical_error("Out of memory in GC",0);
 		}
 		else
 			gen++;

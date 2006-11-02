@@ -147,8 +147,8 @@ happens on Intel Mac OS X */
 void box_value_pair(CELL x, CELL y)
 {
 	F_ARRAY *array = allot_byte_array(2 * sizeof(CELL));
-	put(AREF(array,0),x);
-	put(AREF(array,1),y);
+	set_array_nth(array,0,x);
+	set_array_nth(array,1,y);
 	dpush(tag_object(array));
 }
 

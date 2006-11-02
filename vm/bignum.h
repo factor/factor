@@ -52,9 +52,7 @@ enum bignum_comparison
   bignum_comparison_greater = 1
 };
 
-typedef void * bignum_procedure_context;
 int s48_bignum_equal_p(bignum_type, bignum_type);
-enum bignum_comparison s48_bignum_test(bignum_type);
 enum bignum_comparison s48_bignum_compare(bignum_type, bignum_type);
 bignum_type s48_bignum_add(bignum_type, bignum_type);
 bignum_type s48_bignum_subtract(bignum_type, bignum_type);
@@ -80,17 +78,6 @@ s64 s48_bignum_to_long_long(bignum_type);
 u64 s48_bignum_to_ulong_long(bignum_type);
 bignum_type s48_double_to_bignum(double);
 double s48_bignum_to_double(bignum_type);
-int s48_bignum_fits_in_word_p(bignum_type, long word_length,
-				     int twos_complement_p);
-bignum_type s48_bignum_length_in_bits(bignum_type);
-bignum_type s48_bignum_length_upper_limit(void);
-bignum_type s48_digit_stream_to_bignum
-       (unsigned int n_digits,
-	unsigned int (*producer(bignum_procedure_context)),
-	bignum_procedure_context context,
-	unsigned int radix,
-	int negative_p);
-long s48_bignum_max_digit_stream_radix(void);
 
 /* Added bitwise operators. */
 
@@ -99,9 +86,6 @@ DLLEXPORT bignum_type s48_bignum_bitwise_not(bignum_type),
                    s48_bignum_bitwise_and(bignum_type, bignum_type),
                    s48_bignum_bitwise_ior(bignum_type, bignum_type),
                    s48_bignum_bitwise_xor(bignum_type, bignum_type);
-
-int s48_bignum_oddp(bignum_type);
-long s48_bignum_bit_count(bignum_type);
 
 /* Forward references */
 int bignum_equal_p_unsigned(bignum_type, bignum_type);
@@ -138,13 +122,9 @@ bignum_type bignum_allocate(bignum_length_type, int);
 bignum_type bignum_allocate_zeroed(bignum_length_type, int);
 bignum_type bignum_shorten_length(bignum_type, bignum_length_type);
 bignum_type bignum_trim(bignum_type);
-bignum_type bignum_copy(bignum_type);
 bignum_type bignum_new_sign(bignum_type, int);
 bignum_type bignum_maybe_new_sign(bignum_type, int);
 void bignum_destructive_copy(bignum_type, bignum_type);
-/* Unused
-void bignum_destructive_zero(bignum_type);
-*/
 
 /* Added for bitwise operations. */
 bignum_type bignum_magnitude_ash(bignum_type arg1, long n);
@@ -152,5 +132,3 @@ bignum_type bignum_pospos_bitwise_op(int op, bignum_type, bignum_type);
 bignum_type bignum_posneg_bitwise_op(int op, bignum_type, bignum_type);
 bignum_type bignum_negneg_bitwise_op(int op, bignum_type, bignum_type);
 void        bignum_negate_magnitude(bignum_type);
-long        bignum_unsigned_logcount(bignum_type arg);
-int         bignum_unsigned_logbitp(int shift, bignum_type bignum);
