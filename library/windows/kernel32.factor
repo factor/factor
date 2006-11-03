@@ -608,7 +608,7 @@ FUNCTION: BOOL IsProcessorFeaturePresent ( DWORD ProcessorFeature ) ;
 ! FUNCTION: LocalCompact
 ! FUNCTION: LocalFileTimeToFileTime
 ! FUNCTION: LocalFlags
-! FUNCTION: LocalFree
+FUNCTION: HLOCAL LocalFree ( HLOCAL hMem ) ;
 ! FUNCTION: LocalHandle
 ! FUNCTION: LocalLock
 ! FUNCTION: LocalReAlloc

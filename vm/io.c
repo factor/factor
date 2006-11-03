@@ -1,8 +1,8 @@
 #include "factor.h"
 
-/* This function is used by FFI I/O. Accessing the errno global is
-too troublesome... on some libc's its a funky macro that reads
-thread-local storage. */
+/* This function is used by FFI I/O. Accessing the errno global directly is
+not portable, since on some libc's errno is not a global but a funky macro that
+reads thread-local storage. */
 int err_no(void)
 {
 	return errno;

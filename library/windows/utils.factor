@@ -1,13 +1,20 @@
 ! Copyright (C) 2005, 2006 Doug Coleman.
-! See http://factor.sf.net/license.txt for BSD license.
+! See http://factorcode.org/license.txt for BSD license.
 USING: alien errors io kernel math namespaces parser prettyprint words ;
 IN: win32-api
 
-: (win32-error) ( id -- string )
-    #! In f.exe
-    "char*" f "error_message" [ "int" ] alien-invoke ;
+! You must LocalFree the return value!
+FUNCTION: void* error_message ( DWORD id ) ;
 
-: win32-error ( -- ) GetLastError dup 0 = [ (win32-error) throw ] unless drop ;
+: win32-error ( -- )
+    GetLastError dup zero? [
+        drop
+    ] [
+        error_message
+        dup alien>char-string
+        swap LocalFree drop
+        throw
+    ] if ;
 
 : win32-error=0 zero? [ win32-error ] when ;
 : win32-error>0 0 > [ win32-error ] when ;
@@ -19,4 +26,3 @@ IN: win32-api
 
 : msgbox ( str -- )
     f swap "DebugMsg" MB_OK MessageBox drop ;
-

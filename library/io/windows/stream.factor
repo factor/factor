@@ -137,7 +137,7 @@ M: win32-stream-reader stream-read1 ( stream -- ch/f )
 
 M: win32-stream-reader stream-close ( stream -- )
     dup win32-stream-reader-in buffer-free
-    win32-stream-handle CloseHandle 0 = [ win32-throw-error ] when ;
+    win32-stream-handle CloseHandle win32-error=0 ;
 
 M: win32-stream-writer stream-flush ( stream -- ) maybe-flush-output ;
 M: win32-stream-writer stream-write1 ( ch stream -- ) >r >fixnum r> do-write ;
@@ -145,13 +145,13 @@ M: win32-stream-writer stream-write ( str stream -- ) do-write ;
 M: win32-stream-writer stream-close ( stream -- )
     dup maybe-flush-output
     dup win32-stream-writer-out buffer-free
-    win32-stream-handle CloseHandle 0 = [ win32-throw-error ] when ;
+    win32-stream-handle CloseHandle win32-error=0 ;
 
 M: win32-stream set-timeout ( n stream -- ) set-win32-stream-timeout ;
 
 : expire ( stream -- )
     dup win32-stream-timeout millis pick win32-stream-cutoff > and [
-        win32-stream-handle CancelIo [ win32-throw-error ] unless
+        win32-stream-handle CancelIo [ win32-error ] unless
     ] [
         drop
     ] if ;
@@ -193,5 +193,4 @@ M: win32-duplex-stream stream-close ( stream -- )
     dup duplex-stream-out win32-stream-writer-out buffer-free
     dup duplex-stream-in win32-stream-reader-in buffer-free
     duplex-stream-in
-    win32-stream-handle CloseHandle drop ; ! 0 = [ win32-throw-error ] when ;
-
+    win32-stream-handle CloseHandle drop ;

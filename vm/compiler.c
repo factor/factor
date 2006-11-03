@@ -261,7 +261,6 @@ void primitive_add_compiled_block(void)
 executable */
 void primitive_finalize_compile(void)
 {
-	gc_off = true;
 	F_ARRAY *array = untag_array(dpop());
 
 	/* set word XT's */
@@ -282,5 +281,4 @@ void primitive_finalize_compile(void)
 		CELL xt = to_cell(get(AREF(pair,1)));
 		iterate_code_heap_step(xt_to_compiled(xt),finalize_code_block);
 	}
-	gc_off = false;
 }

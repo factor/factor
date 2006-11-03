@@ -1,9 +1,8 @@
 + allot refactoring:
 
-- os-windows.c error_message &co
 - inline float allocation needs a gc check
 - alien invoke, callback need a gc check
-- last-index miscompiles
+- make sure alien>ZZZ-string is safe on byte arrays
 
 + ui:
 

@@ -1,22 +1,15 @@
 #include "factor.h"
 
-/* frees memory allocated by win32 api calls */
-char *buffer_to_char_string(char *buffer)
-{
-	int capacity = strlen(buffer);
-	F_STRING *_c_str = allot_c_string(capacity,sizeof(u8)) / CHARS + 1);
-	u8 *c_str = (u8*)(_c_str + 1);
-	strcpy(c_str, buffer);
-	LocalFree(buffer);
-	return (char*)c_str;
-}
-
 F_STRING *get_error_message()
 {
 	DWORD id = GetLastError();
-	return from_char_string(error_message(id));
+	char *msg = error_message(id);
+	F_STRING *string = from_char_string(msg);
+	LocalFree(msg);
+	return string;
 }
 
+/* You must LocalFree() the return value! */
 char *error_message(DWORD id)
 {
 	char *buffer;
@@ -36,15 +29,15 @@ char *error_message(DWORD id)
 	while(index >= 0 && isspace(buffer[index]))
 		buffer[index--] = 0;
 
-	return buffer_to_char_string(buffer);
+	return buffer;
 }
 
 s64 current_millis(void)
 {
 	FILETIME t;
 	GetSystemTimeAsFileTime(&t);
-	return (((s64)t.dwLowDateTime | (s64)t.dwHighDateTime<<32) - EPOCH_OFFSET)
-		/ 10000;
+	return (((s64)t.dwLowDateTime | (s64)t.dwHighDateTime<<32)
+		- EPOCH_OFFSET) / 10000;
 }
 
 void ffi_dlopen (DLL *dll, bool error)

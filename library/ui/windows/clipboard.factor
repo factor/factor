@@ -38,10 +38,7 @@ IN: win32
     dup GlobalLock
     rot [ string>char-alien ] keep length memcpy
     dup GlobalUnlock drop
-    CF_TEXT swap SetClipboardData 0 = [
-        win32-error
-        "SetClipboardData failed" throw
-    ] when
+    CF_TEXT swap SetClipboardData 0 = [ win32-error ] when
     CloseClipboard drop ;
 
 TUPLE: pasteboard ;
