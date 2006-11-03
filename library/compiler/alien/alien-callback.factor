@@ -66,7 +66,7 @@ M: alien-callback-error summary
     ] generate-1 ;
 
 M: alien-callback generate-node
-    end-basic-block compile-gc generate-callback iterate-next ;
+    end-basic-block generate-callback iterate-next ;
 
 M: alien-callback stack-reserve*
     alien-callback-parameters stack-space ;

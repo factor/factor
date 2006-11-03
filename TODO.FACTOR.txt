@@ -3,6 +3,7 @@
 - inline float allocation needs a gc check
 - fix alien invoke as required
   - we can just convert strings to aliens beforehand
+  - >float first too
 - fix alien callback as required
 
 + ui:

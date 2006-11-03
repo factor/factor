@@ -33,7 +33,7 @@ M: alien-indirect-error summary
     ] if ;
 
 M: alien-indirect generate-node
-    end-basic-block compile-gc
+    end-basic-block
     %prepare-alien-indirect
     dup alien-indirect-parameters objects>registers
     %alien-indirect

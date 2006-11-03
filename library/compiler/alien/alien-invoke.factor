@@ -67,7 +67,7 @@ M: alien-invoke-error summary
     ] if ;
 
 M: alien-invoke generate-node
-    end-basic-block compile-gc
+    end-basic-block
     dup alien-invoke-parameters objects>registers
     dup alien-invoke-dlsym %alien-invoke
     dup generate-invoke-cleanup
