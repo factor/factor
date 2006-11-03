@@ -7,10 +7,13 @@ INLINE void execute(F_WORD* word)
 
 INLINE void push_callframe(void)
 {
+	put(cs + CELLS,callframe);
+	put(cs + CELLS * 2,callframe_scan);
+	put(cs + CELLS * 3,callframe_end);
+
+	/* update the pointer last, so that if we have a memory protection error
+	above, we don't have garbage stored as live data */
 	cs += CELLS * 3;
-	put(cs - CELLS * 2,callframe);
-	put(cs - CELLS,callframe_scan);
-	put(cs,callframe_end);
 }
 
 INLINE void set_callframe(CELL quot)
@@ -278,6 +281,10 @@ void general_error(F_ERRORTYPE error, CELL arg1, CELL arg2, bool keep_stacks)
 
 void memory_protection_error(CELL addr, int signal)
 {
+	/* this is here to catch GC bugs; see the comment in push_callframe()
+	above */
+	garbage_collection(NURSERY,false);
+
 	if(in_page(addr, ds_bot, 0, -1))
 		general_error(ERROR_DS_UNDERFLOW,F,F,false);
 	else if(in_page(addr, ds_bot, ds_size, 0))

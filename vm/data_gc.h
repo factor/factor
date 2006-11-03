@@ -208,8 +208,28 @@ DEFPUSHPOP(root_,extra_roots)
 #define REGISTER_STRING(obj) root_push(tag_object(obj))
 #define UNREGISTER_STRING(obj) obj = untag_string_fast(root_pop())
 
-#define REGISTER_C_STRING(obj) root_push(tag_object(((F_ARRAY *)obj) - 1))
-#define UNREGISTER_C_STRING(obj) obj = ((char*)(untag_array_fast(root_pop()) + 1))
+/* We ignore strings which point outside the data heap, but we might be given
+a char* which points inside the data heap, in which case it is a root, for
+example if we call unbox_char_string() the result is placed in a byte array */
+INLINE bool root_push_alien(const void *ptr)
+{
+	if((CELL)ptr > data_heap_start && (CELL)ptr < data_heap_end)
+	{
+		F_ARRAY *objptr = ((F_ARRAY *)ptr) - 1;
+		if(objptr->header == tag_header(BYTE_ARRAY_TYPE))
+		{
+			root_push(tag_object(objptr));
+			return true;
+		}
+	}
+
+	return false;
+}
+
+#define REGISTER_C_STRING(obj) \
+	bool obj##_root = root_push_alien(obj)
+#define UNREGISTER_C_STRING(obj) \
+	if(obj##_root) obj = alien_offset(root_pop())
 
 #define REGISTER_BIGNUM(obj) root_push(tag_bignum(obj))
 #define UNREGISTER_BIGNUM(obj) obj = (untag_bignum_fast(root_pop()))

@@ -1,8 +1,9 @@
 + allot refactoring:
 
 - inline float allocation needs a gc check
-- alien invoke, callback need a gc check
-- make sure alien>ZZZ-string is safe on byte arrays
+- fix alien invoke as required
+  - we can just convert strings to aliens beforehand
+- fix alien callback as required
 
 + ui:
 

@@ -229,7 +229,9 @@ void primitive_resize_string(void)
 #define MEMORY_TO_STRING(type,utype) \
 	F_STRING *memory_to_##type##_string(const type *string, CELL length) \
 	{ \
+		REGISTER_C_STRING(string); \
 		F_STRING* s = allot_string_internal(length); \
+		UNREGISTER_C_STRING(string); \
 		CELL i; \
 		for(i = 0; i < length; i++) \
 		{ \
