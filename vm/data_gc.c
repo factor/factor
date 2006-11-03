@@ -317,6 +317,7 @@ void collect_roots(void)
 	copy_handle(&bignum_zero);
 	copy_handle(&bignum_pos_one);
 	copy_handle(&bignum_neg_one);
+	
 	collect_callframe_triple(&callframe,&callframe_scan,&callframe_end);
 
 	collect_stack(extra_roots_region,extra_roots);

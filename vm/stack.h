@@ -48,8 +48,8 @@ CELL ds_size, rs_size, cs_size;
 #define rs_bot ((CELL)(stack_chain->retain_region->start))
 #define cs_bot ((CELL)(stack_chain->call_region->start))
 
-#define STACK_UNDERFLOW(stack,region) ((stack) + CELLS < (region)->start)
-#define STACK_OVERFLOW(stack,region) ((stack) + CELLS >= (region)->start + (region)->size)
+#define STACK_UNDERFLOW(stack,region) ((stack) + 3 * CELLS < (region)->start)
+#define STACK_OVERFLOW(stack,region) ((stack) + 3 * CELLS >= (region)->start + (region)->size)
 
 void reset_datastack(void);
 void reset_retainstack(void);

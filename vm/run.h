@@ -118,7 +118,6 @@ INLINE CELL type_of(CELL tagged)
 
 DEFPUSHPOP(d,ds)
 DEFPUSHPOP(r,rs)
-DEFPUSHPOP(c,cs)
 
 void call(CELL quot);
 
