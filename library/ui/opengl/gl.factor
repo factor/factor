@@ -1,5 +1,5 @@
 ! Copyright (C) 2005 Alex Chapman.
-! See http://factor.sf.net/license.txt for BSD license.
+! See http://factorcode.org/license.txt for BSD license.
 
 ! This file is based on the gl.h that comes with xorg-x11 6.8.2
 
