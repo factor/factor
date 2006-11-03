@@ -13,28 +13,19 @@ windows? [
 
 TYPEDEF: uint    GLenum
 TYPEDEF: uchar   GLboolean
-TYPEDEF: uchar*  GLboolean*
 TYPEDEF: uint    GLbitfield
 TYPEDEF: char    GLbyte
 TYPEDEF: short   GLshort
-TYPEDEF: short*  GLshort*
 TYPEDEF: int     GLint
-TYPEDEF: int*    GLint*
 TYPEDEF: int     GLsizei
 TYPEDEF: uchar   GLubyte
-TYPEDEF: uchar*  GLubyte*
 TYPEDEF: ushort  GLushort
-TYPEDEF: ushort* GLushort*
 TYPEDEF: uint    GLuint
-TYPEDEF: uint*   GLuint*
 TYPEDEF: float   GLfloat
-TYPEDEF: float*  GLfloat*
 TYPEDEF: float   GLclampf
 TYPEDEF: double  GLdouble
-TYPEDEF: double* GLdouble*
 TYPEDEF: double  GLclampd
 TYPEDEF: void*   GLvoid*
-TYPEDEF: void*   GLvoid**
 
 ! Constants
 
