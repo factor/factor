@@ -24,11 +24,6 @@ HELP: c-size
 }
 { $errors "Throws a " { $link no-c-type } " error if the type does not exist." } ;
 
-HELP: c-align
-{ $values { "name" "a string" } { "align" "an integer" } }
-{ $description "Outputs alignment at which values of this C type are padded in C structures." }
-{ $errors "Throws a " { $link no-c-type } " error if the type does not exist." } ;
-
 HELP: c-getter
 { $values { "name" "a string" } { "quot" "a quotation with stack effect " { $snippet "( c-ptr n -- obj )" } } }
 { $description "Outputs a quotation which reads values of this C type from a C structure." }

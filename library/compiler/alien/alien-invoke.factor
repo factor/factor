@@ -41,11 +41,8 @@ M: alien-invoke-error summary
     alien-invoke-stack
 ] "infer" set-word-prop
 
-: unbox-parameter ( stack# type -- )
-    c-type [ "reg-class" get "unboxer" get call ] bind ;
-
 : unbox-parameters ( parameters -- )
-    [ unbox-parameter ] reverse-each-parameter ;
+    [ c-type c-type-unbox ] reverse-each-parameter ;
 
 : objects>registers ( parameters -- )
     #! Generate code for boxing a list of C types, then generate
@@ -57,7 +54,7 @@ M: alien-invoke-error summary
     \ %stack>freg move-parameters ;
 
 : box-return ( ctype -- )
-    [ ] [ f swap box-parameter ] if-void ;
+    [ ] [ f swap c-type c-type-box ] if-void ;
 
 : generate-invoke-cleanup ( node -- )
     dup alien-invoke-library library-abi "stdcall" = [

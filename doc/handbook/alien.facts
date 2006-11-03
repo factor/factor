@@ -53,7 +53,6 @@ $terpri
 "The C library interface can handle a variety of native data types. C types are identified by strings, and a few utility words are defined for working with them:"
 { $subsection c-type }
 { $subsection c-size }
-{ $subsection c-align }
 "Support for a number of C types is built-in:"
 { $subsection "c-types-numeric" }
 { $subsection "c-types-pointers" }

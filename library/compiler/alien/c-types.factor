@@ -1,17 +1,17 @@
 ! Copyright (C) 2004, 2006 Slava Pestov.
-! See http://factor.sf.net/license.txt for BSD license.
+! See http://factorcode.org/license.txt for BSD license.
 IN: alien
 USING: arrays compiler errors generic
 hashtables kernel kernel-internals libc math namespaces
 parser sequences strings words ;
 
-: <c-type> ( -- type )
-    H{
-        { "boxer" [ "boxer-function" get %box ] }
-        { "unboxer" [ "unboxer-function" get %unbox ] }
-        { "reg-class" T{ int-regs f } }
-        { "width" 0 }
-    } clone ;
+TUPLE: c-type
+boxer prep unboxer
+getter setter
+reg-class size align ;
+
+C: c-type ( -- type )
+    T{ int-regs f } over set-c-type-reg-class ;
 
 SYMBOL: c-types
 
@@ -21,17 +21,21 @@ TUPLE: no-c-type name ;
 : c-type ( name -- type )
     dup c-types get hash [ ] [ no-c-type ] ?if ;
 
-: c-size ( name -- size ) "width" swap c-type hash ;
+GENERIC: c-type-unbox ( n type -- )
 
-: c-align ( name -- align ) "align" swap c-type hash ;
+M: c-type c-type-unbox
+    dup c-type-reg-class swap c-type-unboxer %unbox ;
 
-: c-getter ( name -- quot ) "getter" swap c-type hash ;
+GENERIC: c-type-box ( n type -- )
 
-: c-setter ( name -- quot ) "setter" swap c-type hash ;
+M: c-type c-type-box
+    dup c-type-reg-class swap c-type-boxer %box ;
 
-: define-c-type ( quot name -- )
-    >r <c-type> [ swap bind ] keep r> c-types get set-hash ;
-    inline
+: c-size ( name -- size ) c-type c-type-size ;
+
+: c-getter ( name -- quot ) c-type c-type-getter ;
+
+: c-setter ( name -- quot ) c-type c-type-setter ;
 
 : <c-array> ( n type -- array )
     global [ c-size * <byte-array> ] bind ;
@@ -73,15 +77,26 @@ TUPLE: no-c-type name ;
 : init-c-type ( name vocab -- )
     over define-pointer define-nth ;
 
-: (define-primitive-type) ( quot name -- )
-    [ define-c-type ] keep "alien"
-    2dup init-c-type
-    2dup define-deref
-    over c-setter [ 2dup define-set-nth define-out ] when ;
+: <primitive-type> ( getter setter width boxer unboxer -- type )
+    <c-type>
+    [ set-c-type-unboxer ] keep
+    [ set-c-type-boxer ] keep
+    [ set-c-type-size ] 2keep
+    [ set-c-type-align ] keep
+    [ set-c-type-setter ] keep
+    [ set-c-type-getter ] keep ;
 
-: define-primitive-type ( quot name -- )
-    [ (define-primitive-type) ] keep dup c-setter
-    [ "alien" 2dup define-set-nth define-out ] [ drop ] if ;
+: define-c-type ( type name vocab -- )
+    >r [ c-types get set-hash ] keep r>
+    over define-pointer
+    define-nth ;
+
+: define-primitive-type ( getter setter width boxer unboxer name -- )
+    >r <primitive-type> r> "alien"
+    [ define-c-type ] 2keep
+    [ define-deref ] 2keep
+    [ define-set-nth ] 2keep
+    define-out ;
 
 : typedef ( old new -- )
     over "*" append over "*" append (typedef) (typedef) ;

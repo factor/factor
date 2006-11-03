@@ -64,3 +64,5 @@ unit-test
 unit-test
 
 [ t ] [ f expired? ] unit-test
+
+[ "fdasfds" ] [ [ "fdasfds" f dlsym ] catch third ] unit-test

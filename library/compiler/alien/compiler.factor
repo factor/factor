@@ -23,7 +23,7 @@ kernel-internals math namespaces sequences words ;
     [ dup class get swap inc-reg-class ] keep ;
 
 : alloc-parameter ( parameter -- reg reg-class )
-    c-type "reg-class" swap hash dup reg-class-full?
+    c-type c-type-reg-class dup reg-class-full?
     [ spill-param ] [ fastcall-param ] if
     [ fastcall-regs nth ] keep ;
 
@@ -54,9 +54,6 @@ kernel-internals math namespaces sequences words ;
         [ pick >r alloc-parameter r> execute ] each-parameter
         drop
     ] with-scope ; inline
-
-: box-parameter ( stack# type -- node )
-    c-type [ "reg-class" get "boxer" get call ] bind ;
 
 : if-void ( type true false -- )
     pick "void" = [ drop nip call ] [ nip call ] if ; inline

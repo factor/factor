@@ -42,7 +42,8 @@ void *ffi_dlsym(F_DLL *dll, char *symbol, bool error)
 	{
 		if(error)
 		{
-			general_error(ERROR_FFI,tag_object(symbol),
+			general_error(ERROR_FFI,
+				tag_object(from_char_string(symbol)),
 				tag_object(from_char_string(dlerror())),true);
 		}
 

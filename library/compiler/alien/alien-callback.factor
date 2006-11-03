@@ -39,7 +39,7 @@ M: alien-callback-error summary
 ] "infer" set-word-prop
 
 : box-parameters ( parameters -- )
-    [ box-parameter ] each-parameter ;
+    [ c-type c-type-box ] each-parameter ;
 
 : registers>objects ( parameters -- )
     dup \ %freg>stack move-parameters
@@ -49,11 +49,9 @@ M: alien-callback-error summary
     alien-callback-return [
         "unnest_stacks" f %alien-invoke
     ] [
-        c-type [
-            "reg-class" get
-            "unboxer-function" get
-            %callback-value
-        ] bind
+        c-type dup c-type-reg-class
+        swap c-type-unboxer
+        %callback-value
     ] if-void ;
 
 : generate-callback ( node -- )

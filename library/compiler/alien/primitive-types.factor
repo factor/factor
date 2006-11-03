@@ -1,158 +1,131 @@
 USING: alien compiler kernel kernel-internals math namespaces ;
 
-[
-    [ alien-unsigned-cell <alien> ] "getter" set
-    [
-        >r >r alien-address r> r> set-alien-unsigned-cell
-    ] "setter" set
-    bootstrap-cell "width" set
-    bootstrap-cell "align" set
-    "box_alien" "boxer-function" set
-    "unbox_alien" "unboxer-function" set
-] "void*" define-primitive-type
+[ alien-unsigned-cell <alien> ]
+[ >r >r alien-address r> r> set-alien-unsigned-cell ]
+bootstrap-cell
+"box_alien"
+"unbox_alien"
+"void*" define-primitive-type
 
-[
-    [ alien-signed-8 ] "getter" set
-    [ set-alien-signed-8 ] "setter" set
-    8 "width" set
-    8 "align" set
-    "box_signed_8" "boxer-function" set
-    "unbox_signed_8" "unboxer-function" set
-] "longlong" define-primitive-type
 
-[
-    [ alien-unsigned-8 ] "getter" set
-    [ set-alien-unsigned-8 ] "setter" set
-    8 "width" set
-    8 "align" set
-    "box_unsigned_8" "boxer-function" set
-    "unbox_unsigned_8" "unboxer-function" set
-] "ulonglong" define-primitive-type
+[ alien-signed-8 ]
+[ set-alien-signed-8 ]
+8
+"box_signed_8"
+"unbox_signed_8"
+"longlong" define-primitive-type
 
-[
-    [ alien-signed-cell ] "getter" set
-    [ set-alien-signed-cell ] "setter" set
-    bootstrap-cell "width" set
-    bootstrap-cell "align" set
-    "box_signed_cell" "boxer-function" set
-    "unbox_signed_cell" "unboxer-function" set
-] "long" define-primitive-type
 
-[
-    [ alien-unsigned-cell ] "getter" set
-    [ set-alien-unsigned-cell ] "setter" set
-    bootstrap-cell "width" set
-    bootstrap-cell "align" set
-    "box_unsigned_cell" "boxer-function" set
-    "unbox_unsigned_cell" "unboxer-function" set
-] "ulong" define-primitive-type
+[ alien-unsigned-8 ]
+[ set-alien-unsigned-8 ]
+8
+"box_unsigned_8"
+"unbox_unsigned_8"
+"ulonglong" define-primitive-type
 
-[
-    [ alien-signed-4 ] "getter" set
-    [ set-alien-signed-4 ] "setter" set
-    4 "width" set
-    4 "align" set
-    "box_signed_4" "boxer-function" set
-    "unbox_signed_4" "unboxer-function" set
-] "int" define-primitive-type
 
-[
-    [ alien-unsigned-4 ] "getter" set
-    [ set-alien-unsigned-4 ] "setter" set
-    4 "width" set
-    4 "align" set
-    "box_unsigned_4" "boxer-function" set
-    "unbox_unsigned_4" "unboxer-function" set
-] "uint" define-primitive-type
+[ alien-signed-cell ]
+[ set-alien-signed-cell ]
+bootstrap-cell
+"box_signed_cell"
+"unbox_signed_cell"
+"long" define-primitive-type
 
-[
-    [ alien-signed-2 ] "getter" set
-    [ set-alien-signed-2 ] "setter" set
-    2 "width" set
-    2 "align" set
-    "box_signed_2" "boxer-function" set
-    "unbox_signed_2" "unboxer-function" set
-] "short" define-primitive-type
 
-[
-    [ alien-unsigned-2 ] "getter" set
-    [ set-alien-unsigned-2 ] "setter" set
-    2 "width" set
-    2 "align" set
-    "box_unsigned_2" "boxer-function" set
-    "unbox_unsigned_2" "unboxer-function" set
-] "ushort" define-primitive-type
+[ alien-unsigned-cell ]
+[ set-alien-unsigned-cell ]
+bootstrap-cell
+"box_unsigned_cell"
+"unbox_unsigned_cell"
+"ulong" define-primitive-type
 
-[
-    [ alien-signed-1 ] "getter" set
-    [ set-alien-signed-1 ] "setter" set
-    1 "width" set
-    1 "align" set
-    "box_signed_1" "boxer-function" set
-    "unbox_signed_1" "unboxer-function" set
-] "char" define-primitive-type
 
-[
-    [ alien-unsigned-1 ] "getter" set
-    [ set-alien-unsigned-1 ] "setter" set
-    1 "width" set
-    1 "align" set
-    "box_unsigned_1" "boxer-function" set
-    "unbox_unsigned_1" "unboxer-function" set
-] "uchar" define-primitive-type
+[ alien-signed-4 ]
+[ set-alien-signed-4 ]
+4
+"box_signed_4"
+"unbox_signed_4"
+"int" define-primitive-type
 
-[
-    [ alien-unsigned-cell <alien> alien>char-string ] "getter" set
-    [ >r >r alien-address r> r> set-alien-unsigned-cell ] "setter" set
-    bootstrap-cell "width" set
-    bootstrap-cell "align" set
-    "box_char_string" "boxer-function" set
-    "unbox_char_string" "unboxer-function" set
-] "char*" (define-primitive-type)
 
-[
-    [ swap <displaced-alien> alien>char-string ] "getter" set
-    [ swap <displaced-alien> swap set-alien-unsigned-1 ] "setter" set
-    1 "width" set
-    1 "align" set
-    "box_char_array" "boxer-function" set
-    "unbox_char_array" "unboxer-function" set
-] "char[]" (define-primitive-type)
+[ alien-unsigned-4 ]
+[ set-alien-unsigned-4 ]
+4
+"box_unsigned_4"
+"unbox_unsigned_4"
+"uint" define-primitive-type
 
-[
-    [ alien-unsigned-cell <alien> alien>u16-string ] "getter" set
-    [ >r >r alien-address r> r> set-alien-unsigned-cell ] "setter" set
-    4 "width" set
-    4 "align" set
-    "box_u16_string" "boxer-function" set
-    "unbox_u16_string" "unboxer-function" set
-] "ushort*" (define-primitive-type)
 
-[
-    [ alien-unsigned-4 zero? not ] "getter" set
-    [ 1 0 ? set-alien-unsigned-4 ] "setter" set
-    4 "width" set
-    4 "align" set
-    "box_boolean" "boxer-function" set
-    "unbox_boolean" "unboxer-function" set
-] "bool" define-primitive-type
+[ alien-signed-2 ]
+[ set-alien-signed-2 ]
+2
+"box_signed_2"
+"unbox_signed_2"
+"short" define-primitive-type
 
-[
-    [ alien-float ] "getter" set
-    [ set-alien-float ] "setter" set
-    4 "width" set
-    4 "align" set
-    "box_float" "boxer-function" set
-    "unbox_float" "unboxer-function" set
-    T{ float-regs f 4 } "reg-class" set
-] "float" define-primitive-type
 
-[
-    [ alien-double ] "getter" set
-    [ set-alien-double ] "setter" set
-    8 "width" set
-    8 "align" set
-    "box_double" "boxer-function" set
-    "unbox_double" "unboxer-function" set
-    T{ float-regs f 8 } "reg-class" set
-] "double" define-primitive-type
+[ alien-unsigned-2 ]
+[ set-alien-unsigned-2 ]
+2
+"box_unsigned_2"
+"unbox_unsigned_2"
+"ushort" define-primitive-type
+
+
+[ alien-signed-1 ]
+[ set-alien-signed-1 ]
+1
+"box_signed_1"
+"unbox_signed_1"
+"char" define-primitive-type
+
+
+[ alien-unsigned-1 ]
+[ set-alien-unsigned-1 ]
+1
+"box_unsigned_1"
+"unbox_unsigned_1"
+"uchar" define-primitive-type
+
+
+[ alien-unsigned-cell <alien> alien>char-string ]
+[ >r >r alien-address r> r> set-alien-unsigned-cell ]
+bootstrap-cell
+"box_char_string"
+"unbox_char_string"
+"char*" define-primitive-type
+
+
+[ alien-unsigned-cell <alien> alien>u16-string ]
+[ >r >r alien-address r> r> set-alien-unsigned-cell ]
+4
+"box_u16_string"
+"unbox_u16_string"
+"ushort*" define-primitive-type
+
+
+[ alien-unsigned-4 zero? not ]
+[ 1 0 ? set-alien-unsigned-4 ]
+4
+"box_boolean"
+"unbox_boolean"
+"bool" define-primitive-type
+
+
+[ alien-float ]
+[ set-alien-float ]
+4
+"box_float"
+"unbox_float"
+"float" define-primitive-type
+
+T{ float-regs f 4 } "float" c-type set-c-type-reg-class
+
+[ alien-double ]
+[ set-alien-double ]
+8
+"box_double"
+"unbox_double"
+"double" define-primitive-type
+
+T{ float-regs f 8 } "double" c-type set-c-type-reg-class

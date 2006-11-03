@@ -65,7 +65,8 @@ void *ffi_dlsym (DLL *dll, char *symbol, bool error)
 	if (!sym)
 	{
 		if(error)
-			general_error(ERROR_FFI, tag_object(symbol),
+			general_error(ERROR_FFI,
+				tag_object(from_char_string(symbol)),
 				tag_object(get_error_message()),true);
 		else
 			return NULL;
@@ -191,7 +192,7 @@ void dealloc_segment(F_SEGMENT *block)
 	free(block);
 }
 
-long getpagesize (void)
+long getpagesize(void)
 {
 	static long g_pagesize = 0;
 	if (! g_pagesize)

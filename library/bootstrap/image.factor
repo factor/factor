@@ -245,15 +245,15 @@ M: quotation '
 M: vector '
     dup underlying ' swap length
     vector-type object-tag [
-        emit-fixnum ( length )
-        emit ( array ptr )
+        emit-fixnum ! length
+        emit ! array ptr
     ] emit-object ;
 
 M: sbuf '
     dup underlying ' swap length
     sbuf-type object-tag [
-        emit-fixnum ( length )
-        emit ( array ptr )
+        emit-fixnum ! length
+        emit ! array ptr
     ] emit-object ;
 
 ! Hashes
@@ -263,7 +263,7 @@ M: hashtable '
     hashtable-type object-tag [
         dup hash-count emit-fixnum
         hash-deleted emit-fixnum
-        emit ( array ptr )
+        emit ! array ptr
     ] emit-object ;
 
 ! End of the image
