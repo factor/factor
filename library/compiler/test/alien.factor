@@ -86,3 +86,8 @@ cpu "x86" = macosx? and [
 [ 5 ]
 [ 2 3 "ffi_test_2" f dlsym indirect-test-2 ]
 unit-test
+
+FUNCTION: char* ffi_test_15 char* x char* y ;
+
+[ "foo" ] [ "xy" "zt" ffi_test_15 ] unit-test
+[ "bar" ] [ "xy" "xy" ffi_test_15 ] unit-test

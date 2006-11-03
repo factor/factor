@@ -1,9 +1,6 @@
 + allot refactoring:
 
 - inline float allocation needs a gc check
-- fix alien invoke as required
-  - we can just convert strings to aliens beforehand
-  - >float first too
 - docs: don't pass volatile aliens to callbacks
 
 + ui:

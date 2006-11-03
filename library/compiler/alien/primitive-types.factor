@@ -7,14 +7,12 @@ bootstrap-cell
 "unbox_alien"
 "void*" define-primitive-type
 
-
 [ alien-signed-8 ]
 [ set-alien-signed-8 ]
 8
 "box_signed_8"
 "unbox_signed_8"
 "longlong" define-primitive-type
-
 
 [ alien-unsigned-8 ]
 [ set-alien-unsigned-8 ]
@@ -23,14 +21,12 @@ bootstrap-cell
 "unbox_unsigned_8"
 "ulonglong" define-primitive-type
 
-
 [ alien-signed-cell ]
 [ set-alien-signed-cell ]
 bootstrap-cell
 "box_signed_cell"
 "unbox_signed_cell"
 "long" define-primitive-type
-
 
 [ alien-unsigned-cell ]
 [ set-alien-unsigned-cell ]
@@ -39,14 +35,12 @@ bootstrap-cell
 "unbox_unsigned_cell"
 "ulong" define-primitive-type
 
-
 [ alien-signed-4 ]
 [ set-alien-signed-4 ]
 4
 "box_signed_4"
 "unbox_signed_4"
 "int" define-primitive-type
-
 
 [ alien-unsigned-4 ]
 [ set-alien-unsigned-4 ]
@@ -55,14 +49,12 @@ bootstrap-cell
 "unbox_unsigned_4"
 "uint" define-primitive-type
 
-
 [ alien-signed-2 ]
 [ set-alien-signed-2 ]
 2
 "box_signed_2"
 "unbox_signed_2"
 "short" define-primitive-type
-
 
 [ alien-unsigned-2 ]
 [ set-alien-unsigned-2 ]
@@ -71,14 +63,12 @@ bootstrap-cell
 "unbox_unsigned_2"
 "ushort" define-primitive-type
 
-
 [ alien-signed-1 ]
 [ set-alien-signed-1 ]
 1
 "box_signed_1"
 "unbox_signed_1"
 "char" define-primitive-type
-
 
 [ alien-unsigned-1 ]
 [ set-alien-unsigned-1 ]
@@ -87,30 +77,12 @@ bootstrap-cell
 "unbox_unsigned_1"
 "uchar" define-primitive-type
 
-
-[ alien-unsigned-cell <alien> alien>char-string ]
-[ >r >r alien-address r> r> set-alien-unsigned-cell ]
-bootstrap-cell
-"box_char_string"
-"unbox_char_string"
-"char*" define-primitive-type
-
-
-[ alien-unsigned-cell <alien> alien>u16-string ]
-[ >r >r alien-address r> r> set-alien-unsigned-cell ]
-4
-"box_u16_string"
-"unbox_u16_string"
-"ushort*" define-primitive-type
-
-
 [ alien-unsigned-4 zero? not ]
 [ 1 0 ? set-alien-unsigned-4 ]
 4
 "box_boolean"
 "unbox_boolean"
 "bool" define-primitive-type
-
 
 [ alien-float ]
 [ set-alien-float ]
@@ -120,6 +92,7 @@ bootstrap-cell
 "float" define-primitive-type
 
 T{ float-regs f 4 } "float" c-type set-c-type-reg-class
+[ >float ] "float" c-type set-c-type-prep
 
 [ alien-double ]
 [ set-alien-double ]
@@ -129,3 +102,22 @@ T{ float-regs f 4 } "float" c-type set-c-type-reg-class
 "double" define-primitive-type
 
 T{ float-regs f 8 } "double" c-type set-c-type-reg-class
+[ >float ] "double" c-type set-c-type-prep
+
+[ alien-unsigned-cell <alien> alien>char-string ]
+[ >r >r alien-address r> r> set-alien-unsigned-cell ]
+bootstrap-cell
+"box_char_string"
+"unbox_alien"
+"char*" define-primitive-type
+
+[ string>char-alien ] "char*" c-type set-c-type-prep
+
+[ alien-unsigned-cell <alien> alien>u16-string ]
+[ >r >r alien-address r> r> set-alien-unsigned-cell ]
+4
+"box_u16_string"
+"unbox_alien"
+"ushort*" define-primitive-type
+
+[ string>u16-alien ] "ushort*" c-type set-c-type-prep

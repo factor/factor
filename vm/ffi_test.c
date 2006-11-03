@@ -93,3 +93,11 @@ struct foo ffi_test_14(int x, int y)
 	r.x = x; r.y = y;
 	return r;
 }
+
+char *ffi_test_15(char *x, char *y)
+{
+	if(strcmp(x,y))
+		return "foo";
+	else
+		return "bar";
+}

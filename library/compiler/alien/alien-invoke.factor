@@ -28,16 +28,32 @@ M: alien-invoke-error summary
     [ alien-invoke-dlsym dlsym drop ]
     [ inference-warning ] recover ;
 
+: (make-prep-quot) ( parameters -- )
+    dup empty? [
+        drop
+    ] [
+        unclip c-type c-type-prep %
+        \ >r , (make-prep-quot) \ r> ,
+    ] if ;
+
+: make-prep-quot ( parameters -- quot )
+    [ <reversed> (make-prep-quot) ] [ ] make ;
+
+: prep-alien-invoke ( node -- )
+    alien-invoke-parameters make-prep-quot infer-quot ;
+
 \ alien-invoke [ string object string object ] [ ] <effect>
 "infer-effect" set-word-prop
 
 \ alien-invoke [
-    empty-node <alien-invoke> dup node,
+    empty-node <alien-invoke>
     pop-literal nip over set-alien-invoke-parameters
     pop-literal nip over set-alien-invoke-function
     pop-literal nip over set-alien-invoke-library
     pop-literal nip over set-alien-invoke-return
+    dup prep-alien-invoke
     dup ensure-dlsym
+    dup node,
     alien-invoke-stack
 ] "infer" set-word-prop
 
