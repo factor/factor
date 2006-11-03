@@ -128,6 +128,9 @@ macosx.dmg:
 	hdiutil create -srcfolder "$(DISK_IMAGE_DIR)" -fs HFS+ \
 		-volname "$(DISK_IMAGE_DIR)" "$(DISK_IMAGE)"
 
+tags:
+	ctags-exuberant vm/*.[chm]
+
 f: $(OBJS)
 	$(CC) $(LIBS) $(LIBPATH) $(CFLAGS) -o $@$(PLAF_SUFFIX) $(OBJS)
 

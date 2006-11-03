@@ -9,7 +9,7 @@ namespaces prettyprint sequences strings vectors words ;
     [ drop r> length ] [ r> drop ] if ; inline
 
 : skip-blank ( -- )
-    column [ line-text get [ blank? not ] skip ] change ;
+    column-number [ line-text get [ blank? not ] skip ] change ;
 
 : skip-word ( m line -- n )
     2dup nth CHAR: " = [ drop 1+ ] [ [ blank? ] skip ] if ;
@@ -19,7 +19,7 @@ namespaces prettyprint sequences strings vectors words ;
 
 : scan ( -- token )
     skip-blank
-    column [ line-text get (scan) dup ] change
+    column-number [ line-text get (scan) dup ] change
     2dup = [ 2drop f ] [ line-text get subseq ] if ;
 
 : CREATE ( -- word ) scan create-in ;
@@ -55,7 +55,10 @@ TUPLE: no-word name ;
         dup parsing? [ execute ] [ parsed ] if  parse-loop
     ] when* ;
 
-: (parse) ( str -- ) line-text set 0 column set parse-loop ;
+: (parse) ( str -- )
+    line-text set
+    0 column-number set
+    parse-loop ;
 
 TUPLE: bad-escape ;
 : bad-escape ( -- * ) <bad-escape> throw ;
@@ -88,7 +91,7 @@ TUPLE: bad-escape ;
     [ drop 1+ ] [ [ next-char , ] keep (parse-string) ] if ;
 
 : parse-string ( -- str )
-    column
+    column-number
     [ [ line-text get (parse-string) ] "" make swap ] change ;
 
 : (parse-effect) ( -- )
@@ -98,9 +101,17 @@ TUPLE: bad-escape ;
         "Unexpected EOL" throw
     ] if* ;
 
+: string>effect ( seq -- effect )
+    { "--" } split1 dup [
+        <effect>
+    ] [
+        "Stack effect declaration must contain --" throw
+    ] if ;
+
 : parse-effect ( -- effect )
-    [ (parse-effect) column get ] { } make swap column set
-    { "--" } split1 <effect> ;
+    [ (parse-effect) column-number get ] { } make
+    swap column-number set
+    string>effect ;
 
 : parse-base ( parsed base -- parsed ) scan swap base> parsed ;
 

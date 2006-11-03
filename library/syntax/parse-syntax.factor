@@ -11,7 +11,7 @@ USING: alien arrays definitions errors generic
 hashtables kernel math modules namespaces parser sequences
 strings vectors words ;
 
-: !! line-text get length column set ; parsing
+: !! line-text get length column-number set ; parsing
 : !#! POSTPONE: ! ; parsing
 : !IN: scan set-in ; parsing
 : !USE: scan use+ ; parsing

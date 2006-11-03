@@ -81,3 +81,5 @@ unit-test
 
 ! Funny bug
 [ 2 ] [ "IN: temporary : \0. 2 ; \0." eval ] unit-test
+
+[ "IN: temporary : missing-- ( a b ) ;" eval ] unit-test-fails

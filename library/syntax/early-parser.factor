@@ -11,7 +11,7 @@ SYMBOL: file
 SYMBOL: line-number
 
 SYMBOL: line-text
-SYMBOL: column
+SYMBOL: column-number
 
 TUPLE: check-vocab name ;
 : check-vocab ( name -- vocab )
@@ -53,6 +53,6 @@ TUPLE: parse-error file line col text ;
 C: parse-error ( msg -- error )
     file get over set-parse-error-file
     line-number get over set-parse-error-line
-    column get over set-parse-error-col
+    column-number get over set-parse-error-col
     line-text get over set-parse-error-text
     [ set-delegate ] keep ;
