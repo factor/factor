@@ -394,10 +394,10 @@ num-types f <array> builtins set
 
 "dll?" "alien" create t "inline" set-word-prop
 "dll" "alien" create 15 "dll?" "alien" create
-{ { 1 object { "dll-path" "alien" } f } } define-builtin
+{ { 1 byte-array { "dll-path" "alien" } f } } define-builtin
 
 "alien" "alien" create 16 "alien?" "alien" create
-{ { 1 object { "underlying-alien" "alien" } f } } define-builtin
+{ { 1 c-ptr { "underlying-alien" "alien" } f } } define-builtin
 
 "tuple?" "kernel" create t "inline" set-word-prop
 "tuple" "kernel" create 17 "tuple?" "kernel" create

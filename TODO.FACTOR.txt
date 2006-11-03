@@ -5,8 +5,6 @@
   - we can just convert strings to aliens beforehand
   - >float first too
 - docs: don't pass volatile aliens to callbacks
-- TYPEDEF: float GLfloat  creates a null GLfloat* type
-- callstack overflow broken again
 
 + ui:
 

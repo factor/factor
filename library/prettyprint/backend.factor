@@ -70,7 +70,8 @@ M: string pprint* "\"" pprint-string ;
 
 M: sbuf pprint* "SBUF\" " pprint-string ;
 
-M: dll pprint* dll-path "DLL\" " pprint-string ;
+M: dll pprint*
+    dll-path alien>char-string "DLL\" " pprint-string ;
 
 ! Sequences
 : nesting-limit? ( -- ? )
