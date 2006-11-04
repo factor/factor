@@ -40,7 +40,7 @@ s64 current_millis(void)
 		- EPOCH_OFFSET) / 10000;
 }
 
-void ffi_dlopen (DLL *dll, bool error)
+void ffi_dlopen (F_DLL *dll, bool error)
 {
 	HMODULE module = LoadLibrary(alien_offset(dll->path));
 
@@ -56,7 +56,7 @@ void ffi_dlopen (DLL *dll, bool error)
 	dll->dll = module;
 }
 
-void *ffi_dlsym (DLL *dll, char *symbol, bool error)
+void *ffi_dlsym (F_DLL *dll, char *symbol, bool error)
 {
 	void *sym = GetProcAddress(
 		dll ? (HMODULE)dll->dll : GetModuleHandle(NULL),
@@ -75,7 +75,7 @@ void *ffi_dlsym (DLL *dll, char *symbol, bool error)
 	return sym;
 }
 
-void ffi_dlclose (DLL *dll)
+void ffi_dlclose (F_DLL *dll)
 {
 	FreeLibrary((HMODULE)dll->dll);
 	dll->dll = NULL;
@@ -100,7 +100,7 @@ void primitive_stat(void)
 		box_boolean(st.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY);
 		box_signed_4(0);
 		box_unsigned_8(
-			(s64)st.nFileSizeLow | (s64)st.nFileSizeHigh << 32));
+			(s64)st.nFileSizeLow | (s64)st.nFileSizeHigh << 32);
 		box_unsigned_8((int)
 			((*(s64*)&st.ftLastWriteTime - EPOCH_OFFSET) / 10000000));
 	}
