@@ -41,14 +41,20 @@ M: #shuffle optimize-node*
     [ node-values empty? ] prune-if ;
 
 ! #>r
-M: #>r optimize-node* 
-    [ dup node-in-d empty? swap node-successor #r>? or ]
-    prune-if ;
+M: #>r optimize-node*
+    dup node-successor #r>? [
+        node-successor node-successor
+    ] [
+        [ node-in-d empty? ] prune-if
+    ] if ;
 
 ! #r>
-M: #r> optimize-node* 
-    [ dup node-in-r empty? swap node-successor #>r? or ]
-    prune-if ;
+M: #r> optimize-node*
+    dup node-successor #>r? [
+        node-successor node-successor
+    ] [
+        [ node-in-r empty? ] prune-if
+    ] if ;
 
 ! #push
 M: #push optimize-node* 
