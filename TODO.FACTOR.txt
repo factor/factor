@@ -62,6 +62,7 @@
 
 + prettyprinter:
 
+- array with POSTPONE: in it: printed wrong
 - clean it up
 - if we're printing a block on multiple lines, break at some words like
   set off on % # , ... and assembler opcodes
