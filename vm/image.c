@@ -103,6 +103,7 @@ bool save_image(const char* filename)
 	h.bignum_zero = bignum_zero;
 	h.bignum_pos_one = bignum_pos_one;
 	h.bignum_neg_one = bignum_neg_one;
+	
 	h.code_size = heap_size(&compiling);
 	h.code_relocation_base = compiling.base;
 	fwrite(&h,sizeof(F_HEADER),1,file);

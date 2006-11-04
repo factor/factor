@@ -2,9 +2,7 @@
 
 - inline float allocation needs a gc check
 - docs: don't pass volatile aliens to callbacks
-- don't save big free chunk at the end of the code heap
 - some instability remains
-- overhaul alien docs
 
 + ui:
 

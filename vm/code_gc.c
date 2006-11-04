@@ -118,7 +118,7 @@ CELL heap_allot(F_HEAP *heap, CELL size)
 		return (CELL)(scan + 1);
 	}
 
-	return 0; /* can't happen */
+	return 0;
 }
 
 /* After code GC, all referenced code blocks have status set to B_MARKED, so any
@@ -173,13 +173,20 @@ CELL heap_free_space(F_HEAP *heap)
 	return size;
 }
 
+/* The size of the heap, not including the last block if it's free */
 CELL heap_size(F_HEAP *heap)
 {
-	CELL start = heap->base;
-	F_BLOCK *scan = (F_BLOCK *)start;
-	while(next_block(heap,scan))
+	F_BLOCK *scan = (F_BLOCK *)heap->base;
+
+	while(next_block(heap,scan) != NULL)
 		scan = next_block(heap,scan);
-	return (CELL)scan - (CELL)start;
+
+	/* this is the last block in the heap, and it is free */
+	if(scan->status == B_FREE)
+		return (CELL)scan - heap->base;
+	/* otherwise the last block is allocated */
+	else
+		return heap->limit - heap->base;
 }
 
 /* Apply a function to every code block */
