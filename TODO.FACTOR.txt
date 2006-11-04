@@ -2,7 +2,7 @@
 
 - inline float allocation needs a gc check
 - docs: don't pass volatile aliens to callbacks
-- windows rollover broken again
+- some instability remains
 
 + ui:
 
@@ -52,12 +52,10 @@
 - arm backend
 - mac intel: struct returns from objc methods
 - float= doesn't consider nans equal
-- intrinsic fixnum>float float>fixnum
 - C functions returning structs by value
 - infer which variables are read, written in a quotation
 - compiled continuations
 - compiled call traces
-- amd64 structs-by-value bug
 
 + prettyprinter:
 

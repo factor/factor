@@ -473,31 +473,31 @@ void primitive_float_to_str(void)
 void primitive_float_add(void)
 {
 	POP_FLOATS(x,y);
-	box_float(x + y);
+	box_double(x + y);
 }
 
 void primitive_float_subtract(void)
 {
 	POP_FLOATS(x,y);
-	box_float(x - y);
+	box_double(x - y);
 }
 
 void primitive_float_multiply(void)
 {
 	POP_FLOATS(x,y);
-	box_float(x * y);
+	box_double(x * y);
 }
 
 void primitive_float_divfloat(void)
 {
 	POP_FLOATS(x,y);
-	box_float(x / y);
+	box_double(x / y);
 }
 
 void primitive_float_mod(void)
 {
 	POP_FLOATS(x,y);
-	box_float(fmod(x,y));
+	box_double(fmod(x,y));
 }
 
 void primitive_float_less(void)
