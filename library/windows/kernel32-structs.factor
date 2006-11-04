@@ -148,6 +148,6 @@ BEGIN-STRUCT: OSVERSIONINFO
     FIELD: DWORD dwMinorVersion
     FIELD: DWORD dwBuildNumber
     FIELD: DWORD dwPlatformId
-    FIELD: char[128] szCSDVersion
+    ! FIELD: char[128] szCSDVersion
 END-STRUCT
 TYPEDEF: void* LPOSVERSIONINFO
