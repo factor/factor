@@ -22,9 +22,10 @@ M: alien-indirect-error summary
     empty-node <alien-indirect>
     pop-literal nip over set-alien-indirect-abi
     pop-literal nip over set-alien-indirect-parameters
-    pop-literal nip swap set-alien-indirect-return
-    dup alien-indirect-parameters prep-alien-parameters
-    dup node,
+    pop-literal nip over set-alien-indirect-return
+    dup alien-indirect-parameters
+    make-prep-quot 1 make-dip infer-quot
+    node,
 ] "infer" set-word-prop
 
 : generate-indirect-cleanup ( node -- )

@@ -59,13 +59,13 @@ inference ;
 : if-void ( type true false -- )
     pick "void" = [ drop nip call ] [ nip call ] if ; inline
 
-: make-prep-quot ( parameters -- )
+: (make-prep-quot) ( parameters -- )
     dup empty? [
         drop
     ] [
         unclip c-type c-type-prep %
-        \ >r , make-prep-quot \ r> ,
+        \ >r , (make-prep-quot) \ r> ,
     ] if ;
 
-: prep-alien-parameters ( parameters -- quot )
-    [ <reversed> make-prep-quot ] [ ] make infer-quot ;
+: make-prep-quot ( parameters -- quot )
+    [ <reversed> (make-prep-quot) ] [ ] make ;

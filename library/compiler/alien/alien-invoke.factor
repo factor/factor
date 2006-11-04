@@ -37,7 +37,7 @@ M: alien-invoke-error summary
     pop-literal nip over set-alien-invoke-function
     pop-literal nip over set-alien-invoke-library
     pop-literal nip over set-alien-invoke-return
-    dup alien-invoke-parameters prep-alien-parameters
+    dup alien-invoke-parameters make-prep-quot infer-quot
     dup ensure-dlsym
     dup node,
     alien-invoke-stack

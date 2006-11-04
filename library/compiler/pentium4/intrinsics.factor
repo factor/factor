@@ -9,10 +9,10 @@ M: float-regs (%peek)
     fp-scratch swap %move-int>int
     fp-scratch %move-int>float ;
 
-: load-zone-ptr ( vreg -- )
+: load-zone-ptr ( reg -- )
     #! Load pointer to start of zone array
-    dup "generations" f [ dlsym MOV ] 2keep
-    rel-absolute-cell rel-dlsym
+    0 MOV
+    dup "generations" f rel-absolute-cell rel-dlsym
     dup [] MOV ;
 
 : load-allot-ptr ( vreg -- )
