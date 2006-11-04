@@ -54,11 +54,18 @@ M: alien-callback-error summary
         %callback-value
     ] if-void ;
 
+: alien-callback-quot* ( node -- quot )
+    [
+        \ init-error-handler ,
+        dup alien-callback-quot %
+        alien-callback-return
+        [ ] [ c-type c-type-prep % ] if-void
+    ] [ ] make ;
+
 : generate-callback ( node -- )
     [ alien-callback-xt ] keep [
         dup alien-callback-parameters registers>objects
-        dup alien-callback-quot \ init-error-handler add*
-        %alien-callback
+        dup alien-callback-quot* %alien-callback
         unbox-return
         %return
     ] generate-1 ;

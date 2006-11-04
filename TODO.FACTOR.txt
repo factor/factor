@@ -5,7 +5,6 @@
 
 + ui:
 
-- input operation: copy
 - doc/handbook/alien.facts formatting wrong (erg)
 - docs: mention that 'like' may destroy the underlying sequence
 - live search: timer delay would be nice

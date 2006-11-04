@@ -19,10 +19,12 @@ M: alien-indirect-error summary
 "infer-effect" set-word-prop
 
 \ alien-indirect [
-    empty-node <alien-indirect> dup node,
+    empty-node <alien-indirect>
     pop-literal nip over set-alien-indirect-abi
     pop-literal nip over set-alien-indirect-parameters
     pop-literal nip swap set-alien-indirect-return
+    dup alien-indirect-parameters prep-alien-parameters
+    dup node,
 ] "infer" set-word-prop
 
 : generate-indirect-cleanup ( node -- )

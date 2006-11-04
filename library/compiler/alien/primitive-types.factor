@@ -85,7 +85,7 @@ bootstrap-cell
 "bool" define-primitive-type
 
 [ alien-float ]
-[ set-alien-float ]
+[ >r >r >float r> r> set-alien-float ]
 4
 "box_float"
 "unbox_float"
@@ -95,7 +95,7 @@ T{ float-regs f 4 } "float" c-type set-c-type-reg-class
 [ >float ] "float" c-type set-c-type-prep
 
 [ alien-double ]
-[ set-alien-double ]
+[ >r >r >float r> r> set-alien-double ]
 8
 "box_double"
 "unbox_double"

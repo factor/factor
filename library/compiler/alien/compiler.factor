@@ -2,7 +2,8 @@
 ! See http://factorcode.org/license.txt for BSD license.
 IN: alien
 USING: arrays compiler generic hashtables kernel
-kernel-internals math namespaces sequences words ;
+kernel-internals math namespaces sequences words
+inference ;
 
 : parameter-size c-size cell align ;
 
@@ -57,3 +58,14 @@ kernel-internals math namespaces sequences words ;
 
 : if-void ( type true false -- )
     pick "void" = [ drop nip call ] [ nip call ] if ; inline
+
+: make-prep-quot ( parameters -- )
+    dup empty? [
+        drop
+    ] [
+        unclip c-type c-type-prep %
+        \ >r , make-prep-quot \ r> ,
+    ] if ;
+
+: prep-alien-parameters ( parameters -- quot )
+    [ <reversed> make-prep-quot ] [ ] make infer-quot ;
