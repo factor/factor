@@ -48,7 +48,7 @@ M: c-type c-type-box
 : <malloc-object> ( type -- alien ) 1 swap <malloc-array> ;
 
 : <malloc-string> ( string -- alien )
-    "\0" append dup length malloc check-ptr
+    0 add dup length malloc check-ptr
     [ alien-address string>memory ] keep ;
 
 : (typedef) ( old new -- ) c-types get [ >r get r> set ] bind ;

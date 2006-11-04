@@ -68,6 +68,15 @@ HELP: alien>u16-string ( c-ptr -- string )
 { $description "Reads a null-terminated UTF16 string from the specified address." }
 { $see-also string>u16-alien } ;
 
+HELP: memory>string ( base len -- string )
+{ $values { "base" "an integer address" } { "len" "a non-negative integer" } { "string" "a string" } }
+{ $description "Reads " { $snippet "len" } " bytes starting from " { $snippet "base" } " and stores them in a new Factor string." } ;
+
+HELP: string>memory ( string base -- )
+{ $values { "string" "a string" } { "base" "an integer address" } }
+{ $description "Writes the string to memory starting from the " { $snippet "base" } " address." }
+{ $warning "This word is in the " { $vocab-link "kernel-internals" } " vocabulary because it is unsafe. Improper use can corrupt memory." } ;
+
 HELP: <malloc-array>
 { $values { "n" "a non-negative integer" } { "type" "a string" } { "alien" "an alien address" } }
 { $description "Allocates an unmanaged memory block large enough to hold " { $snippet "n" } " values of a C type." }
