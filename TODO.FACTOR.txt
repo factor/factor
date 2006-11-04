@@ -2,11 +2,11 @@
 
 - inline float allocation needs a gc check
 - docs: don't pass volatile aliens to callbacks
+- docs: mention that 'like' may destroy the underlying sequence
+- don't save big free chunk at the end of the code heap
 
 + ui:
 
-- doc/handbook/alien.facts formatting wrong (erg)
-- docs: mention that 'like' may destroy the underlying sequence
 - live search: timer delay would be nice
 - menu should stay up if mouse button released
 - roundoff is still not quite right with tracks
@@ -73,7 +73,6 @@
 
 + misc:
 
-- don't save big free chunk at the end of the code heap
 - faster apropos
 - growable data heap
 - minor GC takes too long now, we should card mark code heap

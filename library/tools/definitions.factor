@@ -118,7 +118,7 @@ M: tuple-class see-class*
 M: word see-class* drop ;
 
 : see-class ( word -- )
-    dup class? over builtin? not [
+    dup class? over builtin? not and [
         terpri [ see-class* ] with-pprint terpri
     ] [
         drop

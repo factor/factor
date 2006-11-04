@@ -7,11 +7,11 @@ vectors math parser ;
 
 PREDICATE: word class ( obj -- ? ) "class" word-prop ;
 
-PREDICATE: word builtin ( obj -- ? ) builtins get memq? ;
-
 SYMBOL: typemap
 SYMBOL: class<map
 SYMBOL: builtins
+
+PREDICATE: word builtin ( obj -- ? ) builtins get memq? ;
 
 : classes ( -- seq ) class<map get hash-keys ;
 
