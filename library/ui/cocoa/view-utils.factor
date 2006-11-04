@@ -14,7 +14,10 @@ opengl sequences ;
     dup 1 -> setPostsBoundsChangedNotifications:
     dup 1 -> setPostsFrameChangedNotifications: ;
 
-: view-dim -> bounds dup NSRect-w swap NSRect-h 2array ;
+: view-dim ( view -- dim )
+    -> bounds
+    dup NSRect-w >fixnum
+    swap NSRect-h >fixnum 2array ;
 
 : mouse-location ( view event -- loc )
     over >r

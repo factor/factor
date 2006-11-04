@@ -21,7 +21,7 @@ sequences ;
     swap [ glMatrixMode glPushMatrix call ] keep
     glMatrixMode glPopMatrix ; inline
 
-: gl-vertex first2 glVertex2i ; inline
+: gl-vertex first2 glVertex2d ; inline
 
 : gl-line ( a b -- )
     GL_LINES [ gl-vertex gl-vertex ] do-state ;

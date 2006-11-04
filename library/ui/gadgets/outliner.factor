@@ -10,8 +10,8 @@ TUPLE: guide color ;
 
 M: guide draw-interior
     guide-color gl-color
-    rect-dim dup { 0.5 0 0 } v* origin get v+
-    swap { 0.5 1 0 } v* origin get v+ gl-line ;
+    rect-dim dup first 2 /i 0 2array origin get v+
+    swap first2 >r 2 /i r> 2array origin get v+ gl-line ;
 
 : guide-theme ( gadget -- )
     T{ guide f { 0.5 0.5 0.5 1.0 } } swap set-gadget-interior ;
