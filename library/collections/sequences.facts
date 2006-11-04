@@ -1,5 +1,5 @@
 USING: arrays help sequences sequences-internals vectors
-strings ;
+strings kernel ;
 
 HELP: <vector>
 { $values { "n" "a positive integer specifying initial capacity" } { "vector" "a new vector" } }
@@ -36,7 +36,25 @@ HELP: thaw
 
 HELP: like
 { $values { "seq" "a sequence" } { "prototype" "a sequence" } { "newseq" "a sequence" } }
-{ $contract "Outputs a sequence with the same elements as the input sequence, but " { $emphasis "like" } " the template sequence, in the sense that it either has the same class as the template sequence, or if the template sequence is a virtual sequence, the same class as the template sequence's underlying sequence. The default implementation does nothing." } ;
+{ $contract "Outputs a sequence with the same elements as the input sequence, but " { $emphasis "like" } " the template sequence, in the sense that it either has the same class as the template sequence, or if the template sequence is a virtual sequence, the same class as the template sequence's underlying sequence."
+$terpri
+"The default implementation does nothing." }
+{ $notes "The output sequence might share storage with the input sequence, for example:"
+{ $example
+    "{ 1 2 3 } \"array\" set"
+    "\"array\" get V{ } like \"vector\" set"
+    "t 0 \"array\" get set-nth"
+    "\"vector\" get ."
+    "V{ t 2 3 }"
+}
+"If this behavior is undesirable, you can use one of the following words instead, which always output a fresh sequence:"
+{ $list
+    { $link >array }
+    { $link >quotation }
+    { $link >string }
+    { $link >sbuf }
+    { $link >vector }
+} } ;
 
 HELP: empty?
 { $values { "seq" "a sequence" } { "?" "a boolean" } }

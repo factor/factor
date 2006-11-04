@@ -11,8 +11,8 @@ M: float-regs (%peek)
 
 : load-zone-ptr ( reg -- )
     #! Load pointer to start of zone array
-    0 MOV
-    dup "generations" f rel-absolute-cell rel-dlsym
+    dup 0 MOV
+    "generations" f rel-absolute-cell rel-dlsym
     dup [] MOV ;
 
 : load-allot-ptr ( vreg -- )
