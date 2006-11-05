@@ -253,12 +253,12 @@ $terpri
 { $subsection alien-invoke }
 "Sometimes it is necessary to invoke a C function pointer, rather than a named C function:"
 { $subsection alien-indirect }
-"There are some details concerning the conversion of Factor objects to C values, and vice versa. See " { $link "c-types" } "." ;
+"There are some details concerning the conversion of Factor objects to C values, and vice versa. See " { $link "c-data" } "." ;
 
 ARTICLE: "alien-callback" "Calling Factor from C"
 "Callbacks can be defined and passed to C code as function pointers; the C code can then invoke the callback and run Factor code:"
 { $subsection alien-callback }
-"There are some details concerning the conversion of Factor objects to C values, and vice versa. See " { $link "c-types" } "."
+"There are some details concerning the conversion of Factor objects to C values, and vice versa. See " { $link "c-data" } "."
 { $subsection "alien-callback-gc" } ;
 
 ARTICLE: "alien-callback-gc" "Callbacks and code GC"

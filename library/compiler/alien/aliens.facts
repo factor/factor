@@ -2,10 +2,10 @@ IN: alien
 USING: arrays help ;
 
 HELP: alien
-{ $class-description "The class of alien pointers. See " { $link "syntax-aliens" } " for syntax and " { $link "c-objects" } " for general information." } ;
+{ $class-description "The class of alien pointers. See " { $link "syntax-aliens" } " for syntax and " { $link "c-data" } " for general information." } ;
 
 HELP: dll
-{ $class-description "The class of native library handles. See " { $link "dll-internals" } " for syntax and " { $link "c-objects" } " for general information." } ;
+{ $class-description "The class of native library handles. See " { $link "syntax-aliens" } " for syntax and " { $link "dll-internals" } " for general information." } ;
 
 HELP: expired? ( c-ptr -- ? )
 { $values { "c-ptr" "an alien, byte array, or " { $link f } } { "?" "a boolean" } }

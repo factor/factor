@@ -1,9 +1,9 @@
 IN: alien
-USING: help libc ;
+USING: help libc kernel-internals ;
 
 HELP: <c-type>
 { $values { "type" "a hashtable" } }
-{ $description "Creates a prototypical C type. User code should use higher-level facilities to define C types; see " { $link "c-types" } "." } ;
+{ $description "Creates a prototypical C type. User code should use higher-level facilities to define C types; see " { $link "c-data" } "." } ;
 
 HELP: no-c-type
 { $values { "type" "a string" } }
