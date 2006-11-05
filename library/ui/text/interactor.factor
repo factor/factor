@@ -42,7 +42,7 @@ SYMBOL: structured-input
 
 : interactor-eval ( string interactor -- )
     dup control-model clear-doc
-    2dup interactor-history push-new
+    over empty? [ 2dup interactor-history push-new ] unless
     2dup interactor-input.
     (interactor-eval) ;
 
