@@ -13,7 +13,7 @@ SYMBOL: msg-obj
 SYMBOL: class-name
 SYMBOL: track-mouse-state
 
-: random-class-name "Factor" 100000000 random-int unparse append ;
+: random-class-name "Factor" (random-int) number>string append ;
 
 : style ( -- n ) WS_OVERLAPPEDWINDOW ; inline
 : ex-style ( -- n ) WS_EX_APPWINDOW WS_EX_WINDOWEDGE bitor ; inline
@@ -40,7 +40,7 @@ SYMBOL: track-mouse-state
 : handle-wm-size ( hWnd uMsg wParam lParam -- )
     [ lo-word ] keep hi-word make-RECT get-RECT-dimensions 2array
     2nip
-    dup { 0 0 } = [ 2drop ] [ swap window set-gadget-dim ] if ;
+    dup { 0 0 } = [ 2drop ] [ swap window set-gadget-dim ui-step ] if ;
 
 : wm-keydown-codes ( -- key )
     H{
