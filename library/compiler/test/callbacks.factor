@@ -55,7 +55,6 @@ kernel-internals math memory namespaces test threads ;
 
 : callback-8
     "void" { "int" "int" } [ / "x" set ] alien-callback ;
-   
 
 : callback_test_2
     "void" { "int" "int" } "cdecl" alien-indirect ;
