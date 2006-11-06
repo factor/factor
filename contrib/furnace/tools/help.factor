@@ -1,9 +1,11 @@
 ! Copyright (C) 2005, 2006 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 IN: furnace:help
-USING: furnace help html kernel sequences words strings io ;
+USING: furnace help httpd html kernel sequences words strings
+io ;
 
 : show-help ( topic -- )
+    serving-html
     dup article-title [
         [ help ] with-html-stream
         <br/>

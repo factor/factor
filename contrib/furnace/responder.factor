@@ -102,7 +102,7 @@ SYMBOL: model
     template-path get swap path+ call-template ;
 
 : render-page ( model template title -- )
-    [
+    serving-html [
         [
             render-template
         ] html-document
