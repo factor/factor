@@ -53,6 +53,8 @@ kernel-internals math memory namespaces test threads ;
 
 [ 1 2 3 ] [ callback-7 callback_test_1 1 2 3 ] unit-test
 
+[ f ] [ namespace global eq? ] unit-test
+
 : callback-8
     "void" { "int" "int" } [ / "x" set ] alien-callback ;
 

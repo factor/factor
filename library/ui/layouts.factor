@@ -114,7 +114,8 @@ TUPLE: pack align fill gap ;
 
 : round-dims ( seq -- newseq )
     { 0 0 } swap
-    [ swap v- dup [ ceiling ] map [ swap v- ] keep ] map nip ;
+    [ swap v- dup [ ceiling >fixnum ] map [ swap v- ] keep ] map
+    nip ;
 
 : pack-layout ( gadget sizes -- )
     round-dims over gadget-children

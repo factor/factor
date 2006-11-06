@@ -2,7 +2,10 @@
 
 - inline float allocation needs a gc check
 - docs: don't pass volatile aliens to callbacks
-- some instability remains
+- windows rollover broken again
+- intrinsic fixnum>float float>fixnum
+- amd64 structs-by-value bug
+- callback scheduling issue
 
 + ui:
 

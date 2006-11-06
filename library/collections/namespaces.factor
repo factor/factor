@@ -58,7 +58,7 @@ SYMBOL: building
 
 : # ( n -- ) number>string % ;
 
-: init-namespaces ( -- ) global 1array >vector set-namestack ;
+: init-namespaces ( -- ) global 1array set-namestack ;
 
 IN: sequences
 
