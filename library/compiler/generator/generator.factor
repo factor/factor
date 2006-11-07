@@ -113,7 +113,7 @@ M: #if generate-node
     "end" get %jump-label
     resolve-label
     t 0 <int-vreg> load-literal
-    "end" get resolve-label
+    "end" resolve-label
     0 <int-vreg> phantom-d get phantom-push
     compute-free-vregs ;
 

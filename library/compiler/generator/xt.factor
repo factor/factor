@@ -15,7 +15,8 @@ C: label ( -- label ) ;
 
 : define-label ( name -- ) <label> swap set ;
 
-: resolve-label ( label -- )
+: resolve-label ( label/name -- )
+    dup string? [ get ] when
     compiled-offset swap set-label-offset ;
 
 SYMBOL: compiled-xts

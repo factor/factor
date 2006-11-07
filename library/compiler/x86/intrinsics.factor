@@ -29,7 +29,7 @@ IN: compiler
     ! It doesn't store type info in its header
     "obj" operand tag-bits SHL
     "end" get JMP
-    "header" get resolve-label
+    "header" resolve-label
     ! It does store type info in its header
     ! Is the pointer itself equal to 3? Then its F_TYPE (9).
     "x" operand object-tag CMP
@@ -39,10 +39,10 @@ IN: compiler
     ! Mask off header tag, making a fixnum.
     "obj" operand object-tag XOR
     "end" get JMP
-    "f" get resolve-label
+    "f" resolve-label
     ! The pointer is equal to 3. Load F_TYPE (9).
     "obj" operand f type tag-bits shift MOV
-    "end" get resolve-label
+    "end" resolve-label
 ] H{
     { +input+ { { f "obj" } } }
     { +scratch+ { { f "x" } { f "y" } } }
@@ -155,9 +155,6 @@ IN: compiler
 
 : ?MOV ( dst src -- ) 2dup = [ 2drop ] [ MOV ] if ;
 
-: unique-operands ( operands quot -- )
-    >r [ operand ] map prune r> each ; inline
-
 : simple-overflow ( word -- )
     finalize-contents
     "z" operand "x" operand MOV
@@ -173,7 +170,7 @@ IN: compiler
     ! An untagged pointer to the bignum is now in EAX; tag it
     T{ int-regs } return-reg bignum-tag OR
     "z" operand T{ int-regs } return-reg ?MOV
-    "end" get resolve-label ; inline
+    "end" resolve-label ; inline
 
 : simple-overflow-template ( word insn -- )
     [ simple-overflow ] curry H{
@@ -200,7 +197,7 @@ IN: compiler
     "x" operand tag-bits neg 2array compile-c-call*
     ! an untagged pointer to the bignum is now in EAX; tag it
     T{ int-regs } return-reg bignum-tag OR
-    "end" get resolve-label
+    "end" resolve-label
 ] H{
     { +input+ { { 0 "x" } { 1 "y" } } }
     { +output+ { "x" } }
@@ -233,7 +230,7 @@ IN: compiler
     stack-reg 16 cell - ADD
     ! the remainder is now in EDX
     remainder-reg POP
-    "end" get resolve-label ;
+    "end" resolve-label ;
 
 \ fixnum/i [ generate-fixnum/mod ] H{
     { +input+ { { 0 "x" } { 1 "y" } } }

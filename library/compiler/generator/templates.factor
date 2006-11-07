@@ -277,3 +277,6 @@ SYMBOL: +clobber+
     compute-free-vregs ; inline
 
 : operand ( var -- op ) get v>operand ; inline
+
+: unique-operands ( operands quot -- )
+    >r [ operand ] map prune r> each ; inline

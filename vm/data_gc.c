@@ -618,3 +618,8 @@ void primitive_gc_time(void)
 {
 	box_unsigned_8(gc_time);
 }
+
+void simple_gc(void)
+{
+	maybe_gc(0);
+}

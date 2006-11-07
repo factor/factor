@@ -139,7 +139,7 @@ M: object load-literal
     ! Align for better performance
     compile-aligned
     ! Fix up jump table pointer
-    "end" get resolve-label ;
+    "end" resolve-label ;
 
 : %target ( label -- ) 0 cell, rel-absolute-cell rel-label ;
 

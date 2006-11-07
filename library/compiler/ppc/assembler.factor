@@ -51,6 +51,8 @@ words ;
 
 : ADDIC. d-form 13 insn ; : SUBIC. neg ADDIC. ;
 
+: MULI d-form 7 insn ;
+
 : (ADD) 266 xo-form 31 insn ;
 : ADD 0 0 (ADD) ;  : ADD. 0 1 (ADD) ;
 : ADDO 1 0 (ADD) ; : ADDO. 1 1 (ADD) ;

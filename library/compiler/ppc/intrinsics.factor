@@ -4,12 +4,6 @@ IN: compiler
 USING: alien assembler kernel kernel-internals math
 math-internals namespaces sequences words ;
 
-: untag ( dest src -- ) 0 0 31 tag-bits - RLWINM ;
-
-: tag-fixnum ( src dest -- ) tag-bits SLWI ;
-
-: untag-fixnum ( src dest -- ) tag-bits SRAWI ;
-
 : generate-slot ( size quot -- )
     >r >r
     ! turn tagged fixnum slot # into an offset, multiple of 4
@@ -20,7 +14,7 @@ math-internals namespaces sequences words ;
     "obj" operand dup r> call ; inline
 
 \ slot [
-    "obj" operand dup untag
+    "obj" operand dup %untag
     cell log2 [ 0 LWZ ] generate-slot
 ] H{
     { +input+ { { f "obj" } { f "n" } } }
@@ -29,7 +23,7 @@ math-internals namespaces sequences words ;
 
 \ char-slot [
     1 [ string-offset LHZ ] generate-slot
-    "obj" operand dup tag-fixnum
+    "obj" operand dup %tag-fixnum
 ] H{
     { +input+ { { f "n" } { f "obj" } } }
     { +output+ { "obj" } }
@@ -53,7 +47,7 @@ math-internals namespaces sequences words ;
     "x" operand "obj" operand 0 STB ;
 
 \ set-slot [
-    "obj" operand dup untag
+    "obj" operand dup %untag
     cell log2 [ 0 STW ] generate-set-slot generate-write-barrier
 ] H{
     { +input+ { { f "val" } { f "obj" } { f "slot" } } }
@@ -63,7 +57,7 @@ math-internals namespaces sequences words ;
 
 \ set-char-slot [
     ! untag the new value in 0th input
-    "val" operand dup untag-fixnum
+    "val" operand dup %untag-fixnum
     1 [ string-offset STH ] generate-set-slot
 ] H{
     { +input+ { { f "val" } { f "slot" } { f "obj" } } }
@@ -105,7 +99,7 @@ math-internals namespaces sequences words ;
 
 \ fixnum-bitnot [
     "x" operand dup NOT
-    "x" operand dup untag
+    "x" operand dup %untag
 ] H{
     { +input+ { { f "x" } } }
     { +output+ { "x" } }
@@ -128,18 +122,17 @@ math-internals namespaces sequences words ;
 ] each
 
 : simple-overflow ( word -- )
-    >r
-    "end" define-label
-    "end" get BNO
-    { "x" "y" } [ operand ] map prune [ dup untag-fixnum ] each
-    3 "y" operand "x" operand r> execute
-    "s48_long_to_bignum" f %alien-invoke
-    ! An untagged pointer to the bignum is now in r3; tag it
-    3 "r" operand bignum-tag ORI
-    "end" get resolve-label ; inline
+    [
+        >r
+        "end" define-label
+        "end" get BNO
+        { "x" "y" } [ dup %untag-fixnum ] unique-operands
+        "r" operand "y" operand "x" operand r> execute
+        "r" operand %allot-bignum-signed-1
+        "end" resolve-label
+    ] with-scope ; inline
 
 \ fixnum+ [
-    finalize-contents
     0 MTXER
     "r" operand "y" operand "x" operand ADDO.
     \ ADD simple-overflow
@@ -151,7 +144,6 @@ math-internals namespaces sequences words ;
 } define-intrinsic
 
 \ fixnum- [
-    finalize-contents
     0 MTXER
     "r" operand "y" operand "x" operand SUBFO.
     \ SUBF simple-overflow
@@ -163,23 +155,16 @@ math-internals namespaces sequences words ;
 } define-intrinsic
 
 \ fixnum* [
-    finalize-contents
     "end" define-label
-    "r" operand "x" operand untag-fixnum
+    "r" operand "x" operand %untag-fixnum
     0 MTXER
-    12 "y" operand "r" operand MULLWO.
+    "s" operand "y" operand "r" operand MULLWO.
     "end" get BNO
-    4 "y" operand "r" operand MULHW
-    3 12 MR
-    "s48_fixnum_pair_to_bignum" f %alien-invoke
-    ! now we have to shift it by three bits to remove the second
-    ! tag
-    tag-bits neg 4 LI
-    "s48_bignum_arithmetic_shift" f %alien-invoke
-    ! An untagged pointer to the bignum is now in r3; tag it
-    3 12 bignum-tag ORI
-    "end" get resolve-label
-    "s" operand 12 MR
+    "s" operand "y" operand %untag-fixnum
+    "x" operand "s" operand "r" operand MULLWO.
+    "s" operand "s" operand "r" operand MULHW
+    "s" operand "x" operand %allot-bignum-signed-2
+    "end" resolve-label
 ] H{
     { +input+ { { f "x" } { f "y" } } }
     { +scratch+ { { f "r" } { f "s" } } }
@@ -201,17 +186,15 @@ math-internals namespaces sequences words ;
     most-positive-fixnum "s" operand LOAD
     "r" operand 0 "s" operand CMP
     "no-overflow" get BLE
-    most-negative-fixnum neg 3 LOAD
-    "s48_long_to_bignum" f %alien-invoke
-    "x" operand 3 bignum-tag ORI ;
+    most-negative-fixnum neg "x" operand LOAD
+    "x" operand %allot-bignum-signed-1 ;
 
 \ fixnum/i [
-    finalize-contents
     generate-fixnum/i
     "end" get B
-    "no-overflow" get resolve-label
-    "r" operand "x" operand tag-fixnum
-    "end" get resolve-label
+    "no-overflow" resolve-label
+    "r" operand "x" operand %tag-fixnum
+    "end" resolve-label
 ] H{
     { +input+ { { f "x" } { f "y" } } }
     { +scratch+ { { f "r" } { f "s" } } }
@@ -220,14 +203,13 @@ math-internals namespaces sequences words ;
 } define-intrinsic
 
 \ fixnum/mod [
-    finalize-contents
     generate-fixnum/i
     0 "s" operand LI
     "end" get B
-    "no-overflow" get resolve-label
+    "no-overflow" resolve-label
     generate-fixnum-mod
-    "r" operand "x" operand tag-fixnum
-    "end" get resolve-label
+    "r" operand "x" operand %tag-fixnum
+    "end" resolve-label
 ] H{
     { +input+ { { f "x" } { f "y" } } }
     { +scratch+ { { f "r" } { f "s" } } }
@@ -268,7 +250,7 @@ math-internals namespaces sequences words ;
 
 \ tag [
     "in" operand "out" operand tag-mask ANDI
-    "out" operand dup tag-fixnum
+    "out" operand dup %tag-fixnum
 ] H{
     { +input+ { { f "in" } } }
     { +scratch+ { { f "out" } } }
@@ -281,7 +263,7 @@ math-internals namespaces sequences words ;
     ! Get the tag
     "obj" operand "y" operand tag-mask ANDI
     ! Tag the tag
-    "y" operand "x" operand tag-fixnum
+    "y" operand "x" operand %tag-fixnum
     ! Compare with object tag number (3).
     0 "y" operand object-tag CMPI
     ! Jump if the object doesn't store type info in its header
@@ -292,12 +274,12 @@ math-internals namespaces sequences words ;
     "f" get BEQ
     ! The pointer is not equal to 3. Load the object header.
     "x" operand "obj" operand object-tag neg LWZ
-    "x" operand dup untag
+    "x" operand dup %untag
     "end" get B
-    "f" get resolve-label
+    "f" resolve-label
     ! The pointer is equal to 3. Load F_TYPE (9).
     f type tag-bits shift "x" operand LI
-    "end" get resolve-label
+    "end" resolve-label
 ] H{
     { +input+ { { f "obj" } } }
     { +scratch+ { { f "x" } { f "y" } } }

@@ -243,9 +243,14 @@ INLINE void *allot_zone(F_ZONE *z, CELL a)
 	return (void*)h;
 }
 
+/* We leave this many bytes free at the top of the nursery so that inline
+allocation (which does not call GC because of possible roots in volatile
+registers) does not run out of memory */
+#define ALLOT_BUFFER_ZONE 1024
+
 INLINE void maybe_gc(CELL a)
 {
-	if(nursery.here + a > nursery.limit)
+	if(nursery.here + a + ALLOT_BUFFER_ZONE > nursery.limit)
 		garbage_collection(NURSERY,false);
 }
 
@@ -270,3 +275,4 @@ void update_cards_offset(void);
 CELL collect_next(CELL scan);
 void primitive_data_gc(void);
 void primitive_gc_time(void);
+DLLEXPORT void simple_gc(void);
