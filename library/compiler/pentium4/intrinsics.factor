@@ -9,37 +9,8 @@ M: float-regs (%peek)
     fp-scratch swap %move-int>int
     fp-scratch %move-int>float ;
 
-: load-zone-ptr ( reg -- )
-    #! Load pointer to start of zone array
-    dup 0 MOV
-    "generations" f rel-absolute-cell rel-dlsym
-    dup [] MOV ;
-
-: load-allot-ptr ( vreg -- )
-    dup load-zone-ptr dup cell [+] MOV ;
-
-: inc-allot-ptr ( vreg n -- )
-    >r dup load-zone-ptr cell [+] r> ADD ;
-
-: with-inline-alloc ( prequot postquot spec -- )
-    #! both quotations are called with the vreg
-    [
-        alloc-tmp-reg PUSH
-        alloc-tmp-reg load-allot-ptr
-        alloc-tmp-reg [] \ tag-header get call tag-header MOV
-        >r call alloc-tmp-reg \ tag get call OR
-        r> call alloc-tmp-reg \ size get call inc-allot-ptr
-        alloc-tmp-reg POP
-    ] bind ; inline
-
 M: float-regs (%replace)
-    drop
-    [ alloc-tmp-reg 8 [+] rot v>operand MOVSD ]
-    [ v>operand alloc-tmp-reg MOV ] H{
-        { tag-header [ float-tag ] }
-        { tag [ float-tag ] }
-        { size [ 16 ] }
-    } with-inline-alloc ;
+    drop swap %allot-float ;
 
 ! Floats
 : define-float-op ( word op -- )

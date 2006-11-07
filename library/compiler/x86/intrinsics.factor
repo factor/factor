@@ -153,10 +153,7 @@ IN: compiler
     { +output+ { "out" } }
 } define-intrinsic
 
-: ?MOV ( dst src -- ) 2dup = [ 2drop ] [ MOV ] if ;
-
 : simple-overflow ( word -- )
-    finalize-contents
     "z" operand "x" operand MOV
     "z" operand "y" operand pick execute
     ! If the previous arithmetic operation overflowed, then we
@@ -166,10 +163,8 @@ IN: compiler
     ! There was an overflow. Recompute the original operand.
     { "y" "x" } [ tag-bits SAR ] unique-operands
     "x" operand "y" operand rot execute
-    "s48_long_to_bignum" f "x" operand 1array compile-c-call*
-    ! An untagged pointer to the bignum is now in EAX; tag it
-    T{ int-regs } return-reg bignum-tag OR
-    "z" operand T{ int-regs } return-reg ?MOV
+    "x" operand %allot-bignum-signed-1
+    "z" operand "x" operand MOV
     "end" resolve-label ; inline
 
 : simple-overflow-template ( word insn -- )
@@ -184,19 +179,11 @@ IN: compiler
 \ fixnum- \ SUB simple-overflow-template
 
 \ fixnum* [
-    finalize-contents
     "y" operand tag-bits SAR
     "y" operand IMUL
     "end" define-label
     "end" get JNO
-    "s48_fixnum_pair_to_bignum" f
-    "x" operand remainder-reg 2array compile-c-call*
-    ! now we have to shift it by three bits to remove the second
-    ! tag
-    "s48_bignum_arithmetic_shift" f
-    "x" operand tag-bits neg 2array compile-c-call*
-    ! an untagged pointer to the bignum is now in EAX; tag it
-    T{ int-regs } return-reg bignum-tag OR
+    "x" operand remainder-reg %allot-bignum-signed-2
     "end" resolve-label
 ] H{
     { +input+ { { 0 "x" } { 1 "y" } } }
@@ -217,19 +204,7 @@ IN: compiler
     "x" operand 1 tag-bits shift IMUL2
     ! Did it overflow?
     "end" get JNO
-    ! There was an overflow, so make ECX into a bignum. we must
-    ! save EDX since its volatile.
-    remainder-reg PUSH
-    ! Align the stack -- only needed on Mac OS X
-    stack-reg 16 cell - SUB
-    "s48_long_to_bignum" f
-    "y" operand 1array compile-c-call*
-    ! An untagged pointer to the bignum is now in EAX; tag it
-    T{ int-regs } return-reg bignum-tag OR
-    ! Align the stack -- only needed on Mac OS X
-    stack-reg 16 cell - ADD
-    ! the remainder is now in EDX
-    remainder-reg POP
+    "y" operand %allot-bignum-signed-1
     "end" resolve-label ;
 
 \ fixnum/i [ generate-fixnum/mod ] H{
