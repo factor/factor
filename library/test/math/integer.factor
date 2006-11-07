@@ -103,3 +103,5 @@ unit-test
 [ t ] [ 0 zero? ] unit-test
 [ f ] [ 30 zero? ] unit-test
 [ t ] [ 0 >bignum zero? ] unit-test
+
+[ 4294967280 ] [ 268435455 >fixnum 16 fixnum* ] unit-test

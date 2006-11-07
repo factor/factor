@@ -81,7 +81,7 @@ void primitive_fixnum_multiply(void)
 			F_ARRAY *bx = s48_fixnum_to_bignum(x);
 			REGISTER_BIGNUM(bx);
 			F_ARRAY *by = s48_fixnum_to_bignum(y);
-			UNREGISTER_BIGNUM(by);
+			UNREGISTER_BIGNUM(bx);
 			dpush(tag_bignum(s48_bignum_multiply(bx,by)));
 		}
 	}
