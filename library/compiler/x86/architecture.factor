@@ -16,8 +16,7 @@ IN: compiler
 
 : ds-reg ESI ; inline
 : cs-reg EDI ; inline
-: remainder-reg EDX ; inline
-: alloc-tmp-reg EBX ; inline
+: allot-tmp-reg EBX ; inline
 : stack-reg ESP ; inline
 : stack@ stack-reg swap [+] ;
 
@@ -38,16 +37,6 @@ M: cs-loc v>operand cs-loc-n cs-reg reg-stack ;
 
 : %alien-indirect ( -- )
     [ CALL ] alien-temp ;
-
-: with-aligned-stack ( n quot -- )
-    #! On Linux, there is no requirement to align stack frames,
-    #! so this is mostly a no-op.
-    swap slip stack-reg swap ADD ; inline
-
-: compile-c-call* ( symbol dll args -- )
-    dup length cells [
-        <reversed> [ PUSH ] each %alien-invoke
-    ] with-aligned-stack ;
 
 GENERIC: push-return-reg ( reg-class -- )
 GENERIC: pop-return-reg ( reg-class -- )

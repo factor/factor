@@ -50,10 +50,10 @@ IN: compiler
 } define-intrinsic
 
 ! Slots
-: untag ( reg -- ) tag-mask bitnot AND ;
+: %untag ( reg -- ) tag-mask bitnot AND ;
 
 \ slot [
-    "obj" operand untag
+    "obj" operand %untag
     ! turn tagged fixnum slot # into an offset, multiple of 4
     "n" operand fixnum>slot@
     ! compute slot address
@@ -73,7 +73,7 @@ IN: compiler
     "obj" operand [] card-mark OR ;
 
 \ set-slot [
-    "obj" operand untag
+    "obj" operand %untag
     ! turn tagged fixnum slot # into an offset
     "slot" operand fixnum>slot@
     ! compute slot address
@@ -153,18 +153,20 @@ IN: compiler
     { +output+ { "out" } }
 } define-intrinsic
 
+: %untag-fixnums ( seq -- )
+    [ tag-bits SAR ] unique-operands ;
+
 : simple-overflow ( word -- )
+    "end" define-label
     "z" operand "x" operand MOV
     "z" operand "y" operand pick execute
     ! If the previous arithmetic operation overflowed, then we
     ! turn the result into a bignum and leave it in EAX.
-    "end" define-label
     "end" get JNO
     ! There was an overflow. Recompute the original operand.
-    { "y" "x" } [ tag-bits SAR ] unique-operands
+    { "y" "x" } %untag-fixnums
     "x" operand "y" operand rot execute
-    "x" operand %allot-bignum-signed-1
-    "z" operand "x" operand MOV
+    "z" operand "x" operand %allot-bignum-signed-1
     "end" resolve-label ; inline
 
 : simple-overflow-template ( word insn -- )
@@ -178,16 +180,32 @@ IN: compiler
 \ fixnum+ \ ADD simple-overflow-template
 \ fixnum- \ SUB simple-overflow-template
 
+: %tag-overflow ( -- )
+    #! Tag a cell-size value, where the tagging might posibly
+    #! overflow.
+    "y" operand "x" operand MOV ! Make a copy
+    "x" operand 1 tag-bits shift IMUL2 ! Tag it
+    "end" get JNO ! Overflow?
+    "x" operand "y" operand %allot-bignum-signed-1 ! Yes, box bignum
+    ;
+
 \ fixnum* [
-    "y" operand tag-bits SAR
-    "y" operand IMUL
+    "overflow-1" define-label
+    "overflow-2" define-label
     "end" define-label
-    "end" get JNO
-    "x" operand remainder-reg %allot-bignum-signed-2
+    { "y" "x" } %untag-fixnums
+    "y" operand IMUL
+    "overflow-1" get JNO
+    "x" operand "r" operand %allot-bignum-signed-2
+    "end" get JMP
+    "overflow-1" resolve-label
+    %tag-overflow
     "end" resolve-label
 ] H{
     { +input+ { { 0 "x" } { 1 "y" } } }
     { +output+ { "x" } }
+    { +scratch+ { { 2 "r" } } }
+    { +clobber+ { "y" } }
 } define-intrinsic
 
 : generate-fixnum/mod
@@ -197,27 +215,20 @@ IN: compiler
     "end" define-label
     prepare-division
     "y" operand IDIV
-    ! Make a copy since following shift is destructive
-    "y" operand "x" operand MOV
-    ! Tag the value, since division cancelled tags from both
-    ! inputs
-    "x" operand 1 tag-bits shift IMUL2
-    ! Did it overflow?
-    "end" get JNO
-    "y" operand %allot-bignum-signed-1
+    %tag-overflow
     "end" resolve-label ;
 
 \ fixnum/i [ generate-fixnum/mod ] H{
     { +input+ { { 0 "x" } { 1 "y" } } }
-    { +scratch+ { { 2 "out" } } }
+    { +scratch+ { { 2 "r" } } }
     { +output+ { "x" } }
     { +clobber+ { "x" "y" } }
 } define-intrinsic
 
 \ fixnum/mod [ generate-fixnum/mod ] H{
     { +input+ { { 0 "x" } { 1 "y" } } }
-    { +scratch+ { { 2 "out" } } }
-    { +output+ { "x" "out" } }
+    { +scratch+ { { 2 "r" } } }
+    { +output+ { "x" "r" } }
     { +clobber+ { "x" "y" } }
 } define-intrinsic
 

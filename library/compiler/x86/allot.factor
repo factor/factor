@@ -5,54 +5,66 @@ USING: kernel assembler kernel-internals namespaces math ;
 
 : load-zone-ptr ( reg -- )
     #! Load pointer to start of zone array
-    dup 0 MOV
+    allot-tmp-reg 0 MOV
     "generations" f rel-absolute-cell rel-dlsym
-    dup [] MOV ;
+    allot-tmp-reg allot-tmp-reg [] MOV ;
 
-: load-allot-ptr ( reg -- )
-    dup load-zone-ptr dup cell [+] MOV ;
+: load-allot-ptr ( -- )
+    load-zone-ptr
+    allot-tmp-reg allot-tmp-reg cell [+] MOV ;
 
-: inc-allot-ptr ( reg n -- )
-    >r dup load-zone-ptr cell [+] r> ADD ;
+: inc-allot-ptr ( n -- )
+    load-zone-ptr
+    allot-tmp-reg cell [+] swap 8 align ADD ;
+
+: store-header ( header -- )
+    allot-tmp-reg [] swap tag-header MOV ;
 
 : %allot ( header size quot -- )
     swap >r >r
-    alloc-tmp-reg PUSH
-    alloc-tmp-reg load-allot-ptr
-    alloc-tmp-reg [] rot tag-header MOV
+    allot-tmp-reg PUSH
+    load-allot-ptr
+    store-header
     r> call
-    alloc-tmp-reg r> 8 align inc-allot-ptr
-    alloc-tmp-reg POP ; inline
+    r> inc-allot-ptr
+    allot-tmp-reg POP ; inline
 
 : %allot-float ( loc vreg -- )
-    #! Only called by pentium4 backend
+    #! Only called by pentium4 backend, uses SSE2 instruction
     float-tag 16 [
-        alloc-tmp-reg 8 [+] rot v>operand MOVSD
-        alloc-tmp-reg float-tag OR
-        v>operand alloc-tmp-reg MOV
+        allot-tmp-reg 8 [+] rot v>operand MOVSD
+        allot-tmp-reg float-tag OR
+        v>operand allot-tmp-reg MOV
     ] %allot ;
-
-M: float-regs (%replace)
-    drop swap %allot-float ;
 
 : %allot-bignum ( #digits quot -- )
     #! 1 cell header, 1 cell length, 1 cell sign, + digits
     #! length is the # of digits + sign
     bignum-tag pick 3 + cells [
-        >r alloc-tmp-reg cell [+] swap 1+ tag-bits shift MOV r>
+        ! Write length
+        >r allot-tmp-reg cell [+] swap 1+ tag-bits shift MOV r>
+        ! Call quot
         call
     ] %allot ; inline
 
-: %allot-bignum-signed-1 ( reg -- )
-    #! on entry, reg is a signed 32-bit quantity
-    #! exits with tagged ptr to bignum in reg
+: %allot-bignum-signed-1 ( outreg inreg -- )
+    #! on entry, inreg is a signed 32-bit quantity
+    #! exits with tagged ptr to bignum in outreg
     [
+        "positive" define-label
+        "end" define-label
         1 [
-            ! todo: neg
-            alloc-tmp-reg 2 cells [+] 0 MOV ! positive sign
-            alloc-tmp-reg 3 cells [+] over MOV
-            alloc-tmp-reg bignum-tag OR
-            MOV
+            dup 0 CMP
+            "positive" get JGE
+            allot-tmp-reg 2 cells [+] 1 MOV ! negative sign
+            dup NEG
+            "end" get JMP
+            "positive" resolve-label
+            allot-tmp-reg 2 cells [+] 0 MOV ! positive sign
+            "end" resolve-label
+            allot-tmp-reg 3 cells [+] swap MOV
+            allot-tmp-reg bignum-tag OR
+            allot-tmp-reg MOV
         ] %allot-bignum
     ] with-scope ;
 
@@ -62,10 +74,11 @@ M: float-regs (%replace)
     #! exits with tagged ptr to bignum in reg1
     [
         2 [
-            alloc-tmp-reg 2 cells [+] 0 MOV ! positive sign
-            alloc-tmp-reg 3 cells [+] swap MOV
-            alloc-tmp-reg 4 cells [+] over MOV
-            alloc-tmp-reg bignum-tag OR
-            MOV
+            ! todo: neg
+            allot-tmp-reg 2 cells [+] 0 MOV ! positive sign
+            allot-tmp-reg 3 cells [+] swap MOV
+            allot-tmp-reg 4 cells [+] over MOV
+            allot-tmp-reg bignum-tag OR
+            allot-tmp-reg MOV
         ] %allot-bignum
     ] with-scope ;

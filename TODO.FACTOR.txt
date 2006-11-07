@@ -9,7 +9,8 @@
 - sometimes fep when closing window
 - %allot-bignum-signed-2: handle carry in negation
 - x86: load-allot-ptr doesn't have a stack effect? why?
-- remove useless-coerce optimization
+- mov 0x0(%esi),%ecx  why?
+- mac intel: perhaps its not a good idea using ebx as allot-tmp-reg
 
 + ui:
 

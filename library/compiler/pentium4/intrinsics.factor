@@ -9,8 +9,7 @@ M: float-regs (%peek)
     fp-scratch swap %move-int>int
     fp-scratch %move-int>float ;
 
-M: float-regs (%replace)
-    drop swap %allot-float ;
+M: float-regs (%replace) drop swap %allot-float ;
 
 ! Floats
 : define-float-op ( word op -- )
