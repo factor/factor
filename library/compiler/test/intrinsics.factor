@@ -1,6 +1,6 @@
 IN: temporary
 USING: arrays compiler kernel kernel-internals math
-math-internals sequences strings test words ;
+math-internals sequences strings test words errors ;
 
 ! Make sure that intrinsic ops compile to correct code.
 [ 1 ] [ { 1 2 } [ 2 slot ] compile-1 ] unit-test
@@ -219,3 +219,35 @@ cell 8 = [
 
     [ 1152921504606846976 0 ] [ -1152921504606846976 >fixnum -1 [ fixnum/mod ] compile-1 ] unit-test
 ] when
+
+! Some randomized tests
+: compiled-fixnum* fixnum* ;
+\ compiled-fixnum* compile
+
+: test-fixnum*
+    (random-int) >fixnum (random-int) >fixnum
+    2dup
+    [ fixnum* ] 2keep compiled-fixnum* =
+    [ 2drop ] [ "Oops" throw ] if ;
+
+[ ] [ 10000 [ test-fixnum* ] times ] unit-test
+
+: compiled-fixnum>bignum fixnum>bignum ;
+\ compiled-fixnum>bignum compile
+
+: test-fixnum>bignum
+    (random-int) >fixnum
+    dup [ fixnum>bignum ] keep compiled-fixnum>bignum =
+    [ drop ] [ "Oops" throw ] if ;
+
+[ ] [ 10000 [ test-fixnum>bignum ] times ] unit-test
+
+: compiled-bignum>fixnum bignum>fixnum ;
+\ compiled-bignum>fixnum compile
+
+: test-bignum>fixnum
+    5 random-int [ drop (random-int) ] map product >bignum
+    dup [ bignum>fixnum ] keep compiled-bignum>fixnum =
+    [ drop ] [ "Oops" throw ] if ;
+
+[ ] [ 10000 [ test-bignum>fixnum ] times ] unit-test

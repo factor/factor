@@ -79,8 +79,6 @@ typedef F_FIXNUM bignum_length_type;
 #define BIGNUM_ONE(neg_p) \
    untag_array_fast(neg_p ? bignum_neg_one : bignum_pos_one)
 
-#define BIGNUM_ONE_P(bignum,negative_p) ((bignum) == BIGNUM_ONE(negative_p))
-
 #define HD_LOW(digit) ((digit) & BIGNUM_HALF_DIGIT_MASK)
 #define HD_HIGH(digit) ((digit) >> BIGNUM_HALF_DIGIT_LENGTH)
 #define HD_CONS(high, low) (((high) << BIGNUM_HALF_DIGIT_LENGTH) | (low))

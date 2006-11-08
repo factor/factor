@@ -1,5 +1,5 @@
 IN: temporary
-USING: kernel math namespaces prettyprint test ;
+USING: kernel math namespaces prettyprint test math-internals ;
 
 [ "-8" ] [ -8 unparse ] unit-test
 

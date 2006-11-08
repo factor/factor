@@ -154,23 +154,24 @@ math-internals namespaces sequences words ;
     { +clobber+ { "x" "y" } }
 } define-intrinsic
 
-\ fixnum* [
-    "end" define-label
-    "r" operand "x" operand %untag-fixnum
-    0 MTXER
-    "s" operand "y" operand "r" operand MULLWO.
-    "end" get BNO
-    "s" operand "y" operand %untag-fixnum
-    "x" operand "s" operand "r" operand MULLWO.
-    "s" operand "s" operand "r" operand MULHW
-    "s" operand "x" operand %allot-bignum-signed-2
-    "end" resolve-label
-] H{
-    { +input+ { { f "x" } { f "y" } } }
-    { +scratch+ { { f "r" } { f "s" } } }
-    { +output+ { "s" } }
-    { +clobber+ { "x" "y" } }
-} define-intrinsic
+! \ fixnum* [
+!     "end" define-label
+!     "r" operand "x" operand %untag-fixnum
+!     0 MTXER
+!     "s" operand "y" operand "r" operand MULLWO.
+!     "end" get BNO
+!     "s" operand "y" operand 1 SRAWI
+!     "x" operand "s" operand "r" operand MULLWO.
+!     "x" operand dup 2 SRAWI
+!     "s" operand "s" operand "r" operand MULHW
+!     "s" operand "x" operand %allot-bignum-signed-2
+!     "end" resolve-label
+! ] H{
+!     { +input+ { { f "x" } { f "y" } } }
+!     { +scratch+ { { f "r" } { f "s" } } }
+!     { +output+ { "s" } }
+!     { +clobber+ { "x" "y" } }
+! } define-intrinsic
 
 : generate-fixnum/i
     #! This VOP is funny. If there is an overflow, it falls
@@ -216,6 +217,42 @@ math-internals namespaces sequences words ;
     { +output+ { "x" "s" } }
     { +clobber+ { "y" } }
 } define-intrinsic
+
+! \ fixnum>bignum [
+!     "nonzero" define-label
+!     "end" define-label
+!     0 "x" operand 0 CMPI ! is it zero?
+!     "nonzero" get BNE
+!     0 >bignum "x" get load-literal
+!     "end" get B
+!     "nonzero" resolve-label
+!     "x" operand dup %untag-fixnum
+!     "x" operand %allot-bignum-signed-1
+!     "end" resolve-label
+! ] H{
+!     { +input+ { { f "x" } } }
+!     { +output+ { "x" } }
+! } define-intrinsic
+! 
+! \ bignum>fixnum [
+!     "nonzero" define-label
+!     "end" define-label
+!     "y" operand "x" operand cell LWZ
+!     0 "x" operand 0 CMPI ! is it zero?
+!     "nonzero" get BNE
+!     0 "y" operand LI
+!     "end" get B
+!     "nonzero" resolve-label
+!     "y" operand "x" operand 2 cells LWZ
+!     "y" operand dup -1 tag-bits shift MULI
+!     "x" operand dup 3 cells LWZ
+!     "y" operand "y" operand "x" operand MULLW
+!     "end" resolve-label
+! ] H{
+!     { +input+ { { f "x" } } }
+!     { +scratch+ { { f "y" } } }
+!     { +output+ { "y" } }
+! } define-intrinsic
 
 : define-float-op ( word op -- )
     [ [ "x" operand "x" operand "y" operand ] % , ] [ ] make H{

@@ -182,7 +182,7 @@ IN: compiler
 
 : %tag-overflow ( -- )
     #! Tag a cell-size value, where the tagging might posibly
-    #! overflow.
+    #! overflow BUT IT MUST NOT EXCEED cell-2 BITS
     "y" operand "x" operand MOV ! Make a copy
     "x" operand 1 tag-bits shift IMUL2 ! Tag it
     "end" get JNO ! Overflow?

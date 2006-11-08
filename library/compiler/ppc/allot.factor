@@ -34,12 +34,13 @@ M: float-regs (%replace)
     #! 1 cell header, 1 cell length, 1 cell sign, + digits
     #! length is the # of digits + sign
     bignum-tag over 3 + cells %allot
-    1 + tag-bits shift 12 LI ! compute the length
+    1+ tag-bits shift 12 LI ! compute the length
     12 11 cell STW ! store the length
     ;
 
 : %allot-bignum-signed-1 ( reg -- )
-    #! on entry, reg is a signed 32-bit quantity
+    #! on entry, reg is a 30-bit quantity sign-extended to
+    #! 32-bits.
     #! exits with tagged ptr to bignum in reg
     [
         "end" define-label
@@ -60,25 +61,33 @@ M: float-regs (%replace)
     ] with-scope ;
 
 : %allot-bignum-signed-2 ( reg1 reg2 -- )
-    #! on entry, reg1 and reg2 together form a signed 64-bit
-    #! quantity.
+    #! this word has some hairy restrictions; its really only
+    #! intended to be used by fixnum*.
+    #! - reg1 and reg2 together form a 60-bit signed quantity
+    #!   (product of two 29-bit fixnums cannot exceed this)
+    #! - the quantity must be non-zero
+    #!   (if the product of two fixnums is zero, there's no
+    #!   overflow so this word won't be called in that case)
     #! exits with tagged ptr to bignum in reg1
     [
         "end" define-label
         "pos" define-label
         2 %allot-bignum
-        0 pick 0 CMPI ! is the 64-bit quantity negative?
+        0 pick 0 CMPI ! is the 60-bit quantity negative?
         "pos" get BGE
         1 12 LI
         12 11 2 cells STW ! store negative sign
-        over dup NOT ! negate 64-bit quanity
+        over dup NOT ! negate 60-bit quanity
         dup dup -1 MULI
         "end" get B
         "pos" resolve-label
         0 12 LI
         12 11 2 cells STW ! store positive sign
         "end" resolve-label
-        11 3 cells STW ! store the number
+        HEX: 3fffffff 12 LOAD ! first 30 bits set
+        dup dup 12 AND ! store the number
+        11 3 cells STW
+        dup dup 12 AND
         dup 11 4 cells STW
         11 swap bignum-tag ORI ! tag the bignum, store it in reg
     ] with-scope ;
