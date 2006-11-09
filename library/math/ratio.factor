@@ -25,10 +25,8 @@ M: ratio number=
 : ratio+d ( a/b c/d -- b*d )
     denominator swap denominator * ; inline
 
-M: ratio >integer >fraction /i ;
-
-M: ratio >fixnum >integer >fixnum ;
-M: ratio >bignum >integer >bignum ;
+M: ratio >fixnum >fraction /i >fixnum ;
+M: ratio >bignum >fraction /i >bignum ;
 
 M: ratio < scale < ;
 M: ratio <= scale <= ;

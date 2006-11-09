@@ -3,7 +3,6 @@
 IN: math
 USING: errors generic kernel math-internals ;
 
-GENERIC: >integer ( x -- y ) foldable
 GENERIC: >fixnum ( x -- y ) foldable
 GENERIC: >bignum ( x -- y ) foldable
 GENERIC: >float ( x -- y ) foldable

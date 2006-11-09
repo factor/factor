@@ -45,7 +45,7 @@ M: integer (^)
 
 : power-of-2? ( n -- ? )
     dup 0 > [
-        dup dup neg bitand =
+        dup dup neg bitand number=
     ] [
         drop f
     ] if ; foldable
@@ -53,6 +53,6 @@ M: integer (^)
 : log2 ( n -- b )
     {
         { [ dup 0 <= ] [ "log2 expects positive inputs" throw ] }
-        { [ dup 1 = ] [ drop 0 ] }
+        { [ dup 1 number= ] [ drop 0 ] }
         { [ t ] [ -1 shift log2 1+ ] }
     } cond ; foldable

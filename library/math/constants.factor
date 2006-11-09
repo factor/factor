@@ -26,7 +26,3 @@ IN: math
 
 : most-positive-fixnum ( -- n ) first-bignum 1- ;
 : most-negative-fixnum ( -- n ) first-bignum neg ;
-
-M: float >integer
-    dup most-negative-fixnum most-positive-fixnum between?
-    [ >fixnum ] [ >bignum ] if ;

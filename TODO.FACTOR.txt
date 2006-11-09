@@ -1,9 +1,10 @@
-- crypto sig11
+- %allot-bignum-signed-2 is broken on both platforms
+- sometimes fep when closing window
+- windows rollover broken again
 
 + ui:
 
-- sometimes fep when closing window
-- windows rollover broken again
+- dataflow view of [ { array } declare first ] is wrong
 - docs: don't pass volatile aliens to callbacks
 - live search: timer delay would be nice
 - menu should stay up if mouse button released
@@ -41,7 +42,9 @@
 
 + compiler/ffi:
 
-- %allot-bignum-signed-2 is broken on both platforms
+- optimization: if one branch throws an error, then we need to infer
+  types based solely on the other branch
+- cross-word type inference
 - callback scheduling issue
 - amd64 structs-by-value bug
 - intrinsic fixnum>float float>fixnum fixnum>bignum bignum>fixnum

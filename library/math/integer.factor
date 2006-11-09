@@ -6,9 +6,9 @@ sequences-internals ;
 
 UNION: integer fixnum bignum ;
 
-: even? ( n -- ? ) 1 bitand 0 = ;
+: even? ( n -- ? ) 1 bitand zero? ;
 
-: odd? ( n -- ? ) 1 bitand 1 = ;
+: odd? ( n -- ? ) 1 bitand 1 number= ;
 
 : (gcd) ( b a y x -- a d )
     dup zero? [
@@ -17,7 +17,8 @@ UNION: integer fixnum bignum ;
         tuck /mod >r pick * swap >r swapd - r> r> (gcd)
     ] if ; inline
 
-: gcd ( x y -- a d ) 0 1 2swap (gcd) abs ; foldable
+: gcd ( x y -- a d )
+    0 1 2swap (gcd) dup 0 < [ neg ] when ; foldable
 
 : (next-power-of-2) ( i n -- n )
     2dup >= [
@@ -51,8 +52,6 @@ M: integer /
         dup 0 < [ [ neg ] 2apply ] when
         2dup gcd nip tuck /i >r /i r> fraction>
     ] if ;
-
-M: integer >integer ;
 
 M: fixnum >fixnum ;
 M: fixnum >bignum fixnum>bignum ;

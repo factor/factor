@@ -18,7 +18,8 @@ M: real hashcode >fixnum ;
 M: real <=> - ;
 
 : fp-nan? ( float -- ? )
-    double>bits -51 shift BIN: 111111111111 [ bitand ] keep = ;
+    double>bits -51 shift BIN: 111111111111 [ bitand ] keep
+    number= ;
 
 M: float zero?
     dup 0.0 float= swap -0.0 float= or ;
