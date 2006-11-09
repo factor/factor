@@ -49,7 +49,7 @@ kernel-internals math memory namespaces test threads ;
 [ 1 2 3 ] [ callback-6 callback_test_1 1 2 3 ] unit-test
 
 : callback-7
-    "void" { } [ yield "hi" print flush yield ] alien-callback ;
+    "void" { } [ 1000 sleep ] alien-callback ;
 
 [ 1 2 3 ] [ callback-7 callback_test_1 1 2 3 ] unit-test
 

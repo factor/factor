@@ -1,6 +1,5 @@
 + allot refactoring:
 
-- inline float allocation needs a gc check
 - docs: don't pass volatile aliens to callbacks
 - windows rollover broken again
 - intrinsic fixnum>float float>fixnum
@@ -15,7 +14,6 @@
 - fdasfsdfsa :help -- weird
 - %allot-bignum-signed-2 still has issues on ppc
 - fix %allot-bignum-signed-1/2 on x86
-- see if 0 0 >= is optimized
 
 + ui:
 

@@ -29,6 +29,7 @@ void load_image(const char* filename)
 	}
 
 	printf("Loading %s...",filename);
+	fflush(stdout);
 
 	/* read it in native byte order */
 	fread(&h,sizeof(F_HEADER)/sizeof(CELL),sizeof(CELL),file);
@@ -38,15 +39,14 @@ void load_image(const char* filename)
 
 	if(h.version != IMAGE_VERSION)
 		fatal_error("Bad version number",h.version);
-
+	
 	/* read data heap */
 	{
-		CELL size = h.data_size / CELLS;
+		CELL size = h.data_size;
 		if(size + tenured.base >= tenured.limit)
 			fatal_error("Data heap too large",h.code_size);
 
-		if(size != fread((void*)tenured.base,sizeof(CELL),size,file))
-			fatal_error("Wrong data heap length",h.data_size);
+		fread((void*)tenured.base,size,1,file);
 
 		tenured.here = tenured.base + h.data_size;
 		data_relocation_base = h.data_relocation_base;
@@ -58,9 +58,7 @@ void load_image(const char* filename)
 		if(size + compiling.base > compiling.limit)
 			fatal_error("Code heap too large",h.code_size);
 
-		if(h.version == IMAGE_VERSION
-			&& size != fread((void*)compiling.base,1,size,file))
-			fatal_error("Wrong code heap length",h.code_size);
+		fread((void*)compiling.base,size,1,file);
 
 		code_relocation_base = h.code_relocation_base;
 
