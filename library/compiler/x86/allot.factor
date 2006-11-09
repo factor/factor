@@ -69,15 +69,33 @@ USING: kernel assembler kernel-internals namespaces math ;
         ] %allot-bignum
     ] with-scope ;
 
+: bignum-radix-mask 1 cell 2 - shift 1- ;
+
 : %allot-bignum-signed-2 ( reg1 reg2 -- )
-    #! on entry, reg1 and reg2 together form a signed 64-bit
-    #! quantity.
+    #! this word has some hairy restrictions; its really only
+    #! intended to be used by fixnum*.
+    #! - reg1 and reg2 together form a 60-bit signed quantity
+    #!   (product of two 29-bit fixnums cannot exceed this)
+    #! - the quantity must be non-zero
+    #!   (if the product of two fixnums is zero, there's no
+    #!   overflow so this word won't be called in that case)
     #! exits with tagged ptr to bignum in reg1
     [
+        "positive" define-label
+        "end" define-label
         2 [
-            ! todo: neg
-            allot-tmp-reg 2 cells [+] 0 MOV ! positive sign
+            0 pick CMP
+            "positive" get JGE
+            allot-tmp-reg 2 cells [+] 1 MOV
+            over NOT
+            dup -1 IMUL
+            "end" get JMP
+            "positive" resolve-label
+            allot-tmp-reg 2 cells [+] 0 MOV
+            "end" resolve-label
+            dup bignum-radix-mask AND
             allot-tmp-reg 3 cells [+] swap MOV
+            dup bignum-radix-mask AND
             allot-tmp-reg 4 cells [+] over MOV
             allot-tmp-reg bignum-tag OR
             allot-tmp-reg MOV

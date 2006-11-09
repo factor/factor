@@ -216,22 +216,22 @@ math-internals namespaces sequences words ;
     { +clobber+ { "y" } }
 } define-intrinsic
 
-! \ fixnum>bignum [
-!     "nonzero" define-label
-!     "end" define-label
-!     0 "x" operand 0 CMPI ! is it zero?
-!     "nonzero" get BNE
-!     0 >bignum "x" get load-literal
-!     "end" get B
-!     "nonzero" resolve-label
-!     "x" operand dup %untag-fixnum
-!     "x" operand %allot-bignum-signed-1
-!     "end" resolve-label
-! ] H{
-!     { +input+ { { f "x" } } }
-!     { +output+ { "x" } }
-! } define-intrinsic
-! 
+\ fixnum>bignum [
+    "nonzero" define-label
+    "end" define-label
+    0 "x" operand 0 CMPI ! is it zero?
+    "nonzero" get BNE
+    0 >bignum "x" get load-literal
+    "end" get B
+    "nonzero" resolve-label
+    "x" operand dup %untag-fixnum
+    "x" operand %allot-bignum-signed-1
+    "end" resolve-label
+] H{
+    { +input+ { { f "x" } } }
+    { +output+ { "x" } }
+} define-intrinsic
+
 ! \ bignum>fixnum [
 !     "nonzero" define-label
 !     "end" define-label

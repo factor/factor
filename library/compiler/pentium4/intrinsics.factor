@@ -11,7 +11,6 @@ M: float-regs (%peek)
 
 M: float-regs (%replace) drop swap %allot-float ;
 
-! Floats
 : define-float-op ( word op -- )
     [ "x" operand "y" operand ] swap add H{
         { +input+ { { float "x" } { float "y" } } }

@@ -189,24 +189,24 @@ IN: compiler
     "x" operand "y" operand %allot-bignum-signed-1 ! Yes, box bignum
     ;
 
-\ fixnum* [
-    "overflow-1" define-label
-    "overflow-2" define-label
-    "end" define-label
-    { "y" "x" } %untag-fixnums
-    "y" operand IMUL
-    "overflow-1" get JNO
-    "x" operand "r" operand %allot-bignum-signed-2
-    "end" get JMP
-    "overflow-1" resolve-label
-    %tag-overflow
-    "end" resolve-label
-] H{
-    { +input+ { { 0 "x" } { 1 "y" } } }
-    { +output+ { "x" } }
-    { +scratch+ { { 2 "r" } } }
-    { +clobber+ { "y" } }
-} define-intrinsic
+! \ fixnum* [
+!     "overflow-1" define-label
+!     "overflow-2" define-label
+!     "end" define-label
+!     { "y" "x" } %untag-fixnums
+!     "y" operand IMUL
+!     "overflow-1" get JNO
+!     "x" operand "r" operand %allot-bignum-signed-2
+!     "end" get JMP
+!     "overflow-1" resolve-label
+!     %tag-overflow
+!     "end" resolve-label
+! ] H{
+!     { +input+ { { 0 "x" } { 1 "y" } } }
+!     { +output+ { "x" } }
+!     { +scratch+ { { 2 "r" } } }
+!     { +clobber+ { "y" } }
+! } define-intrinsic
 
 : generate-fixnum/mod
     #! The same code is used for fixnum/i and fixnum/mod.
