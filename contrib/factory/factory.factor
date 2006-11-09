@@ -31,7 +31,7 @@ SYMBOL: root-menu
 : setup-root-menu ( -- )
   create-menu root-menu set
   "black" lookup-color root-menu get set-window-background%
-  "Terminal" [ "gnome-terminal &" system ] root-menu get add-popup-menu-item
+  "Terminal" [ "xterm &" system ] root-menu get add-popup-menu-item
   "Emacs"    [ "emacs &" system ]          root-menu get add-popup-menu-item
   "Firefox"  [ "firefox &" system ]        root-menu get add-popup-menu-item
   "Workspaces"
