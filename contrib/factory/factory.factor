@@ -444,7 +444,7 @@ M: wm-frame move-request-y ( event frame -- y )
 M: wm-frame move-request-position ( event frame -- { x y } )
   2dup move-request-x -rot move-request-y 2array ;
 
-M: wm-frame execute-move-request ( event frame )
+M: wm-frame execute-move-request ( event frame -- )
   dup -rot move-request-position swap move-window% ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
@@ -464,18 +464,18 @@ M: wm-frame size-request-height ( event frame -- height )
 M: wm-frame size-request-size ( event frame -- size )
   2dup size-request-width -rot size-request-height 2array ;
 
-: execute-size-request/child ( event frame )
+: execute-size-request/child ( event frame -- )
   dup wm-frame-child -rot size-request-size swap resize-window% ;
 
-: execute-size-request/frame ( event frame )
+: execute-size-request/frame ( event frame -- )
   dup -rot size-request-size { 10 20 } v+ swap resize-window% ;
 
-M: wm-frame execute-size-request ( event frame )
+M: wm-frame execute-size-request ( event frame -- )
   2dup execute-size-request/child execute-size-request/frame ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-M: wm-frame handle-configure-request-event ( event frame )
+M: wm-frame handle-configure-request-event ( event frame -- )
   over move-request? [ 2dup execute-move-request ] when
   over size-request? [ 2dup execute-size-request ] when
   drop drop ;
@@ -485,12 +485,12 @@ M: wm-frame handle-configure-request-event ( event frame )
 : unmap-event-match? ( event frame -- ? )
   wm-frame-child window-id swap XUnmapEvent-window = ;
 
-M: wm-frame handle-unmap-event ( event frame )
+M: wm-frame handle-unmap-event ( event frame -- )
   2dup unmap-event-match? [ unmap-window% drop ] [ drop drop ] if ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-M: wm-frame handle-button-press-event ( event frame )
+M: wm-frame handle-button-press-event ( event frame -- )
   over XButtonEvent-button				! event frame button
   { { [ dup Button1 = ] [ drop drag-move-frame ] }
     { [ dup Button2 = ] [ drop drag-size-frame ] }
@@ -500,7 +500,7 @@ M: wm-frame handle-button-press-event ( event frame )
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-M: wm-frame handle-enter-window-event ( event frame )
+M: wm-frame handle-enter-window-event ( event frame -- )
   nip dup wm-frame-child valid-window?%
   [ wm-frame-child >r RevertToPointerRoot CurrentTime r> set-input-focus% ]
   [ destroy-window% ]
