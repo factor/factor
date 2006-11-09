@@ -95,10 +95,6 @@ SYMBOL: phantom-r
 
 : phantoms ( -- phantom phantom ) phantom-d get phantom-r get ;
 
-: init-templates ( -- )
-    <phantom-datastack> phantom-d set
-    <phantom-callstack> phantom-r set ;
-
 : finalize-heights ( -- )
     phantoms [ finalize-height ] 2apply ;
 
@@ -148,6 +144,19 @@ SYMBOL: phantom-r
     { T{ int-regs } T{ float-regs f 8 } }
     [ 2dup (compute-free-vregs) ] map>hash \ free-vregs set
     drop ;
+
+: init-templates ( -- )
+    <phantom-datastack> phantom-d set
+    <phantom-callstack> phantom-r set
+    compute-free-vregs ;
+
+: keep-templates ( quot -- )
+    [
+        phantom-d [ clone ] change
+        phantom-r [ clone ] change
+        compute-free-vregs
+        call
+    ] with-scope ; inline
 
 : additional-vregs ( seq seq -- n )
     2array phantoms 2array [ [ length ] map ] 2apply v-

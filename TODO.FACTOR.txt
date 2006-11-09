@@ -15,6 +15,7 @@
 - fdasfsdfsa :help -- weird
 - %allot-bignum-signed-2 still has issues on ppc
 - fix %allot-bignum-signed-1/2 on x86
+- see if 0 0 >= is optimized
 
 + ui:
 

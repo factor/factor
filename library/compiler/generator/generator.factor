@@ -56,13 +56,15 @@ UNION: #terminal
         relocation-table get
         literal-table get
         word-table get
-    ] V{ } make
-    code-format add-compiled-block save-xt ;
-! 
+    ] V{ } make code-format add-compiled-block save-xt ;
+
 GENERIC: generate-node ( node -- )
 
 : generate-nodes ( node -- )
     [ node@ generate-node ] iterate-nodes end-basic-block ;
+
+: generate-branch ( node -- )
+    [ generate-nodes ] keep-templates ;
 
 : generate ( word node -- )
     [ [ generate-nodes ] with-node-iterator ] generate-1 ;
@@ -85,44 +87,57 @@ M: #label generate-node
 
 : generate-if ( node label -- next )
     <label> [
-        >r >r node-children first2 generate-nodes
-        r> r> end-false-branch resolve-label generate-nodes
+        >r >r node-children first2 generate-branch
+        r> r> end-false-branch resolve-label
+        generate-branch
+        init-templates
     ] keep resolve-label iterate-next ;
 
 M: #if generate-node
-    [
-        end-basic-block
-        <label> dup %jump-t
-    ] H{
-        { +input+ { { f "flag" } } }
-    } with-template generate-if ;
+    [ <label> dup %jump-t ]
+    H{ { +input+ { { f "flag" } } } }
+    with-template
+    generate-if ;
 
 ! #call
 : [with-template] ( quot template -- quot )
-    2array >quotation [ with-template ] append ;
+    \ with-template 3array >quotation ;
 
 : define-intrinsic ( word quot template -- )
     [with-template] "intrinsic" set-word-prop ;
 
-: define-if-intrinsic ( word quot template -- )
+: define-if>branch-intrinsic ( word quot inputs -- )
+    +input+ associate
     [with-template] "if-intrinsic" set-word-prop ;
 
-: if>boolean-intrinsic ( label -- )
+: if>boolean-intrinsic ( quot -- )
+    "true" define-label
     "end" define-label
-    f 0 <int-vreg> load-literal
+    "true" get swap call
+    f "if-scratch" get load-literal
     "end" get %jump-label
-    resolve-label
-    t 0 <int-vreg> load-literal
+    "true" resolve-label
+    t "if-scratch" get load-literal
     "end" resolve-label
-    0 <int-vreg> phantom-d get phantom-push
-    compute-free-vregs ;
+    "if-scratch" get phantom-d get phantom-push
+    compute-free-vregs ; inline
+
+: define-if>boolean-intrinsic ( word quot inputs -- )
+    +input+ associate
+    { { f "if-scratch" } } +scratch+ associate
+    hash-union
+    >r [ if>boolean-intrinsic ] curry r>
+    [with-template] "intrinsic" set-word-prop ;
+
+: define-if-intrinsic ( word quot inputs -- )
+    3dup define-if>branch-intrinsic define-if>boolean-intrinsic ;
 
 : do-if-intrinsic ( node -- next )
-    [ <label> dup ] keep if-intrinsic call
-    >r node-successor dup #if? [
-        r> generate-if node-successor
+    dup node-successor dup #if? [
+        <label> [ rot if-intrinsic call ] keep
+        generate-if node-successor
     ] [
-        drop r> if>boolean-intrinsic iterate-next
+        drop intrinsic call iterate-next
     ] if ;
 
 M: #call generate-node
@@ -148,7 +163,7 @@ M: #call-label generate-node
 
 : dispatch-body ( label/node -- )
     <label> swap [
-        first2 resolve-label generate-nodes end-basic-block
+        first2 resolve-label generate-nodes
         dup %jump-label
     ] each resolve-label ;
 

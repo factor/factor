@@ -106,10 +106,8 @@ math-internals namespaces sequences words ;
 } define-intrinsic
 
 : define-fixnum-jump ( word op -- )
-    [
-        [ end-basic-block "x" operand 0 "y" operand CMP ] % ,
-     ] [ ] make H{ { +input+ { { f "x" } { f "y" } } } }
-    define-if-intrinsic ;
+    [ "x" operand 0 "y" operand CMP ] swap add
+    { { f "x" } { f "y" } } define-if-intrinsic ;
 
 {
     { fixnum< BLT }
@@ -270,10 +268,8 @@ math-internals namespaces sequences words ;
 ] each
 
 : define-float-jump ( word op -- )
-    [
-        [ end-basic-block "x" operand 0 "y" operand FCMPU ] % ,
-     ] [ ] make H{ { +input+ { { float "x" } { float "y" } } } }
-    define-if-intrinsic ;
+    [ "x" operand 0 "y" operand FCMPU ] swap add
+    { { float "x" } { float "y" } } define-if-intrinsic ;
 
 {
     { float< BLT }

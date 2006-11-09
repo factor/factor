@@ -233,8 +233,8 @@ IN: compiler
 } define-intrinsic
 
 : define-fixnum-jump ( word op -- )
-    [ end-basic-block "x" operand "y" operand CMP ] swap add
-    H{ { +input+ { { f "x" } { f "y" } } } } define-if-intrinsic ;
+    [ "x" operand "y" operand CMP ] swap add
+    { { f "x" } { f "y" } } define-if-intrinsic ;
 
 {
     { fixnum< JL }

@@ -13,7 +13,7 @@ M: float-regs (%replace) drop swap %allot-float ;
 
 ! Floats
 : define-float-op ( word op -- )
-    [ [ "x" operand "y" operand ] % , ] [ ] make H{
+    [ "x" operand "y" operand ] swap add H{
         { +input+ { { float "x" } { float "y" } } }
         { +output+ { "x" } }
     } define-intrinsic ;
@@ -28,11 +28,8 @@ M: float-regs (%replace) drop swap %allot-float ;
 ] each
 
 : define-float-jump ( word op -- )
-    [
-        [ end-basic-block "x" operand "y" operand UCOMISD ] % ,
-    ] [ ] make H{
-        { +input+ { { float "x" } { float "y" } } }
-    } define-if-intrinsic ;
+    [ "x" operand "y" operand UCOMISD ] swap add
+    { { float "x" } { float "y" } } define-if-intrinsic ;
 
 {
     { float< JB }
