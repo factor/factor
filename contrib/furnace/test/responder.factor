@@ -39,10 +39,9 @@ TUPLE: test-tuple m n ;
 ] unit-test
 
 [
-    "/responder/bar/foo?foo=3"
+    "/responder/temporary/foo?foo=3"
 ] [
     [
-        "bar" "responder" set
         [ "3" foo ] quot-link
     ] with-scope
 ] unit-test

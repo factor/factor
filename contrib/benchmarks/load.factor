@@ -1,4 +1,4 @@
-PROVIDE: contrib/benchmark
+PROVIDE: contrib/benchmarks
 { +tests+ {
     "empty-loop.factor"
     "fac.factor"
