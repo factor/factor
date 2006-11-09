@@ -5,7 +5,7 @@ USING: arrays generic hashtables inference io kernel math
 namespaces prettyprint sequences vectors words ;
 
 ! Set this to t so that end-basic-block compiles a GC check
-SYMBOL: maybe-gc
+: maybe-gc ( n -- ) \ maybe-gc get push ;
 
 ! Register allocation
 
@@ -136,10 +136,12 @@ SYMBOL: phantom-r
 
 : end-basic-block ( -- )
     finalize-contents finalize-heights
-    maybe-gc get [
-        maybe-gc off
+    \ maybe-gc get dup empty? [
+        drop
+    ] [
+        delete-all
         "simple_gc" f %alien-invoke
-    ] when ;
+    ] if ;
 
 : used-vregs ( -- seq ) phantoms append [ vreg? ] subset ;
 
@@ -154,13 +156,14 @@ SYMBOL: phantom-r
     drop ;
 
 : init-templates ( -- )
-    maybe-gc off
+    V{ } clone \ maybe-gc set
     <phantom-datastack> phantom-d set
     <phantom-callstack> phantom-r set
     compute-free-vregs ;
 
 : keep-templates ( quot -- )
     [
+        V{ } clone \ maybe-gc set
         phantom-d [ clone ] change
         phantom-r [ clone ] change
         compute-free-vregs

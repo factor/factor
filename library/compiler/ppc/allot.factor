@@ -9,7 +9,7 @@ USING: kernel assembler kernel-internals namespaces math ;
 : %allot ( header size -- )
     #! Store a pointer to 'size' bytes allocated from the
     #! nursery in r11.
-    maybe-gc on
+    dup maybe-gc
     8 align ! align the size
     12 load-zone-ptr ! nusery -> r12
     11 12 cell LWZ ! nursery.here -> r11
