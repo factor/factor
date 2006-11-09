@@ -3,7 +3,7 @@
 IN: compiler
 USING: kernel assembler kernel-internals namespaces math ;
 
-: load-zone-ptr ( reg -- )
+: load-zone-ptr ( -- )
     #! Load pointer to start of zone array
     allot-tmp-reg 0 MOV
     "generations" f rel-absolute-cell rel-dlsym
