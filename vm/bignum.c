@@ -847,7 +847,8 @@ bignum_divide_unsigned_large_denominator(bignum_type numerator,
     }
 
   REGISTER_BIGNUM(u);
-  q = bignum_trim (q);
+  if(q)
+    q = bignum_trim (q);
   UNREGISTER_BIGNUM(u);
 
   REGISTER_BIGNUM(q);

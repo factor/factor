@@ -231,8 +231,8 @@ INLINE bool root_push_alien(const void *ptr)
 #define UNREGISTER_C_STRING(obj) \
 	if(obj##_root) obj = alien_offset(root_pop())
 
-#define REGISTER_BIGNUM(obj) root_push(tag_bignum(obj))
-#define UNREGISTER_BIGNUM(obj) obj = (untag_bignum_fast(root_pop()))
+#define REGISTER_BIGNUM(obj) if(obj) root_push(tag_bignum(obj))
+#define UNREGISTER_BIGNUM(obj) if(obj) obj = (untag_bignum_fast(root_pop()))
 
 INLINE void *allot_zone(F_ZONE *z, CELL a)
 {
