@@ -90,11 +90,15 @@ M: string do-write ( string stream -- )
     dup win32-stream-eof? [
         drop t
     ] [
-        [
-            dup win32-stream-file-size
-            swap win32-stream-fileptr
-            - zero?
-        ] keep set-win32-stream-eof?
+        dup win32-stream-file-size [
+            [
+                dup win32-stream-file-size
+                swap win32-stream-fileptr
+                - zero?
+            ] keep set-win32-stream-eof?
+        ] [
+            drop
+        ] if
         f
     ] if ;
 
