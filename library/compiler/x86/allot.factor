@@ -88,7 +88,7 @@ USING: kernel assembler kernel-internals namespaces math ;
             "positive" get JGE
             allot-tmp-reg 2 cells [+] 1 MOV
             over NOT
-            dup -1 IMUL
+            dup -1 IMUL2
             "end" get JMP
             "positive" resolve-label
             allot-tmp-reg 2 cells [+] 0 MOV
