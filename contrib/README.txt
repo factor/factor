@@ -7,7 +7,6 @@ Modules can be loaded from the listener:
 
 Available libraries:
 
-- action-field -- Extended field gadget for UI (Eduardo Cavazos)
 - alien -- Alien utility words (Eduardo Cavazos)
 - automata -- Graphics demo for the UI (Eduardo Cavazos)
 - benchmarks -- Various performance benchmarks (Slava Pestov)
