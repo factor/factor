@@ -10,8 +10,6 @@
 - mov 0x0(%esi),%ecx  why?
 - mac intel: perhaps its not a good idea using ebx as allot-tmp-reg
 - RNG is broken
-- gdb triggered 'interrupted system call' error
-- fdasfsdfsa :help -- weird
 - %allot-bignum-signed-2 still has issues on ppc
 - fix %allot-bignum-signed-1/2 on x86
 
