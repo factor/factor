@@ -43,7 +43,8 @@ SYMBOL: restarts
     edit-location ;
 
 : (:help-multi)
-    "This error has multiple delegates:" print help-outliner ;
+    "This error has multiple delegates:" print
+    help-outliner terpri ;
 
 : (:help-none)
     drop "No help for this error. " print ;
