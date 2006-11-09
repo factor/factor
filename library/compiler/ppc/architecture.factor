@@ -77,12 +77,17 @@ M: object load-literal
 : %dispatch ( -- )
     #! The value 20 is a magic number. It is the length of the
     #! instruction sequence that follows
-    "n" operand dup 1 SRAWI
-    0 "scratch" operand LOAD32 rel-absolute-2/2 rel-here
-    "n" operand dup "scratch" operand ADD
-    "n" operand dup 20 LWZ
-    "n" operand MTLR
-    BLR ;
+    [
+        "n" operand dup 1 SRAWI
+        0 "scratch" operand LOAD32 rel-absolute-2/2 rel-here
+        "n" operand dup "scratch" operand ADD
+        "n" operand dup 20 LWZ
+        "n" operand MTLR
+        BLR
+    ] H{
+        { +input+ { { f "n" } } }
+        { +scratch+ { { f "scratch" } } }
+    } with-template ;
 
 : %target ( label -- ) 0 , rel-absolute-cell rel-label ;
 

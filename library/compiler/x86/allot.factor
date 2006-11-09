@@ -21,6 +21,7 @@ USING: kernel assembler kernel-internals namespaces math ;
     allot-tmp-reg [] swap tag-header MOV ;
 
 : %allot ( header size quot -- )
+    maybe-gc on
     swap >r >r
     allot-tmp-reg PUSH
     load-allot-ptr

@@ -114,21 +114,26 @@ M: object load-literal
     #! Compile a piece of code that jumps to an offset in a
     #! jump table indexed by the fixnum at the top of the stack.
     #! The jump table must immediately follow this macro.
-    ! Untag and multiply to get a jump table offset
-    "end" define-label
-    "n" operand fixnum>slot@
-    ! Add to jump table base. We use a temporary register since
-    ! on AMD64 we have to load a 64-bit immediate. On x86, this
-    ! is redundant.
-    "scratch" operand HEX: ffffffff MOV
-    "end" get rel-absolute-cell rel-label
-    "n" operand "scratch" operand ADD
-    ! Jump to jump table entry
-    "n" operand [] JMP
-    ! Align for better performance
-    compile-aligned
-    ! Fix up jump table pointer
-    "end" resolve-label ;
+    [
+        ! Untag and multiply to get a jump table offset
+        "end" define-label
+        "n" operand fixnum>slot@
+        ! Add to jump table base. We use a temporary register
+        ! since on AMD64 we have to load a 64-bit immediate. On
+        ! x86, this is redundant.
+        "scratch" operand HEX: ffffffff MOV
+        "end" get rel-absolute-cell rel-label
+        "n" operand "scratch" operand ADD
+        ! Jump to jump table entry
+        "n" operand [] JMP
+        ! Align for better performance
+        compile-aligned
+        ! Fix up jump table pointer
+        "end" resolve-label
+    ] H{
+        { +input+ { { f "n" } } }
+        { +scratch+ { { f "scratch" } } }
+    } with-template ;
 
 : %target ( label -- ) 0 cell, rel-absolute-cell rel-label ;
 

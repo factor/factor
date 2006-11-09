@@ -153,24 +153,19 @@ M: #call-label generate-node
 
 ! #dispatch
 : dispatch-head ( node -- label/node )
-    #! Output the jump table insn and return a list of
-    #! label/branch pairs.
-    [ end-basic-block %dispatch ] H{
-        { +input+ { { f "n" } } }
-        { +scratch+ { { f "scratch" } } }
-    } with-template
+    #! Return a list of label/branch pairs.
     node-children [ <label> dup %target 2array ] map ;
 
 : dispatch-body ( label/node -- )
     <label> swap [
-        first2 resolve-label generate-nodes
+        first2 resolve-label generate-branch
         dup %jump-label
-    ] each resolve-label ;
+    ] each resolve-label init-templates ;
 
 M: #dispatch generate-node
     #! The parameter is a list of nodes, each one is a branch to
     #! take in case the top of stack has that type.
-    dispatch-head dispatch-body iterate-next ;
+    %dispatch dispatch-head dispatch-body iterate-next ;
 
 ! #push
 UNION: immediate fixnum POSTPONE: f ;
