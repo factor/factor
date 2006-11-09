@@ -1,11 +1,6 @@
-+ allot refactoring:
-
-- sometimes fep when closing window
-- mov 0x0(%esi),%ecx  why?
-- %allot-bignum-signed-2 is broken on both platforms
-
 + ui:
 
+- sometimes fep when closing window
 - windows rollover broken again
 - docs: don't pass volatile aliens to callbacks
 - live search: timer delay would be nice
@@ -44,6 +39,7 @@
 
 + compiler/ffi:
 
+- %allot-bignum-signed-2 is broken on both platforms
 - callback scheduling issue
 - amd64 structs-by-value bug
 - intrinsic fixnum>float float>fixnum fixnum>bignum bignum>fixnum

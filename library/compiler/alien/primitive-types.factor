@@ -77,6 +77,15 @@ bootstrap-cell
 "unbox_unsigned_1"
 "uchar" define-primitive-type
 
+! This is a hack; we need better ways of handling arrays
+! inline structs
+[ swap <displaced-alien> alien>char-string ]
+[ swap <displaced-alien> swap set-alien-unsigned-1 ]
+1
+f
+f
+"char[]" define-primitive-type
+
 [ alien-unsigned-4 zero? not ]
 [ 1 0 ? set-alien-unsigned-4 ]
 4

@@ -26,7 +26,7 @@ USING: kernel generic ;
 
 TUPLE: coroutine resumecc exitcc ;
 
-: cocreate ( quot - co )
+: cocreate ( quot -- co )
   #! Create a new coroutine, which will execute the quotation
   #! when resumed. The quotation will have the coroutine
   #! on the stack and an initial value (received from coresume)

@@ -27,10 +27,10 @@ IN: json
 ! Grammar for JSON from RFC 4627
 USE: tools
 
-: [<&>] ( quot - quot )
+: [<&>] ( quot -- quot )
   { } make unclip [ <&> ] reduce ;
 
-: [<|>] ( quot - quot )
+: [<|>] ( quot -- quot )
   { } make unclip [ <|> ] reduce ;
 
 LAZY: 'ws' ( -- parser )
