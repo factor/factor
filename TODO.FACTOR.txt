@@ -1,10 +1,5 @@
 + allot refactoring:
 
-- docs: don't pass volatile aliens to callbacks
-- windows rollover broken again
-- intrinsic fixnum>float float>fixnum
-- amd64 structs-by-value bug
-- callback scheduling issue
 - sometimes fep when closing window
 - x86: load-allot-ptr doesn't have a stack effect? why?
 - mov 0x0(%esi),%ecx  why?
@@ -14,6 +9,8 @@
 
 + ui:
 
+- windows rollover broken again
+- docs: don't pass volatile aliens to callbacks
 - live search: timer delay would be nice
 - menu should stay up if mouse button released
 - roundoff is still not quite right with tracks
@@ -50,6 +47,9 @@
 
 + compiler/ffi:
 
+- callback scheduling issue
+- amd64 structs-by-value bug
+- intrinsic fixnum>float float>fixnum fixnum>bignum bignum>fixnum
 - we may be able to remove the dlsym primitive
 - [ [ dup call ] dup call ] infer hangs
 - stdcall callbacks

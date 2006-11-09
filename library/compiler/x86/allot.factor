@@ -33,7 +33,7 @@ USING: kernel assembler kernel-internals namespaces math ;
 : %allot-float ( loc vreg -- )
     #! Only called by pentium4 backend, uses SSE2 instruction
     float-tag 16 [
-        allot-tmp-reg 8 [+] rot v>operand MOVSD
+        allot-tmp-reg 8 [+] swap v>operand MOVSD
         allot-tmp-reg float-tag OR
         v>operand allot-tmp-reg MOV
     ] %allot ;
