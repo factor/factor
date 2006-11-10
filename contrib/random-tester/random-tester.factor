@@ -30,7 +30,7 @@ IN: random-tester
     {
         1+ 1- >bignum >digit >fixnum abs absq arg 
         bitnot bits>double bits>float ceiling cis conjugate cos cosec cosech
-        cosh cot coth denominator double>bits exp float>bits floor imaginary
+        cosh cot coth denominator exp floor imaginary
         log neg next-power-of-2 numerator real sec
         sech sgn sin sinh sq sqrt tan tanh truncate 
     } ;
@@ -39,7 +39,7 @@ IN: random-tester
     {
         1+ 1- >bignum >digit >fixnum abs absq arg ceiling
         cis conjugate cos cosec cosech
-        cosh cot coth double>bits exp float>bits floor imaginary
+        cosh cot coth exp floor imaginary
         log neg next-power-of-2 real sec
         sech sgn sin sinh sq sqrt tan tanh truncate 
     } ;
@@ -75,7 +75,7 @@ IN: random-tester
 : 1-integer>integer
     {
         1+ 1- >bignum >digit >fixnum abs absq bitnot ceiling conjugate 
-        denominator double>bits float>bits floor imaginary
+        denominator floor imaginary
         neg next-power-of-2 numerator real sgn sq truncate 
     } ;
 
