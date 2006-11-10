@@ -46,3 +46,10 @@ sequences ;
 
 [ V{ { 100 200 } { 100 8 } { 100 100 } { 100 8 } { 100 100 } } ]
 [ "track" get gadget-children [ rect-dim ] map ] unit-test
+
+{
+    { [ <gadget> ] f f 0 }
+    { [ <gadget> ] f f 1 }
+} { 0 1 } make-track "track" set
+
+[ { 0 8 } ] [ "track" get pref-dim ] unit-test

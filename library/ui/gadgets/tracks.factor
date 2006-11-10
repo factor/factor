@@ -35,8 +35,8 @@ C: track ( orientation -- track )
 M: track layout*
     dup track-layout pack-layout ;
 
-: track-pref-dims ( dims sizes -- dims )
-    [ [ dup zero? [ nip ] [ v/n ] if ] 2map max-dim ] keep
+: track-pref-dims ( dims sizes -- dim )
+    [ [ dup zero? [ drop ] [ v/n ] if ] 2map max-dim ] keep
     divider-sizes v+ [ >fixnum ] map ;
 
 M: track pref-dim*
