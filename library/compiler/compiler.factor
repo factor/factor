@@ -5,6 +5,10 @@ USING: errors generic hashtables inference io kernel math
 namespaces optimizer parser prettyprint sequences test threads
 words ;
 
+SYMBOL: print-warnings
+
+t print-warnings set-global
+
 SYMBOL: batch-errors
 
 GENERIC: batch-begins ( batch-errors -- )
@@ -17,7 +21,10 @@ M: f compile-begins drop "Compiling " write . flush ;
 
 GENERIC: compile-error ( error batch-errors -- )
 
-M: f compile-error drop error. flush ;
+M: f compile-error
+    drop
+    dup inference-error-major? print-warnings get or
+    [ dup error. flush ] when drop ;
 
 GENERIC: batch-ends ( batch-errors -- )
 

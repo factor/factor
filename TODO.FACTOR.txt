@@ -1,6 +1,7 @@
 - sometimes fep when closing window
 - windows rollover broken again
 - compile error after reloading library/math/float.factor
+- move window while factor is busy: mouse gets messed up!
 
 + ui:
 

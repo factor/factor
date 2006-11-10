@@ -5,97 +5,104 @@ kernel kernel-internals listener math memory modules namespaces
 optimizer parser sequences sequences-internals words ;
 
 [
-    ! Wrap everything in a catch which starts a listener so you
-    ! can see what went wrong, instead of dealing with a fep
+    print-warnings off
+
     [
-        "Cross-referencing..." print flush
-        H{ } clone changed-words set-global
-        H{ } clone crossref set-global xref-words
+        ! Wrap everything in a catch which starts a listener so
+        ! you can see what went wrong, instead of dealing with a
+        ! fep
+        [
+            "Cross-referencing..." print flush
+            H{ } clone changed-words set-global
+            H{ } clone crossref set-global xref-words
 
-        cpu "x86" = [
-            macosx?
-            "resource:/library/compiler/x86/alien-macosx.factor"
-            "resource:/library/compiler/x86/alien.factor"
-            ? run-file
-        ] when
-
-        "compile" get [
-            windows? [
-                "resource:/library/windows/dlls.factor" run-file
+            cpu "x86" = [
+                macosx?
+                "resource:/library/compiler/x86/alien-macosx.factor"
+                "resource:/library/compiler/x86/alien.factor"
+                ? run-file
             ] when
 
-            \ number= compile
-            \ + compile
-            \ nth compile
-            \ set-nth compile
-            \ = compile
-
-            ! Load UI backend
-            "cocoa" get [
-                "library/ui/cocoa" require
-            ] when
-
-            "x11" get [
-                "library/ui/x11" require
-            ] when
-
-            windows? [
-                "library/ui/windows" require
-            ] when
-
-            ! Load native I/O code
-            "native-io" get [
-                unix? [
-                    "library/io/unix" require
-                ] when
+            "compile" get [
                 windows? [
-                    "library/io/windows" require
+                    "resource:/library/windows/dlls.factor"
+                    run-file
                 ] when
+
+                \ number= compile
+                \ + compile
+                \ nth compile
+                \ set-nth compile
+                \ = compile
+
+                ! Load UI backend
+                "cocoa" get [
+                    "library/ui/cocoa" require
+                ] when
+
+                "x11" get [
+                    "library/ui/x11" require
+                ] when
+
+                windows? [
+                    "library/ui/windows" require
+                ] when
+
+                ! Load native I/O code
+                "native-io" get [
+                    unix? [
+                        "library/io/unix" require
+                    ] when
+                    windows? [
+                        "library/io/windows" require
+                    ] when
+                ] when
+
+                parse-command-line
+
+                compile-all
+
+                "Initializing native I/O..." print flush
+                "native-io" get [ init-io ] when
+
+                ! We only do this if we are compiled, otherwise
+                ! it takes too long.
+                "Building online help search index..." print
+                flush
+                H{ } clone parent-graph set-global xref-help
+                H{ } clone term-index set-global index-help
             ] when
+        ] no-parse-hook
 
-            parse-command-line
+        run-bootstrap-init
 
-            compile-all
+        [
+            boot
+            run-user-init
+            "shell" get "shells" lookup execute
+            0 exit
+        ] set-boot
 
-            "Initializing native I/O..." print flush
-            "native-io" get [ init-io ] when
+        f error set-global
+        f error-continuation set-global
 
-            ! We only do this if we are compiled, otherwise it
-            ! takes too long.
-            "Building online help search index..." print flush
-            H{ } clone parent-graph set-global xref-help
-            H{ } clone term-index set-global index-help
-        ] when
-    ] no-parse-hook
+        [ compiled? ] word-subset length
+        number>string write " compiled words" print
 
-    run-bootstrap-init
+        [ symbol? ] word-subset length
+        number>string write " symbol words" print
 
-    [
-        boot
-        run-user-init
-        "shell" get "shells" lookup execute
-        0 exit
-    ] set-boot
+        all-words length
+        number>string write " words total" print
 
-    f error set-global
-    f error-continuation set-global
+        "Total bootstrap GC time: " write gc-time
+        number>string write " ms" print
 
-    [ compiled? ] word-subset length
-    number>string write " compiled words" print
+        "Bootstrapping is complete." print
+        "Now, you can run ./f factor.image" print flush
 
-    [ symbol? ] word-subset length
-    number>string write " symbol words" print
-
-    all-words length
-    number>string write " words total" print
-
-    "Total bootstrap GC time: " write gc-time
-    number>string write " ms" print
-
-    "Bootstrapping is complete." print
-    "Now, you can run ./f factor.image" print flush
-
-    "factor.image" resource-path save-image
-] [ print-error :c ] recover
+        "factor.image" resource-path save-image
+    ] [ print-error :c ] recover
+] with-scope
 
 0 exit
