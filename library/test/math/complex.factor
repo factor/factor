@@ -60,7 +60,7 @@ USE: test
 [ 1 ] [ -1 >polar drop ] unit-test
 [ t ] [ -1 >polar nip 3.14 3.15 between? ] unit-test
 
-! I fucked something up
+! I broke something
 [ ] [ C{ 1 4 } tanh drop ] unit-test
 [ ] [ C{ 1 4 } tan drop ] unit-test
 [ ] [ C{ 1 4 } coth drop ] unit-test
