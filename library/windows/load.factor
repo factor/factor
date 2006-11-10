@@ -1,3 +1,4 @@
+USING: kernel namespaces ;
 PROVIDE: library/windows
 { +files+ { 
     "windows-messages.factor"
@@ -15,6 +16,7 @@ PROVIDE: library/windows
     "winsock.factor"
     "opengl32.factor"
     "utils.factor"
+    { "io.factor" [ "native-io" get not ] }
 } } ;
 
 IN: command-line
