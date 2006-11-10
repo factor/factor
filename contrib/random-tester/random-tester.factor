@@ -299,14 +299,14 @@ SYMBOL: second-arg
         test-1-ratio>x-throws
         test-1-float>float
         test-2-float>float
-        test-n-2-float>float
+        ! test-n-2-float>float
         test-1-integer>x-runtime
         ! test-0-float?-when
         test-1-integer?-when
         test-1-ratio?-when
         test-1-float?-when
         test-1-complex?-when
-        full-gc
-        code-gc
+        ! full-gc
+        ! code-gc
     } nth-rand dup . execute terpri ;
 
