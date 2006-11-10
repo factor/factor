@@ -44,7 +44,7 @@
 - cross-word type inference
 - callback scheduling issue
 - amd64 structs-by-value bug
-- intrinsic fixnum>float float>fixnum fixnum>bignum bignum>fixnum
+- intrinsic fixnum>float float>fixnum
 - we may be able to remove the dlsym primitive
 - [ [ dup call ] dup call ] infer hangs
 - stdcall callbacks

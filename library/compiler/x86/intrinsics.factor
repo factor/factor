@@ -246,6 +246,53 @@ IN: compiler
     first2 define-fixnum-jump
 ] each
 
+\ fixnum>bignum [
+    "nonzero" define-label
+    "end" define-label
+    "x" operand 0 CMP ! is it zero?
+    "nonzero" get JNE
+    0 >bignum "x" get load-literal
+    "end" get JMP
+    "nonzero" resolve-label
+    "x" operand tag-bits SAR
+    "x" operand dup %allot-bignum-signed-1
+    "end" resolve-label
+] H{
+    { +input+ { { f "x" } } }
+    { +output+ { "x" } }
+} define-intrinsic
+
+\ bignum>fixnum [
+    "nonzero" define-label
+    "positive" define-label
+    "end" define-label
+    "x" operand %untag
+    "y" operand "x" operand cell [+] MOV
+     ! if the length is 1, its just the sign and nothing else,
+     ! so output 0
+    "y" operand 1 tag-bits shift CMP
+    "nonzero" get JMP
+    "y" operand 0 MOV
+    "end" get JMP
+    "nonzero" resolve-label
+    ! load the value
+    "y" operand "x" operand 3 cells [+] MOV
+    ! load the sign
+    "x" operand "x" operand 2 cells [+] MOV
+    ! is the sign negative?
+    "x" operand 0 CMP
+    "positive" get JMP
+    "y" operand -1 IMUL2
+    "positive" resolve-label
+    "y" operand 3 SHL
+    "end" resolve-label
+] H{
+    { +input+ { { f "x" } } }
+    { +scratch+ { { f "y" } } }
+    { +clobber+ { "x" } }
+    { +output+ { "y" } }
+} define-intrinsic
+
 ! User environment
 : %userenv ( -- )
     "x" operand 0 MOV
