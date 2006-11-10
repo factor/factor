@@ -232,25 +232,36 @@ math-internals namespaces sequences words ;
     { +output+ { "x" } }
 } define-intrinsic
 
-! \ bignum>fixnum [
-!     "nonzero" define-label
-!     "end" define-label
-!     "y" operand "x" operand cell LWZ
-!     0 "x" operand 0 CMPI ! is it zero?
-!     "nonzero" get BNE
-!     0 "y" operand LI
-!     "end" get B
-!     "nonzero" resolve-label
-!     "y" operand "x" operand 2 cells LWZ
-!     "y" operand dup -1 tag-bits shift MULI
-!     "x" operand dup 3 cells LWZ
-!     "y" operand "y" operand "x" operand MULLW
-!     "end" resolve-label
-! ] H{
-!     { +input+ { { f "x" } } }
-!     { +scratch+ { { f "y" } } }
-!     { +output+ { "y" } }
-! } define-intrinsic
+\ bignum>fixnum [
+    "nonzero" define-label
+    "positive" define-label
+    "end" define-label
+    "x" operand dup %untag
+    "y" operand "x" operand cell LWZ
+     ! if the length is 1, its just the sign and nothing else,
+     ! so output 0
+    0 "y" operand 1 tag-bits shift CMPI
+    "nonzero" get BNE
+    0 "y" operand LI
+    "end" get B
+    "nonzero" resolve-label
+    ! load the value
+    "y" operand "x" operand 3 cells LWZ
+    ! load the sign
+    "x" operand "x" operand 2 cells LWZ
+    ! is the sign negative?
+    0 "x" operand 0 CMPI
+    "positive" get BEQ
+    "y" operand dup -1 MULI
+    "positive" resolve-label
+    "y" operand dup %tag-fixnum
+    "end" resolve-label
+] H{
+    { +input+ { { f "x" } } }
+    { +scratch+ { { f "y" } } }
+    { +clobber+ { "x" } }
+    { +output+ { "y" } }
+} define-intrinsic
 
 : define-float-op ( word op -- )
     [ [ "x" operand "x" operand "y" operand ] % , ] [ ] make H{
