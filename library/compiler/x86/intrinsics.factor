@@ -271,7 +271,7 @@ IN: compiler
      ! if the length is 1, its just the sign and nothing else,
      ! so output 0
     "y" operand 1 tag-bits shift CMP
-    "nonzero" get JMP
+    "nonzero" get JNE
     "y" operand 0 MOV
     "end" get JMP
     "nonzero" resolve-label
@@ -281,7 +281,7 @@ IN: compiler
     "x" operand "x" operand 2 cells [+] MOV
     ! is the sign negative?
     "x" operand 0 CMP
-    "positive" get JMP
+    "positive" get JE
     "y" operand -1 IMUL2
     "positive" resolve-label
     "y" operand 3 SHL
