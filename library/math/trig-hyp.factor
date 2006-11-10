@@ -31,7 +31,7 @@ USING: kernel math math-internals ;
 
 : cosech ( x -- y ) sinh recip ; inline
 
-: tan ( x -- y ) dup sin swap cos /f ; inline
-: tanh ( x -- y ) dup sinh swap cosh /f ; inline
-: cot ( x -- y ) dup cos swap sin /f ; inline
-: coth ( x -- y ) dup cosh swap sinh /f ; inline
+: tan ( x -- y ) dup sin swap cos / ; inline
+: tanh ( x -- y ) dup sinh swap cosh / ; inline
+: cot ( x -- y ) dup cos swap sin / ; inline
+: coth ( x -- y ) dup cosh swap sinh / ; inline
