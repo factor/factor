@@ -56,8 +56,10 @@ M: gadget equal? eq? ;
 
 : nth-gadget gadget-children nth ;
 
+: <zero-rect> { 0 0 } dup <rect> ;
+
 C: gadget ( -- gadget )
-    { 0 0 } dup <rect> over set-delegate
+    <zero-rect> over set-delegate
     { 0 1 } over set-gadget-orientation
     t over set-gadget-visible? ;
 

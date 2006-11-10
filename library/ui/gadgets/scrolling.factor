@@ -87,6 +87,9 @@ C: scroller ( gadget -- scroller )
 : (scroll>bottom) ( scroller -- )
     dup scroller-viewport viewport-dim { 0 1 } v* scroll ;
 
+: scroll>top ( gadget -- )
+    <zero-rect> swap scroll>rect ;
+
 : update-scroller ( scroller -- )
     dup scroller-follows [
         dup scroller-follows t eq? [
