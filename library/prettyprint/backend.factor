@@ -20,7 +20,11 @@ M: byte-array pprint* drop "( byte array )" text ;
     dup word-name swap word-style styled-text ;
 
 M: word pprint*
-    dup parsing? [ \ POSTPONE: pprint-word ] when pprint-word ;
+    dup parsing? [
+        H{ } <flow \ POSTPONE: pprint-word pprint-word block>
+    ] [
+        pprint-word
+    ] if ;
 
 M: real pprint* number>string text ;
 
