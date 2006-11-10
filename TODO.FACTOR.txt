@@ -1,5 +1,6 @@
 - sometimes fep when closing window
 - windows rollover broken again
+- compile error after reloading library/math/float.factor
 
 + ui:
 
@@ -16,6 +17,7 @@
 - help search looks funny
 - variable width word wrap
 - graphical module manager tool
+- graphical crossref tool
 - ui browser: show currently selected vocab & words
 - auto-update browser and help when sources reload
 - how do we refer to command shortcuts in the docs?

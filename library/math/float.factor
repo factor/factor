@@ -40,6 +40,6 @@ M: float * float* ;
 M: float / float/f ;
 M: float mod float-mod ;
 
-: /f  ( x y -- z ) >r >float r> >float float/f ; foldable
+: /f  ( x y -- z ) >r >float r> >float float/f ; inline
 
 M: ratio >float >fraction /f ;

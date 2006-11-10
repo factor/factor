@@ -3,6 +3,40 @@ math memory sequences words compiler parser modules definitions
 tools alien ;
 
 ARTICLE: "changes" "Changes in the latest release"
+{ $heading "Factor 0.86" }
+{ $subtopic "Core"
+    { $list
+        "Improved memory management code leads to reduced memory consumption, less frequent garbage collections and fixes a few corner cases where Factor could run out of heap even if a GC would have freed enough memory to proceed"
+        "Improved prettyprinter low lays out code in a more pleasing manner"
+    }
+}
+{ $subtopic "UI"
+    { $list
+        { "Double and triple clicks are now recognized, and can be used to select text in the editor gadget" }
+        { "Windows now update while being resized on Windows" }
+    }
+}
+{ $subtopic "Module system"
+    { $list
+        { "The syntax for " { $link POSTPONE: PROVIDE: } " has changed, consult the documentation" }
+        { "Modules can now provide documentation, see " { $link run-module } " and " { $link POSTPONE: MAIN: } }
+        { "Modules can now provide a main entry point, see " { $link "documenting-modules" } }
+    }
+}
+{ $subtopic "Contributed libraries"
+    { $list
+        { "New " { $snippet "contrib/cpuinfo" } " (Doug Coleman)" }
+        { "Updated " { $snippet "contrib/match" } " (Chris Double)" }
+        { "Updated " { $snippet "contrib/parser-combinators" } " (Chris Double)" }
+        { "Updated " { $snippet "contrib/postgresql" } " (Doug Coleman)" }
+        { "Updated " { $snippet "contrib/process" } " (Doug Coleman)" }
+        { "Updated " { $snippet "contrib/sqlite" } " (Doug Coleman)" }
+        { "Updated " { $snippet "contrib/textmate" } " (Benjamin Pollack)" }
+        { "Updated " { $snippet "contrib/tuple-db" } " (Doug Coleman)" }
+        { "Updated " { $snippet "contrib/vim" } " (Doug Coleman)" }
+        { "Updated " { $snippet "contrib/xml" } " (Daniel Ehrenberg)" }
+    }
+}
 { $heading "Factor 0.85" }
 { $subtopic "Core"
     { $list
