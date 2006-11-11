@@ -32,12 +32,12 @@ TUPLE: tool gadget ;
 
 : select-tool ( workspace class -- ) swap show-tool drop ;
 
-: find-workspace ( -- workspace )
-    [ workspace? ] find-window [
-        dup raise-window world-gadget
-    ] [
-        workspace-window find-workspace
-    ] if* ;
+: find-workspace* ( quot -- workspace )
+    [ dup workspace? [ over call ] [ drop f ] if ] find-window
+    [ nip dup raise-window world-gadget ]
+    [ workspace-window drop find-workspace* ] if* ; inline
+
+: find-workspace ( -- workspace ) [ drop t ] find-workspace* ;
 
 : call-tool ( arg class -- )
     find-workspace show-tool call-tool* ;

@@ -76,8 +76,14 @@ M: listener-gadget tool-scroller
 M: listener-gadget tool-help
     drop "ui-listener" ;
 
+: workspace-busy? ( workspace -- ? )
+    listener-gadget swap find-tool nip tool-gadget
+    listener-gadget-input interactor-busy? ;
+
 : find-listener ( -- listener )
-    listener-gadget find-workspace show-tool tool-gadget ;
+    listener-gadget
+    [ workspace-busy? not ] find-workspace*
+    show-tool tool-gadget ;
 
 : (call-listener) ( quot listener -- )
     listener-gadget-input interactor-call ;

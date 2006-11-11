@@ -77,7 +77,7 @@ M: workspace pref-dim* delegate pref-dim* { 550 650 } vmax ;
     open-window
     listener-gadget get-tool start-listener ;
 
-: tool-window ( class -- ) workspace-window show-tool drop ;
+: tool-window ( class -- ) workspace-window show-tool 2drop ;
 
 : tool-scroll-up ( workspace -- )
     current-page tool-scroller [ scroll-up-page ] when* ;
@@ -100,9 +100,9 @@ workspace "tool-switch" {
 } define-commands
 
 workspace "tool-window" {
-    { "New listener" T{ key-down f { S+ } "F2" } [ listener-gadget tool-window drop ] }
-    { "New definitions" T{ key-down f { S+ } "F3" } [ browser tool-window drop ] }
-    { "New documentation" T{ key-down f { S+ } "F4" } [ help-gadget tool-window drop ] }
+    { "New listener" T{ key-down f { S+ } "F2" } [ listener-gadget tool-window ] }
+    { "New definitions" T{ key-down f { S+ } "F3" } [ browser tool-window ] }
+    { "New documentation" T{ key-down f { S+ } "F4" } [ help-gadget tool-window ] }
 } define-commands
 
 workspace "workflow" {
