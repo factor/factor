@@ -21,10 +21,10 @@
 - faster apropos
 - infer which variables are read, written in a quotation
 - compiled call traces
-- if listener is busy open a new listener when doing listener operations
 
 + ui:
 
+- listener commands from a menu should not include 'hide-glass' etc
 - some way of intercepting all gestures
 - how do we refer to command shortcuts in the docs?
 - fix top level window positioning

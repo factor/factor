@@ -236,6 +236,14 @@ M: tuple '
     transfer-tuple
     objects get [ tuple>array tuple-type emit-array ] cache ;
 
+M: method '
+    [
+        \ method transfer-word ,
+        f ,
+        dup method-loc ,
+        method-def ,
+    ] { } make tuple-type emit-array ;
+
 M: array '
     array-type emit-array ;
 

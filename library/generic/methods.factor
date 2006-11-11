@@ -11,7 +11,7 @@ PREDICATE: array method-spec
         drop f
     ] if ;
 
-TUPLE: method def loc ;
+TUPLE: method loc def ;
 
 M: f method-def ;
 M: f method-loc ;

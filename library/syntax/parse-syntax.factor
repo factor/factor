@@ -48,8 +48,8 @@ DEFER: !PRIMITIVE: parsing
 : !G: CREATE dup reset-word [ define-generic* ] f ; parsing
 : !M:
     f set-word
-    scan-word scan-word
-    [ location <method> -rot define-method ] f ; parsing
+    scan-word scan-word location
+    [ <method> -rot define-method ] f ; parsing
 
 : !UNION:
     CREATE dup intern-symbol dup predicate-word
