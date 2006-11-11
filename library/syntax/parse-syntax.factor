@@ -72,8 +72,7 @@ DEFER: !PRIMITIVE: parsing
 
 : !FORGET: scan use get hash-stack [ forget ] when* ; parsing
 
-: !PROVIDE:
-    scan [ alist>hash provide ] f ; parsing
+: !PROVIDE: scan location [ provide ] f ; parsing
 
 : !REQUIRES:
     string-mode on [

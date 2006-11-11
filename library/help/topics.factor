@@ -97,5 +97,3 @@ M: word-link synopsis*
 
 M: word-link definition
     link-name "help" word-prop t ;
-
-M: word-link see (see) ;

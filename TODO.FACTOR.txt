@@ -1,18 +1,12 @@
-- sometimes fep when closing window
-- windows rollover broken again
-- compile error after reloading library/math/float.factor
-- move window while factor is busy: mouse gets messed up!
++ 0.87:
 
-+ ui:
-
-- docs: don't pass volatile aliens to callbacks
+- cocoa: move window while factor is busy: mouse gets messed up!
 - live search: timer delay would be nice
 - menu should stay up if mouse button released
 - roundoff is still not quite right with tracks
 - grid displays quickly now, but constructing large amounts of gadgets
   is slow: eg, 10000 [ dup number>string ] map describe
 - completion is not ideal: eg, C+e "buttons"
-- some way of intercepting all gestures
 - slider needs to be modelized
 - better help result ranking
 - help search looks funny
@@ -21,6 +15,17 @@
 - graphical crossref tool
 - ui browser: show currently selected vocab & words
 - auto-update browser and help when sources reload
+- amd64 structs-by-value bug
+- intrinsic fixnum>float float>fixnum
+- mac intel: struct returns from objc methods
+- faster apropos
+- infer which variables are read, written in a quotation
+- compiled call traces
+- if listener is busy open a new listener when doing listener operations
+
++ ui:
+
+- some way of intercepting all gestures
 - how do we refer to command shortcuts in the docs?
 - fix top level window positioning
 - editor:
@@ -32,7 +37,6 @@
 
 + module system:
 
-- modules should support definition protocol
 - track a list of assets loaded from each module's file
 - C types should be words
   - TYPEDEF: float { ... } { ... } ;   ==> \ float T{ c-type ... } "c-type" swp
@@ -46,8 +50,6 @@
 - %allot-bignum-signed-2 is broken on both platforms
 - cross-word type inference
 - callback scheduling issue
-- amd64 structs-by-value bug
-- intrinsic fixnum>float float>fixnum
 - we may be able to remove the dlsym primitive
 - [ [ dup call ] dup call ] infer hangs
 - stdcall callbacks
@@ -56,12 +58,9 @@
   recursive
 - ppc64 backend
 - arm backend
-- mac intel: struct returns from objc methods
 - float= doesn't consider nans equal
 - C functions returning structs by value
-- infer which variables are read, written in a quotation
 - compiled continuations
-- compiled call traces
 
 + prettyprinter:
 
@@ -75,12 +74,11 @@
 
 + misc:
 
-- faster apropos
 - growable data heap
 - minor GC takes too long now, we should card mark code heap
 - buffer-ptr should be an alien
 - swap nappend ==> nappend
-- gdb triggers 'mutliple i/o ops on port' error
+- gdb triggers 'multiple i/o ops on port' error
 - incremental GC
 - UDP
 - slice: if sequence or seq start is changed, abstraction violation

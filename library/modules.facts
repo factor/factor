@@ -1,10 +1,6 @@
 IN: modules
 USING: help io parser ;
 
-HELP: prefix-paths
-{ $values { "name" "a module name string" } { "seq" "a sequence of strings" } { "newseq" "a new sequence of path name strings" } }
-{ $description "Prepend the location of the module named " { $snippet "name" } " to every file name in " { $snippet "seq" } "." } ;
-
 HELP: module-def
 { $values { "name" "a module name string" } { "path" "a path name string" } }
 { $description "Outputs the location of the module definition file. This word looks for the module definition in two locations:"
@@ -32,7 +28,7 @@ $terpri
 { $notes "Module definitions should use the " { $link POSTPONE: REQUIRES: } " parsing word instead. In the listener, the " { $link require } " word might be more useful since it recompiles new words after loading the module." } ;
 
 HELP: provide
-{ $values { "name" "a string" } { "hash" "a hashtable" } }
+{ $values { "name" "a string" } { "hash" "a hashtable" } { "loc" "a pair holding a path name and line number" } }
 { $description "Registers a module definition and loads its source files. The possible hashtable keys are documented in the " { $link POSTPONE: PROVIDE: } " word. Usually instead of calling this word, module definitions use the parsing word " { $link POSTPONE: PROVIDE: } " instead." } ;
 
 HELP: test-module

@@ -2,11 +2,12 @@
 ! See http://factorcode.org/license.txt for BSD license.
 IN: modules
 USING: hashtables io kernel namespaces parser sequences
-test words strings arrays math help ;
+test words strings arrays math help prettyprint-internals
+definitions ;
 
 SYMBOL: modules
 
-TUPLE: module name files tests main help ;
+TUPLE: module name loc files tests help main ;
 
 : module-def ( name -- path )
     "resource:" over ".factor" append3
@@ -15,15 +16,6 @@ TUPLE: module name files tests main help ;
     ] [
         drop "resource:" swap "/load.factor" append3
     ] if ;
-
-: prefix-paths ( name seq -- newseq )
-    [ path+ "resource:" swap append ] map-with ;
-
-C: module ( name files tests help -- module )
-    [ set-module-help ] keep
-    [ >r >r over r> prefix-paths r> set-module-tests ] keep
-    [ >r dupd prefix-paths r> set-module-files ] keep
-    [ set-module-name ] keep ;
 
 M: module <=> [ module-name ] 2apply <=> ;
 
@@ -38,27 +30,43 @@ M: module <=> [ module-name ] 2apply <=> ;
 : require ( name -- )
     dup module [ drop ] [ load-module ] if do-parse-hook ;
 
-: process-files ( seq -- newseq )
+: process-files ( name seq -- newseq )
     [ dup string? [ [ t ] 2array ] when ] map
     [ second call ] subset
-    0 <column> >array ;
+    0 <column> >array
+    [ path+ "resource:" swap append ] map-with ;
+
+: module-files* ( module -- seq )
+    dup module-name swap module-files process-files ;
+
+: module-tests* ( module -- seq )
+    dup module-name swap module-tests process-files ;
 
 : remove-module ( name -- )
     module [ modules get delete ] when* ;
 
-: provide ( name hash -- )
-    over remove-module [
-        +files+ get process-files
-        +tests+ get process-files
-        +help+ get
-    ] bind <module>
-    [ module-files run-files ] keep
+: alist>module ( name loc hash -- module )
+    alist>hash [
+        +files+ get +tests+ get +help+ get
+    ] bind f <module> ;
+
+: module>alist ( module -- hash )
+    [
+        +files+ over module-files 2array ,
+        +tests+ over module-tests 2array ,
+        +help+ swap module-help 2array ,
+    ] { } make ;
+
+: provide ( name loc hash -- )
+    pick remove-module
+    alist>module
+    [ module-files* run-files ] keep
     modules get push ;
 
-: test-module ( name -- ) module module-tests run-tests ;
+: test-module ( name -- ) module module-tests* run-tests ;
 
 : test-modules ( -- )
-    modules get [ module-tests ] map concat run-tests ;
+    modules get [ module-tests* ] map concat run-tests ;
 
 : modules. ( -- )
     modules get natural-sort
@@ -68,7 +76,7 @@ M: module <=> [ module-name ] 2apply <=> ;
     dup module-name module-def source-modified? [
         module-name load-module
     ] [
-        module-files [ source-modified? ] subset run-files
+        module-files* [ source-modified? ] subset run-files
     ] if ;
 
 : reload-modules ( -- )
@@ -87,3 +95,9 @@ M: module <=> [ module-name ] 2apply <=> ;
 
 : modules-help ( -- seq )
     modules get [ module-help ] map [ ] subset ;
+
+M: module synopsis* \ PROVIDE: pprint-word module-name text ;
+
+M: module definition module>alist t ;
+
+M: module where* module-loc ;

@@ -92,7 +92,7 @@ M: word declarations.
         ] if newline
     ] with-pprint ;
 
-M: method-spec see (see) ;
+M: object see (see) ;
 
 GENERIC: see-class* ( word -- )
 

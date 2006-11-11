@@ -32,6 +32,12 @@ M: operation invoke-command ( target operation -- )
 } define-operation
 
 [ drop t ] H{
+    { +name+ "Prettyprint" }
+    { +quot+ [ . ] }
+    { +listener+ t }
+} define-operation
+
+[ drop t ] H{
     { +name+ "Push" }
     { +quot+ [ ] }
     { +listener+ t }
@@ -74,6 +80,11 @@ M: operation invoke-command ( target operation -- )
     { +name+ "Documentation" }
     { +keyboard+ T{ key-down f { A+ } "h" } }
     { +quot+ [ help-gadget call-tool ] }
+} define-operation
+
+[ word? ] H{
+    { +name+ "Edit documentation" }
+    { +quot+ [ <link> edit ] }
 } define-operation
 
 [ word? ] H{
@@ -129,7 +140,7 @@ M: operation invoke-command ( target operation -- )
     { +quot+ [ vocab-link-name forget-vocab ] }
 } define-operation
 
-! Module
+! Modules
 [ module? ] H{
     { +name+ "Run" }
     { +quot+ [ module-name run-module ] }
@@ -142,8 +153,19 @@ M: operation invoke-command ( target operation -- )
 } define-operation
 
 [ module? ] H{
+    { +name+ "Edit" }
+    { +quot+ [ edit ] }
+} define-operation
+
+[ module? ] H{
     { +name+ "Reload" }
     { +quot+ [ reload-module ] }
+    { +listener+ t }
+} define-operation
+
+[ module? ] H{
+    { +name+ "See" }
+    { +quot+ [ see ] }
     { +listener+ t }
 } define-operation
 
