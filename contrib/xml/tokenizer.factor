@@ -175,6 +175,7 @@ TUPLE: entity name ;
 
 : name-start-char? ( ch -- ? )
     {
+        { CHAR: :    CHAR: :    }
         { CHAR: _    CHAR: _    }
         { CHAR: A    CHAR: Z    }
         { CHAR: a    CHAR: z    }
