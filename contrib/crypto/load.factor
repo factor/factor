@@ -5,7 +5,6 @@ PROVIDE: contrib/crypto
 
     "common.factor"
     "timing.factor"
-    "base64.factor"
     "barrett.factor"
     "montgomery.factor"
     "random.factor"
@@ -32,7 +31,6 @@ PROVIDE: contrib/crypto
     "test/md5.factor"
     "test/sha1.factor"
     "test/sha2.factor"
-    "test/base64.factor"
     "test/miller-rabin.factor"
     "test/crc32.factor"
     "test/rsa.factor"

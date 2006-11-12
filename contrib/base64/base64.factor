@@ -1,5 +1,8 @@
-USING: kernel math math-contrib sequences namespaces io strings hashtables ;
-IN: crypto-internals
+USING: kernel math sequences namespaces io strings hashtables ;
+IN: base64-internals
+
+: count-end ( seq quot -- count )
+    >r [ length ] keep r> find-last drop dup -1 = [ 2drop 0 ] [ - 1- ] if ;
 
 : ch>base64 ( ch -- ch )
     "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/" nth ;
@@ -22,7 +25,7 @@ IN: crypto-internals
 : >base64-rem ( str -- str )
     [ 3 0 pad-right encode3 ] keep length 1+ head 4 CHAR: = pad-right ;
 
-IN: crypto
+IN: base64
 : >base64 ( str -- str )
     #! cut string into two pieces, convert 3 bytes at a time
     #! pad string with = when not enough bits

@@ -9,6 +9,7 @@ Available libraries:
 
 - alien -- Alien utility words (Eduardo Cavazos)
 - automata -- Graphics demo for the UI (Eduardo Cavazos)
+- base64 -- base64 encoding/decoding (Doug Coleman)
 - benchmarks -- Various performance benchmarks (Slava Pestov)
 - boids -- Graphics demo for the UI (Eduardo Cavazos)
 - cairo -- cairo bindings (Sampo Vuori)
