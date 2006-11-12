@@ -82,6 +82,6 @@ SYMBOL: special-complexes
         [ random-float ]
     } do-one ;
 
-: random-complex ( -- C{ } )
+: random-complex ( -- C )
     random-number random-number rect> ;
 
