@@ -45,7 +45,7 @@ IN: generic
 
 : delegate-slots { { 3 object delegate set-delegate } } ;
 
-: tuple-slots ( class slots -- )
+: define-tuple-slots ( class slots -- )
     2dup "slot-names" set-word-prop
     2dup length 2 + "tuple-size" set-word-prop
     dupd 4 simple-slots
@@ -80,7 +80,7 @@ TUPLE: check-tuple class ;
     dup tuple-predicate
     dup \ tuple bootstrap-word "superclass" set-word-prop
     dup define-class
-    dup r> tuple-slots
+    dup r> define-tuple-slots
     default-constructor ;
 
 M: tuple clone
@@ -105,6 +105,8 @@ M: tuple equal?
 GENERIC: tuple>array ( tuple -- array )
 
 M: tuple tuple>array (clone) array-type become ;
+
+: tuple-slots ( tuple -- seq ) tuple>array 2 tail ;
 
 ! Definition protocol
 M: tuple-class forget

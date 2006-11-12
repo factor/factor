@@ -29,10 +29,8 @@ TUPLE: dt year month day hour minute second ;
     #! length of average month in days
     30.41666666666667 ;
 
-: time>array ( dt -- vec ) tuple>array 2 tail ;
-
 : compare-timestamps ( tuple tuple -- n )
-    [ time>array ] 2apply <=> ;
+    [ tuple-slots ] 2apply <=> ;
 
 SYMBOL: a
 SYMBOL: b
@@ -173,12 +171,12 @@ M: number +second ( timestamp n -- timestamp )
     [ = [ "invalid timestamp" throw ] unless ] keep ;
 
 : array>dt ( vec -- dt ) { dt f } swap append >tuple ;
-: +dts ( dt dt -- dt ) [ time>array ] 2apply v+ array>dt ;
+: +dts ( dt dt -- dt ) [ tuple-slots ] 2apply v+ array>dt ;
 
 : dt>years ( dt -- x )
     #! Uses average month/year length since dt loses calendar
     #! data
-    time>array
+    tuple-slots
     { 1 12 365.2425 8765.82 525949.2 31556952.0 }
     [ / ] 2map sum ;
 : dt>months ( dt -- x ) dt>years 12 * ;
@@ -208,10 +206,10 @@ M: number +second ( timestamp n -- timestamp )
     unix-1970 millis 1000 /f seconds +dt ; 
 
 : timestamp- ( timestamp timestamp -- dt )
-    [ >gmt time>array ] 2apply v- array>dt ;
+    [ >gmt tuple-slots ] 2apply v- array>dt ;
 
 : now ( -- timestamp ) gmt >local-time ;
-: before ( dt -- -dt ) time>array [ neg ] map array>dt ;
+: before ( dt -- -dt ) tuple-slots [ neg ] map array>dt ;
 : from-now ( dt -- timestamp ) now swap +dt ;
 : ago ( dt -- timestamp ) before from-now ;
 
