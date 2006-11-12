@@ -8,8 +8,8 @@ USING: alien errors generic kernel kernel-internals math namespaces
 TUPLE: win32-client-stream host port ;
 
 : (handle-socket-error) ( -- )
-    WSAGetLastError [ ERROR_IO_PENDING ERROR_SUCCESS ] member?
-    [ WSAGetLastError error_message throw ] unless ;
+    WSAGetLastError dup ERROR_IO_PENDING = over ERROR_SUCCESS = or
+    [ drop ] [ error_message alien>char-string throw ] if ;
 
 : handle-socket-error!=0/f ( int -- )
     [ 0 f ] member? [ (handle-socket-error) ] unless ;
