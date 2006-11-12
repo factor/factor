@@ -15,3 +15,5 @@ SYMBOL: xml-file
     tag-props hash ] unit-test
 [ t ] [ xml-file get tag-children second contained-tag? ] unit-test
 [ t ] [ [ "<a></b>" string>xml ] catch xml-parse-error? ] unit-test
+[ "<?xml version=\"1.0\" encoding=\"iso-8859-1\" standalone=\"no\"?><a b=\"c\"/>" ]
+[ "<a b='c'/>" xml-reprint ] unit-test

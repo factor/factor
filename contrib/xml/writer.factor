@@ -6,7 +6,7 @@ USING: hashtables kernel math namespaces sequences strings generic ;
 GENERIC: (xml>string) ( object -- )
 
 : print-name ( name -- )
-    dup name-space [ % CHAR: : , ] when*
+    dup name-space dup "" = [ drop ] [ % CHAR: : , ] if
     name-tag % ;
 
 : print-props ( hash -- )
