@@ -12,7 +12,10 @@ ifdef DEBUG
 	CFLAGS = -g
 	STRIP = touch
 else
-	CFLAGS = -Wall -O3 -ffast-math -fomit-frame-pointer $(SITE_CFLAGS)
+	# Temporary workaround for a Windows gcc issue; later we'll find a
+	# real fix, for now just -fno-inline-functions
+	CFLAGS = -Wall -O3 -ffast-math -fomit-frame-pointer \
+		-fno-inline-functions $(SITE_CFLAGS)
 	STRIP = strip
 endif
 
