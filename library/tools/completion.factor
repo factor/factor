@@ -62,8 +62,8 @@ USING: kernel arrays sequences math namespaces strings io ;
         [ swap call dup rot fuzzy score ] keep swap 2array
     ] if ; inline
 
-: completions ( str candidates quot -- seq )
-    pick empty? pick length 100 >= and [
+: completions ( str quot candidates -- seq )
+    pick empty? over length 100 >= and [
         3drop f
     ] [
         [ >r 2dup r> completion ] map 2nip rank-completions

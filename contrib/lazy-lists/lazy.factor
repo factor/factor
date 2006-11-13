@@ -8,7 +8,7 @@ IN: lazy-lists
   stack-effect dup [ 
     nip effect-in length 
   ] [ 
-    drop infer first 
+    drop infer effect-in length nip
   ] if ;
 
 : make-lazy-quot ( word quot -- quot )

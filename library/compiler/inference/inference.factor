@@ -96,7 +96,7 @@ TUPLE: too-many-r> ;
     ] when ;
 
 : undo-infer ( -- )
-    recorded get [ "infer" word-prop not ] subset [
+    recorded get [ custom-infer? not ] subset [
         dup
         f "inferred-vars" set-word-prop
         f "inferred-effect" set-word-prop

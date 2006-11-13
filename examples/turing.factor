@@ -1,5 +1,5 @@
 IN: turing
-USING: arrays hashtables io kernel lists math namespaces
+USING: arrays hashtables io kernel math namespaces
 prettyprint sequences strings vectors words ;
 
 ! A turing machine simulator.
@@ -14,12 +14,12 @@ SYMBOL: halt
 
 ! This is a simple program that outputs 5 1's
 H{
-    { [[ 1 0 ]] T{ state f 1  1 2    } }
-    { [[ 2 0 ]] T{ state f 1  1 3    } }
-    { [[ 3 0 ]] T{ state f 1 -1 1    } }
-    { [[ 1 1 ]] T{ state f 1 -1 2    } }
-    { [[ 2 1 ]] T{ state f 1 -1 3    } }
-    { [[ 3 1 ]] T{ state f 1 -1 halt } }
+    { { 1 0 } T{ state f 1  1 2    } }
+    { { 2 0 } T{ state f 1  1 3    } }
+    { { 3 0 } T{ state f 1 -1 1    } }
+    { { 1 1 } T{ state f 1 -1 2    } }
+    { { 2 1 } T{ state f 1 -1 3    } }
+    { { 3 1 } T{ state f 1 -1 halt } }
 } states set
 
 ! Current state
@@ -50,7 +50,7 @@ SYMBOL: tape
 
 : next-state ( -- state )
     #! Look up the next state/symbol/direction triplet.
-    state get sym cons states get hash ;
+    state get sym 2array states get hash ;
 
 : turing-step ( -- )
     #! Do one step of the turing machine.
@@ -63,7 +63,7 @@ SYMBOL: tape
     #! Print current turing machine state.
     state get .
     tape get .
-    2 position get 2 * + CHAR: \s fill write "^" print ;
+    2 position get 2 * + CHAR: \s <string> write "^" print ;
 
 : n
     #! Do one step and print new state.

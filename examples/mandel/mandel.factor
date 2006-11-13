@@ -11,7 +11,7 @@ strings test ;
 : nb-iter 40 ; inline
 : center -0.65 ; inline
 
-: f_ ( h s v i -- f ) >r swap rot >r 2dup r> 6 * r> - ;
+: f_ >r swap rot >r 2dup r> 6 * r> - ;
 : p ( v s x -- v p x ) >r dupd neg 1 + * r> ;
 : q ( v s f -- q ) * neg 1 + * ;
 : t_ ( v s f -- t_ ) neg 1 + * neg 1 + * ;
@@ -24,36 +24,13 @@ strings test ;
 
 : hsv>rgb ( h s v -- r g b )
     pick 6 * >fixnum {
-        [ f_ t_ p swap     ( v p t ) ]
-        [ f_ q  p -rot     ( q v p ) ]
-        [ f_ t_ p swapd    ( p v t ) ]
-        [ f_ q  p rot      ( p q v ) ]
-        [ f_ t_ p swap rot ( t p v ) ]
-        [ f_ q  p          ( v p q ) ]
+        [ f_ t_ p swap     ] ! v p t
+        [ f_ q  p -rot     ] ! q v p
+        [ f_ t_ p swapd    ] ! p v t
+        [ f_ q  p rot      ] ! p q v
+        [ f_ t_ p swap rot ] ! t p v
+        [ f_ q  p          ] ! v p q
     } mod-cond ;
-
-[ 1/2 1/2 1/2 ] [ 0 0 1/2 hsv>rgb ] unit-test
-
-[ 1/2 1/4 1/4 ] [ 0 1/2 1/2 hsv>rgb ] unit-test
-[ 1/3 2/9 2/9 ] [ 0 1/3 1/3 hsv>rgb ] unit-test
-
-[ 24/125 1/5 4/25 ] [ 1/5 1/5 1/5 hsv>rgb ] unit-test
-[ 29/180 1/6 5/36 ] [ 1/5 1/6 1/6 hsv>rgb ] unit-test
-
-[ 6/25 2/5 38/125 ] [ 2/5 2/5 2/5 hsv>rgb ] unit-test
-[ 8/25 4/5 64/125 ] [ 2/5 3/5 4/5 hsv>rgb ] unit-test
-
-[ 6/25 48/125 3/5 ] [ 3/5 3/5 3/5 hsv>rgb ] unit-test
-[ 0 0 0 ] [ 3/5 1/5 0 hsv>rgb ] unit-test
-
-[ 84/125 4/25 4/5 ] [ 4/5 4/5 4/5 hsv>rgb ] unit-test
-[ 7/15 1/3 1/2 ] [ 4/5 1/3 1/2 hsv>rgb ] unit-test
-
-[ 5/6 5/36 5/6 ] [ 5/6 5/6 5/6 hsv>rgb ] unit-test
-[ 1/6 0 1/6 ] [ 5/6 1 1/6 hsv>rgb ] unit-test
-
-[ 1 0 0 ] [ 1 1 1 hsv>rgb ] unit-test
-[ 1/6 1/9 1/9 ] [ 1 1/3 1/6 hsv>rgb ] unit-test
 
 : scale 255 * >fixnum ; inline
 
@@ -113,7 +90,3 @@ SYMBOL: cols
 : run>file ( file -- )
     "Generating " write dup write "..." print
     <file-writer> [ run write ] with-stream ;
-
-[ "mandel.pnm" run>file ] time
-
-PROVIDE: examples/mandel ;

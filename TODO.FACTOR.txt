@@ -1,3 +1,5 @@
+- workspace window takes too long to come up
+
 + 0.87:
 
 - live search: timer delay would be nice
@@ -45,6 +47,7 @@
 
 + compiler/ffi:
 
+- recompile get/set/>n/n>/ndrop if needed
 - %allot-bignum-signed-2 is broken on both platforms
 - cross-word type inference
 - callback scheduling issue

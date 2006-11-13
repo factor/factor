@@ -79,10 +79,13 @@ SYMBOL: crossref
 
 : reset-props ( word seq -- ) [ remove-word-prop ] each-with ;
 
+: custom-infer? ( word -- ? )
+    dup "infer" word-prop swap "infer-vars" word-prop or ;
+
 : unxref-word* ( word -- )
     {
         { [ dup compound? not ] [ drop ] }
-        { [ dup "infer" word-prop ] [ drop ] }
+        { [ dup custom-infer? ] [ drop ] }
         { [ t ] [
             dup changed-word
             {
