@@ -121,7 +121,7 @@ H{ } clone objc-methods set-global
 \ (send) [ pop-literal nip infer-send ] "infer" set-word-prop
 
 \ (send) [ object object ] [ ] <effect>
-"infer-effect" set-word-prop
+"inferred-effect" set-word-prop
 
 : send ( ... selector -- ... ) f (send) ; inline
 

@@ -5,29 +5,32 @@ math math-internals namespaces parser prettyprint sequences
 strings vectors words ;
 IN: inference
 
-: consume-values ( n node -- )
+: consume-values ( seq node -- )
+    >r length r>
     over ensure-values
     over 0 rot node-inputs
     meta-d get [ length swap - ] keep set-length ;
 
-: produce-values ( n node -- )
+: produce-values ( seq node -- )
     >r [ drop <computed> ] map dup r> set-node-out-d
     meta-d get swap nappend ;
 
 : recursing? ( word -- label/f )
     recursive-state get <reversed> assoc ;
 
+: if-inline ( word true false -- )
+    >r >r dup "inline" word-prop r> r> if ; inline
+
 : make-call-node ( word -- node )
-    dup "inline" word-prop
     [ dup recursing? [ #call-label ] [ #call ] ?if ]
     [ #call ]
-    if ;
+    if-inline ;
 
-: consume/produce ( word effect -- )
+: consume/produce ( effect word -- )
     meta-d get clone >r
     swap make-call-node dup node,
-    over effect-in length over consume-values
-    over effect-out length over produce-values
+    over effect-in over consume-values
+    over effect-out over produce-values
     r> over #call-label? [ swap set-node-in-d ] [ 2drop ] if
     effect-terminated? [ terminate ] when ;
 
@@ -45,7 +48,7 @@ TUPLE: no-effect word ;
 : add-recursive-state ( word label -- )
     2array recursive-state [ swap add ] change ;
 
-: inline-block ( word -- node-block variables )
+: inline-block ( word -- node-block data )
     [
         copy-inference nest-node
         gensym 2dup add-recursive-state
@@ -87,15 +90,14 @@ M: #call-label collect-recursion*
         apply-infer node-child node-successor splice-node drop
     ] if ;
 
-: infer-compound ( word -- effect )
+: infer-compound ( word -- hash )
     [
-        recursive-state get init-inference
-        [ inline-block nip [ current-effect ] bind ] keep
-    ] with-scope over consume/produce ;
+        recursive-state get init-inference inline-block nip
+    ] with-scope ;
 
-GENERIC: apply-word
+GENERIC: infer-word ( word -- effect data )
 
-M: object apply-word no-effect ;
+M: word infer-word no-effect ;
 
 TUPLE: effect-error word effect ;
 
@@ -104,57 +106,76 @@ TUPLE: effect-error word effect ;
 
 : check-effect ( word effect -- )
     over "infer" word-prop [
-        2drop
-    ] [
         over recorded get push
-        dup pick "declared-effect" word-prop dup
-        [ effect<= [ effect-error ] unless ] [ 2drop ] if
-        "infer-effect" set-word-prop
-    ] if ;
+        over "declared-effect" word-prop 2dup
+        [ swap effect<= [ effect-error ] unless ] [ 2drop ] if
+    ] unless 2drop ;
 
-M: compound apply-word
-    [
-        dup infer-compound check-effect
-    ] [
-        swap t "no-effect" set-word-prop rethrow
-    ] recover ;
+: save-inferred-data ( word effect vars -- )
+    >r over r>
+    dup vars-trivial? [ drop f ] when
+    "inferred-vars" set-word-prop
+    "inferred-effect" set-word-prop ;
 
-: ?no-effect ( word -- )
-    dup "no-effect" word-prop [ no-effect ] [ drop ] if ;
+: finish-word ( word -- effect vars )
+    current-effect 2dup check-effect
+    inferred-vars get
+    [ save-inferred-data ] 2keep ;
 
-: apply-default ( word -- )
-    dup ?no-effect
-    dup "infer-effect" word-prop [
-        over "infer" word-prop [
-            swap effect-in length ensure-values call drop
-        ] [
-            consume/produce
-        ] if*
-    ] [
-        apply-word
-    ] if* ;
+M: compound infer-word
+    [ dup infer-compound [ finish-word ] bind ]
+    [ swap t "no-effect" set-word-prop rethrow ] recover ;
 
-M: word apply-object apply-default ;
+: custom-infer ( word -- )
+    #! Customized inference behavior
+    dup "inferred-vars" word-prop apply-vars
+    dup "inferred-effect" word-prop effect-in ensure-values
+    "infer" word-prop call ;
+
+: apply-effect/vars ( word effect vars -- )
+    apply-vars consume/produce ;
+
+: cached-infer ( word -- )
+    dup "inferred-effect" word-prop
+    over "inferred-vars" word-prop
+    apply-effect/vars ;
+
+: apply-word ( word -- )
+    {
+        { [ dup "no-effect" word-prop ] [ no-effect ] }
+        { [ dup "infer" word-prop ] [ custom-infer ] }
+        { [ dup "inferred-effect" word-prop ] [ cached-infer ] }
+        { [ t ] [ dup infer-word apply-effect/vars ] }
+    } cond ;
+
+M: word apply-object apply-word ;
 
 M: symbol apply-object apply-literal ;
 
 TUPLE: recursive-declare-error word ;
 
-: recursive-effect ( word -- effect )
-    dup stack-effect
-    [ ] [ <recursive-declare-error> inference-error ] ?if ;
+: declared-infer ( word -- )
+    dup stack-effect [
+        consume/produce
+    ] [
+        <recursive-declare-error> inference-error
+    ] if* ;
+
+: apply-inline ( word -- )
+    dup recursive-state get peek first eq?
+    [ declared-infer ] [ inline-closure ] if ;
+
+: apply-compound ( word -- )
+    dup recursing? [ declared-infer ] [ apply-word ] if ;
+
+: custom-infer-vars ( word -- )
+    dup "infer-vars" word-prop dup [
+        swap "inferred-effect" word-prop effect-in ensure-values
+        call
+    ] [
+        2drop
+    ] if ;
 
 M: compound apply-object
-    dup "inline" word-prop [
-        dup recursive-state get peek first eq? [
-            dup recursive-effect consume/produce
-        ] [
-            inline-closure
-        ] if
-    ] [
-        dup recursing? [
-            dup recursive-effect consume/produce
-        ] [
-            apply-default
-        ] if
-    ] if ;
+    dup custom-infer-vars
+    [ apply-inline ] [ apply-compound ] if-inline ;

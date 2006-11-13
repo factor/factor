@@ -55,16 +55,41 @@ TUPLE: unbalanced-branches-error in out ;
     swap meta-r active-variable
     unify-effect meta-r set drop ;
 
+TUPLE: unbalanced-namestacks ;
+
+: unify-namestacks ( seq -- )
+    flip
+    [ H{ } clone [ dupd hash-update ] reduce ] map
+    meta-n set ;
+
+: namestack-effect ( seq -- )
+    #! If the namestack is unbalanced, we don't throw an error
+    meta-n active-variable
+    dup [ length ] map all-equal? [
+        <unbalanced-namestacks> inference-error
+    ] unless
+    unify-namestacks ;
+
+: unify-vars ( seq -- )
+    #! Don't use active-variable here, because we want to
+    #! consider variables set right before a throw too
+    [ inferred-vars swap hash ] map apply-var-seq ;
+
 : unify-effects ( seq -- )
-    dup datastack-effect dup callstack-effect
+    dup datastack-effect
+    dup callstack-effect
+    dup namestack-effect
+    dup unify-vars
     [ terminated? swap hash ] all? terminated? set ;
 
 : unify-dataflow ( effects -- nodes )
     [ dataflow-graph swap hash ] map ;
 
 : copy-inference ( -- )
-    meta-r [ clone ] change
     meta-d [ clone ] change
+    meta-r [ clone ] change
+    meta-n [ [ clone ] map ] change
+    inferred-vars [ clone ] change
     d-in [ ] change
     dataflow-graph off
     current-node off ;

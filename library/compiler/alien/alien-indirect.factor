@@ -16,7 +16,7 @@ M: alien-indirect-error summary
     drop "Words calling ``alien-indirect'' cannot run in the interpreter. Compile the caller word and try again." ;
 
 \ alien-indirect [ string object string ] [ ] <effect>
-"infer-effect" set-word-prop
+"inferred-effect" set-word-prop
 
 \ alien-indirect [
     empty-node <alien-indirect>

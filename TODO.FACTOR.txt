@@ -1,6 +1,5 @@
 + 0.87:
 
-- cocoa: move window while factor is busy: mouse gets messed up!
 - live search: timer delay would be nice
 - menu should stay up if mouse button released
 - roundoff is still not quite right with tracks
@@ -19,7 +18,6 @@
 - intrinsic fixnum>float float>fixnum
 - mac intel: struct returns from objc methods
 - faster apropos
-- infer which variables are read, written in a quotation
 - compiled call traces
 
 + ui:

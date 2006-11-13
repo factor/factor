@@ -2,6 +2,7 @@ PROVIDE: library/compiler
 { +files+ {
     "inference/shuffle.factor"
     "inference/dataflow.factor"
+    "inference/variables.factor"
     "inference/inference.factor"
     "inference/branches.factor"
     "inference/words.factor"

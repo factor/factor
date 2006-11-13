@@ -27,7 +27,7 @@ M: alien-callback-error summary
     alien-callback-xt [ word-xt <alien> ] curry infer-quot ;
 
 \ alien-callback [ string object quotation ] [ alien ] <effect>
-"infer-effect" set-word-prop
+"inferred-effect" set-word-prop
 
 \ alien-callback [
     empty-node <alien-callback> dup node,

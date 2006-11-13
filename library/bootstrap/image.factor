@@ -69,6 +69,7 @@ SYMBOL: architecture
 
 : emit-object ( header tag quot -- addr )
     swap here-as >r swap tag-header emit call align-here r> ;
+    inline
 
 ! Image header
 
@@ -224,7 +225,7 @@ M: string '
 : emit-array ( list type -- pointer )
     >r [ ' ] map r> object-tag [
         dup length emit-fixnum
-        ( elements -- ) emit-seq
+        emit-seq
     ] emit-object ;
 
 : transfer-tuple ( tuple -- tuple )

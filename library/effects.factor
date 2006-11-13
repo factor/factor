@@ -44,7 +44,7 @@ C: effect
 
 : stack-effect ( word -- effect/f )
     dup "declared-effect" word-prop [ ] [
-        dup "infer-effect" word-prop [ ] [ drop f ] ?if
+        dup "inferred-effect" word-prop [ ] [ drop f ] ?if
     ] ?if ;
 
 M: effect clone

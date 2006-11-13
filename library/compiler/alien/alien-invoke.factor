@@ -9,7 +9,7 @@ TUPLE: alien-invoke library function return parameters ;
 C: alien-invoke make-node ;
 
 : alien-invoke-stack ( node -- )
-    dup alien-invoke-parameters length over consume-values
+    dup alien-invoke-parameters over consume-values
     dup alien-invoke-return "void" = 0 1 ? swap produce-values ;
 
 : alien-invoke-dlsym ( node -- symbol dll )
@@ -29,7 +29,7 @@ M: alien-invoke-error summary
     [ inference-warning ] recover ;
 
 \ alien-invoke [ string object string object ] [ ] <effect>
-"infer-effect" set-word-prop
+"inferred-effect" set-word-prop
 
 \ alien-invoke [
     empty-node <alien-invoke>

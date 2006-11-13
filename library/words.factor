@@ -85,8 +85,10 @@ SYMBOL: crossref
         { [ dup "infer" word-prop ] [ drop ] }
         { [ t ] [
             dup changed-word
-            { "infer-effect" "base-case" "no-effect" }
-            reset-props
+            {
+                "inferred-effect" "inferred-vars"
+                "base-case" "no-effect"
+            } reset-props
         ] }
     } cond ;
 

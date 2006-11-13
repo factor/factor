@@ -34,7 +34,9 @@ SYMBOL: restarts
     error-continuation get continuation-name hash-stack ;
 
 : :res ( n -- )
-    restarts get nth first3 continue-with ;
+    restarts get-global nth
+    f restarts set-global
+    first3 continue-with ;
 
 : :edit ( -- )
     error get

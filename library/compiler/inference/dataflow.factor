@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 IN: inference
 USING: arrays generic hashtables kernel math
-namespaces parser sequences words ;
+namespaces parser sequences words vectors ;
 
 SYMBOL: d-in
 SYMBOL: meta-d

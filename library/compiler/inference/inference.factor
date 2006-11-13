@@ -3,7 +3,7 @@
 IN: inference
 USING: arrays errors generic io kernel
 math namespaces parser prettyprint sequences strings
-vectors words ;
+vectors words tools ;
 
 TUPLE: inference-error rstate major? ;
 
@@ -29,16 +29,13 @@ M: object value-literal
 
 : value-vector ( n -- vector ) [ drop <computed> ] map >vector ;
 
-: add-inputs ( n stack -- n stack )
-    tuck length - dup 0 >
+: add-inputs ( seq stack -- n stack )
+    tuck [ length ] 2apply - dup 0 >
     [ dup value-vector [ rot nappend ] keep ]
     [ drop 0 swap ] if ;
 
-: ensure-values ( n -- )
+: ensure-values ( seq -- )
     meta-d [ add-inputs ] change d-in [ + ] change ;
-
-: short-effect ( -- pair )
-    d-in get meta-d get length 2array ;
 
 SYMBOL: terminated?
 
@@ -50,8 +47,10 @@ SYMBOL: recorded
 
 : init-inference ( recursive-state -- )
     terminated? off
-    V{ } clone meta-r set
     V{ } clone meta-d set
+    V{ } clone meta-r set
+    V{ } clone meta-n set
+    empty-vars inferred-vars set
     0 d-in set
     recursive-state set
     dataflow-graph off
@@ -97,9 +96,11 @@ TUPLE: too-many-r> ;
     ] when ;
 
 : undo-infer ( -- )
-    recorded get
-    [ "infer" word-prop not ] subset
-    [ f "infer-effect" set-word-prop ] each ;
+    recorded get [ "infer" word-prop not ] subset [
+        dup
+        f "inferred-vars" set-word-prop
+        f "inferred-effect" set-word-prop
+    ] each ;
 
 : with-infer ( quot -- )
     [
@@ -115,8 +116,19 @@ TUPLE: too-many-r> ;
         ] recover
     ] with-scope ;
 
-: infer ( quot -- effect )
-    [ infer-quot short-effect ] with-infer ;
+: infer ( quot -- effect infer-vars )
+    [ infer-quot inferred-vars get current-effect ] with-infer ;
+
+: vars. ( seq str -- )
+    over empty? [ 2drop ] [ print [ . ] each ] if ;
+
+: infer. ( quot -- )
+    infer
+    "* Stack effect:" print effect>string print
+    dup inferred-vars-reads "* Reads free variables:" vars.
+    dup inferred-vars-writes "* Writes free variables:" vars.
+    dup inferred-vars-reads-globals "* Reads global variables:" vars.
+    inferred-vars-writes-globals "* Writes global variables:" vars. ;
 
 : (dataflow) ( quot -- dataflow )
     infer-quot f #return node, dataflow-graph get ;

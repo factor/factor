@@ -28,6 +28,10 @@ M: too-many-r> summary
     drop
     "Quotation pops retain stack elements which it did not push" ;
 
+M: too-many-n> summary
+    drop
+    "Quotation pops name stack elements which it did not push" ;
+
 M: no-effect error.
     "The word " write
     no-effect-word pprint

@@ -32,10 +32,10 @@ M: f batch-ends drop ;
 
 : word-dataflow ( word -- dataflow )
     [
-        dup ?no-effect
+        dup "no-effect" word-prop [ no-effect ] when
         dup dup add-recursive-state
-        dup specialized-def (dataflow)
-        swap current-effect check-effect
+        [ specialized-def (dataflow) ] keep
+        finish-word 2drop
     ] with-infer ;
 
 : (compile) ( word -- )
@@ -50,11 +50,8 @@ M: f batch-ends drop ;
     [ (compile) ] with-compiler ;
 
 : try-compile ( word -- )
-    [
-        compile
-    ] [
-        batch-errors get compile-error update-xt
-    ] recover ;
+    [ compile ]
+    [ batch-errors get compile-error update-xt ] recover ;
 
 : compile-batch ( seq -- )
     batch-errors get batch-begins
@@ -78,5 +75,3 @@ M: f batch-ends drop ;
     changed-words get [
         dup hash-keys compile-batch clear-hash
     ] when* ;
-
-[ recompile ] parse-hook set

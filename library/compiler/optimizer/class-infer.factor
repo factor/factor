@@ -119,7 +119,7 @@ M: node child-ties
     dup node-param "output-classes" word-prop [
         call
     ] [
-        node-param "infer-effect" word-prop effect-out
+        node-param "inferred-effect" word-prop effect-out
         dup [ word? ] all? [ drop f ] unless
     ] if* ;
 

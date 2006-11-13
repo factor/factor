@@ -7,72 +7,70 @@ optimizer parser sequences sequences-internals words ;
 [
     print-warnings off
 
+    ! Wrap everything in a catch which starts a listener so
+    ! you can see what went wrong, instead of dealing with a
+    ! fep
     [
-        ! Wrap everything in a catch which starts a listener so
-        ! you can see what went wrong, instead of dealing with a
-        ! fep
-        [
-            "Cross-referencing..." print flush
-            H{ } clone changed-words set-global
-            H{ } clone crossref set-global xref-words
+        "Cross-referencing..." print flush
+        H{ } clone changed-words set-global
+        H{ } clone crossref set-global xref-words
 
-            cpu "x86" = [
-                macosx?
-                "resource:/library/compiler/x86/alien-macosx.factor"
-                "resource:/library/compiler/x86/alien.factor"
-                ? run-file
+        cpu "x86" = [
+            macosx?
+            "resource:/library/compiler/x86/alien-macosx.factor"
+            "resource:/library/compiler/x86/alien.factor"
+            ? run-file
+        ] when
+
+        "compile" get [
+            windows? [
+                "resource:/library/windows/dlls.factor"
+                run-file
             ] when
 
-            "compile" get [
-                windows? [
-                    "resource:/library/windows/dlls.factor"
-                    run-file
-                ] when
+            \ number= compile
+            \ + compile
+            \ nth compile
+            \ set-nth compile
+            \ = compile
 
-                \ number= compile
-                \ + compile
-                \ nth compile
-                \ set-nth compile
-                \ = compile
-
-                ! Load UI backend
-                "cocoa" get [
-                    "library/ui/cocoa" require
-                ] when
-
-                "x11" get [
-                    "library/ui/x11" require
-                ] when
-
-                windows? [
-                    "library/ui/windows" require
-                ] when
-
-                ! Load native I/O code
-                "native-io" get [
-                    unix? [
-                        "library/io/unix" require
-                    ] when
-                    windows? [
-                        "library/io/windows" require
-                    ] when
-                ] when
-
-                parse-command-line
-
-                compile-all
-
-                "Initializing native I/O..." print flush
-                "native-io" get [ init-io ] when
-
-                ! We only do this if we are compiled, otherwise
-                ! it takes too long.
-                "Building online help search index..." print
-                flush
-                H{ } clone parent-graph set-global xref-help
-                H{ } clone term-index set-global index-help
+            ! Load UI backend
+            "cocoa" get [
+                "library/ui/cocoa" require
             ] when
-        ] no-parse-hook
+
+            "x11" get [
+                "library/ui/x11" require
+            ] when
+
+            windows? [
+                "library/ui/windows" require
+            ] when
+
+            ! Load native I/O code
+            "native-io" get [
+                unix? [
+                    "library/io/unix" require
+                ] when
+                windows? [
+                    "library/io/windows" require
+                ] when
+            ] when
+
+            parse-command-line
+
+            compile-all
+
+            "Initializing native I/O..." print flush
+            "native-io" get [ init-io ] when
+
+            ! We only do this if we are compiled, otherwise
+            ! it takes too long.
+            "Building online help search index..." print
+            flush
+            H{ } clone parent-graph set-global xref-help
+            H{ } clone term-index set-global index-help
+        ] when
 
         run-bootstrap-init
 
@@ -82,6 +80,10 @@ optimizer parser sequences sequences-internals words ;
             "shell" get "shells" lookup execute
             0 exit
         ] set-boot
+
+        "compile" get [ 
+            [ recompile ] parse-hook set-global
+        ] when
 
         f error set-global
         f error-continuation set-global
