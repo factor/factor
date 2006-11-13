@@ -124,26 +124,26 @@ M: listener-gadget tool-help
     [ set-listener-gadget-minibuffer ] 2keep
     dupd track-add request-focus ;
 
+: show-titled-minibuffer ( listener gadget title -- )
+    <labelled-gadget> swap show-minibuffer ;
+
 : minibuffer-action ( quot -- quot )
     [ find-listener hide-minibuffer ] swap append ;
 
 : show-word-search ( listener action -- )
     minibuffer-action
     >r dup listener-gadget-input selected-word r>
-    <word-search> "Word search" <labelled-gadget>
-    swap show-minibuffer ;
+    <word-search> "Word search" show-titled-minibuffer ;
 
 : show-source-files-search ( listener action -- )
     minibuffer-action
     "" swap <source-files-search>
-    "Source file search" <labelled-gadget>
-    swap show-minibuffer ;
+    "Source file search" show-titled-minibuffer ;
 
 : show-vocabs-search ( listener action -- )
     minibuffer-action
     >r dup listener-gadget-input selected-word r>
-    <vocabs-search> "Vocabulary search" <labelled-gadget>
-    swap show-minibuffer ;
+    <vocabs-search> "Vocabulary search" show-titled-minibuffer ;
 
 : listener-history ( listener -- seq )
     listener-gadget-input interactor-history <reversed> ;
@@ -151,14 +151,10 @@ M: listener-gadget tool-help
 : history-action ( string -- )
     find-listener listener-gadget-input set-editor-text ;
 
-: <history-gadget> ( listener -- gadget )
-    listener-history <model>
-    [ [ dup print-input ] make-pane ]
-    [ history-action ] minibuffer-action
-    <list> <scroller> "History" <labelled-gadget> ;
-
 : show-history ( listener -- )
-    [ <history-gadget> ] keep show-minibuffer ;
+    dup listener-gadget-input editor-text
+    over listener-history [ history-action ] minibuffer-action
+    <history-search> "History search" show-titled-minibuffer ;
 
 : completion-string ( word listener -- string )
     >r dup word-name swap word-vocabulary dup vocab r>

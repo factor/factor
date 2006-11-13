@@ -78,3 +78,6 @@ unit-test
 [ ] [ \ compound see ] unit-test
 
 [ ] [ \ duplex-stream see ] unit-test
+
+[ "[ \\ + ]" ] [ [ \ + ] unparse ] unit-test
+[ "[ \\ [ ]" ] [ [ \ [ ] unparse ] unit-test

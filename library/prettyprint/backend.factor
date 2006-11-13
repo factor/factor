@@ -133,10 +133,9 @@ M: hashtable >pprint-sequence hash>alist \ H{ \ } t ;
 
 M: tuple >pprint-sequence tuple>array \ T{ \ } t ;
 
-M: wrapper >pprint-sequence
-    wrapped dup 1array swap word? [ \ \ f ] [ \ W{ \ } ] if f ;
+M: wrapper >pprint-sequence wrapped 1array \ W{ \ } f ;
 
-M: object pprint*
+: pprint-object ( obj -- )
     [
         >pprint-sequence H{ } <flow
         rot [ pprint-word ] when*
@@ -144,3 +143,12 @@ M: object pprint*
         swap pprint-elements
         block> [ pprint-word ] when* block>
     ] check-recursion ;
+    
+M: object pprint* pprint-object ;
+
+M: wrapper pprint*
+    dup wrapped word? [
+        \ \ pprint-word wrapped pprint-word
+    ] [
+        pprint-object
+    ] if ;

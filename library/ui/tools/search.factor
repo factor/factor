@@ -81,7 +81,11 @@ M: live-search focusable-child* live-search-field ;
     <live-search> ;
 
 : <vocabs-search> ( string action -- gadget )
-    vocabs
-    [ string-completions ] curry
+    vocabs [ string-completions ] curry
     [ [ <vocab-link> ] string-completion. ]
+    <live-search> ;
+
+: <history-search> ( string seq action -- gadget )
+    swap [ string-completions ] curry
+    [ dup <input> write-object ]
     <live-search> ;

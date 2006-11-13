@@ -56,10 +56,14 @@ USING: kernel arrays sequences math namespaces strings io ;
 
 : completion ( str quot obj -- pair )
     #! pair is { obj score }
-    [ swap call dup rot fuzzy score ] keep swap 2array ; inline
+    pick empty? [
+        2nip 1 2array
+    ] [
+        [ swap call dup rot fuzzy score ] keep swap 2array
+    ] if ; inline
 
 : completions ( str candidates quot -- seq )
-    pick empty? [
+    pick empty? pick length 100 >= and [
         3drop f
     ] [
         [ >r 2dup r> completion ] map 2nip rank-completions
