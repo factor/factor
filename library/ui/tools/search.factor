@@ -87,5 +87,5 @@ M: live-search focusable-child* live-search-field ;
 
 : <history-search> ( string seq action -- gadget )
     swap [ string-completions ] curry
-    [ dup <input> write-object ]
+    [ first dup <input> write-object ]
     <live-search> ;
