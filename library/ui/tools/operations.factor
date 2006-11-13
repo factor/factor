@@ -113,6 +113,13 @@ M: operation invoke-command ( target operation -- )
 } define-operation
 
 [ word? ] H{
+    { +name+ "Word stack effect" }
+    { +keyboard+ T{ key-down f { A+ } "i" } }
+    { +quot+ [ word-def infer. ] }
+    { +listener+ t }
+} define-operation
+
+[ word? ] H{
     { +name+ "Word dataflow" }
     { +keyboard+ T{ key-down f { A+ } "d" } }
     { +quot+ [ word-def show-dataflow ] }
@@ -193,9 +200,9 @@ M: operation invoke-command ( target operation -- )
 
 ! Quotations
 [ quotation? ] H{
-    { +name+ "Infer" }
+    { +name+ "Quotation stack effect" }
     { +keyboard+ T{ key-down f { C+ A+ } "i" } }
-    { +quot+ [ infer . ] }
+    { +quot+ [ infer. ] }
     { +listener+ t }
 } define-operation
 
