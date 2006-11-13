@@ -118,9 +118,13 @@ TUPLE: effect-error word effect ;
     "inferred-effect" set-word-prop ;
 
 : finish-word ( word -- effect vars )
-    current-effect 2dup check-effect
-    inferred-vars get
-    [ save-inferred-data ] 2keep ;
+    current-effect inferred-vars get
+    pick custom-infer? [
+        rot drop
+    ] [
+        >r 2dup check-effect r>
+        [ save-inferred-data ] 2keep
+    ] if ;
 
 M: compound infer-word
     [ dup infer-compound [ finish-word ] bind ]

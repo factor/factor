@@ -1,6 +1,8 @@
 IN: temporary
 USING: alien compiler kernel namespaces namespaces test
-sequences ;
+sequences inference errors ;
+
+[ t ] [ [ [ alien-indirect ] infer ] catch inference-error? ] unit-test
 
 FUNCTION: void ffi_test_0 ;
 [ ] [ ffi_test_0 ] unit-test

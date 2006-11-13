@@ -1,8 +1,9 @@
 - workspace window takes too long to come up
+- bogus compile error
+- live search: timer delay would be nice
 
 + 0.87:
 
-- live search: timer delay would be nice
 - menu should stay up if mouse button released
 - roundoff is still not quite right with tracks
 - grid displays quickly now, but constructing large amounts of gadgets

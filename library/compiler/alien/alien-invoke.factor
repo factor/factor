@@ -6,6 +6,12 @@ inference io kernel kernel-internals math namespaces parser
 prettyprint sequences strings words ;
 
 TUPLE: alien-invoke library function return parameters ;
+
+GENERIC: alien-invoke-abi
+
+M: alien-invoke alien-invoke-abi
+    alien-invoke-library library-abi ;
+
 C: alien-invoke make-node ;
 
 : alien-invoke-stack ( node -- )
@@ -59,7 +65,7 @@ M: alien-invoke-error summary
     [ ] [ f swap c-type c-type-box ] if-void ;
 
 : generate-invoke-cleanup ( node -- )
-    dup alien-invoke-library library-abi "stdcall" = [
+    dup alien-invoke-abi [
         drop
     ] [
         alien-invoke-parameters stack-space %cleanup
