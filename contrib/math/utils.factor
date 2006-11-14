@@ -101,6 +101,3 @@ SYMBOL: step-size .01 step-size set  ! base on arguments
 
 : nth-rand ( seq -- elem ) [ length random-int ] keep nth ;
 
-: count-end ( seq quot -- count )
-    >r [ length ] keep r> find-last drop dup -1 = [ 2drop 0 ] [ - 1- ] if ;
-
