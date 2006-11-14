@@ -376,3 +376,5 @@ SYMBOL: x
 [ V{ } ] [ [ >n x set ndrop ] infer drop inferred-vars-writes ] unit-test
 
 [ [ >n ] [ ] if ] unit-test-fails
+
+[ V{ 2 3 } ] [ [ [ [ 2 get 3 throw ] [ 3 get ] if ] with-scope ] infer drop inferred-vars-reads ] unit-test

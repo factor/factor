@@ -24,7 +24,7 @@ USING: kernel http-client sequences namespaces math errors io ;
   dup rot "<" swap append swap start dup 0 >= [ ! seq index
     ">" -rot start* dup 0 >= [ 1 + ] [ drop f ] if
   ] [
-    drop f
+    2drop f
   ] if  ;
 
 : find-end-tag ( tag seq -- n )

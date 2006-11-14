@@ -7,7 +7,7 @@ prettyprint sequences strings words ;
 
 TUPLE: alien-invoke library function return parameters ;
 
-GENERIC: alien-invoke-abi
+GENERIC: alien-invoke-abi ( node -- string )
 
 M: alien-invoke alien-invoke-abi
     alien-invoke-library library-abi ;

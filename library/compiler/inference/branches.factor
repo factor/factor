@@ -64,7 +64,7 @@ TUPLE: unbalanced-namestacks ;
 
 : namestack-effect ( seq -- )
     #! If the namestack is unbalanced, we don't throw an error
-    meta-n active-variable
+    [ meta-n swap hash ] map
     dup [ length ] map all-equal? [
         <unbalanced-namestacks> inference-error
     ] unless

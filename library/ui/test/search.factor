@@ -12,6 +12,8 @@ sequences ;
 "set-word-prop" [ ] <word-search> "search" set
 "search" get graft*
 
+1000 sleep
+
 [ f ]
 [ "search" get live-search-list control-value empty? ]
 unit-test

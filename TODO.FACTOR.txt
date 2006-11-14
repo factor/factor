@@ -1,7 +1,3 @@
-- workspace window takes too long to come up
-- bogus compile error
-- windows crash
-
 + 0.87:
 
 - these things are "Too Slow":
@@ -28,6 +24,7 @@
 
 + ui:
 
+- workspace window takes too long to come up
 - new windows don't always have focus, eg focus follows mouse
 - dataflow for [ ] map [ ] subset looks weird (wrong?)
 - listener commands from a menu should not include 'hide-glass' etc
@@ -53,6 +50,7 @@
 
 + compiler/ffi:
 
+- bogus compile error
 - recompile get/set/>n/n>/ndrop if needed
 - %allot-bignum-signed-2 is broken on both platforms
 - cross-word type inference
@@ -81,6 +79,7 @@
 
 + misc:
 
+- windows crash
 - growable data heap
 - minor GC takes too long now, we should card mark code heap
 - buffer-ptr should be an alien

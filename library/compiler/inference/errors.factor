@@ -32,6 +32,10 @@ M: too-many-n> summary
     drop
     "Quotation pops name stack elements which it did not push" ;
 
+M: unbalanced-namestacks error.
+    "Unbalanced name stack usage." print
+    "Make sure occurrences of >n/n> are consistent across branches." print ;
+
 M: no-effect error.
     "The word " write
     no-effect-word pprint

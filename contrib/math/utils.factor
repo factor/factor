@@ -6,7 +6,7 @@ USING: errors kernel sequences math sequences-internals namespaces arrays ;
 
 : lcm ( a b -- c )
     #! Smallest integer such that c/a and c/b are both integers.
-    2dup gcd nip >r * r> /i ; foldable
+    [ * ] 2keep gcd nip /i ; foldable
 
 : mod-inv ( x n -- y )
     #! Compute the multiplicative inverse of x mod n.
@@ -35,7 +35,7 @@ USING: errors kernel sequences math sequences-internals namespaces arrays ;
 
 : powers ( n x -- seq )
     #! Output sequence has n elements, { 1 x x^2 x^3 ... }
-    <array> 1 [ * ] accumulate ;
+    <array> 1 [ * ] accumulate nip ;
 
 : ** ( u v -- u*v' ) conjugate * ; inline
 

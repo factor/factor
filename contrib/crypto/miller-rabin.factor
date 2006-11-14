@@ -22,7 +22,7 @@ SYMBOL: trials
 
 : init-miller-rabin ( n trials -- ) 0 composite set trials set n set ;
 
-: (miller-rabin) ( n -- bool )
+: (miller-rabin) ( -- bool )
     n get dup 1 = [ drop f ]
     [
         even? [

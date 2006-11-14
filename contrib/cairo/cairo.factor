@@ -180,10 +180,10 @@ C-ENUM:
 	"cairo_t*" "cairo" "cairo_create" [ "void*" ] alien-invoke ;
 
 : cairo_destroy ( cairo_t -- )
-	"void" "cairo" "cairo_destroy" [ "cairo_t*" ] ;
+	"void" "cairo" "cairo_destroy" [ "cairo_t*" ] alien-invoke ;
 
 : cairo_set_operator ( cairo_t cairo_operator_t -- )
-	"void" "cairo" "cairo_set_operator" [ "cairo_t*" "int" ] ;
+	"void" "cairo" "cairo_set_operator" [ "cairo_t*" "int" ] alien-invoke ;
 
 : cairo_image_surface_create_for_data ( data format width height stride -- cairo_surface_t )
 	"void*" "cairo" "cairo_image_surface_create_for_data" [ "void*" "uint" "int" "int" "int" ] alien-invoke ;

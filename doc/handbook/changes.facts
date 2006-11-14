@@ -8,6 +8,7 @@ ARTICLE: "changes" "Changes in the latest release"
     { $list
         "Improved memory management code leads to reduced memory consumption, less frequent garbage collections and fixes a few corner cases where Factor could run out of heap even if a GC would have freed enough memory to proceed"
         "Improved prettyprinter low lays out code in a more pleasing manner"
+        "Windows native I/O has been sped up (Doug Coleman)"
     }
 }
 { $subtopic "UI"

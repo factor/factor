@@ -136,7 +136,8 @@ LAZY: 'int' ( -- parser )
 LAZY: 'e' ( -- parser )
   "e" token "E" token <|> ;
 
-: sign-number ( { minus? num } -- number )
+: sign-number ( pair -- number )
+  #! Pair is { minus? num }
   #! Convert the json number value to a factor number
   dup second swap first [ -1 * ] when ;
 
@@ -152,7 +153,8 @@ LAZY: 'exp' ( -- parser )
 LAZY: 'frac' ( -- parser )
   'decimal-point' 'digit0-9' <+> &> [ sequence>frac ] <@ ;
 
-: raise-to-power ( { num exp } -- num )
+: raise-to-power ( pair -- num )
+  #! Pair is { num exp }.
   #! Multiply 'num' by 10^exp
   dup second dup [ 10 swap first ^ swap first * ] [ drop first ] if ;
 

@@ -20,7 +20,7 @@ VAR: rule   VAR: rule-number
 
 : init-rule ( -- ) 8 <hashtable> >rule ;
 
-: rule-keys ( -- { ... } )
+: rule-keys ( -- array )
 { { 1 1 1 }
   { 1 1 0 }
   { 1 0 1 }

@@ -8,12 +8,12 @@ TUPLE: splay-node v k l r ;
 
 C: splay-tree ;
 
-: rotate-right
+: rotate-right ( node -- node )
     dup splay-node-l
     [ splay-node-r swap set-splay-node-l ] 2keep
     [ set-splay-node-r ] keep ;
 
-: rotate-left
+: rotate-left ( node -- node )
     dup splay-node-r
     [ splay-node-l swap set-splay-node-r ] 2keep
     [ set-splay-node-l ] keep ;
@@ -26,21 +26,24 @@ C: splay-tree ;
     swap >r rot [ set-splay-node-r ] 2keep
     drop dup splay-node-r swapd r> swap ;
 
-: cmp 2dup splay-node-k <=> ;
+: cmp ( key node -- obj node -1/0/1 )
+    2dup splay-node-k <=> ;
 
-: lcmp 2dup splay-node-l splay-node-k <=> ;
+: lcmp ( key node -- obj node -1/0/1 ) 
+    2dup splay-node-l splay-node-k <=> ;
 
-: rcmp 2dup splay-node-r splay-node-k <=> ;
+: rcmp ( key node -- obj node -1/0/1 ) 
+    2dup splay-node-r splay-node-k <=> ;
 
 DEFER: (splay)
 
-: splay-left
+: splay-left ( left right key node -- left right key node )
     dup splay-node-l [
         lcmp 0 < [ rotate-right ] when
         dup splay-node-l [ link-right (splay) ] when
     ] when ;
 
-: splay-right
+: splay-right ( left right key node -- left right key node )
     dup splay-node-r [
         rcmp 0 > [ rotate-left ] when
         dup splay-node-r [ link-left (splay) ] when
