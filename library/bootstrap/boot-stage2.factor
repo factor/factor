@@ -72,8 +72,6 @@ optimizer parser sequences sequences-internals words ;
             H{ } clone term-index set-global index-help
         ] when
 
-        run-bootstrap-init
-
         [
             boot
             run-user-init
@@ -84,6 +82,8 @@ optimizer parser sequences sequences-internals words ;
         "compile" get [ 
             [ recompile ] parse-hook set-global
         ] when
+
+        run-bootstrap-init
 
         f error set-global
         f error-continuation set-global
