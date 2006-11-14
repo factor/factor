@@ -13,12 +13,7 @@ C: dimensioned
     [ set-dimensioned-value ] keep ;
 
 : remove-one ( obj seq -- seq )
-    [ index ] keep over -1 = [
-        drop
-    ] [
-        [ 0 -rot <slice> ] 2keep
-        >r 1+ r> [ length ] keep <slice> append 
-    ] if ;
+    [ index ] keep over -1 = [ 2drop ] [ remove-nth ] if ;
 
 : dimensions ( dimensioned -- top bot )
     dup >r dimensioned-top r> dimensioned-bot ;
