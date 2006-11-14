@@ -65,7 +65,7 @@ M: alien-invoke-error summary
     [ ] [ f swap c-type c-type-box ] if-void ;
 
 : generate-invoke-cleanup ( node -- )
-    dup alien-invoke-abi [
+    dup alien-invoke-abi "stdcall" = [
         drop
     ] [
         alien-invoke-parameters stack-space %cleanup

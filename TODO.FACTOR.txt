@@ -1,5 +1,6 @@
 - workspace window takes too long to come up
 - bogus compile error
+- windows crash
 - live search: timer delay would be nice
 
 + 0.87:
