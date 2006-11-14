@@ -10,17 +10,12 @@ HELP: cd ( path -- )
 { $description "Changes the current working directory of the Factor process." }
 { $see-also cwd } ;
 
-HELP: stat ( path -- array/f )
-{ $values { "path" "a path name string" } { "array/f" "a four-element array or " { $link f } } }
+HELP: stat ( path -- directory? length permissions modified )
+{ $values { "path" "a path name string" } { "directory?" "boolean indicating if the file is a directory" } { "length" "the length in bytes as an integer" } { "permissions" "a Unix permission bitmap (0 on Windows" } { "the last modification time, as milliseconds since midnight, January 1st 1970 GMT" } }
 { $description
-    "If the file does not exist, outputs " { $link f } ". Otherwise, outputs a four-element array:"
-    { $list
-        "boolean indicating if the file is a directory"
-        "the length in bytes as an integer"
-        "a Unix permission bitmap (0 on Windows)"
-        "the last modification time, as milliseconds since midnight, January 1st 1970 GMT"
-    }
-} ;
+    "Queries the file system for file meta data. If the file does not exist, outputs " { $link f } " for all four values."
+}
+{ $see-also exists? directory? file-length file-modified } ;
 
 HELP: path+
 { $values { "str1" "a string" } { "str2" "a string" } { "str" "a string" } }
