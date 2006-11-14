@@ -1,6 +1,6 @@
 IN: temporary
 USING: gadgets-search io test namespaces gadgets 
-sequences ;
+sequences threads ;
 
 [ "hey man (score: 123)" ]
 [

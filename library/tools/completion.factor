@@ -63,8 +63,12 @@ USING: kernel arrays sequences math namespaces strings io ;
     ] if ; inline
 
 : completions ( str quot candidates -- seq )
-    pick empty? over length 100 >= and [
-        3drop f
+    pick empty? [
+        dup length 100 > [
+            3drop f
+        ] [
+            2nip [ 1 2array ] map
+        ] if
     ] [
         [ >r 2dup r> completion ] map 2nip rank-completions
     ] if ; inline

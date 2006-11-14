@@ -3,6 +3,7 @@
 - these things are "Too Slow":
   - all-words
   - make-image
+  - workspace-window
 - menu should stay up if mouse button released
 - roundoff is still not quite right with tracks
 - grid displays quickly now, but constructing large amounts of gadgets
@@ -21,13 +22,18 @@
 - mac intel: struct returns from objc methods
 - faster apropos
 - compiled call traces
-
-+ ui:
-
 - workspace window takes too long to come up
 - new windows don't always have focus, eg focus follows mouse
 - dataflow for [ ] map [ ] subset looks weird (wrong?)
 - listener commands from a menu should not include 'hide-glass' etc
+- bogus compile errors?
+- recompile get/set/>n/n>/ndrop if needed
+- cross-word type inference
+- callback scheduling issue
+- windows crash
+
++ ui:
+
 - some way of intercepting all gestures
 - how do we refer to command shortcuts in the docs?
 - fix top level window positioning
@@ -50,11 +56,7 @@
 
 + compiler/ffi:
 
-- bogus compile error
-- recompile get/set/>n/n>/ndrop if needed
 - %allot-bignum-signed-2 is broken on both platforms
-- cross-word type inference
-- callback scheduling issue
 - we may be able to remove the dlsym primitive
 - [ [ dup call ] dup call ] infer hangs
 - stdcall callbacks
@@ -79,7 +81,6 @@
 
 + misc:
 
-- windows crash
 - growable data heap
 - minor GC takes too long now, we should card mark code heap
 - buffer-ptr should be an alien
