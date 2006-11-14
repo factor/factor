@@ -170,7 +170,9 @@ typedef enum
 } F_ERRORTYPE;
 
 /* Are we throwing an error? */
-bool throwing;
+/* XXX Why is this volatile? The resulting executable crashes when compiled
+under gcc on windows otherwise. Proper fix pending */
+volatile bool throwing;
 /* When throw_error throws an error, it sets this global and
 longjmps back to the top-level. */
 CELL thrown_error;

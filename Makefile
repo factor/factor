@@ -9,13 +9,10 @@ DISK_IMAGE = Factor-$(VERSION).dmg
 LIBPATH = -L/usr/X11R6/lib
 
 ifdef DEBUG
-	CFLAGS = -g
+	CFLAGS = -pg -O1
 	STRIP = touch
 else
-	# Temporary workaround for a Windows gcc issue; later we'll find a
-	# real fix, for now just -fno-inline-functions
-	CFLAGS = -Wall -O3 -ffast-math -fomit-frame-pointer \
-		-fno-inline-functions $(SITE_CFLAGS)
+	CFLAGS = -Wall -O3 -ffast-math -fomit-frame-pointer $(SITE_CFLAGS)
 	STRIP = strip
 endif
 

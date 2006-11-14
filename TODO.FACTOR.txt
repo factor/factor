@@ -1,5 +1,6 @@
 + 0.87:
 
+- fix search unit test
 - these things are "Too Slow":
   - all-words
   - make-image
@@ -31,6 +32,13 @@
 - cross-word type inference
 - callback scheduling issue
 - windows crash
+- ui docs
+- some kind of declarative wiring framework for ui
+- overhaul models, set-model* is crap
+- allow rebinding styles
+- fix windows gcc issue
+- robustify stepper -- see if step back past a throw works
+- empty callstack: should throw an exception instead of being a critical error
 
 + ui:
 
@@ -81,6 +89,7 @@
 
 + misc:
 
+- should be possible to reload any source file in library
 - growable data heap
 - minor GC takes too long now, we should card mark code heap
 - buffer-ptr should be an alien

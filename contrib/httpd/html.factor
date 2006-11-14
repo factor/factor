@@ -194,7 +194,7 @@ M: html-stream stream-terpri [ <br/> ] with-stream* ;
     link/> ;
 
 : xhtml-preamble
-    xml-preamble write-html
+    "<?xml version=\"1.0\"?>" write-html
     "<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Strict//EN\" \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd\">" write-html ;
 
 : html-document ( title quot -- )
