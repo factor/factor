@@ -28,30 +28,30 @@ $terpri
 { $subsection d-in }
 { $subsection meta-d }
 "When a literal is encountered, it is simply pushed on the shadow stack. For example, the stack effect of the following quotation is inferred by pushing all three literals on the shadow stack, then taking the value of " { $link d-in } " and the length of " { $link meta-d } ":"
-{ $example "[ 1 2 3 ] infer." "* Stack effect:" "( -- object object object )" }
+{ $example "[ 1 2 3 ] infer." "* Stack effect:\n( -- object object object )" }
 "In the following example, the call to " { $link + } " expects two values on the shadow stack, but only one value is present, the literal which was pushed previously. This increments the " { $link d-in } " counter by one:"
-{ $example "[ 2 + ] infer." "* Stack effect:" "( object -- object )" }
+{ $example "[ 2 + ] infer." "* Stack effect:\n( object -- object )" }
 "After the call to " { $link + } ", the shadow stack contains a \"computed value placeholder\", since the inferencer has no way to know what the resulting value actually is (in fact it is arbitrary)." ;
 
 ARTICLE: "inference-combinators" "Combinator stack effects"
 "Without further information, one cannot say what the stack effect of " { $link call } " is; it depends on the given quotation. If the inferencer encounters a " { $link call } " when the top of the stack is a computed value placeholder, a " { $link literal-expected } " error is raised."
 { $example "[ [ + ] append call ] infer." "... an error ..." }
 "On the other hand, applying " { $link call } " to a literal value behaves as if the quotation was substituted at that point:"
-{ $example "[ [ 2 + ] call ] infer." "* Stack effect:" "( object -- object )" }
+{ $example "[ [ 2 + ] call ] infer." "* Stack effect:\n( object -- object )" }
 "Consider a combinator such as " { $link keep } ". The combinator itself does not have a stack effect. However, since the combinator is declared " { $link POSTPONE: inline } ", a given usage of it can have a stack effect:"
-{ $example "[ [ 2 + ] keep ] infer." "* Stack effect:" "( object -- object object )" }
+{ $example "[ [ 2 + ] keep ] infer." "* Stack effect:\n( object -- object object )" }
 "In general, combinators must be declared " { $link POSTPONE: inline } " so that we can infer the stack effects of words that call them with literal quotations."
 $terpri
 "Here is an example where the stack effect cannot be inferred:"
 { $code ": foo 0 [ + ] ;" "[ foo reduce ] infer." }
 "However if " { $snippet "foo" } " was declared " { $link POSTPONE: inline } ", everything would work, since the " { $link reduce } " combinator is also " { $link POSTPONE: inline } ", and the inferencer can see the literal quotation value at the point it is passed to " { $link call } ":"
-{ $example ": foo 0 [ + ] ; inline" "[ foo reduce ] infer." "* Stack effect:" "( object -- object )" } ;
+{ $example ": foo 0 [ + ] ; inline" "[ foo reduce ] infer." "* Stack effect:\n( object -- object )" } ;
 
 ARTICLE: "inference-branches" "Branch stack effects"
 "Conditionals such as " { $link if } " and combinators built on " { $link if } " present a problem, in that if the two branches leave the stack at a different height, it is not clear what the stack effect should be. In this case, inference throws a " { $link unbalanced-branches-error } "."
 $terpri
 "If all branches leave the stack at the same height, then the stack effect of the conditional is just the maximum of the stack effect of each branch. For example,"
-{ $example "[ [ + ] [ drop ] if ] infer." "* Stack effect:" "( object object object -- object )" }
+{ $example "[ [ + ] [ drop ] if ] infer." "* Stack effect:\n( object object object -- object )" }
 "The call to " { $link if } " takes one value from the stack, a generalized boolean. The first branch " { $snippet "[ + ]" } " has stack effect " { $snippet "( x x -- x )" } " and the second has stack effect " { $snippet "( x -- )" } ". Since both branches decrease the height of the stack by one, we say that the stack effect of the two branches is " { $snippet "( x x -- x )" } ", and together with the boolean popped off the stack by " { $link if } ", this gives a total stack effect of " { $snippet "( x x x -- x )" } "." ;
 
 ARTICLE: "inference-recursive" "Stack effects of recursive words"

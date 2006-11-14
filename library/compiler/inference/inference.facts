@@ -42,7 +42,8 @@ HELP: infer
 HELP: infer.
 { $values { "quot" "a quotation" } }
 { $description "Attempts to infer the quotation's stack effect and variable usage, and prints this data to the default stream." }
-{ $errors "Throws an " { $link inference-error } " if stack effect inference fails." } ;
+{ $errors "Throws an " { $link inference-error } " if stack effect inference fails." }
+{ $see-also infer } ;
 
 HELP: dataflow
 { $values { "quot" "a quotation" } { "dataflow" "a dataflow node" } }
