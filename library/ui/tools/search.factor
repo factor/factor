@@ -29,6 +29,7 @@ search-field H{
 
 : <search-model> ( -- model )
     gadget get dup live-search-field control-model
+    200 <delay>
     swap live-search-producer [ "\n" join ] swap append
     <filter> ;
 

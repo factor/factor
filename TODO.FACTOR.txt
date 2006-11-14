@@ -1,10 +1,12 @@
 - workspace window takes too long to come up
 - bogus compile error
 - windows crash
-- live search: timer delay would be nice
 
 + 0.87:
 
+- these things are "Too Slow":
+  - all-words
+  - make-image
 - menu should stay up if mouse button released
 - roundoff is still not quite right with tracks
 - grid displays quickly now, but constructing large amounts of gadgets
@@ -26,6 +28,8 @@
 
 + ui:
 
+- new windows don't always have focus, eg focus follows mouse
+- dataflow for [ ] map [ ] subset looks weird (wrong?)
 - listener commands from a menu should not include 'hide-glass' etc
 - some way of intercepting all gestures
 - how do we refer to command shortcuts in the docs?

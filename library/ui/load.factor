@@ -2,9 +2,9 @@ REQUIRES: library/ui/opengl library/ui/freetype ;
 
 PROVIDE: library/ui
 { +files+ {
+    "timers.factor"
     "models.factor"
     "backend.factor"
-    "timers.factor"
     "gadgets.factor"
     "layouts.factor"
     "hierarchy.factor"

@@ -1,9 +1,9 @@
 ! Copyright (C) 2005, 2006 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: alien arrays errors freetype gadgets gadgets-listener
-       gadgets-workspace hashtables io kernel math namespaces prettyprint
-       sequences strings vectors words win32-api win32-api-messages ;
-USING: tools threads memory ;
+       gadgets-workspace hashtables io kernel math namespaces
+       prettyprint sequences strings vectors words win32-api
+       win32-api-messages tools threads memory timers ;
 IN: win32
 
 ! world-handle is a <win>

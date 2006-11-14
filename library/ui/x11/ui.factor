@@ -3,7 +3,7 @@
 IN: x11
 USING: arrays errors freetype gadgets gadgets-listener
 gadgets-workspace hashtables kernel kernel-internals math
-namespaces opengl sequences strings ;
+namespaces opengl sequences strings timers ;
 
 ! In the X11 backend, world-handle is a pair { window context }.
 ! The window is an X11 window ID, and the context is a

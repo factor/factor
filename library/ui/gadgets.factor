@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 IN: gadgets
 USING: arrays generic hashtables kernel models math
-namespaces sequences styles ;
+namespaces sequences styles timers ;
 
 SYMBOL: origin
 

@@ -1,5 +1,5 @@
 IN: temporary
-USING: gadgets-scrolling gadgets test generic kernel ;
+USING: gadgets-scrolling gadgets test generic kernel timers ;
 
 timers [ init-timers ] unless
 

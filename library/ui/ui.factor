@@ -5,7 +5,7 @@ USING: arrays errors gadgets gadgets-buttons
 gadgets-labels gadgets-panes gadgets-presentations
 gadgets-scrolling gadgets-theme gadgets-viewports generic
 hashtables io kernel math models namespaces prettyprint queues
-sequences test threads help sequences words ;
+sequences test threads help sequences words timers ;
 
 ! Assoc mapping aliens to gadgets
 SYMBOL: windows
