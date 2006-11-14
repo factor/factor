@@ -11,7 +11,7 @@ HELP: cd ( path -- )
 { $see-also cwd } ;
 
 HELP: stat ( path -- directory? length permissions modified )
-{ $values { "path" "a path name string" } { "directory?" "boolean indicating if the file is a directory" } { "length" "the length in bytes as an integer" } { "permissions" "a Unix permission bitmap (0 on Windows" } { "the last modification time, as milliseconds since midnight, January 1st 1970 GMT" } }
+{ $values { "path" "a path name string" } { "directory?" "boolean indicating if the file is a directory" } { "length" "the length in bytes as an integer" } { "permissions" "a Unix permission bitmap (0 on Windows" } { "modified" "the last modification time, as milliseconds since midnight, January 1st 1970 GMT" } }
 { $description
     "Queries the file system for file meta data. If the file does not exist, outputs " { $link f } " for all four values."
 }
