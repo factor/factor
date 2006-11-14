@@ -1,5 +1,5 @@
 IN: inference
-USING: compiler help kernel sequences ;
+USING: compiler help kernel sequences words ;
 
 HELP: inference-error
 { $values { "msg" "an object" } }
@@ -35,8 +35,13 @@ HELP: too-many-r>
 { $notes "See " { $link "shuffle-words" } " for retain stack usage conventions." } ;
 
 HELP: infer
-{ $values { "quot" "a quotation" } { "effect" "a pair of integers" } }
-{ $description "Attempts to infer the quotation's stack effect, and outputs a pair holding the correct of data stack inputs and outputs for the quotation." }
+{ $values { "quot" "a quotation" } { "effect" "an instance of " { $link effect } } { "infer-vars" "an instance of " { $link inferred-vars } } }
+{ $description "Attempts to infer the quotation's stack effect and variable usage. For interactive testing, the " { $link infer. } " word should be called instead since it presents the output in a nicely formatted manner." }
+{ $errors "Throws an " { $link inference-error } " if stack effect inference fails." } ;
+
+HELP: infer.
+{ $values { "quot" "a quotation" } }
+{ $description "Attempts to infer the quotation's stack effect and variable usage, and prints this data to the default stream." }
 { $errors "Throws an " { $link inference-error } " if stack effect inference fails." } ;
 
 HELP: dataflow

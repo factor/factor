@@ -1,6 +1,6 @@
 USING: errors gadgets-tracks generic hashtables help io kernel
 math memory sequences words compiler parser modules definitions
-tools alien ;
+tools alien inference ;
 
 ARTICLE: "changes" "Changes in the latest release"
 { $heading "Factor 0.86" }
@@ -17,11 +17,17 @@ ARTICLE: "changes" "Changes in the latest release"
         { "Windows now update while being resized on Windows" }
     }
 }
+{ $subtopic "Stack effect inference"
+    { $list
+        { "The new " { $link infer. } " word should be called instead of " { $link infer } ", since it presents information in a more pleasing way" }
+        "Stack effect inference now infers variables read and written by a quotation to facilitate code comprehension and debugging"
+    }
+}
 { $subtopic "Module system"
     { $list
         { "The syntax for " { $link POSTPONE: PROVIDE: } " has changed, consult the documentation" }
-        { "Modules can now provide documentation, see " { $link run-module } " and " { $link POSTPONE: MAIN: } }
-        { "Modules can now provide a main entry point, see " { $link "documenting-modules" } }
+        { "Modules can now provide a main entry point, see " { $link run-module } " and " { $link POSTPONE: MAIN: } }
+        { "Modules can now provide documentation, see " { $link "documenting-modules" } }
     }
 }
 { $subtopic "Contributed libraries"
@@ -269,13 +275,13 @@ ARTICLE: "changes" "Changes in the latest release"
     }
 }
 { $subtopic "Contributed libraries"
-    { $subtopic { "External process interface - " { $snippet "contrib/processes.factor" } }
+    { $subtopic "contrib/processes.factor"
         { $list "This is a new library" }
     }
-    { $subtopic { "Partial continuations - " { $snippet "contrib/partial-continuations.factor" } }
+    { $subtopic "contrib/partial-continuations.factor"
         { $list "This is a new library (Chris Double)" }
     }
-    { $subtopic { "HTTP server - " { $snippet "contrib/httpd/" } }
+    { $subtopic "contrib/httpd/"
         { $list
             "File responder fixes"
             "Inspector responder fixes"
@@ -283,23 +289,23 @@ ARTICLE: "changes" "Changes in the latest release"
             { "Add templating engine in " { $snippet "embedded.factor" } " (Alex Chapman)" }
         }
     }
-    { $subtopic { "XML parser - " { $snippet "contrib/xml.factor" } }
+    { $subtopic "contrib/xml.factor"
         { $list
             "Various updates for recent Factor changes"
             "Improved XML output capabilities"
         }
     }
-    { $subtopic { "Factory window manager - " { $snippet "contrib/factory/" } }
+    { $subtopic "contrib/factory/"
         { $list "Many updates" }
     }
-    { $subtopic { "Cryptography library - " { $snippet "contrib/crypto/" } }
+    { $subtopic "contrib/crypto/"
         { $list
             "Added Base64 encoding (Doug Coleman)"
             "Added Blum Blum Shub random number generator (Doug Coleman)"
             "Added CRC32 checksum (Doug Coleman)"
         }
     }
-    { $subtopic { "Space invaders/Intel 8080 emulator - " { $snippet "contrib/space-invaders/" } }
+    { $subtopic "contrib/space-invaders/"
         { $list
             "Updated to use Factor UI instead of SDL (Chris Double)"
         }

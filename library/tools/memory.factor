@@ -68,7 +68,6 @@ strings styles vectors words ;
     heap-stats dup hash-keys natural-sort [
         { "Class" "Bytes" "Instances" } ,
         [
-            ( hash hash key -- )
             [ dup , dup pick hash , pick hash , ] { } make ,
         ] each 2drop
     ] { } make simple-table ;
