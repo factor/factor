@@ -27,3 +27,10 @@ USING: arrays generic kernel sequences math ;
 : v.m ( v m -- v ) flip [ v. ] map-with ;
 : m.v ( m v -- v ) swap [ v. ] map-with ;
 : m.  ( m m -- m ) flip swap [ m.v ] map-with ;
+
+: mmin ( m -- n ) >r 1/0. r> [ [ min ] each ] each ;
+: mmax ( m -- n ) >r -1/0. r> [ [ max ] each ] each ;
+: mnorm ( m -- n ) dup mmax abs m/n ;
+: m-almost= ( m n -- ? )
+    t -rot [ [ almost= and ] 2each ] 2each ;
+
