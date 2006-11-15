@@ -104,7 +104,5 @@ int main(int argc, char** argv)
 
 	run_toplevel();
 
-	critical_error("run_toplevel() returned due to empty callstack",0);
-
 	return 0;
 }

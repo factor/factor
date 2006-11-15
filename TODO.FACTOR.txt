@@ -38,7 +38,6 @@
 - allow rebinding styles
 - fix windows gcc issue
 - robustify stepper -- see if step back past a throw works
-- empty callstack: should throw an exception instead of being a critical error
 
 + ui:
 

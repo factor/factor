@@ -69,7 +69,12 @@ void interpreter_loop(void)
 		if(callframe_scan == callframe_end)
 		{
 			if(cs_bot - cs == CELLS)
-				return;
+			{
+				if(stack_chain->next)
+					return;
+
+				general_error(ERROR_CS_UNDERFLOW,F,F,false);
+			}
 
 			callframe_end = get(cs);
 			callframe_scan = get(cs - CELLS);
