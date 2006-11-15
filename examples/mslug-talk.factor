@@ -12,6 +12,13 @@ IN: mslug
 
 : mslug-stylesheet
     H{
+        { default-style
+            H{
+                { font "serif" }
+                { font-size 24 }
+                { wrap-margin 700 }
+            }
+        }
         { code-style
             H{
                 { font "monospace" }
@@ -42,15 +49,12 @@ IN: mslug
     T{ gradient f { { 0.8 0.8 1.0 1.0 } { 1.0 0.8 1.0 1.0 } } }
     swap set-gadget-interior ;
 
-: tutorial-style
-    H{
-        { font "serif" }
-        { font-size 24 }
-        { wrap-margin 700 }
-    } ;
-
 : <page> ( list -- gadget )
-    [ tutorial-style [ print-element ] with-style ] make-pane
+    [
+        mslug-stylesheet clone [
+            [ print-element ] with-default-style
+        ] bind
+    ] make-pane
     dup page-theme ;
 
 : $slide ( element -- )
