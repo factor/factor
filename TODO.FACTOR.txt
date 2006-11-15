@@ -5,10 +5,10 @@
   - all-words
   - make-image
   - workspace-window
+  - apropos
+  - 10000 [ dup number>string ] map describe in the UI
 - menu should stay up if mouse button released
 - roundoff is still not quite right with tracks
-- grid displays quickly now, but constructing large amounts of gadgets
-  is slow: eg, 10000 [ dup number>string ] map describe
 - completion is not ideal: eg, C+e "buttons"
 - slider needs to be modelized
 - better help result ranking
@@ -21,11 +21,8 @@
 - amd64 structs-by-value bug
 - intrinsic fixnum>float float>fixnum
 - mac intel: struct returns from objc methods
-- faster apropos
 - compiled call traces
-- workspace window takes too long to come up
 - new windows don't always have focus, eg focus follows mouse
-- dataflow for [ ] map [ ] subset looks weird (wrong?)
 - listener commands from a menu should not include 'hide-glass' etc
 - bogus compile errors?
 - recompile get/set/>n/n>/ndrop if needed
