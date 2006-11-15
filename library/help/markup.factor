@@ -49,7 +49,7 @@ M: f print-element drop ;
     [ print-element ] with-style ;
 
 : with-default-style ( quot -- )
-    default-style [
+    default-style get [
         last-element off
         H{ } swap with-nesting
     ] with-style ; inline
@@ -66,13 +66,13 @@ M: f print-element drop ;
 
 ! Some spans
 
-: $snippet [ snippet-style print-element* ] ($span) ;
+: $snippet [ snippet-style get print-element* ] ($span) ;
 
-: $emphasis [ emphasis-style print-element* ] ($span) ;
+: $emphasis [ emphasis-style get print-element* ] ($span) ;
 
-: $strong [ strong-style print-element* ] ($span) ;
+: $strong [ strong-style get print-element* ] ($span) ;
 
-: $url [ url-style print-element* ] ($span) ;
+: $url [ url-style get print-element* ] ($span) ;
 
 : $terpri terpri terpri drop ;
 
@@ -81,13 +81,13 @@ M: f print-element drop ;
     last-element get [ terpri ] when ($block) ; inline
 
 : $heading ( element -- )
-    [ heading-style print-element* ] ($heading) ;
+    [ heading-style get print-element* ] ($heading) ;
 
 : ($code) ( presentation quot -- )
     [
-        code-style [
+        code-style get [
             last-element off
-            >r presented associate code-style hash-union r>
+            >r presented associate code-style get hash-union r>
             with-nesting
         ] with-style
     ] ($block) ; inline
@@ -117,7 +117,7 @@ M: f print-element drop ;
 
 : $example ( element -- )
     1 swap cut* swap "\n" join dup <input> [
-        input-style format terpri print-element
+        input-style get format terpri print-element
     ] ($code) ;
 
 : $markup-example ( element -- )
@@ -126,7 +126,7 @@ M: f print-element drop ;
 
 : $warning ( element -- )
     [
-        warning-style [
+        warning-style get [
             last-element off
             "Warning" $heading print-element
         ] with-nesting
@@ -136,7 +136,7 @@ M: f print-element drop ;
 : >link ( obj -- obj ) dup link? [ <link> ] unless ;
 
 : ($link) ( article -- )
-    link-style [
+    link-style get [
         dup article-title swap >link write-object
     ] with-style ;
 
@@ -144,7 +144,7 @@ M: f print-element drop ;
     first ($link) ;
 
 : $vocab-link ( element -- )
-    first link-style [
+    first link-style get [
         dup <vocab-link> write-object
     ] with-style ;
 
@@ -166,7 +166,7 @@ M: f print-element drop ;
         drop
     ] [
         [
-            doc-path-style [
+            doc-path-style get [
                 "Parent topics: " write $links
             ] with-style
         ] ($block)
@@ -174,16 +174,16 @@ M: f print-element drop ;
 
 : $grid ( content style -- )
     [
-        table-content-style [
+        table-content-style get [
             [ last-element off print-element ] tabular-output
         ] with-style
     ] ($block) table last-element set ;
 
 : $list ( element -- )
-    [  "-" swap 2array ] map list-style $grid ;
+    [  "-" swap 2array ] map list-style get $grid ;
 
 : $table ( element -- )
-    table-style $grid ;
+    table-style get $grid ;
 
 : $values ( element -- )
     "Inputs and outputs" $heading
@@ -209,8 +209,8 @@ M: f print-element drop ;
 
 : ($see) ( word -- )
     [
-        code-style [
-            code-style [ see ] with-nesting
+        code-style get [
+            code-style get [ see ] with-nesting
         ] with-style
     ] ($block) ;
 

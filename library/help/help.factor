@@ -26,8 +26,8 @@ M: word article-content
     ] { } make ;
 
 : $title ( topic -- )
-    title-style [
-        title-style [
+    title-style get [
+        title-style get [
             dup [ 1array $link ] ($block) $doc-path
         ] with-nesting
     ] with-style terpri ;
@@ -43,7 +43,7 @@ M: word article-content
 
 : $subtopic ( element -- )
     [
-        subtopic-style [
+        subtopic-style get [
             unclip f rot [ print-content ] curry write-outliner
         ] with-style
     ] ($block) ;
@@ -55,11 +55,11 @@ M: word article-content
 
 : $subsection ( element -- )
     [
-        subsection-style [ first ($subsection) ] with-style
+        subsection-style get [ first ($subsection) ] with-style
     ] ($block) ;
 
 : help-outliner ( seq quot -- )
-    subsection-style [
+    subsection-style get [
         sort-articles [ ($subsection) ] [ terpri ] interleave
     ] with-style ;
 

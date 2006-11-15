@@ -1,4 +1,5 @@
-USING: help io kernel prettyprint prettyprint-internals words ;
+IN: help
+USING: io kernel prettyprint prettyprint-internals words ;
 
 : $prettyprinting-note
     drop {
