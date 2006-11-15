@@ -33,7 +33,7 @@ $io-error ;
 
 HELP: stream-write
 { $values { "str" "a string" } { "stream" "an output stream" } }
-{ $contract "Writes a character of output to the stream. If the stream does buffering, output may not be performed immediately; use " { $link stream-flush } " to force output." }
+{ $contract "Writes a string of output to the stream. If the stream does buffering, output may not be performed immediately; use " { $link stream-flush } " to force output." }
 $io-error ;
 
 HELP: stream-flush
