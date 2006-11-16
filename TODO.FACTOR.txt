@@ -35,6 +35,8 @@
 - overhaul models, set-model* is crap
 - fix windows gcc issue
 - robustify stepper -- see if step back past a throw works
+- httpd crash
+- fep when closing window
 
 + ui:
 

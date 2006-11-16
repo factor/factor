@@ -64,4 +64,5 @@ PROVIDE: library/compiler
     "test/optimizer.factor"
     "test/alien.factor"
     "test/callbacks.factor"
+    "test/stack-trace.factor"
 } } ;
