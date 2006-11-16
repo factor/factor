@@ -140,7 +140,6 @@ clean:
 	rm -f vm/*.o
 
 clean.app:
-	rm -rf $(BUNDLE)/Contents/Resources/
 	rm -f $(BUNDLE)/Contents/MacOS/Factor
 
 .c.o:
