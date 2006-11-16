@@ -36,11 +36,11 @@ DEFER: literal-template ( literals -- template )
 ! Load a literal (immediate or indirect)
 G: load-literal ( obj vreg -- ) 1 standard-combination ;
 
-! Set up caller stack frame (PowerPC and AMD64)
-: %prologue ( n -- ) drop ; inline
+! Set up caller stack frame
+DEFER: %prologue ( n -- )
 
-! Tear down stack frame (PowerPC and AMD64)
-: %epilogue ( -- ) ; inline
+! Tear down stack frame
+DEFER: %epilogue ( -- )
 
 ! Tail call another word
 DEFER: %jump ( label -- )

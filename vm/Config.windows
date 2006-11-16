@@ -2,3 +2,4 @@ CFLAGS += -DWINDOWS
 LIBS = -lm
 PLAF_SUFFIX = .exe
 PLAF_OBJS = vm/os-windows.o
+include wm/Config.x86

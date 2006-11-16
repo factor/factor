@@ -263,13 +263,16 @@ CELL native_stack_trace(void)
 
 	while((CELL)frame < (CELL)stack_chain->native_stack_pointer)
 	{
-		fflush(stdout);
 		REGISTER_ARRAY(array);
 		CELL cell = allot_cell((CELL)frame->return_address);
 		UNREGISTER_ARRAY(array);
 		GROWABLE_ADD(array,cell);
 		if((CELL)frame->previous <= (CELL)frame)
-			critical_error("C stack is busted",(CELL)frame);
+		{
+			fprintf(stderr,"Factor warning: unusual C stack layout\n");
+			fflush(stderr);
+			break;
+		}
 		frame = frame->previous;
 	}
 

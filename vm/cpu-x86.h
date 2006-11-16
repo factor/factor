@@ -6,12 +6,7 @@ CELL cards_offset;
 
 INLINE void flush_icache(CELL start, CELL len) {}
 
-INLINE void *native_stack_pointer(void)
-{
-	void *ptr;
-	asm("mov %%ebp, %0" : "=r" (ptr));
-	return ptr;
-}
+void *native_stack_pointer(void);
 
 typedef struct _F_STACK_FRAME {
 	struct _F_STACK_FRAME *previous;

@@ -96,6 +96,14 @@ M: immediate load-literal
 M: object load-literal
     v>operand load-indirect ;
 
+: %prologue ( n -- )
+    drop
+    EBP PUSH
+    EBP ESP MOV ;
+
+: %epilogue ( -- )
+    LEAVE ;
+
 : (%call) ( label -- label )
     dup (compile) dup primitive? [ address-operand ] when ;
 

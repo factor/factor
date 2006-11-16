@@ -323,6 +323,7 @@ M: label JUMPcc (JUMPcc) rel-label ;
 : JLE HEX: 8e JUMPcc ;
 : JG  HEX: 8f JUMPcc ;
 
+: LEAVE ( -- ) HEX: c9 , ;
 : RET ( -- ) HEX: c3 , ;
 
 ! Arithmetic

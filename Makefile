@@ -12,7 +12,7 @@ ifdef DEBUG
 	CFLAGS = -g
 	STRIP = touch
 else
-	CFLAGS = -Wall -O3 -ffast-math -fomit-frame-pointer $(SITE_CFLAGS)
+	CFLAGS = -Wall -O3 -ffast-math $(SITE_CFLAGS)
 	STRIP = strip
 endif
 
@@ -73,11 +73,11 @@ macosx-ppc: macosx-freetype
 	$(MAKE) $(BINARY) CONFIG=vm/Config.macosx.ppc
 
 macosx-x86: macosx-freetype
-	$(MAKE) $(BINARY) CONFIG=vm/Config.macosx
+	$(MAKE) $(BINARY) CONFIG=vm/Config.macosx.x86
 
 linux-x86:
-	$(MAKE) $(BINARY) CONFIG=vm/Config.linux
-	$(STRIP) $(BINARY)
+	$(MAKE) $(BINARY) CONFIG=vm/Config.linux.x86
+	# $(STRIP) $(BINARY)
 
 linux-amd64:
 	$(MAKE) $(BINARY) CONFIG=vm/Config.linux.amd64
