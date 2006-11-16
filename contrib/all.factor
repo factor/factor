@@ -11,10 +11,10 @@ contrib/jni contrib/json contrib/lambda contrib/lazy-lists
 contrib/lindenmayer contrib/match contrib/math
 contrib/parser-combinators contrib/postgresql contrib/process
 contrib/random-tester contrib/rss contrib/sequences
-contrib/serialize contrib/slate contrib/space-invaders
-contrib/splay-trees contrib/sqlite contrib/textmate
-contrib/topology contrib/units contrib/usb contrib/vars
-contrib/vim contrib/xml ;
+contrib/serialize contrib/shuffle contrib/slate
+contrib/space-invaders contrib/splay-trees contrib/sqlite
+contrib/textmate contrib/topology contrib/units contrib/usb
+contrib/vars contrib/vim contrib/xml ;
 
 "x11" vocab [
     "contrib/factory" require

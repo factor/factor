@@ -44,6 +44,7 @@ Available libraries:
 - rss -- Code to retrieve and parse an RSS2 file (Chris Double)
 - sequences -- Non-core sequence words (Eduardo Cavazos)
 - serialize -- Binary object serialization (Chris Double)
+- shuffle -- Shuffle words not in the core library (Doug Coleman)
 - slate -- Graphics canvas for the UI (Eduardo Cavazos)
 - slate-examples -- Examples of how to use slate (Eduardo Cavazos)
 - space-invaders -- Intel 8080-based Space Invaders arcade machine emulator (Chris Double)
