@@ -1,5 +1,5 @@
 IN: temporary
-USING: errors compiler test namespaces sequences ;
+USING: errors compiler test namespaces sequences kernel-internals ;
 
 : foo 3 throw 7 ;
 : bar foo 4 ;

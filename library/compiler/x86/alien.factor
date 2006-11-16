@@ -30,11 +30,11 @@ kernel-internals math memory namespaces words ;
     nip
     ! Compute source address in EAX
     EAX ESP MOV
-    EAX 4 ADD
+    EAX 8 ADD
     "box_value_struct" struct-ptr/size ;
 
 : %box ( n reg-class func -- )
-    rot [ 4 + pick load-return-reg ] when*
+    rot [ 8 + pick load-return-reg ] when*
     over push-return-reg
     f %alien-invoke
     drop-return-reg ;
