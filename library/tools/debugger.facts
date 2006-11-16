@@ -2,10 +2,6 @@ IN: errors
 USING: alien arrays generic help kernel math memory
 strings vectors ;
 
-HELP: restarts
-{ $var-description "Global variable holding the set of possible restarts for the most recently thrown error." }
-{ $notes "Only updated by " { $link throw } ", not " { $link rethrow } "." } ;
-
 HELP: :s
 { $description "Prints the data stack at the time of the most recent error. Used for interactive debugging." } ;
 

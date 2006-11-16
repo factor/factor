@@ -3,13 +3,13 @@ CC = gcc
 BINARY = f
 IMAGE = factor.image
 BUNDLE = Factor.app
-VERSION = 0.86
+VERSION = 0.87
 DISK_IMAGE_DIR = Factor-$(VERSION)
 DISK_IMAGE = Factor-$(VERSION).dmg
 LIBPATH = -L/usr/X11R6/lib
 
 ifdef DEBUG
-	CFLAGS = -pg -O1
+	CFLAGS = -g
 	STRIP = touch
 else
 	CFLAGS = -Wall -O3 -ffast-math -fomit-frame-pointer $(SITE_CFLAGS)

@@ -1,12 +1,43 @@
 ! Copyright (C) 2004, 2006 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: arrays definitions generic hashtables help tools io
-kernel kernel-internals math namespaces parser prettyprint
-sequences sequences-internals strings styles vectors words ;
-IN: errors
+kernel math namespaces parser prettyprint sequences
+sequences-internals strings styles vectors words errors ;
+IN: kernel-internals
 
-PREDICATE: array kernel-error ( obj -- ? )
-    dup first \ kernel-error eq? swap second 0 18 between? and ;
+: save-error ( error trace continuation -- )
+    error-continuation set-global
+    error-stack-trace set-global
+    dup error set-global
+    compute-restarts restarts set-global ;
+
+: error-handler ( error trace -- )
+    dupd continuation save-error rethrow ;
+
+: init-error-handler ( -- )
+    V{ } clone set-catchstack
+    ! kernel calls on error
+    [ error-handler ] 5 setenv
+    \ kernel-error 12 setenv ;
+
+: code-heap-start 17 getenv ;
+: code-heap-end 18 getenv ;
+
+: <xt-map> ( -- xtmap )
+    [
+        f code-heap-start 2array ,
+	    all-words [ compiled? ] subset
+	    [ dup word-xt 2array , ] each
+        f  code-heap-end 2array ,
+    ] { } make [ [ second ] 2apply - ] sort ;
+
+: find-xt ( xt xtmap -- word )
+    [ second - ] binsearch* first ;
+
+: symbolic-stack-trace ( seq -- seq )
+    <xt-map> swap [ dup pick find-xt 2array ] map nip ;
+
+IN: errors
 
 GENERIC: error. ( error -- )
 GENERIC: error-help ( error -- topic )
@@ -19,16 +50,29 @@ M: tuple error-help class ;
 
 M: string error. print ;
 
-SYMBOL: restarts
-
 : :s ( -- )
     error-continuation get continuation-data stack. ;
 
 : :r ( -- )
     error-continuation get continuation-retain stack. ;
 
+: xt. ( xt -- )
+    >hex cell 2 * CHAR: 0 pad-left write ;
+
+: word-xt. ( xt word -- )
+    "Compiled: " write dup pprint bl
+    "(offset " write word-xt - >hex write ")" write ;
+
+: bare-xt. ( xt -- )
+    "C code:   " write xt. ;
+
+: :trace
+    error-stack-trace get symbolic-stack-trace <reversed> [
+        first2 [ word-xt. ] [ bare-xt. ] if* terpri
+    ] each ;
+
 : :c ( -- )
-    error-continuation get continuation-call callstack. ;
+    error-continuation get continuation-call callstack. :trace ;
 
 : :get ( variable -- value )
     error-continuation get continuation-name hash-stack ;
@@ -99,17 +143,3 @@ SYMBOL: restarts
     ] recover drop ;
 
 : try ( quot -- ) [ print-error ] recover ;
-
-: save-error ( error continuation -- )
-    error-continuation set-global
-    dup error set-global
-    compute-restarts restarts set-global ;
-
-: error-handler ( error -- )
-    dup continuation save-error rethrow ;
-
-: init-error-handler ( -- )
-    V{ } clone set-catchstack
-    ! kernel calls on error
-    [ error-handler ] 5 setenv
-    \ kernel-error 12 setenv ;

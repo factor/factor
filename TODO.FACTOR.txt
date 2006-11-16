@@ -1,5 +1,9 @@
 + 0.87:
 
+- amd64 structs-by-value bug
+- intrinsic fixnum>float float>fixnum
+- compiled call traces
+
 - fix search unit test
 - these things are "Too Slow":
   - all-words
@@ -18,10 +22,7 @@
 - graphical crossref tool
 - ui browser: show currently selected vocab & words
 - auto-update browser and help when sources reload
-- amd64 structs-by-value bug
-- intrinsic fixnum>float float>fixnum
 - mac intel: struct returns from objc methods
-- compiled call traces
 - new windows don't always have focus, eg focus follows mouse
 - listener commands from a menu should not include 'hide-glass' etc
 - bogus compile errors?
@@ -32,7 +33,6 @@
 - ui docs
 - some kind of declarative wiring framework for ui
 - overhaul models, set-model* is crap
-- allow rebinding styles
 - fix windows gcc issue
 - robustify stepper -- see if step back past a throw works
 

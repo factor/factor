@@ -85,8 +85,7 @@ void primitive_stat(void)
 void primitive_read_dir(void)
 {
 	DIR* dir = opendir(unbox_char_string());
-	CELL result_count = 0;
-	F_ARRAY *result = allot_array(ARRAY_TYPE,100,F);
+	GROWABLE_ARRAY(result);
 
 	if(dir != NULL)
 	{
@@ -94,24 +93,16 @@ void primitive_read_dir(void)
 
 		while((file = readdir(dir)) != NULL)
 		{
-			if(result_count == array_capacity(result))
-			{
-				result = reallot_array(result,
-					result_count * 2,F);
-			}
-
 			REGISTER_ARRAY(result);
 			CELL name = tag_object(from_char_string(file->d_name));
 			UNREGISTER_ARRAY(result);
-
-			set_array_nth(result,result_count,name);
-			result_count++;
+			GROWABLE_ADD(result,name);
 		}
 
 		closedir(dir);
 	}
 
-	result = reallot_array(result,result_count,F);
+	GROWABLE_TRIM(result);
 
 	dpush(tag_object(result));
 }

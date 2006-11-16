@@ -38,7 +38,7 @@ HELP: font
 { $description "Character style. Font family named by a string." }
 { $examples
     "This example outputs some different font sizes:"
-    { $code "{ \"Monospaced\" \"Serif\" \"Sans Serif\" }\n[ dup font associate format terpri ] each" }
+    { $code "{ \"monospace\" \"serif\" \"sans-serif\" }\n[ dup font associate format terpri ] each" }
 } ;
 
 HELP: font-size
@@ -90,7 +90,7 @@ HELP: outline
 { $see-also write-outliner } ;
 
 HELP: table-gap
-{ $description "Table style. Pixels between table cells." }
+{ $description "Table style. Horizontal and vertical gap between table cells, denoted by a pair of integers." }
 { $see-also with-stream-table tabular-output } ;
 
 HELP: table-border

@@ -115,31 +115,23 @@ void primitive_read_dir(void)
 
 	sprintf(path, "%s\\*", unbox_char_string());
 
-	F_ARRAY *result = allot_array(ARRAY_TYPE,100,F);
+	GROWABLE_ARRAY(result);
 
 	if(INVALID_HANDLE_VALUE != (dir = FindFirstFile(path, &find_data)))
 	{
 		do
 		{
-			if(result_count == array_capacity(result))
-			{
-				result = reallot_array(result,
-					result_count * 2,F);
-			}
-
 			REGISTER_ARRAY(result);
 			CELL name = tag_object(from_char_string(
 				find_data.cFileName));
 			UNREGISTER_ARRAY(result);
-
-			set_array_nth(result,result_count,name);
-			result_count++;
+			GROWABLE_ADD(result,name);
 		}
 		while (FindNextFile(dir, &find_data));
 		CloseHandle(dir);
 	}
 
-	result = reallot_array(result,result_count,F);
+	GROWABLE_TRIM(result);
 
 	dpush(tag_object(result));
 }

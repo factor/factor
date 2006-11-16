@@ -25,6 +25,8 @@ void init_factor(const char* image,
 	userenv[GEN_ENV] = tag_fixnum(gen_count);
 	userenv[IMAGE_ENV] = tag_object(from_char_string(image));
 	userenv[CELL_SIZE_ENV] = tag_fixnum(sizeof(CELL));
+	userenv[CODE_HEAP_START_ENV] = allot_cell(compiling.base);
+	userenv[CODE_HEAP_END_ENV] = allot_cell(compiling.limit);
 }
 
 INLINE bool factor_arg(const char* str, const char* arg, CELL* value)

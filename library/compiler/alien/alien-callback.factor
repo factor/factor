@@ -2,7 +2,8 @@
 ! See http://factorcode.org/license.txt for BSD license.
 IN: alien
 USING: compiler errors generic hashtables inference
-kernel namespaces sequences strings words parser prettyprint ;
+kernel namespaces sequences strings words parser prettyprint
+kernel-internals ;
 
 ! Callbacks are registered in a global hashtable. If you clear
 ! this hashtable, they will all be blown away by code GC, beware

@@ -44,7 +44,7 @@ M: hashtable sheet hash>alist ;
 
 : describe ( object -- ) dup summary print sheet sheet. ;
 
-: stack. ( seq -- ) <reversed> >array sheet sheet. ;
+: stack. ( seq -- ) >array sheet sheet. ;
 
 : .s ( -- ) datastack stack. ;
 : .r ( -- ) retainstack stack. ;
@@ -58,6 +58,6 @@ M: hashtable sheet hash>alist ;
     ] with-scope ;
 
 : callstack. ( seq -- )
-    3 group <reversed> [ first2 1- callframe. ] each ;
+    3 group [ first2 1- callframe. ] each ;
 
 : .c ( -- ) callstack callstack. ;

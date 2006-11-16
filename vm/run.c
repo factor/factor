@@ -53,6 +53,7 @@ void handle_error(void)
 			fix_stacks();
 
 		dpush(thrown_error);
+		dpush(thrown_native_stack_trace);
 		/* Notify any 'catch' blocks */
 		push_callframe();
 		set_callframe(userenv[BREAK_ENV]);
@@ -103,6 +104,7 @@ void interpreter_loop(void)
 
 void interpreter(void)
 {
+	stack_chain->native_stack_pointer = native_stack_pointer();
 	SETJMP(stack_chain->toplevel);
 	handle_error();
 	interpreter_loop();
@@ -254,6 +256,28 @@ void early_error(CELL error)
 	}
 }
 
+CELL native_stack_trace(void)
+{
+	F_STACK_FRAME *frame = native_stack_pointer();
+	GROWABLE_ARRAY(array);
+
+	while((CELL)frame < (CELL)stack_chain->native_stack_pointer)
+	{
+		fflush(stdout);
+		REGISTER_ARRAY(array);
+		CELL cell = allot_cell((CELL)frame->return_address);
+		UNREGISTER_ARRAY(array);
+		GROWABLE_ADD(array,cell);
+		if((CELL)frame->previous <= (CELL)frame)
+			critical_error("C stack is busted",(CELL)frame);
+		frame = frame->previous;
+	}
+
+	GROWABLE_TRIM(array);
+
+	return tag_object(array);
+}
+
 void throw_error(CELL error, bool keep_stacks)
 {
 	early_error(error);
@@ -263,6 +287,7 @@ void throw_error(CELL error, bool keep_stacks)
 	thrown_keep_stacks = keep_stacks;
 	thrown_ds = ds;
 	thrown_rs = rs;
+	thrown_native_stack_trace = native_stack_trace();
 
 	/* Return to interpreter() function */
 	LONGJMP(stack_chain->toplevel,1);

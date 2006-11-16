@@ -12,22 +12,24 @@ CELL callframe_end;
 
 #define USER_ENV 32
 
-#define CELL_SIZE_ENV     1 /* sizeof(CELL) */
-#define NLX_VECTOR_ENV    2 /* non-local exit hook, used by library only */
-#define NAMESTACK_ENV     3 /* used by library only */
-#define GLOBAL_ENV        4
-#define BREAK_ENV         5
-#define CATCHSTACK_ENV    6 /* used by library only */
-#define CPU_ENV           7
-#define BOOT_ENV          8
-#define CALLCC_1_ENV      9 /* used by library only */
-#define ARGS_ENV          10
-#define OS_ENV            11
-#define ERROR_ENV         12 /* a marker consed onto kernel errors */
-#define IN_ENV            13
-#define OUT_ENV           14
-#define GEN_ENV           15 /* set to gen_count */
-#define IMAGE_ENV         16 /* image name */
+#define CELL_SIZE_ENV       1 /* sizeof(CELL) */
+#define NLX_VECTOR_ENV      2 /* non-local exit hook, used by library only */
+#define NAMESTACK_ENV       3 /* used by library only */
+#define GLOBAL_ENV          4
+#define BREAK_ENV           5
+#define CATCHSTACK_ENV      6 /* used by library only */
+#define CPU_ENV             7
+#define BOOT_ENV            8
+#define CALLCC_1_ENV        9 /* used by library only */
+#define ARGS_ENV            10
+#define OS_ENV              11
+#define ERROR_ENV           12 /* a marker consed onto kernel errors */
+#define IN_ENV              13
+#define OUT_ENV             14
+#define GEN_ENV             15 /* set to gen_count */
+#define IMAGE_ENV           16 /* image name */
+#define CODE_HEAP_START_ENV 17 /* start of code heap, used by :trace */
+#define CODE_HEAP_END_ENV   18 /* end of code heap, used by :trace */
 
 /* TAGGED user environment data; see getenv/setenv prims */
 DLLEXPORT CELL userenv[USER_ENV];
@@ -176,6 +178,7 @@ volatile bool throwing;
 /* When throw_error throws an error, it sets this global and
 longjmps back to the top-level. */
 CELL thrown_error;
+CELL thrown_native_stack_trace;
 CELL thrown_keep_stacks;
 /* Since longjmp restores registers, we must save all these values. */
 CELL thrown_ds;

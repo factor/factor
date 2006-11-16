@@ -1,7 +1,7 @@
 ! Copyright (C) 2004, 2006 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 IN: kernel-internals
-USING: arrays generic namespaces sequences ;
+USING: arrays generic namespaces sequences math ;
 
 : >c ( continuation -- ) catchstack* push ;
 : c> ( -- continuation ) catchstack* pop ;
@@ -11,6 +11,8 @@ USING: kernel ;
 
 SYMBOL: error
 SYMBOL: error-continuation
+SYMBOL: error-stack-trace
+SYMBOL: restarts
 
 : catch ( try -- error/f )
     [ >c call f c> drop f ] callcc1 nip ; inline
@@ -48,5 +50,8 @@ M: condition compute-restarts
     [ delegate compute-restarts ] keep
     [ condition-cc ] keep
     condition-restarts [ swap add ] map-with append ;
+
+PREDICATE: array kernel-error ( obj -- ? )
+    dup first \ kernel-error eq? swap second 0 18 between? and ;
 
 DEFER: try

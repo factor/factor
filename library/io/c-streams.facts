@@ -17,8 +17,8 @@ HELP: <file-writer>
 
 HELP: <client>
 { $values { "host" "a string" } { "port" "an integer between 0 and 65535" } { "stream" "a bidirectional stream" } }
-{ $description "Connects to TCP/IP port number " { $code "port" } " on the host named by " { $code "host" } ", and outputs a bidirectional stream." }
-{ $errors "Throws an error if domain name lookup fails, or if there is a connection cannot be established." } ;
+{ $description "Connects to TCP/IP port number " { $snippet "port" } " on the host named by " { $snippet "host" } ", and outputs a bidirectional stream." }
+{ $errors "Throws an error if domain name lookup fails, or if the connection cannot be established." } ;
 
 HELP: <server>
 { $values  { "port" "an integer between 0 and 65535" } { "server" "a handle" } }
@@ -32,10 +32,10 @@ HELP: <server>
 { $errors "Throws an error if the port is already in use, or if the OS forbits access." } ;
 
 HELP: accept
-{ $values { "server" "a handle" } { "stream" "a bidirectional stream" } }
+{ $values { "server" "a handle" } { "client" "a bidirectional stream" } }
 { $description "Waits for a connection to a server socket created by " { $link <server> } ", and outputs a bidirectional stream when the connection has been established."
 $terpri
-"The client socket supports two accessor words to get the host name and port number of the incoming connection:"
+"The new stream supports two accessor words to get the host name and port number of the incoming connection:"
 { $list { $link client-stream-host } { $link client-stream-port } } }
 { $errors "Throws an error if the server socket is closed or otherwise is unavailable." } ;
 

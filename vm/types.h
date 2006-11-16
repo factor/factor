@@ -50,6 +50,32 @@ INLINE CELL array_capacity(F_ARRAY* array)
 	return array->capacity >> TAG_BITS;
 }
 
+#define GROWABLE_ARRAY(result) \
+	CELL result##_count = 0; \
+	F_ARRAY *result = allot_array(ARRAY_TYPE,100,F)
+
+INLINE F_ARRAY *growable_add(F_ARRAY *result, CELL elt, CELL *result_count)
+{
+	REGISTER_ROOT(elt);
+
+	if(*result_count == array_capacity(result))
+	{
+		result = reallot_array(result,
+			*result_count * 2,F);
+	}
+
+	UNREGISTER_ROOT(elt);
+	set_array_nth(result,*result_count,elt);
+	*result_count = *result_count + 1;
+
+	return result;
+}
+
+#define GROWABLE_ADD(result,elt) \
+	result = growable_add(result,elt,&result##_count)
+
+#define GROWABLE_TRIM(result) result = reallot_array(result,result##_count,F)
+
 INLINE F_VECTOR* untag_vector(CELL tagged)
 {
 	type_check(VECTOR_TYPE,tagged);

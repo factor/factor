@@ -34,6 +34,9 @@ typedef struct _F_STACKS {
 	/* saved extra_roots pointer on entry to callback */
 	CELL extra_roots;
 
+	/* C stack pointer on entry */
+	void *native_stack_pointer;
+
 	/* error handler longjmp buffer */
 	JMP_BUF toplevel;
 
