@@ -5,13 +5,12 @@ USING: assembler errors kernel kernel-internals math namespaces ;
 
 ! OS X uses a different ABI. The stack must be 16-byte aligned.
 
-: stack-increment \ stack-reserve get 16 align 16 + cell - ;
+: stack-increment \ stack-reserve get 16 align 16 + 2 cells - ;
 
 : %prologue ( n -- )
+    EBP PUSH
+    EBP ESP MOV
     \ stack-reserve set stack-reg stack-increment SUB ;
-
-: %epilogue ( -- )
-    stack-reg stack-increment ADD ;
 
 : align-sub ( n -- )
     dup 16 align swap - ESP swap SUB ;
@@ -55,7 +54,7 @@ USING: assembler errors kernel kernel-internals math namespaces ;
 
 : %box-struct ( n size -- )
     over [
-        >r stack-increment + cell + r>
+        >r stack-increment + 2 cells + r>
         "box_value_struct" struct-ptr/size 
     ] [
         nip 8 = [
@@ -71,7 +70,7 @@ USING: assembler errors kernel kernel-internals math namespaces ;
     #! frame, since %box sets one up to call the one-arg boxer
     #! function. The size of this stack frame so far depends on
     #! the reg-class of the boxer's arg.
-    16 swap reg-size - + stack-increment + cell + ;
+    16 swap reg-size - + stack-increment + 2 cells + ;
 
 : (%box) ( n reg-class -- )
     #! If n is f, push the return register onto the stack; we
