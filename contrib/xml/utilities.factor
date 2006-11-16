@@ -1,7 +1,8 @@
 ! Copyright (C) 2005, 2006 Daniel Ehrenberg
 ! See http://factorcode.org/license.txt for BSD license.
 IN: xml
-USING: kernel namespaces sequences words io errors hashtables parser arrays ;
+USING: kernel namespaces sequences words io errors hashtables
+    strings parser arrays ;
 
 ! * Easy XML generation for more literal things
 ! should this be rewritten?
@@ -33,7 +34,7 @@ M: process-missing error.
 
 : run-process ( tag word -- )
     2dup "xtable" word-prop
-    >r dup tag-name r> hash* [ 2nip call ] [
+    >r dup tag-name name-tag r> hash* [ 2nip call ] [
         drop <process-missing> throw
     ] if ;
 
@@ -48,3 +49,24 @@ M: process-missing error.
         rot "/" split [ >r 2dup r> swap set-hash ] each 2drop
     ] f ; parsing
 
+
+! * Common utility functions
+
+: build-tag* ( items name -- tag )
+    "" swap <name> "" over set-name-url
+    swap >r H{ } r> <tag> ;
+
+: build-tag ( item name -- tag )
+    >r 1array r> build-tag* ;
+
+: build-xml-doc ( tag -- xml-doc )
+    T{ prolog f "1.0" "iso-8859-1" f } { } rot { } <xml-doc> ;
+
+: children>string ( tag -- string )
+    tag-children [ string? ] subset concat ;
+
+: children-tags ( tag -- sequence )
+    tag-children [ any-tag? ] subset ;
+
+: first-child-tag ( tag -- tag )
+    tag-children [ any-tag? ] find nip ;
