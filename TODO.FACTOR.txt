@@ -1,22 +1,36 @@
 + 0.87:
 
-- claim: if module fails to load, reloading it doesn't work?
+- tabs across the bottom:
+  [History] [Words] [Vocabs] [Sources] [Modules] [Help]
+  to show various search gadgets
+- list: primary/secondary action
+- search gadget: actions should 
+- fix top level window positioning when opening new windows
+  - cocoa: [center]
+  - x11: let the wm take care of it
+  - windows: ?
+- scroll>rect broken if there are gadgets in between
+- completion is not ideal: eg, C+e "buttons"
+- crashes:
+  - windows gcc issue
+  - robustify stepper -- see if step back past a throw works
+  - callback scheduling issue
+  - httpd crash
+  - fep when closing window
+  - got a random sig11 while reloading/recompiling
 - these things are "Too Slow":
   - all-words
   - make-image
   - workspace-window
   - apropos
   - 10000 [ dup number>string ] map describe in the UI
+  - available-modules
+  - :trace
 - menu should stay up if mouse button released
 - roundoff is still not quite right with tracks
-- completion is not ideal: eg, C+e "buttons"
 - slider needs to be modelized
-- better help result ranking
-- help search looks funny
 - variable width word wrap
-- graphical module manager tool
 - graphical crossref tool
-- ui browser: show currently selected vocab & words
 - auto-update browser and help when sources reload
 - mac intel: struct returns from objc methods
 - new windows don't always have focus, eg focus follows mouse
@@ -24,27 +38,19 @@
 - bogus compile errors?
 - recompile get/set/>n/n>/ndrop if needed
 - cross-word type inference
-- callback scheduling issue
 - ui docs
 - some kind of declarative wiring framework for ui
 - overhaul models, set-model* is crap
-- fix windows gcc issue
-- robustify stepper -- see if step back past a throw works
-- httpd crash
-- fep when closing window
-- compiled call traces needs work:
-  - :trace is kind of slow
+- compiled call traces:
   - should be independent of whenever the runtime was built with
     -fomit-frame-pointer or not
   - doesn't show #labels
   - we don't know if signal handlers run with the same stack or not
-- got a random sig11 while reloading/recompiling
 
 + ui:
 
 - some way of intercepting all gestures
 - how do we refer to command shortcuts in the docs?
-- fix top level window positioning
 - editor:
   - autoscroll
   - transpose char/word/line

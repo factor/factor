@@ -64,12 +64,6 @@ optimizer parser sequences sequences-internals words ;
             "Initializing native I/O..." print flush
             "native-io" get [ init-io ] when
 
-            ! We only do this if we are compiled, otherwise
-            ! it takes too long.
-            "Building online help search index..." print
-            flush
-            H{ } clone parent-graph set-global xref-help
-            H{ } clone term-index set-global index-help
         ] when
 
         [
@@ -82,6 +76,10 @@ optimizer parser sequences sequences-internals words ;
         "compile" get [ 
             [ recompile ] parse-hook set-global
         ] when
+
+        "Building online help search index..." print
+        flush
+        H{ } clone parent-graph set-global xref-help
 
         run-bootstrap-init
 

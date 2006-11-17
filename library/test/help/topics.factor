@@ -4,9 +4,9 @@ namespaces hashtables ;
 
 ! Test help cross-referencing
 
-{ "test" "b" } "Test B" { "Hello world." } f <article> add-article
+"Test B" { "Hello world." } f <article> { "test" "b" } add-article
 
-{ "test" "a" } "Test A" { { $subsection { "test" "b" } } } f <article> add-article
+"Test A" { { $subsection { "test" "b" } } } f <article> { "test" "a" } add-article
 
 { "test" "a" } remove-article
 
@@ -15,14 +15,6 @@ namespaces hashtables ;
 SYMBOL: foo
 
 { "test" "a" } "Test A" { { $subsection foo } } f <article> add-article
-
-foo { $description "Fie foe fee" } set-word-help
-
-[ t ] [ "Fie" search-help [ first foo eq? ] contains? ] unit-test
-
-\ foo forget
-
-[ f ] [ "Fie" search-help [ first foo eq? ] contains? ] unit-test
 
 ! Test article location recording
 

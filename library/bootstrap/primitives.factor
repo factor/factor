@@ -26,7 +26,6 @@ vocabularies get [ "syntax" set ] bind
 
 H{ } clone articles set
 parent-graph off
-term-index off
 crossref off
 changed-words off
 

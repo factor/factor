@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 IN: help
 USING: arrays io kernel namespaces parser prettyprint sequences
-words ;
+words hashtables definitions ;
 
 M: word article-title
     dup parsing? [
@@ -66,3 +66,27 @@ M: word article-content
 : $outliner ( element -- )
     first call dup empty?
     [ drop ] [ [ help-outliner ] ($block) ] if ;
+
+: remove-article ( name -- )
+    dup articles get hash-member? [
+        dup unxref-article
+        dup articles get remove-hash
+    ] when drop ;
+
+: add-article ( article name -- )
+    [ remove-article ] keep
+    [ articles get set-hash ] keep
+    xref-article ;
+
+: remove-word-help ( word -- )
+    dup word-help [ dup unxref-article ] when drop ;
+
+: set-word-help ( content word -- )
+    [ remove-word-help ] keep
+    [ swap "help" set-word-prop ] keep
+    xref-article ;
+
+! Definition protocol
+M: link forget link-name remove-article ;
+
+M: word-link forget f "help" set-word-prop ;

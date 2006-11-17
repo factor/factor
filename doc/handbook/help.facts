@@ -1,11 +1,9 @@
-USING: help porter-stemmer ;
+USING: help ;
 
 ARTICLE: "help" "The help system"
 "The help system maintains documentation written in a simple markup language, along with cross-referencing and search. Documentation can either exist as free-standing " { $emphasis "articles" } " or be associated with words."
 { $subsection "browsing-help" }
-{ $subsection "searching-help" }
-{ $subsection "writing-help" }
-{ $subsection "porter-stemmer" } ;
+{ $subsection "writing-help" } ;
 
 ARTICLE: "browsing-help" "Browsing documentation"
 "The easiest way to browse the help is from the help browser tool in the UI, however you can also display help topics in the listener."
@@ -14,21 +12,6 @@ ARTICLE: "browsing-help" "Browsing documentation"
 { $subsection help }
 "You can also view a word's documentation and definition at once:"
 { $subsection see-help } ;
-
-ARTICLE: "searching-help" "Searching documentation"
-"The help system maintains a full-text term index. The easiest way to search the help is from the help browser tool in the UI, however you can also search in the listener."
-{ $subsection search-help. }
-"A lower-level word:"
-{ $subsection search-help }
-{ $subsection "searching-help-impl" } ;
-
-ARTICLE: "searching-help-impl" "Full-text search implementation"
-"The help system search engine is a very simple full-text indexer. The index is rebuilt with a call to this word:"
-{ $subsection index-help }
-"This indexes every help topic by first tokenizing the article content and discarding certain words,"
-{ $subsection tokenize }
-"and then by adding it to the index:"
-{ $subsection index-text } ;
 
 ARTICLE: "writing-help" "Writing documentation"
 "By convention, documentation is written in files with the " { $snippet ".facts" } " filename extension. Module documentation should follow a few conventions documented in " { $link "documenting-modules" } "."
@@ -92,21 +75,3 @@ ARTICLE: "markup-utils" "Markup element utilities"
 { $subsection simple-element }
 { $subsection ($span) }
 { $subsection ($block) } ;
-
-ARTICLE: "porter-stemmer" "Porter stemming algorithm"
-"The help system uses the Porter stemming algorithm to normalize words when building the full-text search index."
-$terpri
-"The Factor implementation of the algorithm is based on the Common Lisp version, which was hand-translated from ANSI C by Steven M. Haflich. The original ANSI C was written by Martin Porter."
-$terpri
-"A detailed description of the algorithm, along with implementations in various languages, can be at in " { $url "http://www.tartarus.org/~martin/PorterStemmer" } "."
-$terpri
-"The main word of the algorithm takes an English word as input and outputs its stem:"
-{ $subsection stem }
-"The algorithm consists of a number of steps:"
-{ $subsection step1a }
-{ $subsection step1b }
-{ $subsection step1c }
-{ $subsection step2 }
-{ $subsection step3 }
-{ $subsection step4 }
-{ $subsection step5 } ;

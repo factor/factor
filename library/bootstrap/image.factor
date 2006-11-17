@@ -284,7 +284,7 @@ M: hashtable '
     [
         {
             vocabularies typemap builtins c-types crossref
-            articles parent-graph term-index changed-words
+            articles parent-graph changed-words
             modules class<map source-files
         } [ dup get swap bootstrap-word set ] each
     ] make-hash '
