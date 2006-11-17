@@ -8,7 +8,7 @@ gadgets-workspace help gadgets-buttons
 gadgets-search tools ;
 IN: gadgets-browser
 
-TUPLE: browser navigator definitions search ;
+TUPLE: browser navigator definitions ;
 
 TUPLE: definitions showing ;
 
@@ -48,6 +48,8 @@ C: tile ( definition -- gadget )
     2dup { tile } <toolbar>
     <tile-content> over set-gadget-delegate
     [ set-tile-definition ] keep ;
+
+tile "toolbar" { { "Close" f [ close-tile ] } } define-commands
 
 : show-definition ( definition definitions -- )
     2dup definition-index dup 0 >= [
@@ -93,17 +95,9 @@ C: browser ( -- gadget )
             [ <definitions> ]
             set-browser-definitions
             [ <scroller> ]
-            3/5
-        }
-        {
-            [ "" [ browser call-tool ] <word-search> ]
-            set-browser-search
-            [ "Word search" <labelled-gadget> ]
-            1/5
+            4/5
         }
     } { 0 1 } make-track* ;
-
-M: browser focusable-child* browser-search ;
 
 : show-vocab ( vocab browser -- )
     browser-navigator navigator-vocab set-model* ;

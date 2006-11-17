@@ -5,7 +5,7 @@ USING: gadgets gadgets-borders gadgets-buttons
 gadgets-panes gadgets-search gadgets-scrolling help kernel
 models namespaces sequences gadgets-tracks gadgets-workspace ;
 
-TUPLE: help-gadget pane history search ;
+TUPLE: help-gadget pane history ;
 
 : show-help ( link help -- )
     dup help-gadget-history add-history
@@ -26,17 +26,9 @@ C: help-gadget ( -- gadget )
             [ <help-pane> ]
             set-help-gadget-pane
             [ <scroller> ]
-            4/5
+            @center
         }
-        {
-            [ "" [ help-gadget call-tool ] <help-search> ]
-            set-help-gadget-search
-            [ "Help search" <labelled-gadget> ]
-            1/5
-        }
-    } { 0 1 } make-track* ;
-
-M: help-gadget focusable-child* help-gadget-search ;
+    } make-frame* ;
 
 M: help-gadget call-tool* show-help ;
 

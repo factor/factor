@@ -1,14 +1,13 @@
 + 0.87:
 
+- vocab links don't work
+- browse modules and vocabs by showing a new list
+- get rid of the navigator in the browser tool
+- list gadget mouse over help
 - tabs across the bottom:
   [History] [Words] [Vocabs] [Sources] [Modules] [Help]
   to show various search gadgets
-- list: primary/secondary action
-- search gadget: actions should 
-- fix top level window positioning when opening new windows
-  - cocoa: [center]
-  - x11: let the wm take care of it
-  - windows: ?
+- top level window positioning on ms windows
 - scroll>rect broken if there are gadgets in between
 - completion is not ideal: eg, C+e "buttons"
 - crashes:
@@ -17,7 +16,7 @@
   - callback scheduling issue
   - httpd crash
   - fep when closing window
-  - got a random sig11 while reloading/recompiling
+  - : foo \ each reload foo ; foo  eventually crashes
 - these things are "Too Slow":
   - all-words
   - make-image

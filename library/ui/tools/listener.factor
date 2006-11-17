@@ -127,27 +127,28 @@ M: listener-gadget tool-help
 : show-titled-minibuffer ( listener gadget title -- )
     <labelled-gadget> swap show-minibuffer ;
 
-: minibuffer-action ( quot -- quot )
-    [ find-listener hide-minibuffer ] swap append ;
-
-: show-word-search ( listener action -- )
-    minibuffer-action
+: show-word-search ( listener words -- )
+    >r [ find-listener hide-minibuffer ]
     >r dup listener-gadget-input selected-word r>
-    <word-search> "Word search" show-titled-minibuffer ;
+    r> <word-search> "Word search" show-titled-minibuffer ;
 
-: show-source-files-search ( listener action -- )
-    minibuffer-action
-    "" swap <source-files-search>
+: show-help-search ( listener -- )
+    [ find-listener hide-minibuffer ]
+    "" swap <help-search> "Help search" show-titled-minibuffer ;
+
+: show-source-file-search ( listener action -- )
+    [ find-listener hide-minibuffer ]
+    "" swap <source-file-search>
     "Source file search" show-titled-minibuffer ;
 
-: show-vocabs-search ( listener action -- )
-    minibuffer-action
+: show-vocab-search ( listener action -- )
+    [ find-listener hide-minibuffer ]
     >r dup listener-gadget-input selected-word r>
-    <vocabs-search> "Vocabulary search" show-titled-minibuffer ;
+    <vocab-search> "Vocabulary search" show-titled-minibuffer ;
 
-: show-modules-search ( listener action -- )
-    minibuffer-action
-    "" swap <modules-search>
+: show-module-search ( listener action -- )
+    [ find-listener hide-minibuffer ]
+    "" swap <module-search>
     "Module search" show-titled-minibuffer ;
 
 : listener-history ( listener -- seq )
@@ -158,26 +159,12 @@ M: listener-gadget tool-help
 
 : show-history ( listener -- )
     dup listener-gadget-input editor-text
-    [ input-string history-action ] minibuffer-action
+    [ find-listener hide-minibuffer ]
     pick listener-history <history-search>
     "History search" show-titled-minibuffer ;
 
-: completion-string ( word listener -- string )
-    >r dup word-name swap word-vocabulary dup vocab r>
-    listener-gadget-use memq?
-    [ drop ] [ [ "USE: " % % " " % % ] "" make ] if ;
-
-: insert-completion ( completion -- )
-    find-listener [ completion-string ] keep
-    listener-gadget-input user-input ;
-
 listener-gadget "toolbar" {
     { "Restart" f [ start-listener ] }
-    {
-        "History"
-        T{ key-down f { C+ } "h" }
-        [ show-history ]
-    }
     {
         "Clear output"
         T{ key-down f f "CLEAR" }
@@ -191,26 +178,36 @@ listener-gadget "toolbar" {
     { "Send EOF" T{ key-down f { C+ } "d" } [ listener-eof ] }
 } define-commands
 
-listener-gadget "completion" {
+listener-gadget "popups" {
     {
         "Complete word"
         T{ key-down f f "TAB" }
-        [ [ insert-completion ] show-word-search ]
-    }
-    {
-        "Edit file"
-        T{ key-down f { C+ } "e" }
-        [ [ pathname-string edit-file ] show-source-files-search ]
+        [ all-words show-word-search ]
     }
     {
         "Use vocabulary"
         T{ key-down f { C+ } "u" }
-        [ [ [ vocab-link-name use+ ] curry call-listener ] show-vocabs-search ]
+        [ show-vocab-search ]
+    }
+    {
+        "History"
+        T{ key-down f { C+ } "p" }
+        [ show-history ]
+    }
+    {
+        "Help search"
+        T{ key-down f { C+ } "h" }
+        [ show-help-search ]
     }
     {
         "Run module"
         T{ key-down f { C+ } "m" }
-        [ [ [ module-name run-module ] curry call-listener ] show-modules-search ]
+        [ show-module-search ]
+    }
+    {
+        "Edit file"
+        T{ key-down f { C+ } "e" }
+        [ show-source-file-search ]
     }
     {
         "Hide minibuffer"

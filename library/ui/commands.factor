@@ -10,6 +10,8 @@ M: command equal? eq? ;
 
 GENERIC: invoke-command ( target command -- )
 
+M: f invoke-command ( target command -- ) 2drop ;
+
 M: command invoke-command ( target command -- )
     command-quot call ;
 
@@ -58,9 +60,10 @@ SYMBOL: +name+
 SYMBOL: +quot+
 SYMBOL: +listener+
 SYMBOL: +keyboard+
-SYMBOL: +default+
+SYMBOL: +primary+
+SYMBOL: +secondary+
 
-TUPLE: operation predicate listener? default? ;
+TUPLE: operation predicate listener? primary? secondary? ;
 
 : (command) ( -- command )
     +name+ get +keyboard+ get +quot+ get <command> ;
@@ -68,7 +71,8 @@ TUPLE: operation predicate listener? default? ;
 C: operation ( predicate hash -- operation )
     swap [
         (command) over set-delegate
-        +default+ get over set-operation-default?
+        +primary+ get over set-operation-primary?
+        +secondary+ get over set-operation-secondary?
         +listener+ get over set-operation-listener?
     ] bind
     [ set-operation-predicate ] keep ;
@@ -82,8 +86,11 @@ SYMBOL: operations
     "predicate" word-prop
     operations get [ operation-predicate = ] subset-with ;
 
-: default-operation ( obj -- command )
-    object-operations [ operation-default? ] find-last nip ;
+: primary-operation ( obj -- command )
+    object-operations [ operation-primary? ] find-last nip ;
+
+: secondary-operation ( obj -- command )
+    object-operations [ operation-secondary? ] find-last nip ;
 
 : modify-operation ( quot operation -- operation )
     clone

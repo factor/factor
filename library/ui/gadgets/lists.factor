@@ -4,15 +4,15 @@ IN: gadgets-lists
 USING: gadgets gadgets-labels gadgets-scrolling kernel sequences
 models opengl math namespaces gadgets-theme ;
 
-TUPLE: list index presenter action color ;
+TUPLE: list index hook presenter color ;
 
 : list-theme ( list -- )
     { 0.8 0.8 1.0 1.0 } swap set-list-color ;
 
-C: list ( action presenter model -- gadget )
+C: list ( hook presenter model -- gadget )
     [ swap <pile> delegate>control ] keep
     [ set-list-presenter ] keep
-    [ set-list-action ] keep
+    [ set-list-hook ] keep
     0 over set-list-index
     1 over set-pack-fill
     dup list-theme ;
@@ -67,11 +67,6 @@ M: list focusable-child* drop t ;
 : select-next ( list -- )
     dup list-index 1+ swap select-index ;
 
-: call-action ( list -- )
-    dup list-empty? [
-        dup list-value over list-action call
-    ] unless drop ;
-
 : click-list ( list -- )
     hand-gadget get [ gadget-parent list? ] find-parent
     dup [
@@ -81,10 +76,19 @@ M: list focusable-child* drop t ;
         2drop
     ] if ;
 
+: list-action ( list -- )
+    dup list-empty? [
+        drop
+    ] [
+        [
+            list-value dup secondary-operation invoke-command
+        ] keep list-hook call
+    ] if ; inline
+
 list H{
     { T{ button-down } [ dup request-focus click-list ] }
     { T{ drag } [ click-list ] }
     { T{ key-down f f "UP" } [ select-prev ] }
     { T{ key-down f f "DOWN" } [ select-next ] }
-    { T{ key-down f f "RETURN" } [ call-action ] }
+    { T{ key-down f f "RETURN" } [ list-action ] }
 } set-gestures

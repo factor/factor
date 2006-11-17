@@ -2,10 +2,10 @@
 ! See http://factorcode.org/license.txt for BSD license.
 IN: gadgets-workspace
 USING: definitions gadgets gadgets-browser gadgets-dataflow
-gadgets-help gadgets-listener gadgets-text gadgets-workspace
-hashtables help inference kernel namespaces parser prettyprint
-scratchpad sequences strings styles syntax test tools words
-generic models io modules ;
+gadgets-help gadgets-listener gadgets-search gadgets-text
+gadgets-workspace hashtables help inference kernel namespaces
+parser prettyprint scratchpad sequences strings styles syntax
+test tools words generic models io modules ;
 
 V{ } clone operations set-global
 
@@ -25,7 +25,7 @@ M: operation invoke-command ( target operation -- )
 
 ! Objects
 [ drop t ] H{
-    { +default+ t }
+    { +primary+ t }
     { +name+ "Inspect" }
     { +quot+ [ inspect ] }
     { +listener+ t }
@@ -45,15 +45,17 @@ M: operation invoke-command ( target operation -- )
 
 ! Input
 [ input? ] H{
-    { +default+ t }
+    { +primary+ t }
+    { +secondary+ t }
     { +name+ "Input" }
     { +quot+ [ listener-gadget call-tool ] }
 } define-operation
 
 ! Pathnames
 [ pathname? ] H{
-    { +default+ t }
+    { +primary+ t }
     { +name+ "Edit" }
+    { +keyboard+ T{ key-down f { A+ } "e" } }
     { +quot+ [ pathname-string edit-file ] }
 } define-operation
 

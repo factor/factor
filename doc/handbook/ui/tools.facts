@@ -27,7 +27,7 @@ ARTICLE: "ui-listener" "UI listener"
 { $commands interactor "interactor" }
 { $heading "Completion" }
 "Completion commands display a gadget at the bottom of the listener, known as the mini-buffer. Typing more text narrows down the list of available items. The " { $snippet "UP" } " and " { $snippet "DOWN" } " arrow keys shift the selection between listed items, and the " { $snippet "RETURN" } " key invokes a default operation for the selected item."
-{ $commands listener-gadget "completion" }
+{ $commands listener-gadget "popups" }
 { $heading "Word commands" }
 "These commands operate on the token at the caret position in the input area."
 { $commands interactor "words" }
