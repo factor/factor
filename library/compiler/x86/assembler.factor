@@ -391,12 +391,17 @@ M: integer IMUL2 swap dup reg-code t HEX: 69 immediate-1/4 ;
 
 ! SSE multimedia instructions
 
-: 2-operand-sse ( dst src op1 op2 -- )
-    #! We swap the operands here to make everything consistent
-    #! with the integer instructions.
-    swap , pick register-128? [ swapd ] [ 1 bitor ] if
+: (2-operand-sse)
     >r 2dup t prefix HEX: 0f , r>
     , reg-code swap addressing ;
+
+: 2-operand-sse ( dst src op1 op2 -- )
+    swap , pick register-128? [ swapd ] [ 1 bitor ] if
+    (2-operand-sse) ;
+
+: 2-operand-int/sse ( dst src op1 op2 -- )
+    swap , over register-128? [ swapd ] [ 1 bitor ] if
+    (2-operand-sse) ;
 
 : MOVSS ( dest src -- ) HEX: f3 HEX: 10 2-operand-sse ;
 : MOVSD ( dest src -- ) HEX: f2 HEX: 10 2-operand-sse ;
@@ -408,4 +413,4 @@ M: integer IMUL2 swap dup reg-code t HEX: 69 immediate-1/4 ;
 : UCOMISD ( dest src -- ) HEX: 66 HEX: 2e 2-operand-sse ;
 : COMISD ( dest src -- ) HEX: 66 HEX: 2f 2-operand-sse ;
 : CVTSI2SD ( dest src -- ) HEX: f2 HEX: 2a 2-operand-sse ;
-: CVTSD2SI ( dest src -- ) HEX: f2 HEX: 2d 2-operand-sse ;
+: CVTSD2SI ( dest src -- ) HEX: f2 HEX: 2d 2-operand-int/sse ;

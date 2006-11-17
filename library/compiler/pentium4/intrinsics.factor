@@ -39,3 +39,21 @@ M: float-regs (%replace) drop swap %allot-float ;
 } [
     first2 define-float-jump
 ] each
+
+\ float>fixnum [
+    "out" operand "in" operand CVTSD2SI
+    "out" operand tag-bits SHL
+] H{
+    { +input+ { { float "in" } } }
+    { +scratch+ { { f "out" } } }
+    { +output+ { "out" } }
+} define-intrinsic
+
+\ fixnum>float [
+    "in" operand tag-bits SAR
+    "out" operand "in" operand CVTSI2SD
+] H{
+    { +input+ { { f "in" } } }
+    { +scratch+ { { float "out" } } }
+    { +output+ { "out" } }
+} define-intrinsic

@@ -1,8 +1,7 @@
 + 0.87:
 
-- amd64 structs-by-value bug
+- claim: if module fails to load, reloading it doesn't work?
 - intrinsic fixnum>float float>fixnum
-- compiled call traces
 
 - fix search unit test
 - these things are "Too Slow":
@@ -37,6 +36,12 @@
 - robustify stepper -- see if step back past a throw works
 - httpd crash
 - fep when closing window
+- compiled call traces needs work:
+  - :trace is kind of slow
+  - should be independent of whenever the runtime was built with
+    -fomit-frame-pointer or not
+  - doesn't show #labels
+  - we don't know if signal handlers run with the same stack or not
 
 + ui:
 
@@ -62,6 +67,7 @@
 
 + compiler/ffi:
 
+- amd64 structs-by-value bug
 - %allot-bignum-signed-2 is broken on both platforms
 - we may be able to remove the dlsym primitive
 - [ [ dup call ] dup call ] infer hangs
