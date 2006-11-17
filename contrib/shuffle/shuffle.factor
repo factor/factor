@@ -21,3 +21,7 @@ IN: shuffle
 
 : map-with2 ( obj obj list quot -- newseq )
     swap [ with2 roll ] map 3nip ; inline
+
+: each-with2 ( obj obj list quot -- )
+    swap [ with2 roll ] map 3drop ;
+
