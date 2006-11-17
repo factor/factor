@@ -36,7 +36,11 @@ M: font equal? eq? ;
     ] bind ;
 
 : with-freetype ( quot -- )
-    init-freetype [ close-freetype ] cleanup ; inline
+    freetype get expired? [
+        init-freetype [ close-freetype ] cleanup
+    ] [
+        call
+    ] if ; inline
 
 : ttf-name ( font style -- name )
     2array H{
