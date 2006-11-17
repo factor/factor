@@ -1,8 +1,6 @@
 + 0.87:
 
 - claim: if module fails to load, reloading it doesn't work?
-
-- fix search unit test
 - these things are "Too Slow":
   - all-words
   - make-image
@@ -40,6 +38,7 @@
     -fomit-frame-pointer or not
   - doesn't show #labels
   - we don't know if signal handlers run with the same stack or not
+- got a random sig11 while reloading/recompiling
 
 + ui:
 
@@ -91,6 +90,7 @@
 
 + misc:
 
+- tuple shape changes
 - should be possible to reload any source file in library
 - growable data heap
 - minor GC takes too long now, we should card mark code heap

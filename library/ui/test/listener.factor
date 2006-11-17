@@ -1,6 +1,8 @@
 IN: temporary
 USING: gadgets-listener words arrays namespaces test kernel
-freetype ;
+freetype timers ;
+
+timers [ init-timers ] unless
 
 [
     <listener-gadget> "listener" set
