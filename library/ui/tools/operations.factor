@@ -61,15 +61,31 @@ M: operation invoke-command ( target operation -- )
 
 [ pathname? ] H{
     { +name+ "Run file" }
+    { +keyboard+ T{ key-down f { A+ } "r" } }
     { +quot+ [ pathname-string [ run-file ] curry call-listener ] }
 } define-operation
 
 ! Words
 [ word? ] H{
-    { +default+ t }
+    { +primary+ t }
     { +name+ "Browse" }
     { +keyboard+ T{ key-down f { A+ } "b" } }
     { +quot+ [ browser call-tool ] }
+} define-operation
+
+: word-completion-string ( word listener -- string )
+    >r dup word-name swap word-vocabulary dup vocab r>
+    listener-gadget-use memq?
+    [ drop ] [ [ "USE: " % % " " % % ] "" make ] if ;
+
+: insert-word ( word -- )
+    find-listener [ word-completion-string ] keep
+    listener-gadget-input user-input ;
+
+[ word? ] H{
+    { +secondary+ t }
+    { +name+ "Insert" }
+    { +quot+ [ insert-word ] }
 } define-operation
 
 [ word? ] H{
@@ -129,28 +145,33 @@ M: operation invoke-command ( target operation -- )
 
 ! Vocabularies
 [ vocab-link? ] H{
-    { +default+ t }
+    { +primary+ t }
     { +name+ "Browse" }
+    { +keyboard+ T{ key-down f { A+ } "b" } }
     { +quot+ [ browser call-tool ] }
 } define-operation
 
 [ vocab-link? ] H{
     { +name+ "Enter in" }
+    { +keyboard+ T{ key-down f { A+ } "i" } }
     { +quot+ [ vocab-link-name [ set-in ] curry call-listener ] }
 } define-operation
 
 [ vocab-link? ] H{
+    { +secondary+ t }
     { +name+ "Use" }
     { +quot+ [ vocab-link-name [ use+ ] curry call-listener ] }
 } define-operation
 
 [ vocab-link? ] H{
     { +name+ "Forget" }
+    { +keyboard+ T{ key-down f { A+ } "f" } }
     { +quot+ [ vocab-link-name forget-vocab ] }
 } define-operation
 
 ! Modules
 [ module? ] H{
+    { +primary+ t }
     { +name+ "Run" }
     { +quot+ [ module-name run-module ] }
     { +listener+ t }
@@ -158,45 +179,53 @@ M: operation invoke-command ( target operation -- )
 
 [ module? ] H{
     { +name+ "Documentation" }
+    { +keyboard+ T{ key-down f { A+ } "h" } }
     { +quot+ [ module-help [ help-gadget call-tool ] when* ] }
 } define-operation
 
 [ module? ] H{
     { +name+ "Edit" }
+    { +keyboard+ T{ key-down f { A+ } "e" } }
     { +quot+ [ edit ] }
 } define-operation
 
 [ module? ] H{
     { +name+ "Reload" }
+    { +keyboard+ T{ key-down f { A+ } "r" } }
     { +quot+ [ reload-module ] }
     { +listener+ t }
 } define-operation
 
 [ module? ] H{
     { +name+ "See" }
+    { +keyboard+ T{ key-down f { A+ } "b" } }
     { +quot+ [ see ] }
     { +listener+ t }
 } define-operation
 
 ! Link
 [ link? ] H{
-    { +default+ t }
+    { +primary+ t }
+    { +secondary+ t }
     { +name+ "Follow" }
     { +quot+ [ help-gadget call-tool ] }
 } define-operation
 
 [ link? ] H{
     { +name+ "Edit" }
+    { +keyboard+ T{ key-down f { A+ } "e" } }
     { +quot+ [ edit ] }
 } define-operation
 
 [ link? ] H{
     { +name+ "Reload" }
+    { +keyboard+ T{ key-down f { A+ } "r" } }
     { +quot+ [ reload ] }
 } define-operation
 
 [ word-link? ] H{
     { +name+ "Definition" }
+    { +keyboard+ T{ key-down f { A+ } "b" } }
     { +quot+ [ link-name browser call-tool ] }
 } define-operation
 
@@ -230,9 +259,8 @@ M: operation invoke-command ( target operation -- )
 } define-operation
 
 ! Dataflow nodes
-
 [ [ node? ] is? ] H{
-    { +default+ t }
+    { +primary+ t }
     { +name+ "Show dataflow" }
     { +quot+ [ dataflow-gadget call-tool ] }
 } define-operation
@@ -244,13 +272,6 @@ M: operation invoke-command ( target operation -- )
 } define-operation
 
 ! Define commands in terms of operations
-
-! Tile commands
-tile "toolbar"
-\ word class-operations [ tile-definition ] modify-operations
-[ command-name "Browse" = not ] subset
-{ "Close" f [ close-tile ] } add*
-define-commands
 
 ! Interactor commands
 : word-action ( target -- quot )
@@ -277,4 +298,29 @@ help-gadget "toolbar" {
 link class-operations [ help-action ] modify-operations
 [ command-name "Follow" = not ] subset
 append
+define-commands
+
+\ word-search "operations"
+\ word class-operations
+[ search-action ] modify-operations
+define-commands
+
+\ vocab-search "operations"
+\ vocab-link class-operations
+[ search-action ] modify-operations
+define-commands
+
+\ module-search "operations"
+\ module class-operations
+[ search-action ] modify-operations
+define-commands
+
+\ source-file-search "operations"
+\ pathname class-operations
+[ search-action ] modify-operations
+define-commands
+
+\ help-search "operations"
+\ link class-operations
+[ search-action ] modify-operations
 define-commands

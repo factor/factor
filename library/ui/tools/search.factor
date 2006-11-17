@@ -9,7 +9,7 @@ completion styles strings modules ;
 
 TUPLE: live-search field list ;
 
-: find-live-search [ live-search? ] find-parent ;
+: find-live-search [ [ live-search? ] is? ] find-parent ;
 
 : find-search-list find-live-search live-search-list ;
 
@@ -23,7 +23,7 @@ C: search-field ( -- gadget )
 search-field H{
     { T{ key-down f f "UP" } [ find-search-list select-prev ] }
     { T{ key-down f f "DOWN" } [ find-search-list select-next ] }
-    { T{ key-down f f "RETURN" } [ find-search-list call-action ] }
+    { T{ key-down f f "RETURN" } [ find-search-list list-action ] }
 } set-gestures
 
 : <search-model> ( producer -- model )
@@ -31,10 +31,10 @@ search-field H{
     [ "\n" join ] <filter>
     swap <filter> ;
 
-: <search-list> ( action seq producer presenter -- gadget )
+: <search-list> ( hook seq producer presenter -- gadget )
     -rot curry <search-model> <list> ;
 
-C: live-search ( string action seq producer presenter -- gadget )
+C: live-search ( string hook seq producer presenter -- gadget )
     {
         {
             [ <search-field> ]
@@ -53,43 +53,73 @@ C: live-search ( string action seq producer presenter -- gadget )
 
 M: live-search focusable-child* live-search-field ;
 
-: <word-search> ( string action -- gadget )
-    all-words
+: delegate>live-search ( string hook seq producer presenter gadget -- )
+    >r <live-search> r> set-gadget-delegate ;
+
+TUPLE: word-search ;
+
+C: word-search ( string action words -- gadget )
+    >r
     [ word-completions ]
     [ word-name ]
-    <live-search> ;
+    r>
+    [ delegate>live-search ] keep ;
 
 : help-completions ( str pairs -- seq )
     >r >lower r>
     [ second >lower ] swap completions
     [ first <link> ] map ;
 
-: <help-search> ( string action -- gadget )
+TUPLE: help-search ;
+
+C: help-search ( string action -- gadget )
+    >r
     all-articles [ dup article-title 2array ] map
+    [ [ second ] 2apply <=> ] sort
     [ help-completions ]
     [ article-title ]
-    <live-search> ;
+    r>
+    [ delegate>live-search ] keep ;
 
-: <source-files-search> ( string action -- gadget )
+TUPLE: source-file-search ;
+
+C: source-file-search ( string action -- gadget )
+    >r
     source-files get hash-keys natural-sort
     [ string-completions [ <pathname> ] map ]
     [ pathname-string ]
-    <live-search> ;
+    r>
+    [ delegate>live-search ] keep ;
 
 : module-completions ( str modules -- seq )
     [ module-name ] swap completions ;
 
-: <modules-search> ( string action -- gadget )
+TUPLE: module-search ;
+
+: module-search ( string action -- gadget )
+    >r
     available-modules [ module-completions ]
     [ module-name ]
-    <live-search> ;
+    r>
+    [ delegate>live-search ] keep ;
 
-: <vocabs-search> ( string action -- gadget )
+TUPLE: vocab-search ;
+
+C: vocab-search ( string action -- gadget )
+    >r
     vocabs [ string-completions [ <vocab-link> ] map ]
     [ vocab-link-name ]
-    <live-search> ;
+    r>
+    [ delegate>live-search ] keep ;
 
-: <history-search> ( string action seq -- gadget )
+TUPLE: history-search ;
+
+C: history-search ( string action seq -- gadget )
+    >r
     [ string-completions [ <input> ] map ]
     [ input-string ]
-    <live-search> ;
+    r>
+    [ delegate>live-search ] keep ;
+
+: search-action ( search -- obj )
+    live-search-list list-value ;
