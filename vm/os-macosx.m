@@ -18,7 +18,7 @@ void run()
 	for(;;)
 	{
 NS_DURING
-		/* stack_chain->native_stack_pointer = native_stack_pointer(); */
+		stack_chain->native_stack_pointer = native_stack_pointer();
 		SETJMP(stack_chain->toplevel);
 		handle_error();
 
