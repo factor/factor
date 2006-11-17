@@ -27,7 +27,6 @@
 - recompile get/set/>n/n>/ndrop if needed
 - cross-word type inference
 - callback scheduling issue
-- windows crash
 - ui docs
 - some kind of declarative wiring framework for ui
 - overhaul models, set-model* is crap

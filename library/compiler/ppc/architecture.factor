@@ -178,12 +178,10 @@ M: stack-params %freg>stack
 
 : %prepare-alien-indirect ( -- )
     "unbox_alien" f %alien-invoke
-    "alien_temp" f 12 compile-dlsym
-    3 12 0 STW ;
+    3 1 12 STW ;
 
 : %alien-indirect ( -- )
-    "alien_temp" f 12 compile-dlsym
-    12 12 0 LWZ
+    12 1 12 LWZ
     12 MTLR BLRL ;
 
 : save-return 0 swap [ return-reg ] keep %freg>stack ;
