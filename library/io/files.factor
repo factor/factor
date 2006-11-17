@@ -15,7 +15,7 @@ strings styles arrays ;
 
 : directory ( path -- seq )
     (directory)
-    [ { "." ".." } member? not ] subset natural-sort ;
+    [ { "." ".." } member? not ] subset ;
 
 : file-length ( path -- n ) stat 4array third ;
 
@@ -50,7 +50,7 @@ DEFER: directory.
     dup directory? [ (directory.) ] [ (file.) terpri ] if ;
 
 : directory. ( path -- )
-    dup directory [ file. ] each-with ;
+    dup directory natural-sort [ file. ] each-with ;
 
 : home ( -- dir )
     windows? "USERPROFILE" "HOME" ? os-env [ "." ] unless* ;
