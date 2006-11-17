@@ -19,10 +19,6 @@ memory namespaces sequences words ;
 : stack@ macosx? 24 8 ? + ;
 : lr@ macosx? 8 4 ? + ;
 
-! Frames are 16-byte aligned, minimum size is 32 bytes
-! Grows down
-! - lr@: return address
-
 M: int-regs return-reg drop 3 ;
 M: int-regs fastcall-regs drop { 3 4 5 6 7 8 9 10 } ;
 M: int-regs vregs drop { 3 4 5 6 7 8 9 10 } ;
@@ -30,7 +26,6 @@ M: int-regs vregs drop { 3 4 5 6 7 8 9 10 } ;
 M: float-regs return-reg drop 1 ;
 M: float-regs fastcall-regs drop { 1 2 3 4 5 6 7 8 } ;
 M: float-regs vregs drop { 0 1 2 3 4 5 6 7 8 9 10 11 12 13 } ;
-
 
 GENERIC: loc>operand ( loc -- reg n )
 

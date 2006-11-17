@@ -1,7 +1,6 @@
 + 0.87:
 
 - claim: if module fails to load, reloading it doesn't work?
-- intrinsic fixnum>float float>fixnum
 
 - fix search unit test
 - these things are "Too Slow":

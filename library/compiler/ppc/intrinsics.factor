@@ -292,6 +292,17 @@ math-internals namespaces sequences words ;
     first2 define-float-jump
 ] each
 
+\ float>fixnum [
+    "scratch" operand "in" operand FCTIWZ
+    "scratch" operand 1 0 stack@ STFD
+    "out" operand 1 cell stack@ LWZ
+    "out" operand dup %tag-fixnum
+] H{
+    { +input+ { { float "in" } } }
+    { +scratch+ { { float "scratch" } { f "out" } } }
+    { +output+ { "out" } }
+} define-intrinsic
+
 \ tag [
     "in" operand "out" operand tag-mask ANDI
     "out" operand dup %tag-fixnum

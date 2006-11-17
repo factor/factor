@@ -206,7 +206,7 @@ M: label BC >r 0 BC r> rel-relative-2 rel-label ;
 : (FMR) >r 0 -rot 72 r> x-form 63 insn ;
 : FMR 0 (FMR) ;  : FMR. 1 (FMR) ;
 
-: (FCTIWZ) >r 0 -rot 15 r> x-form 63 insn ;
+: (FCTIWZ) >r 0 -rot r> 15 x-form 63 insn ;
 : FCTIWZ 0 (FCTIWZ) ;  : FCTIWZ. 1 (FCTIWZ) ;
 
 : (FADD) >r 0 21 r> a-form 63 insn ;
