@@ -9,6 +9,11 @@ SYMBOL: modules
 
 TUPLE: module name loc files tests help main ;
 
+! For presentations
+TUPLE: module-link name ;
+
+M: module-link module-name module-link-name ;
+
 : module-def ( name -- path )
     "resource:" over ".factor" append3
     dup ?resource-path exists? [
@@ -16,8 +21,6 @@ TUPLE: module name loc files tests help main ;
     ] [
         drop "resource:" swap "/load.factor" append3
     ] if ;
-
-M: module <=> [ module-name ] 2apply <=> ;
 
 : module modules get [ module-name = ] find-with nip ;
 
@@ -68,10 +71,6 @@ M: module <=> [ module-name ] 2apply <=> ;
 : test-modules ( -- )
     modules get [ module-tests* ] map concat run-tests ;
 
-: modules. ( -- )
-    modules get natural-sort
-    [ [ module-name ] keep write-object terpri ] each ;
-
 : reload-module ( module -- )
     dup module-name module-def source-modified? [
         module-name load-module
@@ -101,3 +100,33 @@ M: module synopsis* \ PROVIDE: pprint-word module-name text ;
 M: module definition module>alist t ;
 
 M: module where* module-loc ;
+
+: module-dir? ( path -- ? )
+    "load.factor" path+ resource-path exists? ;
+
+: (available-modules) ( path -- )
+    dup directory [ path+ ] map-with
+    dup [ module-dir? ] subset %
+    [ (available-modules) ] each ;
+
+: small-modules ( path -- seq )
+    dup resource-path directory [ path+ ] map-with
+    [ ".factor" tail? ] subset
+    [ ".factor" ?tail drop ] map ;
+
+: available-modules ( -- seq )
+    [
+        "library" (available-modules)
+        "contrib" (available-modules)
+        "contrib" small-modules %
+        "examples" (available-modules)
+        "examples" small-modules %
+    ] { } make natural-sort
+    [ dup module [ ] [ <module-link> ] ?if ] map ;
+
+: module-string ( obj -- str )
+    dup module-name swap module? [ " (loaded)" append ] when ;
+
+: modules. ( -- )
+    available-modules
+    [ [ module-string ] keep write-object terpri ] each ;

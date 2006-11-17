@@ -1,19 +1,20 @@
 ! Copyright (C) 2006 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 IN: gadgets-lists
-USING: gadgets gadgets-scrolling kernel sequences models opengl
-math namespaces ;
+USING: gadgets gadgets-labels gadgets-scrolling kernel sequences
+models opengl math namespaces gadgets-theme ;
 
 TUPLE: list index presenter action color ;
 
 : list-theme ( list -- )
     { 0.8 0.8 1.0 1.0 } swap set-list-color ;
 
-C: list ( model presenter action -- gadget )
-    [ set-list-action ] keep
+C: list ( action presenter model -- gadget )
+    [ swap <pile> delegate>control ] keep
     [ set-list-presenter ] keep
-    dup rot <pile> 1 over set-pack-fill delegate>control
+    [ set-list-action ] keep
     0 over set-list-index
+    1 over set-pack-fill
     dup list-theme ;
 
 : bound-index ( list -- )
@@ -22,7 +23,9 @@ C: list ( model presenter action -- gadget )
 
 M: list model-changed
     dup clear-gadget
-    dup control-value over list-presenter map over add-gadgets
+    dup control-value
+    over list-presenter map [ <label> dup text-theme ] map
+    over add-gadgets
     bound-index ;
 
 : selected-rect ( list -- rect )

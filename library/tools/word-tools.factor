@@ -47,12 +47,8 @@ generic completion ;
         swap [ global [ inc ] bind ] curry swap append
     ] annotate ;
 
-: word-completion. ( pair -- )
-    first2 over summary completion>string swap write-object ;
-
 : word-completions ( str words -- seq )
     [ word-name ] swap completions ;
 
 : apropos ( str -- )
-    all-words word-completions
-    [ word-completion. terpri ] each ;
+    all-words word-completions [ . ] each ;

@@ -10,7 +10,7 @@ ARTICLE: "handbook" "Factor documentation"
     { "The basic unit of code, corresponding to a \"function\" in other languages, is called a " { $emphasis "word" } " in Factor." }
     { "Word take inputs from the stack, and leave output values on the stack. This is documented in a " { $emphasis "stack effect declaration" } ", for example " { $snippet "( x y -- z )" } " denotes that a word takes two inputs, with " { $snippet "y" } " at the top of the stack, and returns one output. See " { $link "effect-declaration" } " for details." }
     { "You can load source files with " { $link run-file } ":"
-    { $code "\"hello-world.factor\" run-file" } }
+    { $code "\"my-program.factor\" run-file" } }
     { { "You can load modules from " { $snippet "contrib/" } " and " { $snippet "examples/" } " with " { $link require } ":" }
     { $code "\"contrib/httpd\" require" } }
     { { "Some modules have a defined main entry point, and can be run just like applications in an operating system:" }

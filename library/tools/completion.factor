@@ -50,31 +50,25 @@ USING: kernel arrays sequences math namespaces strings io ;
 
 : rank-completions ( results -- newresults )
     #! Discard results in the low 33%
-    [ [ second ] 2apply swap - ] sort
-    [ 0 [ second max ] reduce 3 / ] keep
-    [ second < ] subset-with ;
+    [ [ first ] 2apply swap - ] sort
+    [ 0 [ first max ] reduce 3 / ] keep
+    [ first < ] subset-with
+    [ second ] map ;
 
 : completion ( str quot obj -- pair )
     #! pair is { obj score }
-    pick empty? [
-        2nip 1 2array
-    ] [
-        [ swap call dup rot fuzzy score ] keep swap 2array
-    ] if ; inline
+    [ swap call dup rot fuzzy score ] keep 2array ; inline
 
 : completions ( str quot candidates -- seq )
     pick empty? [
         dup length 100 > [
             3drop f
         ] [
-            2nip [ 1 2array ] map
+            2nip
         ] if
     ] [
         [ >r 2dup r> completion ] map 2nip rank-completions
     ] if ; inline
-
-: completion>string ( score str -- newstr )
-    [ % " (score: " % >fixnum # ")" % ] "" make ;
 
 : string-completions ( str strs -- seq )
     f swap completions ;

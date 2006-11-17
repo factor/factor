@@ -6,7 +6,7 @@ gadgets-panes gadgets-scrolling gadgets-text gadgets-lists
 gadgets-search gadgets-theme gadgets-tracks gadgets-workspace
 generic hashtables tools io kernel listener math models
 namespaces parser prettyprint sequences shells strings styles
-threads words definitions help ;
+threads words definitions help modules ;
 
 TUPLE: listener-gadget input output stack use minibuffer ;
 
@@ -145,6 +145,11 @@ M: listener-gadget tool-help
     >r dup listener-gadget-input selected-word r>
     <vocabs-search> "Vocabulary search" show-titled-minibuffer ;
 
+: show-modules-search ( listener action -- )
+    minibuffer-action
+    "" swap <modules-search>
+    "Module search" show-titled-minibuffer ;
+
 : listener-history ( listener -- seq )
     listener-gadget-input interactor-history <reversed> ;
 
@@ -153,8 +158,9 @@ M: listener-gadget tool-help
 
 : show-history ( listener -- )
     dup listener-gadget-input editor-text
-    over listener-history [ history-action ] minibuffer-action
-    <history-search> "History search" show-titled-minibuffer ;
+    [ input-string history-action ] minibuffer-action
+    pick listener-history <history-search>
+    "History search" show-titled-minibuffer ;
 
 : completion-string ( word listener -- string )
     >r dup word-name swap word-vocabulary dup vocab r>
@@ -166,7 +172,7 @@ M: listener-gadget tool-help
     listener-gadget-input user-input ;
 
 listener-gadget "toolbar" {
-    { "Restart" T{ key-down f { C+ } "r" } [ start-listener ] }
+    { "Restart" f [ start-listener ] }
     {
         "History"
         T{ key-down f { C+ } "h" }
@@ -194,12 +200,17 @@ listener-gadget "completion" {
     {
         "Edit file"
         T{ key-down f { C+ } "e" }
-        [ [ edit-file ] show-source-files-search ]
+        [ [ pathname-string edit-file ] show-source-files-search ]
     }
     {
         "Use vocabulary"
         T{ key-down f { C+ } "u" }
-        [ [ [ use+ ] curry call-listener ] show-vocabs-search ]
+        [ [ [ vocab-link-name use+ ] curry call-listener ] show-vocabs-search ]
+    }
+    {
+        "Run module"
+        T{ key-down f { C+ } "m" }
+        [ [ [ module-name run-module ] curry call-listener ] show-modules-search ]
     }
     {
         "Hide minibuffer"

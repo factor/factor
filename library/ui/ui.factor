@@ -148,7 +148,8 @@ C: labelled-gadget ( gadget title -- gadget )
 M: labelled-gadget focusable-child* labelled-gadget-content ;
 
 : <labelled-pane> ( model quot title -- gadget )
-    >r <pane-control> <scroller> r> <labelled-gadget> ;
+    >r <pane-control> t over set-pane-scrolls? <scroller> r>
+    <labelled-gadget> ;
 
 : pane-window ( quot title -- )
     >r make-pane <scroller> r> open-titled-window ;

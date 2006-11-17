@@ -5,9 +5,9 @@ USING: arrays gadgets gadgets-labels gadgets-panes
 gadgets-scrolling gadgets-text gadgets-theme
 generic help tools kernel models sequences words
 gadgets-borders gadgets-lists namespaces parser hashtables io
-completion styles ;
+completion styles strings modules ;
 
-TUPLE: live-search field list producer action presenter ;
+TUPLE: live-search field list ;
 
 : find-live-search [ live-search? ] find-parent ;
 
@@ -15,10 +15,9 @@ TUPLE: live-search field list producer action presenter ;
 
 TUPLE: search-field ;
 
-C: search-field ( string -- gadget )
+C: search-field ( -- gadget )
     <editor> over set-gadget-delegate
     dup dup set-control-self
-    [ set-editor-text ] keep
     [ editor-doc-end ] keep ;
 
 search-field H{
@@ -27,22 +26,15 @@ search-field H{
     { T{ key-down f f "RETURN" } [ find-search-list call-action ] }
 } set-gestures
 
-: <search-model> ( -- model )
-    gadget get dup live-search-field control-model
-    200 <delay>
-    swap live-search-producer [ "\n" join ] swap append
-    <filter> ;
+: <search-model> ( producer -- model )
+    gadget get live-search-field control-model 200 <delay>
+    [ "\n" join ] <filter>
+    swap <filter> ;
 
-: <search-list>
-    <search-model>
-    gadget get live-search-presenter [ make-pane ] curry
-    gadget get live-search-action \ first add*
-    <list> ;
+: <search-list> ( action seq producer presenter -- gadget )
+    -rot curry <search-model> <list> ;
 
-C: live-search ( string action producer presenter -- gadget )
-    [ set-live-search-presenter ] keep
-    [ set-live-search-producer ] keep
-    [ set-live-search-action ] keep
+C: live-search ( string action seq producer presenter -- gadget )
     {
         {
             [ <search-field> ]
@@ -56,37 +48,48 @@ C: live-search ( string action producer presenter -- gadget )
             [ <scroller> ]
             @center
         }
-    } make-frame* ;
+    } make-frame*
+    [ live-search-field set-editor-text ] keep ;
 
 M: live-search focusable-child* live-search-field ;
 
 : <word-search> ( string action -- gadget )
     all-words
-    [ word-completions ] curry
-    [ word-completion. ]
+    [ word-completions ]
+    [ word-name ]
     <live-search> ;
+
+: help-completions ( str pairs -- seq )
+    >r >lower r>
+    [ second >lower ] swap completions
+    [ first <link> ] map ;
 
 : <help-search> ( string action -- gadget )
-    [ search-help ]
-    [ first ($link) ]
+    all-articles [ dup article-title 2array ] map
+    [ help-completions ]
+    [ article-title ]
     <live-search> ;
-
-: string-completion. ( pair quot -- )
-    >r first2 over completion>string swap r> call write-object ;
-    inline
 
 : <source-files-search> ( string action -- gadget )
     source-files get hash-keys natural-sort
-    [ string-completions ] curry
-    [ [ <pathname> ] string-completion. ]
+    [ string-completions [ <pathname> ] map ]
+    [ pathname-string ]
+    <live-search> ;
+
+: module-completions ( str modules -- seq )
+    [ module-name ] swap completions ;
+
+: <modules-search> ( string action -- gadget )
+    available-modules [ module-completions ]
+    [ module-name ]
     <live-search> ;
 
 : <vocabs-search> ( string action -- gadget )
-    vocabs [ string-completions ] curry
-    [ [ <vocab-link> ] string-completion. ]
+    vocabs [ string-completions [ <vocab-link> ] map ]
+    [ vocab-link-name ]
     <live-search> ;
 
-: <history-search> ( string seq action -- gadget )
-    swap [ string-completions ] curry
-    [ first dup <input> write-object ]
+: <history-search> ( string action seq -- gadget )
+    [ string-completions [ <input> ] map ]
+    [ input-string ]
     <live-search> ;
