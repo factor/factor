@@ -80,6 +80,7 @@ DEFER: objc-error. ( alien -- )
         retainstack-overflow.
         callstack-underflow.
         callstack-overflow.
+	objc-error.
     } nth ;
 
 M: kernel-error error. dup kernel-error execute ;
