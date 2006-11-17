@@ -1,5 +1,6 @@
 + 0.87:
 
+- live search operations need to hide the minibuffer
 - vocab links don't work
 - browse modules and vocabs by showing a new list
 - get rid of the navigator in the browser tool

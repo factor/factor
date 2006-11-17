@@ -36,12 +36,16 @@ USING: alien gadgets hashtables kernel math namespaces sequences ;
     USPosition over set-XSizeHints-flags
     dpy get -rot XSetWMNormalHints ;
 
+: auto-position ( window loc -- )
+    { 0 0 } = [ drop ] [ set-size-hints ] if ;
+
 : create-window ( loc dim visinfo -- window )
+    pick >r
     >r >r >r dpy get root get r> first2 r> first2 0 r>
     [ XVisualInfo-depth InputOutput ] keep
     [ XVisualInfo-visual create-window-mask ] keep
     window-attributes XCreateWindow
-    dup set-size-hints ;
+    dup r> auto-position ;
 
 : glx-window ( loc dim -- window context )
     choose-visual

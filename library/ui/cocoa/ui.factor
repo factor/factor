@@ -79,9 +79,17 @@ IN: gadgets
 : set-title ( string world -- )
     world-handle second swap <NSString> -> setTitle: ;
 
+: auto-position ( world -- )
+    dup world-loc { 0 0 } = [
+        world-handle second -> center
+    ] [
+        drop
+    ] if ;
+
 : open-window* ( world -- )
     dup gadget-window
     dup start-world
+    dup auto-position
     world-handle second f -> makeKeyAndOrderFront: ;
 
 : raise-window ( world -- )
