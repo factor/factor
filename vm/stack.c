@@ -245,7 +245,9 @@ void primitive_from_r(void)
 
 void stack_to_vector(CELL bottom, CELL top)
 {
-	CELL depth = (top - bottom + CELLS) / CELLS;
+	F_FIXNUM depth = (F_FIXNUM)(top - bottom + CELLS) / CELLS;
+	if(depth < 0)
+		depth = 0;
 	F_ARRAY *a = allot_array_internal(ARRAY_TYPE,depth);
 	memcpy(a + 1,(void*)bottom,depth * CELLS);
 	dpush(tag_object(a));
