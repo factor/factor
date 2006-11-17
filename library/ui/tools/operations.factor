@@ -54,8 +54,8 @@ M: operation invoke-command ( target operation -- )
 ! Pathnames
 [ pathname? ] H{
     { +primary+ t }
+    { +secondary+ t }
     { +name+ "Edit" }
-    { +keyboard+ T{ key-down f { A+ } "e" } }
     { +quot+ [ pathname-string edit-file ] }
 } define-operation
 
@@ -148,19 +148,21 @@ M: operation invoke-command ( target operation -- )
     { +primary+ t }
     { +name+ "Browse" }
     { +keyboard+ T{ key-down f { A+ } "b" } }
-    { +quot+ [ browser call-tool ] }
+    { +quot+ [ vocab-link-name find-workspace swap show-vocab-words ] }
 } define-operation
 
 [ vocab-link? ] H{
     { +name+ "Enter in" }
     { +keyboard+ T{ key-down f { A+ } "i" } }
-    { +quot+ [ vocab-link-name [ set-in ] curry call-listener ] }
+    { +quot+ [ vocab-link-name set-in ] }
+    { +listener+ t }
 } define-operation
 
 [ vocab-link? ] H{
     { +secondary+ t }
     { +name+ "Use" }
-    { +quot+ [ vocab-link-name [ use+ ] curry call-listener ] }
+    { +quot+ [ vocab-link-name use+ ] }
+    { +listener+ t }
 } define-operation
 
 [ vocab-link? ] H{
@@ -171,9 +173,22 @@ M: operation invoke-command ( target operation -- )
 
 ! Modules
 [ module? ] H{
-    { +primary+ t }
+    { +secondary+ t }
     { +name+ "Run" }
     { +quot+ [ module-name run-module ] }
+    { +listener+ t }
+} define-operation
+
+[ module? ] H{
+    { +name+ "Load" }
+    { +quot+ [ module-name require ] }
+    { +listener+ t }
+} define-operation
+
+[ module? ] H{
+    { +name+ "Reload" }
+    { +keyboard+ T{ key-down f { A+ } "r" } }
+    { +quot+ [ reload-module ] }
     { +listener+ t }
 } define-operation
 
@@ -190,16 +205,37 @@ M: operation invoke-command ( target operation -- )
 } define-operation
 
 [ module? ] H{
-    { +name+ "Reload" }
-    { +keyboard+ T{ key-down f { A+ } "r" } }
-    { +quot+ [ reload-module ] }
+    { +primary+ t }
+    { +name+ "Browse" }
+    { +keyboard+ T{ key-down f { A+ } "b" } }
+    { +quot+ [ find-workspace swap show-module-files ] }
     { +listener+ t }
 } define-operation
 
 [ module? ] H{
     { +name+ "See" }
-    { +keyboard+ T{ key-down f { A+ } "b" } }
-    { +quot+ [ see ] }
+    { +quot+ [ browser call-tool ] }
+    { +listener+ t }
+} define-operation
+
+[ module? ] H{
+    { +name+ "Test" }
+    { +quot+ [ module-name test-module ] }
+    { +listener+ t }
+} define-operation
+
+! Module links
+[ module-link? ] H{
+    { +primary+ t }
+    { +secondary+ t }
+    { +name+ "Run" }
+    { +quot+ [ module-name run-module ] }
+    { +listener+ t }
+} define-operation
+
+[ module-link? ] H{
+    { +name+ "Load" }
+    { +quot+ [ module-name require ] }
     { +listener+ t }
 } define-operation
 

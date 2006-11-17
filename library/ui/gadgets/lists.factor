@@ -82,7 +82,7 @@ M: list focusable-child* drop t ;
     ] [
         [
             list-value dup secondary-operation invoke-command
-        ] keep list-hook call
+        ] keep dup list-hook call
     ] if ; inline
 
 list H{

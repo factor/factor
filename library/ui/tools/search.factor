@@ -4,8 +4,9 @@ IN: gadgets-search
 USING: arrays gadgets gadgets-labels gadgets-panes
 gadgets-scrolling gadgets-text gadgets-theme
 generic help tools kernel models sequences words
-gadgets-borders gadgets-lists namespaces parser hashtables io
-completion styles strings modules ;
+gadgets-borders gadgets-lists gadgets-workspace gadgets-listener
+namespaces parser hashtables io completion styles strings
+modules ;
 
 TUPLE: live-search field list ;
 
@@ -31,10 +32,12 @@ search-field H{
     [ "\n" join ] <filter>
     swap <filter> ;
 
-: <search-list> ( hook seq producer presenter -- gadget )
-    -rot curry <search-model> <list> ;
+: <search-list> ( seq producer presenter -- gadget )
+    -rot curry <search-model>
+    [ [ workspace? ] find-parent hide-popup ] -rot
+    <list> ;
 
-C: live-search ( string hook seq producer presenter -- gadget )
+C: live-search ( string seq producer presenter -- gadget )
     {
         {
             [ <search-field> ]
@@ -49,16 +52,18 @@ C: live-search ( string hook seq producer presenter -- gadget )
             @center
         }
     } make-frame*
-    [ live-search-field set-editor-text ] keep ;
+    [ live-search-field set-editor-text ] keep
+    [ live-search-field select-all ] keep
+    dup popup-theme ;
 
 M: live-search focusable-child* live-search-field ;
 
-: delegate>live-search ( string hook seq producer presenter gadget -- )
+: delegate>live-search ( string seq producer presenter gadget -- )
     >r <live-search> r> set-gadget-delegate ;
 
 TUPLE: word-search ;
 
-C: word-search ( string action words -- gadget )
+C: word-search ( string words -- gadget )
     >r
     [ word-completions ]
     [ word-name ]
@@ -72,7 +77,7 @@ C: word-search ( string action words -- gadget )
 
 TUPLE: help-search ;
 
-C: help-search ( string action -- gadget )
+C: help-search ( string -- gadget )
     >r
     all-articles [ dup article-title 2array ] map
     [ [ second ] 2apply <=> ] sort
@@ -83,9 +88,8 @@ C: help-search ( string action -- gadget )
 
 TUPLE: source-file-search ;
 
-C: source-file-search ( string action -- gadget )
+C: source-file-search ( string files -- gadget )
     >r
-    source-files get hash-keys natural-sort
     [ string-completions [ <pathname> ] map ]
     [ pathname-string ]
     r>
@@ -96,7 +100,7 @@ C: source-file-search ( string action -- gadget )
 
 TUPLE: module-search ;
 
-: module-search ( string action -- gadget )
+C: module-search ( string -- gadget )
     >r
     available-modules [ module-completions ]
     [ module-name ]
@@ -105,7 +109,7 @@ TUPLE: module-search ;
 
 TUPLE: vocab-search ;
 
-C: vocab-search ( string action -- gadget )
+C: vocab-search ( string -- gadget )
     >r
     vocabs [ string-completions [ <vocab-link> ] map ]
     [ vocab-link-name ]
@@ -114,7 +118,7 @@ C: vocab-search ( string action -- gadget )
 
 TUPLE: history-search ;
 
-C: history-search ( string action seq -- gadget )
+C: history-search ( string seq -- gadget )
     >r
     [ string-completions [ <input> ] map ]
     [ input-string ]
@@ -123,3 +127,86 @@ C: history-search ( string action seq -- gadget )
 
 : search-action ( search -- obj )
     live-search-list list-value ;
+
+: show-titled-popup ( workspace gadget title -- )
+    <labelled-gadget> swap show-popup ;
+
+: workspace-listener ( workspace -- listener )
+    listener-gadget swap find-tool tool-gadget nip ;
+
+: current-word ( workspace -- string )
+    workspace-listener listener-gadget-input selected-word ;
+
+: show-word-search ( workspace words -- )
+    >r dup current-word r> <word-search>
+    "Word search" show-titled-popup ;
+
+: show-vocab-words ( workspace vocab -- )
+    "" over words <word-search>
+    "Words in " rot append show-titled-popup ;
+
+: show-help-search ( workspace -- )
+    "" <help-search> "Help search" show-titled-popup ;
+
+: all-source-files ( -- seq )
+    source-files get hash-keys natural-sort ;
+
+: show-source-file-search ( workspace -- )
+    "" all-source-files <source-file-search>
+    "Source file search" show-titled-popup ;
+
+: show-module-files ( workspace module -- )
+    "" over module-files <source-file-search>
+    "Source files in " rot module-name append show-titled-popup ;
+
+: show-vocab-search ( workspace -- )
+    dup current-word <vocab-search>
+    "Vocabulary search" show-titled-popup ;
+
+: show-module-search ( workspace -- )
+    "" <module-search> "Module search" show-titled-popup ;
+
+: listener-history ( listener -- seq )
+    listener-gadget-input interactor-history <reversed> ;
+
+: history-action ( string -- )
+    find-listener listener-gadget-input set-editor-text ;
+
+: show-history ( workspace -- )
+    dup workspace-listener
+    [ listener-gadget-input editor-text ] keep listener-history
+    <history-search>
+    "History search" show-titled-popup ;
+
+workspace "toolbar" {
+    {
+        "History"
+        T{ key-down f { C+ } "p" }
+        [ show-history ]
+    }
+    {
+        "Words"
+        T{ key-down f f "TAB" }
+        [ all-words show-word-search ]
+    }
+    {
+        "Vocabularies"
+        T{ key-down f { C+ } "u" }
+        [ show-vocab-search ]
+    }
+    {
+        "Modules"
+        T{ key-down f { C+ } "m" }
+        [ show-module-search ]
+    }
+    {
+        "Sources"
+        T{ key-down f { C+ } "e" }
+        [ show-source-file-search ]
+    }
+    {
+        "Search help"
+        T{ key-down f { C+ } "h" }
+        [ show-help-search ]
+    }
+} define-commands

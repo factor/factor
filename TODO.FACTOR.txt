@@ -1,13 +1,7 @@
 + 0.87:
 
 - live search operations need to hide the minibuffer
-- vocab links don't work
-- browse modules and vocabs by showing a new list
-- get rid of the navigator in the browser tool
 - list gadget mouse over help
-- tabs across the bottom:
-  [History] [Words] [Vocabs] [Sources] [Modules] [Help]
-  to show various search gadgets
 - top level window positioning on ms windows
 - scroll>rect broken if there are gadgets in between
 - completion is not ideal: eg, C+e "buttons"

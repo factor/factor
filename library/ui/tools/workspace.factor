@@ -53,14 +53,19 @@ tool "toolbar" {
         { "Dataflow" <dataflow-gadget> }
     } ;
 
+: <workspace-book> ( -- gadget )
+    workspace-tabs 1 <column> [ execute <tool> ] map <book> ;
+
 C: workspace ( -- workspace )
-    workspace-tabs 1 <column> [ execute <tool> ] map <book>
-    over set-gadget-delegate dup dup set-control-self ;
+    {
+        { [ <workspace-book> ] set-workspace-book f @center }
+        { [ gadget get { workspace } <toolbar> ] f f @bottom }
+    } make-frame* ;
 
 M: workspace pref-dim* delegate pref-dim* { 550 650 } vmax ;
 
-: <workspace-tabs> ( book -- tabs )
-    control-model
+: <workspace-tabs> ( workspace -- tabs )
+    workspace-book control-model
     workspace-tabs dup length [ swap first 2array ] 2map
     <radio-box> ;
 
@@ -69,6 +74,33 @@ M: workspace pref-dim* delegate pref-dim* { 550 650 } vmax ;
 
 : init-tabs ( world -- )
     [ world-gadget <workspace-tabs> ] keep @top grid-add ;
+
+: hide-popup ( workspace -- )
+    dup workspace-popup unparent
+    f over set-workspace-popup
+    request-focus ;
+
+: show-popup ( gadget workspace -- )
+    dup hide-popup 2dup set-workspace-popup dupd add-gadget
+    request-focus ;
+
+: popup-dim ( workspace -- dim )
+    rect-dim first2 3 /i 2array ;
+
+: popup-loc ( workspace -- loc )
+    dup rect-dim swap popup-dim v- ;
+
+: layout-popup ( workspace gadget -- )
+    over popup-dim over set-gadget-dim
+    swap popup-loc swap set-rect-loc ;
+
+M: workspace layout*
+    dup delegate layout*
+    dup workspace-popup dup [ layout-popup ] [ 2drop ] if ;
+
+M: workspace children-on nip gadget-children ;
+
+M: workspace focusable-child* workspace-book ;
 
 : workspace-window ( -- workspace )
     <workspace> dup <world>
@@ -91,6 +123,7 @@ workspace "scrolling" {
 } define-commands
 
 workspace "tool-switch" {
+    { "Hide popup" T{ key-down f f "ESCAPE" } [ hide-popup ] }
     { "Listener" T{ key-down f f "F2" } [ listener-gadget select-tool ] }
     { "Messages" T{ key-down f f "F3" } [ messages select-tool ] }
     { "Definitions" T{ key-down f f "F4" } [ browser select-tool ] }

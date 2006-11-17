@@ -1,14 +1,14 @@
 ! Copyright (C) 2005, 2006 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 IN: gadgets-listener
-USING: compiler arrays gadgets gadgets-labels
-gadgets-panes gadgets-scrolling gadgets-text gadgets-lists
-gadgets-search gadgets-theme gadgets-tracks gadgets-workspace
+USING: arrays compiler gadgets gadgets-labels
+gadgets-panes gadgets-scrolling gadgets-text
+gadgets-theme gadgets-tracks gadgets-workspace
 generic hashtables tools io kernel listener math models
 namespaces parser prettyprint sequences shells strings styles
-threads words definitions help modules ;
+threads words definitions help ;
 
-TUPLE: listener-gadget input output stack use minibuffer ;
+TUPLE: listener-gadget input output stack use ;
 
 : ui-listener-hook ( listener -- )
     use get over set-listener-gadget-use
@@ -113,56 +113,6 @@ M: listener-gadget tool-help
 : clear-listener-stack ( listener -- )
     [ clear ] swap (call-listener) ;
 
-: hide-minibuffer ( listener -- )
-    dup listener-gadget-minibuffer dup
-    [ over track-remove ] [ drop ] if
-    dup listener-gadget-input request-focus
-    f swap set-listener-gadget-minibuffer ;
-
-: show-minibuffer ( gadget listener -- )
-    [ hide-minibuffer ] keep
-    [ set-listener-gadget-minibuffer ] 2keep
-    dupd track-add request-focus ;
-
-: show-titled-minibuffer ( listener gadget title -- )
-    <labelled-gadget> swap show-minibuffer ;
-
-: show-word-search ( listener words -- )
-    >r [ find-listener hide-minibuffer ]
-    >r dup listener-gadget-input selected-word r>
-    r> <word-search> "Word search" show-titled-minibuffer ;
-
-: show-help-search ( listener -- )
-    [ find-listener hide-minibuffer ]
-    "" swap <help-search> "Help search" show-titled-minibuffer ;
-
-: show-source-file-search ( listener action -- )
-    [ find-listener hide-minibuffer ]
-    "" swap <source-file-search>
-    "Source file search" show-titled-minibuffer ;
-
-: show-vocab-search ( listener action -- )
-    [ find-listener hide-minibuffer ]
-    >r dup listener-gadget-input selected-word r>
-    <vocab-search> "Vocabulary search" show-titled-minibuffer ;
-
-: show-module-search ( listener action -- )
-    [ find-listener hide-minibuffer ]
-    "" swap <module-search>
-    "Module search" show-titled-minibuffer ;
-
-: listener-history ( listener -- seq )
-    listener-gadget-input interactor-history <reversed> ;
-
-: history-action ( string -- )
-    find-listener listener-gadget-input set-editor-text ;
-
-: show-history ( listener -- )
-    dup listener-gadget-input editor-text
-    [ find-listener hide-minibuffer ]
-    pick listener-history <history-search>
-    "History search" show-titled-minibuffer ;
-
 listener-gadget "toolbar" {
     { "Restart" f [ start-listener ] }
     {
@@ -176,42 +126,4 @@ listener-gadget "toolbar" {
         [ clear-listener-stack ]
     }
     { "Send EOF" T{ key-down f { C+ } "d" } [ listener-eof ] }
-} define-commands
-
-listener-gadget "popups" {
-    {
-        "Complete word"
-        T{ key-down f f "TAB" }
-        [ all-words show-word-search ]
-    }
-    {
-        "Use vocabulary"
-        T{ key-down f { C+ } "u" }
-        [ show-vocab-search ]
-    }
-    {
-        "History"
-        T{ key-down f { C+ } "p" }
-        [ show-history ]
-    }
-    {
-        "Help search"
-        T{ key-down f { C+ } "h" }
-        [ show-help-search ]
-    }
-    {
-        "Run module"
-        T{ key-down f { C+ } "m" }
-        [ show-module-search ]
-    }
-    {
-        "Edit file"
-        T{ key-down f { C+ } "e" }
-        [ show-source-file-search ]
-    }
-    {
-        "Hide minibuffer"
-        T{ key-down f f "ESCAPE" }
-        [ hide-minibuffer ]
-    }
 } define-commands

@@ -4,11 +4,10 @@ USING: arrays sequences kernel gadgets-panes definitions
 prettyprint gadgets-theme gadgets-borders gadgets
 generic gadgets-scrolling math io words models styles
 namespaces gadgets-tracks gadgets-presentations
-gadgets-workspace help gadgets-buttons
-gadgets-search tools ;
+gadgets-workspace help gadgets-buttons tools ;
 IN: gadgets-browser
 
-TUPLE: browser navigator definitions ;
+TUPLE: browser definitions ;
 
 TUPLE: definitions showing ;
 
@@ -60,51 +59,15 @@ tile "toolbar" { { "Close" f [ close-tile ] } } define-commands
         scroll>bottom
     ] if ;
 
-: <list-control> ( model quot -- gadget )
-    [ map [ first2 write-object terpri ] each ] curry
-    <pane-control> ;
-
-TUPLE: navigator vocab ;
-
-: <vocab-list> ( -- gadget )
-    vocabs <model> [ dup <vocab-link> 2array ]
-    <list-control> ;
-
-: <word-list> ( model -- gadget )
-    gadget get navigator-vocab
-    [ words natural-sort ] <filter>
-    [ dup word-name swap 2array ]
-    <list-control> ;
-
-C: navigator ( -- gadget )
-    f <model> over set-navigator-vocab
-    {
-        { [ <vocab-list> ] f [ <scroller> ] 1/2 }
-        { [ <word-list> ] f [ <scroller> ] 1/2 }
-    } { 1 0 } make-track* ;
-
 C: browser ( -- gadget )
     {
-        {
-            [ <navigator> ]
-            set-browser-navigator
-            f
-            1/5
-        }
         {
             [ <definitions> ]
             set-browser-definitions
             [ <scroller> ]
-            4/5
+            @center
         }
-    } { 0 1 } make-track* ;
-
-: show-vocab ( vocab browser -- )
-    browser-navigator navigator-vocab set-model* ;
-
-: show-word ( word browser -- )
-    over word-vocabulary over show-vocab
-    browser-definitions show-definition ;
+    } make-frame* ;
 
 : clear-browser ( browser -- )
     browser-definitions close-definitions ;
@@ -114,11 +77,7 @@ browser "toolbar" {
 } define-commands
 
 M: browser call-tool*
-    over vocab-link? [
-        >r vocab-link-name r> show-vocab
-    ] [
-        show-word
-    ] if ;
+    browser-definitions show-definition ;
 
 M: browser tool-scroller browser-definitions find-scroller ;
 

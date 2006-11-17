@@ -20,15 +20,17 @@ GENERIC: tool-help ( tool -- topic )
 
 M: gadget tool-help drop f ;
 
-TUPLE: workspace ;
+TUPLE: workspace book popup ;
 
 TUPLE: tool gadget ;
 
 : find-tool ( class workspace -- index tool )
-    gadget-children [ tool-gadget class eq? ] find-with ;
+    workspace-book gadget-children
+    [ tool-gadget class eq? ] find-with ;
 
 : show-tool ( class workspace -- tool )
-    [ find-tool swap ] keep control-model set-model* ;
+    [ find-tool swap ] keep workspace-book control-model
+    set-model* ;
 
 : select-tool ( workspace class -- ) swap show-tool drop ;
 

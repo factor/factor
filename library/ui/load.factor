@@ -39,7 +39,6 @@ PROVIDE: library/ui
     "gadgets/presentations.factor"
     "ui.factor"
     "tools/tools.factor"
-    "tools/search.factor"
     "tools/messages.factor"
     "tools/listener.factor"
     "tools/walker.factor"
@@ -47,6 +46,7 @@ PROVIDE: library/ui
     "tools/help.factor"
     "tools/dataflow.factor"
     "tools/workspace.factor"
+    "tools/search.factor"
     "tools/operations.factor"
     "text/editor.facts"
 } }
