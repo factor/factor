@@ -9,7 +9,8 @@ contrib/hardware-info contrib/hexdump contrib/http
 contrib/httpd contrib/http-client contrib/jedit
 contrib/jni contrib/json contrib/lambda contrib/lazy-lists
 contrib/lindenmayer contrib/match contrib/math
-contrib/parser-combinators contrib/postgresql contrib/process
+contrib/parser-combinators contrib/porter-stemmer
+contrib/postgresql contrib/process
 contrib/random-tester contrib/rss contrib/sequences
 contrib/serialize contrib/shuffle contrib/slate
 contrib/space-invaders contrib/splay-trees contrib/sqlite

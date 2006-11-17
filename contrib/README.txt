@@ -38,6 +38,7 @@ Available libraries:
 - match -- pattern matching (Chris Double)
 - math -- extended math library (Doug Coleman, Slava Pestov)
 - parser-combinators -- Haskell-style parser combinators (Chris Double)
+- porter-stemmer -- Porter stemming algorithm (Slava Pestov)
 - postgresql -- PostgreSQL binding (Doug Coleman)
 - process -- Run external programs (Slava Pestov, Doug Coleman)
 - random-tester -- Random compiler tester (Doug Coleman)
