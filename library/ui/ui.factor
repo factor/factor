@@ -99,11 +99,11 @@ C: titled-gadget ( gadget title -- )
     focused-ancestors f swap focus-gestures ;
 
 : reset-world ( world -- )
+    dup world-fonts clear-hash
     dup unfocus-world
-    dup ungraft
     f over set-world-focus
     f over set-world-handle
-    world-fonts clear-hash ;
+    ungraft ;
 
 : close-world ( world -- )
     dup hand-clicked close-global

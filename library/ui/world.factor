@@ -56,7 +56,9 @@ M: world ungraft*
     dup world-status remove-connection ;
 
 M: world model-changed
-    dup world-title model-value swap set-title ;
+    dup world-handle [
+        dup world-title model-value over set-title
+    ] when drop ;
 
 : focused-ancestors ( world -- seq )
     world-focus parents <reversed> ;

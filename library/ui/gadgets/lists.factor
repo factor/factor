@@ -2,7 +2,8 @@
 ! See http://factorcode.org/license.txt for BSD license.
 IN: gadgets-lists
 USING: gadgets gadgets-labels gadgets-scrolling kernel sequences
-models opengl math namespaces gadgets-theme ;
+models opengl math namespaces gadgets-theme
+gadgets-presentations ;
 
 TUPLE: list index hook presenter color ;
 
@@ -14,7 +15,6 @@ C: list ( hook presenter model -- gadget )
     [ set-list-presenter ] keep
     [ set-list-hook ] keep
     0 over set-list-index
-    1 over set-pack-fill
     dup list-theme ;
 
 : bound-index ( list -- )
@@ -23,8 +23,8 @@ C: list ( hook presenter model -- gadget )
 
 M: list model-changed
     dup clear-gadget
-    dup control-value
-    over list-presenter map [ <label> dup text-theme ] map
+    dup list-presenter over control-value
+    [ [ swap call ] keep <presentation> ] map-with
     over add-gadgets
     bound-index ;
 

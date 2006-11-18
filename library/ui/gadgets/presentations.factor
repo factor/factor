@@ -35,8 +35,17 @@ C: presentation ( gadget object -- button )
     [ invoke-command drop ] curry curry
     <bevel-button> ;
 
+TUPLE: menu-command ;
+
+C: menu-command ( command -- command )
+    [ set-delegate ] keep ;
+
+M: menu-command invoke-command
+    hand-clicked get find-world hide-glass
+    delegate invoke-command ;
+
 : <commands-menu> ( target commands -- gadget )
-    [ hand-clicked get find-world hide-glass ] modify-operations
+    [ <menu-command> ] map
     [ <command-button> ] map-with
     make-pile 1 over set-pack-fill ;
 

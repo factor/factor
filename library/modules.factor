@@ -3,7 +3,7 @@
 IN: modules
 USING: hashtables io kernel namespaces parser sequences
 test words strings arrays math help prettyprint-internals
-definitions ;
+definitions styles ;
 
 SYMBOL: modules
 
@@ -24,15 +24,6 @@ M: module-link module-name module-link-name ;
 
 : module modules get [ module-name = ] find-with nip ;
 
-: load-module ( name -- )
-    [
-        "Loading module " write dup write "..." print
-        [ dup module-def run-file ] assert-depth drop
-    ] no-parse-hook ;
-
-: require ( name -- )
-    dup module [ drop ] [ load-module ] if do-parse-hook ;
-
 : process-files ( name seq -- newseq )
     [ dup string? [ [ t ] 2array ] when ] map
     [ second call ] subset
@@ -41,6 +32,24 @@ M: module-link module-name module-link-name ;
 
 : module-files* ( module -- seq )
     dup module-name swap module-files process-files ;
+
+: load-module ( name -- )
+    [
+        "Loading module " write dup write "..." print
+        [ dup module-def run-file ] assert-depth drop
+    ] no-parse-hook ;
+
+: reload-module ( module -- )
+    dup module-name module-def source-modified? [
+        module-name load-module
+    ] [
+        module-files* [ source-modified? ] subset run-files
+    ] if ;
+
+: require ( name -- )
+    dup module
+    [ reload-module ] [ load-module ] ?if
+    do-parse-hook ;
 
 : module-tests* ( module -- seq )
     dup module-name swap module-tests process-files ;
@@ -71,13 +80,6 @@ M: module-link module-name module-link-name ;
 : test-modules ( -- )
     modules get [ module-tests* ] map concat run-tests ;
 
-: reload-module ( module -- )
-    dup module-name module-def source-modified? [
-        module-name load-module
-    ] [
-        module-files* [ source-modified? ] subset run-files
-    ] if ;
-
 : reload-modules ( -- )
     modules get [ reload-module ] each do-parse-hook ;
 
@@ -95,7 +97,9 @@ M: module-link module-name module-link-name ;
 : modules-help ( -- seq )
     modules get [ module-help ] map [ ] subset ;
 
-M: module synopsis* \ PROVIDE: pprint-word module-name text ;
+M: module synopsis*
+    \ PROVIDE: pprint-word
+    [ module-name ] keep presented associate styled-text ;
 
 M: module definition module>alist t ;
 

@@ -6,7 +6,7 @@ gadgets-scrolling gadgets-text gadgets-theme
 generic help tools kernel models sequences words
 gadgets-borders gadgets-lists gadgets-workspace gadgets-listener
 namespaces parser hashtables io completion styles strings
-modules ;
+modules prettyprint ;
 
 TUPLE: live-search field list ;
 
@@ -53,7 +53,6 @@ C: live-search ( string seq producer presenter -- gadget )
         }
     } make-frame*
     [ live-search-field set-editor-text ] keep
-    [ live-search-field select-all ] keep
     dup popup-theme ;
 
 M: live-search focusable-child* live-search-field ;
@@ -66,7 +65,7 @@ TUPLE: word-search ;
 C: word-search ( string words -- gadget )
     >r
     [ word-completions ]
-    [ word-name ]
+    [ summary ]
     r>
     [ delegate>live-search ] keep ;
 
@@ -103,7 +102,7 @@ TUPLE: module-search ;
 C: module-search ( string -- gadget )
     >r
     available-modules [ module-completions ]
-    [ module-name ]
+    [ module-string ]
     r>
     [ delegate>live-search ] keep ;
 
@@ -126,6 +125,7 @@ C: history-search ( string seq -- gadget )
     [ delegate>live-search ] keep ;
 
 : search-action ( search -- obj )
+    dup [ workspace? ] find-parent hide-popup
     live-search-list list-value ;
 
 : show-titled-popup ( workspace gadget title -- )
@@ -156,7 +156,7 @@ C: history-search ( string seq -- gadget )
     "Source file search" show-titled-popup ;
 
 : show-module-files ( workspace module -- )
-    "" over module-files <source-file-search>
+    "" over module-files* <source-file-search>
     "Source files in " rot module-name append show-titled-popup ;
 
 : show-vocab-search ( workspace -- )

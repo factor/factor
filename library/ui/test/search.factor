@@ -1,11 +1,11 @@
 IN: temporary
 USING: gadgets-search io test namespaces gadgets 
-sequences threads freetype timers kernel ;
+sequences threads freetype timers kernel words ;
 
 timers get [ init-timers ] unless
 
 [
-    "set-word-prop" [ ] <word-search> "search" set
+    "set-word-prop" all-words <word-search> "search" set
     "search" get graft
     
     1000 sleep

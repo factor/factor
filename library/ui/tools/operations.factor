@@ -62,7 +62,8 @@ M: operation invoke-command ( target operation -- )
 [ pathname? ] H{
     { +name+ "Run file" }
     { +keyboard+ T{ key-down f { A+ } "r" } }
-    { +quot+ [ pathname-string [ run-file ] curry call-listener ] }
+    { +quot+ [ pathname-string run-file ] }
+    { +listener+ t }
 } define-operation
 
 ! Words
@@ -122,7 +123,6 @@ M: operation invoke-command ( target operation -- )
 [ word? ] H{
     { +name+ "Watch" }
     { +quot+ [ watch ] }
-    { +listener+ t }
 } define-operation
 
 [ word? ] H{
@@ -130,16 +130,14 @@ M: operation invoke-command ( target operation -- )
     { +quot+ [ forget ] }
 } define-operation
 
-[ word? ] H{
+[ compound? ] H{
     { +name+ "Word stack effect" }
-    { +keyboard+ T{ key-down f { A+ } "i" } }
     { +quot+ [ word-def infer. ] }
     { +listener+ t }
 } define-operation
 
-[ word? ] H{
+[ compound? ] H{
     { +name+ "Word dataflow" }
-    { +keyboard+ T{ key-down f { A+ } "d" } }
     { +quot+ [ word-def show-dataflow ] }
 } define-operation
 
@@ -167,7 +165,6 @@ M: operation invoke-command ( target operation -- )
 
 [ vocab-link? ] H{
     { +name+ "Forget" }
-    { +keyboard+ T{ key-down f { A+ } "f" } }
     { +quot+ [ vocab-link-name forget-vocab ] }
 } define-operation
 
@@ -182,13 +179,6 @@ M: operation invoke-command ( target operation -- )
 [ module? ] H{
     { +name+ "Load" }
     { +quot+ [ module-name require ] }
-    { +listener+ t }
-} define-operation
-
-[ module? ] H{
-    { +name+ "Reload" }
-    { +keyboard+ T{ key-down f { A+ } "r" } }
-    { +quot+ [ reload-module ] }
     { +listener+ t }
 } define-operation
 
@@ -209,13 +199,11 @@ M: operation invoke-command ( target operation -- )
     { +name+ "Browse" }
     { +keyboard+ T{ key-down f { A+ } "b" } }
     { +quot+ [ find-workspace swap show-module-files ] }
-    { +listener+ t }
 } define-operation
 
 [ module? ] H{
     { +name+ "See" }
     { +quot+ [ browser call-tool ] }
-    { +listener+ t }
 } define-operation
 
 [ module? ] H{
@@ -268,28 +256,28 @@ M: operation invoke-command ( target operation -- )
 ! Quotations
 [ quotation? ] H{
     { +name+ "Quotation stack effect" }
-    { +keyboard+ T{ key-down f { C+ A+ } "i" } }
+    { +keyboard+ T{ key-down f { A+ } "i" } }
     { +quot+ [ infer. ] }
     { +listener+ t }
 } define-operation
 
 [ quotation? ] H{
     { +name+ "Quotation dataflow" }
-    { +keyboard+ T{ key-down f { C+ A+ } "d" } }
+    { +keyboard+ T{ key-down f { A+ } "d" } }
     { +quot+ [ show-dataflow ] }
     { +listener+ t }
 } define-operation
 
 [ quotation? ] H{
     { +name+ "Walk" }
-    { +keyboard+ T{ key-down f { C+ A+ } "w" } }
+    { +keyboard+ T{ key-down f { A+ } "w" } }
     { +quot+ [ walk ] }
     { +listener+ t }
 } define-operation
 
 [ quotation? ] H{
     { +name+ "Time" }
-    { +keyboard+ T{ key-down f { C+ A+ } "t" } }
+    { +keyboard+ T{ key-down f { A+ } "t" } }
     { +quot+ [ time ] }
     { +listener+ t }
 } define-operation
@@ -299,12 +287,6 @@ M: operation invoke-command ( target operation -- )
     { +primary+ t }
     { +name+ "Show dataflow" }
     { +quot+ [ dataflow-gadget call-tool ] }
-} define-operation
-
-[ [ node? ] is? ] H{
-    { +name+ "Inspect" }
-    { +quot+ [ inspect ] }
-    { +listener+ t }
 } define-operation
 
 ! Define commands in terms of operations
