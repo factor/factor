@@ -270,7 +270,12 @@ void primitive_finalize_compile(void)
 	{
 		F_ARRAY *pair = untag_array(get(AREF(array,i)));
 		F_WORD *word = untag_word(get(AREF(pair,0)));
-		word->xt = to_cell(get(AREF(pair,1)));
+		CELL xt = to_cell(get(AREF(pair,1)));
+		F_BLOCK *block = xt_to_block(xt);
+		if(block->status != B_ALLOCATED)
+			critical_error("bad XT",xt);
+
+		word->xt = xt;
 		word->compiledp = T;
 	}
 
@@ -278,7 +283,8 @@ void primitive_finalize_compile(void)
 	for(i = 0; i < count; i++)
 	{
 		F_ARRAY *pair = untag_array(get(AREF(array,i)));
-		CELL xt = to_cell(get(AREF(pair,1)));
+		F_WORD *word = untag_word(get(AREF(pair,0)));
+		CELL xt = word->xt;
 		iterate_code_heap_step(xt_to_compiled(xt),finalize_code_block);
 	}
 }
