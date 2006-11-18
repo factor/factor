@@ -7,6 +7,6 @@ USING: cocoa objc objc-classes kernel ;
 "NSSpeechSynthesizer" f import-objc-class
 
 : say ( string -- )
-	NSSpeechSynthesizer -> alloc f -> initWithVoice: swap <NSString> -> startSpeakingString: ;
+	NSSpeechSynthesizer -> alloc f -> initWithVoice: swap <NSString> -> startSpeakingString: drop ;
 
 "Hello from Factor" say
