@@ -5,12 +5,14 @@ USING: help kernel xml ;
 HELP: string>xml
 { $values { "string" "a string" } { "xml-doc" "an xml document" } }
 { $description "converts a string into an " { $snippet "xml-doc" }
-    " datatype for further processing" }  ;
+    " datatype for further processing" }
+{ $see-also xml>string xml-reprint } ;
 
 HELP: xml>string
 { $values { "xml-doc" "an xml document" } { "string" "a string" } }
 { $description "converts an xml document into a string" }
-{ $notes "does not preserve what type of quotes were used or what data was omitted from version declaration" } ;
+{ $notes "does not preserve what type of quotes were used or what data was omitted from version declaration" }
+{ $see-also string>xml xml-reprint } ;
 
 HELP: xml-parse-error
 { $description "the exception class that all parsing errors in XML documents are in." } ;
@@ -20,9 +22,26 @@ HELP: xml-reprint
 { $description "parses XML and converts it back into a string, for testing purposes" }
 { $notes "does not preserve what type of quotes were used or what data was omitted from version declaration" } ;
 
+HELP: PROCESS:
+{ $syntax "PROCESS: word" }
+{ $values { "word" "a new word to define" } }
+{ $description "creates a new word to process XML tags" }
+{ $see-also POSTPONE: TAG: } ;
+
+HELP: TAG:
+{ $syntax "TAG: tag word definition... ;" }
+{ $values { "tag" "an xml tag name" } { "word" "an XML process" } }
+{ $description "defines what a process should do when it encounters a specific tag" }
+{ $examples { $code "PROCESS: x ( tag -- )\nTAG: a x drop \"hi\" write ;" } }
+{ $see-also POSTPONE: PROCESS: } ;
+
 ARTICLE: { "xml" "intro" } "XML"
     "The XML module attempts to implement the XML 1.1 standard, converting strings of text into XML and vice versa. It currently is a work in progress."
     $terpri
     "The XML module was implemented by Daniel Ehrenberg, with edits by Slava Pestov. Main functions implemented include:"
     { $subsection string>xml }
-    { $subsection xml>string } ;
+    { $subsection xml>string }
+    { $subsection xml-parse-error }
+    { $subsection xml-reprint }
+    { $subsection POSTPONE: PROCESS: }
+    { $subsection POSTPONE: TAG: } ;

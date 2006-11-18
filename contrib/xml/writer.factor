@@ -51,6 +51,9 @@ M: instruction (xml>string)
 M: entity (xml>string)
     CHAR: & , entity-name % CHAR: ; , ;
 
+M: reference (xml>string)
+    CHAR: % , reference-name % CHAR: ; , ;
+
 : xml-preamble ( xml -- )
     "<?xml version=\"" % dup prolog-version %
     "\" encoding=\"" % dup prolog-encoding %

@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 IN: xml
 USING: errors hashtables io kernel math namespaces prettyprint sequences
-    arrays generic strings vectors ;
+    arrays generic strings vectors char-classes ;
 
 TUPLE: opener name props ;
 TUPLE: closer name ;
@@ -146,8 +146,8 @@ GENERIC: process ( object -- )
 M: f process drop ;
 
 M: object process add-child ;
-M: vector process [ add-child ] each ;
-M: array process [ add-child ] each ; ! does this ever occur? 
+M: vector process [ add-child ] each ; ! does this ever occur? 
+M: array process [ add-child ] each ;
 
 M: contained process
     [ contained-name ] keep contained-props
@@ -228,8 +228,7 @@ M: extra-attrs error.
     <prolog> dup prolog-data set ;
 
 : init-xml ( string -- )
-    code set
-    [ spot line column ] [ 0 swap set ] each
+    code set { 0 1 1 } spot set
     init-xml-stack init-ns-stack ;
 
 UNION: any-tag tag contained-tag ;

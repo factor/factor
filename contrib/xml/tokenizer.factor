@@ -2,20 +2,24 @@
 ! See http://factorcode.org/license.txt for BSD license.
 IN: xml
 USING: errors hashtables io kernel math namespaces prettyprint sequences tools
-    generic strings ;
+    generic strings char-classes ;
 
 SYMBOL: code #! Source code
-SYMBOL: spot #! Current index of string
+SYMBOL: spot #! { index line column }
+: get-index ( -- index ) spot get first ;
+: set-index ( index -- ) 0 spot get set-nth ;
+: get-line ( -- line ) spot get second ;
+: set-line ( line -- ) 1 spot get set-nth ;
+: get-column ( -- column ) 2 spot get nth ;
+: set-column ( column -- ) 2 spot get set-nth ;
 SYMBOL: prolog-data
-SYMBOL: line
-SYMBOL: column
 
 !   -- Error reporting
 
 TUPLE: xml-error line column ;
 C: xml-error ( -- xml-error )
-    [ line get swap set-xml-error-line ] keep
-    [ column get swap set-xml-error-column ] keep ;
+    [ get-line swap set-xml-error-line ] keep
+    [ get-column swap set-xml-error-column ] keep ;
 
 : xml-error. ( xml-error -- )
     "XML error" print
@@ -53,21 +57,18 @@ M: xml-string-error error.
 
 !   -- Basic utility words
 
-: set-code ( string -- ) ! for debugging
-    code set [ spot line column ] [ 0 swap set ] each ;
-
 : more? ( -- ? )
     #! Return t if spot is not at the end of code
-    code get length spot get = not ;
+    code get length get-index = not ;
 
 : char ( -- char/f )
-    more? [ spot get code get nth ] [ f ] if ;
+    more? [ get-index code get nth ] [ f ] if ;
 
 : incr-spot ( -- )
     #! Increment spot.
-    spot inc
-    char "\n\r" member? [ 0 column set line ] [ column ] if
-    inc ;
+    get-index 1+ set-index char "\n\r" member?
+    [ 0 set-column get-line 1+ set-line ]
+    [ get-column 1+ set-column ] if ;
 
 : skip-until ( quot -- )
     #! quot: ( char -- ? )
@@ -81,29 +82,29 @@ M: xml-string-error error.
     #! Take the substring of a string starting at spot
     #! from code until the quotation given is true and
     #! advance spot to after the substring.
-    spot get >r skip-until r>
-    spot get code get subseq ; inline
+    get-index >r skip-until r>
+    get-index code get subseq ; inline
 
 : pass-blank ( -- )
     #! Advance code past any whitespace, including newlines
     [ blank? not ] skip-until ;
 
 : string-matches? ( string -- ? )
-    spot get dup pick length + code get
+    get-index dup pick length + code get
     2dup length > [ 3drop drop f ] [ <slice> sequence= ] if ;
 
 : (take-until-string) ( string -- n )
     more? [
         dup string-matches? [
-            drop spot get
+            drop get-index
         ] [
             incr-spot (take-until-string)
         ] if
     ] [ "Missing closing token" <xml-string-error> throw ] if ;
 
 : take-until-string ( string -- string )
-    [ >r spot get r> (take-until-string) code get subseq ] keep
-    length spot [ + ] change ;
+    [ >r get-index r> (take-until-string) code get subseq ] keep
+    length get-index + set-index ;
 
 !   -- Parsing strings
 
@@ -117,10 +118,10 @@ M: xml-string-error error.
     [ incr-spot ] times ;
 
 : expect-string ( string -- )
-    >r spot get r> t over [ char incr-spot = and ] each [
+    >r get-index r> t over [ char incr-spot = and ] each [
         2drop
     ] [
-        swap spot get code get subseq <expected> throw
+        swap get-index code get subseq <expected> throw
     ] if ;
 
 TUPLE: prolog version encoding standalone ; ! part of xml-doc, see parser
@@ -144,63 +145,38 @@ TUPLE: entity name ;
 
 : parsed-ch ( sbuf ch -- sbuf ) over push incr-spot ;
 
-: parse-entity ( vector sbuf -- vector sbuf )
+: parse-entity ( sbuf -- sbuf )
     incr-spot [ CHAR: ; = ] take-until "#" ?head [
         "x" ?head 16 10 ? base> parsed-ch
     ] [
         dup entities hash [ parsed-ch ] [ 
             prolog-data get prolog-standalone
             [ <no-entity> throw ] [
-                >r >string over push r> <entity> over push incr-spot SBUF" " 
+                >r >string , r> <entity> , incr-spot
+                SBUF" " clone
             ] if
         ] ?if
     ] if ;
 
-: (parse-text) ( vector sbuf -- vector )
+TUPLE: reference name ;
+
+: parse-reference ( sbuf -- sbuf )
+    , incr-spot [ CHAR: ; = ] take-until
+    <reference> , SBUF" " clone incr-spot ;
+
+: (parse-text) ( sbuf -- )
     {
-        { [ more? not ] [ >string over push ] }
-        { [ char CHAR: < = ] [ >string over push ] }
+        { [ more? not ] [ >string , ] } ! should this be an error?
+        { [ char CHAR: < = ] [ >string , ] }
         { [ char CHAR: & = ] [ parse-entity (parse-text) ] }
+        { [ char CHAR: % = ] [ parse-reference (parse-text) ] }
         { [ t ] [ char parsed-ch (parse-text) ] }
     } cond ;
 
 : parse-text ( -- array )
-   V{ } clone SBUF" " clone (parse-text) ;
+   [ SBUF" " clone (parse-text) ] { } make ;
 
 !   -- Parsing tags
-
-: in-range-seq? ( number seq -- ? )
-    #! seq: { { min max } { min max }* }
-    [ first2 between? ] contains-with? ;
-
-: name-start-char? ( ch -- ? )
-    {
-        { CHAR: _    CHAR: _    }
-        { CHAR: A    CHAR: Z    }
-        { CHAR: a    CHAR: z    }
-        { HEX: C0    HEX: D6    }
-        { HEX: D8    HEX: F6    }
-        { HEX: F8    HEX: 2FF   }
-        { HEX: 370   HEX: 37D   }
-        { HEX: 37F   HEX: 1FFF  }
-        { HEX: 200C  HEX: 200D  }
-        { HEX: 2070  HEX: 218F  }
-        { HEX: 2C00  HEX: 2FEF  }
-        { HEX: 3001  HEX: D7FF  }
-        { HEX: F900  HEX: FDCF  }
-        { HEX: FDF0  HEX: FFFD  }
-        { HEX: 10000 HEX: EFFFF }
-    } in-range-seq? ;
-
-: name-char? ( ch -- ? )
-    dup name-start-char? swap {
-        { CHAR: -   CHAR: -   }
-        { CHAR: .   CHAR: .   }
-        { CHAR: 0   CHAR: 9   }
-        { HEX: b7   HEX: b7   }
-        { HEX: 300  HEX: 36F  }
-        { HEX: 203F HEX: 2040 }
-    } in-range-seq? or ;
 
 TUPLE: name space tag url ;
 C: name ( space tag -- name )

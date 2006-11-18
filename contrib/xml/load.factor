@@ -2,6 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 PROVIDE: contrib/xml
 { +files+ {
+    "char-class.factor"
     "tokenizer.factor"
     "parser.factor"
     "writer.factor"
