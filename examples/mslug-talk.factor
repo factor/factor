@@ -108,7 +108,7 @@ IN: mslug
     { $code "100 [ 4 mod 3 = ] subset ." }
     { $code "0 100 [ 1 + * ] reduce ." } }
 }
-{ $slide "Data types - hashtables, lazy lists"
+{ $slide "Data types - hashtables"
     "Hashtables: literal syntax, utility words, higher-order combinators..."
     { $code
         "H{ { \"grass\" \"green\" } { \"chicken\" \"white\" } }"
@@ -116,16 +116,10 @@ IN: mslug
         "hash-union"
     }
     "Prettyprinter -vs- inspector"
-    { "Lazy lists"
-    { $code "\"contrib/lazy-lists\" require" "USE: lazy-lists" } }
-    { $code
-        ": squares naturals [ sq ] lmap ;"
-        ": first-five-squares 5 squares ltake list>array ;"
-    }
     "Option+h"
 }
 { $slide "Data types - others"
-    "Queues, graphs, splay trees, double linked lists..."
+    "Queues, graphs, splay trees, double linked lists, lazy lists..."
 }
 { $slide "Variables"
     "Dynamic scope - WHY?"
@@ -153,6 +147,8 @@ IN: mslug
     }
     { $code "100 200 <rectangle>" }
     { $code "rectangle-w ." }
+}
+{ $slide "Polymorphism"
     { "Generic words:"
         { $code
             "GENERIC: area ( shape -- n )"
@@ -161,9 +157,10 @@ IN: mslug
             "M: circle area circle-r sq pi * ;"
         }
     }
-    { "Philosophy: " { $link array } " -vs- " { $link nth } }
+    { "Methods in classes -vs- methods in functions?" }
+    { "Both: " { $link array } " -vs- " { $link nth } }
 }
-{ $slide "Polymorphism continued"
+{ $slide "More polymorphism"
     "Tuples can have custom constructor words"
     { "Delegation instead of inheritance"
     { $code
@@ -174,23 +171,6 @@ IN: mslug
     } }
     { $code "100 200 <rectangle>" "{ 0.5 0.5 1 } <colored-shape>" "area ." }
     "Advanced features: predicate classes, union classes, method combination"
-}
-{ $slide "The compiler"
-    "Most code has a static stack effect"
-    { "Combinators have a static stack effect if quotations are known:"
-    { $code "[ sq ] map" } }
-    "First stage: construct dataflow graph"
-    "Second stage: optimize"
-    "Third stage: emit machine code"
-    "Compiled code saved in the image"
-    "Compiler invoked explicitly (not a ``JIT'')"
-}
-{ $slide "The compiler, continued"
-    "Rewrite rules"
-    "Identities"
-    "Intrinsics"
-    "Register allocation"
-    "Unboxing floats"
 }
 { $slide "The Factor UI"
     "Factor UI is totally implemented in Factor"
@@ -206,11 +186,26 @@ IN: mslug
 { $slide "Models"
     { $code
         "USING: models gadgets-scrolling gadgets-text ;"
-        "<editor> dup <scroller> swap control-model"
+    }
+    "Create an editor, wrap it in a scroller:"
+    { $code
+        "<editor>"
+    }
+    "Length filter:"
+    { $code "dup control-model"
         "[ concat length number>string ] <filter>"
-        "<label-control>"
-        "2array make-pile"
-        "\"Model test\" open-titled-window"
+    }
+}
+{ $slide "Models continued"
+    "Layout:"
+    { $code "{"
+    "    { [ <label-control> ] f f @top }"
+    "    { [ ] f f @center }"
+    "} make-frame"
+    }
+    "Window:"
+    { $code
+    "\"Model test\" open-titled-window"
     }
 }
 { $slide "This talk"
@@ -219,6 +214,47 @@ IN: mslug
     "Slides are grouped in a custom gadget which handles Up/Down arrow keys to move between slides"
     "Let's look at the source code:"
     { $module "examples/mslug-talk" }
+}
+{ $slide "The compiler"
+    "Performance is a goal"
+    "Compromise: The compiler only compiles words with a static stack effect"
+    "Three stages"
+    { "First stage transforms a quotation into the " { $emphasis "dataflow representation" } }
+    "Second stage: high-level optimizations"
+    "Third stage: register allocation, peephole optimization, code generation"
+    "Compiled code saved in the image"
+    "Compiler invoked explicitly (not a ``JIT'')"
+}
+{ $slide "High-level optimizer"
+    "Quotations <-> dataflow conversion is ``loss-less''"
+    "Really, just rewriting quotations"
+    "Type inference"
+    "Partial evaluation"
+    "Arithmetic identities"
+    "Optimistic specialization"
+}
+{ $slide "Low level optimizer"
+    "Caching stack in registers"
+    "Shuffling renames registers"
+    "Unboxing floats"
+    "Tail call optimization"
+}
+{ $slide "Assember DSL"
+    "The compiler emits machine code:"
+    { $code
+        "char-reg PUSH"
+        "\"n\" operand 2 SHR"
+        "char-reg dup XOR"
+        "\"obj\" operand \"n\" operand ADD"
+        "char-reg-16 \"obj\" operand string-offset [+] MOV"
+        "char-reg tag-bits SHL"
+        "\"obj\" operand char-reg MOV"
+        "char-reg POP"
+    }
+}
+{ $slide "Assember DSL - continued"
+    { "It's all done with " { $link make } }
+    { $code "USE: assembler" "[ EAX ECX MOV ] { } make ." }
 }
 { $slide "The end"
     { $url "http://factorcode.org" }

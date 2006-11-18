@@ -1,7 +1,11 @@
 + 0.87:
 
-- live search operations need to hide the minibuffer
-- list gadget mouse over help
+- list usability
+  - presentation actions close the popup
+  - popup: -- close button
+  - popup: -- pin button
+- modules: core/ libs/ apps/
+- xml: "</a>" string>xml miscompiles
 - top level window positioning on ms windows
 - scroll>rect broken if there are gadgets in between
 - completion is not ideal: eg, C+e "buttons"
@@ -12,6 +16,7 @@
   - httpd crash
   - fep when closing window
   - : foo \ each reload foo ; foo  eventually crashes
+  - : foo "ppc" make-image stdio get duplex-stream-out pane-stream-pane pane-clear foo ; foo
 - these things are "Too Slow":
   - all-words
   - make-image
@@ -28,7 +33,6 @@
 - auto-update browser and help when sources reload
 - mac intel: struct returns from objc methods
 - new windows don't always have focus, eg focus follows mouse
-- listener commands from a menu should not include 'hide-glass' etc
 - bogus compile errors?
 - recompile get/set/>n/n>/ndrop if needed
 - cross-word type inference
