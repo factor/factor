@@ -60,7 +60,7 @@ SYMBOL: responders
 
 : read-post-request ( header -- hash )
     "Content-Length" swap hash dup
-    [ string>number read query>hash ] when ;
+    [ string>number read dup "raw-response" set query>hash ] when ;
 
 : log-headers ( hash -- )
     [
@@ -90,6 +90,7 @@ SYMBOL: responders
 !            H{ { "a" "b" } { "c" "d" } }
 ! - header -- a hashtable of headers from the user's client
 ! - response -- a hashtable of the POST request response
+! - raw-response -- raw POST request response
 
 : query-param ( key -- value ) "query" get hash ;
 
