@@ -252,7 +252,9 @@ void primitive_add_compiled_block(void)
 	here += words_length;
 
 	/* push the XT of the new word on the stack */
-	box_unsigned_cell(start + sizeof(F_COMPILED));
+	F_WORD *word = allot_word(F,F);
+	word->xt = start + sizeof(F_COMPILED);
+	dpush(tag_word(word));
 }
 
 #undef FROB
@@ -270,7 +272,7 @@ void primitive_finalize_compile(void)
 	{
 		F_ARRAY *pair = untag_array(get(AREF(array,i)));
 		F_WORD *word = untag_word(get(AREF(pair,0)));
-		CELL xt = to_cell(get(AREF(pair,1)));
+		CELL xt = untag_word(get(AREF(pair,1)))->xt;
 		F_BLOCK *block = xt_to_block(xt);
 		if(block->status != B_ALLOCATED)
 			critical_error("bad XT",xt);

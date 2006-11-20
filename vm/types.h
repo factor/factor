@@ -183,6 +183,7 @@ INLINE CELL tag_word(F_WORD *word)
 }
 
 void update_xt(F_WORD* word);
+F_WORD *allot_word(CELL vocab, CELL name);
 void primitive_word(void);
 void primitive_update_xt(void);
 void primitive_word_xt(void);

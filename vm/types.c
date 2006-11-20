@@ -379,17 +379,24 @@ void update_xt(F_WORD* word)
 }
 
 /* <word> ( name vocabulary -- word ) */
-void primitive_word(void)
+F_WORD *allot_word(CELL vocab, CELL name)
 {
 	F_WORD *word = allot_object(WORD_TYPE,sizeof(F_WORD));
 	word->hashcode = tag_fixnum(rand());
-	word->vocabulary = dpop();
-	word->name = dpop();
+	word->vocabulary = vocab;
+	word->name = name;
 	word->primitive = tag_fixnum(0);
 	word->def = F;
 	word->props = F;
 	update_xt(word);
-	dpush(tag_word(word));
+	return word;
+}
+
+void primitive_word(void)
+{
+	CELL vocab = dpop();
+	CELL name = dpop();
+	dpush(tag_word(allot_word(vocab,name)));
 }
 
 void primitive_update_xt(void)
