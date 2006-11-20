@@ -9,7 +9,7 @@ TUPLE: testdata one two ;
 
 testdata default-mapping set-mapping
 
-"contrib/sqlite/test.db" [
+"contrib/sqlite/test.db" resource-path [
 
     db get testdata create-tuple-table
 

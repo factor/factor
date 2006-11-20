@@ -33,7 +33,7 @@ USE: kernel
 USE: io
 USE: prettyprint
 
-: test.db "contrib/sqlite/test.db" ;
+: test.db "contrib/sqlite/test.db" resource-path ;
 
 : show-people ( statement -- )
   dup 0 column-text write " from " write 1 column-text . ;
