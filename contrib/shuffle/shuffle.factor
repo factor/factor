@@ -10,6 +10,9 @@ IN: shuffle
 : -roll ( a b c d -- d a b c )
     -rot >r >r swap r> r> ; inline
 
+: nipd ( a b c -- b c )
+    rot drop ; inline
+
 : 3nip ( a b c d -- d )
     2nip nip ; inline
 
