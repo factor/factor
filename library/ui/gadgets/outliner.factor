@@ -38,7 +38,7 @@ DEFER: set-outliner-expanded?
 : <expand-button> ( ? -- gadget )
     #! If true, the button expands, otherwise it collapses.
     dup [ swap find-outliner set-outliner-expanded? ] curry
-    >r <expand-arrow> r> <highlight-button> ;
+    >r <expand-arrow> r> <button> ;
 
 : setup-expand ( expanded? outliner -- )
     >r not <expand-button> r> @top-left grid-add ;

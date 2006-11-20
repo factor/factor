@@ -18,7 +18,7 @@ M: operation invoke-command ( target operation -- )
 
 : modify-listener-operation ( quot operation -- operation )
     clone t over set-operation-listener?
-    modify-operation ;
+    modify-command ;
 
 : modify-listener-operations ( operations quot -- operations )
     swap [ modify-listener-operation ] map-with ;
@@ -313,32 +313,32 @@ help-gadget "toolbar" {
     { "Forward" T{ key-down f { C+ } "f" } [ help-gadget-history go-forward ] }
     { "Home" T{ key-down f { C+ } "h" } [ go-home ] }
 }
-link class-operations [ help-action ] modify-operations
+link class-operations [ help-action ] modify-commands
 [ command-name "Follow" = not ] subset
 append
 define-commands
 
 \ word-search "operations"
 \ word class-operations
-[ search-action ] modify-operations
+[ search-action ] modify-commands
 define-commands
 
 \ vocab-search "operations"
 \ vocab-link class-operations
-[ search-action ] modify-operations
+[ search-action ] modify-commands
 define-commands
 
 \ module-search "operations"
 \ module class-operations
-[ search-action ] modify-operations
+[ search-action ] modify-commands
 define-commands
 
 \ source-file-search "operations"
 \ pathname class-operations
-[ search-action ] modify-operations
+[ search-action ] modify-commands
 define-commands
 
 \ help-search "operations"
 \ link class-operations
-[ search-action ] modify-operations
+[ search-action ] modify-commands
 define-commands

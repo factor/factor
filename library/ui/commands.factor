@@ -92,10 +92,10 @@ SYMBOL: operations
 : secondary-operation ( obj -- command )
     object-operations [ operation-secondary? ] find-last nip ;
 
-: modify-operation ( quot operation -- operation )
+: modify-command ( quot operation -- operation )
     clone
     [ command-quot append ] keep
     [ set-command-quot ] keep ;
 
-: modify-operations ( operations quot -- operations )
-    swap [ modify-operation ] map-with ;
+: modify-commands ( operations quot -- operations )
+    swap [ modify-command ] map-with ;

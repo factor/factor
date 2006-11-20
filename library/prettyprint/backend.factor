@@ -17,7 +17,8 @@ M: byte-array pprint* drop "( byte array )" text ;
     ] make-hash ;
 
 : pprint-word ( word -- )
-    dup word-name swap word-style styled-text ;
+    dup word-name [ "( no name )" ] unless*
+    swap word-style styled-text ;
 
 M: word pprint*
     dup parsing? [

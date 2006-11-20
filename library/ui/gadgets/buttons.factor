@@ -41,16 +41,15 @@ M: object >label ;
 M: f >label drop <gadget> ;
 
 C: button ( gadget quot -- button )
-    rot >label <default-border> over set-gadget-delegate
-    [ set-button-quot ] keep ;
+    [ set-button-quot ] keep
+    [ set-gadget-delegate ] keep ;
 
-: <highlight-button> ( gadget quot -- button )
-    <button> { 0 0 } over set-border-size ;
+: <roll-button> ( str/gadget quot -- button )
+    >r >label r>
+    <button> dup roll-button-theme ;
 
-: <roll-button> ( gadget quot -- button )
-    <highlight-button> dup roll-button-theme ;
-
-: <bevel-button> ( gadget quot -- button )
+: <bevel-button> ( str/gadget quot -- button )
+    >r >label <default-border> r>
     <button> dup bevel-button-theme ;
 
 TUPLE: repeat-button ;

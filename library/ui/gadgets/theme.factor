@@ -24,6 +24,10 @@ USING: arrays gadgets kernel sequences styles ;
 
 : solid-boundary solid-black swap set-gadget-boundary ;
 
+: faint T{ solid f { 0.62 0.62 0.62 0.8 } } ;
+
+: faint-boundary faint swap set-gadget-boundary ;
+
 : plain-gradient
     T{ gradient f {
         { 0.94 0.94 0.94 1.0 }
@@ -56,9 +60,6 @@ USING: arrays gadgets kernel sequences styles ;
         { 1.0 1.0 1.0 1.0 }
     } } ;
 
-: faint-boundary
-    T{ solid f { 0.62 0.62 0.62 0.8 } } swap set-gadget-boundary ;
-
 : bevel-button-theme ( gadget -- )
     plain-gradient
     rollover-gradient
@@ -71,10 +72,8 @@ USING: arrays gadgets kernel sequences styles ;
     plain-gradient over set-gadget-interior faint-boundary ;
 
 : roll-button-theme ( button -- )
-    f solid-black solid-black f
-    <button-paint> over set-gadget-boundary
-    f f pressed-gradient solid-black
-    <button-paint> swap set-gadget-interior ;
+    f faint solid-black f <button-paint>
+    swap set-gadget-boundary ;
 
 : caret-theme ( caret -- )
     T{ solid f { 1.0 0.0 0.0 1.0 } } swap set-gadget-interior ;

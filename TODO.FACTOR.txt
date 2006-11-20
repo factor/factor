@@ -1,9 +1,10 @@
 + 0.87:
 
+- : foo \ each reload foo ; foo  eventually crashes
 - list usability
-  - presentation actions close the popup
   - popup: -- close button
   - popup: -- pin button
+- some module operations don't work on module-links
 - modules: core/ libs/ apps/
 - xml: "</a>" string>xml miscompiles
 - top level window positioning on ms windows
@@ -15,7 +16,6 @@
   - callback scheduling issue
   - httpd crash
   - fep when closing window
-  - : foo \ each reload foo ; foo  eventually crashes
   - : foo "ppc" make-image stdio get duplex-stream-out pane-stream-pane pane-clear foo ; foo
 - these things are "Too Slow":
   - all-words

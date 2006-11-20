@@ -11,10 +11,19 @@ generic hashtables tools io kernel prettyprint sequences strings
 styles words help math models namespaces ;
 
 ! Clickable objects
-TUPLE: presentation object ;
+TUPLE: presentation object hook ;
 
-: invoke-presentation ( presentation -- )
-    presentation-object dup primary-operation invoke-command ;
+: invoke-presentation ( presentation command -- )
+    over dup presentation-hook call
+    >r presentation-object r> invoke-command ;
+
+: invoke-primary ( presentation -- )
+    dup presentation-object primary-operation
+    invoke-presentation ;
+
+: invoke-secondary ( presentation -- )
+    dup presentation-object secondary-operation
+    invoke-presentation ;
 
 : show-mouse-help ( presentation -- )
     dup find-world [ world-status set-model* ] [ drop ] if* ;
@@ -26,8 +35,9 @@ M: presentation ungraft* ( presentation -- )
     dup hide-mouse-help delegate ungraft* ;
 
 C: presentation ( gadget object -- button )
+    [ drop ] over set-presentation-hook
     [ set-presentation-object ] keep
-    swap [ invoke-presentation ] <roll-button>
+    swap [ invoke-primary ] <roll-button>
     over set-gadget-delegate ;
 
 : <command-button> ( target command -- button )
@@ -35,23 +45,22 @@ C: presentation ( gadget object -- button )
     [ invoke-command drop ] curry curry
     <bevel-button> ;
 
-TUPLE: menu-command ;
-
-C: menu-command ( command -- command )
-    [ set-delegate ] keep ;
-
-M: menu-command invoke-command
-    hand-clicked get find-world hide-glass
-    delegate invoke-command ;
+: <menu-command> ( command -- command )
+    [ hand-clicked get find-world hide-glass ]
+    swap modify-command ;
 
 : <commands-menu> ( target commands -- gadget )
     [ <menu-command> ] map
     [ <command-button> ] map-with
     make-pile 1 over set-pack-fill ;
 
+: hooked-operations ( hook obj -- seq )
+    object-operations swap modify-commands ;
+
 : operations-menu ( presentation -- )
-    dup presentation-object
-    dup object-operations <commands-menu>
+    dup dup presentation-hook curry
+    over presentation-object hooked-operations
+    over presentation-object swap <commands-menu>
     swap show-menu ;
 
 presentation H{

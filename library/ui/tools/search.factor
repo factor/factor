@@ -53,7 +53,8 @@ C: live-search ( string seq producer presenter -- gadget )
         }
     } make-frame*
     [ live-search-field set-editor-text ] keep
-    dup popup-theme ;
+    [ live-search-field editor-doc-end ] keep
+    [ popup-theme ] keep ;
 
 M: live-search focusable-child* live-search-field ;
 

@@ -2,10 +2,10 @@
 ! See http://factorcode.org/license.txt for BSD license.
 IN: gadgets-lists
 USING: gadgets gadgets-labels gadgets-scrolling kernel sequences
-models opengl math namespaces gadgets-theme
+generic models opengl math namespaces gadgets-theme
 gadgets-presentations ;
 
-TUPLE: list index hook presenter color ;
+TUPLE: list index presenter color hook ;
 
 : list-theme ( list -- )
     { 0.8 0.8 1.0 1.0 } swap set-list-color ;
@@ -15,17 +15,31 @@ C: list ( hook presenter model -- gadget )
     [ set-list-presenter ] keep
     [ set-list-hook ] keep
     0 over set-list-index
+    1 over set-pack-fill
     dup list-theme ;
 
 : bound-index ( list -- )
     dup list-index over control-value length 1- max 0 min
     swap set-list-index ;
 
+: list-presentation-hook ( list -- quot )
+    list-hook [ [ [ list? ] is? ] find-parent ] swap append ;
+
+: <list-presentation> ( hook presenter elt -- gadget )
+    [ swap call ] keep <presentation>
+    [ set-presentation-hook ] keep
+    [ text-theme ] keep ;
+
+: <list-items> ( list -- seq )
+    dup list-presentation-hook
+    over list-presenter
+    rot control-value [
+        >r 2dup r> <list-presentation>
+    ] map 2nip ;
+
 M: list model-changed
     dup clear-gadget
-    dup list-presenter over control-value
-    [ [ swap call ] keep <presentation> ] map-with
-    over add-gadgets
+    dup <list-items> over add-gadgets
     bound-index ;
 
 : selected-rect ( list -- rect )
@@ -67,27 +81,15 @@ M: list focusable-child* drop t ;
 : select-next ( list -- )
     dup list-index 1+ swap select-index ;
 
-: click-list ( list -- )
-    hand-gadget get [ gadget-parent list? ] find-parent
-    dup [
-        over gadget-children index dup -1 =
-        [ 2drop ] [ swap select-index ] if
-    ] [
-        2drop
-    ] if ;
-
 : list-action ( list -- )
     dup list-empty? [
         drop
     ] [
-        [
-            list-value dup secondary-operation invoke-command
-        ] keep dup list-hook call
+        dup list-index swap nth-gadget invoke-secondary
     ] if ; inline
 
 list H{
-    { T{ button-down } [ dup request-focus click-list ] }
-    { T{ drag } [ click-list ] }
+    { T{ button-down } [ request-focus ] }
     { T{ key-down f f "UP" } [ select-prev ] }
     { T{ key-down f f "DOWN" } [ select-next ] }
     { T{ key-down f f "RETURN" } [ list-action ] }
