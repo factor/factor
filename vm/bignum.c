@@ -371,18 +371,6 @@ FOO_TO_BIGNUM(ulong,unsigned long,unsigned long)
 FOO_TO_BIGNUM(long_long,s64,u64)
 FOO_TO_BIGNUM(ulong_long,u64,u64)
 
-/* this is inefficient; its only used for fixnum multiplication overflow so
-it probaly does not matter */
-bignum_type s48_fixnum_pair_to_bignum(CELL x, F_FIXNUM y)
-{
-  bignum_type hiword = s48_bignum_arithmetic_shift(
-      s48_fixnum_to_bignum(y),sizeof(unsigned long) * 8);
-  REGISTER_BIGNUM(hiword);
-  bignum_type loword = s48_cell_to_bignum(x);
-  UNREGISTER_BIGNUM(hiword);
-  return s48_bignum_add(hiword,loword);
-}
-
 #define BIGNUM_TO_FOO(name,type,utype) \
   type s48_bignum_to_##name(bignum_type bignum) \
   { \
@@ -1380,7 +1368,7 @@ allot_bignum_zeroed(bignum_length_type length, int negative_p)
 }
 
 #define BIGNUM_REDUCE_LENGTH(source, length) \
-     source = reallot_array(source,length + 1,69)
+     source = reallot_array(source,length + 1,0)
 
 /* allocates memory */
 bignum_type

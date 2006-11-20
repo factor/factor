@@ -69,7 +69,6 @@ DLLEXPORT bignum_type s48_long_to_bignum(long);
 DLLEXPORT bignum_type s48_long_long_to_bignum(s64 n);
 DLLEXPORT bignum_type s48_ulong_long_to_bignum(u64 n);
 DLLEXPORT bignum_type s48_ulong_to_bignum(unsigned long);
-DLLEXPORT bignum_type s48_fixnum_pair_to_bignum(CELL x, F_FIXNUM y);
 F_FIXNUM s48_bignum_to_fixnum(bignum_type);
 CELL s48_bignum_to_cell(bignum_type);
 long s48_bignum_to_long(bignum_type);

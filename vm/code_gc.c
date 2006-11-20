@@ -234,11 +234,8 @@ void mark_sweep_step(F_COMPILED *compiled, CELL code_start,
 {
 	CELL scan;
 
-	if(compiled->finalized)
-	{
-		for(scan = words_start; scan < words_end; scan += CELLS)
-			recursive_mark(get(scan));
-	}
+	for(scan = words_start; scan < words_end; scan += CELLS)
+		recursive_mark(get(scan));
 }
 
 /* Mark all XTs and literals referenced from a word XT */
@@ -258,7 +255,9 @@ void recursive_mark(CELL xt)
 
 	F_COMPILED *compiled = xt_to_compiled(xt);
 	iterate_code_heap_step(compiled,collect_literals_step);
-	iterate_code_heap_step(compiled,mark_sweep_step);
+
+	if(compiled->finalized)
+		iterate_code_heap_step(compiled,mark_sweep_step);
 }
 
 /* Push the free space and total size of the code heap */

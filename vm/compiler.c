@@ -193,8 +193,6 @@ void primitive_add_compiled_block(void)
 	{
 		/* Read parameters from stack, leaving them on the stack */
 		FROB
-		if(code->header != tag_header(VECTOR_TYPE))
-			critical_error("FUCKUP 1",0);
 
 		/* Try allocating a new code block */
 		CELL total_length = sizeof(F_COMPILED) + code_length
@@ -254,6 +252,7 @@ void primitive_add_compiled_block(void)
 	/* push the XT of the new word on the stack */
 	F_WORD *word = allot_word(F,F);
 	word->xt = start + sizeof(F_COMPILED);
+	word->compiledp = T;
 	dpush(tag_word(word));
 }
 
