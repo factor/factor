@@ -323,5 +323,5 @@ M: invaders-gadget ungraft* ( gadget -- )
  t swap set-invaders-gadget-quit? ;
 
 : run ( -- )  
-  <space-invaders> "invaders.rom" over load-rom <invaders-gadget> 
+  <space-invaders> "contrib/space-invaders/invaders.rom" resource-path over load-rom <invaders-gadget> 
   "Space Invaders" open-titled-window ;
