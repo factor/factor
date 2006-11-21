@@ -110,7 +110,6 @@ void primitive_read_dir(void)
 {
 	HANDLE dir;
 	WIN32_FIND_DATA find_data;
-	CELL result_count = 0;
 	char path[MAX_PATH + 4];
 
 	sprintf(path, "%s\\*", unbox_char_string());

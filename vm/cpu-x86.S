@@ -1,4 +1,4 @@
-#ifdef __APPLE__
+#if defined(__APPLE__) || defined(WINDOWS)
 	#define MANGLE(sym) _##sym
 #else
 	#define MANGLE(sym) sym
