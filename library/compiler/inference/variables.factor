@@ -29,7 +29,11 @@ TUPLE: inferred-vars reads writes reads-globals writes-globals ;
     dup meta-n get [ hash-member? ] contains-with? [
         drop
     ] [
-        inferred-vars get inferred-vars-reads push-new
+        inferred-vars get 2dup inferred-vars-writes member? [
+            2drop
+        ] [
+            inferred-vars-reads push-new
+        ] if
     ] if ;
     
 : apply-var-write ( symbol -- )
@@ -40,7 +44,12 @@ TUPLE: inferred-vars reads writes reads-globals writes-globals ;
     ] if ;
 
 : apply-global-read ( symbol -- )
-    inferred-vars get inferred-vars-reads-globals push-new ;
+    inferred-vars get
+    2dup inferred-vars-writes-globals member? [
+        2drop
+    ] [
+        inferred-vars-reads-globals push-new
+    ] if ;
 
 : apply-global-write ( symbol -- )
     inferred-vars get inferred-vars-writes-globals push-new ;
