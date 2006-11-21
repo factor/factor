@@ -256,7 +256,8 @@ void early_error(CELL error)
 	}
 }
 
-CELL native_stack_trace(void)
+/* allocates memory */
+CELL allot_native_stack_trace(void)
 {
 	F_STACK_FRAME *frame = native_stack_pointer();
 	GROWABLE_ARRAY(array);
@@ -285,12 +286,15 @@ void throw_error(CELL error, bool keep_stacks)
 {
 	early_error(error);
 
+	REGISTER_ROOT(error);
+	thrown_native_stack_trace = allot_native_stack_trace();
+	UNREGISTER_ROOT(error);
+
 	throwing = true;
 	thrown_error = error;
 	thrown_keep_stacks = keep_stacks;
 	thrown_ds = ds;
 	thrown_rs = rs;
-	thrown_native_stack_trace = native_stack_trace();
 
 	/* Return to interpreter() function */
 	LONGJMP(stack_chain->toplevel,1);

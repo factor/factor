@@ -1,6 +1,5 @@
 + 0.87:
 
-- thrown_* vars are not gc roots
 - "ker" C+u: for a moment, full vocab list is shown
 - : foo \ each reload foo ; foo  eventually crashes
 - list usability
