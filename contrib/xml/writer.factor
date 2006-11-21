@@ -24,17 +24,17 @@ M: string (xml>string) chars>entities % ;
 
 M: contained-tag (xml>string)
     CHAR: < ,
-    dup tag-name print-name
+    dup print-name
     tag-props print-props
     "/>" % ;
 
 M: tag (xml>string)
     CHAR: < ,
-    dup tag-name print-name
+    dup print-name
     dup tag-props print-props
     CHAR: > ,
     dup tag-children [ (xml>string) ] each
-    "</" % tag-name print-name CHAR: > , ;
+    "</" % print-name CHAR: > , ;
 
 M: comment (xml>string)
     "<!--" % comment-text % "-->" % ;

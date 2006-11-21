@@ -9,9 +9,9 @@ SYMBOL: xml-file
     contents string>xml xml-file set ] unit-test
 [ "1.0" ] [ xml-file get xml-doc-prolog prolog-version ] unit-test
 [ f ] [ xml-file get xml-doc-prolog prolog-standalone ] unit-test
-[ "a" ] [ xml-file get tag-name  name-space ] unit-test
-[ "http://www.hello.com" ] [ xml-file get tag-name name-url ] unit-test
-[ V{ "that" } ] [ T{ name f "" "this" "http://d.de" } xml-file get
+[ "a" ] [ xml-file get name-space ] unit-test
+[ "http://www.hello.com" ] [ xml-file get name-url ] unit-test
+[ { "that" } ] [ T{ name f "" "this" "http://d.de" } xml-file get
     tag-props hash ] unit-test
 [ t ] [ xml-file get tag-children second contained-tag? ] unit-test
 [ t ] [ [ "<a></b>" string>xml ] catch xml-parse-error? ] unit-test

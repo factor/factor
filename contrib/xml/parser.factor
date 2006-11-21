@@ -16,34 +16,35 @@ TUPLE: instruction text ;
     char CHAR: / = dup [ incr-spot ] when
     parse-name swap ;
 
-: (parse-quot) ( ch vector sbuf -- vector )
-    {
-        { [ more? not ] [ "File ended in quote" <xml-string-error> throw ] }
-        { [ char >r pick r> swap = ] [ >string over push nip incr-spot ] }
-        { [ char CHAR: & = ] [ parse-entity (parse-quot) ] }
-        { [ t ] [ char parsed-ch (parse-quot) ] }
+: (parse-quot) ( ch sbuf -- )
+    char {
+        { [ dup not ] [ "File ended in quote" <xml-string-error> throw ] }
+        { [ 3dup nip = ] [ drop >string , drop incr-spot ] }
+        { [ dup CHAR: & = ] [ drop parse-entity (parse-quot) ] }
+        { [ dup CHAR: % = ] [ drop parse-reference (parse-quot) ] }
+        { [ t ] [ parsed-ch (parse-quot) ] }
     } cond ;
 
 : parse-quot ( ch -- array )
-   V{ } clone SBUF" " clone (parse-quot) ;
+   [ SBUF" " clone (parse-quot) ] { } make ;
 
-: parse-prop-value ( -- str )
+: parse-prop-value ( -- seq )
     char dup "'\"" member? [
         incr-spot parse-quot
     ] [
         "Attribute lacks quote" <xml-string-error> throw
     ] if ;
 
-: parse-prop ( -- seq )
+: parse-prop ( -- )
     parse-name pass-blank CHAR: = expect pass-blank
-    parse-prop-value 2array ;
+    parse-prop-value swap set ;
 
-: (middle-tag) ( seq -- seq )
-    pass-blank char name-char?
-    [ parse-prop over push (middle-tag) ] when ;
+: (middle-tag) ( -- )
+    pass-blank char name-start-char?
+    [ parse-prop (middle-tag) ] when ;
 
 : middle-tag ( -- hash )
-    V{ } clone (middle-tag) alist>hash pass-blank ;
+    [ (middle-tag) ] make-hash pass-blank ;
 
 : end-tag ( string hash -- tag )
     pass-blank char CHAR: / =
@@ -81,7 +82,11 @@ TUPLE: instruction text ;
 
 !   -- Overall parser with data tree
 
-TUPLE: tag name props children ;
+TUPLE: tag props children ;
+C: tag ( name props children -- tag )
+    [ set-tag-children ] keep
+    [ set-tag-props ] keep
+    [ set-delegate ] keep ;
 
 TUPLE: contained-tag ;
 C: contained-tag ( name props -- contained-tag )
@@ -212,37 +217,41 @@ M: extra-attrs error.
       <xml-string-error> throw ] unless
     concat ;
 
-: prolog-attr ( hash name default -- value )
-    >r "" swap <name> swap ?hash concat-strings
-    [ r> drop ] [ r> ] if* ;    
+: prolog-attrs ( hash -- )
+    T{ name f "" "version" f } over hash [
+        concat-strings prolog-data get set-prolog-version
+    ] when*
+    T{ name f "" "encoding" f } over hash [
+        concat-strings prolog-data get set-prolog-encoding
+    ] when*
+    T{ name f "" "standalone" f } swap hash [
+        concat-strings yes/no>bool
+        prolog-data get set-prolog-standalone
+    ] when* ;
 
-: parse-prolog ( -- prolog )
+: parse-prolog ( -- )
     "<?xml" string-matches? [
         5 expect-string*
         pass-blank middle-tag "?>" expect-string
-         dup assure-no-extra
-    ] [ f ] if 
-    [ "version" "1.0" prolog-attr ] keep
-    [ "encoding" "iso-8859-1" prolog-attr ] keep
-    "standalone" "no" prolog-attr yes/no>bool
-    <prolog> dup prolog-data set ;
+         dup assure-no-extra prolog-attrs
+    ] when ;
 
 : init-xml ( string -- )
-    code set { 0 1 1 } clone spot set
+    code set { 0 1 1 } spot set
     init-xml-stack init-ns-stack ;
 
 UNION: any-tag tag contained-tag ;
 
 TUPLE: notags ;
 M: notags error.
-    drop "XML document lacks a main tag" print ;
+    "XML document lacks a main tag" print ;
 
 TUPLE: multitags ;
 M: multitags error.
-    drop "XML document contains multiple main tags" print ;
+    "XML document contains multiple tags" print ;
 
-: make-xml-doc ( prolog seq -- xml-doc )
-    dup [ any-tag? ] find
+: make-xml-doc ( seq -- xml-doc )
+    prolog-data get swap dup [ any-tag? ] find
     >r dup -1 = [ <notags> throw ] when
     swap cut 1 tail
     dup [ any-tag? ] contains? [ <multitags> throw ] when r>
@@ -260,7 +269,8 @@ M: multitags error.
         xml-stack get
         dup length 1 = [ <unclosed> throw ] unless
         first second
-    ] with-scope make-xml-doc ;
+        make-xml-doc
+    ] with-scope ;
 
 UNION: xml-parse-error multitags notags xml-error extra-attrs nonexist-ns
        not-yes/no unclosed mismatched xml-string-error expected no-entity ;

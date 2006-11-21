@@ -165,12 +165,14 @@ TUPLE: reference name ;
     <reference> , SBUF" " clone incr-spot ;
 
 : (parse-text) ( sbuf -- )
-    {
-        { [ more? not ] [ >string , ] } ! should this be an error?
-        { [ char CHAR: < = ] [ >string , ] }
-        { [ char CHAR: & = ] [ parse-entity (parse-text) ] }
-        { [ char CHAR: % = ] [ parse-reference (parse-text) ] }
-        { [ t ] [ char parsed-ch (parse-text) ] }
+    char {
+        { [ dup not ] [ drop >string , ] } ! should this be an error?
+        { [ dup CHAR: < = ] [ drop >string , ] }
+        { [ dup CHAR: & = ]
+          [ drop parse-entity (parse-text) ] }
+        { [ dup CHAR: % = ]
+          [ drop parse-reference (parse-text) ] }
+        { [ t ] [ parsed-ch (parse-text) ] }
     } cond ;
 
 : parse-text ( -- array )
@@ -182,6 +184,17 @@ TUPLE: name space tag url ;
 C: name ( space tag -- name )
     [ set-name-tag ] keep
     [ set-name-space ] keep ;
+
+: get-version ( -- string )
+    prolog-data get prolog-version ;
+
+: name-start-char? ( char -- ? )
+    get-version "1.0" =
+    [ 1.0name-start-char? ] [ 1.1name-start-char? ] if ;
+
+: name-char? ( char -- ? )
+    get-version "1.0" =
+    [ 1.0name-char? ] [ 1.1name-char? ] if ;
 
 : (parse-name) ( -- str )
     char dup name-start-char? [
