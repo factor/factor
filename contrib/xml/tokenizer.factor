@@ -1,8 +1,8 @@
 ! Copyright (C) 2005, 2006 Daniel Ehrenberg
 ! See http://factorcode.org/license.txt for BSD license.
 IN: xml
-USING: errors hashtables io kernel math namespaces prettyprint sequences tools
-    generic strings char-classes ;
+USING: errors hashtables io kernel math namespaces prettyprint
+sequences tools generic strings char-classes ;
 
 SYMBOL: code #! Source code
 SYMBOL: spot #! { index line column }
@@ -10,7 +10,7 @@ SYMBOL: spot #! { index line column }
 : set-index ( index -- ) 0 spot get set-nth ;
 : get-line ( -- line ) spot get second ;
 : set-line ( line -- ) 1 spot get set-nth ;
-: get-column ( -- column ) 2 spot get nth ;
+: get-column ( -- column ) spot get third ;
 : set-column ( column -- ) 2 spot get set-nth ;
 SYMBOL: prolog-data
 

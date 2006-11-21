@@ -228,7 +228,7 @@ M: extra-attrs error.
     <prolog> dup prolog-data set ;
 
 : init-xml ( string -- )
-    code set { 0 1 1 } spot set
+    code set { 0 1 1 } clone spot set
     init-xml-stack init-ns-stack ;
 
 UNION: any-tag tag contained-tag ;
