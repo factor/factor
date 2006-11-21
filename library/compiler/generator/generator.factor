@@ -58,7 +58,7 @@ UNION: #terminal
         word-table get
     ] V{ } make code-format add-compiled-block save-xt ;
 
-GENERIC: generate-node ( node -- )
+GENERIC: generate-node ( node -- next )
 
 : generate-nodes ( node -- )
     [ node@ generate-node ] iterate-nodes end-basic-block ;

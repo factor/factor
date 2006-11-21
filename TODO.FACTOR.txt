@@ -4,7 +4,6 @@
 - some module operations don't work on module-links
 - list operations: what if nothing is selected?
 - menu should stay up if mouse button released
-- bogus compile errors?
 
 - list usability
   - popup: -- close button
