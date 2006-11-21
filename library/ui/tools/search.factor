@@ -170,13 +170,8 @@ C: history-search ( string seq -- gadget )
 : listener-history ( listener -- seq )
     listener-gadget-input interactor-history <reversed> ;
 
-: history-action ( string -- )
-    find-listener listener-gadget-input set-editor-text ;
-
 : show-history ( workspace -- )
-    dup workspace-listener
-    [ listener-gadget-input editor-text ] keep listener-history
-    <history-search>
+    "" over workspace-listener listener-history <history-search>
     "History search" show-titled-popup ;
 
 workspace "toolbar" {
