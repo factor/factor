@@ -65,6 +65,15 @@ C: gadget ( -- gadget )
 
 : delegate>gadget ( tuple -- ) <gadget> swap set-delegate ;
 
+: relative-loc ( fromgadget togadget -- loc )
+    2dup eq? [
+        2drop { 0 0 }
+    ] [
+        over rect-loc >r
+        >r gadget-parent r> relative-loc
+        r> v+
+    ] if ;
+
 GENERIC: user-input* ( str gadget -- ? )
 
 M: gadget user-input* 2drop t ;

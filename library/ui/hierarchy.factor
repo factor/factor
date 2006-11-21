@@ -99,8 +99,6 @@ M: gadget ungraft* drop ;
     #! The position of the gadget on the screen.
     parents { 0 0 } [ rect-loc v+ ] reduce ;
 
-: relative-loc ( g1 point -- point-g1 ) swap screen-loc v- ;
-
 : child? ( parent child -- ? ) parents memq? ;
 
 GENERIC: focusable-child* ( gadget -- gadget/t )

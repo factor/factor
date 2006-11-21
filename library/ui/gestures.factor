@@ -148,10 +148,10 @@ SYMBOL: double-click-timeout
     hand-loc get-global hand-click-loc get-global v- ;
 
 : hand-rel ( gadget -- loc )
-    hand-loc get-global relative-loc ;
+    hand-loc get-global swap screen-loc v- ;
 
 : hand-click-rel ( gadget -- loc )
-    hand-click-loc get-global relative-loc ;
+    hand-click-loc get-global swap screen-loc v- ;
 
 : multi-click? ( button -- ? )
     millis hand-last-time get - double-click-timeout get <=

@@ -61,6 +61,7 @@ PROVIDE: library/ui
     "test/commands.factor"
     "test/panes.factor"
     "test/presentations.factor"
+    "test/scrolling.factor"
     "test/search.factor"
     "test/sliders.factor"
     "test/tracks.factor"

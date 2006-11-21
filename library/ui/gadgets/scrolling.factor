@@ -75,14 +75,25 @@ C: scroller ( gadget -- scroller )
         >r >r v- { 0 0 } vmin r> r> v- { 0 0 } vmax v+
     ] keep dup scroller-origin rot v+ scroll ;
 
+: relative-scroll-rect ( rect gadget scroller -- rect )
+    #! Adjust rect for the case where the gadget is not the
+    #! immediate child of the scroller's viewport.
+    scroller-viewport gadget-child relative-loc offset-rect ;
+
 : scroll>rect ( rect gadget -- )
-    find-scroller dup [
-        [ set-scroller-follows ] keep relayout
+    dup find-scroller dup [
+        [ relative-scroll-rect ] keep
+        [ set-scroller-follows ] keep
+        relayout
     ] [
-        2drop
+        3drop
     ] if ;
 
-: scroll>bottom ( gadget -- ) t swap scroll>rect ;
+: scroll>bottom ( gadget -- )
+    find-scroller [
+        t over set-scroller-follows
+        relayout
+    ] when* ;
 
 : (scroll>bottom) ( scroller -- )
     dup scroller-viewport viewport-dim { 0 1 } v* scroll ;

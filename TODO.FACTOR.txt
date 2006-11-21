@@ -1,14 +1,16 @@
 + 0.87:
 
 - "ker" C+u: for a moment, full vocab list is shown
-- : foo \ each reload foo ; foo  eventually crashes
+- some module operations don't work on module-links
+- list operations: what if nothing is selected?
+- menu should stay up if mouse button released
+- bogus compile errors?
+
 - list usability
   - popup: -- close button
   - popup: -- pin button
-- some module operations don't work on module-links
 - modules: core/ libs/ apps/
 - top level window positioning on ms windows
-- scroll>rect broken if there are gadgets in between
 - completion is not ideal: eg, C+e "buttons"
 - crashes:
   - windows gcc issue
@@ -24,7 +26,6 @@
   - 10000 [ dup number>string ] map describe in the UI
   - available-modules
   - :trace
-- menu should stay up if mouse button released
 - roundoff is still not quite right with tracks
 - slider needs to be modelized
 - variable width word wrap
@@ -32,7 +33,6 @@
 - auto-update browser and help when sources reload
 - mac intel: struct returns from objc methods
 - new windows don't always have focus, eg focus follows mouse
-- bogus compile errors?
 - recompile get/set/>n/n>/ndrop if needed
 - cross-word type inference
 - ui docs
