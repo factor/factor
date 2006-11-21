@@ -287,7 +287,7 @@ void throw_error(CELL error, bool keep_stacks)
 	early_error(error);
 
 	REGISTER_ROOT(error);
-	thrown_native_stack_trace = allot_native_stack_trace();
+	thrown_native_stack_trace = F; /* allot_native_stack_trace(); */
 	UNREGISTER_ROOT(error);
 
 	throwing = true;
