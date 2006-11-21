@@ -381,7 +381,11 @@ void update_xt(F_WORD* word)
 /* <word> ( name vocabulary -- word ) */
 F_WORD *allot_word(CELL vocab, CELL name)
 {
+	REGISTER_ROOT(vocab);
+	REGISTER_ROOT(name);
 	F_WORD *word = allot_object(WORD_TYPE,sizeof(F_WORD));
+	UNREGISTER_ROOT(name);
+	UNREGISTER_ROOT(vocab);
 	word->hashcode = tag_fixnum(rand());
 	word->vocabulary = vocab;
 	word->name = name;

@@ -1,12 +1,13 @@
 + 0.87:
 
+- thrown_* vars are not gc roots
+- "ker" C+u: for a moment, full vocab list is shown
 - : foo \ each reload foo ; foo  eventually crashes
 - list usability
   - popup: -- close button
   - popup: -- pin button
 - some module operations don't work on module-links
 - modules: core/ libs/ apps/
-- xml: "</a>" string>xml miscompiles
 - top level window positioning on ms windows
 - scroll>rect broken if there are gadgets in between
 - completion is not ideal: eg, C+e "buttons"
@@ -16,7 +17,6 @@
   - callback scheduling issue
   - httpd crash
   - fep when closing window
-  - : foo "ppc" make-image stdio get duplex-stream-out pane-stream-pane pane-clear foo ; foo
 - these things are "Too Slow":
   - all-words
   - make-image
