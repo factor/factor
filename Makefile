@@ -77,7 +77,7 @@ macosx-x86: macosx-freetype
 
 linux-x86:
 	$(MAKE) $(BINARY) CONFIG=vm/Config.linux.x86
-	# $(STRIP) $(BINARY)
+	$(STRIP) $(BINARY)
 
 linux-amd64:
 	$(MAKE) $(BINARY) CONFIG=vm/Config.linux.amd64
