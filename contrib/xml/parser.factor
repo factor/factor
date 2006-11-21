@@ -235,11 +235,11 @@ UNION: any-tag tag contained-tag ;
 
 TUPLE: notags ;
 M: notags error.
-    "XML document lacks a main tag" print ;
+    drop "XML document lacks a main tag" print ;
 
 TUPLE: multitags ;
 M: multitags error.
-    "XML document contains multiple tags" print ;
+    drop "XML document contains multiple main tags" print ;
 
 : make-xml-doc ( prolog seq -- xml-doc )
     dup [ any-tag? ] find
