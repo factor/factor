@@ -46,7 +46,8 @@ F_ARRAY *allot_array(CELL type, F_FIXNUM capacity, CELL fill)
 /* size is in bytes this time */
 F_ARRAY *allot_byte_array(F_FIXNUM size)
 {
-	F_FIXNUM byte_size = (size + sizeof(CELL) - 1) / sizeof(CELL);
+	F_FIXNUM byte_size = (F_FIXNUM)(size + sizeof(CELL) - 1)
+		/ (F_FIXNUM)sizeof(CELL);
 	return allot_array(BYTE_ARRAY_TYPE,byte_size,0);
 }
 

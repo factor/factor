@@ -27,3 +27,5 @@ sequences test errors math-internals ;
 ! Make sure we report the correct error on stack underflow
 [ { kernel-error 11 f f } ]
 [ [ clear drop ] catch ] unit-test
+
+[ -7 <byte-array> ] unit-test-fails
