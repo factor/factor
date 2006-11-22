@@ -109,7 +109,7 @@ M: module where* module-loc ;
     "load.factor" path+ resource-path exists? ;
 
 : (available-modules) ( path -- )
-    dup directory [ path+ ] map-with
+    dup resource-path directory [ path+ ] map-with
     dup [ module-dir? ] subset %
     [ (available-modules) ] each ;
 
