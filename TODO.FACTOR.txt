@@ -1,9 +1,14 @@
 + 0.87:
 
-- menu Command: quots look dumb
-- http://paste.lisp.org/display/30426
 - some module operations don't work on module-links
 - list operations: what if nothing is selected?
+- slider needs to be modelized
+- overhaul models, set-model* is crap
+- variable width word wrap
+- graphical crossref tool
+- http://paste.lisp.org/display/30426
+
+- menu Command: quots look dumb
 - top level window positioning on ms windows
 - crashes:
   - windows gcc issue
@@ -19,9 +24,6 @@
   - 10000 [ dup number>string ] map describe in the UI
   - available-modules
   - :trace
-- slider needs to be modelized
-- variable width word wrap
-- graphical crossref tool
 - auto-update browser and help when sources reload
 - mac intel: struct returns from objc methods
 - new windows don't always have focus, eg focus follows mouse
@@ -29,7 +31,6 @@
 - cross-word type inference
 - ui docs
 - some kind of declarative wiring framework for ui
-- overhaul models, set-model* is crap
 - compiled call traces:
   - should be independent of whenever the runtime was built with
     -fomit-frame-pointer or not

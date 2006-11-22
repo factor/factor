@@ -29,7 +29,7 @@ IN: mslug
         { table-content-style
             H{ { wrap-margin 700 } }
         }
-        { bullet "\u00b7" }
+        { bullet "\u00b7 " }
     } ;
 
 : $title ( string -- )
@@ -71,7 +71,7 @@ IN: mslug
     "Inspirations: Forth, Joy, Common Lisp, others..."
     "Powerful language features"
     "Interactive development"
-    "Why stack-based?"
+    "Stack-based"
     "Syntax: ``s-expressions''"
     "Code is data"
     { "Simple evaluation semantics; left to right:"
@@ -115,16 +115,16 @@ IN: mslug
         "H{ { \"carrot\" \"orange\" } }"
         "hash-union"
     }
-    "Prettyprinter -vs- inspector"
     "Option+h"
+    "Prettyprinter -vs- inspector"
 }
 { $slide "Data types - others"
     "Queues, graphs, splay trees, double linked lists, lazy lists..."
 }
 { $slide "Variables"
-    "Dynamic scope - WHY?"
+    "Dynamic scope"
     { $code "SYMBOL: foo" "5 foo set" "foo get ." }
-    { $code "SYMBOL: foo" "[ 6 foo set foo get . ] with-scope" }
+    { $code "SYMBOL: foo" "[ 6 foo set foo get ] with-scope" }
     "Dynamic scope can be analyzed statically:"
     { $code "SYMBOL: bar" "bar get sq foo set" }
 }
@@ -132,7 +132,7 @@ IN: mslug
     { "Stream-like sequence construction:"
     { $code
         ": print-name ( name -- )"
-        "    [ \"Greetings, \" % % \".\" ] \"\" make print ;"
+        "    [ \"Greetings, \" % % \".\" % ] \"\" make print ;"
     } }
     "Key factors:"
     { $code "%" }
@@ -140,7 +140,7 @@ IN: mslug
     { "Also, I/O:"
     { $code ": 100-bytes [ 100 read ] with-stream ;" "\"foo.txt\" <file-reader> 100-bytes" } }
 }
-{ $slide "Custom data types and polymorphism"
+{ $slide "Custom data types"
     { "Built-in classes: " { $link integer } ", " { $link array } ", " { $link hashtable } "..." }
     { "You can define your own:"
         { $code "TUPLE: rectangle w h ;" "TUPLE: circle r ;" }
@@ -200,7 +200,7 @@ IN: mslug
     "Layout:"
     { $code "{"
     "    { [ <label-control> ] f f @top }"
-    "    { [ ] f f @center }"
+    "    { [ <scroller> ] f f @center }"
     "} make-frame"
     }
     "Window:"
