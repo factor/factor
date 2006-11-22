@@ -139,6 +139,7 @@ M: operation invoke-command ( target operation -- )
 [ compound? ] H{
     { +name+ "Word dataflow" }
     { +quot+ [ word-def show-dataflow ] }
+    { +keyboard+ T{ key-down f { A+ } "d" } }
 } define-operation
 
 ! Vocabularies
@@ -256,28 +257,28 @@ M: operation invoke-command ( target operation -- )
 ! Quotations
 [ quotation? ] H{
     { +name+ "Quotation stack effect" }
-    { +keyboard+ T{ key-down f { A+ } "i" } }
+    { +keyboard+ T{ key-down f { C+ } "i" } }
     { +quot+ [ infer. ] }
     { +listener+ t }
 } define-operation
 
 [ quotation? ] H{
     { +name+ "Quotation dataflow" }
-    { +keyboard+ T{ key-down f { A+ } "d" } }
+    { +keyboard+ T{ key-down f { C+ } "d" } }
     { +quot+ [ show-dataflow ] }
     { +listener+ t }
 } define-operation
 
 [ quotation? ] H{
     { +name+ "Walk" }
-    { +keyboard+ T{ key-down f { A+ } "w" } }
+    { +keyboard+ T{ key-down f { C+ } "w" } }
     { +quot+ [ walk ] }
     { +listener+ t }
 } define-operation
 
 [ quotation? ] H{
     { +name+ "Time" }
-    { +keyboard+ T{ key-down f { A+ } "t" } }
+    { +keyboard+ T{ key-down f { C+ } "t" } }
     { +quot+ [ time ] }
     { +listener+ t }
 } define-operation
@@ -299,7 +300,7 @@ M: operation invoke-command ( target operation -- )
     dup editor-text swap select-all parse ;
 
 interactor "words"
-\ word class-operations
+{ word compound } [ class-operations ] map concat
 [ word-action ] modify-listener-operations
 define-commands
 
@@ -319,7 +320,7 @@ append
 define-commands
 
 \ word-search "operations"
-\ word class-operations
+{ word compound } [ class-operations ] map concat
 [ search-action ] modify-commands
 define-commands
 

@@ -78,8 +78,7 @@ TUPLE: node-gadget value height ;
 C: node-gadget ( gadget node height -- gadget )
     [ set-node-gadget-height ] keep
     [ set-node-gadget-value ] keep
-    swap <default-border> over set-gadget-delegate
-    dup faint-boundary ;
+    swap <default-border> over set-gadget-delegate ;
 
 M: node-gadget pref-dim*
     dup delegate pref-dim
@@ -110,10 +109,6 @@ M: #push node-presents >#push< first ;
         >r number>string "Child " swap append <label> r>
         <presentation>
     ] 2map ;
-
-: <node-presentation> ( node -- gadget )
-    class [ word-name <label> ] keep <link>
-    <presentation> ;
 
 : default-node-content ( node -- gadget )
     dup node-children <child-nodes>
@@ -169,7 +164,7 @@ DEFER: (compute-heights)
 ! Then we create gadgets for every node
 : node>gadget ( height node -- gadget )
     [ node>gadget* ] keep node-presents
-    [ <presentation> ] when* ;
+    [ <presentation> dup faint-boundary ] when* ;
 
 : print-node ( d-height node -- )
     dup full-height-node? [

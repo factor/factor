@@ -1,6 +1,5 @@
 + 0.87:
 
-- dataflow looks odd
 - menu Command: quots look dumb
 - http://paste.lisp.org/display/30426
 - "ker" C+u: for a moment, full vocab list is shown

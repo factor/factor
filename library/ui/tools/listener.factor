@@ -125,5 +125,5 @@ listener-gadget "toolbar" {
         T{ key-down f { C+ } "CLEAR" }
         [ clear-listener-stack ]
     }
-    { "Send EOF" T{ key-down f { C+ } "d" } [ listener-eof ] }
+    { "Send EOF" f [ listener-eof ] }
 } define-commands
