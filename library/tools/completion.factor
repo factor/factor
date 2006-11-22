@@ -55,9 +55,16 @@ USING: kernel arrays sequences math namespaces strings io ;
     [ first < ] subset-with
     [ second ] map ;
 
+: complete ( full short -- score )
+    #! Match forwards and backwards, see which one has the
+    #! highest score.
+    [ dupd fuzzy score ] 2keep
+    [ <reversed> ] 2apply
+    dupd fuzzy score max ;
+
 : completion ( str quot obj -- pair )
     #! pair is { obj score }
-    [ swap call dup rot fuzzy score ] keep 2array ; inline
+    [ swap call swap complete ] keep 2array ; inline
 
 : completions ( str quot candidates -- seq )
     pick empty? [
