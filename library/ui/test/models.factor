@@ -18,7 +18,9 @@ M: model-tester model-changed t swap set-model-tester-hit? ;
 4 <model> "model-b" set
 "model-a" get "model-b" get 2array <compose> "model-c" set
 
+"model-c" get activate-model
 [ { 3 4 } ] [ "model-c" get model-value  ] unit-test
+"model-c" get deactivate-model
 
 T{ model-tester f f } "tester" set
 
@@ -74,3 +76,12 @@ f <history> "history" set
 [ 9 ] [ "y" get model-value ] unit-test
 [ ] [ "y" get deactivate-model ] unit-test
 [ f ] [ "z" get "x" get model-connections memq? ] unit-test
+
+3 <model> "x" set
+"x" get [ sq ] <filter> "y" set
+
+4 "x" get set-model
+
+"y" get activate-model
+[ 16 ] [ "y" get model-value ] unit-test
+"y" get deactivate-model

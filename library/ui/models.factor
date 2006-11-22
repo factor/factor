@@ -19,6 +19,10 @@ C: model ( value -- model )
 
 DEFER: add-connection
 
+GENERIC: model-activated ( model -- )
+
+M: model model-activated drop ;
+
 : ref-model ( model -- n )
     dup model-ref 1+ dup rot set-model-ref ;
 
@@ -28,7 +32,8 @@ DEFER: add-connection
 : activate-model ( model -- )
     dup ref-model 1 = [
         dup model-dependencies
-        [ dup activate-model add-connection ] each-with
+        [ dup activate-model dupd add-connection ] each
+        model-activated
     ] [
         drop
     ] if ;
@@ -81,23 +86,25 @@ C: filter ( model quot -- filter )
     dup delegate>model
     [ set-filter-quot ] keep
     [ set-filter-model ] 2keep
-    [ add-dependency ] keep
-    dup model-changed ;
+    [ add-dependency ] keep ;
 
 M: filter model-changed
     dup filter-model model-value over filter-quot call
     swap set-model ;
 
+M: filter model-activated model-changed ;
+
 TUPLE: compose ;
 
 C: compose ( models -- compose )
     dup delegate>model
-    [ set-model-dependencies ] keep
-    dup model-changed ;
+    swap clone over set-model-dependencies ;
 
 M: compose model-changed
     dup model-dependencies [ model-value ] map
     swap delegate set-model ;
+
+M: compose model-activated model-changed ;
 
 M: compose set-model
     model-dependencies [ set-model ] 2each ;
@@ -129,16 +136,18 @@ C: history ( value -- history )
 
 TUPLE: delay model timeout ;
 
+: update-delay-model ( delay -- )
+    dup delay-model model-value swap set-model ;
+
 C: delay ( model timeout -- filter )
     dup delegate>model
     [ set-delay-timeout ] keep
     [ set-delay-model ] 2keep
     [ add-dependency ] keep
-    dup model-changed ;
+    dup update-delay-model ;
 
-M: delay model-changed
-    0 over delay-timeout add-timer ;
+M: delay model-changed 0 over delay-timeout add-timer ;
 
-M: delay tick
-    dup remove-timer
-    dup delay-model model-value swap set-model ;
+M: delay model-activated update-delay-model ;
+
+M: delay tick dup remove-timer update-delay-model ;
