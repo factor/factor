@@ -180,7 +180,7 @@ M: f print-element drop ;
     ] ($block) table last-element set ;
 
 : $list ( element -- )
-    [  "-" swap 2array ] map list-style get $grid ;
+    [ bullet get swap 2array ] map list-style get $grid ;
 
 : $table ( element -- )
     table-style get $grid ;

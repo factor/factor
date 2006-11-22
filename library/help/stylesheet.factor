@@ -99,4 +99,4 @@ SYMBOL: list-style
 H{ { table-gap { 10 2 } } } list-style set-global
 
 SYMBOL: bullet
-"-" bullet set-global
+"- " bullet set-global
