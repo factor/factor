@@ -53,27 +53,25 @@ tool "toolbar" {
         { "Dataflow" <dataflow-gadget> }
     } ;
 
+: <workspace-tabs> ( workspace -- tabs )
+    workspace-book control-model
+    workspace-tabs dup length [ swap first 2array ] 2map
+    <radio-box> ;
+
 : <workspace-book> ( -- gadget )
     workspace-tabs 1 <column> [ execute <tool> ] map <book> ;
 
 C: workspace ( -- workspace )
     {
         { [ <workspace-book> ] set-workspace-book f @center }
+        { [ gadget get <workspace-tabs> ] f f @top }
         { [ gadget get { workspace } <toolbar> ] f f @bottom }
     } make-frame* ;
 
 M: workspace pref-dim* delegate pref-dim* { 550 650 } vmax ;
 
-: <workspace-tabs> ( workspace -- tabs )
-    workspace-book control-model
-    workspace-tabs dup length [ swap first 2array ] 2map
-    <radio-box> ;
-
 : init-status ( world -- )
     dup world-status <presentation-help> swap @bottom grid-add ;
-
-: init-tabs ( world -- )
-    [ world-gadget <workspace-tabs> ] keep @top grid-add ;
 
 : hide-popup ( workspace -- )
     dup workspace-popup unparent
@@ -85,10 +83,12 @@ M: workspace pref-dim* delegate pref-dim* { 550 650 } vmax ;
     request-focus ;
 
 : popup-dim ( workspace -- dim )
-    rect-dim first2 3 /i 2array ;
+    rect-dim first2 4 /i 2array ;
 
 : popup-loc ( workspace -- loc )
-    dup rect-dim swap popup-dim v- ;
+    dup rect-dim
+    over popup-dim v-
+    swap rect-loc v+ ;
 
 : layout-popup ( workspace gadget -- )
     over popup-dim over set-gadget-dim
@@ -96,7 +96,8 @@ M: workspace pref-dim* delegate pref-dim* { 550 650 } vmax ;
 
 M: workspace layout*
     dup delegate layout*
-    dup workspace-popup dup [ layout-popup ] [ 2drop ] if ;
+    dup workspace-book swap workspace-popup dup
+    [ layout-popup ] [ 2drop ] if ;
 
 M: workspace children-on nip gadget-children ;
 
@@ -105,7 +106,6 @@ M: workspace focusable-child* workspace-book ;
 : workspace-window ( -- workspace )
     <workspace> dup <world>
     [ init-status ] keep
-    [ init-tabs ] keep
     open-window
     listener-gadget get-tool start-listener ;
 

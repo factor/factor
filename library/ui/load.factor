@@ -64,6 +64,5 @@ PROVIDE: library/ui
     "test/scrolling.factor"
     "test/search.factor"
     "test/sliders.factor"
-    "test/tracks.factor"
     "test/titled-gadget.factor"
 } } ;

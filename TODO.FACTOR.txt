@@ -19,7 +19,6 @@
   - 10000 [ dup number>string ] map describe in the UI
   - available-modules
   - :trace
-- roundoff is still not quite right with tracks
 - slider needs to be modelized
 - variable width word wrap
 - graphical crossref tool
