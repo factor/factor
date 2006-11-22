@@ -38,17 +38,14 @@ TUPLE: tile definition gadget ;
     definitions-showing delete
     unparent ;
 
-: <tile-content> ( definition toolbar -- gadget )
-    >r [ see ] make-pane r> 2array
-    make-pile { 5 5 } over set-pack-gap
-    <default-border> dup faint-boundary ;
+: <tile-content> ( definition -- gadget )
+    [ [ see ] make-pane <default-border> ] keep
+    unparse [ find-tile close-tile ] <labelled-gadget>
+    dup faint-boundary ;
 
 C: tile ( definition -- gadget )
-    2dup { tile } <toolbar>
-    <tile-content> over set-gadget-delegate
+    over <tile-content> over set-gadget-delegate
     [ set-tile-definition ] keep ;
-
-tile "toolbar" { { "Close" f [ close-tile ] } } define-commands
 
 : show-definition ( definition definitions -- )
     2dup definition-index dup 0 >= [

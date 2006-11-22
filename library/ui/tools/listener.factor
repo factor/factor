@@ -59,7 +59,7 @@ C: listener-gadget ( -- gadget )
         {
             [ <listener-input> ]
             set-listener-gadget-input
-            [ <scroller> "Input" <labelled-gadget> ]
+            [ <scroller> "Input" f <labelled-gadget> ]
             1/6
         }
     } { 0 1 } make-track* ;

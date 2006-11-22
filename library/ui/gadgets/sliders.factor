@@ -129,7 +129,7 @@ M: elevator layout*
 : slide-by-line ( -1/1 slider -- ) >r 32 * r> slide-by ;
 
 : <slide-button> ( vector polygon amount -- )
-    >r { 0.5 0.5 0.5 1.0 } swap <polygon-gadget> r>
+    >r gray swap <polygon-gadget> r>
     [ swap slide-by-line ] curry <repeat-button>
     [ set-gadget-orientation ] keep ;
 

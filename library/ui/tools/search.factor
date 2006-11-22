@@ -130,7 +130,8 @@ C: history-search ( string seq -- gadget )
     live-search-list list-value ;
 
 : show-titled-popup ( workspace gadget title -- )
-    <labelled-gadget> swap show-popup ;
+    [ find-workspace hide-popup ] <labelled-gadget>
+    swap show-popup ;
 
 : workspace-listener ( workspace -- listener )
     listener-gadget swap find-tool tool-gadget nip ;

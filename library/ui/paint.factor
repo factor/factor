@@ -117,6 +117,7 @@ M: polygon draw-interior
 : arrow-right { { 0 0 } { 6 3 } { 0 6 } } ;
 : arrow-down  { { 0 0 } { 6 0 } { 3 6 } } ;
 : arrow-left  { { 0 3 } { 6 0 } { 6 6 } } ;
+: close-box   { { 0 0 } { 6 0 } { 6 6 } { 0 6 } } ;
 
 : <polygon-gadget> ( color points -- gadget )
     dup max-dim

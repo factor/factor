@@ -16,17 +16,15 @@ DEFER: set-editor-font
 IN: gadgets-theme
 USING: arrays gadgets kernel sequences styles ;
 
-: solid-black T{ solid f { 0.0 0.0 0.0 1.0 } } ;
+: black { 0.0 0.0 0.0 1.0 } ;
+: white { 1.0 1.0 1.0 1.0 } ;
+: gray { 0.6 0.6 0.6 1.0 } ;
 
-: solid-white T{ solid f { 1.0 1.0 1.0 1.0 } } ;
+: solid-interior white <solid> swap set-gadget-interior ;
 
-: solid-interior solid-white swap set-gadget-interior ;
+: solid-boundary black <solid> swap set-gadget-boundary ;
 
-: solid-boundary solid-black swap set-gadget-boundary ;
-
-: faint T{ solid f { 0.62 0.62 0.62 0.8 } } ;
-
-: faint-boundary faint swap set-gadget-boundary ;
+: faint-boundary gray <solid> swap set-gadget-boundary ;
 
 : plain-gradient
     T{ gradient f {
@@ -72,7 +70,7 @@ USING: arrays gadgets kernel sequences styles ;
     plain-gradient over set-gadget-interior faint-boundary ;
 
 : roll-button-theme ( button -- )
-    f solid-black solid-black f <button-paint>
+    f black <solid> dup f <button-paint>
     swap set-gadget-boundary ;
 
 : caret-theme ( caret -- )
@@ -86,19 +84,19 @@ USING: arrays gadgets kernel sequences styles ;
     } } swap set-gadget-interior ;
 
 : reverse-video-theme ( label -- )
-    { 1.0 1.0 1.0 1.0 } over set-label-color
-    solid-black swap set-gadget-interior ;
+    white over set-label-color
+    black <solid> swap set-gadget-interior ;
 
 : label-theme ( gadget -- )
-    { 0.0 0.0 0.0 1.0 } over set-label-color
+    black over set-label-color
     { "sans-serif" plain 12 } swap set-label-font ;
 
 : text-theme ( gadget -- )
-    { 0.0 0.0 0.0 1.0 } over set-label-color
+    black over set-label-color
     { "monospace" plain 12 } swap set-label-font ;
 
 : editor-theme ( editor -- )
-    { 0.0 0.0 0.0 1.0 } over set-editor-color
+    black over set-editor-color
     { 1.0 0.0 0.0 1.0 } over set-editor-caret-color
     { 0.8 0.8 1.0 1.0 } over set-editor-selection-color
     { "monospace" plain 12 } swap set-editor-font ;
@@ -110,5 +108,11 @@ USING: arrays gadgets kernel sequences styles ;
 : menu-theme ( gadget -- )
     T{ solid f { 0.95 0.95 0.95 0.95 } }
     over set-gadget-interior
-    T{ solid f { 0.7 0.7 0.7 1.0 } }
-    swap set-gadget-boundary ;
+    gray <solid> swap set-gadget-boundary ;
+
+: title-theme ( gadget -- )
+    { 1 0 } over set-gadget-orientation
+    T{ gradient f {
+        { 0.65 0.65 1.0 1.0 }
+        { 0.65 0.45 1.0 1.0 }
+    } } swap set-gadget-interior ;
