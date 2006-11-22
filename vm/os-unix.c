@@ -158,9 +158,14 @@ void dealloc_segment(F_SEGMENT *block)
 	free(block);
 }
 
-void signal_handler(int signal, siginfo_t* siginfo, void* uap)
+void memory_signal_handler(int signal, siginfo_t* siginfo, void* uap)
 {
 	memory_protection_error((CELL)siginfo->si_addr, signal);
+}
+
+void misc_signal_handler(int signal, siginfo_t* siginfo, void* uap)
+{
+	signal_error(signal);
 }
 
 static void sigaction_safe(int signum, const struct sigaction *act, struct sigaction *oldact)
@@ -174,18 +179,25 @@ static void sigaction_safe(int signum, const struct sigaction *act, struct sigac
 
 void unix_init_signals(void)
 {
-	struct sigaction custom_sigaction;
+	struct sigaction memory_sigaction;
+	struct sigaction misc_sigaction;
 	struct sigaction ign_sigaction;
 	
-	sigemptyset(&custom_sigaction.sa_mask);
-	custom_sigaction.sa_sigaction = signal_handler;
-	custom_sigaction.sa_flags = SA_SIGINFO;
-	sigaction_safe(SIGABRT,&custom_sigaction,NULL);
-	sigaction_safe(SIGFPE,&custom_sigaction,NULL);
-	sigaction_safe(SIGBUS,&custom_sigaction,NULL);
-	sigaction_safe(SIGQUIT,&custom_sigaction,NULL);
-	sigaction_safe(SIGSEGV,&custom_sigaction,NULL);
-	sigaction_safe(SIGILL,&custom_sigaction,NULL);
+	sigemptyset(&memory_sigaction.sa_mask);
+	memory_sigaction.sa_sigaction = memory_signal_handler;
+	memory_sigaction.sa_flags = SA_SIGINFO;
+
+	sigaction_safe(SIGBUS,&memory_sigaction,NULL);
+	sigaction_safe(SIGSEGV,&memory_sigaction,NULL);
+
+	sigemptyset(&misc_sigaction.sa_mask);
+	misc_sigaction.sa_sigaction = misc_signal_handler;
+	misc_sigaction.sa_flags = SA_SIGINFO;
+
+	sigaction_safe(SIGABRT,&misc_sigaction,NULL);
+	sigaction_safe(SIGFPE,&misc_sigaction,NULL);
+	sigaction_safe(SIGQUIT,&misc_sigaction,NULL);
+	sigaction_safe(SIGILL,&misc_sigaction,NULL);
 	
 	sigemptyset(&ign_sigaction.sa_mask);
 	ign_sigaction.sa_handler = SIG_IGN;

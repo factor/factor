@@ -112,3 +112,7 @@ unit-test
     79562815144503850065234921197651376510595262628033069372760833939060637564931
     bignum-mod
 ] unit-test
+
+! We don't care if this fails or returns 0 (its CPU-specific)
+! as long as it doesn't crash
+[ ] [ [ 0 0 /i ] catch drop ] unit-test

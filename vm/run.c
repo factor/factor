@@ -42,6 +42,7 @@ void handle_error(void)
 {
 	if(throwing)
 	{
+		gc_off = false;
 		extra_roots = stack_chain->extra_roots;
 
 		if(thrown_keep_stacks)
@@ -318,9 +319,7 @@ void general_error(F_ERRORTYPE error, CELL arg1, CELL arg2, bool keep_stacks)
 
 void memory_protection_error(CELL addr, int signal)
 {
-	/* this is here to catch GC bugs; see the comment in push_callframe()
-	above */
-	garbage_collection(NURSERY,false);
+	gc_off = true;
 
 	if(in_page(addr, ds_bot, 0, -1))
 		general_error(ERROR_DS_UNDERFLOW,F,F,false);
@@ -336,13 +335,13 @@ void memory_protection_error(CELL addr, int signal)
 		general_error(ERROR_CS_OVERFLOW,F,F,false);
 	else if(in_page(addr, nursery.limit, 0, 0))
 		critical_error("Out of memory in allot",0);
-		signal_error(signal);
+
+	signal_error(signal);
 }
 
-/* It is not safe to access 'ds' from a signal handler, so we just not
-touch it */
 void signal_error(int signal)
 {
+	gc_off = true;
 	general_error(ERROR_SIGNAL,tag_fixnum(signal),F,false);
 }
 
