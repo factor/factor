@@ -72,7 +72,7 @@ USING: arrays gadgets kernel sequences styles ;
     plain-gradient over set-gadget-interior faint-boundary ;
 
 : roll-button-theme ( button -- )
-    f faint solid-black f <button-paint>
+    f solid-black solid-black f <button-paint>
     swap set-gadget-boundary ;
 
 : caret-theme ( caret -- )
@@ -106,3 +106,9 @@ USING: arrays gadgets kernel sequences styles ;
 : popup-theme ( gadget -- )
     T{ solid f { 0.95 0.95 0.95 0.95 } }
     swap set-gadget-interior ;
+
+: menu-theme ( gadget -- )
+    T{ solid f { 0.95 0.95 0.95 0.95 } }
+    over set-gadget-interior
+    T{ solid f { 0.7 0.7 0.7 1.0 } }
+    swap set-gadget-boundary ;

@@ -40,19 +40,25 @@ C: presentation ( gadget object -- button )
     swap [ invoke-primary ] <roll-button>
     over set-gadget-delegate ;
 
-: <command-button> ( target command -- button )
+: (command-button) ( target command -- label quot )
     dup command-name -rot
-    [ invoke-command drop ] curry curry
-    <bevel-button> ;
+    [ invoke-command drop ] curry curry ;
+
+: <command-button> ( target command -- button )
+    (command-button) <bevel-button> ;
 
 : <menu-command> ( command -- command )
     [ hand-clicked get find-world hide-glass ]
     swap modify-command ;
 
+: <menu-item> ( target command -- button )
+    <menu-command> (command-button) <roll-button> ;
+
 : <commands-menu> ( target commands -- gadget )
-    [ <menu-command> ] map
-    [ <command-button> ] map-with
-    make-pile 1 over set-pack-fill ;
+    [ <menu-item> ] map-with
+    make-pile 1 over set-pack-fill
+    <default-border>
+    dup menu-theme ;
 
 : hooked-operations ( hook obj -- seq )
     object-operations swap modify-commands ;

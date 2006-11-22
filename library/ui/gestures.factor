@@ -179,7 +179,6 @@ SYMBOL: double-click-timeout
     dup hand-world set-global
     under-hand >r over hand-loc set-global
     pick-up hand-gadget set-global
-    menu-mode? get-global [ update-clicked ] when
     under-hand r> hand-gestures ;
 
 : send-button-down ( gesture loc world -- )

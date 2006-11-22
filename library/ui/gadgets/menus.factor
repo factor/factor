@@ -16,17 +16,20 @@ C: menu-glass ( menu world -- glass )
 
 M: menu-glass layout* gadget-child prefer ;
 
-: retarget-drag ( gadget -- )
-    hand-gadget get-global hand-clicked get-global eq? [
-        drop
-    ] [
-        hand-loc get-global swap find-world move-hand
-    ] if ;
+: hide-glass ( world -- )
+    dup world-glass [ unparent ] when*
+    f swap set-world-glass ;
 
-\ menu-glass H{
-    { T{ button-up } [ find-world [ hide-glass ] when* ] }
-    { T{ drag } [ retarget-drag ] }
-} set-gestures
+: show-glass ( gadget world -- )
+    over hand-clicked set-global
+    [ hide-glass ] keep
+    [ add-gadget ] 2keep
+    set-world-glass ;
 
 : show-menu ( gadget owner -- )
     find-world [ <menu-glass> ] keep show-glass ;
+
+\ menu-glass H{
+    { T{ button-down } [ find-world [ hide-glass ] when* ] }
+    { T{ drag } [ update-clicked drop ] }
+} set-gestures
