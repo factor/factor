@@ -1,5 +1,6 @@
 IN: temporary
-USING: kernel math namespaces prettyprint test math-internals ;
+USING: kernel math namespaces prettyprint test math-internals
+errors ;
 
 [ "-8" ] [ -8 unparse ] unit-test
 
@@ -115,4 +116,4 @@ unit-test
 
 ! We don't care if this fails or returns 0 (its CPU-specific)
 ! as long as it doesn't crash
-[ ] [ [ 0 0 /i ] catch drop ] unit-test
+[ ] [ [ 0 0 /i ] catch clear ] unit-test
