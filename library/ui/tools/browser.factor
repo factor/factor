@@ -40,7 +40,7 @@ TUPLE: tile definition gadget ;
 
 : <tile-content> ( definition -- gadget )
     [ [ see ] make-pane <default-border> ] keep
-    unparse [ find-tile close-tile ] <labelled-gadget>
+    unparse [ find-tile close-tile ] <closable-gadget>
     dup faint-boundary ;
 
 C: tile ( definition -- gadget )

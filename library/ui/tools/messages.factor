@@ -44,10 +44,10 @@ M: messages batch-ends
     <messages-button> gadget. ;
 
 : <errors> ( gadget -- newgadget )
-    <scroller> "Compiler errors" f <labelled-gadget> ;
+    <scroller> "Compiler errors" <labelled-gadget> ;
 
 : <warnings> ( gadget -- newgadget )
-    <scroller> "Compiler warnings" f <labelled-gadget> ;
+    <scroller> "Compiler warnings" <labelled-gadget> ;
 
 C: messages ( -- gadget )
     {

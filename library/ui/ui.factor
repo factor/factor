@@ -139,6 +139,18 @@ C: titled-gadget ( gadget title -- )
 
 TUPLE: labelled-gadget content ;
 
+C: labelled-gadget ( gadget title -- gadget )
+    {
+        { [ <label> dup reverse-video-theme ] f f @top }
+        { f set-labelled-gadget-content f @center }
+    } make-frame* ;
+
+M: labelled-gadget focusable-child* labelled-gadget-content ;
+
+: <labelled-pane> ( model quot title -- gadget )
+    >r <pane-control> t over set-pane-scrolls? <scroller> r>
+    <labelled-gadget> ;
+
 : <close-box> ( quot -- button/f )
     gray close-box <polygon-gadget> swap <bevel-button> ;
 
@@ -154,17 +166,15 @@ TUPLE: labelled-gadget content ;
         <title-label>
     ] if* ;
 
-C: labelled-gadget ( gadget title quot -- gadget )
+TUPLE: closable-gadget content ;
+
+C: closable-gadget ( gadget title quot -- gadget )
     {
         { [ <title-bar> ] f f @top }
-        { f set-labelled-gadget-content f @center }
+        { f set-closable-gadget-content f @center }
     } make-frame* ;
 
-M: labelled-gadget focusable-child* labelled-gadget-content ;
-
-: <labelled-pane> ( model quot title -- gadget )
-    >r <pane-control> t over set-pane-scrolls? <scroller> r>
-    f <labelled-gadget> ;
+M: closable-gadget focusable-child* closable-gadget-content ;
 
 : pane-window ( quot title -- )
     >r make-pane <scroller> r> open-titled-window ;
