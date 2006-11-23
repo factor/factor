@@ -33,7 +33,7 @@ M: messages compile-error
 
 : <messages-button> ( -- gadget )
     "Compiler messages"
-    [ drop find-workspace messages select-tool ]
+    [ find-workspace messages select-tool ]
     <bevel-button> ;
 
 M: messages batch-ends

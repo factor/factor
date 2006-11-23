@@ -22,6 +22,8 @@ M: gadget tool-help drop f ;
 
 TUPLE: workspace book popup ;
 
+: find-workspace [ workspace? ] find-parent ;
+
 TUPLE: tool gadget ;
 
 : find-tool ( class workspace -- index tool )
@@ -34,17 +36,17 @@ TUPLE: tool gadget ;
 
 : select-tool ( workspace class -- ) swap show-tool drop ;
 
-: find-workspace* ( quot -- workspace )
+: get-workspace* ( quot -- workspace )
     [ dup workspace? [ over call ] [ drop f ] if ] find-window
     [ nip dup raise-window world-gadget ]
-    [ workspace-window drop find-workspace* ] if* ; inline
+    [ workspace-window drop get-workspace* ] if* ; inline
 
-: find-workspace ( -- workspace ) [ drop t ] find-workspace* ;
+: get-workspace ( -- workspace ) [ drop t ] get-workspace* ;
 
 : call-tool ( arg class -- )
-    find-workspace show-tool call-tool* ;
+    get-workspace show-tool call-tool* ;
 
 : get-tool ( class -- gadget )
-    find-workspace find-tool nip tool-gadget ;
+    get-workspace find-tool nip tool-gadget ;
 
 : find-messages ( -- gadget ) messages get-tool ;

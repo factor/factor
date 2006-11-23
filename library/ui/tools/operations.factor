@@ -80,7 +80,7 @@ M: operation invoke-command ( target operation -- )
     [ drop ] [ [ "USE: " % % " " % % ] "" make ] if ;
 
 : insert-word ( word -- )
-    find-listener [ word-completion-string ] keep
+    get-listener [ word-completion-string ] keep
     listener-gadget-input user-input ;
 
 [ word? ] H{
@@ -147,7 +147,7 @@ M: operation invoke-command ( target operation -- )
     { +primary+ t }
     { +name+ "Browse" }
     { +keyboard+ T{ key-down f { A+ } "b" } }
-    { +quot+ [ vocab-link-name find-workspace swap show-vocab-words ] }
+    { +quot+ [ vocab-link-name get-workspace swap show-vocab-words ] }
 } define-operation
 
 [ vocab-link? ] H{
@@ -199,7 +199,7 @@ M: operation invoke-command ( target operation -- )
     { +primary+ t }
     { +name+ "Browse" }
     { +keyboard+ T{ key-down f { A+ } "b" } }
-    { +quot+ [ find-workspace swap show-module-files ] }
+    { +quot+ [ get-workspace swap show-module-files ] }
 } define-operation
 
 [ module? ] H{

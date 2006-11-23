@@ -80,19 +80,19 @@ M: listener-gadget tool-help
     listener-gadget swap find-tool nip tool-gadget
     listener-gadget-input interactor-busy? ;
 
-: find-listener ( -- listener )
+: get-listener ( -- listener )
     listener-gadget
-    [ workspace-busy? not ] find-workspace*
+    [ workspace-busy? not ] get-workspace*
     show-tool tool-gadget ;
 
 : (call-listener) ( quot listener -- )
     listener-gadget-input interactor-call ;
 
 : call-listener ( quot -- )
-    find-listener (call-listener) ;
+    get-listener (call-listener) ;
 
 : eval-listener ( string -- )
-    find-listener
+    get-listener
     listener-gadget-input [ set-editor-text ] keep
     interactor-commit ;
 

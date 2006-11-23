@@ -34,7 +34,7 @@ search-field H{
 
 : <search-list> ( seq producer presenter -- gadget )
     -rot curry <search-model>
-    [ [ workspace? ] find-parent hide-popup ] -rot
+    [ find-workspace hide-popup ] -rot
     <list> ;
 
 C: live-search ( string seq producer presenter -- gadget )
@@ -126,7 +126,7 @@ C: history-search ( string seq -- gadget )
     [ delegate>live-search ] keep ;
 
 : search-action ( search -- obj )
-    dup [ workspace? ] find-parent hide-popup
+    dup find-workspace hide-popup
     live-search-list list-value ;
 
 : show-titled-popup ( workspace gadget title -- )
