@@ -1,6 +1,7 @@
 /* Fault handler information.  MacOSX version.
 Copyright (C) 1993-1999, 2002-2003  Bruno Haible <clisp.org at bruno>
 Copyright (C) 2003  Paolo Bonzini <gnu.org at bonzini>
+Various modifications to support Intel Macs by Slava Pestov
 
 Used under BSD license with permission from Paolo Bonzini and Bruno Haible,
 2005-03-10
@@ -19,14 +20,20 @@ see http://www.caddr.com/macho/archives/sbcl-devel/2005-3/4764.html */
 /* The exception port on which our thread listens.  */
 static mach_port_t our_exception_port;
 
-/* A handler that is called in the faulting thread. */
+/* Handlers that are called in the faulting thread. */
 static void
-terminating_handler (void *fault_addr)
+memory_protection_handler (void *fault_addr)
 {
   memory_protection_error((CELL)fault_addr,SIGSEGV);
   abort ();
 }
 
+static void
+arithmetic_handler (void *ignore)
+{
+  signal_error(SIGFPE);
+  abort ();
+}
 
 /* Handle an exception by invoking the user's fault handler and/or forwarding
    the duty to the previously installed handlers.  */
@@ -66,7 +73,16 @@ catch_exception_raise (mach_port_t exception_port,
 
   sp = (unsigned long) (SIGSEGV_STACK_POINTER (thread_state));
 
-  SIGSEGV_PROGRAM_COUNTER (thread_state) = (unsigned long) terminating_handler;
+  void *handler;
+
+  if(exception == EXC_BAD_ACCESS)
+    handler = memory_protection_handler;
+  else if(exception == EXC_ARITHMETIC)
+    handler = arithmetic_handler;
+  else
+    abort();
+
+  SIGSEGV_PROGRAM_COUNTER (thread_state) = (unsigned long) handler;
   SIGSEGV_STACK_POINTER (thread_state) = fix_stack_ptr(sp);
   pass_arg0(&thread_state,SIGSEGV_EXC_STATE_FAULT(exc_state));
 
@@ -155,9 +171,8 @@ int mach_initialize ()
       != KERN_SUCCESS)
     return -1;
 
-  /* The exceptions we want to catch.  Only EXC_BAD_ACCESS is interesting
-     for us (see above in function catch_exception_raise).  */
-  mask = EXC_MASK_BAD_ACCESS;
+  /* The exceptions we want to catch. */
+  mask = EXC_MASK_BAD_ACCESS | EXC_MASK_ARITHMETIC;
 
   /* Create the thread listening on the exception port.  */
   if (pthread_attr_init (&attr) != 0)
