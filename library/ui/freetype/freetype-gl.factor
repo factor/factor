@@ -109,9 +109,6 @@ C: font ( handle -- font )
         dupd load-glyph glyph-hori-advance ft-ceil
     ] cache-nth nip ;
 
-: string-width ( open-font string -- w )
-    0 -rot [ char-width + ] each-with ;
-
 : glyph-size ( glyph -- dim )
     dup glyph-hori-advance ft-ceil
     swap glyph-height ft-ceil 2array ;

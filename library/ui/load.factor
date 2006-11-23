@@ -11,6 +11,7 @@ PROVIDE: library/ui
     "gadgets/grids.factor"
     "gadgets/frames.factor"
     "world.factor"
+    "text.factor"
     "paint.factor"
     "gestures.factor"
     "commands.factor"

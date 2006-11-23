@@ -138,8 +138,7 @@ M: loc-monitor model-changed
     line-translation gl-translate ;
 
 : draw-line ( editor str -- )
-    >r dup editor-color gl-color editor-font r>
-    { 0 0 } draw-string ;
+    >r editor-font r> { 0 0 } draw-string ;
 
 : first-visible-line ( editor -- n )
     clip get rect-loc second origin get second -
@@ -170,7 +169,8 @@ M: loc-monitor model-changed
 
 : draw-lines ( -- )
     \ first-visible-line get [
-        editor get dup visible-lines
+        editor get dup editor-color gl-color
+        dup visible-lines
         [ draw-line 1 translate-lines ] each-with
     ] with-editor-translation ;
 
@@ -201,15 +201,8 @@ M: loc-monitor model-changed
 M: editor draw-gadget*
     [ draw-selection draw-lines draw-caret ] with-editor ;
 
-: editor-height ( editor -- n )
-    [ control-value length ] keep line>y ;
-
-: editor-width ( editor -- n )
-    0 swap dup editor-font* swap control-value
-    [ string-width max ] each-with ;
-
 M: editor pref-dim*
-    dup editor-width swap editor-height 2array ;
+    dup editor-font* swap control-value text-dim ;
 
 M: editor gadget-selection?
     selection-start/end = not ;

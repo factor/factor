@@ -7,7 +7,6 @@
 - variable width word wrap
 - graphical crossref tool
 - http://paste.lisp.org/display/30426
-- C+p: shows newlines as a box
 
 - menu Command: quots look dumb
 - top level window positioning on ms windows

@@ -3,24 +3,32 @@
 IN: gadgets-labels
 USING: arrays freetype gadgets gadgets-theme
 generic hashtables io kernel math namespaces opengl sequences
-styles ;
+styles strings ;
 
 ! A label gadget draws a string.
 TUPLE: label text font color ;
 
-C: label ( text -- label )
+: label-string ( label -- string )
+    label-text dup string? [ "\n" join ] unless ; inline
+
+: set-label-string ( string label -- )
+    CHAR: \n pick memq? [
+        >r "\n" split r> set-label-text
+    ] [
+        set-label-text
+    ] if ; inline
+
+C: label ( string -- label )
     dup delegate>gadget
-    [ set-label-text ] keep
+    [ set-label-string ] keep
     dup label-theme ;
 
 M: label pref-dim*
-    dup label-font lookup-font dup font-height >r
-    swap label-text string-width r> 2array ;
+    dup label-font lookup-font swap label-text text-dim ;
 
 M: label draw-gadget*
     dup label-color gl-color
-    dup label-font swap label-text
-    origin get draw-string ;
+    dup label-font swap label-text origin get draw-text ;
 
 : <label-control> ( model -- gadget )
-    "" <label> [ set-label-text ] <control> ;
+    "" <label> [ set-label-string ] <control> ;
