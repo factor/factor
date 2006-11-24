@@ -61,8 +61,7 @@ DEFER: objc-error. ( alien -- )
 : callstack-overflow. "Call" stack-overflow. ;
 
 : memory-error.
-    "Allocation of " write second pprint
-    " bytes failed due to insufficient room in data heap" print ;
+    "Data heap allocation request failed" print ;
 
 : kernel-error ( error -- word )
     #! Kernel errors are indexed by integers.

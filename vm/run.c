@@ -350,7 +350,7 @@ void type_error(CELL type, CELL tagged)
 	general_error(ERROR_TYPE,tag_fixnum(type),tagged,true);
 }
 
-void memory_error(CELL bytes)
+void memory_error(void)
 {
-	general_error(ERROR_MEMORY,allot_cell(bytes),F,false);
+	general_error(ERROR_MEMORY,F,F,false);
 }
