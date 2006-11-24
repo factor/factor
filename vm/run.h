@@ -168,6 +168,7 @@ typedef enum
 	ERROR_RS_OVERFLOW,
 	ERROR_CS_UNDERFLOW,
 	ERROR_CS_OVERFLOW,
+	ERROR_MEMORY,
 	ERROR_OBJECTIVE_C
 } F_ERRORTYPE;
 
@@ -192,6 +193,7 @@ void general_error(F_ERRORTYPE error, CELL arg1, CELL arg2, bool keep_stacks);
 void memory_protection_error(CELL addr, int signal);
 void signal_error(int signal);
 void type_error(CELL type, CELL tagged);
+void memory_error(CELL bytes);
 void primitive_throw(void);
 void primitive_die(void);
 

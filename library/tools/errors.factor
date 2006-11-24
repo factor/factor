@@ -60,6 +60,10 @@ DEFER: objc-error. ( alien -- )
 : callstack-underflow. "Call" stack-underflow. ;
 : callstack-overflow. "Call" stack-overflow. ;
 
+: memory-error.
+    "Allocation of " write second pprint
+    " bytes failed due to insufficient room in data heap" print ;
+
 : kernel-error ( error -- word )
     #! Kernel errors are indexed by integers.
     second {
@@ -80,7 +84,8 @@ DEFER: objc-error. ( alien -- )
         retainstack-overflow.
         callstack-underflow.
         callstack-overflow.
-	objc-error.
+        memory-error.
+        objc-error.
     } nth ;
 
 M: kernel-error error. dup kernel-error execute ;

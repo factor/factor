@@ -253,7 +253,12 @@ INLINE void maybe_gc(CELL a)
 	if(nursery.here + a + ALLOT_BUFFER_ZONE > nursery.limit)
 		garbage_collection(NURSERY,false);
 	if(nursery.here + a + ALLOT_BUFFER_ZONE > nursery.limit)
-		critical_error("Out of memory in maybe_gc",0);
+	{
+		if(nursery.here + ALLOT_BUFFER_ZONE > nursery.limit)
+			critical_error("Out of memory in maybe_gc",0);
+		else
+			memory_error(a);
+	}
 }
 
 INLINE void *allot(CELL a)
