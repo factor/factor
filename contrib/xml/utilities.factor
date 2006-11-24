@@ -80,7 +80,8 @@ M: xml-doc (xml-map)
     [ (xml-map) ] with-delegate ;
 : xml-map ( tag quot -- tag ) swap (xml-map) ; inline
 
-! : xml-subset ( tag quot -- tag )
-!     V{ } clone rot [ ! this is wrong
-!         [ swap >r call [ r> push ] [ r> 2drop ] if ] 3keep drop
-!     ] xml-each 2drop ;
+: xml-subset ( quot tag -- seq )
+    V{ } clone rot [
+        swap >r [ swap call ] 2keep rot r>
+        swap [ [ push ] keep ] [ nip ] if
+    ] xml-each nip ;

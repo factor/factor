@@ -26,7 +26,7 @@ TUPLE: instruction text ;
     } cond ;
 
 : parse-quot ( ch -- array )
-   [ SBUF" " clone (parse-quot) ] { } make ;
+   [ SBUF" " clone (parse-quot) ] { } make <xml-string> ;
 
 : parse-prop-value ( -- seq )
     char dup "'\"" member? [
@@ -122,13 +122,25 @@ M: unclosed error.
 : push-xml-stack ( object -- )
     V{ } clone 2array xml-stack get push ;
 
+TUPLE: bad-uri string ;
+M: bad-uri error.
+    "Bad URI:" print bad-uri-string . ;
+
+: xml-string>uri ( xml-string -- string )
+    xml-string-array
+    dup length 1 = [ <bad-uri> throw ] unless
+    first ;
+
 : process-ns ( hash -- hash )
     ! This should assure all namespaces are URIs by replacing first
     [
-        dup [ swap dup name-space "xmlns" =
-            [ >r first r> name-tag set ] [ 2drop ] if
+        dup [
+            swap dup name-space "xmlns" =
+            [ >r xml-string>uri r> name-tag set ]
+            [ 2drop ] if
         ] hash-each
-        T{ name f "" "xmlns" } swap hash [ first "" set ] when*
+        T{ name f "" "xmlns" } swap hash
+        [ xml-string>uri "" set ] when*
     ] make-hash ;
 
 TUPLE: nonexist-ns name ;
@@ -148,11 +160,10 @@ M: nonexist-ns error.
 
 GENERIC: process ( object -- )
 
-M: f process drop ;
+M: xml-string process 
+    xml-string-array [ add-child ] each ;
 
 M: object process add-child ;
-M: vector process [ add-child ] each ; ! does this ever occur? 
-M: array process [ add-child ] each ;
 
 M: contained process
     [ contained-name ] keep contained-props
@@ -162,10 +173,16 @@ M: contained process
 M: opener process ! move add-ns2name on name to closer and fix mismatched
     dup opener-props push-ns-stack push-xml-stack ;
 
+TUPLE: unopened ;
+M: unopened error.
+    drop "Closed an unopened tag" print ;
+
 M: closer process
     closer-name xml-stack get pop first2 >r [ 
+        dup [ <unopened> throw ] unless
         opener-name [
-            2dup = [ nip add-ns2name ] [ swap <mismatched> throw ] if
+            2dup = [ nip add-ns2name ]
+            [ swap <mismatched> throw ] if
         ] keep
     ] keep opener-props r> <tag> add-child pop-ns-stack ;
 
@@ -211,8 +228,8 @@ M: extra-attrs error.
         T{ name f "" "standalone" f }
     } swap diff dup empty? [ drop ] [ <extra-attrs> throw ] if ; 
 
-: concat-strings ( seq -- string )
-    dup [ string? ] all?
+: concat-strings ( xml-string -- string )
+    xml-string-array dup [ string? ] all?
     [ "XML prolog attributes contain undefined entities"
       <xml-string-error> throw ] unless
     concat ;
@@ -237,18 +254,19 @@ M: extra-attrs error.
     ] when ;
 
 : init-xml ( string -- )
-    code set { 0 1 1 } spot set
+    code set { 0 1 1 } clone spot set
+    "1.0" "iso-8859-1" f <prolog> prolog-data set
     init-xml-stack init-ns-stack ;
 
 UNION: any-tag tag contained-tag ;
 
 TUPLE: notags ;
 M: notags error.
-    "XML document lacks a main tag" print ;
+    drop "XML document lacks a main tag" print ;
 
 TUPLE: multitags ;
 M: multitags error.
-    "XML document contains multiple tags" print ;
+    drop "XML document contains multiple main tags" print ;
 
 : make-xml-doc ( seq -- xml-doc )
     prolog-data get swap dup [ any-tag? ] find

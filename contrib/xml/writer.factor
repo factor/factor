@@ -1,71 +1,78 @@
 ! Copyright (C) 2005, 2006 Daniel Ehrenberg
 ! See http://factorcode.org/license.txt for BSD license.
 IN: xml
-USING: hashtables kernel math namespaces sequences strings generic ;
+USING: hashtables kernel math namespaces sequences strings
+    io generic ;
 
-GENERIC: (xml>string) ( object -- )
+GENERIC: write-str-elem ( elem -- )
+
+: chars>entities ( str -- )
+    #! Convert <, >, &, ' and " to HTML entities.
+    [ dup entities hash [ write ] [ write1 ] ?if ] each ;
+
+M: string write-str-elem
+    chars>entities ;
+
+M: entity write-str-elem
+    CHAR: & write1 entity-name write CHAR: ; write1 ;
+
+M: reference write-str-elem
+    CHAR: % write1 reference-name write CHAR: ; write1 ;
 
 : print-name ( name -- )
-    dup name-space dup "" = [ drop ] [ % CHAR: : , ] if
-    name-tag % ;
+    dup name-space dup "" = [ drop ]
+    [ write CHAR: : write1 ] if
+    name-tag write ;
 
 : print-props ( hash -- )
     [
-        " " % swap print-name "=\"" % [ (xml>string) ] each "\"" %
+        " " write swap print-name "=\"" write
+        xml-string-array [ write-str-elem ] each "\"" write
     ] hash-each ;
 
-: chars>entities ( str -- str )
-    #! Convert <, >, &, ' and " to HTML entities.
-    [
-        [ dup entities hash [ % ] [ , ] ?if ] each
-    ] "" make ;
+GENERIC: (xml>string) ( object -- )
 
-M: string (xml>string) chars>entities % ;
+M: object (xml>string) ! string element
+    write-str-elem ;
 
 M: contained-tag (xml>string)
-    CHAR: < ,
+    CHAR: < write1
     dup print-name
     tag-props print-props
-    "/>" % ;
+    "/>" write ;
 
 M: tag (xml>string)
-    CHAR: < ,
+    CHAR: < write1
     dup print-name
     dup tag-props print-props
-    CHAR: > ,
+    CHAR: > write1
     dup tag-children [ (xml>string) ] each
-    "</" % print-name CHAR: > , ;
+    "</" write print-name CHAR: > write1 ;
 
 M: comment (xml>string)
-    "<!--" % comment-text % "-->" % ;
-
-M: object (xml>string)
-    [ (xml>string) ] each ;
+    "<!--" write comment-text write "-->" write ;
 
 M: directive (xml>string)
-    "<!" % directive-text % CHAR: > , ;
+    "<!" write directive-text write CHAR: > write1 ;
 
 M: instruction (xml>string)
-    "<?" % instruction-text % "?>" % ;
-
-M: entity (xml>string)
-    CHAR: & , entity-name % CHAR: ; , ;
-
-M: reference (xml>string)
-    CHAR: % , reference-name % CHAR: ; , ;
+    "<?" write instruction-text write "?>" write ;
 
 : xml-preamble ( xml -- )
-    "<?xml version=\"" % dup prolog-version %
-    "\" encoding=\"" % dup prolog-encoding %
-    "\" standalone=\"" % prolog-standalone "yes" "no" ? %
-    "\"?>" % ;
+    "<?xml version=\"" write dup prolog-version write
+    "\" encoding=\"" write dup prolog-encoding write
+    "\" standalone=\"" write
+    prolog-standalone "yes" "no" ? write
+    "\"?>" write ;
+
+: write-xml ( xml-doc -- )
+    dup xml-doc-prolog xml-preamble
+    dup xml-doc-before [ (xml>string) ] each
+    dup delegate (xml>string)
+    xml-doc-after [ (xml>string) ] each ;
 
 : xml>string ( xml-doc -- string )
-    [ 
-        dup xml-doc-prolog xml-preamble
-        dup xml-doc-before (xml>string)
-        dup delegate (xml>string)
-        xml-doc-after (xml>string) ] "" make ;
+    [ write-xml ] string-out ;
 
 : xml-reprint ( string -- string )
     string>xml xml>string ;

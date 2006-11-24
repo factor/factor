@@ -161,7 +161,7 @@ TUPLE: entity name ;
 TUPLE: reference name ;
 
 : parse-reference ( sbuf -- sbuf )
-    , incr-spot [ CHAR: ; = ] take-until
+    >string , incr-spot [ CHAR: ; = ] take-until
     <reference> , SBUF" " clone incr-spot ;
 
 : (parse-text) ( sbuf -- )
@@ -175,8 +175,10 @@ TUPLE: reference name ;
         { [ t ] [ parsed-ch (parse-text) ] }
     } cond ;
 
+TUPLE: xml-string array ;
+
 : parse-text ( -- array )
-   [ SBUF" " clone (parse-text) ] { } make ;
+   [ SBUF" " clone (parse-text) ] { } make <xml-string> ;
 
 !   -- Parsing tags
 

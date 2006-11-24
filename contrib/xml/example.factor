@@ -1,4 +1,6 @@
-IN: xml-stupid-math
+! Copyright (C) 2005, 2006 Daniel Ehrenberg
+! See http://factorcode.org/license.txt for BSD license.
+IN: xml-arith
 USING: xml io kernel math sequences strings ;
 
 PROCESS: calculate ( tag -- n )

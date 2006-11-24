@@ -35,6 +35,109 @@ HELP: TAG:
 { $examples { $code "PROCESS: x ( tag -- )\nTAG: a x drop \"hi\" write ;" } }
 { $see-also POSTPONE: PROCESS: } ;
 
+HELP: xml-each
+{ $values { "tag" "an XML tag" } { "quot" "a quotation ( element -- )" } }
+{ $description "applies the quotation to each element (tags, strings, DTD references, etc) in the tag, moving top-down" }
+{ $see-also xml-map xml-subset } ;
+
+HELP: xml-map
+{ $values { "tag" "an XML tag" } { "quot" "a quotation ( element -- element )" }
+    { "tag" "an XML tag with the quotation applied to each element" } }
+{ $description "applies the quotation to each element (tags, strings, DTD references, etc) in the tag, moving top-down, and produces a new tag" }
+{ $see-also xml-each xml-subset } ;
+
+HELP: xml-subset
+{ $values { "tag" "an XML tag" } { "quot" "a quotation ( tag -- ? )" }
+    { "seq" "sequence of elements" } }
+{ $description "applies the quotation to each element (tags, strings, DTD references, etc) in the tag, moving top-down, producing a sequence of elements which do not return false for the sequence" }
+{ $see-also xml-map xml-each } ;
+
+HELP: build-tag*
+{ $values { "items" "sequence of elements" } { "name" "string" }
+    { "tag" "an XML tag" } }
+{ $description "builds a tag with the specified name, in the namespace \"\" and URL \"\" containing the children listed in item" }
+{ $see-also build-tag build-xml-doc } ;
+
+HELP: build-tag
+{ $values { "item" "an element" } { "name" "string" } { "tag" "XML tag" } }
+{ $description "builds a tag with the specified name containing the single child item" }
+{ $see-also build-tag* build-xml-doc } ;
+
+HELP: build-xml-doc
+{ $values { "tag" "an XML tag" } { "xml-doc" "an XML document" } }
+{ $description "builds an XML document out of a tag" }
+{ $see-also build-tag* build-tag } ;
+
+HELP: tag
+{ $class-description "tuple representing an XML tag, delegating to a name, containing the slots props (a hashtable) and children (a sequence)" }
+{ $see-also <tag> name contained-tag xml-doc } ;
+
+HELP: <tag>
+{ $values { "name" "an XML tag name" }
+    { "props" "a hashtable of XML properties" }
+    { "children" "a sequence" } }
+{ $description "constructs an XML tag, with the specified name (not a string) and tag properties specified in props, and children specified" }
+{ $see-also tag <contained-tag> build-tag build-tag* } ;
+
+HELP: name
+{ $class-description "represents an XML name, with the fields space (a string representing the namespace, as written in the document, tag (a string of the actual name of the tag) and url (a string of the URL that the namespace points to)" }
+{ $see-also <name> tag } ;
+
+HELP: <name>
+{ $values { "space" "a string" } { "tag" "a string" }
+    { "name" "an XML tag name" } }
+{ $description "creates a name tuple with the name-space space and the tag-name tag. The namespace URL must be added later." }
+{ $see-also name <tag> } ;
+
+HELP: contained-tag
+{ $class-description "delegates to tag representing a tag like <a/> with no contents. The tag properties are accessed with tag-props" }
+{ $see-also tag <contained-tag> } ;
+
+HELP: <contained-tag>
+{ $values { "name" "an XML tag name" }
+    { "props" "a hashtable of XML properties" }
+    { "contained-tag" "an XML tag" } }
+{ $description "creates an empty tag (like <a/>) with the specified name and tag properties. This delegates to tag" }
+{ $see-also contained-tag <tag> } ;
+
+HELP: reference
+{ $class-description "represents a DTD reference like %foo;" }
+{ $see-also <reference> entity } ;
+
+HELP: <reference> ( name -- reference )
+{ $values { "name" "a string" } { "reference" "an XML reference" } }
+{ $description "creates a DTD reference (like %foo;) with the specified name" }
+{ $see-also reference <entity> } ;
+
+HELP: entity
+{ $class-description "represents an XML entity like &foo;" }
+{ $see-also <entity> reference } ;
+
+HELP: <entity> ( name -- entity )
+{ $values { "name" "a string" } { "entity" "an XML entity" } }
+{ $description "creates an XML entity like &foo; with the specified name" }
+{ $see-also entity <reference> } ;
+
+HELP: xml-doc
+{ $class-description "tuple representing an XML document, delegating to the main tag, containing the fields prolog (the header <?xml...?>), before (whatever comes between the prolog and the main tag) and after (whatever comes after the main tag)" }
+{ $see-also <xml-doc> tag prolog } ;
+
+HELP: <xml-doc>
+{ $values { "prolog" "an XML prolog" } { "before" "a sequence of XML elements" }
+    { "main" "an XML tag" } { "after" "a sequence of XML elements" } }
+{ $description "creates an XML document, delegating to the main tag, with the specified prolog, before, and after" }
+{ $see-also xml-doc <tag> } ;
+
+HELP: prolog
+{ $class-description "represents an XML prolog, with the tuple fields version (containing \"1.0\" or \"1.1\"), encoding (a string representing the encoding type), and standalone (t or f, whether the document is standalone without external entities)" }
+{ $see-also <prolog> xml-doc } ;
+
+HELP: <prolog> ( version encoding standalone -- prolog )
+{ $values { "version" "a string, 1.0 or 1.1" }
+    { "encoding" "a string" } { "standalone" "a boolean" } }
+{ $description "creates an XML prolog tuple" }
+{ $see-also prolog <xml-doc> } ;
+
 ARTICLE: { "xml" "intro" } "XML"
     "The XML module attempts to implement the XML 1.1 standard, converting strings of text into XML and vice versa. It currently is a work in progress."
     $terpri
@@ -43,5 +146,32 @@ ARTICLE: { "xml" "intro" } "XML"
     { $subsection xml>string }
     { $subsection xml-parse-error }
     { $subsection xml-reprint }
+    "Data types that XML documents are made of:"
+    { $subsection name }
+    { $subsection tag }
+    { $subsection contained-tag }
+!    { $subsection xml-string }
+    { $subsection reference }
+    { $subsection entity }
+    { $subsection xml-doc }
+    { $subsection prolog }
+    "These data types are constructed with:"
+    { $subsection <name> }
+    { $subsection <tag> }
+    { $subsection <contained-tag> }
+!    { $subsection <xml-string> }
+    { $subsection <reference> }
+    { $subsection <entity> }
+    { $subsection <xml-doc> }
+    { $subsection <prolog> }
+    "System for creating words which dispatch on XML tags:"
     { $subsection POSTPONE: PROCESS: }
-    { $subsection POSTPONE: TAG: } ;
+    { $subsection POSTPONE: TAG: }
+    "Combinators for traversing XML trees:"
+    { $subsection xml-each }
+    { $subsection xml-map }
+    { $subsection xml-subset }
+    "Words for simplified generation of XML:"
+    { $subsection build-tag* }
+    { $subsection build-tag }
+    { $subsection build-xml-doc } ;
