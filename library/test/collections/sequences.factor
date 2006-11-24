@@ -202,8 +202,6 @@ unit-test
 
 [ 1 ] [ 1/2 { 1 2 3 } nth ] unit-test
 
-[ { } ] [ { } 0 group ] unit-test
-
 ! Pathological case
 [ "ihbye" ] [ "hi" <reversed> "bye" append ] unit-test
 
@@ -223,3 +221,5 @@ unit-test
 [ { 1 4 7 } ] [ "seq" get 0 <column> >array ] unit-test
 [ ] [ "seq" get 1 <column> [ sq ] inject ] unit-test
 [ { 4 25 64 } ] [ "seq" get 1 <column> >array ] unit-test
+
+[ { 1 2 3 } 0 group ] unit-test-fails

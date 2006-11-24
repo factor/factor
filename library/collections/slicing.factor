@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 IN: sequences
 USING: generic kernel kernel-internals math namespaces
-strings vectors ;
+strings vectors errors ;
 
 : head-slice ( seq n -- slice ) 0 swap rot <slice> ;
 
@@ -66,7 +66,9 @@ strings vectors ;
         dupd (cut) >r , r> (group)
     ] if ;
 
-: group ( seq n -- groups ) [ swap (group) ] { } make ;
+: group ( seq n -- groups )
+    dup 0 <= [ "Invalid group count" throw ] when
+    [ swap (group) ] { } make ;
 
 : start-step ( subseq seq n -- subseq slice )
     pick length dupd + rot <slice> ;

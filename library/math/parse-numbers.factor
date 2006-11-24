@@ -46,6 +46,7 @@ M: object digit> drop f ;
     dup 10 < [ CHAR: 0 + ] [ 10 - CHAR: a + ] if ;
 
 : integer, ( num radix -- )
+    dup 1 <= [ "Invalid radix" throw ] when
     dup >r /mod >digit , dup 0 >
     [ r> integer, ] [ r> 2drop ] if ;
 

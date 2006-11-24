@@ -120,3 +120,7 @@ unit-test
 !     { 1.0/0.0 -1.0/0.0 0.0/0.0 }
 !     [ dup number>string string>number = ] all?
 ! ] unit-test
+
+[ 1 1 >base ] unit-test-fails
+[ 1 0 >base ] unit-test-fails
+[ 1 -1 >base ] unit-test-fails

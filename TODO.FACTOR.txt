@@ -4,15 +4,25 @@
 - list operations: what if nothing is selected?
 - slider needs to be modelized
 - overhaul models, set-model* is crap
+- color picker example
 - variable width word wrap
 - graphical crossref tool
 - http://paste.lisp.org/display/30426
+- robustify stepper -- see if step back past a throw works
+- listener: if partial parse, RETURN should insert newline
+- some way of intercepting all gestures
+- compiled call traces:
+  - should be independent of whenever the runtime was built with
+    -fomit-frame-pointer or not
+  - doesn't show #labels
+  - we don't know if signal handlers run with the same stack or not
+- modules: core/ libs/ apps/
+
++ 0.88:
 
 - menu Command: quots look dumb
 - top level window positioning on ms windows
 - crashes:
-  - windows gcc issue
-  - robustify stepper -- see if step back past a throw works
   - callback scheduling issue
   - httpd crash
   - fep when closing window
@@ -31,16 +41,15 @@
 - cross-word type inference
 - ui docs
 - some kind of declarative wiring framework for ui
-- compiled call traces:
-  - should be independent of whenever the runtime was built with
-    -fomit-frame-pointer or not
-  - doesn't show #labels
-  - we don't know if signal handlers run with the same stack or not
+- if we're printing a block on multiple lines, break at some words like
+  set off on % # , ... and assembler opcodes
+- don't end lines with literals, shuffle words or symbols?
+- see should try to not show ; on a line by itself
+- IN: on its own line if the entire 'see' form doesn't fit
+- growable data heap
 
 + ui:
 
-- listener: if partial parse, RETURN should insert newline
-- some way of intercepting all gestures
 - how do we refer to command shortcuts in the docs?
 - editor:
   - autoscroll
@@ -51,7 +60,6 @@
 
 + module system:
 
-- modules: core/ libs/ apps/
 - track a list of assets loaded from each module's file
 - C types should be words
   - TYPEDEF: float { ... } { ... } ;   ==> \ float T{ c-type ... } "c-type" swp
@@ -76,22 +84,13 @@
 - C functions returning structs by value
 - compiled continuations
 
-+ prettyprinter:
-
-- clean it up
-- if we're printing a block on multiple lines, break at some words like
-  set off on % # , ... and assembler opcodes
-- don't end lines with literals, shuffle words or symbols?
-- see should try to not show ; on a line by itself
-- IN: on its own line if the entire 'see' form doesn't fit
-- don't build entire tree to print first
-
 + misc:
 
+- prettyprinter: clean it up
+- prettyprinter: don't build entire tree to print first
 - automatic help/effects for slot accessors
 - tuple shape changes
 - should be possible to reload any source file in library
-- growable data heap
 - minor GC takes too long now, we should card mark code heap
 - buffer-ptr should be an alien
 - swap nappend ==> nappend
