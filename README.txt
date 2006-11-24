@@ -160,8 +160,11 @@ the command prompt:
 
   f.exe boot.image.pentium4 (or boot.image.x86)
 
-Once bootstrapped, double-clicking f.exe starts the Factor UI. There is
-no option to run the listener in the command prompt on Windows.
+Once bootstrapped, double-clicking f.exe starts the Factor UI.
+
+To run the listener in the command prompt:
+
+  f.exe -shell=tty
 
 * Source organization
 
