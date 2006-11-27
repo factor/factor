@@ -9,7 +9,7 @@ SYMBOL: _
 USE: prettyprint
 
 : define-match-var ( name -- )
-  create-in [ dup <wrapper> , \ get , ] [ ] make define-compound ;
+  create-in dup t "match-var" set-word-prop [ dup <wrapper> , \ get , ] [ ] make define-compound ;
 
 : define-match-vars ( seq -- )
   [ define-match-var ] each ;
@@ -19,7 +19,7 @@ USE: prettyprint
 
 : match-var? ( symbol -- bool )
   dup word? [
-    word-name first CHAR: ? = 
+    "match-var" word-prop
   ] [
     drop f
   ] if ;
