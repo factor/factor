@@ -86,7 +86,7 @@ IN: sequences
     [ 2drop ] [ 0 over length 1- (nsort) ] if ; inline
 
 : sort ( seq quot -- sortedseq )
-    swap [ swap nsort ] immutable ; inline
+    swap [ >array [ swap nsort ] keep ] keep like ; inline
 
 : natural-sort ( seq -- sortedseq ) [ <=> ] sort ;
 

@@ -19,14 +19,14 @@ M: vector set-nth
 : >vector ( seq -- vector )
     [ vector? ] [ <vector> ] >sequence ; inline
 
-M: object thaw drop V{ } clone ;
-
 M: vector clone clone-resizable ;
 
 M: vector like
     drop dup vector? [
         dup array? [ array>vector ] [ >vector ] if
     ] unless ;
+
+M: vector new drop <vector> ;
 
 IN: kernel
 

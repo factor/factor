@@ -53,8 +53,6 @@ UNION: alpha Letter digit ;
 : >string ( seq -- str )
     [ string? ] [ 0 <string> ] >sequence ; inline
 
-M: string thaw drop SBUF" " clone ;
-
 M: string like
     drop dup string? [
         dup sbuf? [
@@ -64,3 +62,5 @@ M: string like
             >string
         ] if
     ] unless ;
+
+M: string new drop 0 <string> ;

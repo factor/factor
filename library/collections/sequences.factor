@@ -13,8 +13,12 @@ GENERIC: length ( seq -- n )
 GENERIC: set-length ( n seq -- )
 GENERIC: nth ( n seq -- elt )
 GENERIC: set-nth ( elt n seq -- )
-GENERIC: thaw ( seq -- resizable-seq )
+GENERIC: new ( len seq -- newseq )
 GENERIC: like ( seq prototype -- newseq )
+
+M: object new drop f <array> ;
+
+M: object like drop ;
 
 : empty? ( seq -- ? ) length zero? ; inline
 

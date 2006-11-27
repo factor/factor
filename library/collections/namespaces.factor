@@ -48,9 +48,9 @@ words ;
 SYMBOL: building
 
 : make ( quot exemplar -- seq )
-    [
-        dup thaw building set >r call building get r> like
-    ] with-scope ; inline
+    >r
+    [ V{ } clone building set call building get ] with-scope
+    r> like ; inline
 
 : , ( elt -- ) building get push ;
 

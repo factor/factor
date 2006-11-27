@@ -13,8 +13,6 @@ sequences-internals strings vectors words ;
 : first4 ( seq -- first second third fourth )
     3 swap bounds-check nip first4-unsafe ;
 
-M: object like drop ;
-
 : index ( obj seq -- n )
     [ = ] find-with drop ;
 
@@ -64,27 +62,34 @@ M: object like drop ;
 : nappend ( dest src -- )
     >r [ length ] keep r> copy-into ; inline
 
-: >resizable ( seq -- newseq ) [ thaw dup ] keep nappend ;
+: ((append)) ( seq1 seq2 accum -- accum )
+    [ >r over length r> rot copy-into ] keep
+    [ 0 swap rot copy-into ] keep ; inline
 
-: immutable ( seq quot -- newseq )
-    swap [ >resizable [ swap call ] keep ] keep like ; inline
+: (append3) ( seq1 seq2 seq3 exemplar -- newseq )
+    [
+        >r pick length pick length pick length + + r> new
+        [ >r pick length pick length + r> rot copy-into ] keep
+        ((append))
+    ] keep like ;
+
+: append3 ( seq1 seq2 seq3 -- newseq )
+    pick (append3) ; inline
+
+: (append) ( seq1 seq2 exemplar -- newseq )
+    [
+        >r over length over length + r> new ((append))
+    ] keep like ;
 
 : append ( seq1 seq2 -- newseq )
-    swap [ swap nappend ] immutable ;
+    over (append) ; inline
 
-: add ( seq elt -- newseq )
-    swap [ push ] immutable ;
+: add ( seq elt -- newseq ) 1array append ; inline
 
-: add* ( seq elt -- newseq )
-    over >r
-    over thaw [ push ] keep [ swap nappend ] keep
-    r> like ;
+: add* ( seq elt -- newseq ) 1array swap dup (append) ; inline
 
 : diff ( seq1 seq2 -- newseq )
     [ swap member? not ] subset-with ;
-
-: append3 ( seq1 seq2 seq3 -- newseq )
-    rot [ [ rot nappend ] keep swap nappend ] immutable ;
 
 : peek ( seq -- elt ) dup length 1- swap nth ;
 

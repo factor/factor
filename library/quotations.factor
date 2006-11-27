@@ -15,6 +15,7 @@ M: quotation nth bounds-check nth-unsafe ;
 M: quotation set-nth bounds-check set-nth-unsafe ;
 M: quotation nth-unsafe >r >fixnum r> array-nth ;
 M: quotation set-nth-unsafe >r >fixnum r> set-array-nth ;
+M: quotation new drop <quotation> ;
 
 : >quotation ( seq -- quot )
     [ quotation? ] [ <quotation> ] >sequence ; inline

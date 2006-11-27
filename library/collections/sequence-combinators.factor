@@ -30,6 +30,9 @@ vectors ;
         t <array> f 0 pick set-nth-unsafe
     ] if ;
 
+: map>array ( seq quot -- array )
+    over length [ (map) ] collect 2nip ; inline
+
 IN: sequences
 
 : each ( seq quot -- )
@@ -43,9 +46,7 @@ IN: sequences
 : reduce ( seq identity quot -- result )
     swapd each ; inline
 
-: map ( seq quot -- newseq )
-    over >r over length [ (map) ] collect r> like 2nip ;
-    inline
+: map ( seq quot -- newseq ) over >r map>array r> like ; inline
 
 : map-with ( obj list quot -- newseq )
     swap [ with rot ] map 2nip ; inline
@@ -132,12 +133,14 @@ IN: sequences
 : all-with? ( obj seq quot -- ? )
     swap [ with rot ] all? 2nip ; inline
 
+: subset* ( flags seq -- subseq )
+    [
+        dup length <vector>
+        [ swap [ over push ] [ drop ] if ] 2reduce
+    ] keep like ; inline
+
 : subset ( seq quot -- subseq )
-    over >r over length <vector> rot [
-        -rot [
-            >r over >r call [ r> r> push ] [ r> r> 2drop ] if
-        ] 2keep
-    ] each r> like nip ; inline
+    over >r map>array r> subset* ; inline
 
 : subset-with ( obj seq quot -- subseq )
     swap [ with rot ] subset 2nip ; inline

@@ -22,7 +22,7 @@ M: reversed set-nth-unsafe
 
 M: reversed like reversed-seq like ;
 
-M: reversed thaw reversed-seq thaw ;
+M: reversed new reversed-seq new ;
 
 : reverse ( seq -- newseq ) [ <reversed> ] keep like ;
 
@@ -64,7 +64,7 @@ M: slice set-nth-unsafe slice@ set-nth-unsafe ;
 
 M: slice like slice-seq like ;
 
-M: slice thaw slice-seq thaw ;
+M: slice new slice-seq new ;
 
 TUPLE: column seq col ;
 
@@ -79,4 +79,4 @@ M: column set-nth column@ set-nth ;
 
 M: column like column-seq like ;
 
-M: column thaw column-seq thaw ;
+M: column new column-seq new ;

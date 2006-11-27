@@ -94,19 +94,6 @@ HELP: nappend
 { $side-effects "dest" }
 { $errors "Throws an error if " { $snippet "src" } " contains elements not permitted in " { $snippet "dest" } "." } ;
 
-HELP: >resizable
-{ $values { "seq" "a sequence" } { "newseq" "a mutable resizable sequence" } }
-{ $description "Outputs a new, mutable resizable sequence having the same elements as " { $snippet "seq" } "." } ;
-
-HELP: immutable
-{ $values { "seq" "a sequence" } { "quot" "a quotation with stack effect " { $snippet "( seq -- )" } } { "newseq" "a sequence" } }
-{ $description "A utility combinator transforming a word which modifies its input sequence into a word which returns a new output sequence. "
-$terpri
-"A mutable, resizable copy of " { $snippet "seq" } " is made, then the quotation is called to modify this copy and consume it. Finally, the copy is converted into a sequence of the same type as the original." }
-{ $examples
-    "Take a look at " { $link append } ", which is built off the mutating word " { $link nappend } ", or " { $link add } " which is built from " { $link push } "."
-} ;
-
 HELP: add
 { $values { "seq" "a sequence" } { "elt" "an object" } { "newseq" "a sequence" } }
 { $description "Outputs a new sequence obtained by adding " { $snippet "elt" } " at the end of " { $snippet "seq" } "." }

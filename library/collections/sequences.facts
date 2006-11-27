@@ -29,10 +29,9 @@ $terpri
 "Throws an error if the sequence cannot hold elements of the given type." }
 { $side-effects "seq" } ;
 
-HELP: thaw
-{ $values { "seq" "a sequence" } { "resizable-seq" "a resizable mutable sequence" } }
-{ $contract "Outputs an empty, resizable mutable sequence that can hold the elements of " { $snippet "seq" } "." }
-{ $examples "The default implementation returns a new vector, but given a string, it returns a string buffer, since string buffers are more efficient in terms of memory usage." } ;
+HELP: new
+{ $values { "n" "a non-negative integer" } { "seq" "a sequence" } { "newseq" "a mutable sequence" } }
+{ $contract "Outputs a mutable sequence of length " { $snippet "n" } " which can hold the elements of " { $snippet "seq" } "." } ;
 
 HELP: like
 { $values { "seq" "a sequence" } { "prototype" "a sequence" } { "newseq" "a sequence" } }

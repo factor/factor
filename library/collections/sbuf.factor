@@ -12,7 +12,7 @@ M: sbuf nth bounds-check nth-unsafe ;
 M: sbuf set-nth-unsafe underlying set-nth-unsafe ;
 M: sbuf set-nth growable-check 2dup ensure set-nth-unsafe ;
 M: sbuf clone clone-resizable ;
-M: sbuf thaw drop SBUF" " clone ;
+M: sbuf new drop <sbuf> ;
 : >sbuf ( seq -- sbuf ) [ sbuf? ] [ <sbuf> ] >sequence ; inline
 
 M: sbuf like
