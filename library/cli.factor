@@ -14,15 +14,6 @@ parser sequences strings ;
         home ".factor-rc" path+ ?run-file
     ] when ;
 
-TUPLE: bad-option name ;
-M: bad-option error.
-    "Error: '-" write bad-option-name write
-    "' is not an acceptable command-line option" write ;
-
-: good-option! ( name -- )
-    { "user-init" "compile" "native-io" "cocoa" "null-stdio" "x11" "shell" }
-    member? [ "Bad option" print bye ] unless ;
-
 : cli-var-param ( name value -- ) swap set-global ;
 
 : cli-bool-param ( name -- ) "no-" ?head not cli-var-param ;
