@@ -15,7 +15,4 @@ SYMBOL: vim-detach
     vim-detach get-global
     [ run-detached ] [ run-process ] if ;
 
-: vim ( spec -- )
-    where first2 vim-location ;
-
 [ vim-location ] edit-hook set-global

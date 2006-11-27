@@ -5,9 +5,6 @@ USING: arrays errors generic hashtables io kernel math
 namespaces parser prettyprint prettyprint-internals sequences
 styles words ;
 
-: where ( defspec -- loc )
-    where* dup [ first2 >r ?resource-path r> 2array ] when ;
-
 : reload ( defspec -- )
     where first [ run-file ] when* ;
 
@@ -16,6 +13,7 @@ TUPLE: no-edit-hook ;
 SYMBOL: edit-hook
 
 : edit-location ( file line -- )
+    >r ?resource-path r>
     edit-hook get [ call ] [ <no-edit-hook> throw ] if* ;
 
 : edit-file ( file -- ) ?resource-path 0 edit-location ;

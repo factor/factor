@@ -5,7 +5,7 @@ USING: kernel sequences namespaces errors ;
 
 GENERIC: see ( defspec -- )
 
-GENERIC: where* ( defspec -- loc )
+GENERIC: where ( defspec -- loc )
 
 GENERIC: subdefs ( defspec -- seq )
 

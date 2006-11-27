@@ -2,8 +2,6 @@
 
 - module operations on module-links, etc
 - empty search list, handle
-- change file, reload it manually, then reload modules; shouldn't this
-  work?
 - variable width word wrap
 - graphical crossref tool
 - http://paste.lisp.org/display/30426

@@ -103,7 +103,7 @@ M: module synopsis*
 
 M: module definition module>alist t ;
 
-M: module where* module-loc ;
+M: module where module-loc ;
 
 : module-dir? ( path -- ? )
     "load.factor" path+ resource-path exists? ;

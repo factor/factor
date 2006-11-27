@@ -46,7 +46,7 @@ TUPLE: check-method class generic ;
 : implementors ( class -- seq )
     [ "methods" word-prop ?hash* nip ] word-subset-with ;
 
-M: method-spec where*
+M: method-spec where
     dup first2 method method-loc [ ] [ second where* ] ?if ;
 
 M: method-spec subdefs drop f ;

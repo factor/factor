@@ -35,7 +35,4 @@ namespaces parser prettyprint sequences strings words shells ;
 : jedit-file ( file -- )
     1array make-jedit-request send-jedit-request ;
 
-: jedit ( defspec -- )
-    where first2 jedit-location ;
-
 [ jedit-location ] edit-hook set-global

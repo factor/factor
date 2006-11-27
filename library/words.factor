@@ -188,7 +188,7 @@ TUPLE: check-create name vocab ;
     all-words [ word-name = ] subset-with ;
 
 ! Definition protocol
-M: word where* "loc" word-prop ;
+M: word where "loc" word-prop ;
 
 M: word subdefs drop f ;
 
