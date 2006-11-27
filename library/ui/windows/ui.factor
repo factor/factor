@@ -128,7 +128,7 @@ SYMBOL: hWnd
     lParam set wParam set uMsg set hWnd set
     wParam get exclude-key-wm-keydown? [
         wParam get keystroke>gesture <key-down>
-        hWnd get window-focus handle-gesture drop 
+        hWnd get window-focus send-gesture drop 
     ] unless ;
 
 : handle-wm-char ( hWnd uMsg wParam lParam -- )
@@ -141,7 +141,7 @@ SYMBOL: hWnd
 : handle-wm-keyup ( hWnd uMsg wParam lParam -- )
     lParam set wParam set uMsg set hWnd set
     wParam get keystroke>gesture <key-up>
-    hWnd get window-focus handle-gesture
+    hWnd get window-focus send-gesture
     drop ;
 
 : cleanup-window ( handle -- )

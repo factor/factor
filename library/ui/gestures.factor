@@ -4,20 +4,19 @@ IN: gadgets
 USING: arrays generic hashtables kernel math models namespaces
 queues sequences words ;
 
-: gestures ( gadget -- seq )
-    delegates [ class "gestures" word-prop ] map [ ] subset ;
-
 : set-gestures ( class hash -- ) "gestures" set-word-prop ;
 
-: handle-gesture* ( gesture gadget -- )
-    tuck gestures hash-stack [ call f ] [ drop t ] if* ;
+GENERIC: handle-gesture* ( gadget gesture delegate -- ? )
+
+M: object handle-gesture*
+    class "gestures" word-prop ?hash*
+    [ call f ] [ 2drop t ] if ;
 
 : handle-gesture ( gesture gadget -- ? )
-    #! If a gadget's handle-gesture* generic returns t, the
-    #! event was not consumed and is passed on to the gadget's
-    #! parent. This word returns t if no gadget handled the
-    #! gesture, otherwise returns f.
-    [ dupd handle-gesture* ] each-parent nip ;
+    tuck delegates [ >r 2dup r> handle-gesture* ] all? 2nip ;
+
+: send-gesture ( gesture gadget -- ? )
+    [ dupd handle-gesture ] each-parent nip ;
 
 : user-input ( str gadget -- )
     [ dupd user-input* ] each-parent 2drop ;
@@ -41,7 +40,7 @@ TUPLE: delete-action ;
 TUPLE: select-all-action ;
 
 : handle-action ( gadget constructor -- )
-    execute swap handle-gesture drop ; inline
+    execute swap send-gesture drop ; inline
 
 : generalize-gesture ( gesture -- gesture )
     #! Strip button number from drag/button-up/button-down.
@@ -85,8 +84,8 @@ SYMBOL: double-click-timeout
 300 double-click-timeout set-global
 
 : button-gesture ( gesture -- )
-    hand-clicked get-global 2dup handle-gesture [
-        >r generalize-gesture r> handle-gesture drop
+    hand-clicked get-global 2dup send-gesture [
+        >r generalize-gesture r> send-gesture drop
     ] [
         2drop
     ] if ;
@@ -99,13 +98,13 @@ SYMBOL: double-click-timeout
     #! and if a mouse button is down, fire a drag gesture to the
     #! gadget that was clicked.
     hand-buttons get-global empty? [
-        T{ motion } hand-gadget get-global handle-gesture drop
+        T{ motion } hand-gadget get-global send-gesture drop
     ] [
         drag-gesture
     ] if ;
 
 : each-gesture ( gesture seq -- )
-    [ handle-gesture* drop ] each-with ;
+    [ handle-gesture drop ] each-with ;
 
 : hand-gestures ( new old -- )
     drop-prefix <reversed>
@@ -199,11 +198,11 @@ SYMBOL: double-click-timeout
 : send-wheel ( direction loc world -- )
     move-hand
     scroll-direction set-global
-    T{ mouse-scroll } hand-gadget get-global handle-gesture
+    T{ mouse-scroll } hand-gadget get-global send-gesture
     drop ;
 
 : send-action ( world gesture -- )
-    swap world-focus handle-gesture drop ;
+    swap world-focus send-gesture drop ;
 
 : resend-button-down ( gesture world -- )
     hand-loc get-global swap send-button-down ;

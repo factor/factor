@@ -7,7 +7,6 @@
 - http://paste.lisp.org/display/30426
 - robustify stepper -- see if step back past a throw works
 - listener: if partial parse, RETURN should insert newline
-- some way of intercepting all gestures
 - compiled call traces:
   - should be independent of whenever the runtime was built with
     -fomit-frame-pointer or not

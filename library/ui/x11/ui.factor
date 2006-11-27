@@ -80,7 +80,7 @@ M: world configure-event
 
 M: world key-down-event
     world-focus over key-down-event>gesture [
-        over handle-gesture
+        over send-gesture
         [ swap lookup-string nip swap user-input ] [ 2drop ] if
     ] [
         2drop
@@ -88,7 +88,7 @@ M: world key-down-event
 
 M: world key-up-event
     world-focus swap key-event>gesture dup [
-        <key-up> dup [ swap handle-gesture drop ] [ 2drop ] if
+        <key-up> dup [ swap send-gesture drop ] [ 2drop ] if
     ] [
         3drop
     ] if ;

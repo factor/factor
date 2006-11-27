@@ -79,7 +79,7 @@ opengl sequences ;
 
 : send-key-event ( view event quot -- ? )
     >r key-event>gesture r> call swap window-focus
-    handle-gesture ; inline
+    send-gesture ; inline
 
 : send-user-input ( view event -- )
     -> characters CF>string swap window-focus user-input ;
