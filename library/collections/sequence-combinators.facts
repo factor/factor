@@ -82,7 +82,11 @@ HELP: 2map
 { $notes "If one sequence is shorter than the other, than only the prefix having the length of the minimum of the two is examined." } ;
 
 HELP: find
-{ $values { "seq" "a sequence" } { "quot" "a quotation with stack effect " { $snippet "( elt -- ? )" } } { "i" "the index of the first match, or -1" } { "elt" "the first matching element, or " { $link f } } }
+{ $values { "seq" "a sequence" }
+          { "quot" "a quotation with stack effect "
+                   { $snippet "( elt -- ? )" } }
+          { "i" "the index of the first match, or -1" }
+          { "elt" "the first matching element, or " { $link f } } }
 { $description "A simpler variant of " { $link find* } " where the starting index is 0." } ;
 
 HELP: find-with
@@ -90,7 +94,12 @@ HELP: find-with
 { $description "Variant of " { $link find } " which pushes a retained object on each invocation of the quotation." } ;
 
 HELP: find*
-{ $values { "n" "a starting index" } { "seq" "a sequence" } { "quot" "a quotation with stack effect " { $snippet "( elt -- ? )" } } }
+{ $values { "n" "a starting index" }
+          { "seq" "a sequence" }
+          { "quot" "a quotation with stack effect "
+                   { $snippet "( elt -- ? )" } }
+          { "i" "the index of the first match, or -1" }
+          { "elt" "the first matching element, or " { $link f } } }
 { $description "Applies the quotation to each element of the sequence in turn, until it outputs a true value or the end of the sequence is reached. If the quotation yields a true value for some sequence element, the word outputs the element index and the element itself. Otherwise, the word outputs an index of -1 and " { $link f } " as the element." } ;
 
 HELP: find-with*
