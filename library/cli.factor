@@ -40,6 +40,7 @@ parser sequences strings ;
 : default-cli-args
     #! Some flags are *on* by default, unless user specifies
     #! -no-<flag> CLI switch
+    "e" off
     "user-init" on
     "compile" on
     "native-io" on
@@ -54,5 +55,8 @@ parser sequences strings ;
     macosx? "shell" get "ui" = and ;
 
 : parse-command-line ( -- )
-    cli-args [ cli-arg ] subset
-    ignore-cli-args? [ drop ] [ [ ?run-file ] each ] if ;
+    [
+        cli-args [ cli-arg ] subset
+        ignore-cli-args? [ drop ] [ [ run-file ] each ] if
+        "e" get eval
+    ] try ;
