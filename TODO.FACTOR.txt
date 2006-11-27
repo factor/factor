@@ -1,9 +1,10 @@
 + 0.87:
 
-- better error handling in early startup
-- slider needs to be modelized
+- module operations on module-links, etc
+- empty search list, handle
+- change file, reload it manually, then reload modules; shouldn't this
+  work?
 - overhaul models, set-model* is crap
-- color picker example
 - variable width word wrap
 - graphical crossref tool
 - http://paste.lisp.org/display/30426
