@@ -12,15 +12,22 @@ HELP: xml>string
 { $values { "xml-doc" "an xml document" } { "string" "a string" } }
 { $description "converts an xml document into a string" }
 { $notes "does not preserve what type of quotes were used or what data was omitted from version declaration" }
-{ $see-also string>xml xml-reprint } ;
+{ $see-also string>xml xml-reprint write-xml } ;
 
 HELP: xml-parse-error
-{ $description "the exception class that all parsing errors in XML documents are in." } ;
+{ $class-description "the exception class that all parsing errors in XML documents are in." } ;
 
 HELP: xml-reprint
-{ $values { "in" "a string of XML" } { "out" "reprinted XML" } }
+{ $values { "string" "a string of XML" } { "string" "reprinted XML" } }
 { $description "parses XML and converts it back into a string, for testing purposes" }
-{ $notes "does not preserve what type of quotes were used or what data was omitted from version declaration" } ;
+{ $notes "does not preserve what type of quotes were used or what data was omitted from version declaration" }
+{ $see-also write-xml xml>string string>xml } ;
+
+HELP: write-xml
+{ $values { "xml-doc" "an XML document" } }
+{ $description "prints the contents of an XML document to stdio" }
+{ $notes "does not preserve what type of quotes were used or what data was omitted from version declaration" }
+{ $see-also xml>string xml-reprint } ;
 
 HELP: PROCESS:
 { $syntax "PROCESS: word" }
@@ -139,13 +146,15 @@ HELP: <prolog> ( version encoding standalone -- prolog )
 { $see-also prolog <xml-doc> } ;
 
 ARTICLE: { "xml" "intro" } "XML"
-    "The XML module attempts to implement the XML 1.1 standard, converting strings of text into XML and vice versa. It currently is a work in progress."
+    "The XML module attempts to implement the XML 1.1 standard, converting strings of text into XML and vice versa. It currently is a work in progress. Together with XML-RPC, this is a component of the F2EE framework."
     $terpri
     "The XML module was implemented by Daniel Ehrenberg, with edits by Slava Pestov. Main functions implemented include:"
     { $subsection string>xml }
     { $subsection xml>string }
     { $subsection xml-parse-error }
     { $subsection xml-reprint }
+    { $subsection write-xml }
+    { $subsection init-xml }
     "Data types that XML documents are made of:"
     { $subsection name }
     { $subsection tag }

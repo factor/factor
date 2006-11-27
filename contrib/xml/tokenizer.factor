@@ -4,15 +4,43 @@ IN: xml
 USING: errors hashtables io kernel math namespaces prettyprint
 sequences tools generic strings char-classes ;
 
-SYMBOL: code #! Source code
-SYMBOL: spot #! { index line column }
-: get-index ( -- index ) spot get first ;
-: set-index ( index -- ) 0 spot get set-nth ;
+! -- Low-level parsing
+! Code stored in stdio
+! Spot is composite so it won't be lost in sub-scopes
+SYMBOL: spot #! { char line column line-str }
+: get-char ( -- char ) spot get first ;
+: set-char ( char -- ) 0 spot get set-nth ;
 : get-line ( -- line ) spot get second ;
 : set-line ( line -- ) 1 spot get set-nth ;
 : get-column ( -- column ) spot get third ;
 : set-column ( column -- ) 2 spot get set-nth ;
+: get-line-str ( -- line-str ) 3 spot get nth ;
+: set-line-str ( line-str -- ) 3 spot get set-nth ;
 SYMBOL: prolog-data
+
+! Record is composite so it changes in nested scopes
+SYMBOL: record ! string
+SYMBOL: now-recording? ! t/f
+: recording? ( -- t/f ) now-recording? get ;
+: get-record ( -- sbuf ) record get ;
+
+: push-record ( ch -- )
+    get-record push ;
+: new-record ( -- )
+    SBUF" " clone record set
+    t now-recording? set
+    get-char [ push-record ] when* ;
+: unrecord ( -- )
+    record get pop* ;
+
+: (end-record) ( -- sbuf )
+    f now-recording? set
+    get-record ;
+: end-record* ( n -- string )
+    (end-record) tuck length swap -
+    head-slice >string ;
+: end-record ( -- string )
+    1 end-record* ;
 
 !   -- Error reporting
 
@@ -57,72 +85,79 @@ M: xml-string-error error.
 
 !   -- Basic utility words
 
-: more? ( -- ? )
-    #! Return t if spot is not at the end of code
-    code get length get-index = not ;
+: readln-nb ( -- string )
+    ! read a non-blank line
+    readln dup "" = [ drop readln-nb ] when ;
 
-: char ( -- char/f )
-    more? [ get-index code get nth ] [ f ] if ;
+: (incr-spot) ( -- char )
+    get-column get-line-str 2dup length 1- < [
+        >r 1+ dup set-column r> nth
+    ] [
+        2drop 0 set-column
+        readln-nb dup set-line-str
+        [ first ] [ f ] if*
+        get-line 1+ set-line
+    ] if ;
 
 : incr-spot ( -- )
     #! Increment spot.
-    get-index 1+ set-index char "\n\r" member?
-    [ 0 set-column get-line 1+ set-line ]
-    [ get-column 1+ set-column ] if ;
+    get-char [
+         "XML document unexpectedly ended"
+        <xml-string-error> throw
+    ] unless
+    (incr-spot) dup set-char
+    recording? over and [ push-record ] [ drop ] if ;
 
 : skip-until ( quot -- )
-    #! quot: ( char -- ? )
-    more? [
-        char swap [ call ] keep swap [ drop ] [
-             incr-spot skip-until
+    #! quot: ( -- ? )
+    get-char [
+        [ call ] keep swap [ drop ] [
+            incr-spot skip-until
         ] if
-    ] [ drop ] if ; inline
+    ] [ 2drop ] if ; inline
 
-: take-until ( quot -- string | quot: char -- ? )
+: take-until ( quot -- string | quot: -- ? )
     #! Take the substring of a string starting at spot
     #! from code until the quotation given is true and
     #! advance spot to after the substring.
-    get-index >r skip-until r>
-    get-index code get subseq ; inline
+    new-record skip-until end-record ; inline
+
+: take-char ( ch -- string )
+    [ dup get-char = ] take-until nip ;
 
 : pass-blank ( -- )
     #! Advance code past any whitespace, including newlines
-    [ blank? not ] skip-until ;
+    [ get-char blank? not ] skip-until ;
 
 : string-matches? ( string -- ? )
-    get-index dup pick length + code get
-    2dup length > [ 3drop drop f ] [ <slice> sequence= ] if ;
+    dup length get-column tuck +
+    dup get-line-str length <=
+    [ get-line-str <slice> sequence= ]
+    [ 3drop f ] if ;
 
-: (take-until-string) ( string -- n )
-    more? [
-        dup string-matches? [
-            drop get-index
-        ] [
-            incr-spot (take-until-string)
-        ] if
-    ] [ "Missing closing token" <xml-string-error> throw ] if ;
-
-: take-until-string ( string -- string )
-    [ >r get-index r> (take-until-string) code get subseq ] keep
-    length get-index + set-index ;
+: take-string ( match -- string )
+    ! match must not contain a newline
+    [ dup string-matches? ] take-until
+    get-line-str
+    [ "Missing closing token" <xml-string-error> throw ] unless
+    swap length [ incr-spot ] times ;
 
 !   -- Parsing strings
 
 : expect ( ch -- )
-    char 2dup = [ 2drop ] [
+    get-char 2dup = [ 2drop ] [
         >r ch>string r> ch>string <expected> throw
     ] if incr-spot ;
 
 : expect-string* ( num -- )
-    #! only skips string
+    #! only skips string, and only for when you're sure the string is there
     [ incr-spot ] times ;
 
 : expect-string ( string -- )
-    >r get-index r> t over [ char incr-spot = and ] each [
-        2drop
-    ] [
-        swap get-index code get subseq <expected> throw
-    ] if ;
+    ! TODO: add error if this isn't long enough
+    new-record dup length [ incr-spot ] times
+    end-record 2dup = [ 2drop ]
+    [ <expected> throw ] if ;
 
 TUPLE: prolog version encoding standalone ; ! part of xml-doc, see parser
 
@@ -143,42 +178,47 @@ TUPLE: prolog version encoding standalone ; ! part of xml-doc, see parser
 
 TUPLE: entity name ;
 
-: parsed-ch ( sbuf ch -- sbuf ) over push incr-spot ;
+: (parse-entity) ( string -- )
+    dup entities hash [ push-record ] [ 
+        prolog-data get prolog-standalone
+        [ <no-entity> throw ] [
+            end-record , <entity> , new-record
+        ] if
+    ] ?if ;
 
-: parse-entity ( sbuf -- sbuf )
-    incr-spot [ CHAR: ; = ] take-until "#" ?head [
-        "x" ?head 16 10 ? base> parsed-ch
-    ] [
-        dup entities hash [ parsed-ch ] [ 
-            prolog-data get prolog-standalone
-            [ <no-entity> throw ] [
-                >r >string , r> <entity> , incr-spot
-                SBUF" " clone
-            ] if
-        ] ?if
-    ] if ;
+: parse-entity ( -- )
+    unrecord
+    ! the following line is in a scope to shield this
+    ! word from the record-altering side effects of
+    ! take-until.
+    [ CHAR: ; take-char ] with-scope
+    "#" ?head [
+        "x" ?head 16 10 ? base>
+        push-record incr-spot
+    ] [ (parse-entity) ] if ;
 
 TUPLE: reference name ;
 
-: parse-reference ( sbuf -- sbuf )
-    >string , incr-spot [ CHAR: ; = ] take-until
-    <reference> , SBUF" " clone incr-spot ;
+: parse-reference ( -- )
+    unrecord end-record , CHAR: ; take-char
+    <reference> , new-record incr-spot ;
 
-: (parse-text) ( sbuf -- )
-    char {
-        { [ dup not ] [ drop >string , ] } ! should this be an error?
-        { [ dup CHAR: < = ] [ drop >string , ] }
+: (parse-text) ( -- )
+    get-char {
+        { [ dup not ]
+          [ drop 0 end-record* , ] }
+        { [ dup CHAR: < = ] [ drop end-record , ] }
         { [ dup CHAR: & = ]
           [ drop parse-entity (parse-text) ] }
-        { [ dup CHAR: % = ]
-          [ drop parse-reference (parse-text) ] }
-        { [ t ] [ parsed-ch (parse-text) ] }
+        { [ CHAR: % = ]
+          [ parse-reference (parse-text) ] }
+        { [ t ] [ incr-spot (parse-text) ] }
     } cond ;
 
 TUPLE: xml-string array ;
 
 : parse-text ( -- array )
-   [ SBUF" " clone (parse-text) ] { } make <xml-string> ;
+   [ new-record (parse-text) ] { } make <xml-string> ;
 
 !   -- Parsing tags
 
@@ -199,12 +239,12 @@ C: name ( space tag -- name )
     [ 1.0name-char? ] [ 1.1name-char? ] if ;
 
 : (parse-name) ( -- str )
-    char dup name-start-char? [
-        incr-spot ch>string [ name-char? not ] take-until append
+    new-record get-char name-start-char? [
+        [ get-char name-char? not ] skip-until end-record
     ] [
         "Malformed name" <xml-string-error> throw
     ] if ;
 
-: parse-name ( -- str-name )
-    (parse-name) char CHAR: : =
+: parse-name ( -- name )
+    (parse-name) get-char CHAR: : =
     [ incr-spot (parse-name) ] [ "" swap ] if <name> ;

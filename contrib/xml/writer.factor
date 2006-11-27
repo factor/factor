@@ -19,6 +19,8 @@ M: entity write-str-elem
 M: reference write-str-elem
     CHAR: % write1 reference-name write CHAR: ; write1 ;
 
+UNION: str-elem string entity reference ;
+
 : print-name ( name -- )
     dup name-space dup "" = [ drop ]
     [ write CHAR: : write1 ] if
@@ -32,7 +34,7 @@ M: reference write-str-elem
 
 GENERIC: (xml>string) ( object -- )
 
-M: object (xml>string) ! string element
+M: str-elem (xml>string) ! string element
     write-str-elem ;
 
 M: contained-tag (xml>string)

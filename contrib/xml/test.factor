@@ -8,7 +8,7 @@ USING: kernel xml test io namespaces hashtables sequences
 ! This is insufficient
 SYMBOL: xml-file
 [ ] [ "contrib/xml/test.xml" resource-path <file-reader>
-    contents string>xml xml-file set ] unit-test
+    stream>xml xml-file set ] unit-test
 [ "1.0" ] [ xml-file get xml-doc-prolog prolog-version ] unit-test
 [ f ] [ xml-file get xml-doc-prolog prolog-standalone ] unit-test
 [ "a" ] [ xml-file get name-space ] unit-test

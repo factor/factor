@@ -21,7 +21,7 @@ HELP: base64
 
 HELP: <rpc-method>
 { $values { "name" "a string" } { "params" "a sequence" } }
-{ $description "creates a tuple reprsenting a method call which can be translated using" { $code send-rpc } "into an XML-RPC document" }
+{ $description "creates a tuple reprsenting a method call which can be translated using send-rpc into an XML-RPC document" }
 { $see-also rpc-method <rpc-response> <rpc-fault> } ;
 
 HELP: rpc-method
@@ -52,7 +52,7 @@ HELP: post-rpc
 { $description "posts an XML-RPC document to the specified URL, receives the response and parses it as XML-RPC, returning the tuple" } ;
 
 ARTICLE: { "xml-rpc" "intro" } "XML-RPC"
-    "This is the XML-RPC library. XML-RPC is used instead of SOAP because it is far simpler and easier to use for most tasks. The library was implemented by Daniel Ehrenberg."
+    "This is the XML-RPC library. XML-RPC is used instead of SOAP because it is far simpler and easier to use for most tasks. The library was implemented by Daniel Ehrenberg. Together with XML, this is part of the F2EE framework."
     $terpri
     "The most important words that this library implements are:"
     { $subsection send-rpc }

@@ -1,4 +1,4 @@
-! Copyright (C) 2005, 2006 Daniel Ehrenberg
+! --> Copyright (C) 2005, 2006 Daniel Ehrenberg
 ! See http://factorcode.org/license.txt for BSD license.
 IN: xml
 USING: errors hashtables io kernel math namespaces prettyprint sequences
@@ -13,72 +13,79 @@ TUPLE: instruction text ;
 
 : start-tag ( -- name ? )
     #! Outputs the name and whether this is a closing tag
-    char CHAR: / = dup [ incr-spot ] when
+    get-char CHAR: / = dup [ incr-spot ] when
     parse-name swap ;
 
-: (parse-quot) ( ch sbuf -- )
-    char {
-        { [ dup not ] [ "File ended in quote" <xml-string-error> throw ] }
-        { [ 3dup nip = ] [ drop >string , drop incr-spot ] }
-        { [ dup CHAR: & = ] [ drop parse-entity (parse-quot) ] }
-        { [ dup CHAR: % = ] [ drop parse-reference (parse-quot) ] }
-        { [ t ] [ parsed-ch (parse-quot) ] }
+: (parse-quot) ( ch -- )
+    ! The similarities with (parse-text) should be factored out
+    get-char {
+        { [ dup not ]
+          [ "File ended in quote" <xml-string-error> throw ] }
+        { [ 2dup = ]
+          [ 2drop end-record , incr-spot ] }
+        { [ dup CHAR: & = ]
+          [ drop parse-entity (parse-quot) ] }
+        { [ CHAR: % = ] [ parse-reference (parse-quot) ] }
+        { [ t ] [ incr-spot (parse-quot) ] }
     } cond ;
 
 : parse-quot ( ch -- array )
-   [ SBUF" " clone (parse-quot) ] { } make <xml-string> ;
+   [ new-record (parse-quot) ] { } make <xml-string> ;
 
 : parse-prop-value ( -- seq )
-    char dup "'\"" member? [
+    get-char dup "'\"" member? [
         incr-spot parse-quot
     ] [
         "Attribute lacks quote" <xml-string-error> throw
     ] if ;
 
 : parse-prop ( -- )
-    parse-name pass-blank CHAR: = expect pass-blank
-    parse-prop-value swap set ;
+    [ parse-name ] with-scope
+    pass-blank CHAR: = expect pass-blank
+    [ parse-prop-value ] with-scope
+    swap set ;
 
 : (middle-tag) ( -- )
-    pass-blank char name-start-char?
+    pass-blank get-char name-start-char?
     [ parse-prop (middle-tag) ] when ;
 
 : middle-tag ( -- hash )
     [ (middle-tag) ] make-hash pass-blank ;
 
 : end-tag ( string hash -- tag )
-    pass-blank char CHAR: / =
+    pass-blank get-char CHAR: / =
     [ <contained> incr-spot ] [ <opener> ] if ;
 
 : skip-comment ( -- comment )
     "--" expect-string
-    "--" take-until-string
+    "--" take-string
     <comment>
     CHAR: > expect ;
 
 : cdata ( -- string )
-    "[CDATA[" expect-string "]]>" take-until-string ;
+    "[CDATA[" expect-string "]]>" take-string ;
 
 : directive ( -- object )
     {
         { [ "--" string-matches? ] [ skip-comment ] }
         { [ "[CDATA[" string-matches? ] [ cdata ] }
-        { [ t ] [ ">" take-until-string <directive> ] }
+        { [ t ] [ CHAR: > take-char <directive> ] }
     } cond ;
 
 : instruction ( -- instruction )
     ! this should make sure the name doesn't include 'xml'
-    "?>" take-until-string <instruction> ;
+    "?>" take-string <instruction> ;
 
 : make-tag ( -- tag/f )
     CHAR: < expect
-    { { [ char dup CHAR: ! = ] [ drop incr-spot directive ] }
+    { { [ get-char dup CHAR: ! = ] [ drop incr-spot directive ] }
       { [ CHAR: ? = ] [ incr-spot instruction ] } 
       { [ t ] [
             start-tag [ <closer> ] [
                 middle-tag end-tag
             ] if pass-blank CHAR: > expect
-        ] } } cond ;
+        ] }
+    } cond ;
 
 !   -- Overall parser with data tree
 
@@ -234,9 +241,18 @@ M: extra-attrs error.
       <xml-string-error> throw ] unless
     concat ;
 
+TUPLE: bad-version num ;
+M: bad-version error.
+    "XML version must be \"1.0\" or \"1.1\". Version here was " write
+    bad-version-num . ;
+
+: good-version ( version -- version )
+    dup { "1.0" "1.1" } member? [ <bad-version> throw ] unless ;
+
 : prolog-attrs ( hash -- )
     T{ name f "" "version" f } over hash [
-        concat-strings prolog-data get set-prolog-version
+        concat-strings good-version
+        prolog-data get set-prolog-version
     ] when*
     T{ name f "" "encoding" f } over hash [
         concat-strings prolog-data get set-prolog-encoding
@@ -253,10 +269,14 @@ M: extra-attrs error.
          dup assure-no-extra prolog-attrs
     ] when ;
 
-: init-xml ( string -- )
-    code set { 0 1 1 } clone spot set
+: init-xml ( stream -- )
+    stdio set
+    { 0 0 0 "" } clone spot set
+    f record set f now-recording? set
+    incr-spot
     "1.0" "iso-8859-1" f <prolog> prolog-data set
-    init-xml-stack init-ns-stack ;
+    init-xml-stack
+    init-ns-stack ;
 
 UNION: any-tag tag contained-tag ;
 
@@ -277,9 +297,9 @@ M: multitags error.
 
 : (string>xml) ( -- )
     parse-text process
-    more? [ make-tag process (string>xml) ] when ; inline
+    get-char [ make-tag process (string>xml) ] when ;
 
-: string>xml ( string -- xml-doc )
+: stream>xml ( stream -- xml-doc )
     #! Produces a tree of XML nodes
     [
         init-xml
@@ -289,6 +309,9 @@ M: multitags error.
         first second
         make-xml-doc
     ] with-scope ;
+
+: string>xml ( string -- xml-doc )
+    <string-reader> stream>xml ;
 
 UNION: xml-parse-error multitags notags xml-error extra-attrs nonexist-ns
        not-yes/no unclosed mismatched xml-string-error expected no-entity ;
