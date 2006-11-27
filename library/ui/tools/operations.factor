@@ -13,12 +13,8 @@ V{ } clone operations set-global
     <operation> operations get push-new ;
 
 M: operation invoke-command ( target operation -- )
-    2dup operation-predicate call [
-        dup command-quot swap operation-listener?
-        [ curry call-listener ] [ call ] if
-    ] [
-        2drop
-    ] if ;
+    dup command-quot swap operation-listener?
+    [ curry call-listener ] [ call ] if ;
 
 : modify-listener-operation ( quot operation -- operation )
     clone t over set-operation-listener?

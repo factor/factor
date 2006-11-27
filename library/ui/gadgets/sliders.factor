@@ -1,9 +1,9 @@
 ! Copyright (C) 2005, 2006 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-IN: gadgets-scrolling
+IN: gadgets-sliders
 USING: arrays gadgets gadgets-buttons
 gadgets-theme generic kernel math namespaces
-sequences styles threads vectors ;
+sequences styles threads vectors models ;
 
 ! An elevator has a thumb that may be moved up and down.
 TUPLE: elevator ;
@@ -11,7 +11,7 @@ TUPLE: elevator ;
 : find-elevator [ elevator? ] find-parent ;
 
 ! A slider scrolls a viewport.
-TUPLE: slider elevator thumb value saved max page ;
+TUPLE: slider elevator thumb saved max line page ;
 
 : find-slider [ slider? ] find-parent ;
 
@@ -43,26 +43,20 @@ TUPLE: slider elevator thumb value saved max page ;
 : fix-slider-value ( n slider -- n )
     slider-max* min 0 max >fixnum ;
 
-TUPLE: slider-changed ;
+: set-slider-value ( value slider -- )
+    [ fix-slider-value ] keep set-control-value ;
 
-: set-slider-value* ( value slider -- )
-    [ fix-slider-value ] keep 2dup slider-value = [
-        2drop
-    ] [
-        [ set-slider-value ] keep
-        dup slider-elevator relayout-1
-        T{ slider-changed } swap handle-gesture drop
-    ] if ;
+M: slider model-changed slider-elevator relayout-1 ;
 
 TUPLE: thumb ;
 
 : begin-drag ( thumb -- )
-    find-slider dup slider-value swap set-slider-saved ;
+    find-slider dup control-value swap set-slider-saved ;
 
 : do-drag ( thumb -- )
     find-slider drag-loc over gadget-orientation v.
     over screen>slider swap [ slider-saved + ] keep
-    set-slider-value* ;
+    set-slider-value ;
 
 thumb H{
     { T{ button-down } [ begin-drag ] }
@@ -76,18 +70,17 @@ C: thumb ( vector -- thumb )
     dup thumb-theme
     [ set-gadget-orientation ] keep ;
 
-: slide-by ( amount gadget -- )
-    #! The gadget can be any child of a slider.
-    find-slider [ slider-value + ] keep set-slider-value* ;
+: slide-by ( amount slider -- )
+    [ control-value + ] keep set-slider-value ;
 
-: slide-by-page ( -1/1 gadget -- )
+: slide-by-page ( -1/1 slider -- )
     [ slider-page * ] keep slide-by ;
 
 : page-direction ( elevator -- -1/1 )
     dup find-slider swap hand-click-rel
     over gadget-orientation v.
     over screen>slider
-    swap slider-value - sgn ;
+    swap control-value - sgn ;
 
 : elevator-click ( elevator -- )
     dup page-direction
@@ -108,7 +101,7 @@ C: elevator ( vector -- elevator )
     over gadget-orientation n*v swap slider-thumb ;
 
 : thumb-loc ( slider -- loc )
-    dup slider-value swap slider>screen ;
+    dup control-value swap slider>screen ;
 
 : layout-thumb-loc ( slider -- )
     dup thumb-loc (layout-thumb)
@@ -126,11 +119,12 @@ C: elevator ( vector -- elevator )
 M: elevator layout*
     find-slider layout-thumb ;
 
-: slide-by-line ( -1/1 slider -- ) >r 32 * r> slide-by ;
+: slide-by-line ( -1/1 slider -- )
+    [ slider-line * ] keep slide-by ;
 
 : <slide-button> ( vector polygon amount -- )
     >r gray swap <polygon-gadget> r>
-    [ swap slide-by-line ] curry <repeat-button>
+    [ swap find-slider slide-by-line ] curry <repeat-button>
     [ set-gadget-orientation ] keep ;
 
 : <left-button> { 0 1 } arrow-left -1 <slide-button> ;
@@ -158,9 +152,9 @@ M: elevator layout*
     set-slider-thumb ;
 
 C: slider ( vector -- slider )
-    dup delegate>frame
+    dup 0 <model> <frame> delegate>control
     [ set-gadget-orientation ] keep
-    0 over set-slider-value
+    32 over set-slider-line
     0 over set-slider-page
     0 over set-slider-max ;
 

@@ -11,7 +11,11 @@ C: control ( model gadget quot -- gadget )
     [ set-gadget-delegate ] keep
     [ set-control-model ] keep ;
 
-: control-value ( control -- value ) control-model model-value ;
+: control-value ( control -- value )
+    control-model model-value ;
+
+: set-control-value ( value control -- )
+    control-model set-model* ;
 
 M: control graft*
     control-self dup dup control-model add-connection
