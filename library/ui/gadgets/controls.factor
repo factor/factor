@@ -15,7 +15,7 @@ C: control ( model gadget quot -- gadget )
     control-model model-value ;
 
 : set-control-value ( value control -- )
-    control-model set-model* ;
+    control-model set-model ;
 
 M: control graft*
     control-self dup dup control-model add-connection

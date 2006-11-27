@@ -28,7 +28,7 @@ scroller H{
     { T{ mouse-scroll } [ do-mouse-scroll ] }
 } set-gestures
 
-: init-scroller-model ( scroller -- point )
+: init-scroller-model ( scroller -- )
     dup scroller-x control-model
     over scroller-y control-model
     2array <compose> swap set-scroller-model ;
