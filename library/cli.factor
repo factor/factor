@@ -59,6 +59,7 @@ parser sequences strings ;
         cli-args [ cli-arg ] subset
         ignore-cli-args? [ drop ] [ [ run-file ] each ] if
         "e" get eval
+        flush
     ] try ;
 
 IN: shells
