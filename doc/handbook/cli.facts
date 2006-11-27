@@ -45,6 +45,7 @@ ARTICLE: "bootstrap-cli-args" "Switches available when bootstrapping"
 ARTICLE: "standard-cli-args" "General command line switches"
 "The following command line switches can be passed to a bootstrapped Factor image:"
 { $table
-    { { $snippet "-shell=" { $emphasis "shell" } } { { $snippet { $emphasis "shell" } } " is either " { $link tty } ", " { $link ui } ", or the name of any other word in the " { $vocab-link "shells" } " vocabulary. This specifies the user interface to run on startup." } }
+    { { $snippet "-e=" { $emphasis "code" } } { "This specifies a code snippet to evaluate. If you want Factor to exit immediately after, also specify " { $snippet "-shell=none" } "." } }
+    { { $snippet "-shell=" { $emphasis "shell" } } { { $snippet { $emphasis "shell" } } " is either " { $link tty } ", " { $link ui } ", " { $link none } ", or the name of any other word in the " { $vocab-link "shells" } " vocabulary. This specifies the user interface to run on startup." } }
     { { $snippet "-no-user-init" } { "If specified, Factor will not run the " { $snippet "~/.factor-rc" } " file on startup" } }
 } ;
