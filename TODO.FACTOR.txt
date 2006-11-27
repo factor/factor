@@ -1,8 +1,6 @@
 + 0.87:
 
 - better error handling in early startup
-- some module operations don't work on module-links
-- list operations: what if nothing is selected?
 - slider needs to be modelized
 - overhaul models, set-model* is crap
 - color picker example
