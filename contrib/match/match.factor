@@ -24,6 +24,8 @@ USE: prettyprint
     drop f
   ] if ;
 
+: && ( obj seq -- ? ) [ call ] all-with? ;
+
 : (match) ( seq1 seq2 -- matched? )
   {
     { [ 2dup = ] [ 2drop t ] }
@@ -31,7 +33,7 @@ USE: prettyprint
     { [ dup _ = ] [ 2drop t ] }
     { [ dup match-var? ] [ set t ] }
     { [ over match-var? ] [ swap set t ] }
-    { [ over sequence? over sequence? and [ over first over first (match) ] [ f ] if ] [ >r 1 tail r> 1 tail (match) ] }
+    { [ over { [ sequence? ] [ empty? not ] } && over { [ sequence? ] [ empty? not ] } && and [ over first over first (match) ] [ f ] if ] [ >r 1 tail r> 1 tail (match) ] }
     { [ over tuple? over tuple? and ] [ >r tuple>array r> tuple>array (match) ] }
     { [ t ] [ 2drop f ] }
   } cond ;
