@@ -60,3 +60,7 @@ parser sequences strings ;
         ignore-cli-args? [ drop ] [ [ run-file ] each ] if
         "e" get eval
     ] try ;
+
+IN: shells
+
+: none ;
