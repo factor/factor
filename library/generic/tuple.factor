@@ -92,7 +92,7 @@ M: tuple equal?
     over tuple? [ tuple= ] [ 2drop f ] if ;
 
 : (delegates) ( obj -- )
-    [ dup delegate (delegates) , ] when* ;
+    [ dup , delegate (delegates) ] when* ;
 
 : delegates ( obj -- seq ) [ (delegates) ] { } make ;
 

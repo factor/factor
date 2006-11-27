@@ -1,7 +1,5 @@
 + 0.87:
 
-- module operations on module-links, etc
-- empty search list, handle
 - variable width word wrap
 - graphical crossref tool
 - http://paste.lisp.org/display/30426

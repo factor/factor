@@ -62,7 +62,7 @@ HELP: define-tuple
 
 HELP: delegates
 { $values { "obj" "an object" } { "seq" "a sequence" } }
-{ $description "Outputs the delegation chain of an object. The last element of " { $snippet "seq" } " is " { $snippet "obj" } " itself. If " { $snippet "obj" } " is " { $link f } ", an empty sequence is output." } ;
+{ $description "Outputs the delegation chain of an object. The first element of " { $snippet "seq" } " is " { $snippet "obj" } " itself. If " { $snippet "obj" } " is " { $link f } ", an empty sequence is output." } ;
 
 HELP: is?
 { $values { "obj" "an object" } { "quot" "a quotation with stack effect " { $snippet "( obj -- ? )" } } { "?" "a boolean" } }

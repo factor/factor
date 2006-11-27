@@ -318,28 +318,3 @@ link class-operations [ help-action ] modify-commands
 [ command-name "Follow" = not ] subset
 append
 define-commands
-
-\ word-search "operations"
-{ word compound } [ class-operations ] map concat
-[ search-action ] modify-commands
-define-commands
-
-\ vocab-search "operations"
-\ vocab-link class-operations
-[ search-action ] modify-commands
-define-commands
-
-\ module-search "operations"
-\ module class-operations
-[ search-action ] modify-commands
-define-commands
-
-\ source-file-search "operations"
-\ pathname class-operations
-[ search-action ] modify-commands
-define-commands
-
-\ help-search "operations"
-\ link class-operations
-[ search-action ] modify-commands
-define-commands

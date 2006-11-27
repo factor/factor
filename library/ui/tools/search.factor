@@ -10,6 +10,18 @@ modules prettyprint ;
 
 TUPLE: live-search field list ;
 
+: search-gesture ( gesture live-search -- command/f )
+    live-search-list list-value object-operations
+    [ command-gesture = ] find-with nip ;
+
+M: live-search handle-gesture* ( gadget gesture delegate -- ? )
+    drop over search-gesture dup [
+        over find-workspace hide-popup
+        >r live-search-list list-value r> invoke-command f
+    ] [
+        2drop t
+    ] if ;
+
 : find-live-search [ [ live-search? ] is? ] find-parent ;
 
 : find-search-list find-live-search live-search-list ;
@@ -61,73 +73,45 @@ M: live-search focusable-child* live-search-field ;
 : delegate>live-search ( string seq producer presenter gadget -- )
     >r <live-search> r> set-gadget-delegate ;
 
-TUPLE: word-search ;
-
-C: word-search ( string words -- gadget )
-    >r
+: <word-search> ( string words -- gadget )
     [ word-completions ]
     [ summary ]
-    r>
-    [ delegate>live-search ] keep ;
+    <live-search> ;
 
 : help-completions ( str pairs -- seq )
     >r >lower r>
     [ second >lower ] swap completions
     [ first <link> ] map ;
 
-TUPLE: help-search ;
-
-C: help-search ( string -- gadget )
-    >r
+: <help-search> ( string -- gadget )
     all-articles [ dup article-title 2array ] map
     [ [ second ] 2apply <=> ] sort
     [ help-completions ]
     [ article-title ]
-    r>
-    [ delegate>live-search ] keep ;
+    <live-search> ;
 
-TUPLE: source-file-search ;
-
-C: source-file-search ( string files -- gadget )
-    >r
+: <source-file-search> ( string files -- gadget )
     [ string-completions [ <pathname> ] map ]
     [ pathname-string ]
-    r>
-    [ delegate>live-search ] keep ;
+    <live-search> ;
 
 : module-completions ( str modules -- seq )
     [ module-name ] swap completions ;
 
-TUPLE: module-search ;
-
-C: module-search ( string -- gadget )
-    >r
+: <module-search> ( string -- gadget )
     available-modules [ module-completions ]
     [ module-string ]
-    r>
-    [ delegate>live-search ] keep ;
+    <live-search> ;
 
-TUPLE: vocab-search ;
-
-C: vocab-search ( string -- gadget )
-    >r
+: <vocab-search> ( string -- gadget )
     vocabs [ string-completions [ <vocab-link> ] map ]
     [ vocab-link-name ]
-    r>
-    [ delegate>live-search ] keep ;
+    <live-search> ;
 
-TUPLE: history-search ;
-
-C: history-search ( string seq -- gadget )
-    >r
+: <history-search> ( string seq -- gadget )
     [ string-completions [ <input> ] map ]
     [ input-string ]
-    r>
-    [ delegate>live-search ] keep ;
-
-: search-action ( search -- obj )
-    dup find-workspace hide-popup
-    live-search-list list-value ;
+    <live-search> ;
 
 : show-titled-popup ( workspace gadget title -- )
     [ find-workspace hide-popup ] <closable-gadget>
