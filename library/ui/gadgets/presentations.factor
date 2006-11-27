@@ -26,10 +26,10 @@ TUPLE: presentation object hook ;
     invoke-presentation ;
 
 : show-mouse-help ( presentation -- )
-    dup find-world [ world-status set-model* ] [ drop ] if* ;
+    dup find-world [ world-status set-model ] [ drop ] if* ;
 
 : hide-mouse-help ( presentation -- )
-    find-world [ world-status f swap set-model* ] when* ;
+    find-world [ world-status f swap set-model ] when* ;
 
 M: presentation ungraft* ( presentation -- )
     dup hide-mouse-help delegate ungraft* ;

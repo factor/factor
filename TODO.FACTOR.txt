@@ -4,7 +4,6 @@
 - empty search list, handle
 - change file, reload it manually, then reload modules; shouldn't this
   work?
-- overhaul models, set-model* is crap
 - variable width word wrap
 - graphical crossref tool
 - http://paste.lisp.org/display/30426
@@ -20,6 +19,7 @@
 
 + 0.88:
 
+- models: don't do redundant work
 - menu Command: quots look dumb
 - top level window positioning on ms windows
 - crashes:

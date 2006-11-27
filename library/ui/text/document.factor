@@ -25,7 +25,7 @@ C: document ( -- document )
 : remove-loc document-locs delete ;
 
 : update-locs ( loc document -- )
-    document-locs [ set-model* ] each-with ;
+    document-locs [ set-model ] each-with ;
 
 : doc-line ( line# document -- str ) model-value nth ;
 

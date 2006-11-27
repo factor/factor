@@ -32,7 +32,7 @@ TUPLE: tool gadget ;
 
 : show-tool ( class workspace -- tool )
     [ find-tool swap ] keep workspace-book control-model
-    set-model* ;
+    set-model ;
 
 : select-tool ( workspace class -- ) swap show-tool drop ;
 

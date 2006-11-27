@@ -47,7 +47,7 @@ USING: gadgets kernel models namespaces sequences arrays ;
     dupd editor-select-next mark>caret ;
 
 : editor-select ( from to editor -- )
-    tuck editor-caret set-model* editor-mark set-model* ;
+    tuck editor-caret set-model editor-mark set-model ;
 
 : select-elt ( editor elt -- )
     over >r
