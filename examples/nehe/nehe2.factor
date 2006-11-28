@@ -12,9 +12,6 @@ C: nehe2-gadget (  -- gadget )
 M: nehe2-gadget pref-dim* ( gadget -- dim )
   drop width height 0 3array ;
 
-: gl-begin ( type quot -- )
-  >r glBegin r> call glEnd ; inline
-
 M: nehe2-gadget draw-gadget* ( gadget -- )
   drop
   GL_PROJECTION glMatrixMode
@@ -35,14 +32,14 @@ M: nehe2-gadget draw-gadget* ( gadget -- )
     0.0 1.0 0.0 glVertex3f
     -1.0 -1.0 0.0 glVertex3f
     1.0 -1.0 0.0 glVertex3f
-  ] gl-begin
+  ] with-gl
   3.0 0.0 0.0 glTranslatef
   GL_QUADS [
     -1.0 1.0 0.0 glVertex3f
     1.0 1.0 0.0 glVertex3f
     1.0 -1.0 0.0 glVertex3f
     -1.0 -1.0 0.0 glVertex3f
-  ] gl-begin ;
+  ] with-gl ;
 
 : run2 ( -- )
   <nehe2-gadget> "NeHe Tutorial 2" open-titled-window ;
