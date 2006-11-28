@@ -74,7 +74,7 @@ SYMBOL: break-hook
     save-callframe (meta-call) ;
 
 : restore-normally
-    meta-interp set
+    clone meta-interp set
     meta-c empty? [ f (meta-call) ] [ up ] if ;
 
 : restore-with

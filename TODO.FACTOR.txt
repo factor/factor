@@ -3,7 +3,6 @@
 - variable width word wrap
 - graphical crossref tool
 - http://paste.lisp.org/display/30426
-- robustify stepper -- see if step back past a throw works
 - listener: if partial parse, RETURN should insert newline
 - compiled call traces:
   - should be independent of whenever the runtime was built with

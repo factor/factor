@@ -106,3 +106,55 @@ unit-test
 
 [ V{ 6 } ]
 [ [ [ 3 swap continue-with ] callcc1 2 * ] test-interpreter ] unit-test
+
+: meta-catch meta-interp get continuation-catch ;
+
+! Step back test
+[
+    init-interpreter
+    V{ } clone meta-history set
+
+    V{ f } clone
+    V{ } clone
+    V{ [ 1 2 3 ] 0 3 } clone
+    V{ } clone
+    V{ } clone
+    <continuation>
+    meta-catch push
+
+    [ ] [ [ 2 2 + throw ] (meta-call) ] unit-test
+
+    [ ] [ step ] unit-test
+
+    [ ] [ step ] unit-test
+    
+    [ V{ 2 2 } ] [ meta-d ] unit-test
+
+    [ ] [ step ] unit-test
+    
+    [ V{ 4 } ] [ meta-d ] unit-test
+    [ 3 ] [ callframe-scan get ] unit-test
+    
+    [ ] [ step-back ] unit-test
+    [ 2 ] [ callframe-scan get ] unit-test
+    
+    [ V{ 2 2 } ] [ meta-d ] unit-test
+    
+    [ ] [ step ] unit-test
+    
+    [ [ 1 2 3 ] ] [ meta-catch peek continuation-call first ] unit-test
+
+    [ ] [ step ] unit-test
+    
+    [ [ 1 2 3 ] ] [ callframe get ] unit-test
+    [ ] [ step-back ] unit-test
+    
+    [ V{ 4 } ] [ meta-d ] unit-test
+    
+    [ [ 1 2 3 ] ] [ meta-catch peek continuation-call first ] unit-test
+
+    [ ] [ step ] unit-test
+    
+    [ [ 1 2 3 ] ] [ callframe get ] unit-test
+
+] with-scope

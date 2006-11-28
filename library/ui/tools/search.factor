@@ -70,9 +70,6 @@ C: live-search ( string seq producer presenter -- gadget )
 
 M: live-search focusable-child* live-search-field ;
 
-: delegate>live-search ( string seq producer presenter gadget -- )
-    >r <live-search> r> set-gadget-delegate ;
-
 : <word-search> ( string words -- gadget )
     [ word-completions ]
     [ summary ]
