@@ -3,7 +3,7 @@
 - variable width word wrap
 - graphical crossref tool
 - http://paste.lisp.org/display/30426
-- listener: if partial parse, RETURN should insert newline
+- parse errors should be shown in a popup
 - compiled call traces:
   - should be independent of whenever the runtime was built with
     -fomit-frame-pointer or not

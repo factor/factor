@@ -35,10 +35,7 @@ C: source-file ( path -- source-file )
     "scratchpad" set-in { "syntax" "scratchpad" } set-use ;
 
 : with-parser ( quot -- )
-    0 line-number set [
-        dup [ parse-error? ] is? [ <parse-error> ] unless
-        rethrow
-    ] recover ;
+    0 line-number set [ <parse-error> rethrow ] recover ;
 
 : parse-lines ( lines -- quot )
     [ f [ (parse) ] reduce >quotation ] with-parser ;

@@ -73,9 +73,10 @@ M: interactor stream-read
     interactor-in in set ;
 
 : handle-parse-error ( interactor error -- )
-    dup [ parse-error? ] is? [
+    dup parse-error? [
         2dup dup parse-error-line 1- swap parse-error-col 2array
         over editor-caret set-model mark>caret
+        delegate
     ] when
     swap interactor-output [ print-error ] with-stream* ;
 

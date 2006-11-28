@@ -83,10 +83,10 @@ M: string error. print ;
     first3 continue-with ;
 
 : :edit ( -- )
-    error get
-    dup parse-error-file ?resource-path
-    swap parse-error-line
-    edit-location ;
+    error get delegates [ parse-error-file ] find nip [
+        dup parse-error-file ?resource-path
+        swap parse-error-line edit-location
+    ] when* ;
 
 : (:help-multi)
     "This error has multiple delegates:" print
