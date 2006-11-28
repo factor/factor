@@ -7,3 +7,9 @@ PROVIDE: examples/nehe
   }
 } ;
 
+USING: kernel gadgets nehe sequences gadgets-buttons ;
+
+MAIN: examples/nehe
+   { { "Nehe 2" [ drop run2 ] } { "Nehe 3" [ drop run3 ] } }
+   [ first2 <bevel-button> ] map make-pile 
+   "Nehe examples" open-titled-window ;
