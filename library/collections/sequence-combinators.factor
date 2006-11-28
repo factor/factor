@@ -82,7 +82,7 @@ IN: sequences
     [ 2dup min-length [ (2map) ] collect ] keep like
     >r 3drop r> ; inline
 
-: if-bounds ( i seq quot -- )
+: if-bounds ( i seq quot quot -- )
     >r pick pick bounds-check? r> [ 3drop -1 f ] if ; inline
 
 : find* ( n seq quot -- i elt )

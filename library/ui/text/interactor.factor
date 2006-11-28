@@ -4,7 +4,7 @@ IN: gadgets-text
 USING: arrays definitions gadgets gadgets-panes
 generic hashtables help io kernel namespaces prettyprint styles
 threads sequences vectors definitions parser words strings
-math listener ;
+math listener models errors ;
 
 TUPLE: interactor
 history output
@@ -32,10 +32,12 @@ M: interactor graft*
 : interactor-finish ( obj interactor -- )
     dup editor-text over interactor-input.
     dup control-model clear-doc
-    interactor-continuation schedule-thread-with ;
+    interactor-continuation continue-with ;
 
 : interactor-eval ( interactor -- )
-    [ editor-text ] keep dup interactor-quot call ;
+    [
+        [ editor-text ] keep dup interactor-quot call
+    ] in-thread drop ;
 
 : interactor-eof ( interactor -- )
     f swap interactor-continuation schedule-thread-with ;
@@ -70,25 +72,32 @@ M: interactor stream-read
     dup interactor-use use set
     interactor-in in set ;
 
-: try-parse ( str interactor -- quot ? )
+: handle-parse-error ( interactor error -- )
+    dup [ parse-error? ] is? [
+        2dup dup parse-error-line 1- swap parse-error-col 2array
+        over editor-caret set-model mark>caret
+    ] when
+    swap interactor-output [ print-error ] with-stream* ;
+
+: try-parse ( str interactor -- quot/error/f )
     [
         [
-            restore-in/use
-            1array \ parse with-datastack
-            dup length 1 = [ first t ] [ drop f f ] if
-        ] keep save-in/use
+            [
+                restore-in/use
+                1array \ parse with-datastack dup length 1 =
+                [ first ] [ drop f ] if
+            ] keep save-in/use
+        ] [
+            2nip
+        ] recover
     ] with-scope ;
 
 : handle-interactive ( str/f interactor -- )
-    over [
-        dup >r try-parse [
-            r> interactor-finish
-        ] [
-            "\n" r> user-input drop
-        ] if
-    ] [
-        interactor-finish
-    ] if ;
+    tuck try-parse {
+        { [ dup quotation? ] [ swap interactor-finish ] }
+        { [ dup not ] [ drop "\n" swap user-input ] }
+        { [ t ] [ handle-parse-error ] }
+    } cond ;
 
 M: interactor parse-interactive
     [ save-in/use ] keep
