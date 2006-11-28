@@ -1,21 +1,21 @@
 IN: nehe
 USING: kernel gadgets opengl math arrays ;
 
-TUPLE: nehe2-gadget ;
+TUPLE: nehe3-gadget ;
 
 : width 256 ;
 : height 256 ;
 
-C: nehe2-gadget (  -- gadget )
+C: nehe3-gadget (  -- gadget )
   [ delegate>gadget ] keep ;
 
-M: nehe2-gadget pref-dim* ( gadget -- dim )
+M: nehe3-gadget pref-dim* ( gadget -- dim )
   drop width height 0 3array ;
 
 : gl-begin ( type quot -- )
   >r glBegin r> call glEnd ; inline
 
-M: nehe2-gadget draw-gadget* ( gadget -- )
+M: nehe3-gadget draw-gadget* ( gadget -- )
   drop
   GL_PROJECTION glMatrixMode
   glLoadIdentity
@@ -32,11 +32,15 @@ M: nehe2-gadget draw-gadget* ( gadget -- )
   glLoadIdentity
   -1.5 0.0 -6.0 glTranslatef
   GL_TRIANGLES [
+    1.0 0.0 0.0 glColor3f
     0.0 1.0 0.0 glVertex3f
+    0.0 1.0 0.0 glColor3f
     -1.0 -1.0 0.0 glVertex3f
+    0.0 0.0 1.0 glColor3f
     1.0 -1.0 0.0 glVertex3f
   ] gl-begin
   3.0 0.0 0.0 glTranslatef
+  0.5 0.5 1.0 glColor3f
   GL_QUADS [
     -1.0 1.0 0.0 glVertex3f
     1.0 1.0 0.0 glVertex3f
@@ -44,5 +48,5 @@ M: nehe2-gadget draw-gadget* ( gadget -- )
     -1.0 -1.0 0.0 glVertex3f
   ] gl-begin ;
 
-: run2 ( -- )
-  <nehe2-gadget> "NeHe Tutorial 2" open-titled-window ;
+: run3 ( -- )
+  <nehe3-gadget> "NeHe Tutorial 3" open-titled-window ;
