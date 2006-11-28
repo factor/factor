@@ -15,21 +15,20 @@ TUPLE: interactive-stream ;
 C: interactive-stream ( stream -- stream )
     [ set-delegate ] keep ;
 
-: (parse-interactive) ( quot depth -- quot/f )
-    >r readln dup [
-        (parse) depth r> dup >r <= [
-            >quotation r> drop
+: (parse-interactive) ( stream stack -- quot/f )
+    over stream-readln dup [
+        over push \ (parse) with-datastack
+        dup length 1 = [
+            nip first >quotation
         ] [
-            r> (parse-interactive)
+            (parse-interactive)
         ] if
     ] [
-        r> 3drop f
+        3drop f
     ] if ;
 
 M: interactive-stream parse-interactive
-    delegate [
-        [ f depth (parse-interactive) in get ] with-parser
-    ] with-stream* in set ;
+    [ V{ f } clone (parse-interactive) ] with-parser ;
 
 M: duplex-stream parse-interactive
     duplex-stream-in parse-interactive ;

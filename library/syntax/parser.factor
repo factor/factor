@@ -57,6 +57,7 @@ TUPLE: no-word name ;
 
 : (parse) ( str -- )
     line-text set
+    line-number inc
     0 column-number set
     parse-loop ;
 
