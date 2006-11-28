@@ -36,7 +36,7 @@ $terpri
 "The following variables can be rebound inside a nested scope to customize the behavior of a listener; this can be done to create a development tool with a custom interaction loop:"
 { $subsection listener-hook }
 "Finally, the multi-line expression reading word can be used independently of the rest of the listener:"
-{ $subsection read-multiline } ;
+{ $subsection parse-interactive } ;
 
 ARTICLE: "sources" "Source files"
 "The simplest way to distribute a piece of Factor code is in the form of a source file. Source files can be loaded in the listener:"

@@ -2,50 +2,59 @@
 ! See http://factorcode.org/license.txt for BSD license.
 IN: listener
 USING: errors hashtables io kernel math memory namespaces
-parser sequences strings styles vectors words ;
+parser sequences strings styles vectors words generic ;
 
 SYMBOL: quit-flag
+
 SYMBOL: listener-hook
 
-: bye ( -- ) quit-flag on ;
+GENERIC: parse-interactive ( stream -- quot/f )
 
-: (read-multiline) ( quot depth -- newquot ? )
+TUPLE: interactive-stream ;
+
+C: interactive-stream ( stream -- stream )
+    [ set-delegate ] keep ;
+
+: (parse-interactive) ( quot depth -- quot/f )
     >r readln dup [
         (parse) depth r> dup >r <= [
-            r> drop t
+            >quotation r> drop
         ] [
-            r> (read-multiline)
+            r> (parse-interactive)
         ] if
     ] [
-        r> 2drop f
+        r> 3drop f
     ] if ;
 
-: read-multiline ( -- quot ? )
-    [
-        f depth (read-multiline) >r >quotation r> in get
-    ] with-parser in set ;
+M: interactive-stream parse-interactive
+    delegate [
+        [ f depth (parse-interactive) in get ] with-parser
+    ] with-stream* in set ;
+
+M: duplex-stream parse-interactive
+    duplex-stream-in parse-interactive ;
+
+: bye ( -- ) quit-flag on ;
 
 : prompt. ( -- )
     in get H{ { background { 1 0.7 0.7 1 } } } format bl flush ;
 
 : listen ( -- )
-    prompt. [
-        listener-hook get call
-        read-multiline [ call ] [ drop bye ] if
-    ] try ;
+    [ stdio get parse-interactive [ call ] [ bye ] if* ] try ;
 
-: listener ( -- )
-    quit-flag get [ quit-flag off ] [ listen listener ] if ;
+: (listener) ( -- )
+    quit-flag get
+    [ quit-flag off ]
+    [ prompt. listener-hook get call listen (listener) ] if ;
 
 : print-banner ( -- )
     "Factor " write version write
     " on " write os write "/" write cpu print ;
 
+: listener ( -- )
+    print-banner use [ clone ] change (listener) ;
+
 IN: shells
 
 : tty ( -- )
-    [
-        use [ clone ] change
-        print-banner
-        listener
-    ] with-scope ;
+    stdio get <interactive-stream> [ listener ] with-stream* ;

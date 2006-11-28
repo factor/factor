@@ -40,7 +40,7 @@ TUPLE: listener-gadget input output stack use ;
         [ ui-listener-hook ] curry listener-hook set
         find-messages batch-errors set
         welcome.
-        tty
+        listener
     ] with-stream* ;
 
 : start-listener ( listener -- )
@@ -104,7 +104,7 @@ M: listener-gadget tool-help
     ] if ;
 
 : listener-eof ( listener -- )
-    listener-gadget-input f swap interactor-eval ;
+    listener-gadget-input interactor-eof ;
 
 : clear-listener-output ( listener -- )
     [ listener-gadget-output [ pane-clear ] curry ] keep
