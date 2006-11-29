@@ -1,15 +1,18 @@
 + 0.87:
 
+- macbook mouse tracking is off
+- xml: chars>entities got broken
+- parse errors should be shown in a popup
+- growable data heap
+
 - variable width word wrap
 - graphical crossref tool
 - http://paste.lisp.org/display/30426
-- parse errors should be shown in a popup
 - compiled call traces:
   - should be independent of whenever the runtime was built with
     -fomit-frame-pointer or not
   - doesn't show #labels
   - we don't know if signal handlers run with the same stack or not
-- xml: chars>entities got broken
 
 + 0.88:
 
@@ -40,7 +43,6 @@
 - don't end lines with literals, shuffle words or symbols?
 - see should try to not show ; on a line by itself
 - IN: on its own line if the entire 'see' form doesn't fit
-- growable data heap
 
 + ui:
 
