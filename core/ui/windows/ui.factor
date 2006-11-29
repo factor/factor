@@ -307,7 +307,7 @@ SYMBOL: hWnd
     GetDoubleClickTime double-click-timeout set-global ;
 
 : cleanup-win32-ui ( -- )
-    class-name get <malloc-string> f UnregisterClass drop ;
+    class-name get string>char-alien f UnregisterClass drop ;
 
 : setup-pixel-format ( hdc -- )
     16 make-pfd [ ChoosePixelFormat dup win32-error=0 ] 2keep
