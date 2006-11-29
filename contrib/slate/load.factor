@@ -1,1 +1,0 @@
-PROVIDE: contrib/slate { +files+ { "slate.factor" } } ;

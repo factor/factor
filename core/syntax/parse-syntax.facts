@@ -1,0 +1,306 @@
+USING: generic help kernel math modules parser words ;
+
+HELP: parsing
+{ $syntax "parsing" }
+{ $description "Declares the most recently defined word as a parsing word." }
+{ $examples "In the below example, the " { $snippet "world" } " word is never called, however its body references a parsing word which executes immediately:" { $example ": hello \"Hello parser!\" print ; parsing\n: world hello ;" "Hello parser!" } } ;
+
+HELP: inline
+{ $syntax "inline" }
+{ $description
+    "Declares the most recently defined word as an inline word."
+    $terpri
+    "Combinators must be inlined in order to compile - see " { $link "inference-combinators" } ". For any other word, inlining is merely an optimization. Inlining does not affect the execution of the word in the interpreter."
+} ;
+
+HELP: foldable
+{ $syntax "foldable " }
+{ $description
+    "Declares that the most recently defined word may be evaluated at compile-time if all inputs are literal. Foldable words must satisfy a very strong contract:"
+    { $list
+        "foldable words must not have any observable side effects,"
+        "foldable words must halt - for example, a word computing a series until it coverges should not be foldable, since compilation will not halt in the event the series does not converge."
+        "both inputs and outputs of foldable words must be immutable."
+    }
+    "The last restriction ensures that words such as " { $link clone } " do not satisfy the foldable word contract. Indeed, " { $link clone } " will output a mutable object if its input is mutable, and so it is undesirable to evaluate it at compile-time, since doing so would give incorrect semantics for code that clones mutable objects and proceeds to mutate them."
+}
+{ $examples "Most operations on numbers are foldable. For example, " { $snippet "2 2 +" } " compiles to a literal 4, since " { $link + } " is declared foldable." } ;
+
+HELP: t
+{ $syntax "t" }
+{ $values { "t" "the canonical truth value" } }
+{ $description "The canonical instance of " { $link general-t } ". It is just a symbol." } ;
+
+HELP: f
+{ $syntax "f" }
+{ $values { "f" "the singleton false value" } }
+{ $description "The " { $link f } " parsing word adds the " { $link f } " object to the parse tree, and is also the class whose sole instance is the " { $link f } " object. The " { $link f } " object is the singleton false value, the only object that is not true. The " { $link f } " object is not equal to the " { $link f } " class word, which can be pushed on the stack using word wrapper syntax:"
+{ $code "f    ! the singleton f object denoting falsity\n\\ f  ! the f class word" } } ;
+
+HELP: [
+{ $syntax "[ elements... ]" }
+{ $description "Marks the beginning of a literal quotation." }
+{ $examples { $code "[ 1 2 3 ]" } }
+{ $see-also POSTPONE: ] } ;
+
+HELP: ]
+{ $syntax "]" }
+{ $description "Marks the end of a literal quotation." }
+{ $see-also POSTPONE: [ } ;
+
+HELP: }
+{ $syntax "}" }
+{ $description "Marks the end of an array, vector, hashtable, complex number, tuple, or wrapper." }
+{ $see-also POSTPONE: { POSTPONE: V{ POSTPONE: H{ POSTPONE: C{ POSTPONE: T{ POSTPONE: W{ } ;
+
+HELP: {
+{ $syntax "{ elements... }" }
+{ $values { "elements" "a list of objects" } }
+{ $description "Marks the beginning of a literal array." } 
+{ $examples { $code "{ 1 2 3 }" } } ;
+
+HELP: V{
+{ $syntax "V{ elements... }" }
+{ $values { "elements" "a list of objects" } }
+{ $description "Marks the beginning of a literal vector." } 
+{ $examples { $code "V{ 1 2 3 }" } } ;
+
+HELP: H{
+{ $syntax "H{ { key value }... }" }
+{ $values { "key" "an object" } { "value" "an object" } }
+{ $description "Marks the beginning of a literal hashtable, given as a list of two-element arrays holding key/value pairs." }
+{ $examples { $code "H{ { \"tuna\" \"fish\" } { \"jalapeno\" \"vegetable\" } }" } } ;
+
+HELP: C{
+{ $syntax "C{ real imaginary }" }
+{ $values { "real" "a real number" } { "imaginary" "a real number" } }
+{ $description "Parses a complex number given in rectangular form as a pair of real numbers." } ;
+
+HELP: T{
+{ $syntax "T{ class delegate slots... }" }
+{ $values { "class" "a tuple class word" } { "delegate" "a delegate" } { "slots" "list of objects" } }
+{ $description "Marks the beginning of a literal tuple. The class word must always be specified. If an insufficient number of values is given after the class word, the remaining slots of the tuple are set to " { $link f } ". If too many values are given, an error is thrown." } ;
+
+HELP: W{
+{ $syntax "W{ object }" }
+{ $values { "object" "an object" } }
+{ $description "Marks the beginning of a literal wrapper." }
+{ $see-also POSTPONE: \ <wrapper> literalize } ;
+
+HELP: POSTPONE:
+{ $syntax "POSTPONE: word" }
+{ $values { "word" "a word" } }
+{ $description "Reads the next word from the input string and appends the word to the parse tree, even if it is a parsing word." }
+{ $examples "For an ordinary word " { $snippet "foo" } ", " { $snippet "foo" } " and " { $snippet "POSTPONE: foo" } " are equivalent; however, if " { $snippet "foo" } " is a parsing word, the former will execute it at parse time, while the latter will execute it at runtime." }
+{ $notes "This word is used inside parsing words to delegate further action to another parsing word, and to refer to parsing words literally from literal arrays and such." } ;
+
+HELP: :
+{ $syntax ": word definition... ;" }
+{ $values { "word" "a new word to define" } { "definition" "a word definition" } }
+{ $description "Defines a compound word in the current vocabulary." }
+{ $examples { $code ": ask-name ( -- name )\n    \"What is your name? \" write readln ;\n: greet ( name -- )    \"Greetings, \" write print ;\n: friend ( -- )    ask-name greet ;" } }
+{ $see-also POSTPONE: ; define-compound } ;
+
+HELP: ;
+{ $syntax ";" }
+{ $description
+    "Marks the end of a definition."
+    $terpri
+    "Parsing words can use this word as a generic end delimiter. It has parse-time stack effect " { $snippet "( definer parsed -- )" } "; when parsed, it reverses the " { $snippet "parsed" } " quotation, and passes it as input to the " { $snippet "definer" } " quotation."
+}
+{ $see-also POSTPONE: : POSTPONE: G: POSTPONE: M: POSTPONE: C: POSTPONE: UNION: POSTPONE: PREDICATE: POSTPONE: USING: } ;
+
+HELP: SYMBOL:
+{ $syntax "SYMBOL: word" }
+{ $values { "word" "a new word to define" } }
+{ $description "Defines a new symbol word in the current vocabulary. Symbols push themselves on the stack when executed, and are used to identify variables (see " { $link "namespaces" } ") as well as for storing crufties in word properties (see " { $link "word-props" } ")." }
+{ $examples { $example "SYMBOL: foo\nfoo ." "foo" } } ;
+
+HELP: \
+{ $syntax "\\ word" }
+{ $values { "word" "a word" } }
+{ $description "Reads the next word from the input and appends a wrapper holding the word to the parse tree. When the evaluator encounters a wrapper, it pushes the wrapped word literally on the data stack." }
+{ $examples "The following two lines are equivalent:" { $code "0 \\ <vector> execute\n0 <vector>" } } ;
+
+HELP: DEFER:
+{ $syntax "DEFER: word" }
+{ $values { "word" "a new word to define" } }
+{ $description "Create a word in the current vocabulary that simply raises an error when executed. Usually, the word will be replaced with a real definition later." }
+{ $notes "Due to the way the parser works, words cannot be referenced before they are defined; that is, source files must order definitions in a strictly bottom-up fashion. Mutually-recursive pairs of words can be implemented by " { $emphasis "deferring" } " one of the words in the pair allowing the second word in the pair to parse, then by defining the first word." }
+{ $examples { $code "DEFER: foe\n: fie ... foe ... ;\n: foe ... fie ... ;" } } ;
+
+HELP: FORGET:
+{ $syntax "FORGET: word" }
+{ $values { "word" "a word" } }
+{ $description "Removes the word from its vocabulary, or does nothing if no such word exists. Existing definitions that reference forgotten words will continue to work, but new occurrences of the word will not parse." } ;
+
+HELP: USE:
+{ $syntax "USE: vocabulary" }
+{ $values { "vocabulary" "a vocabulary name" } }
+{ $description "Adds a new vocabulary at the front of the search path. Subsequent word lookups by the parser will search this vocabulary first." }
+{ $errors "Throws an error if the vocabulary does not exist." } ;
+
+HELP: USING:
+{ $syntax "USING: vocabularies... ;" }
+{ $values { "vocabularies" "a list of vocabulary names" } }
+{ $description "Adds a list of vocabularies to the front of the search path, with later vocabularies taking precedence." }
+{ $errors "Throws an error if one of the vocabularies does not exist." } ;
+
+HELP: IN:
+{ $syntax "IN: vocabulary" }
+{ $values { "vocabulary" "a new vocabulary name" } }
+{ $description "Sets the current vocabulary where new words will be defined, creating the vocabulary first if it does not exist. After the vocabulary has been created, it can be listed in " { $link POSTPONE: USE: } " and " { $link POSTPONE: USING: } " declarations." } ;
+
+HELP: CHAR:
+{ $syntax "CHAR: token" }
+{ $values { "token" "a literal character or escape code" } }
+{ $description "Adds the Unicode code point of the character represented by the token to the parse tree." } ;
+
+HELP: "
+{ $syntax "\"string...\"" }
+{ $values { "string" "literal and escaped characters" } }
+{ $description "Reads from the input string until the next occurrence of " { $link POSTPONE: " } ", and appends the resulting string to the parse tree. String literals cannot span multiple lines. Strings containing the " { $link POSTPONE: " } " character and various other special characters can be read by inserting escape sequences." }
+{ $examples { $example "\"Hello\nworld\" print" "Hello\nworld" } } ;
+
+HELP: SBUF"
+{ $syntax "SBUF\" string... \"" }
+{ $values { "string" "literal and escaped characters" } }
+{ $description "Reads from the input string until the next occurrence of " { $link POSTPONE: " } ", converts the string to a string buffer, and appends it to the parse tree." }
+{ $examples { $example "SBUF\" Hello world\" >string print" "Hello world" } } ;
+
+HELP: (
+{ $syntax "( inputs -- outputs )" }
+{ $values { "inputs" "a list of tokens" } { "outputs" "a list of tokens" } }
+{ $description "Declares the stack effect of the most recently defined word, storing a new " { $link effect } " instance in the " { $snippet "\"declared-effect\"" } " word property." }
+{ $notes "Recursive words must have a declared stack effect to compile. See " { $link "effect-declaration" } " for details." } ;
+
+HELP: !
+{ $syntax "! comment..." }
+{ $values { "comment" "characters" } }
+{ $description "Discards all input until the end of the line." }
+{ $see-also POSTPONE: #! } ;
+
+HELP: #!
+{ $syntax "#! comment..." }
+{ $values { "comment" "characters" } }
+{ $description "Discards all input until the end of the line." }
+{ $see-also POSTPONE: ! } ;
+
+HELP: HEX:
+{ $syntax "HEX: integer" }
+{ $values { "integer" "hexadecimal digits (0-9, a-f, A-F)" } }
+{ $description "Adds an integer read from a hexadecimal literal to the parse tree." }
+{ $examples { $example "HEX: ff ." "255" } } ;
+
+HELP: OCT:
+{ $syntax "OCT: integer" }
+{ $values { "integer" "octal digits (0-7)" } }
+{ $description "Adds an integer read from an octal literal to the parse tree." }
+{ $examples { $example "OCT: 31337 ." "13023" } } ;
+
+HELP: BIN:
+{ $syntax "BIN: integer" }
+{ $values { "integer" "binary digits (0 and 1)" } }
+{ $description "Adds an integer read from an binary literal to the parse tree." }
+{ $examples { $example "BIN: 100 ." "4" } } ;
+
+HELP: GENERIC:
+{ $syntax "GENERIC: word" }
+{ $values { "word" "a new word to define" } }
+{ $description "Defines a new generic word in the current vocabulary. Initially, it contains no methods, and thus will throw a " { $link no-method } " error when called." }
+{ $notes
+    "A " { $link "method-combination" } " facility exists for customizing method dispatch behavior."
+    $terpri
+    "This parsing word is equivalent to the following usage of the more general " { $link POSTPONE: G: } " word:"
+    { $code "G: word 0 standard-combination ;" }
+}
+{ $see-also define-generic } ;
+
+HELP: G:
+{ $syntax "G: word combination... ;" }
+{ $values { "word" "a new word to define" } { "combination" "a method combination definition with stack effect " { $snippet "( word -- quot )" } } }
+{ $description "Defines a generic word using the long-form. A method combination is a quotation that is given the generic word on the stack, and outputs a quotation " { $emphasis "that becomes the definition of the word" } "." }
+{ $contract "The method combination quotation is called each time the generic word has to be updated (for example, when a method is added), and thus must be side-effect free." }
+{ $see-also define-generic* } ;
+
+HELP: M:
+{ $syntax "M: class generic definition... ;" }
+{ $values { "class" "a class word" } { "generic" "a generic word" } { "definition" "a method definition" } }
+{ $description "Defines a method, that is, a behavior for the generic word specialized on instances of the class." }
+{ $see-also define-method } ;
+
+HELP: UNION:
+{ $syntax "UNION: class members... ;" }
+{ $values { "class" "a new class word to define" } { "members" "a list of class words separated by whitespace" } }
+{ $description "Defines a union class. An object is an instance of a union class if it is an instance of one of its members." }
+{ $notes "Union classes are used to associate the same method with several different classes, as well as to conveniently define predicates." }
+{ $see-also define-union } ;
+
+HELP: PREDICATE:
+{ $syntax "PREDICATE: superclass class predicate... ;" }
+{ $values { "superclass" "an existing class word" } { "class" "a new class word to define" } { "predicate" "membership test with stack effect " { $snippet "( superclass -- ? )" } } }
+{ $description
+    "Defines a predicate class deriving from " { $snippet "superclass" } "."
+    $terpri
+    "An object is an instance of a predicate class if two conditions hold:"
+    { $list
+        "it is an instance of the predicate's superclass,"
+        "it satisfies the predicate"
+    }
+    "Each predicate must be defined as a subclass of some other class. This ensures that predicates inheriting from disjoint classes do not need to be exhaustively tested during method dispatch."
+}
+{ $see-also define-predicate-class } ;
+
+HELP: TUPLE:
+{ $syntax "TUPLE: class slots... ;" }
+{ $values { "class" "a new class word to define" } { "slots" "a list of slot names" } }
+{ $description "Defines a new tuple class with membership predicate " { $snippet "name?" } " and constructor " { $snippet "<name>" } "."
+$terpri
+"Tuples are user-defined classes with instances composed of named slots. All tuple classes are subtypes of the built-in " { $link tuple } " type." }
+{ $see-also define-tuple } ;
+
+HELP: C:
+{ $syntax "C: class definition... ;" }
+{ $values { "class" "a class word" } { "definition" "a constructor definition" } }
+{ $description "Define a constructor word for a tuple class. The constructor definition receives a new instance of the class on the stack, with all slots initially set to " { $link f } "."
+$terpri
+"Constructors are named after the tuple class surrounded in angle brackets: " { $snippet "<" } " and " { $snippet ">" } ". Constructor words are defined in the same vocabulary as the tuple class, and the current value of the " { $link in } " variable has no effect."  }
+{ $contract "The definition must only have one output, the new tuple itself." }
+{ $notes "Each tuple class defines a default constructor that reads slot values from the stack. This parsing word redefines the default constructor." }
+{ $see-also define-constructor } ;
+
+HELP: REQUIRES:
+{ $syntax "REQUIRES: modules... ;" }
+{ $values { "modules" "module name strings" } }
+{ $description "Loads a list of modules by calling " { $link require } " on each one." } ;
+
+HELP: PROVIDE:
+{ $syntax "PROVIDE: name pairs... ;" }
+{ $values { "name" "a string" } { "pairs" "a sequence of pairs, with keys described below" } }
+{ $description "Registers a module definition and loads its source files by calling " { $link provide } "."
+$terpri
+"The module name is followed by key/value pairs, where the keys are drawn from the following set:"
+{ $list
+    { { $link +files+ } " - the value is a sequence of source file names" }
+    { { $link +tests+ } " - the value is a sequence of unit test file names" }
+    { { $link +help+ } " - the value is a help topic" }
+}
+"All keys are optional, and path names are relative to the main module directory."
+$terpri
+"Elements of path name lists can optionally be pairs, where the first element is a source file which is conditionally loaded if the quotation in the second element yields a true value." }
+{ $examples
+"An example where the conditional load feature is used to load platform-specific code:"
+{ $code
+"PROVIDE: libs/calendar"
+"{ +files+ {"
+"    { \"os-unix.factor\" [ unix? ] }"
+"    { \"os-win32.factor\" [ windows? ] }"
+"    \"calendar.factor\""
+"} }"
+"{ +tests+ { \"test/calendar.factor\" } } ;"
+} } ;
+
+HELP: MAIN:
+{ $syntax "MAIN: name definition... ;" }
+{ $values { "name" "a module name string" } { "definition" "an entry point definition" } }
+{ $description "Registers a module entry point which can be run by passing the module name to " { $link run-module } ". The entry point quotation must not take any inputs from the stack, or leave any values on the stack when returning." } ;

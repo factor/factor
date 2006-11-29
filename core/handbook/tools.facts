@@ -1,0 +1,134 @@
+USING: definitions errors help image tools io kernel
+listener memory modules parser prettyprint sequences test
+words shells ;
+
+ARTICLE: "tools" "Development tools"
+"This section covers words which are used during development, and not usually invoked directly by user code."
+$terpri
+"There are two useful development tools which are complex enough that separate sections are devoted to them; see " { $link "inference" } " and " { $link "compiler" } "."
+{ $subsection "listener" }
+{ $subsection "debugger" }
+{ $subsection "definitions" }
+{ $subsection "word-introspection" }
+{ $subsection "inspector" }
+{ $subsection "annotations" }
+{ $subsection "sources" }
+{ $subsection "images" }
+{ $subsection "memory" }
+{ $subsection "timing" } ;
+
+ARTICLE: "listener" "The listener"
+"The listener evaluates Factor expressions read from a stream. The listener is the primary interface to the Factor runtime. Typically, you write Factor code in a text editor, then load it using the listener and test it."
+$terpri
+"The classical first program can be run in the listener:"
+{ $example "\"Hello, world\" print" "Hello, world" }
+"Multi-line phrases are supported:"
+{ $example "{ 1 2 3 } [\n    .\n] each" "1\n2\n3" }
+"The listener knows when to expect more input by looking at the height of the stack. Parsing words such as " { $link POSTPONE: { } " leave elements on the parser stack, and corresponding words such as " { $link POSTPONE: } } " pop them."
+$terpri
+"A very common operation is to inspect the contents of the data stack in the listener:"
+{ $subsection .s }
+"Note that calls to " { $link .s } " can also be included inside words as a debugging aid, however a more convenient way to achieve this is to use the annotation facility. See " { $link "annotations" } "."
+$terpri
+"You can start a nested listener or exit a listener using the following words:"
+{ $subsection tty }
+{ $subsection bye }
+"The following variables can be rebound inside a nested scope to customize the behavior of a listener; this can be done to create a development tool with a custom interaction loop:"
+{ $subsection listener-hook }
+"Finally, the multi-line expression reading word can be used independently of the rest of the listener:"
+{ $subsection parse-interactive } ;
+
+ARTICLE: "sources" "Source files"
+"The simplest way to distribute a piece of Factor code is in the form of a source file. Source files can be loaded in the listener:"
+{ $subsection run-file }
+"Factor tracks which source files definitions were loaded from; see " { $link "definitions" } "."
+$terpri
+"Details on the Factor source parser itself can be found in " { $link "parser" } "."
+$terpri
+"Modules in the " { $snippet "apps/" } " and " { $snippet "libs/" } " directories of the Factor distribution should be loaded via the high-level module system instead of the above words (" { $link "modules" } ")." ;
+
+ARTICLE: "debugger" "The debugger"
+"If an expression entered in the listener throws an error, the error is printed to the output stream. A number of words facilitate interactive debugging of the error:"
+{ $subsection :s }
+{ $subsection :r }
+{ $subsection :c }
+{ $subsection :get }
+"You can get a more detailed explanation as most types of errors are documented:"
+{ $subsection :help }
+"If the error is recoverable, a list of restarts is also printed, and a numbered restart can be invoked:"
+{ $subsection :res }
+"You can read more about error handling in " { $link "errors" } "." ;
+
+ARTICLE: "inspector" "The inspector"
+"The prettyprinter (see " { $link "prettyprint" } ") can turn any object into a source representation. Sometimes this source representation is hard to read for a human, so the inspector provides an alternative tabular view of an object:"
+{ $subsection inspect }
+"The inspector supports a number of commands which operate on the most recently inspected object:"
+{ $subsection me }
+{ $subsection go }
+{ $subsection up }
+"Word for getting very brief descriptions of words and general objects:"
+{ $subsection summary } ;
+
+ARTICLE: "memory" "Object memory"
+"You can print object heap status information:"
+{ $subsection room. }
+{ $subsection heap-stats. }
+"There are a pair of combinators, analogous to " { $link each } " and " { $link subset } ", which operate on the entire collection of objects in the object heap:"
+{ $subsection each-object }
+{ $subsection instances } ;
+
+ARTICLE: "word-introspection" "Word introspection"
+"Words support the definition protocol; see " { $link "definitions" } " for general tools that work with definitions. A few word-specific tools also exist:"
+{ $subsection apropos }
+{ $subsection vocabs }
+{ $subsection words }
+{ $subsection usage. } ;
+
+ARTICLE: "definitions" "Definitions"
+"A " { $emphasis "definition" } " is something read from a source file -- this includes words, methods, and help articles."
+$terpri
+"Words that work with definition take " { $emphasis "definition specifiers" } " as input. A definition specifier is one of the following:"
+{ $list
+    "a word"
+    "a two-element array, holding a class name and a generic word name, naming a method"
+    { "a " { $link link } " instance holding a word or a help topic, naming a piece of documentation" }
+}
+"The following words all accept definition specifiers."
+$terpri
+"Obtaining information about definitions:"
+{ $subsection see }
+{ $subsection where }
+{ $subsection subdefs }
+"Editing definitions:"
+{ $subsection edit }
+{ $subsection reload }
+"Removing definitions:"
+{ $subsection forget } ;
+
+ARTICLE: "timing" "Timing code"
+"You can time the execution of a quotation in the listener:"
+{ $subsection time }
+"A lower-level word puts timings on the stack, intead of printing:"
+{ $subsection benchmark }
+"You can also read the system clock and total garbage collection time directly:"
+{ $subsection millis } 
+{ $subsection gc-time } ;
+
+ARTICLE: "annotations" "Word annotations"
+"The word annotation feature modifies word definitions to add debugging code. You can restore the old definition by calling " { $link reload } " on the word in question."
+{ $subsection watch }
+{ $subsection profile }
+"All of the above words are implemented using a single combinator which applies a quotation to a word definition to yield a new definition:"
+{ $subsection annotate } ;
+
+ARTICLE: "images" "Working with images"
+"Factor is an " { $emphasis "image-based" } " system, meaning it integrates a persistence mechanism where the object heap can be checkpointed to disk and loaded back in. Every time Factor runs, it starts by loading an image. The image contains all code and data needed to run Factor in a \"ready-to-go\" form."
+$terpri
+"Image files are loaded by launching the Factor runtime with the image file as the first command line argument. Images are saved using one of the following two words; the latter takes an image path as a parameter:"
+{ $subsection save }
+{ $subsection save-image }
+"A new image can also be built from sources; this is known as " { $emphasis "bootstrap" } ". Bootstrap is a two-step process. The first stage is the creation of a bootstrap image inside a running Factor instance:"
+{ $subsection make-image }
+"The second stage is initiated by running the resulting bootstrap image. This stage loads any additional platform-specific code, compiles all words, and dumps a new, final image."
+$terpri
+"The bootstrap image supports a number of command line arguments; see " { $link "bootstrap-cli-args" } "." ;
