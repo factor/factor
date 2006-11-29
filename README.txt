@@ -165,11 +165,15 @@ no option to run the listener in the command prompt on Windows.
 
 * Source organization
 
-  doc/ - the developer's handbook, and various other bits and pieces
-  contrib/ - various handy libraries not part of the core
-  examples/ - small examples illustrating various language features
+The following four directories are managed by the module system; consult
+the documentation for details:
+
+  apps/ - user-contributed applications
+  libs/ - user-contributed libraries
+  demos/ - small examples illustrating various language features
+  core/ - sources for the library, written in Factor
+
   fonts/ - TrueType fonts used by UI
-  library/ - sources for the library, written in Factor
   vm/ - sources for the Factor runtime, written in C
 
 * Community
@@ -190,10 +194,6 @@ Doug Coleman:       Mersenne Twister RNG, Windows port
 Eduardo Cavazos:    X11 binding
 Joshua Grams:       PowerPC instruction cache flush code
 Mackenzie Straight: Windows port
-Trent Buck:         Debian package
-
-A number of contributed libraries not part of the core can be found in
-contrib/. See contrib/README.txt for details.
 
 Have fun!
 
