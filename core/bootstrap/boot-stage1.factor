@@ -13,7 +13,7 @@ prettyprint sequences vectors words ;
 [
     \ boot ,
 
-    "library" require
+    "core" require
     "core/compiler" require
     "core/io/buffer" require
     "core/ui" require
