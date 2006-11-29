@@ -19,6 +19,12 @@ USE: test
 
 [ t ] [ 134.3 >fixnum 134 = ] unit-test
 
+[ 3 ] [ 3.5 >bignum ] unit-test
+[ -3 ] [ -3.5 >bignum ] unit-test
+
+[ 3 ] [ 3.5 >fixnum ] unit-test
+[ -3 ] [ -3.5 >fixnum ] unit-test
+
 [ 2.1 ] [ -2.1 neg ] unit-test
 
 [ 1 ] [ 0.5 1/2 + ] unit-test

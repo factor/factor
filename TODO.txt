@@ -31,6 +31,7 @@
   - 10000 [ dup number>string ] map describe in the UI
   - available-modules
   - :trace
+  - string-lines
 - auto-update browser and help when sources reload
 - mac intel: struct returns from objc methods
 - new windows don't always have focus, eg focus follows mouse
