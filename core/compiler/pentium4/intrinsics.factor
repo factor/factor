@@ -41,7 +41,7 @@ M: float-regs (%replace) drop swap %allot-float ;
 ] each
 
 \ float>fixnum [
-    "out" operand "in" operand CVTSD2SI
+    "out" operand "in" operand CVTTSD2SI
     "out" operand tag-bits SHL
 ] H{
     { +input+ { { float "in" } } }

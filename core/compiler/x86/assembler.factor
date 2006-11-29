@@ -414,3 +414,4 @@ M: integer IMUL2 swap dup reg-code t HEX: 69 immediate-1/4 ;
 : COMISD ( dest src -- ) HEX: 66 HEX: 2f 2-operand-sse ;
 : CVTSI2SD ( dest src -- ) HEX: f2 HEX: 2a 2-operand-sse ;
 : CVTSD2SI ( dest src -- ) HEX: f2 HEX: 2d 2-operand-int/sse ;
+: CVTTSD2SI ( dest src -- ) HEX: f2 HEX: 2c 2-operand-int/sse ;
