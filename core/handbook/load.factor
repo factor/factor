@@ -1,4 +1,4 @@
-PROVIDE: doc/handbook
+PROVIDE: core/handbook
 { +files+ {
     "alien.facts"
     "changes.facts"
