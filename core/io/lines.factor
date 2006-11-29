@@ -1,4 +1,4 @@
-! Copyright (C) 2004, 2005 Slava Pestov.
+! Copyright (C) 2004, 2006 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 IN: io
 USING: errors generic io kernel math namespaces sequences

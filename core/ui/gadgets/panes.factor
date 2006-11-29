@@ -63,10 +63,10 @@ M: pane-stream stream-write1
     [ pane-current stream-write1 ] do-pane-stream ;
 
 M: pane-stream stream-write
-    [ swap "\n" split pane-write ] do-pane-stream ;
+    [ swap string-lines pane-write ] do-pane-stream ;
 
 M: pane-stream stream-format
-    [ rot "\n" split pane-format ] do-pane-stream ;
+    [ rot string-lines pane-format ] do-pane-stream ;
 
 M: pane-stream stream-close drop ;
 

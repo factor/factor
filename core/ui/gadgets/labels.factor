@@ -13,7 +13,7 @@ TUPLE: label text font color ;
 
 : set-label-string ( string label -- )
     CHAR: \n pick memq? [
-        >r "\n" split r> set-label-text
+        >r string-lines r> set-label-text
     ] [
         set-label-text
     ] if ; inline

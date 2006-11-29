@@ -40,7 +40,7 @@ C: source-file ( path -- source-file )
 : parse-lines ( lines -- quot )
     [ f [ (parse) ] reduce >quotation ] with-parser ;
 
-: parse ( str -- quot ) <string-reader> lines parse-lines ;
+: parse ( str -- quot ) string-lines parse-lines ;
 
 : eval ( str -- ) parse call ;
 

@@ -90,7 +90,7 @@ C: document ( -- document )
 
 : set-doc-range ( str startloc endloc document -- )
     [
-        >r >r >r "\n" split r> [ text+loc ] 2keep r> r>
+        >r >r >r string-lines r> [ text+loc ] 2keep r> r>
         [ (set-doc-range) ] change-model
     ] keep update-locs ;
 
@@ -123,7 +123,7 @@ C: document ( -- document )
     [ set-model ] keep dup doc-end swap update-locs ;
 
 : set-doc-text ( string document -- )
-    >r "\n" split r> set-doc-lines ;
+    >r string-lines r> set-doc-lines ;
 
 : clear-doc ( document -- )
     "" swap set-doc-text ;

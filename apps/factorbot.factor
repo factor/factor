@@ -76,7 +76,7 @@ M: ping handle-irc ( line -- )
 : factorbot-loop [ factorbot ] try 30000 sleep factorbot-loop ;
 
 : multiline-respond ( string -- )
-    <string-reader> lines [ respond ] each ;
+    string-lines [ respond ] each ;
 
 : object-href
     "http://factorcode.org" swap browser-link-href append ;

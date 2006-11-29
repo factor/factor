@@ -53,3 +53,6 @@ M: sbuf stream-read
 
 : contents ( stream -- str )
     <string-writer> [ stream-copy ] keep >string ;
+
+: string-lines ( string -- seq )
+    CHAR: \n add <string-reader> lines ;
