@@ -1,4 +1,5 @@
-USING: arrays errors math parser test kernel generic words ;
+USING: arrays errors math parser test kernel generic words io
+listener namespaces ;
 IN: temporary
 
 [ 1 CHAR: a ]
@@ -83,3 +84,22 @@ unit-test
 [ 2 ] [ "IN: temporary : \0. 2 ; \0." eval ] unit-test
 
 [ "IN: temporary : missing-- ( a b ) ;" eval ] unit-test-fails
+
+! Test interactive parsing, restarts
+[
+    file-vocabs
+    "errors" use+
+
+    [ [ + 1 2 3 4 ] ]
+    [
+        [
+            "cont" set
+            [
+                "\ + 1 2 3 4" 
+                <string-reader> <interactive-stream>
+                parse-interactive "cont" get continue-with
+            ] catch
+            "0 :res" eval
+        ] callcc1
+    ] unit-test
+] with-scope

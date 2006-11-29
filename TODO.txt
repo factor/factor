@@ -10,7 +10,6 @@
   - doesn't show #labels
   - we don't know if signal handlers run with the same stack or not
 - xml: chars>entities got broken
-- restarts broken: \ ADD see   0 :res   now its just ADD on the stack?
 
 + 0.88:
 

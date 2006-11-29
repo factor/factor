@@ -28,7 +28,9 @@ C: interactive-stream ( stream -- stream )
     ] if ;
 
 M: interactive-stream parse-interactive
-    [ V{ f } clone (parse-interactive) ] with-parser ;
+    [
+        [ V{ f } clone (parse-interactive) ] with-parser in get
+    ] with-scope in set ;
 
 M: duplex-stream parse-interactive
     duplex-stream-in parse-interactive ;
