@@ -22,15 +22,16 @@ M: interactor graft*
 
 : interactor-input. ( string interactor -- )
     interactor-output [
-        dup string? [
-            dup print-input
-        ] [
-            short.
-        ] if
+        dup string? [ dup print-input ] [ short. ] if
     ] with-stream* ;
 
+: add-interactor-history ( str interactor -- )
+    over empty? [ 2drop ] [ interactor-history push-new ] if ;
+
 : interactor-finish ( obj interactor -- )
-    dup editor-text over interactor-input.
+    [ editor-text ] keep
+    [ interactor-input. ] 2keep
+    [ add-interactor-history ] keep
     dup control-model clear-doc
     interactor-continuation continue-with ;
 
@@ -52,7 +53,6 @@ M: interactor graft*
 
 M: interactor stream-readln
     [
-        over empty? [ 2dup interactor-history push-new ] unless
         interactor-finish
     ] interactor-yield ;
 
