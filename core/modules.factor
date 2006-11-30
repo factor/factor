@@ -75,7 +75,9 @@ M: module-link module-name module-link-name ;
     [ module-files* run-files ] keep
     modules get push ;
 
-: test-module ( name -- ) module module-tests* run-tests ;
+: test-module ( name -- )
+    dup require
+    module module-tests* run-tests ;
 
 : test-modules ( -- )
     modules get [ module-tests* ] map concat run-tests ;
