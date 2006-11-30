@@ -63,19 +63,10 @@ SYMBOL: +keyboard+
 SYMBOL: +primary+
 SYMBOL: +secondary+
 
-TUPLE: operation predicate listener? primary? secondary? ;
+TUPLE: operation predicate primary? secondary? ;
 
 : (command) ( -- command )
     +name+ get +keyboard+ get +quot+ get <command> ;
-
-C: operation ( predicate hash -- operation )
-    swap [
-        (command) over set-delegate
-        +primary+ get over set-operation-primary?
-        +secondary+ get over set-operation-secondary?
-        +listener+ get over set-operation-listener?
-    ] bind
-    [ set-operation-predicate ] keep ;
 
 SYMBOL: operations
 

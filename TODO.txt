@@ -1,11 +1,10 @@
 + 0.87:
 
-- menu Command: quots look dumb
-- no need for modify-listener-operation!
+- ui operations: restarts are broken
 - command buttons: indicate shortcuts
-- hide popup after a restart
 - http://paste.lisp.org/display/30426
 - update ui docs
+- error window, why so small?
 
 + 0.88:
 
@@ -49,6 +48,7 @@
 
 + ui:
 
+- browser tool: dropdown menu button for definition operations
 - copying pane output
 - how do we refer to command shortcuts in the docs?
 - editor:

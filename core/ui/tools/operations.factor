@@ -9,19 +9,22 @@ test tools words generic models io modules errors ;
 
 V{ } clone operations set-global
 
+: handle-listener-operation
+    +listener+ get [
+        +quot+ [ [ curry call-listener ] curry ] change
+    ] when ;
+
+C: operation ( predicate hash -- operation )
+    swap clone [
+        handle-listener-operation
+        (command) over set-delegate
+        +primary+ get over set-operation-primary?
+        +secondary+ get over set-operation-secondary?
+    ] bind
+    [ set-operation-predicate ] keep ;
+
 : define-operation ( class props -- )
     <operation> operations get push-new ;
-
-M: operation invoke-command ( target operation -- )
-    dup command-quot swap operation-listener?
-    [ curry call-listener ] [ call ] if ;
-
-: modify-listener-operation ( quot operation -- operation )
-    clone t over set-operation-listener?
-    modify-command ;
-
-: modify-listener-operations ( operations quot -- operations )
-    swap [ modify-listener-operation ] map-with ;
 
 ! Objects
 [ drop t ] H{
@@ -310,12 +313,12 @@ M: operation invoke-command ( target operation -- )
 
 interactor "words"
 { word compound } [ class-operations ] map concat
-[ word-action ] modify-listener-operations
+[ word-action ] modify-commands
 define-commands
 
 interactor "quotations"
 quotation class-operations
-[ quot-action ] modify-listener-operations
+[ quot-action ] modify-commands
 define-commands
 
 help-gadget "toolbar" {

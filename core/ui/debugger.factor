@@ -13,8 +13,8 @@ queues sequences test threads help sequences words timers ;
 : <debugger-button>
     [ call-listener drop ] curry <bevel-button> ;
 
-: <restart-list> ( seq -- gadget )
-    [ drop ] [ restart-name ] rot <model> <list> ;
+: <restart-list> ( seq restart-hook -- gadget )
+    [ restart-name ] rot <model> <list> ;
 
 TUPLE: debugger restarts ;
 
@@ -23,7 +23,7 @@ TUPLE: debugger restarts ;
     2array make-pile
     1 over set-pack-fill ;
 
-C: debugger ( error restarts -- gadget )
+C: debugger ( error restarts restart-hook -- gadget )
     {
         {
             [ gadget get { debugger } <toolbar> ]
@@ -51,7 +51,8 @@ debugger "toolbar" {
 ] map define-commands
 
 : debugger-window ( error restarts -- )
-    restarts get <debugger> "Error" open-titled-window ;
+    restarts get [ drop ] <debugger>
+    "Error" open-titled-window ;
 
 : ui-try ( quot -- )
     [ debugger-window ] recover ;
