@@ -20,7 +20,7 @@ GENERIC: tool-help ( tool -- topic )
 
 M: gadget tool-help drop f ;
 
-TUPLE: workspace book popup ;
+TUPLE: workspace book popup error-hook ;
 
 : find-workspace [ workspace? ] find-parent ;
 

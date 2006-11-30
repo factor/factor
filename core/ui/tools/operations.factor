@@ -5,7 +5,7 @@ USING: definitions gadgets gadgets-browser gadgets-dataflow
 gadgets-help gadgets-listener gadgets-search gadgets-text
 gadgets-workspace hashtables help inference kernel namespaces
 parser prettyprint scratchpad sequences strings styles syntax
-test tools words generic models io modules ;
+test tools words generic models io modules errors ;
 
 V{ } clone operations set-global
 
@@ -49,6 +49,15 @@ M: operation invoke-command ( target operation -- )
     { +secondary+ t }
     { +name+ "Input" }
     { +quot+ [ listener-gadget call-tool ] }
+} define-operation
+
+! Restart
+[ restart? ] H{
+    { +primary+ t }
+    { +secondary+ t }
+    { +name+ "Restart" }
+    { +quot+ [ restart ] }
+    { +listener+ t }
 } define-operation
 
 ! Pathnames

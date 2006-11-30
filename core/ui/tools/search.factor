@@ -109,11 +109,6 @@ M: live-search focusable-child* live-search-field ;
     [ input-string ]
     <live-search> ;
 
-: show-titled-popup ( workspace gadget title -- )
-    [ find-workspace hide-popup ] <closable-gadget>
-    [ popup-theme ] keep
-    swap show-popup ;
-
 : workspace-listener ( workspace -- listener )
     listener-gadget swap find-tool tool-gadget nip ;
 

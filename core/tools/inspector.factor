@@ -25,8 +25,8 @@ SYMBOL: inspector-stack
 
 : inspector-help ( -- )
     "Object inspector." print
-    "up -- return to previous object" [ up ] print-quot
-    "me ( -- obj ) push this object" [ me ] print-quot
+    "up -- return to previous object" print
+    "me ( -- obj ) push this object" print
     "go ( n -- ) inspect nth slot" print
     terpri ;
 

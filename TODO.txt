@@ -1,22 +1,24 @@
 + 0.87:
 
 - parse errors should be shown in a popup
-- growable data heap
+  - menu Command: quots look dumb
+  - no need for modify-listener-operation!
+  - command buttons: indicate shortcuts
+- http://paste.lisp.org/display/30426
+- update ui docs
 
++ 0.88:
+
+- growable data heap
 - variable width word wrap
 - graphical crossref tool
-- http://paste.lisp.org/display/30426
 - compiled call traces:
   - should be independent of whenever the runtime was built with
     -fomit-frame-pointer or not
   - doesn't show #labels
   - we don't know if signal handlers run with the same stack or not
-
-+ 0.88:
-
 - use crc32 instead of modification date in reload-modules
 - models: don't do redundant work
-- menu Command: quots look dumb
 - top level window positioning on ms windows
 - crashes:
   - callback scheduling issue
@@ -31,6 +33,7 @@
   - available-modules
   - :trace
   - string-lines
+  - md5, crc32
 - auto-update browser and help when sources reload
 - mac intel: struct returns from objc methods
 - new windows don't always have focus, eg focus follows mouse

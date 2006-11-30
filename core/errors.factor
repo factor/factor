@@ -30,15 +30,20 @@ SYMBOL: restarts
     [ >c drop call c> drop ]
     [ rot drop swap call ] ifcc ; inline
 
-TUPLE: condition restarts cc ;
+TUPLE: condition restarts continuation ;
 
 C: condition ( error restarts cc -- condition )
-    [ set-condition-cc ] keep
+    [ set-condition-continuation ] keep
     [ set-condition-restarts ] keep
     [ set-delegate ] keep ;
 
 : condition ( error restarts -- restart )
     [ <condition> throw ] callcc1 2nip ;
+
+TUPLE: restart name obj continuation ;
+
+: restart ( restart -- )
+    dup restart-obj swap restart-continuation continue-with ;
 
 GENERIC: compute-restarts ( error -- seq )
 
@@ -48,8 +53,9 @@ M: tuple compute-restarts delegate compute-restarts ;
 
 M: condition compute-restarts
     [ delegate compute-restarts ] keep
-    [ condition-cc ] keep
-    condition-restarts [ swap add ] map-with append ;
+    [ condition-continuation ] keep
+    condition-restarts [ first2 rot <restart> ] map-with
+    append ;
 
 PREDICATE: array kernel-error ( obj -- ? )
     dup first \ kernel-error eq? swap second 0 18 between? and ;

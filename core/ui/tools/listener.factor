@@ -6,13 +6,16 @@ gadgets-panes gadgets-scrolling gadgets-text
 gadgets-theme gadgets-tracks gadgets-workspace
 generic hashtables tools io kernel listener math models
 namespaces parser prettyprint sequences shells strings styles
-threads words definitions help ;
+threads words definitions help errors ;
 
 TUPLE: listener-gadget input output stack use ;
 
 : ui-listener-hook ( listener -- )
     use get over set-listener-gadget-use
     >r datastack r> listener-gadget-stack set-model ;
+
+: ui-error-hook ( listener -- )
+    find-workspace dup workspace-error-hook call ;
 
 : listener-stream ( listener -- stream )
     dup listener-gadget-input
@@ -37,7 +40,9 @@ TUPLE: listener-gadget input output stack use ;
 
 : listener-thread ( listener -- )
     dup listener-stream [
+        dup
         [ ui-listener-hook ] curry listener-hook set
+        [ ui-error-hook ] curry error-hook set
         find-messages batch-errors set
         welcome.
         listener

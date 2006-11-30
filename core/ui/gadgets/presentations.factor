@@ -81,9 +81,6 @@ presentation H{
         [ presentation-object summary ] [ "" ] if*
     ] <filter> <label-control> dup reverse-video-theme ;
 
-: <listener-button> ( gadget quot -- button )
-    [ call-listener drop ] curry <roll-button> ;
-
 ! Character styles
 
 : apply-style ( style gadget key quot -- style gadget )
@@ -106,16 +103,12 @@ presentation H{
 : apply-presentation-style ( style gadget -- style gadget )
     presented [ <presentation> ] apply-style ;
 
-: apply-quotation-style ( style gadget -- style gadget )
-    quotation [ <listener-button> ] apply-style ;
-
 : <styled-label> ( style text -- gadget )
     <label>
     apply-foreground-style
     apply-background-style
     apply-font-style
     apply-presentation-style
-    apply-quotation-style
     nip ;
 
 ! Paragraph styles
@@ -148,7 +141,6 @@ presentation H{
     apply-border-color-style
     apply-page-color-style
     apply-presentation-style
-    apply-quotation-style
     apply-outliner-style
     nip ;
 

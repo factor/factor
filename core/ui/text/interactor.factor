@@ -9,7 +9,7 @@ math listener models errors ;
 TUPLE: interactor
 history output
 continuation quot busy?
-use in ;
+use in error-hook ;
 
 C: interactor ( output -- gadget )
     [ set-interactor-output ] keep
@@ -66,19 +66,21 @@ M: interactor stream-read
 
 : save-in/use ( interactor -- )
     use get over set-interactor-use
-    in get swap set-interactor-in ;
+    in get over set-interactor-in
+    error-hook get swap set-interactor-error-hook ;
 
 : restore-in/use ( interactor -- )
     dup interactor-use use set
-    interactor-in in set ;
+    dup interactor-in in set
+    interactor-error-hook error-hook set ;
 
 : go-to-error ( interactor error -- )
     dup parse-error-line 1- swap parse-error-col 2array
     over editor-caret set-model mark>caret ;
 
 : handle-parse-error ( interactor error -- )
-    dup parse-error? [ 2dup go-to-error delegate ] when
-    swap interactor-output [ print-error ] with-stream* ;
+    dup parse-error? [ dupd go-to-error ] when
+    interactor-error-hook call ;
 
 : try-parse ( str interactor -- quot/error/f )
     [

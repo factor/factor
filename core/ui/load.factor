@@ -40,6 +40,7 @@ PROVIDE: core/ui
     "text/interactor.factor"
     "ui.factor"
     "tools/tools.factor"
+    "tools/debugger.factor"
     "tools/messages.factor"
     "tools/listener.factor"
     "tools/walker.factor"

@@ -4,9 +4,10 @@ IN: gadgets-workspace
 USING: help arrays compiler gadgets gadgets-books
 gadgets-browser gadgets-buttons gadgets-dataflow gadgets-help
 gadgets-listener gadgets-presentations gadgets-walker
-gadgets-workspace generic kernel math modules scratchpad
+gadgets-debugger generic kernel math modules scratchpad
 sequences syntax words io namespaces hashtables
-gadgets-scrolling gadgets-panes gadgets-messages ;
+gadgets-scrolling gadgets-panes gadgets-messages gadgets-theme
+errors ;
 
 C: tool ( gadget -- tool )
     {
@@ -61,13 +62,6 @@ tool "toolbar" {
 : <workspace-book> ( -- gadget )
     workspace-tabs 1 <column> [ execute <tool> ] map <book> ;
 
-C: workspace ( -- workspace )
-    {
-        { [ <workspace-book> ] set-workspace-book f @center }
-        { [ gadget get <workspace-tabs> ] f f @top }
-        { [ gadget get { workspace } <toolbar> ] f f @bottom }
-    } make-frame* ;
-
 M: workspace pref-dim* delegate pref-dim* { 550 650 } vmax ;
 
 : init-status ( world -- )
@@ -79,8 +73,15 @@ M: workspace pref-dim* delegate pref-dim* { 550 650 } vmax ;
     request-focus ;
 
 : show-popup ( gadget workspace -- )
-    dup hide-popup 2dup set-workspace-popup dupd add-gadget
+    dup hide-popup
+    2dup set-workspace-popup
+    dupd add-gadget
+    dup popup-theme
     request-focus ;
+
+: show-titled-popup ( workspace gadget title -- )
+    [ find-workspace hide-popup ] <closable-gadget>
+    swap show-popup ;
 
 : popup-dim ( workspace -- dim )
     rect-dim first2 4 /i 2array ;
@@ -93,6 +94,18 @@ M: workspace pref-dim* delegate pref-dim* { 550 650 } vmax ;
 : layout-popup ( workspace gadget -- )
     over popup-dim over set-gadget-dim
     swap popup-loc swap set-rect-loc ;
+
+: debugger-popup ( workspace -- )
+    error get restarts get <debugger>
+    "Error" show-titled-popup ;
+
+C: workspace ( -- workspace )
+    [ debugger-popup ] over set-workspace-error-hook
+    {
+        { [ <workspace-book> ] set-workspace-book f @center }
+        { [ gadget get <workspace-tabs> ] f f @top }
+        { [ gadget get { workspace } <toolbar> ] f f @bottom }
+    } make-frame* ;
 
 M: workspace layout*
     dup delegate layout*

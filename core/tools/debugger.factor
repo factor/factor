@@ -64,7 +64,7 @@ M: string error. print ;
     "(offset " write word-xt - >hex write ")" write ;
 
 : bare-xt. ( xt -- )
-    "C code:   " write xt. ;
+    "C code: " write xt. ;
 
 : :trace
     error-stack-trace get symbolic-stack-trace <reversed> [
@@ -78,12 +78,10 @@ M: string error. print ;
     error-continuation get continuation-name hash-stack ;
 
 : :res ( n -- )
-    restarts get-global nth
-    f restarts set-global
-    first3 continue-with ;
+    restarts get-global nth f restarts set-global restart ;
 
 : :edit ( -- )
-    error get delegates [ parse-error-file ] find nip [
+    error get delegates [ parse-error? ] find-last nip [
         dup parse-error-file ?resource-path
         swap parse-error-line edit-location
     ] when* ;
@@ -104,8 +102,7 @@ M: string error. print ;
     } cond ;
 
 : restart. ( restart n -- )
-    [ [ # " :res  " % first % ] "" make ] keep
-    [ :res ] curry print-quot ;
+    [ # " :res  " % restart-name % ] "" make print ;
 
 : restarts. ( -- )
     restarts get dup empty? [
@@ -121,13 +118,13 @@ M: string error. print ;
     terpri
     "Debugger commands:" print
     terpri
-    ":help - documentation for this error" [ :help ] print-quot
-    ":s    - data stack at exception time" [ :s ] print-quot
-    ":r    - retain stack at exception time" [ :r ] print-quot
-    ":c    - call stack at exception time" [ :c ] print-quot
+    ":help - documentation for this error" print
+    ":s    - data stack at exception time" print
+    ":r    - retain stack at exception time" print
+    ":c    - call stack at exception time" print
 
     error get [ parse-error? ] is? [
-        ":edit - jump to source location" [ :edit ] print-quot
+        ":edit - jump to source location" print
     ] when
 
     ":get  ( var -- value ) accesses variables at time of the error" print
@@ -142,4 +139,7 @@ M: string error. print ;
         "Error in print-error!" print
     ] recover drop ;
 
-: try ( quot -- ) [ print-error ] recover ;
+SYMBOL: error-hook
+
+: try ( quot -- )
+    [ error-hook get [ call ] [ print-error ] ?if ] recover ;
