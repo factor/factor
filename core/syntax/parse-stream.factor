@@ -66,8 +66,10 @@ SYMBOL: parse-hook
 
 : parse-file ( file -- quot )
     [
-        dup parsing-file dup record-file
-        [ ?resource-path <file-reader> ] keep parse-stream
+        [ parsing-file ] keep
+        [ ?resource-path <file-reader> ] keep
+        [ parse-stream ] keep
+        record-file
     ] [
         over parse-file-restarts condition drop parse-file
     ] recover ;

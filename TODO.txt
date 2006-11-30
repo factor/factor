@@ -1,7 +1,5 @@
 + 0.87:
 
-- macbook mouse tracking is off
-- xml: chars>entities got broken
 - parse errors should be shown in a popup
 - growable data heap
 
@@ -16,6 +14,7 @@
 
 + 0.88:
 
+- use crc32 instead of modification date in reload-modules
 - models: don't do redundant work
 - menu Command: quots look dumb
 - top level window positioning on ms windows
