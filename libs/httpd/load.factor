@@ -18,7 +18,6 @@ PROVIDE: libs/httpd
 } }
 { +tests+ {
     "test/html.factor"
-    "test/http-client.factor"
     "test/httpd.factor"
     "test/url-encoding.factor"
 } } ;

@@ -1,7 +1,5 @@
 ! Copyright (C) 2005 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-REQUIRES: libs/http ;
-
 IN: http-client
 USING: errors hashtables http kernel math namespaces parser
 sequences io strings ;
@@ -67,5 +65,3 @@ DEFER: http-get
     parse-url over parse-host <client> [
         post-request flush read-response stdio get contents
     ] with-stream ;
-
-PROVIDE: libs/http-client ;
