@@ -27,7 +27,13 @@ HELP: write-xml
 { $values { "xml-doc" "an XML document" } }
 { $description "prints the contents of an XML document to stdio" }
 { $notes "does not preserve what type of quotes were used or what data was omitted from version declaration" }
-{ $see-also xml>string xml-reprint } ;
+{ $see-also xml>string xml-reprint read-xml } ;
+
+HELP: read-xml
+{ $values { "stream" "a stream that supports readln" }
+    { "xml-doc" "an XML document" } }
+{ $description "exausts the given stream, reading an XML document from it" }
+{ $see-also write-xml string>xml } ;
 
 HELP: PROCESS:
 { $syntax "PROCESS: word" }
@@ -145,34 +151,70 @@ HELP: <prolog> ( version encoding standalone -- prolog )
 { $description "creates an XML prolog tuple" }
 { $see-also prolog <xml-doc> } ;
 
+HELP: comment
+{ $class-description "represents a comment in XML. Has one slot, text, which contains the string of the comment" }
+{ $see-also <comment> } ;
+
+HELP: <comment> ( text -- comment )
+{ $values { "text" "a string" } { "comment" "a comment" } }
+{ $description "creates an XML comment tuple" }
+{ $see-also comment } ;
+
+HELP: instruction
+{ $class-description "represents an XML instruction, such as <?xsl stylesheet='foo.xml'?>. Contains one slot, text, which contains the string between the question marks." }
+{ $see-also <instruction> } ;
+
+HELP: <instruction> ( text -- instruction )
+{ $values { "text" "a string" } { "instruction" "an XML instruction" } }
+{ $description "creates an XML parsing instruction, such as <?xsl stylesheet='foo.xml'?>." }
+{ $see-also instruction } ;
+
 ARTICLE: { "xml" "intro" } "XML"
     "The XML module attempts to implement the XML 1.1 standard, converting strings of text into XML and vice versa. It currently is a work in progress. Together with XML-RPC, this is a component of the F2EE framework."
     $terpri
-    "The XML module was implemented by Daniel Ehrenberg, with edits by Slava Pestov. Main functions implemented include:"
+    "The XML module was implemented by Daniel Ehrenberg, with edits by Slava Pestov."
+    { $subsection { "xml" "basic" } }
+    { $subsection { "xml" "classes" } }
+    { $subsection { "xml" "construct" } }
+    { $subsection { "xml" "utils" } } ;
+
+ARTICLE: { "xml" "basic" } "Basic words for XML processing"
+    "These are the most basic words needed for processing an XML document"
     { $subsection string>xml }
     { $subsection xml>string }
     { $subsection xml-parse-error }
     { $subsection xml-reprint }
     { $subsection write-xml }
-    { $subsection init-xml }
+    { $subsection read-xml }
+    { $subsection init-xml } ;
+
+ARTICLE: { "xml" "classes" } "XML data classes"
     "Data types that XML documents are made of:"
     { $subsection name }
     { $subsection tag }
     { $subsection contained-tag }
-!    { $subsection xml-string }
     { $subsection reference }
     { $subsection entity }
     { $subsection xml-doc }
     { $subsection prolog }
+    { $subsection comment }
+    { $subsection instruction } ;
+
+ARTICLE: { "xml" "construct" } "XML data constructors"
     "These data types are constructed with:"
     { $subsection <name> }
     { $subsection <tag> }
     { $subsection <contained-tag> }
-!    { $subsection <xml-string> }
     { $subsection <reference> }
     { $subsection <entity> }
     { $subsection <xml-doc> }
     { $subsection <prolog> }
+    { $subsection <comment> }
+    { $subsection <instruction> } ;
+
+ARTICLE: { "xml" "utils" } "XML processing utilities"
+    "Utilities for processing XML include..."
+    $terpri
     "System for creating words which dispatch on XML tags:"
     { $subsection POSTPONE: PROCESS: }
     { $subsection POSTPONE: TAG: }

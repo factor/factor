@@ -29,7 +29,7 @@ UNION: str-elem string entity reference ;
 : print-props ( hash -- )
     [
         " " write swap print-name "=\"" write
-        xml-string-array [ write-str-elem ] each "\"" write
+        [ write-str-elem ] each "\"" write
     ] hash-each ;
 
 GENERIC: (xml>string) ( object -- )

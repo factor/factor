@@ -13,7 +13,7 @@ TUPLE: instruction text ;
 
 : start-tag ( -- name ? )
     #! Outputs the name and whether this is a closing tag
-    get-char CHAR: / = dup [ incr-spot ] when
+    get-char CHAR: / = dup [ next ] when
     parse-name swap ;
 
 : (parse-quot) ( ch -- )
@@ -22,19 +22,19 @@ TUPLE: instruction text ;
         { [ dup not ]
           [ "File ended in quote" <xml-string-error> throw ] }
         { [ 2dup = ]
-          [ 2drop end-record , incr-spot ] }
+          [ 2drop end-record , next ] }
         { [ dup CHAR: & = ]
           [ drop parse-entity (parse-quot) ] }
         { [ CHAR: % = ] [ parse-reference (parse-quot) ] }
-        { [ t ] [ incr-spot (parse-quot) ] }
+        { [ t ] [ next (parse-quot) ] }
     } cond ;
 
 : parse-quot ( ch -- array )
-   [ new-record (parse-quot) ] { } make <xml-string> ;
+   [ new-record (parse-quot) ] { } make ;
 
 : parse-prop-value ( -- seq )
     get-char dup "'\"" member? [
-        incr-spot parse-quot
+        next parse-quot
     ] [
         "Attribute lacks quote" <xml-string-error> throw
     ] if ;
@@ -54,7 +54,7 @@ TUPLE: instruction text ;
 
 : end-tag ( string hash -- tag )
     pass-blank get-char CHAR: / =
-    [ <contained> incr-spot ] [ <opener> ] if ;
+    [ <contained> next ] [ <opener> ] if ;
 
 : skip-comment ( -- comment )
     "--" expect-string
@@ -78,8 +78,8 @@ TUPLE: instruction text ;
 
 : make-tag ( -- tag/f )
     CHAR: < expect
-    { { [ get-char dup CHAR: ! = ] [ drop incr-spot directive ] }
-      { [ CHAR: ? = ] [ incr-spot instruction ] } 
+    { { [ get-char dup CHAR: ! = ] [ drop next directive ] }
+      { [ CHAR: ? = ] [ next instruction ] } 
       { [ t ] [
             start-tag [ <closer> ] [
                 middle-tag end-tag
@@ -105,14 +105,13 @@ SYMBOL: xml-stack
 ! A stack of hashtables
 SYMBOL: namespace-stack
 
+DEFER: print-name
+
 TUPLE: mismatched open close ;
-: write-name ( name -- )
-    dup name-space dup "" = [ drop ] [ write ":" write ] if
-    name-tag write ;
 M: mismatched error.
     "Mismatched tags" print
-    "Opening tag: <" write dup mismatched-open write-name ">" print
-    "Closing tag: </" write mismatched-close write-name ">" print ;
+    "Opening tag: <" write dup mismatched-open print-name ">" print
+    "Closing tag: </" write mismatched-close print-name ">" print ;
 
 TUPLE: unclosed tags ;
 C: unclosed ( -- unclosed )
@@ -121,7 +120,7 @@ C: unclosed ( -- unclosed )
 M: unclosed error.
     "Unclosed tags" print
     "Tags: " print
-    unclosed-tags [ "  <" write write ">" print ] each ;
+    unclosed-tags [ "  <" write print-name ">" print ] each ;
 
 : add-child ( object -- )
     xml-stack get peek second push ;
@@ -133,8 +132,7 @@ TUPLE: bad-uri string ;
 M: bad-uri error.
     "Bad URI:" print bad-uri-string . ;
 
-: xml-string>uri ( xml-string -- string )
-    xml-string-array
+: xml-string>uri ( seq -- string )
     dup length 1 = [ <bad-uri> throw ] unless
     first ;
 
@@ -166,9 +164,6 @@ M: nonexist-ns error.
     namespace-stack get pop drop ;
 
 GENERIC: process ( object -- )
-
-M: xml-string process 
-    xml-string-array [ add-child ] each ;
 
 M: object process add-child ;
 
@@ -236,7 +231,7 @@ M: extra-attrs error.
     } swap diff dup empty? [ drop ] [ <extra-attrs> throw ] if ; 
 
 : concat-strings ( xml-string -- string )
-    xml-string-array dup [ string? ] all?
+    dup [ string? ] all?
     [ "XML prolog attributes contain undefined entities"
       <xml-string-error> throw ] unless
     concat ;
@@ -273,7 +268,7 @@ M: bad-version error.
     stdio set
     { 0 0 0 "" } clone spot set
     f record set f now-recording? set
-    incr-spot
+    next
     "1.0" "iso-8859-1" f <prolog> prolog-data set
     init-xml-stack
     init-ns-stack ;
@@ -295,15 +290,15 @@ M: multitags error.
     dup [ any-tag? ] contains? [ <multitags> throw ] when r>
     swap <xml-doc> ;
 
-: (string>xml) ( -- )
-    parse-text process
-    get-char [ make-tag process (string>xml) ] when ;
+: (read-xml) ( -- )
+    parse-text [ add-child ] each
+    get-char [ make-tag process (read-xml) ] when ;
 
-: stream>xml ( stream -- xml-doc )
+: read-xml ( stream -- xml-doc )
     #! Produces a tree of XML nodes
     [
         init-xml
-        parse-prolog (string>xml)
+        parse-prolog (read-xml)
         xml-stack get
         dup length 1 = [ <unclosed> throw ] unless
         first second
@@ -311,7 +306,7 @@ M: multitags error.
     ] with-scope ;
 
 : string>xml ( string -- xml-doc )
-    <string-reader> stream>xml ;
+    <string-reader> read-xml ;
 
 UNION: xml-parse-error multitags notags xml-error extra-attrs nonexist-ns
        not-yes/no unclosed mismatched xml-string-error expected no-entity ;

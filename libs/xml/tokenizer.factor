@@ -40,7 +40,9 @@ SYMBOL: now-recording? ! t/f
     (end-record) tuck length swap -
     head-slice >string ;
 : end-record ( -- string )
-    1 end-record* ;
+    get-record length 0 =
+    [ "" f recording? set ]
+    [ 1 end-record* ] if ;
 
 !   -- Error reporting
 
@@ -85,34 +87,34 @@ M: xml-string-error error.
 
 !   -- Basic utility words
 
-: readln-nb ( -- string )
+: next-line ( -- string )
     ! read a non-blank line
-    readln dup "" = [ drop readln-nb ] when ;
+    readln dup "" = [ drop next-line ] when ;
 
-: (incr-spot) ( -- char )
+: (next) ( -- char )
     get-column get-line-str 2dup length 1- < [
         >r 1+ dup set-column r> nth
     ] [
         2drop 0 set-column
-        readln-nb dup set-line-str
+        next-line dup set-line-str
         [ first ] [ f ] if*
         get-line 1+ set-line
     ] if ;
 
-: incr-spot ( -- )
+: next ( -- )
     #! Increment spot.
     get-char [
          "XML document unexpectedly ended"
         <xml-string-error> throw
     ] unless
-    (incr-spot) dup set-char
+    (next) dup set-char
     recording? over and [ push-record ] [ drop ] if ;
 
 : skip-until ( quot -- )
     #! quot: ( -- ? )
     get-char [
         [ call ] keep swap [ drop ] [
-            incr-spot skip-until
+            next skip-until
         ] if
     ] [ 2drop ] if ; inline
 
@@ -140,22 +142,22 @@ M: xml-string-error error.
     [ dup string-matches? ] take-until
     get-line-str
     [ "Missing closing token" <xml-string-error> throw ] unless
-    swap length [ incr-spot ] times ;
+    swap length [ next ] times ;
 
 !   -- Parsing strings
 
 : expect ( ch -- )
     get-char 2dup = [ 2drop ] [
         >r ch>string r> ch>string <expected> throw
-    ] if incr-spot ;
+    ] if next ;
 
 : expect-string* ( num -- )
     #! only skips string, and only for when you're sure the string is there
-    [ incr-spot ] times ;
+    [ next ] times ;
 
 : expect-string ( string -- )
     ! TODO: add error if this isn't long enough
-    new-record dup length [ incr-spot ] times
+    new-record dup length [ next ] times
     end-record 2dup = [ 2drop ]
     [ <expected> throw ] if ;
 
@@ -182,26 +184,26 @@ TUPLE: entity name ;
     dup entities hash [ push-record ] [ 
         prolog-data get prolog-standalone
         [ <no-entity> throw ] [
-            end-record , <entity> , new-record
+            end-record , <entity> , next new-record
         ] if
     ] ?if ;
 
 : parse-entity ( -- )
-    unrecord
+    next unrecord unrecord 
     ! the following line is in a scope to shield this
     ! word from the record-altering side effects of
     ! take-until.
     [ CHAR: ; take-char ] with-scope
     "#" ?head [
         "x" ?head 16 10 ? base>
-        push-record incr-spot
+        push-record
     ] [ (parse-entity) ] if ;
 
 TUPLE: reference name ;
 
 : parse-reference ( -- )
-    unrecord end-record , CHAR: ; take-char
-    <reference> , new-record incr-spot ;
+    next unrecord end-record , CHAR: ; take-char
+    <reference> , next new-record ;
 
 : (parse-text) ( -- )
     get-char {
@@ -212,13 +214,11 @@ TUPLE: reference name ;
           [ drop parse-entity (parse-text) ] }
         { [ CHAR: % = ]
           [ parse-reference (parse-text) ] }
-        { [ t ] [ incr-spot (parse-text) ] }
+        { [ t ] [ next (parse-text) ] }
     } cond ;
 
-TUPLE: xml-string array ;
-
 : parse-text ( -- array )
-   [ new-record (parse-text) ] { } make <xml-string> ;
+   [ new-record (parse-text) ] { } make ;
 
 !   -- Parsing tags
 
@@ -247,4 +247,4 @@ C: name ( space tag -- name )
 
 : parse-name ( -- name )
     (parse-name) get-char CHAR: : =
-    [ incr-spot (parse-name) ] [ "" swap ] if <name> ;
+    [ next (parse-name) ] [ "" swap ] if <name> ;

@@ -1,26 +1,26 @@
-IN: ref-template
+IN: templating
 USING: kernel xml sequences hashtables tools io arrays namespaces generic ;
 
 SYMBOL: ref-table
 
-: replace-ref ( ref -- object )
+: replace ( ref -- object )
     reference-name ref-table get hash call ;
 
-: r-ref-string ( xml-string -- xml-string )
-    xml-string-array [
-        dup reference? [ replace-ref ] when
-    ] map <xml-string> ;
+: ref-string ( seq -- seq )
+    [
+        dup reference? [ replace ] when
+    ] map ;
 
 GENERIC: (r-ref) ( xml -- object )
 M: any-tag (r-ref)
     dup tag-props dup [
-        dup [ r-ref-string swap set ] hash-each 
+        dup [ ref-string swap set ] hash-each 
     ] bind over set-tag-props ;
 M: reference (r-ref)
-    replace-ref ;
+    replace ;
 M: object (r-ref) ;
 
-: replace-refs ( xml -- xml )
+: template ( xml -- xml )
     [ (r-ref) ] xml-map ;
 
 ! Example
@@ -32,5 +32,5 @@ M: object (r-ref) ;
         { "baz" [ "<a/>" string>xml delegate ] }
     } ref-table set
     "<x>%foo;<y prop='blah%foo;'>%bar;</y>%baz;</x>" string>xml
-    replace-refs ;
+    template ;
 
