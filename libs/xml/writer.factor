@@ -6,12 +6,12 @@ USING: hashtables kernel math namespaces sequences strings
 
 GENERIC: write-str-elem ( elem -- )
 
-: chars>entities ( str -- )
+: chars>entities ( str -- str )
     #! Convert <, >, &, ' and " to HTML entities.
-    [ dup entities hash [ write ] [ write1 ] ?if ] each ;
+    [ [ dup entities hash [ % ] [ , ] ?if ] each ] "" make ;
 
 M: string write-str-elem
-    chars>entities ;
+    chars>entities write ;
 
 M: entity write-str-elem
     CHAR: & write1 entity-name write CHAR: ; write1 ;
