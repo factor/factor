@@ -3,28 +3,9 @@
 IN: gadgets
 USING: arrays errors gadgets gadgets-buttons
 gadgets-labels gadgets-panes gadgets-presentations
-gadgets-scrolling gadgets-theme gadgets-viewports generic
-hashtables io kernel math models namespaces prettyprint queues
-sequences test threads help sequences words timers ;
-
-! Assoc mapping aliens to gadgets
-SYMBOL: windows
-
-: window ( handle -- world ) windows get-global assoc ;
-
-: window-focus ( handle -- gadget ) window world-focus ;
-
-: register-window ( world handle -- )
-    swap 2array windows get-global push ;
-
-: unregister-window ( handle -- )
-    windows get-global
-    [ first = not ] subset-with
-    windows set-global  ;
-
-: raised-window ( world -- )
-    windows get-global [ second eq? ] find-with drop
-    windows get-global [ length 1- ] keep exchange ;
+gadgets-scrolling gadgets-theme gadgets-viewports gadgets-lists
+generic hashtables io kernel math models namespaces prettyprint
+queues sequences test threads sequences words timers ;
 
 : update-hand ( gadget -- )
     find-world [
@@ -57,134 +38,6 @@ SYMBOL: windows
         10 sleep
     ] assert-depth ;
 
-TUPLE: titled-gadget title child ;
-
-M: titled-gadget gadget-title titled-gadget-title ;
-
-M: titled-gadget focusable-child* titled-gadget-child ;
-
-C: titled-gadget ( gadget title -- )
-    [ set-titled-gadget-title ] keep
-    { { f set-titled-gadget-child f @center } } make-frame* ;
-
-: open-window ( world -- )
-    dup pref-dim over set-gadget-dim
-    dup open-window* draw-world ;
-
-: open-titled-window ( gadget title -- )
-    <model> <titled-gadget> <world> open-window ;
-
-: find-window ( quot -- world )
-    windows get 1 <column>
-    [ world-gadget swap call ] find-last-with nip ; inline
-
-: start-world ( world -- )
-    dup graft
-    dup relayout
-    world-gadget request-focus ;
-
-: close-global ( world global -- )
-    dup get-global find-world rot eq?
-    [ f swap set-global ] [ drop ] if ;
-
-: focus-world ( world -- )
-    #! Sent when native window receives focus
-    t over set-world-focused?
-    dup raised-window
-    focused-ancestors f focus-gestures ;
-
-: unfocus-world ( world -- )
-    #! Sent when native window loses focus.
-    f over set-world-focused?
-    focused-ancestors f swap focus-gestures ;
-
-: reset-world ( world -- )
-    dup world-fonts clear-hash
-    dup unfocus-world
-    f over set-world-focus
-    f over set-world-handle
-    ungraft ;
-
-: close-world ( world -- )
-    dup hand-clicked close-global
-    dup hand-gadget close-global
-    dup free-fonts
-    reset-world ;
-
-: restore-windows ( -- )
-    windows get [ 1 <column> >array ] keep delete-all
-    [ dup reset-world open-window* ] each
-    forget-rollover ;
-
-: restore-windows? ( -- ? )
-    windows get [ empty? not ] [ f ] if* ;
-
-: <toolbar> ( target classes -- toolbar )
-    [ commands "toolbar" swap hash ] map concat
-    [ <command-button> ] map-with
-    make-shelf ;
-
-: command-description ( command -- element )
-    dup command-name swap command-gesture gesture>string
-    2array ;
-
-: commands. ( commands -- )
-    [ command-gesture key-down? ] subset
-    [ command-description ] map
-    { { $strong "Command" } { $strong "Shortcut" } } add*
-    $table ;
-
-: $commands ( elt -- )
-    first2 swap commands hash commands. ;
-
-TUPLE: labelled-gadget content ;
-
-C: labelled-gadget ( gadget title -- gadget )
-    {
-        { [ <label> dup reverse-video-theme ] f f @top }
-        { f set-labelled-gadget-content f @center }
-    } make-frame* ;
-
-M: labelled-gadget focusable-child* labelled-gadget-content ;
-
-: <labelled-pane> ( model quot title -- gadget )
-    >r <pane-control> t over set-pane-scrolls? <scroller> r>
-    <labelled-gadget> ;
-
-: <close-box> ( quot -- button/f )
-    gray close-box <polygon-gadget> swap <bevel-button> ;
-
-: <title-label> <label> dup title-theme ;
-
-: <title-bar> ( title quot -- gadget )
-    [
-        {
-            { [ <close-box> ] f f @left }
-            { [ <title-label> ] f f @center }
-        } make-frame
-    ] [
-        <title-label>
-    ] if* ;
-
-TUPLE: closable-gadget content ;
-
-C: closable-gadget ( gadget title quot -- gadget )
-    {
-        { [ <title-bar> ] f f @top }
-        { f set-closable-gadget-content f @center }
-    } make-frame* ;
-
-M: closable-gadget focusable-child* closable-gadget-content ;
-
-: pane-window ( quot title -- )
-    >r make-pane <scroller> r> open-titled-window ;
-
-: error-window ( error -- )
-    [ print-error ] "Error" pane-window ;
-
-: ui-try ( quot -- )
-    [ error-window ] recover ;
-
 TUPLE: world-error world ;
 
 C: world-error ( error world -- error )
@@ -208,7 +61,7 @@ M: world-error error.
             dup world set [
                 dup (draw-world)
             ] [
-                over <world-error> error-window
+                over <world-error> debugger-window
                 f over set-world-active?
             ] recover
         ] with-scope

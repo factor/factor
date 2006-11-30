@@ -1,9 +1,14 @@
 ! Copyright (C) 2006 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-IN: gadgets-debugger
-USING: errors sequences gadgets gadgets-buttons gadgets-listener
-gadgets-panes gadgets-lists gadgets-scrolling gadgets-theme
-kernel models arrays namespaces ;
+IN: gadgets-listener
+DEFER: call-listener
+
+IN: gadgets
+USING: arrays errors gadgets gadgets-buttons
+gadgets-labels gadgets-panes gadgets-presentations
+gadgets-scrolling gadgets-theme gadgets-viewports gadgets-lists
+generic hashtables io kernel math models namespaces prettyprint
+queues sequences test threads help sequences words timers ;
 
 : <debugger-button>
     [ call-listener drop ] curry <bevel-button> ;
@@ -44,3 +49,9 @@ debugger "toolbar" {
 } [
     first3 [ call-listener drop ] curry 3array
 ] map define-commands
+
+: debugger-window ( error restarts -- )
+    restarts get <debugger> "Error" open-titled-window ;
+
+: ui-try ( quot -- )
+    [ debugger-window ] recover ;

@@ -99,3 +99,16 @@ SYMBOL: operations
 
 : modify-commands ( operations quot -- operations )
     swap [ modify-command ] map-with ;
+
+: command-description ( command -- element )
+    dup command-name swap command-gesture gesture>string
+    2array ;
+
+: commands. ( commands -- )
+    [ command-gesture key-down? ] subset
+    [ command-description ] map
+    { { $strong "Command" } { $strong "Shortcut" } } add*
+    $table ;
+
+: $commands ( elt -- )
+    first2 swap commands hash commands. ;

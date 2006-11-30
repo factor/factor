@@ -1,9 +1,9 @@
 + 0.87:
 
-- parse errors should be shown in a popup
-  - menu Command: quots look dumb
-  - no need for modify-listener-operation!
-  - command buttons: indicate shortcuts
+- menu Command: quots look dumb
+- no need for modify-listener-operation!
+- command buttons: indicate shortcuts
+- hide popup after a restart
 - http://paste.lisp.org/display/30426
 - update ui docs
 
@@ -49,6 +49,7 @@
 
 + ui:
 
+- copying pane output
 - how do we refer to command shortcuts in the docs?
 - editor:
   - autoscroll

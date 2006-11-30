@@ -47,6 +47,11 @@ C: presentation ( gadget object -- button )
 : <command-button> ( target command -- button )
     (command-button) <bevel-button> ;
 
+: <toolbar> ( target classes -- toolbar )
+    [ commands "toolbar" swap hash ] map concat
+    [ <command-button> ] map-with
+    make-shelf ;
+
 : <menu-command> ( command -- command )
     [ hand-clicked get find-world hide-glass ]
     swap modify-command ;

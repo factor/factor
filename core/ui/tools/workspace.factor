@@ -3,11 +3,10 @@
 IN: gadgets-workspace
 USING: help arrays compiler gadgets gadgets-books
 gadgets-browser gadgets-buttons gadgets-dataflow gadgets-help
-gadgets-listener gadgets-presentations gadgets-walker
-gadgets-debugger generic kernel math modules scratchpad
-sequences syntax words io namespaces hashtables
-gadgets-scrolling gadgets-panes gadgets-messages gadgets-theme
-errors ;
+gadgets-listener gadgets-presentations gadgets-walker generic
+kernel math modules scratchpad sequences syntax words io
+namespaces hashtables gadgets-scrolling gadgets-panes
+gadgets-messages gadgets-theme errors ;
 
 C: tool ( gadget -- tool )
     {
