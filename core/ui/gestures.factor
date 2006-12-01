@@ -39,9 +39,6 @@ TUPLE: paste-action ;
 TUPLE: delete-action ;
 TUPLE: select-all-action ;
 
-: handle-action ( gadget constructor -- )
-    execute swap send-gesture drop ; inline
-
 : generalize-gesture ( gesture -- gesture )
     #! Strip button number from drag/button-up/button-down.
     tuple>array 1 head* >tuple ;
