@@ -103,3 +103,6 @@ SYMBOL: operations
 
 : $commands ( elt -- )
     first2 swap commands hash commands. ;
+
+: $operations ( elt -- )
+    [ class-operations ] map concat commands. ;

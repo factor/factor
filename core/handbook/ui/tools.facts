@@ -1,7 +1,8 @@
 USING: gadgets gadgets-listener gadgets-browser gadgets-help
 gadgets-presentations gadgets-walker gadgets-dataflow
 gadgets-workspace help gadgets-panes gadgets-text listener
-definitions prettyprint io parser modules compiler ;
+definitions prettyprint io parser modules compiler words
+styles ;
 
 ARTICLE: "ui-presentations" "Presentations in the UI"
 "A " { $emphasis "presentation" } " is a graphical view of an object which is directly linked to the object in some way. The help article links you see in the documentation browser are presentations; and if you " { $link see } " a word in the UI listener, all words in the definition will themselves be presentations."
@@ -18,16 +19,13 @@ ARTICLE: "ui-listener" "UI listener"
 "The graphical listener is based around the terminal listener (" { $link "listener" } ") and adds the following features:"
 { $list
     "Input history"
-    "Completion"
+    { "Completion (see " { $link "ui-completion" } ")" }
     { "Clickable presentations (see " { $link "ui-presentations" } ")" }
 }
 { $heading "Listener commands" }
 { $commands listener-gadget "toolbar" }
 { $heading "Interactor commands" }
 { $commands interactor "interactor" }
-{ $heading "Completion" }
-"Completion commands display a gadget at the bottom of the listener, known as the mini-buffer. Typing more text narrows down the list of available items. The " { $snippet "UP" } " and " { $snippet "DOWN" } " arrow keys shift the selection between listed items, and the " { $snippet "RETURN" } " key invokes a default operation for the selected item."
-{ $commands listener-gadget "popups" }
 { $heading "Word commands" }
 "These commands operate on the token at the caret position in the input area."
 { $commands interactor "words" }
@@ -40,6 +38,7 @@ ARTICLE: "ui-listener" "UI listener"
 "Listeners are instances of " { $link listener-gadget } ". The listener consists of an output area (instance of " { $link pane } "), and an input area (instance of " { $link interactor } "), and a stack display kept up to date using a " { $link listener-hook } "." ;
 
 ARTICLE: "ui-browser" "UI definition browser"
+"The graphical browser displays word definitions. To show a word definition, click a presentation of a word or use the word and vocabulary completion popups to browse the dictionary (see " { $link "ui-completion" } ")."
 { $commands browser "toolbar" }
 "Definition browsers are instances of " { $link browser } "." ;
 
@@ -75,11 +74,7 @@ $terpri
 
 ;
 
-ARTICLE: "ui-tools" "UI development tools"
-"The Factor development environment can seem rather different from what you are used to, however it is very simple and powerful."
-$terpri
-"To take full advantage of the UI, you should be using a supported text editor, and load the correct editor integration module. See " { $link edit } "."
-$terpri
+ARTICLE: "ui-tool-tutorial" "UI tool tutorial"
 "The following is an example of a typical session with the UI which should give you a taste of its power:"
 { $list
     { "You decide to refactor some code, and move a few words from a source file you have already loaded, into a new source file." }
@@ -88,9 +83,37 @@ $terpri
     { "Interactively testing the new code reveals a problem with one particular code snippet, so you enter it in the listener's input area, and press " { $snippet "C+A+w" } " to invoke the single stepper." }
     { "Single stepping through the code makes the problem obvious, so you right-click on a presentation of the broken word in the stepper, and choose " { $strong "Edit" } " from the resulting popup menu." }
     { "After fixing the problem in the source editor, you right click on the word in the stepper and invoke " { $strong "Reload" } "." }
-}
+} ;
+
+ARTICLE: "ui-completion-words" "Word completion popup"
+"Clicking a word in the word completion popup displays the word definition in the " { $link "ui-browser" } ". Pressing " { $snippet "RETURN" } " with a word selected inserts the word name in the listener, along with a " { $link POSTPONE: USE: } " declaration (if necessary)."
+{ $operations word compound } ;
+
+ARTICLE: "ui-completion-vocabs" "Vocabulary completion popup"
+"Clicking a vocabulary in the vocabulary completion popup displays a list of words in the vocabulary in another " { $link "ui-completion-word" } ". Pressing " { $snippet "RETURN" } " adds the vocabulary to the current search path, just as if you invoked " { $link POSTPONE: USE: } "."
+{ $operations vocab-link } ;
+
+ARTICLE: "ui-completion-modules" "Module completion popup"
+"The module completion popup lists loaded and unloaded modules, the list being obtained by calling the " { $link available-modules } " word. Clicking a module in the module completion popup loads the module first if necessary, and then displays a list of source files in a " { $link "ui-completion-sources" } ". Pressing " { $snippet "RETURN" } " loads the module first if necessary, and then runs the module's main entry point with " { $link run-module } "."
+{ $operations module } ;
+
+ARTICLE: "ui-completion-sources" "Source file completion popup"
+"The source file completion popup lists all source files which have been previously loaded by " { $link run-file } ". Clicking a source file  or pressing " { $snippet "RETURN" } " opens the source file in your editor with " { $link edit-file } "."
+{ $operations pathname } ;
+
+ARTICLE: "ui-completion" "UI completion popups"
+"Completion popups allow fast access to aspects of the environment. Completion popups can be invoked by clicking the row of buttons along the bottom of the workspace, or via keyboard commands:"
+{ $commands workspace "toolbar" }
+"A completion popup instantly updates the list of completions as keys are typed. The list of completions can be navigated from the keyboard with the " { $snippet "UP" } " and " { $snippet "DOWN" } " arrow keys. Every completion has a " { $emphasis "primary action" } " and " { $emphasis "secondary action" } ". The primary action is invoked when clicking a completion, and the secondary action is invoked on the currently-selected completion when pressing " { $snippet "RETURN" } "."
+$terpri
+"The primary and secondary actions, along with additional keyboard shortcuts, are documented for some completion popups in the below sections."
+{ $subsection "ui-completion-words" }
+{ $subsection "ui-completion-vocabs" }
+{ $subsection "ui-completion-modules" }
+{ $subsection "ui-completion-sources" } ;
+
+ARTICLE: "ui-workspace-keys" "UI keyboard shortcuts"
 { $heading "Switching tools" }
-"All development tools are integrated into a single-window " { $emphasis "workspace" } "."
 { $commands workspace "tool-switch" }
 { $heading "Opening new windows" }
 "Multiple workspace windows can be open at once."
@@ -102,9 +125,18 @@ $terpri
 "A pair of commands for invoking " { $link reload-modules } " and " { $link recompile } "."
 { $commands workspace "workflow" }
 { $heading "Implementation" }
-"Workspaces are instances of " { $link workspace-window } "."
-{ $heading "Tools" }
+"Workspaces are instances of " { $link workspace-window } "." ;
+
+ARTICLE: "ui-tools" "UI development tools"
+"The Factor development environment can seem rather different from what you are used to, because it is very simple and powerful.."
+$terpri
+"To take full advantage of the UI, you should be using a supported text editor, and load the correct editor integration module. See " { $link edit } "."
+{ $subsection "ui-tool-tutorial" }
+"All development tools are integrated into a single-window " { $emphasis "workspace" } "."
+{ $subsection "ui-workspace-keys" }
 { $subsection "ui-presentations" }
+{ $subsection "ui-completion" }
+{ $heading "Tools" }
 { $subsection "ui-listener" }
 { $subsection "ui-browser" }
 { $subsection "ui-help" }

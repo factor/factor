@@ -179,9 +179,7 @@ TUPLE: check-create name vocab ;
 : bootstrap-word ( word -- target )
     bootstrapping? get [
         dup word-name swap word-vocabulary
-        dup "syntax" = [
-            drop "!syntax" >r "!" swap append r>
-        ] when lookup
+        dup "syntax" = [ [ CHAR: ! add* ] 2apply ] when lookup
     ] when ;
 
 : words-named ( str -- seq )
