@@ -13,3 +13,5 @@ USING: kernel math sequences strings ;
     } cond ;
 
 : rot13 ( string -- string ) [ rot-letter ] map ;
+
+PROVIDE: demos/rot13 ;
