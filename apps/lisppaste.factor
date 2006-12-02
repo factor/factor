@@ -11,3 +11,5 @@ USING: arrays kernel xml-rpc ;
     ! seq is { channel user title contents }
     ! or { channel user title contents annotation-number }
     "newpaste" url invoke-method ;
+
+PROVIDE: apps/lisppaste ;
