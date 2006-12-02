@@ -73,6 +73,9 @@ M: instruction (xml>string)
     dup delegate (xml>string)
     xml-doc-after [ (xml>string) ] each ;
 
+: print-xml ( xml-doc -- )
+    write-xml terpri ;
+
 : xml>string ( xml-doc -- string )
     [ write-xml ] string-out ;
 

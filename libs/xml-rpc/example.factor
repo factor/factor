@@ -16,13 +16,6 @@ USING: kernel hashtables xml-rpc xml calendar sequences
     receive-rpc dup rpc-method-name swap rpc-method-params
     apply-function <rpc-response> send-rpc ;
 
-: put-http-response ( string -- )
-    "HTTP/1.1 200 OK\nConnection: close\nContent-Length: " write
-    dup length number>string write
-    "\nContent-Type: text/xml\nDate: " write
-    now timestamp>http-string write "\n\n" write
-    write ;
-
 : respond-rpc-arith ( -- )
     "raw-response" get
     string>xml problem>solution xml>string

@@ -28,3 +28,8 @@ SYMBOL: xml-file
     "<main>a<sub>bc</sub>d<nothing/></main>" string>xml
     [ [ dup string? [ % ] [ drop ] if ] xml-each ] "" make
 ] unit-test
+[ "foo" ] [
+    "<a><b id='c'>%foo;</b><d id='e'/></a>" string>xml
+    "c" get-id tag-children [ reference? ] find nip
+    reference-name
+] unit-test

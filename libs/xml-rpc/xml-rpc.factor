@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 IN: xml-rpc
 USING: kernel xml arrays math errors errors generic http-client
-    hashtables namespaces io base64 sequences strings ;
+    hashtables namespaces io base64 sequences strings calendar ;
 
 ! * Sending RPC requests
 ! TODO: time
@@ -111,6 +111,10 @@ TAG: struct xml>item
 TAG: base64 xml>item
     children>string base64> <base64> ;
 
+TAG: array xml>item
+    first-child-tag children-tags
+    [ first-child-tag xml>item ] map ;
+
 : params>array ( tag -- array )
     children-tags
     [ first-child-tag first-child-tag xml>item ] map ;
@@ -141,3 +145,12 @@ TAG: base64 xml>item
     >r "text/xml" swap send-rpc xml>string r> http-post
     2nip string>xml receive-rpc ;
 
+: invoke-method ( params method url -- )
+    >r swap <rpc-method> r> post-rpc ;
+
+: put-http-response ( string -- )
+    "HTTP/1.1 200 OK\nConnection: close\nContent-Length: " write
+    dup length number>string write
+    "\nContent-Type: text/xml\nDate: " write
+    now timestamp>http-string write "\n\n" write
+    write ;

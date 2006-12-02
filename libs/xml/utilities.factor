@@ -22,7 +22,7 @@ M: process-missing error.
 : PROCESS:
     CREATE
     dup H{ } clone "xtable" set-word-prop
-    dup literalize \ run-process 2array >quotation define-compound ; parsing
+    dup [ run-process ] curry define-compound ; parsing
 
 : TAG:
     scan scan-word [
@@ -67,7 +67,8 @@ M: object (xml-each)
     swap call ;
 M: xml-doc (xml-each)
     delegate (xml-each) ;
-: xml-each ( tag quot -- ) swap (xml-each) ; inline
+: xml-each ( tag quot -- ) ! quot: tag --
+    swap (xml-each) ; inline
 
 GENERIC: (xml-map) ( quot tag -- tag ) inline
 M: tag (xml-map)
@@ -78,10 +79,40 @@ M: object (xml-map)
     swap call ;
 M: xml-doc (xml-map)
     [ (xml-map) ] with-delegate ;
-: xml-map ( tag quot -- tag ) swap (xml-map) ; inline
+: xml-map ( tag quot -- tag ) ! quot: tag -- tag
+    swap (xml-map) ; inline
 
-: xml-subset ( quot tag -- seq )
+: xml-subset ( quot tag -- seq ) ! quot: tag -- ?
     V{ } clone rot [
         swap >r [ swap call ] 2keep rot r>
         swap [ [ push ] keep ] [ nip ] if
     ] xml-each nip ;
+
+GENERIC: (xml-find) ( quot tag -- tag ) inline
+M: tag (xml-find)
+    [ swap call ] 2keep rot [
+        tag-children f swap
+        [ nip over >r (xml-find) r> swap dup ] find
+        2drop ! leaves result of quot
+    ] unless nip ;
+M: object (xml-find)
+    [ swap call ] keep f ? ;
+M: xml-doc (xml-find)
+    delegate (xml-find) ;
+: xml-find ( tag quot -- tag ) ! quot: tag -- ?
+    swap (xml-find) ; inline
+
+: prop-name ( name-tag tag -- seq/f )
+    #! gets the property with the name-tag string specified
+    tag-props [
+        hash-keys [ name-tag over = ] find
+    ] keep hash 2nip ;
+
+: get-id ( tag id -- elem ) ! elem=tag.getElementById(id)
+    swap [
+        dup any-tag? [
+            "id" swap prop-name
+            [ string? ] subset concat
+            over =
+        ] [ drop f ] if
+    ] xml-find nip ;
