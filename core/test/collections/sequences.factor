@@ -82,6 +82,9 @@ unit-test
 [ [ 1 2 3 4 ]   ] [ [ 1 2 3 ] [ 4 ] append ] unit-test
 [ [ 1 2 3 4 ]   ] [ [ 1 2 3 ] { 4 } append ] unit-test
 
+[ "a" -1 append ] unit-test-fails
+[ -1 "a" append ] unit-test-fails
+
 [ [ ]       ] [ 1 [ ]           remove ] unit-test
 [ [ ]       ] [ 1 [ 1 ]         remove ] unit-test
 [ [ 3 1 1 ] ] [ 2 [ 3 2 1 2 1 ] remove ] unit-test

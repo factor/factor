@@ -3,9 +3,14 @@
 - ui operations: restarts are broken
 - command buttons: indicate shortcuts
 - http://paste.lisp.org/display/30426
+- error popups obscure input area, and show redundant info (parse-error error.)
+- also error popups should protect against error. throwing an exception
+- operations which call parse are being run in the wrong namespace
 
 + 0.88:
 
+- browser: tile titles should respond to right-clicks and/or have a
+  menu popup button
 - growable data heap
 - variable width word wrap
 - graphical crossref tool

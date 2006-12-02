@@ -132,11 +132,11 @@ ARTICLE: "ui-tools" "UI development tools"
 $terpri
 "To take full advantage of the UI, you should be using a supported text editor, and load the correct editor integration module. See " { $link edit } "."
 { $subsection "ui-tool-tutorial" }
-"All development tools are integrated into a single-window " { $emphasis "workspace" } "."
 { $subsection "ui-workspace-keys" }
 { $subsection "ui-presentations" }
 { $subsection "ui-completion" }
 { $heading "Tools" }
+"All development tools are integrated into a single-window " { $emphasis "workspace" } "."
 { $subsection "ui-listener" }
 { $subsection "ui-browser" }
 { $subsection "ui-help" }

@@ -165,6 +165,7 @@ IN: sequences
     ] if ; inline
 
 : copy-into-check ( n dest src -- n dest src )
+    pick 0 < [ >r bounds-error r> ] when
     pick over length + pick 2dup length >
     [ set-length ] [ 2drop ] if ; inline
 
