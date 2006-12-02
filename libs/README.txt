@@ -3,7 +3,7 @@ library, but is useful enough to ship with the Factor distribution.
 
 Modules can be loaded from the listener:
 
-  "contrib/modulename" require
+  "libs/modulename" require
 
 Available libraries:
 
@@ -60,3 +60,4 @@ Available libraries:
 - vim -- VIM integration (Alex Chapman)
 - x11 -- X Window System client library (Eduardo Cavazos)
 - xml -- XML parser (Daniel Ehrenberg)
+- xml-rpc -- XML-RPC client and server (Daniel Ehrenberg)
