@@ -69,5 +69,3 @@ M: object zero? drop f ;
 
 : times ( n quot -- )
     swap [ >r dup slip r> ] repeat drop ; inline
-
-GENERIC: number>string ( n -- str ) foldable
