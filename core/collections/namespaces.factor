@@ -62,8 +62,5 @@ SYMBOL: building
 
 IN: sequences
 
-: concat ( seq -- newseq )
-    dup empty? [ [ [ % ] each ] over first make ] unless ;
-
 : join ( seq glue -- newseq )
     [ swap [ % ] [ dup % ] interleave drop ] over make ;

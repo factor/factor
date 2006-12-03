@@ -144,7 +144,8 @@ SYMBOL: bootstrapping?
 
 : words ( vocab -- seq ) vocab dup [ hash-values ] when ;
 
-: all-words ( -- seq ) vocabs [ words ] map concat ;
+: all-words ( -- seq )
+    vocabularies get hash-values [ hash-values ] map concat ;
 
 : word-subset ( quot -- seq )
     all-words swap subset ; inline

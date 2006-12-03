@@ -86,11 +86,6 @@ HELP: ?grow-hash
 { $see-also (set-hash) grow-hash set-hash }
 { $side-effects "hash" } ;
 
-HELP: hash>seq
-{ $values { "i" "0 or 1" } { "hash" "a hashtable" } { "seq" "a sequence of keys or values" } }
-{ $description "User code should not call this word. It is unsafe and only used in the implementation of " { $link hash-keys } " and " { $link hash-values } ", both of which are safe." }
-{ $warning "This word is in the " { $vocab-link "hashtables-internals" } " vocabulary because passing an invalid value for " { $snippet "i" } " can lead to memory corruption." } ;
-
 HELP: <hashtable>
 { $values { "n" "a positive integer specifying hashtable capacity" } { "hash" "a new hashtable" } }
 { $description "Create a new hashtable capable of storing " { $snippet "n" } " key/value pairs before growing." }

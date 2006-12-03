@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 IN: hashtables-internals
 USING: arrays hashtables kernel kernel-internals math
-math-internals sequences sequences-internals ;
+math-internals sequences sequences-internals vectors ;
 
 TUPLE: tombstone ;
 
@@ -108,10 +108,10 @@ TUPLE: tombstone ;
 : all-pairs? ( array quot -- ? )
     swap 0 (all-pairs?) ; inline
 
-: hash>seq ( i hash -- seq )
-    hash-array dup array-capacity 2 /i
-    [ 2 * pick + over array-nth ] map
-    [ tombstone? not ] subset 2nip ;
+: (hash-keys/values) ( hash quot -- accum array )
+    >r
+    hash-array [ length 2 /i <vector> ] keep
+    r> each-pair { } like ; inline
 
 IN: hashtables
 
@@ -177,9 +177,11 @@ IN: hashtables
 : associate ( value key -- hash )
     2 <hashtable> [ set-hash ] keep ;
 
-: hash-keys ( hash -- keys ) 0 swap hash>seq ;
+: hash-keys ( hash -- seq )
+    [ drop over push ] (hash-keys/values) ;
 
-: hash-values ( hash -- values ) 1 swap hash>seq ;
+: hash-values ( hash -- seq )
+    [ nip over push ] (hash-keys/values) ;
 
 : hash>alist ( hash -- alist )
     dup hash-keys swap hash-values 2array flip ;

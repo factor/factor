@@ -123,12 +123,6 @@ HELP: init-namespaces
     { $code "[ init-namestack do-some-work ] in-thread" }
 } ;
 
-HELP: concat
-{ $values { "seq" "a sequence" } { "newseq" "a sequence" } }
-{ $description "Concatenates a sequence of sequences together into one sequence. The resulting sequence is of the same class as the first element of " { $snippet "seq" } "." }
-{ $errors "Throws an error if one of the sequences in " { $snippet "seq" } " contains elements not permitted in sequences of the same class as the first element of " { $snippet "seq" } "." }
-{ $see-also join } ;
-
 HELP: join
 { $values { "seq" "a sequence" } { "glue" "a sequence" } { "newseq" "a sequence" } }
 { $description "Concatenates a sequence of sequences together into one sequence, placing a copy of " { $snippet "glue" } " between each pair of sequences. The resulting sequence is of the same class as " { $snippet "glue" } "." }

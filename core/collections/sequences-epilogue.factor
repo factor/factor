@@ -88,6 +88,13 @@ sequences-internals strings vectors words ;
 
 : add* ( seq elt -- newseq ) 1array swap dup (append) ; inline
 
+: concat ( seq -- newseq )
+    dup empty? [
+        [ 0 [ length + ] accumulate ] keep
+        rot over first new -rot
+        [ >r over r> copy-into ] 2each
+    ] unless ;
+
 : diff ( seq1 seq2 -- newseq )
     [ swap member? not ] subset-with ;
 
