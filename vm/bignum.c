@@ -574,7 +574,7 @@ bignum_add_unsigned(bignum_type x, bignum_type y, int negative_p)
 bignum_type
 bignum_subtract_unsigned(bignum_type x, bignum_type y)
 {
-  int negative_p;
+  int negative_p = 0;
   switch (bignum_compare_unsigned (x, y))
     {
     case bignum_comparison_equal:
