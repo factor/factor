@@ -136,6 +136,9 @@ void finalize_code_block(F_COMPILED *relocating, CELL code_start,
 {
 	CELL scan;
 
+	if(relocating->finalized != false)
+		critical_error("Finalizing a finalized block",relocating);
+
 	for(scan = words_start; scan < words_end; scan += CELLS)
 		put(scan,untag_word(get(scan))->xt);
 

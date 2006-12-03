@@ -171,7 +171,7 @@ void factorbug(void)
 		char cmd[1024];
 
 		fprintf(stderr,"READY\n");
-		fflush(stdout);
+		fflush(stderr);
 
 		if(scanf("%1000s",cmd) <= 0)
 			exit(1);
