@@ -104,3 +104,7 @@ unit-test
 
 [ "ab" ] [ 2 "abc" resize-string ] unit-test
 [ "abc\0\0\0" ] [ 6 "abc" resize-string ] unit-test
+
+! Random tester found this
+[ { kernel-error 3 12 -7 } ]
+[ [ 2 -7 resize-string ] catch ] unit-test

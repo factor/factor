@@ -220,7 +220,7 @@ F_STRING* reallot_string(F_STRING* string, F_FIXNUM capacity, u16 fill)
 
 void primitive_resize_string(void)
 {
-	F_STRING* string = untag_string_fast(dpop());
+	F_STRING* string = untag_string(dpop());
 	F_FIXNUM capacity = unbox_signed_cell();
 	dpush(tag_object(reallot_string(string,capacity,0)));
 }
