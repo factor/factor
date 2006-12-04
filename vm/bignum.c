@@ -421,6 +421,7 @@ s48_bignum_to_double(bignum_type bignum)
 bignum_type
 s48_double_to_bignum(double x)
 {
+  if (!isnormal(x)) return (BIGNUM_ZERO ());
   int exponent;
   double significand = (frexp (x, (&exponent)));
   if (exponent <= 0) return (BIGNUM_ZERO ());
