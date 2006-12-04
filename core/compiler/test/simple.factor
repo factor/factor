@@ -45,3 +45,13 @@ full-gc
 
 : foox dup [ foox ] when ; inline
 : bar foox ;
+
+: xyz 3 ;
+
+: execute-test execute ; inline
+: execute-test-2 \ xyz execute-test ;
+
+\ execute-test-2 compile
+
+[ f ] [ \ execute-test compiled? ] unit-test
+[ 3 ] [ execute-test-2 ] unit-test

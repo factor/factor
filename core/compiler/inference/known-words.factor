@@ -38,9 +38,7 @@ sequences strings vectors words prettyprint namespaces ;
 
 \ execute { word } { } <effect> "inferred-effect" set-word-prop
 
-\ execute [
-    pop-literal unit infer-quot-value
-] "infer" set-word-prop
+\ execute [ pop-literal nip apply-word ] "infer" set-word-prop
 
 \ if { object object object } { } <effect> "inferred-effect" set-word-prop
 

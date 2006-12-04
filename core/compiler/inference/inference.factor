@@ -56,7 +56,7 @@ SYMBOL: recorded
     dataflow-graph off
     current-node off ;
 
-GENERIC: apply-object
+GENERIC: apply-object ( obj -- )
 
 : apply-literal ( obj -- )
     #push dup node,
@@ -66,6 +66,10 @@ GENERIC: apply-object
 M: object apply-object apply-literal ;
 
 M: wrapper apply-object wrapped apply-literal ;
+
+GENERIC: apply-word ( word -- )
+
+M: word apply-object apply-word ;
 
 : terminate ( -- )
     terminated? on #terminate node, ;

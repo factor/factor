@@ -144,7 +144,7 @@ M: compound infer-word
     over "inferred-vars" word-prop
     apply-effect/vars ;
 
-: apply-word ( word -- )
+: default-apply-word ( word -- )
     {
         { [ dup "no-effect" word-prop ] [ no-effect ] }
         { [ dup "infer" word-prop ] [ custom-infer ] }
@@ -152,9 +152,9 @@ M: compound infer-word
         { [ t ] [ dup infer-word apply-effect/vars ] }
     } cond ;
 
-M: word apply-object apply-word ;
+M: word apply-word default-apply-word ;
 
-M: symbol apply-object apply-literal ;
+M: symbol apply-word apply-literal ;
 
 TUPLE: recursive-declare-error word ;
 
@@ -170,7 +170,8 @@ TUPLE: recursive-declare-error word ;
     [ declared-infer ] [ inline-closure ] if ;
 
 : apply-compound ( word -- )
-    dup recursing? [ declared-infer ] [ apply-word ] if ;
+    dup recursing?
+    [ declared-infer ] [ default-apply-word ] if ;
 
 : custom-infer-vars ( word -- )
     dup "infer-vars" word-prop dup [
@@ -180,6 +181,6 @@ TUPLE: recursive-declare-error word ;
         2drop
     ] if ;
 
-M: compound apply-object
+M: compound apply-word
     dup custom-infer-vars
     [ apply-inline ] [ apply-compound ] if-inline ;
