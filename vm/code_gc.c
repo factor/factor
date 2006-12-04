@@ -28,12 +28,14 @@ INLINE void update_free_list(F_HEAP *heap, F_BLOCK *prev, F_BLOCK *next_free)
 		heap->free_list = next_free;
 }
 
-/* Called after reading the code heap from the image file. We must build the
-free list, and add a large free block from compiling.base + size to
+/* Called after reading the code heap from the image file, and after code GC.
+
+In the former case, we must add a large free block from compiling.base + size to
 compiling.limit. */
 void build_free_list(F_HEAP *heap, CELL size)
 {
 	F_BLOCK *prev = NULL;
+	F_BLOCK *prev_free = NULL;
 	F_BLOCK *scan = (F_BLOCK *)heap->base;
 	F_BLOCK *end = (F_BLOCK *)(heap->base + size);
 
@@ -42,29 +44,39 @@ void build_free_list(F_HEAP *heap, CELL size)
 	{
 		if(scan->status == B_FREE)
 		{
-			update_free_list(heap,prev,scan);
-			prev = scan;
+			update_free_list(heap,prev_free,scan);
+			prev_free = scan;
 		}
 
+		prev = scan;
 		scan = next_block(heap,scan);
 	}
 
-	/* If there is room at the end of the heap, add a free block */
+	/* If there is room at the end of the heap, add a free block. This
+	branch is only taken after loading a new image, not after code GC */
 	if((CELL)(end + 1) <= heap->limit)
 	{
 		end->status = B_FREE;
 		end->next_free = NULL;
 		end->size = heap->limit - (CELL)end;
+
+		/* add final free block */
+		update_free_list(heap,prev_free,end);
 	}
+	/* This branch is taken if the newly loaded image fits exactly, or
+	after code GC */
 	else
 	{
-		end = NULL;
-
+		/* even if there's no room at the end of the heap for a new
+		free block, we might have to jigger it up by a few bytes in
+		case prev + prev->size */
 		if(prev)
 			prev->size = heap->limit - (CELL)prev;
+
+		/* this is the last free block */
+		update_free_list(heap,prev_free,NULL);
 	}
 
-	update_free_list(heap,prev,end);
 }
 
 /* Allocate a block of memory from the mark and sweep GC heap */
