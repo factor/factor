@@ -256,7 +256,7 @@ HELP: with
 
 HELP: keep-datastack
 { $values { "quot" "a quotation" } }
-{ $description "Calls a quotation, saving the datastack before calling it and restoring it after it returns." } ;
+{ $description "Calls a quotation, saving the data stack before calling it and restoring it after it returns." } ;
 
 HELP: die
 { $description "Starts the front-end processor (FEP), which is a low-level debugger which can inspect memory addresses and the like. The FEP is also entered when a critical error occurs." } ;

@@ -100,7 +100,7 @@ ARTICLE: "interpreter" "The interpreter"
     { "If the end of the current quotation has been reached, the parent quotation is popped from the call stack and execution resumes from the saved location" }
     { "Otherwise, the interpreter performs an action depending on the type of the object at the instruction pointer:"
         { $list
-            { { $emphasis "Symbol word" } " - pushed on the datastack. See " { $link "symbols" } }
+            { { $emphasis "Symbol word" } " - pushed on the data stack. See " { $link "symbols" } }
             { { $emphasis "Compound word" } " - the associated quotation is called. See " { $link "colon-definition" } }
             { { $emphasis "Compiled or primitive word" } " - the interpreter jumps to machine code. See " { $link "primitives" } }
             { { $emphasis "Undefined word" } " -  an error is raised. See " { $link "deferred" } }

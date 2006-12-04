@@ -1,4 +1,4 @@
-USING: help threads kernel ;
+USING: help threads kernel io ;
 
 HELP: run-queue
 { $values { "queue" "a queue" } }
@@ -36,7 +36,15 @@ HELP: sleep
 
 HELP: in-thread
 { $values { "quot" "a quotation" } }
-{ $description "Spawns a new thread. The new thread begins running immediately. If an unhandled error occurs in the thread, the error is logged to the default stream in the dynamic extent of the caller of this word." } ;
+{ $description "Spawns a new thread. The new thread begins running immediately."
+$terpri
+"The new thread inherits the current data stack and name stack. The call stack initially contains the new quotation only, so when the quotation returns the thread stops. The catch stack contains a default handler which logs errors to the " { $link stdio } " stream." }
+{ $examples
+    { $code "1 2 [ + . ] in-thread" }
+}
+{ $notes
+    "A higher-level concurrency library can be found in the " { $snippet "libs/concurrency" } " module; see " { $link "modules" } "."
+} ;
 
 HELP: idle-thread
 { $description "Runs the idle thread, which services I/O requests and relinquishes control to the operating system until the next Factor thread has to wake up again." }

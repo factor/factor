@@ -37,7 +37,7 @@ HELP: print-error
 
 HELP: try
 { $values { "quot" "a quotation" } }
-{ $description "Calls the quotation. If it throws an error, logs the error to the default stream and restores the datastack." } ;
+{ $description "Calls the quotation. If it throws an error, logs the error to the default stream and restores the data stack." } ;
 
 HELP: expired-error.
 { $error-description "Thrown by " { $link alien-address } " and " { $link alien-invoke } " if an " { $link alien } " object passed in as a parameter has expired. Alien objects expire if they are saved an image which is subsequently loaded; this prevents a certain class of programming errors, usually attempts to use uninitialized objects, since holding a C address is meaningless between sessions." }

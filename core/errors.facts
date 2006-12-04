@@ -28,18 +28,18 @@ HELP: throw ( error -- * )
 
 HELP: catch
 { $values { "try" "a quotation" } { "error/f" "an object" } }
-{ $description "Calls the " { $snippet "try" } " quotation. If an error is thrown in the dynamic extent of the quotation, restores the datastack and pushes the error. If the quotation returns successfully, outputs " { $link f } " without restoring the datastack." }
+{ $description "Calls the " { $snippet "try" } " quotation. If an error is thrown in the dynamic extent of the quotation, restores the data stack and pushes the error. If the quotation returns successfully, outputs " { $link f } " without restoring the data stack." }
 { $notes "This word cannot differentiate between the case of " { $link f } " being thrown, and no error being thrown. You should never throw " { $link f } ", and you should also use other error handling combinators where possible." }
 { $see-also cleanup recover } ;
 
 HELP: cleanup
 { $values { "try" "a quotation" } { "cleanup" "a quotation" } }
-{ $description "Calls the " { $snippet "try" } " quotation. If an exception is thrown in the dynamic extent of the " { $snippet "try" } " quotation, restores the datastack, calls the " { $snippet "cleanup" } " quotation, and rethrows the error. If the " { $snippet "try" } " quotation returns successfully, calls the " { $snippet "cleanup" } " quotation without restoring the datastack." }
+{ $description "Calls the " { $snippet "try" } " quotation. If an exception is thrown in the dynamic extent of the " { $snippet "try" } " quotation, restores the data stack, calls the " { $snippet "cleanup" } " quotation, and rethrows the error. If the " { $snippet "try" } " quotation returns successfully, calls the " { $snippet "cleanup" } " quotation without restoring the data stack." }
 { $see-also catch recover } ;
 
 HELP: recover
 { $values { "try" "a quotation" } { "recovery" "a quotation with stack effect " { $snippet "( error -- )" } } }
-{ $description "Calls the " { $snippet "try" } " quotation. If an exception is thrown in the dynamic extent of the " { $snippet "try" } " quotation, restores the datastack and calls the " { $snippet "recovery" } " quotation to handle the error." } 
+{ $description "Calls the " { $snippet "try" } " quotation. If an exception is thrown in the dynamic extent of the " { $snippet "try" } " quotation, restores the data stack and calls the " { $snippet "recovery" } " quotation to handle the error." } 
 { $see-also catch cleanup } ;
 
 HELP: rethrow
