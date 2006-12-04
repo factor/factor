@@ -44,8 +44,15 @@ void build_free_list(F_HEAP *heap, CELL size)
 	{
 		switch(scan->status)
 		{
+		case B_FREE:
 			update_free_list(heap,prev,scan);
-			prev = scan;
+			prev_free = scan;
+			break;
+		case B_ALLOCATED:
+			break;
+		default:
+			critical_error("Invalid scan->status",(CELL)scan);
+			break;
 		}
 
 		prev = scan;
