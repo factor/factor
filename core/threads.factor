@@ -42,7 +42,8 @@ namespaces queues sequences vectors ;
         V{ } set-catchstack
         V{ } set-callstack
         V{ } set-retainstack
-        try stop
+        [ print-error ] recover
+        stop
     ] callcc0 drop ;
 
 : (idle-thread) ( fast? -- )
