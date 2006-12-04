@@ -202,3 +202,6 @@ H{ } clone "cache-test" set
 ! Resource leak...
 H{ } "x" set
 100 [ drop "x" get clear-hash ] each
+
+! Crash discovered by erg
+[ t ] [ 3/4 <hashtable> dup clone = ] unit-test

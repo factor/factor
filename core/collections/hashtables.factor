@@ -34,7 +34,7 @@ TUPLE: tombstone ;
     >r >r [ key@ ] 2keep pick -1 > r> r> if ; inline
 
 : <hash-array> ( n -- array )
-    1+ 4 * ((empty)) <array> ; inline
+    >fixnum 1+ 4 * ((empty)) <array> ; inline
 
 : init-hash ( hash -- )
     0 over set-hash-count 0 swap set-hash-deleted ;
