@@ -112,10 +112,6 @@ HELP: %
 { $values { "seq" "a sequence" } }
 { $description "Appends a sequence to the end of the sequence being constructed by " { $link make } "." } ;
 
-HELP: #
-{ $values { "n" "a real number" } }
-{ $description "Appends the string representation of a real number to the end of the sequence being constructed by " { $link make } "." } ;
-
 HELP: init-namespaces
 { $description "Resets the name stack to its initial state, holding a single copy of the global namespace. This word is called during startup and is rarely useful, except in certain situations such as the example below." }
 { $examples

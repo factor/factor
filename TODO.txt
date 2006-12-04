@@ -1,14 +1,14 @@
 + 0.87:
 
-- ui operations: restarts are broken
 - command buttons: indicate shortcuts
-- http://paste.lisp.org/display/30426
-- error popups obscure input area, and show redundant info (parse-error error.)
-- also error popups should protect against error. throwing an exception
+- error popups obscure input area
+- ui operations: restarts are broken
 - operations which call parse are being run in the wrong namespace
+- callback scheduling issue
 
 + 0.88:
 
+- lisppaste gui
 - browser: tile titles should respond to right-clicks and/or have a
   menu popup button
 - growable data heap
@@ -23,11 +23,9 @@
 - models: don't do redundant work
 - top level window positioning on ms windows
 - crashes:
-  - callback scheduling issue
   - httpd crash
   - fep when closing window
 - these things are "Too Slow":
-  - all-words
   - make-image
   - workspace-window
   - apropos

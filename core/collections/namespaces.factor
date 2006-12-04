@@ -56,8 +56,6 @@ SYMBOL: building
 
 : % ( seq -- ) building get swap nappend ;
 
-: # ( n -- ) number>string % ;
-
 : init-namespaces ( -- ) global 1array set-namestack ;
 
 IN: sequences

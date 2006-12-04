@@ -1,4 +1,4 @@
-USING: help math math-internals prettyprint ;
+USING: help math math-internals prettyprint namespaces ;
 
 HELP: base>
 { $values { "str" "a string" } { "radix" "an integer between 2 and 36" } { "n/f" "a real number or " { $link f } } }
@@ -68,3 +68,7 @@ $terpri
 HELP: float>string ( n -- str )
 { $values { "n" "a real number" } { "str" "a string" } }
 { $description "Primitive for getting a string representation of a float. User code should call " { $link number>string } " instead, since it is polymorphic and can handle other types of numbers." } ;
+
+HELP: #
+{ $values { "n" "a real number" } }
+{ $description "Appends the string representation of a real number to the end of the sequence being constructed by " { $link make } "." } ;
