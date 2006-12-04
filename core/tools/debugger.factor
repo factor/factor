@@ -133,13 +133,13 @@ M: string error. print ;
 : print-error ( error -- )
     [
         dup error.
-        restarts.
-        debug-help
     ] [
-        "Error in print-error!" print
+        "Error in print-error!" print drop
     ] recover drop ;
 
 SYMBOL: error-hook
 
+[ print-error restarts. debug-help ] error-hook set-global
+
 : try ( quot -- )
-    [ error-hook get [ call ] [ print-error ] ?if ] recover ;
+    [ error-hook get call ] recover ;

@@ -14,7 +14,7 @@ TUPLE: listener-gadget input output stack use ;
     use get over set-listener-gadget-use
     >r datastack r> listener-gadget-stack set-model ;
 
-: ui-error-hook ( listener -- )
+: ui-error-hook ( error listener -- )
     find-workspace dup workspace-error-hook call ;
 
 : listener-stream ( listener -- stream )

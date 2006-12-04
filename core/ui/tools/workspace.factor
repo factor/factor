@@ -94,9 +94,9 @@ M: workspace pref-dim* delegate pref-dim* { 550 650 } vmax ;
     over popup-dim over set-gadget-dim
     swap popup-loc swap set-rect-loc ;
 
-: debugger-popup ( workspace -- )
-    error get restarts get [ find-workspace hide-popup ]
-    <debugger> "Error" show-titled-popup ;
+: debugger-popup ( error workspace -- )
+    swap [ find-workspace hide-popup ] <debugger>
+    "Error" show-titled-popup ;
 
 C: workspace ( -- workspace )
     [ debugger-popup ] over set-workspace-error-hook

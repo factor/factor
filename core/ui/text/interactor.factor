@@ -79,8 +79,8 @@ M: interactor stream-read
     over editor-caret set-model mark>caret ;
 
 : handle-parse-error ( interactor error -- )
-    dup parse-error? [ dupd go-to-error ] when
-    interactor-error-hook call ;
+    dup parse-error? [ 2dup go-to-error delegate ] when
+    swap interactor-error-hook call ;
 
 : try-parse ( str interactor -- quot/error/f )
     [
