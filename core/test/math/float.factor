@@ -62,3 +62,5 @@ USE: test
 [ t ] [ -0.0 zero? ] unit-test
 
 ! [ t ] [ 0.0/0.0 0.0/0.0 = ] unit-test
+
+[ 0 ] [ 1/0. >bignum ] unit-test
