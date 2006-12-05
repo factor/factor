@@ -67,7 +67,7 @@ M: f batch-ends drop ;
     vocabs compile-vocabs changed-words get clear-hash ;
 
 : compile-quot ( quot -- word )
-    define-temp "compile" get [ dup compile ] when ;
+    define-temp dup compile ;
 
 : compile-1 ( quot -- ) compile-quot execute ;
 
