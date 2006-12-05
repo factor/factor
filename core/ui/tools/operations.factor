@@ -26,14 +26,6 @@ M: operation invoke-command
 : define-operation ( class props -- )
     <operation> operations get push ;
 
-: listener-operation ( hook quot operation -- operation )
-    modify-command
-    tuck set-operation-hook
-    t over set-operation-listener? ;
-
-: listener-operations ( operations hook quot -- operations )
-    rot [ >r 2dup r> listener-operation ] map 2nip ;
-
 : modify-command ( quot command -- command )
     clone
     [ command-quot append ] keep
@@ -41,6 +33,14 @@ M: operation invoke-command
 
 : modify-commands ( commands quot -- commands )
     swap [ modify-command ] map-with ;
+
+: listener-operation ( hook quot operation -- operation )
+    modify-command
+    tuck set-operation-hook
+    t over set-operation-listener? ;
+
+: listener-operations ( operations hook quot -- operations )
+    rot [ >r 2dup r> listener-operation ] map 2nip ;
 
 ! Objects
 [ drop t ] H{
