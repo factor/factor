@@ -172,7 +172,7 @@ DEFER: (compute-heights)
     ] [
         [ node-in-d length - <height-gadget> ] 2keep
         node>gadget swap 2array
-        make-pile 1 over set-pack-fill
+        make-filled-pile
     ] if , ;
 
 : <dataflow-graph> ( node -- gadget )

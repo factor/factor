@@ -63,7 +63,7 @@ SYMBOL: +keyboard+
 SYMBOL: +primary+
 SYMBOL: +secondary+
 
-TUPLE: operation predicate primary? secondary? ;
+TUPLE: operation predicate primary? secondary? listener? hook ;
 
 : (command) ( -- command )
     +name+ get +keyboard+ get +quot+ get <command> ;
@@ -82,14 +82,6 @@ SYMBOL: operations
 
 : secondary-operation ( obj -- command )
     object-operations [ operation-secondary? ] find-last nip ;
-
-: modify-command ( quot operation -- operation )
-    clone
-    [ command-quot append ] keep
-    [ set-command-quot ] keep ;
-
-: modify-commands ( operations quot -- operations )
-    swap [ modify-command ] map-with ;
 
 : command-description ( command -- element )
     dup command-name swap command-gesture gesture>string

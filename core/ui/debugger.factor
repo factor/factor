@@ -19,8 +19,7 @@ queues sequences test threads help sequences words timers ;
 TUPLE: debugger restarts ;
 
 : <debugger-display> ( error restart-list -- gadget )
-    >r [ print-error ] make-pane r> 2array make-pile
-    1 over set-pack-fill ;
+    >r [ print-error ] make-pane r> 2array make-filled-pile ;
 
 C: debugger ( error restart-hook -- gadget )
     {

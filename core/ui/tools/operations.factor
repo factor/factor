@@ -9,22 +9,38 @@ test tools words generic models io modules errors ;
 
 V{ } clone operations set-global
 
-: handle-listener-operation
-    +listener+ get [
-        +quot+ [ [ curry call-listener ] curry ] change
-    ] when ;
-
 C: operation ( predicate hash -- operation )
-    swap clone [
-        handle-listener-operation
+    swap [
         (command) over set-delegate
         +primary+ get over set-operation-primary?
         +secondary+ get over set-operation-secondary?
+        +listener+ get over set-operation-listener?
     ] bind
     [ set-operation-predicate ] keep ;
 
+M: operation invoke-command
+    [ operation-hook call ] keep
+    dup command-quot swap operation-listener?
+    [ curry call-listener ] [ call ] if ;
+
 : define-operation ( class props -- )
-    <operation> operations get push-new ;
+    <operation> operations get push ;
+
+: listener-operation ( hook quot operation -- operation )
+    modify-command
+    tuck set-operation-hook
+    t over set-operation-listener? ;
+
+: listener-operations ( operations hook quot -- operations )
+    rot [ >r 2dup r> listener-operation ] map 2nip ;
+
+: modify-command ( quot command -- command )
+    clone
+    [ command-quot append ] keep
+    [ set-command-quot ] keep ;
+
+: modify-commands ( commands quot -- commands )
+    swap [ modify-command ] map-with ;
 
 ! Objects
 [ drop t ] H{
@@ -88,7 +104,7 @@ C: operation ( predicate hash -- operation )
 
 : word-completion-string ( word listener -- string )
     >r dup word-name swap word-vocabulary dup vocab r>
-    listener-gadget-use memq?
+    listener-gadget-input interactor-use memq?
     [ drop ] [ [ "USE: " % % " " % % ] "" make ] if ;
 
 : insert-word ( word -- )
@@ -305,20 +321,17 @@ C: operation ( predicate hash -- operation )
 ! Define commands in terms of operations
 
 ! Interactor commands
-: word-action ( target -- quot )
-    selected-word search ;
-
 : quot-action ( interactor -- quot )
-    dup editor-text swap select-all parse ;
+    dup editor-text swap select-all ;
 
 interactor "words"
 { word compound } [ class-operations ] map concat
-[ word-action ] modify-commands
+[ selected-word ] [ search ] listener-operations
 define-commands
 
 interactor "quotations"
 quotation class-operations
-[ quot-action ] modify-commands
+[ quot-action ] [ parse ] listener-operations
 define-commands
 
 help-gadget "toolbar" {

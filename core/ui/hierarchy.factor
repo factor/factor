@@ -111,4 +111,7 @@ M: gadget focusable-child* drop t ;
 
 : make-pile ( children -- pack ) <pile> [ add-gadgets ] keep ;
 
+: make-filled-pile ( children -- pack )
+    make-pile 1 over set-pack-fill ;
+
 : make-shelf ( children -- pack ) <shelf> [ add-gadgets ] keep ;

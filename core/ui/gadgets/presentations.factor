@@ -52,26 +52,21 @@ C: presentation ( gadget object -- button )
     [ <command-button> ] map-with
     make-shelf ;
 
-: <menu-command> ( command -- command )
-    [ hand-clicked get find-world hide-glass ]
-    swap modify-command ;
+: <menu-item> ( hook target command -- button )
+    rot >r
+    (command-button) [ hand-clicked get find-world hide-glass ]
+    r> append3 <roll-button> ;
 
-: <menu-item> ( target command -- button )
-    <menu-command> (command-button) <roll-button> ;
-
-: <commands-menu> ( target commands -- gadget )
-    [ <menu-item> ] map-with
-    make-pile 1 over set-pack-fill
+: <commands-menu> ( hook target commands -- gadget )
+    [ >r 2dup r> <menu-item> ] map 2nip make-filled-pile
     <default-border>
     dup menu-theme ;
 
-: hooked-operations ( hook obj -- seq )
-    object-operations swap modify-commands ;
-
 : operations-menu ( presentation -- )
-    dup dup presentation-hook curry
-    over presentation-object hooked-operations
-    over presentation-object swap <commands-menu>
+    dup
+    dup presentation-hook curry
+    over presentation-object
+    dup object-operations <commands-menu>
     swap show-menu ;
 
 presentation H{
