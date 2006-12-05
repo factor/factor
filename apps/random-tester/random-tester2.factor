@@ -42,6 +42,7 @@ SYMBOL: wordbank
         create forget-word forget-vocab forget forget-tuple
         check-create?
         remove-word-prop empty-method
+        continue-with <continuation>
 
         define-compound define make-generic
         define-tuple define-temp define-tuple-slots
