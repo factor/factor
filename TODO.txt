@@ -1,9 +1,6 @@
 + 0.87:
 
-- command buttons: indicate shortcuts
 - error popups obscure input area
-- ui operations: restarts are broken
-- operations which call parse are being run in the wrong namespace
 - callback scheduling issue
 
 + 0.88:
@@ -46,6 +43,7 @@
 - don't end lines with literals, shuffle words or symbols?
 - see should try to not show ; on a line by itself
 - IN: on its own line if the entire 'see' form doesn't fit
+- command buttons: indicate shortcuts
 
 + ui:
 

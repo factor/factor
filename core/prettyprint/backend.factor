@@ -82,12 +82,15 @@ M: dll pprint*
 : nesting-limit? ( -- ? )
     nesting-limit get dup [ pprinter-stack get length < ] when ;
 
+: truncated-nesting ( obj str -- )
+    swap presented associate styled-text ;
+
 : check-recursion ( obj quot -- )
     nesting-limit? [
-        2drop "#" text
+        drop "#" truncated-nesting
     ] [
         over recursion-check get memq? [
-            2drop "&" text
+            drop "&" truncated-nesting
         ] [
             over recursion-check get push
             call
