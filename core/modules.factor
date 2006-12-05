@@ -15,11 +15,11 @@ TUPLE: module-link name ;
 M: module-link module-name module-link-name ;
 
 : module-def ( name -- path )
-    "resource:" over ".factor" append3
+    "resource:" over "/load.factor" append3
     dup ?resource-path exists? [
         nip
     ] [
-        drop "resource:" swap "/load.factor" append3
+        drop "resource:" swap ".factor" append3
     ] if ;
 
 : module modules get [ module-name = ] find-with nip ;
