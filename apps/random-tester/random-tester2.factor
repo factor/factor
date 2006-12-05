@@ -81,14 +81,16 @@ SYMBOL: wordbank
         gensym random-int counter <byte-array>
         <word> <client-stream> <server> <client>
         <duplex-stream>
-        <file-writer> <file-reader>
-        init-namespaces unxref-word set-global
+        <file-writer> <file-reader> <file-r/w>
+        init-namespaces unxref-word set-global set off on
+        nest
         set-restart-obj
         +@ inc dec
 
         ! 0.0 5000000 condition
         condition
         
+        changed-words
         callstack namespace namestack global vocabularies
 
         file. (file.) path+ parent-dir
@@ -98,7 +100,7 @@ SYMBOL: wordbank
     }
     { "arrays" "errors" "generic" "graphs" "hashtables" "io"
     "kernel" "math" "namespaces"
-    "queues" "strings" "sequences" "words" "vectors" "words" }
+    "queues" "strings" "sequences" "vectors" "words" }
     [ words ] map concat diff ;
 
 w1 wordbank set-global
