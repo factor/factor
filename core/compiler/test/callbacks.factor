@@ -132,3 +132,18 @@ END-STRUCT
 : callback_test_8 "int" { "foo" } "cdecl" alien-indirect ;
 
 [ 5 ] [ 10 2 make-foo callback-14 callback_test_8 ] unit-test
+
+! Callback scheduling issue
+: callback_test_9 "int" { } "cdecl" alien-indirect ;
+
+: callback-16
+    "int" { } [
+        yield 2
+    ] alien-callback ;
+
+: callback-15
+    "int" { } [
+        [ callback-16 callback_test_9 ] in-thread 3
+    ] alien-callback ;
+
+[ 3 ] [ callback-15 callback_test_9 ] unit-test
