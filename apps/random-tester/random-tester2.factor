@@ -1,5 +1,6 @@
 USING: compiler errors inference interpreter io
-kernel math namespaces prettyprint random-tester sequences tools words ;
+kernel math memory namespaces prettyprint random-tester
+sequences tools words ;
 USING: arrays definitions generic graphs hashtables ;
 IN: random-tester2
 
