@@ -105,10 +105,6 @@ IN: random-tester
 : 2-complex>complex { * + - /f } ;
 
 
-
-
-
-
 SYMBOL: last-quot
 SYMBOL: first-arg
 SYMBOL: second-arg
@@ -178,10 +174,10 @@ SYMBOL: second-arg
 
 
 ! RANDOM QUOTATIONS TO TEST
-: random-1-integer>x-quot ( -- quot ) 1-integer>x nth-rand unit ;
-: random-1-ratio>x-quot ( -- quot ) 1-ratio>x nth-rand unit ;
-: random-1-float>x-quot ( -- quot ) 1-float>x nth-rand unit ;
-: random-1-complex>x-quot ( -- quot ) 1-complex>x nth-rand unit ;
+: random-1-integer>x-quot ( -- quot ) 1-integer>x pick-one unit ;
+: random-1-ratio>x-quot ( -- quot ) 1-ratio>x pick-one unit ;
+: random-1-float>x-quot ( -- quot ) 1-float>x pick-one unit ;
+: random-1-complex>x-quot ( -- quot ) 1-complex>x pick-one unit ;
 
 : test-1-integer>x ( -- )
     random-integer random-1-integer>x-quot 1-interpreted-vs-compiled-check ;
@@ -193,18 +189,18 @@ SYMBOL: second-arg
     random-complex random-1-complex>x-quot 1-interpreted-vs-compiled-check ;
 
 
-: random-1-float>float-quot ( -- obj ) 1-float>float nth-rand unit ;
-: random-2-float>float-quot ( -- obj ) 2-float>float nth-rand unit ;
+: random-1-float>float-quot ( -- obj ) 1-float>float pick-one unit ;
+: random-2-float>float-quot ( -- obj ) 2-float>float pick-one unit ;
 : nrandom-2-float>float-quot ( -- obj )
     [
         5
         [
             {
-                [ 2-float>float nth-rand , random-float , ]
-                [ 1-float>float nth-rand ,  ]
+                [ 2-float>float pick-one , random-float , ]
+                [ 1-float>float pick-one ,  ]
             } do-one
         ] times 
-        2-float>float nth-rand ,
+        2-float>float pick-one ,
     ] [ ] make ;
 
 : test-1-float>float ( -- )
@@ -220,8 +216,8 @@ SYMBOL: second-arg
 : test-1-integer>x-runtime ( -- )
     random-integer random-1-integer>x-quot 1-runtime-check ;
 
-: random-1-integer>x-throws-quot ( -- obj ) 1-integer>x-throws nth-rand unit ;
-: random-1-ratio>x-throws-quot ( -- obj ) 1-ratio>x-throws nth-rand unit ;
+: random-1-integer>x-throws-quot ( -- obj ) 1-integer>x-throws pick-one unit ;
+: random-1-ratio>x-throws-quot ( -- obj ) 1-ratio>x-throws pick-one unit ;
 : test-1-integer>x-throws ( -- obj )
     random-integer random-1-integer>x-throws-quot
     1-interpreted-vs-compiled-check-catch ;
@@ -234,15 +230,8 @@ SYMBOL: second-arg
 : test-2-integer>x-throws ( -- )
     [
         random-integer , random-integer ,
-        2-x>y-throws nth-rand ,
+        2-x>y-throws pick-one ,
     ] [ ] make 2-interpreted-vs-compiled-check-catch ;
-
-! : test-^-shift ( -- )
-!    [
-        ! 100 random-int 50 - ,
-        ! 100 random-int 50 - ,
-        ! { ^ shift } nth-rand ,
-    ! ] [ ] make 2-interpreted-vs-compiled-check-catch ;
 
 ! : test-^-ratio ( -- )
     ! [
@@ -251,27 +240,27 @@ SYMBOL: second-arg
 
 : test-0-float?-when
     [
-        random-number , \ dup , \ float? , 1-float>x nth-rand unit , \ when ,
+        random-number , \ dup , \ float? , 1-float>x pick-one unit , \ when ,
     ] [ ] make 0-runtime-check ;
 
 : test-1-integer?-when
     random-integer [
-        \ dup , \ integer? , 1-integer>x nth-rand unit , \ when ,
+        \ dup , \ integer? , 1-integer>x pick-one unit , \ when ,
     ] [ ] make 1-interpreted-vs-compiled-check ;
 
 : test-1-ratio?-when
     random-ratio [
-        \ dup , \ ratio? , 1-ratio>x nth-rand unit , \ when ,
+        \ dup , \ ratio? , 1-ratio>x pick-one unit , \ when ,
     ] [ ] make 1-interpreted-vs-compiled-check ;
 
 : test-1-float?-when
     random-float [
-        \ dup , \ float? , 1-float>x nth-rand unit , \ when ,
+        \ dup , \ float? , 1-float>x pick-one unit , \ when ,
     ] [ ] make 1-interpreted-vs-compiled-check ;
 
 : test-1-complex?-when
     random-complex [
-        \ dup , \ complex? , 1-complex>x nth-rand unit , \ when ,
+        \ dup , \ complex? , 1-complex>x pick-one unit , \ when ,
     ] [ ] make 1-interpreted-vs-compiled-check ;
 
 
@@ -308,5 +297,5 @@ SYMBOL: second-arg
         test-1-complex?-when
         ! full-gc
         ! code-gc
-    } nth-rand dup . execute terpri ;
+    } pick-one dup . execute terpri ;
 

@@ -22,7 +22,7 @@ IN: random-tester
     random-int 2 swap ^ random-int ;
 
 : random-seq ( -- seq )
-    { [ ] { } V{ } "" } nth-rand
+    { [ ] { } V{ } "" } pick-one
     [ max-length random-int [ max-value random-int , ] times ] swap make ;
 
 : random-string
@@ -56,7 +56,7 @@ SYMBOL: special-complexes
     coin-flip [
         random-fixnum
     ] [
-        coin-flip [ random-bignum ] [ special-integers nth-rand ] if
+        coin-flip [ random-bignum ] [ special-integers pick-one ] if
     ] if ;
 
 : random-positive-integer ( -- int )
@@ -70,7 +70,7 @@ SYMBOL: special-complexes
     1000000000 dup [ random-int ] 2apply 1+ / coin-flip [ neg ] when dup [ drop random-ratio ] unless 10% [ drop 0 ] when ;
 
 : random-float ( -- float )
-    coin-flip [ random-ratio ] [ special-floats nth-rand ] if
+    coin-flip [ random-ratio ] [ special-floats pick-one ] if
     coin-flip 
     [ .0000000000000000001 /f ] [ coin-flip [ .00000000000000001 * ] when ] if
     >float ;
