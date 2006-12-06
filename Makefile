@@ -12,7 +12,7 @@ ifdef DEBUG
 	CFLAGS = -g
 	STRIP = touch
 else
-	CFLAGS = -Wall -O3 -ffast-math $(SITE_CFLAGS)
+	CFLAGS = -Wall -O3 -ffast-math -std=gnu99 $(SITE_CFLAGS)
 	STRIP = strip
 endif
 
