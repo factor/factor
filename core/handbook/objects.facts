@@ -142,8 +142,15 @@ ARTICLE: "class-operations" "Class operations"
 { $subsection types } ;
 
 ARTICLE: "tuples" "Tuples"
-"Tuples are user-defined classes composed of named slots. All tuples have the same type, however distinct classes of tuples are defined."
+"Tuples are user-defined classes composed of named slots. A new tuple class can be defined as follows:"
 { $code "TUPLE: person name address phone ;" }
+"This defines a class word named " { $snippet "person" } ", along with a predicate " { $snippet "person?" } ", a default constructor " { $snippet "<person>" } ", and the following reader/writer words:"
+{ $table
+    { "Reader" "Writer" }
+    { { $snippet "person-name" }    { $snippet "set-person-name" }    }
+    { { $snippet "person-address" } { $snippet "set-person-address" } }
+    { { $snippet "person-phone" }   { $snippet "set-person-phone" }   }
+}
 "A parsing word defines tuple classes."
 { $subsection POSTPONE: TUPLE: }
 { $subsection "tuple-constructors" }
