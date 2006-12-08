@@ -95,7 +95,8 @@ M: workspace pref-dim* delegate pref-dim* { 550 650 } vmax ;
     swap popup-loc swap set-rect-loc ;
 
 : debugger-popup ( error workspace -- )
-    swap [ find-workspace hide-popup ] <debugger>
+    swap dup compute-restarts
+    [ find-workspace hide-popup ] <debugger>
     "Error" show-titled-popup ;
 
 C: workspace ( -- workspace )
@@ -136,7 +137,6 @@ workspace "scrolling" {
 
 workspace "tool-switch" {
     { "Hide popup" T{ key-down f f "ESCAPE" } [ hide-popup ] }
-    { "Hide popup" T{ key-down f f "ENTER" } [ hide-popup ] }
     { "Listener" T{ key-down f f "F2" } [ listener-gadget select-tool ] }
     { "Messages" T{ key-down f f "F3" } [ messages select-tool ] }
     { "Definitions" T{ key-down f f "F4" } [ browser select-tool ] }

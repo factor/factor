@@ -83,7 +83,7 @@ M: list focusable-child* drop t ;
 
 : list-action ( list -- )
     dup list-empty? [
-        drop
+        dup list-hook call
     ] [
         dup list-index swap nth-gadget invoke-secondary
     ] if ; inline

@@ -1,6 +1,5 @@
 + 0.87:
 
-- error popups obscure input area
 - callback scheduling issue
 - error window: ENTER hides it
 

@@ -7,8 +7,8 @@ gadgets-scrolling gadgets-theme gadgets-viewports gadgets-lists
 generic hashtables io kernel math models namespaces prettyprint
 queues sequences test threads help sequences words timers ;
 
-: <restart-list> ( error restart-hook -- gadget )
-    [ restart-name ] rot compute-restarts <model> <list> ;
+: <restart-list> ( restarts restart-hook -- gadget )
+    [ restart-name ] rot <model> <list> ;
 
 TUPLE: debugger restarts ;
 
@@ -22,7 +22,7 @@ C: debugger ( error restarts restart-hook -- gadget )
             f f @top
         }
         {
-            [ dupd <restart-list> ]
+            [ <restart-list> ]
             set-debugger-restarts
             [ <debugger-display> <scroller> ]
             @center

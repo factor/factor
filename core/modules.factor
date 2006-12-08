@@ -44,9 +44,7 @@ TUPLE: module name loc directory files tests help main ;
     modules get [ reload-module ] each do-parse-hook ;
 
 : require ( name -- )
-    dup module
-    [ reload-module ] [ load-module ] ?if
-    do-parse-hook ;
+    dup module [ drop ] [ load-module ] if do-parse-hook ;
 
 : remove-module ( name -- )
     module [ modules get delete ] when* ;
