@@ -9,5 +9,4 @@ void *native_stack_pointer(void) */
 	.globl MANGLE(native_stack_pointer)
 MANGLE(native_stack_pointer):
 	mov %esp,%eax
-	add $4,%ebp
 	ret
