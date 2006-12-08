@@ -118,12 +118,11 @@ TUPLE: bad-escape ;
 
 global [
     {
-        "scratchpad" "syntax" "arrays" "compiler" "definitions"
+        "scratchpad" "syntax" "arrays" "definitions"
         "errors" "generic" "hashtables" "help" "inference"
-        "io" "kernel" "listener" "math"
-        "memory" "modules" "namespaces" "parser" "prettyprint"
-        "sequences" "shells" "strings" "styles" "test"
-        "threads" "tools" "vectors" "words"
+        "io" "kernel" "listener" "math" "memory" "modules"
+        "namespaces" "parser" "prettyprint" "sequences" "shells"
+        "strings" "styles" "tools" "vectors" "words"
     } set-use
     "scratchpad" set-in
 ] bind
