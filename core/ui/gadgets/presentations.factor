@@ -1,8 +1,5 @@
 ! Copyright (C) 2005, 2006 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-IN: gadgets-listener
-DEFER: call-listener
-
 IN: gadgets-presentations
 USING: arrays definitions gadgets gadgets-borders
 gadgets-buttons gadgets-labels gadgets-outliner

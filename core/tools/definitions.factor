@@ -3,7 +3,7 @@
 IN: definitions
 USING: arrays errors generic hashtables io kernel math
 namespaces parser prettyprint prettyprint-internals sequences
-styles words ;
+styles words help ;
 
 : reload ( defspec -- )
     where first [ run-file ] when* ;
@@ -24,8 +24,6 @@ SYMBOL: edit-hook
     ] [
         "Not from a source file" throw
     ] if* ;
-
-GENERIC: synopsis* ( defspec -- )
 
 : write-vocab ( vocab -- )
     dup <vocab-link> presented associate styled-text ;
@@ -125,3 +123,30 @@ M: word see-class* drop ;
 : see-subdefs ( word -- ) subdefs [ terpri see ] each ;
 
 M: word see dup (see) dup see-class see-subdefs ;
+
+M: link where link-name article article-loc ;
+
+M: link synopsis*
+    \ ARTICLE: pprint-word
+    dup link-name pprint*
+    article-title pprint* ;
+
+M: link definition article-content t ;
+
+M: link see (see) ;
+
+PREDICATE: link word-link link-name word? ;
+
+M: word-link where link-name "help-loc" word-prop ;
+
+M: word-link synopsis*
+    \ HELP: pprint-word
+    link-name dup pprint-word
+    stack-effect effect>string comment. ;
+
+M: word-link definition
+    link-name "help" word-prop t ;
+
+M: link forget link-name remove-article ;
+
+M: word-link forget f "help" set-word-prop ;

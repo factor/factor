@@ -80,8 +80,7 @@ M: live-search focusable-child* live-search-field ;
     [ first <link> ] map ;
 
 : <help-search> ( string -- gadget )
-    all-articles [ dup article-title 2array ] map
-    [ [ second ] 2apply <=> ] sort
+    all-articles [ dup article-title 2array ] map sort-values
     [ help-completions ]
     [ article-title ]
     <live-search> ;

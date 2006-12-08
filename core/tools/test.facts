@@ -1,12 +1,6 @@
 IN: test
 USING: help kernel ;
 
-HELP: assert
-{ $values { "got" "the obtained value" } { "expect" "the expected value" } }
-{ $description "Throws an " { $link assert } " error." }
-{ $error-description "Thrown when a unit test or other assertion fails." }
-{ $see-also unit-test unit-test-fails assert-depth } ;
-
 HELP: benchmark
 { $values { "quot" "a quotation" } { "gctime" "an integer denoting milliseconds" } { "runtime" "an integer denoting milliseconds" } }
 { $description "Runs a quotation, measuring the total wall clock time and the total time spent in the garbage collector." }
@@ -27,7 +21,3 @@ HELP: unit-test-fails
 { $values { "quot" "a quotation run with an empty stack" } }
 { $description "Runs a quotation with an empty stack, expecting it to throw an error. If the quotation throws an error, this word returns normally. If the quotation does not throw an error, this word " { $emphasis "does" } " raise an error." }
 { $notes "This word is used to test boundary conditions and fail-fast behavior." } ;
-
-HELP: assert-depth
-{ $values { "quot" "a quotation" } }
-{ $description "Runs a quotation. Throws an error if the total number of elements on the stack is not the same before and after the quotation runs." } ;

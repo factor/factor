@@ -93,3 +93,4 @@ DEFER: !PRIMITIVE: parsing
 SYMBOL: !+files+
 SYMBOL: !+tests+
 SYMBOL: !+help+
+SYMBOL: !+directory+

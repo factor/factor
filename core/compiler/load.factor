@@ -31,6 +31,7 @@ PROVIDE: core/compiler
     "alien/alien-invoke.factor"
     "alien/alien-callback.factor"
     "alien/alien-indirect.factor"
+    "alien/prettyprint.factor"
     "alien/syntax.factor"
 
     "alien/alien-callback.facts"

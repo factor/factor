@@ -3,7 +3,7 @@ USING: definitions io prettyprint ;
 
 HELP: $title
 { $values { "topic" "a help article name or a word" } }
-{ $description "Prints a help article's title, or a word's " { $link synopsis } ", depending on the type of " { $snippet "topic" } "." } ;
+{ $description "Prints a help article's title, or a word's " { $link summary } ", depending on the type of " { $snippet "topic" } "." } ;
 
 HELP: (help)
 { $values { "topic" "an article name or a word" } }

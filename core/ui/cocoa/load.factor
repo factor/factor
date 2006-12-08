@@ -1,6 +1,6 @@
 USING: compiler io parser sequences words ;
 
-REQUIRES: core/compiler/alien/objc ;
+REQUIRES: core/compiler/alien/objc core/ui/tools ;
 
 PROVIDE: core/ui/cocoa
 { +files+ { 

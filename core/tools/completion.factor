@@ -50,7 +50,7 @@ USING: kernel arrays sequences math namespaces strings io ;
 
 : rank-completions ( results -- newresults )
     #! Discard results in the low 33%
-    [ [ first ] 2apply swap - ] sort
+    sort-keys <reversed>
     [ 0 [ first max ] reduce 3 / ] keep
     [ first < ] subset-with
     [ second ] map ;

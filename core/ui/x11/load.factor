@@ -1,6 +1,8 @@
 ! Copyright (C) 2005, 2006 Eduardo Cavazos
 ! See http://factorcode.org/license.txt for BSD license.
 
+REQUIRES: core/ui/tools ;
+
 PROVIDE: core/ui/x11
 { +files+ { 
     "xlib.factor"

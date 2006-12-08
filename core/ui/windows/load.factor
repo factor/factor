@@ -1,4 +1,4 @@
-REQUIRES: core/windows ;
+REQUIRES: core/windows core/ui/tools ;
 
 PROVIDE: core/ui/windows { +files+ { 
     "clipboard.factor"

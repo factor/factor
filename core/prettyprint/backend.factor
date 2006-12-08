@@ -1,7 +1,7 @@
 ! Copyright (C) 2003, 2006 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 IN: prettyprint-internals
-USING: alien arrays generic hashtables io kernel math
+USING: arrays generic hashtables io kernel math
 namespaces parser sequences strings styles vectors words
 prettyprint ;
 
@@ -30,13 +30,6 @@ M: word pprint*
 M: real pprint* number>string text ;
 
 M: f pprint* drop \ f pprint-word ;
-
-M: alien pprint*
-    dup expired? [
-        drop "( alien expired )"
-    ] [
-        \ ALIEN: pprint-word alien-address number>string
-    ] if text ;
 
 ! Strings
 : ch>ascii-escape ( ch -- str )
@@ -74,9 +67,6 @@ M: alien pprint*
 M: string pprint* "\"" pprint-string ;
 
 M: sbuf pprint* "SBUF\" " pprint-string ;
-
-M: dll pprint*
-    dll-path alien>char-string "DLL\" " pprint-string ;
 
 ! Sequences
 : nesting-limit? ( -- ? )

@@ -131,3 +131,13 @@ listener-gadget "toolbar" {
     }
     { "Send EOF" f [ listener-eof ] }
 } define-commands
+
+debugger "toolbar" {
+    { "Data stack" T{ key-down f f "s" } [ :s ] }
+    { "Retain stack" T{ key-down f f "r" } [ :r ] }
+    { "Call stack" T{ key-down f f "c" } [ :c ] }
+    { "Help" T{ key-down f f "h" } [ :help ] }
+    { "Edit" T{ key-down f f "e" } [ :edit ] }
+} [
+    first3 [ call-listener drop ] curry 3array
+] map define-commands

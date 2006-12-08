@@ -136,6 +136,7 @@ workspace "scrolling" {
 
 workspace "tool-switch" {
     { "Hide popup" T{ key-down f f "ESCAPE" } [ hide-popup ] }
+    { "Hide popup" T{ key-down f f "ENTER" } [ hide-popup ] }
     { "Listener" T{ key-down f f "F2" } [ listener-gadget select-tool ] }
     { "Messages" T{ key-down f f "F3" } [ messages select-tool ] }
     { "Definitions" T{ key-down f f "F4" } [ browser select-tool ] }

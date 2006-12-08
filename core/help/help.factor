@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 IN: help
 USING: arrays io kernel namespaces parser prettyprint sequences
-words hashtables definitions ;
+words hashtables definitions errors generic ;
 
 M: word article-title
     dup parsing? [
@@ -85,8 +85,3 @@ M: word article-content
     [ remove-word-help ] keep
     [ swap "help" set-word-prop ] keep
     xref-article ;
-
-! Definition protocol
-M: link forget link-name remove-article ;
-
-M: word-link forget f "help" set-word-prop ;

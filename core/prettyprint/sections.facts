@@ -1,12 +1,6 @@
 IN: help
 USING: io kernel prettyprint prettyprint-internals words ;
 
-: $prettyprinting-note
-    drop {
-        "This word should only be called from inside the "
-        { $link with-pprint } " combinator."
-    } $notes ;
-
 HELP: pprint-section
 { $values { "section" "a section" } }
 { $contract "Prettyprints an object delegating to an instance of " { $link section } ", performing wrapping and indentation using the formatting information in the section." } ;

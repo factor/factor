@@ -5,12 +5,6 @@ USING: arrays errors hashtables tools io kernel math
 memory namespaces parser prettyprint sequences strings words
 vectors ;
 
-TUPLE: assert got expect ;
-
-: assert ( got expect -- * ) <assert> throw ;
-
-: assert= ( a b -- ) 2dup = [ 2drop ] [ assert ] if ;
-
 : print-test ( input output -- )
     "----> Quotation: " write .
     "Expected output: " write . flush ;
@@ -34,8 +28,6 @@ TUPLE: assert got expect ;
 : unit-test-fails ( quot -- )
     [ f ] swap [ [ call t ] [ 2drop f ] recover ]
     curry unit-test ;
-
-: assert-depth ( quot -- ) depth slip depth swap assert= ;
 
 SYMBOL: failures
 

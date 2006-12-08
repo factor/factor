@@ -2,6 +2,7 @@
 
 - error popups obscure input area
 - callback scheduling issue
+- error window: ENTER hides it
 
 + 0.88:
 

@@ -73,27 +73,3 @@ DEFER: $subsection
 
 : xref-help ( -- )
     all-articles [ children ] parent-graph get build-graph ;
-
-! Definition protocol
-M: link where link-name article article-loc ;
-
-M: link synopsis*
-    \ ARTICLE: pprint-word
-    dup link-name pprint*
-    article-title pprint* ;
-
-M: link definition article-content t ;
-
-M: link see (see) ;
-
-PREDICATE: link word-link link-name word? ;
-
-M: word-link where link-name "help-loc" word-prop ;
-
-M: word-link synopsis*
-    \ HELP: pprint-word
-    link-name dup pprint-word
-    stack-effect effect>string comment. ;
-
-M: word-link definition
-    link-name "help" word-prop t ;

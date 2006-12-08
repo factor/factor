@@ -10,3 +10,5 @@ GENERIC: where ( defspec -- loc )
 GENERIC: subdefs ( defspec -- seq )
 
 GENERIC: forget ( defspec -- )
+
+GENERIC: synopsis* ( defspec -- )

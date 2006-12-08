@@ -71,3 +71,13 @@ HELP: compute-restarts
 { $description "Outputs a sequence of triples, where each triple consists of a human-readable string, an object, and a continuation. Resuming a continuation with the corresponding object restarts execution immediately after the corresponding call to " { $link condition } "."
 $terpri
 "This word recursively travels up the delegation chain to collate restarts from nested and wrapped conditions." } ;
+
+HELP: assert
+{ $values { "got" "the obtained value" } { "expect" "the expected value" } }
+{ $description "Throws an " { $link assert } " error." }
+{ $error-description "Thrown when a unit test or other assertion fails." }
+{ $see-also assert-depth } ;
+
+HELP: assert-depth
+{ $values { "quot" "a quotation" } }
+{ $description "Runs a quotation. Throws an error if the total number of elements on the stack is not the same before and after the quotation runs." } ;

@@ -60,4 +60,12 @@ M: condition compute-restarts
 PREDICATE: array kernel-error ( obj -- ? )
     dup first \ kernel-error eq? swap second 0 18 between? and ;
 
+TUPLE: assert got expect ;
+
+: assert ( got expect -- * ) <assert> throw ;
+
+: assert= ( a b -- ) 2dup = [ 2drop ] [ assert ] if ;
+
+: assert-depth ( quot -- ) depth slip depth swap assert= ;
+
 DEFER: try

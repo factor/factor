@@ -14,9 +14,12 @@ prettyprint sequences vectors words ;
     \ boot ,
 
     "core" require
+    "core/help" require
+    "core/tools" require
     "core/compiler" require
     "core/io/buffer" require
     "core/ui" require
+    "core/ui/tools" require
     "core/compiler/" architecture get append require
     "core/handbook" require
 

@@ -242,7 +242,13 @@ M: f print-element drop ;
     drop
     "Throws an error if the I/O operation fails." $errors ;
 
+: $prettyprinting-note
+    drop {
+        "This word should only be called from inside the "
+        { $link with-pprint } " combinator."
+    } $notes ;
+
 : sort-articles ( seq -- newseq )
-    [ [ article-title ] keep 2array ] map
-    [ [ first ] 2apply <=> ] sort
-    1 <column> ;
+    [ dup article-title 2array ] map
+    [ [ second ] 2apply <=> ] sort
+    0 <column> ;

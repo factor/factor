@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 IN: kernel-internals
 USING: assembler command-line errors io io-internals kernel math
-namespaces parser threads words ;
+namespaces parser words threads ;
 
 : boot ( -- )
     init-namespaces

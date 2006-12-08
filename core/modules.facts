@@ -31,17 +31,6 @@ HELP: provide
 { $values { "name" "a string" } { "hash" "a hashtable" } { "loc" "a pair holding a path name and line number" } }
 { $description "Registers a module definition and loads its source files. The possible hashtable keys are documented in the " { $link POSTPONE: PROVIDE: } " word. Usually instead of calling this word, module definitions use the parsing word " { $link POSTPONE: PROVIDE: } " instead." } ;
 
-HELP: test-module
-{ $values { "name" "a module name string" } }
-{ $description "Runs the unit test files associated to the module by a previous call to " { $link provide } " or " { $link POSTPONE: PROVIDE: } "." } ;
-
-HELP: test-modules
-{ $description "Runs unit test files for all loaded modules." } ;
-
-HELP: run-module
-{ $values { "name" "a module name string" } }
-{ $description "Runs the main entry point of the module, first loading the module if necessary using " { $link require } ". Entry points can be defined with the " { $link POSTPONE: MAIN: } " word." } ;
-
 HELP: reload-module
 { $values { "module" "a " { $link module } " instance" } }
 { $description "Reloads any source files making up a module if they have been modified on disk since last being loaded. Most of the time " { $link reload-modules } " should be called instead." } ;
@@ -49,7 +38,3 @@ HELP: reload-module
 HELP: reload-modules
 { $description "Reloads all source files in all loaded modules which have been modified on disk since last being loaded." }
 { $notes "If modification times become invalid after moving sources or images between machines, and this word ends up trying to reload all library sources, call " { $link reset-modified } " from the listener." } ;
-
-HELP: modules-help
-{ $values { "seq" "a new sequence" } }
-{ $description "Outputs a sequence of help articles which are the main entry points into the documentation of loaded modules. Modules can define documentation entry points with the " { $link +help+ } " key of the association list given in " { $link POSTPONE: PROVIDE: } "." } ;

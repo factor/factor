@@ -90,6 +90,12 @@ IN: sequences
 
 : natural-sort ( seq -- sortedseq ) [ <=> ] sort ;
 
+: sort-keys ( alist -- alist )
+    [ [ first ] 2apply <=> ] sort ;
+
+: sort-values ( alist -- alist )
+    [ [ second ] 2apply <=> ] sort ;
+
 : binsearch ( elt seq quot -- i )
     swap dup empty?
     [ 3drop -1 ] [ flatten-slice (binsearch) ] if ; inline
