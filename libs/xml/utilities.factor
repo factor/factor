@@ -34,7 +34,7 @@ M: process-missing error.
 ! * Common utility functions
 
 : build-tag* ( items name -- tag )
-    "" swap <name> "" over set-name-url
+    "" swap "" <name>
     swap >r H{ } r> <tag> ;
 
 : build-tag ( item name -- tag )
@@ -47,10 +47,10 @@ M: process-missing error.
     tag-children [ string? ] subset concat ;
 
 : children-tags ( tag -- sequence )
-    tag-children [ any-tag? ] subset ;
+    tag-children [ tag? ] subset ;
 
 : first-child-tag ( tag -- tag )
-    tag-children [ any-tag? ] find nip ;
+    tag-children [ tag? ] find nip ;
 
 ! * Utilities for searching through XML documents
 ! These all work from the outside in, top to bottom.
@@ -102,16 +102,16 @@ M: xml-doc (xml-find)
 : xml-find ( tag quot -- tag ) ! quot: tag -- ?
     swap (xml-find) ; inline
 
-: prop-name ( name-tag tag -- seq/f )
-    #! gets the property with the name-tag string specified
+: prop-name ( name tag -- seq/f )
+    #! gets the property with the first matching name
     tag-props [
-        hash-keys [ name-tag over = ] find
+        hash-keys [ over names-match? ] find
     ] keep hash 2nip ;
 
 : get-id ( tag id -- elem ) ! elem=tag.getElementById(id)
     swap [
-        dup any-tag? [
-            "id" swap prop-name
+        dup tag? [
+            T{ name f f "id" f } swap prop-name
             [ string? ] subset concat
             over =
         ] [ drop f ] if

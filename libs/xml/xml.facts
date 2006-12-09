@@ -4,13 +4,13 @@ USING: help kernel xml ;
 
 HELP: string>xml
 { $values { "string" "a string" } { "xml-doc" "an xml document" } }
-{ $description "converts a string into an " { $snippet "xml-doc" }
+{ $description "converts a string into an " { $link xml-doc }
     " datatype for further processing" }
 { $see-also xml>string xml-reprint } ;
 
 HELP: xml>string
 { $values { "xml-doc" "an xml document" } { "string" "a string" } }
-{ $description "converts an xml document into a string" }
+{ $description "converts an xml document (" { $link xml-doc } ") into a string" }
 { $notes "does not preserve what type of quotes were used or what data was omitted from version declaration" }
 { $see-also string>xml xml-reprint write-xml } ;
 
@@ -18,14 +18,14 @@ HELP: xml-parse-error
 { $class-description "the exception class that all parsing errors in XML documents are in." } ;
 
 HELP: xml-reprint
-{ $values { "string" "a string of XML" } { "string" "reprinted XML" } }
-{ $description "parses XML and converts it back into a string, for testing purposes" }
+{ $values { "string" "a string of XML" } }
+{ $description "parses XML and prints it out again, for testing purposes" }
 { $notes "does not preserve what type of quotes were used or what data was omitted from version declaration" }
 { $see-also write-xml xml>string string>xml } ;
 
 HELP: write-xml
 { $values { "xml-doc" "an XML document" } }
-{ $description "prints the contents of an XML document to stdio" }
+{ $description "prints the contents of an XML document (" { $link xml-doc } ") to stdio" }
 { $notes "does not preserve what type of quotes were used or what data was omitted from version declaration" }
 { $see-also xml>string xml-reprint read-xml } ;
 
@@ -68,12 +68,12 @@ HELP: xml-subset
 HELP: build-tag*
 { $values { "items" "sequence of elements" } { "name" "string" }
     { "tag" "an XML tag" } }
-{ $description "builds a tag with the specified name, in the namespace \"\" and URL \"\" containing the children listed in item" }
+{ $description "builds a " { $link tag } " with the specified name, in the namespace \"\" and URL \"\" containing the children listed in item" }
 { $see-also build-tag build-xml-doc } ;
 
 HELP: build-tag
 { $values { "item" "an element" } { "name" "string" } { "tag" "XML tag" } }
-{ $description "builds a tag with the specified name containing the single child item" }
+{ $description "builds a " { $link tag } " with the specified name containing the single child item" }
 { $see-also build-tag* build-xml-doc } ;
 
 HELP: build-xml-doc
@@ -82,24 +82,24 @@ HELP: build-xml-doc
 { $see-also build-tag* build-tag } ;
 
 HELP: tag
-{ $class-description "tuple representing an XML tag, delegating to a name, containing the slots props (a hashtable) and children (a sequence)" }
+{ $class-description "tuple representing an XML tag, delegating to a " { $link name } ", containing the slots props (a hashtable) and children (a sequence)" }
 { $see-also <tag> name contained-tag xml-doc } ;
 
 HELP: <tag>
 { $values { "name" "an XML tag name" }
     { "props" "a hashtable of XML properties" }
     { "children" "a sequence" } }
-{ $description "constructs an XML tag, with the specified name (not a string) and tag properties specified in props, and children specified" }
+{ $description "constructs an XML " { $link tag } ", with the name (not a string) and tag properties specified in props, and children specified" }
 { $see-also tag <contained-tag> build-tag build-tag* } ;
 
 HELP: name
 { $class-description "represents an XML name, with the fields space (a string representing the namespace, as written in the document, tag (a string of the actual name of the tag) and url (a string of the URL that the namespace points to)" }
 { $see-also <name> tag } ;
 
-HELP: <name>
-{ $values { "space" "a string" } { "tag" "a string" }
+HELP: <name> ( space tag url -- name )
+{ $values { "space" "a string" } { "tag" "a string" } { "url" "a string" }
     { "name" "an XML tag name" } }
-{ $description "creates a name tuple with the name-space space and the tag-name tag. The namespace URL must be added later." }
+{ $description "creates a name tuple with the name-space space and the tag-name tag and the tag-url url." }
 { $see-also name <tag> } ;
 
 HELP: contained-tag
@@ -169,6 +169,66 @@ HELP: <instruction> ( text -- instruction )
 { $description "creates an XML parsing instruction, such as <?xsl stylesheet='foo.xml'?>." }
 { $see-also instruction } ;
 
+HELP: names-match?
+{ $values { "name1" "a name" } { "name2" "a name" } { "?" "t or f" } }
+{ $description "checks to see if the two names match, that is, if all fields are equal, ignoring fields whose value is f in either name." }
+{ $example "T{ name f \"rpc\" \"methodCall\" f } T{ name f f \"methodCall\" \"http://www.xmlrpc.org/\" } names-match? ! => t" }
+{ $see-also name } ;
+
+HELP: xml-chunk
+{ $values { "stream" "an input stream" } { "seq" "a sequence of elements" } }
+{ $description "rather than parse a document, as " { $link read-xml } " does, this word parses and returns a sequence of XML elements (tags, strings, etc). This is useful for fragments of XML which may have more than one main tag." }
+{ $see-also read-xml } ;
+
+HELP: xml-find
+{ $values { "tag" "an XML element or document" } { "quot" "a quotation ( elem -- ? )" } { "tag" "an XML element which satisfies the predicate" } }
+{ $description "finds the first element in the XML document which satisfies the predicate, moving from the outermost element to the innermost, top-down" }
+{ $see-also xml-each xml-map get-id } ;
+
+HELP: get-id
+{ $values { "tag" "an XML tag or document" } { "id" "a string" } { "elem" "an XML element or f" } }
+{ $description "finds the XML tag with the specified id, ignoring the namespace" }
+{ $see-also xml-find } ;
+
+HELP: spot
+{ $var-description "This variable represents the location in the program. It is in the format { char line column line-str } where char is the current character, line is the line number, column is the column number, and line-str is the full contents of the line, as a string. The contents shouldn't be accessed directly but rather with the proxy words get-char set-char get-line etc." } ;
+
+HELP: new-record
+{ $description "puts the parser into recording mode, where all characters encountered are pushed into a string buffer to be extracted later" }
+{ $see-also end-record } ;
+
+HELP: end-record
+{ $values { "string" "a string" } }
+{ $description "takes the parser out of recording mode and outputs the string recorded" }
+{ $see-also new-record } ;
+
+HELP: skip-until
+{ $values { "quot" "a quotation ( -- ? )" } }
+{ $description "executes " { $link next } " until the quotation yields false. Usually, the quotation will call " { $link get-char } " in its test, but not always." }
+{ $see-also take-until } ;
+
+HELP: take-until
+{ $values { "quot" "a quotation ( -- ? )" } { "string" "a string" } }
+{ $description "like " { $link skip-until } " but records what it passes over and outputs the string." }
+{ $see-also skip-until take-char take-string } ;
+
+HELP: take-char
+{ $values { "char" "a character" } { "string" "a string" } }
+{ $description "records the document from the current spot to the first instance of the given character. Outputs the content between those two points." }
+{ $see-also take-until take-string } ;
+
+HELP: take-string
+{ $values { "match" "a string to match" } { "string" "the portion of the XML document" } }
+{ $description "records the document from the current spot to the first instance of the given character. Outputs the content between those two points." }
+{ $notes "match may not contain a newline" } ;
+
+HELP: next
+{ $description "originally written as " { $code "spot inc" } ", code that would no longer run, this word moves the state of the XML parser to the next place in the source file, keeping track of appropriate debugging information." } ;
+
+HELP: process
+{ $values { "object" "an opener, closer, contained or text element" } }
+{ $description { "takes an XML event and, using the XML stack, processes it and adds it to the tree" } } ;
+
 ARTICLE: { "xml" "intro" } "XML"
     "The XML module attempts to implement the XML 1.1 standard, converting strings of text into XML and vice versa. It currently is a work in progress. Together with XML-RPC, this is a component of the F2EE framework."
     $terpri
@@ -176,7 +236,8 @@ ARTICLE: { "xml" "intro" } "XML"
     { $subsection { "xml" "basic" } }
     { $subsection { "xml" "classes" } }
     { $subsection { "xml" "construct" } }
-    { $subsection { "xml" "utils" } } ;
+    { $subsection { "xml" "utils" } }
+    { $subsection { "xml" "internal" } } ;
 
 ARTICLE: { "xml" "basic" } "Basic words for XML processing"
     "These are the most basic words needed for processing an XML document"
@@ -185,8 +246,7 @@ ARTICLE: { "xml" "basic" } "Basic words for XML processing"
     { $subsection xml-parse-error }
     { $subsection xml-reprint }
     { $subsection write-xml }
-    { $subsection read-xml }
-    { $subsection init-xml } ;
+    { $subsection read-xml } ;
 
 ARTICLE: { "xml" "classes" } "XML data classes"
     "Data types that XML documents are made of:"
@@ -222,7 +282,23 @@ ARTICLE: { "xml" "utils" } "XML processing utilities"
     { $subsection xml-each }
     { $subsection xml-map }
     { $subsection xml-subset }
+    { $subsection xml-find }
+    { $subsection get-id }
     "Words for simplified generation of XML:"
     { $subsection build-tag* }
     { $subsection build-tag }
-    { $subsection build-xml-doc } ;
+    { $subsection build-xml-doc }
+    "Other relevant words:"
+    { $subsection names-match? } ;
+
+ARTICLE: { "xml" "internal" } "Internals of the XML parser"
+    "The XML parser creates its own parsing framework to process XML documents. The parser operates on streams. Important words involved in processing are:"
+    { $subsection spot }
+    { $subsection new-record }
+    { $subsection end-record }
+    { $subsection skip-until }
+    { $subsection take-until }
+    { $subsection take-char }
+    { $subsection take-string }
+    { $subsection next }
+    { $subsection process } ; ! should I have more? less?

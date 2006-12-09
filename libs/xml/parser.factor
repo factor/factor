@@ -1,8 +1,10 @@
-! --> Copyright (C) 2005, 2006 Daniel Ehrenberg
+! Copyright (C) 2005, 2006 Daniel Ehrenberg
 ! See http://factorcode.org/license.txt for BSD license.
 IN: xml
 USING: errors hashtables io kernel math namespaces prettyprint sequences
     arrays generic strings vectors char-classes ;
+
+! * Parsing tags
 
 TUPLE: opener name props ;
 TUPLE: closer name ;
@@ -15,22 +17,6 @@ TUPLE: instruction text ;
     #! Outputs the name and whether this is a closing tag
     get-char CHAR: / = dup [ next ] when
     parse-name swap ;
-
-: (parse-quot) ( ch -- )
-    ! The similarities with (parse-text) should be factored out
-    get-char {
-        { [ dup not ]
-          [ "File ended in quote" <xml-string-error> throw ] }
-        { [ 2dup = ]
-          [ 2drop end-record , next ] }
-        { [ dup CHAR: & = ]
-          [ drop parse-entity (parse-quot) ] }
-        { [ CHAR: % = ] [ parse-reference (parse-quot) ] }
-        { [ t ] [ next (parse-quot) ] }
-    } cond ;
-
-: parse-quot ( ch -- array )
-   [ new-record (parse-quot) ] { } make ;
 
 : parse-prop-value ( -- seq )
     get-char dup "'\"" member? [
@@ -46,7 +32,7 @@ TUPLE: instruction text ;
     swap set ;
 
 : (middle-tag) ( -- )
-    pass-blank get-char name-start-char?
+    pass-blank version=1.0? get-char name-start-char?
     [ parse-prop (middle-tag) ] when ;
 
 : middle-tag ( -- hash )
@@ -77,7 +63,6 @@ TUPLE: instruction text ;
     "?>" take-string <instruction> ;
 
 : make-tag ( -- tag/f )
-    CHAR: < expect
     { { [ get-char dup CHAR: ! = ] [ drop next directive ] }
       { [ CHAR: ? = ] [ next instruction ] } 
       { [ t ] [
@@ -95,9 +80,12 @@ C: tag ( name props children -- tag )
     [ set-tag-props ] keep
     [ set-delegate ] keep ;
 
-TUPLE: contained-tag ;
-C: contained-tag ( name props -- contained-tag )
-    [ >r { } <tag> r> set-delegate ] keep ;
+! tag with children=f is contained
+: <contained-tag> ( name props -- tag )
+    f <tag> ;
+
+PREDICATE: tag contained-tag tag-children not ;
+PREDICATE: tag open-tag tag-children ;
 
 ! A stack of { tag children } pairs
 SYMBOL: xml-stack
@@ -273,7 +261,8 @@ M: bad-version error.
     init-xml-stack
     init-ns-stack ;
 
-UNION: any-tag tag contained-tag ;
+: init-xml-string ( string -- ) ! for debugging
+    <string-reader> init-xml ;
 
 TUPLE: notags ;
 M: notags error.
@@ -284,26 +273,28 @@ M: multitags error.
     drop "XML document contains multiple main tags" print ;
 
 : make-xml-doc ( seq -- xml-doc )
-    prolog-data get swap dup [ any-tag? ] find
+    prolog-data get swap dup [ tag? ] find
     >r dup -1 = [ <notags> throw ] when
     swap cut 1 tail
-    dup [ any-tag? ] contains? [ <multitags> throw ] when r>
+    dup [ tag? ] contains? [ <multitags> throw ] when r>
     swap <xml-doc> ;
 
 : (read-xml) ( -- )
     parse-text [ add-child ] each
     get-char [ make-tag process (read-xml) ] when ;
 
+: (xml-chunk) ( stream -- seq )
+    init-xml parse-prolog (read-xml)
+    xml-stack get
+    dup length 1 = [ <unclosed> throw ] unless
+    first second ;
+
 : read-xml ( stream -- xml-doc )
     #! Produces a tree of XML nodes
-    [
-        init-xml
-        parse-prolog (read-xml)
-        xml-stack get
-        dup length 1 = [ <unclosed> throw ] unless
-        first second
-        make-xml-doc
-    ] with-scope ;
+    [ (xml-chunk) make-xml-doc ] with-scope ;
+
+: xml-chunk ( stream -- seq )
+    [ (xml-chunk) ] with-scope ;
 
 : string>xml ( string -- xml-doc )
     <string-reader> read-xml ;

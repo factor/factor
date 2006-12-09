@@ -205,46 +205,60 @@ TUPLE: reference name ;
     next unrecord end-record , CHAR: ; take-char
     <reference> , next new-record ;
 
-: (parse-text) ( -- )
+: (parse-char) ( ch -- )
+    ! The similarities with (parse-text) should be factored out
     get-char {
         { [ dup not ]
-          [ drop 0 end-record* , ] }
-        { [ dup CHAR: < = ] [ drop end-record , ] }
+          [ 2drop 0 end-record* , ] }
+        { [ 2dup = ]
+          [ 2drop end-record , next ] }
         { [ dup CHAR: & = ]
-          [ drop parse-entity (parse-text) ] }
-        { [ CHAR: % = ]
-          [ parse-reference (parse-text) ] }
-        { [ t ] [ next (parse-text) ] }
+          [ drop parse-entity (parse-char) ] }
+        { [ CHAR: % = ] [ parse-reference (parse-char) ] }
+        { [ t ] [ next (parse-char) ] }
     } cond ;
 
-: parse-text ( -- array )
-   [ new-record (parse-text) ] { } make ;
+: parse-char ( ch -- array )
+    [ new-record (parse-char) ] { } make ;
 
-!   -- Parsing tags
+: parse-quot ( ch -- array )
+    parse-char get-char
+    [ "XML file ends in a quote" <xml-string-error> throw ] unless ;
+
+: parse-text ( -- array )
+    CHAR: < parse-char ;
+
+!   -- Parsing names
 
 TUPLE: name space tag url ;
-C: name ( space tag -- name )
-    [ set-name-tag ] keep
-    [ set-name-space ] keep ;
 
-: get-version ( -- string )
-    prolog-data get prolog-version ;
+: version=1.0? ( -- ? )
+    prolog-data get prolog-version "1.0" = ;
 
-: name-start-char? ( char -- ? )
-    get-version "1.0" =
-    [ 1.0name-start-char? ] [ 1.1name-start-char? ] if ;
+! version=1.0? is calculated once and passed around for efficiency
+: name-start-char? ( 1.0? char -- ? )
+    swap [ 1.0name-start-char? ] [ 1.1name-start-char? ] if ;
 
-: name-char? ( char -- ? )
-    get-version "1.0" =
-    [ 1.0name-char? ] [ 1.1name-char? ] if ;
+: name-char? ( 1.0? char -- ? )
+    swap [ 1.0name-char? ] [ 1.1name-char? ] if ;
 
 : (parse-name) ( -- str )
+    version=1.0? dup
     new-record get-char name-start-char? [
-        [ get-char name-char? not ] skip-until end-record
+        [ dup get-char name-char? not ] skip-until
+        drop end-record
     ] [
         "Malformed name" <xml-string-error> throw
     ] if ;
 
 : parse-name ( -- name )
     (parse-name) get-char CHAR: : =
-    [ next (parse-name) ] [ "" swap ] if <name> ;
+    [ next (parse-name) ] [ "" swap ] if f <name> ;
+
+: ?= ( object/f object/f -- ? )
+    2dup and [ = ] [ 2drop t ] if ;
+
+: names-match? ( name1 name2 -- ? )
+    [ name-space swap name-space ?= ] 2keep
+    [ name-url swap name-url ?= ] 2keep
+    name-tag swap name-tag ?= and and ;

@@ -19,7 +19,7 @@ SYMBOL: xml-file
 [ t ] [ xml-file get tag-children second contained-tag? ] unit-test
 [ t ] [ [ "<a></b>" string>xml ] catch xml-parse-error? ] unit-test
 [ "<?xml version=\"1.0\" encoding=\"iso-8859-1\" standalone=\"no\"?><a b=\"c\"/>" ]
-    [ "<a b='c'/>" xml-reprint ] unit-test
+    [ "<a b='c'/>" string>xml xml>string ] unit-test
 [ 32 ] [
     "<math><times><add><number>1</number><number>3</number></add><neg><number>-8</number></neg></times></math>"
     calc-arith

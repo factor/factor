@@ -43,7 +43,7 @@ M: contained-tag (xml>string)
     tag-props print-props
     "/>" write ;
 
-M: tag (xml>string)
+M: open-tag (xml>string)
     CHAR: < write1
     dup print-name
     dup tag-props print-props
@@ -79,6 +79,6 @@ M: instruction (xml>string)
 : xml>string ( xml-doc -- string )
     [ write-xml ] string-out ;
 
-: xml-reprint ( string -- string )
-    string>xml xml>string ;
+: xml-reprint ( string -- )
+    string>xml print-xml ;
 
