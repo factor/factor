@@ -130,11 +130,6 @@ M: operation invoke-command
 } define-operation
 
 [ word? ] H{
-    { +name+ "Edit documentation" }
-    { +quot+ [ <link> edit ] }
-} define-operation
-
-[ word? ] H{
     { +name+ "Usage" }
     { +keyboard+ T{ key-down f { A+ } "u" } }
     { +quot+ [ usage. ] }

@@ -1,13 +1,14 @@
 + 0.87:
 
 - callback scheduling issue
-- error window: ENTER hides it
+- error popup obscures input area
+- browser: tile titles should respond to right-clicks and/or have a
+  menu popup button
+- ui docs
 
 + 0.88:
 
 - lisppaste gui
-- browser: tile titles should respond to right-clicks and/or have a
-  menu popup button
 - growable data heap
 - variable width word wrap
 - graphical crossref tool
@@ -19,9 +20,7 @@
 - use crc32 instead of modification date in reload-modules
 - models: don't do redundant work
 - top level window positioning on ms windows
-- crashes:
-  - httpd crash
-  - fep when closing window
+- httpd crash
 - these things are "Too Slow":
   - make-image
   - workspace-window
@@ -36,7 +35,6 @@
 - new windows don't always have focus, eg focus follows mouse
 - recompile get/set/>n/n>/ndrop if needed
 - cross-word type inference
-- ui docs
 - some kind of declarative wiring framework for ui
 - if we're printing a block on multiple lines, break at some words like
   set off on % # , ... and assembler opcodes
