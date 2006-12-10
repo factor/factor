@@ -279,9 +279,20 @@ M: multitags error.
     dup [ tag? ] contains? [ <multitags> throw ] when r>
     swap <xml-doc> ;
 
+: sax-loop ( quot -- ) ! quot: xml-elem --
+    parse-text [ swap dup slip ] each
+    get-char [ make-tag swap dup slip sax-loop ]
+    [ drop ] if ; inline
+
+: sax ( stream quot -- ) ! quot: xml-elem --
+    swap [
+        init-xml parse-prolog
+        prolog-data get swap dup slip
+        sax-loop
+    ] with-scope ; inline
+
 : (read-xml) ( -- )
-    parse-text [ add-child ] each
-    get-char [ make-tag process (read-xml) ] when ;
+    [ process ] sax-loop ; inline
 
 : (xml-chunk) ( stream -- seq )
     init-xml parse-prolog (read-xml)

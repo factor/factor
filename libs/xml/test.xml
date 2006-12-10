@@ -8,7 +8,9 @@
            Here's a new, undefined &entity;
  and here's a %reference; to go along with it!
         isn't this fun?
-   <a:c><d mood="happy"></d></a:c>
+   <a:c><d mood="happy"></d>
+              <e a:id='x'>f&#97;&amp;g</e>
+   </a:c>
 </a:b>
 <!--Well, that went over pretty well-->
 <?xsl stylesheet="that-one.xsl"?>

@@ -18,6 +18,16 @@ SYMBOL: xml-file
     tag-props hash ] unit-test
 [ t ] [ xml-file get tag-children second contained-tag? ] unit-test
 [ t ] [ [ "<a></b>" string>xml ] catch xml-parse-error? ] unit-test
+[ T{ comment f "This is where the fun begins!" } ] [
+    xml-file get xml-doc-before [ comment? ] find nip
+] unit-test
+[ "entity" ] [ xml-file get [ entity? ] xml-find entity-name ] unit-test
+[ "reference" ] [ xml-file get [ reference? ] xml-find reference-name ] unit-test
+[ "xsl stylesheet=\"that-one.xsl\"" ] [
+    xml-file get xml-doc-after [ instruction? ] find nip instruction-text
+] unit-test
+[ V{ "fa&g" } ] [ xml-file get "x" get-id tag-children ] unit-test
+[ { "that" } ] [ xml-file get "this" prop-name-tag ] unit-test
 [ "<?xml version=\"1.0\" encoding=\"iso-8859-1\" standalone=\"no\"?><a b=\"c\"/>" ]
     [ "<a b='c'/>" string>xml xml>string ] unit-test
 [ 32 ] [

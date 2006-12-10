@@ -227,7 +227,25 @@ HELP: next
 
 HELP: process
 { $values { "object" "an opener, closer, contained or text element" } }
-{ $description { "takes an XML event and, using the XML stack, processes it and adds it to the tree" } } ;
+{ $description  "takes an XML event and, using the XML stack, processes it and adds it to the tree"  } ;
+
+HELP: sax
+{ $values { "stream" "an input stream" } { "quot" "a quotation ( xml-elem -- )" } }
+{ $description "parses the XML document, and whenever an event is encountered (a tag piece, comment, parsing instruction, directive or string element), the quotation is called with that event on the stack. The quotation has all responsibility to deal with the event properly, and it is advised that generic words be used in dispatching on the event class." }
+{ $notes "It is important to note that this is not SAX, merely an event-based XML view" }
+{ $see-also read-xml } ;
+
+HELP: opener
+{ $class-description "describes an opening tag, like <a>. Contains two slots, name and props, containing, respectively, the name of the tag and its attributes. Usually, the name-url will be f." }
+{ $see-also closer contained } ;
+
+HELP: closer
+{ $class-description "describes a closing tag, like </a>. Contains one slot, name, containing the tag's name. Usually, the name-url will be f." }
+{ $see-also opener contained } ;
+
+HELP: contained
+{ $class-description "represents a self-closing tag, like <a/>. Contains two slots, name and props, containing, respectively, the name of the tag and its attributes. Usually, the name-url will be f." }
+{ $see-also opener closer } ;
 
 ARTICLE: { "xml" "intro" } "XML"
     "The XML module attempts to implement the XML 1.1 standard, converting strings of text into XML and vice versa. It currently is a work in progress. Together with XML-RPC, this is a component of the F2EE framework."
@@ -237,7 +255,8 @@ ARTICLE: { "xml" "intro" } "XML"
     { $subsection { "xml" "classes" } }
     { $subsection { "xml" "construct" } }
     { $subsection { "xml" "utils" } }
-    { $subsection { "xml" "internal" } } ;
+    { $subsection { "xml" "internal" } }
+    { $subsection { "xml" "events" } } ;
 
 ARTICLE: { "xml" "basic" } "Basic words for XML processing"
     "These are the most basic words needed for processing an XML document"
@@ -246,7 +265,8 @@ ARTICLE: { "xml" "basic" } "Basic words for XML processing"
     { $subsection xml-parse-error }
     { $subsection xml-reprint }
     { $subsection write-xml }
-    { $subsection read-xml } ;
+    { $subsection read-xml }
+    { $subsection xml-chunk } ;
 
 ARTICLE: { "xml" "classes" } "XML data classes"
     "Data types that XML documents are made of:"
@@ -302,3 +322,10 @@ ARTICLE: { "xml" "internal" } "Internals of the XML parser"
     { $subsection take-string }
     { $subsection next }
     { $subsection process } ; ! should I have more? less?
+
+ARTICLE: { "xml" "events" } "Event-based XML parsing"
+    "In addition to DOM-style parsing based around " { $link read-xml } ", the XML module also provides SAX-style event-based parsing. This uses much of the same data structures as normal XML, with the exception of the classes " { $link xml-doc } " and " { $link tag } " and as such, the articles " { $link { "xml" "classes" } } " and " { $link { "xml" "construct" } } " may be useful in learning how to process documents in this way. Other useful words are:"
+    { $subsection sax }
+    { $subsection opener }
+    { $subsection closer }
+    { $subsection contained } ;

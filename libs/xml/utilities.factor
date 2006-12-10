@@ -102,16 +102,20 @@ M: xml-doc (xml-find)
 : xml-find ( tag quot -- tag ) ! quot: tag -- ?
     swap (xml-find) ; inline
 
-: prop-name ( name tag -- seq/f )
+: prop-name ( tag name -- seq/f )
     #! gets the property with the first matching name
-    tag-props [
+    swap tag-props [
         hash-keys [ over names-match? ] find
     ] keep hash 2nip ;
+
+: prop-name-tag ( tag string -- seq/f )
+    ! like prop-name but only with name-tag not the whole name
+    f swap f <name> prop-name ;
 
 : get-id ( tag id -- elem ) ! elem=tag.getElementById(id)
     swap [
         dup tag? [
-            T{ name f f "id" f } swap prop-name
+            "id" prop-name-tag
             [ string? ] subset concat
             over =
         ] [ drop f ] if
