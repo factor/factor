@@ -45,8 +45,3 @@ SYMBOL: stdio
 
 : write-outliner ( str obj content -- )
     outline associate [ write-object ] with-nesting ;
-
-: print-input ( string input -- )
-    <input> presented associate
-    [ H{ { font-style bold } } format ] with-nesting
-    terpri ;

@@ -59,7 +59,7 @@ M: font equal? eq? ;
     } hash ;
 
 : ttf-path ( name -- string )
-    "/fonts/" swap ".ttf" append3 resource-path ;
+    "/fonts/" swap ".ttf" 3append resource-path ;
 
 : open-face ( font style -- face )
     #! Open a TrueType font with the given logical name and

@@ -43,7 +43,7 @@ parser sequences strings words ;
     [ first4 define-slot ] each-with ;
 
 : reader-word ( class name -- word )
-    >r word-name "-" r> append3 in get 2array ;
+    >r word-name "-" r> 3append in get 2array ;
 
 : writer-word ( class name -- word )
     [ swap "set-" % word-name % "-" % % ] "" make in get 2array ;

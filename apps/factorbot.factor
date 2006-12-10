@@ -93,7 +93,7 @@ IN: factorbot-commands
     ] [
         nip [
             dup summary " -- " 
-            rot object-href append3 respond
+            rot object-href 3append respond
         ] each
     ] if ;
 

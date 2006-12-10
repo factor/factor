@@ -14,4 +14,4 @@ USING: arrays kernel sequences sequences-internals test vectors ;
 [ V{ "a" "b" "c" } ] [ { "a" "b" "c" } V{ } like ] unit-test
 [ { "a" "b" "c" } ] [ { "a" } { "b" "c" } append ] unit-test
 [ { "a" "b" "c" "d" "e" } ]
-[ { "a" } { "b" "c" } { "d" "e" } append3 ] unit-test
+[ { "a" } { "b" "c" } { "d" "e" } 3append ] unit-test

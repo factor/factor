@@ -139,3 +139,9 @@ TUPLE: loc-recording ;
 [ f ] [ \ loc-recording where not ] unit-test
 [ f ] [ \ <loc-recording> where not ] unit-test
 [ f ] [ \ loc-recording? where not ] unit-test
+
+! Ensure C: puts the word in the right vocabulary
+[ f ] [
+    "IN: temporary TUPLE: xyz ; IN: temporary2 C: xyz ;" eval
+    "<xyz>" "temporary2" lookup
+] unit-test

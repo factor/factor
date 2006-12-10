@@ -92,7 +92,7 @@ SYMBOL: break-hook
     >r >quotation r> over length 3array >vector ;
 
 : <breakpoint> ( break quot scan -- callframe )
-    >r cut [ break ] swap append3 r> <callframe> ;
+    >r cut [ break ] swap 3append r> <callframe> ;
 
 : step-to ( n -- )
     >r meta-c r>

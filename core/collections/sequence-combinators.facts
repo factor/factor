@@ -143,6 +143,13 @@ HELP: all-with?
 { $values { "obj" "an object" } { "seq" "a sequence" } { "quot" "a quotation with stack effect " { $snippet "( obj elt -- ? )" } } { "?" "a boolean" } }
 { $description "Variant of " { $link all? } " which pushes a retained object on each invocation of the quotation." } ;
 
+HELP: subset*
+{ $values { "flags" "a sequence" } { "seq" "a sequence" } { "subseq" "a new sequence" } }
+{ $description "Outputs a new sequence containing all elements of " { $snippet "seq" } " such that the corresponding element of " { $snippet "flags" } " is not equal to " { $link f } "." }
+{ $examples
+    { $example "{ t f t f } { 1 2 3 4 } subset* ." "{ 1 3 }" }
+} ;
+
 HELP: subset
 { $values { "seq" "a sequence" } { "quot" "a quotation with stack effect " { $snippet "( elt -- ? )" } } { "subseq" "a new sequence" } }
 { $description "Applies the quotation to each element in turn, and outputs a new sequence containing the elements of the original sequence for which the quotation output a true value." } ;

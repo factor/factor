@@ -9,7 +9,7 @@ queues sequences words ;
 GENERIC: handle-gesture* ( gadget gesture delegate -- ? )
 
 M: object handle-gesture*
-    class "gestures" word-prop ?hash*
+    class "gestures" word-prop ?hash dup
     [ call f ] [ 2drop t ] if ;
 
 : handle-gesture ( gesture gadget -- ? )

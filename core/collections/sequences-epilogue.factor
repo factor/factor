@@ -66,15 +66,15 @@ sequences-internals strings vectors words ;
     [ >r over length r> rot copy-into ] keep
     [ 0 swap rot copy-into ] keep ; inline
 
-: (append3) ( seq1 seq2 seq3 exemplar -- newseq )
+: (3append) ( seq1 seq2 seq3 exemplar -- newseq )
     [
         >r pick length pick length pick length + + r> new
         [ >r pick length pick length + r> rot copy-into ] keep
         ((append))
     ] keep like ;
 
-: append3 ( seq1 seq2 seq3 -- newseq )
-    pick (append3) ; inline
+: 3append ( seq1 seq2 seq3 -- newseq )
+    pick (3append) ; inline
 
 : (append) ( seq1 seq2 exemplar -- newseq )
     [

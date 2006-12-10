@@ -15,7 +15,7 @@ USE: vectors
 [ "abc" ] [ [ "a" "b" "c" ] [ [ % ] each ] "" make ] unit-test
 
 [ "abc" ] [ "ab" "c" append ] unit-test
-[ "abc" ] [ "a" "b" "c" append3 ] unit-test
+[ "abc" ] [ "a" "b" "c" 3append ] unit-test
 
 [ 3 ] [ "a" "hola" start ] unit-test
 [ -1 ] [ "x" "hola" start ] unit-test

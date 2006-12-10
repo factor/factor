@@ -12,5 +12,4 @@ namespaces parser words threads ;
     init-error-handler
     init-threads
     default-cli-args
-    parse-command-line
-    "null-stdio" get [ stdio off ] when ;
+    [ parse-command-line ] try ;

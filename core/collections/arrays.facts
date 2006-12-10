@@ -22,12 +22,17 @@ HELP: 1array
 
 HELP: 2array
 { $values { "x" "an object" } { "y" "an object" } { "array" "an array" } }
-{ $description "Create a new array with two elements." }
+{ $description "Create a new array with two elements, with " { $snippet "x" } " appearing first." }
 { $see-also 1array 3array ch>string } ;
 
 HELP: 3array
 { $values { "x" "an object" } { "y" "an object" } { "z" "an object" } { "array" "an array" } }
-{ $description "Create a new array with three elements." }
+{ $description "Create a new array with three elements, with " { $snippet "x" } " appearing first." }
+{ $see-also 1array 2array ch>string } ;
+
+HELP: 4array
+{ $values { "w" "an object" } { "x" "an object" } { "y" "an object" } { "z" "an object" } { "array" "an array" } }
+{ $description "Create a new array with four elements, with " { $snippet "w" } " appearing first." }
 { $see-also 1array 2array ch>string } ;
 
 HELP: resize-array ( n array -- newarray )

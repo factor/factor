@@ -28,7 +28,7 @@ M: array sheet sequence-sheet ;
 
 M: hashtable summary
     "a hashtable storing " swap hash-size number>string
-    " keys" append3 ;
+    " keys" 3append ;
 
 M: hashtable sheet hash>alist ;
 

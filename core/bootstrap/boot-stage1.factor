@@ -17,6 +17,7 @@ prettyprint sequences vectors words ;
     "core/help" require
     "core/tools" require
     "core/compiler" require
+    "core/documentation" require
     "core/io/buffer" require
     "core/ui" require
     "core/ui/tools" require

@@ -5,4 +5,4 @@ HELP: :help
 { $description "Displays documentation for the most recent error." } ;
 
 HELP: :edit
-{ $description "If the most recent error was a " { $link parse-error } " thrown while parsing a source file, opens the source file at the failing line in the default editor using " { $link edit-location } "." } ;
+{ $description "If the most recent error was a " { $link parse-error } " thrown while parsing a source file, opens the source file at the failing line in the default editor using the " { $link edit-hook } ". See " { $link "editor" } "." } ;

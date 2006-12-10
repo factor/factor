@@ -4,6 +4,9 @@ IN: command-line
 USING: errors hashtables io kernel kernel-internals namespaces
 parser sequences strings ;
 
+: ?run-file ( file -- )
+    dup exists? [ run-file ] [ drop ] if ;
+
 : run-bootstrap-init ( -- )
     "user-init" get [
         home ".factor-boot-rc" path+ ?run-file
@@ -44,7 +47,6 @@ parser sequences strings ;
     "user-init" on
     "compile" on
     "native-io" on
-    "null-stdio" off
     macosx? "cocoa" set
     unix? macosx? not and "x11" set
     default-shell "shell" set ;
@@ -55,12 +57,9 @@ parser sequences strings ;
     macosx? "shell" get "ui" = and ;
 
 : parse-command-line ( -- )
-    [
-        cli-args [ cli-arg ] subset
-        ignore-cli-args? [ drop ] [ [ run-file ] each ] if
-        "e" get eval
-        flush
-    ] try ;
+    cli-args [ cli-arg ] subset
+    ignore-cli-args? [ drop ] [ [ run-file ] each ] if
+    "e" get [ eval flush ] when* ;
 
 IN: shells
 

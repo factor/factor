@@ -62,7 +62,7 @@ SYMBOL: parse-hook
     [ <source-file> ] keep source-files get set-hash ;
 
 : parse-file-restarts ( file -- restarts )
-    "Load " swap " again" append3 t 2array 1array ;
+    "Load " swap " again" 3append t 2array 1array ;
 
 : parse-file ( file -- quot )
     [
@@ -84,9 +84,6 @@ SYMBOL: parse-hook
         bootstrapping? get
         [ parse-file % ] [ run-file ] ? each
     ] no-parse-hook ;
-
-: ?run-file ( file -- )
-    dup exists? [ [ [ run-file ] keep ] try ] when drop ;
 
 : eval>string ( str -- str )
     [ [ [ eval ] keep ] try drop ] string-out ;

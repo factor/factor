@@ -5,6 +5,14 @@ HELP: sort
 { $values { "seq" "a sequence" } { "quot" "a comparator quotation" } { "sortedseq" "a new sorted sequence" } }
 { $description "Sorts the elements into a new sequence of the same class as " { $snippet "seq" } "." } ;
 
+HELP: sort-keys
+{ $values { "seq" "a sequence of pairs" } { "sortedseq" "a new sorted sequence" } }
+{ $description "Sorts the elements comparing first elements of pairs using the " { $link <=> } " word." } ;
+
+HELP: sort-values
+{ $values { "seq" "a sequence of pairs" } { "sortedseq" "a new sorted sequence" } }
+{ $description "Sorts the elements comparing second elements of pairs using the " { $link <=> } " word." } ;
+
 HELP: nsort
 { $values { "seq" "a mutable sequence" } { "quot" "a comparator quotation" } }
 { $description "Sorts the sequence in-place." }

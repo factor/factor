@@ -2,8 +2,12 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: command-line compiler errors generic help io io-internals
 kernel kernel-internals listener math memory modules namespaces
-optimizer parser sequences sequences-internals words ;
+optimizer parser sequences sequences-internals words prettyprint 
+;
 
+! Wrap everything in a scope where we disable print-warnings,
+! so that people don't get confused thinking bootstrap failed
+! because the compiler prints stuff
 [
     print-warnings off
 
@@ -68,8 +72,8 @@ optimizer parser sequences sequences-internals words ;
 
         [
             boot
-            run-user-init
-            "shell" get "shells" lookup execute
+            [ run-user-init ] try
+            [ "shell" get "shells" lookup execute ] try
             0 exit
         ] set-boot
 
@@ -81,19 +85,18 @@ optimizer parser sequences sequences-internals words ;
         flush
         H{ } clone parent-graph set-global xref-help
 
-        run-bootstrap-init
+        [ run-bootstrap-init ] try
 
         f error set-global
         f error-continuation set-global
 
-        [ compiled? ] word-subset length
-        number>string write " compiled words" print
+        : count-words all-words swap subset length pprint ;
 
-        [ symbol? ] word-subset length
-        number>string write " symbol words" print
+        [ compiled? ] count-words " compiled words" print
+        [ symbol? ] count-words " symbol words" print
+        [ ] count-words " words total" print
 
-        all-words length
-        number>string write " words total" print
+        FORGET: count-words
 
         "Total bootstrap GC time: " write gc-time
         number>string write " ms" print

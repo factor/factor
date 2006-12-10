@@ -272,8 +272,11 @@ DEFER: (map-nodes)
     [ >r 2dup r> node-successor (subst-values) ] each 2drop ;
 
 : node-literal? ( node value -- ? )
-    dup value?
-    [ 2drop t ] [ swap node-literals ?hash* nip ] if ;
+    {
+        { [ dup value? ] [ 2drop t ] }
+        { [ over node-literals not ] [ 2drop f ] }
+        { [ swap node-literals hash-member? ] [ 2drop t ] }
+    } cond ;
 
 : node-literal ( node value -- obj )
     dup value?

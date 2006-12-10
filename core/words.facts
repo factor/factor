@@ -1,5 +1,6 @@
 IN: words
-USING: definitions help tools kernel kernel-internals parser ;
+USING: definitions help tools kernel kernel-internals parser
+compiler ;
 
 HELP: execute ( word -- )
 { $values { "word" "a word" } }
@@ -197,10 +198,6 @@ HELP: all-words
 { $values { "seq" "a sequence of words" } }
 { $description "Outputs a sequence of all words in the dictionary." } ;
 
-HELP: word-subset
-{ $values { "quot" "a quotation with stack effect " { $snippet "( word -- ? )" } } { "seq" "a sequence of words" } }
-{ $description "Outputs a sequence of words satisfying the predicate." } ;
-
 HELP: xref-words
 { $description "Update the " { $link crossref } " graph of word dependencies. Usually this is done automatically." } ;
 
@@ -252,3 +249,6 @@ HELP: bootstrap-word
 HELP: update-xt ( word -- )
 { $values { "word" "a word" } }
 { $description "Updates a word's execution token based on the value of the " { $link word-primitive } " slot. If the word was compiled, this will lose the compiled definition and make it run in the interpreter." } ;
+
+HELP: changed-words
+{ $var-description "Global variable holding words which need to be recompiled. Implemented as a hashtable where a key equals its value. This hashtable is updated by " { $link define } " when words are redefined, and inspected and cleared by " { $link recompile } "." } ;

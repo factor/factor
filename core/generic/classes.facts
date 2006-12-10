@@ -4,6 +4,9 @@ HELP: classes
 { $values { "seq" "a sequence of class words" } }
 { $description "Finds all class words in the dictionary." } ;
 
+HELP: builtin
+{ $class-description "The class of built-in classes." } ;
+
 HELP: typemap
 { $description "Global variable. Hashtable mapping unions to class words." }
 { $see-also class-and } ;

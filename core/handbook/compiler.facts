@@ -10,11 +10,14 @@ $terpri
 ARTICLE: "compiler-usage" "Compiler usage"
 "The main entry point to the compiler is a single word taking a word as input:"
 { $subsection compile }
-"The above word throws an error if the word did not compile. Another variant does not:"
+"The above word throws an error if the word did not compile. Another variant simply prints the error and returns:"
 { $subsection try-compile }
 "The compiler can also compile a single quotation:"
 { $subsection compile-quot }
-{ $subsection compile-1 } ;
+{ $subsection compile-1 }
+"Two utility words for bulk compilation:"
+{ $subsection compile-vocabs }
+{ $subsection compile-all } ;
 
 ARTICLE: "recompile" "Automatic recompilation"
 "Factor's compiler performs " { $emphasis "early binding" } "; if a compiled word " { $snippet "A" } " calls another compiled word " { $snippet "B" } " and " { $snippet "B" } " is subsequently redefined, the compiled definition of " { $snippet "A" } " will still refer to the earlier compiled definition of " { $snippet "B" } "."

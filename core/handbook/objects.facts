@@ -121,7 +121,9 @@ ARTICLE: "builtin-classes" "Built-in classes"
 { $subsection tuple }
 { $subsection vector }
 { $subsection word }
-{ $subsection wrapper } ;
+{ $subsection wrapper }
+"There is a class of built-in classes:"
+{ $subsection builtin } ;
 
 ARTICLE: "unions" "Union classes"
 "An object is an instance of a union class if it is an instance of one of its members. Union classes are used to associate the same method with several different classes, as well as to conveniently define predicates."

@@ -41,7 +41,7 @@ prettyprint-internals ;
 GENERIC: summary ( object -- string )
 
 M: object summary
-    "an instance of the " swap class word-name " class" append3 ;
+    "an instance of the " swap class word-name " class" 3append ;
 
 M: input summary
     "Input: " swap input-string dup string?

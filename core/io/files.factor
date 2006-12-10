@@ -7,7 +7,7 @@ strings styles arrays ;
 ! Words for accessing filesystem meta-data.
 
 : path+ ( str1 str2 -- str )
-    over "/" tail? [ append ] [ "/" swap append3 ] if ;
+    over "/" tail? [ append ] [ "/" swap 3append ] if ;
 
 : exists? ( path -- ? ) stat >r 3drop r> >boolean ;
 

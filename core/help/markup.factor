@@ -185,9 +185,19 @@ M: f print-element drop ;
 : $table ( element -- )
     table-style get $grid ;
 
+: a/an ( str -- str )
+    first "aeiou" member? "an" "a" ? ;
+
+: $instance ( element -- )
+    first dup word-name a/an write bl ($link) ;
+
+: values-row ( seq -- seq )
+    unclip \ $snippet swap 2array
+    swap dup first word? [ \ $instance add* ] when 2array ;
+
 : $values ( element -- )
     "Inputs and outputs" $heading
-    [ unclip \ $snippet swap 2array swap 2array ] map $table ;
+    [ values-row ] map $table ;
 
 : $predicate ( element -- )
     { { "object" "an object" } } $values

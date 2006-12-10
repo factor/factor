@@ -67,7 +67,7 @@ M: c-type c-type-box
     swap dup c-getter (define-nth) ;
 
 : define-set-nth ( name vocab -- )
-    >r "set-" over "-nth" append3 r> create
+    >r "set-" over "-nth" 3append r> create
     swap dup c-setter (define-nth) ;
 
 : define-out ( name vocab -- )

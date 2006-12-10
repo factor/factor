@@ -8,6 +8,7 @@ $terpri
 "There are two useful development tools which are complex enough that separate sections are devoted to them; see " { $link "inference" } " and " { $link "compiler" } "."
 { $subsection "listener" }
 { $subsection "debugger" }
+{ $subsection "editor" }
 { $subsection "definitions" }
 { $subsection "word-introspection" }
 { $subsection "inspector" }
@@ -38,6 +39,27 @@ $terpri
 "Finally, the multi-line expression reading word can be used independently of the rest of the listener:"
 { $subsection parse-interactive } ;
 
+ARTICLE: "editor" "Editor integration"
+"Factor development is best done with one of the supported editors; this allows you to quickly jump to definitions from the Factor environment."
+$terpri
+"Depending on the editor you are using, you must load one of the following modules using " { $link require } ":"
+{ $list
+    { $snippet "libs/emacs" }
+    { $snippet "libs/jedit" }
+    { $snippet "libs/textmate" }
+    { $snippet "libs/vim" }
+}
+"These modules store a quotation in a global variable when loaded:"
+{ $subsection edit-hook }
+"To jump to a definition:"
+{ $subsection edit }
+"To jump to a source file:"
+{ $subsection edit-file }
+"To jump to a source file and line number:"
+{ $subsection edit-location }
+"To jump to the most recent syntax error:"
+{ $subsection :edit } ;
+
 ARTICLE: "sources" "Source files"
 "The simplest way to distribute a piece of Factor code is in the form of a source file. Source files can be loaded in the listener:"
 { $subsection run-file }
@@ -55,8 +77,10 @@ ARTICLE: "debugger" "The debugger"
 { $subsection :get }
 "You can get a more detailed explanation as most types of errors are documented:"
 { $subsection :help }
-"If the error is recoverable, a list of restarts is also printed, and a numbered restart can be invoked:"
+"If the error was recoverable, a list of restarts is also printed, and a numbered restart can be invoked:"
 { $subsection :res }
+"If the error was a syntax error thrown by " { $link run-file } " or " { $link require } " while loading a source file, you can jump to the location of the error in your editor:"
+{ $subsection :edit }
 "You can read more about error handling in " { $link "errors" } "." ;
 
 ARTICLE: "inspector" "The inspector"
@@ -73,9 +97,19 @@ ARTICLE: "memory" "Object memory"
 "You can print object heap status information:"
 { $subsection room. }
 { $subsection heap-stats. }
+"Alternative forms of the above words return data on the stack instead of printing:"
+{ $subsection data-room }
+{ $subsection code-room }
+{ $subsection heap-stats }
 "There are a pair of combinators, analogous to " { $link each } " and " { $link subset } ", which operate on the entire collection of objects in the object heap:"
 { $subsection each-object }
-{ $subsection instances } ;
+{ $subsection instances }
+"You can request the amount of heap memory used by an object:"
+{ $subsection size }
+"The garbage collector can be invoked manually:"
+{ $subsection data-gc }
+{ $subsection full-gc }
+{ $subsection code-gc } ;
 
 ARTICLE: "word-introspection" "Word introspection"
 "Words support the definition protocol; see " { $link "definitions" } " for general tools that work with definitions. A few word-specific tools also exist:"

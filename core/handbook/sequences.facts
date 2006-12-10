@@ -102,7 +102,7 @@ ARTICLE: "sequences-search" "Searching sequences"
 ARTICLE: "sequences-join-split" "Joining and splitting sequences"
 "Forming new sequences from existing sequences:"
 { $subsection append }
-{ $subsection append3 }
+{ $subsection 3append }
 { $subsection concat }
 { $subsection join }
 { $subsection replace-slice }
@@ -280,8 +280,10 @@ ARTICLE: "sequences-sorting" "Sorting and binary search"
 { $subsection nsort }
 "Sorting elements in a new sequence:"
 { $subsection sort }
-"Using the default comparator:"
+"Common comparators:"
 { $subsection natural-sort }
+{ $subsection sort-keys }
+{ $subsection sort-values }
 "Binary search:"
 { $subsection binsearch }
 { $subsection binsearch* } ;

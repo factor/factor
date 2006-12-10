@@ -52,7 +52,7 @@ C: presentation ( gadget object -- button )
 : <menu-item> ( hook target command -- button )
     rot >r
     (command-button) [ hand-clicked get find-world hide-glass ]
-    r> append3 <roll-button> ;
+    r> 3append <roll-button> ;
 
 : <commands-menu> ( hook target commands -- gadget )
     [ >r 2dup r> <menu-item> ] map 2nip make-filled-pile

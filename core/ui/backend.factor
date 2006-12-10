@@ -1,7 +1,9 @@
+! Copyright (C) 2006 Slava Pestov.
+! See http://factorcode.org/license.txt for BSD license.
 IN: gadgets
 USING: generic kernel namespaces opengl ;
 
-DEFER: set-title ( string handle -- )
+DEFER: set-title ( string world -- )
 
 DEFER: draw-world ! defined in world.factor
 

@@ -9,11 +9,11 @@ SYMBOL: modules
 TUPLE: module name loc directory files tests help main ;
 
 : module-def ( name -- path )
-    "resource:" over "/load.factor" append3
+    "resource:" over "/load.factor" 3append
     dup ?resource-path exists? [
         nip
     ] [
-        drop "resource:" swap ".factor" append3
+        drop "resource:" swap ".factor" 3append
     ] if ;
 
 : module modules get [ module-name = ] find-with nip ;

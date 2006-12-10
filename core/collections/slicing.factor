@@ -45,7 +45,7 @@ strings vectors errors ;
     2dup tail? [ length head* t ] [ drop f ] if ;
 
 : replace-slice ( new m n seq -- replaced )
-    tuck swap tail-slice >r swap head-slice swap r> append3 ;
+    tuck swap tail-slice >r swap head-slice swap r> 3append ;
 
 : remove-nth ( n seq -- newseq )
     >r f swap dup 1+ r> replace-slice ;

@@ -332,7 +332,7 @@ define-commands
 help-gadget "toolbar" {
     { "Back" T{ key-down f { C+ } "b" } [ help-gadget-history go-back ] }
     { "Forward" T{ key-down f { C+ } "f" } [ help-gadget-history go-forward ] }
-    { "Home" T{ key-down f { C+ } "h" } [ go-home ] }
+    { "Home" T{ key-down f { C+ } "1" } [ go-home ] }
 }
 link class-operations [ help-action ] modify-commands
 [ command-name "Follow" = not ] subset

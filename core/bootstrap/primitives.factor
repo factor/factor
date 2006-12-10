@@ -40,7 +40,7 @@ call
     { "call" "kernel"                       }
     { "if" "kernel"                         }
     { "dispatch" "kernel-internals"         }
-    { "rehash-string" "strings"             }
+    { "rehash-string" "kernel-internals"    }
     { "string>sbuf" "strings"               }
     { "bignum>fixnum" "math-internals"      }
     { "float>fixnum" "math-internals"       }

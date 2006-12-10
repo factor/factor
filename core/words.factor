@@ -147,12 +147,6 @@ SYMBOL: bootstrapping?
 : all-words ( -- seq )
     vocabularies get hash-values [ hash-values ] map concat ;
 
-: word-subset ( quot -- seq )
-    all-words swap subset ; inline
-
-: word-subset-with ( obj quot -- seq )
-    all-words swap subset-with ; inline
-
 : xref-words ( -- )
     all-words [ uses ] crossref get build-graph ;
 
@@ -172,7 +166,7 @@ TUPLE: check-create name vocab ;
     [ 2nip ] [ drop <word> dup reveal ] if ;
 
 : constructor-word ( name vocab -- word )
-    >r "<" swap ">" append3 r> create ;
+    >r "<" swap ">" 3append r> create ;
 
 : forget-vocab ( vocab -- )
     words [ forget ] each ;

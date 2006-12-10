@@ -50,7 +50,3 @@ HELP: run-file
 { $values { "file" "a path name string" } }
 { $description "Parses the Factor source code stored in a file and runs it. The initial vocabulary search path is used." }
 { $errors "Throws an error if loading the file fails, there input is malformed, or if a runtime error occurs while calling the parsed quotation." }  ;
-
-HELP: ?run-file
-{ $values { "file" "a path name string" } }
-{ $description "Forgiving variant of " { $link run-file } " which does nothing if the file does not exist, and logs errors to the default stream without re-throwing them." }  ;

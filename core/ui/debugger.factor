@@ -39,3 +39,7 @@ M: debugger focusable-child*
 
 : ui-try ( quot -- )
     [ debugger-window ] recover ;
+
+debugger "gestures" {
+    { "Request focus" T{ button-down } [ request-focus ] }
+} define-commands

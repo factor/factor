@@ -326,7 +326,7 @@ M: hashtable '
 
 : prepare-profile ( arch -- )
     "resource:/core/bootstrap/profile-"
-    swap ".factor" append3
+    swap ".factor" 3append
     run-file ;
 
 : prepare-image ( arch -- )

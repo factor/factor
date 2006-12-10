@@ -37,7 +37,7 @@ sequences strings words ;
 : define-field ( offset type name -- offset )
     >r parse-c-decl [ c-type c-type-align ] keep
     >r swapd align r> r> 
-    "struct-name" get swap "-" swap append3
+    "struct-name" get swap "-" swap 3append
     3dup define-getter 3dup define-setter
     drop c-size rot * + ;
 

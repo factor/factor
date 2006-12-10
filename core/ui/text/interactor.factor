@@ -20,9 +20,13 @@ C: interactor ( output -- gadget )
 M: interactor graft*
     f over set-interactor-busy? delegate graft* ;
 
+: write-input ( string input -- )
+    <input> presented associate
+    [ H{ { font-style bold } } format ] with-nesting ;
+
 : interactor-input. ( string interactor -- )
     interactor-output [
-        dup string? [ dup print-input ] [ short. ] if
+        dup string? [ dup write-input terpri ] [ short. ] if
     ] with-stream* ;
 
 : add-interactor-history ( str interactor -- )

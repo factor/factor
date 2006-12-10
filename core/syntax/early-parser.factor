@@ -46,7 +46,8 @@ TUPLE: check-vocab name ;
     in get create dup save-location ;
 
 : create-constructor ( class -- word )
-    word-name in get constructor-word dup save-location ;
+    dup word-name swap word-vocabulary constructor-word
+    dup save-location ;
 
 TUPLE: parse-error file line col text ;
 

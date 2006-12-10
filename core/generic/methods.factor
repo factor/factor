@@ -44,7 +44,9 @@ TUPLE: check-method class generic ;
     [ set-hash ] with-methods ;
 
 : implementors ( class -- seq )
-    [ "methods" word-prop ?hash* nip ] word-subset-with ;
+    all-words
+    [ generic? ] subset
+    [ "methods" word-prop hash-member? ] subset-with ;
 
 M: method-spec where
     dup first2 method method-loc [ ] [ second where ] ?if ;
