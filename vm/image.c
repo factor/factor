@@ -28,9 +28,6 @@ void load_image(const char* filename)
 		exit(1);
 	}
 
-	printf("Loading %s...",filename);
-	fflush(stdout);
-
 	/* read it in native byte order */
 	fread(&h,sizeof(F_HEADER)/sizeof(CELL),sizeof(CELL),file);
 
@@ -67,16 +64,10 @@ void load_image(const char* filename)
 
 	fclose(file);
 
-	printf(" relocating...");
-	fflush(stdout);
-
 	init_objects(&h);
 
 	relocate_data();
 	relocate_code();
-
-	printf(" done\n");
-	fflush(stdout);
 }
 
 /* Save the current image to disk */
