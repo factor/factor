@@ -6,7 +6,7 @@ namespaces ;
 IN: emacs
 
 : emacsclient ( file line -- )
-number>string "emacsclient --no-wait +" swap append " " rot append3 system drop ;
+[ "emacsclient --no-wait +" % # " " % % ] "" make system drop ;
 
 : emacs ( word -- )
 where first2 emacsclient ;

@@ -61,7 +61,7 @@ SYMBOL: html
     #! dynamically creating words.
     >r "html" create r> define-compound ;
  
-: <foo> "<" swap ">" append3 ;
+: <foo> "<" swap ">" 3append ;
 
 : def-for-html-word-<foo> ( name -- )
     #! Return the name and code for the <foo> patterned

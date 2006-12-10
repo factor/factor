@@ -65,7 +65,7 @@ SYMBOL: responders
 : log-headers ( hash -- )
     [
         drop { "User-Agent" "X-Forwarded-For" "Host" } member?
-    ] hash-subset [ ": " swap append3 log-message ] hash-each ;
+    ] hash-subset [ ": " swap 3append log-message ] hash-each ;
 
 : prepare-url ( url -- url )
     #! This is executed in the with-request namespace.

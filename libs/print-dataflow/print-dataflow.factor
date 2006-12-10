@@ -11,7 +11,7 @@ GENERIC: node>quot ( ? node -- )
 TUPLE: comment node text ;
 
 M: comment pprint*
-    "( " over comment-text " )" append3
+    "( " over comment-text " )" 3append
     swap comment-node presented associate
     styled-text ;
 

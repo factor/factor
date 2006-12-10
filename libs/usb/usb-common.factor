@@ -8,7 +8,7 @@ USING: kernel alien math namespaces sequences parser ;
     >r parse-c-decl 
     >r 1 r> 
     >r swapd align r> r> 
-    "struct-name" get swap "-" swap append3
+    "struct-name" get swap "-" swap 3append
     3dup define-getter 3dup define-setter
     drop c-size rot * + ;
 

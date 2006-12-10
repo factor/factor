@@ -11,7 +11,7 @@ threads http sequences prettyprint ;
 
 : url>path ( uri -- path )
     "?" split1 dup [
-      >r (url>path) "?" r> append3
+      >r (url>path) "?" r> 3append
     ] [
       drop (url>path)
     ] if ;
