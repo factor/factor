@@ -7,6 +7,8 @@ USING: kernel lazy-lists parser-combinators strings math sequences namespaces io
 TUPLE: ast-number value ;
 TUPLE: ast-identifier value ;
 TUPLE: ast-string value ;
+TUPLE: ast-quotation expression ;
+TUPLE: ast-array elements ;
 TUPLE: ast-define name expression ;
 TUPLE: ast-expression values ;
 
@@ -27,20 +29,28 @@ LAZY: 'string' ( -- parser )
 LAZY: 'identifier-ends' ( -- parser )  
   [ 
     [ blank? not ] keep 
+    [ CHAR: [ = not ] keep 
+    [ CHAR: ] = not ] keep 
+    [ CHAR: { = not ] keep 
+    [ CHAR: } = not ] keep 
     [ CHAR: : = not ] keep 
     [ CHAR: " = not ] keep 
     CHAR: ; = not 
-    and and and 
+    and and and and and and and
   ] satisfy <*> ;
 
 LAZY: 'identifier-middle' ( -- parser )  
   [ 
     [ blank? not ] keep 
+    [ CHAR: [ = not ] keep 
+    [ CHAR: ] = not ] keep 
+    [ CHAR: { = not ] keep 
+    [ CHAR: } = not ] keep 
     [ CHAR: : = not ] keep 
     [ CHAR: " = not ] keep 
     [ CHAR: ; = not ] keep
     digit? not
-    and and and and
+    and and and and and and and and
   ] satisfy <+> ;
 
 USE: prettyprint
@@ -56,29 +66,55 @@ LAZY: 'define' ( -- parser )
   'expression' <&>
   ";" token sp <& [ first2 <ast-define> ] <@ ;
 
+LAZY: 'quotation' ( -- parser )
+  "[" token sp 
+  'expression' &>
+  "]" token sp <& [ <ast-quotation> ] <@ ;
+
+LAZY: 'array' ( -- parser )
+  "{" token sp 
+  'expression' &>
+  "}" token sp <& [ <ast-array> ] <@ ;
+
 LAZY: 'atom' ( -- parser )
   'identifier' 'number' <|> 'string' <|> ;
 
 LAZY: 'expression' ( -- parser )
-  'define' sp 'atom' sp <|> <*> [ <ast-expression> ] <@ ;
+  'define' sp 
+  'atom' sp <|> 
+  'quotation' sp <|> 
+  'array' sp <|>
+  <*> [ <ast-expression> ] <@ ;
 
 LAZY: 'statement' ( -- parser )
   'define' 'expression' <|> ;
 
 GENERIC: (compile) ( ast -- )
+GENERIC: (literal) ( ast -- )
+
+M: ast-number (literal) 
+  ast-number-value number>string , ;
 
 M: ast-number (compile) 
   "factor.data_stack.push(" ,
-  ast-number-value number>string , 
-  ")" , ;
+  (literal)  
+  ");" , ;
+
+M: ast-string (literal) 
+  "'" ,
+  ast-string-value ,
+  "'" , ;
 
 M: ast-string (compile) 
-  "factor.data_stack.push('" ,
-  ast-string-value , 
-  "')" , ;
+  "factor.data_stack.push(" ,
+  (literal)
+  ");" , ;
+
+M: ast-identifier (literal) 
+  "factor.words[\"" , ast-identifier-value , "\"]" ,  ;
 
 M: ast-identifier (compile) 
-  "factor.words[\"" , ast-identifier-value , "\"]()" ,  ;
+  (literal) "();" ,  ;
 
 M: ast-define (compile) 
   "factor.words[\"" , 
@@ -87,13 +123,41 @@ M: ast-define (compile)
   ast-define-expression (compile)
   "}" , ;
 
-M: ast-expression (compile)
+M: ast-quotation (literal)   
+  "function() { " ,  
+  ast-quotation-expression (compile)
+  "}" , ;
+
+M: ast-quotation (compile)   
+  "factor.data_stack.push(" ,  
+  (literal)
+  ")" , ;
+
+M: ast-array (literal)   
+  "[" ,  
+  ast-array-elements ast-expression-values [ (literal) ] [ "," , ] interleave
+  "]" , ;
+
+M: ast-array (compile)   
+  "factor.data_stack.push(" ,  
+  (literal)
+  ")" , ;
+
+M: ast-expression (literal)
   ast-expression-values [
-    (compile) "; " ,
+    (literal) 
   ] each ;
+
+M: ast-expression (compile)
+  ast-expression-values [ (compile) ] [ ";" , ] interleave ;
 
 : fjsc-compile ( ast -- string )
   [
     [ (compile) ] { } make [ write ] each
+  ] string-out ;
+  
+: fjsc-literal ( ast -- string )
+  [
+    [ (literal) ] { } make [ write ] each
   ] string-out ;
   

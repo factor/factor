@@ -1,5 +1,5 @@
 <form id="toeval" onsubmit="factor.fjsc_eval(document.getElementById('toeval'));return false;" method="post">
-  <textarea name="code" id="code">
+  <textarea name="code" id="code" cols="64" rows="10">
   </textarea>
   <input type="submit"/>
 </form>

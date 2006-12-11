@@ -10,6 +10,10 @@ function Factor() {
     "*": function() { self.fjsc_times(); },
     "/": function() { self.fjsc_divide(); },
     ".": function() { self.fjsc_dot(); },
+    "call": function() { self.fjsc_call(); },
+    "map": function() { self.fjsc_map(); },
+    "reduce": function() { self.fjsc_reduce(); },
+    "clear": function() { self.fjsc_clear(); },
     alert: function() { self.fjsc_alert(); }
   };  
 }
@@ -92,8 +96,41 @@ Factor.prototype.fjsc_dot = function() {
   alert(this.data_stack.pop());
 }
 
+Factor.prototype.fjsc_call = function() {
+  (this.data_stack.pop())();
+}
+
+Factor.prototype.fjsc_map = function() {
+  var quot = this.data_stack.pop();
+  var seq = this.data_stack.pop();
+  var result = [ ];
+  for(var i=0;i<seq.length;++i) {  
+    this.data_stack.push(seq[i]);
+    (quot)();
+    result[i]=this.data_stack.pop();
+  }
+  this.data_stack.push(result);
+}
+
+Factor.prototype.fjsc_reduce = function() {
+  var quot = this.data_stack.pop();
+  var prev = this.data_stack.pop();
+  var seq = this.data_stack.pop();
+  for(var i=0;i<seq.length;++i) {  
+    this.data_stack.push(prev);
+    this.data_stack.push(seq[i]);
+    (quot)();
+    prev=this.data_stack.pop();
+  }
+  this.data_stack.push(prev);
+}
+
 Factor.prototype.fjsc_alert = function() {
   alert(this.data_stack.pop());
+}
+
+Factor.prototype.fjsc_clear = function() {
+  factor.data_stack = [ ]
 }
 
 
