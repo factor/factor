@@ -7,6 +7,7 @@ USING: kernel lazy-lists parser-combinators strings math sequences namespaces io
 TUPLE: ast-number value ;
 TUPLE: ast-identifier value ;
 TUPLE: ast-string value ;
+TUPLE: ast-define name expression ;
 TUPLE: ast-expression values ;
 
 LAZY: 'digit' ( -- parser )
@@ -22,22 +23,47 @@ LAZY: 'string' ( -- parser )
   'quote' sp [
     CHAR: " = not
   ] satisfy <+> [ >string <ast-string> ] <@ &> 'quote' <& ;
-  
-LAZY: 'identifier' ( -- parser )
+
+LAZY: 'identifier-ends' ( -- parser )  
   [ 
     [ blank? not ] keep 
-    [ digit? not ] keep 
     [ CHAR: : = not ] keep 
     [ CHAR: " = not ] keep 
     CHAR: ; = not 
+    and and and 
+  ] satisfy <*> ;
+
+LAZY: 'identifier-middle' ( -- parser )  
+  [ 
+    [ blank? not ] keep 
+    [ CHAR: : = not ] keep 
+    [ CHAR: " = not ] keep 
+    [ CHAR: ; = not ] keep
+    digit? not
     and and and and
-  ] satisfy <+> [ >string <ast-identifier> ] <@ ;
+  ] satisfy <+> ;
+
+USE: prettyprint
+LAZY: 'identifier' ( -- parser )
+  'identifier-ends' 
+  'identifier-middle' <&> [ first2 append ] <@
+  'identifier-ends' <&> [ first2 append ] <@
+  [ >string <ast-identifier> ] <@ ;
+
+LAZY: 'define' ( -- parser )
+  ":" token sp 
+  'identifier' sp &>
+  'expression' <&>
+  ";" token sp <& [ first2 <ast-define> ] <@ ;
 
 LAZY: 'atom' ( -- parser )
-  'number' 'identifier' <|> 'string' <|> ;
+  'identifier' 'number' <|> 'string' <|> ;
 
 LAZY: 'expression' ( -- parser )
-  'atom' sp <*> [ <ast-expression> ] <@ ;
+  'define' sp 'atom' sp <|> <*> [ <ast-expression> ] <@ ;
+
+LAZY: 'statement' ( -- parser )
+  'define' 'expression' <|> ;
 
 GENERIC: (compile) ( ast -- )
 
@@ -53,6 +79,13 @@ M: ast-string (compile)
 
 M: ast-identifier (compile) 
   "factor.words[\"" , ast-identifier-value , "\"]()" ,  ;
+
+M: ast-define (compile) 
+  "factor.words[\"" , 
+  dup ast-define-name ast-identifier-value , 
+  "\"]=function() { " ,  
+  ast-define-expression (compile)
+  "}" , ;
 
 M: ast-expression (compile)
   ast-expression-values [

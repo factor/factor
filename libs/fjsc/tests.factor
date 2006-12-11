@@ -4,8 +4,8 @@
 USING: kernel test parser-combinators lazy-lists fjsc ;
 IN: temporary
 
-{ "factor.data_stack.push(123)" } [
-  "123" 'number' parse car parse-result-parsed fjsc-compile 
+{ T{ ast-expression f { T{ ast-number f 55 } T{ ast-identifier f "2abc1" } T{ ast-number f 100 } } } } [
+  "55 2abc1 100" 'expression' parse car parse-result-parsed
 ] unit-test
 
 { "factor.words[\"alert\"]()" } [
@@ -20,3 +20,11 @@ IN: temporary
   "123 \"hello\" alert" 'expression' parse car parse-result-parsed fjsc-compile 
 ] unit-test
  
+{ "factor.words[\"foo\"]=function() { factor.data_stack.push(123); factor.data_stack.push('hello'); }" } [
+  ": foo 123 \"hello\" ;" 'define' parse car parse-result-parsed fjsc-compile 
+] unit-test
+
+{ "factor.words[\"foo\"]=function() { factor.data_stack.push(123); factor.data_stack.push('hello'); }; " } [
+  ": foo 123 \"hello\" ;" 'expression' parse car parse-result-parsed fjsc-compile 
+] unit-test
+
