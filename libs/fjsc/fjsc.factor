@@ -60,6 +60,8 @@ LAZY: 'identifier' ( -- parser )
   'identifier-ends' <&> [ first2 append ] <@
   [ >string <ast-identifier> ] <@ ;
 
+DEFER: 'expression'
+
 LAZY: 'define' ( -- parser )
   ":" token sp 
   'identifier' sp &>
