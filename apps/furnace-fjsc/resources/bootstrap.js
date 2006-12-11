@@ -9,6 +9,7 @@ function Factor() {
     "-": function() { self.fjsc_minus(); },
     "*": function() { self.fjsc_times(); },
     "/": function() { self.fjsc_divide(); },
+    ".": function() { self.fjsc_dot(); },
     alert: function() { self.fjsc_alert(); }
   };  
 }
@@ -85,6 +86,10 @@ Factor.prototype.fjsc_divide = function() {
   var v1 = stack.pop();
   var v2 = stack.pop();
   stack.push(v2/v1);
+}
+
+Factor.prototype.fjsc_dot = function() {
+  alert(this.data_stack.pop());
 }
 
 Factor.prototype.fjsc_alert = function() {
