@@ -27,9 +27,16 @@ TUPLE: module name loc directory files tests help main ;
 : module-files* ( module -- seq )
     dup module-directory swap module-files process-files ;
 
+: loading-module ( name -- )
+    "quiet" get [
+        drop
+    ] [
+        "Loading module " write write "..." print flush
+    ] if ;
+
 : load-module ( name -- )
     [
-        "Loading module " write dup write "..." print
+        dup loading-module
         [ dup module-def run-file ] assert-depth drop
     ] no-parse-hook ;
 

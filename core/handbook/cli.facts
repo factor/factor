@@ -1,4 +1,4 @@
-USING: help parser shells ;
+USING: help parser shells modules ;
 
 ARTICLE: "cli" "Command line usage"
 "Unless the " { $snippet "-no-user-init" } " command line switch is specified, The startup routine runs the " { $snippet ".factor-rc" } " file in the user's home directory, if it exists. This file can contain initialization and customization for your development environment."
@@ -48,4 +48,5 @@ ARTICLE: "standard-cli-args" "General command line switches"
     { { $snippet "-e=" { $emphasis "code" } } { "This specifies a code snippet to evaluate. If you want Factor to exit immediately after, also specify " { $snippet "-shell=none" } "." } }
     { { $snippet "-shell=" { $emphasis "shell" } } { { $snippet { $emphasis "shell" } } " is either " { $link tty } ", " { $link ui } ", " { $link none } ", or the name of any other word in the " { $vocab-link "shells" } " vocabulary. This specifies the user interface to run on startup." } }
     { { $snippet "-no-user-init" } { "If specified, Factor will not run the " { $snippet "~/.factor-rc" } " file on startup" } }
+    { { $snippet "-quiet" } { "If set, " { $link run-file } " and " { $link require } " will not print load messages" } }
 } ;
