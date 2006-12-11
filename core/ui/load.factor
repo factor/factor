@@ -42,6 +42,10 @@ PROVIDE: core/ui
     "text/interactor.factor"
     "debugger.factor"
     "ui.factor"
+    "backend.facts"
+    "commands.facts"
+    "debugger.facts"
+    "gadgets.facts"
     "text/editor.facts"
 } }
 { +tests+ {

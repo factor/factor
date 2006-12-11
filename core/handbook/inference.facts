@@ -1,4 +1,4 @@
-USING: help inference interpreter kernel math sequences ;
+USING: help inference interpreter kernel math sequences gadgets ;
 
 ARTICLE: "effect-declaration" "Stack effect declaration"
 "It is good practice to declare the stack effects of words using the following syntax:"
@@ -15,6 +15,9 @@ ARTICLE: "effect-declaration" "Stack effect declaration"
     { { { $snippet "seq" } } "a sequence" }
     { { { $snippet "str" } } "a string" }
     { { { $snippet "x" } ", " { $snippet "y" } ", " { $snippet "z" } } "a number" }
+    { { $snippet "loc" } "a screen location specified as a two-element array holding x and y co-ordinates" }
+    { { $snippet "dim" } "a screen dimension specified as a two-element array holding width and height values" }
+    { { $snippet "rect" } { "a " { $link rect } } }
     { { $snippet "*" } "when this symbol appears by itself in the list of outputs, it means the word unconditionally throws an error" }
 }
 "The stack effect inferencer verifies stack effect comments to ensure the correct number of inputs and outputs is listed. Value names are ignored; only their number matters. If a word's declared stack effect does not match its inferred stack effect, a " { $link effect-error } " is thrown."

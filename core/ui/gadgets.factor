@@ -23,7 +23,7 @@ M: array rect-dim drop { 0 0 } ;
 
 : <extent-rect> ( loc ext -- rect ) dupd swap [v-] <rect> ;
 
-: offset-rect ( rect loc -- rect )
+: offset-rect ( rect loc -- newrect )
     over rect-loc v+ swap rect-dim <rect> ;
 
 : >absolute ( rect -- rect )
@@ -32,7 +32,7 @@ M: array rect-dim drop { 0 0 } ;
 : (rect-intersect) ( rect rect -- array array )
     2rect-extent vmin >r vmax r> ;
 
-: rect-intersect ( rect rect -- rect )
+: rect-intersect ( rect1 rect2 -- newrect )
     (rect-intersect) <extent-rect> ;
 
 : intersects? ( rect/point rect -- ? )
@@ -52,11 +52,11 @@ interior boundary ;
 
 M: gadget equal? eq? ;
 
-: gadget-child gadget-children first ;
+: gadget-child ( gadget -- child ) gadget-children first ;
 
-: nth-gadget gadget-children nth ;
+: nth-gadget ( n gadget -- ) gadget-children nth ;
 
-: <zero-rect> { 0 0 } dup <rect> ;
+: <zero-rect> ( -- rect ) { 0 0 } dup <rect> ;
 
 C: gadget ( -- gadget )
     <zero-rect> over set-delegate
@@ -86,15 +86,15 @@ M: gadget children-on nip gadget-children ;
     dup gadget-visible?
     [ >absolute intersects? ] [ 2drop f ] if ;
 
-: pick-up-list ( rect/point gadget -- gadget/f )
+: (pick-up) ( point gadget -- gadget/f )
     dupd children-on <reversed> [ inside? ] find-with nip ;
 
-: translate ( rect/point -- ) rect-loc origin [ v+ ] change ;
+: translate ( point -- ) origin [ v+ ] change ;
 
-: pick-up ( rect/point gadget -- gadget )
+: pick-up ( point gadget -- child/f )
     [
         2dup inside? [
-            dup translate 2dup pick-up-list dup
+            dup translate 2dup (pick-up) dup
             [ nip pick-up ] [ rot 2drop ] if
         ] [ 2drop f ] if
     ] with-scope ;
@@ -107,7 +107,7 @@ M: gadget children-on nip gadget-children ;
 : each-child-with ( obj gadget quot -- )
     >r gadget-children r> each-with ; inline
 
-: set-gadget-delegate ( delegate gadget -- )
+: set-gadget-delegate ( gadget tuple -- )
     over [ dup pick [ set-gadget-parent ] each-child-with ] when
     set-delegate ;
 
@@ -132,7 +132,7 @@ M: gadget gadget-selection drop f ;
 ! slider gadgets
 TUPLE: timer-gadget quot ;
 
-C: timer-gadget ( gadget -- gadget )
+C: timer-gadget ( gadget -- newgadget )
     [ set-gadget-delegate ] keep ;
 
 M: timer-gadget tick timer-gadget-quot call ;

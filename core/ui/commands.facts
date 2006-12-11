@@ -1,0 +1,41 @@
+IN: gadgets
+USING: help strings gadgets-presentations generic kernel ;
+
+HELP: command
+{ $class-description "A command is a named piece of code associated to an input gesture. Commands have the following slots:"
+{ $list
+    { { $link command-name } " - a string naming the command" }
+    { { $link command-gesture } " - a gesture or " { $link f } }
+    { { $link command-quot } " - a quotation with stack effect " { $snippet "( target -- )" } }
+}
+"Classes delegating to " { $link command } " can re-implement the " { $link invoke-command } " generic word." }
+{ $see-also operation <command-button> invoke-command define-commands } ;
+
+HELP: invoke-command
+{ $values { "target" object } { "command" command } }
+{ $contract "Invokes the command on the given target. The default implementation calls " { $link command-quot } "." } ;
+
+HELP: gesture>string
+{ $values { "gesture" "a gesture" } { "string/f" "a " { $link string } " or " { $link f } } }
+{ $contract "Creates a human-readable string from a gesture object, returning " { $link f } " if the gesture does not have a human-readable form." }
+{ $examples
+    { $example "T{ key-down f { C+ } \"x\" } gesture>string print" "C+x" }
+} ;
+
+HELP: commands
+{ $values { "class" "a class word" } }
+{ $description "Outputs a hashtable mapping command group strings to sequences of commands for the given gadget class." }
+{ $see-also define-commands } ;
+
+HELP: define-commands
+{ $values { "class" "a class word" } { "group" string } { "specs" "a sequence of command specifiers" } }
+{ $description
+    "Defines a group of commands for the specified gadget class. The " { $snippet "specs" } " parameter is a sequence of triples " { $snippet "{ name gesture quot }" } ", where " { $snippet "name" } " is a string, " { $snippet "gesture" } " is a gesture, and " { $snippet "quot" } " is a " { $link quotation } "."
+}
+{ $notes "Only one of " { $link define-commands } " and " { $link set-gestures } " can be used on a given gadget class, since each word will overwrite the other word's definitions." }
+{ $see-also commands $commands } ;
+
+HELP: $commands
+{ $values { "element" "a pair" } }
+{ $description "Prints a table of commands, where the first element of the pair is a class word and the second is a command group name." }
+{ $see-also commands define-commands } ;

@@ -15,7 +15,7 @@ M: f invoke-command ( target command -- ) 2drop ;
 M: command invoke-command ( target command -- )
     command-quot call ;
 
-GENERIC: gesture>string ( gesture -- string )
+GENERIC: gesture>string ( gesture -- string/f )
 
 : modifiers>string ( modifiers -- string )
     [ word-name ] map concat >string ;
@@ -56,17 +56,20 @@ M: object gesture>string drop f ;
     swap pick commands set-hash
     dup commands>gestures "gestures" set-word-prop ;
 
-SYMBOL: +name+
-SYMBOL: +quot+
-SYMBOL: +listener+
-SYMBOL: +keyboard+
-SYMBOL: +primary+
-SYMBOL: +secondary+
+: command-description ( command -- element )
+    dup command-name swap command-gesture gesture>string
+    2array ;
+
+: commands. ( commands -- )
+    [ command-gesture key-down? ] subset
+    [ command-description ] map
+    { { $strong "Command" } { $strong "Shortcut" } } add*
+    $table ;
+
+: $commands ( element -- )
+    first2 swap commands hash commands. ;
 
 TUPLE: operation predicate primary? secondary? listener? hook ;
-
-: (command) ( -- command )
-    +name+ get +keyboard+ get +quot+ get <command> ;
 
 SYMBOL: operations
 
@@ -83,18 +86,5 @@ SYMBOL: operations
 : secondary-operation ( obj -- command )
     object-operations [ operation-secondary? ] find-last nip ;
 
-: command-description ( command -- element )
-    dup command-name swap command-gesture gesture>string
-    2array ;
-
-: commands. ( commands -- )
-    [ command-gesture key-down? ] subset
-    [ command-description ] map
-    { { $strong "Command" } { $strong "Shortcut" } } add*
-    $table ;
-
-: $commands ( elt -- )
-    first2 swap commands hash commands. ;
-
-: $operations ( elt -- )
+: $operations ( element -- )
     [ class-operations ] map concat commands. ;

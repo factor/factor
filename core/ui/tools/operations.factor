@@ -9,6 +9,16 @@ test tools words generic models io modules errors ;
 
 V{ } clone operations set-global
 
+SYMBOL: +name+
+SYMBOL: +quot+
+SYMBOL: +listener+
+SYMBOL: +keyboard+
+SYMBOL: +primary+
+SYMBOL: +secondary+
+
+: (command) ( -- command )
+    +name+ get +keyboard+ get +quot+ get <command> ;
+
 C: operation ( predicate hash -- operation )
     swap [
         (command) over set-delegate
