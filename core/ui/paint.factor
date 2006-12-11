@@ -37,7 +37,7 @@ DEFER: draw-gadget
 
 : (draw-gadget) ( gadget -- )
     [
-        dup rect-loc translate
+        dup translate
         dup dup gadget-interior draw-interior
         dup draw-gadget*
         dup visible-children [ draw-gadget ] each
