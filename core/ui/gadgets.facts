@@ -91,6 +91,7 @@ HELP: <gadget>
 HELP: delegate>gadget
 { $values { "tuple" tuple } }
 { $description "Sets the tuple's delegate to a new " { $link gadget } "." }
+{ $side-effects "tuple" }
 { $see-also <gadget> } ;
 
 HELP: relative-loc

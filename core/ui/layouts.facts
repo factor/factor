@@ -83,6 +83,7 @@ HELP: <pack>
 HELP: delegate>pack
 { $values { "orientation" "either " { $snippet "{ 1 0 }" } " or " { $snippet "{ 0 1 }" } } { "tuple" tuple } }
 { $description "Sets the tuple's delegate to a new pack." }
+{ $side-effects "tuple" }
 { $see-also <pack> <pile> <shelf> } ;
 
 HELP: <pile>

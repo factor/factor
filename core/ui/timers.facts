@@ -1,0 +1,22 @@
+IN: timers
+USING: generic help ;
+
+HELP: tick
+{ $values { "object" object } }
+{ $description "Called to notify an object registered with a timer that the timer has fired." }
+{ $see-also add-timer remove-timer do-timers } ;
+
+HELP: add-timer
+{ $values { "object" object } { "delay" "a positive integer" } { "initial" "a positive integer" } }
+{ $description "Registers a timer. Every " { $snippet "delay" } " milliseconds, " { $link tick } " will be called on the object. The initial delay from the time " { $link add-timer } " is called to when " { $link tick } " is first called is " { $snippet "initial" } " milliseconds." }
+{ $see-also remove-timer do-timers } ;
+
+HELP: remove-timer
+{ $values { "object" object } }
+{ $description "Unregisters a timer." }
+{ $see-also add-timer do-timers } ;
+
+HELP: do-timers
+{ $description "Fires all registered timers which are due to fire." }
+{ $notes "This word is automatically called from the UI event loop, however it should be called manually if timers are being used outside of the UI." }
+{ $see-also tick add-timer remove-timer } ;

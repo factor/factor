@@ -3,7 +3,7 @@
 IN: models
 USING: generic kernel math sequences timers ;
 
-TUPLE: model connections value dependencies ref ;
+TUPLE: model value connections dependencies ref ;
 
 C: model ( value -- model )
     [ set-model-value ] keep
@@ -11,10 +11,12 @@ C: model ( value -- model )
     V{ } clone over set-model-dependencies
     0 over set-model-ref ;
 
-: add-dependency ( model model -- )
+M: model equal? eq? ;
+
+: add-dependency ( dep model -- )
     model-dependencies push ;
 
-: remove-dependency ( model model -- )
+: remove-dependency ( dep model -- )
     model-dependencies delete ;
 
 DEFER: add-connection
@@ -50,11 +52,11 @@ DEFER: remove-connection
 
 GENERIC: model-changed ( observer -- )
 
-: add-connection ( obj model -- )
+: add-connection ( observer model -- )
     dup model-connections empty? [ dup activate-model ] when
     model-connections push ;
 
-: remove-connection ( obj model -- )
+: remove-connection ( observer model -- )
     [ model-connections delete ] keep
     dup model-connections empty? [ dup deactivate-model ] when
     drop ;
@@ -74,7 +76,7 @@ M: model set-model
 : (change-model) ( model quot -- )
     ((change-model)) set-model-value ; inline
 
-: delegate>model ( obj -- )
+: delegate>model ( tuple -- )
     f <model> swap set-delegate ;
 
 TUPLE: filter model quot ;
@@ -127,7 +129,7 @@ C: history ( value -- history )
 : go-forward ( history -- )
     dup history-back over history-forward go-back/forward ;
 
-: add-history
+: add-history ( history -- )
     dup history-forward delete-all
     dup history-back (add-history) ;
 

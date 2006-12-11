@@ -5,6 +5,7 @@
 - browser: tile titles should respond to right-clicks and/or have a
   menu popup button
 - ui docs
+- calling 'see' with an unknown method should be an error
 
 + 0.88:
 
