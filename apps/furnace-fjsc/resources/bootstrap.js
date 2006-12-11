@@ -5,6 +5,10 @@ function Factor() {
     dup: function() { self.fjsc_dup(); },
     drop: function() { self.fjsc_drop(); },
     nip: function() { self.fjsc_nip(); },
+    "+": function() { self.fjsc_plus(); },
+    "-": function() { self.fjsc_minus(); },
+    "*": function() { self.fjsc_times(); },
+    "/": function() { self.fjsc_divide(); },
     alert: function() { self.fjsc_alert(); }
   };  
 }
@@ -53,6 +57,34 @@ Factor.prototype.fjsc_nip = function() {
   var v = stack.pop();
   stack.pop();
   stack.push(v);
+}
+
+Factor.prototype.fjsc_plus = function() {
+  var stack = this.data_stack;
+  var v1 = stack.pop();
+  var v2 = stack.pop();
+  stack.push(v1+v2);
+}
+
+Factor.prototype.fjsc_minus = function() {
+  var stack = this.data_stack;
+  var v1 = stack.pop();
+  var v2 = stack.pop();
+  stack.push(v1-v2);
+}
+
+Factor.prototype.fjsc_times = function() {
+  var stack = this.data_stack;
+  var v1 = stack.pop();
+  var v2 = stack.pop();
+  stack.push(v1*v2);
+}
+
+Factor.prototype.fjsc_divide = function() {
+  var stack = this.data_stack;
+  var v1 = stack.pop();
+  var v2 = stack.pop();
+  stack.push(v2/v1);
 }
 
 Factor.prototype.fjsc_alert = function() {
