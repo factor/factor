@@ -1,0 +1,27 @@
+IN: gadgets
+USING: help models gadgets-presentations prettyprint
+freetype opengl ;
+
+HELP: world
+{ $class-description "A gadget which appears at the top of the gadget hieararchy, and in turn may be displayed in a native window. Worlds delegate to " { $link gadget } " instances and have the following slots:"
+    { $list
+        { { $link world-active? } " - if set to " { $link f } ", the world will not be drawn. This slot is set to " { $link f } " if an error is thrown while drawing the world; this prevents multiple debugger windows from being shown." }
+        { { $link world-gadget } " - the primary gadget in the world." }
+        { { $link world-glass } " - a glass pane in front of the primary gadget, used to implement behaviors such as popup menus which are hidden when the mouse is clicked outside the menu." }
+        { { $link world-title } " - a " { $link model } " holding a string to be displayed in the title bar of the native window containing the world." }
+        { { $link world-title } " - a " { $link model } " holding a " { $link presentation } " whose " { $link summary } " is to be displayed in the world's status bar." }
+        { { $link world-focus } " - the current owner of the keyboard focus in the world." }
+        { { $link world-focused? } " - a boolean indicating if the native window containing the world has keyboard focus." }
+        { { $link world-fonts } " - a hashtable mapping " { $link font } " instances to vectors of " { $link sprite } " instances." }
+        { { $link world-handle } " - a backend-specific native handle representing the native window containing the world, or " { $link f } " if the world is not grafted." }
+        { { $link world-loc } " - the on-screen location of the native window containing the world. The co-ordinate system here is backend-specific." }
+    }
+} ;
+
+HELP: <world>
+{ $values { "gadget" gadget } { "world" "a new " { $link world } } }
+{ $description "Creates a new " { $link world } " containing the given gadget." } ;
+
+HELP: find-world
+{ $values { "gadget" gadget } { "world" "a " { $link world } " or " { $link f } } }
+{ $description "Finds the " { $link world } " containing the gadget, or outputs " { $link f } " if the gadget is not grafted." } ;

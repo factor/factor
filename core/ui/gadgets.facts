@@ -18,6 +18,11 @@ HELP: <rect> ( loc dim -- rect )
 { $values { "loc" "a pair of integers" } { "dim" "a pair of integers" } { "newrect" "a new " { $link rect } } }
 { $description "Creates a new rectangle with the specified top-left location and dimensions." } ;
 
+HELP: set-rect-dim ( dim rect -- )
+{ $values { "dim" "a pair of integers" } { "rect" rect } }
+{ $description "Modifies the dimensions of a rectangle. To resize a gadget, use " { $link set-gadget-dim } " or " { $link set-layout-dim } " instead." }
+{ $side-effects "rect" } ;
+
 HELP: rect-bounds
 { $values { "rect" rect } { "loc" "a pair of integers" } { "dim" "a pair of integers" } }
 { $description "Outputs the location and dimensions of a rectangle." }
@@ -59,7 +64,7 @@ HELP: gadget
         { { $link gadget-interior } " - an object whose class implements the " { $link draw-interior } " generic word." }
         { { $link gadget-boundary } " - an object whose class implements the " { $link draw-boundary } " generic word." }
     }
-}
+"Gadgets delegate to " { $link rect } " instances holding their location and dimensions." }
 { $notes
 "Other classes may delegate to " { $link gadget } " in order to re-implement generic words such as " { $link draw-gadget* } " and " { $link user-input* } ", or to define gestures with " { $link set-gestures } " or " { $link define-commands } "." }
 { $warning

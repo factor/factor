@@ -54,11 +54,9 @@ M: gadget ungraft* drop ;
     gadget-grafted? [ graft ] [ drop ] if ;
 
 : add-gadget ( gadget parent -- )
-    #! Add a gadget to a parent gadget.
     [ (add-gadget) ] keep relayout ;
 
 : add-gadgets ( seq parent -- )
-    #! Add all gadgets in a sequence to a parent gadget.
     swap [ over (add-gadget) ] each relayout ;
 
 : add-spec ( quot spec -- )
@@ -84,28 +82,25 @@ M: gadget ungraft* drop ;
 : (parents) ( gadget -- )
     [ dup , gadget-parent (parents) ] when* ;
 
-: parents ( gadget -- vector )
-    #! A list of all parents of the gadget, the first element
-    #! is the gadget itself.
+: parents ( gadget -- seq )
     [ (parents) ] { } make ;
 
 : each-parent ( gadget quot -- ? )
     >r parents r> all? ; inline
 
-: find-parent ( gadget quot -- gadget )
+: find-parent ( gadget quot -- parent )
     >r parents r> find nip ; inline
 
 : screen-loc ( gadget -- point )
-    #! The position of the gadget on the screen.
     parents { 0 0 } [ rect-loc v+ ] reduce ;
 
 : child? ( parent child -- ? ) parents memq? ;
 
-GENERIC: focusable-child* ( gadget -- gadget/t )
+GENERIC: focusable-child* ( gadget -- child/t )
 
 M: gadget focusable-child* drop t ;
 
-: focusable-child ( gadget -- gadget )
+: focusable-child ( gadget -- child )
     dup focusable-child*
     dup t eq? [ drop ] [ nip focusable-child ] if ;
 

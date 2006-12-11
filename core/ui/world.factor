@@ -4,16 +4,6 @@ IN: gadgets
 USING: arrays errors freetype generic hashtables
 kernel math models namespaces opengl sequences ;
 
-! The world gadget is the top level gadget that all (visible)
-! gadgets are contained in. There is one world per top-level
-! native window.
-
-! fonts: mapping font tuples to sprite vectors
-! handle: native resource
-! loc: location of native window on the screen.
-!   we don't store this in the world's rect-loc, since the
-!   co-ordinate system might be different, and generally the
-!   UI code assumes that everything starts at { 0 0 }.
 TUPLE: world
 active?
 gadget glass

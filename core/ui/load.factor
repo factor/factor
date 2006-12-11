@@ -46,6 +46,13 @@ PROVIDE: core/ui
     "commands.facts"
     "debugger.facts"
     "gadgets.facts"
+    "gestures.facts"
+    "hierarchy.facts"
+    "layouts.facts"
+    "paint.facts"
+    "text.facts"
+    "world.facts"
+    "windows.facts"
     "text/editor.facts"
 } }
 { +tests+ {

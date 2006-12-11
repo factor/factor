@@ -28,17 +28,10 @@ DEFER: relayout
     [ add-invalid ] [ gadget-parent [ relayout ] when* ] if ;
 
 : relayout ( gadget -- )
-    #! Relayout and redraw a gadget and its parent before the
-    #! next iteration of the event loop. Should be used when the
-    #! gadget's size has potentially changed. See relayout-1.
     dup gadget-state \ relayout eq?
     [ drop ] [ invalidate* ] if ;
 
 : relayout-1 ( gadget -- )
-    #! Relayout and redraw a gadget before the next iteration of
-    #! the event loop. Should be used if the gadget should be
-    #! repainted, or if its internal layout changed, but its
-    #! preferred size did not change.
     dup gadget-state
     [ drop ] [ dup invalidate add-invalid ] if ;
 
@@ -52,7 +45,6 @@ DEFER: relayout
     [ drop ] r> if ; inline
 
 : set-layout-dim ( dim gadget -- )
-    #! Can only be used inside layout*.
     [ invalidate ] (set-rect-dim) ;
 
 : set-gadget-dim ( dim gadget -- )
@@ -64,7 +56,6 @@ GENERIC: pref-dim* ( gadget -- dim )
     dup gadget-state [ 2drop ] [ set-gadget-pref-dim ] if ;
 
 : pref-dim ( gadget -- dim )
-    #! Do not cache the pref-dim if it is potentially invalid.
     dup gadget-pref-dim [ ] [
         [ pref-dim* dup ] keep ?set-gadget-pref-dim
     ] ?if ;
@@ -82,9 +73,6 @@ DEFER: layout
 : layout-children ( gadget -- ) [ layout ] each-child ;
 
 : layout ( gadget -- )
-    #! Position the children of the gadget inside the gadget.
-    #! Note that nothing is done if the gadget does not need to
-    #! be laid out.
     dup gadget-state [
         f over set-gadget-state
         dup layout* dup layout-children
@@ -117,22 +105,20 @@ TUPLE: pack align fill gap ;
     [ swap v- dup [ ceiling >fixnum ] map [ swap v- ] keep ] map
     nip ;
 
-: pack-layout ( gadget sizes -- )
+: pack-layout ( pack sizes -- )
     round-dims over gadget-children
     >r dupd packed-dims r> 2dup [ set-layout-dim ] 2each
     >r packed-locs r> [ set-rect-loc ] 2each ;
 
-C: pack ( vector -- pack )
-    #! gap: between each child.
-    #! fill: 0 leaves default width, 1 fills to pack width.
-    #! align: 0 left, 1/2 center, 1 right.
+C: pack ( orientation -- pack )
     dup delegate>gadget
     [ set-gadget-orientation ] keep
     0 over set-pack-align
     0 over set-pack-fill
     { 0 0 } over set-pack-gap ;
 
-: delegate>pack ( vector tuple -- ) >r <pack> r> set-delegate ;
+: delegate>pack ( orientation tuple -- )
+    >r <pack> r> set-delegate ;
 
 : <pile> ( -- pack ) { 0 1 } <pack> ;
 

@@ -39,8 +39,7 @@ TUPLE: paste-action ;
 TUPLE: delete-action ;
 TUPLE: select-all-action ;
 
-: generalize-gesture ( gesture -- gesture )
-    #! Strip button number from drag/button-up/button-down.
+: generalize-gesture ( gesture -- newgesture )
     tuple>array 1 head* >tuple ;
 
 ! Modifiers
@@ -91,9 +90,6 @@ SYMBOL: double-click-timeout
     hand-buttons get-global first <drag> button-gesture ;
 
 : fire-motion ( -- )
-    #! Fire a motion gesture to the gadget underneath the hand,
-    #! and if a mouse button is down, fire a drag gesture to the
-    #! gadget that was clicked.
     hand-buttons get-global empty? [
         T{ motion } hand-gadget get-global send-gesture drop
     ] [
@@ -109,9 +105,6 @@ SYMBOL: double-click-timeout
     T{ mouse-enter } swap each-gesture ;
 
 : forget-rollover ( -- )
-    #! After we restore the UI, send mouse leave events to all
-    #! gadgets that were under the mouse at the time of the
-    #! save, since the mouse is in a different location now.
     f hand-world set-global
     hand-gadget get-global >r
     f hand-gadget set-global
@@ -123,8 +116,6 @@ SYMBOL: double-click-timeout
     T{ gain-focus } swap each-gesture ;
 
 : focus-receiver ( world -- seq )
-    #! If the world is not focused, we want focus-gestures to
-    #! only send focus-lost and not focus-gained.
     dup world-focused? [ focused-ancestors ] [ drop f ] if ;
 
 : request-focus* ( gadget world -- )
@@ -167,8 +158,6 @@ SYMBOL: double-click-timeout
     hand-loc get-global hand-click-loc set-global ;
  
 : under-hand ( -- seq )
-    #! A sequence whose first element is the world and last is
-    #! the current gadget, with all parents in between.
     hand-gadget get-global parents <reversed> ;
 
 : move-hand ( loc world -- )

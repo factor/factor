@@ -1,0 +1,85 @@
+IN: gadgets
+USING: help gadgets-text ;
+
+HELP: graft*
+{ $values { "gadget" gadget } }
+{ $contract "Called to notify the gadget it has become visible on the screen. This should set up timers and threads, and acquire any resources used by the gadget." }
+{ $see-also ungraft* } ;
+
+HELP: ungraft*
+{ $values { "gadget" gadget } }
+{ $contract "Called to notify the gadget it is no longer visible on the screen. This should stop timers and threads, and release any resources used by the gadget." }
+{ $see-also graft* } ;
+
+HELP: graft
+{ $values { "gadget" gadget } }
+{ $description "Calls " { $link graft* } " on the gadget and all children." }
+{ $notes "This word should never be called directly." }
+{ $see-also graft* ungraft } ;
+
+HELP: ungraft
+{ $values { "gadget" gadget } }
+{ $description "If the gadget is grafted, calls " { $link ungraft* } " on the gadget and all children." }
+{ $notes "This word should never be called directly." }
+{ $see-also ungraft* graft } ;
+
+HELP: unparent
+{ $values { "gadget" gadget } }
+{ $description "Removes the gadget from its parent. This will relayout the parent." }
+{ $notes "This may result in " { $link ungraft* } " being called on the gadget and its children, if the gadget's parent is visible on the screen." } ;
+
+HELP: clear-gadget
+{ $values { "gadget" gadget } }
+{ $description "Removes all children from the gadget. This will relayout the gadget." }
+{ $notes "This may result in " { $link ungraft* } " being called on the children, if the gadget is visible on the screen." } ;
+
+HELP: add-gadget
+{ $values { "gadget" gadget } { "parent" gadget } }
+{ $description "Adds a child gadget to a parent. If the gadget is contained in another gadget, " { $link unparent } " is called on the gadget first. The parent will be relayout." }
+{ $notes "Adding a gadget to a parent may result in " { $link graft* } " being called on the children, if the parent is visible on the screen." } ;
+
+HELP: add-gadgets
+{ $values { "seq" "a sequence of gadgets" } { "parent" gadget } }
+{ $description "Adds a sequence of gadgets to a parent. The parent will be relayout." }
+{ $notes "This may result in " { $link graft* } " being called on the children, if the parent is visible on the screen." } ;
+
+HELP: parents
+{ $values { "gadget" gadget } }
+{ $description "Outputs a sequence of all parents of the gadget, with the first element being the gadget itself." } ;
+
+HELP: each-parent
+{ $values { "gadget" gadget } { "quot" "a quotation with stack effect " { $snippet "( gadget -- )" } } }
+{ $description "Applies the quotation to every parent of the gadget, starting from the gadget itself." } ;
+
+HELP: find-parent
+{ $values { "gadget" gadget } { "quot" "a quotation with stack effect " { $snippet "( gadget -- ? )" } } { "parent" gadget } }
+{ $description "Outputs the first parent of the gadget, starting from the gadget itself, for which the quotation outputs a true value, or " { $link f } " if the quotation outputs " { $link f } " for every parent." } ;
+
+HELP: screen-loc
+{ $values { "gadget" gadget } { "loc" "a pair of integers" } }
+{ $description "Outputs the location of the gadget relative to the top-left corner of the world containing the gadget. This word does not output a useful value if the gadget is not grafted." } ;
+
+HELP: child?
+{ $values { "parent" gadget } { "child" gadget } { "?" "a boolean" } }
+{ $description "Tests if " { $snippet "child" } " is contained inside " { $snippet "parent" } "." } ;
+
+HELP: focusable-child*
+{ $values { "gadget" gadget } { "child" gadget } }
+{ $description "Outputs the child of the gadget which would prefer to receive keyboard focus, or " { $link t } " if the gadget itself should receive focus." }
+{ $examples "For example, if your gadget consists of an " { $link editor } " together with an output area whose contents react to changes in editor contents, then the " { $link focusable-child* } " method for your gadget class should return the editor, so that when the gadget is displayed in a window or passed to " { $link request-focus } ", the editor receives keyboard focus automatically." } ;
+
+HELP: focusable-child
+{ $values { "gadget" gadget } { "child" gadget } }
+{ $description "Outputs the child of the gadget which would prefer to receive keyboard focus." } ;
+
+HELP: make-pile
+{ $values { "children" "a sequence of gadgets" } { "pack" "a new " { $link pack } } }
+{ $description "Creates a new " { $link pack } " which lays out a sequence of gadgets vertically." } ;
+
+HELP: make-filled-pile
+{ $values { "children" "a sequence of gadgets" } { "pack" "a new " { $link pack } } }
+{ $description "Creates a new " { $link pack } " which lays out a sequence of gadgets vertically, such that all gadgets have the same width." } ;
+
+HELP: make-shelf
+{ $values { "children" "a sequence of gadgets" } { "pack" "a new " { $link pack } } }
+{ $description "Creates a new " { $link pack } " which lays out a sequence of gadgets horizontally." } ;

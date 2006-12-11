@@ -55,13 +55,11 @@ C: titled-gadget ( gadget title -- )
     [ f swap set-global ] [ drop ] if ;
 
 : focus-world ( world -- )
-    #! Sent when native window receives focus
     t over set-world-focused?
     dup raised-window
     focused-ancestors f focus-gestures ;
 
 : unfocus-world ( world -- )
-    #! Sent when native window loses focus.
     f over set-world-focused?
     focused-ancestors f swap focus-gestures ;
 

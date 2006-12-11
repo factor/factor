@@ -1,0 +1,22 @@
+IN: gadgets
+USING: help freetype strings ;
+
+HELP: string-width
+{ $values { "open-font" "an instance of " { $link font } } { "string" string } { "w" "a positive integer" } }
+{ $description "Outputs the width of a string." }
+{ $see-also open-font text-dim } ;
+
+HELP: text-dim
+{ $values { "open-font" "an instance of " { $link font } } { "text" "a string or an array of strings" } { "dim" "a pair of integers" } }
+{ $description "Outputs the dimensions of a piece of text, which is either a single-line string or an array of lines." }
+{ $see-also open-font string-width } ;
+
+HELP: draw-string
+{ $values { "font" "a font specifier" } { "string" string } { "loc" "a pair of integers" } }
+{ $description "Draws a string. This word can only be called from a " { $link draw-gadget* } ", " { $link draw-interior } " or " { $link draw-boundary } " method." }
+{ $see-also open-font draw-text } ;
+
+HELP: draw-text
+{ $values { "font" "a font specifier" } { "text" "a string or an array of strings" } { "loc" "a pair of integers" } }
+{ $description "Draws a piece of text, which is either a single-line string or an array of lines. This word can only be called from a " { $link draw-gadget* } ", " { $link draw-interior } " or " { $link draw-boundary } " method." }
+{ $see-also open-font draw-text } ;

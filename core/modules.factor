@@ -31,7 +31,7 @@ TUPLE: module name loc directory files tests help main ;
     "quiet" get [
         drop
     ] [
-        "Loading module " write write "..." print flush
+        "Loading module " write print flush
     ] if ;
 
 : load-module ( name -- )
