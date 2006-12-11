@@ -1,7 +1,7 @@
 ! Copyright (C) 2005 Alex Chapman.
 ! See http://factorcode.org/license.txt for BSD license.
 IN: embedded
-USING: sequences kernel parser math namespaces io html errors ;
+USING: sequences kernel parser math namespaces io html test ;
 
 ! if example.fhtml contains:
 ! <html>
