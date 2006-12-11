@@ -1,12 +1,12 @@
 ! Copyright (C) 2006 Chris Double. All Rights Reserved.
 ! See http://factorcode.org/license.txt for BSD license.
 !
-REQUIRES: libs/httpd libs/fjsc ;
+REQUIRES: libs/furnace libs/fjsc ;
 
-PROVIDE: apps/fjsc-responder 
+PROVIDE: apps/furnace-fjsc 
 { 
   +files+ { 
-  "fjsc-responder.factor"
+  "furnace-fjsc.factor"
   } 
 } {
   +tests+ { 

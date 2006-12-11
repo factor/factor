@@ -1,0 +1,9 @@
+<form id="toeval" onsubmit="fjsc_eval(document.getElementById('toeval'));return false;" method="post">
+  <textarea name="code" id="code">
+  </textarea>
+  <input type="submit"/>
+</form>
+<div id="compiled">
+</div>
+<div id="stack">
+</div>

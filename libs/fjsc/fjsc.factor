@@ -59,7 +59,7 @@ M: ast-expression (compile)
     (compile) "; " ,
   ] each ;
 
-: compile ( ast -- string )
+: fjsc-compile ( ast -- string )
   [
     [ (compile) ] { } make [ write ] each
   ] string-out ;

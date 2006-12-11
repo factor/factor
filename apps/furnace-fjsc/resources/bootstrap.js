@@ -10,7 +10,7 @@ function fjsc_eval(form) {
       }
    };
    YAHOO.util.Connect.setForm(form);
-   YAHOO.util.Connect.asyncRequest('POST', "/responder/fjsceval/", callback);
+   YAHOO.util.Connect.asyncRequest('POST', "/responder/fjsc/compile", callback);
 }
 
 var data_stack = [ ] 
