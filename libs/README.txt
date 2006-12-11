@@ -21,6 +21,7 @@ Available libraries:
 - dlists -- double-linked-lists (Mackenzie Straight)
 - emacs -- emacs integration (Eduardo Cavazos)
 - factory -- X11 window manager (Eduardo Cavazos)
+- fjsc -- Factor to Javascript compiler (Chris Double)
 - furnace -- Web framework (Slava Pestov)
 - furnace-pastebin -- demo app for Furnace (Slava Pestov)
 - gap-buffer -- Efficient text editor buffer (Alex Chapman)

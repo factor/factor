@@ -2,7 +2,7 @@ USING: kernel modules words ;
 
 REQUIRES: libs/alien libs/base64 libs/cairo
 libs/calendar libs/concurrency libs/coroutines libs/crypto
-libs/dlists libs/emacs libs/furnace libs/gap-buffer
+libs/dlists libs/emacs libs/fjsc libs/furnace libs/gap-buffer
 libs/hardware-info libs/http libs/httpd libs/http-client
 libs/jedit libs/jni libs/json libs/lambda libs/levenshtein 
 libs/lazy-lists libs/match libs/math libs/parser-combinators
