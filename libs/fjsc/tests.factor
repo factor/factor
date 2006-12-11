@@ -4,19 +4,19 @@
 USING: kernel test parser-combinators lazy-lists fjsc ;
 IN: temporary
 
-{ "data_stack.push(123)" } [
-  "123" 'number' parse car parse-result-parsed compile 
+{ "factor.data_stack.push(123)" } [
+  "123" 'number' parse car parse-result-parsed fjsc-compile 
 ] unit-test
 
-{ "fjsc_alert()" } [
-  "alert" 'identifier' parse car parse-result-parsed compile 
+{ "factor.words[\"alert\"]()" } [
+  "alert" 'identifier' parse car parse-result-parsed fjsc-compile 
 ] unit-test
 
-{ "data_stack.push(123); fjsc_alert(); " } [
-  "123 alert" 'expression' parse car parse-result-parsed compile 
+{ "factor.data_stack.push(123); factor.words[\"alert\"](); " } [
+  "123 alert" 'expression' parse car parse-result-parsed fjsc-compile 
 ] unit-test
 
-{ "data_stack.push(123); data_stack.push('hello'); fjsc_alert(); " } [
-  "123 \"hello\" alert" 'expression' parse car parse-result-parsed compile 
+{ "factor.data_stack.push(123); factor.data_stack.push('hello'); factor.words[\"alert\"](); " } [
+  "123 \"hello\" alert" 'expression' parse car parse-result-parsed fjsc-compile 
 ] unit-test
  

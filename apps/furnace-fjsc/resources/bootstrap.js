@@ -1,9 +1,20 @@
-function fjsc_eval(form) {
+function Factor() {
+  var self = this;
+  this.data_stack = [ ];  
+  this.words = { 
+    dup: function() { self.fjsc_dup() },
+    drop: function() { self.fjsc_drop() },
+    alert: function() { self.fjsc_alert() }
+  };  
+}
+
+Factor.prototype.fjsc_eval = function(form) {
+   var self = this;
    var callback = {
       success: function(o) {
 	 var v = o.responseText;
 	 eval(v)
-	 display_datastack();
+	 self.display_datastack();
 	 document.getElementById('compiled').innerHTML="<pre>" + v + "</pre>";
 	 document.getElementById('code').value="";
 
@@ -13,30 +24,31 @@ function fjsc_eval(form) {
    YAHOO.util.Connect.asyncRequest('POST', "/responder/fjsc/compile", callback);
 }
 
-var data_stack = [ ] 
-
-function fjsc_dup() {
-   var v = data_stack.pop();
-   data_stack.push(v);
-   data_stack.push(v);
+Factor.prototype.fjsc_dup = function() {
+  var stack = this.data_stack;
+   var v = stack.pop();
+   stack.push(v);
+   stack.push(v);
 }
 
-function fjsc_drop() {
-   data_stack.pop();
+Factor.prototype.fjsc_drop = function() {
+  this.data_stack.pop();
 }
 
-function fjsc_alert() {
-   alert(data_stack.pop())
+Factor.prototype.fjsc_alert = function() {
+  alert(this.data_stack.pop());
 }
 
-function display_datastack() {
+Factor.prototype.display_datastack = function() {
    var html=[];
    html.push("<table border='1'>")
-   for(var i = 0; i < data_stack.length; ++i) {
+   for(var i = 0; i < this.data_stack.length; ++i) {
       html.push("<tr><td>")
-      html.push(data_stack[i])
+      html.push(this.data_stack[i])
       html.push("</td></tr>")
    }
    html.push("</table>")
    document.getElementById('stack').innerHTML=html.join("");
 }
+
+var factor = new Factor();

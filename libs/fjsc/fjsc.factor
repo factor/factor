@@ -42,17 +42,17 @@ LAZY: 'expression' ( -- parser )
 GENERIC: (compile) ( ast -- )
 
 M: ast-number (compile) 
-  "data_stack.push(" ,
+  "factor.data_stack.push(" ,
   ast-number-value number>string , 
   ")" , ;
 
 M: ast-string (compile) 
-  "data_stack.push('" ,
+  "factor.data_stack.push('" ,
   ast-string-value , 
   "')" , ;
 
 M: ast-identifier (compile) 
-  "fjsc_" , ast-identifier-value , "()" ,  ;
+  "factor.words[\"" , ast-identifier-value , "\"]()" ,  ;
 
 M: ast-expression (compile)
   ast-expression-values [
