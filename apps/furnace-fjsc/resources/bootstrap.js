@@ -5,6 +5,7 @@ function Factor() {
     dup: function() { self.fjsc_dup(); },
     drop: function() { self.fjsc_drop(); },
     nip: function() { self.fjsc_nip(); },
+    over: function() { self.fjsc_over(); },
     "+": function() { self.fjsc_plus(); },
     "-": function() { self.fjsc_minus(); },
     "*": function() { self.fjsc_times(); },
@@ -14,6 +15,11 @@ function Factor() {
     "map": function() { self.fjsc_map(); },
     "reduce": function() { self.fjsc_reduce(); },
     "clear": function() { self.fjsc_clear(); },
+    "if": function() { self.fjsc_if(); },
+    "=": function() { self.fjsc_equals(); },
+    "f": function() { self.fjsc_false(); },
+    "t": function() { self.fjsc_true(); },
+    "empty?": function() { self.fjsc_is_empty(); },
     alert: function() { self.fjsc_alert(); }
   };  
 }
@@ -75,7 +81,7 @@ Factor.prototype.fjsc_minus = function() {
   var stack = this.data_stack;
   var v1 = stack.pop();
   var v2 = stack.pop();
-  stack.push(v1-v2);
+  stack.push(v2-v1);
 }
 
 Factor.prototype.fjsc_times = function() {
@@ -125,6 +131,23 @@ Factor.prototype.fjsc_reduce = function() {
   this.data_stack.push(prev);
 }
 
+Factor.prototype.fjsc_if = function() {
+  var else_quot = this.data_stack.pop();
+  var then_quot = this.data_stack.pop();
+  var condition = this.data_stack.pop();
+  if(condition) {
+    (then_quot)();
+  } else {
+    (else_quot)();
+  }
+}
+
+Factor.prototype.fjsc_equals = function() {
+  var v1 = this.data_stack.pop();
+  var v2 = this.data_stack.pop();
+  this.data_stack.push(v1==v2);
+}
+
 Factor.prototype.fjsc_alert = function() {
   alert(this.data_stack.pop());
 }
@@ -133,5 +156,21 @@ Factor.prototype.fjsc_clear = function() {
   factor.data_stack = [ ]
 }
 
+Factor.prototype.fjsc_false = function() {
+  factor.data_stack.push(false);
+}
+
+Factor.prototype.fjsc_true = function() {
+  factor.data_stack.push(true);
+}
+
+Factor.prototype.fjsc_is_empty = function() {
+  factor.data_stack.push(factor.data_stack.pop().length==0);
+}
+
+Factor.prototype.fjsc_over = function() {
+   var stack = this.data_stack;
+   stack.push(stack[stack.length-2]);
+}
 
 var factor = new Factor();
