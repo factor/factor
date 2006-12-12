@@ -257,4 +257,3 @@ FUNCTION: void gluTessProperty ( GLUtesselator* tess, GLenum which, GLdouble dat
 FUNCTION: void gluTessVertex ( GLUtesselator* tess, GLdouble* location, GLvoid* data ) ;
 FUNCTION: GLint gluUnProject ( GLdouble winX, GLdouble winY, GLdouble winZ, GLdouble* model, GLdouble* proj, GLint* view, GLdouble* objX, GLdouble* objY, GLdouble* objZ ) ;
 FUNCTION: GLint gluUnProject4 ( GLdouble winX, GLdouble winY, GLdouble winZ, GLdouble clipW, GLdouble* model, GLdouble* proj, GLint* view, GLdouble nearVal, GLdouble farVal, GLdouble* objX, GLdouble* objY, GLdouble* objZ, GLdouble* objW ) ;
-

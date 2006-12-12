@@ -4,7 +4,7 @@ IN: opengl
 USING: alien errors io kernel math namespaces opengl
 sequences ;
 
-: gl-color ( colorspec -- ) first4 glColor4d ; inline
+: gl-color ( color -- ) first4 glColor4d ; inline
 
 : gl-error ( -- )
     glGetError dup zero? [
@@ -21,17 +21,15 @@ sequences ;
     swap [ glMatrixMode glPushMatrix call ] keep
     glMatrixMode glPopMatrix ; inline
 
-: gl-vertex first2 glVertex2d ; inline
+: gl-vertex ( point -- ) first2 glVertex2d ; inline
 
 : gl-line ( a b -- )
     GL_LINES [ gl-vertex gl-vertex ] do-state ;
 
 : gl-fill-rect ( loc dim -- )
-    #! Draws a two-dimensional box.
     [ first2 ] 2apply glRectd ;
 
 : gl-rect ( loc dim -- )
-    #! Draws a two-dimensional box.
     GL_FRONT_AND_BACK GL_LINE glPolygonMode
     >r { 0.5 0.5 } v+ r> { 0.5 0.5 } v- gl-fill-rect
     GL_FRONT_AND_BACK GL_FILL glPolygonMode ;
@@ -39,18 +37,15 @@ sequences ;
 : (gl-poly) [ [ gl-vertex ] each ] do-state ;
 
 : gl-fill-poly ( points -- )
-    #! Draw a filled polygon.
     dup length 2 > GL_POLYGON GL_LINES ? (gl-poly) ;
 
 : gl-poly ( points -- )
-    #! Draw a polygon.
     GL_LINE_LOOP (gl-poly) ;
 
 : prepare-gradient ( direction dim -- v1 v2 )
     tuck v* [ v- ] keep ;
 
 : gl-gradient ( direction colors dim -- )
-    #! Draws a quad strip.
     GL_QUAD_STRIP [
         swap >r prepare-gradient r>
         [ length dup 1- v/n ] keep [
@@ -60,13 +55,11 @@ sequences ;
     ] do-state ;
 
 : gen-texture ( -- id )
-    #! Generate texture ID.
     1 0 <uint> [ glGenTextures ] keep *uint ;
 
 : save-attribs ( bits quot -- )
     swap glPushAttrib call glPopAttrib ; inline
 
-! A sprite is a texture and a display list.
 TUPLE: sprite dlist texture loc dim dim2 ;
 
 C: sprite ( loc dim dim2 -- sprite )
@@ -78,9 +71,7 @@ C: sprite ( loc dim dim2 -- sprite )
 
 : sprite-width sprite-dim first ;
 
-: gray-texture ( sprite buffer -- id )
-    #! Given a buffer holding a width x height (powers of two)
-    #! grayscale texture, bind it and return the ID.
+: gray-texture ( sprite pixmap -- id )
     gen-texture [
         GL_TEXTURE_BIT [
             GL_TEXTURE_2D swap glBindTexture
@@ -90,12 +81,9 @@ C: sprite ( loc dim dim2 -- sprite )
         ] save-attribs
     ] keep ;
 
-: gen-dlist ( -- id )
-    #! Generate display list ID.
-    1 glGenLists ;
+: gen-dlist ( -- id ) 1 glGenLists ;
 
 : make-dlist ( type quot -- id )
-    #! Make a display list.
     gen-dlist [ rot glNewList call glEndList ] keep ; inline
 
 : init-texture ( -- )

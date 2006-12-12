@@ -5,8 +5,6 @@ libc math namespaces opengl prettyprint
 sequences styles ;
 IN: freetype
 
-! Memory management: freetype is allocated and freed by
-! with-freetype.
 SYMBOL: freetype
 SYMBOL: open-fonts
 
@@ -20,9 +18,6 @@ SYMBOL: open-fonts
         H{ } clone open-fonts set
     ] bind ;
 
-! A font object from FreeType.
-! the handle is an FT_Face.
-! sprites is a vector.
 TUPLE: font ascent descent height handle widths ;
 
 M: font equal? eq? ;
@@ -62,8 +57,6 @@ M: font equal? eq? ;
     "/fonts/" swap ".ttf" 3append resource-path ;
 
 : open-face ( font style -- face )
-    #! Open a TrueType font with the given logical name and
-    #! style.
     ttf-name ttf-path >r freetype get r>
     0 f <void*> [ FT_New_Face freetype-error ] keep *void* ;
 
@@ -91,14 +84,12 @@ C: font ( handle -- font )
     [ set-font-handle ] keep dup init-font
     V{ } clone over set-font-widths ;
 
-: open-font ( fontspec -- font )
-    #! Open a font and set the point size of the font.
+: (open-font) ( font -- open-font )
     first3 >r open-face dup 0 r> 6 shift
     dpi dpi FT_Set_Char_Size freetype-error <font> ;
 
-: lookup-font ( fontspec -- font )
-    #! Cache open fonts.
-    open-fonts get [ open-font ] cache ;
+: open-font ( font -- open-font )
+    open-fonts get [ (open-font) ] cache ;
 
 : load-glyph ( font char -- glyph )
     >r font-handle dup r> 0 FT_Load_Char
@@ -114,7 +105,6 @@ C: font ( handle -- font )
     swap glyph-height ft-ceil 2array ;
 
 : render-glyph ( font char -- bitmap )
-    #! Render a character and return a pointer to the bitmap.
     load-glyph dup
     FT_RENDER_MODE_NORMAL FT_Render_Glyph freetype-error ;
 
@@ -140,8 +130,6 @@ C: font ( handle -- font )
     [ copy-row ] times 2drop 2drop ;
 
 : bitmap>texture ( glyph sprite -- id )
-    #! Given a glyph bitmap, copy it to a texture with the given
-    #! width/height (which must be powers of two).
     tuck sprite-size2 * 2 * [
         alien-address [ copy-bitmap ] keep <alien> gray-texture
     ] with-malloc ;
@@ -155,8 +143,6 @@ C: font ( handle -- font )
     swap glyph-bitmap-rows next-power-of-2 2array ;
 
 : <char-sprite> ( font char -- sprite )
-    #! Create a new display list of a rendered glyph. This
-    #! allocates external resources. See free-sprites.
     over >r render-glyph dup r> glyph-texture-loc
     over glyph-size pick glyph-texture-size <sprite>
     [ bitmap>texture ] keep [ init-sprite ] keep ;

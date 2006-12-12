@@ -1325,5 +1325,3 @@ FUNCTION: void glCopyTexSubImage3D ( GLenum target, GLint level,
 : GL_TEXTURE_COMPARE_MODE           HEX: 884C ; inline
 : GL_TEXTURE_COMPARE_FUNC           HEX: 884D ; inline
 : GL_COMPARE_R_TO_TEXTURE           HEX: 884E ; inline
-
-

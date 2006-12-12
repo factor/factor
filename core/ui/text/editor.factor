@@ -63,7 +63,7 @@ M: editor model-changed
 
 : editor-line ( n editor -- str ) control-value nth ;
 
-: editor-font* ( editor -- font ) editor-font lookup-font ;
+: editor-font* ( editor -- font ) editor-font open-font ;
 
 : line-height ( editor -- n )
     editor-font* font-height ;

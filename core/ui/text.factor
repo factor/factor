@@ -22,7 +22,7 @@ kernel math models namespaces opengl sequences strings ;
     [ text-width ] 2keep text-height 2array ;
 
 : font-sprites ( open-font world -- pair )
-    world-fonts [ lookup-font V{ } clone 2array ] cache ;
+    world-fonts [ open-font V{ } clone 2array ] cache ;
 
 : draw-string ( font string loc -- )
     >r >r world get font-sprites first2 r> r> (draw-string) ;

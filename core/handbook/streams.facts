@@ -47,8 +47,10 @@ $terpri
 { $subsection stream-copy } ;
 
 ARTICLE: "stdio" "The default stream"
-"Various words take an implicit stream parameter from the " { $link stdio } " variable to reduce stack shuffling. Unless rebound in a child namespace, this variable will be set to a console stream for interacting with the user."
-{ $link close }
+"Various words take an implicit stream parameter from a variable to reduce stack shuffling."
+{ $subsection stdio }
+"Unless rebound in a child namespace, this variable will be set to a console stream for interacting with the user."
+{ $subsection close }
 { $subsection read1 }
 { $subsection read }
 { $subsection readln }

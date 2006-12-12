@@ -24,7 +24,7 @@ C: label ( string -- label )
     dup label-theme ;
 
 M: label pref-dim*
-    dup label-font lookup-font swap label-text text-dim ;
+    dup label-font open-font swap label-text text-dim ;
 
 M: label draw-gadget*
     dup label-color gl-color

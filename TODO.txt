@@ -2,10 +2,9 @@
 
 - callback scheduling issue
 - error popup obscures input area
-- browser: tile titles should respond to right-clicks and/or have a
-  menu popup button
 - ui docs
-- calling 'see' with an unknown method should be an error
+- calling 'see' with an nonexistent method should be an error
+- grid-lines are rendered incorrectly
 
 + 0.88:
 
@@ -13,6 +12,7 @@
 - growable data heap
 - variable width word wrap
 - graphical crossref tool
+- inspector where slot values can be changed
 - compiled call traces:
   - should be independent of whenever the runtime was built with
     -fomit-frame-pointer or not
