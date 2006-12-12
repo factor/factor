@@ -9,9 +9,7 @@ ARTICLE: "browsing-help" "Browsing documentation"
 "The easiest way to browse the help is from the help browser tool in the UI, however you can also display help topics in the listener."
 { $subsection handbook }
 "Help topics are identified by article name strings, or words. You can request a specific help topic:"
-{ $subsection help }
-"You can also view a word's documentation and definition at once:"
-{ $subsection see-help } ;
+{ $subsection help } ;
 
 ARTICLE: "writing-help" "Writing documentation"
 "By convention, documentation is written in files with the " { $snippet ".facts" } " filename extension. Module documentation should follow a few conventions documented in " { $link "documenting-modules" } "."

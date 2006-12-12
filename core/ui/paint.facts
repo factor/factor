@@ -11,11 +11,11 @@ HELP: draw-gadget*
 
 HELP: draw-interior
 { $values { "gadget" gadget } } 
-{ $contract "Draws the interior of a gadget by making OpenGL calls." } ;
+{ $contract "Draws the interior of a gadget by making OpenGL calls. The " { $link gadget-interior } " slot may be set to objects implementing this generic word." } ;
 
 HELP: draw-boundary
 { $values { "gadget" gadget } } 
-{ $contract "Draws the boundary of a gadget by making OpenGL calls." } ;
+{ $contract "Draws the boundary of a gadget by making OpenGL calls. The " { $link gadget-boundary } " slot may be set to objects implementing this generic word." } ;
 
 HELP: solid
 { $class-description "A class implementing the " { $link draw-boundary } " and " { $link draw-interior } " generic words to draw a solid outline or a solid fill, respectively. The " { $link solid-color } " slot stores a color specifier." } ;

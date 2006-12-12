@@ -227,7 +227,7 @@ M: f print-element drop ;
 : $see ( element -- ) first ($see) ;
 
 : $definition ( word -- )
-    "Definition" $heading ($see) ;
+    "Definition" $heading $see ;
 
 : $curious ( element -- )
     "For the curious..." $heading print-element ;

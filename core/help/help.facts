@@ -10,21 +10,14 @@ HELP: (help)
 { $description
     "Displays a help article or documentation associated to a word on the " { $link stdio } " stream. This word does not print the article title, so it is intended for use by outliners and in other contexts where the title is already visible to the user."
 }
-{ $see-also help see-help } ;
+{ $see-also help } ;
 
 HELP: help
 { $values { "topic" "an article name or a word" } }
 { $description
     "Displays a help article or documentation associated to a word on the " { $link stdio } " stream."
 }
-{ $see-also (help) see-help } ;
-
-HELP: see-help
-{ $values { "word" "a word" } }
-{ $description
-    "Display the documentation and definition of a word on the " { $link stdio } " stream."
-}
-{ $see-also (help) help see } ;
+{ $see-also (help) } ;
 
 HELP: handbook
 { $description "Displays the Factor developer's handbook." }

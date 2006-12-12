@@ -8,6 +8,7 @@
 
 + 0.88:
 
+- interactor: show stack effect for word at caret in status bar
 - lisppaste gui
 - growable data heap
 - variable width word wrap

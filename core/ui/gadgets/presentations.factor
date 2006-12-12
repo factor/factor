@@ -23,7 +23,8 @@ TUPLE: presentation object hook ;
     invoke-presentation ;
 
 : show-mouse-help ( presentation -- )
-    dup find-world [ world-status set-model ] [ drop ] if* ;
+    dup presentation-object swap find-world
+    [ world-status set-model ] [ drop ] if* ;
 
 : hide-mouse-help ( presentation -- )
     find-world [ world-status f swap set-model ] when* ;
@@ -74,9 +75,8 @@ presentation H{
 
 ! Presentation help bar
 : <presentation-help> ( model -- gadget )
-    [
-        [ presentation-object summary ] [ "" ] if*
-    ] <filter> <label-control> dup reverse-video-theme ;
+    [ [ summary ] [ "" ] if* ] <filter> <label-control>
+    dup reverse-video-theme ;
 
 ! Character styles
 

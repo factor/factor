@@ -44,11 +44,11 @@ C: button ( gadget quot -- button )
     [ set-button-quot ] keep
     [ set-gadget-delegate ] keep ;
 
-: <roll-button> ( str/gadget quot -- button )
+: <roll-button> ( label quot -- button )
     >r >label r>
     <button> dup roll-button-theme ;
 
-: <bevel-button> ( str/gadget quot -- button )
+: <bevel-button> ( label quot -- button )
     >r >label <default-border> r>
     <button> dup bevel-button-theme ;
 
@@ -59,7 +59,7 @@ repeat-button H{
     { T{ button-up } [ dup stop-timer-gadget button-update ] }
 } set-gestures
 
-C: repeat-button ( gadget quot -- button )
+C: repeat-button ( label quot -- button )
     #! Button that calls the quotation every 100ms as long as
     #! the mouse is held down.
     [
@@ -82,7 +82,7 @@ M: button-paint draw-interior
 M: button-paint draw-boundary
     button-paint draw-boundary ;
 
-: <radio-control> ( model value gadget -- gadget )
+: <radio-control> ( model value label -- gadget )
     over [ swap set-control-value ] curry <bevel-button>
     swap [ swap >r = r> set-button-selected? ] curry <control> ;
 

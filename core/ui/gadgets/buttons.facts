@@ -1,0 +1,64 @@
+IN: gadgets-buttons
+USING: help gadgets gadgets-labels gadgets-presentations
+generic models ;
+
+HELP: button
+{ $class-description "A button is a " { $link gadget } " which responds to mouse clicks by invoking a quotation."
+$terpri
+"The following words construct buttons:"
+{ $list
+    { $link <button> }
+    { $link <roll-button> }
+    { $link <bevel-button> }
+    { $link <command-button> }
+    { $link <presentation> }
+    { $link <repeat-button> }
+}
+"A button's appearance can vary depending on the state of the mouse button if the " { $link gadget-interior } " or " { $link gadget-boundary } " slots are set to instances of " { $link button-paint } "."
+$terpri
+"A button can be selected, which is distinct from being pressed. This state is held in the " { $link button-selected? } " slot, and is used by the " { $link <radio-box> } " word to construct a row of buttons for choosing among several alternatives." } ;
+
+HELP: >label
+{ $values { "obj" object } }
+{ $description "Convert the object into a gadget suitable for use as the label of a button. If " { $snippet "obj" } " is already a gadget, does nothing. Otherwise creates a " { $link label } " gadget if it is a string and an empty gadget if " { $snippet "obj" } " is " { $link f } "." } ;
+
+HELP: <button>
+{ $values { "gadget" gadget } { "quot" "a quotation with stack effect " { $snippet "( button -- )" } } { "button" "a new " { $link button } } }
+{ $description "Creates a new " { $link button } " which calls the quotation when clicked. The given gadget becomes the button's delegate." }
+{ $see-also <bevel-button> <command-button> <roll-button> <presentation> } ;
+
+HELP: <roll-button>
+{ $values { "label" object } { "quot" "a quotation with stack effect " { $snippet "( button -- )" } } }
+{ $description "Creates a new " { $link button } " which is displayed with a solid border when it is under the mouse, informing the user that the gadget is clickable. The label is converted into a gadget by calling " { $link >label } "." }
+{ $see-also <button> <bevel-button> <command-button> <roll-button> <presentation> } ;
+
+HELP: <bevel-button>
+{ $values { "label" object } { "quot" "a quotation with stack effect " { $snippet "( button -- )" } } }
+{ $description "Creates a new " { $link button } " with a shaded border which is always visible. The label is converted into a gadget by calling " { $link >label } ". The button appearance changes in response to mouse gestures using a " { $link button-paint } "." }
+{ $see-also <button> <roll-button> <command-button> <roll-button> <presentation> } ;
+
+HELP: <repeat-button>
+{ $values { "label" object } { "quot" "a quotation with stack effect " { $snippet "( button -- )" } } }
+{ $description "Creates a new " { $link button } " derived from a " { $link <bevel-button> } " which calls the quotation every 100 milliseconds as long as the mouse button is held down." }
+{ $see-also <button> <bevel-button> } ;
+
+HELP: button-paint
+{ $class-description "A class implementing the " { $link draw-boundary } " and " { $link draw-interior } " gneeric words by delegating to an object in one of four slots which depend on the state of the button being drawn:"
+    { $list
+        { { $link button-paint-plain } " - the button is inactive" }
+        { { $link button-paint-rollover } " - the button is under the mouse" }
+        { { $link button-paint-pressed } " - the button is under the mouse and a mouse button is held down" }
+        { { $link button-paint-selected } " - the button is selected (see " { $link <radio-box> }  }
+    }
+"The " { $link <roll-button> } " and " { $link <bevel-button> } " words create " { $link button } " instances with specific " { $link button-paint } "." } ;
+
+HELP: <radio-control>
+{ $values { "model" model } { "value" object } { "label" object } }
+{ $description
+    "Creates a " { $link <bevel-button> } " which sets the model's value to " { $snippet "value" } " when pressed. After being pressed, the button becomes selected until the value of the model changes again. The label is converted into a gadget by calling " { $link >label } "."
+}
+{ $notes "Typically a row of radio controls should be built together using " { $link <radio-box> } "." } ;
+
+HELP: <radio-box>
+{ $values { "model" model } { "assoc" "an association list mapping labels to objects" } }
+{ $description "Creates a row of labelled " { $link <radio-control> } " gadgets which change the value of the model." } ;

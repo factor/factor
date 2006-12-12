@@ -55,6 +55,11 @@ PROVIDE: core/ui
     "timers.facts"
     "world.facts"
     "windows.facts"
+    "gadgets/books.facts"
+    "gadgets/borders.facts"
+    "gadgets/buttons.facts"
+    "gadgets/controls.facts"
+    "gadgets/frames.facts"
     "text/editor.facts"
 } }
 { +tests+ {

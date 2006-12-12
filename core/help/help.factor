@@ -19,10 +19,11 @@ M: word article-content
         dup word-help [
             %
         ] [
-            "predicating" word-prop [
+            dup "predicating" word-prop [
                 \ $predicate swap 2array ,
             ] when*
-        ] ?if
+        ] if*
+        \ $definition swap 2array ,
     ] { } make ;
 
 : $title ( topic -- )
@@ -35,9 +36,6 @@ M: word article-content
 : (help) ( topic -- ) article-content print-content ;
 
 : help ( topic -- ) dup $title (help) terpri ;
-
-: see-help ( word -- )
-    dup help terpri $definition terpri ;
 
 : handbook ( -- ) "handbook" help ;
 

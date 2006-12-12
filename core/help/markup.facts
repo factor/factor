@@ -185,11 +185,8 @@ HELP: $see
 } ;
 
 HELP: $definition
-{ $values { "word" "a word" } }
-{ $description "Prints a heading followed by the definition of " { $snippet "word" } " by calling " { $link see } "." }
-{ $notes
-    "This markup element is output by " { $link see-help } " but not " { $link help } "."
-} ;
+{ $values { "element" "a markup element of the form " { $snippet "{ word }" } } }
+{ $description "Prints a heading followed by the definition of " { $snippet "word" } " by calling " { $link see } "." } ;
 
 HELP: $curious
 { $values { "element" "a markup element" } }
