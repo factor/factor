@@ -40,3 +40,5 @@ USE: memory
     full-gc
     full-gc
 ] unit-test
+
+[ f ] [ { "A" "B" } kernel-error? ] unit-test

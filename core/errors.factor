@@ -58,7 +58,11 @@ M: condition compute-restarts
     append ;
 
 PREDICATE: array kernel-error ( obj -- ? )
-    dup first \ kernel-error eq? swap second 0 18 between? and ;
+    dup first \ kernel-error eq? [
+        second 0 18 between?
+    ] [
+        drop f
+    ] if ;
 
 TUPLE: assert got expect ;
 

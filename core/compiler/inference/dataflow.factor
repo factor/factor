@@ -275,7 +275,7 @@ DEFER: (map-nodes)
     {
         { [ dup value? ] [ 2drop t ] }
         { [ over node-literals not ] [ 2drop f ] }
-        { [ swap node-literals hash-member? ] [ 2drop t ] }
+        { [ swap node-literals hash-member? ] [ t ] }
     } cond ;
 
 : node-literal ( node value -- obj )
