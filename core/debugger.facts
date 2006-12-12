@@ -37,19 +37,24 @@ HELP: try
 { $description "Calls the quotation. If it throws an error, logs the error to the default stream and restores the data stack." } ;
 
 HELP: expired-error.
+{ $values { "obj" "an error" } }
 { $error-description "Thrown by " { $link alien-address } " and " { $link alien-invoke } " if an " { $link alien } " object passed in as a parameter has expired. Alien objects expire if they are saved an image which is subsequently loaded; this prevents a certain class of programming errors, usually attempts to use uninitialized objects, since holding a C address is meaningless between sessions." }
 { $notes "You can check if an alien object has expired by calling " { $link expired? } "." } ;
 
 HELP: io-error.
+{ $values { "error" "an object" } }
 { $error-description "Thrown by the C streams I/O primitives if an I/O error occurs." } ;
 
 HELP: undefined-word-error.
+{ $values { "obj" "an object" } }
 { $error-description "Thrown if an attempt is made to call a word which was defined by " { $link POSTPONE: DEFER: } "." } ;
 
 HELP: type-check-error.
+{ $values { "obj" "an object" } }
 { $error-description "Thrown by various primitives if one of the inputs does not have the expected type. Generic words throw " { $link no-method } " and " { $link no-math-method } " errors in such cases instead." } ;
 
 HELP: signal-error.
+{ $values { "obj" "an object" } }
 { $error-description
     "Thrown by the runtime when a Unix signal is received. While signal numbers are system-specific, the following are relatively standard:"
     { $list
@@ -61,21 +66,27 @@ HELP: signal-error.
 } ;
 
 HELP: negative-array-size-error.
+{ $values { "obj" "an object" } }
 { $error-description "Thrown by " { $link <array> } ", " { $link <string> } ", " { $link <vector> } " and " { $link <sbuf> } " if a negative capacity is specified." } ;
 
 HELP: c-string-error.
+{ $values { "obj" "an object" } }
 { $error-description "Thrown by " { $link alien-invoke } " and various primitives if a string containing null bytes, or characters with values higher than 255 is passed in where a C string is expected. See " { $link "c-strings" } "." } ;
 
 HELP: ffi-error.
+{ $values { "obj" "an object" } }
 { $error-description "Thrown by " { $link dlopen } " and " { $link dlsym } " if a problem occurs while loading a native library or looking up a symbol. See " { $link "alien" } "." } ;
 
 HELP: heap-scan-error.
+{ $values { "obj" "an object" } }
 { $error-description "Thrown if " { $link next-object } " is called outside of a " { $link begin-scan } "/" { $link end-scan } " pair." } ;
 
 HELP: undefined-symbol-error.
+{ $values { "obj" "an object" } }
 { $error-description "Thrown if a previously-compiled " { $link alien-invoke } " call refers to a native library symbol which no longer exists." } ;
 
 HELP: user-interrupt.
+{ $values { "obj" "an object" } }
 { $error-description "Thrown by the " { $snippet "t" } " command in the FEP." } ;
 
 HELP: datastack-underflow.

@@ -2,7 +2,7 @@ IN: compiler
 USING: assembler help words ;
 
 HELP: compiled? ( word -- ? )
-{ $values { "word" "a word" } }
+{ $values { "word" "a word" } { "?" "a boolean" } }
 { $description "Tests if a word is compiled." } ;
 
 HELP: compile

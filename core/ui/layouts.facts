@@ -8,7 +8,7 @@ HELP: relayout
 
 HELP: relayout-1
 { $values { "gadget" gadget } }
-{ $description "Relayout and redraw a gadget before the next iteration of the event loop. Unlike " { $link relayout } ", this does not propogate requests up to the parent, and so this word should only be used when the gadget's internal layout or appearance has changed, but the dimensions have not." }
+{ $description "Relayout and redraw a gadget before the next iteration of the event loop. Unlike " { $link relayout } ", this does not propagate requests up to the parent, and so this word should only be used when the gadget's internal layout or appearance has changed, but the dimensions have not." }
 { $see-also relayout } ;
 
 HELP: set-layout-dim

@@ -57,7 +57,7 @@ HELP: gen-texture
 { $description "Wrapper for " { $link glGenTextures } " to handle the common case of generating a single texture ID." } ;
 
 HELP: save-attribs
-{ $values { "what" integer } { "quot" quotation } }
+{ $values { "bits" integer } { "quot" quotation } }
 { $description "Wraps a quotation in " { $link glPushAttrib } "/" { $link glPopAttrib } " calls." } ;
 
 HELP: sprite
@@ -80,7 +80,7 @@ HELP: gen-dlist
 { $description "Wrapper for " { $link glGenLists } " to handle the common case of generating a single display list ID." } ;
 
 HELP: make-dlist
-{ $values { "type" "one of " { $link GL_COMPILE } " or " { $link GL_COMPILE_AND_EXECUTE } } { "quot" quotation } }
+{ $values { "type" "one of " { $link GL_COMPILE } " or " { $link GL_COMPILE_AND_EXECUTE } } { "quot" quotation } { "id" "an OpenGL texture ID" } }
 { $description "Compiles the results of calling the quotation into a new OpenGL display list." } ;
 
 HELP: gl-translate

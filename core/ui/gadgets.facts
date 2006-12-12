@@ -29,7 +29,7 @@ HELP: rect-bounds
 { $see-also rect-extent } ;
 
 HELP: <extent-rect> ( loc ext -- rect )
-{ $values { "loc" "a pair of integers" } { "ext" "a pair of integers" } { "newrect" "a new " { $link rect } } }
+{ $values { "loc" "a pair of integers" } { "ext" "a pair of integers" } { "rect" "a new " { $link rect } } }
 { $description "Creates a new rectangle with the specified top-left and bottom-right corner locations." } ;
 
 HELP: rect-extent
@@ -58,7 +58,7 @@ HELP: gadget
         { { $link gadget-orientation } " - one of " { $snippet "{ 0 1 }" } " or " { $snippet "{ 1 0 }" } ". This slot is used by layout gadgets such as " { $link pack } "." }
         { { $link gadget-state } " - stores the layout state of the gadget. Do not read or write this slot directly, instead call " { $link relayout } " and " { $link relayout-1 } " if the gadget needs to be relayout." }
         { { $link gadget-visible? } " - a boolean indicating if the gadget should display and receive user input." }
-        { { $link gadget-root? } " - if set to " { $link t } ", layout changes in this gadget will not propogate to the gadget's parent." }
+        { { $link gadget-root? } " - if set to " { $link t } ", layout changes in this gadget will not propagate to the gadget's parent." }
         { { $link gadget-clipped? } " - a boolean indicating if clipping will be enabled when drawing this gadget's children." }
         { { $link gadget-grafted? } " - if set to " { $link t } ", the gadget is parented in a native window. Do not write this slot directly, instead add gadgets to visible gadgets or use " { $link open-window } " to display gadgets in new windows on the screen." }
         { { $link gadget-interior } " - an object whose class implements the " { $link draw-interior } " generic word." }

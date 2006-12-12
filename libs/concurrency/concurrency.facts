@@ -134,7 +134,7 @@ HELP: spawn-link
 { $values { "quot" "a predicate with stack effect " { $snippet "( -- )" } }  
           { "process" "a process object" } 
 }
-{ $description "Start a process which runs the given quotation. If that quotation throws an error which is not caught then the error will get propogated to the process that spawned it. This can be used to set up 'supervisor' processes that restart child processes that crash due to uncaught errors.\n" } 
+{ $description "Start a process which runs the given quotation. If that quotation throws an error which is not caught then the error will get propagated to the process that spawned it. This can be used to set up 'supervisor' processes that restart child processes that crash due to uncaught errors.\n" } 
 { $see-also spawn } ;
 
 ARTICLE: { "concurrency" "loading" } "Loading"

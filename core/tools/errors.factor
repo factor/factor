@@ -14,7 +14,7 @@ words definitions ;
 : io-error. ( error -- )
     "I/O error: " write third print ;
 
-: type-check-error. ( list -- )
+: type-check-error. ( obj -- )
     "Type check error" print
     "Object: " write dup fourth short.
     "Object type: " write dup fourth class .

@@ -179,7 +179,7 @@ HELP: set-word
 { $see-also word } ;
 
 HELP: vocabs
-{ $values { "word" "a sequence of strings" } }
+{ $values { "seq" "a sequence of strings" } }
 { $description "Outputs a sequence of all defined vocabulary names." } ;
 
 HELP: vocab
