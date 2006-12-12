@@ -38,7 +38,7 @@ HELP: <wrapper> ( obj -- wrapper )
 { $values { "obj" "an object" } { "wrapper" "a new wrapper" } }
 { $description "Creates an object which pushes " { $snippet "obj" } " on the stack when evaluated. User code should call " { $link literalize } " instead, since it avoids wrapping self-evaluating objects (which is redundant)." } ;
 
-HELP: literalize ( obj -- wrapped )
+HELP: literalize
 { $values { "obj" "an object" } { "wrapped" "an object" } }
 { $description "Outputs an object which evaluates to " { $snippet "obj" } " when placed in a quotation. If " { $snippet "obj" } " is not self-evaluating (for example, it is a word), then it will be wrapped." }
 { $examples

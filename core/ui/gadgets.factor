@@ -47,7 +47,7 @@ M: gadget equal? eq? ;
 
 : gadget-child ( gadget -- child ) gadget-children first ;
 
-: nth-gadget ( n gadget -- ) gadget-children nth ;
+: nth-gadget ( n gadget -- child ) gadget-children nth ;
 
 : <zero-rect> ( -- rect ) { 0 0 } dup <rect> ;
 

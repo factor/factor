@@ -27,7 +27,7 @@ M: quotation like drop dup quotation? [ >quotation ] unless ;
 
 : unit ( obj -- quot ) 1array >quotation ;
 
-GENERIC: literalize ( obj -- newobj )
+GENERIC: literalize ( obj -- wrapped )
 M: object literalize ;
 M: word literalize <wrapper> ;
 M: wrapper literalize <wrapper> ;
