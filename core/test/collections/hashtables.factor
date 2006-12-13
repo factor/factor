@@ -205,3 +205,11 @@ H{ } "x" set
 
 ! Crash discovered by erg
 [ t ] [ 3/4 <hashtable> dup clone = ] unit-test
+
+! Another crash discovered by erg
+[ ] [
+    H{ } clone
+    [ 1 swap set-hash ] catch drop
+    [ 2 swap set-hash ] catch drop
+    [ 3 swap set-hash ] catch drop
+] unit-test
