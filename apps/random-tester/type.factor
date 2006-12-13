@@ -93,7 +93,7 @@ TUPLE: inert-object ;
     >r { no-method? no-math-method? } f r> reduce ;
 
 : maybe-explode
-    dup sequence? [ [ ] each ] when ;
+    dup sequence? [ [ ] each ] when ; inline
 
 SYMBOL: err
 SYMBOL: type-error

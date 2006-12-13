@@ -19,9 +19,11 @@ IN: random-tester
 : zero-array
     [ drop 0 ] map ;
 
-TUPLE: p-list seq max counter ;
+TUPLE: p-list seq max count count-vec ;
 : make-p-list ( seq -- tuple )
-    dup length [ 1- ] keep zero-array <p-list> ;
+    dup length [ 1- ] keep
+    [ dup ^ 0 swap 2array ] keep
+    zero-array <p-list> ;
 
 : inc-seq ( seq max -- )
     2dup [ < ] curry find-last over -1 = [
@@ -31,13 +33,41 @@ TUPLE: p-list seq max counter ;
         1+ over length rot <slice> nzero-array
     ] if ;
 
-: get-permutation ( tuple -- seq )
-    [ p-list-seq ] keep p-list-counter [ swap nth ] map-with ;
+: inc-count ( tuple -- )
+    [ p-list-count first2 >r 1+ r> 2array ] keep
+    set-p-list-count ;
 
-: p-list-next ( tuple -- seq )
-    [ get-permutation ] keep 
-    [ p-list-counter ] keep p-list-max inc-seq ;
+: get-permutation ( tuple -- seq )
+    [ p-list-seq ] keep p-list-count-vec [ swap nth ] map-with ;
+
+: p-list-next ( tuple -- seq/f )
+    dup p-list-count first2 < [
+        [
+            [ get-permutation ] keep 
+            [ p-list-count-vec ] keep p-list-max
+            inc-seq
+        ] keep inc-count
+    ] [
+        drop f
+    ] if ;
+
+: (permutations) ( tuple -- )
+    dup p-list-next [ , (permutations) ] [ drop ] if* ;
 
 : permutations ( seq -- seq )
-    ;
+    make-p-list
+    [
+        (permutations)
+    ] { } make ;
+
+: (each-permutation) ( tuple quot -- )
+    over p-list-next [
+        [ rot drop swap call ] 3keep
+        drop (each-permutation)
+    ] [
+        2drop
+    ] if* ; inline
+
+: each-permutation ( seq quot -- )
+    >r make-p-list r> (each-permutation) ;
 
