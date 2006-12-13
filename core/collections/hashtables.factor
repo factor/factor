@@ -165,11 +165,12 @@ IN: hashtables
     drop ;
 
 : ?grow-hash ( hash -- )
-    dup hash-count 3 * over hash-array array-capacity >
-    [ dup grow-hash ] when drop ; inline
+    dup hash-count 1 fixnum+fast 3 fixnum*
+    over hash-array array-capacity >
+    [ grow-hash ] [ drop ] if ; inline
 
 : set-hash ( value key hash -- )
-    [ (set-hash) ] keep ?grow-hash ;
+    dup ?grow-hash (set-hash) ;
 
 : hash+ ( n key hash -- )
     [ hash [ 0 ] unless* + ] 2keep set-hash ;

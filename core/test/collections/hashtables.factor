@@ -212,4 +212,5 @@ H{ } "x" set
     [ 1 swap set-hash ] catch drop
     [ 2 swap set-hash ] catch drop
     [ 3 swap set-hash ] catch drop
+    drop
 ] unit-test
