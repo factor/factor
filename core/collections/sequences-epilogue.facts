@@ -78,7 +78,7 @@ HELP: push-new
         "\"nachos\" \"v\" get push-new"
         "\"salsa\" \"v\" get push-new"
         "\"v\" get ."
-        "V{ \"beans\" \"cheese\" \"salsa\" \"nachos\" }"
+        "V{ \"beans\" \"cheese\" \"nachos\" \"salsa\" }"
     }
 }
 { $side-effects "seq" }
@@ -222,7 +222,7 @@ HELP: cond
 }
 { $errors "Throws a " { $link no-cond } " error if none of the test quotations yield a true value." }
 { $examples
-    { $example
+    { $code
         "{"
         "    { [ dup 0 > ] [ \"positive\" ] }"
         "    { [ dup 0 < ] [ \"negative\" ] }"

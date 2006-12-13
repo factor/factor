@@ -317,10 +317,10 @@ HELP: declare
 { $description "Declares that the elements at the top of the stack are instances of the classes in " { $snippet "spec" } "." }
 { $warning "The compiler blindly trusts declarations, and false declarations can lead to crashes, memory corruption and other undesirable behavior." }
 { $examples
-    "The optimizer cannot do anything with the below quotation:"
-    { $example "[ 2 + 10 * ] f dataflow." "[ 2 + 10 * ]" }
+    "The optimizer cannot do anything with the below code as you can verify with " { $link "ui-dataflow" } ":"
+    { $code "2 + 10 *" }
     "However, if we declare that the top of the stack is a " { $link float } ", then type checks and generic dispatch are eliminated, and the compiler can use unsafe intrinsics:"
-    { $example "[ { float } declare 2 + 10 * ] f dataflow." "[ 2.0 float+ 10.0 float* ]" }
+    { $code "{ float } declare 2 + 10 *" }
 } ;
 
 HELP: array-capacity

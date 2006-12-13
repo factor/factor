@@ -52,7 +52,7 @@ IN: generic
     2dup delegate-slots swap append "slots" set-word-prop
     define-slots ;
 
-PREDICATE: class tuple-class tuple-size ;
+PREDICATE: class tuple-class tuple-size >boolean ;
 
 TUPLE: check-tuple class ;
 : check-tuple ( class -- class )

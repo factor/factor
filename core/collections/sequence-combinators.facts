@@ -24,7 +24,7 @@ HELP: accumulate
 { $values { "seq" "a sequence" } { "quot" "a quotation with stack effect " { $snippet "( prev elt -- next )" } } { "final" "the final result" } { "newseq" "a new sequence" } }
 { $description "Combines successive elements of the sequence using a binary operation, and outputs a sequence of intermediate results together with the final result. On the first iteration, the two inputs to the quotation are " { $snippet "identity" } ", and the first element of the sequence. On successive iterations, the first input is the result of the previous iteration, and the second input is the corresponding element of the sequence. Given the empty sequence, outputs a one-element sequence consisting of " { $snippet "identity" } "." }
 { $examples
-    { $example "{ 2 2 2 2 2 } 0 [ + ] accumulate . ." "{ 0 2 4 6 8 } 10" }
+    { $example "{ 2 2 2 2 2 } 0 [ + ] accumulate . ." "{ 0 2 4 6 8 }\n10" }
 } ;
 
 HELP: map
@@ -163,9 +163,9 @@ HELP: monotonic?
 { $description "Applies the relation to successive pairs of elements in the sequence, testing for a truth value. The relation should be a transitive relation, such as a total order or an equality relation." }
 { $examples
     "Testing if a sequence is non-decreasing:"
-    { $example "{ 1 1 2 } [ >= ] monotonic?" "t" }
+    { $example "{ 1 1 2 } [ >= ] monotonic? ." "t" }
     "Testing if a sequence is decreasing:"
-    { $example "{ 9 8 6 7 } [ < ] monotonic?" "f" }
+    { $example "{ 9 8 6 7 } [ < ] monotonic? ." "f" }
 }
 { $see-also all-eq? all-equal? } ;
 

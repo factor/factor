@@ -99,7 +99,7 @@ HELP: textual-list
 { $values { "seq" "a sequence" } { "quot" "a quotation with stack effect " { $snippet "( elt -- )" } } }
 { $description "Applies the quotation to each element of the sequence, printing a comma between each pair of elements." }
 { $examples
-    { $example "{ \"fish\" \"chips\" \"salt\" } [ write ] textual-list print" "fish, chips, salt" }
+    { $example "{ \"fish\" \"chips\" \"salt\" } [ write ] textual-list" "fish, chips, salt" }
 } ;
 
 HELP: $links
