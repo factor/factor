@@ -1,5 +1,5 @@
 IN: help
-USING: gadgets ;
+USING: gadgets kernel arrays ;
 
 : $ui-frame-constant
     { $description "Symbolic constant for a common input to " { $link grid-add } "." } print-element ;
@@ -26,3 +26,16 @@ HELP: <frame>
 { $values { "frame" frame } }
 { $description "Creates a new " { $link frame } " for laying out gadgets in a 3x3 grid." }
 { $see-also delegate>frame make-frame make-frame* } ;
+
+HELP: delegate>frame
+{ $values { "tuple" tuple } }
+{ $description "Sets the tuple's delegate to a new " { $link frame } "." } 
+{ $side-effects "frame" } ;
+
+HELP: make-frame
+{ $values { "specs" array } { "frame" frame } }
+{ $description "Creates a new frame from a declarative specification. See " { $link build-grid } " for a description of the format of " { $snippet "spec" } "." } ;
+
+HELP: make-frame*
+{ $values { "tuple" tuple } { "specs" array } { "frame" frame } }
+{ $description "Creates a new frame from a declarative specification and sets " { $snippet "tuple" } "'s delegate to the new frame. See " { $link build-grid } " for a description of the format of " { $snippet "spec" } "." } ;

@@ -33,6 +33,7 @@
   - string-lines
   - md5, crc32
   - all-words [ word-name ] map prune [ words-named ] map
+  - 100000 [ "\"hello\" not" eval drop ] times
 - auto-update browser and help when sources reload
 - mac intel: struct returns from objc methods
 - new windows don't always have focus, eg focus follows mouse

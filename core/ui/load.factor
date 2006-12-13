@@ -60,6 +60,13 @@ PROVIDE: core/ui
     "gadgets/buttons.facts"
     "gadgets/controls.facts"
     "gadgets/frames.facts"
+    "gadgets/grid-lines.facts"
+    "gadgets/grids.facts"
+    "gadgets/incremental.facts"
+    "gadgets/labelled-gadget.facts"
+    "gadgets/labels.facts"
+    "gadgets/lists.facts"
+    "gadgets/outliner.facts"
     "text/editor.facts"
 } }
 { +tests+ {

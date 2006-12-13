@@ -6,8 +6,7 @@ USING: arrays kernel math namespaces sequences words ;
 TUPLE: grid children gap ;
 
 : set-grid-children* ( children grid -- )
-    [ set-grid-children ] 2keep
-    >r concat [ ] subset r> add-gadgets ;
+    [ set-grid-children ] 2keep >r concat r> add-gadgets ;
 
 C: grid ( children -- grid )
     dup delegate>gadget
@@ -35,8 +34,7 @@ C: grid ( children -- grid )
 
 : gap grid get grid-gap ;
 
-: (pair-up) ( horiz vert -- dim )
-    >r first r> second 2array ;
+: (pair-up) ( horiz vert -- dim ) >r first r> second 2array ;
 
 M: grid pref-dim*
     [
@@ -68,9 +66,6 @@ M: grid layout*
     [ grid-layout ] with-grid ;
 
 : build-grid ( grid specs -- )
-    #! Specs is an array of quadruples { quot post setter loc }.
-    #! The setter has stack effect ( new gadget -- ),
-    #! the loc is @center, @top, etc.
     swap [ [ grid-add ] build-spec ] with-gadget ; inline
 
 M: grid children-on ( rect gadget -- seq )

@@ -6,7 +6,7 @@ queues sequences test threads help sequences words timers ;
 
 TUPLE: labelled-gadget content ;
 
-C: labelled-gadget ( gadget title -- gadget )
+C: labelled-gadget ( gadget title -- newgadget )
     {
         { [ <label> dup reverse-video-theme ] f f @top }
         { f set-labelled-gadget-content f @center }

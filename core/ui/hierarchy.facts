@@ -1,5 +1,5 @@
 IN: gadgets
-USING: help gadgets-text ;
+USING: help gadgets-text gadgets-tracks ;
 
 HELP: graft*
 { $values { "gadget" gadget } }
@@ -26,22 +26,29 @@ HELP: ungraft
 HELP: unparent
 { $values { "gadget" gadget } }
 { $description "Removes the gadget from its parent. This will relayout the parent." }
-{ $notes "This may result in " { $link ungraft* } " being called on the gadget and its children, if the gadget's parent is visible on the screen." } ;
+{ $notes "This may result in " { $link ungraft* } " being called on the gadget and its children, if the gadget's parent is visible on the screen." }
+{ $warning "Some gadget classes have their own words for removing children, for example " { $link grid-remove } ". Read the documentation for the class of the gadget's parent before using this word." } ;
 
 HELP: clear-gadget
 { $values { "gadget" gadget } }
 { $description "Removes all children from the gadget. This will relayout the gadget." }
-{ $notes "This may result in " { $link ungraft* } " being called on the children, if the gadget is visible on the screen." } ;
+{ $notes "This may result in " { $link ungraft* } " being called on the children, if the gadget is visible on the screen." }
+{ $warning "Some gadget classes have their own words for adding children, for example " { $link grid-remove } ". Read the documentation for the gadget class before using this word." }
+{ $side-effects "gadget" } ;
 
 HELP: add-gadget
 { $values { "gadget" gadget } { "parent" gadget } }
 { $description "Adds a child gadget to a parent. If the gadget is contained in another gadget, " { $link unparent } " is called on the gadget first. The parent will be relayout." }
-{ $notes "Adding a gadget to a parent may result in " { $link graft* } " being called on the children, if the parent is visible on the screen." } ;
+{ $notes "Adding a gadget to a parent may result in " { $link graft* } " being called on the children, if the parent is visible on the screen." }
+{ $warning "Some gadget classes have their own words for adding children, for example " { $link grid-add } " and " { $link track-add } ". Read the documentation for the gadget class before using this word." }
+{ $side-effects "parent" } ;
 
 HELP: add-gadgets
 { $values { "seq" "a sequence of gadgets" } { "parent" gadget } }
 { $description "Adds a sequence of gadgets to a parent. The parent will be relayout." }
-{ $notes "This may result in " { $link graft* } " being called on the children, if the parent is visible on the screen." } ;
+{ $notes "This may result in " { $link graft* } " being called on the children, if the parent is visible on the screen." }
+{ $warning "Some gadget classes have their own words for adding children, for example " { $link grid-add } " and " { $link track-add } ". Read the documentation for the gadget class before using this word." }
+{ $side-effects "parent" } ;
 
 HELP: parents
 { $values { "gadget" gadget } }

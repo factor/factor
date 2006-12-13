@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 IN: gadgets-presentations
 USING: arrays definitions gadgets gadgets-borders
-gadgets-buttons gadgets-labels gadgets-outliner
+gadgets-buttons gadgets-labels gadgets-outliners
 gadgets-panes gadgets-paragraphs gadgets-theme
 generic hashtables tools io kernel prettyprint sequences strings
 styles words help math models namespaces ;
@@ -130,7 +130,7 @@ presentation H{
     ] apply-style ;
 
 : apply-outliner-style ( style gadget -- style gadget )
-    outline [ <outliner> ] apply-style ;
+    outline [ [ make-pane ] curry <outliner> ] apply-style ;
 
 : <styled-paragraph> ( style pane -- gadget )
     apply-wrap-style

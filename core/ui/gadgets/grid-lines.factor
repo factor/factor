@@ -3,7 +3,6 @@
 IN: gadgets
 USING: kernel math namespaces opengl sequences ;
 
-! You can set a grid's gadget-boundary to this.
 TUPLE: grid-lines color ;
 
 SYMBOL: grid-dim
@@ -16,12 +15,10 @@ SYMBOL: grid-dim
     grid-dim get swap rot set-axis ;
 
 : draw-grid-lines ( gaps orientation -- )
-    #! Clean this up later.
     swap grid-positions grid get rect-dim { 1 0 } v- add
     [ grid-line-from/to gl-line ] each-with ;
 
 M: grid-lines draw-boundary
-    #! Clean this up later.
     origin get [
         grid-lines-color gl-color [
             grid get rect-dim half-gap v- grid-dim set

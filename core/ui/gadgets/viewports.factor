@@ -4,7 +4,7 @@ IN: gadgets-viewports
 USING: arrays gadgets gadgets-borders generic kernel math
 namespaces sequences models ;
 
-: viewport-gap { 3 3 } ;
+: viewport-gap { 3 3 } ; inline
 
 TUPLE: viewport ;
 

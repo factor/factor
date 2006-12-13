@@ -88,9 +88,9 @@ M: list focusable-child* drop t ;
         dup list-index swap nth-gadget invoke-secondary
     ] if ; inline
 
-list H{
-    { T{ button-down } [ request-focus ] }
-    { T{ key-down f f "UP" } [ select-prev ] }
-    { T{ key-down f f "DOWN" } [ select-next ] }
-    { T{ key-down f f "RETURN" } [ list-action ] }
-} set-gestures
+list "commands" {
+    { "Request focus" T{ button-down } [ request-focus ] }
+    { "Select previous value" T{ key-down f f "UP" } [ select-prev ] }
+    { "Select next value" T{ key-down f f "DOWN" } [ select-next ] }
+    { "Invoke value action" T{ key-down f f "RETURN" } [ list-action ] }
+} define-commands

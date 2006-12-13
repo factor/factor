@@ -39,5 +39,5 @@ M: frame layout*
 : make-frame ( specs -- gadget )
     <frame> [ swap build-grid ] keep ; inline
 
-: make-frame* ( gadget specs -- gadget )
+: make-frame* ( tuple specs -- gadget )
     over [ delegate>frame build-grid ] keep ; inline
