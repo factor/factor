@@ -10,6 +10,12 @@ IN: shuffle
 : -roll ( a b c d -- d a b c )
     -rot >r >r swap r> r> ; inline
 
+: 2over ( a b c -- a b c a b )
+    pick pick ; inline
+
+: 2pick ( a b c d -- a b c d a b )
+    reach reach ; inline
+
 : nipd ( a b c -- b c )
     rot drop ; inline
 
