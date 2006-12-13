@@ -7,7 +7,7 @@ libs/hardware-info libs/http libs/httpd libs/http-client
 libs/jedit libs/jni libs/json libs/lambda libs/levenshtein 
 libs/lazy-lists libs/match libs/math libs/parser-combinators
 libs/porter-stemmer libs/postgresql libs/process
-libs/random-tester libs/sequences libs/serialize libs/shuffle
+libs/sequences libs/serialize libs/shuffle
 libs/slate libs/splay-trees libs/sqlite libs/textmate
 libs/topology libs/units libs/usb libs/vars libs/vim libs/xml
 libs/xml-rpc ;
