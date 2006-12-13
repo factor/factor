@@ -97,6 +97,8 @@ SYMBOL: wordbank
 
         <continuation> continue-with
 
+        set-delegate
+
     }
     { "arrays" "errors" "generic" "graphs" "hashtables" "io"
     "kernel" "math" "namespaces"

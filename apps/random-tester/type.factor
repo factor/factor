@@ -32,7 +32,7 @@ TUPLE: inert-object ;
         0
         ! -268435457
         inert
-        ! T{ inert-object f }
+            ! T{ inert-object f }
         -29/2
         -3.14
         C{ 1 -1 }
@@ -71,22 +71,10 @@ TUPLE: inert-object ;
         T{ inert-object f } ,
     ] { } make ;
 
-! : cartesian-inputs ( n -- list )
-    ! >r make-inputs >list r>
-    ! 1- [ drop make-inputs >list lcartesian-product ] each ;
-
-: cartesian-inputs ( n -- list )
-    dup 2 > [
-        drop { } >list
-    ] [
-        >r make-inputs >list r>
-        1- [ drop make-inputs >list lcartesian-product ] each
-    ] if ;
-
 
 : word-inputs ( word -- seq )
     [ stack-effect effect-in length ] [ drop 0 ] recover
-    cartesian-inputs list>array ;
+    inputs swap ;
     
 : type-error? ( exception -- ? )
     [ swap execute or ] curry
@@ -104,23 +92,30 @@ SYMBOL: params
         dup clone params set
         maybe-explode
     r>
-     "<<<<<testing" .
+     ! "<<<<<testing" .
      .s
-     "-----" . flush
+     ! "-----" . flush
+
+        ! dup [ standard-combination ] = [
+            ! >r 3dup . sheet . . r> dup .
+        ! ] when
     [ call ] [ err on ] recover
-     .s
-     ">>>>>tested" .
+     ! .s
+     ! ">>>>>tested" .
     err get [
         dup type-error? dup [
-            .s
+            ! .s
         ] unless
         type-error set
-    ] when clear type-error get
-    ;
+    ] when clear type-error get ;
 
 : test-inputs ( word -- seq )
     [ word-inputs ] keep
     unit [
         throws? not
-    ] curry map ;
+    ] curry each-permutation ;
 
+: test1
+    wordbank get [
+        [ stack-effect effect-in length ] catch [ 4 < ] unless
+    ] subset [ test-inputs ] each ;

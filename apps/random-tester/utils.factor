@@ -20,9 +20,9 @@ IN: random-tester
     [ drop 0 ] map ;
 
 TUPLE: p-list seq max count count-vec ;
-: make-p-list ( seq -- tuple )
-    dup length [ 1- ] keep
-    [ dup ^ 0 swap 2array ] keep
+: make-p-list ( seq n -- tuple )
+    >r dup length [ 1- ] keep r>
+    [ ^ 0 swap 2array ] keep
     zero-array <p-list> ;
 
 : inc-seq ( seq max -- )
@@ -54,7 +54,7 @@ TUPLE: p-list seq max count count-vec ;
 : (permutations) ( tuple -- )
     dup p-list-next [ , (permutations) ] [ drop ] if* ;
 
-: permutations ( seq -- seq )
+: permutations ( seq n -- seq )
     make-p-list
     [
         (permutations)
@@ -68,6 +68,6 @@ TUPLE: p-list seq max count count-vec ;
         2drop
     ] if* ; inline
 
-: each-permutation ( seq quot -- )
+: each-permutation ( seq n quot -- )
     >r make-p-list r> (each-permutation) ;
 
