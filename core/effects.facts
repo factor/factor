@@ -16,7 +16,7 @@ HELP: effect>string
 { $values { "effect" "a stack effect" } { "string" "a string" } }
 { $description "Turns a stack effect object into a string mnemonic." }
 { $examples
-    { $example "1 2 <effect> effect>string print" "( object object -- object )" }
+    { $example "1 2 <effect> effect>string print" "( object -- object object )" }
 } ;
 
 HELP: stack-effect

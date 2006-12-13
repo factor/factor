@@ -34,7 +34,11 @@ $terpri
 }
 "You can define a word for invoking it:"
 { $example
-    "LIBRARY: foo\nFUNCTION: void the_answer ( char* question, int value ) ;\n\\ the_answer compile\n\"the question\" 42 the-answer" "The answer to the question is 42."
+    "LIBRARY: foo\nFUNCTION: void the_answer ( char* question, int value ) ;"
+    "USE: compiler"
+    "\\ the_answer compile"
+    "\"the question\" 42 the_answer"
+    "The answer to the question is 42."
 } }
 { $notes "Note that the parentheses and commas are only syntax sugar and can be omitted; they serve no purpose other than to make the declaration slightly easier to read:"
 { $code

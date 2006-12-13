@@ -53,7 +53,7 @@ HELP: bad-escape
 HELP: escape
 { $values { "escape" "a single-character escape" } { "ch" "a character" } }
 { $description "Converts from a single-character escape code and the corresponding character." }
-{ $examples { $example "CHAR: n escape CHAR: \n = ." "t" } } ;
+{ $examples { $example "CHAR: n escape CHAR: \\n = ." "t" } } ;
 
 HELP: parse-string
 { $values { "str" "a new string" } }

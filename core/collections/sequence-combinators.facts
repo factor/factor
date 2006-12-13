@@ -163,7 +163,7 @@ HELP: monotonic?
 { $description "Applies the relation to successive pairs of elements in the sequence, testing for a truth value. The relation should be a transitive relation, such as a total order or an equality relation." }
 { $examples
     "Testing if a sequence is non-decreasing:"
-    { $example "{ 1 1 2 } [ >= ] monotonic? ." "t" }
+    { $example "{ 1 1 2 } [ <= ] monotonic? ." "t" }
     "Testing if a sequence is decreasing:"
     { $example "{ 9 8 6 7 } [ < ] monotonic? ." "f" }
 }
