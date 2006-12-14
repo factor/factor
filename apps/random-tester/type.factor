@@ -2,28 +2,6 @@ USING: errors generic io kernel lazy-lists math namespaces
 prettyprint random-tester2 sequences tools words ;
 IN: random-tester
 
-: inputs-exhaustive ( -- seq )
-    {
-        -100000000000000000
-        -1
-        0
-        1
-        100000000000000000
-
-        -29/2
-         100000000000000000/999999999999999999
-
-        -1/0.
-        -3.14
-        0.0
-        3.14
-        1/0.
-        0/0.
-
-        C{ 1 -1 }
-    } ;
-
-
 : inert ;
 TUPLE: inert-object ;
 
@@ -72,9 +50,8 @@ SYMBOL: last-time
         dup clone params set
         maybe-explode
     r>
-    dup [ nth-byte ] = [ .s ] when
     ! .s
-    dup last-time get = [ dup . dup last-time set ] unless
+    dup last-time get = [ dup . flush dup last-time set ] unless
     [ call ] [ err on ] recover
     err get [
         dup type-error? dup [

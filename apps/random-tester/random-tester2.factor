@@ -23,8 +23,6 @@ SYMBOL: wordbank
 
         clear-hash build-graph
 
-        be>
-
         >r r>
 
         set-callstack set-word set-word-prop
@@ -38,10 +36,9 @@ SYMBOL: wordbank
         set-nested-style-stream-style
         set-pathname-string
         set-check-create-vocab
-        <check-create>
+        <check-create> check-create?
         reset-generic forget-class
         create forget-word forget-vocab forget forget-tuple
-        check-create?
         remove-word-prop empty-method
         continue-with <continuation>
 
@@ -59,52 +56,42 @@ SYMBOL: wordbank
         set-word-def set-word-name
         set-word-props set-word-primitive
 
-        close readln read1 read (lines) with-server
-        stream-read
-        stream-readln stream-read1 lines contents stream-copy
-        stream-write log-stream stream-format set-line-reader-cr
-        stream-flush (readln)
-
-        word-xt.
-
         stdio
-
-        .s
+        close readln (readln) read1 read with-server
+        stream-read stream-readln stream-read1 lines (lines)
+        contents stream-copy stream-flush
+        stream-write log-stream stream-format set-line-reader-cr
 
         double>bits float>bits >bignum
 
         intern-slots class-predicates delete (delete) prune memq?
         normalize norm vneg vmax vmin v- v+ [v-]
 
-        bin> oct> le> be> hex> concat string>number
+        bin> oct> le> be> hex> string>number
 
         gensym random-int counter <byte-array>
         <word> <client-stream> <server> <client>
-        <duplex-stream>
-        <file-writer> <file-reader> <file-r/w>
+        <duplex-stream> <file-writer> <file-reader> <file-r/w>
         init-namespaces unxref-word set-global set off on
         nest
         set-restart-obj
         +@ inc dec
 
-        ! 0.0 5000000 condition
-        condition
-        
         changed-words
         callstack namespace namestack global vocabularies
 
         file. (file.) path+ parent-dir directory.
 
-        <continuation> continue-with
+        .s . word-xt.
 
+        <continuation> continue-with
         set-delegate
+
         closure
         
         tabular-output simple-slots
 
-        join
-
-
+        join concat
     }
     { "arrays" "errors" "generic" "graphs" "hashtables" "io"
     "kernel" "math" "namespaces"
@@ -162,17 +149,15 @@ err off
 : run-random-tester2
     100000000000000 [ 6 3 random-test ] times ;
 
-
 ! A worthwhile test that has not been run extensively
 1000 [ drop gensym ] map "syms" set
 
 : pick-one [ length random-int ] keep nth ;
 
-: fooify
+: fooify-test
     "syms" get pick-one
     2000 random-int >quotation
     over set-word-def
     100 random-int zero? [ code-gc ] when
     compile fooify ;
-
 
