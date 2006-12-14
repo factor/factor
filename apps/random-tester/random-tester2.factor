@@ -103,8 +103,7 @@ w1 wordbank set-global
 : databank
     {
         ! V{ } H{ } V{ 3 } { 3 } { } "" "asdf"
-        pi
-        1/0. -1/0. 0/0. [ ]
+        pi 1/0. -1/0. 0/0. [ ]
         f t "" 0 0.0 3.14 2 -3 -7 20 3/4 -3/4 1.2/3 3.5
         C{ 2 2 } C{ 1/0. 1/0. }
     } ;
@@ -149,6 +148,7 @@ err off
 : run-random-tester2
     100000000000000 [ 6 3 random-test ] times ;
 
+
 ! A worthwhile test that has not been run extensively
 1000 [ drop gensym ] map "syms" set
 
@@ -159,5 +159,5 @@ err off
     2000 random-int >quotation
     over set-word-def
     100 random-int zero? [ code-gc ] when
-    compile fooify ;
+    compile fooify-test ;
 
