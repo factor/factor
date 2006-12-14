@@ -29,18 +29,20 @@ TUPLE: inert-object ;
 
 : inputs ( -- seq )
     {
-        0
+        0 -1 -1000000000000000000000000
         ! -268435457
         inert
             ! T{ inert-object f }
-        -29/2
-        -3.14
+        -29/2 1000000000000000000000000000000/1111111111111111111111111111111111111111111
+        3/4
+            -1000000000000000000000000/111111111111111111
+        -3.14 1/0. 0.0 -1/0. 3.14 0/0.
         C{ 1 -1 }
         W{ 55 }
         { }
-        f
+        f  t
         H{ }
-        V{ }
+        V{ 65536 0 0 0 65536 }
         ""
         SBUF" "
         [ ]
@@ -86,22 +88,17 @@ TUPLE: inert-object ;
 SYMBOL: err
 SYMBOL: type-error
 SYMBOL: params
+SYMBOL: last-time
 : throws? ( data... quot -- ? )
     err off type-error off
     >r
         dup clone params set
         maybe-explode
     r>
-     ! "<<<<<testing" .
-     .s
-     ! "-----" . flush
-
-        ! dup [ standard-combination ] = [
-            ! >r 3dup . sheet . . r> dup .
-        ! ] when
+    dup [ nth-byte ] = [ .s ] when
+    ! .s
+    dup last-time get = [ dup . dup last-time set ] unless
     [ call ] [ err on ] recover
-     ! .s
-     ! ">>>>>tested" .
     err get [
         dup type-error? dup [
             ! .s
@@ -112,7 +109,7 @@ SYMBOL: params
 : test-inputs ( word -- seq )
     [ word-inputs ] keep
     unit [
-        throws? not
+        throws? not clear
     ] curry each-permutation ;
 
 : test1

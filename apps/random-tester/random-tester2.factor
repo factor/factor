@@ -46,6 +46,7 @@ SYMBOL: wordbank
         continue-with <continuation>
 
         define-compound define make-generic
+        define-method define-predicate-class
         define-tuple define-temp define-tuple-slots
         define-writer define-predicate define-generic
         ?make-generic define-reader define-slot define-slots
@@ -61,13 +62,12 @@ SYMBOL: wordbank
         close readln read1 read (lines) with-server
         stream-read
         stream-readln stream-read1 lines contents stream-copy
+        stream-write log-stream stream-format set-line-reader-cr
         stream-flush (readln)
 
         word-xt.
 
         stdio
-
-        group
 
         .s
 
@@ -93,11 +93,17 @@ SYMBOL: wordbank
         changed-words
         callstack namespace namestack global vocabularies
 
-        file. (file.) path+ parent-dir
+        file. (file.) path+ parent-dir directory.
 
         <continuation> continue-with
 
         set-delegate
+        closure
+        
+        tabular-output simple-slots
+
+        join
+
 
     }
     { "arrays" "errors" "generic" "graphs" "hashtables" "io"
