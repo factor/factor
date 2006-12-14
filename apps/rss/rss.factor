@@ -36,7 +36,7 @@ USING: kernel http-client sequences namespaces math errors io ;
 : (between-tags) ( tag seq -- content )
   #! Return a string containing the contents of the XML tag contained in seq. Returns
   #! false if the tag is not found.
-  [ find-start-tag [ "no start tag" throw ] unless* ] 2keep [ find-end-tag 2dup and ] keep swap [ subseq ] when ;
+  [ find-start-tag [ "no start tag" throw ] unless* ] 2keep [ find-end-tag 2dup and ] keep swap [ subseq ] [ 3drop "" ] if ;
 
 : between-tags ( tag seq -- content )
   [ (between-tags) ] catch [ 3drop "" ] when* ;
@@ -54,7 +54,7 @@ USING: kernel http-client sequences namespaces math errors io ;
     -rot >r >r over push r> r> r> ! list tag seq end
     over length rot subseq  (child-tags) 
   ] [
-    drop drop drop drop drop 
+    drop drop drop drop 
   ] if ;
   
 : child-tags ( tag seq -- list )
