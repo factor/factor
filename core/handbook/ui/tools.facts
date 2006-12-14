@@ -90,7 +90,7 @@ ARTICLE: "ui-completion-words" "Word completion popup"
 { $operations word compound } ;
 
 ARTICLE: "ui-completion-vocabs" "Vocabulary completion popup"
-"Clicking a vocabulary in the vocabulary completion popup displays a list of words in the vocabulary in another " { $link "ui-completion-word" } ". Pressing " { $snippet "RETURN" } " adds the vocabulary to the current search path, just as if you invoked " { $link POSTPONE: USE: } "."
+"Clicking a vocabulary in the vocabulary completion popup displays a list of words in the vocabulary in another " { $link "ui-completion-words" } ". Pressing " { $snippet "RETURN" } " adds the vocabulary to the current search path, just as if you invoked " { $link POSTPONE: USE: } "."
 { $operations vocab-link } ;
 
 ARTICLE: "ui-completion-modules" "Module completion popup"

@@ -1,7 +1,8 @@
 IN: help
 USING: gadgets kernel arrays ;
 
-: $ui-frame-constant
+: $ui-frame-constant ( element -- )
+    drop
     { $description "Symbolic constant for a common input to " { $link grid-add } "." } print-element ;
 
 IN: gadgets

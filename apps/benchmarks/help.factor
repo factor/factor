@@ -1,5 +1,5 @@
 USING: gadgets-panes hashtables help io kernel namespaces
-prettyprint sequences test threads words ;
+prettyprint sequences errors threads words test ;
 
 [
     all-articles [

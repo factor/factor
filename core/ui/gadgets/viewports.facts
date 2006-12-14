@@ -1,5 +1,5 @@
 IN: gadgets-viewports
-USING: help gadgets ;
+USING: help gadgets gadgets-scrolling models ;
 
 HELP: viewport
 { $class-description "A viewport is a " { $link control } " which positions a child gadget translated by the " { $link control-value } " vector. Viewports are used in the implementation of " { $link scroller } " gadgets and can be created directly by calling " { $link <viewport> } "." } ;

@@ -33,7 +33,7 @@ HELP: build-grid
 { $description "Constructs gadgets and adds them to the grid by interpreting " { $snippet "spec" } ", which is an array of quadruples of the form " { $snippet "{ quot setter post loc }" } ". The quadruples break down as follows:"
     { $list
         { { $snippet "quot" } " - a quotation which pushes a new gadget on the stack. The quotation is permitted to consume values from the stack, and it is up to the caller of " { $link build-grid } " to prove the correct amount." }
-        { { $snippet "setter" } " - a word with stack effect " { $link "( gadget grid -- )" } ". If " { $snippet "grid" } " is a tuple delegating to a " { $link grid } ", this can be used to store the new gadget in a tuple slot." }
+        { { $snippet "setter" } " - a word with stack effect " { $snippet "( gadget grid -- )" } ". If " { $snippet "grid" } " is a tuple delegating to a " { $link grid } ", this can be used to store the new gadget in a tuple slot." }
         { { $snippet "post" } " - a quotation with stack effect " { $snippet "( gadget -- newgadget )" } ", applied to the gadget before it is added to the grid" }
         { { $snippet "loc" } " - a word with stack effect " { $snippet "( -- i j )" } " which pushes the grid location where to add the new gadget, for example " { $link @center } "." }
     }
