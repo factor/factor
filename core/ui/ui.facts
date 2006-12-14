@@ -1,0 +1,5 @@
+IN: gadgets
+
+HELP: ui
+{ $description "Starts the Factor UI." }
+{ $see-also tty } ;

@@ -7,6 +7,17 @@
 
 + 0.88:
 
+- poorly documented vocabs:
+  - alien
+  - assembler
+  - cocoa
+  - command-line
+  - compiler
+  - completion
+  - image
+  - interpreter
+  - objc
+  - optimizer
 - calling 'see' with an nonexistent method should be an error
 - grid-lines are rendered incorrectly
 - interactor: show stack effect for word at caret in status bar
