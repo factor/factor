@@ -51,29 +51,6 @@ TUPLE: inert-object ;
         T{ inert-object f }
     } ;
 
-: make-inputs
-    [
-        0 ,
-        ! ! -268435457 ,
-        \ inert ,
-        ! ! T{ inert-object f } ,
-        -29/2 ,
-        -3.14 ,
-        C{ 1 -1 } ,
-        W{ 55 } clone ,
-        { } clone ,
-        f ,
-        H{ } clone ,
-        V{ } clone ,
-        "" ,
-        SBUF" " clone ,
-        [ ] clone ,
-        DLL" libm.dylib" clone ,
-        ALIEN: 1 ,
-        T{ inert-object f } ,
-    ] { } make ;
-
-
 : word-inputs ( word -- seq )
     [ stack-effect effect-in length ] [ drop 0 ] recover
     inputs swap ;
