@@ -25,6 +25,7 @@ Available libraries:
 - furnace -- Web framework (Slava Pestov)
 - furnace-pastebin -- demo app for Furnace (Slava Pestov)
 - gap-buffer -- Efficient text editor buffer (Alex Chapman)
+- google-search -- Access Google Search SOAP API (Chris Double)
 - hardware-info -- Information about your computer (Doug Coleman)
 - hexdump -- Hexdump routine (Doug Coleman)
 - http -- Code shared by HTTP server and client (Slava Pestov)
