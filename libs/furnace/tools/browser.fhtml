@@ -16,7 +16,7 @@ html ; %>
                 <% "word" get "vocab" get word-list %>
             </td>
             <td valign="top">
-                <% "word" get "vocab" get lookup [ see-help ] when* %>
+                <% "word" get "vocab" get lookup [ help ] when* %>
             </td>
         </tr>
     </table>

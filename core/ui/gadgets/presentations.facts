@@ -1,0 +1,66 @@
+IN: gadgets-presentations
+USING: help gadgets gadgets-buttons gadgets-lists prettyprint
+generic models ;
+
+HELP: presentation
+{ $class-description "A presentation is a " { $link button } " which represents an object. Left-clicking a presentation invokes the default " { $link operation } ", and right-clicking displays a menu of possible operations output by " { $link object-operations } "."
+$terpri
+"Presentations are created by calling " { $link <presentation> } "."
+$terpri
+"Presentations have two slots:"
+{ $list
+    { { $link presentation-object } " - the object being presented." }
+    { { $link presentation-hook } " - a quotation with stack effect " { $snippet "( presentation -- )" } ". The default value is " { $snippet "[ drop ]" } "." }
+} }
+{ $see-also "presentations" <command-button> } ;
+
+HELP: invoke-presentation
+{ $values { "presentation" presentation } { "command" command } }
+{ $description "Calls the " { $link presentation-hook } " and then invokes the command on the " { $link presentation-object } "." }
+{ $see-also invoke-primary invoke-secondary } ;
+
+HELP: invoke-primary
+{ $values { "presentation" presentation } } 
+{ $description "Invokes the " { $link primary-operation } " associated to the " { $link presentation-object } ". This word is executed when the presentation is clicked with the left mouse button." }
+{ $see-also invoke-secondary } ;
+
+HELP: invoke-secondary
+{ $values { "presentation" presentation } } 
+{ $description "Invokes the " { $link secondary-operation } " associated to the " { $link presentation-object } ". This word is executed when a " { $link list } " receives a " { $snippet "RETURN" } " key press." }
+{ $see-also invoke-primary } ;
+
+HELP: show-mouse-help
+{ $values { "presentation" presentation } }
+{ $description "Displays a " { $link summary } " of the " { $link presentation-object } "in the status bar of the " { $link world } " containing this presentation. This word is executed when the mouse enters the presentation." }
+{ $see-also hide-mouse-help } ;
+
+HELP: hide-mouse-help
+{ $values { "presentation" presentation } }
+{ $description "Hides the status bar message from the status bar of the " { $link world } " containing this presentation. This word is executed when the mouse leaves the presentation." }
+{ $see-also show-mouse-help } ;
+
+HELP: <presentation>
+{ $values { "label" "a label" } { "object" object } }
+{ $description "Creates a new " { $link presentation } " derived from " { $link <roll-button> } "." }
+{ $see-also "presentations" } ;
+
+HELP: <command-button>
+{ $values { "target" object } { "command" command } { "button" "a new " button } }
+{ $description "Creates a " { $link <bevel-button> } " which invokes the command on " { $snippet "target" } " when clicked." }
+{ $see-also <button> <roll-button> <presentation> } ;
+
+HELP: <toolbar>
+{ $values { "target" object } { "classes" "a sequence of class words" } }
+{ $description "Creates a row of " { $link <command-button> } " gadgets invoking commands on " { $snippet "target" } ". The commands are taken from the " { $snippet "\"toolbar\"" } " command group of each class in " { $snippet "classes" } "." }
+{ $see-also define-commands } ;
+
+HELP: <commands-menu>
+{ $values { "hook" "a quotation with stack effect " { $snippet "( button -- )" } } { "target" object } { "commands" "a sequence of " { $link command } " instances" } { "gadget" "a new " { $link gadget } } }
+{ $description "Creates a popup menu of commands which are to be invoked on " { $snippet "target" } ". The " { $snippet "hook" } " quotation is run before a command is invoked." }
+{ $see-also <toolbar> operations-menu show-menu } ;
+
+HELP: <presentation-help>
+{ $values { "model" model } }
+{ $description "Creates a new " { $link gadget } " displaying a " { $link summary } " of the model value." }
+{ $notes "If the " { $snippet "model" } " is " { $link world-status } ", this gadget will display " { $link presentation } " mouse over help." }
+{ $see-also show-mouse-help hide-mouse-help } ; 

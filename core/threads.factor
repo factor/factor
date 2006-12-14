@@ -46,6 +46,8 @@ namespaces queues sequences vectors ;
         stop
     ] callcc0 drop ;
 
+IN: kernel-internals
+
 : (idle-thread) ( fast? -- )
     #! If fast, then we don't sleep, just select()
     sleep-queue* dup sleep-time dup zero?

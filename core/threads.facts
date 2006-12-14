@@ -1,4 +1,4 @@
-USING: help threads kernel io ;
+USING: help threads kernel kernel-internals io ;
 
 HELP: run-queue
 { $values { "queue" "a queue" } }

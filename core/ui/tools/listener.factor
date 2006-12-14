@@ -44,7 +44,7 @@ TUPLE: listener-gadget input output stack ;
         [ ui-error-hook ] curry error-hook set
         find-messages batch-errors set
         welcome.
-        listener
+        tty
     ] with-stream* ;
 
 : start-listener ( listener -- )

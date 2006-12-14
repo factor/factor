@@ -35,7 +35,7 @@ HELP: <roll-button>
 HELP: <bevel-button>
 { $values { "label" object } { "quot" "a quotation with stack effect " { $snippet "( button -- )" } } }
 { $description "Creates a new " { $link button } " with a shaded border which is always visible. The label is converted into a gadget by calling " { $link >label } ". The button appearance changes in response to mouse gestures using a " { $link button-paint } "." }
-{ $see-also <button> <roll-button> <command-button> <roll-button> <presentation> } ;
+{ $see-also <button> <roll-button> <command-button> <repeat-button> <presentation> } ;
 
 HELP: <repeat-button>
 { $values { "label" object } { "quot" "a quotation with stack effect " { $snippet "( button -- )" } } }

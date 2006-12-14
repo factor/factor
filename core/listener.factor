@@ -10,11 +10,6 @@ SYMBOL: listener-hook
 
 GENERIC: parse-interactive ( stream -- quot/f )
 
-TUPLE: interactive-stream ;
-
-C: interactive-stream ( stream -- stream )
-    [ set-delegate ] keep ;
-
 : (parse-interactive) ( stream stack -- quot/f )
     over stream-readln dup [
         over push \ (parse) with-datastack
@@ -27,7 +22,7 @@ C: interactive-stream ( stream -- stream )
         3drop f
     ] if ;
 
-M: interactive-stream parse-interactive
+M: line-reader parse-interactive
     [
         [ V{ f } clone (parse-interactive) ] with-parser in get
     ] with-scope in set ;
@@ -43,19 +38,16 @@ M: duplex-stream parse-interactive
 : listen ( -- )
     [ stdio get parse-interactive [ call ] [ bye ] if* ] try ;
 
-: (listener) ( -- )
+: listener ( -- )
     quit-flag get
     [ quit-flag off ]
-    [ prompt. listener-hook get call listen (listener) ] if ;
+    [ prompt. listener-hook get call listen listener ] if ;
 
 : print-banner ( -- )
     "Factor " write version write
     " on " write os write "/" write cpu print ;
 
-: listener ( -- )
-    print-banner use [ clone ] change (listener) ;
-
 IN: shells
 
 : tty ( -- )
-    stdio get <interactive-stream> [ listener ] with-stream* ;
+    print-banner use [ clone ] change listener ;

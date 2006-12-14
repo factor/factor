@@ -3,11 +3,12 @@
 - callback scheduling issue
 - error popup obscures input area
 - ui docs
-- calling 'see' with an nonexistent method should be an error
-- grid-lines are rendered incorrectly
+- vocab popup: sort
 
 + 0.88:
 
+- calling 'see' with an nonexistent method should be an error
+- grid-lines are rendered incorrectly
 - interactor: show stack effect for word at caret in status bar
 - lisppaste gui
 - growable data heap

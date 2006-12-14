@@ -157,7 +157,7 @@ ARTICLE: "threads" "Multitasking"
 { $subsection run-queue }
 { $subsection sleep-queue }
 { $subsection schedule-thread }
-{ $subsection idle-thread } ;
+{ $subsection schedule-thread-with } ;
 
 ARTICLE: "continuations-internals" "Continuation implementation details"
 "A continuation is simply a tuple holding the contents of the five stacks:"
