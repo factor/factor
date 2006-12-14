@@ -42,12 +42,9 @@ IN: math-internals
 : fraction> ( a b -- a/b )
     dup 1 number= [ drop ] [ (fraction>) ] if ; inline
 
-TUPLE: /0 ;
-: /0 ( -- * ) </0> throw ;
-
 M: integer /
     dup zero? [
-        /0
+        /i
     ] [
         dup 0 < [ [ neg ] 2apply ] when
         2dup gcd nip tuck /i >r /i r> fraction>

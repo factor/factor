@@ -25,7 +25,7 @@ sequences test errors math-internals ;
 [ [ \ + = ] ] [ \ + [ = ] curry ] unit-test
 
 ! Make sure we report the correct error on stack underflow
-[ { kernel-error 11 f f } ]
+[ { kernel-error 12 f f } ]
 [ [ clear drop ] catch ] unit-test
 
 [ -7 <byte-array> ] unit-test-fails

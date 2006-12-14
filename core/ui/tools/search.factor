@@ -119,7 +119,7 @@ M: live-search focusable-child* live-search-field ;
     "Word search" show-titled-popup ;
 
 : show-vocab-words ( workspace vocab -- )
-    "" over words <word-search>
+    "" over words natural-sort <word-search>
     "Words in " rot append show-titled-popup ;
 
 : show-help-search ( workspace -- )

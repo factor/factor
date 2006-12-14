@@ -155,6 +155,7 @@ typedef enum
 	ERROR_IO,
 	ERROR_UNDEFINED_WORD,
 	ERROR_TYPE,
+	ERROR_DIVIDE_BY_ZERO,
 	ERROR_SIGNAL,
 	ERROR_NEGATIVE_ARRAY_SIZE,
 	ERROR_C_STRING,
@@ -193,6 +194,7 @@ void general_error(F_ERRORTYPE error, CELL arg1, CELL arg2, bool keep_stacks);
 void memory_protection_error(CELL addr, int signal);
 void signal_error(int signal);
 void type_error(CELL type, CELL tagged);
+void divide_by_zero_error(void);
 void memory_error(void);
 void primitive_throw(void);
 void primitive_die(void);

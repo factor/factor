@@ -59,7 +59,7 @@ M: condition compute-restarts
 
 PREDICATE: array kernel-error ( obj -- ? )
     dup first \ kernel-error eq? [
-        second 0 18 between?
+        second 0 19 between?
     ] [
         drop f
     ] if ;

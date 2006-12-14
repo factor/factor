@@ -169,7 +169,7 @@ s48_bignum_divide(bignum_type numerator, bignum_type denominator,
 {
   if (BIGNUM_ZERO_P (denominator))
     {
-      raise(SIGFPE);
+      divide_by_zero_error();
       return;
     }
   if (BIGNUM_ZERO_P (numerator))
@@ -241,7 +241,7 @@ s48_bignum_quotient(bignum_type numerator, bignum_type denominator)
 {
   if (BIGNUM_ZERO_P (denominator))
     {
-      raise(SIGFPE);
+      divide_by_zero_error();
       return (BIGNUM_OUT_OF_BAND);
     }
   if (BIGNUM_ZERO_P (numerator))
@@ -294,7 +294,7 @@ s48_bignum_remainder(bignum_type numerator, bignum_type denominator)
 {
   if (BIGNUM_ZERO_P (denominator))
     {
-      raise(SIGFPE);
+      divide_by_zero_error();
       return (BIGNUM_OUT_OF_BAND);
     }
   if (BIGNUM_ZERO_P (numerator))

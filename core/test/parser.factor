@@ -96,7 +96,7 @@ unit-test
             "cont" set
             [
                 "\ + 1 2 3 4" 
-                <string-reader> <interactive-stream>
+                <string-reader>
                 parse-interactive "cont" get continue-with
             ] catch
             "0 :res" eval

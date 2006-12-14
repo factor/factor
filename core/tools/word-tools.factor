@@ -51,4 +51,4 @@ generic completion ;
     [ word-name ] swap completions ;
 
 : apropos ( str -- )
-    all-words word-completions [ summary ] each ;
+    all-words word-completions [ summary print ] each ;

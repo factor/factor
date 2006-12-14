@@ -3,7 +3,8 @@
 - callback scheduling issue
 - error popup obscures input area
 - ui docs
-- vocab popup: sort
+- test factor on linux/ppc
+- auto-generate error-index
 
 + 0.88:
 

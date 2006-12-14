@@ -350,7 +350,12 @@ void type_error(CELL type, CELL tagged)
 	general_error(ERROR_TYPE,tag_fixnum(type),tagged,true);
 }
 
+void divide_by_zero_error(void)
+{
+	general_error(ERROR_DIVIDE_BY_ZERO,F,F,true);
+}
+
 void memory_error(void)
 {
-	general_error(ERROR_MEMORY,F,F,false);
+	general_error(ERROR_MEMORY,F,F,true);
 }

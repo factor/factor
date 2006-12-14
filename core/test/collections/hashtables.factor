@@ -9,6 +9,7 @@ USE: sequences-internals
 USE: hashtables
 USE: io
 USE: prettyprint
+USE: errors
 
 [ "hi" V{ 1 2 3 } hash ] unit-test-fails
 

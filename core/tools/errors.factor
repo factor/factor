@@ -20,6 +20,9 @@ words definitions ;
     "Object type: " write dup fourth class .
     "Expected type: " write third type>class . ;
 
+: divide-by-zero-error. ( obj -- )
+    "Division by zero" print drop ;
+
 : signal-error. ( obj -- )
     "Operating system signal " write third . ;
 
@@ -70,6 +73,7 @@ DEFER: objc-error. ( alien -- )
         io-error.
         undefined-word-error.
         type-check-error.
+        divide-by-zero-error.
         signal-error.
         negative-array-size-error.
         c-string-error.
@@ -105,9 +109,6 @@ M: no-method error.
 
 M: no-math-method summary
     drop "No suitable arithmetic method" ;
-
-M: /0 summary
-    drop "Division by zero" ;
 
 M: bad-escape summary
     drop "Invalid escape code" ;
