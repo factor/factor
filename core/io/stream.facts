@@ -75,7 +75,6 @@ HELP: with-stream-style
 { $description "Calls the quotation in a new dynamic scope where calls to " { $link write } ", " { $link format } " and other stream output words automatically inherit style settings from " { $snippet "style" } "."
 $terpri
 "Unlike " { $link with-nested-stream } ", the quotation's output is inline, and not nested in a paragraph block." }
-{ $notes "Details are in the documentation for " { $link with-stream-style } "." }
 $io-error ;
 
 HELP: stream-print

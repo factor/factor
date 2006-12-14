@@ -5,15 +5,15 @@ USING: arrays gadgets gadgets-buttons
 gadgets-theme generic kernel math namespaces
 sequences styles threads vectors models ;
 
-! An elevator has a thumb that may be moved up and down.
 TUPLE: elevator ;
 
-: find-elevator [ elevator? ] find-parent ;
+: find-elevator ( gadget -- elevator/f )
+    [ elevator? ] find-parent ;
 
-! A slider scrolls a viewport.
 TUPLE: slider elevator thumb saved max line page ;
 
-: find-slider [ slider? ] find-parent ;
+: find-slider ( gadget -- slider/f )
+    [ slider? ] find-parent ;
 
 : elevator-length ( slider -- n )
     dup slider-elevator rect-dim
@@ -151,7 +151,7 @@ M: elevator layout*
     <thumb> swap 2dup slider-elevator add-gadget
     set-slider-thumb ;
 
-C: slider ( vector -- slider )
+C: slider ( orientation -- slider )
     dup 0 <model> <frame> delegate>control
     [ set-gadget-orientation ] keep
     32 over set-slider-line
@@ -165,3 +165,8 @@ C: slider ( vector -- slider )
 : <y-slider> ( -- slider )
     { 0 1 } <slider> dup build-y-slider
     dup { 1 0 } add-thumb ;
+
+: set-slider ( value page max slider -- )
+    [ [ gadget-orientation v. ] keep set-slider-max ] keep
+    [ [ gadget-orientation v. ] keep set-slider-page ] keep
+    [ gadget-orientation v. ] keep set-slider-value ;

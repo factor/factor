@@ -5,11 +5,10 @@ USING: arrays gadgets gadgets-theme gadgets-viewports
 gadgets-sliders generic kernel math namespaces sequences
 models ;
 
-! A scroller combines a viewport with two x and y sliders.
-! The follows slot is t or a gadget
 TUPLE: scroller viewport x y follows model ;
 
-: find-scroller [ scroller? ] find-parent ;
+: find-scroller ( gadget -- scroller/f )
+    [ scroller? ] find-parent ;
 
 : scroll-up-page scroller-y -1 swap slide-by-page ;
 
@@ -33,7 +32,8 @@ scroller H{
     over scroller-y control-model
     2array <compose> swap set-scroller-model ;
 
-: scroller-value scroller-model model-value ;
+: scroller-value ( scroller -- loc )
+    scroller-model model-value ;
 
 C: scroller ( gadget -- scroller )
     {
@@ -50,12 +50,6 @@ C: scroller ( gadget -- scroller )
     } make-frame*
     t over set-gadget-root?
     dup faint-boundary ;
-
-: set-slider ( value page max slider -- )
-    #! page/max/value are 2-vectors.
-    [ [ gadget-orientation v. ] keep set-slider-max ] keep
-    [ [ gadget-orientation v. ] keep set-slider-page ] keep
-    [ gadget-orientation v. ] keep set-slider-value ;
 
 : update-slider ( scroller value slider -- )
     >r swap scroller-viewport dup rect-dim swap viewport-dim
@@ -76,9 +70,7 @@ C: scroller ( gadget -- scroller )
         >r >r v- { 0 0 } vmin r> r> v- { 0 0 } vmax v+
     ] keep dup scroller-value rot v+ scroll ;
 
-: relative-scroll-rect ( rect gadget scroller -- rect )
-    #! Adjust rect for the case where the gadget is not the
-    #! immediate child of the scroller's viewport.
+: relative-scroll-rect ( rect gadget scroller -- newrect )
     scroller-viewport gadget-child relative-loc offset-rect ;
 
 : scroll>rect ( rect gadget -- )

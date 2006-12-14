@@ -30,9 +30,6 @@ M: track pref-dim*
     over track-sizes push add-gadget ;
 
 : build-track ( track specs -- )
-    #! Specs is an array of quadruples { quot post setter loc }.
-    #! The setter has stack effect ( new gadget -- ),
-    #! the loc is a ratio from 0 to 1.
     swap [ [ track-add ] build-spec ] with-gadget ; inline
 
 : make-track ( specs orientation -- gadget )

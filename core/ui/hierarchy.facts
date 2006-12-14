@@ -40,14 +40,14 @@ HELP: add-gadget
 { $values { "gadget" gadget } { "parent" gadget } }
 { $description "Adds a child gadget to a parent. If the gadget is contained in another gadget, " { $link unparent } " is called on the gadget first. The parent will be relayout." }
 { $notes "Adding a gadget to a parent may result in " { $link graft* } " being called on the children, if the parent is visible on the screen." }
-{ $warning "Some gadget classes have their own words for adding children, for example " { $link grid-add } " and " { $link track-add } ". Read the documentation for the gadget class before using this word." }
+{ $warning "Some gadget classes have their own words for adding children, for example " { $link grid-add } " and " { $link add-incremental } ". Read the documentation for the gadget class before using this word." }
 { $side-effects "parent" } ;
 
 HELP: add-gadgets
 { $values { "seq" "a sequence of gadgets" } { "parent" gadget } }
 { $description "Adds a sequence of gadgets to a parent. The parent will be relayout." }
 { $notes "This may result in " { $link graft* } " being called on the children, if the parent is visible on the screen." }
-{ $warning "Some gadget classes have their own words for adding children, for example " { $link grid-add } " and " { $link track-add } ". Read the documentation for the gadget class before using this word." }
+{ $warning "Some gadget classes have their own words for adding children, for example " { $link grid-add } " and " { $link add-incremental } ". Read the documentation for the gadget class before using this word." }
 { $side-effects "parent" } ;
 
 HELP: parents

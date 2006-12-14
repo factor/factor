@@ -9,7 +9,6 @@
 
 - poorly documented vocabs:
   - alien
-  - assembler
   - cocoa
   - command-line
   - compiler

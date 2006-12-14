@@ -45,7 +45,7 @@ HELP: <presentation>
 { $see-also "presentations" } ;
 
 HELP: <command-button>
-{ $values { "target" object } { "command" command } { "button" "a new " button } }
+{ $values { "target" object } { "command" command } { "button" "a new " { $link button } } }
 { $description "Creates a " { $link <bevel-button> } " which invokes the command on " { $snippet "target" } " when clicked." }
 { $see-also <button> <roll-button> <presentation> } ;
 

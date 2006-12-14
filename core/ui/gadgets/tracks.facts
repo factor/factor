@@ -1,0 +1,26 @@
+IN: gadgets-tracks
+USING: help gadgets ;
+
+HELP: track
+{ $class-description "A track is like a " { $link pack } " except each child is resized to a fixed multiple of the track's dimension in the direction of " { $link gadget-orientation } ". Tracks are created by calling " { $link <track> } "." }
+{ $see-also make-track make-track* } ;
+
+HELP: build-track
+{ $values { "track" track } { "specs" array } }
+{ $description "Constructs gadgets and adds them to the track by interpreting " { $snippet "spec" } ", which is an array of quadruples of the form " { $snippet "{ quot setter post ratio }" } ". The quadruples break down as follows:"
+    { $list
+        { { $snippet "quot" } " - a quotation which pushes a new gadget on the stack. The quotation is permitted to consume values from the stack, and it is up to the caller of " { $link build-grid } " to prove the correct amount." }
+        { { $snippet "setter" } " - a word with stack effect " { $link "( gadget grid -- )" } ". If " { $snippet "track" } " is a tuple delegating to a " { $link track } ", this can be used to store the new gadget in a tuple slot." }
+        { { $snippet "post" } " - a quotation with stack effect " { $snippet "( gadget -- newgadget )" } ", applied to the gadget before it is added to the grid" }
+        { { $snippet "ratio" } " - a rational number between 0 and 1 which determines the space allocation received by the child." }
+    }
+}
+{ $see-also make-track make-track* } ;
+
+HELP: make-track
+{ $values { "specs" array } { "track" track } }
+{ $description "Creates a new track from a declarative specification. See " { $link build-track } " for a description of the format of " { $snippet "spec" } "." } ;
+
+HELP: make-track*
+{ $values { "tuple" tuple } { "specs" array } { "track" track } }
+{ $description "Creates a new track from a declarative specification and sets " { $snippet "tuple" } "'s delegate to the new track. See " { $link build-track } " for a description of the format of " { $snippet "spec" } "." } ;

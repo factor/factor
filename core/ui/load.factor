@@ -68,8 +68,12 @@ PROVIDE: core/ui
     "gadgets/lists.facts"
     "gadgets/menus.facts"
     "gadgets/outliner.facts"
-    "gadgets/presentations.facts"
     "gadgets/panes.facts"
+    "gadgets/presentations.facts"
+    "gadgets/scrolling.facts"
+    "gadgets/sliders.facts"
+    "gadgets/tracks.facts"
+    "gadgets/viewports.facts"
     "text/editor.facts"
 } }
 { +tests+ {
