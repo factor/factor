@@ -32,32 +32,32 @@ UNION: str-elem string entity reference ;
         [ write-str-elem ] each "\"" write
     ] hash-each ;
 
-GENERIC: (xml>string) ( object -- )
+GENERIC: write-item ( object -- )
 
-M: str-elem (xml>string) ! string element
+M: str-elem write-item ! string element
     write-str-elem ;
 
-M: contained-tag (xml>string)
+M: contained-tag write-item
     CHAR: < write1
     dup print-name
     tag-props print-props
     "/>" write ;
 
-M: open-tag (xml>string)
+M: open-tag write-item
     CHAR: < write1
     dup print-name
     dup tag-props print-props
     CHAR: > write1
-    dup tag-children [ (xml>string) ] each
+    dup tag-children [ write-item ] each
     "</" write print-name CHAR: > write1 ;
 
-M: comment (xml>string)
+M: comment write-item
     "<!--" write comment-text write "-->" write ;
 
-M: directive (xml>string)
+M: directive write-item
     "<!" write directive-text write CHAR: > write1 ;
 
-M: instruction (xml>string)
+M: instruction write-item
     "<?" write instruction-text write "?>" write ;
 
 : xml-preamble ( xml -- )
@@ -67,11 +67,14 @@ M: instruction (xml>string)
     prolog-standalone "yes" "no" ? write
     "\"?>" write ;
 
+: write-chunk ( seq -- )
+    [ write-item ] each ;
+
 : write-xml ( xml-doc -- )
     dup xml-doc-prolog xml-preamble
-    dup xml-doc-before [ (xml>string) ] each
-    dup delegate (xml>string)
-    xml-doc-after [ (xml>string) ] each ;
+    dup xml-doc-before write-chunk
+    dup delegate write-item
+    xml-doc-after write-chunk ;
 
 : print-xml ( xml-doc -- )
     write-xml terpri ;

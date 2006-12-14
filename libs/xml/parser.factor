@@ -1,8 +1,8 @@
 ! Copyright (C) 2005, 2006 Daniel Ehrenberg
 ! See http://factorcode.org/license.txt for BSD license.
-IN: xml
 USING: errors hashtables io kernel math namespaces prettyprint sequences
     arrays generic strings vectors char-classes ;
+IN: xml
 
 ! * Parsing tags
 
@@ -62,7 +62,7 @@ TUPLE: instruction text ;
     ! this should make sure the name doesn't include 'xml'
     "?>" take-string <instruction> ;
 
-: make-tag ( -- tag/f )
+: make-tag ( -- tag )
     { { [ get-char dup CHAR: ! = ] [ drop next directive ] }
       { [ CHAR: ? = ] [ next instruction ] } 
       { [ t ] [
@@ -252,14 +252,15 @@ M: bad-version error.
          dup assure-no-extra prolog-attrs
     ] when ;
 
-: init-xml ( stream -- )
+: basic-init ( stream -- )
     stdio set
     { 0 0 0 "" } clone spot set
     f record set f now-recording? set
     next
-    "1.0" "iso-8859-1" f <prolog> prolog-data set
-    init-xml-stack
-    init-ns-stack ;
+    "1.0" "iso-8859-1" f <prolog> prolog-data set ;
+
+: init-xml ( stream -- )
+    basic-init init-xml-stack init-ns-stack ;
 
 : init-xml-string ( string -- ) ! for debugging
     <string-reader> init-xml ;
@@ -279,15 +280,37 @@ M: multitags error.
     dup [ tag? ] contains? [ <multitags> throw ] when r>
     swap <xml-doc> ;
 
+! * Views of XML
+
+SYMBOL: text-now?
+
+TUPLE: pull-xml scope ;
+C: pull-xml ( stream -- pull-xml )
+    [
+        swap basic-init parse-prolog
+        t text-now? set
+        [ namestack pop swap set-pull-xml-scope ] keep
+    ] with-scope ;
+
+: pull-next ( pull -- xml-elem/f )
+    pull-xml-scope [
+        text-now? get [ parse-text f ] [
+            get-char [ make-tag t ] [ f f ] if
+        ] if text-now? set    
+    ] bind ;
+
+: call-under ( quot object -- quot )
+    swap dup slip ; inline
+
 : sax-loop ( quot -- ) ! quot: xml-elem --
-    parse-text [ swap dup slip ] each
-    get-char [ make-tag swap dup slip sax-loop ]
+    parse-text [ call-under ] each
+    get-char [ make-tag call-under sax-loop ]
     [ drop ] if ; inline
 
 : sax ( stream quot -- ) ! quot: xml-elem --
     swap [
-        init-xml parse-prolog
-        prolog-data get swap dup slip
+        basic-init parse-prolog
+        prolog-data get call-under
         sax-loop
     ] with-scope ; inline
 

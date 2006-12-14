@@ -11,4 +11,5 @@ PROVIDE: libs/xml
 } }
 { +tests+ {
     "test.factor"
-} } ;
+} }
+{ +help+ { "xml" "intro" } } ;

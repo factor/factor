@@ -206,7 +206,6 @@ TUPLE: reference name ;
     <reference> , next new-record ;
 
 : (parse-char) ( ch -- )
-    ! The similarities with (parse-text) should be factored out
     get-char {
         { [ dup not ]
           [ 2drop 0 end-record* , ] }

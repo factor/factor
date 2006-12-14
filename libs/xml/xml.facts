@@ -247,6 +247,45 @@ HELP: contained
 { $class-description "represents a self-closing tag, like <a/>. Contains two slots, name and props, containing, respectively, the name of the tag and its attributes. Usually, the name-url will be f." }
 { $see-also opener closer } ;
 
+HELP: parse-text
+{ $values { "array" "an array of text elements" } }
+{ $description "moves the pointer from the current spot to the beginning of the next tag, parsing the text underneath, returning the text elements it passed. This parses DTD references like %foo; and XML entities like &bar; &#97; and &amp;" }
+{ $see-also parse-name } ;
+
+HELP: parse-name
+{ $values { "name" "an XML name" } }
+{ $description "parses a " { $link name } " from the input stream. Returns a name with only the name-space and name-tag defined, with name-url=f" }
+{ $see-also parse-text } ;
+
+HELP: make-tag
+{ $values { "tag" "an opener, closer or contained" } }
+{ $description "assuming the pointer is just past a <, this word parses until the next > and emits a tuple representing the tag parsed" }
+{ $see-also opener closer contained } ;
+
+HELP: pull-xml
+{ $class-description "represents the state of a pull-parser for XML. Has one slot, scope, which is a namespace which contains all relevant state information." }
+{ $see-also <pull-xml> pull-next } ;
+
+HELP: <pull-xml>
+{ $values { "stream" "an input stream containing XML" } { "pull-xml" "a pull-xml tuple" } }
+{ $description "creates an XML pull-based parser, executing all initial XML commands to set up the parser" }
+{ $see-also pull-xml pull-next } ;
+
+HELP: pull-next
+{ $values { "pull" "an XML pull parser" } { "xml-elem/f" "an XML tag event, sequence of string elements, or f" } }
+{ $description "gets the next xml element from the given XML pull parser. Returns f upon exaustion" }
+{ $see-also pull-xml <pull-xml> } ;
+
+HELP: write-item
+{ $values { "object" "an XML element" } }
+{ $description "writes an XML element to stdio" }
+{ $see-also write-chunk write-xml } ;
+
+HELP: write-chunk
+{ $values { "seq" "an XML document fragment" } }
+{ $description "writes an XML document fragment, ie a sequence of XML elements, to stdio" }
+{ $see-also write-item write-xml } ;
+
 ARTICLE: { "xml" "intro" } "XML"
     "The XML module attempts to implement the XML 1.1 standard, converting strings of text into XML and vice versa. It currently is a work in progress. Together with XML-RPC, this is a component of the F2EE framework."
     $terpri
@@ -260,13 +299,19 @@ ARTICLE: { "xml" "intro" } "XML"
 
 ARTICLE: { "xml" "basic" } "Basic words for XML processing"
     "These are the most basic words needed for processing an XML document"
+    $terpri
+    "Parsing XML:"
     { $subsection string>xml }
-    { $subsection xml>string }
-    { $subsection xml-parse-error }
-    { $subsection xml-reprint }
-    { $subsection write-xml }
     { $subsection read-xml }
-    { $subsection xml-chunk } ;
+    { $subsection xml-chunk }
+    "Printing XML"
+    { $subsection xml>string }
+    { $subsection write-xml }
+    { $subsection write-item }
+    { $subsection write-chunk }
+    "Other"
+    { $subsection xml-parse-error }
+    { $subsection xml-reprint } ;
 
 ARTICLE: { "xml" "classes" } "XML data classes"
     "Data types that XML documents are made of:"
@@ -295,7 +340,7 @@ ARTICLE: { "xml" "construct" } "XML data constructors"
 ARTICLE: { "xml" "utils" } "XML processing utilities"
     "Utilities for processing XML include..."
     $terpri
-    "System for creating words which dispatch on XML tags:"
+    "System sfor creating words which dispatch on XML tags:"
     { $subsection POSTPONE: PROCESS: }
     { $subsection POSTPONE: TAG: }
     "Combinators for traversing XML trees:"
@@ -321,6 +366,9 @@ ARTICLE: { "xml" "internal" } "Internals of the XML parser"
     { $subsection take-char }
     { $subsection take-string }
     { $subsection next }
+    { $subsection parse-text }
+    { $subsection make-tag }
+    { $subsection parse-name }
     { $subsection process } ; ! should I have more? less?
 
 ARTICLE: { "xml" "events" } "Event-based XML parsing"
@@ -328,4 +376,8 @@ ARTICLE: { "xml" "events" } "Event-based XML parsing"
     { $subsection sax }
     { $subsection opener }
     { $subsection closer }
-    { $subsection contained } ;
+    { $subsection contained }
+    "There is also pull-based parsing to augment the push-parsing of SAX. This is probably easier to use and more logical. It uses the same parsing objects as the above style of parsing, except string elements are always in arrays, for example { \"\" }. Relevant pull-parsing words are:"
+    { $subsection <pull-xml> }
+    { $subsection pull-xml }
+    { $subsection pull-next } ;
