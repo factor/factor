@@ -11,6 +11,7 @@ TUPLE: ast-quotation expression ;
 TUPLE: ast-array elements ;
 TUPLE: ast-define name expression ;
 TUPLE: ast-expression values ;
+TUPLE: ast-word value ;
 TUPLE: ast-alien return method args ;
 
 LAZY: 'digit' ( -- parser )
@@ -78,6 +79,10 @@ LAZY: 'array' ( -- parser )
   'expression' &>
   "}" token sp <& [ <ast-array> ] <@ ;
 
+LAZY: 'word' ( -- parser )
+  "\\" token sp 
+  'identifier' sp &> [ ast-identifier-value <ast-word> ] <@ ;
+
 LAZY: 'atom' ( -- parser )
   'identifier' 'number' <|> 'string' <|> ;
 
@@ -89,6 +94,7 @@ LAZY: 'alien' ( -- parser )
 
 LAZY: 'expression' ( -- parser )
   'define' sp 
+  'word' sp <|>
   'alien' sp <|>
   'atom' sp <|> 
   'quotation' sp <|> 
@@ -172,6 +178,16 @@ M: ast-alien (compile)
   ast-alien-return empty? not [
     ")" ,
   ] when ;
+
+M: ast-word (literal)   
+  "factor.words[\"" , 
+  ast-word-value ,
+  "\"]" , ;
+
+M: ast-word (compile)
+  "factor.data_stack.push(" ,
+  (literal)
+  ")" , ;
   
 : fjsc-compile ( ast -- string )
   [
