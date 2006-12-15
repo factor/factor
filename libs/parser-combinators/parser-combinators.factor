@@ -196,3 +196,28 @@ LAZY: <?> ( parser -- parser )
   #! Return a parser that optionally uses the parser
   #! if that parser would be successfull.
   [ 1array ] <@ f succeed <|> ;
+
+TUPLE: only-first-parser p1 ;
+LAZY: only-first ( parser -- parser )
+  <only-first-parser> ;
+
+M: only-first-parser (parse) ( input parser -- list )
+  #! Transform a parser into a parser that only yields
+  #! the first possibility.
+  only-first-parser-p1 parse 1 swap ltake ;
+
+LAZY: <!*> ( parser -- parser )
+  #! Like <*> but only return one possible result
+  #! containing all matching parses. Does not return
+  #! partial matches. Useful for efficiency since that's
+  #! usually the effect you want and cuts down on backtracking
+  #! required.
+  <*> only-first ;
+
+LAZY: <!+> ( parser -- parser )
+  #! Like <+> but only return one possible result
+  #! containing all matching parses. Does not return
+  #! partial matches. Useful for efficiency since that's
+  #! usually the effect you want and cuts down on backtracking
+  #! required.
+  <+> only-first ;
