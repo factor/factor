@@ -11,6 +11,7 @@ TUPLE: ast-quotation expression ;
 TUPLE: ast-array elements ;
 TUPLE: ast-define name expression ;
 TUPLE: ast-expression values ;
+TUPLE: ast-alien return object method args ;
 
 LAZY: 'digit' ( -- parser )
   [ digit? ] satisfy [ digit> ] <@ ;
@@ -80,8 +81,16 @@ LAZY: 'array' ( -- parser )
 LAZY: 'atom' ( -- parser )
   'identifier' 'number' <|> 'string' <|> ;
 
+LAZY: 'alien' ( -- parser )
+  'array' [ ast-array-elements ast-expression-values [ ast-string-value ] map ] <@
+  'string' [ ast-string-value ] <@ <&>
+  'string' [ ast-string-value ] <@ <:&>
+  'array' [ ast-array-elements ast-expression-values [ ast-string-value ] map ] <@ <:&>
+  "alien-invoke" token sp <& [ first4 <ast-alien> ] <@ ;
+
 LAZY: 'expression' ( -- parser )
   'define' sp 
+  'alien' sp <|>
   'atom' sp <|> 
   'quotation' sp <|> 
   'array' sp <|>
@@ -152,6 +161,20 @@ M: ast-expression (literal)
 M: ast-expression (compile)
   ast-expression-values [ (compile) ] [ ";" , ] interleave ;
 
+M: ast-alien (compile)
+  dup ast-alien-return empty? not [
+    "factor.data_stack.push(" ,
+  ] when
+  dup ast-alien-object ,	
+  "." ,
+  dup ast-alien-method ,
+  "(" ,
+  dup ast-alien-args [ drop "factor.data_stack.pop()" , ] [ "," , ] interleave 
+  ")" ,
+  ast-alien-return empty? not [
+    ")" ,
+  ] when ;
+  
 : fjsc-compile ( ast -- string )
   [
     [ (compile) ] { } make [ write ] each
