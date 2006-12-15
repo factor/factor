@@ -11,7 +11,7 @@ TUPLE: ast-quotation expression ;
 TUPLE: ast-array elements ;
 TUPLE: ast-define name expression ;
 TUPLE: ast-expression values ;
-TUPLE: ast-alien return object method args ;
+TUPLE: ast-alien return method args ;
 
 LAZY: 'digit' ( -- parser )
   [ digit? ] satisfy [ digit> ] <@ ;
@@ -84,9 +84,8 @@ LAZY: 'atom' ( -- parser )
 LAZY: 'alien' ( -- parser )
   'array' [ ast-array-elements ast-expression-values [ ast-string-value ] map ] <@
   'string' [ ast-string-value ] <@ <&>
-  'string' [ ast-string-value ] <@ <:&>
   'array' [ ast-array-elements ast-expression-values [ ast-string-value ] map ] <@ <:&>
-  "alien-invoke" token sp <& [ first4 <ast-alien> ] <@ ;
+  "alien-invoke" token sp <& [ first3 <ast-alien> ] <@ ;
 
 LAZY: 'expression' ( -- parser )
   'define' sp 
@@ -165,12 +164,11 @@ M: ast-alien (compile)
   dup ast-alien-return empty? not [
     "factor.data_stack.push(" ,
   ] when
-  dup ast-alien-object ,	
-  "." ,
   dup ast-alien-method ,
-  "(" ,
+  ".apply(" ,
+  "factor.data_stack.pop(), [" ,
   dup ast-alien-args [ drop "factor.data_stack.pop()" , ] [ "," , ] interleave 
-  ")" ,
+  "])" ,
   ast-alien-return empty? not [
     ")" ,
   ] when ;

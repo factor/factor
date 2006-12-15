@@ -36,10 +36,10 @@ IN: temporary
   ": foo 123 \"hello\" ;" 'expression' parse car parse-result-parsed fjsc-compile 
 ] unit-test
 
-{ "window.alert(factor.data_stack.pop())" } [
-  "{ } \"window\" \"alert\" { \"string\" } alien-invoke" 'expression' parse car parse-result-parsed fjsc-compile
+{ "alert.apply(factor.data_stack.pop(), [factor.data_stack.pop()])" } [
+  "{ } \"alert\" { \"string\" } alien-invoke" 'expression' parse car parse-result-parsed fjsc-compile
 ] unit-test
 
-{ "factor.data_stack.push(window.alert(factor.data_stack.pop()))" } [
-  "{ \"string\" } \"window\" \"alert\" { \"string\" } alien-invoke" 'expression' parse car parse-result-parsed fjsc-compile
+{ "factor.data_stack.push(alert.apply(factor.data_stack.pop(), [factor.data_stack.pop()]))" } [
+  "{ \"string\" } \"alert\" { \"string\" } alien-invoke" 'expression' parse car parse-result-parsed fjsc-compile
 ] unit-test
