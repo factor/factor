@@ -224,7 +224,11 @@ M: lazy-take cdr ( lazy-take -- cdr )
   lazy-take-cons cdr ltake ;
 
 M: lazy-take nil? ( lazy-take -- bool )
-  lazy-take-n zero? ;
+  dup lazy-take-n zero? [
+    drop t
+  ] [ 
+    lazy-take-cons nil?
+  ] if ;
 
 M: lazy-take list? ( object -- bool )
   drop t ;
