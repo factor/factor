@@ -24,6 +24,7 @@ function Factor() {
     "empty?": function() { self.fjsc_is_empty(); },
     "window": function() { self.fjsc_window(); },
     "run-file": function() { self.fjsc_run_file(); },
+    "http-get": function() { self.fjsc_http_get(); },
     "bootstrap": function() { self.fjsc_bootstrap(); }
   };  
 }
@@ -207,6 +208,25 @@ Factor.prototype.fjsc_run_file = function() {
 
    YAHOO.util.Connect.asyncRequest('GET', url, callback, null);
 }
+
+Factor.prototype.fjsc_http_get = function() {
+   var self = this;
+   var stack = this.data_stack;
+   var url = stack.pop();
+   var callback = {
+     success: function(o) {
+       var result = o.responseText;
+       self.data_stack.push(result);
+       self.display_datastack();
+     },
+     failure: function(o) {
+       alert('http-get failed');
+     }
+   };
+
+   YAHOO.util.Connect.asyncRequest('GET', url, callback, null);
+}
+
 
 Factor.prototype.fjsc_bootstrap = function() {
    this.data_stack.push("/responder/fjsc-resources/bootstrap.factor");
