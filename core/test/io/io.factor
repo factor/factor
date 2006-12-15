@@ -70,3 +70,21 @@ unit-test
     "/core/test/io/binary.txt" <resource-reader>
     [ 0.2 read ] with-stream
 ] unit-test
+
+[ { } ]
+[ "/core/test/io/empty-file.txt" <resource-reader> lines ]
+unit-test
+
+[ "xyzzy" ] [ [ "xyzzy" write ] string-out ] unit-test
+
+[ { "" } ] [ "" string-lines ] unit-test
+[ { "" "" } ] [ "\n" string-lines ] unit-test
+[ { "" "" } ] [ "\r" string-lines ] unit-test
+[ { "" "" } ] [ "\r\n" string-lines ] unit-test
+[ { "hello" } ] [ "hello" string-lines ] unit-test
+[ { "hello" "" } ] [ "hello\n" string-lines ] unit-test
+[ { "hello" "" } ] [ "hello\r" string-lines ] unit-test
+[ { "hello" "" } ] [ "hello\r\n" string-lines ] unit-test
+[ { "hello" "hi" } ] [ "hello\nhi" string-lines ] unit-test
+[ { "hello" "hi" } ] [ "hello\rhi" string-lines ] unit-test
+[ { "hello" "hi" } ] [ "hello\r\nhi" string-lines ] unit-test

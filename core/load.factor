@@ -124,7 +124,6 @@ PROVIDE: core
     "test/prettyprint.factor"
     "test/random.factor"
     "test/redefine.factor"
-    "test/stream.factor"
     "test/threads.factor"
     "test/tuple.factor"
     "test/words.factor"
