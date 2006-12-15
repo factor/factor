@@ -13,6 +13,7 @@ TUPLE: ast-define name expression ;
 TUPLE: ast-expression values ;
 TUPLE: ast-word value ;
 TUPLE: ast-alien return method args ;
+TUPLE: ast-comment ;
 
 LAZY: 'digit' ( -- parser )
   [ digit? ] satisfy [ digit> ] <@ ;
@@ -92,8 +93,15 @@ LAZY: 'alien' ( -- parser )
   'array' [ ast-array-elements ast-expression-values [ ast-string-value ] map ] <@ <:&>
   "alien-invoke" token sp <& [ first3 <ast-alien> ] <@ ;
 
+LAZY: 'comment' ( -- parser )
+  "#!" token sp
+  "!" token sp <|> [
+    dup CHAR: \n = swap CHAR: \r = or not
+  ] satisfy <*> <&> [ drop <ast-comment> ] <@ ;
+
 LAZY: 'expression' ( -- parser )
-  'define' sp 
+  'comment' 
+  'define' sp <|>
   'word' sp <|>
   'alien' sp <|>
   'atom' sp <|> 
@@ -189,6 +197,9 @@ M: ast-word (compile)
   (literal)
   ")" , ;
   
+M: ast-comment (compile)
+  drop "/* */" , ;
+
 : fjsc-compile ( ast -- string )
   [
     [ (compile) ] { } make [ write ] each
