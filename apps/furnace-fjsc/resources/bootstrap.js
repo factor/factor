@@ -1,5 +1,6 @@
 function Factor() {
   var self = this;
+  this.form = false;
   this.data_stack = [ ];  
   this.words = { 
     dup: function() { self.fjsc_dup(); },
@@ -20,11 +21,13 @@ function Factor() {
     "f": function() { self.fjsc_false(); },
     "t": function() { self.fjsc_true(); },
     "empty?": function() { self.fjsc_is_empty(); },
-    alert: function() { self.fjsc_alert(); }
+    "window": function() { self.fjsc_window(); },
+    "run-file": function() { self.fjsc_run_file(); },
+    "bootstrap": function() { self.fjsc_bootstrap(); }
   };  
 }
 
-Factor.prototype.fjsc_eval = function(form) {
+Factor.prototype.server_eval = function(text) {
    var self = this;
    var callback = {
       success: function(o) {
@@ -33,11 +36,16 @@ Factor.prototype.fjsc_eval = function(form) {
 	 self.display_datastack();
 	 document.getElementById('compiled').innerHTML="<pre>" + v + "</pre>";
 	 document.getElementById('code').value="";
-
       }
    };
-   YAHOO.util.Connect.setForm(form);
+   this.form.code.value=text;
+   YAHOO.util.Connect.setForm(this.form);
    YAHOO.util.Connect.asyncRequest('POST', "/responder/fjsc/compile", callback);
+}
+
+Factor.prototype.fjsc_eval = function(form) {
+   this.form = form;
+   this.server_eval(form.code.value);
 }
 
 Factor.prototype.display_datastack = function() {
@@ -148,10 +156,6 @@ Factor.prototype.fjsc_equals = function() {
   this.data_stack.push(v1==v2);
 }
 
-Factor.prototype.fjsc_alert = function() {
-  alert(this.data_stack.pop());
-}
-
 Factor.prototype.fjsc_clear = function() {
   factor.data_stack = [ ]
 }
@@ -171,6 +175,33 @@ Factor.prototype.fjsc_is_empty = function() {
 Factor.prototype.fjsc_over = function() {
    var stack = this.data_stack;
    stack.push(stack[stack.length-2]);
+}
+
+Factor.prototype.fjsc_window = function() {
+   var stack = this.data_stack;
+   stack.push(window);
+}
+
+Factor.prototype.fjsc_run_file = function() {
+   var self = this;
+   var stack = this.data_stack;
+   var url = stack.pop();
+   var callback = {
+     success: function(o) {
+       var result = o.responseText;
+       self.server_eval(result);
+     },
+     failure: function(o) {
+       alert('run-file failed');
+     }
+   };
+
+   YAHOO.util.Connect.asyncRequest('GET', url, callback, null);
+}
+
+Factor.prototype.fjsc_bootstrap = function() {
+   this.data_stack.push("/responder/fjsc-resources/bootstrap.factor");
+   this.fjsc_run_file();
 }
 
 var factor = new Factor();
