@@ -28,11 +28,11 @@ IN: temporary
   "123 \"hello\" alert" 'expression' parse car parse-result-parsed fjsc-compile 
 ] unit-test
  
-{ "factor.words[\"foo\"]=function() { factor.data_stack.push(123);factor.data_stack.push('hello');}" } [
+{ "factor.words[\"foo\"]=function() { factor.data_stack.push(123);factor.data_stack.push('hello')}" } [
   ": foo 123 \"hello\" ;" 'define' parse car parse-result-parsed fjsc-compile 
 ] unit-test
 
-{ "factor.words[\"foo\"]=function() { factor.data_stack.push(123);factor.data_stack.push('hello');}" } [
+{ "factor.words[\"foo\"]=function() { factor.data_stack.push(123);factor.data_stack.push('hello')}" } [
   ": foo 123 \"hello\" ;" 'expression' parse car parse-result-parsed fjsc-compile 
 ] unit-test
 
