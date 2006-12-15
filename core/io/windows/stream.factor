@@ -166,6 +166,7 @@ C: win32-stream ( handle -- stream )
     0 swap [ set-win32-stream-cutoff ] keep
     dup win32-stream-handle f GetFileSize dup -1 = [ drop f ] when
     over set-win32-stream-file-size
+    dup win32-stream-file-size zero? [ t over set-win32-stream-eof? ] when
     0 swap [ set-win32-stream-fileptr ] keep ;
 
 C: win32-stream-reader ( stream -- stream )
