@@ -221,3 +221,11 @@ LAZY: <!+> ( parser -- parser )
   #! usually the effect you want and cuts down on backtracking
   #! required.
   <+> only-first ;
+
+LAZY: <!?> ( parser -- parser )
+  #! Like <?> but only return one possible result
+  #! containing all matching parses. Does not return
+  #! partial matches. Useful for efficiency since that's
+  #! usually the effect you want and cuts down on backtracking
+  #! required.
+  <?> only-first ;
