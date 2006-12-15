@@ -7,6 +7,7 @@ function Factor() {
     drop: function() { self.fjsc_drop(); },
     nip: function() { self.fjsc_nip(); },
     over: function() { self.fjsc_over(); },
+    swap: function() { self.fjsc_swap(); },
     "+": function() { self.fjsc_plus(); },
     "-": function() { self.fjsc_minus(); },
     "*": function() { self.fjsc_times(); },
@@ -175,6 +176,14 @@ Factor.prototype.fjsc_is_empty = function() {
 Factor.prototype.fjsc_over = function() {
    var stack = this.data_stack;
    stack.push(stack[stack.length-2]);
+}
+
+Factor.prototype.fjsc_swap = function() {
+   var stack = this.data_stack; 
+   var len = stack.length;
+   var temp = stack[len-2];   
+   stack[len-2] = stack[len-1];
+   stack[len-1] = temp;
 }
 
 Factor.prototype.fjsc_window = function() {
