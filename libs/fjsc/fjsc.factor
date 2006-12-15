@@ -53,7 +53,6 @@ LAZY: 'identifier-middle' ( -- parser )
     and and and and and and and and
   ] satisfy <+> ;
 
-USE: prettyprint
 LAZY: 'identifier' ( -- parser )
   'identifier-ends' 
   'identifier-middle' <&> [ first2 append ] <@
@@ -100,7 +99,7 @@ M: ast-number (literal)
 M: ast-number (compile) 
   "factor.data_stack.push(" ,
   (literal)  
-  ");" , ;
+  ")" , ;
 
 M: ast-string (literal) 
   "'" ,
@@ -110,7 +109,7 @@ M: ast-string (literal)
 M: ast-string (compile) 
   "factor.data_stack.push(" ,
   (literal)
-  ");" , ;
+  ")" , ;
 
 M: ast-identifier (literal) 
   "factor.words[\"" , ast-identifier-value , "\"]" ,  ;
