@@ -9,17 +9,18 @@ TUPLE: ast-identifier value ;
 TUPLE: ast-string value ;
 TUPLE: ast-quotation expression ;
 TUPLE: ast-array elements ;
-TUPLE: ast-define name expression ;
+TUPLE: ast-define name stack-effect expression ;
 TUPLE: ast-expression values ;
 TUPLE: ast-word value ;
 TUPLE: ast-alien return method args ;
 TUPLE: ast-comment ;
+TUPLE: ast-stack-effect in out ;
 
 LAZY: 'digit' ( -- parser )
   [ digit? ] satisfy [ digit> ] <@ ;
 
 LAZY: 'number' ( -- parser )
-  'digit' <+> [ 0 [ swap 10 * + ] reduce <ast-number> ] <@ ;
+  'digit' <!+> [ 0 [ swap 10 * + ] reduce <ast-number> ] <@ ;
 
 LAZY: 'quote' ( -- parser )
   [ CHAR: " = ] satisfy ;
@@ -28,47 +29,57 @@ LAZY: 'string' ( -- parser )
   'quote' sp [
     CHAR: " = not
   ] satisfy <+> [ >string <ast-string> ] <@ &> 'quote' <& ;
+ 
+: identifier-middle? ( ch -- bool )
+  [ blank? not ] keep
+  [ CHAR: } = not ] keep
+  [ CHAR: ] = not ] keep
+  [ CHAR: " = not ] keep
+  digit? not 
+  and and and and ;
 
 LAZY: 'identifier-ends' ( -- parser )  
   [ 
-    [ blank? not ] keep 
-    [ CHAR: [ = not ] keep 
-    [ CHAR: ] = not ] keep 
-    [ CHAR: { = not ] keep 
-    [ CHAR: } = not ] keep 
-    [ CHAR: : = not ] keep 
-    [ CHAR: " = not ] keep 
-    CHAR: ; = not 
-    and and and and and and and
-  ] satisfy <*> ;
+    [ blank? not ] keep
+    [ CHAR: " = not ] keep
+    [ LETTER? not ] keep
+    [ letter? not ] keep
+    identifier-middle? not
+    and and and and
+  ] satisfy <!*> ;
 
 LAZY: 'identifier-middle' ( -- parser )  
-  [ 
-    [ blank? not ] keep 
-    [ CHAR: [ = not ] keep 
-    [ CHAR: ] = not ] keep 
-    [ CHAR: { = not ] keep 
-    [ CHAR: } = not ] keep 
-    [ CHAR: : = not ] keep 
-    [ CHAR: " = not ] keep 
-    [ CHAR: ; = not ] keep
-    digit? not
-    and and and and and and and and
-  ] satisfy <+> ;
+  [ identifier-middle? ] satisfy <!+> ;
 
 LAZY: 'identifier' ( -- parser )
   'identifier-ends' 
-  'identifier-middle' <&> [ first2 append ] <@
-  'identifier-ends' <&> [ first2 append ] <@
-  [ >string <ast-identifier> ] <@ ;
+  'identifier-middle' <&>
+  'identifier-ends' <:&> 
+  [ concat >string <ast-identifier> ] <@ ;
 
+  
 DEFER: 'expression'
+
+LAZY: 'effect-name' ( -- parser )
+  [ 
+    [ blank? not ] keep
+    CHAR: - = not
+    and    
+  ] satisfy <!+> [ >string ] <@ ;
+
+LAZY: 'stack-effect' ( -- parser )
+  "(" token sp
+  'effect-name' sp <*> &>
+  "--" token sp <&
+  'effect-name' sp <*> <&>
+  ")" token sp <& [ first2 <ast-stack-effect> ] <@ ;
 
 LAZY: 'define' ( -- parser )
   ":" token sp 
   'identifier' sp &>
-  'expression' <&>
-  ";" token sp <& [ first2 <ast-define> ] <@ ;
+  'stack-effect' sp <!?> <&>
+  'expression' <:&>
+  ";" token sp <& [ first3 <ast-define> ] <@ ;
 
 LAZY: 'quotation' ( -- parser )
   "[" token sp 
@@ -110,7 +121,7 @@ LAZY: 'expression' ( -- parser )
   <*> [ <ast-expression> ] <@ ;
 
 LAZY: 'statement' ( -- parser )
-  'define' 'expression' <|> ;
+  'expression' ;
 
 GENERIC: (compile) ( ast -- )
 GENERIC: (literal) ( ast -- )
@@ -199,6 +210,9 @@ M: ast-word (compile)
   
 M: ast-comment (compile)
   drop "/* */" , ;
+
+M: ast-stack-effect (compile)
+  drop ;
 
 : fjsc-compile ( ast -- string )
   [

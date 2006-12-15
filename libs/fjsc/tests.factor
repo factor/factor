@@ -43,3 +43,23 @@ IN: temporary
 { "factor.data_stack.push(alert.apply(factor.data_stack.pop(), [factor.data_stack.pop()]))" } [
   "{ \"string\" } \"alert\" { \"string\" } alien-invoke" 'expression' parse car parse-result-parsed fjsc-compile
 ] unit-test
+
+{ T{ ast-stack-effect f { } { "d" "e" "f" } } } [
+  "( -- d e f )" 'stack-effect' parse car parse-result-parsed 
+] unit-test
+
+{ T{ ast-stack-effect f { "a" "b" "c" } { "d" "e" "f" } } } [
+  "( a b c -- d e f )" 'stack-effect' parse car parse-result-parsed 
+] unit-test
+
+{ T{ ast-stack-effect f { "a" "b" "c" } { } } } [
+  "( a b c -- )" 'stack-effect' parse car parse-result-parsed 
+] unit-test
+
+{ T{ ast-stack-effect f { } { } } } [
+  "( -- )" 'stack-effect' parse car parse-result-parsed 
+] unit-test
+
+{ } [
+  ": foo ( a b -- c d ) abcdefghijklmn 123 ;" 'expression' parse car drop
+] unit-test
