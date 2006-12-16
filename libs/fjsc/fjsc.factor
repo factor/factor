@@ -2,12 +2,12 @@
 ! See http://factorcode.org/license.txt for BSD license.
 !
 IN: fjsc
-USING: kernel lazy-lists parser-combinators strings math sequences namespaces io ;
+USING: kernel lazy-lists parser-combinators strings math sequences namespaces io words arrays ;
 
 TUPLE: ast-number value ;
 TUPLE: ast-identifier value ;
 TUPLE: ast-string value ;
-TUPLE: ast-quotation expression ;
+TUPLE: ast-quotation values ;
 TUPLE: ast-array elements ;
 TUPLE: ast-define name stack-effect expression ;
 TUPLE: ast-expression values ;
@@ -76,19 +76,19 @@ LAZY: 'stack-effect' ( -- parser )
 
 LAZY: 'define' ( -- parser )
   ":" token sp 
-  'identifier' sp &>
+  'identifier' sp [ ast-identifier-value ] <@ &>
   'stack-effect' sp <!?> <&>
   'expression' <:&>
   ";" token sp <& [ first3 <ast-define> ] <@ ;
 
 LAZY: 'quotation' ( -- parser )
   "[" token sp 
-  'expression' &>
+  'expression' [ ast-expression-values ] <@ &>
   "]" token sp <& [ <ast-quotation> ] <@ ;
 
 LAZY: 'array' ( -- parser )
   "{" token sp 
-  'expression' &>
+  'expression' [ ast-expression-values ] <@ &>
   "}" token sp <& [ <ast-array> ] <@ ;
 
 LAZY: 'word' ( -- parser )
@@ -99,9 +99,9 @@ LAZY: 'atom' ( -- parser )
   'identifier' 'number' <|> 'string' <|> ;
 
 LAZY: 'alien' ( -- parser )
-  'array' [ ast-array-elements ast-expression-values ] <@
+  'array' [ ast-array-elements ] <@
   'string' [ ast-string-value ] <@ <&>
-  'array' [ ast-array-elements ast-expression-values ] <@ <:&>
+  'array' [ ast-array-elements ] <@ <:&>
   "alien-invoke" token sp <& [ first3 <ast-alien> ] <@ ;
 
 LAZY: 'comment' ( -- parser )
@@ -152,34 +152,10 @@ M: ast-identifier (compile)
 
 M: ast-define (compile) 
   "world.define_word(\"" , 
-  dup ast-define-name ast-identifier-value , 
+  dup ast-define-name , 
   "\",\"source\"," ,
   ast-define-expression (compile)
   ",world," , ;
-
-M: ast-quotation (literal)   
-  "world.make_quotation(\"source\"," ,
-  ast-quotation-expression (compile)
-  ")" , ;
-
-M: ast-quotation (compile)   
-  "world.data_stack.push(world.make_quotation(\"source\"," ,
-  ast-quotation-expression (compile)
-  "),world," , ;
-
-M: ast-array (literal)   
-  "[" ,  
-  ast-array-elements ast-expression-values [ (literal) ] [ "," , ] interleave
-  "]" , ;
-
-M: ast-array (compile)   
-  "world.data_stack.push(" , (literal) ",world," , ;
-
-
-M: ast-expression (literal)
-  ast-expression-values [
-    (literal) 
-  ] each ;
 
 : do-expressions ( seq -- )
   dup empty? not [
@@ -195,6 +171,30 @@ M: ast-expression (literal)
   ] [
     drop "world.next" ,
   ] if  ;
+
+M: ast-quotation (literal)   
+  "world.make_quotation(\"source\"," ,
+  ast-quotation-values do-expressions
+  ")" , ;
+
+M: ast-quotation (compile)   
+  "world.data_stack.push(world.make_quotation(\"source\"," ,
+  ast-quotation-values do-expressions
+  "),world," , ;
+
+M: ast-array (literal)   
+  "[" ,  
+  ast-array-elements [ (literal) ] [ "," , ] interleave
+  "]" , ;
+
+M: ast-array (compile)   
+  "world.data_stack.push(" , (literal) ",world," , ;
+
+
+M: ast-expression (literal)
+  ast-expression-values [
+    (literal) 
+  ] each ;
   
 M: ast-expression (compile)
   ast-expression-values do-expressions ;
@@ -226,6 +226,41 @@ M: ast-comment (compile)
 
 M: ast-stack-effect (compile)
   drop ;
+
+GENERIC: (parse-factor-quotation) ( object -- ast )
+
+M: number (parse-factor-quotation) ( object -- ast )
+  <ast-number> ;
+
+M: symbol (parse-factor-quotation) ( object -- ast )
+  >string <ast-identifier> ;
+
+M: word (parse-factor-quotation) ( object -- ast )
+  word-name <ast-identifier> ;
+
+M: string (parse-factor-quotation) ( object -- ast )
+  <ast-identifier> ;
+
+M: quotation (parse-factor-quotation) ( object -- ast )
+  [ 
+    [ (parse-factor-quotation) , ] each
+  ] { } make <ast-quotation> ;
+
+M: array (parse-factor-quotation) ( object -- ast )
+  [ 
+    [ (parse-factor-quotation) , ] each
+  ] { } make <ast-array> ;
+
+M: wrapper (parse-factor-quotation) ( object -- ast )
+  wrapped word-name <ast-word> ;
+
+GENERIC: fjsc-parse ( object -- ast )
+
+M: string fjsc-parse ( object -- ast )
+  'expression' parse car parse-result-parsed ;
+
+M: quotation fjsc-parse ( object -- ast )
+  (parse-factor-quotation) ;
 
 : fjsc-compile ( ast -- string )
   [
