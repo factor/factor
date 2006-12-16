@@ -219,7 +219,7 @@ M: word (parse-factor-quotation) ( object -- ast )
   word-name <ast-identifier> ;
 
 M: string (parse-factor-quotation) ( object -- ast )
-  <ast-identifier> ;
+  <ast-string> ;
 
 M: quotation (parse-factor-quotation) ( object -- ast )
   [ 
@@ -240,7 +240,9 @@ M: string fjsc-parse ( object -- ast )
   'expression' parse car parse-result-parsed ;
 
 M: quotation fjsc-parse ( object -- ast )
-  (parse-factor-quotation) <ast-expression> ;
+  [
+    [ (parse-factor-quotation) , ] each 
+  ] { } make <ast-expression> ;
 
 : fjsc-compile ( ast -- string )
   [
