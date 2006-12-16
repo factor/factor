@@ -16,34 +16,6 @@ IN: temporary
   "{ 55 2abc1 100 }" 'array' parse car parse-result-parsed
 ] unit-test
 
-{ "factor.words[\"alert\"]();" } [
-  "alert" 'identifier' parse car parse-result-parsed fjsc-compile 
-] unit-test
-
-{ "factor.data_stack.push(123);factor.words[\"alert\"]();" } [
-  "123 alert" 'expression' parse car parse-result-parsed fjsc-compile 
-] unit-test
-
-{ "factor.data_stack.push(123);factor.data_stack.push('hello');factor.words[\"alert\"]();" } [
-  "123 \"hello\" alert" 'expression' parse car parse-result-parsed fjsc-compile 
-] unit-test
- 
-{ "factor.words[\"foo\"]=function() { factor.data_stack.push(123);factor.data_stack.push('hello')}" } [
-  ": foo 123 \"hello\" ;" 'define' parse car parse-result-parsed fjsc-compile 
-] unit-test
-
-{ "factor.words[\"foo\"]=function() { factor.data_stack.push(123);factor.data_stack.push('hello')}" } [
-  ": foo 123 \"hello\" ;" 'expression' parse car parse-result-parsed fjsc-compile 
-] unit-test
-
-{ "alert.apply(factor.data_stack.pop(), [factor.data_stack.pop()])" } [
-  "{ } \"alert\" { \"string\" } alien-invoke" 'expression' parse car parse-result-parsed fjsc-compile
-] unit-test
-
-{ "factor.data_stack.push(alert.apply(factor.data_stack.pop(), [factor.data_stack.pop()]))" } [
-  "{ \"string\" } \"alert\" { \"string\" } alien-invoke" 'expression' parse car parse-result-parsed fjsc-compile
-] unit-test
-
 { T{ ast-stack-effect f { } { "d" "e" "f" } } } [
   "( -- d e f )" 'stack-effect' parse car parse-result-parsed 
 ] unit-test

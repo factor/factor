@@ -1,44 +1,213 @@
-function Factor() {
-  var self = this;
-  this.form = false;
-  this.data_stack = [ ];  
-  this.words = { 
-    dup: function() { self.fjsc_dup(); },
-    drop: function() { self.fjsc_drop(); },
-    nip: function() { self.fjsc_nip(); },
-    over: function() { self.fjsc_over(); },
-    swap: function() { self.fjsc_swap(); },
-    "+": function() { self.fjsc_plus(); },
-    "-": function() { self.fjsc_minus(); },
-    "*": function() { self.fjsc_times(); },
-    "/": function() { self.fjsc_divide(); },
-    ".": function() { self.fjsc_dot(); },
-    "call": function() { self.fjsc_call(); },
-    "execute": function() { self.fjsc_call(); },
-    "map": function() { self.fjsc_map(); },
-    "reduce": function() { self.fjsc_reduce(); },
-    "clear": function() { self.fjsc_clear(); },
-    "if": function() { self.fjsc_if(); },
-    "=": function() { self.fjsc_equals(); },
-    "f": function() { self.fjsc_false(); },
-    "t": function() { self.fjsc_true(); },
-    "empty?": function() { self.fjsc_is_empty(); },
-    "window": function() { self.fjsc_window(); },
-    "run-file": function() { self.fjsc_run_file(); },
-    "http-get": function() { self.fjsc_http_get(); },
-    "bootstrap": function() { self.fjsc_bootstrap(); }
-  };  
+function Word(name, source, func) {
+  this.name = name;
+  this.source = source;
+  this.func = func;
 }
 
-Factor.prototype.server_eval = function(text) {
+Word.prototype.execute = function(world, next) {
+  this.func(world,next);
+}
+
+function Stack() {
+  this.stack = [];
+}
+
+Stack.prototype.push = function(v,world,next) {
+  this.stack.push(v);
+  next(world);
+}
+
+Stack.prototype.pop = function(world,next) {
+  this.stack.pop();
+  next(world);
+}
+
+function Factor() {
+  this.words = { };
+  this.data_stack = new Stack();
+  this.form = false ;
+  this.next = false;
+}
+
+var factor = new Factor();
+
+factor.words["dup"] = new Word("dup", "primitive", function(world, next) {
+  var stack = world.data_stack.stack;
+  stack[stack.length] = stack[stack.length-1];
+  next(world);
+});
+
+factor.words["drop"] = new Word("drop", "primitive", function(world, next) {
+  world.data_stack.stack.pop();
+  next(world);
+});
+
+factor.words["nip"] = new Word("nip", "primitive", function(world, next) {
+  var stack = world.data_stack.stack;
+  stack[stack.length-2] = stack[stack.length-1];
+  stack.pop();
+  next(world);
+});
+
+factor.words["over"] = new Word("over", "primitive", function(world, next) {
+  var stack = world.data_stack.stack;
+  stack[stack.length] = stack[stack.length-2];
+  next(world);
+});
+
+factor.words["swap"] = new Word("swap", "primitive", function(world, next) {
+  var stack = world.data_stack.stack;
+  var temp = stack[stack.length-2];
+  stack[stack.length-2] = stack[stack.length-1];
+  stack[stack.length-1] = temp;
+  next(world);
+});
+
+factor.words["*"] = new Word("*", "primitive", function(world, next) {
+  var stack = world.data_stack.stack;
+  stack.push(stack.pop() * stack.pop());
+  next(world);
+});
+
+factor.words["+"] = new Word("+", "primitive", function(world, next) {
+  var stack = world.data_stack.stack;
+  stack.push(stack.pop() + stack.pop());
+  next(world);
+});
+
+factor.words["-"] = new Word("-", "primitive", function(world, next) {
+  var stack = world.data_stack.stack;
+  var v1 = stack.pop();
+  var v2 = stack.pop();
+  stack.push(v2 - v1);
+  next(world);
+});
+
+factor.words["/"] = new Word("/", "primitive", function(world, next) {
+  var stack = world.data_stack.stack;
+  var v1 = stack.pop();
+  var v2 = stack.pop();
+  stack.push(v2 / v1);
+  next(world);
+});
+
+factor.words["."] = new Word(".", "primitive", function(world, next) {
+  alert(world.data_stack.stack.pop());
+  next(world);
+});
+
+factor.words["call"] = new Word("call", "primitive", function(world, next) {
+  var quot = world.data_stack.stack.pop();
+  quot.execute(world, next);
+});
+
+factor.words["execute"] = new Word("execute", "primitive", function(world, next) {
+  var quot = world.data_stack.stack.pop();
+  quot.execute(world, next);
+});
+
+factor.words["clear"] = new Word("clear", "primitive", function(world, next) {
+  world.data_stack.stack = [];
+  next(world);
+});
+
+factor.words["square"] = new Word("square", "primitive", function(world, next) {  
+  var stack = world.data_stack.stack;
+  stack[stack.length-1] = stack[stack.length-1] * stack[stack.length-1];
+  next(world);
+});
+
+factor.words["if"] = new Word("if", "primitive", function(world, next) {  
+  var stack = world.data_stack.stack;
+  var else_quot = stack.pop();
+  var then_quot = stack.pop();
+  var condition = stack.pop();
+  if(condition) {
+    then_quot.execute(world, next);
+  } else {
+    else_quot.execute(world, next);
+  }
+});
+
+factor.words["f"] = new Word("f", "primitive", function(world, next) {  
+  world.data_stack.stack.push(false);
+  next(world);
+});
+
+factor.words["t"] = new Word("t", "primitive", function(world, next) {  
+  world.data_stack.stack.push(true);
+  next(world);
+});
+
+factor.words["window"] = new Word("window", "primitive", function(world, next) {  
+  world.data_stack.stack.push(window);
+  next(world);
+});
+
+factor.words["bootstrap"] = new Word("bootstrap", "primitive", function(world, next) {  
+  world.data_stack.stack.push("/responder/fjsc-resources/bootstrap.factor");
+  world.words["run-file"].execute(world, next);
+});
+
+factor.words["run-file"] = new Word("run-file", "primitive", function(world, next) {  
+  var stack = world.data_stack.stack;
+  var url = stack.pop();
+  var callback = {
+    success: function(o) {
+      var result = o.responseText;
+      world.server_eval(result, world, next);
+    },
+    failure: function(o) {
+      alert('run-file failed');
+      next(world);
+    }
+  };
+  YAHOO.util.Connect.asyncRequest('GET', url, callback, null);
+});
+
+Factor.prototype.define_word = function(name, source, func, world, next) {
+  factor.words[name] = new Word(name, source, function(world, next) {
+    var old = world.next;
+    world.next = function(world) {
+      world.next = old;
+      next(world);
+    }
+    func(world);
+  });
+  next(world);
+}
+
+Factor.prototype.make_quotation = function(source, func) {
+  return new Word("quotation", source, function(world, next) {
+    var old = world.next;
+    world.next = function(world) {
+      world.next = old;
+      next(world);
+    }
+    func(world);
+  });
+}
+
+Factor.prototype.call_alien = function(has_return,method_name, object, args, world, next) {
+  var v = object[method_name].apply(object, args);
+  if(has_return)
+    world.data_stack.stack.push(v);
+  next(world);
+}
+
+
+Factor.prototype.server_eval = function(text, world, next) {
    var self = this;
    var callback = {
       success: function(o) {
 	 var v = o.responseText;
-	 eval(v)
-	 self.display_datastack();
 	 document.getElementById('compiled').innerHTML="<pre>" + v + "</pre>";
 	 document.getElementById('code').value="";
+	 var func = eval(v);
+         factor.next = function() { self.display_datastack(); } 
+	 func(factor);
+         if(world && next) 
+           next(world);
       }
    };
    this.form.code.value=text;
@@ -54,184 +223,12 @@ Factor.prototype.fjsc_eval = function(form) {
 Factor.prototype.display_datastack = function() {
    var html=[];
    html.push("<table border='1'>")
-   for(var i = 0; i < this.data_stack.length; ++i) {
+   for(var i = 0; i < this.data_stack.stack.length; ++i) {
       html.push("<tr><td>")
-      html.push(this.data_stack[i])
+      html.push(this.data_stack.stack[i])
       html.push("</td></tr>")
    }
    html.push("</table>")
    document.getElementById('stack').innerHTML=html.join("");
 }
 
-Factor.prototype.fjsc_dup = function() {
-  var stack = this.data_stack;
-   var v = stack.pop();
-   stack.push(v);
-   stack.push(v);
-}
-
-Factor.prototype.fjsc_drop = function() {
-  this.data_stack.pop();
-}
-
-Factor.prototype.fjsc_nip = function() {
-  var stack = this.data_stack;
-  var v = stack.pop();
-  stack.pop();
-  stack.push(v);
-}
-
-Factor.prototype.fjsc_plus = function() {
-  var stack = this.data_stack;
-  var v1 = stack.pop();
-  var v2 = stack.pop();
-  stack.push(v1+v2);
-}
-
-Factor.prototype.fjsc_minus = function() {
-  var stack = this.data_stack;
-  var v1 = stack.pop();
-  var v2 = stack.pop();
-  stack.push(v2-v1);
-}
-
-Factor.prototype.fjsc_times = function() {
-  var stack = this.data_stack;
-  var v1 = stack.pop();
-  var v2 = stack.pop();
-  stack.push(v1*v2);
-}
-
-Factor.prototype.fjsc_divide = function() {
-  var stack = this.data_stack;
-  var v1 = stack.pop();
-  var v2 = stack.pop();
-  stack.push(v2/v1);
-}
-
-Factor.prototype.fjsc_dot = function() {
-  alert(this.data_stack.pop());
-}
-
-Factor.prototype.fjsc_call = function() {
-  (this.data_stack.pop())();
-}
-
-Factor.prototype.fjsc_map = function() {
-  var quot = this.data_stack.pop();
-  var seq = this.data_stack.pop();
-  var result = [ ];
-  for(var i=0;i<seq.length;++i) {  
-    this.data_stack.push(seq[i]);
-    (quot)();
-    result[i]=this.data_stack.pop();
-  }
-  this.data_stack.push(result);
-}
-
-Factor.prototype.fjsc_reduce = function() {
-  var quot = this.data_stack.pop();
-  var prev = this.data_stack.pop();
-  var seq = this.data_stack.pop();
-  for(var i=0;i<seq.length;++i) {  
-    this.data_stack.push(prev);
-    this.data_stack.push(seq[i]);
-    (quot)();
-    prev=this.data_stack.pop();
-  }
-  this.data_stack.push(prev);
-}
-
-Factor.prototype.fjsc_if = function() {
-  var else_quot = this.data_stack.pop();
-  var then_quot = this.data_stack.pop();
-  var condition = this.data_stack.pop();
-  if(condition) {
-    (then_quot)();
-  } else {
-    (else_quot)();
-  }
-}
-
-Factor.prototype.fjsc_equals = function() {
-  var v1 = this.data_stack.pop();
-  var v2 = this.data_stack.pop();
-  this.data_stack.push(v1==v2);
-}
-
-Factor.prototype.fjsc_clear = function() {
-  factor.data_stack = [ ]
-}
-
-Factor.prototype.fjsc_false = function() {
-  factor.data_stack.push(false);
-}
-
-Factor.prototype.fjsc_true = function() {
-  factor.data_stack.push(true);
-}
-
-Factor.prototype.fjsc_is_empty = function() {
-  factor.data_stack.push(factor.data_stack.pop().length==0);
-}
-
-Factor.prototype.fjsc_over = function() {
-   var stack = this.data_stack;
-   stack.push(stack[stack.length-2]);
-}
-
-Factor.prototype.fjsc_swap = function() {
-   var stack = this.data_stack; 
-   var len = stack.length;
-   var temp = stack[len-2];   
-   stack[len-2] = stack[len-1];
-   stack[len-1] = temp;
-}
-
-Factor.prototype.fjsc_window = function() {
-   var stack = this.data_stack;
-   stack.push(window);
-}
-
-Factor.prototype.fjsc_run_file = function() {
-   var self = this;
-   var stack = this.data_stack;
-   var url = stack.pop();
-   var callback = {
-     success: function(o) {
-       var result = o.responseText;
-       self.server_eval(result);
-     },
-     failure: function(o) {
-       alert('run-file failed');
-     }
-   };
-
-   YAHOO.util.Connect.asyncRequest('GET', url, callback, null);
-}
-
-Factor.prototype.fjsc_http_get = function() {
-   var self = this;
-   var stack = this.data_stack;
-   var url = stack.pop();
-   var callback = {
-     success: function(o) {
-       var result = o.responseText;
-       self.data_stack.push(result);
-       self.display_datastack();
-     },
-     failure: function(o) {
-       alert('http-get failed');
-     }
-   };
-
-   YAHOO.util.Connect.asyncRequest('GET', url, callback, null);
-}
-
-
-Factor.prototype.fjsc_bootstrap = function() {
-   this.data_stack.push("/responder/fjsc-resources/bootstrap.factor");
-   this.fjsc_run_file();
-}
-
-var factor = new Factor();

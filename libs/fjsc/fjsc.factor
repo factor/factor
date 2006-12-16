@@ -99,9 +99,9 @@ LAZY: 'atom' ( -- parser )
   'identifier' 'number' <|> 'string' <|> ;
 
 LAZY: 'alien' ( -- parser )
-  'array' [ ast-array-elements ast-expression-values [ ast-string-value ] map ] <@
+  'array' [ ast-array-elements ast-expression-values ] <@
   'string' [ ast-string-value ] <@ <&>
-  'array' [ ast-array-elements ast-expression-values [ ast-string-value ] map ] <@ <:&>
+  'array' [ ast-array-elements ast-expression-values ] <@ <:&>
   "alien-invoke" token sp <& [ first3 <ast-alien> ] <@ ;
 
 LAZY: 'comment' ( -- parser )
@@ -112,12 +112,12 @@ LAZY: 'comment' ( -- parser )
 
 LAZY: 'expression' ( -- parser )
   'comment' 
-  'define' sp <|>
-  'word' sp <|>
   'alien' sp <|>
-  'atom' sp <|> 
   'quotation' sp <|> 
   'array' sp <|>
+  'define' sp <|>
+  'word' sp <|>
+  'atom' sp <|> 
   <*> [ <ast-expression> ] <@ ;
 
 LAZY: 'statement' ( -- parser )
@@ -130,9 +130,9 @@ M: ast-number (literal)
   ast-number-value number>string , ;
 
 M: ast-number (compile) 
-  "factor.data_stack.push(" ,
+  "world.data_stack.push(" ,
   (literal)  
-  ")" , ;
+  ",world," , ;
 
 M: ast-string (literal) 
   "'" ,
@@ -142,30 +142,30 @@ M: ast-string (literal)
 M: ast-string (compile) 
   "factor.data_stack.push(" ,
   (literal)
-  ")" , ;
+  ",world," , ;
 
 M: ast-identifier (literal) 
-  "factor.words[\"" , ast-identifier-value , "\"]" ,  ;
+  "world.words[\"" , ast-identifier-value , "\"]" ,  ;
 
 M: ast-identifier (compile) 
-  (literal) "();" ,  ;
+  (literal) ".execute(world, " ,  ;
 
 M: ast-define (compile) 
-  "factor.words[\"" , 
+  "world.define_word(\"" , 
   dup ast-define-name ast-identifier-value , 
-  "\"]=function() { " ,  
+  "\",\"source\"," ,
   ast-define-expression (compile)
-  "}" , ;
+  ",world," , ;
 
 M: ast-quotation (literal)   
-  "function() { " ,  
+  "world.make_quotation(\"source\"," ,
   ast-quotation-expression (compile)
-  "}" , ;
+  ")" , ;
 
 M: ast-quotation (compile)   
-  "factor.data_stack.push(" ,  
-  (literal)
-  ")" , ;
+  "world.data_stack.push(world.make_quotation(\"source\"," ,
+  ast-quotation-expression (compile)
+  "),world," , ;
 
 M: ast-array (literal)   
   "[" ,  
@@ -173,30 +173,43 @@ M: ast-array (literal)
   "]" , ;
 
 M: ast-array (compile)   
-  "factor.data_stack.push(" ,  
-  (literal)
-  ")" , ;
+  "world.data_stack.push(" , (literal) ",world," , ;
+
 
 M: ast-expression (literal)
   ast-expression-values [
     (literal) 
   ] each ;
 
+: do-expressions ( seq -- )
+  dup empty? not [
+    unclip
+    dup ast-comment? not [
+      "function(world) {" ,
+      (compile) 
+      do-expressions
+      ")}" ,
+    ] [
+      drop do-expressions
+    ] if
+  ] [
+    drop "world.next" ,
+  ] if  ;
+  
 M: ast-expression (compile)
-  ast-expression-values [ (compile) ] [ ";" , ] interleave ;
+  ast-expression-values do-expressions ;
 
 M: ast-alien (compile)
+  "world.call_alien(" ,
   dup ast-alien-return empty? not [
-    "factor.data_stack.push(" ,
-  ] when
-  dup ast-alien-method ,
-  ".apply(" ,
-  "factor.data_stack.pop(), [" ,
-  dup ast-alien-args [ drop "factor.data_stack.pop()" , ] [ "," , ] interleave 
-  "])" ,
-  ast-alien-return empty? not [
-    ")" ,
-  ] when ;
+    "true," ,
+  ] [
+    "false," ,
+  ] if
+  dup ast-alien-method "\"" , , "\"," ,
+  "factor.data_stack.stack.pop(), [" ,
+  ast-alien-args [ drop "factor.data_stack.stack.pop()" , ] [ "," , ] interleave 
+  "],world," , ;
 
 M: ast-word (literal)   
   "factor.words[\"" , 
@@ -206,19 +219,32 @@ M: ast-word (literal)
 M: ast-word (compile)
   "factor.data_stack.push(" ,
   (literal)
-  ")" , ;
+  ",world," , ;
   
 M: ast-comment (compile)
-  drop "/* */" , ;
+  drop ;
 
 M: ast-stack-effect (compile)
   drop ;
 
 : fjsc-compile ( ast -- string )
   [
-    [ (compile) ] { } make [ write ] each
+    [ 
+      "(" ,
+      (compile) 
+      ")" ,
+    ] { } make [ write ] each
   ] string-out ;
   
+: fjsc-compile* ( string -- string )
+  'statement' parse car parse-result-parsed fjsc-compile ;
+
+: fc* ( string -- string )
+  [
+  'statement' parse car parse-result-parsed ast-expression-values do-expressions 
+  ] { } make [ write ] each ;
+  
+
 : fjsc-literal ( ast -- string )
   [
     [ (literal) ] { } make [ write ] each
