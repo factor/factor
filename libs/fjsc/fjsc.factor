@@ -12,7 +12,6 @@ TUPLE: ast-array elements ;
 TUPLE: ast-define name stack-effect expression ;
 TUPLE: ast-expression values ;
 TUPLE: ast-word value ;
-TUPLE: ast-alien return method args ;
 TUPLE: ast-comment ;
 TUPLE: ast-stack-effect in out ;
 
@@ -28,7 +27,7 @@ LAZY: 'quote' ( -- parser )
 LAZY: 'string' ( -- parser )
   'quote' sp [
     CHAR: " = not
-  ] satisfy <+> [ >string <ast-string> ] <@ &> 'quote' <& ;
+  ] satisfy <*> [ >string <ast-string> ] <@ &> 'quote' <& ;
  
 : identifier-middle? ( ch -- bool )
   [ blank? not ] keep
@@ -98,12 +97,6 @@ LAZY: 'word' ( -- parser )
 LAZY: 'atom' ( -- parser )
   'identifier' 'number' <|> 'string' <|> ;
 
-LAZY: 'alien' ( -- parser )
-  'array' [ ast-array-elements ] <@
-  'string' [ ast-string-value ] <@ <&>
-  'array' [ ast-array-elements ] <@ <:&>
-  "alien-invoke" token sp <& [ first3 <ast-alien> ] <@ ;
-
 LAZY: 'comment' ( -- parser )
   "#!" token sp
   "!" token sp <|> [
@@ -112,7 +105,6 @@ LAZY: 'comment' ( -- parser )
 
 LAZY: 'expression' ( -- parser )
   'comment' 
-  'alien' sp <|>
   'quotation' sp <|> 
   'array' sp <|>
   'define' sp <|>
@@ -199,18 +191,6 @@ M: ast-expression (literal)
 M: ast-expression (compile)
   ast-expression-values do-expressions ;
 
-M: ast-alien (compile)
-  "world.call_alien(" ,
-  dup ast-alien-return empty? not [
-    "true," ,
-  ] [
-    "false," ,
-  ] if
-  dup ast-alien-method "\"" , , "\"," ,
-  "factor.data_stack.stack.pop(), [" ,
-  ast-alien-args [ drop "factor.data_stack.stack.pop()" , ] [ "," , ] interleave 
-  "],world," , ;
-
 M: ast-word (literal)   
   "factor.words[\"" , 
   ast-word-value ,
@@ -260,7 +240,7 @@ M: string fjsc-parse ( object -- ast )
   'expression' parse car parse-result-parsed ;
 
 M: quotation fjsc-parse ( object -- ast )
-  (parse-factor-quotation) ;
+  (parse-factor-quotation) <ast-expression> ;
 
 : fjsc-compile ( ast -- string )
   [

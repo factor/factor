@@ -202,6 +202,23 @@ factor.words["continue"] = new Word("continue", "primitive", function(world, nex
   (cont.next)(world);
 });
 
+factor.words["alien-invoke"] = new Word("alien-invoke", "primitive", function(world, next) {  
+  var stack = world.data_stack.stack;
+  var arg_types = stack.pop();
+  var method_name = stack.pop();
+  var library_name = stack.pop();
+  var return_values = stack.pop();
+  var obj = stack.pop();
+  var args = [ ];
+  for(var i = 0; i < arg_types.length; ++i) {
+    args[i] = stack.pop();
+  }
+  var v = obj[method_name].apply(obj, args);
+  if(return_values.length > 0)
+    stack.push(v);
+  next(world);
+});
+
 Factor.prototype.define_word = function(name, source, func, world, next) {
   factor.words[name] = new Word(name, source, function(world, next) {
     var old = world.next;
