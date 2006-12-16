@@ -52,7 +52,7 @@ $terpri
     "5 0 -       ! Computes 5-0"
     "5 0 swap -  ! Computes 0-5"
 }
-"Also, in the above example a stack efect declaration is written between " { $snippet "(" } " and " { $snippet ")" } " with a mnemonic description of what the word does to the stack. See " { $link "effect-declaration" } " for details."
+"Also, in the above example a stack effect declaration is written between " { $snippet "(" } " and " { $snippet ")" } " with a mnemonic description of what the word does to the stack. See " { $link "effect-declaration" } " for details."
 { $curious
     "This syntax will be familiar to anybody who has used FORTH before. However the behavior is slightly different. In most FORTH systems, the below code prints 2, because the definition of " { $snippet "b" } " still refers to the previous definition of " { $snippet "b" } ":"
     { $code
