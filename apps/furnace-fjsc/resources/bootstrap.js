@@ -8,29 +8,21 @@ Word.prototype.execute = function(world, next) {
   this.func(world,next);
 }
 
-function Stack() {
-  this.stack = [];
+function Continuation() {
+  this.data_stack = [ ];
+  this.retain_stack = [ ];
 }
 
-Stack.prototype.push = function(v,world,next) {
-  this.stack.push(v);
-  next(world);
-}
-
-Stack.prototype.pop = function(world,next) {
-  this.stack.pop();
-  next(world);
-}
-
-Stack.prototype.clone = function() {
-  var stack = new Stack();
-  stack.stack = this.stack.slice(0);
-  return stack;
+Continuation.prototype.clone = function() {
+  var c = new Continuation();
+  c.data_stack = this.data_stack.slice(0);
+  c.retain_stack = this.retain_stack.slice(0);
+  return c;
 }
 
 function Factor() {
   this.words = { };
-  this.data_stack = new Stack();
+  this.cont = new Continuation();
   this.form = false ;
   this.next = false;
 }
@@ -38,51 +30,65 @@ function Factor() {
 var factor = new Factor();
 
 factor.words["dup"] = new Word("dup", "primitive", function(world, next) {
-  var stack = world.data_stack.stack;
+  var stack = world.cont.data_stack;
   stack[stack.length] = stack[stack.length-1];
   next(world);
 });
 
 factor.words["drop"] = new Word("drop", "primitive", function(world, next) {
-  world.data_stack.stack.pop();
+  world.cont.data_stack.pop();
   next(world);
 });
 
 factor.words["nip"] = new Word("nip", "primitive", function(world, next) {
-  var stack = world.data_stack.stack;
+  var stack = world.cont.data_stack;
   stack[stack.length-2] = stack[stack.length-1];
   stack.pop();
   next(world);
 });
 
 factor.words["over"] = new Word("over", "primitive", function(world, next) {
-  var stack = world.data_stack.stack;
+  var stack = world.cont.data_stack;
   stack[stack.length] = stack[stack.length-2];
   next(world);
 });
 
 factor.words["swap"] = new Word("swap", "primitive", function(world, next) {
-  var stack = world.data_stack.stack;
+  var stack = world.cont.data_stack;
   var temp = stack[stack.length-2];
   stack[stack.length-2] = stack[stack.length-1];
   stack[stack.length-1] = temp;
   next(world);
 });
 
+factor.words[">r"] = new Word(">r", "primitive", function(world, next) {
+  var data_stack = world.cont.data_stack;
+  var retain_stack = world.cont.retain_stack;
+  retain_stack.push(data_stack.pop());
+  next(world);
+});
+
+factor.words["r>"] = new Word("r>", "primitive", function(world, next) {
+  var data_stack = world.cont.data_stack;
+  var retain_stack = world.cont.retain_stack;
+  data_stack.push(retain_stack.pop());
+  next(world);
+});
+
 factor.words["*"] = new Word("*", "primitive", function(world, next) {
-  var stack = world.data_stack.stack;
+  var stack = world.cont.data_stack;
   stack.push(stack.pop() * stack.pop());
   next(world);
 });
 
 factor.words["+"] = new Word("+", "primitive", function(world, next) {
-  var stack = world.data_stack.stack;
+  var stack = world.cont.data_stack;
   stack.push(stack.pop() + stack.pop());
   next(world);
 });
 
 factor.words["-"] = new Word("-", "primitive", function(world, next) {
-  var stack = world.data_stack.stack;
+  var stack = world.cont.data_stack;
   var v1 = stack.pop();
   var v2 = stack.pop();
   stack.push(v2 - v1);
@@ -90,7 +96,7 @@ factor.words["-"] = new Word("-", "primitive", function(world, next) {
 });
 
 factor.words["/"] = new Word("/", "primitive", function(world, next) {
-  var stack = world.data_stack.stack;
+  var stack = world.cont.data_stack;
   var v1 = stack.pop();
   var v2 = stack.pop();
   stack.push(v2 / v1);
@@ -98,33 +104,34 @@ factor.words["/"] = new Word("/", "primitive", function(world, next) {
 });
 
 factor.words["."] = new Word(".", "primitive", function(world, next) {
-  alert(world.data_stack.stack.pop());
+  alert(world.cont.data_stack.pop());
   next(world);
 });
 
 factor.words["call"] = new Word("call", "primitive", function(world, next) {
-  var quot = world.data_stack.stack.pop();
+  var quot = world.cont.data_stack.pop();
   quot.execute(world, next);
 });
 
 factor.words["execute"] = new Word("execute", "primitive", function(world, next) {
-  var quot = world.data_stack.stack.pop();
+  var quot = world.cont.data_stack.pop();
   quot.execute(world, next);
 });
 
 factor.words["clear"] = new Word("clear", "primitive", function(world, next) {
-  world.data_stack.stack = [];
+  world.cont.data_stack = [];
+  world.cont.retain_stack = [];
   next(world);
 });
 
 factor.words["square"] = new Word("square", "primitive", function(world, next) {  
-  var stack = world.data_stack.stack;
+  var stack = world.cont.data_stack;
   stack[stack.length-1] = stack[stack.length-1] * stack[stack.length-1];
   next(world);
 });
 
 factor.words["if"] = new Word("if", "primitive", function(world, next) {  
-  var stack = world.data_stack.stack;
+  var stack = world.cont.data_stack;
   var else_quot = stack.pop();
   var then_quot = stack.pop();
   var condition = stack.pop();
@@ -136,33 +143,33 @@ factor.words["if"] = new Word("if", "primitive", function(world, next) {
 });
 
 factor.words["f"] = new Word("f", "primitive", function(world, next) {  
-  world.data_stack.stack.push(false);
+  world.cont.data_stack.push(false);
   next(world);
 });
 
 factor.words["t"] = new Word("t", "primitive", function(world, next) {  
-  world.data_stack.stack.push(true);
+  world.cont.data_stack.push(true);
   next(world);
 });
 
 factor.words["="] = new Word("=", "primitive", function(world, next) {   
-  var stack = world.data_stack.stack;
+  var stack = world.cont.data_stack;
   stack.push(stack.pop()==stack.pop());
   next(world);
 });
 
 factor.words["window"] = new Word("window", "primitive", function(world, next) {  
-  world.data_stack.stack.push(window);
+  world.cont.data_stack.push(window);
   next(world);
 });
 
 factor.words["bootstrap"] = new Word("bootstrap", "primitive", function(world, next) {  
-  world.data_stack.stack.push("/responder/fjsc-resources/bootstrap.factor");
+  world.cont.data_stack.push("/responder/fjsc-resources/bootstrap.factor");
   world.words["run-file"].execute(world, next);
 });
 
 factor.words["run-file"] = new Word("run-file", "primitive", function(world, next) {  
-  var stack = world.data_stack.stack;
+  var stack = world.cont.data_stack;
   var url = stack.pop();
   var callback = {
     success: function(o) {
@@ -178,9 +185,9 @@ factor.words["run-file"] = new Word("run-file", "primitive", function(world, nex
 });
 
 factor.words["callcc0"] = new Word("callcc0", "primitive", function(world, next) {  
-  var stack = world.data_stack;
-  var quot = stack.stack.pop();
-  var new_stack = stack.clone();  
+  var data_stack = world.cont.data_stack;
+  var quot = data_stack.pop();
+  var new_cont = world.cont.clone();  
   var old_next = world.next;
   var cont = {
     world: world,
@@ -188,22 +195,22 @@ factor.words["callcc0"] = new Word("callcc0", "primitive", function(world, next)
       world.next = old_next;
       next(world);
     },
-    stack: stack
+    cont: world.cont
   };
-  new_stack.stack.push(cont);
-  world.data_stack = new_stack;
+  new_cont.data_stack.push(cont);
+  world.cont = new_cont;;
   quot.execute(world, next);  
 });
 
 factor.words["continue"] = new Word("continue", "primitive", function(world, next) {  
-  var stack = world.data_stack;
-  var cont = stack.stack.pop(); 
-  world.data_stack = cont.stack.clone();
+  var data_stack = world.cont.data_stack;
+  var cont = data_stack.pop(); 
+  world.cont = cont.cont.clone();
   (cont.next)(world);
 });
 
 factor.words["alien-invoke"] = new Word("alien-invoke", "primitive", function(world, next) {  
-  var stack = world.data_stack.stack;
+  var stack = world.cont.data_stack;
   var arg_types = stack.pop();
   var method_name = stack.pop();
   var library_name = stack.pop();
@@ -218,6 +225,11 @@ factor.words["alien-invoke"] = new Word("alien-invoke", "primitive", function(wo
     stack.push(v);
   next(world);
 });
+
+Factor.prototype.push_data = function(v, world, next) {
+  world.cont.data_stack.push(v);
+  next(world);
+}
 
 Factor.prototype.define_word = function(name, source, func, world, next) {
   factor.words[name] = new Word(name, source, function(world, next) {
@@ -241,14 +253,6 @@ Factor.prototype.make_quotation = function(source, func) {
     func(world);
   });
 }
-
-Factor.prototype.call_alien = function(has_return,method_name, object, args, world, next) {
-  var v = object[method_name].apply(object, args);
-  if(has_return)
-    world.data_stack.stack.push(v);
-  next(world);
-}
-
 
 Factor.prototype.server_eval = function(text, world, next) {
    var self = this;
@@ -277,12 +281,11 @@ Factor.prototype.fjsc_eval = function(form) {
 Factor.prototype.display_datastack = function() {
    var html=[];
    html.push("<table border='1'>")
-   for(var i = 0; i < this.data_stack.stack.length; ++i) {
+   for(var i = 0; i < this.cont.data_stack.length; ++i) {
       html.push("<tr><td>")
-      html.push(this.data_stack.stack[i])
+      html.push(this.cont.data_stack[i])
       html.push("</td></tr>")
    }
    html.push("</table>")
    document.getElementById('stack').innerHTML=html.join("");
 }
-

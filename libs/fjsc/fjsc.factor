@@ -122,7 +122,7 @@ M: ast-number (literal)
   ast-number-value number>string , ;
 
 M: ast-number (compile) 
-  "world.data_stack.push(" ,
+  "world.push_data(" ,
   (literal)  
   ",world," , ;
 
@@ -132,7 +132,7 @@ M: ast-string (literal)
   "'" , ;
 
 M: ast-string (compile) 
-  "factor.data_stack.push(" ,
+  "factor.push_data(" ,
   (literal)
   ",world," , ;
 
@@ -170,7 +170,7 @@ M: ast-quotation (literal)
   ")" , ;
 
 M: ast-quotation (compile)   
-  "world.data_stack.push(world.make_quotation(\"source\"," ,
+  "world.push_data(world.make_quotation(\"source\"," ,
   ast-quotation-values do-expressions
   "),world," , ;
 
@@ -180,7 +180,7 @@ M: ast-array (literal)
   "]" , ;
 
 M: ast-array (compile)   
-  "world.data_stack.push(" , (literal) ",world," , ;
+  "world.push_data(" , (literal) ",world," , ;
 
 
 M: ast-expression (literal)
@@ -197,7 +197,7 @@ M: ast-word (literal)
   "\"]" , ;
 
 M: ast-word (compile)
-  "factor.data_stack.push(" ,
+  "factor.push_data(" ,
   (literal)
   ",world," , ;
   
