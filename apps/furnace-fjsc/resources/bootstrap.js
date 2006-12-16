@@ -22,6 +22,12 @@ Stack.prototype.pop = function(world,next) {
   next(world);
 }
 
+Stack.prototype.clone = function() {
+  var stack = new Stack();
+  stack.stack = this.stack.slice(0);
+  return stack;
+}
+
 function Factor() {
   this.words = { };
   this.data_stack = new Stack();
@@ -163,6 +169,31 @@ factor.words["run-file"] = new Word("run-file", "primitive", function(world, nex
     }
   };
   YAHOO.util.Connect.asyncRequest('GET', url, callback, null);
+});
+
+factor.words["callcc0"] = new Word("callcc0", "primitive", function(world, next) {  
+  var stack = world.data_stack;
+  var quot = stack.stack.pop();
+  var new_stack = stack.clone();  
+  var old_next = world.next;
+  var cont = {
+    world: world,
+    next: function(world) {
+      world.next = old_next;
+      next(world);
+    },
+    stack: stack
+  };
+  new_stack.stack.push(cont);
+  world.data_stack = new_stack;
+  quot.execute(world, next);  
+});
+
+factor.words["continue"] = new Word("continue", "primitive", function(world, next) {  
+  var stack = world.data_stack;
+  var cont = stack.stack.pop(); 
+  world.data_stack = cont.stack.clone();
+  (cont.next)(world);
 });
 
 Factor.prototype.define_word = function(name, source, func, world, next) {
