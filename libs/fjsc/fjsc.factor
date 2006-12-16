@@ -122,9 +122,9 @@ M: ast-number (literal)
   ast-number-value number>string , ;
 
 M: ast-number (compile) 
-  "world.push_data(" ,
+  "factor.push_data(" ,
   (literal)  
-  ",world," , ;
+  "," , ;
 
 M: ast-string (literal) 
   "'" ,
@@ -134,26 +134,26 @@ M: ast-string (literal)
 M: ast-string (compile) 
   "factor.push_data(" ,
   (literal)
-  ",world," , ;
+  "," , ;
 
 M: ast-identifier (literal) 
-  "world.words[\"" , ast-identifier-value , "\"]" ,  ;
+  "factor.words[\"" , ast-identifier-value , "\"]" ,  ;
 
 M: ast-identifier (compile) 
-  (literal) ".execute(world, " ,  ;
+  (literal) ".execute(" ,  ;
 
 M: ast-define (compile) 
-  "world.define_word(\"" , 
+  "factor.define_word(\"" , 
   dup ast-define-name , 
   "\",\"source\"," ,
   ast-define-expression (compile)
-  ",world," , ;
+  "," , ;
 
 : do-expressions ( seq -- )
   dup empty? not [
     unclip
     dup ast-comment? not [
-      "function(world) {" ,
+      "function() {" ,
       (compile) 
       do-expressions
       ")}" ,
@@ -161,18 +161,18 @@ M: ast-define (compile)
       drop do-expressions
     ] if
   ] [
-    drop "world.next" ,
+    drop "factor.next" ,
   ] if  ;
 
 M: ast-quotation (literal)   
-  "world.make_quotation(\"source\"," ,
+  "factor.make_quotation(\"source\"," ,
   ast-quotation-values do-expressions
   ")" , ;
 
 M: ast-quotation (compile)   
-  "world.push_data(world.make_quotation(\"source\"," ,
+  "factor.push_data(factor.make_quotation(\"source\"," ,
   ast-quotation-values do-expressions
-  "),world," , ;
+  ")," , ;
 
 M: ast-array (literal)   
   "[" ,  
@@ -180,7 +180,7 @@ M: ast-array (literal)
   "]" , ;
 
 M: ast-array (compile)   
-  "world.push_data(" , (literal) ",world," , ;
+  "factor.push_data(" , (literal) "," , ;
 
 
 M: ast-expression (literal)
@@ -199,7 +199,7 @@ M: ast-word (literal)
 M: ast-word (compile)
   "factor.push_data(" ,
   (literal)
-  ",world," , ;
+  "," , ;
   
 M: ast-comment (compile)
   drop ;
