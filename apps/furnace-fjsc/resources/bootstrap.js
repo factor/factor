@@ -145,6 +145,12 @@ factor.words["t"] = new Word("t", "primitive", function(world, next) {
   next(world);
 });
 
+factor.words["="] = new Word("=", "primitive", function(world, next) {   
+  var stack = world.data_stack.stack;
+  stack.push(stack.pop()==stack.pop());
+  next(world);
+});
+
 factor.words["window"] = new Word("window", "primitive", function(world, next) {  
   world.data_stack.stack.push(window);
   next(world);
