@@ -31,12 +31,14 @@ function Factor() {
 var factor = new Factor();
 
 Factor.prototype.call_next = function(next) {
-  if(this.nesting++ > 150) {
-    this.nesting = 0;
-    setTimeout(next, 0);
-  }
-  else {
-    next();
+  if(next) {
+    if(this.nesting++ > 150) {
+      this.nesting = 0;
+      setTimeout(next, 0);
+   }
+    else {
+      next();
+    }
   }
 }
 
@@ -297,5 +299,34 @@ factor.words["alien-invoke"] = new Word("alien-invoke", "primitive", function(ne
   var v = obj[method_name].apply(obj, args);
   if(return_values.length > 0)
     stack.push(v);
+  factor.call_next(next);
+});
+
+factor.words["map"] = new Word("map", "primitive", function(next) {   
+  var stack = factor.cont.data_stack;
+  var quot = stack.pop();
+  var seq = stack.pop();
+  var result = [ ];
+  for(var i=0;i<seq.length;++i) {  
+    stack.push(seq[i]);
+    quot.execute();
+    result[i]=stack.pop();
+  }
+  stack.push(result);
+  factor.call_next(next);
+});
+
+factor.words["reduce"] = new Word("reduce", "primitive", function(next) {   
+  var stack = factor.cont.data_stack;
+  var quot = stack.pop();
+  var prev = stack.pop();
+  var seq = stack.pop();
+  for(var i=0;i<seq.length;++i) {  
+    stack.push(prev);
+    stack.push(seq[i]);
+    quot.execute();
+    prev=stack.pop();
+  }
+  stack.push(prev);
   factor.call_next(next);
 });
