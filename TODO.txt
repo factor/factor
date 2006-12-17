@@ -5,6 +5,7 @@
 - ui docs
 - test factor on linux/ppc
 - auto-generate error-index
+- C+up/down broken
 
 + 0.88:
 
@@ -99,6 +100,8 @@
 
 + misc:
 
+- if a word drops the stack pointer below the bottom, then an error
+  won't be thrown until the next word accesses the stack
 - prettyprinter: clean it up
 - prettyprinter: don't build entire tree to print first
 - automatic help/effects for slot accessors

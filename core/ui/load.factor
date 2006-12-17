@@ -74,6 +74,7 @@ PROVIDE: core/ui
     "gadgets/sliders.facts"
     "gadgets/tracks.facts"
     "gadgets/viewports.facts"
+    "text/document.facts"
     "text/editor.facts"
 } }
 { +tests+ {

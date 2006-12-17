@@ -72,7 +72,7 @@ M: listener-gadget focusable-child*
     listener-gadget-input ;
 
 M: listener-gadget call-tool* ( input listener -- )
-    >r input-string r> listener-gadget-input set-editor-text ;
+    >r input-string r> listener-gadget-input set-editor-string ;
 
 M: listener-gadget tool-scroller
     listener-gadget-output find-scroller ;
@@ -97,7 +97,7 @@ M: listener-gadget tool-help
 
 : eval-listener ( string -- )
     get-listener
-    listener-gadget-input [ set-editor-text ] keep
+    listener-gadget-input [ set-editor-string ] keep
     interactor-commit ;
 
 : listener-run-files ( seq -- )

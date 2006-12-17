@@ -124,11 +124,14 @@ M: workspace focusable-child* workspace-book ;
 
 : tool-window ( class -- ) workspace-window show-tool 2drop ;
 
+M: workspace tool-scroller ( workspace -- scroller )
+    workspace-book current-page tool-scroller ;
+
 : tool-scroll-up ( workspace -- )
-    current-page tool-scroller [ scroll-up-page ] when* ;
+    tool-scroller [ scroll-up-page ] when* ;
 
 : tool-scroll-down ( workspace -- )
-    current-page tool-scroller [ scroll-down-page ] when* ;
+    tool-scroller [ scroll-down-page ] when* ;
 
 workspace "scrolling" {
     { "Scroll up" T{ key-down f { C+ } "PAGE_UP" } [ tool-scroll-up ] }

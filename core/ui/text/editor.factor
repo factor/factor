@@ -217,11 +217,11 @@ M: editor gadget-selection
 M: editor user-input*
     [ selection-start/end ] keep control-model set-doc-range t ;
 
-: editor-text ( editor -- str )
-    control-model doc-text ;
+: editor-string ( editor -- str )
+    control-model doc-string ;
 
-: set-editor-text ( str editor -- )
-    control-model set-doc-text ;
+: set-editor-string ( str editor -- )
+    control-model set-doc-string ;
 
 ! Editors support the stream output protocol
 M: editor stream-write1 >r ch>string r> stream-write ;

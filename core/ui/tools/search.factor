@@ -64,7 +64,7 @@ C: live-search ( string seq producer presenter -- gadget )
             @center
         }
     } make-frame*
-    [ live-search-field set-editor-text ] keep
+    [ live-search-field set-editor-string ] keep
     [ live-search-field editor-doc-end ] keep ;
 
 M: live-search focusable-child* live-search-field ;

@@ -327,7 +327,7 @@ M: operation invoke-command
 
 ! Interactor commands
 : quot-action ( interactor -- quot )
-    dup editor-text swap select-all ;
+    dup editor-string swap select-all ;
 
 interactor "words"
 { word compound } [ class-operations ] map concat

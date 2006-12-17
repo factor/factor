@@ -4,15 +4,15 @@ IN: gadgets-text
 USING: arrays generic io kernel math models namespaces sequences
 strings test ;
 
-: +col ( loc n -- loc ) >r first2 r> + 2array ;
+: +col ( loc n -- newloc ) >r first2 r> + 2array ;
 
-: +line ( loc n -- loc ) >r first2 swap r> + swap 2array ;
+: +line ( loc n -- newloc ) >r first2 swap r> + swap 2array ;
 
-: =col ( n loc -- loc ) first swap 2array ;
+: =col ( n loc -- newloc ) first swap 2array ;
 
-: =line ( n loc -- loc ) second 2array ;
+: =line ( n loc -- newloc ) second 2array ;
 
-: lines-equal? ( loc loc -- n ) [ first ] 2apply number= ;
+: lines-equal? ( loc1 loc2 -- n ) [ first ] 2apply number= ;
 
 TUPLE: document locs ;
 
@@ -27,9 +27,9 @@ C: document ( -- document )
 : update-locs ( loc document -- )
     document-locs [ set-model ] each-with ;
 
-: doc-line ( line# document -- str ) model-value nth ;
+: doc-line ( n document -- string ) model-value nth ;
 
-: doc-lines ( from# to# document -- slice )
+: doc-lines ( from to document -- slice )
     >r 1+ r> model-value <slice> ;
 
 : start-on-line ( document from line# -- n1 )
@@ -42,21 +42,21 @@ C: document ( -- document )
         nip swap doc-line length
     ] if ;
 
-: each-line ( startloc endloc quot -- )
+: each-line ( from to quot -- )
     pick pick = [
         3drop
     ] [
         >r [ first ] 2apply 1+ dup <slice> r> each
     ] if ; inline
 
-: start/end-on-line ( startloc endloc line# -- n1 n2 )
+: start/end-on-line ( from to line# -- n1 n2 )
     tuck >r >r document get -rot start-on-line r> r>
     document get -rot end-on-line ;
 
-: (doc-range) ( startloc endloc line# -- )
+: (doc-range) ( from to line# -- )
     [ start/end-on-line ] keep document get doc-line <slice> , ;
 
-: doc-range ( startloc endloc document -- str )
+: doc-range ( from to document -- string )
     [
         document set 2dup [
             >r 2dup r> (doc-range)
@@ -79,22 +79,22 @@ C: document ( -- document )
 : loc-col/str ( loc document -- str col )
     >r first2 swap r> nth swap ;
 
-: prepare-insert ( newinput startloc endloc lines -- newinput )
+: prepare-insert ( newinput from to lines -- newinput )
     tuck loc-col/str tail-slice >r loc-col/str head-slice r>
     pick append-last over prepend-first ;
 
-: (set-doc-range) ( newlines startloc endloc lines -- newlines )
+: (set-doc-range) ( newlines from to lines -- newlines )
     [ prepare-insert ] 3keep
     >r [ first ] 2apply 1+ r>
     replace-slice ;
 
-: set-doc-range ( str startloc endloc document -- )
+: set-doc-range ( string from to document -- )
     [
         >r >r >r string-lines r> [ text+loc ] 2keep r> r>
         [ (set-doc-range) ] change-model
     ] keep update-locs ;
 
-: remove-doc-range ( startloc endloc document -- )
+: remove-doc-range ( from to document -- )
     >r >r >r "" r> r> r> set-doc-range ;
 
 : validate-line ( line document -- line )
@@ -103,7 +103,7 @@ C: document ( -- document )
 : validate-col ( col line document -- col )
     doc-line length min 0 max ;
 
-: validate-loc ( loc document -- loc )
+: validate-loc ( loc document -- newloc )
     >r first2 swap r> [ validate-line ] keep
     >r tuck r> validate-col 2array ;
 
@@ -116,14 +116,14 @@ C: document ( -- document )
 : doc-end ( document -- loc )
     model-value dup length 1- swap peek length 2array ;
 
-: doc-text ( document -- str )
+: doc-string ( document -- str )
     model-value "\n" join ;
 
 : set-doc-lines ( seq document -- )
     [ set-model ] keep dup doc-end swap update-locs ;
 
-: set-doc-text ( string document -- )
+: set-doc-string ( string document -- )
     >r string-lines r> set-doc-lines ;
 
 : clear-doc ( document -- )
-    "" swap set-doc-text ;
+    "" swap set-doc-string ;

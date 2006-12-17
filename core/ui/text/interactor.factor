@@ -33,7 +33,7 @@ M: interactor graft*
     over empty? [ 2drop ] [ interactor-history push-new ] if ;
 
 : interactor-finish ( obj interactor -- )
-    [ editor-text ] keep
+    [ editor-string ] keep
     [ interactor-input. ] 2keep
     [ add-interactor-history ] keep
     dup control-model clear-doc
@@ -41,7 +41,7 @@ M: interactor graft*
 
 : interactor-eval ( interactor -- )
     [
-        [ editor-text ] keep dup interactor-quot call
+        [ editor-string ] keep dup interactor-quot call
     ] in-thread drop ;
 
 : interactor-eof ( interactor -- )
