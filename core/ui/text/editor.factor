@@ -46,9 +46,9 @@ M: editor model-changed
     over editor-mark [ over validate-loc ] (change-model)
     drop relayout ;
 
-: editor-caret* editor-caret model-value ;
+: editor-caret* ( editor -- loc ) editor-caret model-value ;
 
-: editor-mark* editor-mark model-value ;
+: editor-mark* ( editor -- loc ) editor-mark model-value ;
 
 : change-caret ( editor quot -- )
     over >r >r dup editor-caret* swap control-model r> call r>
@@ -68,8 +68,7 @@ M: editor model-changed
 : line-height ( editor -- n )
     editor-font* font-height ;
 
-: run-char-widths ( str editor -- wlist )
-    #! List of x co-ordinates of each character.
+: run-char-widths ( string editor -- widths )
     editor-font* swap >array [ char-width ] map-with
     dup 0 [ + ] accumulate nip swap 2 v/n v+ ;
 
@@ -217,10 +216,10 @@ M: editor gadget-selection
 M: editor user-input*
     [ selection-start/end ] keep control-model set-doc-range t ;
 
-: editor-string ( editor -- str )
+: editor-string ( editor -- string )
     control-model doc-string ;
 
-: set-editor-string ( str editor -- )
+: set-editor-string ( string editor -- )
     control-model set-doc-string ;
 
 ! Editors support the stream output protocol

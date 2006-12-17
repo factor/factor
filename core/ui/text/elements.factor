@@ -1,8 +1,8 @@
 IN: gadgets-text
 USING: arrays kernel math sequences strings models ;
 
-GENERIC: prev-elt ( loc document elt -- loc )
-GENERIC: next-elt ( loc document elt -- loc )
+GENERIC: prev-elt ( loc document elt -- newloc )
+GENERIC: next-elt ( loc document elt -- newloc )
 
 TUPLE: char-elt ;
 

@@ -1,8 +1,8 @@
 IN: gadgets-text
-USING: help gadgets ;
+USING: help gadgets gadgets-scrolling models strings ;
 
 HELP: editor
-{ $class-description "Instances of this class are multi-line text editors which edit an underlying " { $link document } " model."
+{ $class-description "An editor is a " { $link control } " for editing a multi-line passage of text stored in a " { $link document } " model. Editors are crated by calling " { $link <editor> } "."
 $terpri
 "The " { $link interactor } " gadget is built off the " { $link editor } " gadget and is used by the " { $link "ui-listener" } "." }
 { $heading "General commands" }
@@ -10,4 +10,82 @@ $terpri
 { $heading "Caret motion commands" }
 { $commands editor "caret" }
 { $heading "Selection commands" }
-{ $commands editor "selection" } ;
+{ $commands editor "selection" }
+{ $heading "Slots" }
+"Editors have the following slots:"
+{ $list
+    { { $link editor-font } " - a font specifier." }
+    { { $link editor-color } " - text color specifier." }
+    { { $link editor-caret-color } " - caret color specifier." }
+    { { $link editor-selection-color } " - selection background color specifier." }
+    { { $link editor-caret } " - a model storing a line/column pair." }
+    { { $link editor-mark } " - a model storing a line/column pair. If there is no selection, the mark is equal to the caret, otherwise the mark is located at the opposite end of the selection from the caret." }
+    { { $link editor-focused? } " - a boolean." }
+} ;
+
+HELP: loc-monitor
+{ $class-description "Instances of this class are used internally by " { $link editor } " controls to redraw the editor when the caret or mark is moved by calling " { $link set-model } " on " { $link editor-caret } " or " { $link editor-mark } "." } ;
+
+HELP: <editor>
+{ $values { "editor" "a new " { $link editor } } }
+{ $description "Creates a new " { $link editor } " with an empty document." } ;
+
+HELP: editor-caret ( editor -- model )
+{ $values { "editor" editor } { "model" model } }
+{ $values "Outputs a " { $link model } " holding the current caret location." }
+{ $see-also editor-caret editor-mark editor-mark* } ;
+
+HELP: editor-caret*
+{ $values { "editor" editor } { "loc" "a pair of integers" } }
+{ $values "Outputs the current caret location as a line/column number pair." }
+{ $see-also editor-caret editor-mark editor-mark* } ;
+
+HELP: editor-mark ( editor -- model )
+{ $values { "editor" editor } { "model" model } }
+{ $values "Outputs a " { $link model } " holding the current mark location." }
+{ $see-also editor-mark editor-mark editor-mark* } ;
+
+HELP: editor-mark*
+{ $values { "editor" editor } { "loc" "a pair of integers" } }
+{ $values "Outputs the current mark location as a line/column number pair." }
+{ $see-also editor-mark editor-mark editor-mark* } ;
+
+HELP: change-caret
+{ $values { "editor" editor } { "quot" "a quotation with stack effect " { $snippet "( loc -- newloc )" } } }
+{ $description "Applies a quotation to the current caret location and moves the caret to the location output by the quotation." }
+{ $see-also mark>caret change-caret&mark } ;
+
+HELP: mark>caret
+{ $values { "editor" editor } }
+{ $description "Moves the mark to the caret location, effectively deselecting any selected text." }
+{ $see-also editor-caret editor-mark change-caret change-caret&mark } ;
+
+HELP: change-caret&mark
+{ $values { "editor" editor } { "quot" "a quotation with stack effect " { $snippet "( loc -- newloc )" } } }
+{ $description "Applies a quotation to the current caret location and moves the caret and the mark to the location output by the quotation." }
+{ $see-also mark>caret change-caret } ;
+
+HELP: run-char-widths
+{ $values { "string" string } { "editor" editor } { "widths" "a sequence of integers" } }
+{ $description "Outputs a sequence of x co-ordinates of the midpoint of each character in the string." }
+{ $notes "This word is used to convert x offsets to document locations, for example when the user moves the caret by clicking the mouse." } ;
+
+HELP: point>loc
+{ $values { "point" "a pair of integers" } { "editor" editor } { "loc" "a pair of integers" } }
+{ $description "Converts a point to a line/column number pair." } ;
+
+HELP: scroll>caret
+{ $values { "editor" editor } }
+{ $description "Ensures that the caret becomes visible in a " { $link scroller } " containing the editor. Does nothing if no parent of " { $snippet "gadget" } " is a " { $link scroller } "." } ;
+
+HELP: remove-editor-selection
+{ $values { "editor" editor } }
+{ $description "Removes currently selected text from the editor's " { $link document } "." } ;
+
+HELP: editor-string
+{ $values { "editor" editor } { "string" string } }
+{ $description "Outputs the contents of the editor's " { $link document } " as a string. Lines are separated by " { $snippet "\\n" } "." } ;
+
+HELP: set-editor-string
+{ $values { "array" "an array of strings" } { "editor" editor } }
+{ $description "Sets the contents of the editor's " { $link document } " to a string,  which may use either " { $snippet "\\n" } ", " { $snippet "\\r\\n" } " or " { $snippet "\\r" } " line separators." } ;

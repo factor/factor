@@ -76,6 +76,8 @@ PROVIDE: core/ui
     "gadgets/viewports.facts"
     "text/document.facts"
     "text/editor.facts"
+    "text/elements.facts"
+    "text/interactor.facts"
 } }
 { +tests+ {
     "test/editor.factor"

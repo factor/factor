@@ -77,7 +77,7 @@ HELP: doc-end
 
 HELP: doc-string
 { $values { "document" document } { "string" "a new " { $link string } } }
-{ $description "Outputs the contents of the document as a string." } ;
+{ $description "Outputs the contents of the document as a string. Lines are separated by " { $snippet "\\n" } "." } ;
 
 HELP: set-doc-lines
 { $values { "array" "an array of strings" } { "document" document } }

@@ -5,7 +5,6 @@
 - ui docs
 - test factor on linux/ppc
 - auto-generate error-index
-- C+up/down broken
 
 + 0.88:
 

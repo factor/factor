@@ -15,4 +15,5 @@ PROVIDE: core/ui/tools
 } }
 { +tests+ {
     "test/listener.factor"
+    "test/workspace.factor"
 } } ;

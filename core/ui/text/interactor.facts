@@ -1,0 +1,9 @@
+IN: gadgets-text
+USING: gadgets listener io help ;
+
+HELP: interactor
+{ $class-description "An interactor is an " { $link editor } " intended to be used as the input component of a " { $link "ui-listener" } "."
+$terpri
+"Interactors are created by calling " { $link <interactor> } "."
+$terpri
+"Interactors implement the " { $link stream-readln } ", " { $link stream-read } " and " { $link parse-interactive } " generic words." } ;

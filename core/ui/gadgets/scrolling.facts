@@ -30,12 +30,12 @@ HELP: relative-scroll-rect
 
 HELP: scroll>rect
 { $values { "rect" rect } { "gadget" gadget } }
-{ $description "Ensures that a rectangular region relative to the top-left corner of " { $snippet "gadget" } " becomes visible in a scroller containing " { $snippet "gadget" } ". If no parent of " { $snippet "scroller" } " is a gadget, does nothing." }
+{ $description "Ensures that a rectangular region relative to the top-left corner of " { $snippet "gadget" } " becomes visible in a " { $link scroller } " containing " { $snippet "gadget" } ". Does nothing if no parent of " { $snippet "gadget" } " is a " { $link scroller } "." }
 { $see-also scroll>bottom scroll>top } ;
 
 HELP: scroll>bottom
 { $values { "gadget" gadget } }
-{ $description "Ensures that any scroller containing " { $snippet "gadget" } " is scrolled all the way down. If no parent of " { $snippet "scroller" } " is a gadget, does nothing." }
+{ $description "Ensures that any " { $link scroller } " containing " { $snippet "gadget" } " is scrolled all the way down. Does nothing if no parent of " { $snippet "gadget" } " is a " { $link scroller } "." }
 { $see-also scroll>rect scroll>top } ;
 
 HELP: scroll>top
