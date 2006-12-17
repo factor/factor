@@ -4,7 +4,6 @@
 - error popup obscures input area
 - ui docs
 - test factor on linux/ppc
-- auto-generate error-index
 
 + 0.88:
 
