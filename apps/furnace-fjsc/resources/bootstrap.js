@@ -84,6 +84,15 @@ Factor.prototype.add_word = function(vocab,name, source, func) {
   }
   v[name] = new Word(vocab,name,source,func);
 }
+
+Factor.prototype.remove_word = function(vocab,name) {
+  var v = factor.vocabs[vocab];
+  if(!v) {
+    v = { };
+    factor.vocabs[vocab] = v;
+  }
+  delete v[name];
+}
     
 Factor.prototype.define_word = function(name, source, func, next) {
   factor.vocabs[factor.in_vocab][name] = new Word(factor.in_vocab, name, source, function(next) {
@@ -301,6 +310,13 @@ factor.add_word("kernel", "using", "primitive", function(next) {
 factor.add_word("kernel", "current-using", "primitive", function(next) {   
   var stack = factor.cont.data_stack;
   stack.push(factor.using_vocabs);
+  factor.call_next(next);  
+});
+
+factor.add_word("kernel", "forget", "primitive", function(next) {   
+  var stack = factor.cont.data_stack;
+  var word = stack.pop();
+  factor.remove_word(word.vocab, word.name);
   factor.call_next(next);  
 });
 
