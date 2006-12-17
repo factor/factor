@@ -243,22 +243,32 @@ factor.add_word("kernel", "callcc0", "primitive", function(next) {
   var quot = data_stack.pop();
   var new_cont = factor.cont.clone();  
   var old_next = factor.cont.next;
-  var cont = {
-    next: function() {
+  factor.cont.next = function() {
       factor.cont.next = old_next;
       factor.call_next(next);
-    },
-    cont: factor.cont
-  };
-  new_cont.data_stack.push(cont);
-  factor.cont = new_cont;;
+  }
+  new_cont.data_stack.push(factor.cont);
+  factor.cont = new_cont;
   quot.execute(next);  
+});
+
+factor.add_word("kernel", "callcc1", "primitive", function(next) {  
+  factor.get_word("kernel", "callcc0").execute(next);
 });
 
 factor.add_word("kernel", "continue", "primitive", function(next) {  
   var data_stack = factor.cont.data_stack;
   var cont = data_stack.pop(); 
-  factor.cont = cont.cont.clone();
+  factor.cont = cont.clone();
+  factor.call_next(cont.next);
+});
+
+factor.add_word("kernel", "continue-with", "primitive", function(next) {  
+  var data_stack = factor.cont.data_stack;
+  var cont = data_stack.pop(); 
+  var data = data_stack.pop(); 
+  factor.cont = cont.clone();
+  factor.cont.data_stack.push(data);
   factor.call_next(cont.next);
 });
 
