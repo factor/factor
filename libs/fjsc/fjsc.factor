@@ -129,9 +129,9 @@ M: ast-number (compile)
   "," , ;
 
 M: ast-string (literal) 
-  "'" ,
+  "\"" ,
   ast-string-value ,
-  "'" , ;
+  "\"" , ;
 
 M: ast-string (compile) 
   "factor.push_data(" ,

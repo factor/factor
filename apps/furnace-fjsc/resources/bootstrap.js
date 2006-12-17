@@ -330,6 +330,25 @@ factor.add_word("kernel", "forget", "primitive", function(next) {
   factor.call_next(next);  
 });
 
+factor.add_word("kernel", ">function", "primitive", function(next) {   
+  var stack = factor.cont.data_stack;
+  var word = stack.pop();
+  stack.push(function() { word.func(function() { }) });
+  factor.call_next(next);  
+});
+
+factor.add_word("kernel", "curry", "primitive", function(next) {   
+  var stack = factor.cont.data_stack;
+  var quot = stack.pop();
+  var value = stack.pop();
+  
+  stack.push(factor.make_quotation("quotation", function(next) {
+    factor.cont.data_stack.push(value);   
+    quot.execute(factor.cont.next);
+  }));
+  factor.call_next(next);
+});
+
 /* Math vocabulary */
 factor.add_word("math", "*", "primitive", function(next) {
   var stack = factor.cont.data_stack;
@@ -384,7 +403,7 @@ factor.add_word("alien", "alien-invoke", "primitive", function(next) {
   for(var i = 0; i < arg_types.length; ++i) {
     args[i] = stack.pop();
   }
-  var v = obj[method_name].apply(obj, args);
+  var v = obj[method_name].apply(obj, args.reverse());
   if(return_values.length > 0)
     stack.push(v);
   factor.call_next(next);
@@ -396,6 +415,15 @@ factor.add_word("alien", "alien-property", "primitive", function(next) {
   var property_name = stack.pop();
   var v = obj[property_name];
   stack.push(v);
+  factor.call_next(next);
+});
+
+factor.add_word("alien", "set-alien-property", "primitive", function(next) {  
+  var stack = factor.cont.data_stack;
+  var obj = stack.pop();
+  var property_name = stack.pop();
+  var data = stack.pop();
+  obj[property_name] = v;
   factor.call_next(next);
 });
 
