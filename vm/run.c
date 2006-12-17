@@ -263,19 +263,27 @@ CELL allot_native_stack_trace(void)
 	F_STACK_FRAME *frame = native_stack_pointer();
 	GROWABLE_ARRAY(array);
 
-	while((CELL)frame < (CELL)stack_chain->native_stack_pointer)
+	while(frame < stack_chain->native_stack_pointer)
 	{
-		REGISTER_ARRAY(array);
-		CELL cell = allot_cell((CELL)frame->return_address);
-		UNREGISTER_ARRAY(array);
-		GROWABLE_ADD(array,cell);
-		if((CELL)frame->previous <= (CELL)frame)
+		CELL return_address = RETURN_ADDRESS(frame);
+
+		if(return_address >= compiling.base
+			&& return_address <= compiling.limit)
 		{
-			fprintf(stderr,"Factor warning: unusual C stack layout\n");
+			REGISTER_ARRAY(array);
+			CELL cell = allot_cell(return_address);
+			UNREGISTER_ARRAY(array);
+			GROWABLE_ADD(array,cell);
+		}
+
+		if(PREVIOUS_FRAME(frame) <= frame)
+		{
+			fprintf(stderr,"*** Unusual C stack layout (why?)\n");
 			fflush(stderr);
 			break;
 		}
-		frame = frame->previous;
+
+		frame = PREVIOUS_FRAME(frame);
 	}
 
 	GROWABLE_TRIM(array);
@@ -288,7 +296,7 @@ void throw_error(CELL error, bool keep_stacks)
 	early_error(error);
 
 	REGISTER_ROOT(error);
-	thrown_native_stack_trace = F; /* allot_native_stack_trace(); */
+	thrown_native_stack_trace = allot_native_stack_trace();
 	UNREGISTER_ROOT(error);
 
 	throwing = true;

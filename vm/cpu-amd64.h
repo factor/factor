@@ -10,5 +10,8 @@ void *native_stack_pointer(void);
 
 typedef struct _F_STACK_FRAME {
 	struct _F_STACK_FRAME *previous;
-	CELL *return_address;
+	CELL return_address;
 } F_STACK_FRAME;
+
+#define PREVIOUS_FRAME(frame) (frame->previous)
+#define RETURN_ADDRESS(frame) (frame->return_address)

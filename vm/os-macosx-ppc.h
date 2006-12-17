@@ -1,7 +1,7 @@
 typedef struct _F_STACK_FRAME {
 	struct _F_STACK_FRAME *previous;
 	CELL padding1;
-	CELL *return_address;
+	CELL return_address;
 	CELL padding2;
 } F_STACK_FRAME;
 

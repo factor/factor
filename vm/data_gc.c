@@ -311,7 +311,7 @@ the user environment and extra roots registered with REGISTER_ROOT */
 void collect_roots(void)
 {
 	int i;
-	F_STACKS *stacks;
+	F_CONTEXT *stacks;
 
 	copy_handle(&T);
 	copy_handle(&bignum_zero);

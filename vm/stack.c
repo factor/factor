@@ -43,7 +43,7 @@ void save_stacks(void)
 /* called on entry into a compiled callback */
 void nest_stacks(void)
 {
-	F_STACKS *new_stacks = safe_malloc(sizeof(F_STACKS));
+	F_CONTEXT *new_stacks = safe_malloc(sizeof(F_CONTEXT));
 	
 	/* note that these register values are not necessarily valid stack
 	pointers. they are merely saved non-volatile registers, and are
@@ -101,7 +101,7 @@ void unnest_stacks(void)
 
 	extra_roots = stack_chain->extra_roots;
 
-	F_STACKS *old_stacks = stack_chain;
+	F_CONTEXT *old_stacks = stack_chain;
 	stack_chain = old_stacks->next;
 	free(old_stacks);
 }

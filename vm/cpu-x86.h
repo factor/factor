@@ -8,7 +8,7 @@ INLINE void flush_icache(CELL start, CELL len) {}
 
 void *native_stack_pointer(void);
 
-typedef struct _F_STACK_FRAME {
-	struct _F_STACK_FRAME *previous;
-	CELL *return_address;
-} F_STACK_FRAME;
+typedef CELL F_STACK_FRAME;
+
+#define PREVIOUS_FRAME(frame) (frame + 1)
+#define RETURN_ADDRESS(frame) (*(frame))

@@ -245,15 +245,15 @@ void primitive_resize_string(void)
 	void primitive_memory_to_##type##_string(void) \
 	{ \
 		CELL length = unbox_unsigned_cell(); \
-		type *string = (type*)unbox_unsigned_cell(); \
+		const type *string = (const type*)unbox_unsigned_cell(); \
 		dpush(tag_object(memory_to_##type##_string(string,length))); \
 	} \
 	F_STRING *from_##type##_string(const type *str) \
 	{ \
 		CELL length = 0; \
-		type *scan = str; \
+		const type *scan = str; \
 		while(*scan++) length++; \
-		return memory_to_##type##_string((type*)str,length); \
+		return memory_to_##type##_string(str,length); \
 	} \
 	void box_##type##_string(const type *str) \
 	{ \

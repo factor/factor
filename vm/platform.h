@@ -27,7 +27,11 @@
 		#ifdef __FreeBSD__
 			#include "os-freebsd.h"
 		#elif defined(linux)
-				#include "os-linux.h"
+			#ifdef FACTOR_PPC
+				#include "os-linux-ppc.h"
+			#endif
+
+			#include "os-linux.h"
 		#elif defined(__sun)
 			#include "os-solaris.h"
 		#else
