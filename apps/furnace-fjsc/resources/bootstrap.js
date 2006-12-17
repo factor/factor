@@ -145,6 +145,7 @@ Factor.prototype.display_datastack = function() {
    document.getElementById('stack').innerHTML=html.join("");
 }
 
+/* Kernel Vocabulary */
 factor.add_word("kernel","dup", "primitive", function(next) {
   var stack = factor.cont.data_stack;
   stack[stack.length] = stack[stack.length-1];
@@ -188,39 +189,6 @@ factor.add_word("kernel", "r>", "primitive", function(next) {
   var data_stack = factor.cont.data_stack;
   var retain_stack = factor.cont.retain_stack;
   data_stack.push(retain_stack.pop());
-  factor.call_next(next);
-});
-
-factor.add_word("math", "*", "primitive", function(next) {
-  var stack = factor.cont.data_stack;
-  stack.push(stack.pop() * stack.pop());
-  factor.call_next(next);
-});
-
-factor.add_word("math", "+", "primitive", function(next) {
-  var stack = factor.cont.data_stack;
-  stack.push(stack.pop() + stack.pop());
-  factor.call_next(next);
-});
-
-factor.add_word("math", "-", "primitive", function(next) {
-  var stack = factor.cont.data_stack;
-  var v1 = stack.pop();
-  var v2 = stack.pop();
-  stack.push(v2 - v1);
-  factor.call_next(next);
-});
-
-factor.add_word("math", "/", "primitive", function(next) {
-  var stack = factor.cont.data_stack;
-  var v1 = stack.pop();
-  var v2 = stack.pop();
-  stack.push(v2 / v1);
-  factor.call_next(next);
-});
-
-factor.add_word("prettyprint", ".", "primitive", function(next) {
-  alert(factor.cont.data_stack.pop());
   factor.call_next(next);
 });
 
@@ -268,30 +236,9 @@ factor.add_word("kernel", "=", "primitive", function(next) {
   factor.call_next(next);
 });
 
-factor.add_word("browser-dom", "window", "primitive", function(next) {  
-  factor.cont.data_stack.push(window);
-  factor.call_next(next);
-});
-
 factor.add_word("kernel", "bootstrap", "primitive", function(next) {  
   factor.cont.data_stack.push("/responder/fjsc-resources/bootstrap.factor");
   factor.get_word("parser", "run-file").execute(next);
-});
-
-factor.add_word("parser", "run-file", "primitive", function(next) {  
-  var stack = factor.cont.data_stack;
-  var url = stack.pop();
-  var callback = {
-    success: function(o) {
-      var result = o.responseText;
-      factor.server_eval(result, next);
-    },
-    failure: function(o) {
-      alert('run-file failed');
-      factor.call_next(next);
-    }
-  };
-  YAHOO.util.Connect.asyncRequest('GET', url, callback, null);
 });
 
 factor.add_word("kernel", "callcc0", "primitive", function(next) {  
@@ -316,57 +263,6 @@ factor.add_word("kernel", "continue", "primitive", function(next) {
   var cont = data_stack.pop(); 
   factor.cont = cont.cont.clone();
   factor.call_next(cont.next);
-});
-
-factor.add_word("alien", "alien-invoke", "primitive", function(next) {  
-  var stack = factor.cont.data_stack;
-  var arg_types = stack.pop();
-  var method_name = stack.pop();
-  var library_name = stack.pop();
-  var return_values = stack.pop();
-  var obj = stack.pop();
-  var args = [ ];
-  for(var i = 0; i < arg_types.length; ++i) {
-    args[i] = stack.pop();
-  }
-  var v = obj[method_name].apply(obj, args);
-  if(return_values.length > 0)
-    stack.push(v);
-  factor.call_next(next);
-});
-
-
-factor.add_word("words", "vocabs", "primitive", function(next) {   
-  var stack = factor.cont.data_stack;
-  var result = [];
-  for(v in factor.vocabs) {
-    result.push(v);
-  }
-  stack.push(result);
-  factor.call_next(next);
-});
-
-factor.add_word("words", "words", "primitive", function(next) {   
-  var stack = factor.cont.data_stack;
-  var vocab = factor.vocabs[stack.pop()];
-  var result = [];
-  for(w in vocab) {
-    result.push(vocab[w]);
-  }
-  stack.push(result);
-  factor.call_next(next);
-});
-
-factor.add_word("words", "all-words", "primitive", function(next) {   
-  var stack = factor.cont.data_stack;
-  var result = [];
-  for(v in factor.vocabs) {
-    for(w in factor.vocabs[v]) {
-      result.push(factor.vocabs[v][w]);
-    }
-  }
-  stack.push(result);
-  factor.call_next(next);
 });
 
 factor.add_word("kernel", "in", "primitive", function(next) {   
@@ -418,6 +314,107 @@ factor.add_word("kernel", "current-using", "primitive", function(next) {
   var stack = factor.cont.data_stack;
   stack.push(factor.using_vocabs);
   factor.call_next(next);  
+});
+
+/* Math vocabulary */
+factor.add_word("math", "*", "primitive", function(next) {
+  var stack = factor.cont.data_stack;
+  stack.push(stack.pop() * stack.pop());
+  factor.call_next(next);
+});
+
+factor.add_word("math", "+", "primitive", function(next) {
+  var stack = factor.cont.data_stack;
+  stack.push(stack.pop() + stack.pop());
+  factor.call_next(next);
+});
+
+factor.add_word("math", "-", "primitive", function(next) {
+  var stack = factor.cont.data_stack;
+  var v1 = stack.pop();
+  var v2 = stack.pop();
+  stack.push(v2 - v1);
+  factor.call_next(next);
+});
+
+factor.add_word("math", "/", "primitive", function(next) {
+  var stack = factor.cont.data_stack;
+  var v1 = stack.pop();
+  var v2 = stack.pop();
+  stack.push(v2 / v1);
+  factor.call_next(next);
+});
+
+factor.add_word("prettyprint", ".", "primitive", function(next) {
+  alert(factor.cont.data_stack.pop());
+  factor.call_next(next);
+});
+
+factor.add_word("parser", "run-file", "primitive", function(next) {  
+  var stack = factor.cont.data_stack;
+  var url = stack.pop();
+  var callback = {
+    success: function(o) {
+      var result = o.responseText;
+      factor.server_eval(result, next);
+    },
+    failure: function(o) {
+      alert('run-file failed');
+      factor.call_next(next);
+    }
+  };
+  YAHOO.util.Connect.asyncRequest('GET', url, callback, null);
+});
+
+
+factor.add_word("alien", "alien-invoke", "primitive", function(next) {  
+  var stack = factor.cont.data_stack;
+  var arg_types = stack.pop();
+  var method_name = stack.pop();
+  var library_name = stack.pop();
+  var return_values = stack.pop();
+  var obj = stack.pop();
+  var args = [ ];
+  for(var i = 0; i < arg_types.length; ++i) {
+    args[i] = stack.pop();
+  }
+  var v = obj[method_name].apply(obj, args);
+  if(return_values.length > 0)
+    stack.push(v);
+  factor.call_next(next);
+});
+
+factor.add_word("words", "vocabs", "primitive", function(next) {   
+  var stack = factor.cont.data_stack;
+  var result = [];
+  for(v in factor.vocabs) {
+    result.push(v);
+  }
+  stack.push(result);
+  factor.call_next(next);
+});
+
+factor.add_word("words", "words", "primitive", function(next) {   
+  var stack = factor.cont.data_stack;
+  var vocab = factor.vocabs[stack.pop()];
+  var result = [];
+  for(w in vocab) {
+    result.push(vocab[w]);
+  }
+  stack.push(result);
+  factor.call_next(next);
+});
+
+factor.add_word("words", "all-words", "primitive", function(next) {   
+  var stack = factor.cont.data_stack;
+  var result = [];
+  for(v in factor.vocabs) {
+    for(w in factor.vocabs[v]) {
+      result.push(factor.vocabs[v][w]);
+    }
+  }
+  stack.push(result);
+  factor.call_next(next);
 });
 
 /* Sequences vocabulary */
@@ -515,5 +512,16 @@ factor.add_word("sequences", "reduce", "primitive", function(next) {
     prev=stack.pop();
   }
   stack.push(prev);
+  factor.call_next(next);
+});
+
+/* browser-dom vocab */
+factor.add_word("browser-dom", "window", "primitive", function(next) {  
+  factor.cont.data_stack.push(window);
+  factor.call_next(next);
+});
+
+factor.add_word("browser-dom", "document", "primitive", function(next) {  
+  factor.cont.data_stack.push(document);
   factor.call_next(next);
 });

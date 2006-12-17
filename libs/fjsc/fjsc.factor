@@ -33,18 +33,20 @@ LAZY: 'string' ( -- parser )
   [ blank? not ] keep
   [ CHAR: } = not ] keep
   [ CHAR: ] = not ] keep
+  [ CHAR: ;" = not ] keep
   [ CHAR: " = not ] keep
   digit? not 
-  and and and and ;
+  and and and and and ;
 
 LAZY: 'identifier-ends' ( -- parser )  
   [ 
     [ blank? not ] keep
     [ CHAR: " = not ] keep
+    [ CHAR: ;" = not ] keep
     [ LETTER? not ] keep
     [ letter? not ] keep
     identifier-middle? not
-    and and and and
+    and and and and and
   ] satisfy <!*> ;
 
 LAZY: 'identifier-middle' ( -- parser )  
@@ -106,8 +108,8 @@ LAZY: 'comment' ( -- parser )
 LAZY: 'expression' ( -- parser )
   'comment' 
   'quotation' sp <|> 
-  'array' sp <|>
   'define' sp <|>
+  'array' sp <|>
   'word' sp <|>
   'atom' sp <|> 
   <*> [ <ast-expression> ] <@ ;
