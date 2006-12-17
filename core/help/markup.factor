@@ -262,3 +262,9 @@ M: f print-element drop ;
     [ dup article-title 2array ] map
     [ [ second ] 2apply <=> ] sort
     0 <column> ;
+
+: error? ( word -- ? )
+    \ $error-description swap word-help elements empty? not ;
+
+: all-errors ( -- seq )
+    all-words [ error? ] subset sort-articles ;

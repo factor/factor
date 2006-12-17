@@ -35,12 +35,6 @@ M: f article-content drop \ f article-content ;
     articles get hash-keys
     all-words [ word-help ] subset append ;
 
-: error? ( word -- ? )
-    \ $error-description swap word-help elements empty? not ;
-
-: all-errors ( -- seq )
-    all-words [ error? ] subset natural-sort ;
-
 GENERIC: elements* ( elt-type element -- )
 
 : elements ( elt-type element -- seq ) [ elements* ] { } make ;
