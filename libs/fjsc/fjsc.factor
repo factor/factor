@@ -5,13 +5,13 @@ IN: fjsc
 USING: kernel lazy-lists parser-combinators strings math sequences namespaces io words arrays ;
 
 TUPLE: ast-number value ;
-TUPLE: ast-identifier value ;
+TUPLE: ast-identifier value vocab ;
 TUPLE: ast-string value ;
 TUPLE: ast-quotation values ;
 TUPLE: ast-array elements ;
 TUPLE: ast-define name stack-effect expression ;
 TUPLE: ast-expression values ;
-TUPLE: ast-word value ;
+TUPLE: ast-word value vocab ;
 TUPLE: ast-comment ;
 TUPLE: ast-stack-effect in out ;
 
@@ -54,7 +54,7 @@ LAZY: 'identifier' ( -- parser )
   'identifier-ends' 
   'identifier-middle' <&>
   'identifier-ends' <:&> 
-  [ concat >string <ast-identifier> ] <@ ;
+  [ concat >string f <ast-identifier> ] <@ ;
 
   
 DEFER: 'expression'
@@ -92,7 +92,7 @@ LAZY: 'array' ( -- parser )
 
 LAZY: 'word' ( -- parser )
   "\\" token sp 
-  'identifier' sp &> [ ast-identifier-value <ast-word> ] <@ ;
+  'identifier' sp &> [ ast-identifier-value f <ast-word> ] <@ ;
 
 LAZY: 'atom' ( -- parser )
   'identifier' 'number' <|> 'string' <|> ;
@@ -137,7 +137,15 @@ M: ast-string (compile)
   "," , ;
 
 M: ast-identifier (literal) 
-  "factor.words[\"" , ast-identifier-value , "\"]" ,  ;
+  dup ast-identifier-vocab [
+   "factor.get_word(\"" , 
+   dup ast-identifier-vocab ,
+   "\",\"" ,
+   ast-identifier-value , 
+   "\")" ,  
+  ] [
+   "factor.find_word(\"" , ast-identifier-value , "\")" ,  
+  ] if ;
 
 M: ast-identifier (compile) 
   (literal) ".execute(" ,  ;
@@ -192,9 +200,15 @@ M: ast-expression (compile)
   ast-expression-values do-expressions ;
 
 M: ast-word (literal)   
-  "factor.words[\"" , 
-  ast-word-value ,
-  "\"]" , ;
+  dup ast-word-vocab [
+   "factor.get_word(\"" , 
+   dup ast-word-vocab ,
+   "\",\"" ,
+   ast-word-value , 
+   "\")" ,  
+  ] [
+   "factor.find_word(\"" , ast-word-value , "\")" ,  
+  ] if ;
 
 M: ast-word (compile)
   "factor.push_data(" ,
@@ -213,10 +227,10 @@ M: number (parse-factor-quotation) ( object -- ast )
   <ast-number> ;
 
 M: symbol (parse-factor-quotation) ( object -- ast )
-  >string <ast-identifier> ;
+  dup >string swap word-vocabulary <ast-identifier> ;
 
 M: word (parse-factor-quotation) ( object -- ast )
-  word-name <ast-identifier> ;
+  dup word-name swap word-vocabulary <ast-identifier> ;
 
 M: string (parse-factor-quotation) ( object -- ast )
   <ast-string> ;
@@ -232,7 +246,7 @@ M: array (parse-factor-quotation) ( object -- ast )
   ] { } make <ast-array> ;
 
 M: wrapper (parse-factor-quotation) ( object -- ast )
-  wrapped word-name <ast-word> ;
+  wrapped dup word-name swap word-vocabulary <ast-word> ;
 
 GENERIC: fjsc-parse ( object -- ast )
 

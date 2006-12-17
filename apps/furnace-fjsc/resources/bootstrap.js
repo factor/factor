@@ -1,4 +1,5 @@
-function Word(name, source, func) {
+function Word(vocab, name, source, func) {
+  this.vocab = vocab;
   this.name = name;
   this.source = source;
   this.func = func;
@@ -8,32 +9,48 @@ Word.prototype.execute = function(next) {
   this.func(next);
 }
 
+Word.prototype.toString = function() {
+  var html = [];
+  html.push("<a href='/responder/browser/browse?vocab=")
+  html.push(this.vocab);
+  html.push("&amp;word=")
+  html.push(this.name);
+  html.push("'>")
+  html.push(this.name);
+  html.push("</a>");
+  return html.join("");
+}
+
 function Continuation() {
   this.data_stack = [ ];
   this.retain_stack = [ ];
+  this.next = false;
+  this.nesting = 0;
 }
 
 Continuation.prototype.clone = function() {
   var c = new Continuation();
   c.data_stack = this.data_stack.slice(0);
   c.retain_stack = this.retain_stack.slice(0);
+  c.nesting = this.nesting;
+  c.next = this.next;
   return c;
 }
 
 function Factor() {
-  this.words = { };
+  this.vocabs = { scratchpad: { } };
+  this.in_vocab = "scratchpad";
+  this.using_vocabs = [ "scratchpad", "kernel","math","sequences","parser","alien","browser-dom", "words" ];
   this.cont = new Continuation();
   this.form = false ;
-  this.next = false;
-  this.nesting = 0;
 }
 
 var factor = new Factor();
 
 Factor.prototype.call_next = function(next) {
   if(next) {
-    if(this.nesting++ > 150) {
-      this.nesting = 0;
+    if(this.cont.nesting++ > 150) {
+      this.cont.nesting = 0;
       setTimeout(next, 0);
    }
     else {
@@ -47,11 +64,33 @@ Factor.prototype.push_data = function(v, next) {
   factor.call_next(next);
 }
 
+Factor.prototype.get_word = function(vocab,name) {
+  return factor.vocabs[vocab][name];
+}
+
+Factor.prototype.find_word = function(name) {
+  for(var v = 0; v<factor.using_vocabs.length; ++v) {
+    var w = factor.vocabs[factor.using_vocabs[v]][name];
+    if(w)
+      return w;
+  }
+  return false;
+}
+
+Factor.prototype.add_word = function(vocab,name, source, func) {
+  var v = factor.vocabs[vocab];
+  if(!v) {
+    v = { };
+    factor.vocabs[vocab] = v;
+  }
+  v[name] = new Word(vocab,name,source,func);
+}
+    
 Factor.prototype.define_word = function(name, source, func, next) {
-  factor.words[name] = new Word(name, source, function(next) {
-    var old = factor.next;
-    factor.next = function() {
-      factor.next = old;
+  factor.vocabs[factor.in_vocab][name] = new Word(factor.in_vocab, name, source, function(next) {
+    var old = factor.cont.next;
+    factor.cont.next = function() {
+      factor.cont.next = old;
       factor.call_next(next);
     }
     func();
@@ -60,10 +99,10 @@ Factor.prototype.define_word = function(name, source, func, next) {
 }
 
 Factor.prototype.make_quotation = function(source, func) {
-  return new Word("quotation", source, function(next) {
-    var old = factor.next;
-    factor.next = function() {
-      factor.next = old;
+  return new Word("quotations", "quotation", source, function(next) {
+    var old = factor.cont.next;
+    factor.cont.next = function() {
+      factor.cont.next = old;
       factor.call_next(next);
     }
     func();
@@ -78,7 +117,7 @@ Factor.prototype.server_eval = function(text, next) {
 	 document.getElementById('compiled').innerHTML="<pre>" + v + "</pre>";
 	 document.getElementById('code').value="";
 	 var func = eval(v);
-         factor.next = function() { self.display_datastack(); } 
+         factor.cont.next = function() { self.display_datastack(); } 
 	 func(factor);
          if(next) 
            factor.call_next(next);
@@ -106,31 +145,31 @@ Factor.prototype.display_datastack = function() {
    document.getElementById('stack').innerHTML=html.join("");
 }
 
-factor.words["dup"] = new Word("dup", "primitive", function(next) {
+factor.add_word("kernel","dup", "primitive", function(next) {
   var stack = factor.cont.data_stack;
   stack[stack.length] = stack[stack.length-1];
   factor.call_next(next);
 });
 
-factor.words["drop"] = new Word("drop", "primitive", function(next) {
+factor.add_word("kernel", "drop", "primitive", function(next) {
   factor.cont.data_stack.pop();
   factor.call_next(next);
 });
 
-factor.words["nip"] = new Word("nip", "primitive", function(next) {
+factor.add_word("kernel", "nip", "primitive", function(next) {
   var stack = factor.cont.data_stack;
   stack[stack.length-2] = stack[stack.length-1];
   stack.pop();
   factor.call_next(next);
 });
 
-factor.words["over"] = new Word("over", "primitive", function(next) {
+factor.add_word("kernel", "over", "primitive", function(next) {
   var stack = factor.cont.data_stack;
   stack[stack.length] = stack[stack.length-2];
   factor.call_next(next);
 });
 
-factor.words["swap"] = new Word("swap", "primitive", function(next) {
+factor.add_word("kernel", "swap", "primitive", function(next) {
   var stack = factor.cont.data_stack;
   var temp = stack[stack.length-2];
   stack[stack.length-2] = stack[stack.length-1];
@@ -138,33 +177,33 @@ factor.words["swap"] = new Word("swap", "primitive", function(next) {
   factor.call_next(next);
 });
 
-factor.words[">r"] = new Word(">r", "primitive", function(next) {
+factor.add_word("kernel", ">r", "primitive", function(next) {
   var data_stack = factor.cont.data_stack;
   var retain_stack = factor.cont.retain_stack;
   retain_stack.push(data_stack.pop());
   factor.call_next(next);
 });
 
-factor.words["r>"] = new Word("r>", "primitive", function(next) {
+factor.add_word("kernel", "r>", "primitive", function(next) {
   var data_stack = factor.cont.data_stack;
   var retain_stack = factor.cont.retain_stack;
   data_stack.push(retain_stack.pop());
   factor.call_next(next);
 });
 
-factor.words["*"] = new Word("*", "primitive", function(next) {
+factor.add_word("math", "*", "primitive", function(next) {
   var stack = factor.cont.data_stack;
   stack.push(stack.pop() * stack.pop());
   factor.call_next(next);
 });
 
-factor.words["+"] = new Word("+", "primitive", function(next) {
+factor.add_word("math", "+", "primitive", function(next) {
   var stack = factor.cont.data_stack;
   stack.push(stack.pop() + stack.pop());
   factor.call_next(next);
 });
 
-factor.words["-"] = new Word("-", "primitive", function(next) {
+factor.add_word("math", "-", "primitive", function(next) {
   var stack = factor.cont.data_stack;
   var v1 = stack.pop();
   var v2 = stack.pop();
@@ -172,7 +211,7 @@ factor.words["-"] = new Word("-", "primitive", function(next) {
   factor.call_next(next);
 });
 
-factor.words["/"] = new Word("/", "primitive", function(next) {
+factor.add_word("math", "/", "primitive", function(next) {
   var stack = factor.cont.data_stack;
   var v1 = stack.pop();
   var v2 = stack.pop();
@@ -180,34 +219,28 @@ factor.words["/"] = new Word("/", "primitive", function(next) {
   factor.call_next(next);
 });
 
-factor.words["."] = new Word(".", "primitive", function(next) {
+factor.add_word("prettyprint", ".", "primitive", function(next) {
   alert(factor.cont.data_stack.pop());
   factor.call_next(next);
 });
 
-factor.words["call"] = new Word("call", "primitive", function(next) {
+factor.add_word("kernel", "call", "primitive", function(next) {
   var quot = factor.cont.data_stack.pop();
   quot.execute(next);
 });
 
-factor.words["execute"] = new Word("execute", "primitive", function(next) {
+factor.add_word("kernel", "execute", "primitive", function(next) {
   var quot = factor.cont.data_stack.pop();
   quot.execute(next);
 });
 
-factor.words["clear"] = new Word("clear", "primitive", function(next) {
+factor.add_word("kernel", "clear", "primitive", function(next) {
   factor.cont.data_stack = [];
   factor.cont.retain_stack = [];
   factor.call_next(next);
 });
 
-factor.words["square"] = new Word("square", "primitive", function(next) {  
-  var stack = factor.cont.data_stack;
-  stack[stack.length-1] = stack[stack.length-1] * stack[stack.length-1];
-  factor.call_next(next);
-});
-
-factor.words["if"] = new Word("if", "primitive", function(next) {  
+factor.add_word("kernel", "if", "primitive", function(next) {  
   var stack = factor.cont.data_stack;
   var else_quot = stack.pop();
   var then_quot = stack.pop();
@@ -219,33 +252,33 @@ factor.words["if"] = new Word("if", "primitive", function(next) {
   }
 });
 
-factor.words["f"] = new Word("f", "primitive", function(next) {  
+factor.add_word("kernel", "f", "primitive", function(next) {  
   factor.cont.data_stack.push(false);
   factor.call_next(next);
 });
 
-factor.words["t"] = new Word("t", "primitive", function(next) {  
+factor.add_word("kernel", "t", "primitive", function(next) {  
   factor.cont.data_stack.push(true);
   factor.call_next(next);
 });
 
-factor.words["="] = new Word("=", "primitive", function(next) {   
+factor.add_word("kernel", "=", "primitive", function(next) {   
   var stack = factor.cont.data_stack;
   stack.push(stack.pop()==stack.pop());
   factor.call_next(next);
 });
 
-factor.words["window"] = new Word("window", "primitive", function(next) {  
+factor.add_word("browser-dom", "window", "primitive", function(next) {  
   factor.cont.data_stack.push(window);
   factor.call_next(next);
 });
 
-factor.words["bootstrap"] = new Word("bootstrap", "primitive", function(next) {  
+factor.add_word("kernel", "bootstrap", "primitive", function(next) {  
   factor.cont.data_stack.push("/responder/fjsc-resources/bootstrap.factor");
-  factor.words["run-file"].execute(next);
+  factor.get_word("parser", "run-file").execute(next);
 });
 
-factor.words["run-file"] = new Word("run-file", "primitive", function(next) {  
+factor.add_word("parser", "run-file", "primitive", function(next) {  
   var stack = factor.cont.data_stack;
   var url = stack.pop();
   var callback = {
@@ -261,14 +294,14 @@ factor.words["run-file"] = new Word("run-file", "primitive", function(next) {
   YAHOO.util.Connect.asyncRequest('GET', url, callback, null);
 });
 
-factor.words["callcc0"] = new Word("callcc0", "primitive", function(next) {  
+factor.add_word("kernel", "callcc0", "primitive", function(next) {  
   var data_stack = factor.cont.data_stack;
   var quot = data_stack.pop();
   var new_cont = factor.cont.clone();  
-  var old_next = factor.next;
+  var old_next = factor.cont.next;
   var cont = {
     next: function() {
-      factor.next = old_next;
+      factor.cont.next = old_next;
       factor.call_next(next);
     },
     cont: factor.cont
@@ -278,14 +311,14 @@ factor.words["callcc0"] = new Word("callcc0", "primitive", function(next) {
   quot.execute(next);  
 });
 
-factor.words["continue"] = new Word("continue", "primitive", function(next) {  
+factor.add_word("kernel", "continue", "primitive", function(next) {  
   var data_stack = factor.cont.data_stack;
   var cont = data_stack.pop(); 
   factor.cont = cont.cont.clone();
   factor.call_next(cont.next);
 });
 
-factor.words["alien-invoke"] = new Word("alien-invoke", "primitive", function(next) {  
+factor.add_word("alien", "alien-invoke", "primitive", function(next) {  
   var stack = factor.cont.data_stack;
   var arg_types = stack.pop();
   var method_name = stack.pop();
@@ -302,7 +335,7 @@ factor.words["alien-invoke"] = new Word("alien-invoke", "primitive", function(ne
   factor.call_next(next);
 });
 
-factor.words["map"] = new Word("map", "primitive", function(next) {   
+factor.add_word("sequences", "map", "primitive", function(next) {   
   var stack = factor.cont.data_stack;
   var quot = stack.pop();
   var seq = stack.pop();
@@ -316,7 +349,7 @@ factor.words["map"] = new Word("map", "primitive", function(next) {
   factor.call_next(next);
 });
 
-factor.words["reduce"] = new Word("reduce", "primitive", function(next) {   
+factor.add_word("sequences", "reduce", "primitive", function(next) {   
   var stack = factor.cont.data_stack;
   var quot = stack.pop();
   var prev = stack.pop();
@@ -329,4 +362,88 @@ factor.words["reduce"] = new Word("reduce", "primitive", function(next) {
   }
   stack.push(prev);
   factor.call_next(next);
+});
+
+factor.add_word("words", "vocabs", "primitive", function(next) {   
+  var stack = factor.cont.data_stack;
+  var result = [];
+  for(v in factor.vocabs) {
+    result.push(v);
+  }
+  stack.push(result);
+  factor.call_next(next);
+});
+
+factor.add_word("words", "words", "primitive", function(next) {   
+  var stack = factor.cont.data_stack;
+  var vocab = factor.vocabs[stack.pop()];
+  var result = [];
+  for(w in vocab) {
+    result.push(vocab[w]);
+  }
+  stack.push(result);
+  factor.call_next(next);
+});
+
+factor.add_word("words", "all-words", "primitive", function(next) {   
+  var stack = factor.cont.data_stack;
+  var result = [];
+  for(v in factor.vocabs) {
+    for(w in factor.vocabs[v]) {
+      result.push(factor.vocabs[v][w]);
+    }
+  }
+  stack.push(result);
+  factor.call_next(next);
+});
+
+factor.add_word("kernel", "in", "primitive", function(next) {   
+  var stack = factor.cont.data_stack;
+  var vocab = stack.pop();
+  var v = factor.vocabs[vocab];
+  if(!v) {
+    v = { };
+    factor.vocabs[vocab] = v;
+  }
+  factor.in_vocab = vocab;
+  factor.call_next(next);  
+});
+
+factor.add_word("kernel", "current-vocab", "primitive", function(next) {   
+  var stack = factor.cont.data_stack;
+  stack.push(factor.in_vocab);
+  factor.call_next(next);  
+});
+
+factor.add_word("kernel", "use", "primitive", function(next) {   
+  var stack = factor.cont.data_stack;
+  var vocab = stack.pop();
+  var v = factor.vocabs[vocab];
+  if(!v) {
+    v = { };
+    factor.vocabs[vocab] = v;
+  }
+  factor.using_vocabs.push(vocab);
+  factor.call_next(next);  
+});
+
+factor.add_word("kernel", "using", "primitive", function(next) {   
+  var stack = factor.cont.data_stack;
+  var vocabs = stack.pop();
+  factor.using_vocabs = [];
+  for(var i=0;i<vocabs.length;++i) {  
+    var v = factor.vocabs[vocabs[i]];
+    if(!v) {
+      v = { };
+      factor.vocabs[vocabs[i]] = v;
+    }
+  }
+  factor.using_vocabs = vocabs;
+  factor.call_next(next);  
+});
+
+factor.add_word("kernel", "current-using", "primitive", function(next) {   
+  var stack = factor.cont.data_stack;
+  stack.push(factor.using_vocabs);
+  factor.call_next(next);  
 });
