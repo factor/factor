@@ -384,6 +384,15 @@ factor.add_word("alien", "alien-invoke", "primitive", function(next) {
   factor.call_next(next);
 });
 
+factor.add_word("alien", "alien-property", "primitive", function(next) {  
+  var stack = factor.cont.data_stack;
+  var obj = stack.pop();
+  var property_name = stack.pop();
+  var v = obj[property_name];
+  stack.push(v);
+  factor.call_next(next);
+});
+
 factor.add_word("words", "vocabs", "primitive", function(next) {   
   var stack = factor.cont.data_stack;
   var result = [];
