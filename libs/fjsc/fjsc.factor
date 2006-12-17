@@ -169,7 +169,7 @@ M: ast-define (compile)
       drop do-expressions
     ] if
   ] [
-    drop "factor.next" ,
+    drop "factor.cont.next" ,
   ] if  ;
 
 M: ast-quotation (literal)   

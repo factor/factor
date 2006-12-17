@@ -335,34 +335,6 @@ factor.add_word("alien", "alien-invoke", "primitive", function(next) {
   factor.call_next(next);
 });
 
-factor.add_word("sequences", "map", "primitive", function(next) {   
-  var stack = factor.cont.data_stack;
-  var quot = stack.pop();
-  var seq = stack.pop();
-  var result = [ ];
-  for(var i=0;i<seq.length;++i) {  
-    stack.push(seq[i]);
-    quot.execute();
-    result[i]=stack.pop();
-  }
-  stack.push(result);
-  factor.call_next(next);
-});
-
-factor.add_word("sequences", "reduce", "primitive", function(next) {   
-  var stack = factor.cont.data_stack;
-  var quot = stack.pop();
-  var prev = stack.pop();
-  var seq = stack.pop();
-  for(var i=0;i<seq.length;++i) {  
-    stack.push(prev);
-    stack.push(seq[i]);
-    quot.execute();
-    prev=stack.pop();
-  }
-  stack.push(prev);
-  factor.call_next(next);
-});
 
 factor.add_word("words", "vocabs", "primitive", function(next) {   
   var stack = factor.cont.data_stack;
@@ -446,4 +418,102 @@ factor.add_word("kernel", "current-using", "primitive", function(next) {
   var stack = factor.cont.data_stack;
   stack.push(factor.using_vocabs);
   factor.call_next(next);  
+});
+
+/* Sequences vocabulary */
+factor.add_word("sequences", "nth", "primitive", function(next) {   
+  var stack = factor.cont.data_stack;
+  var seq = stack.pop();
+  var index = stack.pop();
+  stack.push(seq[index]);
+  factor.call_next(next);
+});
+
+factor.add_word("sequences", "first", "primitive", function(next) {   
+  var stack = factor.cont.data_stack;
+  var seq = stack.pop();
+  stack.push(seq[0]);
+  factor.call_next(next);
+});
+
+factor.add_word("sequences", "second", "primitive", function(next) {   
+  var stack = factor.cont.data_stack;
+  var seq = stack.pop();
+  stack.push(seq[1]);
+  factor.call_next(next);
+});
+
+factor.add_word("sequences", "third", "primitive", function(next) {   
+  var stack = factor.cont.data_stack;
+  var seq = stack.pop();
+  stack.push(seq[2]);
+  factor.call_next(next);
+});
+
+factor.add_word("sequences", "fourth", "primitive", function(next) {   
+  var stack = factor.cont.data_stack;
+  var seq = stack.pop();
+  stack.push(seq[0]);
+  factor.call_next(next);
+});
+
+factor.add_word("sequences", "first2", "primitive", function(next) {   
+  var stack = factor.cont.data_stack;
+  var seq = stack.pop();
+  stack.push(seq[0],seq[1]);
+  factor.call_next(next);
+});
+
+factor.add_word("sequences", "first3", "primitive", function(next) {   
+  var stack = factor.cont.data_stack;
+  var seq = stack.pop();
+  stack.push(seq[0],seq[1],seq[2]);
+  factor.call_next(next);
+});
+
+factor.add_word("sequences", "first4", "primitive", function(next) {   
+  var stack = factor.cont.data_stack;
+  var seq = stack.pop();
+  stack.push(seq[0],seq[1],seq[2],seq[3]);
+  factor.call_next(next);
+});
+
+factor.add_word("sequences", "each", "primitive", function(next) {   
+  var stack = factor.cont.data_stack;
+  var quot = stack.pop();
+  var seq = stack.pop();
+  for(var i=0;i<seq.length;++i) {  
+    stack.push(seq[i]);
+    quot.execute();
+  }
+  factor.call_next(next);
+});
+
+factor.add_word("sequences", "map", "primitive", function(next) {   
+  var stack = factor.cont.data_stack;
+  var quot = stack.pop();
+  var seq = stack.pop();
+  var result = [ ];
+  for(var i=0;i<seq.length;++i) {  
+    stack.push(seq[i]);
+    quot.execute();
+    result[i]=stack.pop();
+  }
+  stack.push(result);
+  factor.call_next(next);
+});
+
+factor.add_word("sequences", "reduce", "primitive", function(next) {   
+  var stack = factor.cont.data_stack;
+  var quot = stack.pop();
+  var prev = stack.pop();
+  var seq = stack.pop();
+  for(var i=0;i<seq.length;++i) {  
+    stack.push(prev);
+    stack.push(seq[i]);
+    quot.execute();
+    prev=stack.pop();
+  }
+  stack.push(prev);
+  factor.call_next(next);
 });
