@@ -1,15 +1,18 @@
-<h1>Factor to Javascript Compiler</h1>
 <table border="0">
 <tr><td valign="top">
+<p><b>Enter Factor Code Here</b></p>
 <form id="toeval" onsubmit="factor.server_eval($('#code').get(0).value);return false;" method="post">
-  <textarea name="code" id="code" cols="64" rows="10">
+  <textarea name="code" id="code" cols="64" rows="5">
   </textarea>
-  <input type="submit"/>
+  <input type="submit" value="Compile"/>
 </form>
-<textarea id="compiled" cols="64" row="5">
+<h3>Compiled Code</h3>
+<textarea id="compiled" cols="64" rows="3">
 </textarea>
+<p><b>Stack</b></p>
 <div id="stack">
 </div>
+<p><b>Playground</b></p>
 <div id="playground">
 </div>
 </td>
