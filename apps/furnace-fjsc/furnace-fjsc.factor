@@ -31,9 +31,7 @@ USING: kernel html furnace xml io httpd sequences
   #! Render the fjsc page importing the required
   #! scripts.
   serving-html {
-    "/responder/fjsc-resources/yahoo/yahoo.js"
-    "/responder/fjsc-resources/yahoo/event.js"
-    "/responder/fjsc-resources/yahoo/connection.js"
+    "/responder/fjsc-resources/jquery.js"
     "/responder/fjsc-resources/bootstrap.js"
   } swap [
     [

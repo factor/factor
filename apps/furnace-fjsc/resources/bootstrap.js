@@ -42,7 +42,6 @@ function Factor() {
   this.in_vocab = "scratchpad";
   this.using_vocabs = [ "scratchpad", "kernel","math","sequences","parser","alien","browser-dom", "words" ];
   this.cont = new Continuation();
-  this.form = false ;
 }
 
 var factor = new Factor();
@@ -111,26 +110,15 @@ Factor.prototype.make_quotation = function(source, func) {
 
 Factor.prototype.server_eval = function(text, next) {
    var self = this;
-   var callback = {
-      success: function(o) {
-	 var v = o.responseText;
-	 document.getElementById('compiled').innerHTML="<pre>" + v + "</pre>";
-	 document.getElementById('code').value="";
-	 var func = eval(v);
-         factor.cont.next = function() { self.display_datastack(); } 
-	 func(factor);
-         if(next) 
-           factor.call_next(next);
-      }
-   };
-   this.form.code.value=text;
-   YAHOO.util.Connect.setForm(this.form);
-   YAHOO.util.Connect.asyncRequest('POST', "/responder/fjsc/compile", callback);
-}
-
-Factor.prototype.fjsc_eval = function(form) {
-   this.form = form;
-   this.server_eval(form.code.value);
+   $.post("/responder/fjsc/compile", { code: text }, function(result) {
+     document.getElementById('compiled').innerHTML="<pre>" + result + "</pre>";
+     document.getElementById('code').value="";
+     var func = eval(result);
+     factor.cont.next = function() { self.display_datastack(); } 
+     func(factor);
+     if(next) 
+       factor.call_next(next);
+   });
 }
 
 Factor.prototype.display_datastack = function() {
@@ -353,17 +341,9 @@ factor.add_word("prettyprint", ".", "primitive", function(next) {
 factor.add_word("parser", "run-file", "primitive", function(next) {  
   var stack = factor.cont.data_stack;
   var url = stack.pop();
-  var callback = {
-    success: function(o) {
-      var result = o.responseText;
-      factor.server_eval(result, next);
-    },
-    failure: function(o) {
-      alert('run-file failed');
-      factor.call_next(next);
-    }
-  };
-  YAHOO.util.Connect.asyncRequest('GET', url, callback, null);
+  $.get(url, function(result) {
+    factor.server_eval(result, next);
+  });
 });
 
 
