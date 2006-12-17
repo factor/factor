@@ -530,3 +530,10 @@ factor.add_word("browser-dom", "document", "primitive", function(next) {
   factor.cont.data_stack.push(document);
   factor.call_next(next);
 });
+
+/* Run initial factor code */
+$(document).ready(function() {
+  $.get("/responder/fjsc-resources/bootstrap.factor", function(result) {
+    factor.server_eval(result, function() { });
+  });
+});

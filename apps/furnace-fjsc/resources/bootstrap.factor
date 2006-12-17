@@ -4,11 +4,9 @@
 
 "browser-dom" in
 
-: get-element ( id -- element )
-  document { "element" } "" "getElementById" { "string" } alien-invoke ;
-
-: property ( name element -- value )
-  alien-property ;
+: $ ( string -- result )
+  #! Call JQuery's $ function
+  window { "result" } "" "$" { "string" } alien-invoke ;
+  
 
 "scratchpad" in
-"Bootstrap code loaded" alert
