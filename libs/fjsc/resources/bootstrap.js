@@ -120,7 +120,7 @@ Factor.prototype.make_quotation = function(source, func) {
 Factor.prototype.server_eval = function(text, next) {
    var self = this;
    $.post("/responder/fjsc/compile", { code: text }, function(result) {
-     document.getElementById('compiled').innerHTML="<pre>" + result + "</pre>";
+     document.getElementById('compiled').value=result;
      document.getElementById('code').value="";
      var func = eval(result);
      factor.cont.next = function() { self.display_datastack(); } 

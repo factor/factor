@@ -1,11 +1,36 @@
+<h1>Factor to Javascript Compiler</h1>
+<table border="0">
+<tr><td valign="top">
 <form id="toeval" onsubmit="factor.server_eval($('#code').get(0).value);return false;" method="post">
   <textarea name="code" id="code" cols="64" rows="10">
   </textarea>
   <input type="submit"/>
 </form>
-<div id="compiled">
-</div>
+<textarea id="compiled" cols="64" row="5">
+</textarea>
 <div id="stack">
 </div>
 <div id="playground">
 </div>
+</td>
+<td valign="top">
+<p>More information on the Factor to Javascript compiler can be found at these blog posts:"
+<ul>
+<li><a href="http://www.bluishcoder.co.nz/2006/12/compiling-factor-to-javascript.html">Factor to Javascript Compiler</a></li>
+<li><a href="http://www.bluishcoder.co.nz/2006/12/factor-to-javascript-compiler-updates.html">Factor to Javascript Compiler Updates</a></li>
+</ul>
+</p>
+<p>Some useful words:
+<dl>
+<dt>vocabs ( -- seq )</dt>
+<dd>Return a sequence of available vocabularies</dd>
+<dt>words ( string -- seq )</dt>
+<dd>Return a sequence of words in the given vocabulary</dd>
+<dt>all-words ( -- seq )</dt>
+<dd>Return a sequence of all words</dd>
+</dl>
+</p>
+<p>The contents of <a href="/responder/fjsc-resources/bootstrap.factor">bootstrap.factor</a> have been loaded on startup.</p>
+</td>
+</tr>
+</table>

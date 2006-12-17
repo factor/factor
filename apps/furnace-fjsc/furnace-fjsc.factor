@@ -70,7 +70,7 @@ USING: kernel html furnace xml io httpd sequences
 ! the 'fjsc' responder.
 "fjsc-resources" [
  [
-   "apps/furnace-fjsc/resources/" resource-path "doc-root" set
+   "libs/fjsc/resources/" resource-path "doc-root" set
    file-responder
  ] with-scope
 ] add-simple-responder
