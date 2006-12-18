@@ -276,14 +276,16 @@ CELL allot_native_stack_trace(void)
 			GROWABLE_ADD(array,cell);
 		}
 
-		if(PREVIOUS_FRAME(frame) <= frame)
+		F_STACK_FRAME *prev = PREVIOUS_FRAME(frame);
+
+		if(prev <= frame)
 		{
 			fprintf(stderr,"*** Unusual C stack layout (why?)\n");
 			fflush(stderr);
 			break;
 		}
 
-		frame = PREVIOUS_FRAME(frame);
+		frame = prev;
 	}
 
 	GROWABLE_TRIM(array);

@@ -9,7 +9,7 @@ DISK_IMAGE = Factor-$(VERSION).dmg
 LIBPATH = -L/usr/X11R6/lib
 
 ifdef DEBUG
-	CFLAGS = -g
+	CFLAGS = -g -std=gnu99
 	STRIP = touch
 else
 	CFLAGS = -Wall -O3 -ffast-math -std=gnu99 $(SITE_CFLAGS)

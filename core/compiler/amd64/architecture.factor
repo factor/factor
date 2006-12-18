@@ -46,5 +46,4 @@ M: float-regs fastcall-regs vregs ;
 : %prologue ( n -- )
     \ stack-reserve set stack-reg stack-increment SUB ;
 
-: %epilogue ( -- )
-    stack-reg stack-increment ADD ;
+: %epilogue ( -- ) stack-reg stack-increment ADD ;
