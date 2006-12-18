@@ -1,57 +1,24 @@
-! Copyright (C) 2005 Alex Chapman.
+! Copyright (C) 2005 Alex Chapman
+! Copyright (C) 2006 Slava Pestov
 ! See http://factorcode.org/license.txt for BSD license.
 IN: embedded
-USING: sequences kernel parser math namespaces io html test errors ;
+USING: sequences kernel parser namespaces io html errors ;
 
-! if example.fhtml contains:
-! <html>
-!     <head><title>Simple Embedded Factor Example</title></head>
-!     <body>
-! 	<% 5 [ %><p>I like repetition</p>
-!       <% drop ] each %>
-!     </body>
-! </html>
-!
-! then "example.fhtml" run-embedded-file prints to stdout:
-! <html>
-!     <head><title>Simple Embedded Factor Example</title></head>
-!     <body>
-!         <p>I like repetition</p>
-!         <p>I like repetition</p>
-!         <p>I like repetition</p>
-!         <p>I like repetition</p>
-!         <p>I like repetition</p>
-! 
-!     </body>
-! </html>
+! See libs/httpd/test/ or libs/furnace/ for embedded usage
+! examples!
 
-: get-text ( string -- remainder chunk )
-    "<%" over start dup -1 = [
-	    drop "" swap
-    ] [
-	    2dup head >r tail r>
-    ] if ;
+: process-html ( parse-tree string -- parse-tree )
+    dup empty? [ drop ] [ parsed \ write-html parsed ] if ;
 
-: get-embedded ( string -- string code-string )
-    ! regexps where art thou?
-    "%>" over 2 start* 2dup swap 2 -rot subseq >r 2 + tail r> ;
+: process-embedded ( parse-tree string -- string parse-tree )
+    "<%" split1 >r process-html r> "%>" split1 >r (parse) r> ;
 
-: get-first-chunk ( string -- string )
-    dup "<%" head? [
-	    get-embedded parse %
-    ] [
-	    get-text , \ write-html ,
-    ] if ;
-
-: embedded>factor ( string -- )
-    dup length 0 > [
-	    get-first-chunk embedded>factor
-    ] [ drop ] if ;
+: (parse-embedded) ( parse-tree string -- parse-tree )
+    dup empty?
+    [ drop ] [ process-embedded (parse-embedded) ] if ;
 
 : parse-embedded ( string -- quot )
-    #! simple example: "numbers: <% 3 [ 1 + pprint ] each %>"
-    #! => "\"numbers: \" write 3 [ 1 + pprint ] each"
-    [ embedded>factor ] [ ] make ;
+    [ f swap (parse-embedded) >quotation ] with-parser ;
 
 : eval-embedded ( string -- ) parse-embedded call ;
 
