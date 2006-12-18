@@ -20,6 +20,7 @@ PROVIDE: libs/httpd
     "test/html.factor"
     "test/httpd.factor"
     "test/url-encoding.factor"
+    "test/embedded.factor"
 } } ;
 
 USE: httpd
