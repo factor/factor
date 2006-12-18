@@ -17,11 +17,12 @@
 </div>
 </td>
 <td valign="top">
-<p>More information on the Factor to Javascript compiler can be found at these blog posts:"
+<p>More information on the Factor to Javascript compiler can be found at these blog posts:
 <ul>
 <li><a href="http://www.bluishcoder.co.nz/2006/12/compiling-factor-to-javascript.html">Factor to Javascript Compiler</a></li>
 <li><a href="http://www.bluishcoder.co.nz/2006/12/factor-to-javascript-compiler-updates.html">Factor to Javascript Compiler Updates</a></li>
 <li><a href="http://www.bluishcoder.co.nz/2006/12/continuations-added-to-fjsc.html">Continuations added to fjsc</a></li>
+<li><a href="http://www.bluishcoder.co.nz/2006/12/cross-domain-json-with-fjsc.html">Cross Domain JSON with fjsc</a></li>
 </ul>
 </p>
 <p>Some useful words:
