@@ -48,10 +48,13 @@ TUPLE: no-effect word ;
 : add-recursive-state ( word label -- )
     2array recursive-state [ swap add ] change ;
 
+: block-label ( word -- newword )
+    word-name " - inlined" append f <word> ;
+
 : inline-block ( word -- node-block data )
     [
         copy-inference nest-node
-        gensym 2dup add-recursive-state
+        dup block-label 2dup add-recursive-state
         #label >r word-def infer-quot r>
         unnest-node
     ] make-hash ;

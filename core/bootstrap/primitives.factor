@@ -206,6 +206,7 @@ call
     { "become" "kernel-internals"           }
     { "array>vector" "vectors"              }
     { "<string>" "strings"                  }
+    { "xt-map" "kernel-internals"           }
 } dup length 3 swap [ + ] map-with [ make-primitive ] 2each
 
 FORGET: make-primitive

@@ -292,3 +292,34 @@ void primitive_finalize_compile(void)
 		iterate_code_heap_step(xt_to_compiled(xt),finalize_code_block);
 	}
 }
+
+void primitive_xt_map(void)
+{
+	GROWABLE_ARRAY(array);
+	F_BLOCK *scan = (F_BLOCK *)compiling.base;
+
+	while(scan)
+	{
+		if(scan->status != B_FREE)
+		{
+			F_COMPILED *compiled = (F_COMPILED *)(scan + 1);
+			CELL code_start = (CELL)(compiled + 1);
+			CELL literal_start = code_start
+				+ compiled->code_length
+				+ compiled->reloc_length;
+
+			CELL word = get_literal(literal_start,0);
+			GROWABLE_ADD(array,word);
+			REGISTER_ARRAY(array);
+			CELL xt = allot_cell(code_start);
+			UNREGISTER_ARRAY(array);
+			GROWABLE_ADD(array,xt);
+		}
+
+		scan = next_block(&compiling,scan);
+	}
+
+	GROWABLE_TRIM(array);
+
+	dpush(tag_object(array));
+}

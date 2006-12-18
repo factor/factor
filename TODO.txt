@@ -27,8 +27,7 @@
 - inspector where slot values can be changed
 - compiled call traces:
   - should be independent of whenever the runtime was built with
-    -fomit-frame-pointer or not
-  - doesn't show #labels
+    -fomit-frame-pointer or not (ppc and amd64)
   - we don't know if signal handlers run with the same stack or not
 - use crc32 instead of modification date in reload-modules
 - models: don't do redundant work

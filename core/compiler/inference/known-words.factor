@@ -362,6 +362,8 @@ t over set-effect-terminated?
 
 \ <quotation> { integer } { quotation } <effect> "inferred-effect" set-word-prop
 
+\ xt-map { } { array } <effect> "inferred-effect" set-word-prop
+
 ! Dynamic scope inference
 : if-tos-literal ( quot -- )
     peek-d dup value? [ value-literal swap call ] [ 2drop ] if ;

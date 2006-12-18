@@ -20,22 +20,11 @@ IN: kernel-internals
     [ error-handler ] 5 setenv
     \ kernel-error 12 setenv ;
 
-: code-heap-start 17 getenv ;
-: code-heap-end 18 getenv ;
-
-: <xt-map> ( -- xtmap )
-    [
-        f code-heap-start 2array ,
-	    all-words [ compiled? ] subset
-	    [ dup word-xt 2array , ] each
-        f  code-heap-end 2array ,
-    ] { } make sort-values ;
-
 : find-xt ( xt xtmap -- word )
     [ second - ] binsearch* first ;
 
 : symbolic-stack-trace ( seq -- seq )
-    <xt-map> swap [ dup pick find-xt 2array ] map nip ;
+    xt-map 2 group swap [ dup rot find-xt 2array ] map-with ;
 
 IN: errors
 
@@ -61,15 +50,11 @@ M: string error. print ;
 
 : word-xt. ( xt word -- )
     "Compiled: " write dup pprint bl
-    "(offset " write word-xt - >hex write ")" write ;
-
-: bare-xt. ( xt -- )
-    "C code: " write xt. ;
+    "(offset " write word-xt - >hex write ")" print ;
 
 : :trace
-    error-stack-trace get symbolic-stack-trace <reversed> [
-        first2 [ word-xt. ] [ bare-xt. ] if* terpri
-    ] each ;
+    error-stack-trace get symbolic-stack-trace <reversed>
+    [ first2 word-xt. ] each ;
 
 : :c ( -- )
     error-continuation get continuation-call callstack. :trace ;

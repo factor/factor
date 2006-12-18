@@ -39,17 +39,20 @@ UNION: #terminal
 : generate-code ( node quot -- )
     over stack-reserve %prologue call ; inline
 
-: init-generator ( -- )
+: init-generator ( word -- )
+    #! The first entry in the literal table is the word itself,
+    #! this is for compiled call traces
     V{ } clone relocation-table set
     V{ } clone literal-table set
     V{ } clone label-table set 
-    V{ } clone word-table set ;
+    V{ } clone word-table set
+    literal-table get push ;
 
 : generate-1 ( word node quot -- )
     #! Generate the code, then dump three vectors to pass to
     #! add-compiled-block.
     pick f save-xt [
-        init-generator
+        pick init-generator
         init-templates
         generate-code
         generate-labels
