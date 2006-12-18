@@ -569,6 +569,29 @@ factor.add_word("browser-dom", "document", "primitive", function(next) {
   factor.call_next(next);
 });
 
+factor.add_word("browser-dom", "load-script", "primitive", function(next) {  
+  var stack = factor.cont.data_stack;
+  $("head/script#jsonrequest").remove();
+  var script = document.createElement("script");
+  script.id = "jsonrequest";    
+  script.type = "text/javascript";
+  script.src = stack.pop();
+  $("head").append(script);
+  factor.call_next(next); 
+});
+
+var handle_json = false;
+factor.add_word("browser-dom", "json-request", "primitive", function(next) {  
+  var stack = factor.cont.data_stack;
+  var quot = stack.pop();
+  handle_json = function(data) { 
+    factor.cont.data_stack.push(data);
+    quot.func(function() { });
+  }
+  factor.get_word("browser-dom", "load-script").execute(next);
+});
+
+
 /* Run initial factor code */
 $(document).ready(function() {
   $.get("/responder/fjsc-resources/bootstrap.factor", function(result) {
