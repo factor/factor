@@ -22,6 +22,4 @@ PROVIDE: core/handbook
     "help.facts"
     "tools.facts"
     "words.facts"
-    "ui/tools.facts"
-    "ui/ui.facts"
 } } ;

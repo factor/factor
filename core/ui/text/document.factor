@@ -119,11 +119,9 @@ C: document ( -- document )
 : doc-string ( document -- str )
     model-value "\n" join ;
 
-: set-doc-lines ( seq document -- )
-    [ set-model ] keep dup doc-end swap update-locs ;
-
 : set-doc-string ( string document -- )
-    >r string-lines r> set-doc-lines ;
+    >r string-lines r> [ set-model ] keep
+    dup doc-end swap update-locs ;
 
 : clear-doc ( document -- )
     "" swap set-doc-string ;

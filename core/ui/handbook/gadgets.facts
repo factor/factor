@@ -1,0 +1,194 @@
+USING: gadgets gadgets-labels gadgets-buttons gadgets-sliders
+gadgets-panes gadgets-lists gadgets-text gadgets-borders
+gadgets-presentations gadgets-scrolling gadgets-outliners help ;
+
+ARTICLE: "gadgets" "UI gadgets"
+{ $subsection "gadgets-labels" }
+{ $subsection "gadgets-polygons" }
+{ $subsection "gadgets-borders" }
+{ $subsection "gadgets-buttons" }
+{ $subsection "gadgets-sliders" }
+{ $subsection "gadgets-scrolling" }
+{ $subsection "gadgets-editors" }
+{ $subsection "gadgets-panes" }
+{ $subsection "gadgets-presentations" }
+{ $subsection "gadgets-lists" }
+{ $subsection "gadgets-outliners" } ;
+
+ARTICLE: "gadgets-labels" "Label gadgets"
+"A label displays a piece of text, either a single line string or an array of line strings."
+{ $subsection label }
+{ $subsection <label> }
+{ $subsection <label-control> }
+{ $subsection label-string }
+{ $subsection set-label-string } ;
+
+ARTICLE: "gadgets-polygons" "Polygon gadgets"
+"A polygon gadget renders a simple shaded polygon."
+{ $subsection polygon }
+{ $subsection <polygon> }
+{ $subsection <polygon-gadget> }
+"Some pre-made polygons:"
+{ $subsection arrow-up }
+{ $subsection arrow-right }
+{ $subsection arrow-down }
+{ $subsection arrow-left }
+{ $subsection close-box } ;
+
+ARTICLE: "gadgets-borders" "Border gadgets"
+"Border gadgets add empty space around a child gadget."
+{ $subsection border }
+{ $subsection <border> }
+{ $subsection <default-border> }
+"It is also possible to create a labelled border around a child gadget:"
+{ $subsection labelled-gadget }
+{ $subsection <labelled-gadget> }
+"Or a labelled border with a close box:"
+{ $subsection closable-gadget }
+{ $subsection <closable-gadget> } ;
+
+ARTICLE: "gadgets-buttons" "Button gadgets"
+"Buttons respond to mouse clicks by invoking a quotation."
+{ $subsection button }
+"There are many ways to create a new button:"
+{ $subsection <button> }
+{ $subsection <roll-button> }
+{ $subsection <bevel-button> }
+{ $subsection <command-button> }
+{ $subsection <repeat-button> }
+"A radio box is a row of buttons for choosing amongst several distinct possibilities:"
+{ $subsection <radio-box> }
+"Button appearance can be customized:"
+{ $subsection button-paint } ;
+
+ARTICLE: "gadgets-sliders" "Slider gadgets"
+"A slider allows the user to graphically manipulate a value by moving a thumb back and forth."
+{ $subsection slider }
+{ $subsection <x-slider> }
+{ $subsection <y-slider> }
+"Changing slider values:"
+{ $subsection set-slider }
+{ $subsection set-slider-value }
+{ $subsection slide-by }
+{ $subsection slide-by-line }
+{ $subsection slide-by-page } ;
+
+ARTICLE: "gadgets-scrolling" "Scroller gadgets"
+"A scroller displays a gadget which is larger than the visible area."
+{ $subsection scroller }
+{ $subsection <scroller> }
+"Getting and setting the scroll position:"
+{ $subsection scroller-value }
+{ $subsection scroll }
+"Writing scrolling-aware gadgets:"
+{ $subsection scroll>bottom }
+{ $subsection scroll>top }
+{ $subsection scroll>rect }
+{ $subsection find-scroller } ;
+
+ARTICLE: "gadgets-editors-selection" "The caret and mark"
+"If there is no selection, the caret and the mark are at the same location; otherwise the mark delimits the end-point of the selection opposite the caret."
+{ $subsection editor-caret }
+{ $subsection editor-caret* }
+{ $subsection editor-mark }
+{ $subsection editor-mark* }
+{ $subsection change-caret }
+{ $subsection change-caret&mark }
+{ $subsection mark>caret }
+"Getting and setting the selected text:"
+{ $subsection gadget-selection? }
+{ $subsection gadget-selection }
+{ $subsection user-input* }
+"Scrolling to the caret location:"
+{ $subsection scroll>caret } ;
+
+ARTICLE: "documents" "Documents"
+"The " { $link control-model } " of an " { $link editor } " is a " { $link document } "."
+{ $subsection document }
+{ $subsection <document> }
+"Getting and setting the contents of the entire document:"
+{ $subsection doc-string }
+{ $subsection set-doc-string }
+{ $subsection clear-doc }
+"Getting and setting subranges:"
+{ $subsection doc-line }
+{ $subsection doc-lines }
+{ $subsection doc-range }
+{ $subsection set-doc-range }
+{ $subsection remove-doc-range } ;
+
+ARTICLE: "document-locs-elts" "Locations and elements"
+"Locations in the document are represented as a line/column number pair, with both indices being zero-based. There are some words for manipulating locations:"
+{ $subsection +col }
+{ $subsection +line }
+{ $subsection =col }
+{ $subsection =line }
+"New locations can be created out of existing ones by finding the start or end of a document element nearest to a given location."
+{ $subsection prev-elt }
+{ $subsection next-elt }
+"The different types of document elements correspond to the standard editing taxonomy:"
+{ $subsection char-elt }
+{ $subsection one-word-elt }
+{ $subsection word-elt }
+{ $subsection one-line-elt }
+{ $subsection line-elt }
+{ $subsection doc-elt }
+"Miscellaneous words for working with locations:"
+{ $subsection lines-equal? }
+{ $subsection validate-loc } ;
+
+ARTICLE: "gadgets-editors" "Editor gadgets"
+"An editor edits a multi-line passage of text."
+{ $heading "General commands" }
+{ $commands editor "editing" }
+{ $heading "Caret motion commands" }
+{ $commands editor "caret" }
+{ $heading "Selection commands" }
+{ $commands editor "selection" }
+{ $heading "Editor words" }
+{ $subsection editor }
+{ $subsection <editor> }
+{ $subsection editor-string }
+{ $subsection set-editor-string }
+{ $subsection "gadgets-editors-selection" }
+{ $subsection "documents" }
+{ $subsection "document-locs-elts" } ;
+
+ARTICLE: "gadgets-panes" "Pane gadgets"
+"A pane displays formatted text."
+{ $subsection pane }
+{ $subsection <pane> }
+{ $subsection <scrolling-pane> }
+{ $subsection <pane-control> }
+{ $subsection <labelled-pane> }
+"Panes are written to by creating a special output stream:"
+{ $subsection pane-stream }
+{ $subsection <pane-stream> }
+"In addition to the stream output words (" { $link "stream-protocol" } ", pane streams can have gadgets written to them:"
+{ $subsection write-gadget }
+{ $subsection print-gadget }
+{ $subsection gadget. }
+"The " { $link gadget. } " word is useful for interactive debugging of gadgets in the listener."
+$terpri
+"There are a few combinators for working with panes:"
+{ $subsection with-pane }
+{ $subsection make-pane } ;
+
+ARTICLE: "gadgets-presentations" "Presentation gadgets"
+"Outliner gadgets are usually not constructed directly, and instead are written to " { $link "gadgets-panes" } " with formatted stream output words (" { $link "presentations" } ")."
+{ $subsection presentation }
+{ $subsection <presentation> }
+"If you want to display your own windows with mouse-over help for presentations, add this gadget to the window:"
+{ $subsection <presentation-help> } ;
+
+ARTICLE: "gadgets-lists" "List gadgets"
+"A list displays a list of presentations."
+{ $subsection list }
+{ $subsection <list> }
+{ $subsection list-value } ;
+
+ARTICLE: "gadgets-outliners" "Outliner gadgets"
+"Outliner gadgets are usually not constructed directly, and instead are written to " { $link "gadgets-panes" } " with formatted stream output words (" { $link "presentations" } ")."
+{ $subsection outliner }
+{ $subsection <outliner> }
+{ $subsection set-outliner-expanded? } ;

@@ -5,30 +5,8 @@ kernel generic ;
 
 ARTICLE: "handbook" "Factor documentation"
 { $subsection "changes" }
-{ $heading "Survival guide" }
-{ $list
-    { "The basic unit of code, corresponding to a \"function\" in other languages, is called a " { $emphasis "word" } " in Factor." }
-    { "Word take inputs from the stack, and leave output values on the stack. This is documented in a " { $emphasis "stack effect declaration" } ", for example " { $snippet "( x y -- z )" } " denotes that a word takes two inputs, with " { $snippet "y" } " at the top of the stack, and returns one output. See " { $link "effect-declaration" } " for details." }
-    { "You can load source files with " { $link run-file } ":"
-    { $code "\"my-program.factor\" run-file" } }
-    { { "You can load modules from " { $snippet "apps/" } ", " { $snippet "libs/" } " or " { $snippet "demos/" } " with " { $link require } ":" }
-    { $code "\"libs/httpd\" require" } }
-    { { "Some modules have a defined main entry point, and can be run just like applications in an operating system:" }
-        { $code "\"apps/tetris\" run-module" }
-    }
-    { { $link .s } " prints the contents of the stack." }
-    { { $link . } " prints the object at the top of the stack." }
-    { "If you are reading this from the Factor UI, take a look at " { $link "ui-tools" } "." }
-}
-{ $heading "Cookbook" }
-{ $subsection "cookbook-syntax" }
-{ $subsection "cookbook-colon-defs" }
-{ $subsection "cookbook-combinators" }
-{ $subsection "cookbook-variables" }
-{ $subsection "cookbook-vocabs" }
-{ $subsection "cookbook-sources" }
-{ $subsection "cookbook-io" }
-{ $subsection "cookbook-philosophy" }
+"If you are new to Factor, please read the cookbook first."
+{ $subsection "cookbook" }
 { $heading "Language reference" }
 { $subsection "conventions" }
 { $subsection "syntax" }
@@ -50,14 +28,15 @@ ARTICLE: "handbook" "Factor documentation"
 { $subsection "compiler" }
 { $heading "Graphical user interface" }
 { $subsection "ui-tools" }
+{ $subsection "gadgets" }
 { $heading "Currently-loaded contributed modules" }
 { $outliner [ modules-help ] }
 { $heading "Index" }
 { $subsection "article-index" }
-{ $subsection "primitive-index" }
 { $subsection "error-index" }
 { $subsection "type-index" }
-{ $subsection "class-index" } ;
+{ $subsection "class-index" }
+{ $subsection "primitive-index" } ;
 
 ARTICLE: "article-index" "Article index"
 { $outliner [ articles get hash-keys ] } ;

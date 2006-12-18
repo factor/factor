@@ -21,6 +21,7 @@ prettyprint sequences vectors words ;
     "core/io/buffer" require
     "core/ui" require
     "core/ui/tools" require
+    "core/ui/handbook" require
     "core/compiler/" architecture get append require
     "core/handbook" require
 

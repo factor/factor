@@ -79,11 +79,6 @@ HELP: doc-string
 { $values { "document" document } { "string" "a new " { $link string } } }
 { $description "Outputs the contents of the document as a string. Lines are separated by " { $snippet "\\n" } "." } ;
 
-HELP: set-doc-lines
-{ $values { "array" "an array of strings" } { "document" document } }
-{ $description "Sets the contents of the document to an array of lines." }
-{ $side-effects "document" } ;
-
 HELP: set-doc-string
 { $values { "array" "an array of strings" } { "document" document } }
 { $description "Sets the contents of the document to a string,  which may use either " { $snippet "\\n" } ", " { $snippet "\\r\\n" } " or " { $snippet "\\r" } " line separators." }

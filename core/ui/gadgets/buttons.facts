@@ -5,15 +5,6 @@ generic models ;
 HELP: button
 { $class-description "A button is a " { $link gadget } " which responds to mouse clicks by invoking a quotation."
 $terpri
-"The following words construct buttons:"
-{ $list
-    { $link <button> }
-    { $link <roll-button> }
-    { $link <bevel-button> }
-    { $link <command-button> }
-    { $link <presentation> }
-    { $link <repeat-button> }
-}
 "A button's appearance can vary depending on the state of the mouse button if the " { $link gadget-interior } " or " { $link gadget-boundary } " slots are set to instances of " { $link button-paint } "."
 $terpri
 "A button can be selected, which is distinct from being pressed. This state is held in the " { $link button-selected? } " slot, and is used by the " { $link <radio-box> } " word to construct a row of buttons for choosing among several alternatives." } ;

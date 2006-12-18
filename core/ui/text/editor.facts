@@ -5,13 +5,6 @@ HELP: editor
 { $class-description "An editor is a " { $link control } " for editing a multi-line passage of text stored in a " { $link document } " model. Editors are crated by calling " { $link <editor> } "."
 $terpri
 "The " { $link interactor } " gadget is built off the " { $link editor } " gadget and is used by the " { $link "ui-listener" } "." }
-{ $heading "General commands" }
-{ $commands editor "editing" }
-{ $heading "Caret motion commands" }
-{ $commands editor "caret" }
-{ $heading "Selection commands" }
-{ $commands editor "selection" }
-{ $heading "Slots" }
 "Editors have the following slots:"
 { $list
     { { $link editor-font } " - a font specifier." }
