@@ -123,7 +123,7 @@ SYMBOL: responders
         call
     ] make-hash add-responder ;
 
-: vhost ( name -- responder )
+: vhost ( name -- vhost )
     vhosts get hash [ "default" vhost ] unless* ;
 
 : responder ( name -- responder )
@@ -150,7 +150,7 @@ SYMBOL: responders
         swap responder call-responder
     ] [
         ! Just a responder name by itself
-        drop "request" get "/" append redirect drop
+        drop "request" get "/" append redirect 2drop
     ] if ;
 
 : serve-responder ( method path host -- )
