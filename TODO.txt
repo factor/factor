@@ -25,10 +25,8 @@
 - variable width word wrap
 - graphical crossref tool
 - inspector where slot values can be changed
-- compiled call traces:
-  - should be independent of whenever the runtime was built with
-    -fomit-frame-pointer on ppc
-  - we don't know if signal handlers run with the same stack or not
+- compiled call traces do not work if the runtime is built with
+  -fomit-frame-pointer on ppc
 - use crc32 instead of modification date in reload-modules
 - models: don't do redundant work
 - top level window positioning on ms windows

@@ -188,11 +188,13 @@ CELL thrown_rs;
 
 void fatal_error(char* msg, CELL tagged);
 void critical_error(char* msg, CELL tagged);
-void throw_error(CELL error, bool keep_stacks);
+void throw_error(CELL error, bool keep_stacks, F_STACK_FRAME *native_stack);
 void early_error(CELL error);
-void general_error(F_ERRORTYPE error, CELL arg1, CELL arg2, bool keep_stacks);
-void memory_protection_error(CELL addr, int signal);
-void signal_error(int signal);
+void general_error(F_ERRORTYPE error, CELL arg1, CELL arg2,
+	bool keep_stacks, F_STACK_FRAME *native_stack);
+void simple_error(F_ERRORTYPE error, CELL arg1, CELL arg2);
+void memory_protection_error(CELL addr, int signal, F_STACK_FRAME *native_stacks);
+void signal_error(int signal, F_STACK_FRAME *native_stack);
 void type_error(CELL type, CELL tagged);
 void divide_by_zero_error(void);
 void memory_error(void);

@@ -114,7 +114,7 @@ void primitive_next_object(void)
 	CELL type;
 
 	if(!gc_off)
-		general_error(ERROR_HEAP_SCAN,F,F,true);
+		simple_error(ERROR_HEAP_SCAN,F,F);
 
 	if(heap_scan_ptr >= tenured.here)
 	{

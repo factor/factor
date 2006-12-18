@@ -24,14 +24,14 @@ static mach_port_t our_exception_port;
 static void
 memory_protection_handler (void *fault_addr)
 {
-  memory_protection_error((CELL)fault_addr,SIGSEGV);
+  memory_protection_error((CELL)fault_addr,SIGSEGV,native_stack_pointer());
   abort ();
 }
 
 static void
 arithmetic_handler (void *ignore)
 {
-  signal_error(SIGFPE);
+  signal_error(SIGFPE,native_stack_pointer());
   abort ();
 }
 

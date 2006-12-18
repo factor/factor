@@ -20,7 +20,7 @@ F_ARRAY *allot_array_internal(CELL type, F_FIXNUM capacity)
 
 	if(capacity < 0)
 	{
-		general_error(ERROR_NEGATIVE_ARRAY_SIZE,allot_integer(capacity),F,true);
+		simple_error(ERROR_NEGATIVE_ARRAY_SIZE,allot_integer(capacity),F);
 		return NULL;
 	}
 	else
@@ -48,7 +48,7 @@ F_ARRAY *allot_byte_array(F_FIXNUM size)
 {
 	if(size < 0)
 	{
-		general_error(ERROR_NEGATIVE_ARRAY_SIZE,allot_integer(size),F,true);
+		simple_error(ERROR_NEGATIVE_ARRAY_SIZE,allot_integer(size),F);
 		return NULL;
 	}
 
@@ -144,7 +144,7 @@ F_STRING* allot_string_internal(F_FIXNUM capacity)
 
 	if(capacity < 0)
 	{
-		general_error(ERROR_NEGATIVE_ARRAY_SIZE,allot_integer(capacity),F,true);
+		simple_error(ERROR_NEGATIVE_ARRAY_SIZE,allot_integer(capacity),F);
 		return NULL;
 	}
 	else
@@ -309,7 +309,7 @@ F_ARRAY *allot_c_string(CELL capacity, CELL size)
 		CELL capacity = string_capacity(s); \
 		F_ARRAY *_c_str; \
 		if(check && !check_string(s,sizeof(type))) \
-			general_error(ERROR_C_STRING,tag_object(s),F,true); \
+			simple_error(ERROR_C_STRING,tag_object(s),F); \
 		REGISTER_STRING(s); \
 		_c_str = allot_c_string(capacity,sizeof(type)); \
 		UNREGISTER_STRING(s); \
@@ -323,7 +323,7 @@ F_ARRAY *allot_c_string(CELL capacity, CELL size)
 		if(sizeof(type) == sizeof(u16)) \
 		{ \
 			if(check && !check_string(s,sizeof(type))) \
-				general_error(ERROR_C_STRING,tag_object(s),F,true); \
+				simple_error(ERROR_C_STRING,tag_object(s),F); \
 			return (type*)(s + 1); \
 		} \
 		else \

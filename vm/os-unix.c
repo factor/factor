@@ -22,8 +22,8 @@ void ffi_dlopen(F_DLL *dll, bool error)
 	{
 		if(error)
 		{
-			general_error(ERROR_FFI,F,
-				tag_object(from_char_string(dlerror())),true);
+			simple_error(ERROR_FFI,F,
+				tag_object(from_char_string(dlerror())));
 		}
 		else
 			dll->dll = NULL;
@@ -42,9 +42,9 @@ void *ffi_dlsym(F_DLL *dll, char *symbol, bool error)
 	{
 		if(error)
 		{
-			general_error(ERROR_FFI,
+			simple_error(ERROR_FFI,
 				tag_object(from_char_string(symbol)),
-				tag_object(from_char_string(dlerror())),true);
+				tag_object(from_char_string(dlerror())));
 		}
 
 		return NULL;
@@ -56,8 +56,8 @@ void ffi_dlclose(F_DLL *dll)
 {
 	if(dlclose(dll->dll))
 	{
-		general_error(ERROR_FFI,tag_object(
-			from_char_string(dlerror())),F,true);
+		simple_error(ERROR_FFI,tag_object(
+			from_char_string(dlerror())),F);
 	}
 	dll->dll = NULL;
 }
@@ -158,14 +158,21 @@ void dealloc_segment(F_SEGMENT *block)
 	free(block);
 }
 
-void memory_signal_handler(int signal, siginfo_t* siginfo, void* uap)
+INLINE F_STACK_FRAME *uap_stack_pointer(void *uap)
 {
-	memory_protection_error((CELL)siginfo->si_addr, signal);
+	ucontext_t *ucontext = (ucontext_t *)uap;
+	return (F_STACK_FRAME *)ucontext->uc_stack.ss_sp;
 }
 
-void misc_signal_handler(int signal, siginfo_t* siginfo, void* uap)
+void memory_signal_handler(int signal, siginfo_t *siginfo, void *uap)
 {
-	signal_error(signal);
+	memory_protection_error((CELL)siginfo->si_addr,signal,
+		uap_stack_pointer(uap));
+}
+
+void misc_signal_handler(int signal, siginfo_t *siginfo, void *uap)
+{
+	signal_error(signal,uap_stack_pointer(uap));
 }
 
 static void sigaction_safe(int signum, const struct sigaction *act, struct sigaction *oldact)
@@ -174,7 +181,8 @@ static void sigaction_safe(int signum, const struct sigaction *act, struct sigac
 	do
 	{
 		ret = sigaction(signum, act, oldact);
-	} while(ret == -1 && errno == EINTR);
+	}
+	while(ret == -1 && errno == EINTR);
 }
 
 void unix_init_signals(void)

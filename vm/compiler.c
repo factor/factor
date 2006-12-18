@@ -4,7 +4,7 @@
 image load */
 void undefined_symbol(void)
 {
-	general_error(ERROR_UNDEFINED_SYMBOL,F,F,true);
+	simple_error(ERROR_UNDEFINED_SYMBOL,F,F);
 }
 
 #define CREF(array,i) ((CELL)(array) + CELLS * (i))

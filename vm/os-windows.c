@@ -48,7 +48,8 @@ void ffi_dlopen (F_DLL *dll, bool error)
 	{
 		dll->dll = NULL;
 		if(error)
-			general_error(ERROR_FFI, F, tag_object(get_error_message()),true);
+			simple_error(ERROR_FFI,F,
+				tag_object(get_error_message()));
 		else
 			return;
 	}
@@ -65,9 +66,9 @@ void *ffi_dlsym (F_DLL *dll, char *symbol, bool error)
 	if (!sym)
 	{
 		if(error)
-			general_error(ERROR_FFI,
+			simple_error(ERROR_FFI,
 				tag_object(from_char_string(symbol)),
-				tag_object(get_error_message()),true);
+				tag_object(get_error_message()));
 		else
 			return NULL;
 	}
@@ -222,7 +223,8 @@ void seh_call(void (*func)(), exception_handler_t *handler)
 
 static long exception_handler(PEXCEPTION_RECORD rec, void *frame, void *ctx, void *dispatch)
 {
-	memory_protection_error(rec->ExceptionInformation[1], SIGSEGV);
+	memory_protection_error(rec->ExceptionInformation[1],
+		SIGSEGV,native_stack_pointer());
 	return -1; /* unreachable */
 }
 

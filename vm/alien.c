@@ -30,7 +30,7 @@ void *alien_offset(CELL object)
 	case ALIEN_TYPE:
 		alien = untag_alien_fast(object);
 		if(alien->expired)
-			general_error(ERROR_EXPIRED,object,F,true);
+			simple_error(ERROR_EXPIRED,object,F);
 		return alien_offset(alien->alien) + alien->displacement;
 	case F_TYPE:
 		return NULL;
@@ -178,7 +178,7 @@ void primitive_dlsym(void)
 	{
 		d = untag_dll(dll);
 		if(d->dll == NULL)
-			general_error(ERROR_EXPIRED,dll,F,true);
+			simple_error(ERROR_EXPIRED,dll,F);
 	}
 
 	box_alien(ffi_dlsym(d,sym,true));

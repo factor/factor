@@ -5,6 +5,7 @@
 #include <unistd.h>
 #include <sys/time.h>
 #include <dlfcn.h>
+#include <ucontext.h>
 
 #define DLLEXPORT
 #define SETJMP(jmpbuf) sigsetjmp(jmpbuf,1)
