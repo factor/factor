@@ -583,12 +583,11 @@ factor.add_word("browser-dom", "load-script", "primitive", function(next) {
 var handle_json = false;
 factor.add_word("browser-dom", "json-request", "primitive", function(next) {  
   var stack = factor.cont.data_stack;
-  var quot = stack.pop();
   handle_json = function(data) { 
     factor.cont.data_stack.push(data);
-    quot.func(function() { });
+    factor.call_next(next);
   }
-  factor.get_word("browser-dom", "load-script").execute(next);
+  factor.get_word("browser-dom", "load-script").execute();
 });
 
 
