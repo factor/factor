@@ -9,7 +9,8 @@
 ! executing SQL calls and obtaining results.
 !
 IN: sqlite
-USING: alien compiler errors libsqlite kernel namespaces sequences sql strings ;
+USING: alien compiler errors generic libsqlite kernel math namespaces
+prettyprint sequences sql strings sql:utils ;
 
 TUPLE: sqlite-error n message ;
 
@@ -52,7 +53,7 @@ TUPLE: sqlite-error n message ;
 : sqlite-bind-parameter-index ( statement name -- index )
   sqlite3_bind_parameter_index ;
 
-: sqlite-bind-text-by-name ( statement name text -- )
+ : sqlite-bind-text-by-name ( statement name text -- )
   >r dupd sqlite-bind-parameter-index r> sqlite-bind-text ;
 
 : sqlite-finalize ( statement -- )
@@ -123,4 +124,36 @@ DEFER: (sqlite-map)
         >r sqlite-open db set r>
         [ db get sqlite-close ] cleanup
     ] with-scope ;
+
+: bind-for-sql ( statement alist -- )
+    [
+        first2 >r field>sqlite-bind-name r>
+        obj>string/f sqlite-bind-text-by-name
+    ] each-with ;
+
+: bind-for-insert ( statement tuple -- )
+    tuple>insert-alist dupd dupd bind-for-sql ;
+
+: bind-for-update ( statement tuple -- )
+    tuple>update-alist dupd dupd dupd bind-for-sql ;
+
+: bind-for-delete ( statement tuple -- )
+    tuple>delete-alist dupd dupd bind-for-sql ;
+
+: bind-for-select ( statement tuple -- )
+    tuple>select-alist dupd dupd bind-for-sql ;
+
+: restore-tuple ( statement tuple -- tuple )
+    break
+    clone dup dup full-tuple>fields
+    [
+        2drop
+        ! over 1+ >r
+        ! db-field-slot >r
+        ! pick swap column-text
+        ! over r> set-slot r>
+    ] each-with
+    ! drop make-persistent swap 0 column-text swap
+    ! [ set-persistent-key ] keep
+    ;
 
