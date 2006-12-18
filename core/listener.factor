@@ -50,4 +50,6 @@ M: duplex-stream parse-interactive
 IN: shells
 
 : tty ( -- )
-    print-banner use [ clone ] change listener ;
+    [
+        print-banner use [ clone ] change listener
+    ] with-scope ;
