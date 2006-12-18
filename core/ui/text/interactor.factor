@@ -32,12 +32,16 @@ M: interactor graft*
 : add-interactor-history ( str interactor -- )
     over empty? [ 2drop ] [ interactor-history push-new ] if ;
 
+: interactor-continue ( obj interactor -- )
+    t over set-interactor-busy?
+    interactor-continuation schedule-thread-with ;
+
 : interactor-finish ( obj interactor -- )
     [ editor-string ] keep
     [ interactor-input. ] 2keep
     [ add-interactor-history ] keep
     dup control-model clear-doc
-    interactor-continuation continue-with ;
+    interactor-continue ;
 
 : interactor-eval ( interactor -- )
     [
@@ -61,8 +65,7 @@ M: interactor stream-readln
     ] interactor-yield ;
 
 : interactor-call ( quot interactor -- )
-    2dup interactor-input.
-    interactor-continuation schedule-thread-with ;
+    2dup interactor-input. interactor-continue ;
 
 M: interactor stream-read
     swap dup zero?
