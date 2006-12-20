@@ -1,8 +1,8 @@
 ! Copyright (C) 2004, 2006 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-IN: file-responder
 USING: calendar embedded errors html httpd io kernel math
 namespaces parser sequences strings hashtables ;
+IN: file-responder
 
 : serving-path ( filename -- filename )
     [ "" ] unless* "doc-root" get swap path+ ;
@@ -53,12 +53,22 @@ SYMBOL: page
     dup mime-type dup "application/x-factor-server-page" =
     [ drop serving-html run-page ] [ serve-static ] if ;
 
+: file. ( path name -- )
+    tuck path+
+    directory? "[DIR] " "      " ? write
+    write-pathname terpri ;
+
+: directory. ( path -- )
+    dup directory natural-sort [ file. ] each-with ;
+
 : list-directory ( directory -- )
     serving-html
      "method" get "head" = [
         drop
     ] [
-        "request" get [ dup log-message directory. ] simple-html-document
+        "request" get [
+            "" swap directory.
+        ] simple-html-document
     ] if ;
 
 : find-index ( filename -- path )

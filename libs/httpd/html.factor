@@ -62,7 +62,7 @@ IN: html
 : padding-css, ( padding -- ) "padding: " % # "px; " % ;
 
 : pre-css, ( -- )
-    "white-space: pre; font-family:monospace; " % ;
+    "white-space: pre; font-family: monospace; " % ;
 
 : div-css-style ( style -- str )
     [
@@ -88,16 +88,7 @@ GENERIC: browser-link-href ( presented -- href )
 
 M: object browser-link-href drop f ;
 
-: resolve-file-link ( path -- link )
-    #! The file responder needs relative links not absolute
-    #! links.
-    "doc-root" get [
-        ?head [ "/" ?head drop ] when
-    ] when* "/" ?tail drop ;
-
-M: pathname browser-link-href
-    pathname-string
-    "/" swap resolve-file-link url-encode append ;
+M: pathname browser-link-href pathname-string url-encode ;
 
 : object-link-tag ( style quot -- )
     presented pick hash browser-link-href
