@@ -54,12 +54,14 @@
 - see should try to not show ; on a line by itself
 - IN: on its own line if the entire 'see' form doesn't fit
 - command buttons: indicate shortcuts
+- test what is done in the case of an invalid declaration on an inline
+  recursive
+- how do we refer to command shortcuts in the docs?
 
 + ui:
 
 - browser tool: dropdown menu button for definition operations
 - copying pane output
-- how do we refer to command shortcuts in the docs?
 - editor:
   - autoscroll
   - transpose char/word/line
@@ -67,27 +69,18 @@
 - see if its possible to only repaint dirty regions
 - structure editor
 
-+ module system:
++ compiler/ffi:
 
-- track a list of assets loaded from each module's file
 - C types should be words
   - TYPEDEF: float { ... } { ... } ;   ==> \ float T{ c-type ... } "c-type" swp
   - TYPEDEF: float FTFloat ;  ==> \ float \ FTFloat "c-type" swp
   - make typedef aliasing explicit
 - seeing a C struct word should show its def
-- file out
-
-+ compiler/ffi:
-
 - amd64 structs-by-value bug
 - %allot-bignum-signed-2 is broken on both platforms
-- we may be able to remove the dlsym primitive
 - [ [ dup call ] dup call ] infer hangs
 - stdcall callbacks
 - callstack overflow when compiling mutually recursive inline words
-- test what is done in the case of an invalid declaration on an inline
-  recursive
-- ppc64 backend
 - arm backend
 - float= doesn't consider nans equal
 - C functions returning structs by value
@@ -97,7 +90,6 @@
 
 - if a word drops the stack pointer below the bottom, then an error
   won't be thrown until the next word accesses the stack
-- prettyprinter: clean it up
 - prettyprinter: don't build entire tree to print first
 - automatic help/effects for slot accessors
 - tuple shape changes
@@ -105,7 +97,6 @@
 - minor GC takes too long now, we should card mark code heap
 - buffer-ptr should be an alien
 - swap nappend ==> nappend
-- gdb triggers 'multiple i/o ops on port' error
 - incremental GC
 - UDP
 - slice: if sequence or seq start is changed, abstraction violation
@@ -114,3 +105,4 @@
 + httpd:
 
 - remaining HTML issues need fixing
+- embedded.factor is O(n^2)

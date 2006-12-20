@@ -48,7 +48,3 @@ HELP: resource-path
 
 HELP: pathname
 { $class-description "Class of path name presentations. Instances can be used passed to " { $link write-object } " to output a clickable path name." } ;
-
-HELP: directory.
-{ $values { "path" "a string" } }
-{ $description "Prints a directory listing to the " { $link stdio } " stream. If the stream supports it, subdirectories are shown as expandable outliners." } ;

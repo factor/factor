@@ -34,23 +34,7 @@ strings styles arrays ;
 
 TUPLE: pathname string ;
 
-: (file.) ( name path -- )
-    <pathname> write-object ;
-
-: write-pathname ( path -- ) dup (file.) ;
-
-DEFER: directory.
-
-: (directory.) ( name path -- )
-    >r "/" append r> dup <pathname> swap [ directory. ] curry
-    write-outliner terpri ;
-
-: file. ( dir name -- )
-    tuck path+
-    dup directory? [ (directory.) ] [ (file.) terpri ] if ;
-
-: directory. ( path -- )
-    dup directory natural-sort [ file. ] each-with ;
+: write-pathname ( path -- ) dup <pathname> write-object ;
 
 : home ( -- dir )
     windows? "USERPROFILE" "HOME" ? os-env [ "." ] unless* ;
