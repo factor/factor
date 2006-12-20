@@ -14,7 +14,7 @@ SYMBOL: wordbank
 
         times repeat (repeat)
         supremum infimum assoc rassoc norm-sq
-        product sum curry remove-all member?
+        product sum curry remove-all member? subseq?
 
         (next-power-of-2) (^) d>w/w w>h/h millis
         (random-int) ^n integer, first-bignum
@@ -60,7 +60,7 @@ SYMBOL: wordbank
         close readln (readln) read1 read with-server
         stream-read stream-readln stream-read1 lines (lines)
         contents stream-copy stream-flush
-        stream-write log-stream stream-format set-line-reader-cr
+        stream-format set-line-reader-cr
 
         double>bits float>bits >bignum
 
@@ -71,7 +71,7 @@ SYMBOL: wordbank
 
         gensym random-int counter <byte-array>
         <word> <client-stream> <server> <client>
-        <duplex-stream> <file-writer> <file-reader> <file-r/w>
+        <duplex-stream> <file-writer> <file-reader> ! <file-r/w>
         init-namespaces unxref-word set-global set off on
         nest
         set-restart-obj
@@ -80,7 +80,7 @@ SYMBOL: wordbank
         changed-words
         callstack namespace namestack global vocabularies
 
-        file. (file.) path+ parent-dir directory.
+        path+ parent-dir
 
         .s . word-xt.
 

@@ -24,7 +24,7 @@ TUPLE: inert-object ;
         ""
         SBUF" "
         [ ]
-        DLL" libm.dylib"
+        ! DLL" libm.dylib"
         ALIEN: 1
         T{ inert-object f }
     } ;
