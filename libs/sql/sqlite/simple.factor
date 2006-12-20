@@ -14,6 +14,9 @@ M: sqlite create-sql* ( db tuple -- string )
         ");" %
     ] "" make ;
 
+M: sqlite drop-sql* ( db tuple -- string )
+    nip [ "drop table " % tuple>sql-name % ";" % ] "" make 
+
 M: sqlite insert-sql* ( db tuple -- string )
     #! Insert and fill in the ID column
     nip [
