@@ -15,7 +15,7 @@ then
 elif [ \( `uname -s` = NetBSD \) -a \( `uname -p` = i386 \) ]
 then
   echo netbsd-x86-32
-elif [ \( `uname -s` = NetBSD \) -a \( `uname -p` = amd64 \) ]
+elif [ \( `uname -s` = NetBSD \) -a \( `uname -p` = x86_64 \) ]
 then
   echo netbsd-x86-64
 elif [ \( `uname -s` = Darwin \) -a \( `uname -p` = powerpc \) ]
