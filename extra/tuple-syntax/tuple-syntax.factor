@@ -1,5 +1,5 @@
 USING: kernel sequences slots parser words classes
-slots.private ;
+slots.private mirrors ;
 IN: tuple-syntax
 
 ! TUPLE: foo bar baz ;
@@ -10,8 +10,7 @@ IN: tuple-syntax
 
 : parse-slot-writer ( tuple -- slot# )
     scan dup "}" = [ 2drop f ] [
-        1 head* swap class "slots" word-prop
-        [ slot-spec-name = ] with find nip slot-spec-offset
+        1 head* swap object-slots slot-named slot-spec-offset
     ] if ;
 
 : parse-slots ( accum tuple -- accum tuple )

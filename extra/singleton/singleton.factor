@@ -5,8 +5,9 @@ sequences words ;
 IN: singleton
 
 : define-singleton ( token -- )
-    \ word swap create-class-in
-    dup [ eq? ] curry define-predicate-class ;
+    create-class-in
+    \ word
+    over [ eq? ] curry define-predicate-class ;
 
 : SINGLETON:
     scan define-singleton ; parsing

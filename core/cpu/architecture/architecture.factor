@@ -153,11 +153,11 @@ M: f v>operand drop \ f tag-number ;
 
 M: object load-literal v>operand load-indirect ;
 
-PREDICATE: integer small-slot cells small-enough? ;
+PREDICATE: small-slot < integer cells small-enough? ;
 
-PREDICATE: integer small-tagged v>operand small-enough? ;
+PREDICATE: small-tagged < integer v>operand small-enough? ;
 
-PREDICATE: integer inline-array 32 < ;
+PREDICATE: inline-array < integer 32 < ;
 
 : if-small-struct ( n size true false -- ? )
     >r >r over not over struct-small-enough? and

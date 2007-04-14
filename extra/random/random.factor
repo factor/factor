@@ -4,6 +4,8 @@ USING: alien.c-types kernel math namespaces sequences
 io.backend ;
 IN: random
 
+SYMBOL: random-generator
+
 HOOK: os-crypto-random-bytes io-backend ( n -- byte-array )
 HOOK: os-random-bytes io-backend ( n -- byte-array )
 HOOK: os-crypto-random-32 io-backend ( -- r )
@@ -11,16 +13,15 @@ HOOK: os-random-32 io-backend ( -- r )
 
 GENERIC: seed-random ( tuple seed -- )
 GENERIC: random-32 ( tuple -- r )
+GENERIC: random-bytes* ( tuple n -- bytes )
 
-: (random-bytes) ( tuple n -- byte-array )
+M: object random-bytes* ( tuple n -- byte-array )
     [ drop random-32 ] with map >c-uint-array ;
-
-SYMBOL: random-generator
 
 : random-bytes ( n -- r )
     [
         4 /mod zero? [ 1+ ] unless
-        random-generator get swap (random-bytes)
+        random-generator get swap random-bytes*
     ] keep head ;
 
 : random ( seq -- elt )

@@ -10,7 +10,7 @@ IN: delegate
     CREATE-WORD dup define-symbol
     parse-definition swap define-protocol ; parsing
 
-PREDICATE: word protocol "protocol-words" word-prop ;
+PREDICATE: protocol < word "protocol-words" word-prop ;
 
 GENERIC: group-words ( group -- words )
 

@@ -81,8 +81,8 @@ unit-test
     -12 -13 [ [ 0 swap fixnum- ] 2apply ] compile-call
 ] unit-test
 
-[ 2 ] [
-    SBUF" " [ 2 slot 2 [ slot ] keep ] compile-call nip
+[ 1 ] [
+    SBUF" " [ 1 slot 1 [ slot ] keep ] compile-call nip
 ] unit-test
 
 ! Test slow shuffles

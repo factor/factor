@@ -1,6 +1,6 @@
-USING: help.markup help.syntax words classes definitions kernel
-alien sequences math quotations generic.standard generic.math
-combinators ;
+USING: help.markup help.syntax words classes classes.algebra
+definitions kernel alien sequences math quotations
+generic.standard generic.math combinators ;
 IN: generic
 
 ARTICLE: "method-order" "Method precedence"

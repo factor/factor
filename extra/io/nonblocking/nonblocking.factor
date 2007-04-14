@@ -22,8 +22,8 @@ M: port set-timeout set-port-timeout ;
 
 SYMBOL: closed
 
-PREDICATE: port input-port port-type input-port eq? ;
-PREDICATE: port output-port port-type output-port eq? ;
+PREDICATE: input-port < port port-type input-port eq? ;
+PREDICATE: output-port < port port-type output-port eq? ;
 
 GENERIC: init-handle ( handle -- )
 GENERIC: close-handle ( handle -- )

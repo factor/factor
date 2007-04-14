@@ -19,7 +19,7 @@ TUPLE: operation predicate command translator hook listener? ;
         set-operation-hook
     } operation construct ;
 
-PREDICATE: operation listener-operation
+PREDICATE: listener-operation < operation
     dup operation-command listener-command?
     swap operation-listener? or ;
 

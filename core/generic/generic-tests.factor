@@ -1,8 +1,8 @@
 USING: alien arrays definitions generic generic.standard
 generic.math assocs hashtables io kernel math namespaces parser
 prettyprint sequences strings tools.test vectors words
-quotations classes continuations layouts classes.union sorting
-compiler.units ;
+quotations classes classes.algebra continuations layouts
+classes.union sorting compiler.units ;
 IN: generic.tests
 
 GENERIC: foobar ( x -- y )
@@ -44,7 +44,7 @@ M: object funny drop 0 ;
 [ 2 ] [ [ { } ] funny ] unit-test
 [ 0 ] [ { } funny ] unit-test
 
-PREDICATE: funnies very-funny number? ;
+PREDICATE: very-funny < funnies number? ;
 
 GENERIC: gooey ( x -- y )
 M: very-funny gooey sq ;

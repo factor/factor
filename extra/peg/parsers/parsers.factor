@@ -3,23 +3,24 @@
 USING: kernel sequences strings namespaces math assocs shuffle 
      vectors arrays combinators.lib math.parser match
      unicode.categories sequences.deep peg peg.private 
-     peg.search math.ranges ;
+     peg.search math.ranges words memoize ;
 IN: peg.parsers
 
 TUPLE: just-parser p1 ;
+M: just-parser equal? 2drop f ;
 
 : just-pattern
   [
-    dup [
+    execute dup [
       dup parse-result-remaining empty? [ drop f ] unless
     ] when
   ] ;
 
 
-M: just-parser compile ( parser -- quot )
-  just-parser-p1 compile just-pattern append ;
+M: just-parser (compile) ( parser -- quot )
+  just-parser-p1 compiled-parser just-pattern curry ;
 
-: just ( parser -- parser )
+MEMO: just ( parser -- parser )
   just-parser construct-boa ;
 
 : 1token ( ch -- parser ) 1string token ;
@@ -47,10 +48,10 @@ PRIVATE>
 
 PRIVATE>
 
-: exactly-n ( parser n -- parser' )
+MEMO: exactly-n ( parser n -- parser' )
   swap <repetition> seq ;
 
-: at-most-n ( parser n -- parser' )
+MEMO: at-most-n ( parser n -- parser' )
   dup zero? [
     2drop epsilon
   ] [
@@ -58,15 +59,15 @@ PRIVATE>
     -rot 1- at-most-n 2choice
   ] if ;
 
-: at-least-n ( parser n -- parser' )
+MEMO: at-least-n ( parser n -- parser' )
   dupd exactly-n swap repeat0 2seq
   [ flatten-vectors ] action ;
 
-: from-m-to-n ( parser m n -- parser' )
+MEMO: from-m-to-n ( parser m n -- parser' )
   >r [ exactly-n ] 2keep r> swap - at-most-n 2seq
   [ flatten-vectors ] action ;
 
-: pack ( begin body end -- parser )
+MEMO: pack ( begin body end -- parser )
   >r >r hide r> r> hide 3seq [ first ] action ;
 
 : surrounded-by ( parser begin end -- parser' )
@@ -83,7 +84,7 @@ PRIVATE>
     [ CHAR: " = ] satisfy hide ,
     [ CHAR: " = not ] satisfy repeat0 ,
     [ CHAR: " = ] satisfy hide ,
-  ] { } make seq [ first >string ] action ;
+  ] seq* [ first >string ] action ;
 
 : (range-pattern) ( pattern -- string )
   #! Given a range pattern, produce a string containing

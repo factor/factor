@@ -25,7 +25,7 @@ V{
 
 : vocab-dir? ( root name -- ? )
     over [
-        ".factor" vocab-dir+ append-path resource-exists?
+        ".factor" vocab-dir+ append-path exists?
     ] [
         2drop f
     ] if ;

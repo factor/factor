@@ -172,7 +172,7 @@ SYMBOL: ns-stack
     [ T{ name f "" "version" f } swap at
       [ good-version ] [ <versionless-prolog> throw ] if* ] keep
     [ T{ name f "" "encoding" f } swap at
-      "iso-8859-1" or ] keep
+      "UTF-8" or ] keep
     T{ name f "" "standalone" f } swap at
     [ yes/no>bool ] [ f ] if*
     <prolog> ;

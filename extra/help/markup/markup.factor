@@ -14,7 +14,7 @@ IN: help.markup
 
 ! Element types are words whose name begins with $.
 
-PREDICATE: array simple-element
+PREDICATE: simple-element < array
     dup empty? [ drop t ] [ first word? not ] if ;
 
 SYMBOL: last-element

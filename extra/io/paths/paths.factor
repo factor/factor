@@ -44,7 +44,7 @@ TUPLE: directory-iterator path bfs queue ;
 
 : find-all-files ( path bfs? quot -- paths )
     >r <directory-iterator> r>
-    pusher >r iterate-directory drop r> ; inline
+    pusher >r [ f ] compose iterate-directory drop r> ; inline
 
 : recursive-directory ( path bfs? -- paths )
     [ ] accumulator >r each-file r> ;

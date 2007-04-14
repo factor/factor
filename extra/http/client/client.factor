@@ -3,7 +3,7 @@
 USING: assocs http kernel math math.parser namespaces sequences
 io io.sockets io.streams.string io.files io.timeouts strings
 splitting calendar continuations accessors vectors
-io.encodings.latin1 io.encodings.binary fry ;
+io.encodings.8-bit io.encodings.binary fry ;
 IN: http.client
 
 DEFER: http-request

@@ -51,7 +51,7 @@ M: win32-file close-handle ( handle -- )
 ! Clean up resources (open handle) if add-completion fails
 : open-file ( path access-mode create-mode flags -- handle )
     [
-        >r >r >r normalize-pathname r>
+        >r >r
         share-mode security-attributes-inherit r> r> CreateFile-flags f CreateFile
         dup invalid-handle? dup close-later
         dup add-completion

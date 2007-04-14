@@ -225,3 +225,6 @@ PRIVATE>
 
 : replace ( str oldseq newseq -- str' )
     H{ } 2seq>assoc substitute ;
+
+: remove-nth ( seq n -- seq' )
+    cut-slice 1 tail-slice append ;

@@ -62,11 +62,12 @@ T{ macosx-deploy-implementation } deploy-implementation set-global
 
 M: macosx-deploy-implementation deploy* ( vocab -- )
     ".app deploy tool" assert.app
-    "." resource-path cd
-    dup deploy-config [
-        bundle-name dup exists? [ delete-tree ] [ drop ] if
-        [ bundle-name create-app-dir ] keep
-        [ bundle-name deploy.app-image ] keep
-        namespace make-deploy-image
-        bundle-name show-in-finder
-    ] bind ;
+    "resource:" [
+        dup deploy-config [
+            bundle-name dup exists? [ delete-tree ] [ drop ] if
+            [ bundle-name create-app-dir ] keep
+            [ bundle-name deploy.app-image ] keep
+            namespace make-deploy-image
+            bundle-name show-in-finder
+        ] bind
+    ] with-directory ;

@@ -20,9 +20,6 @@ ARTICLE: "pathnames" "Pathname manipulation"
 { $subsection file-name }
 { $subsection last-path-separator }
 { $subsection append-path }
-"Pathnames relative to Factor's install directory:"
-{ $subsection resource-path }
-{ $subsection ?resource-path }
 "Pathnames relative to Factor's temporary files directory:"
 { $subsection temp-directory }
 { $subsection temp-file }
@@ -247,12 +244,6 @@ HELP: directory*
 HELP: resource-path
 { $values { "path" "a pathname string" } { "newpath" "a pathname string" } }
 { $description "Resolve a path relative to the Factor source code location. This first checks if the " { $link resource-path } " variable is set to a path, and if not, uses the parent directory of the current image." } ;
-
-HELP: ?resource-path
-{ $values { "path" "a pathname string" } { "newpath" "a string" } }
-{ $description "If the path is prefixed with " { $snippet "\"resource:\"" } ", prepends the resource path." } ;
-
-{ resource-path ?resource-path } related-words
 
 HELP: pathname
 { $class-description "Class of pathname presentations. Path name presentations can be created by calling " { $link <pathname> } ". Instances can be passed to " { $link write-object } " to output a clickable pathname." } ;

@@ -1,6 +1,7 @@
 IN: io.files.tests
-USING: tools.test io.files io threads kernel continuations io.encodings.ascii
-io.files.unique sequences strings accessors ;
+USING: tools.test io.files io threads kernel continuations
+io.encodings.ascii io.files.unique sequences strings accessors
+io.encodings.utf8 ;
 
 [ ] [ "blahblah" temp-file dup exists? [ delete-directory ] [ drop ] if ] unit-test
 [ ] [ "blahblah" temp-file make-directory ] unit-test
@@ -9,6 +10,7 @@ io.files.unique sequences strings accessors ;
 [ "passwd" ] [ "/etc/passwd" file-name ] unit-test
 [ "awk" ] [ "/usr/libexec/awk/" file-name ] unit-test
 [ "awk" ] [ "/usr/libexec/awk///" file-name ] unit-test
+[ "" ] [ "" file-name ] unit-test
 
 [ ] [
     { "Hello world." }
@@ -81,6 +83,18 @@ io.files.unique sequences strings accessors ;
     "delete-tree-test" temp-file delete-tree
 ] unit-test
 
+[ { { "kernel" t } } ] [
+    "core" resource-path [
+        "." directory [ first "kernel" = ] subset
+    ] with-directory
+] unit-test
+
+[ { { "kernel" t } } ] [
+    "resource:core" [
+        "." directory [ first "kernel" = ] subset
+    ] with-directory
+] unit-test
+
 [ ] [
     "copy-tree-test/a/b/c" temp-file make-directories
 ] unit-test
@@ -129,6 +143,15 @@ io.files.unique sequences strings accessors ;
 
 [ t ] [ cwd "misc" resource-path [ ] with-directory cwd = ] unit-test
 
+[ t ] [
+    temp-directory [ "hi41" "test41" utf8 set-file-contents ] with-directory
+    temp-directory "test41" append-path utf8 file-contents "hi41" =
+] unit-test
+
+[ t ] [
+    temp-directory [ "test41" file-info size>> ] with-directory 4 =
+] unit-test
+
 [ ] [ "append-test" temp-file dup exists? [ delete-file ] [ drop ] if ] unit-test
 
 [ ] [ "append-test" temp-file ascii <file-appender> dispose ] unit-test
@@ -144,3 +167,51 @@ io.files.unique sequences strings accessors ;
         ] keep file-info size>>
     ] with-unique-file
 ] unit-test
+
+[ "/usr/lib" ] [ "/usr" "lib" append-path ] unit-test
+[ "/usr/lib" ] [ "/usr/" "lib" append-path ] unit-test
+[ "/lib" ] [ "/usr/" "/lib" append-path ] unit-test
+[ "/lib/" ] [ "/usr/" "/lib/" append-path ] unit-test
+[ "/usr/lib" ] [ "/usr" "./lib" append-path ] unit-test
+[ "/usr/lib/" ] [ "/usr" "./lib/" append-path ] unit-test
+[ "/lib" ] [ "/usr" "../lib" append-path ] unit-test
+[ "/lib/" ] [ "/usr" "../lib/" append-path ] unit-test
+
+[ "" ] [ "" "." append-path ] unit-test
+[ "" ".." append-path ] must-fail
+
+[ "/" ] [ "/" "./." append-path ] unit-test
+[ "/" ] [ "/" "././" append-path ] unit-test
+[ "/a/b/lib" ] [ "/a/b/c/d/e/f/" "../../../../lib" append-path ] unit-test
+[ "/a/b/lib/" ] [ "/a/b/c/d/e/f/" "../../../../lib/" append-path ] unit-test
+
+[ "" "../lib/" append-path ] must-fail
+[ "lib" ] [ "" "lib" append-path ] unit-test
+[ "lib" ] [ "" "./lib" append-path ] unit-test
+
+[ "/lib/bux" ] [ "/usr" "/lib/bux" append-path ] unit-test
+[ "/lib/bux/" ] [ "/usr" "/lib/bux/" append-path ] unit-test
+
+[ "foo/bar/." parent-directory ] must-fail
+[ "foo/bar/./" parent-directory ] must-fail
+[ "foo/bar/baz/.." parent-directory ] must-fail
+[ "foo/bar/baz/../" parent-directory ] must-fail
+
+[ "." parent-directory ] must-fail
+[ "./" parent-directory ] must-fail
+[ ".." parent-directory ] must-fail
+[ "../" parent-directory ] must-fail
+[ "../../" parent-directory ] must-fail
+[ "foo/.." parent-directory ] must-fail
+[ "foo/../" parent-directory ] must-fail
+[ "" parent-directory ] must-fail
+[ "." ] [ "boot.x86.64.image" parent-directory ] unit-test
+
+[ "bar/foo" ] [ "bar/baz" "..///foo" append-path ] unit-test
+[ "bar/baz/foo" ] [ "bar/baz" ".///foo" append-path ] unit-test
+[ "bar/foo" ] [ "bar/baz" "./..//foo" append-path ] unit-test
+[ "bar/foo" ] [ "bar/baz" "./../././././././///foo" append-path ] unit-test
+
+[ t ] [ "resource:core" absolute-path? ] unit-test
+[ t ] [ "/foo" absolute-path? ] unit-test
+[ f ] [ "" absolute-path? ] unit-test

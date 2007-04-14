@@ -48,7 +48,7 @@ uses definitions ;
 
 : reset-checksums ( -- )
     source-files get [
-        swap ?resource-path dup exists? [
+        swap dup exists? [
             utf8 file-lines swap record-checksum
         ] [ 2drop ] if
     ] assoc-each ;

@@ -3,7 +3,7 @@
 USING: arrays assocs kernel kernel.private slots.private math
 namespaces sequences vectors words quotations definitions
 hashtables layouts combinators sequences.private generic
-classes classes.private ;
+classes classes.algebra classes.private ;
 IN: generic.standard
 
 TUPLE: standard-combination # ;
@@ -174,13 +174,13 @@ M: hook-combination perform-combination
 : define-simple-generic ( word -- )
     T{ standard-combination f 0 } define-generic ;
 
-PREDICATE: generic standard-generic
+PREDICATE: standard-generic < generic
     "combination" word-prop standard-combination? ;
 
-PREDICATE: standard-generic simple-generic
+PREDICATE: simple-generic < standard-generic
     "combination" word-prop standard-combination-# zero? ;
 
-PREDICATE: generic hook-generic
+PREDICATE: hook-generic < generic
     "combination" word-prop hook-combination? ;
 
 GENERIC: dispatch# ( word -- n )

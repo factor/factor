@@ -125,7 +125,6 @@ TYPEDEF: FILE_NOTIFY_INFORMATION* PFILE_NOTIFY_INFORMATION
 : OF_REOPEN    32768 ;
 : OF_VERIFY    1024 ;
 
-
 : INFINITE HEX: FFFFFFFF ; inline
 
 ! From C:\cygwin\usr\include\w32api\winbase.h
@@ -188,6 +187,16 @@ TYPEDEF: FILE_NOTIFY_INFORMATION* PFILE_NOTIFY_INFORMATION
 : FILE_MAP_READ   4 ;
 : FILE_MAP_WRITE  2 ;
 : FILE_MAP_COPY   1 ;
+
+: THREAD_MODE_BACKGROUND_BEGIN HEX: 10000 ; inline
+: THREAD_MODE_BACKGROUND_END   HEX: 20000 ; inline
+: THREAD_PRIORITY_ABOVE_NORMAL 1 ; inline
+: THREAD_PRIORITY_BELOW_NORMAL -1 ; inline
+: THREAD_PRIORITY_HIGHEST 2 ; inline
+: THREAD_PRIORITY_IDLE -15 ; inline
+: THREAD_PRIORITY_LOWEST -2 ; inline
+: THREAD_PRIORITY_NORMAL 0 ; inline
+: THREAD_PRIORITY_TIME_CRITICAL 15 ; inline
 
 C-STRUCT: OVERLAPPED
     { "int" "internal" }
@@ -998,7 +1007,7 @@ FUNCTION: HMODULE GetModuleHandleW ( LPCWSTR lpModuleName ) ;
 ! FUNCTION: GetNumberOfConsoleMouseButtons
 ! FUNCTION: GetOEMCP
 FUNCTION: BOOL GetOverlappedResult ( HANDLE hFile, LPOVERLAPPED lpOverlapped, LPDWORD lpNumberOfBytesTransferred, BOOL bWait ) ;
-! FUNCTION: GetPriorityClass
+FUNCTION: DWORD GetPriorityClass ( HANDLE hProcess ) ;
 ! FUNCTION: GetPrivateProfileIntA
 ! FUNCTION: GetPrivateProfileIntW
 ! FUNCTION: GetPrivateProfileSectionA
@@ -1065,8 +1074,8 @@ FUNCTION: UINT GetSystemWindowsDirectoryW ( LPTSTR lpBuffer, UINT uSize ) ;
 ! FUNCTION: GetThreadContext
 ! FUNCTION: GetThreadIOPendingFlag
 ! FUNCTION: GetThreadLocale
-! FUNCTION: GetThreadPriority
-! FUNCTION: GetThreadPriorityBoost
+FUNCTION: int GetThreadPriority ( HANDLE hThread ) ;
+FUNCTION: BOOL GetThreadPriorityBoost ( HANDLE hThread, PBOOL pDisablePriorityBoost ) ;
 ! FUNCTION: GetThreadSelectorEntry
 ! FUNCTION: GetThreadTimes
 ! FUNCTION: GetTickCount
@@ -1437,9 +1446,9 @@ FUNCTION: BOOL SetHandleInformation ( HANDLE hObject, DWORD dwMask, DWORD dwFlag
 ! FUNCTION: SetMailslotInfo
 ! FUNCTION: SetMessageWaitingIndicator
 ! FUNCTION: SetNamedPipeHandleState
-! FUNCTION: SetPriorityClass
+FUNCTION: BOOL SetPriorityClass ( HANDLE hProcess, DWORD dwPriorityClass ) ;
 ! FUNCTION: SetProcessAffinityMask
-! FUNCTION: SetProcessPriorityBoost
+FUNCTION: BOOL SetProcessPriorityBoost ( HANDLE hProcess, BOOL disablePriorityBoost ) ;
 ! FUNCTION: SetProcessShutdownParameters
 ! FUNCTION: SetProcessWorkingSetSize
 ! FUNCTION: SetStdHandle
@@ -1454,8 +1463,8 @@ FUNCTION: BOOL SetHandleInformation ( HANDLE hObject, DWORD dwMask, DWORD dwFlag
 ! FUNCTION: SetThreadExecutionState
 ! FUNCTION: SetThreadIdealProcessor
 ! FUNCTION: SetThreadLocale
-! FUNCTION: SetThreadPriority
-! FUNCTION: SetThreadPriorityBoost
+FUNCTION: BOOL SetThreadPriority ( HANDLE hThread, int nPriority ) ;
+FUNCTION: BOOL SetThreadPriorityBoost ( HANDLE hThread, BOOL disablePriorityBoost ) ;
 ! FUNCTION: SetThreadUILanguage
 ! FUNCTION: SetTimerQueueTimer
 ! FUNCTION: SetTimeZoneInformation

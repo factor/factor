@@ -46,3 +46,8 @@ IN: combinators.lib.tests
         [ dup array? ] [ dup vector? ] [ dup float? ]
     } || nip
 ] unit-test
+
+
+{ 1 1 } [
+    [ even? ] [ drop 1 ] [ drop 2 ] ifte
+] must-infer-as

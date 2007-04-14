@@ -3,8 +3,8 @@
 USING: arrays generic assocs inference inference.class
 inference.dataflow inference.backend inference.state io kernel
 math namespaces sequences vectors words quotations hashtables
-combinators classes generic.math continuations optimizer.def-use
-optimizer.backend generic.standard ;
+combinators classes classes.algebra generic.math continuations
+optimizer.def-use optimizer.backend generic.standard ;
 IN: optimizer.control
 
 ! ! ! Rudimentary CFA

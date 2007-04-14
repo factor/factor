@@ -1,25 +1,42 @@
 ! Copyright (C) 2004, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
+USING: arrays definitions assocs kernel kernel.private
+slots.private namespaces sequences strings words vectors math
+quotations combinators sorting effects graphs vocabs ;
 IN: classes
-USING: arrays definitions assocs kernel
-kernel.private slots.private namespaces sequences strings words
-vectors math quotations combinators sorting effects graphs ;
 
-PREDICATE: word class ( obj -- ? ) "class" word-prop ;
+SYMBOL: class<-cache
+SYMBOL: class-not-cache
+SYMBOL: classes-intersect-cache
+SYMBOL: class-and-cache
+SYMBOL: class-or-cache
 
-SYMBOL: typemap
-SYMBOL: class-map
-SYMBOL: class<map
+: init-caches ( -- )
+    H{ } clone class<-cache set
+    H{ } clone class-not-cache set
+    H{ } clone classes-intersect-cache set
+    H{ } clone class-and-cache set
+    H{ } clone class-or-cache set ;
+
+: reset-caches ( -- )
+    class<-cache get clear-assoc
+    class-not-cache get clear-assoc
+    classes-intersect-cache get clear-assoc
+    class-and-cache get clear-assoc
+    class-or-cache get clear-assoc ;
+
+PREDICATE: class < word ( obj -- ? ) "class" word-prop ;
+
 SYMBOL: update-map
 SYMBOL: builtins
 
-PREDICATE: class builtin-class
+PREDICATE: builtin-class < class
     "metaclass" word-prop builtin-class eq? ;
 
-PREDICATE: class tuple-class
+PREDICATE: tuple-class < class
     "metaclass" word-prop tuple-class eq? ;
 
-: classes ( -- seq ) class<map get keys ;
+: classes ( -- seq ) all-words [ class? ] subset ;
 
 : type>class ( n -- class ) builtins get-global nth ;
 
@@ -30,153 +47,22 @@ PREDICATE: class tuple-class
 
 : predicate-effect 1 { "?" } <effect> ;
 
-PREDICATE: word predicate "predicating" word-prop >boolean ;
+PREDICATE: predicate < word "predicating" word-prop >boolean ;
 
 : define-predicate ( class quot -- )
     >r "predicate" word-prop first
     r> predicate-effect define-declared ;
 
 : superclass ( class -- super )
-    "superclass" word-prop ;
+    #! Output f for non-classes to work with algebra code
+    dup class? [ "superclass" word-prop ] [ drop f ] if ;
 
-: members ( class -- seq ) "members" word-prop ;
+: superclasses ( class -- supers )
+    [ dup ] [ dup superclass swap ] [ ] unfold reverse nip ;
 
-: class-empty? ( class -- ? ) members dup [ empty? ] when ;
-
-: (flatten-union-class) ( class -- )
-    dup members [
-        [ (flatten-union-class) ] each
-    ] [
-        dup set
-    ] ?if ;
-
-: flatten-union-class ( class -- assoc )
-    [ (flatten-union-class) ] H{ } make-assoc ;
-
-: (flatten-class) ( class -- )
-    {
-        { [ dup tuple-class? ] [ dup set ] }
-        { [ dup builtin-class? ] [ dup set ] }
-        { [ dup members ] [ members [ (flatten-class) ] each ] }
-        { [ dup superclass ] [ superclass (flatten-class) ] }
-        { [ t ] [ drop ] }
-    } cond ;
-
-: flatten-class ( class -- assoc )
-    [ (flatten-class) ] H{ } make-assoc ;
-
-: class-hashes ( class -- seq )
-    flatten-class keys [
-        dup builtin-class?
-        [ "type" word-prop ] [ hashcode ] if
-    ] map ;
-
-: (flatten-builtin-class) ( class -- )
-    {
-        { [ dup members ] [ members [ (flatten-builtin-class) ] each ] }
-        { [ dup superclass ] [ superclass (flatten-builtin-class) ] }
-        { [ t ] [ dup set ] }
-    } cond ;
-
-: flatten-builtin-class ( class -- assoc )
-    [ (flatten-builtin-class) ] H{ } make-assoc ;
-
-: types ( class -- seq )
-    flatten-builtin-class keys
-    [ "type" word-prop ] map natural-sort ;
-
-: class< ( class1 class2 -- ? ) swap class<map get at key? ;
-
-<PRIVATE
-
-DEFER: (class<)
-
-: superclass< ( cls1 cls2 -- ? )
-    >r superclass r> 2dup and [ (class<) ] [ 2drop f ] if ;
-
-: union-class< ( cls1 cls2 -- ? )
-    [ flatten-union-class ] 2apply keys
-    [ nip [ (class<) ] with contains? ] curry assoc-all? ;
-
-: (class<) ( class1 class2 -- ? )
-    {
-        { [ 2dup eq? ] [ 2drop t ] }
-        { [ over class-empty? ] [ 2drop t ] }
-        { [ 2dup superclass< ] [ 2drop t ] }
-        { [ 2dup [ members not ] both? ] [ 2drop f ] }
-        { [ t ] [ union-class< ] }
-    } cond ;
-
-: lookup-union ( classes -- class )
-    typemap get at dup empty? [ drop object ] [ first ] if ;
-
-: lookup-tuple-union ( classes -- class )
-    class-map get at dup empty? [ drop object ] [ first ] if ;
-
-! : (class-or) ( class class -- class )
-!     [ flatten-builtin-class ] 2apply union lookup-union ;
-! 
-! : (class-and) ( class class -- class )
-!     [ flatten-builtin-class ] 2apply intersect lookup-union ;
-
-: class-or-fixup ( set set -- set )
-    union
-    tuple over key?
-    [ [ drop tuple-class? not ] assoc-subset ] when ;
-
-: (class-or) ( class class -- class )
-    [ flatten-class ] 2apply class-or-fixup lookup-tuple-union ;
-
-: (class-and) ( class class -- class )
-    2dup [ tuple swap class< ] either? [
-        [ flatten-builtin-class ] 2apply
-        intersect lookup-union
-    ] [
-        [ flatten-class ] 2apply
-        intersect lookup-tuple-union
-    ] if ;
-
-: tuple-class-and ( class1 class2 -- class )
-    dupd eq? [ drop null ] unless ;
-
-: largest-class ( seq -- n elt )
-    dup [
-        [ 2dup class< >r swap class< not r> and ]
-        with subset empty?
-    ] curry find [ "Topological sort failed" throw ] unless* ;
-
-PRIVATE>
-
-: sort-classes ( seq -- newseq )
-    >vector
-    [ dup empty? not ]
-    [ dup largest-class >r over delete-nth r> ]
-    [ ] unfold nip ;
-
-: class-or ( class1 class2 -- class )
-    {
-        { [ 2dup class< ] [ nip ] }
-        { [ 2dup swap class< ] [ drop ] }
-        { [ t ] [ (class-or) ] }
-    } cond ;
-
-: class-and ( class1 class2 -- class )
-    {
-        { [ 2dup class< ] [ drop ] }
-        { [ 2dup swap class< ] [ nip ] }
-        { [ 2dup [ tuple-class? ] both? ] [ tuple-class-and ] }
-        { [ t ] [ (class-and) ] }
-    } cond ;
-
-: classes-intersect? ( class1 class2 -- ? )
-    class-and class-empty? not ;
-
-: min-class ( class seq -- class/f )
-    [ dupd classes-intersect? ] subset dup empty? [
-        2drop f
-    ] [
-        tuck [ class< ] with all? [ peek ] [ drop f ] if
-    ] if ;
+: members ( class -- seq )
+    #! Output f for non-classes to work with algebra code
+    dup class? [ "members" word-prop ] [ drop f ] if ;
 
 GENERIC: reset-class ( class -- )
 
@@ -184,36 +70,9 @@ M: word reset-class drop ;
 
 <PRIVATE
 
-! class<map
-: bigger-classes ( class -- seq )
-    classes [ (class<) ] with subset ;
-
-: bigger-classes+ ( class -- )
-    [ bigger-classes [ dup ] H{ } map>assoc ] keep
-    class<map get set-at ;
-
-: bigger-classes- ( class -- )
-    class<map get delete-at ;
-
-: smaller-classes ( class -- seq )
-    classes swap [ (class<) ] curry subset ;
-
-: smaller-classes+ ( class -- )
-    dup smaller-classes class<map get add-vertex ;
-
-: smaller-classes- ( class -- )
-    dup smaller-classes class<map get remove-vertex ;
-
-: class<map+ ( class -- )
-    H{ } clone over class<map get set-at
-    dup smaller-classes+ bigger-classes+ ;
-
-: class<map- ( class -- )
-    dup smaller-classes- bigger-classes- ;
-
 ! update-map
 : class-uses ( class -- seq )
-    [ dup members % superclass [ , ] when* ] { } make ;
+    dup members swap superclass [ add ] when* ;
 
 : class-usages ( class -- assoc )
     [ update-map get at ] closure ;
@@ -223,47 +82,6 @@ M: word reset-class drop ;
 
 : update-map- ( class -- )
     dup class-uses update-map get remove-vertex ;
-
-! typemap
-: push-at ( value key assoc -- )
-    2dup at* [
-        2nip push
-    ] [
-        drop >r >r 1vector r> r> set-at
-    ] if ;
-
-: typemap+ ( class -- )
-    dup flatten-builtin-class typemap get push-at ;
-
-: pop-at ( value key assoc -- )
-    at* [ delete ] [ 2drop ] if ;
-
-: typemap- ( class -- )
-    dup flatten-builtin-class typemap get pop-at ;
-
-! class-map
-: class-map+ ( class -- )
-    dup flatten-class class-map get push-at ;
-
-: class-map- ( class -- )
-    dup flatten-class class-map get pop-at ;
-
-! Class definition
-: cache-class ( class -- )
-    dup typemap+ dup class-map+ dup class<map+ update-map+ ;
-
-: cache-classes ( assoc -- )
-    [ drop cache-class ] assoc-each ;
-
-GENERIC: uncache-class ( class -- )
-
-M: class uncache-class
-    dup update-map- dup class<map- dup class-map- typemap- ;
-
-M: word uncache-class drop ;
-
-: uncache-classes ( assoc -- )
-    [ drop uncache-class ] assoc-each ;
 
 PRIVATE>
 
@@ -293,22 +111,13 @@ GENERIC: update-methods ( assoc -- )
 
 : define-class ( word members superclass metaclass -- )
     #! If it was already a class, update methods after.
+    reset-caches
     define-class-props
-    over class? >r
-    over class-usages [
-        uncache-classes
-        dupd (define-class)
-    ] keep cache-classes r>
-    [ class-usages dup update-predicates update-methods ]
-    [ drop ] if ;
+    over update-map-
+    dupd (define-class)
+    dup update-map+
+    class-usages dup update-predicates update-methods ;
 
 GENERIC: class ( object -- class ) inline
 
 M: object class type type>class ;
-
-<PRIVATE
-
-: class-of-tuple ( obj -- class )
-    2 slot { word } declare ; inline
-
-PRIVATE>

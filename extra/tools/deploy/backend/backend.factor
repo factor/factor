@@ -21,6 +21,7 @@ IN: tools.deploy.backend
         swap >>command
         +stdout+ >>stderr
         +closed+ >>stdin
+        +low-priority+ >>priority
     utf8 <process-stream>
     dup copy-lines
     process>> wait-for-process zero? [

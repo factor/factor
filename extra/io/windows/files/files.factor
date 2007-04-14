@@ -1,6 +1,6 @@
 ! Copyright (C) 2008 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: alien.c-types io.files io.windows kernel
+USING: alien.c-types io.backend io.files io.windows kernel
 math windows windows.kernel32 combinators.cleave
 windows.time calendar combinators math.functions
 sequences namespaces words symbols ;
@@ -89,5 +89,7 @@ SYMBOLS: +read-only+ +hidden+ +system+
     ] if ;
 
 M: windows-nt-io file-info ( path -- info )
-    get-file-information-stat ;
+    normalize-pathname get-file-information-stat ;
 
+M: windows-nt-io link-info ( path -- info )
+    file-info ;

@@ -8,7 +8,7 @@ IN: slots.deprecated
 : reader-effect ( class spec -- effect )
     >r ?word-name 1array r> slot-spec-name 1array <effect> ;
 
-PREDICATE: word slot-reader "reading" word-prop >boolean ;
+PREDICATE: slot-reader < word "reading" word-prop >boolean ;
 
 : set-reader-props ( class spec -- )
     2dup reader-effect
@@ -30,7 +30,7 @@ PREDICATE: word slot-reader "reading" word-prop >boolean ;
 : writer-effect ( class spec -- effect )
     slot-spec-name swap ?word-name 2array 0 <effect> ;
 
-PREDICATE: word slot-writer "writing" word-prop >boolean ;
+PREDICATE: slot-writer < word "writing" word-prop >boolean ;
 
 : set-writer-props ( class spec -- )
     2dup writer-effect

@@ -1,7 +1,7 @@
 IN: io.unix.launcher.tests
 USING: io.files tools.test io.launcher arrays io namespaces
 continuations math io.encodings.binary io.encodings.ascii
-accessors kernel sequences ;
+accessors kernel sequences io.encodings.utf8 ;
 
 [ ] [
     [ "launcher-test-1" temp-file delete-file ] ignore-errors
@@ -94,4 +94,16 @@ accessors kernel sequences ;
         { { "A" "B" } } >>environment
         +replace-environment+ >>environment-mode
     ascii <process-stream> lines
+] unit-test
+
+[ "hi\n" ] [
+    temp-directory [
+        [ "aloha" delete-file ] ignore-errors
+        <process>
+            { "echo" "hi" } >>command
+            "aloha" >>stdout
+        try-process
+    ] with-directory
+    temp-directory "aloha" append-path
+    utf8 file-contents
 ] unit-test

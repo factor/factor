@@ -8,7 +8,7 @@ layouts alien alien.accessors alien.compiler alien.structs slots
 splitting assocs ;
 IN: cpu.x86.64
 
-PREDICATE: x86-backend amd64-backend
+PREDICATE: amd64-backend < x86-backend
     x86-backend-cell 8 = ;
 
 M: amd64-backend ds-reg R14 ;

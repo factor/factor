@@ -4,7 +4,7 @@ USING: classes classes.union words kernel sequences
 definitions combinators arrays ;
 IN: classes.mixin
 
-PREDICATE: union-class mixin-class "mixin" word-prop ;
+PREDICATE: mixin-class < union-class "mixin" word-prop ;
 
 M: mixin-class reset-class
     { "metaclass" "members" "mixin" } reset-props ;

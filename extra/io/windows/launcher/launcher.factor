@@ -5,7 +5,7 @@ io.windows io.windows.nt.pipes libc io.nonblocking
 io.streams.duplex windows.types math windows.kernel32 windows
 namespaces io.launcher kernel sequences windows.errors assocs
 splitting system threads init strings combinators
-io.backend accessors concurrency.flags ;
+io.backend accessors concurrency.flags io.files ;
 IN: io.windows.launcher
 
 TUPLE: CreateProcess-args
@@ -27,7 +27,8 @@ TUPLE: CreateProcess-args
     "STARTUPINFO" <c-object>
     "STARTUPINFO" heap-size over set-STARTUPINFO-cb >>lpStartupInfo
     "PROCESS_INFORMATION" <c-object> >>lpProcessInformation
-    TRUE >>bInheritHandles ;
+    TRUE >>bInheritHandles
+    current-directory get >>lpCurrentDirectory ;
 
 : call-CreateProcess ( CreateProcess-args -- )
     {
@@ -48,6 +49,17 @@ TUPLE: CreateProcess-args
 
 : join-arguments ( args -- cmd-line )
     [ escape-argument ] map " " join ;
+
+: lookup-priority ( process -- n )
+    priority>> {
+        { +lowest-priority+ [ IDLE_PRIORITY_CLASS ] }
+        { +low-priority+ [ BELOW_NORMAL_PRIORITY_CLASS ] }
+        { +normal-priority+ [ NORMAL_PRIORITY_CLASS ] }
+        { +high-priority+ [ ABOVE_NORMAL_PRIORITY_CLASS ] }
+        { +highest-priority+ [ HIGH_PRIORITY_CLASS ] }
+        { +realtime-priority+ [ REALTIME_PRIORITY_CLASS ] }
+        [ drop f ]
+    } case ;
 
 : app-name/cmd-line ( process -- app-name cmd-line )
     command>> dup string? [
@@ -71,6 +83,7 @@ TUPLE: CreateProcess-args
     0
     pick pass-environment? [ CREATE_UNICODE_ENVIRONMENT bitor ] when
     pick detached>> winnt? and [ DETACHED_PROCESS bitor ] when
+    pick lookup-priority [ bitor ] when*
     >>dwCreateFlags ;
 
 : fill-lpEnvironment ( process args -- process args )

@@ -4,7 +4,7 @@ USING: alien arrays bit-arrays byte-arrays generic assocs
 hashtables assocs hashtables.private io kernel kernel.private
 math namespaces parser prettyprint sequences sequences.private
 strings sbufs vectors words quotations assocs system layouts
-splitting growable classes tuples words.private
+splitting growable classes tuples tuples.private words.private
 io.binary io.files vocabs vocabs.loader source-files
 definitions debugger float-arrays quotations.private
 sequences.private combinators io.encodings.binary ;
@@ -294,17 +294,14 @@ M: bit-array ' bit-array emit-dummy-array ;
 
 M: float-array ' float-array emit-dummy-array ;
 
-! Arrays
-: emit-array ( list type tag -- pointer )
-    >r >r [ ' ] map r> r> [
-        dup length emit-fixnum
-        emit-seq
-    ] emit-object ;
-
-: emit-tuple ( obj -- pointer )
+! Tuples
+: emit-tuple ( tuple -- pointer )
     [
-        [ tuple>array unclip transfer-word , % ] { } make
-        tuple type-number dup emit-array
+        [
+            dup class transfer-word tuple-layout ' ,
+            tuple>array 1 tail-slice [ ' ] map %
+        ] { } make
+        tuple type-number dup [ emit-seq ] emit-object
     ]
     ! Hack
     over class word-name "tombstone" =
@@ -312,10 +309,30 @@ M: float-array ' float-array emit-dummy-array ;
 
 M: tuple ' emit-tuple ;
 
+M: tuple-layout '
+    objects get [
+        [
+            dup layout-hashcode ' ,
+            dup layout-class ' ,
+            dup layout-size ' ,
+            dup layout-superclasses ' ,
+            layout-echelon ' ,
+        ] { } make
+        \ tuple-layout type-number
+        object tag-number [ emit-seq ] emit-object
+    ] cache ;
+
 M: tombstone '
     delegate
     "((tombstone))" "((empty))" ? "hashtables.private" lookup
     word-def first objects get [ emit-tuple ] cache ;
+
+! Arrays
+: emit-array ( list type tag -- pointer )
+    >r >r [ ' ] map r> r> [
+        dup length emit-fixnum
+        emit-seq
+    ] emit-object ;
 
 M: array '
     array type-number object tag-number emit-array ;
@@ -348,8 +365,10 @@ M: curry '
 : emit-global ( -- )
     [
         {
-            dictionary source-files
-            typemap builtins class<map class-map update-map
+            dictionary source-files builtins
+            update-map class<-cache class-not-cache
+            classes-intersect-cache class-and-cache
+            class-or-cache
         } [ dup get swap bootstrap-word set ] each
     ] H{ } make-assoc
     bootstrap-global set

@@ -102,6 +102,17 @@ FUNCTION: int utimes ( char* path, timeval[2] times ) ;
 
 FUNCTION: int kill ( pid_t pid, int sig ) ;
 
+: PRIO_PROCESS 0 ; inline
+: PRIO_PGRP 1 ; inline
+: PRIO_USER 2 ; inline
+
+: PRIO_MIN -20 ; inline
+: PRIO_MAX 20 ; inline
+
+! which/who = 0 for current process
+FUNCTION: int getpriority ( int which, int who ) ;
+FUNCTION: int setpriority ( int which, int who, int prio ) ;
+
 ! Flags for waitpid
 
 : WNOHANG   1 ; inline

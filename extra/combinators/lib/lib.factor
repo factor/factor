@@ -1,7 +1,8 @@
-! Copyright (C) 2007 Slava Pestov, Chris Double, Doug Coleman,
-!                    Eduardo Cavazos, Daniel Ehrenberg.
+! Copyright (C) 2007, 2008 Slava Pestov, Chris Double,
+!                          Doug Coleman, Eduardo Cavazos,
+!                          Daniel Ehrenberg.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel combinators namespaces quotations hashtables
+USING: kernel combinators fry namespaces quotations hashtables
 sequences assocs arrays inference effects math math.ranges
 arrays.lib shuffle macros bake combinators.cleave
 continuations ;
@@ -34,9 +35,8 @@ MACRO: nwith ( quot n -- )
 
 MACRO: napply ( n -- )
   2 [a,b]
-  [ [ ] [ 1- ] bi
-    [ , ntuck , nslip ]
-    bake ]
+  [ [ 1- ] [ ] bi
+    '[ , ntuck , nslip ] ]
   map concat >quotation [ call ] append ;
 
 : 3apply ( obj obj obj quot -- ) 3 napply ; inline
@@ -88,26 +88,21 @@ MACRO: || ( quots -- ? ) [ [ t ] ] f short-circuit ;
 ! ifte
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
+MACRO: preserving ( predicate -- quot )
+    dup infer effect-in
+    dup 1+
+    '[ , , nkeep , nrot ] ;
+
 MACRO: ifte ( quot quot quot -- )
-    pick infer effect-in
-    dup 1+ swap
-    [ >r >r , nkeep , nrot r> r> if ]
-    bake ;
+    '[ , preserving , , if ] ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 ! switch
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-: preserving ( predicate -- quot )
-    dup infer effect-in
-    dup 1+ spin
-    [ , , nkeep , nrot ]
-    bake ;
-
 MACRO: switch ( quot -- )
-    [ [ preserving ] [ ] bi* ] assoc-map
-    [ , cond ]
-    bake ;
+    [ [ [ preserving ] curry ] dip ] assoc-map
+    [ cond ] curry ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 

@@ -96,9 +96,32 @@ DEFINE_UNTAG(F_QUOTATION,QUOTATION_TYPE,quotation)
 
 DEFINE_UNTAG(F_WORD,WORD_TYPE,word)
 
-INLINE CELL tag_tuple(F_ARRAY *tuple)
+INLINE CELL tag_tuple(F_TUPLE *tuple)
 {
 	return RETAG(tuple,TUPLE_TYPE);
+}
+
+INLINE F_TUPLE *untag_tuple(CELL object)
+{
+	type_check(TUPLE_TYPE,object);
+	return untag_object(object);
+}
+
+INLINE CELL tuple_size(F_TUPLE_LAYOUT *layout)
+{
+	CELL size = untag_fixnum_fast(layout->size);
+	return sizeof(F_TUPLE) + size * CELLS;
+}
+
+INLINE CELL tuple_nth(F_TUPLE *tuple, CELL slot)
+{
+	return get(AREF(tuple,slot));
+}
+
+INLINE void set_tuple_nth(F_TUPLE *tuple, CELL slot, CELL value)
+{
+	put(AREF(tuple,slot),value);
+	write_barrier((CELL)tuple);
 }
 
 /* Prototypes */
@@ -116,12 +139,11 @@ CELL allot_array_4(CELL v1, CELL v2, CELL v3, CELL v4);
 DECLARE_PRIMITIVE(array);
 DECLARE_PRIMITIVE(tuple);
 DECLARE_PRIMITIVE(tuple_boa);
+DECLARE_PRIMITIVE(tuple_layout);
 DECLARE_PRIMITIVE(byte_array);
 DECLARE_PRIMITIVE(bit_array);
 DECLARE_PRIMITIVE(float_array);
 DECLARE_PRIMITIVE(clone);
-DECLARE_PRIMITIVE(tuple_to_array);
-DECLARE_PRIMITIVE(to_tuple);
 
 F_ARRAY *reallot_array(F_ARRAY* array, CELL capacity, CELL fill);
 DECLARE_PRIMITIVE(resize_array);

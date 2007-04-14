@@ -7,7 +7,7 @@ IN: alien
 
 ! Some predicate classes used by the compiler for optimization
 ! purposes
-PREDICATE: alien simple-alien
+PREDICATE: simple-alien < alien
     underlying-alien not ;
 
 UNION: simple-c-ptr
@@ -18,7 +18,7 @@ alien POSTPONE: f byte-array bit-array float-array ;
 
 DEFER: pinned-c-ptr?
 
-PREDICATE: alien pinned-alien
+PREDICATE: pinned-alien < alien
     underlying-alien pinned-c-ptr? ;
 
 UNION: pinned-c-ptr

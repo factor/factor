@@ -83,7 +83,7 @@ DEFER: <% delimiter
             templating-vocab use+
             ! so that reload works properly
             dup source-file file set
-            ?resource-path utf8 file-contents
+            utf8 file-contents
             [ eval-template ] [ html-error. drop ] recover
         ] with-file-vocabs
     ] assert-depth ;

@@ -55,9 +55,9 @@ IN: opengl.shaders
 
 : delete-gl-shader ( shader -- ) glDeleteShader ; inline
 
-PREDICATE: integer gl-shader (gl-shader?) ;
-PREDICATE: gl-shader vertex-shader (vertex-shader?) ;
-PREDICATE: gl-shader fragment-shader (fragment-shader?) ;
+PREDICATE: gl-shader < integer (gl-shader?) ;
+PREDICATE: vertex-shader < gl-shader (vertex-shader?) ;
+PREDICATE: fragment-shader < gl-shader (fragment-shader?) ;
 
 ! Programs
 
@@ -126,7 +126,7 @@ PREDICATE: gl-shader fragment-shader (fragment-shader?) ;
 MACRO: with-gl-program ( uniforms quot -- )
     (make-with-gl-program) ;
 
-PREDICATE: integer gl-program (gl-program?) ;
+PREDICATE: gl-program < integer (gl-program?) ;
 
 : <simple-gl-program> ( vertex-shader-source fragment-shader-source -- program )
     >r <vertex-shader> check-gl-shader

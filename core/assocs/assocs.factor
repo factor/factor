@@ -134,11 +134,11 @@ M: assoc assoc-clone-like ( assoc exemplar -- newassoc )
     (substitute) map ;
 
 : cache ( key assoc quot -- value )
-    2over at [
+    2over at* [
         >r 3drop r>
     ] [
-        pick rot >r >r call dup r> r> set-at
-    ] if* ; inline
+        drop pick rot >r >r call dup r> r> set-at
+    ] if ; inline
 
 : change-at ( key assoc quot -- )
     [ >r at r> call ] 3keep drop set-at ; inline

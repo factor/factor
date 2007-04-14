@@ -379,45 +379,61 @@ DEFINE_PRIMITIVE(resize_float_array)
 	dpush(tag_object(reallot_float_array(array,capacity)));
 }
 
+/* Tuple layouts */
+DEFINE_PRIMITIVE(tuple_layout)
+{
+	F_TUPLE_LAYOUT *layout = allot_object(TUPLE_LAYOUT_TYPE,sizeof(F_TUPLE_LAYOUT));
+	layout->echelon = dpop();
+	layout->superclasses = dpop();
+	layout->size = dpop();
+	layout->class = dpop();
+	layout->hashcode = untag_word(layout->class)->hashcode;
+	dpush(tag_object(layout));
+}
+
 /* Tuples */
 
 /* push a new tuple on the stack */
+F_TUPLE *allot_tuple(F_TUPLE_LAYOUT *layout)
+{
+	REGISTER_UNTAGGED(layout);
+	F_TUPLE *tuple = allot_object(TUPLE_TYPE,tuple_size(layout));
+	UNREGISTER_UNTAGGED(layout);
+	tuple->layout = tag_object(layout);
+	return tuple;
+}
+
 DEFINE_PRIMITIVE(tuple)
 {
-	CELL size = unbox_array_size();
-	F_ARRAY *array = allot_array(TUPLE_TYPE,size,F);
-	set_array_nth(array,0,dpop());
-	dpush(tag_tuple(array));
+	F_TUPLE_LAYOUT *layout = untag_object(dpop());
+	F_FIXNUM size = to_fixnum(layout->size);
+
+	F_TUPLE *tuple = allot_tuple(layout);
+	F_FIXNUM i;
+	for(i = size - 1; i >= 0; i--)
+		put(AREF(tuple,i),F);
+
+	dpush(tag_tuple(tuple));
 }
 
 /* push a new tuple on the stack, filling its slots from the stack */
 DEFINE_PRIMITIVE(tuple_boa)
 {
-	CELL size = unbox_array_size();
-	F_ARRAY *array = allot_array(TUPLE_TYPE,size,F);
-	set_array_nth(array,0,dpop());
+	F_TUPLE_LAYOUT *layout = untag_object(dpop());
+	F_FIXNUM size = to_fixnum(layout->size);
 
-	CELL i;
-	for(i = size - 1; i >= 2; i--)
-		set_array_nth(array,i,dpop());
+	REGISTER_UNTAGGED(layout);
+	F_TUPLE *tuple = allot_tuple(layout);
+	UNREGISTER_UNTAGGED(layout);
 
-	dpush(tag_tuple(array));
-}
+	/* set delegate slot */
+	put(AREF(tuple,0),F);
 
-DEFINE_PRIMITIVE(tuple_to_array)
-{
-	CELL object = dpeek();
-	type_check(TUPLE_TYPE,object);
-	object = RETAG(clone(object),OBJECT_TYPE);
-	set_slot(object,0,tag_header(ARRAY_TYPE));
-	drepl(object);
-}
+	F_FIXNUM i;
+	for(i = size - 1; i >= 1; i--)
+		put(AREF(tuple,i),dpop());
 
-DEFINE_PRIMITIVE(to_tuple)
-{
-	CELL object = RETAG(clone(dpeek()),TUPLE_TYPE);
-	set_slot(object,0,tag_header(TUPLE_TYPE));
-	drepl(object);
+	dpush(tag_tuple(tuple));
 }
 
 /* Strings */

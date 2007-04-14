@@ -5,9 +5,10 @@ USING: alien alien.accessors arrays generic hashtables kernel
 assocs math math.private kernel.private sequences words parser
 inference.class inference.dataflow vectors strings sbufs io
 namespaces assocs quotations math.intervals sequences.private
-combinators splitting layouts math.parser classes generic.math
-optimizer.pattern-match optimizer.backend optimizer.def-use
-optimizer.inlining generic.standard system ;
+combinators splitting layouts math.parser classes
+classes.algebra generic.math optimizer.pattern-match
+optimizer.backend optimizer.def-use optimizer.inlining
+generic.standard system ;
 
 { + bignum+ float+ fixnum+fast } {
     { { number 0 } [ drop ] }

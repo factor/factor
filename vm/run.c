@@ -320,8 +320,9 @@ DEFINE_PRIMITIVE(class_hash)
 	CELL tag = TAG(obj);
 	if(tag == TUPLE_TYPE)
 	{
-		F_WORD *class = untag_object(get(SLOT(obj,2)));
-		drepl(class->hashcode);
+		F_TUPLE *tuple = untag_object(obj);
+		F_TUPLE_LAYOUT *layout = untag_object(tuple->layout);
+		drepl(layout->hashcode);
 	}
 	else if(tag == OBJECT_TYPE)
 		drepl(get(UNTAG(obj)));

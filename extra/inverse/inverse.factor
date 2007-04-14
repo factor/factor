@@ -1,7 +1,7 @@
 USING: kernel words inspector slots quotations sequences assocs
 math arrays inference effects shuffle continuations debugger
 tuples namespaces vectors bit-arrays byte-arrays strings sbufs
-math.functions macros sequences.private combinators ;
+math.functions macros sequences.private combinators mirrors ;
 IN: inverse
 
 TUPLE: fail ;
@@ -54,9 +54,9 @@ M: no-inverse summary
 : undo-literal ( object -- quot )
     [ =/fail ] curry ;
 
-PREDICATE: word normal-inverse "inverse" word-prop ;
-PREDICATE: word math-inverse "math-inverse" word-prop ;
-PREDICATE: word pop-inverse "pop-length" word-prop ;
+PREDICATE: normal-inverse < word "inverse" word-prop ;
+PREDICATE: math-inverse < word "math-inverse" word-prop ;
+PREDICATE: pop-inverse < word "pop-length" word-prop ;
 UNION: explicit-inverse normal-inverse math-inverse pop-inverse ;
 
 : inline-word ( word -- )
@@ -191,7 +191,7 @@ MACRO: undo ( quot -- ) [undo] ;
     "predicate" word-prop [ dupd call assure ] curry ;
 
 : slot-readers ( class -- quot )
-    "slots" word-prop 1 tail ! tail gets rid of delegate
+    all-slots 1 tail ! tail gets rid of delegate
     [ slot-spec-reader 1quotation [ keep ] curry ] map concat
     [ ] like [ drop ] compose ;
 

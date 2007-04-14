@@ -39,7 +39,7 @@ vocabs.loader system debugger continuations ;
 
     [
         "resource:core/bootstrap/stage2.factor"
-        dup resource-exists? [
+        dup exists? [
             [ run-file ]
             [
                 :c

@@ -40,4 +40,4 @@ M: object (r-ref) drop ;
         sample-doc string>xml dup template xml>string
     ] with-scope ;
 
-[ "<?xml version=\"1.0\" encoding=\"iso-8859-1\"?><html xmlns:f=\"http://littledan.onigirihouse.com/namespaces/replace\"><body><span f:sub=\"foo\">foo</span><div f:sub=\"bar\">blah<a/></div><p f:sub=\"baz\"/></body></html>" ] [ test-refs ] unit-test
+[ "<?xml version=\"1.0\" encoding=\"UTF-8\"?><html xmlns:f=\"http://littledan.onigirihouse.com/namespaces/replace\"><body><span f:sub=\"foo\">foo</span><div f:sub=\"bar\">blah<a/></div><p f:sub=\"baz\"/></body></html>" ] [ test-refs ] unit-test

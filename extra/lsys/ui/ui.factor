@@ -196,6 +196,8 @@ slate> handler> set-gadget-delegate
 
 handler> "L-system view" open-window
 
+500 sleep
+
 slate> find-gl-context
 1 glGenLists >model
 

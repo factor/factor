@@ -42,7 +42,7 @@ M: process-missing error.
     >r 1array r> build-tag* ;
 
 : standard-prolog ( -- prolog )
-    T{ prolog f "1.0" "iso-8859-1" f } ;
+    T{ prolog f "1.0" "UTF-8" f } ;
 
 : build-xml ( tag -- xml )
     standard-prolog { } rot { } <xml> ;

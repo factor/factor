@@ -23,17 +23,17 @@ M: word definition word-def ;
 
 ERROR: undefined ;
 
-PREDICATE: word deferred ( obj -- ? )
+PREDICATE: deferred < word ( obj -- ? )
     word-def [ undefined ] = ;
 M: deferred definer drop \ DEFER: f ;
 M: deferred definition drop f ;
 
-PREDICATE: word symbol ( obj -- ? )
+PREDICATE: symbol < word ( obj -- ? )
     dup <wrapper> 1array swap word-def sequence= ;
 M: symbol definer drop \ SYMBOL: f ;
 M: symbol definition drop f ;
 
-PREDICATE: word primitive ( obj -- ? )
+PREDICATE: primitive < word ( obj -- ? )
     word-def [ do-primitive ] tail? ;
 M: primitive definer drop \ PRIMITIVE: f ;
 M: primitive definition drop f ;

@@ -16,7 +16,7 @@ M: link >link ;
 M: vocab-spec >link ;
 M: object >link link construct-boa ;
 
-PREDICATE: link word-link link-name word? ;
+PREDICATE: word-link < link link-name word? ;
 
 M: link summary
     [

@@ -214,7 +214,7 @@ SYMBOL: in
 
 ERROR: unexpected want got ;
 
-PREDICATE: unexpected unexpected-eof
+PREDICATE: unexpected-eof < unexpected
     unexpected-got not ;
 
 : unexpected-eof ( word -- * ) f unexpected ;
@@ -287,6 +287,14 @@ M: no-word summary
 
 : CREATE-METHOD ( -- method )
     scan-word bootstrap-word scan-word create-method-in ;
+
+: parse-tuple-definition ( -- class superclass slots )
+    CREATE-CLASS
+    scan {
+        { ";" [ tuple f ] }
+        { "<" [ scan-word ";" parse-tokens ] }
+        [ >r tuple ";" parse-tokens r> add* ]
+    } case ;
 
 ERROR: staging-violation word ;
 
@@ -512,7 +520,7 @@ SYMBOL: interactive-vocabs
     [
         [
             [ parsing-file ] keep
-            [ ?resource-path utf8 <file-reader> ] keep
+            [ utf8 <file-reader> ] keep
             parse-stream
         ] with-compiler-errors
     ] [
@@ -524,7 +532,7 @@ SYMBOL: interactive-vocabs
     [ dup parse-file call ] assert-depth drop ;
 
 : ?run-file ( path -- )
-    dup resource-exists? [ run-file ] [ drop ] if ;
+    dup exists? [ run-file ] [ drop ] if ;
 
 : bootstrap-file ( path -- )
     [ parse-file % ] [ run-file ] if-bootstrapping ;

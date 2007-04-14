@@ -6,7 +6,8 @@ kernel models namespaces parser quotations sequences ui.commands
 ui.gadgets ui.gadgets.editors ui.gadgets.labelled
 ui.gadgets.panes ui.gadgets.buttons ui.gadgets.scrollers
 ui.gadgets.tracks ui.gestures ui.operations vocabs words
-prettyprint listener debugger threads boxes concurrency.flags ;
+prettyprint listener debugger threads boxes concurrency.flags
+math arrays ;
 IN: ui.tools.listener
 
 TUPLE: listener-gadget input output stack ;
@@ -23,9 +24,19 @@ TUPLE: listener-gadget input output stack ;
 : <listener-input> ( listener -- gadget )
     listener-gadget-output <pane-stream> <interactor> ;
 
+TUPLE: input-scroller ;
+
+: <input-scroller> ( interactor -- scroller )
+    <scroller>
+    input-scroller construct-empty
+    [ set-gadget-delegate ] keep ;
+
+M: input-scroller pref-dim*
+    drop { 0 100 } ;
+
 : listener-input, ( -- )
     g <listener-input> g-> set-listener-gadget-input
-    <scroller> "Input" <labelled-gadget> f track, ;
+    <input-scroller> "Input" <labelled-gadget> f track, ;
 
 : welcome. ( -- )
    "If this is your first time with Factor, please read the " print

@@ -8,7 +8,7 @@ io.encodings.utf8 ;
 IN: editors.jedit
 
 : jedit-server-info ( -- port auth )
-    home "/.jedit/server" append-path ascii [
+    home ".jedit/server" append-path ascii [
         readln drop
         readln string>number
         readln string>number

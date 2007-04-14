@@ -94,7 +94,7 @@ M: unix-io copy-file ( from to -- )
     \ file-info construct-boa ;
 
 M: unix-io file-info ( path -- info )
-    stat* stat>file-info ;
+    normalize-pathname stat* stat>file-info ;
 
 M: unix-io link-info ( path -- info )
-    lstat* stat>file-info ;
+    normalize-pathname lstat* stat>file-info ;

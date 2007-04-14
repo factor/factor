@@ -5,7 +5,7 @@ TUPLE: foo bar baz ;
 
 C: <foo> foo
 
-[ { "bar" "baz" } ] [ 1 2 <foo> <mirror> keys ] unit-test
+[ { "delegate" "bar" "baz" } ] [ 1 2 <foo> <mirror> keys ] unit-test
 
 [ 1 t ] [ "bar" 1 2 <foo> <mirror> at* ] unit-test
 

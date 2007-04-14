@@ -8,7 +8,7 @@ alien.compiler combinators command-line
 compiler compiler.units io vocabs.loader accessors ;
 IN: cpu.x86.32
 
-PREDICATE: x86-backend x86-32-backend
+PREDICATE: x86-32-backend < x86-backend
     x86-backend-cell 4 = ;
 
 ! We implement the FFI for Linux, OS X and Windows all at once.

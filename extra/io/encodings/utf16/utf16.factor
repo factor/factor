@@ -1,7 +1,8 @@
 ! Copyright (C) 2006, 2008 Daniel Ehrenberg.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: math kernel sequences sbufs vectors namespaces io.binary
-io.encodings combinators splitting io byte-arrays inspector ;
+io.encodings combinators splitting io byte-arrays inspector
+alien.c-types ;
 IN: io.encodings.utf16
 
 TUPLE: utf16be ;
@@ -9,6 +10,8 @@ TUPLE: utf16be ;
 TUPLE: utf16le ;
 
 TUPLE: utf16 ;
+
+TUPLE: utf16n ;
 
 <PRIVATE
 
@@ -120,5 +123,14 @@ M: utf16 <decoder> ( stream utf16 -- decoder )
 
 M: utf16 <encoder> ( stream utf16 -- encoder )
     drop bom-le over stream-write utf16le <encoder> ;
+
+! Native-order UTF-16
+
+: native-utf16 ( -- descriptor )
+    little-endian? utf16le utf16be ? ;
+
+M: utf16n <decoder> drop native-utf16 <decoder> ;
+
+M: utf16n <encoder> drop native-utf16 <encoder> ;
 
 PRIVATE>

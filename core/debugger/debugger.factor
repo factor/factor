@@ -156,7 +156,7 @@ M: relative-overflow summary
 : primitive-error.
     "Unimplemented primitive" print drop ;
 
-PREDICATE: array kernel-error ( obj -- ? )
+PREDICATE: kernel-error < array
     {
         { [ dup empty? ] [ drop f ] }
         { [ dup first "kernel-error" = not ] [ drop f ] }

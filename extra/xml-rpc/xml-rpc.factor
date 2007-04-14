@@ -17,7 +17,7 @@ M: integer item>xml
     [ "Integers must fit in 32 bits" throw ] unless
     number>string "i4" build-tag ;
 
-PREDICATE: object boolean { t f } member? ;
+PREDICATE: boolean < object { t f } member? ;
 
 M: boolean item>xml
     "1" "0" ? "boolean" build-tag ;

@@ -31,7 +31,7 @@ IN: project-euler
 
 : solution-path ( n -- str/f )
     number>euler "project-euler." prepend
-    vocab where dup [ first ?resource-path ] when ;
+    vocab where dup [ first ] when ;
 
 PRIVATE>
 

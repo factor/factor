@@ -216,25 +216,45 @@ void fixup_callstack_object(F_CALLSTACK *stack)
 /* Initialize an object in a newly-loaded image */
 void relocate_object(CELL relocating)
 {
-	do_slots(relocating,data_fixup);
-
-	switch(untag_header(get(relocating)))
+	/* Tuple relocation is a bit trickier; we have to fix up the
+	fixup object before we can get the tuple size, so do_slots is
+	out of the question */
+	if(untag_header(get(relocating)) == TUPLE_TYPE)
 	{
-	case WORD_TYPE:
-		fixup_word((F_WORD *)relocating);
-		break;
-	case QUOTATION_TYPE:
-		fixup_quotation((F_QUOTATION *)relocating);
-		break;
-	case DLL_TYPE:
-		ffi_dlopen((F_DLL *)relocating);
-		break;
-	case ALIEN_TYPE:
-		fixup_alien((F_ALIEN *)relocating);
-		break;
-	case CALLSTACK_TYPE:
-		fixup_callstack_object((F_CALLSTACK *)relocating);
-		break;
+		data_fixup((CELL *)relocating + 1);
+
+		CELL scan = relocating + 2 * CELLS;
+		CELL size = untagged_object_size(relocating);
+		CELL end = relocating + size;
+
+		while(scan < end)
+		{
+			data_fixup((CELL *)scan);
+			scan += CELLS;
+		}
+	}
+	else
+	{
+		do_slots(relocating,data_fixup);
+
+		switch(untag_header(get(relocating)))
+		{
+		case WORD_TYPE:
+			fixup_word((F_WORD *)relocating);
+			break;
+		case QUOTATION_TYPE:
+			fixup_quotation((F_QUOTATION *)relocating);
+			break;
+		case DLL_TYPE:
+			ffi_dlopen((F_DLL *)relocating);
+			break;
+		case ALIEN_TYPE:
+			fixup_alien((F_ALIEN *)relocating);
+			break;
+		case CALLSTACK_TYPE:
+			fixup_callstack_object((F_CALLSTACK *)relocating);
+			break;
+		}
 	}
 }
 

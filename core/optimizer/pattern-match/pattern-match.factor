@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 IN: optimizer.pattern-match
 USING: kernel sequences inference namespaces generic
-combinators classes inference.dataflow ;
+combinators classes classes.algebra inference.dataflow ;
 
 ! Funny pattern matching
 SYMBOL: @

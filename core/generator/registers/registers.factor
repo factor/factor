@@ -1,9 +1,9 @@
 ! Copyright (C) 2006, 2007 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: arrays assocs classes classes.private combinators
-cpu.architecture generator.fixup hashtables kernel layouts math
-namespaces quotations sequences system vectors words effects
-alien byte-arrays bit-arrays float-arrays ;
+USING: arrays assocs classes classes.private classes.algebra
+combinators cpu.architecture generator.fixup hashtables kernel
+layouts math namespaces quotations sequences system vectors
+words effects alien byte-arrays bit-arrays float-arrays ;
 IN: generator.registers
 
 SYMBOL: +input+
@@ -581,13 +581,14 @@ M: loc lazy-store
         2drop t
     ] if ;
 
+: class-tags ( class -- tag/f )
+    class-types [
+        dup num-tags get >=
+        [ drop object tag-number ] when
+    ] map prune ;
+
 : class-tag ( class -- tag/f )
-    dup hi-tag class< [
-        drop object tag-number
-    ] [
-        flatten-builtin-class keys
-        dup length 1 = [ first tag-number ] [ drop f ] if
-    ] if ;
+    class-tags dup length 1 = [ first ] [ drop f ] if ;
 
 : class-matches? ( actual expected -- ? )
     {
