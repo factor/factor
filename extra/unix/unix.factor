@@ -149,6 +149,5 @@ FUNCTION: ssize_t write ( int fd, void* buf, size_t nbytes ) ;
     { [ linux? ] [ "unix.linux" require ] }
     { [ bsd? ] [ "unix.bsd" require ] }
     { [ solaris? ] [ "unix.solaris" require ] }
-    { [ t ] [ ] }
 } cond
 
