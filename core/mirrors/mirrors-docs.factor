@@ -36,7 +36,7 @@ HELP: <mirror>
         "TUPLE: circle center radius ;"
         "C: <circle> circle"
         "{ 100 50 } 15 <circle> <mirror> >alist ."
-        "{ { \"center\" { 100 50 } } { \"radius\" 15 } }"
+        "{ { \"delegate\" f } { \"center\" { 100 50 } } { \"radius\" 15 } }"
     }
 } ;
 

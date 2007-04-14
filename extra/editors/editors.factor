@@ -1,8 +1,9 @@
-! Copyright (C) 2005, 2007 Slava Pestov.
+! Copyright (C) 2005, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: parser kernel namespaces sequences definitions io.files
 inspector continuations tuples tools.crossref tools.vocabs 
-io prettyprint source-files assocs vocabs vocabs.loader ;
+io prettyprint source-files assocs vocabs vocabs.loader
+io.backend splitting ;
 IN: editors
 
 TUPLE: no-edit-hook ;
@@ -25,11 +26,8 @@ SYMBOL: edit-hook
     require ;
 
 : edit-location ( file line -- )
-    edit-hook get [
-        call
-    ] [
-        no-edit-hook edit-location
-    ] if* ;
+    >r normalize-pathname "\\\\?\\" ?head drop r>
+    edit-hook get [ call ] [ no-edit-hook edit-location ] if* ;
 
 : edit ( defspec -- )
     where [ first2 edit-location ] when* ;
