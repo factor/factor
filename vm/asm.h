@@ -1,8 +1,13 @@
-#if defined( __APPLE__) || (defined(WINDOWS) && !defined(__arm__))
+#if defined(__APPLE__) || (defined(WINDOWS) && !defined(__arm__))
 	#define MANGLE(sym) _##sym
-	#define XX @
 #else
 	#define MANGLE(sym) sym
+#endif
+
+/* Apple's PPC assembler is out of date? */
+#if defined(__APPLE__) && defined(FACTOR_PPC)
+	#define XX @
+#else
 	#define XX ;
 #endif
 

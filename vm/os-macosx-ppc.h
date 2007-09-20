@@ -46,6 +46,3 @@ typedef struct _F_STACK_FRAME {
     #define MACH_STACK_POINTER(thr_state) (thr_state)->r1
     #define MACH_PROGRAM_COUNTER(thr_state) (thr_state)->srr0
 #endif
-
-#define UAP_PROGRAM_COUNTER(ucontext) \
-	MACH_PROGRAM_COUNTER(&(((ucontext_t *)(ucontext))->uc_mcontext->ss))
