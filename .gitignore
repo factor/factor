@@ -1,0 +1,11 @@
+*~
+_darcs
+*.obj
+*.o
+*.exe
+Factor/factor
+*.a
+*.dll
+*.lib
+*.image
+*.dylib
