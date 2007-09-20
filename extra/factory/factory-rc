@@ -1,0 +1,25 @@
+! -*-factor-*-
+
+USING: kernel mortar x
+       x.widgets.wm.root
+       x.widgets.wm.workspace
+       x.widgets.wm.unmapped-frames-menu
+       tty-server ;
+
+IN: factory
+
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+create-root-menu
+create-unmapped-frames-menu
+load-factory-menus
+6 setup-workspaces
+
+wm-root>
+ no-modifiers "F12"   [ root-menu> <- popup ] <---- set-key-action
+ control-alt  "LEFT"  [ prev-workspace ]  <---- set-key-action
+ control-alt  "RIGHT" [ next-workspace ]  <---- set-key-action
+ alt          "TAB"   [ circulate-focus ] <---- set-key-action
+drop
+
+9010 tty-server

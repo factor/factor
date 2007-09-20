@@ -1,7 +1,0 @@
-<% USING: namespaces io kernel math furnace ; %>
-
-<tr>
-<td><% "summary" get write %></td>
-<td><% "author" get write %></td>
-<td><% "n" get number>string "show-paste-quot" get curry "Show" render-link %></td>
-</tr>

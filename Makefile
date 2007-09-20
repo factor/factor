@@ -1,26 +1,26 @@
 CC = gcc
 
-BINARY = f
+EXECUTABLE = factor
+VERSION = 0.91
+
 IMAGE = factor.image
 BUNDLE = Factor.app
-VERSION = 0.87
-DISK_IMAGE_DIR = Factor-$(VERSION)
-DISK_IMAGE = Factor-$(VERSION).dmg
 LIBPATH = -L/usr/X11R6/lib
+CFLAGS = -Wall
 
 ifdef DEBUG
-	CFLAGS = -g -std=gnu99
-	STRIP = touch
+	CFLAGS += -g
 else
-	CFLAGS = -Wall -O3 -ffast-math -std=gnu99 $(SITE_CFLAGS)
-	STRIP = strip
+	CFLAGS += -O3 -fomit-frame-pointer $(SITE_CFLAGS)
 endif
 
 ifdef CONFIG
 	include $(CONFIG)
 endif
 
-OBJS = $(PLAF_OBJS) \
+ENGINE = $(DLL_PREFIX)factor$(DLL_SUFFIX)$(DLL_EXTENSION)
+
+DLL_OBJS = $(PLAF_DLL_OBJS) \
 	vm/alien.o \
 	vm/bignum.o \
 	vm/compiler.o \
@@ -35,112 +35,112 @@ OBJS = $(PLAF_OBJS) \
 	vm/primitives.o \
 	vm/run.o \
 	vm/stack.o \
-	vm/types.o
+	vm/types.o \
+	vm/jit.o \
+	vm/utilities.o
+
+EXE_OBJS = $(PLAF_EXE_OBJS)
 
 default:
 	@echo "Run 'make' with one of the following parameters:"
 	@echo ""
-	@echo "freebsd"
+	@echo "freebsd-x86"
+	@echo "freebsd-amd64"
 	@echo "linux-x86"
 	@echo "linux-amd64"
 	@echo "linux-ppc"
+	@echo "linux-arm"
+	@echo "openbsd-x86"
+	@echo "openbsd-amd64"
 	@echo "macosx-x86"
 	@echo "macosx-ppc"
-	@echo "solaris"
-	@echo "windows"
+	@echo "solaris-x86"
+	@echo "solaris-amd64"
+	@echo "windows-ce-arm"
+	@echo "windows-ce-x86"
+	@echo "windows-nt-x86"
 	@echo ""
-	@echo "On Unix, pass NO_UI=1 if you don't want to link with the"
-	@echo "X11 and OpenGL libraries."
+	@echo "Additional modifiers:"
 	@echo ""
-	@echo "On Mac OS X, pass X11=1 if you want to link with the"
-	@echo "X11 library instead of Cocoa. You will also need to bootstrap"
-	@echo "Factor with the -no-cocoa -x11 switches."
-	@echo
-	@echo "Also, you might want to set the SITE_CFLAGS environment"
-	@echo "variable to enable some CPU-specific optimizations; this"
-	@echo "can make a huge difference. Eg:"
-	@echo ""
-	@echo "export SITE_CFLAGS=\"-march=pentium4 -ffast-math\""
+	@echo "DEBUG=1  compile VM with debugging information"
+	@echo "SITE_CFLAGS=...  additional optimization flags"
+	@echo "NO_UI=1  don't link with X11 libraries (ignored on Mac OS X)"
+	@echo "X11=1  force link with X11 libraries instead of Cocoa (only on Mac OS X)"
 
-freebsd:
-	$(MAKE) $(BINARY) CONFIG=vm/Config.freebsd
+openbsd-x86:
+	$(MAKE) $(EXECUTABLE) CONFIG=vm/Config.openbsd.x86
+
+openbsd-amd64:
+	$(MAKE) $(EXECUTABLE) CONFIG=vm/Config.openbsd.amd64
+
+freebsd-x86:
+	$(MAKE) $(EXECUTABLE) CONFIG=vm/Config.freebsd.x86
+
+freebsd-amd64:
+	$(MAKE) $(EXECUTABLE) CONFIG=vm/Config.freebsd.amd64
 
 macosx-freetype:
 	ln -sf libfreetype.6.dylib \
 		Factor.app/Contents/Frameworks/libfreetype.dylib
 
 macosx-ppc: macosx-freetype
-	$(MAKE) $(BINARY) CONFIG=vm/Config.macosx.ppc
+	$(MAKE) $(EXECUTABLE) macosx.app CONFIG=vm/Config.macosx.ppc
 
 macosx-x86: macosx-freetype
-	$(MAKE) $(BINARY) CONFIG=vm/Config.macosx.x86
+	$(MAKE) $(EXECUTABLE) macosx.app CONFIG=vm/Config.macosx.x86
 
 linux-x86:
-	$(MAKE) $(BINARY) CONFIG=vm/Config.linux.x86
-	$(STRIP) $(BINARY)
+	$(MAKE) $(EXECUTABLE) CONFIG=vm/Config.linux.x86
 
 linux-amd64:
-	$(MAKE) $(BINARY) CONFIG=vm/Config.linux.amd64
-	$(STRIP) $(BINARY)
+	$(MAKE) $(EXECUTABLE) CONFIG=vm/Config.linux.amd64
 
 linux-ppc:
-	$(MAKE) $(BINARY) CONFIG=vm/Config.linux.ppc
-	$(STRIP) $(BINARY)
+	$(MAKE) $(EXECUTABLE) CONFIG=vm/Config.linux.ppc
 
-solaris solaris-x86 solaris-amd64:
-	$(MAKE) $(BINARY) CONFIG=vm/Config.solaris
-	$(STRIP) $(BINARY)
+linux-arm:
+	$(MAKE) $(EXECUTABLE) CONFIG=vm/Config.linux.arm
 
-windows:
-	$(MAKE) $(BINARY) CONFIG=vm/Config.windows
+solaris-x86:
+	$(MAKE) $(EXECUTABLE) CONFIG=vm/Config.solaris.x86
 
-macosx.app:
-	cp $(BINARY) $(BUNDLE)/Contents/MacOS/Factor
+solaris-amd64:
+	$(MAKE) $(EXECUTABLE) CONFIG=vm/Config.solaris.amd64
+
+windows-nt-x86:
+	$(MAKE) $(EXECUTABLE) CONFIG=vm/Config.windows.nt.x86
+
+windows-ce-arm:
+	$(MAKE) $(EXECUTABLE) CONFIG=vm/Config.windows.ce.arm
+
+windows-ce-x86:
+	$(MAKE) $(EXECUTABLE) CONFIG=vm/Config.windows.ce.x86
+
+macosx.app: factor
+	cp $(EXECUTABLE) $(BUNDLE)/Contents/MacOS/factor
+	cp $(ENGINE) $(BUNDLE)/Contents/Frameworks
 
 	install_name_tool \
 		-id @executable_path/../Frameworks/libfreetype.6.dylib \
 		Factor.app/Contents/Frameworks/libfreetype.6.dylib
 	install_name_tool \
-		-change /usr/X11R6/lib/libfreetype.6.dylib \
-		@executable_path/../Frameworks/libfreetype.6.dylib \
-		Factor.app/Contents/MacOS/Factor
+		-change libfactor.dylib \
+		@executable_path/../Frameworks/libfactor.dylib \
+		Factor.app/Contents/MacOS/factor
 
-macosx.dmg:
-	rm -f $(DISK_IMAGE)
-	rm -rf $(DISK_IMAGE_DIR)
-	mkdir $(DISK_IMAGE_DIR)
-	mkdir -p $(DISK_IMAGE_DIR)/Factor/
-	cp -R $(BUNDLE) $(DISK_IMAGE_DIR)/Factor/$(BUNDLE)
-	chmod +x cp_dir
-	cp factor.image license.txt README.txt TODO.FACTOR.txt \
-		$(DISK_IMAGE_DIR)/Factor/
-	find doc library contrib examples fonts \( -name '*.factor' \
-		-o -name '*.facts' \
-		-o -name '*.txt' \
-		-o -name '*.html' \
-		-o -name '*.ttf' \
-		-o -name '*.el' \
-		-o -name '*.vim' \
-		-o -name '*.fgen' \
-		-o -name '*.tex' \
-		-o -name '*.fhtml' \
-		-o -name '*.xml' \
-		-o -name '*.js' \) \
-		-exec ./cp_dir {} $(DISK_IMAGE_DIR)/Factor/{} \;
-	hdiutil create -srcfolder "$(DISK_IMAGE_DIR)" -fs HFS+ \
-		-volname "$(DISK_IMAGE_DIR)" "$(DISK_IMAGE)"
+factor: $(DLL_OBJS) $(EXE_OBJS)
+	$(LINKER) $(ENGINE) $(DLL_OBJS)
+	$(CC) $(LIBS) $(LIBPATH) -L. $(LINK_WITH_ENGINE) \
+		$(CFLAGS) -o $@$(EXE_SUFFIX)$(EXE_EXTENSION) $(EXE_OBJS)
 
-tags:
-	ctags-exuberant vm/*.[chm]
-
-f: $(OBJS)
-	$(CC) $(LIBS) $(LIBPATH) $(CFLAGS) -o $@$(PLAF_SUFFIX) $(OBJS)
+pull:
+	darcs pull http://factorcode.org/repos/
 
 clean:
 	rm -f vm/*.o
 
-clean.app:
-	rm -f $(BUNDLE)/Contents/MacOS/Factor
+vm/resources.o:
+	windres vm/factor.rs vm/resources.o
 
 .c.o:
 	$(CC) -c $(CFLAGS) -o $@ $<
@@ -150,3 +150,5 @@ clean.app:
 
 .m.o:
 	$(CC) -c $(CFLAGS) -o $@ $<
+	
+.PHONY: factor

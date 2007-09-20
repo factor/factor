@@ -1,14 +1,9 @@
-#include "factor.h"
+#include "master.h"
 
-void* primitives[] = {
-	undefined,
-	docol,
-	dosym,
+void *primitives[] = {
 	primitive_execute,
 	primitive_call,
-	primitive_ifte,
-	primitive_dispatch,
-	primitive_rehash_string,
+	primitive_uncurry,
 	primitive_string_to_sbuf,
 	primitive_bignum_to_fixnum,
 	primitive_float_to_fixnum,
@@ -29,6 +24,7 @@ void* primitives[] = {
 	primitive_fixnum_subtract,
 	primitive_fixnum_subtract_fast,
 	primitive_fixnum_multiply,
+	primitive_fixnum_multiply_fast,
 	primitive_fixnum_divint,
 	primitive_fixnum_mod,
 	primitive_fixnum_divmod,
@@ -57,6 +53,10 @@ void* primitives[] = {
 	primitive_bignum_lesseq,
 	primitive_bignum_greater,
 	primitive_bignum_greatereq,
+	primitive_bignum_bitp,
+	primitive_bignum_log2,
+	primitive_byte_array_to_bignum,
+	primitive_float_eq,
 	primitive_float_add,
 	primitive_float_subtract,
 	primitive_float_multiply,
@@ -96,6 +96,7 @@ void* primitives[] = {
 	primitive_code_gc,
 	primitive_gc_time,
 	primitive_save_image,
+	primitive_save_image_and_exit,
 	primitive_datastack,
 	primitive_retainstack,
 	primitive_callstack,
@@ -116,6 +117,7 @@ void* primitives[] = {
 	primitive_dlsym,
 	primitive_dlclose,
 	primitive_byte_array,
+	primitive_bit_array,
 	primitive_displaced_alien,
 	primitive_alien_signed_cell,
 	primitive_set_alien_signed_cell,
@@ -141,6 +143,8 @@ void* primitives[] = {
 	primitive_set_alien_float,
 	primitive_alien_double,
 	primitive_set_alien_double,
+	primitive_alien_cell,
+	primitive_set_alien_cell,
 	primitive_alien_to_char_string,
 	primitive_string_to_char_alien,
 	primitive_alien_to_u16_string,
@@ -165,19 +169,26 @@ void* primitives[] = {
 	primitive_finalize_compile,
 	primitive_fopen,
 	primitive_fgetc,
+	primitive_fread,
 	primitive_fwrite,
 	primitive_fflush,
 	primitive_fclose,
-	primitive_expired,
 	primitive_wrapper,
 	primitive_clone,
-	primitive_become,
 	primitive_array_to_vector,
 	primitive_string,
-	primitive_xt_map
+	primitive_to_tuple,
+	primitive_array_to_quotation,
+	primitive_quotation_xt,
+	primitive_tuple,
+	primitive_tuple_to_array,
+	primitive_profiling,
+	primitive_become,
+	primitive_sleep,
+	primitive_float_array,
+	primitive_curry,
+	primitive_tuple_boa,
+	primitive_class_hash,
+	primitive_callstack_to_array,
+	primitive_array_to_callstack,
 };
-
-CELL primitive_to_xt(CELL primitive)
-{
-	return (CELL)primitives[primitive];
-}

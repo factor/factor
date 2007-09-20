@@ -1,0 +1,12 @@
+<link rel="stylesheet" type="text/css" href="/responder/article-manager-resources/style.css"/>
+<link rel="stylesheet" type="text/css" href="/responder/article-manager-resources/wiky.css"/>
+<link rel="stylesheet" type="text/css" href="/responder/article-manager-resources/wiky.lang.css"/>
+<link rel="stylesheet" type="text/css" href="/responder/article-manager-resources/wiky.math.css"/>
+<link rel="stylesheet" type="text/css" href="/responder/article-manager-resources/jscalendar-1.0/calendar-win2k-1.css"/>
+<script type="text/javascript" src="/responder/article-manager-resources/jquery.js"></script>
+<script type="text/javascript" src="/responder/article-manager-resources/wiky.js"></script>
+<script type="text/javascript" src="/responder/article-manager-resources/wiky.lang.js"></script>
+<script type="text/javascript" src="/responder/article-manager-resources/wiky.math.js"></script>
+<script type="text/javascript" src="/responder/article-manager-resources/jscalendar-1.0/calendar.js"></script>
+<script type="text/javascript" src="/responder/article-manager-resources/jscalendar-1.0/lang/calendar-en.js"></script>
+<script type="text/javascript" src="/responder/article-manager-resources/jscalendar-1.0/calendar-setup.js"></script>

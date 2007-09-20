@@ -1,0 +1,9 @@
+<% USING: furnace:onigiri io namespaces math calendar html kernel furnace ; %>
+
+<div class="entry">
+<h2><a href="<% "entry-show" action>url write %>?stub=<% "stub" get write %>"><% "title" get write %></a></h2>
+
+<p>posted <% "created" get timestamp>string write %> <% "stub" get [ entry-edit ] curry "(edit)" render-link %></p>
+
+<% "body" get write-html %>
+</div>

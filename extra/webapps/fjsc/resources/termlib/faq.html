@@ -1,0 +1,356 @@
+<HTML>
+<HEAD>
+	<TITLE>mass:werk termlib faq</TITLE>
+
+<STYLE TYPE="text/css">
+body,p,a,td {
+	font-family: courier,fixed,swiss,sans-serif;
+	font-size: 12px;
+	color: #cccccc;
+}
+.lh13 {
+	line-height: 13px;
+}
+.lh15 {
+	line-height: 15px;
+}
+pre {
+	font-family: courier,fixed,swiss,sans-serif;
+	color: #ccffaa;
+	font-size: 12px;
+	line-height: 15px;
+}
+.prop {
+	font-family: courier,fixed,swiss,sans-serif;
+	color: #bbee99;
+	font-size: 12px;
+	line-height: 15px;
+}
+h1 {
+	font-family: courier,fixed,swiss,sans-serif;
+	font-size: 16px;
+	color: #cccccc;
+}
+b.quest {
+	font-family: courier,fixed,swiss,sans-serif;
+	font-size: 14px;
+	font-weight: bold;
+	color: #bbee99;
+}
+a,a:link,a:visited {
+	text-decoration: none;
+	color: #77dd11;
+}
+a:hover {
+	text-decoration: underline;
+	color: #77dd11;
+}
+a:active {
+	text-decoration: underline;
+	color: #dddddd;
+}
+
+@media print {
+	body { background-color: #ffffff; }
+	body,p,a,td {
+		font-family: courier,fixed,swiss,sans-serif;
+		font-size: 12px;
+		color: #000000;
+	}
+	.lh13 {
+		line-height: 13px;
+	}
+	.lh15 {
+		line-height: 15px;
+	}
+	pre,.prop {
+		font-family: courier,fixed,swiss,sans-serif;
+		font-size: 12px;
+		color: #000000;
+		line-height: 15px;
+	}
+	h1 {
+		font-family: courier,fixed,swiss,sans-serif;
+		font-size: 16px;
+		color: #000000;
+	}
+	b.quest {
+		font-family: courier,fixed,swiss,sans-serif;
+		font-size: 14px;
+		font-weight: bold;
+		color: #000000;
+	}
+	a,a:link,a:visited {
+		text-decoration: none;
+		color: #000000;
+	}
+	a:hover {
+		text-decoration: underline;
+		color: #000000;
+	}
+	a:active {
+		text-decoration: underline;
+		color: #000000;
+	}
+}
+</STYLE>
+</HEAD>
+
+
+<BODY BGCOLOR="#222222" LINK="#77dd11" TEXT="#cccccc" ALINK="#dddddd" VLINK="#77dd11"
+TOPMARGIN="0" BOTTOMMARGIN="0" LEFTMARGIN="0" RIGHTMARGIN="0" MARGINHEIGHT="0" MARGINWIDTH="0"><A NAME="top"></A>
+
+<TABLE BORDER="0" CELLSPACING="20" CELLPADDING="0" ALIGN="center">
+<TR>
+	<TD NOWRAP><A HREF="index.html">termlib.js home</A></TD>
+	<TD>|</TD>
+	<TD NOWRAP><A HREF="multiterm_test.html">multiple terminal test</A></TD>
+	<TD>|</TD>
+	<TD NOWRAP><A HREF="parser_sample.html">sample parser</A></TD>
+	<TD>|</TD>
+	<TD NOWRAP>faq</TD>
+	<TD>|</TD>
+	<TD NOWRAP><A HREF="readme.txt" TITLE="readme.txt (text/plain)">documentation</A></TD>
+</TR>
+</TABLE>
+
+<TABLE BORDER="0" CELLSPACING="20" CELLPADDING="0" WIDTH="700" ALIGN="center">
+	<TR><TD>
+		<H1>frequently asked questions</H1>
+	</TD></TR>
+	<TR><TD CLASS="lh13">
+&nbsp;<BR>
+	<UL>
+	<LI CLASS="lh15"><A HREF="#chrome">Can I add chrome to the terminal? (e.g. a window header, a close box)</A></LI>
+	<LI CLASS="lh15"><A HREF="#embed">How can I embed a terminal relative to my HTML layout?</A></LI>
+	<LI CLASS="lh15"><A HREF="#syntax">I pasted your sample code and just got an error. - ???</A></LI>
+	<LI CLASS="lh15"><A HREF="#keyboard">I can't get any input, but I don't get any erros too.</A></LI>
+	<LI CLASS="lh15"><A HREF="#keylock">How can I temporary disable the keyboard handlers?</A></LI>
+	<LI CLASS="lh15"><A HREF="#linesranges">How can I set the cusor to the start / the end of the command line?</A></LI>
+	<LI CLASS="lh15"><A HREF="#historyunique">How can I limit the command history to unique entries only?</A></LI>
+	<LI CLASS="lh15"><A HREF="#rebuild">How can I change my color theme on the fly?</A></LI>
+	<LI CLASS="lh15"><A HREF="#connect">How can I connect to a server?</A></LI>
+	</UL>
+	</TD></TR>
+	<TR><TD CLASS="lh13"><A NAME="chrome"></A>
+&nbsp;<BR>
+<B CLASS="quest">Can I add chrome to the terminal? (e.g. a window header, a close box)</B><BR><BR>
+
+Not by the means of the Terminal object's interface (since there are way too many things that you may possibly want to add).<BR>
+The Terminal object allows you to specify the background color, the frame color, the frame's width and the font class used. If you want to add more chrome, you must align this in a separate division element.<BR><BR>
+
+To calculate the dimensions of the terminal use this formula:<BR><BR>
+
+width:&nbsp; 2 * frameWidth + conf.cols * &lt;width of &nbsp;&gt; + 2 * 2px padding (left and right)<BR>
+height: 2 * frameWidth + conf.rows * conf.rowHeight + 2 * 2px padding (top and bottom).<BR><BR>
+
+Or you could get the empirical values for width and height by calling a terminal's `<SPAN CLASS="prop">getDimensions()</SPAN>' method, once the terminal is open. (see documentation in &quot;readme.txt&quot;).<BR><BR>
+
+Finnally, you could obviously embed the terminal's division element in your custom chrome layout (see below). [This will not be compatible to Netscape 4.]<BR><BR>
+
+p.e.:<PRE>
+  &lt;div id=&quot;myTerminal1&quot; style=&quot;position:absolute; top:100px; left:100px;&quot;&gt;
+     &lt;table class=&quot;termChrome&quot;&gt;
+     	&lt;tbody&gt;
+        &lt;tr&gt;
+           &lt;td class=&quot;termTitle&quot;&gt;terminal 1&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+           &lt;td class=&quot;termBody&quot;&gt;&lt;div id=&quot;termDiv1&quot; style=&quot;position:relative&quot;&gt;&lt;/div&gt;&lt;/td&gt;
+        &lt;/tr&gt;
+     	&lt;/tbody&gt;
+     &lt;/table&gt;
+   &lt;/div&gt;
+
+   // get a terminal for this
+
+   var term1 = new Terminal(
+                 {
+                   x: 0,
+                   y: 0,
+                   id: 1,
+                   termDiv: &quot;termDiv1&quot;,
+                   handler: myTermHandler
+                 }
+              );
+   term1.open();
+   
+   // and this is how to move the chrome and the embedded terminal
+
+   TermGlobals.setElementXY( &quot;myTerminal1&quot;, 200, 80 );
+</PRE>
+To keep track of the instance for any widgets use the terminal's `id' property. (You must set this in the configuration object to a unique value for this purpose.)<BR><BR>
+
+For a demonstration see the <A HREF="chrome_sample.html">Chrome Sample Page</A>.
+	</TD></TR>
+	<TR><TD CLASS="lh13"><A NAME="embed"></A>
+&nbsp;<BR>
+<B CLASS="quest">How can I embed a terminal relative to my HTML layout?</B><BR><BR>
+
+Define your devision element with attribute &quot;position&quot; set to &quot;relative&quot; and place this inside your layout. Call &quot;new Terminal()&quot; with config-values { x: 0, y: 0 } to leave it at its relative origin.
+	</TD></TR>
+	<TR><TD CLASS="lh13"><A NAME="syntax"></A>
+&nbsp;<BR>
+<B CLASS="quest">I pasted your sample code and just got an error. - ???</B><BR><BR>
+
+The short examples are kept arbitrarily simple to show the syntax.<BR>
+Make sure that your divison element(s) is/are rendered by the browser before `Terminal.open()' is called.<BR><BR>
+
+Does not work:
+<PRE>  &lt;head&gt;
+  &lt;script&gt;
+    var term = new Terminal();
+    term.open();
+  &lt;/script&gt;
+  &lt;/head&gt;
+</PRE>
+Does work:
+<PRE>  &lt;head&gt;
+  &lt;script&gt;
+    var term;
+    
+    function termOpen() {
+       // to be called from outside after compile time
+       term = new Terminal();
+       term.open();
+    }
+  &lt;/script&gt;
+  &lt;/head&gt;
+</PRE>
+c.f. &quot;readme.txt&quot;<BR>
+(Opening a terminal by clicking a link implies also that the page has currently focus.)<BR><BR>
+With v.1.01 and higher this doesn't cause an error any more.<BR>`Terminal.prototype.open()' now returns a value for success.
+	</TD></TR>
+	<TR><TD CLASS="lh13"><A NAME="keyboard"></A>
+&nbsp;<BR>
+<B CLASS="quest">I can't get any input, but I don't get any erros too.</B><BR><BR>
+
+The Terminal object's functionality relies on the browsers ability to generate and handle keyboard events.<BR>
+Sadly some browsers lack a full implementation of the event model. (e.g. Konquerer [khtml] and early versions of Apple Safari, which is a descendant of khtml.)
+	</TD></TR>
+	<TR><TD CLASS="lh13"><A NAME="keylock"></A>
+&nbsp;<BR>
+<B CLASS="quest">How can I temporary disable the keyboard handlers?</B><BR>
+<SPAN CLASS="prop">(The terminal is blocking my HTML form fields, etc.)</SPAN><BR><BR>
+
+With version 1.03 there's a global property `<SPAN CLASS="prop">TermGlobals.keylock</SPAN>'. Set this to `true' to disable the keyboard handlers without altering any other state. Reset it to `false' to continue with your terminal session(s).
+	</TD></TR>
+	<TR><TD CLASS="lh13"><A NAME="linesranges"></A>
+&nbsp;<BR>
+<B CLASS="quest">How can I set the cusor to the start / the end of the command line?</B><BR><BR>
+
+In case you need to implement a shortcut (like ^A of some UN*X-shells) to jump to the beginning or the end of the current input line, there are two private instance methods you could utilize:<BR><BR>
+`<SPAN CLASS="prop">_getLineEnd(&lt;row&gt;, &lt;col&gt;)</SPAN>' returns an array [&lt;row&gt;, &lt;col&gt;] with the position of the last character in the logical input line with ASCII value &gt;= 32 (0x20).<BR><BR>
+`<SPAN CLASS="prop">_getLineStart(&lt;row&gt;, &lt;col&gt;)</SPAN>' returns an array [&lt;row&gt;, &lt;col&gt;] with the position of the first character in the logical input line with ASCII value &gt;= 32 (0x20).<BR><BR>
+Both take a row and a column of a cursor position as arguments.<BR><BR>
+
+p.e.:
+<PRE>
+  // jump to the start of the input line
+
+  myCtrlHandler() {
+     // catch ^A and jump to start of the line
+     if (this.inputChar == 1) {
+        var firstChar = this._getLineStart(this.r, this.c);
+        this.cursorSet(firstChar[0], firstChar[1]);
+     }
+  }</PRE>
+(Keep in mind that this is not exactly a good example, since some browser actually don't issue a keyboard event for 
+&quot;^A&quot;. And other browsers, which do catch such codes, are not very reliable in that.)
+	</TD></TR>
+	<TR><TD CLASS="lh13"><A NAME="historyunique"></A>
+&nbsp;<BR>
+<B CLASS="quest">How can I limit the command history to unique entries only?</B><BR>
+	<SPAN CLASS="prop">(My application effords commands to be commonly repeated.)</SPAN><BR><BR>
+
+With version 1.05 there is a new configuration and control flag `<SPAN CLASS="prop">historyUnique</SPAN>'. All you need is setting this to `true' in your terminal's configuration object.
+	</TD></TR>
+	<TR><TD CLASS="lh13"><A NAME="rebuild"></A>
+&nbsp;<BR>
+<B CLASS="quest">How can I change my color theme on the fly?</B><BR><BR>
+
+With version 1.07 there is a new method `<SPAN CLASS="prop">Terminal.rebuild()</SPAN>'.<BR>
+This method updates the GUI to current config settings while preserving all other state.<BR><BR>
+p.e.:
+<PRE>
+   // change color settings on the fly
+   // here: set bgColor to white and font style to class &quot;termWhite&quot;
+   // method rebuild() updates the GUI without side effects
+   // assume var term holds a referene to a Terminal object already active
+
+   term.conf.bgColor = '#ffffff';
+   term.conf.fontClass = 'termWhite';
+   term.rebuild();</PRE>
+	</TD></TR>
+	<TR><TD CLASS="lh13"><A NAME="connect"></A>
+&nbsp;<BR>
+<B CLASS="quest">How can I connect to a server?</B><BR><BR>
+
+The Terminal object only provides an interface to handle console input and output.<BR>
+External connections have to be handled outside the Terminal object. You could use the XMLHttpRequest-Object (and use a communication model like AJAX or JSON) or connect via a frame or iframe element to a foreign host.<BR><BR>
+Handling connections is considered to be out of the realm of the &quot;termlib.js&quot; library.<BR>
+The code you need is in fact quite simple:
+<PRE>
+  function connectToHost(url) {
+     if (window.XMLHttpRequest) {
+        request = new XMLHttpRequest();
+     }
+     else if (window.ActiveXObject) {
+         request = new ActiveXObject('Microsoft.XMLHTTP');
+     }
+     if (request) {
+         request.onreadystatechange = requestChangeHandler;
+         request.open('GET', url);
+         request.send('');
+     }
+     else {
+        // XMLHttpRequest not implemented
+     }
+  }
+  
+  function requestChangeHandler() {
+     if (request.readyState == 4) {
+        // readyState 4: complete; now test for server's response status
+        if (request.status == 200) {
+           // response in request.responseText or request.responseXML if XML-code
+           // if it's JS-code we could get this by eval(request.responseText)
+           // by this we could import whole functions to be used via the terminal
+        }
+        else {
+           // connection error
+           // status code and message in request.status and request.statusText
+        }
+     }
+  }
+</PRE>
+You should use this only together with a timer (window.setTimeout()) to handle connection timeouts.<BR>
+Additionally you would need some syntax to authenticate and tell the server what you want.<BR>
+For this purpose you could use the following methods of the XMLHttpRequest object:<BR><BR>
+
+	<TABLE BORDER="0" CELLSPACING="0" CELLPADDING="3">
+	<TR VALIGN="top"><TD NOWRAP CLASS="prop">setRequestHeader(&quot;<I>headerLabel</I>&quot;, &quot;<I>value</I>&quot;)</TD><TD>set a HTTP header to be sent to the server</TD></TR>
+	<TR VALIGN="top"><TD NOWRAP CLASS="prop">getResponseHeader(&quot;<I>headerLabel</I>&quot;)</TD><TD>get a HTTP header sent from the server</TD></TR>
+	<TR VALIGN="top"><TD NOWRAP CLASS="prop">open(<I>method</I>, &quot;<I>url</I>&quot; [, <I>asyncFlag</I> [,<BR>&nbsp; &quot;<I>userid</I>&quot; [, &quot;<I>password</I>&quot;]]])</TD><TD>assign the destination properties to the request.<BR>be aware that userid and password are not encrypted!</TD></TR>
+	<TR VALIGN="top"><TD NOWRAP CLASS="prop">send(<I>content</I>)</TD><TD>transmit a message body (post-string or DOM object)</TD></TR>
+	<TR VALIGN="top"><TD NOWRAP CLASS="prop">abort()</TD><TD>use this to stop a pending connection</TD></TR>
+	</TABLE>
+
+	</TD></TR>
+	<TR><TD CLASS="lh13">
+	&nbsp;<BR>
+	Norbert Landsteiner - August 2005<BR>
+	<A HREF="http://www.masswerk.at/" TARGET="_blank">http://www.masswerk.at</A>
+	</TD></TR>
+	<TR><TD CLASS="lh13">
+	&nbsp;<BR>
+		<A HREF="#top">&gt; top of page</A>
+	</TD></TR>
+	<TR><TD CLASS="lh13">
+	&nbsp;
+	</TD></TR>
+</TABLE>
+
+<DIV ID="termDiv" STYLE="position:absolute; top:20px; left:100px;"></DIV>
+
+</BODY>
+</HTML>

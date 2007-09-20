@@ -1,4 +1,0 @@
-USING: kernel ;
-IN: sql
-
-

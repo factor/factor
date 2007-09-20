@@ -1,0 +1,5 @@
+CFLAGS += -DWINCE
+LIBS = -lm
+PLAF_DLL_OBJS += vm/os-windows-ce.o
+PLAF_EXE_OBJS += vm/main-windows-ce.o
+include vm/Config.windows

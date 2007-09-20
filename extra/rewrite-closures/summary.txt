@@ -1,0 +1,1 @@
+Closures implemented via quotation rewriting

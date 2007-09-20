@@ -1,54 +1,57 @@
-#include "factor.h"
+#include "master.h"
 
 F_STRING *get_error_message()
 {
 	DWORD id = GetLastError();
-	char *msg = error_message(id);
-	F_STRING *string = from_char_string(msg);
+	F_CHAR *msg = error_message(id);
+	F_STRING *string = from_u16_string(msg);
 	LocalFree(msg);
 	return string;
 }
 
 /* You must LocalFree() the return value! */
-char *error_message(DWORD id)
+F_CHAR *error_message(DWORD id)
 {
-	char *buffer;
+	F_CHAR *buffer;
 	int index;
 
-	FormatMessage(
+	DWORD ret = FormatMessage(
 		FORMAT_MESSAGE_ALLOCATE_BUFFER |
 		FORMAT_MESSAGE_FROM_SYSTEM,
 		NULL,
 		id,
 		MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
-		(LPTSTR) &buffer,
+		(LPTSTR)(void *) &buffer,
 		0, NULL);
+	if(ret == 0)
+		return error_message(GetLastError());
 
 	/* strip whitespace from end */
-	index = strlen(buffer) - 1;
+	index = wcslen(buffer) - 1;
 	while(index >= 0 && isspace(buffer[index]))
 		buffer[index--] = 0;
 
 	return buffer;
 }
 
-s64 current_millis(void)
+HMODULE hFactorDll;
+
+void init_ffi()
 {
-	FILETIME t;
-	GetSystemTimeAsFileTime(&t);
-	return (((s64)t.dwLowDateTime | (s64)t.dwHighDateTime<<32)
-		- EPOCH_OFFSET) / 10000;
+	hFactorDll = GetModuleHandle(FACTOR_DLL);
+	if(!hFactorDll)
+		fatal_error("GetModuleHandle(\"" FACTOR_DLL_NAME "\") failed", 0);
 }
 
 void ffi_dlopen (F_DLL *dll, bool error)
 {
-	HMODULE module = LoadLibrary(alien_offset(dll->path));
+	HMODULE module = LoadLibraryEx(alien_offset(dll->path), NULL, 0);
 
 	if (!module)
 	{
 		dll->dll = NULL;
 		if(error)
-			simple_error(ERROR_FFI,F,
+			general_error(ERROR_FFI,F,
 				tag_object(get_error_message()));
 		else
 			return;
@@ -57,39 +60,54 @@ void ffi_dlopen (F_DLL *dll, bool error)
 	dll->dll = module;
 }
 
-void *ffi_dlsym (F_DLL *dll, char *symbol, bool error)
+void *ffi_dlsym(F_DLL *dll, F_SYMBOL *symbol)
 {
-	void *sym = GetProcAddress(
-		dll ? (HMODULE)dll->dll : GetModuleHandle(NULL),
-		symbol);
-
-	if (!sym)
-	{
-		if(error)
-			simple_error(ERROR_FFI,
-				tag_object(from_char_string(symbol)),
-				tag_object(get_error_message()));
-		else
-			return NULL;
-	}
-
-	return sym;
+	return GetProcAddress(dll ? (HMODULE)dll->dll : hFactorDll, symbol);
 }
 
-void ffi_dlclose (F_DLL *dll)
+void ffi_dlclose(F_DLL *dll)
 {
 	FreeLibrary((HMODULE)dll->dll);
 	dll->dll = NULL;
 }
 
-void primitive_stat(void)
+/* You must free() this yourself. */
+const F_CHAR *default_image_path(void)
 {
-	WIN32_FILE_ATTRIBUTE_DATA st;
+	F_CHAR full_path[MAX_UNICODE_PATH];
+	F_CHAR *ptr;
+	F_CHAR path_temp[MAX_UNICODE_PATH];
 
-	if(!GetFileAttributesEx(
-		unbox_char_string(),
-		GetFileExInfoStandard,
-		&st))
+	if(!GetModuleFileName(NULL, full_path, MAX_UNICODE_PATH))
+		fatal_error("GetModuleFileName() failed", 0);
+
+	if((ptr = wcsrchr(full_path, '.')))
+		*ptr = 0;
+
+	snwprintf(path_temp, sizeof(path_temp)-1, L"%s.image", full_path); 
+	path_temp[sizeof(path_temp) - 1] = 0;
+
+	return safe_strdup(path_temp);
+}
+
+/* You must free() this yourself. */
+const F_CHAR *vm_executable_path(void)
+{
+	F_CHAR full_path[MAX_UNICODE_PATH];
+	if(!GetModuleFileName(NULL, full_path, MAX_UNICODE_PATH))
+		fatal_error("GetModuleFileName() failed", 0);
+	return safe_strdup(full_path);
+}
+
+DEFINE_PRIMITIVE(stat)
+{
+	WIN32_FIND_DATA st;
+	HANDLE h;
+
+	F_CHAR *path = unbox_u16_string();
+	if(INVALID_HANDLE_VALUE == (h = FindFirstFile(
+		path,
+		&st)))
 	{
 		dpush(F);
 		dpush(F);
@@ -99,21 +117,20 @@ void primitive_stat(void)
 	else
 	{
 		box_boolean(st.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY);
-		box_signed_4(0);
+		dpush(tag_fixnum(0));
 		box_unsigned_8(
-			(s64)st.nFileSizeLow | (s64)st.nFileSizeHigh << 32);
-		box_unsigned_8((int)
-			((*(s64*)&st.ftLastWriteTime - EPOCH_OFFSET) / 10000000));
+			(u64)st.nFileSizeLow | (u64)st.nFileSizeHigh << 32);
+		box_unsigned_8(
+			((*(u64*)&st.ftLastWriteTime - EPOCH_OFFSET) / 10000000));
+		FindClose(h);
 	}
 }
 
-void primitive_read_dir(void)
+DEFINE_PRIMITIVE(read_dir)
 {
 	HANDLE dir;
 	WIN32_FIND_DATA find_data;
-	char path[MAX_PATH + 4];
-
-	sprintf(path, "%s\\*", unbox_char_string());
+	F_CHAR *path = unbox_u16_string();
 
 	GROWABLE_ARRAY(result);
 
@@ -121,11 +138,12 @@ void primitive_read_dir(void)
 	{
 		do
 		{
-			REGISTER_ARRAY(result);
-			CELL name = tag_object(from_char_string(
-				find_data.cFileName));
-			UNREGISTER_ARRAY(result);
-			GROWABLE_ADD(result,name);
+			REGISTER_UNTAGGED(result);
+			CELL name = tag_object(from_u16_string(find_data.cFileName));
+			CELL dirp = tag_boolean(find_data.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY);
+			CELL pair = allot_array_2(name,dirp);
+			UNREGISTER_UNTAGGED(result);
+			GROWABLE_ADD(result,pair);
 		}
 		while (FindNextFile(dir, &find_data));
 		CloseHandle(dir);
@@ -136,41 +154,27 @@ void primitive_read_dir(void)
 	dpush(tag_object(result));
 }
 
-void primitive_cwd(void)
-{
-	char buf[MAX_PATH];
-
-	if(!GetCurrentDirectory(MAX_PATH, buf))
-		io_error();
-
-	box_char_string(buf);
-}
-
-void primitive_cd(void)
-{
-	SetCurrentDirectory(unbox_char_string());
-}
-
 F_SEGMENT *alloc_segment(CELL size)
 {
-	SYSTEM_INFO si;
 	char *mem;
 	DWORD ignore;
 
-	GetSystemInfo(&si);
-	if((mem = (char *)VirtualAlloc(NULL, si.dwPageSize*2 + size, MEM_COMMIT, PAGE_EXECUTE_READWRITE)) == 0)
-		fatal_error("VirtualAlloc() failed in alloc_segment()",0);
+	if((mem = (char *)VirtualAlloc(NULL, getpagesize() * 2 + size,
+		MEM_COMMIT, PAGE_EXECUTE_READWRITE)) == 0)
+		fatal_error("Out of memory in alloc_segment",0);
 
-	if (!VirtualProtect(mem, si.dwPageSize, PAGE_NOACCESS, &ignore))
+	if (!VirtualProtect(mem, getpagesize(), PAGE_NOACCESS, &ignore))
 		fatal_error("Cannot allocate low guard page", (CELL)mem);
 
-	if (!VirtualProtect(mem+size+si.dwPageSize, si.dwPageSize, PAGE_NOACCESS, &ignore))
+	if (!VirtualProtect(mem + size + getpagesize(),
+		getpagesize(), PAGE_NOACCESS, &ignore))
 		fatal_error("Cannot allocate high guard page", (CELL)mem);
 
 	F_SEGMENT *block = safe_malloc(sizeof(F_SEGMENT));
 
-	block->start = (int)mem + si.dwPageSize;
+	block->start = (CELL)mem + getpagesize();
 	block->size = size;
+	block->end = block->start + size;
 
 	return block;
 }
@@ -180,7 +184,7 @@ void dealloc_segment(F_SEGMENT *block)
 	SYSTEM_INFO si;
 	GetSystemInfo(&si);
 	if(!VirtualFree((void*)(block->start - si.dwPageSize), 0, MEM_RELEASE))
-		fatal_error("VirtualFree() failed",0);
+		fatal_error("dealloc_segment failed",0);
 	free(block);
 }
 
@@ -196,36 +200,9 @@ long getpagesize(void)
 	return g_pagesize;
 }
 
-const char *default_image_path(void)
+void sleep_millis(DWORD msec)
 {
-	return "factor.image";
-}
-
-/* SEH support. Proceed with caution. */
-typedef long exception_handler_t(
-	PEXCEPTION_RECORD rec, void *frame, void *context, void *dispatch);
-
-typedef struct exception_record
-{
-	struct exception_record *next_handler;
-	void *handler_func;
-} exception_record_t;
-
-void seh_call(void (*func)(), exception_handler_t *handler)
-{
-	exception_record_t record;
-	asm("mov %%fs:0, %0" : "=r" (record.next_handler));
-	asm("mov %0, %%fs:0" : : "r" (&record));
-	record.handler_func = handler;
-	func();
-	asm("mov %0, %%fs:0" : "=r" (record.next_handler));
-}
-
-static long exception_handler(PEXCEPTION_RECORD rec, void *frame, void *ctx, void *dispatch)
-{
-	memory_protection_error(rec->ExceptionInformation[1],
-		SIGSEGV,native_stack_pointer());
-	return -1; /* unreachable */
+    Sleep(msec);
 }
 
 void run(void)
@@ -233,7 +210,3 @@ void run(void)
 	interpreter();
 }
 
-void run_toplevel(void)
-{
-	seh_call(run, exception_handler);
-}

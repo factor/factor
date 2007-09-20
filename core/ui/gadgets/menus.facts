@@ -1,7 +1,0 @@
-IN: gadgets
-USING: help gadgets-presentations ;
-
-HELP: show-menu
-{ $values { "gadget" gadget } { "owner" gadget } }
-{ $description "Displays a popup menu in the " { $link world } " containing " { $snippet "owner" } " at the current mouse location." }
-{ $see-also <commands-menu> operations-menu } ;

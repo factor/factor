@@ -1,36 +1,74 @@
-#include "factor.h"
+#include "master.h"
 
-/* Get things started */
-void init_factor(const char* image,
-	CELL ds_size, CELL rs_size, CELL cs_size,
-	CELL gen_count, CELL young_size, CELL aging_size,
-	CELL code_size,
-	bool secure_gc)
+void default_parameters(F_PARAMETERS *p)
 {
-	srand(current_millis());
-	init_ffi();
-	init_data_heap(gen_count,young_size,aging_size,secure_gc);
-	init_code_heap(code_size);
-	init_stacks(ds_size,rs_size,cs_size);
-	/* callframe must be valid in case load_image() does GC */
-	callframe = F;
-	callframe_scan = callframe_end = 0;
-	thrown_error = F;
-	load_image(image);
-	call(userenv[BOOT_ENV]);
-	init_c_io();
-	init_signals();
-	userenv[CPU_ENV] = tag_object(from_char_string(FACTOR_CPU_STRING));
-	userenv[OS_ENV] = tag_object(from_char_string(FACTOR_OS_STRING));
-	userenv[GEN_ENV] = tag_fixnum(gen_count);
-	userenv[IMAGE_ENV] = tag_object(from_char_string(image));
-	userenv[CELL_SIZE_ENV] = tag_fixnum(sizeof(CELL));
+	p->image = NULL;
+	p->ds_size = 128;
+	p->rs_size = 128;
+
+	/* We make a wild guess here that if we're running on ARM, we don't
+	have a lot of memory. */
+#ifdef FACTOR_ARM
+	p->gen_count = 2;
+	p->code_size = 2 * CELLS;
+#else
+	p->gen_count = 3;
+	p->code_size = 4 * CELLS;
+#endif
+
+	p->young_size = 2 * CELLS;
+	p->aging_size = 4 * CELLS;
+	p->secure_gc = false;
 }
 
-INLINE bool factor_arg(const char* str, const char* arg, CELL* value)
+/* Get things started */
+void init_factor(F_PARAMETERS *p)
+{
+	/* Kilobytes */
+	p->ds_size = align_page(p->ds_size << 10);
+	p->rs_size = align_page(p->rs_size << 10);
+
+	/* Megabytes */
+	p->young_size <<= 20;
+	p->aging_size <<= 20;
+	p->code_size <<= 20;
+
+	/* Disable GC during init as a sanity check */
+	gc_off = true;
+
+	profiling = false;
+
+	early_init();
+
+	if(p->image == NULL)
+		p->image = default_image_path();
+
+	srand(current_millis());
+	init_ffi();
+	init_stacks(p->ds_size,p->rs_size);
+	load_image(p);
+	init_c_io();
+	init_signals();
+
+	stack_chain = NULL;
+
+	userenv[CPU_ENV] = tag_object(from_char_string(FACTOR_CPU_STRING));
+	userenv[OS_ENV] = tag_object(from_char_string(FACTOR_OS_STRING));
+	userenv[CELL_SIZE_ENV] = tag_fixnum(sizeof(CELL));
+
+	performing_gc = false;
+	last_code_heap_scan = NURSERY;
+	collecting_aging_again = false;
+	stack_chain = NULL;
+
+	/* We can GC now */
+	gc_off = false;
+}
+
+INLINE bool factor_arg(const F_CHAR* str, const F_CHAR* arg, CELL* value)
 {
 	int val;
-	if(sscanf(str,arg,&val))
+	if(SSCANF(str,arg,&val) > 0)
 	{
 		*value = val;
 		return true;
@@ -39,70 +77,90 @@ INLINE bool factor_arg(const char* str, const char* arg, CELL* value)
 		return false;
 }
 
-int main(int argc, char** argv)
+void init_factor_from_args(F_CHAR *image, int argc, F_CHAR **argv, bool embedded)
 {
-	const char *image = NULL;
-	CELL ds_size = 128;
-	CELL rs_size = 128;
-	CELL cs_size = 128;
-	CELL generations = 2;
-	CELL young_size = 4 * CELLS;
-	CELL aging_size = 8 * CELLS;
-	CELL code_size = CELLS;
-	F_ARRAY *args;
-	CELL arg_count;
-	CELL i;
-	bool image_given = true;
-	bool secure_gc = false;
+	F_PARAMETERS p;
+	default_parameters(&p);
 
-	early_init();
+	if(image) p.image = image;
+
+	CELL i;
+
+	posix_argc = argc;
+	posix_argv = safe_malloc(argc * sizeof(F_CHAR*));
+	posix_argv[0] = safe_strdup(argv[0]);
 
 	for(i = 1; i < argc; i++)
 	{
-		if(factor_arg(argv[i],"-D=%d",&ds_size)) continue;
-		if(factor_arg(argv[i],"-R=%d",&rs_size)) continue;
-		if(factor_arg(argv[i],"-C=%d",&cs_size)) continue;
-		if(factor_arg(argv[i],"-G=%d",&generations)) continue;
-		if(factor_arg(argv[i],"-Y=%d",&young_size)) continue;
-		if(factor_arg(argv[i],"-A=%d",&aging_size)) continue;
-		if(factor_arg(argv[i],"-X=%d",&code_size)) continue;
-		if(strcmp(argv[i],"-S") == 0) { secure_gc = true; continue; }
-
-		if(strncmp(argv[i],"-",1) != 0 && image == NULL)
-			image = argv[1];
+		posix_argv[i] = safe_strdup(argv[i]);
+		if(factor_arg(argv[i],STR_FORMAT("-datastack=%d"),&p.ds_size));
+		else if(factor_arg(argv[i],STR_FORMAT("-retainstack=%d"),&p.rs_size));
+		else if(factor_arg(argv[i],STR_FORMAT("-generations=%d"),&p.gen_count));
+		else if(factor_arg(argv[i],STR_FORMAT("-young=%d"),&p.young_size));
+		else if(factor_arg(argv[i],STR_FORMAT("-aging=%d"),&p.aging_size));
+		else if(factor_arg(argv[i],STR_FORMAT("-codeheap=%d"),&p.code_size));
+		else if(STRCMP(argv[i],STR_FORMAT("-securegc")) == 0)
+			p.secure_gc = true;
+		else if(STRNCMP(argv[i],STR_FORMAT("-i="),3) == 0)
+			p.image = argv[i] + 3;
 	}
 
-	if(image == NULL)
+	init_factor(&p);
+
+	F_ARRAY *args = allot_array(ARRAY_TYPE,argc,F);
+
+	for(i = 1; i < argc; i++)
 	{
-		image_given = false;
-		image = default_image_path();
-	}
-
-	init_factor(image,
-		ds_size * 1024,
-		rs_size * 1024,
-		cs_size * 1024,
-		generations,
-		young_size * 1024 * 1024,
-		aging_size * 1024 * 1024,
-		code_size * 1024 * 1024,
-		secure_gc);
-
-	arg_count = (image_given ? 2 : 1);
-
-	args = allot_array(ARRAY_TYPE,argc,F);
-
-	for(i = arg_count; i < argc; i++)
-	{
-		REGISTER_ARRAY(args);
-		CELL arg = tag_object(from_char_string(argv[i]));
-		UNREGISTER_ARRAY(args);
+		REGISTER_UNTAGGED(args);
+		CELL arg = tag_object(from_native_string(argv[i]));
+		UNREGISTER_UNTAGGED(args);
 		set_array_nth(args,i,arg);
 	}
 
 	userenv[ARGS_ENV] = tag_object(args);
 
-	run_toplevel();
+	const F_CHAR *executable_path = vm_executable_path();
+	if(!executable_path)
+		executable_path = argv[0];
 
-	return 0;
+	userenv[EXECUTABLE_ENV] = tag_object(from_native_string(executable_path));
+	userenv[EMBEDDED_ENV] = (embedded ? T : F);
+
+	if(!untag_quotation(userenv[BOOT_ENV])->xt)
+	{
+		/* This can only happen when we're starting a stage2 bootstrap.
+		The stage1 bootstrapper doesn't attempt to compile quotations,
+		so we do it here. */
+		jit_compile_all();
+	}
+
+	nest_stacks();
+	c_to_factor_toplevel(userenv[BOOT_ENV]);
+	unnest_stacks();
+
+	for(i = 0; i < argc; i++)
+		free(posix_argv[i]);
+}
+
+char *factor_eval_string(char *string)
+{
+	char* (*callback)(char*) = alien_offset(userenv[EVAL_CALLBACK_ENV]);
+	return callback(string);
+}
+
+void factor_eval_free(char *result)
+{
+	free(result);
+}
+
+void factor_yield(void)
+{
+	void (*callback)() = alien_offset(userenv[YIELD_CALLBACK_ENV]);
+	callback();
+}
+
+void factor_sleep(long ms)
+{
+	void (*callback)() = alien_offset(userenv[SLEEP_CALLBACK_ENV]);
+	callback(ms);
 }

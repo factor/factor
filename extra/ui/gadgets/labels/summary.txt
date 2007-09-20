@@ -1,0 +1,1 @@
+Label gadgets display one or more lines of text with a single font and color

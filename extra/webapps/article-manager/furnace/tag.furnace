@@ -1,0 +1,16 @@
+<% USING: kernel io http.server namespaces sequences math html furnace webapps.article-manager.database webapps.article-manager ; %>
+
+	<div id="banner"><h1><% "arg1" get second tag-title write %></h1></div>
+    <% f "navigation" render-template %>
+	<div id="article">
+	<h1><% "arg1" get second tag-title write %></h1>
+        <% "arg1" get second tag-description write-html %>
+	<ul>
+          <% "arg1" get second articles-for-tag [ %>
+	    <li><a href="<% "responder-url" get write "article/" write dup article-url write "/" write %>"><% dup article-title write %></a> (<% article-pubdate write %>)</li></a></li>
+         <% ] each %>
+	</ul>    
+	</div>
+<p class="footer"></p>
+<p id="copyright"><% "arg1" get first site-footer write %></p>
+<% "arg1" get first site-html write-html %>

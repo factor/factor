@@ -1,0 +1,1 @@
+Slider gadgets provide a graphical view of an integer-valued model

@@ -1,0 +1,19 @@
+<% USING: namespaces io kernel sequences furnace:onigiri html 
+furnace ; %>
+
+<p><% "stub" get [ "true" entry-edit ] curry "Edit with Wiky" render-link %></p>
+
+<form method="post" action="entry-update">
+    <% "stub" get [ %><input type="hidden" name="stub" value="<% "stub" get write %>"/><% ] when %>
+    <table><tr><td>Title:</td><td><input type="text" name="title" value="<% "title" get write %>"/></td></tr>
+    <tr><td>Body:</td><td><textarea id="body" rows="10" cols="60" name="body" onKeyUp="$('preview').innerHTML=$('body').value;"><% "body" get write %></textarea></td></tr>
+    <tr><td></td><td><input type="submit" name="post" value="<% "stub" get "update" "post" ? write %>"/>
+    
+    <% "stub" get [  [ entry-delete ] curry "Delete" render-link ] when* %>(preview below)</td></tr>
+    <tr><td></td><td><div id="preview"></div></td></tr>
+    </table>
+</form>
+
+<script>
+$('preview').innerHTML=$('body').value;
+</script>

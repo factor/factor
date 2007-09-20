@@ -1,0 +1,25 @@
+<?xml version="1.0"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+    <% USING: namespaces io kernel hashtables furnace:onigiri furnace sequences ; %>
+    <title><% "model" get write %></title>
+    <link rel='stylesheet' type='text/css' href='/responder/onigiri-resources/<% css-path write %>'/>
+    <link rel='stylesheet' type='text/css' href='/responder/onigiri-resources/wiky/wiky.css'/>
+    <link rel='stylesheet' type='text/css' href='/responder/onigiri-resources/wiky/wiky.lang.css'/>
+    <link rel='stylesheet' type='text/css' href='/responder/onigiri-resources/wiky/wiky.math.css'/>
+    <script type='text/javascript' src='/responder/onigiri-resources/wiky/wiky.js'></script>
+    <script type='text/javascript' src='/responder/onigiri-resources/wiky/wiky.lang.js'></script>
+    <script type='text/javascript' src='/responder/onigiri-resources/wiky/wiky.math.js'></script>
+    <script type='text/javascript' src='/responder/resources/prototype.js'></script>
+</head>
+<body>
+
+<div id="header">
+    <h1><a href="<% "" action>url write %>"><% "title" key>meta* meta-value write %></a></h1>
+
+    <p>Proudly running on <a href="http://factorcode.org">Factor <% version write %></a></p>
+
+    <p><a href="http://validator.w3.org/check?uri=referer">Valid XHTML 1.0 Strict</a> | <a href="<% "atom" action>url write %>">Subscribe to <% "title" key>meta [ meta-value ] [ "this weblog" ] if* write %></a> | <% [ meta-list ] "Admin" render-link %> | <% [ f entry-edit ] "Post" render-link %></p>
+</div>
+
+<div id="container">

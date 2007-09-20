@@ -1,138 +1,98 @@
+#define CELL_MAX (CELL)(-1)
 #define FIXNUM_MAX (((F_FIXNUM)1 << (WORD_SIZE - TAG_BITS - 1)) - 1)
 #define FIXNUM_MIN (-((F_FIXNUM)1 << (WORD_SIZE - TAG_BITS - 1)))
+#define ARRAY_SIZE_MAX ((CELL)1 << (WORD_SIZE - TAG_BITS - 2))
 
-INLINE F_FIXNUM untag_fixnum_fast(CELL tagged)
-{
-	return ((F_FIXNUM)tagged) >> TAG_BITS;
-}
+DLLEXPORT F_FIXNUM to_fixnum(CELL tagged);
+DLLEXPORT CELL to_cell(CELL tagged);
 
-INLINE CELL tag_fixnum(F_FIXNUM untagged)
-{
-	return RETAG(untagged << TAG_BITS,FIXNUM_TYPE);
-}
+DECLARE_PRIMITIVE(bignum_to_fixnum);
+DECLARE_PRIMITIVE(float_to_fixnum);
 
-INLINE F_FIXNUM bignum_to_fixnum(CELL tagged)
-{
-	return (F_FIXNUM)s48_bignum_to_fixnum(untag_array_fast(tagged));
-}
-
-F_FIXNUM to_fixnum(CELL tagged);
-CELL to_cell(CELL tagged);
-
-void primitive_bignum_to_fixnum(void);
-void primitive_float_to_fixnum(void);
-
-void primitive_fixnum_add(void);
-void primitive_fixnum_subtract(void);
-void primitive_fixnum_add_fast(void);
-void primitive_fixnum_subtract_fast(void);
-void primitive_fixnum_multiply(void);
-void primitive_fixnum_divint(void);
-void primitive_fixnum_divmod(void);
-void primitive_fixnum_mod(void);
-void primitive_fixnum_and(void);
-void primitive_fixnum_or(void);
-void primitive_fixnum_xor(void);
-void primitive_fixnum_shift(void);
-void primitive_fixnum_less(void);
-void primitive_fixnum_lesseq(void);
-void primitive_fixnum_greater(void);
-void primitive_fixnum_greatereq(void);
-void primitive_fixnum_not(void);
-DLLEXPORT void box_signed_1(signed char integer);
-DLLEXPORT void box_signed_2(signed short integer);
-DLLEXPORT void box_unsigned_1(unsigned char integer);
-DLLEXPORT void box_unsigned_2(unsigned short integer);
-DLLEXPORT signed char unbox_signed_1(void);
-DLLEXPORT signed short unbox_signed_2(void);
-DLLEXPORT unsigned char unbox_unsigned_1(void);
-DLLEXPORT unsigned short unbox_unsigned_2(void);
+DECLARE_PRIMITIVE(fixnum_add);
+DECLARE_PRIMITIVE(fixnum_subtract);
+DECLARE_PRIMITIVE(fixnum_add_fast);
+DECLARE_PRIMITIVE(fixnum_subtract_fast);
+DECLARE_PRIMITIVE(fixnum_multiply);
+DECLARE_PRIMITIVE(fixnum_multiply_fast);
+DECLARE_PRIMITIVE(fixnum_divint);
+DECLARE_PRIMITIVE(fixnum_divmod);
+DECLARE_PRIMITIVE(fixnum_mod);
+DECLARE_PRIMITIVE(fixnum_and);
+DECLARE_PRIMITIVE(fixnum_or);
+DECLARE_PRIMITIVE(fixnum_xor);
+DECLARE_PRIMITIVE(fixnum_shift);
+DECLARE_PRIMITIVE(fixnum_less);
+DECLARE_PRIMITIVE(fixnum_lesseq);
+DECLARE_PRIMITIVE(fixnum_greater);
+DECLARE_PRIMITIVE(fixnum_greatereq);
+DECLARE_PRIMITIVE(fixnum_not);
 
 CELL bignum_zero;
 CELL bignum_pos_one;
 CELL bignum_neg_one;
-
-INLINE F_ARRAY* untag_bignum_fast(CELL tagged)
-{
-	return (F_ARRAY*)UNTAG(tagged);
-}
 
 INLINE CELL tag_bignum(F_ARRAY* bignum)
 {
 	return RETAG(bignum,BIGNUM_TYPE);
 }
 
-INLINE F_ARRAY *fixnum_to_bignum(CELL tagged)
-{
-	return s48_fixnum_to_bignum(untag_fixnum_fast(tagged));
-}
-
-void primitive_fixnum_to_bignum(void);
-void primitive_float_to_bignum(void);
-void primitive_bignum_eq(void);
-void primitive_bignum_add(void);
-void primitive_bignum_subtract(void);
-void primitive_bignum_multiply(void);
-void primitive_bignum_divint(void);
-void primitive_bignum_divmod(void);
-void primitive_bignum_mod(void);
-void primitive_bignum_and(void);
-void primitive_bignum_or(void);
-void primitive_bignum_xor(void);
-void primitive_bignum_shift(void);
-void primitive_bignum_less(void);
-void primitive_bignum_lesseq(void);
-void primitive_bignum_greater(void);
-void primitive_bignum_greatereq(void);
-void primitive_bignum_not(void);
+DECLARE_PRIMITIVE(fixnum_to_bignum);
+DECLARE_PRIMITIVE(float_to_bignum);
+DECLARE_PRIMITIVE(bignum_eq);
+DECLARE_PRIMITIVE(bignum_add);
+DECLARE_PRIMITIVE(bignum_subtract);
+DECLARE_PRIMITIVE(bignum_multiply);
+DECLARE_PRIMITIVE(bignum_divint);
+DECLARE_PRIMITIVE(bignum_divmod);
+DECLARE_PRIMITIVE(bignum_mod);
+DECLARE_PRIMITIVE(bignum_and);
+DECLARE_PRIMITIVE(bignum_or);
+DECLARE_PRIMITIVE(bignum_xor);
+DECLARE_PRIMITIVE(bignum_shift);
+DECLARE_PRIMITIVE(bignum_less);
+DECLARE_PRIMITIVE(bignum_lesseq);
+DECLARE_PRIMITIVE(bignum_greater);
+DECLARE_PRIMITIVE(bignum_greatereq);
+DECLARE_PRIMITIVE(bignum_not);
+DECLARE_PRIMITIVE(bignum_bitp);
+DECLARE_PRIMITIVE(bignum_log2);
+DECLARE_PRIMITIVE(byte_array_to_bignum);
 
 INLINE CELL allot_integer(F_FIXNUM x)
 {
 	if(x < FIXNUM_MIN || x > FIXNUM_MAX)
-		return tag_bignum(s48_fixnum_to_bignum(x));
+		return tag_bignum(fixnum_to_bignum(x));
 	else
 		return tag_fixnum(x);
 }
 
 INLINE CELL allot_cell(CELL x)
 {
-	if(x > FIXNUM_MAX)
-		return tag_bignum(s48_cell_to_bignum(x));
+	if(x > (CELL)FIXNUM_MAX)
+		return tag_bignum(cell_to_bignum(x));
 	else
 		return tag_fixnum(x);
 }
 
 /* FFI calls this */
-DLLEXPORT void box_signed_cell(F_FIXNUM integer);
-DLLEXPORT F_FIXNUM unbox_signed_cell(void);
-
-DLLEXPORT void box_unsigned_cell(CELL cell);
-DLLEXPORT F_FIXNUM unbox_unsigned_cell(void);
-
+DLLEXPORT void box_signed_1(s8 n);
+DLLEXPORT void box_unsigned_1(u8 n);
+DLLEXPORT void box_signed_2(s16 n);
+DLLEXPORT void box_unsigned_2(u16 n);
 DLLEXPORT void box_signed_4(s32 n);
-DLLEXPORT s32 unbox_signed_4(void);
-
 DLLEXPORT void box_unsigned_4(u32 n);
-DLLEXPORT u32 unbox_unsigned_4(void);
-
+DLLEXPORT void box_signed_cell(F_FIXNUM integer);
+DLLEXPORT void box_unsigned_cell(CELL cell);
 DLLEXPORT void box_signed_8(s64 n);
-DLLEXPORT s64 unbox_signed_8(void);
+DLLEXPORT s64 to_signed_8(CELL obj);
 
 DLLEXPORT void box_unsigned_8(u64 n);
-DLLEXPORT u64 unbox_unsigned_8(void);
+DLLEXPORT u64 to_unsigned_8(CELL obj);
 
-void primitive_from_fraction(void);
+CELL unbox_array_size(void);
 
-/* for punning */
-typedef union {
-    double x;
-    u64 y;
-} F_DOUBLE_BITS;
-
-typedef union {
-    float x;
-    u32 y;
-} F_FLOAT_BITS;
+DECLARE_PRIMITIVE(from_fraction);
 
 INLINE double untag_float_fast(CELL tagged)
 {
@@ -159,7 +119,7 @@ INLINE F_FIXNUM float_to_fixnum(CELL tagged)
 
 INLINE F_ARRAY *float_to_bignum(CELL tagged)
 {
-	return s48_double_to_bignum(untag_float_fast(tagged));
+	return double_to_bignum(untag_float_fast(tagged));
 }
 
 INLINE double fixnum_to_float(CELL tagged)
@@ -169,33 +129,34 @@ INLINE double fixnum_to_float(CELL tagged)
 
 INLINE double bignum_to_float(CELL tagged)
 {
-	return s48_bignum_to_double(untag_array_fast(tagged));
+	return bignum_to_double(untag_object(tagged));
 }
 
-void primitive_fixnum_to_float(void);
-void primitive_bignum_to_float(void);
-void primitive_str_to_float(void);
-void primitive_float_to_str(void);
-void primitive_float_to_bits(void);
-
-void primitive_float_add(void);
-void primitive_float_subtract(void);
-void primitive_float_multiply(void);
-void primitive_float_divfloat(void);
-void primitive_float_mod(void);
-void primitive_float_less(void);
-void primitive_float_lesseq(void);
-void primitive_float_greater(void);
-void primitive_float_greatereq(void);
-
-void primitive_float_bits(void);
-void primitive_bits_float(void);
-void primitive_double_bits(void);
-void primitive_bits_double(void);
-
 DLLEXPORT void box_float(float flo);
-DLLEXPORT float unbox_float(void);
+DLLEXPORT float to_float(CELL value);
 DLLEXPORT void box_double(double flo);
-DLLEXPORT double unbox_double(void);
+DLLEXPORT double to_double(CELL value);
 
-void primitive_from_rect(void);
+DECLARE_PRIMITIVE(fixnum_to_float);
+DECLARE_PRIMITIVE(bignum_to_float);
+DECLARE_PRIMITIVE(str_to_float);
+DECLARE_PRIMITIVE(float_to_str);
+DECLARE_PRIMITIVE(float_to_bits);
+
+DECLARE_PRIMITIVE(float_eq);
+DECLARE_PRIMITIVE(float_add);
+DECLARE_PRIMITIVE(float_subtract);
+DECLARE_PRIMITIVE(float_multiply);
+DECLARE_PRIMITIVE(float_divfloat);
+DECLARE_PRIMITIVE(float_mod);
+DECLARE_PRIMITIVE(float_less);
+DECLARE_PRIMITIVE(float_lesseq);
+DECLARE_PRIMITIVE(float_greater);
+DECLARE_PRIMITIVE(float_greatereq);
+
+DECLARE_PRIMITIVE(float_bits);
+DECLARE_PRIMITIVE(bits_float);
+DECLARE_PRIMITIVE(double_bits);
+DECLARE_PRIMITIVE(bits_double);
+
+DECLARE_PRIMITIVE(from_rect);

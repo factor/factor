@@ -1,0 +1,1 @@
+Border gadget adds padding around a child

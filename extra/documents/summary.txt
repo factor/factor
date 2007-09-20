@@ -1,0 +1,1 @@
+Mutable structure for storing a plain text document being edited in memory

@@ -1,12 +1,16 @@
 #define FACTOR_CPU_STRING "ppc"
+#define FASTCALL
 
 register CELL ds asm("r14");
 register CELL rs asm("r15");
-register CELL cards_offset asm("r16");
 
+void c_to_factor(CELL quot);
+void dosym(CELL word);
+void docol_profiling(CELL word);
+void docol(CELL word);
+void undefined(CELL word);
+void set_callstack(F_STACK_FRAME *to, F_STACK_FRAME *from, CELL length, void *memcpy);
+void throw_impl(CELL quot, F_STACK_FRAME *rewind);
 void flush_icache(CELL start, CELL len);
 
-void *native_stack_pointer(void);
-
-#define PREVIOUS_FRAME(frame) (frame->previous)
-#define RETURN_ADDRESS(frame) (frame->return_address)
+#define FRAME_SUCCESSOR(frame) (frame)->previous

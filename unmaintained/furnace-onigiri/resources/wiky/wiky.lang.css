@@ -1,0 +1,9 @@
+pre.syntax { font-size:100%; background: #eed; border:1px dotted #999; padding:0 0.5em; overflow:auto; }
+span.cmt { font-style: italic; color: green; }
+span.str { font-style: italic; color: darkred; }
+span.kwd { color: blue; }
+span.obj  { color: purple; }
+span.mbr  { color: gray; }
+span.xtag { color: blue; }
+span.xnam { color: purple; }
+span.xval { font-style: italic; color: darkred; }

@@ -3,28 +3,41 @@ typedef enum {
 	RT_PRIMITIVE,
 	/* arg is a literal table index, holding an array pair (symbol/dll) */
 	RT_DLSYM,
-	/* store current address here */
-	RT_HERE,
-	/* store the offset of the card table from the data heap base */
-	RT_CARDS,
 	/* an indirect literal from the word's literal table */
 	RT_LITERAL,
+	/* a pointer to a compiled word reference */
+	RT_DISPATCH,
 	/* a compiled word reference */
 	RT_XT,
 	/* a local label */
 	RT_LABEL
 } F_RELTYPE;
 
-#define REL_ABSOLUTE_CELL 0
-#define REL_ABSOLUTE 1
-#define REL_RELATIVE 2
-#define REL_ABSOLUTE_2_2 3
-#define REL_RELATIVE_2_2 4
-#define REL_RELATIVE_2 5
-#define REL_RELATIVE_3 6
+typedef enum {
+	/* absolute address in a 64-bit location */
+	RC_ABSOLUTE_CELL,
+	/* absolute address in a 32-bit location */
+	RC_ABSOLUTE,
+	/* relative address in a 32-bit location */
+	RC_RELATIVE,
+	/* relative address in a PowerPC LIS/ORI sequence */
+	RC_ABSOLUTE_PPC_2_2,
+	/* relative address in a PowerPC LWZ/STW/BC instruction */
+	RC_RELATIVE_PPC_2,
+	/* relative address in a PowerPC B/BL instruction */
+	RC_RELATIVE_PPC_3,
+	/* relative address in an ARM B/BL instruction */
+	RC_RELATIVE_ARM_3,
+	/* pointer to address in an ARM LDR/STR instruction */
+	RC_INDIRECT_ARM,
+	/* pointer to address in an ARM LDR/STR instruction offset by 8 bytes */
+	RC_INDIRECT_ARM_PC
+} F_RELCLASS;
 
-#define REL_RELATIVE_2_MASK 0xfffc
-#define REL_RELATIVE_3_MASK 0x3fffffc
+#define REL_RELATIVE_PPC_2_MASK 0xfffc
+#define REL_RELATIVE_PPC_3_MASK 0x3fffffc
+#define REL_INDIRECT_ARM_MASK 0xfff
+#define REL_RELATIVE_ARM_3_MASK 0xffffff
 
 /* the rel type is built like a cell to avoid endian-specific code in
 the compiler */
@@ -39,7 +52,20 @@ typedef struct {
 } F_REL;
 
 void relocate_code_block(F_COMPILED *relocating, CELL code_start,
-	CELL reloc_start, CELL literal_start, CELL words_start, CELL words_end);
-void primitive_add_compiled_block(void);
-void primitive_finalize_compile(void);
-void primitive_xt_map(void);
+	CELL reloc_start, CELL literals_start, CELL words_start, CELL words_end);
+
+void finalize_code_block(F_COMPILED *relocating, CELL code_start,
+	CELL reloc_start, CELL literals_start, CELL words_start, CELL words_end);
+
+XT add_compiled_block(
+	CELL type,
+	F_ARRAY *code,
+	F_ARRAY *labels,
+	F_ARRAY *rel,
+	F_ARRAY *words,
+	F_ARRAY *literals);
+
+CELL compiled_code_format(void);
+
+DECLARE_PRIMITIVE(add_compiled_block);
+DECLARE_PRIMITIVE(finalize_compile);

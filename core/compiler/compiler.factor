@@ -1,77 +1,92 @@
-! Copyright (C) 2004, 2006 Slava Pestov.
+! Copyright (C) 2004, 2007 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
+USING: kernel namespaces arrays sequences io inference.backend
+generator debugger math.parser prettyprint words continuations
+vocabs assocs alien.compiler ;
 IN: compiler
-USING: errors generic hashtables inference io kernel math
-namespaces optimizer parser prettyprint sequences test threads
-words ;
 
-SYMBOL: print-warnings
+M: object inference-error-major? drop t ;
 
-t print-warnings set-global
-
-SYMBOL: batch-errors
-
-GENERIC: batch-begins ( batch-errors -- )
-
-M: f batch-begins drop ;
-
-GENERIC: compile-begins ( word batch-errors -- )
-
-M: f compile-begins drop "Compiling " write . flush ;
-
-GENERIC: compile-error ( error batch-errors -- )
-
-M: f compile-error
-    drop
-    dup inference-error-major? print-warnings get or
-    [ dup error. flush ] when drop ;
-
-GENERIC: batch-ends ( batch-errors -- )
-
-M: f batch-ends drop ;
-
-: word-dataflow ( word -- dataflow )
-    [
-        dup "no-effect" word-prop [ no-effect ] when
-        dup dup add-recursive-state
-        [ specialized-def (dataflow) ] keep
-        finish-word 2drop
-    ] with-infer ;
-
-: (compile) ( word -- )
-    dup compiling? not over compound? and [
-        dup batch-errors get compile-begins
-        dup word-dataflow optimize generate
+: compile-error ( word error -- )
+    batch-mode get [
+        2array compile-errors get push
     ] [
-        drop
+        "quiet" get [ drop ] [ print-error flush ] if drop
     ] if ;
 
+: begin-batch ( seq -- )
+    batch-mode on
+    [
+        "Compiling " % length # " words..." %
+    ] "" make print flush
+    V{ } clone compile-errors set-global ;
+
+: compile-error. ( pair -- )
+    nl
+    "While compiling " write dup first pprint ": " print
+    nl
+    second print-error ;
+
+: (:errors) ( -- seq )
+    compile-errors get-global
+    [ second inference-error-major? ] subset ;
+
+: :errors (:errors) [ compile-error. ] each ;
+
+: (:warnings) ( -- seq )
+    compile-errors get-global
+    [ second inference-error-major? not ] subset ;
+
+: :warnings (:warnings) [ compile-error. ] each ;
+
+: end-batch ( -- )
+    batch-mode off
+    "quiet" get [
+        "Compile finished." print
+        nl
+        ":errors - print " write (:errors) length pprint
+        " compiler errors." print
+        ":warnings - print " write (:warnings) length pprint
+        " compiler warnings." print
+        nl
+    ] unless ;
+
 : compile ( word -- )
-    [ (compile) ] with-compiler ;
+    H{ } clone [
+        compiled-xts [ (compile) ] with-variable
+    ] keep >alist finalize-compile ;
+
+: compile-failed ( word error -- )
+    dupd compile-error dup update-xt unchanged-word ;
 
 : try-compile ( word -- )
-    [ compile ]
-    [ batch-errors get compile-error update-xt ] recover ;
+    [ compile ] [ compile-failed ] recover ;
+
+: forget-errors ( seq -- )
+    [ f "no-effect" set-word-prop ] each ;
 
 : compile-batch ( seq -- )
-    batch-errors get batch-begins
-    dup
-    [ f "no-effect" set-word-prop ] each
-    [ try-compile ] each
-    batch-errors get batch-ends ;
+    dup empty? [
+        drop
+    ] [
+        dup begin-batch
+        dup forget-errors
+        [ try-compile ] each
+        end-batch
+    ] if ;
 
-: compile-vocabs ( seq -- )
-    [ words ] map concat compile-batch ;
+: compile-vocabs ( seq -- ) [ words ] map concat compile-batch ;
 
-: compile-all ( -- )
-    vocabs compile-vocabs changed-words get clear-hash ;
+: compile-all ( -- ) vocabs compile-vocabs ;
 
-: compile-quot ( quot -- word )
-    define-temp dup compile ;
+: compile-quot ( quot -- word ) define-temp dup compile ;
 
 : compile-1 ( quot -- ) compile-quot execute ;
 
 : recompile ( -- )
     changed-words get [
-        dup hash-keys compile-batch clear-hash
+        dup keys compile-batch clear-assoc
     ] when* ;
+
+: recompile-all ( -- )
+    all-words [ changed-word ] each recompile ;

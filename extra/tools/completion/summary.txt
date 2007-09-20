@@ -1,0 +1,1 @@
+Support for fuzzy search and completion of a string from a set of candidates

@@ -1,0 +1,1 @@
+Operations are commands which may be performed on a presentation's underlying object

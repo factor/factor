@@ -1,8 +1,8 @@
 IN: temporary
-USING: compiler kernel kernel-internals memory math
-math-internals test ;
+USING: compiler kernel kernel.private memory math
+math.private tools.test math.floats.private ;
 
-[ 5.0 ] [ [ 5.0 ] compile-1 full-gc full-gc full-gc ] unit-test
+[ 5.0 ] [ [ 5.0 ] compile-1 data-gc data-gc data-gc ] unit-test
 [ 2.0 3.0 ] [ 3.0 [ 2.0 swap ] compile-1 ] unit-test
 
 [ 1 2 3 4.0 ] [ [ 1 2 3 4.0 ] compile-1 ] unit-test
@@ -81,3 +81,5 @@ math-internals test ;
 [ t ] [ 0.0 [ dup 0.0 float= swap -0.0 float= or ] compile-1 ] unit-test
 [ t ] [ -0.0 [ dup 0.0 float= swap -0.0 float= or ] compile-1 ] unit-test
 [ f ] [ 3.0 [ dup 0.0 float= swap -0.0 float= or ] compile-1 ] unit-test
+
+[ 315 315.0 ] [ 313 [ 2 fixnum+fast dup fixnum>float ] compile-1 ] unit-test

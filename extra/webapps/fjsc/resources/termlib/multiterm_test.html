@@ -1,0 +1,188 @@
+<HTML>
+<HEAD>
+	<TITLE>termlib Multiple Terminal Test</TITLE>
+	<SCRIPT LANGUAGE="JavaScript" TYPE="text/javascript" SRC="termlib.js"></SCRIPT>
+
+<SCRIPT LANGUAGE="JavaScript" TYPE="text/javascript">
+<!--
+
+/*
+  multiple terminal test for termlib.js
+
+  (c) Norbert Landsteiner 2003-2005
+  mass:werk - media environments
+  <http://www.masswerk.at>
+
+*/
+
+var term=new Array();
+
+var helpPage=[
+	'%CS%+r Terminal Help %-r%n',
+	'  This is just a tiny test for multiple terminals.',
+	'  use one of the following commands:',
+	'     clear .... clear the terminal',
+	'     exit ..... close the terminal (or <ESC>)',
+	'     id ....... show terminal\'s id',
+	'     switch ... switch to other terminal',
+	'     help ..... show this help page',
+	'  other input will be echoed to the terminal.',
+	' '
+];
+
+function termOpen(n) {
+	if (!term[n]) {
+		var y=(n==1)? 70: 280;
+		term[n]=new Terminal(
+			{
+				x: 220,
+				y: y,
+				rows: 12,
+				greeting: '%+r +++ Terminal #'+n+' ready. +++ %-r%nType "help" for help.%n',
+				id: n,
+				termDiv: 'termDiv'+n,
+				crsrBlinkMode: true,
+				handler: termHandler,
+				exitHandler: termExitHandler
+			}
+		);
+		if (term[n]) term[n].open();
+	}
+	else if (term[n].closed) {
+		term[n].open();
+	}
+	else {
+		term[n].focus();
+	}
+}
+
+function termHandler() {
+	// called on <CR> or <ENTER>
+	this.newLine();
+	var cmd=this.lineBuffer;
+	if (cmd!='') {
+		if (cmd=='switch') {
+			var other=(this.id==1)? 2:1;
+			termOpen(other);
+		}
+		else if (cmd=='clear') {
+			this.clear();
+		}
+		else if (cmd=='exit') {
+			this.close();
+		}
+		else if (cmd=='help') {
+			this.write(helpPage);
+		}
+		else if (cmd=='id') {
+			this.write('terminal id: '+this.id);
+		}
+		else {
+			this.type('You typed: '+cmd);
+			this.newLine();
+		}
+	}
+	this.prompt();
+}
+
+function termExitHandler() {
+	// optional handler called on exit
+	// activate other terminal if open
+	var other=(this.id==1)? 2:1;
+	if ((term[other]) && (term[other].closed==false)) term[other].focus();
+}
+
+//-->
+</SCRIPT>
+
+<STYLE TYPE="text/css">
+body,p,a,td {
+	font-family: courier,fixed,swiss,sans-serif;
+	font-size: 12px;
+	color: #cccccc;
+}
+.lh15 {
+	line-height: 15px;
+}
+.term {
+	font-family: courier,fixed,swiss,sans-serif;
+	font-size: 12px;
+	color: #33d011;
+	background: none;
+}
+.termReverse {
+	color: #111111;
+	background: #33d011;
+}
+a,a:link,a:visited {
+	text-decoration: none;
+	color: #77dd11;
+}
+a:hover {
+	text-decoration: underline;
+	color: #77dd11;
+}
+a:active {
+	text-decoration: underline;
+	color: #dddddd;
+}
+
+a.termopen,a.termopen:link,a.termopen:visited {
+	text-decoration: none;
+	color: #77dd11;
+	background: none;
+}
+a.termopen:hover {
+	text-decoration: none;
+	color: #222222;
+	background: #77dd11;
+}
+a.termopen:active {
+	text-decoration: none;
+	color: #222222;
+	background: #dddddd;
+}
+
+</STYLE>
+</HEAD>
+
+
+<BODY BGCOLOR="#222222" LINK="#77dd11" TEXT="#cccccc" ALINK="#dddddd" VLINK="#77dd11"
+TOPMARGIN="0" BOTTOMMARGIN="0" LEFTMARGIN="0" RIGHTMARGIN="0" MARGINHEIGHT="0" MARGINWIDTH="0">
+
+<TABLE BORDER="0" CELLSPACING="20" CELLPADDING="0" ALIGN="center">
+<TR>
+	<TD NOWRAP><A HREF="index.html">termlib.js home</A></TD>
+	<TD>|</TD>
+	<TD NOWRAP>multiple terminal test</TD>
+	<TD>|</TD>
+	<TD NOWRAP><A HREF="parser_sample.html">sample parser</A></TD>
+	<TD>|</TD>
+	<TD NOWRAP><A HREF="faq.html">faq</A></TD>
+	<TD>|</TD>
+	<TD NOWRAP><A HREF="readme.txt" TITLE="readme.txt (text/plain)">documentation</A></TD>
+</TR>
+</TABLE>
+
+<TABLE BORDER="0" CELLSPACING="20" CELLPADDING="0">
+	<TR><TD NOWRAP>
+		Multiple Terminal Test<BR>&nbsp;
+	</TD></TR>
+	<TR><TD NOWRAP>
+		<A HREF="javascript:termOpen(1)" onfocus="if(this.blur)this.blur();" onmouseover="window.status='terminal 1'; return true" onmouseout="window.status=''; return true" CLASS="termopen">&gt; open terminal 1 &nbsp;</A>
+	</TD></TR>
+	<TR><TD NOWRAP>
+		<A HREF="javascript:termOpen(2)" onfocus="if(this.blur)this.blur();" onmouseover="window.status='terminal 2'; return true" onmouseout="window.status=''; return true" CLASS="termopen">&gt; open terminal 2 &nbsp;</A>
+	</TD></TR>
+	<TR><TD NOWRAP CLASS="lh15">
+		&nbsp;<BR>
+		(c) mass:werk,<BR>N. Landsteiner 2003-2005<BR>
+		<A HREF="http://www.masswerk.at/" TARGET="_blank">http://www.masswerk.at</A>
+	</TD></TR>
+</TABLE>
+
+<DIV ID="termDiv1" STYLE="position:absolute; top:20px; left:100px;"></DIV>
+<DIV ID="termDiv2" STYLE="position:absolute; top:20px; left:100px;"></DIV>
+
+</BODY>
+</HTML>

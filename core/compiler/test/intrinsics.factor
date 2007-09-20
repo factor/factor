@@ -1,8 +1,30 @@
 IN: temporary
-USING: arrays compiler kernel kernel-internals math
-math-internals sequences strings test words errors ;
+USING: arrays compiler kernel kernel.private math
+math.private sequences strings tools.test words continuations
+sequences.private hashtables.private byte-arrays
+strings.private system random math.vectors layouts
+vectors.private sbufs.private strings.private slots.private
+alien alien.c-types alien.syntax namespaces libc math.constants
+math.functions ;
 
 ! Make sure that intrinsic ops compile to correct code.
+[ ] [ 1 [ drop ] compile-1 ] unit-test
+[ ] [ 1 2 [ 2drop ] compile-1 ] unit-test
+[ ] [ 1 2 3 [ 3drop ] compile-1 ] unit-test
+[ 1 1 ] [ 1 [ dup ] compile-1 ] unit-test
+[ 1 2 1 2 ] [ 1 2 [ 2dup ] compile-1 ] unit-test
+[ 1 2 3 1 2 3 ] [ 1 2 3 [ 3dup ] compile-1 ] unit-test
+[ 2 3 1 ] [ 1 2 3 [ rot ] compile-1 ] unit-test
+[ 3 1 2 ] [ 1 2 3 [ -rot ] compile-1 ] unit-test
+[ 1 1 2 ] [ 1 2 [ dupd ] compile-1 ] unit-test
+[ 2 1 3 ] [ 1 2 3 [ swapd ] compile-1 ] unit-test
+[ 2 ] [ 1 2 [ nip ] compile-1 ] unit-test
+[ 3 ] [ 1 2 3 [ 2nip ] compile-1 ] unit-test
+[ 2 1 2 ] [ 1 2 [ tuck ] compile-1 ] unit-test
+[ 1 2 1 ] [ 1 2 [ over ] compile-1 ] unit-test
+[ 1 2 3 1 ] [ 1 2 3 [ pick ] compile-1 ] unit-test
+[ 2 1 ] [ 1 2 [ swap ] compile-1 ] unit-test
+
 [ 1 ] [ { 1 2 } [ 2 slot ] compile-1 ] unit-test
 [ 1 ] [ [ { 1 2 } 2 slot ] compile-1 ] unit-test
 [ 3 ] [ 3 1 2 2array [ [ 2 set-slot ] keep ] compile-1 first ] unit-test
@@ -19,9 +41,9 @@ math-internals sequences strings test words errors ;
 [ CHAR: b ] [ 1 [ "abc" char-slot ] compile-1 ] unit-test
 [ CHAR: b ] [ [ 1 "abc" char-slot ] compile-1 ] unit-test
 
-[ "axc" ] [ CHAR: x 1 "abc" [ [ set-char-slot ] keep dup rehash-string ] compile-1 ] unit-test
-[ "axc" ] [ CHAR: x 1 [ "abc" [ set-char-slot ] keep dup rehash-string ] compile-1 ] unit-test
-[ "axc" ] [ CHAR: x [ 1 "abc" [ set-char-slot ] keep dup rehash-string ] compile-1 ] unit-test
+[ "axc" ] [ CHAR: x 1 "abc" [ [ set-char-slot ] keep { string } declare dup rehash-string ] compile-1 ] unit-test
+[ "axc" ] [ CHAR: x 1 [ "abc" [ set-char-slot ] keep { string } declare dup rehash-string ] compile-1 ] unit-test
+[ "axc" ] [ CHAR: x [ 1 "abc" [ set-char-slot ] keep { string } declare dup rehash-string ] compile-1 ] unit-test
 
 [ ] [ [ 0 getenv ] compile-1 drop ] unit-test
 [ ] [ 1 getenv [ 1 setenv ] compile-1 ] unit-test
@@ -132,6 +154,19 @@ math-internals sequences strings test words errors ;
 [ 4 ] [ 1 [ 3 fixnum+ ] compile-1 ] unit-test
 [ 4 ] [ [ 1 3 fixnum+ ] compile-1 ] unit-test
 
+[ 4 ] [ 1 3 [ fixnum+fast ] compile-1 ] unit-test
+[ 4 ] [ 1 [ 3 fixnum+fast ] compile-1 ] unit-test
+[ 4 ] [ [ 1 3 fixnum+fast ] compile-1 ] unit-test
+
+[ 30001 ] [ 1 [ 30000 fixnum+fast ] compile-1 ] unit-test
+
+[ 6 ] [ 2 3 [ fixnum*fast ] compile-1 ] unit-test
+[ 6 ] [ 2 [ 3 fixnum*fast ] compile-1 ] unit-test
+[ 6 ] [ [ 2 3 fixnum*fast ] compile-1 ] unit-test
+[ -6 ] [ 2 -3 [ fixnum*fast ] compile-1 ] unit-test
+[ -6 ] [ 2 [ -3 fixnum*fast ] compile-1 ] unit-test
+[ -6 ] [ [ 2 -3 fixnum*fast ] compile-1 ] unit-test
+
 [ 6 ] [ 2 3 [ fixnum* ] compile-1 ] unit-test
 [ 6 ] [ 2 [ 3 fixnum* ] compile-1 ] unit-test
 [ 6 ] [ [ 2 3 fixnum* ] compile-1 ] unit-test
@@ -218,6 +253,8 @@ cell 8 = [
     [ 1152921504606846976 ] [ -1152921504606846976 >fixnum -1 [ fixnum/i ] compile-1 ] unit-test
 
     [ 1152921504606846976 0 ] [ -1152921504606846976 >fixnum -1 [ fixnum/mod ] compile-1 ] unit-test
+
+    [ -268435457 ] [ 28 2^ [ fixnum-bitnot ] compile-1 ] unit-test
 ] when
 
 ! Some randomized tests
@@ -225,7 +262,7 @@ cell 8 = [
 \ compiled-fixnum* compile
 
 : test-fixnum*
-    (random-int) >fixnum (random-int) >fixnum
+    (random) >fixnum (random) >fixnum
     2dup
     [ fixnum* ] 2keep compiled-fixnum* =
     [ 2drop ] [ "Oops" throw ] if ;
@@ -236,7 +273,7 @@ cell 8 = [
 \ compiled-fixnum>bignum compile
 
 : test-fixnum>bignum
-    (random-int) >fixnum
+    (random) >fixnum
     dup [ fixnum>bignum ] keep compiled-fixnum>bignum =
     [ drop ] [ "Oops" throw ] if ;
 
@@ -246,8 +283,131 @@ cell 8 = [
 \ compiled-bignum>fixnum compile
 
 : test-bignum>fixnum
-    5 random-int [ drop (random-int) ] map product >bignum
+    5 random [ drop (random) ] map product >bignum
     dup [ bignum>fixnum ] keep compiled-bignum>fixnum =
     [ drop ] [ "Oops" throw ] if ;
 
 [ ] [ 10000 [ test-bignum>fixnum ] times ] unit-test
+
+! Test overflow check removal
+[ t ] [
+    most-positive-fixnum 100 - >fixnum
+    200
+    [ [ fixnum+ ] compile-1 [ bignum>fixnum ] compile-1 ] 2keep
+    [ fixnum+ >fixnum ] compile-1
+    =
+] unit-test
+
+[ t ] [
+    most-negative-fixnum 100 + >fixnum
+    -200
+    [ [ fixnum+ ] compile-1 [ bignum>fixnum ] compile-1 ] 2keep
+    [ fixnum+ >fixnum ] compile-1
+    =
+] unit-test
+
+[ t ] [
+    most-negative-fixnum 100 + >fixnum
+    200
+    [ [ fixnum- ] compile-1 [ bignum>fixnum ] compile-1 ] 2keep
+    [ fixnum- >fixnum ] compile-1
+    =
+] unit-test
+
+! Test inline allocators
+[ { 1 1 1 } ] [
+    [ 3 1 <array> ] compile-1
+] unit-test
+
+[ B{ 0 0 0 } ] [
+    [ 3 <byte-array> ] compile-1
+] unit-test
+
+[ 500 ] [
+    [ 500 <byte-array> length ] compile-1
+] unit-test
+
+[ C{ 1 2 } ] [ 1 2 [ <complex> ] compile-1 ] unit-test
+
+[ 1/2 ] [ 1 2 [ <ratio> ] compile-1 ] unit-test
+
+[ \ + ] [ \ + [ <wrapper> ] compile-1 ] unit-test
+
+[ H{ } ] [
+    100 [ (hashtable) ] compile-1 [ reset-hash ] keep
+] unit-test
+
+[ B{ 0 0 0 0 0 } ] [
+    [ 5 <byte-array> ] compile-1
+] unit-test
+
+[ V{ 1 2 } ] [
+    { 1 2 3 } 2 [ array>vector ] compile-1
+] unit-test
+
+[ SBUF" hello" ] [
+    "hello world" 5 [ string>sbuf ] compile-1
+] unit-test
+
+[ [ 3 + ] ] [
+    3 [ + ] [ curry ] compile-1
+] unit-test
+
+! Alien intrinsics
+[ 3 ] [ B{ 1 2 3 4 5 } 2 [ alien-unsigned-1 ] compile-1 ] unit-test
+[ 3 ] [ [ B{ 1 2 3 4 5 } 2 alien-unsigned-1 ] compile-1 ] unit-test
+[ 3 ] [ B{ 1 2 3 4 5 } 2 [ { byte-array fixnum } declare alien-unsigned-1 ] compile-1 ] unit-test
+[ 3 ] [ B{ 1 2 3 4 5 } 2 [ { simple-c-ptr fixnum } declare alien-unsigned-1 ] compile-1 ] unit-test
+
+[ ] [ B{ 1 2 3 4 5 } malloc-byte-array "b" set ] unit-test
+
+[ 3 ] [ "b" get 2 [ alien-unsigned-1 ] compile-1 ] unit-test
+[ 3 ] [ "b" get [ { simple-alien } declare 2 alien-unsigned-1 ] compile-1 ] unit-test
+[ 3 ] [ "b" get 2 [ { simple-alien fixnum } declare alien-unsigned-1 ] compile-1 ] unit-test
+[ 3 ] [ "b" get 2 [ { simple-c-ptr fixnum } declare alien-unsigned-1 ] compile-1 ] unit-test
+
+[ ] [ "b" get free ] unit-test
+
+[ ] [ "hello world" malloc-char-string "s" set ] unit-test
+
+[ "hello world" ] [ "s" get <void*> [ { byte-array } declare *void* ] compile-1 alien>char-string ] unit-test
+[ "hello world" ] [ "s" get <void*> [ { simple-c-ptr } declare *void* ] compile-1 alien>char-string ] unit-test
+
+[ ] [ "s" get free ] unit-test
+
+[ ALIEN: 1234 ] [ ALIEN: 1234 [ { simple-alien } declare <void*> ] compile-1 *void* ] unit-test
+[ ALIEN: 1234 ] [ ALIEN: 1234 [ { simple-c-ptr } declare <void*> ] compile-1 *void* ] unit-test
+[ f ] [ f [ { POSTPONE: f } declare <void*> ] compile-1 *void* ] unit-test
+
+[ 252 ] [ B{ 1 2 3 -4 5 } 3 [ { byte-array fixnum } declare alien-unsigned-1 ] compile-1 ] unit-test
+[ -4 ] [ B{ 1 2 3 -4 5 } 3 [ { byte-array fixnum } declare alien-signed-1 ] compile-1 ] unit-test
+
+: xword-def word-def [ { fixnum } declare ] swap append ;
+
+[ -100 ] [ -100 <char> [ { byte-array } declare *char ] compile-1 ] unit-test
+[ 156 ] [ -100 <uchar> [ { byte-array } declare *uchar ] compile-1 ] unit-test
+
+[ -100 ] [ -100 \ <char> xword-def compile-1 *char ] unit-test
+[ 156 ] [ -100 \ <uchar> xword-def compile-1 *uchar ] unit-test
+
+[ -1000 ] [ -1000 <short> [ { byte-array } declare *short ] compile-1 ] unit-test
+[ 64536 ] [ -1000 <ushort> [ { byte-array } declare *ushort ] compile-1 ] unit-test
+
+[ -1000 ] [ -1000 \ <short> xword-def compile-1 *short ] unit-test
+[ 64536 ] [ -1000 \ <ushort> xword-def compile-1 *ushort ] unit-test
+
+[ -100000 ] [ -100000 <int> [ { byte-array } declare *int ] compile-1 ] unit-test
+[ 4294867296 ] [ -100000 <uint> [ { byte-array } declare *uint ] compile-1 ] unit-test
+
+[ -100000 ] [ -100000 \ <int> xword-def compile-1 *int ] unit-test
+[ 4294867296 ] [ -100000 \ <uint> xword-def compile-1 *uint ] unit-test
+
+[ t ] [ pi pi <double> *double = ] unit-test
+
+[ t ] [ pi <double> [ { byte-array } declare *double ] compile-1 pi = ] unit-test
+
+! Silly
+[ t ] [ pi 4 <byte-array> [ [ { float byte-array } declare 0 set-alien-float ] compile-1 ] keep *float pi - abs 0.001 < ] unit-test
+[ t ] [ pi <float> [ { byte-array } declare *float ] compile-1 pi - abs 0.001 < ] unit-test
+
+[ t ] [ pi 8 <byte-array> [ [ { float byte-array } declare 0 set-alien-double ] compile-1 ] keep *double pi = ] unit-test

@@ -1,104 +1,15 @@
-USING: arrays assembler compiler generic
-hashtables inference kernel kernel-internals math
-optimizer prettyprint sequences strings test vectors words
-sequences-internals ;
+USING: arrays compiler generic hashtables inference kernel
+kernel.private math optimizer prettyprint sequences sbufs
+strings tools.test vectors words sequences.private quotations
+optimizer.backend classes inference.dataflow tuples.private ;
 IN: temporary
 
-: kill-1
-    [ 1 2 3 ] [ + ] over drop drop ;
-
-[ [ 1 2 3 ] ] [ kill-1 ] unit-test
-
-: kill-2
-    [ + ] [ 1 2 3 ] over drop nip ;
-
-[ [ 1 2 3 ] ] [ kill-2 ] unit-test
-
-: kill-3
-    [ + ] dup over 3drop ;
-
-[ ] [ kill-3 ] unit-test
-
-: kill-4
-    [ 1 2 3 ] [ + ] [ - ] pick >r 2drop r> ;
-
-[ [ 1 2 3 ] [ 1 2 3 ] ] [ kill-4 ] unit-test
-
-: kill-5
-    [ + ] [ - ] [ 1 2 3 ] pick pick 2drop >r 2drop r> ;
-
-[ [ 1 2 3 ] ] [ kill-5 ] unit-test
-
-: kill-6
-    [ 1 2 3 ] [ 4 5 6 ] [ + ] pick >r drop r> ;
-
-[ [ 1 2 3 ] [ 4 5 6 ] [ 1 2 3 ] ] [ kill-6 ] unit-test
-
-: subset? swap [ swap member? ] all-with? ;
-
-: set= 2dup subset? >r swap subset? r> and ;
-
-USE: optimizer
-
-: kill-set dup live-values swap literals hash-diff ;
-
-: kill-set=
-    dataflow kill-set hash-keys [ value-literal ] map set= ;
-
-: foo 1 2 3 ;
-
-[ H{ } ] [ \ foo word-def dataflow kill-set ] unit-test
-
-[ t ] [ [ [ 1 ] [ 2 ] ] [ [ 1 ] [ 2 ] if ] kill-set= ] unit-test
-
-[ t ] [ [ [ 1 ] [ 2 ] ] [ [ 1 ] [ 2 ] if ] kill-set= ] unit-test
-
-
-: literal-kill-test-1 4 cell 2 cells - ;
-
-[ 4 ] [ literal-kill-test-1 drop ] unit-test
-
-: literal-kill-test-2 3 cell 2 cells - ;
-
-[ 3 ] [ literal-kill-test-2 drop ] unit-test
-
-: literal-kill-test-3 10 3 /mod drop ;
-
-[ 3 ] [ literal-kill-test-3 ] unit-test
-
-: literal-kill-test-4
-    5 swap [ 3 ] [ dup ] if 2drop ;
-
-[ ] [ t literal-kill-test-4 ] unit-test
-[ ] [ f literal-kill-test-4 ] unit-test
-
-: literal-kill-test-5
-    5 swap [ 5 ] [ dup ] if 2drop ;
-
-[ ] [ t literal-kill-test-5 ] unit-test
-[ ] [ f literal-kill-test-5 ] unit-test
-
-: literal-kill-test-6
-    5 swap [ dup ] [ dup ] if 2drop ;
-
-[ ] [ t literal-kill-test-6 ] unit-test
-[ ] [ f literal-kill-test-6 ] unit-test
-
-[ t ] [ [
-    5 [ dup ] [ dup ] ] \ literal-kill-test-6 word-def kill-set=
+[ H{ { 1 5 } { 3 4 } { 2 5 } } ] [
+    H{ { 1 2 } { 3 4 } } H{ { 2 5 } } union*
 ] unit-test
 
-: literal-kill-test-7
-    [ 1 2 3 ] >r + r> drop ;
-
-[ 4 ] [ 2 2 literal-kill-test-7 ] unit-test
-
-: literal-kill-test-8 ( a b -- )
-    dup [ >r dup slip r> literal-kill-test-8 ] [ 2drop ] if ; inline
-
-[ t ] [
-    [ [ ] swap literal-kill-test-8 ] dataflow
-    live-values hash-values [ value? ] subset empty?
+[ H{ { 1 4 } { 2 4 } { 3 4 } } ] [
+    H{ { 1 2 } { 3 4 } } H{ { 2 3 } } union*
 ] unit-test
 
 ! Test method inlining
@@ -108,31 +19,31 @@ USE: optimizer
     \ string
     [ integer string array reversed sbuf
     slice vector quotation ]
-    [ class-compare ] sort min-class
-] unit-test
-
-[ f ] [
-    \ fixnum
-    [ fixnum integer letter ]
-    [ class-compare ] sort min-class
+    sort-classes min-class
 ] unit-test
 
 [ fixnum ] [
     \ fixnum
     [ fixnum integer object ]
-    [ class-compare ] sort min-class
+    sort-classes min-class
 ] unit-test
 
 [ integer ] [
     \ fixnum
     [ integer float object ]
-    [ class-compare ] sort min-class
+    sort-classes min-class
 ] unit-test
 
 [ object ] [
     \ word
     [ integer float object ]
-    [ class-compare ] sort min-class
+    sort-classes min-class
+] unit-test
+
+[ reversed ] [
+    \ reversed
+    [ integer reversed slice ]
+    sort-classes min-class
 ] unit-test
 
 FORGET: xyz
@@ -171,12 +82,12 @@ TUPLE: pred-test ;
 
 [ T{ pred-test } "pred-test" ] [ T{ pred-test } pred-test-3 ] unit-test
 
-! : inline-test
-!     "nom" = ;
-! 
-! [ t ] [ "nom" inline-test ] unit-test
-! [ f ] [ "shayin" inline-test ] unit-test
-! [ f ] [ 3 inline-test ] unit-test
+: inline-test
+    "nom" = ;
+
+[ t ] [ "nom" inline-test ] unit-test
+[ f ] [ "shayin" inline-test ] unit-test
+[ f ] [ 3 inline-test ] unit-test
 
 : fixnum-declarations >fixnum 24 shift 1234 bitxor ;
 
@@ -196,8 +107,8 @@ TUPLE: pred-test ;
 [ 3 ] [ t bad-kill-2 ] unit-test
 
 ! regression
-: (the-test) dup 0 > [ 1- (the-test) ] when ; inline
-: the-test 2 dup (the-test) ;
+: (the-test) ( n -- ) dup 0 > [ 1- (the-test) ] when ; inline
+: the-test ( -- n ) 2 dup (the-test) ;
 
 [ 2 0 ] [ the-test ] unit-test
 
@@ -213,9 +124,10 @@ TUPLE: pred-test ;
 [ ] [ double-recursion ] unit-test
 
 ! regression
-: double-label-1
+: double-label-1 ( a b c -- d )
     [ f double-label-1 ] [ swap nth-unsafe ] if ; inline
-: double-label-2
+
+: double-label-2 ( a -- b )
     dup array? [ ] [ ] if 0 t double-label-1 ;
 
 [ 0 ] [ 10 double-label-2 ] unit-test
@@ -227,16 +139,16 @@ GENERIC: void-generic ( obj -- * )
 [ breakage ] unit-test-fails
 
 ! regression
-: test-0 dup 0 = [ drop ] [ 1- test-0 ] if ; inline
-: test-1 t [ test-0 ] [ delegate dup [ test-1 ] [ drop ] if ] if ; inline
-: test-2 5 test-1 ;
+: test-0 ( n -- ) dup 0 = [ drop ] [ 1- test-0 ] if ; inline
+: test-1 ( n -- ) t [ test-0 ] [ delegate dup [ test-1 ] [ drop ] if ] if ; inline
+: test-2 ( -- ) 5 test-1 ;
 
 [ f ] [ f test-2 ] unit-test
 
-: branch-fold-regression-0
+: branch-fold-regression-0 ( n -- )
     t [ ] [ 1+ branch-fold-regression-0 ] if ; inline
 
-: branch-fold-regression-1
+: branch-fold-regression-1 ( -- )
     10 branch-fold-regression-0 ;
 
 [ 10 ] [ branch-fold-regression-1 ] unit-test
@@ -250,3 +162,114 @@ GENERIC: void-generic ( obj -- * )
 : foo f ;
 : bar foo 4 4 = and ;
 [ f ] [ bar ] unit-test
+
+! ensure identities are working in some form
+[ t ] [
+    [ { number } declare 0 + ] dataflow optimize
+    [ #push? ] node-exists? not
+] unit-test
+
+! compiling <tuple> with a non-literal class failed
+[ t ] [ [ <tuple> ] compile-quot word? ] unit-test
+
+GENERIC: foozul
+M: reversed foozul ;
+M: integer foozul ;
+M: slice foozul ;
+
+[ reversed ] [ reversed \ foozul specific-method ] unit-test
+
+! regression
+: constant-fold-2 f ; foldable
+: constant-fold-3 4 ; foldable
+
+[ f t ] [
+    [ constant-fold-2 constant-fold-3 4 = ] compile-1
+] unit-test
+
+: constant-fold-4 f ; foldable
+: constant-fold-5 f ; foldable
+
+[ f ] [
+    [ constant-fold-4 constant-fold-5 or ] compile-1
+] unit-test
+
+[ 5 ] [ 5 [ 0 + ] compile-1 ] unit-test
+[ 5 ] [ 5 [ 0 swap + ] compile-1 ] unit-test
+
+[ 5 ] [ 5 [ 0 - ] compile-1 ] unit-test
+[ -5 ] [ 5 [ 0 swap - ] compile-1 ] unit-test
+[ 0 ] [ 5 [ dup - ] compile-1 ] unit-test
+
+[ 5 ] [ 5 [ 1 * ] compile-1 ] unit-test
+[ 5 ] [ 5 [ 1 swap * ] compile-1 ] unit-test
+[ 0 ] [ 5 [ 0 * ] compile-1 ] unit-test
+[ 0 ] [ 5 [ 0 swap * ] compile-1 ] unit-test
+[ -5 ] [ 5 [ -1 * ] compile-1 ] unit-test
+[ -5 ] [ 5 [ -1 swap * ] compile-1 ] unit-test
+
+[ 5 ] [ 5 [ 1 / ] compile-1 ] unit-test
+[ 1/5 ] [ 5 [ 1 swap / ] compile-1 ] unit-test
+[ -5 ] [ 5 [ -1 / ] compile-1 ] unit-test
+
+[ 0 ] [ 5 [ 1 mod ] compile-1 ] unit-test
+[ 0 ] [ 5 [ 1 rem ] compile-1 ] unit-test
+
+[ 5 ] [ 5 [ -1 bitand ] compile-1 ] unit-test
+[ 0 ] [ 5 [ 0 bitand ] compile-1 ] unit-test
+[ 5 ] [ 5 [ -1 swap bitand ] compile-1 ] unit-test
+[ 0 ] [ 5 [ 0 swap bitand ] compile-1 ] unit-test
+[ 5 ] [ 5 [ dup bitand ] compile-1 ] unit-test
+
+[ 5 ] [ 5 [ 0 bitor ] compile-1 ] unit-test
+[ -1 ] [ 5 [ -1 bitor ] compile-1 ] unit-test
+[ 5 ] [ 5 [ 0 swap bitor ] compile-1 ] unit-test
+[ -1 ] [ 5 [ -1 swap bitor ] compile-1 ] unit-test
+[ 5 ] [ 5 [ dup bitor ] compile-1 ] unit-test
+
+[ 5 ] [ 5 [ 0 bitxor ] compile-1 ] unit-test
+[ 5 ] [ 5 [ 0 swap bitxor ] compile-1 ] unit-test
+[ -6 ] [ 5 [ -1 bitxor ] compile-1 ] unit-test
+[ -6 ] [ 5 [ -1 swap bitxor ] compile-1 ] unit-test
+[ 0 ] [ 5 [ dup bitxor ] compile-1 ] unit-test
+
+[ 0 ] [ 5 [ 0 swap shift ] compile-1 ] unit-test
+[ 5 ] [ 5 [ 0 shift ] compile-1 ] unit-test
+
+[ f ] [ 5 [ dup < ] compile-1 ] unit-test
+[ t ] [ 5 [ dup <= ] compile-1 ] unit-test
+[ f ] [ 5 [ dup > ] compile-1 ] unit-test
+[ t ] [ 5 [ dup >= ] compile-1 ] unit-test
+
+[ t ] [ 5 [ dup eq? ] compile-1 ] unit-test
+[ t ] [ 5 [ dup = ] compile-1 ] unit-test
+[ t ] [ 5 [ dup number= ] compile-1 ] unit-test
+[ t ] [ \ vector [ \ vector = ] compile-1 ] unit-test
+
+[ 3 ] [ 10/3 [ { ratio } declare 1 /i ] compile-1 ] unit-test
+
+GENERIC: detect-number ( obj -- obj )
+M: number detect-number ;
+
+[ 10 f [ <array> 0 + detect-number ] compile-1 ] unit-test-fails
+
+! Regression
+[ 4 [ + ] ] [ 2 2 [ [ + ] [ call ] keep ] compile-1 ] unit-test
+
+! Regression
+USE: sorting
+USE: sorting.private
+
+: old-binsearch ( elt quot seq -- elt quot i )
+    dup length 1 <= [
+        slice-from
+    ] [
+        [ midpoint swap call ] 3keep roll dup zero?
+        [ drop dup slice-from swap midpoint@ + ]
+        [ partition old-binsearch ] if
+    ] if ; inline
+
+[ 10 ] [
+    10 20 >vector <flat-slice>
+    [ [ - ] swap old-binsearch ] compile-1 2nip
+] unit-test

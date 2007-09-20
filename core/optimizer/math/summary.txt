@@ -1,0 +1,1 @@
+Overflow check removal and mathematical identities

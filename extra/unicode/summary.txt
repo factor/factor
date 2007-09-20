@@ -1,0 +1,1 @@
+Unicode 5.0 support

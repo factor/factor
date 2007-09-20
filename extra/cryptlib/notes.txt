@@ -1,0 +1,51 @@
+Read remaining data:
+
+ USING: alien libc kernel-internals byte-arrays ;
+ 
+ SYMBOL: buffer
+ 
+ 11 "uchar*" malloc-array buffer set
+ 
+ "Hello world" buffer get string>memory
+ 
+ buffer get 11 memory>string .
+ 
+ "Hello world"
+ 
+ 11 [ buffer get swap alien-unsigned-1 ] each
+ 
+ .s
+ 
+ 72
+ 101
+ 108
+ 108
+ 111
+ 32
+ 119
+ 111
+ 114
+ 108
+ 100 
+ 
+ 11 [ buffer get swap alien-unsigned-1 ] map
+ 
+ >byte-array .
+ 
+ { 72 101 108 108 111 32 119 111 114 108 100 }
+
+Parse a file:
+
+ openssl asn1parse -in file.pem
+
+Parse a DER file:
+
+ openssl asn1parse -inform DER -in file.der
+
+Generate a PKCS#12 file:
+
+ openssl pkcs12 -export -in certs.pem -out file.p12 -name "MY Certificate"
+
+ The export option specifies that a PKCS#12 file will be generated (rather 
+ than parsed).
+

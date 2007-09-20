@@ -1,7 +1,0 @@
-<% USING: namespaces furnace sequences ; %>
-
-<table>
-<tr><th>Summary:</th><th>Paste by:</th></tr>
-<% "pastes" get [ "paste-summary" render-template ] each %></table>
-
-<% "new-paste-quot" get "New paste" render-link %>

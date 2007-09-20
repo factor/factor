@@ -1,0 +1,1 @@
+Window manager for the X Window System

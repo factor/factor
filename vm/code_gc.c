@@ -1,21 +1,26 @@
-#include "factor.h"
+#include "master.h"
 
 /* This malloc-style heap code is reasonably generic. Maybe in the future, it
 will be used for the data heap too, if we ever get incremental
 mark/sweep/compact GC. */
 void new_heap(F_HEAP *heap, CELL size)
 {
-	heap->base = (CELL)(alloc_segment(size)->start);
-	if(heap->base == 0)
-		fatal_error("Cannot allocate code heap",size);
-	heap->limit = heap->base + size;
+	heap->segment = alloc_segment(align_page(size));
+	if(!heap->segment)
+		fatal_error("Out of memory in new_heap",size);
 	heap->free_list = NULL;
 }
 
 /* Allocate a code heap during startup */
 void init_code_heap(CELL size)
 {
-	new_heap(&compiling,size);
+	new_heap(&code_heap,size);
+}
+
+bool in_code_heap_p(CELL ptr)
+{
+	return (ptr >= code_heap.segment->start
+		&& ptr <= code_heap.segment->end);
 }
 
 /* If there is no previous block, next_free becomes the head of the free list,
@@ -36,8 +41,8 @@ void build_free_list(F_HEAP *heap, CELL size)
 {
 	F_BLOCK *prev = NULL;
 	F_BLOCK *prev_free = NULL;
-	F_BLOCK *scan = (F_BLOCK *)heap->base;
-	F_BLOCK *end = (F_BLOCK *)(heap->base + size);
+	F_BLOCK *scan = first_block(heap);
+	F_BLOCK *end = (F_BLOCK *)(heap->segment->start + size);
 
 	/* Add all free blocks to the free list */
 	while(scan && scan < end)
@@ -61,11 +66,11 @@ void build_free_list(F_HEAP *heap, CELL size)
 
 	/* If there is room at the end of the heap, add a free block. This
 	branch is only taken after loading a new image, not after code GC */
-	if((CELL)(end + 1) <= heap->limit)
+	if((CELL)(end + 1) <= heap->segment->end)
 	{
 		end->status = B_FREE;
 		end->next_free = NULL;
-		end->size = heap->limit - (CELL)end;
+		end->size = heap->segment->end - (CELL)end;
 
 		/* add final free block */
 		update_free_list(heap,prev_free,end);
@@ -78,7 +83,7 @@ void build_free_list(F_HEAP *heap, CELL size)
 		free block, we might have to jigger it up by a few bytes in
 		case prev + prev->size */
 		if(prev)
-			prev->size = heap->limit - (CELL)prev;
+			prev->size = heap->segment->end - (CELL)prev;
 
 		/* this is the last free block */
 		update_free_list(heap,prev_free,NULL);
@@ -92,7 +97,7 @@ CELL heap_allot(F_HEAP *heap, CELL size)
 	F_BLOCK *prev = NULL;
 	F_BLOCK *scan = heap->free_list;
 
-	size = align8(size);
+	size = (size + 31) & ~31;
 
 	while(scan)
 	{
@@ -140,12 +145,27 @@ CELL heap_allot(F_HEAP *heap, CELL size)
 	return 0;
 }
 
+/* If in the middle of code GC, we have to grow the heap, GC restarts from
+scratch, so we have to unmark any marked blocks. */
+void unmark_marked(F_HEAP *heap)
+{
+	F_BLOCK *scan = first_block(heap);
+
+	while(scan)
+	{
+		if(scan->status == B_MARKED)
+			scan->status = B_ALLOCATED;
+
+		scan = next_block(heap,scan);
+	}
+}
+
 /* After code GC, all referenced code blocks have status set to B_MARKED, so any
 which are allocated and not marked can be reclaimed. */
 void free_unmarked(F_HEAP *heap)
 {
 	F_BLOCK *prev = NULL;
-	F_BLOCK *scan = (F_BLOCK *)heap->base;
+	F_BLOCK *scan = first_block(heap);
 
 	while(scan)
 	{
@@ -175,18 +195,18 @@ void free_unmarked(F_HEAP *heap)
 		scan = next_block(heap,scan);
 	}
 
-	build_free_list(heap,heap->limit - heap->base);
+	build_free_list(heap,heap->segment->size);
 }
 
 /* Compute total sum of sizes of free blocks */
-CELL heap_free_space(F_HEAP *heap)
+CELL heap_usage(F_HEAP *heap, F_BLOCK_STATUS status)
 {
 	CELL size = 0;
-	F_BLOCK *scan = (F_BLOCK *)heap->base;
+	F_BLOCK *scan = first_block(heap);
 
 	while(scan)
 	{
-		if(scan->status == B_FREE)
+		if(scan->status == status)
 			size += scan->size;
 		scan = next_block(heap,scan);
 	}
@@ -197,41 +217,41 @@ CELL heap_free_space(F_HEAP *heap)
 /* The size of the heap, not including the last block if it's free */
 CELL heap_size(F_HEAP *heap)
 {
-	F_BLOCK *scan = (F_BLOCK *)heap->base;
+	F_BLOCK *scan = first_block(heap);
 
 	while(next_block(heap,scan) != NULL)
 		scan = next_block(heap,scan);
 
 	/* this is the last block in the heap, and it is free */
 	if(scan->status == B_FREE)
-		return (CELL)scan - heap->base;
+		return (CELL)scan - heap->segment->start;
 	/* otherwise the last block is allocated */
 	else
-		return heap->limit - heap->base;
+		return heap->segment->size;
 }
 
 /* Apply a function to every code block */
 void iterate_code_heap(CODE_HEAP_ITERATOR iter)
 {
-	F_BLOCK *scan = (F_BLOCK *)compiling.base;
+	F_BLOCK *scan = first_block(&code_heap);
 
 	while(scan)
 	{
 		if(scan->status != B_FREE)
-			iterate_code_heap_step((F_COMPILED *)(scan + 1),iter);
-		scan = next_block(&compiling,scan);
+			iterate_code_heap_step(block_to_compiled(scan),iter);
+		scan = next_block(&code_heap,scan);
 	}
 }
 
 /* Copy all literals referenced from a code block to newspace */
 void collect_literals_step(F_COMPILED *compiled, CELL code_start,
-	CELL reloc_start, CELL literal_start, CELL words_start, CELL words_end)
+	CELL reloc_start, CELL literals_start, CELL words_start, CELL words_end)
 {
 	CELL scan;
 
-	CELL literal_end = literal_start + compiled->literal_length;
+	CELL literal_end = literals_start + compiled->literals_length;
 
-	for(scan = literal_start; scan < literal_end; scan += CELLS)
+	for(scan = literals_start; scan < literal_end; scan += CELLS)
 		copy_handle((CELL*)scan);
 
 	/* If the block is not finalized, the words area contains pointers to
@@ -257,16 +277,16 @@ void collect_literals(void)
 
 /* Mark all XTs referenced from a code block */
 void mark_sweep_step(F_COMPILED *compiled, CELL code_start,
-	CELL reloc_start, CELL literal_start, CELL words_start, CELL words_end)
+	CELL reloc_start, CELL literals_start, CELL words_start, CELL words_end)
 {
 	CELL scan;
 
 	for(scan = words_start; scan < words_end; scan += CELLS)
-		recursive_mark(get(scan));
+		recursive_mark((XT)get(scan));
 }
 
 /* Mark all XTs and literals referenced from a word XT */
-void recursive_mark(CELL xt)
+void recursive_mark(XT xt)
 {
 	F_BLOCK *block = xt_to_block(xt);
 
@@ -300,22 +320,26 @@ void recursive_mark(CELL xt)
 }
 
 /* Push the free space and total size of the code heap */
-void primitive_code_room(void)
+DEFINE_PRIMITIVE(code_room)
 {
-	dpush(tag_fixnum(heap_free_space(&compiling) / 1024));
-	dpush(tag_fixnum((compiling.limit - compiling.base) / 1024));
+	dpush(tag_fixnum(heap_usage(&code_heap,B_FREE) / 1024));
+	dpush(tag_fixnum((code_heap.segment->size) / 1024));
 }
 
-/* Perform a code GC */
-void primitive_code_gc(void)
+void code_gc(void)
 {
-	garbage_collection(TENURED,true);
+	garbage_collection(TENURED,true,false,0);
+}
+
+DEFINE_PRIMITIVE(code_gc)
+{
+	code_gc();
 }
 
 /* Dump all code blocks for debugging */
 void dump_heap(F_HEAP *heap)
 {
-	F_BLOCK *scan = (F_BLOCK *)heap->base;
+	F_BLOCK *scan = first_block(heap);
 
 	while(scan)
 	{
@@ -336,8 +360,131 @@ void dump_heap(F_HEAP *heap)
 			break;
 		}
 
-		fprintf(stderr,"%lx %s\n",(CELL)scan,status);
+		fprintf(stderr,"%lx %lx %s\n",(CELL)scan,scan->size,status);
 
 		scan = next_block(heap,scan);
 	}
+}
+
+/* Compute where each block is going to go, after compaction */
+CELL compute_heap_forwarding(F_HEAP *heap)
+{
+	F_BLOCK *scan = first_block(heap);
+	CELL address = (CELL)first_block(heap);
+
+	while(scan)
+	{
+		if(scan->status == B_ALLOCATED)
+		{
+			scan->forwarding = (F_BLOCK *)address;
+			address += scan->size;
+		}
+
+		scan = next_block(heap,scan);
+	}
+
+	return address - heap->segment->start;
+}
+
+void forward_xt(XT *xt)
+{
+	F_BLOCK *block = xt_to_block(*xt);
+	*xt = block_to_xt(block->forwarding);
+}
+
+void forward_object_xts(void)
+{
+	begin_scan();
+
+	CELL obj;
+
+	while((obj = next_object()) != F)
+	{
+		if(type_of(obj) == WORD_TYPE)
+		{
+			F_WORD *word = untag_object(obj);
+
+			if(in_code_heap_p((CELL)word->xt))
+				forward_xt(&word->xt);
+		}
+		else if(type_of(obj) == QUOTATION_TYPE)
+		{
+			F_QUOTATION *quot = untag_object(obj);
+
+			if(in_code_heap_p((CELL)quot->xt))
+				forward_xt(&quot->xt);
+		}
+	}
+
+	/* End the heap scan */
+	gc_off = false;
+}
+
+void compaction_code_block_fixup(F_COMPILED *compiled, CELL code_start,
+	CELL reloc_start, CELL literals_start, CELL words_start, CELL words_end)
+{
+	XT *iter = (XT *)words_start;
+	XT *end = (XT *)words_end;
+
+	while(iter < end)
+		forward_xt(iter++);
+}
+
+void forward_block_xts(void)
+{
+	F_BLOCK *scan = first_block(&code_heap);
+
+	while(scan)
+	{
+		if(scan->status == B_ALLOCATED)
+		{
+			iterate_code_heap_step(block_to_compiled(scan),
+				compaction_code_block_fixup);
+		}
+
+		scan = next_block(&code_heap,scan);
+	}
+}
+
+void compact_heap(F_HEAP *heap)
+{
+	F_BLOCK *scan = first_block(heap);
+
+	while(scan)
+	{
+		F_BLOCK *next = next_block(heap,scan);
+
+		if(scan->status == B_ALLOCATED && scan != scan->forwarding)
+			memcpy(scan->forwarding,scan,scan->size);
+
+		scan = next;
+	}
+}
+
+/* Move all free space to the end of the code heap. This is not very efficient,
+since it makes several passes over the code and data heaps, but we only ever
+do this before saving a deployed image and exiting, so performaance is not
+critical here */
+void compact_code_heap(void)
+{
+	/* Free all unreachable code blocks */
+	code_gc();
+
+	fprintf(stderr,"*** Code heap compaction...\n");
+
+	/* Figure out where the code heap blocks are going to end up */
+	CELL size = compute_heap_forwarding(&code_heap);
+
+	/* Update word and quotation XTs to point to the new locations */
+	forward_object_xts();
+
+	/* Update code block XTs to point to the new locations */
+	forward_block_xts();
+
+	/* Actually perform the compaction */
+	compact_heap(&code_heap);
+
+	/* Now update the free list; there will be a single free block at
+	the end */
+	build_free_list(&code_heap,size);
 }

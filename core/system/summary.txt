@@ -1,0 +1,1 @@
+OS and CPU queries, environment variables, paths

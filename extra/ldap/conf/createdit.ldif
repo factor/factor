@@ -1,0 +1,45 @@
+# this is a comment # MUST be in FIRST column - very picky
+
+## DEFINE DIT ROOT/BASE/SUFFIX ####
+## uses RFC 2377 format
+## replace example and com as necessary below
+## or for experimentation leave as is
+
+## dcObject is an AUXILLIARY objectclass and MUST
+## have a STRUCTURAL objectclass (organization in this case)
+# this is an ENTRY sequence and is preceded by a BLANK line
+
+dn: dc=example,dc=com
+dc: example
+description: My wonderful company as much text as you want to place in this line up to 32K
+ continuation data for the line above must have &lt;CR> or &lt;CR>&lt;LF> i.e. ENTER works 
+ on both Windows and *nix system - new line MUST begin with ONE SPACE
+objectClass: dcObject
+objectClass: organization
+o: Example, Inc.
+
+## FIRST Level hierarchy - people 
+## uses mixed upper and lower case for objectclass
+# this is an ENTRY sequence and is preceded by a BLANK line
+
+dn: ou=people, dc=example,dc=com
+ou: people
+description: All people in organisation
+objectclass: organizationalunit
+
+## SECOND Level hierarchy
+## ADD a single entry under FIRST (people) level
+# this is an ENTRY sequence and is preceded by a BLANK line
+# the ou: Human Resources is the department name
+
+dn: cn=Robert Forest,ou=people,dc=example,dc=com
+objectclass: inetOrgPerson
+cn: Robert Forest
+sn: Forest
+uid: 0
+userpassword: rForest
+carlicense: HISCAR 123
+homephone: 555-111-2222
+mail: r.forest@example.com
+description: swell guy
+# ou: Human Resources

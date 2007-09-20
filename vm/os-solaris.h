@@ -1,1 +1,2 @@
-#define FACTOR_OS_STRING "solaris"
+#define UNKNOWN_TYPE_P(file) 1
+#define DIRECTORY_P(file) 0

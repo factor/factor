@@ -1,7 +1,9 @@
 ! Black box testing of templater optimization
 
-USING: arrays compiler kernel kernel-internals math
-math-internals namespaces sequences sequences-internals test ;
+USING: arrays compiler kernel kernel.private math
+hashtables.private math.private math.ratios.private namespaces
+sequences sequences.private tools.test namespaces.private
+slots.private combinators.private ;
 IN: temporary
 
 ! Oops!
@@ -73,7 +75,7 @@ unit-test
 [ 3 ]
 [
     global [ 3 \ foo set ] bind
-    \ foo [ global >n get n> drop ] compile-1
+    \ foo [ global >n get ndrop ] compile-1
 ] unit-test
 
 : blech drop ;
@@ -87,7 +89,7 @@ unit-test
 [ 3 ]
 [
     global [ 3 \ foo set ] bind
-    \ foo [ global [ get ] swap >n call n> drop ] compile-1
+    \ foo [ global [ get ] swap >n call ndrop ] compile-1
 ] unit-test
 
 [ 3 ]
@@ -106,20 +108,80 @@ unit-test
     -12 -13 [ [ 0 swap fixnum- ] 2apply ] compile-1
 ] unit-test
 
-[ { t t } ] [
-    { t } { t } [
-        dup array-capacity [
-            2dup swap swap 2 fixnum+fast slot
-            >r pick swap 2 fixnum+fast slot r> 2array
-        ] collect 2nip
-    ] compile-1 first
+[ 2 ] [
+    SBUF" " [ 2 slot 2 [ slot ] keep ] compile-1 nip
 ] unit-test
 
-[ { t t } ] [
-    { t } { t } [
-        dup array-capacity [
-            2dup swap swap 2 fixnum+ slot
-            >r pick swap 2 fixnum+ slot r> 2array
-        ] collect 2nip
-    ] compile-1 first
+! Test slow shuffles
+[ 3 1 2 3 4 5 6 7 8 9 ] [
+    1 2 3 4 5 6 7 8 9
+    [ >r >r >r >r >r >r >r >r >r 3 r> r> r> r> r> r> r> r> r> ]
+    compile-1
 ] unit-test
+
+[ 2 2 2 2 2 2 2 2 2 2 1 ] [
+    1 2
+    [ swap >r dup dup dup dup dup dup dup dup dup r> ] compile-1
+] unit-test
+
+[ ] [ [ 9 [ ] times ] compile-1 ] unit-test
+
+[ ] [
+    [
+        [ 200 dup [ 200 3array ] curry map drop ] times
+    ] compile-quot drop
+] unit-test
+
+
+! Test how dispatch handles the end of a basic block
+: try-breaking-dispatch
+    float+ swap { [ "hey" ] [ "bye" ] } dispatch ;
+
+: try-breaking-dispatch-2
+    1 1.0 2.5 try-breaking-dispatch "bye" = >r 3.5 = r> and ;
+
+[ t ] [
+    10000000 [ drop try-breaking-dispatch-2 ] all?
+] unit-test
+
+! Regression
+: (broken) ( x -- y ) ;
+
+[ 2.0 { 2.0 0.0 } ] [
+    2.0 1.0
+    [ float/f 0.0 [ drop (broken) ] 2keep 2array ] compile-1
+] unit-test
+
+! Regression
+: hellish-bug-1 2drop ;
+
+: hellish-bug-2 ( i array x -- x ) 
+    2dup 1 slot eq? [ 2drop ] [ 
+        2dup array-nth tombstone? [ 
+            [
+                [ array-nth ] 2keep >r 1 fixnum+fast r> array-nth
+                pick 2dup hellish-bug-1 3drop
+            ] 2keep
+        ] unless >r 2 fixnum+fast r> hellish-bug-2
+    ] if ; inline
+
+: hellish-bug-3 ( hash array -- ) 
+    0 swap hellish-bug-2 drop ;
+
+[ ] [
+    H{ { 1 2 } { 3 4 } } dup hash-array
+    [ 0 swap hellish-bug-2 drop ] compile-1
+] unit-test
+
+! Regression
+: foox
+    dup not
+    [ drop 3 ] [ dup tuple? [ drop 4 ] [ drop 5 ] if ] if ;
+
+[ 3 ] [ f foox ] unit-test
+
+TUPLE: my-tuple ;
+
+[ 4 ] [ T{ my-tuple } foox ] unit-test
+
+[ 5 ] [ "hi" foox ] unit-test

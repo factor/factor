@@ -1,7 +1,0 @@
-IN: inference
-USING: help ;
-
-HELP: shuffle-stacks
-{ $values { "shuffle" "an instance of " { $link shuffle } } }
-{ $description "Applies a stack shuffle pattern to the inference stacks." }
-{ $errors "Throws an error if the stacks contain insufficient elements." } ;

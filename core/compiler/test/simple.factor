@@ -1,57 +1,58 @@
-USE: compiler
-USE: test
-USE: math
-USE: kernel
-USE: words
-USE: kernel
-USE: math-internals
-USE: memory
+USING: compiler tools.test kernel kernel.private
+combinators.private ;
 IN: temporary
 
+! Test empty word
+[ ] [ [ ] compile-1 ] unit-test
+
+! Test literals
+[ 1 ] [ [ 1 ] compile-1 ] unit-test
+[ 31 ] [ [ 31 ] compile-1 ] unit-test
+[ 255 ] [ [ 255 ] compile-1 ] unit-test
+[ -1 ] [ [ -1 ] compile-1 ] unit-test
+[ 65536 ] [ [ 65536 ] compile-1 ] unit-test
+[ -65536 ] [ [ -65536 ] compile-1 ] unit-test
+[ "hey" ] [ [ "hey" ] compile-1 ] unit-test
+
+! Calls
 : no-op ;
+
+[ ] [ [ no-op ] compile-1 ] unit-test
+[ 3 ] [ [ no-op 3 ] compile-1 ] unit-test
+[ 3 ] [ [ 3 no-op ] compile-1 ] unit-test
+
+: bar 4 ;
+
+[ 4 ] [ [ bar no-op ] compile-1 ] unit-test
+[ 4 3 ] [ [ no-op bar 3 ] compile-1 ] unit-test
+[ 3 4 ] [ [ 3 no-op bar ] compile-1 ] unit-test
 
 [ ] [ no-op ] unit-test
 
-: literals 3 5 ;
+! Conditionals
 
-: tail-call fixnum+ ;
+[ 1 ] [ t [ [ 1 ] [ 2 ] if ] compile-1 ] unit-test
+[ 2 ] [ f [ [ 1 ] [ 2 ] if ] compile-1 ] unit-test
+[ 1 3 ] [ t [ [ 1 ] [ 2 ] if 3 ] compile-1 ] unit-test
+[ 2 3 ] [ f [ [ 1 ] [ 2 ] if 3 ] compile-1 ] unit-test
 
-[ 4 ] [ 1 3 tail-call ] unit-test
+[ "hi" ] [ 0 [ { [ "hi" ] [ "bye" ] } dispatch ] compile-1 ] unit-test
+[ "bye" ] [ 1 [ { [ "hi" ] [ "bye" ] } dispatch ] compile-1 ] unit-test
 
-[ 3 5 ] [ literals ] unit-test
+[ "hi" 3 ] [ 0 [ { [ "hi" ] [ "bye" ] } dispatch 3 ] compile-1 ] unit-test
+[ "bye" 3 ] [ 1 [ { [ "hi" ] [ "bye" ] } dispatch 3 ] compile-1 ] unit-test
 
-: literals&tail-call 3 5 fixnum+ ;
+[ 4 1 ] [ 0 [ { [ bar 1 ] [ 3 1 ] } dispatch ] compile-1 ] unit-test
+[ 3 1 ] [ 1 [ { [ bar 1 ] [ 3 1 ] } dispatch ] compile-1 ] unit-test
+[ 4 1 3 ] [ 0 [ { [ bar 1 ] [ 3 1 ] } dispatch 3 ] compile-1 ] unit-test
+[ 3 1 3 ] [ 1 [ { [ bar 1 ] [ 3 1 ] } dispatch 3 ] compile-1 ] unit-test
 
-[ 8 ] [ literals&tail-call ] unit-test
+! Labels
 
-: two-calls dup fixnum* ;
+: recursive ( ? -- ) [ f recursive ] when ; inline
 
-[ 25 ] [ 5 two-calls ] unit-test
+[ ] [ t [ recursive ] compile-1 ] unit-test
 
-: mix-test 3 5 fixnum+ 6 fixnum* ;
+\ recursive compile
 
-[ 48 ] [ mix-test ] unit-test
-
-: indexed-literal-test "hello world" ;
-
-full-gc
-full-gc
-
-[ "hello world" ] [ indexed-literal-test ] unit-test
-
-: foo dup [ dup [ ] [ ] if drop ] [ drop ] if ;
-
-[ 10 ] [ 10 2 foo ] unit-test
-
-: foox dup [ foox ] when ; inline
-: bar foox ;
-
-: xyz 3 ;
-
-: execute-test execute ; inline
-: execute-test-2 \ xyz execute-test ;
-
-\ execute-test-2 compile
-
-[ f ] [ \ execute-test compiled? ] unit-test
-[ 3 ] [ execute-test-2 ] unit-test
+[ ] [ t recursive ] unit-test

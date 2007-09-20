@@ -1,8 +1,7 @@
-/* -*-C-*-
+/* :tabSize=2:indentSize=2:noTabs=true:
 
-$Id: s48_bignum.h,v 1.13 2005/12/21 02:36:52 spestov Exp $
-
-Copyright (c) 1989-1992 Massachusetts Institute of Technology
+Copyright (C) 1989-1992 Massachusetts Institute of Technology
+Portions copyright (C) 2004-2007 Slava Pestov
 
 This material was developed by the Scheme project at the Massachusetts
 Institute of Technology, Department of Electrical Engineering and
@@ -33,15 +32,6 @@ Technology nor of any adaptation thereof in any advertising,
 promotional, or sales literature without prior written consent from
 MIT in each case. */
 
-/* External Interface to Bignum Code */
-
-/* The `unsigned long' type is used for the conversion procedures
-   `bignum_to_long' and `long_to_bignum'.  Older implementations of C
-   don't support this type; if you have such an implementation you can
-   disable these procedures using the following flag (alternatively
-   you could write alternate versions that don't require this type). */
-/* #define BIGNUM_NO_ULONG */
-
 typedef F_ARRAY * bignum_type;
 #define BIGNUM_OUT_OF_BAND ((bignum_type) 0)
 
@@ -52,39 +42,39 @@ enum bignum_comparison
   bignum_comparison_greater = 1
 };
 
-int s48_bignum_equal_p(bignum_type, bignum_type);
-enum bignum_comparison s48_bignum_compare(bignum_type, bignum_type);
-bignum_type s48_bignum_add(bignum_type, bignum_type);
-bignum_type s48_bignum_subtract(bignum_type, bignum_type);
-bignum_type s48_bignum_negate(bignum_type);
-bignum_type s48_bignum_multiply(bignum_type, bignum_type);
+int bignum_equal_p(bignum_type, bignum_type);
+enum bignum_comparison bignum_compare(bignum_type, bignum_type);
+bignum_type bignum_add(bignum_type, bignum_type);
+bignum_type bignum_subtract(bignum_type, bignum_type);
+bignum_type bignum_negate(bignum_type);
+bignum_type bignum_multiply(bignum_type, bignum_type);
 void
-s48_bignum_divide(bignum_type numerator, bignum_type denominator,
+bignum_divide(bignum_type numerator, bignum_type denominator,
 		  bignum_type * quotient, bignum_type * remainder);
-bignum_type s48_bignum_quotient(bignum_type, bignum_type);
-bignum_type s48_bignum_remainder(bignum_type, bignum_type);
-DLLEXPORT bignum_type s48_fixnum_to_bignum(F_FIXNUM);
-DLLEXPORT bignum_type s48_cell_to_bignum(CELL);
-DLLEXPORT bignum_type s48_long_to_bignum(long);
-DLLEXPORT bignum_type s48_long_long_to_bignum(s64 n);
-DLLEXPORT bignum_type s48_ulong_long_to_bignum(u64 n);
-DLLEXPORT bignum_type s48_ulong_to_bignum(unsigned long);
-F_FIXNUM s48_bignum_to_fixnum(bignum_type);
-CELL s48_bignum_to_cell(bignum_type);
-long s48_bignum_to_long(bignum_type);
-unsigned long s48_bignum_to_ulong(bignum_type);
-s64 s48_bignum_to_long_long(bignum_type);
-u64 s48_bignum_to_ulong_long(bignum_type);
-bignum_type s48_double_to_bignum(double);
-double s48_bignum_to_double(bignum_type);
+bignum_type bignum_quotient(bignum_type, bignum_type);
+bignum_type bignum_remainder(bignum_type, bignum_type);
+DLLEXPORT bignum_type fixnum_to_bignum(F_FIXNUM);
+DLLEXPORT bignum_type cell_to_bignum(CELL);
+DLLEXPORT bignum_type long_to_bignum(long);
+DLLEXPORT bignum_type long_long_to_bignum(s64 n);
+DLLEXPORT bignum_type ulong_long_to_bignum(u64 n);
+DLLEXPORT bignum_type ulong_to_bignum(unsigned long);
+F_FIXNUM bignum_to_fixnum(bignum_type);
+CELL bignum_to_cell(bignum_type);
+long bignum_to_long(bignum_type);
+unsigned long bignum_to_ulong(bignum_type);
+s64 bignum_to_long_long(bignum_type);
+u64 bignum_to_ulong_long(bignum_type);
+bignum_type double_to_bignum(double);
+double bignum_to_double(bignum_type);
 
 /* Added bitwise operators. */
 
-DLLEXPORT bignum_type s48_bignum_bitwise_not(bignum_type),
-                   s48_bignum_arithmetic_shift(bignum_type, long),
-                   s48_bignum_bitwise_and(bignum_type, bignum_type),
-                   s48_bignum_bitwise_ior(bignum_type, bignum_type),
-                   s48_bignum_bitwise_xor(bignum_type, bignum_type);
+DLLEXPORT bignum_type bignum_bitwise_not(bignum_type),
+                   bignum_arithmetic_shift(bignum_type, long),
+                   bignum_bitwise_and(bignum_type, bignum_type),
+                   bignum_bitwise_ior(bignum_type, bignum_type),
+                   bignum_bitwise_xor(bignum_type, bignum_type);
 
 /* Forward references */
 int bignum_equal_p_unsigned(bignum_type, bignum_type);
@@ -131,3 +121,11 @@ bignum_type bignum_pospos_bitwise_op(int op, bignum_type, bignum_type);
 bignum_type bignum_posneg_bitwise_op(int op, bignum_type, bignum_type);
 bignum_type bignum_negneg_bitwise_op(int op, bignum_type, bignum_type);
 void        bignum_negate_magnitude(bignum_type);
+
+bignum_type bignum_integer_length(bignum_type arg1);
+int bignum_unsigned_logbitp(int shift, bignum_type bignum);
+int bignum_logbitp(int shift, bignum_type arg);
+bignum_type digit_stream_to_bignum(unsigned int n_digits,
+                                   unsigned int (*producer)(unsigned int),
+                                   unsigned int radix,
+                                   int negative_p);

@@ -1,183 +1,68 @@
-#include "factor.h"
+#include "master.h"
 
-INLINE void execute(F_WORD* word)
+void uncurry(CELL obj)
 {
-	((XT)(word->xt))(word);
-}
+	F_CURRY *curry;
 
-INLINE void push_callframe(void)
-{
-	put(cs + CELLS,callframe);
-	put(cs + CELLS * 2,callframe_scan);
-	put(cs + CELLS * 3,callframe_end);
-
-	/* update the pointer last, so that if we have a memory protection error
-	above, we don't have garbage stored as live data */
-	cs += CELLS * 3;
-}
-
-INLINE void set_callframe(CELL quot)
-{
-	F_ARRAY *untagged = (F_ARRAY*)UNTAG(quot);
-	type_check(QUOTATION_TYPE,quot);
-	callframe = quot;
-	callframe_scan = AREF(untagged,0);
-	callframe_end = AREF(untagged,array_capacity(untagged));
-}
-
-void call(CELL quot)
-{
-	if(quot == F)
-		return;
-
-	/* tail call optimization */
-	if(callframe_scan < callframe_end)
-		push_callframe();
-
-	set_callframe(quot);
-}
-
-/* Called from interpreter() */
-void handle_error(void)
-{
-	if(throwing)
+	switch(type_of(obj))
 	{
-		gc_off = false;
-		extra_roots = stack_chain->extra_roots;
+	case QUOTATION_TYPE:
+		dpush(obj);
+		break;
+	case CURRY_TYPE:
+		curry = untag_object(obj);
+		dpush(curry->obj);
+		uncurry(curry->quot);
+		break;
+	default:
+		type_error(QUOTATION_TYPE,obj);
+		break;
+	}
+}
 
-		if(thrown_keep_stacks)
-		{
-			ds = thrown_ds;
-			rs = thrown_rs;
-		}
+void update_xt(F_WORD* word)
+{
+	word->compiledp = F;
+
+	if(word->def == T)
+		word->xt = dosym;
+	else if(type_of(word->def) == QUOTATION_TYPE)
+	{
+		if(profiling)
+			word->xt = docol_profiling;
 		else
-			fix_stacks();
-
-		dpush(thrown_error);
-		dpush(thrown_native_stack_trace);
-		/* Notify any 'catch' blocks */
-		push_callframe();
-		set_callframe(userenv[BREAK_ENV]);
-		throwing = false;
+			word->xt = docol;
 	}
+	else if(type_of(word->def) == FIXNUM_TYPE)
+		word->xt = primitives[to_fixnum(word->def)];
+	else
+		word->xt = undefined;
 }
 
-void interpreter_loop(void)
+DEFINE_PRIMITIVE(uncurry)
 {
-	CELL next;
-
-	for(;;)
-	{
-		if(callframe_scan == callframe_end)
-		{
-			if(cs_bot - cs == CELLS)
-			{
-				if(stack_chain->next)
-					return;
-
-				simple_error(ERROR_CS_UNDERFLOW,F,F);
-			}
-
-			callframe_end = get(cs);
-			callframe_scan = get(cs - CELLS);
-			callframe = get(cs - CELLS * 2);
-			cs -= CELLS * 3;
-			continue;
-		}
-
-		next = get(callframe_scan);
-		callframe_scan += CELLS;
-
-		switch(TAG(next))
-		{
-		case WORD_TYPE:
-			execute(untag_word_fast(next));
-			break;
-		case WRAPPER_TYPE:
-			dpush(untag_wrapper_fast(next)->object);
-			break;
-		default:
-			dpush(next);
-			break;
-		}
-	}
+	uncurry(dpop());
 }
 
-void interpreter(void)
-{
-	stack_chain->native_stack_pointer = native_stack_pointer();
-	SETJMP(stack_chain->toplevel);
-	handle_error();
-	interpreter_loop();
-}
-
-/* Called by compiled callbacks after nest_stacks() and boxing registers */
-void run_callback(CELL quot)
-{
-	call(quot);
-	run();
-}
-
-/* XT of deferred words */
-void undefined(F_WORD* word)
-{
-	simple_error(ERROR_UNDEFINED_WORD,tag_word(word),F);
-}
-
-/* XT of compound definitions */
-void docol(F_WORD* word)
-{
-	call(word->def);
-}
-
-/* pushes word parameter */
-void dosym(F_WORD* word)
-{
-	dpush(word->def);
-}
-
-void primitive_execute(void)
-{
-	execute(untag_word(dpop()));
-}
-
-void primitive_call(void)
-{
-	call(dpop());
-}
-
-void primitive_ifte(void)
-{
-	ds -= CELLS * 3;
-	call(get(ds + CELLS) == F ? get(ds + CELLS * 3) : get(ds + CELLS * 2));
-}
-
-void primitive_dispatch(void)
-{
-	F_ARRAY *a = untag_array_fast(dpop());
-	F_FIXNUM n = untag_fixnum_fast(dpop());
-	call(get(AREF(a,n)));
-}
-
-void primitive_getenv(void)
+DEFINE_PRIMITIVE(getenv)
 {
 	F_FIXNUM e = untag_fixnum_fast(dpeek());
 	drepl(userenv[e]);
 }
 
-void primitive_setenv(void)
+DEFINE_PRIMITIVE(setenv)
 {
 	F_FIXNUM e = untag_fixnum_fast(dpop());
 	CELL value = dpop();
 	userenv[e] = value;
 }
 
-void primitive_exit(void)
+DEFINE_PRIMITIVE(exit)
 {
-	exit(unbox_signed_cell());
+	exit(to_fixnum(dpop()));
 }
 
-void primitive_os_env(void)
+DEFINE_PRIMITIVE(os_env)
 {
 	char *name = unbox_char_string();
 	char *value = getenv(name);
@@ -187,190 +72,215 @@ void primitive_os_env(void)
 		box_char_string(value);
 }
 
-void primitive_eq(void)
+DEFINE_PRIMITIVE(eq)
 {
 	CELL lhs = dpop();
 	CELL rhs = dpeek();
 	drepl((lhs == rhs) ? T : F);
 }
 
-void primitive_millis(void)
+DEFINE_PRIMITIVE(millis)
 {
 	box_unsigned_8(current_millis());
 }
 
-void primitive_type(void)
+DEFINE_PRIMITIVE(sleep)
+{
+	sleep_millis(to_cell(dpop()));
+}
+
+DEFINE_PRIMITIVE(type)
 {
 	drepl(tag_fixnum(type_of(dpeek())));
 }
 
-void primitive_tag(void)
+DEFINE_PRIMITIVE(tag)
 {
 	drepl(tag_fixnum(TAG(dpeek())));
 }
 
-void primitive_slot(void)
+DEFINE_PRIMITIVE(class_hash)
+{
+	CELL obj = dpeek();
+	CELL tag = TAG(obj);
+	if(tag == TUPLE_TYPE)
+	{
+		F_WORD *class = untag_object(get(SLOT(obj,2)));
+		drepl(class->hashcode);
+	}
+	else if(tag == OBJECT_TYPE)
+		drepl(get(UNTAG(obj)));
+	else
+		drepl(tag_fixnum(tag));
+}
+
+DEFINE_PRIMITIVE(slot)
 {
 	F_FIXNUM slot = untag_fixnum_fast(dpop());
-	CELL obj = UNTAG(dpop());
+	CELL obj = dpop();
 	dpush(get(SLOT(obj,slot)));
 }
 
-void primitive_set_slot(void)
+DEFINE_PRIMITIVE(set_slot)
 {
 	F_FIXNUM slot = untag_fixnum_fast(dpop());
-	CELL obj = UNTAG(dpop());
+	CELL obj = dpop();
 	CELL value = dpop();
 	set_slot(obj,slot,value);
 }
 
-void primitive_clone(void)
-{
-	CELL size = object_size(dpeek());
-	void *new_obj = allot(size);
-	CELL tag = TAG(dpeek());
-	memcpy(new_obj,(void*)UNTAG(dpeek()),size);
-	drepl(RETAG(new_obj,tag));
-}
-
 void fatal_error(char* msg, CELL tagged)
 {
-	fprintf(stderr,"Fatal error: %s %lx\n",msg,tagged);
+	fprintf(stderr,"fatal_error: %s %lx\n",msg,tagged);
 	exit(1);
 }
 
 void critical_error(char* msg, CELL tagged)
 {
-	fprintf(stderr,"Critical error: %s %lx\n",msg,tagged);
+	fprintf(stderr,"You have triggered a bug in Factor. Please report.\n");
+	fprintf(stderr,"critical_error: %s %lx\n",msg,tagged);
 	factorbug();
 }
 
-void early_error(CELL error)
+void throw_error(CELL error, F_STACK_FRAME *callstack_top)
 {
-	if(userenv[BREAK_ENV] == F)
+	/* If error was thrown during heap scan, we re-enable the GC */
+	gc_off = false;
+
+	/* Reset local roots */
+	extra_roots = stack_chain->extra_roots;
+
+	/* If we had an underflow or overflow, stack pointers might be
+	out of bounds */
+	fix_stacks();
+
+	dpush(error);
+
+	/* If the error handler is set, we rewind any C stack frames and
+	pass the error to user-space. */
+	if(userenv[BREAK_ENV] != F)
 	{
-		/* Crash at startup */
-		fprintf(stderr,"Error during startup: ");
+		/* Errors thrown from C code pass NULL for this parameter.
+		Errors thrown from Factor code, or signal handlers, pass the
+		actual stack pointer at the time, since the saved pointer is
+		not necessarily up to date at that point. */
+		if(!callstack_top)
+			callstack_top = stack_chain->callstack_top;
+
+		throw_impl(userenv[BREAK_ENV],callstack_top);
+	}
+	/* Error was thrown in early startup before error handler is set, just
+	crash. */
+	else
+	{
+		fprintf(stderr,"You have triggered a bug in Factor. Please report.\n");
+		fprintf(stderr,"early_error: ");
 		print_obj(error);
 		fprintf(stderr,"\n");
 		factorbug();
 	}
 }
 
-/* allocates memory */
-CELL allot_native_stack_trace(F_STACK_FRAME *stack)
-{
-	GROWABLE_ARRAY(array);
-
-	while(stack < stack_chain->native_stack_pointer)
-	{
-		CELL return_address = RETURN_ADDRESS(stack);
-
-		if(return_address >= compiling.base
-			&& return_address <= compiling.limit)
-		{
-			REGISTER_ARRAY(array);
-			CELL cell = allot_cell(return_address);
-			UNREGISTER_ARRAY(array);
-			GROWABLE_ADD(array,cell);
-		}
-
-		F_STACK_FRAME *prev = PREVIOUS_FRAME(stack);
-
-		if(prev <= stack)
-		{
-			fprintf(stderr,"*** Unusual C stack layout (why?)\n");
-			fflush(stderr);
-			break;
-		}
-
-		stack = prev;
-	}
-
-	GROWABLE_TRIM(array);
-
-	return tag_object(array);
-}
-
-void throw_error(CELL error, bool keep_stacks, F_STACK_FRAME *native_stack)
-{
-	early_error(error);
-
-	REGISTER_ROOT(error);
-	thrown_native_stack_trace = allot_native_stack_trace(native_stack);
-	UNREGISTER_ROOT(error);
-
-	throwing = true;
-	thrown_error = error;
-	thrown_keep_stacks = keep_stacks;
-	thrown_ds = ds;
-	thrown_rs = rs;
-
-	/* Return to interpreter() function */
-	LONGJMP(stack_chain->toplevel,1);
-}
-
-void primitive_throw(void)
-{
-	throw_error(dpop(),true,native_stack_pointer());
-}
-
-void primitive_die(void)
-{
-	factorbug();
-}
-
 void general_error(F_ERRORTYPE error, CELL arg1, CELL arg2,
-	bool keep_stacks, F_STACK_FRAME *native_stack)
+	F_STACK_FRAME *callstack_top)
 {
 	throw_error(allot_array_4(userenv[ERROR_ENV],
-		tag_fixnum(error),arg1,arg2),keep_stacks,native_stack);
-}
-
-void simple_error(F_ERRORTYPE error, CELL arg1, CELL arg2)
-{
-	general_error(error,arg1,arg2,true,native_stack_pointer());
-}
-
-void memory_protection_error(CELL addr, int signal, F_STACK_FRAME *native_stack)
-{
-	gc_off = true;
-
-	if(in_page(addr, ds_bot, 0, -1))
-		general_error(ERROR_DS_UNDERFLOW,F,F,false,native_stack);
-	else if(in_page(addr, ds_bot, ds_size, 0))
-		general_error(ERROR_DS_OVERFLOW,F,F,false,native_stack);
-	else if(in_page(addr, rs_bot, 0, -1))
-		general_error(ERROR_RS_UNDERFLOW,F,F,false,native_stack);
-	else if(in_page(addr, rs_bot, rs_size, 0))
-		general_error(ERROR_RS_OVERFLOW,F,F,false,native_stack);
-	else if(in_page(addr, cs_bot, 0, -1))
-		general_error(ERROR_CS_UNDERFLOW,F,F,false,native_stack);
-	else if(in_page(addr, cs_bot, cs_size, 0))
-		general_error(ERROR_CS_OVERFLOW,F,F,false,native_stack);
-	else if(in_page(addr, nursery.limit, 0, 0))
-		critical_error("Out of memory in allot",0);
-
-	signal_error(signal,native_stack);
-}
-
-void signal_error(int signal, F_STACK_FRAME *native_stack)
-{
-	gc_off = true;
-	general_error(ERROR_SIGNAL,tag_fixnum(signal),F,false,native_stack);
+		tag_fixnum(error),arg1,arg2),callstack_top);
 }
 
 void type_error(CELL type, CELL tagged)
 {
-	simple_error(ERROR_TYPE,tag_fixnum(type),tagged);
+	general_error(ERROR_TYPE,tag_fixnum(type),tagged,NULL);
 }
 
-void divide_by_zero_error(void)
+void not_implemented_error(void)
 {
-	simple_error(ERROR_DIVIDE_BY_ZERO,F,F);
+	general_error(ERROR_NOT_IMPLEMENTED,F,F,NULL);
 }
 
-void memory_error(void)
+/* This function is called from the undefined function in cpu_*.S */
+void undefined_error(CELL word, F_STACK_FRAME *callstack_top)
 {
-	simple_error(ERROR_MEMORY,F,F);
+	stack_chain->callstack_top = callstack_top;
+	general_error(ERROR_UNDEFINED_WORD,word,F,NULL);
+}
+
+/* Test if 'fault' is in the guard page at the top or bottom (depending on
+offset being 0 or -1) of area+area_size */
+bool in_page(CELL fault, CELL area, CELL area_size, int offset)
+{
+	int pagesize = getpagesize();
+	area += area_size;
+	area += offset * pagesize;
+
+	return fault >= area && fault <= area + pagesize;
+}
+
+void memory_protection_error(CELL addr, F_STACK_FRAME *native_stack)
+{
+	if(in_page(addr, ds_bot, 0, -1))
+		general_error(ERROR_DS_UNDERFLOW,F,F,native_stack);
+	else if(in_page(addr, ds_bot, ds_size, 0))
+		general_error(ERROR_DS_OVERFLOW,F,F,native_stack);
+	else if(in_page(addr, rs_bot, 0, -1))
+		general_error(ERROR_RS_UNDERFLOW,F,F,native_stack);
+	else if(in_page(addr, rs_bot, rs_size, 0))
+		general_error(ERROR_RS_OVERFLOW,F,F,native_stack);
+	else if(in_page(addr, nursery->end, 0, 0))
+		critical_error("allot_object() missed GC check",0);
+	else if(in_page(addr, extra_roots_region->start, 0, -1))
+		critical_error("local root underflow",0);
+	else if(in_page(addr, extra_roots_region->end, 0, 0))
+		critical_error("local root overflow",0);
+	else
+		general_error(ERROR_MEMORY,allot_cell(addr),F,native_stack);
+}
+
+void signal_error(int signal, F_STACK_FRAME *native_stack)
+{
+	general_error(ERROR_SIGNAL,tag_fixnum(signal),F,native_stack);
+}
+
+void divide_by_zero_error(F_STACK_FRAME *native_stack)
+{
+	general_error(ERROR_DIVIDE_BY_ZERO,F,F,native_stack);
+}
+
+DEFINE_PRIMITIVE(throw)
+{
+	uncurry(dpop());
+	throw_impl(dpop(),stack_chain->callstack_top);
+}
+
+void enable_word_profiling(F_WORD *word)
+{
+	if(word->xt == docol)
+		word->xt = docol_profiling;
+}
+
+void disable_word_profiling(F_WORD *word)
+{
+	if(word->xt == docol_profiling)
+		word->xt = docol;
+}
+
+DEFINE_PRIMITIVE(profiling)
+{
+	profiling = to_boolean(dpop());
+
+	begin_scan();
+
+	CELL obj;
+	while((obj = next_object()) != F)
+	{
+		if(type_of(obj) == WORD_TYPE)
+		{
+			if(profiling)
+				enable_word_profiling(untag_object(obj));
+			else
+				disable_word_profiling(untag_object(obj));
+		}
+	}
+
+	gc_off = false; /* end heap scan */
 }

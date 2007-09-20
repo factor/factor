@@ -1,89 +1,91 @@
+/* Assembly code makes assumptions about the layout of this struct:
+   - callstack_top field is 0
+   - callstack_bottom field is 1
+   - datastack field is 2
+   - retainstack field is 3 */
 typedef struct _F_CONTEXT {
+	/* C stack pointer on entry */
+	F_STACK_FRAME *callstack_top;
+	F_STACK_FRAME *callstack_bottom;
+
 	/* current datastack top pointer */
-	CELL data;
-	/* saved contents of ds register on entry to callback */
-	CELL data_save;
-	/* memory region holding current datastack */
-	F_SEGMENT *data_region;
+	CELL datastack;
 
 	/* current retain stack top pointer */
-	CELL retain;
+	CELL retainstack;
+
+	/* saved contents of ds register on entry to callback */
+	CELL datastack_save;
+
 	/* saved contents of rs register on entry to callback */
-	CELL retain_save;
+	CELL retainstack_save;
+
+	/* memory region holding current datastack */
+	F_SEGMENT *datastack_region;
+
 	/* memory region holding current retain stack */
-	F_SEGMENT *retain_region;
+	F_SEGMENT *retainstack_region;
 
-	/* current callstack top pointer */
-	CELL call;
-	/* saved contents of cs register on entry to callback */
-	CELL call_save;
-	/* memory region holding current callstack */
-	F_SEGMENT *call_region;
-
-	/* saved callframe on entry to callback */
-	CELL callframe;
-	CELL callframe_scan;
-	CELL callframe_end;
-
-	/* saved catchstack on entry to callback */
-	CELL catch_save;
-
-	/* saved cards_offset register on entry to callback */
-	CELL cards_offset;
+	/* saved userenv slots on entry to callback */
+	CELL catchstack_save;
+	CELL current_callback_save;
 
 	/* saved extra_roots pointer on entry to callback */
 	CELL extra_roots;
 
-	/* C stack pointer on entry */
-	F_STACK_FRAME *native_stack_pointer;
-
-	/* error handler longjmp buffer */
-	JMP_BUF toplevel;
-
 	struct _F_CONTEXT *next;
 } F_CONTEXT;
 
-F_CONTEXT *stack_chain;
+DLLEXPORT F_CONTEXT *stack_chain;
 
-CELL ds_size, rs_size, cs_size;
+CELL ds_size, rs_size;
 
-#define ds_bot ((CELL)(stack_chain->data_region->start))
-#define rs_bot ((CELL)(stack_chain->retain_region->start))
-#define cs_bot ((CELL)(stack_chain->call_region->start))
-
-#define STACK_UNDERFLOW(stack,region) ((stack) + 3 * CELLS < (region)->start)
-#define STACK_OVERFLOW(stack,region) ((stack) + 3 * CELLS >= (region)->start + (region)->size)
+#define ds_bot (stack_chain->datastack_region->start)
+#define ds_top (stack_chain->datastack_region->end)
+#define rs_bot (stack_chain->retainstack_region->start)
+#define rs_top (stack_chain->retainstack_region->end)
 
 void reset_datastack(void);
 void reset_retainstack(void);
-void reset_callstack(void);
 void fix_stacks(void);
+void save_callstack_bottom(F_STACK_FRAME *callstack_bottom);
 DLLEXPORT void save_stacks(void);
 DLLEXPORT void nest_stacks(void);
 DLLEXPORT void unnest_stacks(void);
-void init_stacks(CELL ds_size, CELL rs_size, CELL cs_size);
+void init_stacks(CELL ds_size, CELL rs_size);
 
-void primitive_drop(void);
-void primitive_2drop(void);
-void primitive_3drop(void);
-void primitive_dup(void);
-void primitive_2dup(void);
-void primitive_3dup(void);
-void primitive_rot(void);
-void primitive__rot(void);
-void primitive_dupd(void);
-void primitive_swapd(void);
-void primitive_nip(void);
-void primitive_2nip(void);
-void primitive_tuck(void);
-void primitive_over(void);
-void primitive_pick(void);
-void primitive_swap(void);
-void primitive_to_r(void);
-void primitive_from_r(void);
-void primitive_datastack(void);
-void primitive_retainstack(void);
-void primitive_callstack(void);
-void primitive_set_datastack(void);
-void primitive_set_retainstack(void);
-void primitive_set_callstack(void);
+#define FIRST_STACK_FRAME(stack) (F_STACK_FRAME *)((stack) + 1)
+
+typedef void (*CALLSTACK_ITER)(F_STACK_FRAME *frame);
+
+void iterate_callstack(CELL top, CELL bottom, CELL base, CALLSTACK_ITER iterator);
+void iterate_callstack_object(F_CALLSTACK *stack, CALLSTACK_ITER iterator);
+CELL frame_executing(F_STACK_FRAME *frame);
+CELL frame_type(F_STACK_FRAME *frame);
+
+DECLARE_PRIMITIVE(drop);
+DECLARE_PRIMITIVE(2drop);
+DECLARE_PRIMITIVE(3drop);
+DECLARE_PRIMITIVE(dup);
+DECLARE_PRIMITIVE(2dup);
+DECLARE_PRIMITIVE(3dup);
+DECLARE_PRIMITIVE(rot);
+DECLARE_PRIMITIVE(_rot);
+DECLARE_PRIMITIVE(dupd);
+DECLARE_PRIMITIVE(swapd);
+DECLARE_PRIMITIVE(nip);
+DECLARE_PRIMITIVE(2nip);
+DECLARE_PRIMITIVE(tuck);
+DECLARE_PRIMITIVE(over);
+DECLARE_PRIMITIVE(pick);
+DECLARE_PRIMITIVE(swap);
+DECLARE_PRIMITIVE(to_r);
+DECLARE_PRIMITIVE(from_r);
+DECLARE_PRIMITIVE(datastack);
+DECLARE_PRIMITIVE(retainstack);
+DECLARE_PRIMITIVE(callstack);
+DECLARE_PRIMITIVE(set_datastack);
+DECLARE_PRIMITIVE(set_retainstack);
+DECLARE_PRIMITIVE(set_callstack);
+DECLARE_PRIMITIVE(callstack_to_array);
+DECLARE_PRIMITIVE(array_to_callstack);

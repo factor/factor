@@ -1,12 +1,6 @@
 IN: temporary
-USE: compiler
-USE: generic
-USE: test
-USE: math
-USE: kernel
-USE: words
-USE: arrays
-USE: sequences
+USING: compiler generic tools.test math kernel words arrays
+sequences quotations ;
 
 GENERIC: single-combination-test
 

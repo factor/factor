@@ -1,34 +1,8 @@
-#ifndef __FACTOR_H__
-#define __FACTOR_H__
+int posix_argc;
+F_CHAR **posix_argv;
 
-#include <errno.h>
-#include <fcntl.h>
-#include <limits.h>
-#include <math.h>
-#include <stdbool.h>
-#include <setjmp.h>
-#include <signal.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <time.h>
-#include <sys/param.h>
-
-#include "layouts.h"
-#include "platform.h"
-#include "debug.h"
-#include "run.h"
-#include "bignumint.h"
-#include "bignum.h"
-#include "data_gc.h"
-#include "types.h"
-#include "math.h"
-#include "io.h"
-#include "code_gc.h"
-#include "compiler.h"
-#include "image.h"
-#include "primitives.h"
-#include "stack.h"
-#include "alien.h"
-
-#endif /* __FACTOR_H__ */
+DLLEXPORT void init_factor_from_args(F_CHAR *image, int argc, F_CHAR **argv, bool embedded);
+DLLEXPORT char *factor_eval_string(char *string);
+DLLEXPORT void factor_eval_free(char *result);
+DLLEXPORT void factor_yield(void);
+DLLEXPORT void factor_sleep(long ms);

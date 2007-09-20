@@ -1,36 +1,68 @@
 #include <windows.h>
 #include <ctype.h>
 
-#define FACTOR_OS_STRING "windows"
+#ifndef wcslen
+  /* for cygwin */
+  #include <wchar.h>
+#endif
 
+typedef wchar_t F_CHAR;
+
+#define from_native_string from_u16_string
+#define unbox_native_string unbox_u16_string
+#define string_to_native_alien(string) string_to_u16_alien(string,true)
+
+#define STR_FORMAT(string) L##string
+
+#define MAX_UNICODE_PATH 32768
 #define DLLEXPORT __declspec(dllexport)
-#define SETJMP setjmp
-#define LONGJMP longjmp
-#define JMP_BUF jmp_buf
+#define SSCANF swscanf
+#define STRCMP wcscmp
+#define STRNCMP wcsncmp
+#define STRDUP _wcsdup
+
+#define OPEN_READ(path) _wfopen(path,L"rb")
+#define OPEN_WRITE(path) _wfopen(path,L"wb")
+#define FPRINTF(stream,format,arg) fwprintf(stream,L##format,arg)
+
 
 /* Difference between Jan 1 00:00:00 1601 and Jan 1 00:00:00 1970 */
 #define EPOCH_OFFSET 0x019db1ded53e8000LL
 
-char *buffer_to_c_string(char *buffer);
 F_STRING *get_error_message(void);
-DLLEXPORT char *error_message(DWORD id);
+DLLEXPORT F_CHAR *error_message(DWORD id);
 
-INLINE void init_ffi(void) {}
+void init_ffi(void);
 void ffi_dlopen(F_DLL *dll, bool error);
-void *ffi_dlsym(F_DLL *dll, char *symbol, bool error);
+void *ffi_dlsym(F_DLL *dll, F_SYMBOL *symbol);
 void ffi_dlclose(F_DLL *dll);
 
-void primitive_open_file(void);
-void primitive_stat(void);
-void primitive_read_dir(void);
-void primitive_cwd(void);
-void primitive_cd(void);
+void sleep_millis(DWORD msec);
 
 INLINE void init_signals(void) {}
 INLINE void early_init(void) {}
-const char *default_image_path(void);
+const F_CHAR *vm_executable_path(void);
+const F_CHAR *default_image_path(void);
 long getpagesize (void);
 
 s64 current_millis(void);
 
 INLINE void reset_stdio(void) {}
+
+/* SEH support. Proceed with caution. */
+typedef long exception_handler_t(
+	PEXCEPTION_RECORD rec, void *frame, void *context, void *dispatch);
+
+typedef struct exception_record
+{
+	struct exception_record *next_handler;
+	void *handler_func;
+} exception_record_t;
+
+long exception_handler(PEXCEPTION_RECORD rec, void *frame, void *ctx, void *dispatch);
+
+DECLARE_PRIMITIVE(open_file);
+DECLARE_PRIMITIVE(stat);
+DECLARE_PRIMITIVE(read_dir);
+DECLARE_PRIMITIVE(cwd);
+DECLARE_PRIMITIVE(cd);

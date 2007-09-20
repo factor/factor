@@ -1,57 +1,55 @@
-#include "factor.h"
+#include "master.h"
 
 /* References to undefined symbols are patched up to call this function on
 image load */
 void undefined_symbol(void)
 {
-	simple_error(ERROR_UNDEFINED_SYMBOL,F,F);
+	general_error(ERROR_UNDEFINED_SYMBOL,F,F,NULL);
 }
 
 #define CREF(array,i) ((CELL)(array) + CELLS * (i))
 
-INLINE CELL get_literal(CELL literal_start, CELL num)
+INLINE CELL get_literal(CELL literals_start, CELL num)
 {
-	return get(CREF(literal_start,num));
+	return get(CREF(literals_start,num));
 }
 
 /* Look up an external library symbol referenced by a compiled code block */
-CELL get_rel_symbol(F_REL *rel, CELL literal_start)
+void *get_rel_symbol(F_REL *rel, CELL literals_start)
 {
 	CELL arg = REL_ARGUMENT(rel);
-	F_ARRAY *pair = untag_array(get_literal(literal_start,arg));
-	char *symbol = alien_offset(get(AREF(pair,0)));
-	CELL library = get(AREF(pair,1));
+	F_SYMBOL *symbol = alien_offset(get_literal(literals_start,arg));
+	CELL library = get_literal(literals_start,arg + 1);
 	F_DLL *dll = (library == F ? NULL : untag_dll(library));
 
 	if(dll != NULL && !dll->dll)
-		return (CELL)undefined_symbol;
+		return undefined_symbol;
 
-	CELL sym = (CELL)ffi_dlsym(dll,symbol,false);
+	if(!symbol)
+		return undefined_symbol;
 
-	if(!sym)
-		return (CELL)undefined_symbol;
+	void *sym = ffi_dlsym(dll,symbol);
 
-	return sym;
+	if(sym)
+		return sym;
+	else
+		return undefined_symbol;
 }
 
 /* Compute an address to store at a relocation */
 INLINE CELL compute_code_rel(F_REL *rel,
-	CELL code_start, CELL literal_start, CELL words_start)
+	CELL code_start, CELL literals_start, CELL words_start)
 {
-	CELL offset = code_start + rel->offset;
-
 	switch(REL_TYPE(rel))
 	{
 	case RT_PRIMITIVE:
-		return primitive_to_xt(REL_ARGUMENT(rel));
+		return (CELL)primitives[REL_ARGUMENT(rel)];
 	case RT_DLSYM:
-		return get_rel_symbol(rel,literal_start);
-	case RT_HERE:
-		return offset;
-	case RT_CARDS:
-		return cards_offset;
+		return (CELL)get_rel_symbol(rel,literals_start);
 	case RT_LITERAL:
-		return CREF(literal_start,REL_ARGUMENT(rel));
+		return CREF(literals_start,REL_ARGUMENT(rel));
+	case RT_DISPATCH:
+		return CREF(words_start,REL_ARGUMENT(rel));
 	case RT_XT:
 		return get(CREF(words_start,REL_ARGUMENT(rel)));
 	case RT_LABEL:
@@ -62,7 +60,7 @@ INLINE CELL compute_code_rel(F_REL *rel,
 	}
 }
 
-/* Store a 32-bit value into two consecutive PowerPC LI/LIS instructions */
+/* Store a 32-bit value into a PowerPC LIS/ORI sequence */
 INLINE void reloc_set_2_2(CELL cell, CELL value)
 {
 	put(cell - CELLS,((get(cell - CELLS) & ~0xffff) | ((value >> 16) & 0xffff)));
@@ -70,69 +68,98 @@ INLINE void reloc_set_2_2(CELL cell, CELL value)
 }
 
 /* Store a value into a bitfield of a PowerPC instruction */
-INLINE void reloc_set_masked(CELL cell, CELL value, CELL mask)
+INLINE void reloc_set_masked(CELL cell, F_FIXNUM value, CELL mask, F_FIXNUM shift)
 {
 	u32 original = *(u32*)cell;
 	original &= ~mask;
-	*(u32*)cell = (original | (value & mask));
+	*(u32*)cell = (original | ((value >> shift) & mask));
 }
 
 /* Perform a fixup on a code block */
-void apply_relocation(F_REL *rel,
-	CELL code_start, CELL literal_start, CELL words_start)
+void apply_relocation(CELL class, CELL offset, F_FIXNUM absolute_value)
 {
-	CELL absolute_value;
-	CELL relative_value;
-	CELL offset = rel->offset + code_start;
+	F_FIXNUM relative_value = absolute_value - offset;
 
-	absolute_value = compute_code_rel(rel,
-		code_start,literal_start,words_start);
-	relative_value = absolute_value - offset;
-
-	switch(REL_CLASS(rel))
+	switch(class)
 	{
-	case REL_ABSOLUTE_CELL:
+	case RC_ABSOLUTE_CELL:
 		put(offset,absolute_value);
 		break;
-	case REL_ABSOLUTE:
+	case RC_ABSOLUTE:
 		*(u32*)offset = absolute_value;
 		break;
-	case REL_RELATIVE:
+	case RC_RELATIVE:
 		*(u32*)offset = relative_value - sizeof(u32);
 		break;
-	case REL_ABSOLUTE_2_2:
+	case RC_ABSOLUTE_PPC_2_2:
 		reloc_set_2_2(offset,absolute_value);
 		break;
-	case REL_RELATIVE_2_2:
-		reloc_set_2_2(offset,relative_value);
+	case RC_RELATIVE_PPC_2:
+		reloc_set_masked(offset,relative_value,REL_RELATIVE_PPC_2_MASK,0);
 		break;
-	case REL_RELATIVE_2:
-		reloc_set_masked(offset,relative_value,REL_RELATIVE_2_MASK);
+	case RC_RELATIVE_PPC_3:
+		reloc_set_masked(offset,relative_value,REL_RELATIVE_PPC_3_MASK,0);
 		break;
-	case REL_RELATIVE_3:
-		reloc_set_masked(offset,relative_value,REL_RELATIVE_3_MASK);
+	case RC_RELATIVE_ARM_3:
+		reloc_set_masked(offset,relative_value - CELLS * 2,
+			REL_RELATIVE_ARM_3_MASK,2);
+		break;
+	case RC_INDIRECT_ARM:
+		reloc_set_masked(offset,relative_value - CELLS,
+			REL_INDIRECT_ARM_MASK,0);
+		break;
+	case RC_INDIRECT_ARM_PC:
+		reloc_set_masked(offset,relative_value - CELLS * 2,
+			REL_INDIRECT_ARM_MASK,0);
 		break;
 	default:
-		critical_error("Bad rel class",REL_CLASS(rel));
-		return;
+		critical_error("Bad rel class",class);
+		break;
 	}
 }
 
 /* Perform all fixups on a code block */
 void relocate_code_block(F_COMPILED *relocating, CELL code_start,
-	CELL reloc_start, CELL literal_start, CELL words_start, CELL words_end)
+	CELL reloc_start, CELL literals_start, CELL words_start, CELL words_end)
 {
 	F_REL *rel = (F_REL *)reloc_start;
-	F_REL *rel_end = (F_REL *)literal_start;
+	F_REL *rel_end = (F_REL *)literals_start;
 
 	while(rel < rel_end)
-		apply_relocation(rel++,code_start,literal_start,words_start);
+	{
+		CELL offset = rel->offset + code_start;
+
+		F_FIXNUM absolute_value = compute_code_rel(rel,
+			code_start,literals_start,words_start);
+
+		apply_relocation(REL_CLASS(rel),offset,absolute_value);
+
+		rel++;
+	}
+}
+
+/* Fixup labels. This is done at compile time, not image load time */
+void fixup_labels(F_ARRAY *labels, CELL code_format, CELL code_start)
+{
+	CELL i;
+	CELL size = array_capacity(labels);
+
+	for(i = 0; i < size; i += 3)
+	{
+		CELL class = to_fixnum(array_nth(labels,i));
+		CELL offset = to_fixnum(array_nth(labels,i + 1));
+		CELL target = to_fixnum(array_nth(labels,i + 2));
+
+		apply_relocation(class,
+			offset + code_start,
+			target + code_start);
+	}
 }
 
 /* After compiling a batch of words, we replace all mutual word references with
 direct XT references, and perform fixups */
 void finalize_code_block(F_COMPILED *relocating, CELL code_start,
-	CELL reloc_start, CELL literal_start, CELL words_start, CELL words_end)
+	CELL reloc_start, CELL literals_start, CELL words_start, CELL words_end)
 {
 	CELL scan;
 
@@ -140,26 +167,25 @@ void finalize_code_block(F_COMPILED *relocating, CELL code_start,
 		critical_error("Finalizing a finalized block",(CELL)relocating);
 
 	for(scan = words_start; scan < words_end; scan += CELLS)
-		put(scan,untag_word(get(scan))->xt);
+		put(scan,(CELL)(untag_word(get(scan))->xt));
 
 	relocating->finalized = true;
 
 	relocate_code_block(relocating,code_start,reloc_start,
-		literal_start,words_start,words_end);
+		literals_start,words_start,words_end);
 
 	flush_icache(code_start,reloc_start - code_start);
 }
 
 /* Write a sequence of integers to memory, with 'format' bytes per integer */
-void deposit_integers(CELL here, F_VECTOR *vector, CELL format)
+void deposit_integers(CELL here, F_ARRAY *array, CELL format)
 {
-	CELL count = untag_fixnum_fast(vector->top);
-	F_ARRAY *array = untag_array_fast(vector->array);
+	CELL count = array_capacity(array);
 	CELL i;
 
 	for(i = 0; i < count; i++)
 	{
-		F_FIXNUM value = to_fixnum(get(AREF(array,i)));
+		F_FIXNUM value = to_fixnum(array_nth(array,i));
 		if(format == 1)
 			cput(here + i,value);
 		else if(format == sizeof(unsigned int))
@@ -172,68 +198,76 @@ void deposit_integers(CELL here, F_VECTOR *vector, CELL format)
 }
 
 /* Write a sequence of tagged pointers to memory */
-void deposit_objects(CELL here, F_VECTOR *vector, CELL literal_length)
+void deposit_objects(CELL here, F_ARRAY *array)
 {
-	F_ARRAY *array = untag_array_fast(vector->array);
-	memcpy((void*)here,array + 1,literal_length);
+	memcpy((void*)here,array + 1,array_capacity(array) * CELLS);
 }
 
-#define FROB \
-	CELL code_format = to_cell(get(ds)); \
-	F_VECTOR *code = untag_vector(get(ds - CELLS)); \
-	F_VECTOR *words = untag_vector(get(ds - CELLS * 2)); \
-	F_VECTOR *literals = untag_vector(get(ds - CELLS * 3)); \
-	F_VECTOR *rel = untag_vector(get(ds - CELLS * 4)); \
-	CELL code_length = align8(untag_fixnum_fast(code->top) * code_format); \
-	CELL rel_length = untag_fixnum_fast(rel->top) * sizeof(unsigned int); \
-	CELL literal_length = untag_fixnum_fast(literals->top) * CELLS; \
-	CELL words_length = untag_fixnum_fast(words->top) * CELLS;
-
-void primitive_add_compiled_block(void)
+CELL compiled_code_format(void)
 {
-	CELL start;
+	return untag_fixnum_fast(userenv[JIT_CODE_FORMAT]);
+}
 
+CELL allot_code_block(CELL size)
+{
+	CELL start = heap_allot(&code_heap,size);
+
+	/* If allocation failed, do a code GC */
+	if(start == 0)
 	{
-		/* Read parameters from stack, leaving them on the stack */
-		FROB
+		code_gc();
+		start = heap_allot(&code_heap,size);
 
-		/* Try allocating a new code block */
-		CELL total_length = sizeof(F_COMPILED) + code_length
-			+ rel_length + literal_length + words_length;
-
-		start = heap_allot(&compiling,total_length);
-
-		/* If allocation failed, do a code GC */
+		/* Insufficient room even after code GC, give up */
 		if(start == 0)
-		{
-			garbage_collection(TENURED,true);
-			start = heap_allot(&compiling,total_length);
-
-			/* Insufficient room even after code GC, give up */
-			if(start == 0)
-				critical_error("Out of memory in add-compiled-block",0);
-		}
+			critical_error("Out of memory in add-compiled-block",0);
 	}
 
-	/* we have to read the parameters again, since we may have called
-	GC above in which case the data heap semi-spaces will have switched */
-	FROB
+	return start;
+}
 
-	/* now we can pop the parameters from the stack */
-	ds -= CELLS * 5;
+XT add_compiled_block(
+	CELL type,
+	F_ARRAY *code,
+	F_ARRAY *labels,
+	F_ARRAY *rel,
+	F_ARRAY *words,
+	F_ARRAY *literals)
+{
+	CELL code_format = compiled_code_format();
+
+	CELL code_length = align8(array_capacity(code) * code_format);
+	CELL rel_length = (rel ? array_capacity(rel) * sizeof(unsigned int) : 0);
+	CELL words_length = (words ? array_capacity(words) * CELLS : 0);
+	CELL literals_length = (literals ? array_capacity(literals) * CELLS : 0);
+
+	REGISTER_UNTAGGED(code);
+	REGISTER_UNTAGGED(labels);
+	REGISTER_UNTAGGED(rel);
+	REGISTER_UNTAGGED(words);
+	REGISTER_UNTAGGED(literals);
+
+	CELL start = allot_code_block(sizeof(F_COMPILED) + code_length
+		+ rel_length + literals_length + words_length);
+
+	UNREGISTER_UNTAGGED(literals);
+	UNREGISTER_UNTAGGED(words);
+	UNREGISTER_UNTAGGED(rel);
+	UNREGISTER_UNTAGGED(labels);
+	UNREGISTER_UNTAGGED(code);
 
 	/* begin depositing the code block's contents */
 	CELL here = start;
 
 	/* compiled header */
-	F_COMPILED header;
-	header.code_length = code_length;
-	header.reloc_length = rel_length;
-	header.literal_length = literal_length;
-	header.words_length = words_length;
-	header.finalized = false;
+	F_COMPILED *header = (void *)here;
+	header->type = type;
+	header->code_length = code_length;
+	header->reloc_length = rel_length;
+	header->literals_length = literals_length;
+	header->words_length = words_length;
+	header->finalized = false;
 
-	memcpy((void*)here,&header,sizeof(F_COMPILED));
 	here += sizeof(F_COMPILED);
 
 	/* code */
@@ -241,29 +275,60 @@ void primitive_add_compiled_block(void)
 	here += code_length;
 
 	/* relation info */
-	deposit_integers(here,rel,sizeof(unsigned int));
-	here += rel_length;
+	if(rel)
+	{
+		deposit_integers(here,rel,sizeof(unsigned int));
+		here += rel_length;
+	}
 
 	/* literals */
-	deposit_objects(here,literals,literal_length);
-	here += literal_length;
+	if(literals)
+	{
+		deposit_objects(here,literals);
+		here += literals_length;
+	}
 
 	/* words */
-	deposit_objects(here,words,words_length);
-	here += words_length;
+	if(words)
+	{
+		deposit_objects(here,words);
+		here += words_length;
+	}
+
+	/* compute the XT */
+	XT xt = (XT)(start + sizeof(F_COMPILED));
+
+	/* fixup labels */
+	if(labels)
+		fixup_labels(labels,code_format,(CELL)xt);
+
+	/* next time we do a minor GC, we have to scan the code heap for
+	literals */
+	last_code_heap_scan = NURSERY;
+
+	return xt;
+}
+
+DEFINE_PRIMITIVE(add_compiled_block)
+{
+	F_ARRAY *code = untag_array(dpop());
+	F_ARRAY *labels = untag_array(dpop());
+	F_ARRAY *rel = untag_array(dpop());
+	F_ARRAY *words = untag_array(dpop());
+	F_ARRAY *literals = untag_array(dpop());
+
+	XT xt = add_compiled_block(WORD_TYPE,code,labels,rel,words,literals);
 
 	/* push the XT of the new word on the stack */
 	F_WORD *word = allot_word(F,F);
-	word->xt = start + sizeof(F_COMPILED);
+	word->xt = xt;
 	word->compiledp = T;
-	dpush(tag_word(word));
+	dpush(tag_object(word));
 }
-
-#undef FROB
 
 /* After batch compiling a bunch of words, perform various fixups to make them
 executable */
-void primitive_finalize_compile(void)
+DEFINE_PRIMITIVE(finalize_compile)
 {
 	F_ARRAY *array = untag_array(dpop());
 
@@ -272,12 +337,12 @@ void primitive_finalize_compile(void)
 	CELL i;
 	for(i = 0; i < count; i++)
 	{
-		F_ARRAY *pair = untag_array(get(AREF(array,i)));
-		F_WORD *word = untag_word(get(AREF(pair,0)));
-		CELL xt = untag_word(get(AREF(pair,1)))->xt;
+		F_ARRAY *pair = untag_array(array_nth(array,i));
+		F_WORD *word = untag_word(array_nth(pair,0));
+		XT xt = untag_word(array_nth(pair,1))->xt;
 		F_BLOCK *block = xt_to_block(xt);
 		if(block->status != B_ALLOCATED)
-			critical_error("bad XT",xt);
+			critical_error("bad XT",(CELL)xt);
 
 		word->xt = xt;
 		word->compiledp = T;
@@ -286,40 +351,9 @@ void primitive_finalize_compile(void)
 	/* perform relocation */
 	for(i = 0; i < count; i++)
 	{
-		F_ARRAY *pair = untag_array(get(AREF(array,i)));
-		F_WORD *word = untag_word(get(AREF(pair,0)));
-		CELL xt = word->xt;
+		F_ARRAY *pair = untag_array(array_nth(array,i));
+		F_WORD *word = untag_word(array_nth(pair,0));
+		XT xt = word->xt;
 		iterate_code_heap_step(xt_to_compiled(xt),finalize_code_block);
 	}
-}
-
-void primitive_xt_map(void)
-{
-	GROWABLE_ARRAY(array);
-	F_BLOCK *scan = (F_BLOCK *)compiling.base;
-
-	while(scan)
-	{
-		if(scan->status != B_FREE)
-		{
-			F_COMPILED *compiled = (F_COMPILED *)(scan + 1);
-			CELL code_start = (CELL)(compiled + 1);
-			CELL literal_start = code_start
-				+ compiled->code_length
-				+ compiled->reloc_length;
-
-			CELL word = get_literal(literal_start,0);
-			GROWABLE_ADD(array,word);
-			REGISTER_ARRAY(array);
-			CELL xt = allot_cell(code_start);
-			UNREGISTER_ARRAY(array);
-			GROWABLE_ADD(array,xt);
-		}
-
-		scan = next_block(&compiling,scan);
-	}
-
-	GROWABLE_TRIM(array);
-
-	dpush(tag_object(array));
 }
