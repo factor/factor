@@ -1,0 +1,1 @@
+Labelled gadgets display a border with a text label surrounding a child

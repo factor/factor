@@ -1,0 +1,88 @@
+/* math */
+dfn, div.eq {
+  white-space: nowrap;
+  font-family: sans-serif;
+  font-style: normal;
+  color: navy;
+}
+div.eq {
+   margin-left: 3em;
+   margin-right: 1em;
+}
+div.eq a {float:right}
+
+span.h {  /* huge */
+  font-size:150%; 
+}
+
+span.o, span.s, span.f {
+  display:-moz-inline-box;
+  -moz-box-orient:vertical;
+  display:inline-block; 
+  vertical-align:middle; 
+  margin:0 0.2em;
+}
+
+span.x, span.i, span.d, span.n, span.o span {
+  display: block;
+}
+
+span.x, span.d, span.n, span.s, span.o span {
+  text-align:center;
+  margin:0 0.2em;
+}
+
+span.n, span.d {
+  font-size: 90%;
+}
+
+span.i {
+  text-align: left;
+  margin:0 0.2em 0 0;
+}
+span.b {
+  font-weight: bold;
+}
+
+span.x, span.i, span.f span.f {
+  font-size: 80%;
+}
+
+span.n {
+  border-bottom:solid 1px navy;
+}
+
+span.v, span.m {
+  display:-moz-inline-box;
+  -moz-box-orient:vertical;
+  display:inline-block;
+  vertical-align:middle; 
+}
+span.v span.e, span.m span.e {
+  font-size: 90%;
+  white-space:nowrap;
+  display: block;
+  text-align:center;
+  margin:0.2em;
+}
+/*span.m > span.e { height:2em; }*/ /* hide ie 6 */
+
+span.lb, span.rb {
+  margin:0; 
+  padding:0; 
+  vertical-align: middle; 
+  border-top:1px solid navy; 
+  border-bottom:1px solid navy;
+}
+span.lb {
+  border-left:1px solid navy; 
+}
+span.rb {
+  border-right:1px solid navy; 
+}
+span.lbrk2, span.rbrk2 {
+  font-size:200%; 
+}
+span.lbrk3, span.rbrk3 {
+  font-size:300%; 
+}

@@ -1,0 +1,15 @@
+
+USE: lisp.listener lisp-listener
+
+This only works with a tty listener. lisp-listener doesn't play well
+with the ui listener.
+
+There is no run-file. Just paste in your code. :-)
+
+If you pick a name for a symbol that's already used in some Factor
+vocabulary, Factor Lisp will complain. For example, x and y are words
+in the gadgets-paragraphs vocabulary. To use these as symbols in
+Factor Lisp, just do this before you use them:
+
+       SYMBOL: x
+       SYMBOL: y

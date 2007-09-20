@@ -1,0 +1,5 @@
+CC = arm-wince-mingw32ce-gcc
+DLL_SUFFIX=-ce
+EXE_SUFFIX=-ce
+PLAF_DLL_OBJS += vm/os-windows-ce-arm.o
+include vm/Config.windows.ce vm/Config.arm

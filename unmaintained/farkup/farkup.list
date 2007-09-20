@@ -1,0 +1,20 @@
+Blocks
+------
+Must be terminated by \n or end of input.
+
+foo => <p>foo</p>
+=foo => <h1>foo</h1>
+==foo => <h2>foo</h2>
+ ...
+ 
+["foo"] => <blockquote>foo</blockquote>
+
+Inlines
+-------
+Can appear anywhere within a block
+
+*foo* => <strong>foo</strong>
+[url,text] => <a href="url">text</a>
+
+
+

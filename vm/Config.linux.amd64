@@ -1,0 +1,3 @@
+include vm/Config.linux
+include vm/Config.amd64
+LIBPATH = -L/usr/X11R6/lib64 -L/usr/X11R6/lib

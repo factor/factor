@@ -1,0 +1,9 @@
+<% USING: kernel furnace webapps.article-manager webapps.article-manager.database io namespaces http.server html.elements ; %>
+    <div id="navigation">
+    <ul>
+     <li><a href="<% "responder-url" get write %>">Home</a></li>
+    </ul>
+    <% current-site site-ad1 write-html %>
+    <h1>Tags</h1>
+    <% host all-tags <template-args> "tags" render-template %>
+    </div>

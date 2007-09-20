@@ -1,0 +1,1 @@
+Loading graphical user interface in stage 2 bootstrap

@@ -1,0 +1,1 @@
+Implementation of task for ICFP 2006

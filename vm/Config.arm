@@ -1,0 +1,2 @@
+BOOT_ARCH = arm
+PLAF_DLL_OBJS += vm/cpu-arm.o

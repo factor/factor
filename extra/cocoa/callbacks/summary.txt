@@ -1,0 +1,1 @@
+Allows you to use Factor quotations as Cocoa actions

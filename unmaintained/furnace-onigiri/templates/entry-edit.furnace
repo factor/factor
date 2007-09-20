@@ -1,0 +1,34 @@
+<% USING: namespaces io kernel sequences furnace:onigiri html 
+furnace ; %>
+
+<script type="text/javascript">
+function transformWiky() {
+  var wiky = $('wiky').value;
+  var html = Wiky.toHtml(wiky);
+  $('html').value = html;
+  $('preview').innerHTML = html;
+}
+function transformHtml() {
+  var html = $('preview').innerHTML;
+  var wiky = Wiky.toWiki(html);
+  $('wiky').value = wiky;
+  $('html').value = html;
+}
+</script>
+
+<p><% "stub" get [ f entry-edit ] curry "Edit in non-Wiky editor" render-link %></p>
+
+<form method="post" action="entry-update">
+    <% "stub" get [ %><input type="hidden" name="stub" value="<% "stub" get write %>"/><% ] when %>
+    <table><tr><td>Title:</td><td><input type="text" name="title" value="<% "title" get write %>"/></td></tr>
+    <tr><td>Body:</td><td><textarea id="wiky" rows="10" cols="60" name="wiky" onkeyup="transformWiky();"></textarea></td></tr>
+    <tr><td></td><td><input type="submit" name="post" value="<% "stub" get "update" "post" ? write %>"/>
+    
+    <% "stub" get [  [ entry-delete ] curry "Delete" render-link ] when* %> 
+    (preview below)</td></tr>
+    <tr><td></td><td><input id="html" type="hidden" name="body" value=""/><div id="preview"><% "body" get [ write-html ] when* %></div></td></tr>
+    </table>
+</form>
+<script type="text/javascript">
+transformHtml();  
+</script>

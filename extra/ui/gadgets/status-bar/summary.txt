@@ -1,0 +1,1 @@
+Status bar gadgets display mouse-over help for other gadgets

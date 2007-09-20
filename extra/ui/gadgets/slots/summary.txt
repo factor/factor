@@ -1,0 +1,1 @@
+Slot editor gadgets are used to implement the UI inspector

@@ -1,0 +1,41 @@
+<% USING: kernel io namespaces furnace webapps.article-manager html.elements ; %>
+<script type="text/javascript">
+function transformWiky() {
+  var wiky = $('#wiky').get(0).value;
+  var html = Wiky.toHtml(wiky);
+  $('#html').get(0).value = html;
+  $('#preview').html(html);
+}
+function transformHtml() {
+  var html = $('#preview').get(0).innerHTML;
+  var wiky = Wiky.toWiki(html);
+  $('#wiky').get(0).value = wiky;
+  $('#html').get(0).value = html;
+}
+</script>
+<form method="post" action="<% update-article-link write %>">
+  <table>
+    <tr><td>URL:</td><td><input type="hidden" name="url" value="<% "url" get write %>"/><input type="text" name="readonlyurl" disabled="disabled" value="<% "url" get write %>"/></td></tr>
+    <tr><td>Publication Date:</td><td><input id="pubdate" type="text" name="pubdate" value="<% "pubdate" get write %>"/> <button id="calendar">[c]</button></td></tr>
+    <tr><td>Title:</td><td><input type="text" name="title" value="<% "title" get write %>"/></td></tr>
+    <tr><td>Status:</td><td><select name="status">
+                              <option value="draft">Draft</option>
+                              <option value="published">Published</option>
+        </td></tr>
+    <tr><td>Tags:</td><td><input type="text" name="tags" value="<% "tags" get write %>"/></td></tr>
+    <tr><td>Body:</td><td><textarea id='wiky' onkeyup="transformWiky();" rows="10" cols="80" name="wiky"></textarea></td></tr>
+    <tr><td>Preview:</td><td><input id="html" type='hidden' name="body" value=""/><div id="preview"><% "body" get write-html %></div></td></tr>
+    <tr><td colspan="2"><input type="submit" name="post" value="Post"/></td></tr>
+</form>
+<script type="text/javascript">
+transformHtml();
+Calendar.setup(
+  {
+    inputField: "pubdate",
+    ifFormat  : "%Y/%m/%d %H:%M",
+    showsTime : true,
+    timeFormat: "24",
+    button: "calendar"
+  });  
+</script>
+

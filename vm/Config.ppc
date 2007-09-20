@@ -1,0 +1,2 @@
+BOOT_ARCH = ppc
+PLAF_DLL_OBJS += vm/cpu-ppc.o

@@ -1,0 +1,1 @@
+Support for embedding Factor in other applications

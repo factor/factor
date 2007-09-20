@@ -1,0 +1,20 @@
+include vm/Config.unix
+CFLAGS += -fPIC
+
+PLAF_DLL_OBJS += vm/os-macosx.o vm/mach_signal.o
+
+DLL_EXTENSION = .dylib
+
+ifdef X11
+	LIBS = -lm -framework Foundation $(X11_UI_LIBS)
+else
+    LIBS = -lm -framework Cocoa -framework AppKit
+endif
+
+LINKER = gcc $(CFLAGS) -dynamiclib -single_module -std=gnu99 \
+	-current_version $(VERSION) \
+	-compatibility_version $(VERSION) \
+	-fvisibility=hidden \
+	$(LIBS) $(LIBPATH) -o
+
+LINK_WITH_ENGINE = -lfactor

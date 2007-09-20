@@ -1,0 +1,21 @@
+EXE_SUFFIX =
+DLL_PREFIX = lib
+DLL_EXTENSION = .a
+# DLL_EXTENSION = .so
+
+PLAF_DLL_OBJS = vm/os-unix.o
+PLAF_EXE_OBJS += vm/main-unix.o
+
+ifdef NO_UI
+	X11_UI_LIBS =
+else
+	X11_UI_LIBS = -lfreetype -lGL -lGLU -lX11
+endif
+
+# CFLAGS += -fPIC
+
+# LINKER = gcc -shared -o
+# LINK_WITH_ENGINE = '-Wl,-rpath,$$ORIGIN' -lfactor
+
+LINKER = ar rcs
+LINK_WITH_ENGINE = -Wl,--whole-archive -lfactor -Wl,-no-whole-archive

@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+    <% USING: io namespaces furnace:onigiri html
+    math kernel sequences hashtables calendar ; %>
+    <title><% "title" key>meta* meta-value [ "an onigiri weblog" ] unless* write %></title>
+    <link rel="self" href="<% base-url write "atom" action>url write %>"/>
+    <author>
+        <name><% "author" key>meta* meta-value [ "anonymous" ] unless* write %></name>
+    </author>
+    <id><% base-url write "atom" action>url write %></id>
+    <% entry get 
+    [ [ entry-created ] 2apply compare-timestamps neg ] sort
+    dup empty? [ %>
+    <updated><% dup first entry-created timestamp>rfc3339 write %></updated><% ] unless
+    [ %>
+    <entry>
+        <title><% dup entry-title write %></title>
+        <id><% dup entry-stub stub>url dup base-url write write %></id>
+        <updated><% over entry-created timestamp>rfc3339 write %></updated>
+        <link href="<% base-url write write %>"/>
+        <summary><% entry-body write-html %></summary>
+    </entry><% ] each %>
+</feed>

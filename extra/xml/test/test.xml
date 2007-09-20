@@ -1,0 +1,16 @@
+<?xml version='1.0' encoding="UTF-8"     standalone="no" ?>
+<!--This is where the fun begins!-->
+<!DOCTYPE greeting SYSTEM "hello.dtd">
+	<!--this is fun, isn't it, guys?-->
+<a:b xmlns:a='http://www.hello.com' xmlns='http://d.de'
+     this='that' that="this">
+   <b xmlns='http://b.nu' feeling='sombre'/>
+           Here's a new, undefined &euro;
+ and here's a to go along with it!
+        isn't this fun?
+   <a:c><d mood="happy"></d>
+              <e a:id='x'>f&#97;&amp;g</e>
+   </a:c>
+</a:b>
+<!--Well, that went over pretty well-->
+<?xsl stylesheet="that-one.xsl"?>

@@ -1,0 +1,3 @@
+include vm/Config.linux
+include vm/Config.ppc
+CFLAGS += -mregnames
