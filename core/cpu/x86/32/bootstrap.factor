@@ -20,9 +20,9 @@ big-endian off
 ] { } make jit-setup set
 
 [
-    EBP ESP -48 [+] LEA                     ! compute forward chain pointer
-    EBP PUSH                                ! save forward chain pointer
     xt-reg PUSH                             ! save XT
+    xt-reg ESP -44 [+] LEA                  ! compute forward chain pointer
+    xt-reg PUSH                             ! save forward chain pointer
     EAX PUSH                                ! save array
     ESP 16 SUB                              ! reserve space for scan-save
 ] { } make jit-prolog set

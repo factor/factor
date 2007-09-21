@@ -16,8 +16,7 @@ IN: cpu.x86.32
 M: x86-backend ds-reg ESI ;
 M: x86-backend rs-reg EDI ;
 M: x86-backend stack-reg ESP ;
-M: x86-backend frame-reg EBP ;
-M: x86-backend xt-reg EDX ;
+M: x86-backend xt-reg ECX ;
 M: x86-backend stack-save-reg EDX ;
 
 M: temp-reg v>operand drop EBX ;

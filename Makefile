@@ -117,6 +117,7 @@ windows-ce-x86:
 	$(MAKE) $(EXECUTABLE) CONFIG=vm/Config.windows.ce.x86
 
 macosx.app: factor
+	mkdir -p $(BUNDLE)/Contents/MacOS
 	cp $(EXECUTABLE) $(BUNDLE)/Contents/MacOS/factor
 	cp $(ENGINE) $(BUNDLE)/Contents/Frameworks
 

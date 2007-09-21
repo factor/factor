@@ -4,11 +4,11 @@
 
 void c_to_factor_toplevel(CELL quot)
 {
-	for(;;)
+	/* for(;;)
 	{
-NS_DURING
+NS_DURING */
 		c_to_factor(quot);
-		NS_VOIDRETURN;
+		/* NS_VOIDRETURN;
 NS_HANDLER
 		dpush(allot_alien(F,(CELL)localException));
 		quot = userenv[COCOA_EXCEPTION_ENV];
@@ -16,11 +16,11 @@ NS_HANDLER
 		{
 			/* No Cocoa exception handler was registered, so
 			extra/cocoa/ is not loaded. So we pass the exception
-			along. */
+			along. *
 			[localException raise];
 		}
 NS_ENDHANDLER
-	}
+	} */
 }
 
 void early_init(void)

@@ -11,7 +11,6 @@ TUPLE: x86-backend cell ;
 HOOK: ds-reg compiler-backend
 HOOK: rs-reg compiler-backend
 HOOK: stack-reg compiler-backend
-HOOK: frame-reg compiler-backend
 HOOK: xt-reg compiler-backend
 HOOK: stack-save-reg compiler-backend
 
@@ -49,8 +48,8 @@ M: x86-backend %save-xt ( -- )
     xt-reg compiling-label get MOV ;
 
 M: x86-backend %prologue ( n -- )
-    frame-reg stack-reg pick stack-frame 5 cells + neg [+] LEA
-    frame-reg PUSH
+    xt-reg PUSH
+    xt-reg stack-reg pick stack-frame 4 cells + neg [+] LEA
     xt-reg PUSH
     stack-reg swap stack-frame 2 cells - SUB ;
 

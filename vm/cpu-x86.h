@@ -15,10 +15,12 @@ typedef struct _F_STACK_FRAME
 	In compiled word frames, unused. */
 	CELL array;
 
+	/* Pointer to the next stack frame; frames are chained from
+	the bottom on up */
+	struct _F_STACK_FRAME *next;
+
 	/* In all compiled frames, the XT on entry. */
 	XT xt;
-
-	struct _F_STACK_FRAME *next;
 } F_STACK_FRAME;
 
 #define CALLSTACK_UP_P
