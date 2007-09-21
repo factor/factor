@@ -81,5 +81,9 @@ DEFER: <% delimiter
         ] with-scope
     ] assert-depth drop ;
 
+: run-relative-template-file ( filename -- )
+    file get source-file-path parent-dir
+    swap path+ run-template-file ;
+
 : template-convert ( infile outfile -- )
     <file-writer> [ run-template-file ] with-stream ;
