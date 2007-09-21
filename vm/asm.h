@@ -5,7 +5,7 @@
 #endif
 
 /* Apple's PPC assembler is out of date? */
-#if defined(__APPLE__) && defined(FACTOR_PPC)
+#if defined(__APPLE__) && defined(__ppc__)
 	#define XX @
 #else
 	#define XX ;
