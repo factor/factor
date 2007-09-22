@@ -56,6 +56,8 @@ void init_stacks(CELL ds_size, CELL rs_size);
 
 #define FIRST_STACK_FRAME(stack) (F_STACK_FRAME *)((stack) + 1)
 
+#define REBASE_FRAME_SUCCESSOR(frame,delta) (F_STACK_FRAME *)((CELL)FRAME_SUCCESSOR(frame) + delta)
+
 typedef void (*CALLSTACK_ITER)(F_STACK_FRAME *frame);
 
 void iterate_callstack(CELL top, CELL bottom, CELL base, CALLSTACK_ITER iterator);

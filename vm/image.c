@@ -173,6 +173,8 @@ void fixup_alien(F_ALIEN *d)
 	d->expired = T;
 }
 
+F_FIXNUM delta;
+
 void fixup_stack_frame(F_STACK_FRAME *frame)
 {
 	code_fixup(&frame->xt);
@@ -185,11 +187,20 @@ void fixup_stack_frame(F_STACK_FRAME *frame)
 	}
 
 #ifdef CALLSTACK_UP_P
-	printf("%x %x\n",frame->xt,*(CELL *)(frame->next + 1));
-	code_fixup((CELL *)(frame->next + 1));
+	F_STACK_FRAME *next = REBASE_FRAME_SUCCESSOR(frame,delta);
+	code_fixup((XT *)(next + 1));
 #else
 	code_fixup(&frame->return_address);
 #endif
+}
+
+void fixup_callstack_object(F_CALLSTACK *stack)
+{
+	CELL top = (CELL)(stack + 1);
+	CELL bottom = top + untag_fixnum_fast(stack->length);
+	delta = (bottom - stack->bottom);
+
+	iterate_callstack_object(stack,fixup_stack_frame);
 }
 
 /* Initialize an object in a newly-loaded image */
@@ -212,9 +223,7 @@ void relocate_object(CELL relocating)
 		fixup_alien((F_ALIEN *)relocating);
 		break;
 	case CALLSTACK_TYPE:
-		iterate_callstack_object(
-			(F_CALLSTACK *)relocating,
-			fixup_stack_frame);
+		fixup_callstack_object((F_CALLSTACK *)relocating);
 		break;
 	}
 }
