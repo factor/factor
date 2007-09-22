@@ -14,10 +14,10 @@ M: amd64-backend ds-reg R14 ;
 M: amd64-backend rs-reg R15 ;
 M: amd64-backend stack-reg RSP ;
 
-M: temp-reg v>operand drop R16 ;
+M: temp-reg v>operand drop R13 ;
 
 M: int-regs return-reg drop RAX ;
-M: int-regs vregs drop { RAX RBX RCX RDX RBP RSI RDI R8 R9 R10 R11 R12 R13 } ;
+M: int-regs vregs drop { RAX RBX RCX RDX RBP RSI RDI R8 R9 R10 R11 R12 } ;
 M: int-regs param-regs drop { RDI RSI RDX RCX R8 R9 } ;
 
 M: float-regs return-reg drop XMM0 ;

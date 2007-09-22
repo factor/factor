@@ -12,13 +12,9 @@
 	push %rbx ; \
 	push %rbp ; \
 	push %r12 ; \
-	push %r13 ; \
-	push %r16 ; \
-	push %rax                          /* Alignment */
+	push %r13 ;
 
 #define POP_NONVOLATILE \
-	pop %rax ;                         /* Alignment */ \
-	pop %r16 ; \
 	pop %r13 ; \
 	pop %r12 ; \
 	pop %rbp ; \

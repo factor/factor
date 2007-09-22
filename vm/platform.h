@@ -63,6 +63,7 @@
 
 			#if defined(FACTOR_X86)
 				#include "os-unix-ucontext.h"
+				#include "os-linux-x86-32.h"
 			#elif defined(FACTOR_PPC)
 				#include "os-unix-ucontext.h"
 				#include "os-linux-ppc.h"
@@ -70,6 +71,7 @@
 				#include "os-linux-arm.h"
 			#elif defined(FACTOR_AMD64)
 				#include "os-unix-ucontext.h"
+				#include "os-linux-x86-64.h"
 			#else
 				#error "Unsupported Linux flavor"
 			#endif
