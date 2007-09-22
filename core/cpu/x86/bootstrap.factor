@@ -94,7 +94,7 @@ big-endian off
 ] { } make jit-dispatch set
 
 [
-    stack-reg 7 cells ADD                      ! unwind stack frame
+    stack-reg 7 bootstrap-cells ADD            ! unwind stack frame
 ] { } make jit-epilog set
 
 [ 0 RET ] { } make jit-return set

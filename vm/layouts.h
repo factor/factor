@@ -88,7 +88,7 @@ INLINE void *untag_object(CELL tagged)
 	return (void *)UNTAG(tagged);
 }
 
-typedef void (*XT)(CELL arg);
+typedef void *XT;
 
 /* Assembly code makes assumptions about the layout of this struct */
 typedef struct {
