@@ -27,7 +27,7 @@
 		#include "mach_signal.h"
 		
 		#ifdef FACTOR_X86
-			#include "os-macosx-x86.h"
+			#include "os-macosx-x86.32.h"
 		#elif defined(FACTOR_PPC)
 			#include "os-macosx-ppc.h"
 		#else
