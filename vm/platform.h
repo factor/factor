@@ -87,10 +87,12 @@
 
 #if defined(FACTOR_X86)
 	#include "cpu-x86.h"
+	#include "cpu-x86.32.h"
+#elif defined(FACTOR_AMD64)
+	#include "cpu-x86.h"
+	#include "cpu-x86.64.h"
 #elif defined(FACTOR_PPC)
 	#include "cpu-ppc.h"
-#elif defined(FACTOR_AMD64)
-	#include "cpu-amd64.h"
 #elif defined(FACTOR_ARM)
 	#include "cpu-arm.h"
 #else
