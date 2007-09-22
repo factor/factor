@@ -81,19 +81,6 @@ void load_image(F_PARAMETERS *p)
 	userenv[IMAGE_ENV] = tag_object(from_native_string(p->image));
 }
 
-/* Compute total sum of sizes of free blocks */
-void save_code_heap(FILE *file)
-{
-	F_BLOCK *scan = first_block(&code_heap);
-
-	while(scan)
-	{
-		if(scan->status == B_ALLOCATED)
-			fwrite(scan,scan->size,1,file);
-		scan = next_block(&code_heap,scan);
-	}
-}
-
 /* Save the current image to disk */
 bool save_image(const F_CHAR *filename)
 {
@@ -132,7 +119,6 @@ bool save_image(const F_CHAR *filename)
 	fwrite(&h,sizeof(F_HEADER),1,file);
 
 	fwrite((void*)tenured->start,h.data_size,1,file);
-	/* save_code_heap(file); */
 	fwrite(first_block(&code_heap),h.code_size,1,file);
 
 	fclose(file);
@@ -198,7 +184,12 @@ void fixup_stack_frame(F_STACK_FRAME *frame)
 		frame->scan = scan + frame->array;
 	}
 
-	/* code_fixup(&frame->return_address); */
+#ifdef CALLSTACK_UP_P
+	printf("%x %x\n",frame->xt,*(CELL *)(frame->next + 1));
+	code_fixup((CELL *)(frame->next + 1));
+#else
+	code_fixup(&frame->return_address);
+#endif
 }
 
 /* Initialize an object in a newly-loaded image */
