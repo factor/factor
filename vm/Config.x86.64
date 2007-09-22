@@ -1,2 +1,1 @@
-BOOT_ARCH = amd64
 PLAF_DLL_OBJS += vm/cpu-x86.64.o

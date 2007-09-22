@@ -10,7 +10,7 @@ DEF(FASTCALL void,c_to_factor,(CELL quot)):
 	call MANGLE(save_callstack_bottom)
 
 	mov (STACK_REG),ARG0                  /* Pass quot as arg 1 */
-	mov QUOT_XT_OFFSET(STACK_REG),XT_REG
+	mov QUOT_XT_OFFSET(ARG0),XT_REG
 	call *XT_REG                          /* Call quot-xt */
 
 	POP ARG0
@@ -18,7 +18,7 @@ DEF(FASTCALL void,c_to_factor,(CELL quot)):
 	ret
 
 DEF(FASTCALL void,undefined,(CELL word)):
-	mov STACK_REG,ARG1                    /* Pass callstack pointer as arg 2 (not fastcall) */
+	mov STACK_REG,ARG1                    /* Pass callstack pointer */
 	jmp MANGLE(undefined_error)           /* This throws an error */
 
 DEF(FASTCALL void,dosym,(CELL word)):
@@ -31,7 +31,7 @@ enabled */
 DEF(FASTCALL void,docol_profiling,(CELL word)):
 	add $CELL_SIZE,PROFILING_OFFSET(%eax) /* Increment profile-count slot */
 DEF(FASTCALL void,docol,(CELL word)):
-	mov WORD_XT_OFFSET(ARG0),ARG0         /* Load word-def slot */
+	mov WORD_DEF_OFFSET(ARG0),ARG0        /* Load word-def slot */
 	JUMP_QUOT
 
 /* We must pass the XT to the quotation in ECX. */

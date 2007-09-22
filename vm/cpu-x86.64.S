@@ -9,19 +9,19 @@
 #define CELL_SIZE 8
 
 #define PUSH_NONVOLATILE \
-	push %rbx \
-	push %rbp \
-	push %r12 \
-	push %r13 \
-	push %r16 \
+	push %rbx ; \
+	push %rbp ; \
+	push %r12 ; \
+	push %r13 ; \
+	push %r16 ; \
 	push %rax                          /* Alignment */
 
 #define POP_NONVOLATILE \
-	pop %rax                           /* Alignment */ \
-	pop %r16 \
-	pop %r13 \
-	pop %r12 \
-	pop %rbp \
+	pop %rax ;                         /* Alignment */ \
+	pop %r16 ; \
+	pop %r13 ; \
+	pop %r12 ; \
+	pop %rbp ; \
 	pop %rbx
 
 #define QUOT_XT_OFFSET 13

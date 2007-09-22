@@ -8,16 +8,16 @@ and the callstack top is passed in EDX */
 #define ARG1 %edx
 #define XT_REG %ecx
 #define STACK_REG %esp
-#define DS_REG %edi
+#define DS_REG %esi
 
 #define CELL_SIZE 4
 
 #define PUSH_NONVOLATILE \
-	push %ebx \
+	push %ebx ; \
 	push %ebp
 
 #define POP_NONVOLATILE \
-	pop %ebp \
+	pop %ebp ; \
 	pop %ebx
 
 #define QUOT_XT_OFFSET 5

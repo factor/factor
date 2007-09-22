@@ -13,10 +13,8 @@
 #if defined(WINDOWS)
 	#if defined(WINCE)
 		#include "os-windows-ce.h"
-	#elif defined (__i386)
-		#include "os-windows-nt.h"
 	#else
-		#error "Unsupported Windows flavor"
+		#include "os-windows-nt.h"
 	#endif
 
 	#include "os-windows.h"
@@ -44,7 +42,7 @@
 			#include "os-unix-ucontext.h"
 			
 			#if defined(FACTOR_X86)
-				#include "os-freebsd-x86.h"
+				#include "os-freebsd-x86.32.h"
 			#else
 				#error "Unsupported FreeBSD flavor"
 			#endif
@@ -53,9 +51,9 @@
 			#include "os-openbsd.h"
 
 			#if defined(FACTOR_X86)
-				#include "os-openbsd-x86.h"
+				#include "os-openbsd-x86.32.h"
 			#elif defined(FACTOR_AMD64)
-				#include "os-openbsd-amd64.h"
+				#include "os-openbsd-x86.64.h"
 			#else
 				#error "Unsupported OpenBSD flavor"
 			#endif
@@ -86,11 +84,11 @@
 #endif
 
 #if defined(FACTOR_X86)
-	#include "cpu-x86.h"
 	#include "cpu-x86.32.h"
-#elif defined(FACTOR_AMD64)
 	#include "cpu-x86.h"
+#elif defined(FACTOR_AMD64)
 	#include "cpu-x86.64.h"
+	#include "cpu-x86.h"
 #elif defined(FACTOR_PPC)
 	#include "cpu-ppc.h"
 #elif defined(FACTOR_ARM)

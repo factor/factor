@@ -28,3 +28,5 @@ FASTCALL void undefined(CELL word);
 FASTCALL void dosym(CELL word);
 FASTCALL void docol_profiling(CELL word);
 FASTCALL void docol(CELL word);
+
+void set_callstack(F_STACK_FRAME *to, F_STACK_FRAME *from, CELL length, void *memcpy);
