@@ -25,7 +25,7 @@ and the callstack top is passed in EDX */
 #define WORD_DEF_OFFSET 13
 #define WORD_XT_OFFSET 29
 
-/* We pass a function pointer to memcpy in 16(%esp) to work around a Mac OS X
+/* We pass a function pointer to memcpy to work around a Mac OS X
 ABI limitation which would otherwise require us to do a bizzaro PC-relative
 trampoline to retrieve the function address */
 DEF(void,set_callstack,(F_STACK_FRAME *to, F_STACK_FRAME *from, CELL length, void *memcpy)):
