@@ -135,7 +135,6 @@ void init_factor_from_args(F_CHAR *image, int argc, F_CHAR **argv, bool embedded
 	}
 
 	nest_stacks();
-	printf("%lx\n",untag_quotation(userenv[BOOT_ENV])->xt);
 	c_to_factor_toplevel(userenv[BOOT_ENV]);
 	unnest_stacks();
 
