@@ -4,4 +4,4 @@ DLL_SUFFIX=-nt
 PLAF_DLL_OBJS += vm/os-windows-nt.o
 PLAF_EXE_OBJS += vm/resources.o
 PLAF_EXE_OBJS += vm/main-windows-nt.o
-include vm/Config.x86 vm/Config.windows
+include vm/Config.x86.32 vm/Config.windows

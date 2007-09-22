@@ -199,7 +199,7 @@ void not_implemented_error(void)
 }
 
 /* This function is called from the undefined function in cpu_*.S */
-void undefined_error(CELL word, F_STACK_FRAME *callstack_top)
+FASTCALL void undefined_error(CELL word, F_STACK_FRAME *callstack_top)
 {
 	stack_chain->callstack_top = callstack_top;
 	general_error(ERROR_UNDEFINED_WORD,word,F,NULL);

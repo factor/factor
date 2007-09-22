@@ -126,13 +126,7 @@ SYMBOL: max-post-request
     #! Add a responder object to the list.
     "responder" over at  responders get set-at ;
 
-: add-simple-responder ( name quot -- )
-    [
-        [ drop ] swap append dup "get" set "post" set
-        "responder" set
-    ] H{ } make-assoc add-responder ;
-
-: make-responder ( quot -- responder )
+: make-responder ( quot -- )
     #! quot has stack effect ( url -- )
     [
         [
@@ -150,6 +144,12 @@ SYMBOL: max-post-request
         
         call
     ] H{ } make-assoc add-responder ;
+
+: add-simple-responder ( name quot -- )
+    [
+        [ drop ] swap append dup "get" set "post" set
+        "responder" set
+    ] make-responder ;
 
 : vhost ( name -- vhost )
     vhosts get at [ "default" vhost ] unless* ;
@@ -175,7 +175,7 @@ SYMBOL: max-post-request
     "/" ?head drop ;
 
 : serve-explicit-responder ( method url -- )
-    "/" split1 
+    "/" split1
     "/responder/" pick "/" 3append "responder-url" set
     dup [
         swap responder call-responder
@@ -200,7 +200,7 @@ SYMBOL: max-post-request
     "404 No such responder" httpd-error ;
 
 ! create a responders hash if it doesn't already exist
-global [ 
+global [
     responders [ H{ } assoc-like ] change
     
     ! 404 error message pages are served by this guy

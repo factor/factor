@@ -1,2 +1,0 @@
-include vm/Config.linux
-include vm/Config.x86

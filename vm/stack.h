@@ -48,7 +48,7 @@ CELL ds_size, rs_size;
 void reset_datastack(void);
 void reset_retainstack(void);
 void fix_stacks(void);
-void save_callstack_bottom(F_STACK_FRAME *callstack_bottom);
+FASTCALL void save_callstack_bottom(F_STACK_FRAME *callstack_bottom);
 DLLEXPORT void save_stacks(void);
 DLLEXPORT void nest_stacks(void);
 DLLEXPORT void unnest_stacks(void);

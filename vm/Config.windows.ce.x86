@@ -1,2 +1,0 @@
-#CC = x86-wince-mingw32ce-gcc
-include vm/Config.windows.ce vm/Config.x86

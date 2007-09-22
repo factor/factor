@@ -1,2 +1,2 @@
 include vm/Config.openbsd
-include vm/Config.amd64
+include vm/Config.x86.64
