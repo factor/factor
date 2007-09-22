@@ -20,7 +20,7 @@ big-endian off
     xt-reg stack-reg -44 [+] LEA               ! compute forward chain pointer
     xt-reg PUSH                                ! save forward chain pointer
     arg0 PUSH                                  ! save array
-    stack-reg 2 bootstrap-cells SUB            ! reserve space for scan-save
+    stack-reg 4 bootstrap-cells SUB            ! reserve space for scan-save
 ] { } make jit-prolog set                      
                                                
 : advance-scan scan-reg bootstrap-cell ADD ;   
