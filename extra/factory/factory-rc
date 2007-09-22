@@ -4,6 +4,7 @@ USING: kernel mortar x
        x.widgets.wm.root
        x.widgets.wm.workspace
        x.widgets.wm.unmapped-frames-menu
+       factory.load
        tty-server ;
 
 IN: factory
