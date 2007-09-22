@@ -206,10 +206,10 @@ M: x86-backend %box-small-struct ( size -- )
 
 M: x86-backend %prepare-alien-indirect ( -- )
     "unbox_alien" f %alien-invoke
-    ESP cell temp@ [+] EAX MOV ;
+    cell temp@ EAX MOV ;
 
 M: x86-backend %alien-indirect ( -- )
-    ESP cell temp@ [+] CALL ;
+    cell temp@ CALL ;
 
 M: x86-backend %alien-callback ( quot -- )
     4 [

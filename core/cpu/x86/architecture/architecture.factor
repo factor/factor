@@ -150,7 +150,7 @@ M: x86-backend small-enough? ( n -- ? )
 
 : %tag-fixnum ( reg -- ) tag-bits get SHL ;
 
-: temp@ \ stack-frame get swap - ;
+: temp@ stack-reg \ stack-frame get rot - [+] ;
 
 : struct-return@ ( size n -- n )
     [

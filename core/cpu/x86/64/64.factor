@@ -16,10 +16,10 @@ M: amd64-backend stack-reg RSP ;
 M: x86-backend xt-reg RCX ;
 M: x86-backend stack-save-reg RSI ;
 
-M: temp-reg v>operand drop R13 ;
+M: temp-reg v>operand drop RBX ;
 
 M: int-regs return-reg drop RAX ;
-M: int-regs vregs drop { RAX RBX RCX RDX RBP RSI RDI R8 R9 R10 R11 R12 } ;
+M: int-regs vregs drop { RAX RCX RDX RBP RSI RDI R8 R9 R10 R11 R12 R13 } ;
 M: int-regs param-regs drop { RDI RSI RDX RCX R8 R9 } ;
 
 M: float-regs return-reg drop XMM0 ;
@@ -146,17 +146,17 @@ M: amd64-backend %alien-indirect ( -- )
     cell temp@ CALL ;
 
 M: amd64-backend %alien-callback ( quot -- )
-    RDI load-indirect "run_callback" f compile-c-call ;
+    RDI load-indirect "c_to_factor" f compile-c-call ;
 
 M: amd64-backend %callback-value ( ctype -- )
     ! Save top of data stack
     %prepare-unbox
     ! Put former top of data stack in RDI
-    temp@ RDI MOV
+    cell temp@ RDI MOV
     ! Restore data/call/retain stacks
     "unnest_stacks" f %alien-invoke
     ! Put former top of data stack in RDI
-    RDI temp@ MOV
+    RDI cell temp@ MOV
     ! Unbox former top of data stack to return registers
     unbox-return ;
 
