@@ -121,7 +121,7 @@ IN: cpu.x86.intrinsics
 \ set-slot {
     ! Slot number is literal and the tag is known
     {
-        [ %slot-literal-known-tag "val" operand MOV ] H{
+        [ %slot-literal-known-tag "val" operand MOV generate-write-barrier ] H{
             { +input+ { { f "val" } { f "obj" known-tag } { [ small-slot? ] "n" } } }
             { +clobber+ { "obj" } }
         }
