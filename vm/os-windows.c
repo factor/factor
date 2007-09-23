@@ -51,7 +51,7 @@ void ffi_dlopen (F_DLL *dll, bool error)
 	{
 		dll->dll = NULL;
 		if(error)
-			general_error(ERROR_FFI,F,
+			general_error(ERROR_FFI,F,F,
 				tag_object(get_error_message()));
 		else
 			return;
@@ -204,9 +204,3 @@ void sleep_millis(DWORD msec)
 {
     Sleep(msec);
 }
-
-void run(void)
-{
-	interpreter();
-}
-
