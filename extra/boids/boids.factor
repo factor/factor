@@ -68,7 +68,9 @@ VAR: separation-radius
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-: distance ( boid boid -- n ) boid-pos swap boid-pos v- norm ;
+! : distance ( boid boid -- n ) boid-pos swap boid-pos v- norm ;
+
+: distance ( boid boid -- n ) [ boid-pos ] [ boid-pos ] bi* v- norm ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
