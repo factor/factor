@@ -32,7 +32,7 @@ IN: bootstrap.image
 : -1-offset             9 ; inline
 
 : array-start 2 bootstrap-cells object tag-number - ;
-: scan@ array-start 4 - ;
+: scan@ array-start bootstrap-cell - ;
 : wrapper@ bootstrap-cell object tag-number - ;
 : word-xt@ 8 bootstrap-cells object tag-number - ;
 : quot-array@ bootstrap-cell object tag-number - ;

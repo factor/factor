@@ -107,6 +107,7 @@ FUNCTION: void close ( int fd ) ;
 FUNCTION: int connect ( int s, void* name, socklen_t namelen ) ;
 FUNCTION: int dup2 ( int oldd, int newd ) ;
 ! FUNCTION: int dup ( int oldd ) ;
+FUNCTION: int execvp ( char* path, char** argv ) ;
 FUNCTION: int execve ( char* path, char** argv, char** envp ) ;
 FUNCTION: int fchdir ( int fd ) ;
 FUNCTION: int fchmod ( int fd, mode_t mode ) ;

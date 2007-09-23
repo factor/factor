@@ -48,13 +48,15 @@ CELL ds_size, rs_size;
 void reset_datastack(void);
 void reset_retainstack(void);
 void fix_stacks(void);
-void save_callstack_bottom(F_STACK_FRAME *callstack_bottom);
+FASTCALL void save_callstack_bottom(F_STACK_FRAME *callstack_bottom);
 DLLEXPORT void save_stacks(void);
 DLLEXPORT void nest_stacks(void);
 DLLEXPORT void unnest_stacks(void);
 void init_stacks(CELL ds_size, CELL rs_size);
 
 #define FIRST_STACK_FRAME(stack) (F_STACK_FRAME *)((stack) + 1)
+
+#define REBASE_FRAME_SUCCESSOR(frame,delta) (F_STACK_FRAME *)((CELL)FRAME_SUCCESSOR(frame) + delta)
 
 typedef void (*CALLSTACK_ITER)(F_STACK_FRAME *frame);
 

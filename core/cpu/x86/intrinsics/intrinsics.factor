@@ -71,29 +71,38 @@ IN: cpu.x86.intrinsics
 } define-intrinsic
 
 ! Slots
+: %slot-literal-known-tag
+    "obj" operand
+    "n" get cells
+    "obj" operand-tag - [+] ;
+
+: %slot-literal-any-tag
+    "obj" operand %untag
+    "obj" operand "n" get cells [+] ;
+
+: %slot-any
+    "obj" operand %untag
+    "n" operand fixnum>slot@
+    "obj" operand "n" operand [+] ;
 
 \ slot {
+    ! Slot number is literal and the tag is known
+    {
+        [ "obj" operand %slot-literal-known-tag MOV ] H{
+            { +input+ { { f "obj" known-tag } { [ small-slot? ] "n" } } }
+            { +output+ { "obj" } }
+        }
+    }
     ! Slot number is literal
     {
-        [
-            "obj" operand %untag
-            ! load slot value
-            "obj" operand dup "n" get cells [+] MOV
-        ] H{
+        [ "obj" operand %slot-literal-any-tag MOV ] H{
             { +input+ { { f "obj" } { [ small-slot? ] "n" } } }
             { +output+ { "obj" } }
         }
     }
     ! Slot number in a register
     {
-        [
-            "obj" operand %untag
-            ! turn tagged fixnum slot # into an offset,
-            ! multiple of 4
-            "n" operand fixnum>slot@
-            ! load slot value
-            "obj" operand dup "n" operand [+] MOV
-        ] H{
+        [ "obj" operand %slot-any MOV ] H{
             { +input+ { { f "obj" } { f "n" } } }
             { +output+ { "obj" } }
             { +clobber+ { "n" } }
@@ -105,38 +114,28 @@ IN: cpu.x86.intrinsics
     #! Mark the card pointed to by vreg.
     "val" operand-immediate? "obj" get fresh-object? or [
         "obj" operand card-bits SHR
-        "scratch" operand HEX: ffffffff MOV
-        "cards_offset" f rc-absolute-cell rel-dlsym
-        "scratch" operand dup [] MOV
-        "scratch" operand "obj" operand [+] card-mark OR
+        "cards_offset" f %alien-global
+        temp-reg v>operand "obj" operand [+] card-mark OR
     ] unless ;
 
 \ set-slot {
+    ! Slot number is literal and the tag is known
+    {
+        [ %slot-literal-known-tag "val" operand MOV generate-write-barrier ] H{
+            { +input+ { { f "val" } { f "obj" known-tag } { [ small-slot? ] "n" } } }
+            { +clobber+ { "obj" } }
+        }
+    }
     ! Slot number is literal
     {
-        [
-            "obj" operand %untag
-            ! store new slot value
-            "obj" operand "n" get cells [+] "val" operand MOV
-            generate-write-barrier
-        ] H{
+        [ %slot-literal-any-tag "val" operand MOV generate-write-barrier ] H{
             { +input+ { { f "val" } { f "obj" } { [ small-slot? ] "n" } } }
-            { +scratch+ { { f "scratch" } } }
             { +clobber+ { "obj" } }
         }
     }
     ! Slot number in a register
     {
-        [
-            ! turn tagged fixnum slot # into an offset
-            "n" operand fixnum>slot@
-            "obj" operand %untag
-            ! store new slot value
-            "obj" operand "n" operand [+] "val" operand MOV
-            ! reuse register
-            "n" get "scratch" set
-            generate-write-barrier
-        ] H{
+        [ %slot-any "val" operand MOV generate-write-barrier ] H{
             { +input+ { { f "val" } { f "obj" } { f "n" } } }
             { +clobber+ { "obj" "n" } }
         }

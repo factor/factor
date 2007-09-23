@@ -19,7 +19,7 @@ void fix_stacks(void)
 }
 
 /* called before entry into Factor code. */
-void save_callstack_bottom(F_STACK_FRAME *callstack_bottom)
+FASTCALL void save_callstack_bottom(F_STACK_FRAME *callstack_bottom)
 {
 	stack_chain->callstack_bottom = callstack_bottom;
 }
@@ -111,7 +111,7 @@ void iterate_callstack(CELL top, CELL bottom, CELL base, CALLSTACK_ITER iterator
 
 	while(ITERATING_P)
 	{
-		F_STACK_FRAME *next = (F_STACK_FRAME *)((CELL)FRAME_SUCCESSOR(frame) + delta);
+		F_STACK_FRAME *next = REBASE_FRAME_SUCCESSOR(frame,delta);
 		iterator(frame);
 		frame = next;
 	}
@@ -344,7 +344,7 @@ static F_FIXNUM delta;
 
 void adjust_stack_frame(F_STACK_FRAME *frame)
 {
-	FRAME_SUCCESSOR(frame) = (F_STACK_FRAME *)((CELL)FRAME_SUCCESSOR(frame) + delta);
+	FRAME_SUCCESSOR(frame) = REBASE_FRAME_SUCCESSOR(frame,delta);
 }
 
 void adjust_callstack(F_CALLSTACK *stack, CELL bottom)

@@ -81,19 +81,6 @@ void load_image(F_PARAMETERS *p)
 	userenv[IMAGE_ENV] = tag_object(from_native_string(p->image));
 }
 
-/* Compute total sum of sizes of free blocks */
-void save_code_heap(FILE *file)
-{
-	F_BLOCK *scan = first_block(&code_heap);
-
-	while(scan)
-	{
-		if(scan->status == B_ALLOCATED)
-			fwrite(scan,scan->size,1,file);
-		scan = next_block(&code_heap,scan);
-	}
-}
-
 /* Save the current image to disk */
 bool save_image(const F_CHAR *filename)
 {
@@ -132,7 +119,6 @@ bool save_image(const F_CHAR *filename)
 	fwrite(&h,sizeof(F_HEADER),1,file);
 
 	fwrite((void*)tenured->start,h.data_size,1,file);
-	/* save_code_heap(file); */
 	fwrite(first_block(&code_heap),h.code_size,1,file);
 
 	fclose(file);
@@ -187,6 +173,8 @@ void fixup_alien(F_ALIEN *d)
 	d->expired = T;
 }
 
+F_FIXNUM delta;
+
 void fixup_stack_frame(F_STACK_FRAME *frame)
 {
 	code_fixup(&frame->xt);
@@ -198,7 +186,21 @@ void fixup_stack_frame(F_STACK_FRAME *frame)
 		frame->scan = scan + frame->array;
 	}
 
-	/* code_fixup(&frame->return_address); */
+#ifdef CALLSTACK_UP_P
+	F_STACK_FRAME *next = REBASE_FRAME_SUCCESSOR(frame,delta);
+	code_fixup((XT *)(next + 1));
+#else
+	code_fixup(&frame->return_address);
+#endif
+}
+
+void fixup_callstack_object(F_CALLSTACK *stack)
+{
+	CELL top = (CELL)(stack + 1);
+	CELL bottom = top + untag_fixnum_fast(stack->length);
+	delta = (bottom - stack->bottom);
+
+	iterate_callstack_object(stack,fixup_stack_frame);
 }
 
 /* Initialize an object in a newly-loaded image */
@@ -221,9 +223,7 @@ void relocate_object(CELL relocating)
 		fixup_alien((F_ALIEN *)relocating);
 		break;
 	case CALLSTACK_TYPE:
-		iterate_callstack_object(
-			(F_CALLSTACK *)relocating,
-			fixup_stack_frame);
+		fixup_callstack_object((F_CALLSTACK *)relocating);
 		break;
 	}
 }

@@ -1,10 +1,3 @@
-#define FACTOR_CPU_STRING "x86.32"
-
-register CELL ds asm("esi");
-register CELL rs asm("edi");
-
-#define FASTCALL __attribute__ ((regparm (2)))
-
 typedef struct _F_STACK_FRAME
 {
 	/* In compiled quotation frames, position within the array.
@@ -29,14 +22,11 @@ typedef struct _F_STACK_FRAME
 
 INLINE void flush_icache(CELL start, CELL len) {}
 
-void c_to_factor(CELL quot);
+FASTCALL void c_to_factor(CELL quot);
+FASTCALL void throw_impl(CELL quot, F_STACK_FRAME *rewind_to);
+FASTCALL void undefined(CELL word);
+FASTCALL void dosym(CELL word);
+FASTCALL void docol_profiling(CELL word);
+FASTCALL void docol(CELL word);
 
 void set_callstack(F_STACK_FRAME *to, F_STACK_FRAME *from, CELL length, void *memcpy);
-void throw_impl(CELL quot, F_STACK_FRAME *rewind_to);
-
-/* Defined in cpu-x86.S and only called from Factor-compiled code. They all
-use funny calling convention. */
-void undefined(CELL word);
-void dosym(CELL word);
-void docol_profiling(CELL word);
-void docol(CELL word);

@@ -1,7 +1,8 @@
 ! -*-factor-*-
 
 USING: kernel unix vars mortar slot-accessors
-       x.widgets.wm.menu x.widgets.wm.unmapped-frames-menu ;
+       x.widgets.wm.menu x.widgets.wm.unmapped-frames-menu
+       factory.commands factory.load ;
 
 IN: factory
 

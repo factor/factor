@@ -196,7 +196,8 @@ void memory_protection_error(CELL addr, F_STACK_FRAME *native_stack);
 void signal_error(int signal, F_STACK_FRAME *native_stack);
 void type_error(CELL type, CELL tagged);
 void not_implemented_error(void);
-void undefined_error(CELL word, F_STACK_FRAME *callstack_top);
+
+FASTCALL void undefined_error(CELL word, F_STACK_FRAME *callstack_top);
 
 DECLARE_PRIMITIVE(throw);
 
