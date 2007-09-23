@@ -156,7 +156,7 @@ M: x86-backend small-enough? ( n -- ? )
     [
         stack-frame* cell + +
     ] [
-        temp@
+        \ stack-frame get swap -
     ] ?if ;
 
 HOOK: %unbox-struct-1 compiler-backend ( -- )
