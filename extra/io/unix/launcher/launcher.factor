@@ -9,16 +9,15 @@ USE: unix
 : with-fork ( quot -- pid )
     fork [ zero? -rot if ] keep ; inline
 
-: prepare-execve ( args -- cmd args envp )
+: prepare-execvp ( args -- cmd args )
     #! Doesn't free any memory, so we only call this word
     #! after forking.
     [ malloc-char-string ] map
     [ first ] keep
-    f add >c-void*-array
-    f ;
+    f add >c-void*-array ;
 
 : (spawn-process) ( args -- )
-    [ prepare-execve execve ] catch 1 exit ;
+    [ prepare-execvp execvp ] catch 1 exit ;
 
 : spawn-process ( args -- pid )
     [ (spawn-process) ] [ drop ] with-fork ;

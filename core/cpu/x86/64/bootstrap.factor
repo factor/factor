@@ -13,5 +13,6 @@ IN: bootstrap.x86
 : scan-reg RBX ;
 : xt-reg RCX ;
 : fixnum>slot@ ;
+: next-frame@ -88 ;
 
 "resource:core/cpu/x86/bootstrap.factor" run-file

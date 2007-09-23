@@ -13,5 +13,6 @@ IN: bootstrap.x86
 : scan-reg EBX ;
 : xt-reg ECX ;
 : fixnum>slot@ arg0 1 SAR ;
+: next-frame@ -44 ;
 
 "resource:core/cpu/x86/bootstrap.factor" run-file

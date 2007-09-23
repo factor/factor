@@ -17,7 +17,7 @@ big-endian off
                                                
 [                                              
     xt-reg PUSH                                ! save XT
-    xt-reg stack-reg -44 [+] LEA               ! compute forward chain pointer
+    xt-reg stack-reg next-frame@ [+] LEA       ! compute forward chain pointer
     xt-reg PUSH                                ! save forward chain pointer
     arg0 PUSH                                  ! save array
     stack-reg 4 bootstrap-cells SUB            ! reserve space for scan-save
