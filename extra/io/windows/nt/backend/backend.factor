@@ -1,7 +1,8 @@
 USING: alien alien.c-types arrays assocs combinators continuations
 destructors io io.backend io.nonblocking io.windows libc
 kernel math namespaces sequences threads tuples.lib windows
-windows.errors windows.kernel32 prettyprint ;
+windows.errors windows.kernel32 prettyprint strings splitting
+io.files windows.winsock ;
 IN: io.windows.nt.backend
 
 : unicode-prefix ( -- seq )
