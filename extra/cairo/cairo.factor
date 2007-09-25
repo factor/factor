@@ -1,6 +1,25 @@
-! Cairo binding
+! Bindings for Cairo library
+!  Copyright (c) 2007 Sampo Vuori
+!    License: http://factorcode.org/license.txt
+
+! Unimplemented:
+!  - most of the font stuff
+!  - most of the matrix stuff
+!  - most of the query functions
+
+
+USING: alien alien.syntax combinators system ;
+
 IN: cairo
-USING: alien alien.syntax ;
+
+: load-cairo-library ( -- )
+  "cairo" {
+	{ [ win32? ] [ "cairo.dll" ] }
+	{ [ macosx? ] [ "libcairo.dylib" ] }
+	{ [ unix? ] [ "libcairo.so.2" ] }
+  } cond "cdecl" add-library ; parsing
+
+load-cairo-library
 
 ! cairo_status_t
 C-ENUM:
@@ -10,24 +29,43 @@ C-ENUM:
     CAIRO_STATUS_INVALID_POP_GROUP
     CAIRO_STATUS_NO_CURRENT_POINT
     CAIRO_STATUS_INVALID_MATRIX
-    CAIRO_STATUS_NO_TARGET_SURFACE
+    CAIRO_STATUS_INVALID_STATUS
     CAIRO_STATUS_NULL_POINTER
     CAIRO_STATUS_INVALID_STRING
+    CAIRO_STATUS_INVALID_PATH_DATA
+    CAIRO_STATUS_READ_ERROR
+    CAIRO_STATUS_WRITE_ERROR
+    CAIRO_STATUS_SURFACE_FINISHED
+    CAIRO_STATUS_SURFACE_TYPE_MISMATCH
+    CAIRO_STATUS_PATTERN_TYPE_MISMATCH
+    CAIRO_STATUS_INVALID_CONTENT
+    CAIRO_STATUS_INVALID_FORMAT
+    CAIRO_STATUS_INVALID_VISUAL
+    CAIRO_STATUS_FILE_NOT_FOUND
+    CAIRO_STATUS_INVALID_DASH
+    CAIRO_STATUS_INVALID_DSC_COMMENT
+    CAIRO_STATUS_INVALID_INDEX
+    CAIRO_STATUS_CLIP_NOT_REPRESENTABLE
 ;
+
+! cairo_content_t
+: CAIRO_CONTENT_COLOR HEX: 1000 ;
+: CAIRO_CONTENT_ALPHA HEX: 2000 ;
+: CAIRO_CONTENT_COLOR_ALPHA HEX: 3000 ;
 
 ! cairo_operator_t
 C-ENUM:
     CAIRO_OPERATOR_CLEAR
-    CAIRO_OPERATOR_SRC
-    CAIRO_OPERATOR_DST
+    CAIRO_OPERATOR_SOURCE
     CAIRO_OPERATOR_OVER
-    CAIRO_OPERATOR_OVER_REVERSE
     CAIRO_OPERATOR_IN
-    CAIRO_OPERATOR_IN_REVERSE
     CAIRO_OPERATOR_OUT
-    CAIRO_OPERATOR_OUT_REVERSE
     CAIRO_OPERATOR_ATOP
-    CAIRO_OPERATOR_ATOP_REVERSE
+    CAIRO_OPERATOR_DEST
+    CAIRO_OPERATOR_DEST_OVER
+    CAIRO_OPERATOR_DEST_IN
+    CAIRO_OPERATOR_DEST_OUT
+    CAIRO_OPERATOR_DEST_ATOP
     CAIRO_OPERATOR_XOR
     CAIRO_OPERATOR_ADD
     CAIRO_OPERATOR_SATURATE
@@ -116,6 +154,14 @@ C-STRUCT: cairo_t
     { "cairo_gstate_t*" "gstate" }
     { "uint" "status ! cairo_status_t" } ;
 
+C-STRUCT: cairo_matrix_t
+	{ "double" "xx" }
+	{ "double" "yx" }
+	{ "double" "xy" }
+	{ "double" "yy" }
+	{ "double" "x0" }
+	{ "double" "y0" } ;
+
 ! cairo_format_t
 C-ENUM:
     CAIRO_FORMAT_ARGB32
@@ -160,15 +206,24 @@ C-ENUM:
 : cairo_create ( cairo_surface_t -- cairo_t )
     "cairo_t*" "cairo" "cairo_create" [ "void*" ] alien-invoke ;
 
+: cairo_reference ( cairo_t -- cairo_t )
+  	"cairo_t*" "cairo" "cairo_reference" [ "cairo_t*" ] alien-invoke ;
+
 : cairo_destroy ( cairo_t -- )
     "void" "cairo" "cairo_destroy" [ "cairo_t*" ] alien-invoke ;
+
+: cairo_save ( cairo_t -- )
+  	"void" "cairo" "cairo_save" [ "cairo_t*" ] alien-invoke ;
+
+: cairo_restore ( cairo_t -- )
+  	"void" "cairo" "cairo_restore" [ "cairo_t*" ] alien-invoke ;
 
 : cairo_set_operator ( cairo_t cairo_operator_t -- )
     "void" "cairo" "cairo_set_operator" [ "cairo_t*" "int" ] alien-invoke ;
 
-: cairo_image_surface_create_for_data ( data format width height stride -- cairo_surface_t )
-    "void*" "cairo" "cairo_image_surface_create_for_data" [ "void*" "uint" "int" "int" "int" ] alien-invoke ;
-    
+: cairo_set_source ( cairo_t cairo_pattern_t -- )
+    "void" "cairo" "cairo_set_source" [ "cairo_t*" "void*" ] alien-invoke ;
+
 : cairo_set_source_rgb ( cairo_t red green blue -- )
     "void" "cairo" "cairo_set_source_rgb" [ "cairo_t*" "double" "double" "double" ] alien-invoke ;
 
@@ -180,6 +235,10 @@ C-ENUM:
 
 : cairo_set_tolerance ( cairo_t tolerance -- )
     "void" "cairo" "cairo_set_tolerance" [ "cairo_t*" "double" ] alien-invoke ;
+
+: cairo_image_surface_create_for_data ( data format width height stride -- cairo_surface_t )
+    "void*" "cairo" "cairo_image_surface_create_for_data" [ "void*" "uint" "int" "int" "int" ] alien-invoke ;
+    
 
 : cairo_set_antialias ( cairo_t cairo_antialias_t -- )
     "void" "cairo" "cairo_set_antialias" [ "cairo_t*" "int" ] alien-invoke ;
@@ -211,6 +270,14 @@ C-ENUM:
 : cairo_rotate ( cairo_t angle -- )
     "void" "cairo" "cairo_rotate" [ "cairo_t*" "double" ] alien-invoke ;
 
+: cairo_transform ( cairo_t cairo_matrix_t -- )
+  	"void" "cairo" "cairo_transform" [ "cairo_t*" "cairo_matrix_t*" ] alien-invoke ;
+
+: cairo_set_matrix ( cairo_t cairo_matrix_t -- )
+  	"void" "cairo" "cairo_set_matrix" [ "cairo_t*" "cairo_matrix_t*" ] alien-invoke ;
+
+: cairo_identity_matrix ( cairo_t -- )
+  	"void" "cairo" "cairo_identity_matrix" [ "cairo_t*" ] alien-invoke ;
 
 ! cairo path creating functions
 
@@ -219,6 +286,9 @@ C-ENUM:
 
 : cairo_move_to ( cairo_t x y -- )
     "void" "cairo" "cairo_move_to" [ "cairo_t*" "double" "double" ] alien-invoke ;
+
+: cairo_new_sub_path ( cairo_t -- )
+    "void" "cairo" "cairo_new_sub_path" [ "cairo_t*" ] alien-invoke ;
     
 : cairo_line_to ( cairo_t x y -- )
     "void" "cairo" "cairo_line_to" [ "cairo_t*" "double" "double" ] alien-invoke ;
@@ -246,6 +316,29 @@ C-ENUM:
 
 : cairo_close_path ( cairo_t -- )
     "void" "cairo" "cairo_close_path" [ "cairo_t*" ] alien-invoke ;
+
+! Surface manipulation
+
+: cairo_surface_create_similar ( cairo_surface_t cairo_content_t width height -- cairo_surface_t )
+    "cairo_surface_t*" "cairo" "cairo_surface_create_similar" [ "cairo_surface_t*" "uint" "int" "int" ] alien-invoke ;
+
+: cairo_surface_reference ( cairo_surface_t -- cairo_surface_t )
+    "cairo_surface_t*" "cairo" "cairo_surface_reference" [ "cairo_surface_t*" ] alien-invoke ;
+
+: cairo_surface_finish ( cairo_surface_t -- )
+    "void" "cairo" "cairo_surface_finish" [ "cairo_surface_t*" ] alien-invoke ;
+
+: cairo_surface_destroy ( cairo_surface_t -- )
+    "void" "cairo" "cairo_surface_destroy" [ "cairo_surface_t*" ] alien-invoke ;
+
+: cairo_surface_get_reference_count ( cairo_surface_t -- count )
+    "uint" "cairo" "cairo_surface_get_reference_count" [ "cairo_surface_t*" ] alien-invoke ;
+
+: cairo_surface_status ( cairo_surface_t -- cairo_status_t )
+    "uint" "cairo" "cairo_surface_status" [ "cairo_surface_t*" ] alien-invoke ;
+
+: cairo_surface_flush ( cairo_surface_t -- )
+    "void" "cairo" "cairo_surface_flush" [ "cairo_surface_t*" ] alien-invoke ;
 
 ! painting functions
 : cairo_paint ( cairo_t -- )
@@ -302,8 +395,6 @@ C-ENUM:
 : cairo_clip_preserve ( cairo_t -- )
     "void" "cairo" "cairo_clip_preserve" [ "cairo_t*" ] alien-invoke ;
 
-: cairo_set_source ( cairo_t cairo_pattern_t -- )
-    "void" "cairo" "cairo_set_source" [ "cairo_t*" "void*" ] alien-invoke ;
 
 : cairo_pattern_create_linear ( x0 y0 x1 y1 -- cairo_pattern_t )
     "void*" "cairo" "cairo_pattern_create_linear" [ "double" "double" "double" "double" ] alien-invoke ;
@@ -326,5 +417,26 @@ C-ENUM:
 : cairo_set_font_size ( cairo_t scale -- )
     "void" "cairo" "cairo_set_font_size" [ "cairo_t*" "double" ] alien-invoke ;
 
-: cairo_identity_matrix ( cairo_t -- )
-    "void" "cairo" "cairo_identity_matrix" [ "cairo_t*" ] alien-invoke ;
+: cairo_set_font_matrix ( cairo_t cairo_matrix_t -- )
+  	"void" "cairo" "cairo_set_font_matrix" [ "cairo_t*" "cairo_matrix_t*" ] alien-invoke ;
+
+: cairo_get_font_matrix ( cairo_t cairo_matrix_t -- )
+  	"void" "cairo" "cairo_get_font_matrix" [ "cairo_t*" "cairo_matrix_t*" ] alien-invoke ;
+
+
+
+! Cairo pdf
+
+: cairo_pdf_surface_create ( filename width height -- surface )
+  "void*" "cairo" "cairo_pdf_surface_create" [ "char*" "double" "double" ] alien-invoke ;
+
+! Missing:
+
+! cairo_public cairo_surface_t *
+! cairo_pdf_surface_create_for_stream (cairo_write_func_t write_func,
+!                                      void              *closure,
+!                                      double             width_in_points,
+!                                      double             height_in_points);
+
+: cairo_pdf_surface_set_size ( surface width height -- )
+  "void" "cairo" "cairo_pdf_surface_set_size" [ "void*" "double" "double" ] alien-invoke ;
