@@ -1,2 +1,2 @@
-fraptor ICON "misc/icons/FRaptorMix.ico"
+fraptor ICON "misc/icons/Factor.ico"
 
