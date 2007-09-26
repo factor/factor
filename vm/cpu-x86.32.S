@@ -9,6 +9,7 @@ and the callstack top is passed in EDX */
 #define XT_REG %ecx
 #define STACK_REG %esp
 #define DS_REG %esi
+#define RETURN_REG %eax
 
 #define CELL_SIZE 4
 

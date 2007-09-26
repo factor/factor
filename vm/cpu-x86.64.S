@@ -5,6 +5,7 @@
 #define XT_REG %rcx
 #define STACK_REG %rsp
 #define DS_REG %r14
+#define RETURN_REG %rax
 
 #define CELL_SIZE 8
 
