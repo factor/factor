@@ -20,7 +20,7 @@ and the callstack top is passed in EDX */
 	pop %ebp ; \
 	pop %ebx
 
-#define QUOT_XT_OFFSET 5
+#define QUOT_XT_OFFSET 9
 #define PROFILING_OFFSET 25
 #define WORD_DEF_OFFSET 13
 #define WORD_XT_OFFSET 29
