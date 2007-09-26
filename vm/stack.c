@@ -407,13 +407,12 @@ void stack_frame_to_array(F_STACK_FRAME *frame)
 		offset = F;
 
 #ifdef CALLSTACK_UP_P
-	#define I(n) (n)
+	set_array_nth(array,frame_index++,frame_executing(frame));
+	set_array_nth(array,frame_index++,offset);
 #else
-	#define I(n) (array_capacity(array) - (n) - 1)
+	set_array_nth(array,frame_index--,offset);
+	set_array_nth(array,frame_index--,frame_executing(frame));
 #endif
-
-	set_array_nth(array,I(frame_index++),frame_executing(frame));
-	set_array_nth(array,I(frame_index++),offset);
 }
 
 DEFINE_PRIMITIVE(callstack_to_array)
@@ -429,7 +428,12 @@ DEFINE_PRIMITIVE(callstack_to_array)
 
 	/* frame_count is equal to the total length now */
 
+#ifdef CALLSTACK_UP_P
 	frame_index = 0;
+#else
+	frame_index = frame_count - 1;
+#endif
+
 	iterate_callstack_object(stack,stack_frame_to_array);
 
 	dpush(tag_object(array));
