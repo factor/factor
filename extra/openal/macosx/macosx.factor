@@ -2,7 +2,8 @@
 ! See http://factorcode.org/license.txt for BSD license.
 !
 IN: openal.macosx
-USING: openal alien.c-types kernel alien alien.syntax shuffle ;
+USING: openal alien.c-types kernel alien alien.syntax shuffle
+combinators.lib ;
 
 LIBRARY: alut
 

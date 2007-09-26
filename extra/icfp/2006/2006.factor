@@ -2,7 +2,8 @@
 ! See http://factorcode.org/license.txt for BSD license.
 
 USING: kernel math sequences kernel.private namespaces arrays
-io io.files splitting io.binary math.functions vectors ;
+io io.files splitting io.binary math.functions vectors
+quotations combinators.private ;
 IN: universal-machine
 
 SYMBOL: regs

@@ -1,7 +1,7 @@
 USING: alien.c-types hexdump io io.backend io.sockets.headers
 io.sockets.headers.bsd kernel io.sniffer io.sniffer.bsd
 io.sniffer.filter io.streams.string io.unix.backend math
-sequences system ;
+sequences system byte-arrays ;
 IN: io.sniffer.filter.bsd
 
 ! http://www.iana.org/assignments/ethernet-numbers

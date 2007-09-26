@@ -4,7 +4,8 @@
 USING: cpu.8080 openal math alien.c-types sequences kernel
        shuffle arrays io.files combinators kernel.private
        ui.gestures ui.gadgets ui.render opengl.gl system 
-       threads concurrency match ui byte-arrays combinators.lib ;
+       threads concurrency match ui byte-arrays combinators.lib
+       combinators.private ;
 IN: space-invaders
 
 TUPLE: space-invaders port1 port2i port2o port3o port4lo port4hi port5o bitmap sounds looping? ;
