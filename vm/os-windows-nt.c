@@ -27,10 +27,11 @@ long exception_handler(PEXCEPTION_POINTERS pe)
 {
 	PEXCEPTION_RECORD e = (PEXCEPTION_RECORD)pe->ExceptionRecord;
 	CONTEXT *c = (CONTEXT*)pe->ContextRecord;
-	void *signal_callstack_top = NULL;
 
 	if(in_code_heap_p(c->Eip))
 		signal_callstack_top = (void*)c->Esp;
+	else
+		signal_callstack_top = NULL;
 
 	if(e->ExceptionCode == EXCEPTION_ACCESS_VIOLATION)
 	{
@@ -57,19 +58,4 @@ void c_to_factor_toplevel(CELL quot)
 	AddVectoredExceptionHandler(0, (void*)exception_handler);
 	c_to_factor(quot);
 	RemoveVectoredExceptionHandler((void*)exception_handler);
-}
-
-void memory_signal_handler_impl(void)
-{
-    memory_protection_error(signal_fault_addr,signal_callstack_top);
-}
-
-void divide_by_zero_signal_handler_impl(void)
-{
-    general_error(ERROR_DIVIDE_BY_ZERO,F,F,signal_callstack_top);
-}
-
-void misc_signal_handler_impl(void)
-{
-    signal_error(signal_number,signal_callstack_top);
 }

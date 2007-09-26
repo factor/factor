@@ -3,4 +3,4 @@
 register CELL ds asm("r14");
 register CELL rs asm("r15");
 
-#define FASTCALL
+#define F_FASTCALL

@@ -1,5 +1,5 @@
 #define FACTOR_CPU_STRING "ppc"
-#define FASTCALL
+#define F_FASTCALL
 
 register CELL ds asm("r14");
 register CELL rs asm("r15");

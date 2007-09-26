@@ -14,6 +14,8 @@ typedef char F_SYMBOL;
 #define FACTOR_DLL L"factor-nt.dll"
 #define FACTOR_DLL_NAME "factor-nt.dll"
 
+void c_to_factor_toplevel(CELL quot);
+
 CELL signal_number;
 CELL signal_fault_addr;
 void *signal_callstack_top;

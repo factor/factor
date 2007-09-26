@@ -199,7 +199,7 @@ void not_implemented_error(void)
 }
 
 /* This function is called from the undefined function in cpu_*.S */
-FASTCALL void undefined_error(CELL word, F_STACK_FRAME *callstack_top)
+F_FASTCALL void undefined_error(CELL word, F_STACK_FRAME *callstack_top)
 {
 	stack_chain->callstack_top = callstack_top;
 	general_error(ERROR_UNDEFINED_WORD,word,F,NULL);
@@ -244,6 +244,21 @@ void signal_error(int signal, F_STACK_FRAME *native_stack)
 void divide_by_zero_error(F_STACK_FRAME *native_stack)
 {
 	general_error(ERROR_DIVIDE_BY_ZERO,F,F,native_stack);
+}
+
+void memory_signal_handler_impl(void)
+{
+    memory_protection_error(signal_fault_addr,signal_callstack_top);
+}
+
+void divide_by_zero_signal_handler_impl(void)
+{
+    divide_by_zero_error(signal_callstack_top);
+}
+
+void misc_signal_handler_impl(void)
+{
+    signal_error(signal_number,signal_callstack_top);
 }
 
 DEFINE_PRIMITIVE(throw)

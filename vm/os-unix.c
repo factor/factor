@@ -179,21 +179,11 @@ INLINE F_STACK_FRAME *uap_stack_pointer(void *uap)
 		return NULL;
 }
 
-void memory_signal_handler_impl(void)
-{
-	memory_protection_error(signal_fault_addr,signal_callstack_top);
-}
-
 void memory_signal_handler(int signal, siginfo_t *siginfo, void *uap)
 {
 	signal_fault_addr = (CELL)siginfo->si_addr;
 	signal_callstack_top = uap_stack_pointer(uap);
 	UAP_PROGRAM_COUNTER(uap) = (CELL)memory_signal_handler_impl;
-}
-
-void misc_signal_handler_impl(void)
-{
-	signal_error(signal_number,signal_callstack_top);
 }
 
 void misc_signal_handler(int signal, siginfo_t *siginfo, void *uap)
