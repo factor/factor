@@ -40,10 +40,18 @@ in the public domain. */
 
 #define RESTORE(register,offset) lwz register,SAVE_AT(offset)(r1)
 
-DEF(void,c_to_factor,(CELL quot)):
-        mflr r0            /* get caller's return address */
-        stwu r1,-FRAME(r1) /* create a stack frame to hold non-volatile registers */
+#define PROLOGUE \
+	mflr r0 ;          /* get caller's return address */ \
+        stwu r1,-FRAME(r1) ; /* create a stack frame to hold non-volatile registers */
         SAVE_LR(r0)
+
+#define EPILOGUE \
+	LOAD_LR(r0) ; \
+        lwz r1,0(r1) ;     /* destroy the stack frame */ \
+        mtlr r0            /* get ready to return */ \
+
+DEF(void,c_to_factor,(CELL quot)):
+        PROLOGUE
 
 	SAVE(r13,0)        /* save GPRs */
                            /* don't save ds pointer */
@@ -92,9 +100,7 @@ DEF(void,c_to_factor,(CELL quot)):
                            /* don't restore ds pointer */
         RESTORE(r13,0)
 
-        LOAD_LR(r0)
-        lwz r1,0(r1)       /* destroy the stack frame */
-        mtlr r0            /* get ready to return */
+        EPILOGUE
         blr
 
 /* The JIT compiles an 'mr r4,r1' in front of every primitive call, since a
@@ -163,6 +169,15 @@ DEF(void,throw_impl,(CELL quot, F_STACK_FRAME *rewind_to)):
 	lwz r0,LR_SAVE(r1) /* we have rewound the stack; load return address */
 	mtlr r0
 	JUMP_QUOT          /* call the quotation */
+
+DEF(void,lazy_jit_compile,(CELL quot)):
+	mr r4,r1           /* save stack pointer */
+	PROLOGUE
+	SAVE(r3,19)        /* save quotation since we're about to mangle it */
+	b MANGLE(jit_compile)
+	RESTORE(r3,19)     /* restore quotation */
+	EPILOGUE
+        JUMP_QUOT          /* call the quotation */
 
 /* Thanks to Joshua Grams for this code.
 

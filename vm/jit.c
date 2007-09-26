@@ -152,21 +152,6 @@ void jit_compile(F_QUOTATION *quot)
 	quot->xt = xt;
 }
 
-void jit_compile_all(void)
-{
-	begin_scan();
-
-	CELL obj;
-	while((obj = next_object()) != F)
-	{
-		if(type_of(obj) == QUOTATION_TYPE)
-			jit_compile(untag_quotation(obj));
-	}
-
-	/* End the scan */
-	gc_off = false;
-}
-
 XT quot_offset_to_pc(F_QUOTATION *quot, F_FIXNUM offset)
 {
 	if(offset != -1)

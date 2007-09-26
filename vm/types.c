@@ -131,12 +131,7 @@ DEFINE_PRIMITIVE(array_to_quotation)
 {
 	F_QUOTATION *quot = allot_object(QUOTATION_TYPE,sizeof(F_QUOTATION));
 	quot->array = dpeek();
-	quot->xt = NULL;
-
-	REGISTER_UNTAGGED(quot);
-	jit_compile(quot);
-	UNREGISTER_UNTAGGED(quot);
-
+	quot->xt = lazy_jit_compile;
 	drepl(tag_object(quot));
 }
 

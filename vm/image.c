@@ -162,10 +162,9 @@ void fixup_word(F_WORD *word)
 
 void fixup_quotation(F_QUOTATION *quot)
 {
-	/* quot->xt is only ever NULL at the start of stage2 bootstrap,
-	in this case the JIT compiles all quotations */
-	if(quot->xt)
-		code_fixup(&quot->xt);
+	code_fixup(&quot->xt);
+	if(!in_code_heap_p(quot->xt))
+		quot->xt = lazy_jit_compile;
 }
 
 void fixup_alien(F_ALIEN *d)
