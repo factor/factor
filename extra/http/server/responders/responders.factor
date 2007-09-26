@@ -16,16 +16,16 @@ SYMBOL: responders
 : response ( header msg -- )
     "HTTP/1.0 " write print print-header ;
 
-: error-body ( error -- body )
+: error-body ( error -- )
     <html> <body> <h1> write </h1> </body> </html> ;
 
 : error-head ( error -- )
     dup log-error
-    H{ { "Content-Type" "text/html" } } over response ;
+    H{ { "Content-Type" "text/html" } } swap response ;
 
 : httpd-error ( error -- )
     #! This must be run from handle-request
-    error-head
+    dup error-head
     "head" "method" get = [ drop ] [ nl error-body ] if ;
 
 : bad-request ( -- )
@@ -101,7 +101,8 @@ SYMBOL: max-post-request
     dup "request" set ;
 
 : prepare-header ( -- )
-    read-header dup "header" set
+    read-header
+    dup "header" set
     dup log-headers
     read-post-request "response" set "raw-response" set ;
 

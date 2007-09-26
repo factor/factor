@@ -34,7 +34,7 @@ IN: http.server.responders.continuation.examples
     <h1> over write </h1>
     swap [ 
       <a =href a> "Next" write </a>
-    ] html-document 
+    ] simple-html-document 
   ] show 2drop ;
 
 : display-get-name-page ( -- name )
@@ -47,7 +47,7 @@ IN: http.server.responders.continuation.examples
         <input "text" =type "name" =name "20" =size input/>
         <input "submit" =type "Ok" =value input/>
       </form>
-    ] html-document
+    ] simple-html-document
   ] show "name" swap at ;
 
 : test-cont-responder ( -- )
@@ -71,7 +71,7 @@ IN: http.server.responders.continuation.examples
         <li> "Test responder1" [ test-cont-responder ] quot-href </li>
         <li> "Test responder2" [ test-cont-responder2 ] quot-href </li>
       </ol>
-    ] html-document 
+    ] simple-html-document 
   ] show-final ;
 
 : counter-example ( count -- )
@@ -87,7 +87,7 @@ IN: http.server.responders.continuation.examples
       "++" over 1quotation [ f ] swap append [ 1 + counter-example ] append quot-href
       "--" over 1quotation [ f ] swap append [ 1 - counter-example ] append quot-href
       drop
-    ] html-document 
+    ] simple-html-document 
   ] show drop ;
 
 : counter-example2 ( -- )
@@ -102,7 +102,7 @@ IN: http.server.responders.continuation.examples
       <h2> "counter" get unparse write </h2>
       "++" [ "counter" get 1 + "counter" set ] quot-href
       "--" [ "counter" get 1 - "counter" set ] quot-href
-    ] html-document 
+    ] simple-html-document 
   ] show 
   drop ;
 
