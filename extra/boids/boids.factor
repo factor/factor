@@ -79,8 +79,6 @@ VAR: separation-radius
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-! : relative-position ( self other -- v ) boid-pos swap boid-pos v- ;
-
 : relative-position ( self other -- v ) swap [ boid-pos ] 2apply v- ;
 
 : relative-angle ( self other -- angle )
