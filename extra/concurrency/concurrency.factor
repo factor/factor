@@ -239,7 +239,7 @@ PRIVATE>
         "Exiting process: " write self process-pid print
     ] curry spawn-link ;
 
-: server-cc ( -- cc | process )
+: server-cc ( -- cc|process )
     #! Captures the current continuation and returns the value.
     #! If that CC is called with a process on the stack it will
     #! set 'self' for the current process to it. Otherwise it will

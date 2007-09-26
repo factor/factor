@@ -10,9 +10,9 @@ IN: xml.utilities
 TUPLE: process-missing process tag ;
 M: process-missing error.
     "Tag <" write
-    process-missing-tag print-name
+    dup process-missing-tag print-name
     "> not implemented on process process " write
-    dup process-missing-process word-name print ;
+    process-missing-process word-name print ;
 
 : run-process ( tag word -- )
     2dup "xtable" word-prop
