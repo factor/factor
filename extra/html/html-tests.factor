@@ -1,30 +1,39 @@
 USING: html http io io.streams.string io.styles kernel
-namespaces tools.test xml.writer ;
+namespaces tools.test xml.writer sbufs sequences html.private ;
 IN: temporary
 
-[
-    "/responder/foo?z=%20"
-] [
-    "/responder/foo" H{ { "z" " " } } build-url
+: make-html-string
+    [ with-html-stream ] string-out ;
+
+[ ] [
+    512 <sbuf> <html-stream> drop
 ] unit-test
 
-[
-    "&lt;html&gt;&amp;&apos;sgml&apos;"
-] [ "<html>&'sgml'" chars>entities ] unit-test
+[ "" ] [
+    [ "" write ] make-html-string
+] unit-test
 
-[ "" ]
-[
+[ "a" ] [
+    [ CHAR: a write1 ] make-html-string
+] unit-test
+
+[ "&lt;" ] [
+    [ "<" write ] make-html-string
+] unit-test
+
+[ "<" ] [
+    [ "<" H{ } stdio get format-html-span ] make-html-string
+] unit-test
+
+TUPLE: funky town ;
+
+M: funky browser-link-href
+    "http://www.funky-town.com/" swap funky-town append ;
+
+[ "<a href='http://www.funky-town.com/austin'>&lt;</a>" ] [
     [
-        H{ } [ drop ] span-tag
-    ] string-out
-] unit-test
-
-: html-format ( string style -- string )
-    [ format ] with-html-stream ;
-
-[ "hello world" ]
-[
-    [ "hello world" H{ } html-format ] string-out
+        "<" "austin" funky construct-boa write-object
+    ] make-html-string
 ] unit-test
 
 [ "<span style='font-family: monospace; '>car</span>" ]
@@ -32,8 +41,8 @@ IN: temporary
     [
         "car"
         H{ { font "monospace" } }
-        html-format
-    ] string-out
+        format
+    ] make-html-string
 ] unit-test
 
 [ "<span style='color: #ff00ff; '>car</span>" ]
@@ -41,6 +50,14 @@ IN: temporary
     [
         "car"
         H{ { foreground { 1 0 1 1 } } }
-        html-format
-    ] string-out
+        format
+    ] make-html-string
+] unit-test
+
+[ "<div style='background-color: #ff00ff; '>cdr</div>" ]
+[
+    [
+        H{ { page-color { 1 0 1 1 } } }
+        [ "cdr" write ] with-nesting
+    ] make-html-string
 ] unit-test
