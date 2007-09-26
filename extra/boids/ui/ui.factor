@@ -18,7 +18,7 @@ USING: kernel namespaces
        ui.gadgets.packs
        ui.gadgets.grids
        ui.gestures
-       hashtables.lib vars rewrite-closures boids ;
+       combinators.lib hashtables.lib vars rewrite-closures boids ;
 
 IN: boids.ui
 
@@ -26,16 +26,13 @@ IN: boids.ui
 ! draw-boid
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-: boid-point-a ( boid -- a ) boid-pos ;
+: point-a ( boid -- a ) boid-pos ;
 
-: boid-point-b ( boid -- b ) dup boid-pos swap boid-vel normalize* 20 v*n v+ ;
+: point-b ( boid -- b ) [ boid-pos ] [ boid-vel normalize* 20 v*n ] bi v+ ;
 
-: boid-points ( boid -- point-a point-b ) dup boid-point-a swap boid-point-b ;
+: boid-points ( boid -- point-a point-b ) [ point-a ] [ point-b ] bi ;
 
-: draw-line ( a b -- )
-GL_LINES glBegin first2 glVertex2d first2 glVertex2d glEnd ;
-
-: draw-boid ( boid -- ) boid-points draw-line ;
+: draw-boid ( boid -- ) boid-points gl-line ;
 
 : draw-boids ( -- ) boids> [ draw-boid ] each ;
 
