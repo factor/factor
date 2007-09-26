@@ -4,7 +4,7 @@ in the public domain. */
 
 /* Note that the XT is passed to the quotation in r11 */
 #define CALL_OR_JUMP_QUOT \
-        lwz r11,5(r3)      /* load quotation-xt slot */ XX \
+        lwz r11,9(r3)      /* load quotation-xt slot */ XX \
 
 #define CALL_QUOT \
         CALL_OR_JUMP_QUOT XX \
@@ -41,14 +41,14 @@ in the public domain. */
 #define RESTORE(register,offset) lwz register,SAVE_AT(offset)(r1)
 
 #define PROLOGUE \
-	mflr r0 ;          /* get caller's return address */ \
-        stwu r1,-FRAME(r1) ; /* create a stack frame to hold non-volatile registers */
+	mflr r0 XX         /* get caller's return address */ \
+        stwu r1,-FRAME(r1) XX /* create a stack frame to hold non-volatile registers */ \
         SAVE_LR(r0)
 
 #define EPILOGUE \
-	LOAD_LR(r0) ; \
-        lwz r1,0(r1) ;     /* destroy the stack frame */ \
-        mtlr r0            /* get ready to return */ \
+	LOAD_LR(r0) XX \
+        lwz r1,0(r1) XX    /* destroy the stack frame */ \
+        mtlr r0            /* get ready to return */
 
 DEF(void,c_to_factor,(CELL quot)):
         PROLOGUE
@@ -173,9 +173,9 @@ DEF(void,throw_impl,(CELL quot, F_STACK_FRAME *rewind_to)):
 DEF(void,lazy_jit_compile,(CELL quot)):
 	mr r4,r1           /* save stack pointer */
 	PROLOGUE
-	SAVE(r3,19)        /* save quotation since we're about to mangle it */
-	b MANGLE(jit_compile)
-	RESTORE(r3,19)     /* restore quotation */
+	SAVE(r3,18)        /* save quot */
+	bl MANGLE(jit_compile)
+	RESTORE(r3,18)
 	EPILOGUE
         JUMP_QUOT          /* call the quotation */
 

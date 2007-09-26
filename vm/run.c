@@ -20,23 +20,21 @@ void uncurry(CELL obj)
 	}
 }
 
-void update_xt(F_WORD* word)
+XT default_word_xt(F_WORD *word)
 {
-	word->compiledp = F;
-
 	if(word->def == T)
-		word->xt = dosym;
+		return dosym;
 	else if(type_of(word->def) == QUOTATION_TYPE)
 	{
 		if(profiling)
-			word->xt = docol_profiling;
+			return docol_profiling;
 		else
-			word->xt = docol;
+			return docol;
 	}
 	else if(type_of(word->def) == FIXNUM_TYPE)
-		word->xt = primitives[to_fixnum(word->def)];
+		return primitives[to_fixnum(word->def)];
 	else
-		word->xt = undefined;
+		return undefined;
 }
 
 DEFINE_PRIMITIVE(uncurry)

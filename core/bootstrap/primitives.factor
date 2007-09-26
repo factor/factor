@@ -452,6 +452,13 @@ num-types get f <array> builtins set
         { "quotation-array" "quotations.private" }
         f
     }
+    {
+        { "object" "kernel" }
+        "compiled?"
+        2
+        { "quotation-compiled?" "quotations" }
+        f
+    }
 } define-builtin
 
 "dll" "alien" create "dll?" "alien" create

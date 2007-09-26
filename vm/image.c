@@ -154,17 +154,18 @@ void fixup_word(F_WORD *word)
 {
 	/* If this is a compiled word, relocate the code pointer. Otherwise,
 	reset it based on the primitive number of the word. */
-	if(word->compiledp != F)
-		code_fixup(&word->xt);
+	if(word->compiledp == F)
+		word->xt = default_word_xt(word);
 	else
-		update_xt(word);
+		code_fixup(&word->xt);
 }
 
 void fixup_quotation(F_QUOTATION *quot)
 {
-	code_fixup(&quot->xt);
-	if(!in_code_heap_p(quot->xt))
+	if(quot->compiled == F)
 		quot->xt = lazy_jit_compile;
+	else
+		code_fixup(&quot->xt);
 }
 
 void fixup_alien(F_ALIEN *d)

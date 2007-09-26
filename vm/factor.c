@@ -126,14 +126,6 @@ void init_factor_from_args(F_CHAR *image, int argc, F_CHAR **argv, bool embedded
 	userenv[EXECUTABLE_ENV] = tag_object(from_native_string(executable_path));
 	userenv[EMBEDDED_ENV] = (embedded ? T : F);
 
-	if(!untag_quotation(userenv[BOOT_ENV])->xt)
-	{
-		/* This can only happen when we're starting a stage2 bootstrap.
-		The stage1 bootstrapper doesn't attempt to compile quotations,
-		so we do it here. */
-		jit_compile_all();
-	}
-
 	nest_stacks();
 	c_to_factor_toplevel(userenv[BOOT_ENV]);
 	unnest_stacks();

@@ -132,6 +132,7 @@ DEFINE_PRIMITIVE(array_to_quotation)
 	F_QUOTATION *quot = allot_object(QUOTATION_TYPE,sizeof(F_QUOTATION));
 	quot->array = dpeek();
 	quot->xt = lazy_jit_compile;
+	quot->compiled = F;
 	drepl(tag_object(quot));
 }
 
@@ -477,7 +478,8 @@ F_WORD *allot_word(CELL vocab, CELL name)
 	word->def = F;
 	word->props = F;
 	word->counter = tag_fixnum(0);
-	update_xt(word);
+	word->compiledp = F;
+	word->xt = default_word_xt(word);
 	return word;
 }
 
@@ -490,7 +492,9 @@ DEFINE_PRIMITIVE(word)
 
 DEFINE_PRIMITIVE(update_xt)
 {
-	update_xt(untag_word(dpop()));
+	F_WORD *word = untag_word(dpop());
+	word->compiledp = F;
+	word->xt = default_word_xt(word);
 }
 
 DEFINE_PRIMITIVE(word_xt)
