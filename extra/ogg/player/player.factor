@@ -148,7 +148,7 @@ HINTS: yuv>rgb byte-array byte-array ;
 : process-video ( player -- player )
     dup player-gadget [
         dup { player-td player-yuv } get-slots theora_decode_YUVout drop
-        dup player-rgb over player-yuv yuv>rgb
+        dup player-rgb over player-yuv [ yuv>rgb ] time flush
         dup player-gadget find-world dup draw-world 
     ] when ;
 
@@ -158,7 +158,7 @@ HINTS: yuv>rgb byte-array byte-array ;
     
 : append-new-audio-buffer ( player -- player )
     dup player-buffers 1 gen-buffers append over set-player-buffers 
-    [ dup >r player-buffers second r> al-channel-format ] keep
+    [ [ player-buffers second ] keep al-channel-format ] keep
     [ player-audio-buffer dup length  ] keep
     [ player-vi vorbis_info-rate alBufferData check-error ]  keep 
     [ player-source 1 ] keep
@@ -182,7 +182,7 @@ HINTS: yuv>rgb byte-array byte-array ;
     } cond ;    
 
 : start-audio ( player -- player bool )
-    [ dup >r player-buffers first r> al-channel-format ] keep
+    [ [ player-buffers first ] keep al-channel-format ] keep
     [ player-audio-buffer dup length ] keep
     [ player-vi vorbis_info-rate alBufferData check-error ]  keep 
     [ player-source 1 ] keep
