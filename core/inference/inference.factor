@@ -9,19 +9,20 @@ namespaces quotations ;
 GENERIC: infer ( quot -- effect )
 
 M: callable infer ( quot -- effect )
-    [ infer-quot current-effect ] with-infer ;
+    [ f infer-quot ] with-infer drop ;
 
 : infer. ( quot -- )
     infer effect>string print ;
 
-: (dataflow) ( quot -- dataflow )
-    infer-quot
-    reify-all
-    f #return node,
-    dataflow-graph get ;
+GENERIC: dataflow ( quot -- dataflow )
 
-: dataflow ( quot -- dataflow )
-    [ (dataflow) ] with-infer ;
+M: callable dataflow
+    [ f infer-quot ] with-infer nip ;
 
-: dataflow-with ( quot stack -- dataflow )
-    [ V{ } like meta-d set (dataflow) ] with-infer ;
+GENERIC# dataflow-with 1 ( quot stack -- dataflow )
+
+M: callable dataflow-with
+    [
+        V{ } like meta-d set
+        f infer-quot
+    ] with-infer nip ;

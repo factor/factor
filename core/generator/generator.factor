@@ -73,10 +73,9 @@ SYMBOL: profiler-prologues
 : word-dataflow ( word -- dataflow )
     [
         dup "no-effect" word-prop [ no-effect ] when
-        dup dup add-recursive-state
-        [ specialized-def (dataflow) ] keep
-        finish-word drop
-    ] with-infer ;
+        dup specialized-def over dup 2array 1array infer-quot
+        finish-word
+    ] with-infer nip ;
 
 SYMBOL: compiler-hook
 

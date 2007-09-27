@@ -34,7 +34,7 @@ PREDICATE: class math-class ( object -- ? )
 : math-upgrade ( class1 class2 -- quot )
     [ math-class-max ] 2keep
     >r over r> (math-upgrade)
-    >r (math-upgrade) dup empty? [ 1 make-dip ] unless
+    >r (math-upgrade) dup empty? [ [ dip ] curry ] unless
     r> append ;
 
 TUPLE: no-math-method left right generic ;

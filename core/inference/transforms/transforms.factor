@@ -5,16 +5,16 @@ quotations assocs combinators math.bitfields inference.backend
 inference.dataflow tuples.private ;
 IN: inference.transforms
 
-: pop-literals ( n -- seq )
-    [ ensure-values ] keep
-    [ d-tail ] keep
-    (consume-values)
-    [ value-literal ] map ;
+: pop-literals ( n -- rstate seq )
+    dup zero? [ drop f ] [
+        [ ensure-values ] keep [ d-tail ] keep (consume-values)
+        dup value-recursion swap [ value-literal ] map
+    ] if ;
 
 : transform-quot ( quot n -- newquot )
-    [
-        , \ pop-literals , [ [ ] each ] % % \ infer-quot ,
-    ] [ ] make ;
+    [ pop-literals [ ] each ] curry
+    swap
+    [ swap infer-quot ] 3compose ;
 
 : define-transform ( word quot n -- )
     transform-quot "infer" set-word-prop ;

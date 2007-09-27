@@ -3,7 +3,8 @@
 USING: alien alien.c-types alien.compiler
 arrays assocs combinators compiler inference.transforms kernel
 math namespaces parser prettyprint prettyprint.sections
-quotations sequences strings words cocoa.runtime io macros ;
+quotations sequences strings words cocoa.runtime io macros
+combinators.lib ;
 IN: cocoa.messages
 
 : make-sender ( method function -- quot )
@@ -74,7 +75,7 @@ H{ } clone objc-methods set-global
         [ \ <super> , ] when
         swap cache-selector , \ selector ,
     ] [ ] make
-    swap second length 2 - make-dip ;
+    swap second length 2 - [ ndip ] curry ;
 
 MACRO: (send) ( selector super? -- quot )
     [

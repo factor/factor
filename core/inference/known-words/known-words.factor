@@ -69,6 +69,7 @@ M: object infer-call
     ] [
         drop
         [ "execute must be given a word" throw ]
+        recursive-state get
         infer-quot
     ] if
 ] "infer" set-word-prop
@@ -76,7 +77,8 @@ M: object infer-call
 \ if [
     3 ensure-values
     2 d-tail [ special? ] contains? [
-        [ rot [ drop call ] [ nip call ] if ] infer-quot
+        [ rot [ drop call ] [ nip call ] if ]
+        recursive-state get infer-quot
     ] [
         [ #values ]
         2 #drop node, pop-d pop-d swap 2array
