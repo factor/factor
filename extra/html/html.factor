@@ -1,9 +1,42 @@
 ! Copyright (C) 2004, 2006 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: generic assocs help http io io.styles io.files io.streams.string
-kernel math math.parser namespaces xml.writer quotations
-assocs sequences strings words html.elements ;
+USING: generic assocs help http io io.styles io.files
+io.streams.string kernel math math.parser namespaces
+quotations assocs sequences strings words html.elements
+xml.writer sbufs ;
 IN: html
+
+GENERIC: browser-link-href ( presented -- href )
+
+M: object browser-link-href drop f ;
+
+TUPLE: html-stream ;
+
+: <html-stream> ( stream -- stream )
+    html-stream construct-delegate ;
+
+<PRIVATE
+
+TUPLE: html-sub-stream style stream ;
+
+: (html-sub-stream) ( style stream -- stream )
+    html-sub-stream construct-boa
+    512 <sbuf> <html-stream> over set-delegate ;
+
+: <html-sub-stream> ( style stream class -- stream )
+    >r (html-sub-stream) r> construct-delegate ; inline
+
+: end-sub-stream ( substream -- string style stream )
+    dup delegate >string
+    over html-sub-stream-style
+    rot html-sub-stream-stream ;
+
+: delegate-write ( string -- )
+    stdio get delegate stream-write ;
+
+: object-link-tag ( style quot -- )
+    presented pick at browser-link-href
+    [ <a =href a> call </a> ] [ call ] if* ; inline
 
 : hex-color, ( triplet -- )
     3 head-slice
@@ -28,166 +61,149 @@ IN: html
 : font-css, ( font -- )
     "font-family: " % % "; " % ;
 
-: hash-apply ( value-hash quot-hash -- )
-    #! Looks up the key of each pair in the first list in the
-    #! second list to produce a quotation. The quotation is
-    #! applied to the value of the pair. If there is no
-    #! corresponding quotation, the value is popped off the
-    #! stack.
-    [ swapd at dup [ call ] [ 2drop ] if ] curry assoc-each ;
+: apply-style ( style key quot -- style gadget )
+    >r over at r> when* ; inline
+
+: make-css ( style quot -- str )
+    "" make nip ; inline
 
 : span-css-style ( style -- str )
     [
-        H{
-            { foreground  [ fg-css,        ] }
-            { background  [ bg-css,        ] }
-            { font        [ font-css,      ] }
-            { font-style  [ style-css,     ] }
-            { font-size   [ size-css,      ] }
-        } hash-apply
-    ] "" make ;
+        foreground [ fg-css,    ] apply-style
+        background [ bg-css,    ] apply-style
+        font       [ font-css,  ] apply-style
+        font-style [ style-css, ] apply-style
+        font-size  [ size-css,  ] apply-style
+    ] make-css ;
 
 : span-tag ( style quot -- )
     over span-css-style dup empty? [
         drop call
     ] [
         <span =style span> call </span>
-    ] if ;
+    ] if ; inline
+
+: format-html-span ( string style stream -- )
+    [
+        [ [ drop delegate-write ] span-tag ] object-link-tag
+    ] with-stream* ;
+
+TUPLE: html-span-stream ;
+
+M: html-span-stream stream-close
+    end-sub-stream format-html-span ;
 
 : border-css, ( border -- )
     "border: 1px solid #" % hex-color, "; " % ;
 
 : padding-css, ( padding -- ) "padding: " % # "px; " % ;
 
-: pre-css, ( -- )
-    "white-space: pre; font-family: monospace; " % ;
+: pre-css, ( margin -- )
+    [ "white-space: pre; font-family: monospace; " % ] unless ;
 
 : div-css-style ( style -- str )
     [
-        H{
-            { page-color [ bg-css, ] }
-            { border-color [ border-css, ] }
-            { border-width [ padding-css, ] }
-            { wrap-margin [ [ pre-css, ] unless ] }
-        } hash-apply
-    ] "" make ;
+        page-color   [ bg-css,      ] apply-style
+        border-color [ border-css,  ] apply-style
+        border-width [ padding-css, ] apply-style
+        wrap-margin  [ pre-css,     ] apply-style
+    ] make-css ;
 
 : div-tag ( style quot -- )
     swap div-css-style dup empty? [
         drop call
     ] [
         <div =style div> call </div>
-    ] if ;
+    ] if ; inline
 
-: do-escaping ( string style -- string )
-    html swap at [ chars>entities ] unless ;
-
-GENERIC: browser-link-href ( presented -- href )
-
-M: object browser-link-href drop f ;
-
-: object-link-tag ( style quot -- )
-    presented pick at browser-link-href
-    [ <a =href a> call </a> ] [ call ] if* ;
-
-TUPLE: nested-stream ;
-
-: <nested-stream> ( stream -- stream )
-    nested-stream construct-delegate ;
-
-M: nested-stream stream-close drop ;
-
-TUPLE: html-stream ;
-
-: <html-stream> ( stream -- stream )
-    html-stream construct-delegate ;
-
-M: html-stream stream-write1 ( char stream -- )
-    >r 1string r> stream-write ;
-
-: delegate-write delegate stream-write ;
-
-M: html-stream stream-write ( str stream -- )
-    >r chars>entities r> delegate-write ;
-
-: with-html-style ( quot style stream -- )
-    [ [ swap span-tag ] object-link-tag ] with-stream* ; inline
-
-M: html-stream with-stream-style ( quot style stream -- )
-    [ drop call ] -rot with-html-style ;
-
-M: html-stream stream-format ( str style stream -- )
-    [ do-escaping stdio get delegate-write ] -rot
-    with-html-style ;
-
-: with-html-stream ( quot -- )
-    stdio get <html-stream> swap with-stream* ;
-
-M: html-stream with-nested-stream ( quot style stream -- )
+: format-html-div ( string style stream -- )
     [
-        [
-            [
-                stdio get <nested-stream> swap with-stream*
-            ] div-tag
-        ] object-link-tag
+        [ [ delegate-write ] div-tag ] object-link-tag
     ] with-stream* ;
+
+TUPLE: html-block-stream ;
+
+M: html-block-stream stream-close ( quot style stream -- )
+    end-sub-stream format-html-div ;
 
 : border-spacing-css,
     "padding: " % first2 max 2 /i # "px; " % ;
 
 : table-style ( style -- str )
     [
-        H{
-            { table-border [ border-css,         ] }
-            { table-gap    [ border-spacing-css, ] }
-        } hash-apply
-    ] "" make ;
+        table-border [ border-css,         ] apply-style
+        table-gap    [ border-spacing-css, ] apply-style
+    ] make-css ;
 
 : table-attrs ( style -- )
     table-style " border-collapse: collapse;" append =style ;
+
+: do-escaping ( string style -- string )
+    html swap at [ chars>entities ] unless ;
+
+PRIVATE>
+
+! Stream protocol
+M: html-stream stream-write1 ( char stream -- )
+    >r 1string r> stream-write ;
+
+M: html-stream stream-write ( str stream -- )
+    >r chars>entities r> delegate stream-write ;
+
+M: html-stream make-span-stream ( style stream -- stream' )
+    html-span-stream <html-sub-stream> ;
+
+M: html-stream stream-format ( str style stream -- )
+    >r html over at [ >r chars>entities r> ] unless r>
+    format-html-span ;
+
+M: html-stream make-block-stream ( style stream -- stream' )
+    html-block-stream <html-sub-stream> ;
 
 M: html-stream stream-write-table ( grid style stream -- )
     [
         <table dup table-attrs table> swap [
             <tr> [
                 <td "top" =valign swap table-style =style td>
-                    write-html
+                    >string write-html
                 </td>
             ] curry* each </tr>
         ] curry* each </table>
     ] with-stream* ;
 
-M: html-stream make-table-cell ( quot style stream -- table-cell )
-    2drop [ with-html-stream ] string-out ;
+M: html-stream make-cell-stream ( style stream -- stream' )
+    (html-sub-stream) ;
 
-M: html-stream stream-nl [ <br/> ] with-stream* ;
+M: html-stream stream-nl ( stream -- )
+    [ <br/> ] with-stream* ;
 
-: default-css ( -- )
-    <link
-    "stylesheet" =rel "text/css" =type
-    "/responder/resources/stylesheet.css" =href
-    link/> ;
+! Utilities
+: with-html-stream ( quot -- )
+    stdio get <html-stream> swap with-stream* ;
 
 : xhtml-preamble
     "<?xml version=\"1.0\"?>" write-html
     "<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Strict//EN\" \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd\">" write-html ;
 
-: html-document* ( body-quot head-quot -- )
+: html-document ( body-quot head-quot -- )
     #! head-quot is called to produce output to go
     #! in the html head portion of the document.
     #! body-quot is called to produce output to go
     #! in the html body portion of the document.
     xhtml-preamble
-    <html " xmlns=\"http://www.w3.org/1999/xhtml\" xml:lang=\"en\" lang=\"en\"" write-html html>
+    <html "http://www.w3.org/1999/xhtml" =xmlns "en" =xml:lang "en" =lang html>
         <head> call </head>
         <body> call </body>
     </html> ;
-  
-: html-document ( title quot -- )
+
+: default-css ( -- )
+    <link
+    "stylesheet" =rel "text/css" =type
+    "/responder/resources/extra/html/stylesheet.css" =href
+    link/> ;
+
+: simple-html-document ( title quot -- )
     swap [
         <title> write </title>
         default-css
-    ] html-document* ;
-
-: simple-html-document ( title quot -- )
-    swap [ <pre> with-html-stream </pre> ] html-document ;
+    ] html-document ;

@@ -34,8 +34,13 @@ bool jit_stack_frame_p(F_ARRAY *array)
 	return false;
 }
 
-void jit_compile(F_QUOTATION *quot)
+FASTCALL CELL jit_compile(CELL tagged, F_STACK_FRAME *stack)
 {
+	stack_chain->callstack_top = stack;
+
+	REGISTER_ROOT(tagged);
+
+	F_QUOTATION *quot = untag_quotation(tagged);
 	F_ARRAY *array = untag_object(quot->array);
 
 	REGISTER_UNTAGGED(quot);
@@ -150,21 +155,10 @@ void jit_compile(F_QUOTATION *quot)
 
 	UNREGISTER_UNTAGGED(quot);
 	quot->xt = xt;
-}
+	quot->compiled = T;
 
-void jit_compile_all(void)
-{
-	begin_scan();
-
-	CELL obj;
-	while((obj = next_object()) != F)
-	{
-		if(type_of(obj) == QUOTATION_TYPE)
-			jit_compile(untag_quotation(obj));
-	}
-
-	/* End the scan */
-	gc_off = false;
+	UNREGISTER_ROOT(tagged);
+	return tagged;
 }
 
 XT quot_offset_to_pc(F_QUOTATION *quot, F_FIXNUM offset)

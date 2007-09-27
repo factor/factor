@@ -194,6 +194,8 @@ typedef struct {
 	CELL header;
 	/* tagged */
 	CELL array;
+	/* tagged */
+	CELL compiled;
 	/* untagged */
 	XT xt;
 } F_QUOTATION;

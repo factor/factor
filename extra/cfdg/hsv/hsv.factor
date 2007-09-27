@@ -1,5 +1,5 @@
 
-USING: kernel combinators arrays sequences math ;
+USING: kernel combinators arrays sequences math combinators.lib ;
 
 IN: cfdg.hsv
 
@@ -15,13 +15,13 @@ IN: cfdg.hsv
 
 : Hi ( hsv -- Hi ) H 60 / floor 6 mod ;
 
-: f ( hsv -- f ) dup H 60 / swap Hi - ;
+: f ( hsv -- f ) [ H 60 / ] [ Hi ] bi - ;
 
-: p ( hsv -- p ) 1 over S - swap V * ;
+: p ( hsv -- p ) [ S 1 swap - ] [ V ] bi * ;
 
-: q ( hsv -- q ) dup f over S * 1 swap - swap V * ;
+: q ( hsv -- q ) [ [ f ] [ S ] bi * 1 swap - ] [ V ] bi * ;
 
-: t ( hsv -- t ) 1 over f - over S * 1 swap - swap V * ;
+: t ( hsv -- t ) [ [ f 1 swap - ] [ S ] bi * 1 swap - ] [ V ] bi * ;
 
 PRIVATE>
 
@@ -31,9 +31,9 @@ PRIVATE>
 
 : hsv>rgb ( hsv -- rgb )
 dup Hi
-{ { 0 [ dup V swap dup t swap p ] }
-  { 1 [ dup q over V rot p ] }
-  { 2 [ dup p over V rot t ] }
-  { 3 [ dup p over q rot V ] }
-  { 4 [ dup t over p rot V ] }
-  { 5 [ dup V over p rot q ] } } case 3array ;
+{ { 0 [ [ V ] [ t ] [ p ] tri ] }
+  { 1 [ [ q ] [ V ] [ p ] tri ] }
+  { 2 [ [ p ] [ V ] [ t ] tri ] }
+  { 3 [ [ p ] [ q ] [ V ] tri ] }
+  { 4 [ [ t ] [ p ] [ V ] tri ] }
+  { 5 [ [ V ] [ p ] [ q ] tri ] } } case 3array ;

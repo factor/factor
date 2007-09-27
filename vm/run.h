@@ -145,7 +145,7 @@ INLINE CELL type_of(CELL tagged)
 DEFPUSHPOP(d,ds)
 DEFPUSHPOP(r,rs)
 
-void update_xt(F_WORD* word);
+XT default_word_xt(F_WORD *word);
 
 DECLARE_PRIMITIVE(execute);
 DECLARE_PRIMITIVE(call);

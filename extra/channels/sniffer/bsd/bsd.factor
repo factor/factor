@@ -3,7 +3,7 @@
 !
 ! Wrap a sniffer in a channel
 USING: kernel channels channels.sniffer concurrency io
-io.sniffer io.sniffer.bsd ;
+io.sniffer io.sniffer.bsd io.unix.backend ;
 
 M: unix-io sniff-channel ( -- channel ) 
   "/dev/bpf0" "en1" <sniffer-spec> <sniffer> <channel> [

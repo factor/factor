@@ -10,7 +10,7 @@ IN: webapps.help
     serving-html
     dup article-title [
         [ help ] with-html-stream
-    ] html-document ;
+    ] simple-html-document ;
 
 : string>topic ( string -- topic )
     " " split dup length 1 = [ first ] when ;
@@ -73,9 +73,10 @@ M: vocab-author browser-link-href
 "help" "show-help" "extra/webapps/help" web-app
 
 ! Hard-coding for factorcode.org
-M: pathname browser-link-href
-    pathname-string "resource:" ?head [
-        "http://factorcode.org/repos/Factor/" swap append
-    ] [
-        drop f
-    ] if ;
+PREDICATE: pathname resource-pathname
+    pathname-string "resource:" head? ;
+
+M: resource-pathname browser-link-href
+    pathname-string
+    "resource:" ?head drop
+    "/responder/resources/" swap append ;

@@ -7,7 +7,7 @@ IN: http
 : header-line ( line -- )
     ": " split1 dup [ swap set ] [ 2drop ] if ;
 
-: (read-header) ( hash -- hash )
+: (read-header) ( -- )
     readln dup
     empty? [ drop ] [ header-line (read-header) ] if ;
 

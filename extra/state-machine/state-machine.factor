@@ -1,5 +1,5 @@
-USING: kernel parser strings math namespaces sequences words io arrays 
-quotations debugger kernel.private ;
+USING: kernel parser strings math namespaces sequences words io
+arrays quotations debugger kernel.private combinators.private ;
 IN: state-machine
 
 : STATES:

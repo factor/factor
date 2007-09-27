@@ -118,18 +118,18 @@ SYMBOL: model
 
 : render-page* ( model body-template head-template -- )
     [
-        [ render-template ] [ f rot render-template ] html-document* 
+        [ render-template ] [ f rot render-template ] html-document 
     ] serve-html ;
 
 : render-titled-page* ( model body-template head-template title -- )
     [ 
-        [ render-template ] swap [ <title> write </title> f rot render-template ] curry html-document* 
+        [ render-template ] swap [ <title> write </title> f rot render-template ] curry html-document
     ] serve-html ;
 
 
 : render-page ( model template title -- )
     [
-        [ render-template ] html-document
+        [ render-template ] simple-html-document
     ] serve-html ;
 
 : web-app ( name default path -- )
