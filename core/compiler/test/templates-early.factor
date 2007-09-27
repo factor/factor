@@ -8,7 +8,7 @@ namespaces sequences words kernel math effects ;
     
     [ V{ 3 } ] [ 3 fresh-object fresh-objects get ] unit-test
     
-    [ ] [ 0 <int-vreg> phantom-d get phantom-push ] unit-test
+    [ ] [ 0 <int-vreg> phantom-push ] unit-test
     
     [ ] [ compute-free-vregs ] unit-test
     
@@ -17,7 +17,7 @@ namespaces sequences words kernel math effects ;
     [ f ] [
         [
             copy-templates
-            1 <int-vreg> phantom-d get phantom-push
+            1 <int-vreg> phantom-push
             compute-free-vregs
             1 <int-vreg> T{ int-regs } free-vregs member?
         ] with-scope

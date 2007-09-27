@@ -62,6 +62,25 @@ GENERIC: alien-node-abi ( node -- str )
     call
     f set-stack-frame ; inline
 
+GENERIC: reg-size ( register-class -- n )
+
+M: int-regs reg-size drop cell ;
+
+M: float-regs reg-size float-regs-size ;
+
+GENERIC: inc-reg-class ( register-class -- )
+
+: (inc-reg-class)
+    dup class inc
+    fp-shadows-int? [ reg-size stack-params +@ ] [ drop ] if ;
+
+M: int-regs inc-reg-class
+    (inc-reg-class) ;
+
+M: float-regs inc-reg-class
+    dup (inc-reg-class)
+    fp-shadows-int? [ reg-size 4 / int-regs +@ ] [ drop ] if ;
+
 : reg-class-full? ( class -- ? )
     dup class get swap param-regs length >= ;
 

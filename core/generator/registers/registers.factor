@@ -2,9 +2,16 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: arrays assocs classes classes.private combinators
 cpu.architecture generator.fixup generic hashtables
-inference.dataflow kernel kernel.private layouts math memory
-namespaces quotations sequences system vectors words ;
+inference.dataflow inference.stack kernel kernel.private layouts
+math memory namespaces quotations sequences system vectors words
+effects ;
 IN: generator.registers
+
+SYMBOL: +input+
+SYMBOL: +output+
+SYMBOL: +scratch+
+SYMBOL: +clobber+
+SYMBOL: known-tag
 
 ! A scratch register for computations
 TUPLE: vreg n ;
@@ -24,44 +31,7 @@ TUPLE: temp-reg ;
 
 : temp-reg T{ temp-reg T{ int-regs } } ;
 
-: %move ( dst src -- )
-    2dup = [
-        2drop
-    ] [
-        2dup [ delegate class ] 2apply 2array {
-            { { int-regs int-regs } [ %move-int>int ] }
-            { { float-regs int-regs } [ %move-int>float ] }
-            { { int-regs float-regs } [ %move-float>int ] }
-        } case
-    ] if ;
-
-GENERIC: reg-size ( register-class -- n )
-
-GENERIC: inc-reg-class ( register-class -- )
-
-M: int-regs reg-size drop cell ;
-
-: (inc-reg-class)
-    dup class inc
-    fp-shadows-int? [ reg-size stack-params +@ ] [ drop ] if ;
-
-M: int-regs inc-reg-class
-    (inc-reg-class) ;
-
-M: float-regs reg-size float-regs-size ;
-
-M: float-regs inc-reg-class
-    dup (inc-reg-class)
-    fp-shadows-int? [ reg-size 4 / int-regs +@ ] [ drop ] if ;
-
 M: vreg v>operand dup vreg-n swap vregs nth ;
-
-: reg-spec>class ( spec -- class )
-    float eq?
-    T{ float-regs f 8 } T{ int-regs } ? ;
-
-SYMBOL: phantom-d
-SYMBOL: phantom-r
 
 ! A data stack location.
 TUPLE: ds-loc n ;
@@ -73,9 +43,17 @@ TUPLE: rs-loc n ;
 
 C: <rs-loc> rs-loc
 
+<PRIVATE
+
 UNION: loc ds-loc rs-loc ;
 
+! A compile-time stack
 TUPLE: phantom-stack height ;
+
+GENERIC: finalize-height ( stack -- )
+
+SYMBOL: phantom-d
+SYMBOL: phantom-r
 
 : <phantom-stack> ( class -- stack )
     >r
@@ -83,10 +61,6 @@ TUPLE: phantom-stack height ;
     { set-delegate set-phantom-stack-height }
     phantom-stack construct
     r> construct-delegate ;
-
-GENERIC: finalize-height ( stack -- )
-
-GENERIC: <loc> ( n stack -- loc )
 
 : (loc)
     #! Utility for methods on <loc>
@@ -101,6 +75,8 @@ GENERIC: <loc> ( n stack -- loc )
         dup zero? [ 2drop ] [ swap execute ] if
         0
     ] keep set-phantom-stack-height ; inline
+
+GENERIC: <loc> ( n stack -- loc )
 
 TUPLE: phantom-datastack ;
 
@@ -137,16 +113,13 @@ M: phantom-retainstack finalize-height
 : adjust-phantom ( n phantom -- )
     [ phantom-stack-height + ] keep set-phantom-stack-height ;
 
-: phantom-push ( obj stack -- )
-    1 over adjust-phantom push ;
-
-: phantom-append ( seq stack -- )
-    over length over adjust-phantom push-all ;
-
 GENERIC: cut-phantom ( n phantom -- seq )
 
 M: phantom-stack cut-phantom
     [ delegate cut* swap ] keep set-delegate ;
+
+: phantom-append ( seq stack -- )
+    over length over adjust-phantom push-all ;
 
 : phantom-input ( n phantom -- seq )
     [
@@ -159,6 +132,26 @@ M: phantom-stack cut-phantom
             delete-all
         ] if
     ] 2keep >r neg r> adjust-phantom ;
+
+PRIVATE>
+
+: phantom-push ( obj -- )
+    1 phantom-d get adjust-phantom
+    phantom-d get push ;
+
+: phantom-shuffle ( shuffle -- )
+    [ effect-in length phantom-d get phantom-input ] keep
+    shuffle* phantom-d get phantom-append ;
+
+: phantom->r ( n -- )
+    phantom-d get phantom-input
+    phantom-r get phantom-append ;
+
+: phantom-r> ( n -- )
+    phantom-r get phantom-input
+    phantom-d get phantom-append ;
+
+<PRIVATE
 
 : phantoms ( -- phantom phantom ) phantom-d get phantom-r get ;
 
@@ -195,10 +188,6 @@ UNION: pseudo loc value ;
 ! are guaranteed to be in the nursery
 SYMBOL: fresh-objects
 
-: fresh-object ( obj -- ) fresh-objects get push ;
-
-: fresh-object? ( obj -- ? ) fresh-objects get memq? ;
-
 ! Computing free registers and initializing allocator
 : free-vregs ( reg-class -- seq )
     #! Free vregs in a given register class
@@ -217,24 +206,24 @@ SYMBOL: fresh-objects
     [ 2dup (compute-free-vregs) ] H{ } map>assoc \ free-vregs set
     drop ;
 
-: init-templates ( -- )
-    #! Initialize register allocator.
-    V{ } clone fresh-objects set
-    <phantom-datastack> phantom-d set
-    <phantom-retainstack> phantom-r set
-    compute-free-vregs ;
-
-: copy-templates ( -- )
-    #! Copies register allocator state, used when compiling
-    #! branches.
-    fresh-objects [ clone ] change
-    phantom-d [ clone ] change
-    phantom-r [ clone ] change
-    compute-free-vregs ;
+: reg-spec>class ( spec -- class )
+    float eq?
+    T{ float-regs f 8 } T{ int-regs } ? ;
 
 ! Copying vregs to stacks
 : alloc-vreg ( spec -- vreg )
     reg-spec>class free-vregs pop ;
+
+: %move ( dst src -- )
+    2dup = [
+        2drop
+    ] [
+        2dup [ delegate class ] 2apply 2array {
+            { { int-regs int-regs } [ %move-int>int ] }
+            { { float-regs int-regs } [ %move-int>float ] }
+            { { int-regs float-regs } [ %move-float>int ] }
+        } case
+    ] if ;
 
 : vreg>vreg ( vreg spec -- vreg )
     alloc-vreg dup rot %move ;
@@ -382,13 +371,6 @@ M: object template-rhs ;
     %prepare-alien-invoke
     "simple_gc" f %alien-invoke ;
 
-: end-basic-block ( -- )
-    #! Commit all deferred stacking shuffling, and ensure the
-    #! in-memory data and retain stacks are up to date with
-    #! respect to the compiler's current picture.
-    finalize-contents finalize-heights
-    fresh-objects get dup empty? swap delete-all [ %gc ] unless ;
-
 ! Loading stacks to vregs
 : free-vregs# ( -- int# float# )
     T{ int-regs } T{ float-regs f 8 } 
@@ -432,11 +414,6 @@ M: object template-rhs ;
     ] [
         dup length phantom-d get phantom-input swap lazy-load
     ] if ;
-
-SYMBOL: +input+
-SYMBOL: +output+
-SYMBOL: +scratch+
-SYMBOL: +clobber+
 
 : output-vregs ( -- seq seq )
     +output+ +clobber+ [ get [ get ] map ] 2apply ;
@@ -489,11 +466,6 @@ SYMBOL: +clobber+
 : template-outputs ( -- )
     +output+ get [ get ] map phantom-d get phantom-append ;
 
-: with-template ( quot hash -- )
-    clone [ template-inputs call template-outputs ] bind
-    compute-free-vregs ;
-    inline
-
 : value-matches? ( value spec -- ? )
     #! If the spec is a quotation and the value is a literal
     #! fixnum, see if the quotation yields true when applied
@@ -519,8 +491,6 @@ SYMBOL: +clobber+
         dup length 1 = [ first tag-number ] [ drop f ] if
     ] if ;
 
-SYMBOL: known-tag
-
 : class-match? ( actual expected -- ? )
     {
         { f [ drop t ] }
@@ -544,6 +514,39 @@ SYMBOL: known-tag
 : (find-template) ( templates -- pair/f )
     #! Depends on node@
     [ second template-matches? ] find nip ;
+
+PRIVATE>
+
+: end-basic-block ( -- )
+    #! Commit all deferred stacking shuffling, and ensure the
+    #! in-memory data and retain stacks are up to date with
+    #! respect to the compiler's current picture.
+    finalize-contents finalize-heights
+    fresh-objects get dup empty? swap delete-all [ %gc ] unless ;
+
+: with-template ( quot hash -- )
+    clone [ template-inputs call template-outputs ] bind
+    compute-free-vregs ;
+    inline
+
+: fresh-object ( obj -- ) fresh-objects get push ;
+
+: fresh-object? ( obj -- ? ) fresh-objects get memq? ;
+
+: init-templates ( -- )
+    #! Initialize register allocator.
+    V{ } clone fresh-objects set
+    <phantom-datastack> phantom-d set
+    <phantom-retainstack> phantom-r set
+    compute-free-vregs ;
+
+: copy-templates ( -- )
+    #! Copies register allocator state, used when compiling
+    #! branches.
+    fresh-objects [ clone ] change
+    phantom-d [ clone ] change
+    phantom-r [ clone ] change
+    compute-free-vregs ;
 
 : find-template ( templates -- pair/f )
     #! Pair has shape { quot hash }

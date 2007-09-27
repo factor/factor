@@ -228,7 +228,7 @@ M: #dispatch generate-node
     "true" resolve-label
     t "if-scratch" get load-literal
     "end" resolve-label
-    "if-scratch" get phantom-d get phantom-push ; inline
+    "if-scratch" get phantom-push ; inline
 
 : define-if>boolean-intrinsics ( word intrinsics -- )
     [
@@ -281,26 +281,20 @@ M: #call-label generate-node node-param generate-call ;
 UNION: immediate fixnum POSTPONE: f ;
 
 M: #push generate-node
-    node-out-d phantom-d get phantom-append iterate-next ;
+    node-out-d [ phantom-push ] each iterate-next ;
 
 ! #shuffle
-: phantom-shuffle ( shuffle -- )
-    [ effect-in length phantom-d get phantom-input ] keep
-    shuffle* phantom-d get phantom-append ;
-
 M: #shuffle generate-node
     node-shuffle phantom-shuffle iterate-next ;
 
 M: #>r generate-node
     node-in-d length
-    phantom-d get phantom-input
-    phantom-r get phantom-append
+    phantom->r
     iterate-next ;
 
 M: #r> generate-node
     node-out-d length
-    phantom-r get phantom-input
-    phantom-d get phantom-append
+    phantom-r>
     iterate-next ;
 
 ! #return
