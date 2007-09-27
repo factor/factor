@@ -360,6 +360,7 @@ cell 8 = [
 [ 3 ] [ B{ 1 2 3 4 5 } 2 [ { simple-c-ptr fixnum } declare alien-unsigned-1 ] compile-1 ] unit-test
 
 [ ] [ B{ 1 2 3 4 5 } malloc-byte-array "b" set ] unit-test
+[ t ] [ "b" get >boolean ] unit-test
 
 "b" get [
     [ 3 ] [ "b" get 2 [ alien-unsigned-1 ] compile-1 ] unit-test
