@@ -26,6 +26,7 @@ spike
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 : run ( -- )
+[ ] >background
 { -40 80 -40 80 } viewport set
 0.1 threshold set
 [ snowflake ] start-shape set

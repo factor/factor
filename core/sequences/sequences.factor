@@ -191,14 +191,14 @@ TUPLE: slice from to seq ;
 TUPLE: slice-error reason ;
 : slice-error ( str -- * ) \ slice-error construct-boa throw ;
 
-: check-slice ( from to seq -- )
+: check-slice ( from to seq -- from to seq )
     pick 0 < [ "start < 0" slice-error ] when
-    length over < [ "end > sequence" slice-error ] when
-    > [ "start > end" slice-error ] when ;
+    dup length pick < [ "end > sequence" slice-error ] when
+    pick pick > [ "start > end" slice-error ] when ;
 
 : <slice> ( from to seq -- slice )
     dup slice? [ collapse-slice ] when
-    3dup check-slice
+    check-slice
     slice construct-boa ;
 
 M: slice virtual-seq slice-seq ;
@@ -259,7 +259,7 @@ INSTANCE: repetition immutable-sequence
 PRIVATE>
 
 : subseq ( from to seq -- subseq )
-    [ 3dup check-slice prepare-subseq (copy) ] keep like ;
+    [ check-slice prepare-subseq (copy) ] keep like ;
 
 : head ( seq n -- headseq ) (head) subseq ;
 
@@ -525,7 +525,7 @@ M: sequence <=>
     ] if ;
 
 : delete-slice ( from to seq -- )
-    3dup check-slice >r over >r - r> r> open-slice ;
+    check-slice >r over >r - r> r> open-slice ;
 
 : delete-nth ( n seq -- )
     >r dup 1+ r> delete-slice ;

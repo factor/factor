@@ -553,7 +553,7 @@ CELL collect_next(CELL scan)
 		break;
 	case QUOTATION_TYPE:
 		quot = (F_QUOTATION *)scan;
-		if(collecting_code && quot->xt != NULL)
+		if(collecting_code && quot->xt != lazy_jit_compile)
 			recursive_mark(quot->xt);
 		break;
 	case CALLSTACK_TYPE:

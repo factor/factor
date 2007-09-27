@@ -5,6 +5,7 @@
 #define XT_REG %rcx
 #define STACK_REG %rsp
 #define DS_REG %r14
+#define RETURN_REG %rax
 
 #define CELL_SIZE 8
 
@@ -20,7 +21,7 @@
 	pop %rbp ; \
 	pop %rbx
 
-#define QUOT_XT_OFFSET 13
+#define QUOT_XT_OFFSET 21
 #define PROFILING_OFFSET 53
 #define WORD_DEF_OFFSET 29
 #define WORD_XT_OFFSET 61

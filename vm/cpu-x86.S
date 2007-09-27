@@ -51,3 +51,15 @@ DEF(FASTCALL void,primitive_execute,(void)):
 DEF(FASTCALL void,throw_impl,(CELL quot, F_STACK_FRAME *rewind_to)):
 	mov ARG1,STACK_REG                    /* rewind_to */
 	JUMP_QUOT
+
+DEF(FASTCALL void,lazy_jit_compile,(CELL quot)):
+	mov STACK_REG,ARG1           /* Save stack pointer */
+	push XT_REG                  /* Alignment */
+	push XT_REG
+	push XT_REG
+	call MANGLE(jit_compile)
+	mov RETURN_REG,ARG0          /* No-op on 32-bit */
+	pop XT_REG                   /* OK to clobber XT_REG here */
+	pop XT_REG
+	pop XT_REG
+        JUMP_QUOT                    /* Call the quotation */

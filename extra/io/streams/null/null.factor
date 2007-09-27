@@ -16,7 +16,10 @@ M: null-stream stream-write 2drop ;
 M: null-stream stream-nl drop ;
 M: null-stream stream-flush drop ;
 M: null-stream stream-format 3drop ;
-M: null-stream with-nested-stream rot drop with-stream* ;
+M: null-stream make-span-stream nip ;
+M: null-stream make-block-stream nip ;
+M: null-stream make-cell-stream nip ;
+M: null-stream stream-write-table 3drop ;
 
 : with-null-stream ( quot -- )
     T{ null-stream } swap with-stream* ; inline

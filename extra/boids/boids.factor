@@ -56,7 +56,7 @@ VAR: separation-radius
 ! random-boid and random-boids
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-: random-range ( a b -- n ) 1 + dupd swap - random + ;
+: random-range ( a b -- n ) 1+ over - random + ;
 
 : random-pos ( -- pos ) world-size> [ random ] map ;
 
@@ -68,7 +68,7 @@ VAR: separation-radius
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-: distance ( boid boid -- n ) boid-pos swap boid-pos v- norm ;
+: distance ( boid boid -- n ) [ boid-pos ] [ boid-pos ] bi* v- norm ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
@@ -79,7 +79,7 @@ VAR: separation-radius
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-: relative-position ( self other -- v ) boid-pos swap boid-pos v- ;
+: relative-position ( self other -- v ) swap [ boid-pos ] 2apply v- ;
 
 : relative-angle ( self other -- angle )
 over boid-vel -rot relative-position angle-between ;
@@ -88,7 +88,7 @@ over boid-vel -rot relative-position angle-between ;
 
 : vsum ( vector-of-vectors -- vec ) { 0 0 } [ v+ ] reduce ;
 
-: vaverage ( seq-of-vectors -- seq ) dup vsum swap length v/n ;
+: vaverage ( seq-of-vectors -- seq ) [ vsum ] [ length ] bi v/n ;
 
 : average-position ( boids -- pos ) [ boid-pos ] map vaverage ;
 
@@ -204,14 +204,14 @@ cond ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-: new-pos ( boid -- pos ) dup boid-vel time-slice> v*n swap boid-pos v+ ;
+: new-pos ( boid -- pos ) [ boid-pos ] [ boid-vel time-slice> v*n ] bi v+ ;
 
 : new-vel ( boid -- vel )
-dup acceleration time-slice> v*n swap boid-vel v+ normalize* ;
+  [ boid-vel ] [ acceleration time-slice> v*n ] bi v+ normalize* ;
 
 : wrap-pos ( pos -- pos ) { [ wrap-x ] [ wrap-y ] } parallel-call ;
 
-: iterate-boid ( self -- self ) dup >r new-pos wrap-pos r> new-vel <boid> ;
+: iterate-boid ( self -- self ) [ new-pos wrap-pos ] [ new-vel ] bi <boid> ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 

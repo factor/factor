@@ -97,6 +97,7 @@ iterate? [
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 : run ( -- )
+[ ] >background
 { -5 25 -15 25 } viewport set
 0.03 threshold set
 [ toc ] start-shape set

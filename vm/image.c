@@ -154,17 +154,17 @@ void fixup_word(F_WORD *word)
 {
 	/* If this is a compiled word, relocate the code pointer. Otherwise,
 	reset it based on the primitive number of the word. */
-	if(word->compiledp != F)
-		code_fixup(&word->xt);
+	if(word->compiledp == F)
+		word->xt = default_word_xt(word);
 	else
-		update_xt(word);
+		code_fixup(&word->xt);
 }
 
 void fixup_quotation(F_QUOTATION *quot)
 {
-	/* quot->xt is only ever NULL at the start of stage2 bootstrap,
-	in this case the JIT compiles all quotations */
-	if(quot->xt)
+	if(quot->compiled == F)
+		quot->xt = lazy_jit_compile;
+	else
 		code_fixup(&quot->xt);
 }
 

@@ -36,7 +36,7 @@ IN: bootstrap.image
 : wrapper@ bootstrap-cell object tag-number - ;
 : word-xt@ 8 bootstrap-cells object tag-number - ;
 : quot-array@ bootstrap-cell object tag-number - ;
-: quot-xt@ 2 bootstrap-cells object tag-number - ;
+: quot-xt@ 3 bootstrap-cells object tag-number - ;
 
 ! The image being constructed; a vector of word-size integers
 SYMBOL: image
@@ -312,6 +312,7 @@ M: quotation '
         quotation-array '
         quotation type-number object tag-number [
             emit ! array
+            f ' emit ! compiled?
             0 emit ! XT
         ] emit-object
     ] cache ;

@@ -1,8 +1,9 @@
 ! Copyright (C) 2004, 2006 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: calendar html io io.files kernel math math.parser http.server.responders
-http.server.templating namespaces parser sequences strings assocs hashtables
-debugger http.mime sorting ;
+USING: calendar html io io.files kernel math math.parser
+http.server.responders http.server.templating namespaces parser
+sequences strings assocs hashtables debugger http.mime sorting
+html.elements ;
 
 IN: http.server.responders.file
 
@@ -55,19 +56,25 @@ SYMBOL: page
     dup mime-type dup "application/x-factor-server-page" =
     [ drop serving-html run-page ] [ serve-static ] if ;
 
-: file. ( path name dirp -- )
-    "[DIR] " "      " ? write
-    dup <pathname> write-object nl ;
+: file. ( name dirp -- )
+    [ "/" append ] when
+    dup <a =href a> write </a> ;
 
-: directory. ( path -- )
-    directory sort-keys [ first2 file. ] each ;
+: directory. ( path request -- )
+    dup [
+        <h1> write </h1>
+        <ul>
+            directory sort-keys
+            [ <li> file. </li> ] assoc-each
+        </ul>
+    ] simple-html-document ;
 
 : list-directory ( directory -- )
     serving-html
      "method" get "head" = [
         drop
     ] [
-        "request" get [ directory. ] simple-html-document
+        "request" get directory.
     ] if ;
 
 : find-index ( filename -- path )
@@ -98,17 +105,17 @@ SYMBOL: page
     ] if ;
 
 global [
-    ! Javascript source used by ajax libraries
+    ! Serve up our own source code
     "resources" [ 
         [
-            "extra/http/server/resources/" resource-path "doc-root" set
+            "" resource-path "doc-root" set
             file-responder
         ] with-scope
     ] add-simple-responder
     
     ! Serves files from a directory stored in the "doc-root"
-    ! variable. You can set the variable in the global namespace,
-    ! or inside the responder.
+    ! variable. You can set the variable in the global
+    ! namespace, or inside the responder.
     "file" [ file-responder ] add-simple-responder
     
     ! The root directory is served by...

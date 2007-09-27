@@ -4,7 +4,8 @@
 USING: kernel namespaces sequences sequences.private assocs
        math inference.transforms parser words quotations debugger
        macros arrays macros splitting combinators prettyprint.backend
-       definitions prettyprint hashtables combinators.lib ;
+       definitions prettyprint hashtables combinators.lib
+       prettyprint.sections ;
 
 IN: locals
 

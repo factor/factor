@@ -9,6 +9,7 @@ and the callstack top is passed in EDX */
 #define XT_REG %ecx
 #define STACK_REG %esp
 #define DS_REG %esi
+#define RETURN_REG %eax
 
 #define CELL_SIZE 4
 
@@ -20,7 +21,7 @@ and the callstack top is passed in EDX */
 	pop %ebp ; \
 	pop %ebx
 
-#define QUOT_XT_OFFSET 5
+#define QUOT_XT_OFFSET 9
 #define PROFILING_OFFSET 25
 #define WORD_DEF_OFFSET 13
 #define WORD_XT_OFFSET 29

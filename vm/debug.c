@@ -3,7 +3,12 @@
 void print_word(F_WORD* word, CELL nesting)
 {
 	if(type_of(word->name) == STRING_TYPE)
-		printf("%s",to_char_string(untag_string(word->name),true));
+	{
+		F_STRING *string = untag_string(word->name);
+		CELL i;
+		for(i = 0; i < string_capacity(string); i++)
+			putchar(cget(SREF(string,i)));
+	}
 	else
 	{
 		printf("#<not a string: ");
@@ -14,7 +19,11 @@ void print_word(F_WORD* word, CELL nesting)
 
 void print_string(F_STRING* str)
 {
-	printf("\"%s\"",to_char_string(str,true));
+	putchar('"');
+	CELL i;
+	for(i = 0; i < string_capacity(str); i++)
+		putchar(cget(SREF(str,i)));
+	putchar('"');
 }
 
 void print_array(F_ARRAY* array, CELL nesting)
