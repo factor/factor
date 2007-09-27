@@ -34,7 +34,7 @@ bool jit_stack_frame_p(F_ARRAY *array)
 	return false;
 }
 
-FASTCALL CELL jit_compile(CELL tagged, F_STACK_FRAME *stack)
+F_FASTCALL CELL jit_compile(CELL tagged, F_STACK_FRAME *stack)
 {
 	stack_chain->callstack_top = stack;
 

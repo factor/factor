@@ -2,7 +2,7 @@
 	mov QUOT_XT_OFFSET(ARG0),XT_REG ;     /* Load quot-xt */ \
 	jmp *XT_REG                           /* Jump to quot-xt */
 
-DEF(FASTCALL void,c_to_factor,(CELL quot)):
+DEF(F_FASTCALL void,c_to_factor,(CELL quot)):
 	PUSH_NONVOLATILE
 	push ARG0                             /* Save quot */
 
@@ -17,38 +17,38 @@ DEF(FASTCALL void,c_to_factor,(CELL quot)):
 	POP_NONVOLATILE
 	ret
 
-DEF(FASTCALL void,undefined,(CELL word)):
+DEF(F_FASTCALL void,undefined,(CELL word)):
 	mov STACK_REG,ARG1                    /* Pass callstack pointer */
 	jmp MANGLE(undefined_error)           /* This throws an error */
 
-DEF(FASTCALL void,dosym,(CELL word)):
+DEF(F_FASTCALL void,dosym,(CELL word)):
 	add $CELL_SIZE,DS_REG                 /* Increment stack pointer */
 	mov ARG0,(DS_REG)                     /* Store word on stack */
 	ret
 
 /* Here we have two entry points. The first one is taken when profiling is
 enabled */
-DEF(FASTCALL void,docol_profiling,(CELL word)):
+DEF(F_FASTCALL void,docol_profiling,(CELL word)):
 	add $CELL_SIZE,PROFILING_OFFSET(ARG0) /* Increment profile-count slot */
-DEF(FASTCALL void,docol,(CELL word)):
+DEF(F_FASTCALL void,docol,(CELL word)):
 	mov WORD_DEF_OFFSET(ARG0),ARG0        /* Load word-def slot */
 	JUMP_QUOT
 
 /* We must pass the XT to the quotation in ECX. */
-DEF(FASTCALL void,primitive_call,(void)):
+DEF(F_FASTCALL void,primitive_call,(void)):
         mov (DS_REG),ARG0                     /* Load quotation from data stack */
 	sub $CELL_SIZE,DS_REG                 /* Pop data stack */
 	JUMP_QUOT
 
 /* We pass the word in EAX and the XT in ECX. Don't mess up EDX, it's the
 callstack top parameter to primitives. */
-DEF(FASTCALL void,primitive_execute,(void)):
+DEF(F_FASTCALL void,primitive_execute,(void)):
 	mov (DS_REG),ARG0                     /* Load word from data stack */
 	sub $CELL_SIZE,DS_REG                 /* Pop data stack */
         mov WORD_XT_OFFSET(ARG0),XT_REG       /* Load word-xt slot */
 	jmp *XT_REG                           /* Go */
 
-DEF(FASTCALL void,throw_impl,(CELL quot, F_STACK_FRAME *rewind_to)):
+DEF(F_FASTCALL void,throw_impl,(CELL quot, F_STACK_FRAME *rewind_to)):
 	mov ARG1,STACK_REG                    /* rewind_to */
 	JUMP_QUOT
 

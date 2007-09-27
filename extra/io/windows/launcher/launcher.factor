@@ -1,6 +1,7 @@
 USING: alien alien.c-types destructors io.windows libc
 io.nonblocking io.streams.duplex windows.types math
-windows.kernel32 windows namespaces io.launcher kernel ;
+windows.kernel32 windows namespaces io.launcher kernel
+io.windows.nt.backend ;
 IN: io.windows.launcher
 
 ! From MSDN: "Handles in PROCESS_INFORMATION must be closed with CloseHandle when they are no longer needed."

@@ -19,7 +19,7 @@ void fix_stacks(void)
 }
 
 /* called before entry into Factor code. */
-FASTCALL void save_callstack_bottom(F_STACK_FRAME *callstack_bottom)
+F_FASTCALL void save_callstack_bottom(F_STACK_FRAME *callstack_bottom)
 {
 	stack_chain->callstack_bottom = callstack_bottom;
 }

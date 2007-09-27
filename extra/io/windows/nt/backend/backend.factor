@@ -1,8 +1,35 @@
 USING: alien alien.c-types arrays assocs combinators continuations
-destructors io io.backend io.nonblocking io.windows io.windows.nt libc
+destructors io io.backend io.nonblocking io.windows libc
 kernel math namespaces sequences threads tuples.lib windows
-windows.errors windows.kernel32 prettyprint ;
+windows.errors windows.kernel32 prettyprint strings splitting
+io.files windows.winsock ;
 IN: io.windows.nt.backend
+
+: unicode-prefix ( -- seq )
+    "\\\\?\\" ; inline
+
+M: windows-nt-io normalize-pathname ( string -- string )
+    dup string? [ "pathname must be a string" throw ] unless
+    "/" split "\\" join
+    {
+        ! empty
+        { [ dup empty? ] [ "empty path" throw ] }
+        ! .\\foo
+        { [ dup ".\\" head? ] [
+            >r unicode-prefix cwd r> 1 tail 3append
+        ] }
+        ! c:\\
+        { [ dup 1 tail ":" head? ] [ >r unicode-prefix r> append ] }
+        ! \\\\?\\c:\\foo
+        { [ dup unicode-prefix head? ] [ ] }
+        ! foo.txt ..\\foo.txt
+        { [ t ] [
+            [
+                unicode-prefix % cwd %
+                dup first CHAR: \\ = [ CHAR: \\ , ] unless %
+            ] "" make
+        ] }
+    } cond [ "/\\." member? ] rtrim ;
 
 SYMBOL: io-hash
 
@@ -63,9 +90,9 @@ C: <GetQueuedCompletionStatusParams> GetQueuedCompletionStatusParams
         GetQueuedCompletionStatus
     ] keep swap ;
 
-: lookup-callback ( GetQueuedCompletion-args -- callback ? )
+: lookup-callback ( GetQueuedCompletion-args -- callback )
     GetQueuedCompletionStatusParams-lpOverlapped* *void*
-    \ io-hash get-global delete-at* ;
+    \ io-hash get-global delete-at drop ;
 
 : wait-for-io ( timeout -- continuation/f )
     wait-for-overlapped
@@ -73,15 +100,18 @@ C: <GetQueuedCompletionStatusParams> GetQueuedCompletionStatusParams
         GetLastError dup (expected-io-error?) [
             2drop f
         ] [
-            (win32-error-string) swap lookup-callback [
+            dup ERROR_HANDLE_EOF = [
+                drop lookup-callback [
+                    io-callback-port t swap set-port-eof?
+                ] keep io-callback-continuation
+            ] [
+                (win32-error-string) swap lookup-callback
                 [ io-callback-port set-port-error ] keep
                 io-callback-continuation
-            ] [
-                drop "No callback found" 2array throw
             ] if
         ] if
     ] [
-        lookup-callback [ io-callback-continuation ] when
+        lookup-callback io-callback-continuation
     ] if ;
 
 : maybe-expire ( io-callbck -- )
@@ -99,3 +129,12 @@ M: windows-nt-io io-multiplex ( ms -- )
     cancel-timedout
     [ wait-for-io ] [ global [ "error: " write . flush ] bind drop f ] recover
     [ schedule-thread ] when* ;
+
+M: windows-nt-io init-io ( -- )
+    #! Should only be called on startup. Calling this at any
+    #! other time can have unintended consequences.
+    global [
+        master-completion-port \ master-completion-port set
+        H{ } clone \ io-hash set
+        init-winsock
+    ] bind ;

@@ -360,20 +360,25 @@ cell 8 = [
 [ 3 ] [ B{ 1 2 3 4 5 } 2 [ { simple-c-ptr fixnum } declare alien-unsigned-1 ] compile-1 ] unit-test
 
 [ ] [ B{ 1 2 3 4 5 } malloc-byte-array "b" set ] unit-test
+[ t ] [ "b" get >boolean ] unit-test
 
-[ 3 ] [ "b" get 2 [ alien-unsigned-1 ] compile-1 ] unit-test
-[ 3 ] [ "b" get [ { simple-alien } declare 2 alien-unsigned-1 ] compile-1 ] unit-test
-[ 3 ] [ "b" get 2 [ { simple-alien fixnum } declare alien-unsigned-1 ] compile-1 ] unit-test
-[ 3 ] [ "b" get 2 [ { simple-c-ptr fixnum } declare alien-unsigned-1 ] compile-1 ] unit-test
+"b" get [
+    [ 3 ] [ "b" get 2 [ alien-unsigned-1 ] compile-1 ] unit-test
+    [ 3 ] [ "b" get [ { simple-alien } declare 2 alien-unsigned-1 ] compile-1 ] unit-test
+    [ 3 ] [ "b" get 2 [ { simple-alien fixnum } declare alien-unsigned-1 ] compile-1 ] unit-test
+    [ 3 ] [ "b" get 2 [ { simple-c-ptr fixnum } declare alien-unsigned-1 ] compile-1 ] unit-test
 
-[ ] [ "b" get free ] unit-test
+    [ ] [ "b" get free ] unit-test
+] when
 
-[ ] [ "hello world" malloc-char-string "s" set ] unit-test
+[ t ] [ "hello world" malloc-char-string "s" set ] unit-test
 
-[ "hello world" ] [ "s" get <void*> [ { byte-array } declare *void* ] compile-1 alien>char-string ] unit-test
-[ "hello world" ] [ "s" get <void*> [ { simple-c-ptr } declare *void* ] compile-1 alien>char-string ] unit-test
+"s" get [
+    [ "hello world" ] [ "s" get <void*> [ { byte-array } declare *void* ] compile-1 alien>char-string ] unit-test
+    [ "hello world" ] [ "s" get <void*> [ { simple-c-ptr } declare *void* ] compile-1 alien>char-string ] unit-test
 
-[ ] [ "s" get free ] unit-test
+    [ ] [ "s" get free ] unit-test
+] when
 
 [ ALIEN: 1234 ] [ ALIEN: 1234 [ { simple-alien } declare <void*> ] compile-1 *void* ] unit-test
 [ ALIEN: 1234 ] [ ALIEN: 1234 [ { simple-c-ptr } declare <void*> ] compile-1 *void* ] unit-test

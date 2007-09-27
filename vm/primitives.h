@@ -14,19 +14,19 @@ DEFINE_PRIMITIVE(name)
 
 Becomes
 
-FASTCALL void primitive_name(CELL word, F_STACK_FRAME *callstack_top)
+F_FASTCALL void primitive_name(CELL word, F_STACK_FRAME *callstack_top)
 {
 	stack_chain->callstack_top = callstack_top;
 	... CODE ...
 }
 
-On x86, FASTCALL expands into a GCC declaration which forces the two parameters
-to be passed in registers. This simplifies the quotation compiler and support
-code in cpu-x86.S. */
+On x86, F_FASTCALL expands into a GCC declaration which forces the two
+parameters to be passed in registers. This simplifies the quotation compiler
+and support code in cpu-x86.S. */
 #define DEFINE_PRIMITIVE(name) \
 	INLINE void primitive_##name##_impl(void); \
 	\
-	FASTCALL void primitive_##name(CELL word, F_STACK_FRAME *callstack_top) \
+	F_FASTCALL void primitive_##name(CELL word, F_STACK_FRAME *callstack_top) \
 	{ \
 		stack_chain->callstack_top = callstack_top; \
 		primitive_##name##_impl(); \
@@ -36,4 +36,4 @@ code in cpu-x86.S. */
 
 /* Prototype for header files */
 #define DECLARE_PRIMITIVE(name) \
-	FASTCALL void primitive_##name(CELL word, F_STACK_FRAME *callstack_top)
+	F_FASTCALL void primitive_##name(CELL word, F_STACK_FRAME *callstack_top)
