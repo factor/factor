@@ -49,20 +49,5 @@ s64 current_millis(void);
 
 INLINE void reset_stdio(void) {}
 
-/* SEH support. Proceed with caution. */
-typedef long exception_handler_t(
-	PEXCEPTION_RECORD rec, void *frame, void *context, void *dispatch);
+long exception_handler(PEXCEPTION_POINTERS pe);
 
-typedef struct exception_record
-{
-	struct exception_record *next_handler;
-	void *handler_func;
-} exception_record_t;
-
-long exception_handler(PEXCEPTION_RECORD rec, void *frame, void *ctx, void *dispatch);
-
-DECLARE_PRIMITIVE(open_file);
-DECLARE_PRIMITIVE(stat);
-DECLARE_PRIMITIVE(read_dir);
-DECLARE_PRIMITIVE(cwd);
-DECLARE_PRIMITIVE(cd);
