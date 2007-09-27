@@ -68,9 +68,7 @@ M: object infer-call
         apply-object
     ] [
         drop
-        [ "execute must be given a word" throw ]
-        recursive-state get
-        infer-quot
+        "execute must be given a word" time-bomb
     ] if
 ] "infer" set-word-prop
 

@@ -75,7 +75,7 @@ H{ } clone objc-methods set-global
         [ \ <super> , ] when
         swap cache-selector , \ selector ,
     ] [ ] make
-    swap second length 2 - [ ndip ] curry ;
+    swap second length 2 - [ ndip ] 2curry ;
 
 MACRO: (send) ( selector super? -- quot )
     [
