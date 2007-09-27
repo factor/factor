@@ -8,7 +8,7 @@ IN: inference.transforms
 : pop-literals ( n -- rstate seq )
     dup zero? [ drop f ] [
         [ ensure-values ] keep [ d-tail ] keep (consume-values)
-        dup value-recursion swap [ value-literal ] map
+        dup first value-recursion swap [ value-literal ] map
     ] if ;
 
 : transform-quot ( quot n -- newquot )
@@ -19,6 +19,7 @@ IN: inference.transforms
 : define-transform ( word quot n -- )
     transform-quot "infer" set-word-prop ;
 
+! Combinators
 \ cond [
     cond>quot
 ] 1 define-transform
@@ -35,6 +36,7 @@ IN: inference.transforms
     ] if
 ] 1 define-transform
 
+! Bitfields
 GENERIC: (bitfield-quot) ( spec -- quot )
 
 M: integer (bitfield-quot) ( spec -- quot )
@@ -58,5 +60,5 @@ M: pair (bitfield-quot) ( spec -- quot )
 \ set-slots [ <reversed> [get-slots] ] 1 define-transform
 
 \ construct-boa [
-    [ dup literalize , tuple-size , \ <tuple-boa> , ] [ ] make
+    dup tuple-size [ <tuple-boa> ] 2curry
 ] 1 define-transform

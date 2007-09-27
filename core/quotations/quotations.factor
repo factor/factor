@@ -43,6 +43,6 @@ M: curry nth
         >r 1- r> curry-quot nth
     ] if ;
 
-M: curry like drop [ ] like ;
+M: curry like drop dup callable? [ >quotation ] unless ;
 
 INSTANCE: curry immutable-sequence

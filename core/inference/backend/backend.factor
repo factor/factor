@@ -89,7 +89,7 @@ M: wrapper apply-object wrapped apply-literal ;
     r> recursive-state set ;
 
 : infer-quot-recursive ( quot word label -- )
-    2array add* infer-quot ;
+    recursive-state get -rot 2array add* infer-quot ;
 
 : time-bomb ( error -- )
     [ throw ] curry recursive-state get infer-quot ;
@@ -106,7 +106,7 @@ TUPLE: recursive-quotation-error quot ;
         dup value-literal callable? [
             dup value-literal
             over value-recursion
-            rot f infer-quot-recursive
+            rot f 2array add* infer-quot
         ] [
             drop bad-call
         ] if
@@ -364,11 +364,12 @@ TUPLE: effect-error word effect ;
     over recorded get push
     "inferred-effect" set-word-prop ;
 
-: infer-compound ( word -- )
+: infer-compound ( word -- effect )
     [
         init-inference
         dup word-def over dup infer-quot-recursive
         finish-word
+        current-effect
     ] with-scope ;
 
 M: compound infer-word
@@ -413,8 +414,8 @@ TUPLE: recursive-declare-error word ;
     [
         copy-inference nest-node
         dup word-def swap gensym
-        recursive-state get pick pick infer-quot-recursive
-         #label unnest-node
+        [ infer-quot-recursive ] 2keep
+        #label unnest-node
     ] H{ } make-assoc ;
 
 GENERIC: collect-recursion* ( label node -- )

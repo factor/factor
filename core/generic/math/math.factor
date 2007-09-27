@@ -25,16 +25,12 @@ PREDICATE: class math-class ( object -- ? )
     [ [ math-precedence ] compare 0 > ] most ;
 
 : (math-upgrade) ( max class -- quot )
-    dupd = [
-        drop [ ]
-    ] [
-        "coercer" word-prop [ ] or
-    ] if ;
+    dupd = [ drop [ ] ] [ "coercer" word-prop [ ] or ] if ;
 
 : math-upgrade ( class1 class2 -- quot )
     [ math-class-max ] 2keep
-    >r over r> (math-upgrade)
-    >r (math-upgrade) dup empty? [ [ dip ] curry ] unless
+    >r over r> (math-upgrade) >r (math-upgrade)
+    dup empty? [ [ dip ] curry [ ] like ] unless
     r> append ;
 
 TUPLE: no-math-method left right generic ;
