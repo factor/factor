@@ -6,7 +6,8 @@ IN: benchmark
 
 : run-benchmark ( vocab -- result )
     "=== Benchmark " write dup print flush
-    dup require [ run ] benchmark 2array ;
+    dup require [ run ] benchmark 2array
+    dup . ;
 
 : run-benchmarks ( -- assoc )
     "benchmark" load-children
