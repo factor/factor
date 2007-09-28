@@ -104,7 +104,7 @@ M: phantom-retainstack finalize-height
     dup length swap phantom-locs ;
 
 : (each-loc) ( phantom quot -- )
-    >r dup phantom-locs* r> 2each ; inline
+    >r dup phantom-locs* swap r> 2each ; inline
 
 : each-loc ( quot -- )
     >r phantom-d get r> phantom-r get over
@@ -161,8 +161,6 @@ PRIVATE>
     phantoms [ finalize-height ] 2apply ;
 
 ! Phantom stacks hold values, locs, and vregs
-UNION: pseudo loc value ;
-
 : live-vregs ( -- seq ) phantoms append [ vreg? ] subset ;
 
 : live-loc? ( current actual -- ? )
@@ -211,34 +209,6 @@ SYMBOL: fresh-objects
     T{ float-regs f 8 } T{ int-regs } ? ;
 
 ! Copying vregs to stacks
-: alloc-vreg ( spec -- vreg )
-    reg-spec>class free-vregs pop ;
-
-: %move ( dst src -- )
-    2dup = [
-        2drop
-    ] [
-        2dup [ delegate class ] 2apply 2array {
-            { { int-regs int-regs } [ %move-int>int ] }
-            { { float-regs int-regs } [ %move-int>float ] }
-            { { int-regs float-regs } [ %move-float>int ] }
-        } case
-    ] if ;
-
-: vreg>vreg ( vreg spec -- vreg )
-    alloc-vreg dup rot %move ;
-
-: value>int-vreg ( value spec -- vreg )
-    alloc-vreg [ >r value-literal  r> load-literal ] keep ;
-
-: value>float-vreg ( value spec -- vreg )
-    alloc-vreg [
-        >r value-literal temp-reg load-literal r> temp-reg %move
-    ] keep ;
-
-: loc>vreg ( loc spec -- vreg )
-    alloc-vreg [ swap %peek ] keep ;
-
 : allocation
     H{
         { { int-regs f } f }
@@ -252,17 +222,25 @@ SYMBOL: fresh-objects
         { { loc float } T{ float-regs 8 f } }
     } at ;
 
+: alloc-vreg ( spec -- vreg )
+    reg-spec>class free-vregs pop ;
+
+: value>float-vreg ( dst src -- )
+    value-literal temp-reg load-literal
+    temp-reg %unbox-float ;
+
+: loc>float-vreg ( dst src -- )
+    temp-reg swap %peek
+    temp-reg %unbox-float ;
+
 : transfer
     {
-        { { int-regs f } [ drop ] }
-        { { int-regs float } [ vreg>vreg ] }
-        { { float-regs f } [ vreg>vreg ] }
-        { { float-regs float } [ drop ] }
-        { { value f } [ value>int-vreg ] }
+        { { int-regs float } [ %unbox-float ] }
+        { { float-regs f } [ %box-float ] }
+        { { value f } [ value-literal swap load-literal ] }
         { { value float } [ value>float-vreg ] }
-        { { value value } [ drop ] }
-        { { loc f } [ loc>vreg ] }
-        { { loc float } [ loc>vreg ] }
+        { { loc f } [ %peek ] }
+        { { loc float } [ loc>float-vreg ] }
     } case ;
 
 GENERIC: template-lhs ( obj -- lhs )
@@ -283,29 +261,47 @@ M: object template-rhs ;
     swap template-lhs swap template-rhs 2array ;
 
 : (lazy-load) ( value spec -- value )
-    2dup transfer-op transfer ;
+    2dup transfer-op dup allocation
+    ! ( value spec transfer-op )
+    [
+        >r alloc-vreg dup rot r> transfer
+    ] [
+        2drop
+    ] if ;
 
-: loc>loc ( fromloc toloc -- )
-    #! Move a value from a stack location to another stack
-    #! location.
-    temp-reg rot %peek
+: float-vreg>loc ( dst src -- )
+    temp-reg swap %box-float
     temp-reg swap %replace ;
 
-: lazy-store ( src dest -- )
+: value>loc ( src dst -- )
+    #! Move a literal to a stack location.
+    value-literal temp-reg load-literal
+    temp-reg swap %replace ;
+
+: loc>loc ( dst src -- )
+    temp-reg swap %peek
+    temp-reg swap %replace ;
+
+: (lazy-store) ( dst src -- )
+    dup template-lhs {
+        { float-regs [ float-vreg>loc ] }
+        { int-regs [ swap %replace ] }
+        { value [ value>loc ] }
+        { loc [ loc>loc ] }
+    } case ;
+
+: lazy-store ( dst src live-locs -- )
     #! Don't store a location to itself.
-    2dup = [
-        2drop
-    ] [
-        >r \ live-locs get at dup vreg?
-        [ r> %replace ] [ r> loc>loc ] if
-    ] if ;
+    >r 2dup = [ r> 3drop ] [ r> at (lazy-store) ] if ;
 
 : do-shuffle ( hash -- )
     dup assoc-empty? [
         drop
     ] [
-        \ live-locs set
-        [ over loc? [ lazy-store ] [ 2drop ] if ] each-loc
+        [
+            >r dup loc?
+            [ r> lazy-store ] [ r> 3drop ] if
+        ] curry each-loc
     ] if ;
 
 : fast-shuffle ( locs -- )
@@ -341,19 +337,16 @@ M: object template-rhs ;
     live-locs dup fast-shuffle?
     [ fast-shuffle ] [ slow-shuffle ] if ;
 
-: value>loc ( literal toloc -- )
-    #! Move a literal to a stack location.
-    >r value-literal temp-reg load-literal
-    temp-reg r> %replace ;
-
 : finalize-values ( -- )
     #! Store any deferred literals to their final stack
     #! locations.
-    [ over value? [ value>loc ] [ 2drop ] if ] each-loc ;
+    [ dup value? [ (lazy-store) ] [ 2drop ] if ] each-loc ;
+
+UNION: pseudo loc value ;
 
 : finalize-vregs ( -- )
     #! Store any vregs to their final stack locations.
-    [ over pseudo? [ 2drop ] [ %replace ] if ] each-loc ;
+    [ dup pseudo? [ 2drop ] [ (lazy-store) ] if ] each-loc ;
 
 : reusing-vregs ( quot -- )
     #! Any vregs allocated by quot are released again.

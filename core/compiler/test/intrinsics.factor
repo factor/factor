@@ -371,7 +371,7 @@ cell 8 = [
     [ ] [ "b" get free ] unit-test
 ] when
 
-[ t ] [ "hello world" malloc-char-string "s" set ] unit-test
+[ ] [ "hello world" malloc-char-string "s" set ] unit-test
 
 "s" get [
     [ "hello world" ] [ "s" get <void*> [ { byte-array } declare *void* ] compile-1 alien>char-string ] unit-test

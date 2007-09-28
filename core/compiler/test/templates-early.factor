@@ -1,7 +1,8 @@
 ! Testing templates machinery without compiling anything
 IN: temporary
-USING: compiler generator generator.registers tools.test
-namespaces sequences words kernel math effects ;
+USING: compiler generator generator.registers
+generator.registers.private tools.test namespaces sequences
+words kernel math effects ;
 
 [
     [ ] [ init-templates ] unit-test

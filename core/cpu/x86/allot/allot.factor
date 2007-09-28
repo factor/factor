@@ -37,7 +37,7 @@ IN: cpu.x86.allot
     temp-reg v>operand swap tag-number OR
     temp-reg v>operand MOV ;
 
-M: x86-backend %move-float>int ( dst src -- )
+M: x86-backend %box-float ( dst src -- )
     #! Only called by pentium4 backend, uses SSE2 instruction
     #! dest is a loc or a vreg
     float 16 [

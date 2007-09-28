@@ -156,21 +156,13 @@ M: ppc-backend %return ( -- ) %epilogue-later BLR ;
 
 M: ppc-backend %unwind drop %return ;
 
-M: int-regs (%peek)
-    drop >r v>operand r> loc>operand LWZ ;
+M: ppc-backend %peek ( vreg loc -- )
+    >r v>operand r> loc>operand LWZ ;
 
-M: float-regs (%peek)
-    drop
-    11 swap loc>operand LWZ
-    v>operand 11 float-offset LFD ;
+M: ppc-backend %replace
+    >r v>operand r> loc>operand STW ;
 
-M: int-regs (%replace)
-    drop >r v>operand r> loc>operand STW ;
-
-M: ppc-backend %move-int>int ( dst src -- )
-    [ v>operand ] 2apply MR ;
-
-M: ppc-backend %move-int>float ( dst src -- )
+M: ppc-backend %unbox-float ( dst src -- )
     [ v>operand ] 2apply float-offset LFD ;
 
 M: ppc-backend %inc-d ( n -- ) ds-reg dup rot cells ADDI ;

@@ -79,17 +79,14 @@ HOOK: %inc-d compiler-backend ( n -- )
 HOOK: %inc-r compiler-backend ( n -- )
 
 ! Load stack into vreg
-GENERIC: (%peek) ( vreg loc reg-class -- )
-: %peek ( vreg loc -- ) over (%peek) ;
+HOOK: %peek compiler-backend ( vreg loc -- )
 
 ! Store vreg to stack
-GENERIC: (%replace) ( vreg loc reg-class -- )
-: %replace ( vreg loc -- ) over (%replace) ;
+HOOK: %replace compiler-backend ( vreg loc -- )
 
-! Move one vreg to another
-HOOK: %move-int>int compiler-backend ( dst src -- )
-HOOK: %move-int>float compiler-backend ( dst src -- )
-HOOK: %move-float>int compiler-backend ( dst src -- )
+! Box and unbox floats
+HOOK: %unbox-float compiler-backend ( dst src -- )
+HOOK: %box-float compiler-backend ( dst src -- )
 
 ! FFI stuff
 

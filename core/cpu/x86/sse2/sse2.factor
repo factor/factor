@@ -6,13 +6,6 @@ namespaces sequences words generator generator.registers
 cpu.architecture math.floats.private layouts quotations ;
 IN: cpu.x86.sse2
 
-M: float-regs (%peek)
-    drop
-    temp-reg swap %move-int>int
-    temp-reg %move-int>float ;
-
-M: float-regs (%replace) drop swap %move-float>int ;
-
 : define-float-op ( word op -- )
     [ "x" operand "y" operand ] swap add H{
         { +input+ { { float "x" } { float "y" } } }

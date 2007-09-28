@@ -32,12 +32,7 @@ IN: cpu.ppc.allot
     12 11 float tag-number ORI
     f fresh-object ;
 
-M: float-regs (%replace)
-    drop
-    swap v>operand %allot-float
-    12 swap loc>operand STW ;
-
-M: ppc-backend %move-float>int ( dst src -- )
+M: ppc-backend %box-float ( dst src -- )
     [ v>operand ] 2apply %allot-float 12 MR ;
 
 : %allot-bignum ( #digits -- )

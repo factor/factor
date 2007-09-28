@@ -121,15 +121,12 @@ M: x86-backend %call-dispatch ( word-table# -- )
 M: x86-backend %jump-dispatch ( word-table# -- )
     [ %epilogue-later JMP ] dispatch-template ;
 
-M: x86-backend %move-int>int ( dst src -- )
-    [ v>operand ] 2apply MOV ;
-
-M: x86-backend %move-int>float ( dst src -- )
+M: x86-backend %unbox-float ( dst src -- )
     [ v>operand ] 2apply float-offset [+] MOVSD ;
 
-M: int-regs (%peek) drop %move-int>int ;
+M: x86-backend %peek [ v>operand ] 2apply MOV ;
 
-M: int-regs (%replace) drop swap %move-int>int ;
+M: x86-backend %replace swap %peek ;
 
 : (%inc) swap cells dup 0 > [ ADD ] [ neg SUB ] if ;
 
