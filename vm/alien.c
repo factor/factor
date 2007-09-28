@@ -26,6 +26,27 @@ void *alien_offset(CELL object)
 	}
 }
 
+/* gets the address of an object representing a C pointer, with the
+intention of storing the pointer across code which may potentially GC. */
+void *pinned_alien_offset(CELL object)
+{
+	F_ALIEN *alien;
+
+	switch(type_of(object))
+	{
+	case ALIEN_TYPE:
+		alien = untag_object(object);
+		if(alien->expired != F)
+			general_error(ERROR_EXPIRED,object,F,NULL);
+		return alien_offset(alien->alien) + alien->displacement;
+	case F_TYPE:
+		return NULL;
+	default:
+		type_error(ALIEN_TYPE,object);
+		return NULL; /* can't happen */
+	}
+}
+
 /* pop an object representing a C pointer */
 void *unbox_alien(void)
 {
@@ -57,6 +78,8 @@ void box_alien(void *ptr)
 DEFINE_PRIMITIVE(displaced_alien)
 {
 	CELL alien = dpop();
+	if(type_of(alien) != F_TYPE && type_of(alien) != ALIEN_TYPE)
+		type_error(ALIEN_TYPE,alien);
 	CELL displacement = to_cell(dpop());
 	if(alien == F && displacement == 0)
 		dpush(F);
@@ -68,17 +91,7 @@ DEFINE_PRIMITIVE(displaced_alien)
 if the object is a byte array, as a sanity check. */
 DEFINE_PRIMITIVE(alien_address)
 {
-	CELL object = dpop();
-	switch(type_of(object))
-	{
-	case ALIEN_TYPE:
-	case F_TYPE:
-		box_unsigned_cell((CELL)alien_offset(object));
-		break;
-	default:
-		type_error(ALIEN_TYPE,object);
-		break;
-	}
+	box_unsigned_cell((CELL)pinned_alien_offset(dpop()));
 }
 
 /* pop ( alien n ) from datastack, return alien's address plus n */
@@ -113,7 +126,7 @@ DEFINE_ALIEN_ACCESSOR(signed_1,s8,box_signed_1,to_fixnum)
 DEFINE_ALIEN_ACCESSOR(unsigned_1,u8,box_unsigned_1,to_cell)
 DEFINE_ALIEN_ACCESSOR(float,float,box_float,to_float)
 DEFINE_ALIEN_ACCESSOR(double,double,box_double,to_double)
-DEFINE_ALIEN_ACCESSOR(cell,void *,box_alien,alien_offset)
+DEFINE_ALIEN_ACCESSOR(cell,void *,box_alien,pinned_alien_offset)
 
 /* for FFI calls passing structs by value */
 void to_value_struct(CELL src, void *dest, CELL size)
