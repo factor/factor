@@ -33,6 +33,10 @@ TUPLE: temp-reg ;
 
 M: vreg v>operand dup vreg-n swap vregs nth ;
 
+TUPLE: cached loc vreg ;
+
+C: <cached> cached
+
 ! A data stack location.
 TUPLE: ds-loc n ;
 
@@ -53,17 +57,19 @@ GENERIC: move-spec ( obj -- spec )
 M: int-regs move-spec drop f ;
 M: float-regs move-spec drop float ;
 M: value move-spec class ;
+M: cached move-spec drop cached ;
 M: loc move-spec drop loc ;
 M: f move-spec drop loc ;
-
+USE: prettyprint
 : %move ( dst src -- )
-    2dup [ move-spec ] 2apply swap 2array {
+    dup [ "FUCK" throw ] unless
+    2dup [ move-spec ] 2apply 2array {
         { { f f } [ "Bug in generator.registers %move" throw ] }
-        { { f float } [ %unbox-float ] }
-        { { f loc } [ swap %replace ] }
-        { { float f } [ %box-float ] }
-        { { value f } [ value-literal swap load-literal ] }
-        { { loc f } [ %peek ] }
+        { { float f } [ %unbox-float ] }
+        { { loc f } [ swap %replace ] }
+        { { f float } [ %box-float ] }
+        { { f value } [ value-literal swap load-literal ] }
+        { { f loc } [ %peek ] }
         [ drop temp-reg swap %move temp-reg %move ]
     } case ;
 
@@ -177,30 +183,32 @@ PRIVATE>
 
 : each-phantom ( quot -- ) phantoms rot 2apply ; inline
 
-: finalize-heights ( -- )
-    phantoms [ finalize-height ] 2apply ;
+: finalize-heights ( -- ) [ finalize-height ] each-phantom ;
 
 ! Phantom stacks hold values, locs, and vregs
-: live-vregs ( -- seq ) phantoms append [ vreg? ] subset ;
+GENERIC: live-vregs* ( obj -- )
 
-: live-loc? ( current actual -- ? )
-    over loc? [ = not ] [ 2drop f ] if ;
+M: cached live-vregs* cached-vreg , ;
+M: vreg live-vregs* , ;
+M: object live-vregs* drop ;
+
+: live-vregs ( -- seq )
+    [ [ [ live-vregs* ] each ] each-phantom ] { } make ;
+
+GENERIC: live-loc? ( actual current -- ? )
+
+M: cached live-loc? cached-loc live-loc? ;
+M: loc live-loc? = not ;
+M: object live-loc? 2drop f ;
 
 : (live-locs) ( phantom -- seq )
     #! Discard locs which haven't moved
-    dup phantom-locs* 2array flip
+    dup phantom-locs* swap 2array flip
     [ live-loc? ] assoc-subset
-    keys ;
+    values ;
 
 : live-locs ( -- seq )
     [ (live-locs) ] each-phantom append prune ;
-
-: minimal-ds-loc ( phantom -- n )
-    #! When shuffling more values than can fit in registers, we
-    #! need to find an area on the data stack which isn't in
-    #! use.
-    dup phantom-stack-height neg
-    [ dup ds-loc? [ ds-loc-n min ] [ drop ] if ] reduce ;
 
 ! Operands holding pointers to freshly-allocated objects which
 ! are guaranteed to be in the nursery
@@ -221,7 +229,8 @@ SYMBOL: fresh-objects
     #! Create a new hashtable for thee free-vregs variable.
     live-vregs
     { T{ int-regs } T{ float-regs f 8 } }
-    [ 2dup (compute-free-vregs) ] H{ } map>assoc \ free-vregs set
+    [ 2dup (compute-free-vregs) ] H{ } map>assoc
+    \ free-vregs set
     drop ;
 
 : reg-spec>class ( spec -- class )
@@ -243,27 +252,49 @@ SYMBOL: fresh-objects
         ] if
     ] if ;
 
-: (lazy-load) ( value spec -- value )
+GENERIC# (lazy-load) 1 ( value spec -- value )
+
+M: cached (lazy-load)
+    >r cached-vreg r> (lazy-load) ;
+
+M: object (lazy-load)
     2dup allocation [ alloc-vreg dup rot %move ] [ drop ] if ;
 
-: lazy-store ( dst src live-locs -- )
-    #! Don't store a location to itself.
-    >r 2dup = [ r> 3drop ] [ r> at %move ] if ;
+GENERIC: lazy-store ( dst src -- )
+
+M: loc lazy-store
+    2dup = [ 2drop ] [ \ live-locs get at %move ] if ;
+
+M: cached lazy-store
+    2dup cached-loc = [ 2drop ] [ cached-vreg %move ] if ;
+
+M: object lazy-store
+    2drop ;
 
 : do-shuffle ( hash -- )
     dup assoc-empty? [
         drop
     ] [
-        [
-            >r dup loc?
-            [ r> lazy-store ] [ r> 3drop ] if
-        ] curry each-loc
+        \ live-locs set
+        [ lazy-store ] each-loc
     ] if ;
 
 : fast-shuffle ( locs -- )
     #! We have enough free registers to load all shuffle inputs
     #! at once
     [ dup f (lazy-load) ] H{ } map>assoc do-shuffle ;
+
+GENERIC: minimal-ds-loc* ( min obj -- min )
+
+M: cached minimal-ds-loc* cached-loc minimal-ds-loc* ;
+M: ds-loc minimal-ds-loc* ds-loc-n min ;
+M: object minimal-ds-loc* drop ;
+
+: minimal-ds-loc ( phantom -- n )
+    #! When shuffling more values than can fit in registers, we
+    #! need to find an area on the data stack which isn't in
+    #! use.
+    dup phantom-stack-height neg [ minimal-ds-loc* ] reduce ;
 
 : find-tmp-loc ( -- n )
     #! Find an area of the data stack which is not referenced
@@ -297,7 +328,9 @@ SYMBOL: fresh-objects
 
 : finalize-vregs ( -- )
     #! Store any vregs to their final stack locations.
-    [ dup loc? [ 2drop ] [ %move ] if ] each-loc ;
+    [
+        dup loc? over cached? or [ 2drop ] [ %move ] if
+    ] each-loc ;
 
 : finalize-contents ( -- )
     finalize-locs finalize-vregs [ delete-all ] each-phantom ;
@@ -342,7 +375,8 @@ SYMBOL: fresh-objects
     flip first2
     >r dupd [ (lazy-load) ] 2map dup r>
     [ >r dup value? [ value-literal ] when r> set ] 2each
-    2array flip substitute-vregs ;
+    dupd [ <cached> ] 2map 2array flip [ first loc? ] subset
+    substitute-vregs ;
 
 : fast-input ( template -- )
     dup empty? [
@@ -355,7 +389,9 @@ SYMBOL: fresh-objects
     +output+ +clobber+ [ get [ get ] map ] 2apply ;
 
 : clash? ( seq -- ? )
-    phantoms append swap [ member? ] curry contains? ;
+    phantoms append [
+        dup cached? [ cached-vreg ] when swap member?
+    ] curry* contains? ;
 
 : outputs-clash? ( -- ? )
     output-vregs append clash? ;
@@ -366,7 +402,9 @@ SYMBOL: fresh-objects
 : count-vregs ( reg-classes -- ) [ [ inc ] when* ] each ;
 
 : count-input-vregs ( phantom spec -- )
-    phantom&spec [ allocation ] 2map count-vregs ;
+    phantom&spec [
+        >r dup cached? [ cached-vreg ] when r> allocation
+    ] 2map count-vregs ;
 
 : count-scratch-regs ( spec -- )
     [ first reg-spec>class ] map count-vregs ;
