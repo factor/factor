@@ -130,9 +130,6 @@ factor: $(DLL_OBJS) $(EXE_OBJS)
 	$(CC) $(LIBS) $(LIBPATH) -L. $(LINK_WITH_ENGINE) \
 		$(CFLAGS) -o $@$(EXE_SUFFIX)$(EXE_EXTENSION) $(EXE_OBJS)
 
-pull:
-	darcs pull http://factorcode.org/repos/
-
 clean:
 	rm -f vm/*.o
 
