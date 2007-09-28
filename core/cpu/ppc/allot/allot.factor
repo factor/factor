@@ -78,22 +78,22 @@ M: ppc-backend %box-float ( dst src -- )
         "end" resolve-label
     ] with-scope ;
 
-: %allot-alien ( ptr -- )
-    "temp" set
+M: ppc-backend %box-alien ( dst src -- )
     "f" define-label
     "end" define-label
-    0 "temp" operand 0 CMPI
+    0 over v>operand 0 CMPI
     "f" get BEQ
     alien 4 cells %allot
-    "temp" operand 11 3 cells STW
-    f v>operand "temp" operand LI
+    ! Store offset
+    v>operand 11 3 cells STW
+    f v>operand 12 LI
     ! Store expired slot
-    "temp" operand 11 1 cells STW
+    12 11 1 cells STW
     ! Store underlying-alien slot
-    "temp" operand 11 2 cells STW
+    12 11 2 cells STW
     ! Store tagged ptr in reg
-    "temp" get object %store-tagged
+    dup object %store-tagged
     "end" get B
     "f" resolve-label
-    f v>operand "temp" operand LI
+    f v>operand swap v>operand LI
     "end" resolve-label ;

@@ -315,34 +315,28 @@ M: ppc-backend %unbox-small-struct
     drop "No small structs" throw ;
 
 ! Alien intrinsics
-M: ppc-backend %unbox-byte-array ( quot src -- )
-    "address" operand "alien" operand "offset" operand ADD
-    "address" operand byte-array-offset
-    roll call ;
+M: ppc-backend %unbox-byte-array ( dst src -- )
+    [ v>operand ] 2apply byte-array-offset ADDI ;
 
-M: ppc-backend %unbox-alien ( quot src -- )
-    "address" operand "alien" operand alien-offset LWZ
-    "address" operand dup "offset" operand ADD
-    "address" operand 0
-    roll call ;
+M: ppc-backend %unbox-alien ( dst src -- )
+    [ v>operand ] 2apply alien-offset LWZ ;
 
-M: ppc-backend %unbox-f ( quot src -- )
-    "offset" operand 0
-    roll call ;
+M: ppc-backend %unbox-f ( dst src -- )
+    drop 0 swap v>operand LI ;
 
-M: ppc-backend %complex-alien-accessor ( quot src -- )
+M: ppc-backend %unbox-c-ptr ( dst src -- )
     "is-f" define-label
     "is-alien" define-label
     "end" define-label
-    0 "alien" operand f v>operand CMPI
+    0 over v>operand f v>operand CMPI
     "is-f" get BEQ
-    "address" operand "alien" operand header-offset LWZ
-    0 "address" operand alien type-number tag-header CMPI
+    12 over v>operand header-offset LWZ
+    0 12 alien type-number tag-header CMPI
     "is-alien" get BEQ
-    [ %unbox-byte-array ] 2keep
+    2dup %unbox-byte-array
     "end" get B
     "is-alien" resolve-label
-    [ %unbox-alien ] 2keep
+    2dup %unbox-alien
     "end" get B
     "is-f" resolve-label
     %unbox-f

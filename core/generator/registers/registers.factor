@@ -47,6 +47,23 @@ TUPLE: rs-loc n ;
 
 C: <rs-loc> rs-loc
 
+! Unboxed alien pointers
+TUPLE: unboxed-alien vreg ;
+C: <unboxed-alien> unboxed-alien
+M: unboxed-alien v>operand unboxed-alien-vreg v>operand ;
+
+TUPLE: unboxed-byte-array vreg ;
+C: <unboxed-byte-array> unboxed-byte-array
+M: unboxed-byte-array v>operand unboxed-byte-array-vreg v>operand ;
+
+TUPLE: unboxed-f vreg ;
+C: <unboxed-f> unboxed-f
+M: unboxed-f v>operand unboxed-f-vreg v>operand ;
+
+TUPLE: unboxed-c-ptr vreg ;
+C: <unboxed-c-ptr> unboxed-c-ptr
+M: unboxed-c-ptr v>operand unboxed-c-ptr-vreg v>operand ;
+
 <PRIVATE
 
 UNION: loc ds-loc rs-loc ;
@@ -54,22 +71,34 @@ UNION: loc ds-loc rs-loc ;
 ! Moving values between locations and registers
 GENERIC: move-spec ( obj -- spec )
 
+M: unboxed-alien move-spec class ;
+M: unboxed-byte-array move-spec class ;
+M: unboxed-f move-spec class ;
+M: unboxed-c-ptr move-spec class ;
 M: int-regs move-spec drop f ;
 M: float-regs move-spec drop float ;
 M: value move-spec class ;
 M: cached move-spec drop cached ;
 M: loc move-spec drop loc ;
 M: f move-spec drop loc ;
-USE: prettyprint
+
 : %move ( dst src -- )
-    dup [ "FUCK" throw ] unless
     2dup [ move-spec ] 2apply 2array {
         { { f f } [ "Bug in generator.registers %move" throw ] }
-        { { float f } [ %unbox-float ] }
-        { { loc f } [ swap %replace ] }
-        { { f float } [ %box-float ] }
         { { f value } [ value-literal swap load-literal ] }
+
+        { { f float } [ %box-float ] }
+        ! { { f unboxed-alien } [ %box-alien ] }
+        { { f unboxed-c-ptr } [ %box-alien ] }
         { { f loc } [ %peek ] }
+
+        { { float f } [ %unbox-float ] }
+        { { unboxed-alien f } [ %unbox-alien ] }
+        { { unboxed-byte-array f } [ %unbox-byte-array ] }
+        { { unboxed-f f } [ %unbox-f ] }
+        { { unboxed-c-ptr f } [ %unbox-c-ptr ] }
+        { { loc f } [ swap %replace ] }
+
         [ drop temp-reg swap %move temp-reg %move ]
     } case ;
 
@@ -188,7 +217,11 @@ PRIVATE>
 ! Phantom stacks hold values, locs, and vregs
 GENERIC: live-vregs* ( obj -- )
 
-M: cached live-vregs* cached-vreg , ;
+M: cached live-vregs* cached-vreg live-vregs* ;
+M: unboxed-alien live-vregs* unboxed-alien-vreg , ;
+M: unboxed-byte-array live-vregs* unboxed-byte-array-vreg , ;
+M: unboxed-f live-vregs* unboxed-f-vreg , ;
+M: unboxed-c-ptr live-vregs* unboxed-c-ptr-vreg , ;
 M: vreg live-vregs* , ;
 M: object live-vregs* drop ;
 
@@ -239,7 +272,13 @@ SYMBOL: fresh-objects
 
 ! Copying vregs to stacks
 : alloc-vreg ( spec -- reg )
-    reg-spec>class free-vregs pop ;
+    dup reg-spec>class free-vregs pop swap {
+        { unboxed-alien [ <unboxed-alien> ] }
+        { unboxed-byte-array [ <unboxed-byte-array> ] }
+        { unboxed-f [ <unboxed-f> ] }
+        { unboxed-c-ptr [ <unboxed-c-ptr> ] }
+        [ drop ]
+    } case ;
 
 : allocation ( value spec -- reg-class )
     dup quotation? [
@@ -368,8 +407,19 @@ M: object minimal-ds-loc* drop ;
 : vreg-substitution ( value vreg -- pair )
     dupd <cached> 2array ;
 
+: substitute-vreg? ( old new -- ? )
+    #! We don't substitute locs for float or alien vregs,
+    #! since in those cases the boxing overhead might kill us.
+    cached-vreg {
+        { [ dup vreg? not ] [ f ] }
+        { [ dup delegate int-regs? not ] [ f ] }
+        { [ over loc? not ] [ f ] }
+        { [ t ] [ t ] }
+    } cond 2nip ;
+
 : substitute-vregs ( values vregs -- )
-    [ vreg-substitution ] 2map [ first loc? ] subset >hashtable
+    [ vreg-substitution ] 2map
+    [ substitute-vreg? ] assoc-subset >hashtable
     [ swap substitute ] curry each-phantom ;
 
 : lazy-load ( values template -- )

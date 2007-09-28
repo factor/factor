@@ -119,12 +119,12 @@ SYMBOL: template-chosen
 
     ! This is not empty since a load instruction is emitted
     [ f ] [
-        [ { { f "x"  } } fast-input ] { } make empty?
+        [ { { f "x" } } fast-input ] { } make empty?
     ] unit-test
 
     ! This is empty since we already loaded the value
     [ t ] [
-        [ { { f "x"  } } fast-input ] { } make empty?
+        [ { { f "x" } } fast-input ] { } make empty?
     ] unit-test
 
     ! This is empty since we didn't change the stack

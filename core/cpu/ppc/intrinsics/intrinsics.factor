@@ -601,40 +601,47 @@ IN: cpu.ppc.intrinsics
 } define-intrinsic
 
 ! Alien intrinsics
+: %alien-get ( quot -- )
+    "offset" operand dup %untag-fixnum
+    "offset" operand dup "alien" operand ADD
+    "output" operand "offset" operand 0 roll call ; inline
+
+: %alien-set ( quot -- )
+    "offset" operand dup %untag-fixnum
+    "offset" operand dup "alien" operand ADD
+    "value" operand "offset" operand 0 roll call ; inline
+
 : alien-integer-get-template
     H{
         { +input+ {
-            { f "alien" simple-c-ptr }
+            { unboxed-c-ptr "alien" simple-c-ptr }
             { f "offset" fixnum }
         } }
-        { +scratch+ { { f "output" } } }
+        { +scratch+ { { f "output" } { f "address" } } }
         { +output+ { "output" } }
         { +clobber+ { "offset" } }
     } ;
-
-: %alien-get ( quot -- )
-    "output" get "address" set
-    "offset" operand dup %untag-fixnum
-    "output" operand "alien" operand-class %alien-accessor ;
 
 : %alien-integer-get ( quot -- )
     %alien-get
     "output" operand dup %tag-fixnum ; inline
 
-: %alien-integer-set ( quot -- )
-    { "offset" "value" } %untag-fixnums
-    "value" operand "alien" operand-class %alien-accessor ; inline
-
 : alien-integer-set-template
     H{
         { +input+ {
             { f "value" fixnum }
-            { f "alien" simple-c-ptr }
+            { unboxed-c-ptr "alien" simple-c-ptr }
             { f "offset" fixnum }
         } }
         { +scratch+ { { f "address" } } }
         { +clobber+ { "value" "offset" } }
     } ;
+
+: %alien-integer-set ( quot -- )
+    "offset" get "value" get = [
+        "value" operand dup %untag-fixnum
+    ] unless
+    %alien-set ; inline
 
 : define-alien-integer-intrinsics ( word get-quot word set-quot -- )
     [ %alien-integer-set ] curry
@@ -660,41 +667,56 @@ define-alien-integer-intrinsics
 \ set-alien-signed-2 [ STH ]
 define-alien-integer-intrinsics
 
-: %alien-float-get ( quot -- )
-    "offset" operand dup %untag-fixnum
-    "output" operand "alien" operand-class %alien-accessor ; inline
+\ alien-cell [
+    [ LWZ ] %alien-get
+] H{
+    { +input+ {
+        { unboxed-c-ptr "alien" simple-c-ptr }
+        { f "offset" fixnum }
+    } }
+    ! should be unboxed-alien
+    { +scratch+ { { unboxed-c-ptr "output" } } }
+    { +output+ { "output" } }
+    { +clobber+ { "offset" } }
+} define-intrinsic
+
+\ set-alien-cell [
+    [ STW ] %alien-set
+] H{
+    { +input+ {
+        { unboxed-c-ptr "value" simple-c-ptr }
+        { unboxed-c-ptr "alien" simple-c-ptr }
+        { f "offset" fixnum }
+    } }
+    { +clobber+ { "offset" } }
+} define-intrinsic
 
 : alien-float-get-template
     H{
         { +input+ {
-            { f "alien" simple-c-ptr }
+            { unboxed-c-ptr "alien" simple-c-ptr }
             { f "offset" fixnum }
         } }
-        { +scratch+ { { float "output" } { f "address" } } }
+        { +scratch+ { { float "output" } } }
         { +output+ { "output" } }
         { +clobber+ { "offset" } }
     } ;
-
-: %alien-float-set ( quot -- )
-    "offset" operand dup %untag-fixnum
-    "value" operand "alien" operand-class %alien-accessor ; inline
 
 : alien-float-set-template
     H{
         { +input+ {
             { float "value" float }
-            { f "alien" simple-c-ptr }
+            { unboxed-c-ptr "alien" simple-c-ptr }
             { f "offset" fixnum }
         } }
-        { +scratch+ { { f "address" } } }
         { +clobber+ { "offset" } }
     } ;
 
 : define-alien-float-intrinsics ( word get-quot word set-quot -- )
-    [ %alien-float-set ] curry
+    [ %alien-set ] curry
     alien-float-set-template
     define-intrinsic
-    [ %alien-float-get ] curry
+    [ %alien-get ] curry
     alien-float-get-template
     define-intrinsic ;
 
@@ -705,8 +727,3 @@ define-alien-float-intrinsics
 \ alien-float [ LFS ]
 \ set-alien-float [ STFS ]
 define-alien-float-intrinsics
-
-\ alien-cell [
-    [ LWZ ] %alien-get
-    "output" get %allot-alien
-] alien-integer-get-template define-intrinsic
