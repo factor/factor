@@ -1,4 +1,4 @@
-USING: math.ranges sequences tools.test ;
+USING: math.ranges sequences tools.test arrays ;
 IN: temporary
 
 [ { } ] [ 1 1 (a,b) >array ] unit-test
