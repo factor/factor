@@ -365,17 +365,17 @@ M: object minimal-ds-loc* drop ;
     2dup [ length ] 2apply <=
     [ drop { } swap ] [ length swap cut* ] if ;
 
-: substitute-vregs ( alist -- )
-    >hashtable
-    { phantom-d phantom-r }
-    [ get substitute ] curry* each ;
+: vreg-substitution ( value vreg -- pair )
+    dupd <cached> 2array ;
+
+: substitute-vregs ( values vregs -- )
+    [ vreg-substitution ] 2map [ first loc? ] subset >hashtable
+    [ swap substitute ] curry each-phantom ;
 
 : lazy-load ( values template -- )
     #! Set operand vars here.
-    flip first2
-    >r dupd [ (lazy-load) ] 2map dup r>
-    [ >r dup value? [ value-literal ] when r> set ] 2each
-    dupd [ <cached> ] 2map 2array flip [ first loc? ] subset
+    2dup [ first (lazy-load) ] 2map dup rot
+    [ >r dup value? [ value-literal ] when r> second set ] 2each
     substitute-vregs ;
 
 : fast-input ( template -- )
