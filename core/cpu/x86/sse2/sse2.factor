@@ -62,34 +62,29 @@ IN: cpu.x86.sse2
 : alien-float-get-template
     H{
         { +input+ {
-            { f "alien" simple-c-ptr }
+            { unboxed-c-ptr "alien" simple-c-ptr }
             { f "offset" fixnum }
         } }
-        { +scratch+ { { float "output" } } }
+        { +scratch+ { { float "value" } } }
         { +output+ { "output" } }
-        { +clobber+ { "alien" "offset" } }
+        { +clobber+ { "offset" } }
     } ;
-
-: %alien-float-set ( quot -- )
-    "offset" operand %untag-fixnum
-    "value" operand "alien" operand-class %alien-accessor ;
-    inline
 
 : alien-float-set-template
     H{
         { +input+ {
             { float "value" float }
-            { f "alien" simple-c-ptr }
+            { unboxed-c-ptr "alien" simple-c-ptr }
             { f "offset" fixnum }
         } }
-        { +clobber+ { "value" "alien" "offset" } }
+        { +clobber+ { "offset" } }
     } ;
 
 : define-alien-float-intrinsics ( word get-quot word set-quot -- )
-    [ %alien-float-set ] curry
+    [ %alien-accessor ] curry
     alien-float-set-template
     define-intrinsic
-    [ %alien-float-get ] curry
+    [ %alien-accessor ] curry
     alien-float-get-template
     define-intrinsic ;
 

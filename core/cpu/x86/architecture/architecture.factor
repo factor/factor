@@ -174,29 +174,25 @@ M: x86-backend struct-small-enough? ( size -- ? )
 M: x86-backend %return ( -- ) 0 %unwind ;
 
 ! Alien intrinsics
-M: x86-backend %unbox-byte-array ( quot src -- )
-    "alien" operand "offset" operand ADD
-    "alien" operand byte-array-offset [+]
-    rot call ;
+M: x86-backend %unbox-byte-array ( dst src -- )
+    [ v>operand ] 2apply byte-array-offset [+] LEA ;
 
-M: x86-backend %unbox-alien ( quot src -- )
-    "alien" operand dup alien-offset [+] MOV
-    "alien" operand "offset" operand [+]
-    rot call ;
+M: x86-backend %unbox-alien ( dst src -- )
+    [ v>operand ] 2apply alien-offset [+] MOV ;
 
-M: x86-backend %unbox-f ( quot src -- )
-    "offset" operand rot call ;
+M: x86-backend %unbox-f ( dst src -- )
+    drop 0 MOV ;
 
-M: x86-backend %complex-alien-accessor ( quot src -- )
+M: x86-backend %complex-alien-accessor ( dst src -- )
     { "is-f" "is-alien" "end" } [ define-label ] each
-    "alien" operand f v>operand CMP
+    dup f [ v>operand ] 2apply CMP
     "is-f" get JE
-    "alien" operand header-offset [+] alien type-number tag-header CMP
+    dup header-offset [+] alien type-number tag-header CMP
     "is-alien" get JE
-    [ %unbox-byte-array ] 2keep
+    2dup %unbox-byte-array
     "end" get JMP
     "is-alien" resolve-label
-    [ %unbox-alien ] 2keep
+    2dup %unbox-alien
     "end" get JMP
     "is-f" resolve-label
     %unbox-f
