@@ -601,12 +601,7 @@ IN: cpu.ppc.intrinsics
 } define-intrinsic
 
 ! Alien intrinsics
-: %alien-get ( quot -- )
-    "offset" operand dup %untag-fixnum
-    "offset" operand dup "alien" operand ADD
-    "output" operand "offset" operand 0 roll call ; inline
-
-: %alien-set ( quot -- )
+: %alien-accessor ( quot -- )
     "offset" operand dup %untag-fixnum
     "offset" operand dup "alien" operand ADD
     "value" operand "offset" operand 0 roll call ; inline
@@ -617,13 +612,13 @@ IN: cpu.ppc.intrinsics
             { unboxed-c-ptr "alien" simple-c-ptr }
             { f "offset" fixnum }
         } }
-        { +scratch+ { { f "output" } { f "address" } } }
-        { +output+ { "output" } }
+        { +scratch+ { { f "value" } { f "address" } } }
+        { +output+ { "value" } }
         { +clobber+ { "offset" } }
     } ;
 
 : %alien-integer-get ( quot -- )
-    %alien-get
+    %alien-accessor
     "output" operand dup %tag-fixnum ; inline
 
 : alien-integer-set-template
@@ -641,7 +636,7 @@ IN: cpu.ppc.intrinsics
     "offset" get "value" get = [
         "value" operand dup %untag-fixnum
     ] unless
-    %alien-set ; inline
+    %alien-accessor ; inline
 
 : define-alien-integer-intrinsics ( word get-quot word set-quot -- )
     [ %alien-integer-set ] curry
@@ -668,7 +663,7 @@ define-alien-integer-intrinsics
 define-alien-integer-intrinsics
 
 \ alien-cell [
-    [ LWZ ] %alien-get
+    [ LWZ ] %alien-accessor
 ] H{
     { +input+ {
         { unboxed-c-ptr "alien" simple-c-ptr }
@@ -680,7 +675,7 @@ define-alien-integer-intrinsics
 } define-intrinsic
 
 \ set-alien-cell [
-    [ STW ] %alien-set
+    [ STW ] %alien-accessor
 ] H{
     { +input+ {
         { unboxed-c-ptr "value" simple-c-ptr }
@@ -712,10 +707,10 @@ define-alien-integer-intrinsics
     } ;
 
 : define-alien-float-intrinsics ( word get-quot word set-quot -- )
-    [ %alien-set ] curry
+    [ %alien-accessor ] curry
     alien-float-set-template
     define-intrinsic
-    [ %alien-get ] curry
+    [ %alien-accessor ] curry
     alien-float-get-template
     define-intrinsic ;
 

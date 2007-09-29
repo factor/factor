@@ -325,9 +325,7 @@ M: ppc-backend %unbox-f ( dst src -- )
     drop 0 swap v>operand LI ;
 
 M: ppc-backend %unbox-any-c-ptr ( dst src -- )
-    "is-f" define-label
-    "is-alien" define-label
-    "end" define-label
+    { "is-f" "is-alien" "end" } [ define-label ] each
     0 over v>operand f v>operand CMPI
     "is-f" get BEQ
     12 over v>operand header-offset LWZ
