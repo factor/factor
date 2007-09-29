@@ -2,8 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: arrays generic kernel kernel.private math memory
 namespaces sequences layouts system hashtables classes alien
-byte-arrays bit-arrays float-arrays combinators words
-inference.dataflow ;
+byte-arrays bit-arrays float-arrays combinators words ;
 IN: cpu.architecture
 
 SYMBOL: compiler-backend
@@ -153,8 +152,6 @@ M: integer v>operand tag-bits get shift ;
 
 M: f v>operand drop \ f tag-number ;
 
-M: value v>operand value-literal ;
-
 M: object load-literal v>operand load-indirect ;
 
 PREDICATE: integer small-slot cells small-enough? ;
@@ -189,7 +186,7 @@ HOOK: %unbox-alien compiler-backend ( dst src -- )
 
 HOOK: %unbox-f compiler-backend ( dst src -- )
 
-HOOK: %unbox-c-ptr compiler-backend ( dst src -- )
+HOOK: %unbox-any-c-ptr compiler-backend ( dst src -- )
 
 HOOK: %box-alien compiler-backend ( dst src -- )
 

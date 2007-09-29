@@ -269,7 +269,7 @@ M: ppc-backend %alien-invoke ( symbol dll -- )
     11 %load-dlsym (%call) ;
 
 M: ppc-backend %alien-callback ( quot -- )
-    0 <int-vreg> load-literal "c_to_factor" f %alien-invoke ;
+    3 load-indirect "c_to_factor" f %alien-invoke ;
 
 M: ppc-backend %prepare-alien-indirect ( -- )
     "unbox_alien" f %alien-invoke
@@ -324,7 +324,7 @@ M: ppc-backend %unbox-alien ( dst src -- )
 M: ppc-backend %unbox-f ( dst src -- )
     drop 0 swap v>operand LI ;
 
-M: ppc-backend %unbox-c-ptr ( dst src -- )
+M: ppc-backend %unbox-any-c-ptr ( dst src -- )
     "is-f" define-label
     "is-alien" define-label
     "end" define-label

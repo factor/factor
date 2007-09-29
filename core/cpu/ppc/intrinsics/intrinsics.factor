@@ -15,7 +15,7 @@ IN: cpu.ppc.intrinsics
     "val" operand
     "obj" operand
     "n" get cells
-    "obj" operand-tag - ;
+    "obj" get operand-tag - ;
 
 : %slot-literal-any-tag
     "obj" operand "scratch" operand %untag
@@ -58,7 +58,7 @@ IN: cpu.ppc.intrinsics
     "cards_offset" f pick %load-dlsym  dup 0 LWZ ;
 
 : %write-barrier ( -- )
-    "val" operand-immediate? "obj" get fresh-object? or [
+    "val" get operand-immediate? "obj" get fresh-object? or [
         "obj" operand "scratch" operand card-bits SRWI
         "val" operand load-cards-offset
         "scratch" operand dup "val" operand ADD
@@ -674,8 +674,7 @@ define-alien-integer-intrinsics
         { unboxed-c-ptr "alien" simple-c-ptr }
         { f "offset" fixnum }
     } }
-    ! should be unboxed-alien
-    { +scratch+ { { unboxed-c-ptr "output" } } }
+    { +scratch+ { { unboxed-alien "output" } } }
     { +output+ { "output" } }
     { +clobber+ { "offset" } }
 } define-intrinsic

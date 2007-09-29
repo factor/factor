@@ -2,9 +2,8 @@
 ! See http://factorcode.org/license.txt for BSD license.
 IN: inference
 USING: inference.backend inference.dataflow
-inference.known-words inference.stack inference.transforms
-inference.errors sequences prettyprint io effects kernel
-namespaces quotations ;
+inference.known-words inference.transforms inference.errors
+sequences prettyprint io effects kernel namespaces quotations ;
 
 GENERIC: infer ( quot -- effect )
 

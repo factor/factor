@@ -1,10 +1,9 @@
 ! Copyright (C) 2006, 2007 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: arrays assocs classes classes.private combinators
-cpu.architecture generator.fixup generic hashtables
-inference.dataflow inference.stack kernel kernel.private layouts
-math memory namespaces quotations sequences system vectors words
-effects ;
+cpu.architecture generator.fixup hashtables kernel layouts math
+namespaces quotations sequences system vectors words effects
+alien byte-arrays bit-arrays float-arrays ;
 IN: generator.registers
 
 SYMBOL: +input+
@@ -13,83 +12,205 @@ SYMBOL: +scratch+
 SYMBOL: +clobber+
 SYMBOL: known-tag
 
+! Register classes
+TUPLE: int-regs ;
+
+TUPLE: float-regs size ;
+
+<PRIVATE
+
+! Value protocol
+GENERIC: set-operand-class ( class obj -- )
+GENERIC: operand-class* ( operand -- class )
+GENERIC: move-spec ( obj -- spec )
+GENERIC: live-vregs* ( obj -- )
+GENERIC: live-loc? ( actual current -- ? )
+GENERIC# (lazy-load) 1 ( value spec -- value )
+GENERIC: lazy-store ( dst src -- )
+GENERIC: minimal-ds-loc* ( min obj -- min )
+
+! This will be a multimethod soon
+DEFER: %move
+
+MIXIN: value
+
+PRIVATE>
+
+: operand-class ( operand -- class )
+    operand-class* object or ;
+
+! Default implementation
+M: value set-operand-class 2drop ;
+M: value operand-class* drop f ;
+M: value live-vregs* drop ;
+M: value live-loc? 2drop f ;
+M: value minimal-ds-loc* drop ;
+M: value lazy-store 2drop ;
+
 ! A scratch register for computations
 TUPLE: vreg n ;
 
 : <vreg> ( n reg-class -- vreg )
     { set-vreg-n set-delegate } vreg construct ;
 
-! Register classes
-TUPLE: int-regs ;
-TUPLE: float-regs size ;
+M: vreg v>operand dup vreg-n swap vregs nth ;
+M: vreg live-vregs* , ;
 
-: <int-vreg> ( n -- vreg ) T{ int-regs } <vreg> ;
-: <float-vreg> ( n -- vreg ) T{ float-regs f 8 } <vreg> ;
+INSTANCE: vreg value
+
+M: float-regs move-spec drop float ;
+M: float-regs operand-class* drop float ;
 
 ! Temporary register for stack shuffling
 TUPLE: temp-reg ;
 
 : temp-reg T{ temp-reg T{ int-regs } } ;
 
-M: vreg v>operand dup vreg-n swap vregs nth ;
+M: temp-reg move-spec drop f ;
 
+INSTANCE: temp-reg value
+
+! A data stack location.
+TUPLE: ds-loc n class ;
+
+: <ds-loc> { set-ds-loc-n } ds-loc construct ;
+
+M: ds-loc minimal-ds-loc* ds-loc-n min ;
+M: ds-loc operand-class* ds-loc-class ;
+M: ds-loc set-operand-class set-ds-loc-class ;
+
+! A retain stack location.
+TUPLE: rs-loc n class ;
+
+: <rs-loc> { set-rs-loc-n } rs-loc construct ;
+
+M: rs-loc operand-class* rs-loc-class ;
+M: rs-loc set-operand-class set-rs-loc-class ;
+
+UNION: loc ds-loc rs-loc ;
+
+M: loc move-spec drop loc ;
+M: loc live-loc? = not ;
+
+INSTANCE: loc value
+
+M: f move-spec drop loc ;
+M: f operand-class* ;
+
+! A stack location which has been loaded into a register. To
+! read the location, we just read the register, but when time
+! comes to save it back to the stack, we know the register just
+! contains a stack value so we don't have to redundantly write
+! it back.
 TUPLE: cached loc vreg ;
 
 C: <cached> cached
 
-! A data stack location.
-TUPLE: ds-loc n ;
+M: cached set-operand-class cached-vreg set-operand-class ;
+M: cached operand-class* cached-vreg operand-class* ;
+M: cached move-spec drop cached ;
+M: cached live-vregs* cached-vreg live-vregs* ;
+M: cached live-loc? cached-loc live-loc? ;
+M: cached (lazy-load) >r cached-vreg r> (lazy-load) ;
+M: cached lazy-store
+    2dup cached-loc = [ 2drop ] [ cached-vreg %move ] if ;
+M: cached minimal-ds-loc* cached-loc minimal-ds-loc* ;
 
-C: <ds-loc> ds-loc
+INSTANCE: cached value
 
-! A retain stack location.
-TUPLE: rs-loc n ;
+! A tagged pointer
+TUPLE: tagged vreg class ;
 
-C: <rs-loc> rs-loc
+: <tagged> ( vreg -- tagged )
+    { set-tagged-vreg } tagged construct ;
+
+M: tagged v>operand tagged-vreg v>operand ;
+M: tagged set-operand-class set-tagged-class ;
+M: tagged operand-class* tagged-class ;
+M: tagged move-spec drop f ;
+M: tagged live-vregs* tagged-vreg , ;
+
+INSTANCE: tagged value
 
 ! Unboxed alien pointers
 TUPLE: unboxed-alien vreg ;
 C: <unboxed-alien> unboxed-alien
 M: unboxed-alien v>operand unboxed-alien-vreg v>operand ;
+M: unboxed-alien operand-class* drop simple-alien ;
+M: unboxed-alien move-spec class ;
+M: unboxed-alien live-vregs* unboxed-alien-vreg , ;
+
+INSTANCE: unboxed-alien value
 
 TUPLE: unboxed-byte-array vreg ;
 C: <unboxed-byte-array> unboxed-byte-array
 M: unboxed-byte-array v>operand unboxed-byte-array-vreg v>operand ;
+M: unboxed-byte-array operand-class* drop simple-c-ptr ;
+M: unboxed-byte-array move-spec class ;
+M: unboxed-byte-array live-vregs* unboxed-byte-array-vreg , ;
+
+INSTANCE: unboxed-byte-array value
 
 TUPLE: unboxed-f vreg ;
 C: <unboxed-f> unboxed-f
 M: unboxed-f v>operand unboxed-f-vreg v>operand ;
+M: unboxed-f operand-class* drop \ f ;
+M: unboxed-f move-spec class ;
+M: unboxed-f live-vregs* unboxed-f-vreg , ;
+
+INSTANCE: unboxed-f value
 
 TUPLE: unboxed-c-ptr vreg ;
 C: <unboxed-c-ptr> unboxed-c-ptr
 M: unboxed-c-ptr v>operand unboxed-c-ptr-vreg v>operand ;
+M: unboxed-c-ptr operand-class* drop simple-c-ptr ;
+M: unboxed-c-ptr move-spec class ;
+M: unboxed-c-ptr live-vregs* unboxed-c-ptr-vreg , ;
+
+INSTANCE: unboxed-c-ptr value
+
+! A constant value
+TUPLE: constant value ;
+C: <constant> constant
+M: constant operand-class* constant-value class ;
+M: constant move-spec class ;
+
+INSTANCE: constant value
 
 <PRIVATE
 
-UNION: loc ds-loc rs-loc ;
-
 ! Moving values between locations and registers
-GENERIC: move-spec ( obj -- spec )
+: %move-bug "Bug in generator.registers" throw ;
 
-M: unboxed-alien move-spec class ;
-M: unboxed-byte-array move-spec class ;
-M: unboxed-f move-spec class ;
-M: unboxed-c-ptr move-spec class ;
-M: int-regs move-spec drop f ;
-M: float-regs move-spec drop float ;
-M: value move-spec class ;
-M: cached move-spec drop cached ;
-M: loc move-spec drop loc ;
-M: f move-spec drop loc ;
+: %unbox-c-ptr ( dst src -- )
+    dup operand-class {
+        { [ dup \ f class< ] [ drop %unbox-f ] }
+        { [ dup simple-alien class< ] [ drop %unbox-alien ] }
+        { [ dup byte-array class< ] [ drop %unbox-byte-array ] }
+        { [ dup bit-array class< ] [ drop %unbox-byte-array ] }
+        { [ dup float-array class< ] [ drop %unbox-byte-array ] }
+        { [ t ] [ drop %unbox-any-c-ptr ] }
+    } cond ; inline
+
+: %move-via-temp ( dst src -- )
+    #! For many transfers, such as loc to unboxed-alien, we
+    #! don't have an intrinsic, so we transfer the source to
+    #! temp then temp to the destination.
+    temp-reg over %move
+    operand-class temp-reg
+    { set-operand-class set-tagged-vreg } tagged construct
+    %move ;
 
 : %move ( dst src -- )
     2dup [ move-spec ] 2apply 2array {
-        { { f f } [ "Bug in generator.registers %move" throw ] }
-        { { f value } [ value-literal swap load-literal ] }
+        { { f f } [ %move-bug ] }
+        { { f unboxed-c-ptr } [ %move-bug ] }
+        { { f unboxed-byte-array } [ %move-bug ] }
+
+        { { f constant } [ constant-value swap load-literal ] }
 
         { { f float } [ %box-float ] }
-        ! { { f unboxed-alien } [ %box-alien ] }
-        { { f unboxed-c-ptr } [ %box-alien ] }
+        { { f unboxed-alien } [ %box-alien ] }
         { { f loc } [ %peek ] }
 
         { { float f } [ %unbox-float ] }
@@ -99,7 +220,7 @@ M: f move-spec drop loc ;
         { { unboxed-c-ptr f } [ %unbox-c-ptr ] }
         { { loc f } [ swap %replace ] }
 
-        [ drop temp-reg swap %move temp-reg %move ]
+        [ drop %move-via-temp ]
     } case ;
 
 ! A compile-time stack
@@ -176,37 +297,20 @@ M: phantom-stack cut-phantom
 : phantom-append ( seq stack -- )
     over length over adjust-phantom push-all ;
 
+: add-locs ( n phantom -- )
+    2dup length <= [
+        2drop
+    ] [
+        [ phantom-locs ] keep
+        [ length head-slice* ] keep
+        [ append >vector ] keep
+        delegate set-delegate
+    ] if ;
+
 : phantom-input ( n phantom -- seq )
-    [
-        2dup length <= [
-            cut-phantom
-        ] [
-            [ phantom-locs ] keep
-            [ length head-slice* ] keep
-            [ append ] keep
-            delete-all
-        ] if
-    ] 2keep >r neg r> adjust-phantom ;
-
-PRIVATE>
-
-: phantom-push ( obj -- )
-    1 phantom-d get adjust-phantom
-    phantom-d get push ;
-
-: phantom-shuffle ( shuffle -- )
-    [ effect-in length phantom-d get phantom-input ] keep
-    shuffle* phantom-d get phantom-append ;
-
-: phantom->r ( n -- )
-    phantom-d get phantom-input
-    phantom-r get phantom-append ;
-
-: phantom-r> ( n -- )
-    phantom-r get phantom-input
-    phantom-d get phantom-append ;
-
-<PRIVATE
+    2dup add-locs
+    2dup cut-phantom
+    >r >r neg r> adjust-phantom r> ;
 
 : phantoms ( -- phantom phantom ) phantom-d get phantom-r get ;
 
@@ -214,25 +318,8 @@ PRIVATE>
 
 : finalize-heights ( -- ) [ finalize-height ] each-phantom ;
 
-! Phantom stacks hold values, locs, and vregs
-GENERIC: live-vregs* ( obj -- )
-
-M: cached live-vregs* cached-vreg live-vregs* ;
-M: unboxed-alien live-vregs* unboxed-alien-vreg , ;
-M: unboxed-byte-array live-vregs* unboxed-byte-array-vreg , ;
-M: unboxed-f live-vregs* unboxed-f-vreg , ;
-M: unboxed-c-ptr live-vregs* unboxed-c-ptr-vreg , ;
-M: vreg live-vregs* , ;
-M: object live-vregs* drop ;
-
 : live-vregs ( -- seq )
     [ [ [ live-vregs* ] each ] each-phantom ] { } make ;
-
-GENERIC: live-loc? ( actual current -- ? )
-
-M: cached live-loc? cached-loc live-loc? ;
-M: loc live-loc? = not ;
-M: object live-loc? 2drop f ;
 
 : (live-locs) ( phantom -- seq )
     #! Discard locs which haven't moved
@@ -248,9 +335,50 @@ M: object live-loc? 2drop f ;
 SYMBOL: fresh-objects
 
 ! Computing free registers and initializing allocator
+: reg-spec>class ( spec -- class )
+    float eq?
+    T{ float-regs f 8 } T{ int-regs } ? ;
+
 : free-vregs ( reg-class -- seq )
     #! Free vregs in a given register class
     \ free-vregs get at ;
+
+: alloc-vreg ( spec -- reg )
+    dup reg-spec>class free-vregs pop swap {
+        { f [ <tagged> ] }
+        { unboxed-alien [ <unboxed-alien> ] }
+        { unboxed-byte-array [ <unboxed-byte-array> ] }
+        { unboxed-f [ <unboxed-f> ] }
+        { unboxed-c-ptr [ <unboxed-c-ptr> ] }
+        [ drop ]
+    } case ;
+
+: compatible? ( value spec -- ? )
+    >r move-spec r> {
+        { [ 2dup = ] [ t ] }
+        { [ dup unboxed-c-ptr eq? ] [
+            over { unboxed-byte-array unboxed-alien } member?
+        ] }
+        { [ t ] [ f ] }
+    } cond 2nip ;
+
+: allocation ( value spec -- reg-class )
+    {
+        { [ dup quotation? ] [ 2drop f ] }
+        { [ 2dup compatible? ] [ 2drop f ] }
+        { [ t ] [ nip reg-spec>class ] }
+    } cond ;
+
+: alloc-vreg-for ( value spec -- vreg )
+    swap operand-class swap alloc-vreg
+    dup tagged? [ tuck set-tagged-class ] [ nip ] if ;
+
+M: value (lazy-load)
+    2dup allocation [
+        dupd alloc-vreg-for dup rot %move
+    ] [
+        drop
+    ] if ;
 
 : (compute-free-vregs) ( used class -- vector )
     #! Find all vregs in 'class' which are not in 'used'.
@@ -266,55 +394,14 @@ SYMBOL: fresh-objects
     \ free-vregs set
     drop ;
 
-: reg-spec>class ( spec -- class )
-    float eq?
-    T{ float-regs f 8 } T{ int-regs } ? ;
-
-! Copying vregs to stacks
-: alloc-vreg ( spec -- reg )
-    dup reg-spec>class free-vregs pop swap {
-        { unboxed-alien [ <unboxed-alien> ] }
-        { unboxed-byte-array [ <unboxed-byte-array> ] }
-        { unboxed-f [ <unboxed-f> ] }
-        { unboxed-c-ptr [ <unboxed-c-ptr> ] }
-        [ drop ]
-    } case ;
-
-: allocation ( value spec -- reg-class )
-    dup quotation? [
-        2drop f
-    ] [
-        dup rot move-spec = [
-            drop f
-        ] [
-            reg-spec>class
-        ] if
-    ] if ;
-
-GENERIC# (lazy-load) 1 ( value spec -- value )
-
-M: cached (lazy-load)
-    >r cached-vreg r> (lazy-load) ;
-
-M: object (lazy-load)
-    2dup allocation [ alloc-vreg dup rot %move ] [ drop ] if ;
-
-GENERIC: lazy-store ( dst src -- )
-
 M: loc lazy-store
-    2dup = [ 2drop ] [ \ live-locs get at %move ] if ;
-
-M: cached lazy-store
-    2dup cached-loc = [ 2drop ] [ cached-vreg %move ] if ;
-
-M: object lazy-store
-    2drop ;
+    2dup = [ 2drop ] [ "live-locs" get at %move ] if ;
 
 : do-shuffle ( hash -- )
     dup assoc-empty? [
         drop
     ] [
-        \ live-locs set
+        "live-locs" set
         [ lazy-store ] each-loc
     ] if ;
 
@@ -322,12 +409,6 @@ M: object lazy-store
     #! We have enough free registers to load all shuffle inputs
     #! at once
     [ dup f (lazy-load) ] H{ } map>assoc do-shuffle ;
-
-GENERIC: minimal-ds-loc* ( min obj -- min )
-
-M: cached minimal-ds-loc* cached-loc minimal-ds-loc* ;
-M: ds-loc minimal-ds-loc* ds-loc-n min ;
-M: object minimal-ds-loc* drop ;
 
 : minimal-ds-loc ( phantom -- n )
     #! When shuffling more values than can fit in registers, we
@@ -380,29 +461,16 @@ M: object minimal-ds-loc* drop ;
     "simple_gc" f %alien-invoke ;
 
 ! Loading stacks to vregs
-: free-vregs# ( -- int# float# )
-    T{ int-regs } T{ float-regs f 8 } 
-    [ free-vregs length ] 2apply ;
-
 : free-vregs? ( int# float# -- ? )
-    free-vregs# swapd <= >r <= r> and ;
-
-: ensure-vregs ( int# float# -- )
-    compute-free-vregs free-vregs?
-    [ finalize-contents compute-free-vregs ] unless ;
+    T{ float-regs f 8 } free-vregs length <
+    >r T{ int-regs } free-vregs length < r> and ;
 
 : phantom&spec ( phantom spec -- phantom' spec' )
-    0 <column>
     [ length f pad-left ] keep
     [ <reversed> ] 2apply ; inline
 
 : phantom&spec-agree? ( phantom spec quot -- ? )
     >r phantom&spec r> 2all? ; inline
-
-: split-template ( input -- slow fast )
-    phantom-d get
-    2dup [ length ] 2apply <=
-    [ drop { } swap ] [ length swap cut* ] if ;
 
 : vreg-substitution ( value vreg -- pair )
     dupd <cached> 2array ;
@@ -410,30 +478,25 @@ M: object minimal-ds-loc* drop ;
 : substitute-vreg? ( old new -- ? )
     #! We don't substitute locs for float or alien vregs,
     #! since in those cases the boxing overhead might kill us.
-    cached-vreg {
-        { [ dup vreg? not ] [ f ] }
-        { [ dup delegate int-regs? not ] [ f ] }
-        { [ over loc? not ] [ f ] }
-        { [ t ] [ t ] }
-    } cond 2nip ;
+    cached-vreg tagged? >r loc? r> and ;
 
 : substitute-vregs ( values vregs -- )
     [ vreg-substitution ] 2map
     [ substitute-vreg? ] assoc-subset >hashtable
     [ swap substitute ] curry each-phantom ;
 
+: set-operand ( value var -- )
+    >r dup constant? [ constant-value ] when r> set ;
+
 : lazy-load ( values template -- )
     #! Set operand vars here.
-    2dup [ first (lazy-load) ] 2map dup rot
-    [ >r dup value? [ value-literal ] when r> second set ] 2each
+    2dup [ first (lazy-load) ] 2map
+    dup rot [ second set-operand ] 2each
     substitute-vregs ;
 
-: fast-input ( template -- )
-    dup empty? [
-        drop
-    ] [
-        dup length phantom-d get phantom-input swap lazy-load
-    ] if ;
+: load-inputs ( -- )
+    +input+ get dup length phantom-d get phantom-input
+    swap lazy-load ;
 
 : output-vregs ( -- seq seq )
     +output+ +clobber+ [ get [ get ] map ] 2apply ;
@@ -445,9 +508,6 @@ M: object minimal-ds-loc* drop ;
 
 : outputs-clash? ( -- ? )
     output-vregs append clash? ;
-
-: slow-input ( template -- )
-    outputs-clash? [ finalize-contents ] when fast-input ;
 
 : count-vregs ( reg-classes -- ) [ [ inc ] when* ] each ;
 
@@ -477,14 +537,12 @@ M: object minimal-ds-loc* drop ;
     +input+ get { } +scratch+ get guess-vregs ;
 
 : template-inputs ( -- )
-    ! Ensure we have enough to hold any new stack elements we
-    ! will read (if any), and scratch.
-    guess-template-vregs ensure-vregs
-    ! Split the template into available (fast) parts and those
-    ! that require allocating registers and reading the stack
-    +input+ get split-template fast-input slow-input
-    ! Finally allocate scratch registers
-    alloc-scratch ;
+    ! Load input values into registers
+    load-inputs
+    ! Allocate scratch registers
+    alloc-scratch
+    ! If outputs clash, we write values back to the stack
+    outputs-clash? [ finalize-contents ] when ;
 
 : template-outputs ( -- )
     +output+ get [ get ] map phantom-d get phantom-append ;
@@ -496,15 +554,11 @@ M: object minimal-ds-loc* drop ;
     #! spec is not a quotation, its a reg-class, in which case
     #! the value is always good.
     dup quotation? [
-        over value?
-        [ >r value-literal r> call ] [ 2drop f ] if
+        over constant?
+        [ >r constant-value r> call ] [ 2drop f ] if
     ] [
         2drop t
     ] if ;
-
-: template-specs-match? ( -- ? )
-    phantom-d get +input+ get
-    [ value-matches? ] phantom&spec-agree? ;
 
 : class-tag ( class -- tag/f )
     dup hi-tag class< [
@@ -514,31 +568,41 @@ M: object minimal-ds-loc* drop ;
         dup length 1 = [ first tag-number ] [ drop f ] if
     ] if ;
 
-: class-match? ( actual expected -- ? )
+: class-matches? ( actual expected -- ? )
     {
         { f [ drop t ] }
         { known-tag [ class-tag >boolean ] }
         [ class< ]
     } case ;
 
-: template-classes-match? ( -- ? )
-    #! Depends on node@
-    node@ node-input-classes +input+ get
-    [ 2 swap ?nth class-match? ] 2all? ;
+: spec-matches? ( value spec -- ? )
+    2dup first value-matches?
+    >r >r operand-class 2 r> ?nth class-matches? r> and ;
+
+: template-specs-match? ( -- ? )
+    phantom-d get +input+ get
+    [ spec-matches? ] phantom&spec-agree? ;
 
 : template-matches? ( spec -- ? )
-    #! Depends on node@
     clone [
         template-specs-match?
-        template-classes-match? and
         [ guess-template-vregs free-vregs? ] [ f ] if
     ] bind ;
 
 : (find-template) ( templates -- pair/f )
-    #! Depends on node@
     [ second template-matches? ] find nip ;
 
+: ensure-template-vregs ( -- )
+    guess-template-vregs free-vregs? [
+        finalize-contents compute-free-vregs
+    ] unless ;
+
 PRIVATE>
+
+: set-operand-classes ( classes -- )
+    phantom-d get
+    over length over add-locs
+    [ set-operand-class ] 2reverse-each ;
 
 : end-basic-block ( -- )
     #! Commit all deferred stacking shuffling, and ensure the
@@ -547,10 +611,18 @@ PRIVATE>
     finalize-contents finalize-heights
     fresh-objects get dup empty? swap delete-all [ %gc ] unless ;
 
-: with-template ( quot hash -- )
+: do-template ( pair -- )
+    #! Use with return value from find-template
+    first2
     clone [ template-inputs call template-outputs ] bind
-    compute-free-vregs ;
-    inline
+    compute-free-vregs ; inline
+
+: with-template ( quot hash -- )
+    clone [
+        ensure-template-vregs
+        template-inputs call template-outputs
+    ] bind
+    compute-free-vregs ; inline
 
 : fresh-object ( obj -- ) fresh-objects get push ;
 
@@ -573,17 +645,31 @@ PRIVATE>
 
 : find-template ( templates -- pair/f )
     #! Pair has shape { quot hash }
-    #! Depends on node@
     compute-free-vregs
     dup (find-template) [ ] [
         finalize-contents (find-template)
     ] ?if ;
 
-: operand-class ( operand -- class )
-    #! Depends on node@
-    +input+ get [ second = ] curry* find drop
-    node@ tuck node-in-d nth node-class ;
-
 : operand-tag ( operand -- tag/f )
-    #! Depends on node@
     operand-class class-tag ;
+
+UNION: immediate fixnum POSTPONE: f ;
+
+: operand-immediate? ( operand -- ? )
+    operand-class immediate class< ;
+
+: phantom-push ( obj -- )
+    1 phantom-d get adjust-phantom
+    phantom-d get push ;
+
+: phantom-shuffle ( shuffle -- )
+    [ effect-in length phantom-d get phantom-input ] keep
+    shuffle* phantom-d get phantom-append ;
+
+: phantom->r ( n -- )
+    phantom-d get phantom-input
+    phantom-r get phantom-append ;
+
+: phantom-r> ( n -- )
+    phantom-r get phantom-input
+    phantom-d get phantom-append ;

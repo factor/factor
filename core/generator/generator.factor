@@ -2,9 +2,9 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: arrays assocs classes combinators cpu.architecture
 effects generator.fixup generator.registers generic hashtables
-inference inference.backend inference.dataflow inference.stack
-io kernel kernel.private layouts math namespaces optimizer
-prettyprint quotations sequences system threads words ;
+inference inference.backend inference.dataflow io kernel
+kernel.private layouts math namespaces optimizer prettyprint
+quotations sequences system threads words ;
 IN: generator
 
 SYMBOL: compiled-xts
@@ -246,10 +246,8 @@ M: #dispatch generate-node
 : define-if-intrinsic ( word quot inputs -- )
     2array 1array define-if-intrinsics ;
 
-: do-intrinsic ( pair -- ) first2 with-template ;
-
 : do-if-intrinsic ( #call pair -- next )
-    <label> [ swap do-intrinsic ] keep
+    <label> [ swap do-template ] keep
     >r node-successor r> generate-if
     node-successor ;
 
@@ -264,11 +262,12 @@ M: #dispatch generate-node
     ] if ;
 
 M: #call generate-node
+    dup node-input-classes set-operand-classes
     dup find-if-intrinsic [
         do-if-intrinsic
     ] [
         dup find-intrinsic [
-            do-intrinsic iterate-next
+            do-template iterate-next
         ] [
             node-param generate-call
         ] ?if
@@ -278,10 +277,9 @@ M: #call generate-node
 M: #call-label generate-node node-param generate-call ;
 
 ! #push
-UNION: immediate fixnum POSTPONE: f ;
-
 M: #push generate-node
-    node-out-d [ phantom-push ] each iterate-next ;
+    node-out-d [ value-literal <constant> phantom-push ] each
+    iterate-next ;
 
 ! #shuffle
 M: #shuffle generate-node
@@ -313,6 +311,3 @@ M: #return generate-node drop end-basic-block %return f ;
 : alien-offset 3 cells object tag-number - ;
 : tuple-class-offset 2 cells tuple tag-number - ;
 : class-hash-offset cell object tag-number - ;
-
-: operand-immediate? ( operand -- ? )
-    operand-class immediate class< ;

@@ -4,6 +4,8 @@ USING: compiler generator generator.registers
 generator.registers.private tools.test namespaces sequences
 words kernel math effects ;
 
+: <int-vreg> ( n -- vreg ) T{ int-regs } <vreg> ;
+
 [
     [ ] [ init-templates ] unit-test
     
@@ -58,8 +60,6 @@ words kernel math effects ;
         { +input+ { { f "x" } } }
     } clone [
         [ 1 0 ] [ +input+ get { } { } guess-vregs ] unit-test
-        [ ] [ 1 0 ensure-vregs ] unit-test
-        ! [ t ] [ +input+ get phantom-d get compatible? ] unit-test
         [ ] [ finalize-contents ] unit-test
         [ ] [ [ template-inputs ] { } make drop ] unit-test
     ] bind
@@ -119,12 +119,14 @@ SYMBOL: template-chosen
 
     ! This is not empty since a load instruction is emitted
     [ f ] [
-        [ { { f "x" } } fast-input ] { } make empty?
+        [ { { f "x" } } +input+ set load-inputs ] { } make
+        empty?
     ] unit-test
 
     ! This is empty since we already loaded the value
     [ t ] [
-        [ { { f "x" } } fast-input ] { } make empty?
+        [ { { f "x" } } +input+ set load-inputs ] { } make
+        empty?
     ] unit-test
 
     ! This is empty since we didn't change the stack
