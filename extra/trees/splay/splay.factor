@@ -1,7 +1,7 @@
 ! Copyright (c) 2005 Mackenzie Straight.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel math combinators assocs parser ;
-IN: splay-trees
+IN: trees.splay
 
 TUPLE: splay-tree r count ;
 INSTANCE: splay-tree assoc
