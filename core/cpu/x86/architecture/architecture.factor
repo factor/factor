@@ -56,22 +56,21 @@ M: x86-backend %prologue ( n -- )
 M: x86-backend %epilogue ( n -- )
     stack-reg swap stack-frame ADD ;
 
-: %alien-global ( symbol dll -- )
-    temp-reg v>operand 0 MOV rc-absolute-cell rel-dlsym
-    temp-reg v>operand dup [] MOV ;
+: %alien-global ( symbol dll register -- )
+    [ 0 MOV rc-absolute-cell rel-dlsym ] keep dup [] MOV ;
 
 M: x86-backend %prepare-alien-invoke
     #! Save Factor stack pointers in case the C code calls a
     #! callback which does a GC, which must reliably trace
     #! all roots.
-    "stack_chain" f %alien-global
+    "stack_chain" f temp-reg v>operand %alien-global
     temp-reg v>operand [] stack-reg MOV
     temp-reg v>operand 2 cells [+] ds-reg MOV
     temp-reg v>operand 3 cells [+] rs-reg MOV ;
 
 M: x86-backend %profiler-prologue ( word -- )
     "end" define-label
-    "profiling" f %alien-global
+    "profiling" f temp-reg v>operand %alien-global
     temp-reg v>operand 0 CMP
     "end" get JE
     temp-reg load-literal
@@ -181,13 +180,13 @@ M: x86-backend %unbox-alien ( dst src -- )
     [ v>operand ] 2apply alien-offset [+] MOV ;
 
 M: x86-backend %unbox-f ( dst src -- )
-    drop 0 MOV ;
+    drop v>operand 0 MOV ;
 
-M: x86-backend %complex-alien-accessor ( dst src -- )
+M: x86-backend %unbox-any-c-ptr ( dst src -- )
     { "is-f" "is-alien" "end" } [ define-label ] each
     dup f [ v>operand ] 2apply CMP
     "is-f" get JE
-    dup header-offset [+] alien type-number tag-header CMP
+    dup v>operand header-offset [+] alien type-number tag-header CMP
     "is-alien" get JE
     2dup %unbox-byte-array
     "end" get JMP

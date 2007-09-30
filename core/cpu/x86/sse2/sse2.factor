@@ -55,11 +55,6 @@ IN: cpu.x86.sse2
     { +clobber+ { "in" } }
 } define-intrinsic
 
-: %alien-float-get ( quot -- )
-    "offset" operand %untag-fixnum
-    "output" operand "alien" operand-class %alien-accessor ;
-    inline
-
 : alien-float-get-template
     H{
         { +input+ {
@@ -67,7 +62,7 @@ IN: cpu.x86.sse2
             { f "offset" fixnum }
         } }
         { +scratch+ { { float "value" } } }
-        { +output+ { "output" } }
+        { +output+ { "value" } }
         { +clobber+ { "offset" } }
     } ;
 
@@ -82,10 +77,10 @@ IN: cpu.x86.sse2
     } ;
 
 : define-alien-float-intrinsics ( word get-quot word set-quot -- )
-    [ small-reg %alien-accessor ] curry
+    [ "value" operand swap %alien-accessor ] curry
     alien-float-set-template
     define-intrinsic
-    [ small-reg %alien-accessor ] curry
+    [ "value" operand swap %alien-accessor ] curry
     alien-float-get-template
     define-intrinsic ;
 
