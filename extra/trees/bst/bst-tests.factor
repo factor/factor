@@ -1,4 +1,4 @@
-USING: trees test kernel sequences ;
+USING: trees trees.bst tools.test kernel sequences ;
 IN: temporary
 
 : test-tree ( -- tree )

@@ -1,18 +1,18 @@
 ! Copyright (C) 2007 Alex Chapman
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel generic math namespaces io sequences ;
-IN: trees
+USING: combinators kernel generic math math.functions math.parser namespaces io
+sequences trees ;
+IN: trees.avl-tree
 
 TUPLE: avl-tree ;
 
-C: avl-tree ( -- tree )
-    <tree> over set-delegate ;
+: <avl-tree> ( -- tree )
+    avl-tree construct-empty <tree> over set-delegate ;
 
 TUPLE: avl-node balance ;
 
-C: avl-node ( value key -- node )
-    >r <node> r> tuck set-delegate
-    0 over set-avl-node-balance ;
+: <avl-node> ( value key -- node )
+    <node> 0 avl-node construct-boa tuck set-delegate ;
 
 M: avl-tree create-node ( value key tree -- node ) drop <avl-node> ;
 
