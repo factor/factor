@@ -1,6 +1,6 @@
 ! Copyright (c) 2005 Mackenzie Straight.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel tools.test splay-trees namespaces assocs
+USING: kernel tools.test trees.splay math namespaces assocs
 sequences random ;
 IN: temporary
 

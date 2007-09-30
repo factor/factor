@@ -1,6 +1,7 @@
 ! Copyright (C) 2007 Alex Chapman
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel generic math math.parser sequences arrays io namespaces namespaces.private random layouts ;
+USING: kernel generic math math.parser sequences arrays io namespaces
+namespaces.private random layouts ;
 IN: trees
 
 TUPLE: tree root ;
