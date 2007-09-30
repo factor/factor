@@ -1,15 +1,16 @@
 ! Copyright (C) 2007 Alex Chapman
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel generic math ;
-IN: trees
+USING: kernel generic math trees ;
+IN: trees.bst
 
 TUPLE: bst ;
 
-C: bst ( -- tree ) <tree> over set-delegate ;
+: <bst> ( -- tree ) bst construct-empty <tree> over set-delegate ;
 
 TUPLE: bst-node ;
 
-C: bst-node ( value key -- node ) >r <node> r> tuck set-delegate ;
+: <bst-node> ( value key -- node )
+    <node> bst-node construct-empty tuck set-delegate ;
 
 M: bst create-node ( value key tree -- node ) drop <bst-node> ;
 
