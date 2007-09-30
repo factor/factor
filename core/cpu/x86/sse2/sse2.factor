@@ -1,9 +1,10 @@
 ! Copyright (C) 2005, 2007 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: alien arrays cpu.x86.assembler cpu.x86.architecture
-generic kernel kernel.private math math.private memory
-namespaces sequences words generator generator.registers
-cpu.architecture math.floats.private layouts quotations ;
+cpu.x86.intrinsics generic kernel kernel.private math
+math.private memory namespaces sequences words generator
+generator.registers cpu.architecture math.floats.private layouts
+quotations ;
 IN: cpu.x86.sse2
 
 : define-float-op ( word op -- )
@@ -81,10 +82,10 @@ IN: cpu.x86.sse2
     } ;
 
 : define-alien-float-intrinsics ( word get-quot word set-quot -- )
-    [ %alien-accessor ] curry
+    [ small-reg %alien-accessor ] curry
     alien-float-set-template
     define-intrinsic
-    [ %alien-accessor ] curry
+    [ small-reg %alien-accessor ] curry
     alien-float-get-template
     define-intrinsic ;
 
