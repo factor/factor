@@ -690,8 +690,8 @@ define-alien-integer-intrinsics
             { unboxed-c-ptr "alien" simple-c-ptr }
             { f "offset" fixnum }
         } }
-        { +scratch+ { { float "output" } } }
-        { +output+ { "output" } }
+        { +scratch+ { { float "value" } } }
+        { +output+ { "value" } }
         { +clobber+ { "offset" } }
     } ;
 

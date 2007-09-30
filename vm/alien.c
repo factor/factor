@@ -78,13 +78,26 @@ void box_alien(void *ptr)
 DEFINE_PRIMITIVE(displaced_alien)
 {
 	CELL alien = dpop();
-	if(type_of(alien) != F_TYPE && type_of(alien) != ALIEN_TYPE)
-		type_error(ALIEN_TYPE,alien);
 	CELL displacement = to_cell(dpop());
+
 	if(alien == F && displacement == 0)
 		dpush(F);
 	else
-		dpush(allot_alien(alien,displacement));
+	{
+		switch(type_of(alien))
+		{
+		case BYTE_ARRAY_TYPE:
+		case BIT_ARRAY_TYPE:
+		case FLOAT_ARRAY_TYPE:
+		case ALIEN_TYPE:
+		case F_TYPE:
+			dpush(allot_alien(alien,displacement));
+			break;
+		default:
+			type_error(ALIEN_TYPE,alien);
+			break;
+		}
+	}
 }
 
 /* address of an object representing a C pointer. Explicitly throw an error

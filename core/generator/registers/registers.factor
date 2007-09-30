@@ -114,7 +114,7 @@ M: cached live-loc? cached-loc live-loc? ;
 M: cached (lazy-load) >r cached-vreg r> (lazy-load) ;
 M: cached lazy-store
     2dup cached-loc =
-    [ 2drop f ] [ "live-locs" get at %move ] if ;
+    [ 2drop ] [ "live-locs" get at %move ] if ;
 M: cached minimal-ds-loc* cached-loc minimal-ds-loc* ;
 
 INSTANCE: cached value

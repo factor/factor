@@ -79,8 +79,7 @@ M: ppc-backend %box-float ( dst src -- )
     ] with-scope ;
 
 M: ppc-backend %box-alien ( dst src -- )
-    "f" define-label
-    "end" define-label
+    { "end" "f" } [ define-label ] each
     0 over v>operand 0 CMPI
     "f" get BEQ
     alien 4 cells %allot
