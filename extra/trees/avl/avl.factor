@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: combinators kernel generic math math.functions math.parser namespaces io
 sequences trees ;
-IN: trees.avl-tree
+IN: trees.avl
 
 TUPLE: avl-tree ;
 

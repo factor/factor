@@ -1,4 +1,4 @@
-USING: kernel tools.test trees trees.avl-tree math random sequences ;
+USING: kernel tools.test trees trees.avl math random sequences ;
 IN: temporary
 
 [ "key1" 0 "key2" 0 ] [ T{ avl-node T{ node f "key1" f f T{ avl-node T{ node f "key2" } 1 } } 2 } [ single-rotate ] go-left [ node-left dup node-key swap avl-node-balance ] keep dup node-key swap avl-node-balance ] unit-test
