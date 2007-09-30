@@ -612,14 +612,14 @@ IN: cpu.ppc.intrinsics
             { unboxed-c-ptr "alien" simple-c-ptr }
             { f "offset" fixnum }
         } }
-        { +scratch+ { { f "value" } { f "address" } } }
+        { +scratch+ { { f "value" } } }
         { +output+ { "value" } }
         { +clobber+ { "offset" } }
     } ;
 
 : %alien-integer-get ( quot -- )
     %alien-accessor
-    "output" operand dup %tag-fixnum ; inline
+    "value" operand dup %tag-fixnum ; inline
 
 : alien-integer-set-template
     H{
@@ -628,7 +628,6 @@ IN: cpu.ppc.intrinsics
             { unboxed-c-ptr "alien" simple-c-ptr }
             { f "offset" fixnum }
         } }
-        { +scratch+ { { f "address" } } }
         { +clobber+ { "value" "offset" } }
     } ;
 
@@ -669,8 +668,8 @@ define-alien-integer-intrinsics
         { unboxed-c-ptr "alien" simple-c-ptr }
         { f "offset" fixnum }
     } }
-    { +scratch+ { { unboxed-alien "output" } } }
-    { +output+ { "output" } }
+    { +scratch+ { { unboxed-alien "value" } } }
+    { +output+ { "value" } }
     { +clobber+ { "offset" } }
 } define-intrinsic
 
