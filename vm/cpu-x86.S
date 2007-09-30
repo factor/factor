@@ -29,7 +29,7 @@ DEF(F_FASTCALL void,dosym,(CELL word)):
 /* Here we have two entry points. The first one is taken when profiling is
 enabled */
 DEF(F_FASTCALL void,docol_profiling,(CELL word)):
-	add $CELL_SIZE,PROFILING_OFFSET(ARG0) /* Increment profile-count slot */
+	add $8,PROFILING_OFFSET(ARG0)         /* Increment profile-count slot */
 DEF(F_FASTCALL void,docol,(CELL word)):
 	mov WORD_DEF_OFFSET(ARG0),ARG0        /* Load word-def slot */
 	JUMP_QUOT
