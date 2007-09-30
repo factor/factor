@@ -38,7 +38,7 @@ void *pinned_alien_offset(CELL object)
 		alien = untag_object(object);
 		if(alien->expired != F)
 			general_error(ERROR_EXPIRED,object,F,NULL);
-		return alien_offset(alien->alien) + alien->displacement;
+		return pinned_alien_offset(alien->alien) + alien->displacement;
 	case F_TYPE:
 		return NULL;
 	default:
