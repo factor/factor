@@ -38,4 +38,25 @@ INSTANCE: range immutable-sequence
 
 : [1,b] 1 swap [a,b] ;
 
-: [0,b) 0 swap (a,b] ;
+: [0,b) 0 swap [a,b) ;
+
+: range-increasing? ( range -- ? )
+    range-step 0 > ;
+
+: range-decreasing? ( range -- ? )
+    range-step 0 < ;
+
+: first-or-peek ( seq head? -- elt )
+    [ first ] [ peek ] if ;
+
+: range-min ( range -- min )
+    dup range-increasing? first-or-peek ;
+
+: range-max ( range -- max )
+    dup range-decreasing? first-or-peek ;
+
+: clamp-to-range ( n range -- n )
+    tuck range-min max swap range-max min ;
+
+: sequence-index-range  ( seq -- range )
+    length [0,b) ;
