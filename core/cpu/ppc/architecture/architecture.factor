@@ -325,17 +325,33 @@ M: ppc-backend %unbox-f ( dst src -- )
     drop 0 swap v>operand LI ;
 
 M: ppc-backend %unbox-any-c-ptr ( dst src -- )
-    { "is-f" "is-alien" "end" } [ define-label ] each
-    0 over v>operand f v>operand CMPI
-    "is-f" get BEQ
-    12 over v>operand header-offset LWZ
-    0 12 alien type-number tag-header CMPI
-    "is-alien" get BEQ
-    2dup %unbox-byte-array
-    "end" get B
-    "is-alien" resolve-label
-    2dup %unbox-alien
-    "end" get B
-    "is-f" resolve-label
-    %unbox-f
-    "end" resolve-label ;
+    { "is-byte-array" "end" "start" } [ define-label ] each
+    ! Address is computed in R12
+    0 12 LI
+    ! Load object into R11
+    11 swap v>operand MR
+    ! We come back here with displaced aliens
+    "start" resolve-label
+    ! Is the object f?
+    0 11 f v>operand CMPI
+    ! If so, done
+    "end" get BEQ
+    ! Is the object an alien?
+    0 11 header-offset LWZ
+    0 0 alien type-number tag-header CMPI
+    "is-byte-array" get BNE
+    ! If so, load the offset
+    0 11 alien-offset LWZ
+    ! Add it to address being computed
+    12 12 0 ADD
+    ! Now recurse on the underlying alien
+    11 11 underlying-alien-offset LWZ
+    "start" get B
+    "is-byte-array" resolve-label
+    ! Add byte array address to address being computed
+    12 12 11 ADD
+    ! Add an offset to start of byte array's data area
+    12 12 byte-array-offset ADDI
+    "end" resolve-label
+    ! Done, store address in destination register
+    v>operand 12 MR ;

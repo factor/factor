@@ -183,16 +183,33 @@ M: x86-backend %unbox-f ( dst src -- )
     drop v>operand 0 MOV ;
 
 M: x86-backend %unbox-any-c-ptr ( dst src -- )
-    { "is-f" "is-alien" "end" } [ define-label ] each
-    dup f [ v>operand ] 2apply CMP
-    "is-f" get JE
-    dup v>operand header-offset [+] alien type-number tag-header CMP
-    "is-alien" get JE
-    2dup %unbox-byte-array
-    "end" get JMP
-    "is-alien" resolve-label
-    2dup %unbox-alien
-    "end" get JMP
-    "is-f" resolve-label
-    %unbox-f
-    "end" resolve-label ;
+    { "is-byte-array" "end" "start" } [ define-label ] each
+    ! Address is computed in ds-reg
+    ds-reg PUSH
+    ! Object is stored in ds-reg
+    rs-reg swap v>operand MOV
+    ! We come back here with displaced aliens
+    "start" resolve-label
+    ! Is the object f?
+    rs-reg f v>operand CMP
+    "end" get JE
+    ! Is the object an alien?
+    rs-reg header-offset [+] alien type-number tag-header CMP
+    "is-byte-array" get JNE
+    ! If so, load the offset and add it to the address
+    ds-reg rs-reg alien-offset [+] ADD
+    ! Now recurse on the underlying alien
+    rs-reg rs-reg underlying-alien-offset [+] MOV
+    "start" get JMP
+    "is-byte-array" resolve-label
+    ! Add byte array address to address being computed
+    ds-reg rs-reg ADD
+    ! Add an offset to start of byte array's data
+    ds-reg byte-array-offset ADD
+    "end" resolve-label
+    ! Done, store address in destination register
+    v>operand ds-reg MOV
+    ! Restore rs-reg
+    rs-reg POP
+    ! Restore ds-reg
+    ds-reg POP ;

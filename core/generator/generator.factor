@@ -309,5 +309,6 @@ M: #return generate-node drop end-basic-block %return f ;
 : profile-count-offset 7 cells object tag-number - ;
 : byte-array-offset 2 cells object tag-number - ;
 : alien-offset 3 cells object tag-number - ;
+: underlying-alien-offset cell object tag-number - ;
 : tuple-class-offset 2 cells tuple tag-number - ;
 : class-hash-offset cell object tag-number - ;

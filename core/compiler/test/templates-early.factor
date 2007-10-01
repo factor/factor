@@ -132,3 +132,28 @@ SYMBOL: template-chosen
     ! This is empty since we didn't change the stack
     [ t ] [ [ end-basic-block ] { } make empty? ] unit-test
 ] with-scope
+
+! Regression
+[
+    [ ] [ init-templates ] unit-test
+
+    ! >r r>
+    [ ] [
+        1 phantom->r
+        1 phantom-r>
+    ] unit-test
+
+    ! This is empty since we didn't change the stack
+    [ t ] [ [ end-basic-block ] { } make empty? ] unit-test
+
+    ! >r r>
+    [ ] [
+        1 phantom->r
+        1 phantom-r>
+    ] unit-test
+
+    [ ] [ { object } set-operand-classes ] unit-test
+
+    ! This is empty since we didn't change the stack
+    [ t ] [ [ end-basic-block ] { } make empty? ] unit-test
+] with-scope

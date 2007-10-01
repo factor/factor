@@ -357,16 +357,16 @@ cell 8 = [
 [ 3 ] [ B{ 1 2 3 4 5 } 2 [ alien-unsigned-1 ] compile-1 ] unit-test
 [ 3 ] [ [ B{ 1 2 3 4 5 } 2 alien-unsigned-1 ] compile-1 ] unit-test
 [ 3 ] [ B{ 1 2 3 4 5 } 2 [ { byte-array fixnum } declare alien-unsigned-1 ] compile-1 ] unit-test
-[ 3 ] [ B{ 1 2 3 4 5 } 2 [ { simple-c-ptr fixnum } declare alien-unsigned-1 ] compile-1 ] unit-test
+[ 3 ] [ B{ 1 2 3 4 5 } 2 [ { c-ptr fixnum } declare alien-unsigned-1 ] compile-1 ] unit-test
 
 [ ] [ B{ 1 2 3 4 5 } malloc-byte-array "b" set ] unit-test
 [ t ] [ "b" get >boolean ] unit-test
 
 "b" get [
     [ 3 ] [ "b" get 2 [ alien-unsigned-1 ] compile-1 ] unit-test
-    [ 3 ] [ "b" get [ { simple-alien } declare 2 alien-unsigned-1 ] compile-1 ] unit-test
+    [ 3 ] [ "b" get [ { alien } declare 2 alien-unsigned-1 ] compile-1 ] unit-test
     [ 3 ] [ "b" get 2 [ { simple-alien fixnum } declare alien-unsigned-1 ] compile-1 ] unit-test
-    [ 3 ] [ "b" get 2 [ { simple-c-ptr fixnum } declare alien-unsigned-1 ] compile-1 ] unit-test
+    [ 3 ] [ "b" get 2 [ { c-ptr fixnum } declare alien-unsigned-1 ] compile-1 ] unit-test
 
     [ ] [ "b" get free ] unit-test
 ] when
@@ -375,13 +375,13 @@ cell 8 = [
 
 "s" get [
     [ "hello world" ] [ "s" get <void*> [ { byte-array } declare *void* ] compile-1 alien>char-string ] unit-test
-    [ "hello world" ] [ "s" get <void*> [ { simple-c-ptr } declare *void* ] compile-1 alien>char-string ] unit-test
+    [ "hello world" ] [ "s" get <void*> [ { c-ptr } declare *void* ] compile-1 alien>char-string ] unit-test
 
     [ ] [ "s" get free ] unit-test
 ] when
 
-[ ALIEN: 1234 ] [ ALIEN: 1234 [ { simple-alien } declare <void*> ] compile-1 *void* ] unit-test
-[ ALIEN: 1234 ] [ ALIEN: 1234 [ { simple-c-ptr } declare <void*> ] compile-1 *void* ] unit-test
+[ ALIEN: 1234 ] [ ALIEN: 1234 [ { alien } declare <void*> ] compile-1 *void* ] unit-test
+[ ALIEN: 1234 ] [ ALIEN: 1234 [ { c-ptr } declare <void*> ] compile-1 *void* ] unit-test
 [ f ] [ f [ { POSTPONE: f } declare <void*> ] compile-1 *void* ] unit-test
 
 [ 252 ] [ B{ 1 2 3 -4 5 } 3 [ { byte-array fixnum } declare alien-unsigned-1 ] compile-1 ] unit-test
@@ -416,3 +416,17 @@ cell 8 = [
 [ t ] [ pi <float> [ { byte-array } declare *float ] compile-1 pi - abs 0.001 < ] unit-test
 
 [ t ] [ pi 8 <byte-array> [ [ { float byte-array } declare 0 set-alien-double ] compile-1 ] keep *double pi = ] unit-test
+
+[ 4 ] [
+    2 B{ 1 2 3 4 5 6 } <displaced-alien> [
+        { alien } declare 1 alien-unsigned-1
+    ] compile-1
+] unit-test
+
+[
+    B{ 0 0 0 0 } [ { byte-array } declare <void*> ] compile-1
+] unit-test-fails
+
+[
+    B{ 0 0 0 0 } [ { c-ptr } declare <void*> ] compile-1
+] unit-test-fails

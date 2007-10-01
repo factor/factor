@@ -609,7 +609,7 @@ IN: cpu.ppc.intrinsics
 : alien-integer-get-template
     H{
         { +input+ {
-            { unboxed-c-ptr "alien" simple-c-ptr }
+            { unboxed-c-ptr "alien" c-ptr }
             { f "offset" fixnum }
         } }
         { +scratch+ { { f "value" } } }
@@ -625,7 +625,7 @@ IN: cpu.ppc.intrinsics
     H{
         { +input+ {
             { f "value" fixnum }
-            { unboxed-c-ptr "alien" simple-c-ptr }
+            { unboxed-c-ptr "alien" c-ptr }
             { f "offset" fixnum }
         } }
         { +clobber+ { "value" "offset" } }
@@ -665,7 +665,7 @@ define-alien-integer-intrinsics
     [ LWZ ] %alien-accessor
 ] H{
     { +input+ {
-        { unboxed-c-ptr "alien" simple-c-ptr }
+        { unboxed-c-ptr "alien" c-ptr }
         { f "offset" fixnum }
     } }
     { +scratch+ { { unboxed-alien "value" } } }
@@ -677,8 +677,8 @@ define-alien-integer-intrinsics
     [ STW ] %alien-accessor
 ] H{
     { +input+ {
-        { unboxed-c-ptr "value" simple-c-ptr }
-        { unboxed-c-ptr "alien" simple-c-ptr }
+        { unboxed-c-ptr "value" pinned-c-ptr }
+        { unboxed-c-ptr "alien" c-ptr }
         { f "offset" fixnum }
     } }
     { +clobber+ { "offset" } }
@@ -687,7 +687,7 @@ define-alien-integer-intrinsics
 : alien-float-get-template
     H{
         { +input+ {
-            { unboxed-c-ptr "alien" simple-c-ptr }
+            { unboxed-c-ptr "alien" c-ptr }
             { f "offset" fixnum }
         } }
         { +scratch+ { { float "value" } } }
@@ -699,7 +699,7 @@ define-alien-integer-intrinsics
     H{
         { +input+ {
             { float "value" float }
-            { unboxed-c-ptr "alien" simple-c-ptr }
+            { unboxed-c-ptr "alien" c-ptr }
             { f "offset" fixnum }
         } }
         { +clobber+ { "offset" } }

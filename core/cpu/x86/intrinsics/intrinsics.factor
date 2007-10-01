@@ -514,7 +514,7 @@ IN: cpu.x86.intrinsics
 : alien-integer-get-template
     H{
         { +input+ {
-            { unboxed-c-ptr "alien" simple-c-ptr }
+            { unboxed-c-ptr "alien" c-ptr }
             { f "offset" fixnum }
         } }
         { +scratch+ { { f "value" } } }
@@ -546,7 +546,7 @@ IN: cpu.x86.intrinsics
     H{
         { +input+ {
             { f "value" fixnum }
-            { unboxed-c-ptr "alien" simple-c-ptr }
+            { unboxed-c-ptr "alien" c-ptr }
             { f "offset" fixnum }
         } }
         { +clobber+ { "value" "offset" } }
@@ -574,7 +574,7 @@ IN: cpu.x86.intrinsics
     "value" operand [ MOV ] %alien-accessor
 ] H{
     { +input+ {
-        { unboxed-c-ptr "alien" simple-c-ptr }
+        { unboxed-c-ptr "alien" c-ptr }
         { f "offset" fixnum }
     } }
     { +scratch+ { { unboxed-alien "value" } } }
@@ -586,8 +586,8 @@ IN: cpu.x86.intrinsics
     "value" operand [ swap MOV ] %alien-accessor
 ] H{
     { +input+ {
-        { unboxed-c-ptr "value" simple-c-ptr }
-        { unboxed-c-ptr "alien" simple-c-ptr }
+        { unboxed-c-ptr "value" c-ptr }
+        { unboxed-c-ptr "alien" c-ptr }
         { f "offset" fixnum }
     } }
     { +clobber+ { "offset" } }

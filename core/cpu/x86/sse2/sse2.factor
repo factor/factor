@@ -58,7 +58,7 @@ IN: cpu.x86.sse2
 : alien-float-get-template
     H{
         { +input+ {
-            { unboxed-c-ptr "alien" simple-c-ptr }
+            { unboxed-c-ptr "alien" c-ptr }
             { f "offset" fixnum }
         } }
         { +scratch+ { { float "value" } } }
@@ -70,7 +70,7 @@ IN: cpu.x86.sse2
     H{
         { +input+ {
             { float "value" float }
-            { unboxed-c-ptr "alien" simple-c-ptr }
+            { unboxed-c-ptr "alien" c-ptr }
             { f "offset" fixnum }
         } }
         { +clobber+ { "offset" } }

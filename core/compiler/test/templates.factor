@@ -202,14 +202,14 @@ TUPLE: my-tuple ;
 
 [ 1 t ] [
     B{ 1 2 3 4 } [
-        { simple-c-ptr } declare
+        { c-ptr } declare
         [ 0 alien-unsigned-1 ] keep type
     ] compile-1 byte-array type-number =
 ] unit-test
 
 [ t ] [
     B{ 1 2 3 4 } [
-        { simple-c-ptr } declare
+        { c-ptr } declare
         0 alien-cell type
     ] compile-1 alien type-number =
 ] unit-test

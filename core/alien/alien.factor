@@ -4,11 +4,21 @@ IN: alien
 USING: assocs kernel math namespaces sequences system
 byte-arrays bit-arrays float-arrays kernel.private tuples ;
 
+! Some predicate classes used by the compiler for optimization
+! purposes
 PREDICATE: alien simple-alien
     underlying-alien not ;
 
 UNION: simple-c-ptr
     simple-alien byte-array bit-array float-array POSTPONE: f ;
+
+DEFER: pinned-c-ptr?
+
+PREDICATE: alien pinned-alien
+    underlying-alien pinned-c-ptr? ;
+
+UNION: pinned-c-ptr
+    alien POSTPONE: f ;
 
 UNION: c-ptr
     alien bit-array byte-array float-array POSTPONE: f ;

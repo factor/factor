@@ -146,7 +146,7 @@ INSTANCE: unboxed-alien value
 TUPLE: unboxed-byte-array vreg ;
 C: <unboxed-byte-array> unboxed-byte-array
 M: unboxed-byte-array v>operand unboxed-byte-array-vreg v>operand ;
-M: unboxed-byte-array operand-class* drop simple-c-ptr ;
+M: unboxed-byte-array operand-class* drop c-ptr ;
 M: unboxed-byte-array move-spec class ;
 M: unboxed-byte-array live-vregs* unboxed-byte-array-vreg , ;
 
@@ -164,7 +164,7 @@ INSTANCE: unboxed-f value
 TUPLE: unboxed-c-ptr vreg ;
 C: <unboxed-c-ptr> unboxed-c-ptr
 M: unboxed-c-ptr v>operand unboxed-c-ptr-vreg v>operand ;
-M: unboxed-c-ptr operand-class* drop simple-c-ptr ;
+M: unboxed-c-ptr operand-class* drop c-ptr ;
 M: unboxed-c-ptr move-spec class ;
 M: unboxed-c-ptr live-vregs* unboxed-c-ptr-vreg , ;
 
@@ -396,7 +396,7 @@ M: value (lazy-load)
     drop ;
 
 M: loc lazy-store
-    2dup = [ 2drop ] [ "live-locs" get at %move ] if ;
+    2dup live-loc? [ "live-locs" get at %move ] [ 2drop ] if ;
 
 : do-shuffle ( hash -- )
     dup assoc-empty? [
