@@ -5,7 +5,7 @@ IN: jamshred.game
 TUPLE: jamshred tunnel players running ;
 
 : <jamshred> ( -- jamshred )
-    <random-tunnel> "Player 1" <player> 1array f
+    <random-tunnel> "Player 1" <player> 2dup swap play-in-tunnel 1array f
     jamshred construct-boa ;
 
 : jamshred-player ( jamshred -- player )
@@ -14,7 +14,7 @@ TUPLE: jamshred tunnel players running ;
 
 : jamshred-update ( jamshred -- )
     dup jamshred-running [
-        jamshred-player update-player
+        dup jamshred-tunnel swap jamshred-player update-player
     ] [ drop ] if ;
 
 : toggle-running ( jamshred -- )

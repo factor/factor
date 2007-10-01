@@ -6,8 +6,11 @@ IN: jamshred.gl
 : min-vertices 6 ; inline
 : max-vertices 32 ; inline
 
-: n-vertices ( -- n )
-    32 ; inline
+: n-vertices ( -- n ) 32 ; inline
+
+! render enough of the tunnel that it looks continuous
+: n-segments-ahead ( -- n ) 50 ; inline
+: n-segments-behind ( -- n ) 50 ; inline
 
 : draw-segment-vertex ( segment theta -- )
     over segment-color gl-color segment-vertex-and-normal
@@ -25,8 +28,9 @@ IN: jamshred.gl
 : draw-segments ( segments -- )
     1 over length pick subseq swap [ draw-segment ] 2each ;
 
-: draw-tunnel ( tunnel -- )
-    tunnel-segments draw-segments ;
+: draw-tunnel ( player tunnel -- )
+    tuck swap player-nearest-segment segment-number dup n-segments-behind -
+    swap n-segments-ahead + rot sub-tunnel draw-segments ;
 
 : init-graphics ( width height -- )
     GL_DEPTH_TEST glEnable
@@ -57,6 +61,6 @@ IN: jamshred.gl
     oint-up first3 gluLookAt ;
 
 : draw-jamshred ( jamshred width height -- )
-    init-graphics dup jamshred-player player-view
-    jamshred-tunnel draw-tunnel ;
+    init-graphics dup jamshred-player dup player-view
+    swap jamshred-tunnel draw-tunnel ;
 

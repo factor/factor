@@ -1,8 +1,8 @@
-USING: arrays kernel jamshred.oint math math.functions math.vectors
+USING: arrays kernel jamshred.oint math math.functions math.ranges math.vectors
 math.constants random sequences vectors ;
 IN: jamshred.tunnel
 
-: n-segments ( -- n ) 100 ; inline
+: n-segments ( -- n ) 5000 ; inline
 
 TUPLE: segment number color radius ;
 
@@ -71,18 +71,31 @@ C: <tunnel> tunnel
 : <straight-tunnel> ( -- tunnel )
     n-segments simple-segments <tunnel> ;
 
+: sub-tunnel ( from to tunnel -- segments )
+    #! return segments between from and to, after clamping from and to to
+    #! valid values
+    tunnel-segments [
+        sequence-index-range [ clamp-to-range ] curry 2apply
+    ] keep <slice> ;
+
 : nearer-segment ( segment segment oint -- segment )
     #! return whichever of the two segments is nearer to the oint
     >r 2dup r> tuck distance >r distance r> < -rot ? ;
 
+: (find-nearest-segment) ( nearest next oint -- nearest ? )
+    #! find the nearest of 'next' and 'nearest' to 'oint', and return
+    #! t if the nearest hasn't changed
+    pick >r nearer-segment dup r> = ;
+
 : find-nearest-segment ( oint segments -- segment )
-    tuck first swap [ -rot nearer-segment ] curry reduce ;
+    dup first swap 1 tail-slice rot [ (find-nearest-segment) ] curry
+    find 2drop ;
     
 : nearest-segment-forward ( segments oint start -- segment )
     rot dup length swap <slice> find-nearest-segment ;
 
 : nearest-segment-backward ( segments oint start -- segment )
-    1+ 0 swap rot <slice> <reversed> find-nearest-segment ;
+    swapd 1+ 0 swap rot <slice> <reversed> find-nearest-segment ;
 
 : nearest-segment ( tunnel oint start-segment -- segment )
     #! find the segment nearest to 'oint', and return it.
