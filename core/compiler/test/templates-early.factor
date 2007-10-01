@@ -157,3 +157,33 @@ SYMBOL: template-chosen
     ! This is empty since we didn't change the stack
     [ t ] [ [ end-basic-block ] { } make empty? ] unit-test
 ] with-scope
+
+! Regression
+[
+    [ ] [ init-templates ] unit-test
+
+    [ ] [ { object object } set-operand-classes ] unit-test
+
+    ! 2dup
+    [ ] [
+        T{ effect f { "x" "y" } { "x" "y" "x" "y" } }
+        phantom-shuffle
+    ] unit-test
+
+    [ ] [
+        2 phantom-d get phantom-input
+        [ { { f "a" } { f "b" } } lazy-load ] { } make drop
+    ] unit-test
+    
+    [ t ] [
+        phantom-d get [ cached? ] all?
+    ] unit-test
+
+    ! >r
+    [ ] [
+        1 phantom->r
+    ] unit-test
+
+    ! This should not fail
+    [ ] [ [ end-basic-block ] { } make drop ] unit-test
+] with-scope

@@ -213,3 +213,8 @@ TUPLE: my-tuple ;
         0 alien-cell type
     ] compile-1 alien type-number =
 ] unit-test
+
+[ 2 1 ] [
+    2 1
+    [ 2dup fixnum< [ >r die r> ] when ] compile-1
+] unit-test

@@ -116,8 +116,8 @@ M: cached live-vregs* cached-vreg live-vregs* ;
 M: cached live-loc? cached-loc live-loc? ;
 M: cached (lazy-load) >r cached-vreg r> (lazy-load) ;
 M: cached lazy-store
-    2dup cached-loc =
-    [ 2drop ] [ "live-locs" get at %move ] if ;
+    2dup cached-loc live-loc?
+    [ "live-locs" get at %move ] [ 2drop ] if ;
 M: cached minimal-ds-loc* cached-loc minimal-ds-loc* ;
 
 INSTANCE: cached value
@@ -433,16 +433,18 @@ M: loc lazy-store
     #! We don't have enough free registers to load all shuffle
     #! inputs, so we use a single temporary register, together
     #! with the area of the data stack above the stack pointer
-    find-tmp-loc slow-shuffle-mapping
-    [
-        [ swap dup cached? [ cached-vreg ] when %move ] assoc-each
-    ] keep
-    >hashtable do-shuffle ;
+    find-tmp-loc slow-shuffle-mapping [
+        [
+            swap dup cached? [ cached-vreg ] when %move
+        ] assoc-each
+    ] keep >hashtable do-shuffle ;
 
 : fast-shuffle? ( live-locs -- ? )
     #! Test if we have enough free registers to load all
     #! shuffle inputs at once.
     T{ int-regs } free-vregs [ length ] 2apply <= ;
+
+USING: io prettyprint ;
 
 : finalize-locs ( -- )
     #! Perform any deferred stack shuffling.
