@@ -78,6 +78,8 @@ TUPLE: ds-loc n class ;
 M: ds-loc minimal-ds-loc* ds-loc-n min ;
 M: ds-loc operand-class* ds-loc-class ;
 M: ds-loc set-operand-class set-ds-loc-class ;
+M: ds-loc live-loc?
+    over ds-loc? [ [ ds-loc-n ] 2apply = not ] [ 2drop t ] if ;
 
 ! A retain stack location.
 TUPLE: rs-loc n class ;
@@ -86,11 +88,12 @@ TUPLE: rs-loc n class ;
 
 M: rs-loc operand-class* rs-loc-class ;
 M: rs-loc set-operand-class set-rs-loc-class ;
+M: rs-loc live-loc?
+    over rs-loc? [ [ rs-loc-n ] 2apply = not ] [ 2drop t ] if ;
 
 UNION: loc ds-loc rs-loc ;
 
 M: loc move-spec drop loc ;
-M: loc live-loc? = not ;
 
 INSTANCE: loc value
 
