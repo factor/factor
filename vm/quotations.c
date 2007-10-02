@@ -178,3 +178,52 @@ XT quot_offset_to_pc(F_QUOTATION *quot, F_FIXNUM offset)
 
 	return quot->xt + xt;
 }
+
+DEFINE_PRIMITIVE(curry)
+{
+	F_CURRY *curry = allot_object(CURRY_TYPE,sizeof(F_CURRY));
+	curry->quot = dpop();
+	curry->obj = dpop();
+	dpush(tag_object(curry));
+}
+
+void uncurry(CELL obj)
+{
+	F_CURRY *curry;
+
+	switch(type_of(obj))
+	{
+	case QUOTATION_TYPE:
+		dpush(obj);
+		break;
+	case CURRY_TYPE:
+		curry = untag_object(obj);
+		dpush(curry->obj);
+		uncurry(curry->quot);
+		break;
+	default:
+		type_error(QUOTATION_TYPE,obj);
+		break;
+	}
+}
+
+DEFINE_PRIMITIVE(uncurry)
+{
+	uncurry(dpop());
+}
+
+/* push a new quotation on the stack */
+DEFINE_PRIMITIVE(array_to_quotation)
+{
+	F_QUOTATION *quot = allot_object(QUOTATION_TYPE,sizeof(F_QUOTATION));
+	quot->array = dpeek();
+	quot->xt = lazy_jit_compile;
+	quot->compiled = F;
+	drepl(tag_object(quot));
+}
+
+DEFINE_PRIMITIVE(quotation_xt)
+{
+	F_QUOTATION *quot = untag_quotation(dpeek());
+	drepl(allot_cell((CELL)quot->xt));
+}

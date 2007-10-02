@@ -34,10 +34,11 @@ DLL_OBJS = $(PLAF_DLL_OBJS) \
 	vm/code_gc.o \
 	vm/primitives.o \
 	vm/run.o \
-	vm/stack.o \
+	vm/callstack.o \
 	vm/types.o \
-	vm/jit.o \
-	vm/utilities.o
+	vm/quotations.o \
+	vm/utilities.o \
+	vm/errors.o
 
 EXE_OBJS = $(PLAF_EXE_OBJS)
 

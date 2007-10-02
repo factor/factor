@@ -145,11 +145,85 @@ INLINE CELL type_of(CELL tagged)
 DEFPUSHPOP(d,ds)
 DEFPUSHPOP(r,rs)
 
+/* Assembly code makes assumptions about the layout of this struct:
+   - callstack_top field is 0
+   - callstack_bottom field is 1
+   - datastack field is 2
+   - retainstack field is 3 */
+typedef struct _F_CONTEXT {
+	/* C stack pointer on entry */
+	F_STACK_FRAME *callstack_top;
+	F_STACK_FRAME *callstack_bottom;
+
+	/* current datastack top pointer */
+	CELL datastack;
+
+	/* current retain stack top pointer */
+	CELL retainstack;
+
+	/* saved contents of ds register on entry to callback */
+	CELL datastack_save;
+
+	/* saved contents of rs register on entry to callback */
+	CELL retainstack_save;
+
+	/* memory region holding current datastack */
+	F_SEGMENT *datastack_region;
+
+	/* memory region holding current retain stack */
+	F_SEGMENT *retainstack_region;
+
+	/* saved userenv slots on entry to callback */
+	CELL catchstack_save;
+	CELL current_callback_save;
+
+	/* saved extra_roots pointer on entry to callback */
+	CELL extra_roots;
+
+	struct _F_CONTEXT *next;
+} F_CONTEXT;
+
+DLLEXPORT F_CONTEXT *stack_chain;
+
+CELL ds_size, rs_size;
+
+#define ds_bot (stack_chain->datastack_region->start)
+#define ds_top (stack_chain->datastack_region->end)
+#define rs_bot (stack_chain->retainstack_region->start)
+#define rs_top (stack_chain->retainstack_region->end)
+
+void reset_datastack(void);
+void reset_retainstack(void);
+void fix_stacks(void);
+DLLEXPORT void save_stacks(void);
+DLLEXPORT void nest_stacks(void);
+DLLEXPORT void unnest_stacks(void);
+void init_stacks(CELL ds_size, CELL rs_size);
+DECLARE_PRIMITIVE(drop);
+DECLARE_PRIMITIVE(2drop);
+DECLARE_PRIMITIVE(3drop);
+DECLARE_PRIMITIVE(dup);
+DECLARE_PRIMITIVE(2dup);
+DECLARE_PRIMITIVE(3dup);
+DECLARE_PRIMITIVE(rot);
+DECLARE_PRIMITIVE(_rot);
+DECLARE_PRIMITIVE(dupd);
+DECLARE_PRIMITIVE(swapd);
+DECLARE_PRIMITIVE(nip);
+DECLARE_PRIMITIVE(2nip);
+DECLARE_PRIMITIVE(tuck);
+DECLARE_PRIMITIVE(over);
+DECLARE_PRIMITIVE(pick);
+DECLARE_PRIMITIVE(swap);
+DECLARE_PRIMITIVE(to_r);
+DECLARE_PRIMITIVE(from_r);
+DECLARE_PRIMITIVE(datastack);
+DECLARE_PRIMITIVE(retainstack);
+
 XT default_word_xt(F_WORD *word);
 
 DECLARE_PRIMITIVE(execute);
 DECLARE_PRIMITIVE(call);
-DECLARE_PRIMITIVE(uncurry);
 DECLARE_PRIMITIVE(getenv);
 DECLARE_PRIMITIVE(setenv);
 DECLARE_PRIMITIVE(exit);
@@ -162,48 +236,4 @@ DECLARE_PRIMITIVE(tag);
 DECLARE_PRIMITIVE(class_hash);
 DECLARE_PRIMITIVE(slot);
 DECLARE_PRIMITIVE(set_slot);
-
-/* Runtime errors */
-typedef enum
-{
-	ERROR_EXPIRED = 0,
-	ERROR_IO,
-	ERROR_UNDEFINED_WORD,
-	ERROR_TYPE,
-	ERROR_DIVIDE_BY_ZERO,
-	ERROR_SIGNAL,
-	ERROR_ARRAY_SIZE,
-	ERROR_C_STRING,
-	ERROR_FFI,
-	ERROR_HEAP_SCAN,
-	ERROR_UNDEFINED_SYMBOL,
-	ERROR_DS_UNDERFLOW,
-	ERROR_DS_OVERFLOW,
-	ERROR_RS_UNDERFLOW,
-	ERROR_RS_OVERFLOW,
-	ERROR_MEMORY,
-	ERROR_NOT_IMPLEMENTED,
-} F_ERRORTYPE;
-
-void fatal_error(char* msg, CELL tagged);
-void critical_error(char* msg, CELL tagged);
-DECLARE_PRIMITIVE(die);
-
-void throw_error(CELL error, F_STACK_FRAME *native_stack);
-void general_error(F_ERRORTYPE error, CELL arg1, CELL arg2, F_STACK_FRAME *native_stack);
-void divide_by_zero_error(F_STACK_FRAME *native_stack);
-void memory_protection_error(CELL addr, F_STACK_FRAME *native_stack);
-void signal_error(int signal, F_STACK_FRAME *native_stack);
-void type_error(CELL type, CELL tagged);
-void not_implemented_error(void);
-
-F_FASTCALL void undefined_error(CELL word, F_STACK_FRAME *callstack_top);
-
-DECLARE_PRIMITIVE(throw);
-
-INLINE void type_check(CELL type, CELL tagged)
-{
-	if(type_of(tagged) != type) type_error(type,tagged);
-}
-
 DECLARE_PRIMITIVE(profiling);
