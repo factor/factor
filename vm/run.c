@@ -218,25 +218,31 @@ DEFINE_PRIMITIVE(from_r)
 	dpush(rpop());
 }
 
-void stack_to_array(CELL bottom, CELL top)
+bool stack_to_array(CELL bottom, CELL top)
 {
 	F_FIXNUM depth = (F_FIXNUM)(top - bottom + CELLS);
 
-	if(depth < 0) critical_error("depth < 0",0);
-
-	F_ARRAY *a = allot_array_internal(ARRAY_TYPE,depth / CELLS);
-	memcpy(a + 1,(void*)bottom,depth);
-	dpush(tag_object(a));
+	if(depth < 0)
+		return false;
+	else
+	{
+		F_ARRAY *a = allot_array_internal(ARRAY_TYPE,depth / CELLS);
+		memcpy(a + 1,(void*)bottom,depth);
+		dpush(tag_object(a));
+		return true;
+	}
 }
 
 DEFINE_PRIMITIVE(datastack)
 {
-	stack_to_array(ds_bot,ds);
+	if(!stack_to_array(ds_bot,ds))
+		general_error(ERROR_DS_UNDERFLOW,F,F,NULL);
 }
 
 DEFINE_PRIMITIVE(retainstack)
 {
-	stack_to_array(rs_bot,rs);
+	if(!stack_to_array(rs_bot,rs))
+		general_error(ERROR_RS_UNDERFLOW,F,F,NULL);
 }
 
 /* returns pointer to top of stack */
