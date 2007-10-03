@@ -1,21 +1,10 @@
 USING: tools.interpreter io io.streams.string kernel math
 math.private namespaces prettyprint sequences tools.test
-continuations math.parser threads arrays ;
+continuations math.parser threads arrays
+tools.interpreter.debug ;
 IN: temporary
 
 [ "Ooops" throw ] break-hook set
-
-: run-interpreter ( -- )
-    interpreter get [ step-into run-interpreter ] when ;
-
-: init-interpreter ( quot -- )
-    [
-        "out" set
-        [ f swap 2array restore "out" get continue ] callcc0
-    ] swap [ datastack "datastack" set stop ] 3append callcc0 ;
-
-: test-interpreter ( quot -- )
-    init-interpreter run-interpreter "datastack" get ;
 
 [ { } ] [
     [ ] test-interpreter
