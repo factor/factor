@@ -8,56 +8,39 @@ ui.gestures ui.gadgets.buttons ui.gadgets.panes
 prettyprint.config prettyprint.backend ;
 IN: ui.tools.walker
 
-: quotation. ( callframe -- )
-    [
-        dup second hilite-index set
-        dup first hilite-quotation set
-        2 nesting-limit set
-        first pprint-elements
-    ] with-pprint ;
-
-: <quotation-display> ( model -- gadget )
-    [ quotation. ] <pane-control>
-    "Current quotation" <labelled-scroller> ;
-
-TUPLE: walker-gadget model quot ns ;
+TUPLE: walker-gadget model ns ;
 
 : update-stacks ( walker -- )
-    meta-interp get
-    over walker-gadget-model set-model
-    callframe get callframe-scan get 2array
-    swap walker-gadget-quot set-model ;
+    interpreter get swap walker-gadget-model set-model ;
 
 : with-walker ( gadget quot -- )
-    swap dup walker-gadget-ns
-    [ slip update-stacks ] bind ; inline
+    swap dup walker-gadget-ns [ slip update-stacks ] bind ;
+    inline
 
 : walker-active? ( walker -- ? )
-    meta-interp swap walker-gadget-ns key? ;
+    interpreter swap walker-gadget-ns key? ;
 
 : walker-command ( gadget quot -- )
     over walker-active? [ with-walker ] [ 2drop ] if ; inline
 
 : com-step [ step ] walker-command ;
-: com-into [ step-in ] walker-command ;
+: com-into [ step-into ] walker-command ;
 : com-out [ step-out ] walker-command ;
 : com-back [ step-back ] walker-command ;
 
 : init-walker-models ( walker -- )
-    f <model> over set-walker-gadget-quot
     f <model> over set-walker-gadget-model
     H{ } clone swap set-walker-gadget-ns ;
 
 : reset-walker ( walker -- )
     dup walker-gadget-ns clear-assoc
-    [ V{ } clone meta-history set ] with-walker ;
+    [ V{ } clone history set ] with-walker ;
 
 : <walker-gadget> ( -- gadget )
     walker-gadget construct-empty
     dup init-walker-models [
         toolbar,
-        g walker-gadget-quot <quotation-display> 1/4 track,
-        g walker-gadget-model <traceback-gadget> 3/4 track,
+        g walker-gadget-model <traceback-gadget> 1 track,
     ] { 0 1 } build-track
     dup reset-walker ;
 
@@ -66,7 +49,7 @@ M: walker-gadget call-tool* ( continuation walker -- )
 
 : com-inspect ( walker -- )
     dup walker-active? [
-        meta-interp swap walker-gadget-ns at
+        interpreter swap walker-gadget-ns at
         [ inspect ] curry call-listener
     ] [
         drop
@@ -74,9 +57,6 @@ M: walker-gadget call-tool* ( continuation walker -- )
 
 : com-continue ( walker -- )
     dup [ step-all ] walker-command reset-walker ;
-
-: com-abandon ( walker -- )
-    dup [ abandon ] walker-command reset-walker ;
 
 : walker-help "ui-walker" help-window ;
 
@@ -92,7 +72,6 @@ walker-gadget "toolbar" f {
 } define-command-map
 
 walker-gadget "other" f {
-    { T{ key-down f { A+ } "a" } com-abandon }
     { T{ key-down f { A+ } "n" } com-inspect }
 } define-command-map
 

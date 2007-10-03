@@ -145,6 +145,12 @@ INLINE CELL type_of(CELL tagged)
 DEFPUSHPOP(d,ds)
 DEFPUSHPOP(r,rs)
 
+typedef struct {
+	CELL start;
+	CELL size;
+	CELL end;
+} F_SEGMENT;
+
 /* Assembly code makes assumptions about the layout of this struct:
    - callstack_top field is 0
    - callstack_bottom field is 1

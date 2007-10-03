@@ -57,7 +57,7 @@ DEF(FASTCALL void,lazy_jit_compile,(CELL quot)):
 	push XT_REG                  /* Alignment */
 	push XT_REG
 	push XT_REG
-	call MANGLE(jit_compile)
+	call MANGLE(primitive_jit_compile)
 	mov RETURN_REG,ARG0          /* No-op on 32-bit */
 	pop XT_REG                   /* OK to clobber XT_REG here */
 	pop XT_REG

@@ -20,8 +20,6 @@ SYMBOL: restarts
 : (catch) ( quot -- newquot )
     [ swap >c call c> drop ] curry ; inline
 
-: (callcc1) 4 getenv f 4 setenv ; inline
-
 PRIVATE>
 
 : catchstack ( -- catchstack ) catchstack* clone ; inline
@@ -45,10 +43,10 @@ C: <continuation> continuation
         continuation-catch
     } get-slots ;
 
-: ifcc0 ( capture restore -- )
+: ifcc ( capture restore -- )
     #! After continuation is being captured, the stacks looks
     #! like:
-    #! ( continuation r:capture r:restore )
+    #! ( f continuation r:capture r:restore )
     #! so the 'capture' branch is taken.
     #!
     #! Note that the continuation itself is not captured as part
@@ -56,19 +54,17 @@ C: <continuation> continuation
     #!
     #! BUT...
     #!
-    #! After the continuation is resumed, (continue) pushes f,
+    #! After the continuation is resumed, (continue-with) pushes
+    #! the given value together with f,
     #! so now, the stacks looks like:
-    #! ( f r:capture r:restore )
+    #! ( value f r:capture r:restore )
     #! Execution begins right after the call to 'continuation'.
     #! The 'restore' branch is taken.
-    >r >r continuation r> r> if* ; inline
+    >r >r f continuation r> r> ?if ; inline
 
-: ifcc1 ( capture restore -- )
-    [ (callcc1) ] swap compose ifcc0 ; inline
+: callcc0 ( quot -- ) [ drop ] ifcc ; inline
 
-: callcc0 ( quot -- ) [ ] ifcc0 ; inline
-
-: callcc1 ( quot -- obj ) [ ] ifcc1 ; inline
+: callcc1 ( quot -- obj ) [ ] ifcc ; inline
 
 : set-walker-hook ( quot -- ) 3 setenv ; inline
 
@@ -76,28 +72,24 @@ C: <continuation> continuation
 
 <PRIVATE
 
-: (continue) ( continuation -- )
+: (continue-with) ( obj continuation -- )
+    swap 4 setenv
     >continuation<
     set-catchstack
     set-namestack
     set-retainstack
-    >r set-datastack f r>
+    >r set-datastack drop 4 getenv f r>
     set-callstack ;
 
-: (continue-with) ( obj continuation -- )
-    swap 4 setenv (continue) ;
-
 PRIVATE>
-
-: continue ( continuation -- )
-    [
-        walker-hook [ (continue-with) ] [ (continue) ] if*
-    ] curry (throw) ;
 
 : continue-with ( obj continuation -- )
     [
         walker-hook [ >r 2array r> ] when* (continue-with)
     ] 2curry (throw) ;
+
+: continue ( continuation -- )
+    f swap continue-with ;
 
 GENERIC: compute-restarts ( error -- seq )
 
@@ -117,11 +109,11 @@ PRIVATE>
     (catch) [ f ] compose callcc1 ; inline
 
 : recover ( try recovery -- )
-    >r (catch) r> ifcc1 ; inline
+    >r (catch) r> ifcc ; inline
 
 : cleanup ( try cleanup-always cleanup-error -- )
     >r [ compose (catch) ] keep r> compose
-    [ dip rethrow ] curry ifcc1 ; inline
+    [ dip rethrow ] curry ifcc ; inline
 
 : attempt-all ( seq quot -- obj )
     [

@@ -1,12 +1,6 @@
 /* Set by the -S command line argument */
 bool secure_gc;
 
-typedef struct {
-	CELL start;
-	CELL size;
-	CELL end;
-} F_SEGMENT;
-
 /* set up guard pages to check for under/overflow.
 size must be a multiple of the page size */
 F_SEGMENT *alloc_segment(CELL size);

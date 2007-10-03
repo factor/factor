@@ -16,3 +16,6 @@ DECLARE_PRIMITIVE(set_datastack);
 DECLARE_PRIMITIVE(set_retainstack);
 DECLARE_PRIMITIVE(set_callstack);
 DECLARE_PRIMITIVE(callstack_to_array);
+DECLARE_PRIMITIVE(innermost_stack_frame_quot);
+DECLARE_PRIMITIVE(innermost_stack_frame_scan);
+DECLARE_PRIMITIVE(set_innermost_stack_frame_quot);

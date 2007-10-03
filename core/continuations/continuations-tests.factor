@@ -1,13 +1,7 @@
 USING: kernel math namespaces io tools.test sequences vectors
-continuations debugger parser memory arrays ;
+continuations debugger parser memory arrays words
+kernel.private ;
 IN: temporary
-
-! [ "hello" ] [
-!     [
-!         callstack [ set-callstack ] curry [ ] like -1 2array
-!         array>callstack set-callstack
-!     ] call "hello"
-! ] unit-test
 
 : (callcc1-test)
     swap 1- tuck swap ?push
@@ -66,5 +60,14 @@ IN: temporary
 ! 
 ! : callstack-overflow callstack-overflow f ;
 ! [ callstack-overflow ] unit-test-fails
-! 
-! 
+
+: don't-compile-me { } [ ] each ;
+
+: foo callstack "c" set 3 don't-compile-me ;
+: bar 1 foo 2 ;
+
+[ 1 3 2 ] [ bar ] unit-test
+
+[ t ] [ \ bar word-def "c" get innermost-frame-quot = ] unit-test
+
+[ 1 ] [ "c" get innermost-frame-scan ] unit-test

@@ -106,6 +106,8 @@ GENERIC: clone ( obj -- cloned )
 
 M: object clone ;
 
+M: callstack clone (clone) ;
+
 ! Tuple construction
 
 GENERIC# get-slots 1 ( tuple slots -- ... )

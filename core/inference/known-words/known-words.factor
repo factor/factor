@@ -568,9 +568,12 @@ t over set-effect-terminated?
 \ callstack>array { callstack } { array } <effect> "inferred-effect" set-word-prop
 \ callstack>array make-flushable
 
-\ array>callstack { array } { callstack } <effect> "inferred-effect" set-word-prop
-\ array>callstack make-flushable
-
 \ (sleep) { integer } { } <effect> "inferred-effect" set-word-prop
 
 \ become { array array } { } <effect> "inferred-effect" set-word-prop
+
+\ innermost-frame-quot { callstack } { quotation } <effect> "inferred-effect" set-word-prop
+
+\ innermost-frame-scan { callstack } { fixnum } <effect> "inferred-effect" set-word-prop
+
+\ set-innermost-frame-quot { quotation callstack } { } <effect> "inferred-effect" set-word-prop

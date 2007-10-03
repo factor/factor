@@ -24,6 +24,14 @@ IN: bootstrap.syntax
 
 { "]" "}" ";" } [ define-delimiter ] each
 
+"PRIMITIVE:" [
+    "Primitive definition is not supported" throw
+] define-syntax
+
+"CS{" [
+    "Call stack literals are not supported" throw
+] define-syntax
+
 "!" [ lexer get next-line ] define-syntax
 
 "#!" [ POSTPONE: ! ] define-syntax
@@ -72,7 +80,6 @@ IN: bootstrap.syntax
 "C{" [ \ } [ first2 rect> ] parse-literal ] define-syntax
 "T{" [ \ } [ >tuple ] parse-literal ] define-syntax
 "W{" [ \ } [ first <wrapper> ] parse-literal ] define-syntax
-"CS{" [ \ } [ >array array>callstack ] parse-literal ] define-syntax
 
 "POSTPONE:" [ scan-word parsed ] define-syntax
 "\\" [ scan-word literalize parsed ] define-syntax

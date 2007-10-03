@@ -140,20 +140,21 @@ CELL frame_executing(F_STACK_FRAME *frame)
 	return get(literal_start);
 }
 
+CELL frame_scan(F_STACK_FRAME *frame)
+{
+	if(frame_type(frame) == QUOTATION_TYPE)
+		return tag_fixnum(UNAREF(UNTAG(frame->array),frame->scan));
+	else
+		return F;
+}
+
 void stack_frame_to_array(F_STACK_FRAME *frame)
 {
-	CELL offset;
-
-	if(frame_type(frame) == QUOTATION_TYPE)
-		offset = tag_fixnum(UNAREF(UNTAG(frame->array),frame->scan));
-	else
-		offset = F;
-
 #ifdef CALLSTACK_UP_P
 	set_array_nth(array,frame_index++,frame_executing(frame));
-	set_array_nth(array,frame_index++,offset);
+	set_array_nth(array,frame_index++,frame_scan(frame));
 #else
-	set_array_nth(array,frame_index--,offset);
+	set_array_nth(array,frame_index--,frame_scan(frame));
 	set_array_nth(array,frame_index--,frame_executing(frame));
 #endif
 }
@@ -180,4 +181,59 @@ DEFINE_PRIMITIVE(callstack_to_array)
 	iterate_callstack_object(stack,stack_frame_to_array);
 
 	dpush(tag_object(array));
+}
+
+/* Some primitives implementing a limited form of callstack mutation.
+Used by the single stepper. */
+DEFINE_PRIMITIVE(innermost_stack_frame_quot)
+{
+	F_STACK_FRAME *inner = FIRST_STACK_FRAME(
+		untag_callstack(dpop()));
+	type_check(QUOTATION_TYPE,frame_executing(inner));
+
+	dpush(frame_executing(inner));
+}
+
+DEFINE_PRIMITIVE(innermost_stack_frame_scan)
+{
+	F_STACK_FRAME *inner = FIRST_STACK_FRAME(
+		untag_callstack(dpop()));
+	type_check(QUOTATION_TYPE,frame_executing(inner));
+
+	dpush(frame_scan(inner));
+}
+
+DEFINE_PRIMITIVE(set_innermost_stack_frame_quot)
+{
+	CELL callstack = dpop();
+
+	REGISTER_ROOT(callstack);
+	F_QUOTATION *quot = untag_quotation(dpop());
+	REGISTER_UNTAGGED(quot);
+
+	if(quot->compiled == F)
+		jit_compile(quot);
+
+	UNREGISTER_UNTAGGED(quot);
+	UNREGISTER_ROOT(callstack);
+
+	F_STACK_FRAME *inner = FIRST_STACK_FRAME(
+		untag_callstack(callstack));
+	type_check(QUOTATION_TYPE,frame_executing(inner));
+
+
+	CELL scan = inner->scan - inner->array;
+	CELL offset = inner->return_address - inner->xt;
+
+	inner->array = quot->array;
+	inner->scan = quot->array + scan;
+
+	inner->xt = quot->xt;
+
+#ifdef CALLSTACK_UP_P
+	F_STACK_FRAME *next = REBASE_FRAME_SUCCESSOR(frame,delta);
+	*(XT *)(next + 1) = quot->xt + offset;
+#else
+	inner->return_address = quot->xt + offset;
+#endif
 }

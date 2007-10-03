@@ -444,8 +444,6 @@ M: loc lazy-store
     #! shuffle inputs at once.
     T{ int-regs } free-vregs [ length ] 2apply <= ;
 
-USING: io prettyprint ;
-
 : finalize-locs ( -- )
     #! Perform any deferred stack shuffling.
     [

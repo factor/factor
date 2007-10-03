@@ -1,5 +1,8 @@
 #include "master.h"
 
+/* Simple JIT compiler. This is one of the two compilers implementing Factor;
+the second one is written in Factor and performs a lot of optimizations.
+See core/compiler/compiler.factor */
 bool jit_fast_if_p(F_ARRAY *array, CELL i)
 {
 	return (i + 3) <= array_capacity(array)
@@ -34,13 +37,8 @@ bool jit_stack_frame_p(F_ARRAY *array)
 	return false;
 }
 
-F_FASTCALL CELL jit_compile(CELL tagged, F_STACK_FRAME *stack)
+void jit_compile(F_QUOTATION *quot)
 {
-	stack_chain->callstack_top = stack;
-
-	REGISTER_ROOT(tagged);
-
-	F_QUOTATION *quot = untag_quotation(tagged);
 	F_ARRAY *array = untag_object(quot->array);
 
 	REGISTER_UNTAGGED(quot);
@@ -156,7 +154,13 @@ F_FASTCALL CELL jit_compile(CELL tagged, F_STACK_FRAME *stack)
 	UNREGISTER_UNTAGGED(quot);
 	quot->xt = xt;
 	quot->compiled = T;
+}
 
+F_FASTCALL CELL primitive_jit_compile(CELL tagged, F_STACK_FRAME *stack)
+{
+	stack_chain->callstack_top = stack;
+	REGISTER_ROOT(tagged);
+	jit_compile(untag_quotation(tagged));
 	UNREGISTER_ROOT(tagged);
 	return tagged;
 }
