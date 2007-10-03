@@ -3,8 +3,7 @@
 USING: alien alien.c-types alien.compiler
 arrays assocs combinators compiler inference.transforms kernel
 math namespaces parser prettyprint prettyprint.sections
-quotations sequences strings words cocoa.runtime io macros
-combinators.lib ;
+quotations sequences strings words cocoa.runtime io macros ;
 IN: cocoa.messages
 
 : make-sender ( method function -- quot )
@@ -70,12 +69,17 @@ H{ } clone objc-methods set-global
     dup objc-methods get at
     [ ] [ "No such method: " swap append throw ] ?if ;
 
+: make-dip ( quot n -- quot' )
+    dup
+    \ >r <repetition> >quotation -rot
+    \ r> <repetition> >quotation 3append ;
+
 : make-prepare-send ( selector method super? -- quot )
     [
         [ \ <super> , ] when
         swap cache-selector , \ selector ,
     ] [ ] make
-    swap second length 2 - [ ndip ] 2curry ;
+    swap second length 2 - make-dip ;
 
 MACRO: (send) ( selector super? -- quot )
     [
