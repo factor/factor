@@ -1,4 +1,4 @@
-USING: arrays kernel math math.constants math.functions math.matrices math.vectors math.quaternions random sequences ;
+USING: arrays float-arrays kernel math math.constants math.functions math.matrices math.vectors math.quaternions random sequences ;
 IN: jamshred.oint
 
 ! An oint is a point with three linearly independent unit vectors
@@ -16,9 +16,9 @@ TUPLE: oint location forward up left ;
 !     #! { { 1           0          0 }
 !     #!   { 0  cos(theta) sin(theta) }
 !     #!   { 0 -sin(theta) cos(theta) } }
-!     dup sin neg swap cos 2dup 0 -rot 3array >r
-!     swap neg 0 -rot 3array >r
-!     { 1 0 0 } r> r> 3array ;
+!     dup sin neg swap cos 2dup 0 -rot 3float-array >r
+!     swap neg 0 -rot 3float-array >r
+!     { 1 0 0 } r> r> 3float-array ;
 ! 
 ! : y-rotation ( theta -- matrix )
 !     #! costruct this matrix:
@@ -26,9 +26,9 @@ TUPLE: oint location forward up left ;
 !     #!   {          0 1           0 }
 !     #!   { sin(theta) 0  cos(theta) } }
 !     dup sin swap cos 2dup
-!     0 swap 3array >r
+!     0 swap 3float-array >r
 !     { 0 1 0 } >r
-!     0 rot neg 3array r> r> 3array ;
+!     0 rot neg 3float-array r> r> 3float-array ;
 
 : apply-to-oint ( oint quot -- )
     #! apply quot to each of forward, up, and left, storing the results
@@ -59,5 +59,16 @@ TUPLE: oint location forward up left ;
 : go-forward ( distance oint -- )
     tuck oint-forward n*v over oint-location v+ swap set-oint-location ;
 
+: distance-vector ( oint oint -- vector )
+    oint-location swap oint-location v- ;
+
 : distance ( oint oint -- distance )
-    oint-location swap oint-location v- norm ;
+    distance-vector norm ;
+
+: scalar-projection ( v1 v2 -- n )
+    #! the scalar projection of v1 onto v2
+    tuck v. swap norm / ;
+
+: perpendicular-distance ( oint oint -- distance )
+    tuck distance-vector swap 2dup oint-left scalar-projection abs
+    -rot oint-up scalar-projection abs + ;

@@ -1,5 +1,5 @@
-USING: arrays kernel jamshred.oint math math.functions math.ranges math.vectors
-math.constants random sequences vectors ;
+USING: arrays float-arrays kernel jamshred.oint math math.functions
+math.ranges math.vectors math.constants random sequences vectors ;
 IN: jamshred.tunnel
 
 : n-segments ( -- n ) 5000 ; inline
@@ -30,8 +30,8 @@ TUPLE: segment number color radius ;
 : random-color ( -- color )
     { 100 100 100 } [ random 100 / >float ] map { 1.0 } append ;
 
-: tunnel-segment-distance ( -- n ) 0.5 ;
-: random-rotation-angle ( -- theta ) pi 6 / ;
+: tunnel-segment-distance ( -- n ) 0.4 ;
+: random-rotation-angle ( -- theta ) pi 20 / ;
 
 : random-segment ( previous-segment -- segment )
     clone dup random-rotation-angle random-turn
@@ -49,34 +49,28 @@ TUPLE: segment number color radius ;
 
 : initial-segment ( -- segment )
     0 random-color default-segment-radius
-    { 0 0 0 } { 0 0 -1 } { 0 1 0 } { -1 0 0 } <segment> ;
+    F{ 0 0 0 } F{ 0 0 -1 } F{ 0 1 0 } F{ -1 0 0 } <segment> ;
 
 : random-segments ( n -- segments )
     initial-segment 1vector swap (random-segments) ;
 
 : simple-segment ( n -- segment )
-    random-color default-segment-radius pick { 0 0 -1 } n*v
-    { 0 0 -1 } { 0 1 0 } { -1 0 0 } <segment> ;
+    random-color default-segment-radius pick F{ 0 0 -1 } n*v
+    F{ 0 0 -1 } F{ 0 1 0 } F{ -1 0 0 } <segment> ;
 
 : simple-segments ( n -- segments )
     [ simple-segment ] map ;
 
-TUPLE: tunnel segments ;
+: <random-tunnel> ( -- segments )
+    n-segments random-segments ;
 
-C: <tunnel> tunnel
+: <straight-tunnel> ( -- segments )
+    n-segments simple-segments ;
 
-: <random-tunnel> ( -- tunnel )
-    n-segments random-segments <tunnel> ;
-
-: <straight-tunnel> ( -- tunnel )
-    n-segments simple-segments <tunnel> ;
-
-: sub-tunnel ( from to tunnel -- segments )
+: sub-tunnel ( from to sements -- segments )
     #! return segments between from and to, after clamping from and to to
     #! valid values
-    tunnel-segments [
-        sequence-index-range [ clamp-to-range ] curry 2apply
-    ] keep <slice> ;
+    [ sequence-index-range [ clamp-to-range ] curry 2apply ] keep <slice> ;
 
 : nearer-segment ( segment segment oint -- segment )
     #! return whichever of the two segments is nearer to the oint
@@ -97,10 +91,21 @@ C: <tunnel> tunnel
 : nearest-segment-backward ( segments oint start -- segment )
     swapd 1+ 0 swap rot <slice> <reversed> find-nearest-segment ;
 
-: nearest-segment ( tunnel oint start-segment -- segment )
+: nearest-segment ( segments oint start-segment -- segment )
     #! find the segment nearest to 'oint', and return it.
     #! start looking at segment 'start-segment'
     segment-number over >r
-    >r >r tunnel-segments r> r>
     [ nearest-segment-forward ] 3keep
     nearest-segment-backward r> nearer-segment ;
+
+: distance-from-centre ( oint segment -- distance )
+    perpendicular-distance ;
+
+: distance-from-wall ( oint segment -- distance )
+    tuck distance-from-centre swap segment-radius swap - ;
+
+: fraction-from-centre ( oint segment -- fraction )
+    tuck distance-from-centre swap segment-radius / ;
+
+: fraction-from-wall ( oint segment -- fraction )
+    fraction-from-centre 1 swap - ;

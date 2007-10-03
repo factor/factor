@@ -14,7 +14,7 @@ TUPLE: jamshred tunnel players running ;
 
 : jamshred-update ( jamshred -- )
     dup jamshred-running [
-        dup jamshred-tunnel swap jamshred-player update-player
+        jamshred-player update-player
     ] [ drop ] if ;
 
 : toggle-running ( jamshred -- )
