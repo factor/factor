@@ -26,8 +26,7 @@ M: continuation restore
     clone interpreter set ;
 
 M: pair restore
-    first2 clone interpreter set
-    [ nip f ] curry with-interpreter-datastack ;
+    first2 restore [ nip f ] curry with-interpreter-datastack ;
 
 M: f restore
     drop interpreter off ;
@@ -73,12 +72,9 @@ SYMBOL: history
 : save-interpreter ( -- )
     history get [ interpreter get clone swap push ] when* ;
 
-: restore-interpreter ( interp -- )
-    clone interpreter set ;
-
 : step-back ( -- )
     history get dup empty?
-    [ drop ] [ pop restore-interpreter ] if ;
+    [ drop ] [ pop restore ] if ;
 
 : (continue) ( continuation -- )
     >continuation<

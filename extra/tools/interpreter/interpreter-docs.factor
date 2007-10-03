@@ -18,8 +18,6 @@ ARTICLE: "meta-interp-travel" "Backwards time travel"
 { $subsection history }
 "If this variable holds a vector, the interpreter state is automatically saved after every step. It can be saved at other points manually:"
 { $subsection save-interpreter }
-"You can also restore any prior state:"
-{ $subsection restore-interpreter }
 "Or restore the most recently saved state:"
 { $subsection step-back } ;
 
@@ -47,10 +45,6 @@ HELP: history
 
 HELP: save-interpreter
 { $description "Snapshots the single stepper state and saves it in " { $link history } "." } ;
-
-HELP: restore-interpreter
-{ $values { "ns" continuation } }
-{ $description "Restores the single stepper to a former state, which must have been saved by a call to " { $link save-interpreter } "." } ;
 
 HELP: step
 { $description "Evaluates the object in the single stepper using Factor evaluation semantics:"
