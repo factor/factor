@@ -20,6 +20,10 @@ SYMBOL: restarts
 : (catch) ( quot -- newquot )
     [ swap >c call c> drop ] curry ; inline
 
+: dummy
+    #! Defeat an optimization.
+    f ;
+
 PRIVATE>
 
 : catchstack ( -- catchstack ) catchstack* clone ; inline
@@ -60,7 +64,7 @@ C: <continuation> continuation
     #! ( value f r:capture r:restore )
     #! Execution begins right after the call to 'continuation'.
     #! The 'restore' branch is taken.
-    >r >r f continuation r> r> ?if ; inline
+    >r >r dummy continuation r> r> ?if ; inline
 
 : callcc0 ( quot -- ) [ drop ] ifcc ; inline
 
