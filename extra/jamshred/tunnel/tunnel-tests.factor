@@ -6,10 +6,10 @@ IN: temporary
         T{ oint f { 0 0 0.25 } }
         nearer-segment segment-number ] unit-test
 
-[ 0 ] [ T{ oint f { 0 0 0 } } <straight-tunnel> tunnel-segments find-nearest-segment segment-number ] unit-test
-[ 1 ] [ T{ oint f { 0 0 -1 } } <straight-tunnel> tunnel-segments find-nearest-segment segment-number ] unit-test
-[ 2 ] [ T{ oint f { 0 0.1 -2.1 } } <straight-tunnel> tunnel-segments find-nearest-segment segment-number ] unit-test
+[ 0 ] [ T{ oint f { 0 0 0 } } <straight-tunnel> find-nearest-segment segment-number ] unit-test
+[ 1 ] [ T{ oint f { 0 0 -1 } } <straight-tunnel> find-nearest-segment segment-number ] unit-test
+[ 2 ] [ T{ oint f { 0 0.1 -2.1 } } <straight-tunnel> find-nearest-segment segment-number ] unit-test
 
-[ 3 ] [ <straight-tunnel> tunnel-segments T{ oint f { 0 0 -3.25 } } 0 nearest-segment-forward segment-number ] unit-test
+[ 3 ] [ <straight-tunnel> T{ oint f { 0 0 -3.25 } } 0 nearest-segment-forward segment-number ] unit-test
 
-[ { 0 0 0 } ] [ <straight-tunnel> T{ oint f { 0 0 -0.25 } } over tunnel-segments first nearest-segment oint-location ] unit-test
+[ { 0 0 0 } ] [ <straight-tunnel> T{ oint f { 0 0 -0.25 } } over first nearest-segment oint-location ] unit-test

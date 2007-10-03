@@ -29,7 +29,7 @@ M: jamshred-gadget ungraft* ( gadget -- ) remove-timer ;
     <jamshred> swap set-jamshred-gadget-jamshred ;
 
 : pix>radians ( n m -- theta )
-    2 / / pi * ;
+    2 / / pi 2 * * ;
 
 : x>radians ( x gadget -- theta )
     #! translate motion of x pixels to an angle
