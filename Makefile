@@ -23,7 +23,7 @@ ENGINE = $(DLL_PREFIX)factor$(DLL_SUFFIX)$(DLL_EXTENSION)
 DLL_OBJS = $(PLAF_DLL_OBJS) \
 	vm/alien.o \
 	vm/bignum.o \
-	vm/compiler.o \
+	vm/code_heap.o \
 	vm/debug.o \
 	vm/factor.o \
 	vm/ffi_test.o \
