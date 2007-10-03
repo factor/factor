@@ -186,7 +186,9 @@ M: x86-backend %unbox-any-c-ptr ( dst src -- )
     { "is-byte-array" "end" "start" } [ define-label ] each
     ! Address is computed in ds-reg
     ds-reg PUSH
+    ds-reg 0 MOV
     ! Object is stored in ds-reg
+    rs-reg PUSH
     rs-reg swap v>operand MOV
     ! We come back here with displaced aliens
     "start" resolve-label
