@@ -227,26 +227,29 @@ DEFINE_PRIMITIVE(innermost_stack_frame_scan)
 
 DEFINE_PRIMITIVE(set_innermost_stack_frame_quot)
 {
-	CELL callstack = dpop();
-
-	REGISTER_ROOT(callstack);
+	F_CALLSTACK *callstack = untag_callstack(dpop());
 	F_QUOTATION *quot = untag_quotation(dpop());
+
+	REGISTER_UNTAGGED(callstack);
 	REGISTER_UNTAGGED(quot);
 
 	if(quot->compiled == F)
 		jit_compile(quot);
 
 	UNREGISTER_UNTAGGED(quot);
-	UNREGISTER_ROOT(callstack);
+	UNREGISTER_UNTAGGED(callstack);
 
-	F_STACK_FRAME *inner = innermost_stack_frame(
-		untag_callstack(callstack));
+	F_STACK_FRAME *inner = innermost_stack_frame(callstack);
 	type_check(QUOTATION_TYPE,frame_executing(inner));
-
 
 	CELL scan = inner->scan - inner->array;
 
 #ifdef CALLSTACK_UP_P
+	CELL top = (CELL)(callstack + 1);
+	CELL bottom = top + untag_fixnum_fast(callstack->length);
+	CELL base = callstack->bottom;
+	CELL delta = (bottom - base);
+
 	F_STACK_FRAME *next = REBASE_FRAME_SUCCESSOR(inner,delta);
 	CELL offset = *(XT *)(next + 1) - inner->xt;
 #else

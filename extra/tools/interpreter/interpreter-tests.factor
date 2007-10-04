@@ -88,6 +88,10 @@ IN: temporary
     [ [ 2 2 + number>string print ] string-out ] test-interpreter
 ] unit-test
 
+[ { 1 2 3 } ] [
+    [ { 1 2 3 } set-datastack ] test-interpreter
+] unit-test
+
 [ { 6 } ]
 [ [ 3 [ nip continue ] callcc0 2 * ] test-interpreter ] unit-test
 
@@ -96,6 +100,10 @@ IN: temporary
 
 [ { 6 } ]
 [ [ [ 3 throw ] catch 2 * ] test-interpreter ] unit-test
+
+[ { "{ 1 2 3 }\n" } ] [
+    [ [ { 1 2 3 } . ] string-out ] test-interpreter
+] unit-test
 
 : meta-catch interpreter get continuation-catch ;
 

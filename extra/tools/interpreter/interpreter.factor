@@ -26,7 +26,8 @@ M: continuation restore
     clone interpreter set ;
 
 M: pair restore
-    first2 restore [ nip f ] curry with-interpreter-datastack ;
+    first2 clone interpreter set
+    [ nip f ] curry with-interpreter-datastack ;
 
 M: f restore
     drop interpreter off ;
@@ -49,17 +50,21 @@ M: f restore
         ] if
     ] ?if ;
 
+: (step-into-continuation)
+    continuation callstack over set-continuation-call break ;
+
 {
     { call [ (step-into-call) ] }
     { (throw) [ (step-into-call) ] }
     { execute [ (step-into-execute) ] }
     { if [ (step-into-if) ] }
     { dispatch [ (step-into-dispatch) ] }
+    { continuation [ (step-into-continuation) ] }
 } [ "step-into" set-word-prop ] assoc-each
 
 {
     >n ndrop >c c>
-    continuation continue continue-with
+    continue continue-with
     (continue-with) stop break
 } [
     dup [ execute break ] curry
@@ -72,9 +77,12 @@ SYMBOL: history
 : save-interpreter ( -- )
     history get [ interpreter get clone swap push ] when* ;
 
+: restore-interpreter ( interp -- )
+    clone interpreter set ;
+
 : step-back ( -- )
     history get dup empty?
-    [ drop ] [ pop restore ] if ;
+    [ drop ] [ pop restore-interpreter ] if ;
 
 : (continue) ( continuation -- )
     >continuation<

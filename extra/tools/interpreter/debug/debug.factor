@@ -11,7 +11,8 @@ IN: tools.interpreter.debug
     [
         "out" set
         [ f swap 2array restore "out" get continue ] callcc0
-    ] swap [ datastack "datastack" set stop ] 3append callcc0 ;
+    ] swap [ datastack "datastack" set stop ]
+    3append callcc0 ;
 
 : test-interpreter ( quot -- )
     init-interpreter run-interpreter "datastack" get ;
