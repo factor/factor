@@ -59,8 +59,7 @@ IN: hashtables
     swap 2 fixnum+fast 2dup slot -rot 1 fixnum+fast slot ;
     inline
 
-: set-nth-pair ( value key n seq -- )
-    swap
+: set-nth-pair ( value key seq n -- )
     2 fixnum+fast [ set-slot ] 2keep
     1 fixnum+fast set-slot ; inline
 
@@ -73,7 +72,7 @@ IN: hashtables
 : (set-hash) ( value key hash -- )
     2dup new-key@
     [ rot hash-count+ ] [ rot drop ] if
-    swap set-nth-pair ; inline
+    set-nth-pair ; inline
 
 : find-pair-next >r 2 fixnum+fast r> ; inline
 
@@ -133,7 +132,7 @@ M: hashtable clear-assoc ( hash -- )
 
 M: hashtable delete-at ( key hash -- )
     tuck key@ [
-        >r >r ((tombstone)) dup r> r> swap set-nth-pair
+        >r >r ((tombstone)) dup r> r> set-nth-pair
         hash-deleted+
     ] [
         3drop
