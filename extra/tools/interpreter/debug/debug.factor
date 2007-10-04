@@ -1,18 +1,31 @@
 ! Copyright (C) 2004, 2007 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: tools.interpreter namespaces kernel arrays continuations
-threads sequences ;
+USING: tools.interpreter kernel arrays continuations threads
+sequences namespaces ;
 IN: tools.interpreter.debug
 
-: run-interpreter ( -- )
-    interpreter get [ step-into run-interpreter ] when ;
+: run-interpreter ( interpreter -- )
+    dup interpreter-continuation [
+        dup step-into run-interpreter
+    ] [
+        drop
+    ] if ;
 
-: init-interpreter ( quot -- )
+: quot>cont ( quot -- cont )
     [
-        "out" set
-        [ f swap 2array restore "out" get continue ] callcc0
-    ] swap [ datastack "datastack" set stop ]
-    3append callcc0 ;
+        swap [
+            continue-with
+        ] curry callcc0 call stop
+    ] curry callcc1 ;
+
+: init-interpreter ( quot interpreter -- )
+    >r
+    [ datastack "datastack" set ] compose quot>cont
+    f swap 2array
+    r> restore ;
 
 : test-interpreter ( quot -- )
-    init-interpreter run-interpreter "datastack" get ;
+    <interpreter>
+    [ init-interpreter ] keep
+    run-interpreter
+    "datastack" get ;
