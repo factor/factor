@@ -58,9 +58,9 @@ ARTICLE: "ui-walker" "UI walker"
 "The walker single-steps through quotations. To use the walker, enter a piece of code in the listener's input area and press " { $operation walk } "."
 $nl
 "The walker can travel backwards through time, and restore stacks. This does not undo side effects and therefore can only be used reliably on referentially transparent code."
-{ $command-map walker-gadget "toolbar" }
-{ $command-map walker-gadget "other" }
-"Walkers are instances of " { $link walker-gadget } "." ;
+{ $command-map walker "toolbar" }
+{ $command-map walker "other" }
+"Walkers are instances of " { $link walker } "." ;
 
 ARTICLE: "ui-profiler" "UI profiler" 
 "The graphical profiler is based on the terminal profiler (see " { $link "profiling" } ") and adds more convenient browsing of profiler results."

@@ -6,7 +6,9 @@ kernel.private math namespaces namespaces.private prettyprint
 quotations sequences splitting strings threads vectors words ;
 IN: tools.interpreter
 
-SYMBOL: interpreter
+TUPLE: interpreter continuation ;
+
+: <interpreter> interpreter construct-empty ;
 
 SYMBOL: break-hook
 
@@ -15,22 +17,25 @@ SYMBOL: break-hook
     over set-continuation-call
     walker-hook [ continue-with ] [ break-hook get call ] if* ;
 
-: with-interpreter-datastack ( quot -- )
-    interpreter get continuation-data
-    swap with-datastack
-    interpreter get set-continuation-data ; inline
-
-GENERIC: restore ( obj -- )
-
-M: continuation restore
-    clone interpreter set ;
-
-M: pair restore
-    first2 clone interpreter set
-    [ nip f ] curry with-interpreter-datastack ;
+GENERIC# restore 1 ( obj interpreter -- )
 
 M: f restore
-    drop interpreter off ;
+    set-interpreter-continuation ;
+
+M: continuation restore
+    >r clone r> set-interpreter-continuation ;
+
+: with-interpreter-datastack ( quot interpreter -- )
+    interpreter-continuation [
+        continuation-data
+        swap with-datastack
+    ] keep set-continuation-data ; inline
+
+M: pair restore
+    >r first2 r> [ restore ] keep
+    >r [ nip f ] curry r> with-interpreter-datastack ;
+
+<PRIVATE
 
 : (step-into-call) \ break add* call ;
 
@@ -71,19 +76,6 @@ M: f restore
     "step-into" set-word-prop
 ] each
 
-! Time travel
-SYMBOL: history
-
-: save-interpreter ( -- )
-    history get [ interpreter get clone swap push ] when* ;
-
-: restore-interpreter ( interp -- )
-    clone interpreter set ;
-
-: step-back ( -- )
-    history get dup empty?
-    [ drop ] [ pop restore-interpreter ] if ;
-
 : (continue) ( continuation -- )
     >continuation<
     set-catchstack
@@ -93,26 +85,34 @@ SYMBOL: history
     set-callstack ;
 
 ! Stepping
-: step-all ( -- )
-    [ interpreter get (continue) ] in-thread ;
+: change-innermost-frame ( quot interpreter -- )
+    interpreter-continuation [
+        continuation-call clone
+        [
+            dup innermost-frame-scan 1+
+            swap innermost-frame-quot
+            rot call
+        ] keep
+        [ set-innermost-frame-quot ] keep
+    ] keep set-continuation-call ; inline
 
-: change-innermost-frame ( quot -- )
-    interpreter get continuation-call clone
+: (step) ( interpreter quot -- )
+    swap
+    [ change-innermost-frame ] keep
     [
-        dup innermost-frame-scan 1+
-        swap innermost-frame-quot
-        rot call
-    ] keep
-    [ set-innermost-frame-quot ] keep
-    interpreter get set-continuation-call ; inline
+        set-walker-hook
+        interpreter-continuation (continue)
+    ] callcc1 swap restore ;
 
-: (step) ( quot -- )
-    save-interpreter
-    change-innermost-frame
-    [ set-walker-hook interpreter get (continue) ] callcc1
-    restore ;
+GENERIC: (step-into) ( obj -- )
 
-: step ( n -- )
+M: word (step-into) (step-into-execute) ;
+M: wrapper (step-into) wrapped break ;
+M: object (step-into) break ;
+
+PRIVATE>
+
+: step ( interpreter -- )
     [
         2dup nth \ break = [
             nip
@@ -121,18 +121,15 @@ SYMBOL: history
         ] if
     ] (step) ;
 
-: step-out ( -- )
+: step-out ( interpreter -- )
     [ nip \ break add ] (step) ;
 
-GENERIC: (step-into) ( obj -- )
-
-M: word (step-into) (step-into-execute) ;
-M: wrapper (step-into) wrapped break ;
-M: object (step-into) break ;
-
-: step-into ( -- )
+: step-into ( interpreter -- )
     [
         cut [
             swap % unclip literalize , \ (step-into) , %
         ] [ ] make
     ] (step) ;
+
+: step-all ( interpreter -- )
+    interpreter-continuation [ (continue) ] curry in-thread ;

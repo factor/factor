@@ -17,7 +17,7 @@ IN: ui.tools
         <stack-display>
         <browser-gadget>
         <inspector-gadget>
-        <walker-gadget>
+        <walker>
         <profiler-gadget>
     } ;
 
@@ -65,7 +65,7 @@ M: workspace model-changed
 
 : com-inspector inspector-gadget select-tool ;
 
-: com-walker walker-gadget select-tool ;
+: com-walker walker select-tool ;
 
 : com-profiler profiler-gadget select-tool ;
 
