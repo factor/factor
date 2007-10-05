@@ -3,7 +3,7 @@
 USING: parser layouts system ;
 IN: bootstrap.ppc
 
-: reserved-area-size 6 bootstrap-cells ;
+: c-area-size 14 bootstrap-cells ;
 : lr-save 2 bootstrap-cells ;
 
 "resource:core/cpu/ppc/bootstrap.factor" run-file

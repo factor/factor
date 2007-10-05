@@ -1,34 +1,4 @@
-typedef struct _F_STACK_FRAME {
-	/* ===== 24 bytes reserved ===== */
-	struct _F_STACK_FRAME *previous;
-
-	CELL padding1;
-
-	/* Callee stores our LR here */
-	XT return_address;
-
-	CELL padding2;
-	CELL padding3;
-	CELL padding4;
-	/* ===== 32 bytes saved register area ===== */
-	CELL padding5[8];
-
-	/* ===== 16 byte local variable area ===== */
-
-	/* In compiled quotation frames, the quot->array slot.
-	In compiled word frames, unused. */
-	CELL array;
-
-	/* In compiled quotation frames, position within the array.
-	In compiled word frames, unused. */
-	CELL scan;
-
-	/* In all compiled frames, the XT on entry. */
-	XT xt;
-
-	/* ===== 12 byte padding to make it 16 byte aligned ===== */
-	CELL padding6[3];
-} F_STACK_FRAME;
+#define FRAME_RETURN_ADDRESS(frame,delta) *((XT *)(REBASE_FRAME_SUCCESSOR(frame,delta) + 1) + 2)
 
 #define MACH_EXC_STATE_TYPE ppc_exception_state_t
 #define MACH_EXC_STATE_FLAVOR PPC_EXCEPTION_STATE

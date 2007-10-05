@@ -16,9 +16,7 @@ typedef struct _F_STACK_FRAME
 	XT xt;
 } F_STACK_FRAME;
 
-#define CALLSTACK_UP_P
-
-#define FRAME_SUCCESSOR(frame) (frame)->next
+#define FRAME_RETURN_ADDRESS(frame,delta) *(XT *)(REBASE_FRAME_SUCCESSOR(frame,delta) + 1)
 
 INLINE void flush_icache(CELL start, CELL len) {}
 

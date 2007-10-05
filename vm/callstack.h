@@ -2,6 +2,7 @@ F_FASTCALL void save_callstack_bottom(F_STACK_FRAME *callstack_bottom);
 
 #define FIRST_STACK_FRAME(stack) (F_STACK_FRAME *)((stack) + 1)
 
+#define FRAME_SUCCESSOR(frame) (frame)->next
 #define REBASE_FRAME_SUCCESSOR(frame,delta) (F_STACK_FRAME *)((CELL)FRAME_SUCCESSOR(frame) + delta)
 
 typedef void (*CALLSTACK_ITER)(F_STACK_FRAME *frame);

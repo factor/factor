@@ -12,15 +12,9 @@ void iterate_callstack(CELL top, CELL bottom, CELL base, CALLSTACK_ITER iterator
 {
 	CELL delta = (bottom - base);
 
-#ifdef CALLSTACK_UP_P
 	F_STACK_FRAME *frame = (F_STACK_FRAME *)bottom - 1;
-	#define ITERATING_P (CELL)frame >= top
-#else
-	F_STACK_FRAME *frame = (F_STACK_FRAME *)top;
-	#define ITERATING_P (CELL)frame < bottom
-#endif
 
-	while(ITERATING_P)
+	while((CELL)frame >= top)
 	{
 		F_STACK_FRAME *next = REBASE_FRAME_SUCCESSOR(frame,delta);
 		iterator(frame);
@@ -55,7 +49,6 @@ called by continuation implementation, and user code shouldn't
 be calling it at all, so we leave it as it is for now. */
 F_STACK_FRAME *capture_start(void)
 {
-#ifdef CALLSTACK_UP_P
 	F_STACK_FRAME *frame = stack_chain->callstack_bottom - 1;
 	while(frame >= stack_chain->callstack_top
 		&& FRAME_SUCCESSOR(frame) >= stack_chain->callstack_top)
@@ -63,9 +56,6 @@ F_STACK_FRAME *capture_start(void)
 		frame = FRAME_SUCCESSOR(frame);
 	}
 	return frame + 1;
-#else
-	return FRAME_SUCCESSOR(stack_chain->callstack_top);
-#endif
 }
 
 DEFINE_PRIMITIVE(callstack)
@@ -152,13 +142,8 @@ CELL frame_scan(F_STACK_FRAME *frame)
 
 void stack_frame_to_array(F_STACK_FRAME *frame)
 {
-#ifdef CALLSTACK_UP_P
 	set_array_nth(array,frame_index++,frame_executing(frame));
 	set_array_nth(array,frame_index++,frame_scan(frame));
-#else
-	set_array_nth(array,frame_index--,frame_scan(frame));
-	set_array_nth(array,frame_index--,frame_executing(frame));
-#endif
 }
 
 DEFINE_PRIMITIVE(callstack_to_array)
@@ -174,11 +159,7 @@ DEFINE_PRIMITIVE(callstack_to_array)
 
 	/* frame_count is equal to the total length now */
 
-#ifdef CALLSTACK_UP_P
 	frame_index = 0;
-#else
-	frame_index = frame_count - 1;
-#endif
 
 	iterate_callstack_object(stack,stack_frame_to_array);
 
@@ -187,7 +168,6 @@ DEFINE_PRIMITIVE(callstack_to_array)
 
 F_STACK_FRAME *innermost_stack_frame(F_CALLSTACK *callstack)
 {
-#ifdef CALLSTACK_UP_P
 	CELL top = (CELL)(callstack + 1);
 	CELL bottom = top + untag_fixnum_fast(callstack->length);
 	CELL base = callstack->bottom;
@@ -200,9 +180,6 @@ F_STACK_FRAME *innermost_stack_frame(F_CALLSTACK *callstack)
 		frame = REBASE_FRAME_SUCCESSOR(frame,delta);
 
 	return frame;
-#else
-	return FIRST_STACK_FRAME(callstack);
-#endif
 }
 
 /* Some primitives implementing a limited form of callstack mutation.
@@ -244,26 +221,17 @@ DEFINE_PRIMITIVE(set_innermost_stack_frame_quot)
 
 	CELL scan = inner->scan - inner->array;
 
-#ifdef CALLSTACK_UP_P
 	CELL top = (CELL)(callstack + 1);
 	CELL bottom = top + untag_fixnum_fast(callstack->length);
 	CELL base = callstack->bottom;
 	CELL delta = (bottom - base);
 
-	F_STACK_FRAME *next = REBASE_FRAME_SUCCESSOR(inner,delta);
-	CELL offset = *(XT *)(next + 1) - inner->xt;
-#else
-	CELL offset = inner->return_address - inner->xt;
-#endif
+	CELL offset = FRAME_RETURN_ADDRESS(inner,delta) - inner->xt;
 
 	inner->array = quot->array;
 	inner->scan = quot->array + scan;
 
 	inner->xt = quot->xt;
 
-#ifdef CALLSTACK_UP_P
-	*(XT *)(next + 1) = quot->xt + offset;
-#else
-	inner->return_address = quot->xt + offset;
-#endif
+	FRAME_RETURN_ADDRESS(inner,delta) = quot->xt + offset;
 }

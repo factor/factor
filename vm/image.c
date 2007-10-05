@@ -186,12 +186,7 @@ void fixup_stack_frame(F_STACK_FRAME *frame)
 		frame->scan = scan + frame->array;
 	}
 
-#ifdef CALLSTACK_UP_P
-	F_STACK_FRAME *next = REBASE_FRAME_SUCCESSOR(frame,delta);
-	code_fixup((XT *)(next + 1));
-#else
-	code_fixup(&frame->return_address);
-#endif
+	code_fixup(&FRAME_RETURN_ADDRESS(frame,delta));
 }
 
 void fixup_callstack_object(F_CALLSTACK *stack)
