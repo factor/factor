@@ -1,7 +1,7 @@
 USING: arrays definitions io.streams.string io.streams.duplex
 kernel math namespaces parser prettyprint prettyprint.config
 prettyprint.sections sequences tools.test vectors words
-effects splitting generic.standard ;
+effects splitting generic.standard prettyprint.private ;
 IN: temporary
 
 [ "4" ] [ 4 unparse ] unit-test
@@ -277,3 +277,24 @@ unit-test
 ] unit-test
 
 [ ] [ \ effect-in synopsis drop ] unit-test
+
+[ [ + ] ] [
+    [ \ + (step-into) ] (remove-breakpoints)
+] unit-test
+
+[ [ (step-into) ] ] [
+    [ (step-into) ] (remove-breakpoints)
+] unit-test
+
+[ [ 3 ] ] [
+    [ 3 (step-into) ] (remove-breakpoints)
+] unit-test
+
+[ [ 2 2 + . ] ] [
+    [ 2 2 \ + (step-into) . ] (remove-breakpoints)
+] unit-test
+
+[ [ 2 2 + . ] ] [
+    [ 2 break 2 \ + (step-into) . ] (remove-breakpoints)
+] unit-test
+
