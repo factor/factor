@@ -1,7 +1,5 @@
 #include "master.h"
 
-/* This code is very ugly. Perhaps unavoidably so. */
-
 /* called before entry into Factor code. */
 F_FASTCALL void save_callstack_bottom(F_STACK_FRAME *callstack_bottom)
 {
@@ -22,7 +20,7 @@ void iterate_callstack(CELL top, CELL bottom, CALLSTACK_ITER iterator)
 
 void iterate_callstack_object(F_CALLSTACK *stack, CALLSTACK_ITER iterator)
 {
-	CELL top = (CELL)(stack + 1);
+	CELL top = (CELL)FIRST_STACK_FRAME(stack);
 	CELL bottom = top + untag_fixnum_fast(stack->length);
 
 	iterate_callstack(top,bottom,iterator);
@@ -82,16 +80,6 @@ DEFINE_PRIMITIVE(set_callstack)
 	critical_error("Bug in set_callstack()",0);
 }
 
-/* C doesn't have closures... */
-static CELL frame_count;
-static CELL frame_index;
-static F_ARRAY *array;
-
-void count_stack_frame(F_STACK_FRAME *frame)
-{
-	frame_count += 2; 
-}
-
 CELL frame_type(F_STACK_FRAME *frame)
 {
 	return xt_to_compiled(frame->xt)->type;
@@ -121,6 +109,17 @@ CELL frame_scan(F_STACK_FRAME *frame)
 		return F;
 }
 
+/* C doesn't have closures... */
+static CELL frame_count;
+
+void count_stack_frame(F_STACK_FRAME *frame)
+{
+	frame_count += 2; 
+}
+
+static CELL frame_index;
+static F_ARRAY *array;
+
 void stack_frame_to_array(F_STACK_FRAME *frame)
 {
 	set_array_nth(array,frame_index++,frame_executing(frame));
@@ -146,13 +145,12 @@ DEFINE_PRIMITIVE(callstack_to_array)
 
 F_STACK_FRAME *innermost_stack_frame(F_CALLSTACK *callstack)
 {
-	CELL top = (CELL)(callstack + 1);
-	CELL bottom = top + untag_fixnum_fast(callstack->length);
+	F_STACK_FRAME *top = FIRST_STACK_FRAME(callstack);
+	CELL bottom = (CELL)top + untag_fixnum_fast(callstack->length);
 
 	F_STACK_FRAME *frame = (F_STACK_FRAME *)bottom - 1;
 
-	while(frame >= (F_STACK_FRAME *)top
-		&& frame_successor(frame) >= (F_STACK_FRAME *)top)
+	while(frame >= top && frame_successor(frame) >= top)
 		frame = frame_successor(frame);
 
 	return frame;
