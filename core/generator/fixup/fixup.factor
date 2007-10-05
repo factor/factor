@@ -35,7 +35,8 @@ M: label fixup*
 : resolve-label ( label/name -- ) dup label? [ get ] unless , ;
 
 : if-stack-frame ( frame-size quot -- )
-    over no-stack-frame = [ 2drop ] [ call ] if ; inline
+    swap dup no-stack-frame =
+    [ 2drop ] [ stack-frame swap call ] if ; inline
 
 M: word fixup*
     {

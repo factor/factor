@@ -47,14 +47,16 @@ M: x86-backend stack-frame ( n -- i )
 M: x86-backend %save-xt ( -- )
     xt-reg compiling-label get MOV ;
 
+: factor-area-size 4 cells ;
+
 M: x86-backend %prologue ( n -- )
     xt-reg PUSH
-    xt-reg stack-reg pick stack-frame 4 cells + neg [+] LEA
+    xt-reg stack-reg pick factor-area-size + neg [+] LEA
     xt-reg PUSH
-    stack-reg swap stack-frame 2 cells - SUB ;
+    stack-reg swap 2 cells - SUB ;
 
 M: x86-backend %epilogue ( n -- )
-    stack-reg swap stack-frame ADD ;
+    stack-reg swap ADD ;
 
 : %alien-global ( symbol dll register -- )
     [ 0 MOV rc-absolute-cell rel-dlsym ] keep dup [] MOV ;
