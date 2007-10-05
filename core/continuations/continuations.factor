@@ -20,9 +20,12 @@ SYMBOL: restarts
 : (catch) ( quot -- newquot )
     [ swap >c call c> drop ] curry ; inline
 
-: dummy
-    #! Defeat an optimization.
-    f ;
+: dummy ( -- obj )
+    #! Optimizing compiler assumes stack won't be messed with
+    #! in-transit. To ensure that a value is actually reified
+    #! on the stack, we put it in a non-inline word together
+    #! with a declaration.
+    f { object } declare ;
 
 PRIVATE>
 
@@ -70,11 +73,15 @@ C: <continuation> continuation
 
 : callcc1 ( quot -- obj ) [ ] ifcc ; inline
 
-: set-walker-hook ( quot -- ) 3 setenv ; inline
-
-: walker-hook ( -- quot ) 3 getenv f set-walker-hook ; inline
-
 <PRIVATE
+
+: (continue) ( continuation -- )
+    >continuation<
+    set-catchstack
+    set-namestack
+    set-retainstack
+    >r set-datastack r>
+    set-callstack ;
 
 : (continue-with) ( obj continuation -- )
     swap 4 setenv
@@ -86,6 +93,10 @@ C: <continuation> continuation
     set-callstack ;
 
 PRIVATE>
+
+: set-walker-hook ( quot -- ) 3 setenv ; inline
+
+: walker-hook ( -- quot ) 3 getenv f set-walker-hook ; inline
 
 : continue-with ( obj continuation -- )
     [
@@ -170,3 +181,19 @@ M: condition compute-restarts
     "kernel-error" 6 setenv ;
 
 PRIVATE>
+
+! Debugging support
+: with-walker-hook ( continuation -- )
+    [ swap set-walker-hook (continue) ] curry callcc1 ;
+
+SYMBOL: break-hook
+
+: break ( -- )
+    continuation callstack
+    over set-continuation-call
+    walker-hook [ (continue-with) ] [ break-hook get call ] if* ;
+
+GENERIC: (step-into) ( obj -- )
+
+M: wrapper (step-into) wrapped break ;
+M: object (step-into) break ;

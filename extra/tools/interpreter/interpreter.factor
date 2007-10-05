@@ -10,13 +10,6 @@ TUPLE: interpreter continuation ;
 
 : <interpreter> interpreter construct-empty ;
 
-SYMBOL: break-hook
-
-: break ( -- )
-    continuation callstack
-    over set-continuation-call
-    walker-hook [ continue-with ] [ break-hook get call ] if* ;
-
 GENERIC# restore 1 ( obj interpreter -- )
 
 M: f restore
@@ -58,6 +51,8 @@ M: pair restore
 : (step-into-continuation)
     continuation callstack over set-continuation-call break ;
 
+M: word (step-into) (step-into-execute) ;
+
 {
     { call [ (step-into-call) ] }
     { (throw) [ (step-into-call) ] }
@@ -76,14 +71,6 @@ M: pair restore
     "step-into" set-word-prop
 ] each
 
-: (continue) ( continuation -- )
-    >continuation<
-    set-catchstack
-    set-namestack
-    set-retainstack
-    >r set-datastack r>
-    set-callstack ;
-
 ! Stepping
 : change-innermost-frame ( quot interpreter -- )
     interpreter-continuation [
@@ -99,16 +86,8 @@ M: pair restore
 : (step) ( interpreter quot -- )
     swap
     [ change-innermost-frame ] keep
-    [
-        set-walker-hook
-        interpreter-continuation (continue)
-    ] callcc1 swap restore ;
-
-GENERIC: (step-into) ( obj -- )
-
-M: word (step-into) (step-into-execute) ;
-M: wrapper (step-into) wrapped break ;
-M: object (step-into) break ;
+    [ interpreter-continuation with-walker-hook ] keep
+    restore ;
 
 PRIVATE>
 
