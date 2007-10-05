@@ -24,8 +24,8 @@ big-endian on
 
 : next-save stack-frame bootstrap-cell - ;
 : xt-save stack-frame 2 bootstrap-cells - ;
-: scan-save stack-frame 3 bootstrap-cells - ;
-: array-save stack-frame 4 bootstrap-cells - ;
+: array-save stack-frame 3 bootstrap-cells - ;
+: scan-save stack-frame 4 bootstrap-cells - ;
 
 [
     temp-reg quot-reg quot-array@ LWZ          ! load array

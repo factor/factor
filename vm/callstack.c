@@ -65,7 +65,6 @@ DEFINE_PRIMITIVE(callstack)
 		size = 0;
 
 	F_CALLSTACK *callstack = allot_callstack(size);
-	callstack->bottom = (CELL)bottom;
 	memcpy(FIRST_STACK_FRAME(callstack),top,size);
 	dpush(tag_object(callstack));
 }
