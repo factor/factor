@@ -204,7 +204,7 @@ HELP: stack.
 
 HELP: callstack.
 { $values { "callstack" callstack } }
-{ $description "Displays a sequence output by " { $link callstack } " in a nice way, by highlighting the current execution point in every call frame." } ;
+{ $description "Displays a sequence output by " { $link callstack } " in a nice way, by highlighting the current execution point in every call frame with " { $link -> } "." } ;
 
 HELP: .c
 { $description "Displays the contents of the call stack, with the top of the stack printed first." } ;

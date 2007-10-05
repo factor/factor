@@ -53,12 +53,6 @@ unit-test
 
 [ "W{ \\ + }" ] [ [ W{ \ + } ] first unparse ] unit-test
 
-[ "[ 1 2 =>dup<= ]" ]
-[
-    [ 1 2 dup ] dup hilite-quotation set 2 hilite-index set
-    [ pprint ] string-out
-] unit-test
-
 [ t ] [
     "[ >r \"alloc\" add 0 0 r> ]" dup parse first unparse =
 ] unit-test
