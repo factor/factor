@@ -173,8 +173,6 @@ void fixup_alien(F_ALIEN *d)
 	d->expired = T;
 }
 
-F_FIXNUM delta;
-
 void fixup_stack_frame(F_STACK_FRAME *frame)
 {
 	code_fixup(&frame->xt);
@@ -186,15 +184,11 @@ void fixup_stack_frame(F_STACK_FRAME *frame)
 		frame->scan = scan + frame->array;
 	}
 
-	code_fixup(&FRAME_RETURN_ADDRESS(frame,delta));
+	code_fixup(&FRAME_RETURN_ADDRESS(frame));
 }
 
 void fixup_callstack_object(F_CALLSTACK *stack)
 {
-	CELL top = (CELL)(stack + 1);
-	CELL bottom = top + untag_fixnum_fast(stack->length);
-	delta = (bottom - stack->bottom);
-
 	iterate_callstack_object(stack,fixup_stack_frame);
 }
 

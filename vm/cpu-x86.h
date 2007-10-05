@@ -1,22 +1,4 @@
-typedef struct _F_STACK_FRAME
-{
-	/* In compiled quotation frames, position within the array.
-	In compiled word frames, unused. */
-	CELL scan;
-
-	/* In compiled quotation frames, the quot->array slot.
-	In compiled word frames, unused. */
-	CELL array;
-
-	/* Pointer to the next stack frame; frames are chained from
-	the bottom on up */
-	struct _F_STACK_FRAME *next;
-
-	/* In all compiled frames, the XT on entry. */
-	XT xt;
-} F_STACK_FRAME;
-
-#define FRAME_RETURN_ADDRESS(frame,delta) *(XT *)(REBASE_FRAME_SUCCESSOR(frame,delta) + 1)
+#define FRAME_RETURN_ADDRESS(frame) *(XT *)(frame_successor(frame) + 1)
 
 INLINE void flush_icache(CELL start, CELL len) {}
 

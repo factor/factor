@@ -1,4 +1,4 @@
-#define FRAME_RETURN_ADDRESS(frame,delta) *((XT *)(REBASE_FRAME_SUCCESSOR(frame,delta) + 1) + 2)
+#define FRAME_RETURN_ADDRESS(frame) *((XT *)(frame_successor(frame) + 1) + 2)
 
 #define MACH_EXC_STATE_TYPE ppc_exception_state_t
 #define MACH_EXC_STATE_FLAVOR PPC_EXCEPTION_STATE

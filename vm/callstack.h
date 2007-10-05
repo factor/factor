@@ -1,14 +1,30 @@
+typedef struct _F_STACK_FRAME
+{
+	/* In compiled quotation frames, position within the array.
+	In compiled word frames, unused. */
+	CELL scan;
+
+	/* In compiled quotation frames, the quot->array slot.
+	In compiled word frames, unused. */
+	CELL array;
+
+	/* In all compiled frames, the XT on entry. */
+	XT xt;
+
+	/* Pointer to the next stack frame; frames are chained from
+	the bottom on up */
+	struct _F_STACK_FRAME *next;
+} F_STACK_FRAME;
+
 F_FASTCALL void save_callstack_bottom(F_STACK_FRAME *callstack_bottom);
 
 #define FIRST_STACK_FRAME(stack) (F_STACK_FRAME *)((stack) + 1)
 
-#define FRAME_SUCCESSOR(frame) (frame)->next
-#define REBASE_FRAME_SUCCESSOR(frame,delta) (F_STACK_FRAME *)((CELL)FRAME_SUCCESSOR(frame) + delta)
-
 typedef void (*CALLSTACK_ITER)(F_STACK_FRAME *frame);
 
-void iterate_callstack(CELL top, CELL bottom, CELL base, CALLSTACK_ITER iterator);
+void iterate_callstack(CELL top, CELL bottom, CALLSTACK_ITER iterator);
 void iterate_callstack_object(F_CALLSTACK *stack, CALLSTACK_ITER iterator);
+F_STACK_FRAME *frame_successor(F_STACK_FRAME *frame);
 CELL frame_executing(F_STACK_FRAME *frame);
 CELL frame_type(F_STACK_FRAME *frame);
 

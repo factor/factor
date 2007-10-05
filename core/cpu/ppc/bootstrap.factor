@@ -36,8 +36,8 @@ big-endian on
     0 MFLR
     1 1 stack-frame neg ADDI
     xt-reg 1 xt-save STW                       ! save XT
-    xt-reg 1 factor-area-size neg ADDI
-    xt-reg 1 next-save STW                     ! save forward chain pointer
+    stack-frame xt-reg LI
+    xt-reg 1 next-save STW                     ! save frame size
     temp-reg 1 array-save STW                  ! save array
     0 1 lr-save stack-frame + STW              ! save return address
 ] { } make jit-prolog set

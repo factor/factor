@@ -395,8 +395,7 @@ void collect_callstack(F_CONTEXT *stacks)
 {
 	CELL top = (CELL)stacks->callstack_top;
 	CELL bottom = (CELL)stacks->callstack_bottom;
-	CELL base = bottom;
-	iterate_callstack(top,bottom,base,collect_stack_frame);
+	iterate_callstack(top,bottom,collect_stack_frame);
 }
 
 /* Copy roots over at the start of GC, namely various constants, stacks,

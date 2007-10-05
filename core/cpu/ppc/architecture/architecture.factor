@@ -90,7 +90,7 @@ M: ppc-backend %prologue ( n -- )
     0 MFLR
     1 1 pick neg ADDI
     11 1 pick xt-save STW
-    11 1 factor-area-size neg ADDI
+    dup 11 LI
     11 1 pick next-save STW
     0 1 rot lr-save + STW ;
 

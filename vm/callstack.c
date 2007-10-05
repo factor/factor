@@ -8,15 +8,13 @@ F_FASTCALL void save_callstack_bottom(F_STACK_FRAME *callstack_bottom)
 	stack_chain->callstack_bottom = callstack_bottom;
 }
 
-void iterate_callstack(CELL top, CELL bottom, CELL base, CALLSTACK_ITER iterator)
+void iterate_callstack(CELL top, CELL bottom, CALLSTACK_ITER iterator)
 {
-	CELL delta = (bottom - base);
-
 	F_STACK_FRAME *frame = (F_STACK_FRAME *)bottom - 1;
 
 	while((CELL)frame >= top)
 	{
-		F_STACK_FRAME *next = REBASE_FRAME_SUCCESSOR(frame,delta);
+		F_STACK_FRAME *next = frame_successor(frame);
 		iterator(frame);
 		frame = next;
 	}
@@ -26,9 +24,8 @@ void iterate_callstack_object(F_CALLSTACK *stack, CALLSTACK_ITER iterator)
 {
 	CELL top = (CELL)(stack + 1);
 	CELL bottom = top + untag_fixnum_fast(stack->length);
-	CELL base = stack->bottom;
 
-	iterate_callstack(top,bottom,base,iterator);
+	iterate_callstack(top,bottom,iterator);
 }
 
 F_CALLSTACK *allot_callstack(CELL size)
@@ -51,9 +48,9 @@ F_STACK_FRAME *capture_start(void)
 {
 	F_STACK_FRAME *frame = stack_chain->callstack_bottom - 1;
 	while(frame >= stack_chain->callstack_top
-		&& FRAME_SUCCESSOR(frame) >= stack_chain->callstack_top)
+		&& frame_successor(frame) >= stack_chain->callstack_top)
 	{
-		frame = FRAME_SUCCESSOR(frame);
+		frame = frame_successor(frame);
 	}
 	return frame + 1;
 }
@@ -73,30 +70,9 @@ DEFINE_PRIMITIVE(callstack)
 	dpush(tag_object(callstack));
 }
 
-/* If a callstack object was captured at a different base stack height than
-we have now, we have to patch up the back-chain pointers. */
-static F_FIXNUM delta;
-
-void adjust_stack_frame(F_STACK_FRAME *frame)
-{
-	FRAME_SUCCESSOR(frame) = REBASE_FRAME_SUCCESSOR(frame,delta);
-}
-
-void adjust_callstack(F_CALLSTACK *stack, CELL bottom)
-{
-	delta = (bottom - stack->bottom);
-	iterate_callstack_object(stack,adjust_stack_frame);
-	stack->bottom = bottom;
-}
-
 DEFINE_PRIMITIVE(set_callstack)
 {
 	F_CALLSTACK *stack = untag_callstack(dpop());
-
-	CELL bottom = (CELL)stack_chain->callstack_bottom;
-
-	if(stack->bottom != bottom)
-		adjust_callstack(stack,bottom);
 
 	set_callstack(stack_chain->callstack_bottom,
 		FIRST_STACK_FRAME(stack),
@@ -112,7 +88,8 @@ static CELL frame_count;
 static CELL frame_index;
 static F_ARRAY *array;
 
-void count_stack_frame(F_STACK_FRAME *frame) {
+void count_stack_frame(F_STACK_FRAME *frame)
+{
 	frame_count += 2; 
 }
 
@@ -130,6 +107,11 @@ CELL frame_executing(F_STACK_FRAME *frame)
 		+ compiled->reloc_length;
 
 	return get(literal_start);
+}
+
+F_STACK_FRAME *frame_successor(F_STACK_FRAME *frame)
+{
+	return (F_STACK_FRAME *)((CELL)frame - frame->size);
 }
 
 CELL frame_scan(F_STACK_FRAME *frame)
@@ -157,10 +139,7 @@ DEFINE_PRIMITIVE(callstack_to_array)
 	array = allot_array_internal(ARRAY_TYPE,frame_count);
 	UNREGISTER_UNTAGGED(stack);
 
-	/* frame_count is equal to the total length now */
-
 	frame_index = 0;
-
 	iterate_callstack_object(stack,stack_frame_to_array);
 
 	dpush(tag_object(array));
@@ -170,14 +149,12 @@ F_STACK_FRAME *innermost_stack_frame(F_CALLSTACK *callstack)
 {
 	CELL top = (CELL)(callstack + 1);
 	CELL bottom = top + untag_fixnum_fast(callstack->length);
-	CELL base = callstack->bottom;
-	CELL delta = (bottom - base);
 
 	F_STACK_FRAME *frame = (F_STACK_FRAME *)bottom - 1;
 
 	while(frame >= (F_STACK_FRAME *)top
-		&& REBASE_FRAME_SUCCESSOR(frame,delta) >= (F_STACK_FRAME *)top)
-		frame = REBASE_FRAME_SUCCESSOR(frame,delta);
+		&& frame_successor(frame) >= (F_STACK_FRAME *)top)
+		frame = frame_successor(frame);
 
 	return frame;
 }
@@ -220,18 +197,12 @@ DEFINE_PRIMITIVE(set_innermost_stack_frame_quot)
 	type_check(QUOTATION_TYPE,frame_executing(inner));
 
 	CELL scan = inner->scan - inner->array;
-
-	CELL top = (CELL)(callstack + 1);
-	CELL bottom = top + untag_fixnum_fast(callstack->length);
-	CELL base = callstack->bottom;
-	CELL delta = (bottom - base);
-
-	CELL offset = FRAME_RETURN_ADDRESS(inner,delta) - inner->xt;
+	CELL offset = FRAME_RETURN_ADDRESS(inner) - inner->xt;
 
 	inner->array = quot->array;
 	inner->scan = quot->array + scan;
 
 	inner->xt = quot->xt;
 
-	FRAME_RETURN_ADDRESS(inner,delta) = quot->xt + offset;
+	FRAME_RETURN_ADDRESS(inner) = quot->xt + offset;
 }
