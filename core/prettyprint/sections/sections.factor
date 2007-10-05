@@ -157,11 +157,6 @@ TUPLE: block sections ;
         { highlight t }
     } ;
 
-: hilite ( -- )
-    last-section
-    dup section-style hilite-style union
-    swap set-section-style ;
-
 : start-group ( -- )
     t last-section set-section-start-group? ;
 

@@ -22,11 +22,13 @@ GENERIC: pprint* ( obj -- )
 
 ! Atoms
 : word-style ( word -- style )
-    [
-        dup presented set
-        dup parsing? over delimiter? rot t eq? or or
-        [ bold font-style set ] when
-    ] H{ } make-assoc ;
+    dup "word-style" word-prop >hashtable [
+        [
+            dup presented set
+            dup parsing? over delimiter? rot t eq? or or
+            [ bold font-style set ] when
+        ] bind
+    ] keep ;
 
 : word-name* ( word -- str )
     word-name "( no name )" or ;
@@ -129,15 +131,9 @@ M: pathname pprint* dup pathname-string "P\" " pprint-string ;
         dup zero? [ 2drop f ] [ >r head r> ] if
     ] when ;
 
-: pprint-hilite ( n object -- )
-    pprint* hilite-index get = [ hilite ] when ;
-
 : pprint-elements ( seq -- )
-    do-length-limit >r dup hilite-quotation get eq? [
-        [ length ] keep [ pprint-hilite ] 2each
-    ] [
-        [ pprint* ] each
-    ] if
+    do-length-limit >r
+    [ pprint* ] each
     r> [ "~" swap number>string " more~" 3append text ] when* ;
 
 GENERIC: pprint-delims ( obj -- start end )

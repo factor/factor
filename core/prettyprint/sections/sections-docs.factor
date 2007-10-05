@@ -74,7 +74,6 @@ HELP: section
     { $link block }
     { $link inset }
     { $link flow }
-    { $link hilite }
     { $link colon }
 }
 "Instances of this class have the following slots:"
