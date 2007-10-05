@@ -4,26 +4,6 @@ continuations math.parser threads arrays
 tools.interpreter.private tools.interpreter.debug ;
 IN: temporary
 
-[ [ + ] ] [
-    [ \ + (step-into) ] (remove-breakpoints)
-] unit-test
-
-[ [ (step-into) ] ] [
-    [ (step-into) ] (remove-breakpoints)
-] unit-test
-
-[ [ 3 ] ] [
-    [ 3 (step-into) ] (remove-breakpoints)
-] unit-test
-
-[ [ 2 2 + . ] ] [
-    [ 2 2 \ + (step-into) . ] (remove-breakpoints)
-] unit-test
-
-[ [ 2 2 + . ] ] [
-    [ 2 break 2 \ + (step-into) . ] (remove-breakpoints)
-] unit-test
-
 [ "Ooops" throw ] break-hook set
 
 [ { } ] [
