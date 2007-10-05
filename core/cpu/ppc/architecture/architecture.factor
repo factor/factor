@@ -41,9 +41,9 @@ TUPLE: ppc-backend ;
 
 : factor-area-size 4 cells ;
 
-: xt-save ( n -- i ) cell - ;
+: next-save ( n -- i ) cell - ;
 
-: next-save ( n -- i ) 2 cells - ;
+: xt-save ( n -- i ) 2 cells - ;
 
 M: ppc-backend stack-frame ( n -- i )
     local@ factor-area-size + 4 cells align ;
