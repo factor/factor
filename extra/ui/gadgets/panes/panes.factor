@@ -184,33 +184,12 @@ M: pane-stream make-span-stream
 : apply-presentation-style ( style gadget -- style gadget )
     presented [ <presentation> ] apply-style ;
 
-TUPLE: scroll-to-me done? ;
-
-: <scroll-to-me>
-    scroll-to-me construct-empty
-    [ set-gadget-delegate ] keep ;
-
-: scroll-on-graft? ( gadget -- ? )
-    parents
-    [ [ pane? ] is? ] subset
-    [ pane-scrolls? ] contains? not ;
-
-M: scroll-to-me graft*
-    dup scroll-to-me-done? [
-        t over set-scroll-to-me-done?
-        dup scroll-on-graft? [ dup scroll>gadget ] when
-    ] unless delegate graft* ;
-
-: apply-highlight-style ( style gadget -- style gadget )
-    highlight [ drop <scroll-to-me> ] apply-style ;
-
 : <styled-label> ( style text -- gadget )
     <label>
     apply-foreground-style
     apply-background-style
     apply-font-style
     apply-presentation-style
-    apply-highlight-style
     nip ;
 
 ! Paragraph styles
