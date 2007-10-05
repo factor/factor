@@ -153,7 +153,7 @@ FUNCTION: void ffi_test_20 double x1, double x2, double x3,
     { "int" "int" "int" "int" "int" "int" "int" "int" "int" "int" "int" "int" "int" "int" "int" "int" "int" "int" "int" "int" "int" "int" "int" "int" "int" "int" "int" "int" "int" "int" "int" "int" "int" "int" "int" "int" "int" "int" "int" "int" "int" "int" }
     alien-invoke code-gc 3 ;
 
-! [ 3 ] [ 42 [ ] each ffi_test_31 ] unit-test
+[ 3 ] [ 42 [ ] each ffi_test_31 ] unit-test
 
 FUNCTION: longlong ffi_test_21 long x long y ;
 
