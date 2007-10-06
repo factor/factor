@@ -40,5 +40,5 @@ TUPLE: coroutine resumecc exitcc ;
 
 : coterminate ( v -- )
   current-coro get
-  f over set-coroutine-resumecc
+  [ ] over set-coroutine-resumecc
   coroutine-exitcc continue-with ;

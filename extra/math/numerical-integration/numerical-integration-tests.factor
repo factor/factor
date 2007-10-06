@@ -1,4 +1,5 @@
-USING: kernel math.numerical-integration ;
+USING: kernel math.numerical-integration tools.test math
+math.constants math.functions ;
 IN: temporary
 
 [ 50 ] [ 0 10 [ ] integrate-simpson ] unit-test
