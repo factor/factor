@@ -36,6 +36,3 @@ DEF(void,set_callstack,(F_STACK_FRAME *to, F_STACK_FRAME *from, CELL length, voi
 	ret                                /* return _with new stack_ */
 
 #include "cpu-x86.S"
-
-.section .drectve
-.ascii " -export:set_callstack"

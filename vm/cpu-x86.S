@@ -64,11 +64,7 @@ DEF(FASTCALL void,lazy_jit_compile,(CELL quot)):
 	pop XT_REG
         JUMP_QUOT                    /* Call the quotation */
 
-.section .drectve
-.ascii " -export:c_to_factor"
-.ascii " -export:undefined"
-.ascii " -export:docol_profiling"
-.ascii " -export:primitive_call"
-.ascii " -export:primitive_execute"
-.ascii " -export:throw_impl"
-.ascii " -export:lazy_jit_compile"
+#ifdef WINDOWS
+	.section .drectve
+	.ascii " -export:c_to_factor"
+#endif
