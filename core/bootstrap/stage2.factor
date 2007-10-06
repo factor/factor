@@ -29,6 +29,13 @@ IN: bootstrap.stage2
     wince? [ "windows.ce" require ] when
     winnt? [ "windows.nt" require ] when
 
+    "deploy-vocab" get [
+        "stage2: deployment mode" print
+    ] [
+        "listener" require
+        "none" require
+    ] if
+
     [
         ! Compile everything if compiler is loaded
         all-words [ changed-word ] each
@@ -54,11 +61,8 @@ IN: bootstrap.stage2
     f error-continuation set-global
 
     "deploy-vocab" get [
-        "tools.deploy" run
+        "tools.deploy.shaker" run
     ] [
-        "listener" require
-        "none" require
-
         [
             boot
             do-init-hooks
