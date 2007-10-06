@@ -8,9 +8,9 @@ big-endian off
 
 1 jit-code-format set
 
-: scan-save stack-reg 3 bootstrap-cells [+] ;
-
 : stack-frame-size 8 bootstrap-cells ;
+
+: scan-save stack-reg stack-frame-size 3 bootstrap-cells - [+] ;
 
 [
     arg0 arg0 quot-array@ [+] MOV              ! load array
