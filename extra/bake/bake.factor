@@ -49,4 +49,3 @@ DEFER: bake
 
 : bake ( seq -- seq )
   [ reset-building save-exemplar bake-items finish-baking ] with-scope ;
-

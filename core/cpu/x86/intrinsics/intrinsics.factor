@@ -74,7 +74,7 @@ IN: cpu.x86.intrinsics
 : %slot-literal-known-tag
     "obj" operand
     "n" get cells
-    "obj" operand-tag - [+] ;
+    "obj" get operand-tag - [+] ;
 
 : %slot-literal-any-tag
     "obj" operand %untag
@@ -88,9 +88,10 @@ IN: cpu.x86.intrinsics
 \ slot {
     ! Slot number is literal and the tag is known
     {
-        [ "obj" operand %slot-literal-known-tag MOV ] H{
+        [ "val" operand %slot-literal-known-tag MOV ] H{
             { +input+ { { f "obj" known-tag } { [ small-slot? ] "n" } } }
-            { +output+ { "obj" } }
+            { +scratch+ { { f "val" } } }
+            { +output+ { "val" } }
         }
     }
     ! Slot number is literal
@@ -112,9 +113,9 @@ IN: cpu.x86.intrinsics
 
 : generate-write-barrier ( -- )
     #! Mark the card pointed to by vreg.
-    "val" operand-immediate? "obj" get fresh-object? or [
+    "val" get operand-immediate? "obj" get fresh-object? or [
         "obj" operand card-bits SHR
-        "cards_offset" f %alien-global
+        "cards_offset" f temp-reg v>operand %alien-global
         temp-reg v>operand "obj" operand [+] card-mark OR
     ] unless ;
 
@@ -498,22 +499,27 @@ IN: cpu.x86.intrinsics
 } define-intrinsic
 
 ! Alien intrinsics
+: %alien-accessor ( quot -- )
+    "offset" operand %untag-fixnum
+    "offset" operand "alien" operand ADD
+    "offset" operand [] swap call ; inline
+
 : %alien-integer-get ( quot reg -- )
     small-reg PUSH
-    "offset" operand %untag-fixnum
-    "alien" operand-class %alien-accessor
-    "offset" operand small-reg MOV
-    "offset" operand %tag-fixnum
+    swap %alien-accessor
+    "value" operand small-reg MOV
+    "value" operand %tag-fixnum
     small-reg POP ; inline
 
 : alien-integer-get-template
     H{
         { +input+ {
-            { f "alien" simple-c-ptr }
+            { unboxed-c-ptr "alien" c-ptr }
             { f "offset" fixnum }
         } }
-        { +output+ { "offset" } }
-        { +clobber+ { "alien" "offset" } }
+        { +scratch+ { { f "value" } } }
+        { +output+ { "value" } }
+        { +clobber+ { "offset" } }
     } ;
 
 : define-getter
@@ -529,19 +535,21 @@ IN: cpu.x86.intrinsics
 
 : %alien-integer-set ( quot reg -- )
     small-reg PUSH
-    { "offset" "value" } %untag-fixnums
+    "offset" get "value" get = [
+        "value" operand %untag-fixnum
+    ] unless
     small-reg "value" operand MOV
-    "alien" operand-class %alien-accessor
+    swap %alien-accessor
     small-reg POP ; inline
 
 : alien-integer-set-template
     H{
         { +input+ {
             { f "value" fixnum }
-            { f "alien" simple-c-ptr }
+            { unboxed-c-ptr "alien" c-ptr }
             { f "offset" fixnum }
         } }
-        { +clobber+ { "value" "alien" "offset" } }
+        { +clobber+ { "value" "offset" } }
     } ;
 
 : define-setter
@@ -563,12 +571,24 @@ IN: cpu.x86.intrinsics
 \ set-alien-signed-2 small-reg-16 define-setter
 
 \ alien-cell [
-    "offset" operand %untag-fixnum
+    "value" operand [ MOV ] %alien-accessor
+] H{
+    { +input+ {
+        { unboxed-c-ptr "alien" c-ptr }
+        { f "offset" fixnum }
+    } }
+    { +scratch+ { { unboxed-alien "value" } } }
+    { +output+ { "value" } }
+    { +clobber+ { "offset" } }
+} define-intrinsic
 
-    [ MOV ]
-    "offset" operand
-    "alien" operand-class
-    %alien-accessor
-
-    "offset" get %allot-alien
-] alien-integer-get-template define-intrinsic
+\ set-alien-cell [
+    "value" operand [ swap MOV ] %alien-accessor
+] H{
+    { +input+ {
+        { unboxed-c-ptr "value" c-ptr }
+        { unboxed-c-ptr "alien" c-ptr }
+        { f "offset" fixnum }
+    } }
+    { +clobber+ { "offset" } }
+} define-intrinsic

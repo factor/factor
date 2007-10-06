@@ -118,6 +118,12 @@ M: #return optimize-node* cleanup-inlining ;
 ! #values
 M: #values optimize-node* cleanup-inlining ;
 
+! #>r
+M: #>r optimize-node* [ node-in-d empty? ] prune-if ;
+
+! #r>
+M: #r> optimize-node* [ node-in-r empty? ] prune-if ;
+
 ! Some utilities for splicing in dataflow IR subtrees
 : follow ( key assoc -- value )
     2dup at* [ swap follow nip ] [ 2drop ] if ;

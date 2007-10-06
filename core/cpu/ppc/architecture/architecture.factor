@@ -9,17 +9,16 @@ IN: cpu.ppc.architecture
 TUPLE: ppc-backend ;
 
 ! PowerPC register assignments
-! r3-r10, r17-r31: integer vregs
+! r3-r10, r16-r31: integer vregs
 ! f0-f13: float vregs
 ! r11, r12: scratch
 ! r14: data stack
 ! r15: retain stack
 
-! For stack frame layout, see vm/os-{macosx,linux}-ppc.h.
+! For stack frame layout, see vm/cpu-ppc.h.
 
 : ds-reg 14 ;
 : rs-reg 15 ;
-: stack-chain-reg 16 ;
 
 : reserved-area-size
     os {
@@ -37,13 +36,17 @@ TUPLE: ppc-backend ;
 
 : param-save-size 8 cells ; foldable
 
-: xt-save reserved-area-size param-save-size + 2 cells + ; foldable
+: local@ ( n -- x )
+    reserved-area-size param-save-size + + ; inline
 
-: local-area-start xt-save cell + ; foldable
+: factor-area-size 4 cells ;
 
-: local@ ( n -- x ) local-area-start + ; inline
+: next-save ( n -- i ) cell - ;
 
-M: ppc-backend stack-frame ( n -- i ) local@ 4 cells align ;
+: xt-save ( n -- i ) 2 cells - ;
+
+M: ppc-backend stack-frame ( n -- i )
+    local@ factor-area-size + 4 cells align ;
 
 M: temp-reg v>operand drop 11 ;
 
@@ -85,17 +88,19 @@ M: ppc-backend %save-xt ( -- )
 
 M: ppc-backend %prologue ( n -- )
     0 MFLR
-    1 1 pick stack-frame neg STWU
-    11 1 xt-save STW
-    0 1 rot stack-frame lr-save + STW ;
+    1 1 pick neg ADDI
+    11 1 pick xt-save STW
+    dup 11 LI
+    11 1 pick next-save STW
+    0 1 rot lr-save + STW ;
 
 M: ppc-backend %epilogue ( n -- )
     #! At the end of each word that calls a subroutine, we store
     #! the previous link register value in r0 by popping it off
     #! the stack, set the link register to the contents of r0,
     #! and jump to the link register.
-    0 1 pick stack-frame lr-save + LWZ
-    1 1 rot stack-frame ADDI
+    0 1 pick lr-save + LWZ
+    1 1 rot ADDI
     0 MTLR ;
 
 : %load-dlsym ( symbol dll register -- )
@@ -156,21 +161,13 @@ M: ppc-backend %return ( -- ) %epilogue-later BLR ;
 
 M: ppc-backend %unwind drop %return ;
 
-M: int-regs (%peek)
-    drop >r v>operand r> loc>operand LWZ ;
+M: ppc-backend %peek ( vreg loc -- )
+    >r v>operand r> loc>operand LWZ ;
 
-M: float-regs (%peek)
-    drop
-    11 swap loc>operand LWZ
-    v>operand 11 float-offset LFD ;
+M: ppc-backend %replace
+    >r v>operand r> loc>operand STW ;
 
-M: int-regs (%replace)
-    drop >r v>operand r> loc>operand STW ;
-
-M: ppc-backend %move-int>int ( dst src -- )
-    [ v>operand ] 2apply MR ;
-
-M: ppc-backend %move-int>float ( dst src -- )
+M: ppc-backend %unbox-float ( dst src -- )
     [ v>operand ] 2apply float-offset LFD ;
 
 M: ppc-backend %inc-d ( n -- ) ds-reg dup rot cells ADDI ;
@@ -244,7 +241,7 @@ M: ppc-backend %box-long-long ( n func -- )
         4 1 rot cell + local@ LWZ
     ] when* r> f %alien-invoke ;
 
-: temp@ stack-frame* swap - ;
+: temp@ stack-frame* factor-area-size - swap - ;
 
 : struct-return@ ( size n -- n ) [ local@ ] [ temp@ ] ?if ;
 
@@ -277,7 +274,7 @@ M: ppc-backend %alien-invoke ( symbol dll -- )
     11 %load-dlsym (%call) ;
 
 M: ppc-backend %alien-callback ( quot -- )
-    0 <int-vreg> load-literal "c_to_factor" f %alien-invoke ;
+    3 load-indirect "c_to_factor" f %alien-invoke ;
 
 M: ppc-backend %prepare-alien-indirect ( -- )
     "unbox_alien" f %alien-invoke
@@ -323,35 +320,43 @@ M: ppc-backend %unbox-small-struct
     drop "No small structs" throw ;
 
 ! Alien intrinsics
-M: ppc-backend %unbox-byte-array ( quot src -- )
-    "address" operand "alien" operand "offset" operand ADD
-    "address" operand byte-array-offset
-    roll call ;
+M: ppc-backend %unbox-byte-array ( dst src -- )
+    [ v>operand ] 2apply byte-array-offset ADDI ;
 
-M: ppc-backend %unbox-alien ( quot src -- )
-    "address" operand "alien" operand alien-offset LWZ
-    "address" operand dup "offset" operand ADD
-    "address" operand 0
-    roll call ;
+M: ppc-backend %unbox-alien ( dst src -- )
+    [ v>operand ] 2apply alien-offset LWZ ;
 
-M: ppc-backend %unbox-f ( quot src -- )
-    "offset" operand 0
-    roll call ;
+M: ppc-backend %unbox-f ( dst src -- )
+    drop 0 swap v>operand LI ;
 
-M: ppc-backend %complex-alien-accessor ( quot src -- )
-    "is-f" define-label
-    "is-alien" define-label
-    "end" define-label
-    0 "alien" operand f v>operand CMPI
-    "is-f" get BEQ
-    "address" operand "alien" operand header-offset LWZ
-    0 "address" operand alien type-number tag-header CMPI
-    "is-alien" get BEQ
-    [ %unbox-byte-array ] 2keep
-    "end" get B
-    "is-alien" resolve-label
-    [ %unbox-alien ] 2keep
-    "end" get B
-    "is-f" resolve-label
-    %unbox-f
-    "end" resolve-label ;
+M: ppc-backend %unbox-any-c-ptr ( dst src -- )
+    { "is-byte-array" "end" "start" } [ define-label ] each
+    ! Address is computed in R12
+    0 12 LI
+    ! Load object into R11
+    11 swap v>operand MR
+    ! We come back here with displaced aliens
+    "start" resolve-label
+    ! Is the object f?
+    0 11 f v>operand CMPI
+    ! If so, done
+    "end" get BEQ
+    ! Is the object an alien?
+    0 11 header-offset LWZ
+    0 0 alien type-number tag-header CMPI
+    "is-byte-array" get BNE
+    ! If so, load the offset
+    0 11 alien-offset LWZ
+    ! Add it to address being computed
+    12 12 0 ADD
+    ! Now recurse on the underlying alien
+    11 11 underlying-alien-offset LWZ
+    "start" get B
+    "is-byte-array" resolve-label
+    ! Add byte array address to address being computed
+    12 12 11 ADD
+    ! Add an offset to start of byte array's data area
+    12 12 byte-array-offset ADDI
+    "end" resolve-label
+    ! Done, store address in destination register
+    v>operand 12 MR ;

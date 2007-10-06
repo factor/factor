@@ -2,36 +2,43 @@
 USING: kernel alien.c-types combinators namespaces arrays
        sequences sequences.lib namespaces.lib splitting
        math math.functions math.vectors math.trig
-       opengl.gl opengl.glu ui ui.gadgets.slate vars mortar slot-accessors
-       random-weighted cfdg.hsv cfdg.gl ;
+       opengl.gl opengl.glu opengl ui ui.gadgets.slate
+       combinators.lib vars
+       random-weighted colors.hsv cfdg.gl ;
 
 IN: cfdg
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-SYMBOL: <hsba>
+! hsba { hue saturation brightness alpha }
 
-<hsba>
-  { "hue" "saturation" "brightness" "alpha" } accessors
-define-independent-class
-
-! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-
-: hsv>rgb* ( h s v -- r g b ) 3array hsv>rgb first3 ;
-
-: gl-set-hsba ( color -- ) object-values first4 >r hsv>rgb* r> glColor4d ;
-
-: gl-clear-hsba ( color -- ) object-values first4 >r hsv>rgb* r> glClearColor ;
-
-! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+: <hsba> 4array ;
 
 VAR: color
 
-: init-color ( -- ) 0 0 0 1 <hsba> new >color ;
+! ( -- val )
 
-: hue ( num -- ) color> tuck $hue + 360 mod >>hue drop ;
+: hue>>        0 color> nth ;
+: saturation>> 1 color> nth ;
+: brightness>> 2 color> nth ;
+: alpha>>      3 color> nth ;
 
-: h ( num -- ) hue ;
+! ( val -- )
+
+: >>hue        0 color> set-nth ;
+: >>saturation 1 color> set-nth ;
+: >>brightness 2 color> set-nth ;
+: >>alpha      3 color> set-nth ;
+
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+: hsva>rgba ( hsva -- rgba ) [ 3 head hsv>rgb ] [ peek ] bi add ;
+
+: gl-set-hsba ( hsva -- ) hsva>rgba gl-color ;
+
+: gl-clear-hsba ( hsva -- ) hsva>rgba gl-clear ;
+
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 ! if (adjustment < 0)
 !   base + base * adjustment
@@ -41,17 +48,20 @@ VAR: color
 
 : adjust ( val num -- val ) dup 0 > [ 1 pick - * + ] [ dupd * + ] if ;
 
-: saturation ( num -- ) color> dup $saturation rot adjust >>saturation drop ;
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-: sat ( num -- ) saturation ;
+: hue ( num -- ) hue>> + 360 mod >>hue ;
 
-: brightness ( num -- ) color> dup $brightness rot adjust >>brightness drop ;
+: saturation ( num -- ) saturation>> swap adjust >>saturation ;
+: brightness ( num -- ) brightness>> swap adjust >>brightness ;
+: alpha      ( num -- ) alpha>>      swap adjust >>alpha ;
 
-: b ( num -- ) brightness ;
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-: alpha ( num -- ) color> dup $alpha rot adjust >>alpha drop ;
-
-: a ( num -- ) alpha ;
+: h   hue ;
+: sat saturation ;
+: b   brightness ;
+: a   alpha ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
@@ -59,38 +69,19 @@ VAR: color-stack
 
 : init-color-stack ( -- ) V{ } clone >color-stack ;
 
-: clone-color ( hsba -- hsba ) object-values first4 <hsba> new ;
-
-: push-color ( -- )
-color> color-stack> push
-color> clone-color >color ;
+: push-color ( -- ) color> color-stack> push   color> clone >color ;
 
 : pop-color ( -- ) color-stack> pop dup >color gl-set-hsba ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-! : check-size ( modelview-matrix -- num )
-! { 0 1 4 5 } swap [ double-nth ] curry map
-! [ abs ] map
-! [ <=> ] maximum ;
-
-! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-
-! : check-size ( modelview-matrix -- num )
-!   { 0 1 4 5 } swap [ double-nth ] curry map
-!   [ abs ] map
-!   biggest ;
-
-! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-
 : double-nth* ( c-array indices -- seq ) swap [ double-nth ] curry map ;
 
-: check-size ( modelview-matrix -- num )
-  { 0 1 4 5 } double-nth* [ abs ] map biggest ;
+: check-size ( modelview -- num ) { 0 1 4 5 } double-nth* [ abs ] map biggest ;
 
 VAR: threshold
 
-: iterate? ( -- ? ) get-modelview-matrix check-size threshold get > ;
+: iterate? ( -- ? ) get-modelview-matrix check-size threshold> > ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
@@ -101,48 +92,43 @@ VAR: threshold
 
 ! column major order
 
-: gl-flip ( angle -- ) deg>rad
-{ [ dup 2 * cos ] [ dup 2 * sin ] 0 0
-  [ dup 2 * sin ] [ 2 * cos neg ] 0 0
-  0 0 1 0
-  0 0 0 1 } make* >c-double-array glMultMatrixd ;
+: gl-flip ( angle -- ) deg>rad dup dup dup
+  [ 2 * cos ,   2 * sin ,       0 ,   0 ,
+    2 * sin ,	2 * cos neg ,   0 ,   0 ,
+          0 ,             0 ,   1 ,   0 , 
+	  0 ,		  0 ,	0 ,   1 , ]
+  { } make >c-double-array glMultMatrixd ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 : circle ( -- )
-color> gl-set-hsba
-gluNewQuadric dup 0 0.5 20 10 gluDisk gluDeleteQuadric ;
+  color> gl-set-hsba
+  gluNewQuadric dup 0 0.5 20 10 gluDisk gluDeleteQuadric ;
 
 : triangle ( -- )
-color> gl-set-hsba
-GL_POLYGON glBegin
-   0    0.577 glVertex2d
-   0.5 -0.289 glVertex2d
-  -0.5 -0.289 glVertex2d
-glEnd ;
+  color> gl-set-hsba
+  GL_POLYGON glBegin
+    0    0.577 glVertex2d
+    0.5 -0.289 glVertex2d
+   -0.5 -0.289 glVertex2d
+  glEnd ;
 
 : square ( -- )
-color> gl-set-hsba
-GL_POLYGON glBegin
-  -0.5  0.5 glVertex2d
-   0.5  0.5 glVertex2d
-   0.5 -0.5 glVertex2d
-  -0.5 -0.5 glVertex2d
-glEnd ;
+  color> gl-set-hsba
+  GL_POLYGON glBegin
+    -0.5  0.5 glVertex2d
+     0.5  0.5 glVertex2d
+     0.5 -0.5 glVertex2d
+    -0.5 -0.5 glVertex2d
+  glEnd ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 : size ( scale -- ) dup 1 glScaled ;
 
-: s ( scale -- ) size ;
-
 : size* ( scale-x scale-y -- ) 1 glScaled ;
 
-: s* ( scale-x scale-y -- ) size* ;
-
 : rotate ( angle -- ) 0 0 1 glRotated ;
-
-: r ( angle -- ) rotate ;
 
 : x ( x -- ) 0 0 glTranslated ;
 
@@ -150,16 +136,21 @@ glEnd ;
 
 : flip ( angle -- ) gl-flip ;
 
-: f ( angle -- ) flip ;
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+: s  size ;
+: s* size* ;
+: r  rotate ;
+: f  flip ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 : do ( quot -- )
-push-modelview-matrix
-push-color
-call
-pop-modelview-matrix
-pop-color ;
+  push-modelview-matrix
+  push-color
+  call
+  pop-modelview-matrix
+  pop-color ; inline
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
@@ -171,10 +162,10 @@ pop-color ;
 
 VAR: background
 
-: initial-background ( -- hsba ) 0 0 1 1 <hsba> new ;
+: set-initial-background ( -- ) { 0 0 1 1 } clone >color ;
 
 : set-background ( -- )
-  initial-background >color
+  set-initial-background
   background> call
   color> gl-clear-hsba ;
 
@@ -186,22 +177,9 @@ VAR: viewport ! { left width bottom height }
 
 VAR: start-shape
 
-: initial-color ( -- hsba ) 0 0 0 1 <hsba> new ;
+: set-initial-color ( -- ) { 0 0 0 1 } clone >color ;
 
 : display ( -- )
-
-!   GL_LINE_SMOOTH glEnable
-!   GL_BLEND glEnable
-!   GL_SRC_ALPHA GL_ONE_MINUS_SRC_ALPHA glBlendFunc
-!   GL_POINT_SMOOTH_HINT GL_NICEST glHint
-
-!   GL_FOG glEnable
-!   GL_FOG_MODE GL_LINEAR glFogi
-!   GL_FOG_COLOR { 0.5 0.5 0.5 1.0 } >c-double-array glFogfv
-!   GL_FOG_DENSITY 0.35 glFogf
-!   GL_FOG_HINT GL_DONT_CARE glHint
-!   GL_FOG_START 1.0 glFogf
-!   GL_FOG_END 5.0 glFogf
 
   GL_PROJECTION glMatrixMode
   glLoadIdentity
@@ -218,14 +196,14 @@ VAR: start-shape
   init-modelview-matrix-stack
   init-color-stack
 
-  initial-color >color
+  set-initial-color
 
   color> gl-set-hsba
 
   start-shape> call ;
 
 : cfdg-window* ( -- )
-[ display ] closed-quot <slate>
+  [ display ] closed-quot <slate>
   { 500 500 } over set-slate-dim
   dup "CFDG" open-window ;
 

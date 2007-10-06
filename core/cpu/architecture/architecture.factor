@@ -79,17 +79,14 @@ HOOK: %inc-d compiler-backend ( n -- )
 HOOK: %inc-r compiler-backend ( n -- )
 
 ! Load stack into vreg
-GENERIC: (%peek) ( vreg loc reg-class -- )
-: %peek ( vreg loc -- ) over (%peek) ;
+HOOK: %peek compiler-backend ( vreg loc -- )
 
 ! Store vreg to stack
-GENERIC: (%replace) ( vreg loc reg-class -- )
-: %replace ( vreg loc -- ) over (%replace) ;
+HOOK: %replace compiler-backend ( vreg loc -- )
 
-! Move one vreg to another
-HOOK: %move-int>int compiler-backend ( dst src -- )
-HOOK: %move-int>float compiler-backend ( dst src -- )
-HOOK: %move-float>int compiler-backend ( dst src -- )
+! Box and unbox floats
+HOOK: %unbox-float compiler-backend ( dst src -- )
+HOOK: %box-float compiler-backend ( dst src -- )
 
 ! FFI stuff
 
@@ -183,24 +180,15 @@ PREDICATE: integer inline-array 32 < ;
     ] if-small-struct ;
 
 ! Alien accessors
-HOOK: %unbox-byte-array compiler-backend ( quot src -- ) inline
+HOOK: %unbox-byte-array compiler-backend ( dst src -- )
 
-HOOK: %unbox-alien compiler-backend ( quot src -- ) inline
+HOOK: %unbox-alien compiler-backend ( dst src -- )
 
-HOOK: %unbox-f compiler-backend ( quot src -- ) inline
+HOOK: %unbox-f compiler-backend ( dst src -- )
 
-HOOK: %complex-alien-accessor compiler-backend ( quot src -- )
-inline
+HOOK: %unbox-any-c-ptr compiler-backend ( dst src -- )
 
-: %alien-accessor ( quot src class -- )
-    {
-        { [ dup \ f class< ] [ drop %unbox-f ] }
-        { [ dup simple-alien class< ] [ drop %unbox-alien ] }
-        { [ dup byte-array class< ] [ drop %unbox-byte-array ] }
-        { [ dup bit-array class< ] [ drop %unbox-byte-array ] }
-        { [ dup float-array class< ] [ drop %unbox-byte-array ] }
-        { [ t ] [ drop %complex-alien-accessor ] }
-    } cond ; inline
+HOOK: %box-alien compiler-backend ( dst src -- )
 
 : operand ( var -- op ) get v>operand ; inline
 

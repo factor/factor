@@ -145,6 +145,16 @@ FUNCTION: void ffi_test_20 double x1, double x2, double x3,
 
 [ ] [ 1.0 2.0 3.0 4.0 5.0 6.0 7.0 8.0 9.0 ffi_test_20 ] unit-test
 
+! Make sure XT doesn't get clobbered in stack frame
+
+: ffi_test_31
+    "void"
+    f "ffi_test_31"
+    { "int" "int" "int" "int" "int" "int" "int" "int" "int" "int" "int" "int" "int" "int" "int" "int" "int" "int" "int" "int" "int" "int" "int" "int" "int" "int" "int" "int" "int" "int" "int" "int" "int" "int" "int" "int" "int" "int" "int" "int" "int" "int" }
+    alien-invoke code-gc 3 ;
+
+[ 3 ] [ 42 [ ] each ffi_test_31 ] unit-test
+
 FUNCTION: longlong ffi_test_21 long x long y ;
 
 [ 121932631112635269 ]

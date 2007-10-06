@@ -106,10 +106,6 @@ HELP: presented-path
 HELP: presented-printer
 { $description "Character and paragraph style. A quotation with stack effect " { $snippet "( obj -- )" } " which is applied to the value at the " { $link presented-path } " if the presentation needs to be re-displayed after the object has been edited." } ;
 
-HELP: highlight
-{ $description "Character style. Used to mark up text on streams that otherwise do not support different colors or font styles." }
-{ $examples "Instances of " { $link plain-writer } " uppercases highlighted text." } ;
-
 HELP: page-color
 { $description "Paragraph style. Background color of the paragraph block, denoted by a sequence of four numbers between 0 and 1 (red, green, blue and alpha)." } 
 { $examples

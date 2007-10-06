@@ -23,7 +23,7 @@ ENGINE = $(DLL_PREFIX)factor$(DLL_SUFFIX)$(DLL_EXTENSION)
 DLL_OBJS = $(PLAF_DLL_OBJS) \
 	vm/alien.o \
 	vm/bignum.o \
-	vm/compiler.o \
+	vm/code_heap.o \
 	vm/debug.o \
 	vm/factor.o \
 	vm/ffi_test.o \
@@ -34,10 +34,11 @@ DLL_OBJS = $(PLAF_DLL_OBJS) \
 	vm/code_gc.o \
 	vm/primitives.o \
 	vm/run.o \
-	vm/stack.o \
+	vm/callstack.o \
 	vm/types.o \
-	vm/jit.o \
-	vm/utilities.o
+	vm/quotations.o \
+	vm/utilities.o \
+	vm/errors.o
 
 EXE_OBJS = $(PLAF_EXE_OBJS)
 
@@ -129,9 +130,6 @@ factor: $(DLL_OBJS) $(EXE_OBJS)
 	$(LINKER) $(ENGINE) $(DLL_OBJS)
 	$(CC) $(LIBS) $(LIBPATH) -L. $(LINK_WITH_ENGINE) \
 		$(CFLAGS) -o $@$(EXE_SUFFIX)$(EXE_EXTENSION) $(EXE_OBJS)
-
-pull:
-	darcs pull http://factorcode.org/repos/
 
 clean:
 	rm -f vm/*.o

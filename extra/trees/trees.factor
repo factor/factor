@@ -1,18 +1,17 @@
 ! Copyright (C) 2007 Alex Chapman
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel generic math sequences arrays io namespaces kernel-internals ;
+USING: kernel generic math math.parser sequences arrays io namespaces
+namespaces.private random layouts ;
 IN: trees
 
 TUPLE: tree root ;
 
-C: tree ( -- tree ) ;
+: <tree> ( -- tree ) tree construct-empty ;
 
 TUPLE: node key value left right ;
 
-C: node ( value key -- node )
-    [ set-node-key ] keep
-    [ set-node-value ] keep
-    f over 2dup set-node-left set-node-right ;
+: <node> ( value key -- node )
+    swap f f node construct-boa ;
 
 SYMBOL: current-side
 

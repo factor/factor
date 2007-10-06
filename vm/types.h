@@ -137,8 +137,6 @@ DECLARE_PRIMITIVE(tuple_boa);
 DECLARE_PRIMITIVE(byte_array);
 DECLARE_PRIMITIVE(bit_array);
 DECLARE_PRIMITIVE(float_array);
-DECLARE_PRIMITIVE(array_to_quotation);
-DECLARE_PRIMITIVE(quotation_xt);
 DECLARE_PRIMITIVE(clone);
 DECLARE_PRIMITIVE(tuple_to_array);
 DECLARE_PRIMITIVE(to_tuple);
@@ -191,11 +189,8 @@ F_WORD *allot_word(CELL vocab, CELL name);
 DECLARE_PRIMITIVE(word);
 DECLARE_PRIMITIVE(update_xt);
 DECLARE_PRIMITIVE(word_xt);
-void fixup_word(F_WORD* word);
-void fixup_quotation(F_QUOTATION *quot);
 
 DECLARE_PRIMITIVE(wrapper);
-DECLARE_PRIMITIVE(curry);
 
 /* Macros to simulate a vector in C */
 #define GROWABLE_ARRAY(result) \

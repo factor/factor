@@ -190,5 +190,7 @@ void *primitives[] = {
 	primitive_tuple_boa,
 	primitive_class_hash,
 	primitive_callstack_to_array,
-	primitive_array_to_callstack,
+	primitive_innermost_stack_frame_quot,
+	primitive_innermost_stack_frame_scan,
+	primitive_set_innermost_stack_frame_quot,
 };

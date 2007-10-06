@@ -1,14 +1,17 @@
 ! Testing templates machinery without compiling anything
 IN: temporary
-USING: compiler generator generator.registers tools.test
-namespaces sequences words kernel math effects ;
+USING: compiler generator generator.registers
+generator.registers.private tools.test namespaces sequences
+words kernel math effects ;
+
+: <int-vreg> ( n -- vreg ) T{ int-regs } <vreg> ;
 
 [
     [ ] [ init-templates ] unit-test
     
     [ V{ 3 } ] [ 3 fresh-object fresh-objects get ] unit-test
     
-    [ ] [ 0 <int-vreg> phantom-d get phantom-push ] unit-test
+    [ ] [ 0 <int-vreg> phantom-push ] unit-test
     
     [ ] [ compute-free-vregs ] unit-test
     
@@ -17,7 +20,7 @@ namespaces sequences words kernel math effects ;
     [ f ] [
         [
             copy-templates
-            1 <int-vreg> phantom-d get phantom-push
+            1 <int-vreg> phantom-push
             compute-free-vregs
             1 <int-vreg> T{ int-regs } free-vregs member?
         ] with-scope
@@ -57,8 +60,6 @@ namespaces sequences words kernel math effects ;
         { +input+ { { f "x" } } }
     } clone [
         [ 1 0 ] [ +input+ get { } { } guess-vregs ] unit-test
-        [ ] [ 1 0 ensure-vregs ] unit-test
-        ! [ t ] [ +input+ get phantom-d get compatible? ] unit-test
         [ ] [ finalize-contents ] unit-test
         [ ] [ [ template-inputs ] { } make drop ] unit-test
     ] bind
@@ -118,14 +119,71 @@ SYMBOL: template-chosen
 
     ! This is not empty since a load instruction is emitted
     [ f ] [
-        [ { { f "x"  } } fast-input ] { } make empty?
+        [ { { f "x" } } +input+ set load-inputs ] { } make
+        empty?
     ] unit-test
 
     ! This is empty since we already loaded the value
     [ t ] [
-        [ { { f "x"  } } fast-input ] { } make empty?
+        [ { { f "x" } } +input+ set load-inputs ] { } make
+        empty?
     ] unit-test
 
     ! This is empty since we didn't change the stack
     [ t ] [ [ end-basic-block ] { } make empty? ] unit-test
+] with-scope
+
+! Regression
+[
+    [ ] [ init-templates ] unit-test
+
+    ! >r r>
+    [ ] [
+        1 phantom->r
+        1 phantom-r>
+    ] unit-test
+
+    ! This is empty since we didn't change the stack
+    [ t ] [ [ end-basic-block ] { } make empty? ] unit-test
+
+    ! >r r>
+    [ ] [
+        1 phantom->r
+        1 phantom-r>
+    ] unit-test
+
+    [ ] [ { object } set-operand-classes ] unit-test
+
+    ! This is empty since we didn't change the stack
+    [ t ] [ [ end-basic-block ] { } make empty? ] unit-test
+] with-scope
+
+! Regression
+[
+    [ ] [ init-templates ] unit-test
+
+    [ ] [ { object object } set-operand-classes ] unit-test
+
+    ! 2dup
+    [ ] [
+        T{ effect f { "x" "y" } { "x" "y" "x" "y" } }
+        phantom-shuffle
+    ] unit-test
+
+    [ ] [
+        2 phantom-d get phantom-input
+        [ { { f "a" } { f "b" } } lazy-load ] { } make drop
+    ] unit-test
+    
+    [ t ] [
+        phantom-d get [ cached? ] all?
+    ] unit-test
+
+    ! >r
+    [ ] [
+        1 phantom->r
+    ] unit-test
+
+    ! This should not fail
+    [ ] [ [ end-basic-block ] { } make drop ] unit-test
 ] with-scope

@@ -267,7 +267,9 @@ H{ } clone update-map set
     { "<tuple-boa>" "tuples.private" }
 	{ "class-hash" "kernel.private" }
     { "callstack>array" "kernel" }
-    { "array>callstack" "kernel" }
+    { "innermost-frame-quot" "kernel.private" }
+    { "innermost-frame-scan" "kernel.private" }
+    { "set-innermost-frame-quot" "kernel.private" }
 }
 dup length [ >r first2 r> make-primitive ] 2each
 

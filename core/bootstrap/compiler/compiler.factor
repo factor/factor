@@ -3,7 +3,7 @@ parser kernel kernel.private classes classes.private
 arrays hashtables vectors tuples sbufs inference.dataflow
 hashtables.private sequences.private math tuples.private
 growable namespaces.private alien.remote-control assocs
-words generator command-line vocabs io prettyprint ;
+words generator command-line vocabs io prettyprint libc ;
 
 "bootstrap.math" vocab [
     "cpu." cpu append require
@@ -44,6 +44,8 @@ words generator command-line vocabs io prettyprint ;
         new nth push pop peek hashcode* = get set
 
         . lines
+
+        malloc free memcpy
     } [ compile ] each
 
     [ recompile ] parse-hook set-global

@@ -6,7 +6,8 @@ math namespaces sequences strings io.styles io.streams.string
 vectors words prettyprint.backend prettyprint.sections
 prettyprint.config sorting splitting math.parser vocabs
 definitions effects tuples io.files classes continuations
-hashtables classes.mixin classes.union classes.predicate ;
+hashtables classes.mixin classes.union classes.predicate
+combinators quotations ;
 
 : make-pprint ( obj quot -- block in use )
     [
@@ -85,20 +86,48 @@ hashtables classes.mixin classes.union classes.predicate ;
 : .s ( -- ) datastack stack. ;
 : .r ( -- ) retainstack stack. ;
 
-: callframe. ( seq pos -- )
+SYMBOL: ->
+
+\ ->
+{ { foreground { 1 1 1 1 } } { background { 0 0 0 1 } } }
+"word-style" set-word-prop
+
+<PRIVATE
+
+! This code is ugly and could probably be simplified
+: remove-step-into
+    building get dup empty? [
+        drop \ (step-into) ,
+    ] [
+        pop dup wrapper? [ wrapped ] when ,
+    ] if ;
+
+: (remove-breakpoints) ( quot -- newquot )
     [
         [
-            hilite-index set
-            dup hilite-quotation set
-            2 nesting-limit set
-            .
-        ] with-scope
+            {
+                { break [ ] }
+                { (step-into) [ remove-step-into ] }
+                [ , ]
+            } case
+        ] each
+    ] [ ] make ;
+
+: remove-breakpoints ( quot pos -- quot' )
+    over quotation? [
+        1+ swap cut [ (remove-breakpoints) ] 2apply
+        [ -> ] swap 3append
     ] [
-        .
-    ] if* ;
+        drop
+    ] if ;
+
+PRIVATE>
 
 : callstack. ( callstack -- )
-    callstack>array 2 <groups> [ callframe. ] assoc-each ;
+    callstack>array 2 <groups> [
+        remove-breakpoints
+        2 nesting-limit [ . ] with-variable
+    ] assoc-each ;
 
 : .c ( -- ) callstack callstack. ;
 

@@ -1,7 +1,7 @@
 ! Copyright (C) 2005, 2007 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel words parser io inspector quotations sequences
-prettyprint tools.interpreter ;
+prettyprint continuations ;
 IN: tools.annotations
 
 : annotate ( word quot -- )

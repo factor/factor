@@ -9,12 +9,11 @@ TUPLE: plain-writer ;
 : <plain-writer> ( stream -- new-stream )
     plain-writer construct-delegate ;
 
-M: plain-writer stream-nl CHAR: \n swap stream-write1 ;
+M: plain-writer stream-nl
+    CHAR: \n swap stream-write1 ;
 
 M: plain-writer stream-format
-    highlight rot at
-    [ >r "=>" swap "<=" 3append r> ] when
-    stream-write ;
+    nip stream-write ;
 
 M: plain-writer make-span-stream
     <style-stream> <ignore-close-stream> ;

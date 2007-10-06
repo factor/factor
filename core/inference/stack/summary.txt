@@ -1,1 +1,0 @@
-Stack shuffles as first-class data types

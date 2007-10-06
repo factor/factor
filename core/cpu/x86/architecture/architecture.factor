@@ -47,31 +47,31 @@ M: x86-backend stack-frame ( n -- i )
 M: x86-backend %save-xt ( -- )
     xt-reg compiling-label get MOV ;
 
+: factor-area-size 4 cells ;
+
 M: x86-backend %prologue ( n -- )
+    dup cell + PUSH
     xt-reg PUSH
-    xt-reg stack-reg pick stack-frame 4 cells + neg [+] LEA
-    xt-reg PUSH
-    stack-reg swap stack-frame 2 cells - SUB ;
+    stack-reg swap 2 cells - SUB ;
 
 M: x86-backend %epilogue ( n -- )
-    stack-reg swap stack-frame ADD ;
+    stack-reg swap ADD ;
 
-: %alien-global ( symbol dll -- )
-    temp-reg v>operand 0 MOV rc-absolute-cell rel-dlsym
-    temp-reg v>operand dup [] MOV ;
+: %alien-global ( symbol dll register -- )
+    [ 0 MOV rc-absolute-cell rel-dlsym ] keep dup [] MOV ;
 
 M: x86-backend %prepare-alien-invoke
     #! Save Factor stack pointers in case the C code calls a
     #! callback which does a GC, which must reliably trace
     #! all roots.
-    "stack_chain" f %alien-global
+    "stack_chain" f temp-reg v>operand %alien-global
     temp-reg v>operand [] stack-reg MOV
     temp-reg v>operand 2 cells [+] ds-reg MOV
     temp-reg v>operand 3 cells [+] rs-reg MOV ;
 
 M: x86-backend %profiler-prologue ( word -- )
     "end" define-label
-    "profiling" f %alien-global
+    "profiling" f temp-reg v>operand %alien-global
     temp-reg v>operand 0 CMP
     "end" get JE
     temp-reg load-literal
@@ -121,15 +121,12 @@ M: x86-backend %call-dispatch ( word-table# -- )
 M: x86-backend %jump-dispatch ( word-table# -- )
     [ %epilogue-later JMP ] dispatch-template ;
 
-M: x86-backend %move-int>int ( dst src -- )
-    [ v>operand ] 2apply MOV ;
-
-M: x86-backend %move-int>float ( dst src -- )
+M: x86-backend %unbox-float ( dst src -- )
     [ v>operand ] 2apply float-offset [+] MOVSD ;
 
-M: int-regs (%peek) drop %move-int>int ;
+M: x86-backend %peek [ v>operand ] 2apply MOV ;
 
-M: int-regs (%replace) drop swap %move-int>int ;
+M: x86-backend %replace swap %peek ;
 
 : (%inc) swap cells dup 0 > [ ADD ] [ neg SUB ] if ;
 
@@ -177,30 +174,45 @@ M: x86-backend struct-small-enough? ( size -- ? )
 M: x86-backend %return ( -- ) 0 %unwind ;
 
 ! Alien intrinsics
-M: x86-backend %unbox-byte-array ( quot src -- )
-    "alien" operand "offset" operand ADD
-    "alien" operand byte-array-offset [+]
-    rot call ;
+M: x86-backend %unbox-byte-array ( dst src -- )
+    [ v>operand ] 2apply byte-array-offset [+] LEA ;
 
-M: x86-backend %unbox-alien ( quot src -- )
-    "alien" operand dup alien-offset [+] MOV
-    "alien" operand "offset" operand [+]
-    rot call ;
+M: x86-backend %unbox-alien ( dst src -- )
+    [ v>operand ] 2apply alien-offset [+] MOV ;
 
-M: x86-backend %unbox-f ( quot src -- )
-    "offset" operand rot call ;
+M: x86-backend %unbox-f ( dst src -- )
+    drop v>operand 0 MOV ;
 
-M: x86-backend %complex-alien-accessor ( quot src -- )
-    { "is-f" "is-alien" "end" } [ define-label ] each
-    "alien" operand f v>operand CMP
-    "is-f" get JE
-    "alien" operand header-offset [+] alien type-number tag-header CMP
-    "is-alien" get JE
-    [ %unbox-byte-array ] 2keep
-    "end" get JMP
-    "is-alien" resolve-label
-    [ %unbox-alien ] 2keep
-    "end" get JMP
-    "is-f" resolve-label
-    %unbox-f
-    "end" resolve-label ;
+M: x86-backend %unbox-any-c-ptr ( dst src -- )
+    { "is-byte-array" "end" "start" } [ define-label ] each
+    ! Address is computed in ds-reg
+    ds-reg PUSH
+    ds-reg 0 MOV
+    ! Object is stored in ds-reg
+    rs-reg PUSH
+    rs-reg swap v>operand MOV
+    ! We come back here with displaced aliens
+    "start" resolve-label
+    ! Is the object f?
+    rs-reg f v>operand CMP
+    "end" get JE
+    ! Is the object an alien?
+    rs-reg header-offset [+] alien type-number tag-header CMP
+    "is-byte-array" get JNE
+    ! If so, load the offset and add it to the address
+    ds-reg rs-reg alien-offset [+] ADD
+    ! Now recurse on the underlying alien
+    rs-reg rs-reg underlying-alien-offset [+] MOV
+    "start" get JMP
+    "is-byte-array" resolve-label
+    ! Add byte array address to address being computed
+    ds-reg rs-reg ADD
+    ! Add an offset to start of byte array's data
+    ds-reg byte-array-offset ADD
+    "end" resolve-label
+    ! Done, store address in destination register
+    v>operand ds-reg MOV
+    ! Restore rs-reg
+    rs-reg POP
+    ! Restore ds-reg
+    ds-reg POP ;

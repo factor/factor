@@ -123,9 +123,9 @@ TUPLE: delegating ;
 [ "SYMBOL: not-a-class C: not-a-class ;" parse ] unit-test-fails
 
 ! Test math-combination
-[ [ >r >float r> ] ] [ \ real \ float math-upgrade ] unit-test
+[ [ [ >float ] dip ] ] [ \ real \ float math-upgrade ] unit-test
 [ [ >float ] ] [ \ float \ real math-upgrade ] unit-test
-[ [ >r >bignum r> ] ] [ \ fixnum \ bignum math-upgrade ] unit-test
+[ [ [ >bignum ] dip ] ] [ \ fixnum \ bignum math-upgrade ] unit-test
 [ [ >float ] ] [ \ float \ integer math-upgrade ] unit-test
 [ number ] [ \ number \ float math-class-max ] unit-test
 [ float ] [ \ real \ float math-class-max ] unit-test

@@ -69,6 +69,11 @@ H{ } clone objc-methods set-global
     dup objc-methods get at
     [ ] [ "No such method: " swap append throw ] ?if ;
 
+: make-dip ( quot n -- quot' )
+    dup
+    \ >r <repetition> >quotation -rot
+    \ r> <repetition> >quotation 3append ;
+
 : make-prepare-send ( selector method super? -- quot )
     [
         [ \ <super> , ] when

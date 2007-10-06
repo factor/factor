@@ -51,3 +51,18 @@ M: integer (stack-picture) drop "object" ;
 
 M: effect clone
     [ effect-in clone ] keep effect-out clone <effect> ;
+
+: split-shuffle ( stack shuffle -- stack1 stack2 )
+    effect-in length swap cut* ;
+
+: load-shuffle ( stack shuffle -- )
+    effect-in [ set ] 2each ;
+
+: shuffled-values ( shuffle -- values )
+    effect-out [ get ] map ;
+
+: shuffle* ( stack shuffle -- newstack )
+    [ [ load-shuffle ] keep shuffled-values ] with-scope ;
+
+: shuffle ( stack shuffle -- newstack )
+    [ split-shuffle ] keep shuffle* append ;

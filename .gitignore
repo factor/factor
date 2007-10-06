@@ -10,3 +10,7 @@ Factor/factor
 *.image
 *.dylib
 factor
+*#*#
+.DS_Store
+.gdb_history
+*.*.marks

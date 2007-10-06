@@ -1,5 +1,8 @@
 #include "master.h"
 
+/* Simple JIT compiler. This is one of the two compilers implementing Factor;
+the second one is written in Factor and performs a lot of optimizations.
+See core/compiler/compiler.factor */
 bool jit_fast_if_p(F_ARRAY *array, CELL i)
 {
 	return (i + 3) <= array_capacity(array)
@@ -34,13 +37,8 @@ bool jit_stack_frame_p(F_ARRAY *array)
 	return false;
 }
 
-FASTCALL CELL jit_compile(CELL tagged, F_STACK_FRAME *stack)
+void jit_compile(F_QUOTATION *quot)
 {
-	stack_chain->callstack_top = stack;
-
-	REGISTER_ROOT(tagged);
-
-	F_QUOTATION *quot = untag_quotation(tagged);
 	F_ARRAY *array = untag_object(quot->array);
 
 	REGISTER_UNTAGGED(quot);
@@ -156,7 +154,13 @@ FASTCALL CELL jit_compile(CELL tagged, F_STACK_FRAME *stack)
 	UNREGISTER_UNTAGGED(quot);
 	quot->xt = xt;
 	quot->compiled = T;
+}
 
+F_FASTCALL CELL primitive_jit_compile(CELL tagged, F_STACK_FRAME *stack)
+{
+	stack_chain->callstack_top = stack;
+	REGISTER_ROOT(tagged);
+	jit_compile(untag_quotation(tagged));
 	UNREGISTER_ROOT(tagged);
 	return tagged;
 }
@@ -177,4 +181,53 @@ XT quot_offset_to_pc(F_QUOTATION *quot, F_FIXNUM offset)
 	xt *= compiled_code_format();
 
 	return quot->xt + xt;
+}
+
+DEFINE_PRIMITIVE(curry)
+{
+	F_CURRY *curry = allot_object(CURRY_TYPE,sizeof(F_CURRY));
+	curry->quot = dpop();
+	curry->obj = dpop();
+	dpush(tag_object(curry));
+}
+
+void uncurry(CELL obj)
+{
+	F_CURRY *curry;
+
+	switch(type_of(obj))
+	{
+	case QUOTATION_TYPE:
+		dpush(obj);
+		break;
+	case CURRY_TYPE:
+		curry = untag_object(obj);
+		dpush(curry->obj);
+		uncurry(curry->quot);
+		break;
+	default:
+		type_error(QUOTATION_TYPE,obj);
+		break;
+	}
+}
+
+DEFINE_PRIMITIVE(uncurry)
+{
+	uncurry(dpop());
+}
+
+/* push a new quotation on the stack */
+DEFINE_PRIMITIVE(array_to_quotation)
+{
+	F_QUOTATION *quot = allot_object(QUOTATION_TYPE,sizeof(F_QUOTATION));
+	quot->array = dpeek();
+	quot->xt = lazy_jit_compile;
+	quot->compiled = F;
+	drepl(tag_object(quot));
+}
+
+DEFINE_PRIMITIVE(quotation_xt)
+{
+	F_QUOTATION *quot = untag_quotation(dpeek());
+	drepl(allot_cell((CELL)quot->xt));
 }

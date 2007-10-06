@@ -108,8 +108,7 @@ void print_callstack(void)
 {
 	CELL bottom = (CELL)stack_chain->callstack_bottom;
 	CELL top = (CELL)stack_chain->callstack_top;
-	CELL base = bottom;
-	iterate_callstack(top,bottom,base,print_stack_frame);
+	iterate_callstack(top,bottom,print_stack_frame);
 }
 
 void dump_cell(CELL cell)

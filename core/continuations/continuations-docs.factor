@@ -49,7 +49,6 @@ ARTICLE: "continuations.private" "Continuation implementation details"
 "The continuations implementation has hooks for single-steppers:"
 { $subsection walker-hook }
 { $subsection set-walker-hook }
-{ $subsection (continue) }
 { $subsection (continue-with) } ;
 
 ARTICLE: "continuations" "Continuations"
@@ -89,15 +88,11 @@ HELP: >continuation<
 { $values { "continuation" continuation } { "data" vector } { "retain" vector } { "call" vector } { "name" vector } { "catch" vector } { "c" array } }
 { $description "Takes a continuation apart into its constituents." } ;
 
-HELP: ifcc0
+HELP: ifcc
 { $values { "capture" "a quotation with stack effect " { $snippet "( continuation -- )" } } { "restore" quotation } }
 { $description "Reifies a continuation from the point immediately after which this word returns, and passes it to " { $snippet "capture" } ". When the continuation is restored, execution resumes and "{ $snippet "restore" } " is called." } ;
 
-HELP: ifcc1
-{ $values { "capture" "a quotation with stack effect " { $snippet "( continuation -- )" } } { "restore" quotation } }
-{ $description "Reifies a continuation from the point immediately after which this word returns, and passes it to " { $snippet "capture" } ". When the continuation is restored, execution resumes and "{ $snippet "restore" } " is called." } ;
-
-{ callcc0 continue callcc1 continue-with ifcc0 ifcc1 } related-words
+{ callcc0 continue callcc1 continue-with ifcc } related-words
 
 HELP: callcc0
 { $values { "quot" "a quotation with stack effect " { $snippet "( continuation -- )" } } }
@@ -106,28 +101,6 @@ HELP: callcc0
 HELP: callcc1
 { $values { "quot" "a quotation with stack effect " { $snippet "( continuation -- )" } } { "obj" "an object provided when resuming the continuation" } }
 { $description "Applies the quotation to the current continuation, which is reified from the point immediately after which the caller returns. The " { $link continue-with } " word resumes the continuation, passing a value back to the original execution context." } ;
-
-HELP: set-walker-hook
-{ $values { "quot" "a quotation with stack effect " { $snippet "( continuation -- )" } ", or " { $link f } } }
-{ $description "Sets a quotation to be called when a continuation is resumed." }
-{ $notes "The single-stepper uses this hook to support single-stepping through code which makes use of continuations." } ;
-
-HELP: walker-hook
-{ $values { "quot" "a quotation with stack effect " { $snippet "( obj -- )" } ", or " { $link f } } }
-{ $description "Outputs a quotation to be called when a continuation is resumed, or " { $link f } " if no hook is set. If a hook was set prior to this word being called, it will be reset to " { $link f } "."
-$nl
-"The following words do not perform their usual action and instead just call the walker hook if one is set:"
-    { $list
-        { { $link callcc0 } " will call the hook, passing it the continuation to resume." }
-        { { $link callcc1 } " will call the hook, passing it a " { $snippet "{ obj continuation }" } " pair." }
-        { { $link stop } " will call the hook, passing it " { $link f } "." }
-    }
-"The walker hook must take appropriate action so that the callers of these words see the behavior that they expect." }
-{ $notes "The single-stepper uses this hook to support single-stepping through code which makes use of continuations." } ;
-
-HELP: (continue)
-{ $values { "continuation" continuation } }
-{ $description "Resumes a continuation reified by " { $link callcc0 } " without invoking " { $link walker-hook } "." } ;
 
 HELP: (continue-with)
 { $values { "obj" "an object to pass to the continuation's execution context" } { "continuation" continuation } }
@@ -223,3 +196,6 @@ $low-level-note ;
 
 HELP: init-error-handler
 { $description "Called on startup to initialize the catch stack and set a pair of hooks which allow the Factor VM to signal errors to library code." } ;
+
+HELP: break
+{ $description "Suspends execution of the current thread and starts the single stepper by calling " { $link break-hook } "." } ;

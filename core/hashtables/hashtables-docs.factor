@@ -70,7 +70,7 @@ HELP: nth-pair
 { nth-pair set-nth-pair } related-words
 
 HELP: set-nth-pair
-{ $values { "value" "the second element of the pair" } { "key" "the first element of the pair" } { "n" "an index in the sequence" } { "seq" "a sequence" } }
+{ $values { "value" "the second element of the pair" } { "key" "the first element of the pair" } { "seq" "a sequence" } { "n" "an index in the sequence" } }
 { $description "Stores a pair of values into the elements with index " { $snippet "n" } " and " { $snippet "n+1" } ", respectively." }
 { $warning "This word is in the " { $vocab-link "hashtables.private" } " vocabulary because it does not perform bounds checks." }
 { $side-effects "seq" } ;

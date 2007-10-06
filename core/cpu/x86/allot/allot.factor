@@ -6,38 +6,47 @@ math.functions sequences generic arrays generator
 generator.fixup generator.registers system layouts alien ;
 IN: cpu.x86.allot
 
-: (object@) ( n -- operand ) temp-reg v>operand swap [+] ;
+: allot-reg
+    #! We temporarily use the datastack register, since it won't
+    #! be accessed inside the quotation given to %allot in any
+    #! case.
+    ds-reg ;
+
+: (object@) ( n -- operand ) allot-reg swap [+] ;
 
 : object@ ( n -- operand ) cells (object@) ;
 
 : load-zone-ptr ( -- )
     #! Load pointer to start of zone array
-    "nursery" f %alien-global ;
+    "nursery" f allot-reg %alien-global ;
 
 : load-allot-ptr ( -- )
     load-zone-ptr
-    temp-reg v>operand dup cell [+] MOV ;
+    allot-reg PUSH
+    allot-reg dup cell [+] MOV ;
 
 : inc-allot-ptr ( n -- )
-    load-zone-ptr
-    temp-reg v>operand cell [+] swap 8 align ADD ;
+    allot-reg POP
+    allot-reg cell [+] swap 8 align ADD ;
 
 : store-header ( header -- )
     0 object@ swap type-number tag-header MOV ;
 
 : %allot ( header size quot -- )
+    allot-reg PUSH
     swap >r >r
     load-allot-ptr
     store-header
     r> call
-    r> inc-allot-ptr ; inline
+    r> inc-allot-ptr
+    allot-reg POP ; inline
 
 : %store-tagged ( reg tag -- )
     >r dup fresh-object v>operand r>
-    temp-reg v>operand swap tag-number OR
-    temp-reg v>operand MOV ;
+    allot-reg swap tag-number OR
+    allot-reg MOV ;
 
-M: x86-backend %move-float>int ( dst src -- )
+M: x86-backend %box-float ( dst src -- )
     #! Only called by pentium4 backend, uses SSE2 instruction
     #! dest is a loc or a vreg
     float 16 [
@@ -77,21 +86,21 @@ M: x86-backend %move-float>int ( dst src -- )
         "end" resolve-label
     ] with-scope ;
 
-: %allot-alien ( ptr -- )
+M: x86-backend %box-alien ( dst src -- )
     [
-        "temp" set
         { "end" "f" } [ define-label ] each
-        "temp" operand 0 CMP
+        dup v>operand 0 CMP
         "f" get JE
         alien 4 cells [
             1 object@ f v>operand MOV
             2 object@ f v>operand MOV
-            3 object@ "temp" operand MOV
-            ! Store tagged ptr in reg
-            "temp" get object %store-tagged
+            ! Store src in alien-offset slot
+            3 object@ swap v>operand MOV
+            ! Store tagged ptr in dst
+            dup object %store-tagged
         ] %allot
         "end" get JMP
         "f" resolve-label
-        "temp" operand f v>operand MOV
+        f [ v>operand ] 2apply MOV
         "end" resolve-label
     ] with-scope ;

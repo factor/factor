@@ -3,4 +3,5 @@
 register CELL ds asm("esi");
 register CELL rs asm("edi");
 
-#define FASTCALL __attribute__ ((regparm (2)))
+#define F_FASTCALL __attribute__ ((regparm (2)))
+

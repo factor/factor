@@ -74,4 +74,5 @@ IN: temporary
 [ 6 2 ] [ 1 2 [ 5 + ] dip ] unit-test
 
 [ ] [ callstack set-callstack ] unit-test
-! [ ] [ callstack callstack>array array>callstack set-callstack ] unit-test
+
+[ 3drop datastack ] unit-test-fails

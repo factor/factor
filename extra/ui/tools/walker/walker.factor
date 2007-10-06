@@ -5,84 +5,73 @@ ui.tools.workspace inspector kernel models namespaces
 prettyprint quotations sequences threads tools.interpreter
 ui.commands ui.gadgets ui.gadgets.labelled ui.gadgets.tracks
 ui.gestures ui.gadgets.buttons ui.gadgets.panes
-prettyprint.config prettyprint.backend ;
+prettyprint.config prettyprint.backend continuations ;
 IN: ui.tools.walker
 
-: quotation. ( callframe -- )
-    [
-        dup second hilite-index set
-        dup first hilite-quotation set
-        2 nesting-limit set
-        first pprint-elements
-    ] with-pprint ;
-
-: <quotation-display> ( model -- gadget )
-    [ quotation. ] <pane-control>
-    "Current quotation" <labelled-scroller> ;
-
-TUPLE: walker-gadget model quot ns ;
+TUPLE: walker model interpreter history ;
 
 : update-stacks ( walker -- )
-    meta-interp get
-    over walker-gadget-model set-model
-    callframe get callframe-scan get 2array
-    swap walker-gadget-quot set-model ;
+    dup walker-interpreter interpreter-continuation
+    swap walker-model set-model ;
 
-: with-walker ( gadget quot -- )
-    swap dup walker-gadget-ns
-    [ slip update-stacks ] bind ; inline
+: with-walker ( walker quot -- )
+    over >r >r walker-interpreter r> call r>
+    update-stacks ; inline
 
 : walker-active? ( walker -- ? )
-    meta-interp swap walker-gadget-ns key? ;
+    walker-interpreter interpreter-continuation >boolean ;
 
 : walker-command ( gadget quot -- )
     over walker-active? [ with-walker ] [ 2drop ] if ; inline
 
-: com-step [ step ] walker-command ;
-: com-into [ step-in ] walker-command ;
-: com-out [ step-out ] walker-command ;
-: com-back [ step-back ] walker-command ;
+: save-interpreter ( walker -- )
+    dup walker-interpreter interpreter-continuation clone
+    swap walker-history push ;
 
-: init-walker-models ( walker -- )
-    f <model> over set-walker-gadget-quot
-    f <model> over set-walker-gadget-model
-    H{ } clone swap set-walker-gadget-ns ;
+: com-step ( walker -- )
+    dup save-interpreter [ step ] walker-command ;
+
+: com-into ( walker -- )
+    dup save-interpreter [ step-into ] walker-command ;
+
+: com-out ( walker -- )
+    dup save-interpreter [ step-out ] walker-command ;
+
+: com-back ( walker -- )
+    dup walker-history
+    dup empty? [ drop ] [ pop swap call-tool* ] if ;
 
 : reset-walker ( walker -- )
-    dup walker-gadget-ns clear-assoc
-    [ V{ } clone meta-history set ] with-walker ;
+    <interpreter> over set-walker-interpreter
+    V{ } clone over set-walker-history
+    update-stacks ;
 
-: <walker-gadget> ( -- gadget )
-    walker-gadget construct-empty
-    dup init-walker-models [
+: <walker> ( -- gadget )
+    f <model> f f walker construct-boa [
         toolbar,
-        g walker-gadget-quot <quotation-display> 1/4 track,
-        g walker-gadget-model <traceback-gadget> 3/4 track,
+        g walker-model <traceback-gadget> 1 track,
     ] { 0 1 } build-track
     dup reset-walker ;
 
-M: walker-gadget call-tool* ( continuation walker -- )
+M: walker call-tool* ( continuation walker -- )
     [ restore ] with-walker ;
 
 : com-inspect ( walker -- )
     dup walker-active? [
-        meta-interp swap walker-gadget-ns at
+        walker-interpreter interpreter-continuation
         [ inspect ] curry call-listener
     ] [
         drop
     ] if ;
 
 : com-continue ( walker -- )
-    dup [ step-all ] walker-command reset-walker ;
-
-: com-abandon ( walker -- )
-    dup [ abandon ] walker-command reset-walker ;
+    dup walker-interpreter step-all reset-walker ;
 
 : walker-help "ui-walker" help-window ;
 
 \ walker-help H{ { +nullary+ t } } define-command
 
-walker-gadget "toolbar" f {
+walker "toolbar" f {
     { T{ key-down f { A+ } "s" } com-step }
     { T{ key-down f { A+ } "i" } com-into }
     { T{ key-down f { A+ } "o" } com-out }
@@ -91,9 +80,8 @@ walker-gadget "toolbar" f {
     { T{ key-down f f "F1" } walker-help }
 } define-command-map
 
-walker-gadget "other" f {
-    { T{ key-down f { A+ } "a" } com-abandon }
+walker "other" f {
     { T{ key-down f { A+ } "n" } com-inspect }
 } define-command-map
 
-[ walker-gadget call-tool stop ] break-hook set-global
+[ walker call-tool stop ] break-hook set-global

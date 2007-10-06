@@ -5,6 +5,7 @@ set +e
 
 # Case insensitive string comparison
 shopt -s nocaseglob
+shopt -s nocasematch
 
 ensure_program_installed() {
         echo -n "Checking for $1..."
@@ -44,6 +45,7 @@ uname_s=`uname -s`
 case $uname_s in
         CYGWIN_NT-5.2-WOW64) OS=windows-nt;;
         *CYGWIN_NT*) OS=windows-nt;;
+        *CYGWIN*) OS=windows-nt;;
         *darwin*) OS=macosx;;
         *linux*) OS=linux;;
 esac

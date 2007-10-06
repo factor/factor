@@ -8,17 +8,21 @@ IN: cfdg.models.chiaroscuro
 DEFER: white
 
 : black ( -- ) iterate? [
-{ { 60 [ [ 0.6 s circle ] do
-       	 [ 0.1 x 5 r 0.99 s -0.01 b -0.01 a black ] do ] }
-  { 1 [ white black ] } }
-random-weighted* call
+  { { 60 [ [ 0.6 s circle ] do
+      	   [ 0.1 x 5 r 0.99 s -0.01 b -0.01 a black ] do ] }
+    { 1 [ white black ] } }
+  call-random-weighted
 ] when ;
 
 : white ( -- ) iterate? [
-{ { 60 [ [ 0.6 s circle ] do
-       	 [ 0.1 x -5 r 0.99 s 0.01 b -0.01 a white ] do ] }
-  { 1 [ black white ] } }
-random-weighted* call
+  { { 60 [
+      	   [ 0.6 s circle ] do
+      	   [ 0.1 x -5 r 0.99 s 0.01 b -0.01 a white ] do
+         ] }
+    { 1 [
+      	  black white
+        ] } }
+  call-random-weighted
 ] when ;
 
 : chiaroscuro ( -- ) [ 0.5 b black ] do ;

@@ -26,10 +26,6 @@ M: quotation like drop dup quotation? [ >quotation ] unless ;
 
 INSTANCE: quotation immutable-sequence
 
-: make-dip ( quot n -- newquot )
-    dup \ >r <repetition> -rot \ r> <repetition> 3append
-    >quotation ;
-
 : 1quotation ( obj -- quot ) 1array >quotation ;
 
 GENERIC: literalize ( obj -- wrapped )
@@ -47,6 +43,6 @@ M: curry nth
         >r 1- r> curry-quot nth
     ] if ;
 
-M: curry like drop [ ] like ;
+M: curry like drop dup callable? [ >quotation ] unless ;
 
 INSTANCE: curry immutable-sequence

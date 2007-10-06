@@ -20,9 +20,6 @@ debugger assocs combinators ;
 : recursive-quotation? ( quot -- ? )
     local-recursive-state [ first eq? ] curry* contains? ;
 
-: add-recursive-state ( word label -- )
-    2array recursive-state [ swap add* ] change ;
-
 TUPLE: inference-error rstate major? ;
 
 : (inference-error) ( ... class important? -- * )
@@ -65,12 +62,11 @@ SYMBOL: terminated?
 
 SYMBOL: recorded
 
-: init-inference ( recursive-state -- )
+: init-inference ( -- )
     terminated? off
     V{ } clone meta-d set
     V{ } clone meta-r set
     0 d-in set
-    recursive-state set
     dataflow-graph off
     current-node off ;
 
@@ -86,25 +82,31 @@ M: wrapper apply-object wrapped apply-literal ;
 : terminate ( -- )
     terminated? on #terminate node, ;
 
-: infer-quot ( quot -- )
-    [ apply-object terminated? get not ] all? drop ;
+: infer-quot ( quot rstate -- )
+    recursive-state get >r
+    recursive-state set
+    [ apply-object terminated? get not ] all? drop
+    r> recursive-state set ;
 
-TUPLE: recursive-quotation-error quot ;
+: infer-quot-recursive ( quot word label -- )
+    recursive-state get -rot 2array add* infer-quot ;
+
+: time-bomb ( error -- )
+    [ throw ] curry recursive-state get infer-quot ;
 
 : bad-call ( -- )
-    [ "call must be given a callable" throw ] infer-quot ;
+    "call must be given a callable" time-bomb ;
+
+TUPLE: recursive-quotation-error quot ;
 
 : infer-quot-value ( value -- )
     dup recursive-quotation? [
         value-literal recursive-quotation-error inference-error
     ] [
         dup value-literal callable? [
-            recursive-state get >r
-            [
-                [ value-recursion ] keep f 2array add*
-                recursive-state set
-            ] keep value-literal infer-quot
-            r> recursive-state set
+            dup value-literal
+            over value-recursion
+            rot f 2array add* infer-quot
         ] [
             drop bad-call
         ] if
@@ -140,17 +142,6 @@ TUPLE: too-many-r> ;
 
 : undo-infer ( -- )
     recorded get [ f "inferred-effect" set-word-prop ] each ;
-
-: with-infer ( quot -- )
-    [
-        [
-            { } recursive-state set
-            V{ } clone recorded set
-            f init-inference
-            call
-            check->r
-        ] [ ] [ undo-infer ] cleanup
-    ] with-scope ;
 
 : (consume-values) ( n -- )
     meta-d get [ length swap - ] keep set-length ;
@@ -215,6 +206,11 @@ M: object constructor drop f ;
 
 : reify-all ( -- )
     meta-d get length reify-curries ;
+
+: end-infer ( -- )
+    check->r
+    reify-all
+    f #return node, ;
 
 : unify-lengths ( seq -- newseq )
     dup empty? [
@@ -349,65 +345,6 @@ TUPLE: no-effect word ;
 
 : no-effect ( word -- * ) \ no-effect inference-warning ;
 
-: nest-node ( -- ) #entry node, ;
-
-: unnest-node ( new-node -- new-node )
-    dup node-param #return node,
-    dataflow-graph get 1array over set-node-children ;
-
-: inline-block ( word -- node-block data )
-    [
-        copy-inference nest-node
-        gensym 2dup add-recursive-state
-        over >r #label r> word-def infer-quot
-        unnest-node
-    ] H{ } make-assoc ;
-
-: apply-infer ( hash -- )
-    { meta-d meta-r d-in terminated? }
-    [ swap [ at ] curry map ] keep
-    [ set ] 2each ;
-
-GENERIC: collect-recursion* ( label node -- )
-
-M: node collect-recursion* 2drop ;
-
-M: #call-label collect-recursion*
-    tuck node-param eq? [ , ] [ drop ] if ;
-
-: collect-recursion ( #label -- seq )
-    dup node-param
-    [ [ swap collect-recursion* ] curry each-node ] { } make ;
-
-: join-values ( node -- )
-    collect-recursion [ node-in-d ] map meta-d get add
-    unify-lengths unify-stacks
-    meta-d [ length tail* ] change ;
-
-: splice-node ( node -- )
-    dup node-successor [
-        dup node, penultimate-node f over set-node-successor
-        dup current-node set
-    ] when drop ;
-
-: inline-closure ( word -- )
-    dup inline-block over recursive-label? [
-        flatten-meta-d >r
-        drop join-values inline-block apply-infer
-        r> over set-node-in-d
-        dup node,
-        collect-recursion [
-            [ flatten-curries ] modify-values
-        ] each
-    ] [
-        apply-infer node-child node-successor splice-node drop
-    ] if ;
-
-: infer-compound ( word -- hash )
-    [
-        recursive-state get init-inference inline-block nip
-    ] with-scope ;
-
 GENERIC: infer-word ( word -- effect )
 
 M: word infer-word no-effect ;
@@ -421,15 +358,23 @@ TUPLE: effect-error word effect ;
     dup pick "declared-effect" word-prop effect<=
     [ 2drop ] [ effect-error ] if ;
 
-: finish-word ( word -- effect )
+: finish-word ( word -- )
     current-effect
     2dup check-effect
     over recorded get push
-    tuck "inferred-effect" set-word-prop ;
+    "inferred-effect" set-word-prop ;
+
+: infer-compound ( word -- effect )
+    [
+        init-inference
+        dup word-def over dup infer-quot-recursive
+        finish-word
+        current-effect
+    ] with-scope ;
 
 M: compound infer-word
-    [ dup infer-compound [ finish-word ] bind ]
-    [ ] [ t "no-effect" set-word-prop ] cleanup ;
+    [ infer-compound ] [ ] [ t "no-effect" set-word-prop ]
+    cleanup ;
 
 : custom-infer ( word -- )
     #! Customized inference behavior
@@ -459,6 +404,60 @@ TUPLE: recursive-declare-error word ;
         \ recursive-declare-error inference-error
     ] if* ;
 
+: nest-node ( -- ) #entry node, ;
+
+: unnest-node ( new-node -- new-node )
+    dup node-param #return node,
+    dataflow-graph get 1array over set-node-children ;
+
+: inline-block ( word -- node-block data )
+    [
+        copy-inference nest-node
+        dup word-def swap gensym
+        [ infer-quot-recursive ] 2keep
+        #label unnest-node
+    ] H{ } make-assoc ;
+
+GENERIC: collect-recursion* ( label node -- )
+
+M: node collect-recursion* 2drop ;
+
+M: #call-label collect-recursion*
+    tuck node-param eq? [ , ] [ drop ] if ;
+
+: collect-recursion ( #label -- seq )
+    dup node-param
+    [ [ swap collect-recursion* ] curry each-node ] { } make ;
+
+: join-values ( node -- )
+    collect-recursion [ node-in-d ] map meta-d get add
+    unify-lengths unify-stacks
+    meta-d [ length tail* ] change ;
+
+: splice-node ( node -- )
+    dup node-successor [
+        dup node, penultimate-node f over set-node-successor
+        dup current-node set
+    ] when drop ;
+
+: apply-infer ( hash -- )
+    { meta-d meta-r d-in terminated? }
+    [ swap [ at ] curry map ] keep
+    [ set ] 2each ;
+
+: inline-closure ( word -- )
+    dup inline-block over recursive-label? [
+        flatten-meta-d >r
+        drop join-values inline-block apply-infer
+        r> over set-node-in-d
+        dup node,
+        collect-recursion [
+            [ flatten-curries ] modify-values
+        ] each
+    ] [
+        apply-infer node-child node-successor splice-node drop
+    ] if ;
+
 M: compound apply-object
     [
         dup inline-recursive-label
@@ -469,4 +468,16 @@ M: compound apply-object
     ] if-inline ;
 
 M: undefined apply-object
-    drop [ "Undefined" throw ] infer-quot ;
+    drop "Undefined word" time-bomb ;
+
+: with-infer ( quot -- effect dataflow )
+    [
+        [
+            V{ } clone recorded set
+            init-inference
+            call
+            end-infer
+            current-effect
+            dataflow-graph get
+        ] [ ] [ undo-infer ] cleanup
+    ] with-scope ;

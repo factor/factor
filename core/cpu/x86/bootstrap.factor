@@ -10,15 +10,16 @@ big-endian off
 
 : scan-save stack-reg 3 bootstrap-cells [+] ;
 
+: stack-frame-size 8 bootstrap-cells ;
+
 [
     arg0 arg0 quot-array@ [+] MOV              ! load array
     scan-reg arg0 scan@ [+] LEA                ! initialize scan pointer
 ] { } make jit-setup set                       
-                                               
-[                                              
+
+[                                       
+    stack-frame-size PUSH                      ! save stack frame size       
     xt-reg PUSH                                ! save XT
-    xt-reg stack-reg next-frame@ [+] LEA       ! compute forward chain pointer
-    xt-reg PUSH                                ! save forward chain pointer
     arg0 PUSH                                  ! save array
     stack-reg 4 bootstrap-cells SUB            ! reserve space for scan-save
 ] { } make jit-prolog set                      
@@ -31,7 +32,7 @@ big-endian off
     arg0 scan-reg [] MOV                       ! load literal
     ds-reg [] arg0 MOV                         ! store literal on datastack
 ] { } make jit-push-literal set                
-                                               
+
 [                                              
     advance-scan                               
     ds-reg bootstrap-cell ADD                  ! increment datastack pointer
@@ -94,7 +95,7 @@ big-endian off
 ] { } make jit-dispatch set
 
 [
-    stack-reg 7 bootstrap-cells ADD            ! unwind stack frame
+    stack-reg stack-frame-size bootstrap-cell - ADD ! unwind stack frame
 ] { } make jit-epilog set
 
 [ 0 RET ] { } make jit-return set

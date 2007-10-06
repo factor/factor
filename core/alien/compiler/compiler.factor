@@ -62,6 +62,25 @@ GENERIC: alien-node-abi ( node -- str )
     call
     f set-stack-frame ; inline
 
+GENERIC: reg-size ( register-class -- n )
+
+M: int-regs reg-size drop cell ;
+
+M: float-regs reg-size float-regs-size ;
+
+GENERIC: inc-reg-class ( register-class -- )
+
+: (inc-reg-class)
+    dup class inc
+    fp-shadows-int? [ reg-size stack-params +@ ] [ drop ] if ;
+
+M: int-regs inc-reg-class
+    (inc-reg-class) ;
+
+M: float-regs inc-reg-class
+    dup (inc-reg-class)
+    fp-shadows-int? [ reg-size 4 / int-regs +@ ] [ drop ] if ;
+
 : reg-class-full? ( class -- ? )
     dup class get swap param-regs length >= ;
 
@@ -206,7 +225,7 @@ M: alien-invoke-error summary
     pop-literal nip over set-alien-invoke-library
     pop-literal nip over set-alien-invoke-return
     ! Quotation which coerces parameters to required types
-    dup make-prep-quot infer-quot
+    dup make-prep-quot recursive-state get infer-quot
     ! If symbol doesn't resolve, no stack effect, no compile
     dup alien-invoke-dlsym 2drop
     ! Add node to IR
@@ -243,7 +262,7 @@ M: alien-indirect-error summary
     pop-parameters over set-alien-indirect-parameters
     pop-literal nip over set-alien-indirect-return
     ! Quotation which coerces parameters to required types
-    dup make-prep-quot 1 make-dip infer-quot
+    dup make-prep-quot [ dip ] curry recursive-state get infer-quot
     ! Add node to IR
     dup node,
     ! Magic #: consume the function pointer, too
@@ -282,7 +301,8 @@ M: alien-callback-error summary
     drop "Words calling ``alien-callback'' cannot run in the interpreter. Compile the caller word and try again." ;
 
 : callback-bottom ( node -- )
-    alien-callback-xt [ word-xt <alien> ] curry infer-quot ;
+    alien-callback-xt [ word-xt <alien> ] curry
+    recursive-state get infer-quot ;
 
 \ alien-callback [
     4 ensure-values

@@ -126,22 +126,6 @@ DEFINE_PRIMITIVE(float_array)
 	dpush(tag_object(allot_float_array(size,initial)));
 }
 
-/* push a new quotation on the stack */
-DEFINE_PRIMITIVE(array_to_quotation)
-{
-	F_QUOTATION *quot = allot_object(QUOTATION_TYPE,sizeof(F_QUOTATION));
-	quot->array = dpeek();
-	quot->xt = lazy_jit_compile;
-	quot->compiled = F;
-	drepl(tag_object(quot));
-}
-
-DEFINE_PRIMITIVE(quotation_xt)
-{
-	F_QUOTATION *quot = untag_quotation(dpeek());
-	drepl(allot_cell((CELL)quot->xt));
-}
-
 CELL clone(CELL object)
 {
 	CELL size = object_size(object);
@@ -508,12 +492,4 @@ DEFINE_PRIMITIVE(wrapper)
 	F_WRAPPER *wrapper = allot_object(WRAPPER_TYPE,sizeof(F_WRAPPER));
 	wrapper->object = dpeek();
 	drepl(tag_object(wrapper));
-}
-
-DEFINE_PRIMITIVE(curry)
-{
-	F_CURRY *curry = allot_object(CURRY_TYPE,sizeof(F_CURRY));
-	curry->quot = dpop();
-	curry->obj = dpop();
-	dpush(tag_object(curry));
 }

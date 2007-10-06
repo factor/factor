@@ -19,8 +19,8 @@ math.functions math.parser io.files colors.hsv ;
 
 : <color-map> ( nb-cols -- map )
     dup [
-        360 * swap 1+ / 360 / sat val
-        hsv>rgb scale-rgb
+        360 * swap 1+ / sat val
+        3array hsv>rgb first3 scale-rgb
     ] curry* map ;
 
 : iter ( c z nb-iter -- x )

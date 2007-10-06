@@ -194,7 +194,7 @@ TUPLE: slice-error reason ;
 : check-slice ( from to seq -- from to seq )
     pick 0 < [ "start < 0" slice-error ] when
     dup length pick < [ "end > sequence" slice-error ] when
-    pick pick > [ "start > end" slice-error ] when ;
+    pick pick > [ "start > end" slice-error ] when ; inline
 
 : <slice> ( from to seq -- slice )
     dup slice? [ collapse-slice ] when

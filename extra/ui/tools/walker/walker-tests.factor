@@ -4,7 +4,7 @@ listener tools.test ui ui.gadgets ui.gadgets.worlds
 ui.gadgets.packs vectors ui.tools ;
 IN: temporary
 
-[ ] [ <walker-gadget> "walker" set ] unit-test
+[ ] [ <walker> "walker" set ] unit-test
 
 ! Make sure the toolbar buttons don't throw if we're
 ! not actually walking.
@@ -16,7 +16,6 @@ IN: temporary
 [ ] [ "walker" get com-inspect ] unit-test
 [ ] [ "walker" get reset-walker ] unit-test
 [ ] [ "walker" get com-continue ] unit-test
-[ ] [ "walker" get com-abandon ] unit-test
 
 : <test-world> ( gadget -- world )
     [ gadget, ] make-pile "Hi" f <world> ;
@@ -37,7 +36,7 @@ IN: temporary
 
     [ t ] [ "ok" get ] unit-test
 
-    [ ] [ <walker-gadget> "w" set ] unit-test
+    [ ] [ <walker> "w" set ] unit-test
     continuation "c" set
     
     [ ] [ "c" get "w" get call-tool* ] unit-test

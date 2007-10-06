@@ -151,17 +151,6 @@ TUPLE: block sections ;
 : last-section ( -- section )
     pprinter-block block-sections [ break? not ] find-last nip ;
 
-: hilite-style ( -- hash )
-    H{
-        { background { 0.9 0.9 0.9 1 } }
-        { highlight t }
-    } ;
-
-: hilite ( -- )
-    last-section
-    dup section-style hilite-style union
-    swap set-section-style ;
-
 : start-group ( -- )
     t last-section set-section-start-group? ;
 

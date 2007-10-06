@@ -514,7 +514,7 @@ HELP: PREDICATE:
 HELP: TUPLE:
 { $syntax "TUPLE: class slots... ;" }
 { $values { "class" "a new tuple class to define" } { "slots" "a list of slot names" } }
-{ $description "Defines a new tuple class with membership predicate " { $snippet "name?" } " and constructor " { $snippet "<name>" } "."
+{ $description "Defines a new tuple class with membership predicate " { $snippet "name?" } "."
 $nl
 "Tuples are user-defined classes with instances composed of named slots. All tuple classes are subtypes of the built-in " { $link tuple } " type." } ;
 

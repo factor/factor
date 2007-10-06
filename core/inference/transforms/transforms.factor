@@ -5,20 +5,24 @@ quotations assocs combinators math.bitfields inference.backend
 inference.dataflow tuples.private ;
 IN: inference.transforms
 
-: pop-literals ( n -- seq )
-    [ ensure-values ] keep
-    [ d-tail ] keep
-    (consume-values)
-    [ value-literal ] map ;
+: pop-literals ( n -- rstate seq )
+    dup zero? [ drop recursive-state get f ] [
+        [ ensure-values ] keep
+        [ d-tail ] keep
+        (consume-values)
+        dup [ value-literal ] map
+        swap first value-recursion swap
+    ] if ;
 
 : transform-quot ( quot n -- newquot )
-    [
-        , \ pop-literals , [ [ ] each ] % % \ infer-quot ,
-    ] [ ] make ;
+    [ pop-literals [ ] each ] curry
+    swap
+    [ swap infer-quot ] 3compose ;
 
 : define-transform ( word quot n -- )
     transform-quot "infer" set-word-prop ;
 
+! Combinators
 \ cond [
     cond>quot
 ] 1 define-transform
@@ -35,6 +39,7 @@ IN: inference.transforms
     ] if
 ] 1 define-transform
 
+! Bitfields
 GENERIC: (bitfield-quot) ( spec -- quot )
 
 M: integer (bitfield-quot) ( spec -- quot )
@@ -58,5 +63,5 @@ M: pair (bitfield-quot) ( spec -- quot )
 \ set-slots [ <reversed> [get-slots] ] 1 define-transform
 
 \ construct-boa [
-    [ dup literalize , tuple-size , \ <tuple-boa> , ] [ ] make
+    dup tuple-size [ <tuple-boa> ] 2curry
 ] 1 define-transform

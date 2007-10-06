@@ -2,9 +2,9 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: arrays assocs classes combinators cpu.architecture
 effects generator.fixup generator.registers generic hashtables
-inference inference.backend inference.dataflow inference.stack
-io kernel kernel.private layouts math namespaces optimizer
-prettyprint quotations sequences system threads words ;
+inference inference.backend inference.dataflow io kernel
+kernel.private layouts math namespaces optimizer prettyprint
+quotations sequences system threads words ;
 IN: generator
 
 SYMBOL: compiled-xts
@@ -73,10 +73,9 @@ SYMBOL: profiler-prologues
 : word-dataflow ( word -- dataflow )
     [
         dup "no-effect" word-prop [ no-effect ] when
-        dup dup add-recursive-state
-        [ specialized-def (dataflow) ] keep
-        finish-word drop
-    ] with-infer ;
+        dup specialized-def over dup 2array 1array infer-quot
+        finish-word
+    ] with-infer nip ;
 
 SYMBOL: compiler-hook
 
@@ -229,7 +228,7 @@ M: #dispatch generate-node
     "true" resolve-label
     t "if-scratch" get load-literal
     "end" resolve-label
-    "if-scratch" get phantom-d get phantom-push ; inline
+    "if-scratch" get phantom-push ; inline
 
 : define-if>boolean-intrinsics ( word intrinsics -- )
     [
@@ -247,10 +246,8 @@ M: #dispatch generate-node
 : define-if-intrinsic ( word quot inputs -- )
     2array 1array define-if-intrinsics ;
 
-: do-intrinsic ( pair -- ) first2 with-template ;
-
 : do-if-intrinsic ( #call pair -- next )
-    <label> [ swap do-intrinsic ] keep
+    <label> [ swap do-template ] keep
     >r node-successor r> generate-if
     node-successor ;
 
@@ -265,11 +262,12 @@ M: #dispatch generate-node
     ] if ;
 
 M: #call generate-node
+    dup node-input-classes set-operand-classes
     dup find-if-intrinsic [
         do-if-intrinsic
     ] [
         dup find-intrinsic [
-            do-intrinsic iterate-next
+            do-template iterate-next
         ] [
             node-param generate-call
         ] ?if
@@ -279,29 +277,22 @@ M: #call generate-node
 M: #call-label generate-node node-param generate-call ;
 
 ! #push
-UNION: immediate fixnum POSTPONE: f ;
-
 M: #push generate-node
-    node-out-d phantom-d get phantom-append iterate-next ;
+    node-out-d [ value-literal <constant> phantom-push ] each
+    iterate-next ;
 
 ! #shuffle
-: phantom-shuffle ( shuffle -- )
-    [ effect-in length phantom-d get phantom-input ] keep
-    shuffle* phantom-d get phantom-append ;
-
 M: #shuffle generate-node
     node-shuffle phantom-shuffle iterate-next ;
 
 M: #>r generate-node
     node-in-d length
-    phantom-d get phantom-input
-    phantom-r get phantom-append
+    phantom->r
     iterate-next ;
 
 M: #r> generate-node
     node-out-d length
-    phantom-r get phantom-input
-    phantom-d get phantom-append
+    phantom-r>
     iterate-next ;
 
 ! #return
@@ -318,8 +309,6 @@ M: #return generate-node drop end-basic-block %return f ;
 : profile-count-offset 7 cells object tag-number - ;
 : byte-array-offset 2 cells object tag-number - ;
 : alien-offset 3 cells object tag-number - ;
+: underlying-alien-offset cell object tag-number - ;
 : tuple-class-offset 2 cells tuple tag-number - ;
 : class-hash-offset cell object tag-number - ;
-
-: operand-immediate? ( operand -- ? )
-    operand-class immediate class< ;

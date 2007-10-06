@@ -5,7 +5,6 @@ IN: combinators
 
 ARTICLE: "combinators-quot" "Quotation construction utilities"
 "Some words for creating quotations which can be useful for implementing method combinations and compiler transforms:"
-{ $subsection make-dip }
 { $subsection cond>quot }
 { $subsection case>quot }
 { $subsection alist>quot }
@@ -26,13 +25,6 @@ ARTICLE: "combinators" "Additional combinators"
 { $see-also "quotations" "basic-combinators" } ;
 
 ABOUT: "combinators"
-
-HELP: make-dip
-{ $values { "quot" "a quotation" } { "n" "a non-negative integer" } { "newquot" "a new quotation" } }
-{ $description "Constructs a quotation which retains the top " { $snippet "n" } " stack items, and applies " { $snippet "quot" } " to what is underneath." }
-{ $examples
-    { $example "USE: quotations" "[ 3 + ] 2 make-dip ." "[ >r >r 3 + r> r> ]" }
-} ;
 
 HELP: alist>quot
 { $values { "default" "a quotation" } { "assoc" "a sequence of quotation pairs" } { "quot" "a new quotation" } }
