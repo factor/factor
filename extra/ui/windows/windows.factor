@@ -456,7 +456,7 @@ M: windows-ui-backend ui
             init-win32-ui
             start-ui
             event-loop
-        ] [ cleanup-win32-ui ] cleanup
+        ] [ cleanup-win32-ui ] [ ] cleanup
     ] ui-running ;
 
 T{ windows-ui-backend } ui-backend set-global

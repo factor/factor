@@ -14,3 +14,4 @@ factor
 .DS_Store
 .gdb_history
 *.*.marks
+.*.swp
