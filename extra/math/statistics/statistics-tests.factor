@@ -15,9 +15,11 @@ IN: temporary
 
 [ 1 ] [ { 1 2 3 } var ] unit-test
 [ 1 ] [ { 1 2 3 } std ] unit-test
+[ t ] [ { 1 2 3 4 } ste 0.6454972243679028 - .0001 < ] unit-test
 
 [ t ] [ { 23.2 33.4 22.5 66.3 44.5 } std 18.1906 - .0001 < ] unit-test
 
 [ 0 ] [ { 1 } var ] unit-test
 [ 0 ] [ { 1 } std ] unit-test
+[ 0 ] [ { 1 } ste ] unit-test
 

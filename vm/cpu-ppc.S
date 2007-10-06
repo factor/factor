@@ -146,8 +146,6 @@ DEF(void,primitive_execute,(void)):
         subi r14,r14,4     /* pop word from data stack */
         bctr               /* go */
 
-#define SCAN_SAVE (RESERVED_SIZE + PARAM_SIZE + 4)
-
 /* We pass a function pointer to memcpy in r6 to work around a Mac OS X ABI
 limitation which would otherwise require us to do a bizzaro PC-relative
 trampoline to retrieve the function address */
@@ -159,8 +157,6 @@ DEF(void,set_callstack,(F_STACK_FRAME *to, F_STACK_FRAME *from, CELL length, voi
         blrl               /* go */
 	lwz r1,0(r1)       /* tear down fake stack frame */
         lwz r0,LR_SAVE(r1) /* we have restored the stack; load return address */
-	                   /* load quotation scan pointer */
-        lwz r5,SCAN_SAVE(r1)
         mtlr r0            /* prepare to return to restored callstack */
         blr                /* go */
 

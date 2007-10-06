@@ -1,4 +1,5 @@
-USING: inverse tools.test arrays math kernel sequences ;
+USING: inverse tools.test arrays math kernel sequences
+math.functions ;
 
 [ 2 ] [ { 3 2 } [ 3 swap 2array ] undo ] unit-test
 [ { 3 4 } [ dup 2array ] undo ] unit-test-fails

@@ -5,7 +5,7 @@ ui.tools.workspace inspector kernel models namespaces
 prettyprint quotations sequences threads tools.interpreter
 ui.commands ui.gadgets ui.gadgets.labelled ui.gadgets.tracks
 ui.gestures ui.gadgets.buttons ui.gadgets.panes
-prettyprint.config prettyprint.backend ;
+prettyprint.config prettyprint.backend continuations ;
 IN: ui.tools.walker
 
 TUPLE: walker model interpreter history ;

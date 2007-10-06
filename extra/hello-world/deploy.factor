@@ -1,4 +1,4 @@
-USING: tools.deploy ;
+USING: tools.deploy.config ;
 V{
     { strip-word-props? t }
     { strip-word-names? t }

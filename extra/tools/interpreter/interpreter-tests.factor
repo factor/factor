@@ -1,7 +1,7 @@
 USING: tools.interpreter io io.streams.string kernel math
 math.private namespaces prettyprint sequences tools.test
 continuations math.parser threads arrays
-tools.interpreter.debug ;
+tools.interpreter.private tools.interpreter.debug ;
 IN: temporary
 
 [ "Ooops" throw ] break-hook set

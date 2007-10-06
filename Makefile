@@ -11,7 +11,7 @@ CFLAGS = -Wall
 ifdef DEBUG
 	CFLAGS += -g
 else
-	CFLAGS += -O3 $(SITE_CFLAGS)
+	CFLAGS += -O3 -fomit-frame-pointer $(SITE_CFLAGS)
 endif
 
 ifdef CONFIG

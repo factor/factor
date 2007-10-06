@@ -137,3 +137,9 @@ DEFINE_PRIMITIVE(throw)
 	uncurry(dpop());
 	throw_impl(dpop(),stack_chain->callstack_top);
 }
+
+DEFINE_PRIMITIVE(call_clear)
+{
+	uncurry(dpop());
+	throw_impl(dpop(),stack_chain->callstack_bottom);
+}

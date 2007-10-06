@@ -35,6 +35,7 @@ void not_implemented_error(void);
 F_FASTCALL void undefined_error(CELL word, F_STACK_FRAME *callstack_top);
 
 DECLARE_PRIMITIVE(throw);
+DECLARE_PRIMITIVE(call_clear);
 
 INLINE void type_check(CELL type, CELL tagged)
 {

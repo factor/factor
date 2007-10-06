@@ -338,6 +338,11 @@ $nl
     { $code "2 [ 2 + 3 * ] call" "2 2 + 3 *" }
 } ;
 
+HELP: call-clear ( quot -- )
+{ $values { "quot" callable } }
+{ $description "Calls a quotation with an empty call stack. If the quotation returns, Factor will exit.." }
+{ $notes "Used to implement " { $link "threads" } "." } ;
+
 HELP: slip
 { $values { "quot" quotation } { "x" object } }
 { $description "Calls a quotation while hiding the top of the stack." } ;

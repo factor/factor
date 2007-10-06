@@ -9,17 +9,16 @@ IN: cpu.ppc.architecture
 TUPLE: ppc-backend ;
 
 ! PowerPC register assignments
-! r3-r10, r17-r31: integer vregs
+! r3-r10, r16-r31: integer vregs
 ! f0-f13: float vregs
 ! r11, r12: scratch
 ! r14: data stack
 ! r15: retain stack
 
-! For stack frame layout, see vm/os-{macosx,linux}-ppc.h.
+! For stack frame layout, see vm/cpu-ppc.h.
 
 : ds-reg 14 ;
 : rs-reg 15 ;
-: stack-chain-reg 16 ;
 
 : reserved-area-size
     os {
@@ -37,13 +36,17 @@ TUPLE: ppc-backend ;
 
 : param-save-size 8 cells ; foldable
 
-: xt-save reserved-area-size param-save-size + 2 cells + ; foldable
+: local@ ( n -- x )
+    reserved-area-size param-save-size + + ; inline
 
-: local-area-start xt-save cell + ; foldable
+: factor-area-size 4 cells ;
 
-: local@ ( n -- x ) local-area-start + ; inline
+: next-save ( n -- i ) cell - ;
 
-M: ppc-backend stack-frame ( n -- i ) local@ 4 cells align ;
+: xt-save ( n -- i ) 2 cells - ;
+
+M: ppc-backend stack-frame ( n -- i )
+    local@ factor-area-size + 4 cells align ;
 
 M: temp-reg v>operand drop 11 ;
 
@@ -85,17 +88,19 @@ M: ppc-backend %save-xt ( -- )
 
 M: ppc-backend %prologue ( n -- )
     0 MFLR
-    1 1 pick stack-frame neg STWU
-    11 1 xt-save STW
-    0 1 rot stack-frame lr-save + STW ;
+    1 1 pick neg ADDI
+    11 1 pick xt-save STW
+    dup 11 LI
+    11 1 pick next-save STW
+    0 1 rot lr-save + STW ;
 
 M: ppc-backend %epilogue ( n -- )
     #! At the end of each word that calls a subroutine, we store
     #! the previous link register value in r0 by popping it off
     #! the stack, set the link register to the contents of r0,
     #! and jump to the link register.
-    0 1 pick stack-frame lr-save + LWZ
-    1 1 rot stack-frame ADDI
+    0 1 pick lr-save + LWZ
+    1 1 rot ADDI
     0 MTLR ;
 
 : %load-dlsym ( symbol dll register -- )
@@ -236,7 +241,7 @@ M: ppc-backend %box-long-long ( n func -- )
         4 1 rot cell + local@ LWZ
     ] when* r> f %alien-invoke ;
 
-: temp@ stack-frame* swap - ;
+: temp@ stack-frame* factor-area-size - swap - ;
 
 : struct-return@ ( size n -- n ) [ local@ ] [ temp@ ] ?if ;
 

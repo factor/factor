@@ -1,8 +1,8 @@
 ! Copyright (C) 2007 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: io io.files io.launcher kernel namespaces sequences
-system cocoa.plists cocoa.application tools.deploy assocs
-hashtables prettyprint ;
+system cocoa.plists cocoa.application tools.deploy
+tools.deploy.config assocs hashtables prettyprint ;
 IN: tools.deploy.app
 
 : mkdir ( path -- )

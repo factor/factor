@@ -1,6 +1,6 @@
 IN: temporary
 USING: kernel math.matrices math.matrices.elimination
-tools.test ;
+tools.test sequences ;
 
 [
     {

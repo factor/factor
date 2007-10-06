@@ -7,7 +7,7 @@ IN: temporary
     { { 1 } { 2 3 } { 4 5 6 } { 7 8 } { } } graded
 ] unit-test
 
-SYMBOLS: x1 x2 x3 x4 z1 z2 ;
+SYMBOLS: x1 x2 x3 x4 x5 x6 z1 z2 ;
 
 [ H{ { { x1 } 3 } } ] [ x1 3 wedge ] unit-test
 
@@ -23,7 +23,7 @@ x3 x4 wedge z2 d=
 ! Unimodular example
 boundaries get clear-assoc
 
-SYMBOLS: x y z ;
+SYMBOLS: x y w z ;
 
 x y wedge z d=
 y z wedge x d=

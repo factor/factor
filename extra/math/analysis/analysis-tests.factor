@@ -1,4 +1,5 @@
-USING: kernel math math.functions tools.test ;
+USING: kernel math math.functions tools.test math.analysis
+math.constants ;
 IN: temporary
 
 : eps

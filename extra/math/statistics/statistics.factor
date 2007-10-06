@@ -40,6 +40,10 @@ IN: math.statistics
     #! standard deviation, sqrt of variance
     var sqrt ;
 
+: ste ( seq -- x )
+    #! standard error, standard deviation / sqrt ( length of sequence )
+    dup std swap length sqrt / ;
+     
 : ((r)) ( mean(x) mean(y) {x} {y} -- (r) )
     ! finds sigma((xi-mean(x))(yi-mean(y)) 
     0 [ [ >r pick r> swap - ] 2apply * + ] 2reduce 2nip ;

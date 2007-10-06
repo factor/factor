@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 !
 USING: kernel tools.test math channels channels.private 
-sequences threads ;
+sequences threads sorting ;
 IN: temporary
 
 { 3 t } [

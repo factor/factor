@@ -24,9 +24,6 @@ ABOUT: "meta-interpreter"
 HELP: interpreter
 { $class-description "An interpreter instance." } ;
 
-HELP: break
-{ $description "Suspends execution of the current thread and starts the single stepper by calling " { $link break-hook } "." } ;
-
 HELP: step
 { $values { "interpreter" interpreter } }
 { $description "Evaluates the object in the single stepper using Factor evaluation semantics:"

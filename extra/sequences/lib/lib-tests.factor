@@ -1,4 +1,4 @@
-USING: kernel sequences.lib ;
+USING: kernel sequences.lib math math.functions tools.test ;
 
 [ 4 ] [ { 1 2 } [ sq ] [ * ] map-reduce ] unit-test
 [ 36 ] [ { 2 3 } [ sq ] [ * ] map-reduce ] unit-test

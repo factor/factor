@@ -51,7 +51,7 @@ PRIVATE>
         >r schedule-thread r> [
             V{ } set-catchstack
             { } set-retainstack
-            [ print-error ] recover stop
+            [ [ print-error ] recover stop ] call-clear
         ] (throw)
     ] curry callcc0 ;
 

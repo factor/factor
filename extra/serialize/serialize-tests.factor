@@ -2,7 +2,8 @@
 ! See http://factorcode.org/license.txt for BSD license.
 ! 
 USING: tools.test kernel serialize io io.streams.string math
-alien arrays byte-arrays sequences math prettyprint ;
+alien arrays byte-arrays sequences math prettyprint parser
+classes math.constants ;
 IN: temporary
 
 TUPLE: serialize-test a b ;

@@ -270,6 +270,7 @@ H{ } clone update-map set
     { "innermost-frame-quot" "kernel.private" }
     { "innermost-frame-scan" "kernel.private" }
     { "set-innermost-frame-quot" "kernel.private" }
+    { "call-clear" "kernel" }
 }
 dup length [ >r first2 r> make-primitive ] 2each
 
