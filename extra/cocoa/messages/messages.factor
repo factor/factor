@@ -3,7 +3,8 @@
 USING: alien alien.c-types alien.compiler
 arrays assocs combinators compiler inference.transforms kernel
 math namespaces parser prettyprint prettyprint.sections
-quotations sequences strings words cocoa.runtime io macros ;
+quotations sequences strings words cocoa.runtime io macros
+memoize ;
 IN: cocoa.messages
 
 : make-sender ( method function -- quot )
@@ -20,10 +21,8 @@ IN: cocoa.messages
 SYMBOL: message-senders
 SYMBOL: super-message-senders
 
-global [
-    message-senders [ H{ } assoc-like ] change
-    super-message-senders [ H{ } assoc-like ] change
-] bind
+message-senders global [ H{ } assoc-like ] change-at
+super-message-senders global [ H{ } assoc-like ] change-at
 
 : cache-stub ( method function hash -- )
     [
@@ -56,14 +55,14 @@ TUPLE: selector name object ;
 
 SYMBOL: selectors
 
-H{ } clone selectors set-global
+selectors global [ H{ } assoc-like ] change-at
 
 : cache-selector ( string -- selector )
     selectors get-global [ <selector> ] cache ;
 
 SYMBOL: objc-methods
 
-H{ } clone objc-methods set-global
+objc-methods global [ H{ } assoc-like ] change-at
 
 : lookup-method ( selector -- method )
     dup objc-methods get at
@@ -74,7 +73,7 @@ H{ } clone objc-methods set-global
     \ >r <repetition> >quotation -rot
     \ r> <repetition> >quotation 3append ;
 
-: make-prepare-send ( selector method super? -- quot )
+MEMO: make-prepare-send ( selector method super? -- quot )
     [
         [ \ <super> , ] when
         swap cache-selector , \ selector ,
@@ -82,11 +81,10 @@ H{ } clone objc-methods set-global
     swap second length 2 - make-dip ;
 
 MACRO: (send) ( selector super? -- quot )
-    [
-        >r dup lookup-method r>
-        [ make-prepare-send % ] 2keep
-        super-message-senders message-senders ? get at ,
-    ] [ ] make ;
+    >r dup lookup-method r>
+    [ make-prepare-send ] 2keep
+    super-message-senders message-senders ? get at
+    [ slip execute ] 2curry ;
 
 : send ( args... receiver selector -- return... ) f (send) ; inline
 
