@@ -102,6 +102,8 @@ void print_stack_frame(F_STACK_FRAME *frame)
 {
 	print_obj(frame_executing(frame));
 	printf("\n");
+	print_obj(frame_scan(frame));
+	printf("\n");
 }
 
 void print_callstack(void)
