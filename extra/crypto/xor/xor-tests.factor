@@ -1,4 +1,5 @@
-USING: crypto errors kernel test strings ;
+USING: continuations crypto.xor kernel strings tools.test ;
+IN: temporary
 
 ! No key
 [ T{ no-xor-key f } ] [ [ "" dup xor-crypt ] catch ] unit-test
@@ -7,7 +8,7 @@ USING: crypto errors kernel test strings ;
 [ T{ no-xor-key f } ] [ [ "" "asdf" dupd xor-crypt xor-crypt ] catch ] unit-test
 
 ! a xor a = 0
-[ { 0 0 0 0 0 0 0 } ] [ "abcdefg" dup xor-crypt ] unit-test
+[ "\0\0\0\0\0\0\0" ] [ "abcdefg" dup xor-crypt ] unit-test
 
 [ { 15 15 15 15 } ] [ { 10 10 10 10 } { 5 5 5 5 } xor-crypt ] unit-test
 

@@ -5,7 +5,7 @@ set +e
 
 # Case insensitive string comparison
 shopt -s nocaseglob
-shopt -s nocasematch
+#shopt -s nocasematch
 
 ensure_program_installed() {
         echo -n "Checking for $1..."
@@ -47,7 +47,9 @@ case $uname_s in
         *CYGWIN_NT*) OS=windows-nt;;
         *CYGWIN*) OS=windows-nt;;
         *darwin*) OS=macosx;;
+        *Darwin*) OS=macosx;;
         *linux*) OS=linux;;
+        *Linux*) OS=linux;;
 esac
 
 # Architecture
@@ -106,5 +108,13 @@ rm $BOOT_IMAGE > /dev/null 2>&1
 rm $BOOT_IMAGE.* > /dev/null 2>&1
 wget http://factorcode.org/images/latest/$BOOT_IMAGE
 check_ret wget
+
+if [[ $OS == windows-nt ]] ; then
+	wget http://factorcode.org/dlls/freetype6.dll
+	check_ret
+	wget http://factorcode.org/dlls/zlib1.dla
+	check_ret
+fi
+
 
 ./$FACTOR_BINARY -i=$BOOT_IMAGE
