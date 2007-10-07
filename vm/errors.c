@@ -37,8 +37,8 @@ void throw_error(CELL error, F_STACK_FRAME *callstack_top)
 		not necessarily up to date at that point. */
 		if(callstack_top)
 		{
-			callstack_top = fix_callstack_top(
-				stack_chain->callstack_bottom,callstack_top);
+			callstack_top = fix_callstack_top(callstack_top,
+				stack_chain->callstack_bottom);
 		}
 		else
 			callstack_top = stack_chain->callstack_top;
