@@ -1,6 +1,6 @@
 USING: arrays byte-arrays kernel kernel.private math memory
 namespaces sequences tools.test math.private quotations
-continuations prettyprint io.streams.string ;
+continuations prettyprint io.streams.string debugger ;
 IN: temporary
 
 [ 0 ] [ f size ] unit-test
@@ -15,18 +15,35 @@ IN: temporary
 [ { "kernel-error" 11 f f } ]
 [ [ clear drop ] catch ] unit-test
 
+[ ] [ :c ] unit-test
+
 [ { "kernel-error" 13 f f } ]
 [ [ { } set-retainstack r> ] catch ] unit-test
+
+[ ] [ :c ] unit-test
 
 : overflow-d 3 overflow-d ;
 
 [ { "kernel-error" 12 f f } ]
 [ [ overflow-d ] catch ] unit-test
 
+[ ] [ :c ] unit-test
+
+: (overflow-d-alt) 3 ;
+
+: overflow-d-alt (overflow-d-alt) overflow-d-alt ;
+
+[ { "kernel-error" 12 f f } ]
+[ [ overflow-d-alt ] catch ] unit-test
+
+[ ] [ [ :c ] string-out drop ] unit-test
+
 : overflow-r 3 >r overflow-r ;
 
 [ { "kernel-error" 14 f f } ]
 [ [ overflow-r ] catch ] unit-test
+
+[ ] [ :c ] unit-test
 
 ! : overflow-c overflow-c 3 ;
 ! 
@@ -45,9 +62,17 @@ IN: temporary
 [ 6 ] [ f 6 or ] unit-test
 
 [ slip ] unit-test-fails
+[ ] [ :c ] unit-test
+
 [ 1 slip ] unit-test-fails
+[ ] [ :c ] unit-test
+
 [ 1 2 slip ] unit-test-fails
+[ ] [ :c ] unit-test
+
 [ 1 2 3 slip ] unit-test-fails
+[ ] [ :c ] unit-test
+
 
 [ 5 ] [ [ 2 2 + ] 1 slip + ] unit-test
 
@@ -76,3 +101,4 @@ IN: temporary
 [ ] [ callstack set-callstack ] unit-test
 
 [ 3drop datastack ] unit-test-fails
+[ ] [ :c ] unit-test
