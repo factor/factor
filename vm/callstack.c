@@ -6,6 +6,11 @@ F_FASTCALL void save_callstack_bottom(F_STACK_FRAME *callstack_bottom)
 	stack_chain->callstack_bottom = callstack_bottom;
 }
 
+__attribute__((noinline)) void save_callstack_top(F_STACK_FRAME *callstack_top)
+{
+	stack_chain->callstack_top = callstack_top;
+}
+
 void iterate_callstack(CELL top, CELL bottom, CALLSTACK_ITER iterator)
 {
 	F_STACK_FRAME *frame = (F_STACK_FRAME *)bottom - 1;
