@@ -197,3 +197,4 @@ GENERIC: (step-into) ( obj -- )
 
 M: wrapper (step-into) wrapped break ;
 M: object (step-into) break ;
+M: callable (step-into) \ break add* break ;

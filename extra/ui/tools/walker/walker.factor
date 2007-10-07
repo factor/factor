@@ -65,7 +65,9 @@ M: walker call-tool* ( continuation walker -- )
     ] if ;
 
 : com-continue ( walker -- )
-    dup walker-interpreter step-all reset-walker ;
+    #! Reset walker first, in case step-all ends up calling
+    #! the walker again.
+    dup walker-interpreter swap reset-walker step-all ;
 
 : walker-help "ui-walker" help-window ;
 
