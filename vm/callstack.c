@@ -40,6 +40,16 @@ F_CALLSTACK *allot_callstack(CELL size)
 	return callstack;
 }
 
+F_STACK_FRAME *fix_callstack_top(F_STACK_FRAME *top, F_STACK_FRAME *bottom)
+{
+	F_STACK_FRAME *frame = bottom - 1;
+
+	while(frame >= top)
+		frame = frame_successor(frame);
+
+	return frame + 1;
+}
+
 /* We ignore the topmost frame, the one calling 'callstack',
 so that set-callstack doesn't get stuck in an infinite loop.
 
