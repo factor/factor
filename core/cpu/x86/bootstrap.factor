@@ -10,7 +10,7 @@ big-endian off
 
 : stack-frame-size 8 bootstrap-cells ;
 
-: scan-save stack-reg stack-frame-size 3 bootstrap-cells - [+] ;
+: scan-save stack-reg 3 bootstrap-cells [+] ;
 
 [
     arg0 arg0 quot-array@ [+] MOV              ! load array
@@ -79,9 +79,9 @@ big-endian off
 
 [
     load-branch
-    stack-reg [] scan-reg MOV                  ! save scan pointer
+    scan-save scan-reg MOV                     ! save scan pointer
     xt-reg CALL                                ! call quotation
-    scan-reg stack-reg [] MOV                  ! restore scan pointer
+    scan-reg scan-save MOV                     ! restore scan pointer
 ] { } make jit-if-call set
 
 [
