@@ -1,5 +1,5 @@
 F_FASTCALL void save_callstack_bottom(F_STACK_FRAME *callstack_bottom);
-__attribute__((noinline)) void save_callstack_top(F_STACK_FRAME *callstack_top);
+F_FASTCALL __attribute__((noinline)) void save_callstack_top(F_STACK_FRAME *callstack_top);
 
 #define FIRST_STACK_FRAME(stack) (F_STACK_FRAME *)((stack) + 1)
 
