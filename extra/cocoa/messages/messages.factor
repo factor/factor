@@ -43,7 +43,7 @@ super-message-senders global [ H{ } assoc-like ] change-at
 
 TUPLE: selector name object ;
 
-: <selector> ( name -- sel ) f \ selector construct-boa ;
+MEMO: <selector> ( name -- sel ) f \ selector construct-boa ;
 
 : selector ( selector -- alien )
     dup selector-object expired? [
@@ -52,13 +52,6 @@ TUPLE: selector name object ;
     ] [
         selector-object
     ] if ;
-
-SYMBOL: selectors
-
-selectors global [ H{ } assoc-like ] change-at
-
-: cache-selector ( string -- selector )
-    selectors get-global [ <selector> ] cache ;
 
 SYMBOL: objc-methods
 
@@ -76,7 +69,7 @@ objc-methods global [ H{ } assoc-like ] change-at
 MEMO: make-prepare-send ( selector method super? -- quot )
     [
         [ \ <super> , ] when
-        swap cache-selector , \ selector ,
+        swap <selector> , \ selector ,
     ] [ ] make
     swap second length 2 - make-dip ;
 
