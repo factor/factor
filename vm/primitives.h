@@ -16,19 +16,22 @@ Becomes
 
 F_FASTCALL void primitive_name(CELL word, F_STACK_FRAME *callstack_top)
 {
-	stack_chain->callstack_top = callstack_top;
+	save_callstack_top(callstack_top);
 	... CODE ...
 }
 
 On x86, F_FASTCALL expands into a GCC declaration which forces the two
 parameters to be passed in registers. This simplifies the quotation compiler
-and support code in cpu-x86.S. */
+and support code in cpu-x86.S.
+
+We do the assignment of stack_chain->callstack_top in a ``noinline'' function
+to inhibit assignment re-ordering. */
 #define DEFINE_PRIMITIVE(name) \
 	INLINE void primitive_##name##_impl(void); \
 	\
 	F_FASTCALL void primitive_##name(CELL word, F_STACK_FRAME *callstack_top) \
 	{ \
-		stack_chain->callstack_top = callstack_top; \
+		save_callstack_top(callstack_top); \
 		primitive_##name##_impl(); \
 	} \
 	\
