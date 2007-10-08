@@ -1,5 +1,5 @@
 #ifndef DEBUG
-    C_FLAGS += -fomit-frame-pointer
+    CFLAGS += -fomit-frame-pointer
 #endif
 
 EXE_SUFFIX =
