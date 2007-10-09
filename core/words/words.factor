@@ -6,13 +6,13 @@ slots.private math namespaces sequences strings vectors sbufs
 quotations assocs hashtables sorting math.parser words.private
 vocabs ;
 
-GENERIC: execute ( word -- )
-
-M: word execute (execute) ;
-
 : word ( -- word ) \ word get-global ;
 
 : set-word ( word -- ) \ word set-global ;
+
+GENERIC: execute ( word -- )
+
+M: word execute (execute) ;
 
 ! Used by the compiler
 SYMBOL: changed-words
@@ -201,7 +201,6 @@ M: word (forget-word)
     reveal ;
 
 : forget-word ( word -- )
-    dup f "methods" set-word-prop
     dup delete-xref
     dup unchanged-word
     (forget-word) ;

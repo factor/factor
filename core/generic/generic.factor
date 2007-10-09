@@ -94,7 +94,7 @@ M: method-spec forget first2 [ delete-at ] with-methods ;
     dup associate implementors* ;
 
 : forget-methods ( class -- )
-    [ implementors ] keep [ swap 2array forget ] curry each ;
+    [ implementors ] keep [ swap 2array ] curry map forget-all ;
 
 M: class forget ( class -- )
     dup forget-methods
