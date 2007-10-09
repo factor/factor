@@ -89,7 +89,7 @@ C: <continuation> continuation
     set-catchstack
     set-namestack
     set-retainstack
-    >r set-datastack drop 4 getenv f r>
+    >r set-datastack drop 4 getenv f 4 setenv f r>
     set-callstack ;
 
 PRIVATE>
