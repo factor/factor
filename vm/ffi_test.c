@@ -225,3 +225,23 @@ struct test_struct_7 ffi_test_30(void)
 }
 
 void ffi_test_31(int x0, int x1, int x2, int x3, int x4, int x5, int x6, int x7, int x8, int x9, int x10, int x11, int x12, int x13, int x14, int x15, int x16, int x17, int x18, int x19, int x20, int x21, int x22, int x23, int x24, int x25, int x26, int x27, int x28, int x29, int x30, int x31, int x32, int x33, int x34, int x35, int x36, int x37, int x38, int x39, int x40, int x41) { }
+
+double ffi_test_32(struct test_struct_8 x, int y)
+{
+	return (x.x + x.y) * y;
+}
+
+double ffi_test_33(struct test_struct_9 x, int y)
+{
+	return (x.x + x.y) * y;
+}
+
+double ffi_test_34(struct test_struct_10 x, int y)
+{
+	return (x.x + x.y) * y;
+}
+
+double ffi_test_35(struct test_struct_11 x, int y)
+{
+	return (x.x + x.y) * y;
+}
