@@ -1,8 +1,8 @@
 ! Copyright (C) 2005 Alex Chapman
 ! Copyright (C) 2006, 2007 Slava Pestov
 ! See http://factorcode.org/license.txt for BSD license.
-USING: sequences kernel parser namespaces io io.files
-io.streams.lines io.streams.string html html.elements
+USING: continuations sequences kernel parser namespaces io
+io.files io.streams.lines io.streams.string html html.elements
 source-files debugger combinators math quotations generic
 strings splitting ;
 
@@ -70,6 +70,9 @@ DEFER: <% delimiter
 
 : eval-template ( string -- ) parse-template call ;
 
+: html-error. ( error -- )
+    <pre> error. </pre> ;
+
 : run-template-file ( filename -- )
     [
         [
@@ -77,7 +80,7 @@ DEFER: <% delimiter
             parser-notes off
             templating-vocab use+
             dup source-file file set ! so that reload works properly
-            [ <file-reader> contents eval-template ] keep
+            [ <file-reader> contents [ eval-template ] [ html-error. ] recover ] keep
         ] with-scope
     ] assert-depth drop ;
 
