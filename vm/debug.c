@@ -1,14 +1,23 @@
 #include "master.h"
 
+void print_chars(F_STRING* str)
+{
+	CELL i;
+	for(i = 0; i < string_capacity(str); i++)
+		putchar(cget(SREF(str,i)));
+}
+
 void print_word(F_WORD* word, CELL nesting)
 {
-	if(type_of(word->name) == STRING_TYPE)
+
+	if(type_of(word->vocabulary) == STRING_TYPE)
 	{
-		F_STRING *string = untag_string(word->name);
-		CELL i;
-		for(i = 0; i < string_capacity(string); i++)
-			putchar(cget(SREF(string,i)));
+		print_chars(untag_string(word->vocabulary));
+		printf(":");
 	}
+	
+	if(type_of(word->name) == STRING_TYPE)
+		print_chars(untag_string(word->name));
 	else
 	{
 		printf("#<not a string: ");
@@ -20,9 +29,7 @@ void print_word(F_WORD* word, CELL nesting)
 void print_string(F_STRING* str)
 {
 	putchar('"');
-	CELL i;
-	for(i = 0; i < string_capacity(str); i++)
-		putchar(cget(SREF(str,i)));
+	print_chars(str);
 	putchar('"');
 }
 
@@ -181,6 +188,24 @@ void dump_generations(void)
 		(CELL)(data_heap->cards_end - data_heap->cards));
 }
 
+void dump_objects(F_FIXNUM type)
+{
+	begin_scan();
+
+	CELL obj;
+	while((obj = next_object()) != F)
+	{
+		if(type == -1 || type_of(obj) == type)
+		{
+			print_nested_obj(obj,3);
+			printf("\n");
+		}
+	}
+
+	/* end scan */
+	gc_off = false;
+}
+
 void factorbug(void)
 {
 	reset_stdio();
@@ -200,8 +225,10 @@ void factorbug(void)
 	printf("g                -- dump generations\n");
 	printf("card <addr>      -- print card containing address\n");
 	printf("addr <card>      -- print address containing card\n");
+	printf("data             -- data heap dump\n");
+	printf("words            -- words dump\n");
 	printf("code             -- code heap dump\n");
-	
+
 	for(;;)
 	{
 		char cmd[1024];
@@ -268,6 +295,10 @@ void factorbug(void)
 			exit(1);
 		else if(strcmp(cmd,"im") == 0)
 			save_image(STR_FORMAT("fep.image"));
+		else if(strcmp(cmd,"data") == 0)
+			dump_objects(-1);
+		else if(strcmp(cmd,"words") == 0)
+			dump_objects(WORD_TYPE);
 		else if(strcmp(cmd,"code") == 0)
 			dump_heap(&code_heap);
 		else

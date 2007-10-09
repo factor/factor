@@ -31,6 +31,7 @@ typedef struct {
 	CELL gen_count, young_size, aging_size;
 	CELL code_size;
 	bool secure_gc;
+	bool fep;
 } F_PARAMETERS;
 
 void load_image(F_PARAMETERS *p);

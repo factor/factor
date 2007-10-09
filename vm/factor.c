@@ -19,6 +19,7 @@ void default_parameters(F_PARAMETERS *p)
 	p->young_size = 2 * CELLS;
 	p->aging_size = 4 * CELLS;
 	p->secure_gc = false;
+	p->fep = false;
 }
 
 /* Get things started */
@@ -101,6 +102,8 @@ void init_factor_from_args(F_CHAR *image, int argc, F_CHAR **argv, bool embedded
 		else if(factor_arg(argv[i],STR_FORMAT("-codeheap=%d"),&p.code_size));
 		else if(STRCMP(argv[i],STR_FORMAT("-securegc")) == 0)
 			p.secure_gc = true;
+		else if(STRCMP(argv[i],STR_FORMAT("-fep")) == 0)
+			p.fep = true;
 		else if(STRNCMP(argv[i],STR_FORMAT("-i="),3) == 0)
 			p.image = argv[i] + 3;
 	}
@@ -127,6 +130,10 @@ void init_factor_from_args(F_CHAR *image, int argc, F_CHAR **argv, bool embedded
 	userenv[EMBEDDED_ENV] = (embedded ? T : F);
 
 	nest_stacks();
+
+	if(p.fep)
+		factorbug();
+
 	c_to_factor_toplevel(userenv[BOOT_ENV]);
 	unnest_stacks();
 

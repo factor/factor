@@ -6,3 +6,4 @@ DECLARE_PRIMITIVE(curry);
 DECLARE_PRIMITIVE(array_to_quotation);
 DECLARE_PRIMITIVE(quotation_xt);
 DECLARE_PRIMITIVE(uncurry);
+DECLARE_PRIMITIVE(strip_compiled_quotations);
