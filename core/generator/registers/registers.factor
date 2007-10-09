@@ -458,8 +458,23 @@ M: loc lazy-store
         dup loc? over cached? or [ 2drop ] [ %move ] if
     ] each-loc ;
 
+: reset-phantom ( phantom -- )
+    #! Kill register assignments but preserve constants and
+    #! class information.
+    dup phantom-locs*
+    over [
+        dup constant? [ nip ] [
+            operand-class over set-operand-class
+        ] if
+    ] 2map
+    over delete-all
+    swap push-all ;
+
+: reset-phantoms ( -- )
+    [ reset-phantom ] each-phantom ;
+
 : finalize-contents ( -- )
-    finalize-locs finalize-vregs [ delete-all ] each-phantom ;
+    finalize-locs finalize-vregs reset-phantoms ;
 
 : %gc ( -- )
     0 frame-required
@@ -468,8 +483,8 @@ M: loc lazy-store
 
 ! Loading stacks to vregs
 : free-vregs? ( int# float# -- ? )
-    T{ float-regs f 8 } free-vregs length <
-    >r T{ int-regs } free-vregs length < r> and ;
+    T{ float-regs f 8 } free-vregs length <=
+    >r T{ int-regs } free-vregs length <= r> and ;
 
 : phantom&spec ( phantom spec -- phantom' spec' )
     [ length f pad-left ] keep
@@ -585,23 +600,17 @@ M: loc lazy-store
     2dup first value-matches?
     >r >r operand-class 2 r> ?nth class-matches? r> and ;
 
-: template-specs-match? ( -- ? )
-    phantom-d get +input+ get
-    [ spec-matches? ] phantom&spec-agree? ;
-
 : template-matches? ( spec -- ? )
-    clone [
-        template-specs-match?
-        [ guess-template-vregs free-vregs? ] [ f ] if
-    ] bind ;
-
-: (find-template) ( templates -- pair/f )
-    [ second template-matches? ] find nip ;
+    phantom-d get +input+ rot at
+    [ spec-matches? ] phantom&spec-agree? ;
 
 : ensure-template-vregs ( -- )
     guess-template-vregs free-vregs? [
         finalize-contents compute-free-vregs
     ] unless ;
+
+: clear-phantoms ( -- )
+    [ delete-all ] each-phantom ;
 
 PRIVATE>
 
@@ -614,14 +623,10 @@ PRIVATE>
     #! Commit all deferred stacking shuffling, and ensure the
     #! in-memory data and retain stacks are up to date with
     #! respect to the compiler's current picture.
-    finalize-contents finalize-heights
+    finalize-contents
+    clear-phantoms
+    finalize-heights
     fresh-objects get dup empty? swap delete-all [ %gc ] unless ;
-
-: do-template ( pair -- )
-    #! Use with return value from find-template
-    first2
-    clone [ template-inputs call template-outputs ] bind
-    compute-free-vregs ; inline
 
 : with-template ( quot hash -- )
     clone [
@@ -629,6 +634,10 @@ PRIVATE>
         template-inputs call template-outputs
     ] bind
     compute-free-vregs ; inline
+
+: do-template ( pair -- )
+    #! Use with return value from find-template
+    first2 with-template ;
 
 : fresh-object ( obj -- ) fresh-objects get push ;
 
@@ -651,10 +660,7 @@ PRIVATE>
 
 : find-template ( templates -- pair/f )
     #! Pair has shape { quot hash }
-    compute-free-vregs
-    dup (find-template) [ ] [
-        finalize-contents (find-template)
-    ] ?if ;
+    [ second template-matches? ] find nip ;
 
 : operand-tag ( operand -- tag/f )
     operand-class class-tag ;

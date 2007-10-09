@@ -3,7 +3,7 @@
 !
 USING: kernel concurrency threads vectors arrays sequences
 namespaces tools.test continuations dlists strings math words
-match quotations ;
+match quotations concurrency.private ;
 IN: temporary
 
 [ V{ 1 2 3 } ] [

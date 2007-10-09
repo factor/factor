@@ -1,6 +1,7 @@
 
-USING: kernel math vectors sequences opengl.gl math.vectors math.matrices
-       vars opengl.lib self pos ori turtle lsys.tortoise lsys.strings ;
+USING: kernel math vectors sequences opengl.gl math.vectors
+math.matrices vars opengl self pos ori turtle lsys.tortoise
+lsys.strings ;
 
 IN: lsys.tortoise.graphics
 
@@ -12,7 +13,7 @@ IN: lsys.tortoise.graphics
 
 : (polygon) ( vertices -- )
 GL_POLYGON glBegin
-dup polygon-normal gl-normal-3f [ gl-vertex-3f ] each
+dup polygon-normal gl-normal [ gl-vertex ] each
 glEnd ;
 
 : polygon ( vertices -- ) dup length 3 >= [ (polygon) ] [ drop ] if ;
@@ -31,7 +32,7 @@ VAR: vertices
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-: record-vertex ( -- ) pos> gl-vertex-3f ;
+: record-vertex ( -- ) pos> gl-vertex ;
 
 : draw-forward ( length -- )
 GL_LINES glBegin record-vertex step-turtle record-vertex glEnd ;
@@ -78,10 +79,10 @@ VAR: color-table
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 : material-color ( color -- )
-GL_FRONT_AND_BACK GL_AMBIENT_AND_DIFFUSE rot gl-material-fv ;
+GL_FRONT_AND_BACK GL_AMBIENT_AND_DIFFUSE rot gl-material ;
 
 : set-color ( i -- )
-dup >color color-table> nth dup gl-color-4f material-color ;
+dup >color color-table> nth dup gl-color material-color ;
 
 : inc-color ( -- ) color> 1+ set-color ;
 

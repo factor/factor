@@ -1,7 +1,8 @@
 USING: arrays continuations ui.tools.listener ui.tools.walker
 ui.tools.workspace inspector kernel namespaces sequences threads
 listener tools.test ui ui.gadgets ui.gadgets.worlds
-ui.gadgets.packs vectors ui.tools ;
+ui.gadgets.packs vectors ui.tools tools.interpreter
+tools.interpreter.debug ;
 IN: temporary
 
 [ ] [ <walker> "walker" set ] unit-test
@@ -50,4 +51,18 @@ IN: temporary
         "q" get dup first continuation?
         swap second \ inspect eq? and
     ] unit-test
+] with-scope
+
+[
+    f <workspace> <test-world> 2array 1vector windows set
+
+    [ ] [
+        [ 2 3 break 4 ] quot>cont f swap 2array walker call-tool
+    ] unit-test
+
+    [ ] [ walker get-tool com-continue ] unit-test
+
+    [ ] [ yield ] unit-test
+
+    [ t ] [ walker get-tool walker-active? ] unit-test
 ] with-scope

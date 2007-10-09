@@ -1,6 +1,6 @@
 USING: arrays kernel kernel.private math namespaces
 sequences sequences.private strings tools.test vectors
-continuations random growable ;
+continuations random growable classes ;
 IN: temporary
 
 [ ] [ 10 [ [ -1000000 <vector> ] catch drop ] times ] unit-test
@@ -93,3 +93,7 @@ IN: temporary
 [ t ] [
     100 >array dup >vector <reversed> >array >r reverse r> =
 ] unit-test
+
+[ fixnum ] [ 1 >bignum V{ } new length class ] unit-test
+
+[ fixnum ] [ 1 >bignum [ ] V{ } map-as length class ] unit-test

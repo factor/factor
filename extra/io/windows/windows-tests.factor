@@ -1,4 +1,4 @@
-USING: kernel ;
+USING: io.files kernel tools.test ;
 IN: temporary
 
 [ "c:\\foo\\" ] [ "c:\\foo\\bar" parent-dir ] unit-test

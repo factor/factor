@@ -1,4 +1,4 @@
-USING: kernel math tools.test units.imperial ;
+USING: kernel math tools.test units.imperial inverse ;
 IN: temporary
 
 [ 1 ] [ 12 inches [ feet ] undo ] unit-test

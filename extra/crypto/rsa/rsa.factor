@@ -2,28 +2,44 @@ USING: math.miller-rabin kernel math math.functions namespaces
 sequences ;
 IN: crypto.rsa
 
-SYMBOL: d
-SYMBOL: p
-SYMBOL: q
-SYMBOL: n
-SYMBOL: m
-SYMBOL: ee
+! The private key is the only secret.
 
-! e = public key, d = private key, n = public modulus
-TUPLE: rsa e d n ;
+! p,q are two random primes of numbits/2
+! phi = (p-1)(q-1)
+! modulus = p*q
+! public = 65537
+! private = public modinv phi
+
+TUPLE: rsa modulus private-key public-key ;
 
 C: <rsa> rsa
 
-! n bits
+<PRIVATE
+
+: public-key 65537 ; inline
+
+: rsa-primes ( numbits -- p q )
+    2/ 2 unique-primes first2 ;
+
+: modulus-phi ( numbits -- n phi ) 
+    #! Loop until phi is not divisible by the public key.
+    dup rsa-primes [ * ] 2keep
+    [ 1- ] 2apply *
+    dup public-key gcd nip 1 = [
+        rot drop
+    ] [
+        2drop modulus-phi
+    ] if ;
+
+PRIVATE>
+
 : generate-rsa-keypair ( numbits -- <rsa> )
-    [
-        2 /i 2 unique-primes first2 [ q set p set ] 2keep [ * n set ] 2keep
-        [ 1- ] 2apply * m set
-        65537 ee set
-        m get ee get mod-inv m get + d set
-        ee get d get n get <rsa>
-    ] with-scope ;
+    modulus-phi
+    public-key over mod-inv +
+    public-key <rsa> ;
 
-: rsa-encrypt ( message rsa -- encrypted ) [ rsa-e ] keep rsa-n ^mod ;
-: rsa-decrypt ( encrypted rsa -- message ) [ rsa-d ] keep rsa-n ^mod ;
+: rsa-encrypt ( message rsa -- encrypted )
+    [ rsa-public-key ] keep rsa-modulus ^mod ;
 
+: rsa-decrypt ( encrypted rsa -- message )
+    [ rsa-private-key ] keep rsa-modulus ^mod ;

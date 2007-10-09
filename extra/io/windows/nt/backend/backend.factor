@@ -5,6 +5,9 @@ windows.errors windows.kernel32 prettyprint strings splitting
 io.files windows.winsock ;
 IN: io.windows.nt.backend
 
+: .. global [ . flush ] bind ;
+: .S global [ .s flush ] bind ;
+
 : unicode-prefix ( -- seq )
     "\\\\?\\" ; inline
 
@@ -92,7 +95,7 @@ C: <GetQueuedCompletionStatusParams> GetQueuedCompletionStatusParams
 
 : lookup-callback ( GetQueuedCompletion-args -- callback )
     GetQueuedCompletionStatusParams-lpOverlapped* *void*
-    \ io-hash get-global delete-at drop ;
+    \ io-hash get-global delete-at* drop ;
 
 : wait-for-io ( timeout -- continuation/f )
     wait-for-overlapped

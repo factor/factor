@@ -1,5 +1,5 @@
 USING: kernel math namespaces sequences sbufs strings
-tools.test ;
+tools.test classes ;
 IN: temporary
 
 [ 5 ] [ "Hello" >sbuf length ] unit-test
@@ -18,3 +18,7 @@ IN: temporary
 ] unit-test
 
 [ SBUF" x" ] [ 1 <sbuf> CHAR: x >bignum over push ] unit-test
+
+[ fixnum ] [ 1 >bignum SBUF" " new length class ] unit-test
+
+[ fixnum ] [ 1 >bignum [ ] SBUF" " map-as length class ] unit-test

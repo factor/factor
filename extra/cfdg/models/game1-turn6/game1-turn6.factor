@@ -1,5 +1,4 @@
 
-
 USING: kernel namespaces math opengl.gl opengl.glu ui ui.gadgets.slate
        mortar random-weighted cfdg ;
 
@@ -24,17 +23,17 @@ IN: cfdg.models.game1-turn6
 DEFER: start
 
 : spiral ( -- ) iterate? [
-{ { 1 [ f-squares
-      	[ 0.5 x 0.5 y 45 r f-triangles ] do
-	[ 1 y 25 r 0.9 s spiral ] do ] }
-  { 0.022 [ [ 90 flip 50 hue start ] do ] } }
-random-weighted* call
+  { { 1 [ f-squares
+      	  [ 0.5 x 0.5 y 45 r f-triangles ] do
+	  [ 1 y 25 r 0.9 s spiral ] do ] }
+    { 0.022 [ [ 90 flip 50 hue start ] do ] } }
+  call-random-weighted
 ] when ;
 
 : start ( -- )
-[       spiral ] do
-[ 120 r spiral ] do
-[ 240 r spiral ] do ;
+  [       spiral ] do
+  [ 120 r spiral ] do
+  [ 240 r spiral ] do ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 

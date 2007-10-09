@@ -50,7 +50,7 @@ M: integer (^)
     tuck gcd 1 = [
         dup 0 < [ + ] [ nip ] if
     ] [
-        [ "Non-trivial divisor found" throw ] unless
+        "Non-trivial divisor found" throw
     ] if ; foldable
 
 : ^mod ( x y n -- z )

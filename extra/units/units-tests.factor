@@ -1,4 +1,5 @@
-USING: arrays kernel math sequences tools.test units.si units ;
+USING: arrays kernel math sequences tools.test units.si
+units.imperial units inverse math.functions ;
 IN: temporary
 
 [ T{ dimensioned f 3 { m } { } } ] [ 3 m ] unit-test

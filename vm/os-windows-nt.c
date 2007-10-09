@@ -29,7 +29,7 @@ long exception_handler(PEXCEPTION_POINTERS pe)
 	CONTEXT *c = (CONTEXT*)pe->ContextRecord;
 
 	if(in_code_heap_p(c->Eip))
-		signal_callstack_top = (void*)c->Esp;
+		signal_callstack_top = (void *)c->Esp;
 	else
 		signal_callstack_top = NULL;
 

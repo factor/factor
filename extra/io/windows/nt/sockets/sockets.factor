@@ -48,7 +48,7 @@ TUPLE: ConnectEx-args port
 : check-connect-error ( ConnectEx -- )
     ConnectEx-args-port duplex-stream-in get-overlapped-result drop ;
 
-: connect-continuation ( duplex-stream ConnectEx -- )
+: connect-continuation ( ConnectEx -- )
     [ ConnectEx-args-port duplex-stream-in save-callback ] keep
     check-connect-error ;
 
@@ -153,7 +153,6 @@ M: windows-nt-io <server> ( addrspec -- server )
             <win32-socket> f <port>
         ] keep <server-port>
     ] with-destructors ;
-
 
 M: windows-nt-io <datagram> ( addrspec -- datagram )
     [

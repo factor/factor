@@ -1,4 +1,5 @@
-USING: io io.mmap kernel tools.test ;
+USING: io io.mmap io.files kernel tools.test continuations
+sequences ;
 IN: temporary
 
 [ "mmap-test-file.txt" resource-path delete-file ] catch drop

@@ -1,3 +1,7 @@
+#ifndef DEBUG
+    CFLAGS += -fomit-frame-pointer
+#endif
+
 EXE_SUFFIX =
 DLL_PREFIX = lib
 DLL_EXTENSION = .a

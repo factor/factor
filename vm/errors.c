@@ -35,7 +35,12 @@ void throw_error(CELL error, F_STACK_FRAME *callstack_top)
 		Errors thrown from Factor code, or signal handlers, pass the
 		actual stack pointer at the time, since the saved pointer is
 		not necessarily up to date at that point. */
-		if(!callstack_top)
+		if(callstack_top)
+		{
+			callstack_top = fix_callstack_top(callstack_top,
+				stack_chain->callstack_bottom);
+		}
+		else
 			callstack_top = stack_chain->callstack_top;
 
 		throw_impl(userenv[BREAK_ENV],callstack_top);
@@ -136,4 +141,10 @@ DEFINE_PRIMITIVE(throw)
 {
 	uncurry(dpop());
 	throw_impl(dpop(),stack_chain->callstack_top);
+}
+
+DEFINE_PRIMITIVE(call_clear)
+{
+	uncurry(dpop());
+	throw_impl(dpop(),stack_chain->callstack_bottom);
 }

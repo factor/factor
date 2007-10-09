@@ -1,4 +1,4 @@
-USING: destructors kernel tools.test ;
+USING: destructors kernel tools.test continuations ;
 IN: temporary
 
 TUPLE: dummy-obj destroyed? ;

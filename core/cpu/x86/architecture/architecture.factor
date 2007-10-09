@@ -66,6 +66,7 @@ M: x86-backend %prepare-alien-invoke
     #! all roots.
     "stack_chain" f temp-reg v>operand %alien-global
     temp-reg v>operand [] stack-reg MOV
+    temp-reg v>operand [] cell SUB
     temp-reg v>operand 2 cells [+] ds-reg MOV
     temp-reg v>operand 3 cells [+] rs-reg MOV ;
 

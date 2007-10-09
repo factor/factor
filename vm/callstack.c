@@ -6,6 +6,11 @@ F_FASTCALL void save_callstack_bottom(F_STACK_FRAME *callstack_bottom)
 	stack_chain->callstack_bottom = callstack_bottom;
 }
 
+F_FASTCALL __attribute__((noinline)) void save_callstack_top(F_STACK_FRAME *callstack_top)
+{
+	stack_chain->callstack_top = callstack_top;
+}
+
 void iterate_callstack(CELL top, CELL bottom, CALLSTACK_ITER iterator)
 {
 	F_STACK_FRAME *frame = (F_STACK_FRAME *)bottom - 1;
@@ -33,6 +38,16 @@ F_CALLSTACK *allot_callstack(CELL size)
 		callstack_size(size));
 	callstack->length = tag_fixnum(size);
 	return callstack;
+}
+
+F_STACK_FRAME *fix_callstack_top(F_STACK_FRAME *top, F_STACK_FRAME *bottom)
+{
+	F_STACK_FRAME *frame = bottom - 1;
+
+	while(frame >= top)
+		frame = frame_successor(frame);
+
+	return frame + 1;
 }
 
 /* We ignore the topmost frame, the one calling 'callstack',
