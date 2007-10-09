@@ -187,3 +187,30 @@ SYMBOL: template-chosen
     ! This should not fail
     [ ] [ [ end-basic-block ] { } make drop ] unit-test
 ] with-scope
+
+! Regression
+SYMBOL: templates-chosen
+
+V{ } clone templates-chosen set
+
+: template-choice-1 ;
+
+\ template-choice-1
+[ "template-choice-1" templates-chosen get push ]
+H{
+    { +input+ { { f "obj" } { [ ] "n" } } }
+    { +output+ { "obj" } }
+} define-intrinsic
+
+: template-choice-2 ;
+
+\ template-choice-2
+[ "template-choice-2" templates-chosen get push drop ]
+{ { f "x" } { f "y" } } define-if-intrinsic
+
+[ ] [
+    [ 2 template-choice-1 template-choice-2 ] compile-quot drop
+] unit-test
+
+[ V{ "template-choice-1" "template-choice-2" } ]
+[ templates-chosen get ] unit-test
