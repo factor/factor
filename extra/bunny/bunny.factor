@@ -57,10 +57,7 @@ IN: bunny
     ] unless ;
 
 : draw-triangle ( ns vs triple -- )
-    [
-        dup roll nth first3 glNormal3d
-        swap nth first3 glVertex3d
-    ] each-with2 ;
+    [ dup roll nth gl-normal swap nth gl-vertex ] each-with2 ;
 
 : draw-bunny ( ns vs is -- )
     GL_TRIANGLES [ [ draw-triangle ] each-with2 ] do-state ;
