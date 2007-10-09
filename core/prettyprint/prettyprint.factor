@@ -159,6 +159,9 @@ GENERIC: see ( defspec -- )
 M: word synopsis*
     dup word-synopsis ;
 
+M: simple-generic synopsis*
+    dup word-synopsis ;
+
 M: standard-generic synopsis*
     dup seeing-word
     \ GENERIC# pprint-word
