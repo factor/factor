@@ -458,6 +458,12 @@ M: loc lazy-store
         dup loc? over cached? or [ 2drop ] [ %move ] if
     ] each-loc ;
 
+: reset-phantom ( phantom -- )
+    dup phantom-locs* over delete-all swap push-all ;
+
+: reset-phantoms ( -- )
+    [ reset-phantom ] each-phantom ;
+
 : finalize-contents ( -- )
     finalize-locs finalize-vregs [ delete-all ] each-phantom ;
 

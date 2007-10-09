@@ -130,7 +130,7 @@ UNION: #terminal
 M: node generate-node drop iterate-next ;
 
 : %call ( word -- )
-    dup primitive? [ %call-primitive ] [ %call-label ] if ;
+    dup primitive? [ "Call prim: " write dup . %call-primitive ] [ %call-label ] if ;
 
 : %jump ( word -- )
     {
@@ -138,6 +138,7 @@ M: node generate-node drop iterate-next ;
             drop current-label-start get %jump-label
         ] }
         { [ dup primitive? ] [
+                "Jump prim: " write dup .
             %epilogue-later %jump-primitive
         ] }
         { [ t ] [
