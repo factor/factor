@@ -175,3 +175,31 @@ USE: cpu.x86.intrinsics
 \ set-alien-signed-4 small-reg-32 define-setter
 
 T{ x86-backend f 8 } compiler-backend set-global
+
+! The ABI for passing structs by value is pretty messed up
+"void*" c-type clone "__stack_value" define-primitive-type
+T{ stack-regs } "__stack_value" c-type set-c-type-reg-class
+
+: struct-types&offset ( ctype -- pairs )
+    c-type struct-type-fields [
+        dup slot-spec-type swap slot-spec-offset 2array
+    ] map ;
+
+: split-struct ( pairs -- seq )
+    [
+        [ first2 8 mod zero? [ t , ] when , ] each
+    ] { } make { t } split [ empty? not ] subset ;
+
+: flatten-large-struct ( type -- )
+    heap-size cell align
+    cell /i "__stack_value" <repetition> % ;
+
+M: struct-type flatten-value-type ( type -- seq )
+    dup c-size 16 > [
+        flatten-large-struct
+    ] [
+        struct-types&offset split-struct [
+            [ c-type c-type-reg-class ] map
+            T{ int-regs } swap member? "void*" "double" ? ,
+        ] each
+    ] if ;
