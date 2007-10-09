@@ -1,29 +1,24 @@
 ! Copyright (C) 2007 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: memory io io.files io.styles io.launcher
-sequences prettyprint kernel arrays xml xml.utilities system
-hashtables sorting math.parser assocs ;
+USING: io.files io.launcher io.styles io hashtables kernel
+sequences combinators.lib assocs system sorting math.parser ;
 IN: contributors
 
-: changelog ( -- xml )
+: changelog ( -- authors )
     image parent-dir cd
-    "darcs changes --xml-output" <process-stream> read-xml ;
-
-: authors ( xml -- seq )
-    children-tags [ "author" swap at ] map ;
-
-: patch-count ( authors author -- n )
-    [ = ] curry subset length ;
+    "git-log --pretty=format:%an" <process-stream> lines ;
 
 : patch-counts ( authors -- assoc )
-    dup prune [ [ patch-count ] keep 2array ] curry* map ;
+    dup prune
+    [ dup rot [ = ] curry* count ] curry*
+    { } map>assoc ;
 
 : contributors ( -- )
-    changelog authors patch-counts sort-keys <reversed>
+    changelog patch-counts sort-values <reversed>
     standard-table-style [
         [
             [
-                first2
+                first2 swap
                 [ write ] with-cell
                 [ number>string write ] with-cell
             ] with-row
