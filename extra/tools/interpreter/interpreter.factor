@@ -65,11 +65,13 @@ M: word (step-into) (step-into-execute) ;
 {
     >n ndrop >c c>
     continue continue-with
-    (continue-with) stop break
+    (continue-with) stop
 } [
     dup [ execute break ] curry
     "step-into" set-word-prop
 ] each
+
+\ break [ break ] "step-into" set-word-prop
 
 ! Stepping
 : change-innermost-frame ( quot interpreter -- )

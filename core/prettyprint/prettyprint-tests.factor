@@ -299,3 +299,7 @@ unit-test
     [ 2 break 2 \ + (step-into) . ] (remove-breakpoints)
 ] unit-test
 
+[ [ 2 . ] ] [
+    [ 2 \ break (step-into) . ] (remove-breakpoints)
+] unit-test
+
