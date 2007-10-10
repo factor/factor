@@ -586,7 +586,7 @@ IN: cpu.x86.intrinsics
     "value" operand [ swap MOV ] %alien-accessor
 ] H{
     { +input+ {
-        { unboxed-c-ptr "value" c-ptr }
+        { unboxed-c-ptr "value" pinned-c-ptr }
         { unboxed-c-ptr "alien" c-ptr }
         { f "offset" fixnum }
     } }

@@ -69,13 +69,15 @@ cond ;
 ! : handle-client ( client -- ) <user> dup users> push
 ! dup [ >user [ handle-user-loop ] with-stream* ] with-scope ;
 
-: handle-client ( client -- ) <user> dup users> push
+: handle-client ( client -- )
+<user> dup users> push
 dup [ >user [ handle-user-loop ] with-stream ] with-scope ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 : accept-client-loop ( server -- )
-dup >r accept [ handle-client ] in-thread r> accept-client-loop ;
+[ accept [ handle-client ] curry in-thread ] keep
+accept-client-loop ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 

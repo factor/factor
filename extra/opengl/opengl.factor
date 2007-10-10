@@ -1,7 +1,8 @@
-! Copyright (C) 2005, 2006 Slava Pestov.
+! Copyright (C) 2005, 2007 Slava Pestov.
+! Portions copyright (C) 2007 Eduardo Cavazos.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: alien alien.c-types io kernel math namespaces
-sequences math.vectors opengl.gl opengl.glu ;
+sequences math.vectors opengl.gl opengl.glu combinators ;
 IN: opengl
 
 : coordinates [ first2 ] 2apply ;
@@ -10,8 +11,11 @@ IN: opengl
 
 : gl-color ( color -- ) first4 glColor4d ; inline
 
+: gl-clear-color ( color -- )
+    first4 glClearColor ;
+
 : gl-clear ( color -- )
-    first4 glClearColor GL_COLOR_BUFFER_BIT glClear ;
+    gl-clear-color GL_COLOR_BUFFER_BIT glClear ;
 
 : gl-error ( -- )
     glGetError dup zero? [
@@ -28,7 +32,17 @@ IN: opengl
     swap [ glMatrixMode glPushMatrix call ] keep
     glMatrixMode glPopMatrix ; inline
 
-: gl-vertex ( point -- ) first2 glVertex2d ; inline
+: gl-vertex ( point -- )
+    dup length {
+        { 2 [ first2 glVertex2d ] }
+        { 3 [ first3 glVertex3d ] }
+        { 4 [ first4 glVertex4d ] }
+    } case ;
+
+: gl-normal ( normal -- ) first3 glNormal3d ;
+
+: gl-material ( face pname params -- )
+    >c-float-array glMaterialfv ;
 
 : gl-line ( a b -- )
     GL_LINES [ gl-vertex gl-vertex ] do-state ;
@@ -66,6 +80,9 @@ IN: opengl
 
 : do-attribs ( bits quot -- )
     swap glPushAttrib call glPopAttrib ; inline
+
+: gl-look-at ( eye focus up -- )
+    >r >r first3 r> first3 r> first3 gluLookAt ;
 
 TUPLE: sprite loc dim dim2 dlist texture ;
 

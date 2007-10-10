@@ -1,9 +1,7 @@
-USING: tools.deploy.config ;
+USING: tools.deploy ;
 V{
-    { strip-prettyprint? t }
-    { strip-globals? t }
     { strip-word-props? t }
-    { strip-word-names? f }
+    { strip-word-names? t }
     { strip-dictionary? t }
     { strip-debugger? t }
     { strip-c-types? t }
@@ -11,6 +9,5 @@ V{
     { deploy-compiled? t }
     { deploy-io? f }
     { deploy-ui? t }
-    { "stop-after-last-window?" t }
-    { "bundle-name" "Hello World.app" }
+    { "bundle-name" "Lindenmayer Systems.app" }
 }

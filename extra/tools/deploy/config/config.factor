@@ -4,6 +4,7 @@ USING: vocabs.loader io.files io kernel sequences assocs
 splitting parser prettyprint ;
 IN: tools.deploy.config
 
+SYMBOL: strip-io?
 SYMBOL: strip-globals?
 SYMBOL: strip-word-props?
 SYMBOL: strip-word-names?
@@ -22,6 +23,7 @@ SYMBOL: deploy-image
 
 : default-config ( -- assoc )
     V{
+        { strip-io?          f }
         { strip-prettyprint? t }
         { strip-globals?     t }
         { strip-word-props?  t }

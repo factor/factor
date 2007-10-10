@@ -446,7 +446,8 @@ INLINE void *copy_untagged_object(void *pointer, CELL size)
 
 INLINE void forward_object(CELL pointer, CELL newpointer)
 {
-	put(UNTAG(pointer),RETAG(newpointer,GC_COLLECTED));
+	if(pointer != newpointer)
+		put(UNTAG(pointer),RETAG(newpointer,GC_COLLECTED));
 }
 
 INLINE CELL copy_object_impl(CELL pointer)

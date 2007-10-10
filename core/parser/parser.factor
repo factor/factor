@@ -416,7 +416,7 @@ SYMBOL: parse-hook
     ] keep ;
 
 : forget-smudged ( -- )
-    smudged-usage [ forget ] each
+    smudged-usage forget-all
     over empty? [ 2dup smudged-usage-warning ] unless 2drop ;
 
 : record-definitions ( file -- )

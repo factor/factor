@@ -14,7 +14,7 @@ IN: jamshred.gl
 
 : draw-segment-vertex ( segment theta -- )
     over segment-color gl-color segment-vertex-and-normal
-    first3 glNormal3d first3 glVertex3d ;
+    gl-normal gl-vertex ;
 
 : draw-vertex-pair ( theta next-segment segment -- )
     rot tuck draw-segment-vertex draw-segment-vertex ;

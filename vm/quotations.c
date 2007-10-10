@@ -231,3 +231,22 @@ DEFINE_PRIMITIVE(quotation_xt)
 	F_QUOTATION *quot = untag_quotation(dpeek());
 	drepl(allot_cell((CELL)quot->xt));
 }
+
+DEFINE_PRIMITIVE(strip_compiled_quotations)
+{
+	begin_scan();
+
+	CELL obj;
+	while((obj = next_object()) != F)
+	{
+		if(type_of(obj) == QUOTATION_TYPE)
+		{
+			F_QUOTATION *quot = untag_object(obj);
+			quot->compiled = F;
+			quot->xt = lazy_jit_compile;
+		}
+	}
+
+	/* end scan */
+	gc_off = false;
+}

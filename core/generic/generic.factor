@@ -14,6 +14,15 @@ M: generic definition drop f ;
 
 GENERIC: perform-combination ( word combination -- quot )
 
+M: object perform-combination
+    #! We delay the invalid method combination error for a
+    #! reason. If we call forget-vocab on a vocabulary which
+    #! defines a method combination, a generic using this
+    #! method combination, and a method on the generic, and the
+    #! method combination is forgotten first, then forgetting
+    #! the method will throw an error. We don't want that.
+    nip [ "Invalid method combination" throw ] curry ;
+
 : make-generic ( word -- )
     dup
     dup "combination" word-prop perform-combination
@@ -94,7 +103,7 @@ M: method-spec forget first2 [ delete-at ] with-methods ;
     dup associate implementors* ;
 
 : forget-methods ( class -- )
-    [ implementors ] keep [ swap 2array forget ] curry each ;
+    [ implementors ] keep [ swap 2array ] curry map forget-all ;
 
 M: class forget ( class -- )
     dup forget-methods

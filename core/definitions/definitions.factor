@@ -13,6 +13,8 @@ GENERIC: forget ( defspec -- )
 
 M: object forget drop ;
 
+: forget-all ( definitions -- ) [ forget ] each ;
+
 GENERIC: synopsis* ( defspec -- )
 
 GENERIC: definer ( defspec -- start end )

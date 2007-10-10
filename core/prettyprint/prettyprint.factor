@@ -99,7 +99,12 @@ SYMBOL: ->
     building get dup empty? [
         drop \ (step-into) ,
     ] [
-        pop dup wrapper? [ wrapped ] when ,
+        pop dup wrapper? [
+            wrapped dup \ break eq?
+            [ drop ] [ , ] if
+        ] [
+            ,
+        ] if
     ] if ;
 
 : (remove-breakpoints) ( quot -- newquot )

@@ -57,4 +57,5 @@ PRIVATE>
     deploy-command-line stage2 ;
 
 : deploy ( vocab -- )
+    "" resource-path cd
     vm over ".image" append rot dup deploy-config deploy* ;

@@ -27,11 +27,11 @@ GENERIC: alien-node-abi ( node -- str )
 : alien-node-return* ( node -- ctype )
     alien-node-return dup large-struct? [ drop "void" ] when ;
 
+: c-type-stack-align ( type -- align )
+    dup c-type-stack-align? [ c-type-align ] [ drop cell ] if ;
+
 : parameter-align ( n type -- n delta )
-    over >r
-    dup c-type-stack-align? [ c-type-align ] [ drop cell ] if
-    align
-    dup r> - ;
+    over >r c-type-stack-align align dup r> - ;
 
 : parameter-sizes ( types -- total offsets )
     #! Compute stack frame locations.
@@ -91,24 +91,33 @@ M: float-regs inc-reg-class
     [ dup class get swap inc-reg-class ] keep ;
 
 : alloc-parameter ( parameter -- reg reg-class )
-    c-type c-type-reg-class dup reg-class-full?
+    c-type-reg-class dup reg-class-full?
     [ spill-param ] [ fastcall-param ] if
     [ param-reg ] keep ;
 
 : (flatten-int-type) ( size -- )
-    cell /i "void*" <repetition> % ;
+    cell /i "void*" c-type <repetition> % ;
 
-: flatten-int-type ( n type -- n )
-    [ parameter-align (flatten-int-type) ] keep
-    stack-size cell align dup (flatten-int-type) + ;
+GENERIC: flatten-value-type ( type -- )
 
-: flatten-value-type ( n type -- n )
-    dup c-type c-type-reg-class T{ int-regs } =
-    [ flatten-int-type ] [ , ] if ;
+M: object flatten-value-type , ;
+
+M: struct-type flatten-value-type ( type -- )
+    stack-size cell align (flatten-int-type) ;
+
+M: long-long-type flatten-value-type ( type -- )
+    stack-size cell align (flatten-int-type) ;
 
 : flatten-value-types ( params -- params )
     #! Convert value type structs to consecutive void*s.
-    [ 0 [ flatten-value-type ] reduce drop ] { } make ;
+    [
+        0 [
+            c-type
+            [ parameter-align (flatten-int-type) ] keep
+            [ stack-size cell align + ] keep
+            flatten-value-type
+        ] reduce drop
+    ] { } make ;
 
 : each-parameter ( parameters quot -- )
     >r [ parameter-sizes nip ] keep r> 2each ; inline
@@ -127,11 +136,11 @@ M: float-regs inc-reg-class
     #! Moves values from C stack to registers (if word is
     #! %load-param-reg) and registers to C stack (if word is
     #! %save-param-reg).
-    swap
+    >r
     alien-node-parameters*
     flatten-value-types
-    [ pick >r alloc-parameter r> execute ] each-parameter
-    drop ; inline
+    r> [ >r alloc-parameter r> execute ] curry each-parameter ;
+    inline
 
 : if-void ( type true false -- )
     pick "void" = [ drop nip call ] [ nip call ] if ; inline
