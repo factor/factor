@@ -1,7 +1,7 @@
 
 USING: kernel namespaces threads sequences math math.vectors combinators.lib
        opengl.gl opengl colors ui ui.gadgets ui.gadgets.slate
-       rewrite-closures vars springies ;
+       bake rewrite-closures vars springies ;
 
 IN: springies.ui
 
@@ -51,7 +51,7 @@ DEFER: maybe-loop
 : springies-window* ( -- )
 
   C[ display ] <slate> >slate
-    { 500 500 }					     slate> set-slate-dim
+    { 700 500 }					     slate> set-slate-dim
     C[ { 500 500 } >world-size loop on [ run ] in-thread ]
       slate> set-slate-graft
     C[ loop off ]	       	 	     	     slate> set-slate-ungraft
@@ -59,3 +59,8 @@ DEFER: maybe-loop
   slate> "Springies" open-window ;
 
 : springies-window ( -- ) [ [ springies-window* ] with-scope ] with-ui ;
+
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+: go* ( quot -- )
+  [ [ [ springies-window* 1000 sleep % ] with-scope ] with-ui ] bake call ;

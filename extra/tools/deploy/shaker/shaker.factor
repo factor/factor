@@ -15,19 +15,20 @@ IN: tools.deploy.shaker
 
 : strip-init-hooks ( -- )
     "Stripping startup hooks" show
-    "command-line" init-hooks get delete-at ;
+    "command-line" init-hooks get delete-at
+    strip-io? get [ "io.backend" init-hooks get delete-at ] when ;
 
 : strip-debugger ( -- )
     strip-debugger? get [
         "Stripping debugger" show
-        "resource:extra/tools/deploy/strip-debugger.factor"
+        "resource:extra/tools/deploy/shaker/strip-debugger.factor"
         run-file
     ] when ;
 
 : strip-cocoa ( -- )
     "cocoa" vocab [
         "Stripping unused Cocoa methods" show
-        "resource:extra/tools/deploy/strip-cocoa.factor"
+        "resource:extra/tools/deploy/shaker/strip-cocoa.factor"
         run-file
     ] when ;
 
@@ -90,6 +91,8 @@ USING: bit-arrays byte-arrays io.streams.nested ;
     { } set-retainstack
     V{ } set-namestack
     V{ } set-catchstack
+    "Stripping compiled quotations" show
+    strip-compiled-quotations
     "Saving final image" show
     [ save-image-and-exit ] call-clear ;
 
@@ -100,14 +103,14 @@ SYMBOL: deploy-vocab
         \ boot ,
         init-hooks get values concat %
         ,
-        "io.backend" init-hooks get at [ \ flush , ] when
+        strip-io? get [ \ flush , ] unless
     ] [ ] make "Boot quotation: " write dup . flush
     set-boot-quot ;
 
 : retained-globals ( -- seq )
     [
         builtins ,
-        io-backend ,
+        strip-io? get [ io-backend , ] unless
 
         strip-dictionary? get [
             {
@@ -178,6 +181,8 @@ SYMBOL: deploy-vocab
             deploy-vocab get require
             r> [ call ] when*
             strip
+            "Compressing image" show
+            compress-image
             finish-deploy
         ] [
             print-error flush 1 exit

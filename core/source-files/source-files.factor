@@ -71,7 +71,7 @@ M: pathname where pathname-string 1 2array ;
 : forget-source ( path -- )
     dup source-file
     dup unxref-source
-    source-file-definitions [ drop forget ] assoc-each
+    source-file-definitions keys forget-all
     source-files get delete-at ;
 
 M: pathname forget pathname-string forget-source ;

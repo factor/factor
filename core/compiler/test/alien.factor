@@ -234,6 +234,50 @@ FUNCTION: test-struct-7 ffi_test_30 ;
 
 [ B{ 1 2 3 4 5 6 7 } ] [ ffi_test_30 ] unit-test
 
+C-STRUCT: test-struct-8 { "double" "x" } { "double" "y" } ;
+
+FUNCTION: double ffi_test_32 test-struct-8 x int y ;
+
+[ 9.0 ] [
+    "test-struct-8" <c-object>
+    1.0 over set-test-struct-8-x
+    2.0 over set-test-struct-8-y
+    3 ffi_test_32
+] unit-test
+
+C-STRUCT: test-struct-9 { "float" "x" } { "float" "y" } ;
+
+FUNCTION: double ffi_test_33 test-struct-9 x int y ;
+
+[ 9.0 ] [
+    "test-struct-9" <c-object>
+    1.0 over set-test-struct-9-x
+    2.0 over set-test-struct-9-y
+    3 ffi_test_33
+] unit-test
+
+C-STRUCT: test-struct-10 { "float" "x" } { "int" "y" } ;
+
+FUNCTION: double ffi_test_34 test-struct-10 x int y ;
+
+[ 9.0 ] [
+    "test-struct-10" <c-object>
+    1.0 over set-test-struct-10-x
+    2 over set-test-struct-10-y
+    3 ffi_test_34
+] unit-test
+
+C-STRUCT: test-struct-11 { "int" "x" } { "int" "y" } ;
+
+FUNCTION: double ffi_test_35 test-struct-11 x int y ;
+
+[ 9.0 ] [
+    "test-struct-11" <c-object>
+    1 over set-test-struct-11-x
+    2 over set-test-struct-11-y
+    3 ffi_test_35
+] unit-test
+
 ! Test callbacks
 
 : callback-1 "void" { } "cdecl" [ ] alien-callback ;

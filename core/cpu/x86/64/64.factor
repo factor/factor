@@ -4,7 +4,7 @@ USING: alien.c-types arrays cpu.x86.assembler
 cpu.x86.architecture cpu.x86.intrinsics cpu.x86.sse2
 cpu.x86.allot cpu.architecture kernel kernel.private math
 namespaces sequences generator.registers generator.fixup system
-alien ;
+alien alien.compiler alien.structs slots splitting math.functions ;
 IN: cpu.x86.64
 
 PREDICATE: x86-backend amd64-backend
@@ -175,3 +175,32 @@ USE: cpu.x86.intrinsics
 \ set-alien-signed-4 small-reg-32 define-setter
 
 T{ x86-backend f 8 } compiler-backend set-global
+
+! The ABI for passing structs by value is pretty messed up
+"void*" c-type clone "__stack_value" define-primitive-type
+T{ stack-params } "__stack_value" c-type set-c-type-reg-class
+
+: struct-types&offset ( struct-type -- pairs )
+    struct-type-fields [
+        dup slot-spec-type swap slot-spec-offset 2array
+    ] map ;
+
+: split-struct ( pairs -- seq )
+    [
+        [ first2 8 mod zero? [ t , ] when , ] each
+    ] { } make { t } split [ empty? not ] subset ;
+
+: flatten-large-struct ( type -- )
+    heap-size cell align
+    cell /i "__stack_value" c-type <repetition> % ;
+
+M: struct-type flatten-value-type ( type -- seq )
+    dup heap-size 16 > [
+        flatten-large-struct
+    ] [
+        struct-types&offset split-struct [
+            [ c-type c-type-reg-class ] map
+            T{ int-regs } swap member?
+            "void*" "double" ? c-type ,
+        ] each
+    ] if ;

@@ -7,9 +7,10 @@ V{
     { strip-dictionary? t }
     { strip-debugger? t }
     { strip-c-types? t }
-    { deploy-math? f }
-    { deploy-compiled? f }
+    { deploy-math? t }
+    { deploy-compiled? t }
     { deploy-io? f }
-    { deploy-ui? f }
+    { deploy-ui? t }
     { "stop-after-last-window?" t }
+    { "bundle-name" "Cellular Automata.app" }
 }

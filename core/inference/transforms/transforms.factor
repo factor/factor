@@ -6,12 +6,11 @@ inference.dataflow tuples.private ;
 IN: inference.transforms
 
 : pop-literals ( n -- rstate seq )
-    dup zero? [ drop recursive-state get f ] [
-        [ ensure-values ] keep
-        [ d-tail ] keep
-        (consume-values)
-        dup [ value-literal ] map
-        swap first value-recursion swap
+    dup zero? [
+        drop recursive-state get { }
+    ] [
+        dup ensure-values
+        f swap [ 2drop pop-literal ] map reverse
     ] if ;
 
 : transform-quot ( quot n -- newquot )

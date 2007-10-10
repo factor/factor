@@ -65,4 +65,10 @@ IN: temporary
     [ ] [ yield ] unit-test
 
     [ t ] [ walker get-tool walker-active? ] unit-test
+
+    [ ] [ "walker" get com-continue ] unit-test
+
+    [ ] [ "walker" get com-continue ] unit-test
+
+    [ ] [ "walker" get com-continue ] unit-test
 ] with-scope
