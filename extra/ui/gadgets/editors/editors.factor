@@ -5,7 +5,7 @@ ui.gadgets.borders ui.gadgets.buttons ui.gadgets.labels
 ui.gadgets.scrollers ui.gadgets.theme ui.gadgets.controls
 ui.render ui.gestures io kernel math models namespaces opengl
 opengl.gl sequences strings io.styles math.vectors sorting
-colors ;
+colors combinators ;
 IN: ui.gadgets.editors
 
 TUPLE: editor
@@ -292,11 +292,11 @@ M: editor gadget-text* editor-string % ;
 
 : position-caret ( editor -- )
     hand-click# get {
-        [ ]
-        [ dup (position-caret) ]
-        [ dup T{ one-word-elt } select-elt ]
-        [ dup T{ one-line-elt } select-elt ]
-    } ?nth call drop ;
+        { 1 [ (position-caret) ] }
+        { 2 [ T{ one-word-elt } select-elt ] }
+        { 3 [ T{ one-line-elt } select-elt ] }
+        [ 2drop ]
+    } case ;
 
 : insert-newline "\n" swap user-input ;
 

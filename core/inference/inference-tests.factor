@@ -347,6 +347,9 @@ DEFER: bar
 
 [ t ] [ [ [ r> ] infer short-effect ] catch inference-error? ] unit-test
 
+! Regression
+[ t ] [ [ [ get-slots ] infer ] catch inference-error? ] unit-test
+
 ! Test some curry stuff
 [ { 1 1 } ] [ [ 3 [ ] curry 4 [ ] curry if ] infer short-effect ] unit-test
 
