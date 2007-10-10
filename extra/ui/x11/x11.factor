@@ -93,8 +93,12 @@ M: world button-up-event
     send-button-up ;
 
 : mouse-event>scroll-direction ( event -- pair )
-    #! Reminder for myself: 4 is up, 5 is down
-    XButtonEvent-button 5 = 1 -1 ? 0 swap 2array ;
+    XButtonEvent-button {
+        { 4 { 0 -1 } }
+        { 5 { 0 1 } }
+        { 6 { -1 0 } }
+        { 7 { 1 0 } }
+    } at ;
 
 M: world wheel-event
     >r dup mouse-event>scroll-direction swap mouse-event-loc r>
