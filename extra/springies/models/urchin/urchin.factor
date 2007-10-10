@@ -3,13 +3,13 @@ USING: kernel namespaces arrays sequences threads math math.vectors
        ui random bake
        springies springies.ui ;
 
-IN: springies.models.ball
+IN: springies.models.urchin
 
 : model ( -- )
 
 { } clone >nodes
 { } clone >springs
-0.008 >time-slice
+0.007 >time-slice
 gravity on
 
 1 507.296953 392.174236 -11.451186 -71.267273 1.0 1.0 mass
@@ -103,7 +103,7 @@ gravity on
 65 23 12 200.0 3.0 72.277244 spng
 
 nodes>
-    100 random -100 + 0 2array [ over node-vel v+ swap set-node-vel ]
+    75 random -75 + 0 2array [ over node-vel v+ swap set-node-vel ]
 curry each
 
 ;
