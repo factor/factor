@@ -273,3 +273,9 @@ USE: sorting.private
     10 20 >vector <flat-slice>
     [ [ - ] swap old-binsearch ] compile-1 2nip
 ] unit-test
+
+! Regression
+[ 1 2 { real imaginary } ] [
+    C{ 1 2 }
+    [ { real imaginary } [ get-slots ] keep ] compile-1
+] unit-test
