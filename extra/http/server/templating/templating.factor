@@ -77,7 +77,10 @@ DEFER: <% delimiter
             parser-notes off
             templating-vocab use+
             dup source-file file set ! so that reload works properly
-            [ <file-reader> contents eval-template ] keep
+            [
+                ?resource-path <file-reader> contents
+                eval-template
+            ] keep
         ] with-scope
     ] assert-depth drop ;
 
