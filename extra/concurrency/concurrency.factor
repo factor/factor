@@ -286,13 +286,15 @@ TUPLE: promise fulfilled? value processes ;
 : fulfill ( value promise  -- )
     #! Set the future of the promise to the given value. Threads
     #! blocking on the promise will then be released.
-    dup promise-fulfilled? [
+    dup promise-fulfilled? [ 
+        2drop
+    ] [
         [ set-promise-value ] keep
         [ t swap set-promise-fulfilled? ] keep
         [ promise-processes ] keep
         0 <vector> swap set-promise-processes
         [ schedule-thread ] each yield
-    ] unless ;
+    ] if ;
 
 <PRIVATE
  : (maybe-block-promise) ( promise -- promise )
