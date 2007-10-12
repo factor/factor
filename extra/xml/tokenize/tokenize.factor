@@ -137,7 +137,7 @@ SYMBOL: ns-stack
     CHAR: > expect ;
 
 : take-cdata ( -- string )
-    "[CDATA[" expect-string "]]>" take-string next ;
+    "[CDATA[" expect-string "]]>" take-string ;
 
 : take-directive ( -- directive )
     CHAR: > take-char <directive> next ;
