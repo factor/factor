@@ -11,7 +11,7 @@ IN: io.sniffer.filter.bsd
     "long" heap-size 1- [ + ] keep bitnot bitand ;
 
 M: unix-io packet. ( string -- )
-    18 swap cut swap >byte-array bpfh.
+    18 cut swap >byte-array bpfh.
     (packet.) ;
 
 M: unix-io sniffer-loop ( stream -- )

@@ -98,7 +98,7 @@ PRIVATE>
         2dup nth \ break = [
             nip
         ] [
-            >r 1+ r> cut [ break ] swap 3append
+            swap 1+ cut [ break ] swap 3append
         ] if
     ] (step) ;
 
@@ -107,7 +107,7 @@ PRIVATE>
 
 : step-into ( interpreter -- )
     [
-        cut [
+        swap cut [
             swap % unclip literalize , \ (step-into) , %
         ] [ ] make
     ] (step) ;
