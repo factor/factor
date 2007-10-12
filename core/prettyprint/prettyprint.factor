@@ -120,7 +120,7 @@ SYMBOL: ->
 
 : remove-breakpoints ( quot pos -- quot' )
     over quotation? [
-        1+ swap cut [ (remove-breakpoints) ] 2apply
+        1+ cut [ (remove-breakpoints) ] 2apply
         [ -> ] swap 3append
     ] [
         drop
