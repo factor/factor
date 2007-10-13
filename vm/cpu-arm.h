@@ -5,6 +5,28 @@ register CELL rs asm("r6");
 
 #define F_FASTCALL
 
+typedef struct
+{
+	/* In compiled quotation frames, position within the array.
+	In compiled word frames, unused. */
+	CELL scan;
+
+	/* In compiled quotation frames, the quot->array slot.
+	In compiled word frames, unused. */
+	CELL array;
+
+	/* In all compiled frames, the XT on entry. */
+	XT xt;
+
+	/* Frame size in bytes */
+	CELL size;
+
+	/* Return address */
+	XT return_address;
+} F_STACK_FRAME;
+
+#define FRAME_RETURN_ADDRESS(frame) (frame)->return_address
+
 void c_to_factor(CELL quot);
 void dosym(CELL word);
 void docol_profiling(CELL word);
@@ -14,5 +36,3 @@ void set_callstack(F_STACK_FRAME *to, F_STACK_FRAME *from, CELL length, void *me
 void throw_impl(CELL quot, F_STACK_FRAME *rewind);
 void lazy_jit_compile(CELL quot);
 void flush_icache(CELL start, CELL len);
-
-#define FRAME_RETURN_ADDRESS(frame) *((XT *)(frame_successor(frame) + 1) + 1)

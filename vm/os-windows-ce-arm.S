@@ -1,6 +1,6 @@
 	.text
 
-	.globl run_toplevel
+	.globl c_to_factor_toplevel
 
 	.word exception_handler
 	.word 0

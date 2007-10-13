@@ -17,14 +17,12 @@ big-endian off
 : temp-reg R3 ;
 : xt-reg R12 ;
 
-: lr-save bootstrap-cell ;
-
 : stack-frame 8 bootstrap-cells ;
 
-: next-save stack-frame bootstrap-cell - ;
-: xt-save stack-frame 2 bootstrap-cells - ;
-: array-save stack-frame 3 bootstrap-cells - ;
-: scan-save stack-frame 4 bootstrap-cells - ;
+: next-save stack-frame 2 bootstrap-cells - ;
+: xt-save stack-frame 3 bootstrap-cells - ;
+: array-save stack-frame 4 bootstrap-cells - ;
+: scan-save stack-frame 5 bootstrap-cells - ;
 
 [
     temp-reg quot-reg quot-array@ <+> LDR      ! load array
@@ -32,12 +30,12 @@ big-endian off
 ] { } make jit-setup set
 
 [
+    LR SP 4 <-> STR                            ! save return address
     SP SP stack-frame SUB
     xt-reg SP xt-save <+> STR                  ! save XT
     xt-reg stack-frame MOV
     xt-reg SP next-save <+> STR                ! save frame size
     temp-reg SP array-save <+> STR             ! save array
-    LR SP lr-save stack-frame + <+> STR        ! save return address
 ] { } make jit-prolog set
 
 [
@@ -52,11 +50,11 @@ big-endian off
 ] { } make jit-push-wrapper set
 
 [
-    R1 SP MOV                                  ! pass stack pointer to primitive
+    R1 SP 4 SUB                                ! pass stack pointer to primitive
 ] { } make jit-word-primitive-jump set
 
 [
-    R1 SP MOV                                  ! pass stack pointer to primitive
+    R1 SP 4 SUB                                ! pass stack pointer to primitive
 ] { } make jit-word-primitive-call set
 
 : load-word-xt ( -- )
@@ -81,10 +79,10 @@ big-endian off
     xt-reg quot-reg quot-xt@ <+> LDR ;
 
 : load-branch
-    temp-reg ds-reg -4 <-!> LDR                ! pop boolean
+    temp-reg ds-reg 4 <-!> LDR                 ! pop boolean
     temp-reg \ f tag-number CMP                ! compare it with f
-    scan-reg quot-reg MOV                      ! point quot-reg at false branch
-    quot-reg dup 4 NE ADD                      ! point quot-reg at true branch
+    quot-reg scan-reg MOV                      ! point quot-reg at false branch
+    quot-reg dup 4 EQ ADD                      ! point quot-reg at true branch
     quot-reg dup 4 <+> LDR                     ! load the branch
     scan-reg dup 12 ADD                        ! advance scan pointer
     load-quot-xt
@@ -110,7 +108,7 @@ big-endian off
 
 [
     SP SP stack-frame ADD                      ! pop stack frame
-    LR SP lr-save stack-frame + <+> LDR        ! load return address
+    LR SP 4 <-> LDR                            ! load return address
 ] { } make jit-epilog set
 
 [ PC LR MOV ] { } make jit-return set

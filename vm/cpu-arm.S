@@ -3,17 +3,18 @@
 /* Note that the XT is passed to the quotation in r12 */
 #define CALL_QUOT \
         ldr r12,[r0, #9]     /* load quotation-xt slot */ ; \
-	mov pc,lr ; \
-        mov r11,pc
+	mov lr,pc ; \
+        mov pc,r12
 
 #define JUMP_QUOT \
-        ldr pc,[r0, #9]     /* load quotation-xt slot */
+        ldr r12,[r0, #9]     /* load quotation-xt slot */ ; \
+	mov pc,r12
 
 #define SAVED_REGS_SIZE 32
 
 #define FRAME (RESERVED_SIZE + SAVED_REGS_SIZE + 8)
 
-#define LR_SAVE [sp, #4]
+#define LR_SAVE [sp, #-4]
 #define RESERVED_SIZE 8
 
 #define SAVE_LR str lr,LR_SAVE
@@ -27,12 +28,12 @@
 #define RESTORE(register,offset) ldr register,[sp, #SAVE_AT(offset)]
 
 #define PROLOGUE \
-        sub sp,sp,#FRAME ; \
-        SAVE_LR
+	SAVE_LR ; \
+	sub sp,sp,#FRAME
 
 #define EPILOGUE \
-	LOAD_LR ; \
-	sub sp,sp,#FRAME
+	add sp,sp,#FRAME ; \
+	LOAD_LR
 
 DEF(void,c_to_factor,(CELL quot)):
         PROLOGUE
@@ -47,7 +48,7 @@ DEF(void,c_to_factor,(CELL quot)):
         SAVE(r11,7)
 	SAVE(r0,8)           /* save quotation since we're about to mangle it */
 
-        mov sp,r1            /* pass call stack pointer as an argument */
+        mov r0,sp            /* pass call stack pointer as an argument */
 	bl MANGLE(save_callstack_bottom)
 
 	RESTORE(r0,8)        /* restore quotation */
@@ -63,9 +64,9 @@ DEF(void,c_to_factor,(CELL quot)):
         RESTORE(r4,0)
 
         EPILOGUE
-        mov lr,pc
+        mov pc,lr
 
-/* The JIT compiles an 'mov sp,r1' in front of every primitive call, since a
+/* The JIT compiles an 'mov r1',sp in front of every primitive call, since a
 word which was defined as a primitive will not change its definition for the
 lifetime of the image -- adding new primitives requires a bootstrap. However,
 an undefined word can certainly become defined,
@@ -77,12 +78,12 @@ DEFER: foo
 And calls to non-primitives do not have this one-instruction prologue, so we
 set the XT of undefined words to this symbol. */
 DEF(void,undefined,(CELL word)):
-	mov sp,r1
+	mov r1,sp
 	b MANGLE(undefined_error)
 
 DEF(void,dosym,(CELL word)):
-	str r0,[r5], #4      /* push word to stack */
-	mov lr,pc            /* return */
+	str r0,[r5, #4]!     /* push word to stack */
+	mov pc,lr            /* return */
 
 /* Here we have two entry points. The first one is taken when profiling is
 enabled */
@@ -94,32 +95,32 @@ DEF(void,docol,(CELL word)):
         ldr r0,[r0, #13]     /* load word-def slot */
         JUMP_QUOT
 
-/* We must pass the XT to the quotation in r11. */
+/* We must pass the XT to the quotation in r12. */
 DEF(void,primitive_call,(void)):
-        ldr r0,[r5, #-4]!    /* load quotation from data stack */
+        ldr r0,[r5], #-4     /* load quotation from data stack */
         JUMP_QUOT
 
 /* We must preserve r1 here in case we're calling a primitive */
 DEF(void,primitive_execute,(void)):
-        ldr r0,[r5, #-4]!    /* load word from data stack */
+        ldr r0,[r5], #-4     /* load word from data stack */
         ldr pc,[r0, #29]     /* jump to word-xt */
 
 DEF(void,set_callstack,(F_STACK_FRAME *to, F_STACK_FRAME *from, CELL length)):
-        sub sp,r0,r2       /* compute new stack pointer */
-        mov r0,r1          /* start of destination of memcpy() */
-	str sp,[sp, #-64]  /* setup fake stack frame for memcpy() */
-        bl MANGLE(memcpy)  /* go */
-	ldr sp,[sp]        /* tear down fake stack frame */
-        ldr pc,LR_SAVE /* return */
+        sub sp,r0,r2         /* compute new stack pointer */
+        mov r0,sp            /* start of destination of memcpy() */
+	sub sp,sp,#12        /* alignment */
+        bl MANGLE(memcpy)    /* go */
+	add sp,sp,#16        /* point SP at innermost frame */
+        ldr pc,LR_SAVE       /* return */
 
 DEF(void,throw_impl,(CELL quot, F_STACK_FRAME *rewind_to)):
-	mov r1,sp          /* compute new stack pointer */
-	ldr lr,LR_SAVE /* we have rewound the stack; load return address */
-	JUMP_QUOT          /* call the quotation */
+	mov sp,r1            /* compute new stack pointer */
+	ldr lr,LR_SAVE       /* we have rewound the stack; load return address */
+	JUMP_QUOT            /* call the quotation */
 
 DEF(void,lazy_jit_compile,(CELL quot)):
-	mov sp,r1          /* save stack pointer */
+	mov r1,sp            /* save stack pointer */
 	PROLOGUE
 	bl MANGLE(primitive_jit_compile)
 	EPILOGUE
-        JUMP_QUOT          /* call the quotation */
+        JUMP_QUOT            /* call the quotation */
