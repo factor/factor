@@ -1,7 +1,10 @@
 
 USING: kernel math vectors sequences opengl.gl math.vectors
-math.matrices vars opengl self pos ori turtle lsys.tortoise
-lsys.strings ;
+       math.matrices vars opengl self pos ori turtle lsys.tortoise
+
+       lsys.strings.interpret ;
+
+       ! lsys.strings
 
 IN: lsys.tortoise.graphics
 

@@ -30,7 +30,7 @@ M: tuple class class-of-tuple ;
     swap [ index ] curry map ;
 
 : reshape-tuple ( oldtuple permutation -- newtuple )
-    >r tuple>array 2 swap cut r>
+    >r tuple>array 2 cut r>
     [ [ swap ?nth ] [ drop f ] if* ] curry* map
     append (>tuple) ;
 

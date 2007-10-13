@@ -14,8 +14,12 @@ USING: kernel namespaces threads math math.vectors quotations sequences
        ui.gadgets.theme
        vars rewrite-closures
        self pos ori turtle opengl.camera
-       lsys.tortoise lsys.tortoise.graphics lsys.strings
-;
+       lsys.tortoise lsys.tortoise.graphics
+       lsys.strings.rewrite lsys.strings.interpret ;
+
+       ! lsys.strings
+       ! lsys.strings.rewrite
+       ! lsys.strings.interpret
 
 IN: lsys.ui
 
@@ -147,7 +151,7 @@ make-pile 1 over set-pack-fill "L-system control" open-window ;
 
 : lsys-viewer ( -- )
 
-f <slate> >slate
+[ ] <slate> >slate
 { 400 400 } clone slate> set-slate-dim
 
 {

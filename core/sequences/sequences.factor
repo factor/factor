@@ -604,14 +604,14 @@ M: sequence <=>
         tuck length tail-slice* sequence=
     ] if ;
 
-: cut-slice ( n seq -- before after )
-    swap [ head ] 2keep tail-slice ;
+: cut-slice ( seq n -- before after )
+    [ head ] 2keep tail-slice ;
 
-: cut ( n seq -- before after )
-    swap [ head ] 2keep tail ;
+: cut ( seq n -- before after )
+    [ head ] 2keep tail ;
 
-: cut* ( n seq -- before after )
-    swap [ head* ] 2keep tail* ;
+: cut* ( seq n -- before after )
+    [ head* ] 2keep tail* ;
 
 <PRIVATE
 

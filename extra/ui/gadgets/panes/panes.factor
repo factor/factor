@@ -353,7 +353,6 @@ M: f sloppy-pick-up*
 : move-caret ( pane -- )
     dup hand-rel
     over sloppy-pick-up
-    2dup gadget-at-path scroll>gadget
     over set-pane-caret
     relayout-1 ;
 
@@ -372,6 +371,7 @@ M: f sloppy-pick-up*
                 dup caret>mark
             ] when
         ] if
+        dup dup pane-caret gadget-at-path scroll>gadget
     ] when drop ;
 
 : end-selection ( pane -- )

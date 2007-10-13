@@ -34,7 +34,7 @@ linkname magic version uname gname devmajor devminor prefix ;
     155 read-c-string* over set-tar-header-prefix ;
 
 : header-checksum ( seq -- x )
-    148 swap cut-slice 8 tail-slice
+    148 cut-slice 8 tail-slice
     [ 0 [ + ] reduce ] 2apply + 256 + ;
 
 TUPLE: checksum-error ;
