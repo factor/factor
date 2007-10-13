@@ -62,6 +62,7 @@ big-endian on
 ] { } make jit-word-primitive-call set
 
 : load-xt ( -- )
+    word-reg scan-reg 4 LWZU                   ! load word and advance
     xt-reg word-reg word-xt@ LWZ ;
 
 : jit-call
@@ -74,17 +75,9 @@ big-endian on
 : jit-jump
     xt-reg MTCTR BCTR ;
 
-[
-    word-reg scan-reg 4 LWZU                   ! load word and advance
-    load-xt
-    jit-call
-] { } make jit-word-call set
+[ load-xt jit-call ] { } make jit-word-call set
 
-[
-    word-reg scan-reg 4 LWZ                    ! load word
-    load-xt                                    ! jump to word XT
-    jit-jump
-] { } make jit-word-jump set
+[ load-xt jit-jump ] { } make jit-word-jump set
 
 : load-branch
     temp-reg ds-reg 0 LWZ                      ! load boolean
