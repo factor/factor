@@ -2,16 +2,17 @@
 
 register CELL ds asm("r5");
 register CELL rs asm("r6");
-register void **primitives asm("r7");
 
-void *native_stack_pointer(void);
+#define F_FASTCALL
 
-typedef CELL F_COMPILED_FRAME;
+void c_to_factor(CELL quot);
+void dosym(CELL word);
+void docol_profiling(CELL word);
+void docol(CELL word);
+void undefined(CELL word);
+void set_callstack(F_STACK_FRAME *to, F_STACK_FRAME *from, CELL length, void *memcpy);
+void throw_impl(CELL quot, F_STACK_FRAME *rewind);
+void lazy_jit_compile(CELL quot);
+void flush_icache(CELL start, CELL len);
 
-#define PREVIOUS_FRAME(frame) (frame + 1)
-#define RETURN_ADDRESS(frame) (*(frame))
-
-INLINE void execute(CELL word)
-{
-	untag_object(word)->xt(word);
-}
+#define FRAME_RETURN_ADDRESS(frame) *((XT *)(frame_successor(frame) + 1) + 1)

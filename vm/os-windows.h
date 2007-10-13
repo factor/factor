@@ -1,4 +1,3 @@
-#include <windows.h>
 #include <ctype.h>
 
 #ifndef wcslen
@@ -48,6 +47,4 @@ long getpagesize (void);
 s64 current_millis(void);
 
 INLINE void reset_stdio(void) {}
-
-long exception_handler(PEXCEPTION_POINTERS pe);
 

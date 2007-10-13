@@ -22,7 +22,7 @@ M: temp-reg v>operand drop R12 ;
 
 M: int-regs return-reg drop R0 ;
 M: int-regs param-regs drop { R0 R1 R2 R3 } ;
-M: int-regs vregs drop { R0 R1 R2 R3 } ;
+M: int-regs vregs drop { R0 R1 R2 R3 R4 R7 R8 R9 R10 R11 } ;
 
 ! No FPU support yet
 M: float-regs param-regs drop { } ;

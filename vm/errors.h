@@ -41,3 +41,9 @@ INLINE void type_check(CELL type, CELL tagged)
 {
 	if(type_of(tagged) != type) type_error(type,tagged);
 }
+
+/* Global variables used to pass fault handler state from signal handler to
+user-space */
+CELL signal_number;
+CELL signal_fault_addr;
+void *signal_callstack_top;
