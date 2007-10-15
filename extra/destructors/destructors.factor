@@ -1,35 +1,91 @@
 ! Copyright (C) 2007 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: continuations kernel namespaces sequences vectors ;
+USING: continuations io.backend libc kernel namespaces
+sequences system vectors ;
 IN: destructors
 
 SYMBOL: destructors
-SYMBOL: errored?
-TUPLE: destructor obj quot always? ;
 
-<PRIVATE
+TUPLE: destructor obj always? destroyed? ;
 
-: filter-destructors ( -- )
-    errored? get [
-        destructors [ [ destructor-always? ] subset ] change
-    ] unless ;
+: <destructor> ( obj always? -- newobj )
+    {
+        set-destructor-obj
+        set-destructor-always?
+    } destructor construct ;
 
-PRIVATE>
+: push-destructor ( obj -- )
+    destructors [ ?push ] change ;
 
-: add-destructor ( obj quot always? -- )
-    \ destructor construct-boa destructors [ ?push ] change ;
+GENERIC: (destruct) ( obj -- )
 
-: call-destructors ( -- )
-    destructors get [
-        dup destructor-obj swap destructor-quot call
-    ] each ;
+: destruct ( obj -- )
+    dup destructor-destroyed? [
+        drop
+    ] [
+        [ (destruct) t ] keep set-destructor-destroyed?
+    ] if ;
+
+: destruct-always ( destructor -- )
+    dup destructor-always? [
+        destruct
+    ] [
+        drop
+    ] if ;
 
 : with-destructors ( quot -- )
     [
-        [ call ] [ errored? on ] recover
-        filter-destructors call-destructors
-        errored? get [ rethrow ] when
+        [ call ]
+        [ destructors get [ destruct-always ] each ]
+        [ destructors get [ destruct ] each ] cleanup
     ] with-scope ; inline
+
+
+
+TUPLE: memory-destructor ;
+
+: <memory-destructor> ( obj ? -- newobj )
+    <destructor> memory-destructor construct-delegate ;
+
+TUPLE: handle-destructor ;
+
+: <handle-destructor> ( obj ? -- newobj )
+    <destructor> handle-destructor construct-delegate ;
+
+TUPLE: socket-destructor ;
+
+: <socket-destructor> ( obj ? -- newobj )
+    <destructor> socket-destructor construct-delegate ;
+
+M: memory-destructor (destruct) ( obj -- )
+    destructor-obj free ;
+
+HOOK: (handle-destructor) io-backend ( obj -- )
+HOOK: (socket-destructor) io-backend ( obj -- )
+
+M: handle-destructor (destruct) ( obj -- ) (handle-destructor) ;
+M: socket-destructor (destruct) ( obj -- ) (socket-destructor) ;
+
+: free-always ( alien -- )
+    t <memory-destructor> push-destructor ;
+
+: free-later ( alien -- )
+    f <memory-destructor> push-destructor ;
+
+: close-always ( handle -- )
+    t <handle-destructor> push-destructor ;
+
+: close-later ( handle -- )
+    f <handle-destructor> push-destructor ;
+
+: close-socket-always ( handle -- )
+    t <socket-destructor> push-destructor ;
+
+: close-socket-later ( handle -- )
+    f <socket-destructor> push-destructor ;
+
+USE-IF: windows? destructors.windows
+USE-IF: unix? destructors.unix
 
 
 

@@ -50,7 +50,7 @@ C: <sniffer-spec> sniffer-spec
 : make-ifreq-props ( ifname -- ifreq )
     "ifreq" <c-object>
     12 <short> 16 0 pad-right over set-ifreq-props
-    swap malloc-char-string dup [ free ] t add-destructor
+    swap malloc-char-string dup free-always
     over set-ifreq-name ;
 
 : make-ioctl-buffer ( fd -- buffer )
@@ -77,7 +77,7 @@ M: unix-io <sniffer> ( obj -- sniffer )
         [
             sniffer-spec-path
             open-read
-            dup [ unix:close ] f add-destructor
+            dup close-later
         ] keep
         dupd sniffer-spec-ifname ioctl-sniffer-fd
         dup make-ioctl-buffer
