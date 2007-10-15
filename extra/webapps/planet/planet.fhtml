@@ -1,0 +1,39 @@
+<% USING: namespaces html.elements webapps.planet sequences ; %>
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+	"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+	<meta http-equiv="Content-type" content="text/html; charset=utf-8" />
+
+	<title>planet-factor</title>
+	<link rel="stylesheet" href="/responder/file/css/news.css" type="text/css" media="screen" title="no title" charset="utf-8" />
+</head>
+
+<body id="index">
+    <h1 class="planet-title">[ planet-factor ]</h1>
+    <table width="100%" cellpadding="10">
+        <tr>
+            <td> <% cached-postings get 20 head print-postings %> </td>
+            <td valign="top" width="25%" class="infobox">
+                <p>
+                    <b>planet-factor</b> is an Atom/RSS aggregator that collects the
+                    contents of <a href="http://factorcode.org/">Factor</a>-related blogs. It is inspired by
+                    <a href="http://planet.lisp.org">Planet Lisp</a>.
+                </p>
+                <p>
+                    This webapp is written in <a href="http://factorcode.org/">Factor</a>.
+                    <% "webapps.planet" browse-webapp-source %>
+                </p>
+                <h2 class="blogroll-title">Blogroll</h2>
+                <% default-blogroll get print-blogroll %>
+                <p>
+                    If you want your weblog added to the blogroll, <a href="http://factorcode.org/gethelp.fhtml">just ask</a>.
+                </p>
+            </td>
+        </tr>
+    </table>
+</body>
+
+</html>
