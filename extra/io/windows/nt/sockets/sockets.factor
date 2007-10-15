@@ -81,7 +81,7 @@ TUPLE: AcceptEx-args port
 
 : init-accept-buffer ( server-port AcceptEx -- )
     >r server-port-addr sockaddr-type heap-size 16 +
-    dup dup 2 * malloc dup [ free ] t add-destructor r>
+    dup dup 2 * malloc dup free-always r>
     [ set-AcceptEx-args-lpOutputBuffer* ] keep
     [ set-AcceptEx-args-dwLocalAddressLength* ] keep
     set-AcceptEx-args-dwRemoteAddressLength* ;
@@ -174,17 +174,17 @@ TUPLE: WSARecvFrom-args port
         set-WSARecvFrom-args-s*
     ] 2keep [
         >r datagram-port-addr sockaddr-type heap-size r>
-        2dup >r malloc dup [ free ] t add-destructor r> set-WSARecvFrom-args-lpFrom*
-        >r malloc-int dup [ free ] t add-destructor r> set-WSARecvFrom-args-lpFromLen*
+        2dup >r malloc dup free-always r> set-WSARecvFrom-args-lpFrom*
+        >r malloc-int dup free-always r> set-WSARecvFrom-args-lpFromLen*
     ] keep
-    "WSABUF" malloc-object dup [ free ] t add-destructor
+    "WSABUF" malloc-object dup free-always
     2dup swap set-WSARecvFrom-args-lpBuffers*
-    default-buffer-size [ malloc dup [ free ] t add-destructor ] keep
+    default-buffer-size [ malloc dup free-always ] keep
     pick set-WSABUF-len
     swap set-WSABUF-buf
     1 over set-WSARecvFrom-args-dwBufferCount*
-    0 malloc-int dup [ free ] t add-destructor over set-WSARecvFrom-args-lpFlags*
-    0 malloc-int dup [ free ] t add-destructor over set-WSARecvFrom-args-lpNumberOfBytesRecvd*
+    0 malloc-int dup free-always over set-WSARecvFrom-args-lpFlags*
+    0 malloc-int dup free-always over set-WSARecvFrom-args-lpNumberOfBytesRecvd*
     (make-overlapped) [ over set-WSARecvFrom-args-lpOverlapped* ] keep
     swap WSARecvFrom-args-port set-port-overlapped ;
 
@@ -230,14 +230,14 @@ TUPLE: WSASendTo-args port
         set-WSASendTo-args-s*
     ] keep [
         >r make-sockaddr >r
-        malloc-byte-array dup [ free ] t add-destructor
+        malloc-byte-array dup free-always
         r> heap-size r>
         [ set-WSASendTo-args-iToLen* ] keep
         set-WSASendTo-args-lpTo*
     ] keep [
-        "WSABUF" malloc-object dup [ free ] t add-destructor
+        "WSABUF" malloc-object dup free-always
         dup rot set-WSASendTo-args-lpBuffers*
-        swap [ malloc-byte-array dup [ free ] t add-destructor ] keep length
+        swap [ malloc-byte-array dup free-always ] keep length
         rot [ set-WSABUF-len ] keep
         set-WSABUF-buf
     ] keep

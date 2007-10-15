@@ -31,7 +31,7 @@ TYPEDEF: TOKEN_PRIVILEGES* PTOKEN_PRIVILEGES
     "TOKEN_PRIVILEGES" <c-object>
     1 [ over set-TOKEN_PRIVILEGES-PrivilegeCount ] keep
     "LUID_AND_ATTRIBUTES" malloc-array
-    dup [ free ] t add-destructor over set-TOKEN_PRIVILEGES-Privileges
+    dup free-always over set-TOKEN_PRIVILEGES-Privileges
 
     swap [
         SE_PRIVILEGE_ENABLED over TOKEN_PRIVILEGES-Privileges
@@ -60,10 +60,10 @@ TYPEDEF: TOKEN_PRIVILEGES* PTOKEN_PRIVILEGES
     { "SeCreateGlobalPrivilege" "SeLockMemoryPrivilege" } [
         >r >r open-file dup f r> 0 0 f
         CreateFileMapping [ win32-error=0/f ] keep
-        dup [ CloseHandle drop ] f add-destructor
+        dup close-later
         dup
         r> 0 0 0 MapViewOfFile [ win32-error=0/f ] keep
-        dup [ CloseHandle drop ] f add-destructor
+        dup close-later
     ] with-privileges ;
     
 M: windows-io <mapped-file> ( path length -- mmap )
@@ -81,7 +81,7 @@ M: windows-io <mapped-file> ( path length -- mmap )
 M: windows-io close-mapped-file ( mapped-file -- )
     [
         dup mapped-file-handle [
-            [ CloseHandle drop ] t add-destructor
+            close-always
         ] each
         mapped-file-address UnmapViewOfFile win32-error=0/f
     ] with-destructors ;
