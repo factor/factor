@@ -84,10 +84,6 @@ M: socket-destructor (destruct) ( obj -- ) (socket-destructor) ;
 : close-socket-later ( handle -- )
     f <socket-destructor> push-destructor ;
 
-USE-IF: windows? destructors.windows
-USE-IF: unix? destructors.unix
-
-
 
 ! : add-destructor ( word quot -- )
     ! >quotation

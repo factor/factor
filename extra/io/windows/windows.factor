@@ -10,6 +10,12 @@ TUPLE: windows-nt-io ;
 TUPLE: windows-ce-io ;
 UNION: windows-io windows-nt-io windows-ce-io ;
 
+M: windows-io (handle-destructor) ( obj -- )
+    destructor-obj CloseHandle drop ;
+
+M: windows-io (socket-destructor) ( obj -- )
+    destructor-obj closesocket drop ;
+
 M: windows-io root-directory? ( path -- ? )
     [ path-separator? ] rtrim
     dup length 2 = [
