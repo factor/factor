@@ -1,4 +1,4 @@
-USING: kernel math tools.test ;
+USING: kernel math math.parser tools.test ;
 IN: temporary
 
 [ 1 2 ] [ 1/2 >fraction ] unit-test
@@ -79,3 +79,27 @@ unit-test
 
 [ -1/2 ] [ 1/2 1- ] unit-test
 [ 3/2 ] [ 1/2 1+ ] unit-test
+
+[ 1 ] [ 0.5 1/2 + ] unit-test
+[ 1 ] [ 1/2 0.5 + ] unit-test
+
+[ 1/268435456 ] [ -1 -268435456 >fixnum / ] unit-test
+
+[ 5 ]
+[ "10/2" string>number ]
+unit-test
+
+[ -5 ]
+[ "-10/2" string>number ]
+unit-test
+
+[ -5 ]
+[ "10/-2" string>number ]
+unit-test
+
+[ 5 ]
+[ "-10/-2" string>number ]
+unit-test
+[ "33/100" ]
+[ "66/200" string>number number>string ]
+unit-test

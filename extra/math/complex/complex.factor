@@ -2,12 +2,11 @@
 ! See http://factorcode.org/license.txt for BSD license.
 IN: math.complex.private
 USING: kernel kernel.private math math.private
-math.libm math.functions ;
+math.libm math.functions prettyprint.backend arrays
+math.functions.private sequences parser ;
 
 M: real real ;
 M: real imaginary drop 0 ;
-
-M: number equal? number= ;
 
 M: complex absq >rect [ sq ] 2apply + ;
 
@@ -34,3 +33,9 @@ M: complex abs absq >float fsqrt ;
 M: complex sqrt >polar swap fsqrt swap 2.0 / polar> ;
 
 M: complex hashcode* nip >rect >fixnum swap >fixnum bitxor ;
+
+M: complex >pprint-sequence >rect 2array ;
+
+IN: syntax
+
+: C{ \ } [ first2 rect> ] parse-literal ; parsing

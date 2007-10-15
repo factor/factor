@@ -20,12 +20,9 @@ typedef struct
 
 	/* Frame size in bytes */
 	CELL size;
-
-	/* Return address */
-	XT return_address;
 } F_STACK_FRAME;
 
-#define FRAME_RETURN_ADDRESS(frame) (frame)->return_address
+#define FRAME_RETURN_ADDRESS(frame) *(XT *)(frame_successor(frame) + 1)
 
 void c_to_factor(CELL quot);
 void dosym(CELL word);

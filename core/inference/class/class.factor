@@ -2,8 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: arrays generic assocs hashtables inference kernel
 math namespaces sequences words parser math.intervals
-math.vectors effects classes inference.dataflow
-inference.backend ;
+effects classes inference.dataflow inference.backend ;
 IN: inference.class
 
 ! Class inference

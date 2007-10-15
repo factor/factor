@@ -77,7 +77,6 @@ IN: bootstrap.syntax
 "?{" [ \ } [ >bit-array ] parse-literal ] define-syntax
 "F{" [ \ } [ >float-array ] parse-literal ] define-syntax
 "H{" [ \ } [ >hashtable ] parse-literal ] define-syntax
-"C{" [ \ } [ first2 rect> ] parse-literal ] define-syntax
 "T{" [ \ } [ >tuple ] parse-literal ] define-syntax
 "W{" [ \ } [ first <wrapper> ] parse-literal ] define-syntax
 
@@ -165,5 +164,3 @@ IN: bootstrap.syntax
 ] define-syntax
 
 "MAIN:" [ scan-word in get vocab set-vocab-main ] define-syntax
-
-"bootstrap.syntax" forget-vocab

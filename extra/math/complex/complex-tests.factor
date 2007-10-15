@@ -1,4 +1,5 @@
-USING: kernel math math.constants math.functions tools.test ;
+USING: kernel math math.constants math.functions tools.test
+prettyprint ;
 IN: temporary
 
 [ 1 C{ 0 1 } rect> ] unit-test-fails
@@ -63,3 +64,5 @@ IN: temporary
 [ ] [ C{ 1 4 } tan drop ] unit-test
 [ ] [ C{ 1 4 } coth drop ] unit-test
 [ ] [ C{ 1 4 } cot drop ] unit-test
+
+[ "C{ 1/2 2/3 }" ] [ C{ 1/2 2/3 } unparse ] unit-test

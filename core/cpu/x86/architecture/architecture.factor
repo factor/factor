@@ -2,8 +2,8 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: alien alien.c-types alien.compiler arrays
 cpu.x86.assembler cpu.architecture kernel kernel.private math
-math.functions memory namespaces sequences words generator
-generator.registers generator.fixup system layouts combinators ;
+memory namespaces sequences words generator generator.registers
+generator.fixup system layouts combinators ;
 IN: cpu.x86.architecture
 
 TUPLE: x86-backend cell ;

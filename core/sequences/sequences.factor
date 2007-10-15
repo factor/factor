@@ -655,3 +655,9 @@ PRIVATE>
 
 : trim ( seq quot -- newseq )
     [ ltrim ] keep rtrim ; inline
+
+: sum ( seq -- n ) 0 [ + ] reduce ;
+: product ( seq -- n ) 1 [ * ] reduce ;
+
+: infimum ( seq -- n ) dup first [ min ] reduce ;
+: supremum ( seq -- n ) dup first [ max ] reduce ;

@@ -5,7 +5,7 @@ USING: alien arrays generic hashtables kernel assocs math
 math.private kernel.private sequences words parser
 inference.class inference.dataflow vectors strings sbufs io
 namespaces assocs quotations math.intervals sequences.private
-math.libm combinators splitting layouts math.parser classes
+combinators splitting layouts math.parser classes
 generic.math optimizer.pattern-match optimizer.backend
 optimizer.def-use generic.standard ;
 
@@ -439,17 +439,3 @@ most-negative-fixnum most-positive-fixnum [a,b]
         [ splice-quot ] curry ,
     ] { } make 1array define-optimizers
 ] assoc-each
-
-! This will go away when we have cross-word type inference
-{
-    facos fasin fatan
-    fcos fexp fcosh flog fpow
-    fsin fsinh fsqrt
-} [
-    [ drop { float } f ]
-    "output-classes" set-word-prop
-] each
-
-\ fatan2
-[ drop { float float } f ]
-"output-classes" set-word-prop

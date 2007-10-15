@@ -3,21 +3,27 @@
 void default_parameters(F_PARAMETERS *p)
 {
 	p->image = NULL;
-	p->ds_size = 128;
-	p->rs_size = 128;
 
 	/* We make a wild guess here that if we're running on ARM, we don't
 	have a lot of memory. */
 #ifdef FACTOR_ARM
+	p->ds_size = 8 * CELLS;
+	p->rs_size = 8 * CELLS;
+
 	p->gen_count = 2;
-	p->code_size = 2 * CELLS;
+	p->code_size = 4;
+	p->young_size = 1;
+	p->aging_size = 4;
 #else
+	p->ds_size = 32 * CELLS;
+	p->rs_size = 32 * CELLS;
+
 	p->gen_count = 3;
 	p->code_size = 4 * CELLS;
-#endif
-
 	p->young_size = 2 * CELLS;
 	p->aging_size = 4 * CELLS;
+#endif
+
 	p->secure_gc = false;
 	p->fep = false;
 }
@@ -134,9 +140,7 @@ void init_factor_from_args(F_CHAR *image, int argc, F_CHAR **argv, bool embedded
 	if(p.fep)
 		factorbug();
 
-	printf("about to call boot\n");
-	c_to_factor(userenv[BOOT_ENV]);
-	printf("return from call boot\n");
+	c_to_factor_toplevel(userenv[BOOT_ENV]);
 	unnest_stacks();
 
 	for(i = 0; i < argc; i++)

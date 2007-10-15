@@ -3,7 +3,7 @@
 USING: kernel cpu.ppc.architecture cpu.ppc.assembler
 kernel.private namespaces math sequences generic arrays
 generator generator.registers generator.fixup system layouts
-math.functions cpu.architecture alien ;
+cpu.architecture alien ;
 IN: cpu.ppc.allot
 
 : load-zone-ptr ( reg -- )

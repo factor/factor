@@ -155,7 +155,6 @@ GENERIC: >pprint-sequence ( obj -- seq )
 
 M: object >pprint-sequence ;
 
-M: complex >pprint-sequence >rect 2array ;
 M: hashtable >pprint-sequence >alist ;
 M: tuple >pprint-sequence tuple>array ;
 M: wrapper >pprint-sequence wrapped 1array ;

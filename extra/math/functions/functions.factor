@@ -1,7 +1,27 @@
 ! Copyright (C) 2004, 2007 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: math kernel math.constants math.libm combinators ;
+USING: math kernel math.constants math.private
+math.libm combinators ;
 IN: math.functions
+
+<PRIVATE
+
+: (rect>) ( x y -- z )
+    dup zero? [ drop ] [ <complex> ] if ; inline
+
+PRIVATE>
+
+: rect> ( x y -- z )
+    over real? over real? and [
+        (rect>)
+    ] [
+        "Complex number must have real components" throw
+    ] if ; inline
+
+GENERIC: sqrt ( x -- y ) foldable
+
+M: real sqrt
+    >float dup 0.0 < [ neg fsqrt 0.0 swap rect> ] [ fsqrt ] if ;
 
 : each-bit ( n quot -- )
     over 0 number= pick -1 number= or [
@@ -62,7 +82,11 @@ M: integer (^)
 
 GENERIC: abs ( x -- y ) foldable
 
+M: real abs dup 0 < [ neg ] when ;
+
 GENERIC: absq ( x -- y ) foldable
+
+M: real absq sq ;
 
 : ~abs ( x y epsilon -- ? )
     >r - abs r> < ;
@@ -81,9 +105,12 @@ GENERIC: absq ( x -- y ) foldable
 : power-of-2? ( n -- ? )
     dup 0 < [ drop f ] [ dup 1- bitand zero? ] if ; foldable
 
-: align ( m w -- n ) 1- [ + ] keep bitnot bitand ; inline
+: >rect ( z -- x y ) dup real swap imaginary ; inline
 
 : conjugate ( z -- z* ) >rect neg rect> ; inline
+
+: >float-rect ( z -- x y )
+    >rect swap >float swap >float ; inline
 
 : arg ( z -- arg ) >float-rect swap fatan2 ; inline
 
@@ -160,18 +187,32 @@ M: number (^)
 : [-1,1]? ( x -- ? )
     dup complex? [ drop f ] [ abs 1 <= ] if ; inline
 
+: i* ( x -- y ) >rect neg swap rect> ;
+
+: -i* ( x -- y ) >rect swap neg rect> ;
+
 : asin ( x -- y )
-    dup [-1,1]? [ >float fasin ] [ i * asinh -i * ] if ; inline
+    dup [-1,1]? [ >float fasin ] [ i* asinh -i* ] if ; inline
 
 : acos ( x -- y )
     dup [-1,1]? [ >float facos ] [ asin pi 2 / swap - ] if ;
     inline
 
 : atan ( x -- y )
-    dup [-1,1]? [ >float fatan ] [ i * atanh i * ] if ; inline
+    dup [-1,1]? [ >float fatan ] [ i* atanh i* ] if ; inline
 
 : asec ( x -- y ) recip acos ; inline
 
 : acosec ( x -- y ) recip asin ; inline
 
 : acot ( x -- y ) recip atan ; inline
+
+: truncate ( x -- y ) dup 1 mod - ; inline
+
+: round ( x -- y ) dup sgn 2 / + truncate ; inline
+
+: floor ( x -- y )
+    dup 1 mod dup zero?
+    [ drop ] [ dup 0 < [ - 1- ] [ - ] if ] if ; foldable
+
+: ceiling ( x -- y ) neg floor neg ; foldable

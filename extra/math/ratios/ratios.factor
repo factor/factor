@@ -1,11 +1,26 @@
 ! Copyright (C) 2004, 2006 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-IN: math.ratios.private
-USING: kernel kernel.private math math.functions
-math.private ;
+IN: math.ratios
+USING: kernel kernel.private math math.functions math.private ;
+
+: >fraction ( a/b -- a b )
+    dup numerator swap denominator ; inline
+
+: 2>fraction ( a/b c/d -- a c b d )
+    [ >fraction ] 2apply swapd ; inline
+
+<PRIVATE
 
 : fraction> ( a b -- a/b )
     dup 1 number= [ drop ] [ <ratio> ] if ; inline
+
+: scale ( a/b c/d -- a*d b*c )
+    2>fraction >r * swap r> * swap ; inline
+
+: ratio+d ( a/b c/d -- b*d )
+    denominator swap denominator * ; inline
+
+PRIVATE>
 
 M: integer /
     dup zero? [
@@ -14,15 +29,6 @@ M: integer /
         dup 0 < [ [ neg ] 2apply ] when
         2dup gcd nip tuck /i >r /i r> fraction>
     ] if ;
-
-: 2>fraction ( a/b c/d -- a c b d )
-    [ >fraction ] 2apply swapd ; inline
-
-: scale ( a/b c/d -- a*d b*c )
-    2>fraction >r * swap r> * swap ; inline
-
-: ratio+d ( a/b c/d -- b*d )
-    denominator swap denominator * ; inline
 
 M: ratio number=
     2>fraction number= [ number= ] [ 2drop f ] if ;

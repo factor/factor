@@ -94,6 +94,19 @@ ARTICLE: "math-functions" "Mathematical functions"
 
 ABOUT: "math-functions"
 
+HELP: (rect>)
+{ $values { "x" real } { "y" real } { "z" number } }
+{ $description "Creates a complex number from real and imaginary components." }
+{ $warning "This word does not check that the arguments are real numbers, which can have undefined consequences. Use the " { $link rect> } " word instead." } ;
+
+HELP: rect>
+{ $values { "x" real } { "y" real } { "z" number } }
+{ $description "Creates a complex number from real and imaginary components." } ;
+
+HELP: >rect
+{ $values { "z" number } { "x" real } { "y" real } }
+{ $description "Extracts the real and imaginary components of a complex number." } ;
+
 HELP: power-of-2?
 { $values { "n" integer } { "?" "a boolean" } }
 { $description "Tests if " { $snippet "n" } " is a power of 2." } ;
@@ -281,3 +294,24 @@ HELP: ~
         { { $snippet "epsilon" } " is negative: relative distance test." }
     }
 } ;
+
+
+HELP: truncate
+{ $values { "x" real } { "y" "a whole real number" } }
+{ $description "Outputs the number that results from subtracting the fractional component of " { $snippet "x" } "." }
+{ $notes "The result is not necessarily an integer." } ;
+
+HELP: floor
+{ $values { "x" real } { "y" "a whole real number" } }
+{ $description "Outputs the greatest whole number smaller than or equal to " { $snippet "x" } "." }
+{ $notes "The result is not necessarily an integer." } ;
+
+HELP: ceiling
+{ $values { "x" real } { "y" "a whole real number" } }
+{ $description "Outputs the least whole number greater than or equal to " { $snippet "x" } "." }
+{ $notes "The result is not necessarily an integer." } ;
+
+HELP: round
+{ $values { "x" real } { "y" "a whole real number" } }
+{ $description "Outputs the whole number closest to " { $snippet "x" } "." }
+{ $notes "The result is not necessarily an integer." } ;

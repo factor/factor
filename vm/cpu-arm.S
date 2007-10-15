@@ -48,7 +48,7 @@ DEF(void,c_to_factor,(CELL quot)):
         SAVE(r11,7)
 	SAVE(r0,8)           /* save quotation since we're about to mangle it */
 
-        mov r0,sp            /* pass call stack pointer as an argument */
+        sub r0,sp,#4         /* pass call stack pointer as an argument */
 	bl MANGLE(save_callstack_bottom)
 
 	RESTORE(r0,8)        /* restore quotation */
@@ -78,7 +78,7 @@ DEFER: foo
 And calls to non-primitives do not have this one-instruction prologue, so we
 set the XT of undefined words to this symbol. */
 DEF(void,undefined,(CELL word)):
-	mov r1,sp
+	sub r1,sp,#4
 	b MANGLE(undefined_error)
 
 DEF(void,dosym,(CELL word)):

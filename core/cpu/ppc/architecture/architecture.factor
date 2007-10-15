@@ -3,7 +3,7 @@
 USING: alien.c-types cpu.ppc.assembler cpu.architecture generic
 kernel kernel.private math memory namespaces sequences words
 assocs generator generator.registers generator.fixup system
-layouts math.functions classes words.private alien combinators ;
+layouts classes words.private alien combinators ;
 IN: cpu.ppc.architecture
 
 TUPLE: ppc-backend ;

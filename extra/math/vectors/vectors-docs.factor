@@ -21,12 +21,7 @@ $nl
 { $subsection v. }
 { $subsection norm }
 { $subsection norm-sq }
-{ $subsection normalize }
-"Combining all the values in a vector into a scalar with " { $link reduce } ":"
-{ $subsection sum }
-{ $subsection product }
-{ $subsection supremum }
-{ $subsection infimum } ;
+{ $subsection normalize } ;
 
 ABOUT: "math-vectors"
 
@@ -105,21 +100,3 @@ HELP: set-axis
 { $values { "u" "a sequence of numbers" } { "v" "a sequence of numbers" } { "axis" "a sequence of 0/1" } { "w" "a sequence of numbers" } }
 { $description "Using " { $snippet "w" } " as a template, creates a new sequence containing corresponding elements from " { $snippet "u" } " in place of 0, and corresponding elements from " { $snippet "v" } " in place of 1." }
 { $examples { $example "USE: math.vectors" "{ 1 2 3 } { 4 5 6 } { 0 1 0 } set-axis ." "{ 1 5 3 }" } } ;
-
-HELP: sum
-{ $values { "seq" "a sequence of numbers" } { "n" "a number" } }
-{ $description "Outputs the sum of all elements of " { $snippet "seq" } ". Outputs zero given an empty sequence." } ;
-
-HELP: product
-{ $values { "seq" "a sequence of numbers" } { "n" "a number" } }
-{ $description "Outputs the product of all elements of " { $snippet "seq" } ". Outputs one given an empty sequence." } ;
-
-HELP: infimum
-{ $values { "seq" "a sequence of real numbers" } { "n" "a number" } }
-{ $description "Outputs the least element of " { $snippet "seq" } "." }
-{ $errors "Throws an error if the sequence is empty." } ;
-
-HELP: supremum
-{ $values { "seq" "a sequence of real numbers" } { "n" "a number" } }
-{ $description "Outputs the greatest element of " { $snippet "seq" } "." }
-{ $errors "Throws an error if the sequence is empty." } ;

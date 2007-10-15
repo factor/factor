@@ -1,7 +1,7 @@
 ! Copyright (C) 2006, 2007 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel cpu.architecture cpu.arm.assembler
-cpu.arm.architecture namespaces math math.functions sequences
+cpu.arm.architecture namespaces math sequences
 generator generator.registers generator.fixup system layouts
 alien ;
 IN: cpu.arm.allot

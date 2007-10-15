@@ -19,11 +19,14 @@ IN: bootstrap.stage2
 
     parse-command-line
 
-    "Cross-referencing..." print flush
     H{ } clone changed-words set-global
-    H{ } clone crossref set-global
-    xref-words
-    xref-sources
+
+    "-no-crossref" cli-args member? [
+        "Cross-referencing..." print flush
+        H{ } clone crossref set-global
+        xref-words
+        xref-sources
+    ] unless
 
     ! Set dll paths
     wince? [ "windows.ce" require ] when
@@ -34,6 +37,7 @@ IN: bootstrap.stage2
     ] [
         "listener" require
         "none" require
+        "listener" use+
     ] if
 
     [

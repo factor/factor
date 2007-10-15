@@ -5,7 +5,7 @@ cpu.ppc.architecture cpu.ppc.allot cpu.architecture kernel
 kernel.private math math.private namespaces sequences words
 generic quotations byte-arrays hashtables hashtables.private
 generator generator.registers generator.fixup sequences.private
-sbufs vectors system layouts math.functions math.floats.private
+sbufs vectors system layouts math.floats.private
 classes tuples tuples.private sbufs.private vectors.private
 strings.private slots.private combinators bit-arrays
 float-arrays ;
@@ -373,14 +373,6 @@ IN: cpu.ppc.intrinsics
     { +scratch+ { { float "scratch" } { f "out" } } }
     { +output+ { "out" } }
 } define-intrinsic
-
-! \ fsqrt [
-!     "y" operand "x" operand FSQRT
-! ] H{
-!     { +input+ { { float "x" } } }
-!     { +scratch+ { { float "y" } } }
-!     { +output+ { "y" } }
-! } define-intrinsic
 
 \ tag [
     "out" operand "in" operand tag-mask get ANDI

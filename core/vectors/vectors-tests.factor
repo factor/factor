@@ -10,7 +10,7 @@ IN: temporary
 
 [ -3 V{ } nth ] unit-test-fails
 [ 3 V{ } nth ] unit-test-fails
-[ 3 C{ 1 2 } nth ] unit-test-fails
+[ 3 54.3 nth ] unit-test-fails
 
 [ "hey" [ 1 2 ] set-length ] unit-test-fails
 [ "hey" V{ 1 2 } set-length ] unit-test-fails

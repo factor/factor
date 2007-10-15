@@ -2,10 +2,9 @@ IN: temporary
 USING: arrays compiler kernel kernel.private math
 math.private sequences strings tools.test words continuations
 sequences.private hashtables.private byte-arrays
-strings.private system random math.vectors layouts
+strings.private system random layouts
 vectors.private sbufs.private strings.private slots.private
-alien alien.c-types alien.syntax namespaces libc math.constants
-math.functions ;
+alien alien.c-types alien.syntax namespaces libc ;
 
 ! Make sure that intrinsic ops compile to correct code.
 [ ] [ 1 [ drop ] compile-1 ] unit-test

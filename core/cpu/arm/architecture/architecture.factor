@@ -1,7 +1,7 @@
 ! Copyright (C) 2007 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: alien alien.c-types arrays cpu.arm.assembler compiler
-kernel kernel.private math math.functions namespaces words
+kernel kernel.private math namespaces words
 words.private generator.registers generator.fixup generator
 cpu.architecture system layouts ;
 IN: cpu.arm.architecture

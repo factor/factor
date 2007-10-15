@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 IN: inference.backend
 USING: inference.dataflow arrays generic io io.streams.string
-kernel math math.vectors namespaces parser prettyprint sequences
+kernel math namespaces parser prettyprint sequences
 strings vectors words quotations effects classes continuations
 debugger assocs combinators ;
 

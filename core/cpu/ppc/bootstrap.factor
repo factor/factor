@@ -1,7 +1,7 @@
 ! Copyright (C) 2007 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: bootstrap.image.private kernel namespaces system
-cpu.ppc.assembler math math.functions layouts words vocabs ;
+cpu.ppc.assembler math layouts words vocabs ;
 IN: bootstrap.ppc
 
 4 \ cell set

@@ -23,6 +23,7 @@ vocabs.loader system ;
     \ boot ,
 
     "math.integers" require
+    "math.floats" require
     "memory" require
     "io.streams.c" require
     "vocabs.loader" require

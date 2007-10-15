@@ -1,5 +1,4 @@
-USING: help.markup help.syntax math math.private math.functions
-math.ratios.private ;
+USING: help.markup help.syntax math math.private ;
 IN: math.integers
 
 ARTICLE: "integers" "Integers"
