@@ -8,6 +8,5 @@ IN: temporary
 [ ] [ [ "Errors, errors" throw ] in-thread ] unit-test
 yield
 
-[ ] [ 1 2 / sleep ] unit-test
 [ ] [ 0.3 sleep ] unit-test
 [ "hey" sleep ] unit-test-fails

@@ -22,5 +22,5 @@ unit-test-fails
 
 [ ] [
     10 V{ } [ set-length ] keep
-    1/2 swap set-length
+    0.5 swap set-length
 ] unit-test

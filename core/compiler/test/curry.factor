@@ -7,8 +7,8 @@ IN: temporary
 [ 3 ] [ [ 5 2 [ - ] 2curry call ] compile-1 ] unit-test
 [ 3 ] [ 5 [ 2 [ - ] 2curry call ] compile-1 ] unit-test
 [ 3 ] [ 5 2 [ [ - ] 2curry call ] compile-1 ] unit-test
-[ 1/3 ] [ 5 2 [ [ - ] 2curry 1 swap call / ] compile-1 ] unit-test
-[ 1/3 ] [ 5 2 [ [ - ] 2curry >r 1 r> call / ] compile-1 ] unit-test
+[ 3 ] [ 5 2 [ [ - ] 2curry 9 swap call /i ] compile-1 ] unit-test
+[ 3 ] [ 5 2 [ [ - ] 2curry >r 9 r> call /i ] compile-1 ] unit-test
 
 [ -10 -20 ] [ 10 20 -1 [ [ * ] curry 2apply ] compile-1 ] unit-test
 

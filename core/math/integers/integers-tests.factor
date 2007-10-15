@@ -98,7 +98,6 @@ unit-test
 [ 16 ] [ 13 next-power-of-2 ] unit-test
 [ 16 ] [ 16 next-power-of-2 ] unit-test
 
-[ 268435456 ] [ -268435456 >fixnum -1 / ] unit-test
 [ 268435456 ] [ -268435456 >fixnum -1 /i ] unit-test
 [ 268435456 0 ] [ -268435456 >fixnum -1 /mod ] unit-test
 [ 0 ] [ -1 -268435456 >fixnum /i ] unit-test

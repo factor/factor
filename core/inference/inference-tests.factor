@@ -230,8 +230,8 @@ DEFER: do-crap*
 ! Error reporting is wrong
 MATH: xyz
 M: fixnum xyz 2array ;
-M: ratio xyz 
-    [ >fraction ] 2apply swapd >r 2array swap r> 2array swap ;
+M: float xyz
+    [ 3 ] 2apply swapd >r 2array swap r> 2array swap ;
 
 [ t ] [ [ [ xyz ] infer short-effect ] catch inference-error? ] unit-test
 

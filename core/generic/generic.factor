@@ -21,7 +21,7 @@ M: object perform-combination
     #! method combination, and a method on the generic, and the
     #! method combination is forgotten first, then forgetting
     #! the method will throw an error. We don't want that.
-    nip [ "Invalid method combination" throw ] curry ;
+    nip [ "Invalid method combination" throw ] curry [ ] like ;
 
 : make-generic ( word -- )
     dup

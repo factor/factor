@@ -33,12 +33,12 @@ math.private combinators ;
 
 : dead-code-rec
     t [
-        C{ 3 2 }
+        3.2
     ] [
         dead-code-rec
     ] if ;
 
-[ C{ 3 2 } ] [ dead-code-rec ] unit-test
+[ 3.2 ] [ dead-code-rec ] unit-test
 
 : one-rec [ f one-rec ] [ "hi" ] if ;
 

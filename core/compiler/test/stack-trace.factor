@@ -27,8 +27,8 @@ words splitting ;
     [ { 1 "hi" } bleh ] catch drop \ + stack-trace-contains?
 ] unit-test
     
-[ f t ] [
-    [ { C{ 1 2 } } bleh ] catch drop
+[ t f ] [
+    [ { "hi" } bleh ] catch drop
     \ + stack-trace-contains?
     \ > stack-trace-contains?
 ] unit-test

@@ -1,10 +1,10 @@
 IN: temporary
 USING: arrays compiler kernel kernel.private math
-math.private sequences strings tools.test words continuations
-sequences.private hashtables.private byte-arrays
-strings.private system random layouts
-vectors.private sbufs.private strings.private slots.private
-alien alien.c-types alien.syntax namespaces libc ;
+math.constants math.private sequences strings tools.test words
+continuations sequences.private hashtables.private byte-arrays
+strings.private system random layouts vectors.private
+sbufs.private strings.private slots.private alien alien.c-types
+alien.syntax namespaces libc ;
 
 ! Make sure that intrinsic ops compile to correct code.
 [ ] [ 1 [ drop ] compile-1 ] unit-test
@@ -326,9 +326,13 @@ cell 8 = [
     [ 500 <byte-array> length ] compile-1
 ] unit-test
 
-[ C{ 1 2 } ] [ 1 2 [ <complex> ] compile-1 ] unit-test
+[ 1 2 ] [
+    1 2 [ <complex> ] compile-1 dup real swap imaginary
+] unit-test
 
-[ 1/2 ] [ 1 2 [ <ratio> ] compile-1 ] unit-test
+[ 1 2 ] [
+    1 2 [ <ratio> ] compile-1 dup numerator swap denominator
+] unit-test
 
 [ \ + ] [ \ + [ <wrapper> ] compile-1 ] unit-test
 
@@ -411,8 +415,8 @@ cell 8 = [
 [ t ] [ pi <double> [ { byte-array } declare *double ] compile-1 pi = ] unit-test
 
 ! Silly
-[ t ] [ pi 4 <byte-array> [ [ { float byte-array } declare 0 set-alien-float ] compile-1 ] keep *float pi - abs 0.001 < ] unit-test
-[ t ] [ pi <float> [ { byte-array } declare *float ] compile-1 pi - abs 0.001 < ] unit-test
+[ t ] [ pi 4 <byte-array> [ [ { float byte-array } declare 0 set-alien-float ] compile-1 ] keep *float pi - -0.001 0.001 between? ] unit-test
+[ t ] [ pi <float> [ { byte-array } declare *float ] compile-1 pi - -0.001 0.001 between? ] unit-test
 
 [ t ] [ pi 8 <byte-array> [ [ { float byte-array } declare 0 set-alien-double ] compile-1 ] keep *double pi = ] unit-test
 
