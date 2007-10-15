@@ -34,10 +34,10 @@ M: complex sqrt >polar swap fsqrt swap 2.0 / polar> ;
 
 M: complex hashcode* nip >rect >fixnum swap >fixnum bitxor ;
 
-M: complex pprint-delims drop \ C{ \ } ;
-
-M: complex >pprint-sequence >rect 2array ;
-
 IN: syntax
 
 : C{ \ } [ first2 rect> ] parse-literal ; parsing
+
+M: complex pprint-delims drop \ C{ \ } ;
+
+M: complex >pprint-sequence >rect 2array ;

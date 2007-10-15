@@ -1,4 +1,5 @@
-USING: kernel math math.parser tools.test ;
+USING: kernel math math.parser math.ratios math.functions
+tools.test ;
 IN: temporary
 
 [ 1 2 ] [ 1/2 >fraction ] unit-test
