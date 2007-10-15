@@ -138,7 +138,6 @@ M: pathname pprint* dup pathname-string "P\" " pprint-string ;
 
 GENERIC: pprint-delims ( obj -- start end )
 
-M: complex pprint-delims drop \ C{ \ } ;
 M: quotation pprint-delims drop \ [ \ ] ;
 M: curry pprint-delims drop \ [ \ ] ;
 M: array pprint-delims drop \ { \ } ;

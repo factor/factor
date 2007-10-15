@@ -92,7 +92,7 @@ float-arrays combinators.private ;
 ] each
 
 ! Specializers
-{ 1+ 1- sq neg recip sgn truncate } [
+{ 1+ 1- sq neg recip sgn } [
     { number } "specializer" set-word-prop
 ] each
 

@@ -166,7 +166,7 @@ GENERIC: ' ( obj -- ptr )
     [ (bignum>seq) ] { } make ;
 
 : emit-bignum ( n -- )
-    [ 0 < 1 0 ? ] keep abs bignum>seq
+    dup 0 < [ 1 swap neg ] [ 0 swap ] if bignum>seq
     dup length 1+ emit-fixnum
     swap emit emit-seq ;
 
