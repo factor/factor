@@ -1,8 +1,10 @@
 ! Copyright (C) 2007 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: bootstrap.image.private kernel namespaces system
-cpu.arm.assembler math layouts words vocabs ;
+cpu.arm.assembler cpu.arm5.assembler math layouts words vocabs ;
 IN: bootstrap.arm
+
+T{ arm5-variant } arm-variant set-global
 
 4 \ cell set
 big-endian off
@@ -17,7 +19,7 @@ big-endian off
 : temp-reg R3 ;
 : xt-reg R12 ;
 
-: stack-frame 8 bootstrap-cells ;
+: stack-frame 16 bootstrap-cells ;
 
 : next-save stack-frame 2 bootstrap-cells - ;
 : xt-save stack-frame 3 bootstrap-cells - ;

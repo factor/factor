@@ -9,8 +9,8 @@ IN: cpu.arm.architecture
 TUPLE: arm-backend ;
 
 ! ARM register assignments:
-! R0, R1, R2, R3 integer vregs
-! R12 temporary
+! R0-R4, R7-R10 integer vregs
+! R11, R12 temporary
 ! R5 data stack
 ! R6 retain stack
 ! R7 primitives
@@ -22,7 +22,7 @@ M: temp-reg v>operand drop R12 ;
 
 M: int-regs return-reg drop R0 ;
 M: int-regs param-regs drop { R0 R1 R2 R3 } ;
-M: int-regs vregs drop { R0 R1 R2 R3 R4 R7 R8 R9 R10 R11 } ;
+M: int-regs vregs drop { R0 R1 R2 R3 R4 R7 R8 R9 R10 } ;
 
 ! No FPU support yet
 M: float-regs param-regs drop { } ;
@@ -44,15 +44,27 @@ M: immediate load-literal
         v>operand load-indirect
     ] if ;
 
-M: arm-backend stack-frame ( n -- i ) 4 + 8 align ;
+: lr-save ( n -- i ) cell - ;
+: next-save ( n -- i ) 2 cells - ;
+: xt-save ( n -- i ) 3 cells - ;
+: factor-area-size 5 cells ;
+
+M: arm-backend stack-frame ( n -- i )
+    factor-area-size + 8 align ;
+
+M: ppc-backend %save-xt ( -- )
+    R12 PC 8 SUB ;
 
 M: arm-backend %prologue ( n -- )
-    LR SP 4 <-> STR
-    SP SP rot stack-frame SUB ;
+    SP SP pick SUB
+    R11 over LI
+    R11 SP pick next-save <+> STR
+    R12 SP rot xt-save <+> STR
+    LR SP pick lr-save <+> STR ;
 
 M: arm-backend %epilogue ( n -- )
-    SP SP rot stack-frame ADD
-    LR SP 4 <-> LDR ;
+    LR SP lr-save <+> LDR
+    SP SP rot stack-frame ADD ;
 
 : compile-dlsym ( symbol dll reg -- )
     [
@@ -83,26 +95,32 @@ M: arm-backend %profiler-prologue ( word -- )
     R0 R12 profile-count-offset <+> STR
     "end" resolve-label ;
 
-: primitive-addr ( word dst -- )
-    #! Load a word address into dst.
-    R7 rot word-primitive cells <+> LDR ;
+M: arm-backend %call-label ( label -- ) BL ;
 
-M: arm-backend %call ( label -- )
-    #! Far C call for primitives, near C call for compiled defs.
-    dup primitive? [ R0 primitive-addr R0 BLX ] [ BL ] if ;
+M: arm-backend %jump-label ( label -- ) B ;
 
-M: arm-backend %jump-label ( label -- )
-    #! For tail calls. IP not saved on C stack.
-    #! WARNING: don't clobber LR here!
-    dup primitive? [ PC primitive-addr ] [ B ] if ;
+: %load-xt ( word -- )
+    0 swap LOAD32  rc-absolute-ppc-2/2 rel-word ;
+
+: %prepare-primitive ( word -- )
+    #! Save stack pointer to stack_chain->callstack_top, load XT
+    R1 SP MOV
+    T{ temp-reg } load-literal
+    R12 R12 word-xt-offset <+> LDR ;
+
+M: arm-backend %call-primitive ( word -- )
+    %prepare-primitive R12 BLX ;
+
+M: arm-backend %jump-primitive ( word -- )
+    %prepare-primitive R12 BX ;
 
 M: arm-backend %jump-t ( label -- )
-    "flag" operand object tag-number CMP NE B ;
+    "flag" operand f v>operand CMP NE B ;
 
 : (%dispatch) ( word-table# reg -- )
     #! Load jump table target address into reg.
-    "n" operand PC "n" operand 1 <LSR> ADD
-    "n" operand 0 <+> LDR
+    "scratch" operand PC "n" operand 1 <LSR> ADD
+    "scratch" operand 0 <+> LDR
     rc-indirect-arm rel-dispatch ;
 
 M: arm-backend %call-dispatch ( word-table# -- )
@@ -112,7 +130,6 @@ M: arm-backend %call-dispatch ( word-table# -- )
     ] H{
         { +input+ { { f "n" } } }
         { +scratch+ { { f "scratch" } } }
-        { +clobber+ { "n" } }
     } with-template ;
 
 M: arm-backend %jump-dispatch ( word-table# -- )
@@ -121,7 +138,7 @@ M: arm-backend %jump-dispatch ( word-table# -- )
         PC (%dispatch)
     ] H{
         { +input+ { { f "n" } } }
-        { +clobber+ { "n" } }
+        { +scratch+ { { f "scratch" } } }
     } with-template ;
 
 M: arm-backend %return ( -- ) %epilogue-later PC LR MOV ;
@@ -133,9 +150,6 @@ M: arm-backend %unwind drop %return ;
 
 M: int-regs (%peek) \ LDR (%peek/replace) ;
 M: int-regs (%replace) \ STR (%peek/replace) ;
-
-M: arm-backend %move-int>int ( dst src -- )
-    [ v>operand ] 2apply MOV ;
 
 : (%inc) ( n reg -- )
     dup rot cells dup 0 < [ neg SUB ] [ ADD ] if ;
@@ -215,11 +229,13 @@ M: arm-backend %box-small-struct ( size -- )
     R2 swap MOV
     "box_small_struct" f %alien-invoke ;
 
+: temp@ stack-frame* factor-area-size - swap - ;
+
 : struct-return@ ( size n -- n )
     [
         stack-frame* +
     ] [
-        stack-frame* swap - cell -
+        stack-frame* factor-area-size - swap -
     ] ?if ;
 
 M: arm-backend %prepare-box-struct ( size -- )
@@ -239,6 +255,15 @@ M: arm-backend %box-large-struct ( n size -- )
 M: arm-backend struct-small-enough? ( size -- ? )
     wince? [ drop f ] [ 4 <= ] if ;
 
+M: ppc-backend %prepare-alien-invoke
+    #! Save Factor stack pointers in case the C code calls a
+    #! callback which does a GC, which must reliably trace
+    #! all roots.
+    "stack_chain" f R12 %alien-global
+    SP R12 0 <+> STR
+    ds-reg 11 8 <+> STR
+    rs-reg 11 12 <+> STR ;
+
 M: arm-backend %alien-invoke ( symbol dll -- )
     ! Load target address
     R12 PC 4 <+> LDR
@@ -249,15 +274,13 @@ M: arm-backend %alien-invoke ( symbol dll -- )
     ! The target address
     0 , rc-absolute rel-dlsym ;
 
-: temp@ SP stack-frame* 2 cells - <+> ;
-
 M: arm-backend %prepare-alien-indirect ( -- )
     "unbox_alien" f %alien-invoke
-    R0 temp@ STR ;
+    R0 SP cell temp@ <+> STR ;
 
 M: arm-backend %alien-indirect ( -- )
-    IP temp@ LDR
-    IP BLX ;
+    R12 SP cell temp@ <+> LDR
+    R12 BLX ;
 
 M: arm-backend %alien-callback ( quot -- )
     R0 load-indirect
@@ -266,11 +289,11 @@ M: arm-backend %alien-callback ( quot -- )
 M: arm-backend %callback-value ( ctype -- )
     ! Save top of data stack
     %prepare-unbox
-    R0 temp@ STR
+    R0 SP cell temp@ <+> STR
     ! Restore data/call/retain stacks
     "unnest_stacks" f %alien-invoke
     ! Place former top of data stack in R0
-    R0 temp@ LDR
+    R0 SP cell temp@ <+> LDR
     ! Unbox R0
     unbox-return ;
 

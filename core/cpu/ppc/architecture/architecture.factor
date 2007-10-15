@@ -15,10 +15,8 @@ TUPLE: ppc-backend ;
 ! r14: data stack
 ! r15: retain stack
 
-! For stack frame layout, see vm/cpu-ppc.h.
-
-: ds-reg 14 ;
-: rs-reg 15 ;
+: ds-reg 14 ; inline
+: rs-reg 15 ; inline
 
 : reserved-area-size
     os {
@@ -59,13 +57,11 @@ M: int-regs vregs
     } ;
 
 M: float-regs return-reg drop 1 ;
-
 M: float-regs param-regs 
     drop os H{
         { "macosx" { 1 2 3 4 5 6 7 8 9 10 11 12 13 } }
         { "linux" { 1 2 3 4 5 6 7 8 } }
     } at ;
-
 M: float-regs vregs drop { 0 1 2 3 4 5 6 7 8 9 10 11 12 13 } ;
 
 GENERIC: loc>operand ( loc -- reg n )
@@ -123,7 +119,7 @@ M: ppc-backend %call-label ( label -- ) BL ;
 M: ppc-backend %jump-label ( label -- ) B ;
 
 : %prepare-primitive ( word -- )
-    ! Save stack pointer to stack_chain->callstack_top, load XT
+    #! Save stack pointer to stack_chain->callstack_top, load XT
     4 1 MR 11 %load-xt ;
 
 : (%call) 11 MTLR BLRL ;
@@ -137,7 +133,7 @@ M: ppc-backend %jump-primitive ( word -- )
     %prepare-primitive (%jump) ;
 
 M: ppc-backend %jump-t ( label -- )
-    0 "flag" operand \ f tag-number CMPI BNE ;
+    0 "flag" operand f v>operand CMPI BNE ;
 
 : dispatch-template ( word-table# quot -- )
     [

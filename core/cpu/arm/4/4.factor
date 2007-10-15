@@ -6,7 +6,7 @@ math math.private namespaces sequences words quotations
 byte-arrays hashtables.private hashtables generator
 generator.registers generator.fixup sequences.private
 strings.private ;
-IN: cpu.arm5.intrinsics
+IN: cpu.arm4
 
 : (%char-slot)
     "out" operand string-offset MOV

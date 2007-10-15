@@ -24,27 +24,29 @@ vocabs.loader ;
 
 T{ arm-backend } compiler-backend set-global
 
-: (detect-arm5) ;
-
-\ (detect-arm5) [
-    ! The LDRH word is defined in the module we conditionally
-    ! load below...
-    ! R0 PC 0 <+> LDRH
-    HEX: e1df00b0 ,
-] H{
-    { +scratch+ { { 0 "scratch" } } }
-} define-intrinsic
-
-: detect-arm5 (detect-arm5) ;
-
-: arm5? ( -- ? ) [ detect-arm5 ] catch not ;
+! We don't auto-detect since that would require us to support
+! illegal instruction traps. This works on Linux but not on
+! Windows CE.
 
 "arm-variant" get [
-    \ detect-arm5 compile
-    "Detecting ARM architecture variant..." print
-    arm5? "arm5" "arm3" ? "arm-variant" set
-] unless
+    "ARM variant: " write "arm-variant" get print
+] [
+    "==========" print
+    "You should specify the -arm-variant=<variant> switch." print
+    "<variant> can be one of arm3, arm4, arm4t, or arm5." print
+    "Assuming arm4t." print
+    "==========" print
+    "arm4t" "arm-variant" set
+] if
 
-"ARM architecture variant: " write "arm-variant" get print
+"arm-variant" get { "arm4" "arm4t" "arm5" } member? [
+    "cpu.arm.4" require
+] when
 
-"arm-variant" "arm5" = [ "cpu.arm5" require ] when
+"arm-variant" get { "arm4t" "arm5" } member? [
+    t have-BX? set-global
+] when
+
+"arm-variant" get "arm5" = [
+    t have-BLX? set-global
+] when

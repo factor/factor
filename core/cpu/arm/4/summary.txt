@@ -1,0 +1,1 @@
+Additional compiler intrinsics for ARM4

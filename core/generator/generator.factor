@@ -312,3 +312,4 @@ M: #return generate-node drop end-basic-block %return f ;
 : underlying-alien-offset cell object tag-number - ;
 : tuple-class-offset 2 cells tuple tag-number - ;
 : class-hash-offset cell object tag-number - ;
+: word-xt-offset 8 cells object tag-number - ;
