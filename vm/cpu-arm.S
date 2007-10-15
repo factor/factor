@@ -114,7 +114,7 @@ DEF(void,set_callstack,(F_STACK_FRAME *to, F_STACK_FRAME *from, CELL length)):
         ldr pc,LR_SAVE       /* return */
 
 DEF(void,throw_impl,(CELL quot, F_STACK_FRAME *rewind_to)):
-	mov sp,r1            /* compute new stack pointer */
+	add sp,r1,#4         /* compute new stack pointer */
 	ldr lr,LR_SAVE       /* we have rewound the stack; load return address */
 	JUMP_QUOT            /* call the quotation */
 
