@@ -48,7 +48,7 @@ M: win32-file init-handle ( handle -- ) drop ;
 : open-file ( path access-mode create-mode -- handle )
     [
         >r share-mode f r> CreateFile-flags f CreateFile
-        dup invalid-handle? dup [ CloseHandle drop ] f add-destructor
+        dup invalid-handle? dup close-later
         dup add-completion
     ] with-destructors ;
 
@@ -168,7 +168,7 @@ USE: windows.winsock
 
 : server-fd ( addrspec type -- fd )
     >r dup protocol-family r> open-socket
-        dup [ closesocket drop ] f add-destructor
+        dup close-socket-later
     dup rot make-sockaddr heap-size bind socket-error ;
 
 USE: namespaces

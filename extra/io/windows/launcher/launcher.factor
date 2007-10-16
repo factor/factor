@@ -1,7 +1,10 @@
-USING: alien alien.c-types destructors io.windows libc
+USING: alien alien.c-types arrays continuations
+destructors io.windows libc
 io.nonblocking io.streams.duplex windows.types math
 windows.kernel32 windows namespaces io.launcher kernel
-io.windows.nt.backend ;
+sequences io.windows.nt.backend windows.errors ;
+USE: io
+USE: prettyprint
 IN: io.windows.launcher
 
 ! From MSDN: "Handles in PROCESS_INFORMATION must be closed with CloseHandle when they are no longer needed."
@@ -88,35 +91,44 @@ C: <pipe> pipe
 
 : ERROR_PIPE_CONNECT 535 ; inline
 
+: pipe-connect-error? ( n -- ? )
+    ERROR_SUCCESS ERROR_PIPE_CONNECT 2array member? not ;
+
+! clear "ls" <process-stream> contents
 M: windows-nt-io <process-stream> ( command -- stream )
     [
+
+    break
         default-CreateProcess-args
         TRUE over set-CreateProcess-args-bInheritHandles
-
-        ! over set-CreateProcess-args-stdin-pipe
 
         dup CreateProcess-args-lpStartupInfo
         STARTF_USESTDHANDLES over set-STARTUPINFO-dwFlags
 
         factor-pipe-name create-named-pipe
+        global [ "Named pipe: " write dup . ] bind
         dup t set-inherit
         [ add-completion ] keep
  
         ! CreateFile
         ! factor-pipe-name open-pipe-r/w
-        factor-pipe-name GENERIC_READ GENERIC_WRITE bitor 0 f OPEN_EXISTING FILE_FLAG_OVERLAPPED f CreateFile dup invalid-handle? dup [ CloseHandle drop ] f add-destructor
+        factor-pipe-name GENERIC_READ GENERIC_WRITE bitor
+        0 f OPEN_EXISTING FILE_FLAG_OVERLAPPED f
+        CreateFile
+        global [ "Created File: " write dup . ] bind
+        dup invalid-handle? dup close-later
         dup add-completion
 
         swap (make-overlapped) ConnectNamedPipe zero? [
-            GetLastError ERROR_PIPE_CONNECT = [
+            GetLastError pipe-connect-error? [
                 win32-error-string throw
-            ] unless
+            ] when
         ] when
-
         dup t set-inherit
 
         ! ERROR_PIPE_CONNECTED
         [ pick set-CreateProcess-args-stdin-pipe ] keep
+        global [ "Setting the stdios to: " write dup . ] bind
         [ over set-STARTUPINFO-hStdOutput ] keep
         [ over set-STARTUPINFO-hStdInput ] keep
         swap set-STARTUPINFO-hStdError
@@ -134,7 +146,7 @@ M: windows-nt-io <process-stream> ( command -- stream )
         0
         CreatePipe win32-error=0/f
     ] 2keep
-    [ *void* dup [ CloseHandle ] f add-destructor ] 2apply <pipe> ;
+    [ *void* dup close-later ] 2apply <pipe> ;
 
 M: windows-ce-io <process-stream>
     [

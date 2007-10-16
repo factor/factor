@@ -42,3 +42,4 @@ SYMBOL: xml-file
 ] unit-test
 [ "foo" ] [ "<x y='foo'/>" string>xml "y" <name-tag> over
 at swap "z" <name-tag> >r tuck r> swap set-at T{ name f "blah" "z" f } swap at ] unit-test
+[ "foo" ] [ "<boo><![CDATA[foo]]></boo>" string>xml children>string ] unit-test
