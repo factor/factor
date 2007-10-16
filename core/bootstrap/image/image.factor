@@ -153,17 +153,11 @@ GENERIC: ' ( obj -- ptr )
 
 : bignum-radix bignum-bits 2^ 1- ;
 
-: (bignum>seq) ( n -- )
-    dup zero? [
-        drop
-    ] [
-        dup bignum-radix bitand ,
-        bignum-bits neg shift (bignum>seq)
-    ] if ;
-
 : bignum>seq ( n -- seq )
     #! n is positive or zero.
-    [ (bignum>seq) ] { } make ;
+    [ dup 0 > ]
+    [ dup bignum-bits neg shift swap bignum-radix bitand ]
+    { } unfold ;
 
 : emit-bignum ( n -- )
     [ 0 < 1 0 ? ] keep abs bignum>seq

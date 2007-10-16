@@ -85,10 +85,8 @@ SYMBOL: stdio
 : write-object ( str obj -- )
     presented associate format ;
 
-: lines-loop ( -- ) readln [ , lines-loop ] when* ;
-
 : lines ( stream -- seq )
-    [ [ lines-loop ] { } make ] with-stream ;
+    [ [ readln dup ] [ ] { } unfold ] with-stream ;
 
 : contents ( stream -- str )
     2048 <sbuf> [ stream-copy ] keep >string ;

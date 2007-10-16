@@ -13,11 +13,8 @@ M: link uses
     { $subsection $link $see-also }
     collect-elements [ \ f or ] map ;
 
-: (help-path) ( topic -- )
-    article-parent [ dup , (help-path) ] when* ;
-
 : help-path ( topic -- seq )
-    [ (help-path) ] { } make ;
+    [ dup ] [ [ article-parent ] keep ] { } unfold 1 tail ;
 
 : set-article-parents ( parent article -- )
     article-children [ set-article-parent ] curry* each ;

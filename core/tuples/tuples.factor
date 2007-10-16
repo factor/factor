@@ -106,7 +106,8 @@ M: tuple equal?
 : (delegates) ( obj -- )
     [ dup , delegate (delegates) ] when* ;
 
-: delegates ( obj -- seq ) [ (delegates) ] { } make ;
+: delegates ( obj -- seq )
+    [ dup ] [ [ delegate ] keep ] { } unfold ;
 
 : is? ( obj quot -- ? ) >r delegates r> contains? ; inline
 

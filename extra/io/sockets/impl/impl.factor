@@ -94,11 +94,10 @@ M: f parse-sockaddr nip ;
     swap addrinfo-family addrspec-of-family
     parse-sockaddr ;
 
-: addrspec, ( addrinfo -- )
-    [ dup addrinfo>addrspec , addrinfo-next addrspec, ] when* ;
-
 : parse-addrinfo-list ( addrinfo -- seq )
-    [ addrspec, ] { } make [ ] subset ;
+    [ dup ]
+    [ dup addrinfo-next swap addrinfo>addrspec ]
+    { } unfold [ ] subset ;
 
 M: object resolve-host ( host serv passive? -- seq )
     >r dup integer? [ number>string ] when
