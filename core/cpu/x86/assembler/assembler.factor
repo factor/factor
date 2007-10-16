@@ -255,9 +255,8 @@ UNION: operand register indirect ;
 : extended-opcode, ( opcode -- ) extended-opcode opcode, ;
 
 : opcode-or ( opcode mask -- opcode' )
-    over array?
-    [ 1 rot cut* first rot bitor add ]
-    [ bitor ] if ;
+    swap dup array?
+    [ 1 cut* first rot bitor add ] [ bitor ] if ;
 
 : 1-operand ( op reg rex.w opcode -- )
     #! The 'reg' is not really a register, but a value for the
