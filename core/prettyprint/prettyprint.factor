@@ -227,7 +227,7 @@ M: mixin-class see-class*
     \ MIXIN: pprint-word
     dup pprint-word <block
     dup members [
-        hard break
+        hard line-break
         \ INSTANCE: pprint-word pprint-word pprint-word
     ] curry* each block> ;
 
