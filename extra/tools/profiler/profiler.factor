@@ -3,7 +3,7 @@
 USING: words sequences math prettyprint kernel arrays
 io io.styles namespaces assocs kernel.private generator
 compiler strings combinators sorting math.parser
-math.vectors vocabs definitions tools.profiler.private ;
+vocabs definitions tools.profiler.private ;
 IN: tools.profiler
 
 : reset-counters ( -- )
