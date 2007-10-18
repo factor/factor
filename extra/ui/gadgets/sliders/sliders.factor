@@ -3,7 +3,7 @@
 USING: arrays ui.gestures ui.gadgets ui.gadgets.buttons
 ui.gadgets.controls ui.gadgets.frames ui.gadgets.grids
 ui.gadgets.theme ui.render kernel math namespaces sequences
-vectors models math.vectors quotations colors ;
+vectors models math.vectors math.functions quotations colors ;
 IN: ui.gadgets.sliders
 
 TUPLE: elevator direction ;
