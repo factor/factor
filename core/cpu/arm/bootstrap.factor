@@ -1,10 +1,11 @@
 ! Copyright (C) 2007 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: bootstrap.image.private kernel namespaces system
-cpu.arm.assembler cpu.arm5.assembler math layouts words vocabs ;
+cpu.arm.assembler math layouts words vocabs ;
 IN: bootstrap.arm
 
-T{ arm5-variant } arm-variant set-global
+! We generate ARM3 code
+f have-BX? set
 
 4 \ cell set
 big-endian off
@@ -66,12 +67,12 @@ big-endian off
 : jit-call
     scan-reg SP scan-save <+> STR              ! save scan pointer
     LR PC MOV                                  ! save return address
-    PC xt-reg MOV                              ! call
+    xt-reg BX                                  ! call
     scan-reg SP scan-save <+> LDR              ! restore scan pointer
     ;
 
 : jit-jump
-    PC xt-reg MOV ;
+    xt-reg BX ;
 
 [ load-word-xt jit-call ] { } make jit-word-call set
 
@@ -113,6 +114,6 @@ big-endian off
     LR SP 4 <-> LDR                            ! load return address
 ] { } make jit-epilog set
 
-[ PC LR MOV ] { } make jit-return set
+[ LR BX ] { } make jit-return set
 
 "bootstrap.arm" forget-vocab

@@ -16,11 +16,11 @@ IN: cpu.arm.intrinsics
     "obj" get operand-tag - <+/-> ;
 
 : %slot-literal-any-tag
-    "obj" operand "scratch" operand %untag
+    "scratch" operand "obj" operand %untag
     "val" operand "scratch" operand "n" get cells <+> ;
 
 : %slot-any
-    "obj" operand "scratch" operand %untag
+    "scratch" operand "obj" operand %untag
     "n" operand dup 1 <LSR> MOV
     "scratch" operand "val" operand "n" operand <+> ;
 
@@ -52,8 +52,8 @@ IN: cpu.arm.intrinsics
     }
 } define-intrinsics
 
-: generate-write-barrier ( -- )
-    "val" operand-immediate? "obj" get fresh-object? or [
+: %write-barrier ( -- )
+    "val" get operand-immediate? "obj" get fresh-object? or [
         "cards_offset" f R12 %alien-global
         "scratch" operand R12 "scratch" operand card-bits <LSR> ADD
         "val" operand "scratch" operand 0 LDRB
@@ -156,7 +156,7 @@ IN: cpu.arm.intrinsics
         "end" get VC B
         { "x" "y" } %untag-fixnums
         "x" operand "x" operand "y" operand roll execute
-        "x" get %allot-bignum-signed-1
+        "out" get "x" get %allot-bignum-signed-1
         "end" resolve-label
     ] with-scope ; inline
 
@@ -173,7 +173,7 @@ IN: cpu.arm.intrinsics
 
 \ fixnum>bignum [
     "x" operand dup %untag-fixnum
-    "x" get %allot-bignum-signed-1
+    "out" get "x" get %allot-bignum-signed-1
 ] H{
     { +input+ { { f "x" } } }
     { +scratch+ { { f "out" } } }

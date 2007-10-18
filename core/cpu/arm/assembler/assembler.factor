@@ -276,7 +276,7 @@ M: label (BX) 0 swap (BX) rc-relative-arm-3 label-fixup ;
 
 : BX have-BX? get [ 0 (BX) ] [ PC swap MOV ] if ;
 
-: BLX have-BLX? get [ 1 (BLX) ] [ LR PC MOV BX ] if ;
+: BLX have-BLX? get [ 1 (BX) ] [ LR PC MOV BX ] if ;
 
 ! More load and store instructions
 GENERIC: addressing-mode-3 ( addressing-mode -- n )

@@ -22,7 +22,7 @@ IN: cpu.arm.allot
     ;
     
 : %store-tagged ( reg tag -- )
-    >r dup fresh-object v>operand R11 r> tag-number ORI ;
+    >r dup fresh-object v>operand R11 r> tag-number ORR ;
 
 : %allot-bignum ( #digits -- )
     #! 1 cell header, 1 cell length, 1 cell sign, + digits
@@ -32,10 +32,10 @@ IN: cpu.arm.allot
     R12 R11 cell <+> STR ! store the length
     ;
 
-: %allot-bignum-signed-1 ( reg -- )
+: %allot-bignum-signed-1 ( dst src -- )
     #! on entry, reg is a 30-bit quantity sign-extended to
     #! 32-bits.
-    #! exits with tagged ptr to bignum in allot-tmp.
+    #! exits with tagged ptr to bignum in reg.
     [
         "end" define-label
         ! is it zero?
@@ -55,9 +55,9 @@ IN: cpu.arm.allot
         ! store sign
         R12 R11 2 cells <+> STR
         ! store the number
-        dup v>operand R11 3 cells <+> STR
+        v>operand R11 3 cells <+> STR
         ! tag the bignum, store it in reg
-        bignum %tag-allot
+        bignum %store-tagged
         "end" resolve-label
     ] with-scope ;
 

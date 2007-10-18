@@ -1,7 +1,9 @@
+! Copyright (C) 2007 Slava Pestov.
+! See http://factorcode.org/license.txt for BSD license.
 USING: alien alien.c-types kernel math namespaces
-cpu.architecture cpu.arm.architecture cpu.arm.intrinsics
-generator generator.registers continuations compiler io
-vocabs.loader ;
+cpu.architecture cpu.arm.architecture cpu.arm.assembler
+cpu.arm.intrinsics generator generator.registers continuations
+compiler io vocabs.loader sequences ;
 
 ! EABI passes floats in integer registers.
 [ alien-float ]
@@ -34,9 +36,9 @@ T{ arm-backend } compiler-backend set-global
     "==========" print
     "You should specify the -arm-variant=<variant> switch." print
     "<variant> can be one of arm3, arm4, arm4t, or arm5." print
-    "Assuming arm4t." print
+    "Assuming arm3." print
     "==========" print
-    "arm4t" "arm-variant" set
+    "arm3" "arm-variant" set-global
 ] if
 
 "arm-variant" get { "arm4" "arm4t" "arm5" } member? [
