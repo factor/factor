@@ -1,5 +1,5 @@
 USING: help.markup help.syntax kernel math
-sequences quotations ;
+sequences quotations math.functions.private ;
 IN: math.functions
 
 ARTICLE: "integer-functions" "Integer functions"

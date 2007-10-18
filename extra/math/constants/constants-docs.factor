@@ -3,8 +3,6 @@ IN: math.constants
 
 ARTICLE: "math-constants" "Constants"
 "Standard mathematical constants:"
-{ $subsection i }
-{ $subsection -i }
 { $subsection e }
 { $subsection pi }
 "Various limits:"
@@ -13,12 +11,6 @@ ARTICLE: "math-constants" "Constants"
 { $subsection epsilon } ;
 
 ABOUT: "math-constants"
-
-HELP: i
-{ $values { "i" "the imaginary unit" } } ;
-
-HELP: -i
-{ $values { "-i" "the negated imaginary unit" } } ;
 
 HELP: e
 { $values { "e" "base of natural logarithm" } } ;

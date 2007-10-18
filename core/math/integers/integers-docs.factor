@@ -44,10 +44,6 @@ HELP: odd?
 { $values { "n" integer } { "?" "a boolean" } }
 { $description "Tests if an integer is odd." } ;
 
-HELP: fraction>
-{ $values { "a" integer } { "b" "a positive integer" } { "a/b" rational } }
-{ $description "Creates a new ratio, or outputs the numerator if the denominator is 1. This word does not reduce the fraction to lowest terms, and should not be called directly; use " { $link / } " instead." } ;
-
 ! Unsafe primitives
 HELP: fixnum+ ( x y -- z )
 { $values { "x" fixnum } { "y" fixnum } { "z" integer } }

@@ -90,6 +90,9 @@ M: real hashcode* nip >fixnum ;
 
 M: real <=> - ;
 
+! real and sequence overlap. we disambiguate:
+M: integer <=> - ;
+
 GENERIC: fp-nan? ( x -- ? )
 
 M: object fp-nan?

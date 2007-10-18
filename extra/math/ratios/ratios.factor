@@ -24,7 +24,7 @@ PRIVATE>
 
 M: integer /
     dup zero? [
-        /i
+        "Division by zero" throw
     ] [
         dup 0 < [ [ neg ] 2apply ] when
         2dup gcd nip tuck /i >r /i r> fraction>
