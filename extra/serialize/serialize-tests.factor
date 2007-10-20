@@ -59,3 +59,13 @@ C: <serialize-test> serialize-test
 [ t ] [ objects [ check-serialize-2 ] all? ] unit-test
 
 [ t ] [ pi check-serialize-1 ] unit-test
+
+[ t ] [
+    { 1 2 3 } [
+        [
+            dup (serialize) (serialize)
+        ] with-serialized
+    ] string-out [
+        deserialize-sequence all-eq?
+    ] string-in
+] unit-test

@@ -60,6 +60,11 @@ DEFER: if
 
 : 2apply ( x y quot -- ) tuck 2slip call ; inline
 
+: while ( pred body tail -- )
+    >r >r dup slip r> r> roll
+    [ >r tuck 2slip r> while ]
+    [ 2nip call ] if ; inline
+
 ! Quotation building
 
 : 2curry ( obj1 obj2 quot -- curry )

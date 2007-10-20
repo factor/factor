@@ -72,7 +72,7 @@ $nl
 "Once the output sections have been generated, the tree of sections is traversed and intelligent decisions are made about indentation and line breaks. Finally, text is output."
 { $subsection section }
 "Adding leaf sections:"
-{ $subsection break }
+{ $subsection line-break }
 { $subsection text }
 { $subsection styled-text }
 "Nesting and denesting sections:"

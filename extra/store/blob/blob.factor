@@ -11,7 +11,7 @@ IN: store.blob
 : (load-blob) ( path -- seq/f )
     dup exists? [
         <file-reader> [
-            [ deserialize-sequence ] with-serialized
+            deserialize-sequence
         ] with-stream
     ] [
         drop f

@@ -655,3 +655,10 @@ PRIVATE>
 
 : trim ( seq quot -- newseq )
     [ ltrim ] keep rtrim ; inline
+
+: unfold ( obj pred quot exemplar -- seq )
+    [
+        10 swap new-resizable [
+            [ push ] curry compose [ drop ] while
+        ] keep
+    ] keep like ; inline

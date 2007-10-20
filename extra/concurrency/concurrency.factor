@@ -40,17 +40,11 @@ PRIVATE>
     (mailbox-block-if-empty)
     mailbox-data dlist-pop-front ;
 
-<PRIVATE
-: (mailbox-get-all) ( mailbox -- )
-    dup mailbox-empty? [
-        drop
-    ] [
-        dup mailbox-data dlist-pop-front , (mailbox-get-all)
-    ] if ;
-PRIVATE>
 : mailbox-get-all ( mailbox -- array )
     (mailbox-block-if-empty)
-    [ (mailbox-get-all) ] { } make ;
+    [ dup mailbox-empty? ]
+    [ dup mailbox-data dlist-pop-front ]
+    { } unfold ;
 
 : while-mailbox-empty ( mailbox quot -- )
     over mailbox-empty? [

@@ -30,10 +30,10 @@ HELP: fresh-line
 { $description "Advances the prettyprinter by one line unless the current line is empty. If the line limit is exceeded, escapes the prettyprinter by restoring a continuation captured in " { $link do-pprint } "." } ;
 
 HELP: soft
-{ $description "Possible input parameter to " { $link break } "." } ;
+{ $description "Possible input parameter to " { $link line-break } "." } ;
 
 HELP: hard
-{ $description "Possible input parameter to " { $link break } "." } ;
+{ $description "Possible input parameter to " { $link line-break } "." } ;
 
 { soft hard } related-words
 
@@ -70,7 +70,7 @@ HELP: section
 { $class-description "A piece of prettyprinter output. Instances of this class are not used directly, instead one instantiates various classes which delegate to this class:"
 { $list
     { $link text }
-    { $link break }
+    { $link line-break }
     { $link block }
     { $link inset }
     { $link flow }
@@ -123,7 +123,7 @@ HELP: pprint-section
 { $contract "Prints a section, performing wrapping and indentation using available formatting information." }
 $prettyprinting-note ;
 
-HELP: break
+HELP: line-break
 { $values { "type" { $link soft } " or " { $link hard } } }
 { $description "Adds a section introducing a line break to the current block. If the block is output as a " { $link short-section } ", all breaks are ignored. Otherwise, hard breaks introduce unconditional newlines, and soft breaks introduce a newline if the position is more than half of the " { $link margin } "." }
 $prettyprinting-note ;
@@ -158,11 +158,11 @@ HELP: save-end-position
 
 HELP: pprint-sections
 { $values { "block" block } { "advancer" "a quotation with stack effect " { $snippet "( block -- )" } } }
-{ $description "Prints child sections of a block, ignoring any " { $link break } " sections. The " { $snippet "advancer" } " quotation is called between every pair of sections." } ;
+{ $description "Prints child sections of a block, ignoring any " { $link line-break } " sections. The " { $snippet "advancer" } " quotation is called between every pair of sections." } ;
 
 HELP: do-break
-{ $values { "break" break } }
-{ $description "Prints a break section as per the policy outlined in " { $link break } "." } ;
+{ $values { "break" line-break } }
+{ $description "Prints a break section as per the policy outlined in " { $link line-break } "." } ;
 
 HELP: empty-block?
 { $values { "block" block } { "?" "a boolean" } }

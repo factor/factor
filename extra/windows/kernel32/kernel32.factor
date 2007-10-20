@@ -16,13 +16,6 @@ IN: windows.kernel32
 : GENERIC_EXECUTE HEX: 20000000 ; inline
 : GENERIC_ALL     HEX: 10000000 ; inline
 
-: DELETE                   HEX: 00010000 ; inline
-: READ_CONTROL             HEX: 00020000 ; inline
-: WRITE_DAC                HEX: 00040000 ; inline
-: WRITE_OWNER              HEX: 00080000 ; inline
-: SYNCHRONIZE              HEX: 00100000 ; inline
-: STANDARD_RIGHTS_REQUIRED HEX: 000f0000 ; inline
-
 : CREATE_NEW        1 ; inline
 : CREATE_ALWAYS     2 ; inline
 : OPEN_EXISTING     3 ; inline
