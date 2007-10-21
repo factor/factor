@@ -65,7 +65,7 @@ M: pasteboard set-clipboard-contents drop copy ;
     <clipboard> selection set-global ;
 
 ! world-handle is a <win>
-TUPLE: win hWnd hDC hRC swap-hint? world title ;
+TUPLE: win hWnd hDC hRC world title ;
 C: <win> win
 
 SYMBOL: msg-obj
@@ -413,11 +413,8 @@ SYMBOL: hWnd
     dup wglCreateContext dup win32-error=0/f
     [ wglMakeCurrent win32-error=0/f ] keep ;
 
-: setup-gl ( hwnd -- hDC hRC swap-hint? )
-    get-dc
-    dup setup-pixel-format
-    dup get-rc
-    swap-hint-supported? ;
+: setup-gl ( hwnd -- hDC hRC )
+    get-dc dup setup-pixel-format get-rc ;
 
 M: windows-ui-backend (open-world-window) ( world -- )
     [ rect-dim first2 create-window dup setup-gl ] keep
@@ -430,10 +427,6 @@ M: windows-ui-backend select-gl-context ( handle -- )
     [ win-hDC ] keep win-hRC wglMakeCurrent win32-error=0/f ;
 
 M: windows-ui-backend flush-gl-context ( handle -- )
-    dup win-swap-hint? [
-        clip get flip-rect fix-coordinates
-        glAddSwapHintRectWIN
-    ] when
     win-hDC SwapBuffers win32-error=0/f ;
 
 ! Move window to front

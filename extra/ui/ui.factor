@@ -55,7 +55,7 @@ SYMBOL: windows
 : open-world-window ( world -- )
     dup pref-dim over set-gadget-dim
     dup (open-world-window)
-    dup draw-world ;
+    draw-world ;
 
 : open-window ( gadget title -- )
     >r [ 1 track, ] { 0 1 } make-track r>
@@ -77,19 +77,12 @@ SYMBOL: windows
     dup hand-world get-global eq?
     [ hand-loc get-global swap move-hand ] [ drop ] if ;
 
-: post-layout ( hash gadget -- )
-    dup find-world dup [
-        rot [
-            >r screen-rect r> [ rect-union ] when*
-        ] change-at
-    ] [
-        3drop
-    ] if ;
-
-: layout-queued ( -- hash )
-    H{ } clone invalid [
-        dup layout dupd post-layout
-    ] queue-each ;
+: layout-queued ( -- seq )
+    [
+        invalid [
+            dup layout find-world [ , ] when*
+        ] queue-each
+    ] { } make ;
 
 SYMBOL: ui-hook
 
@@ -105,11 +98,8 @@ SYMBOL: ui-hook
         init-ui ui-hook get call
     ] if ;
 
-: redraw-worlds ( hash -- )
-    [
-        swap dup update-hand
-        dup world-handle [ draw-world ] [ 2drop ] if
-    ] assoc-each ;
+: redraw-worlds ( seq -- )
+    [ dup update-hand draw-world ] each ;
 
 : ui-step ( -- )
     [

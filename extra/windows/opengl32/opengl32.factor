@@ -101,10 +101,3 @@ FUNCTION: HGLRC wglCreateContext ( HDC hDC ) ;
 FUNCTION: BOOL wglDeleteContext ( HGLRC hRC ) ;
 FUNCTION: BOOL wglMakeCurrent ( HDC hDC, HGLRC hglrc ) ;
 FUNCTION: void* wglGetProcAddress ( char* name ) ;
-
-: glAddSwapHintRectWIN ( x y width height -- )
-    "glAddSwapHintRectWIN" wglGetProcAddress check-ptr
-    "void" { "int" "int" "int" "int" } "stdcall" alien-indirect ;
-
-: swap-hint-supported? ( -- ? )
-    "GL_WIN_swap_hint" GL_EXTENSIONS glGetString subseq? ;
