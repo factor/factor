@@ -35,7 +35,7 @@ M: string item>xml ! This should change < and &
     2array "member" build-tag* ;
 
 M: hashtable item>xml
-    [ [ struct-member , ] assoc-each ] { } make
+    [ struct-member ] { } assoc>map
     "struct" build-tag* ;
 
 M: array item>xml

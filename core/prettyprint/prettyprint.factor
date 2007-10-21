@@ -120,7 +120,7 @@ SYMBOL: ->
 
 : remove-breakpoints ( quot pos -- quot' )
     over quotation? [
-        1+ swap cut [ (remove-breakpoints) ] 2apply
+        1+ cut [ (remove-breakpoints) ] 2apply
         [ -> ] swap 3append
     ] [
         drop
@@ -227,7 +227,7 @@ M: mixin-class see-class*
     \ MIXIN: pprint-word
     dup pprint-word <block
     dup members [
-        hard break
+        hard line-break
         \ INSTANCE: pprint-word pprint-word pprint-word
     ] curry* each block> ;
 

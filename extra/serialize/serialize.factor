@@ -260,11 +260,8 @@ DEFER: (deserialize) ( -- obj )
 : with-serialized ( quot -- )
     V{ } clone serialized rot with-variable ; inline
 
-: (deserialize-sequence)
-    deserialize* [ , (deserialize-sequence) ] [ drop ] if ;
-
 : deserialize-sequence ( -- seq )
-    [ (deserialize-sequence) ] { } make ;
+    [ [ deserialize* ] [ ] { } unfold ] with-serialized ;
 
 : deserialize ( -- obj )
     [ (deserialize) ] with-serialized ;

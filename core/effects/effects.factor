@@ -53,7 +53,7 @@ M: effect clone
     [ effect-in clone ] keep effect-out clone <effect> ;
 
 : split-shuffle ( stack shuffle -- stack1 stack2 )
-    effect-in length swap cut* ;
+    effect-in length cut* ;
 
 : load-shuffle ( stack shuffle -- )
     effect-in [ set ] 2each ;

@@ -904,17 +904,17 @@ HELP: tail?
 { delete-nth remove delete } related-words
 
 HELP: cut-slice
-{ $values { "n" "a non-negative integer" } { "seq" sequence } { "before" sequence } { "after" "a slice" } }
+{ $values { "seq" sequence } { "n" "a non-negative integer" } { "before" sequence } { "after" "a slice" } }
 { $description "Outputs a pair of sequences, where " { $snippet "before" } " consists of the first " { $snippet "n" } " elements of " { $snippet "seq" } " and has the same type, while " { $snippet "after" } " is a slice of the remaining elements." }
 { $notes "Unlike " { $link cut } ", the run time of this word is proportional to the length of " { $snippet "before" } ", not " { $snippet "after" } ", so it is suitable for use in an iterative algorithm which cuts successive pieces off a sequence." } ;
 
 HELP: cut
-{ $values { "n" "a non-negative integer" } { "seq" sequence } { "before" sequence } { "after" sequence } }
+{ $values { "seq" sequence } { "n" "a non-negative integer" } { "before" sequence } { "after" sequence } }
 { $description "Outputs a pair of sequences, where " { $snippet "before" } " consists of the first " { $snippet "n" } " elements of " { $snippet "seq" } ", while " { $snippet "after" } " holds the remaining elements. Both output sequences have the same type as " { $snippet "seq" } "." }
 { $notes "Since this word copies the entire tail of the sequence, it should not be used in a loop. If this is important, consider using " { $link cut-slice } " instead, since it returns a slice for the tail instead of copying." } ;
 
 HELP: cut*
-{ $values { "n" "a non-negative integer" } { "seq" sequence } { "before" sequence } { "after" sequence } }
+{ $values { "seq" sequence } { "n" "a non-negative integer" } { "before" sequence } { "after" sequence } }
 { $description "Outputs a pair of sequences, where " { $snippet "after" } " consists of the last " { $snippet "n" } " elements of " { $snippet "seq" } ", while " { $snippet "before" } " holds the remaining elements. Both output sequences have the same type as " { $snippet "seq" } "." } ;
 
 HELP: start*

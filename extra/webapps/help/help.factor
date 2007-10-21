@@ -20,8 +20,8 @@ IN: webapps.help
 } define-action
 
 M: link browser-link-href
-    link-name 
-    dup word? [
+    link-name
+    dup word? over f eq? or [
         browser-link-href
     ] [
         dup array? [ " " join ] when
@@ -32,9 +32,12 @@ M: link browser-link-href
     lookup show-help ;
 
 \ show-word {
-    { "vocab" "kernel" v-default }
     { "word" "call" v-default }
+    { "vocab" "kernel" v-default }
 } define-action
+
+M: f browser-link-href
+    drop \ f browser-link-href ;
 
 M: word browser-link-href
     dup word-name swap word-vocabulary

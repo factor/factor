@@ -414,6 +414,13 @@ PRIVATE>
 : interleave ( seq between quot -- )
     [ (interleave) ] 2curry iterate-seq 2each ; inline
 
+: unfold ( obj pred quot exemplar -- seq )
+    [
+        10 swap new-resizable [
+            [ push ] curry compose [ drop ] while
+        ] keep
+    ] keep like ; inline
+
 : index ( obj seq -- n )
     [ = ] curry* find drop ;
 
@@ -604,14 +611,14 @@ M: sequence <=>
         tuck length tail-slice* sequence=
     ] if ;
 
-: cut-slice ( n seq -- before after )
-    swap [ head ] 2keep tail-slice ;
+: cut-slice ( seq n -- before after )
+    [ head ] 2keep tail-slice ;
 
-: cut ( n seq -- before after )
-    swap [ head ] 2keep tail ;
+: cut ( seq n -- before after )
+    [ head ] 2keep tail ;
 
-: cut* ( n seq -- before after )
-    swap [ head* ] 2keep tail* ;
+: cut* ( seq n -- before after )
+    [ head* ] 2keep tail* ;
 
 <PRIVATE
 

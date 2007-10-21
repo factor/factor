@@ -83,7 +83,7 @@ HELP: filter
 { $examples
     "The following code displays a label showing the result of applying " { $link sq } " to the value 5:"
     { $code
-        "USING: models gadgets-labels gadgets-panes ;"
+        "USING: models ui.gadgets.labels ui.gadgets.panes ;"
         "5 <model> [ sq ] <filter> [ number>string ] <filter>"
         "<label-control> gadget."
     }
@@ -142,7 +142,7 @@ HELP: delay
 { $examples
     "The following code displays a sliders and a label which is updated half a second after the slider stops changing:"
     { $code
-        "USING: models gadgets-labels gadgets-sliders gadgets-panes ;"
+        "USING: models ui.gadgets.labels ui.gadgets.sliders ui.gadgets.panes ;"
         ": <funny-slider>"
         "    0 0 0 100 <range> <x-slider> 500 over set-slider-max ;"
         "<funny-slider> dup gadget."

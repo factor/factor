@@ -10,6 +10,12 @@ TUPLE: windows-nt-io ;
 TUPLE: windows-ce-io ;
 UNION: windows-io windows-nt-io windows-ce-io ;
 
+M: windows-io (handle-destructor) ( obj -- )
+    destructor-obj CloseHandle drop ;
+
+M: windows-io (socket-destructor) ( obj -- )
+    destructor-obj closesocket drop ;
+
 M: windows-io root-directory? ( path -- ? )
     [ path-separator? ] rtrim
     dup length 2 = [
@@ -48,7 +54,7 @@ M: win32-file init-handle ( handle -- ) drop ;
 : open-file ( path access-mode create-mode -- handle )
     [
         >r share-mode f r> CreateFile-flags f CreateFile
-        dup invalid-handle? dup [ CloseHandle drop ] f add-destructor
+        dup invalid-handle? dup close-later
         dup add-completion
     ] with-destructors ;
 
@@ -168,7 +174,7 @@ USE: windows.winsock
 
 : server-fd ( addrspec type -- fd )
     >r dup protocol-family r> open-socket
-        dup [ closesocket drop ] f add-destructor
+        dup close-socket-later
     dup rot make-sockaddr heap-size bind socket-error ;
 
 USE: namespaces

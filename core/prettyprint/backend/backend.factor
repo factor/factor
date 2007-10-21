@@ -44,10 +44,10 @@ M: word pprint*
     dup parsing? [
         \ POSTPONE: [ pprint-word ] pprint-prefix
     ] [
-        dup "break-before" word-prop break
+        dup "break-before" word-prop line-break
         dup pprint-word
         dup ?start-group dup ?end-group
-        "break-after" word-prop break
+        "break-after" word-prop line-break
     ] if ;
 
 M: real pprint* number>string text ;

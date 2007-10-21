@@ -296,7 +296,7 @@ M: phantom-retainstack finalize-height
 GENERIC: cut-phantom ( n phantom -- seq )
 
 M: phantom-stack cut-phantom
-    [ delegate cut* swap ] keep set-delegate ;
+    [ delegate swap cut* swap ] keep set-delegate ;
 
 : phantom-append ( seq stack -- )
     over length over adjust-phantom push-all ;

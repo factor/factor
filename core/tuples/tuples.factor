@@ -30,7 +30,7 @@ M: tuple class class-of-tuple ;
     swap [ index ] curry map ;
 
 : reshape-tuple ( oldtuple permutation -- newtuple )
-    >r tuple>array 2 swap cut r>
+    >r tuple>array 2 cut r>
     [ [ swap ?nth ] [ drop f ] if* ] curry* map
     append (>tuple) ;
 
@@ -106,7 +106,8 @@ M: tuple equal?
 : (delegates) ( obj -- )
     [ dup , delegate (delegates) ] when* ;
 
-: delegates ( obj -- seq ) [ (delegates) ] { } make ;
+: delegates ( obj -- seq )
+    [ dup ] [ [ delegate ] keep ] { } unfold ;
 
 : is? ( obj quot -- ? ) >r delegates r> contains? ; inline
 

@@ -137,7 +137,7 @@ M: interactor stream-read-partial
             [ restore-vars parse ] keep save-vars
         ] [
             >r f swap set-interactor-busy? drop r>
-            dup [ unexpected-eof? ] is? [ drop f ] when
+            dup delegate unexpected-eof? [ drop f ] when
         ] recover
     ] with-scope ;
 

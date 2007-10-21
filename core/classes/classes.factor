@@ -127,15 +127,13 @@ DEFER: (class<)
         curry* subset empty?
     ] curry find [ "Topological sort failed" throw ] unless* ;
 
-: (sort-classes) ( vec -- )
-    dup empty?
-    [ drop ]
-    [ dup largest-class , over delete-nth (sort-classes) ] if ;
-
 PRIVATE>
 
 : sort-classes ( seq -- newseq )
-    [ >vector (sort-classes) ] { } make ;
+    >vector
+    [ dup empty? not ]
+    [ dup largest-class >r over delete-nth r> ]
+    { } unfold ;
 
 : class-or ( class1 class2 -- class )
     {

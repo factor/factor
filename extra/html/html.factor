@@ -35,8 +35,11 @@ TUPLE: html-sub-stream style stream ;
     stdio get delegate stream-write ;
 
 : object-link-tag ( style quot -- )
-    presented pick at browser-link-href
-    [ <a =href a> call </a> ] [ call ] if* ; inline
+    presented pick at [
+        browser-link-href [
+            <a =href a> call </a>
+        ] [ call ] if*
+    ] [ call ] if* ; inline
 
 : hex-color, ( triplet -- )
     3 head-slice

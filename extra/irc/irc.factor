@@ -77,7 +77,7 @@ SYMBOL: irc-client
     trim-: "!" split first ;
 : irc-split ( string -- seq )
     1 swap [ [ CHAR: : = ] find* ] keep
-    swap [ cut trim-: ] [ nip f ] if >r [ blank? ] trim trim-:
+    swap [ swap cut trim-: ] [ nip f ] if >r [ blank? ] trim trim-:
     " " split r> [ 1array append ] when* ;
 : me? ( name -- ? )
     irc-client get irc-client-nick nick-name = ;
