@@ -652,16 +652,16 @@ PRIVATE>
     dup slice? [ { } like ] when 0 over length rot <slice> ;
     inline
 
-: ltrim ( seq quot -- newseq )
-    over >r [ not ] compose find drop
-    r> swap [ tail ] when* ; inline
+: left-trim ( seq quot -- newseq )
+    over >r [ not ] compose find drop r> swap
+    [ tail ] [ dup length tail ] if* ; inline
 
-: rtrim ( seq quot -- newseq )
-    over >r [ not ] compose find-last drop
-    r> swap [ 1+ head ] when* ; inline
+: right-trim ( seq quot -- newseq )
+    over >r [ not ] compose find-last drop r> swap
+    [ 1+ head ] [ 0 head ] if* ; inline
 
 : trim ( seq quot -- newseq )
-    [ ltrim ] keep rtrim ; inline
+    [ left-trim ] keep right-trim ; inline
 
 : sum ( seq -- n ) 0 [ + ] reduce ;
 : product ( seq -- n ) 1 [ * ] reduce ;

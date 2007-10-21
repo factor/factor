@@ -19,7 +19,7 @@ IN: bootstrap.stage2
 
     parse-command-line
 
-    H{ } clone changed-words set-global
+    all-words [ dup ] H{ } map>assoc changed-words set-global
 
     "-no-crossref" cli-args member? [
         "Cross-referencing..." print flush
@@ -41,9 +41,6 @@ IN: bootstrap.stage2
     ] if
 
     [
-        ! Compile everything if compiler is loaded
-        all-words [ changed-word ] each
-
         "exclude" "include"
         [ get-global " " split [ empty? not ] subset ] 2apply
         seq-diff

@@ -9,7 +9,7 @@ IN: math.fft
 : odd ( seq -- seq ) 2 group 1 <column> ;
 DEFER: fft
 : two ( seq -- seq ) fft 2 v/n dup append ;
-: omega ( n -- n ) recip -2 pi i * * * exp ;
+: omega ( n -- n ) recip -2 pi i* * * exp ;
 : twiddle ( seq -- seq ) dup length dup omega swap n^v v* ;
 : (fft) ( seq -- seq ) dup odd two twiddle swap even two v+ ;
 : fft ( seq -- seq ) dup length 1 = [ (fft) ] unless ;

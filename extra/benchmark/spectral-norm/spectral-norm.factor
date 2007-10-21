@@ -1,7 +1,7 @@
 ! Factor port of
 ! http://shootout.alioth.debian.org/gp4/benchmark.php?test=spectralnorm&lang=all
-USING: float-arrays kernel math math.vectors sequences
-sequences.private prettyprint words tools.time hints ;
+USING: float-arrays kernel math math.functions math.vectors
+sequences sequences.private prettyprint words tools.time hints ;
 IN: benchmark.spectral-norm
 
 : fast-truncate >fixnum >float ; inline

@@ -88,7 +88,7 @@ M: string b, ( n string -- ) heap-size b, ;
     "\0" read-until [ drop f ] unless ;
 
 : read-c-string* ( n -- str/f )
-    read [ 0 = ] rtrim dup empty? [ drop f ] when ;
+    read [ 0 = ] right-trim dup empty? [ drop f ] when ;
 
 : (read-128-ber) ( n -- n )
     1 read first

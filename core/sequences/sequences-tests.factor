@@ -236,9 +236,11 @@ unit-test
 
 [ -1./0. 0 delete-nth ] unit-test-fails
 [ "" ] [ "" [ blank? ] trim ] unit-test
-[ "" ] [ "" [ blank? ] ltrim ] unit-test
-[ "" ] [ "" [ blank? ] rtrim ] unit-test
+[ "" ] [ "" [ blank? ] left-trim ] unit-test
+[ "" ] [ "" [ blank? ] right-trim ] unit-test
+[ "" ] [ "  " [ blank? ] left-trim ] unit-test
+[ "" ] [ "  " [ blank? ] right-trim ] unit-test
 [ "asdf" ] [ " asdf " [ blank? ] trim ] unit-test
-[ "asdf " ] [ " asdf " [ blank? ] ltrim ] unit-test
-[ " asdf" ] [ " asdf " [ blank? ] rtrim ] unit-test
+[ "asdf " ] [ " asdf " [ blank? ] left-trim ] unit-test
+[ " asdf" ] [ " asdf " [ blank? ] right-trim ] unit-test
 

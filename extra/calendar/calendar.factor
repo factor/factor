@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 
 USING: arrays hashtables io io.streams.string kernel math
-math.vectors math.parser
+math.vectors math.functions math.parser
 namespaces sequences strings tuples system ;
 IN: calendar
 

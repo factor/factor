@@ -1,5 +1,5 @@
-USING: tools.deploy.app sequences io.files io.launcher io
-kernel concurrency ;
+USING: tools.deploy sequences io.files io.launcher io
+kernel concurrency prettyprint ;
 
 "." resource-path cd
 
@@ -12,6 +12,7 @@ kernel concurrency ;
     "color-picker"
     "gesture-logger"
     "golden-section"
+    "hello-world"
     "hello-ui"
     "lsys.ui"
     "maze"
@@ -19,6 +20,9 @@ kernel concurrency ;
     "tetris"
     "catalyst-talk"
 } [
+    dup
     "deploy-log/" over append <file-writer>
-    [ deploy.app ] with-stream
-] parallel-each
+    [ deploy ] with-stream
+    dup file-length 1024 /f
+    2array
+] parallel-map .

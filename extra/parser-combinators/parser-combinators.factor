@@ -111,11 +111,11 @@ M: or-parser (parse) ( input parser1 -- list )
   #! input. This implements the choice parsing operator.
   [ or-parser-p1 ] keep or-parser-p2 >r dupd parse swap r> parse lappend ;
 
-: ltrim-slice ( string -- string )
+: left-trim-slice ( string -- string )
   #! Return a new string without any leading whitespace
   #! from the original string.
   dup empty? [
-    dup first blank? [ 1 tail-slice ltrim-slice ] when 
+    dup first blank? [ 1 tail-slice left-trim-slice ] when 
   ] unless ;
 
 TUPLE: sp-parser p1 ;
@@ -127,7 +127,7 @@ C: sp sp-parser ( p1 -- parser )
 M: sp-parser (parse) ( input parser -- list )
   #! Skip all leading whitespace from the input then call
   #! the parser on the remaining input.
-  >r ltrim-slice r> sp-parser-p1 parse ;
+  >r left-trim-slice r> sp-parser-p1 parse ;
 
 TUPLE: just-parser p1 ;
 
