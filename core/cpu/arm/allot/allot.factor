@@ -40,7 +40,7 @@ IN: cpu.arm.allot
         "end" define-label
         ! is it zero?
         dup v>operand 0 CMP
-        0 >bignum over EQ load-literal
+        0 >bignum pick EQ load-literal
         "end" get EQ B
         ! ! it is non-zero
         1 %allot-bignum
@@ -64,12 +64,12 @@ IN: cpu.arm.allot
 M: arm-backend %box-alien ( dst src -- )
     "end" define-label
     dup v>operand 0 CMP
-    over f v>operand EQ MOV
+    over v>operand f v>operand EQ MOV
     "end" get EQ B
     alien 4 cells %allot
     ! Store offset
     v>operand R11 3 cells <+> STR
-    R12 f v>operand R12
+    R12 f v>operand MOV
     ! Store expired slot
     R12 R11 1 cells <+> STR
     ! Store underlying-alien slot

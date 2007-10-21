@@ -140,7 +140,7 @@ void init_factor_from_args(F_CHAR *image, int argc, F_CHAR **argv, bool embedded
 	if(p.fep)
 		factorbug();
 
-	c_to_factor(userenv[BOOT_ENV]);
+	c_to_factor_toplevel(userenv[BOOT_ENV]);
 	unnest_stacks();
 
 	for(i = 0; i < argc; i++)

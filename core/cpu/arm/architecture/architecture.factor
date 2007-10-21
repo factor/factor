@@ -326,7 +326,7 @@ M: arm-backend %unbox-any-c-ptr ( dst src -- )
     "start" define-label
     ! Save R14.
     R14 SP 4 <-> STR
-    ! Address is computed in RR11
+    ! Address is computed in R11
     R11 0 MOV
     ! Load object into R12
     R12 swap v>operand MOV
@@ -337,7 +337,7 @@ M: arm-backend %unbox-any-c-ptr ( dst src -- )
     ! If so, done
     "end" get EQ B
     ! Is the object an alien?
-    R14 R12 header-offset <+> LDR
+    R14 R12 header-offset <+/-> LDR
     R14 alien type-number tag-header CMP
     ! Add byte array address to address being computed
     R11 R11 R12 NE ADD
@@ -345,11 +345,11 @@ M: arm-backend %unbox-any-c-ptr ( dst src -- )
     R11 R11 byte-array-offset NE ADD
     "end" get NE B
     ! If alien, load the offset
-    R14 R12 alien-offset LDR
+    R14 R12 alien-offset <+/-> LDR
     ! Add it to address being computed
     R11 R11 R14 ADD
     ! Now recurse on the underlying alien
-    R12 R12 underlying-alien-offset LDR
+    R12 R12 underlying-alien-offset <+/-> LDR
     "start" get B
     "end" resolve-label
     ! Done, store address in destination register

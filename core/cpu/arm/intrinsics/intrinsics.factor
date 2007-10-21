@@ -22,7 +22,7 @@ IN: cpu.arm.intrinsics
 : %slot-any
     "scratch" operand "obj" operand %untag
     "n" operand dup 1 <LSR> MOV
-    "scratch" operand "val" operand "n" operand <+> ;
+    "val" operand "scratch" operand "n" operand <+> ;
 
 \ slot {
     ! Slot number is literal and the tag is known
