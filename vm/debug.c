@@ -111,6 +111,8 @@ void print_stack_frame(F_STACK_FRAME *frame)
 	printf("\n");
 	print_obj(frame_scan(frame));
 	printf("\n");
+	printf("%lx\n",(CELL)frame_executing(frame));
+	printf("%lx\n",(CELL)frame->xt);
 }
 
 void print_callstack(void)

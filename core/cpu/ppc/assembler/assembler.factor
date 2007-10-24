@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 IN: cpu.ppc.assembler
 USING: generator.fixup generic kernel math memory namespaces
-words math.bitfields math.functions io.binary ;
+words math.bitfields io.binary ;
 
 ! See the Motorola or IBM documentation for details. The opcode
 ! names are standard, and the operand order is the same as in

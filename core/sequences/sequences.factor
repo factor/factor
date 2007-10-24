@@ -414,6 +414,13 @@ PRIVATE>
 : interleave ( seq between quot -- )
     [ (interleave) ] 2curry iterate-seq 2each ; inline
 
+: unfold ( obj pred quot exemplar -- seq )
+    [
+        10 swap new-resizable [
+            [ push ] curry compose [ drop ] while
+        ] keep
+    ] keep like ; inline
+
 : index ( obj seq -- n )
     [ = ] curry* find drop ;
 
@@ -645,20 +652,19 @@ PRIVATE>
     dup slice? [ { } like ] when 0 over length rot <slice> ;
     inline
 
-: ltrim ( seq quot -- newseq )
-    over >r [ not ] compose find drop
-    r> swap [ tail ] when* ; inline
+: left-trim ( seq quot -- newseq )
+    over >r [ not ] compose find drop r> swap
+    [ tail ] [ dup length tail ] if* ; inline
 
-: rtrim ( seq quot -- newseq )
-    over >r [ not ] compose find-last drop
-    r> swap [ 1+ head ] when* ; inline
+: right-trim ( seq quot -- newseq )
+    over >r [ not ] compose find-last drop r> swap
+    [ 1+ head ] [ 0 head ] if* ; inline
 
 : trim ( seq quot -- newseq )
-    [ ltrim ] keep rtrim ; inline
+    [ left-trim ] keep right-trim ; inline
 
-: unfold ( obj pred quot exemplar -- seq )
-    [
-        10 swap new-resizable [
-            [ push ] curry compose [ drop ] while
-        ] keep
-    ] keep like ; inline
+: sum ( seq -- n ) 0 [ + ] reduce ;
+: product ( seq -- n ) 1 [ * ] reduce ;
+
+: infimum ( seq -- n ) dup first [ min ] reduce ;
+: supremum ( seq -- n ) dup first [ max ] reduce ;

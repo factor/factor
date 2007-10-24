@@ -37,7 +37,7 @@ TUPLE: html-sub-stream style stream ;
 : object-link-tag ( style quot -- )
     presented pick at [
         browser-link-href [
-            <a =href a> call </a> 
+            <a =href a> call </a>
         ] [ call ] if*
     ] [ call ] if* ; inline
 

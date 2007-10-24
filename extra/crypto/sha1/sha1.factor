@@ -127,7 +127,7 @@ SYMBOL: K
 : file>sha1 ( file -- sha1 ) <file-reader> stream>sha1 ;
 
 : string>sha1-interleave ( string -- )
-    [ zero? ] ltrim
+    [ zero? ] left-trim
     dup length odd? [ 1 tail ] when
     seq>2seq [ string>sha1 ] 2apply
     swap 2seq>seq ;

@@ -19,8 +19,10 @@ void init_c_io(void)
 
 void io_error(void)
 {
+#ifndef WINCE
 	if(errno == EINTR)
 		return;
+#endif
 
 	CELL error = tag_object(from_char_string(strerror(errno)));
 	general_error(ERROR_IO,error,F,NULL);

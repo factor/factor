@@ -77,22 +77,6 @@ unit-test
 [ "-101.0e-2" string>number number>string ]
 unit-test
 
-[ 5 ]
-[ "10/2" string>number ]
-unit-test
-
-[ -5 ]
-[ "-10/2" string>number ]
-unit-test
-
-[ -5 ]
-[ "10/-2" string>number ]
-unit-test
-
-[ 5 ]
-[ "-10/-2" string>number ]
-unit-test
-
 [ 5.0 ]
 [ "10.0/2" string>number ]
 unit-test
@@ -103,10 +87,6 @@ unit-test
 
 [ f ]
 [ "e/2" string>number ]
-unit-test
-
-[ "33/100" ]
-[ "66/200" string>number number>string ]
 unit-test
 
 [ f ] [ "12" bin> ] unit-test

@@ -8,6 +8,7 @@ GENERIC: >bignum ( x -- y ) foldable
 GENERIC: >float ( x -- y ) foldable
 
 MATH: number= ( x y -- ? ) foldable
+
 M: object number= 2drop f ;
 
 MATH: <  ( x y -- ? ) foldable
@@ -48,8 +49,6 @@ GENERIC: zero? ( x -- ? ) foldable
 
 M: object zero? drop f ;
 
-GENERIC: sqrt ( x -- y ) foldable
-
 : 1+ ( x -- y ) 1 + ; foldable
 : 1- ( x -- y ) 1 - ; foldable
 : 2/ ( x -- y ) -1 shift ; foldable
@@ -66,15 +65,8 @@ GENERIC: sqrt ( x -- y ) foldable
     pick >= [ >= ] [ 2drop f ] if ; inline
 
 : rem ( x y -- z ) tuck mod over + swap mod ; foldable
+
 : sgn ( x -- n ) dup 0 < -1 0 ? swap 0 > 1 0 ? bitor ; foldable
-: truncate ( x -- y ) dup 1 mod - ; inline
-: round ( x -- y ) dup sgn 2 / + truncate ; inline
-
-: floor ( x -- y )
-    dup 1 mod dup zero?
-    [ drop ] [ dup 0 < [ - 1- ] [ - ] if ] if ; foldable
-
-: ceiling ( x -- y ) neg floor neg ; foldable
 
 : [-] ( x y -- z ) - 0 max ; inline
 
@@ -84,9 +76,6 @@ GENERIC: sqrt ( x -- y ) foldable
 
 : odd? ( n -- ? ) 1 bitand 1 number= ;
 
-: >fraction ( a/b -- a b )
-    dup numerator swap denominator ; inline
-
 UNION: integer fixnum bignum ;
 
 UNION: rational integer ratio ;
@@ -94,6 +83,19 @@ UNION: rational integer ratio ;
 UNION: real rational float ;
 
 UNION: number real complex ;
+
+M: number equal? number= ;
+
+M: real hashcode* nip >fixnum ;
+
+M: real <=> - ;
+
+! real and sequence overlap. we disambiguate:
+M: integer equal? number= ;
+
+M: integer hashcode* nip >fixnum ;
+
+M: integer <=> - ;
 
 GENERIC: fp-nan? ( x -- ? )
 
@@ -104,25 +106,6 @@ M: float fp-nan?
     double>bits -51 shift BIN: 111111111111 [ bitand ] keep
     number= ;
 
-<PRIVATE
-
-: (rect>) ( x y -- z )
-    dup zero? [ drop ] [ <complex> ] if ; inline
-
-PRIVATE>
-
-: rect> ( x y -- z )
-    over real? over real? and [
-        (rect>)
-    ] [
-        "Complex number must have real components" throw
-    ] if ; inline
-
-: >rect ( z -- x y ) dup real swap imaginary ; inline
-
-: >float-rect ( z -- x y )
-    >rect swap >float swap >float ; inline
-
 : (next-power-of-2) ( i n -- n )
     2dup >= [
         drop
@@ -131,6 +114,8 @@ PRIVATE>
     ] if ;
 
 : next-power-of-2 ( m -- n ) 2 swap (next-power-of-2) ; foldable
+
+: align ( m w -- n ) 1- [ + ] keep bitnot bitand ; inline
 
 <PRIVATE
 

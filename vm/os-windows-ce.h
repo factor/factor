@@ -2,6 +2,7 @@
 #define UNICODE
 #endif
 
+#include <windows.h>
 #include <ctype.h>
 
 typedef wchar_t F_SYMBOL;
@@ -15,15 +16,11 @@ typedef wchar_t F_SYMBOL;
 
 int errno;
 char *strerror(int err);
-void flush_icache();
+void flush_icache(CELL start, CELL end);
 char *getenv(char *name);
 
 #define snprintf _snprintf
 #define snwprintf _snwprintf
-#define EINTR 0
 
 s64 current_millis(void);
-
-DECLARE_PRIMITIVE(cwd);
-DECLARE_PRIMITIVE(cd);
-
+void c_to_factor_toplevel(CELL quot);

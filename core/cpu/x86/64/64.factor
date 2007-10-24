@@ -4,7 +4,7 @@ USING: alien.c-types arrays cpu.x86.assembler
 cpu.x86.architecture cpu.x86.intrinsics cpu.x86.sse2
 cpu.x86.allot cpu.architecture kernel kernel.private math
 namespaces sequences generator.registers generator.fixup system
-alien alien.compiler alien.structs slots splitting math.functions ;
+alien alien.compiler alien.structs slots splitting ;
 IN: cpu.x86.64
 
 PREDICATE: x86-backend amd64-backend
@@ -13,8 +13,8 @@ PREDICATE: x86-backend amd64-backend
 M: amd64-backend ds-reg R14 ;
 M: amd64-backend rs-reg R15 ;
 M: amd64-backend stack-reg RSP ;
-M: x86-backend xt-reg RCX ;
-M: x86-backend stack-save-reg RSI ;
+M: amd64-backend xt-reg RCX ;
+M: amd64-backend stack-save-reg RSI ;
 
 M: temp-reg v>operand drop RBX ;
 

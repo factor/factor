@@ -1,4 +1,4 @@
-USING: kernel math namespaces prettyprint math.functions
+USING: kernel math namespaces prettyprint
 math.private continuations tools.test sequences ;
 IN: temporary
 
@@ -57,15 +57,6 @@ IN: temporary
 [ 134217728 dup + dup + dup + dup + dup + dup + unparse ]
 unit-test
 
-[ t ] [ 0 0 ^ fp-nan? ] unit-test
-[ 1 ] [ 10 0 ^ ] unit-test
-[ 1/8 ] [ 1/2 3 ^ ] unit-test
-[ 1/8 ] [ 2 -3 ^ ] unit-test
-[ t ] [ 1 100 shift 2 100 ^ = ] unit-test
-
-[ t ] [ 256 power-of-2? ] unit-test
-[ f ] [ 123 power-of-2? ] unit-test
-
 [ 7 ] [ 255 log2 ] unit-test
 [ 8 ] [ 256 log2 ] unit-test
 [ 8 ] [ 257 log2 ] unit-test
@@ -100,11 +91,6 @@ unit-test
 [ f ] [ BIN: -1101 >bignum 3 bit? ] unit-test
 [ t ] [ BIN: -1101 >bignum 4 bit? ] unit-test
 
-[ 1 ] [ 7/8 ceiling ] unit-test
-[ 2 ] [ 3/2 ceiling ] unit-test
-[ 0 ] [ -7/8 ceiling ] unit-test
-[ -1 ] [ -3/2 ceiling ] unit-test
-
 [ 2 ] [ 0 next-power-of-2 ] unit-test
 [ 2 ] [ 1 next-power-of-2 ] unit-test
 [ 2 ] [ 2 next-power-of-2 ] unit-test
@@ -112,10 +98,8 @@ unit-test
 [ 16 ] [ 13 next-power-of-2 ] unit-test
 [ 16 ] [ 16 next-power-of-2 ] unit-test
 
-[ 268435456 ] [ -268435456 >fixnum -1 / ] unit-test
 [ 268435456 ] [ -268435456 >fixnum -1 /i ] unit-test
 [ 268435456 0 ] [ -268435456 >fixnum -1 /mod ] unit-test
-[ 1/268435456 ] [ -1 -268435456 >fixnum / ] unit-test
 [ 0 ] [ -1 -268435456 >fixnum /i ] unit-test
 [ 0 -1 ] [ -1 -268435456 >fixnum /mod ] unit-test
 [ 14355 ] [ 1591517158873146351817850880000000 32769 mod ] unit-test

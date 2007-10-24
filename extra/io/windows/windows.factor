@@ -17,7 +17,7 @@ M: windows-io (socket-destructor) ( obj -- )
     destructor-obj closesocket drop ;
 
 M: windows-io root-directory? ( path -- ? )
-    [ path-separator? ] rtrim
+    [ path-separator? ] right-trim
     dup length 2 = [
         dup first Letter?
         swap second CHAR: : = and

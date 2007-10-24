@@ -1,5 +1,5 @@
 USING: math.intervals kernel sequences words math arrays
-prettyprint tools.test random ;
+prettyprint tools.test random vocabs ;
 IN: temporary
 
 [ T{ interval f { 1 t } { 2 t } } ] [ 1 2 [a,b] ] unit-test
@@ -39,11 +39,11 @@ IN: temporary
 ] unit-test
 
 [ t ] [
-    1 2 [a,b] -1/2 1/2 [a,b] interval* -1 1 [a,b] =
+    1 2 [a,b] -0.5 0.5 [a,b] interval* -1 1 [a,b] =
 ] unit-test
 
 [ t ] [
-    1 2 [a,b] -1/2 1/2 (a,b] interval* -1 1 (a,b] =
+    1 2 [a,b] -0.5 0.5 (a,b] interval* -1 1 (a,b] =
 ] unit-test
 
 [ t ] [
@@ -77,7 +77,7 @@ IN: temporary
 ] unit-test
 
 [ t ] [
-    1/2 0 1 (a,b) interval-contains?
+    0.5 0 1 (a,b) interval-contains?
 ] unit-test
 
 [ f ] [
@@ -88,9 +88,11 @@ IN: temporary
 
 [ f ] [ -1 1 (a,b) 0 1 (a,b) interval/ ] unit-test
 
-[ t ] [
-    -1 1 (a,b) 1/2 1 (a,b) interval/ -2 2 (a,b) =
-] unit-test
+"math.ratios.private" vocab [
+    [ t ] [
+        -1 1 (a,b) 0.5 1 (a,b) interval/ -2 2 (a,b) =
+    ] unit-test
+] when
 
 [ t ] [ 0 5 [a,b] 5 interval<= ] unit-test
 
@@ -125,12 +127,15 @@ IN: temporary
         { + interval+ }
         { - interval- }
         { * interval* }
-        { / interval/ }
         { /i interval/i }
         { shift interval-shift }
         { min interval-min }
         { max interval-max }
-    } random ;
+    }
+    "math.ratios.private" vocab [
+        { / interval/ } add
+    ] when
+    random ;
 
 : interval-test
     random-interval random-interval random-op

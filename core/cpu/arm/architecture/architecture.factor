@@ -1,7 +1,7 @@
 ! Copyright (C) 2007 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: alien alien.c-types arrays cpu.arm.assembler compiler
-kernel kernel.private math math.functions namespaces words
+kernel kernel.private math namespaces words
 words.private generator.registers generator.fixup generator
 cpu.architecture system layouts ;
 IN: cpu.arm.architecture
@@ -9,8 +9,8 @@ IN: cpu.arm.architecture
 TUPLE: arm-backend ;
 
 ! ARM register assignments:
-! R0, R1, R2, R3 integer vregs
-! R12 temporary
+! R0-R4, R7-R10 integer vregs
+! R11, R12 temporary
 ! R5 data stack
 ! R6 retain stack
 ! R7 primitives
@@ -22,7 +22,7 @@ M: temp-reg v>operand drop R12 ;
 
 M: int-regs return-reg drop R0 ;
 M: int-regs param-regs drop { R0 R1 R2 R3 } ;
-M: int-regs vregs drop { R0 R1 R2 R3 } ;
+M: int-regs vregs drop { R0 R1 R2 R3 R4 R7 R8 R9 R10 } ;
 
 ! No FPU support yet
 M: float-regs param-regs drop { } ;
@@ -44,15 +44,27 @@ M: immediate load-literal
         v>operand load-indirect
     ] if ;
 
-M: arm-backend stack-frame ( n -- i ) 4 + 8 align ;
+: lr-save ( n -- i ) cell - ;
+: next-save ( n -- i ) 2 cells - ;
+: xt-save ( n -- i ) 3 cells - ;
+: factor-area-size 5 cells ;
+
+M: arm-backend stack-frame ( n -- i )
+    factor-area-size + 8 align ;
+
+M: arm-backend %save-xt ( -- )
+    R12 PC 8 SUB ;
 
 M: arm-backend %prologue ( n -- )
-    LR SP 4 <-> STR
-    SP SP rot stack-frame SUB ;
+    SP SP pick SUB
+    R11 over MOV
+    R11 SP pick next-save <+> STR
+    R12 SP pick xt-save <+> STR
+    LR SP rot lr-save <+> STR ;
 
 M: arm-backend %epilogue ( n -- )
-    SP SP rot stack-frame ADD
-    LR SP 4 <-> LDR ;
+    LR SP pick lr-save <+> LDR
+    SP SP rot ADD ;
 
 : compile-dlsym ( symbol dll reg -- )
     [
@@ -83,26 +95,29 @@ M: arm-backend %profiler-prologue ( word -- )
     R0 R12 profile-count-offset <+> STR
     "end" resolve-label ;
 
-: primitive-addr ( word dst -- )
-    #! Load a word address into dst.
-    R7 rot word-primitive cells <+> LDR ;
+M: arm-backend %call-label ( label -- ) BL ;
 
-M: arm-backend %call ( label -- )
-    #! Far C call for primitives, near C call for compiled defs.
-    dup primitive? [ R0 primitive-addr R0 BLX ] [ BL ] if ;
+M: arm-backend %jump-label ( label -- ) B ;
 
-M: arm-backend %jump-label ( label -- )
-    #! For tail calls. IP not saved on C stack.
-    #! WARNING: don't clobber LR here!
-    dup primitive? [ PC primitive-addr ] [ B ] if ;
+: %prepare-primitive ( word -- )
+    #! Save stack pointer to stack_chain->callstack_top, load XT
+    R1 SP MOV
+    T{ temp-reg } load-literal
+    R12 R12 word-xt-offset <+> LDR ;
+
+M: arm-backend %call-primitive ( word -- )
+    %prepare-primitive R12 BLX ;
+
+M: arm-backend %jump-primitive ( word -- )
+    %prepare-primitive R12 BX ;
 
 M: arm-backend %jump-t ( label -- )
-    "flag" operand object tag-number CMP NE B ;
+    "flag" operand f v>operand CMP NE B ;
 
 : (%dispatch) ( word-table# reg -- )
     #! Load jump table target address into reg.
-    "n" operand PC "n" operand 1 <LSR> ADD
-    "n" operand 0 <+> LDR
+    "scratch" operand PC "n" operand 1 <LSR> ADD
+    "scratch" operand 0 <+> LDR
     rc-indirect-arm rel-dispatch ;
 
 M: arm-backend %call-dispatch ( word-table# -- )
@@ -112,7 +127,6 @@ M: arm-backend %call-dispatch ( word-table# -- )
     ] H{
         { +input+ { { f "n" } } }
         { +scratch+ { { f "scratch" } } }
-        { +clobber+ { "n" } }
     } with-template ;
 
 M: arm-backend %jump-dispatch ( word-table# -- )
@@ -121,21 +135,16 @@ M: arm-backend %jump-dispatch ( word-table# -- )
         PC (%dispatch)
     ] H{
         { +input+ { { f "n" } } }
-        { +clobber+ { "n" } }
+        { +scratch+ { { f "scratch" } } }
     } with-template ;
 
 M: arm-backend %return ( -- ) %epilogue-later PC LR MOV ;
 
 M: arm-backend %unwind drop %return ;
 
-: (%peek/replace)
-    >r drop >r v>operand r> loc>operand r> execute ;
+M: arm-backend %peek >r v>operand r> loc>operand LDR ;
 
-M: int-regs (%peek) \ LDR (%peek/replace) ;
-M: int-regs (%replace) \ STR (%peek/replace) ;
-
-M: arm-backend %move-int>int ( dst src -- )
-    [ v>operand ] 2apply MOV ;
+M: arm-backend %replace >r v>operand r> loc>operand STR ;
 
 : (%inc) ( n reg -- )
     dup rot cells dup 0 < [ neg SUB ] [ ADD ] if ;
@@ -215,11 +224,13 @@ M: arm-backend %box-small-struct ( size -- )
     R2 swap MOV
     "box_small_struct" f %alien-invoke ;
 
+: temp@ stack-frame* factor-area-size - swap - ;
+
 : struct-return@ ( size n -- n )
     [
         stack-frame* +
     ] [
-        stack-frame* swap - cell -
+        stack-frame* factor-area-size - swap -
     ] ?if ;
 
 M: arm-backend %prepare-box-struct ( size -- )
@@ -239,6 +250,15 @@ M: arm-backend %box-large-struct ( n size -- )
 M: arm-backend struct-small-enough? ( size -- ? )
     wince? [ drop f ] [ 4 <= ] if ;
 
+M: arm-backend %prepare-alien-invoke
+    #! Save Factor stack pointers in case the C code calls a
+    #! callback which does a GC, which must reliably trace
+    #! all roots.
+    "stack_chain" f R12 %alien-global
+    SP R12 0 <+> STR
+    ds-reg R12 8 <+> STR
+    rs-reg R12 12 <+> STR ;
+
 M: arm-backend %alien-invoke ( symbol dll -- )
     ! Load target address
     R12 PC 4 <+> LDR
@@ -249,15 +269,13 @@ M: arm-backend %alien-invoke ( symbol dll -- )
     ! The target address
     0 , rc-absolute rel-dlsym ;
 
-: temp@ SP stack-frame* 2 cells - <+> ;
-
 M: arm-backend %prepare-alien-indirect ( -- )
     "unbox_alien" f %alien-invoke
-    R0 temp@ STR ;
+    R0 SP cell temp@ <+> STR ;
 
 M: arm-backend %alien-indirect ( -- )
-    IP temp@ LDR
-    IP BLX ;
+    R12 SP cell temp@ <+> LDR
+    R12 BLX ;
 
 M: arm-backend %alien-callback ( quot -- )
     R0 load-indirect
@@ -266,11 +284,11 @@ M: arm-backend %alien-callback ( quot -- )
 M: arm-backend %callback-value ( ctype -- )
     ! Save top of data stack
     %prepare-unbox
-    R0 temp@ STR
+    R0 SP cell temp@ <+> STR
     ! Restore data/call/retain stacks
     "unnest_stacks" f %alien-invoke
     ! Place former top of data stack in R0
-    R0 temp@ LDR
+    R0 SP cell temp@ <+> LDR
     ! Unbox R0
     unbox-return ;
 
@@ -291,37 +309,50 @@ M: long-long-type c-type-stack-align? drop wince? not ;
 M: arm-backend fp-shadows-int? ( -- ? ) f ;
 
 ! Alien intrinsics
-: add-alien-offset "offset" operand tag-bits get <ASR> ADD ;
+M: arm-backend %unbox-byte-array ( dst src -- )
+    [ v>operand ] 2apply byte-array-offset ADD ;
 
-: (%unbox-alien) <+> roll call ; inline
+M: arm-backend %unbox-alien ( dst src -- )
+    [ v>operand ] 2apply alien-offset <+> LDR ;
 
-M: arm-backend %unbox-byte-array ( quot src -- )
-    "address" operand "alien" operand add-alien-offset
-    "address" operand alien-offset (%unbox-alien) ;
+M: arm-backend %unbox-f ( dst src -- )
+    drop v>operand 0 MOV ;
 
-M: arm-backend %unbox-alien ( quot src -- )
-    "address" operand "alien" operand alien-offset <+> LDR
-    "address" operand dup add-alien-offset
-    "address" operand 0 (%unbox-alien) ;
-
-M: arm-backend %unbox-f ( quot src -- )
-    "offset" operand dup %untag-fixnum
-    "offset" operand 0 (%unbox-alien) ;
-
-M: arm-backend %complex-alien-accessor ( quot src -- )
-    "is-f" define-label
-    "is-alien" define-label
+M: arm-backend %unbox-any-c-ptr ( dst src -- )
+    #! We need three registers here. R11 and R12 are reserved
+    #! temporary registers. The third one is R14, which we have
+    #! to save/restore.
     "end" define-label
-    "alien" operand f v>operand CMP
-    "is-f" get EQ B
-    "address" operand "alien" operand header-offset neg <-> LDR
-    "address" operand alien type-number tag-header CMP
-    "is-alien" get EQ B
-    [ %unbox-byte-array ] 2keep
-    "end" get B
-    "is-alien" resolve-label
-    [ %unbox-alien ] 2keep
-    "end" get B
-    "is-f" resolve-label
-    %unbox-f
-    "end" resolve-label ;
+    "start" define-label
+    ! Save R14.
+    R14 SP 4 <-> STR
+    ! Address is computed in R11
+    R11 0 MOV
+    ! Load object into R12
+    R12 swap v>operand MOV
+    ! We come back here with displaced aliens
+    "start" resolve-label
+    ! Is the object f?
+    R12 f v>operand CMP
+    ! If so, done
+    "end" get EQ B
+    ! Is the object an alien?
+    R14 R12 header-offset <+/-> LDR
+    R14 alien type-number tag-header CMP
+    ! Add byte array address to address being computed
+    R11 R11 R12 NE ADD
+    ! Add an offset to start of byte array's data area
+    R11 R11 byte-array-offset NE ADD
+    "end" get NE B
+    ! If alien, load the offset
+    R14 R12 alien-offset <+/-> LDR
+    ! Add it to address being computed
+    R11 R11 R14 ADD
+    ! Now recurse on the underlying alien
+    R12 R12 underlying-alien-offset <+/-> LDR
+    "start" get B
+    "end" resolve-label
+    ! Done, store address in destination register
+    v>operand R11 MOV
+    ! Restore R14.
+    R14 SP 4 <-> LDR ;

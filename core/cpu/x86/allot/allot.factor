@@ -2,8 +2,8 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel cpu.architecture cpu.x86.assembler
 cpu.x86.architecture kernel.private namespaces math
-math.functions sequences generic arrays generator
-generator.fixup generator.registers system layouts alien ;
+sequences generic arrays generator generator.fixup
+generator.registers system layouts alien ;
 IN: cpu.x86.allot
 
 : allot-reg

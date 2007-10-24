@@ -1,6 +1,7 @@
 
 USING: kernel namespaces
        math
+       math.functions
        math.vectors
        math.parser
        hashtables sequences threads

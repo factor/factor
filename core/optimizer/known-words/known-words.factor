@@ -6,7 +6,7 @@ inference.class kernel assocs math math.private kernel.private
 sequences words parser vectors strings sbufs io namespaces
 assocs quotations sequences.private io.binary io.crc32
 io.buffers io.streams.string layouts splitting math.intervals
-math.floats.private math.vectors tuples tuples.private classes
+math.floats.private tuples tuples.private classes
 optimizer.def-use optimizer.backend optimizer.pattern-match
 float-arrays combinators.private ;
 
@@ -92,7 +92,7 @@ float-arrays combinators.private ;
 ] each
 
 ! Specializers
-{ 1+ 1- sq neg recip sgn truncate } [
+{ 1+ 1- sq neg recip sgn } [
     { number } "specializer" set-word-prop
 ] each
 
@@ -100,20 +100,6 @@ float-arrays combinators.private ;
 
 { min max } [
     { number number } "specializer" set-word-prop
-] each
-
-{ vneg norm-sq norm normalize } [
-    { { float-array array } } "specializer" set-word-prop
-] each
-
-\ n*v { * { float-array array } } "specializer" set-word-prop
-\ v*n { { float-array array } * } "specializer" set-word-prop
-\ n/v { * { float-array array } } "specializer" set-word-prop
-\ v/n { { float-array array } * } "specializer" set-word-prop
-
-{ v+ v- v* v/ vmax vmin v. } [
-    { { float-array array } { float-array array } }
-    "specializer" set-word-prop
 ] each
 
 { first first2 first3 first4 }

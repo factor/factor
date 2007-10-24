@@ -4,9 +4,6 @@ USING: kernel kernel.private sequences
 sequences.private math math.private combinators ;
 IN: math.integers.private
 
-M: integer hashcode* nip >fixnum ;
-M: integer <=> - ;
-
 M: integer numerator ;
 M: integer denominator drop 1 ;
 

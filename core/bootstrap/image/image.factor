@@ -4,7 +4,7 @@ USING: alien arrays bit-arrays byte-arrays generic assocs
 hashtables assocs hashtables.private io kernel kernel.private
 math namespaces parser prettyprint sequences sequences.private
 strings sbufs vectors words quotations assocs system layouts
-splitting growable math.functions classes tuples words.private
+splitting growable classes tuples words.private
 io.binary io.files vocabs vocabs.loader source-files
 definitions debugger float-arrays quotations.private
 combinators.private combinators ;
@@ -160,7 +160,7 @@ GENERIC: ' ( obj -- ptr )
     { } unfold ;
 
 : emit-bignum ( n -- )
-    [ 0 < 1 0 ? ] keep abs bignum>seq
+    dup 0 < [ 1 swap neg ] [ 0 swap ] if bignum>seq
     dup length 1+ emit-fixnum
     swap emit emit-seq ;
 

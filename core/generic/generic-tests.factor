@@ -34,7 +34,7 @@ M: f bool>str drop "false" ;
 [ f ] [ f bool>str str>bool ] unit-test
 
 ! Testing unions
-UNION: funnies quotation ratio complex ;
+UNION: funnies quotation float complex ;
 
 GENERIC: funny ( x -- y )
 M: funnies funny drop 2 ;
@@ -48,7 +48,7 @@ PREDICATE: funnies very-funny number? ;
 GENERIC: gooey ( x -- y )
 M: very-funny gooey sq ;
 
-[ 1/4 ] [ 1/2 gooey ] unit-test
+[ 0.25 ] [ 0.5 gooey ] unit-test
 
 DEFER: complement-test
 FORGET: complement-test

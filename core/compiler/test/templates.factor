@@ -1,9 +1,9 @@
 ! Black box testing of templating optimization
 
 USING: arrays compiler kernel kernel.private math
-hashtables.private math.private math.ratios.private namespaces
-sequences sequences.private tools.test namespaces.private
-slots.private combinators.private byte-arrays alien layouts ;
+hashtables.private math.private namespaces sequences
+sequences.private tools.test namespaces.private slots.private
+combinators.private byte-arrays alien layouts ;
 IN: temporary
 
 ! Oops!
@@ -37,40 +37,13 @@ unit-test
 
 : foo ;
 
-[ 4 4 ]
-[ 1/2 [ tag [ foo ] keep ] compile-1 ]
+[ 5 5 ]
+[ 1.2 [ tag [ foo ] keep ] compile-1 ]
 unit-test
 
 [ 1 2 2 ]
-[ 1/2 [ dup 1 slot swap 2 slot [ foo ] keep ] compile-1 ]
+[ { 1 2 } [ dup 2 slot swap 3 slot [ foo ] keep ] compile-1 ]
 unit-test
-
-[ 41 5 4 ] [
-    5/4 4/5 [
-        dup ratio? [
-            over ratio? [
-                2dup 2>fraction >r * swap r> * swap
-                + -rot denominator swap denominator
-            ] [
-                2drop f f f
-            ] if
-        ] [
-            2drop f f f
-        ] if
-    ] compile-1
-] unit-test
-
-: jxyz
-    over bignum? [
-        dup ratio? [
-            [ >fraction ] 2apply swapd
-            >r 2array swap r> 2array swap
-        ] when
-    ] when ;
-
-\ jxyz compile
-
-[ { 1 2 } { 1 1 } ] [ 1 >bignum 1/2 jxyz ] unit-test
 
 [ 3 ]
 [

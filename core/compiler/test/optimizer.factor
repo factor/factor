@@ -208,10 +208,6 @@ M: slice foozul ;
 [ -5 ] [ 5 [ -1 * ] compile-1 ] unit-test
 [ -5 ] [ 5 [ -1 swap * ] compile-1 ] unit-test
 
-[ 5 ] [ 5 [ 1 / ] compile-1 ] unit-test
-[ 1/5 ] [ 5 [ 1 swap / ] compile-1 ] unit-test
-[ -5 ] [ 5 [ -1 / ] compile-1 ] unit-test
-
 [ 0 ] [ 5 [ 1 mod ] compile-1 ] unit-test
 [ 0 ] [ 5 [ 1 rem ] compile-1 ] unit-test
 
@@ -246,8 +242,6 @@ M: slice foozul ;
 [ t ] [ 5 [ dup number= ] compile-1 ] unit-test
 [ t ] [ \ vector [ \ vector = ] compile-1 ] unit-test
 
-[ 3 ] [ 10/3 [ { ratio } declare 1 /i ] compile-1 ] unit-test
-
 GENERIC: detect-number ( obj -- obj )
 M: number detect-number ;
 
@@ -275,7 +269,11 @@ USE: sorting.private
 ] unit-test
 
 ! Regression
-[ 1 2 { real imaginary } ] [
-    C{ 1 2 }
-    [ { real imaginary } [ get-slots ] keep ] compile-1
+TUPLE: silly-tuple a b ;
+
+[ 1 2 { silly-tuple-a silly-tuple-b } ] [
+    T{ silly-tuple f 1 2 }
+    [
+        { silly-tuple-a silly-tuple-b } [ get-slots ] keep
+    ] compile-1
 ] unit-test

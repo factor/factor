@@ -40,11 +40,5 @@ void sleep_millis(CELL msec);
 
 void reset_stdio(void);
 
-/* Global variables used to pass fault handler state from signal handler to
-user-space */
-CELL signal_number;
-CELL signal_fault_addr;
-void *signal_callstack_top;
-
 void memory_signal_handler_impl(void);
 void misc_signal_handler_impl(void);

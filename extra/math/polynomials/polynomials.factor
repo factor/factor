@@ -22,7 +22,7 @@ PRIVATE>
 : p= ( p p -- ? ) pextend = ;
 
 : ptrim ( p -- p )
-    dup length 1 = [ [ zero? ] rtrim ] unless ;
+    dup length 1 = [ [ zero? ] right-trim ] unless ;
 
 : 2ptrim ( p p -- p p ) [ ptrim ] 2apply ;
 : p+ ( p p -- p ) pextend v+ ;

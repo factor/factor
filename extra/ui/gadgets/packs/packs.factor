@@ -1,7 +1,7 @@
 ! Copyright (C) 2005, 2007 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: sequences ui.gadgets kernel math math.vectors
-namespaces ;
+USING: sequences ui.gadgets kernel math math.functions
+math.vectors namespaces ;
 IN: ui.gadgets.packs
 
 TUPLE: pack align fill gap ;

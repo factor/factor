@@ -34,6 +34,10 @@ HELP: denominator ( a/b -- b )
 { $values { "a/b" rational } { "b" "a positive integer" } }
 { $description "Outputs the denominator of a rational number. Always outputs 1 with integers." } ;
 
+HELP: fraction>
+{ $values { "a" integer } { "b" "a positive integer" } { "a/b" rational } }
+{ $description "Creates a new ratio, or outputs the numerator if the denominator is 1. This word does not reduce the fraction to lowest terms, and should not be called directly; use " { $link / } " instead." } ;
+
 HELP: >fraction
 { $values { "a/b" rational } { "a" integer } { "b" "a positive integer" } }
 { $description "Extracts the numerator and denominator of a rational number." } ;

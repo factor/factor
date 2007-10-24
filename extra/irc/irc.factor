@@ -72,7 +72,7 @@ TUPLE: part-command channel text ;
 
 SYMBOL: irc-client
 : irc-stream> ( -- stream ) irc-client get irc-client-stream ;
-: trim-: ( seq -- seq ) [ CHAR: : = ] ltrim ;
+: trim-: ( seq -- seq ) [ CHAR: : = ] left-trim ;
 : parse-name ( string -- string )
     trim-: "!" split first ;
 : irc-split ( string -- seq )

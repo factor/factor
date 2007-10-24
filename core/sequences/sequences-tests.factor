@@ -43,9 +43,9 @@ IN: temporary
 
 [ f ] [ CHAR: a 0 "tuvwxyz" >vector index* ] unit-test
 
-[ f ] [ [ "Hello" { } 4/3 ] [ string? ] all? ] unit-test
+[ f ] [ [ "Hello" { } 0.75 ] [ string? ] all? ] unit-test
 [ t ] [ [ ] [ ] all? ] unit-test
-[ t ] [ [ "hi" t 1/2 ] [ ] all? ] unit-test
+[ t ] [ [ "hi" t 0.5 ] [ ] all? ] unit-test
 
 [ [ 1 2 3 ] ] [ [ 1 4 2 5 3 6 ] [ 4 < ] subset ] unit-test
 [ { 4 2 6 } ] [ { 1 4 2 5 3 6 } [ 2 mod 0 = ] subset ] unit-test
@@ -68,8 +68,8 @@ unit-test
 [ f ] [ [ { } { } "Hello" ] all-equal? ] unit-test
 [ f ] [ [ { 2 } { } { } ] all-equal? ] unit-test
 [ t ] [ [ ] all-equal? ] unit-test
-[ t ] [ [ 1/2 ] all-equal? ] unit-test
-[ t ] [ [ 1.0 10/10 1 ] all-equal? ] unit-test
+[ t ] [ [ 1234 ] all-equal? ] unit-test
+[ t ] [ [ 1.0 1 1 ] all-equal? ] unit-test
 [ t ] [ { 1 2 3 4 } [ < ] monotonic? ] unit-test
 [ f ] [ { 1 2 3 4 } [ > ] monotonic? ] unit-test
 [ [ 2 3 4 ] ] [ [ 1 2 3 ] 1 [ + ] curry map ] unit-test
@@ -190,7 +190,7 @@ unit-test
     "cache-test" get
 ] unit-test
 
-[ 1 ] [ 1/2 { 1 2 3 } nth ] unit-test
+[ 1 ] [ 0.5 { 1 2 3 } nth ] unit-test
 
 ! Pathological case
 [ "ihbye" ] [ "hi" <reversed> "bye" append ] unit-test
@@ -236,9 +236,11 @@ unit-test
 
 [ -1./0. 0 delete-nth ] unit-test-fails
 [ "" ] [ "" [ blank? ] trim ] unit-test
-[ "" ] [ "" [ blank? ] ltrim ] unit-test
-[ "" ] [ "" [ blank? ] rtrim ] unit-test
+[ "" ] [ "" [ blank? ] left-trim ] unit-test
+[ "" ] [ "" [ blank? ] right-trim ] unit-test
+[ "" ] [ "  " [ blank? ] left-trim ] unit-test
+[ "" ] [ "  " [ blank? ] right-trim ] unit-test
 [ "asdf" ] [ " asdf " [ blank? ] trim ] unit-test
-[ "asdf " ] [ " asdf " [ blank? ] ltrim ] unit-test
-[ " asdf" ] [ " asdf " [ blank? ] rtrim ] unit-test
+[ "asdf " ] [ " asdf " [ blank? ] left-trim ] unit-test
+[ " asdf" ] [ " asdf " [ blank? ] right-trim ] unit-test
 

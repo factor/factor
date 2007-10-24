@@ -23,10 +23,10 @@ DEFINE_PRIMITIVE(cd)
 char *strerror(int err)
 {
 	/* strerror() is not defined on WinCE */
-	return "strerror() is not defined on WinCE. Use native io";
+	return "strerror() is not defined on WinCE. Use native I/O.";
 }
 
-void flush_icache()
+void flush_icache(CELL start, CELL end)
 {
 	FlushInstructionCache(GetCurrentProcess(), 0, 0);
 }
@@ -39,8 +39,5 @@ char *getenv(char *name)
 
 long exception_handler(PEXCEPTION_RECORD rec, void *frame, void *ctx, void *dispatch)
 {
-	memory_protection_error(
-		rec->ExceptionInformation[1] & 0x1ffffff,
-		native_stack_pointer());
-	return -1; /* unreachable */
+	return 0;
 }

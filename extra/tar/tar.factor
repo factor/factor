@@ -164,7 +164,7 @@ TUPLE: unimplemented-typeflag header ;
 ! Long file name
 : typeflag-L ( header -- )
     <string-writer> [ read-data-blocks ] keep
-    >string [ CHAR: \0 = ] rtrim filename set
+    >string [ CHAR: \0 = ] right-trim filename set
     global [ "long filename: " write filename get . flush ] bind
     filename get tar-path+ make-directories ;
 

@@ -29,9 +29,8 @@ M: object root-directory? ( path -- ? ) "/" = ;
     "/\\" member? ;
 
 : path+ ( str1 str2 -- str )
-    >r [ path-separator? ] rtrim r>
-    [ path-separator? ] ltrim
-    >r "/" r> 3append ;
+    >r [ path-separator? ] right-trim "/" r>
+    [ path-separator? ] left-trim 3append ;
 
 : stat ( path -- directory? permissions length modified )
     normalize-pathname (stat) ;

@@ -1,8 +1,9 @@
 ! Copyright (C) 2006, 2007 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel math math.parser models sequences ui ui.gadgets
-ui.gadgets.controls ui.gadgets.frames ui.gadgets.labels
-ui.gadgets.packs ui.gadgets.sliders ui.render ;
+USING: kernel math math.functions math.parser models sequences
+ui ui.gadgets ui.gadgets.controls ui.gadgets.frames
+ui.gadgets.labels ui.gadgets.packs ui.gadgets.sliders ui.render
+;
 IN: color-picker
 
 ! Simple example demonstrating the use of models.

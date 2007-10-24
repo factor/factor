@@ -1,6 +1,6 @@
 #include "master.h"
 
-F_STRING *get_error_message()
+F_STRING *get_error_message(void)
 {
 	DWORD id = GetLastError();
 	F_CHAR *msg = error_message(id);
@@ -36,7 +36,7 @@ F_CHAR *error_message(DWORD id)
 
 HMODULE hFactorDll;
 
-void init_ffi()
+void init_ffi(void)
 {
 	hFactorDll = GetModuleHandle(FACTOR_DLL);
 	if(!hFactorDll)
@@ -120,8 +120,12 @@ DEFINE_PRIMITIVE(stat)
 		dpush(tag_fixnum(0));
 		box_unsigned_8(
 			(u64)st.nFileSizeLow | (u64)st.nFileSizeHigh << 32);
-		box_unsigned_8(
-			((*(u64*)&st.ftLastWriteTime - EPOCH_OFFSET) / 10000000));
+
+		u64 lo = st.ftLastWriteTime.dwLowDateTime;
+		u64 hi = st.ftLastWriteTime.dwHighDateTime;
+		u64 modTime = (hi << 32) + lo;
+
+		box_unsigned_8((modTime - EPOCH_OFFSET) / 10000000);
 		FindClose(h);
 	}
 }

@@ -1,6 +1,7 @@
 ! Copyright (C) 2005, 2007 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: arrays kernel sequences math math.functions ;
+USING: arrays kernel sequences math math.functions hints
+float-arrays ;
 IN: math.vectors
 
 : vneg ( u -- v ) [ neg ] map ;
@@ -26,8 +27,20 @@ IN: math.vectors
 : set-axis ( u v axis -- w )
     dup length [ >r zero? pick pick ? r> swap nth ] 2map 2nip ;
 
-: sum ( seq -- n ) 0 [ + ] reduce ;
-: product ( seq -- n ) 1 [ * ] reduce ;
+HINTS: vneg { float-array array } ;
+HINTS: norm-sq { float-array array } ;
+HINTS: norm { float-array array } ;
+HINTS: normalize { float-array array } ;
 
-: infimum ( seq -- n ) dup first [ min ] reduce ;
-: supremum ( seq -- n ) dup first [ max ] reduce ;
+HINTS: n*v * { float-array array } ;
+HINTS: v*n { float-array array } * ;
+HINTS: n/v * { float-array array } ;
+HINTS: v/n { float-array array } * ;
+
+HINTS: v+ { float-array array } { float-array array } ;
+HINTS: v- { float-array array } { float-array array } ;
+HINTS: v* { float-array array } { float-array array } ;
+HINTS: v/ { float-array array } { float-array array } ;
+HINTS: vmax { float-array array } { float-array array } ;
+HINTS: vmin { float-array array } { float-array array } ;
+HINTS: v. { float-array array } { float-array array } ;

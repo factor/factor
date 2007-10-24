@@ -32,7 +32,7 @@ M: windows-nt-io normalize-pathname ( string -- string )
                 dup first CHAR: \\ = [ CHAR: \\ , ] unless %
             ] "" make
         ] }
-    } cond [ "/\\." member? ] rtrim ;
+    } cond [ "/\\." member? ] right-trim ;
 
 SYMBOL: io-hash
 

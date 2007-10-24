@@ -82,7 +82,7 @@ void load_image(F_PARAMETERS *p)
 }
 
 /* Save the current image to disk */
-bool save_image(const F_CHAR *filename)
+void save_image(const F_CHAR *filename)
 {
 	FILE* file;
 	F_HEADER h;
@@ -91,7 +91,11 @@ bool save_image(const F_CHAR *filename)
 
 	file = OPEN_WRITE(filename);
 	if(file == NULL)
-		fatal_error("Cannot open image for writing",errno);
+	{
+		FPRINTF(stderr,"Cannot open image file: %s\n",filename);
+		fprintf(stderr,"%s\n",strerror(errno));
+		return;
+	}
 
 	F_ZONE *tenured = &data_heap->generations[TENURED];
 
@@ -122,8 +126,6 @@ bool save_image(const F_CHAR *filename)
 	fwrite(first_block(&code_heap),h.code_size,1,file);
 
 	fclose(file);
-
-	return true;
 }
 
 DEFINE_PRIMITIVE(save_image)

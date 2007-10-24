@@ -3,21 +3,27 @@
 void default_parameters(F_PARAMETERS *p)
 {
 	p->image = NULL;
-	p->ds_size = 128;
-	p->rs_size = 128;
 
 	/* We make a wild guess here that if we're running on ARM, we don't
 	have a lot of memory. */
 #ifdef FACTOR_ARM
+	p->ds_size = 8 * CELLS;
+	p->rs_size = 8 * CELLS;
+
 	p->gen_count = 2;
-	p->code_size = 2 * CELLS;
+	p->code_size = 4;
+	p->young_size = 1;
+	p->aging_size = 4;
 #else
+	p->ds_size = 32 * CELLS;
+	p->rs_size = 32 * CELLS;
+
 	p->gen_count = 3;
 	p->code_size = 4 * CELLS;
-#endif
-
 	p->young_size = 2 * CELLS;
 	p->aging_size = 4 * CELLS;
+#endif
+
 	p->secure_gc = false;
 	p->fep = false;
 }

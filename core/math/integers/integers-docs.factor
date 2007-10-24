@@ -1,5 +1,4 @@
-USING: help.markup help.syntax math math.private math.functions
-math.ratios.private ;
+USING: help.markup help.syntax math math.private ;
 IN: math.integers
 
 ARTICLE: "integers" "Integers"
@@ -44,10 +43,6 @@ HELP: even?
 HELP: odd?
 { $values { "n" integer } { "?" "a boolean" } }
 { $description "Tests if an integer is odd." } ;
-
-HELP: fraction>
-{ $values { "a" integer } { "b" "a positive integer" } { "a/b" rational } }
-{ $description "Creates a new ratio, or outputs the numerator if the denominator is 1. This word does not reduce the fraction to lowest terms, and should not be called directly; use " { $link / } " instead." } ;
 
 ! Unsafe primitives
 HELP: fixnum+ ( x y -- z )

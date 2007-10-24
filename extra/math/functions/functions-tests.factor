@@ -17,8 +17,8 @@ IN: temporary
 [ 4.0 ] [ 2 2 ^ ] unit-test
 [ 0.25 ] [ 2 -2 ^ ] unit-test
 [ t ] [ 2 0.5 ^ 2 ^ 2 2.00001 between? ] unit-test
-[ t ] [ e pi i * ^ real -1.0 = ] unit-test
-[ t ] [ e pi i * ^ imaginary -0.00001 0.00001 between? ] unit-test
+[ t ] [ e pi i* ^ real -1.0 = ] unit-test
+[ t ] [ e pi i* ^ imaginary -0.00001 0.00001 between? ] unit-test
 
 [ t ] [ 0 0 ^ fp-nan? ] unit-test
 [ 1.0/0.0 ] [ 0 -2 ^ ] unit-test
@@ -74,3 +74,34 @@ IN: temporary
 [ 78572682077 ] [ 234829342 342389423843 mod-inv ] unit-test
 
 [ 2 10 mod-inv ] unit-test-fails
+
+[ t ] [ 0 0 ^ fp-nan? ] unit-test
+[ 1 ] [ 10 0 ^ ] unit-test
+[ 1/8 ] [ 1/2 3 ^ ] unit-test
+[ 1/8 ] [ 2 -3 ^ ] unit-test
+[ t ] [ 1 100 shift 2 100 ^ = ] unit-test
+
+[ t ] [ 256 power-of-2? ] unit-test
+[ f ] [ 123 power-of-2? ] unit-test
+
+[ 1 ] [ 7/8 ceiling ] unit-test
+[ 2 ] [ 3/2 ceiling ] unit-test
+[ 0 ] [ -7/8 ceiling ] unit-test
+[ -1 ] [ -3/2 ceiling ] unit-test
+
+[ 4.0 ] [ 4.5 truncate ] unit-test
+[ 4.0 ] [ 4.5 floor ] unit-test
+[ 5.0 ] [ 4.5 ceiling ] unit-test
+
+[ -4.0 ] [ -4.5 truncate ] unit-test
+[ -5.0 ] [ -4.5 floor ] unit-test
+[ -4.0 ] [ -4.5 ceiling ] unit-test
+
+[ -4.0 ] [ -4.0 truncate ] unit-test
+[ -4.0 ] [ -4.0 floor ] unit-test
+[ -4.0 ] [ -4.0 ceiling ] unit-test
+
+[ -5.0 ] [ -4.5 round ] unit-test
+[ -4.0 ] [ -4.4 round ] unit-test
+[ 5.0 ] [ 4.5 round ] unit-test
+[ 4.0 ] [ 4.4 round ] unit-test

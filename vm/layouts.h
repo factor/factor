@@ -239,20 +239,3 @@ typedef struct {
 	/* tagged */
 	CELL length;
 } F_CALLSTACK;
-
-typedef struct
-{
-	/* In compiled quotation frames, position within the array.
-	In compiled word frames, unused. */
-	CELL scan;
-
-	/* In compiled quotation frames, the quot->array slot.
-	In compiled word frames, unused. */
-	CELL array;
-
-	/* In all compiled frames, the XT on entry. */
-	XT xt;
-
-	/* Frame size in bytes */
-	CELL size;
-} F_STACK_FRAME;

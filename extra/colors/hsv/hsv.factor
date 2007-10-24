@@ -1,7 +1,8 @@
 ! Copyright (C) 2007 Eduardo Cavazos
 ! See http://factorcode.org/license.txt for BSD license.
 
-USING: kernel combinators arrays sequences math combinators.lib ;
+USING: kernel combinators arrays sequences math math.functions
+combinators.lib ;
 
 IN: colors.hsv
 
