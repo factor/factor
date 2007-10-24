@@ -1,7 +1,7 @@
 USING: sequences rss arrays concurrency kernel sorting
 html.elements io assocs namespaces math threads vocabs html
 furnace http.server.templating calendar math.parser splitting
-continuations debugger ;
+continuations debugger system ;
 IN: webapps.planet
 
 TUPLE: posting author title date link body ;
@@ -108,8 +108,11 @@ SYMBOL: cached-postings
     { "Slava Pestov" "http://factor-language.blogspot.com/atom.xml" "http://factor-language.blogspot.com/" }
 } default-blogroll set-global
 
+SYMBOL: last-update
+
 : update-thread ( -- )
-    [ update-cached-postings ] try
+    millis last-update set-global
+    [ update-cached-postings ] in-thread
     10 60 * 1000 * sleep
     update-thread ;
 
