@@ -34,8 +34,22 @@ GENERIC: loc>operand ( loc -- reg addressing )
 M: ds-loc loc>operand ds-loc-n cells neg ds-reg swap <+/-> ;
 M: rs-loc loc>operand rs-loc-n cells neg rs-reg swap <+/-> ;
 
+: load-cell ( reg -- )
+    [
+        "end" define-label
+        ! Load target address
+        PC 0 <+> LDR
+        ! Skip an instruction
+        "end" get B
+        ! The target address
+        0 ,
+        ! Continue here
+        "end" resolve-label
+    ] with-scope ;
+
 M: arm-backend load-indirect ( obj reg -- )
-    PC 0 <+> LDR rc-indirect-arm-pc rel-literal ;
+    tuck load-cell rc-absolute-cell rel-literal
+    dup 0 <+> LDR ;
 
 M: immediate load-literal
     over v>operand small-enough? [
@@ -67,17 +81,7 @@ M: arm-backend %epilogue ( n -- )
     SP SP rot ADD ;
 
 : compile-dlsym ( symbol dll reg -- )
-    [
-        "end" define-label
-        ! Load target address
-        PC 0 <+> LDR
-        ! Skip an instruction
-        "end" get B
-        ! The target address
-        0 , rc-absolute rel-dlsym
-        ! Continue here
-        "end" resolve-label
-    ] with-scope ;
+    load-cell rc-absolute rel-dlsym ;
 
 : %alien-global ( symbol dll reg -- )
     [ compile-dlsym ] keep dup 0 <+> LDR ;
