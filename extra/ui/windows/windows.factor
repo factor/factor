@@ -94,7 +94,7 @@ SYMBOL: mouse-captured
 : handle-wm-paint ( hWnd uMsg wParam lParam -- )
     #! wParam and lParam are unused
     #! only paint if width/height both > 0
-    3drop window dup draw-world ;
+    3drop window draw-world ;
 
 : handle-wm-size ( hWnd uMsg wParam lParam -- )
     [ lo-word ] keep hi-word make-RECT get-RECT-dimensions 2array
@@ -414,7 +414,7 @@ SYMBOL: hWnd
     [ wglMakeCurrent win32-error=0/f ] keep ;
 
 : setup-gl ( hwnd -- hDC hRC )
-    get-dc dup setup-pixel-format get-rc ;
+    get-dc dup setup-pixel-format dup get-rc ;
 
 M: windows-ui-backend (open-world-window) ( world -- )
     [ rect-dim first2 create-window dup setup-gl ] keep

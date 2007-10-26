@@ -1,22 +1,25 @@
 USING: help.markup help.syntax generic.math generic.standard
-words classes definitions kernel alien combinators sequences ;
+words classes definitions kernel alien combinators sequences 
+math ;
 IN: generic
 
-ARTICLE: "method-order" "Method ordering"
-"It is possible that two classes have a non-empty intersection and neither is a subclass of the other. This means there is no canonical linear ordering of classes."
+ARTICLE: "method-order" "Method precedence"
+"Consider the case where a generic word has methods on two classes, say A and B, which share a non-empty intersection. If the generic word is called on an object which is an instance of both A and B, a choice of method must be made. If A is a subclass of B, the method for A to be called; this makes sense, because we're defining general behavior for instances of B, and refining it for instances of A. Conversely, if B is a subclass of A, then we expect B's method to be called. However, if neither is a subclass of the other, we have an ambiguous situation and undefined behavior will result. Either the method for A or B will be called, and there is no way to predict ahead of time."
 $nl
-"Consider the following set of definitions:"
+"The generic word system linearly orders all the methods on a generic word by their class. Conceptually, method dispatch is implemented by testing the object against the predicate word for every class, in order. If methods are defined on overlapping classes, this order will fail to be unique and the problem described above can occur."
+$nl
+"Here is an example:"
 { $code
     "GENERIC: explain"
-    "M: general-t explain drop \"a true value\" print ;"
-    "M: c-ptr explain drop \"a tagged immediate\" print ;"
+    "M: number explain drop \"an integer\" print ;"
+    "M: sequence explain drop \"a sequence\" print ;"
     "M: object explain drop \"an object\" print ;"
 }
-"Neither " { $link general-t } " nor " { $link sequence } " are subclasses of each other, yet their intersection is non-empty. So the generic word system will place " { $link object } " first in the method order, however either " { $link general-t } " or " { $link sequence } " may come next, and it is pretty much a random choice that depends on hashing:"
-{ $example "\\ bar order ."  "{ object general-t sequence }" }
-"Therefore, the outcome of calling " { $snippet "bar" } " with " { $link f } " on the stack is undefined."
-$nl
-"As you can see above, the " { $link order } " word can be useful to clarify method dispatch."
+"Neither " { $link number } " nor " { $link sequence } " are subclasses of each other, yet their intersection is the non-empty " { $link integer } " class. As a result, the outcome of calling " { $snippet "bar" } " with an " { $link integer } " on the stack is undefined - either one of the two methods may be called. This situation can lead to subtle bugs. To avoid it, explicitly disambiguate the method order by defining a method on the intersection. If in this case we want integers to behave like numbers, we would also define:"
+{ $code "M: integer explain drop \"an integer\" print ;" }
+"On the other hand, if we want integers to behave like sequences here, we could define:"
+{ $code "M: integer explain drop \"a sequence\" print ;" }
+"The " { $link order } " word can be useful to clarify method dispatch order."
 { $subsection order } ;
 
 ARTICLE: "generic-introspection" "Generic word introspection"
