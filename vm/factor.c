@@ -143,6 +143,7 @@ void init_factor_from_args(F_CHAR *image, int argc, F_CHAR **argv, bool embedded
 
 	for(i = 0; i < argc; i++)
 		free(posix_argv[i]);
+	free(posix_argv);
 }
 
 char *factor_eval_string(char *string)
