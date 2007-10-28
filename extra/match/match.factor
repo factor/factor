@@ -61,4 +61,6 @@ MACRO: match-cond ( assoc -- )
     } cond ;
 
 : match-replace ( object pattern1 pattern2 -- result )
-    -rot match [ replace-patterns ] bind ;
+    -rot
+    match [ "Pattern does not match" throw ] unless*
+    [ replace-patterns ] bind ;
