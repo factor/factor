@@ -37,7 +37,7 @@ char *getenv(char *name)
 	return 0; /* unreachable */
 }
 
-long exception_handler(PEXCEPTION_RECORD rec, void *frame, void *ctx, void *dispatch)
+void c_to_factor_toplevel(CELL quot)
 {
-	return 0;
+	c_to_factor(quot);
 }

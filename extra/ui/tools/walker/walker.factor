@@ -39,7 +39,7 @@ TUPLE: walker model interpreter history ;
 
 : com-back ( walker -- )
     dup walker-history
-    dup empty? [ drop ] [ pop swap call-tool* ] if ;
+    dup empty? [ 2drop ] [ pop swap call-tool* ] if ;
 
 : reset-walker ( walker -- )
     <interpreter> over set-walker-interpreter

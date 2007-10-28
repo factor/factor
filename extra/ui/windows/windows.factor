@@ -14,21 +14,18 @@ TUPLE: windows-ui-backend ;
 : crlf>lf CHAR: \r swap remove ;
 : lf>crlf [ [ dup CHAR: \n = [ CHAR: \r , ] when , ] each ] "" make ;
 
-: (enum-clipboard) ( n -- n )
-    EnumClipboardFormats win32-error dup 0 > [ dup , (enum-clipboard) ] when ;
-
 : enum-clipboard ( -- seq )
-    [ 0 (enum-clipboard) ] { } make nip ;
+    0 [ EnumClipboardFormats win32-error dup dup 0 > ] [ ]
+    { } unfold nip ;
 
 : with-clipboard ( quot -- )
     f OpenClipboard win32-error=0/f
     call
     CloseClipboard win32-error=0/f ; inline
-    
 
 : paste ( -- str )
     [
-        CF_UNICODETEXT IsClipboardFormatAvailable 0 = [
+        CF_UNICODETEXT IsClipboardFormatAvailable zero? [
             ! nothing to paste
             ""
         ] [
@@ -132,7 +129,7 @@ SYMBOL: mouse-captured
     } ;
 
 : key-state-down?
-    GetKeyState 1 16 shift bitand 0 > ;
+    GetKeyState 16 bit? ;
 
 : left-shift? ( -- ? ) VK_LSHIFT key-state-down? ;
 : left-ctrl? ( -- ? ) VK_LCONTROL key-state-down? ;
@@ -309,8 +306,6 @@ SYMBOL: hWnd
     "uint" { "void*" "uint" "long" "long" } "stdcall" [
         [
         pick
-        ! "Message: " write dup get-windows-message-name write
-            ! " " write dup unparse print flush
             {
                 { [ dup WM_CLOSE = ]    [ drop handle-wm-close 0 ] }
                 { [ dup WM_PAINT = ]
@@ -319,7 +314,7 @@ SYMBOL: hWnd
 
                 ! Keyboard events
                 { [ dup WM_KEYDOWN = over WM_SYSKEYDOWN = or ]
-                    [ drop 4dup handle-wm-keydown DefWindowProc ] }
+                [ drop 4dup handle-wm-keydown DefWindowProc ] }
                 { [ dup WM_CHAR = over WM_SYSCHAR = or ]
                     [ drop 4dup handle-wm-char DefWindowProc ] }
                 { [ dup WM_KEYUP = over WM_SYSKEYUP = or ]
@@ -343,7 +338,6 @@ SYMBOL: hWnd
                 { [ t ] [ drop DefWindowProc ] }
             } cond
         ] ui-try
-        ! "finished handling message" print .s flush
      ] alien-callback ;
 
 : do-events ( -- )
