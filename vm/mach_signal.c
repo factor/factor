@@ -7,7 +7,7 @@ Used under BSD license with permission from Paolo Bonzini and Bruno Haible,
 
 http://sourceforge.net/mailarchive/message.php?msg_name=200503102200.32002.bruno%40clisp.org
 
-Extensively modified for Factor - portions copyright (C) 2004-2007 Slava Pestov */
+Modified for Factor by Slava Pestov */
 
 #include "master.h"
 
