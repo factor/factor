@@ -15,22 +15,22 @@ void critical_error(char* msg, CELL tagged)
 
 void throw_error(CELL error, F_STACK_FRAME *callstack_top)
 {
-	/* If error was thrown during heap scan, we re-enable the GC */
-	gc_off = false;
-
-	/* Reset local roots */
-	extra_roots = stack_chain->extra_roots;
-
-	/* If we had an underflow or overflow, stack pointers might be
-	out of bounds */
-	fix_stacks();
-
-	dpush(error);
-
 	/* If the error handler is set, we rewind any C stack frames and
 	pass the error to user-space. */
 	if(userenv[BREAK_ENV] != F)
 	{
+		/* If error was thrown during heap scan, we re-enable the GC */
+		gc_off = false;
+
+		/* Reset local roots */
+		extra_roots = stack_chain->extra_roots;
+
+		/* If we had an underflow or overflow, stack pointers might be
+		out of bounds */
+		fix_stacks();
+
+		dpush(error);
+
 		/* Errors thrown from C code pass NULL for this parameter.
 		Errors thrown from Factor code, or signal handlers, pass the
 		actual stack pointer at the time, since the saved pointer is

@@ -22,6 +22,7 @@
 #include "primitives.h"
 #include "debug.h"
 #include "run.h"
+#include "profiler.h"
 #include "errors.h"
 #include "bignumint.h"
 #include "bignum.h"

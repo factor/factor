@@ -33,17 +33,17 @@ t compiled-stack-traces set-global
 : init-generator ( -- )
     V{ } clone literal-table set
     V{ } clone word-table set
-    compiled-stack-traces get
-    [ compiling-word get ] [ f ] if
+    compiled-stack-traces get compiling-word get f ?
     literal-table get push ;
+
+: profiler-prologue ( -- )
+    literal-table get first %profiler-prologue ;
 
 : generate-1 ( word label node quot -- )
     pick f save-xt [
         roll compiling-word set
         pick compiling-label set
         init-generator
-        %save-xt
-        %prologue-later
         call
         literal-table get >array
         word-table get >array
@@ -54,17 +54,12 @@ GENERIC: generate-node ( node -- next )
 : generate-nodes ( node -- )
     [ node@ generate-node ] iterate-nodes end-basic-block ;
 
-SYMBOL: profiler-prologues
-
-: profiler-prologue ( -- )
-    profiler-prologues get-global [
-        compiling-word get %profiler-prologue
-    ] when ;
-
 : generate ( word label node -- )
     [
         init-templates
         profiler-prologue
+        %save-xt
+        %prologue-later
         current-label-start define-label
         current-label-start resolve-label
         [ generate-nodes ] with-node-iterator
@@ -188,6 +183,8 @@ M: #if generate-node
     gensym [
         rot [
             copy-templates
+            %save-xt
+            %prologue-later
             [ generate-nodes ] with-node-iterator
         ] generate-1
     ] keep ;

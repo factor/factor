@@ -386,7 +386,7 @@ void collect_stack_frame(F_STACK_FRAME *frame)
 	}
 
 	if(collecting_code)
-		recursive_mark(frame->xt);
+		recursive_mark(compiled_to_block(frame_code(frame)));
 }
 
 /* The base parameter allows us to adjust for a heap-allocated
@@ -402,9 +402,6 @@ void collect_callstack(F_CONTEXT *stacks)
 the user environment and extra roots registered with REGISTER_ROOT */
 void collect_roots(void)
 {
-	int i;
-	F_CONTEXT *stacks;
-
 	copy_handle(&T);
 	copy_handle(&bignum_zero);
 	copy_handle(&bignum_pos_one);
@@ -413,7 +410,7 @@ void collect_roots(void)
 	collect_stack(extra_roots_region,extra_roots);
 
 	save_stacks();
-	stacks = stack_chain;
+	F_CONTEXT *stacks = stack_chain;
 
 	while(stacks)
 	{
@@ -428,6 +425,7 @@ void collect_roots(void)
 		stacks = stacks->next;
 	}
 
+	int i;
 	for(i = 0; i < USER_ENV; i++)
 		copy_handle(&userenv[i]);
 }
@@ -517,13 +515,13 @@ CELL binary_payload_start(CELL pointer)
 		return 0;
 	/* these objects have some binary data at the end */
 	case WORD_TYPE:
-		return sizeof(F_WORD) - CELLS;
+		return sizeof(F_WORD) - CELLS * 2;
 	case ALIEN_TYPE:
 		return CELLS * 3;
 	case DLL_TYPE:
 		return CELLS * 2;
 	case QUOTATION_TYPE:
-		return sizeof(F_QUOTATION) - CELLS;
+		return sizeof(F_QUOTATION) - CELLS * 2;
 	/* everything else consists entirely of pointers */
 	default:
 		return unaligned_object_size(pointer);
@@ -549,12 +547,12 @@ CELL collect_next(CELL scan)
 	case WORD_TYPE:
 		word = (F_WORD *)scan;
 		if(collecting_code && word->compiledp != F)
-			recursive_mark(word->xt);
+			recursive_mark(compiled_to_block(word->code));
 		break;
 	case QUOTATION_TYPE:
 		quot = (F_QUOTATION *)scan;
-		if(collecting_code && quot->xt != lazy_jit_compile)
-			recursive_mark(quot->xt);
+		if(collecting_code && quot->compiledp != F)
+			recursive_mark(compiled_to_block(quot->code));
 		break;
 	case CALLSTACK_TYPE:
 		stack = (F_CALLSTACK *)scan;

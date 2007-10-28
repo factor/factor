@@ -95,14 +95,19 @@ DEFINE_PRIMITIVE(set_callstack)
 	critical_error("Bug in set_callstack()",0);
 }
 
+F_COMPILED *frame_code(F_STACK_FRAME *frame)
+{
+	return (F_COMPILED *)frame->xt - 1;
+}
+
 CELL frame_type(F_STACK_FRAME *frame)
 {
-	return xt_to_compiled(frame->xt)->type;
+	return frame_code(frame)->type;
 }
 
 CELL frame_executing(F_STACK_FRAME *frame)
 {
-	F_COMPILED *compiled = xt_to_compiled(frame->xt);
+	F_COMPILED *compiled = frame_code(frame);
 	CELL code_start = (CELL)(compiled + 1);
 	CELL literal_start = code_start
 		+ compiled->code_length
@@ -199,7 +204,7 @@ DEFINE_PRIMITIVE(set_innermost_stack_frame_quot)
 	REGISTER_UNTAGGED(callstack);
 	REGISTER_UNTAGGED(quot);
 
-	if(quot->compiled == F)
+	if(quot->compiledp == F)
 		jit_compile(quot);
 
 	UNREGISTER_UNTAGGED(quot);

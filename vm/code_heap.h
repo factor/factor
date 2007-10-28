@@ -57,7 +57,9 @@ void relocate_code_block(F_COMPILED *relocating, CELL code_start,
 void finalize_code_block(F_COMPILED *relocating, CELL code_start,
 	CELL reloc_start, CELL literals_start, CELL words_start, CELL words_end);
 
-XT add_compiled_block(
+void set_word_xt(F_WORD *word, F_COMPILED *compiled);
+
+F_COMPILED *add_compiled_block(
 	CELL type,
 	F_ARRAY *code,
 	F_ARRAY *labels,

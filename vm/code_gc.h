@@ -47,18 +47,6 @@ INLINE F_BLOCK *next_block(F_HEAP *heap, F_BLOCK *block)
 /* compiled code */
 F_HEAP code_heap;
 
-/* The compiled code heap is structured into blocks. */
-typedef struct
-{
-	CELL type; /* this is WORD_TYPE or QUOTATION_TYPE */
-	CELL code_length; /* # bytes */
-	CELL reloc_length; /* # bytes */
-	CELL literals_length; /* # bytes */
-	CELL words_length; /* # bytes */
-	CELL finalized; /* has finalize_code_block() been called on this yet? */
-	CELL padding[2];
-} F_COMPILED;
-
 typedef void (*CODE_HEAP_ITERATOR)(F_COMPILED *compiled, CELL code_start,
 	CELL reloc_start, CELL literals_start, CELL words_start, CELL words_end);
 
@@ -73,24 +61,14 @@ INLINE void iterate_code_heap_step(F_COMPILED *compiled, CODE_HEAP_ITERATOR iter
 	iter(compiled,code_start,reloc_start,literals_start,words_start,words_end);
 }
 
-INLINE F_BLOCK *xt_to_block(XT xt)
+INLINE F_BLOCK *compiled_to_block(F_COMPILED *compiled)
 {
-	return (F_BLOCK *)((CELL)xt - sizeof(F_BLOCK) - sizeof(F_COMPILED));
-}
-
-INLINE F_COMPILED *xt_to_compiled(XT xt)
-{
-	return (F_COMPILED *)((CELL)xt - sizeof(F_COMPILED));
+	return (F_BLOCK *)compiled - 1;
 }
 
 INLINE F_COMPILED *block_to_compiled(F_BLOCK *block)
 {
 	return (F_COMPILED *)(block + 1);
-}
-
-INLINE XT block_to_xt(F_BLOCK *block)
-{
-	return (XT)((CELL)block + sizeof(F_BLOCK) + sizeof(F_COMPILED));
 }
 
 INLINE F_BLOCK *first_block(F_HEAP *heap)
@@ -107,7 +85,7 @@ void init_code_heap(CELL size);
 bool in_code_heap_p(CELL ptr);
 void iterate_code_heap(CODE_HEAP_ITERATOR iter);
 void collect_literals(void);
-void recursive_mark(XT xt);
+void recursive_mark(F_BLOCK *block);
 void dump_heap(F_HEAP *heap);
 void code_gc(void);
 void compact_code_heap(void);

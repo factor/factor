@@ -144,8 +144,8 @@ DEFINE_PRIMITIVE(save_image_and_exit)
 		userenv[i] = F;
 
 	/* do a full GC + code heap compaction */
-	compact_code_heap();
-
+	//compact_code_heap();
+	code_gc();
 	save_image(unbox_native_string());
 
 	/* now exit; we cannot continue executing like this */
@@ -159,15 +159,21 @@ void fixup_word(F_WORD *word)
 	if(word->compiledp == F)
 		word->xt = default_word_xt(word);
 	else
+	{
 		code_fixup(&word->xt);
+		code_fixup(&word->code);
+	}
 }
 
 void fixup_quotation(F_QUOTATION *quot)
 {
-	if(quot->compiled == F)
+	if(quot->compiledp == F)
 		quot->xt = lazy_jit_compile;
 	else
+	{
 		code_fixup(&quot->xt);
+		code_fixup(&quot->code);
+	}
 }
 
 void fixup_alien(F_ALIEN *d)
@@ -263,8 +269,11 @@ void fixup_code_block(F_COMPILED *relocating, CELL code_start,
 			data_fixup((CELL*)scan);
 	}
 
-	relocate_code_block(relocating,code_start,reloc_start,
-		literals_start,words_start,words_end);
+	if(reloc_start != literals_start)
+	{
+		relocate_code_block(relocating,code_start,reloc_start,
+			literals_start,words_start,words_end);
+	}
 }
 
 void relocate_code()

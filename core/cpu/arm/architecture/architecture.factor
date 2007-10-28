@@ -1,9 +1,9 @@
 ! Copyright (C) 2007 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: alien alien.c-types arrays cpu.arm.assembler compiler
-kernel kernel.private math namespaces words
-words.private generator.registers generator.fixup generator
-cpu.architecture system layouts ;
+kernel kernel.private math namespaces words words.private
+generator.registers generator.fixup generator cpu.architecture
+system layouts ;
 IN: cpu.arm.architecture
 
 TUPLE: arm-backend ;
@@ -86,18 +86,13 @@ M: arm-backend %epilogue ( n -- )
 : %alien-global ( symbol dll reg -- )
     [ compile-dlsym ] keep dup 0 <+> LDR ;
 
-M: arm-backend %profiler-prologue ( word -- )
+M: arm-backend %profiler-prologue ( -- )
     #! We can clobber R0 here since it is undefined at the start
     #! of a word.
-    "end" define-label
-    "profiling" f R12 %alien-global
-    R12 0 CMP
-    "end" get EQ B
     R12 load-indirect
     R0 R12 profile-count-offset <+> LDR
     R0 R0 1 v>operand ADD
-    R0 R12 profile-count-offset <+> STR
-    "end" resolve-label ;
+    R0 R12 profile-count-offset <+> STR ;
 
 M: arm-backend %call-label ( label -- ) BL ;
 

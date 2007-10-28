@@ -43,8 +43,6 @@ void init_factor(F_PARAMETERS *p)
 	/* Disable GC during init as a sanity check */
 	gc_off = true;
 
-	profiling = false;
-
 	early_init();
 
 	if(p->image == NULL)

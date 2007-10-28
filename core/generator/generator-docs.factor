@@ -5,8 +5,7 @@ IN: generator
 ARTICLE: "generator" "Compiled code generator"
 "Most of the words in the " { $vocab-link "generator" } " vocabulary are internal to the compiler and user code has no reason to call them."
 $nl
-"Debugging information can be enabled or disabled; these hooks are used by " { $link "profiling" } " and " { $link "tools.deploy" } ":"
-{ $subsection profiler-prologues }
+"Debugging information can be enabled or disabled; this hook is used by " { $link "tools.deploy" } ":"
 { $subsection compiled-stack-traces }
 "Assembler intrinsics can be defined for low-level optimization:"
 { $subsection define-intrinsic }
@@ -65,9 +64,6 @@ HELP: generate-nodes
 { $values { "node" "a dataflow node" } } 
 { $description "Recursively generate machine code for a dataflow graph." }
 { $notes "This word can only be called from inside the quotation passed to " { $link generate-1 } "." } ;
-
-HELP: profiler-prologue
-{ $description "Compiles a prologue which increment's the currently compiling word's call count, if such prologues were enabled by setting " { $link profiler-prologues } " to a true value." } ;
 
 HELP: generate
 { $values { "word" word } { "label" word } { "node" "a dataflow node" } }

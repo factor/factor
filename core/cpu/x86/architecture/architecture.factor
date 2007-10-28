@@ -71,13 +71,8 @@ M: x86-backend %prepare-alien-invoke
     temp-reg v>operand 3 cells [+] rs-reg MOV ;
 
 M: x86-backend %profiler-prologue ( word -- )
-    "end" define-label
-    "profiling" f temp-reg v>operand %alien-global
-    temp-reg v>operand 0 CMP
-    "end" get JE
     temp-reg load-literal
-    temp-reg v>operand profile-count-offset [+] 1 v>operand ADD
-    "end" resolve-label ;
+    temp-reg v>operand profile-count-offset [+] 1 v>operand ADD ;
 
 M: x86-backend %call-label ( label -- ) CALL ;
 

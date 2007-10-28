@@ -281,3 +281,5 @@ T{ x86-backend f 4 } compiler-backend set-global
         " - no" print
     ] if
 ] unless
+
+9 set-profiler-prologues

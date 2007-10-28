@@ -103,16 +103,10 @@ M: ppc-backend %epilogue ( n -- )
     0 swap LOAD32 rc-absolute-ppc-2/2 rel-dlsym ;
 
 M: ppc-backend %profiler-prologue ( word -- )
-    "end" define-label
-    "profiling" f 3 %load-dlsym
-    3 3 0 LWZ
-    0 3 0 CMPI
-    "end" get BEQ
     3 load-indirect
     4 3 profile-count-offset LWZ
     4 4 1 v>operand ADDI
-    4 3 profile-count-offset STW
-    "end" resolve-label ;
+    4 3 profile-count-offset STW ;
 
 M: ppc-backend %call-label ( label -- ) BL ;
 

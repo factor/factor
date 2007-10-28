@@ -37,6 +37,13 @@ bool jit_stack_frame_p(F_ARRAY *array)
 	return false;
 }
 
+void set_quot_xt(F_QUOTATION *quot, F_COMPILED *code)
+{
+	quot->code = code;
+	quot->xt = (XT)(code + 1);
+	quot->compiledp = T;
+}
+
 void jit_compile(F_QUOTATION *quot)
 {
 	F_ARRAY *array = untag_object(quot->array);
@@ -148,12 +155,11 @@ void jit_compile(F_QUOTATION *quot)
 	F_ARRAY *literals = allot_array(ARRAY_TYPE,1,tag_object(quot));
 	UNREGISTER_UNTAGGED(result);
 
-	XT xt = add_compiled_block(QUOTATION_TYPE,result,NULL,NULL,NULL,literals);
-	iterate_code_heap_step(xt_to_compiled(xt),finalize_code_block);
+	F_COMPILED *compiled = add_compiled_block(QUOTATION_TYPE,result,NULL,NULL,NULL,literals);
+	iterate_code_heap_step(compiled,finalize_code_block);
 
 	UNREGISTER_UNTAGGED(quot);
-	quot->xt = xt;
-	quot->compiled = T;
+	set_quot_xt(quot,compiled);
 }
 
 F_FASTCALL CELL primitive_jit_compile(CELL tagged, F_STACK_FRAME *stack)
@@ -222,7 +228,7 @@ DEFINE_PRIMITIVE(array_to_quotation)
 	F_QUOTATION *quot = allot_object(QUOTATION_TYPE,sizeof(F_QUOTATION));
 	quot->array = dpeek();
 	quot->xt = lazy_jit_compile;
-	quot->compiled = F;
+	quot->compiledp = F;
 	drepl(tag_object(quot));
 }
 
@@ -234,6 +240,7 @@ DEFINE_PRIMITIVE(quotation_xt)
 
 DEFINE_PRIMITIVE(strip_compiled_quotations)
 {
+	data_gc();
 	begin_scan();
 
 	CELL obj;
@@ -242,7 +249,7 @@ DEFINE_PRIMITIVE(strip_compiled_quotations)
 		if(type_of(obj) == QUOTATION_TYPE)
 		{
 			F_QUOTATION *quot = untag_object(obj);
-			quot->compiled = F;
+			quot->compiledp = F;
 			quot->xt = lazy_jit_compile;
 		}
 	}
