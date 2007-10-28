@@ -306,8 +306,6 @@ SYMBOL: hWnd
     "uint" { "void*" "uint" "long" "long" } "stdcall" [
         [
         pick
-        ! "Message: " write dup get-windows-message-name write
-            ! " " write dup unparse print flush
             {
                 { [ dup WM_CLOSE = ]    [ drop handle-wm-close 0 ] }
                 { [ dup WM_PAINT = ]
@@ -340,7 +338,6 @@ SYMBOL: hWnd
                 { [ t ] [ drop DefWindowProc ] }
             } cond
         ] ui-try
-        ! "finished handling message" print .s flush
      ] alien-callback ;
 
 : do-events ( -- )
