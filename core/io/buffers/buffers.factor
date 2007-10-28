@@ -51,18 +51,21 @@ TUPLE: buffer size ptr fill pos ;
 : buffer>> ( buffer -- string )
     dup (buffer>>) 0 rot buffer-reset ;
 
-: (buffer-until) ( start end alien separators -- n )
+: search-buffer-until ( start end alien separators -- n )
     [ >r swap alien-unsigned-1 r> memq? ] 2curry find* drop ;
 
-: buffer-until ( separators buffer -- string separator )
-    tuck { buffer-pos buffer-fill buffer-ptr } get-slots roll
-    (buffer-until) [
+: finish-buffer-until ( buffer n -- string separator )
+    [
         over buffer-pos -
         over buffer>
         swap buffer-pop
     ] [
         buffer>> f
     ] if* ;
+
+: buffer-until ( separators buffer -- string separator )
+    tuck { buffer-pos buffer-fill buffer-ptr } get-slots roll
+    search-buffer-until finish-buffer-until ;
 
 : buffer-length ( buffer -- n )
     dup buffer-fill swap buffer-pos - ;

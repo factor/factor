@@ -3,7 +3,7 @@
 !
 ! Based on pattern matching code from Paul Graham's book 'On Lisp'.
 USING: parser kernel words namespaces sequences tuples
-combinators macros ;
+combinators macros assocs ;
 IN: match
 
 SYMBOL: _
@@ -22,10 +22,13 @@ SYMBOL: _
 : match-var? ( symbol -- bool )
     dup word? [ "match-var" word-prop ] [ drop f ] if ;
 
+: set-match-var ( value var -- ? )
+    dup namespace key? [ get = ] [ set t ] if ;
+
 : (match) ( value1 value2 -- matched? )
     {
-        { [ dup match-var? ] [ set t ] }
-        { [ over match-var? ] [ swap set t ] }
+        { [ dup match-var? ] [ set-match-var ] }
+        { [ over match-var? ] [ swap set-match-var ] }
         { [ 2dup = ] [ 2drop t ] }
         { [ 2dup [ _ eq? ] either? ] [ 2drop t ] }
         { [ 2dup [ sequence? ] both? ] [
@@ -58,4 +61,6 @@ MACRO: match-cond ( assoc -- )
     } cond ;
 
 : match-replace ( object pattern1 pattern2 -- result )
-    -rot match [ replace-patterns ] bind ;
+    -rot
+    match [ "Pattern does not match" throw ] unless*
+    [ replace-patterns ] bind ;
