@@ -37,6 +37,8 @@ static void call_fault_handler(exception_type_t exception,
 	else
 		signal_callstack_top = NULL;
 
+	MACH_STACK_POINTER(thread_state) = fix_stack_pointer(MACH_STACK_POINTER(thread_state));
+
 	/* Now we point the program counter at the right handler function. */
 	if(exception == EXC_BAD_ACCESS)
 	{
