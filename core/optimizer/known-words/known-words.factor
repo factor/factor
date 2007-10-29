@@ -149,4 +149,4 @@ float-arrays combinators.private ;
 
 \ >be { { fixnum bignum } fixnum } "specializer" set-word-prop
 
-\ (buffer-until) { fixnum fixnum simple-alien string } "specializer" set-word-prop
+\ search-buffer-until { fixnum fixnum simple-alien string } "specializer" set-word-prop
