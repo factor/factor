@@ -2,7 +2,8 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: words sequences math prettyprint kernel arrays io
 io.styles namespaces assocs kernel.private strings combinators
-sorting math.parser vocabs definitions tools.profiler.private ;
+sorting math.parser vocabs definitions tools.profiler.private
+continuations ;
 IN: tools.profiler
 
 : profile ( quot -- )

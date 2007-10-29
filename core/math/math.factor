@@ -91,8 +91,6 @@ M: real hashcode* nip >fixnum ;
 M: real <=> - ;
 
 ! real and sequence overlap. we disambiguate:
-M: integer equal? number= ;
-
 M: integer hashcode* nip >fixnum ;
 
 M: integer <=> - ;

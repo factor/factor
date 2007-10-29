@@ -55,11 +55,10 @@ INLINE void data_fixup(CELL *cell)
 
 CELL code_relocation_base;
 
-INLINE void code_fixup(XT *cell)
+INLINE void code_fixup(CELL cell)
 {
-	CELL value = (CELL)*cell;
-	value += (code_heap.segment->start - code_relocation_base);
-	*cell = (XT)value;
+	CELL value = get(cell);
+	put(cell,value + (code_heap.segment->start - code_relocation_base));
 }
 
 void relocate_data();

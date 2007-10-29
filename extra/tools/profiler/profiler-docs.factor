@@ -19,10 +19,6 @@ ARTICLE: "profiling" "Profiling code"
 
 ABOUT: "profiling"
 
-HELP: reset-counters
-{ $description "Reset the call count of all words in the dictionary." }
-{ $notes "This word is automatically called by the profiler when profiling begins." } ;
-
 HELP: counters
 { $values { "words" "a sequence of words" } { "assoc" "an association list mapping words to integers" } }
 { $description "Outputs an association list of word call counts." } ;

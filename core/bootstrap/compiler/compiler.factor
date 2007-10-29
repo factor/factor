@@ -1,16 +1,17 @@
-USING: compiler vocabs.loader system sequences namespaces
-parser kernel kernel.private classes classes.private
+USING: compiler cpu.architecture vocabs.loader system sequences
+namespaces parser kernel kernel.private classes classes.private
 arrays hashtables vectors tuples sbufs inference.dataflow
 hashtables.private sequences.private math tuples.private
-growable namespaces.private alien.remote-control assocs
-words generator command-line vocabs io prettyprint libc ;
+growable namespaces.private alien.remote-control assocs words
+generator command-line vocabs io prettyprint libc ;
 
 "cpu." cpu append require
 
 global [ { "compiler" } add-use ] bind
 
 "-no-stack-traces" cli-args member? [
-    f compiled-stack-traces set-global
+    f compiled-stack-traces? set-global
+    0 set-profiler-prologues
 ] when
 
 ! Compile a set of words ahead of our general

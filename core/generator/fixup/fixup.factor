@@ -64,12 +64,13 @@ SYMBOL: label-table
     rot rc-absolute-ppc-2/2 = or or ;
 
 ! Relocation types
-: rt-primitive 0 ;
-: rt-dlsym     1 ;
-: rt-literal   2 ;
-: rt-dispatch  3 ;
-: rt-xt        4 ;
-: rt-label     5 ;
+: rt-primitive    0 ;
+: rt-dlsym        1 ;
+: rt-literal      2 ;
+: rt-dispatch     3 ;
+: rt-xt           4 ;
+: rt-xt-profiling 5 ;
+: rt-label        6 ;
 
 TUPLE: label-fixup label class ;
 

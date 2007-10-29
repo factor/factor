@@ -55,6 +55,9 @@ INLINE CELL compute_code_rel(F_REL *rel,
 	case RT_XT:
 		return get(CREF(words_start,REL_ARGUMENT(rel)))
 			+ sizeof(F_COMPILED) + xt_offset;
+	case RT_XT_PROFILING:
+		return get(CREF(words_start,REL_ARGUMENT(rel)))
+			+ sizeof(F_COMPILED);
 	case RT_LABEL:
 		return code_start + REL_ARGUMENT(rel);
 	default:

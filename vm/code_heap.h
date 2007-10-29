@@ -9,6 +9,8 @@ typedef enum {
 	RT_DISPATCH,
 	/* a compiled word reference */
 	RT_XT,
+	/* a compiled word reference, pointing at the profiling prologue */
+	RT_XT_PROFILING,
 	/* a local label */
 	RT_LABEL
 } F_RELTYPE;

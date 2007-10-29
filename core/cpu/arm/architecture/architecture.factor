@@ -67,7 +67,7 @@ M: arm-backend stack-frame ( n -- i )
     factor-area-size + 8 align ;
 
 M: arm-backend %save-xt ( -- )
-    R12 PC 8 SUB ;
+    R12 PC 9 cells SUB ;
 
 M: arm-backend %prologue ( n -- )
     SP SP pick SUB
