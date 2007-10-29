@@ -4,7 +4,7 @@ math.constants math.private sequences strings tools.test words
 continuations sequences.private hashtables.private byte-arrays
 strings.private system random layouts vectors.private
 sbufs.private strings.private slots.private alien alien.c-types
-alien.syntax namespaces libc ;
+alien.syntax namespaces libc combinators.private ;
 
 ! Make sure that intrinsic ops compile to correct code.
 [ ] [ 1 [ drop ] compile-1 ] unit-test
@@ -433,3 +433,13 @@ cell 8 = [
 [
     B{ 0 0 0 0 } [ { c-ptr } declare <void*> ] compile-1
 ] unit-test-fails
+
+[
+    4 5
+] [
+    3 [
+        [
+            { [ 4444 ] [ 444 ] [ 44 ] [ 4 ] } dispatch
+        ] keep 2 fixnum+fast
+    ] compile-1
+] unit-test

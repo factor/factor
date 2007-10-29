@@ -101,14 +101,16 @@ M: x86-backend %jump-t ( label -- )
     ! since on AMD64 we have to load a 64-bit immediate. On
     ! x86, this is redundant.
     "scratch" operand HEX: ffffffff MOV rc-absolute-cell rel-dispatch
-    "n" operand "scratch" operand ADD ;
+    "n" operand "n" operand "scratch" operand [+] MOV
+    "n" operand compiled-header-size ADD ;
 
 : dispatch-template ( word-table# quot -- )
     [
-        >r (%dispatch) "n" operand [] r> call
+        >r (%dispatch) "n" operand r> call
     ] H{
         { +input+ { { f "n" } } }
         { +scratch+ { { f "scratch" } } }
+        { +clobber+ { "n" } }
     } with-template ; inline
 
 M: x86-backend %call-dispatch ( word-table# -- )

@@ -8,20 +8,23 @@ alien.compiler combinators command-line
 compiler io vocabs.loader ;
 IN: cpu.x86.32
 
+PREDICATE: x86-backend x86-32-backend
+    x86-backend-cell 4 = ;
+
 ! We implement the FFI for Linux, OS X and Windows all at once.
 ! OS X requires that the stack be 16-byte aligned, and we do
 ! this on all platforms, sacrificing some stack space for
 ! code simplicity.
 
-M: x86-backend ds-reg ESI ;
-M: x86-backend rs-reg EDI ;
-M: x86-backend stack-reg ESP ;
-M: x86-backend xt-reg ECX ;
-M: x86-backend stack-save-reg EDX ;
+M: x86-32-backend ds-reg ESI ;
+M: x86-32-backend rs-reg EDI ;
+M: x86-32-backend stack-reg ESP ;
+M: x86-32-backend xt-reg ECX ;
+M: x86-32-backend stack-save-reg EDX ;
 
 M: temp-reg v>operand drop EBX ;
 
-M: x86-backend %alien-invoke ( symbol dll -- )
+M: x86-32-backend %alien-invoke ( symbol dll -- )
     (CALL) rel-dlsym ;
 
 ! On x86, parameters are never passed in registers.
@@ -58,20 +61,20 @@ M: float-regs store-return-reg load/store-float-return FSTP ;
 
 ! On x86, we can always use an address as an operand
 ! directly.
-M: x86-backend address-operand ;
+M: x86-32-backend address-operand ;
 
-M: x86-backend fixnum>slot@ 1 SHR ;
+M: x86-32-backend fixnum>slot@ 1 SHR ;
 
-M: x86-backend prepare-division CDQ ;
+M: x86-32-backend prepare-division CDQ ;
 
-M: x86-backend load-indirect
+M: x86-32-backend load-indirect
     0 [] MOV rc-absolute-cell rel-literal ;
 
 M: object %load-param-reg 3drop ;
 
 M: object %save-param-reg 3drop ;
 
-M: x86-backend %prepare-unbox ( -- )
+M: x86-32-backend %prepare-unbox ( -- )
     #! Move top of data stack to EAX.
     EAX ESI [] MOV
     ESI 4 SUB ;
@@ -84,7 +87,7 @@ M: x86-backend %prepare-unbox ( -- )
         f %alien-invoke
     ] with-aligned-stack ;
 
-M: x86-backend %unbox ( n reg-class func -- )
+M: x86-32-backend %unbox ( n reg-class func -- )
     #! The value being unboxed must already be in EAX.
     #! If n is f, we're unboxing a return value about to be
     #! returned by the callback. Otherwise, we're unboxing
@@ -93,7 +96,7 @@ M: x86-backend %unbox ( n reg-class func -- )
     ! Store the return value on the C stack
     over [ store-return-reg ] [ 2drop ] if ;
 
-M: x86-backend %unbox-long-long ( n func -- )
+M: x86-32-backend %unbox-long-long ( n func -- )
     (%unbox)
     ! Store the return value on the C stack
     [
@@ -101,7 +104,7 @@ M: x86-backend %unbox-long-long ( n func -- )
         cell + stack@ EDX MOV
     ] when* ;
 
-M: x86-backend %unbox-struct-2
+M: x86-32-backend %unbox-struct-2
     #! Alien must be in EAX.
     4 [
         EAX PUSH
@@ -112,7 +115,7 @@ M: x86-backend %unbox-struct-2
         EAX EAX [] MOV
     ] with-aligned-stack ;
 
-M: x86-backend %unbox-large-struct ( n size -- )
+M: x86-32-backend %unbox-large-struct ( n size -- )
     #! Alien must be in EAX.
     ! Compute destination address
     ECX ESP roll [+] LEA
@@ -144,7 +147,7 @@ M: x86-backend %unbox-large-struct ( n size -- )
     over [ [ box@ ] keep [ load-return-reg ] keep ] [ nip ] if
     push-return-reg ;
 
-M: x86-backend %box ( n reg-class func -- )
+M: x86-32-backend %box ( n reg-class func -- )
     over reg-size [
         >r (%box) r> f %alien-invoke
     ] with-aligned-stack ;
@@ -162,12 +165,12 @@ M: x86-backend %box ( n reg-class func -- )
     EDX PUSH
     EAX PUSH ;
 
-M: x86-backend %box-long-long ( n func -- )
+M: x86-32-backend %box-long-long ( n func -- )
     8 [
         >r (%box-long-long) r> f %alien-invoke
     ] with-aligned-stack ;
 
-M: x86-backend %box-large-struct ( n size -- )
+M: x86-32-backend %box-large-struct ( n size -- )
     ! Compute destination address
     [ swap struct-return@ ] keep
     ECX ESP roll [+] LEA
@@ -180,13 +183,13 @@ M: x86-backend %box-large-struct ( n size -- )
         "box_value_struct" f %alien-invoke
     ] with-aligned-stack ;
 
-M: x86-backend %prepare-box-struct ( size -- )
+M: x86-32-backend %prepare-box-struct ( size -- )
     ! Compute target address for value struct return
     EAX ESP rot f struct-return@ [+] LEA
     ! Store it as the first parameter
     ESP [] EAX MOV ;
 
-M: x86-backend %unbox-struct-1
+M: x86-32-backend %unbox-struct-1
     #! Alien must be in EAX.
     4 [
         EAX PUSH
@@ -195,7 +198,7 @@ M: x86-backend %unbox-struct-1
         EAX EAX [] MOV
     ] with-aligned-stack ;
 
-M: x86-backend %box-small-struct ( size -- )
+M: x86-32-backend %box-small-struct ( size -- )
     #! Box a <= 8-byte struct returned in EAX:DX. OS X only.
     12 [
         PUSH
@@ -204,21 +207,21 @@ M: x86-backend %box-small-struct ( size -- )
         "box_small_struct" f %alien-invoke
     ] with-aligned-stack ;
 
-M: x86-backend %prepare-alien-indirect ( -- )
+M: x86-32-backend %prepare-alien-indirect ( -- )
     "unbox_alien" f %alien-invoke
     cell temp@ EAX MOV ;
 
-M: x86-backend %alien-indirect ( -- )
+M: x86-32-backend %alien-indirect ( -- )
     cell temp@ CALL ;
 
-M: x86-backend %alien-callback ( quot -- )
+M: x86-32-backend %alien-callback ( quot -- )
     4 [
         EAX load-indirect
         EAX PUSH
         "c_to_factor" f %alien-invoke
     ] with-aligned-stack ;
 
-M: x86-backend %callback-value ( ctype -- )
+M: x86-32-backend %callback-value ( ctype -- )
     ! Align C stack
     ESP 12 SUB
     ! Save top of data stack
@@ -233,7 +236,7 @@ M: x86-backend %callback-value ( ctype -- )
     ! Unbox EAX
     unbox-return ;
 
-M: x86-backend %cleanup ( alien-node -- )
+M: x86-32-backend %cleanup ( alien-node -- )
     #! a) If we just called an stdcall function in Windows, it
     #! cleaned up the stack frame for us. But we don't want that
     #! so we 'undo' the cleanup since we do that in %epilogue.
@@ -251,7 +254,7 @@ M: x86-backend %cleanup ( alien-node -- )
         }
     } cond ;
 
-M: x86-backend %unwind ( n -- ) %epilogue-later RET ;
+M: x86-32-backend %unwind ( n -- ) %epilogue-later RET ;
 
 windows? [
     cell "longlong" c-type set-c-type-align
@@ -272,6 +275,8 @@ T{ x86-backend f 4 } compiler-backend set-global
     JNE
 ] { } define-if-intrinsic
 
+10 set-profiler-prologues
+
 "-no-sse2" cli-args member? [
     "Checking if your CPU supports SSE2..." print flush
     [ sse2? ] compile-1 [
@@ -281,5 +286,3 @@ T{ x86-backend f 4 } compiler-backend set-global
         " - no" print
     ] if
 ] unless
-
-9 set-profiler-prologues
