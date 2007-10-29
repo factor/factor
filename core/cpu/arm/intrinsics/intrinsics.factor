@@ -55,10 +55,10 @@ IN: cpu.arm.intrinsics
 : %write-barrier ( -- )
     "val" get operand-immediate? "obj" get fresh-object? or [
         "cards_offset" f R12 %alien-global
-        "scratch" operand R12 "scratch" operand card-bits <LSR> ADD
-        "val" operand "scratch" operand 0 LDRB
+        "scratch" operand R12 "obj" operand card-bits <LSR> ADD
+        "val" operand "scratch" operand 0 <+> LDRB
         "val" operand dup card-mark ORR
-        "val" operand "scratch" operand 0 STRB
+        "val" operand "scratch" operand 0 <+> STRB
     ] unless ;
 
 \ set-slot {
@@ -315,12 +315,12 @@ IN: cpu.arm.intrinsics
     ! Store class
     "class" operand 2 %set-slot
     ! Zero out the rest of the tuple
-    R12 f v>operand MOV
-    "n" get 1- [ 1+ R12 %fill-array ] each
-    "out" get object %store-tagged
+    "initial" operand f v>operand MOV
+    "n" get 1- [ 1+ "initial" operand %fill-array ] each
+    "out" get tuple %store-tagged
 ] H{
     { +input+ { { f "class" } { [ inline-array? ] "n" } } }
-    { +scratch+ { { f "out" } } }
+    { +scratch+ { { f "out" } { f "initial" } } }
     { +output+ { "out" } }
 } define-intrinsic
 
