@@ -98,9 +98,9 @@ M: assoc assoc-clone-like ( assoc exemplar -- newassoc )
     2dup subassoc? >r swap subassoc? r> and ;
 
 : assoc-hashcode ( n assoc -- code )
-    swap [
-        tuck swap hashcode* >r swap hashcode* 2/ r> bitxor
-    ] curry { } assoc>map hashcode ;
+    [
+        >r over r> hashcode* 2/ >r dupd hashcode* r> bitxor
+    ] { } assoc>map hashcode* ;
 
 : intersect ( assoc1 assoc2 -- intersection )
     swap [ nip key? ] curry assoc-subset ;
