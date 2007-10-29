@@ -144,6 +144,18 @@ typedef struct {
 	CELL array;
 } F_HASHTABLE;
 
+/* The compiled code heap is structured into blocks. */
+typedef struct
+{
+	CELL type; /* this is WORD_TYPE or QUOTATION_TYPE */
+	CELL code_length; /* # bytes */
+	CELL reloc_length; /* # bytes */
+	CELL literals_length; /* # bytes */
+	CELL words_length; /* # bytes */
+	CELL finalized; /* has finalize_code_block() been called on this yet? */
+	CELL padding[2];
+} F_COMPILED;
+
 /* Assembly code makes assumptions about the layout of this struct */
 typedef struct {
 	/* TAGGED header */
@@ -164,6 +176,8 @@ typedef struct {
 	CELL counter;
 	/* UNTAGGED execution token: jump here to execute word */
 	XT xt;
+	/* UNTAGGED compiled code block */
+	F_COMPILED *code;
 } F_WORD;
 
 /* Assembly code makes assumptions about the layout of this struct */
@@ -195,9 +209,11 @@ typedef struct {
 	/* tagged */
 	CELL array;
 	/* tagged */
-	CELL compiled;
-	/* untagged */
+	CELL compiledp;
+	/* UNTAGGED */
 	XT xt;
+	/* UNTAGGED compiled code block */
+	F_COMPILED *code;
 } F_QUOTATION;
 
 /* Assembly code makes assumptions about the layout of this struct */

@@ -26,15 +26,14 @@ SYMBOL: compiling-label
 ! Label of current word, after prologue, makes recursion faster
 SYMBOL: current-label-start
 
-SYMBOL: compiled-stack-traces
+SYMBOL: compiled-stack-traces?
 
-t compiled-stack-traces set-global
+t compiled-stack-traces? set-global
 
 : init-generator ( -- )
     V{ } clone literal-table set
     V{ } clone word-table set
-    compiled-stack-traces get
-    [ compiling-word get ] [ f ] if
+    compiled-stack-traces? get compiling-word get f ?
     literal-table get push ;
 
 : generate-1 ( word label node quot -- )
@@ -42,29 +41,27 @@ t compiled-stack-traces set-global
         roll compiling-word set
         pick compiling-label set
         init-generator
-        %save-xt
-        %prologue-later
         call
         literal-table get >array
         word-table get >array
     ] { } make fixup add-compiled-block save-xt ;
+
+: generate-profiler-prologue ( -- )
+    compiled-stack-traces? get [
+        compiling-word get %profiler-prologue
+    ] when ;
 
 GENERIC: generate-node ( node -- next )
 
 : generate-nodes ( node -- )
     [ node@ generate-node ] iterate-nodes end-basic-block ;
 
-SYMBOL: profiler-prologues
-
-: profiler-prologue ( -- )
-    profiler-prologues get-global [
-        compiling-word get %profiler-prologue
-    ] when ;
-
 : generate ( word label node -- )
     [
         init-templates
-        profiler-prologue
+        generate-profiler-prologue
+        %save-xt
+        %prologue-later
         current-label-start define-label
         current-label-start resolve-label
         [ generate-nodes ] with-node-iterator
@@ -183,11 +180,17 @@ M: #if generate-node
     with-template
     generate-if ;
 
+: rel-current-word ( class -- )
+    compiling-label get add-word
+    swap rt-xt-profiling rel-fixup ;
+
 ! #dispatch
 : dispatch-branch ( node word -- label )
     gensym [
         rot [
             copy-templates
+            %save-xt
+            %prologue-later
             [ generate-nodes ] with-node-iterator
         ] generate-1
     ] keep ;
@@ -232,11 +235,9 @@ M: #dispatch generate-node
 
 : define-if>boolean-intrinsics ( word intrinsics -- )
     [
-        first2
         >r [ if>boolean-intrinsic ] curry r>
         { { f "if-scratch" } } +scratch+ associate union
-        2array
-    ] map "intrinsics" set-word-prop ;
+    ] assoc-map "intrinsics" set-word-prop ;
 
 : define-if-intrinsics ( word intrinsics -- )
     [ +input+ associate ] assoc-map
@@ -313,3 +314,4 @@ M: #return generate-node drop end-basic-block %return f ;
 : tuple-class-offset 2 cells tuple tag-number - ;
 : class-hash-offset cell object tag-number - ;
 : word-xt-offset 8 cells object tag-number - ;
+: compiled-header-size 8 cells ;

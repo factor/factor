@@ -38,7 +38,8 @@ DLL_OBJS = $(PLAF_DLL_OBJS) \
 	vm/types.o \
 	vm/quotations.o \
 	vm/utilities.o \
-	vm/errors.o
+	vm/errors.o \
+	vm/profiler.o
 
 EXE_OBJS = $(PLAF_EXE_OBJS)
 

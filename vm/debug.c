@@ -192,6 +192,7 @@ void dump_generations(void)
 
 void dump_objects(F_FIXNUM type)
 {
+	data_gc();
 	begin_scan();
 
 	CELL obj;

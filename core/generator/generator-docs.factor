@@ -5,9 +5,8 @@ IN: generator
 ARTICLE: "generator" "Compiled code generator"
 "Most of the words in the " { $vocab-link "generator" } " vocabulary are internal to the compiler and user code has no reason to call them."
 $nl
-"Debugging information can be enabled or disabled; these hooks are used by " { $link "profiling" } " and " { $link "tools.deploy" } ":"
-{ $subsection profiler-prologues }
-{ $subsection compiled-stack-traces }
+"Debugging information can be enabled or disabled; this hook is used by " { $link "tools.deploy" } ":"
+{ $subsection compiled-stack-traces? }
 "Assembler intrinsics can be defined for low-level optimization:"
 { $subsection define-intrinsic }
 { $subsection define-intrinsics }
@@ -42,11 +41,11 @@ HELP: compiling-word
 HELP: compiling-label
 { $var-description "The label currently being compiled, set by " { $link generate-1 } "." } ;
 
-HELP: compiled-stack-traces
+HELP: compiled-stack-traces?
 { $var-description "If set to true, compiled code blocks will retain what word they were compiled from. This information is used by " { $link :c } " to display call stack traces after an error is thrown from compiled code. This variable is on by default; the deployment tool switches it off to save some space in the deployed image." } ;
 
 HELP: literal-table
-{ $var-description "Holds a vector of literal objects referenced from the currently compiling word. If " { $link compiled-stack-traces } " is on, " { $link init-generator } " ensures that the first entry is the word being compiled." } ;
+{ $var-description "Holds a vector of literal objects referenced from the currently compiling word. If " { $link compiled-stack-traces? } " is on, " { $link init-generator } " ensures that the first entry is the word being compiled." } ;
 
 HELP: init-generator
 { $values { "word" word } }
@@ -65,9 +64,6 @@ HELP: generate-nodes
 { $values { "node" "a dataflow node" } } 
 { $description "Recursively generate machine code for a dataflow graph." }
 { $notes "This word can only be called from inside the quotation passed to " { $link generate-1 } "." } ;
-
-HELP: profiler-prologue
-{ $description "Compiles a prologue which increment's the currently compiling word's call count, if such prologues were enabled by setting " { $link profiler-prologues } " to a true value." } ;
 
 HELP: generate
 { $values { "word" word } { "label" word } { "node" "a dataflow node" } }

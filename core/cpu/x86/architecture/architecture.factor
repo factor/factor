@@ -45,7 +45,7 @@ M: x86-backend stack-frame ( n -- i )
     3 cells + 16 align cell - ;
 
 M: x86-backend %save-xt ( -- )
-    xt-reg compiling-label get MOV ;
+    xt-reg 0 MOV rc-absolute-cell rel-current-word ;
 
 : factor-area-size 4 cells ;
 
@@ -71,13 +71,8 @@ M: x86-backend %prepare-alien-invoke
     temp-reg v>operand 3 cells [+] rs-reg MOV ;
 
 M: x86-backend %profiler-prologue ( word -- )
-    "end" define-label
-    "profiling" f temp-reg v>operand %alien-global
-    temp-reg v>operand 0 CMP
-    "end" get JE
     temp-reg load-literal
-    temp-reg v>operand profile-count-offset [+] 1 v>operand ADD
-    "end" resolve-label ;
+    temp-reg v>operand profile-count-offset [+] 1 v>operand ADD ;
 
 M: x86-backend %call-label ( label -- ) CALL ;
 
@@ -106,14 +101,16 @@ M: x86-backend %jump-t ( label -- )
     ! since on AMD64 we have to load a 64-bit immediate. On
     ! x86, this is redundant.
     "scratch" operand HEX: ffffffff MOV rc-absolute-cell rel-dispatch
-    "n" operand "scratch" operand ADD ;
+    "n" operand "n" operand "scratch" operand [+] MOV
+    "n" operand compiled-header-size ADD ;
 
 : dispatch-template ( word-table# quot -- )
     [
-        >r (%dispatch) "n" operand [] r> call
+        >r (%dispatch) "n" operand r> call
     ] H{
         { +input+ { { f "n" } } }
         { +scratch+ { { f "scratch" } } }
+        { +clobber+ { "n" } }
     } with-template ; inline
 
 M: x86-backend %call-dispatch ( word-table# -- )

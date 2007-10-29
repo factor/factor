@@ -2,8 +2,6 @@ IN: temporary
 USING: tools.profiler tools.test kernel memory math threads
 alien tools.profiler.private ;
 
-enable-profiler
-
 [ ] [ [ 10 [ data-gc ] times ] profile ] unit-test
 
 [ ] [ [ 1000 sleep ] profile ] unit-test 
@@ -28,5 +26,3 @@ enable-profiler
 ] profile
 
 [ 1 ] [ \ foobar profile-counter ] unit-test
-
-disable-profiler

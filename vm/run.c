@@ -269,7 +269,7 @@ XT default_word_xt(F_WORD *word)
 		return dosym;
 	else if(type_of(word->def) == QUOTATION_TYPE)
 	{
-		if(profiling)
+		if(profiling_p())
 			return docol_profiling;
 		else
 			return docol;
@@ -363,37 +363,4 @@ DEFINE_PRIMITIVE(set_slot)
 	CELL obj = dpop();
 	CELL value = dpop();
 	set_slot(obj,slot,value);
-}
-
-void enable_word_profiling(F_WORD *word)
-{
-	if(word->xt == docol)
-		word->xt = docol_profiling;
-}
-
-void disable_word_profiling(F_WORD *word)
-{
-	if(word->xt == docol_profiling)
-		word->xt = docol;
-}
-
-DEFINE_PRIMITIVE(profiling)
-{
-	profiling = to_boolean(dpop());
-
-	begin_scan();
-
-	CELL obj;
-	while((obj = next_object()) != F)
-	{
-		if(type_of(obj) == WORD_TYPE)
-		{
-			if(profiling)
-				enable_word_profiling(untag_object(obj));
-			else
-				disable_word_profiling(untag_object(obj));
-		}
-	}
-
-	gc_off = false; /* end heap scan */
 }

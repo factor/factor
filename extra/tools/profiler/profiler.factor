@@ -1,13 +1,13 @@
 ! Copyright (C) 2007 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: words sequences math prettyprint kernel arrays
-io io.styles namespaces assocs kernel.private generator
-compiler strings combinators sorting math.parser
-vocabs definitions tools.profiler.private ;
+USING: words sequences math prettyprint kernel arrays io
+io.styles namespaces assocs kernel.private strings combinators
+sorting math.parser vocabs definitions tools.profiler.private
+continuations ;
 IN: tools.profiler
 
-: reset-counters ( -- )
-    all-words [ 0 swap set-profile-counter ] each ;
+: profile ( quot -- )
+    [ t profiling call ] [ f profiling ] [ ] cleanup ;
 
 : counters ( words -- assoc )
     [ dup profile-counter ] { } map>assoc ;
@@ -39,26 +39,6 @@ M: string (profile.)
     standard-table-style [
         [ counter. ] assoc-each
     ] tabular-output ;
-
-: enable-profiler ( -- )
-    t profiler-prologues set-global recompile-all
-    "Profiler enabled; use disable-profiler to disable" print ;
-
-: disable-profiler ( -- )
-    f profiler-prologues set-global recompile-all ;
-
-: check-profiler ( -- )
-    profiler-prologues get-global [
-        "Enable the profiler by calling enable-profiler first"
-        throw
-    ] unless ;
-
-: profile ( quot -- )
-    check-profiler
-    reset-counters
-    t profiling
-    call
-    f profiling ;
 
 : profile. ( -- )
     "Call counts for all words:" print

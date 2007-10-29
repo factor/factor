@@ -204,3 +204,5 @@ M: struct-type flatten-value-type ( type -- seq )
             "void*" "double" ? c-type ,
         ] each
     ] if ;
+
+14 set-profiler-prologues

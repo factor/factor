@@ -76,11 +76,8 @@ M: ppc-backend load-indirect ( obj reg -- )
     [ 0 swap LOAD32 rc-absolute-ppc-2/2 rel-literal ] keep
     dup 0 LWZ ;
 
-: %load-xt ( word reg -- )
-    0 swap LOAD32  rc-absolute-ppc-2/2 rel-word ;
-
 M: ppc-backend %save-xt ( -- )
-    compiling-label get 11 %load-xt ;
+    0 11 LOAD32 rc-absolute-ppc-2/2 rel-current-word ;
 
 M: ppc-backend %prologue ( n -- )
     0 MFLR
@@ -103,16 +100,10 @@ M: ppc-backend %epilogue ( n -- )
     0 swap LOAD32 rc-absolute-ppc-2/2 rel-dlsym ;
 
 M: ppc-backend %profiler-prologue ( word -- )
-    "end" define-label
-    "profiling" f 3 %load-dlsym
-    3 3 0 LWZ
-    0 3 0 CMPI
-    "end" get BEQ
     3 load-indirect
     4 3 profile-count-offset LWZ
     4 4 1 v>operand ADDI
-    4 3 profile-count-offset STW
-    "end" resolve-label ;
+    4 3 profile-count-offset STW ;
 
 M: ppc-backend %call-label ( label -- ) BL ;
 
@@ -120,7 +111,9 @@ M: ppc-backend %jump-label ( label -- ) B ;
 
 : %prepare-primitive ( word -- )
     #! Save stack pointer to stack_chain->callstack_top, load XT
-    4 1 MR 11 %load-xt ;
+    4 1 MR
+    0 11 LOAD32
+    rc-absolute-ppc-2/2 rel-word ;
 
 : (%call) 11 MTLR BLRL ;
 
@@ -141,6 +134,7 @@ M: ppc-backend %jump-t ( label -- )
         "offset" operand "n" operand 1 SRAWI
         0 11 LOAD32 rc-absolute-ppc-2/2 rel-dispatch
         11 dup "offset" operand LWZX
+        11 dup compiled-header-size ADDI
         r> call
     ] H{
         { +input+ { { f "n" } } }

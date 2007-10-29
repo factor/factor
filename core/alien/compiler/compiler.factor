@@ -383,8 +383,11 @@ TUPLE: callback-context ;
 
 : generate-callback ( node -- )
     dup alien-callback-xt dup rot [
+        init-templates
+        generate-profiler-prologue
+        %save-xt
+        %prologue-later
         dup alien-stack-frame [
-            init-templates
             dup registers>objects
             dup wrap-callback-quot %alien-callback
             %callback-return

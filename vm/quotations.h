@@ -1,3 +1,4 @@
+void set_quot_xt(F_QUOTATION *quot, F_COMPILED *code);
 void jit_compile(F_QUOTATION *quot);
 F_FASTCALL CELL primitive_jit_compile(CELL tagged, F_STACK_FRAME *stack);
 XT quot_offset_to_pc(F_QUOTATION *quot, F_FIXNUM offset);

@@ -146,6 +146,7 @@ DEFINE_PRIMITIVE(save_image_and_exit)
 	/* do a full GC + code heap compaction */
 	compact_code_heap();
 
+	/* Save the image */
 	save_image(unbox_native_string());
 
 	/* now exit; we cannot continue executing like this */
@@ -159,15 +160,21 @@ void fixup_word(F_WORD *word)
 	if(word->compiledp == F)
 		word->xt = default_word_xt(word);
 	else
-		code_fixup(&word->xt);
+	{
+		code_fixup((CELL)&word->xt);
+		code_fixup((CELL)&word->code);
+	}
 }
 
 void fixup_quotation(F_QUOTATION *quot)
 {
-	if(quot->compiled == F)
+	if(quot->compiledp == F)
 		quot->xt = lazy_jit_compile;
 	else
-		code_fixup(&quot->xt);
+	{
+		code_fixup((CELL)&quot->xt);
+		code_fixup((CELL)&quot->code);
+	}
 }
 
 void fixup_alien(F_ALIEN *d)
@@ -177,7 +184,7 @@ void fixup_alien(F_ALIEN *d)
 
 void fixup_stack_frame(F_STACK_FRAME *frame)
 {
-	code_fixup(&frame->xt);
+	code_fixup((CELL)&frame->xt);
 
 	if(frame_type(frame) == QUOTATION_TYPE)
 	{
@@ -186,7 +193,7 @@ void fixup_stack_frame(F_STACK_FRAME *frame)
 		frame->scan = scan + frame->array;
 	}
 
-	code_fixup(&FRAME_RETURN_ADDRESS(frame));
+	code_fixup((CELL)&FRAME_RETURN_ADDRESS(frame));
 }
 
 void fixup_callstack_object(F_CALLSTACK *stack)
@@ -258,13 +265,16 @@ void fixup_code_block(F_COMPILED *relocating, CELL code_start,
 	for(scan = words_start; scan < words_end; scan += CELLS)
 	{
 		if(relocating->finalized)
-			code_fixup((XT*)scan);
+			code_fixup(scan);
 		else
 			data_fixup((CELL*)scan);
 	}
 
-	relocate_code_block(relocating,code_start,reloc_start,
-		literals_start,words_start,words_end);
+	if(reloc_start != literals_start)
+	{
+		relocate_code_block(relocating,code_start,reloc_start,
+			literals_start,words_start,words_end);
+	}
 }
 
 void relocate_code()

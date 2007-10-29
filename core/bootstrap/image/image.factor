@@ -210,8 +210,9 @@ M: f '
         dup word-def ' ,
         dup word-props ' ,
         f ' ,
-        0 ,
-        0 ,
+        0 , ! count
+        0 , ! xt
+        0 , ! code
     ] { } make
     \ word type-number object tag-number
     [ emit-seq ] emit-object
@@ -307,7 +308,8 @@ M: quotation '
         quotation type-number object tag-number [
             emit ! array
             f ' emit ! compiled?
-            0 emit ! XT
+            0 emit ! xt
+            0 emit ! code
         ] emit-object
     ] cache ;
 

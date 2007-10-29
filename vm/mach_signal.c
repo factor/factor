@@ -7,7 +7,7 @@ Used under BSD license with permission from Paolo Bonzini and Bruno Haible,
 
 http://sourceforge.net/mailarchive/message.php?msg_name=200503102200.32002.bruno%40clisp.org
 
-Extensively modified for Factor - portions copyright (C) 2004-2007 Slava Pestov */
+Modified for Factor by Slava Pestov */
 
 #include "master.h"
 
@@ -36,6 +36,8 @@ static void call_fault_handler(exception_type_t exception,
 	/* Are we in C? Then use the saved callstack top */
 	else
 		signal_callstack_top = NULL;
+
+	MACH_STACK_POINTER(thread_state) = fix_stack_pointer(MACH_STACK_POINTER(thread_state));
 
 	/* Now we point the program counter at the right handler function. */
 	if(exception == EXC_BAD_ACCESS)

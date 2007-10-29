@@ -36,6 +36,8 @@ void *get_rel_symbol(F_REL *rel, CELL literals_start)
 		return undefined_symbol;
 }
 
+static CELL xt_offset;
+
 /* Compute an address to store at a relocation */
 INLINE CELL compute_code_rel(F_REL *rel,
 	CELL code_start, CELL literals_start, CELL words_start)
@@ -51,7 +53,11 @@ INLINE CELL compute_code_rel(F_REL *rel,
 	case RT_DISPATCH:
 		return CREF(words_start,REL_ARGUMENT(rel));
 	case RT_XT:
-		return get(CREF(words_start,REL_ARGUMENT(rel)));
+		return get(CREF(words_start,REL_ARGUMENT(rel)))
+			+ sizeof(F_COMPILED) + xt_offset;
+	case RT_XT_PROFILING:
+		return get(CREF(words_start,REL_ARGUMENT(rel)))
+			+ sizeof(F_COMPILED);
 	case RT_LABEL:
 		return code_start + REL_ARGUMENT(rel);
 	default:
@@ -127,6 +133,8 @@ void apply_relocation(CELL class, CELL offset, F_FIXNUM absolute_value)
 void relocate_code_block(F_COMPILED *relocating, CELL code_start,
 	CELL reloc_start, CELL literals_start, CELL words_start, CELL words_end)
 {
+	xt_offset = (profiling_p() ? 0 : profiler_prologue());
+
 	F_REL *rel = (F_REL *)reloc_start;
 	F_REL *rel_end = (F_REL *)literals_start;
 
@@ -172,12 +180,15 @@ void finalize_code_block(F_COMPILED *relocating, CELL code_start,
 		critical_error("Finalizing a finalized block",(CELL)relocating);
 
 	for(scan = words_start; scan < words_end; scan += CELLS)
-		put(scan,(CELL)(untag_word(get(scan))->xt));
+		put(scan,(CELL)(untag_word(get(scan))->code));
 
 	relocating->finalized = true;
 
-	relocate_code_block(relocating,code_start,reloc_start,
-		literals_start,words_start,words_end);
+	if(reloc_start != literals_start)
+	{
+		relocate_code_block(relocating,code_start,reloc_start,
+			literals_start,words_start,words_end);
+	}
 
 	flush_icache(code_start,reloc_start - code_start);
 }
@@ -231,7 +242,7 @@ CELL allot_code_block(CELL size)
 	return start;
 }
 
-XT add_compiled_block(
+F_COMPILED *add_compiled_block(
 	CELL type,
 	F_ARRAY *code,
 	F_ARRAY *labels,
@@ -252,7 +263,7 @@ XT add_compiled_block(
 	REGISTER_UNTAGGED(words);
 	REGISTER_UNTAGGED(literals);
 
-	CELL start = allot_code_block(sizeof(F_COMPILED) + code_length
+	CELL here = allot_code_block(sizeof(F_COMPILED) + code_length
 		+ rel_length + literals_length + words_length);
 
 	UNREGISTER_UNTAGGED(literals);
@@ -260,9 +271,6 @@ XT add_compiled_block(
 	UNREGISTER_UNTAGGED(rel);
 	UNREGISTER_UNTAGGED(labels);
 	UNREGISTER_UNTAGGED(code);
-
-	/* begin depositing the code block's contents */
-	CELL here = start;
 
 	/* compiled header */
 	F_COMPILED *header = (void *)here;
@@ -274,6 +282,8 @@ XT add_compiled_block(
 	header->finalized = false;
 
 	here += sizeof(F_COMPILED);
+
+	CELL code_start = here;
 
 	/* code */
 	deposit_integers(here,code,code_format);
@@ -300,18 +310,26 @@ XT add_compiled_block(
 		here += words_length;
 	}
 
-	/* compute the XT */
-	XT xt = (XT)(start + sizeof(F_COMPILED));
-
 	/* fixup labels */
 	if(labels)
-		fixup_labels(labels,code_format,(CELL)xt);
+		fixup_labels(labels,code_format,code_start);
 
 	/* next time we do a minor GC, we have to scan the code heap for
 	literals */
 	last_code_heap_scan = NURSERY;
 
-	return xt;
+	return header;
+}
+
+void set_word_xt(F_WORD *word, F_COMPILED *compiled)
+{
+	word->code = compiled;
+	word->xt = (XT)(compiled + 1);
+
+	if(!profiling_p())
+		word->xt += profiler_prologue();
+
+	word->compiledp = T;
 }
 
 DEFINE_PRIMITIVE(add_compiled_block)
@@ -322,12 +340,11 @@ DEFINE_PRIMITIVE(add_compiled_block)
 	F_ARRAY *words = untag_array(dpop());
 	F_ARRAY *literals = untag_array(dpop());
 
-	XT xt = add_compiled_block(WORD_TYPE,code,labels,rel,words,literals);
+	F_COMPILED *compiled = add_compiled_block(WORD_TYPE,code,labels,rel,words,literals);
 
-	/* push the XT of the new word on the stack */
+	/* push a new word whose XT points to this code block on the stack */
 	F_WORD *word = allot_word(F,F);
-	word->xt = xt;
-	word->compiledp = T;
+	set_word_xt(word,compiled);
 	dpush(tag_object(word));
 }
 
@@ -344,13 +361,8 @@ DEFINE_PRIMITIVE(finalize_compile)
 	{
 		F_ARRAY *pair = untag_array(array_nth(array,i));
 		F_WORD *word = untag_word(array_nth(pair,0));
-		XT xt = untag_word(array_nth(pair,1))->xt;
-		F_BLOCK *block = xt_to_block(xt);
-		if(block->status != B_ALLOCATED)
-			critical_error("bad XT",(CELL)xt);
-
-		word->xt = xt;
-		word->compiledp = T;
+		F_COMPILED *compiled = untag_word(array_nth(pair,1))->code;
+		set_word_xt(word,compiled);
 	}
 
 	/* perform relocation */
@@ -358,7 +370,6 @@ DEFINE_PRIMITIVE(finalize_compile)
 	{
 		F_ARRAY *pair = untag_array(array_nth(array,i));
 		F_WORD *word = untag_word(array_nth(pair,0));
-		XT xt = word->xt;
-		iterate_code_heap_step(xt_to_compiled(xt),finalize_code_block);
+		iterate_code_heap_step(word->code,finalize_code_block);
 	}
 }

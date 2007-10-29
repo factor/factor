@@ -1,6 +1,3 @@
-/* Is profiling on? */
-DLLEXPORT bool profiling;
-
 #define USER_ENV 40
 
 typedef enum {
@@ -52,6 +49,10 @@ typedef enum {
 	JIT_DISPATCH,
 	JIT_EPILOG,
 	JIT_RETURN,
+
+	/* Profiler support */    
+	PROFILING_ENV       = 38, /* is the profiler on? */
+	PROFILER_PROLOGUE_ENV     /* length of optimizing compiler's profiler prologue */
 } F_ENVTYPE;
 
 #define FIRST_SAVE_ENV BOOT_ENV
@@ -242,4 +243,3 @@ DECLARE_PRIMITIVE(tag);
 DECLARE_PRIMITIVE(class_hash);
 DECLARE_PRIMITIVE(slot);
 DECLARE_PRIMITIVE(set_slot);
-DECLARE_PRIMITIVE(profiling);

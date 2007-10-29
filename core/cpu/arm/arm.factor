@@ -52,3 +52,5 @@ T{ arm-backend } compiler-backend set-global
 "arm-variant" get "arm5" = [
     t have-BLX? set-global
 ] when
+
+7 cells set-profiler-prologue

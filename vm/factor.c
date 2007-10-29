@@ -43,8 +43,6 @@ void init_factor(F_PARAMETERS *p)
 	/* Disable GC during init as a sanity check */
 	gc_off = true;
 
-	profiling = false;
-
 	early_init();
 
 	if(p->image == NULL)
@@ -145,6 +143,7 @@ void init_factor_from_args(F_CHAR *image, int argc, F_CHAR **argv, bool embedded
 
 	for(i = 0; i < argc; i++)
 		free(posix_argv[i]);
+	free(posix_argv);
 }
 
 char *factor_eval_string(char *string)

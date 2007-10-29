@@ -279,17 +279,17 @@ void collect_literals(void)
 void mark_sweep_step(F_COMPILED *compiled, CELL code_start,
 	CELL reloc_start, CELL literals_start, CELL words_start, CELL words_end)
 {
-	CELL scan;
+	F_COMPILED **start = (F_COMPILED **)words_start;
+	F_COMPILED **end = (F_COMPILED **)words_end;
+	F_COMPILED **iter = start;
 
-	for(scan = words_start; scan < words_end; scan += CELLS)
-		recursive_mark((XT)get(scan));
+	while(iter < end)
+		recursive_mark(compiled_to_block(*iter++));
 }
 
 /* Mark all XTs and literals referenced from a word XT */
-void recursive_mark(XT xt)
+void recursive_mark(F_BLOCK *block)
 {
-	F_BLOCK *block = xt_to_block(xt);
-
 	/* If already marked, do nothing */
 	switch(block->status)
 	{
@@ -303,7 +303,7 @@ void recursive_mark(XT xt)
 		break;
 	}
 
-	F_COMPILED *compiled = xt_to_compiled(xt);
+	F_COMPILED *compiled = block_to_compiled(block);
 	iterate_code_heap_step(compiled,collect_literals_step);
 
 	switch(compiled->finalized)
@@ -386,10 +386,9 @@ CELL compute_heap_forwarding(F_HEAP *heap)
 	return address - heap->segment->start;
 }
 
-void forward_xt(XT *xt)
+F_COMPILED *forward_xt(F_COMPILED *compiled)
 {
-	F_BLOCK *block = xt_to_block(*xt);
-	*xt = block_to_xt(block->forwarding);
+	return block_to_compiled(compiled_to_block(compiled)->forwarding);
 }
 
 void forward_object_xts(void)
@@ -404,15 +403,15 @@ void forward_object_xts(void)
 		{
 			F_WORD *word = untag_object(obj);
 
-			if(in_code_heap_p((CELL)word->xt))
-				forward_xt(&word->xt);
+			if(word->compiledp != F)
+				set_word_xt(word,forward_xt(word->code));
 		}
 		else if(type_of(obj) == QUOTATION_TYPE)
 		{
 			F_QUOTATION *quot = untag_object(obj);
 
-			if(in_code_heap_p((CELL)quot->xt))
-				forward_xt(&quot->xt);
+			if(quot->compiledp != F)
+				set_quot_xt(quot,forward_xt(quot->code));
 		}
 	}
 
@@ -423,11 +422,14 @@ void forward_object_xts(void)
 void compaction_code_block_fixup(F_COMPILED *compiled, CELL code_start,
 	CELL reloc_start, CELL literals_start, CELL words_start, CELL words_end)
 {
-	XT *iter = (XT *)words_start;
-	XT *end = (XT *)words_end;
+	F_COMPILED **iter = (F_COMPILED **)words_start;
+	F_COMPILED **end = (F_COMPILED **)words_end;
 
 	while(iter < end)
-		forward_xt(iter++);
+	{
+		*iter = forward_xt(*iter);
+		iter++;
+	}
 }
 
 void forward_block_xts(void)

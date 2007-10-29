@@ -65,7 +65,7 @@ $nl
 ARTICLE: "ui-profiler" "UI profiler" 
 "The graphical profiler is based on the terminal profiler (see " { $link "profiling" } ") and adds more convenient browsing of profiler results."
 $nl
-"The profiler must be enabled before use. Once the profiler has been enabled, enter a piece of code in the listener input area and press " { $operation com-profile } "."
+"To use the profiler, enter a piece of code in the listener input area and press " { $operation com-profile } "."
 $nl
 "Vocabulary and word presentations in the profiler pane can be clicked on to show profiler results pertaining to the object in question. Clicking a vocabulary in the profiler yields the same output as the " { $link vocab-profile. } " word, and clicking a word yields the same output as the " { $link usage-profile. } " word. Consult " { $link "profiling" } " for details."
 { $command-map profiler-gadget "toolbar" } ;
