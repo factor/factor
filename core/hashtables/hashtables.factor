@@ -168,8 +168,10 @@ M: hashtable equal?
     } cond ;
 
 M: hashtable hashcode*
-    dup assoc-size 1 number=
-    [ assoc-hashcode ] [ nip assoc-size ] if ;
+    [
+        dup assoc-size 1 number=
+        [ assoc-hashcode ] [ nip assoc-size ] if
+    ] recursive-hashcode ;
 
 ! Default method
 M: assoc new-assoc drop <hashtable> ;
