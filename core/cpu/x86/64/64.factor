@@ -40,9 +40,6 @@ M: amd64-backend address-operand ( address -- operand )
     #! call, where all vregs have been flushed anyway.
     temp-reg v>operand [ swap MOV ] keep ;
 
-: compile-c-call ( symbol dll -- )
-    0 address-operand >r rc-absolute-cell rel-dlsym r> CALL ;
-
 M: amd64-backend fixnum>slot@ drop ;
 
 M: amd64-backend prepare-division CQO ;
@@ -65,7 +62,7 @@ M: amd64-backend %prepare-unbox ( -- )
 
 M: amd64-backend %unbox ( n reg-class func -- )
     ! Call the unboxer
-    f compile-c-call
+    f %alien-invoke
     ! Store the return value on the C stack
     over [ [ return-reg ] keep %save-param-reg ] [ 2drop ] if ;
 
@@ -74,13 +71,13 @@ M: amd64-backend %unbox-long-long ( n func -- )
 
 M: amd64-backend %unbox-struct-1 ( -- )
     #! Alien must be in RDI.
-    "alien_offset" f compile-c-call
+    "alien_offset" f %alien-invoke
     ! Load first cell
     RAX RAX [] MOV ;
 
 M: amd64-backend %unbox-struct-2 ( -- )
     #! Alien must be in RDI.
-    "alien_offset" f compile-c-call
+    "alien_offset" f %alien-invoke
     ! Load second cell
     RDX RAX cell [+] MOV
     ! Load first cell
@@ -93,7 +90,7 @@ M: amd64-backend %unbox-large-struct ( n size -- )
     ! Load structure size
     RDX swap MOV
     ! Copy the struct to the C stack
-    "to_value_struct" f compile-c-call ;
+    "to_value_struct" f %alien-invoke ;
 
 : load-return-value ( reg-class -- )
     0 over param-reg swap return-reg
@@ -105,7 +102,7 @@ M: amd64-backend %box ( n reg-class func -- )
     ] [
         swap load-return-value
     ] if*
-    f compile-c-call ;
+    f %alien-invoke ;
 
 M: amd64-backend %box-long-long ( n func -- )
     T{ int-regs } swap %box ;
@@ -117,7 +114,7 @@ M: amd64-backend %box-small-struct ( size -- )
     RDI RAX MOV
     RSI RDX MOV
     RDX swap MOV
-    "box_small_struct" f compile-c-call ;
+    "box_small_struct" f %alien-invoke ;
 
 M: amd64-backend %box-large-struct ( n size -- )
     ! Struct size is parameter 2
@@ -125,28 +122,27 @@ M: amd64-backend %box-large-struct ( n size -- )
     ! Compute destination address
     swap struct-return@ RDI RSP rot [+] LEA
     ! Copy the struct from the C stack
-    "box_value_struct" f compile-c-call ;
+    "box_value_struct" f %alien-invoke ;
 
 M: amd64-backend %prepare-box-struct ( size -- )
     ! Compute target address for value struct return
     RAX RSP rot f struct-return@ [+] LEA
     RSP 0 [+] RAX MOV ;
 
-: reset-sse RAX RAX XOR ;
+M: amd64-backend %prepare-var-args RAX RAX XOR ;
 
 M: amd64-backend %alien-invoke ( symbol dll -- )
-    reset-sse compile-c-call ;
+    0 address-operand >r rc-absolute-cell rel-dlsym r> CALL ;
 
 M: amd64-backend %prepare-alien-indirect ( -- )
-    "unbox_alien" f compile-c-call
+    "unbox_alien" f %alien-invoke
     cell temp@ RAX MOV ;
 
 M: amd64-backend %alien-indirect ( -- )
-    reset-sse
     cell temp@ CALL ;
 
 M: amd64-backend %alien-callback ( quot -- )
-    RDI load-indirect "c_to_factor" f compile-c-call ;
+    RDI load-indirect "c_to_factor" f %alien-invoke ;
 
 M: amd64-backend %callback-value ( ctype -- )
     ! Save top of data stack
@@ -205,4 +201,4 @@ M: struct-type flatten-value-type ( type -- seq )
         ] each
     ] if ;
 
-14 set-profiler-prologues
+12 set-profiler-prologues

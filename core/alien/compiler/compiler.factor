@@ -248,6 +248,7 @@ M: alien-invoke generate-node
         end-basic-block
         %prepare-alien-invoke
         dup objects>registers
+        %prepare-var-args
         dup alien-invoke-dlsym %alien-invoke
         dup %cleanup
         box-return*
@@ -287,6 +288,7 @@ M: alien-indirect generate-node
         ! Save alien at top of stack to temporary storage
         %prepare-alien-indirect
         dup objects>registers
+        %prepare-var-args
         ! Call alien in temporary storage
         %alien-indirect
         dup %cleanup
