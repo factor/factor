@@ -1,4 +1,4 @@
-USING: combinators.lib kernel sequences math
+USING: combinators.lib kernel sequences math namespaces
 sequences.private shuffle ;
 
 IN: sequences.lib
@@ -45,4 +45,19 @@ IN: sequences.lib
 : minmax ( seq -- min max )
     #! find the min and max of a seq in one pass
     1/0. -1/0. rot [ tuck max >r min r> ] each ;
+
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+: ,, building get peek push ;
+: v, V{ } clone , ;
+: ,v building get dup peek empty? [ dup pop* ] when drop ;
+
+: monotonic-split ( seq quot -- newseq )
+    [
+        >r dup unclip add r>
+        v, [ pick ,, call [ v, ] unless ] curry 2each ,v
+    ] { } make ;
+
+: singleton? ( seq -- ? )
+    length 1 = ;
 
