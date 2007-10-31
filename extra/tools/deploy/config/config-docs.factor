@@ -1,5 +1,5 @@
 USING: help.markup help.syntax words alien.c-types assocs
-kernel ;
+kernel math ;
 IN: tools.deploy.config
 
 ARTICLE: "deploy-config" "Deployment configuration"
@@ -14,17 +14,13 @@ ARTICLE: "deploy-config" "Deployment configuration"
 ARTICLE: "deploy-flags" "Deployment flags"
 "There are two types of flags. The first set controls the major subsystems which are to be included in the deployment image:"
 { $subsection deploy-math?     }
-{ $subsection deploy-compiled? }
-{ $subsection deploy-io?       }
+{ $subsection deploy-compiler? }
 { $subsection deploy-ui?       }
 "The second set of flags controls the level of stripping to be performed on the deployment image; there is a trade-off between image size, and retaining functionality which is required by the application:"
-{ $subsection strip-globals?     }
-{ $subsection strip-word-props?  }
-{ $subsection strip-word-names?  }
-{ $subsection strip-dictionary?  }
-{ $subsection strip-debugger?    }
-{ $subsection strip-prettyprint? }
-{ $subsection strip-c-types?     } ;
+{ $subsection deploy-io          }
+{ $subsection deploy-reflection  }
+{ $subsection deploy-word-props? }
+{ $subsection deploy-c-types?    } ;
 
 ARTICLE: "prepare-deploy" "Preparing to deploy an application"
 "In order to deploy an application as a stand-alone image, the application's vocabulary must first be given a " { $link POSTPONE: MAIN: } " hook. Then, a " { $emphasis "deployment configuration" } " must be created."
@@ -33,47 +29,22 @@ ARTICLE: "prepare-deploy" "Preparing to deploy an application"
 
 ABOUT: "prepare-deploy"
 
-HELP: strip-globals?
-{ $description "Deploy flag. If set, the deploy tool applies various heuristics to strip out un-needed variables from the global namespace."
+HELP: deploy-word-props?
+{ $description "Deploy flag. If set, the deploy tool retains all word properties. Otherwise, it applies various heuristics to strip out un-needed word properties from words in the dictionary."
 $nl
-"On by default. Disable this if the heuristics strip out required variables." } ;
+"Off by default. Enable this if the heuristics strip out required word properties." } ;
 
-HELP: strip-word-props?
-{ $description "Deploy flag. If set, the deploy tool applies various heuristics to strip out un-needed word properties from words in the dictionary."
+HELP: deploy-c-types?
+{ $description "Deploy flag. If set, the deploy tool retains the " { $link c-types } " table."
 $nl
-"On by default. Disable this if the heuristics strip out required word properties." } ;
-
-HELP: strip-word-names?
-{ $description "Deploy flag. If set, the deploy tool strips word names from words in the dictionary."
-$nl
-"On by default. Disable this if your program calls " { $link word-name } "." } ;
-
-HELP: strip-dictionary?
-{ $description "Deploy flag. If set, the deploy tool strips unused words."
-$nl
-"On by default. Disable this if your program calls " { $link lookup } " to look up words by name, or needs to parse code at run-time." } ;
-
-HELP: strip-debugger?
-{ $description "Deploy flag. If set, the deploy tool strips the verbose error reporting facility; any errors thrown by the program will start the low-level debugger in the VM."
-$nl
-"On by default. Disable this if you need to debug a problem which only occurs when your program is running deployed." } ;
-
-HELP: strip-prettyprint?
-{ $description "Deploy flag. If set, the deploy tool strips variables used by the prettyprinter."
-$nl
-"On by default. Disable this if your program uses the prettyprinter." } ;
-
-HELP: strip-c-types?
-{ $description "Deploy flag. If set, the deploy tool strips out the " { $link c-types } " table."
-$nl
-"On by default. Disable this if your program calls " { $link c-type } ", " { $link heap-size } ", " { $link <c-object> } ", " { $link <c-array> } ", " { $link malloc-object } ", or " { $link malloc-array } " with a C type name which is not a literal pushed directly at the call site. In this situation, the compiler is unable to fold away the C type lookup, and thus must use the global table at runtime." } ;
+"Off by default. Disable this if your program calls " { $link c-type } ", " { $link heap-size } ", " { $link <c-object> } ", " { $link <c-array> } ", " { $link malloc-object } ", or " { $link malloc-array } " with a C type name which is not a literal pushed directly at the call site. In this situation, the compiler is unable to fold away the C type lookup, and thus must use the global table at runtime." } ;
 
 HELP: deploy-math?
-{ $description "Deploy flag. If set, the deployed image will contain the full number tower."
+{ $description "Deploy flag. If set, the deployed image will contain support for " { $link ratio } " and " { $link complex } " types."
 $nl
-"On by default. Most programs require the number tower, in particular, any program deployed with " { $link deploy-compiled? } " set." } ;
+"On by default. Often the programmer will use rationals without realizing it. A small amount of space can be saved by stripping these features out, but some code may require changes to work properly." } ;
 
-HELP: deploy-compiled?
+HELP: deploy-compiler?
 { $description "Deploy flag. If set, words in the deployed image will be compiled when possible."
 $nl
 "On by default. Most programs should be compiled, not only for performance but because features which depend on the C library interface only function after compilation." } ;
@@ -83,10 +54,11 @@ HELP: deploy-ui?
 $nl
 "Off by default. Programs wishing to use the UI must be deployed with this flag on." } ;
 
-HELP: deploy-io?
-{ $description "Deploy flag. If set, support for non-blocking I/O and networking will be included in the deployed image."
-$nl
-"Off by default. Programs wishing to use non-blocking I/O or networking must be deployed with this flag on." } ;
+HELP: deploy-io
+{ $description "The level of I/O support required by the deployed image." } ;
+
+HELP: deploy-reflection
+{ $description "The level of reflection support required by the deployed image." } ;
 
 HELP: default-config
 { $values { "assoc" assoc } }

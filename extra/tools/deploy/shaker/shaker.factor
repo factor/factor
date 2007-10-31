@@ -16,10 +16,10 @@ IN: tools.deploy.shaker
 : strip-init-hooks ( -- )
     "Stripping startup hooks" show
     "command-line" init-hooks get delete-at
-    strip-io? get [ "io.backend" init-hooks get delete-at ] when ;
+    strip-io? [ "io.backend" init-hooks get delete-at ] when ;
 
 : strip-debugger ( -- )
-    strip-debugger? get [
+    strip-debugger? [
         "Stripping debugger" show
         "resource:extra/tools/deploy/shaker/strip-debugger.factor"
         run-file
@@ -65,23 +65,13 @@ IN: tools.deploy.shaker
 
 : strip-words ( props -- )
     [ word? ] instances
-    strip-word-props? get [ tuck strip-word-props ] [ nip ] if
-    strip-word-names? get [ dup strip-word-names ] when
+    deploy-word-props? get [ nip ] [ tuck strip-word-props ] if
+    strip-word-names? [ dup strip-word-names ] when
     strip-word-defs ;
-
-USING: bit-arrays byte-arrays io.streams.nested ;
-
-: strip-classes ( -- )
-    "Stripping classes" show
-    io-backend get [
-        c-reader forget
-        c-writer forget
-    ] when
-    { style-stream mirror enum } [ forget ] each ;
 
 : strip-environment ( retain-globals -- )
     "Stripping environment" show
-    strip-globals? get [
+    strip-globals? [
         global strip-assoc 21 setenv
     ] [ drop ] if ;
 
@@ -103,16 +93,16 @@ SYMBOL: deploy-vocab
         \ boot ,
         init-hooks get values concat %
         ,
-        strip-io? get [ \ flush , ] unless
+        strip-io? [ \ flush , ] unless
     ] [ ] make "Boot quotation: " write dup . flush
     set-boot-quot ;
 
 : retained-globals ( -- seq )
     [
         builtins ,
-        strip-io? get [ io-backend , ] unless
+        strip-io? [ io-backend , ] unless
 
-        strip-dictionary? get [
+        strip-dictionary? [
             {
                 builtins
                 dictionary
@@ -129,14 +119,14 @@ SYMBOL: deploy-vocab
             } %
         ] unless
 
-        strip-prettyprint? get [
+        strip-prettyprint? [
             {
                 tab-size
                 margin
             } %
         ] unless
 
-        strip-c-types? get not deploy-ui? get or [
+        deploy-c-types? get deploy-ui? get or [
             "c-types" "alien.c-types" lookup ,
         ] when
 
@@ -150,18 +140,7 @@ SYMBOL: deploy-vocab
         ] when
     ] { } make dup . ;
 
-: normalize-strip-flags
-    strip-prettyprint? get [
-        strip-word-names? off
-    ] unless
-    strip-dictionary? get [
-        strip-prettyprint? off
-        strip-word-names? off
-        strip-word-props? off
-    ] unless ;
-
 : strip ( -- )
-    normalize-strip-flags
     strip-cocoa
     strip-debugger
     strip-init-hooks
