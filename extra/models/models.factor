@@ -1,6 +1,6 @@
 ! Copyright (C) 2006, 2007 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: generic kernel math sequences timers arrays ;
+USING: generic kernel math sequences timers arrays assocs ;
 IN: models
 
 TUPLE: model value connections dependencies ref ;
@@ -108,6 +108,22 @@ M: compose model-changed
 M: compose model-activated model-changed ;
 
 M: compose set-model [ set-model ] set-composed-value ;
+
+TUPLE: mapping assoc ;
+
+: <mapping> ( models -- mapping )
+    f mapping construct-model
+    over values over set-model-dependencies
+    tuck set-mapping-assoc ;
+
+M: mapping model-changed
+    dup mapping-assoc [ model-value ] assoc-map
+    swap delegate set-model ;
+
+M: mapping model-activated model-changed ;
+
+M: mapping set-model
+    mapping-assoc [ swapd at set-model ] curry assoc-each ;
 
 TUPLE: history back forward ;
 
