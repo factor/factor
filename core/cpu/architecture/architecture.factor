@@ -132,6 +132,10 @@ GENERIC: %load-param-reg ( stack reg reg-class -- )
 
 HOOK: %prepare-alien-invoke compiler-backend ( -- )
 
+HOOK: %prepare-var-args compiler-backend ( -- )
+
+M: object %prepare-var-args ;
+
 HOOK: %alien-invoke compiler-backend ( library function -- )
 
 HOOK: %cleanup compiler-backend ( alien-node -- )
