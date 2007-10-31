@@ -11,12 +11,12 @@ C: <store> store
     [ store-data ] keep store-path <file-writer> [
         [
             dup
-            [ drop [ get ] keep rot set-at ] curry* assoc-each
+            [ >r drop [ get ] keep r> set-at ] curry assoc-each
         ] keep serialize
     ] with-stream ;
 
 : load-store ( path -- store )
-    resource-path dup exists? [
+    dup exists? [
         dup <file-reader> [
             deserialize
         ] with-stream
@@ -30,4 +30,3 @@ C: <store> store
     ] [
         drop >r 2dup set-global r> set-at
     ] if ;
-
