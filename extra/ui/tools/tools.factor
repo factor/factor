@@ -9,7 +9,7 @@ ui.gadgets.books ui.gadgets.buttons ui.gadgets.controls
 ui.gadgets.labelled ui.gadgets.scrollers ui.gadgets.tracks
 ui.gadgets.worlds ui.gadgets.presentations ui.gestures words
 vocabs.loader tools.test ui.gadgets.buttons
-ui.gadgets.status-bar ;
+ui.gadgets.status-bar mirrors ;
 IN: ui.tools
 
 : workspace-tabs ( -- seq )
@@ -24,9 +24,8 @@ IN: ui.tools
 : <workspace-tabs> ( -- tabs )
     g control-model
     "tool-switching" workspace command-map
-    [ command-string ] { } assoc>map
-    [ length ] keep 2array flip
-    <radio-box> ;
+    [ command-string ] { } assoc>map <enum> >alist
+    <toggle-buttons> ;
 
 : <workspace-book> ( -- gadget )
     workspace-tabs [ execute ] map g control-model <book> ;

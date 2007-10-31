@@ -30,6 +30,12 @@ ARTICLE: "ui.gadgets.labels" "Label gadgets"
 { $subsection <label> }
 { $subsection <label-control> }
 { $subsection label-string }
-{ $subsection set-label-string } ;
+{ $subsection set-label-string }
+"Label specifiers are used by buttons, checkboxes and radio buttons:"
+{ $subsection >label } ;
 
 ABOUT: "ui.gadgets.labels"
+
+HELP: >label
+{ $values { "obj" "a label specifier" } { "gadget" "a new " { $link gadget } } }
+{ $description "Convert the object into a gadget suitable for use as the label of a button. If " { $snippet "obj" } " is already a gadget, does nothing. Otherwise creates a " { $link label } " gadget if it is a string and an empty gadget if " { $snippet "obj" } " is " { $link f } "." } ;

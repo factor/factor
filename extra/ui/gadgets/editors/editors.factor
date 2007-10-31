@@ -34,6 +34,15 @@ TUPLE: loc-monitor editor ;
     dup init-editor-locs
     dup editor-theme ;
 
+: field-theme ( gadget -- )
+    gray <solid> swap set-gadget-boundary ;
+
+: <field> ( model -- )
+    drop
+    <editor>
+    2 <border>
+    dup field-theme ;
+
 : construct-editor ( class -- tuple )
     >r <editor> { set-gadget-delegate } r>
     (construct-control) ; inline

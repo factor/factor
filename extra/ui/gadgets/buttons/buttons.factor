@@ -4,7 +4,7 @@ USING: arrays ui.commands ui.gadgets ui.gadgets.borders
 ui.gadgets.controls ui.gadgets.labels ui.gadgets.theme
 ui.gadgets.tracks ui.gadgets.packs ui.gadgets.worlds ui.gestures
 ui.render kernel math models namespaces sequences strings
-quotations assocs combinators classes colors ;
+quotations assocs combinators classes colors tuples ;
 IN: ui.gadgets.buttons
 
 TUPLE: button pressed? selected? quot ;
@@ -38,12 +38,6 @@ button H{
     { T{ mouse-enter } [ button-update ] }
 } set-gestures
 
-GENERIC: >label ( obj -- gadget )
-M: string >label <label> ;
-M: array >label <label> ;
-M: object >label ;
-M: f >label drop <gadget> ;
-
 : <button> ( gadget quot -- button )
     button construct-empty
     [ set-button-quot ] keep
@@ -53,12 +47,14 @@ TUPLE: button-paint plain rollover pressed selected ;
 
 C: <button-paint> button-paint
 
+: find-button [ [ button? ] is? ] find-parent ;
+
 : button-paint ( button paint -- button paint )
-    {
-        { [ over button-pressed? ] [ button-paint-pressed ] }
-        { [ over button-selected? ] [ button-paint-selected ] }
-        { [ over button-rollover? ] [ button-paint-rollover ] }
-        { [ t ] [ button-paint-plain ] }
+    over find-button {
+        { [ dup button-pressed? ] [ drop button-paint-pressed ] }
+        { [ dup button-selected? ] [ drop button-paint-selected ] }
+        { [ dup button-rollover? ] [ drop button-paint-rollover ] }
+        { [ t ] [ drop button-paint-plain ] }
     } cond ;
 
 M: button-paint draw-interior
@@ -99,14 +95,78 @@ repeat-button H{
     repeat-button construct-empty
     [ >r <bevel-button> r> set-gadget-delegate ] keep ;
 
-: <radio-control> ( model value label -- gadget )
-    over [ swap set-control-value ] curry <bevel-button>
-    swap [ swap >r = r> set-button-selected? ] curry <control> ;
+: checkmark-theme ( gadget -- )
+    f
+    f
+    black <solid>
+    black <checkmark-paint>
+    <button-paint>
+    over set-gadget-interior
+    black <solid>
+    swap set-gadget-boundary ;
 
-: <radio-box> ( model assoc -- gadget )
-    [
-        swap [ -rot <radio-control> gadget, ] curry assoc-each
-    ] make-shelf ;
+: <checkmark> ( -- gadget )
+    <gadget>
+    dup checkmark-theme
+    { 14 14 } over set-gadget-dim ;
+
+: toggle-model ( model -- )
+    [ not ] change-model ;
+
+: checkbox-theme
+    f over set-gadget-interior
+    { 5 5 } over set-pack-gap
+    1/2 swap set-pack-align ;
+
+: <checkbox> ( model label -- checkbox )
+    <checkmark>
+    label-on-right
+    over [ toggle-model drop ] curry <button>
+    [ set-button-selected? ] <control>
+    dup checkbox-theme ;
+
+: radio-knob-theme ( gadget -- )
+    f
+    f
+    black <radio-paint>
+    black <radio-paint>
+    <button-paint>
+    over set-gadget-interior
+    black <radio-paint>
+    swap set-gadget-boundary ;
+
+: <radio-knob> ( -- gadget )
+    <gadget>
+    dup radio-knob-theme
+    { 16 16 } over set-gadget-dim ;
+
+: <radio-control> ( model value gadget quot -- control )
+    >r dupd [ set-control-value ] curry* r> call
+    [ >r = r> set-button-selected? ] curry* <control> ; inline
+
+: <radio-controls> ( model assoc quot -- gadget )
+    swapd [ >r -rot r> call gadget, ] 2curry assoc-each ; inline
+
+: radio-button-theme
+    { 5 5 } over set-pack-gap 1/2 swap set-pack-align ;
+
+: <radio-button> ( model value label -- gadget )
+    <radio-knob> label-on-right
+    [ <button> ] <radio-control>
+    dup radio-button-theme ;
+
+: radio-buttons-theme
+    { 5 5 } swap set-pack-gap ;
+
+: <radio-buttons> ( model assoc -- gadget )
+    [ [ <radio-button> ] <radio-controls> ] make-filled-pile
+    dup radio-buttons-theme ;
+
+: <toggle-button> ( model value label -- gadget )
+    [ <bevel-button> ] <radio-control> ;
+
+: <toggle-buttons> ( model assoc -- gadget )
+    [ [ <toggle-button> ] <radio-controls> ] make-shelf ;
 
 : command-button-quot ( target command -- quot )
     [ invoke-command drop ] 2curry ;

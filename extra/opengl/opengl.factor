@@ -2,7 +2,7 @@
 ! Portions copyright (C) 2007 Eduardo Cavazos.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: alien alien.c-types io kernel math namespaces
-sequences math.vectors opengl.gl opengl.glu combinators ;
+sequences math.vectors math.constants math.functions opengl.gl opengl.glu combinators arrays ;
 IN: opengl
 
 : coordinates [ first2 ] 2apply ;
@@ -62,6 +62,23 @@ IN: opengl
 
 : gl-poly ( points -- )
     GL_LINE_LOOP (gl-poly) ;
+
+: circle-steps dup length v/n 2 pi * v*n ;
+
+: unit-circle dup [ sin ] map swap [ cos ] map ;
+
+: adjust-points [ [ 1 + 0.5 * ] map ] 2apply ;
+
+: scale-points 2array flip [ v* ] curry* map [ v+ ] curry* map ;
+
+: circle-points ( loc dim steps -- points )
+    circle-steps unit-circle adjust-points scale-points ;
+
+: gl-circle ( loc dim steps -- )
+    circle-points gl-poly ;
+
+: gl-fill-circle ( loc dim steps -- )
+    circle-points gl-fill-poly ;
 
 : prepare-gradient ( direction dim -- v1 v2 )
     tuck v* [ v- ] keep ;
