@@ -79,7 +79,7 @@ M: int-regs inc-reg-class
 
 M: float-regs inc-reg-class
     dup (inc-reg-class)
-    fp-shadows-int? [ reg-size 4 / int-regs +@ ] [ drop ] if ;
+    fp-shadows-int? [ reg-size cell /i int-regs +@ ] [ drop ] if ;
 
 : reg-class-full? ( class -- ? )
     dup class get swap param-regs length >= ;
