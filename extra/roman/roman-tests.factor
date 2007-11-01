@@ -1,9 +1,5 @@
 USING: arrays kernel math roman roman.private sequences tools.test ;
 
-[ { { 1 } { -1 5 } { 2 4 } } ]
-[ { 1 -1 5 2 4 } [ < ] monotonic-split [ >array ] map ] unit-test
-[ { { 1 1 1 1 } { 2 2 } { 3 } { 4 } { 5 } { 6 6 6 } } ]
-[ { 1 1 1 1 2 2 3 4 5 6 6 6 } [ = ] monotonic-split [ >array ] map ] unit-test
 [ "i" ] [ 1 >roman ] unit-test
 [ "ii" ] [ 2 >roman ] unit-test
 [ "iii" ] [ 3 >roman ] unit-test

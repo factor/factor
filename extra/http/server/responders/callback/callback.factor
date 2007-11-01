@@ -2,8 +2,7 @@
 ! Copyright (C) 2006 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: html http http.server.responders io kernel math namespaces
-continuations random system sequences assocs ;
-
+prettyprint continuations random system sequences assocs ;
 IN: http.server.responders.callback
 
 #! Name of the variable holding the continuation used to exit
@@ -58,7 +57,7 @@ TUPLE: request stream exitcc method url raw-query query header response ;
 
 : get-random-id ( -- id ) 
     #! Generate a random id to use for continuation URL's
-    "ID" 32 [ drop 9 random CHAR: 0 + ] map append ;
+    4 big-random unparse ;
 
 : callback-table ( -- <hashtable> ) 
     #! Return the global table of continuations
