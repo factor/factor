@@ -12,3 +12,5 @@ vocabs vocabs.loader ;
 
     "ui.freetype" require
 ] when
+
+macosx? [ "ui.tools.deploy" require ] when

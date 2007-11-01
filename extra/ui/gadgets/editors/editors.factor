@@ -37,13 +37,6 @@ TUPLE: loc-monitor editor ;
 : field-theme ( gadget -- )
     gray <solid> swap set-gadget-boundary ;
 
-: <field> ( model -- gadget )
-    drop
-    <editor>
-    2 <border>
-    { 1 0 } over set-border-fill
-    dup field-theme ;
-
 : construct-editor ( class -- tuple )
     >r <editor> { set-gadget-delegate } r>
     (construct-control) ; inline
@@ -435,3 +428,28 @@ M: editor stream-write
 M: editor stream-close drop ;
 
 M: editor stream-flush drop ;
+
+! Fields are like editors except they edit an external model
+TUPLE: field model editor ;
+
+: <field-border> ( gadget -- border )
+    2 <border>
+    { 1 0 } over set-border-fill
+    dup field-theme ;
+
+: <field> ( model -- gadget )
+    <editor> dup <field-border>
+    { set-field-model set-field-editor set-gadget-delegate }
+    field construct ;
+
+M: field graft*
+    dup field-model model-value
+    over field-editor set-editor-string
+    dup field-editor control-model add-connection ;
+
+M: field ungraft*
+    dup field-editor control-model remove-connection ;
+
+M: field model-changed
+    dup field-editor editor-string
+    swap field-model set-model ;
