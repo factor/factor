@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 
 USING: arrays assocs kernel math math.vectors namespaces
-quotations sequences sequences.private strings ;
+quotations sequences sequences.lib sequences.private strings ;
 IN: roman
 
 <PRIVATE
@@ -21,16 +21,6 @@ TUPLE: roman-range-error n ;
     ] [
         roman-range-error construct-boa throw
     ] if ;
-
-: ,, building get peek push ;
-: v, V{ } clone , ;
-: ,v building get dup peek empty? [ dup pop* ] when drop ;
-
-: monotonic-split ( seq quot -- newseq )
-    [
-        >r dup unclip add r>
-        v, [ pick ,, call [ v, ] unless ] curry 2each ,v
-    ] { } make ;
 
 : roman<= ( ch1 ch2 -- ? )
     [ 1string roman-digits index ] 2apply >= ;

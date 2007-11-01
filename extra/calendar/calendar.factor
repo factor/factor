@@ -205,7 +205,7 @@ M: number +second ( timestamp n -- timestamp )
 : >gmt ( timestamp -- timestamp )
     0 convert-timezone ;
 
-: compare-timestamps ( tuple tuple -- n )
+M: timestamp <=> ( ts1 ts2 -- n )
     [ >gmt tuple-slots ] compare ;
 
 : timestamp- ( timestamp timestamp -- seconds )
