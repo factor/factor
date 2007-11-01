@@ -47,6 +47,7 @@ SYMBOL: deploy-image
 
 : default-config ( -- assoc )
     V{
+        { deploy-ui?                f }
         { deploy-io                 2 }
         { deploy-reflection         1 }
         { deploy-compiler?          t }

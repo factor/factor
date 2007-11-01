@@ -5,13 +5,18 @@ ui.gadgets.controls models sequences ui.gadgets.buttons
 ui.gadgets.packs ui.gadgets.labels tools.deploy.config
 namespaces ui.gadgets.editors ui.gadgets.borders ui.gestures
 ui.commands assocs ui.gadgets.tracks ui ui.tools.listener
-tools.deploy.app vocabs ;
+tools.deploy vocabs ui.tools.workspace ;
 IN: ui.tools.deploy
 
 TUPLE: deploy-gadget vocab settings ;
 
 : bundle-name ( -- )
-    "bundle-name" get <field> "Bundle name:" label-on-left gadget, ;
+    "bundle-name" get <field>
+    "Bundle name:" label-on-left gadget, ;
+
+: deploy-ui ( -- )
+    deploy-ui? get
+    "Include user interface framework" <checkbox> gadget, ;
 
 : exit-when-windows-closed ( -- )
     "stop-after-last-window?" get
@@ -40,6 +45,7 @@ TUPLE: deploy-gadget vocab settings ;
     default-config [ <model> ] assoc-map [
         [
             bundle-name
+            deploy-ui
             exit-when-windows-closed
             io-settings
             reflection-settings
@@ -70,22 +76,34 @@ TUPLE: deploy-gadget vocab settings ;
 
 : com-deploy ( gadget -- )
     dup com-save
-    find-deploy-vocab [ deploy.app ] curry call-listener ;
+    find-deploy-vocab [ deploy ] curry call-listener ;
+
+: com-help ( -- )
+    "ui-deploy" help-window ;
+
+\ com-help H{
+    { +nullary+ t }
+} define-command
 
 deploy-gadget "toolbar" f {
+    { f com-help }
     { f com-revert }
     { f com-save }
     { T{ key-down f f "RETURN" } com-deploy }
 } define-command-map
 
+: buttons,
+    g <toolbar> { 10 10 } over set-pack-gap gadget, ;
+
 : <deploy-gadget> ( vocab -- gadget )
     dup f deploy-gadget construct-boa [
         <deploy-settings>
-        g-> set-deploy-gadget-settings
-        10 <border> 1 track,
-        toolbar,
-    ] { 0 1 } build-track dup com-revert ;
+        g-> set-deploy-gadget-settings gadget,
+        buttons,
+    ] { 0 1 } build-pack
+    dup deploy-settings-theme
+    dup com-revert ;
 
 : deploy-tool ( vocab -- )
-    vocab-name dup <deploy-gadget>
+    vocab-name dup <deploy-gadget> 10 <border>
     "Deploying \"" rot "\"" 3append open-window ;

@@ -37,10 +37,11 @@ TUPLE: loc-monitor editor ;
 : field-theme ( gadget -- )
     gray <solid> swap set-gadget-boundary ;
 
-: <field> ( model -- )
+: <field> ( model -- gadget )
     drop
     <editor>
     2 <border>
+    { 1 0 } over set-border-fill
     dup field-theme ;
 
 : construct-editor ( class -- tuple )
