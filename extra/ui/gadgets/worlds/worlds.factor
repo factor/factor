@@ -95,7 +95,6 @@ SYMBOL: ui-error-hook
             ] [
                 over <world-error> ui-error
                 f swap set-world-active?
-                drop
             ] recover
         ] with-variable
     ] [

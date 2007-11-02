@@ -30,13 +30,16 @@ IN: tools.deploy
     dup duplex-stream-out stream-close
     copy-lines ;
 
+: ?append swap [ append ] [ drop ] if ;
+
 : profile-string ( config -- string )
-    {
-        { deploy-math? "math" }
-        { deploy-compiled? "compiler" }
-        { deploy-ui? "ui" }
-        { deploy-io? "io" }
-    } swap [ nip at ] curry assoc-subset values " " join ;
+    [
+        ""
+        deploy-math? get " math" ?append
+        deploy-compiler? get " compiler" ?append
+        native-io? " io" ?append
+        deploy-ui? get " ui" ?append
+    ] bind ;
 
 : deploy-command-line ( vm image vocab config -- vm flags )
     [

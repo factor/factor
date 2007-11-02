@@ -181,13 +181,8 @@ M: word com-stack-effect word-def com-stack-effect ;
 } define-operation
 
 ! Profiler presentations
-[ usage-profile? ] \ com-show-profile H{
-    { +primary+ t }
-} define-operation
-
-[ vocab-profile? ] \ com-show-profile H{
-    { +primary+ t }
-} define-operation
+[ dup usage-profile? swap vocab-profile? or ]
+\ com-show-profile H{ { +primary+ t } } define-operation
 
 ! Operations -> commands
 source-editor

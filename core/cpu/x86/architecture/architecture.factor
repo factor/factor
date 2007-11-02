@@ -160,7 +160,7 @@ HOOK: %unbox-struct-2 compiler-backend ( -- )
 
 M: x86-backend %unbox-small-struct ( size -- )
     #! Alien must be in EAX.
-    cell align cell / {
+    cell align cell /i {
         { 1 [ %unbox-struct-1 ] }
         { 2 [ %unbox-struct-2 ] }
     } case ;

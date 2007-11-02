@@ -7,11 +7,7 @@ HELP: button
 $nl
 "A button's appearance can vary depending on the state of the mouse button if the " { $link gadget-interior } " or " { $link gadget-boundary } " slots are set to instances of " { $link button-paint } "."
 $nl
-"A button can be selected, which is distinct from being pressed. This state is held in the " { $link button-selected? } " slot, and is used by the " { $link <radio-box> } " word to construct a row of buttons for choosing among several alternatives." } ;
-
-HELP: >label
-{ $values { "obj" "a label specifier" } { "gadget" "a new " { $link gadget } } }
-{ $description "Convert the object into a gadget suitable for use as the label of a button. If " { $snippet "obj" } " is already a gadget, does nothing. Otherwise creates a " { $link label } " gadget if it is a string and an empty gadget if " { $snippet "obj" } " is " { $link f } "." } ;
+"A button can be selected, which is distinct from being pressed. This state is held in the " { $link button-selected? } " slot, and is used by the " { $link <toggle-buttons> } " word to construct a row of buttons for choosing among several alternatives." } ;
 
 HELP: <button>
 { $values { "gadget" gadget } { "quot" "a quotation with stack effect " { $snippet "( button -- )" } } { "button" "a new " { $link button } } }
@@ -35,20 +31,20 @@ HELP: button-paint
         { { $link button-paint-plain } " - the button is inactive" }
         { { $link button-paint-rollover } " - the button is under the mouse" }
         { { $link button-paint-pressed } " - the button is under the mouse and a mouse button is held down" }
-        { { $link button-paint-selected } " - the button is selected (see " { $link <radio-box> }  }
+        { { $link button-paint-selected } " - the button is selected (see " { $link <toggle-buttons> }  }
     }
 "The " { $link <roll-button> } " and " { $link <bevel-button> } " words create " { $link button } " instances with specific " { $link button-paint } "." } ;
 
-HELP: <radio-control>
+HELP: <toggle-button>
 { $values { "model" model } { "value" object } { "label" "a label specifier" } { "gadget" gadget } }
 { $description
     "Creates a " { $link <bevel-button> } " which sets the model's value to " { $snippet "value" } " when pressed. After being pressed, the button becomes selected until the value of the model changes again."
 }
-{ $notes "Typically a row of radio controls should be built together using " { $link <radio-box> } "." } ;
+{ $notes "Typically a row of radio controls should be built together using " { $link <toggle-buttons> } "." } ;
 
-HELP: <radio-box>
+HELP: <toggle-buttons>
 { $values { "model" model } { "assoc" "an association list mapping labels to objects" } { "gadget" gadget } }
-{ $description "Creates a row of labelled " { $link <radio-control> } " gadgets which change the value of the model." } ;
+{ $description "Creates a row of labelled " { $link <toggle-button> } " gadgets which change the value of the model." } ;
 
 HELP: <command-button>
 { $values { "target" object } { "gesture" "a gesture" } { "command" "a command" } { "button" "a new " { $link button } } }
@@ -74,11 +70,8 @@ ARTICLE: "ui.gadgets.buttons" "Button gadgets"
 { $subsection <command-button> }
 { $subsection <toolbar> }
 "A radio box is a row of buttons for choosing amongst several distinct possibilities:"
-{ $subsection <radio-box> }
+{ $subsection <toggle-buttons> }
 "Button appearance can be customized:"
 { $subsection button-paint }
 "Button constructors take " { $emphasis "label specifiers" } " as input. A label specifier is either a string, an array of strings, a gadget or " { $link f } "."
-$nl
-"A generic word used to convert label specifiers to gadgets:"
-{ $subsection >label }
 { $see-also <command-button> "ui-commands" } ;

@@ -1,40 +1,59 @@
 ! Copyright (C) 2007 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: vocabs.loader io.files io kernel sequences assocs
-splitting parser prettyprint ;
+splitting parser prettyprint namespaces math ;
 IN: tools.deploy.config
 
-SYMBOL: strip-io?
-SYMBOL: strip-globals?
-SYMBOL: strip-word-props?
-SYMBOL: strip-word-names?
-SYMBOL: strip-dictionary?
-SYMBOL: strip-debugger?
-SYMBOL: strip-prettyprint?
-SYMBOL: strip-c-types?
-
-SYMBOL: deploy-math?
-SYMBOL: deploy-compiled?
-SYMBOL: deploy-io?
 SYMBOL: deploy-ui?
+SYMBOL: deploy-compiler?
+SYMBOL: deploy-math?
+
+SYMBOL: deploy-io
+
+: deploy-io-options
+    {
+        { 1 "Level 1 - No input/output" }
+        { 2 "Level 2 - Basic ANSI C streams" }
+        { 3 "Level 3 - Non-blocking streams and networking" }
+    } ;
+
+: strip-io? deploy-io get zero? ;
+
+: native-io? deploy-io get 3 = ;
+
+SYMBOL: deploy-reflection
+
+: deploy-reflection-options
+    {
+        { 1 "Level 1 - No reflection" }
+        { 2 "Level 2 - Retain word names" }
+        { 3 "Level 3 - Prettyprinter" }
+        { 4 "Level 4 - Debugger" }
+        { 5 "Level 5 - Parser" }
+        { 6 "Level 6 - Full environment" }
+    } ;
+
+: strip-word-names? deploy-reflection get 2 < ;
+: strip-prettyprint? deploy-reflection get 3 < ;
+: strip-debugger? deploy-reflection get 4 < ;
+: strip-dictionary? deploy-reflection get 5 < ;
+: strip-globals? deploy-reflection get 6 < ;
+
+SYMBOL: deploy-word-props?
+SYMBOL: deploy-c-types?
 
 SYMBOL: deploy-vm
 SYMBOL: deploy-image
 
 : default-config ( -- assoc )
     V{
-        { strip-io?          f }
-        { strip-prettyprint? t }
-        { strip-globals?     t }
-        { strip-word-props?  t }
-        { strip-word-names?  t }
-        { strip-dictionary?  t }
-        { strip-debugger?    t }
-        { strip-c-types?     t }
-        { deploy-math?       t }
-        { deploy-compiled?   t }
-        { deploy-io?         f }
-        { deploy-ui?         f }
+        { deploy-ui?                f }
+        { deploy-io                 2 }
+        { deploy-reflection         1 }
+        { deploy-compiler?          t }
+        { deploy-math?              t }
+        { deploy-word-props?        f }
+        { deploy-c-types?           f }
         ! default value for deploy.app
         { "stop-after-last-window?" t }
     } clone ;
