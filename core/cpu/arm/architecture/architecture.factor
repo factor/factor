@@ -117,7 +117,8 @@ M: arm-backend %jump-t ( label -- )
     #! Load jump table target address into reg.
     "scratch" operand PC "n" operand 1 <LSR> ADD
     "scratch" operand 0 <+> LDR
-    rc-indirect-arm rel-dispatch ;
+    rc-indirect-arm rel-dispatch
+    "scratch" operand dup compiled-header-size ADD ;
 
 M: arm-backend %call-dispatch ( word-table# -- )
     [
