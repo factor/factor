@@ -70,8 +70,8 @@ IN: tools.deploy.shaker
     strip-word-defs ;
 
 : strip-environment ( retain-globals -- )
-    "Stripping environment" show
     strip-globals? [
+        "Stripping environment" show
         global strip-assoc 21 setenv
     ] [ drop ] if ;
 
@@ -160,8 +160,6 @@ SYMBOL: deploy-vocab
             deploy-vocab get require
             r> [ call ] when*
             strip
-            "Compressing image" show
-            compress-image
             finish-deploy
         ] [
             print-error flush 1 exit
