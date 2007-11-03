@@ -95,6 +95,18 @@ repeat-button H{
     repeat-button construct-empty
     [ >r <bevel-button> r> set-gadget-delegate ] keep ;
 
+TUPLE: checkmark-paint color ;
+
+C: <checkmark-paint> checkmark-paint
+
+M: checkmark-paint draw-interior
+    checkmark-paint-color gl-color
+    origin get [
+        rect-dim
+        { 0 0 } over gl-line
+        dup { 0 1 } v* swap { 1 0 } v* gl-line
+    ] with-translation ;
+
 : checkmark-theme ( gadget -- )
     f
     f
@@ -124,6 +136,18 @@ repeat-button H{
     over [ toggle-model drop ] curry <button>
     [ set-button-selected? ] <control>
     dup checkbox-theme ;
+
+TUPLE: radio-paint color ;
+
+C: <radio-paint> radio-paint
+
+M: radio-paint draw-interior
+    radio-paint-color gl-color
+    origin get { 4 4 } v+ swap rect-dim { 8 8 } v- 12 gl-fill-circle ;
+
+M: radio-paint draw-boundary
+    radio-paint-color gl-color
+    origin get { 1 1 } v+ swap rect-dim { 2 2 } v- 12 gl-circle ;
 
 : radio-knob-theme ( gadget -- )
     f
