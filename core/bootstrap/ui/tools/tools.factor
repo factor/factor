@@ -1,4 +1,4 @@
-USING: kernel vocabs vocabs.loader sequences ;
+USING: kernel vocabs vocabs.loader sequences system ;
 
 { "ui" "help" "tools" }
 [ "bootstrap." swap append vocab ] all? [
