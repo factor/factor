@@ -4,7 +4,8 @@ USING: arrays ui.commands ui.gadgets ui.gadgets.borders
 ui.gadgets.controls ui.gadgets.labels ui.gadgets.theme
 ui.gadgets.tracks ui.gadgets.packs ui.gadgets.worlds ui.gestures
 ui.render kernel math models namespaces sequences strings
-quotations assocs combinators classes colors tuples ;
+quotations assocs combinators classes colors tuples opengl
+math.vectors ;
 IN: ui.gadgets.buttons
 
 TUPLE: button pressed? selected? quot ;
