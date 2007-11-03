@@ -5,7 +5,7 @@ assocs kernel vocabs words sequences memory io system arrays
 continuations math definitions mirrors splitting parser classes
 inspector layouts vocabs.loader prettyprint.config prettyprint
 debugger io.streams.c io.streams.duplex io.files io.backend
-quotations words.private tools.deploy.config ;
+quotations words.private tools.deploy.config compiler ;
 IN: tools.deploy.shaker
 
 : show ( msg -- )
@@ -23,6 +23,15 @@ IN: tools.deploy.shaker
         "Stripping debugger" show
         "resource:extra/tools/deploy/shaker/strip-debugger.factor"
         run-file
+        recompile
+    ] when ;
+
+: strip-libc ( -- )
+    "libc" vocab [
+        "Stripping manual memory management debug code" show
+        "resource:extra/tools/deploy/shaker/strip-libc.factor"
+        run-file
+        recompile
     ] when ;
 
 : strip-cocoa ( -- )
@@ -30,6 +39,7 @@ IN: tools.deploy.shaker
         "Stripping unused Cocoa methods" show
         "resource:extra/tools/deploy/shaker/strip-cocoa.factor"
         run-file
+        recompile
     ] when ;
 
 : strip-assoc ( retained-keys assoc -- newassoc )
@@ -126,7 +136,7 @@ SYMBOL: deploy-vocab
             } %
         ] unless
 
-        deploy-c-types? get deploy-ui? get or [
+        deploy-c-types? get [
             "c-types" "alien.c-types" lookup ,
         ] when
 
@@ -141,6 +151,7 @@ SYMBOL: deploy-vocab
     ] { } make dup . ;
 
 : strip ( -- )
+    strip-libc
     strip-cocoa
     strip-debugger
     strip-init-hooks

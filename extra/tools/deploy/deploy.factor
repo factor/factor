@@ -37,8 +37,8 @@ IN: tools.deploy
         ""
         deploy-math? get " math" ?append
         deploy-compiler? get " compiler" ?append
-        native-io? " io" ?append
         deploy-ui? get " ui" ?append
+        native-io? " io" ?append
     ] bind ;
 
 : deploy-command-line ( vm image vocab config -- vm flags )
@@ -49,7 +49,7 @@ IN: tools.deploy
 
         "\"-output-image=" swap "\"" 3append ,
 
-        "-no-stack-traces" ,
+        ! "-no-stack-traces" ,
         
         "-no-user-init" ,
     ] { } make ;
