@@ -52,7 +52,6 @@ VARS: buffer-start buffer-length output-callback-var ;
 
 : output ( data header pcm -- mad_flow ) 
   "output" . flush
-  break
   -rot 2drop output-callback-var> call
   [ MAD_FLOW_CONTINUE ] [ MAD_FLOW_STOP ] if ;
 
