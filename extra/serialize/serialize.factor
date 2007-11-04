@@ -261,7 +261,7 @@ DEFER: (deserialize) ( -- obj )
     V{ } clone serialized rot with-variable ; inline
 
 : deserialize-sequence ( -- seq )
-    [ [ deserialize* ] [ ] { } unfold ] with-serialized ;
+    [ [ deserialize* ] [ ] [ drop ] unfold ] with-serialized ;
 
 : deserialize ( -- obj )
     [ (deserialize) ] with-serialized ;
