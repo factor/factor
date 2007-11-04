@@ -3,7 +3,7 @@
 USING: alien alien.c-types kernel math namespaces
 cpu.architecture cpu.arm.architecture cpu.arm.assembler
 cpu.arm.intrinsics generator generator.registers continuations
-compiler io vocabs.loader sequences ;
+compiler io vocabs.loader sequences system ;
 
 ! EABI passes floats in integer registers.
 [ alien-float ]
@@ -53,4 +53,4 @@ T{ arm-backend } compiler-backend set-global
     t have-BLX? set-global
 ] when
 
-7 cells set-profiler-prologue
+7 cells set-profiler-prologues

@@ -278,7 +278,7 @@ M: arm-backend %alien-indirect ( -- )
 
 M: arm-backend %alien-callback ( quot -- )
     R0 load-indirect
-    "run_callback" f %alien-invoke ;
+    "c_to_factor" f %alien-invoke ;
 
 M: arm-backend %callback-value ( ctype -- )
     ! Save top of data stack

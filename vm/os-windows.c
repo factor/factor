@@ -51,8 +51,7 @@ void ffi_dlopen (F_DLL *dll, bool error)
 	{
 		dll->dll = NULL;
 		if(error)
-			general_error(ERROR_FFI,F,F,
-				(void*)tag_object(get_error_message()));
+			general_error(ERROR_FFI,F,tag_object(get_error_message()),NULL);
 		else
 			return;
 	}

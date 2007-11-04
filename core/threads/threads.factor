@@ -2,7 +2,7 @@
 ! Copyright (C) 2005 Mackenzie Straight.
 ! See http://factorcode.org/license.txt for BSD license.
 IN: threads
-USING: arrays init hashtables io.backend kernel kernel.private
+USING: arrays init hashtables heaps io.backend kernel kernel.private
 math namespaces queues sequences vectors io system sorting
 continuations debugger ;
 
@@ -10,21 +10,22 @@ continuations debugger ;
 
 SYMBOL: sleep-queue
 
+TUPLE: sleeping ms continuation ;
+
+M: sleeping <=> ( obj1 obj2 -- n )
+    [ sleeping-ms ] 2apply - ;
+
 : sleep-time ( -- ms )
     sleep-queue get-global
-    dup empty? [ drop 1000 ] [ first first millis [-] ] if ;
+    dup heap-empty? [ drop 1000 ] [ peek-heap sleeping-ms millis [-] ] if ;
 
 : run-queue ( -- queue ) \ run-queue get-global ;
 
 : schedule-sleep ( ms continuation -- )
-    2array global [
-        sleep-queue [ swap add sort-keys ] change
-    ] bind ;
+    sleeping construct-boa sleep-queue get-global push-heap ;
 
 : wake-up ( -- continuation )
-    global [
-        sleep-queue [ unclip second swap ] change
-    ] bind ;
+    sleep-queue get-global pop-heap sleeping-continuation ;
 
 PRIVATE>
 
@@ -67,9 +68,8 @@ PRIVATE>
 
 : init-threads ( -- )
     <queue> \ run-queue set-global
-    f sleep-queue set-global
+    <min-heap> sleep-queue set-global
     [ idle-thread ] in-thread ;
 
 [ init-threads ] "threads" add-init-hook
-
 PRIVATE>

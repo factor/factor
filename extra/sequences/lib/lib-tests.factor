@@ -1,4 +1,5 @@
-USING: kernel sequences.lib math math.functions tools.test ;
+USING: arrays kernel sequences sequences.lib math
+math.functions tools.test ;
 
 [ 4 ] [ { 1 2 } [ sq ] [ * ] map-reduce ] unit-test
 [ 36 ] [ { 2 3 } [ sq ] [ * ] map-reduce ] unit-test
@@ -28,3 +29,7 @@ USING: kernel sequences.lib math math.functions tools.test ;
 [ -11 -9 ] [ { -11 -10 -9 } minmax ] unit-test
 [ -1/0. 1/0. ] [ { -1/0. 1/0. -11 -10 -9 } minmax ] unit-test
 
+[ { { 1 } { -1 5 } { 2 4 } } ]
+[ { 1 -1 5 2 4 } [ < ] monotonic-split [ >array ] map ] unit-test
+[ { { 1 1 1 1 } { 2 2 } { 3 } { 4 } { 5 } { 6 6 6 } } ]
+[ { 1 1 1 1 2 2 3 4 5 6 6 6 } [ = ] monotonic-split [ >array ] map ] unit-test
