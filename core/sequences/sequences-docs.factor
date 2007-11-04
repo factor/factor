@@ -127,8 +127,9 @@ ARTICLE: "sequences-combinators" "Sequence combinators"
 { $subsection 2reduce }
 "Mapping:"
 { $subsection map }
-{ $subsection accumulate }
 { $subsection 2map }
+{ $subsection accumulate }
+{ $subsection unfold }
 "Filtering:"
 { $subsection push-if }
 { $subsection subset } ;
@@ -230,6 +231,7 @@ $nl
 { $subsection "sequences-tests" }
 { $subsection "sequences-search" }
 { $subsection "sequences-comparing" }
+{ $subsection "sequences-split" }
 { $subsection "sequences-destructive" }
 { $subsection "sequences-stacks" }
 "For inner loops:"
@@ -961,3 +963,13 @@ HELP: supremum
 { $values { "seq" "a sequence of real numbers" } { "n" "a number" } }
 { $description "Outputs the greatest element of " { $snippet "seq" } "." }
 { $errors "Throws an error if the sequence is empty." } ;
+
+HELP: unfold
+{ $values { "pred" "a quotation with stack effect " { $snippet "( -- ? )" } } { "quot" "a quotation with stack effect " { $snippet "( -- obj )" } } { "tail" "a quotation" } { "seq" "a sequence" } }
+{ $description "Calls " { $snippet "pred" } " repeatedly. If the predicate yields " { $link f } ", stops, otherwise, calls " { $snippet "quot" } " to yield a value. Values are accumulated and returned in a sequence at the end." }
+{ $examples
+    "The following example divides a number by two until we reach zero, and accumulates intermediate results:"
+    { $example "1337 [ dup 0 > ] [ 2/ dup ] [ ] unfold nip ." "{ 668 334 167 83 41 20 10 5 2 1 0 }" }
+    "The " { $snippet "tail" } " quotation is used when the predicate produces more than one output value. In this case, we have to drop this value even if the predicate fails in order for stack inference to calculate a stack effect for the " { $link unfold } " call:"
+    { $unchecked-example "[ 10 random dup 1 > ] [ ] [ drop ] unfold ." "{ 8 2 2 9 }" }
+} ;
