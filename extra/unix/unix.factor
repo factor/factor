@@ -107,6 +107,7 @@ FUNCTION: void close ( int fd ) ;
 FUNCTION: int connect ( int s, void* name, socklen_t namelen ) ;
 FUNCTION: int dup2 ( int oldd, int newd ) ;
 ! FUNCTION: int dup ( int oldd ) ;
+FUNCTION: int execv ( char* path, char** argv ) ;
 FUNCTION: int execvp ( char* path, char** argv ) ;
 FUNCTION: int execve ( char* path, char** argv, char** envp ) ;
 FUNCTION: int fchdir ( int fd ) ;
@@ -164,6 +165,18 @@ FUNCTION: int system ( char* command ) ;
 FUNCTION: time_t time ( time_t* t ) ;
 FUNCTION: int unlink ( char* path ) ;
 FUNCTION: int utimes ( char* path, timeval[2] times ) ;
+
+! Flags for waitpid
+
+: WNOHANG   1 ;
+: WUNTRACED 2 ;
+
+: WSTOPPED   2 ;
+: WEXITED    4 ;
+: WCONTINUED 8 ;
+: WNOWAIT    HEX: 1000000 ;
+
 FUNCTION: pid_t wait ( int* status ) ;
 FUNCTION: pid_t waitpid ( pid_t wpid, int* status, int options ) ;
+
 FUNCTION: ssize_t write ( int fd, void* buf, size_t nbytes ) ;
