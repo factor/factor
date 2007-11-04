@@ -153,7 +153,7 @@ M: windows-ce-io WSASocket-flags ( -- DWORD ) 0 ;
 
 : do-connect ( addrspec -- socket )
     [ tcp-socket dup ] keep
-    make-sockaddr heap-size
+    make-sockaddr/size
     f f f f windows.winsock:WSAConnect zero? [
         winsock-error-string throw
     ] unless ;
@@ -227,7 +227,7 @@ M: windows-ce-io send ( packet addrspec datagram -- )
     [ windows.winsock:set-WSABUF-len ] keep
     [ windows.winsock:set-WSABUF-buf ] keep
     
-    rot make-sockaddr heap-size
+    rot make-sockaddr/size
     >r >r 1 0 <uint> 0 r> r> f f 
     windows.winsock:WSASendTo zero? [
         winsock-error-string throw

@@ -175,7 +175,7 @@ USE: windows.winsock
 : server-fd ( addrspec type -- fd )
     >r dup protocol-family r> open-socket
         dup close-socket-later
-    dup rot make-sockaddr heap-size bind socket-error ;
+    dup rot make-sockaddr/size bind socket-error ;
 
 USE: namespaces
 
