@@ -29,8 +29,7 @@ TUPLE: ConnectEx-args port
     s* name* namelen* lpSendBuffer* dwSendDataLength*
     lpdwBytesSent* lpOverlapped* ptr* ;
 
-: init-connect ( sockaddr sockaddr-name ConnectEx -- )
-    >r heap-size r>
+: init-connect ( sockaddr size ConnectEx -- )
     [ set-ConnectEx-args-namelen* ] keep
     [ set-ConnectEx-args-name* ] keep
     f over set-ConnectEx-args-lpSendBuffer*
@@ -55,7 +54,7 @@ TUPLE: ConnectEx-args port
 M: windows-nt-io (client) ( addrspec -- duplex-stream )
     [
         \ ConnectEx-args construct-empty
-        over make-sockaddr pick init-connect
+        over make-sockaddr/size pick init-connect
         over tcp-socket over set-ConnectEx-args-s*
         dup ConnectEx-args-s* add-completion
         dup ConnectEx-args-s* get-ConnectEx-ptr over set-ConnectEx-args-ptr*
@@ -229,9 +228,9 @@ TUPLE: WSASendTo-args port
         >r delegate port-handle delegate win32-file-handle r>
         set-WSASendTo-args-s*
     ] keep [
-        >r make-sockaddr >r
+        >r make-sockaddr/size >r
         malloc-byte-array dup free-always
-        r> heap-size r>
+        r> r>
         [ set-WSASendTo-args-iToLen* ] keep
         set-WSASendTo-args-lpTo*
     ] keep [

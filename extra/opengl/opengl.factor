@@ -1,8 +1,9 @@
 ! Copyright (C) 2005, 2007 Slava Pestov.
 ! Portions copyright (C) 2007 Eduardo Cavazos.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: alien alien.c-types io kernel math namespaces
-sequences math.vectors math.constants math.functions opengl.gl opengl.glu combinators arrays ;
+USING: alien alien.c-types kernel math namespaces sequences
+math.vectors math.constants math.functions opengl.gl opengl.glu
+combinators arrays ;
 IN: opengl
 
 : coordinates [ first2 ] 2apply ;
@@ -19,7 +20,7 @@ IN: opengl
 
 : gl-error ( -- )
     glGetError dup zero? [
-        "GL error: " write dup gluErrorString print flush
+        "GL error: " dup gluErrorString append throw
     ] unless drop ;
 
 : do-state ( what quot -- )

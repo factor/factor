@@ -286,7 +286,7 @@ M: gadget ungraft* drop ;
     swap [ over (add-gadget) ] each relayout ;
 
 : parents ( gadget -- seq )
-    [ dup ] [ [ gadget-parent ] keep ] { } unfold ;
+    [ dup ] [ [ gadget-parent ] keep ] [ ] unfold nip ;
 
 : each-parent ( gadget quot -- ? )
     >r parents r> all? ; inline
@@ -333,7 +333,7 @@ M: f request-focus-on 2drop ;
     dup focusable-child swap request-focus-on ;
 
 : focus-path ( world -- seq )
-    [ dup ] [ [ gadget-focus ] keep ] { } unfold ;
+    [ dup ] [ [ gadget-focus ] keep ] [ ] unfold nip ;
 
 : make-gadget ( quot gadget -- gadget )
     [ \ make-gadget rot with-variable ] keep ; inline

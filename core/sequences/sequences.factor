@@ -414,12 +414,10 @@ PRIVATE>
 : interleave ( seq between quot -- )
     [ (interleave) ] 2curry iterate-seq 2each ; inline
 
-: unfold ( obj pred quot exemplar -- seq )
-    [
-        10 swap new-resizable [
-            [ push ] curry compose [ drop ] while
-        ] keep
-    ] keep like ; inline
+: unfold ( pred quot tail -- seq )
+    V{ } clone [
+        swap >r [ push ] curry compose r> while
+    ] keep { } like ; inline
 
 : index ( obj seq -- n )
     [ = ] curry* find drop ;

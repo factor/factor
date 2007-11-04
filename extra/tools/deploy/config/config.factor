@@ -17,7 +17,7 @@ SYMBOL: deploy-io
         { 3 "Level 3 - Non-blocking streams and networking" }
     } ;
 
-: strip-io? deploy-io get zero? ;
+: strip-io? deploy-io get 1 = ;
 
 : native-io? deploy-io get 3 = ;
 

@@ -5,7 +5,7 @@ USING: alien arrays generic hashtables inference.dataflow
 inference.class kernel assocs math math.private kernel.private
 sequences words parser vectors strings sbufs io namespaces
 assocs quotations sequences.private io.binary io.crc32
-io.buffers io.streams.string layouts splitting math.intervals
+io.streams.string layouts splitting math.intervals
 math.floats.private tuples tuples.private classes
 optimizer.def-use optimizer.backend optimizer.pattern-match
 float-arrays combinators.private ;
@@ -148,5 +148,3 @@ float-arrays combinators.private ;
 \ >le { { fixnum bignum } fixnum } "specializer" set-word-prop
 
 \ >be { { fixnum bignum } fixnum } "specializer" set-word-prop
-
-\ search-buffer-until { fixnum fixnum simple-alien string } "specializer" set-word-prop

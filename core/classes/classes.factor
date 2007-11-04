@@ -133,7 +133,7 @@ PRIVATE>
     >vector
     [ dup empty? not ]
     [ dup largest-class >r over delete-nth r> ]
-    { } unfold ;
+    [ ] unfold nip ;
 
 : class-or ( class1 class2 -- class )
     {
