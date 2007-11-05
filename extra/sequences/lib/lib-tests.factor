@@ -33,3 +33,9 @@ math.functions tools.test ;
 [ { 1 -1 5 2 4 } [ < ] monotonic-split [ >array ] map ] unit-test
 [ { { 1 1 1 1 } { 2 2 } { 3 } { 4 } { 5 } { 6 6 6 } } ]
 [ { 1 1 1 1 2 2 3 4 5 6 6 6 } [ = ] monotonic-split [ >array ] map ] unit-test
+[ f ] [ { } singleton? ] unit-test
+[ t ] [ { "asdf" } singleton? ] unit-test
+[ f ] [ { "asdf" "bsdf" } singleton? ] unit-test
+
+[ 2 ] [ V{ 10 20 30 } [ delete-random drop ] keep length ] unit-test
+[ V{ } [ delete-random drop ] keep length ] unit-test-fails
