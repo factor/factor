@@ -8,5 +8,5 @@ V{
     { deploy-word-props? f }
     { deploy-c-types? f }
     { "stop-after-last-window?" t }
-    { "bundle-name" "NeHe OpenGL demos.app" }
+    { deploy-name "NeHe OpenGL demos" }
 }

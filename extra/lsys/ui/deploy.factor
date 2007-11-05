@@ -9,5 +9,5 @@ V{
     { deploy-word-defs? t }
     { deploy-c-types? f }
     { "stop-after-last-window?" t }
-    { "bundle-name" "Lindenmayer System Explorer.app" }
+    { deploy-name "Lindenmayer System Explorer" }
 }

@@ -8,5 +8,5 @@ V{
     { deploy-word-props? f }
     { deploy-c-types? f }
     { "stop-after-last-window?" t }
-    { "bundle-name" "Golden Section.app" }
+    { deploy-name "Golden Section" }
 }
