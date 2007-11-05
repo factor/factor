@@ -3,10 +3,7 @@
 USING: io io.files io.launcher kernel namespaces sequences
 system cocoa.plists cocoa.application tools.deploy
 tools.deploy.config assocs hashtables prettyprint ;
-IN: tools.deploy.app
-
-: mkdir ( path -- )
-    "mkdir -p \"" swap "\"" 3append run-process ;
+IN: tools.deploy.macosx
 
 : touch ( path -- )
     "touch \"" swap "\"" 3append run-process ;
@@ -14,22 +11,19 @@ IN: tools.deploy.app
 : rm ( path -- )
     "rm -rf \"" swap "\"" 3append run-process ;
 
-: cp ( from to -- )
-    "Copying " write over write " to " write dup print
-    dup parent-dir mkdir
-    [ "cp -R \"" % swap % "\" \"" % % "\"" % ] "" make
-    run-process ;
+: bundle-dir ( -- dir )
+    vm parent-directory parent-directory ;
 
 : copy-bundle-dir ( name dir -- )
-    vm parent-dir parent-dir over path+ -rot
-    >r "Contents" path+ r> path+ cp ;
+    bundle-dir over path+ -rot
+    >r "Contents" path+ r> path+ copy-directory ;
 
 : copy-vm ( executable bundle-name -- vm )
-    "Contents/MacOS/" path+ swap path+ vm swap [ cp ] keep ;
+    "Contents/MacOS/" path+ swap path+ vm swap [ copy-file ] keep ;
 
 : copy-fonts ( name -- )
     "fonts/" resource-path
-    swap "Contents/Resources/fonts/" path+ cp ;
+    swap "Contents/Resources/fonts/" path+ copy-directory ;
 
 : print-app-plist ( executable bundle-name -- )
     [
@@ -57,16 +51,19 @@ IN: tools.deploy.app
 : deploy.app-image ( vocab bundle-name -- str )
     [ % "/Contents/Resources/" % % ".image" % ] "" make ;
 
-: deploy.app-config ( vocab -- assoc )
-    [ ".app" append "bundle-name" associate ] keep
-    deploy-config union ;
+: bundle-name ( -- string )
+    deploy-name get ".app" append ;
 
-: deploy.app ( vocab -- )
+TUPLE: macosx-deploy-implementation ;
+
+T{ macosx-deploy-implementation } deploy-implementation set-global
+
+M: macosx-deploy-implementation deploy ( vocab -- )
     ".app deploy tool" assert.app
     "." resource-path cd
-    dup deploy.app-config [
-        "bundle-name" get rm
-        [ "bundle-name" get create-app-dir ] keep
-        [ "bundle-name" get deploy.app-image ] keep
+    dup deploy-config [
+        bundle-name rm
+        [ bundle-name create-app-dir ] keep
+        [ bundle-name deploy.app-image ] keep
         namespace
     ] bind deploy* ;

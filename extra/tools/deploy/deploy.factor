@@ -49,7 +49,7 @@ IN: tools.deploy
 
         "\"-output-image=" swap "\"" 3append ,
 
-        ! "-no-stack-traces" ,
+        "-no-stack-traces" ,
         
         "-no-user-init" ,
     ] { } make ;
@@ -59,6 +59,10 @@ PRIVATE>
 : deploy* ( vm image vocab config -- )
     deploy-command-line stage2 ;
 
-: deploy ( vocab -- )
-    "" resource-path cd
-    vm over ".image" append rot dup deploy-config deploy* ;
+SYMBOL: deploy-implementation
+
+HOOK: deploy deploy-implementation ( vocab -- )
+
+USE-IF: macosx? tools.deploy.macosx
+
+USE-IF: winnt? tools.deploy.windows

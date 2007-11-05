@@ -30,6 +30,11 @@ ARTICLE: "prepare-deploy" "Preparing to deploy an application"
 
 ABOUT: "prepare-deploy"
 
+HELP: deploy-name
+{ $description "Deploy setting. The name of the executable."
+$nl
+"On Mac OS X, this becomes the name of the application bundle, with " { $snippet ".app" } " appended. On Windows, this becomes the name of the directory containing the executable." } ;
+
 HELP: deploy-word-props?
 { $description "Deploy flag. If set, the deploy tool retains all word properties. Otherwise, it applies various heuristics to strip out un-needed word properties from words in the dictionary."
 $nl
@@ -95,8 +100,8 @@ HELP: deploy-reflection
 "The defalut value is 1, no reflection. Programs which use the above features will need to be deployed with a higher level of reflection support." } ;
 
 HELP: default-config
-{ $values { "assoc" assoc } }
-{ $description "Outputs the default deployment configuration." } ;
+{ $values { "vocab" "a vocabulary specifier" } { "assoc" assoc } }
+{ $description "Outputs the default deployment configuration for a vocabulary." } ;
 
 HELP: deploy-config
 { $values { "vocab" "a vocabulary specifier" } { "assoc" assoc } }
