@@ -127,8 +127,9 @@ ARTICLE: "collections" "Collections"
 { $subsection "hashtables" }
 { $subsection "alists" }
 { $heading "Other collections" }
-{ $subsection "queues" }
-{ $subsection "buffers" } ;
+{ $subsection "buffers" }
+{ $subsection "dlists" }
+{ $subsection "heaps" } ;
 
 USE: io.sockets
 
