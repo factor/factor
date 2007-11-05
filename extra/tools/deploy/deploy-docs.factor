@@ -2,16 +2,20 @@ USING: help.markup help.syntax words alien.c-types assocs
 kernel ;
 IN: tools.deploy
 
-ARTICLE: "tools.deploy" "Stand-alone image deployment"
-"The stand-alone image deployment tool takes a vocabulary and generates an image, which when passed to the VM, runs the vocabulary's " { $link POSTPONE: MAIN: } " hook."
+ARTICLE: "tools.deploy" "Application deployment"
+"The stand-alone application deployment tool compiles a vocabulary down to a native executable which runs the vocabulary's " { $link POSTPONE: MAIN: } " hook. Deployed executables do not depend on Factor being installed, and do not expose any source code, and thus are suitable for delivering commercial end-user applications."
 $nl
 "For example, we can deploy the " { $vocab-link "hello-world" } " demo which comes with Factor:"
-{ $code "\"hello-world\" deploy" }
-"This generates an image file named " { $snippet "hello-world.image" } ". Now we can start this image from the operating system's command line (see " { $link "runtime-cli-args" } "):"
-{ $code "./factor -i=hello-world.image" "Hello world" }
-
-"Once the necessary deployment flags have been set, a deployment image can be generated:"
-{ $subsection deploy } ;
+{ $code "\"hello-ui\" deploy" }
+"On Mac OS X, this yields a program named " { $snippet "Hello world.app" } ". On Windows, it yields a directory named " { $snippet "Hello world" } " containing a program named " { $snippet "hello-ui.exe" } ". In both cases, running the program displays a window with a message."
+$nl
+"The deployment tool works by bootstrapping a fresh image, loading the vocabulary into this image, then applying various heuristics to strip the image down to minimal size."
+$nl
+"You must explicitly specify major subsystems which are required, as well as the level of reflection support needed. This is done by modifying the deployment configuration prior to deployment."
+{ $subsection "prepare-deploy" }
+"Once the necessary deployment flags have been set, the application can be deployed:"
+{ $subsection deploy }
+{ $see-also "ui.tools.deploy" } ;
 
 ABOUT: "tools.deploy"
 

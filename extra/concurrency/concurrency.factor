@@ -26,7 +26,7 @@ TUPLE: thread timeout continuation continued? ;
     mailbox-data dlist-empty? ;
 
 : mailbox-put ( obj mailbox -- )
-    [ mailbox-data dlist-push-end ] keep
+    [ mailbox-data push-back ] keep
     [ mailbox-threads ] keep
     V{ } clone swap set-mailbox-threads
     [ thread-continuation schedule-thread ] each yield ;
@@ -51,7 +51,7 @@ TUPLE: thread timeout continuation continued? ;
 PRIVATE>
 : mailbox-get* ( mailbox timeout -- obj )
     (mailbox-block-if-empty)
-    mailbox-data dlist-pop-front ;
+    mailbox-data pop-front ;
 
 : mailbox-get ( mailbox -- obj )
     f mailbox-get* ;
@@ -59,7 +59,7 @@ PRIVATE>
 : mailbox-get-all* ( mailbox timeout -- array )
     (mailbox-block-if-empty)
     [ dup mailbox-empty? ]
-    [ dup mailbox-data dlist-pop-front ]
+    [ dup mailbox-data pop-front ]
     [ ] unfold nip ;
 
 : mailbox-get-all ( mailbox -- array )
@@ -74,7 +74,7 @@ PRIVATE>
 
 : mailbox-get?* ( pred mailbox timeout -- obj )
     2over >r >r (mailbox-block-unless-pred) r> r>
-    mailbox-data dlist-remove ; inline
+    mailbox-data delete-node ; inline
 
 : mailbox-get? ( pred mailbox -- obj )
     f mailbox-get?* ;
@@ -85,21 +85,19 @@ C: <process> process
 
 GENERIC: send ( message process -- )
 
-: random-pid ( -- id ) 8 big-random ;
-
 <PRIVATE
 : make-process ( -- process )
     #! Return a process set to run on the local node. A process is
     #! similar to a thread but can send and receive messages to and
     #! from other processes. It may also be linked to other processes so
     #! that it receives a message if that process terminates.
-    [ ] random-pid make-mailbox <process> ;
+    [ ] random-256 make-mailbox <process> ;
 
 : make-linked-process ( process -- process )
     #! Return a process set to run on the local node. That process is
     #! linked to the process on the stack. It will receive a message if
     #! that process terminates.
-    1quotation random-pid make-mailbox <process> ;
+    1quotation random-256 make-mailbox <process> ;
 PRIVATE>
 
 : self ( -- process )
@@ -206,7 +204,7 @@ MATCH-VARS: ?from ?tag ;
 <PRIVATE
 : tag-message ( message -- tagged-message )
     #! Given a message, wrap it with the sending process and a unique tag.
-    >r self random-pid r> 3array ;
+    >r self random-256 r> 3array ;
 PRIVATE>
 
 : send-synchronous ( message process -- reply )

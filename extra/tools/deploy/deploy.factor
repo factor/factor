@@ -5,10 +5,19 @@ assocs kernel vocabs words sequences memory io system arrays
 continuations math definitions mirrors splitting parser classes
 inspector layouts vocabs.loader prettyprint.config prettyprint
 debugger io.streams.c io.streams.duplex io.files io.backend
-quotations io.launcher words.private tools.deploy.config ;
+quotations io.launcher words.private tools.deploy.config
+bootstrap.image ;
 IN: tools.deploy
 
 <PRIVATE
+
+: boot-image-name ( -- string )
+    "boot." my-arch ".image" 3append ;
+
+: stage1 ( -- )
+    #! If stage1 image doesn't exist, create one.
+    boot-image-name resource-path exists?
+    [ my-arch make-image ] unless ;
 
 : (copy-lines) ( stream -- stream )
     dup stream-readln [ print flush (copy-lines) ] when* ;
@@ -16,14 +25,10 @@ IN: tools.deploy
 : copy-lines ( stream -- )
     [ (copy-lines) ] [ stream-close ] [ ] cleanup ;
 
-: boot-image-name ( -- string )
-    cpu dup "ppc" = [ os "-" rot 3append ] when ;
-
 : stage2 ( vm flags -- )
 	[
-        "\"" % swap % "\" -i=boot." %
-        boot-image-name
-        % ".image" %
+        "\"" % swap % "\" -i=" %
+        boot-image-name %
         [ " " % % ] each
     ] "" make
     dup print <process-stream>
@@ -57,7 +62,7 @@ IN: tools.deploy
 PRIVATE>
 
 : deploy* ( vm image vocab config -- )
-    deploy-command-line stage2 ;
+    stage1 deploy-command-line stage2 ;
 
 SYMBOL: deploy-implementation
 

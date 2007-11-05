@@ -200,6 +200,7 @@ void dump_objects(F_FIXNUM type)
 	{
 		if(type == -1 || type_of(obj) == type)
 		{
+			printf("%lx ",obj);
 			print_nested_obj(obj,3);
 			printf("\n");
 		}

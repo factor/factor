@@ -100,7 +100,7 @@ HELP: $link
 { $values { "element" "a markup element of the form " { $snippet "{ topic }" } } }
 { $description "Prints a link to a help article or word." }
 { $examples
-    { $markup-example { $link "queues" } }
+    { $markup-example { $link "dlists" } }
     { $markup-example { $link + } }
 } ;
 
@@ -123,7 +123,7 @@ HELP: $see-also
 { $values { "topics" "a sequence of article names or words" } }
 { $description "Prints a heading followed by a series of links." }
 { $examples
-    { $markup-example { $see-also "graphs" "queues" } }
+    { $markup-example { $see-also "graphs" "dlists" } }
 } ;
 
 { $see-also $related related-words } related-words

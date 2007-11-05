@@ -5,7 +5,7 @@ assocs kernel vocabs words sequences memory io system arrays
 continuations math definitions mirrors splitting parser classes
 inspector layouts vocabs.loader prettyprint.config prettyprint
 debugger io.streams.c io.streams.duplex io.files io.backend
-quotations words.private tools.deploy.config compiler ;
+quotations words.private tools.deploy.config ;
 IN: tools.deploy.shaker
 
 : show ( msg -- )
@@ -24,7 +24,7 @@ IN: tools.deploy.shaker
         "Stripping debugger" show
         "resource:extra/tools/deploy/shaker/strip-debugger.factor"
         run-file
-        recompile
+        do-parse-hook
     ] when ;
 
 : strip-libc ( -- )
@@ -32,7 +32,7 @@ IN: tools.deploy.shaker
         "Stripping manual memory management debug code" show
         "resource:extra/tools/deploy/shaker/strip-libc.factor"
         run-file
-        recompile
+        do-parse-hook
     ] when ;
 
 : strip-cocoa ( -- )
@@ -40,7 +40,7 @@ IN: tools.deploy.shaker
         "Stripping unused Cocoa methods" show
         "resource:extra/tools/deploy/shaker/strip-cocoa.factor"
         run-file
-        recompile
+        do-parse-hook
     ] when ;
 
 : strip-assoc ( retained-keys assoc -- newassoc )
