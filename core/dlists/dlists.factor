@@ -8,11 +8,11 @@ TUPLE: dlist front back length ;
     dlist construct-empty
     0 over set-dlist-length ;
 
+: dlist-empty? ( dlist -- ? ) dlist-front not ;
+
 <PRIVATE
 TUPLE: dlist-node obj prev next ;
 C: <dlist-node> dlist-node
-
-: dlist-empty? ( dlist -- ? ) dlist-front not ;
 
 : inc-length ( dlist -- )
     [ dlist-length 1+ ] keep set-dlist-length ; inline
@@ -42,6 +42,24 @@ C: <dlist-node> dlist-node
 : set-front-to-back ( dlist -- )
     dup dlist-front
     [ drop ] [ dup dlist-back swap set-dlist-front ] if ;
+
+: (dlist-find-node) ( quot dlist-node -- node/f ? )
+    dup dlist-node-obj pick dupd call [
+        drop nip t
+    ] [
+        drop dlist-node-next [ (dlist-find-node) ] [ drop f f ] if*
+    ] if ;
+
+: dlist-find-node ( quot dlist -- node/f ? )
+    dlist-front [ (dlist-find-node) ] [ drop f f ] if* ;
+
+: (dlist-each-node) ( quot dlist -- )
+    over
+    [ 2dup call >r dlist-node-next r> (dlist-each-node) ]
+    [ 2drop ] if ;
+
+: dlist-each-node ( quot dlist -- )
+    >r dlist-front r> (dlist-each-node) ; inline
 PRIVATE>
 
 : push-front ( obj dlist -- )
@@ -78,16 +96,6 @@ PRIVATE>
 
 : pop-back* ( dlist -- ) pop-back drop ;
 
-: (dlist-find-node) ( quot dlist-node -- node/f ? )
-    dup dlist-node-obj pick dupd call [
-        drop nip t
-    ] [
-        drop dlist-node-next [ (dlist-find-node) ] [ drop f f ] if*
-    ] if ;
-
-: dlist-find-node ( quot dlist -- node/f ? )
-    dlist-front [ (dlist-find-node) ] [ drop f f ] if* ;
-
 : dlist-find ( quot dlist -- obj/f ? )
     dlist-find-node dup [ >r dlist-node-obj r> ] when ;
 
@@ -102,20 +110,15 @@ PRIVATE>
                   dec-length ] }
     } cond ;
 
-: delete-node ( quot dlist -- obj/f )
+: delete-node* ( quot dlist -- obj/f ? )
     tuck dlist-find-node [
-        [ (delete-node) ] keep [ dlist-node-obj ] [ f ] if*
+        [ (delete-node) ] keep [ dlist-node-obj t ] [ f f ] if*
     ] [
-        2drop f
+        2drop f f
     ] if ;
 
-: (dlist-each-node) ( quot dlist -- )
-    over
-    [ 2dup call >r dlist-node-next r> (dlist-each-node) ]
-    [ 2drop ] if ;
-
-: dlist-each-node ( quot dlist -- )
-    >r dlist-front r> (dlist-each-node) ; inline
+: delete-node ( quot dlist -- obj/f )
+    delete-node* drop ;
 
 : dlist-each ( dlist quot -- )
     [ dlist-node-obj ] swap compose dlist-each-node ; inline
