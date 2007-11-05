@@ -442,7 +442,7 @@ M: curry '
 
 PRIVATE>
 
-: make-image ( architecture -- )
+: make-image ( arch -- )
     [
         parse-hook off
         prepare-image
@@ -451,6 +451,9 @@ PRIVATE>
         end-image
         image get image-name write-image
     ] with-scope ;
+
+: my-arch ( -- arch )
+    cpu dup "ppc" = [ os "-" rot 3append ] when ;
 
 : make-images ( -- )
     {
