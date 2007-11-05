@@ -17,15 +17,15 @@ M: sleeping <=> ( obj1 obj2 -- n )
 
 : sleep-time ( -- ms )
     sleep-queue get-global
-    dup heap-empty? [ drop 1000 ] [ peek-heap sleeping-ms millis [-] ] if ;
+    dup heap-empty? [ drop 1000 ] [ heap-peek sleeping-ms millis [-] ] if ;
 
 : run-queue ( -- queue ) \ run-queue get-global ;
 
 : schedule-sleep ( ms continuation -- )
-    sleeping construct-boa sleep-queue get-global push-heap ;
+    sleeping construct-boa sleep-queue get-global heap-push ;
 
 : wake-up ( -- continuation )
-    sleep-queue get-global pop-heap sleeping-continuation ;
+    sleep-queue get-global heap-pop sleeping-continuation ;
 
 PRIVATE>
 
