@@ -1,13 +1,12 @@
 USING: tools.deploy.config ;
 V{
-    { strip-word-props? t }
-    { strip-word-names? f }
-    { strip-dictionary? t }
-    { strip-debugger? t }
-    { deploy-math? t }
-    { deploy-compiled? t }
-    { deploy-io? f }
     { deploy-ui? t }
-    { strip-prettyprint? f }
+    { deploy-io 1 }
+    { deploy-reflection 3 }
+    { deploy-compiler? t }
+    { deploy-math? t }
+    { deploy-word-props? f }
+    { deploy-c-types? f }
+    { "stop-after-last-window?" t }
     { "bundle-name" "Gesture Logger.app" }
 }

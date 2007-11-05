@@ -1,12 +1,12 @@
 USING: tools.deploy.config ;
 V{
-    { strip-word-props? t }
-    { strip-word-names? t }
-    { strip-dictionary? t }
-    { strip-debugger? t }
-    { deploy-math? t }
-    { deploy-compiled? t }
-    { deploy-io? t }
     { deploy-ui? t }
+    { deploy-io 3 }
+    { deploy-reflection 1 }
+    { deploy-compiler? t }
+    { deploy-math? t }
+    { deploy-word-props? f }
+    { deploy-c-types? f }
+    { "stop-after-last-window?" t }
     { "bundle-name" "Bunny.app" }
 }
