@@ -1,7 +1,7 @@
 ! Copyright (C) 2007 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel math math.functions ;
-IN: quadratic
+IN: math.quadratic
 
 : monic ( c b a -- c' b' ) tuck / >r / r> ;
 

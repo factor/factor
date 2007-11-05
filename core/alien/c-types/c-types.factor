@@ -29,7 +29,7 @@ TUPLE: no-c-type name ;
         dup string? [ (c-type) ] when
     ] when ;
 
-GENERIC: c-type ( name -- type )
+GENERIC: c-type ( name -- type ) foldable
 
 : resolve-pointer-type ( name -- name )
     c-types get at dup string?

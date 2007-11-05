@@ -3,7 +3,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 IN: io.buffers
 USING: alien alien.syntax kernel kernel.private libc math
-sequences strings ;
+sequences strings hints ;
 
 TUPLE: buffer size ptr fill pos ;
 
@@ -53,6 +53,8 @@ TUPLE: buffer size ptr fill pos ;
 
 : search-buffer-until ( start end alien separators -- n )
     [ >r swap alien-unsigned-1 r> memq? ] 2curry find* drop ;
+
+HINTS: search-buffer-until { fixnum fixnum simple-alien string } ;
 
 : finish-buffer-until ( buffer n -- string separator )
     [

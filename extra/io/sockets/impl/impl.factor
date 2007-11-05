@@ -12,7 +12,10 @@ GENERIC: protocol-family ( addrspec -- af )
 
 GENERIC: sockaddr-type ( addrspec -- type )
 
-GENERIC: make-sockaddr ( addrspec -- sockaddr type )
+GENERIC: make-sockaddr ( addrspec -- sockaddr )
+
+: make-sockaddr/size ( addrspec -- sockaddr size )
+    dup make-sockaddr swap sockaddr-type heap-size ;
 
 GENERIC: parse-sockaddr ( sockaddr addrspec -- newaddrspec )
 
@@ -36,16 +39,15 @@ M: inet4 address-size drop 4 ;
 
 M: inet4 protocol-family drop PF_INET ;
 
-M: inet4 sockaddr-type drop "sockaddr-in" ;
+M: inet4 sockaddr-type drop "sockaddr-in" c-type ;
 
-M: inet4 make-sockaddr ( inet -- sockaddr type )
+M: inet4 make-sockaddr ( inet -- sockaddr )
     "sockaddr-in" <c-object>
     AF_INET over set-sockaddr-in-family
     over inet4-port htons over set-sockaddr-in-port
     over inet4-host
     "0.0.0.0" or
-    rot inet-pton *uint over set-sockaddr-in-addr
-    "sockaddr-in" ;
+    rot inet-pton *uint over set-sockaddr-in-addr ;
 
 M: inet4 parse-sockaddr
     >r dup sockaddr-in-addr <uint> r> inet-ntop
@@ -65,15 +67,14 @@ M: inet6 address-size drop 16 ;
 
 M: inet6 protocol-family drop PF_INET6 ;
 
-M: inet6 sockaddr-type drop "sockaddr-in6" ;
+M: inet6 sockaddr-type drop "sockaddr-in6" c-type ;
 
-M: inet6 make-sockaddr ( inet -- sockaddr type )
+M: inet6 make-sockaddr ( inet -- sockaddr )
     "sockaddr-in6" <c-object>
     AF_INET6 over set-sockaddr-in6-family
     over inet6-port htons over set-sockaddr-in6-port
     over inet6-host "::" or
-    rot inet-pton over set-sockaddr-in6-addr
-    "sockaddr-in6" ;
+    rot inet-pton over set-sockaddr-in6-addr ;
 
 M: inet6 parse-sockaddr
     >r dup sockaddr-in6-addr r> inet-ntop
@@ -97,7 +98,7 @@ M: f parse-sockaddr nip ;
 : parse-addrinfo-list ( addrinfo -- seq )
     [ dup ]
     [ dup addrinfo-next swap addrinfo>addrspec ]
-    { } unfold [ ] subset ;
+    [ ] unfold nip [ ] subset ;
 
 M: object resolve-host ( host serv passive? -- seq )
     >r dup integer? [ number>string ] when

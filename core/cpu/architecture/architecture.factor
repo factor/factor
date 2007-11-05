@@ -50,7 +50,12 @@ HOOK: %epilogue compiler-backend ( n -- )
 HOOK: %profiler-prologue compiler-backend ( word -- )
 
 ! Store word XT in stack frame
-HOOK: %save-xt compiler-backend ( -- )
+HOOK: %save-word-xt compiler-backend ( -- )
+
+! Store dispatch branch XT in stack frame
+HOOK: %save-dispatch-xt compiler-backend ( -- )
+
+M: object %save-dispatch-xt %save-word-xt ;
 
 ! Call another label
 HOOK: %call-label compiler-backend ( label -- )

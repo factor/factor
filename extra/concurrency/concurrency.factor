@@ -60,7 +60,7 @@ PRIVATE>
     (mailbox-block-if-empty)
     [ dup mailbox-empty? ]
     [ dup mailbox-data pop-front ]
-    { } unfold ;
+    [ ] unfold nip ;
 
 : mailbox-get-all ( mailbox -- array )
     f mailbox-get-all* ;

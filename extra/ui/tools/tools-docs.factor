@@ -130,12 +130,14 @@ $nl
 { $subsection "ui-presentations" }
 { $subsection "ui-completion" }
 { $heading "Tools" }
-"All development tools are integrated into a single-window " { $emphasis "workspace" } "."
+"A single-window " { $emphasis "workspace" } " contains the most frequently-used tools:"
 { $subsection "ui-listener" }
 { $subsection "ui-browser" }
 { $subsection "ui-inspector" }
 { $subsection "ui-walker" }
 { $subsection "ui-profiler" }
+"Additional tools:"
+{ $subsection "ui.tools.deploy" }
 "Platform-specific features:"
 { $subsection "ui-cocoa" } ;
 

@@ -157,7 +157,7 @@ GENERIC: ' ( obj -- ptr )
     #! n is positive or zero.
     [ dup 0 > ]
     [ dup bignum-bits neg shift swap bignum-radix bitand ]
-    { } unfold ;
+    [ ] unfold nip ;
 
 : emit-bignum ( n -- )
     dup 0 < [ 1 swap neg ] [ 0 swap ] if bignum>seq
@@ -442,7 +442,7 @@ M: curry '
 
 PRIVATE>
 
-: make-image ( architecture -- )
+: make-image ( arch -- )
     [
         parse-hook off
         prepare-image
@@ -451,6 +451,9 @@ PRIVATE>
         end-image
         image get image-name write-image
     ] with-scope ;
+
+: my-arch ( -- arch )
+    cpu dup "ppc" = [ os "-" rot 3append ] when ;
 
 : make-images ( -- )
     {

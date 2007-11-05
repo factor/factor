@@ -1,8 +1,8 @@
 ! Copyright (C) 2004, 2007 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 IN: io.files
-USING: io.backend io.files.private hashtables kernel math memory
-namespaces sequences strings arrays definitions system
+USING: io.backend io.files.private io hashtables kernel math
+memory namespaces sequences strings arrays definitions system
 combinators splitting ;
 
 HOOK: <file-reader> io-backend ( path -- stream )
@@ -58,13 +58,16 @@ M: object root-directory? ( path -- ? ) "/" = ;
 
 TUPLE: no-parent-directory path ;
 
-: parent-dir ( path -- parent )
+: no-parent-directory ( path -- * )
+    \ no-parent-directory construct-boa throw ;
+
+: parent-directory ( path -- parent )
     {
         { [ dup root-directory? ] [ ] }
         { [ dup "/\\" split ".." over member? "." rot member? or ]
-            [ \ no-parent-directory construct-boa throw ] }
+            [ no-parent-directory ] }
         { [ t ] [ dup last-path-separator
-                [ 1+ head ] [ 2drop "." ] if ] }
+            [ 1+ head ] [ 2drop "." ] if ] }
     } cond ;
 
 : file-name ( path -- string )
@@ -72,7 +75,7 @@ TUPLE: no-parent-directory path ;
     [ 1+ tail ] [ drop ] if ;
 
 : resource-path ( path -- newpath )
-    \ resource-path get [ image parent-dir ] unless*
+    \ resource-path get [ image parent-directory ] unless*
     swap path+ ;
 
 : ?resource-path ( path -- newpath )
@@ -86,7 +89,7 @@ TUPLE: no-parent-directory path ;
         { [ dup empty? ] [ ] }
         { [ dup exists? ] [ ] }
         { [ t ] [
-            dup parent-dir make-directories
+            dup parent-directory make-directories
             dup make-directory
         ] }
     } cond drop ;
@@ -103,3 +106,18 @@ M: pathname <=> [ pathname-string ] compare ;
         { [ wince? ] [ "" resource-path ] }
         { [ unix? ] [ "HOME" os-env ] }
     } cond ;
+
+: copy-file ( from to -- )
+    dup parent-directory make-directories
+    <file-writer> [
+        stdio get swap
+        <file-reader> [
+            stdio get swap stream-copy
+        ] with-stream
+    ] with-stream ;
+
+: copy-directory ( from to -- )
+    dup make-directories
+    >r dup directory swap r> [
+        >r >r first r> over path+ r> rot path+ copy-file
+    ] 2curry each ;

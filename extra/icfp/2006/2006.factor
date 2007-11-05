@@ -4,7 +4,7 @@
 USING: kernel math sequences kernel.private namespaces arrays
 io io.files splitting io.binary math.functions vectors
 quotations combinators.private ;
-IN: universal-machine
+IN: icfp.2006
 
 SYMBOL: regs
 SYMBOL: arrays
