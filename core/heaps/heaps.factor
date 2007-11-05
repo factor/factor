@@ -6,7 +6,7 @@ IN: heaps
 <PRIVATE
 TUPLE: heap data ;
 
-: <heap> ( class -- obj )
+: <heap> ( class -- heap )
     >r V{ } clone heap construct-boa r>
     construct-delegate ; inline
 PRIVATE>
@@ -29,9 +29,10 @@ TUPLE: max-heap ;
 : swap-up ( n vec -- ) >r dup up r> exchange ; inline
 : last-index ( vec -- n ) length 1- ; inline
 
-GENERIC: heap-compare ( obj1 obj2 heap -- ? )
-M: min-heap heap-compare drop <=> 0 > ;
-M: max-heap heap-compare drop <=> 0 < ;
+GENERIC: heap-compare ( pair1 pair2 heap -- ? )
+: (heap-compare) drop [ first ] 2apply <=> 0 ; inline
+M: min-heap heap-compare (heap-compare) > ;
+M: max-heap heap-compare (heap-compare) < ;
 
 : heap-bounds-check? ( m heap -- ? )
     heap-data length >= ; inline
@@ -84,12 +85,12 @@ DEFER: down-heap
 
 PRIVATE>
 
-: heap-push ( obj heap -- )
+: heap-push ( pair heap -- )
     tuck heap-data push [ heap-data ] keep up-heap ;
 
 : heap-push-all ( seq heap -- ) [ heap-push ] curry each ;
 
-: heap-peek ( heap -- obj ) heap-data first ;
+: heap-peek ( heap -- pair ) heap-data first ;
 
 : heap-pop* ( heap -- )
     dup heap-data length 1 > [
@@ -100,5 +101,6 @@ PRIVATE>
         heap-data pop*
     ] if ;
 
-: heap-pop ( heap -- obj ) [ heap-data first ] keep heap-pop* ;
+: heap-pop ( heap -- pair ) [ heap-data first ] keep heap-pop* ;
 : heap-empty? ( heap -- ? ) heap-data empty? ;
+: heap-length ( heap -- n ) heap-data length ;
