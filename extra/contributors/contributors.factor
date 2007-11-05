@@ -5,7 +5,7 @@ sequences combinators.lib assocs system sorting math.parser ;
 IN: contributors
 
 : changelog ( -- authors )
-    image parent-dir cd
+    image parent-directory cd
     "git-log --pretty=format:%an" <process-stream> lines ;
 
 : patch-counts ( authors -- assoc )

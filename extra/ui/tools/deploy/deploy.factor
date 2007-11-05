@@ -5,14 +5,14 @@ ui.gadgets.controls models sequences ui.gadgets.buttons
 ui.gadgets.packs ui.gadgets.labels tools.deploy.config
 namespaces ui.gadgets.editors ui.gadgets.borders ui.gestures
 ui.commands assocs ui.gadgets.tracks ui ui.tools.listener
-tools.deploy.app vocabs ui.tools.workspace ui.operations ;
+tools.deploy vocabs ui.tools.workspace system ;
 IN: ui.tools.deploy
 
 TUPLE: deploy-gadget vocab settings ;
 
 : bundle-name ( -- )
-    "bundle-name" get <field>
-    "Bundle name:" label-on-left gadget, ;
+    deploy-name get <field>
+    "Executable name:" label-on-left gadget, ;
 
 : deploy-ui ( -- )
     deploy-ui? get
@@ -42,13 +42,12 @@ TUPLE: deploy-gadget vocab settings ;
     { 10 10 } over set-pack-gap
     1 swap set-pack-fill ;
 
-: <deploy-settings> ( -- control )
+: <deploy-settings> ( vocab -- control )
     default-config [ <model> ] assoc-map [
-        f <model> "bundle-name" set
         [
             bundle-name
             deploy-ui
-            exit-when-windows-closed
+            macosx? [ exit-when-windows-closed ] when
             io-settings
             reflection-settings
             advanced-settings
@@ -63,7 +62,7 @@ TUPLE: deploy-gadget vocab settings ;
     find-deploy-gadget deploy-gadget-vocab ;
 
 : find-deploy-config
-    find-deploy-vocab deploy.app-config ;
+    find-deploy-vocab deploy-config ;
 
 : find-deploy-settings
     find-deploy-gadget deploy-gadget-settings ;
@@ -78,7 +77,7 @@ TUPLE: deploy-gadget vocab settings ;
 
 : com-deploy ( gadget -- )
     dup com-save
-    find-deploy-vocab [ deploy.app ] curry call-listener ;
+    find-deploy-vocab [ deploy ] curry call-listener ;
 
 : com-help ( -- )
     "ui-deploy" help-window ;
@@ -99,7 +98,7 @@ deploy-gadget "toolbar" f {
 
 : <deploy-gadget> ( vocab -- gadget )
     f deploy-gadget construct-boa [
-        <deploy-settings>
+        dup <deploy-settings>
         g-> set-deploy-gadget-settings gadget,
         buttons,
     ] { 0 1 } build-pack
@@ -109,5 +108,3 @@ deploy-gadget "toolbar" f {
 : deploy-tool ( vocab -- )
     vocab-name dup <deploy-gadget> 10 <border>
     "Deploying \"" rot "\"" 3append open-window ;
-
-[ vocab-spec? ] \ deploy-tool H{ } define-operation
