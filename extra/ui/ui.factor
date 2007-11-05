@@ -87,7 +87,7 @@ SYMBOL: windows
 SYMBOL: ui-hook
 
 : init-ui ( -- )
-    <queue> \ invalid set-global
+    <dlist> \ invalid set-global
     V{ } clone windows set-global ;
 
 : start-ui ( -- )
