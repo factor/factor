@@ -47,6 +47,16 @@ M: rs-loc loc>operand rs-loc-n cells neg rs-reg swap <+/-> ;
         "end" resolve-label
     ] with-scope ;
 
+: call-cell ( -- )
+    ! Compute return address; we skip 3 instructions
+    LR PC 8 ADD
+    ! Load target address
+    R12 PC 0 <+> LDR
+    ! Jump to target address
+    R12 BX
+    ! The target address
+    0 , ;
+
 M: arm-backend load-indirect ( obj reg -- )
     tuck load-cell rc-absolute-cell rel-literal
     dup 0 <+> LDR ;
@@ -66,8 +76,11 @@ M: immediate load-literal
 M: arm-backend stack-frame ( n -- i )
     factor-area-size + 8 align ;
 
-M: arm-backend %save-xt ( -- )
+M: arm-backend %save-word-xt ( -- )
     R12 PC 9 cells SUB ;
+
+M: arm-backend %save-dispatch-xt ( -- )
+    R12 PC 2 cells SUB ;
 
 M: arm-backend %prologue ( n -- )
     SP SP pick SUB
@@ -98,30 +111,36 @@ M: arm-backend %call-label ( label -- ) BL ;
 
 M: arm-backend %jump-label ( label -- ) B ;
 
-: %prepare-primitive ( word -- )
+: %prepare-primitive ( -- )
     #! Save stack pointer to stack_chain->callstack_top, load XT
-    R1 SP MOV
-    T{ temp-reg } load-literal
-    R12 R12 word-xt-offset <+> LDR ;
+    R1 SP MOV ;
 
 M: arm-backend %call-primitive ( word -- )
-    %prepare-primitive R12 BLX ;
+    %prepare-primitive
+    call-cell rc-absolute-cell rel-word ;
 
 M: arm-backend %jump-primitive ( word -- )
-    %prepare-primitive R12 BX ;
+    %prepare-primitive
+    ! Load target address
+    R12 PC 0 <+> LDR
+    ! Jump to target address
+    R12 BX
+    ! The target address
+    0 , rc-absolute-cell rel-word ;
 
 M: arm-backend %jump-t ( label -- )
     "flag" operand f v>operand CMP NE B ;
 
-: (%dispatch) ( word-table# reg -- )
+: (%dispatch) ( word-table# -- )
     #! Load jump table target address into reg.
     "scratch" operand PC "n" operand 1 <LSR> ADD
-    "scratch" operand 0 <+> LDR
-    rc-indirect-arm rel-dispatch ;
+    "scratch" operand dup 0 <+> LDR
+    rc-indirect-arm rel-dispatch
+    "scratch" operand dup compiled-header-size ADD ;
 
 M: arm-backend %call-dispatch ( word-table# -- )
     [
-        "scratch" operand (%dispatch)
+        (%dispatch)
         "scratch" operand BLX
     ] H{
         { +input+ { { f "n" } } }
@@ -131,7 +150,8 @@ M: arm-backend %call-dispatch ( word-table# -- )
 M: arm-backend %jump-dispatch ( word-table# -- )
     [
         %epilogue-later
-        PC (%dispatch)
+        (%dispatch)
+        "scratch" operand BX
     ] H{
         { +input+ { { f "n" } } }
         { +scratch+ { { f "scratch" } } }
@@ -259,14 +279,7 @@ M: arm-backend %prepare-alien-invoke
     rs-reg R12 12 <+> STR ;
 
 M: arm-backend %alien-invoke ( symbol dll -- )
-    ! Load target address
-    R12 PC 4 <+> LDR
-    ! Store address of next instruction in LR
-    LR PC 4 ADD
-    ! Jump to target address
-    R12 BX
-    ! The target address
-    0 , rc-absolute rel-dlsym ;
+    call-cell rc-absolute-cell rel-dlsym ;
 
 M: arm-backend %prepare-alien-indirect ( -- )
     "unbox_alien" f %alien-invoke

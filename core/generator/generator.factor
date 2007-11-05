@@ -60,7 +60,7 @@ GENERIC: generate-node ( node -- next )
     [
         init-templates
         generate-profiler-prologue
-        %save-xt
+        %save-word-xt
         %prologue-later
         current-label-start define-label
         current-label-start resolve-label
@@ -189,7 +189,7 @@ M: #if generate-node
     gensym [
         rot [
             copy-templates
-            %save-xt
+            %save-dispatch-xt
             %prologue-later
             [ generate-nodes ] with-node-iterator
         ] generate-1

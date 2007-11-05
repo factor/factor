@@ -86,7 +86,7 @@ SYMBOL: stdio
     presented associate format ;
 
 : lines ( stream -- seq )
-    [ [ readln dup ] [ ] { } unfold ] with-stream ;
+    [ [ readln dup ] [ ] [ drop ] unfold ] with-stream ;
 
 : contents ( stream -- str )
     2048 <sbuf> [ stream-copy ] keep >string ;

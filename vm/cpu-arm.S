@@ -124,3 +124,8 @@ DEF(void,lazy_jit_compile,(CELL quot)):
 	bl MANGLE(primitive_jit_compile)
 	EPILOGUE
         JUMP_QUOT            /* call the quotation */
+
+#ifdef WINCE
+	.section .drectve
+	.ascii " -export:c_to_factor"
+#endif

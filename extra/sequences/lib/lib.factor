@@ -1,6 +1,5 @@
 USING: combinators.lib kernel sequences math namespaces
-sequences.private shuffle ;
-
+random sequences.private shuffle ;
 IN: sequences.lib
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
@@ -61,3 +60,5 @@ IN: sequences.lib
 : singleton? ( seq -- ? )
     length 1 = ;
 
+: delete-random ( seq -- value )
+    [ length random ] keep [ nth ] 2keep delete-nth ;

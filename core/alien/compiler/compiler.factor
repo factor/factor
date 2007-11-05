@@ -387,7 +387,7 @@ TUPLE: callback-context ;
     dup alien-callback-xt dup rot [
         init-templates
         generate-profiler-prologue
-        %save-xt
+        %save-word-xt
         %prologue-later
         dup alien-stack-frame [
             dup registers>objects

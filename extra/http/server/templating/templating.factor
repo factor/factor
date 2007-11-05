@@ -88,7 +88,7 @@ DEFER: <% delimiter
     ] assert-depth drop ;
 
 : run-relative-template-file ( filename -- )
-    file get source-file-path parent-dir
+    file get source-file-path parent-directory
     swap path+ run-template-file ;
 
 : template-convert ( infile outfile -- )

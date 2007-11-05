@@ -93,6 +93,8 @@ PRIVATE>
 : big-random ( n -- r )
     [ drop (random) ] map >c-uint-array byte-array>bignum ;
 
+: random-256 ( -- r ) 8 big-random ; inline
+
 : random ( seq -- elt )
     dup empty? [
         drop f

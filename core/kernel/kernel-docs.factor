@@ -60,6 +60,8 @@ $nl
 "A pair of utility words built from " { $link 2apply } ":"
 { $subsection both? }
 { $subsection either? }
+"A looping combinator:"
+{ $subsection while }
 "Quotations can be composed using efficient quotation-specific operations:"
 { $subsection curry }
 { $subsection 2curry }
@@ -538,3 +540,15 @@ HELP: 3compose
     }
     "However, " { $link 3compose } " runs in constant time, and the compiler is able to compile code which calls composed quotations."
 } ;
+
+HELP: while
+{ $values { "pred" "a quotation with stack effect " { $snippet "( -- ? )" } } { "quot" "a quotation" } { "tail" "a quotation" } }
+{ $description "Repeatedly calls " { $snippet "pred" } ". If it yields " { $link f } ", iteration stops, otherwise " { $snippet "quot" } " is called. After iteration stops, " { $snippet "tail" } " is called." }
+{ $notes "In most cases, tail recursion should be used, because it is simpler both in terms of implementation and conceptually. However in some cases this combinator expresses intent better and should be used."
+$nl
+"Strictly speaking, the " { $snippet "tail" } " is not necessary, since the following are equivalent:"
+{ $code
+    "[ P ] [ Q ] [ T ] while"
+    "[ P ] [ Q ] [ ] while T"
+}
+"However, depending on the stack effects of " { $snippet "pred" } " and " { $snippet "quot" } ", the " { $snippet "tail" } " quotation might need to be non-empty in order to balance out the stack effect of branches for stack effect inference." } ;

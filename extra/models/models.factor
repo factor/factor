@@ -207,7 +207,8 @@ M: range range-max-value range-max model-value ;
 M: range range-max-value*
     dup range-max-value swap range-page-value [-] ;
 
-M: range set-range-value range-model set-model ;
+M: range set-range-value
+    [ clamp-value ] keep range-model set-model ;
 
 M: range set-range-page-value range-page set-model ;
 

@@ -20,7 +20,8 @@ M: border pref-dim*
 
 : border-minor-rect ( major border -- rect )
     gadget-child pref-dim
-    [ >r rect-bounds r> v- 2 v/n v+ ] keep <rect> ;
+    [ >r rect-bounds r> v- [ 2 / >fixnum ] map v+ ] keep
+    <rect> ;
 
 : scale-rect ( rect vec -- loc dim )
     [ v* ] curry >r rect-bounds r> 2apply ;

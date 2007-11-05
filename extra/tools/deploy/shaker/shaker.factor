@@ -16,6 +16,7 @@ IN: tools.deploy.shaker
 : strip-init-hooks ( -- )
     "Stripping startup hooks" show
     "command-line" init-hooks get delete-at
+    "mallocs" init-hooks get delete-at
     strip-io? [ "io.backend" init-hooks get delete-at ] when ;
 
 : strip-debugger ( -- )
@@ -23,6 +24,15 @@ IN: tools.deploy.shaker
         "Stripping debugger" show
         "resource:extra/tools/deploy/shaker/strip-debugger.factor"
         run-file
+        do-parse-hook
+    ] when ;
+
+: strip-libc ( -- )
+    "libc" vocab [
+        "Stripping manual memory management debug code" show
+        "resource:extra/tools/deploy/shaker/strip-libc.factor"
+        run-file
+        do-parse-hook
     ] when ;
 
 : strip-cocoa ( -- )
@@ -30,6 +40,7 @@ IN: tools.deploy.shaker
         "Stripping unused Cocoa methods" show
         "resource:extra/tools/deploy/shaker/strip-cocoa.factor"
         run-file
+        do-parse-hook
     ] when ;
 
 : strip-assoc ( retained-keys assoc -- newassoc )
@@ -65,13 +76,14 @@ IN: tools.deploy.shaker
 
 : strip-words ( props -- )
     [ word? ] instances
-    deploy-word-props? get [ nip ] [ tuck strip-word-props ] if
+    deploy-word-props? get [ 2dup strip-word-props ] unless
+    deploy-word-defs? get [ dup strip-word-defs ] unless
     strip-word-names? [ dup strip-word-names ] when
-    strip-word-defs ;
+    2drop ;
 
 : strip-environment ( retain-globals -- )
-    "Stripping environment" show
     strip-globals? [
+        "Stripping environment" show
         global strip-assoc 21 setenv
     ] [ drop ] if ;
 
@@ -126,7 +138,7 @@ SYMBOL: deploy-vocab
             } %
         ] unless
 
-        deploy-c-types? get deploy-ui? get or [
+        deploy-c-types? get [
             "c-types" "alien.c-types" lookup ,
         ] when
 
@@ -141,6 +153,7 @@ SYMBOL: deploy-vocab
     ] { } make dup . ;
 
 : strip ( -- )
+    strip-libc
     strip-cocoa
     strip-debugger
     strip-init-hooks
@@ -160,8 +173,6 @@ SYMBOL: deploy-vocab
             deploy-vocab get require
             r> [ call ] when*
             strip
-            "Compressing image" show
-            compress-image
             finish-deploy
         ] [
             print-error flush 1 exit

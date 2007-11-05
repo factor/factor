@@ -76,7 +76,7 @@ M: ppc-backend load-indirect ( obj reg -- )
     [ 0 swap LOAD32 rc-absolute-ppc-2/2 rel-literal ] keep
     dup 0 LWZ ;
 
-M: ppc-backend %save-xt ( -- )
+M: ppc-backend %save-word-xt ( -- )
     0 11 LOAD32 rc-absolute-ppc-2/2 rel-current-word ;
 
 M: ppc-backend %prologue ( n -- )

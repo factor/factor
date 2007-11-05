@@ -7,7 +7,7 @@ ARTICLE: "file-streams" "Reading and writing files"
 { $subsection <file-writer> }
 { $subsection <file-appender> }
 "Pathname manipulation:"
-{ $subsection parent-dir }
+{ $subsection parent-directory }
 { $subsection file-name }
 { $subsection last-path-separator }
 { $subsection path+ }
@@ -101,10 +101,10 @@ HELP: file-modified
 { $values { "path" "a pathname string" } { "n" "a non-negative integer or " { $link f } } }
 { $description "Outputs a file's last modification time, since midnight January 1, 1970. If the file does not exist, outputs " { $link f } "." } ;
 
-HELP: parent-dir
+HELP: parent-directory
 { $values { "path" "a pathname string" } { "parent" "a pathname string" } }
 { $description "Strips the last component off a pathname." }
-{ $examples { $example "USE: io.files" "\"/etc/passwd\" parent-dir print" "/etc" } } ;
+{ $examples { $example "USE: io.files" "\"/etc/passwd\" parent-directory print" "/etc" } } ;
 
 HELP: file-name
 { $values { "path" "a pathname string" } { "string" string } }

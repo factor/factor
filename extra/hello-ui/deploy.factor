@@ -1,16 +1,13 @@
 USING: tools.deploy.config ;
-V{
-    { strip-prettyprint? t }
-    { strip-globals? t }
-    { strip-word-props? t }
-    { strip-word-names? f }
-    { strip-dictionary? t }
-    { strip-debugger? t }
-    { strip-c-types? t }
+H{
     { deploy-math? t }
-    { deploy-compiled? t }
-    { deploy-io? f }
-    { deploy-ui? t }
+    { deploy-reflection 2 }
+    { deploy-io 1 }
+    { deploy-word-props? f }
+    { deploy-word-defs? f }
     { "stop-after-last-window?" t }
-    { "bundle-name" "Hello World.app" }
+    { deploy-ui? t }
+    { deploy-compiler? t }
+    { deploy-name "Hello world" }
+    { deploy-c-types? f }
 }

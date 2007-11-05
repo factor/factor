@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 !
 ! Channels - based on ideas from newsqueak
-USING: kernel sequences threads continuations random math ;
+USING: kernel sequences sequences.lib threads continuations random math ;
 IN: channels
 
 TUPLE: channel receivers senders ;
@@ -14,9 +14,6 @@ GENERIC: to ( value channel -- )
 GENERIC: from ( channel -- value )
 
 <PRIVATE
-
-: delete-random ( seq -- value )
-    [ length random ] keep [ nth ] 2keep delete-nth ;
 
 : wait ( channel -- )
     [ channel-senders push stop ] curry callcc0 ;

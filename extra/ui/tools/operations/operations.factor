@@ -6,8 +6,9 @@ ui.tools.search ui.tools.traceback ui.tools.workspace generic
 help.topics inference inspector io.files io.styles kernel
 namespaces parser prettyprint quotations tools.annotations
 editors tools.profiler tools.test tools.time tools.walker
-ui.commands ui.gadgets.editors ui.gestures ui.operations vocabs
-vocabs.loader words sequences tools.browser classes ;
+ui.commands ui.gadgets.editors ui.gestures ui.operations
+ui.tools.deploy vocabs vocabs.loader words sequences
+tools.browser classes ;
 IN: ui.tools.operations
 
 V{ } clone operations set-global
@@ -154,6 +155,8 @@ M: word com-stack-effect word-def com-stack-effect ;
     { +keyboard+ T{ key-down f { C+ } "T" } }
     { +listener+ t }
 } define-operation
+
+[ vocab-spec? ] \ deploy-tool H{ } define-operation
 
 ! Quotations
 [ quotation? ] \ com-stack-effect H{
