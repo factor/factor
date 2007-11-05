@@ -11,6 +11,9 @@ IN: tools.deploy.macosx
 : rm ( path -- )
     "rm -rf \"" swap "\"" 3append run-process ;
 
+: chmod ( path perms -- )
+    [ "chmod " % % " \"" % % "\"" % ] "" make run-process ;
+
 : bundle-dir ( -- dir )
     vm parent-directory parent-directory ;
 
@@ -19,7 +22,9 @@ IN: tools.deploy.macosx
     >r "Contents" path+ r> path+ copy-directory ;
 
 : copy-vm ( executable bundle-name -- vm )
-    "Contents/MacOS/" path+ swap path+ vm swap [ copy-file ] keep ;
+    "Contents/MacOS/" path+ swap path+ vm swap
+    [ copy-file ] keep
+    [ "755" chmod ] keep ;
 
 : copy-fonts ( name -- )
     "fonts/" resource-path
