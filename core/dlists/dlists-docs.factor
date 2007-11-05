@@ -6,6 +6,8 @@ ARTICLE: "dlists" "Doubly-linked lists"
 $nl
 "While nodes can be modified directly, the fundamental protocol support by doubly-linked lists is that of a double-ended queue with a few additional operations. Elements can be added or removed at both ends of the dlist in constant time."
 $nl
+"When using a dlist as a simple queue, the convention is to queue elements with " { $link push-front } " and dequeue them with " { $link pop-back } "."
+$nl
 "Dlists form a class:"
 { $subsection dlist }
 { $subsection dlist? }

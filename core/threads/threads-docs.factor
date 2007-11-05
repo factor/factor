@@ -1,5 +1,5 @@
 USING: help.markup help.syntax kernel kernel.private io
-threads.private continuations ;
+threads.private continuations dlists ;
 IN: threads
 
 ARTICLE: "threads" "Threads"
@@ -20,8 +20,8 @@ $nl
 ABOUT: "threads"
 
 HELP: run-queue
-{ $values { "queue" queue } }
-{ $description "Outputs the runnable thread queue." } ;
+{ $values { "queue" dlist } }
+{ $description "Outputs the runnable thread queue. By convention, continuations are queued with " { $link push-front } " and dequeued with " { $link pop-back } "." } ;
 
 HELP: schedule-thread
 { $values { "continuation" "a continuation reified by " { $link callcc0 } } }
