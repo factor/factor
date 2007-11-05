@@ -1,4 +1,6 @@
 CC = gcc
+AR = ar
+LD = ld
 
 EXECUTABLE = factor
 VERSION = 0.91
