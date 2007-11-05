@@ -1,8 +1,8 @@
 ! Copyright (C) 2005, 2007 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: arrays hashtables kernel models math namespaces sequences
-timers quotations math.vectors queues combinators sorting
-vectors ;
+timers quotations math.vectors combinators sorting vectors
+dlists ;
 IN: ui.gadgets
 
 TUPLE: rect loc dim ;
@@ -159,7 +159,7 @@ M: array gadget-text*
     #! When unit testing gadgets without the UI running, the
     #! invalid queue is not initialized and we simply ignore
     #! invalidation requests.
-    invalid [ enque ] [ drop ] if* ;
+    invalid [ push-front ] [ drop ] if* ;
 
 DEFER: relayout
 

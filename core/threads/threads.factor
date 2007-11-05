@@ -2,9 +2,9 @@
 ! Copyright (C) 2005 Mackenzie Straight.
 ! See http://factorcode.org/license.txt for BSD license.
 IN: threads
-USING: arrays init hashtables heaps io.backend kernel kernel.private
-math namespaces queues sequences vectors io system sorting
-continuations debugger ;
+USING: arrays init hashtables heaps io.backend kernel
+kernel.private math namespaces sequences vectors io system
+continuations debugger dlists ;
 
 <PRIVATE
 
@@ -16,8 +16,8 @@ M: sleeping <=> ( obj1 obj2 -- n )
     [ sleeping-ms ] 2apply - ;
 
 : sleep-time ( -- ms )
-    sleep-queue get-global
-    dup heap-empty? [ drop 1000 ] [ heap-peek sleeping-ms millis [-] ] if ;
+    sleep-queue get-global dup heap-empty?
+    [ drop 1000 ] [ heap-peek sleeping-ms millis [-] ] if ;
 
 : run-queue ( -- queue ) \ run-queue get-global ;
 
@@ -29,7 +29,7 @@ M: sleeping <=> ( obj1 obj2 -- n )
 
 PRIVATE>
 
-: schedule-thread ( continuation -- ) run-queue enque ;
+: schedule-thread ( continuation -- ) run-queue push-front ;
 
 : schedule-thread-with ( obj continuation -- )
     2array schedule-thread ;
@@ -38,7 +38,7 @@ PRIVATE>
     walker-hook [
         f swap continue-with
     ] [
-        run-queue deque dup array?
+        run-queue pop-back dup array?
         [ first2 continue-with ] [ continue ] if
     ] if* ;
 
@@ -64,10 +64,10 @@ PRIVATE>
     [ 0 ? io-multiplex ] if ;
 
 : idle-thread ( -- )
-    run-queue queue-empty? (idle-thread) yield idle-thread ;
+    run-queue dlist-empty? (idle-thread) yield idle-thread ;
 
 : init-threads ( -- )
-    <queue> \ run-queue set-global
+    <dlist> \ run-queue set-global
     <min-heap> sleep-queue set-global
     [ idle-thread ] in-thread ;
 

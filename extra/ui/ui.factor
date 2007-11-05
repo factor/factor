@@ -1,7 +1,7 @@
 ! Copyright (C) 2006, 2007 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: arrays assocs io kernel math models namespaces
-prettyprint queues sequences threads sequences words timers
+prettyprint dlists sequences threads sequences words timers
 debugger ui.gadgets ui.gadgets.worlds ui.gadgets.tracks
 ui.gestures ui.backend ui.render continuations init ;
 IN: ui
@@ -81,7 +81,7 @@ SYMBOL: windows
     [
         invalid [
             dup layout find-world [ , ] when*
-        ] queue-each
+        ] dlist-slurp
     ] { } make ;
 
 SYMBOL: ui-hook

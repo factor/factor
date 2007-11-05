@@ -122,14 +122,14 @@ ARTICLE: "collections" "Collections"
 { $heading "Associative mappings" }
 { $subsection "assocs" }
 { $subsection "namespaces" }
-{ $subsection "graphs" }
 "Implementations:"
 { $subsection "hashtables" }
 { $subsection "alists" }
 { $heading "Other collections" }
-{ $subsection "buffers" }
 { $subsection "dlists" }
-{ $subsection "heaps" } ;
+{ $subsection "heaps" }
+{ $subsection "graphs" }
+{ $subsection "buffers" } ;
 
 USE: io.sockets
 

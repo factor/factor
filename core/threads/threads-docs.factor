@@ -1,5 +1,5 @@
 USING: help.markup help.syntax kernel kernel.private io
-threads.private continuations queues ;
+threads.private continuations ;
 IN: threads
 
 ARTICLE: "threads" "Threads"

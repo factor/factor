@@ -2,9 +2,31 @@ USING: heaps.private help.markup help.syntax kernel ;
 IN: heaps
 
 ARTICLE: "heaps" "Heaps"
-"A heap is a data structure that obeys the heap property.  A min-heap will always have its smallest member available, as a max-heap will its largest.  Objects stored on the heap must be comparable using the " { $link <=> } " operator, which may mean defining a new method on an object by using " { $link POSTPONE: M: } "."
-;
+"A heap is an implementation of a " { $emphasis "priority queue" } ", which is a structure that maintains a sorted set of elements. The key property is that insertion of an arbitrary element and removal of the first element (determined by order) is performed in O(log n) time."
+$nl
+"Heap elements are compared using the " { $link <=> } " generic word."
+$nl
+"There are two classes of heaps. Min-heaps sort their elements so that the minimum element is first:"
+{ $subsection min-heap }
+{ $subsection min-heap? }
+{ $subsection <min-heap> }
+"Max-heaps sort their elements so that the maximum element is first:"
+{ $subsection min-heap }
+{ $subsection min-heap? }
+{ $subsection <min-heap> }
+"Both obey a protocol."
+$nl
+"Queries:"
+{ $subsection heap-empty? }
+{ $subsection heap-peek }
+"Insertion:"
+{ $subsection heap-push }
+{ $subsection heap-push-all }
+"Removal:"
+{ $subsection heap-pop* }
+{ $subsection heap-pop } ;
 
+ABOUT: "heaps"
 
 HELP: <min-heap>
 { $values { "min-heap" min-heap } }

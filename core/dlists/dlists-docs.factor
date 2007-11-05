@@ -2,8 +2,36 @@ USING: help.markup help.syntax kernel ;
 IN: dlists
 
 ARTICLE: "dlists" "Doubly-linked lists"
-"A doubly-linked list is a list of nodes.  Each node has a link to the previous and next nodes, and a slot to store an object.  Objects can be pushed and popped from the front and back of the list.  The linked list keeps track of its length, so finding the length is O(1)."
-;
+"A doubly-linked list, or dlist, is a list of nodes. Each node has a link to the previous and next nodes, and a slot to store an object."
+$nl
+"While nodes can be modified directly, the fundamental protocol support by doubly-linked lists is that of a double-ended queue with a few additional operations. Elements can be added or removed at both ends of the dlist in constant time."
+$nl
+"Dlists form a class:"
+{ $subsection dlist }
+{ $subsection dlist? }
+"Constructing a dlist:"
+{ $subsection <dlist> }
+"Double-ended queue protocol:"
+{ $subsection dlist-empty? }
+{ $subsection push-front }
+{ $subsection pop-front }
+{ $subsection pop-front* }
+{ $subsection push-back }
+{ $subsection pop-back }
+{ $subsection pop-back* }
+"Finding out the length:"
+{ $subsection dlist-length }
+"Iterating over elements:"
+{ $subsection dlist-each }
+{ $subsection dlist-find }
+{ $subsection dlist-contains? }
+"Deleting a node matching a predicate:"
+{ $subsection delete-node* }
+{ $subsection delete-node }
+"Consuming all nodes:"
+{ $subsection dlist-slurp } ;
+
+ABOUT: "dlists"
 
 HELP: dlist-empty?
 { $values { "dlist" { $link dlist } } { "?" "a boolean" } }

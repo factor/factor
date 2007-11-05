@@ -4,6 +4,7 @@ USING: combinators kernel math ;
 IN: dlists
 
 TUPLE: dlist front back length ;
+
 : <dlist> ( -- obj )
     dlist construct-empty
     0 over set-dlist-length ;
@@ -122,3 +123,8 @@ PRIVATE>
 
 : dlist-each ( dlist quot -- )
     [ dlist-node-obj ] swap compose dlist-each-node ; inline
+
+: dlist-slurp ( dlist quot -- )
+    over dlist-empty?
+    [ 2drop ] [ [ >r pop-back r> call ] 2keep dlist-slurp ] if ;
+    inline

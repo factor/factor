@@ -1,6 +1,6 @@
 ! Copyright (C) 2005, 2007 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: arrays assocs kernel math models namespaces queues
+USING: arrays assocs kernel math models namespaces
 sequences words strings system hashtables math.parser
 math.vectors tuples classes ui.gadgets timers ;
 IN: ui.gestures
