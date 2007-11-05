@@ -10,22 +10,17 @@ continuations debugger dlists ;
 
 SYMBOL: sleep-queue
 
-TUPLE: sleeping ms continuation ;
-
-M: sleeping <=> ( obj1 obj2 -- n )
-    [ sleeping-ms ] 2apply - ;
-
 : sleep-time ( -- ms )
     sleep-queue get-global dup heap-empty?
-    [ drop 1000 ] [ heap-peek sleeping-ms millis [-] ] if ;
+    [ drop 1000 ] [ heap-peek first millis [-] ] if ;
 
 : run-queue ( -- queue ) \ run-queue get-global ;
 
 : schedule-sleep ( ms continuation -- )
-    sleeping construct-boa sleep-queue get-global heap-push ;
+    2array sleep-queue get-global heap-push ;
 
 : wake-up ( -- continuation )
-    sleep-queue get-global heap-pop sleeping-continuation ;
+    sleep-queue get-global heap-pop second ;
 
 PRIVATE>
 
