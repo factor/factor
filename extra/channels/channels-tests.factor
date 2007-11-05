@@ -5,10 +5,6 @@ USING: kernel tools.test math channels channels.private
 sequences threads sorting ;
 IN: temporary
 
-{ 3 t } [
-    V{ 1 2 3 4 } clone [ delete-random ] keep length swap integer?
-] unit-test
-
 { V{ 10 } } [
     V{ } clone <channel>
     [ from swap push ] in-thread
