@@ -1,15 +1,12 @@
 USING: tools.deploy.config ;
 V{
-    { strip-prettyprint? t }
-    { strip-globals? t }
-    { strip-word-props? t }
-    { strip-word-names? t }
-    { strip-dictionary? t }
-    { strip-debugger? t }
-    { strip-c-types? t }
-    { deploy-math? f }
-    { deploy-compiled? f }
-    { deploy-io? f }
     { deploy-ui? f }
+    { deploy-io 3 }
+    { deploy-reflection 1 }
+    { deploy-compiler? t }
+    { deploy-math? f }
+    { deploy-word-props? f }
+    { deploy-c-types? f }
     { "stop-after-last-window?" t }
+    { "bundle-name" "Hello world (console).app" }
 }

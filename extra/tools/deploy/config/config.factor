@@ -40,6 +40,7 @@ SYMBOL: deploy-reflection
 : strip-globals? deploy-reflection get 6 < ;
 
 SYMBOL: deploy-word-props?
+SYMBOL: deploy-word-defs?
 SYMBOL: deploy-c-types?
 
 SYMBOL: deploy-vm
@@ -53,6 +54,7 @@ SYMBOL: deploy-image
         { deploy-compiler?          t }
         { deploy-math?              t }
         { deploy-word-props?        f }
+        { deploy-word-defs?         f }
         { deploy-c-types?           f }
         ! default value for deploy.app
         { "stop-after-last-window?" t }

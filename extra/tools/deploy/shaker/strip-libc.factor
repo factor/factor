@@ -6,3 +6,5 @@ IN: libc
 : free (free) ;
 
 : realloc (realloc) ;
+
+: calloc (calloc) ;
