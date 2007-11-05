@@ -1,4 +1,4 @@
-USING: heaps.private help.markup help.syntax kernel ;
+USING: heaps.private help.markup help.syntax kernel math ;
 IN: heaps
 
 ARTICLE: "heaps" "Heaps"
@@ -40,36 +40,36 @@ HELP: <max-heap>
 { $see-also <min-heap> } ;
 
 HELP: heap-push
-{ $values { "pair" "a key/value pair" } { "heap" "a heap" } }
-{ $description "Push an pair onto a heap.  The first element of the pair must be comparable to the rest of the heap by the " { $link <=> } " word." }
+{ $values { "key" "a comparable object" } { "value" object } { "heap"  } }
+{ $description "Push an pair onto a heap.  The key must be comparable with all other keys by the " { $link <=> } " generic word." }
 { $see-also heap-push-all heap-pop } ;
 
 HELP: heap-push-all
-{ $values { "seq" "a sequence of pairs" } { "heap" "a heap" } }
+{ $values { "seq" "a sequence of pairs" } { "heap"  } }
 { $description "Push a sequence of pairs onto a heap." }
 { $see-also heap-push heap-pop } ; 
 
 HELP: heap-peek
-{ $values { "heap" "a heap" } { "pair" "a key/value pair" } }
-{ $description "Returns the first element in the heap and leaves it in the heap." }
+{ $values { "heap"  } { "key" object } { "value" object } }
+{ $description "Outputs the first element in the heap, leaving it in the heap." }
 { $see-also heap-pop heap-pop* } ;
 
 HELP: heap-pop*
-{ $values { "heap" "a heap" } }
+{ $values { "heap"  } }
 { $description "Removes the first element from the heap." }
 { $see-also heap-pop heap-push heap-peek } ;
 
 HELP: heap-pop
-{ $values { "heap" "a heap" } { "pair" "an key/value pair" } }
-{ $description "Returns the first element in the heap and removes it from the heap." }
+{ $values { "heap"  } { "key" object } { "value" object } }
+{ $description "Outputs the first element in the heap and removes it from the heap." }
 { $see-also heap-pop* heap-push heap-peek } ;
 
 HELP: heap-empty?
-{ $values { "heap" "a heap" } { "?" "a boolean" } }
+{ $values { "heap"  } { "?" "a boolean" } }
 { $description "Tests if a " { $link heap } " has no nodes." }
 { $see-also heap-length heap-peek } ;
 
 HELP: heap-length
-{ $values { "heap" "a heap" } { "n" "an integer" } }
+{ $values { "heap"  } { "n" integer } }
 { $description "Returns the number of key/value pairs in the heap." }
 { $see-also heap-empty? } ;

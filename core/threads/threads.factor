@@ -12,19 +12,20 @@ SYMBOL: sleep-queue
 
 : sleep-time ( -- ms )
     sleep-queue get-global dup heap-empty?
-    [ drop 1000 ] [ heap-peek first millis [-] ] if ;
+    [ drop 1000 ] [ heap-peek nip millis [-] ] if ;
 
 : run-queue ( -- queue ) \ run-queue get-global ;
 
-: schedule-sleep ( ms continuation -- )
-    2array sleep-queue get-global heap-push ;
+: schedule-sleep ( continuation ms -- )
+    sleep-queue get-global heap-push ;
 
 : wake-up ( -- continuation )
-    sleep-queue get-global heap-pop second ;
+    sleep-queue get-global heap-pop drop ;
 
 PRIVATE>
 
-: schedule-thread ( continuation -- ) run-queue push-front ;
+: schedule-thread ( continuation -- )
+    run-queue push-front ;
 
 : schedule-thread-with ( obj continuation -- )
     2array schedule-thread ;
@@ -40,7 +41,7 @@ PRIVATE>
 : yield ( -- ) [ schedule-thread stop ] callcc0 ;
 
 : sleep ( ms -- )
-    >fixnum millis + [ schedule-sleep stop ] callcc0 drop ;
+    >fixnum millis + [ schedule-sleep stop ] curry callcc0 ;
 
 : in-thread ( quot -- )
     [

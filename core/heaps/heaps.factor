@@ -1,6 +1,6 @@
 ! Copyright (C) 2007 Ryan Murphy, Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel math sequences ;
+USING: kernel math sequences arrays assocs ;
 IN: heaps
 
 <PRIVATE
@@ -30,13 +30,13 @@ TUPLE: max-heap ;
 : last-index ( vec -- n ) length 1- ; inline
 
 GENERIC: heap-compare ( pair1 pair2 heap -- ? )
-: (heap-compare) drop [ first ] 2apply <=> 0 ; inline
+: (heap-compare) drop [ first ] compare 0 ; inline
 M: min-heap heap-compare (heap-compare) > ;
 M: max-heap heap-compare (heap-compare) < ;
 
 : heap-bounds-check? ( m heap -- ? )
     heap-data length >= ; inline
-    
+
 : left-bounds-check? ( m heap -- ? )
     >r left r> heap-bounds-check? ; inline
 
@@ -72,7 +72,7 @@ DEFER: down-heap
 : down-heap-continue? ( heap m heap -- m heap ? )
     [ heap-data nth ] 2keep child pick
     dupd [ heap-data nth swapd ] keep heap-compare ;
-    
+
 : (down-heap) ( m heap -- )
     2dup down-heap-continue? [
         -rot [ swap-down ] keep down-heap
@@ -85,12 +85,17 @@ DEFER: down-heap
 
 PRIVATE>
 
-: heap-push ( pair heap -- )
-    tuck heap-data push [ heap-data ] keep up-heap ;
+: heap-push ( value key heap -- )
+    >r swap 2array r>
+    [ heap-data push ] keep
+    [ heap-data ] keep
+    up-heap ;
 
-: heap-push-all ( seq heap -- ) [ heap-push ] curry each ;
+: heap-push-all ( assoc heap -- )
+    [ swap heap-push ] curry assoc-each ;
 
-: heap-peek ( heap -- pair ) heap-data first ;
+: heap-peek ( heap -- value key )
+    heap-data first first2 swap ;
 
 : heap-pop* ( heap -- )
     dup heap-data length 1 > [
@@ -101,6 +106,16 @@ PRIVATE>
         heap-data pop*
     ] if ;
 
-: heap-pop ( heap -- pair ) [ heap-data first ] keep heap-pop* ;
+: heap-pop ( heap -- value key ) dup heap-peek rot heap-pop* ;
+
 : heap-empty? ( heap -- ? ) heap-data empty? ;
+
 : heap-length ( heap -- n ) heap-data length ;
+
+: heap-pop-all ( heap -- seq )
+    [ dup heap-empty? not ]
+    [ dup heap-pop drop ] 
+    [ ] unfold nip ;
+
+: heap-sort ( assoc -- seq )
+    <min-heap> tuck heap-push-all heap-pop-all ;
