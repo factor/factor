@@ -113,7 +113,7 @@ M: arm-backend %jump-label ( label -- ) B ;
 
 : %prepare-primitive ( -- )
     #! Save stack pointer to stack_chain->callstack_top, load XT
-    R1 SP MOV ;
+    R1 SP 4 SUB ;
 
 M: arm-backend %call-primitive ( word -- )
     %prepare-primitive
