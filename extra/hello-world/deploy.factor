@@ -1,12 +1,13 @@
 USING: tools.deploy.config ;
-V{
-    { deploy-ui? f }
-    { deploy-io 3 }
+H{
     { deploy-reflection 1 }
-    { deploy-compiler? t }
-    { deploy-math? f }
-    { deploy-word-props? f }
-    { deploy-c-types? f }
-    { "stop-after-last-window?" t }
     { deploy-name "Hello world (console)" }
+    { deploy-word-props? f }
+    { "stop-after-last-window?" t }
+    { deploy-c-types? f }
+    { deploy-compiler? f }
+    { deploy-word-defs? f }
+    { deploy-io 2 }
+    { deploy-ui? f }
+    { deploy-math? f }
 }
