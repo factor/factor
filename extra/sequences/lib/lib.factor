@@ -1,6 +1,5 @@
 USING: combinators.lib kernel sequences math namespaces
 random sequences.private shuffle ;
-
 IN: sequences.lib
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
