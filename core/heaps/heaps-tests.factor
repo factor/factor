@@ -25,11 +25,11 @@ IN: temporary
     3 [ dup heap-pop* ] times
 ] unit-test
 
-[ 2 t ] [ <min-heap> 300 t pick heap-push 200 t pick heap-push 400 t pick heap-push 3 t pick heap-push 2 t pick heap-push heap-pop ] unit-test
+[ t 2 ] [ <min-heap> t 300 pick heap-push t 200 pick heap-push t 400 pick heap-push t 3 pick heap-push t 2 pick heap-push heap-pop ] unit-test
 
-[ 1 t ] [ <min-heap> 300 300 pick heap-push 200 200 pick heap-push 400 400 pick heap-push 3 3 pick heap-push 2 2 pick heap-push 1 1 pick heap-push heap-pop ] unit-test
+[ t 1 ] [ <min-heap> t 300 pick heap-push t 200 pick heap-push t 400 pick heap-push t 3 pick heap-push t 2 pick heap-push t 1 pick heap-push heap-pop ] unit-test
 
-[ 400 t ] [ <max-heap> 300 300 pick heap-push 200 200 pick heap-push 400 400 pick heap-push 3 3 pick heap-push 2 2 pick heap-push 1 1 pick heap-push heap-pop ] unit-test
+[ t 400 ] [ <max-heap> t 300 pick heap-push t 200 pick heap-push t 400 pick heap-push t 3 pick heap-push t 2 pick heap-push t 1 pick heap-push heap-pop ] unit-test
 
 [ 0 ] [ <max-heap> heap-length ] unit-test
-[ 1 ] [ <max-heap> 1 1 pick heap-push heap-length ] unit-test
+[ 1 ] [ <max-heap> t 1 pick heap-push heap-length ] unit-test

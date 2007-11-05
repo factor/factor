@@ -92,7 +92,7 @@ PRIVATE>
     up-heap ;
 
 : heap-push-all ( assoc heap -- )
-    [ swap heap-push ] curry assoc-each ;
+    [ swapd heap-push ] curry assoc-each ;
 
 : heap-peek ( heap -- value key )
     heap-data first first2 swap ;
@@ -111,11 +111,3 @@ PRIVATE>
 : heap-empty? ( heap -- ? ) heap-data empty? ;
 
 : heap-length ( heap -- n ) heap-data length ;
-
-: heap-pop-all ( heap -- seq )
-    [ dup heap-empty? not ]
-    [ dup heap-pop drop ] 
-    [ ] unfold nip ;
-
-: heap-sort ( assoc -- seq )
-    <min-heap> tuck heap-push-all heap-pop-all ;
