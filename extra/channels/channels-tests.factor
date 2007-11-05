@@ -10,39 +10,39 @@ IN: temporary
 ] unit-test
 
 { V{ 10 } } [
-   V{ } clone <channel>
-   [ from swap push ] in-thread
-   10 swap to 
+    V{ } clone <channel>
+    [ from swap push ] in-thread
+    10 swap to 
 ] unit-test
 
 { 20 } [
-   <channel>
-   [ 20 swap to ] in-thread
-   from 
+    <channel>
+    [ 20 swap to ] in-thread
+    from 
 ] unit-test
 
 { V{ 1 2 3 4 } } [
-   V{ } clone <channel>
-   [ from swap push ] in-thread
-   [ from swap push ] in-thread
-   [ from swap push ] in-thread
-   [ from swap push ] in-thread
-   4 over to 
-   2 over to 
-   1 over to 
-   3 swap to 
-   [ <=> ] sort
+    V{ } clone <channel>
+    [ from swap push ] in-thread
+    [ from swap push ] in-thread
+    [ from swap push ] in-thread
+    [ from swap push ] in-thread
+    4 over to 
+    2 over to 
+    1 over to 
+    3 swap to 
+    natural-sort
 ] unit-test
 
 { V{ 1 2 4 9 } } [
-   V{ } clone <channel>
-   [ 4 swap to ] in-thread
-   [ 2 swap to ] in-thread
-   [ 1 swap to ] in-thread
-   [ 9 swap to ] in-thread
-   2dup from swap push 
-   2dup from swap push 
-   2dup from swap push 
-   dupd from swap push 
-   [ <=> ] sort
+    V{ } clone <channel>
+    [ 4 swap to ] in-thread
+    [ 2 swap to ] in-thread
+    [ 1 swap to ] in-thread
+    [ 9 swap to ] in-thread
+    2dup from swap push 
+    2dup from swap push 
+    2dup from swap push 
+    dupd from swap push 
+    natural-sort
 ] unit-test
