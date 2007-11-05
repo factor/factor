@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 !
 ! Remote Channels
-USING: kernel init namespaces assocs arrays 
+USING: kernel init namespaces assocs arrays random
 sequences channels match concurrency concurrency.distributed ;
 IN: channels.remote
 
@@ -13,7 +13,7 @@ IN: channels.remote
 PRIVATE>
 
 : publish ( channel -- id )
-    random-64 dup >r remote-channels set-at r> ;
+    random-256 dup >r remote-channels set-at r> ;
 
 : get-channel ( id -- channel )
     remote-channels at ;
