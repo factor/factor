@@ -92,8 +92,7 @@ void save_image(const F_CHAR *filename)
 	file = OPEN_WRITE(filename);
 	if(file == NULL)
 	{
-		FPRINTF(stderr,"Cannot open image file: %s\n",filename);
-		fprintf(stderr,"%s\n",strerror(errno));
+		fprintf(stderr,"Cannot open image file: %s\n",strerror(errno));
 		return;
 	}
 
@@ -122,10 +121,23 @@ void save_image(const F_CHAR *filename)
 
 	fwrite(&h,sizeof(F_HEADER),1,file);
 
-	fwrite((void*)tenured->start,h.data_size,1,file);
-	fwrite(first_block(&code_heap),h.code_size,1,file);
+	if(fwrite((void*)tenured->start,h.data_size,1,file) != 1)
+	{
+		fprintf(stderr,"Save data heap failed: %s\n",strerror(errno));
+		return;
+	}
 
-	fclose(file);
+	if(fwrite(first_block(&code_heap),h.code_size,1,file) != 1)
+	{
+		fprintf(stderr,"Save code heap failed: %s\n",strerror(errno));
+		return;
+	}
+
+	if(fclose(file))
+	{
+		fprintf(stderr,"Failed to close image file: %s\n",strerror(errno));
+		return;
+	}
 }
 
 DEFINE_PRIMITIVE(save_image)
