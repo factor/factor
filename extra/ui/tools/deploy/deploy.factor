@@ -35,6 +35,7 @@ TUPLE: deploy-gadget vocab settings ;
     deploy-compiler? get "Use optimizing compiler" <checkbox> gadget,
     deploy-math? get "Rational and complex number support" <checkbox> gadget,
     deploy-word-props? get "Include word properties" <checkbox> gadget,
+    deploy-word-defs? get "Include word definitions" <checkbox> gadget,
     deploy-c-types? get "Include C types" <checkbox> gadget, ;
 
 : deploy-settings-theme

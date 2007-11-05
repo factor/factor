@@ -76,9 +76,10 @@ IN: tools.deploy.shaker
 
 : strip-words ( props -- )
     [ word? ] instances
-    deploy-word-props? get [ nip ] [ tuck strip-word-props ] if
+    deploy-word-props? get [ 2dup strip-word-props ] unless
+    deploy-word-defs? get [ dup strip-word-defs ] unless
     strip-word-names? [ dup strip-word-names ] when
-    strip-word-defs ;
+    2drop ;
 
 : strip-environment ( retain-globals -- )
     strip-globals? [
