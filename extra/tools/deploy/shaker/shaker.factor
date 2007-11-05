@@ -16,6 +16,7 @@ IN: tools.deploy.shaker
 : strip-init-hooks ( -- )
     "Stripping startup hooks" show
     "command-line" init-hooks get delete-at
+    "mallocs" init-hooks get delete-at
     strip-io? [ "io.backend" init-hooks get delete-at ] when ;
 
 : strip-debugger ( -- )
