@@ -17,26 +17,24 @@ M: windows-nt-io FileArgs-overlapped ( port -- overlapped )
         2drop
     ] if* ;
 
-DEFER: (flush-output)
 : finish-flush ( port -- )
     dup pending-error
     dup get-overlapped-result
-    [ over update-file-ptr ] keep
-    over delegate [ buffer-consume ] keep
-    buffer-length 0 > [
-        (flush-output)
-    ] [
-        drop
-    ] if ;
+    dup pick update-file-ptr
+    swap buffer-consume ;
+
+: save-overlapped-and-callback ( fileargs port -- )
+    swap FileArgs-lpOverlapped over set-port-overlapped
+    save-callback ;
 
 : (flush-output) ( port -- )
     dup touch-port
     dup make-FileArgs
-    [ setup-write WriteFile ] keep
-    >r dupd overlapped-error? r> swap [
-        FileArgs-lpOverlapped over set-port-overlapped
-        dup save-callback
-        finish-flush
+    tuck setup-write WriteFile
+    dupd overlapped-error? [
+        [ save-overlapped-and-callback ] keep
+        [ finish-flush ] keep
+        dup buffer-empty? [ drop ] [ (flush-output) ] if
     ] [
         2drop
     ] if ;
@@ -49,17 +47,16 @@ M: windows-nt-io flush-output ( port -- )
     dup get-overlapped-result dup zero? [
         drop t swap set-port-eof?
     ] [
-        [ over n>buffer ] keep
+        dup pick n>buffer
         swap update-file-ptr
     ] if ;
 
 : ((wait-to-read)) ( port -- )
     dup touch-port
     dup make-FileArgs
-    [ setup-read ReadFile ] keep
-    >r dupd overlapped-error? r> swap [
-        FileArgs-lpOverlapped over set-port-overlapped
-        dup save-callback
+    tuck setup-read ReadFile
+    dupd overlapped-error? [
+        [ save-overlapped-and-callback ] keep
         finish-read
     ] [
         2drop

@@ -178,7 +178,7 @@ TUPLE: WSARecvFrom-args port
     ] keep
     "WSABUF" malloc-object dup free-always
     2dup swap set-WSARecvFrom-args-lpBuffers*
-    default-buffer-size [ malloc dup free-always ] keep
+    default-buffer-size get [ malloc dup free-always ] keep
     pick set-WSABUF-len
     swap set-WSABUF-buf
     1 over set-WSARecvFrom-args-dwBufferCount*
@@ -255,6 +255,8 @@ TUPLE: WSASendTo-args port
 : call-WSASendTo ( WSASendTo -- )
     \ WSASendTo-args >tuple*<
     WSASendTo socket-error* ;
+
+USE: io.sockets
 
 M: windows-nt-io send ( packet addrspec datagram -- )
     [
