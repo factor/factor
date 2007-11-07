@@ -1,0 +1,15 @@
+<% USING: namespaces io furnace sequences ; %>
+
+<h1>Paste: <% "summary" get write %></h1>
+
+<table>
+<tr><th>Paste by:</th><td><% "author" get write %></td></tr>
+<tr><th>Channel:</th><td><% "channel" get write %></td></tr>
+<tr><th>Created:</th><td><% "date" get write %></td></tr>
+</table>
+
+<pre><% "contents" get write %></pre>
+
+<% "annotations" get [ "annotation" render-template ] each %>
+
+<% model get "annotate-paste" render-template %>
