@@ -112,7 +112,7 @@ check_ret wget
 if [[ $OS == windows-nt ]] ; then
 	wget http://factorcode.org/dlls/freetype6.dll
 	check_ret
-	wget http://factorcode.org/dlls/zlib1.dla
+	wget http://factorcode.org/dlls/zlib1.dll
 	check_ret
 fi
 
