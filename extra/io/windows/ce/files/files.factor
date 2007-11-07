@@ -14,23 +14,15 @@ M: win32-file wince-read
     drop dup make-FileArgs dup setup-read ReadFile zero? [
         drop port-errored
     ] [
-        FileArgs-lpNumberOfBytesRet *uint dup zero? [
-            drop
-            t swap set-port-eof?
-        ] [
-            swap n>buffer
-        ] if
+        FileArgs-lpNumberOfBytesRet *uint dup zero?
+        [ drop t swap set-port-eof? ] [ swap n>buffer ] if
     ] if ;
 
 M: win32-file wince-write ( port port-handle -- )
     drop dup make-FileArgs dup setup-write WriteFile zero? [
         drop port-errored
     ] [
-        FileArgs-lpNumberOfBytesRet *uint ! *DWORD
-        over delegate [ buffer-consume ] keep
-        buffer-length 0 > [
-            flush-output
-        ] [
-            drop
-        ] if
+        FileArgs-lpNumberOfBytesRet *uint
+        over buffer-consume
+        port-flush
     ] if ;

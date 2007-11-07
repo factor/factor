@@ -1,7 +1,8 @@
 USING: alien alien.c-types combinators io io.backend io.buffers
 io.nonblocking io.sockets io.sockets.impl io.windows kernel libc
 math namespaces prettyprint qualified sequences strings threads
-threads.private windows windows.kernel32 io.windows.ce.backend ;
+threads.private windows windows.kernel32 io.windows.ce.backend
+byte-arrays ;
 QUALIFIED: windows.winsock
 IN: io.windows.ce
 
@@ -19,7 +20,7 @@ C: <WSAArgs> WSAArgs
 
 : make-WSAArgs ( port -- <WSARecv> )
     [ port-handle win32-file-handle ] keep
-    delegate 1 "DWORD" <c-object> f f f <WSAArgs> ;
+    1 "DWORD" <c-object> f f f <WSAArgs> ;
 
 : setup-WSARecv ( <WSAArgs> -- s lpBuffers dwBufferCount lpNumberOfBytesRet lpFlags lpOverlapped lpCompletionRoutine )
     [ WSAArgs-s ] keep
@@ -49,9 +50,9 @@ C: <WSAArgs> WSAArgs
     ! ] if ;
 
 M: win32-socket wince-read ( port port-handle -- )
-    win32-file-handle over
-    delegate [ buffer-end ] keep buffer-capacity 0
-    windows.winsock:recv dup windows.winsock:SOCKET_ERROR = [
+    win32-file-handle over buffer-end pick buffer-capacity 0
+    windows.winsock:recv
+    dup windows.winsock:SOCKET_ERROR = [
         drop port-errored
     ] [
         dup zero? [
@@ -91,18 +92,10 @@ M: win32-socket wince-read ( port port-handle -- )
     ! ] if ;
 
 M: win32-socket wince-write ( port port-handle -- )
-    win32-file-handle over
-    delegate [ buffer@ ] keep
-    buffer-length 0 windows.winsock:send dup windows.winsock:SOCKET_ERROR = [
-        drop port-errored
-    ] [
-        over delegate [ buffer-consume ] keep
-        buffer-length 0 > [
-            flush-output
-        ] [
-            drop
-        ] if
-    ] if ;
+    win32-file-handle over buffer@ pick buffer-length 0
+    windows.winsock:send
+    dup windows.winsock:SOCKET_ERROR =
+    [ drop port-errored ] [ over buffer-consume port-flush ] if ;
 
 : do-connect ( addrspec -- socket )
     [ tcp-socket dup ] keep
@@ -123,12 +116,11 @@ M: windows-ce-io <server> ( addrspec -- duplex-stream )
 M: windows-ce-io accept ( server -- client )
     dup check-server-port
     [
-        [ touch-port ] keep
-        [ port-handle win32-file-handle ] keep
-        server-port-addr sockaddr-type heap-size
-        [ "char" <c-array> ] keep [
-            <int>
-            f 0
+        dup touch-port
+        dup port-handle win32-file-handle
+        swap server-port-addr sockaddr-type heap-size
+        dup <byte-array> [
+            swap <int> f 0
             windows.winsock:WSAAccept dup windows.winsock:INVALID_SOCKET =
             [ windows.winsock:winsock-error ] when
         ] keep
@@ -143,10 +135,10 @@ M: windows-ce-io <datagram> ( addrspec -- datagram )
 M: windows-ce-io receive ( datagram -- packet addrspec )
     dup check-datagram-port
     [
-        port-handle delegate win32-file-handle
+        port-handle win32-file-handle
         "WSABUF" <c-object>
-        default-buffer-size over windows.winsock:set-WSABUF-len
-        default-buffer-size "char" <c-array> over windows.winsock:set-WSABUF-buf
+        default-buffer-size get over windows.winsock:set-WSABUF-len
+        default-buffer-size get <byte-array> over windows.winsock:set-WSABUF-buf
         [
             1
             0 <uint> [
@@ -167,7 +159,7 @@ M: windows-ce-io receive ( datagram -- packet addrspec )
 
 M: windows-ce-io send ( packet addrspec datagram -- )
     3dup check-datagram-send
-    delegate port-handle delegate win32-file-handle
+    port-handle win32-file-handle
     rot dup length "WSABUF" <c-object>
     [ windows.winsock:set-WSABUF-len ] keep
     [ windows.winsock:set-WSABUF-buf ] keep

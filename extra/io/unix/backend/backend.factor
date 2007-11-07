@@ -34,6 +34,9 @@ M: integer init-handle ( fd -- )
     #! 1 are closed).
     F_SETFL O_NONBLOCK fcntl drop ;
 
+M: integer close-handle ( fd -- )
+    close ;
+
 : report-error ( error port -- )
     [ "Error on fd " % dup port-handle # ": " % swap % ] "" make
     swap set-port-error ;
@@ -168,20 +171,8 @@ M: write-task task-container drop write-tasks get-global ;
 : (wait-to-write) ( port -- )
     [ swap <write-task> add-write-io-task stop ] callcc0 drop ;
 
-: port-flush ( port -- )
+M: port port-flush ( port -- )
     dup buffer-empty? [ drop ] [ (wait-to-write) ] if ;
-
-M: output-port stream-flush
-    dup port-flush pending-error ;
-
-M: port stream-close
-    dup port-type closed eq? [
-        dup port-type >r closed over set-port-type r>
-        output eq? [ dup port-flush ] when
-        dup port-handle close
-        dup delegate [ buffer-free ] when*
-        f over set-delegate
-    ] unless drop ;
 
 USE: io
 
