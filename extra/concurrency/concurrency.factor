@@ -43,7 +43,6 @@ TUPLE: thread timeout continuation continued? ;
 : (mailbox-block-if-empty) ( mailbox timeout -- mailbox2 )
     over mailbox-empty? [
         [ <thread> swap mailbox-threads push stop ] callcc0
-        "(mailbox-block-if-empty)" print flush
         (mailbox-block-if-empty)
     ] [
         drop
