@@ -59,3 +59,6 @@ IN: temporary
 [ 0 ] [ <dlist> dlist-length ] unit-test
 [ 1 ] [ <dlist> 1 over push-front dlist-length ] unit-test
 [ 0 ] [ <dlist> 1 over push-front dup pop-front* dlist-length ] unit-test
+
+[ 4 ] [ <dlist> 1 over push-back 2 over push-back 3 over push-back 4 over push-back 5 over push-back [ 3 = ] over delete-node drop dlist-front dlist-node-next dlist-node-next dlist-node-obj ] unit-test
+[ 2 ] [ <dlist> 1 over push-back 2 over push-back 3 over push-back 4 over push-back 5 over push-back [ 3 = ] over delete-node drop dlist-front dlist-node-next dlist-node-next dlist-node-prev dlist-node-obj ] unit-test
