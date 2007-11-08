@@ -1,11 +1,12 @@
-! Copyright (C) 2007 Slava Pestov, Doug Coleman
+! Copyright (C) 2005, 2007 Slava Pestov, Doug Coleman
 ! See http://factorcode.org/license.txt for BSD license.
 IN: io.nonblocking
 USING: math kernel io sequences io.buffers generic sbufs
 system io.streams.lines io.streams.plain io.streams.duplex
-continuations debugger classes byte-arrays ;
+continuations debugger classes byte-arrays namespaces ;
 
-: default-buffer-size 64 1024 * ; inline
+SYMBOL: default-buffer-size
+64 1024 * default-buffer-size set-global
 
 ! Common delegate of native stream readers and writers
 TUPLE: port handle error timeout cutoff type eof? ;
@@ -18,6 +19,7 @@ PREDICATE: port input-port port-type input eq? ;
 PREDICATE: port output-port port-type output eq? ;
 
 GENERIC: init-handle ( handle -- )
+GENERIC: close-handle ( handle -- )
 
 : <port> ( handle buffer -- port )
     over init-handle
@@ -29,7 +31,7 @@ GENERIC: init-handle ( handle -- )
     } port construct ;
 
 : <buffered-port> ( handle -- port )
-    default-buffer-size <buffer> <port> ;
+    default-buffer-size get <buffer> <port> ;
 
 : <reader> ( handle -- stream )
     <buffered-port> input over set-port-type <line-reader> ;
@@ -149,6 +151,20 @@ M: output-port stream-write1
 
 M: output-port stream-write
     over length over wait-to-write >buffer ;
+
+GENERIC: port-flush ( port -- )
+
+M: output-port stream-flush ( port -- )
+    dup port-flush pending-error ;
+
+M: port stream-close
+    dup port-type closed eq? [
+        dup port-type >r closed over set-port-type r>
+        output eq? [ dup port-flush ] when
+        dup port-handle close-handle
+        dup delegate [ buffer-free ] when*
+        f over set-delegate
+    ] unless drop ;
 
 TUPLE: server-port addr client ;
 

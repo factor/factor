@@ -166,9 +166,8 @@ FUNCTION: int connect ( void* socket, sockaddr_in* sockaddr, int addrlen ) ;
 FUNCTION: int select ( int nfds, fd_set* readfds, fd_set* writefds, fd_set* exceptfds, timeval* timeout ) ;
 FUNCTION: int closesocket ( SOCKET s ) ;
 FUNCTION: int shutdown ( SOCKET s, int how ) ;
-! FUNCTION: int send ( SOCKET s, char* buf, int len, int flags ) ;
-! FUNCTION: int recv ( SOCKET s, char* buf, int len, int flags ) ;
-
+FUNCTION: int send ( SOCKET s, char* buf, int len, int flags ) ;
+FUNCTION: int recv ( SOCKET s, char* buf, int len, int flags ) ;
 
 TYPEDEF: uint SERVICETYPE
 TYPEDEF: OVERLAPPED WSAOVERLAPPED
@@ -405,6 +404,9 @@ FUNCTION: void GetAcceptExSockaddrs ( void* a, int b, int c, int d, void* e, voi
 : winsock-error-string ( -- string/f )
     WSAGetLastError (winsock-error-string) ;
 
+: winsock-error ( -- )
+    winsock-error-string [ throw ] when* ;
+
 : winsock-error=0/f ( n/f -- )
     { 0 f } member? [
         winsock-error-string throw
@@ -428,7 +430,7 @@ FUNCTION: void GetAcceptExSockaddrs ( void* a, int b, int c, int d, void* e, voi
     ] when ;
 
 : socket-error ( n -- )
-    SOCKET_ERROR = [ winsock-error-string throw ] when ;
+    SOCKET_ERROR = [ winsock-error ] when ;
 
 : init-winsock ( -- )
     HEX: 0202 <wsadata> WSAStartup winsock-error!=0/f ;

@@ -76,4 +76,5 @@ TUPLE: expected-error ;
 
 : test-all ( -- ) "" test ;
 
-: test-changes ( -- ) "" (refresh) run-vocab-tests ;
+: test-changes ( -- )
+    "" to-refresh dupd do-refresh run-vocab-tests ;

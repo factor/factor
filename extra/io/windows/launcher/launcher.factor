@@ -83,8 +83,8 @@ C: <pipe> pipe
     PIPE_ACCESS_DUPLEX FILE_FLAG_OVERLAPPED bitor
     PIPE_TYPE_BYTE PIPE_READMODE_BYTE PIPE_NOWAIT bitor bitor
     PIPE_UNLIMITED_INSTANCES
-    default-buffer-size
-    default-buffer-size
+    default-buffer-size get
+    default-buffer-size get
     0
     security-attributes-inherit
     CreateNamedPipe dup invalid-handle? ;

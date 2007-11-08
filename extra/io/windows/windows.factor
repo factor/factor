@@ -31,12 +31,6 @@ TUPLE: win32-file handle ptr overlapped ;
     { set-win32-file-handle set-win32-file-ptr }
     \ win32-file construct ;
 
-: set-port-overlapped ( overlapped port -- )
-    port-handle set-win32-file-overlapped ;
-
-: port-overlapped ( port -- overlapped )
-    port-handle win32-file-overlapped ;
-
 HOOK: CreateFile-flags io-backend ( -- DWORD )
 HOOK: flush-output io-backend ( port -- )
 HOOK: FileArgs-overlapped io-backend ( port -- overlapped/f )
@@ -48,7 +42,14 @@ M: windows-io normalize-directory ( string -- string )
 : share-mode ( -- fixnum )
     FILE_SHARE_READ FILE_SHARE_WRITE bitor ; inline
 
-M: win32-file init-handle ( handle -- ) drop ;
+M: win32-file init-handle ( handle -- )
+    drop ;
+
+M: win32-file close-handle ( handle -- )
+    win32-file-handle CloseHandle drop ;
+
+M: port port-flush
+    dup buffer-empty? [ dup flush-output ] unless drop ;
 
 ! Clean up resources (open handle) if add-completion fails
 : open-file ( path access-mode create-mode -- handle )
@@ -100,27 +101,6 @@ C: <FileArgs> FileArgs
     [ FileArgs-lpBuffer buffer-length ] keep
     [ FileArgs-lpNumberOfBytesRet ] keep
     FileArgs-lpOverlapped ;
-
-M: output-port stream-flush ( port -- )
-    dup buffer-empty? [
-        dup flush-output
-    ] unless pending-error ;
-
-M: port stream-close ( port -- )
-    dup port-type closed = [
-        drop
-    ] [
-        ! For duplex-streams, we call CloseHandle twice on the same handle
-        [ dup port-type output = [ stream-flush ] [ drop ] if ] keep
-        [ closed swap set-port-type ] keep
-        [ port-handle win32-file-handle CloseHandle drop ] keep
-        USE: namespaces
-        [ delegate [ buffer-free ] [
-            global [ "delegate was empty!!" print flush ] bind
-            USE: windows.winsock.private
-        ] if* ] keep
-        f swap set-delegate
-    ] if ;
 
 M: windows-io <file-reader> ( path -- stream )
     open-read <win32-file> <reader> ;

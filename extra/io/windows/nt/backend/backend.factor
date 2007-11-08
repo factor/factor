@@ -1,12 +1,9 @@
-USING: alien alien.c-types arrays assocs combinators continuations
-destructors io io.backend io.nonblocking io.windows libc
-kernel math namespaces sequences threads tuples.lib windows
-windows.errors windows.kernel32 prettyprint strings splitting
-io.files windows.winsock ;
+USING: alien alien.c-types arrays assocs combinators
+continuations destructors io io.backend io.nonblocking
+io.windows libc kernel math namespaces sequences threads
+tuples.lib windows windows.errors windows.kernel32 strings
+splitting io.files windows.winsock ;
 IN: io.windows.nt.backend
-
-: .. global [ . flush ] bind ;
-: .S global [ .s flush ] bind ;
 
 : unicode-prefix ( -- seq )
     "\\\\?\\" ; inline
@@ -51,6 +48,12 @@ C: <io-callback> io-callback
     >r (make-overlapped) r> port-handle win32-file-ptr
     [ over set-OVERLAPPED-offset ] when* ;
 
+: port-overlapped ( port -- overlapped )
+    port-handle win32-file-overlapped ;
+
+: set-port-overlapped ( overlapped port -- )
+    port-handle set-win32-file-overlapped ;
+
 : completion-port ( handle existing -- handle )
      f 1 CreateIoCompletionPort dup win32-error=0/f ;
 
@@ -75,7 +78,7 @@ C: <GetOverlappedResult-args> GetOverlappedResult-args
 
 : (save-callback) ( io-callback -- )
     dup io-callback-port port-handle win32-file-overlapped
-    \ io-hash get-global set-at ;
+    io-hash get-global set-at ;
 
 : save-callback ( port -- )
     [
@@ -95,7 +98,7 @@ C: <GetQueuedCompletionStatusParams> GetQueuedCompletionStatusParams
 
 : lookup-callback ( GetQueuedCompletion-args -- callback )
     GetQueuedCompletionStatusParams-lpOverlapped* *void*
-    \ io-hash get-global delete-at* drop ;
+    io-hash get-global delete-at* drop ;
 
 : wait-for-io ( timeout -- continuation/f )
     wait-for-overlapped
@@ -125,19 +128,17 @@ C: <GetQueuedCompletionStatusParams> GetQueuedCompletionStatusParams
         drop
     ] if ;
 
-: cancel-timedout ( -- )
+: cancel-timeout ( -- )
     io-hash get-global values [ maybe-expire ] each ;
 
 M: windows-nt-io io-multiplex ( ms -- )
-    cancel-timedout
-    [ wait-for-io ] [ global [ "error: " write . flush ] bind drop f ] recover
-    [ schedule-thread ] when* ;
+    cancel-timeout wait-for-io [ schedule-thread ] when* ;
 
 M: windows-nt-io init-io ( -- )
     #! Should only be called on startup. Calling this at any
     #! other time can have unintended consequences.
     global [
         master-completion-port \ master-completion-port set
-        H{ } clone \ io-hash set
+        H{ } clone io-hash set
         init-winsock
     ] bind ;

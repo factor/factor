@@ -13,7 +13,7 @@ void default_parameters(F_PARAMETERS *p)
 	p->gen_count = 2;
 	p->code_size = 4;
 	p->young_size = 1;
-	p->aging_size = 4;
+	p->aging_size = 6;
 #else
 	p->ds_size = 32 * CELLS;
 	p->rs_size = 32 * CELLS;

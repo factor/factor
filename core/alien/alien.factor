@@ -18,7 +18,7 @@ PREDICATE: alien pinned-alien
     underlying-alien pinned-c-ptr? ;
 
 UNION: pinned-c-ptr
-    alien POSTPONE: f ;
+    pinned-alien POSTPONE: f ;
 
 UNION: c-ptr
     alien bit-array byte-array float-array POSTPONE: f ;
