@@ -120,10 +120,6 @@ HELP: vocab-tests-path
 { $values { "vocab" "a vocabulary specifier" } { "path/f" "a pathname string or " { $link f } } }
 { $description "Outputs a pathname where the unit tests for " { $snippet "vocab" } " might be found. Outputs " { $link f } " if the vocabulary does not have a directory on disk." } ;
 
-HELP: (refresh)
-{ $values { "prefix" string } { "seq" "a sequence of strings" } }
-{ $description "Reloads source files and documentation belonging to loaded vocabularies whose names are prefixed by " { $snippet "prefix" } " which have been modified on disk. Also outputs a sequence of reloaded vocabularies." } ;
-
 HELP: refresh
 { $values { "prefix" string } }
 { $description "Reloads source files and documentation belonging to loaded vocabularies whose names are prefixed by " { $snippet "prefix" } " which have been modified on disk." } ;
