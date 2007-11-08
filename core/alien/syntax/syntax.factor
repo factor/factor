@@ -3,7 +3,7 @@
 USING: arrays alien alien.c-types alien.structs kernel math
 namespaces parser sequences words quotations math.parser
 splitting effects prettyprint prettyprint.sections
-prettyprint.backend assocs ;
+prettyprint.backend assocs combinators ;
 IN: alien.syntax
 
 <PRIVATE
@@ -53,10 +53,10 @@ PRIVATE>
     parsing
 
 M: alien pprint*
-    dup expired? [
-        drop "( alien expired )" text
-    ] [
-        \ ALIEN: [ alien-address pprint* ] pprint-prefix
-    ] if ;
+    {
+        { [ dup expired? ] [ drop "( alien expired )" text ] }
+        { [ dup pinned-c-ptr? not ] [ drop "( displaced alien )" text ] }
+        { [ t ] [ \ ALIEN: [ alien-address pprint* ] pprint-prefix ] }
+    } cond ;
 
 M: dll pprint* dll-path dup "DLL\" " pprint-string ;

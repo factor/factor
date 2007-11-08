@@ -64,3 +64,7 @@ cell 8 = [
 [ 0 B{ 1 2 3 } <displaced-alien> alien-address ] unit-test-fails
 
 [ 1 1 <displaced-alien> ] unit-test-fails
+
+[ f ] [ 0 B{ 1 2 3 } <displaced-alien> pinned-c-ptr? ] unit-test
+
+[ "( displaced alien )" ] [ 0 B{ 1 2 3 } <displaced-alien> unparse ] unit-test

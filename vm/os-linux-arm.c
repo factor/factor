@@ -8,6 +8,9 @@ void flush_icache(CELL start, CELL len)
 	identically to the below assembly. */
 	/* result = syscall(__ARM_NR_cacheflush,start,start + len,0); */
 
+	/* Assembly swiped from
+	http://lists.arm.linux.org.uk/pipermail/linux-arm/2002-July/003931.html
+	*/
 	__asm__ __volatile__ (
 		"mov     r0, %1\n"
 		"sub     r1, %2, #1\n"
