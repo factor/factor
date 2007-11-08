@@ -127,7 +127,7 @@ HELP: refresh
 HELP: refresh-all
 { $description "Reloads source files and documentation for all loaded vocabularies which have been modified on disk." } ;
 
-{ refresh (refresh) refresh-all } related-words
+{ refresh refresh-all } related-words
 
 HELP: vocab-file-contents
 { $values { "vocab" "a vocabulary specifier" } { "name" string } { "seq" "a sequence of lines, or " { $link f } } }
