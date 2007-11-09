@@ -119,9 +119,10 @@ SYMBOL: load-help?
         "To define one, refer to \\ MAIN: help" print
     ] ?if ;
 
-: modified ( assoc -- seq )
-    [ nip dup [ source-modified? ] when ] assoc-subset
-    keys ;
+: modified ( seq quot -- seq )
+    [ dup ] swap compose { } map>assoc
+    [ nip ] assoc-subset
+    [ nip source-modified? ] assoc-subset keys ; inline
 
 : vocab-path+ ( vocab path -- newpath )
     swap vocab-root dup [ swap path+ ] [ 2drop f ] if ;
@@ -136,19 +137,26 @@ SYMBOL: load-help?
     dup vocab-docs vocab-path+ ;
 
 : modified-sources ( vocabs -- seq )
-    [ dup vocab-source-path ] { } map>assoc modified ;
+    [ vocab-source-path ] modified ;
 
 : modified-docs ( vocabs -- seq )
-    [ dup vocab-docs-path ] { } map>assoc modified ;
+    [ vocab-docs-path ] modified ;
 
-: (refresh) ( prefix -- seq )
+: update-roots ( vocabs -- )
+    [ dup find-vocab-root swap vocab set-vocab-root ] each ;
+
+: to-refresh ( prefix -- seq )
     child-vocabs
-    dup modified-sources swap modified-docs 2dup
+    dup update-roots
+    dup modified-sources swap modified-docs ;
+
+: do-refresh ( modified-sources modified-docs -- )
+    2dup
     [ f swap set-vocab-docs-loaded? ] each
     [ f swap set-vocab-source-loaded? ] each
-    append prune dup [ [ require ] each ] no-parse-hook ;
+    append prune [ [ require ] each ] no-parse-hook ;
 
-: refresh ( prefix -- ) (refresh) drop ;
+: refresh ( prefix -- ) to-refresh do-refresh ;
 
 : refresh-all ( -- ) "" refresh ;
 
