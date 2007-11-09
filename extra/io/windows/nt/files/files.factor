@@ -39,8 +39,11 @@ M: windows-nt-io FileArgs-overlapped ( port -- overlapped )
         2drop
     ] if ;
 
-M: windows-nt-io flush-output ( port -- )
+: flush-output ( port -- )
     [ (flush-output) ] with-destructors ;
+
+M: port port-flush
+    dup buffer-empty? [ dup flush-output ] unless drop ;
 
 : finish-read ( port -- )
     dup pending-error

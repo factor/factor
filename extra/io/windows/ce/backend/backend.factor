@@ -1,6 +1,7 @@
 USING: io.nonblocking io.windows threads.private kernel
 io.backend windows.winsock windows.kernel32 windows
-io.streams.duplex io namespaces alien.syntax system combinators ;
+io.streams.duplex io namespaces alien.syntax system combinators
+io.buffers ;
 IN: io.windows.ce.backend
 
 : port-errored ( port -- )
@@ -16,8 +17,12 @@ M: input-port (wait-to-read) ( port -- )
 
 GENERIC: wince-write ( port port-handle -- )
 
-M: windows-ce-io flush-output ( port -- )
-    dup port-handle wince-write ;
+M: port port-flush
+    dup buffer-empty? over port-error or [
+        drop
+    ] [
+        dup dup port-handle wince-write port-flush
+    ] if ;
 
 M: windows-ce-io init-io ( -- )
     init-winsock ;
@@ -29,7 +34,7 @@ FUNCTION: void* _fileno void* file ;
 M: windows-ce-io init-stdio ( -- )
     #! We support Windows NT too, to make this I/O backend
     #! easier to debug.
-    4096 default-buffer-size [
+    512 default-buffer-size [
         winnt? [
             STD_INPUT_HANDLE GetStdHandle
             STD_OUTPUT_HANDLE GetStdHandle
