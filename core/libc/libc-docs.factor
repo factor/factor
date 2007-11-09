@@ -26,8 +26,7 @@ HELP: memcpy
 
 HELP: check-ptr
 { $values { "c-ptr" "an alien address, byte array, or " { $link f } } { "checked" "an alien address or byte array with non-zero address" } }
-{ $description "Throws an error if the input is " { $link f } ". Otherwise the object remains on the data stack. This word should be used to check the return values of " { $link malloc } " and " { $link realloc } " before use." }
-{ $error-description "Callers of " { $link malloc } " and " { $link realloc } " should use " { $link check-ptr } " to throw an error in the case of a memory allocation failure." } ;
+{ $description "Throws an error if the input is " { $link f } ". Otherwise the object remains on the data stack." } ;
 
 HELP: free
 { $values { "alien" c-ptr } }

@@ -31,7 +31,7 @@ USE: unix
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-: with-fork ( quot -- pid )
+: with-fork ( child parent -- pid )
     fork [ zero? -rot if ] keep ; inline
 
 : prepare-execvp ( args -- cmd args )
