@@ -86,7 +86,8 @@
     "IN:" "USING:" "TUPLE:" "^C:" "^M:" "USE:" "REQUIRE:" "PROVIDE:"
     "REQUIRES:"
     "GENERIC:" "GENERIC#" "SYMBOL:" "PREDICATE:" "VAR:" "VARS:"
-    "UNION:" "<PRIVATE" "PRIVATE>" "MACRO:" "MACRO::" "DEFER:"))
+    "C-STRUCT:"
+    "C-UNION:" "<PRIVATE" "PRIVATE>" "MACRO:" "MACRO::" "DEFER:" "TYPEDEF:"))
 
 (defun factor-mode ()
   "A mode for editing programs written in the Factor programming language."
