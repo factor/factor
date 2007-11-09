@@ -159,7 +159,7 @@ TUPLE: write-task ;
 : <write-task> ( port -- task ) write-task <io-task> ;
 
 M: write-task do-io-task
-    io-task-port dup buffer-length zero? over port-error or
+    io-task-port dup buffer-empty? over port-error or
     [ 0 swap buffer-reset t ] [ write-step ] if ;
 
 M: write-task task-container drop write-tasks get-global ;

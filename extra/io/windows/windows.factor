@@ -32,7 +32,6 @@ TUPLE: win32-file handle ptr overlapped ;
     \ win32-file construct ;
 
 HOOK: CreateFile-flags io-backend ( -- DWORD )
-HOOK: flush-output io-backend ( port -- )
 HOOK: FileArgs-overlapped io-backend ( port -- overlapped/f )
 HOOK: add-completion io-backend ( port -- )
 
@@ -47,9 +46,6 @@ M: win32-file init-handle ( handle -- )
 
 M: win32-file close-handle ( handle -- )
     win32-file-handle CloseHandle drop ;
-
-M: port port-flush
-    dup buffer-empty? [ dup flush-output ] unless drop ;
 
 ! Clean up resources (open handle) if add-completion fails
 : open-file ( path access-mode create-mode -- handle )
