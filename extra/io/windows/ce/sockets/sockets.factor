@@ -95,7 +95,7 @@ M: win32-socket wince-write ( port port-handle -- )
     win32-file-handle over buffer@ pick buffer-length 0
     windows.winsock:send
     dup windows.winsock:SOCKET_ERROR =
-    [ drop port-errored ] [ over buffer-consume port-flush ] if ;
+    [ drop port-errored ] [ swap buffer-consume ] if ;
 
 : do-connect ( addrspec -- socket )
     [ tcp-socket dup ] keep

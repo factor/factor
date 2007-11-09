@@ -1,8 +1,12 @@
-USING: system vocabs vocabs.loader kernel ;
+USING: system vocabs vocabs.loader kernel combinators
+namespaces sequences ;
 IN: bootstrap.io
 
 "bootstrap.compiler" vocab [
-    unix? [ "io.unix" require ] when
-    winnt? [ "io.windows.nt" require ] when
-    wince? [ "io.windows.ce" require ] when
+    "io." {
+        { [ "io-backend" get ] [ "io-backend" get ] }
+        { [ unix? ] [ "unix" ] }
+        { [ winnt? ] [ "windows.nt" ] }
+        { [ wince? ] [ "windows.ce" ] }
+    } cond append require
 ] when

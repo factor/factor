@@ -23,6 +23,5 @@ M: win32-file wince-write ( port port-handle -- )
         drop port-errored
     ] [
         FileArgs-lpNumberOfBytesRet *uint
-        over buffer-consume
-        port-flush
+        swap buffer-consume
     ] if ;
