@@ -1,7 +1,7 @@
 
 USING: io io.launcher io.unix.backend io.nonblocking
 sequences kernel namespaces math system alien.c-types
-debugger continuations ;
+debugger continuations combinators.lib threads ;
 
 IN: io.unix.launcher
 
