@@ -3,7 +3,8 @@
 IN: io.nonblocking
 USING: math kernel io sequences io.buffers generic sbufs
 system io.streams.lines io.streams.plain io.streams.duplex
-continuations debugger classes byte-arrays namespaces ;
+continuations debugger classes byte-arrays namespaces
+splitting ;
 
 SYMBOL: default-buffer-size
 64 1024 * default-buffer-size set-global
@@ -137,11 +138,7 @@ M: input-port stream-read-partial ( max stream -- string/f )
     >r 0 max >fixnum r> read-step ;
 
 : can-write? ( len writer -- ? )
-    dup buffer-empty? [
-        2drop t
-    ] [
-        [ buffer-fill + ] keep buffer-capacity <=
-    ] if ;
+    [ buffer-fill + ] keep buffer-capacity <= ;
 
 : wait-to-write ( len port -- )
     tuck can-write? [ drop ] [ stream-flush ] if ;
@@ -150,7 +147,12 @@ M: output-port stream-write1
     1 over wait-to-write ch>buffer ;
 
 M: output-port stream-write
-    over length over wait-to-write >buffer ;
+    over length over buffer-size > [
+        [ buffer-size <groups> ] keep
+        [ stream-write ] curry each
+    ] [
+        over length over wait-to-write >buffer
+    ] if ;
 
 GENERIC: port-flush ( port -- )
 

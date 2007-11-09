@@ -79,7 +79,7 @@ HINTS: search-buffer-until { fixnum fixnum simple-alien string } ;
     buffer-fill zero? ;
 
 : extend-buffer ( n buffer -- )
-    2dup buffer-ptr swap realloc check-ptr
+    2dup buffer-ptr swap realloc
     over set-buffer-ptr set-buffer-size ;
 
 : check-overflow ( n buffer -- )
