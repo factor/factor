@@ -1,9 +1,8 @@
-USING: alien alien.c-types arrays destructors io
-io.backend io.buffers io.files io.nonblocking io.sockets
-io.sockets.impl windows.errors strings io.streams.duplex
-kernel math namespaces sequences windows
-windows.kernel32 windows.winsock windows.winsock.private ;
-USE: prettyprint
+USING: alien alien.c-types arrays destructors io io.backend
+io.buffers io.files io.nonblocking io.sockets io.binary
+io.sockets.impl windows.errors strings io.streams.duplex kernel
+math namespaces sequences windows windows.kernel32
+windows.winsock windows.winsock.private ;
 IN: io.windows
 
 TUPLE: windows-nt-io ;
@@ -67,9 +66,18 @@ M: win32-file close-handle ( handle -- )
 : (open-append) ( path -- handle )
     normalize-pathname GENERIC_WRITE OPEN_ALWAYS open-file ;
 
+: set-file-pointer ( handle length -- )
+    dupd d>w/w <uint> FILE_BEGIN SetFilePointer
+    INVALID_SET_FILE_POINTER = [
+        CloseHandle "SetFilePointer failed" throw
+    ] when drop ;
+
 : open-append ( path -- handle length )
-    dup file-length dup
-    [ >r (open-append) r> ] [ drop open-write ] if ;
+    dup file-length dup [
+        >r (open-append) r> 2dup set-file-pointer
+    ] [
+        drop open-write
+    ] if ;
 
 TUPLE: FileArgs
     hFile lpBuffer nNumberOfBytesToRead lpNumberOfBytesRet lpOverlapped ;
@@ -160,13 +168,13 @@ USE: namespaces
 : listen-backlog ( -- n ) HEX: 7fffffff ; inline
 
 : listen-on-socket ( socket -- )
-    listen-backlog listen winsock-error!=0/f ;
+    listen-backlog listen winsock-return-check ;
 
 M: win32-socket stream-close ( stream -- )
     win32-file-handle closesocket drop ;
 
 M: windows-io addrinfo-error ( n -- )
-    winsock-error!=0/f ;
+    winsock-return-check ;
 
 : tcp-socket ( addrspec -- socket )
     protocol-family SOCK_STREAM open-socket ;
