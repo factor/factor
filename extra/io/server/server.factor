@@ -80,7 +80,8 @@ SYMBOL: log-stream
 
 : datagram-loop ( quot datagram -- )
     [
-        [ receive dup log-datagram >r swap call r> ] keep send
+        [ receive dup log-datagram >r swap call r> ] keep
+        pick [ send ] [ 3drop ] keep
     ] 2keep datagram-loop ; inline
 
 : spawn-datagrams ( quot addrspec -- )
@@ -91,4 +92,4 @@ SYMBOL: log-stream
 : with-datagrams ( seq service quot -- )
     [
         [ swap spawn-datagrams ] curry concurrency:parallel-each
-    ] with-logging ; inline
+    ] curry with-logging ; inline

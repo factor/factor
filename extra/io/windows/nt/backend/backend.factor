@@ -8,6 +8,14 @@ IN: io.windows.nt.backend
 : unicode-prefix ( -- seq )
     "\\\\?\\" ; inline
 
+M: windows-nt-io root-directory? ( path -- ? )
+    dup length 2 = [
+        dup first Letter?
+        swap second CHAR: : = and
+    ] [
+        drop f
+    ] if ;
+
 M: windows-nt-io normalize-pathname ( string -- string )
     dup string? [ "pathname must be a string" throw ] unless
     "/" split "\\" join

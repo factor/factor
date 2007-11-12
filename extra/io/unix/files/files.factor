@@ -4,9 +4,6 @@ USING: io.backend io.nonblocking io.unix.backend io.files io
 unix kernel math continuations ;
 IN: io.unix.files
 
-M: unix-io root-directory? ( path -- ? )
-    "/" = ;
-
 : open-read ( path -- fd )
     O_RDONLY file-mode open dup io-error ;
 
