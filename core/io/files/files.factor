@@ -65,14 +65,15 @@ TUPLE: no-parent-directory path ;
     \ no-parent-directory construct-boa throw ;
 
 : parent-directory ( path -- parent )
-    trim-path-separators
-    dup root-directory? [ ] [
-        dup last-path-separator drop dup [
-            1+ cut
-            special-directory?
-            [ no-parent-directory ] when
-        ] [ 2drop "." ] if
-    ] if ;
+    trim-path-separators {
+        { [ dup empty? ] [ drop "/" ] }
+        { [ dup root-directory? ] [ ] }
+        { [ dup [ path-separator? ] contains? not ] [ drop "." ] }
+        { [ t ] [
+            last-path-separator drop 1+ cut
+            special-directory? [ no-parent-directory ] when
+        ] }
+    } cond ;
 
 : file-name ( path -- string )
     dup last-path-separator [ 1+ tail ] [ drop ] if ;

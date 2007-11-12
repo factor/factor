@@ -1,7 +1,7 @@
 USING: sequences rss arrays concurrency kernel sorting
 html.elements io assocs namespaces math threads vocabs html
 furnace http.server.templating calendar math.parser splitting
-continuations debugger system ;
+continuations debugger system http.server.responders ;
 IN: webapps.planet
 
 TUPLE: posting author title date link body ;
@@ -92,7 +92,7 @@ SYMBOL: cached-postings
     cached-postings get 4 head print-posting-summaries ;
 
 : planet-factor ( -- )
-    [
+    serving-html [
         "resource:extra/webapps/planet/planet.fhtml"
         run-template-file
     ] with-html-stream ;
