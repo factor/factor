@@ -145,7 +145,7 @@ SYMBOL: load-help?
 : update-roots ( vocabs -- )
     [ dup find-vocab-root swap vocab set-vocab-root ] each ;
 
-: to-refresh ( prefix -- seq )
+: to-refresh ( prefix -- modified-sources modified-docs )
     child-vocabs
     dup update-roots
     dup modified-sources swap modified-docs ;
