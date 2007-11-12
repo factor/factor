@@ -70,7 +70,7 @@ TUPLE: no-parent-directory path ;
         { [ dup root-directory? ] [ ] }
         { [ dup [ path-separator? ] contains? not ] [ drop "." ] }
         { [ t ] [
-            last-path-separator drop 1+ cut
+            dup last-path-separator drop 1+ cut
             special-directory? [ no-parent-directory ] when
         ] }
     } cond ;
