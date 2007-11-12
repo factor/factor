@@ -67,11 +67,11 @@ TUPLE: no-parent-directory path ;
 : parent-directory ( path -- parent )
     trim-path-separators
     dup root-directory? [ ] [
-        dup last-path-separator drop [
+        dup last-path-separator drop dup [
             1+ cut
             special-directory?
             [ no-parent-directory ] when
-        ] when*
+        ] [ 2drop "." ] if
     ] if ;
 
 : file-name ( path -- string )
