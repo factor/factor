@@ -92,7 +92,7 @@ SYMBOL: cached-postings
     cached-postings get 4 head print-posting-summaries ;
 
 : planet-factor ( -- )
-    [
+    serving-html [
         "resource:extra/webapps/planet/planet.fhtml"
         run-template-file
     ] with-html-stream ;
