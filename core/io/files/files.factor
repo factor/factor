@@ -19,17 +19,17 @@ HOOK: make-directory io-backend ( path -- )
 
 HOOK: delete-directory io-backend ( path -- )
 
+: path-separator? ( ch -- ? ) windows? "/\\" "/" ? member? ;
+
 HOOK: root-directory? io-backend ( path -- ? )
 
-M: object root-directory? ( path -- ? ) "/" = ;
+M: object root-directory? ( path -- ? ) path-separator? ;
 
-! Words for accessing filesystem meta-data.
-
-: path-separator? ( ch -- ? )
-    "/\\" member? ;
+: trim-path-separators ( str -- newstr )
+    [ path-separator? ] right-trim ;
 
 : path+ ( str1 str2 -- str )
-    >r [ path-separator? ] right-trim "/" r>
+    >r trim-path-separators "/" r>
     [ path-separator? ] left-trim 3append ;
 
 : stat ( path -- directory? permissions length modified )
@@ -39,12 +39,15 @@ M: object root-directory? ( path -- ? ) "/" = ;
 
 : directory? ( path -- ? ) stat 3drop ;
 
+: special-directory? ( name -- ? )
+    { "." ".." } member? ;
+
 : fixup-directory ( path seq -- newseq )
     [
         dup string?
         [ tuck path+ directory? 2array ] [ nip ] if
     ] curry* map
-    [ first { "." ".." } member? not ] subset ;
+    [ first special-directory? not ] subset ;
 
 : directory ( path -- seq )
     normalize-directory dup (directory) fixup-directory ;
@@ -62,17 +65,17 @@ TUPLE: no-parent-directory path ;
     \ no-parent-directory construct-boa throw ;
 
 : parent-directory ( path -- parent )
-    {
-        { [ dup root-directory? ] [ ] }
-        { [ dup "/\\" split ".." over member? "." rot member? or ]
-            [ no-parent-directory ] }
-        { [ t ] [ dup last-path-separator
-            [ 1+ head ] [ 2drop "." ] if ] }
-    } cond ;
+    trim-path-separators
+    dup root-directory? [ ] [
+        dup last-path-separator drop [
+            1+ cut
+            special-directory?
+            [ no-parent-directory ] when
+        ] when*
+    ] if ;
 
 : file-name ( path -- string )
-    dup last-path-separator
-    [ 1+ tail ] [ drop ] if ;
+    dup last-path-separator [ 1+ tail ] [ drop ] if ;
 
 : resource-path ( path -- newpath )
     \ resource-path get [ image parent-directory ] unless*
@@ -82,8 +85,7 @@ TUPLE: no-parent-directory path ;
     "resource:" ?head [ resource-path ] when ;
 
 : make-directories ( path -- )
-    normalize-pathname
-    {
+    normalize-pathname trim-path-separators {
         { [ dup "." = ] [ ] }
         { [ dup root-directory? ] [ ] }
         { [ dup empty? ] [ ] }
@@ -93,19 +95,6 @@ TUPLE: no-parent-directory path ;
             dup make-directory
         ] }
     } cond drop ;
-
-TUPLE: pathname string ;
-
-C: <pathname> pathname
-
-M: pathname <=> [ pathname-string ] compare ;
-
-: home ( -- dir )
-    {
-        { [ winnt? ] [ "USERPROFILE" os-env ] }
-        { [ wince? ] [ "" resource-path ] }
-        { [ unix? ] [ "HOME" os-env ] }
-    } cond ;
 
 : copy-file ( from to -- )
     dup parent-directory make-directories
@@ -121,3 +110,16 @@ M: pathname <=> [ pathname-string ] compare ;
     >r dup directory swap r> [
         >r >r first r> over path+ r> rot path+ copy-file
     ] 2curry each ;
+
+: home ( -- dir )
+    {
+        { [ winnt? ] [ "USERPROFILE" os-env ] }
+        { [ wince? ] [ "" resource-path ] }
+        { [ unix? ] [ "HOME" os-env ] }
+    } cond ;
+
+TUPLE: pathname string ;
+
+C: <pathname> pathname
+
+M: pathname <=> [ pathname-string ] compare ;
