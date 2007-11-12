@@ -84,4 +84,4 @@ PRIVATE>
     "void" "libc" "memcpy" { "void*" "void*" "ulong" } alien-invoke ;
 
 : with-malloc ( size quot -- )
-    swap 1 calloc check-ptr swap keep free ; inline
+    swap 1 calloc swap keep free ; inline

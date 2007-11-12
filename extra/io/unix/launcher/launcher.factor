@@ -1,12 +1,37 @@
-IN: io.unix.launcher
+
 USING: io io.launcher io.unix.backend io.nonblocking
 sequences kernel namespaces math system alien.c-types
-debugger continuations ;
+debugger continuations combinators.lib threads ;
+
+IN: io.unix.launcher
 
 ! Search unix first
 USE: unix
 
-: with-fork ( quot -- pid )
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+! Factor friendly versions of the exec functions
+
+: >argv ( seq -- alien ) [ malloc-char-string ] map f add >c-void*-array ;
+
+: execv*  ( pathname argv -- int ) [ malloc-char-string ] [ >argv ] bi* execv ;
+: execvp* ( filename argv -- int ) [ malloc-char-string ] [ >argv ] bi* execvp ;
+
+: execve* ( pathname argv envp -- int )
+  [ malloc-char-string ] [ >argv ] [ >argv ] tri* execve ;
+
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+! Wait for a pid to finish without freezing up all the Factor threads.
+! Need to find a less kludgy way to do this.
+
+: wait-for-pid ( pid -- )
+  dup "int" <c-object> WNOHANG waitpid
+  0 = [ 100 sleep wait-for-pid ] [ drop ] if ;
+
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+: with-fork ( child parent -- pid )
     fork [ zero? -rot if ] keep ; inline
 
 : prepare-execvp ( args -- cmd args )
