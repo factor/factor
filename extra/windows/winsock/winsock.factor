@@ -413,6 +413,11 @@ FUNCTION: void GetAcceptExSockaddrs ( void* a, int b, int c, int d, void* e, voi
     ] when ;
 
 : winsock-error!=0/f ( n/f -- )
+    { 0 f } member? [
+        winsock-error-string throw
+    ] unless ;
+
+: winsock-return-check ( n/f -- )
     dup { 0 f } member? [
         drop
     ] [
@@ -433,5 +438,5 @@ FUNCTION: void GetAcceptExSockaddrs ( void* a, int b, int c, int d, void* e, voi
     SOCKET_ERROR = [ winsock-error ] when ;
 
 : init-winsock ( -- )
-    HEX: 0202 <wsadata> WSAStartup winsock-error!=0/f ;
+    HEX: 0202 <wsadata> WSAStartup winsock-return-check ;
 
