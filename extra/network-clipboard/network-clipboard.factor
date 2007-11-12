@@ -31,9 +31,6 @@ IN: network-clipboard
     { +listener+ t }
 } define-command
 
-: <client-datagram> ( -- datagram )
-    "0.0.0.0" 0 <inet4> <datagram> ;
-
 : with-client ( addrspec quot -- )
     >r <client> r> with-stream ; inline
 
