@@ -205,5 +205,10 @@ long getpagesize(void)
 
 void sleep_millis(DWORD msec)
 {
-    Sleep(msec);
+	Sleep(msec);
+}
+
+DEFINE_PRIMITIVE(os_envs)
+{
+	not_implemented_error();
 }

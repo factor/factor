@@ -272,6 +272,7 @@ H{ } clone update-map set
     { "set-innermost-frame-quot" "kernel.private" }
     { "call-clear" "kernel" }
     { "strip-compiled-quotations" "quotations" }
+    { "(os-envs)" "system" }
 }
 dup length [ >r first2 r> make-primitive ] 2each
 

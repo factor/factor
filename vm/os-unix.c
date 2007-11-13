@@ -128,6 +128,24 @@ DEFINE_PRIMITIVE(cd)
 	chdir(unbox_char_string());
 }
 
+DEFINE_PRIMITIVE(os_envs)
+{
+	GROWABLE_ARRAY(result);
+	char **env = environ;
+
+	while(*env)
+	{
+		REGISTER_UNTAGGED(result);
+		CELL string = tag_object(from_char_string(*env));
+		UNREGISTER_UNTAGGED(result);
+		GROWABLE_ADD(result,string);
+		env++;
+	}
+
+	GROWABLE_TRIM(result);
+	dpush(tag_object(result));
+}
+
 F_SEGMENT *alloc_segment(CELL size)
 {
 	int pagesize = getpagesize();

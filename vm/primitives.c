@@ -195,4 +195,5 @@ void *primitives[] = {
 	primitive_set_innermost_stack_frame_quot,
 	primitive_call_clear,
 	primitive_strip_compiled_quotations,
+	primitive_os_envs,
 };

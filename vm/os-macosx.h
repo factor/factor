@@ -11,3 +11,8 @@ const char *vm_executable_path(void);
 const char *default_image_path(void);
 
 DLLEXPORT void c_to_factor_toplevel(CELL quot);
+
+#ifndef environ
+	extern char ***_NSGetEnviron(void);
+	#define environ (*_NSGetEnviron())
+#endif

@@ -577,3 +577,5 @@ t over set-effect-terminated?
 \ innermost-frame-scan { callstack } { fixnum } <effect> "inferred-effect" set-word-prop
 
 \ set-innermost-frame-quot { quotation callstack } { } <effect> "inferred-effect" set-word-prop
+
+\ (os-envs) { } { array } <effect> "inferred-effect" set-word-prop

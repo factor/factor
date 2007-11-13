@@ -1,7 +1,8 @@
 ! Copyright (C) 2007 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 IN: system
-USING: kernel kernel.private sequences math namespaces ;
+USING: kernel kernel.private sequences math namespaces
+splitting assocs ;
 
 : cell ( -- n ) 7 getenv ; foldable
 
@@ -55,3 +56,6 @@ USING: kernel kernel.private sequences math namespaces ;
 : bootstrap-cells bootstrap-cell * ; inline
 
 : bootstrap-cell-bits 8 bootstrap-cells ; inline
+
+: os-envs ( -- assoc )
+    (os-envs) [ "=" split1 ] H{ } map>assoc ;
