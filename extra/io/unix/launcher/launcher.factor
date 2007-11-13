@@ -1,8 +1,8 @@
-
+! Copyright (C) 2007 Slava Pestov.
+! See http://factorcode.org/license.txt for BSD license.
 USING: io io.launcher io.unix.backend io.nonblocking
 sequences kernel namespaces math system alien.c-types
-debugger continuations ;
-
+debugger continuations arrays assocs combinators ;
 IN: io.unix.launcher
 
 ! Search unix first
@@ -11,33 +11,66 @@ USE: unix
 : with-fork ( child parent -- pid )
     fork [ zero? -rot if ] keep ; inline
 
-: prepare-execvp ( args -- cmd args )
+: get-arguments ( -- seq )
+    +command+ get
+    [ "/bin/sh" "-c" rot 3array ] [ +arguments+ get ] if* ;
+
+: execve? ( -- ? )
+    +environment+ get assoc-empty?
+    [ +environment-mode+ get replace-environment eq? ]
+    [ t ] if ;
+
+: get-environment ( -- env )
+    +environment+ get
+    +environment-mode+ get {
+        { prepend-environment [ os-envs union ] }
+        { append-environment [ os-envs swap union ] }
+        { replace-environment [ ] }
+    } case ;
+
+: >null-term-array f add >c-void*-array ;
+
+: prepare-execvp ( -- cmd args )
     #! Doesn't free any memory, so we only call this word
     #! after forking.
+    get-arguments
     [ malloc-char-string ] map
-    [ first ] keep
-    f add >c-void*-array ;
+    dup first swap >null-term-array ;
 
-: (spawn-process) ( args -- )
-    [ prepare-execvp execvp ] catch 1 exit ;
+: prepare-execve ( -- cmd args env )
+    #! Doesn't free any memory, so we only call this word
+    #! after forking.
+    prepare-execvp
+    get-environment
+    [ "=" swap 3append malloc-char-string ] { } assoc>map
+    >null-term-array ;
 
-: spawn-process ( args -- pid )
-    [ (spawn-process) ] [ drop ] with-fork ;
+: (spawn-process) ( -- )
+    [
+        execve? [
+            prepare-execve execve
+        ] [
+            prepare-execvp execvp
+        ] if io-error
+    ] [ error. :c flush ] recover 1 exit ;
 
 : wait-for-process ( pid -- )
     0 <int> 0 waitpid drop ;
 
-: shell-command ( string -- args )
-    { "/bin/sh" "-c" } swap add ;
+: spawn-process ( -- pid )
+    [ (spawn-process) ] [ ] with-fork ;
 
-M: unix-io run-process ( string -- )
-    shell-command spawn-process wait-for-process ;
+: spawn-detached ( -- )
+    [ spawn-process 0 exit ] [ ] with-fork wait-for-process ;
 
-: detached-shell-command ( string -- args )
-    shell-command "&" add ;
-
-M: unix-io run-detached ( string -- )
-    detached-shell-command spawn-process wait-for-process ;
+M: unix-io run-process* ( desc -- )
+    [
+        +detached+ get [
+            spawn-detached
+        ] [
+            spawn-process wait-for-process
+        ] if
+    ] with-descriptor ;
 
 : open-pipe ( -- pair )
     2 "int" <c-array> dup pipe zero?
@@ -47,13 +80,12 @@ M: unix-io run-detached ( string -- )
     2dup first close second close
     >r first 0 dup2 drop r> second 1 dup2 drop ;
 
-: spawn-process-stream ( args -- in out pid )
+: spawn-process-stream ( -- in out pid )
     open-pipe open-pipe [
         setup-stdio-pipe
         (spawn-process)
     ] [
         2dup second close first close
-        rot drop
     ] with-fork >r first swap second r> ;
 
 TUPLE: pipe-stream pid ;
@@ -66,5 +98,5 @@ M: pipe-stream stream-close
     dup delegate stream-close
     pipe-stream-pid wait-for-process ;
 
-M: unix-io <process-stream>
-    shell-command spawn-process-stream <pipe-stream> ;
+M: unix-io process-stream*
+    [ spawn-process-stream <pipe-stream> ] with-descriptor ;
