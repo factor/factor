@@ -3,6 +3,11 @@ IN: unix.linux.sockios
 
 ! Imported from linux-headers-2.6.15-28-686 on Ubuntu 6.06
 
+! Routing table calls
+: SIOCADDRT	HEX: 890B ;		! add routing table entry
+: SIOCDELRT	HEX: 890C ;		! delete routing table entry
+: SIOCRTMSG	HEX: 890D ;		! call to routing system
+
 ! Socket configuration controls
 
 : SIOCGIFNAME	     HEX: 8910 ;		! get iface name
