@@ -1,5 +1,4 @@
-USING: ui.gadgets.controls help.markup
-help.syntax strings ui.gadgets models ;
+USING: help.markup help.syntax strings ui.gadgets models ;
 IN: ui.gadgets.labels
 
 HELP: label

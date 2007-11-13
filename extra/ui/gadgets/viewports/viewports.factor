@@ -1,7 +1,7 @@
 ! Copyright (C) 2005, 2007 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 IN: ui.gadgets.viewports
-USING: arrays ui.gadgets ui.gadgets.borders ui.gadgets.controls
+USING: arrays ui.gadgets ui.gadgets.borders
 kernel math namespaces sequences models math.vectors ;
 
 : viewport-gap { 3 3 } ; inline

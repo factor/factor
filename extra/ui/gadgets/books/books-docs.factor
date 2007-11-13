@@ -1,4 +1,4 @@
-USING: ui.gadgets.books ui.gadgets.controls help.markup
+USING: ui.gadgets.books help.markup
 help.syntax ui.gadgets models ;
 
 HELP: book

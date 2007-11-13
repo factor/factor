@@ -1,5 +1,4 @@
-USING: ui.gadgets.controls help.markup help.syntax ui.gadgets
-models ;
+USING: help.markup help.syntax ui.gadgets models ;
 IN: ui.gadgets.sliders
 
 HELP: elevator

@@ -5,7 +5,7 @@ ui.tools.operations ui.tools.browser ui.tools.inspector
 ui.tools.listener ui.tools.profiler ui.tools.walker
 ui.tools.operations inspector io kernel math models namespaces
 prettyprint quotations sequences ui ui.commands ui.gadgets
-ui.gadgets.books ui.gadgets.buttons ui.gadgets.controls
+ui.gadgets.books ui.gadgets.buttons
 ui.gadgets.labelled ui.gadgets.scrollers ui.gadgets.tracks
 ui.gadgets.worlds ui.gadgets.presentations ui.gestures words
 vocabs.loader tools.test ui.gadgets.buttons

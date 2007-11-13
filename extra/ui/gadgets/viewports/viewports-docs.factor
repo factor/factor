@@ -1,4 +1,4 @@
-USING: ui.gadgets.viewports ui.gadgets.controls help.markup
+USING: ui.gadgets.viewports help.markup
 help.syntax ui.gadgets models ;
 
 HELP: viewport

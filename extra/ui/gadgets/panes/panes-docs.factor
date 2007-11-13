@@ -1,5 +1,5 @@
-USING: ui.gadgets.controls ui.gadgets models
-help.markup help.syntax io kernel quotations ;
+USING: ui.gadgets models help.markup help.syntax io kernel
+quotations ;
 IN: ui.gadgets.panes
 
 HELP: pane

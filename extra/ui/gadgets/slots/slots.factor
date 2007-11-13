@@ -3,7 +3,7 @@
 USING: namespaces ui.gadgets ui.gestures ui.commands kernel
 ui.gadgets.scrollers parser prettyprint ui.gadgets.buttons
 sequences arrays ui.gadgets.borders ui.gadgets.tracks
-ui.gadgets.editors ui.gadgets.controls io math
+ui.gadgets.editors io math
 definitions math.vectors assocs refs ;
 IN: ui.gadgets.slots
 

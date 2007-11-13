@@ -1,6 +1,5 @@
-USING: ui.commands help.markup help.syntax
-ui.gadgets ui.gadgets.presentations ui.gadgets.controls
-ui.operations kernel models classes ;
+USING: ui.commands help.markup help.syntax ui.gadgets
+ui.gadgets.presentations ui.operations kernel models classes ;
 IN: ui.gadgets.lists
 
 HELP: +secondary+

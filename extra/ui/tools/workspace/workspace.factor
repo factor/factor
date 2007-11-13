@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: classes continuations help help.topics kernel models
 sequences ui ui.backend ui.tools.debugger ui.gadgets
-ui.gadgets.books ui.gadgets.buttons ui.gadgets.controls
+ui.gadgets.books ui.gadgets.buttons
 ui.gadgets.labelled ui.gadgets.panes ui.gadgets.scrollers
 ui.gadgets.tracks ui.gadgets.worlds ui.gadgets.presentations
 ui.gadgets.status-bar ui.commands ui.gestures assocs arrays

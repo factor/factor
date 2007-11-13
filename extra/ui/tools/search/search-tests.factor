@@ -1,6 +1,6 @@
 USING: assocs ui.tools.search help.topics io.files io.styles
 kernel namespaces sequences source-files threads timers
-tools.test ui.gadgets ui.gadgets.controls ui.gestures vocabs
+tools.test ui.gadgets ui.gestures vocabs
 vocabs.loader words ;
 IN: temporary
 

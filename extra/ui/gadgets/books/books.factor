@@ -1,6 +1,6 @@
 ! Copyright (C) 2006, 2007 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel sequences models ui.gadgets ui.gadgets.controls ;
+USING: kernel sequences models ui.gadgets ;
 IN: ui.gadgets.books
 
 TUPLE: book ;

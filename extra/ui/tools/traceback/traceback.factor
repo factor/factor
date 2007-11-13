@@ -1,7 +1,7 @@
 ! Copyright (C) 2006, 2007 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: continuations kernel models namespaces prettyprint ui
-ui.commands ui.gadgets ui.gadgets.controls ui.gadgets.labelled
+ui.commands ui.gadgets ui.gadgets.labelled
 ui.gadgets.tracks ui.gestures ;
 IN: ui.tools.traceback
 

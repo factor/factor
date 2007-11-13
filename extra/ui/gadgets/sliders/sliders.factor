@@ -1,7 +1,7 @@
 ! Copyright (C) 2005, 2007 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: arrays ui.gestures ui.gadgets ui.gadgets.buttons
-ui.gadgets.controls ui.gadgets.frames ui.gadgets.grids
+ui.gadgets.frames ui.gadgets.grids
 ui.gadgets.theme ui.render kernel math namespaces sequences
 vectors models math.vectors math.functions quotations colors ;
 IN: ui.gadgets.sliders

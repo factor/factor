@@ -1,5 +1,5 @@
 USING: ui.gadgets help.markup help.syntax strings models
-ui.gadgets.panes ui.gadgets.controls ;
+ui.gadgets.panes ;
 IN: ui.gadgets.labelled
 
 HELP: labelled-gadget

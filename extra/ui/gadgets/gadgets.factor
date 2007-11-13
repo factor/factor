@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: arrays hashtables kernel models math namespaces sequences
 timers quotations math.vectors combinators sorting vectors
-dlists ;
+dlists models ;
 IN: ui.gadgets
 
 TUPLE: rect loc dim ;
@@ -43,11 +43,14 @@ M: array rect-dim drop { 0 0 } ;
 TUPLE: gadget
 pref-dim parent children orientation state focus
 visible? root? clipped? grafted?
-interior boundary ;
+interior boundary
+model ;
 
 M: gadget equal? 2drop f ;
 
 M: gadget hashcode* drop gadget hashcode* ;
+
+M: gadget model-changed drop ;
 
 : gadget-child ( gadget -- child ) gadget-children first ;
 
@@ -63,7 +66,24 @@ M: gadget hashcode* drop gadget hashcode* ;
     } gadget construct ;
 
 : construct-gadget ( class -- tuple )
-    >r <gadget> { set-delegate } r> construct ; inline
+    >r <gadget> r> construct-delegate ; inline
+
+: construct-control ( model gadget class -- control )
+    >r tuck set-gadget-model r> construct-delegate ; inline
+
+: activate-control ( gadget -- )
+    dup gadget-model dup [ dupd add-connection ] when
+    model-changed ;
+
+: deactivate-control ( gadget -- )
+    dup gadget-model dup [ dupd remove-connection ] when
+    drop ;
+
+: control-value ( control -- value )
+    gadget-model model-value ;
+
+: set-control-value ( value control -- )
+    gadget-model set-model ;
 
 : relative-loc ( fromgadget togadget -- loc )
     2dup eq? [
@@ -228,6 +248,7 @@ M: gadget graft* drop ;
 : graft ( gadget -- )
     t over set-gadget-grafted?
     dup graft*
+    dup activate-control
     [ graft ] each-child ;
 
 GENERIC: ungraft* ( gadget -- )
@@ -237,6 +258,7 @@ M: gadget ungraft* drop ;
 : ungraft ( gadget -- )
     dup gadget-grafted? [
         dup [ ungraft ] each-child
+        dup deactivate-control
         dup ungraft*
         f over set-gadget-grafted?
     ] when drop ;

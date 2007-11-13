@@ -1,6 +1,5 @@
 USING: documents help.markup help.syntax ui.gadgets
-ui.gadgets.scrollers ui.gadgets.controls
-models strings ui.commands ;
+ui.gadgets.scrollers models strings ui.commands ;
 IN: ui.gadgets.editors
 
 HELP: editor
