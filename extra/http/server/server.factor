@@ -32,7 +32,7 @@ IN: http.server
 
 : host ( -- string )
     #! The host the current responder was called from.
-    "Host" "header" get at ":" split1 drop ;
+    "Host" header-param ":" split1 drop ;
 
 : (handle-request) ( arg cmd -- method path host )
     request-method dup "method" set swap

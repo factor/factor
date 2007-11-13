@@ -14,21 +14,22 @@ IN: http.server.responders.file
     file-modified unix-time>timestamp timestamp>http-string ;
 
 : file-response ( filename mime-type -- )
+    "200 OK" response
     [
         "Content-Type" set
         dup file-length number>string "Content-Length" set
         file-http-date "Last-Modified" set
         now timestamp>http-string "Date" set
-    ] H{ } make-assoc "200 OK" response nl ;
+    ] H{ } make-assoc print-header ;
 
 : last-modified-matches? ( filename -- bool )
     file-http-date dup [
-        "If-Modified-Since" "header" get at = 
+        "If-Modified-Since" header-param = 
     ] when ;
 
 : not-modified-response ( -- )
-    now timestamp>http-string "Date" associate
-    "304 Not Modified" response nl ;  
+    "304 Not Modified" response
+    now timestamp>http-string "Date" associate print-header ;  
 
 : serve-static ( filename mime-type -- )
     over last-modified-matches? [

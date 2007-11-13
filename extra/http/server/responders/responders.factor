@@ -11,22 +11,22 @@ SYMBOL: vhosts
 SYMBOL: responders
 
 : print-header ( alist -- )
-    [ swap write ": " write print ] assoc-each ;
+    [ swap write ": " write print ] assoc-each nl ;
 
-: response ( header msg -- )
-    "HTTP/1.0 " write print print-header ;
+: response ( msg -- ) "HTTP/1.0 " write print ;
 
 : error-body ( error -- )
     <html> <body> <h1> write </h1> </body> </html> ;
 
 : error-head ( error -- )
     dup log-error
-    H{ { "Content-Type" "text/html" } } swap response ;
+    dup response
+    H{ { "Content-Type" "text/html" } } print-header nl ;
 
 : httpd-error ( error -- )
     #! This must be run from handle-request
     dup error-head
-    "head" "method" get = [ drop ] [ nl error-body ] if ;
+    "head" "method" get = [ drop ] [ error-body ] if ;
 
 : bad-request ( -- )
     [
@@ -36,8 +36,8 @@ SYMBOL: responders
     ] with-scope ;
 
 : serving-content ( mime -- )
-    "Content-Type" associate
-    "200 Document follows" response nl ;
+    "200 Document follows" response
+    "Content-Type" associate print-header ;
 
 : serving-html "text/html" serving-content ;
 
@@ -46,14 +46,14 @@ SYMBOL: responders
 
 : serving-text "text/plain" serving-content ;
 
-: (redirect) ( to response -- )
-    >r "Location" associate r> response nl ;
+: redirect ( to response -- )
+    response "Location" associate print-header ;
 
 : permanent-redirect ( to -- )
-    "301 Moved Permanently" (redirect) ;
+    "301 Moved Permanently" redirect ;
 
 : temporary-redirect ( to -- )
-    "307 Temporary Redirect" (redirect) ;
+    "307 Temporary Redirect" redirect ;
 
 : directory-no/ ( -- )
     [
@@ -122,6 +122,8 @@ SYMBOL: max-post-request
 ! - raw-response -- raw POST request response
 
 : query-param ( key -- value ) "query" get at ;
+
+: header-param ( key -- value ) "header" get at ;
 
 : add-responder ( responder -- )
     #! Add a responder object to the list.
