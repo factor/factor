@@ -4,7 +4,7 @@
 USING: kernel furnace fjsc  parser-combinators namespaces
        lazy-lists io io.files furnace.validator sequences 
        http.client http.server http.server.responders 
-       http.server.responders.file ;
+       webapps.file ;
 IN: webapps.fjsc
 
 : compile ( code -- )

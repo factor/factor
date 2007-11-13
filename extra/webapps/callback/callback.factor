@@ -1,9 +1,10 @@
 ! Copyright (C) 2004 Chris Double.
 ! Copyright (C) 2006 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: html http http.server.responders io kernel math namespaces
-prettyprint continuations random system sequences assocs ;
-IN: http.server.responders.callback
+USING: html http http.server.responders io kernel math
+namespaces prettyprint continuations random system sequences
+assocs ;
+IN: webapps.callback
 
 #! Name of the variable holding the continuation used to exit
 #! back to the httpd responder.

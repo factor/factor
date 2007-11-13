@@ -210,3 +210,43 @@ M: html-stream stream-nl ( stream -- )
         <title> write </title>
         default-css
     ] html-document ;
+
+: vertical-layout ( list -- )
+    #! Given a list of HTML components, arrange them vertically.
+    <table> 
+    [ <tr> <td> call </td> </tr> ] each
+    </table> ;
+
+: horizontal-layout ( list -- )
+    #! Given a list of HTML components, arrange them horizontally.
+    <table> 
+     <tr "top" =valign tr> [ <td> call </td> ] each </tr>
+    </table> ;
+
+: button ( label -- )
+    #! Output an HTML submit button with the given label.
+    <input "submit" =type =value input/> ;
+
+: paragraph ( str -- )
+    #! Output the string as an html paragraph
+    <p> write </p> ;
+
+: simple-page ( title quot -- )
+    #! Call the quotation, with all output going to the
+    #! body of an html page with the given title.
+    <html>  
+        <head> <title> swap write </title> </head> 
+        <body> call </body>
+    </html> ;
+
+: styled-page ( title stylesheet-quot quot -- )
+    #! Call the quotation, with all output going to the
+    #! body of an html page with the given title. stylesheet-quot
+    #! is called to generate the required stylesheet.
+    <html>  
+        <head>  
+             <title> rot write </title> 
+             swap call 
+        </head> 
+        <body> call </body>
+    </html> ;

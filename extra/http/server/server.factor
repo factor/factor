@@ -2,9 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: assocs kernel namespaces io strings splitting
 threads http http.server.responders sequences prettyprint
-io.server http.server.responders.file
-http.server.responders.callback
-http.server.responders.continuation ;
+io.server ;
 
 IN: http.server
 
@@ -63,3 +61,9 @@ IN: http.server
 : httpd-main ( -- ) 8888 httpd ;
 
 MAIN: httpd-main
+
+! Load default webapps
+USE: webapps.file
+USE: webapps.callback
+USE: webapps.continuation
+USE: webapps.cgi

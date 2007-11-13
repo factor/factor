@@ -22,10 +22,11 @@
 ! ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 !
 ! Simple test applications
-USING: hashtables html kernel io html html.elements strings math assocs quotations
-http.server.responders.continuation namespaces prettyprint sequences ;
+USING: hashtables html kernel io html html.elements strings math
+assocs quotations webapps.continuation namespaces prettyprint
+sequences ;
 
-IN: http.server.responders.continuation.examples
+IN: webapps.continuation.examples
 
 : display-page ( title -- ) 
   #! Display a page with some text to test the cont-responder.

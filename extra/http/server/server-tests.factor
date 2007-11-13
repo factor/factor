@@ -1,4 +1,4 @@
-USING: http.server.responders.file http.server.responders http
+USING: webapps.file http.server.responders http
 http.server namespaces io tools.test strings io.server ;
 IN: temporary
 

@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: namespaces kernel assocs io.files combinators
 arrays io.launcher io http.server http.server.responders
-http.server.responders.file sequences strings ;
+webapps.file sequences strings ;
 IN: webapps.cgi
 
 SYMBOL: cgi-root
@@ -67,4 +67,6 @@ SYMBOL: cgi-root
         { [ t ] [ (do-cgi) ] }
     } cond ;
 
-"cgi" [ "argument" get do-cgi ] add-simple-responder
+global [
+    "cgi" [ "argument" get do-cgi ] add-simple-responder
+] bind

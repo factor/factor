@@ -5,7 +5,7 @@ http.server.responders http.server.templating namespaces parser
 sequences strings assocs hashtables debugger http.mime sorting
 html.elements ;
 
-IN: http.server.responders.file
+IN: webapps.file
 
 : serving-path ( filename -- filename )
     "" or "doc-root" get swap path+ ;

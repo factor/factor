@@ -31,10 +31,10 @@
 ! to use HTML. The remaining code was untouched. 
 !
 ! The result is not that pretty but it shows the basic idea.
-USING: kernel math parser html html.elements io namespaces math.parser
-random http.server.responders.continuation ;
+USING: kernel math parser html html.elements io namespaces
+math.parser random webapps.continuation ;
 
-IN: http.server.responders.continuation.examples.numbers
+IN: webapps.numbers
 
 : web-print ( str -- )
   #! Display the string in a web page.

@@ -4,7 +4,7 @@
 USING: kernel furnace sqlite.tuple-db webapps.article-manager.database 
        sequences namespaces math arrays assocs quotations io.files
        http.server http.basic-authentication http.server.responders 
-       http.server.responders.file ;
+       webapps.file ;
 IN: webapps.article-manager
 
 : current-site ( -- site )

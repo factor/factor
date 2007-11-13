@@ -11,7 +11,7 @@
 IN: rss.reader
 USING: kernel html namespaces sequences io quotations
 assocs sqlite.tuple-db sqlite io.files html.elements
-rss http.server.responders.continuation ;
+rss webapps.continuation ;
    
 TUPLE: reader-feed url title link ;
 

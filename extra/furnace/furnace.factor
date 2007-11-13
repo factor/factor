@@ -4,7 +4,7 @@ USING: kernel vectors io assocs quotations splitting strings
        words sequences namespaces arrays hashtables debugger
        continuations tuples classes io.files 
        http http.server.templating http.basic-authentication 
-       http.server.responders.callback html html.elements 
+       webapps.callback html html.elements 
        http.server.responders furnace.validator ;
 IN: furnace
 
