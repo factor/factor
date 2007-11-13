@@ -3,22 +3,20 @@ IN: temporary
 
 TUPLE: dummy-obj destroyed? ;
 
-TUPLE: dummy-destructor ;
+: <dummy-obj> dummy-obj construct-empty ;
 
-: <dummy-destructor> ( obj ? -- newobj )
-    <destructor> dummy-destructor construct-delegate ;
+TUPLE: dummy-destructor obj ;
 
-M: dummy-destructor (destruct) ( obj -- )
-    destructor-obj t swap set-dummy-obj-destroyed? ;
+C: <dummy-destructor> dummy-destructor
 
-: <dummy-obj>
-    \ dummy-obj construct-empty ;
+M: dummy-destructor destruct ( obj -- )
+    dummy-destructor-obj t swap set-dummy-obj-destroyed? ;
 
 : destroy-always
-    t <dummy-destructor> push-destructor ;
+    <dummy-destructor> add-always-destructor ;
 
 : destroy-later
-    f <dummy-destructor> push-destructor ;
+    <dummy-destructor> add-error-destructor ;
 
 [ t ] [
     [

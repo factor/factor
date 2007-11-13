@@ -1,32 +1,31 @@
+! Copyright (C) 2004, 2007 Mackenzie Straight, Doug Coleman.
+! See http://factorcode.org/license.txt for BSD license.
 USING: alien alien.c-types arrays destructors io io.backend
 io.buffers io.files io.nonblocking io.sockets io.binary
 io.sockets.impl windows.errors strings io.streams.duplex kernel
 math namespaces sequences windows windows.kernel32
-windows.winsock windows.winsock.private ;
+windows.winsock splitting ;
 IN: io.windows
 
 TUPLE: windows-nt-io ;
 TUPLE: windows-ce-io ;
 UNION: windows-io windows-nt-io windows-ce-io ;
 
-M: windows-io (handle-destructor) ( obj -- )
-    destructor-obj CloseHandle drop ;
+M: windows-io destruct-handle CloseHandle drop ;
 
-M: windows-io (socket-destructor) ( obj -- )
-    destructor-obj closesocket drop ;
+M: windows-io destruct-socket closesocket drop ;
 
 TUPLE: win32-file handle ptr overlapped ;
 
-: <win32-file>  ( handle ptr -- obj )
-    { set-win32-file-handle set-win32-file-ptr }
-    \ win32-file construct ;
+: <win32-file> ( handle ptr -- obj )
+    f win32-file construct-boa ;
 
 HOOK: CreateFile-flags io-backend ( -- DWORD )
 HOOK: FileArgs-overlapped io-backend ( port -- overlapped/f )
 HOOK: add-completion io-backend ( port -- )
 
 M: windows-io normalize-directory ( string -- string )
-    dup peek CHAR: \\ = "*" "\\*" ? append ;
+    "\\" ?tail drop "\\*" append ;
 
 : share-mode ( -- fixnum )
     FILE_SHARE_READ FILE_SHARE_WRITE bitor ; inline

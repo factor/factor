@@ -147,11 +147,9 @@ FUNCTION: int setsockopt ( SOCKET s, int level, int optname, char* optval, int o
 
 FUNCTION: ushort htons ( ushort n ) ;
 FUNCTION: ushort ntohs ( ushort n ) ;
-<PRIVATE
 FUNCTION: int bind ( void* socket, sockaddr_in* sockaddr, int len ) ;
 FUNCTION: int listen ( void* socket, int backlog ) ;
 FUNCTION: char* inet_ntoa ( int in-addr ) ;
-PRIVATE>
 FUNCTION: int getaddrinfo ( char* nodename,
                             char* servername,
                             addrinfo* hints,

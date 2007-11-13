@@ -15,19 +15,6 @@ USE: unix
     +command+ get
     [ "/bin/sh" "-c" rot 3array ] [ +arguments+ get ] if* ;
 
-: execve? ( -- ? )
-    +environment+ get assoc-empty?
-    [ +environment-mode+ get replace-environment eq? ]
-    [ t ] if ;
-
-: get-environment ( -- env )
-    +environment+ get
-    +environment-mode+ get {
-        { prepend-environment [ os-envs union ] }
-        { append-environment [ os-envs swap union ] }
-        { replace-environment [ ] }
-    } case ;
-
 : >null-term-array f add >c-void*-array ;
 
 : prepare-execvp ( -- cmd args )
@@ -47,7 +34,7 @@ USE: unix
 
 : (spawn-process) ( -- )
     [
-        execve? [
+        pass-environment? [
             prepare-execve execve
         ] [
             prepare-execvp execvp

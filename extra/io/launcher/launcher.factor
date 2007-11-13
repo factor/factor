@@ -1,7 +1,7 @@
 ! Copyright (C) 2007 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: io.backend system kernel namespaces strings hashtables
-sequences assocs ;
+sequences assocs combinators ;
 IN: io.launcher
 
 SYMBOL: +command+
@@ -25,6 +25,18 @@ SYMBOL: append-environment
 
 : with-descriptor ( desc quot -- )
     default-descriptor [ >r clone r> bind ] bind ; inline
+
+: pass-environment? ( -- ? )
+    +environment+ get assoc-empty? not
+    +environment-mode+ get replace-environment eq? or ;
+
+: get-environment ( -- env )
+    +environment+ get
+    +environment-mode+ get {
+        { prepend-environment [ os-envs union ] }
+        { append-environment [ os-envs swap union ] }
+        { replace-environment [ ] }
+    } case ;
 
 GENERIC: >descriptor ( obj -- desc )
 

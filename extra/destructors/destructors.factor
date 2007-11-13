@@ -4,124 +4,86 @@ USING: continuations io.backend libc kernel namespaces
 sequences system vectors ;
 IN: destructors
 
-SYMBOL: destructors
+GENERIC: destruct ( obj -- )
 
-TUPLE: destructor obj always? destroyed? ;
+SYMBOL: error-destructors
+SYMBOL: always-destructors
 
-: <destructor> ( obj always? -- newobj )
-    {
-        set-destructor-obj
-        set-destructor-always?
-    } destructor construct ;
+TUPLE: destructor object destroyed? ;
 
-: push-destructor ( obj -- )
-    destructors [ ?push ] change ;
-
-GENERIC: (destruct) ( obj -- )
-
-: destruct ( obj -- )
+M: destructor destruct
     dup destructor-destroyed? [
         drop
     ] [
-        [ (destruct) t ] keep set-destructor-destroyed?
+        dup destructor-object destruct
+        t swap set-destructor-destroyed?
     ] if ;
 
-: destruct-always ( destructor -- )
-    dup destructor-always? [
-        destruct
-    ] [
-        drop
-    ] if ;
+: <destructor> ( obj -- newobj )
+    f destructor construct-boa ;
+
+: add-error-destructor ( obj -- )
+    <destructor> error-destructors get push ;
+
+: add-always-destructor ( obj -- )
+    <destructor> always-destructors get push ;
+
+: do-always-destructors ( -- )
+    always-destructors get [ destruct ] each ;
+
+: do-error-destructors ( -- )
+    error-destructors get [ destruct ] each ;
 
 : with-destructors ( quot -- )
     [
-        [ call ]
-        [ destructors get [ destruct-always ] each ]
-        [ destructors get [ destruct ] each ] cleanup
+        V{ } clone always-destructors set
+        V{ } clone error-destructors set
+        [ do-always-destructors ]
+        [ do-error-destructors ] cleanup
     ] with-scope ; inline
 
+! Memory allocations
+TUPLE: memory-destructor alien ;
 
+C: <memory-destructor> memory-destructor
 
-TUPLE: memory-destructor ;
-
-: <memory-destructor> ( obj ? -- newobj )
-    <destructor> memory-destructor construct-delegate ;
-
-TUPLE: handle-destructor ;
-
-: <handle-destructor> ( obj ? -- newobj )
-    <destructor> handle-destructor construct-delegate ;
-
-TUPLE: socket-destructor ;
-
-: <socket-destructor> ( obj ? -- newobj )
-    <destructor> socket-destructor construct-delegate ;
-
-M: memory-destructor (destruct) ( obj -- )
-    destructor-obj free ;
-
-HOOK: (handle-destructor) io-backend ( obj -- )
-HOOK: (socket-destructor) io-backend ( obj -- )
-
-M: handle-destructor (destruct) ( obj -- ) (handle-destructor) ;
-M: socket-destructor (destruct) ( obj -- ) (socket-destructor) ;
+M: memory-destructor destruct ( obj -- )
+    memory-destructor-alien free ;
 
 : free-always ( alien -- )
-    t <memory-destructor> push-destructor ;
+    <memory-destructor> add-always-destructor ;
 
 : free-later ( alien -- )
-    f <memory-destructor> push-destructor ;
+    <memory-destructor> add-error-destructor ;
+
+! Handles
+TUPLE: handle-destructor alien ;
+
+C: <handle-destructor> handle-destructor
+
+HOOK: destruct-handle io-backend ( obj -- )
+
+M: handle-destructor destruct ( obj -- )
+    handle-destructor-alien destruct-handle ;
 
 : close-always ( handle -- )
-    t <handle-destructor> push-destructor ;
+    <handle-destructor> add-always-destructor ;
 
 : close-later ( handle -- )
-    f <handle-destructor> push-destructor ;
+    <handle-destructor> add-error-destructor ;
+
+! Sockets
+TUPLE: socket-destructor alien ;
+
+C: <socket-destructor> socket-destructor
+
+HOOK: destruct-socket io-backend ( obj -- )
+
+M: socket-destructor destruct ( obj -- )
+    socket-destructor-alien destruct-socket ;
 
 : close-socket-always ( handle -- )
-    t <socket-destructor> push-destructor ;
+    <socket-destructor> add-always-destructor ;
 
 : close-socket-later ( handle -- )
-    f <socket-destructor> push-destructor ;
-
-
-! : add-destructor ( word quot -- )
-    ! >quotation
-    ! "slot-destructor" set-word-prop ;
-
-! MACRO: destruct ( class -- )
-    ! "slots" word-prop
-    ! [ slot-spec-reader "slot-destructor" word-prop ] subset
-    ! [
-        ! [
-            ! slot-spec-reader [ 1quotation ] keep
-            ! "slot-destructor" word-prop [ when* ] curry compose
-            ! [ keep f swap ] curry
-        ! ] keep slot-spec-writer 1quotation compose
-        ! dupd curry
-    ! ] map concat nip ;
-
-! : DTOR: scan-word parse-definition add-destructor ; parsing
-
-! : free-destructor ( word -- )
-    ! [ free ] add-destructor ;
-
-! : stream-destructor ( word -- )
-    ! [ stream-close ] add-destructor ;
-
-
-! TUPLE: foo a b c ;
-! C: <foo> foo
-
-! DTOR: foo-a "lol, a destructor" print drop ;
-! DTOR: foo-b "lol, b destructor" print drop ;
-
-! TUPLE: stuff mem stream ;
-! : <stuff>
-    ! 100 malloc
-    ! "license.txt" resource-path <file-reader>
-    ! \ stuff construct-boa ;
-
-! DTOR: stuff-mem free-destructor ;
-! DTOR: stuff-stream stream-destructor ;
-
+    <socket-destructor> add-error-destructor ;
