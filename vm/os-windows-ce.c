@@ -37,6 +37,11 @@ char *getenv(char *name)
 	return 0; /* unreachable */
 }
 
+DEFINE_PRIMITIVE(os_envs)
+{
+	not_implemented_error();
+}
+
 void c_to_factor_toplevel(CELL quot)
 {
 	c_to_factor(quot);

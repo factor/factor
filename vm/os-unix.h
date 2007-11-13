@@ -39,6 +39,3 @@ s64 current_millis(void);
 void sleep_millis(CELL msec);
 
 void reset_stdio(void);
-
-void memory_signal_handler_impl(void);
-void misc_signal_handler_impl(void);

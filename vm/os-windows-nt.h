@@ -17,9 +17,4 @@ typedef char F_SYMBOL;
 #define FACTOR_DLL_NAME "factor-nt.dll"
 
 void c_to_factor_toplevel(CELL quot);
-
-void memory_signal_handler_impl(void);
-void divide_by_zero_signal_handler_impl(void);
-void misc_signal_handler_impl(void);
-
 long exception_handler(PEXCEPTION_POINTERS pe);
