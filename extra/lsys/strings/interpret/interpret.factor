@@ -1,6 +1,6 @@
 
 USING: kernel sequences quotations assocs math math.parser
-       combinators.lib vars lsys.strings ;
+       combinators.cleave combinators.lib vars lsys.strings ;
 
 IN: lsys.strings.interpret
 

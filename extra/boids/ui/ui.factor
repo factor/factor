@@ -19,7 +19,8 @@ USING: kernel namespaces
        ui.gadgets.packs
        ui.gadgets.grids
        ui.gestures
-       combinators.lib hashtables.lib vars rewrite-closures boids ;
+       combinators.cleave
+       hashtables.lib vars rewrite-closures boids ;
 
 IN: boids.ui
 

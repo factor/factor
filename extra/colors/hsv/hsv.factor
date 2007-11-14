@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 
 USING: kernel combinators arrays sequences math math.functions
-combinators.lib ;
+       combinators.cleave ;
 
 IN: colors.hsv
 

@@ -3,7 +3,7 @@ USING: kernel alien.c-types combinators namespaces arrays
        sequences sequences.lib namespaces.lib splitting
        math math.functions math.vectors math.trig
        opengl.gl opengl.glu opengl ui ui.gadgets.slate
-       combinators.lib vars
+       combinators.cleave vars
        random-weighted colors.hsv cfdg.gl ;
 
 IN: cfdg

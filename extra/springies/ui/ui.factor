@@ -1,5 +1,5 @@
 
-USING: kernel namespaces threads sequences math math.vectors combinators.lib
+USING: kernel namespaces threads sequences math math.vectors combinators.cleave
        opengl.gl opengl colors ui ui.gadgets ui.gadgets.slate
        bake rewrite-closures vars springies ;
 

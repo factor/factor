@@ -1,6 +1,6 @@
 
 USING: kernel combinators sequences arrays math math.vectors
-       combinators.lib shuffle vars ;
+       combinators.cleave shuffle vars ;
 
 IN: springies
 
