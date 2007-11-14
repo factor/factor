@@ -3,6 +3,8 @@ USING: alien.syntax ;
 
 IN: unix.linux.route
 
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
 C-STRUCT: struct-rtentry
   { "ulong"           "rt_pad1" }
   { "struct-sockaddr" "rt_dst" }
@@ -37,3 +39,17 @@ C-STRUCT: struct-rtentry
 : RTF_NOFORWARD  HEX: 1000 ;		! Forwarding inhibited.
 : RTF_THROW	 HEX: 2000 ;		! Go to next class.
 : RTF_NOPMTUDISC HEX: 4000 ;		! Do not send packets with DF.
+
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+USING: kernel alien.c-types io.sockets io.sockets.impl
+       unix unix.linux.sockios ;
+
+: route ( dst gateway genmask flags -- )
+  >r >r >r >r
+  "struct-rtentry" <c-object>
+  r> 0 <inet4> make-sockaddr over set-struct-rtentry-rt_dst
+  r> 0 <inet4> make-sockaddr over set-struct-rtentry-rt_gateway
+  r> 0 <inet4> make-sockaddr over set-struct-rtentry-rt_genmask
+  r>   	       		     over set-struct-rtentry-rt_flags
+  AF_INET SOCK_DGRAM 0 socket SIOCADDRT rot ioctl drop ;

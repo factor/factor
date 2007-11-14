@@ -105,7 +105,7 @@ factory-menu> set-menu-items
 
 ! VAR: root-menu
 
-{ { "xterm"             [ "xterm &" system drop ] }
+{ { "xterm"             [ "urxvt -bd grey +sb &" system drop ] }
   { "Firefox"		[ "firefox &" system drop ] }
   { "xclock" 		[ "xclock &" system drop ] }
   { "Apps >" 		[ apps-menu> <- popup ] }
