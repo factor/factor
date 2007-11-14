@@ -1,0 +1,28 @@
+<% USING: io math math.parser namespaces ; %>
+
+<h1>Annotate</h1>
+
+<form method="POST" action="/responder/pastebin/annotate-paste">
+
+<table>
+
+<input type="hidden" name="n" value="<% "n" get number>string write %>" />
+
+<tr>
+<th>Your name:</th>
+<td><input type="TEXT" name="author" value="" /></td>
+</tr>
+
+<tr>
+<th>Summary:</th>
+<td><input type="TEXT" name="summary" value="" /></td>
+</tr>
+
+<tr>
+<th valign="top">Contents:</th>
+<td><textarea rows="24" cols="60" name="contents"></textarea></td>
+</tr>
+</table>
+
+<input type="SUBMIT" value="Annotate" />
+</form>
