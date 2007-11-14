@@ -2,7 +2,8 @@ USING: alien alien.c-types arrays assocs combinators
 continuations destructors io io.backend io.nonblocking
 io.windows libc kernel math namespaces sequences threads
 tuples.lib windows windows.errors windows.kernel32 strings
-splitting io.files windows.winsock ;
+splitting io.files qualified ;
+QUALIFIED: windows.winsock
 IN: io.windows.nt.backend
 
 : unicode-prefix ( -- seq )
@@ -62,14 +63,16 @@ C: <io-callback> io-callback
 : set-port-overlapped ( overlapped port -- )
     port-handle set-win32-file-overlapped ;
 
-: completion-port ( handle existing -- handle )
+: <completion-port> ( handle existing -- handle )
      f 1 CreateIoCompletionPort dup win32-error=0/f ;
 
-: master-completion-port ( -- handle )
-    INVALID_HANDLE_VALUE f completion-port ;
+SYMBOL: master-completion-port
+
+: <master-completion-port> ( -- handle )
+    INVALID_HANDLE_VALUE f <completion-port> ;
 
 M: windows-nt-io add-completion ( handle -- )
-    \ master-completion-port get-global completion-port drop ;
+    master-completion-port get-global <completion-port> drop ;
 
 TUPLE: GetOverlappedResult-args hFile* lpOverlapped* lpNumberOfBytesTransferred* bWait* port ;
 
@@ -98,8 +101,8 @@ TUPLE: GetQueuedCompletionStatusParams hCompletionPort* lpNumberOfBytes* lpCompl
 C: <GetQueuedCompletionStatusParams> GetQueuedCompletionStatusParams
 
 : wait-for-overlapped ( ms -- GetQueuedCompletionStatus-Params ret )
-    >r \ master-completion-port get-global 0 <int>
-    0 <int> 0 <int> r> <GetQueuedCompletionStatusParams> [
+    >r master-completion-port get-global 0 <int> 0 <int> 0 <int>
+    r> <GetQueuedCompletionStatusParams> [
         GetQueuedCompletionStatusParams >tuple*<
         GetQueuedCompletionStatus
     ] keep swap ;
@@ -146,7 +149,7 @@ M: windows-nt-io init-io ( -- )
     #! Should only be called on startup. Calling this at any
     #! other time can have unintended consequences.
     global [
-        master-completion-port \ master-completion-port set
+        <master-completion-port> master-completion-port set
         H{ } clone io-hash set
-        init-winsock
+        windows.winsock:init-winsock
     ] bind ;

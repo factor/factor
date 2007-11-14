@@ -23,7 +23,7 @@ HELP: close-later
 
 HELP: with-destructors
 { $values { "quot" "a quotation" } }
-{ $description "Calls a quotation within a new dynamic scope.  This quotation may register destructors, on any object, by wrapping the object in a destructor and implementing " { $link (destruct) } " on that object type.  After the quotation finishes, if an error was thrown, all destructors are called and the error is then rethrown.  However, if the quotation was successful, only those destructors created with an 'always cleanup' flag will be destroyed." }
+{ $description "Calls a quotation within a new dynamic scope.  This quotation may register destructors, on any object, by wrapping the object in a destructor and implementing " { $link destruct } " on that object type.  After the quotation finishes, if an error was thrown, all destructors are called and the error is then rethrown.  However, if the quotation was successful, only those destructors created with an 'always cleanup' flag will be destroyed." }
 { $notes "Destructors are not allowed to throw exceptions.  No exceptions." }
 { $examples
     { $code "[ 10 malloc free-always ] with-destructors" }
