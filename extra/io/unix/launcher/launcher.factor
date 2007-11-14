@@ -2,42 +2,24 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: io io.launcher io.unix.backend io.nonblocking
 sequences kernel namespaces math system alien.c-types
-debugger continuations arrays assocs combinators ;
+debugger continuations arrays assocs combinators unix.process ;
 IN: io.unix.launcher
 
 ! Search unix first
 USE: unix
 
-: with-fork ( child parent -- pid )
-    fork [ zero? -rot if ] keep ; inline
-
 : get-arguments ( -- seq )
     +command+ get
     [ "/bin/sh" "-c" rot 3array ] [ +arguments+ get ] if* ;
 
-: >null-term-array f add >c-void*-array ;
-
-: prepare-execvp ( -- cmd args )
-    #! Doesn't free any memory, so we only call this word
-    #! after forking.
-    get-arguments
-    [ malloc-char-string ] map
-    dup first swap >null-term-array ;
-
-: prepare-execve ( -- cmd args env )
-    #! Doesn't free any memory, so we only call this word
-    #! after forking.
-    prepare-execvp
-    get-environment
-    [ "=" swap 3append malloc-char-string ] { } assoc>map
-    >null-term-array ;
+: assoc>env ( assoc -- env ) [ "=" swap 3append ] { } assoc>map ;
 
 : (spawn-process) ( -- )
     [
         pass-environment? [
-            prepare-execve execve
+	    get-arguments get-environment assoc>env exec-args-with-env
         ] [
-            prepare-execvp execvp
+	    get-arguments exec-args-with-path
         ] if io-error
     ] [ error. :c flush ] recover 1 exit ;
 
