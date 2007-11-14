@@ -1,7 +1,7 @@
 ! Copyright (C) 2005, 2007 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: arrays ui.commands ui.gadgets ui.gadgets.borders
-ui.gadgets.controls ui.gadgets.labels ui.gadgets.theme
+ui.gadgets.labels ui.gadgets.theme
 ui.gadgets.tracks ui.gadgets.packs ui.gadgets.worlds ui.gestures
 ui.render kernel math models namespaces sequences strings
 quotations assocs combinators classes colors tuples opengl
@@ -131,12 +131,17 @@ M: checkmark-paint draw-interior
     { 5 5 } over set-pack-gap
     1/2 swap set-pack-align ;
 
+TUPLE: checkbox ;
+
 : <checkbox> ( model label -- checkbox )
     <checkmark>
     label-on-right
     over [ toggle-model drop ] curry <button>
-    [ set-button-selected? ] <control>
+    checkbox construct-control
     dup checkbox-theme ;
+
+M: checkbox model-changed
+    dup control-value over set-button-selected? relayout-1 ;
 
 TUPLE: radio-paint color ;
 
@@ -165,17 +170,27 @@ M: radio-paint draw-boundary
     dup radio-knob-theme
     { 16 16 } over set-gadget-dim ;
 
-: <radio-control> ( model value gadget quot -- control )
-    >r dupd [ set-control-value ] curry* r> call
-    [ >r = r> set-button-selected? ] curry* <control> ; inline
+TUPLE: radio-control value ;
 
-: <radio-controls> ( model assoc quot -- gadget )
-    swapd [ >r -rot r> call gadget, ] 2curry assoc-each ; inline
+: <radio-control> ( value model gadget quot -- control )
+    >r pick [ swap set-control-value ] curry r> call
+    radio-control construct-control
+    tuck set-radio-control-value ; inline
+
+M: radio-control model-changed
+    dup control-value
+    over radio-control-value =
+    over set-button-selected?
+    relayout-1 ;
+
+: <radio-controls> ( model assoc quot -- )
+    #! quot has stack effect ( value model label -- )
+    swapd [ swapd call gadget, ] 2curry assoc-each ; inline
 
 : radio-button-theme
     { 5 5 } over set-pack-gap 1/2 swap set-pack-align ;
 
-: <radio-button> ( model value label -- gadget )
+: <radio-button> ( value model label -- gadget )
     <radio-knob> label-on-right
     [ <button> ] <radio-control>
     dup radio-button-theme ;
@@ -187,7 +202,7 @@ M: radio-paint draw-boundary
     [ [ <radio-button> ] <radio-controls> ] make-filled-pile
     dup radio-buttons-theme ;
 
-: <toggle-button> ( model value label -- gadget )
+: <toggle-button> ( value model label -- gadget )
     [ <bevel-button> ] <radio-control> ;
 
 : <toggle-buttons> ( model assoc -- gadget )

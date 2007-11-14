@@ -85,4 +85,6 @@ IN: bootstrap.stage2
 
         "output-image" get resource-path save-image-and-exit
     ] if
-] [ error-hook get call "listener" run ] recover
+] [
+    error-hook get call "listener" vocab-main execute
+] recover

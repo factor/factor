@@ -1,7 +1,7 @@
 USING: continuations documents ui.tools.interactor
 ui.tools.listener hashtables kernel namespaces parser sequences
-timers tools.test ui.commands ui.gadgets.controls
-ui.gadgets.editors ui.gadgets.panes vocabs words ;
+timers tools.test ui.commands ui.gadgets ui.gadgets.editors
+ui.gadgets.panes vocabs words ;
 IN: temporary
 
 timers [ init-timers ] unless
@@ -30,6 +30,6 @@ H{ } "i" get set-interactor-vars
 ] unit-test
 
 [ t ] [
-    "i" get control-model doc-end
+    "i" get gadget-model doc-end
     "i" get editor-caret* =
 ] unit-test

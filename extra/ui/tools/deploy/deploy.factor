@@ -1,7 +1,7 @@
 ! Copyright (C) 2007 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: ui.gadgets colors kernel ui.render namespaces
-ui.gadgets.controls models sequences ui.gadgets.buttons
+models sequences ui.gadgets.buttons
 ui.gadgets.packs ui.gadgets.labels tools.deploy.config
 namespaces ui.gadgets.editors ui.gadgets.borders ui.gestures
 ui.commands assocs ui.gadgets.tracks ui ui.tools.listener
@@ -52,7 +52,7 @@ TUPLE: deploy-gadget vocab settings ;
             reflection-settings
             advanced-settings
         ] make-pile dup deploy-settings-theme
-        namespace <mapping> swap [ 2drop ] <control>
+        namespace <mapping> over set-gadget-model
     ] bind ;
 
 : find-deploy-gadget

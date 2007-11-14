@@ -1,6 +1,6 @@
 USING: arrays hashtables help.markup help.stylesheet io
 io.styles kernel math models namespaces sequences ui ui.gadgets
-ui.gadgets.books ui.gadgets.controls ui.gadgets.panes
+ui.gadgets.books ui.gadgets.panes
 ui.gestures ui.render ;
 IN: slides
 
@@ -75,7 +75,7 @@ TUPLE: slides ;
 
 : change-page ( book n -- )
     over control-value + over gadget-children length rem
-    swap control-model set-model ;
+    swap gadget-model set-model ;
 
 : next-page ( book -- ) 1 change-page ;
 

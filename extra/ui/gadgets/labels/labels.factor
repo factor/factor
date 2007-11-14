@@ -2,8 +2,8 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: arrays hashtables io kernel math namespaces
 opengl sequences io.streams.lines strings splitting
-ui.gadgets ui.gadgets.controls ui.gadgets.tracks
-ui.gadgets.theme ui.render colors ;
+ui.gadgets ui.gadgets.tracks ui.gadgets.theme ui.render colors
+models ;
 IN: ui.gadgets.labels
 
 ! A label gadget draws a string.
@@ -37,8 +37,13 @@ M: label draw-gadget*
 
 M: label gadget-text* label-string % ;
 
+TUPLE: label-control ;
+
+M: label-control model-changed
+    dup control-value over set-label-text relayout ;
+
 : <label-control> ( model -- gadget )
-    "" <label> [ set-label-string ] <control> ;
+    "" <label> label-control construct-control ;
 
 : text-theme ( gadget -- )
     black over set-label-color

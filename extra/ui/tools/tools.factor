@@ -5,7 +5,7 @@ ui.tools.operations ui.tools.browser ui.tools.inspector
 ui.tools.listener ui.tools.profiler ui.tools.walker
 ui.tools.operations inspector io kernel math models namespaces
 prettyprint quotations sequences ui ui.commands ui.gadgets
-ui.gadgets.books ui.gadgets.buttons ui.gadgets.controls
+ui.gadgets.books ui.gadgets.buttons
 ui.gadgets.labelled ui.gadgets.scrollers ui.gadgets.tracks
 ui.gadgets.worlds ui.gadgets.presentations ui.gestures words
 vocabs.loader tools.test ui.gadgets.buttons
@@ -22,13 +22,13 @@ IN: ui.tools
     } ;
 
 : <workspace-tabs> ( -- tabs )
-    g control-model
+    g gadget-model
     "tool-switching" workspace command-map
     [ command-string ] { } assoc>map <enum> >alist
     <toggle-buttons> ;
 
 : <workspace-book> ( -- gadget )
-    workspace-tabs [ execute ] map g control-model <book> ;
+    workspace-tabs [ execute ] map g gadget-model <book> ;
 
 : <workspace> ( -- workspace )
     0 <model> { 0 1 } <track> workspace construct-control [

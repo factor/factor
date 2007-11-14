@@ -1,13 +1,13 @@
 USING: ui.tools ui.tools.interactor ui.tools.listener
 ui.tools.search ui.tools.workspace kernel models namespaces
 sequences timers tools.test ui.gadgets ui.gadgets.buttons
-ui.gadgets.controls ui.gadgets.labelled ui.gadgets.presentations
+ui.gadgets.labelled ui.gadgets.presentations
 ui.gadgets.scrollers vocabs ;
 IN: temporary
 
 [
     [ f ] [
-        0 <model> <gadget> [ 2drop ] <control> gadget set
+        0 <model> <gadget> [ set-gadget-model ] keep gadget set
         <workspace-tabs> gadget-children empty?
     ] unit-test 
 ] with-scope

@@ -1,14 +1,14 @@
 ! Copyright (C) 2005, 2007 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: arrays ui.gadgets ui.gadgets.borders ui.gadgets.buttons
-ui.gadgets.labels ui.gadgets.controls ui.gadgets.scrollers
+ui.gadgets.labels ui.gadgets.scrollers
 ui.gadgets.paragraphs ui.gadgets.incremental ui.gadgets.packs
 ui.gadgets.theme ui.clipboards ui.gestures ui.traverse ui.render
 hashtables io kernel namespaces sequences io.styles strings
 quotations math opengl combinators math.vectors
 io.streams.duplex sorting splitting io.streams.nested assocs
 ui.gadgets.presentations ui.gadgets.slots ui.gadgets.grids
-ui.gadgets.grid-lines tuples ;
+ui.gadgets.grid-lines tuples models ;
 IN: ui.gadgets.panes
 
 TUPLE: pane output current prototype scrolls?
@@ -137,8 +137,14 @@ M: duplex-stream write-gadget
 : <scrolling-pane> ( -- pane )
     <pane> t over set-pane-scrolls? ;
 
+TUPLE: pane-control quot ;
+
+M: pane-control model-changed
+    dup control-value swap dup pane-control-quot with-pane ;
+
 : <pane-control> ( model quot -- pane )
-    [ with-pane ] curry <pane> swap <control> ;
+    >r <pane> pane-control construct-control r>
+    over set-pane-control-quot ;
 
 : do-pane-stream ( pane-stream quot -- )
     >r pane-stream-pane r> keep scroll-pane ; inline
