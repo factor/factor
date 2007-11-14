@@ -75,7 +75,7 @@ TUPLE: slides ;
 
 : change-page ( book n -- )
     over control-value + over gadget-children length rem
-    swap control-model set-model ;
+    swap gadget-model set-model ;
 
 : next-page ( book -- ) 1 change-page ;
 

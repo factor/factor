@@ -19,7 +19,7 @@ help ;
 
 : word-at-loc ( loc interactor -- word )
     over [
-        [ control-model T{ one-word-elt } elt-string ] keep
+        [ gadget-model T{ one-word-elt } elt-string ] keep
         interactor-use assoc-stack
     ] [
         2drop f
@@ -46,7 +46,7 @@ M: caret-help model-changed
     <source-editor>
     { set-interactor-output set-gadget-delegate }
     interactor construct
-    dup dup set-control-self
+    dup dup set-editor-self
     dup init-interactor-history
     dup init-caret-help ;
 
@@ -79,7 +79,7 @@ M: interactor ungraft*
     [ editor-string ] keep
     [ interactor-input. ] 2keep
     [ add-interactor-history ] keep
-    dup control-model clear-doc
+    dup gadget-model clear-doc
     interactor-continue ;
 
 : interactor-eval ( interactor -- )
@@ -123,7 +123,7 @@ M: interactor stream-read-partial
 
 : go-to-error ( interactor error -- )
     dup parse-error-line 1- swap parse-error-col 2array
-    over [ control-model validate-loc ] keep
+    over [ gadget-model validate-loc ] keep
     editor-caret set-model
     mark>caret ;
 
@@ -156,7 +156,7 @@ M: interactor parse-interactive
 M: interactor pref-dim*
     0 over line-height 4 * 2array swap delegate pref-dim* vmax ;
 
-: clear-input control-model clear-doc ;
+: clear-input gadget-model clear-doc ;
 
 interactor "interactor" f {
     { T{ key-down f f "RET" } evaluate-input }

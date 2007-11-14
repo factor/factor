@@ -183,13 +183,14 @@ M: radio-control model-changed
     over set-button-selected?
     relayout-1 ;
 
-: <radio-controls> ( model assoc quot -- gadget )
-    swapd [ >r -rot r> call gadget, ] 2curry assoc-each ; inline
+: <radio-controls> ( model assoc quot -- )
+    #! quot has stack effect ( value model label -- )
+    swapd [ swapd call gadget, ] 2curry assoc-each ; inline
 
 : radio-button-theme
     { 5 5 } over set-pack-gap 1/2 swap set-pack-align ;
 
-: <radio-button> ( model value label -- gadget )
+: <radio-button> ( value model label -- gadget )
     <radio-knob> label-on-right
     [ <button> ] <radio-control>
     dup radio-button-theme ;
@@ -201,7 +202,7 @@ M: radio-control model-changed
     [ [ <radio-button> ] <radio-controls> ] make-filled-pile
     dup radio-buttons-theme ;
 
-: <toggle-button> ( model value label -- gadget )
+: <toggle-button> ( value model label -- gadget )
     [ <bevel-button> ] <radio-control> ;
 
 : <toggle-buttons> ( model assoc -- gadget )

@@ -68,16 +68,12 @@ M: gadget model-changed drop ;
 : construct-gadget ( class -- tuple )
     >r <gadget> r> construct-delegate ; inline
 
-: construct-control ( model gadget class -- control )
-    >r tuck set-gadget-model r> construct-delegate ; inline
-
 : activate-control ( gadget -- )
-    dup gadget-model dup [ dupd add-connection ] when
+    dup gadget-model dup [ 2dup add-connection ] when drop
     model-changed ;
 
 : deactivate-control ( gadget -- )
-    dup gadget-model dup [ dupd remove-connection ] when
-    drop ;
+    dup gadget-model dup [ 2dup remove-connection ] when 2drop ;
 
 : control-value ( control -- value )
     gadget-model model-value ;
@@ -138,6 +134,10 @@ M: gadget children-on nip gadget-children ;
     over [
         dup pick [ set-gadget-parent ] curry* each-child
     ] when set-delegate ;
+
+: construct-control ( model gadget class -- control )
+    >r tuck set-gadget-model
+    { set-gadget-delegate } r> construct ; inline
 
 ! Selection protocol
 GENERIC: gadget-selection? ( gadget -- ? )

@@ -30,7 +30,7 @@ M: viewport focusable-child*
 M: viewport pref-dim* viewport-dim ;
 
 : scroller-value ( scroller -- loc )
-    control-model range-value [ >fixnum ] map ;
+    gadget-model range-value [ >fixnum ] map ;
 
 M: viewport model-changed
     dup relayout-1

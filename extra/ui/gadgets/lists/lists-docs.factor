@@ -7,7 +7,7 @@ HELP: +secondary+
 
 HELP: list
 { $class-description
-    "A list " { $link control } " is backed by a " { $link model } " holding a sequence of objects, and displays as a list of " { $link presentation } " instances of these objects."
+    "A list control is backed by a " { $link model } " holding a sequence of objects, and displays as a list of " { $link presentation } " instances of these objects."
     $nl
     "Lists are created by calling " { $link <list> } "."
     { $command-map list "keyboard-navigation" }

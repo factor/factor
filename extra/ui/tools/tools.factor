@@ -22,13 +22,13 @@ IN: ui.tools
     } ;
 
 : <workspace-tabs> ( -- tabs )
-    g control-model
+    g gadget-model
     "tool-switching" workspace command-map
     [ command-string ] { } assoc>map <enum> >alist
     <toggle-buttons> ;
 
 : <workspace-book> ( -- gadget )
-    workspace-tabs [ execute ] map g control-model <book> ;
+    workspace-tabs [ execute ] map g gadget-model <book> ;
 
 : <workspace> ( -- workspace )
     0 <model> { 0 1 } <track> workspace construct-control [

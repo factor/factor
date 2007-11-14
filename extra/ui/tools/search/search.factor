@@ -44,7 +44,7 @@ search-field H{
 } set-gestures
 
 : <search-model> ( producer -- model )
-    >r g live-search-field control-model 200 <delay>
+    >r g live-search-field gadget-model 200 <delay>
     [ "\n" join ] r> append <filter> ;
 
 : <search-list> ( seq limited? presenter -- gadget )

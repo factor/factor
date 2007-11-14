@@ -25,10 +25,10 @@ M: traceback-gadget pref-dim* drop { 300 400 } ;
     { 0 1 } <track> traceback-gadget construct-control [
         [
             [
-                g control-model <datastack-display> 1/2 track,
-                g control-model <retainstack-display> 1/2 track,
+                g gadget-model <datastack-display> 1/2 track,
+                g gadget-model <retainstack-display> 1/2 track,
             ] { 1 0 } make-track 1/3 track,
-            g control-model <callstack-display> 2/3 track,
+            g gadget-model <callstack-display> 2/3 track,
         ] with-gadget
     ] keep ;
 

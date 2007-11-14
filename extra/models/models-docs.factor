@@ -106,7 +106,7 @@ $nl
         ": <funny-slider> <x-slider> 100 over set-slider-max ;"
         "<funny-slider> <funny-slider> 2array"
         "dup make-pile gadget."
-        "dup [ control-model ] map <compose> [ unparse ] <filter>"
+        "dup [ gadget-model ] map <compose> [ unparse ] <filter>"
         "<label-control> gadget."
     }
 } ;
@@ -146,7 +146,7 @@ HELP: delay
         ": <funny-slider>"
         "    0 0 0 100 <range> <x-slider> 500 over set-slider-max ;"
         "<funny-slider> dup gadget."
-        "control-model 500 <delay> [ number>string ] <filter>"
+        "gadget-model 500 <delay> [ number>string ] <filter>"
         "<label-control> gadget."
     }
 } ;

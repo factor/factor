@@ -18,7 +18,7 @@ HELP: set-label-string
 
 HELP: <label-control>
 { $values { "model" model } { "gadget" "a new " { $link gadget } } }
-{ $description "Creates a " { $link control } " which displays the value of " { $snippet "model" } ", which is required to be a string. The label control is automatically updated when the model value changes." } ;
+{ $description "Creates a control which displays the value of " { $snippet "model" } ", which is required to be a string. The label control is automatically updated when the model value changes." } ;
 
 { label-string set-label-string } related-words
 { <label> <label-control> } related-words

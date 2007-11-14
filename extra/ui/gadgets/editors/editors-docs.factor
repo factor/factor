@@ -3,7 +3,7 @@ ui.gadgets.scrollers models strings ui.commands ;
 IN: ui.gadgets.editors
 
 HELP: editor
-{ $class-description "An editor is a " { $link control } " for editing a multi-line passage of text stored in a " { $link document } " model. Editors are crated by calling " { $link <editor> } "."
+{ $class-description "An editor is a control for editing a multi-line passage of text stored in a " { $link document } " model. Editors are crated by calling " { $link <editor> } "."
 $nl
 "Editors have the following slots:"
 { $list

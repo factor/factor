@@ -28,7 +28,7 @@ M: gadget tool-scroller drop f ;
     workspace-book gadget-children [ class eq? ] curry* find ;
 
 : show-tool ( class workspace -- tool )
-    [ find-tool swap ] keep workspace-book control-model
+    [ find-tool swap ] keep workspace-book gadget-model
     set-model ;
 
 : select-tool ( workspace class -- ) swap show-tool drop ;
