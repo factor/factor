@@ -49,15 +49,15 @@ C: <dlist-node> dlist-node
         drop nip t
     ] [
         drop dlist-node-next [ (dlist-find-node) ] [ drop f f ] if*
-    ] if ;
+    ] if ; inline
 
 : dlist-find-node ( quot dlist -- node/f ? )
-    dlist-front [ (dlist-find-node) ] [ drop f f ] if* ;
+    dlist-front [ (dlist-find-node) ] [ drop f f ] if* ; inline
 
 : (dlist-each-node) ( quot dlist -- )
     over
     [ 2dup call >r dlist-node-next r> (dlist-each-node) ]
-    [ 2drop ] if ;
+    [ 2drop ] if ; inline
 
 : dlist-each-node ( quot dlist -- )
     >r dlist-front r> (dlist-each-node) ; inline
@@ -98,10 +98,10 @@ PRIVATE>
 : pop-back* ( dlist -- ) pop-back drop ;
 
 : dlist-find ( quot dlist -- obj/f ? )
-    dlist-find-node dup [ >r dlist-node-obj r> ] when ;
+    dlist-find-node dup [ >r dlist-node-obj r> ] when ; inline
 
 : dlist-contains? ( quot dlist -- ? )
-    dlist-find nip ;
+    dlist-find nip ; inline
 
 : (delete-node) ( dlist dlist-node -- )
     {
@@ -116,10 +116,10 @@ PRIVATE>
         [ (delete-node) ] keep [ dlist-node-obj t ] [ f f ] if*
     ] [
         2drop f f
-    ] if ;
+    ] if ; inline
 
 : delete-node ( quot dlist -- obj/f )
-    delete-node* drop ;
+    delete-node* drop ; inline
 
 : dlist-each ( dlist quot -- )
     [ dlist-node-obj ] swap compose dlist-each-node ; inline
