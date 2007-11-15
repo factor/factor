@@ -27,5 +27,4 @@ IN: unix.process
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-: with-fork ( child parent -- pid ) fork [ zero? -rot if ] keep ; inline
-
+: with-fork ( child parent -- ) fork dup zero? -roll swap curry if ; inline
