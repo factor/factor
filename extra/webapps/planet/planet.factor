@@ -100,6 +100,7 @@ SYMBOL: cached-postings
 \ planet-factor { } define-action
 
 {
+    { "Berlin Brown" "http://factorlang-fornovices.blogspot.com/feeds/posts/default" "http://factorlang-fornovices.blogspot.com" }
     { "Chris Double" "http://www.bluishcoder.co.nz/atom.xml" "http://www.bluishcoder.co.nz/" }
     { "Elie Chaftari" "http://fun-factor.blogspot.com/feeds/posts/default" "http://fun-factor.blogspot.com/" }
     { "Doug Coleman" "http://code-factor.blogspot.com/feeds/posts/default" "http://code-factor.blogspot.com/" }

@@ -19,8 +19,7 @@ SYMBOL: responders
     <html> <body> <h1> write </h1> </body> </html> ;
 
 : error-head ( error -- )
-    dup log-error
-    dup response
+    dup log-error response
     H{ { "Content-Type" "text/html" } } print-header nl ;
 
 : httpd-error ( error -- )

@@ -11,7 +11,7 @@ LAZY: 'any-char' ( -- parser )
   [ digit? ] satisfy [ digit> ] <@ ;
 
 : 'integer' ( -- parser )
-  'digit' <!+> [ 0 [ swap 10 * + ] reduce ] <@ ;
+  'digit' <!+> [ 10 swap digits>integer ] <@ ;
 
 : 'string' ( -- parser )
   [ CHAR: " = ] satisfy 
