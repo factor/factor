@@ -28,3 +28,14 @@ IN: unix.process
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 : with-fork ( child parent -- ) fork dup zero? -roll swap curry if ; inline
+
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+! This is kludgy. We need a better implementation.
+
+USE: threads
+
+: wait-for-pid ( pid -- )
+  dup "int" <c-object> WNOHANG waitpid
+  0 = [ 100 sleep wait-for-pid ] [ drop ] if ;
+
