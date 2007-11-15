@@ -6,46 +6,40 @@ continuations generic.standard sorting assocs definitions
 prettyprint io inspector bootstrap.image tuples
 classes.union classes.predicate debugger bootstrap.image
 bootstrap.image.private io.launcher threads.private
-io.streams.string combinators.private ;
+io.streams.string combinators.private tools.test.inference ;
 IN: temporary
 
-: short-effect
-    dup effect-in length swap effect-out length 2array ;
+{ 0 2 } [ 2 "Hello" ] unit-test-effect
+{ 1 2 } [ dup ] unit-test-effect
 
-[ { 0 2 } ] [ [ 2 "Hello" ] infer short-effect ] unit-test
-[ { 1 2 } ] [ [ dup ] infer short-effect ] unit-test
+{ 1 2 } [ [ dup ] call ] unit-test-effect
+[ [ call ] infer ] unit-test-fails
 
-[ { 1 2 } ] [ [ [ dup ] call ] infer short-effect ] unit-test
-[ [ call ] infer short-effect ] unit-test-fails
+{ 2 4 } [ 2dup ] unit-test-effect
 
-[ { 2 4 } ] [ [ 2dup ] infer short-effect ] unit-test
+{ 1 0 } [ [ ] [ ] if ] unit-test-effect
+[ [ if ] infer ] unit-test-fails
+[ [ [ ] if ] infer ] unit-test-fails
+[ [ [ 2 ] [ ] if ] infer ] unit-test-fails
+{ 4 3 } [ [ rot ] [ -rot ] if ] unit-test-effect
 
-[ { 1 0 } ] [ [ [ ] [ ] if ] infer short-effect ] unit-test
-[ [ if ] infer short-effect ] unit-test-fails
-[ [ [ ] if ] infer short-effect ] unit-test-fails
-[ [ [ 2 ] [ ] if ] infer short-effect ] unit-test-fails
-[ { 4 3 } ] [ [ [ rot ] [ -rot ] if ] infer short-effect ] unit-test
-
-[ { 4 3 } ] [
+{ 4 3 } [
     [
-        [
-            [ swap 3 ] [ nip 5 5 ] if
-        ] [
-            -rot
-        ] if
-    ] infer short-effect
-] unit-test
+        [ swap 3 ] [ nip 5 5 ] if
+    ] [
+        -rot
+    ] if
+] unit-test-effect
 
-[ { 1 1 } ] [ [ dup [ ] when ] infer short-effect ] unit-test
-[ { 1 1 } ] [ [ dup [ dup fixnum* ] when ] infer short-effect ] unit-test
-[ { 2 1 } ] [ [ [ dup fixnum* ] when ] infer short-effect ] unit-test
+{ 1 1 } [ dup [ ] when ] unit-test-effect
+{ 1 1 } [ dup [ dup fixnum* ] when ] unit-test-effect
+{ 2 1 } [ [ dup fixnum* ] when ] unit-test-effect
 
-[ { 1 0 } ] [ [ [ drop ] when* ] infer short-effect ] unit-test
-[ { 1 1 } ] [ [ [ { { [ ] } } ] unless* ] infer short-effect ] unit-test
+{ 1 0 } [ [ drop ] when* ] unit-test-effect
+{ 1 1 } [ [ { { [ ] } } ] unless* ] unit-test-effect
 
-[ { 0 1 } ] [
-    [ [ 2 2 fixnum+ ] dup [ ] when call ] infer short-effect
-] unit-test
+{ 0 1 }
+[ [ 2 2 fixnum+ ] dup [ ] when call ] unit-test-effect
 
 [
     [ [ [ 2 2 fixnum+ ] ] [ [ 2 2 fixnum* ] ] if call ] infer
@@ -57,37 +51,37 @@ IN: temporary
 
 : termination-test-2 [ termination-test-1 ] [ 3 ] if ;
 
-[ { 1 1 } ] [ [ termination-test-2 ] infer short-effect ] unit-test
+{ 1 1 } [ termination-test-2 ] unit-test-effect
 
 : infinite-loop infinite-loop ;
 
-[ [ infinite-loop ] infer short-effect ] unit-test-fails
+[ [ infinite-loop ] infer ] unit-test-fails
 
 : no-base-case-1 dup [ no-base-case-1 ] [ no-base-case-1 ] if ;
-[ [ no-base-case-1 ] infer short-effect ] unit-test-fails
+[ [ no-base-case-1 ] infer ] unit-test-fails
 
 : simple-recursion-1 ( obj -- obj )
     dup [ simple-recursion-1 ] [ ] if ;
 
-[ { 1 1 } ] [ [ simple-recursion-1 ] infer short-effect ] unit-test
+{ 1 1 } [ simple-recursion-1 ] unit-test-effect
 
 : simple-recursion-2 ( obj -- obj )
     dup [ ] [ simple-recursion-2 ] if ;
 
-[ { 1 1 } ] [ [ simple-recursion-2 ] infer short-effect ] unit-test
+{ 1 1 } [ simple-recursion-2 ] unit-test-effect
 
 : bad-recursion-2 ( obj -- obj )
     dup [ dup first swap second bad-recursion-2 ] [ ] if ;
 
-[ [ bad-recursion-2 ] infer short-effect ] unit-test-fails
+[ [ bad-recursion-2 ] infer ] unit-test-fails
 
 : funny-recursion ( obj -- obj )
     dup [ funny-recursion 1 ] [ 2 ] if drop ;
 
-[ { 1 1 } ] [ [ funny-recursion ] infer short-effect ] unit-test
+{ 1 1 } [ funny-recursion ] unit-test-effect
 
 ! Simple combinators
-[ { 1 2 } ] [ [ [ first ] keep second ] infer short-effect ] unit-test
+{ 1 2 } [ [ first ] keep second ] unit-test-effect
 
 ! Mutual recursion
 DEFER: foe
@@ -110,8 +104,8 @@ DEFER: foe
         2drop f
     ] if ;
 
-[ { 2 1 } ] [ [ fie ] infer short-effect ] unit-test
-[ { 2 1 } ] [ [ foe ] infer short-effect ] unit-test
+{ 2 1 } [ fie ] unit-test-effect
+{ 2 1 } [ foe ] unit-test-effect
 
 : nested-when ( -- )
     t [
@@ -120,7 +114,7 @@ DEFER: foe
         ] when
     ] when ;
 
-[ { 0 0 } ] [ [ nested-when ] infer short-effect ] unit-test
+{ 0 0 } [ nested-when ] unit-test-effect
 
 : nested-when* ( obj -- )
     [
@@ -129,11 +123,11 @@ DEFER: foe
         ] when*
     ] when* ;
 
-[ { 1 0 } ] [ [ nested-when* ] infer short-effect ] unit-test
+{ 1 0 } [ nested-when* ] unit-test-effect
 
 SYMBOL: sym-test
 
-[ { 0 1 } ] [ [ sym-test ] infer short-effect ] unit-test
+{ 0 1 } [ sym-test ] unit-test-effect
 
 : terminator-branch
     dup [
@@ -142,7 +136,7 @@ SYMBOL: sym-test
         "foo" throw
     ] if ;
 
-[ { 1 1 } ] [ [ terminator-branch ] infer short-effect ] unit-test
+{ 1 1 } [ terminator-branch ] unit-test-effect
 
 : recursive-terminator ( obj -- )
     dup [
@@ -151,12 +145,12 @@ SYMBOL: sym-test
         "Hi" throw
     ] if ;
 
-[ { 1 0 } ] [ [ recursive-terminator ] infer short-effect ] unit-test
+{ 1 0 } [ recursive-terminator ] unit-test-effect
 
 GENERIC: potential-hang ( obj -- obj )
 M: fixnum potential-hang dup [ potential-hang ] when ;
 
-[ ] [ [ 5 potential-hang ] infer short-effect drop ] unit-test
+[ ] [ [ 5 potential-hang ] infer drop ] unit-test
 
 TUPLE: funny-cons car cdr ;
 GENERIC: iterate ( obj -- )
@@ -164,24 +158,24 @@ M: funny-cons iterate funny-cons-cdr iterate ;
 M: f iterate drop ;
 M: real iterate drop ;
 
-[ { 1 0 } ] [ [ iterate ] infer short-effect ] unit-test
+{ 1 0 } [ iterate ] unit-test-effect
 
 ! Regression
 : cat ( obj -- * ) dup [ throw ] [ throw ] if ;
 : dog ( a b c -- ) dup [ cat ] [ 3drop ] if ;
-[ { 3 0 } ] [ [ dog ] infer short-effect ] unit-test
+{ 3 0 } [ dog ] unit-test-effect
 
 ! Regression
 DEFER: monkey
 : friend ( a b c -- ) dup [ friend ] [ monkey ] if ;
 : monkey ( a b c -- ) dup [ 3drop ] [ friend ] if ;
-[ { 3 0 } ] [ [ friend ] infer short-effect ] unit-test
+{ 3 0 } [ friend ] unit-test-effect
 
-! Regression -- same as above but we infer short-effect the second word first
+! Regression -- same as above but we infer the second word first
 DEFER: blah2
 : blah ( a b c -- ) dup [ blah ] [ blah2 ] if ;
 : blah2 ( a b c -- ) dup [ blah ] [ 3drop ] if ;
-[ { 3 0 } ] [ [ blah2 ] infer short-effect ] unit-test
+{ 3 0 } [ blah2 ] unit-test-effect
 
 ! Regression
 DEFER: blah4
@@ -189,7 +183,7 @@ DEFER: blah4
     dup [ blah3 ] [ dup [ blah4 ] [ blah3 ] if ] if ;
 : blah4 ( a b c -- )
     dup [ blah4 ] [ dup [ 3drop ] [ blah3 ] if ] if ;
-[ { 3 0 } ] [ [ blah4 ] infer short-effect ] unit-test
+{ 3 0 } [ blah4 ] unit-test-effect
 
 ! Regression
 : bad-combinator ( obj quot -- )
@@ -199,14 +193,14 @@ DEFER: blah4
         [ swap slip ] keep swap bad-combinator
     ] if ; inline
 
-[ [ [ 1 ] [ ] bad-combinator ] infer short-effect ] unit-test-fails
+[ [ [ 1 ] [ ] bad-combinator ] infer ] unit-test-fails
 
 ! Regression
 : bad-input#
     dup string? [ 2array throw ] unless
     over string? [ 2array throw ] unless ;
 
-[ { 2 2 } ] [ [ bad-input# ] infer short-effect ] unit-test
+{ 2 2 } [ bad-input# ] unit-test-effect
 
 ! Regression
 
@@ -214,18 +208,18 @@ DEFER: blah4
 DEFER: do-crap
 : more-crap ( obj -- ) dup [ drop ] [ dup do-crap call ] if ;
 : do-crap ( obj -- ) dup [ more-crap ] [ do-crap ] if ;
-[ [ do-crap ] infer short-effect ] unit-test-fails
+[ [ do-crap ] infer ] unit-test-fails
 
 ! This one does not
 DEFER: do-crap*
 : more-crap* ( obj -- ) dup [ drop ] [ dup do-crap* call ] if ;
 : do-crap* ( obj -- ) dup [ do-crap* ] [ more-crap* ] if ;
-[ [ do-crap* ] infer short-effect ] unit-test-fails
+[ [ do-crap* ] infer ] unit-test-fails
 
 ! Regression
 : too-deep ( a b -- c )
     dup [ drop ] [ 2dup too-deep too-deep * ] if ; inline
-[ { 2 1 } ] [ [ too-deep ] infer short-effect ] unit-test
+{ 2 1 } [ too-deep ] unit-test-effect
 
 ! Error reporting is wrong
 MATH: xyz
@@ -233,7 +227,7 @@ M: fixnum xyz 2array ;
 M: float xyz
     [ 3 ] 2apply swapd >r 2array swap r> 2array swap ;
 
-[ t ] [ [ [ xyz ] infer short-effect ] catch inference-error? ] unit-test
+[ t ] [ [ [ xyz ] infer ] catch inference-error? ] unit-test
 
 ! Doug Coleman discovered this one while working on the
 ! calendar library
@@ -265,17 +259,17 @@ DEFER: C
         [ dup B C ]
     } dispatch ;
 
-[ { 1 0 } ] [ [ A ] infer short-effect ] unit-test
-[ { 1 0 } ] [ [ B ] infer short-effect ] unit-test
-[ { 1 0 } ] [ [ C ] infer short-effect ] unit-test
+{ 1 0 } [ A ] unit-test-effect
+{ 1 0 } [ B ] unit-test-effect
+{ 1 0 } [ C ] unit-test-effect
 
 ! I found this bug by thinking hard about the previous one
 DEFER: Y
 : X ( a b -- c d ) dup [ swap Y ] [ ] if ;
 : Y ( a b -- c d ) X ;
 
-[ { 2 2 } ] [ [ X ] infer short-effect ] unit-test
-[ { 2 2 } ] [ [ Y ] infer short-effect ] unit-test
+{ 2 2 } [ X ] unit-test-effect
+{ 2 2 } [ Y ] unit-test-effect
 
 ! This one comes from UI code
 DEFER: #1
@@ -284,17 +278,17 @@ DEFER: #1
 : #4 ( a -- ) dup [ drop ] [ dup #4 dup #3 call ] if ;
 : #1 ( a -- ) dup [ dup #4 dup #3 ] [ ] if drop ;
 
-[ \ #4 word-def infer short-effect ] unit-test-fails
-[ [ #1 ] infer short-effect ] unit-test-fails
+[ \ #4 word-def infer ] unit-test-fails
+[ [ #1 ] infer ] unit-test-fails
 
 ! Similar
 DEFER: bar
 : foo ( a b -- c d ) dup [ 2drop f f bar ] [ ] if ;
 : bar ( a b -- ) [ 2 2 + ] t foo drop call drop ;
 
-[ [ foo ] infer short-effect ] unit-test-fails
+[ [ foo ] infer ] unit-test-fails
 
-[ 1234 infer short-effect ] unit-test-fails
+[ 1234 infer ] unit-test-fails
 
 ! This used to hang
 [ t ] [
@@ -340,128 +334,128 @@ DEFER: bar
 : bad-recursion-1 ( a -- b )
     dup [ drop bad-recursion-1 5 ] [ ] if ;
 
-[ [ bad-recursion-1 ] infer short-effect ] unit-test-fails
+[ [ bad-recursion-1 ] infer ] unit-test-fails
 
 : bad-bin ( a b -- ) 5 [ 5 bad-bin bad-bin 5 ] [ 2drop ] if ;
-[ [ bad-bin ] infer short-effect ] unit-test-fails
+[ [ bad-bin ] infer ] unit-test-fails
 
-[ t ] [ [ [ r> ] infer short-effect ] catch inference-error? ] unit-test
+[ t ] [ [ [ r> ] infer ] catch inference-error? ] unit-test
 
 ! Regression
 [ t ] [ [ [ get-slots ] infer ] catch inference-error? ] unit-test
 
 ! Test some curry stuff
-[ { 1 1 } ] [ [ 3 [ ] curry 4 [ ] curry if ] infer short-effect ] unit-test
+{ 1 1 } [ 3 [ ] curry 4 [ ] curry if ] unit-test-effect
 
-[ { 2 1 } ] [ [ [ ] curry 4 [ ] curry if ] infer short-effect ] unit-test
+{ 2 1 } [ [ ] curry 4 [ ] curry if ] unit-test-effect
 
 [ [ 3 [ ] curry 1 2 [ ] 2curry if ] infer ] unit-test-fails
 
 ! Test number protocol
-[ { 2 1 } ] [ [ bitor ] infer short-effect ] unit-test
-[ { 2 1 } ] [ [ bitand ] infer short-effect ] unit-test
-[ { 2 1 } ] [ [ bitxor ] infer short-effect ] unit-test
-[ { 2 1 } ] [ [ mod ] infer short-effect ] unit-test
-[ { 2 1 } ] [ [ /i ] infer short-effect ] unit-test
-[ { 2 1 } ] [ [ /f ] infer short-effect ] unit-test
-[ { 2 2 } ] [ [ /mod ] infer short-effect ] unit-test
-[ { 2 1 } ] [ [ + ] infer short-effect ] unit-test
-[ { 2 1 } ] [ [ - ] infer short-effect ] unit-test
-[ { 2 1 } ] [ [ * ] infer short-effect ] unit-test
-[ { 2 1 } ] [ [ / ] infer short-effect ] unit-test
-[ { 2 1 } ] [ [ < ] infer short-effect ] unit-test
-[ { 2 1 } ] [ [ <= ] infer short-effect ] unit-test
-[ { 2 1 } ] [ [ > ] infer short-effect ] unit-test
-[ { 2 1 } ] [ [ >= ] infer short-effect ] unit-test
-[ { 2 1 } ] [ [ number= ] infer short-effect ] unit-test
+{ 2 1 } [ bitor ] unit-test-effect
+{ 2 1 } [ bitand ] unit-test-effect
+{ 2 1 } [ bitxor ] unit-test-effect
+{ 2 1 } [ mod ] unit-test-effect
+{ 2 1 } [ /i ] unit-test-effect
+{ 2 1 } [ /f ] unit-test-effect
+{ 2 2 } [ /mod ] unit-test-effect
+{ 2 1 } [ + ] unit-test-effect
+{ 2 1 } [ - ] unit-test-effect
+{ 2 1 } [ * ] unit-test-effect
+{ 2 1 } [ / ] unit-test-effect
+{ 2 1 } [ < ] unit-test-effect
+{ 2 1 } [ <= ] unit-test-effect
+{ 2 1 } [ > ] unit-test-effect
+{ 2 1 } [ >= ] unit-test-effect
+{ 2 1 } [ number= ] unit-test-effect
 
 ! Test object protocol
-[ { 2 1 } ] [ [ = ] infer short-effect ] unit-test
-[ { 1 1 } ] [ [ clone ] infer short-effect ] unit-test
-[ { 2 1 } ] [ [ hashcode* ] infer short-effect ] unit-test
+{ 2 1 } [ = ] unit-test-effect
+{ 1 1 } [ clone ] unit-test-effect
+{ 2 1 } [ hashcode* ] unit-test-effect
 
 ! Test sequence protocol
-[ { 1 1 } ] [ [ length ] infer short-effect ] unit-test
-[ { 2 1 } ] [ [ nth ] infer short-effect ] unit-test
-[ { 2 0 } ] [ [ set-length ] infer short-effect ] unit-test
-[ { 3 0 } ] [ [ set-nth ] infer short-effect ] unit-test
-[ { 2 1 } ] [ [ new ] infer short-effect ] unit-test
-[ { 2 1 } ] [ [ new-resizable ] infer short-effect ] unit-test
-[ { 2 1 } ] [ [ like ] infer short-effect ] unit-test
-[ { 2 0 } ] [ [ lengthen ] infer short-effect ] unit-test
+{ 1 1 } [ length ] unit-test-effect
+{ 2 1 } [ nth ] unit-test-effect
+{ 2 0 } [ set-length ] unit-test-effect
+{ 3 0 } [ set-nth ] unit-test-effect
+{ 2 1 } [ new ] unit-test-effect
+{ 2 1 } [ new-resizable ] unit-test-effect
+{ 2 1 } [ like ] unit-test-effect
+{ 2 0 } [ lengthen ] unit-test-effect
 
 ! Test assoc protocol
-[ { 2 2 } ] [ [ at* ] infer short-effect ] unit-test
-[ { 3 0 } ] [ [ set-at ] infer short-effect ] unit-test
-[ { 2 1 } ] [ [ new-assoc ] infer short-effect ] unit-test
-[ { 2 0 } ] [ [ delete-at ] infer short-effect ] unit-test
-[ { 1 0 } ] [ [ clear-assoc ] infer short-effect ] unit-test
-[ { 1 1 } ] [ [ assoc-size ] infer short-effect ] unit-test
-[ { 2 1 } ] [ [ assoc-like ] infer short-effect ] unit-test
-[ { 2 1 } ] [ [ assoc-clone-like ] infer short-effect ] unit-test
-[ { 1 1 } ] [ [ >alist ] infer short-effect ] unit-test
-[ { 1 3 } ] [ [ [ 2drop f ] assoc-find ] infer short-effect ] unit-test
+{ 2 2 } [ at* ] unit-test-effect
+{ 3 0 } [ set-at ] unit-test-effect
+{ 2 1 } [ new-assoc ] unit-test-effect
+{ 2 0 } [ delete-at ] unit-test-effect
+{ 1 0 } [ clear-assoc ] unit-test-effect
+{ 1 1 } [ assoc-size ] unit-test-effect
+{ 2 1 } [ assoc-like ] unit-test-effect
+{ 2 1 } [ assoc-clone-like ] unit-test-effect
+{ 1 1 } [ >alist ] unit-test-effect
+{ 1 3 } [ [ 2drop f ] assoc-find ] unit-test-effect
 
 ! Test some random library words
-[ { 1 1 } ] [ [ 1quotation ] infer short-effect ] unit-test
-[ { 1 1 } ] [ [ string>number ] infer short-effect ] unit-test
-[ { 1 1 } ] [ [ get ] infer short-effect ] unit-test
+{ 1 1 } [ 1quotation ] unit-test-effect
+{ 1 1 } [ string>number ] unit-test-effect
+{ 1 1 } [ get ] unit-test-effect
 
-[ { 2 0 } ] [ [ push ] infer short-effect ] unit-test
-[ { 2 1 } ] [ [ append ] infer short-effect ] unit-test
-[ { 1 1 } ] [ [ peek ] infer short-effect ] unit-test
+{ 2 0 } [ push ] unit-test-effect
+{ 2 1 } [ append ] unit-test-effect
+{ 1 1 } [ peek ] unit-test-effect
 
-[ { 1 1 } ] [ [ reverse ] infer short-effect ] unit-test
-[ { 2 1 } ] [ [ member? ] infer short-effect ] unit-test
-[ { 2 1 } ] [ [ remove ] infer short-effect ] unit-test
-[ { 1 1 } ] [ [ natural-sort ] infer short-effect ] unit-test
+{ 1 1 } [ reverse ] unit-test-effect
+{ 2 1 } [ member? ] unit-test-effect
+{ 2 1 } [ remove ] unit-test-effect
+{ 1 1 } [ natural-sort ] unit-test-effect
 
-[ { 1 0 } ] [ [ forget ] infer short-effect ] unit-test
-[ { 4 0 } ] [ [ define-class ] infer short-effect ] unit-test
-[ { 2 0 } ] [ [ define-tuple-class ] infer short-effect ] unit-test
-[ { 2 0 } ] [ [ define-union-class ] infer short-effect ] unit-test
-[ { 3 0 } ] [ [ define-predicate-class ] infer short-effect ] unit-test
+{ 1 0 } [ forget ] unit-test-effect
+{ 4 0 } [ define-class ] unit-test-effect
+{ 2 0 } [ define-tuple-class ] unit-test-effect
+{ 2 0 } [ define-union-class ] unit-test-effect
+{ 3 0 } [ define-predicate-class ] unit-test-effect
 
 ! Test words with continuations
-[ { 0 0 } ] [ [ [ drop ] callcc0 ] infer short-effect ] unit-test
-[ { 0 1 } ] [ [ [ 4 swap continue-with ] callcc1 ] infer short-effect ] unit-test
-[ { 2 1 } ] [ [ [ + ] [ ] [ ] cleanup ] infer short-effect ] unit-test
-[ { 2 1 } ] [ [ [ + ] [ 3drop 0 ] recover ] infer short-effect ] unit-test
+{ 0 0 } [ [ drop ] callcc0 ] unit-test-effect
+{ 0 1 } [ [ 4 swap continue-with ] callcc1 ] unit-test-effect
+{ 2 1 } [ [ + ] [ ] [ ] cleanup ] unit-test-effect
+{ 2 1 } [ [ + ] [ 3drop 0 ] recover ] unit-test-effect
 
 ! Test stream protocol
-[ { 2 0 } ] [ [ set-timeout ] infer short-effect ] unit-test
-[ { 2 1 } ] [ [ stream-read ] infer short-effect ] unit-test
-[ { 1 1 } ] [ [ stream-read1 ] infer short-effect ] unit-test
-[ { 1 1 } ] [ [ stream-readln ] infer short-effect ] unit-test
-[ { 2 2 } ] [ [ stream-read-until ] infer short-effect ] unit-test
-[ { 2 0 } ] [ [ stream-write ] infer short-effect ] unit-test
-[ { 2 0 } ] [ [ stream-write1 ] infer short-effect ] unit-test
-[ { 1 0 } ] [ [ stream-nl ] infer short-effect ] unit-test
-[ { 1 0 } ] [ [ stream-close ] infer short-effect ] unit-test
-[ { 3 0 } ] [ [ stream-format ] infer short-effect ] unit-test
-[ { 3 0 } ] [ [ stream-write-table ] infer short-effect ] unit-test
-[ { 1 0 } ] [ [ stream-flush ] infer short-effect ] unit-test
-[ { 2 1 } ] [ [ make-span-stream ] infer short-effect ] unit-test
-[ { 2 1 } ] [ [ make-block-stream ] infer short-effect ] unit-test
-[ { 2 1 } ] [ [ make-cell-stream ] infer short-effect ] unit-test
+{ 2 0 } [ set-timeout ] unit-test-effect
+{ 2 1 } [ stream-read ] unit-test-effect
+{ 1 1 } [ stream-read1 ] unit-test-effect
+{ 1 1 } [ stream-readln ] unit-test-effect
+{ 2 2 } [ stream-read-until ] unit-test-effect
+{ 2 0 } [ stream-write ] unit-test-effect
+{ 2 0 } [ stream-write1 ] unit-test-effect
+{ 1 0 } [ stream-nl ] unit-test-effect
+{ 1 0 } [ stream-close ] unit-test-effect
+{ 3 0 } [ stream-format ] unit-test-effect
+{ 3 0 } [ stream-write-table ] unit-test-effect
+{ 1 0 } [ stream-flush ] unit-test-effect
+{ 2 1 } [ make-span-stream ] unit-test-effect
+{ 2 1 } [ make-block-stream ] unit-test-effect
+{ 2 1 } [ make-cell-stream ] unit-test-effect
 
 ! Test stream utilities
-[ { 1 1 } ] [ [ lines ] infer short-effect ] unit-test
-[ { 1 1 } ] [ [ contents ] infer short-effect ] unit-test
+{ 1 1 } [ lines ] unit-test-effect
+{ 1 1 } [ contents ] unit-test-effect
 
 ! Test prettyprinting
-[ { 1 0 } ] [ [ . ] infer short-effect ] unit-test
-[ { 1 0 } ] [ [ short. ] infer short-effect ] unit-test
-[ { 1 1 } ] [ [ unparse ] infer short-effect ] unit-test
+{ 1 0 } [ . ] unit-test-effect
+{ 1 0 } [ short. ] unit-test-effect
+{ 1 1 } [ unparse ] unit-test-effect
 
-[ { 1 0 } ] [ [ describe ] infer short-effect ] unit-test
-[ { 1 0 } ] [ [ error. ] infer short-effect ] unit-test
+{ 1 0 } [ describe ] unit-test-effect
+{ 1 0 } [ error. ] unit-test-effect
 
 ! Test odds and ends
-[ { 1 1 } ] [ [ ' ] infer short-effect ] unit-test
-[ { 2 0 } ] [ [ write-image ] infer short-effect ] unit-test
-[ { 1 1 } ] [ [ <process-stream> ] infer short-effect ] unit-test
-[ { 0 0 } ] [ [ idle-thread ] infer short-effect ] unit-test
+{ 1 1 } [ ' ] unit-test-effect
+{ 2 0 } [ write-image ] unit-test-effect
+{ 1 1 } [ <process-stream> ] unit-test-effect
+{ 0 0 } [ idle-thread ] unit-test-effect
 
 ! Incorrect stack declarations on inline recursive words should
 ! be caught
@@ -471,13 +465,13 @@ DEFER: bar
 [ [ barxxx ] infer ] unit-test-fails
 
 ! A typo
-[ { 1 0 } ] [ [ { [ ] } dispatch ] infer short-effect ] unit-test
+{ 1 0 } [ { [ ] } dispatch ] unit-test-effect
 
 DEFER: inline-recursive-2
 : inline-recursive-1 ( -- ) inline-recursive-2 ;
 : inline-recursive-2 ( -- ) inline-recursive-1 ;
 
-[ { 0 0 } ] [ [ inline-recursive-1 ] infer short-effect ] unit-test
+{ 0 0 } [ inline-recursive-1 ] unit-test-effect
 
 ! Hooks
 SYMBOL: my-var
@@ -486,23 +480,22 @@ HOOK: my-hook my-var ( -- x )
 M: integer my-hook "an integer" ;
 M: string my-hook "a string" ;
 
-[ { 0 1 } ] [ [ my-hook ] infer short-effect ] unit-test
+{ 0 1 } [ my-hook ] unit-test-effect
 
 DEFER: deferred-word
 
 : calls-deferred-word [ deferred-word ] [ 3 ] if ;
 
-[ { 1 1 } ] [ [ calls-deferred-word ] infer short-effect ] unit-test
+{ 1 1 } [ calls-deferred-word ] unit-test-effect
 
 USE: inference.dataflow
 
-[ { 1 0 } ] [ [ [ iterate-next ] iterate-nodes ] infer short-effect ] unit-test
+{ 1 0 } [ [ iterate-next ] iterate-nodes ] unit-test-effect
 
-[ { 1 0 } ] [
-    [
-        [ [ iterate-next ] iterate-nodes ] with-node-iterator
-    ] infer short-effect
-] unit-test
+{ 1 0 }
+[
+    [ [ iterate-next ] iterate-nodes ] with-node-iterator
+] unit-test-effect
 
 : nilpotent ( quot -- )
     t [ [ call ] keep nilpotent ] [ drop ] if ; inline
@@ -510,14 +503,13 @@ USE: inference.dataflow
 : semisimple ( quot -- )
     [ call ] keep [ [ semisimple ] keep ] nilpotent drop ; inline
 
-[ { 0 1 } ] [
-    [ [ ] [ call ] keep [ [ call ] keep ] nilpotent ]
-    infer short-effect
-] unit-test
+{ 0 1 }
+[ [ ] [ call ] keep [ [ call ] keep ] nilpotent ]
+unit-test-effect
 
-[ { 0 0 } ] [ [ [ ] semisimple ] infer short-effect ] unit-test
+{ 0 0 } [ [ ] semisimple ] unit-test-effect
 
-[ { 1 0 } ] [ [ [ drop ] each-node ] infer short-effect ] unit-test
+{ 1 0 } [ [ drop ] each-node ] unit-test-effect
 
 DEFER: an-inline-word
 
@@ -533,9 +525,9 @@ DEFER: an-inline-word
 : an-inline-word ( obj quot -- )
     >r normal-word r> call ; inline
 
-[ { 1 1 } ] [ [ [ 3 * ] an-inline-word ] infer short-effect ] unit-test
+{ 1 1 } [ [ 3 * ] an-inline-word ] unit-test-effect
 
-[ { 0 1 } ] [ [ [ 2 ] [ 2 ] [ + ] compose compose call ] infer short-effect ] unit-test
+{ 0 1 } [ [ 2 ] [ 2 ] [ + ] compose compose call ] unit-test-effect
 
 TUPLE: custom-error ;
 
@@ -559,4 +551,4 @@ TUPLE: custom-error ;
 
 ! This was a false trigger of the undecidable quotation
 ! recursion bug
-[ { 2 1 } ] [ [ find-last-sep ] infer short-effect ] unit-test
+{ 2 1 } [ find-last-sep ] unit-test-effect
