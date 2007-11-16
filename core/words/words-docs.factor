@@ -161,6 +161,7 @@ $nl
 { $subsection word? }
 { $subsection "interned-words" }
 { $subsection "word-definition" }
+{ $subsection "word-props" }
 { $subsection "word.private" }
 { $see-also "vocabularies" "vocabs.loader" "definitions" } ;
 
