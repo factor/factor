@@ -40,9 +40,8 @@ USING: io io.files io.streams.lines io.streams.plain io.streams.duplex
        listener ;
 
 : tty-listener ( tty -- )
-  [ <file-reader> <line-reader>  ]
-  [ <file-writer> <plain-writer> ]
-  bi <duplex-stream> [ listener ] with-stream ;
+  [ <file-reader> ] [ <file-writer> ] bi <duplex-stream>
+  [ listener ] with-stream ;
 
 : forever ( quot -- ) [ call ] [ forever ] bi ;
 
