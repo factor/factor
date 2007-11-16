@@ -196,31 +196,9 @@ M: alien-invoke alien-node-abi
     alien-invoke-library library
     [ library-abi ] [ "cdecl" ] if* ;
 
-: stdcall-mangle ( symbol node -- symbol )
-    "@"
-    swap alien-node-parameters parameter-sizes drop
-    number>string 3append ;
-
-: (alien-invoke-dlsym) ( node -- symbol dll )
-    dup alien-invoke-function
-    swap alien-invoke-library load-library ;
-
-TUPLE: no-such-symbol ;
-
-M: no-such-symbol summary
-    drop "Symbol not found" ;
-
-: no-such-symbol ( -- )
-    \ no-such-symbol inference-error ;
-
-: alien-invoke-dlsym ( node -- symbol dll )
-    dup (alien-invoke-dlsym) 2dup dlsym [
-        >r over stdcall-mangle r> 2dup dlsym
-        [ no-such-symbol ] unless
-    ] unless rot drop ;
-
 M: alien-invoke-error summary
-    drop "Words calling ``alien-invoke'' cannot run in the interpreter. Compile the caller word and try again." ;
+    drop
+    "Words calling ``alien-invoke'' must be compiled with the optimizing compiler." ;
 
 : pop-parameters pop-literal nip [ expand-constants ] map ;
 
@@ -235,13 +213,28 @@ M: alien-invoke-error summary
     pop-literal nip over set-alien-invoke-return
     ! Quotation which coerces parameters to required types
     dup make-prep-quot recursive-state get infer-quot
-    ! If symbol doesn't resolve, no stack effect, no compile
-    dup alien-invoke-dlsym 2drop
     ! Add node to IR
     dup node,
     ! Magic #: consume exactly the number of inputs
     0 alien-invoke-stack
 ] "infer" set-word-prop
+
+: stdcall-mangle ( symbol node -- symbol )
+    "@"
+    swap alien-node-parameters parameter-sizes drop
+    number>string 3append ;
+
+: (alien-invoke-dlsym) ( node -- symbol dll )
+    dup alien-invoke-function
+    swap alien-invoke-library load-library ;
+
+: alien-invoke-dlsym ( node -- symbol dll )
+    dup (alien-invoke-dlsym)
+    >r over stdcall-mangle r> 2dup dlsym [
+        rot drop
+    ] [
+        2drop (alien-invoke-dlsym)
+    ] if ;
 
 M: alien-invoke generate-node
     dup alien-invoke-frame [
@@ -260,7 +253,7 @@ M: alien-indirect alien-node-return alien-indirect-return ;
 M: alien-indirect alien-node-abi alien-indirect-abi ;
 
 M: alien-indirect-error summary
-    drop "Words calling ``alien-indirect'' cannot run in the interpreter. Compile the caller word and try again." ;
+    drop "Words calling ``alien-indirect'' must be compiled with the optimizing compiler." ;
 
 \ alien-indirect [
     ! Three literals and function pointer
@@ -309,7 +302,7 @@ M: alien-callback alien-node-return alien-callback-return ;
 M: alien-callback alien-node-abi alien-callback-abi ;
 
 M: alien-callback-error summary
-    drop "Words calling ``alien-callback'' cannot run in the interpreter. Compile the caller word and try again." ;
+    drop "Words calling ``alien-callback'' must be compiled with the optimizing compiler." ;
 
 : callback-bottom ( node -- )
     alien-callback-xt [ word-xt <alien> ] curry
