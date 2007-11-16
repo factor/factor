@@ -141,7 +141,7 @@ TUPLE: checkbox ;
     dup checkbox-theme ;
 
 M: checkbox model-changed
-    dup control-value over set-button-selected? relayout-1 ;
+    swap model-value over set-button-selected? relayout-1 ;
 
 TUPLE: radio-paint color ;
 
@@ -178,7 +178,7 @@ TUPLE: radio-control value ;
     tuck set-radio-control-value ; inline
 
 M: radio-control model-changed
-    dup control-value
+    swap model-value
     over radio-control-value =
     over set-button-selected?
     relayout-1 ;

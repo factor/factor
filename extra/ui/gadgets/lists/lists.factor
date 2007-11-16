@@ -42,6 +42,7 @@ TUPLE: list index presenter color hook ;
     ] map 2nip ;
 
 M: list model-changed
+    nip
     dup clear-gadget
     dup <list-items> over add-gadgets
     bound-index ;

@@ -46,12 +46,13 @@ TUPLE: walker model interpreter history ;
     V{ } clone over set-walker-history
     update-stacks ;
 
+M: walker graft* dup delegate graft* reset-walker ;
+
 : <walker> ( -- gadget )
     f <model> f f walker construct-boa [
         toolbar,
         g walker-model <traceback-gadget> 1 track,
-    ] { 0 1 } build-track
-    dup reset-walker ;
+    ] { 0 1 } build-track ;
 
 M: walker call-tool* ( continuation walker -- )
     [ restore ] with-walker ;

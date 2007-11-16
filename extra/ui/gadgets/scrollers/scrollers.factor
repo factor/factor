@@ -131,4 +131,4 @@ M: scroller focusable-child*
     scroller-viewport ;
 
 M: scroller model-changed
-    f swap set-scroller-follows ;
+    nip f swap set-scroller-follows ;

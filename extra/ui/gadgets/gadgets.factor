@@ -50,7 +50,7 @@ M: gadget equal? 2drop f ;
 
 M: gadget hashcode* drop gadget hashcode* ;
 
-M: gadget model-changed drop ;
+M: gadget model-changed 2drop ;
 
 : gadget-child ( gadget -- child ) gadget-children first ;
 
@@ -71,7 +71,7 @@ M: gadget model-changed drop ;
 
 : activate-control ( gadget -- )
     dup gadget-model dup [ 2dup add-connection ] when drop
-    model-changed ;
+    dup gadget-model swap model-changed ;
 
 : deactivate-control ( gadget -- )
     dup gadget-model dup [ 2dup remove-connection ] when 2drop ;

@@ -3,10 +3,10 @@
 USING: generic kernel math sequences timers arrays assocs ;
 IN: models
 
-TUPLE: model value connections dependencies ref ;
+TUPLE: model value connections dependencies ref locked? ;
 
 : <model> ( value -- model )
-    V{ } clone V{ } clone 0 model construct-boa ;
+    V{ } clone V{ } clone 0 f model construct-boa ;
 
 M: model equal? 2drop f ;
 
@@ -49,7 +49,7 @@ DEFER: remove-connection
         drop
     ] if ;
 
-GENERIC: model-changed ( observer -- )
+GENERIC: model-changed ( model observer -- )
 
 : add-connection ( observer model -- )
     dup model-connections empty? [ dup activate-model ] when
@@ -60,11 +60,26 @@ GENERIC: model-changed ( observer -- )
     dup model-connections empty? [ dup deactivate-model ] when
     drop ;
 
-GENERIC: set-model ( value model -- )
+: with-locked-model ( model quot -- )
+    swap
+    t over set-model-locked?
+    slip
+    f swap set-model-locked? ; inline
 
-M: model set-model
-    [ set-model-value ] keep
-    model-connections [ model-changed ] each ;
+GENERIC: update-model ( model -- )
+
+M: model update-model drop ;
+
+: set-model ( value model -- )
+    dup model-locked? [
+        2drop
+    ] [
+        dup [
+            [ set-model-value ] keep
+            [ update-model ] keep
+            dup model-connections [ model-changed ] curry* each
+        ] with-locked-model
+    ] if ;
 
 : ((change-model)) ( model quot -- newvalue model )
     over >r >r model-value r> call r> ; inline
@@ -87,10 +102,10 @@ TUPLE: filter model quot ;
     [ add-dependency ] keep ;
 
 M: filter model-changed
-    dup filter-model model-value over filter-quot call
+    swap model-value over filter-quot call
     swap set-model ;
 
-M: filter model-activated model-changed ;
+M: filter model-activated dup filter-model swap model-changed ;
 
 TUPLE: compose ;
 
@@ -103,11 +118,13 @@ TUPLE: compose ;
 : set-composed-value >r model-dependencies r> 2each ; inline
 
 M: compose model-changed
+    nip
     dup [ model-value ] composed-value swap delegate set-model ;
 
-M: compose model-activated model-changed ;
+M: compose model-activated dup model-changed ;
 
-M: compose set-model [ set-model ] set-composed-value ;
+M: compose update-model
+    dup model-value swap [ set-model ] set-composed-value ;
 
 TUPLE: mapping assoc ;
 
@@ -117,13 +134,15 @@ TUPLE: mapping assoc ;
     tuck set-mapping-assoc ;
 
 M: mapping model-changed
+    nip
     dup mapping-assoc [ model-value ] assoc-map
     swap delegate set-model ;
 
-M: mapping model-activated model-changed ;
+M: mapping model-activated dup model-changed ;
 
-M: mapping set-model
-    mapping-assoc [ swapd at set-model ] curry assoc-each ;
+M: mapping update-model
+    dup model-value swap mapping-assoc
+    [ swapd at set-model ] curry assoc-each ;
 
 TUPLE: history back forward ;
 
@@ -161,10 +180,9 @@ TUPLE: delay model timeout ;
     f delay construct-model
     [ set-delay-timeout ] keep
     [ set-delay-model ] 2keep
-    [ add-dependency ] keep
-    dup update-delay-model ;
+    [ add-dependency ] keep ;
 
-M: delay model-changed 0 over delay-timeout add-timer ;
+M: delay model-changed nip 0 over delay-timeout add-timer ;
 
 M: delay model-activated update-delay-model ;
 

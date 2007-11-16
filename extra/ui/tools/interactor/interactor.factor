@@ -25,19 +25,8 @@ help ;
         2drop f
     ] if ;
 
-TUPLE: caret-help model gadget ;
-
-: <caret-help> ( interactor -- caret-help )
-    [ editor-caret 100 <delay> ] keep caret-help construct-boa
-    dup dup caret-help-model add-connection ;
-
-M: caret-help model-changed
-    dup caret-help-gadget
-    swap caret-help-model model-value over word-at-loc
-    swap show-summary ;
-
 : init-caret-help ( interactor -- )
-    dup <caret-help> swap set-interactor-help ;
+    dup editor-caret 100 <delay> swap set-interactor-help ;
 
 : init-interactor-history ( interactor -- )
     V{ } clone swap set-interactor-history ;
@@ -52,12 +41,19 @@ M: caret-help model-changed
 
 M: interactor graft*
     dup delegate graft*
-    dup interactor-help caret-help-model activate-model
+    dup dup interactor-help add-connection
     f swap set-interactor-busy? ;
 
 M: interactor ungraft*
-    dup interactor-help caret-help-model deactivate-model
+    dup dup interactor-help remove-connection
     delegate ungraft* ;
+
+M: interactor model-changed
+    2dup interactor-help eq? [
+        swap model-value over word-at-loc swap show-summary
+    ] [
+        delegate model-changed
+    ] if ;
 
 : write-input ( string input -- )
     <input> presented associate

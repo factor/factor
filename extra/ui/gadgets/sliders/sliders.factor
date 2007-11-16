@@ -47,7 +47,7 @@ TUPLE: slider elevator thumb saved line ;
 
 : screen>slider slider-scale / ;
 
-M: slider model-changed slider-elevator relayout-1 ;
+M: slider model-changed nip slider-elevator relayout-1 ;
 
 TUPLE: thumb ;
 

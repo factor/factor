@@ -49,6 +49,7 @@ IN: ui.tools
     ] if relayout ;
 
 M: workspace model-changed
+    nip
     dup workspace-listener listener-gadget-output scroll>bottom
     dup resize-workspace
     request-focus ;

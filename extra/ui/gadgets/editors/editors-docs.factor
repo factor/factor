@@ -16,9 +16,6 @@ $nl
     { { $link editor-focused? } " - a boolean." }
 } } ;
 
-HELP: loc-monitor
-{ $class-description "Instances of this class are used internally by " { $link editor } " controls to redraw the editor when the caret or mark is moved by calling " { $link set-model } " on " { $link editor-caret } " or " { $link editor-mark } "." } ;
-
 HELP: <editor>
 { $values { "editor" "a new " { $link editor } } }
 { $description "Creates a new " { $link editor } " with an empty document." } ;

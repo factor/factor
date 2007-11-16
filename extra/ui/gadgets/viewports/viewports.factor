@@ -32,6 +32,7 @@ M: viewport pref-dim* viewport-dim ;
     gadget-model range-value [ >fixnum ] map ;
 
 M: viewport model-changed
+    nip
     dup relayout-1
     dup scroller-value
     vneg viewport-gap v+
