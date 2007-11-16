@@ -1,4 +1,6 @@
-USING: dlists dlists.private kernel tools.test ;
+USING: dlists dlists.private kernel tools.test random assocs
+hashtables sequences namespaces sorting debugger io prettyprint
+math ;
 IN: temporary
 
 [ t ] [ <dlist> dlist-empty? ] unit-test
@@ -59,3 +61,23 @@ IN: temporary
 [ 0 ] [ <dlist> dlist-length ] unit-test
 [ 1 ] [ <dlist> 1 over push-front dlist-length ] unit-test
 [ 0 ] [ <dlist> 1 over push-front dup pop-front* dlist-length ] unit-test
+
+: assert-same-elements
+    [ prune natural-sort ] 2apply assert= ;
+
+: dlist-push-all [ push-front ] curry each ;
+
+: dlist-delete-all [ dlist-delete drop ] curry each ;
+
+: dlist>array [ [ , ] dlist-slurp ] { } make ;
+
+[ ] [
+    5 [ drop 30 random >fixnum ] map prune
+    6 [ drop 30 random >fixnum ] map prune 2dup nl . . nl
+    [
+        <dlist>
+        [ dlist-push-all ] keep
+        [ dlist-delete-all ] keep
+        dlist>array
+    ] 2keep seq-diff assert-same-elements
+] unit-test

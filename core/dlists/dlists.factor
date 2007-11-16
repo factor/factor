@@ -121,6 +121,9 @@ PRIVATE>
 : delete-node ( quot dlist -- obj/f )
     delete-node* drop ; inline
 
+: dlist-delete ( obj dlist -- obj/f )
+    >r [ eq? ] curry r> delete-node ;
+
 : dlist-each ( dlist quot -- )
     [ dlist-node-obj ] swap compose dlist-each-node ; inline
 
