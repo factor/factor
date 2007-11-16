@@ -1,0 +1,117 @@
+
+Raptor Linux
+
+*** Introduction ***
+
+Raptor Linux is a mod of Ubuntu 6.06 (Dapper Drake)
+
+This is unlikely to work on another version of Ubuntu, much less
+another Linux distribution.
+
+*** Install ***
+
+  ( scratchpad ) USE: raptor
+  ( scratchpad ) save
+
+  # mv -v /sbin/{init,init.orig}
+
+  # cp -v /scratch/factor/factor /sbin/init
+
+  # cp -v /scratch/factor/factor.image /sbin/init.image
+
+  # mkdir -v /etc/raptor
+
+  # cp -v /scratch/factor/extra/raptor/config.factor /etc/raptor/config.factor
+
+*** Static IP networking ***
+
+If you use a static IP in your network then Factor can take care of
+networking.
+
+  # emacs /etc/raptor/config.factor
+
+  (change the settings accordingly)
+
+The udev system has a hook to bring up ethernet interfaces when they
+are detected. Let's remove this hook since we'll be bringing up the
+interface. Actually, we'll move it, not delete it.
+
+  # mv -v /etc/udev/rules.d/85-ifupdown.rules /root
+
+*** DHCP networking ***
+
+If you're using dhcp then we'll fall back on what Ubuntu offers. In
+your config.factor change the line :
+
+     start-networking
+
+to
+
+	"loopback"   start-service
+	"networking" start-service
+
+Add these to your reboot-hook and shutdown-hook :
+
+	"loopback"   stop-service
+	"networking" stop-service
+
+*** Editing the hooks ***
+
+The items in boot-hook correspond to the things in '/etc/rcS.d' and
+'/etc/rc2.d'. Feel free to add and remove items from that hook. For
+example, I removed the printer services. I also removed other things
+that I didn't feel were necessary on my system.
+
+*** Grub ***
+
+Edit your '/boot/grub/menu.lst'. Basically, copy and paste your
+current good entry. My default entry is this:
+
+title           Ubuntu, kernel 2.6.15-28-686
+root            (hd0,0)
+kernel          /boot/vmlinuz-2.6.15-28-686 root=/dev/hda1 ro quiet splash
+initrd          /boot/initrd.img-2.6.15-28-686
+savedefault
+boot
+
+I pasted a copy above it and edited it to look like this:
+
+title           Raptor, kernel 2.6.15-28-686
+root            (hd0,0)
+kernel          /boot/vmlinuz-2.6.15-28-686 root=/dev/hda1 ro quiet -run=ubuntu.dapper.boot
+initrd          /boot/initrd.img-2.6.15-28-686
+savedefault
+boot
+
+* Note that I removed the 'splash' kernel option
+
+* Note the '-run=ubuntu.dapper.boot' option. Unfortunately, this isn't
+  working yet...
+
+*** Boot ***
+
+Reboot or turn on your computer. Eventually, hopefully, you'll be at a
+Factor prompt. Boot your system:
+
+  ( scratchpad ) boot
+
+You'll probably be prompted to select a vocab. Select 'raptor'.
+
+*** Now what ***
+
+The virtual consoles are allocated like so:
+
+  1 - Main listener console
+  2 - listener
+  3 - listener
+  4 - listener
+  5 - getty
+  6 - getty
+
+So you're next step might be to alt-f5, login, and run startx.
+
+*** Join the fun ***
+
+Take a loot at what happens during run levels S and 2. Implement a
+Factor version of something. Let me know about it.
+

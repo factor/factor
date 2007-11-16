@@ -54,8 +54,8 @@ M: unix-io run-process* ( desc -- )
         setup-stdio-pipe
         (spawn-process)
     ] [
-        2dup second close first close
-    ] with-fork >r first swap second r> ;
+        -rot 2dup second close first close
+    ] with-fork first swap second rot ;
 
 TUPLE: pipe-stream pid ;
 
