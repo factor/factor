@@ -41,8 +41,8 @@ M: array rect-dim drop { 0 0 } ;
     (rect-union) <extent-rect> ;
 
 TUPLE: gadget
-pref-dim parent children orientation state focus
-visible? root? clipped? status
+pref-dim parent children orientation focus
+visible? root? clipped? layout-state graft-state
 interior boundary
 model ;
 
@@ -63,7 +63,7 @@ M: gadget model-changed drop ;
         set-delegate
         set-gadget-orientation
         set-gadget-visible?
-        set-gadget-status
+        set-gadget-graft-state
     } gadget construct ;
 
 : construct-gadget ( class -- tuple )
@@ -170,7 +170,7 @@ M: array gadget-text*
 : gadget-text ( gadget -- string ) [ gadget-text* ] "" make ;
 
 : invalidate ( gadget -- )
-    \ invalidate swap set-gadget-state ;
+    \ invalidate swap set-gadget-layout-state ;
 
 : forget-pref-dim ( gadget -- ) f swap set-gadget-pref-dim ;
 
@@ -185,17 +185,17 @@ M: array gadget-text*
 DEFER: relayout
 
 : invalidate* ( gadget -- )
-    \ invalidate* over set-gadget-state
+    \ invalidate* over set-gadget-layout-state
     dup forget-pref-dim
     dup gadget-root?
     [ layout-later ] [ gadget-parent [ relayout ] when* ] if ;
 
 : relayout ( gadget -- )
-    dup gadget-state \ invalidate* eq?
+    dup gadget-layout-state \ invalidate* eq?
     [ drop ] [ invalidate* ] if ;
 
 : relayout-1 ( gadget -- )
-    dup gadget-state
+    dup gadget-layout-state
     [ drop ] [ dup invalidate layout-later ] if ;
 
 : show-gadget t swap set-gadget-visible? ;
@@ -216,7 +216,8 @@ DEFER: relayout
 GENERIC: pref-dim* ( gadget -- dim )
 
 : ?set-gadget-pref-dim ( dim gadget -- )
-    dup gadget-state [ 2drop ] [ set-gadget-pref-dim ] if ;
+    dup gadget-layout-state
+    [ 2drop ] [ set-gadget-pref-dim ] if ;
 
 : pref-dim ( gadget -- dim )
     dup gadget-pref-dim [ ] [
@@ -233,10 +234,10 @@ M: gadget layout* drop ;
 
 : prefer ( gadget -- ) dup pref-dim swap set-layout-dim ;
 
-: validate ( gadget -- ) f swap set-gadget-state ;
+: validate ( gadget -- ) f swap set-gadget-layout-state ;
 
 : layout ( gadget -- )
-    dup gadget-state [
+    dup gadget-layout-state [
         dup validate
         dup layout*
         dup [ layout ] each-child
@@ -246,19 +247,19 @@ M: gadget layout* drop ;
 
 : unqueue-graft ( gadget -- )
     dup graft-queue dlist-delete [ "Not queued" throw ] unless
-    dup gadget-status first { t t } { f f } ?
-    swap set-gadget-status ;
+    dup gadget-graft-state first { t t } { f f } ?
+    swap set-gadget-graft-state ;
 
 : queue-graft ( gadget -- )
-    { f t } over set-gadget-status
+    { f t } over set-gadget-graft-state
     graft-queue push-front ;
 
 : queue-ungraft ( gadget -- )
-    { t f } over set-gadget-status
+    { t f } over set-gadget-graft-state
     graft-queue push-front ;
 
 : graft-later ( gadget -- )
-    dup gadget-status {
+    dup gadget-graft-state {
         { { f t } [ drop ] }
         { { t t } [ drop ] }
         { { t f } [ unqueue-graft ] }
@@ -266,7 +267,7 @@ M: gadget layout* drop ;
     } case ;
 
 : ungraft-later ( gadget -- )
-    dup gadget-status {
+    dup gadget-graft-state {
         { { f f } [ drop ] }
         { { t f } [ drop ] }
         { { f t } [ unqueue-graft ] }
@@ -277,32 +278,12 @@ GENERIC: graft* ( gadget -- )
 
 M: gadget graft* drop ;
 
-! : graft ( gadget -- )
-!     dup gadget-grafted? [
-!         drop
-!     ] [
-!         t over set-gadget-grafted?
-!         dup graft*
-!         dup activate-control
-!         [ graft ] each-child
-!     ] if ;
-
 : graft ( gadget -- )
     dup graft-later [ graft ] each-child ;
 
 GENERIC: ungraft* ( gadget -- )
 
 M: gadget ungraft* drop ;
-
-! : ungraft ( gadget -- )
-!     dup gadget-grafted? [
-!         dup [ ungraft ] each-child
-!         dup deactivate-control
-!         dup ungraft*
-!         f swap set-gadget-grafted?
-!     ] [
-!         drop ! "Fuck you" throw
-!     ] if ;
 
 : ungraft ( gadget -- )
     dup [ ungraft ] each-child ungraft-later ;
@@ -351,7 +332,7 @@ SYMBOL: in-layout?
     over unparent
     dup pick set-gadget-parent
     [ ((add-gadget)) ] 2keep
-    gadget-status second [ graft ] [ drop ] if ;
+    gadget-graft-state second [ graft ] [ drop ] if ;
 
 : add-gadget ( gadget parent -- )
     not-in-layout

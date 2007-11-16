@@ -342,22 +342,17 @@ SYMBOL: hWnd
 
 : peek-message? ( msg -- ? ) f 0 0 PM_REMOVE PeekMessage zero? ;
 
-: do-events ( msg -- )
+: event-loop ( msg -- )
     {
         { [ windows get empty? ] [ drop ] }
-        { [ dup peek-message? ] [ >r [ ui-step ] ui-try r> do-events ] }
+        { [ dup peek-message? ] [ >r [ ui-step ] ui-try r> event-loop ] }
         { [ dup MSG-message WM_QUIT = ] [ drop ] }
         { [ t ] [
             dup TranslateMessage drop
             dup DispatchMessage drop
-            do-events
+            event-loop
         ] }
     } cond ;
-
-: event-loop ( -- )
-    windows get empty? [
-        msg-obj get do-events
-    ] unless ;
 
 : register-wndclassex ( -- class )
     "WNDCLASSEX" <c-object>
@@ -448,7 +443,7 @@ M: windows-ui-backend ui
             init-clipboard
             init-win32-ui
             start-ui
-            event-loop
+            msg-obj get event-loop
         ] [ cleanup-win32-ui ] [ ] cleanup
     ] ui-running ;
 

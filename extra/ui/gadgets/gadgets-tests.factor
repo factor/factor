@@ -139,24 +139,24 @@ M: mock-gadget ungraft*
         <mock-gadget> "g" set
         [ ] [ "g" get queue-graft ] unit-test
         [ f ] [ graft-queue dlist-empty? ] unit-test
-        [ { f t } ] [ "g" get gadget-status ] unit-test
+        [ { f t } ] [ "g" get gadget-graft-state ] unit-test
         [ ] [ "g" get graft-later ] unit-test
-        [ { f t } ] [ "g" get gadget-status ] unit-test
+        [ { f t } ] [ "g" get gadget-graft-state ] unit-test
         [ ] [ "g" get ungraft-later ] unit-test
-        [ { f f } ] [ "g" get gadget-status ] unit-test
+        [ { f f } ] [ "g" get gadget-graft-state ] unit-test
         [ t ] [ graft-queue dlist-empty? ] unit-test
         [ ] [ "g" get ungraft-later ] unit-test
         [ ] [ "g" get graft-later ] unit-test
         [ ] [ notify-queued ] unit-test
-        [ { t t } ] [ "g" get gadget-status ] unit-test
+        [ { t t } ] [ "g" get gadget-graft-state ] unit-test
         [ t ] [ graft-queue dlist-empty? ] unit-test
         [ ] [ "g" get graft-later ] unit-test
         [ 1 ] [ "g" get mock-gadget-graft-called ] unit-test
         [ ] [ "g" get ungraft-later ] unit-test
-        [ { t f } ] [ "g" get gadget-status ] unit-test
+        [ { t f } ] [ "g" get gadget-graft-state ] unit-test
         [ ] [ notify-queued ] unit-test
         [ 1 ] [ "g" get mock-gadget-ungraft-called ] unit-test
-        [ { f f } ] [ "g" get gadget-status ] unit-test
+        [ { f f } ] [ "g" get gadget-graft-state ] unit-test
     ] with-variable
 
     : add-some-children
@@ -167,7 +167,7 @@ M: mock-gadget ungraft*
         ] each ;
 
     : status-flags
-        { "g" "1" "2" "3" } [ get gadget-status ] map prune ;
+        { "g" "1" "2" "3" } [ get gadget-graft-state ] map prune ;
 
     : notify-combo ( ? ? -- )
         nl "===== Combo: " write 2dup 2array . nl
@@ -182,9 +182,9 @@ M: mock-gadget ungraft*
             [ [ 1 ] [ graft-queue dlist-length ] unit-test ] unless
             [ [ ] [ notify-queued ] unit-test ] when
             [ ] [ add-some-children ] unit-test
-            [ { f t } ] [ "1" get gadget-status ] unit-test
-            [ { f t } ] [ "2" get gadget-status ] unit-test
-            [ { f t } ] [ "3" get gadget-status ] unit-test
+            [ { f t } ] [ "1" get gadget-graft-state ] unit-test
+            [ { f t } ] [ "2" get gadget-graft-state ] unit-test
+            [ { f t } ] [ "3" get gadget-graft-state ] unit-test
             [ ] [ [ "x" print notify ] graft-queue swap dlist-slurp ] unit-test
             [ ] [ notify-queued ] unit-test
             [ V{ { t t } } ] [ status-flags ] unit-test

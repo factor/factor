@@ -21,7 +21,7 @@ TUPLE: incremental cursor ;
     dup delegate pref-dim over set-incremental-cursor ;
 
 M: incremental pref-dim*
-    dup gadget-state [
+    dup gadget-layout-state [
         dup delegate pref-dim over set-incremental-cursor
     ] when incremental-cursor ;
 
