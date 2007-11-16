@@ -1,15 +1,7 @@
 USING: ui.gadgets.editors tools.test kernel io io.streams.plain
-io.streams.string definitions namespaces ui.gadgets
+definitions namespaces ui.gadgets
 ui.gadgets.grids prettyprint documents ui.gestures
 tools.test.inference tools.test.ui ;
-
-[ t ] [
-    <editor> "editor" set
-    "editor" get [
-        "editor" get <plain-writer> [ \ = see ] with-stream
-        "editor" get editor-string [ \ = see ] string-out =
-    ] with-grafted-gadget
-] unit-test
 
 [ "foo bar" ] [
     <editor> "editor" set
