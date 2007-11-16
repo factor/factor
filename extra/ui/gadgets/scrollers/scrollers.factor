@@ -115,10 +115,10 @@ scroller H{
 
 : update-scroller ( scroller follows -- )
     {
-        { [ dup t eq? ] [ drop (scroll>bottom) "A" drop ] }
-        { [ dup rect? ] [ swap (scroll>rect) "B" drop ] }
-        { [ dup ] [ swap (scroll>gadget)  "C" drop ] }
-        { [ t ] [ drop dup scroller-value swap scroll "D" drop ] }
+        { [ dup t eq? ] [ drop (scroll>bottom) ] }
+        { [ dup rect? ] [ swap (scroll>rect) ] }
+        { [ dup ] [ swap (scroll>gadget) ] }
+        { [ t ] [ drop dup scroller-value swap scroll ] }
     } cond ;
 
 M: scroller layout*
