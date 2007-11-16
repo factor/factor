@@ -107,7 +107,8 @@ PRIVATE>
     {
         { [ 2dup >r dlist-front r> = ] [ drop pop-front* ] }
         { [ 2dup >r dlist-back r> = ] [ drop pop-back* ] }
-        { [ t ] [ dup dlist-node-prev swap dlist-node-next set-prev-when
+        { [ t ] [ dup dlist-node-prev over dlist-node-next set-prev-when
+                  dup dlist-node-next swap dlist-node-prev set-next-when
                   dec-length ] }
     } cond ;
 
