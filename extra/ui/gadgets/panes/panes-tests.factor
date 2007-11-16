@@ -1,7 +1,8 @@
 IN: temporary
 USING: alien ui.gadgets.panes ui.gadgets namespaces
 kernel sequences io io.streams.string tools.test prettyprint
-definitions help help.syntax help.markup splitting ;
+definitions help help.syntax help.markup splitting
+tools.test.ui models ;
 
 : #children "pane" get gadget-children length ;
 
@@ -33,3 +34,7 @@ ARTICLE: "test-article" "This is a test article"
 
 <pane> [ \ = see ] with-pane
 <pane> [ \ = help ] with-pane
+
+[ ] [
+    \ = <model> [ see ] <pane-control> [ ] with-grafted-gadget
+] unit-test

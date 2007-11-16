@@ -13,9 +13,9 @@ HELP: gadget
         { { $link gadget-visible? } " - a boolean indicating if the gadget should display and receive user input." }
         { { $link gadget-root? } " - if set to " { $link t } ", layout changes in this gadget will not propagate to the gadget's parent." }
         { { $link gadget-clipped? } " - a boolean indicating if clipping will be enabled when drawing this gadget's children." }
-        { { $link gadget-grafted? } " - if set to " { $link t } ", the gadget is parented in a native window." }
         { { $link gadget-interior } " - an object whose class implements the " { $link draw-interior } " generic word." }
         { { $link gadget-boundary } " - an object whose class implements the " { $link draw-boundary } " generic word." }
+        { { $link gadget-model } " - XXX" }
     }
 "Gadgets delegate to " { $link rect } " instances holding their location and dimensions." }
 { $notes

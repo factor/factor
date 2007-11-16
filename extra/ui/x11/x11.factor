@@ -224,7 +224,6 @@ M: x11-ui-backend set-title ( string world -- )
 
 M: x11-ui-backend (open-world-window) ( world -- )
     dup gadget-window
-    dup start-world
     world-handle x11-handle-window dup set-closable map-window ;
 
 M: x11-ui-backend raise-window ( world -- )

@@ -3,7 +3,8 @@
 USING: arrays assocs io kernel math models namespaces
 prettyprint dlists sequences threads sequences words timers
 debugger ui.gadgets ui.gadgets.worlds ui.gadgets.tracks
-ui.gestures ui.backend ui.render continuations init ;
+ui.gestures ui.backend ui.render continuations init
+combinators ;
 IN: ui
 
 ! Assoc mapping aliens to gadgets
@@ -53,25 +54,23 @@ SYMBOL: windows
     reset-world ;
 
 : open-world-window ( world -- )
-    dup pref-dim over set-gadget-dim
-    dup (open-world-window)
-    draw-world ;
+    dup pref-dim over set-gadget-dim dup relayout graft ;
 
 : open-window ( gadget title -- )
     >r [ 1 track, ] { 0 1 } make-track r>
     f <world> open-world-window ;
 
 : find-window ( quot -- world )
-    windows get 1 <column>
+    windows get values
     [ gadget-child swap call ] curry* find-last nip ; inline
 
 : restore-windows ( -- )
-    windows get [ 1 <column> >array ] keep delete-all
+    windows get [ values ] keep delete-all
     [ dup reset-world (open-world-window) ] each
     forget-rollover ;
 
 : restore-windows? ( -- ? )
-    windows get [ empty? not ] [ f ] if* ;
+    windows get empty? not ;
 
 : update-hand ( world -- )
     dup hand-world get-global eq?
@@ -79,7 +78,8 @@ SYMBOL: windows
 
 : layout-queued ( -- seq )
     [
-        invalid [
+        in-layout? on
+        layout-queue [
             dup layout find-world [ , ] when*
         ] dlist-slurp
     ] { } make ;
@@ -87,8 +87,32 @@ SYMBOL: windows
 SYMBOL: ui-hook
 
 : init-ui ( -- )
-    <dlist> \ invalid set-global
+    <dlist> \ graft-queue set-global
+    <dlist> \ layout-queue set-global
     V{ } clone windows set-global ;
+
+: redraw-worlds ( seq -- )
+    [ dup update-hand draw-world ] each ;
+
+: notify ( gadget -- )
+    dup gadget-status {
+        { { f t } [ dup activate-control dup graft* ] }
+        { { t f } [ dup activate-control dup ungraft* ] }
+    } case
+    dup gadget-status first { f f } { t t } ?
+    swap set-gadget-status ;
+
+: notify-queued ( -- )
+    graft-queue [ notify ] dlist-slurp ;
+
+: ui-step ( -- )
+    [
+        do-timers
+        notify-queued
+        layout-queued
+        redraw-worlds
+        10 sleep
+    ] assert-depth ;
 
 : start-ui ( -- )
     init-timers
@@ -96,15 +120,7 @@ SYMBOL: ui-hook
         restore-windows
     ] [
         init-ui ui-hook get call
-    ] if ;
-
-: redraw-worlds ( seq -- )
-    [ dup update-hand draw-world ] each ;
-
-: ui-step ( -- )
-    [
-        do-timers layout-queued redraw-worlds 10 sleep
-    ] assert-depth ;
+    ] if ui-step ;
 
 : ui-running ( quot -- )
     t \ ui-running set-global

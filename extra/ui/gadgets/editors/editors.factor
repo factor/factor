@@ -2,10 +2,9 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: arrays documents ui.clipboards ui.commands ui.gadgets
 ui.gadgets.borders ui.gadgets.buttons ui.gadgets.labels
-ui.gadgets.scrollers ui.gadgets.theme
-ui.render ui.gestures io kernel math models namespaces opengl
-opengl.gl sequences strings io.styles math.vectors sorting
-colors combinators ;
+ui.gadgets.scrollers ui.gadgets.theme ui.render ui.gestures io
+kernel math models namespaces opengl opengl.gl sequences strings
+io.styles math.vectors sorting colors combinators ;
 IN: ui.gadgets.editors
 
 TUPLE: editor
@@ -129,7 +128,7 @@ M: editor model-changed
     line-height 0 swap 2array ;
 
 : scroll>caret ( editor -- )
-    dup gadget-grafted? [
+    dup gadget-status second [
         dup caret-loc over caret-dim { 1 0 } v+ <rect>
         over scroll>rect
     ] when drop ;

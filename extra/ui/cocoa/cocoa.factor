@@ -62,7 +62,6 @@ M: cocoa-ui-backend set-title ( string world -- )
 
 M: cocoa-ui-backend (open-world-window) ( world -- )
     dup gadget-window
-    dup start-world
     dup auto-position
     world-handle second f -> makeKeyAndOrderFront: ;
 

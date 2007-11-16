@@ -18,11 +18,6 @@ HELP: find-window
 { $values { "quot" "a quotation with stack effect " { $snippet "( world -- ? )" } } { "world" "a " { $link world } " or " { $link f } } }
 { $description "Finds a native window whose world satisfies the quotation, outputting " { $link f } " if no such world could be found. The front-most native window is checked first." } ;
 
-HELP: start-world
-{ $values { "world" world } }
-{ $description "Starts a world." }
-{ $notes "This word should be called by the UI backend after " { $link register-window } ", but before making the world's containing window visible on the screen." } ;
-
 HELP: register-window
 { $values { "world" world } { "handle" "a baackend-specific handle" } }
 { $description "Adds a window to the global " { $link windows } " variable." }
@@ -174,7 +169,6 @@ ARTICLE: "ui-backend-windows" "UI backend window management"
 { $subsection open-world-window }
 "This word should create a native window, store some kind of handle in the " { $link world-handle } " slot, then call two words:"
 { $subsection register-window }
-{ $subsection start-world }
 "The following words must also be implemented:"
 { $subsection set-title }
 { $subsection raise-window }

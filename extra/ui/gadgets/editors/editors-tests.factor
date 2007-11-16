@@ -1,6 +1,7 @@
 USING: ui.gadgets.editors tools.test kernel io io.streams.plain
 io.streams.string definitions namespaces ui.gadgets
-ui.gadgets.grids prettyprint documents ui.gestures ;
+ui.gadgets.grids prettyprint documents ui.gestures
+tools.test.inference ;
 
 [ t ] [
     <editor> "editor" set
@@ -36,3 +37,5 @@ ui.gadgets.grids prettyprint documents ui.gestures ;
     "editor" get position-caret
     "editor" get ungraft*
 ] unit-test
+
+{ 0 1 } [ <editor> ] unit-test-effect

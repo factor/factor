@@ -42,7 +42,7 @@ M: array rect-dim drop { 0 0 } ;
 
 TUPLE: gadget
 pref-dim parent children orientation state focus
-visible? root? clipped? grafted?
+visible? root? clipped? status
 interior boundary
 model ;
 
@@ -59,10 +59,11 @@ M: gadget model-changed drop ;
 : <zero-rect> ( -- rect ) { 0 0 } dup <rect> ;
 
 : <gadget> ( -- gadget )
-    <zero-rect> { 0 1 } t {
+    <zero-rect> { 0 1 } t { f f } {
         set-delegate
         set-gadget-orientation
         set-gadget-visible?
+        set-gadget-status
     } gadget construct ;
 
 : construct-gadget ( class -- tuple )
@@ -173,13 +174,13 @@ M: array gadget-text*
 
 : forget-pref-dim ( gadget -- ) f swap set-gadget-pref-dim ;
 
-: invalid ( -- queue ) \ invalid get-global ;
+: layout-queue ( -- queue ) \ layout-queue get ;
 
-: add-invalid ( gadget -- )
+: layout-later ( gadget -- )
     #! When unit testing gadgets without the UI running, the
     #! invalid queue is not initialized and we simply ignore
     #! invalidation requests.
-    invalid [ push-front ] [ drop ] if* ;
+    layout-queue [ push-front ] [ drop ] if* ;
 
 DEFER: relayout
 
@@ -187,7 +188,7 @@ DEFER: relayout
     \ invalidate* over set-gadget-state
     dup forget-pref-dim
     dup gadget-root?
-    [ add-invalid ] [ gadget-parent [ relayout ] when* ] if ;
+    [ layout-later ] [ gadget-parent [ relayout ] when* ] if ;
 
 : relayout ( gadget -- )
     dup gadget-state \ invalidate* eq?
@@ -195,7 +196,7 @@ DEFER: relayout
 
 : relayout-1 ( gadget -- )
     dup gadget-state
-    [ drop ] [ dup invalidate add-invalid ] if ;
+    [ drop ] [ dup invalidate layout-later ] if ;
 
 : show-gadget t swap set-gadget-visible? ;
 
@@ -241,27 +242,70 @@ M: gadget layout* drop ;
         dup [ layout ] each-child
     ] when drop ;
 
+: graft-queue \ graft-queue get ;
+
+: unqueue-graft ( gadget -- )
+    dup graft-queue dlist-delete [ "Not queued" throw ] unless
+    dup gadget-status first { t t } { f f } ?
+    swap set-gadget-status ;
+
+: queue-graft ( gadget -- )
+    { f t } over set-gadget-status
+    graft-queue push-front ;
+
+: queue-ungraft ( gadget -- )
+    { t f } over set-gadget-status
+    graft-queue push-front ;
+
+: graft-later ( gadget -- )
+    dup gadget-status {
+        { { f t } [ drop ] }
+        { { t t } [ drop ] }
+        { { t f } [ unqueue-graft ] }
+        { { f f } [ queue-graft ] }
+    } case ;
+
+: ungraft-later ( gadget -- )
+    dup gadget-status {
+        { { f f } [ drop ] }
+        { { t f } [ drop ] }
+        { { f t } [ unqueue-graft ] }
+        { { t t } [ queue-ungraft ] }
+    } case ;
+
 GENERIC: graft* ( gadget -- )
 
 M: gadget graft* drop ;
 
+! : graft ( gadget -- )
+!     dup gadget-grafted? [
+!         drop
+!     ] [
+!         t over set-gadget-grafted?
+!         dup graft*
+!         dup activate-control
+!         [ graft ] each-child
+!     ] if ;
+
 : graft ( gadget -- )
-    t over set-gadget-grafted?
-    dup graft*
-    dup activate-control
-    [ graft ] each-child ;
+    dup graft-later [ graft ] each-child ;
 
 GENERIC: ungraft* ( gadget -- )
 
 M: gadget ungraft* drop ;
 
+! : ungraft ( gadget -- )
+!     dup gadget-grafted? [
+!         dup [ ungraft ] each-child
+!         dup deactivate-control
+!         dup ungraft*
+!         f swap set-gadget-grafted?
+!     ] [
+!         drop ! "Fuck you" throw
+!     ] if ;
+
 : ungraft ( gadget -- )
-    dup gadget-grafted? [
-        dup [ ungraft ] each-child
-        dup deactivate-control
-        dup ungraft*
-        f over set-gadget-grafted?
-    ] when drop ;
+    dup [ ungraft ] each-child ungraft-later ;
 
 : (unparent) ( gadget -- )
     dup ungraft
@@ -272,7 +316,14 @@ M: gadget ungraft* drop ;
     tuck gadget-focus eq?
     [ f swap set-gadget-focus ] [ drop ] if ;
 
+SYMBOL: in-layout?
+
+: not-in-layout
+    in-layout? get
+    [ "Cannot add/remove gadgets in layout*" throw ] when ;
+
 : unparent ( gadget -- )
+    not-in-layout
     [
         dup gadget-parent dup [
             over (unparent)
@@ -290,6 +341,7 @@ M: gadget ungraft* drop ;
     f swap set-gadget-children ;
 
 : clear-gadget ( gadget -- )
+    not-in-layout
     dup (clear-gadget) relayout ;
 
 : ((add-gadget)) ( gadget box -- )
@@ -299,12 +351,14 @@ M: gadget ungraft* drop ;
     over unparent
     dup pick set-gadget-parent
     [ ((add-gadget)) ] 2keep
-    gadget-grafted? [ graft ] [ drop ] if ;
+    gadget-status second [ graft ] [ drop ] if ;
 
 : add-gadget ( gadget parent -- )
+    not-in-layout
     [ (add-gadget) ] keep relayout ;
 
 : add-gadgets ( seq parent -- )
+    not-in-layout
     swap [ over (add-gadget) ] each relayout ;
 
 : parents ( gadget -- seq )

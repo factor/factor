@@ -16,8 +16,7 @@ TUPLE: viewport ;
 : <viewport> ( content model -- viewport )
     <gadget> viewport construct-control
     t over set-gadget-clipped?
-    [ add-gadget ] keep
-    [ model-changed ] keep ;
+    [ add-gadget ] keep ;
 
 M: viewport layout*
     dup rect-dim viewport-gap 2 v*n v-

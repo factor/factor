@@ -2,14 +2,14 @@ USING: ui.tools ui.tools.interactor ui.tools.listener
 ui.tools.search ui.tools.workspace kernel models namespaces
 sequences timers tools.test ui.gadgets ui.gadgets.buttons
 ui.gadgets.labelled ui.gadgets.presentations
-ui.gadgets.scrollers vocabs ;
+ui.gadgets.scrollers vocabs tools.test.ui ui ;
 IN: temporary
 
 [
     [ f ] [
         0 <model> <gadget> [ set-gadget-model ] keep gadget set
         <workspace-tabs> gadget-children empty?
-    ] unit-test 
+    ] unit-test
 ] with-scope
 
 timers get [ init-timers ] unless
@@ -31,24 +31,29 @@ timers get [ init-timers ] unless
     "w" get hide-popup
 ] unit-test
 
-[ ] [
-    <workspace> "w" set
-    "w" get graft
-    "w" get "kernel" vocab show-vocab-words
-] unit-test
+[ ] [ <workspace> [ ] with-grafted-gadget ] unit-test
 
-"w" get workspace-popup closable-gadget-content
-live-search-list gadget-child "p" set
+"w" get [
 
-[ t ] [ "p" get presentation? ] unit-test
+    [ ] [ "w" get "kernel" vocab show-vocab-words ] unit-test
 
-"p" get <operations-menu> gadget-child gadget-child "c" set
+    [ ] [ notify-queued ] unit-test
 
-[ t ] [ "c" get button? ] unit-test
+    [ ] [ "w" get workspace-popup closable-gadget-content
+    live-search-list gadget-child "p" set ] unit-test
 
-[ ] [
-    "w" get workspace-listener listener-gadget-input
-    3 handle-parse-error
-] unit-test
+    [ t ] [ "p" get presentation? ] unit-test
 
-[ ] [ "w" get ungraft ] unit-test
+    [ ] [ "p" get <operations-menu> gadget-child gadget-child "c" set ] unit-test
+
+    [ ] [ notify-queued ] unit-test
+
+    [ t ] [ "c" get button? ] unit-test
+
+    [ ] [
+        "w" get workspace-listener listener-gadget-input
+        3 handle-parse-error
+    ] unit-test
+
+    [ ] [ notify-queued ] unit-test
+] with-grafted-gadget

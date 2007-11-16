@@ -42,6 +42,7 @@ M: incremental pref-dim*
     dup forget-pref-dim dup pref-dim over set-rect-dim layout ;
 
 : add-incremental ( gadget incremental -- )
+    not-in-layout
     2dup (add-gadget)
     over prefer-incremental
     2dup incremental-loc
@@ -50,6 +51,7 @@ M: incremental pref-dim*
     gadget-parent [ invalidate* ] when* ;
 
 : clear-incremental ( incremental -- )
+    not-in-layout
     dup (clear-gadget) dup forget-pref-dim
     { 0 0 } over set-incremental-cursor
     gadget-parent [ relayout ] when* ;
