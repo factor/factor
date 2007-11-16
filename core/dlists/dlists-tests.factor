@@ -81,3 +81,17 @@ IN: temporary
         dlist>array
     ] 2keep seq-diff assert-same-elements
 ] unit-test
+
+[ ] [
+    <dlist> "d" set
+    1 "d" get push-front
+    2 "d" get push-front
+    3 "d" get push-front
+    4 "d" get push-front
+    2 "d" get dlist-delete drop
+    3 "d" get dlist-delete drop
+    4 "d" get dlist-delete drop
+] unit-test
+
+[ 1 ] [ "d" get dlist-length ] unit-test
+[ 1 ] [ "d" get dlist>array length ] unit-test

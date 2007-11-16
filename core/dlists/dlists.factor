@@ -103,12 +103,15 @@ PRIVATE>
 : dlist-contains? ( quot dlist -- ? )
     dlist-find nip ; inline
 
+: unlink-node ( dlist-node -- )
+    dup dlist-node-prev over dlist-node-next set-prev-when
+    dup dlist-node-next swap dlist-node-prev set-next-when ;
+
 : (delete-node) ( dlist dlist-node -- )
     {
-        { [ 2dup >r dlist-front r> = ] [ drop pop-front* ] }
-        { [ 2dup >r dlist-back r> = ] [ drop pop-back* ] }
-        { [ t ] [ dup dlist-node-prev swap dlist-node-next set-prev-when
-                  dec-length ] }
+        { [ over dlist-front over eq? ] [ drop pop-front* ] }
+        { [ over dlist-back over eq? ] [ drop pop-back* ] }
+        { [ t ] [ unlink-node dec-length ] }
     } cond ;
 
 : delete-node* ( quot dlist -- obj/f ? )
