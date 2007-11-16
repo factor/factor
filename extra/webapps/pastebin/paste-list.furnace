@@ -1,0 +1,7 @@
+<% USING: namespaces furnace sequences ; %>
+
+<table  width="100%">
+<% "new-paste-quot" get "New paste" render-link %>
+<tr align="left"><th>&nbsp;</th><th>Summary:</th><th>Paste by:</th><th>Link</th><th>Date</th></tr>
+<% "pastes" get <reversed> [ "paste-summary" render-template ] each %></table>
+
