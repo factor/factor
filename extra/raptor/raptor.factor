@@ -10,7 +10,9 @@ SYMBOL: reboot-hook
 SYMBOL: shutdown-hook
 SYMBOL: networking-hook
 
-: reload-raptor-config ( -- ) "/etc/raptor/config.factor" run-file ;
+: reload-raptor-config ( -- )
+  "/etc/raptor/config.factor" run-file
+  "/etc/raptor/cronjobs.factor" run-file ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 

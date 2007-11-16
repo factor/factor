@@ -4,6 +4,8 @@ USING: namespaces unix.linux.if unix.linux.ifreq unix.linux.route ;
 IN: raptor
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+! Networking
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 : configure-lo ( -- )
   "lo" "127.0.0.1"      set-if-addr
@@ -41,7 +43,9 @@ IN: raptor
   "checkfs.sh" 			    start-service
   "mountall.sh"			    start-service
 
-				    start-networking
+ 				    start-networking
+!   "loopback" start-service
+!   "networking" start-service
 
   "hwclock.sh"			    start-service
   "displayconfig-hwprobe.py"	    start-service
@@ -49,7 +53,6 @@ IN: raptor
   "x11-common"			    start-service
   "bootmisc.sh"			    start-service
   "urandom"			    start-service
-  "console-screen.sh"		    start-service
 
   ! rc2.d
 
@@ -67,24 +70,20 @@ IN: raptor
   "postfix"			    start-service
   "powernowd"			    start-service
   "ntp-server"			    start-service
-  "anacron"			    start-service
-  "atd"				    start-service
-  "cron"			    start-service
   "binfmt-support"		    start-service
   "acpi-support"		    start-service
   "rc.local"			    start-service
   "rmnologin"			    start-service
 
+  				    schedule-cron-jobs
   				    start-listeners
 				    start-gettys
+				    
 ] boot-hook set-global
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 [
-  "anacron"                         stop-service
-  "atd" 			    stop-service
-  "cron" 			    stop-service
   "acpi-support" 		    stop-service
   "apmd" 			    stop-service
   "dbus" 			    stop-service
@@ -112,9 +111,6 @@ IN: raptor
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 [
-  "anacron"                         stop-service
-  "atd" 			    stop-service
-  "cron" 			    stop-service
   "acpi-support" 		    stop-service
   "apmd" 			    stop-service
   "dbus" 			    stop-service
