@@ -202,23 +202,6 @@ M: alien-invoke-error summary
 
 : pop-parameters pop-literal nip [ expand-constants ] map ;
 
-\ alien-invoke [
-    ! Four literals
-    4 ensure-values
-    \ alien-invoke empty-node
-    ! Compile-time parameters
-    pop-parameters over set-alien-invoke-parameters
-    pop-literal nip over set-alien-invoke-function
-    pop-literal nip over set-alien-invoke-library
-    pop-literal nip over set-alien-invoke-return
-    ! Quotation which coerces parameters to required types
-    dup make-prep-quot recursive-state get infer-quot
-    ! Add node to IR
-    dup node,
-    ! Magic #: consume exactly the number of inputs
-    0 alien-invoke-stack
-] "infer" set-word-prop
-
 : stdcall-mangle ( symbol node -- symbol )
     "@"
     swap alien-node-parameters parameter-sizes drop
@@ -228,13 +211,38 @@ M: alien-invoke-error summary
     dup alien-invoke-function
     swap alien-invoke-library load-library ;
 
+TUPLE: no-such-symbol ;
+
+M: no-such-symbol summary
+    drop "Symbol not found" ;
+
+: no-such-symbol ( -- )
+    \ no-such-symbol inference-error ;
+
 : alien-invoke-dlsym ( node -- symbol dll )
-    dup (alien-invoke-dlsym)
-    >r over stdcall-mangle r> 2dup dlsym [
-        rot drop
-    ] [
-        2drop (alien-invoke-dlsym)
-    ] if ;
+    dup (alien-invoke-dlsym) 2dup dlsym [
+        >r over stdcall-mangle r> 2dup dlsym
+        [ no-such-symbol ] unless
+    ] unless rot drop ;
+
+\ alien-invoke [
+    ! Four literals
+    4 ensure-values
+    \ alien-invoke empty-node
+    ! Compile-time parameters
+    pop-parameters over set-alien-invoke-parameters
+    pop-literal nip over set-alien-invoke-function
+    pop-literal nip over set-alien-invoke-library
+    pop-literal nip over set-alien-invoke-return
+    ! If symbol doesn't resolve, no stack effect, no compile
+    dup alien-invoke-dlsym 2drop
+    ! Quotation which coerces parameters to required types
+    dup make-prep-quot recursive-state get infer-quot
+    ! Add node to IR
+    dup node,
+    ! Magic #: consume exactly the number of inputs
+    0 alien-invoke-stack
+] "infer" set-word-prop
 
 M: alien-invoke generate-node
     dup alien-invoke-frame [
