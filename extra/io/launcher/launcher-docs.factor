@@ -1,7 +1,6 @@
 ! Copyright (C) 2007 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: help.markup help.syntax io.launcher.private quotations
-kernel ;
+USING: help.markup help.syntax io.launcher quotations kernel ;
 IN: io.launcher
 
 HELP: +command+
