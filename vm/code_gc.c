@@ -379,6 +379,8 @@ CELL compute_heap_forwarding(F_HEAP *heap)
 			scan->forwarding = (F_BLOCK *)address;
 			address += scan->size;
 		}
+		else if(scan->status == B_MARKED)
+			critical_error("Why is the block marked?",0);
 
 		scan = next_block(heap,scan);
 	}
@@ -389,6 +391,14 @@ CELL compute_heap_forwarding(F_HEAP *heap)
 F_COMPILED *forward_xt(F_COMPILED *compiled)
 {
 	return block_to_compiled(compiled_to_block(compiled)->forwarding);
+}
+
+void forward_frame_xt(F_STACK_FRAME *frame)
+{
+	CELL offset = (CELL)FRAME_RETURN_ADDRESS(frame) - (CELL)frame_code(frame);
+	F_COMPILED *forwarded = forward_xt(frame_code(frame));
+	frame->xt = (XT)(forwarded + 1);
+	FRAME_RETURN_ADDRESS(frame) = (XT)((CELL)forwarded + offset);
 }
 
 void forward_object_xts(void)
@@ -412,6 +422,11 @@ void forward_object_xts(void)
 
 			if(quot->compiledp != F)
 				set_quot_xt(quot,forward_xt(quot->code));
+		}
+		else if(type_of(obj) == CALLSTACK_TYPE)
+		{
+			F_CALLSTACK *stack = untag_object(obj);
+			iterate_callstack_object(stack,forward_frame_xt);
 		}
 	}
 

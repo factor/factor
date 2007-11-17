@@ -5,23 +5,6 @@ register CELL rs asm("r6");
 
 #define F_FASTCALL
 
-typedef struct
-{
-	/* In compiled quotation frames, position within the array.
-	In compiled word frames, unused. */
-	CELL scan;
-
-	/* In compiled quotation frames, the quot->array slot.
-	In compiled word frames, unused. */
-	CELL array;
-
-	/* In all compiled frames, the XT on entry. */
-	XT xt;
-
-	/* Frame size in bytes */
-	CELL size;
-} F_STACK_FRAME;
-
 #define FRAME_RETURN_ADDRESS(frame) *(XT *)(frame_successor(frame) + 1)
 
 void c_to_factor(CELL quot);
