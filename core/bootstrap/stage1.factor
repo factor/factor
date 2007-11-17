@@ -25,6 +25,10 @@ vocabs.loader system ;
     "math.integers" require
     "math.floats" require
     "memory" require
+
+    ! this must add its init hook before io.backend does
+    "libc" require
+
     "io.streams.c" require
     "vocabs.loader" require
     "syntax" require

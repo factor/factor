@@ -1,5 +1,5 @@
 USING: generic help.markup help.syntax kernel math memory
-namespaces sequences kernel.private io.files ;
+namespaces sequences kernel.private io.files strings ;
 IN: system
 
 ARTICLE: "os" "System interface"
@@ -21,23 +21,27 @@ ARTICLE: "os" "System interface"
 { $subsection cell-bits }
 "Reading environment variables:"
 { $subsection os-env }
+{ $subsection os-envs }
 "Getting the path to the Factor VM and image:"
 { $subsection vm }
 { $subsection image }
+"Getting the current time:"
+{ $subsection millis }
 "Exiting the Factor VM:"
-{ $subsection exit } ;
+{ $subsection exit }
+{ $see-also "file-streams" "network-streams" "io.launcher" } ;
 
 ABOUT: "os"
 
 HELP: cpu
-{ $values { "cpu" "a string" } }
+{ $values { "cpu" string } }
 { $description
     "Outputs a string descriptor of the current CPU architecture. Currently, this set of descriptors is:"
     { $code "x86.32" "x86.64" "ppc" "arm" }
 } ;
 
 HELP: os
-{ $values { "os" "a string" } }
+{ $values { "os" string } }
 { $description
     "Outputs a string descriptor of the current operating system family. Currently, this set of descriptors is:"
     { $code
@@ -87,17 +91,28 @@ HELP: exit ( n -- )
 { $description "Exits the Factor process." } ;
 
 HELP: millis ( -- n )
-{ $values { "n" "an integer" } }
-{ $description "Outputs the number of milliseconds ellapsed since midnight January 1, 1970." } ;
+{ $values { "n" integer } }
+{ $description "Outputs the number of milliseconds ellapsed since midnight January 1, 1970." }
+{ $notes "This is a low-level word. The " { $vocab-link "calendar" } " vocabulary provides features for date/time arithmetic and formatting." } ;
 
 HELP: os-env ( key -- value )
-{ $values { "key" "a string" } { "value" "a string" } }
+{ $values { "key" string } { "value" string } }
 { $description "Looks up the value of a shell environment variable." }
 { $examples 
     "This is an operating system-specific feature. On Unix, you can do:"
     { $unchecked-example "\"USER\" os-env print" "jane" }
 }
-{ $errors "Windows CE has no concept of ``environment variables'', so this word throws an error there." } ;
+{ $errors "Windows CE has no concept of environment variables, so this word throws an error there." } ;
+
+HELP: os-envs
+{ $values { "assoc" "an association mapping strings to strings" } }
+{ $description "Outputs the current set of environment variables." }
+{ $notes 
+    "Names and values of environment variables are operating system-specific."
+}
+{ $errors "Windows CE has no concept of environment variables, so this word throws an error there." } ;
+
+{ os-env os-envs } related-words
 
 HELP: win32?
 { $values { "?" "a boolean" } }
@@ -124,11 +139,11 @@ HELP: cell
 { $description "Outputs the pointer size in bytes of the current CPU architecture." } ;
 
 HELP: cells
-{ $values { "m" "an integer" } { "n" "an integer" } }
+{ $values { "m" integer } { "n" integer } }
 { $description "Computes the number of bytes used by " { $snippet "m" } " CPU operand-sized cells." } ;
 
 HELP: cell-bits
-{ $values { "n" "an integer" } }
+{ $values { "n" integer } }
 { $description "Outputs the number of bits in one CPU operand-sized cell." } ;
 
 HELP: bootstrap-cell
@@ -136,9 +151,9 @@ HELP: bootstrap-cell
 { $description "Outputs the pointer size in bytes for the target image (if bootstrapping) or the current CPU architecture (otherwise)." } ;
 
 HELP: bootstrap-cells
-{ $values { "m" "an integer" } { "n" "an integer" } }
+{ $values { "m" integer } { "n" integer } }
 { $description "Computes the number of bytes used by " { $snippet "m" } " cells in the target image (if bootstrapping) or the current CPU architecture (otherwise)." } ;
 
 HELP: bootstrap-cell-bits
-{ $values { "n" "an integer" } }
+{ $values { "n" integer } }
 { $description "Outputs the number of bits in one cell in the target image (if bootstrapping) or the current CPU architecture (otherwise)." } ;

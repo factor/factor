@@ -131,7 +131,7 @@ ARTICLE: "collections" "Collections"
 { $subsection "graphs" }
 { $subsection "buffers" } ;
 
-USE: io.sockets
+USING: io.sockets io.launcher ;
 
 ARTICLE: "io" "Input and output" 
 { $subsection "streams" }
@@ -144,7 +144,8 @@ ARTICLE: "io" "Input and output"
 "Advanced features:"
 { $subsection "stream-binary" }
 { $subsection "styles" }
-{ $subsection "network-streams" } ;
+{ $subsection "network-streams" }
+{ $subsection "io.launcher" } ;
 
 ARTICLE: "tools" "Developer tools"
 { $subsection "tools.annotations" }
