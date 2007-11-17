@@ -75,13 +75,11 @@ M: windows-io <mapped-file> ( path length -- mmap )
             PAGE_READWRITE SEC_COMMIT bitor
             FILE_MAP_ALL_ACCESS r> mmap-open
         ] keep
-    -roll -rot 2array \ mapped-file construct-boa
+        -roll -rot 2array \ mapped-file construct-boa
     ] with-destructors ;
 
-M: windows-io close-mapped-file ( mapped-file -- )
+M: windows-io (close-mapped-file) ( mapped-file -- )
     [
-        dup mapped-file-handle [
-            close-always
-        ] each
+        dup mapped-file-handle [ close-always ] each
         mapped-file-address UnmapViewOfFile win32-error=0/f
     ] with-destructors ;

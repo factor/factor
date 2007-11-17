@@ -15,7 +15,7 @@ M: unix-io <mapped-file> ( path length -- obj )
     dup PROT_READ PROT_WRITE bitor MAP_FILE MAP_SHARED bitor
     r> mmap-open \ mapped-file construct-boa ;
 
-M: unix-io close-mapped-file ( mmap -- )
+M: unix-io (close-mapped-file) ( mmap -- )
     [ mapped-file-address ] keep
     [ mapped-file-length munmap ] keep
     mapped-file-handle close
