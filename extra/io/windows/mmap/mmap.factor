@@ -81,7 +81,7 @@ M: windows-io <mapped-file> ( path length -- mmap )
         \ mapped-file construct-boa
     ] with-destructors ;
 
-M: windows-io close-mapped-file ( mapped-file -- )
+M: windows-io (close-mapped-file) ( mapped-file -- )
     [
         dup mapped-file-handle [ close-always ] each
         mapped-file-address UnmapViewOfFile win32-error=0/f

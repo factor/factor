@@ -29,7 +29,7 @@ ARTICLE: "os" "System interface"
 { $subsection millis }
 "Exiting the Factor VM:"
 { $subsection exit }
-{ $see-also "file-streams" "network-streams" "io.launcher" } ;
+{ $see-also "file-streams" "network-streams" "io.launcher" "io.mmap" } ;
 
 ABOUT: "os"
 
