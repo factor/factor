@@ -5,15 +5,15 @@ ui.commands ui.gadgets ui.gadgets.labelled
 ui.gadgets.tracks ui.gestures ;
 IN: ui.tools.traceback
 
-: <callstack-display> ( model -- )
+: <callstack-display> ( model -- gadget )
     [ [ continuation-call callstack. ] when* ]
     "Call stack" <labelled-pane> ;
 
-: <datastack-display> ( model -- )
+: <datastack-display> ( model -- gadget )
     [ [ continuation-data stack. ] when* ]
     "Data stack" <labelled-pane> ;
 
-: <retainstack-display> ( model -- )
+: <retainstack-display> ( model -- gadget )
     [ [ continuation-retain stack. ] when* ]
     "Retain stack" <labelled-pane> ;
 

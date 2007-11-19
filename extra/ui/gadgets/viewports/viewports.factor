@@ -16,8 +16,7 @@ TUPLE: viewport ;
 : <viewport> ( content model -- viewport )
     <gadget> viewport construct-control
     t over set-gadget-clipped?
-    [ add-gadget ] keep
-    [ model-changed ] keep ;
+    [ add-gadget ] keep ;
 
 M: viewport layout*
     dup rect-dim viewport-gap 2 v*n v-
@@ -33,6 +32,7 @@ M: viewport pref-dim* viewport-dim ;
     gadget-model range-value [ >fixnum ] map ;
 
 M: viewport model-changed
+    nip
     dup relayout-1
     dup scroller-value
     vneg viewport-gap v+

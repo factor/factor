@@ -2,10 +2,9 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: arrays documents ui.clipboards ui.commands ui.gadgets
 ui.gadgets.borders ui.gadgets.buttons ui.gadgets.labels
-ui.gadgets.scrollers ui.gadgets.theme
-ui.render ui.gestures io kernel math models namespaces opengl
-opengl.gl sequences strings io.styles math.vectors sorting
-colors combinators ;
+ui.gadgets.scrollers ui.gadgets.theme ui.render ui.gestures io
+kernel math models namespaces opengl opengl.gl sequences strings
+io.styles math.vectors sorting colors combinators ;
 IN: ui.gadgets.editors
 
 TUPLE: editor
@@ -14,15 +13,11 @@ font color caret-color selection-color
 caret mark
 focused? ;
 
-TUPLE: loc-monitor editor ;
-
-: <loc> ( editor -- loc )
-    loc-monitor construct-boa
-    { 0 0 } <model> [ add-connection ] keep ;
+: <loc> ( -- loc ) { 0 0 } <model> ;
 
 : init-editor-locs ( editor -- )
-    dup <loc> over set-editor-caret
-    dup <loc> swap set-editor-mark ;
+    <loc> over set-editor-caret
+    <loc> swap set-editor-mark ;
 
 : editor-theme ( editor -- )
     black over set-editor-color
@@ -48,10 +43,14 @@ TUPLE: source-editor ;
 : <source-editor> source-editor construct-editor ;
 
 : activate-editor-model ( editor model -- )
-    dup activate-model swap gadget-model add-loc ;
+    2dup add-connection
+    dup activate-model
+    swap gadget-model add-loc ;
 
 : deactivate-editor-model ( editor model -- )
-    dup deactivate-model swap gadget-model remove-loc ;
+    2dup remove-connection
+    dup deactivate-model
+    swap gadget-model remove-loc ;
 
 M: editor graft*
     dup
@@ -62,12 +61,6 @@ M: editor ungraft*
     dup
     dup editor-caret deactivate-editor-model
     dup editor-mark deactivate-editor-model ;
-
-M: editor model-changed
-    dup gadget-model
-    over editor-caret [ over validate-loc ] (change-model)
-    over editor-mark [ over validate-loc ] (change-model)
-    drop editor-self relayout ;
 
 : editor-caret* ( editor -- loc ) editor-caret model-value ;
 
@@ -129,14 +122,10 @@ M: editor model-changed
     line-height 0 swap 2array ;
 
 : scroll>caret ( editor -- )
-    dup gadget-grafted? [
+    dup gadget-graft-state second [
         dup caret-loc over caret-dim { 1 0 } v+ <rect>
         over scroll>rect
     ] when drop ;
-
-M: loc-monitor model-changed
-    loc-monitor-editor editor-self
-    dup relayout-1 scroll>caret ;
 
 : draw-caret ( -- )
     editor get editor-focused? [
@@ -218,6 +207,22 @@ M: editor draw-gadget*
 
 M: editor pref-dim*
     dup editor-font* swap control-value text-dim ;
+
+: contents-changed
+    editor-self swap
+    over editor-caret [ over validate-loc ] (change-model)
+    over editor-mark [ over validate-loc ] (change-model)
+    drop relayout ;
+
+: caret/mark-changed
+    nip editor-self dup relayout-1 scroll>caret ;
+
+M: editor model-changed
+    {
+        { [ 2dup gadget-model eq? ] [ contents-changed ] }
+        { [ 2dup editor-caret eq? ] [ caret/mark-changed ] }
+        { [ 2dup editor-mark eq? ] [ caret/mark-changed ] }
+    } cond ;
 
 M: editor gadget-selection?
     selection-start/end = not ;
@@ -421,16 +426,6 @@ editor "selection" f {
     { T{ key-down f { S+ C+ } "END" } select-end-of-document }
 } define-command-map
 
-! Editors support the stream output protocol
-M: editor stream-write1 >r 1string r> stream-write ;
-
-M: editor stream-write
-    editor-self dup end-of-document user-input ;
-
-M: editor stream-close drop ;
-
-M: editor stream-flush drop ;
-
 ! Fields are like editors except they edit an external model
 TUPLE: field model editor ;
 
@@ -453,5 +448,6 @@ M: field ungraft*
     dup field-editor gadget-model remove-connection ;
 
 M: field model-changed
+    nip
     dup field-editor editor-string
     swap field-model set-model ;

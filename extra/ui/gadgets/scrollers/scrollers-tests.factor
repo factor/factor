@@ -2,7 +2,8 @@ IN: temporary
 USING: ui.gadgets ui.gadgets.scrollers
 namespaces tools.test kernel models ui.gadgets.viewports
 ui.gadgets.labels ui.gadgets.grids ui.gadgets.frames
-ui.gadgets.sliders math math.vectors arrays sequences ;
+ui.gadgets.sliders math math.vectors arrays sequences
+tools.test.inference tools.test.ui ;
 
 [ ] [
     <gadget> "g" set
@@ -20,12 +21,14 @@ ui.gadgets.sliders math math.vectors arrays sequences ;
 [ ] [
     <gadget> dup "g" set
     10 1 0 100 <range> 20 1 0 100 <range> 2array <compose>
-    <viewport> "v" set 
+    <viewport> "v" set
 ] unit-test
 
-[ { 10 20 } ] [ "v" get gadget-model range-value ] unit-test
+"v" get [
+    [ { 10 20 } ] [ "v" get gadget-model range-value ] unit-test
 
-[ { 10 20 } ] [ "g" get rect-loc vneg { 3 3 } v+ ] unit-test
+    [ { 10 20 } ] [ "g" get rect-loc vneg { 3 3 } v+ ] unit-test
+] with-grafted-gadget
 
 [ ] [
     <gadget> { 100 100 } over set-rect-dim
@@ -36,27 +39,25 @@ ui.gadgets.sliders math math.vectors arrays sequences ;
 
 [ ] [ "s" get layout ] unit-test
 
-[ ] [ "s" get graft ] unit-test
+"s" get [
+    [ { 34 34 } ] [ "s" get scroller-viewport rect-dim ] unit-test
 
-[ { 34 34 } ] [ "s" get scroller-viewport rect-dim ] unit-test
+    [ { 106 106 } ] [ "s" get scroller-viewport viewport-dim ] unit-test
 
-[ { 106 106 } ] [ "s" get scroller-viewport viewport-dim ] unit-test
+    [ ] [ { 0 0 } "s" get scroll ] unit-test
 
-[ ] [ { 0 0 } "s" get scroll ] unit-test
+    [ { 0 0 } ] [ "s" get gadget-model range-min-value ] unit-test
 
-[ { 0 0 } ] [ "s" get gadget-model range-min-value ] unit-test
+    [ { 106 106 } ] [ "s" get gadget-model range-max-value ] unit-test
 
-[ { 106 106 } ] [ "s" get gadget-model range-max-value ] unit-test
+    [ ] [ { 10 20 } "s" get scroll ] unit-test
 
-[ ] [ { 10 20 } "s" get scroll ] unit-test
+    [ { 10 20 } ] [ "s" get gadget-model range-value ] unit-test
 
-[ { 10 20 } ] [ "s" get gadget-model range-value ] unit-test
+    [ { 10 20 } ] [ "s" get scroller-viewport gadget-model range-value ] unit-test
 
-[ { 10 20 } ] [ "s" get scroller-viewport gadget-model range-value ] unit-test
-
-[ { 10 20 } ] [ "g" get rect-loc vneg { 3 3 } v+ ] unit-test
-
-[ ] [ "s" get ungraft ] unit-test
+    [ { 10 20 } ] [ "g" get rect-loc vneg { 3 3 } v+ ] unit-test
+] with-grafted-gadget
 
 <gadget> { 600 400 } over set-rect-dim "g1" set
 <gadget> { 600 10 } over set-rect-dim "g2" set
@@ -84,3 +85,5 @@ dup layout
 [ f ] [ "s" get scroller-viewport find-scroller* ] unit-test
 [ t ] [ "s" get @right grid-child slider? ] unit-test
 [ f ] [ "s" get @right grid-child find-scroller* ] unit-test
+
+{ 1 1 } [ <scroller> ] unit-test-effect

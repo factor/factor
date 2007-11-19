@@ -340,18 +340,19 @@ SYMBOL: hWnd
         ] ui-try
      ] alien-callback ;
 
-: do-events ( -- )
-    msg-obj get f 0 0 PM_REMOVE PeekMessage 
-    zero? not [
-        msg-obj get MSG-message WM_QUIT = [
-            msg-obj get [ TranslateMessage drop ] keep DispatchMessage drop
-        ] unless
-    ] when ;
+: peek-message? ( msg -- ? ) f 0 0 PM_REMOVE PeekMessage zero? ;
 
-: event-loop ( -- )
-    windows get empty? [
-        [ do-events ui-step ] ui-try event-loop
-    ] unless ;
+: event-loop ( msg -- )
+    {
+        { [ windows get empty? ] [ drop ] }
+        { [ dup peek-message? ] [ >r [ ui-step ] ui-try r> event-loop ] }
+        { [ dup MSG-message WM_QUIT = ] [ drop ] }
+        { [ t ] [
+            dup TranslateMessage drop
+            dup DispatchMessage drop
+            event-loop
+        ] }
+    } cond ;
 
 : register-wndclassex ( -- class )
     "WNDCLASSEX" <c-object>
@@ -414,8 +415,8 @@ M: windows-ui-backend (open-world-window) ( world -- )
     [ rect-dim first2 create-window dup setup-gl ] keep
     [ f <win> ] keep
     [ swap win-hWnd register-window ] 2keep
-    [ set-world-handle ] 2keep 
-    start-world win-hWnd show-window ;
+    dupd set-world-handle
+    win-hWnd show-window ;
 
 M: windows-ui-backend select-gl-context ( handle -- )
     [ win-hDC ] keep win-hRC wglMakeCurrent win32-error=0/f ;
@@ -442,7 +443,7 @@ M: windows-ui-backend ui
             init-clipboard
             init-win32-ui
             start-ui
-            event-loop
+            msg-obj get event-loop
         ] [ cleanup-win32-ui ] [ ] cleanup
     ] ui-running ;
 

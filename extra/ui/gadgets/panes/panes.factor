@@ -140,7 +140,7 @@ M: duplex-stream write-gadget
 TUPLE: pane-control quot ;
 
 M: pane-control model-changed
-    dup control-value swap dup pane-control-quot with-pane ;
+    swap model-value swap dup pane-control-quot with-pane ;
 
 : <pane-control> ( model quot -- pane )
     >r <pane> pane-control construct-control r>

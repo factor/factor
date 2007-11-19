@@ -25,7 +25,7 @@ GENERIC: stream-write-table ( table-cells style stream -- )
     [ stream-write ] keep stream-nl ;
 
 : (stream-copy) ( in out -- )
-    64 1024 * pick stream-read
+    64 1024 * pick stream-read-partial
     [ over stream-write (stream-copy) ] [ 2drop ] if* ;
 
 : stream-copy ( in out -- )

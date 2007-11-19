@@ -12,15 +12,6 @@ vocabs.loader tools.test ui.gadgets.buttons
 ui.gadgets.status-bar mirrors ;
 IN: ui.tools
 
-: workspace-tabs ( -- seq )
-    {
-        <stack-display>
-        <browser-gadget>
-        <inspector-gadget>
-        <walker>
-        <profiler-gadget>
-    } ;
-
 : <workspace-tabs> ( -- tabs )
     g gadget-model
     "tool-switching" workspace command-map
@@ -28,7 +19,13 @@ IN: ui.tools
     <toggle-buttons> ;
 
 : <workspace-book> ( -- gadget )
-    workspace-tabs [ execute ] map g gadget-model <book> ;
+    [
+        <stack-display> ,
+        <browser-gadget> ,
+        <inspector-gadget> ,
+        <walker> ,
+        <profiler-gadget> ,
+    ] { } make g gadget-model <book> ;
 
 : <workspace> ( -- workspace )
     0 <model> { 0 1 } <track> workspace construct-control [
@@ -52,6 +49,7 @@ IN: ui.tools
     ] if relayout ;
 
 M: workspace model-changed
+    nip
     dup workspace-listener listener-gadget-output scroll>bottom
     dup resize-workspace
     request-focus ;

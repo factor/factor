@@ -28,7 +28,7 @@ scroller H{
     { T{ mouse-scroll } [ do-mouse-scroll ] }
 } set-gestures
 
-: viewport, ( -- )
+: viewport, ( child -- )
     g gadget-model <viewport>
     g-> set-scroller-viewport @center frame, ;
 
@@ -106,7 +106,7 @@ scroller H{
     dup scroller-viewport viewport-dim { 0 1 } v* swap scroll ;
 
 : scroll>bottom ( gadget -- )
-    find-scroller* [
+    find-scroller [
         t over set-scroller-follows relayout-1
     ] when* ;
 
@@ -115,10 +115,10 @@ scroller H{
 
 : update-scroller ( scroller follows -- )
     {
-        { [ dup t eq? ] [ drop (scroll>bottom) "A" drop ] }
-        { [ dup rect? ] [ swap (scroll>rect) "B" drop ] }
-        { [ dup ] [ swap (scroll>gadget)  "C" drop ] }
-        { [ t ] [ drop dup scroller-value swap scroll "D" drop ] }
+        { [ dup t eq? ] [ drop (scroll>bottom) ] }
+        { [ dup rect? ] [ swap (scroll>rect) ] }
+        { [ dup ] [ swap (scroll>gadget) ] }
+        { [ t ] [ drop dup scroller-value swap scroll ] }
     } cond ;
 
 M: scroller layout*
@@ -131,4 +131,4 @@ M: scroller focusable-child*
     scroller-viewport ;
 
 M: scroller model-changed
-    f swap set-scroller-follows ;
+    nip f swap set-scroller-follows ;

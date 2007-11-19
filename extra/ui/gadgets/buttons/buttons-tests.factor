@@ -1,6 +1,7 @@
 IN: temporary
 USING: ui.commands ui.gadgets.buttons ui.gadgets.labels
-ui.gadgets tools.test namespaces sequences kernel models ;
+ui.gadgets tools.test namespaces sequences kernel models
+tools.test.inference ;
 
 TUPLE: foo-gadget ;
 
@@ -26,6 +27,12 @@ T{ foo-gadget } <toolbar> "t" set
         { 3 "jewish" }
     } <radio-buttons> "religion" set
 ] unit-test
+
+{ 2 1 } [ <radio-buttons> ] unit-test-effect
+
+{ 2 1 } [ <toggle-buttons> ] unit-test-effect
+
+{ 2 1 } [ <checkbox> ] unit-test-effect
 
 [ 0 ] [
     "religion" get gadget-child radio-control-value

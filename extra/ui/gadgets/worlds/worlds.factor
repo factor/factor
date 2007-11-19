@@ -112,12 +112,6 @@ world H{
     { T{ button-up f { A+ } 1 } [ T{ button-up f f 2 } swap resend-button-up ] }
 } set-gestures
 
-: start-world ( world -- )
-    dup graft
-    dup relayout
-    dup world-title over set-title
-    request-focus ;
-
 : close-global ( world global -- )
     dup get-global find-world rot eq?
     [ f swap set-global ] [ drop ] if ;
@@ -126,3 +120,8 @@ world H{
     drop-prefix <reversed>
     T{ lose-focus } swap each-gesture
     T{ gain-focus } swap each-gesture ;
+
+M: world graft*
+    dup (open-world-window)
+    dup world-title over set-title
+    request-focus ;

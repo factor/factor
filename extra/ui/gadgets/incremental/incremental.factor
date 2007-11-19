@@ -11,17 +11,18 @@ IN: ui.gadgets.incremental
 ! pack-gap.
 
 ! The cursor is the current size of the incremental pack.
-! New gadgets are added at cursor-cursor*gadget-orientation.
+! New gadgets are added at
+!   incremental-cursor gadget-orientation v*
 
 TUPLE: incremental cursor ;
 
 : <incremental> ( pack -- incremental )
-    incremental construct-empty
-    [ set-gadget-delegate ] keep
-    dup delegate pref-dim over set-incremental-cursor ;
+    dup pref-dim
+    { set-gadget-delegate set-incremental-cursor }
+    incremental construct ;
 
 M: incremental pref-dim*
-    dup gadget-state [
+    dup gadget-layout-state [
         dup delegate pref-dim over set-incremental-cursor
     ] when incremental-cursor ;
 
@@ -39,9 +40,11 @@ M: incremental pref-dim*
     swap set-rect-loc ;
 
 : prefer-incremental ( gadget -- )
-    dup forget-pref-dim dup pref-dim over set-rect-dim layout ;
+    dup forget-pref-dim dup pref-dim over set-rect-dim
+    layout ;
 
 : add-incremental ( gadget incremental -- )
+    not-in-layout
     2dup (add-gadget)
     over prefer-incremental
     2dup incremental-loc
@@ -50,6 +53,8 @@ M: incremental pref-dim*
     gadget-parent [ invalidate* ] when* ;
 
 : clear-incremental ( incremental -- )
-    dup (clear-gadget) dup forget-pref-dim
+    not-in-layout
+    dup (clear-gadget)
+    dup forget-pref-dim
     { 0 0 } over set-incremental-cursor
     gadget-parent [ relayout ] when* ;

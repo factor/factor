@@ -49,15 +49,15 @@ C: <dlist-node> dlist-node
         drop nip t
     ] [
         drop dlist-node-next [ (dlist-find-node) ] [ drop f f ] if*
-    ] if ;
+    ] if ; inline
 
 : dlist-find-node ( quot dlist -- node/f ? )
-    dlist-front [ (dlist-find-node) ] [ drop f f ] if* ;
+    dlist-front [ (dlist-find-node) ] [ drop f f ] if* ; inline
 
 : (dlist-each-node) ( quot dlist -- )
     over
     [ 2dup call >r dlist-node-next r> (dlist-each-node) ]
-    [ 2drop ] if ;
+    [ 2drop ] if ; inline
 
 : dlist-each-node ( quot dlist -- )
     >r dlist-front r> (dlist-each-node) ; inline
@@ -98,17 +98,20 @@ PRIVATE>
 : pop-back* ( dlist -- ) pop-back drop ;
 
 : dlist-find ( quot dlist -- obj/f ? )
-    dlist-find-node dup [ >r dlist-node-obj r> ] when ;
+    dlist-find-node dup [ >r dlist-node-obj r> ] when ; inline
 
 : dlist-contains? ( quot dlist -- ? )
-    dlist-find nip ;
+    dlist-find nip ; inline
+
+: unlink-node ( dlist-node -- )
+    dup dlist-node-prev over dlist-node-next set-prev-when
+    dup dlist-node-next swap dlist-node-prev set-next-when ;
 
 : (delete-node) ( dlist dlist-node -- )
     {
-        { [ 2dup >r dlist-front r> = ] [ drop pop-front* ] }
-        { [ 2dup >r dlist-back r> = ] [ drop pop-back* ] }
-        { [ t ] [ dup dlist-node-prev swap dlist-node-next set-prev-when
-                  dec-length ] }
+        { [ over dlist-front over eq? ] [ drop pop-front* ] }
+        { [ over dlist-back over eq? ] [ drop pop-back* ] }
+        { [ t ] [ unlink-node dec-length ] }
     } cond ;
 
 : delete-node* ( quot dlist -- obj/f ? )
@@ -116,10 +119,13 @@ PRIVATE>
         [ (delete-node) ] keep [ dlist-node-obj t ] [ f f ] if*
     ] [
         2drop f f
-    ] if ;
+    ] if ; inline
 
 : delete-node ( quot dlist -- obj/f )
-    delete-node* drop ;
+    delete-node* drop ; inline
+
+: dlist-delete ( obj dlist -- obj/f )
+    >r [ eq? ] curry r> delete-node ;
 
 : dlist-each ( dlist quot -- )
     [ dlist-node-obj ] swap compose dlist-each-node ; inline

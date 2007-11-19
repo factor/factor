@@ -47,7 +47,7 @@ TUPLE: slider elevator thumb saved line ;
 
 : screen>slider slider-scale / ;
 
-M: slider model-changed slider-elevator relayout-1 ;
+M: slider model-changed nip slider-elevator relayout-1 ;
 
 TUPLE: thumb ;
 
@@ -131,7 +131,7 @@ M: elevator layout*
 : slide-by-line ( amount slider -- )
     [ slider-line * ] keep slide-by ;
 
-: <slide-button> ( vector polygon amount -- )
+: <slide-button> ( vector polygon amount -- button )
     >r gray swap <polygon-gadget> r>
     [ swap find-slider slide-by-line ] curry <repeat-button>
     [ set-gadget-orientation ] keep ;
@@ -144,7 +144,7 @@ M: elevator layout*
 : <left-button> { 0 1 } arrow-left -1 <slide-button> ;
 : <right-button> { 0 1 } arrow-right 1 <slide-button> ;
 
-: build-x-slider ( slider -- slider )
+: build-x-slider ( slider -- )
     [
         <left-button> @left frame,
         { 0 1 } elevator,
@@ -154,7 +154,7 @@ M: elevator layout*
 : <up-button> { 1 0 } arrow-up -1 <slide-button> ;
 : <down-button> { 1 0 } arrow-down 1 <slide-button> ;
 
-: build-y-slider ( slider -- slider )
+: build-y-slider ( slider -- )
     [
         <up-button> @top frame,
         { 1 0 } elevator,

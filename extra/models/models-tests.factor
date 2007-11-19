@@ -6,7 +6,7 @@ TUPLE: model-tester hit? ;
 
 : <model-tester> model-tester construct-empty ;
 
-M: model-tester model-changed t swap set-model-tester-hit? ;
+M: model-tester model-changed nip t swap set-model-tester-hit? ;
 
 [ T{ model-tester f t } ]
 [

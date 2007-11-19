@@ -1,8 +1,7 @@
-USING: alien alien.c-types arrays continuations
-destructors io io.windows libc
-io.nonblocking io.streams.duplex windows.types math
-windows.kernel32 windows namespaces io.launcher kernel
-sequences io.windows.nt.backend windows.errors assocs ;
+USING: alien alien.c-types arrays continuations destructors io
+io.windows libc io.nonblocking io.streams.duplex windows.types
+math windows.kernel32 windows namespaces io.launcher kernel
+sequences windows.errors assocs splitting system ;
 IN: io.windows.launcher
 
 ! From MSDN: "Handles in PROCESS_INFORMATION must be closed with CloseHandle when they are no longer needed."
@@ -52,19 +51,30 @@ TUPLE: CreateProcess-args
         CreateProcess-args-lpProcessInformation
     } get-slots CreateProcess win32-error=0/f ;
 
-: fill-lpCommandLine
+: join-arguments ( args -- cmd-line )
+    [ "\"" swap "\"" 3append ] map " " join ;
+
+: app-name/cmd-line ( -- app-name cmd-line )
     +command+ get [
-        [
-            +arguments+ get [ CHAR: \s , ] [
-                CHAR: " ,
-                [ dup CHAR: " = [ CHAR: \\ , ] when , ] each
-                CHAR: " ,
-            ] interleave
-        ] "" make
-    ] unless* over set-CreateProcess-args-lpCommandLine ;
+        " " split1
+    ] [
+        +arguments+ get unclip swap join-arguments
+    ] if* ;
+
+: cmd-line ( -- cmd-line )
+    +command+ get [ +arguments+ get join-arguments ] unless* ;
+
+: fill-lpApplicationName
+    app-name/cmd-line
+    pick set-CreateProcess-args-lpCommandLine
+    over set-CreateProcess-args-lpApplicationName ;
+
+: fill-lpCommandLine
+    cmd-line over set-CreateProcess-args-lpCommandLine ;
 
 : fill-dwCreateFlags
-    CREATE_UNICODE_ENVIRONMENT
+    0
+    pass-environment? [ CREATE_UNICODE_ENVIRONMENT bitor ] when
     +detached+ get [ DETACHED_PROCESS bitor ] when
     over set-CreateProcess-args-dwCreateFlags ;
 
@@ -86,7 +96,11 @@ TUPLE: CreateProcess-args
 M: windows-io run-process* ( desc -- )
     [
         default-CreateProcess-args
-        fill-lpCommandLine
+        wince? [
+            fill-lpApplicationName
+        ] [
+            fill-lpCommandLine
+        ] if
         fill-dwCreateFlags
         fill-lpEnvironment
         dup call-CreateProcess

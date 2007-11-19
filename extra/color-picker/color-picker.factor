@@ -18,7 +18,7 @@ TUPLE: color-preview ;
     { 100 100 } over set-rect-dim ;
 
 M: color-preview model-changed
-    dup control-value over set-gadget-interior relayout-1 ;
+    swap model-value over set-gadget-interior relayout-1 ;
 
 : <color-model> ( model -- model )
     [ [ 256 /f ] map 1 add <solid> ] <filter> ;

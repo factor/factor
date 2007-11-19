@@ -217,7 +217,7 @@ ARTICLE: "cookbook-io" "I/O cookbook"
 } ;
 
 ARTICLE: "cookbook-philosophy" "Factor philosophy"
-"Factor is a high-level language with automatic memory management, runtime type checking, and strong typing. Factor code should be as simple as possible, but not simpler. If you are coming to Factor from another programming language, one of your first observations might me related to the amount of code you " { $emphasis "don't" } " have to write."
+"Factor is a high-level language with automatic memory management, runtime type checking, and strong typing. Factor code should be as simple as possible, but not simpler. If you are coming to Factor from another programming language, one of your first observations might be related to the amount of code you " { $emphasis "don't" } " have to write."
 $nl
 "If you try to write Factor word definitions which are longer than a couple of lines, you will find it hard to keep track of the stack contents. Well-written Factor code is " { $emphasis "factored" } " into short definitions, where each definition is easy to test interactively, and has a clear purpose. Well-chosen word names are critical, and having a thesaurus on hand really helps."
 $nl

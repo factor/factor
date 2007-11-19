@@ -40,7 +40,7 @@ M: label gadget-text* label-string % ;
 TUPLE: label-control ;
 
 M: label-control model-changed
-    dup control-value over set-label-text relayout ;
+    swap model-value over set-label-text relayout ;
 
 : <label-control> ( model -- gadget )
     "" <label> label-control construct-control ;
