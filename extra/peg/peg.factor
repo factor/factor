@@ -72,8 +72,7 @@ TUPLE: seq-parser parsers ;
   [ dup parse-result-remaining ] dip parse [
     [ parse-result-remaining swap set-parse-result-remaining ] 2keep  
     [ parse-result-ast swap parse-result-ast push ] 2keep
-    parse-result-matched swap [ parse-result-matched swap append ] keep [ set-parse-result-matched ] keep
-  
+    parse-result-matched swap [ parse-result-matched swap append ] keep [ set-parse-result-matched ] keep  
   ] [
     drop f
   ] if* ;
@@ -90,3 +89,22 @@ M: seq-parser parse ( state parser -- result )
 
 : seq ( seq -- parser )
   seq-parser construct-boa init-parser ;
+
+TUPLE: choice-parser parsers ;
+  
+: (choice-parser) ( state parsers -- result )
+  dup empty? [
+    2drop f
+  ] [
+    unclip pick swap parse [
+      2nip 
+    ] [
+      (choice-parser)
+    ] if* 
+  ] if ;
+
+M: choice-parser parse ( state parser -- result )
+  choice-parser-parsers (choice-parser) ;
+
+: choice ( seq -- parser )
+  choice-parser construct-boa init-parser ;

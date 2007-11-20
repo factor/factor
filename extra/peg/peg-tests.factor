@@ -53,3 +53,19 @@ IN: temporary
 { "go" } [
   "good" 0 <parse-state> "g" token "o" token 2array seq parse parse-result-matched
 ] unit-test
+
+{ "a" } [
+  "abcd" 0 <parse-state> "a" token "b" token 2array choice parse parse-result-matched
+] unit-test
+
+{ "b" } [
+  "bbcd" 0 <parse-state> "a" token "b" token 2array choice parse parse-result-matched
+] unit-test
+
+{ f } [
+  "cbcd" 0 <parse-state> "a" token "b" token 2array choice parse 
+] unit-test
+
+{ f } [
+  "" 0 <parse-state> "a" token "b" token 2array choice parse 
+] unit-test
