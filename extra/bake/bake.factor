@@ -1,6 +1,6 @@
 
-USING: kernel parser namespaces quotations vectors strings
-sequences assocs tuples math combinators ;
+USING: kernel parser namespaces quotations arrays vectors strings
+       sequences assocs tuples math combinators ;
 
 IN: bake
 
@@ -49,3 +49,7 @@ DEFER: bake
 
 : bake ( seq -- seq )
   [ reset-building save-exemplar bake-items finish-baking ] with-scope ;
+
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+: `{ \ } [ >array ] parse-literal \ bake parsed ; parsing
