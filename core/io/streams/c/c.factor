@@ -29,6 +29,9 @@ C: <c-reader> c-reader
 M: c-reader stream-read
     >r >fixnum r> c-reader-handle fread ;
 
+M: c-reader stream-read-partial
+    stream-read ;
+
 M: c-reader stream-read1
     c-reader-handle fgetc ;
 
