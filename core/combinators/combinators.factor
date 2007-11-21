@@ -38,9 +38,7 @@ TUPLE: no-case ;
     pick 0 <= [ 3drop 0 ] [ rot 1- -rot call ] if ; inline
 
 M: sequence hashcode*
-    [
-        0 -rot [ hashcode* bitxor ] curry* each
-    ] recursive-hashcode ;
+    [ sequence-hashcode ] recursive-hashcode ;
 
 : alist>quot ( default assoc -- quot )
     [ rot \ if 3array append [ ] like ] assoc-each ;
