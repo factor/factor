@@ -1,23 +1,13 @@
-! Copyright (C) 2006 Chris Double.
+! Copyright (C) 2006 Chris Double, Daniel Ehrenberg.
 ! See http://factorcode.org/license.txt for BSD license.
 IN: rss
-! USING: kernel http-client xml xml-utils xml-data errors io strings
-!    sequences xml-writer parser-combinators lazy-lists entities ;
 USING: xml.utilities kernel promises parser-combinators assocs
-    parser-combinators.replace strings sequences xml.data xml.writer
+    strings sequences xml.data xml.writer
     io.streams.string combinators xml xml.entities io.files io
-    http.client ;
+    http.client namespaces xml.generator hashtables ;
 
 : ?children>string ( tag/f -- string/f )
     [ children>string ] [ f ] if* ;
-
-LAZY: '&amp;' ( -- parser )
-    "&" token
-    [ blank? ] satisfy &>
-    [ "&amp;" swap add ] <@ ;
-
-: &>&amp; ( string -- string )
-    '&amp;' replace ;
 
 TUPLE: feed title link entries ;
 
@@ -95,3 +85,22 @@ C: <entry> entry
     ] [
         2drop "Error retrieving newsfeed file" throw
     ] if ;
+
+! Atom generation
+: simple-tag, ( content name -- )
+    [ , ] tag, ;
+
+: (generate-atom) ( entry -- )
+    "entry" [
+        dup entry-title "title" simple-tag,
+        "link" over entry-link "href" associate contained*,
+        dup entry-pub-date "published" simple-tag,
+        entry-description "content" simple-tag,
+    ] tag, ;
+
+: generate-atom ( feed -- xml )
+    "feed" [
+        dup feed-title "title" simple-tag,
+        "link" over feed-link "href" associate contained*,
+        feed-entries [ (generate-atom) ] each
+    ] make-xml ;
