@@ -13,8 +13,7 @@ IN: strings
 : reset-string-hashcode f swap set-string-hashcode ; inline
 
 : rehash-string ( str -- )
-    dup 0 [ swap 31 fixnum*fast fixnum+fast ] reduce
-    swap set-string-hashcode ; inline
+    1 over sequence-hashcode swap set-string-hashcode ; inline
 
 PRIVATE>
 

@@ -44,7 +44,7 @@ M: sequence lengthen 2dup length > [ set-length ] [ 2drop ] if ;
 TUPLE: bounds-error index seq ;
 
 : bounds-error ( n seq -- * )
-    \ bounds-error construct-boa throw ;
+    die \ bounds-error construct-boa throw ;
 
 : bounds-check ( n seq -- n seq )
     2dup bounds-check? [ bounds-error ] unless ; inline
@@ -666,3 +666,8 @@ PRIVATE>
 
 : infimum ( seq -- n ) dup first [ min ] reduce ;
 : supremum ( seq -- n ) dup first [ max ] reduce ;
+
+: sequence-hashcode ( n seq -- x )
+    0 -rot [
+        hashcode* >fixnum swap 31 fixnum*fast fixnum+fast
+    ] curry* each ; inline

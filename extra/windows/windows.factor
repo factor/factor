@@ -39,30 +39,21 @@ FUNCTION: void* error_message ( DWORD id ) ;
         win32-error-string throw
     ] when ;
 
-: (expected-io-error?) ( error-code -- ? )
+: expected-io-errors
     ERROR_SUCCESS
     ERROR_IO_INCOMPLETE
     ERROR_IO_PENDING
-    WAIT_TIMEOUT 4array member? ;
+    WAIT_TIMEOUT 4array ; foldable
 
-: expected-io-error? ( error-code -- )
-    dup (expected-io-error?) [
+: expected-io-error? ( error-code -- ? )
+    expected-io-errors member? ;
+
+: expected-io-error ( error-code -- )
+    dup expected-io-error? [
         drop
     ] [
         (win32-error-string) throw
     ] if ;
 
 : io-error ( return-value -- )
-    { 0 f } member? [ GetLastError expected-io-error? ] when ;
-
-: overlapped-error? ( port n -- ? )
-    zero? [
-        GetLastError
-        {
-            { [ dup (expected-io-error?) ] [ 2drop t ] }
-            { [ dup ERROR_HANDLE_EOF = ] [ drop t swap set-port-eof? f ] }
-            { [ t ] [ (win32-error-string) throw ] }
-        } cond
-    ] [
-        drop t
-    ] if ;
+    { 0 f } member? [ GetLastError expected-io-error ] when ;

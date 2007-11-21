@@ -70,8 +70,12 @@ M: gadget model-changed 2drop ;
     >r <gadget> r> construct-delegate ; inline
 
 : activate-control ( gadget -- )
-    dup gadget-model dup [ 2dup add-connection ] when drop
-    dup gadget-model swap model-changed ;
+    dup gadget-model dup [
+        2dup add-connection
+        swap model-changed
+    ] [
+        2drop
+    ] if ;
 
 : deactivate-control ( gadget -- )
     dup gadget-model dup [ 2dup remove-connection ] when 2drop ;
