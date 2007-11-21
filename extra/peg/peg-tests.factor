@@ -113,3 +113,27 @@ IN: temporary
 { f } [
   "bb" 0 <parse-state> "a" token ensure CHAR: a CHAR: z range 2array seq parse 
 ] unit-test
+
+{ t } [
+  "a+b" 0 <parse-state>
+  "a" token "+" token dup ensure-not 2array seq "++" token 2array choice "b" token 3array seq
+  parse [ t ] [ f ] if
+] unit-test
+
+{ t } [
+  "a++b" 0 <parse-state>
+  "a" token "+" token dup ensure-not 2array seq "++" token 2array choice "b" token 3array seq
+  parse [ t ] [ f ] if
+] unit-test
+
+{ t } [
+  "a+b" 0 <parse-state>
+  "a" token "+" token "++" token 2array choice "b" token 3array seq
+  parse [ t ] [ f ] if
+] unit-test
+
+{ f } [
+  "a++b" 0 <parse-state>
+  "a" token "+" token "++" token 2array choice "b" token 3array seq
+  parse [ t ] [ f ] if
+] unit-test

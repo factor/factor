@@ -162,3 +162,15 @@ M: ensure-parser parse ( state parser -- result )
 
 : ensure ( parser -- parser )
   ensure-parser construct-boa init-parser ;
+
+TUPLE: ensure-not-parser p1 ;
+
+M: ensure-not-parser parse ( state parser -- result )
+   dupd ensure-not-parser-p1 parse [
+     drop f
+   ] [
+     ignore <parse-result>  
+   ] if ;
+
+: ensure-not ( parser -- parser )
+  ensure-not-parser construct-boa init-parser ;
