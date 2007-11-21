@@ -256,3 +256,5 @@ void reset_stdio(void)
 	fcntl(0,F_SETFL,0);
 	fcntl(1,F_SETFL,0);
 }
+
+void open_console(void) { }

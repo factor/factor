@@ -18,3 +18,4 @@ typedef char F_SYMBOL;
 
 void c_to_factor_toplevel(CELL quot);
 long exception_handler(PEXCEPTION_POINTERS pe);
+void open_console(void);
