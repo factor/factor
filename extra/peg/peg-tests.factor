@@ -24,9 +24,9 @@ IN: temporary
   "endbegin" 0 <parse-state> "begin" token parse
 ] unit-test
 
-{ "begin" "begin" "end" } [
+{ "begin" "end" } [
   "beginend" 0 <parse-state> "begin" token parse 
-  { parse-result-matched parse-result-ast parse-result-remaining } get-slots
+  { parse-result-ast parse-result-remaining } get-slots
   parse-state-input >string
 ] unit-test
 
@@ -50,16 +50,16 @@ IN: temporary
   "bad" 0 <parse-state> "a" token "b" token 2array seq parse
 ] unit-test
 
-{ "go" } [
-  "good" 0 <parse-state> "g" token "o" token 2array seq parse parse-result-matched
+{ V{ "g" "o" } } [
+  "good" 0 <parse-state> "g" token "o" token 2array seq parse parse-result-ast
 ] unit-test
 
 { "a" } [
-  "abcd" 0 <parse-state> "a" token "b" token 2array choice parse parse-result-matched
+  "abcd" 0 <parse-state> "a" token "b" token 2array choice parse parse-result-ast
 ] unit-test
 
 { "b" } [
-  "bbcd" 0 <parse-state> "a" token "b" token 2array choice parse parse-result-matched
+  "bbcd" 0 <parse-state> "a" token "b" token 2array choice parse parse-result-ast
 ] unit-test
 
 { f } [
@@ -78,8 +78,8 @@ IN: temporary
   "b" 0 <parse-state> "a" token repeat0 parse parse-result-ast length
 ] unit-test
 
-{ "aaa" } [
-  "aaab" 0 <parse-state> "a" token repeat0 parse parse-result-matched 
+{ V{ "a" "a" "a" } } [
+  "aaab" 0 <parse-state> "a" token repeat0 parse parse-result-ast 
 ] unit-test
 
 { f } [
@@ -90,6 +90,6 @@ IN: temporary
   "b" 0 <parse-state> "a" token repeat1 parse 
 ] unit-test
 
-{ "aaa" } [
-  "aaab" 0 <parse-state> "a" token repeat1 parse parse-result-matched 
+{ V{ "a" "a" "a" } } [
+  "aaab" 0 <parse-state> "a" token repeat1 parse parse-result-ast
 ] unit-test
