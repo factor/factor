@@ -59,3 +59,4 @@ HOOK: process-stream* io-backend ( desc -- stream )
 
 USE-IF: unix? io.unix.launcher
 USE-IF: windows? io.windows.launcher
+USE-IF: winnt? io.windows.nt.launcher

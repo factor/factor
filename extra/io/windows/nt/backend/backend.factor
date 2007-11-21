@@ -42,7 +42,8 @@ M: windows-nt-io normalize-pathname ( string -- string )
 
 SYMBOL: io-hash
 
-TUPLE: io-callback port continuation ;
+TUPLE: io-callback continuation port ;
+
 C: <io-callback> io-callback
 
 : (make-overlapped) ( -- overlapped-ext )
@@ -74,53 +75,55 @@ SYMBOL: master-completion-port
 M: windows-nt-io add-completion ( handle -- )
     master-completion-port get-global <completion-port> drop ;
 
-TUPLE: GetOverlappedResult-args hFile* lpOverlapped* lpNumberOfBytesTransferred* bWait* port ;
+: eof? ( error -- ? )
+    dup ERROR_HANDLE_EOF = swap ERROR_BROKEN_PIPE = or ;
 
-C: <GetOverlappedResult-args> GetOverlappedResult-args
+: overlapped-error? ( port n -- ? )
+    zero? [
+        GetLastError {
+            { [ dup expected-io-error? ] [ 2drop t ] }
+            { [ dup eof? ] [ drop t swap set-port-eof? f ] }
+            { [ t ] [ (win32-error-string) throw ] }
+        } cond
+    ] [
+        drop t
+    ] if ;
 
-: get-overlapped-result ( port -- n )
-    [
-        port-handle dup win32-file-handle
-        swap win32-file-overlapped 0 <int> 0
-    ] keep <GetOverlappedResult-args> [
-        \ GetOverlappedResult-args >tuple<
-        >r GetOverlappedResult r> swap overlapped-error? drop
-    ] keep GetOverlappedResult-args-lpNumberOfBytesTransferred* *int ;
-
-: (save-callback) ( io-callback -- )
-    dup io-callback-port port-handle win32-file-overlapped
-    io-hash get-global set-at ;
+: get-overlapped-result ( port -- bytes-transferred )
+    dup
+    port-handle
+    dup win32-file-handle
+    swap win32-file-overlapped
+    0 <uint> [
+        0
+        GetOverlappedResult overlapped-error? drop
+    ] keep *uint ;
 
 : save-callback ( port -- )
     [
-        <io-callback> (save-callback) stop
-    ] callcc0 drop ;
+        [ <io-callback> ] keep port-handle win32-file-overlapped
+        io-hash get-global set-at stop
+    ] curry callcc0 ;
 
-TUPLE: GetQueuedCompletionStatusParams hCompletionPort* lpNumberOfBytes* lpCompletionKey* lpOverlapped* dwMilliseconds* ;
-
-C: <GetQueuedCompletionStatusParams> GetQueuedCompletionStatusParams
-
-: wait-for-overlapped ( ms -- GetQueuedCompletionStatus-Params ret )
-    >r master-completion-port get-global 0 <int> 0 <int> 0 <int>
-    r> <GetQueuedCompletionStatusParams> [
-        GetQueuedCompletionStatusParams >tuple*<
-        GetQueuedCompletionStatus
-    ] keep swap ;
+: wait-for-overlapped ( ms -- overlapped ? )
+    >r master-completion-port get-global r> ! port ms
+    0 <int> ! bytes
+    f <void*> ! key
+    f <void*> ! overlapped
+    [ roll GetQueuedCompletionStatus ] keep *void* swap zero? ;
 
 : lookup-callback ( GetQueuedCompletion-args -- callback )
-    GetQueuedCompletionStatusParams-lpOverlapped* *void*
     io-hash get-global delete-at* drop ;
 
 : wait-for-io ( timeout -- continuation/f )
-    wait-for-overlapped
-    zero? [
-        GetLastError dup (expected-io-error?) [
+    wait-for-overlapped [
+        GetLastError dup expected-io-error? [
             2drop f
         ] [
-            dup ERROR_HANDLE_EOF = [
-                drop lookup-callback [
-                    io-callback-port t swap set-port-eof?
-                ] keep io-callback-continuation
+            dup eof? [
+                drop lookup-callback
+                dup io-callback-port t swap set-port-eof?
+                io-callback-continuation
             ] [
                 (win32-error-string) swap lookup-callback
                 [ io-callback-port set-port-error ] keep
@@ -146,10 +149,6 @@ M: windows-nt-io io-multiplex ( ms -- )
     cancel-timeout wait-for-io [ schedule-thread ] when* ;
 
 M: windows-nt-io init-io ( -- )
-    #! Should only be called on startup. Calling this at any
-    #! other time can have unintended consequences.
-    global [
-        <master-completion-port> master-completion-port set
-        H{ } clone io-hash set
-        windows.winsock:init-winsock
-    ] bind ;
+    <master-completion-port> master-completion-port set-global
+    H{ } clone io-hash set-global
+    windows.winsock:init-winsock ;

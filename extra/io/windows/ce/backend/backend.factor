@@ -13,7 +13,7 @@ M: windows-ce-io add-completion ( port -- ) drop ;
 GENERIC: wince-read ( port port-handle -- )
 
 M: input-port (wait-to-read) ( port -- )
-    dup port-handle wince-read ;
+    dup dup port-handle wince-read pending-error ;
 
 GENERIC: wince-write ( port port-handle -- )
 
@@ -41,7 +41,5 @@ M: windows-ce-io init-stdio ( -- )
         ] [
             0 _getstdfilex _fileno
             1 _getstdfilex _fileno
-        ] if
-        >r f <win32-file> <reader>
-        r> f <win32-file> <writer>
-    ] with-variable <duplex-stream> stdio set ;
+        ] if <win32-duplex-stream>
+    ] with-variable stdio set ;

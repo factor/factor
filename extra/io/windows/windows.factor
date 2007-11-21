@@ -20,6 +20,9 @@ TUPLE: win32-file handle ptr overlapped ;
 : <win32-file> ( handle ptr -- obj )
     f win32-file construct-boa ;
 
+: <win32-duplex-stream> ( in out -- stream )
+    >r f <win32-file> r> f <win32-file> handle>duplex-stream ;
+
 HOOK: CreateFile-flags io-backend ( -- DWORD )
 HOOK: FileArgs-overlapped io-backend ( port -- overlapped/f )
 HOOK: add-completion io-backend ( port -- )
