@@ -1,7 +1,7 @@
 USING: ui.gadgets.editors tools.test kernel io io.streams.plain
 definitions namespaces ui.gadgets
 ui.gadgets.grids prettyprint documents ui.gestures
-tools.test.inference tools.test.ui ;
+tools.test.inference tools.test.ui models ;
 
 [ "foo bar" ] [
     <editor> "editor" set
@@ -31,3 +31,9 @@ tools.test.inference tools.test.ui ;
 ] unit-test
 
 { 0 1 } [ <editor> ] unit-test-effect
+
+"hello" <model> <field> "field" set
+
+"field" get [
+    [ "hello" ] [ "field" get field-model model-value ] unit-test
+] with-grafted-gadget
