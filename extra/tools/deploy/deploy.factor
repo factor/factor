@@ -54,7 +54,7 @@ IN: tools.deploy
 
         "\"-output-image=" swap "\"" 3append ,
 
-        "-no-stack-traces" ,
+        ! "-no-stack-traces" ,
         
         "-no-user-init" ,
     ] { } make ;
