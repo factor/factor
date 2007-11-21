@@ -26,6 +26,9 @@ M: fail summary drop "Unification failed" ;
 
 : define-inverse ( word quot -- ) "inverse" set-word-prop ;
 
+: define-math-inverse ( word quot1 quot2 -- )
+    2array "math-inverse" set-word-prop ;
+
 DEFER: [undo]
 
 : make-inverse ( word -- quot )
@@ -48,32 +51,40 @@ M: word inverse
 M: object inverse undo-literal ;
 M: symbol inverse undo-literal ;
 
+: next ( revquot -- revquot* first )
+    dup empty?
+    [ "Badly formed math inverse" throw ]
+    [ unclip-slice ] if ;
+
+: constant-word? ( word -- ? )
+    stack-effect
+    [ effect-out length 1 = ] keep
+    effect-in length 0 = and ;
+
+: assure-constant ( constant -- quot )
+    dup constant-word?
+    [ "Badly formed math inverse" throw ] unless 1quotation ;
+
+: swap-inverse ( math-inverse revquot -- revquot* quot )
+    next assure-constant rot second compose ;
+
+: pull-inverse ( math-inverse revquot const -- revquot* quot )
+    assure-constant rot first compose ;
+
+: math-inverse ( revquot math-inverse -- revquot* quot )
+    swap 1 tail-slice
+    next dup \ swap = [ drop swap-inverse ] [ pull-inverse ] if ;
+
 : ?word-prop ( word/object name -- value/f )
     over word? [ word-prop ] [ 2drop f ] if ;
 
-: group-pops ( seq -- matrix )
-    [
-        dup length [
-            2dup swap nth dup "pop-length" ?word-prop
-            [ 1+ dupd + tuck >r pick r> swap subseq , 1- ]
-            [ 1quotation , ] ?if
-        ] repeat drop
-    ] [ ] make ;
-
-: inverse-pop ( quot -- inverse )
-    unclip >r reverse r> "pop-inverse" word-prop call ;
-
-: firstn ( n -- quot )
-    { [ drop ] [ first ] [ first2 ] [ first3 ] [ first4 ] } nth ;
-
-: define-pop-inverse ( word n quot -- )
-    -rot 2dup "pop-length" set-word-prop
-    firstn rot append "pop-inverse" set-word-prop ;
+: (undo) ( revquot -- )
+    dup first "math-inverse" ?word-prop
+    [ math-inverse ] [ unclip-slice inverse ] if*
+    % dup empty? [ drop ] [ (undo) ] if ;
 
 : [undo] ( quot -- undo )
-    reverse group-pops [
-        dup length 1 = [ first inverse ] [ inverse-pop ] if
-    ] map concat [ ] like ;
+    reverse [ (undo) ] [ ] make ;
 
 MACRO: undo ( quot -- ) [undo] ;
 
@@ -107,11 +118,11 @@ MACRO: undo ( quot -- ) [undo] ;
 : assert-literal ( n -- n )
     dup [ word? ] keep symbol? not and
     [ "Literal missing in pattern matching" throw ] when ;
-\ + 1 [ assert-literal [ - ] curry ] define-pop-inverse
-\ - 1 [ assert-literal [ + ] curry ] define-pop-inverse
-\ * 1 [ assert-literal [ / ] curry ] define-pop-inverse
-\ / 1 [ assert-literal [ * ] curry ] define-pop-inverse
-\ ^ 1 [ assert-literal recip [ ^ ] curry ] define-pop-inverse
+\ + [ - ] [ - ] define-math-inverse
+\ - [ + ] [ - ] define-math-inverse
+\ * [ / ] [ / ] define-math-inverse
+\ / [ * ] [ / ] define-math-inverse
+\ ^ [ recip ^ ] [ [ log ] 2apply / ] define-math-inverse
 
 \ ? 2 [
     [ assert-literal ] 2apply
