@@ -3,6 +3,8 @@
 USING: kernel sequences strings namespaces math assocs shuffle vectors combinators.lib ;
 IN: peg
 
+SYMBOL: ignore 
+
 TUPLE: parse-state input cache ;
 
 : <parse-state> ( input index -- state )
@@ -71,7 +73,7 @@ TUPLE: seq-parser parsers ;
 : do-seq-parser ( result parser -- result )
   [ dup parse-result-remaining ] dip parse [
     [ parse-result-remaining swap set-parse-result-remaining ] 2keep  
-    parse-result-ast swap [ parse-result-ast push ] keep
+    parse-result-ast dup ignore = [ drop ] [ swap [ parse-result-ast push ] keep ] if
   ] [
     drop f
   ] if* ;
@@ -148,3 +150,15 @@ M: optional-parser parse ( state parser -- result )
 
 : optional ( parser -- parser )
   optional-parser construct-boa init-parser ;
+
+TUPLE: ensure-parser p1 ;
+
+M: ensure-parser parse ( state parser -- result )
+   dupd ensure-parser-p1 parse [
+     ignore <parse-result>  
+   ] [
+     drop f
+   ] if ;
+
+: ensure ( parser -- parser )
+  ensure-parser construct-boa init-parser ;

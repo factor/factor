@@ -105,3 +105,11 @@ IN: temporary
 { f } [ 
   "cb" 0 <parse-state> "a" token optional "b" token 2array seq parse  
 ] unit-test
+
+{ V{ CHAR: a CHAR: b } } [
+  "ab" 0 <parse-state> "a" token ensure CHAR: a CHAR: z range dup 3array seq parse parse-result-ast
+] unit-test
+
+{ f } [
+  "bb" 0 <parse-state> "a" token ensure CHAR: a CHAR: z range 2array seq parse 
+] unit-test
