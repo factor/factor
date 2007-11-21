@@ -93,3 +93,15 @@ IN: temporary
 { V{ "a" "a" "a" } } [
   "aaab" 0 <parse-state> "a" token repeat1 parse parse-result-ast
 ] unit-test
+
+{ V{ "a" "b" } } [ 
+  "ab" 0 <parse-state> "a" token optional "b" token 2array seq parse parse-result-ast 
+] unit-test
+
+{ V{ f "b" } } [ 
+  "b" 0 <parse-state> "a" token optional "b" token 2array seq parse parse-result-ast 
+] unit-test
+
+{ f } [ 
+  "cb" 0 <parse-state> "a" token optional "b" token 2array seq parse  
+] unit-test

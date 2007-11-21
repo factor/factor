@@ -136,7 +136,15 @@ M: repeat0-parser parse ( state parser -- result )
 TUPLE: repeat1-parser p1 ;
 
 M: repeat1-parser parse ( state parser -- result )
-     repeat1-parser-p1 tuck parse dup [ clone-result (repeat-parser) ] [ nip ] if ;
+   repeat1-parser-p1 tuck parse dup [ clone-result (repeat-parser) ] [ nip ] if ;
 
 : repeat1 ( parser -- parser )
   repeat1-parser construct-boa init-parser ;
+
+TUPLE: optional-parser p1 ;
+
+M: optional-parser parse ( state parser -- result )
+   dupd optional-parser-p1 parse swap f <parse-result> or ;
+
+: optional ( parser -- parser )
+  optional-parser construct-boa init-parser ;
