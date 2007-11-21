@@ -1,6 +1,6 @@
 ! Copyright (C) 2007 Chris Double.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel sequences strings namespaces math assocs combinators.lib ;
+USING: kernel sequences strings namespaces math assocs shuffle combinators.lib ;
 IN: peg
 
 TUPLE: parse-state input cache ;
@@ -108,3 +108,37 @@ M: choice-parser parse ( state parser -- result )
 
 : choice ( seq -- parser )
   choice-parser construct-boa init-parser ;
+
+TUPLE: repeat0-parser p1 ;
+
+: (repeat-parser) ( parser result -- result )
+  2dup parse-result-remaining swap parse [
+    [ parse-result-remaining swap set-parse-result-remaining ] 2keep 
+    [ parse-result-ast swap parse-result-ast push ] 2keep
+    parse-result-matched swap [ parse-result-matched swap append ] keep [ set-parse-result-matched ] keep 
+    (repeat-parser) 
+ ] [
+    nip
+  ] if* ;
+
+: clone-result ( result -- result )
+  { parse-result-remaining parse-result-matched parse-result-ast }
+  get-slots V{ } clone-like <parse-result> ;
+
+M: repeat0-parser parse ( state parser -- result )
+     repeat0-parser-p1 2dup parse [ 
+       nipd clone-result (repeat-parser) 
+     ] [ 
+       drop "" V{ } clone <parse-result> 
+     ] if* ;
+
+: repeat0 ( parser -- parser )
+  repeat0-parser construct-boa init-parser ;
+
+TUPLE: repeat1-parser p1 ;
+
+M: repeat1-parser parse ( state parser -- result )
+     repeat1-parser-p1 tuck parse dup [ clone-result (repeat-parser) ] [ nip ] if ;
+
+: repeat1 ( parser -- parser )
+  repeat1-parser construct-boa init-parser ;

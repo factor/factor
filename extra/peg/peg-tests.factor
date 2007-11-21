@@ -1,7 +1,7 @@
 ! Copyright (C) 2007 Chris Double.
 ! See http://factorcode.org/license.txt for BSD license.
 !
-USING: kernel tools.test strings namespaces arrays peg ;
+USING: kernel tools.test strings namespaces arrays sequences peg ;
 IN: temporary
 
 { 0 1 2 } [
@@ -68,4 +68,28 @@ IN: temporary
 
 { f } [
   "" 0 <parse-state> "a" token "b" token 2array choice parse 
+] unit-test
+
+{ 0 } [
+  "" 0 <parse-state> "a" token repeat0 parse parse-result-ast length
+] unit-test
+
+{ 0 } [
+  "b" 0 <parse-state> "a" token repeat0 parse parse-result-ast length
+] unit-test
+
+{ "aaa" } [
+  "aaab" 0 <parse-state> "a" token repeat0 parse parse-result-matched 
+] unit-test
+
+{ f } [
+  "" 0 <parse-state> "a" token repeat1 parse 
+] unit-test
+
+{ f } [
+  "b" 0 <parse-state> "a" token repeat1 parse 
+] unit-test
+
+{ "aaa" } [
+  "aaab" 0 <parse-state> "a" token repeat1 parse parse-result-matched 
 ] unit-test
