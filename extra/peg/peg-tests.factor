@@ -137,3 +137,15 @@ IN: temporary
   "a" token "+" token "++" token 2array choice "b" token 3array seq
   parse [ t ] [ f ] if
 ] unit-test
+
+{ 1 } [
+  "a" 0 <parse-state> "a" token [ drop 1 ] action parse parse-result-ast 
+] unit-test
+
+{ V{ 1 1 } } [
+  "aa" 0 <parse-state> "a" token [ drop 1 ] action dup 2array seq parse parse-result-ast 
+] unit-test
+
+{ f } [
+  "b" 0 <parse-state> "a" token [ drop 1 ] action parse 
+] unit-test

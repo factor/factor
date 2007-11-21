@@ -174,3 +174,16 @@ M: ensure-not-parser parse ( state parser -- result )
 
 : ensure-not ( parser -- parser )
   ensure-not-parser construct-boa init-parser ;
+
+TUPLE: action-parser p1 quot ;
+
+M: action-parser parse ( state parser -- result )
+   tuck action-parser-p1 parse dup [ 
+     dup parse-result-ast rot action-parser-quot call
+     swap [ set-parse-result-ast ] keep
+   ] [
+     nip
+   ] if ;
+
+: action ( parser quot -- parser )
+  action-parser construct-boa init-parser ;
