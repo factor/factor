@@ -1,7 +1,6 @@
 ! Copyright (C) 2005, 2007 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: io kernel math namespaces math.vectors ui.gadgets
-dlists ;
+USING: io kernel math namespaces math.vectors ui.gadgets ;
 IN: ui.gadgets.incremental
 
 ! Incremental layout allows adding lines to panes to be O(1).
@@ -15,14 +14,12 @@ IN: ui.gadgets.incremental
 ! New gadgets are added at
 !   incremental-cursor gadget-orientation v*
 
-TUPLE: incremental cursor queue ;
+TUPLE: incremental cursor ;
 
 : <incremental> ( pack -- incremental )
-    dup pref-dim <dlist> {
-        set-gadget-delegate
-        set-incremental-cursor
-        set-incremental-queue
-    } incremental construct ;
+    dup pref-dim
+    { set-gadget-delegate set-incremental-cursor }
+    incremental construct ;
 
 M: incremental pref-dim*
     dup gadget-layout-state [
@@ -43,17 +40,17 @@ M: incremental pref-dim*
     swap set-rect-loc ;
 
 : prefer-incremental ( gadget -- )
-    dup forget-pref-dim dup pref-dim swap set-rect-dim ;
+    dup forget-pref-dim dup pref-dim over set-rect-dim
+    layout ;
 
 : add-incremental ( gadget incremental -- )
     not-in-layout
-    2dup incremental-queue push-front
-    add-gadget ;
-
-: (add-incremental) ( gadget incremental -- )
+    2dup (add-gadget)
+    over prefer-incremental
     2dup incremental-loc
     tuck update-cursor
-    prefer-incremental ;
+    dup prefer-incremental
+    gadget-parent [ invalidate* ] when* ;
 
 : clear-incremental ( incremental -- )
     not-in-layout
