@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: arrays assocs kernel math models namespaces
 sequences words strings system hashtables math.parser
-math.vectors tuples classes ui.gadgets timers ;
+math.vectors tuples classes ui.gadgets timers combinators ;
 IN: ui.gestures
 
 : set-gestures ( class hash -- ) "gestures" set-word-prop ;
@@ -176,9 +176,23 @@ drag-timer construct-empty drag-timer set-global
 : hand-click-rel ( gadget -- loc )
     hand-click-loc get-global swap screen-loc v- ;
 
+: multi-click-timeout? ( -- ? )
+    millis hand-last-time get - double-click-timeout get <= ;
+
+: multi-click-button? ( button -- button ? )
+    dup hand-last-button get = ;
+
+: multi-click-position? ( -- ? )
+    hand-loc get hand-click-loc get v- norm 10 <= ;
+
 : multi-click? ( button -- ? )
-    millis hand-last-time get - double-click-timeout get <=
-    swap hand-last-button get = and ;
+    {
+        { [ multi-click-timeout? not ] [ f ] }
+        { [ multi-click-button? not ] [ f ] }
+        { [ multi-click-position? not ] [ f ] }
+        { [ multi-click-position? not ] [ f ] }
+        { [ t ] [ t ] }
+    } cond nip ;
 
 : update-click# ( button -- )
     global [
