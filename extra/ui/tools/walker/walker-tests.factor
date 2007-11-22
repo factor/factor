@@ -1,6 +1,6 @@
 USING: arrays continuations ui.tools.listener ui.tools.walker
 ui.tools.workspace inspector kernel namespaces sequences threads
-listener tools.test ui ui.gadgets ui.gadgets.worlds
+listener tools.test ui ui.gadgets ui.gadgets.worlds ui.private
 ui.gadgets.packs vectors ui.tools tools.interpreter
 tools.interpreter.debug tools.test.inference tools.test.ui ;
 IN: temporary
