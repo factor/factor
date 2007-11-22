@@ -1,5 +1,5 @@
 USING: ui.gadgets.editors tools.test kernel io io.streams.plain
-definitions namespaces ui.gadgets
+definitions namespaces ui.gadgets ui.private
 ui.gadgets.grids prettyprint documents ui.gestures
 tools.test.inference tools.test.ui models ;
 
