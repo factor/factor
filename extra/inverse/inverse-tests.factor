@@ -1,5 +1,5 @@
 USING: inverse tools.test arrays math kernel sequences
-math.functions ;
+math.functions math.constants ;
 IN: inverse-tests
 
 [ 2 ] [ { 3 2 } [ 3 swap 2array ] undo ] unit-test
@@ -65,3 +65,6 @@ C: <nil> nil
 
 [ ] [ T{ cons f f f } [ empty-cons ] undo ] unit-test
 [ 1 2 ] [ 2 1 <cons> [ cons* ] undo ] unit-test
+
+[ t ] [ pi [ pi ] matches? ] unit-test
+[ 0.0 ] [ 0.0 pi + [ pi + ] undo ] unit-test
