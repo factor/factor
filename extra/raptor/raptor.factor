@@ -33,7 +33,7 @@ SYMBOL: networking-hook
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-: getty ( tty -- ) `{ "/sbin/getty" "38400" , } fork-exec-wait ;
+: getty ( tty -- ) `{ "/sbin/getty" "38400" , } fork-exec-args-wait ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
@@ -43,6 +43,17 @@ USING: io io.files io.streams.lines io.streams.plain io.streams.duplex
 : tty-listener ( tty -- )
   [ <file-reader> ] [ <file-writer> ] bi <duplex-stream>
   [ listener ] with-stream ;
+
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+USING: unix.linux.swap unix.linux.fs ;
+
+SYMBOL: root-device
+SYMBOL: swap-devices
+
+: activate-swap ( -- ) swap-devices get [ 0 swapon drop ] each ;
+
+: mount-root ( -- ) root-device get "/" "ext3" MS_REMOUNT f mount drop ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 

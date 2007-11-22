@@ -27,6 +27,14 @@ IN: raptor
 ] networking-hook set-global
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+! Filesystems
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+"/dev/hda1"     root-device     set-global
+
+{ "/dev/hda5" } swap-devices	set-global
+
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 ! boot-hook
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
@@ -43,7 +51,12 @@ IN: raptor
   "mountdevsubfs" 		    start-service
   "module-init-tools" 		    start-service
   "procps.sh" 			    start-service
-  "checkroot.sh"		    start-service
+
+  !  "checkroot.sh"		    start-service
+
+     				    activate-swap
+				    mount-root
+
   "mtab"			    start-service
   "checkfs.sh" 			    start-service
   "mountall.sh"			    start-service
