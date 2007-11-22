@@ -1,5 +1,6 @@
 USING: inverse tools.test arrays math kernel sequences
 math.functions ;
+IN: inverse-tests
 
 [ 2 ] [ { 3 2 } [ 3 swap 2array ] undo ] unit-test
 [ { 3 4 } [ dup 2array ] undo ] unit-test-fails
@@ -20,7 +21,7 @@ C: <foo> foo
     {
         { [ dup 1+ 2array ] [ 3 * ] }
         { [ 3array ] [ + + ] }
-    } which ;
+    } switch ;
 
 [ 5 ] [ { 1 2 2 } something ] unit-test
 [ 6 ] [ { 2 3 } something ] unit-test
@@ -35,6 +36,8 @@ C: <foo> foo
 [ { t t f } ] [ { t f 1 } [ [ >boolean ] matches? ] map ] unit-test
 [ { t f } ] [ { { 1 2 3 } 4 } [ [ >array ] matches? ] map ] unit-test
 [ 9 9 ] [ 3 [ 1/2 ^ ] undo 3 [ sqrt ] undo ] unit-test
+[ 5 ] [ 6 5 - [ 6 swap - ] undo ] unit-test
+[ 6 ] [ 6 5 - [ 5 - ] undo ] unit-test
 
 TUPLE: cons car cdr ;
 
@@ -49,9 +52,13 @@ C: <nil> nil
         { [ <cons> ] [ list-sum + ] }
         { [ <nil> ] [ 0 ] }
         { [ ] [ "Malformed list" throw ] }
-    } which ;
+    } switch ;
 
 [ 10 ] [ 1 2 3 4 <nil> <cons> <cons> <cons> <cons> list-sum ] unit-test
+[ ] [ <nil> [ <nil> ] undo ] unit-test
+[ 1 2 ] [ 1 2 <cons> [ <cons> ] undo ] unit-test
+[ t ] [ 1 2 <cons> [ <cons> ] matches? ] unit-test
+[ f ] [ 1 2 <cons> [ <foo> ] matches? ] unit-test
 
 : empty-cons ( -- cons ) cons construct-empty ;
 : cons* ( cdr car -- cons ) { set-cons-cdr set-cons-car } cons construct ;
