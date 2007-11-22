@@ -22,6 +22,10 @@ C: <splice-quot> splice-quot
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
+: ,u ( seq -- seq ) unclip building get push ;
+
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
 SYMBOL: exemplar
 
 : reset-building ( -- ) 1024 <vector> building set ;
@@ -35,6 +39,7 @@ DEFER: bake
 : bake-item ( item -- )
   { { [ dup \ , = ]        [ drop , ] }
     { [ dup \ % = ] 	   [ drop % ] }
+    { [ dup \ ,u = ]	   [ drop ,u ] }
     { [ dup insert-quot? ] [ insert-quot-expr call , ] }
     { [ dup splice-quot? ] [ splice-quot-expr call % ] }
     { [ dup integer? ]     [ , ] }
@@ -53,3 +58,4 @@ DEFER: bake
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 : `{ \ } [ >array ] parse-literal \ bake parsed ; parsing
+
