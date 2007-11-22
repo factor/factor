@@ -5,6 +5,9 @@ windows.types math windows.kernel32 windows namespaces kernel
 sequences windows.errors assocs math.parser system random ;
 IN: io.windows.nt.pipes
 
+! This code is based on
+! http://twistedmatrix.com/trac/browser/trunk/twisted/internet/iocpreactor/process.py
+
 : default-security-attributes ( -- obj )
     "SECURITY_ATTRIBUTES" <c-object>
     "SECURITY_ATTRIBUTES" heap-size over set-SECURITY_ATTRIBUTES-nLength ;

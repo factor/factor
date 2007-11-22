@@ -280,10 +280,13 @@ SYMBOL: hWnd
     mouse-captured? [ release-capture ] when
     prepare-mouse send-button-up ;
 
+: make-TRACKMOUSEEVENT ( hWnd -- alien )
+    "TRACKMOUSEEVENT" <c-object> [ set-TRACKMOUSEEVENT-hwndTrack ] keep
+    "TRACKMOUSEEVENT" heap-size over set-TRACKMOUSEEVENT-cbSize ;
+
 : handle-wm-mousemove ( hWnd uMsg wParam lParam -- )
     2nip
-    over "TRACKMOUSEEVENT" <c-object> [ set-TRACKMOUSEEVENT-hwndTrack ] keep
-    "TRACKMOUSEEVENT" heap-size over set-TRACKMOUSEEVENT-cbSize
+    over make-TRACKMOUSEEVENT
     TME_LEAVE over set-TRACKMOUSEEVENT-dwFlags
     0 over set-TRACKMOUSEEVENT-dwHoverTime
     TrackMouseEvent drop
@@ -387,10 +390,10 @@ SYMBOL: hWnd
     dup SetForegroundWindow drop
     SetFocus drop ;
 
-: init-win32-ui
+: init-win32-ui ( -- )
     "MSG" <c-object> msg-obj set
     "Factor-window" malloc-u16-string class-name-ptr set-global
-    register-wndclassex
+    register-wndclassex drop
     GetDoubleClickTime double-click-timeout set-global ;
 
 : cleanup-win32-ui ( -- )

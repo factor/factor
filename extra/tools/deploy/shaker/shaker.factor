@@ -24,7 +24,6 @@ IN: tools.deploy.shaker
         "Stripping debugger" show
         "resource:extra/tools/deploy/shaker/strip-debugger.factor"
         run-file
-        do-parse-hook
     ] when ;
 
 : strip-libc ( -- )
@@ -32,7 +31,6 @@ IN: tools.deploy.shaker
         "Stripping manual memory management debug code" show
         "resource:extra/tools/deploy/shaker/strip-libc.factor"
         run-file
-        do-parse-hook
     ] when ;
 
 : strip-cocoa ( -- )
@@ -40,7 +38,6 @@ IN: tools.deploy.shaker
         "Stripping unused Cocoa methods" show
         "resource:extra/tools/deploy/shaker/strip-cocoa.factor"
         run-file
-        do-parse-hook
     ] when ;
 
 : strip-assoc ( retained-keys assoc -- newassoc )
@@ -116,7 +113,6 @@ SYMBOL: deploy-vocab
 
         strip-dictionary? [
             {
-                builtins
                 dictionary
                 inspector-hook
                 lexer-factory
@@ -142,6 +138,10 @@ SYMBOL: deploy-vocab
             "c-types" "alien.c-types" lookup ,
         ] when
 
+        native-io? [
+            "default-buffer-size" "io.nonblocking" lookup ,
+        ] when
+
         deploy-ui? get [
             "ui" child-vocabs
             "cocoa" child-vocabs
@@ -152,10 +152,11 @@ SYMBOL: deploy-vocab
         ] when
     ] { } make dup . ;
 
-: strip ( -- )
-    strip-libc
+: strip ( hook -- )
+    >r strip-libc
     strip-cocoa
     strip-debugger
+    r> [ call ] when*
     strip-init-hooks
     deploy-vocab get vocab-main set-boot-quot*
     retained-props >r
@@ -168,10 +169,9 @@ SYMBOL: deploy-vocab
     [
         [
             deploy-vocab set
-            parse-hook get >r
+            parse-hook get
             parse-hook off
             deploy-vocab get require
-            r> [ call ] when*
             strip
             finish-deploy
         ] [
