@@ -115,13 +115,3 @@ world H{
 : close-global ( world global -- )
     dup get-global find-world rot eq?
     [ f swap set-global ] [ drop ] if ;
-
-: focus-gestures ( new old -- )
-    drop-prefix <reversed>
-    T{ lose-focus } swap each-gesture
-    T{ gain-focus } swap each-gesture ;
-
-M: world graft*
-    dup (open-world-window)
-    dup world-title over set-title
-    request-focus ;

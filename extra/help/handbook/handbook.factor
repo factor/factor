@@ -48,6 +48,7 @@ $nl
     { "pathname string"       { "an OS-specific pathname which identifies a file" } }
     { "sequence" { "an object whose class implements the " { $link "sequence-protocol" } } }
     { "slot"                  { "a component of an object which can store a value" } }
+    { "stack effect"          { "a pictorial representation of a word's inputs and outputs, for example " { $snippet "+ ( x y -- z )" } ". See " { $link "effects" } } }
     { "true value"            { "any object not equal to " { $link f } } }
     { "vocabulary" { "a named set of words. See " { $link "vocabularies" } } }
     { "vocabulary specifier"  { "a " { $link vocab } ", " { $link vocab-link } " or a string naming a vocabulary" } }
@@ -71,6 +72,7 @@ $nl
 ARTICLE: "dataflow" "Data and control flow"
 { $subsection "evaluator" }
 { $subsection "words" }
+{ $subsection "effects" }
 { $subsection "shuffle-words" }
 { $subsection "booleans" }
 { $subsection "conditionals" }

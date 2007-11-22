@@ -44,7 +44,7 @@ M: sequence lengthen 2dup length > [ set-length ] [ 2drop ] if ;
 TUPLE: bounds-error index seq ;
 
 : bounds-error ( n seq -- * )
-    die \ bounds-error construct-boa throw ;
+    \ bounds-error construct-boa throw ;
 
 : bounds-check ( n seq -- n seq )
     2dup bounds-check? [ bounds-error ] unless ; inline
