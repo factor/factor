@@ -1,17 +1,16 @@
 ! Copyright (C) 2007 Alex Chapman
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel generic math math.parser sequences arrays io namespaces
-namespaces.private random layouts ;
+USING: kernel generic math sequences arrays io namespaces
+prettyprint.private kernel.private assocs random combinators ;
 IN: trees
 
-TUPLE: tree root ;
-
-: <tree> ( -- tree ) tree construct-empty ;
+TUPLE: tree root count ;
+: <tree> ( -- tree )
+    f 0 tree construct-boa ;
 
 TUPLE: node key value left right ;
-
-: <node> ( value key -- node )
-    swap f f node construct-boa ;
+: <node> ( key value -- node )
+    f f node construct-boa ;
 
 SYMBOL: current-side
 
@@ -20,28 +19,26 @@ SYMBOL: current-side
 
 : go-left? ( -- ? ) current-side get left = ;
 
-: node-link@ ( -- ? quot quot ) go-left? [ node-left ] [ node-right ] ; inline
-: set-node-link@ ( -- ? quot quot ) go-left? [ set-node-left ] [ set-node-right ] ; inline
+: node-link@ ( node ? -- node )
+    go-left? xor [ node-left ] [ node-right ] if ;
+: set-node-link@ ( left parent ? -- ) 
+    go-left? xor [ set-node-left ] [ set-node-right ] if ;
 
-: node-link ( node -- child ) node-link@ if ;
-: set-node-link ( child node -- ) set-node-link@ if ;
-: node+link ( node -- child ) node-link@ swap if ;
-: set-node+link ( child node -- ) set-node-link@ swap if ;
+: node-link ( node -- child ) f node-link@  ;
+: set-node-link ( child node -- ) f set-node-link@ ;
+: node+link ( node -- child ) t node-link@ ;
+: set-node+link ( child node -- ) t set-node-link@ ;
 
-: with-side ( side quot -- ) H{ } clone >n swap current-side set call ndrop ; inline
+: with-side ( side quot -- ) [ swap current-side set call ] with-scope ; inline
 : with-other-side ( quot -- ) current-side get neg swap with-side ; inline
 : go-left ( quot -- ) left swap with-side ; inline
 : go-right ( quot -- ) right swap with-side ; inline
 
-GENERIC: create-node ( value key tree -- node )
+: change-root ( tree quot -- )
+    swap [ tree-root swap call ] keep set-tree-root ; inline
 
-GENERIC: copy-node-contents ( new old -- )
-
-M: node copy-node-contents ( new old -- )
-    #! copy old's key and value into new (keeping children and parent)
-    dup node-key pick set-node-key node-value swap set-node-value ;
-
-M: tree create-node ( value key tree -- node ) drop <node> ;
+: leaf? ( node -- ? )
+    dup node-left swap node-right or not ;
 
 : key-side ( k1 k2 -- side )
     #! side is -1 if k1 < k2, 0 if they are equal, or 1 if k1 > k2
@@ -56,137 +53,121 @@ M: tree create-node ( value key tree -- node ) drop <node> ;
 : choose-branch ( key node -- key node-left/right )
     2dup node-key key-side [ node-link ] with-side ;
 
-GENERIC: node-get ( key node -- value )
+: node-at* ( key node -- value ? )
+    [
+        2dup node-key key= [
+            nip node-value t
+        ] [
+            choose-branch node-at*
+        ] if
+    ] [ f f ] if* ;
 
-: tree-get ( key tree -- value ) tree-root node-get ;
+M: tree at* ( key tree -- value ? )
+    tree-root node-at* ;
 
-M: node node-get ( key node -- value )
-    2dup node-key key= [
-        nip node-value
+: node-set ( value key node -- node )
+    2dup node-key key-side dup zero? [
+        drop nip [ set-node-value ] keep
     ] [
-        choose-branch node-get
+        [
+            [ node-link [ node-set ] [ <node> ] if* ] keep
+            [ set-node-link ] keep
+        ] with-side
     ] if ;
 
-M: f node-get ( key f -- f ) nip ;
+M: tree set-at ( value key tree -- )
+    [ [ node-set ] [ <node> ] if* ] change-root ;
 
-GENERIC: node-get* ( key node -- value ? )
-
-: tree-get* ( key tree -- value ? ) tree-root node-get* ;
-
-M: node node-get* ( key node -- value ? )
-    2dup node-key key= [
-        nip node-value t
-    ] [
-        choose-branch node-get*
-    ] if ;
-
-M: f node-get* ( key f -- f f ) nip f ;
-
-GENERIC: node-get-all ( key node -- seq )
-
-: tree-get-all ( key tree -- seq ) tree-root node-get-all ;
-
-M: f node-get-all ( key f -- V{} ) 2drop V{ } clone ;
-
-M: node node-get-all ( key node -- seq )
-    2dup node-key key= [
-        ! duplicate keys are stored to the right because of choose-branch
-        2dup node-right node-get-all >r nip node-value r> tuck push
-    ] [
-        choose-branch node-get-all
-    ] if ;
-
-GENERIC: node-insert ( value key node -- node ) ! can add duplicates
-
-: tree-insert ( value key tree -- )
-    [ dup tree-root [ nip node-insert ] [ create-node ] if* ] keep set-tree-root ;
-
-GENERIC: node-set ( value key node -- node )
-    #! note that this only sets the first node with this key. if more than one
-    #! has been inserted then the others won't be modified. (should they be deleted?)
-
-: tree-set ( value key tree -- )
-    [ dup tree-root [ nip node-set ] [ create-node ] if* ] keep set-tree-root ;
-
-GENERIC: node-delete ( key node -- node )
-
-: tree-delete ( key tree -- )
-    [ tree-root node-delete ] keep set-tree-root ;
-
-GENERIC: node-delete-all ( key node -- node )
-
-M: f node-delete-all ( key f -- f ) nip ;
-
-: tree-delete-all ( key tree -- )
-    [ tree-root node-delete-all ] keep set-tree-root ;
-
-: node-map-link ( node quot -- node )
-    over node-link swap call over set-node-link ;
-
-: node-map ( node quot -- node )
-    over [
-        tuck [ node-map-link ] go-left over call swap [ node-map-link ] go-right
-    ] [
-        drop
-    ] if ;
-
-: tree-map ( tree quot -- )
-    #! apply quot to each element of the tree, in order
-    over tree-root swap node-map swap set-tree-root ;
-
-: node>node-seq ( node -- seq )
-    dup [
-        dup node-left node>node-seq over 1array rot node-right node>node-seq 3append
-    ] when ;
-
-: tree>node-seq ( tree -- seq )
-    tree-root node>node-seq ;
-
-: tree-keys ( tree -- keys )
-    tree>node-seq [ node-key ] map ;
-
-: tree-values ( tree -- values )
-    tree>node-seq [ node-value ] map ;
-
-: leaf? ( node -- ? )
-    dup node-left swap node-right or not ;
-
-GENERIC: valid-node? ( node -- ? )
-
-M: f valid-node? ( f -- t ) not ;
-
-M: node valid-node? ( node -- ? )
-    dup dup node-left [ node-key swap node-key key< ] when* >r
-    dup dup node-right [ node-key swap node-key key> ] when* r> and swap
-    dup node-left valid-node? swap node-right valid-node? and and ;
+: valid-node? ( node -- ? )
+    [
+        dup dup node-left [ node-key swap node-key key< ] when* >r
+        dup dup node-right [ node-key swap node-key key> ] when* r> and swap
+        dup node-left valid-node? swap node-right valid-node? and and
+    ] [ t ] if* ;
 
 : valid-tree? ( tree -- ? ) tree-root valid-node? ;
 
-DEFER: print-tree
+: tree-call ( node call -- )
+    >r [ node-key ] keep node-value r> call ; inline
+ 
+: find-node ( node quot -- key value ? )
+    {
+        { [ over not ] [ 2drop f f f ] }
+        { [ [
+              >r node-left r> find-node
+            ] 2keep rot ]
+          [ 2drop t ] }
+        { [ >r 2nip r> [ tree-call ] 2keep rot ]
+          [ drop [ node-key ] keep node-value t ] }
+        { [ t ] [ >r node-right r> find-node ] }
+    } cond ; inline
 
-: random-tree ( tree size -- tree )
-    [ most-positive-fixnum random pick tree-set ] each ;
+M: tree assoc-find ( tree quot -- key value ? )
+    >r tree-root r> find-node ;
 
-: increasing-tree ( tree size -- tree )
-    [ dup pick tree-set ] each ;
+M: tree clear-assoc
+    0 over set-tree-count
+    f swap set-tree-root ;
 
-: decreasing-tree ( tree size -- tree )
-    reverse increasing-tree ;
+M: tree assoc-size
+    tree-count ;
 
-GENERIC: print-node ( depth node -- )
+: copy-node-contents ( new old -- )
+    dup node-key pick set-node-key node-value swap set-node-value ;
 
-M: f print-node ( depth f -- ) 2drop ;
+! Deletion
+DEFER: delete-node
 
-M: node print-node ( depth node -- )
-    ! not pretty, but ok for debugging
-    over 1+ over node-right print-node
-    over [ drop "   " write ] each dup node-key number>string print
-    >r 1+ r> node-left print-node ;
+: (prune-extremity) ( parent node -- new-extremity )
+    dup node-link [
+        rot drop (prune-extremity)
+    ] [
+        tuck delete-node swap set-node-link
+    ] if* ;
 
-: print-tree ( tree -- )
-    tree-root 1 swap print-node ;
+: prune-extremity ( node -- new-extremity )
+    #! remove and return the leftmost or rightmost child of this node.
+    #! assumes at least one child
+    dup node-link (prune-extremity) ;
 
-: stump? ( tree -- ? )
-    #! is this tree empty?
-    tree-root not ;
+: replace-with-child ( node -- node )
+    dup dup node-link copy-node-contents dup node-link delete-node over set-node-link ;
 
+: replace-with-extremity ( node -- node )
+    dup node-link dup node+link [
+        ! predecessor/successor is not the immediate child
+        [ prune-extremity ] with-other-side dupd copy-node-contents
+    ] [
+        ! node-link is the predecessor/successor
+        drop replace-with-child
+    ] if ;
+
+: delete-node-with-two-children ( node -- node )
+    #! randomised to minimise tree unbalancing
+    random-side [ replace-with-extremity ] with-side ;
+
+: delete-node ( node -- node )
+    #! delete this node, returning its replacement
+    dup node-left [
+        dup node-right [
+            delete-node-with-two-children
+        ] [
+            node-left ! left but no right
+        ] if
+    ] [
+        dup node-right [
+            node-right ! right but not left
+        ] [
+            drop f ! no children
+        ] if
+    ] if ;
+
+: delete-bst-node ( key node -- node )
+    2dup node-key key-side dup zero? [
+        drop nip delete-node
+    ] [
+        [ tuck node-link delete-bst-node over set-node-link ] with-side
+    ] if ;
+
+M: tree delete-at
+    [ delete-bst-node ] change-root ;
