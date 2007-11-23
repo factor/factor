@@ -8,9 +8,22 @@ Raptor Linux is a mod of Ubuntu 6.06 (Dapper Drake)
 This is unlikely to work on another version of Ubuntu, much less
 another Linux distribution.
 
+*** Features ***
+
+  * /sbin/init is replaced with Factor
+  * Virtual terminals managed by Factor
+  * Listeners run on virtual terminals
+  * Native support for static ip networking
+  * Crontab replacement
+
 *** Install ***
 
+  # mkdir -v /etc/raptor
+
+  # cp -v /scratch/factor/extra/raptor/{config,cronjobs}.factor /etc/raptor
+
   ( scratchpad ) USE: raptor
+  ( scratchpad ) reload-raptor-config
   ( scratchpad ) save
 
   # mv -v /sbin/{init,init.orig}
@@ -18,10 +31,6 @@ another Linux distribution.
   # cp -v /scratch/factor/factor /sbin/init
 
   # cp -v /scratch/factor/factor.image /sbin/init.image
-
-  # mkdir -v /etc/raptor
-
-  # cp -v /scratch/factor/extra/raptor/config.factor /etc/raptor/config.factor
 
 *** Static IP networking ***
 

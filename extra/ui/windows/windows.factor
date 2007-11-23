@@ -397,8 +397,10 @@ M: windows-ui-backend (close-window)
     GetDoubleClickTime double-click-timeout set-global ;
 
 : cleanup-win32-ui ( -- )
-    class-name-ptr get-global f UnregisterClass drop
-    class-name-ptr get-global [ free ] when*
+    class-name-ptr get-global [
+        dup f UnregisterClass drop
+        free
+    ] when*
     f class-name-ptr set-global ;
 
 : setup-pixel-format ( hdc -- )

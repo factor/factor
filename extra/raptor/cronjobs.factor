@@ -1,5 +1,6 @@
 
-USING: kernel threads arrays sequences combinators.cleave raptor raptor.cron ;
+USING: kernel namespaces threads arrays sequences combinators.cleave
+       raptor raptor.cron ;
 
 IN: raptor
 
@@ -7,41 +8,33 @@ IN: raptor
 
 : fork-exec-args-wait ( args -- ) [ first ] [ ] bi fork-exec-wait ;
 
+: run-script ( path -- ) 1array [ fork-exec-args-wait ] curry in-thread ;
+
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-: cron-hourly ( -- ) ;
-
-: cron-daily ( -- )
-  { "/etc/cron.daily/apt"
-    "/etc/cron.daily/aptitude"
-    "/etc/cron.daily/bsdmainutils"
-    "/etc/cron.daily/find.notslocate"
-    "/etc/cron.daily/logrotate"
-    "/etc/cron.daily/man-db"
-    "/etc/cron.daily/ntp-server"
-    "/etc/cron.daily/slocate"
-    "/etc/cron.daily/standard"
-    "/etc/cron.daily/sysklogd"
-    "/etc/cron.daily/tetex-bin" }
-  [ 1array [ fork-exec-args-wait ] in-thread drop ] each ;
+[
+    "/etc/cron.daily/apt"             run-script
+    "/etc/cron.daily/aptitude"	      run-script
+    "/etc/cron.daily/bsdmainutils"    run-script
+    "/etc/cron.daily/find.notslocate" run-script
+    "/etc/cron.daily/logrotate"	      run-script
+    "/etc/cron.daily/man-db"	      run-script
+    "/etc/cron.daily/ntp-server"      run-script
+    "/etc/cron.daily/slocate"	      run-script
+    "/etc/cron.daily/standard"	      run-script
+    "/etc/cron.daily/sysklogd"	      run-script
+    "/etc/cron.daily/tetex-bin"	      run-script
+] cron-jobs-daily set-global
     
-: cron-weekly ( -- )
-  { "/etc/cron.weekly/cvs"
-    "/etc/cron.weekly/man-db"
-    "/etc/cron.weekly/ntp-server"
-    "/etc/cron.weekly/popularity-contest"
-    "/etc/cron.weekly/sysklogd" }
-  [ 1array [ fork-exec-args-wait ] in-thread drop ] each ;
+[
+  "/etc/cron.weekly/cvs"                run-script
+  "/etc/cron.weekly/man-db"		run-script
+  "/etc/cron.weekly/ntp-server"		run-script
+  "/etc/cron.weekly/popularity-contest" run-script
+  "/etc/cron.weekly/sysklogd"		run-script
+] cron-jobs-weekly set-global
 
-: cron-monthly ( -- )
-  { "/etc/cron.monthly/scrollkeeper"
-    "/etc/cron.monthly/standard" }
-  [ 1array [ fork-exec-args-wait ] in-thread drop ] each ;
-
-! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-
-: schedule-cron-jobs ( -- )
-  { 17 } f f f f         <when> [ cron-hourly  ] schedule
-  { 25 } { 6 } f f f     <when> [ cron-daily   ] schedule
-  { 47 } { 6 } f f { 7 } <when> [ cron-weekly  ] schedule
-  { 52 } { 6 } { 1 } f f <when> [ cron-monthly ] schedule ;
+[
+  "/etc/cron.monthly/scrollkeeper" run-script
+  "/etc/cron.monthly/standard"     run-script
+] cron-jobs-monthly set-global
