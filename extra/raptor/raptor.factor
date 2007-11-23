@@ -1,5 +1,6 @@
 
-USING: kernel parser namespaces threads unix.process combinators.cleave ;
+USING: kernel parser namespaces threads sequences unix unix.process
+       combinators.cleave bake ;
 
 IN: raptor
 
@@ -10,29 +11,29 @@ SYMBOL: reboot-hook
 SYMBOL: shutdown-hook
 SYMBOL: networking-hook
 
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
 : reload-raptor-config ( -- )
   "/etc/raptor/config.factor" run-file
   "/etc/raptor/cronjobs.factor" run-file ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-USING: sequences unix ;
+: fork-exec-wait ( pathname args -- )
+  fork dup 0 = [ drop exec drop ] [ 2nip wait-for-pid drop ] if ;
+
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+: forever ( quot -- ) [ call ] [ forever ] bi ;
+
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 : start-service ( name -- ) "/etc/init.d/" swap " start" 3append system drop ;
 : stop-service  ( name -- ) "/etc/init.d/" swap " stop"  3append system drop ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-: fork-exec-wait ( pathname args -- )
-  fork dup 0 = [ drop exec drop ] [ 2nip wait-for-pid ] if ;
-
-! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-
-: respawn ( pathname args -- ) [ fork-exec-wait ] [ respawn ] 2bi ;
-
-: start-gettys ( -- )
-  [ "/sbin/getty" { "getty" "38400" "tty5" } respawn ] in-thread
-  [ "/sbin/getty" { "getty" "38400" "tty6" } respawn ] in-thread ;
+: getty ( tty -- ) `{ "/sbin/getty" "38400" , } fork-exec-args-wait ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
@@ -40,16 +41,19 @@ USING: io io.files io.streams.lines io.streams.plain io.streams.duplex
        listener ;
 
 : tty-listener ( tty -- )
-  [ <file-reader> <line-reader>  ]
-  [ <file-writer> <plain-writer> ]
-  bi <duplex-stream> [ listener ] with-stream ;
+  [ <file-reader> ] [ <file-writer> ] bi <duplex-stream>
+  [ listener ] with-stream ;
 
-: forever ( quot -- ) [ call ] [ forever ] bi ;
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-: start-listeners ( -- )
-  [ [ "/dev/tty2" tty-listener ] forever ] in-thread
-  [ [ "/dev/tty3" tty-listener ] forever ] in-thread
-  [ [ "/dev/tty4" tty-listener ] forever ] in-thread ;
+USING: unix.linux.swap unix.linux.fs ;
+
+SYMBOL: root-device
+SYMBOL: swap-devices
+
+: activate-swap ( -- ) swap-devices get [ 0 swapon drop ] each ;
+
+: mount-root ( -- ) root-device get "/" "ext3" MS_REMOUNT f mount drop ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
@@ -60,3 +64,4 @@ USING: io io.files io.streams.lines io.streams.plain io.streams.duplex
 : shutdown ( -- ) shutdown-hook get call ;
 
 MAIN: boot
+
