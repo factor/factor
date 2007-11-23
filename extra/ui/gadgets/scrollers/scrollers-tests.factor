@@ -1,5 +1,5 @@
 IN: temporary
-USING: ui.gadgets ui.gadgets.scrollers
+USING: ui.gadgets ui.gadgets.scrollers ui.private
 namespaces tools.test kernel models ui.gadgets.viewports
 ui.gadgets.labels ui.gadgets.grids ui.gadgets.frames
 ui.gadgets.sliders math math.vectors arrays sequences

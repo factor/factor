@@ -34,7 +34,7 @@ HELP: ui
 HELP: start-ui
 { $description "Called by the UI backend to initialize the platform-independent parts of UI. This word should be called after the backend is ready to start displaying new windows, and before the event loop starts." } ;
 
-HELP: (open-world-window)
+HELP: (open-window)
 { $values { "world" world } }
 { $description "Opens a native window containing the given world. This grafts the world by calling " { $link graft } ". Each world can only be displayed in one top-level window at a time." }
 { $notes "This word should not be called directly by user code. Instead, use " { $link open-window } "." } ;
@@ -43,11 +43,6 @@ HELP: ui-try
 { $values { "quot" quotation } }
 { $description "Calls the quotation. If it throws an error, opens a window with the error and restores the data stack." }
 { $notes "This is essentially a graphical variant of " { $link try } "." } ;
-
-HELP: stop-world
-{ $values { "world" world } }
-{ $description "Stops a world." }
-{ $notes "This word should only be called by the UI backend, and not user code." } ;
 
 ARTICLE: "ui-glossary" "UI glossary"
 { $table
@@ -177,9 +172,8 @@ ARTICLE: "ui-backend-windows" "UI backend window management"
 "This word can also be called directly if the UI backend is notified by the window system that window contents have been invalidated. Before and after drawing, two words are called, which the UI backend must implement:"
 { $subsection select-gl-context }
 { $subsection flush-gl-context }
-"If the user clicks the window's close box, you must call the following two words in sequence:"
-{ $subsection stop-world }
-{ $subsection unregister-window } ;
+"If the user clicks the window's close box, you must call the following word:"
+{ $subsection close-window } ;
 
 ARTICLE: "ui-layouts" "Gadget hierarchy and layouts"
 "A layout gadget is a gadget whose sole purpose is to contain other gadgets. Layout gadgets position and resize children according to a certain policy, taking the preferred size of the children into account. Gadget hierarchies are constructed by building up nested layouts."

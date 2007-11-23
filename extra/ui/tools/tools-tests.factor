@@ -2,7 +2,7 @@ USING: ui.tools ui.tools.interactor ui.tools.listener
 ui.tools.search ui.tools.workspace kernel models namespaces
 sequences timers tools.test ui.gadgets ui.gadgets.buttons
 ui.gadgets.labelled ui.gadgets.presentations
-ui.gadgets.scrollers vocabs tools.test.ui ui ;
+ui.gadgets.scrollers vocabs tools.test.ui ui ui.private ;
 IN: temporary
 
 [

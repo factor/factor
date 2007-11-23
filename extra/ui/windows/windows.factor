@@ -216,13 +216,13 @@ SYMBOL: hWnd
     dup win-hRC wglDeleteContext win32-error=0/f
     dup win-hWnd swap win-hDC ReleaseDC win32-error=0/f ;
 
-: handle-wm-close ( hWnd uMsg wParam lParam -- )
-    3drop
-    window [ world-handle ] keep
-    stop-world
+M: windows-ui-backend (close-window)
     dup win-hWnd unregister-window
     dup cleanup-window
     win-hWnd DestroyWindow win32-error=0/f ;
+
+: handle-wm-close ( hWnd uMsg wParam lParam -- )
+    3drop window ungraft ;
 
 : handle-wm-set-focus ( hWnd uMsg wParam lParam -- )
     3drop window [ focus-world ] when* ;
@@ -414,7 +414,7 @@ SYMBOL: hWnd
 : setup-gl ( hwnd -- hDC hRC )
     get-dc dup setup-pixel-format dup get-rc ;
 
-M: windows-ui-backend (open-world-window) ( world -- )
+M: windows-ui-backend (open-window) ( world -- )
     [ rect-dim first2 create-window dup setup-gl ] keep
     [ f <win> ] keep
     [ swap win-hWnd register-window ] 2keep
