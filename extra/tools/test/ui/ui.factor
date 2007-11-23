@@ -1,5 +1,5 @@
 USING: dlists ui.gadgets kernel ui namespaces io.streams.string
-io ui.private ;
+io ;
 IN: tools.test.ui
 
 ! We can't print to stdio here because that might be a pane
