@@ -1,4 +1,4 @@
-<% USING: kernel io http.server namespaces sequences math html.elements random furnace webapps.article-manager webapps.article-manager.database ; %>
+<% USING: kernel io http.server namespaces sequences math html.elements random furnace webapps.article-manager webapps.article-manager.database html.elements ; %>
     <div id="banner"><h1><% "arg1" get second article-title write %></h1></div>
     <% f "navigation" render-template %>
     <div id="article">
