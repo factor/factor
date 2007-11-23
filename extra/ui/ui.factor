@@ -28,8 +28,6 @@ SYMBOL: windows
 : unregister-window ( handle -- )
     windows global [ [ first = not ] curry* subset ] change-at ;
 
-<PRIVATE
-
 : raised-window ( world -- )
     windows get-global [ second eq? ] curry* find drop
     windows get-global [ length 1- ] keep exchange ;
@@ -67,8 +65,6 @@ M: world ungraft*
     dup world-handle (close-window)
     reset-world ;
 
-PRIVATE>
-
 : open-world-window ( world -- )
     dup pref-dim over set-gadget-dim dup relayout graft ;
 
@@ -89,8 +85,6 @@ SYMBOL: ui-hook
     <dlist> \ graft-queue set-global
     <dlist> \ layout-queue set-global
     V{ } clone windows set-global ;
-
-<PRIVATE
 
 : restore-gadget-later ( gadget -- )
     dup gadget-graft-state {
@@ -133,7 +127,7 @@ SYMBOL: ui-hook
     ] { } make ;
 
 : redraw-worlds ( seq -- )
-    [ dup update-hand draw-world ] each ;
+    [ dup update-hand [ draw-world ] time ] each ;
 
 : notify ( gadget -- )
     dup gadget-graft-state {
@@ -145,8 +139,6 @@ SYMBOL: ui-hook
 
 : notify-queued ( -- )
     graft-queue [ notify ] dlist-slurp ;
-
-PRIVATE>
 
 : ui-step ( -- )
     [
