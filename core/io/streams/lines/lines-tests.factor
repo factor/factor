@@ -42,6 +42,14 @@ unit-test
 ] unit-test
 
 [
+    "1234"
+] [
+     "Hello world\r\n1234" <string-reader>
+     dup stream-readln drop
+     4 swap stream-read-partial
+] unit-test
+
+[
     CHAR: 1
 ] [
      "Hello world\r\n1234" <string-reader>

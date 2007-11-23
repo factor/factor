@@ -32,15 +32,26 @@ M: line-reader stream-readln ( stream -- str )
     "\r\n" over delegate stream-read-until handle-readln ;
 
 : fix-read ( stream string -- string )
-    "\n" ?head [ swap stream-read1 [ add ] when* ] [ nip ] if ;
+    over line-reader-cr [
+        over cr-
+        "\n" ?head [
+            swap stream-read1 [ add ] when*
+        ] [ nip ] if
+    ] [ nip ] if ;
 
 M: line-reader stream-read
-    tuck delegate stream-read
-    over line-reader-cr [ over cr- fix-read ] [ nip ] if ;
+    tuck delegate stream-read fix-read ;
+
+M: line-reader stream-read-partial
+    tuck delegate stream-read-partial fix-read ;
 
 : fix-read1 ( stream char -- char )
-    dup CHAR: \n = [ drop stream-read1 ] [ nip ] if ;
+    over line-reader-cr [
+        over cr-
+        dup CHAR: \n = [
+            drop stream-read1
+        ] [ nip ] if
+    ] [ nip ] if ;
 
 M: line-reader stream-read1 ( stream -- char )
-    dup delegate stream-read1
-    over line-reader-cr [ over cr- fix-read1 ] [ nip ] if ;
+    dup delegate stream-read1 fix-read1 ;

@@ -166,6 +166,9 @@
   (beginning-of-line)
   (insert "! "))
 
+(defun factor-refresh-all ()
+  (interactive)
+  (comint-send-string "*factor*" "refresh-all\n"))
 
 (define-key factor-mode-map "\C-c\C-f" 'factor-run-file)
 (define-key factor-mode-map "\C-c\C-r" 'factor-send-region)
