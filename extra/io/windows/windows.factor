@@ -116,6 +116,10 @@ M: windows-io delete-file ( path -- )
     normalize-pathname
     DeleteFile win32-error=0/f ;
 
+M: windows-io copy-file ( from to -- )
+    normalize-pathname
+    f CopyFile win32-error=0/f ;
+
 M: windows-io make-directory ( path -- )
     normalize-pathname
     f CreateDirectory win32-error=0/f ;
