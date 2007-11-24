@@ -18,12 +18,12 @@ LAZY: 'escaped-char' "\\" token any-char-parser &> ;
 
 LAZY: 'chars' 'escaped-char' any-char-parser <|> <*> ;
 
-LAZY: 'non-space-char'
-    'escaped-char' [ CHAR: \s = not ] satisfy <|> ;
-
 LAZY: 'quoted-1' 'chars' "\"" "\"" surrounded-by ;
 
 LAZY: 'quoted-2' 'chars' "'" "'" surrounded-by ;
+
+LAZY: 'non-space-char'
+    'escaped-char' [ CHAR: \s = not ] satisfy <|> ;
 
 LAZY: 'unquoted' 'non-space-char' <+> ;
 
