@@ -23,7 +23,7 @@ TUPLE: win32-file handle ptr overlapped ;
 : <win32-duplex-stream> ( in out -- stream )
     >r f <win32-file> r> f <win32-file> handle>duplex-stream ;
 
-HOOK: CreateFile-flags io-backend ( -- DWORD )
+HOOK: CreateFile-flags io-backend ( DWORD -- DWORD )
 HOOK: FileArgs-overlapped io-backend ( port -- overlapped/f )
 HOOK: add-completion io-backend ( port -- )
 
@@ -31,7 +31,8 @@ M: windows-io normalize-directory ( string -- string )
     "\\" ?tail drop "\\*" append ;
 
 : share-mode ( -- fixnum )
-    FILE_SHARE_READ FILE_SHARE_WRITE bitor ; inline
+    FILE_SHARE_READ FILE_SHARE_WRITE bitor
+    FILE_SHARE_DELETE bitor ; foldable
 
 M: win32-file init-handle ( handle -- )
     drop ;
@@ -40,24 +41,25 @@ M: win32-file close-handle ( handle -- )
     win32-file-handle CloseHandle drop ;
 
 ! Clean up resources (open handle) if add-completion fails
-: open-file ( path access-mode create-mode -- handle )
+: open-file ( path access-mode create-mode flags -- handle )
     [
-        >r share-mode f r> CreateFile-flags f CreateFile
+        >r >r >r normalize-pathname r>
+        share-mode f r> r> CreateFile-flags f CreateFile
         dup invalid-handle? dup close-later
         dup add-completion
     ] with-destructors ;
 
 : open-pipe-r/w ( path -- handle )
-    GENERIC_READ GENERIC_WRITE bitor OPEN_EXISTING open-file ;
+    GENERIC_READ GENERIC_WRITE bitor OPEN_EXISTING 0 open-file ;
 
 : open-read ( path -- handle length )
-    normalize-pathname GENERIC_READ OPEN_EXISTING open-file 0 ;
+    GENERIC_READ OPEN_EXISTING 0 open-file 0 ;
 
 : open-write ( path -- handle length )
-    normalize-pathname GENERIC_WRITE CREATE_ALWAYS open-file 0 ;
+    GENERIC_WRITE CREATE_ALWAYS 0 open-file 0 ;
 
 : (open-append) ( path -- handle )
-    normalize-pathname GENERIC_WRITE OPEN_ALWAYS open-file ;
+    GENERIC_WRITE OPEN_ALWAYS 0 open-file ;
 
 : set-file-pointer ( handle length -- )
     dupd d>w/w <uint> FILE_BEGIN SetFilePointer
