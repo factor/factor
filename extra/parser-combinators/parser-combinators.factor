@@ -13,6 +13,9 @@ M: promise (parse) ( input parser -- list )
 : parse ( input parser -- promise )
   (parse) ;
 
+: parse-1 ( input parser -- result )
+  parse car parse-result-parsed ;
+
 TUPLE: parse-result parsed unparsed ;
 
 C: <parse-result> parse-result
@@ -23,7 +26,7 @@ C: token token-parser ( string -- parser )
 
 M: token-parser (parse) ( input parser -- list )
   token-parser-string swap over ?head-slice [
-    <parse-result> 1list    
+    <parse-result> 1list
   ] [
     2drop nil
   ] if ;
@@ -43,8 +46,11 @@ M: satisfy-parser (parse) ( input parser -- list )
       swap <parse-result> 1list
     ] [
       2drop nil
-    ] if 
+    ] if
   ] if ;
+
+LAZY: any-char-parser ( -- parser )
+  [ drop t ] satisfy ;
 
 TUPLE: epsilon-parser ;
 
@@ -63,7 +69,7 @@ C: succeed succeed-parser ( result -- parser )
 
 M: succeed-parser (parse) ( input parser -- list )
   #! A parser that always returns 'result' as a
-  #! successful parse with no input consumed.  
+  #! successful parse with no input consumed.
   succeed-parser-result swap <parse-result> 1list ;
 
 TUPLE: fail-parser ;
@@ -81,7 +87,7 @@ TUPLE: and-parser parsers ;
   over and-parser? [
     >r and-parser-parsers r> add
   ] [
-    2array 
+    2array
   ] if \ and-parser construct-boa ;
 
 : and-parser-parse ( list p1  -- list )
@@ -92,13 +98,13 @@ TUPLE: and-parser parsers ;
       [ parse-result-parsed 2array ] keep
       parse-result-unparsed <parse-result>
     ] lmap-with
-  ] lmap-with lconcat ;  
-  
+  ] lmap-with lconcat ;
+
 M: and-parser (parse) ( input parser -- list )
   #! Parse 'input' by sequentially combining the
   #! two parsers. First parser1 is applied to the
   #! input then parser2 is applied to the rest of
-  #! the input strings from the first parser. 
+  #! the input strings from the first parser.
   and-parser-parsers unclip swapd parse [ [ and-parser-parse ] reduce ] 2curry promise ;
 
 TUPLE: or-parser p1 p2 ;
@@ -115,7 +121,7 @@ M: or-parser (parse) ( input parser1 -- list )
   #! Return a new string without any leading whitespace
   #! from the original string.
   dup empty? [
-    dup first blank? [ 1 tail-slice left-trim-slice ] when 
+    dup first blank? [ 1 tail-slice left-trim-slice ] when
   ] unless ;
 
 TUPLE: sp-parser p1 ;
@@ -136,7 +142,7 @@ C: just just-parser ( p1 -- parser )
 M: just-parser (parse) ( input parser -- result )
   #! Calls the given parser on the input removes
   #! from the results anything where the remaining
-  #! input to be parsed is not empty. So ensures a 
+  #! input to be parsed is not empty. So ensures a
   #! fully parsed input string.
   just-parser-p1 parse [ parse-result-unparsed empty? ] lsubset ;
 
@@ -150,8 +156,8 @@ M: apply-parser (parse) ( input parser -- result )
   #! The result of that quotation then becomes the new parse result.
   #! This allows modification of parse tree results (like
   #! converting strings to integers, etc).
-  [ apply-parser-p1 ] keep apply-parser-quot 
-  -rot parse [ 
+  [ apply-parser-p1 ] keep apply-parser-quot
+  -rot parse [
     [ parse-result-parsed swap call ] keep
     parse-result-unparsed <parse-result>
   ] lmap-with ;
@@ -165,7 +171,7 @@ M: some-parser (parse) ( input parser -- result )
   #! the parse is complete (the remaining input is empty),
   #! picks the first solution and only returns the parse
   #! tree since the remaining input is empty.
-  some-parser-p1 just parse car parse-result-parsed ;
+  some-parser-p1 just parse-1 ;
 
 
 : <& ( parser1 parser2 -- parser )
@@ -230,13 +236,13 @@ LAZY: <!?> ( parser -- parser )
   #! required.
   <?> only-first ;
 
-LAZY: <(*)> ( parser -- parser ) 
-    #! Like <*> but take shortest match first. 
+LAZY: <(*)> ( parser -- parser )
+    #! Like <*> but take shortest match first.
     #! Implementation by Matthew Willis.
     { } succeed swap dup <(*)> <&:> <|> ;
 
 LAZY: <(+)> ( parser -- parser )
-    #! Like <+> but take shortest match first. 
+    #! Like <+> but take shortest match first.
     #! Implementation by Matthew Willis.
     dup <(*)> <&:> ;
 
@@ -249,6 +255,9 @@ LAZY: pack ( close body open -- parser )
 LAZY: list-of ( items separator -- parser )
   #! Given a parser for the separator and for the
   #! items themselves, return a parser that parses
-  #! lists of those items. The parse tree is an 
+  #! lists of those items. The parse tree is an
   #! array of the parsed items.
-  over &> <*> <&:> { } succeed <|> ; 
+  dup <?> -rot over &> <*> <&:> &> { } succeed <|> ;
+
+LAZY: surrounded-by ( parser start end -- parser' )
+    [ token ] 2apply swapd pack ;
