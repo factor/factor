@@ -3,7 +3,7 @@
 USING: io io.launcher io.unix.backend io.nonblocking
 sequences kernel namespaces math system alien.c-types
 debugger continuations arrays assocs combinators unix.process
-parser-combinators memoize ;
+parser-combinators memoize promises strings ;
 IN: io.unix.launcher
 
 ! Search unix first
@@ -40,7 +40,8 @@ MEMO: 'arguments' ( -- parser )
 : get-arguments ( -- seq )
     +command+ get [ tokenize-command ] [ +arguments+ get ] if* ;
 
-: assoc>env ( assoc -- env ) [ "=" swap 3append ] { } assoc>map ;
+: assoc>env ( assoc -- env )
+    [ "=" swap 3append ] { } assoc>map ;
 
 : (spawn-process) ( -- )
     [
