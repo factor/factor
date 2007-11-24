@@ -88,3 +88,17 @@ void c_to_factor_toplevel(CELL quot)
 	c_to_factor(quot);
 	RemoveVectoredExceptionHandler((void*)exception_handler);
 }
+
+void open_console(void)
+{
+	if(!console_open)
+	{
+		if(!AttachConsole(ATTACH_PARENT_PROCESS))
+		{
+			if(AllocConsole())
+				console_open = true;
+		}
+		else
+			console_open = true;
+	}
+}
