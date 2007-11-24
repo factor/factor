@@ -72,7 +72,9 @@ M: world ungraft*
     >r [ 1 track, ] { 0 1 } make-track r>
     f <world> open-world-window ;
 
-: close-window ( gadget -- )
+HOOK: close-window ui-backend ( gadget -- )
+
+M: object close-window
     find-world [ ungraft ] when* ;
 
 : find-window ( quot -- world )
