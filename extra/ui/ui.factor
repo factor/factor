@@ -127,7 +127,7 @@ SYMBOL: ui-hook
     ] { } make ;
 
 : redraw-worlds ( seq -- )
-    [ dup update-hand [ draw-world ] time ] each ;
+    [ dup update-hand draw-world ] each ;
 
 : notify ( gadget -- )
     dup gadget-graft-state {
