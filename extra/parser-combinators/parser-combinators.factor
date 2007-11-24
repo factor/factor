@@ -13,10 +13,10 @@ M: promise (parse) ( input parser -- list )
 : parse ( input parser -- promise )
   (parse) ;
 
+TUPLE: parse-result parsed unparsed ;
+
 : parse-1 ( input parser -- result )
   parse car parse-result-parsed ;
-
-TUPLE: parse-result parsed unparsed ;
 
 C: <parse-result> parse-result
 
