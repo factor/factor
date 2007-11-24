@@ -667,7 +667,14 @@ PRIVATE>
 : infimum ( seq -- n ) dup first [ min ] reduce ;
 : supremum ( seq -- n ) dup first [ max ] reduce ;
 
+! : sequence-hashcode ( n seq -- x )
+!    0 -rot [
+!        hashcode* >fixnum swap 31 fixnum*fast fixnum+fast
+!    ] curry* each ; inline
+
 : sequence-hashcode ( n seq -- x )
     0 -rot [
-        hashcode* >fixnum swap 31 fixnum*fast fixnum+fast
+        hashcode* >fixnum swap
+        [ -2 shift fixnum+fast ] keep [ 5 shift fixnum+fast ] keep
+        bitxor
     ] curry* each ; inline
