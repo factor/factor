@@ -2,15 +2,43 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: io io.launcher io.unix.backend io.nonblocking
 sequences kernel namespaces math system alien.c-types
-debugger continuations arrays assocs combinators unix.process ;
+debugger continuations arrays assocs combinators unix.process
+parser-combinators memoize ;
 IN: io.unix.launcher
 
 ! Search unix first
 USE: unix
 
+! Our command line parser. Supported syntax:
+! foo bar baz -- simple tokens
+! foo\ bar -- escaping the space
+! 'foo bar' -- quotation
+! "foo bar" -- quotation
+LAZY: 'escaped-char' "\\" token any-char-parser &> ;
+
+LAZY: 'chars' 'escaped-char' any-char-parser <|> <*> ;
+
+LAZY: 'non-space-char'
+    'escaped-char' [ CHAR: \s = not ] satisfy <|> ;
+
+LAZY: 'quoted-1' 'chars' "\"" "\"" surrounded-by ;
+
+LAZY: 'quoted-2' 'chars' "'" "'" surrounded-by ;
+
+LAZY: 'unquoted' 'non-space-char' <+> ;
+
+LAZY: 'argument'
+    'quoted-1' 'quoted-2' 'unquoted' <|> <|>
+    [ >string ] <@ ;
+
+MEMO: 'arguments' ( -- parser )
+    'argument' " " token <+> list-of ;
+
+: tokenize-command ( command -- arguments )
+    'arguments' parse-1 ;
+
 : get-arguments ( -- seq )
-    +command+ get
-    [ "/bin/sh" "-c" rot 3array ] [ +arguments+ get ] if* ;
+    +command+ get [ tokenize-command ] [ +arguments+ get ] if* ;
 
 : assoc>env ( assoc -- env ) [ "=" swap 3append ] { } assoc>map ;
 
