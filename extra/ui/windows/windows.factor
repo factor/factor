@@ -381,7 +381,7 @@ M: windows-ui-backend (close-window)
     >r class-name-ptr get-global f r>
     >r >r >r ex-style r> r>
         WS_CLIPSIBLINGS WS_CLIPCHILDREN bitor style bitor
-        0 0 r>
+        CW_USEDEFAULT dup r>
     get-RECT-dimensions
     f f f GetModuleHandle f CreateWindowEx dup win32-error=0/f ;
 
