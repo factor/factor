@@ -2,8 +2,9 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: io io.files io.launcher kernel namespaces sequences
 system tools.deploy tools.deploy.config assocs hashtables
-prettyprint unix io.unix.backend cocoa cocoa.plists
-cocoa.application cocoa.classes ;
+prettyprint io.unix.backend cocoa cocoa.plists
+cocoa.application cocoa.classes qualified ;
+QUALIFIED: unix
 IN: tools.deploy.macosx
 
 : touch ( path -- )
@@ -19,10 +20,13 @@ IN: tools.deploy.macosx
     bundle-dir over path+ -rot
     >r "Contents" path+ r> path+ copy-directory ;
 
+: chmod ( path perms -- )
+    unix:chmod io-error ;
+
 : copy-vm ( executable bundle-name -- vm )
     "Contents/MacOS/" path+ swap path+ vm swap
     [ copy-file ] keep
-    [ 755 chmod io-error ] keep ;
+    [ OCT: 755 chmod ] keep ;
 
 : copy-fonts ( name -- )
     "fonts/" resource-path
