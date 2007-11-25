@@ -1,8 +1,8 @@
 IN: temporary
 USING: io.unix.launcher tools.test ;
 
-[ { } ] [ "" tokenize-command ] unit-test
-[ { } ] [ "   " tokenize-command ] unit-test
+[ "" tokenize-command ] unit-test-fails
+[ "   " tokenize-command ] unit-test-fails
 [ { "a" } ] [ "a" tokenize-command ] unit-test
 [ { "abc" } ] [ "abc" tokenize-command ] unit-test
 [ { "abc" } ] [ "abc   " tokenize-command ] unit-test

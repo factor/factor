@@ -22,19 +22,19 @@ LAZY: 'quoted-char' ( delimiter -- parser' )
     <|> ; inline
 
 LAZY: 'quoted' ( delimiter -- parser )
-    dup 'quoted-char' <*> swap dup surrounded-by ;
+    dup 'quoted-char' <!*> swap dup surrounded-by ;
 
-LAZY: 'unquoted' ( -- parser ) " " 'quoted-char' <+> ;
+LAZY: 'unquoted' ( -- parser ) " '\"" 'quoted-char' <!+> ;
 
 LAZY: 'argument' ( -- parser )
     "\"" 'quoted' "'" 'quoted' 'unquoted' <|> <|>
     [ >string ] <@ ;
 
-MEMO: 'arguments' ( -- parser )
-    'argument' " " token <+> list-of ;
+: 'arguments' ( -- parser )
+    'argument' " " token <!+> nonempty-list-of ;
 
 : tokenize-command ( command -- arguments )
-    'arguments' parse-1 ;
+    'arguments' just parse-1 ;
 
 : get-arguments ( -- seq )
     +command+ get [ tokenize-command ] [ +arguments+ get ] if* ;
