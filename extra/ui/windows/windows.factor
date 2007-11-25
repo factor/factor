@@ -94,8 +94,7 @@ SYMBOL: mouse-captured
     3drop window draw-world ;
 
 : handle-wm-size ( hWnd uMsg wParam lParam -- )
-    [ lo-word ] keep hi-word make-RECT get-RECT-dimensions 2array
-    2nip
+    [ lo-word ] keep hi-word make-RECT get-RECT-dimensions 2array 2nip
     dup { 0 0 } = [ 2drop ] [ swap window set-gadget-dim ui-step ] if ;
 
 : wm-keydown-codes ( -- key )
@@ -348,7 +347,10 @@ M: windows-ui-backend (close-window)
 : event-loop ( msg -- )
     {
         { [ windows get empty? ] [ drop ] }
-        { [ dup peek-message? ] [ >r [ ui-step ] ui-try r> event-loop ] }
+        { [ dup peek-message? ] [
+            >r [ ui-step 10 sleep ] ui-try
+            r> event-loop
+        ] }
         { [ dup MSG-message WM_QUIT = ] [ drop ] }
         { [ t ] [
             dup TranslateMessage drop
