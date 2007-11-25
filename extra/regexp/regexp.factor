@@ -1,6 +1,6 @@
 USING: combinators kernel lazy-lists math math.parser
-namespaces parser parser-combinators promises sequences
-strings ;
+namespaces parser parser-combinators parser-combinators.simple
+promises sequences strings ;
 USING: continuations io prettyprint ;
 IN: regexp
 
@@ -16,8 +16,6 @@ IN: regexp
 : 'char' 'escaped-char' 'ordinary-char' <|> ;
 
 : 'string' 'char' <+> [ >string token ] <@ ;
-
-: 'integer' [ digit? ] satisfy <+> [ string>number ] <@ ;
 
 : exactly-n ( parser n -- parser' )
     swap <repetition> and-parser construct-boa ;
