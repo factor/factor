@@ -61,8 +61,8 @@ check_library_exists() {
 		echo "***Factor will compile NO_UI=1"
 		NO_UI=1
 	fi
-	rm -f GCC_TEST
-	rm -f GCC_OUT
+	rm -f $GCC_TEST
+	rm -f $GCC_OUT
 }
 
 check_X11_libraries() {
