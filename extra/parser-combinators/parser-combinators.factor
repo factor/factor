@@ -190,6 +190,10 @@ M: some-parser (parse) ( input parser -- result )
   #! Same as <&> except flatten the result.
   <&> [ dup second swap first [ , % ] { } make ] <@ ;
 
+: <:&:> ( parser1 parser2 -- result )
+  #! Same as <&> except flatten the result.
+  <&> [ dup second swap first [ % % ] { } make ] <@ ;
+
 LAZY: <*> ( parser -- parser )
   dup <*> <&:> { } succeed <|> ;
 
