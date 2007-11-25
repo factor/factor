@@ -1,5 +1,5 @@
 USING: editors io.launcher math.parser namespaces ;
-IN: notepadpp
+IN: editors.notepadpp
 
 : notepadpp ( file line -- )
     [
