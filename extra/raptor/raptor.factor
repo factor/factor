@@ -22,6 +22,8 @@ SYMBOL: networking-hook
 : fork-exec-wait ( pathname args -- )
   fork dup 0 = [ drop exec drop ] [ 2nip wait-for-pid drop ] if ;
 
+: fork-exec-args-wait ( args -- ) [ first ] [ ] bi fork-exec-wait ;
+
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 : forever ( quot -- ) [ call ] [ forever ] bi ;
@@ -58,6 +60,10 @@ SYMBOL: swap-devices
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 : start-networking ( -- ) networking-hook  get call ;
+
+: set-hostname ( name -- ) `{ "/bin/hostname" , } fork-exec-args-wait ;
+
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 : boot     ( -- ) boot-hook     get call ;
 : reboot   ( -- ) reboot-hook   get call ;
