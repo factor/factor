@@ -10,6 +10,7 @@ shopt -s nocaseglob
 OS=
 ARCH=
 WORD=
+NO_UI=0
 
 ensure_program_installed() {
 	echo -n "Checking for $1..."
@@ -47,6 +48,34 @@ check_installed_programs() {
 	ensure_program_installed gcc
 	ensure_program_installed make
 	check_gcc_version
+}
+
+check_library_exists() {
+	GCC_TEST=factor-library-test.c
+	GCC_OUT=factor-library-test.out
+	echo "Checking for library $1"
+	echo "int main(){return 0;}" > $GCC_TEST
+	gcc $GCC_TEST -o $GCC_OUT -l $1
+	if [[ $? -ne 0 ]] ; then
+		echo "Warning: library $1 not found."
+		echo "***Factor will compile NO_UI=1"
+		NO_UI=1
+	fi
+	rm -f GCC_TEST
+	rm -f GCC_OUT
+}
+
+check_X11_libraries() {
+	check_library_exists freetype
+	check_library_exists GLU
+	check_library_exists GL
+	check_library_exists X11
+}
+
+check_libraries() {
+	case $OS in
+		linux) check_X11_libraries;;
+	esac
 }
 
 check_factor_exists() {
@@ -151,7 +180,7 @@ make_clean() {
 }
 
 make_factor() {
-	make $MAKE_TARGET -j5
+	make NO_UI=$NO_UI $MAKE_TARGET -j5
 	check_ret make
 }
 
@@ -185,31 +214,33 @@ usage() {
 	echo "usage: $0 install|update"
 }
 
+install() {
+	check_factor_exists
+	check_installed_programs
+	find_build_info
+	check_libraries
+	git_clone
+	cd_factor
+	make_factor
+	get_boot_image
+	maybe_download_dlls
+	bootstrap
+}
+
+update() {
+	check_installed_programs
+	find_build_info
+	check_libraries
+	git_pull_factorcode
+	make_clean
+	make_factor
+	delete_boot_images
+	get_boot_image
+	bootstrap
+}
+
 case "$1" in
-	install)
-		check_factor_exists
-		check_installed_programs
-		find_build_info
-		git_clone
-		cd_factor
-		make_factor
-		get_boot_image
-		maybe_download_dlls
-		bootstrap
-	;;
-
-	update)
-		check_installed_programs
-		find_build_info
-		git_pull_factorcode
-		make_clean
-		make_factor
-		delete_boot_images
-		get_boot_image
-		bootstrap
-	;;
-
-	*)
-		usage
-	;;
+	install) install ;;
+	update) update ;;
+	*) usage ;;
 esac
