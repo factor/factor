@@ -10,7 +10,7 @@ shopt -s nocaseglob
 OS=
 ARCH=
 WORD=
-NO_UI=0
+NO_UI=
 
 ensure_program_installed() {
 	echo -n "Checking for $1..."
