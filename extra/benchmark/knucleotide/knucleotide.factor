@@ -4,7 +4,6 @@ USING: kernel io io.files splitting strings
 
 IN: benchmark.knucleotide
 
-
 : float>string ( float places -- string )
     swap >float number>string
     "." split1 rot
