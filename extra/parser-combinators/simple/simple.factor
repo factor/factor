@@ -4,9 +4,6 @@ USING: kernel strings math sequences lazy-lists words
 math.parser promises ;
 IN: parser-combinators 
 
-LAZY: 'any-char' ( -- parser )
-  [ drop t ] satisfy ;
-
 : 'digit' ( -- parser )
   [ digit? ] satisfy [ digit> ] <@ ;
 

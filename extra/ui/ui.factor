@@ -72,7 +72,9 @@ M: world ungraft*
     >r [ 1 track, ] { 0 1 } make-track r>
     f <world> open-world-window ;
 
-: close-window ( gadget -- )
+HOOK: close-window ui-backend ( gadget -- )
+
+M: object close-window
     find-world [ ungraft ] when* ;
 
 : find-window ( quot -- world )
@@ -127,7 +129,7 @@ SYMBOL: ui-hook
     ] { } make ;
 
 : redraw-worlds ( seq -- )
-    [ dup update-hand [ draw-world ] time ] each ;
+    [ dup update-hand draw-world ] each ;
 
 : notify ( gadget -- )
     dup gadget-graft-state {
