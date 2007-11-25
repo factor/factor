@@ -485,19 +485,6 @@ IN: cpu.x86.intrinsics
     { +output+ { "vector" } }
 } define-intrinsic
 
-\ curry [
-    \ curry 3 cells [
-        1 object@ "obj" operand MOV
-        2 object@ "quot" operand MOV
-        ! Store tagged ptr in reg
-        "curry" get object %store-tagged
-    ] %allot
-] H{
-    { +input+ { { f "obj" } { f "quot" } } }
-    { +scratch+ { { f "curry" } } }
-    { +output+ { "curry" } }
-} define-intrinsic
-
 ! Alien intrinsics
 : %alien-accessor ( quot -- )
     "offset" operand %untag-fixnum
