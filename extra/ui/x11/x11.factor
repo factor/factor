@@ -178,7 +178,7 @@ M: world client-event
         next-event dup
         None XFilterEvent zero? [ drop wait-event ] unless
     ] [
-        ui-step wait-event
+        ui-step 10 sleep wait-event
     ] if ;
 
 : do-events ( -- )
