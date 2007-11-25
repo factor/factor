@@ -32,6 +32,7 @@ typedef struct {
 	CELL code_size;
 	bool secure_gc;
 	bool fep;
+	bool console;
 } F_PARAMETERS;
 
 void load_image(F_PARAMETERS *p);

@@ -4,7 +4,7 @@ USING: arrays assocs io kernel math models namespaces
 prettyprint dlists sequences threads sequences words timers
 debugger ui.gadgets ui.gadgets.worlds ui.gadgets.tracks
 ui.gestures ui.backend ui.render continuations init
-combinators ;
+combinators hashtables ;
 IN: ui
 
 ! Assoc mapping aliens to gadgets
@@ -65,18 +65,6 @@ M: world ungraft*
     dup world-handle (close-window)
     reset-world ;
 
-: open-world-window ( world -- )
-    dup pref-dim over set-gadget-dim dup relayout graft ;
-
-: open-window ( gadget title -- )
-    >r [ 1 track, ] { 0 1 } make-track r>
-    f <world> open-world-window ;
-
-HOOK: close-window ui-backend ( gadget -- )
-
-M: object close-window
-    find-world [ ungraft ] when* ;
-
 : find-window ( quot -- world )
     windows get values
     [ gadget-child swap call ] curry* find-last nip ; inline
@@ -126,7 +114,7 @@ SYMBOL: ui-hook
         layout-queue [
             dup layout find-world [ , ] when*
         ] dlist-slurp
-    ] { } make ;
+    ] { } make prune ;
 
 : redraw-worlds ( seq -- )
     [ dup update-hand draw-world ] each ;
@@ -148,8 +136,19 @@ SYMBOL: ui-hook
         notify-queued
         layout-queued
         redraw-worlds
-        10 sleep
     ] assert-depth ;
+
+: open-world-window ( world -- )
+    dup pref-dim over set-gadget-dim dup relayout graft ui-step ;
+
+: open-window ( gadget title -- )
+    >r [ 1 track, ] { 0 1 } make-track r>
+    f <world> open-world-window ;
+
+HOOK: close-window ui-backend ( gadget -- )
+
+M: object close-window
+    find-world [ ungraft ] when* ;
 
 : start-ui ( -- )
     init-timers

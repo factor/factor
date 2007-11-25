@@ -5,7 +5,7 @@ kernel memory namespaces cocoa.messages cocoa.runtime
 cocoa.subclassing cocoa.pasteboard cocoa.types cocoa.windows
 cocoa.classes cocoa.application sequences system ui ui.backend
 ui.clipboards ui.gadgets ui.gadgets.worlds ui.cocoa.views
-core-foundation ;
+core-foundation threads ;
 IN: ui.cocoa
 
 TUPLE: cocoa-ui-backend ;
@@ -19,7 +19,7 @@ SYMBOL: stop-after-last-window?
 : event-loop ( -- )
     event-loop? [
         [
-            [ NSApp do-events ui-step ] ui-try
+            [ NSApp do-events ui-step 10 sleep ] ui-try
         ] with-autorelease-pool event-loop
     ] when ;
 

@@ -158,18 +158,14 @@ M: world selection-request-event
         { [ t ] [ drop send-notify-failure ] }
     } cond ;
 
-: close-window ( handle -- )
+M: x11-ui-backend (close-window) ( handle -- )
     dup x11-handle-xic XDestroyIC
     dup x11-handle-glx destroy-glx
     x11-handle-window dup unregister-window
     destroy-window ;
 
 M: world client-event
-    swap close-box? [
-        dup world-handle >r stop-world r> close-window
-    ] [
-        drop
-    ] if ;
+    swap close-box? [ ungraft ] [ drop ] if ;
 
 : gadget-window ( world -- )
     dup world-loc over rect-dim glx-window
@@ -182,7 +178,7 @@ M: world client-event
         next-event dup
         None XFilterEvent zero? [ drop wait-event ] unless
     ] [
-        ui-step wait-event
+        ui-step 10 sleep wait-event
     ] if ;
 
 : do-events ( -- )
@@ -222,7 +218,7 @@ M: x11-ui-backend set-title ( string world -- )
     world-handle x11-handle-window swap dpy get -rot
     3dup set-title-old set-title-new ;
 
-M: x11-ui-backend (open-world-window) ( world -- )
+M: x11-ui-backend (open-window) ( world -- )
     dup gadget-window
     world-handle x11-handle-window dup set-closable map-window ;
 

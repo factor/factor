@@ -26,12 +26,8 @@ IN: tools.deploy
     [ (copy-lines) ] [ stream-close ] [ ] cleanup ;
 
 : stage2 ( vm flags -- )
-	[
-        "\"" % swap % "\" -i=" %
-        boot-image-name %
-        [ " " % % ] each
-    ] "" make
-    dup print <process-stream>
+    >r "-i=" boot-image-name append 2array r> append dup .
+    <process-stream>
     dup duplex-stream-out stream-close
     copy-lines ;
 
@@ -48,11 +44,11 @@ IN: tools.deploy
 
 : deploy-command-line ( vm image vocab config -- vm flags )
     [
-        "\"-include=" swap profile-string "\"" 3append ,
+        "-include=" swap profile-string append ,
 
         "-deploy-vocab=" swap append ,
 
-        "\"-output-image=" swap "\"" 3append ,
+        "-output-image=" swap append ,
 
         "-no-stack-traces" ,
         
