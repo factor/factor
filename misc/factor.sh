@@ -26,7 +26,7 @@ check_ret() {
     RET=$?
     if [[ $RET -ne 0 ]] ; then
        echo $1 failed
-       exit 5
+       exit 2
     fi
 }
 
@@ -35,7 +35,7 @@ check_gcc_version() {
     if [[ $GCC_VERSION == *3.3.* ]] ; then
         echo "You have a known buggy version of gcc (3.3)"
         echo "Install gcc 3.4 or higher and try again."
-        exit 1
+        exit 3
     fi
 }
 
@@ -49,6 +49,13 @@ check_installed_programs() {
     check_gcc_version
 }
 
+check_factor_exists() {
+	if [[ -d "factor" ]] ; then
+		echo "A directory called 'factor' already exists."
+		echo "Rename or delete it and try again."
+		exit 4
+	fi
+}
 
 find_os() {
     uname_s=`uname -s`
@@ -66,10 +73,10 @@ find_os() {
 find_architecture() {
     uname_m=`uname -m`
     case $uname_m in
-           i386) ARCH=x86;;
-           i686) ARCH=x86;;
-           *86) ARCH=x86;;
-           "Power Macintosh") ARCH=ppc;;
+       i386) ARCH=x86;;
+       i686) ARCH=x86;;
+       *86) ARCH=x86;;
+       "Power Macintosh") ARCH=ppc;;
     esac
 }
 
@@ -107,7 +114,7 @@ echo_build_info() {
 set_build_info() {
     if ! [[ -n $OS && -n $ARCH && -n $WORD ]] ; then
         echo "OS, ARCH, or WORD is empty.  Please report this"
-        exit 4
+        exit 5
     fi
     MAKE_TARGET=$OS-$ARCH-$WORD
     BOOT_IMAGE=boot.$ARCH.$WORD.image
@@ -121,8 +128,6 @@ find_build_info() {
     set_build_info
     echo_build_info
 }
-
-
 
 git_clone() {
     echo "Downloading the git repository from factorcode.org..."
@@ -177,6 +182,7 @@ usage() {
 
 case "$1" in
     install)
+		check_factor_exists
         check_installed_programs
         find_build_info
         git_clone
