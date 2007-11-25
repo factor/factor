@@ -26,6 +26,7 @@ void default_parameters(F_PARAMETERS *p)
 
 	p->secure_gc = false;
 	p->fep = false;
+	p->console = false;
 }
 
 /* Get things started */
@@ -110,6 +111,8 @@ void init_factor_from_args(F_CHAR *image, int argc, F_CHAR **argv, bool embedded
 			p.fep = true;
 		else if(STRNCMP(argv[i],STR_FORMAT("-i="),3) == 0)
 			p.image = argv[i] + 3;
+		else if(STRCMP(argv[i],STR_FORMAT("-console")) == 0)
+			p.console = true ;
 	}
 
 	init_factor(&p);
@@ -134,6 +137,9 @@ void init_factor_from_args(F_CHAR *image, int argc, F_CHAR **argv, bool embedded
 	userenv[EMBEDDED_ENV] = (embedded ? T : F);
 
 	nest_stacks();
+
+	if(p.console)
+		open_console();
 
 	if(p.fep)
 		factorbug();
