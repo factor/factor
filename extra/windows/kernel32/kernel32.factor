@@ -566,7 +566,8 @@ FUNCTION: BOOL ConnectNamedPipe ( HANDLE hNamedPipe, LPOVERLAPPED lpOverlapped )
 ! FUNCTION: CopyFileA
 ! FUNCTION: CopyFileExA
 ! FUNCTION: CopyFileExW
-! FUNCTION: CopyFileW
+FUNCTION: BOOL CopyFileW ( LPCTSTR lpExistingFileName, LPCTSTR lpNewFileName, BOOL bFailIfExists ) ;
+: CopyFile CopyFileW ; inline
 ! FUNCTION: CopyLZFile
 ! FUNCTION: CreateActCtxA
 ! FUNCTION: CreateActCtxW
@@ -575,7 +576,7 @@ FUNCTION: BOOL ConnectNamedPipe ( HANDLE hNamedPipe, LPOVERLAPPED lpOverlapped )
 ! FUNCTION: CreateDirectoryExA
 ! FUNCTION: CreateDirectoryExW
 FUNCTION: BOOL CreateDirectoryW ( LPCTSTR lpPathName, LPSECURITY_ATTRIBUTES lpSecurityAttribytes ) ;
-: CreateDirectory CreateDirectoryW ;
+: CreateDirectory CreateDirectoryW ; inline
 
 ! FUNCTION: CreateEventA
 ! FUNCTION: CreateEventW

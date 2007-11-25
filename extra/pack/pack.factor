@@ -24,7 +24,7 @@ M: integer b, ( m n -- ) >endian % ;
 
 ! for doing native, platform-dependent sized values
 M: string b, ( n string -- ) heap-size b, ;
-: read-native ( string -- ) heap-size read endian> ;
+: read-native ( string -- n ) heap-size read endian> ;
 
 ! Portable
 : s8, ( n -- ) 1 b, ;

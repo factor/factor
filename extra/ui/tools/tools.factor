@@ -67,11 +67,11 @@ M: workspace model-changed
 : com-profiler profiler-gadget select-tool ;
 
 workspace "tool-switching" f {
-    { T{ key-down f f "F2" } com-listener }
-    { T{ key-down f f "F3" } com-browser }
-    { T{ key-down f f "F4" } com-inspector }
-    { T{ key-down f f "F5" } com-walker }
-    { T{ key-down f f "F6" } com-profiler }
+    { T{ key-down f { C+ } "1" } com-listener }
+    { T{ key-down f { C+ } "2" } com-browser }
+    { T{ key-down f { C+ } "3" } com-inspector }
+    { T{ key-down f { C+ } "4" } com-walker }
+    { T{ key-down f { C+ } "5" } com-profiler }
 } define-command-map
 
 \ workspace-window
@@ -86,8 +86,8 @@ H{ { +nullary+ t } { +listener+ t } } define-command
 workspace "workflow" f {
     { T{ key-down f { C+ } "n" } workspace-window }
     { T{ key-down f f "ESC" } hide-popup }
-    { T{ key-down f f "F8" } refresh-all }
-    { T{ key-down f { A+ } "F8" } test-changes }
+    { T{ key-down f f "F2" } refresh-all }
+    { T{ key-down f { A+ } "F2" } test-changes }
 } define-command-map
 
 [

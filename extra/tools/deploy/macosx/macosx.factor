@@ -1,18 +1,17 @@
 ! Copyright (C) 2007 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: io io.files io.launcher kernel namespaces sequences
-system cocoa.plists cocoa.application tools.deploy
-tools.deploy.config assocs hashtables prettyprint ;
+system tools.deploy tools.deploy.config assocs hashtables
+prettyprint io.unix.backend cocoa cocoa.plists
+cocoa.application cocoa.classes qualified ;
+QUALIFIED: unix
 IN: tools.deploy.macosx
 
 : touch ( path -- )
-    "touch \"" swap "\"" 3append run-process ;
+    { "touch" } swap add run-process ;
 
 : rm ( path -- )
-    "rm -rf \"" swap "\"" 3append run-process ;
-
-: chmod ( path perms -- )
-    [ "chmod " % % " \"" % % "\"" % ] "" make run-process ;
+    { "rm" "-rf" } swap add run-process ;
 
 : bundle-dir ( -- dir )
     vm parent-directory parent-directory ;
@@ -21,10 +20,13 @@ IN: tools.deploy.macosx
     bundle-dir over path+ -rot
     >r "Contents" path+ r> path+ copy-directory ;
 
+: chmod ( path perms -- )
+    unix:chmod io-error ;
+
 : copy-vm ( executable bundle-name -- vm )
     "Contents/MacOS/" path+ swap path+ vm swap
     [ copy-file ] keep
-    [ "755" chmod ] keep ;
+    [ OCT: 755 chmod ] keep ;
 
 : copy-fonts ( name -- )
     "fonts/" resource-path
@@ -63,6 +65,12 @@ TUPLE: macosx-deploy-implementation ;
 
 T{ macosx-deploy-implementation } deploy-implementation set-global
 
+: show-in-finder ( path -- )
+    NSWorkspace
+    -> sharedWorkspace
+    over <NSString> rot parent-directory <NSString>
+    -> selectFile:inFileViewerRootedAtPath: drop ;
+
 M: macosx-deploy-implementation deploy ( vocab -- )
     ".app deploy tool" assert.app
     "." resource-path cd
@@ -70,5 +78,6 @@ M: macosx-deploy-implementation deploy ( vocab -- )
         bundle-name rm
         [ bundle-name create-app-dir ] keep
         [ bundle-name deploy.app-image ] keep
-        namespace
-    ] bind deploy* ;
+        namespace deploy*
+        bundle-name show-in-finder
+    ] bind ;
