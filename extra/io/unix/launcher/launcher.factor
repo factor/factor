@@ -30,7 +30,7 @@ LAZY: 'argument' ( -- parser )
     "\"" 'quoted' "'" 'quoted' 'unquoted' <|> <|>
     [ >string ] <@ ;
 
-: 'arguments' ( -- parser )
+MEMO: 'arguments' ( -- parser )
     'argument' " " token <!+> nonempty-list-of ;
 
 : tokenize-command ( command -- arguments )
