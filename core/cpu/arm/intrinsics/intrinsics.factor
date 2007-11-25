@@ -418,17 +418,6 @@ IN: cpu.arm.intrinsics
     { +output+ { "out" } }
 } define-intrinsic
 
-\ curry [
-    \ curry 3 cells %allot
-    "obj" operand 1 %set-slot
-    "quot" operand 2 %set-slot
-    "out" get object %store-tagged
-] H{
-    { +input+ { { f "obj" } { f "quot" } } }
-    { +scratch+ { { f "out" } } }
-    { +output+ { "out" } }
-} define-intrinsic
-
 ! Alien intrinsics
 : %alien-accessor ( quot -- )
     "offset" operand dup %untag-fixnum
