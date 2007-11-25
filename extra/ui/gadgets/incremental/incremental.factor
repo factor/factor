@@ -40,13 +40,13 @@ M: incremental pref-dim*
     swap set-rect-loc ;
 
 : prefer-incremental ( gadget -- )
-    dup forget-pref-dim dup pref-dim over set-rect-dim
-    layout ;
+    dup forget-pref-dim dup pref-dim swap set-rect-dim ;
 
 : add-incremental ( gadget incremental -- )
     not-in-layout
     2dup (add-gadget)
     over prefer-incremental
+    over layout-later
     2dup incremental-loc
     tuck update-cursor
     dup prefer-incremental

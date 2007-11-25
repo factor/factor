@@ -4,7 +4,7 @@ USING: arrays assocs io kernel math models namespaces
 prettyprint dlists sequences threads sequences words timers
 debugger ui.gadgets ui.gadgets.worlds ui.gadgets.tracks
 ui.gestures ui.backend ui.render continuations init
-combinators ;
+combinators hashtables ;
 IN: ui
 
 ! Assoc mapping aliens to gadgets
@@ -114,7 +114,7 @@ SYMBOL: ui-hook
         layout-queue [
             dup layout find-world [ , ] when*
         ] dlist-slurp
-    ] { } make ;
+    ] { } make prune ;
 
 : redraw-worlds ( seq -- )
     [ dup update-hand draw-world ] each ;

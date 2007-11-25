@@ -5,7 +5,7 @@ kernel memory namespaces cocoa.messages cocoa.runtime
 cocoa.subclassing cocoa.pasteboard cocoa.types cocoa.windows
 cocoa.classes cocoa.application sequences system ui ui.backend
 ui.clipboards ui.gadgets ui.gadgets.worlds ui.cocoa.views
-core-foundation ;
+core-foundation threads ;
 IN: ui.cocoa
 
 TUPLE: cocoa-ui-backend ;
