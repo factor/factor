@@ -148,7 +148,7 @@ set_build_info() {
 	
 	MAKE_TARGET=$OS-$ARCH-$WORD
 	BOOT_IMAGE=boot.$ARCH.$WORD.image
-	if [[ $OS == macosx && $ARCH=ppc ]] ; then
+	if [[ $OS == macosx && $ARCH == ppc ]] ; then
 		MAKE_TARGET=$OS-$ARCH
 		BOOT_IMAGE=boot.macosx-ppc.image
 	fi
