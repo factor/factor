@@ -16,19 +16,18 @@ USE: unix
 ! "foo bar" -- quotation
 LAZY: 'escaped-char' "\\" token any-char-parser &> ;
 
-LAZY: 'chars' 'escaped-char' any-char-parser <|> <*> ;
+LAZY: 'quoted-char' ( delimiter -- parser' )
+    'escaped-char'
+    swap [ member? not ] curry satisfy
+    <|> ; inline
 
-LAZY: 'quoted-1' 'chars' "\"" "\"" surrounded-by ;
+LAZY: 'quoted' ( delimiter -- parser )
+    dup 'quoted-char' <*> swap dup surrounded-by ;
 
-LAZY: 'quoted-2' 'chars' "'" "'" surrounded-by ;
+LAZY: 'unquoted' ( -- parser ) " " 'quoted-char' <+> ;
 
-LAZY: 'non-space-char'
-    'escaped-char' [ CHAR: \s = not ] satisfy <|> ;
-
-LAZY: 'unquoted' 'non-space-char' <+> ;
-
-LAZY: 'argument'
-    'quoted-1' 'quoted-2' 'unquoted' <|> <|>
+LAZY: 'argument' ( -- parser )
+    "\"" 'quoted' "'" 'quoted' 'unquoted' <|> <|>
     [ >string ] <@ ;
 
 MEMO: 'arguments' ( -- parser )
