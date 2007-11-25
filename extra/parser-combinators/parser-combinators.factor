@@ -246,18 +246,21 @@ LAZY: <(+)> ( parser -- parser )
     #! Implementation by Matthew Willis.
     dup <(*)> <&:> ;
 
-LAZY: pack ( close body open -- parser )
+: pack ( close body open -- parser )
   #! Parse a construct enclosed by two symbols,
   #! given a parser for the opening symbol, the
   #! closing symbol, and the body.
   <& &> ;
 
-LAZY: list-of ( items separator -- parser )
+: nonempty-list-of ( items separator -- parser )
+  [ over &> <*> <&:> ] keep <?> tuck pack ;
+
+: list-of ( items separator -- parser )
   #! Given a parser for the separator and for the
   #! items themselves, return a parser that parses
   #! lists of those items. The parse tree is an
   #! array of the parsed items.
-  dup <?> -rot over &> <*> <&:> &> { } succeed <|> ;
+  nonempty-list-of { } succeed <|> ;
 
 LAZY: surrounded-by ( parser start end -- parser' )
-    [ token ] 2apply swapd pack ;
+  [ token ] 2apply swapd pack ;
