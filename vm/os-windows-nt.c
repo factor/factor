@@ -91,4 +91,14 @@ void c_to_factor_toplevel(CELL quot)
 
 void open_console(void)
 {
+	/*
+	// Do this: http://www.cygwin.com/ml/cygwin/2007-11/msg00432.html
+	if(console_open)
+		return;
+
+	if(AttachConsole(ATTACH_PARENT_PROCESS) || AllocConsole())
+	{
+		console_open = true;
+	}
+	*/
 }

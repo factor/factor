@@ -1,2 +1,3 @@
+WINDRES=windres
 include vm/Config.windows.nt
 include vm/Config.x86.32
