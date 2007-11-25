@@ -4,7 +4,7 @@ USING: alien alien.c-types alien.compiler
 arrays assocs combinators compiler inference.transforms kernel
 math namespaces parser prettyprint prettyprint.sections
 quotations sequences strings words cocoa.runtime io macros
-memoize ;
+memoize debugger ;
 IN: cocoa.messages
 
 : make-sender ( method function -- quot )
@@ -201,8 +201,11 @@ H{
 : import-objc-class ( name quot -- )
     2dup unless-defined
     dupd define-objc-class-word
-    dup objc-class register-objc-methods
-    objc-meta-class register-objc-methods ;
+    [
+        dup
+        objc-class register-objc-methods
+        objc-meta-class register-objc-methods
+    ] curry try ;
 
 : root-class ( class -- root )
     dup objc-class-super-class [ root-class ] [ ] ?if ;
