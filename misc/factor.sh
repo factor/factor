@@ -145,8 +145,13 @@ set_build_info() {
 		echo "OS, ARCH, or WORD is empty.  Please report this"
 		exit 5
 	fi
+	
 	MAKE_TARGET=$OS-$ARCH-$WORD
 	BOOT_IMAGE=boot.$ARCH.$WORD.image
+	if [[ $OS == macosx && $ARCH=ppc ]] ; then
+		MAKE_TARGET=$OS-$ARCH
+		BOOT_IMAGE=boot.macosx-ppc.image
+	fi
 }
 
 find_build_info() {
