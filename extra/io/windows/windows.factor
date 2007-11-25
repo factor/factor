@@ -116,7 +116,7 @@ M: windows-io delete-file ( path -- )
 
 M: windows-io copy-file ( from to -- )
     dup parent-directory make-directories
-    [ normalize-pathname ] 2apply f CopyFile win32-error=0/f ;
+    [ normalize-pathname ] 2apply 0 CopyFile win32-error=0/f ;
 
 M: windows-io make-directory ( path -- )
     normalize-pathname
