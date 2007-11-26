@@ -5,23 +5,6 @@ IN: peg
 
 SYMBOL: ignore 
 
-TUPLE: parse-state input cache ;
-
-: <parse-state> ( input index -- state )
-  tail-slice { set-parse-state-input } parse-state construct ;
-
-: get-cached ( pid state -- result )
-  tuck parse-state-cache at [
-    swap parse-state-input slice-from swap nth     
-  ] [ 
-    drop f
-  ] if* ;
-
-: state-tail ( state n -- state )
-  dupd [ parse-state-cache ] dipd
-  [ parse-state-input ] dip tail-slice 
-  { set-parse-state-cache set-parse-state-input } parse-state construct ; 
-
 TUPLE: parse-result remaining ast ;
 
 : <parse-result> ( remaining ast -- parse-result )
@@ -42,8 +25,8 @@ GENERIC: parse ( state parser -- result )
 TUPLE: token-parser symbol ;
 
 M: token-parser parse ( state parser -- result )
-  token-parser-symbol 2dup >r parse-state-input r> head? [
-    dup >r length state-tail r>  <parse-result>
+  token-parser-symbol 2dup head? [
+    dup >r length tail-slice r> <parse-result>
   ] [
     2drop f
   ] if ;
@@ -54,12 +37,12 @@ M: token-parser parse ( state parser -- result )
 TUPLE: range-parser min max ;
 
 M: range-parser parse ( state parser -- result )
-  over parse-state-input empty? [
+  over empty? [
     2drop f
   ] [
-    0 pick parse-state-input nth dup rot 
+    0 pick nth dup rot 
     { range-parser-min range-parser-max } get-slots between? [
-      [ 1 state-tail ] dip <parse-result>
+      [ 1 tail-slice ] dip <parse-result>
     ] [
       2drop f
     ] if
