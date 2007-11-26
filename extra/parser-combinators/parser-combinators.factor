@@ -32,6 +32,8 @@ M: token-parser parse ( input parser -- list )
         2drop nil
     ] if ;
 
+: 1token ( n -- parser ) 1string token ;
+
 TUPLE: satisfy-parser quot ;
 
 C: satisfy satisfy-parser ( quot -- parser )
