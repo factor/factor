@@ -1,6 +1,6 @@
 USING: arrays combinators kernel lazy-lists math math.parser
 namespaces parser parser-combinators parser-combinators.simple
-promises sequences sequences.lib strings ;
+promises quotations sequences sequences.lib strings ;
 USING: continuations io prettyprint ;
 IN: regexp
 
@@ -9,22 +9,29 @@ IN: regexp
 
 : escaped-char
     {
-        { CHAR: d [ [ digit? ] satisfy ] }
-        { CHAR: D [ [ digit? not ] satisfy ] }
-        { CHAR: s [ [ blank? ] satisfy ] }
-        { CHAR: S [ [ blank? not ] satisfy ] }
-        [ ]
+        { CHAR: d [ [ digit? ] ] }
+        { CHAR: D [ [ digit? not ] ] }
+        { CHAR: s [ [ blank? ] ] }
+        { CHAR: S [ [ blank? not ] ] }
+        { CHAR: \\ [ [ CHAR: \\ = ] ] }
+        [ "bad \\, use \\\\ to match a literal \\" throw ]
     } case ;
 
 : 'escaped-char'
     "\\" token any-char-parser &> [ escaped-char ] <@ ;
 
+! Must escape to use as literals
+! : meta-chars "[\\^$.|?*+()" ;
+
 : 'ordinary-char'
-    [ "^*+?|(){}[]" member? not ] satisfy [ 1string token ] <@ ;
+    [ "\\^*+?|(){}[" member? not ] satisfy ;
 
 : 'char' 'escaped-char' 'ordinary-char' <|> ;
 
-: 'string' 'char' <+> [ [ <&> ] reduce* ] <@ ;
+: 'string'
+    'char' <+> [
+        [ dup quotation? [ satisfy ] [ 1token ] if ] [ <&> ] map-reduce
+    ] <@ ;
 
 : exactly-n ( parser n -- parser' )
     swap <repetition> and-parser construct-boa ;
@@ -54,10 +61,41 @@ C: <group-result> group-result
     'regexp' [ [ <group-result> ] <@ ] <@
     ")" token <& &> ;
 
+! Special cases: ]\\^-
+: predicates>cond ( seq -- quot )
+    #! Takes an array of quotation predicates/objects and makes a cond
+    #! Makes a predicate of each obj like so:  [ dup obj = ]
+    #! Leaves quotations alone
+    #! The cond returns a boolean, t if one of the predicates matches
+    [
+        dup callable? [ [ = ] curry ] unless
+        [ dup ] swap compose [ drop t ] 2array
+    ] map { [ t ] [ drop f ] } add [ cond ] curry ;
+
+: 'range'
+    any-char-parser "-" token <& any-char-parser <&>
+    [ first2 [ between? ] 2curry ] <@ ;
+
+: 'character-class-contents'
+    'escaped-char'
+    'range' <|>
+    [ "\\]" member? not ] satisfy <|> ;
+
+: 'character-class'
+    "[" token
+    "^" token 'character-class-contents' <+> <&:>
+        [ predicates>cond [ not ] compose satisfy ] <@
+    "]" token [ first ] <@ 'character-class-contents' <*> <&:>
+        [ predicates>cond satisfy ] <@ <|>
+    'character-class-contents' <+> [ predicates>cond satisfy ] <@ <|>
+    &>
+    "]" token <& ;
+
 : 'term'
     'any-char'
     'string' <|>
     'grouping' <|>
+    'character-class' <|>
     <+> [
         dup length 1 =
         [ first ] [ and-parser construct-boa ] if
