@@ -6,8 +6,6 @@ IN: raptor
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-: fork-exec-args-wait ( args -- ) [ first ] [ ] bi fork-exec-wait ;
-
 : run-script ( path -- ) 1array [ fork-exec-args-wait ] curry in-thread ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
