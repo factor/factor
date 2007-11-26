@@ -3,9 +3,13 @@
 USING: kernel sequences strings namespaces math assocs shuffle vectors combinators.lib ;
 IN: peg
 
-SYMBOL: ignore 
-
 TUPLE: parse-result remaining ast ;
+
+GENERIC: parse ( state parser -- result )
+
+<PRIVATE
+
+SYMBOL: ignore 
 
 : <parse-result> ( remaining ast -- parse-result )
   parse-result construct-boa ;
@@ -20,8 +24,6 @@ TUPLE: parser id ;
 : init-parser ( parser -- parser )
   get-next-id parser construct-boa over set-delegate ;
 
-GENERIC: parse ( state parser -- result )
-
 TUPLE: token-parser symbol ;
 
 M: token-parser parse ( state parser -- result )
@@ -30,9 +32,6 @@ M: token-parser parse ( state parser -- result )
   ] [
     2drop f
   ] if ;
-
-: token ( string -- parser )
-  token-parser construct-boa init-parser ;      
 
 TUPLE: range-parser min max ;
 
@@ -47,9 +46,6 @@ M: range-parser parse ( state parser -- result )
       2drop f
     ] if
   ] if ;
-
-: range ( min max -- parser )
-  range-parser construct-boa init-parser ;
 
 TUPLE: seq-parser parsers ;
 
@@ -71,9 +67,6 @@ TUPLE: seq-parser parsers ;
 M: seq-parser parse ( state parser -- result )
   seq-parser-parsers [ V{ } clone <parse-result> ] dip  (seq-parser) ;
 
-: seq ( seq -- parser )
-  seq-parser construct-boa init-parser ;
-
 TUPLE: choice-parser parsers ;
   
 : (choice-parser) ( state parsers -- result )
@@ -89,9 +82,6 @@ TUPLE: choice-parser parsers ;
 
 M: choice-parser parse ( state parser -- result )
   choice-parser-parsers (choice-parser) ;
-
-: choice ( seq -- parser )
-  choice-parser construct-boa init-parser ;
 
 TUPLE: repeat0-parser p1 ;
 
@@ -115,24 +105,15 @@ M: repeat0-parser parse ( state parser -- result )
        drop V{ } clone <parse-result> 
      ] if* ;
 
-: repeat0 ( parser -- parser )
-  repeat0-parser construct-boa init-parser ;
-
 TUPLE: repeat1-parser p1 ;
 
 M: repeat1-parser parse ( state parser -- result )
    repeat1-parser-p1 tuck parse dup [ clone-result (repeat-parser) ] [ nip ] if ;
 
-: repeat1 ( parser -- parser )
-  repeat1-parser construct-boa init-parser ;
-
 TUPLE: optional-parser p1 ;
 
 M: optional-parser parse ( state parser -- result )
    dupd optional-parser-p1 parse swap f <parse-result> or ;
-
-: optional ( parser -- parser )
-  optional-parser construct-boa init-parser ;
 
 TUPLE: ensure-parser p1 ;
 
@@ -143,9 +124,6 @@ M: ensure-parser parse ( state parser -- result )
      drop f
    ] if ;
 
-: ensure ( parser -- parser )
-  ensure-parser construct-boa init-parser ;
-
 TUPLE: ensure-not-parser p1 ;
 
 M: ensure-not-parser parse ( state parser -- result )
@@ -154,9 +132,6 @@ M: ensure-not-parser parse ( state parser -- result )
    ] [
      ignore <parse-result>  
    ] if ;
-
-: ensure-not ( parser -- parser )
-  ensure-not-parser construct-boa init-parser ;
 
 TUPLE: action-parser p1 quot ;
 
@@ -167,6 +142,35 @@ M: action-parser parse ( state parser -- result )
    ] [
      nip
    ] if ;
+
+PRIVATE>
+
+: token ( string -- parser )
+  token-parser construct-boa init-parser ;      
+
+: range ( min max -- parser )
+  range-parser construct-boa init-parser ;
+
+: seq ( seq -- parser )
+  seq-parser construct-boa init-parser ;
+
+: choice ( seq -- parser )
+  choice-parser construct-boa init-parser ;
+
+: repeat0 ( parser -- parser )
+  repeat0-parser construct-boa init-parser ;
+
+: repeat1 ( parser -- parser )
+  repeat1-parser construct-boa init-parser ;
+
+: optional ( parser -- parser )
+  optional-parser construct-boa init-parser ;
+
+: ensure ( parser -- parser )
+  ensure-parser construct-boa init-parser ;
+
+: ensure-not ( parser -- parser )
+  ensure-not-parser construct-boa init-parser ;
 
 : action ( parser quot -- parser )
   action-parser construct-boa init-parser ;
