@@ -1,21 +1,30 @@
-USING: combinators kernel lazy-lists math math.parser
+USING: arrays combinators kernel lazy-lists math math.parser
 namespaces parser parser-combinators parser-combinators.simple
-promises sequences strings ;
+promises sequences sequences.lib strings ;
 USING: continuations io prettyprint ;
 IN: regexp
 
 : 'any-char'
     "." token [ drop any-char-parser ] <@ ;
 
+: escaped-char
+    {
+        { CHAR: d [ [ digit? ] satisfy ] }
+        { CHAR: D [ [ digit? not ] satisfy ] }
+        { CHAR: s [ [ blank? ] satisfy ] }
+        { CHAR: S [ [ blank? not ] satisfy ] }
+        [ ]
+    } case ;
+
 : 'escaped-char'
-    "\\" token any-char-parser &> ;
+    "\\" token any-char-parser &> [ escaped-char ] <@ ;
 
 : 'ordinary-char'
-    [ "*+?|(){}" member? not ] satisfy ;
+    [ "^*+?|(){}[]" member? not ] satisfy [ 1string token ] <@ ;
 
 : 'char' 'escaped-char' 'ordinary-char' <|> ;
 
-: 'string' 'char' <+> [ >string token ] <@ ;
+: 'string' 'char' <+> [ [ <&> ] reduce* ] <@ ;
 
 : exactly-n ( parser n -- parser' )
     swap <repetition> and-parser construct-boa ;
@@ -55,41 +64,13 @@ C: <group-result> group-result
     ] <@ ;
 
 : 'interval'
-    'term'
-    "{" token
-    'integer' <?> &>
-    "," token <?> <:&:>
-    'integer' <?> <:&:>
-    "}" token <& <&> [
-        first2 dup length {
-            { 1 [ first exactly-n ] }
-            { 2 [ first2 dup integer?
-                    [ nip at-most-n ]
-                    [ drop at-least-n ] if ] }
-            { 3 [ first3 nip from-m-to-n ] }
-        } case
-    ] <@ ;
-
-: 'character-range'
-    any-char-parser "-" token <& any-char-parser &> ;
-
-: 'character-class-inside'
-    any-char-parser
-    'character-range' <|> ;
-
-: 'character-class-inclusive'
-    "[" token
-    'character-class-inside'
-    "]" token ;
-
-: 'character-class-exclusive'
-    "[^" token
-    'character-class-inside'
-    "]" token ;
-
-: 'character-class'
-    'character-class-inclusive'
-    'character-class-exclusive' <|> ;
+    'term' "{" token <& 'integer' <&> "}" token <& [ first2 exactly-n ] <@
+    'term' "{" token <& 'integer' <&> "," token <& "}" token <&
+        [ first2 at-least-n ] <@ <|>
+    'term' "{" token <& "," token <& 'integer' <&> "}" token <&
+        [ first2 at-most-n ] <@ <|>
+    'term' "{" token <& 'integer' <&> "," token <& 'integer' <:&> "}" token <&
+        [ first3 from-m-to-n ] <@ <|> ;
 
 : 'repetition'
     'term'
@@ -112,7 +93,6 @@ LAZY: 'regexp' ( -- parser )
     'repetition' 'union' <|> ;
 
 : <regexp> 'regexp' just parse-1 ;
-
 
 GENERIC: >regexp ( obj -- parser )
 M: string >regexp 'regexp' just parse-1 ;
