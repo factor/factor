@@ -29,7 +29,8 @@ define-independent-class
 
 <display> "create" !( name <display> -- display ) [
   new-empty swap >>name
-  dup $name dup [ string>char-alien ] [ ] if XOpenDisplay >>ptr
+  dup $name dup [ string>char-alien ] [ ] if XOpenDisplay
+  dup [ >>ptr ] [ "XOpenDisplay error" throw ] if
   dup $ptr XDefaultScreen >>default-screen
   dup $ptr XDefaultRootWindow dupd <window> new >>default-root
   dup $ptr over $default-screen XDefaultGC >>default-gc
