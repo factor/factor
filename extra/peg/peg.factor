@@ -216,3 +216,6 @@ PRIVATE>
 
 : delay ( parser -- parser )
   delay-parser construct-boa init-parser ;
+
+: list-of ( items separator -- parser )
+  hide over 2array seq repeat0 [ concat ] action 2array seq [ unclip 1vector swap first append ] action ;
