@@ -139,4 +139,4 @@ DEFER: 'rhs'
     f
    ] if* ;
 
-: <EBNF "EBNF>" parse-tokens " " join dup . ebnf>quot call ; parsing
+: <EBNF "EBNF>" parse-tokens " " join ebnf>quot call ; parsing
