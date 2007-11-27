@@ -97,7 +97,9 @@ TUPLE: no-parent-directory path ;
         ] }
     } cond drop ;
 
-: copy-file ( from to -- )
+HOOK: copy-file io-backend ( from to -- )
+
+M: object copy-file
     dup parent-directory make-directories
     <file-writer> [
         stdio get swap

@@ -113,13 +113,6 @@
 (defvar factor-binary "/scratch/repos/Factor/factor")
 (defvar factor-image "/scratch/repos/Factor/factor.image")
 
-(defun run-factor ()
-  (interactive)
-  (switch-to-buffer
-   (make-comint-in-buffer "factor" nil factor-binary nil
-			  (concat "-i=" factor-image)
-			  "-run=listener")))
-
 (defun factor-telnet-to-port (port)
   (interactive "nPort: ")
   (switch-to-buffer
@@ -166,9 +159,30 @@
   (beginning-of-line)
   (insert "! "))
 
-
 (define-key factor-mode-map "\C-c\C-f" 'factor-run-file)
 (define-key factor-mode-map "\C-c\C-r" 'factor-send-region)
 (define-key factor-mode-map "\C-c\C-s" 'factor-see)
-(define-key factor-mode-map "\C-ce" 'factor-edit)
+(define-key factor-mode-map "\C-ce"    'factor-edit)
 (define-key factor-mode-map "\C-c\C-h" 'factor-help)
+(define-key factor-mode-map "\C-cc"    'comment-region)
+(define-key factor-mode-map [return]   'newline-and-indent)
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; factor-listener-mode
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+(define-derived-mode factor-listener-mode comint-mode "Factor Listener")
+
+(define-key factor-listener-mode-map [f8] 'factor-refresh-all)
+
+(defun run-factor ()
+  (interactive)
+  (switch-to-buffer
+   (make-comint-in-buffer "factor" nil factor-binary nil
+			  (concat "-i=" factor-image)
+			  "-run=listener"))
+  (factor-listener-mode))
+
+(defun factor-refresh-all ()
+  (interactive)
+  (comint-send-string "*factor*" "refresh-all\n"))

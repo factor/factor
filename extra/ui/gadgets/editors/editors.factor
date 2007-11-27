@@ -4,7 +4,7 @@ USING: arrays documents ui.clipboards ui.commands ui.gadgets
 ui.gadgets.borders ui.gadgets.buttons ui.gadgets.labels
 ui.gadgets.scrollers ui.gadgets.theme ui.render ui.gestures io
 kernel math models namespaces opengl opengl.gl sequences strings
-io.styles math.vectors sorting colors combinators ;
+io.styles math.vectors sorting colors combinators assocs ;
 IN: ui.gadgets.editors
 
 TUPLE: editor
@@ -94,8 +94,11 @@ M: editor ungraft*
         rot editor-line x>offset ,
     ] { } make ;
 
+: clicked-loc ( editor -- loc )
+    [ hand-rel ] keep point>loc ;
+
 : click-loc ( editor model -- )
-    >r [ hand-rel ] keep point>loc r> set-model ;
+    >r clicked-loc r> set-model ;
 
 : focus-editor ( editor -- )
     t over set-editor-focused? relayout-1 ;
@@ -244,11 +247,37 @@ M: editor user-input*
 
 M: editor gadget-text* editor-string % ;
 
-: start-selection ( editor -- )
-    dup editor-caret click-loc ;
-
 : extend-selection ( editor -- )
-    dup request-focus start-selection ;
+    dup request-focus dup editor-caret click-loc ;
+
+: mouse-elt ( -- elelement )
+    hand-click# get {
+        { 2 T{ one-word-elt } }
+        { 3 T{ one-line-elt } }
+    } at T{ one-char-elt } or ;
+
+: drag-direction? ( loc editor -- ? )
+    editor-mark* <=> 0 < ;
+
+: drag-selection-caret ( loc editor element -- loc )
+    >r [ drag-direction? ] 2keep
+    gadget-model
+    r> prev/next-elt ? ;
+
+: drag-selection-mark ( loc editor element -- loc )
+    >r [ drag-direction? not ] 2keep
+    nip dup editor-mark* swap gadget-model
+    r> prev/next-elt ? ;
+
+: drag-caret&mark ( editor -- caret mark )
+    dup clicked-loc swap mouse-elt
+    [ drag-selection-caret ] 3keep
+    drag-selection-mark ;
+
+: drag-selection ( editor -- )
+    dup drag-caret&mark
+    pick editor-mark set-model
+    swap editor-caret set-model ;
 
 : editor-cut ( editor clipboard -- )
     dupd gadget-copy remove-selection ;
@@ -296,17 +325,10 @@ M: editor gadget-text* editor-string % ;
         dup T{ one-word-elt } select-elt
     ] unless gadget-selection ;
 
-: (position-caret) ( editor -- )
-    dup extend-selection
-    dup editor-mark click-loc ;
-
 : position-caret ( editor -- )
-    hand-click# get {
-        { 1 [ (position-caret) ] }
-        { 2 [ T{ one-word-elt } select-elt ] }
-        { 3 [ T{ one-line-elt } select-elt ] }
-        [ 2drop ]
-    } case ;
+    mouse-elt dup T{ one-char-elt } =
+    [ drop dup extend-selection dup editor-mark click-loc ]
+    [ select-elt ] if ;
 
 : insert-newline "\n" swap user-input ;
 
@@ -408,7 +430,7 @@ editor "caret-motion" f {
 
 editor "selection" f {
     { T{ button-down f { S+ } } extend-selection }
-    { T{ drag } start-selection }
+    { T{ drag } drag-selection }
     { T{ gain-focus } focus-editor }
     { T{ lose-focus } unfocus-editor }
     { T{ delete-action } remove-selection }

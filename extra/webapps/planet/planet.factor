@@ -18,7 +18,7 @@ TUPLE: posting author title date link body ;
     #! entries is an array of { author entries } pairs.
     dup [
         [ fetch-feed ] [ error. drop f ] recover
-    ] parallel-map [ ] subset
+    ] parallel-map
     [ [ >r first r> 2array ] curry* map ] 2map concat ;
 
 : sort-entries ( entries -- entries' )
@@ -108,6 +108,7 @@ SYMBOL: cached-postings
     { "Kio M. Smallwood"
     "http://sekenre.wordpress.com/feed/atom/"
     "http://sekenre.wordpress.com/" }
+    { "Phil Dawes" "http://www.phildawes.net/blog/category/factor/feed/atom" "http://www.phildawes.net/blog/" }
     { "Samuel Tardieu" "http://www.rfc1149.net/blog/tag/factor/feed/atom/" "http://www.rfc1149.net/blog/tag/factor/" }
     { "Slava Pestov" "http://factor-language.blogspot.com/atom.xml" "http://factor-language.blogspot.com/" }
 } default-blogroll set-global
