@@ -33,6 +33,19 @@ M: token-parser parse ( state parser -- result )
     2drop f
   ] if ;
 
+TUPLE: satisfy-parser quot ;
+
+M: satisfy-parser parse ( state parser -- result )
+  over empty? [
+    2drop f 
+  ] [
+    satisfy-parser-quot [ unclip-slice dup ] dip call [  
+      <parse-result>
+    ] [
+      2drop f
+    ] if
+  ] if ;
+
 TUPLE: range-parser min max ;
 
 M: range-parser parse ( state parser -- result )
@@ -147,6 +160,9 @@ PRIVATE>
 
 : token ( string -- parser )
   token-parser construct-boa init-parser ;      
+
+: satisfy ( quot -- parser )
+  satisfy-parser construct-boa init-parser ;
 
 : range ( min max -- parser )
   range-parser construct-boa init-parser ;

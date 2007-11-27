@@ -20,6 +20,15 @@ HELP: token
 { $description 
     "Returns a parser that matches the given string." } ;
 
+HELP: satisfy
+{ $values 
+  { "quot" "a quotation" } 
+  { "parser" "a parser" } 
+}
+{ $description 
+    "Returns a parser that calls the quotation on the first character of the input string, "
+    "succeeding if that quotation returns true. The AST is the character from the string." } ;
+
 HELP: range
 { $values 
   { "min" "a character" } 

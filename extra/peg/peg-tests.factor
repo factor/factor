@@ -137,3 +137,11 @@ IN: temporary
 { f } [
   "b" "a" token [ drop 1 ] action parse 
 ] unit-test
+
+{ f } [ 
+  "b" [ CHAR: a = ] satisfy parse 
+] unit-test
+
+{ CHAR: a } [ 
+  "a" [ CHAR: a = ] satisfy parse parse-result-ast
+] unit-test
