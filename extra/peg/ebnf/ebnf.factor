@@ -6,10 +6,14 @@ IN: peg.ebnf
 TUPLE: ebnf-non-terminal symbol ;
 TUPLE: ebnf-terminal symbol ;
 TUPLE: ebnf-choice options ;
+TUPLE: ebnf-sequence elements ;
+TUPLE: ebnf-rule symbol elements ;
 
 C: <ebnf-non-terminal> ebnf-non-terminal
 C: <ebnf-terminal> ebnf-terminal
 C: <ebnf-choice> ebnf-choice
+C: <ebnf-sequence> ebnf-sequence
+C: <ebnf-rule> ebnf-rule
 
 GENERIC: ebnf-compile ( ast -- quot )
 
@@ -25,7 +29,17 @@ M: ebnf-choice ebnf-compile ( ast -- quot )
         ebnf-compile ,
       ] each
     ] { } make ,
-    [ call ] , \ map ,
+    [ call ] , \ map , \ choice , 
+  ] [ ] make ;
+
+M: ebnf-sequence ebnf-compile ( ast -- quot )
+  [
+    [
+      ebnf-sequence-elements [
+        ebnf-compile ,
+      ] each
+    ] { } make ,
+    [ call ] , \ map , \ seq , 
   ] [ ] make ;
 
 DEFER: 'rhs'
@@ -40,7 +54,9 @@ DEFER: 'rhs'
   'non-terminal' 'terminal' 2array choice ;
 
 : 'sequence' ( -- parser )
-  'element' sp repeat1 ;
+  'element' sp 
+  "|" token sp ensure-not 2array seq [ first ] action 
+   repeat1 [ <ebnf-sequence> ] action ;
   
 : 'choice' ( -- parser )
   'element' sp "|" token sp list-of [ <ebnf-choice> ] action ;
@@ -53,13 +69,13 @@ DEFER: 'rhs'
 
 : 'rhs' ( -- parser )
   'repeat0'
-  'choice'
   'sequence'
+  'choice'
   'element' 
   4array choice ;
   
 : 'rule' ( -- parser )
-  'non-terminal' 
-  "=" token sp 
+  'non-terminal' [ ebnf-non-terminal-symbol ] action 
+  "=" token sp hide 
   'rhs' 
-  3array seq ;
+  3array seq [ first2 <ebnf-rule> ] action ;
