@@ -1,6 +1,6 @@
 ! Copyright (C) 2007 Chris Double.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel parser words arrays strings math.parser sequences namespaces peg ;
+USING: kernel parser words arrays strings math.parser sequences vectors namespaces peg ;
 IN: peg.ebnf
 
 TUPLE: ebnf-non-terminal symbol ;
@@ -9,6 +9,7 @@ TUPLE: ebnf-choice options ;
 TUPLE: ebnf-sequence elements ;
 TUPLE: ebnf-repeat0 group ;
 TUPLE: ebnf-rule symbol elements ;
+TUPLE: ebnf-action quot ;
 TUPLE: ebnf rules ;
 
 C: <ebnf-non-terminal> ebnf-non-terminal
@@ -17,6 +18,7 @@ C: <ebnf-choice> ebnf-choice
 C: <ebnf-sequence> ebnf-sequence
 C: <ebnf-repeat0> ebnf-repeat0
 C: <ebnf-rule> ebnf-rule
+C: <ebnf-action> ebnf-action
 C: <ebnf> ebnf
 
 GENERIC: ebnf-compile ( ast -- quot )
@@ -62,6 +64,19 @@ M: ebnf-rule ebnf-compile ( ast -- quot )
     ebnf-rule-elements ebnf-compile , \ define-compound , 
   ] [ ] make ;
 
+M: ebnf-action ebnf-compile ( ast -- quot )
+  [
+    ebnf-action-quot , \ action , 
+  ] [ ] make ;
+
+M: vector ebnf-compile ( ast -- quot )
+  [
+    [ ebnf-compile % ] each 
+  ] [ ] make ;
+
+M: f ebnf-compile ( ast -- quot )
+  drop [ ] ;
+
 M: ebnf ebnf-compile ( ast -- quot )
   [
     ebnf-rules [
@@ -75,7 +90,7 @@ DEFER: 'rhs'
   CHAR: a CHAR: z range repeat1 [ >string <ebnf-non-terminal> ] action ;
 
 : 'terminal' ( -- parser )
-  "\"" token hide [ CHAR: " = not ] satisfy repeat1 "\"" token hide 3array seq [ first >string <ebnf-terminal> ] action ;
+  "'" token hide [ CHAR: ' = not ] satisfy repeat1 "'" token hide 3array seq [ first >string <ebnf-terminal> ] action ;
 
 : 'element' ( -- parser )
   'non-terminal' 'terminal' 2array choice ;
@@ -94,13 +109,20 @@ DEFER: 'rhs'
   "}" token sp hide 
   3array seq [ first <ebnf-repeat0> ] action ;
 
+: 'action' ( -- parser )
+  "=>" token hide
+  "[" token sp hide
+  "]." token ensure-not [ drop t ] satisfy 2array seq [ first ] action repeat1 [ >string ] action
+  "]" token "." token ensure 2array seq sp hide
+  4array seq [ "[ " swap first append " ]" append eval <ebnf-action> ] action ;
+
 : 'rhs' ( -- parser )
   'repeat0'
   'sequence'
   'choice'
-  'element' 
-  4array choice ;
-  
+  'element'
+  4array choice 'action' sp optional 2array seq ;
+ 
 : 'rule' ( -- parser )
   'non-terminal' [ ebnf-non-terminal-symbol ] action 
   "=" token sp hide 
@@ -117,4 +139,4 @@ DEFER: 'rhs'
     f
    ] if* ;
 
-: <EBNF "EBNF>" parse-tokens "" join ebnf>quot call ; parsing
+: <EBNF "EBNF>" parse-tokens " " join dup . ebnf>quot call ; parsing
