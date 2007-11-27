@@ -7,6 +7,7 @@ TUPLE: ebnf-non-terminal symbol ;
 TUPLE: ebnf-terminal symbol ;
 TUPLE: ebnf-choice options ;
 TUPLE: ebnf-sequence elements ;
+TUPLE: ebnf-repeat0 group ;
 TUPLE: ebnf-rule symbol elements ;
 TUPLE: ebnf rules ;
 
@@ -14,6 +15,7 @@ C: <ebnf-non-terminal> ebnf-non-terminal
 C: <ebnf-terminal> ebnf-terminal
 C: <ebnf-choice> ebnf-choice
 C: <ebnf-sequence> ebnf-sequence
+C: <ebnf-repeat0> ebnf-repeat0
 C: <ebnf-rule> ebnf-rule
 C: <ebnf> ebnf
 
@@ -47,6 +49,11 @@ M: ebnf-sequence ebnf-compile ( ast -- quot )
       ] each
     ] { } make ,
     [ call ] , \ map , \ seq , 
+  ] [ ] make ;
+
+M: ebnf-repeat0 ebnf-compile ( ast -- quot )
+  [
+    ebnf-repeat0-group ebnf-compile % \ repeat0 , 
   ] [ ] make ;
 
 M: ebnf-rule ebnf-compile ( ast -- quot )
@@ -85,7 +92,7 @@ DEFER: 'rhs'
   "{" token sp hide
   [ 'rhs' sp ] delay
   "}" token sp hide 
-  3array seq ;
+  3array seq [ first <ebnf-repeat0> ] action ;
 
 : 'rhs' ( -- parser )
   'repeat0'
