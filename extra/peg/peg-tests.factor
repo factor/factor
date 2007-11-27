@@ -145,3 +145,20 @@ IN: temporary
 { CHAR: a } [ 
   "a" [ CHAR: a = ] satisfy parse parse-result-ast
 ] unit-test
+
+{ "a" } [
+  "    a" "a" token sp parse parse-result-ast
+] unit-test
+
+{ "a" } [
+  "a" "a" token sp parse parse-result-ast
+] unit-test
+
+{ V{ "a" } } [
+  "[a]" "[" token hide "a" token "]" token hide 3array seq parse parse-result-ast
+] unit-test
+
+{ f } [
+  "a]" "[" token hide "a" token "]" token hide 3array seq parse 
+] unit-test
+

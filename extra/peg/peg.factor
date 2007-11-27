@@ -205,3 +205,6 @@ PRIVATE>
 
 : sp ( parser -- parser )
   sp-parser construct-boa init-parser ;
+
+: hide ( parser -- parser )
+  [ drop ignore ] action ;

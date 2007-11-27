@@ -128,3 +128,13 @@ HELP: sp
 { $description 
     "Returns a parser that calls the original parser 'p1' after stripping any whitespace "
     " from the left of the input string." } ;
+
+HELP: hide
+{ $values 
+  { "p1" "a parser" } 
+  { "parser" "a parser" } 
+}
+{ $description 
+    "Returns a parser that succeeds if the original parser succeeds, but does not " 
+    "put any result in the AST. Useful for ignoring 'syntax' in the AST." }
+{ $example "\"[\" token hide number \"]\" token hide 3array seq" } ;
