@@ -1,6 +1,6 @@
 ! Copyright (C) 2007 Chris Double.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel arrays strings math.parser sequences namespaces peg ;
+USING: kernel parser words arrays strings math.parser sequences namespaces peg ;
 IN: peg.ebnf
 
 TUPLE: ebnf-non-terminal symbol ;
@@ -22,6 +22,11 @@ M: ebnf-terminal ebnf-compile ( ast -- quot )
     ebnf-terminal-symbol , \ token ,
   ] [ ] make ;
 
+M: ebnf-non-terminal ebnf-compile ( ast -- quot )
+  [
+    ebnf-non-terminal-symbol in get lookup ,
+  ] [ ] make ;
+
 M: ebnf-choice ebnf-compile ( ast -- quot )
   [
     [
@@ -40,6 +45,12 @@ M: ebnf-sequence ebnf-compile ( ast -- quot )
       ] each
     ] { } make ,
     [ call ] , \ map , \ seq , 
+  ] [ ] make ;
+
+M: ebnf-rule ebnf-compile ( ast -- quot )
+  [
+    dup ebnf-rule-symbol , \ in , \ get , \ create , 
+    ebnf-rule-elements ebnf-compile , \ define-compound , 
   ] [ ] make ;
 
 DEFER: 'rhs'
