@@ -33,6 +33,19 @@ M: token-parser parse ( state parser -- result )
     2drop f
   ] if ;
 
+TUPLE: satisfy-parser quot ;
+
+M: satisfy-parser parse ( state parser -- result )
+  over empty? [
+    2drop f 
+  ] [
+    satisfy-parser-quot [ unclip-slice dup ] dip call [  
+      <parse-result>
+    ] [
+      2drop f
+    ] if
+  ] if ;
+
 TUPLE: range-parser min max ;
 
 M: range-parser parse ( state parser -- result )
@@ -143,10 +156,30 @@ M: action-parser parse ( state parser -- result )
      nip
    ] if ;
 
+: left-trim-slice ( string -- string )
+  #! Return a new string without any leading whitespace
+  #! from the original string.
+  dup empty? [
+    dup first blank? [ 1 tail-slice left-trim-slice ] when
+  ] unless ;
+
+TUPLE: sp-parser p1 ;
+
+M: sp-parser parse ( state parser -- result )
+  [ left-trim-slice ] dip sp-parser-p1 parse ;
+
+TUPLE: delay-parser quot ;
+
+M: delay-parser parse ( state parser -- result )
+  delay-parser-quot call parse ;
+
 PRIVATE>
 
 : token ( string -- parser )
   token-parser construct-boa init-parser ;      
+
+: satisfy ( quot -- parser )
+  satisfy-parser construct-boa init-parser ;
 
 : range ( min max -- parser )
   range-parser construct-boa init-parser ;
@@ -174,3 +207,15 @@ PRIVATE>
 
 : action ( parser quot -- parser )
   action-parser construct-boa init-parser ;
+
+: sp ( parser -- parser )
+  sp-parser construct-boa init-parser ;
+
+: hide ( parser -- parser )
+  [ drop ignore ] action ;
+
+: delay ( parser -- parser )
+  delay-parser construct-boa init-parser ;
+
+: list-of ( items separator -- parser )
+  hide over 2array seq repeat0 [ concat ] action 2array seq [ unclip 1vector swap first append ] action ;
