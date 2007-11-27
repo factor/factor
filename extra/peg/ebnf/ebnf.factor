@@ -8,12 +8,14 @@ TUPLE: ebnf-terminal symbol ;
 TUPLE: ebnf-choice options ;
 TUPLE: ebnf-sequence elements ;
 TUPLE: ebnf-rule symbol elements ;
+TUPLE: ebnf rules ;
 
 C: <ebnf-non-terminal> ebnf-non-terminal
 C: <ebnf-terminal> ebnf-terminal
 C: <ebnf-choice> ebnf-choice
 C: <ebnf-sequence> ebnf-sequence
 C: <ebnf-rule> ebnf-rule
+C: <ebnf> ebnf
 
 GENERIC: ebnf-compile ( ast -- quot )
 
@@ -24,7 +26,7 @@ M: ebnf-terminal ebnf-compile ( ast -- quot )
 
 M: ebnf-non-terminal ebnf-compile ( ast -- quot )
   [
-    ebnf-non-terminal-symbol in get lookup ,
+    ebnf-non-terminal-symbol , \ in , \ get , \ lookup , \ execute ,
   ] [ ] make ;
 
 M: ebnf-choice ebnf-compile ( ast -- quot )
@@ -51,6 +53,13 @@ M: ebnf-rule ebnf-compile ( ast -- quot )
   [
     dup ebnf-rule-symbol , \ in , \ get , \ create , 
     ebnf-rule-elements ebnf-compile , \ define-compound , 
+  ] [ ] make ;
+
+M: ebnf ebnf-compile ( ast -- quot )
+  [
+    ebnf-rules [
+      ebnf-compile %
+    ] each 
   ] [ ] make ;
 
 DEFER: 'rhs'
@@ -90,3 +99,13 @@ DEFER: 'rhs'
   "=" token sp hide 
   'rhs' 
   3array seq [ first2 <ebnf-rule> ] action ;
+
+: 'ebnf' ( -- parser )
+  'rule' sp ";" token sp hide list-of [ <ebnf> ] action ;
+
+: ebnf>quot ( string -- quot )
+  'ebnf' parse [
+     parse-result-ast ebnf-compile  
+   ] [
+    f
+   ] if* ;
