@@ -168,6 +168,11 @@ TUPLE: sp-parser p1 ;
 M: sp-parser parse ( state parser -- result )
   [ left-trim-slice ] dip sp-parser-p1 parse ;
 
+TUPLE: delay-parser quot ;
+
+M: delay-parser parse ( state parser -- result )
+  delay-parser-quot call parse ;
+
 PRIVATE>
 
 : token ( string -- parser )
@@ -208,3 +213,6 @@ PRIVATE>
 
 : hide ( parser -- parser )
   [ drop ignore ] action ;
+
+: delay ( parser -- parser )
+  delay-parser construct-boa init-parser ;

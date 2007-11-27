@@ -138,3 +138,13 @@ HELP: hide
     "Returns a parser that succeeds if the original parser succeeds, but does not " 
     "put any result in the AST. Useful for ignoring 'syntax' in the AST." }
 { $example "\"[\" token hide number \"]\" token hide 3array seq" } ;
+
+HELP: delay
+{ $values 
+  { "quot" "a quotation with stack effect ( -- parser )" } 
+  { "parser" "a parser" } 
+}
+{ $description 
+    "Delays the construction of a parser until it is actually required to parse. This " 
+    "allows for calling a parser that results in a recursive call to itself. The quotation "
+    "should return the constructed parser." } ;
