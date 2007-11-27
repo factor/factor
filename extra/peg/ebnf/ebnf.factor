@@ -108,7 +108,7 @@ DEFER: 'rhs'
   3array seq [ first2 <ebnf-rule> ] action ;
 
 : 'ebnf' ( -- parser )
-  'rule' sp ";" token sp hide list-of [ <ebnf> ] action ;
+  'rule' sp "." token sp hide list-of [ <ebnf> ] action ;
 
 : ebnf>quot ( string -- quot )
   'ebnf' parse [
@@ -116,3 +116,5 @@ DEFER: 'rhs'
    ] [
     f
    ] if* ;
+
+: EBNF: ";" parse-tokens "" join ebnf>quot call ; parsing
