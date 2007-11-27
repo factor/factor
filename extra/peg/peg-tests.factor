@@ -137,3 +137,28 @@ IN: temporary
 { f } [
   "b" "a" token [ drop 1 ] action parse 
 ] unit-test
+
+{ f } [ 
+  "b" [ CHAR: a = ] satisfy parse 
+] unit-test
+
+{ CHAR: a } [ 
+  "a" [ CHAR: a = ] satisfy parse parse-result-ast
+] unit-test
+
+{ "a" } [
+  "    a" "a" token sp parse parse-result-ast
+] unit-test
+
+{ "a" } [
+  "a" "a" token sp parse parse-result-ast
+] unit-test
+
+{ V{ "a" } } [
+  "[a]" "[" token hide "a" token "]" token hide 3array seq parse parse-result-ast
+] unit-test
+
+{ f } [
+  "a]" "[" token hide "a" token "]" token hide 3array seq parse 
+] unit-test
+

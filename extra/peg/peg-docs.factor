@@ -20,6 +20,15 @@ HELP: token
 { $description 
     "Returns a parser that matches the given string." } ;
 
+HELP: satisfy
+{ $values 
+  { "quot" "a quotation" } 
+  { "parser" "a parser" } 
+}
+{ $description 
+    "Returns a parser that calls the quotation on the first character of the input string, "
+    "succeeding if that quotation returns true. The AST is the character from the string." } ;
+
 HELP: range
 { $values 
   { "min" "a character" } 
@@ -111,3 +120,31 @@ HELP: action
     "the default AST." }
 { $example "CHAR: 0 CHAR: 9 range [ to-digit ] action" } ;
 
+HELP: sp
+{ $values 
+  { "p1" "a parser" } 
+  { "parser" "a parser" } 
+}
+{ $description 
+    "Returns a parser that calls the original parser 'p1' after stripping any whitespace "
+    " from the left of the input string." } ;
+
+HELP: hide
+{ $values 
+  { "p1" "a parser" } 
+  { "parser" "a parser" } 
+}
+{ $description 
+    "Returns a parser that succeeds if the original parser succeeds, but does not " 
+    "put any result in the AST. Useful for ignoring 'syntax' in the AST." }
+{ $example "\"[\" token hide number \"]\" token hide 3array seq" } ;
+
+HELP: delay
+{ $values 
+  { "quot" "a quotation with stack effect ( -- parser )" } 
+  { "parser" "a parser" } 
+}
+{ $description 
+    "Delays the construction of a parser until it is actually required to parse. This " 
+    "allows for calling a parser that results in a recursive call to itself. The quotation "
+    "should return the constructed parser." } ;
