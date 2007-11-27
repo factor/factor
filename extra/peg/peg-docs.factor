@@ -120,3 +120,11 @@ HELP: action
     "the default AST." }
 { $example "CHAR: 0 CHAR: 9 range [ to-digit ] action" } ;
 
+HELP: sp
+{ $values 
+  { "p1" "a parser" } 
+  { "parser" "a parser" } 
+}
+{ $description 
+    "Returns a parser that calls the original parser 'p1' after stripping any whitespace "
+    " from the left of the input string." } ;

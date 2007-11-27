@@ -156,6 +156,18 @@ M: action-parser parse ( state parser -- result )
      nip
    ] if ;
 
+: left-trim-slice ( string -- string )
+  #! Return a new string without any leading whitespace
+  #! from the original string.
+  dup empty? [
+    dup first blank? [ 1 tail-slice left-trim-slice ] when
+  ] unless ;
+
+TUPLE: sp-parser p1 ;
+
+M: sp-parser parse ( state parser -- result )
+  [ left-trim-slice ] dip sp-parser-p1 parse ;
+
 PRIVATE>
 
 : token ( string -- parser )
@@ -190,3 +202,6 @@ PRIVATE>
 
 : action ( parser quot -- parser )
   action-parser construct-boa init-parser ;
+
+: sp ( parser -- parser )
+  sp-parser construct-boa init-parser ;
