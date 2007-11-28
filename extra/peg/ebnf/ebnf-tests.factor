@@ -9,27 +9,33 @@ IN: temporary
 ] unit-test
 
 { T{ ebnf-terminal f "55" } } [
-  "\"55\"" 'terminal' parse parse-result-ast 
+  "'55'" 'terminal' parse parse-result-ast 
+] unit-test
+
+{
+  T{ ebnf-rule f 
+     "digit"
+     V{ 
+       T{ ebnf-choice f
+          V{ T{ ebnf-terminal f "1" } T{ ebnf-terminal f "2" } }
+       }
+       f
+     }
+  } 
+} [
+  "digit = '1' | '2'" 'rule' parse parse-result-ast
 ] unit-test
 
 {
   T{ ebnf-rule f 
      "digit" 
-     T{ ebnf-choice f
-        V{ T{ ebnf-terminal f "1" } T{ ebnf-terminal f "2" } }
+     V{
+       T{ ebnf-sequence f
+          V{ T{ ebnf-terminal f "1" } T{ ebnf-terminal f "2" } }
+       }
+       f
      }
-  } 
+  }   
 } [
-  "digit = \"1\" | \"2\"" 'rule' parse parse-result-ast
-] unit-test
-
-{
-  T{ ebnf-rule f 
-     "digit" 
-     T{ ebnf-sequence f
-        V{ T{ ebnf-terminal f "1" } T{ ebnf-terminal f "2" } }
-     }
-  } 
-} [
-  "digit = \"1\" \"2\"" 'rule' parse parse-result-ast
+  "digit = '1' '2'" 'rule' parse parse-result-ast
 ] unit-test
