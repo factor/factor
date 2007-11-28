@@ -65,3 +65,23 @@ IN: temporary
 } [
   "one (two | three)" 'choice' parse parse-result-ast
 ] unit-test
+
+{
+  T{ ebnf-sequence f
+     V{ 
+       T{ ebnf-non-terminal f "one" }
+       T{ ebnf-repeat0 f
+          T{ ebnf-sequence f
+             V{
+                T{ ebnf-choice f
+                   V{ T{ ebnf-non-terminal f "two" } T{ ebnf-non-terminal f "three" } }
+                }
+                T{ ebnf-non-terminal f "four" }
+             }
+          }
+        }
+     }
+  } 
+} [
+  "one {(two | three) four}" 'choice' parse parse-result-ast
+] unit-test

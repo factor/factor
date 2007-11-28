@@ -103,8 +103,14 @@ DEFER: 'choice'
   ")" token sp hide 
   3array seq [ first ] action ;
 
+: 'repeat0' ( -- parser )
+  "{" token sp hide
+  [ 'choice' sp ] delay
+  "}" token sp hide 
+  3array seq [ first <ebnf-repeat0> ] action ;
+
 : 'sequence' ( -- parser )
-  'element' sp 'group' sp 2array choice 
+  'element' sp 'group' sp 'repeat0' sp 3array choice 
    repeat1 [ 
      dup length 1 = [ first ] [ <ebnf-sequence> ] if
    ] action ;  
@@ -114,21 +120,13 @@ DEFER: 'choice'
     dup length 1 = [ first ] [ <ebnf-choice> ] if
    ] action ;
   
-: 'repeat0' ( -- parser )
-  "{" token sp hide
-  [ 'rhs' sp ] delay
-  "}" token sp hide 
-  3array seq [ first <ebnf-repeat0> ] action ;
-
 : 'action' ( -- parser )
   "=>" token hide
   [ blank? ] satisfy ensure-not [ drop t ] satisfy 2array seq [ first ] action repeat1 [ >string ] action sp
   2array seq [ first <ebnf-action> ] action ;
 
 : 'rhs' ( -- parser )
-  'repeat0'
-  'choice'
-  2array choice 'action' sp optional 2array seq ;
+  'choice' 'action' sp optional 2array seq ;
  
 : 'rule' ( -- parser )
   'non-terminal' [ ebnf-non-terminal-symbol ] action 
