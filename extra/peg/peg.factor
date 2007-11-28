@@ -1,6 +1,6 @@
 ! Copyright (C) 2007 Chris Double.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel sequences strings namespaces math assocs shuffle vectors combinators.lib ;
+USING: kernel sequences strings namespaces math assocs shuffle vectors arrays combinators.lib ;
 IN: peg
 
 TUPLE: parse-result remaining ast ;
