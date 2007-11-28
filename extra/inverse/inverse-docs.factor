@@ -24,7 +24,7 @@ HELP: matches?
 { $values { "quot" "a quotation" } { "?" "a boolean" } }
 { $description "Tests if the stack can match the given quotation. The quotation is inverted, and if the inverse can run without a unification failure, then t is returned. Else f is returned. If a different error is encountered (such as stack underflow), this will be propagated." } ;
 
-HELP: which
+HELP: switch
 { $values { "quot-alist" "an alist from inverse quots to quots" } }
 { $description "The equivalent of a case expression in a programming language with buitlin pattern matchining. It attempts to match the stack with each of the patterns, in order, by treating them as inverse quotations. Failure causes the next pattern to be tested." }
 { $code
@@ -34,7 +34,7 @@ HELP: which
 "    {"
 "        { [ <cons> ] [ sum + ] }"
 "        { [ f ] [ 0 ] }"
-"    } which ;" }
+"    } switch ;" }
 { $see-also undo } ;
 
 ARTICLE: { "inverse" "intro" } "Invertible quotations"
@@ -46,7 +46,7 @@ ARTICLE: { "inverse" "intro" } "Invertible quotations"
 "To use the inverse quotation for pattern matching"
 { $subsection undo }
 { $subsection matches? }
-{ $subsection which } ;
+{ $subsection switch } ;
 
 IN: inverse
 ABOUT: { "inverse" "intro" }

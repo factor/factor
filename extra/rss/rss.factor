@@ -3,21 +3,13 @@
 IN: rss
 ! USING: kernel http-client xml xml-utils xml-data errors io strings
 !    sequences xml-writer parser-combinators lazy-lists entities ;
-USING: xml.utilities kernel promises parser-combinators assocs
-    parser-combinators.replace strings sequences xml.data xml.writer
+USING: xml.utilities kernel assocs
+    strings sequences xml.data xml.writer
     io.streams.string combinators xml xml.entities io.files io
     http.client ;
 
 : ?children>string ( tag/f -- string/f )
     [ children>string ] [ f ] if* ;
-
-LAZY: '&amp;' ( -- parser )
-    "&" token
-    [ blank? ] satisfy &>
-    [ "&amp;" swap add ] <@ ;
-
-: &>&amp; ( string -- string )
-    '&amp;' replace ;
 
 TUPLE: feed title link entries ;
 
