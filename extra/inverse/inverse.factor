@@ -4,15 +4,6 @@ tuples namespaces vectors bit-arrays byte-arrays strings sbufs
 math.functions macros ;
 IN: inverse
 
-: (repeat) ( from to quot -- )
-    pick pick >= [
-        3drop
-    ] [
-        [ swap >r call 1+ r> ] keep (repeat)
-    ] if ; inline
-
-: repeat ( n quot -- ) 0 -rot (repeat) ; inline
-
 TUPLE: fail ;
 : fail ( -- * ) \ fail construct-empty throw ;
 M: fail summary drop "Unification failed" ;
@@ -32,11 +23,6 @@ M: fail summary drop "Unification failed" ;
 : define-pop-inverse ( word n quot -- )
     >r dupd "pop-length" set-word-prop r>
     "pop-inverse" set-word-prop ;
-
-DEFER: [undo]
-
-: make-inverse ( word -- quot )
-    word-def [undo] ;
 
 TUPLE: no-inverse word ;
 : no-inverse ( word -- * ) \ no-inverse construct-empty throw ;
@@ -70,9 +56,11 @@ M: no-inverse summary
 
 GENERIC: inverse ( revquot word -- revquot* quot )
 
+DEFER: [undo]
+
 M: word inverse
     dup "inverse" word-prop [ ]
-    [ dup primitive? [ no-inverse ] [ make-inverse ] if ] ?if ;
+    [ dup primitive? [ no-inverse ] [ word-def [undo] ] if ] ?if ;
 
 : undo-literal ( object -- quot )
     [ =/fail ] curry ;
@@ -100,7 +88,7 @@ M: pop-inverse inverse
 
 MACRO: undo ( quot -- ) [undo] ;
 
-! Inversions of selected words
+! Inverse of selected words
 
 \ swap [ swap ] define-inverse
 \ dup [ [ =/fail ] keep ] define-inverse
