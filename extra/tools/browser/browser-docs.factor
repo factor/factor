@@ -1,6 +1,10 @@
 USING: help.markup help.syntax io strings ;
 IN: tools.browser
 
+ARTICLE: "vocab-index" "Vocabulary index"
+{ $tags,authors }
+{ $describe-vocab "" } ;
+
 ARTICLE: "tools.browser" "Vocabulary browser"
 "Getting and setting vocabulary meta-data:"
 { $subsection vocab-summary }
