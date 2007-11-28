@@ -39,3 +39,16 @@ IN: temporary
 } [
   "digit = '1' '2'" 'rule' parse parse-result-ast
 ] unit-test
+
+{
+  T{ ebnf-choice f
+     V{ 
+       T{ ebnf-sequence f
+          V{ T{ ebnf-non-terminal f "one" } T{ ebnf-non-terminal f "two" } }
+       }
+       T{ ebnf-non-terminal f "three" }
+     }
+  } 
+} [
+  "one two | three" 'choice' parse parse-result-ast
+] unit-test

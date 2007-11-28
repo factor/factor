@@ -97,12 +97,15 @@ DEFER: 'rhs'
 
 : 'sequence' ( -- parser )
   'element' sp 
-  "|" token sp ensure-not 2array seq [ first ] action 
-   repeat1 [ <ebnf-sequence> ] action ;
-  
-: 'choice' ( -- parser )
-  'element' sp "|" token sp list-of [ <ebnf-choice> ] action ;
+   repeat1 [ 
+     dup length 1 = [ first ] [ <ebnf-sequence> ] if
+   ] action ;  
 
+: 'choice' ( -- parser )
+  'sequence' sp "|" token sp list-of [ 
+    dup length 1 = [ first ] [ <ebnf-choice> ] if
+   ] action ;
+  
 : 'repeat0' ( -- parser )
   "{" token sp hide
   [ 'rhs' sp ] delay
@@ -116,10 +119,8 @@ DEFER: 'rhs'
 
 : 'rhs' ( -- parser )
   'repeat0'
-  'sequence'
   'choice'
-  'element'
-  4array choice 'action' sp optional 2array seq ;
+  2array choice 'action' sp optional 2array seq ;
  
 : 'rule' ( -- parser )
   'non-terminal' [ ebnf-non-terminal-symbol ] action 
