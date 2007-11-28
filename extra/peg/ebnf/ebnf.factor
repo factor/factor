@@ -27,12 +27,12 @@ GENERIC: ebnf-compile ( ast -- quot )
 
 M: ebnf-terminal ebnf-compile ( ast -- quot )
   [
-    ebnf-terminal-symbol , \ token ,
+    ebnf-terminal-symbol , \ token , \ sp , 
   ] [ ] make ;
 
 M: ebnf-non-terminal ebnf-compile ( ast -- quot )
   [
-    [ ebnf-non-terminal-symbol , \ search , \ execute , ] [ ] make 
+    [ ebnf-non-terminal-symbol , \ search , \ execute , \ sp , ] [ ] make 
     , \ delay ,
   ] [ ] make ;
 
