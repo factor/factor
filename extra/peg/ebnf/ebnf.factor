@@ -1,6 +1,6 @@
 ! Copyright (C) 2007 Chris Double.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel parser words arrays strings math.parser sequences vectors namespaces peg ;
+USING: kernel parser words arrays strings math.parser sequences quotations vectors namespaces peg ;
 IN: peg.ebnf
 
 TUPLE: ebnf-non-terminal symbol ;
@@ -9,7 +9,7 @@ TUPLE: ebnf-choice options ;
 TUPLE: ebnf-sequence elements ;
 TUPLE: ebnf-repeat0 group ;
 TUPLE: ebnf-rule symbol elements ;
-TUPLE: ebnf-action quot ;
+TUPLE: ebnf-action word ;
 TUPLE: ebnf rules ;
 
 C: <ebnf-non-terminal> ebnf-non-terminal
@@ -66,7 +66,7 @@ M: ebnf-rule ebnf-compile ( ast -- quot )
 
 M: ebnf-action ebnf-compile ( ast -- quot )
   [
-    ebnf-action-quot , \ action , 
+    ebnf-action-word search 1quotation , \ action , 
   ] [ ] make ;
 
 M: vector ebnf-compile ( ast -- quot )
@@ -111,10 +111,8 @@ DEFER: 'rhs'
 
 : 'action' ( -- parser )
   "=>" token hide
-  "[" token sp hide
-  "]." token ensure-not [ drop t ] satisfy 2array seq [ first ] action repeat1 [ >string ] action
-  "]" token "." token ensure 2array seq sp hide
-  4array seq [ "[ " swap first append " ]" append eval <ebnf-action> ] action ;
+  [ blank? ] satisfy ensure-not [ drop t ] satisfy 2array seq [ first ] action repeat1 [ >string ] action sp
+  2array seq [ first <ebnf-action> ] action ;
 
 : 'rhs' ( -- parser )
   'repeat0'
