@@ -125,3 +125,15 @@ SYMBOL: last-update
     [ update-thread ] in-thread ;
 
 "planet" "planet-factor" "extra/webapps/planet" web-app
+
+: merge-feeds ( feeds -- feed )
+    [ feed-entries ] map concat sort-entries ;
+
+: planet-feed ( -- feed )
+    default-blogroll get [ second news-get ] map merge-feeds 
+    >r "[ planet-factor ]" "http://planet.factorcode.org" r> <entry>
+    generate-atom ;
+
+: feed.xml planet-feed ;
+
+\ feed.xml { } define-action
