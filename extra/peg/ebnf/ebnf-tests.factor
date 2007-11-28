@@ -12,6 +12,24 @@ IN: temporary
   "\"55\"" 'terminal' parse parse-result-ast 
 ] unit-test
 
-! { } [
-!  "digit = \"0\" | \"1\" | \"2\"" 'rule' parse parse-result-ast
-! ] unit-test
+{
+  T{ ebnf-rule f 
+     "digit" 
+     T{ ebnf-choice f
+        V{ T{ ebnf-terminal f "1" } T{ ebnf-terminal f "2" } }
+     }
+  } 
+} [
+  "digit = \"1\" | \"2\"" 'rule' parse parse-result-ast
+] unit-test
+
+{
+  T{ ebnf-rule f 
+     "digit" 
+     T{ ebnf-sequence f
+        V{ T{ ebnf-terminal f "1" } T{ ebnf-terminal f "2" } }
+     }
+  } 
+} [
+  "digit = \"1\" \"2\"" 'rule' parse parse-result-ast
+] unit-test

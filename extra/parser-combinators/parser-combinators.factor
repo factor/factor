@@ -13,10 +13,10 @@ M: promise parse ( input parser -- list )
 TUPLE: parse-result parsed unparsed ;
 
 : parse-1 ( input parser -- result )
-    parse dup nil? [
-        "Parse error" throw
+    dupd parse dup nil? [
+        "Cannot parse " rot append throw
     ] [
-        car parse-result-parsed
+        nip car parse-result-parsed
     ] if ;
 
 C: <parse-result> parse-result
@@ -31,6 +31,8 @@ M: token-parser parse ( input parser -- list )
     ] [
         2drop nil
     ] if ;
+
+: 1token ( n -- parser ) 1string token ;
 
 TUPLE: satisfy-parser quot ;
 
@@ -91,6 +93,9 @@ TUPLE: and-parser parsers ;
         2array
     ] if and-parser construct-boa ;
 
+: <and-parser> ( parsers -- parser )
+    dup length 1 = [ first ] [ and-parser construct-boa ] if ;
+
 : and-parser-parse ( list p1  -- list )
     swap [
         dup parse-result-unparsed rot parse
@@ -109,15 +114,20 @@ M: and-parser parse ( input parser -- list )
     and-parser-parsers unclip swapd parse
     [ [ and-parser-parse ] reduce ] 2curry promise ;
 
-TUPLE: or-parser p1 p2 ;
+TUPLE: or-parser parsers ;
 
-C: <|> or-parser ( parser1 parser2 -- parser )
+: <or-parser> ( parsers -- parser )
+    dup length 1 = [ first ] [ or-parser construct-boa ] if ;
+
+: <|> ( parser1 parser2 -- parser )
+    2array <or-parser> ;
 
 M: or-parser parse ( input parser1 -- list )
     #! Return the combined list resulting from the parses
     #! of parser1 and parser2 being applied to the same
     #! input. This implements the choice parsing operator.
-    [ or-parser-p1 ] keep or-parser-p2 >r dupd parse swap r> parse lappend ;
+    or-parser-parsers 0 swap seq>list
+    [ parse ] lmap-with lconcat ;
 
 : left-trim-slice ( string -- string )
     #! Return a new string without any leading whitespace

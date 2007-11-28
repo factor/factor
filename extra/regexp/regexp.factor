@@ -1,21 +1,37 @@
-USING: combinators kernel lazy-lists math math.parser
+USING: arrays combinators kernel lazy-lists math math.parser
 namespaces parser parser-combinators parser-combinators.simple
-promises sequences strings ;
+promises quotations sequences sequences.lib strings ;
 USING: continuations io prettyprint ;
 IN: regexp
 
 : 'any-char'
     "." token [ drop any-char-parser ] <@ ;
 
+: escaped-char
+    {
+        { CHAR: d [ [ digit? ] ] }
+        { CHAR: D [ [ digit? not ] ] }
+        { CHAR: s [ [ blank? ] ] }
+        { CHAR: S [ [ blank? not ] ] }
+        { CHAR: \\ [ [ CHAR: \\ = ] ] }
+        [ "bad \\, use \\\\ to match a literal \\" throw ]
+    } case ;
+
 : 'escaped-char'
-    "\\" token any-char-parser &> ;
+    "\\" token any-char-parser &> [ escaped-char ] <@ ;
+
+! Must escape to use as literals
+! : meta-chars "[\\^$.|?*+()" ;
 
 : 'ordinary-char'
-    [ "*+?|(){}" member? not ] satisfy ;
+    [ "\\^*+?|(){}[" member? not ] satisfy ;
 
 : 'char' 'escaped-char' 'ordinary-char' <|> ;
 
-: 'string' 'char' <+> [ >string token ] <@ ;
+: 'string'
+    'char' <+> [
+        [ dup quotation? [ satisfy ] [ 1token ] if ] [ <&> ] map-reduce
+    ] <@ ;
 
 : exactly-n ( parser n -- parser' )
     swap <repetition> and-parser construct-boa ;
@@ -45,51 +61,54 @@ C: <group-result> group-result
     'regexp' [ [ <group-result> ] <@ ] <@
     ")" token <& &> ;
 
+! Special cases: ]\\^-
+: predicates>cond ( seq -- quot )
+    #! Takes an array of quotation predicates/objects and makes a cond
+    #! Makes a predicate of each obj like so:  [ dup obj = ]
+    #! Leaves quotations alone
+    #! The cond returns a boolean, t if one of the predicates matches
+    [
+        dup callable? [ [ = ] curry ] unless
+        [ dup ] swap compose [ drop t ] 2array
+    ] map { [ t ] [ drop f ] } add [ cond ] curry ;
+
+: 'range'
+    any-char-parser "-" token <& any-char-parser <&>
+    [ first2 [ between? ] 2curry ] <@ ;
+
+: 'character-class-contents'
+    'escaped-char'
+    'range' <|>
+    [ "\\]" member? not ] satisfy <|> ;
+
+: 'character-class'
+    "[" token
+    "^" token 'character-class-contents' <+> <&:>
+        [ predicates>cond [ not ] compose satisfy ] <@
+    "]" token [ first ] <@ 'character-class-contents' <*> <&:>
+        [ predicates>cond satisfy ] <@ <|>
+    'character-class-contents' <+> [ predicates>cond satisfy ] <@ <|>
+    &>
+    "]" token <& ;
+
 : 'term'
     'any-char'
     'string' <|>
     'grouping' <|>
+    'character-class' <|>
     <+> [
         dup length 1 =
         [ first ] [ and-parser construct-boa ] if
     ] <@ ;
 
 : 'interval'
-    'term'
-    "{" token
-    'integer' <?> &>
-    "," token <?> <:&:>
-    'integer' <?> <:&:>
-    "}" token <& <&> [
-        first2 dup length {
-            { 1 [ first exactly-n ] }
-            { 2 [ first2 dup integer?
-                    [ nip at-most-n ]
-                    [ drop at-least-n ] if ] }
-            { 3 [ first3 nip from-m-to-n ] }
-        } case
-    ] <@ ;
-
-: 'character-range'
-    any-char-parser "-" token <& any-char-parser &> ;
-
-: 'character-class-inside'
-    any-char-parser
-    'character-range' <|> ;
-
-: 'character-class-inclusive'
-    "[" token
-    'character-class-inside'
-    "]" token ;
-
-: 'character-class-exclusive'
-    "[^" token
-    'character-class-inside'
-    "]" token ;
-
-: 'character-class'
-    'character-class-inclusive'
-    'character-class-exclusive' <|> ;
+    'term' "{" token <& 'integer' <&> "}" token <& [ first2 exactly-n ] <@
+    'term' "{" token <& 'integer' <&> "," token <& "}" token <&
+        [ first2 at-least-n ] <@ <|>
+    'term' "{" token <& "," token <& 'integer' <&> "}" token <&
+        [ first2 at-most-n ] <@ <|>
+    'term' "{" token <& 'integer' <&> "," token <& 'integer' <:&> "}" token <&
+        [ first3 from-m-to-n ] <@ <|> ;
 
 : 'repetition'
     'term'
@@ -112,7 +131,6 @@ LAZY: 'regexp' ( -- parser )
     'repetition' 'union' <|> ;
 
 : <regexp> 'regexp' just parse-1 ;
-
 
 GENERIC: >regexp ( obj -- parser )
 M: string >regexp 'regexp' just parse-1 ;

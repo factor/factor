@@ -29,6 +29,7 @@ IN: regexp-tests
 [ f ] [ "" "." matches? ] unit-test
 [ t ] [ "a" "." matches? ] unit-test
 [ t ] [ "." "." matches? ] unit-test
+[ f ] [ "\n" "." matches? ] unit-test
 
 [ f ] [ "" ".+" matches? ] unit-test
 [ t ] [ "a" ".+" matches? ] unit-test
@@ -74,4 +75,69 @@ IN: regexp-tests
 [ t ] [ "aa" "a{1,3}" matches? ] unit-test
 [ t ] [ "aaa" "a{1,3}" matches? ] unit-test
 [ f ] [ "aaaa" "a{1,3}" matches? ] unit-test
+
+[ f ] [ "" "[a]" matches? ] unit-test
+[ t ] [ "a" "[a]" matches? ] unit-test
+[ t ] [ "a" "[abc]" matches? ] unit-test
+[ f ] [ "b" "[a]" matches? ] unit-test
+[ f ] [ "d" "[abc]" matches? ] unit-test
+[ t ] [ "ab" "[abc]{1,2}" matches? ] unit-test
+[ f ] [ "abc" "[abc]{1,2}" matches? ] unit-test
+
+[ f ] [ "" "[^a]" matches? ] unit-test
+[ f ] [ "a" "[^a]" matches? ] unit-test
+[ f ] [ "a" "[^abc]" matches? ] unit-test
+[ t ] [ "b" "[^a]" matches? ] unit-test
+[ t ] [ "d" "[^abc]" matches? ] unit-test
+[ f ] [ "ab" "[^abc]{1,2}" matches? ] unit-test
+[ f ] [ "abc" "[^abc]{1,2}" matches? ] unit-test
+
+[ t ] [ "]" "[]]" matches? ] unit-test
+[ f ] [ "]" "[^]]" matches? ] unit-test
+
+[ "^" "[^]" matches? ] unit-test-fails
+[ t ] [ "^" "[]^]" matches? ] unit-test
+[ t ] [ "]" "[]^]" matches? ] unit-test
+
+[ t ] [ "[" "[[]" matches? ] unit-test
+[ f ] [ "^" "[^^]" matches? ] unit-test
+[ t ] [ "a" "[^^]" matches? ] unit-test
+
+[ t ] [ "-" "[-]" matches? ] unit-test
+[ f ] [ "a" "[-]" matches? ] unit-test
+[ f ] [ "-" "[^-]" matches? ] unit-test
+[ t ] [ "a" "[^-]" matches? ] unit-test
+
+[ t ] [ "-" "[-a]" matches? ] unit-test
+[ t ] [ "a" "[-a]" matches? ] unit-test
+[ t ] [ "-" "[a-]" matches? ] unit-test
+[ t ] [ "a" "[a-]" matches? ] unit-test
+[ f ] [ "b" "[a-]" matches? ] unit-test
+[ f ] [ "-" "[^-]" matches? ] unit-test
+[ t ] [ "a" "[^-]" matches? ] unit-test
+
+[ f ] [ "-" "[a-c]" matches? ] unit-test
+[ t ] [ "-" "[^a-c]" matches? ] unit-test
+[ t ] [ "b" "[a-c]" matches? ] unit-test
+[ f ] [ "b" "[^a-c]" matches? ] unit-test
+
+[ t ] [ "-" "[a-c-]" matches? ] unit-test
+[ f ] [ "-" "[^a-c-]" matches? ] unit-test
+
+[ t ] [ "\\" "[\\\\]" matches? ] unit-test
+[ f ] [ "a" "[\\\\]" matches? ] unit-test
+[ f ] [ "\\" "[^\\\\]" matches? ] unit-test
+[ t ] [ "a" "[^\\\\]" matches? ] unit-test
+
+[ t ] [ "0" "[\\d]" matches? ] unit-test
+[ f ] [ "a" "[\\d]" matches? ] unit-test
+[ f ] [ "0" "[^\\d]" matches? ] unit-test
+[ t ] [ "a" "[^\\d]" matches? ] unit-test
+
+[ t ] [ "a" "[a-z]{1,}|[A-Z]{2,4}|b*|c|(f|g)*" matches? ] unit-test
+[ t ] [ "a" "[a-z]{1,2}|[A-Z]{3,3}|b*|c|(f|g)*" matches? ] unit-test
+[ t ] [ "a" "[a-z]{1,2}|[A-Z]{3,3}" matches? ] unit-test
+
+[ t ] [ "1000" "\\d{4,6}" matches? ] unit-test
+! [ t ] [ "1000" "[0-9]{4,6}" matches? ] unit-test
 
