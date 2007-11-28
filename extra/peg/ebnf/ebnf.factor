@@ -8,6 +8,7 @@ TUPLE: ebnf-terminal symbol ;
 TUPLE: ebnf-choice options ;
 TUPLE: ebnf-sequence elements ;
 TUPLE: ebnf-repeat0 group ;
+TUPLE: ebnf-optional elements ;
 TUPLE: ebnf-rule symbol elements ;
 TUPLE: ebnf-action word ;
 TUPLE: ebnf rules ;
@@ -17,6 +18,7 @@ C: <ebnf-terminal> ebnf-terminal
 C: <ebnf-choice> ebnf-choice
 C: <ebnf-sequence> ebnf-sequence
 C: <ebnf-repeat0> ebnf-repeat0
+C: <ebnf-optional> ebnf-optional
 C: <ebnf-rule> ebnf-rule
 C: <ebnf-action> ebnf-action
 C: <ebnf> ebnf
@@ -30,7 +32,8 @@ M: ebnf-terminal ebnf-compile ( ast -- quot )
 
 M: ebnf-non-terminal ebnf-compile ( ast -- quot )
   [
-    ebnf-non-terminal-symbol , \ in , \ get , \ lookup , \ execute ,
+    [ ebnf-non-terminal-symbol , \ search , \ execute , ] [ ] make 
+    , \ delay ,
   ] [ ] make ;
 
 M: ebnf-choice ebnf-compile ( ast -- quot )
@@ -56,6 +59,11 @@ M: ebnf-sequence ebnf-compile ( ast -- quot )
 M: ebnf-repeat0 ebnf-compile ( ast -- quot )
   [
     ebnf-repeat0-group ebnf-compile % \ repeat0 , 
+  ] [ ] make ;
+
+M: ebnf-optional ebnf-compile ( ast -- quot )
+  [
+    ebnf-optional-elements ebnf-compile % \ optional , 
   ] [ ] make ;
 
 M: ebnf-rule ebnf-compile ( ast -- quot )
@@ -109,8 +117,14 @@ DEFER: 'choice'
   "}" token sp hide 
   3array seq [ first <ebnf-repeat0> ] action ;
 
+: 'optional' ( -- parser )
+  "[" token sp hide
+  [ 'choice' sp ] delay
+  "]" token sp hide 
+  3array seq [ first <ebnf-optional> ] action ;
+
 : 'sequence' ( -- parser )
-  'element' sp 'group' sp 'repeat0' sp 3array choice 
+  'element' sp 'group' sp 'repeat0' sp 'optional' sp 4array choice 
    repeat1 [ 
      dup length 1 = [ first ] [ <ebnf-sequence> ] if
    ] action ;  
