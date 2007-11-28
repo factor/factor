@@ -95,8 +95,16 @@ DEFER: 'rhs'
 : 'element' ( -- parser )
   'non-terminal' 'terminal' 2array choice ;
 
+DEFER: 'choice'
+
+: 'group' ( -- parser )
+  "(" token sp hide
+  [ 'choice' sp ] delay
+  ")" token sp hide 
+  3array seq [ first ] action ;
+
 : 'sequence' ( -- parser )
-  'element' sp 
+  'element' sp 'group' sp 2array choice 
    repeat1 [ 
      dup length 1 = [ first ] [ <ebnf-sequence> ] if
    ] action ;  
