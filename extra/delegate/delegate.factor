@@ -65,8 +65,8 @@ PROTOCOL: prettyprint-section-protocol
 
 : define-mimic ( group mimicker mimicked -- )
     >r >r group-words r> r> [
-        pick "methods" word-prop at method-def
-        <method> spin define-method
+        pick "methods" word-prop at
+        [ method-def <method> spin define-method ] [ 3drop ] if*
     ] 2curry each ; 
 
 : MIMIC:
