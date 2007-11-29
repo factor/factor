@@ -2,7 +2,7 @@ USING: assocs circular combinators continuations hashtables
 hashtables.private io kernel math
 namespaces prettyprint quotations sequences splitting
 state-parser strings ;
-USING: browser.parser ;
+USING: http.parser ;
 IN: http.parser.utils
 
 : string-parse-end?
