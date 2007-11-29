@@ -1,0 +1,385 @@
+<?xml version="1.0"?>
+
+<!DOCTYPE MODE SYSTEM "xmode.dtd">
+
+<!--
+	.NET CIL by Cullen Linn (linnc@cs.arizona.edu)
+    (pg102 or 198 of PartitionII)
+-->
+
+<MODE>
+
+	<PROPS>
+		<PROPERTY NAME="indentOpenBrackets" VALUE="{" />
+		<PROPERTY NAME="indentCloseBrackets" VALUE="}" />
+		<PROPERTY NAME="commentStart" VALUE="/*" />
+		<PROPERTY NAME="commentEnd" VALUE="*/" />
+		<PROPERTY NAME="lineComment" VALUE="//" />
+		<PROPERTY NAME="wordBreakChars" VALUE=",+\\" />
+	</PROPS>
+
+	<RULES HIGHLIGHT_DIGITS="TRUE" IGNORE_CASE="TRUE">
+
+		<SPAN TYPE="LITERAL1" NO_LINE_BREAK="TRUE">
+			<BEGIN>'</BEGIN>
+			<END>'</END>
+		</SPAN>
+
+        <EOL_SPAN TYPE="COMMENT2">//</EOL_SPAN>
+
+        <MARK_PREVIOUS TYPE="FUNCTION" MATCH_TYPE="OPERATOR">(</MARK_PREVIOUS>
+		<SEQ TYPE="OPERATOR">)</SEQ>
+
+		<SPAN TYPE="LITERAL1" NO_LINE_BREAK="TRUE">
+			<BEGIN>"</BEGIN>
+			<END>"</END>
+		</SPAN>
+
+		<MARK_PREVIOUS TYPE="LABEL" MATCH_TYPE="OPERATOR" AT_LINE_START="TRUE">:</MARK_PREVIOUS>
+
+		<KEYWORDS>
+        <KEYWORD1>public</KEYWORD1>
+            <KEYWORD1>private</KEYWORD1>
+            <KEYWORD1>family</KEYWORD1>
+            <KEYWORD1>assembly</KEYWORD1>
+            <KEYWORD1>famandassem</KEYWORD1>
+            <KEYWORD1>famorassem</KEYWORD1>
+            <KEYWORD1>autochar</KEYWORD1>
+            <KEYWORD1>abstract</KEYWORD1>
+            <KEYWORD1>ansi</KEYWORD1>
+            <KEYWORD1>beforefieldinit</KEYWORD1>
+            <KEYWORD1>explicit</KEYWORD1>
+            <KEYWORD1>interface</KEYWORD1>
+            <KEYWORD1>nested</KEYWORD1>
+            <KEYWORD1>rtspecialname</KEYWORD1>
+            <KEYWORD1>sealed</KEYWORD1>
+            <KEYWORD1>sequential</KEYWORD1>
+            <KEYWORD1>serializable</KEYWORD1>
+            <KEYWORD1>specialname</KEYWORD1>
+            <KEYWORD1>unicode</KEYWORD1>
+            <KEYWORD1>final</KEYWORD1>
+            <KEYWORD1>hidebysig</KEYWORD1>
+            <KEYWORD1>newslot</KEYWORD1>
+            <KEYWORD1>pinvokeimpl</KEYWORD1>
+            <KEYWORD1>static</KEYWORD1>
+            <KEYWORD1>virtual</KEYWORD1>
+            <KEYWORD1>cil</KEYWORD1>
+            <KEYWORD1>forwardref</KEYWORD1>
+            <KEYWORD1>internalcall</KEYWORD1>
+            <KEYWORD1>managed</KEYWORD1>
+            <KEYWORD1>native</KEYWORD1>
+            <KEYWORD1>noinlining</KEYWORD1>
+            <KEYWORD1>runtime</KEYWORD1>
+            <KEYWORD1>synchronized</KEYWORD1>
+            <KEYWORD1>unmanaged</KEYWORD1>
+            <KEYWORD1>typedref</KEYWORD1>
+            <KEYWORD1>cdecl</KEYWORD1>
+            <KEYWORD1>fastcall</KEYWORD1>
+            <KEYWORD1>stdcall</KEYWORD1>
+            <KEYWORD1>thiscall</KEYWORD1>
+            <KEYWORD1>platformapi</KEYWORD1>
+            <KEYWORD1>initonly</KEYWORD1>
+            <KEYWORD1>literal</KEYWORD1>
+            <KEYWORD1>marshal</KEYWORD1>
+            <KEYWORD1>notserialized</KEYWORD1>
+            <KEYWORD1>addon</KEYWORD1>
+            <KEYWORD1>removeon</KEYWORD1>
+            <KEYWORD1>catch</KEYWORD1>
+            <KEYWORD1>fault</KEYWORD1>
+            <KEYWORD1>filter</KEYWORD1>
+            <KEYWORD1>handler</KEYWORD1>
+
+            <!--Assembly Directives (Meta-Data)-->
+            <KEYWORD2>.assembly</KEYWORD2>
+            <KEYWORD2>.assembly extern</KEYWORD2>
+            <KEYWORD2>.class</KEYWORD2>
+            <KEYWORD2>.class extern</KEYWORD2>
+            <KEYWORD2>.field</KEYWORD2>
+            <KEYWORD2>.method</KEYWORD2>
+            <KEYWORD2>.property</KEYWORD2>
+            <KEYWORD2>.get</KEYWORD2>
+            <KEYWORD2>.set</KEYWORD2>
+            <KEYWORD2>.other</KEYWORD2>
+            <KEYWORD2>.ctor</KEYWORD2>
+            <KEYWORD2>.corflags</KEYWORD2>
+            <KEYWORD2>.custom</KEYWORD2>
+            <KEYWORD2>.data</KEYWORD2>
+            <KEYWORD2>.file</KEYWORD2>
+            <KEYWORD2>.mresource</KEYWORD2>
+            <KEYWORD2>.module</KEYWORD2>
+            <KEYWORD2>.module extern</KEYWORD2>
+            <KEYWORD2>.subsystem</KEYWORD2>
+            <KEYWORD2>.vtfixup</KEYWORD2>
+            <KEYWORD2>.publickeytoken</KEYWORD2>
+            <KEYWORD2>.ver</KEYWORD2>
+            <KEYWORD2>.hash algorithm</KEYWORD2>
+            <KEYWORD2>.culture</KEYWORD2>
+            <KEYWORD2>.namespace</KEYWORD2>
+            <KEYWORD2>.event</KEYWORD2>
+            <KEYWORD2>.fire</KEYWORD2>
+            <KEYWORD2>.override</KEYWORD2>
+            <KEYWORD2>.try</KEYWORD2>
+            <KEYWORD2>.catch</KEYWORD2>
+            <KEYWORD2>.finally</KEYWORD2>
+            <KEYWORD2>.locals</KEYWORD2>
+            <KEYWORD2>.maxstack</KEYWORD2>
+            <KEYWORD2>.entrypoint</KEYWORD2>
+            <KEYWORD2>.pack</KEYWORD2>
+            <KEYWORD2>.size</KEYWORD2>
+
+            <!--Implementation Specific Metadata-->
+            <KEYWORD2>.file alignment</KEYWORD2>
+            <KEYWORD2>.imagebase</KEYWORD2>
+            <KEYWORD2>.language</KEYWORD2>
+            <KEYWORD2>.namespace</KEYWORD2>
+
+
+            <KEYWORD3>string</KEYWORD3>
+            <KEYWORD3>object</KEYWORD3>
+            <KEYWORD3>bool</KEYWORD3>
+            <KEYWORD3>true</KEYWORD3>
+            <KEYWORD3>false</KEYWORD3>
+            <KEYWORD3>bytearray</KEYWORD3>
+            <KEYWORD3>char</KEYWORD3>
+            <KEYWORD3>float32</KEYWORD3>
+            <KEYWORD3>float64</KEYWORD3>
+            <KEYWORD3>int8</KEYWORD3>
+            <KEYWORD3>int16</KEYWORD3>
+            <KEYWORD3>int32</KEYWORD3>
+            <KEYWORD3>int64</KEYWORD3>
+            <KEYWORD3>nullref</KEYWORD3>
+
+
+            <OPERATOR>&amp;</OPERATOR>
+            <OPERATOR>*</OPERATOR>
+            <OPERATOR>}</OPERATOR>
+            <OPERATOR>{</OPERATOR>
+
+            <!--arithmetic opcodes-->
+            <FUNCTION>add</FUNCTION>
+            <FUNCTION>add.ovf</FUNCTION>
+            <FUNCTION>add.ovf.un</FUNCTION>
+            <FUNCTION>div</FUNCTION>
+            <FUNCTION>div.un</FUNCTION>
+            <FUNCTION>mul</FUNCTION>
+            <FUNCTION>mul.ovf</FUNCTION>
+            <FUNCTION>mul.ovf.un</FUNCTION>
+            <FUNCTION>sub</FUNCTION>
+            <FUNCTION>sub.ovf</FUNCTION>
+            <FUNCTION>sub.ovf.un</FUNCTION>
+
+            <!--logical-->
+            <FUNCTION>and</FUNCTION>
+            <FUNCTION>not</FUNCTION>
+            <FUNCTION>or</FUNCTION>
+            <FUNCTION>xor</FUNCTION>
+
+            <!--Branches-->
+            <FUNCTION>beq</FUNCTION>
+            <FUNCTION>beq.s</FUNCTION>
+            <FUNCTION>bge</FUNCTION>
+            <FUNCTION>bge.s</FUNCTION>
+            <FUNCTION>bge.un</FUNCTION>
+            <FUNCTION>bge.un.s</FUNCTION>
+            <FUNCTION>bgt</FUNCTION>
+            <FUNCTION>bgt.s</FUNCTION>
+            <FUNCTION>bgt.un</FUNCTION>
+            <FUNCTION>bgt.un.s</FUNCTION>
+            <FUNCTION>ble</FUNCTION>
+            <FUNCTION>ble.s</FUNCTION>
+            <FUNCTION>ble.un</FUNCTION>
+            <FUNCTION>ble.un.s</FUNCTION>
+            <FUNCTION>blt</FUNCTION>
+            <FUNCTION>blt.s</FUNCTION>
+            <FUNCTION>blt.un</FUNCTION>
+            <FUNCTION>blt.un.s</FUNCTION>
+            <FUNCTION>bne.un</FUNCTION>
+            <FUNCTION>bne.un.s</FUNCTION>
+            <FUNCTION>br</FUNCTION>
+            <FUNCTION>brfalse</FUNCTION>
+            <FUNCTION>brfalse.s</FUNCTION>
+            <FUNCTION>brtrue</FUNCTION>
+            <FUNCTION>brtrue.s</FUNCTION>
+            <FUNCTION>br.s</FUNCTION>
+
+            <!--Conversions-->
+            <FUNCTION>conv.i</FUNCTION>
+            <FUNCTION>conv.i1</FUNCTION>
+            <FUNCTION>conv.i2</FUNCTION>
+            <FUNCTION>conv.i4</FUNCTION>
+            <FUNCTION>conv.i8</FUNCTION>
+            <FUNCTION>conv.ovf.i</FUNCTION>
+            <FUNCTION>conv.ovf.i1</FUNCTION>
+            <FUNCTION>conv.ovf.i1.un</FUNCTION>
+            <FUNCTION>conv.ovf.i2</FUNCTION>
+            <FUNCTION>conv.ovf.i2.un</FUNCTION>
+            <FUNCTION>conv.ovf.i4</FUNCTION>
+            <FUNCTION>conv.ovf.i4.un</FUNCTION>
+            <FUNCTION>conv.ovf.i8</FUNCTION>
+            <FUNCTION>conv.ovf.i8.un</FUNCTION>
+            <FUNCTION>conv.ovf.i.un</FUNCTION>
+            <FUNCTION>conv.ovf.u</FUNCTION>
+            <FUNCTION>conv.ovf.u1</FUNCTION>
+            <FUNCTION>conv.ovf.u1.un</FUNCTION>
+            <FUNCTION>conv.ovf.u2</FUNCTION>
+            <FUNCTION>conv.ovf.u2.un</FUNCTION>
+            <FUNCTION>conv.ovf.u4</FUNCTION>
+            <FUNCTION>conv.ovf.u4.un</FUNCTION>
+            <FUNCTION>conv.ovf.u8</FUNCTION>
+            <FUNCTION>conv.ovf.u8.un</FUNCTION>
+            <FUNCTION>conv.ovf.u.un</FUNCTION>
+            <FUNCTION>conv.r4</FUNCTION>
+            <FUNCTION>conv.r8</FUNCTION>
+            <FUNCTION>conv.r.un</FUNCTION>
+            <FUNCTION>conv.u</FUNCTION>
+            <FUNCTION>conv.u1</FUNCTION>
+            <FUNCTION>conv.u2</FUNCTION>
+            <FUNCTION>conv.u4</FUNCTION>
+            <FUNCTION>conv.u8</FUNCTION>
+
+            <!--Loads and Stores-->
+            <FUNCTION>ldarg</FUNCTION>
+            <FUNCTION>ldarga</FUNCTION>
+            <FUNCTION>ldarga.s</FUNCTION>
+            <FUNCTION>ldarg.0</FUNCTION>
+            <FUNCTION>ldarg.1</FUNCTION>
+            <FUNCTION>ldarg.2</FUNCTION>
+            <FUNCTION>ldarg.3</FUNCTION>
+            <FUNCTION>ldarg.s</FUNCTION>
+            <FUNCTION>ldc.i4</FUNCTION>
+            <FUNCTION>ldc.i4.0</FUNCTION>
+            <FUNCTION>ldc.i4.1</FUNCTION>
+            <FUNCTION>ldc.i4.2</FUNCTION>
+            <FUNCTION>ldc.i4.3</FUNCTION>
+            <FUNCTION>ldc.i4.4</FUNCTION>
+            <FUNCTION>ldc.i4.5</FUNCTION>
+            <FUNCTION>ldc.i4.6</FUNCTION>
+            <FUNCTION>ldc.i4.7</FUNCTION>
+            <FUNCTION>ldc.i4.8</FUNCTION>
+            <FUNCTION>ldc.i4.m1</FUNCTION>
+            <FUNCTION>ldc.i4.s</FUNCTION>
+            <FUNCTION>ldc.i8</FUNCTION>
+            <FUNCTION>ldc.r4</FUNCTION>
+            <FUNCTION>ldc.r8</FUNCTION>
+            <FUNCTION>ldelema</FUNCTION>
+            <FUNCTION>ldelem.i</FUNCTION>
+            <FUNCTION>ldelem.i1</FUNCTION>
+            <FUNCTION>ldelem.i2</FUNCTION>
+            <FUNCTION>ldelem.i4</FUNCTION>
+            <FUNCTION>ldelem.i8</FUNCTION>
+            <FUNCTION>ldelem.r4</FUNCTION>
+            <FUNCTION>ldelem.r8</FUNCTION>
+            <FUNCTION>ldelem.ref</FUNCTION>
+            <FUNCTION>ldelem.u1</FUNCTION>
+            <FUNCTION>ldelem.u2</FUNCTION>
+            <FUNCTION>ldelem.u4</FUNCTION>
+            <FUNCTION>ldfld</FUNCTION>
+            <FUNCTION>ldflda</FUNCTION>
+            <FUNCTION>ldftn</FUNCTION>
+            <FUNCTION>ldind.i</FUNCTION>
+            <FUNCTION>ldind.i1</FUNCTION>
+            <FUNCTION>ldind.i2</FUNCTION>
+            <FUNCTION>ldind.i4</FUNCTION>
+            <FUNCTION>ldind.i8</FUNCTION>
+            <FUNCTION>ldind.r4</FUNCTION>
+            <FUNCTION>ldind.r8</FUNCTION>
+            <FUNCTION>ldind.ref</FUNCTION>
+            <FUNCTION>ldind.u1</FUNCTION>
+            <FUNCTION>ldind.u2</FUNCTION>
+            <FUNCTION>ldind.u4</FUNCTION>
+            <FUNCTION>ldlen</FUNCTION>
+            <FUNCTION>ldloc</FUNCTION>
+            <FUNCTION>ldloca</FUNCTION>
+            <FUNCTION>ldloca.s</FUNCTION>
+            <FUNCTION>ldloc.0</FUNCTION>
+            <FUNCTION>ldloc.1</FUNCTION>
+            <FUNCTION>ldloc.2</FUNCTION>
+            <FUNCTION>ldloc.3</FUNCTION>
+            <FUNCTION>ldloc.s</FUNCTION>
+            <FUNCTION>ldnull</FUNCTION>
+            <FUNCTION>ldobj</FUNCTION>
+            <FUNCTION>ldsfld</FUNCTION>
+            <FUNCTION>ldsflda</FUNCTION>
+            <FUNCTION>ldstr</FUNCTION>
+            <FUNCTION>ldtoken</FUNCTION>
+            <FUNCTION>ldvirtftn</FUNCTION>
+            <FUNCTION>starg</FUNCTION>
+            <FUNCTION>starg.s</FUNCTION>
+            <FUNCTION>stelem.i</FUNCTION>
+            <FUNCTION>stelem.i1</FUNCTION>
+            <FUNCTION>stelem.i2</FUNCTION>
+            <FUNCTION>stelem.i4</FUNCTION>
+            <FUNCTION>stelem.i8</FUNCTION>
+            <FUNCTION>stelem.r4</FUNCTION>
+            <FUNCTION>stelem.r8</FUNCTION>
+            <FUNCTION>stelem.ref</FUNCTION>
+            <FUNCTION>stfld</FUNCTION>
+            <FUNCTION>stind.i</FUNCTION>
+            <FUNCTION>stind.i1</FUNCTION>
+            <FUNCTION>stind.i2</FUNCTION>
+            <FUNCTION>stind.i4</FUNCTION>
+            <FUNCTION>stind.i8</FUNCTION>
+            <FUNCTION>stind.r4</FUNCTION>
+            <FUNCTION>stind.r8</FUNCTION>
+            <FUNCTION>stind.ref</FUNCTION>
+            <FUNCTION>stloc</FUNCTION>
+            <FUNCTION>stloc.0</FUNCTION>
+            <FUNCTION>stloc.1</FUNCTION>
+            <FUNCTION>stloc.2</FUNCTION>
+            <FUNCTION>stloc.3</FUNCTION>
+            <FUNCTION>stloc.s</FUNCTION>
+            <FUNCTION>stobj</FUNCTION>
+            <FUNCTION>stsfld</FUNCTION>
+
+            <FUNCTION>call</FUNCTION>
+            <FUNCTION>calli</FUNCTION>
+            <FUNCTION>callvirt</FUNCTION>
+            <FUNCTION>castclass</FUNCTION>
+            <FUNCTION>ceq</FUNCTION>
+            <FUNCTION>cgt</FUNCTION>
+            <FUNCTION>cgt.un</FUNCTION>
+            <FUNCTION>ckfinite</FUNCTION>
+            <FUNCTION>clt</FUNCTION>
+            <FUNCTION>clt.un</FUNCTION>
+            <FUNCTION>cpblk</FUNCTION>
+            <FUNCTION>cpobj</FUNCTION>
+
+            <FUNCTION>initblk</FUNCTION>
+            <FUNCTION>initobj</FUNCTION>
+            <FUNCTION>newarr</FUNCTION>
+            <FUNCTION>newobj</FUNCTION>
+
+            <FUNCTION>dup</FUNCTION>
+            <FUNCTION>endfilter</FUNCTION>
+            <FUNCTION>isinst</FUNCTION>
+            <FUNCTION>box</FUNCTION>
+            <FUNCTION>unbox</FUNCTION>
+            <FUNCTION>arglist</FUNCTION>
+            <FUNCTION>break</FUNCTION>
+            <FUNCTION>jmp</FUNCTION>
+            <FUNCTION>ret</FUNCTION>
+            <FUNCTION>leave</FUNCTION>
+            <FUNCTION>leave.s</FUNCTION>
+            <FUNCTION>localloc</FUNCTION>
+            <FUNCTION>mkrefany</FUNCTION>
+            <FUNCTION>neg</FUNCTION>
+            <FUNCTION>switch</FUNCTION>
+            <FUNCTION>nop</FUNCTION>
+            <FUNCTION>pop</FUNCTION>
+            <FUNCTION>refanytype</FUNCTION>
+            <FUNCTION>refanyval</FUNCTION>
+            <FUNCTION>rem</FUNCTION>
+            <FUNCTION>rem.un</FUNCTION>
+            <FUNCTION>throw</FUNCTION>
+            <FUNCTION>rethrow</FUNCTION>
+            <FUNCTION>endfinally</FUNCTION>
+            <FUNCTION>shl</FUNCTION>
+            <FUNCTION>shr</FUNCTION>
+            <FUNCTION>shr.un</FUNCTION>
+            <FUNCTION>sizeof</FUNCTION>
+            <FUNCTION>tailcall</FUNCTION>
+            <FUNCTION>unaligned</FUNCTION>
+            <FUNCTION>volatile</FUNCTION>
+		</KEYWORDS>
+	</RULES>
+</MODE>

@@ -1,0 +1,406 @@
+<?xml version="1.0"?>
+
+<!DOCTYPE MODE SYSTEM "xmode.dtd">
+
+<MODE>
+	<PROPS>
+		<PROPERTY NAME="lineComment" VALUE=";" />
+	</PROPS>
+	<RULES HIGHLIGHT_DIGITS="FALSE">
+
+		<SEQ TYPE="KEYWORD2" AT_LINE_START="TRUE" DELEGATE="pascal::MAIN">[code]</SEQ>
+
+		<SEQ TYPE="KEYWORD2" AT_LINE_START="TRUE">[Setup]</SEQ>
+		<SEQ TYPE="KEYWORD2" AT_LINE_START="TRUE">[Types]</SEQ>
+		<SEQ TYPE="KEYWORD2" AT_LINE_START="TRUE">[Components]</SEQ>
+		<SEQ TYPE="KEYWORD2" AT_LINE_START="TRUE">[Tasks]</SEQ>
+		<SEQ TYPE="KEYWORD2" AT_LINE_START="TRUE">[Dirs]</SEQ>
+		<SEQ TYPE="KEYWORD2" AT_LINE_START="TRUE">[Files]</SEQ>
+		<SEQ TYPE="KEYWORD2" AT_LINE_START="TRUE">[Icons]</SEQ>
+		<SEQ TYPE="KEYWORD2" AT_LINE_START="TRUE">[INI]</SEQ>
+		<SEQ TYPE="KEYWORD2" AT_LINE_START="TRUE">[InstallDelete]</SEQ>
+		<SEQ TYPE="KEYWORD2" AT_LINE_START="TRUE">[Languages]</SEQ>
+		<SEQ TYPE="KEYWORD2" AT_LINE_START="TRUE">[Messages]</SEQ>
+		<SEQ TYPE="KEYWORD2" AT_LINE_START="TRUE">[CustomMessages]</SEQ>
+		<SEQ TYPE="KEYWORD2" AT_LINE_START="TRUE">[LangOptions]</SEQ>
+		<SEQ TYPE="KEYWORD2" AT_LINE_START="TRUE">[Registry]</SEQ>
+		<SEQ TYPE="KEYWORD2" AT_LINE_START="TRUE">[Run]</SEQ>
+		<SEQ TYPE="KEYWORD2" AT_LINE_START="TRUE">[UninstallRun]</SEQ>
+		<SEQ TYPE="KEYWORD2" AT_LINE_START="TRUE">[UninstallDelete]</SEQ>
+
+		<!-- pre-processor directives -->
+		<EOL_SPAN TYPE="LITERAL4" DELEGATE="DIRECTIVE">#define </EOL_SPAN>
+		<EOL_SPAN TYPE="LITERAL4" DELEGATE="DIRECTIVE">#dim </EOL_SPAN>
+		<EOL_SPAN TYPE="LITERAL4" DELEGATE="DIRECTIVE">#undef </EOL_SPAN>
+		<EOL_SPAN TYPE="LITERAL4" DELEGATE="DIRECTIVE">#include </EOL_SPAN>
+		<EOL_SPAN TYPE="LITERAL4" DELEGATE="DIRECTIVE">#emit </EOL_SPAN>
+		<EOL_SPAN TYPE="LITERAL4" DELEGATE="DIRECTIVE">#expr </EOL_SPAN>
+		<EOL_SPAN TYPE="LITERAL4" DELEGATE="DIRECTIVE">#insert </EOL_SPAN>
+		<EOL_SPAN TYPE="LITERAL4" DELEGATE="DIRECTIVE">#append </EOL_SPAN>
+		<EOL_SPAN TYPE="LITERAL4" DELEGATE="DIRECTIVE">#if </EOL_SPAN>
+		<EOL_SPAN TYPE="LITERAL4" DELEGATE="DIRECTIVE">#elif </EOL_SPAN>
+		<EOL_SPAN TYPE="LITERAL4" DELEGATE="DIRECTIVE">#else </EOL_SPAN>
+		<EOL_SPAN TYPE="LITERAL4" DELEGATE="DIRECTIVE">#endif</EOL_SPAN>
+		<EOL_SPAN TYPE="LITERAL4" DELEGATE="DIRECTIVE">#ifexist </EOL_SPAN>
+		<EOL_SPAN TYPE="LITERAL4" DELEGATE="DIRECTIVE">#ifnexist </EOL_SPAN>
+		<EOL_SPAN TYPE="LITERAL4" DELEGATE="DIRECTIVE">#ifdef </EOL_SPAN>
+		<EOL_SPAN TYPE="LITERAL4" DELEGATE="DIRECTIVE">#for </EOL_SPAN>
+		<EOL_SPAN TYPE="LITERAL4" DELEGATE="DIRECTIVE">#sub </EOL_SPAN>
+		<EOL_SPAN TYPE="LITERAL4" DELEGATE="DIRECTIVE">#endsub</EOL_SPAN>
+		<EOL_SPAN TYPE="LITERAL4" DELEGATE="DIRECTIVE">#pragma </EOL_SPAN>
+		<EOL_SPAN TYPE="LITERAL4" DELEGATE="DIRECTIVE">#error </EOL_SPAN>
+		<SPAN TYPE="LITERAL4">
+			<BEGIN>{#</BEGIN>
+			<END>}</END>
+		</SPAN>
+
+		<MARK_FOLLOWING TYPE="LITERAL2">%</MARK_FOLLOWING>
+
+		<SPAN TYPE="LITERAL1" DELEGATE="STRING">
+			<BEGIN>"</BEGIN>
+			<END>"</END>
+		</SPAN>
+		<SPAN TYPE="LITERAL1" DELEGATE="STRING">
+			<BEGIN>'</BEGIN>
+			<END>'</END>
+		</SPAN>
+		<!-- variable -->
+		<SPAN TYPE="KEYWORD3">
+			<BEGIN>{</BEGIN>
+			<END>}</END>
+		</SPAN>
+
+		<EOL_SPAN TYPE="COMMENT1" AT_LINE_START="TRUE">;</EOL_SPAN>
+		<EOL_SPAN TYPE="COMMENT1" AT_LINE_START="TRUE">#</EOL_SPAN>
+
+		<!--
+		<MARK_PREVIOUS TYPE="KEYWORD1"
+			AT_LINE_START="TRUE" MATCH_TYPE="CONTEXT"">=</MARK_PREVIOUS>
+		-->
+
+		<KEYWORDS>
+			<!-- [Setup] -->
+			<!-- compiler -->
+			<KEYWORD1>Compression</KEYWORD1>
+			<KEYWORD1>DiskClusterSize</KEYWORD1>
+			<KEYWORD1>DiskSliceSize</KEYWORD1>
+			<KEYWORD1>DiskSpanning</KEYWORD1>
+			<KEYWORD1>Encryption</KEYWORD1>
+			<KEYWORD1>InternalCompressLevel</KEYWORD1>
+			<KEYWORD1>MergeDuplicateFiles</KEYWORD1>
+			<KEYWORD1>OutputBaseFilename</KEYWORD1>
+			<KEYWORD1>OutputDir</KEYWORD1>
+			<KEYWORD1>ReserveBytes</KEYWORD1>
+			<KEYWORD1>SlicesPerDisk</KEYWORD1>
+			<KEYWORD1>SolidCompression</KEYWORD1>
+			<KEYWORD1>SourceDir</KEYWORD1>
+			<KEYWORD1>UseSetupLdr</KEYWORD1>
+			<KEYWORD1>VersionInfoCompany</KEYWORD1>
+			<KEYWORD1>VersionInfoDescription</KEYWORD1>
+			<KEYWORD1>VersionInfoTextVersion</KEYWORD1>
+			<KEYWORD1>VersionInfoVersion</KEYWORD1>
+			<!-- installer, functional -->
+			<KEYWORD1>AllowCancelDuringInstall</KEYWORD1>
+			<KEYWORD1>AllowNoIcons</KEYWORD1>
+			<KEYWORD1>AllowRootDirectory</KEYWORD1>
+			<KEYWORD1>AllowUNCPath</KEYWORD1>
+			<KEYWORD1>AlwaysRestart</KEYWORD1>
+			<KEYWORD1>AlwaysShowComponentsList</KEYWORD1>
+			<KEYWORD1>AlwaysShowDirOnReadyPage</KEYWORD1>
+			<KEYWORD1>AlwaysShowGroupOnReadyPage</KEYWORD1>
+			<KEYWORD1>AlwaysUsePersonalGroup</KEYWORD1>
+			<KEYWORD1>AppendDefaultDirName</KEYWORD1>
+			<KEYWORD1>AppendDefaultGroupName</KEYWORD1>
+			<KEYWORD1>AppComments</KEYWORD1>
+			<KEYWORD1>AppContact</KEYWORD1>
+			<KEYWORD1>AppId</KEYWORD1>
+			<KEYWORD1>AppModifyPath</KEYWORD1>
+			<KEYWORD1>AppMutex</KEYWORD1>
+			<KEYWORD1>AppName</KEYWORD1>
+			<KEYWORD1>AppPublisher</KEYWORD1>
+			<KEYWORD1>AppPublisherURL</KEYWORD1>
+			<KEYWORD1>AppReadmeFile</KEYWORD1>
+			<KEYWORD1>AppSupportURL</KEYWORD1>
+			<KEYWORD1>AppUpdatesURL</KEYWORD1>
+			<KEYWORD1>AppVersion</KEYWORD1>
+			<KEYWORD1>AppVerName</KEYWORD1>
+			<KEYWORD1>ChangesAssociations</KEYWORD1>
+			<KEYWORD1>CreateAppDir</KEYWORD1>
+			<KEYWORD1>CreateUninstallRegKey</KEYWORD1>
+			<KEYWORD1>DefaultDirName</KEYWORD1>
+			<KEYWORD1>DefaultGroupName</KEYWORD1>
+			<KEYWORD1>DefaultUserInfoName</KEYWORD1>
+			<KEYWORD1>DefaultUserInfoOrg</KEYWORD1>
+			<KEYWORD1>DefaultUserInfoSerial</KEYWORD1>
+			<KEYWORD1>DirExistsWarning</KEYWORD1>
+			<KEYWORD1>DisableDirPage</KEYWORD1>
+			<KEYWORD1>DisableFinishedPage</KEYWORD1>
+			<KEYWORD1>DisableProgramGroupPage</KEYWORD1>
+			<KEYWORD1>DisableReadyMemo</KEYWORD1>
+			<KEYWORD1>DisableReadyPage</KEYWORD1>
+			<KEYWORD1>DisableStartupPrompt</KEYWORD1>
+			<KEYWORD1>EnableDirDoesntExistWarning</KEYWORD1>
+			<KEYWORD1>ExtraDiskSpaceRequired</KEYWORD1>
+			<KEYWORD1>InfoAfterFile</KEYWORD1>
+			<KEYWORD1>InfoBeforeFile</KEYWORD1>
+			<KEYWORD1>LanguageDetectionMethod</KEYWORD1>
+			<KEYWORD1>LicenseFile</KEYWORD1>
+			<KEYWORD1>MinVersion</KEYWORD1>
+			<KEYWORD1>OnlyBelowVersion</KEYWORD1>
+			<KEYWORD1>Password</KEYWORD1>
+			<KEYWORD1>PrivilegesRequired</KEYWORD1>
+			<KEYWORD1>RestartIfNeededByRun</KEYWORD1>
+			<KEYWORD1>ShowLanguageDialog</KEYWORD1>
+			<KEYWORD1>TimeStampRounding</KEYWORD1>
+			<KEYWORD1>TimeStampsInUTC</KEYWORD1>
+			<KEYWORD1>TouchDate</KEYWORD1>
+			<KEYWORD1>TouchTime</KEYWORD1>
+			<KEYWORD1>Uninstallable</KEYWORD1>
+			<KEYWORD1>UninstallDisplayIcon</KEYWORD1>
+			<KEYWORD1>UninstallDisplayName</KEYWORD1>
+			<KEYWORD1>UninstallFilesDir</KEYWORD1>
+			<KEYWORD1>UninstallLogMode</KEYWORD1>
+			<KEYWORD1>UninstallRestartComputer</KEYWORD1>
+			<KEYWORD1>UpdateUninstallLogAppName</KEYWORD1>
+			<KEYWORD1>UsePreviousAppDir</KEYWORD1>
+			<KEYWORD1>UsePreviousGroup</KEYWORD1>
+			<KEYWORD1>UsePreviousSetupType</KEYWORD1>
+			<KEYWORD1>UsePreviousTasks</KEYWORD1>
+			<KEYWORD1>UsePreviousUserInfo</KEYWORD1>
+			<KEYWORD1>UserInfoPage</KEYWORD1>
+			<!-- installer, cosmetic -->
+			<KEYWORD1>AppCopyright</KEYWORD1>
+			<KEYWORD1>BackColor</KEYWORD1>
+			<KEYWORD1>BackColor2</KEYWORD1>
+			<KEYWORD1>BackColorDirection</KEYWORD1>
+			<KEYWORD1>BackSolid</KEYWORD1>
+			<KEYWORD1>FlatComponentsList</KEYWORD1>
+			<KEYWORD1>SetupIconFile</KEYWORD1>
+			<KEYWORD1>ShowComponentSizes</KEYWORD1>
+			<KEYWORD1>ShowTasksTreeLines</KEYWORD1>
+			<KEYWORD1>UninstallStyle</KEYWORD1>
+			<KEYWORD1>WindowShowCaption</KEYWORD1>
+			<KEYWORD1>WindowStartMaximized</KEYWORD1>
+			<KEYWORD1>WindowResizable</KEYWORD1>
+			<KEYWORD1>WindowVisible</KEYWORD1>
+			<KEYWORD1>WizardImageBackColor</KEYWORD1>
+			<KEYWORD1>WizardImageFile</KEYWORD1>
+			<KEYWORD1>WizardImageStretch</KEYWORD1>
+			<KEYWORD1>WizardSmallImageBackColor</KEYWORD1>
+			<KEYWORD1>WizardSmallImageFile</KEYWORD1>
+			<KEYWORD1>UninstallIconFile</KEYWORD1>
+
+			<!-- parameters -->
+			<KEYWORD4>AfterInstall</KEYWORD4>
+			<KEYWORD4>Attribs</KEYWORD4>
+			<KEYWORD4>BeforeInstall</KEYWORD4>
+			<KEYWORD4>Check</KEYWORD4>
+			<KEYWORD4>Comment</KEYWORD4>
+			<KEYWORD4>Components</KEYWORD4>
+			<KEYWORD4>CopyMode</KEYWORD4>
+			<KEYWORD4>Description</KEYWORD4>
+			<KEYWORD4>DestDir</KEYWORD4>
+			<KEYWORD4>DestName</KEYWORD4>
+			<KEYWORD4>Excludes</KEYWORD4>
+			<KEYWORD4>ExtraDiskSpaceRequired</KEYWORD4>
+			<KEYWORD4>Filename</KEYWORD4>
+			<KEYWORD4>Flags</KEYWORD4>
+			<KEYWORD4>FontInstall</KEYWORD4>
+			<KEYWORD4>GroupDescription</KEYWORD4>
+			<KEYWORD4>HotKey</KEYWORD4>
+			<KEYWORD4>IconFilename</KEYWORD4>
+			<KEYWORD4>IconIndex</KEYWORD4>
+			<KEYWORD4>InfoBeforeFile</KEYWORD4>
+			<KEYWORD4>InfoAfterFile</KEYWORD4>
+			<KEYWORD4>Key</KEYWORD4>
+			<!--<KEYWORD4>LicenseFile</KEYWORD4>-->
+			<KEYWORD4>MessagesFile</KEYWORD4>
+			<KEYWORD4>Name</KEYWORD4>
+			<KEYWORD4>Parameters</KEYWORD4>
+			<KEYWORD4>Permissions</KEYWORD4>
+			<KEYWORD4>Root</KEYWORD4>
+			<KEYWORD4>RunOnceId</KEYWORD4>
+			<KEYWORD4>Section</KEYWORD4>
+			<KEYWORD4>Source</KEYWORD4>
+			<KEYWORD4>StatusMsg</KEYWORD4>
+			<KEYWORD4>String</KEYWORD4>
+			<KEYWORD4>Subkey</KEYWORD4>
+			<KEYWORD4>Tasks</KEYWORD4>
+			<KEYWORD4>Type</KEYWORD4>
+			<KEYWORD4>Types</KEYWORD4>
+			<KEYWORD4>ValueType</KEYWORD4>
+			<KEYWORD4>ValueName</KEYWORD4>
+			<KEYWORD4>ValueData</KEYWORD4>
+			<KEYWORD4>WorkingDir</KEYWORD4>
+
+			<!-- flags -->
+			<LITERAL3>allowunsafefiles</LITERAL3>
+			<LITERAL3>checkedonce</LITERAL3>
+			<LITERAL3>closeonexit</LITERAL3>
+			<LITERAL3>compact</LITERAL3>
+			<LITERAL3>comparetimestamp</LITERAL3>
+			<LITERAL3>confirmoverwrite</LITERAL3>
+			<LITERAL3>createkeyifdoesntexist</LITERAL3>
+			<LITERAL3>createonlyiffileexists</LITERAL3>
+			<LITERAL3>createvalueifdoesntexist</LITERAL3>
+			<LITERAL3>deleteafterinstall</LITERAL3>
+			<LITERAL3>deletekey</LITERAL3>
+			<LITERAL3>deletevalue</LITERAL3>
+			<LITERAL3>desktopicon</LITERAL3>
+			<LITERAL3>dirifempty</LITERAL3>
+			<LITERAL3>disablenouninstallwarning</LITERAL3>
+			<LITERAL3>dontcloseonexit</LITERAL3>
+			<LITERAL3>dontcopy</LITERAL3>
+			<LITERAL3>dontcreatekey</LITERAL3>
+			<LITERAL3>dontinheritcheck</LITERAL3>
+			<LITERAL3>dontverifychecksum</LITERAL3>
+			<LITERAL3>exclusive</LITERAL3>
+			<LITERAL3>external</LITERAL3>
+			<LITERAL3>files</LITERAL3>
+			<LITERAL3>filesandordirs</LITERAL3>
+			<LITERAL3>fixed</LITERAL3>
+			<LITERAL3>fontisnttruetype</LITERAL3>
+			<LITERAL3>full</LITERAL3>
+			<LITERAL3>ignoreversion</LITERAL3>
+			<LITERAL3>iscustom</LITERAL3>
+			<LITERAL3>isreadme</LITERAL3>
+			<LITERAL3>hidden</LITERAL3>
+			<LITERAL3>hidewizard</LITERAL3>
+			<LITERAL3>modify</LITERAL3>
+			<LITERAL3>nocompression</LITERAL3>
+			<LITERAL3>noencryption</LITERAL3>
+			<LITERAL3>noerror</LITERAL3>
+			<LITERAL3>noregerror</LITERAL3>
+			<LITERAL3>nowait</LITERAL3>
+			<LITERAL3>onlyifdestfileexists</LITERAL3>
+			<LITERAL3>onlyifdoesntexist</LITERAL3>
+			<LITERAL3>overwritereadonly</LITERAL3>
+			<LITERAL3>postinstall</LITERAL3>
+			<LITERAL3>preservestringtype</LITERAL3>
+			<LITERAL3>promptifolder</LITERAL3>
+			<LITERAL3>quicklaunchicon</LITERAL3>
+			<LITERAL3>read</LITERAL3>
+			<LITERAL3>readonly</LITERAL3>
+			<LITERAL3>readexec</LITERAL3>
+			<LITERAL3>recursesubdirs</LITERAL3>
+			<LITERAL3>regserver</LITERAL3>
+			<LITERAL3>regtypelib</LITERAL3>
+			<LITERAL3>replacesameversion</LITERAL3>
+			<LITERAL3>restart</LITERAL3>
+			<LITERAL3>restartreplace</LITERAL3>
+			<LITERAL3>runhidden</LITERAL3>
+			<LITERAL3>runmaximized</LITERAL3>
+			<LITERAL3>runminimized</LITERAL3>
+			<LITERAL3>sharedfile</LITERAL3>
+			<LITERAL3>shellexec</LITERAL3>
+			<LITERAL3>skipifnotsilent</LITERAL3>
+			<LITERAL3>skipifsilent</LITERAL3>
+			<LITERAL3>skipifdoesntexist</LITERAL3>
+			<LITERAL3>skipifsourcedoesntexist</LITERAL3>
+			<LITERAL3>sortfilesbyextension</LITERAL3>
+			<LITERAL3>system</LITERAL3>
+			<LITERAL3>touch</LITERAL3>
+			<LITERAL3>unchecked</LITERAL3>
+			<LITERAL3>uninsalwaysuninstall</LITERAL3>
+			<LITERAL3>uninsclearvalue</LITERAL3>
+			<LITERAL3>uninsdeleteentry</LITERAL3>
+			<LITERAL3>uninsdeletekey</LITERAL3>
+			<LITERAL3>uninsdeletekeyifempty</LITERAL3>
+			<LITERAL3>uninsdeletesection</LITERAL3>
+			<LITERAL3>uninsdeletesectionifempty</LITERAL3>
+			<LITERAL3>uninsdeletevalue</LITERAL3>
+			<LITERAL3>uninsneveruninstall</LITERAL3>
+			<LITERAL3>uninsremovereadonly</LITERAL3>
+			<LITERAL3>uninsrestartdelete</LITERAL3>
+			<LITERAL3>useapppaths</LITERAL3>
+			<LITERAL3>waituntilidle</LITERAL3>
+
+			<!-- registry root keys -->
+			<LITERAL3>HKCR</LITERAL3>
+			<LITERAL3>HKCU</LITERAL3>
+			<LITERAL3>HKLM</LITERAL3>
+			<LITERAL3>HKU</LITERAL3>
+			<LITERAL3>HKCC</LITERAL3>
+
+			<!-- registry value types -->
+			<LITERAL3>none</LITERAL3>
+			<LITERAL3>string</LITERAL3>
+			<LITERAL3>expandsz</LITERAL3>
+			<LITERAL3>multisz</LITERAL3>
+			<LITERAL3>dword</LITERAL3>
+			<LITERAL3>binary</LITERAL3>
+		</KEYWORDS>
+	</RULES>
+
+	<RULES SET="STRING" DEFAULT="LITERAL1" IGNORE_CASE="TRUE">
+		<!-- pre-processor constant -->
+		<SPAN TYPE="LITERAL4">
+			<BEGIN>{#</BEGIN>
+			<END>}</END>
+		</SPAN>
+		<!-- constant -->
+		<SPAN TYPE="KEYWORD3" DELEGATE="CONSTANT">
+			<BEGIN>{</BEGIN>
+			<END>}</END>
+		</SPAN>
+	</RULES>
+
+	<RULES SET="CONSTANT" DEFAULT="KEYWORD3">
+		<MARK_FOLLOWING TYPE="FUNCTION" MATCH_TYPE="CONTEXT">code:</MARK_FOLLOWING>
+		<SEQ TYPE="OPERATOR">|</SEQ>
+	</RULES>
+
+	<!-- pre-processor directives -->
+	<RULES SET="DIRECTIVE" DEFAULT="LITERAL4" IGNORE_CASE="TRUE">
+		<EOL_SPAN TYPE="COMMENT1">;</EOL_SPAN>
+
+		<SPAN TYPE="COMMENT2">
+			<BEGIN>/*</BEGIN>
+			<END>*/</END>
+		</SPAN>
+
+		<SPAN TYPE="LITERAL1">
+			<BEGIN>"</BEGIN>
+			<END>"</END>
+		</SPAN>
+
+		<!-- pre-processor defined functions -->
+		<KEYWORDS>
+			<FUNCTION>Defined</FUNCTION>
+			<FUNCTION>TypeOf</FUNCTION>
+			<FUNCTION>GetFileVersion</FUNCTION>
+			<FUNCTION>GetStringFileInfo</FUNCTION>
+			<FUNCTION>Int</FUNCTION>
+			<FUNCTION>Str</FUNCTION>
+			<FUNCTION>FileExists</FUNCTION>
+			<FUNCTION>FileSize</FUNCTION>
+			<FUNCTION>ReadIni</FUNCTION>
+			<FUNCTION>WriteIni</FUNCTION>
+			<FUNCTION>ReadReg</FUNCTION>
+			<FUNCTION>Exec</FUNCTION>
+			<FUNCTION>Copy</FUNCTION>
+			<FUNCTION>Pos</FUNCTION>
+			<FUNCTION>RPos</FUNCTION>
+			<FUNCTION>Len</FUNCTION>
+			<FUNCTION>SaveToFile</FUNCTION>
+			<FUNCTION>Find</FUNCTION>
+			<FUNCTION>SetupSetting</FUNCTION>
+			<FUNCTION>SetSetupSetting</FUNCTION>
+			<FUNCTION>LowerCase</FUNCTION>
+			<FUNCTION>EntryCount</FUNCTION>
+			<FUNCTION>GetEnv</FUNCTION>
+			<FUNCTION>DeleteFile</FUNCTION>
+			<FUNCTION>CopyFile</FUNCTION>
+			<FUNCTION>FindFirst</FUNCTION>
+			<FUNCTION>FindNext</FUNCTION>
+			<FUNCTION>FindClose</FUNCTION>
+			<FUNCTION>FindGetFileName</FUNCTION>
+			<FUNCTION>FileOpen</FUNCTION>
+			<FUNCTION>FileRead</FUNCTION>
+			<FUNCTION>FileReset</FUNCTION>
+			<FUNCTION>FileEof</FUNCTION>
+			<FUNCTION>FileClose</FUNCTION>
+		</KEYWORDS>
+	</RULES>
+</MODE>
+

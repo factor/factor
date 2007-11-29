@@ -1,0 +1,145 @@
+<?xml version="1.0"?>
+
+<!DOCTYPE MODE SYSTEM "xmode.dtd">
+
+<!-- S# mode, by Barry Carr (Ixian Software Components Ltd)
+     based on Marcio Marchini mqm@magma.ca Smalltalk mode -->
+
+<MODE>
+	<PROPS>
+        <PROPERTY NAME="lineComment" VALUE="#" />
+		<PROPERTY NAME="commentStart" VALUE="&quot;" />
+		<PROPERTY NAME="commentEnd" VALUE="&quot;" />
+		<PROPERTY NAME="indentOpenBrackets" VALUE="[" />
+		<PROPERTY NAME="indentCloseBrackets" VALUE="]" />
+
+	</PROPS>
+	<RULES ESCAPE="\" IGNORE_CASE="FALSE" HIGHLIGHT_DIGITS="TRUE">
+		<!-- Standard literals -->
+		<SPAN TYPE="LITERAL1" NO_LINE_BREAK="FALSE">
+			<BEGIN>'</BEGIN>
+			<END>'</END>
+		</SPAN>
+
+        <EOL_SPAN TYPE="COMMENT3">#</EOL_SPAN>
+        <EOL_SPAN TYPE="COMMENT2">""</EOL_SPAN>
+
+		<SPAN TYPE="COMMENT1">
+			<BEGIN>"</BEGIN>
+			<END>"</END>
+		</SPAN>
+
+        <SPAN TYPE="LITERAL2" >
+            <BEGIN>«</BEGIN>
+            <END>»</END>
+        </SPAN>
+
+        <SEQ TYPE="OPERATOR">(</SEQ>
+        <SEQ TYPE="OPERATOR">)</SEQ>
+        <SEQ TYPE="OPERATOR">{</SEQ>
+        <SEQ TYPE="OPERATOR">}</SEQ>
+		<SEQ TYPE="OPERATOR">:=</SEQ>
+		<SEQ TYPE="OPERATOR">_</SEQ>
+		<SEQ TYPE="OPERATOR">=</SEQ>
+		<SEQ TYPE="OPERATOR">==</SEQ>
+		<SEQ TYPE="OPERATOR">&gt;</SEQ>
+		<SEQ TYPE="OPERATOR">&lt;</SEQ>
+		<SEQ TYPE="OPERATOR">&gt;=</SEQ>
+		<SEQ TYPE="OPERATOR">&lt;=</SEQ>
+		<SEQ TYPE="OPERATOR">+</SEQ>
+		<SEQ TYPE="OPERATOR">-</SEQ>
+		<SEQ TYPE="OPERATOR">/</SEQ>
+        <SEQ TYPE="OPERATOR">//</SEQ>
+        <SEQ TYPE="OPERATOR">\\</SEQ>
+		<SEQ TYPE="OPERATOR">*</SEQ>
+        <SEQ TYPE="OPERATOR">**</SEQ>
+        <SEQ TYPE="OPERATOR">#</SEQ>
+        <SEQ TYPE="OPERATOR">^</SEQ>
+        <SEQ TYPE="OPERATOR">^^</SEQ>
+        <SEQ TYPE="OPERATOR">;</SEQ>
+        <SEQ TYPE="OPERATOR">.</SEQ>
+        <SEQ TYPE="OPERATOR">-&gt;</SEQ>
+        <SEQ TYPE="OPERATOR">&amp;&amp;</SEQ>
+        <SEQ TYPE="OPERATOR">||</SEQ>
+        <SEQ TYPE="OPERATOR">^|</SEQ>
+        <SEQ TYPE="OPERATOR">!=</SEQ>
+        <SEQ TYPE="OPERATOR">~=</SEQ>
+        <SEQ TYPE="OPERATOR">!==</SEQ>
+        <SEQ TYPE="OPERATOR">~~</SEQ>
+
+		<MARK_PREVIOUS TYPE="KEYWORD3" MATCH_TYPE="OPERATOR">:</MARK_PREVIOUS>
+		<MARK_FOLLOWING TYPE="LABEL" MATCH_TYPE="OPERATOR">#</MARK_FOLLOWING>
+		<MARK_FOLLOWING TYPE="LITERAL1" MATCH_TYPE="OPERATOR">$</MARK_FOLLOWING>
+
+		<KEYWORDS>
+			<!-- Constants -->
+            <KEYWORD1>disable</KEYWORD1>
+            <KEYWORD1>enable</KEYWORD1>
+            <KEYWORD1>no</KEYWORD1>
+            <KEYWORD1>off</KEYWORD1>
+            <KEYWORD1>on</KEYWORD1>
+			<KEYWORD1>yes</KEYWORD1>
+
+			<!-- Reserved identifiers -->
+			<KEYWORD2>self</KEYWORD2>
+			<KEYWORD2>true</KEYWORD2>
+            <KEYWORD2>false</KEYWORD2>
+            <KEYWORD2>nil</KEYWORD2>
+            <KEYWORD2>super</KEYWORD2>
+            <KEYWORD2>thread</KEYWORD2>
+            <KEYWORD2>sender</KEYWORD2>
+            <KEYWORD2>senderMethod</KEYWORD2>
+            <KEYWORD2>blockSelf</KEYWORD2>
+            <KEYWORD2>scheduler</KEYWORD2>
+            <KEYWORD2>¼</KEYWORD2>
+
+			<!-- not really keywords, but a different color works well-->
+			<KEYWORD4>isNil</KEYWORD4>
+			<KEYWORD4>not</KEYWORD4>
+
+			<!-- not really -->
+			<LITERAL2>Smalltalk</LITERAL2>
+			<LITERAL2>Transcript</LITERAL2>
+
+			<!-- base classes -->
+			<LITERAL2>Date</LITERAL2>
+			<LITERAL2>Time</LITERAL2>
+			<LITERAL2>Boolean</LITERAL2>
+			<LITERAL2>True</LITERAL2>
+			<LITERAL2>False</LITERAL2>
+			<LITERAL2>Character</LITERAL2>
+			<LITERAL2>String</LITERAL2>
+			<LITERAL2>Array</LITERAL2>
+			<LITERAL2>Symbol</LITERAL2>
+			<LITERAL2>Integer</LITERAL2>
+			<LITERAL2>Object</LITERAL2>
+
+            <LITERAL3>Application</LITERAL3>
+            <LITERAL3>Category</LITERAL3>
+            <LITERAL3>Class</LITERAL3>
+            <LITERAL3>Compiler</LITERAL3>
+            <LITERAL3>EntryPoint</LITERAL3>
+            <LITERAL3>Enum</LITERAL3>
+            <LITERAL3>Eval</LITERAL3>
+            <LITERAL3>Exception</LITERAL3>
+            <LITERAL3>Function</LITERAL3>
+            <LITERAL3>IconResource</LITERAL3>
+            <LITERAL3>Interface</LITERAL3>
+            <LITERAL3>Literal</LITERAL3>
+            <LITERAL3>Namespace</LITERAL3>
+            <LITERAL3>Method</LITERAL3>
+            <LITERAL3>Mixin</LITERAL3>
+            <LITERAL3>Module</LITERAL3>
+            <LITERAL3>Project</LITERAL3>
+            <LITERAL3>Reference</LITERAL3>
+            <LITERAL3>Require</LITERAL3>
+            <LITERAL3>Resource</LITERAL3>
+            <LITERAL3>Signal</LITERAL3>
+            <LITERAL3>Struct</LITERAL3>
+            <LITERAL3>Subsystem</LITERAL3>
+            <LITERAL3>Specifications</LITERAL3>
+            <LITERAL3>Warning</LITERAL3>
+
+		</KEYWORDS>
+	</RULES>
+</MODE>

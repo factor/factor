@@ -1,0 +1,195 @@
+<?xml version="1.0"?>
+
+<!DOCTYPE MODE SYSTEM "xmode.dtd">
+
+<!--	jEdit Prolog syntax file
+	based on the INRIA ISO Prolog web page @ http://pauillac.inria.fr/~hodgson/prolog
+
+	written by	Giulio Piancastelli
+	version		1.0
+	created on	31st December 2001
+	last revised	19th November 2002
+-->
+
+<MODE>
+	<PROPS>
+		<PROPERTY NAME="lineComment" VALUE="%" />
+		<PROPERTY NAME="commentStart" VALUE="/*" />
+		<PROPERTY NAME="commentEnd" VALUE="*/" />
+	</PROPS>
+	<RULES ESCAPE="\" IGNORE_CASE="FALSE" HIGHLIGHT_DIGITS="TRUE">
+	
+		<!-- Comments -->
+		<EOL_SPAN TYPE="COMMENT1">%</EOL_SPAN>
+		<!--- ISO compliant C-style comments -->
+		<SPAN TYPE="COMMENT1">
+			<BEGIN>/*</BEGIN>
+			<END>*/</END>
+		</SPAN>
+		
+		<!-- String literals -->
+		<SPAN TYPE="LITERAL1" NO_LINE_BREAK="TRUE">
+			<BEGIN>'</BEGIN>
+			<END>'</END>
+		</SPAN>
+		<SPAN TYPE="LITERAL1" NO_LINE_BREAK="TRUE">
+			<BEGIN>"</BEGIN>
+			<END>"</END>
+		</SPAN>
+		
+		<!-- List literals -->
+		<SPAN TYPE="LITERAL2" NO_LINE_BREAK="TRUE" DELEGATE="LIST">
+			<BEGIN>[</BEGIN>
+			<END>]</END>
+		</SPAN>
+		
+		<!-- Operators -->
+		<SEQ TYPE="OPERATOR">--&gt;</SEQ>
+		<SEQ TYPE="OPERATOR">:-</SEQ>
+		<SEQ TYPE="OPERATOR">?-</SEQ>
+		<SEQ TYPE="OPERATOR">;</SEQ>
+		<SEQ TYPE="OPERATOR">-&gt;</SEQ>
+		<SEQ TYPE="OPERATOR">,</SEQ>
+		<SEQ TYPE="OPERATOR">\+</SEQ> <!-- ISO Prolog uses it instead of 'not' -->
+		<SEQ TYPE="OPERATOR">==</SEQ>
+		<SEQ TYPE="OPERATOR">\==</SEQ>
+		<SEQ TYPE="OPERATOR">\=</SEQ>
+		<SEQ TYPE="OPERATOR">@&lt;</SEQ>
+		<SEQ TYPE="OPERATOR">@=&lt;</SEQ>
+		<SEQ TYPE="OPERATOR">@&gt;=</SEQ>
+		<SEQ TYPE="OPERATOR">@&gt;</SEQ>
+		<SEQ TYPE="OPERATOR">=..</SEQ>
+		<SEQ TYPE="OPERATOR">=:=</SEQ>
+		<SEQ TYPE="OPERATOR">=\=</SEQ>
+		<SEQ TYPE="OPERATOR">=&lt;</SEQ>
+		<SEQ TYPE="OPERATOR">&gt;=</SEQ>
+		<SEQ TYPE="OPERATOR">+</SEQ>
+		<SEQ TYPE="OPERATOR">-</SEQ>
+		<SEQ TYPE="OPERATOR">/\</SEQ>
+		<SEQ TYPE="OPERATOR">\/</SEQ>
+		<SEQ TYPE="OPERATOR">//</SEQ>
+		<SEQ TYPE="OPERATOR">&lt;&lt;</SEQ>
+		<SEQ TYPE="OPERATOR">&lt;</SEQ>
+		<SEQ TYPE="OPERATOR">&gt;&gt;</SEQ>
+		<SEQ TYPE="OPERATOR">&gt;</SEQ>
+		<SEQ TYPE="OPERATOR">**</SEQ>
+		<SEQ TYPE="OPERATOR">^</SEQ>
+		<SEQ TYPE="OPERATOR">\</SEQ>
+		<SEQ TYPE="OPERATOR">/</SEQ>
+		<SEQ TYPE="OPERATOR">=</SEQ>
+		<SEQ TYPE="OPERATOR">*</SEQ>
+		
+		<!-- The '.' at the end of each clause -->
+		<SEQ TYPE="OPERATOR">.</SEQ>
+		
+		<!-- Parentheses -->
+		<SEQ TYPE="MARKUP">(</SEQ>
+		<SEQ TYPE="MARKUP">)</SEQ>
+		<SEQ TYPE="NULL">{</SEQ>
+		<SEQ TYPE="NULL">}</SEQ>
+		
+		<KEYWORDS>
+		
+			<!-- Keywords that are 0 arity built-in predicates -->
+			<KEYWORD1>true</KEYWORD1>
+			<KEYWORD1>fail</KEYWORD1>
+			<KEYWORD1>!</KEYWORD1> <!-- cut -->
+			<KEYWORD1>at_end_of_stream</KEYWORD1>
+			<KEYWORD1>nl</KEYWORD1>
+			<KEYWORD1>repeat</KEYWORD1>
+			<KEYWORD1>halt</KEYWORD1>
+			
+			<!-- Keywords that are built-in predicates with arity greater than or equal to 1 -->
+			<FUNCTION>call</FUNCTION>
+			<FUNCTION>catch</FUNCTION>
+			<FUNCTION>throw</FUNCTION>
+			<FUNCTION>unify_with_occurs_check</FUNCTION>
+			<FUNCTION>var</FUNCTION>
+			<FUNCTION>atom</FUNCTION>
+			<FUNCTION>integer</FUNCTION>
+			<FUNCTION>float</FUNCTION>
+			<FUNCTION>atomic</FUNCTION>
+			<FUNCTION>compound</FUNCTION>
+			<FUNCTION>nonvar</FUNCTION>
+			<FUNCTION>number</FUNCTION>
+			<FUNCTION>functor</FUNCTION>
+			<FUNCTION>arg</FUNCTION>
+			<FUNCTION>copy_term</FUNCTION>
+			<FUNCTION>clause</FUNCTION>
+			<FUNCTION>current_predicate</FUNCTION>
+			<FUNCTION>asserta</FUNCTION>
+			<FUNCTION>assertz</FUNCTION>
+			<FUNCTION>retract</FUNCTION>
+			<FUNCTION>abolish</FUNCTION>
+			<FUNCTION>findall</FUNCTION>
+			<FUNCTION>bagof</FUNCTION>
+			<FUNCTION>setof</FUNCTION>
+			<FUNCTION>current_input</FUNCTION>
+			<FUNCTION>current_output</FUNCTION>
+			<FUNCTION>set_input</FUNCTION>
+			<FUNCTION>set_output</FUNCTION>
+			<FUNCTION>open</FUNCTION>
+			<FUNCTION>close</FUNCTION>
+			<FUNCTION>stream_property</FUNCTION>
+			<FUNCTION>at_end_of_stream</FUNCTION> <!-- arity 1 -->
+			<FUNCTION>set_stream_position</FUNCTION>
+			<FUNCTION>get_char</FUNCTION>
+			<FUNCTION>get_code</FUNCTION>
+			<FUNCTION>peek_char</FUNCTION>
+			<FUNCTION>peek_code</FUNCTION>
+			<FUNCTION>put_char</FUNCTION>
+			<FUNCTION>put_code</FUNCTION>
+			<FUNCTION>nl</FUNCTION> <!-- arity 1 -->
+			<FUNCTION>get_byte</FUNCTION>
+			<FUNCTION>peek_byte</FUNCTION>
+			<FUNCTION>put_byte</FUNCTION>
+			<FUNCTION>read_term</FUNCTION>
+			<FUNCTION>read</FUNCTION>
+			<FUNCTION>write_term</FUNCTION>
+			<FUNCTION>write</FUNCTION>
+			<FUNCTION>writeq</FUNCTION>
+			<FUNCTION>write_canonical</FUNCTION>
+			<FUNCTION>op</FUNCTION>
+			<FUNCTION>current_op</FUNCTION>
+			<FUNCTION>char_conversion</FUNCTION>
+			<FUNCTION>current_char_conversion</FUNCTION>
+			<FUNCTION>once</FUNCTION>
+			<FUNCTION>atom_length</FUNCTION>
+			<FUNCTION>atom_concat</FUNCTION>
+			<FUNCTION>sub_atom</FUNCTION>
+			<FUNCTION>atom_chars</FUNCTION>
+			<FUNCTION>atom_codes</FUNCTION>
+			<FUNCTION>char_code</FUNCTION>
+			<FUNCTION>number_chars</FUNCTION>
+			<FUNCTION>number_codes</FUNCTION>
+			<FUNCTION>set_prolog_flag</FUNCTION>
+			<FUNCTION>current_prolog_flag</FUNCTION>
+			<FUNCTION>halt</FUNCTION> <!-- arity 1 -->
+			
+			<!-- Mathematical functions -->
+			<FUNCTION>sin</FUNCTION>
+			<FUNCTION>cos</FUNCTION>
+			<FUNCTION>atan</FUNCTION>
+			<FUNCTION>exp</FUNCTION>
+			<FUNCTION>log</FUNCTION>
+			<FUNCTION>sqrt</FUNCTION>
+			
+			<!-- Keywords that should be operators -->
+			<KEYWORD2>is</KEYWORD2>
+			<KEYWORD2>rem</KEYWORD2>
+			<KEYWORD2>mod</KEYWORD2>
+			
+			<!-- Singleton variable -->
+			<KEYWORD3>_</KEYWORD3>
+			
+		</KEYWORDS>
+		
+	</RULES>
+
+	<RULES SET="LIST" DEFAULT="LITERAL2">
+		<SPAN TYPE="LITERAL2" NO_LINE_BREAK="TRUE" DELEGATE="LIST">
+			<BEGIN>[</BEGIN>
+			<END>]</END>
+		</SPAN>
+	</RULES>
+</MODE>

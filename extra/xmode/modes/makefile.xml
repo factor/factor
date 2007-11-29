@@ -1,0 +1,101 @@
+<?xml version="1.0"?>
+
+<!DOCTYPE MODE SYSTEM "xmode.dtd">
+
+<MODE>
+	<PROPS>
+		<PROPERTY NAME="lineComment" VALUE="#" />
+	</PROPS>
+	<RULES ESCAPE="\" IGNORE_CASE="FALSE" HIGHLIGHT_DIGITS="TRUE">
+		<!-- Comment -->
+		<EOL_SPAN TYPE="COMMENT1">#</EOL_SPAN>
+
+		<!-- Function calls -->
+		<SPAN_REGEXP TYPE="FUNCTION" HASH_CHAR="$" DELEGATE="MAIN">
+			<BEGIN>\$\([a-zA-Z][\w-]* </BEGIN>
+			<END>)</END>
+		</SPAN_REGEXP>
+
+		<!-- $(...) variables -->
+		<SPAN TYPE="KEYWORD2" NO_LINE_BREAK="TRUE" DELEGATE="VARIABLE">
+			<BEGIN>$(</BEGIN>
+			<END>)</END>
+		</SPAN>
+		<SPAN TYPE="KEYWORD2" NO_LINE_BREAK="TRUE" DELEGATE="VARIABLE">
+			<BEGIN>${</BEGIN>
+			<END>}</END>
+		</SPAN>
+
+		<MARK_FOLLOWING TYPE="KEYWORD2">$</MARK_FOLLOWING>
+
+		<!-- Literals -->
+		<SPAN TYPE="LITERAL1" NO_LINE_BREAK="TRUE">
+			<BEGIN>"</BEGIN>
+			<END>"</END>
+		</SPAN>
+		<SPAN TYPE="LITERAL1" NO_LINE_BREAK="TRUE">
+			<BEGIN>'</BEGIN>
+			<END>'</END>
+		</SPAN>
+		<SPAN TYPE="LITERAL1" NO_LINE_BREAK="TRUE">
+			<BEGIN>`</BEGIN>
+			<END>`</END>
+		</SPAN>
+
+		<SEQ TYPE="OPERATOR">=</SEQ>
+		<SEQ TYPE="OPERATOR">:=</SEQ>
+		<SEQ TYPE="OPERATOR">+=</SEQ>
+		<SEQ TYPE="OPERATOR">?=</SEQ>
+
+		<MARK_PREVIOUS TYPE="LABEL" AT_LINE_START="TRUE">:</MARK_PREVIOUS>
+
+		<KEYWORDS>
+			<KEYWORD1>subst</KEYWORD1>
+			<KEYWORD1>addprefix</KEYWORD1>
+			<KEYWORD1>addsuffix</KEYWORD1>
+			<KEYWORD1>basename</KEYWORD1>
+			<KEYWORD1>dir</KEYWORD1>
+			<KEYWORD1>filter</KEYWORD1>
+			<KEYWORD1>filter-out</KEYWORD1>
+			<KEYWORD1>findstring</KEYWORD1>
+			<KEYWORD1>firstword</KEYWORD1>
+			<KEYWORD1>foreach</KEYWORD1>
+			<KEYWORD1>join</KEYWORD1>
+			<KEYWORD1>notdir</KEYWORD1>
+			<KEYWORD1>origin</KEYWORD1>
+			<KEYWORD1>patsubst</KEYWORD1>
+			<KEYWORD1>shell</KEYWORD1>
+			<KEYWORD1>sort</KEYWORD1>
+			<KEYWORD1>strip</KEYWORD1>
+			<KEYWORD1>suffix</KEYWORD1>
+			<KEYWORD1>wildcard</KEYWORD1>
+			<KEYWORD1>word</KEYWORD1>
+			<KEYWORD1>words</KEYWORD1>
+			<KEYWORD1>ifeq</KEYWORD1>
+            <KEYWORD1>ifneq</KEYWORD1>
+            <KEYWORD1>else</KEYWORD1>
+            <KEYWORD1>endif</KEYWORD1>
+            <KEYWORD1>define</KEYWORD1>
+            <KEYWORD1>endef</KEYWORD1>
+            <KEYWORD1>ifdef</KEYWORD1>
+            <KEYWORD1>ifndef</KEYWORD1>
+		</KEYWORDS>
+
+	</RULES>
+
+	<RULES SET="VARIABLE" ESCAPE="\" IGNORE_CASE="FALSE"
+		DEFAULT="KEYWORD2">
+		<!-- Comment -->
+		<EOL_SPAN TYPE="COMMENT1">#</EOL_SPAN>
+
+		<!-- $(...) variables -->
+		<SPAN TYPE="KEYWORD2" NO_LINE_BREAK="TRUE" DELEGATE="VARIABLE">
+			<BEGIN>$(</BEGIN>
+			<END>)</END>
+		</SPAN>
+		<SPAN TYPE="KEYWORD2" NO_LINE_BREAK="TRUE" DELEGATE="VARIABLE">
+			<BEGIN>${</BEGIN>
+			<END>}</END>
+		</SPAN>
+	</RULES>
+</MODE>

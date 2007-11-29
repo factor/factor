@@ -1,0 +1,134 @@
+<?xml version="1.0"?>
+
+<!DOCTYPE MODE SYSTEM "xmode.dtd">
+
+<!-- CHILL mode by Rudolf Widmann (Rudi.Widmann@web.de)
+     CHILL = "CCITT High Level Programming Language" used for telecommunication programming
+     Pascal was used as reference.
+     Keywords   = KEYWORD1
+     Directives = KEYWORD2.
+     Everything else as is-->
+<MODE>
+    <PROPS>
+        <PROPERTY NAME="commentStart" VALUE="/*" />
+        <PROPERTY NAME="commentEnd" VALUE="*/" />
+    </PROPS>
+
+    <RULES IGNORE_CASE="FALSE" HIGHLIGHT_DIGITS="TRUE">
+
+        <!-- Compiler directives. -->
+        <SPAN TYPE="COMMENT2">
+            <BEGIN>&lt;&gt;</BEGIN>
+            <END>&lt;&gt;</END>
+        </SPAN>
+        <!-- Normal comments. -->
+        <SPAN TYPE="COMMENT1">
+            <BEGIN>/*</BEGIN>
+            <END>*/</END>
+        </SPAN>
+
+        <SPAN TYPE="LITERAL1" NO_LINE_BREAK="TRUE">
+            <BEGIN>'</BEGIN>
+            <END>'</END>
+        </SPAN>
+        <SPAN TYPE="LITERAL1" NO_LINE_BREAK="TRUE">
+            <BEGIN>H'</BEGIN>
+            <END>;</END>
+        </SPAN>
+
+        <SEQ TYPE="OPERATOR">)</SEQ>
+        <SEQ TYPE="OPERATOR">(</SEQ>
+        <SEQ TYPE="OPERATOR">]</SEQ>
+        <SEQ TYPE="OPERATOR">[</SEQ>
+        <SEQ TYPE="OPERATOR">+</SEQ>
+        <SEQ TYPE="OPERATOR">-</SEQ>
+        <SEQ TYPE="OPERATOR">/</SEQ>
+        <SEQ TYPE="OPERATOR">*</SEQ>
+        <SEQ TYPE="OPERATOR">.</SEQ>
+        <SEQ TYPE="OPERATOR">,</SEQ>
+        <SEQ TYPE="OPERATOR">;</SEQ>
+        <SEQ TYPE="OPERATOR">^</SEQ>
+        <SEQ TYPE="OPERATOR">@</SEQ>
+        <SEQ TYPE="OPERATOR">:=</SEQ>
+        <SEQ TYPE="OPERATOR">:</SEQ>
+        <SEQ TYPE="OPERATOR">=</SEQ>
+        <SEQ TYPE="OPERATOR">/=</SEQ>
+        <SEQ TYPE="OPERATOR">&gt;</SEQ>
+        <SEQ TYPE="OPERATOR">&lt;</SEQ>
+        <SEQ TYPE="OPERATOR">&gt;=</SEQ>
+        <SEQ TYPE="OPERATOR">&lt;=</SEQ>
+
+        <KEYWORDS>
+            <!-- Reserved words -->
+            <KEYWORD1>AND</KEYWORD1>
+            <KEYWORD1>BEGIN</KEYWORD1>
+            <KEYWORD1>CASE</KEYWORD1>
+            <KEYWORD1>DIV</KEYWORD1>
+            <KEYWORD1>DO</KEYWORD1>
+            <KEYWORD1>ELSE</KEYWORD1>
+            <KEYWORD1>ELSIF</KEYWORD1>
+            <KEYWORD1>END</KEYWORD1>
+            <KEYWORD1>ESAC</KEYWORD1>
+            <KEYWORD1>EXIT</KEYWORD1>
+            <KEYWORD1>FI</KEYWORD1>
+            <KEYWORD1>FOR</KEYWORD1>
+            <KEYWORD1>GOTO</KEYWORD1>
+            <KEYWORD1>IF</KEYWORD1>
+            <KEYWORD1>IN</KEYWORD1>
+            <KEYWORD1>MOD</KEYWORD1>
+            <KEYWORD1>NOT</KEYWORD1>
+            <KEYWORD1>OD</KEYWORD1>
+            <KEYWORD1>OF</KEYWORD1>
+            <KEYWORD1>ON</KEYWORD1>
+            <KEYWORD1>OR</KEYWORD1>
+            <KEYWORD1>OUT</KEYWORD1>
+            <KEYWORD1>RESULT</KEYWORD1>
+            <KEYWORD1>RETURN</KEYWORD1>
+            <KEYWORD1>THEN</KEYWORD1>
+            <KEYWORD1>THEN</KEYWORD1>
+            <KEYWORD1>TO</KEYWORD1>
+            <KEYWORD1>UNTIL</KEYWORD1>
+            <KEYWORD1>USES</KEYWORD1>
+            <KEYWORD1>WHILE</KEYWORD1>
+            <KEYWORD1>WITH</KEYWORD1>
+            <KEYWORD1>XOR</KEYWORD1>
+            <!-- DEFINITIONS. -->
+            <KEYWORD2>ARRAY</KEYWORD2>
+            <KEYWORD2>DCL</KEYWORD2>
+            <KEYWORD2>GRANT</KEYWORD2>
+            <KEYWORD2>LABEL</KEYWORD2>
+            <KEYWORD2>MODULE</KEYWORD2>
+            <KEYWORD2>NEWMODE</KEYWORD2>
+            <KEYWORD2>PROC</KEYWORD2>
+            <KEYWORD2>POWERSET</KEYWORD2>
+            <KEYWORD2>SEIZE</KEYWORD2>
+            <KEYWORD2>SET</KEYWORD2>
+            <KEYWORD2>STRUCT</KEYWORD2>
+            <KEYWORD2>SYN</KEYWORD2>
+            <KEYWORD2>SYNMODE</KEYWORD2>
+            <KEYWORD2>TYPE</KEYWORD2>
+            <KEYWORD2>PACK</KEYWORD2>
+            <!-- ORDINAL TYPES. -->
+            <KEYWORD3>BIN</KEYWORD3>
+            <KEYWORD3>CHAR</KEYWORD3>
+            <KEYWORD3>INT</KEYWORD3>
+            <KEYWORD3>RANGE</KEYWORD3>
+            <!-- BOOLEAN TYPES. -->
+            <KEYWORD3>BOOL</KEYWORD3>
+            <!-- UNTYPED POINTER. -->
+            <KEYWORD3>PTR</KEYWORD3>
+            <KEYWORD3>REF</KEYWORD3>
+            
+            <LABEL>MODULE_DESCRIPTION_HEADER</LABEL>
+            <LABEL>PATCH_INFOS</LABEL>
+            <LABEL>LIO_INFOS</LABEL>
+            <LABEL>SWSG_INFOS</LABEL>
+            <LABEL>MSG_XREF</LABEL>            
+            <LABEL>EJECT</LABEL>            
+
+            <LITERAL2>FALSE</LITERAL2>
+            <LITERAL2>NULL</LITERAL2>
+            <LITERAL2>TRUE</LITERAL2>
+        </KEYWORDS>
+    </RULES>
+</MODE>
