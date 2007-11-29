@@ -12,6 +12,10 @@ GENERIC: (parse) ( state parser -- result )
 
 SYMBOL: packrat-cache
 SYMBOL: ignore 
+SYMBOL: not-in-cache
+
+: not-in-cache? ( result -- ? )
+  not-in-cache = ;
 
 : <parse-result> ( remaining ast -- parse-result )
   parse-result construct-boa ;
@@ -30,7 +34,9 @@ TUPLE: parser id ;
   dup slice? [ slice-from ] [ drop 0 ] if ;
 
 : get-cached ( input parser -- result )
-  [ from ] dip parser-id packrat-cache get at at ;
+  [ from ] dip parser-id packrat-cache get at at* [ 
+    drop not-in-cache 
+  ] unless ;
 
 : put-cached ( result input parser -- )
   parser-id dup packrat-cache get at [ 
@@ -44,9 +50,13 @@ PRIVATE>
 
 : parse ( input parser -- result )
   packrat-cache get [
-    2dup get-cached [
-      [ (parse) dup ] 2keep put-cached
-    ] unless* 
+    2dup get-cached dup not-in-cache? [ 
+!      "cache missed: " write over parser-id number>string write " - " write nl ! pick .
+      drop [ (parse) dup ] 2keep put-cached
+    ] [ 
+!      "cache hit: " write over parser-id number>string write " - " write nl ! pick . 
+      2nip
+    ] if
   ] [
     (parse)
   ] if ;
