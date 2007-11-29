@@ -1,14 +1,16 @@
 ! Copyright (C) 2007 Chris Double.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel sequences strings namespaces math assocs shuffle vectors combinators.lib ;
+USING: kernel sequences strings namespaces math assocs shuffle 
+       vectors arrays combinators.lib ;
 IN: peg
 
 TUPLE: parse-result remaining ast ;
 
-GENERIC: parse ( state parser -- result )
+GENERIC: (parse) ( state parser -- result )
 
 <PRIVATE
 
+SYMBOL: packrat-cache
 SYMBOL: ignore 
 
 : <parse-result> ( remaining ast -- parse-result )
@@ -24,18 +26,48 @@ TUPLE: parser id ;
 : init-parser ( parser -- parser )
   get-next-id parser construct-boa over set-delegate ;
 
+: from ( slice-or-string -- index )
+  dup slice? [ slice-from ] [ drop 0 ] if ;
+
+: get-cached ( input parser -- result )
+  [ from ] dip parser-id packrat-cache get at at ;
+
+: put-cached ( result input parser -- )
+  parser-id dup packrat-cache get at [ 
+    nip
+  ] [ 
+    H{ } clone dup >r swap packrat-cache get set-at r>
+  ] if* 
+  [ from ] dip set-at ;
+
+PRIVATE>
+
+: parse ( input parser -- result )
+  packrat-cache get [
+    2dup get-cached [
+      [ (parse) dup ] 2keep put-cached
+    ] unless* 
+  ] [
+    (parse)
+  ] if ;
+
+: packrat-parse ( input parser -- result )
+  H{ } clone packrat-cache [ parse ] with-variable ;
+
+<PRIVATE
+
 TUPLE: token-parser symbol ;
 
-M: token-parser parse ( state parser -- result )
+M: token-parser (parse) ( input parser -- result )
   token-parser-symbol 2dup head? [
     dup >r length tail-slice r> <parse-result>
   ] [
     2drop f
   ] if ;
-
+   
 TUPLE: satisfy-parser quot ;
 
-M: satisfy-parser parse ( state parser -- result )
+M: satisfy-parser (parse) ( state parser -- result )
   over empty? [
     2drop f 
   ] [
@@ -48,7 +80,7 @@ M: satisfy-parser parse ( state parser -- result )
 
 TUPLE: range-parser min max ;
 
-M: range-parser parse ( state parser -- result )
+M: range-parser (parse) ( state parser -- result )
   over empty? [
     2drop f
   ] [
@@ -77,7 +109,7 @@ TUPLE: seq-parser parsers ;
     drop   
   ] if ;
 
-M: seq-parser parse ( state parser -- result )
+M: seq-parser (parse) ( state parser -- result )
   seq-parser-parsers [ V{ } clone <parse-result> ] dip  (seq-parser) ;
 
 TUPLE: choice-parser parsers ;
@@ -93,7 +125,7 @@ TUPLE: choice-parser parsers ;
     ] if* 
   ] if ;
 
-M: choice-parser parse ( state parser -- result )
+M: choice-parser (parse) ( state parser -- result )
   choice-parser-parsers (choice-parser) ;
 
 TUPLE: repeat0-parser p1 ;
@@ -111,7 +143,7 @@ TUPLE: repeat0-parser p1 ;
   { parse-result-remaining parse-result-ast }
   get-slots 1vector  <parse-result> ;
 
-M: repeat0-parser parse ( state parser -- result )
+M: repeat0-parser (parse) ( state parser -- result )
      repeat0-parser-p1 2dup parse [ 
        nipd clone-result (repeat-parser) 
      ] [ 
@@ -120,17 +152,17 @@ M: repeat0-parser parse ( state parser -- result )
 
 TUPLE: repeat1-parser p1 ;
 
-M: repeat1-parser parse ( state parser -- result )
+M: repeat1-parser (parse) ( state parser -- result )
    repeat1-parser-p1 tuck parse dup [ clone-result (repeat-parser) ] [ nip ] if ;
 
 TUPLE: optional-parser p1 ;
 
-M: optional-parser parse ( state parser -- result )
+M: optional-parser (parse) ( state parser -- result )
    dupd optional-parser-p1 parse swap f <parse-result> or ;
 
 TUPLE: ensure-parser p1 ;
 
-M: ensure-parser parse ( state parser -- result )
+M: ensure-parser (parse) ( state parser -- result )
    dupd ensure-parser-p1 parse [
      ignore <parse-result>  
    ] [
@@ -139,7 +171,7 @@ M: ensure-parser parse ( state parser -- result )
 
 TUPLE: ensure-not-parser p1 ;
 
-M: ensure-not-parser parse ( state parser -- result )
+M: ensure-not-parser (parse) ( state parser -- result )
    dupd ensure-not-parser-p1 parse [
      drop f
    ] [
@@ -148,7 +180,7 @@ M: ensure-not-parser parse ( state parser -- result )
 
 TUPLE: action-parser p1 quot ;
 
-M: action-parser parse ( state parser -- result )
+M: action-parser (parse) ( state parser -- result )
    tuck action-parser-p1 parse dup [ 
      dup parse-result-ast rot action-parser-quot call
      swap [ set-parse-result-ast ] keep
@@ -165,12 +197,12 @@ M: action-parser parse ( state parser -- result )
 
 TUPLE: sp-parser p1 ;
 
-M: sp-parser parse ( state parser -- result )
+M: sp-parser (parse) ( state parser -- result )
   [ left-trim-slice ] dip sp-parser-p1 parse ;
 
 TUPLE: delay-parser quot ;
 
-M: delay-parser parse ( state parser -- result )
+M: delay-parser (parse) ( state parser -- result )
   delay-parser-quot call parse ;
 
 PRIVATE>

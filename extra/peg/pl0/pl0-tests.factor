@@ -5,9 +5,9 @@ USING: kernel tools.test peg peg.pl0 ;
 IN: temporary
 
 { "abc" } [
-  "abc" 'ident' parse parse-result-ast 
+  "abc" ident parse parse-result-ast 
 ] unit-test
 
 { 55 } [
-  "55abc" 'number' parse parse-result-ast 
+  "55abc" number parse parse-result-ast 
 ] unit-test
