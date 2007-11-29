@@ -83,7 +83,7 @@ M: ebnf-rule (generate-parser) ( ast -- id )
 
 M: ebnf-action (generate-parser) ( ast -- id )
   ebnf-action-word search 1quotation 
-  last-parser get swap action generate-parser ;
+  last-parser get get-parser swap action store-parser ;
 
 M: vector (generate-parser) ( ast -- id )
   [ generate-parser ] map peek ;
