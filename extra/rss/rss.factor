@@ -1,7 +1,7 @@
 ! Copyright (C) 2006 Chris Double, Daniel Ehrenberg.
 ! See http://factorcode.org/license.txt for BSD license.
 IN: rss
-USING: xml.utilities kernel promises parser-combinators assocs
+USING: xml.utilities kernel assocs
     strings sequences xml.data xml.writer
     io.streams.string combinators xml xml.entities io.files io
     http.client namespaces xml.generator hashtables ;
@@ -62,23 +62,17 @@ C: <entry> entry
         children>string <entry>
     ] map <feed> ;
 
-: feed ( xml -- feed )
+: xml>feed ( xml -- feed )
     dup name-tag {
         { "RDF" [ rss1.0 ] }
         { "rss" [ rss2.0 ] }
         { "feed" [ atom1.0 ] }
     } case ;
 
-: read-feed ( string -- feed )
-    ! &>&amp; ! this will be uncommented when parser-combinators are fixed
-    [ string>xml ] with-html-entities feed ;
+: read-feed ( stream -- feed )
+    [ read-xml ] with-html-entities xml>feed ;
 
-: load-news-file ( filename -- feed )
-    #! Load an news syndication file and process it, returning
-    #! it as an feed tuple.
-    <file-reader> [ contents read-feed ] keep stream-close ;
-
-: news-get ( url -- feed )
+: download-feed ( url -- feed )
     #! Retrieve an news syndication file, return as a feed tuple.
     http-get rot 200 = [
         nip read-feed
@@ -90,7 +84,7 @@ C: <entry> entry
 : simple-tag, ( content name -- )
     [ , ] tag, ;
 
-: (generate-atom) ( entry -- )
+: entry, ( entry -- )
     "entry" [
         dup entry-title "title" simple-tag,
         "link" over entry-link "href" associate contained*,
@@ -98,9 +92,12 @@ C: <entry> entry
         entry-description "content" simple-tag,
     ] tag, ;
 
-: generate-atom ( feed -- xml )
-    "feed" [
+: feed>xml ( feed -- xml )
+    "feed" { { "xmlns" "http://www.w3.org/2005/Atom" } } [
         dup feed-title "title" simple-tag,
         "link" over feed-link "href" associate contained*,
-        feed-entries [ (generate-atom) ] each
-    ] make-xml ;
+        feed-entries [ entry, ] each
+    ] make-xml* ;
+
+: write-feed ( feed -- xml )
+    feed>xml write-xml ;
