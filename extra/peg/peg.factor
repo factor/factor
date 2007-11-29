@@ -52,7 +52,11 @@ PRIVATE>
   packrat-cache get [
     2dup get-cached dup not-in-cache? [ 
 !      "cache missed: " write over parser-id number>string write " - " write nl ! pick .
-      drop [ (parse) dup ] 2keep put-cached
+      drop 
+      #! Protect against left recursion blowing the callstack
+      #! by storing a failed parse in the cache.
+      [ f ] dipd  [ put-cached ] 2keep
+      [ (parse) dup ] 2keep put-cached
     ] [ 
 !      "cache hit: " write over parser-id number>string write " - " write nl ! pick . 
       2nip
