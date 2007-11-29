@@ -1,17 +1,8 @@
 USING: kernel words inspector slots quotations sequences assocs
 math arrays inference effects shuffle continuations debugger
 tuples namespaces vectors bit-arrays byte-arrays strings sbufs
-math.functions macros ;
+math.functions macros combinators.private combinators ;
 IN: inverse
-
-: (repeat) ( from to quot -- )
-    pick pick >= [
-        3drop
-    ] [
-        [ swap >r call 1+ r> ] keep (repeat)
-    ] if ; inline
-
-: repeat ( n quot -- ) 0 -rot (repeat) ; inline
 
 TUPLE: fail ;
 : fail ( -- * ) \ fail construct-empty throw ;
@@ -27,16 +18,11 @@ M: fail summary drop "Unification failed" ;
 : define-inverse ( word quot -- ) "inverse" set-word-prop ;
 
 : define-math-inverse ( word quot1 quot2 -- )
-    2array "math-inverse" set-word-prop ;
+    pick 1quotation 3array "math-inverse" set-word-prop ;
 
 : define-pop-inverse ( word n quot -- )
     >r dupd "pop-length" set-word-prop r>
     "pop-inverse" set-word-prop ;
-
-DEFER: [undo]
-
-: make-inverse ( word -- quot )
-    word-def [undo] ;
 
 TUPLE: no-inverse word ;
 : no-inverse ( word -- * ) \ no-inverse construct-empty throw ;
@@ -54,10 +40,7 @@ M: no-inverse summary
     effect-in length 0 = and ;
 
 : assure-constant ( constant -- quot )
-    dup word? [
-        dup constant-word?
-        [ "Badly formed math inverse" throw ] unless
-    ] when 1quotation ;
+    dup word? [ "Badly formed math inverse" throw ] when 1quotation ;
 
 : swap-inverse ( math-inverse revquot -- revquot* quot )
     next assure-constant rot second [ swap ] swap 3compose ;
@@ -68,25 +51,52 @@ M: no-inverse summary
 : ?word-prop ( word/object name -- value/f )
     over word? [ word-prop ] [ 2drop f ] if ;
 
-GENERIC: inverse ( revquot word -- revquot* quot )
-
-M: word inverse
-    dup "inverse" word-prop [ ]
-    [ dup primitive? [ no-inverse ] [ make-inverse ] if ] ?if ;
-
 : undo-literal ( object -- quot )
     [ =/fail ] curry ;
+
+PREDICATE: word normal-inverse "inverse" word-prop ;
+PREDICATE: word math-inverse "math-inverse" word-prop ;
+PREDICATE: word pop-inverse "pop-length" word-prop ;
+UNION: explicit-inverse normal-inverse math-inverse pop-inverse ;
+
+: inline-word ( word -- )
+    {
+        { [ dup word? not over symbol? or ] [ , ] }
+        { [ dup explicit-inverse? ] [ , ] }
+        { [ dup compound? over { if dispatch } member? not and ]
+          [ word-def [ inline-word ] each ] }
+        { [ drop t ] [ "Quotation is not invertible" throw ] }
+    } cond ;
+
+: math-exp? ( n n word -- ? )
+    { + - * / ^ } member? -rot [ number? ] 2apply and and ;
+
+: (fold-constants) ( quot -- )
+    dup length 3 < [ % ] [
+        dup first3 3dup math-exp?
+        [ execute , 3 ] [ 2drop , 1 ] if
+        tail-slice (fold-constants) 
+    ] if ;
+
+: fold-constants ( quot -- folded )
+    [ (fold-constants) ] [ ] make ;
+
+: do-inlining ( quot -- inlined-quot )
+    [ [ inline-word ] each ] [ ] make fold-constants ;
+
+GENERIC: inverse ( revquot word -- revquot* quot )
 
 M: object inverse undo-literal ;
 M: symbol inverse undo-literal ;
 
-PREDICATE: word math-inverse "math-inverse" word-prop ;
+M: normal-inverse inverse
+    "inverse" word-prop ;
+
 M: math-inverse inverse
     "math-inverse" word-prop
     swap next dup \ swap =
     [ drop swap-inverse ] [ pull-inverse ] if ;
 
-PREDICATE: word pop-inverse "pop-length" word-prop ;
 M: pop-inverse inverse
     [ "pop-length" word-prop cut-slice swap ] keep
     "pop-inverse" word-prop compose call ;
@@ -96,11 +106,11 @@ M: pop-inverse inverse
     [ unclip-slice inverse % (undo) ] if ;
 
 : [undo] ( quot -- undo )
-    reverse [ (undo) ] [ ] make ;
+    do-inlining reverse [ (undo) ] [ ] make ;
 
 MACRO: undo ( quot -- ) [undo] ;
 
-! Inversions of selected words
+! Inverse of selected words
 
 \ swap [ swap ] define-inverse
 \ dup [ [ =/fail ] keep ] define-inverse
