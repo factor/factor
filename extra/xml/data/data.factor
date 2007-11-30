@@ -1,6 +1,6 @@
 ! Copyright (C) 2005, 2006 Daniel Ehrenberg
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel sequences sequences.private assocs arrays ;
+USING: kernel sequences sequences.private assocs arrays delegate ;
 IN: xml.data
 
 TUPLE: name space tag url ;
@@ -89,24 +89,11 @@ TUPLE: tag attrs children ;
     tag construct ;
 
 ! For convenience, tags follow the assoc protocol too (for attrs)
-M: tag at* tag-attrs at* ;
-M: tag set-at tag-attrs set-at ;
-M: tag new-assoc tag-attrs new-assoc ;
-M: tag >alist tag-attrs >alist ;
-M: tag delete-at tag-attrs delete-at ;
-M: tag clear-assoc tag-attrs clear-assoc ;
-M: tag assoc-size tag-attrs assoc-size ;
-M: tag assoc-like tag-attrs assoc-like ;
-
+CONSULT: assoc-protocol tag tag-attrs ;
 INSTANCE: tag assoc
 
 ! They also follow the sequence protocol (for children)
-M: tag nth tag-children nth ;
-M: tag nth-unsafe tag-children nth-unsafe ;
-M: tag set-nth tag-children set-nth ;
-M: tag set-nth-unsafe tag-children set-nth-unsafe ;
-M: tag length tag-children length ;
-
+CONSULT: sequence-protocol tag tag-children ;
 INSTANCE: tag sequence
 
 ! tag with children=f is contained
