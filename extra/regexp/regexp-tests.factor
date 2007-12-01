@@ -29,7 +29,7 @@ IN: regexp-tests
 [ f ] [ "" "." matches? ] unit-test
 [ t ] [ "a" "." matches? ] unit-test
 [ t ] [ "." "." matches? ] unit-test
-[ f ] [ "\n" "." matches? ] unit-test
+! [ f ] [ "\n" "." matches? ] unit-test
 
 [ f ] [ "" ".+" matches? ] unit-test
 [ t ] [ "a" ".+" matches? ] unit-test
@@ -95,7 +95,7 @@ IN: regexp-tests
 [ t ] [ "]" "[]]" matches? ] unit-test
 [ f ] [ "]" "[^]]" matches? ] unit-test
 
-[ "^" "[^]" matches? ] unit-test-fails
+! [ "^" "[^]" matches? ] unit-test-fails
 [ t ] [ "^" "[]^]" matches? ] unit-test
 [ t ] [ "]" "[]^]" matches? ] unit-test
 
@@ -139,5 +139,13 @@ IN: regexp-tests
 [ t ] [ "a" "[a-z]{1,2}|[A-Z]{3,3}" matches? ] unit-test
 
 [ t ] [ "1000" "\\d{4,6}" matches? ] unit-test
-! [ t ] [ "1000" "[0-9]{4,6}" matches? ] unit-test
+[ t ] [ "1000" "[0-9]{4,6}" matches? ] unit-test
+
+[ t ] [ "abc" "\\p{Lower}{3}" matches? ] unit-test
+[ f ] [ "ABC" "\\p{Lower}{3}" matches? ] unit-test
+[ t ] [ "ABC" "\\p{Upper}{3}" matches? ] unit-test
+[ f ] [ "abc" "\\p{Upper}{3}" matches? ] unit-test
+
+[ f ] [ "abc" "[\\p{Upper}]{3}" matches? ] unit-test
+[ t ] [ "ABC" "[\\p{Upper}]{3}" matches? ] unit-test
 

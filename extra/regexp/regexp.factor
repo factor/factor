@@ -4,34 +4,123 @@ promises quotations sequences sequences.lib strings ;
 USING: continuations io prettyprint ;
 IN: regexp
 
-: 'any-char'
-    "." token [ drop any-char-parser ] <@ ;
+: 1satisfy ( n -- parser )
+    [ = ] curry satisfy ;
 
-: escaped-char
+: satisfy-token ( string quot -- parser )
+    >r token r> [ satisfy ] curry [ drop ] swap compose <@ ;
+
+: octal-digit? ( n -- ? ) CHAR: 0 CHAR: 7 between? ; inline
+
+: decimal-digit? ( n -- ? ) CHAR: 0 CHAR: 9 between? ; inline
+
+: hex-digit? ( n -- ? )
+    dup decimal-digit?
+    swap CHAR: a CHAR: f between? or ;
+
+: octal? ( str -- ? ) [ octal-digit? ] all? ;
+
+: decimal? ( str -- ? ) [ decimal-digit? ] all? ;
+
+: hex? ( str -- ? ) [ hex-digit? ] all? ;
+
+: control-char? ( n -- ? )
+    dup 0 HEX: 1f between?
+    swap HEX: 7f = or ;
+
+: punct? ( n -- ? )
+    "!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~" member? ;
+
+: c-identifier-char? ( ch -- ? )
+    dup alpha? swap CHAR: _ = or ; inline
+
+: c-identifier? ( str -- ? )
+    [ c-identifier-char? ] all? ;
+
+: java-blank? ( n -- ? )
     {
-        { CHAR: d [ [ digit? ] ] }
-        { CHAR: D [ [ digit? not ] ] }
-        { CHAR: s [ [ blank? ] ] }
-        { CHAR: S [ [ blank? not ] ] }
-        { CHAR: \\ [ [ CHAR: \\ = ] ] }
-        [ "bad \\, use \\\\ to match a literal \\" throw ]
-    } case ;
+        CHAR: \t CHAR: \n CHAR: \r
+        HEX: c HEX: 7 HEX: 1b
+    } member? ;
 
-: 'escaped-char'
-    "\\" token any-char-parser &> [ escaped-char ] <@ ;
+: java-printable? ( n -- ? )
+    dup alpha? swap punct? or ;
 
-! Must escape to use as literals
-! : meta-chars "[\\^$.|?*+()" ;
 
-: 'ordinary-char'
-    [ "\\^*+?|(){}[" member? not ] satisfy ;
+: 'ordinary-char' ( -- parser )
+    [ "\\^*+?|(){}[" member? not ] satisfy [ 1satisfy ] <@ ;
 
-: 'char' 'escaped-char' 'ordinary-char' <|> ;
+: 'octal-digit' ( -- parser ) [ octal-digit? ] satisfy ;
+
+: 'octal' ( -- parser )
+    "\\0" token
+    'octal-digit'
+    'octal-digit' 'octal-digit' <&> <|>
+    [ CHAR: 0 CHAR: 3 between? ] satisfy
+    'octal-digit' <&> 'octal-digit' <:&> <|>
+    &> just [ oct> 1satisfy ] <@ ;
+
+: 'hex-digit' ( -- parser ) [ hex-digit? ] satisfy ;
+
+: 'hex' ( -- parser )
+    "\\x" token 'hex-digit' 'hex-digit' <&> &>
+    "\\u" token 'hex-digit' 'hex-digit' <&>
+    'hex-digit' <:&> 'hex-digit' <:&> &> <|> [ hex> 1satisfy ] <@ ;
+
+: 'control-character' ( -- parser )
+    "\\c" token [ LETTER? ] satisfy &> [ 1satisfy ] <@ ;
+
+: 'simple-escape-char' ( -- parser )
+    {
+        { "\\\\" [ CHAR: \\ = ] }
+        { "\\t" [ CHAR: \t = ] }
+        { "\\n" [ CHAR: \n = ] }
+        { "\\r" [ CHAR: \r = ] }
+        { "\\f" [ HEX: c = ] }
+        { "\\a" [ HEX: 7 = ] }
+        { "\\e" [ HEX: 1b = ] }
+    } [ first2 satisfy-token ] [ <|> ] map-reduce ;
+
+: 'predefined-char-class' ( -- parser )
+    {
+        { "." [ drop any-char-parser ] }
+        { "\\d" [ digit? ] }
+        { "\\D" [ digit? not ] }
+        { "\\s" [ java-blank? ] }
+        { "\\S" [ java-blank? not ] }
+        { "\\w" [ c-identifier? ] }
+        { "\\W" [ c-identifier? not ] }
+    } [ first2 satisfy-token ] [ <|> ] map-reduce ;
+
+: 'posix-character-class' ( -- parser )
+    {
+        { "\\p{Lower}" [ letter? ] }
+        { "\\p{Upper}" [ LETTER? ] }
+        { "\\p{ASCII}" [ 0 HEX: 7f between? ] }
+        { "\\p{Alpha}" [ Letter? ] }
+        { "\\p{Digit}" [ digit? ] }
+        { "\\p{Alnum}" [ alpha? ] }
+        { "\\p{Punct}" [ punct? ] }
+        { "\\p{Graph}" [ java-printable? ] }
+        { "\\p{Print}" [ java-printable? ] }
+        { "\\p{Blank}" [ " \t" member? ] }
+        { "\\p{Cntrl}" [ control-char? ] }
+        { "\\p{XDigit}" [ hex-digit? ] }
+        { "\\p{Space}" [ java-blank? ] }
+    } [ first2 satisfy-token ] [ <|> ] map-reduce ;
+
+: 'escape-seq' ( -- parser )
+    'simple-escape-char'
+    'predefined-char-class' <|>
+    'octal' <|>
+    'hex' <|>
+    'control-character' <|>
+    'posix-character-class' <|> ;
+
+: 'char' 'escape-seq' 'ordinary-char' <|> ;
 
 : 'string'
-    'char' <+> [
-        [ dup quotation? [ satisfy ] [ 1token ] if ] [ <&> ] map-reduce
-    ] <@ ;
+    'char' <+> [ [ <&> ] reduce* ] <@ ;
 
 : exactly-n ( parser n -- parser' )
     swap <repetition> and-parser construct-boa ;
@@ -72,28 +161,30 @@ C: <group-result> group-result
         [ dup ] swap compose [ drop t ] 2array
     ] map { [ t ] [ drop f ] } add [ cond ] curry ;
 
-: 'range'
+: 'range' ( -- parser )
     any-char-parser "-" token <& any-char-parser <&>
-    [ first2 [ between? ] 2curry ] <@ ;
+    [ first2 [ between? ] 2curry satisfy ] <@ ;
 
-: 'character-class-contents'
-    'escaped-char'
+: 'character-class-contents' ( -- parser )
+    'escape-seq'
     'range' <|>
-    [ "\\]" member? not ] satisfy <|> ;
+    [ "\\]" member? not ] satisfy [ 1satisfy ] <@ <|> ;
 
-: 'character-class'
+: make-character-class ( seq ? -- )
+    >r [ parser>predicate ] map predicates>cond r>
+    [ [ not ] compose ] when satisfy ;
+
+: 'character-class' ( -- parser )
     "[" token
-    "^" token 'character-class-contents' <+> <&:>
-        [ predicates>cond [ not ] compose satisfy ] <@
-    "]" token [ first ] <@ 'character-class-contents' <*> <&:>
-        [ predicates>cond satisfy ] <@ <|>
-    'character-class-contents' <+> [ predicates>cond satisfy ] <@ <|>
+    "^" token 'character-class-contents' <+> &> [ t make-character-class ] <@
+    "]" token [ first 1satisfy ] <@ 'character-class-contents' <*> <&:>
+        [ f make-character-class ] <@ <|>
+    'character-class-contents' <+> [ f make-character-class ] <@ <|>
     &>
     "]" token <& ;
 
-: 'term'
-    'any-char'
-    'string' <|>
+: 'term' ( -- parser )
+    'string'
     'grouping' <|>
     'character-class' <|>
     <+> [
@@ -101,7 +192,7 @@ C: <group-result> group-result
         [ first ] [ and-parser construct-boa ] if
     ] <@ ;
 
-: 'interval'
+: 'interval' ( -- parser )
     'term' "{" token <& 'integer' <&> "}" token <& [ first2 exactly-n ] <@
     'term' "{" token <& 'integer' <&> "," token <& "}" token <&
         [ first2 at-least-n ] <@ <|>
@@ -110,7 +201,7 @@ C: <group-result> group-result
     'term' "{" token <& 'integer' <&> "," token <& 'integer' <:&> "}" token <&
         [ first3 from-m-to-n ] <@ <|> ;
 
-: 'repetition'
+: 'repetition' ( -- parser )
     'term'
     [ "*+?" member? ] satisfy <&> [
         first2 {
@@ -148,3 +239,8 @@ M: object >regexp ;
 : R" CHAR: " parse-regexp ; parsing
 : R' CHAR: ' parse-regexp ; parsing
 : R` CHAR: ` parse-regexp ; parsing
+
+! \Q  \E
+! Must escape to use as literals
+! : meta-chars "[\\^$.|?*+()" ;
+
