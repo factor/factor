@@ -109,11 +109,17 @@ IN: regexp
         { "\\p{Space}" [ java-blank? ] }
     } [ first2 satisfy-token ] [ <|> ] map-reduce ;
 
+: 'escaped-seq' ( -- parser )
+    "\\Q" token
+    any-char-parser <*> [ token ] <@ &>
+    "\\E" token <& ;
+
 : 'escape-seq' ( -- parser )
     'simple-escape-char'
     'predefined-char-class' <|>
     'octal' <|>
     'hex' <|>
+    'escaped-seq' <|>
     'control-character' <|>
     'posix-character-class' <|> ;
 
@@ -239,8 +245,3 @@ M: object >regexp ;
 : R" CHAR: " parse-regexp ; parsing
 : R' CHAR: ' parse-regexp ; parsing
 : R` CHAR: ` parse-regexp ; parsing
-
-! \Q  \E
-! Must escape to use as literals
-! : meta-chars "[\\^$.|?*+()" ;
-

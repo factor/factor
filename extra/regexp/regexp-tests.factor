@@ -149,3 +149,8 @@ IN: regexp-tests
 [ f ] [ "abc" "[\\p{Upper}]{3}" matches? ] unit-test
 [ t ] [ "ABC" "[\\p{Upper}]{3}" matches? ] unit-test
 
+[ t ] [ "" "\\Q\\E" matches? ] unit-test
+[ f ] [ "a" "\\Q\\E" matches? ] unit-test
+[ t ] [ "|*+" "\\Q|*+\\E" matches? ] unit-test
+[ f ] [ "abc" "\\Q|*+\\E" matches? ] unit-test
+
