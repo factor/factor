@@ -62,3 +62,11 @@ IN: sequences.lib
 
 : delete-random ( seq -- value )
     [ length random ] keep [ nth ] 2keep delete-nth ;
+
+: (map-until) ( quot pred -- )
+    [ dup ] swap 3compose
+    [ [ drop t ] [ , f ] if ] compose [ find 2drop ] curry ;
+
+: map-until ( seq quot pred -- )
+    #! Example: { 1 3 5 6 } [ sq ] [ even? ] map-until . -> { 1 9 25 }
+    (map-until) { } make ;
