@@ -1,7 +1,7 @@
 ! Copyright (C) 2004 Chris Double.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: lazy-lists promises kernel sequences strings math
-arrays splitting ;
+arrays splitting quotations combinators ;
 IN: parser-combinators
 
 ! Parser combinator protocol
@@ -20,6 +20,15 @@ TUPLE: parse-result parsed unparsed ;
     ] if ;
 
 C: <parse-result> parse-result
+
+: parse-result-parsed-slice ( parse-result -- slice )
+    dup parse-result-parsed empty? [
+        parse-result-unparsed 0 0 rot <slice>
+    ] [
+        dup parse-result-unparsed
+        dup slice-from [ rot parse-result-parsed length - ] keep
+        rot slice-seq <slice>
+    ] if ;
 
 TUPLE: token-parser string ;
 
@@ -280,3 +289,19 @@ LAZY: <(+)> ( parser -- parser )
 
 LAZY: surrounded-by ( parser start end -- parser' )
     [ token ] 2apply swapd pack ;
+
+: predicates>cond ( seq -- quot )
+    #! Takes an array of quotation predicates/objects and makes a cond
+    #! Makes a predicate of each obj like so:  [ dup obj = ]
+    #! Leaves quotations alone
+    #! The cond returns a boolean, t if one of the predicates matches
+    [
+        dup callable? [ [ = ] curry ] unless
+        [ dup ] swap compose [ drop t ] 2array
+    ] map { [ t ] [ drop f ] } add [ cond ] curry ;
+
+GENERIC: parser>predicate ( obj -- quot )
+
+M: satisfy-parser parser>predicate ( obj -- quot )
+    satisfy-parser-quot ;
+
