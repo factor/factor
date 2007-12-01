@@ -1,7 +1,6 @@
 USING: arrays http.parser.utils hashtables io kernel
 namespaces prettyprint quotations
 sequences splitting state-parser strings ;
-USE: tools.interpreter
 IN: http.parser
 
 TUPLE: tag name attributes text matched? closing? ;

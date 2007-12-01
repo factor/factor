@@ -1,4 +1,4 @@
-USING: assocs browser.parser kernel math sequences strings ;
+USING: assocs http.parser kernel math sequences strings ;
 IN: http.parser.analyzer
 
 : remove-blank-text ( vector -- vector' )
