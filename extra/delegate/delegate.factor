@@ -42,7 +42,7 @@ M: tuple-class group-words
 
 PROTOCOL: sequence-protocol
     clone clone-like like new new-resizable nth nth-unsafe
-    set-nth set-nth-unsafe length immutable set-length lengthen ;
+    set-nth set-nth-unsafe length set-length lengthen ;
 
 PROTOCOL: assoc-protocol
     at* assoc-size >alist assoc-find set-at

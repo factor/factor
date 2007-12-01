@@ -42,8 +42,11 @@ M: process-missing error.
 : build-tag ( item name -- tag )
     >r 1array r> build-tag* ;
 
+: standard-prolog ( -- prolog )
+    T{ prolog f "1.0" "iso-8859-1" f } ;
+
 : build-xml ( tag -- xml )
-    T{ prolog f "1.0" "iso-8859-1" f } { } rot { } <xml> ;
+    standard-prolog { } rot { } <xml> ;
 
 : children>string ( tag -- string )
     tag-children

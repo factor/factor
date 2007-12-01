@@ -62,3 +62,7 @@ IN: sequences.lib
 
 : delete-random ( seq -- value )
     [ length random ] keep [ nth ] 2keep delete-nth ;
+
+: split-around ( seq quot -- before elem after )
+    dupd find over [ "Element not found" throw ] unless
+    >r cut-slice 1 tail r> swap ; inline
