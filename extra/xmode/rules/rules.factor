@@ -45,23 +45,6 @@ MEMO: standard-rule-set ( id -- ruleset )
         over [ >r V{ } like r> over push-all ] [ nip ] if
     ] when* ;
 
-DEFER: get-rules
-
-: get-imported-rules ( vector/f char ruleset -- vector/f )
-    rule-set-imports [ get-rules ?push-all ] curry* each ;
-
-: get-always-rules ( vector/f ruleset -- vector/f )
-    f swap rule-set-rules at ?push-all ;
-
-: get-char-rules ( vector/f char ruleset -- vector/f )
-    >r ch>upper r> rule-set-rules at ?push-all ;
-
-: get-rules ( char ruleset -- seq )
-    f -rot
-    [ get-char-rules ] 2keep
-    [ get-always-rules ] keep
-    get-imported-rules ;
-
 : rule-set-no-word-sep* ( ruleset -- str )
     dup rule-set-keywords keyword-map-no-word-sep*
     swap rule-set-no-word-sep "_" 3append ;

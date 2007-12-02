@@ -24,8 +24,18 @@ assocs combinators combinators.lib strings regexp splitting ;
 : mark-number ( keyword -- id )
     keyword-number? DIGIT and ;
 
+: resolve-delegate ( name -- rules )
+    dup string? [
+        "::" split1 [ swap load-mode at ] [ rule-sets get at ] if*
+    ] when ;
+
+: rule-set-keyword-maps ( ruleset -- seq )
+    dup rule-set-imports
+    [ resolve-delegate rule-set-keyword-maps ] map concat
+    swap rule-set-keywords add ;
+
 : mark-keyword ( keyword -- id )
-    current-keywords at ;
+    current-rule-set rule-set-keyword-maps assoc-stack ;
 
 : add-remaining-token ( -- )
     current-rule-set rule-set-default prev-token, ;
@@ -45,30 +55,6 @@ assocs combinators combinators.lib strings regexp splitting ;
 : current-char ( -- char )
     position get line get nth ;
 
-GENERIC: perform-rule ( rule -- )
-
-: ... ;
-
-M: escape-rule perform-rule ( rule -- ) ... ;
-
-: find-escape-rule ( -- rule )
-    context get dup
-    line-context-in-rule-set rule-set-escape-rule
-    [ ] [ line-context-parent find-escape-rule ] ?if ;
-
-: check-escape-rule ( rule -- )
-    #! Unlike jEdit, we keep checking parents until we find
-    #! an escape rule.
-    dup rule-no-escape? [ drop ] [
-        drop
-        ! find-escape-rule
-        ! current-rule-set rule-set-escape-rule [
-        !     find-escape-rule
-        ! ] [
-        !     
-        ! ] if*
-    ] if ;
-
 GENERIC: match-position ( rule -- n )
 
 M: mark-previous-rule match-position drop last-offset get ;
@@ -83,9 +69,9 @@ M: rule match-position drop position get ;
         [ over matcher-at-word-start?     over last-offset get =    implies ]
     } && 2nip ;
 
-: matches-not-mark-following? ... ;
-
 GENERIC: text-matches? ( position text -- match-count/f )
+
+M: f text-matches? 2drop f ;
 
 M: string text-matches?
     ! XXX ignore case
@@ -103,7 +89,7 @@ M: string text-matches?
 
 : rule-end-matches? ( rule -- match-count/f )
     dup mark-following-rule? [
-        dup rule-end swap can-match-here? 0 and
+        dup rule-start swap can-match-here? 0 and
     ] [
         dup rule-end tuck swap can-match-here? [
             position get swap matcher-text
@@ -114,9 +100,47 @@ M: string text-matches?
         ] if
     ] if ;
 
+DEFER: get-rules
+
+: get-imported-rules ( vector/f char ruleset -- vector/f )
+    rule-set-imports
+    [ resolve-delegate get-rules ?push-all ] curry* each ;
+
+: get-always-rules ( vector/f ruleset -- vector/f )
+    f swap rule-set-rules at ?push-all ;
+
+: get-char-rules ( vector/f char ruleset -- vector/f )
+    >r ch>upper r> rule-set-rules at ?push-all ;
+
+: get-rules ( char ruleset -- seq )
+    f -rot
+    [ get-char-rules ] 2keep
+    [ get-always-rules ] keep
+    get-imported-rules ;
+
 GENERIC: handle-rule-start ( match-count rule -- )
 
 GENERIC: handle-rule-end ( match-count rule -- )
+
+: find-escape-rule ( -- rule )
+    context get dup
+    line-context-in-rule-set rule-set-escape-rule [ ] [
+        line-context-parent line-context-in-rule-set
+        dup [ rule-set-escape-rule ] when
+    ] ?if ;
+
+: check-escape-rule ( rule -- ? )
+    rule-no-escape? [ f ] [
+        find-escape-rule dup [
+            dup rule-start-matches? dup [
+                swap handle-rule-start
+                delegate-end-escaped? [ not ] change
+                t
+            ] [
+                2drop f
+            ] if
+        ] when
+    ] if ;
 
 : check-every-rule ( -- ? )
     current-char current-rule-set get-rules
@@ -129,11 +153,6 @@ GENERIC: handle-rule-end ( match-count rule -- )
         dup [ swap handle-rule-end ] [ 2drop ] if
     ] when* ;
 
-: handle-escape-rule ( rule -- )
-    ?end-rule
-    ;
-!        ... process escape ... ;
-
 : rule-match-token* ( rule -- id )
     dup rule-match-token {
         { f [ dup rule-body-token ] }
@@ -141,10 +160,13 @@ GENERIC: handle-rule-end ( match-count rule -- )
         [ ]
     } case nip ;
 
-: resolve-delegate ( name -- rules )
-    dup string? [
-        "::" split1 [ swap load-mode at ] [ rule-sets get at ] if*
-    ] when ;
+M: escape-rule handle-rule-start
+    drop
+    ?end-rule
+    process-escape? get [
+        escaped? [ not ] change
+        position [ + ] change
+    ] [ 2drop ] if ;
 
 M: seq-rule handle-rule-start
     ?end-rule
@@ -174,6 +196,10 @@ M: mark-following-rule handle-rule-start
     f context get set-line-context-end
     context get set-line-context-in-rule ;
 
+M: mark-following-rule handle-rule-end
+    nip rule-match-token* prev-token,
+    f context get set-line-context-in-rule ;
+
 M: mark-previous-rule handle-rule-start
     ?end-rule
     mark-token
@@ -183,7 +209,7 @@ M: mark-previous-rule handle-rule-start
 : do-escaped
     escaped? get [
         escaped? off
-        ...
+        ! ...
     ] when ;
 
 : check-end-delegate ( -- ? )
@@ -198,14 +224,14 @@ M: mark-previous-rule handle-rule-start
                 ] keep context get line-context-parent line-context-in-rule rule-match-token* next-token,
                 pop-context
                 seen-whitespace-end? on t
-            ] [ 2drop f ] if
+            ] [ drop check-escape-rule ] if
         ] [ f ] if*
     ] [ f ] if* ;
 
 : handle-no-word-break ( -- )
     context get line-context-parent [
         line-context-in-rule dup rule-no-word-break? [
-            rule-match-token prev-token,
+            rule-match-token* prev-token,
             pop-context
         ] [ drop ] if
     ] when* ;
@@ -221,6 +247,10 @@ M: mark-previous-rule handle-rule-start
     
     1 current-rule-set rule-set-default next-token, ;
 
+: rule-set-empty? ( ruleset -- ? )
+    dup rule-set-rules assoc-empty?
+    swap rule-set-keywords assoc-empty? and ;
+
 : check-word-break ( -- ? )
     current-char dup blank? [
         drop
@@ -232,14 +262,17 @@ M: mark-previous-rule handle-rule-start
         (check-word-break)
 
     ] [
-        dup alpha? [
+        ! Micro-optimization with incorrect semantics; we keep
+        ! it here because jEdit mode files depend on it now...
+        current-rule-set rule-set-empty? [
             drop
         ] [
-            dup current-rule-set dup short. rule-set-no-word-sep* dup . member? [
-                "A: " write write1 nl
+            dup alpha? [
+                drop
             ] [
-                "B: " write write1 nl
-                (check-word-break)
+                current-rule-set rule-set-no-word-sep* member? [
+                    (check-word-break)
+                ] unless
             ] if
         ] if
 

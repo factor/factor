@@ -14,6 +14,7 @@ SYMBOL: whitespace-end
 SYMBOL: seen-whitespace-end?
 
 SYMBOL: escaped?
+SYMBOL: process-escape?
 SYMBOL: delegate-end-escaped?
 SYMBOL: terminated?
 
@@ -61,5 +62,6 @@ SYMBOL: terminated?
     0 position set
     0 last-offset set
     0 whitespace-end set
+    process-escape? on
     [ clone ] [ main-rule-set f <line-context> ] if*
     context set ;

@@ -35,8 +35,7 @@ IN: xmode.loader
     dup children>string swap position-attrs <matcher> ;
 
 : parse-regexp-matcher ( tag -- matcher )
-    ! XXX
-    dup children>string swap position-attrs <matcher> ;
+    dup children>string <regexp> swap position-attrs <matcher> ;
 
 ! SPAN's children
 <TAGS: parse-begin/end-tag
@@ -146,7 +145,7 @@ TAGS>
         { "SET" string>rule-set-name set-rule-set-name }
         { "IGNORE_CASE" string>boolean set-rule-set-ignore-case? }
         { "HIGHLIGHT_DIGITS" string>boolean set-rule-set-highlight-digits? }
-        { "DIGIT_RE" f set-rule-set-digit-re } ! XXX
+        { "DIGIT_RE" <regexp> set-rule-set-digit-re } ! XXX
         { "ESCAPE" f add-escape-rule }
         { "DEFAULT" string>token set-rule-set-default }
         { "NO_WORD_SEP" f set-rule-set-no-word-sep }
