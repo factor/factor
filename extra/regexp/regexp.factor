@@ -7,23 +7,6 @@ IN: regexp
 : or-predicates ( quots -- quot )
     [ \ dup add* ] map [ [ t ] ] f short-circuit \ nip add ;
 
-: exactly-n ( parser n -- parser' )
-    swap <repetition> <and-parser> ;
-
-: at-most-n ( parser n -- parser' )
-    dup zero? [
-        2drop epsilon
-    ] [
-        2dup exactly-n
-        -rot 1- at-most-n <|>
-    ] if ;
-
-: at-least-n ( parser n -- parser' )
-    dupd exactly-n swap <*> <&> ;
-
-: from-m-to-n ( parser m n -- parser' )
-    >r [ exactly-n ] 2keep r> swap - at-most-n <&> ;
-
 : octal-digit? ( n -- ? ) CHAR: 0 CHAR: 7 between? ;
 
 : decimal-digit? ( n -- ? ) CHAR: 0 CHAR: 9 between? ;
@@ -58,24 +41,25 @@ MACRO: fast-member? ( str -- quot )
     [ "\\^*+?|(){}[" fast-member? not ] satisfy
     [ [ = ] curry ] <@ ;
 
-: 'octal-digit' ( -- parser )
-    [ octal-digit? ] satisfy ;
+: 'octal-digit' ( -- parser ) [ octal-digit? ] satisfy ;
 
 : 'octal' ( -- parser )
-    "0" token
-    'octal-digit' 3 exactly-n
-    'octal-digit' 1 2 from-m-to-n <|>
-    &> [ oct> [ = ] curry ] <@ ;
+    "0" token 'octal-digit' 1 3 from-m-to-n &>
+    [ oct> ] <@ ;
 
 : 'hex-digit' ( -- parser ) [ hex-digit? ] satisfy ;
 
 : 'hex' ( -- parser )
     "x" token 'hex-digit' 2 exactly-n &>
     "u" token 'hex-digit' 4 exactly-n &> <|>
-    [ hex> [ = ] curry ] <@ ;
+    [ hex> ] <@ ;
 
 : 'control-character' ( -- parser )
-    "c" token [ LETTER? ] satisfy [ [ = ] curry ] <@ &> ;
+    "c" token [ LETTER? ] satisfy &> ;
+
+: 'simple-escape' ( -- parser )
+    'octal' 'hex' 'control-character' <|> <|>
+    [ [ = ] curry ] <@ ;
 
 : satisfy-tokens ( assoc -- parser )
     [ >r token r> [ nip ] curry <@ ] { } assoc>map <or-parser> ;
@@ -120,11 +104,9 @@ MACRO: fast-member? ( str -- quot )
 
 : 'escape' ( -- parser )
     "\\" token
-    'simple-escape-char'
+    'simple-escape'
+    'simple-escape-char' <|>
     'predefined-char-class' <|>
-    'octal' <|>
-    'hex' <|>
-    'control-character' <|>
     'posix-character-class' <|> &> ;
 
 : 'any-char' "." token [ drop [ drop t ] ] <@ ;
@@ -132,7 +114,8 @@ MACRO: fast-member? ( str -- quot )
 : 'char'
     'any-char' 'escape' 'ordinary-char' <|> <|> [ satisfy ] <@ ;
 
-: 'string' 'char' <+> [ <and-parser> ] <@ ;
+: 'string'
+    'char' <+> [ <and-parser> ] <@ ;
 
 DEFER: 'regexp'
 
@@ -183,16 +166,11 @@ C: <group-result> group-result
     'term' 'integer' "," token <& 'integer' <&> "{" "}" surrounded-by <&> [ first2 first2 from-m-to-n ] <@ <|> ;
 
 : 'repetition' ( -- parser )
-    'term'
-    [ "*+?" member? ] satisfy <&> [
-        first2 {
-            { CHAR: * [ <*> ] }
-            { CHAR: + [ <+> ] }
-            { CHAR: ? [ <?> ] }
-        } case
-    ] <@ ;
+    'term' "*" token <& [ <*> ] <@ 
+    'term' "+" token <& [ <+> ] <@ <|>
+    'term' "?" token <& [ <?> ] <@ <|> ;
 
-: 'simple' 'term' 'repetition' <|> 'interval' <|> ;
+: 'simple' 'term' 'repetition' 'interval' <|> <|> ;
 
 LAZY: 'union' ( -- parser )
     'simple'

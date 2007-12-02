@@ -156,3 +156,7 @@ IN: regexp-tests
 
 [ t ] [ "S" "\\0123" matches? ] unit-test
 [ t ] [ "SXY" "\\0123XY" matches? ] unit-test
+[ t ] [ "x" "\\x78" matches? ] unit-test
+[ f ] [ "y" "\\x78" matches? ] unit-test
+[ t ] [ "x" "\\u0078" matches? ] unit-test
+[ f ] [ "y" "\\u0078" matches? ] unit-test
