@@ -154,3 +154,5 @@ IN: regexp-tests
 [ t ] [ "|*+" "\\Q|*+\\E" matches? ] unit-test
 [ f ] [ "abc" "\\Q|*+\\E" matches? ] unit-test
 
+[ t ] [ "S" "\\0123" matches? ] unit-test
+[ t ] [ "SXY" "\\0123XY" matches? ] unit-test
