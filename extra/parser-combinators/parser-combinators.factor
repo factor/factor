@@ -290,18 +290,19 @@ LAZY: <(+)> ( parser -- parser )
 LAZY: surrounded-by ( parser start end -- parser' )
     [ token ] 2apply swapd pack ;
 
-: predicates>cond ( seq -- quot )
-    #! Takes an array of quotation predicates/objects and makes a cond
-    #! Makes a predicate of each obj like so:  [ dup obj = ]
-    #! Leaves quotations alone
-    #! The cond returns a boolean, t if one of the predicates matches
-    [
-        dup callable? [ [ = ] curry ] unless
-        [ dup ] swap compose [ drop t ] 2array
-    ] map { [ t ] [ drop f ] } add [ cond ] curry ;
+: exactly-n ( parser n -- parser' )
+    swap <repetition> <and-parser> ;
 
-GENERIC: parser>predicate ( obj -- quot )
+: at-most-n ( parser n -- parser' )
+    dup zero? [
+        2drop epsilon
+    ] [
+        2dup exactly-n
+        -rot 1- at-most-n <|>
+    ] if ;
 
-M: satisfy-parser parser>predicate ( obj -- quot )
-    satisfy-parser-quot ;
+: at-least-n ( parser n -- parser' )
+    dupd exactly-n swap <*> <&> ;
 
+: from-m-to-n ( parser m n -- parser' )
+    >r [ exactly-n ] 2keep r> swap - at-most-n <&> ;
