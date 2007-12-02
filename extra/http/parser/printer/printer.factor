@@ -1,9 +1,9 @@
-USING: assocs browser.parser browser.utils combinators
+USING: assocs http.parser browser.utils combinators
 continuations hashtables
 hashtables.private io kernel math
 namespaces prettyprint quotations sequences splitting
 state-parser strings ;
-IN: browser.printer
+IN: http.parser.printer
 
 SYMBOL: no-section
 SYMBOL: html

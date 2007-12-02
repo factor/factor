@@ -2,8 +2,8 @@ USING: assocs circular combinators continuations hashtables
 hashtables.private io kernel math
 namespaces prettyprint quotations sequences splitting
 state-parser strings ;
-USING: browser.parser ;
-IN: browser.utils
+USING: http.parser ;
+IN: http.parser.utils
 
 : string-parse-end?
     get-next not ;

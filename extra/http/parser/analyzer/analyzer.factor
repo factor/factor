@@ -1,14 +1,22 @@
-USING: assocs browser.parser kernel math sequences strings ;
-IN: browser.analyzer
+USING: assocs http.parser kernel math sequences strings ;
+IN: http.parser.analyzer
 
-: remove-blank-text ( vector -- vector )
+: remove-blank-text ( vector -- vector' )
     [
         dup tag-name text = [
-            tag-text [ blank? not ] all?
+            tag-text [ blank? ] all? not
         ] [
             drop t
         ] if
     ] subset ;
+
+: trim-text ( vector -- vector' )
+    [
+        dup tag-name text = [
+            [ tag-text [ blank? ] trim ] keep
+            [ set-tag-text ] keep
+        ] when
+    ] map ;
 
 : find-by-id ( id vector -- vector )
     [ tag-attributes "id" swap at = ] curry* subset ;
