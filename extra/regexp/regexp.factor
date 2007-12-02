@@ -173,9 +173,7 @@ C: <group-result> group-result
 : 'simple' 'term' 'repetition' 'interval' <|> <|> ;
 
 LAZY: 'union' ( -- parser )
-    'simple'
-    'simple' "|" token nonempty-list-of [ <or-parser> ] <@
-    <|> ;
+    'simple' "|" token nonempty-list-of [ <or-parser> ] <@ ;
 
 LAZY: 'regexp' ( -- parser )
     'repetition' 'union' <|> ;
