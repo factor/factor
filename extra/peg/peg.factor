@@ -1,7 +1,7 @@
 ! Copyright (C) 2007 Chris Double.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel sequences strings namespaces math assocs shuffle 
-       vectors arrays combinators.lib ;
+       vectors arrays combinators.lib memoize ;
 IN: peg
 
 TUPLE: parse-result remaining ast ;
@@ -12,6 +12,10 @@ GENERIC: (parse) ( state parser -- result )
 
 SYMBOL: packrat-cache
 SYMBOL: ignore 
+SYMBOL: not-in-cache
+
+: not-in-cache? ( result -- ? )
+  not-in-cache = ;
 
 : <parse-result> ( remaining ast -- parse-result )
   parse-result construct-boa ;
@@ -30,7 +34,9 @@ TUPLE: parser id ;
   dup slice? [ slice-from ] [ drop 0 ] if ;
 
 : get-cached ( input parser -- result )
-  [ from ] dip parser-id packrat-cache get at at ;
+  [ from ] dip parser-id packrat-cache get at at* [ 
+    drop not-in-cache 
+  ] unless ;
 
 : put-cached ( result input parser -- )
   parser-id dup packrat-cache get at [ 
@@ -44,9 +50,17 @@ PRIVATE>
 
 : parse ( input parser -- result )
   packrat-cache get [
-    2dup get-cached [
+    2dup get-cached dup not-in-cache? [ 
+!      "cache missed: " write over parser-id number>string write " - " write nl ! pick .
+      drop 
+      #! Protect against left recursion blowing the callstack
+      #! by storing a failed parse in the cache.
+      [ f ] dipd  [ put-cached ] 2keep
       [ (parse) dup ] 2keep put-cached
-    ] unless* 
+    ] [ 
+!      "cache hit: " write over parser-id number>string write " - " write nl ! pick . 
+      2nip
+    ] if
   ] [
     (parse)
   ] if ;
@@ -207,13 +221,13 @@ M: delay-parser (parse) ( state parser -- result )
 
 PRIVATE>
 
-: token ( string -- parser )
+MEMO: token ( string -- parser )
   token-parser construct-boa init-parser ;      
 
 : satisfy ( quot -- parser )
   satisfy-parser construct-boa init-parser ;
 
-: range ( min max -- parser )
+MEMO: range ( min max -- parser )
   range-parser construct-boa init-parser ;
 
 : seq ( seq -- parser )
@@ -222,32 +236,32 @@ PRIVATE>
 : choice ( seq -- parser )
   choice-parser construct-boa init-parser ;
 
-: repeat0 ( parser -- parser )
+MEMO: repeat0 ( parser -- parser )
   repeat0-parser construct-boa init-parser ;
 
-: repeat1 ( parser -- parser )
+MEMO: repeat1 ( parser -- parser )
   repeat1-parser construct-boa init-parser ;
 
-: optional ( parser -- parser )
+MEMO: optional ( parser -- parser )
   optional-parser construct-boa init-parser ;
 
-: ensure ( parser -- parser )
+MEMO: ensure ( parser -- parser )
   ensure-parser construct-boa init-parser ;
 
-: ensure-not ( parser -- parser )
+MEMO: ensure-not ( parser -- parser )
   ensure-not-parser construct-boa init-parser ;
 
 : action ( parser quot -- parser )
   action-parser construct-boa init-parser ;
 
-: sp ( parser -- parser )
+MEMO: sp ( parser -- parser )
   sp-parser construct-boa init-parser ;
 
-: hide ( parser -- parser )
+MEMO: hide ( parser -- parser )
   [ drop ignore ] action ;
 
-: delay ( parser -- parser )
+MEMO: delay ( parser -- parser )
   delay-parser construct-boa init-parser ;
 
-: list-of ( items separator -- parser )
+MEMO: list-of ( items separator -- parser )
   hide over 2array seq repeat0 [ concat ] action 2array seq [ unclip 1vector swap first append ] action ;
