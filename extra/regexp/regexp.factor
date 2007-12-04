@@ -41,7 +41,7 @@ MACRO: fast-member? ( str -- quot )
     dup alpha? swap punct? or ;
 
 : 'ordinary-char' ( -- parser )
-    [ "\\^*+?|(){}[" fast-member? not ] satisfy
+    [ "\\^*+?|(){}[$" fast-member? not ] satisfy
     [ [ = ] curry ] <@ ;
 
 : 'octal-digit' ( -- parser ) [ octal-digit? ] satisfy ;
@@ -185,7 +185,13 @@ C: <group-result> group-result
     <+> [ <and-parser> ] <@ ;
 
 LAZY: 'regexp' ( -- parser )
-    'term' "|" token nonempty-list-of [ <or-parser> ] <@ ;
+    'term' "|" token nonempty-list-of [ <or-parser> ] <@
+    "^" token 'term' "|" token nonempty-list-of [ <or-parser> ] <@
+        &> [ "caret" print ] <@ <|>
+    'term' "|" token nonempty-list-of [ <or-parser> ] <@
+        "$" token <& [ "dollar" print ] <@ <|>
+    "^" token 'term' "|" token nonempty-list-of [ <or-parser> ] <@ &>
+        "$" token [ "caret dollar" print ] <@ <& <|> ;
 
 TUPLE: regexp source parser ;
 
